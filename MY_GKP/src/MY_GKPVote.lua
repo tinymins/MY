@@ -35,10 +35,10 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_GKP/lang/')
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_GKP/lang/')
 -- ¹¤×Ê½áËã
 local TEAM_VOTE_REQUEST = {}
-MY.RegisterEvent('TEAM_VOTE_REQUEST', function()
+LIB.RegisterEvent('TEAM_VOTE_REQUEST', function()
 	if arg0 == 1 then
 		TEAM_VOTE_REQUEST = {}
 		local team = GetClientTeam()
@@ -48,7 +48,7 @@ MY.RegisterEvent('TEAM_VOTE_REQUEST', function()
 	end
 end)
 
-MY.RegisterEvent('TEAM_VOTE_RESPOND', function()
+LIB.RegisterEvent('TEAM_VOTE_RESPOND', function()
 	if arg0 == 1 and not IsEmpty(TEAM_VOTE_REQUEST) then
 		if arg2 == 1 then
 			TEAM_VOTE_REQUEST[arg1] = true
@@ -61,11 +61,11 @@ MY.RegisterEvent('TEAM_VOTE_RESPOND', function()
 				agree = agree + 1
 			end
 		end
-		MY.Topmsg(_L('Team Members: %d, %d agree %d%%', num, agree, agree / num * 100))
+		LIB.Topmsg(_L('Team Members: %d, %d agree %d%%', num, agree, agree / num * 100))
 	end
 end)
 
-MY.RegisterEvent('TEAM_INCOMEMONEY_CHANGE_NOTIFY', function()
+LIB.RegisterEvent('TEAM_INCOMEMONEY_CHANGE_NOTIFY', function()
 	local nTotalRaidMoney = GetClientTeam().nInComeMoney
 	if nTotalRaidMoney and nTotalRaidMoney == 0 then
 		TEAM_VOTE_REQUEST = {}

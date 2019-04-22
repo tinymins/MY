@@ -108,7 +108,7 @@ function HP:DrawTexts(aTexts, nY, nLineHeight, r, g, b, a, f, spacing, scale)
 
 		for _, szText in ipairs(aTexts) do
 			if szText ~= '' then
-				sha:AppendCharacterID(self.dwID, true, r, g, b, a, {0, 0, 0, 0, -nY}, f, szText, spacing, scale / MY.GetFontScale() / MY.GetUIScale())
+				sha:AppendCharacterID(self.dwID, true, r, g, b, a, {0, 0, 0, 0, -nY}, f, szText, spacing, scale / LIB.GetFontScale() / LIB.GetUIScale())
 				nY =  nY + nLineHeight
 			end
 		end
@@ -122,7 +122,7 @@ function HP:DrawLifeText(text, x, y, r, g, b, a, f, spacing, scale)
 		local sha = self.handle:Lookup('hp_title')
 		sha:SetTriangleFan(GEOMETRY_TYPE.TEXT)
 		sha:ClearTriangleFanPoint()
-		sha:AppendCharacterID(self.dwID, true, r, g, b, a, {0, 0, 0, x, -y}, f, text, spacing, scale / MY.GetFontScale() / MY.GetUIScale())
+		sha:AppendCharacterID(self.dwID, true, r, g, b, a, {0, 0, 0, x, -y}, f, text, spacing, scale / LIB.GetFontScale() / LIB.GetUIScale())
 	end
 	return self
 end
@@ -241,21 +241,21 @@ function HP:SetSFX(szFile, fScale, nWidth, nHeight, nOffsetY)
 			sfx:SetModelScale(fScale)
 			sfx:Play(true)
 			sfx:Show()
-			MY.RenderCall(szKey, function()
+			LIB.RenderCall(szKey, function()
 				if sfx and sfx:IsValid() then
-					local nX, nY, bFront = MY.CThreadCoor(dwCtcType, self.dwID)
+					local nX, nY, bFront = LIB.CThreadCoor(dwCtcType, self.dwID)
 					nX, nY = Station.AdjustToOriginalPos(nX, nY)
 					sfx:SetAbsPos(nX, nY - nHeight / 2 - nOffsetY)
 				else
-					MY.CThreadCoor(dwCtcType, self.dwID, szKey, false)
-					MY.RenderCall(szKey, false)
+					LIB.CThreadCoor(dwCtcType, self.dwID, szKey, false)
+					LIB.RenderCall(szKey, false)
 				end
 			end)
-			MY.CThreadCoor(dwCtcType, self.dwID, szKey, true)
+			LIB.CThreadCoor(dwCtcType, self.dwID, szKey, true)
 		else
 			sfx:Hide()
-			MY.RenderCall(szKey, false)
-			MY.CThreadCoor(dwCtcType, self.dwID, szKey, false)
+			LIB.RenderCall(szKey, false)
+			LIB.CThreadCoor(dwCtcType, self.dwID, szKey, false)
 		end
 	end
 	return self
@@ -288,5 +288,5 @@ local function onBreathe()
 		REQUIRE_SORT = false
 	end
 end
-MY.BreatheCall('MY_LifeBar_HP', onBreathe)
+LIB.BreatheCall('MY_LifeBar_HP', onBreathe)
 end

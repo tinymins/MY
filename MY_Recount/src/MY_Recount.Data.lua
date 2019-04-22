@@ -245,7 +245,7 @@ local SZ_REC_FILE = '$uid@$lang/cache/fight_recount_log.jx3dat'
 -- ##################################################################################################
 -- 登陆游戏加载保存的数据
 function MY_Recount.Data.LoadData(bLoadHistory)
-	local data = MY.LoadLUAData(SZ_REC_FILE)
+	local data = LIB.LoadLUAData(SZ_REC_FILE)
 	if data then
 		if bLoadHistory then
 			History = data.History or {}
@@ -257,9 +257,9 @@ function MY_Recount.Data.LoadData(bLoadHistory)
 		end
 		MY_Recount.Data.nMaxHistory       = data.nMaxHistory   or 10
 		MY_Recount.Data.nMinFightTime     = data.nMinFightTime or 30
-		MY_Recount.Data.bRecAnonymous     = MY.FormatDataStructure(data.bRecAnonymous, true)
-		MY_Recount.Data.bDistinctTargetID = MY.FormatDataStructure(data.bDistinctTargetID, false)
-		MY_Recount.Data.bDistinctEffectID = MY.FormatDataStructure(data.bDistinctEffectID, false)
+		MY_Recount.Data.bRecAnonymous     = LIB.FormatDataStructure(data.bRecAnonymous, true)
+		MY_Recount.Data.bDistinctTargetID = LIB.FormatDataStructure(data.bDistinctTargetID, false)
+		MY_Recount.Data.bDistinctEffectID = LIB.FormatDataStructure(data.bDistinctEffectID, false)
 	end
 	MY_Recount.Data.Init()
 end
@@ -274,7 +274,7 @@ function MY_Recount.Data.SaveData(bSaveHistory)
 		bDistinctTargetID = MY_Recount.Data.bDistinctTargetID,
 		bDistinctEffectID = MY_Recount.Data.bDistinctEffectID,
 	}
-	local data = MY.SaveLUAData(SZ_REC_FILE, data)
+	local data = LIB.SaveLUAData(SZ_REC_FILE, data)
 end
 
 -- 过图清除当前战斗数据
@@ -284,21 +284,21 @@ local function onLoadingEnding()
 	MY_Recount.Data.Init(true)
 	FireUIEvent('MY_RECOUNT_NEW_FIGHT')
 end
-MY.RegisterEvent('LOADING_ENDING', onLoadingEnding)
-MY.RegisterEvent('RELOAD_UI_ADDON_END', onLoadingEnding)
+LIB.RegisterEvent('LOADING_ENDING', onLoadingEnding)
+LIB.RegisterEvent('RELOAD_UI_ADDON_END', onLoadingEnding)
 end
 
 -- 退出战斗 保存数据
-MY.RegisterEvent('MY_FIGHT_HINT', function(event)
-	if arg0 and MY.GetFightUUID() ~= Data.UUID then -- 进入新的战斗
+LIB.RegisterEvent('MY_FIGHT_HINT', function(event)
+	if arg0 and LIB.GetFightUUID() ~= Data.UUID then -- 进入新的战斗
 		MY_Recount.Data.Init()
 		FireUIEvent('MY_RECOUNT_NEW_FIGHT')
 	else
 		MY_Recount.Data.Push()
 	end
 end)
-MY.BreatheCall('MY_Recount_FightTime', 1000, function()
-	if MY.IsFighting() then
+LIB.BreatheCall('MY_Recount_FightTime', 1000, function()
+	if LIB.IsFighting() then
 		Data.nTimeDuring = GetCurrentTime() - Data.nTimeBegin
 		for _, szRecordType in ipairs({'Damage', 'Heal', 'BeDamage', 'BeHeal'}) do
 			local tInfo = Data[szRecordType]
@@ -433,12 +433,12 @@ end
 -- (table ) tResult     : 所有效果数值集合
 function MY_Recount.Data.OnSkillEffect(dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nResultCount, tResult)
 	-- 获取释放对象和承受对象
-	local KCaster = MY.GetObject(dwCaster)
+	local KCaster = LIB.GetObject(dwCaster)
 	if KCaster and not IsPlayer(dwCaster)
 	and KCaster.dwEmployer and KCaster.dwEmployer ~= 0 then -- 宠物的数据算在主人统计中
-		KCaster = MY.GetObject(KCaster.dwEmployer)
+		KCaster = LIB.GetObject(KCaster.dwEmployer)
 	end
-	local KTarget, dwTargetEmployer = MY.GetObject(dwTarget), nil
+	local KTarget, dwTargetEmployer = LIB.GetObject(dwTarget), nil
 	if KTarget and not IsPlayer(dwTarget)
 	and KTarget.dwEmployer and KTarget.dwEmployer ~= 0 then
 		dwTargetEmployer = KTarget.dwEmployer
@@ -475,8 +475,8 @@ function MY_Recount.Data.OnSkillEffect(dwCaster, dwTarget, nEffectType, dwEffect
 	if dwCaster ~= me.dwID                 -- 释放者不是自己
 	and dwTarget ~= me.dwID                -- 承受者不是自己
 	and dwTargetEmployer ~= me.dwID        -- 承受者主人不是自己
-	and not MY.IsInArena()                 -- 不在竞技场
-	and not MY.IsInBattleField()           -- 不在战场
+	and not LIB.IsInArena()                 -- 不在竞技场
+	and not LIB.IsInBattleField()           -- 不在战场
 	and not me.IsPlayerInMyParty(dwCaster) -- 且释放者不是队友
 	and not me.IsPlayerInMyParty(dwTarget) -- 且承受者不是队友
 	and not (dwTargetEmployer and me.IsPlayerInMyParty(dwTargetEmployer)) -- 且承受者主人不是队友
@@ -485,7 +485,7 @@ function MY_Recount.Data.OnSkillEffect(dwCaster, dwTarget, nEffectType, dwEffect
 	end
 
 	-- 未进战则初始化统计数据（即默认当前帧所有的技能日志为进战技能）
-	if not MY.GetFightUUID() and
+	if not LIB.GetFightUUID() and
 	_Cache.nLastAutoInitFrame ~= GetLogicFrameCount() then
 		_Cache.nLastAutoInitFrame = GetLogicFrameCount()
 		MY_Recount.Data.Init(true)
@@ -831,7 +831,7 @@ local function GetObjectKeyID(obj)
 	if IsPlayer(obj.dwID) then
 		return obj.dwID
 	end
-	local id = MY.GetObjectName(obj, 'never') or g_tStrings.STR_NAME_UNKNOWN
+	local id = LIB.GetObjectName(obj, 'never') or g_tStrings.STR_NAME_UNKNOWN
 	if Data.bDistinctTargetID then
 		id = id .. '#' .. obj.dwID
 	end
@@ -870,7 +870,7 @@ end
 function _Cache.InitObjectData(data, obj, szChannel)
 	local id = GetObjectKeyID(obj)
 	if IsPlayer(obj.dwID) and not data.Namelist[id] then
-		data.Namelist[id]  = MY.GetObjectName(obj, 'never') -- 名称缓存
+		data.Namelist[id]  = LIB.GetObjectName(obj, 'never') -- 名称缓存
 		data.Forcelist[id] = obj.dwForceID or 0           -- 势力缓存
 	end
 
@@ -899,9 +899,9 @@ local function GeneTypeNS()
 end
 function MY_Recount.Data.Init(bForceInit)
 	if bForceInit or (not Data) or
-	(Data.UUID and MY.GetFightUUID() ~= Data.UUID) then
+	(Data.UUID and LIB.GetFightUUID() ~= Data.UUID) then
 		Data = {
-			UUID              = MY.GetFightUUID(),                 -- 战斗唯一标识
+			UUID              = LIB.GetFightUUID(),                 -- 战斗唯一标识
 			nVersion          = VERSION,                           -- 数据版本号
 			bDistinctTargetID = MY_Recount.Data.bDistinctTargetID, -- 是否根据ID区分同名目标
 			bDistinctEffectID = MY_Recount.Data.bDistinctEffectID, -- 是否根据ID区分同名效果
@@ -917,8 +917,8 @@ function MY_Recount.Data.Init(bForceInit)
 		}
 	end
 
-	if not Data.UUID and MY.GetFightUUID() then
-		Data.UUID       = MY.GetFightUUID()
+	if not Data.UUID and LIB.GetFightUUID() then
+		Data.UUID       = LIB.GetFightUUID()
 		Data.nTimeBegin = GetCurrentTime()
 	end
 end
@@ -977,7 +977,7 @@ function MY_Recount.Data.Push()
 end
 
 -- 系统日志监控（数据源）
-MY.RegisterEvent('SYS_MSG', function()
+LIB.RegisterEvent('SYS_MSG', function()
 	if arg0 == 'UI_OME_SKILL_CAST_LOG' then
 		-- 技能施放日志；
 		-- (arg1)dwCaster：技能施放者 (arg2)dwSkillID：技能ID (arg3)dwLevel：技能等级
@@ -988,7 +988,7 @@ MY.RegisterEvent('SYS_MSG', function()
 		-- (arg3)dwLevel：技能等级 (arg4)nRespond：见枚举型[[SKILL_RESULT_CODE]]
 		-- MY_Recount.OnSkillCastRespond(arg1, arg2, arg3, arg4)
 	elseif arg0 == 'UI_OME_SKILL_EFFECT_LOG' then
-		-- if not MY.IsInArena() then
+		-- if not LIB.IsInArena() then
 		-- 技能最终产生的效果（生命值的变化）；
 		-- (arg1)dwCaster：施放者 (arg2)dwTarget：目标 (arg3)bReact：是否为反击 (arg4)nType：Effect类型 (arg5)dwID:Effect的ID
 		-- (arg6)dwLevel：Effect的等级 (arg7)bCriticalStrike：是否会心 (arg8)nCount：tResultCount数据表中元素个数 (arg9)tResultCount：数值集合
@@ -1032,8 +1032,8 @@ MY.RegisterEvent('SYS_MSG', function()
 end)
 
 -- JJC中使用的数据源（不能记录溢出数据）
--- MY.RegisterEvent('SKILL_EFFECT_TEXT', function(event)
---     if MY.IsInArena() then
+-- LIB.RegisterEvent('SKILL_EFFECT_TEXT', function(event)
+--     if LIB.IsInArena() then
 --         local dwCasterID      = arg0
 --         local dwTargetID      = arg1
 --         local bCriticalStrike = arg2
@@ -1120,14 +1120,14 @@ function _Cache.OnTeammateStateChange(dwID, bLeave, nAwayType, bAddWhenRecEmpty)
 		end
 	end
 end
-MY.RegisterEvent('PARTY_UPDATE_MEMBER_INFO', function()
+LIB.RegisterEvent('PARTY_UPDATE_MEMBER_INFO', function()
 	local team = GetClientTeam()
 	local info = team.GetMemberInfo(arg1)
 	if info then
 		_Cache.OnTeammateStateChange(arg1, info.bDeathFlag, AWAYTIME_TYPE.DEATH, false)
 	end
 end)
-MY.RegisterEvent('PARTY_SET_MEMBER_ONLINE_FLAG', function()
+LIB.RegisterEvent('PARTY_SET_MEMBER_ONLINE_FLAG', function()
 	if arg2 == 0 then -- 有人掉线
 		_Cache.OnTeammateStateChange(arg1, true, AWAYTIME_TYPE.OFFLINE, false)
 	else -- 有人上线
@@ -1139,7 +1139,7 @@ MY.RegisterEvent('PARTY_SET_MEMBER_ONLINE_FLAG', function()
 		end
 	end
 end)
-MY.RegisterEvent('MY_RECOUNT_NEW_FIGHT', function() -- 开战扫描队友 记录开战就死掉/掉线的人
+LIB.RegisterEvent('MY_RECOUNT_NEW_FIGHT', function() -- 开战扫描队友 记录开战就死掉/掉线的人
 	local team = GetClientTeam()
 	local me = GetClientPlayer()
 	if team and me and (me.IsInParty() or me.IsInRaid()) then
@@ -1155,7 +1155,7 @@ MY.RegisterEvent('MY_RECOUNT_NEW_FIGHT', function() -- 开战扫描队友 记录开战就死
 		end
 	end
 end)
-MY.RegisterEvent('PARTY_ADD_MEMBER', function() -- 中途有人进队 补上暂离记录
+LIB.RegisterEvent('PARTY_ADD_MEMBER', function() -- 中途有人进队 补上暂离记录
 	local team = GetClientTeam()
 	local info = team.GetMemberInfo(arg1)
 	if info then

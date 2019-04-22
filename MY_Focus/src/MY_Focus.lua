@@ -36,8 +36,8 @@ local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.Is
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
 local CHANGGE_REAL_SHADOW_TPLID = 46140 -- 清绝歌影 的主体影子
-local INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_Focus/ui/MY_Focus.ini'
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Focus/lang/')
+local INI_PATH = LIB.GetAddonInfo().szRoot .. 'MY_Focus/ui/MY_Focus.ini'
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_Focus/lang/')
 local FOCUS_LIST = {}
 local l_tTempFocusList = {
 	[TARGET.PLAYER] = {},   -- dwID
@@ -119,9 +119,9 @@ local function FormatAutoFocusData(data)
 		},
 		nMaxDistance = 0,
 	}
-	return MY.FormatDataStructure(data, ds)
+	return LIB.FormatDataStructure(data, ds)
 end
-function D.IsShielded() return MY.IsShieldedVersion() and MY.IsInShieldedMap() end
+function D.IsShielded() return LIB.IsShieldedVersion() and LIB.IsInShieldedMap() end
 function D.IsEnabled() return O.bEnable and not D.IsShielded() end
 
 function D.CheckFrameOpen(bForceReload)
@@ -139,7 +139,7 @@ function D.LoadStyleConfig()
 	if STYLE_CONFIG_CHANGED then
 		D.SaveConfig()
 	end
-	local config = MY.LoadLUAData({'config/focus/' .. O.szStyle .. '.jx3dat', PATH_TYPE.GLOBAL}) or {}
+	local config = LIB.LoadLUAData({'config/focus/' .. O.szStyle .. '.jx3dat', PATH_TYPE.GLOBAL}) or {}
 	for k, v in pairs(STYLE_DEFAULT) do
 		if IsNil(config[k]) then
 			O[k] = clone(v)
@@ -159,12 +159,12 @@ function D.SaveStyleConfig()
 	for k, v in pairs(STYLE_DEFAULT) do
 		config[k] = O[k]
 	end
-	MY.SaveLUAData({'config/focus/' .. O.szStyle .. '.jx3dat', PATH_TYPE.GLOBAL}, config)
+	LIB.SaveLUAData({'config/focus/' .. O.szStyle .. '.jx3dat', PATH_TYPE.GLOBAL}, config)
 	STYLE_CONFIG_CHANGED = false
 end
 
 function D.LoadConfig()
-	local config = MY.LoadLUAData({'config/focus.jx3dat', PATH_TYPE.ROLE}) or {}
+	local config = LIB.LoadLUAData({'config/focus.jx3dat', PATH_TYPE.ROLE}) or {}
 	for k, v in pairs(BASIC_DEFAULT) do
 		if IsNil(config[k]) then
 			O[k] = clone(v)
@@ -181,12 +181,12 @@ function D.SaveConfig()
 		for k, v in pairs(BASIC_DEFAULT) do
 			config[k] = O[k]
 		end
-		MY.SaveLUAData({'config/focus.jx3dat', PATH_TYPE.ROLE}, config)
+		LIB.SaveLUAData({'config/focus.jx3dat', PATH_TYPE.ROLE}, config)
 		BASIC_CONFIG_CHANGED = false
 	end
 	D.SaveStyleConfig()
 end
-MY.RegisterIdle('MY_Focus_Save', D.SaveConfig)
+LIB.RegisterIdle('MY_Focus_Save', D.SaveConfig)
 
 function D.BeforeConfigChange(k)
 	if k == 'szStyle' then
@@ -221,7 +221,7 @@ end
 -- 添加、修改默认焦点
 function D.SetFocusPattern(szPattern, tData)
 	local nIndex
-	szPattern = MY.TrimString(szPattern)
+	szPattern = LIB.TrimString(szPattern)
 	for i, v in ipairs_r(O.aPatternFocus) do
 		if v.szPattern == szPattern then
 			nIndex = i
@@ -264,9 +264,9 @@ function D.RemoveFocusPattern(szPattern)
 		-- 全字符匹配模式：检查是否在永久焦点中 没有则删除Handle （节约性能）
 		for i = #FOCUS_LIST, 1, -1 do
 			local p = FOCUS_LIST[i]
-			local KObject = MY.GetObject(p.dwType, p.dwID)
+			local KObject = LIB.GetObject(p.dwType, p.dwID)
 			local dwTemplateID = p.dwType == TARGET.PLAYER and p.dwID or KObject.dwTemplateID
-			if KObject and MY.GetObjectName(KObject, 'never') == szPattern
+			if KObject and LIB.GetObjectName(KObject, 'never') == szPattern
 			and not l_tTempFocusList[p.dwType][p.dwID]
 			and not O.tStaticFocus[p.dwType][dwTemplateID] then
 				D.OnObjectLeaveScene(p.dwType, p.dwID)
@@ -282,7 +282,7 @@ end
 function D.SetFocusID(dwType, dwID, bSave)
 	dwType, dwID = tonumber(dwType), tonumber(dwID)
 	if bSave then
-		local KObject = MY.GetObject(dwType, dwID)
+		local KObject = LIB.GetObject(dwType, dwID)
 		local dwTemplateID = dwType == TARGET.PLAYER and dwID or KObject.dwTemplateID
 		if O.tStaticFocus[dwType][dwTemplateID] then
 			return
@@ -306,7 +306,7 @@ function D.RemoveFocusID(dwType, dwID)
 		l_tTempFocusList[dwType][dwID] = nil
 		D.OnObjectLeaveScene(dwType, dwID)
 	end
-	local KObject = MY.GetObject(dwType, dwID)
+	local KObject = LIB.GetObject(dwType, dwID)
 	local dwTemplateID = dwType == TARGET.PLAYER and dwID or KObject.dwTemplateID
 	if O.tStaticFocus[dwType][dwTemplateID] then
 		O.tStaticFocus[dwType][dwTemplateID] = nil
@@ -323,13 +323,13 @@ end
 
 -- 重新扫描附近对象更新焦点列表（只增不减）
 function D.ScanNearby()
-	for _, dwID in ipairs(MY.GetNearPlayerID()) do
+	for _, dwID in ipairs(LIB.GetNearPlayerID()) do
 		D.OnObjectEnterScene(TARGET.PLAYER, dwID)
 	end
-	for _, dwID in ipairs(MY.GetNearNpcID()) do
+	for _, dwID in ipairs(LIB.GetNearNpcID()) do
 		D.OnObjectEnterScene(TARGET.NPC, dwID)
 	end
-	for _, dwID in ipairs(MY.GetNearDoodadID()) do
+	for _, dwID in ipairs(LIB.GetNearDoodadID()) do
 		D.OnObjectEnterScene(TARGET.DOODAD, dwID)
 	end
 end
@@ -339,7 +339,7 @@ function D.RescanNearby()
 	D.ClearFocus()
 	D.ScanNearby()
 end
-MY.RegisterEvent('MY_ANMERKUNGEN_UPDATE.MY_Focus', D.RescanNearby)
+LIB.RegisterEvent('MY_ANMERKUNGEN_UPDATE.MY_Focus', D.RescanNearby)
 
 function D.GetEligibleRule(tRules, dwMapID, dwType, dwID, dwTemplateID, szName, szTong)
 	for _, v in ipairs(tRules) do
@@ -361,10 +361,10 @@ end
 function D.LoadEmbeddedRule()
 	-- auto generate embedded data
 	local DAT_ROOT = 'MY_Resource/data/focus/'
-	local SRC_ROOT = MY.FormatPath(MY.GetAddonInfo().szRoot .. '!src-dist/dat/' .. DAT_ROOT)
-	local DST_ROOT = MY.FormatPath(MY.GetAddonInfo().szRoot .. DAT_ROOT)
+	local SRC_ROOT = LIB.FormatPath(LIB.GetAddonInfo().szRoot .. '!src-dist/dat/' .. DAT_ROOT)
+	local DST_ROOT = LIB.FormatPath(LIB.GetAddonInfo().szRoot .. DAT_ROOT)
 	for _, szFile in ipairs(CPath.GetFileList(SRC_ROOT)) do
-		MY.Sysmsg(_L['Encrypt and compressing: '] .. DAT_ROOT .. szFile)
+		LIB.Sysmsg(_L['Encrypt and compressing: '] .. DAT_ROOT .. szFile)
 		local data = LoadDataFromFile(SRC_ROOT .. szFile)
 		if IsEncodedData(data) then
 			data = DecodeData(data)
@@ -374,8 +374,8 @@ function D.LoadEmbeddedRule()
 	end
 	-- load embedded data
 	local function LoadConfigData(szPath)
-		local szPath = MY.GetAddonInfo().szRoot .. szPath
-		return MY.LoadLUAData(szPath, { passphrase = D.PASSPHRASE }) or MY.LoadLUAData(szPath) or {}
+		local szPath = LIB.GetAddonInfo().szRoot .. szPath
+		return LIB.LoadLUAData(szPath, { passphrase = D.PASSPHRASE }) or LIB.LoadLUAData(szPath) or {}
 	end
 	-- load and format data
 	local data = LoadConfigData('MY_Resource/data/focus/$lang.jx3dat') or {}
@@ -391,23 +391,23 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		return
 	end
 	if not D.EMBEDDED_FOCUS then
-		return MY.DelayCall(5000, function() D.OnObjectEnterScene(dwType, dwID) end)
+		return LIB.DelayCall(5000, function() D.OnObjectEnterScene(dwType, dwID) end)
 	end
 	local me = GetClientPlayer()
-	local KObject = MY.GetObject(dwType, dwID)
+	local KObject = LIB.GetObject(dwType, dwID)
 	if not KObject then
 		return
 	end
 
-	local szName = MY.GetObjectName(KObject, 'never')
+	local szName = LIB.GetObjectName(KObject, 'never')
 	-- 解决玩家刚进入视野时名字为空的问题
 	if (dwType == TARGET.PLAYER and not szName) or not me then -- 解决自身刚进入场景的时候的问题
-		MY.DelayCall(300, function()
+		LIB.DelayCall(300, function()
 			D.OnObjectEnterScene(dwType, dwID, (nRetryCount or 0) + 1)
 		end)
 	else-- if szName then -- 判断是否需要焦点
 		if not szName then
-			szName = MY.GetObjectName(KObject, 'auto')
+			szName = LIB.GetObjectName(KObject, 'auto')
 		end
 		local bFocus, bDeletable = false, true
 		local szVia, tRule = '', nil
@@ -417,7 +417,7 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 			if KObject.dwTongID ~= 0 then
 				szTong = GetTongClient().ApplyGetTongName(KObject.dwTongID, 253)
 				if not szTong or szTong == '' then -- 解决目标刚进入场景的时候帮会获取不到的问题
-					MY.DelayCall(300, function()
+					LIB.DelayCall(300, function()
 						D.OnObjectEnterScene(dwType, dwID, (nRetryCount or 0) + 1)
 					end)
 				end
@@ -439,7 +439,7 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 				dwType == TARGET.NPC
 				and dwTemplateID == CHANGGE_REAL_SHADOW_TPLID
 				and IsEnemy(UI_GetClientPlayerID(), dwID)
-				and MY.IsShieldedVersion()
+				and LIB.IsShieldedVersion()
 			) then
 				bFocus = true
 				bDeletable = true
@@ -467,7 +467,7 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 
 		-- 判断竞技场
 		if not bFocus then
-			if MY.IsInArena() or MY.IsInPubg() or MY.IsInZombieMap() then
+			if LIB.IsInArena() or LIB.IsInPubg() or LIB.IsInZombieMap() then
 				if dwType == TARGET.PLAYER then
 					if O.bFocusJJCEnemy and O.bFocusJJCParty then
 						bFocus = true
@@ -489,7 +489,7 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 				elseif dwType == TARGET.NPC then
 					if O.bFocusJJCParty
 					and KObject.dwTemplateID == CHANGGE_REAL_SHADOW_TPLID
-					and not (IsEnemy(UI_GetClientPlayerID(), dwID) and MY.IsShieldedVersion()) then
+					and not (IsEnemy(UI_GetClientPlayerID(), dwID) and LIB.IsShieldedVersion()) then
 						D.OnRemoveFocus(TARGET.PLAYER, KObject.dwEmployer)
 						bFocus = true
 						bDeletable = false
@@ -497,11 +497,11 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 					end
 				end
 			else
-				if not O.bOnlyPublicMap or (not MY.IsInBattleField() and not MY.IsInDungeon() and not MY.IsInArena()) then
+				if not O.bOnlyPublicMap or (not LIB.IsInBattleField() and not LIB.IsInDungeon() and not LIB.IsInArena()) then
 					-- 判断好友
 					if dwType == TARGET.PLAYER
 					and O.bFocusFriend
-					and MY.GetFriend(dwID) then
+					and LIB.GetFriend(dwID) then
 						bFocus = true
 						bDeletable = false
 						szVia = _L['Friend focus']
@@ -509,8 +509,8 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 					-- 判断同帮会
 					if dwType == TARGET.PLAYER
 					and O.bFocusTong
-					and dwID ~= MY.GetClientInfo().dwID
-					and MY.GetTongMember(dwID) then
+					and dwID ~= LIB.GetClientInfo().dwID
+					and LIB.GetTongMember(dwID) then
 						bFocus = true
 						bDeletable = false
 						szVia = _L['Tong member focus']
@@ -530,7 +530,7 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		-- 判断重要NPC
 		if not bFocus and O.bFocusINpc
 		and dwType == TARGET.NPC
-		and MY.IsImportantNpc(me.GetMapID(), KObject.dwTemplateID) then
+		and LIB.IsImportantNpc(me.GetMapID(), KObject.dwTemplateID) then
 			bFocus = true
 			bDeletable = false
 			szVia = _L['Important npc focus']
@@ -546,7 +546,7 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		end
 
 		-- 判断屏蔽的NPC
-		if bFocus and dwType == TARGET.NPC and MY.IsShieldedNpc(dwTemplateID) and MY.IsShieldedVersion() then
+		if bFocus and dwType == TARGET.NPC and LIB.IsShieldedNpc(dwTemplateID) and LIB.IsShieldedVersion() then
 			bFocus = false
 			bDeletable = false
 		end
@@ -560,13 +560,13 @@ end
 
 -- 对象离开视野
 function D.OnObjectLeaveScene(dwType, dwID)
-	local KObject = MY.GetObject(dwType, dwID)
+	local KObject = LIB.GetObject(dwType, dwID)
 	if KObject then
 		if dwType == TARGET.NPC then
 			if O.bFocusJJCParty
 			and KObject.dwTemplateID == CHANGGE_REAL_SHADOW_TPLID
-			and MY.IsInArena() and not (IsEnemy(UI_GetClientPlayerID(), dwID) and MY.IsShieldedVersion()) then
-				D.OnSetFocus(TARGET.PLAYER, KObject.dwEmployer, MY.GetObjectName(KObject, 'never'), false, _L['JJC focus party'])
+			and LIB.IsInArena() and not (IsEnemy(UI_GetClientPlayerID(), dwID) and LIB.IsShieldedVersion()) then
+				D.OnSetFocus(TARGET.PLAYER, KObject.dwEmployer, LIB.GetObjectName(KObject, 'never'), false, _L['JJC focus party'])
 			end
 		end
 	end
@@ -613,8 +613,8 @@ end
 function D.SortFocus(fn)
 	local p = GetClientPlayer()
 	fn = fn or function(p1, p2)
-		p1 = MY.GetObject(p1.dwType, p1.dwID)
-		p2 = MY.GetObject(p2.dwType, p2.dwID)
+		p1 = LIB.GetObject(p1.dwType, p1.dwID)
+		p2 = LIB.GetObject(p2.dwType, p2.dwID)
 		if p1 and p2 then
 			return pow(p.nX - p1.nX, 2) + pow(p.nY - p1.nY, 2) < pow(p.nX - p2.nX, 2) + pow(p.nY - p2.nY, 2)
 		end
@@ -641,7 +641,7 @@ function D.GetDisplayList()
 			if #t >= O.nMaxDisplay then
 				break
 			end
-			local KObject, bFocus = MY.GetObject(p.dwType, p.dwID), true
+			local KObject, bFocus = LIB.GetObject(p.dwType, p.dwID), true
 			if not KObject then
 				bFocus = false
 			end
@@ -654,15 +654,15 @@ function D.GetDisplayList()
 			end
 			if bFocus and p.tRule then
 				if bFocus and p.tRule.tLife.bEnable
-				and not MY.JudgeOperator(p.tRule.tLife.szOperator, KObject.nCurrentLife / KObject.nMaxLife * 100, p.tRule.tLife.nValue) then
+				and not LIB.JudgeOperator(p.tRule.tLife.szOperator, KObject.nCurrentLife / KObject.nMaxLife * 100, p.tRule.tLife.nValue) then
 					bFocus = false
 				end
 				if bFocus and p.tRule.nMaxDistance ~= 0
-				and MY.GetDistance(me, KObject, O.szDistanceType) > p.tRule.nMaxDistance then
+				and LIB.GetDistance(me, KObject, O.szDistanceType) > p.tRule.nMaxDistance then
 					bFocus = false
 				end
 				if bFocus and not p.tRule.tRelation.bAll then
-					if MY.IsEnemy(me.dwID, KObject.dwID) then
+					if LIB.IsEnemy(me.dwID, KObject.dwID) then
 						bFocus = p.tRule.tRelation.bEnemy
 					else
 						bFocus = p.tRule.tRelation.bAlly
@@ -765,12 +765,12 @@ local function onInit()
 	D.CheckFrameOpen()
 	D.RescanNearby()
 end
-MY.RegisterInit('MY_Focus', onInit)
+LIB.RegisterInit('MY_Focus', onInit)
 
 local function onExit()
 	D.SaveConfig()
 end
-MY.RegisterExit('MY_Focus', onExit)
+LIB.RegisterExit('MY_Focus', onExit)
 end
 
 do
@@ -778,12 +778,12 @@ local function onMenu()
 	local dwType, dwID = GetClientPlayer().GetTarget()
 	return D.GetTargetMenu(dwType, dwID)
 end
-MY.RegisterTargetAddonMenu('MY_Focus', onMenu)
+LIB.RegisterTargetAddonMenu('MY_Focus', onMenu)
 end
 
 do
 local function onHotKey()
-	local dwType, dwID = MY.GetTarget()
+	local dwType, dwID = LIB.GetTarget()
 	local aList = D.GetDisplayList()
 	local t = aList[1]
 	if not t then
@@ -794,12 +794,12 @@ local function onHotKey()
 			t = aList[i + 1] or t
 		end
 	end
-	MY.SetTarget(t.dwType, t.dwID)
+	LIB.SetTarget(t.dwType, t.dwID)
 end
-MY.RegisterHotKey('MY_Focus_LoopTarget', _L['Loop target in focus'], onHotKey)
+LIB.RegisterHotKey('MY_Focus_LoopTarget', _L['Loop target in focus'], onHotKey)
 end
 
-MY.RegisterTutorial({
+LIB.RegisterTutorial({
 	szKey = 'MY_Focus',
 	szMessage = _L['Would you like to use MY focus?'],
 	fnRequire = function() return not O.bEnable end,
@@ -810,7 +810,7 @@ MY.RegisterTutorial({
 			O.bEnable = true
 			STYLE_CONFIG_CHANGED = true
 			MY_Focus.Open()
-			MY.RedrawTab('MY_Focus')
+			LIB.RedrawTab('MY_Focus')
 		end,
 	},
 	{
@@ -819,7 +819,7 @@ MY.RegisterTutorial({
 			O.bEnable = false
 			STYLE_CONFIG_CHANGED = true
 			MY_Focus.Close()
-			MY.RedrawTab('MY_Focus')
+			LIB.RedrawTab('MY_Focus')
 		end,
 	},
 })
@@ -942,5 +942,5 @@ local settings = {
 		},
 	},
 }
-MY_Focus = MY.GeneGlobalNS(settings)
+MY_Focus = LIB.GeneGlobalNS(settings)
 end

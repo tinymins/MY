@@ -35,8 +35,8 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_LifeBar/lang/')
-if not MY.AssertVersion('MY_LifeBar', _L['MY_LifeBar'], 0x2011800) then
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_LifeBar/lang/')
+if not LIB.AssertVersion('MY_LifeBar', _L['MY_LifeBar'], 0x2011800) then
 	return
 end
 
@@ -55,7 +55,7 @@ local D = {
 
 local PS = {}
 local function LoadUI(ui)
-	ui:children('#WndSliderBox_GlobalUIScale'):value(Config.fGlobalUIScale * 100 * MY.GetOriginUIScale())
+	ui:children('#WndSliderBox_GlobalUIScale'):value(Config.fGlobalUIScale * 100 * LIB.GetOriginUIScale())
 	ui:children('#WndSliderBox_LifeBarWidth'):value(Config.nLifeWidth)
 	ui:children('#WndSliderBox_LifeBarHeight'):value(Config.nLifeHeight)
 	ui:children('#WndSliderBox_LifeBarOffsetX'):value(Config.nLifeOffsetX)
@@ -374,9 +374,9 @@ function PS.OnPanelActive(wnd)
 		name = 'WndSliderBox_GlobalUIScale',
 		x = x, y = y, sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE, range = { 1, 200 },
 		text = function(value) return _L('Global UI scale: %.2f.', value / 100) end, -- ×ÖËõ·Å
-		value = Config.fGlobalUIScale * 100 * MY.GetOriginUIScale(),
+		value = Config.fGlobalUIScale * 100 * LIB.GetOriginUIScale(),
 		onchange = function(value)
-			Config.fGlobalUIScale = value / 100 / MY.GetOriginUIScale()
+			Config.fGlobalUIScale = value / 100 / LIB.GetOriginUIScale()
 		end,
 		autoenable = function() return D.IsEnabled() end,
 	})
@@ -781,12 +781,12 @@ function PS.OnPanelActive(wnd)
 	local function onReset()
 		LoadUI(ui)
 	end
-	MY.RegisterEvent('MY_LIFEBAR_CONFIG_LOADED.MY_LifeBarPS', onReset)
-	MY.RegisterEvent('MY_LIFEBAR_CONFIG_UPDATE.MY_LifeBarPS', onReset)
+	LIB.RegisterEvent('MY_LIFEBAR_CONFIG_LOADED.MY_LifeBarPS', onReset)
+	LIB.RegisterEvent('MY_LIFEBAR_CONFIG_UPDATE.MY_LifeBarPS', onReset)
 end
 
 function PS.OnPanelDeactive()
-	MY.RegisterEvent('MY_LIFEBAR_CONFIG_LOADED.MY_LifeBarPS')
-	MY.RegisterEvent('MY_LIFEBAR_CONFIG_UPDATE.MY_LifeBarPS')
+	LIB.RegisterEvent('MY_LIFEBAR_CONFIG_LOADED.MY_LifeBarPS')
+	LIB.RegisterEvent('MY_LIFEBAR_CONFIG_UPDATE.MY_LifeBarPS')
 end
-MY.RegisterPanel('MY_LifeBar', _L['MY_LifeBar'], _L['General'], 'UI/Image/LootPanel/LootPanel.UITex|74', PS)
+LIB.RegisterPanel('MY_LifeBar', _L['MY_LifeBar'], _L['General'], 'UI/Image/LootPanel/LootPanel.UITex|74', PS)

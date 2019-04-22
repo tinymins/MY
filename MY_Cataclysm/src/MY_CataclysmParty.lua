@@ -6,10 +6,6 @@
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
 --------------------------------------------------------
-local _L, D = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/lang/'), {}
------------------------------------------------
--- 重构 @ 2015 赶时间 很多东西写的很粗略
------------------------------------------------
 -------------------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
@@ -39,9 +35,13 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
+local _L, D = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_Cataclysm/lang/'), {}
+-----------------------------------------------
+-- 重构 @ 2015 赶时间 很多东西写的很粗略
+-----------------------------------------------
 local Station, SetTarget = Station, SetTarget
 local Target_GetTargetData, Table_BuffIsVisible = Target_GetTargetData, Table_BuffIsVisible
-local MY_GetDistance, MY_GetBuff, GetEndTime, MY_GetObject = MY.GetDistance, MY.GetBuff, MY.GetEndTime, MY.GetObject
+local MY_GetDistance, MY_GetBuff, GetEndTime, MY_GetObject = LIB.GetDistance, LIB.GetBuff, LIB.GetEndTime, LIB.GetObject
 local CFG                    = MY_Cataclysm.CFG
 local CTM_BG_COLOR_MODE      = MY_Cataclysm.BG_COLOR_MODE
 -- global STR cache
@@ -79,29 +79,29 @@ do
 local function onNpcEnterScene()
 	local me = GetClientPlayer()
 	local npc = GetNpc(arg0)
-	if MY.IsBoss(me.GetMapID(), npc.dwTemplateID) then
+	if LIB.IsBoss(me.GetMapID(), npc.dwTemplateID) then
 		CTM_BOSS_CACHE[npc.dwID] = npc
 	end
 	if npc.dwTemplateID == CHANGGE_REAL_SHADOW_TPLID then
-		if not (IsEnemy(UI_GetClientPlayerID(), arg0) and MY.IsShieldedVersion()) then
-			local dwType, dwID = MY.GetTarget()
+		if not (IsEnemy(UI_GetClientPlayerID(), arg0) and LIB.IsShieldedVersion()) then
+			local dwType, dwID = LIB.GetTarget()
 			if dwType == TARGET.PLAYER and dwID == npc.dwEmployer then
-				MY.SetTarget(TARGET.NPC, arg0)
+				LIB.SetTarget(TARGET.NPC, arg0)
 			end
 		end
 		CHANGGE_REAL_SHADOW_CACHE[npc.dwEmployer] = arg0
 		CHANGGE_REAL_SHADOW_CACHE[arg0] = npc.dwEmployer
 	end
 end
-MY.RegisterEvent('NPC_ENTER_SCENE.MY_Cataclysm', onNpcEnterScene)
+LIB.RegisterEvent('NPC_ENTER_SCENE.MY_Cataclysm', onNpcEnterScene)
 
 local function onNpcLeaveScene()
 	local npc = GetNpc(arg0)
 	if CHANGGE_REAL_SHADOW_CACHE[arg0] then
-		if not (IsEnemy(UI_GetClientPlayerID(), arg0) and MY.IsShieldedVersion()) then
-			local dwType, dwID = MY.GetTarget()
+		if not (IsEnemy(UI_GetClientPlayerID(), arg0) and LIB.IsShieldedVersion()) then
+			local dwType, dwID = LIB.GetTarget()
 			if dwType == TARGET.NPC and dwID == arg0 then
-				MY.SetTarget(TARGET.PLAYER, npc.dwEmployer)
+				LIB.SetTarget(TARGET.PLAYER, npc.dwEmployer)
 			end
 		end
 		CHANGGE_REAL_SHADOW_CACHE[CHANGGE_REAL_SHADOW_CACHE[arg0]] = nil
@@ -109,27 +109,27 @@ local function onNpcLeaveScene()
 	end
 	CTM_BOSS_CACHE[npc.dwID] = nil
 end
-MY.RegisterEvent('NPC_LEAVE_SCENE.MY_Cataclysm', onNpcLeaveScene)
+LIB.RegisterEvent('NPC_LEAVE_SCENE.MY_Cataclysm', onNpcLeaveScene)
 end
 
 do
 local function onBossSet()
 	CTM_BOSS_CACHE = {}
 	local dwMapID = GetClientPlayer().GetMapID()
-	for _, npc in ipairs(MY.GetNearNpc()) do
-		if MY.IsBoss(dwMapID, npc.dwTemplateID) then
+	for _, npc in ipairs(LIB.GetNearNpc()) do
+		if LIB.IsBoss(dwMapID, npc.dwTemplateID) then
 			CTM_BOSS_CACHE[npc.dwID] = npc
 		end
 	end
 end
-MY.RegisterEvent('MY_SET_BOSS.MY_Cataclysm', onBossSet)
+LIB.RegisterEvent('MY_SET_BOSS.MY_Cataclysm', onBossSet)
 end
 
 local function SetTarget(dwType, dwID)
 	if CHANGGE_REAL_SHADOW_CACHE[dwID] then
 		dwType, dwID = TARGET.NPC, CHANGGE_REAL_SHADOW_CACHE[dwID]
 	end
-	MY.SetTarget(dwType, dwID)
+	LIB.SetTarget(dwType, dwID)
 end
 
 local function CanTarget(dwID)
@@ -327,7 +327,7 @@ function MY_CataclysmParty_Base.OnItemLButtonDrag()
 	end
 	local team = GetClientTeam()
 	local me = GetClientPlayer()
-	if (IsAltKeyDown() or CFG.bEditMode) and me.IsInRaid() and MY.IsLeader() then
+	if (IsAltKeyDown() or CFG.bEditMode) and me.IsInRaid() and LIB.IsLeader() then
 		CTM_DRAG = true
 		CTM_DRAG_ID = dwID
 		CTM_CLICK_DISMISS = true
@@ -340,7 +340,7 @@ end
 
 -- DragEnd bug fix
 function MY_CataclysmParty_Base.OnItemLButtonUp()
-	MY.DelayCall(50, function()
+	LIB.DelayCall(50, function()
 		if CTM_DRAG then
 			CTM_DRAG, CTM_DRAG_ID = false, nil
 			CTM:CloseParty()
@@ -364,11 +364,11 @@ function MY_CataclysmParty_Base.OnItemLButtonDragEnd()
 end
 
 function D.SetTargetTeammate(dwID, info)
-	if MY.IsInPubg() and GetClientPlayer().nMoveState == MOVE_STATE.ON_DEATH then
+	if LIB.IsInPubg() and GetClientPlayer().nMoveState == MOVE_STATE.ON_DEATH then
 		BattleField_MatchPlayer(dwID)
 	elseif info.bIsOnLine and CanTarget(dwID) then -- 有待考证
 		if CFG.bTempTargetEnable then
-			MY.DelayCall('MY_Cataclysm_TempTarget', false)
+			LIB.DelayCall('MY_Cataclysm_TempTarget', false)
 			CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID = nil
 		end
 		SetTarget(TARGET.PLAYER, dwID)
@@ -408,12 +408,12 @@ function MY_CataclysmParty_Base.OnItemLButtonClick()
 	end
 	if IsAltKeyDown() then
 		if this.bBuff and CFG.bBuffAltPublish then
-			MY.Talk(
+			LIB.Talk(
 				PLAYER_TALK_CHANNEL.RAID,
 				_L(
 					'[%s] got buff [%s]x%d, remaining %ds.',
 					info.szName,
-					MY.GetBuffName(this.dwID, this.nLevel),
+					LIB.GetBuffName(this.dwID, this.nLevel),
 					this.nStackNum or 1,
 					GetEndTime(this.nEndFrame)
 				)
@@ -445,9 +445,9 @@ local function OnItemRefreshTip()
 	local nX, nY = this:GetRoot():GetAbsPos()
 	local nW, nH = this:GetRoot():GetSize()
 	if this.bBuff then
-		MY.OutputBuffTip(this.dwID, this.nLevel, { nX, nY + 5, nW, nH }, GetEndTime(this.nEndFrame), this.szVia)
+		LIB.OutputBuffTip(this.dwID, this.nLevel, { nX, nY + 5, nW, nH }, GetEndTime(this.nEndFrame), this.szVia)
 	elseif this.bRole then
-		MY.OutputTeamMemberTip(this.dwID, { nX, nY + 5, nW, nH })
+		LIB.OutputTeamMemberTip(this.dwID, { nX, nY + 5, nW, nH })
 	end
 end
 MY_CataclysmParty_Base.OnItemRefreshTip = OnItemRefreshTip
@@ -466,17 +466,17 @@ function MY_CataclysmParty_Base.OnItemMouseEnter()
 		return
 	end
 	if info.bIsOnLine and CanTarget(dwID) and CFG.bTempTargetEnable then
-		MY.DelayCall('MY_Cataclysm_TempTarget', false)
+		LIB.DelayCall('MY_Cataclysm_TempTarget', false)
 		local function fnAction()
 			if not CTM_TEMP_TARGET_TYPE then
-				CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID = MY.GetTarget()
+				CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID = LIB.GetTarget()
 			end
 			SetTarget(TARGET.PLAYER, dwID)
 		end
 		if CFG.nTempTargetDelay == 0 then
 			fnAction()
 		else
-			MY.DelayCall('MY_Cataclysm_TempTarget', CFG.nTempTargetDelay, fnAction)
+			LIB.DelayCall('MY_Cataclysm_TempTarget', CFG.nTempTargetDelay, fnAction)
 		end
 	end
 end
@@ -513,9 +513,9 @@ function MY_CataclysmParty_Base.OnItemMouseLeave(dst)
 		return
 	end
 	if CFG.bTempTargetEnable then
-		MY.DelayCall('MY_Cataclysm_TempTarget', false)
+		LIB.DelayCall('MY_Cataclysm_TempTarget', false)
 		if CTM_TEMP_TARGET_TYPE then
-			MY.DelayCall('MY_Cataclysm_TempTarget', ResumeTempTarget) -- 延迟到下一帧 因为可能当前帧临时选中另外一个玩家 那么不需要切回目标
+			LIB.DelayCall('MY_Cataclysm_TempTarget', ResumeTempTarget) -- 延迟到下一帧 因为可能当前帧临时选中另外一个玩家 那么不需要切回目标
 		end
 	end
 end
@@ -533,17 +533,17 @@ function MY_CataclysmParty_Base.OnItemRButtonClick()
 	table.insert(menu, {
 		szOption = info.szName,
 		szLayer = 'ICON_RIGHT',
-		rgb = { MY.GetForceColor(info.dwForceID, 'foreground') },
+		rgb = { LIB.GetForceColor(info.dwForceID, 'foreground') },
 		szIcon = szPath,
 		nFrame = nFrame
 	})
-	if MY.IsLeader() and me.IsInRaid() then
+	if LIB.IsLeader() and me.IsInRaid() then
 		table.insert(menu, { bDevide = true })
 		InsertChangeGroupMenu(menu, dwID)
 	end
 	local info = CTM:GetMemberInfo(dwID)
 	if dwID ~= me.dwID then
-		if MY.IsLeader() then
+		if LIB.IsLeader() then
 			table.insert(menu, { bDevide = true })
 		end
 		InsertTeammateMenu(menu, dwID)
@@ -587,7 +587,7 @@ function MY_CataclysmParty_Base.OnItemRButtonClick()
 	else
 		table.insert(menu, { bDevide = true })
 		InsertPlayerMenu(menu, dwID)
-		if MY.IsLeader() then
+		if LIB.IsLeader() then
 			table.insert(menu, { bDevide = true })
 			table.insert(menu, {
 				szOption = _L['Take back all permissions'],
@@ -607,28 +607,28 @@ function MY_CataclysmParty_Base.OnItemRButtonClick()
 					szOption = _L['Take back all permissions'],
 					rgb = { 255, 255, 0 },
 					fnAction = function()
-						MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_ABOUT', 'TeamAuth')
+						LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_ABOUT', 'TeamAuth')
 					end,
 				},
 				{
 					szOption = _L['Take back leader permission'],
 					rgb = { 255, 255, 0 },
 					fnAction = function()
-						MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_ABOUT', 'TeamLeader')
+						LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_ABOUT', 'TeamLeader')
 					end,
 				},
 				{
 					szOption = _L['Take back mark permission'],
 					rgb = { 255, 255, 0 },
 					fnAction = function()
-						MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_ABOUT', 'TeamMark')
+						LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_ABOUT', 'TeamMark')
 					end,
 				},
 				{
 					szOption = _L['Take back distribute permission'],
 					rgb = { 255, 255, 0 },
 					fnAction = function()
-						MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_ABOUT', 'TeamDistribute')
+						LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_ABOUT', 'TeamDistribute')
 					end,
 				}
 			})
@@ -665,7 +665,7 @@ function CTM:CreatePanel(nIndex)
 	local frame = self:GetPartyFrame(nIndex)
 	if not frame then
 		frame = Wnd.OpenWindow(
-			MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/ui/MY_CataclysmParty.' .. CFG.eFrameStyle .. '.ini',
+			LIB.GetAddonInfo().szRoot .. 'MY_Cataclysm/ui/MY_CataclysmParty.' .. CFG.eFrameStyle .. '.ini',
 			'MY_CataclysmParty_' .. nIndex
 		)
 		frame:Scale(CFG.fScaleX, CFG.fScaleY)
@@ -838,7 +838,7 @@ function CTM:RefreshBossTarget()
 	local tKeep = {}
 	if CFG.bShowBossTarget then
 		for dwNpcID, npc in pairs(CTM_BOSS_CACHE) do
-			local dwTarID = (MY.IsEnemy(UI_GetClientPlayerID(), dwNpcID) and npc.bFightState)
+			local dwTarID = (LIB.IsEnemy(UI_GetClientPlayerID(), dwNpcID) and npc.bFightState)
 				and (CTM_THREAT_NPC_ID == dwNpcID and CTM_THREAT_TARGET_ID or select(2, npc.GetTarget()))
 				or nil
 			if dwTarID then
@@ -879,7 +879,7 @@ function CTM:RefreshAttention()
 			local p = GetPlayer(dwTarID)
 			if CTM_CACHE[dwTarID] and CTM_CACHE[dwTarID]:IsValid() then
 				if p and not empty(CTM_ATTENTION_STACK[dwTarID]) then
-					local r, g, b = MY.HumanColor2RGB(CTM_ATTENTION_STACK[dwTarID][1].col)
+					local r, g, b = LIB.HumanColor2RGB(CTM_ATTENTION_STACK[dwTarID][1].col)
 					CTM_CACHE[dwTarID]:Lookup('Shadow_Attention'):SetColorRGB(r, g, b)
 					CTM_CACHE[dwTarID]:Lookup('Shadow_Attention'):Show()
 				else
@@ -1050,7 +1050,7 @@ function CTM:KungFuSwitch(dwID)
 		if GetPlayer(dwID) then
 			local key = 'CTM_KUNFU_' .. dwID
 			local img = handle:Lookup('Image_Icon')
-			MY.BreatheCall(key, function()
+			LIB.BreatheCall(key, function()
 				local player = GetPlayer(dwID)
 				if player and img and img:IsValid() then
 					local nType, dwSkillID, dwSkillLevel, fCastPercent = player.GetSkillOTActionState()
@@ -1064,7 +1064,7 @@ function CTM:KungFuSwitch(dwID)
 						img:SetAlpha(255)
 					end
 				end
-				MY.BreatheCall(key, false)
+				LIB.BreatheCall(key, false)
 			end)
 		end
 	end
@@ -1116,7 +1116,7 @@ function CTM:RefreshImages(h, dwID, info, tSetting, bIcon, bFormationLeader, bLa
 			if CFG.nShowIcon == 2 and info.dwMountKungfuID == 0 then
 				img:FromUITex('ui/image/TargetPanel/Target.UITex', 21)
 			elseif CFG.nShowIcon == 2 then
-				local _, nIconID = MY.GetSkillName(info.dwMountKungfuID, 1)
+				local _, nIconID = LIB.GetSkillName(info.dwMountKungfuID, 1)
 				if nIconID == 1435 then nIconID = 889 end
 				img:FromIconID(nIconID)
 			elseif CFG.nShowIcon == 1 then
@@ -1144,11 +1144,11 @@ function CTM:RefreshImages(h, dwID, info, tSetting, bIcon, bFormationLeader, bLa
 		local txtSchool = h:Lookup('Text_School_Name')
 		local r, g, b = 255, 255, 255
 		if CFG.nColoredName == 1 then
-			r, g, b = MY.GetForceColor(info.dwForceID, 'foreground')
+			r, g, b = LIB.GetForceColor(info.dwForceID, 'foreground')
 		elseif CFG.nColoredName == 0 then
 			r, b, b = 255, 255, 255
 		elseif CFG.nColoredName == 2 then
-			r, g, b = MY.GetCampColor(info.nCamp, 'foreground')
+			r, g, b = LIB.GetCampColor(info.nCamp, 'foreground')
 		end
 		txtName:SetText(info.szName)
 		txtName:SetVAlign(CFG.nNameVAlignment)
@@ -1167,7 +1167,7 @@ function CTM:RefreshImages(h, dwID, info, tSetting, bIcon, bFormationLeader, bLa
 			fScale = fScale * 0.9
 		end
 		if CFG.nShowIcon == 4 then
-			local r, g, b = MY.GetForceColor(info.dwForceID, 'foreground')
+			local r, g, b = LIB.GetForceColor(info.dwForceID, 'foreground')
 			txtSchool:SetText(CTM_KUNGFU_TEXT[info.dwMountKungfuID])
 			txtSchool:SetFontScheme(CFG.nNameFont)
 			txtSchool:SetFontColor(r, g, b)
@@ -1449,7 +1449,7 @@ function D.UpdateCharaterBuff(p, handle, key, data, KBuff)
 			-- 描边
 			local r, g, b, a
 			if data.col then
-				r, g, b, a = MY.HumanColor2RGB(data.col)
+				r, g, b, a = LIB.HumanColor2RGB(data.col)
 			end
 			if not data.col then
 				item:Lookup('Handle_RbgBorders'):Hide()
@@ -1498,7 +1498,7 @@ function D.UpdateCharaterBuff(p, handle, key, data, KBuff)
 			end
 			item.nPriority = nPriority
 			-- 文字大小
-			local szName, icon = MY.GetBuffName(data.dwID, data.nLevelEx)
+			local szName, icon = LIB.GetBuffName(data.dwID, data.nLevelEx)
 			if data.nIcon and tonumber(data.nIcon) then
 				icon = data.nIcon
 			end
@@ -1643,7 +1643,7 @@ function CTM:RefreshBuff()
 				local item = handle:Lookup(key)
 				if KBuff then
 					if KBuff.nStackNum and data.nStackNum
-					and not MY.JudgeOperator(data.szStackOp or '>=', KBuff.nStackNum, data.nStackNum) then
+					and not LIB.JudgeOperator(data.szStackOp or '>=', KBuff.nStackNum, data.nStackNum) then
 						KBuff = nil
 					end
 					tKeep[key] = true
@@ -1876,16 +1876,16 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 			lifeFade:Show()
 
 			local key = 'CTM_HIT_' .. dwID
-			MY.BreatheCall(key, false)
-			MY.BreatheCall(key, function()
+			LIB.BreatheCall(key, false)
+			LIB.BreatheCall(key, function()
 				if lifeFade:IsValid() then
 					local nFadeAlpha = math.max(lifeFade:GetAlpha() - CTM_ALPHA_STEP, 0)
 					lifeFade:SetAlpha(nFadeAlpha)
 					if nFadeAlpha <= 0 then
-						MY.BreatheCall(key, false)
+						LIB.BreatheCall(key, false)
 					end
 				else
-					MY.BreatheCall(key, false)
+					LIB.BreatheCall(key, false)
 				end
 			end)
 		end
@@ -1912,7 +1912,7 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 				elseif CFG.nBGColorMode == CTM_BG_COLOR_MODE.SAME_COLOR then
 					r, g, b = unpack(CFG.tDistanceCol[1]) -- 使用用户配色1
 				elseif CFG.nBGColorMode == CTM_BG_COLOR_MODE.BY_FORCE then
-					r, g, b = MY.GetForceColor(info.dwForceID, 'background')
+					r, g, b = LIB.GetForceColor(info.dwForceID, 'background')
 				end
 			end
 			self:DrawShadow(Lsha, nNewW, Lsha:GetH(), r, g, b, nAlpha, CFG.bLifeGradient)
@@ -2029,7 +2029,7 @@ function CTM:StartTeamVote(eType)
 				if eType == 'raid_ready' then
 					bAwait = false
 				elseif eType == 'wage_agree' then
-					bAwait = not MY.IsDistributer()
+					bAwait = not LIB.IsDistributer()
 				end
 			end
 			if bAwait then
@@ -2038,11 +2038,11 @@ function CTM:StartTeamVote(eType)
 		end
 	end
 	if opt.timeoutAlert then
-		MY.DelayCall(opt.timeoutAlert, function()
+		LIB.DelayCall(opt.timeoutAlert, function()
 			for k, v in pairs(CTM_CACHE) do
 				if v:IsValid() then
 					if v:Lookup(opt.awaitPath):IsVisible() or v:Lookup(opt.rejectPath):IsVisible() then
-						MY.Confirm(g_tStrings.STR_RAID_READY_CONFIRM_RESET .. '?', function()
+						LIB.Confirm(g_tStrings.STR_RAID_READY_CONFIRM_RESET .. '?', function()
 							self:ClearTeamVote(eType)
 						end)
 						break
@@ -2052,7 +2052,7 @@ function CTM:StartTeamVote(eType)
 		end)
 	end
 	if opt.timeout then
-		MY.DelayCall(opt.timeout, function()
+		LIB.DelayCall(opt.timeout, function()
 			self:ClearTeamVote(eType)
 		end)
 	end
@@ -2070,12 +2070,12 @@ function CTM:ChangeTeamVoteState(eType, dwID, status)
 			local key = 'CTM_READY_' .. eType .. '_' .. dwID
 			h:Lookup(opt.resolvePath):Show()
 			h:Lookup(opt.resolvePath):SetAlpha(240)
-			MY.BreatheCall(key, function()
+			LIB.BreatheCall(key, function()
 				if h:Lookup(opt.resolvePath):IsValid() then
 					local nAlpha = math.max(h:Lookup(opt.resolvePath):GetAlpha() - 15, 0)
 					h:Lookup(opt.resolvePath):SetAlpha(nAlpha)
 					if nAlpha <= 0 then
-						MY.BreatheCall(key, false)
+						LIB.BreatheCall(key, false)
 					end
 				end
 			end)
@@ -2104,7 +2104,7 @@ end
 
 function CTM:CallEffect(dwTargetID, nDelay)
 	if CTM_CACHE[dwTargetID] and CTM_CACHE[dwTargetID]:IsValid() then
-		MY.DelayCall('MY_Cataclysm_' .. dwTargetID, nDelay, function()
+		LIB.DelayCall('MY_Cataclysm_' .. dwTargetID, nDelay, function()
 			if CTM_CACHE[dwTargetID] and CTM_CACHE[dwTargetID]:IsValid() then
 				CTM_CACHE[dwTargetID]:Lookup('Image_Effect'):Hide()
 			end

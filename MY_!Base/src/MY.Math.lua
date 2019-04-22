@@ -6,20 +6,48 @@
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
 --------------------------------------------------------
-local tinsert, tremove = table.insert, table.remove
+-------------------------------------------------------------------------------------------------------------
+-- these global functions are accessed all the time by the event handler
+-- so caching them is worth the effort
+-------------------------------------------------------------------------------------------------------------
+local setmetatable = setmetatable
+local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
+local sub, len, format, rep = string.sub, string.len, string.format, string.rep
+local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
+local type, tonumber, tostring = type, tonumber, tostring
+local huge, pi, random, abs = math.huge, math.pi, math.random, math.abs
+local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
+local pow, sqrt, sin, cos, tan = math.pow, math.sqrt, math.sin, math.cos, math.tan
+local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
+local pack, unpack = table.pack or function(...) return {...} end, table.unpack or unpack
+-- jx3 apis caching
+local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
+local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
+local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
+local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local LIB, UI, DEBUG_LEVEL, PATH_TYPE = MY, MY.UI, MY.DEBUG_LEVEL, MY.PATH_TYPE
+local var2str, str2var, clone, empty, ipairs_r = LIB.var2str, LIB.str2var, LIB.clone, LIB.empty, LIB.ipairs_r
+local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
+local GetPatch, ApplyPatch = LIB.GetPatch, LIB.ApplyPatch
+local Get, Set, RandomChild, GetTraceback = LIB.Get, LIB.Set, LIB.RandomChild, LIB.GetTraceback
+local IsArray, IsDictionary, IsEquals = LIB.IsArray, LIB.IsDictionary, LIB.IsEquals
+local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsNumber, LIB.IsFunction
+local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
+local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
+-------------------------------------------------------------------------------------------------------------
 
--- (table) MY.Number2Bitmap(number n)
+-- (table) LIB.Number2Bitmap(number n)
 -- 将一个数值转换成一个Bit表（低位在前 高位在后）
 do
 local metatable = { __index = function() return 0 end }
-function MY.Number2Bitmap(n)
+function LIB.Number2Bitmap(n)
 	local t = {}
 	if n == 0 then
-		tinsert(t, 0)
+		insert(t, 0)
 	else
 		while n > 0 do
 			local nValue = math.fmod(n, 2)
-			tinsert(t, nValue)
+			insert(t, nValue)
 			n = math.floor(n / 2)
 		end
 	end
@@ -29,7 +57,7 @@ end
 
 -- (number) Bitmap2Number(table t)
 -- 将一个Bit表转换成一个数值（低位在前 高位在后）
-function MY.Bitmap2Number(t)
+function LIB.Bitmap2Number(t)
 	local n = 0
 	for i, v in pairs(t) do
 		if type(i) == 'number' and v and v ~= 0 then
@@ -41,55 +69,55 @@ end
 
 -- (number) SetBit(number n, number i, bool/0/1 b)
 -- 设置一个数值的指定比特位
-function MY.SetNumberBit(n, i, b)
+function LIB.SetNumberBit(n, i, b)
 	n = n or 0
-	local t = MY.Number2Bitmap(n)
+	local t = LIB.Number2Bitmap(n)
 	if b and b ~= 0 then
 		t[i] = 1
 	else
 		t[i] = 0
 	end
-	return MY.Bitmap2Number(t)
+	return LIB.Bitmap2Number(t)
 end
 
 -- (0/1) GetBit(number n, number i)
 -- 获取一个数值的指定比特位
-function MY.GetNumberBit(n, i)
-	return MY.Number2Bitmap(n)[i] or 0
+function LIB.GetNumberBit(n, i)
+	return LIB.Number2Bitmap(n)[i] or 0
 end
 
 -- (number) BitAnd(number n1, number n2)
 -- 按位与运算
-function MY.NumberBitAnd(n1, n2)
-	local t1 = MY.Number2Bitmap(n1)
-	local t2 = MY.Number2Bitmap(n2)
+function LIB.NumberBitAnd(n1, n2)
+	local t1 = LIB.Number2Bitmap(n1)
+	local t2 = LIB.Number2Bitmap(n2)
 	local t3 = {}
 	for i = 1, math.max(#t1, #t2) do
 		t3[i] = t1[i] == 1 and t2[i] == 1 and 1 or 0
 	end
-	return MY.Bitmap2Number(t3)
+	return LIB.Bitmap2Number(t3)
 end
 
 -- (number) BitOr(number n1, number n2)
 -- 按位或运算
-function MY.NumberBitOr(n1, n2)
-	local t1 = MY.Number2Bitmap(n1)
-	local t2 = MY.Number2Bitmap(n2)
+function LIB.NumberBitOr(n1, n2)
+	local t1 = LIB.Number2Bitmap(n1)
+	local t2 = LIB.Number2Bitmap(n2)
 	local t3 = {}
 	for i = 1, math.max(#t1, #t2) do
 		t3[i] = t1[i] == 0 and t2[i] == 0 and 0 or 1
 	end
-	return MY.Bitmap2Number(t3)
+	return LIB.Bitmap2Number(t3)
 end
 
 -- (number) BitXor(number n1, number n2)
 -- 按位异或运算
-function MY.NumberBitXor(n1, n2)
-	local t1 = MY.Number2Bitmap(n1)
-	local t2 = MY.Number2Bitmap(n2)
+function LIB.NumberBitXor(n1, n2)
+	local t1 = LIB.Number2Bitmap(n1)
+	local t2 = LIB.Number2Bitmap(n2)
 	local t3 = {}
 	for i = 1, math.max(#t1, #t2) do
 		t3[i] = t1[i] == t2[i] and 0 or 1
 	end
-	return MY.Bitmap2Number(t3)
+	return LIB.Bitmap2Number(t3)
 end

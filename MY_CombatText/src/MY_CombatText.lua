@@ -50,8 +50,8 @@ local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_
 	其他类型：使用轨迹合并16-32帧，后来的文本会顶走前面的文本，从而跳过这部分停留的帧数。
 ]]
 
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_CombatText/lang/')
-if not MY.AssertVersion('MY_CombatText', _L['MY_CombatText'], 0x2011800) then
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_CombatText/lang/')
+if not LIB.AssertVersion('MY_CombatText', _L['MY_CombatText'], 0x2011800) then
 	return
 end
 local Table_GetBuffName, Table_GetSkillName, Table_BuffIsVisible = Table_GetBuffName, Table_GetSkillName, Table_BuffIsVisible
@@ -63,8 +63,8 @@ local GetPlayer, GetNpc, IsPlayer = GetPlayer, GetNpc, IsPlayer
 local GetSkill, GetTime, Random = GetSkill, GetTime, Random
 local SKILL_RESULT_TYPE = SKILL_RESULT_TYPE
 
-local COMBAT_TEXT_INIFILE        = MY.GetAddonInfo().szRoot .. 'MY_CombatText/ui/MY_CombatText_Render.ini'
-local COMBAT_TEXT_CONFIG         = MY.GetAddonInfo().szRoot .. 'MY_CombatText/config.jx3dat'
+local COMBAT_TEXT_INIFILE        = LIB.GetAddonInfo().szRoot .. 'MY_CombatText/ui/MY_CombatText_Render.ini'
+local COMBAT_TEXT_CONFIG         = LIB.GetAddonInfo().szRoot .. 'MY_CombatText/config.jx3dat'
 local COMBAT_TEXT_PLAYERID       = 0
 local COMBAT_TEXT_TOTAL          = 32
 local COMBAT_TEXT_UI_SCALE       = 1
@@ -234,7 +234,7 @@ MY_CombatText = {
 		[SKILL_RESULT_TYPE.REFLECTIED_DAMAGE]    = { 255, 128, 128 }, -- 反弹 ？？
 	}
 }
-MY.RegisterCustomData('MY_CombatText', 2)
+LIB.RegisterCustomData('MY_CombatText', 2)
 
 local function IsEnabled()
 	return MY_CombatText.bEnable
@@ -264,7 +264,7 @@ function MY_CombatText.OnFrameCreate()
 	CombatText.FreeQueue()
 	COMBAT_TEXT_UI_SCALE   = Station.GetUIScale()
 	COMBAT_TEXT_TRAJECTORY = CombatText.TrajectoryCount()
-	MY.BreatheCall('COMBAT_TEXT_CACHE', 1000 * 60 * 5, function()
+	LIB.BreatheCall('COMBAT_TEXT_CACHE', 1000 * 60 * 5, function()
 		local count = 0
 		for k, v in pairs(COMBAT_TEXT_LEAVE) do
 			count = count + 1
@@ -803,9 +803,9 @@ function CombatText.LoadConfig()
 			COMBAT_TEXT_EVENT       = data.COMBAT_TEXT_EVENT       or COMBAT_TEXT_EVENT
 			COMBAT_TEXT_IGNORE_TYPE = data.COMBAT_TEXT_IGNORE_TYPE or {}
 			COMBAT_TEXT_IGNORE      = data.COMBAT_TEXT_IGNORE      or {}
-			MY.Sysmsg({_L['CombatText Config loaded']})
+			LIB.Sysmsg({_L['CombatText Config loaded']})
 		else
-			MY.Sysmsg({_L['CombatText Config failed']})
+			LIB.Sysmsg({_L['CombatText Config failed']})
 		end
 	end
 end
@@ -814,9 +814,9 @@ function CombatText.CheckEnable()
 	local frame = Station.Lookup('Lowest/CombatText')
 	local ui = Station.Lookup('Lowest/MY_CombatText')
 	if MY_CombatText.bRender then
-		COMBAT_TEXT_INIFILE = MY.GetAddonInfo().szRoot .. 'MY_CombatText/ui/MY_CombatText_Render.ini'
+		COMBAT_TEXT_INIFILE = LIB.GetAddonInfo().szRoot .. 'MY_CombatText/ui/MY_CombatText_Render.ini'
 	else
-		COMBAT_TEXT_INIFILE = MY.GetAddonInfo().szRoot .. 'MY_CombatText/ui/MY_CombatText.ini'
+		COMBAT_TEXT_INIFILE = LIB.GetAddonInfo().szRoot .. 'MY_CombatText/ui/MY_CombatText.ini'
 	end
 	if MY_CombatText.bEnable then
 		COMBAT_TEXT_SCALE.CRITICAL = COMBAT_TEXT_STYLES[MY_CombatText.nStyle] and COMBAT_TEXT_STYLES[MY_CombatText.nStyle] or COMBAT_TEXT_STYLES[0]
@@ -836,7 +836,7 @@ function CombatText.CheckEnable()
 		if ui then
 			CombatText.FreeQueue()
 			Wnd.CloseWindow(ui)
-			MY.BreatheCall('COMBAT_TEXT_CACHE', false)
+			LIB.BreatheCall('COMBAT_TEXT_CACHE', false)
 			collectgarbage('collect')
 		end
 	end
@@ -1165,9 +1165,9 @@ function PS.OnPanelActive(frame)
 		x = x, y = y, text = _L['Critical Color'], checked = MY_CombatText.bCritical and true or false,
 		oncheck = function(bCheck)
 			MY_CombatText.bCritical = bCheck
-			MY.ShowPanel()
-			MY.FocusPanel()
-			MY.SwitchTab('MY_CombatText', true)
+			LIB.ShowPanel()
+			LIB.FocusPanel()
+			LIB.SwitchTab('MY_CombatText', true)
 		end,
 		autoenable = IsEnabled,
 	})
@@ -1197,22 +1197,22 @@ function PS.OnPanelActive(frame)
 		ui:append('WndButton3', { x = 350, y = 0, text = _L['Load CombatText Config'] }):Click(CombatText.CheckEnable)
 	end
 end
-MY.RegisterPanel('MY_CombatText', _L['CombatText'], _L['System'], 2041, PS)
+LIB.RegisterPanel('MY_CombatText', _L['CombatText'], _L['System'], 2041, PS)
 
 local function GetPlayerID()
 	local me = GetControlPlayer()
 	if me then
 		COMBAT_TEXT_PLAYERID = me.dwID
-		-- MY.Debug('CombatText get player id ' .. me.dwID, DEBUG_LEVEL.LOG)
+		-- LIB.Debug('CombatText get player id ' .. me.dwID, DEBUG_LEVEL.LOG)
 	else
-		MY.Sysmsg({'CombatText get player id failed!!! try again'}, DEBUG_LEVEL.ERROR)
-		MY.DelayCall(1000, GetPlayerID)
+		LIB.Sysmsg({'CombatText get player id failed!!! try again'}, DEBUG_LEVEL.ERROR)
+		LIB.DelayCall(1000, GetPlayerID)
 	end
 end
-MY.RegisterEvent('LOADING_END.MY_CombatText', GetPlayerID) -- 很重要的优化
-MY.RegisterEvent('ON_NEW_PROXY_SKILL_LIST_NOTIFY.MY_CombatText', GetPlayerID) -- 长歌控制主体ID切换
-MY.RegisterEvent('ON_CLEAR_PROXY_SKILL_LIST_NOTIFY.MY_CombatText', GetPlayerID) -- 长歌控制主体ID切换
-MY.RegisterEvent('ON_PVP_SHOW_SELECT_PLAYER.MY_CombatText', function()
+LIB.RegisterEvent('LOADING_END.MY_CombatText', GetPlayerID) -- 很重要的优化
+LIB.RegisterEvent('ON_NEW_PROXY_SKILL_LIST_NOTIFY.MY_CombatText', GetPlayerID) -- 长歌控制主体ID切换
+LIB.RegisterEvent('ON_CLEAR_PROXY_SKILL_LIST_NOTIFY.MY_CombatText', GetPlayerID) -- 长歌控制主体ID切换
+LIB.RegisterEvent('ON_PVP_SHOW_SELECT_PLAYER.MY_CombatText', function()
 	COMBAT_TEXT_PLAYERID = arg0
 end)
-MY.RegisterEvent('FIRST_LOADING_END.MY_CombatText', CombatText.CheckEnable)
+LIB.RegisterEvent('FIRST_LOADING_END.MY_CombatText', CombatText.CheckEnable)

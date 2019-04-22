@@ -36,7 +36,7 @@ local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.Is
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
 -- 测试用（请求共享位置）
-MY.RegisterBgMsg('ASK_CURRENT_LOC', function(_, nChannel, dwTalkerID, szTalkerName, bSelf)
+LIB.RegisterBgMsg('ASK_CURRENT_LOC', function(_, nChannel, dwTalkerID, szTalkerName, bSelf)
 	if bSelf then
 		return
 	end
@@ -45,60 +45,60 @@ MY.RegisterBgMsg('ASK_CURRENT_LOC', function(_, nChannel, dwTalkerID, szTalkerNa
 		szMessage = _L('[%s] wants to get your location, would you like to share?', szTalkerName), {
 			szOption = g_tStrings.STR_HOTKEY_SURE, fnAction = function()
 				local me = GetClientPlayer()
-				MY.SendBgMsg(szTalkerName, 'REPLY_CURRENT_LOC', { me.GetMapID(), me.nX, me.nY, me.nZ })
+				LIB.SendBgMsg(szTalkerName, 'REPLY_CURRENT_LOC', { me.GetMapID(), me.nX, me.nY, me.nZ })
 			end
 		}, { szOption = g_tStrings.STR_HOTKEY_CANCEL },
 	})
 end)
 
 -- 测试用（查看版本信息）
-MY.RegisterBgMsg('MY_VERSION_CHECK', function(_, nChannel, dwTalkerID, szTalkerName, bSelf, bSilent)
+LIB.RegisterBgMsg('MY_VERSION_CHECK', function(_, nChannel, dwTalkerID, szTalkerName, bSelf, bSilent)
 	if bSelf then
 		return
 	end
-	if not bSilent and MY.IsInParty() then
-		MY.Talk(PLAYER_TALK_CHANNEL.RAID, _L('I\'ve installed MY plugins v%s', MY.GetVersion()))
+	if not bSilent and LIB.IsInParty() then
+		LIB.Talk(PLAYER_TALK_CHANNEL.RAID, _L('I\'ve installed MY plugins v%s', LIB.GetVersion()))
 	end
-	MY.SendBgMsg(szTalkerName, 'MY_VERSION_REPLY', MY.GetVersion())
+	LIB.SendBgMsg(szTalkerName, 'MY_VERSION_REPLY', LIB.GetVersion())
 end)
 
 -- 进组查看属性
-MY.RegisterBgMsg('RL', function(_, nChannel, dwID, szName, bIsSelf, ...)
+LIB.RegisterBgMsg('RL', function(_, nChannel, dwID, szName, bIsSelf, ...)
 	local data = {...}
 	if not bIsSelf then
 		if data[1] == 'ASK' then
-			MY.Confirm(_L('[%s] want to see your info, OK?', szName), function()
+			LIB.Confirm(_L('[%s] want to see your info, OK?', szName), function()
 				local me = GetClientPlayer()
-				local nGongZhan = MY.GetBuff(3219) and 1 or 0
-				local bEx = MY.GetAddonInfo().tAuthor[me.dwID] == me.szName and 'Author' or 'Player'
-				MY.SendBgMsg(szName, 'RL', 'Feedback', me.dwID, UI_GetPlayerMountKungfuID(), nGongZhan, bEx)
+				local nGongZhan = LIB.GetBuff(3219) and 1 or 0
+				local bEx = LIB.GetAddonInfo().tAuthor[me.dwID] == me.szName and 'Author' or 'Player'
+				LIB.SendBgMsg(szName, 'RL', 'Feedback', me.dwID, UI_GetPlayerMountKungfuID(), nGongZhan, bEx)
 			end)
 		end
 	end
 end)
 
 -- 查看完整属性
-MY.RegisterBgMsg('CHAR_INFO', function(_, nChannel, dwID, szName, bIsSelf, ...)
+LIB.RegisterBgMsg('CHAR_INFO', function(_, nChannel, dwID, szName, bIsSelf, ...)
 	local data = {...}
 	if not bIsSelf and data[2] == UI_GetClientPlayerID() then
 		if data[1] == 'ASK'  then
 			if not MY_CharInfo or MY_CharInfo.bEnable or data[3] == 'DEBUG' then
-				local aInfo = MY.GetCharInfo()
-				if not MY.IsParty(dwID) and not data[3] == 'DEBUG' then
+				local aInfo = LIB.GetCharInfo()
+				if not LIB.IsParty(dwID) and not data[3] == 'DEBUG' then
 					for _, v in ipairs(aInfo) do
 						v.tip = nil
 					end
 				end
-				MY.SendBgMsg(MY.IsParty(dwID) and PLAYER_TALK_CHANNEL.RAID or szName, 'CHAR_INFO', 'ACCEPT', dwID, aInfo)
+				LIB.SendBgMsg(LIB.IsParty(dwID) and PLAYER_TALK_CHANNEL.RAID or szName, 'CHAR_INFO', 'ACCEPT', dwID, aInfo)
 			else
-				MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'CHAR_INFO', 'REFUSE', dwID)
+				LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'CHAR_INFO', 'REFUSE', dwID)
 			end
 		end
 	end
 end)
 
 -- 搬运JH_ABOUT
-MY.RegisterBgMsg('MY_ABOUT', function(_, nChannel, dwID, szName, bIsSelf, ...)
+LIB.RegisterBgMsg('MY_ABOUT', function(_, nChannel, dwID, szName, bIsSelf, ...)
 	local data = {...}
 	if data[1] == 'Author' then -- 版本检查 自用 可以绘制详细表格
 		local me, szTong = GetClientPlayer(), ''
@@ -106,14 +106,14 @@ MY.RegisterBgMsg('MY_ABOUT', function(_, nChannel, dwID, szName, bIsSelf, ...)
 			szTong = GetTongClient().ApplyGetTongName(me.dwTongID) or 'Failed'
 		end
 		local szServer = select(2, GetUserServer())
-		MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_ABOUT', 'info',
+		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_ABOUT', 'info',
 			me.GetTotalEquipScore(),
 			me.GetMapID(),
 			szTong,
 			me.nRoleType,
-			MY.GetAddonInfo().dwVersion,
+			LIB.GetAddonInfo().dwVersion,
 			szServer,
-			MY.GetBuff(3219)
+			LIB.GetBuff(3219)
 		)
 	elseif data[1] == 'TeamAuth' then -- 防止有人睡着 遇到了不止一次了
 		local team = GetClientTeam()
@@ -131,7 +131,7 @@ end)
 
 -- 团队副本CD
 do local LAST_TIME = {}
-MY.RegisterBgMsg('MY_MAP_COPY_ID_REQUEST', function(_, nChannel, dwID, szName, bIsSelf, dwMapID, aPlayerID)
+LIB.RegisterBgMsg('MY_MAP_COPY_ID_REQUEST', function(_, nChannel, dwID, szName, bIsSelf, dwMapID, aPlayerID)
 	if LAST_TIME[dwMapID] and GetCurrentTime() - LAST_TIME[dwMapID] < 5 then
 		return
 	end
@@ -148,9 +148,9 @@ MY.RegisterBgMsg('MY_MAP_COPY_ID_REQUEST', function(_, nChannel, dwID, szName, b
 		end
 	end
 	local function fnAction(tMapID)
-		MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_MAP_COPY_ID', dwMapID, tMapID[dwMapID] or -1)
+		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_MAP_COPY_ID', dwMapID, tMapID[dwMapID] or -1)
 	end
-	MY.GetMapSaveCopy(fnAction)
+	LIB.GetMapSaveCopy(fnAction)
 	LAST_TIME[dwMapID] = GetCurrentTime()
 end)
 end
@@ -158,17 +158,17 @@ end
 -- 进入团队副本
 do local MSG_MAP_ID, MSG_ID
 local function OnSwitchMap(dwMapID, dwID, dwCopyID)
-	if not MY.IsInParty() then
+	if not LIB.IsInParty() then
 		return
 	end
-	MY.Debug({'Switch dungeon :' .. dwMapID}, 'MYLIB', DEBUG_LEVEL.LOG)
-	MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_SWITCH_MAP', dwMapID, dwID, dwCopyID)
+	LIB.Debug({'Switch dungeon :' .. dwMapID}, LIB.GetAddonInfo().szNameSpace, DEBUG_LEVEL.LOG)
+	LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_SWITCH_MAP', dwMapID, dwID, dwCopyID)
 end
 
 local function OnCrossMapGoFB()
 	local dwMapID, dwID = this.tInfo.MapID, this.tInfo.ID
-	if not MY.IsDungeonResetable(dwMapID) or (MY.IsInParty() and not MY.IsLeader()) then
-		OnSwitchMap(dwMapID, dwID, MY.GetMapSaveCopy(dwMapID))
+	if not LIB.IsDungeonResetable(dwMapID) or (LIB.IsInParty() and not LIB.IsLeader()) then
+		OnSwitchMap(dwMapID, dwID, LIB.GetMapSaveCopy(dwMapID))
 	else
 		MSG_MAP_ID, MSG_ID = dwMapID, dwID
 	end
@@ -183,7 +183,7 @@ local function OnFBAppendItemFromIni(hList)
 	end
 end
 
-MY.RegisterEvent('ON_FRAME_CREATE.MYLIB#CD', function()
+LIB.RegisterEvent('ON_FRAME_CREATE.' .. LIB.GetAddonInfo().szNameSpace .. '#CD', function()
 	if arg0:GetName() ~= 'CrossMap' then
 		return
 	end
@@ -196,10 +196,10 @@ MY.RegisterEvent('ON_FRAME_CREATE.MYLIB#CD', function()
 	if btn then
 		HookTableFunc(btn, 'OnLButtonUp', OnCrossMapGoFB, { bAfterOrigin = true })
 	end
-	MY.Debug({'Cross panel hooked.'}, 'MYLIB', DEBUG_LEVEL.LOG)
+	LIB.Debug({'Cross panel hooked.'}, LIB.GetAddonInfo().szNameSpace, DEBUG_LEVEL.LOG)
 end)
 
-MY.RegisterEvent('MY_MESSAGE_BOX_ACTION.MYLIB#CD', function()
+LIB.RegisterEvent('MY_MESSAGE_BOX_ACTION.' .. LIB.GetAddonInfo().szNameSpace .. '#CD', function()
 	if arg0 ~= 'crossmap_dungeon_reset' then
 		return
 	end

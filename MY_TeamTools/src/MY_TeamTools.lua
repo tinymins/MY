@@ -36,10 +36,10 @@ local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.Is
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
 local SKILL_RESULT_TYPE = SKILL_RESULT_TYPE
-local MY_IsParty, MY_GetSkillName, MY_GetBuffName = MY.IsParty, MY.GetSkillName, MY.GetBuffName
+local MY_IsParty, MY_GetSkillName, MY_GetBuffName = LIB.IsParty, LIB.GetSkillName, LIB.GetBuffName
 
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_TeamTools/lang/')
-local RT_INIFILE = MY.GetAddonInfo().szRoot .. 'MY_TeamTools/ui/RaidTools2.ini'
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_TeamTools/lang/')
+local RT_INIFILE = LIB.GetAddonInfo().szRoot .. 'MY_TeamTools/ui/RaidTools2.ini'
 local RT_EQUIP_TOTAL = {
 	'MELEE_WEAPON', -- 轻剑 藏剑取 BIG_SWORD 重剑
 	'RANGE_WEAPON', -- 远程武器
@@ -140,7 +140,7 @@ MY_RaidTools = {
 }
 local RaidTools = MY_RaidTools
 
-MY.RegisterCustomData('MY_RaidTools')
+LIB.RegisterCustomData('MY_RaidTools')
 
 function RaidTools.OnFrameCreate()
 	this:RegisterEvent('UI_SCALED')
@@ -160,10 +160,10 @@ function RaidTools.OnFrameCreate()
 	-- 重置心法选择
 	RT_SELECT_KUNGFU = nil
 	-- 注册关闭
-	MY.RegisterEsc('MY_RaidTools', RT.IsOpened, RT.ClosePanel)
+	LIB.RegisterEsc('MY_RaidTools', RT.IsOpened, RT.ClosePanel)
 	-- 标题修改
 	local title = _L['Raid Tools']
-	if MY.IsInParty() then
+	if LIB.IsInParty() then
 		local team = GetClientTeam()
 		local info = team.GetMemberInfo(team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER))
 		title = _L('%s\'s Team', info.szName) .. ' (' .. team.GetTeamSize() .. '/' .. team.nGroupNum * 5  .. ')'
@@ -210,7 +210,7 @@ function RaidTools.OnFrameCreate()
 	this.hKungfuList = this.hPageSet:Lookup('Page_Info', 'Handle_Kungfu/Handle_Kungfu_List')
 	this.hKungfu     = this:CreateItemData(RT_INIFILE, 'Handle_Kungfu_Item')
 	this.hKungfuList:Clear()
-	for k, dwKungfuID in pairs(MY.GetKungfuList()) do
+	for k, dwKungfuID in pairs(LIB.GetKungfuList()) do
 		local h = this.hKungfuList:AppendItemFromData(this.hKungfu, dwKungfuID)
 		local img = h:Lookup('Image_Force')
 		img:FromIconID(select(2, MY_GetSkillName(dwKungfuID)))
@@ -250,8 +250,8 @@ function RaidTools.OnFrameCreate()
 	this.tViewInvite = {} -- 请求装备队列
 	this.tDataCache  = {} -- 临时数据
 	-- 请求数据
-	if MY.IsDungeonMap(RT_MAPID) and not MY.IsDungeonRoleProgressMap(RT_MAPID) then
-		MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_MAP_COPY_ID_REQUEST', RT_MAPID) -- 打开界面刷新
+	if LIB.IsDungeonMap(RT_MAPID) and not LIB.IsDungeonRoleProgressMap(RT_MAPID) then
+		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_MAP_COPY_ID_REQUEST', RT_MAPID) -- 打开界面刷新
 	end
 	-- 追加呼吸
 	this.hPageSet:ActivePage(RT_SELECT_PAGE)
@@ -298,8 +298,8 @@ function RaidTools.OnEvent(szEvent)
 		local hDungeon = this.hPageSet:Lookup('Page_Info', 'Handle_Dungeon')
 		RT.UpdateDungeonInfo(hDungeon)
 	elseif szEvent == 'MY_RAIDTOOLS_MAPID_CHANGE' then
-		if MY.IsDungeonMap(RT_MAPID) and not MY.IsDungeonRoleProgressMap(RT_MAPID) then
-			MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_MAP_COPY_ID_REQUEST', RT_MAPID) -- 地图变化刷新
+		if LIB.IsDungeonMap(RT_MAPID) and not LIB.IsDungeonRoleProgressMap(RT_MAPID) then
+			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_MAP_COPY_ID_REQUEST', RT_MAPID) -- 地图变化刷新
 		end
 		local hDungeon = this.hPageSet:Lookup('Page_Info', 'Handle_Dungeon')
 		RT.UpdateDungeonInfo(hDungeon)
@@ -337,15 +337,15 @@ end
 function RaidTools.OnActivePage()
 	local nPage = this:GetActivePageIndex()
 	if nPage == 0 then
-		MY.BreatheCall('MY_RaidTools', 1000, RT.UpdateList)
-		MY.BreatheCall('MY_RaidTools_Clear', 3000, RT.GetEquip)
+		LIB.BreatheCall('MY_RaidTools', 1000, RT.UpdateList)
+		LIB.BreatheCall('MY_RaidTools_Clear', 3000, RT.GetEquip)
 		local hView = RT.GetPlayerView()
 		if hView and hView:IsVisible() then
 			hView:Hide()
 		end
 	else
-		MY.BreatheCall('MY_RaidTools', false)
-		MY.BreatheCall('MY_RaidTools_Clear', false)
+		LIB.BreatheCall('MY_RaidTools', false)
+		LIB.BreatheCall('MY_RaidTools_Clear', false)
 	end
 	if nPage == 1 then
 		RT.UpdatetDeathPage()
@@ -361,7 +361,7 @@ function RaidTools.OnLButtonClick()
 		RT_SELECT_DEATH = nil
 		RT.UpdatetDeathMsg()
 	elseif szName == 'Btn_Clear' then
-		MY.Confirm(_L['Clear Record'], RaidTools.ClearDeathLog)
+		LIB.Confirm(_L['Clear Record'], RaidTools.ClearDeathLog)
 	elseif szName == 'Btn_Style' then
 		RaidTools.nStyle = RaidTools.nStyle == 1 and 2 or 1
 		RT.SetStyle()
@@ -423,7 +423,7 @@ end
 function RaidTools.OnItemLButtonClick()
 	local szName = this:GetName()
 	if szName == 'Handle_Dungeon' then
-		local menu = MY.GetDungeonMenu(function(p) RT.SetMapID(p.dwID) end)
+		local menu = LIB.GetDungeonMenu(function(p) RT.SetMapID(p.dwID) end)
 		menu.x, menu.y = Cursor.GetPos(true)
 		PopupMenu(menu)
 	elseif tonumber(szName:find('P(%d+)')) then
@@ -486,10 +486,10 @@ end
 function RT.UpdateDungeonInfo(hDungeon)
 	local me = GetClientPlayer()
 	local szText = Table_GetMapName(RT_MAPID)
-	if me.GetMapID() == RT_MAPID and MY.IsDungeonMap(RT_MAPID) then
+	if me.GetMapID() == RT_MAPID and LIB.IsDungeonMap(RT_MAPID) then
 		szText = szText .. '\n' .. 'ID:(' .. me.GetScene().nCopyIndex  ..')'
 	else
-		local tCD = MY.GetMapSaveCopy()
+		local tCD = LIB.GetMapSaveCopy()
 		if tCD and tCD[RT_MAPID] then
 			szText = szText .. '\n' .. 'ID:(' .. tCD[RT_MAPID][1]  ..')'
 		end
@@ -532,7 +532,7 @@ end
 function RT.CalculateSort(tInfo)
 	local nCount = -2
 	if RT_SORT_FIELD == 'tBossKill' then
-		if MY.IsDungeonRoleProgressMap(RT_MAPID) then
+		if LIB.IsDungeonRoleProgressMap(RT_MAPID) then
 			nCount = 0
 			for _, p in ipairs(tInfo[RT_SORT_FIELD]) do
 				if p then
@@ -603,7 +603,7 @@ function RT.UpdateList()
 				h:Lookup('Image_Icon'):FromUITex(GetForceImage(v.dwForceID))
 			end
 			h:Lookup('Text_Name'):SetText(v.szName)
-			h:Lookup('Text_Name'):SetFontColor(MY.GetForceColor(v.dwForceID))
+			h:Lookup('Text_Name'):SetFontColor(LIB.GetForceColor(v.dwForceID))
 			-- 药品和BUFF
 			if not h['hHandle_Food'] then
 				h['hHandle_Food'] = {
@@ -653,7 +653,7 @@ function RT.UpdateList()
 						local nTime = (nEndFrame - GetLogicFrameCount()) / 16
 						local x, y = this:GetAbsPos()
 						local w, h = this:GetSize()
-						MY.OutputBuffTip(dwID, nLevel, { x, y, w, h }, nTime)
+						LIB.OutputBuffTip(dwID, nLevel, { x, y, w, h }, nTime)
 					end
 					local nTime = (vv.nEndFrame - GetLogicFrameCount()) / 16
 					if nTime < 480 then
@@ -668,7 +668,7 @@ function RT.UpdateList()
 					if item and not item.bFree then
 						local dwID, nLevel, nEndFrame = select(2, item:GetObject())
 						if dwID and nLevel then
-							if not MY.GetBuff(v.KPlayer, dwID, nLevel) then
+							if not LIB.GetBuff(v.KPlayer, dwID, nLevel) then
 								h.hHandle_Food.Pool:Remove(item)
 							end
 						end
@@ -702,9 +702,9 @@ function RT.UpdateList()
 					hBox.OnItemMouseEnter = function()
 						local x, y = this:GetAbsPos()
 						local w, h = this:GetSize()
-						local kBuff = MY.GetBuff(v.KPlayer, RT_GONGZHAN_ID)
+						local kBuff = LIB.GetBuff(v.KPlayer, RT_GONGZHAN_ID)
 						if kBuff then
-							MY.OutputBuffTip(kBuff.dwID, kBuff.nLevel, { x, y, w, h })
+							LIB.OutputBuffTip(kBuff.dwID, kBuff.nLevel, { x, y, w, h })
 						end
 					end
 				end
@@ -775,7 +775,7 @@ function RT.UpdateList()
 					local box = handle_equip:Lookup(szName)
 					if not box then
 						box = h.hHandle_Equip.Pool:New()
-						MY.UpdateItemBoxExtend(box, vv.nQuality)
+						LIB.UpdateItemBoxExtend(box, vv.nQuality)
 					end
 					box:SetName(szName)
 					box:SetObject(UI_OBJECT_OTER_PLAYER_ITEM, vv.nUiId, vv.dwBox, vv.dwX, v.dwID)
@@ -833,7 +833,7 @@ function RT.UpdateList()
 			end
 			local hCopyID = h:Lookup('Text_CopyID')
 			local hBossKills = h:Lookup('Handle_BossKills')
-			if MY.IsDungeonRoleProgressMap(RT_MAPID) then
+			if LIB.IsDungeonRoleProgressMap(RT_MAPID) then
 				for nIndex, bKill in ipairs(v.tBossKill) do
 					local szName = tostring(nIndex)
 					local hBossKill = hBossKills:Lookup(szName)
@@ -900,7 +900,7 @@ function RT.UpdateList()
 	frame.hProgress:Lookup('Image_Progress'):SetPercentage(nAvgScore / RT_SCORE_FULL)
 	frame.hProgress:Lookup('Text_Progress'):SetText(_L('Team strength(%d/%d)', math.floor(nAvgScore), RT_SCORE_FULL))
 	-- 心法统计
-	for k, dwKungfuID in pairs(MY.GetKungfuList()) do
+	for k, dwKungfuID in pairs(LIB.GetKungfuList()) do
 		local h = frame.hKungfuList:Lookup(k - 1)
 		local img = h:Lookup('Image_Force')
 		local nCount = 0
@@ -1043,8 +1043,8 @@ function RT.GetTeam()
 	local team  = GetClientTeam()
 	local aList = {}
 	local frame = RT.GetFrame()
-	local bIsInParty = MY.IsInParty()
-	local bIsDungeonRoleProgressMap = MY.IsDungeonRoleProgressMap(RT_MAPID)
+	local bIsInParty = LIB.IsInParty()
+	local bIsDungeonRoleProgressMap = LIB.IsDungeonRoleProgressMap(RT_MAPID)
 	local aProgressMapBoss = bIsDungeonRoleProgressMap and Table_GetCDProcessBoss(RT_MAPID)
 	local aRequestMapCopyID = {}
 	local aTeamMemberList = RT.GetTeamMemberList()
@@ -1074,7 +1074,7 @@ function RT.GetTeam()
 		end
 		if KPlayer then
 			-- 小吃和buff
-			for _, tBuff in ipairs(MY.GetBuffList(KPlayer)) do
+			for _, tBuff in ipairs(LIB.GetBuffList(KPlayer)) do
 				local nType = GetBuffInfo(tBuff.dwID, tBuff.nLevel, {}).nDetachType or 0
 				if RT_FOOD_TYPE[nType] then
 					insert(aInfo.tFood, tBuff)
@@ -1091,7 +1091,7 @@ function RT.GetTeam()
 			end
 		end
 		-- 副本CDID
-		if aInfo.bIsOnLine and not bIsDungeonRoleProgressMap and MY.IsDungeonMap(RT_MAPID) then
+		if aInfo.bIsOnLine and not bIsDungeonRoleProgressMap and LIB.IsDungeonMap(RT_MAPID) then
 			if not RT_PLAYER_MAP_COPYID[dwID] then
 				RT_PLAYER_MAP_COPYID[dwID] = {}
 			end
@@ -1119,7 +1119,7 @@ function RT.GetTeam()
 		if #aRequestMapCopyID == #aTeamMemberList then
 			aRequestMapCopyID = nil
 		end
-		MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_MAP_COPY_ID_REQUEST', RT_MAPID, aRequestMapCopyID) -- 周期刷新
+		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_MAP_COPY_ID_REQUEST', RT_MAPID, aRequestMapCopyID) -- 周期刷新
 	end
 	return aList
 end
@@ -1191,7 +1191,7 @@ function RT.UpdatetDeathPage()
 			h.szName = szName
 			h:Lookup('Image_DeathIcon'):FromIconID(icon)
 			h:Lookup('Text_DeathName'):SetText(szName)
-			h:Lookup('Text_DeathName'):SetFontColor(MY.GetForceColor(info and info.dwForceID or me.dwForceID))
+			h:Lookup('Text_DeathName'):SetFontColor(LIB.GetForceColor(info and info.dwForceID or me.dwForceID))
 			h:Lookup('Text_DeathCount'):SetText(v.nCount)
 		end
 	end
@@ -1301,7 +1301,7 @@ function RT.UpdatetDeathMsg(dwID)
 			local t = TimeToDate(v.nCurrentTime)
 			local xml = {}
 			insert(xml, GetFormatText(_L[' * '] .. string.format('[%02d:%02d:%02d]', t.hour, t.minute, t.second), 10, 255, 255, 255, 16, 'this.OnItemLButtonClick = MY_RaidTools.OnAppendEdit'))
-			local r, g, b = MY.GetForceColor(info and info.dwForceID or me.dwForceID)
+			local r, g, b = LIB.GetForceColor(info and info.dwForceID or me.dwForceID)
 			insert(xml, GetFormatText('[' .. (info and info.szName or me.szName) ..']', 10, r, g, b, 16, 'this.OnItemLButtonClick = function() OnItemLinkDown(this) end', 'namelink'))
 			insert(xml, GetFormatText(g_tStrings.TRADE_BE, 10, 255, 255, 255))
 			if szKiller == '' and v.data[1].szKiller ~= '' then
@@ -1319,7 +1319,7 @@ end
 
 -- UI操作 惯例
 function RT.SetStyle()
-	RT_INIFILE = MY.GetAddonInfo().szRoot .. 'MY_TeamTools/ui/MY_RaidTools' .. RaidTools.nStyle .. '.ini'
+	RT_INIFILE = LIB.GetAddonInfo().szRoot .. 'MY_TeamTools/ui/MY_RaidTools' .. RaidTools.nStyle .. '.ini'
 end
 
 function RT.SetMapID(dwMapID)
@@ -1348,9 +1348,9 @@ function RT.ClosePanel()
 		local frame = RT.GetFrame()
 		Wnd.CloseWindow(RT.GetFrame())
 		PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
-		MY.BreatheCall('MY_RaidTools', false)
-		MY.BreatheCall('MY_RaidTools_Clear', false)
-		MY.RegisterEsc('RaidTools')
+		LIB.BreatheCall('MY_RaidTools', false)
+		LIB.BreatheCall('MY_RaidTools_Clear', false)
+		LIB.RegisterEsc('RaidTools')
 	end
 end
 
@@ -1362,12 +1362,12 @@ function RT.TogglePanel()
 	end
 end
 
-MY.RegisterEvent('LOGIN_GAME', RT.SetStyle)
+LIB.RegisterEvent('LOGIN_GAME', RT.SetStyle)
 
 local function onLoadingEnd()
 	RT.SetMapID(GetClientPlayer().GetMapID())
 end
-MY.RegisterEvent('LOADING_END', onLoadingEnd)
+LIB.RegisterEvent('LOADING_END', onLoadingEnd)
 
 local function onBgMsgMapCopyID(_, nChannel, dwID, szName, bIsSelf, dwMapID, aCopyID)
 	if not RT_PLAYER_MAP_COPYID[dwID] then
@@ -1379,10 +1379,10 @@ local function onBgMsgMapCopyID(_, nChannel, dwID, szName, bIsSelf, dwMapID, aCo
 	RT_PLAYER_MAP_COPYID[dwID][dwMapID].nID = IsTable(aCopyID) and aCopyID[1] or -1
 	RT_PLAYER_MAP_COPYID[dwID][dwMapID].nReceiveTime = GetCurrentTime()
 end
-MY.RegisterBgMsg('MY_MAP_COPY_ID', onBgMsgMapCopyID)
+LIB.RegisterBgMsg('MY_MAP_COPY_ID', onBgMsgMapCopyID)
 
-MY.RegisterAddonMenu({ szOption = _L['Raid Tools Panel'], fnAction = RT.TogglePanel })
-MY.RegisterHotKey('MY_RaidTools', _L['Open/Close Raid Tools Panel'], RT.TogglePanel)
+LIB.RegisterAddonMenu({ szOption = _L['Raid Tools Panel'], fnAction = RT.TogglePanel })
+LIB.RegisterHotKey('MY_RaidTools', _L['Open/Close Raid Tools Panel'], RT.TogglePanel)
 
 local ui = {
 	TogglePanel = RT.TogglePanel

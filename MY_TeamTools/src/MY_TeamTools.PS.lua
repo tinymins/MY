@@ -35,8 +35,8 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_TeamTools/lang/')
-if not MY.AssertVersion('MY_TeamTools', _L['MY_TeamTools'], 0x2011800) then
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_TeamTools/lang/')
+if not LIB.AssertVersion('MY_TeamTools', _L['MY_TeamTools'], 0x2011800) then
 	return
 end
 local PS = {}
@@ -65,7 +65,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	}, true):autoWidth():width() + 5
 
-	if not MY.IsShieldedVersion() then
+	if not LIB.IsShieldedVersion() then
 		x = x + ui:append('WndCheckBox', {
 			x = x, y = y,
 			checked = MY_WorldMark.bEnable,
@@ -145,4 +145,4 @@ function PS.OnPanelActive(wnd)
 	}, true):autoWidth()
 	y = y + 25
 end
-MY.RegisterPanel('MY_TeamTools', _L['MY_TeamTools'], _L['Raid'], 5962, PS)
+LIB.RegisterPanel('MY_TeamTools', _L['MY_TeamTools'], _L['Raid'], 5962, PS)

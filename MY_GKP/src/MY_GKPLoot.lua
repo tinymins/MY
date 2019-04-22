@@ -35,18 +35,18 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local PATH_ROOT = MY.GetAddonInfo().szRoot .. 'MY_GKP/'
-local _L = MY.LoadLangPack(PATH_ROOT .. 'lang/')
+local PATH_ROOT = LIB.GetAddonInfo().szRoot .. 'MY_GKP/'
+local _L = LIB.LoadLangPack(PATH_ROOT .. 'lang/')
 
 local GKP_LOOT_ANCHOR  = { s = 'CENTER', r = 'CENTER', x = 0, y = 0 }
 local GKP_LOOT_INIFILE = PATH_ROOT .. 'ui/MY_GKP_Loot.ini'
 local MY_GKP_LOOT_BOSS -- 散件老板
 
 local GKP_LOOT_HUANGBABA = {
-	[MY.GetItemName(72592)]  = true,
-	[MY.GetItemName(68363)]  = true,
-	[MY.GetItemName(66190)]  = true,
-	[MY.GetItemName(153897)] = true,
+	[LIB.GetItemName(72592)]  = true,
+	[LIB.GetItemName(68363)]  = true,
+	[LIB.GetItemName(66190)]  = true,
+	[LIB.GetItemName(153897)] = true,
 }
 local GKP_LOOT_AUTO = {}
 local GKP_LOOT_AUTO_LIST = { -- 记录分配上次的物品
@@ -85,20 +85,20 @@ MY_GKP_Loot = {
 	bVertical = true,
 	bSetColor = true,
 }
-MY.RegisterCustomData('MY_GKP_Loot')
+LIB.RegisterCustomData('MY_GKP_Loot')
 
 MY_GKP_Loot.tItemConfig = {
 	nQualityFilter = -1,
 	nAutoPickupQuality = -1,
 }
-MY.RegisterCustomData('MY_GKP_Loot.tItemConfig')
+LIB.RegisterCustomData('MY_GKP_Loot.tItemConfig')
 
 do
 local function onLoadingEnd()
 	MY_GKP_Loot.tItemConfig.nQualityFilter = -1
 	MY_GKP_Loot.tItemConfig.nAutoPickupQuality = -1
 end
-MY.RegisterEvent('LOADING_END.MY_GKP_Loot', onLoadingEnd)
+LIB.RegisterEvent('LOADING_END.MY_GKP_Loot', onLoadingEnd)
 end
 
 function MY_GKP_Loot.CanDialog(tar, doodad)
@@ -134,12 +134,12 @@ function MY_GKP_Loot.OnFrameBreathe()
 		local doodad = GetDoodad(wnd.dwDoodadID)
 		-- 拾取判定
 		local bCanDialog = MY_GKP_Loot.CanDialog(me, doodad)
-		if not MY.IsShieldedVersion() then
+		if not LIB.IsShieldedVersion() then
 			local hList, box = wnd:Lookup('', 'Handle_ItemList')
 			for i = 0, hList:GetItemCount() - 1 do
 				box = hList:Lookup(i):Lookup('Box_Item')
 				if MY_GKP_Loot.IsItemAutoPickup(box.itemData, wnd.tItemConfig, doodad, bCanDialog) then
-					MY.ExecuteWithThis(box, MY_GKP_Loot.OnItemLButtonClick)
+					LIB.ExecuteWithThis(box, MY_GKP_Loot.OnItemLButtonClick)
 				end
 			end
 		end
@@ -244,7 +244,7 @@ function MY_GKP_Loot.OnMouseEnter()
 		local aPartyMember = Loot.GetaPartyMember(GetDoodad(dwDoodadID))
 		local p = MY_GKP_LOOT_BOSS and aPartyMember(MY_GKP_LOOT_BOSS)
 		if p then
-			local r, g, b = MY.GetForceColor(p.dwForceID)
+			local r, g, b = LIB.GetForceColor(p.dwForceID)
 			szXml = szXml .. GetFormatText(_L['LClick to distrubute all equipment to '], 136)
 			szXml = szXml .. GetFormatText('['.. p.szName ..']', 162, r, g, b)
 			szXml = szXml .. GetFormatText(_L['.'] .. '\n' .. _L['Ctrl + LClick to distrubute all lootable items to '], 136)
@@ -293,7 +293,7 @@ function MY_GKP_Loot.OnLButtonClick()
 					for k, v in ipairs(aItemData) do
 						table.insert(t, MY_GKP.GetFormatLink(v.item))
 					end
-					MY.Talk(PLAYER_TALK_CHANNEL.RAID, t)
+					LIB.Talk(PLAYER_TALK_CHANNEL.RAID, t)
 				end,
 			},
 			{ bDevide = true },
@@ -308,14 +308,14 @@ function MY_GKP_Loot.OnLButtonClick()
 			{
 				szOption = _L['About'],
 				fnAction = function()
-					MY.Alert(_L['GKP_TIPS'])
+					LIB.Alert(_L['GKP_TIPS'])
 				end,
 			},
 		}
 		if IsCtrlKeyDown() then
 			insert(menu, 1, { szOption = dwDoodadID, bDisable = true })
 		end
-		if not MY.IsShieldedVersion() then
+		if not LIB.IsShieldedVersion() then
 			table.insert(menu, MENU_DIVIDER)
 			table.insert(menu, Loot.GetQualityFilterMenu())
 			table.insert(menu, Loot.GetAutoPickupAllMenu())
@@ -386,7 +386,7 @@ function MY_GKP_Loot.OnItemMouseLeave()
 		if szName == 'Handle_Item' then
 			local box = this:Lookup('Box_Item')
 			if box and box.OnItemMouseLeave then
-				MY.ExecuteWithThis(box, box.OnItemMouseLeave)
+				LIB.ExecuteWithThis(box, box.OnItemMouseLeave)
 			end
 		end
 		-- if this and this:IsValid() and this.SetOverText then
@@ -412,12 +412,12 @@ function MY_GKP_Loot.OnItemLButtonClick()
 			if doodad.CanDialog(me) then
 				OpenDoodad(me, doodad)
 			else
-				MY.Topmsg(g_tStrings.TIP_TOO_FAR)
+				LIB.Topmsg(g_tStrings.TIP_TOO_FAR)
 			end
 		end
 		if data.bDist then
 			if not doodad then
-				MY.Debug({'Doodad does not exist!'}, 'MY_GKP_Loot:OnItemLButtonClick', DEBUG_LEVEL.WARNING)
+				LIB.Debug({'Doodad does not exist!'}, 'MY_GKP_Loot:OnItemLButtonClick', DEBUG_LEVEL.WARNING)
 				return Loot.RemoveLootList(dwDoodadID)
 			end
 			if not Loot.AuthCheck(dwDoodadID) then
@@ -432,9 +432,9 @@ function MY_GKP_Loot.OnItemLButtonClick()
 			if team.nLootMode ~= PARTY_LOOT_MODE.BIDDING then
 				return OutputMessage('MSG_ANNOUNCE_RED', g_tStrings.GOLD_CHANGE_BID_LOOT)
 			end
-			MY.Sysmsg({_L['GKP does not support bidding, please re open loot list.']})
+			LIB.Sysmsg({_L['GKP does not support bidding, please re open loot list.']})
 		elseif data.bNeedRoll then
-			MY.Topmsg(g_tStrings.ERROR_LOOT_ROLL)
+			LIB.Topmsg(g_tStrings.ERROR_LOOT_ROLL)
 		else -- 左键摸走
 			LootItem(dwDoodadID, data.dwID)
 		end
@@ -466,7 +466,7 @@ function MY_GKP_Loot.OnItemRButtonClick()
 						MY_RollMonitor.Clear({echo=false})
 					end
 				end
-				MY.Talk(PLAYER_TALK_CHANNEL.RAID, { MY_GKP.GetFormatLink(data.item), MY_GKP.GetFormatLink(_L['Roll the dice if you wang']) })
+				LIB.Talk(PLAYER_TALK_CHANNEL.RAID, { MY_GKP.GetFormatLink(data.item), MY_GKP.GetFormatLink(_L['Roll the dice if you wang']) })
 			end
 		})
 		table.insert(menu, { bDevide = true })
@@ -479,7 +479,7 @@ function MY_GKP_Loot.OnItemRButtonClick()
 							dwDoodadID = dwDoodadID,
 							data = data,
 						})
-						MY.Talk(PLAYER_TALK_CHANNEL.RAID, { MY_GKP.GetFormatLink(data.item), MY_GKP.GetFormatLink(_L(' %d Gold Start Bidding, off a price if you want.', v[1])) })
+						LIB.Talk(PLAYER_TALK_CHANNEL.RAID, { MY_GKP.GetFormatLink(data.item), MY_GKP.GetFormatLink(_L(' %d Gold Start Bidding, off a price if you want.', v[1])) })
 					end
 				})
 			end
@@ -541,13 +541,13 @@ function Loot.GetBossAction(dwDoodadID, bMenu)
 			end
 		end
 		if #tEquipment == 0 then
-			return MY.Alert(_L['No Equiptment left for Equiptment Boss'])
+			return LIB.Alert(_L['No Equiptment left for Equiptment Boss'])
 		end
 		local aPartyMember = Loot.GetaPartyMember(GetDoodad(dwDoodadID))
 		local p = aPartyMember(MY_GKP_LOOT_BOSS)
 		if p and p.bOnlineFlag then  -- 这个人存在团队的情况下
 			local szXml = GetFormatText(_L['Are you sure you want the following item\n'], 162, 255, 255, 255)
-			local r, g, b = MY.GetForceColor(p.dwForceID)
+			local r, g, b = LIB.GetForceColor(p.dwForceID)
 			for k, v in ipairs(tEquipment) do
 				local r, g, b = GetItemFontColorByQuality(v.nQuality)
 				szXml = szXml .. GetFormatText('['.. GetItemNameByItem(v) ..']\n', 166, r, g, b)
@@ -573,7 +573,7 @@ function Loot.GetBossAction(dwDoodadID, bMenu)
 			}
 			MessageBox(msg)
 		else
-			return MY.Alert(_L['Cannot distrubute items to Equipment Boss, may due to Equipment Boss is too far away or got dropline when looting.'])
+			return LIB.Alert(_L['Cannot distrubute items to Equipment Boss, may due to Equipment Boss is too far away or got dropline when looting.'])
 		end
 	end
 	if bMenu then
@@ -593,7 +593,7 @@ function Loot.AuthCheck(dwID)
 	local me, team       = GetClientPlayer(), GetClientTeam()
 	local doodad         = GetDoodad(dwID)
 	if not doodad then
-		return MY.Debug({'Doodad does not exist!'}, 'MY_GKP_Loot:AuthCheck', DEBUG_LEVEL.WARNING)
+		return LIB.Debug({'Doodad does not exist!'}, 'MY_GKP_Loot:AuthCheck', DEBUG_LEVEL.WARNING)
 	end
 	local nLootMode      = team.nLootMode
 	local dwBelongTeamID = doodad.GetBelongTeamID()
@@ -601,7 +601,7 @@ function Loot.AuthCheck(dwID)
 		OutputMessage('MSG_ANNOUNCE_RED', g_tStrings.GOLD_CHANGE_DISTRIBUTE_LOOT)
 		return false
 	end
-	if not MY.IsDistributer() and not MY_GKP.bDebug then -- 需要自己是分配者
+	if not LIB.IsDistributer() and not MY_GKP.bDebug then -- 需要自己是分配者
 		OutputMessage('MSG_ANNOUNCE_RED', g_tStrings.ERROR_LOOT_DISTRIBUTE)
 		return false
 	end
@@ -616,7 +616,7 @@ function Loot.GetaPartyMember(doodad)
 	local team = GetClientTeam()
 	local aPartyMember = doodad.GetLooterList()
 	if not aPartyMember then
-		return MY.Sysmsg({_L['Pick up time limit exceeded, please try again.']})
+		return LIB.Sysmsg({_L['Pick up time limit exceeded, please try again.']})
 	end
 	for k, v in ipairs(aPartyMember) do
 		local player = team.GetMemberInfo(v.dwID)
@@ -641,12 +641,12 @@ function Loot.DistributeItem(dwID, dwDoodadID, dwItemID, info, bShift)
 	local me = GetClientPlayer()
 	local item = GetItem(dwItemID)
 	if not item then
-		MY.Debug({'Item does not exist, check!!'}, 'MY_GKP_Loot', DEBUG_LEVEL.WARNING)
+		LIB.Debug({'Item does not exist, check!!'}, 'MY_GKP_Loot', DEBUG_LEVEL.WARNING)
 		local szName, aItemData = Loot.GetDoodad(dwDoodadID)
 		for k, v in ipairs(aItemData) do
 			if v.nQuality == info.nQuality and GetItemNameByItem(v.item) == info.szName then
 				dwItemID = v.item.dwID
-				MY.Debug({'Item matching, ' .. GetItemNameByItem(v.item)}, 'MY_GKP_Loot', DEBUG_LEVEL.LOG)
+				LIB.Debug({'Item matching, ' .. GetItemNameByItem(v.item)}, 'MY_GKP_Loot', DEBUG_LEVEL.LOG)
 				break
 			end
 		end
@@ -657,13 +657,13 @@ function Loot.DistributeItem(dwID, dwDoodadID, dwItemID, info, bShift)
 	local aPartyMember = Loot.GetaPartyMember(doodad)
 	if item then
 		if not player or (player and not player.bIsOnLine) then -- 不在线
-			return MY.Alert(_L['No Pick up Object, may due to Network off - line'])
+			return LIB.Alert(_L['No Pick up Object, may due to Network off - line'])
 		end
 		if not aPartyMember(dwID) then -- 给不了
-			return MY.Alert(_L['No Pick up Object, may due to Network off - line'])
+			return LIB.Alert(_L['No Pick up Object, may due to Network off - line'])
 		end
 		if player.dwMapID ~= me.GetMapID() then -- 不在同一地图
-			return MY.Alert(_L['No Pick up Object, Please confirm that in the Dungeon.'])
+			return LIB.Alert(_L['No Pick up Object, Please confirm that in the Dungeon.'])
 		end
 		local tab = {
 			szPlayer   = player.szName,
@@ -696,14 +696,14 @@ function Loot.DistributeItem(dwID, dwDoodadID, dwItemID, info, bShift)
 		end
 		doodad.DistributeItem(dwItemID, dwID)
 	else
-		MY.Sysmsg({_L['Userdata is overdue, distribut failed, please try again.']})
+		LIB.Sysmsg({_L['Userdata is overdue, distribut failed, please try again.']})
 	end
 end
 
 function Loot.GetMessageBox(dwID, dwDoodadID, dwItemID, data, bShift)
 	local team = GetClientTeam()
 	local info = team.GetMemberInfo(dwID)
-	local fr, fg, fb = MY.GetForceColor(info.dwForceID)
+	local fr, fg, fb = LIB.GetForceColor(info.dwForceID)
 	local ir, ig, ib = GetItemFontColorByQuality(data.nQuality)
 	local msg = {
 		szMessage = FormatLinkString(
@@ -744,7 +744,7 @@ function Loot.GetDistributeMenu(dwDoodadID, data)
 		return {
 			szOption = v.szName .. (szName and ' - ' .. szName or ''),
 			bDisable = not v.bOnlineFlag,
-			rgb = { MY.GetForceColor(v.dwForceID) },
+			rgb = { LIB.GetForceColor(v.dwForceID) },
 			szIcon = szIcon, nFrame = nFrame,
 			fnAutoClose = function()
 				return not wnd or not wnd:IsValid()
@@ -841,13 +841,13 @@ function Loot.DrawLootList(dwID)
 			end
 		end
 	end
-	MY.Debug({(string.format('Doodad %d, items %d.', dwID, nCount))}, 'MY_GKP_Loot', DEBUG_LEVEL.LOG)
+	LIB.Debug({(string.format('Doodad %d, items %d.', dwID, nCount))}, 'MY_GKP_Loot', DEBUG_LEVEL.LOG)
 
 	if not szName or nCount == 0 then
 		if frame then
 			Loot.RemoveLootList(dwID)
 		end
-		return MY.Debug({'Doodad does not exist!'}, 'MY_GKP_Loot:DrawLootList', DEBUG_LEVEL.LOG)
+		return LIB.Debug({'Doodad does not exist!'}, 'MY_GKP_Loot:DrawLootList', DEBUG_LEVEL.LOG)
 	end
 
 	-- 获取/创建UI元素
@@ -875,7 +875,7 @@ function Loot.DrawLootList(dwID)
 			if MY_GKP_Loot.bSetColor and item.nGenre == ITEM_GENRE.MATERIAL then
 				for dwForceID, szForceTitle in pairs(g_tStrings.tForceTitle) do
 					if szName:find(szForceTitle) then
-						txt:SetFontColor(MY.GetForceColor(dwForceID))
+						txt:SetFontColor(LIB.GetForceColor(dwForceID))
 						break
 					end
 				end
@@ -992,7 +992,7 @@ function Loot.GetDoodad(dwID)
 end
 
 -- 摸箱子
-MY.RegisterEvent('OPEN_DOODAD', function()
+LIB.RegisterEvent('OPEN_DOODAD', function()
 	if not MY_GKP.bOn then
 		return
 	end
@@ -1015,7 +1015,7 @@ MY.RegisterEvent('OPEN_DOODAD', function()
 			return Loot.RemoveLootList(arg0)
 		end
 		Loot.DrawLootList(arg0)
-		MY.Debug({'Open Doodad: ' .. arg0}, 'MY_GKP_Loot', DEBUG_LEVEL.LOG)
+		LIB.Debug({'Open Doodad: ' .. arg0}, 'MY_GKP_Loot', DEBUG_LEVEL.LOG)
 		local hLoot = Station.Lookup('Normal/LootList')
 		if hLoot then
 			hLoot:SetAbsPos(4096, 4096)
@@ -1025,7 +1025,7 @@ MY.RegisterEvent('OPEN_DOODAD', function()
 end)
 
 -- 刷新箱子
-MY.RegisterEvent('SYNC_LOOT_LIST', function()
+LIB.RegisterEvent('SYNC_LOOT_LIST', function()
 	if not MY_GKP.bOn then
 		return
 	end
@@ -1047,7 +1047,7 @@ MY.RegisterEvent('SYNC_LOOT_LIST', function()
 	Loot.DrawLootList(arg0)
 end)
 
-MY.RegisterEvent('MY_GKP_LOOT_BOSS', function()
+LIB.RegisterEvent('MY_GKP_LOOT_BOSS', function()
 	if not arg0 then
 		MY_GKP_LOOT_BOSS = nil
 		GKP_LOOT_AUTO = {}

@@ -35,8 +35,8 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Target/lang/')
-if not MY.AssertVersion('MY_Target', _L['MY_Target'], 0x2011800) then
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_Target/lang/')
+if not LIB.AssertVersion('MY_Target', _L['MY_Target'], 0x2011800) then
 	return
 end
 
@@ -63,13 +63,13 @@ function PS.OnPanelActive(wnd)
 	ui:append('WndComboBox', {
 		x = x, y = y, w = 200, text = _L['Distance type'],
 		menu = function()
-			return MY.GetDistanceTypeMenu(true, MY_TargetDirection.eDistanceType, function(p)
+			return LIB.GetDistanceTypeMenu(true, MY_TargetDirection.eDistanceType, function(p)
 				MY_TargetDirection.eDistanceType = p.szType
 			end)
 		end,
 	}, true):autoWidth()
 
-	if MY.IsShieldedVersion() then
+	if LIB.IsShieldedVersion() then
 		return
 	end
 
@@ -353,4 +353,4 @@ function PS.OnPanelActive(wnd)
 		onchange = function(val) MY_TargetFace.nShapeAlpha = (100 - val) * 2 end,
 	})
 end
-MY.RegisterPanel('MY_Target', _L['MY_Target'], _L['Target'], 2136, PS)
+LIB.RegisterPanel('MY_Target', _L['MY_Target'], _L['Target'], 2136, PS)

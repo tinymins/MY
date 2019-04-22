@@ -35,8 +35,8 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local _L, D = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_LifeBar/lang/'), {}
-if not MY.AssertVersion('MY_LifeBar', _L['MY_LifeBar'], 0x2012400) then
+local _L, D = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_LifeBar/lang/'), {}
+if not LIB.AssertVersion('MY_LifeBar', _L['MY_LifeBar'], 0x2012400) then
 	return
 end
 
@@ -47,10 +47,10 @@ for _, DAT_ROOT in ipairs({
 	'MY_LifeBar/config/clear/',
 	'MY_LifeBar/config/xlifebar/',
 }) do
-	local SRC_ROOT = MY.FormatPath(MY.GetAddonInfo().szRoot .. '!src-dist/dat/' .. DAT_ROOT)
-	local DST_ROOT = MY.FormatPath(MY.GetAddonInfo().szRoot .. DAT_ROOT)
+	local SRC_ROOT = LIB.FormatPath(LIB.GetAddonInfo().szRoot .. '!src-dist/dat/' .. DAT_ROOT)
+	local DST_ROOT = LIB.FormatPath(LIB.GetAddonInfo().szRoot .. DAT_ROOT)
 	for _, szFile in ipairs(CPath.GetFileList(SRC_ROOT)) do
-		MY.Sysmsg(_L['Compressing: '] .. DAT_ROOT .. szFile)
+		LIB.Sysmsg(_L['Compressing: '] .. DAT_ROOT .. szFile)
 		local data = LoadDataFromFile(SRC_ROOT .. szFile)
 		if IsEncodedData(data) then
 			data = DecodeData(data)
@@ -62,14 +62,14 @@ end
 end
 
 local function LoadDefaultTemplate(szStyle)
-	local template = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_LifeBar/config/' .. szStyle .. '/$lang.jx3dat')
+	local template = LIB.LoadLUAData(LIB.GetAddonInfo().szRoot .. 'MY_LifeBar/config/' .. szStyle .. '/$lang.jx3dat')
 	if not template then
 		return
 	end
 	for _, dwForceID in pairs_c(FORCE_TYPE) do
 		for _, szRelation in ipairs({ 'Self', 'Party', 'Enemy', 'Neutrality', 'Ally', 'Foe' }) do
 			if not template[1].Color[szRelation].__VALUE__[dwForceID] then
-				template[1].Color[szRelation].__VALUE__[dwForceID] = { MY.GetForceColor(dwForceID, 'foreground') }
+				template[1].Color[szRelation].__VALUE__[dwForceID] = { LIB.GetForceColor(dwForceID, 'foreground') }
 			end
 		end
 	end
@@ -84,13 +84,13 @@ local CONFIG_DEFAULTS = setmetatable({
 }, {
 	__call = function(t, k, d)
 		local template = t[k]
-		return MY.FormatDataStructure(d, template[1], true, template[2])
+		return LIB.FormatDataStructure(d, template[1], true, template[2])
 	end,
 	__index = function(t, k) return t.DEFAULT end,
 })
 
 if not CONFIG_DEFAULTS.DEFAULT then
-	return MY.Debug({_L['Default config cannot be loaded, please reinstall!!!']}, _L['MY_LifeBar'], DEBUG_LEVEL.ERROR)
+	return LIB.Debug({_L['Default config cannot be loaded, please reinstall!!!']}, _L['MY_LifeBar'], DEBUG_LEVEL.ERROR)
 end
 local Config, ConfigLoaded = CONFIG_DEFAULTS('DEFAULT'), false
 local CONFIG_PATH = 'config/xlifebar/%s.jx3dat'
@@ -101,14 +101,14 @@ end
 
 -- 根据玩家自定义界面缩放设置反向缩放 实现默认设置不受用户缩放影响
 function D.AutoAdjustScale()
-	local fUIScale = MY.GetOriginUIScale()
+	local fUIScale = LIB.GetOriginUIScale()
 	if Config.fDesignUIScale ~= fUIScale then
 		Config.fGlobalUIScale = Config.fGlobalUIScale * Config.fDesignUIScale / fUIScale
 		Config.fDesignUIScale = fUIScale
 	end
 	local nFontOffset = Font.GetOffset()
 	if Config.nDesignFontOffset ~= nFontOffset then
-		Config.fTextScale = Config.fTextScale * MY.GetFontScale(Config.nDesignFontOffset) / MY.GetFontScale()
+		Config.fTextScale = Config.fTextScale * LIB.GetFontScale(Config.nDesignFontOffset) / LIB.GetFontScale()
 		Config.nDesignFontOffset = nFontOffset
 	end
 end
@@ -121,7 +121,7 @@ local function onUIScaled()
 	D.AutoAdjustScale()
 	FireUIEvent('MY_LIFEBAR_CONFIG_UPDATE')
 end
-MY.RegisterEvent('UI_SCALED.MY_LifeBar_Config', onUIScaled)
+LIB.RegisterEvent('UI_SCALED.MY_LifeBar_Config', onUIScaled)
 end
 
 function D.LoadConfig(szConfig)
@@ -136,7 +136,7 @@ function D.LoadConfig(szConfig)
 				MY_LifeBar.szConfig = szConfig
 			end
 		end
-		Config = MY.LoadLUAData({ D.GetConfigPath(), PATH_TYPE.GLOBAL })
+		Config = LIB.LoadLUAData({ D.GetConfigPath(), PATH_TYPE.GLOBAL })
 	end
 	if Config and not Config.fDesignUIScale then -- 兼容老数据
 		for _, key in ipairs({'ShowName', 'ShowTong', 'ShowTitle', 'ShowLife', 'ShowLifePer'}) do
@@ -148,7 +148,7 @@ function D.LoadConfig(szConfig)
 				end
 			end
 		end
-		Config.fDesignUIScale = MY.GetOriginUIScale()
+		Config.fDesignUIScale = LIB.GetOriginUIScale()
 		Config.fMatchedFontOffset = Font.GetOffset()
 	end
 	Config = CONFIG_DEFAULTS('DEFAULT', Config)
@@ -156,15 +156,15 @@ function D.LoadConfig(szConfig)
 	ConfigLoaded = true
 	FireUIEvent('MY_LIFEBAR_CONFIG_LOADED')
 end
-MY.RegisterInit(D.LoadConfig)
+LIB.RegisterInit(D.LoadConfig)
 
 function D.SaveConfig()
 	if not ConfigLoaded then
 		return
 	end
-	MY.SaveLUAData({ D.GetConfigPath(), PATH_TYPE.GLOBAL }, Config)
+	LIB.SaveLUAData({ D.GetConfigPath(), PATH_TYPE.GLOBAL }, Config)
 end
-MY.RegisterExit(D.SaveConfig)
+LIB.RegisterExit(D.SaveConfig)
 
 MY_LifeBar_Config = setmetatable({}, {
 	__call = function(t, op, ...)

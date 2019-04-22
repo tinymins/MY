@@ -35,7 +35,7 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot..'MY_Toolbox/lang/')
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot..'MY_Toolbox/lang/')
 local _C = { Data = {} }
 MY_AutoChat = {}
 MY_AutoChat.bEnable = false
@@ -52,20 +52,20 @@ RegisterCustomData('MY_AutoChat.bEnableShift')
 RegisterCustomData('MY_AutoChat.bAutoSelect1')
 
 function MY_AutoChat.LoadData()
-	local szOrgPath = MY.GetLUADataPath('config/AUTO_CHAT/data.$lang.jx3dat')
-	local szFilePath = MY.GetLUADataPath({'config/autochat.jx3dat', PATH_TYPE.GLOBAL})
+	local szOrgPath = LIB.GetLUADataPath('config/AUTO_CHAT/data.$lang.jx3dat')
+	local szFilePath = LIB.GetLUADataPath({'config/autochat.jx3dat', PATH_TYPE.GLOBAL})
 	if IsLocalFileExist(szOrgPath) then
 		CPath.Move(szOrgPath, szFilePath)
 	end
-	_C.Data = MY.LoadLUAData(szFilePath) or MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_ToolBox/data/interact/$lang.jx3dat') or _C.Data
+	_C.Data = LIB.LoadLUAData(szFilePath) or LIB.LoadLUAData(LIB.GetAddonInfo().szRoot .. 'MY_ToolBox/data/interact/$lang.jx3dat') or _C.Data
 end
-function MY_AutoChat.SaveData() MY.SaveLUAData({'config/autochat.jx3dat', PATH_TYPE.GLOBAL}, _C.Data) end
+function MY_AutoChat.SaveData() LIB.SaveLUAData({'config/autochat.jx3dat', PATH_TYPE.GLOBAL}, _C.Data) end
 function MY_AutoChat.GetName(dwType, dwID)
 	if dwID == UI_GetClientPlayerID() then
 		return _L['Common'], _L['Common']
 	else
 		local szMap  = _L['Common']
-		local szName = MY.GetObjectName(MY.GetObject(dwType, dwID), 'never') or _L['Common']
+		local szName = LIB.GetObjectName(LIB.GetObject(dwType, dwID), 'never') or _L['Common']
 		if dwType ~= TARGET.ITEM then
 			szMap = Table_GetMapName(GetClientPlayer().GetMapID())
 		end
@@ -125,7 +125,7 @@ local function GetActiveDialoguePanel()
 end
 
 local function WindowSelect(dwIndex, dwID)
-	MY.Debug({'WindowSelect ' .. dwIndex .. ',' .. dwID}, 'AUTO_CHAT', DEBUG_LEVEL.LOG)
+	LIB.Debug({'WindowSelect ' .. dwIndex .. ',' .. dwID}, 'AUTO_CHAT', DEBUG_LEVEL.LOG)
 	return GetClientPlayer().WindowSelect(dwIndex, dwID)
 end
 
@@ -177,7 +177,7 @@ function MY_AutoChat.Choose(dwType, dwID, dwIndex, aInfo)
 					WindowSelect(dwIndex, info.id)
 				end
 				if MY_AutoChat.bEchoOn then
-					MY.Sysmsg({_L('Conversation with [%s] auto chose: %s', szName, info.context)})
+					LIB.Sysmsg({_L('Conversation with [%s] auto chose: %s', szName, info.context)})
 				end
 				return true
 			else
@@ -190,10 +190,10 @@ function MY_AutoChat.Choose(dwType, dwID, dwIndex, aInfo)
 		end
 	end
 
-	if MY_AutoChat.bAutoSelect1 and dwID and nCount == 1 and not MY.IsInDungeon() then
+	if MY_AutoChat.bAutoSelect1 and dwID and nCount == 1 and not LIB.IsInDungeon() then
 		WindowSelect(dwIndex, dwID)
 		if MY_AutoChat.bEchoOn then
-			MY.Sysmsg({_L('Conversation with [%s] auto chose: %s', szName, szContext)})
+			LIB.Sysmsg({_L('Conversation with [%s] auto chose: %s', szName, szContext)})
 		end
 		return true
 	end
@@ -202,7 +202,7 @@ end
 function MY_AutoChat.DoSomething()
 	-- Output(MY_AutoChat.Conents, MY_AutoChat.CurrentWindow)
 	if MY_AutoChat.bEnableShift and IsShiftKeyDown() then
-		MY.Sysmsg({_L['Auto interact disabled due to SHIFT key pressed.']})
+		LIB.Sysmsg({_L['Auto interact disabled due to SHIFT key pressed.']})
 		return
 	end
 	local frame = GetActiveDialoguePanel()
@@ -253,8 +253,8 @@ local function GetSettingMenu()
 	}
 end
 
-MY.RegisterAddonMenu('MY_AutoChat', function()
-	if MY.IsShieldedVersion() then
+LIB.RegisterAddonMenu('MY_AutoChat', function()
+	if LIB.IsShieldedVersion() then
 		return
 	end
 	return GetSettingMenu()
@@ -331,7 +331,7 @@ local function GetDialoguePanelMenu(frame)
 end
 
 local function HookDialoguePanel()
-	if MY.IsShieldedVersion() then
+	if LIB.IsShieldedVersion() then
 		return
 	end
 	for _, p in ipairs(HOOK_LIST) do
@@ -353,10 +353,10 @@ local function HookDialoguePanel()
 		end
 	end
 end
-MY.RegisterInit('MY_AutoChat', HookDialoguePanel)
+LIB.RegisterInit('MY_AutoChat', HookDialoguePanel)
 
 local function onOpenWindow()
-	if MY.IsShieldedVersion() then
+	if LIB.IsShieldedVersion() then
 		return
 	end
 	if empty(_C.Data) then
@@ -370,7 +370,7 @@ local function onOpenWindow()
 	MY_AutoChat.Conents = arg1
 	MY_AutoChat.DoSomething()
 end
-MY.RegisterEvent('OPEN_WINDOW.MY_AutoChat', onOpenWindow)
+LIB.RegisterEvent('OPEN_WINDOW.MY_AutoChat', onOpenWindow)
 
 local function UnhookDialoguePanel()
 	for _, p in ipairs(HOOK_LIST) do
@@ -387,14 +387,14 @@ local function UnhookDialoguePanel()
 		end
 	end
 end
-MY.RegisterReload('MY_AutoChat', UnhookDialoguePanel)
+LIB.RegisterReload('MY_AutoChat', UnhookDialoguePanel)
 
 
 local function OnShieldedVersion()
-	if MY.IsShieldedVersion() then
+	if LIB.IsShieldedVersion() then
 		UnhookDialoguePanel()
 	else
 		HookDialoguePanel()
 	end
 end
-MY.RegisterEvent('MY_SHIELDED_VERSION.MY_AutoChat', OnShieldedVersion)
+LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_AutoChat', OnShieldedVersion)

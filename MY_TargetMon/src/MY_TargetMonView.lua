@@ -41,8 +41,8 @@ local D = {
 	GetViewData = MY_TargetMonData.GetViewData,
 	RegisterDataUpdateEvent = MY_TargetMonData.RegisterDataUpdateEvent,
 }
-local INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_TargetMon/ui/MY_TargetMon.ini'
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_TargetMon/lang/')
+local INI_PATH = LIB.GetAddonInfo().szRoot .. 'MY_TargetMon/ui/MY_TargetMon.ini'
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_TargetMon/lang/')
 
 function D.UpdateItemHotkey(hItem, i, j)
 	local nKey, bShift, bCtrl, bAlt = Hotkey.Get('MY_TargetMon_' .. i .. '_' .. j)
@@ -116,8 +116,8 @@ local function DrawItem(hList, hItem, nGroup, nIndex, tViewData, item, bScaleRes
 		hItem.txtLongName  = hItem.hCDBar:Lookup('Text_Name')
 		hItem.imgProcess:SetPercentage(0)
 		hItem.fUIScale = 1
-		hItem.fIconFontScale = MY.GetFontScale()
-		hItem.fOtherFontScale = MY.GetFontScale()
+		hItem.fIconFontScale = LIB.GetFontScale()
+		hItem.fOtherFontScale = LIB.GetFontScale()
 		local fRelativeScale = 1 / Station.GetUIScale()
 		hItem:Scale(fRelativeScale, fRelativeScale)
 		hItem:Hide()
@@ -207,7 +207,7 @@ local function DrawItem(hList, hItem, nGroup, nIndex, tViewData, item, bScaleRes
 		end
 		if hItem.szBoxExtentAnimate ~= item.szExtentAnimate then
 			if item.szExtentAnimate and item.szExtentAnimate ~= '' then
-				local szPath, nFrame = unpack(MY.SplitString(item.szExtentAnimate, '|'))
+				local szPath, nFrame = unpack(LIB.SplitString(item.szExtentAnimate, '|'))
 				hItem.box:SetExtentAnimate(szPath, nFrame)
 			else
 				hItem.box:ClearExtentAnimate()
@@ -395,7 +395,7 @@ function MY_TargetMonView.OnItemMouseEnter()
 		if eMonType == 'BUFF' and hItem.dwID and hItem.nLevel then
 			local w, h = hItem:GetW(), hItem:GetH()
 			local x, y = hItem:GetAbsX(), hItem:GetAbsY()
-			MY.OutputBuffTip(hItem.dwID, hItem.nLevel, {x, y, w, h}, hItem.nTimeLeft)
+			LIB.OutputBuffTip(hItem.dwID, hItem.nLevel, {x, y, w, h}, hItem.nTimeLeft)
 		end
 		this:SetObjectMouseOver(1)
 	end
@@ -439,11 +439,11 @@ function MY_TargetMonView.OnItemRButtonClick()
 	local tViewData = frame.tViewData
 	if name == 'Box_Default' and tViewData.szType == 'BUFF' then
 		local hItem = this:GetParent():GetParent()
-		local KTarget = MY.GetObject(D.GetTarget(tViewData.szTarget, tViewData.szType))
+		local KTarget = LIB.GetObject(D.GetTarget(tViewData.szTarget, tViewData.szType))
 		if not KTarget then
 			return
 		end
-		MY.CancelBuff(KTarget, hItem.dwID, hItem.nLevel)
+		LIB.CancelBuff(KTarget, hItem.dwID, hItem.nLevel)
 	end
 end
 
@@ -474,5 +474,5 @@ local function onDataInit()
 		end
 	end
 end
-MY.RegisterEvent('MY_TARGET_MON_DATA_INIT.MY_TargetMonView', onDataInit)
+LIB.RegisterEvent('MY_TARGET_MON_DATA_INIT.MY_TargetMonView', onDataInit)
 end

@@ -6,14 +6,43 @@
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
 --------------------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_TeamTools/lang/')
+-------------------------------------------------------------------------------------------------------------
+-- these global functions are accessed all the time by the event handler
+-- so caching them is worth the effort
+-------------------------------------------------------------------------------------------------------------
+local setmetatable = setmetatable
+local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
+local sub, len, format, rep = string.sub, string.len, string.format, string.rep
+local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
+local type, tonumber, tostring = type, tonumber, tostring
+local huge, pi, random, abs = math.huge, math.pi, math.random, math.abs
+local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
+local pow, sqrt, sin, cos, tan = math.pow, math.sqrt, math.sin, math.cos, math.tan
+local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
+local pack, unpack = table.pack or function(...) return {...} end, table.unpack or unpack
+-- jx3 apis caching
+local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
+local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
+local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
+local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local LIB, UI, DEBUG_LEVEL, PATH_TYPE = MY, MY.UI, MY.DEBUG_LEVEL, MY.PATH_TYPE
+local var2str, str2var, clone, empty, ipairs_r = LIB.var2str, LIB.str2var, LIB.clone, LIB.empty, LIB.ipairs_r
+local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
+local GetPatch, ApplyPatch = LIB.GetPatch, LIB.ApplyPatch
+local Get, Set, RandomChild, GetTraceback = LIB.Get, LIB.Set, LIB.RandomChild, LIB.GetTraceback
+local IsArray, IsDictionary, IsEquals = LIB.IsArray, LIB.IsDictionary, LIB.IsEquals
+local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsNumber, LIB.IsFunction
+local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
+local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
+-------------------------------------------------------------------------------------------------------------
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_TeamTools/lang/')
 
 local pairs, ipairs = pairs, ipairs
 local GetCurrentTime = GetCurrentTime
 local tinsert = table.insert
 local GetPlayer, GetNpc, IsPlayer = GetPlayer, GetNpc, IsPlayer
 local SKILL_RESULT_TYPE = SKILL_RESULT_TYPE
-local MY_IsParty, MY_GetSkillName, MY_GetBuffName = MY.IsParty, MY.GetSkillName, MY.GetBuffName
+local MY_IsParty, MY_GetSkillName, MY_GetBuffName = LIB.IsParty, LIB.GetSkillName, LIB.GetBuffName
 
 local MAX_COUNT  = 5
 local PLAYER_ID  = 0
@@ -47,7 +76,7 @@ local function OnSkillEffectLog(dwCaster, dwTarget, nEffectType, dwSkillID, dwLe
 			if IsPlayer(dwCaster) then
 				szCaster = KCaster.szName
 			else
-				szCaster = MY.GetObjectName(KCaster)
+				szCaster = LIB.GetObjectName(KCaster)
 			end
 		else
 			szCaster = _L['OUTER GUEST']
@@ -73,7 +102,7 @@ local function OnSkillEffectLog(dwCaster, dwTarget, nEffectType, dwSkillID, dwLe
 			if IsPlayer(dwTarget) then
 				szTarget = KTarget.szName
 			else
-				szTarget = MY.GetObjectName(KTarget)
+				szTarget = LIB.GetObjectName(KTarget)
 			end
 		else
 			szTarget = _L['OUTER GUEST']
@@ -140,7 +169,7 @@ local function OnDeath(dwCharacterID, dwKiller)
 		dwCharacterID = dwCharacterID == PLAYER_ID and 'self' or dwCharacterID
 		DEATH_LOG[dwCharacterID] = DEATH_LOG[dwCharacterID] or {}
 		local killer = (IsPlayer(dwKiller) and GetPlayer(dwKiller)) or (not IsPlayer(dwKiller) and GetNpc(dwKiller))
-		local szKiller = killer and MY.GetObjectName(killer)
+		local szKiller = killer and LIB.GetObjectName(killer)
 		if DAMAGE_LOG[dwCharacterID] then
 			tinsert(DEATH_LOG[dwCharacterID], {
 				nCurrentTime = GetCurrentTime(),
@@ -159,12 +188,12 @@ local function OnDeath(dwCharacterID, dwKiller)
 	end
 end
 
-MY.RegisterEvent('LOADING_END', function()
+LIB.RegisterEvent('LOADING_END', function()
 	DAMAGE_LOG = {}
 	PLAYER_ID  = UI_GetClientPlayerID()
 end)
 
-MY.RegisterEvent('SYS_MSG', function()
+LIB.RegisterEvent('SYS_MSG', function()
 	if arg0 == 'UI_OME_DEATH_NOTIFY' then -- 死亡记录
 		OnDeath(arg1, arg2)
 	elseif arg0 == 'UI_OME_SKILL_EFFECT_LOG' then -- 技能记录
@@ -174,7 +203,7 @@ MY.RegisterEvent('SYS_MSG', function()
 	end
 end)
 
-MY.RegisterEvent('DO_SKILL_CAST', function()
+LIB.RegisterEvent('DO_SKILL_CAST', function()
 	if arg1 == 608 and IsPlayer(arg0) then -- 自觉经脉
 		OnSkill(arg0, arg1, arg2)
 	end

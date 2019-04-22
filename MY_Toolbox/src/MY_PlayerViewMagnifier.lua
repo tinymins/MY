@@ -35,7 +35,7 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Toolbox/lang/')
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_Toolbox/lang/')
 
 local function onFrameCreate()
 	local config
@@ -46,7 +46,7 @@ local function onFrameCreate()
 	end
 	if config then
 		local frame, ui, coefficient, posx, posy = arg0, UI(arg0), config.coefficient / Station.GetUIScale()
-		ui:append(MY.GetAddonInfo().szRoot .. 'MY_Toolbox/ui/Btn_MagnifierUp.ini:WndButton', {
+		ui:append(LIB.GetAddonInfo().szRoot .. 'MY_Toolbox/ui/Btn_MagnifierUp.ini:WndButton', {
 			name = 'Btn_MY_MagnifierUp',
 			x = config.x, y = config.y, w = config.w, h = config.h,
 			onclick = function()
@@ -61,7 +61,7 @@ local function onFrameCreate()
 			end,
 			tip = _L['Click to enable MY player view magnifier'],
 		})
-		ui:append(MY.GetAddonInfo().szRoot .. 'MY_Toolbox/ui/Btn_MagnifierDown.ini:WndButton', {
+		ui:append(LIB.GetAddonInfo().szRoot .. 'MY_Toolbox/ui/Btn_MagnifierDown.ini:WndButton', {
 			name = 'Btn_MY_MagnifierDown',
 			x = config.x, y = config.y, w = config.w, h = config.h, visible = false,
 			onclick = function()
@@ -75,4 +75,4 @@ local function onFrameCreate()
 		})
 	end
 end
-MY.RegisterEvent('ON_FRAME_CREATE.MY_PlayerViewMagnifier', onFrameCreate)
+LIB.RegisterEvent('ON_FRAME_CREATE.MY_PlayerViewMagnifier', onFrameCreate)

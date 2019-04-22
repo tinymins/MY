@@ -48,7 +48,7 @@ end
 Sample:
 	------------------
 	-- Get an instance
-	local IC = MY.InfoCache('cache/PLAYER_INFO/$relserver/TONG/<SEG>.$lang.jx3dat', 2, 3000)
+	local IC = LIB.InfoCache('cache/PLAYER_INFO/$relserver/TONG/<SEG>.$lang.jx3dat', 2, 3000)
 	--------------------
 	-- Setter and Getter
 	-- Set value
@@ -64,7 +64,7 @@ Sample:
 	IC('save', 6000, 5, true)  -- Save to DB with a max unvisited time and a max saving len and release memory
 	IC('clear')                -- Delete all data
 ]]
-function MY.InfoCache(SZ_DATA_PATH, SEG_LEN, L1_SIZE, ValueComparer)
+function LIB.InfoCache(SZ_DATA_PATH, SEG_LEN, L1_SIZE, ValueComparer)
 	if not ValueComparer then
 		ValueComparer = DefaultValueComparer
 	end
@@ -80,7 +80,7 @@ function MY.InfoCache(SZ_DATA_PATH, SEG_LEN, L1_SIZE, ValueComparer)
 			-- read info from saved data
 			local szSegID = concat({byte(k, 1, SEG_LEN)}, '-')
 			if not tInfos[szSegID] then
-				tInfos[szSegID] = MY.LoadLUAData((SZ_DATA_PATH:gsub('<SEG>', szSegID))) or {}
+				tInfos[szSegID] = LIB.LoadLUAData((SZ_DATA_PATH:gsub('<SEG>', szSegID))) or {}
 			end
 			tInfoVisit[szSegID] = GetTime()
 			return tInfos[szSegID][k]
@@ -95,7 +95,7 @@ function MY.InfoCache(SZ_DATA_PATH, SEG_LEN, L1_SIZE, ValueComparer)
 			 -- read from DataBase if L1 CACHE not hit
 			if not tInfo then
 				if not tInfos[szSegID] then
-					tInfos[szSegID] = MY.LoadLUAData((SZ_DATA_PATH:gsub('<SEG>', szSegID))) or {}
+					tInfos[szSegID] = LIB.LoadLUAData((SZ_DATA_PATH:gsub('<SEG>', szSegID))) or {}
 				end
 				tInfo = tInfos[szSegID][k]
 				tInfoVisit[szSegID] = GetTime()
@@ -121,7 +121,7 @@ function MY.InfoCache(SZ_DATA_PATH, SEG_LEN, L1_SIZE, ValueComparer)
 			if bModified then
 				-- save info to DataBase
 				if not tInfos[szSegID] then
-					tInfos[szSegID] = MY.LoadLUAData((SZ_DATA_PATH:gsub('<SEG>', szSegID))) or {}
+					tInfos[szSegID] = LIB.LoadLUAData((SZ_DATA_PATH:gsub('<SEG>', szSegID))) or {}
 				end
 				tInfos[szSegID][k] = v
 				tInfoVisit[szSegID] = GetTime()
@@ -140,8 +140,8 @@ function MY.InfoCache(SZ_DATA_PATH, SEG_LEN, L1_SIZE, ValueComparer)
 				while aSeg[SEG_LEN + 1] ~= 1 do
 					local szSegID = concat(aSeg, '-')
 					local szPath = SZ_DATA_PATH:gsub('<SEG>', szSegID)
-					if IsFileExist(MY.GetLUADataPath(szPath)) then
-						MY.SaveLUAData(szPath, nil)
+					if IsFileExist(LIB.GetLUADataPath(szPath)) then
+						LIB.SaveLUAData(szPath, nil)
 						-- Log('INFO CACHE CLEAR @' .. szSegID)
 					end
 					-- bit add one
@@ -167,9 +167,9 @@ function MY.InfoCache(SZ_DATA_PATH, SEG_LEN, L1_SIZE, ValueComparer)
 							nCount = nCount - 1
 						end
 						if tInfoModified[szSegID] then
-							MY.SaveLUAData((SZ_DATA_PATH:gsub('<SEG>', szSegID)), tInfos[szSegID])
+							LIB.SaveLUAData((SZ_DATA_PATH:gsub('<SEG>', szSegID)), tInfos[szSegID])
 						else
-							MY.Debug({'INFO Unloaded: ' .. szSegID}, 'InfoCache', DEBUG_LEVEL.LOG)
+							LIB.Debug({'INFO Unloaded: ' .. szSegID}, 'InfoCache', DEBUG_LEVEL.LOG)
 						end
 						if bCollect then
 							tInfos[szSegID] = nil

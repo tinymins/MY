@@ -35,8 +35,8 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MYDev_UIEventID/lang/')
-if not MY.AssertVersion('MYDev_UIEventID', _L['MYDev_UIEventID'], 0x2011800) then
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MYDev_UIEventID/lang/')
+if not LIB.AssertVersion('MYDev_UIEventID', _L['MYDev_UIEventID'], 0x2011800) then
 	return
 end
 local _C = {}
@@ -79,17 +79,17 @@ _C.GetEventID = function(ui)
 			t[event.bit] = 0
 		end
 	end
-	return MY.Bitmap2Number(t)
+	return LIB.Bitmap2Number(t)
 end
 
 _C.SetEventID = function(ui, nEventID)
-	local t = MY.Number2Bitmap(nEventID)
+	local t = LIB.Number2Bitmap(nEventID)
 	for i, event in ipairs(_C.tEventIndex) do
 		ui:children('#Event_' .. event.bit):check(t[event.bit] == 1)
 	end
 end
 
-MY.RegisterPanel(
+LIB.RegisterPanel(
 'Dev_UIEventID', _L['UIEventID'], _L['Development'],
 'ui/Image/UICommon/BattleFiled.UITex|7', {
 OnPanelActive = function(wnd)

@@ -35,13 +35,13 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Target/lang/')
-if not MY.AssertVersion('MY_TargetLine', _L['MY_TargetLine'], 0x2011800) then
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_Target/lang/')
+if not LIB.AssertVersion('MY_TargetLine', _L['MY_TargetLine'], 0x2011800) then
 	return
 end
 
-local INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_Target/ui/MY_TargetLine.ini'
-local IMG_PATH = MY.GetAddonInfo().szRoot .. 'MY_Target/img/MY_TargetLine.uitex'
+local INI_PATH = LIB.GetAddonInfo().szRoot .. 'MY_Target/ui/MY_TargetLine.ini'
+local IMG_PATH = LIB.GetAddonInfo().szRoot .. 'MY_Target/img/MY_TargetLine.uitex'
 
 local O = {
 	bTarget       = false,         -- 启用目标追踪线
@@ -91,8 +91,8 @@ local bCurTargetRL, dwCurTarLineSrcID, dwCurTarLineDstID, shaTLine
 local bCurTTargetRL, dwCurTTarLineSrcID, dwCurTTarLineDstID, shaTTLine
 function D.UpdateLine()
 	local me = GetClientPlayer()
-	local tar = MY.GetObject(MY.GetTarget(me))
-	local ttar = MY.GetObject(MY.GetTarget(tar))
+	local tar = LIB.GetObject(LIB.GetTarget(me))
+	local ttar = LIB.GetObject(LIB.GetTarget(tar))
 	local dwTarLineSrcID, dwTarLineDstID, dwTTarLineSrcID, dwTTarLineDstID
 	if not C.bShielded then
 		if me and tar and (not ttar or ttar.dwID ~= me.dwID) then
@@ -181,17 +181,17 @@ end
 end
 
 function D.CheckEnable()
-	C.bShielded = MY.IsShieldedVersion()
+	C.bShielded = LIB.IsShieldedVersion()
 	if (O.bTarget or O.bTTarget) and not bShielded then
-		MY.BreatheCall('MY_TargetLine', D.UpdateLine)
+		LIB.BreatheCall('MY_TargetLine', D.UpdateLine)
 	else
-		MY.BreatheCall('MY_TargetLine', false)
+		LIB.BreatheCall('MY_TargetLine', false)
 	end
 	D.RequireRerender()
 	D.UpdateLine()
 end
-MY.RegisterInit('MY_TargetLine', D.CheckEnable)
-MY.RegisterEvent('MY_SHIELDED_VERSION.MY_TargetLine', D.CheckEnable)
+LIB.RegisterInit('MY_TargetLine', D.CheckEnable)
+LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_TargetLine', D.CheckEnable)
 
 -- Global exports
 do
@@ -240,5 +240,5 @@ local settings = {
 		},
 	},
 }
-MY_TargetLine = MY.GeneGlobalNS(settings)
+MY_TargetLine = LIB.GeneGlobalNS(settings)
 end

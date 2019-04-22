@@ -35,8 +35,8 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Font/lang/')
-if not MY.AssertVersion('MY_Font', _L['MY_Font'], 0x2011800) then
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_Font/lang/')
+if not LIB.AssertVersion('MY_Font', _L['MY_Font'], 0x2011800) then
 	return
 end
 local C = {
@@ -53,16 +53,16 @@ local OBJ = {}
 -- 加载字体配置
 local CONFIG_PATH = {'config/fontconfig.jx3dat', PATH_TYPE.GLOBAL}
 do
-	local szOrgFile = MY.GetLUADataPath('config/MY_FONT/$lang.jx3dat')
-	local szFilePath = MY.GetLUADataPath(CONFIG_PATH)
+	local szOrgFile = LIB.GetLUADataPath('config/MY_FONT/$lang.jx3dat')
+	local szFilePath = LIB.GetLUADataPath(CONFIG_PATH)
 	if IsLocalFileExist(szOrgFile) then
 		CPath.Move(szOrgFile, szFilePath)
 	end
-	C.tFontConfig = MY.LoadLUAData(szFilePath) or {}
+	C.tFontConfig = LIB.LoadLUAData(szFilePath) or {}
 end
 -- 加载字体列表
-local FONT_PATH = MY.GetAddonInfo().szRoot .. 'MY_Font/font/$lang.jx3dat'
-for _, v in ipairs(MY.LoadLUAData(FONT_PATH) or {}) do
+local FONT_PATH = LIB.GetAddonInfo().szRoot .. 'MY_Font/font/$lang.jx3dat'
+for _, v in ipairs(LIB.LoadLUAData(FONT_PATH) or {}) do
 	table.insert(C.tFontList, v)
 end
 for _, p in ipairs(C.tFontList) do
@@ -102,10 +102,10 @@ function OBJ.SetFont(tIDs, szName, szFile, nSize, tStyle)
 		end
 		C.tFontConfig[dwID] = {szName or szName1, szFile or szFile1, nSize or nSize1, tStyle or tStyle1}
 	end
-	MY.SaveLUAData(CONFIG_PATH, C.tFontConfig)
+	LIB.SaveLUAData(CONFIG_PATH, C.tFontConfig)
 end
 
-MY.RegisterPanel(
+LIB.RegisterPanel(
 'MY_Font', _L['MY_Font'], _L['System'],
 'ui/Image/UICommon/CommonPanel7.UITex|36', {
 OnPanelActive = function(wnd)

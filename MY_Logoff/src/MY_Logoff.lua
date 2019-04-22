@@ -35,8 +35,8 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Logoff/lang/')
-if not MY.AssertVersion('MY_Logoff', _L['MY_Logoff'], 0x2011800) then
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_Logoff/lang/')
+if not LIB.AssertVersion('MY_Logoff', _L['MY_Logoff'], 0x2011800) then
 	return
 end
 
@@ -47,9 +47,9 @@ RegisterCustomData('MY_Logoff.bIdleOff')
 RegisterCustomData('MY_Logoff.nIdleOffTime')
 
 local function Logoff(bCompletely, bUnfight, bNotDead)
-	if MY.BreatheCall('MY_LOGOFF') then
-		MY.BreatheCall('MY_LOGOFF', false)
-		MY.Sysmsg({_L['Logoff has been cancelled.']})
+	if LIB.BreatheCall('MY_LOGOFF') then
+		LIB.BreatheCall('MY_LOGOFF', false)
+		LIB.Sysmsg({_L['Logoff has been cancelled.']})
 		return
 	end
 	local function onBreatheCall()
@@ -63,31 +63,31 @@ local function Logoff(bCompletely, bUnfight, bNotDead)
 		if bNotDead and me.nMoveState == MOVE_STATE.ON_DEATH then
 			return
 		end
-		MY.Logout(bCompletely)
+		LIB.Logout(bCompletely)
 	end
 	onBreatheCall()
 	if bUnfight then
-		MY.Sysmsg({_L['Logoff is ready for your casting unfight skill.']})
+		LIB.Sysmsg({_L['Logoff is ready for your casting unfight skill.']})
 	end
-	MY.BreatheCall('MY_LOGOFF', onBreatheCall)
+	LIB.BreatheCall('MY_LOGOFF', onBreatheCall)
 end
 
 local function IdleOff()
 	if not MY_Logoff.bIdleOff then
-		if MY.BreatheCall('MY_LOGOFF_IDLE') then
-			MY.Sysmsg({_L['Idle off has been cancelled.']})
-			MY.BreatheCall('MY_LOGOFF_IDLE', false)
+		if LIB.BreatheCall('MY_LOGOFF_IDLE') then
+			LIB.Sysmsg({_L['Idle off has been cancelled.']})
+			LIB.BreatheCall('MY_LOGOFF_IDLE', false)
 		end
 		return
 	end
-	if MY.BreatheCall('MY_LOGOFF_IDLE') then
+	if LIB.BreatheCall('MY_LOGOFF_IDLE') then
 		return
 	end
 	local function onBreatheCall()
 		local nIdleTime = (Station.GetIdleTime()) / 1000 - 300
 		local remainTime = MY_Logoff.nIdleOffTime * 60 - nIdleTime
 		if remainTime <= 0 then
-			return MY.Logout(true)
+			return LIB.Logout(true)
 		end
 		if remainTime > 1200 and remainTime % 600 ~= 0 then
 			return
@@ -103,19 +103,19 @@ local function IdleOff()
 			if remainTime <= 10 then
 				OutputMessage('MSG_ANNOUNCE_YELLOW', szMessage)
 			end
-			MY.Sysmsg({szMessage})
+			LIB.Sysmsg({szMessage})
 		else
-			MY.Sysmsg({_L('Idle off notice: you\'ll auto logoff if you keep idle for %dm %ds.', remainTime / 60, remainTime % 60)})
+			LIB.Sysmsg({_L('Idle off notice: you\'ll auto logoff if you keep idle for %dm %ds.', remainTime / 60, remainTime % 60)})
 		end
 	end
-	MY.BreatheCall('MY_LOGOFF_IDLE', 1000, onBreatheCall)
-	MY.Sysmsg({_L('Idle off has been started, you\'ll auto logoff if you keep idle for %dm.', MY_Logoff.nIdleOffTime)})
+	LIB.BreatheCall('MY_LOGOFF_IDLE', 1000, onBreatheCall)
+	LIB.Sysmsg({_L('Idle off has been started, you\'ll auto logoff if you keep idle for %dm.', MY_Logoff.nIdleOffTime)})
 end
 
 local function onInit()
-	MY.DelayCall(2000, IdleOff)
+	LIB.DelayCall(2000, IdleOff)
 end
-MY.RegisterInit('MY_LOGOFF', onInit)
+LIB.RegisterInit('MY_LOGOFF', onInit)
 
 local PS = {}
 function PS.OnPanelActive(wnd)
@@ -150,7 +150,7 @@ function PS.OnPanelActive(wnd)
 		value = MY_Logoff.nIdleOffTime,
 		onchange = function(val)
 			MY_Logoff.nIdleOffTime = val
-			MY.DelayCall('MY_LOGOFF_IDLE_TIME_CHANGE', 500, IdleOff)
+			LIB.DelayCall('MY_LOGOFF_IDLE_TIME_CHANGE', 500, IdleOff)
 		end,
 	})
 	y = y + 40
@@ -177,7 +177,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:append('Text', {
 		x = 330, y = y, r = 255, g = 255, b = 0, text = _L['* hotkey setting'],
-		onclick = function() MY.SetHotKey() end,
+		onclick = function() LIB.SetHotKey() end,
 	})
 	y = y + 30
 
@@ -191,7 +191,7 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + 30
 end
-MY.RegisterPanel('Logoff', _L['express logoff'], _L['General'], 'UI/Image/UICommon/LoginSchool.UITex|24', PS)
+LIB.RegisterPanel('Logoff', _L['express logoff'], _L['General'], 'UI/Image/UICommon/LoginSchool.UITex|24', PS)
 
 do
 local menu = {
@@ -221,16 +221,16 @@ local menu = {
 	}, {
 		szOption = _L['set hotkey'],
 		fnAction = function()
-			MY.SetHotKey()
+			LIB.SetHotKey()
 		end,
 	},
 }
-MY.RegisterAddonMenu('MY_LOGOFF_MENU', menu)
+LIB.RegisterAddonMenu('MY_LOGOFF_MENU', menu)
 end
 
-MY.RegisterHotKey('MY_LogOff_RUI', _L['return to role list'], function() Logoff(false) end, nil)
-MY.RegisterHotKey('MY_LogOff_RRL', _L['return to game login'], function() Logoff(true) end, nil)
-MY.RegisterHotKey('MY_LogOff_RUI_UNFIGHT', _L['return to role list while not fight'], function() Logoff(false, true) end, nil)
-MY.RegisterHotKey('MY_LogOff_RRL_UNFIGHT', _L['return to game login while not fight'], function() Logoff(true, true) end, nil)
-MY.RegisterHotKey('MY_LogOff_RUI_UNFIGHT_ALIVE', _L['return to role list while not fight and not dead'], function() Logoff(false, true, true) end, nil)
-MY.RegisterHotKey('MY_LogOff_RRL_UNFIGHT_ALIVE', _L['return to game login while not fight and not dead'], function() Logoff(true, true, true) end, nil)
+LIB.RegisterHotKey('MY_LogOff_RUI', _L['return to role list'], function() Logoff(false) end, nil)
+LIB.RegisterHotKey('MY_LogOff_RRL', _L['return to game login'], function() Logoff(true) end, nil)
+LIB.RegisterHotKey('MY_LogOff_RUI_UNFIGHT', _L['return to role list while not fight'], function() Logoff(false, true) end, nil)
+LIB.RegisterHotKey('MY_LogOff_RRL_UNFIGHT', _L['return to game login while not fight'], function() Logoff(true, true) end, nil)
+LIB.RegisterHotKey('MY_LogOff_RUI_UNFIGHT_ALIVE', _L['return to role list while not fight and not dead'], function() Logoff(false, true, true) end, nil)
+LIB.RegisterHotKey('MY_LogOff_RRL_UNFIGHT_ALIVE', _L['return to game login while not fight and not dead'], function() Logoff(true, true, true) end, nil)

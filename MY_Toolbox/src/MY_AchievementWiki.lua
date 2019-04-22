@@ -35,7 +35,7 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Toolbox/lang/')
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_Toolbox/lang/')
 
 local function OnItemMouseEnter()
 	this:SetObjectMouseOver(true)
@@ -114,15 +114,15 @@ local function OnInit()
 	end
 	HookFrame(frame)
 end
-MY.RegisterInit('MY_AchievementWiki', OnInit)
+LIB.RegisterInit('MY_AchievementWiki', OnInit)
 end
 
 do
 local function OnFrameCreate()
-	if MY.IsShieldedVersion() or arg0:GetName() ~= 'AchievementPanel' then
+	if LIB.IsShieldedVersion() or arg0:GetName() ~= 'AchievementPanel' then
 		return
 	end
 	HookFrame(arg0)
 end
-MY.RegisterEvent('ON_FRAME_CREATE.MY_AchievementWiki', OnFrameCreate)
+LIB.RegisterEvent('ON_FRAME_CREATE.MY_AchievementWiki', OnFrameCreate)
 end

@@ -35,15 +35,15 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_MiddleMapMark/lang/')
-if not MY.AssertVersion('MY_MiddleMapMark', _L['MY_MiddleMapMark'], 0x2011800) then
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_MiddleMapMark/lang/')
+if not LIB.AssertVersion('MY_MiddleMapMark', _L['MY_MiddleMapMark'], 0x2011800) then
 	return
 end
-MY.CreateDataRoot(PATH_TYPE.GLOBAL)
+LIB.CreateDataRoot(PATH_TYPE.GLOBAL)
 local l_szKeyword, l_dwMapID, l_nMapIndex, l_renderTime = '', nil, nil, 0
-local DB = MY.ConnectDatabase(_L['MY_MiddleMapMark'], {'cache/npc_doodad_rec.v2.db', PATH_TYPE.GLOBAL})
+local DB = LIB.ConnectDatabase(_L['MY_MiddleMapMark'], {'cache/npc_doodad_rec.v2.db', PATH_TYPE.GLOBAL})
 if not DB then
-	return MY.Sysmsg({_L['Cannot connect to database!!!'], r = 255, g = 0, b = 0}, _L['MY_MiddleMapMark'])
+	return LIB.Sysmsg({_L['Cannot connect to database!!!'], r = 255, g = 0, b = 0}, _L['MY_MiddleMapMark'])
 end
 DB:Execute('CREATE TABLE IF NOT EXISTS NpcInfo (templateid INTEGER, poskey INTEGER, mapid INTEGER, x INTEGER, y INTEGER, name VARCHAR(20) NOT NULL, title VARCHAR(20) NOT NULL, level INTEGER, PRIMARY KEY(templateid, poskey))')
 DB:Execute('CREATE INDEX IF NOT EXISTS mmm_name_idx ON NpcInfo(name, mapid)')
@@ -85,12 +85,12 @@ local function GeneDoodadInfoPosKey(mapid, x, y)
 end
 
 local SZ_CACHE_PATH = 'cache/NPC_DOODAD_REC/'
-if IsLocalFileExist(MY.FormatPath(SZ_CACHE_PATH)) then
+if IsLocalFileExist(LIB.FormatPath(SZ_CACHE_PATH)) then
 	DB:Execute('BEGIN TRANSACTION')
 	for _, dwMapID in ipairs(GetMapList()) do
-		local data = MY.LoadLUAData(SZ_CACHE_PATH .. dwMapID .. '.$lang.jx3dat')
+		local data = LIB.LoadLUAData(SZ_CACHE_PATH .. dwMapID .. '.$lang.jx3dat')
 		if type(data) == 'string' then
-			data = MY.JsonDecode(data)
+			data = LIB.JsonDecode(data)
 		end
 		if data then
 			for _, p in ipairs(data.Npc) do
@@ -103,11 +103,11 @@ if IsLocalFileExist(MY.FormatPath(SZ_CACHE_PATH)) then
 				DBD_W:BindAll(p.dwTemplateID, GeneDoodadInfoPosKey(dwMapID, p.nX, p.nY), dwMapID, p.nX, p.nY, AnsiToUTF8(p.szName))
 				DBD_W:Execute()
 			end
-			MY.Debug({'MiddleMapMark cache trans from file to sqlite finished!'}, 'MY_MiddleMapMark', DEBUG_LEVEL.LOG)
+			LIB.Debug({'MiddleMapMark cache trans from file to sqlite finished!'}, 'MY_MiddleMapMark', DEBUG_LEVEL.LOG)
 		end
 	end
 	DB:Execute('END TRANSACTION')
-	CPath.DelDir(MY.FormatPath(SZ_CACHE_PATH))
+	CPath.DelDir(LIB.FormatPath(SZ_CACHE_PATH))
 end
 
 ---------------------------------------------------------------
@@ -144,7 +144,7 @@ local function PushDB()
 	DB:Execute('END TRANSACTION')
 end
 local function onLoadingEnding()
-	l_tempMap = MY.IsInZombieMap() or MY.IsInPubg() or MY.IsInArena() or MY.IsInBattleField() or false
+	l_tempMap = LIB.IsInZombieMap() or LIB.IsInPubg() or LIB.IsInArena() or LIB.IsInBattleField() or false
 	if l_tempMap then
 		local dwMapID = GetClientPlayer().GetMapID()
 		DBN_DM:ClearBindings()
@@ -156,13 +156,13 @@ local function onLoadingEnding()
 	end
 	PushDB()
 end
-MY.RegisterEvent('LOADING_ENDING.MY_MiddleMapMark', onLoadingEnding)
+LIB.RegisterEvent('LOADING_ENDING.MY_MiddleMapMark', onLoadingEnding)
 
 local function OnExit()
 	PushDB()
 	DB:Release()
 end
-MY.RegisterExit('MY_MiddleMapMark_Save', OnExit)
+LIB.RegisterExit('MY_MiddleMapMark_Save', OnExit)
 
 local function Rerender()
 	MY_MiddleMapMark.Search(l_szKeyword)
@@ -171,15 +171,15 @@ end
 local function AutomaticRerender()
 	if GetTime() - l_renderTime > MAX_RENDER_INTERVAL then
 		Rerender()
-	elseif not MY.DelayCall('MY_MiddleMapMark_Refresh') then
-		MY.DelayCall('MY_MiddleMapMark_Refresh', MAX_RENDER_INTERVAL, Rerender)
+	elseif not LIB.DelayCall('MY_MiddleMapMark_Refresh') then
+		LIB.DelayCall('MY_MiddleMapMark_Refresh', MAX_RENDER_INTERVAL, Rerender)
 	end
 end
 
-local NpcTpl = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_MiddleMapMark/data/npc/$lang.jx3dat')
-local DoodadTpl = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_MiddleMapMark/data/doodad/$lang.jx3dat')
+local NpcTpl = LIB.LoadLUAData(LIB.GetAddonInfo().szRoot .. 'MY_MiddleMapMark/data/npc/$lang.jx3dat')
+local DoodadTpl = LIB.LoadLUAData(LIB.GetAddonInfo().szRoot .. 'MY_MiddleMapMark/data/doodad/$lang.jx3dat')
 local function OnNpcEnterScene()
-	if l_tempMap and MY.IsShieldedVersion() then
+	if l_tempMap and LIB.IsShieldedVersion() then
 		return
 	end
 	local npc = GetNpc(arg0)
@@ -196,8 +196,8 @@ local function OnNpcEnterScene()
 		return
 	end
 	-- avoid full number named npc
-	local szName = MY.GetObjectName(npc, 'never')
-	if not szName or MY.TrimString(szName) == '' then
+	local szName = LIB.GetObjectName(npc, 'never')
+	if not szName or LIB.TrimString(szName) == '' then
 		return
 	end
 	-- switch map
@@ -220,7 +220,7 @@ local function OnNpcEnterScene()
 	-- redraw ui
 	AutomaticRerender()
 end
-MY.RegisterEvent('NPC_ENTER_SCENE.MY_MIDDLEMAPMARK', OnNpcEnterScene)
+LIB.RegisterEvent('NPC_ENTER_SCENE.MY_MIDDLEMAPMARK', OnNpcEnterScene)
 
 local REC_DOODAD_TYPES = {
 	[DOODAD_KIND.INVALID     ] = false,
@@ -241,7 +241,7 @@ local REC_DOODAD_TYPES = {
 	[DOODAD_KIND.SPRINT      ] = false, -- Çá¹¦Âä½Åµã
 }
 local function OnDoodadEnterScene()
-	if l_tempMap and MY.IsShieldedVersion() then
+	if l_tempMap and LIB.IsShieldedVersion() then
 		return
 	end
 	local doodad = GetDoodad(arg0)
@@ -257,8 +257,8 @@ local function OnDoodadEnterScene()
 		return
 	end
 	-- avoid full number named doodad
-	local szName = MY.GetObjectName(doodad, 'never')
-	if not szName or MY.TrimString(szName) == '' then
+	local szName = LIB.GetObjectName(doodad, 'never')
+	if not szName or LIB.TrimString(szName) == '' then
 		return
 	end
 	-- switch map
@@ -279,7 +279,7 @@ local function OnDoodadEnterScene()
 	-- redraw ui
 	AutomaticRerender()
 end
-MY.RegisterEvent('DOODAD_ENTER_SCENE.MY_MIDDLEMAPMARK', OnDoodadEnterScene)
+LIB.RegisterEvent('DOODAD_ENTER_SCENE.MY_MIDDLEMAPMARK', OnDoodadEnterScene)
 
 function MY_MiddleMapMark.SearchNpc(szText, dwMapID)
 	local aInfos
@@ -421,7 +421,7 @@ local function onReload()
 		end
 	end
 end
-MY.RegisterReload('MY_MiddleMapMark', onReload)
+LIB.RegisterReload('MY_MiddleMapMark', onReload)
 
 -- start search
 local MAX_DISPLAY_COUNT = 1000
@@ -469,8 +469,8 @@ function MY_MiddleMapMark.Search(szKeyword)
 	local aKeywords = {}
 	do
 		local i = 1
-		for _, szSearch in ipairs(MY.SplitString(szKeyword, ',')) do
-			szSearch = MY.TrimString(szSearch)
+		for _, szSearch in ipairs(LIB.SplitString(szKeyword, ',')) do
+			szSearch = LIB.TrimString(szSearch)
 			if szSearch ~= '' then
 				aKeywords[i] = szSearch
 				i = i + 1
@@ -553,7 +553,7 @@ function PS.OnPanelActive(wnd)
 	  :size(w - 32, h - 50)
 	  :listbox('onlclick', function(hItem, text, id, data, selected)
 	  	OpenMiddleMap(data.dwMapID, 0)
-	  	UI('Topmost1/MiddleMap/Wnd_Tool/Edit_Search'):text(MY.EscapeString(data.szName))
+	  	UI('Topmost1/MiddleMap/Wnd_Tool/Edit_Search'):text(LIB.EscapeString(data.szName))
 	  	Station.SetFocusWindow('Topmost1/MiddleMap')
 	  	if not selected then -- avoid unselect
 	  		return false
@@ -629,4 +629,4 @@ function PS.OnPanelResize(wnd)
 	ui:children('#WndEdit_Search'):size(w - 26, 25)
 end
 
-MY.RegisterPanel('MY_MiddleMapMark', _L['middle map mark'], _L['General'], 'ui/Image/MiddleMap/MapWindow2.UITex|4', PS)
+LIB.RegisterPanel('MY_MiddleMapMark', _L['middle map mark'], _L['General'], 'ui/Image/MiddleMap/MapWindow2.UITex|4', PS)

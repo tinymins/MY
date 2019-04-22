@@ -35,8 +35,8 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot..'MY_Toolbox/lang/')
-if not MY.AssertVersion('MY_Toolbox', _L['MY_Toolbox'], 0x2011800) then
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot..'MY_Toolbox/lang/')
+if not LIB.AssertVersion('MY_Toolbox', _L['MY_Toolbox'], 0x2011800) then
 	return
 end
 local _C = {}
@@ -85,7 +85,7 @@ MY_ToolBox.ApplyConfig = function()
 				if not tar then
 					return
 				end
-				local p = MY.GetFriend(dwID)
+				local p = LIB.GetFriend(dwID)
 				if p then
 					if MY_ToolBox.bFriendHeadTipNav and Navigator_SetID then
 						Navigator_SetID('MY_FRIEND_TIP.' .. dwID, TARGET.PLAYER, dwID, p.name)
@@ -116,22 +116,22 @@ MY_ToolBox.ApplyConfig = function()
 				end
 			end
 			local function RescanNearby()
-				for _, p in ipairs(MY.GetNearPlayer()) do
+				for _, p in ipairs(LIB.GetNearPlayer()) do
 					OnPlayerEnter(p.dwID)
 				end
 			end
 			RescanNearby()
-			MY.RegisterEvent('PLAYER_ENTER_SCENE.MY_FRIEND_TIP', function(event) OnPlayerEnter(arg0) end)
-			MY.RegisterEvent('PLAYER_LEAVE_SCENE.MY_FRIEND_TIP', function(event) OnPlayerLeave(arg0) end)
-			MY.RegisterEvent('DELETE_FELLOWSHIP.MY_FRIEND_TIP', function(event) RescanNearby() end)
-			MY.RegisterEvent('PLAYER_FELLOWSHIP_UPDATE.MY_FRIEND_TIP', function(event) RescanNearby() end)
-			MY.RegisterEvent('PLAYER_FELLOWSHIP_CHANGE.MY_FRIEND_TIP', function(event) RescanNearby() end)
+			LIB.RegisterEvent('PLAYER_ENTER_SCENE.MY_FRIEND_TIP', function(event) OnPlayerEnter(arg0) end)
+			LIB.RegisterEvent('PLAYER_LEAVE_SCENE.MY_FRIEND_TIP', function(event) OnPlayerLeave(arg0) end)
+			LIB.RegisterEvent('DELETE_FELLOWSHIP.MY_FRIEND_TIP', function(event) RescanNearby() end)
+			LIB.RegisterEvent('PLAYER_FELLOWSHIP_UPDATE.MY_FRIEND_TIP', function(event) RescanNearby() end)
+			LIB.RegisterEvent('PLAYER_FELLOWSHIP_CHANGE.MY_FRIEND_TIP', function(event) RescanNearby() end)
 		else
-			MY.RegisterEvent('PLAYER_ENTER_SCENE.MY_FRIEND_TIP')
-			MY.RegisterEvent('PLAYER_LEAVE_SCENE.MY_FRIEND_TIP')
-			MY.RegisterEvent('DELETE_FELLOWSHIP.MY_FRIEND_TIP')
-			MY.RegisterEvent('PLAYER_FELLOWSHIP_UPDATE.MY_FRIEND_TIP')
-			MY.RegisterEvent('PLAYER_FELLOWSHIP_CHANGE.MY_FRIEND_TIP')
+			LIB.RegisterEvent('PLAYER_ENTER_SCENE.MY_FRIEND_TIP')
+			LIB.RegisterEvent('PLAYER_LEAVE_SCENE.MY_FRIEND_TIP')
+			LIB.RegisterEvent('DELETE_FELLOWSHIP.MY_FRIEND_TIP')
+			LIB.RegisterEvent('PLAYER_FELLOWSHIP_UPDATE.MY_FRIEND_TIP')
+			LIB.RegisterEvent('PLAYER_FELLOWSHIP_CHANGE.MY_FRIEND_TIP')
 			UI.GetShadowHandle('MY_FriendHeadTip'):Hide()
 		end
 	end
@@ -158,7 +158,7 @@ MY_ToolBox.ApplyConfig = function()
 					return
 				end
 				if tar.szName == '' then
-					MY.DelayCall(500, function() OnPlayerEnter(dwID, nRetryCount + 1) end)
+					LIB.DelayCall(500, function() OnPlayerEnter(dwID, nRetryCount + 1) end)
 					return
 				end
 				if MY_ToolBox.bTongMemberHeadTipNav and Navigator_SetID then
@@ -188,21 +188,21 @@ MY_ToolBox.ApplyConfig = function()
 					end
 				end
 			end
-			for _, p in ipairs(MY.GetNearPlayer()) do
+			for _, p in ipairs(LIB.GetNearPlayer()) do
 				OnPlayerEnter(p.dwID)
 			end
-			MY.RegisterEvent('PLAYER_ENTER_SCENE.MY_GUILDMEMBER_TIP', function(event) OnPlayerEnter(arg0) end)
-			MY.RegisterEvent('PLAYER_LEAVE_SCENE.MY_GUILDMEMBER_TIP', function(event) OnPlayerLeave(arg0) end)
+			LIB.RegisterEvent('PLAYER_ENTER_SCENE.MY_GUILDMEMBER_TIP', function(event) OnPlayerEnter(arg0) end)
+			LIB.RegisterEvent('PLAYER_LEAVE_SCENE.MY_GUILDMEMBER_TIP', function(event) OnPlayerLeave(arg0) end)
 		else
-			MY.RegisterEvent('PLAYER_ENTER_SCENE.MY_GUILDMEMBER_TIP')
-			MY.RegisterEvent('PLAYER_LEAVE_SCENE.MY_GUILDMEMBER_TIP')
+			LIB.RegisterEvent('PLAYER_ENTER_SCENE.MY_GUILDMEMBER_TIP')
+			LIB.RegisterEvent('PLAYER_LEAVE_SCENE.MY_GUILDMEMBER_TIP')
 			UI.GetShadowHandle('MY_TongMemberHeadTip'):Hide()
 		end
 	end
 
 	-- 玩家名字变成link方便组队
 	do
-		MY.RegisterEvent('OPEN_WINDOW.NAMELINKER', function(event)
+		LIB.RegisterEvent('OPEN_WINDOW.NAMELINKER', function(event)
 			local h
 			for _, p in ipairs({
 				{'Normal/DialoguePanel', '', 'Handle_Message'},
@@ -229,7 +229,7 @@ MY_ToolBox.ApplyConfig = function()
 							local nPos1, nPos2 = szText:find(szName)
 							h:InsertItemFromString(i, true, GetFormatText(szText:sub(nPos2 + 1), hItem:GetFontScheme()))
 							h:InsertItemFromString(i, true, GetFormatText('[' .. szText:sub(nPos1, nPos2) .. ']', nil, nil, nil, nil, nil, nil, 'namelink'))
-							MY.RenderChatLink(h:Lookup(i + 1))
+							LIB.RenderChatLink(h:Lookup(i + 1))
 							if MY_Farbnamen and MY_Farbnamen.Render then
 								MY_Farbnamen.Render(h:Lookup(i + 1))
 							end
@@ -247,8 +247,8 @@ MY_ToolBox.ApplyConfig = function()
 
 	-- 试炼之地九宫助手
 	do
-		MY.RegisterEvent('OPEN_WINDOW.JIUGONG_HELPER', function(event)
-			if MY.IsShieldedVersion() then
+		LIB.RegisterEvent('OPEN_WINDOW.JIUGONG_HELPER', function(event)
+			if LIB.IsShieldedVersion() then
 				return
 			end
 			-- 确定当前对话对象是醉逍遥（18707）
@@ -302,7 +302,7 @@ MY_ToolBox.ApplyConfig = function()
 				else
 					szText = szText .. _L['failed to calc.']
 				end
-				MY.Sysmsg({szText})
+				LIB.Sysmsg({szText})
 				OutputWarningMessage('MSG_WARNING_RED', szText, 10)
 			end)
 		end)
@@ -311,7 +311,7 @@ MY_ToolBox.ApplyConfig = function()
 	-- 防止神行CD被吃
 	do
 		if MY_ToolBox.bAvoidBlackShenxingCD then
-			MY.RegisterEvent('DO_SKILL_CAST.MY_TOOLBOX_AVOIDBLACKSHENXINGCD', function()
+			LIB.RegisterEvent('DO_SKILL_CAST.MY_TOOLBOX_AVOIDBLACKSHENXINGCD', function()
 				local dwID, dwSkillID, dwSkillLevel = arg0, arg1, arg2
 				if not(UI_GetClientPlayerID() == dwID and
 				Table_IsSkillFormationCaster(dwSkillID, dwSkillLevel)) then
@@ -329,29 +329,29 @@ MY_ToolBox.ApplyConfig = function()
 				) and dwSkillID == 3691) then
 					return
 				end
-				MY.Sysmsg({_L['Shenxing has been cancelled, cause you got the zhenyan.']})
+				LIB.Sysmsg({_L['Shenxing has been cancelled, cause you got the zhenyan.']})
 				player.StopCurrentAction()
 			end)
 		else
-			MY.RegisterEvent('DO_SKILL_CAST.MY_TOOLBOX_AVOIDBLACKSHENXINGCD')
+			LIB.RegisterEvent('DO_SKILL_CAST.MY_TOOLBOX_AVOIDBLACKSHENXINGCD')
 		end
 	end
 
 	-- 竞技场自动切换团队频道
 	do
 		if MY_ToolBox.bJJCAutoSwitchTalkChannel then
-			MY.RegisterEvent('LOADING_ENDING.MY_TOOLBOX_JJCAUTOSWITCHTALKCHANNEL', function()
+			LIB.RegisterEvent('LOADING_ENDING.MY_TOOLBOX_JJCAUTOSWITCHTALKCHANNEL', function()
 				local bIsBattleField = (GetClientPlayer().GetScene().nType == MAP_TYPE.BATTLE_FIELD)
 				local nChannel, szName = EditBox_GetChannel()
 				if bIsBattleField and (nChannel == PLAYER_TALK_CHANNEL.RAID or nChannel == PLAYER_TALK_CHANNEL.TEAM) then
 					_C.JJCAutoSwitchTalkChannel_OrgChannel = nChannel
-					MY.SwitchChat(PLAYER_TALK_CHANNEL.BATTLE_FIELD)
+					LIB.SwitchChat(PLAYER_TALK_CHANNEL.BATTLE_FIELD)
 				elseif not bIsBattleField and nChannel == PLAYER_TALK_CHANNEL.BATTLE_FIELD then
-					MY.SwitchChat(_C.JJCAutoSwitchTalkChannel_OrgChannel or PLAYER_TALK_CHANNEL.RAID)
+					LIB.SwitchChat(_C.JJCAutoSwitchTalkChannel_OrgChannel or PLAYER_TALK_CHANNEL.RAID)
 				end
 			end)
 		else
-			MY.RegisterEvent('LOADING_ENDING.MY_TOOLBOX_JJCAUTOSWITCHTALKCHANNEL')
+			LIB.RegisterEvent('LOADING_ENDING.MY_TOOLBOX_JJCAUTOSWITCHTALKCHANNEL')
 		end
 	end
 
@@ -363,7 +363,7 @@ MY_ToolBox.ApplyConfig = function()
 			local hShaList = UI.GetShadowHandle('MY_ChangGeShadow')
 			local MAX_SHADOW_COUNT = 10
 			local nInterval = (MY_ToolBox.bChangGeShadowDis or MY_ToolBox.bChangGeShadowCD) and 50 or 400
-			MY.BreatheCall('CHANGGE_SHADOW', nInterval, function()
+			LIB.BreatheCall('CHANGGE_SHADOW', nInterval, function()
 				local frame = Station.Lookup('Lowest1/ChangGeShadow')
 				if not frame then
 					if nCount and nCount > 0 then
@@ -386,7 +386,7 @@ MY_ToolBox.ApplyConfig = function()
 						hShaList:AppendItemFromString('<shadow></shadow>')
 						sha = hShaList:Lookup(i)
 					end
-					nDis = MY.GetDistance(GetNpc(hItem.nNpcID))
+					nDis = LIB.GetDistance(GetNpc(hItem.nNpcID))
 					if hItem.szState == 'disable' then
 						r, g, b = 191, 31, 31
 					else
@@ -418,7 +418,7 @@ MY_ToolBox.ApplyConfig = function()
 			end)
 			hShaList:Show()
 		else
-			MY.BreatheCall('CHANGGE_SHADOW', false)
+			LIB.BreatheCall('CHANGGE_SHADOW', false)
 			UI.GetShadowHandle('MY_ChangGeShadow'):Hide()
 		end
 	end
@@ -426,7 +426,7 @@ MY_ToolBox.ApplyConfig = function()
 	-- 记录点名到密聊频道
 	do
 		if MY_ToolBox.bWhisperMetion then
-			MY.RegisterMsgMonitor('MY_RedirectMetionToWhisper', function(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID, szName)
+			LIB.RegisterMsgMonitor('MY_RedirectMetionToWhisper', function(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID, szName)
 				local me = GetClientPlayer()
 				if not me or me.dwID == dwTalkerID then
 					return
@@ -441,7 +441,7 @@ MY_ToolBox.ApplyConfig = function()
 				'MSG_TEAM', 'MSG_CAMP', 'MSG_GROUP', 'MSG_SEEK_MENTOR', 'MSG_FRIEND', 'MSG_IDENTITY', 'MSG_SYS',
 				'MSG_NPC_NEARBY', 'MSG_NPC_YELL', 'MSG_NPC_PARTY', 'MSG_NPC_WHISPER',
 			})
-			MY.HookChatPanel('FILTER.MY_RedirectMetionToWhisper', function(h, szMsg, szChannel, dwTime)
+			LIB.HookChatPanel('FILTER.MY_RedirectMetionToWhisper', function(h, szMsg, szChannel, dwTime)
 				if h.__MY_LastMsg == szMsg and h.__MY_LastMsgChannel ~= szChannel and szChannel == 'MSG_WHISPER' then
 					return false
 				end
@@ -450,25 +450,25 @@ MY_ToolBox.ApplyConfig = function()
 				return true
 			end)
 		else
-			MY.HookChatPanel('FILTER.MY_RedirectMetionToWhisper', false)
-			MY.RegisterMsgMonitor('MY_RedirectMetionToWhisper')
+			LIB.HookChatPanel('FILTER.MY_RedirectMetionToWhisper', false)
+			LIB.RegisterMsgMonitor('MY_RedirectMetionToWhisper')
 		end
 	end
 end
-MY.RegisterInit('MY_TOOLBOX', MY_ToolBox.ApplyConfig)
+LIB.RegisterInit('MY_TOOLBOX', MY_ToolBox.ApplyConfig)
 -- 密码锁解锁提醒
-MY.RegisterInit('MY_LOCK_TIP', function()
+LIB.RegisterInit('MY_LOCK_TIP', function()
 	-- 刚进游戏好像获取不到锁状态 20秒之后再说吧
-	MY.DelayCall('MY_LOCK_TIP_DELAY', 20000, function()
-		if not MY.IsPhoneLock() then -- 手机密保还提示个鸡
+	LIB.DelayCall('MY_LOCK_TIP_DELAY', 20000, function()
+		if not LIB.IsPhoneLock() then -- 手机密保还提示个鸡
 			local state, nResetTime = Lock_State()
 			if state == 'PASSWORD_LOCK' then
-				MY.DelayCall('MY_LOCK_TIP', 100000, function()
+				LIB.DelayCall('MY_LOCK_TIP', 100000, function()
 					local state, nResetTime = Lock_State()
 					if state == 'PASSWORD_LOCK' then
 						local me = GetClientPlayer()
 						local szText = me and me.GetGlobalID and _L.LOCK_TIP[me.GetGlobalID()] or _L['You have been loged in for 2min, you can unlock bag locker now.']
-						MY.Sysmsg({szText})
+						LIB.Sysmsg({szText})
 						OutputWarningMessage('MSG_REWARD_GREEN', szText, 10)
 					end
 				end)
@@ -488,7 +488,7 @@ local tNonwarData = {
 	{ id = 32, x =   50, y =  45 }, -- 小战宝
 }
 local function drawNonwarMap()
-	if MY.IsShieldedVersion() then
+	if LIB.IsShieldedVersion() then
 		return
 	end
 	local h = Station.Lookup('Topmost1/WorldMap/Wnd_All', 'Handle_CopyBtn')
@@ -532,14 +532,14 @@ local function drawNonwarMap()
 	end
 	h.__MY_NonwarData = true
 end
-MY.BreatheCall('MY_Toolbox#NonwarData', 130, drawNonwarMap)
+LIB.BreatheCall('MY_Toolbox#NonwarData', 130, drawNonwarMap)
 end
 
 -- 【台服用】强开所有地图
 do
 local h, hList, hItem
 local function openAllMap()
-	if MY.IsShieldedVersion() then
+	if LIB.IsShieldedVersion() then
 		return
 	end
 	h = Station.Lookup('Topmost1/WorldMap/Wnd_All', '')
@@ -567,12 +567,12 @@ local function openAllMap()
 	end
 	h, hList, hItem = nil
 end
-MY.BreatheCall('MY_Toolbox#OpenAllMap', 130, openAllMap)
+LIB.BreatheCall('MY_Toolbox#OpenAllMap', 130, openAllMap)
 end
 
 -- 大战没交
 local m_aBigWars = { 19191, 19192, 19195, 19196, 19197 }
-MY.RegisterEvent('ON_FRAME_CREATE.BIG_WAR_CHECK', function()
+LIB.RegisterEvent('ON_FRAME_CREATE.BIG_WAR_CHECK', function()
 	local me = GetClientPlayer()
 	if me and arg0:GetName() == 'ExitPanel' then
 		for _, dwQuestID in ipairs(m_aBigWars) do
@@ -604,34 +604,34 @@ end)
 
 -- auto restore team authourity info in arena
 do local l_tTeamInfo, l_bConfigEnd
-MY.RegisterEvent('ARENA_START', function() l_bConfigEnd = true end)
-MY.RegisterEvent('LOADING_ENDING', function() l_bConfigEnd = false end)
-MY.RegisterEvent('PARTY_DELETE_MEMBER', function() l_bConfigEnd = false end)
+LIB.RegisterEvent('ARENA_START', function() l_bConfigEnd = true end)
+LIB.RegisterEvent('LOADING_ENDING', function() l_bConfigEnd = false end)
+LIB.RegisterEvent('PARTY_DELETE_MEMBER', function() l_bConfigEnd = false end)
 local function RestoreTeam()
 	local me, team = GetClientPlayer(), GetClientTeam()
 	if not l_tTeamInfo
 	or not MY_ToolBox.bRestoreAuthorityInfo
-	or not MY.IsLeader()
-	or not me.IsInParty() or not MY.IsInArena() then
+	or not LIB.IsLeader()
+	or not me.IsInParty() or not LIB.IsInArena() then
 		return
 	end
-	MY.SetTeamInfo(l_tTeamInfo)
+	LIB.SetTeamInfo(l_tTeamInfo)
 end
-MY.RegisterEvent('PARTY_ADD_MEMBER', RestoreTeam)
+LIB.RegisterEvent('PARTY_ADD_MEMBER', RestoreTeam)
 
 local function SaveTeam()
 	local me, team = GetClientPlayer(), GetClientTeam()
-	if not me.IsInParty() or not MY.IsInArena() or l_bConfigEnd then
+	if not me.IsInParty() or not LIB.IsInArena() or l_bConfigEnd then
 		return
 	end
-	l_tTeamInfo = MY.GetTeamInfo()
+	l_tTeamInfo = LIB.GetTeamInfo()
 end
-MY.RegisterEvent({'TEAM_AUTHORITY_CHANGED', 'PARTY_SET_FORMATION_LEADER', 'TEAM_CHANGE_MEMBER_GROUP'}, SaveTeam)
+LIB.RegisterEvent({'TEAM_AUTHORITY_CHANGED', 'PARTY_SET_FORMATION_LEADER', 'TEAM_CHANGE_MEMBER_GROUP'}, SaveTeam)
 end
 
 -- 进入JJC自动显示所有人物
 do local l_bHideNpc, l_bHidePlayer, l_bShowParty, l_lock
-MY.RegisterEvent('ON_REPRESENT_CMD', function()
+LIB.RegisterEvent('ON_REPRESENT_CMD', function()
 	if l_lock then
 		return
 	end
@@ -643,11 +643,11 @@ MY.RegisterEvent('ON_REPRESENT_CMD', function()
 		l_bShowParty = arg0 == 'show or hide party player 1'
 	end
 end)
-MY.RegisterEvent('LOADING_END', function()
+LIB.RegisterEvent('LOADING_END', function()
 	if not MY_ToolBox.bAutoShowInArena then
 		return
 	end
-	if MY.IsInArena() or MY.IsInBattleField() then
+	if LIB.IsInArena() or LIB.IsInBattleField() then
 		l_lock = true
 		rlcmd('show npc')
 		rlcmd('show player')
@@ -707,20 +707,20 @@ function PS.OnPanelActive(wnd)
 	  :text(_L['check nearby gongzhan'])
 	  :lclick(function()
 	  	local tGongZhans = {}
-	  	for _, p in ipairs(MY.GetNearPlayer()) do
-	  		for _, buff in pairs(MY.GetBuffList(p)) do
+	  	for _, p in ipairs(LIB.GetNearPlayer()) do
+	  		for _, buff in pairs(LIB.GetBuffList(p)) do
 	  			if (not buff.bCanCancel) and string.find(Table_GetBuffName(buff.dwID, buff.nLevel), _L['GongZhan']) ~= nil then
 	  				table.insert(tGongZhans, {p = p, time = (buff.nEndFrame - GetLogicFrameCount()) / 16})
 	  			end
 	  		end
 	  	end
 	  	local nChannel = MY_ToolBox.nGongzhanPublishChannel or PLAYER_TALK_CHANNEL.LOCAL_SYS
-	  	MY.Talk(nChannel, _L['------------------------------------'])
+	  	LIB.Talk(nChannel, _L['------------------------------------'])
 	  	for _, r in ipairs(tGongZhans) do
-	  		MY.Talk( nChannel, _L('Detected [%s] has GongZhan buff for %d sec(s).', r.p.szName, r.time) )
+	  		LIB.Talk( nChannel, _L('Detected [%s] has GongZhan buff for %d sec(s).', r.p.szName, r.time) )
 	  	end
-	  	MY.Talk(nChannel, _L('Nearby GongZhan Total Count: %d.', #tGongZhans))
-	  	MY.Talk(nChannel, _L['------------------------------------'])
+	  	LIB.Talk(nChannel, _L('Nearby GongZhan Total Count: %d.', #tGongZhans))
+	  	LIB.Talk(nChannel, _L['------------------------------------'])
 	  end):rmenu(function()
 	  	local t = { { szOption = _L['send to ...'], bDisable = true }, { bDevide = true } }
 	  	for _, tChannel in ipairs(_C.tChannels) do
@@ -1003,18 +1003,18 @@ function PS.OnPanelActive(wnd)
 
 	x = X
 end
-MY.RegisterPanel( 'MY_ToolBox', _L['toolbox'], _L['General'], 'UI/Image/Common/Money.UITex|243', PS)
+LIB.RegisterPanel( 'MY_ToolBox', _L['toolbox'], _L['General'], 'UI/Image/Common/Money.UITex|243', PS)
 
 do
 local TARGET_TYPE, TARGET_ID
 local function onHotKey()
 	if TARGET_TYPE then
-		MY.SetTarget(TARGET_TYPE, TARGET_ID)
+		LIB.SetTarget(TARGET_TYPE, TARGET_ID)
 		TARGET_TYPE, TARGET_ID = nil
 	else
-		TARGET_TYPE, TARGET_ID = MY.GetTarget()
-		MY.SetTarget(TARGET.PLAYER, UI_GetClientPlayerID())
+		TARGET_TYPE, TARGET_ID = LIB.GetTarget()
+		LIB.SetTarget(TARGET.PLAYER, UI_GetClientPlayerID())
 	end
 end
-MY.RegisterHotKey('MY_AutoLoopMeAndTarget', _L['Loop target between me and target'], onHotKey)
+LIB.RegisterHotKey('MY_AutoLoopMeAndTarget', _L['Loop target between me and target'], onHotKey)
 end

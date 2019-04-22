@@ -36,9 +36,9 @@ local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.Is
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
 
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_TeamTools/lang/')
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_TeamTools/lang/')
 local D = {}
-local PR_INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_TeamTools/ui/MY_PartyRequest.ini'
+local PR_INI_PATH = LIB.GetAddonInfo().szRoot .. 'MY_TeamTools/ui/MY_PartyRequest.ini'
 local PR_EQUIP_REQUEST = {}
 local PR_PARTY_REQUEST = {}
 
@@ -50,12 +50,12 @@ MY_PartyRequest = {
 	bAcceptFriend = false,
 	bAcceptAll    = false,
 }
-MY.RegisterCustomData('MY_PartyRequest')
+LIB.RegisterCustomData('MY_PartyRequest')
 
 function MY_PartyRequest.OnFrameCreate()
 	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
 	this:Lookup('', 'Text_Title'):SetText(g_tStrings.STR_ARENA_INVITE)
-	MY.RegisterEsc('MY_PartyRequest', D.GetFrame, D.ClosePanel)
+	LIB.RegisterEsc('MY_PartyRequest', D.GetFrame, D.ClosePanel)
 end
 
 function MY_PartyRequest.OnLButtonClick()
@@ -114,10 +114,10 @@ function MY_PartyRequest.OnLButtonClick()
 	elseif name == 'Btn_Lookup' then
 		local info = this:GetParent().info
 		if not info.dwID or (not info.bDetail and IsCtrlKeyDown()) then
-			MY.SendBgMsg(info.szName, 'RL', 'ASK')
+			LIB.SendBgMsg(info.szName, 'RL', 'ASK')
 			this:Enable(false)
 			this:Lookup('', 'Text_Lookup'):SetText(_L['loading...'])
-			MY.Sysmsg({_L['If it is always loading, the target may not install plugin or refuse.']})
+			LIB.Sysmsg({_L['If it is always loading, the target may not install plugin or refuse.']})
 		elseif info.dwID then
 			ViewInviteToPlayer(info.dwID)
 		end
@@ -132,7 +132,7 @@ end
 
 function MY_PartyRequest.OnRButtonClick()
 	if this.info then
-		PopupMenu(MY.GetTargetContextMenu(TARGET.PLAYER, this.info.szName, this.info.dwID))
+		PopupMenu(LIB.GetTargetContextMenu(TARGET.PLAYER, this.info.szName, this.info.dwID))
 	end
 end
 
@@ -181,7 +181,7 @@ function D.ClosePanel(bCompulsory)
 	if bCompulsory then
 		fnAction()
 	else
-		MY.Confirm(_L['Clear list and close?'], fnAction)
+		LIB.Confirm(_L['Clear list and close?'], fnAction)
 	end
 end
 
@@ -190,8 +190,8 @@ function D.OnPeekPlayer()
 		if arg0 == PEEK_OTHER_PLAYER_RESPOND.SUCCESS then
 			local me = GetClientPlayer()
 			local dwType, dwID = me.GetTarget()
-			MY.SetTarget(TARGET.PLAYER, arg1)
-			MY.SetTarget(dwType, dwID)
+			LIB.SetTarget(TARGET.PLAYER, arg1)
+			LIB.SetTarget(dwType, dwID)
 			local p = GetPlayer(arg1)
 			if p then
 				local mnt = p.GetKungfuMount()
@@ -247,7 +247,7 @@ function D.GetRequestStatus(info)
 				end
 			end
 		end
-		if MY_PartyRequest.bRefuseLowLv and info.nLevel < MY.GetAddonInfo().dwMaxPlayerLevel then
+		if MY_PartyRequest.bRefuseLowLv and info.nLevel < LIB.GetAddonInfo().dwMaxPlayerLevel then
 			szStatus = 'refuse'
 			szMsg = _L('Auto refuse %s(%s %d%s) party request, go to MY/raid/teamtools panel if you want to turn off this feature.',
 				info.szName, g_tStrings.tForceTitle[info.dwForce], info.nLevel, g_tStrings.STR_LEVEL)
@@ -282,7 +282,7 @@ function D.DoAutoAction(info)
 		D.AcceptRequest(info)
 	end
 	if szMsg then
-		MY.Sysmsg(szMsg)
+		LIB.Sysmsg(szMsg)
 	end
 	return bAction, szStatus, szMsg
 end
@@ -312,8 +312,8 @@ function D.OnApplyRequest()
 					nCamp       = arg1,
 					dwForce     = arg2,
 					nLevel      = arg3,
-					bFriend     = MY.IsFriend(arg0),
-					bTongMember = MY.IsTongMember(arg0),
+					bFriend     = LIB.IsFriend(arg0),
+					bTongMember = LIB.IsTongMember(arg0),
 					fnAction = function()
 						pcall(btn.fnAction)
 					end,
@@ -325,7 +325,7 @@ function D.OnApplyRequest()
 			end
 			-- »ñÈ¡dwID
 			local me = GetClientPlayer()
-			local tar = MY.GetObject(TARGET.PLAYER, arg0)
+			local tar = LIB.GetObject(TARGET.PLAYER, arg0)
 			if not info.dwID and tar then
 				info.dwID = tar.dwID
 			end
@@ -400,7 +400,7 @@ function D.UpdateFrame()
 		end
 	end
 	if dwDelayTime then
-		MY.DelayCall('MY_PartyRequest', dwDelayTime - dwTime, D.UpdateFrame)
+		LIB.DelayCall('MY_PartyRequest', dwDelayTime - dwTime, D.UpdateFrame)
 	end
 	container:SetH(nH)
 	container:FormatAllContentPos()
@@ -423,11 +423,11 @@ function D.Feedback(szName, data, bDetail)
 	D.UpdateFrame()
 end
 
-MY.RegisterEvent('PEEK_OTHER_PLAYER.MY_PartyRequest'   , D.OnPeekPlayer  )
-MY.RegisterEvent('PARTY_INVITE_REQUEST.MY_PartyRequest', D.OnApplyRequest)
-MY.RegisterEvent('PARTY_APPLY_REQUEST.MY_PartyRequest' , D.OnApplyRequest)
+LIB.RegisterEvent('PEEK_OTHER_PLAYER.MY_PartyRequest'   , D.OnPeekPlayer  )
+LIB.RegisterEvent('PARTY_INVITE_REQUEST.MY_PartyRequest', D.OnApplyRequest)
+LIB.RegisterEvent('PARTY_APPLY_REQUEST.MY_PartyRequest' , D.OnApplyRequest)
 
-MY.RegisterBgMsg('RL', function(_, nChannel, dwID, szName, bIsSelf, ...)
+LIB.RegisterBgMsg('RL', function(_, nChannel, dwID, szName, bIsSelf, ...)
 	local data = {...}
 	if not bIsSelf then
 		if data[1] == 'Feedback' then

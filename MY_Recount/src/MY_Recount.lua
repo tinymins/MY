@@ -81,11 +81,11 @@ local SZ_SKILL_RESULT = {
 	[SKILL_RESULT.CRITICAL] = g_tStrings.STR_CS_NAME      ,
 	[SKILL_RESULT.INSIGHT ] = g_tStrings.STR_MSG_INSIGHT  ,
 }
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Recount/lang/')
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_Recount/lang/')
 local _C = {
-	szIniRoot   = MY.GetAddonInfo().szRoot .. 'MY_Recount/ui/',
-	szIniFile   = MY.GetAddonInfo().szRoot .. 'MY_Recount/ui/MY_Recount.ini',
-	szIniDetail = MY.GetAddonInfo().szRoot .. 'MY_Recount/ui/MY_Recount_Detail.ini',
+	szIniRoot   = LIB.GetAddonInfo().szRoot .. 'MY_Recount/ui/',
+	szIniFile   = LIB.GetAddonInfo().szRoot .. 'MY_Recount/ui/MY_Recount.ini',
+	szIniDetail = LIB.GetAddonInfo().szRoot .. 'MY_Recount/ui/MY_Recount_Detail.ini',
 	tRandFrame  = {
 		169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182,
 		183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193
@@ -171,10 +171,10 @@ do
 local function CalcGlobalCss()
 	local tCss = FORCE_BAR_CSS[1]
 	for _, dwForceID in pairs_c(FORCE_TYPE) do
-		local r, g, b = MY.GetForceColor(dwForceID, 'background')
+		local r, g, b = LIB.GetForceColor(dwForceID, 'background')
 		tCss[dwForceID] = { r = r, g = g, b = b, a = 150 }
 	end
-	local r, g, b = MY.GetForceColor(-1, 'background')
+	local r, g, b = LIB.GetForceColor(-1, 'background')
 	tCss[-1] = { r = r, g = g, b = b, a = 150 }
 end
 CalcGlobalCss()
@@ -183,11 +183,11 @@ local function onForceColorUpdate()
 	CalcGlobalCss()
 	MY_Recount.DrawUI()
 end
-MY.RegisterEvent('MY_FORCE_COLOR_UPDATE', onForceColorUpdate)
+LIB.RegisterEvent('MY_FORCE_COLOR_UPDATE', onForceColorUpdate)
 end
 
 -- 新的战斗数据时
-MY.RegisterEvent('MY_RECOUNT_NEW_FIGHT', function()
+LIB.RegisterEvent('MY_RECOUNT_NEW_FIGHT', function()
 	if not _C.bHistoryMode then
 		MY_Recount.DisplayData(0)
 	end
@@ -228,10 +228,10 @@ function MY_Recount.Open()
 	-- open
 	m_frame = Wnd.OpenWindow(_C.szIniFile, 'MY_Recount')
 	-- pos
-	local anchor = MY.GetStorage('FrameAnchor.MY_Recount')
+	local anchor = LIB.GetStorage('FrameAnchor.MY_Recount')
 		or { x = 0, y = -70, s = 'BOTTOMRIGHT', r = 'BOTTOMRIGHT' }
 	UI(m_frame):anchor(anchor)
-	MY.RegisterEvent('UI_SCALED.MY_RECOUNT', function()
+	LIB.RegisterEvent('UI_SCALED.MY_RECOUNT', function()
 		UI(m_frame):anchor(anchor)
 	end)
 	-- draw
@@ -241,23 +241,23 @@ end
 
 function MY_Recount.Close()
 	Wnd.CloseWindow(m_frame)
-	MY.RegisterEvent('UI_SCALED.MY_RECOUNT')
+	LIB.RegisterEvent('UI_SCALED.MY_RECOUNT')
 end
 
-MY.RegisterInit('MY_RECOUNT', function()
+LIB.RegisterInit('MY_RECOUNT', function()
 	MY_Recount.LoadCustomCss()
 	MY_Recount.Data.LoadData(MY_Recount.bSaveRecount)
 end)
 
-MY.RegisterStorageInit('MY_RECOUNT', function()
-	if MY.GetStorage('BoolValues.MY_Recount_Enable') then
+LIB.RegisterStorageInit('MY_RECOUNT', function()
+	if LIB.GetStorage('BoolValues.MY_Recount_Enable') then
 		MY_Recount.Open()
 	else
 		MY_Recount.Close()
 	end
 end)
 
-MY.RegisterExit(function()
+LIB.RegisterExit(function()
 	MY_Recount.Data.SaveData(MY_Recount.bSaveRecount)
 end)
 
@@ -338,9 +338,9 @@ function MY_Recount.UpdateUI(data)
 
 	-- 计算战斗时间
 	local nTimeCount = MY_Recount.Data.GeneFightTime(data, nil, MY_Recount.bSysTimeMode and SZ_CHANNEL_KEY[MY_Recount.nChannel])
-	local szTimeCount = MY.FormatTimeCount('M:ss', nTimeCount)
-	if MY.IsInArena() then
-		szTimeCount = MY.GetFightTime('M:ss')
+	local szTimeCount = LIB.FormatTimeCount('M:ss', nTimeCount)
+	if LIB.IsInArena() then
+		szTimeCount = LIB.GetFightTime('M:ss')
 	end
 	-- 自己的记录
 	local tMyRec
@@ -381,7 +381,7 @@ function MY_Recount.UpdateUI(data)
 		end
 	end
 	-- 全程没数据的队友
-	if MY.IsInParty() and MY_Recount.bShowNodataTeammate then
+	if LIB.IsInParty() and MY_Recount.bShowNodataTeammate then
 		local list = GetClientTeam().GetTeamMemberList()
 		for _, dwID in ipairs(list) do
 			local info = GetClientTeam().GetMemberInfo(dwID)
@@ -512,7 +512,7 @@ function MY_Recount.UpdateUI(data)
 	-- 初始化颜色
 	if not hItem.bInited then
 		hItem.OnItemRefreshTip = MY_Recount.OnItemRefreshTip
-		local dwForceID = (MY.GetClientInfo() or {}).dwForceID
+		local dwForceID = (LIB.GetClientInfo() or {}).dwForceID
 		if dwForceID then
 			local css = _C.tCss[dwForceID] or {}
 			if css.image and css.frame then -- uitex, frame
@@ -607,7 +607,7 @@ function MY_Recount.OnFrameBreathe()
 	this.nLastRedrawFrame = GetLogicFrameCount()
 
 	-- 不进战时不刷新UI
-	if not _C.bHistoryMode and not MY.GetFightUUID() then
+	if not _C.bHistoryMode and not LIB.GetFightUUID() then
 		return
 	end
 
@@ -616,7 +616,7 @@ end
 
 function MY_Recount.OnFrameDragEnd()
 	this:CorrectPos()
-	MY.SetStorage('FrameAnchor.MY_Recount', GetFrameAnchor(this))
+	LIB.SetStorage('FrameAnchor.MY_Recount', GetFrameAnchor(this))
 end
 
 function MY_Recount.OnItemLButtonClick()
@@ -771,7 +771,7 @@ function MY_Recount_Detail.OnFrameCreate()
 		if frame and frame:IsValid() then
 			return true
 		else
-			MY.RegisterEsc(frame:GetName())
+			LIB.RegisterEsc(frame:GetName())
 		end
 	end
 	local function onEsc()
@@ -779,11 +779,11 @@ function MY_Recount_Detail.OnFrameCreate()
 			frame.szSelectedSkill  = nil
 			frame.szSelectedTarget = nil
 		else
-			MY.RegisterEsc(frame:GetName())
+			LIB.RegisterEsc(frame:GetName())
 			Wnd.CloseWindow(frame)
 		end
 	end
-	MY.RegisterEsc(frame:GetName(), canEsc, onEsc)
+	LIB.RegisterEsc(frame:GetName(), canEsc, onEsc)
 end
 
 function MY_Recount_Detail.OnFrameBreathe()
@@ -1007,7 +1007,7 @@ end
 function MY_Recount_Detail.OnLButtonClick()
 	local name = this:GetName()
 	if name == 'Btn_Close' then
-		MY.RegisterEsc(this:GetRoot():GetTreePath())
+		LIB.RegisterEsc(this:GetRoot():GetTreePath())
 		Wnd.CloseWindow(this:GetRoot())
 	elseif name == 'Btn_Switch' then
 		if this:GetRoot().szPrimarySort == 'Skill' then
@@ -1085,15 +1085,15 @@ function MY_Recount.GetMenu()
 		{
 			szOption = _L['enable'],
 			bCheck = true,
-			bChecked = MY.GetStorage('BoolValues.MY_Recount_Enable'),
+			bChecked = LIB.GetStorage('BoolValues.MY_Recount_Enable'),
 			fnAction = function()
-				local bEnable = not MY.GetStorage('BoolValues.MY_Recount_Enable')
+				local bEnable = not LIB.GetStorage('BoolValues.MY_Recount_Enable')
 				if bEnable then
 					MY_Recount.Open()
 				else
 					MY_Recount.Close()
 				end
-				MY.SetStorage('BoolValues.MY_Recount_Enable', bEnable)
+				LIB.SetStorage('BoolValues.MY_Recount_Enable', bEnable)
 			end,
 		}, {
 			szOption = _L['display as per second'],
@@ -1104,7 +1104,7 @@ function MY_Recount.GetMenu()
 				MY_Recount.DrawUI()
 			end,
 			fnDisable = function()
-				return not MY.GetStorage('BoolValues.MY_Recount_Enable')
+				return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
 			end,
 		}, {
 			szOption = _L['display effective value'],
@@ -1115,7 +1115,7 @@ function MY_Recount.GetMenu()
 				MY_Recount.DrawUI()
 			end,
 			fnDisable = function()
-				return not MY.GetStorage('BoolValues.MY_Recount_Enable')
+				return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
 			end,
 		}, {
 			szOption = _L['uncount awaytime'],
@@ -1126,7 +1126,7 @@ function MY_Recount.GetMenu()
 				MY_Recount.DrawUI()
 			end,
 			fnDisable = function()
-				return not MY.GetStorage('BoolValues.MY_Recount_Enable')
+				return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
 			end,
 		}, {
 			szOption = _L['show nodata teammate'],
@@ -1137,7 +1137,7 @@ function MY_Recount.GetMenu()
 				MY_Recount.DrawUI()
 			end,
 			fnDisable = function()
-				return not MY.GetStorage('BoolValues.MY_Recount_Enable')
+				return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
 			end,
 		}, {
 			szOption = _L['use system time count'],
@@ -1148,7 +1148,7 @@ function MY_Recount.GetMenu()
 				MY_Recount.DrawUI()
 			end,
 			fnDisable = function()
-				return not MY.GetStorage('BoolValues.MY_Recount_Enable')
+				return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
 			end,
 		}, {
 			szOption = _L['distinct target id with same name'],
@@ -1159,7 +1159,7 @@ function MY_Recount.GetMenu()
 				MY_Recount.DrawUI()
 			end,
 			fnDisable = function()
-				return not MY.GetStorage('BoolValues.MY_Recount_Enable')
+				return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
 			end,
 		}, {
 			szOption = _L['distinct effect id with same name'],
@@ -1170,7 +1170,7 @@ function MY_Recount.GetMenu()
 				MY_Recount.DrawUI()
 			end,
 			fnDisable = function()
-				return not MY.GetStorage('BoolValues.MY_Recount_Enable')
+				return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
 			end,
 		}, {
 			szOption = _L['record anonymous effect'],
@@ -1181,7 +1181,7 @@ function MY_Recount.GetMenu()
 				MY_Recount.DrawUI()
 			end,
 			fnDisable = function()
-				return not MY.GetStorage('BoolValues.MY_Recount_Enable')
+				return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
 			end,
 		}, {
 			szOption = _L['show zero value effect'],
@@ -1192,7 +1192,7 @@ function MY_Recount.GetMenu()
 				MY_Recount.DrawUI()
 			end,
 			fnDisable = function()
-				return not MY.GetStorage('BoolValues.MY_Recount_Enable')
+				return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
 			end,
 		},
 		{   -- 切换统计类型
@@ -1229,7 +1229,7 @@ function MY_Recount.GetMenu()
 	local t1 = {
 		szOption = _L['filter short fight'],
 		fnDisable = function()
-			return not MY.GetStorage('BoolValues.MY_Recount_Enable')
+			return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
 		end,
 	}
 	for _, i in pairs({ -1, 10, 30, 60, 90, 120, 180 }) do
@@ -1251,7 +1251,7 @@ function MY_Recount.GetMenu()
 				MY_Recount.Data.nMinFightTime = i
 			end,
 			fnDisable = function()
-				return not MY.GetStorage('BoolValues.MY_Recount_Enable')
+				return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
 			end,
 		})
 	end
@@ -1261,7 +1261,7 @@ function MY_Recount.GetMenu()
 	local t1 = {
 		szOption = _L['theme'],
 		fnDisable = function()
-			return not MY.GetStorage('BoolValues.MY_Recount_Enable')
+			return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
 		end,
 	}
 	for i, _ in ipairs(FORCE_BAR_CSS) do
@@ -1274,7 +1274,7 @@ function MY_Recount.GetMenu()
 				MY_Recount.DrawUI()
 			end,
 			fnDisable = function()
-				return not MY.GetStorage('BoolValues.MY_Recount_Enable')
+				return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
 			end,
 		}
 		if i == 1 then
@@ -1284,9 +1284,9 @@ function MY_Recount.GetMenu()
 			t2.nMouseOverFrame = 106
 			t2.szLayer = 'ICON_RIGHT'
 			t2.fnClickIcon = function()
-				MY.ShowPanel()
-				MY.FocusPanel()
-				MY.SwitchTab('GlobalColor')
+				LIB.ShowPanel()
+				LIB.FocusPanel()
+				LIB.SwitchTab('GlobalColor')
 			end
 		end
 		table.insert(t1, t2)
@@ -1297,7 +1297,7 @@ function MY_Recount.GetMenu()
 	local t1 = {
 		szOption = _L['redraw interval'],
 		fnDisable = function()
-			return not MY.GetStorage('BoolValues.MY_Recount_Enable')
+			return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
 		end,
 	}
 	for _, i in ipairs({1, GLOBAL.GAME_FPS / 2, GLOBAL.GAME_FPS, GLOBAL.GAME_FPS * 2}) do
@@ -1315,7 +1315,7 @@ function MY_Recount.GetMenu()
 				MY_Recount.nDrawInterval = i
 			end,
 			fnDisable = function()
-				return not MY.GetStorage('BoolValues.MY_Recount_Enable')
+				return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
 			end,
 		})
 	end
@@ -1325,7 +1325,7 @@ function MY_Recount.GetMenu()
 	local t1 = {
 		szOption = _L['max history'],
 		fnDisable = function()
-			return not MY.GetStorage('BoolValues.MY_Recount_Enable')
+			return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
 		end,
 	}
 	for i = 1, 20 do
@@ -1337,7 +1337,7 @@ function MY_Recount.GetMenu()
 				MY_Recount.Data.nMaxHistory = i
 			end,
 			fnDisable = function()
-				return not MY.GetStorage('BoolValues.MY_Recount_Enable')
+				return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
 			end,
 		})
 	end
@@ -1359,7 +1359,7 @@ function MY_Recount.GetHistoryMenu()
 	for _, data in ipairs(MY_Recount.Data.Get()) do
 		if data.UUID and data.nTimeDuring then
 			local t1 = {
-				szOption = (data.szBossName or ''):gsub('#.*', '') .. ' (' .. MY.FormatTimeCount('M:ss', data.nTimeDuring) .. ')',
+				szOption = (data.szBossName or ''):gsub('#.*', '') .. ' (' .. LIB.FormatTimeCount('M:ss', data.nTimeDuring) .. ')',
 				rgb = (data == DataDisplay and {255, 255, 0}) or nil,
 				fnAction = function()
 					MY_Recount.DisplayData(data)
@@ -1427,17 +1427,17 @@ function MY_Recount.GetPublishMenu()
 		if not frame then
 			return
 		end
-		MY.Talk(
+		LIB.Talk(
 			nChannel,
 			'[' .. _L['mingyi plugin'] .. ']'
 			.. _L['fight recount'] .. ' - '
 			.. frame:Lookup('Wnd_Title', 'Text_Title'):GetText()
 			.. ' ' .. ((DataDisplay.szBossName and ' - ' .. DataDisplay.szBossName) or '')
-			.. '(' .. MY.FormatTimeCount('M:ss', DataDisplay.nTimeDuring) .. ')',
+			.. '(' .. LIB.FormatTimeCount('M:ss', DataDisplay.nTimeDuring) .. ')',
 			nil,
 			true
 		)
-		MY.Talk(nChannel, '------------------------')
+		LIB.Talk(nChannel, '------------------------')
 		local hList      = frame:Lookup('Wnd_Main', 'Handle_List')
 		local szUnit     = (' ' .. hList.szUnit) or ''
 		local nTimeCount = hList.nTimeCount or 0
@@ -1473,10 +1473,10 @@ function MY_Recount.GetPublishMenu()
 				)
 			end
 
-			MY.Talk(nChannel, szText, nil, p.id == p.szName)
+			LIB.Talk(nChannel, szText, nil, p.id == p.szName)
 		end
 
-		MY.Talk(nChannel, '------------------------')
+		LIB.Talk(nChannel, '------------------------')
 	end
 	for nChannel, szChannel in pairs({
 		[PLAYER_TALK_CHANNEL.RAID] = 'MSG_TEAM',
@@ -1519,17 +1519,17 @@ function MY_Recount.GetDetailMenu(frame)
 	local t = {}
 	local function Publish(nChannel, nLimit)
 		local bDetail = frame:Lookup('', 'Handle_Spliter'):IsVisible()
-		MY.Talk(
+		LIB.Talk(
 			nChannel,
 			'[' .. _L['mingyi plugin'] .. ']'
 			.. _L['fight recount'] .. ' - '
 			.. frame:Lookup('', 'Text_Default'):GetText()
 			.. ' ' .. ((DataDisplay.szBossName and ' - ' .. DataDisplay.szBossName) or '')
-			.. '(' .. MY.FormatTimeCount('M:ss', DataDisplay.nTimeDuring) .. ')',
+			.. '(' .. LIB.FormatTimeCount('M:ss', DataDisplay.nTimeDuring) .. ')',
 			nil,
 			true
 		)
-		MY.Talk(nChannel, '------------------------------')
+		LIB.Talk(nChannel, '------------------------------')
 
 		local aTabTalk = {}
 		D.InsertFromText(aTabTalk, frame:Lookup('WndScroll_Skill', 'Handle_SkillTitle'))
@@ -1547,8 +1547,8 @@ function MY_Recount.GetDetailMenu(frame)
 				D.InsertFromText(aTabTalk, hList:Lookup(i))
 			end
 		end
-		MY.TabTalk(nChannel, aTabTalk, {'L', 'L', 'R', 'R', 'R'})
-		MY.Talk(nChannel, '------------------------------')
+		LIB.TabTalk(nChannel, aTabTalk, {'L', 'L', 'R', 'R', 'R'})
+		LIB.Talk(nChannel, '------------------------------')
 
 		if bDetail then
 			local aTabTalk = {}
@@ -1557,8 +1557,8 @@ function MY_Recount.GetDetailMenu(frame)
 			for i = 0, hList:GetItemCount() - 1 do
 				D.InsertFromText(aTabTalk, hList:Lookup(i))
 			end
-			MY.TabTalk(nChannel, aTabTalk, {'L', 'L', 'R', 'R', 'R', 'R', 'R'})
-			MY.Talk(nChannel, '------------------------------')
+			LIB.TabTalk(nChannel, aTabTalk, {'L', 'L', 'R', 'R', 'R', 'R', 'R'})
+			LIB.Talk(nChannel, '------------------------------')
 
 			local aTabTalk = {}
 			D.InsertFromText(aTabTalk, frame:Lookup('WndScroll_Target', 'Handle_TargetTitle'))
@@ -1566,8 +1566,8 @@ function MY_Recount.GetDetailMenu(frame)
 			for i = 0, min(hList:GetItemCount(), nLimit) - 1 do
 				D.InsertFromText(aTabTalk, hList:Lookup(i))
 			end
-			MY.TabTalk(nChannel, aTabTalk, {'L', 'L', 'R', 'R', 'R', 'R', 'R', 'R'})
-			MY.Talk(nChannel, '------------------------------')
+			LIB.TabTalk(nChannel, aTabTalk, {'L', 'L', 'R', 'R', 'R', 'R', 'R', 'R'})
+			LIB.Talk(nChannel, '------------------------------')
 		end
 	end
 	for nChannel, szChannel in pairs({
@@ -1596,4 +1596,4 @@ function MY_Recount.GetDetailMenu(frame)
 	return t
 end
 
-MY.RegisterAddonMenu('MY_RECOUNT_MENU', MY_Recount.GetMenu)
+LIB.RegisterAddonMenu('MY_RECOUNT_MENU', MY_Recount.GetMenu)

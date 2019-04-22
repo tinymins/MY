@@ -35,8 +35,8 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_ThreatRank/lang/')
-if not MY.AssertVersion('MY_ThreatRank', _L['MY_ThreatRank'], 0x2011800) then
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_ThreatRank/lang/')
+if not LIB.AssertVersion('MY_ThreatRank', _L['MY_ThreatRank'], 0x2011800) then
 	return
 end
 
@@ -54,7 +54,7 @@ MY_ThreatRank = {
 	tAnchor       = {},
 	nStyle        = 2,
 }
-MY.RegisterCustomData('MY_ThreatRank')
+LIB.RegisterCustomData('MY_ThreatRank')
 
 local TS = MY_ThreatRank
 local ipairs, pairs = ipairs, pairs
@@ -62,15 +62,15 @@ local GetPlayer, GetNpc, IsPlayer, ApplyCharacterThreatRankList = GetPlayer, Get
 local GetClientPlayer, GetClientTeam = GetClientPlayer, GetClientTeam
 local UI_GetClientPlayerID, GetTime = UI_GetClientPlayerID, GetTime
 local HATRED_COLLECT = g_tStrings.HATRED_COLLECT
-local MY_GetObjName, MY_GetForceColor = MY.GetObjectName, MY.GetForceColor
-local MY_GetBuff, MY_GetBuffName, MY_GetEndTime = MY.GetBuff, MY.GetBuffName, MY.GetEndTime
+local MY_GetObjName, MY_GetForceColor = LIB.GetObjectName, LIB.GetForceColor
+local MY_GetBuff, MY_GetBuffName, MY_GetEndTime = LIB.GetBuff, LIB.GetBuffName, LIB.GetEndTime
 local GetNpcIntensity = GetNpcIntensity
 local GetTime = GetTime
 
-local TS_INIFILE = MY.GetAddonInfo().szRoot .. 'MY_ThreatRank/ui/MY_ThreatRank.ini'
+local TS_INIFILE = LIB.GetAddonInfo().szRoot .. 'MY_ThreatRank/ui/MY_ThreatRank.ini'
 
 local _TS = {
-	tStyle = LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_ThreatRank/data/style.jx3dat'),
+	tStyle = LoadLUAData(LIB.GetAddonInfo().szRoot .. 'MY_ThreatRank/data/style.jx3dat'),
 }
 local function IsEnabled() return TS.bEnable end
 
@@ -80,7 +80,7 @@ function TS.OnFrameCreate()
 	this:RegisterEvent('TARGET_CHANGE')
 	this:RegisterEvent('FIGHT_HINT')
 	this:RegisterEvent('LOADING_END')
-	this.hItemData      = this:CreateItemData(MY.GetAddonInfo().szRoot .. 'MY_ThreatRank/ui/Handle_ThreatBar.ini', 'Handle_ThreatBar')
+	this.hItemData      = this:CreateItemData(LIB.GetAddonInfo().szRoot .. 'MY_ThreatRank/ui/Handle_ThreatBar.ini', 'Handle_ThreatBar')
 	this.dwTargetID     = 0
 	this.nTime          = 0
 	this.bSelfTreatRank = 0
@@ -145,7 +145,7 @@ function TS.OnFrameBreathe()
 		or nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL then
 			this.CastBar:Show()
 			this.CastBar:SetPercentage(fCastPercent)
-			local szName = MY.GetSkillName(dwSkillID, dwSkillLevel)
+			local szName = LIB.GetSkillName(dwSkillID, dwSkillLevel)
 			this.txt:SetText(szName)
 		else
 			local lifeper = p.nCurrentLife / p.nMaxLife
@@ -180,7 +180,7 @@ function TS.OnFrameBreathe()
 			local me = GetClientPlayer()
 			if not me.bFightState then return end
 			this.nTime = -1
-			MY.DelayCall(1000, function()
+			LIB.DelayCall(1000, function()
 				if not me.IsInParty() then return end
 				if p and p.dwDropTargetPlayerID and p.dwDropTargetPlayerID ~= 0 then
 					if IsParty(me.dwID, p.dwDropTargetPlayerID) or me.dwID == p.dwDropTargetPlayerID then
@@ -190,7 +190,7 @@ function TS.OnFrameBreathe()
 						local name = MY_GetObjName(p)
 						local oContent = {_L('Well done! %s in %d group first to attack %s!!', nGroup, szMember, name), r = 150, g = 250, b = 230}
 						local oTitile = {g_tStrings.HATRED_COLLECT, r = 150, g = 250, b = 230}
-						MY.Sysmsg(oContent, oTitile)
+						LIB.Sysmsg(oContent, oTitile)
 					end
 				end
 			end)
@@ -203,9 +203,9 @@ end
 function TS.OnLButtonClick()
 	local szName = this:GetName()
 	if szName == 'Btn_Setting' then
-		MY.ShowPanel()
-		MY.FocusPanel()
-		MY.SwitchTab('MY_ThreatRank')
+		LIB.ShowPanel()
+		LIB.FocusPanel()
+		LIB.SwitchTab('MY_ThreatRank')
 	end
 end
 
@@ -244,7 +244,7 @@ end
 function _TS.CheckOpen()
 	if TS.bEnable then
 		if TS.bInDungeon then
-			if MY.IsInDungeon() then
+			if LIB.IsInDungeon() then
 				_TS.OpenPanel()
 			else
 				_TS.ClosePanel()
@@ -355,7 +355,7 @@ function _TS.UpdateThreatBars(tList, dwTargetID, dwApplyID)
 			if UI_GetClientPlayerID() == v.id then
 				if TS.nOTAlertLevel > 0 and GetNpcIntensity(KGnpc) > 2 then
 					if this.bSelfTreatRank < TS.nOTAlertLevel and v.val / nTopRank >= TS.nOTAlertLevel then
-						MY.Topmsg(_L('** You Threat more than %d, 120% is Out of Taunt! **', TS.nOTAlertLevel * 100))
+						LIB.Topmsg(_L('** You Threat more than %d, 120% is Out of Taunt! **', TS.nOTAlertLevel * 100))
 						if TS.bOTAlertSound then
 							PlaySound(SOUND.UI_SOUND, _L['SOUND_nat_view2'])
 						end
@@ -409,14 +409,14 @@ function _TS.UpdateThreatBars(tList, dwTargetID, dwApplyID)
 			else
 				local p = GetNpc(v.id)
 				if p then
-					szName = MY.GetObjectName(p)
+					szName = LIB.GetObjectName(p)
 				end
 			end
 			item:Lookup('Text_ThreatName'):SetText(v.sort .. '.' .. szName)
 			item:Lookup('Text_ThreatName'):SetFontScheme(dat[6][1])
 			item:Lookup('Text_ThreatName'):SetFontColor(r, g, b)
 			if TS.bForceIcon then
-				if MY.IsParty(v.id) and IsPlayer(v.id) then
+				if LIB.IsParty(v.id) and IsPlayer(v.id) then
 					local dwMountKungfuID =	team.GetMemberInfo(v.id).dwMountKungfuID
 					item:Lookup('Image_Icon'):FromIconID(Table_GetSkillIconID(dwMountKungfuID, 1))
 				elseif IsPlayer(v.id) then
@@ -607,7 +607,7 @@ function PS.OnPanelActive(frame)
 		autoenable = IsEnabled,
 	})
 end
-MY.RegisterPanel('MY_ThreatRank', g_tStrings.HATRED_COLLECT, _L['Target'], 632, PS)
+LIB.RegisterPanel('MY_ThreatRank', g_tStrings.HATRED_COLLECT, _L['Target'], 632, PS)
 
 do
 local function GetMenu()
@@ -623,6 +623,6 @@ local function GetMenu()
 		end
 	}
 end
-MY.RegisterAddonMenu(GetMenu)
+LIB.RegisterAddonMenu(GetMenu)
 end
-MY.RegisterEvent('LOADING_END', _TS.CheckOpen)
+LIB.RegisterEvent('LOADING_END', _TS.CheckOpen)

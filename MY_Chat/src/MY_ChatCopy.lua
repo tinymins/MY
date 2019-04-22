@@ -6,7 +6,36 @@
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
 --------------------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_ChatCopy/lang/')
+-------------------------------------------------------------------------------------------------------------
+-- these global functions are accessed all the time by the event handler
+-- so caching them is worth the effort
+-------------------------------------------------------------------------------------------------------------
+local setmetatable = setmetatable
+local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
+local sub, len, format, rep = string.sub, string.len, string.format, string.rep
+local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
+local type, tonumber, tostring = type, tonumber, tostring
+local huge, pi, random, abs = math.huge, math.pi, math.random, math.abs
+local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
+local pow, sqrt, sin, cos, tan = math.pow, math.sqrt, math.sin, math.cos, math.tan
+local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
+local pack, unpack = table.pack or function(...) return {...} end, table.unpack or unpack
+-- jx3 apis caching
+local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
+local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
+local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
+local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local LIB, UI, DEBUG_LEVEL, PATH_TYPE = MY, MY.UI, MY.DEBUG_LEVEL, MY.PATH_TYPE
+local var2str, str2var, clone, empty, ipairs_r = LIB.var2str, LIB.str2var, LIB.clone, LIB.empty, LIB.ipairs_r
+local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
+local GetPatch, ApplyPatch = LIB.GetPatch, LIB.ApplyPatch
+local Get, Set, RandomChild, GetTraceback = LIB.Get, LIB.Set, LIB.RandomChild, LIB.GetTraceback
+local IsArray, IsDictionary, IsEquals = LIB.IsArray, LIB.IsDictionary, LIB.IsEquals
+local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsNumber, LIB.IsFunction
+local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
+local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
+-------------------------------------------------------------------------------------------------------------
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_ChatCopy/lang/')
 MY_ChatCopy = {}
 MY_ChatCopy.bChatCopy = true
 MY_ChatCopy.bChatTime = true
@@ -35,19 +64,19 @@ local function onNewChatLine(h, i, szMsg, szChannel, dwTime, nR, nG, nB)
 			if MY_ChatCopy.bChatCopyAlwaysWhite then
 				_r, _g, _b = 255, 255, 255
 			end
-			szTime = MY.GetCopyLinkText(_L[' * '], { r = _r, g = _g, b = _b })
+			szTime = LIB.GetCopyLinkText(_L[' * '], { r = _r, g = _g, b = _b })
 		elseif MY_ChatCopy.bChatCopyAlwaysWhite then
 			nR, nG, nB = 255, 255, 255
 		end
 		if MY_ChatCopy.bChatTime then
 			if MY_ChatCopy.eChatTime == 'HOUR_MIN_SEC' then
-				szTime = szTime .. MY.GetTimeLinkText({r = nR, g = nG, b = nB, f = 10, s = '[hh:mm:ss]'}, dwTime)
+				szTime = szTime .. LIB.GetTimeLinkText({r = nR, g = nG, b = nB, f = 10, s = '[hh:mm:ss]'}, dwTime)
 			else
-				szTime = szTime .. MY.GetTimeLinkText({r = nR, g = nG, b = nB, f = 10, s = '[hh:mm]'}, dwTime)
+				szTime = szTime .. LIB.GetTimeLinkText({r = nR, g = nG, b = nB, f = 10, s = '[hh:mm]'}, dwTime)
 			end
 		end
 		-- insert timestrap text
 		h:InsertItemFromString(i, false, szTime)
 	end
 end
-MY.HookChatPanel('AFTER.MY_ChatCopy', onNewChatLine)
+LIB.HookChatPanel('AFTER.MY_ChatCopy', onNewChatLine)

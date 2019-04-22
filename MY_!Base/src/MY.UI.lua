@@ -35,7 +35,7 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local _L = MY.LoadLangPack()
+local _L = LIB.LoadLangPack()
 
 -------------------------------------
 -- UI object class
@@ -323,7 +323,7 @@ local function InitComponent(raw, szType)
 			raw:Lookup('', 'Text_Default'):SetText(szText)
 			if not bOnlyUI then
 				for _, fn in ipairs(GetComponentProp(raw, 'onChangeEvents')) do
-					MY.ExecuteWithThis(raw, fn, nCurrentValue)
+					LIB.ExecuteWithThis(raw, fn, nCurrentValue)
 				end
 			end
 			this = _this
@@ -369,7 +369,7 @@ local function InitComponent(raw, szType)
 			-- min search length
 			if len >= opt.minLength then
 				-- delay search
-				MY.DelayCall(opt.delay, function()
+				LIB.DelayCall(opt.delay, function()
 					UI(raw):autocomplete('search')
 					-- for compatible
 					Station.SetFocusWindow(edt)
@@ -379,7 +379,7 @@ local function InitComponent(raw, szType)
 			end
 		end
 		edt.OnKillFocus = function()
-			MY.DelayCall(function()
+			LIB.DelayCall(function()
 				if not Station.GetFocusWindow() or Station.GetFocusWindow():GetName() ~= 'PopupMenuPanel' then
 					Wnd.CloseWindow('PopupMenuPanel')
 				end
@@ -843,7 +843,7 @@ end
 function UI:each(fn)
 	self:_checksum()
 	for _, raw in pairs(self.raws) do
-		MY.ExecuteWithThis(raw, fn, UI(raw))
+		LIB.ExecuteWithThis(raw, fn, UI(raw))
 	end
 	return self
 end
@@ -965,7 +965,7 @@ local _tItemXML = {
 	['Shadow'] = '<shadow>w=15 h=15 eventid=277 </shadow>',
 	['Handle'] = '<handle>firstpostype=0 w=10 h=10</handle>',
 }
-local _szItemINI = MY.GetAddonInfo().szFrameworkRoot .. 'ui\\HandleItems.ini'
+local _szItemINI = LIB.GetAddonInfo().szFrameworkRoot .. 'ui\\HandleItems.ini'
 -- append
 -- similar as jQuery.append()
 -- Instance:append(szXml[, bReturnNewItem])
@@ -1008,15 +1008,15 @@ function UI:append(arg0, arg1, arg2)
 					szFile = sub(szFile, 0, -#szType - 2)
 					szComponet = szFile:gsub('$.*[/\\]', ''):gsub('^[^<>?]*[/\\]', ''):sub(0, -5)
 				else
-					szFile = MY.GetAddonInfo().szFrameworkRoot .. 'ui\\' .. szFile .. '.ini'
+					szFile = LIB.GetAddonInfo().szFrameworkRoot .. 'ui\\' .. szFile .. '.ini'
 				end
 				local frame = Wnd.OpenWindow(szFile, 'MY_TempWnd')
 				if not frame then
-					return MY.Debug({ _L('unable to open ini file [%s]', szFile) }, 'MY#UI#append', DEBUG_LEVEL.ERROR)
+					return LIB.Debug({ _L('unable to open ini file [%s]', szFile) }, 'MY#UI#append', DEBUG_LEVEL.ERROR)
 				end
 				local raw = frame:Lookup(szComponet)
 				if not raw then
-					MY.Debug({_L('can not find wnd component [%s:%s]', szFile, szComponet)}, 'MY#UI#append', DEBUG_LEVEL.ERROR)
+					LIB.Debug({_L('can not find wnd component [%s:%s]', szFile, szComponet)}, 'MY#UI#append', DEBUG_LEVEL.ERROR)
 				else
 					InitComponent(raw, szType)
 					raw:ChangeRelation(parentWnd, true, true)
@@ -1027,7 +1027,7 @@ function UI:append(arg0, arg1, arg2)
 			elseif sub(szType, 1, 3) ~= 'Wnd' and parentHandle then
 				raw = parentHandle:AppendItemFromIni(_szItemINI, szType)
 				if not raw then
-					return MY.Debug({ _L('unable to append handle item [%s]', szType) }, 'MY#UI:append', DEBUG_LEVEL.ERROR)
+					return LIB.Debug({ _L('unable to append handle item [%s]', szType) }, 'MY#UI:append', DEBUG_LEVEL.ERROR)
 				else
 					ui = ui:add(raw)
 				end
@@ -1138,7 +1138,7 @@ function UI:visible(bVisible)
 	elseif IsFunction(bVisible) then
 		for _, raw in ipairs(self.raws) do
 			raw = GetComponentElement(raw, 'CHECKBOX') or GetComponentElement(raw, 'MAIN_WINDOW') or raw
-			MY.BreatheCall('MY_UI_VISIBLE_CHECK#' .. tostring(raw), function()
+			LIB.BreatheCall('MY_UI_VISIBLE_CHECK#' .. tostring(raw), function()
 				if IsElement(raw) then
 					raw:SetVisible(bVisible())
 				else
@@ -1219,7 +1219,7 @@ function UI:enable(...)
 		for _, raw in ipairs(self.raws) do
 			raw = GetComponentElement(raw, 'CHECKBOX') or GetComponentElement(raw, 'MAIN_WINDOW') or raw
 			if IsFunction(bEnable) then
-				MY.BreatheCall('MY_UI_ENABLE_CHECK#' .. tostring(raw), function()
+				LIB.BreatheCall('MY_UI_ENABLE_CHECK#' .. tostring(raw), function()
 					if IsElement(raw) then
 						SetComponentEnable(raw, bEnable())
 					else
@@ -1873,11 +1873,11 @@ function UI:fadeTo(nTime, nOpacity, callback)
 			if not ui:visible() then
 				ui:alpha(0):toggle(true)
 			end
-			MY.BreatheCall('MY_FADE_' .. tostring(ui[1]), function()
+			LIB.BreatheCall('MY_FADE_' .. tostring(ui[1]), function()
 				ui:show()
 				local nCurrentAlpha = fnCurrent(nStartAlpha, nOpacity, nTime, GetTime() - nStartTime)
 				ui:alpha(nCurrentAlpha)
-				-- MY.Debug(format('%d %d %d %d\n', nStartAlpha, nOpacity, nCurrentAlpha, (nStartAlpha - nCurrentAlpha)*(nCurrentAlpha - nOpacity)), 'fade', DEBUG_LEVEL.LOG)
+				-- LIB.Debug(format('%d %d %d %d\n', nStartAlpha, nOpacity, nCurrentAlpha, (nStartAlpha - nCurrentAlpha)*(nCurrentAlpha - nOpacity)), 'fade', DEBUG_LEVEL.LOG)
 				if (nStartAlpha - nCurrentAlpha)*(nCurrentAlpha - nOpacity) <= 0 then
 					ui:alpha(nOpacity)
 					pcall(callback, ui)
@@ -1930,11 +1930,11 @@ function UI:slideTo(nTime, nHeight, callback)
 			if not ui:visible() then
 				ui:height(0):toggle(true)
 			end
-			MY.BreatheCall(function()
+			LIB.BreatheCall(function()
 				ui:show()
 				local nCurrentValue = fnCurrent(nStartValue, nHeight, nTime, GetTime()-nStartTime)
 				ui:height(nCurrentValue)
-				-- MY.Debug(format('%d %d %d %d\n', nStartValue, nHeight, nCurrentValue, (nStartValue - nCurrentValue)*(nCurrentValue - nHeight)), 'slide', DEBUG_LEVEL.LOG)
+				-- LIB.Debug(format('%d %d %d %d\n', nStartValue, nHeight, nCurrentValue, (nStartValue - nCurrentValue)*(nCurrentValue - nHeight)), 'slide', DEBUG_LEVEL.LOG)
 				if (nStartValue - nCurrentValue)*(nCurrentValue - nHeight) <= 0 then
 					ui:height(nHeight):toggle( nHeight ~= 0 )
 					pcall(callback)
@@ -2204,7 +2204,7 @@ function UI:shake(xrange, yrange, maxspeed, time)
 		for _, raw in ipairs(self.raws) do
 			local ui = UI(raw)
 			local xoffset, yoffset = 0, 0
-			MY.RenderCall(tostring(raw) .. ' shake', function()
+			LIB.RenderCall(tostring(raw) .. ' shake', function()
 				if ui:count() == 0 then
 					return 0
 				elseif GetTime() - starttime < time then
@@ -2239,7 +2239,7 @@ function UI:shake(xrange, yrange, maxspeed, time)
 		end
 	else
 		for _, raw in ipairs(self.raws) do
-			MY.RenderCall(tostring(raw) .. ' shake', false)
+			LIB.RenderCall(tostring(raw) .. ' shake', false)
 		end
 	end
 end
@@ -2389,7 +2389,7 @@ function UI:size(arg0, arg1, arg2, arg3)
 					raw:SetDragArea(0, 0, nWidth, 30)
 					hnd:SetSize(nWidth, nHeight)
 					wnd:SetSize(nWidth, nHeight - 30)
-				elseif GetComponentProp(raw, 'intact') or raw == MY.GetFrame() then
+				elseif GetComponentProp(raw, 'intact') or raw == LIB.GetFrame() then
 					hnd:SetSize(nWidth, nHeight)
 					hnd:Lookup('Text_Title'):SetW(nWidth - 90)
 					hnd:Lookup('Text_Author'):SetW(nWidth - 31)
@@ -2545,7 +2545,7 @@ function UI:size(arg0, arg1, arg2, arg3)
 					h:FormatAllItemPos()
 				end
 			end
-			MY.ExecuteWithThis(raw, raw.OnSizeChanged)
+			LIB.ExecuteWithThis(raw, raw.OnSizeChanged)
 		end
 		return self
 	else
@@ -2925,7 +2925,7 @@ function UI:itemInfo(...)
 				end
 				local res, err = pcall(UpdataItemInfoBoxObject, raw, unpack(data)) -- 防止itemtab不一样
 				if not res then
-					MY.Debug({ GetTraceback(err) }, 'MY#UI:itemInfo', DEBUG_LEVEL.ERROR)
+					LIB.Debug({ GetTraceback(err) }, 'MY#UI:itemInfo', DEBUG_LEVEL.ERROR)
 				end
 			end
 		end
@@ -2944,7 +2944,7 @@ function UI:boxInfo(nType, ...)
 			else
 				local res, err = pcall(UpdateBoxObject, raw, nType, ...) -- 防止itemtab内外网不一样
 				if not res then
-					MY.Debug({ GetTraceback(err) }, 'MY#UI:boxInfo', DEBUG_LEVEL.ERROR)
+					LIB.Debug({ GetTraceback(err) }, 'MY#UI:boxInfo', DEBUG_LEVEL.ERROR)
 				end
 			end
 		end
@@ -3241,7 +3241,7 @@ function UI:uievent(szEvent, fnEvent)
 							local res = { p.fn(...) }
 							if #res > 0 then
 								if #rets > 0 then
-									MY.Debug(
+									LIB.Debug(
 										{ _L('Set return value failed, cause another hook has alreay take a returnval. [Path] %s', UI.GetTreePath(raw)) },
 										'UI:uievent#' .. szEvent .. ':' .. (p.id or 'Unnamed'), DEBUG_LEVEL.WARNING
 									)
@@ -3405,7 +3405,7 @@ function UI:click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 					if GetComponentProp(raw, 'bEnable') == false then
 						return
 					end
-					MY.ExecuteWithThis(raw, fnLClick, MY_MOUSE_EVENT.LBUTTON)
+					LIB.ExecuteWithThis(raw, fnLClick, MY_MOUSE_EVENT.LBUTTON)
 				end
 				if GetComponentType(raw) == 'WndScrollBox' then
 					UI(GetComponentElement(raw, 'MAIN_HANDLE')):uievent('OnItemLButtonClick', fnAction)
@@ -3435,7 +3435,7 @@ function UI:click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 					if GetComponentProp(raw, 'bEnable') == false then
 						return
 					end
-					MY.ExecuteWithThis(raw, fnRClick, MY_MOUSE_EVENT.RBUTTON)
+					LIB.ExecuteWithThis(raw, fnRClick, MY_MOUSE_EVENT.RBUTTON)
 				end
 				if GetComponentType(raw) == 'WndScrollBox' then
 					UI(GetComponentElement(raw, 'MAIN_HANDLE')):uievent('OnItemRButtonClick', fnAction)
@@ -3640,7 +3640,7 @@ function UI:check(fnCheck, fnUncheck, bNoAutoBind)
 			end
 		end
 	else
-		MY.Debug({'fnCheck:'..type(fnCheck)..' fnUncheck:'..type(fnUncheck)}, 'ERROR UI:check', DEBUG_LEVEL.ERROR)
+		LIB.Debug({'fnCheck:'..type(fnCheck)..' fnUncheck:'..type(fnUncheck)}, 'ERROR UI:check', DEBUG_LEVEL.ERROR)
 	end
 end
 
@@ -3653,7 +3653,7 @@ function UI:change(fnOnChange)
 		for _, raw in ipairs(self.raws) do
 			local edt = GetComponentElement(raw, 'EDIT')
 			if edt then
-				UI(edt):uievent('OnEditChanged', function() MY.ExecuteWithThis(raw, fnOnChange, edt:GetText()) end)
+				UI(edt):uievent('OnEditChanged', function() LIB.ExecuteWithThis(raw, fnOnChange, edt:GetText()) end)
 			end
 			if GetComponentType(raw) == 'WndSliderBox' then
 				insert(GetComponentProp(raw, 'onChangeEvents'), fnOnChange)
@@ -3726,7 +3726,7 @@ function UI:blur(fnOnKillFocus)
 		for _, raw in ipairs(self.raws) do
 			raw = GetComponentElement(raw, 'EDIT')
 			if raw then
-				UI(raw):uievent('OnKillFocus', function() MY.ExecuteWithThis(raw, fnOnKillFocus) end)
+				UI(raw):uievent('OnKillFocus', function() LIB.ExecuteWithThis(raw, fnOnKillFocus) end)
 			end
 		end
 		return self
@@ -3861,11 +3861,11 @@ function  UI.CreateFrame(szName, opt)
 		opt.level = 'Normal'
 	end
 	-- calc ini file path
-	local szIniFile = MY.GetAddonInfo().szFrameworkRoot .. 'ui\\WndFrame.ini'
+	local szIniFile = LIB.GetAddonInfo().szFrameworkRoot .. 'ui\\WndFrame.ini'
 	if opt.simple then
-		szIniFile = MY.GetAddonInfo().szFrameworkRoot .. 'ui\\WndFrameSimple.ini'
+		szIniFile = LIB.GetAddonInfo().szFrameworkRoot .. 'ui\\WndFrameSimple.ini'
 	elseif opt.empty then
-		szIniFile = MY.GetAddonInfo().szFrameworkRoot .. 'ui\\WndFrameEmpty.ini'
+		szIniFile = LIB.GetAddonInfo().szFrameworkRoot .. 'ui\\WndFrameEmpty.ini'
 	end
 
 	-- close and reopen exist frame
@@ -3879,7 +3879,7 @@ function  UI.CreateFrame(szName, opt)
 	local ui = UI(frm)
 	-- init frame
 	if opt.esc then
-		MY.RegisterEsc('Frame_Close_' .. szName, function()
+		LIB.RegisterEsc('Frame_Close_' .. szName, function()
 			return true
 		end, function()
 			if frm.OnCloseButtonClick then
@@ -3890,7 +3890,7 @@ function  UI.CreateFrame(szName, opt)
 			end
 			Wnd.CloseWindow(frm)
 			PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
-			MY.RegisterEsc('Frame_Close_' .. szName)
+			LIB.RegisterEsc('Frame_Close_' .. szName)
 		end)
 	end
 	if opt.simple then
@@ -3932,7 +3932,7 @@ function  UI.CreateFrame(szName, opt)
 				if chkMax then
 					chkMax:Enable(false)
 				end
-				if select(2, MY.ExecuteWithThis(frm, frm.OnMinimize, frm:Lookup('Wnd_Total'))) then
+				if select(2, LIB.ExecuteWithThis(frm, frm.OnMinimize, frm:Lookup('Wnd_Total'))) then
 					return
 				end
 				if opt.dragresize then
@@ -3952,7 +3952,7 @@ function  UI.CreateFrame(szName, opt)
 					frm:Lookup('Btn_Drag'):Show()
 				end
 				frm.bMinimize = false
-				MY.ExecuteWithThis(frm, frm.OnRestore, frm:Lookup('Wnd_Total'))
+				LIB.ExecuteWithThis(frm, frm.OnRestore, frm:Lookup('Wnd_Total'))
 			end
 		end
 		if not opt.maximize then
@@ -3976,7 +3976,7 @@ function  UI.CreateFrame(szName, opt)
 					local w, h = Station.GetClientSize()
 					UI(frm):pos(0, 0):size(w, h)
 				end)
-				if select(2, MY.ExecuteWithThis(frm, frm.OnMaximize, frm:Lookup('Wnd_Total'))) then
+				if select(2, LIB.ExecuteWithThis(frm, frm.OnMaximize, frm:Lookup('Wnd_Total'))) then
 					return
 				end
 				if opt.dragresize then
@@ -3994,7 +3994,7 @@ function  UI.CreateFrame(szName, opt)
 					frm:Lookup('Btn_Drag'):Show()
 				end
 				frm.bMaximize = false
-				MY.ExecuteWithThis(frm, frm.OnRestore, frm:Lookup('Wnd_Total'))
+				LIB.ExecuteWithThis(frm, frm.OnRestore, frm:Lookup('Wnd_Total'))
 			end
 		end
 		-- drag resize button
@@ -4140,7 +4140,7 @@ function UI.OpenColorPicker(callback, t)
 		if GetRGBValue() then
 			fnClick(GetRGBValue())
 		else
-			MY.Sysmsg({_L['RGB value error']})
+			LIB.Sysmsg({_L['RGB value error']})
 		end
 	end})
 	x = x + 50
@@ -4329,7 +4329,7 @@ function UI.OpenIconPanel(fnAction)
 							end
 						end
 					elseif not bMaxL and bMaxR then
-						MY.Debug('ERROR CALC MAX_ICON!', DEBUG_LEVEL.ERROR)
+						LIB.Debug('ERROR CALC MAX_ICON!', DEBUG_LEVEL.ERROR)
 						break
 					end
 				end
@@ -4360,7 +4360,7 @@ function UI.OpenIconPanel(fnAction)
 				else
 					boxs[i]:icon(-1)
 					txts[i]:text(nIcon):toggle(true)
-					MY.DelayCall(function()
+					LIB.DelayCall(function()
 						if ceil(nIcon / 144) == ICON_PAGE and boxs[i] then
 							boxs[i]:icon(nIcon):toggle(true)
 						end
@@ -4401,7 +4401,7 @@ function UI.OpenIconPanel(fnAction)
 		range = {1, math.ceil(nMaxIcon / 144)}, value = ICON_PAGE or 21,
 		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
 		onchange = function(nVal)
-			MY.DelayCall(function() GetPage(nVal) end)
+			LIB.DelayCall(function() GetPage(nVal) end)
 		end,
 	})
 	GetPage(ICON_PAGE or 21, true)
@@ -4695,12 +4695,12 @@ end
 function UI.GetShadowHandle(szName)
 	local frame = Station.Lookup('Lowest/MY_Shadows')
 	if not frame then
-		frame = Wnd.OpenWindow(MY.GetAddonInfo().szFrameworkRoot .. 'ui/MY_Shadows.ini', 'MY_Shadows')
+		frame = Wnd.OpenWindow(LIB.GetAddonInfo().szFrameworkRoot .. 'ui/MY_Shadows.ini', 'MY_Shadows')
 	end
 	local sh = frame:Lookup('', szName)
 	if not sh then
 		frame:Lookup('', ''):AppendItemFromString(format('<handle> name="%s" </handle>', szName))
-		MY.Debug({'Create sh # ' .. szName}, 'UI', DEBUG_LEVEL.LOG)
+		LIB.Debug({'Create sh # ' .. szName}, 'UI', DEBUG_LEVEL.LOG)
 		sh = frame:Lookup('', szName)
 	end
 	return sh
@@ -4752,7 +4752,7 @@ function UI.GetTempElement(szType)
 	end
 	if not cache or not ui or ui:count() == 0 then
 		cache = {}
-		ui = UI.CreateFrame('MYLIB_TempElement', { empty = true }):hide()
+		ui = UI.CreateFrame(LIB.GetAddonInfo().szNameSpace .. '#TempElement', { empty = true }):hide()
 	end
 	local szName = szType .. '_' .. szKey
 	local raw = cache[szName]
@@ -4766,4 +4766,4 @@ function UI.GetTempElement(szType)
 end
 end
 
-MY.UI = UI
+LIB.UI = UI

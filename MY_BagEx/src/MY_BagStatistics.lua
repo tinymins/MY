@@ -35,14 +35,14 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-MY.CreateDataRoot(PATH_TYPE.GLOBAL)
+LIB.CreateDataRoot(PATH_TYPE.GLOBAL)
 
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_BagEx/lang/')
-local DB = MY.ConnectDatabase(_L['MY_BagStatistics'], {'userdata/bagstatistics.db', PATH_TYPE.GLOBAL})
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_BagEx/lang/')
+local DB = LIB.ConnectDatabase(_L['MY_BagStatistics'], {'userdata/bagstatistics.db', PATH_TYPE.GLOBAL})
 if not DB then
-	return MY.Sysmsg({_L['Cannot connect to database!!!'], r = 255, g = 0, b = 0}, _L['MY_BagStatistics'])
+	return LIB.Sysmsg({_L['Cannot connect to database!!!'], r = 255, g = 0, b = 0}, _L['MY_BagStatistics'])
 end
-local SZ_INI = MY.GetAddonInfo().szRoot .. 'MY_BagEx/ui/MY_BagStatistics.ini'
+local SZ_INI = LIB.GetAddonInfo().szRoot .. 'MY_BagEx/ui/MY_BagStatistics.ini'
 local PAGE_DISPLAY = 8
 local NORMAL_MODE_PAGE_SIZE = 50
 local COMPACT_MODE_PAGE_SIZE = 200
@@ -80,7 +80,7 @@ function GetItemText(KItem)
 			local szKey = KItem.dwTabType .. ',' .. KItem.dwIndex .. ',' .. nBookID
 			if not l_tItemText[szKey] then
 				l_tItemText[szKey] = ''
-				l_tItemText[szKey] = MY.Xml.GetPureText(GetItemTip(KItem))
+				l_tItemText[szKey] = LIB.Xml.GetPureText(GetItemTip(KItem))
 			end
 			return l_tItemText[szKey]
 		else
@@ -111,15 +111,15 @@ local function UpdateTongRepertoryPage()
 		l_guildcache[boxindex] = {boxtype = boxtype, boxindex = boxindex, tabtype = tabtype, tabindex = tabindex, tabsubindex = tabsubindex, name = name, desc = desc, count = count, time = GetCurrentTime()}
 	end
 end
-MY.RegisterEvent('UPDATE_TONG_REPERTORY_PAGE.MY_BagStatistics', UpdateTongRepertoryPage)
+LIB.RegisterEvent('UPDATE_TONG_REPERTORY_PAGE.MY_BagStatistics', UpdateTongRepertoryPage)
 
 function PushDB()
-	MY.Debug({'Pushing to database...'}, 'MY_BagStatistics', DEBUG_LEVEL.LOG)
+	LIB.Debug({'Pushing to database...'}, 'MY_BagStatistics', DEBUG_LEVEL.LOG)
 	local me = GetClientPlayer()
 	local time = GetCurrentTime()
 	local ownerkey = AnsiToUTF8(me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName)
 	local ownername = AnsiToUTF8(me.szName)
-	local servername = AnsiToUTF8(MY.GetRealServer(2))
+	local servername = AnsiToUTF8(LIB.GetRealServer(2))
 	DB:Execute('BEGIN TRANSACTION')
 
 	-- ±³°ü
@@ -170,7 +170,7 @@ function PushDB()
 	-- °ï»á²Ö¿â
 	if not empty(l_guildcache) then
 		local ownerkey = 'tong' .. me.dwTongID
-		local ownername = AnsiToUTF8('[' .. MY.GetTongName(me.dwTongID) .. ']')
+		local ownername = AnsiToUTF8('[' .. LIB.GetTongName(me.dwTongID) .. ']')
 		for _, info in pairs(l_guildcache) do
 			DB_ItemInfoW:ClearBindings()
 			DB_ItemInfoW:BindAll(info.tabtype, info.tabindex, info.tabsubindex, AnsiToUTF8(info.name), AnsiToUTF8(info.desc))
@@ -185,9 +185,9 @@ function PushDB()
 	end
 
 	DB:Execute('END TRANSACTION')
-	MY.Debug({'Pushing to database finished...'}, 'MY_BagStatistics', DEBUG_LEVEL.LOG)
+	LIB.Debug({'Pushing to database finished...'}, 'MY_BagStatistics', DEBUG_LEVEL.LOG)
 end
-MY.RegisterEvent('PLAYER_LEAVE_GAME.MY_BagStatistics', PushDB)
+LIB.RegisterEvent('PLAYER_LEAVE_GAME.MY_BagStatistics', PushDB)
 end
 
 function MY_BagStatistics.Open()
@@ -368,7 +368,7 @@ function MY_BagStatistics.UpdateItems(frame)
 				hItem:Lookup('Shadow_ItemHover'):SetH(hItem:GetH())
 			end
 		else
-			MY.Debug({'KItemInfo not found: ' .. rec.tabtype .. ', ' .. rec.tabindex}, 'MY_BagStatistics', DEBUG_LEVEL.WARNING)
+			LIB.Debug({'KItemInfo not found: ' .. rec.tabtype .. ', ' .. rec.tabindex}, 'MY_BagStatistics', DEBUG_LEVEL.WARNING)
 		end
 	end
 	handle:FormatAllItemPos()
@@ -428,7 +428,7 @@ function MY_BagStatistics.OnLButtonClick()
 		wnd:Lookup('CheckBox_Name'):Check(true)
 	elseif name == 'Btn_Delete' then
 		local wnd = this:GetParent()
-		MY.Confirm(_L('Are you sure to delete item record of %s?', wnd.ownername), function()
+		LIB.Confirm(_L('Are you sure to delete item record of %s?', wnd.ownername), function()
 			DB_ItemsDA:ClearBindings()
 			DB_ItemsDA:BindAll(wnd.ownerkey)
 			DB_ItemsDA:Execute()
@@ -476,6 +476,6 @@ local menu = {
 	szOption = _L['MY_BagStatistics'],
 	fnAction = function() MY_BagStatistics.Toggle() end,
 }
-MY.RegisterAddonMenu('MY_BAGSTATISTICS_MENU', menu)
+LIB.RegisterAddonMenu('MY_BAGSTATISTICS_MENU', menu)
 end
-MY.RegisterHotKey('MY_BagStatistics', _L['MY_BagStatistics'], MY_BagStatistics.Toggle, nil)
+LIB.RegisterHotKey('MY_BagStatistics', _L['MY_BagStatistics'], MY_BagStatistics.Toggle, nil)

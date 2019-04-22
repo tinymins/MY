@@ -36,8 +36,8 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Target/lang/')
-if not MY.AssertVersion('MY_TargetFace', _L['MY_TargetFace'], 0x2011800) then
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_Target/lang/')
+if not LIB.AssertVersion('MY_TargetFace', _L['MY_TargetFace'], 0x2011800) then
 	return
 end
 
@@ -107,8 +107,8 @@ end
 
 local function onBreathe()
 	-- target face
-	local dwTarType, dwTarID = MY.GetTarget()
-	local tar = MY.GetObject(dwTarType, dwTarID)
+	local dwTarType, dwTarID = LIB.GetTarget()
+	local tar = LIB.GetObject(dwTarType, dwTarID)
 	if O.bTargetFace and tar then
 		DrawShape(tar, C.shaTargetFace, O.nSectorDegree, O.nSectorRadius, O.nSectorAlpha, O.tTargetFaceColor)
 	else
@@ -123,8 +123,8 @@ local function onBreathe()
 		end
 	end
 	-- target target face
-	local dwTTarType, dwTTarID = MY.GetTarget(tar)
-	local ttar = MY.GetObject(dwTTarType, dwTTarID)
+	local dwTTarType, dwTTarID = LIB.GetTarget(tar)
+	local ttar = LIB.GetObject(dwTTarType, dwTTarID)
 	local bIsTarget = tar and dwTarID == dwTTarID
 	if O.bTTargetFace and ttar and (not O.bTargetFace or not bIsTarget) then
 		DrawShape(ttar, C.shaTTargetFace, O.nSectorDegree, O.nSectorRadius, O.nSectorAlpha, O.tTTargetFaceColor)
@@ -143,7 +143,7 @@ local function onBreathe()
 end
 
 function D.CheckEnable()
-	if not MY.IsShieldedVersion() and (O.bTargetFace or O.bTTargetFace or O.bTargetShape or O.bTTargetShape) then
+	if not LIB.IsShieldedVersion() and (O.bTargetFace or O.bTTargetFace or O.bTargetShape or O.bTTargetShape) then
 		local hShaList = UI.GetShadowHandle('MY_TargetFace')
 		for _, v in ipairs({'TargetFace', 'TargetShape', 'TTargetFace', 'TTargetShape'}) do
 			local sha = hShaList:Lookup(v)
@@ -153,7 +153,7 @@ function D.CheckEnable()
 			end
 			C['sha' .. v] = sha
 		end
-		MY.BreatheCall('MY_TargetFace', onBreathe)
+		LIB.BreatheCall('MY_TargetFace', onBreathe)
 	else
 		for _, v in ipairs({'TargetFace', 'TargetShape', 'TTargetFace', 'TTargetShape'}) do
 			local sha = C['sha' .. v]
@@ -162,13 +162,13 @@ function D.CheckEnable()
 			end
 			C['sha' .. v] = nil
 		end
-		MY.BreatheCall('MY_TargetFace', false)
+		LIB.BreatheCall('MY_TargetFace', false)
 	end
 	D.RequireRerender()
 end
 
-MY.RegisterInit('MY_TargetFace', D.CheckEnable)
-MY.RegisterEvent('MY_SHIELDED_VERSION.MY_TargetFace', D.CheckEnable)
+LIB.RegisterInit('MY_TargetFace', D.CheckEnable)
+LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_TargetFace', D.CheckEnable)
 end
 
 -- Global exports
@@ -230,5 +230,5 @@ local settings = {
 		},
 	},
 }
-MY_TargetFace = MY.GeneGlobalNS(settings)
+MY_TargetFace = LIB.GeneGlobalNS(settings)
 end

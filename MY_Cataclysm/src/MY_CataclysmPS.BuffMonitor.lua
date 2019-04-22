@@ -35,8 +35,8 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/lang/')
-if not MY.AssertVersion('MY_Cataclysm', _L['MY_Cataclysm'], 0x2011800) then
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_Cataclysm/lang/')
+if not LIB.AssertVersion('MY_Cataclysm', _L['MY_Cataclysm'], 0x2011800) then
 	return
 end
 local CFG, PS = MY_Cataclysm.CFG, {}
@@ -97,16 +97,16 @@ end
 
 local function GetTextList(szText)
 	local t = {}
-	for _, line in ipairs(MY.SplitString(szText, '\n')) do
-		line = MY.TrimString(line)
+	for _, line in ipairs(LIB.SplitString(szText, '\n')) do
+		line = LIB.TrimString(line)
 		if line ~= '' then
 			local tab = {}
-			local vals = MY.SplitString(line, ',')
+			local vals = LIB.SplitString(line, ',')
 			for i, val in ipairs(vals) do
 				if i == 1 then
-					local vs = MY.SplitString(val, '|')
+					local vs = LIB.SplitString(val, '|')
 					for j, v in ipairs(vs) do
-						v = MY.TrimString(v)
+						v = LIB.TrimString(v)
 						if v ~= '' then
 							if j == 1 then
 								tab.dwID = tonumber(v)
@@ -134,7 +134,7 @@ local function GetTextList(szText)
 					tab.bCaution = true
 				elseif val == '!!!!' or val:sub(1, 5) == '!!!!|' then
 					tab.bScreenHead = true
-					local vs = MY.SplitString(val, '|')
+					local vs = LIB.SplitString(val, '|')
 					for _, v in ipairs(vs) do
 						if v:sub(1, 1) == '[' and v:sub(-1, -1) == ']' then
 							tab.colScreenHead = v:sub(2, -2)
@@ -149,7 +149,7 @@ local function GetTextList(szText)
 					if val:sub(1, 1) == '#' then
 						tab.col = val
 					else
-						local vs = MY.SplitString(val, '|')
+						local vs = LIB.SplitString(val, '|')
 						tab.col = vs[1]
 						tab.nColAlpha = vs[2] and tonumber(vs[2])
 					end
@@ -352,13 +352,13 @@ function OpenBuffEditPanel(rec)
 	}, true):autoWidth():width() + 5
 	x = x + ui:append('Shadow', {
 		x = x, y = y + 2, w = 22, h = 22,
-		color = rec.col and {MY.HumanColor2RGB(rec.col)} or {255, 255, 0},
+		color = rec.col and {LIB.HumanColor2RGB(rec.col)} or {255, 255, 0},
 		onlclick = function()
 			local this = this
 			UI.OpenColorPicker(function(r, g, b)
-				local a = rec.col and select(4, MY.Hex2RGB(rec.col)) or 255
+				local a = rec.col and select(4, LIB.Hex2RGB(rec.col)) or 255
 				rec.nColAlpha = a
-				rec.col = MY.RGB2Hex(r, g, b, a)
+				rec.col = LIB.RGB2Hex(r, g, b, a)
 				UI(this):color(r, g, b)
 				update()
 			end)
@@ -374,11 +374,11 @@ function OpenBuffEditPanel(rec)
 	}, true):width() + 5
 	x = x + ui:append('Shadow', {
 		x = x, y = y + 2, w = 22, h = 22,
-		color = rec.colScreenHead and {MY.HumanColor2RGB(rec.colScreenHead)} or {255, 255, 0},
+		color = rec.colScreenHead and {LIB.HumanColor2RGB(rec.colScreenHead)} or {255, 255, 0},
 		onlclick = function()
 			local this = this
 			UI.OpenColorPicker(function(r, g, b)
-				rec.colScreenHead = MY.RGB2Hex(r, g, b)
+				rec.colScreenHead = LIB.RGB2Hex(r, g, b)
 				UI(this):color(r, g, b)
 				update()
 			end)
@@ -404,12 +404,12 @@ function OpenBuffEditPanel(rec)
 		x = x, y = y, text = '',
 		range = {0, 255},
 		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
-		value = rec.col and select(4, MY.HumanColor2RGB(rec.col)) or rec.nColAlpha or 255,
+		value = rec.col and select(4, LIB.HumanColor2RGB(rec.col)) or rec.nColAlpha or 255,
 		onchange = function(nVal)
 			if rec.col then
-				local r, g, b = MY.Hex2RGB(rec.col)
+				local r, g, b = LIB.Hex2RGB(rec.col)
 				if r and g and b then
-					rec.col = MY.RGB2Hex(r, g, b, nVal)
+					rec.col = LIB.RGB2Hex(r, g, b, nVal)
 				end
 			end
 			rec.nColAlpha = nVal
@@ -471,7 +471,7 @@ function OpenBuffEditPanel(rec)
 				ui:remove()
 			end
 			if rec.dwID or (rec.szName and rec.szName ~= '') then
-				MY.Confirm(_L('Delete [%s]?', rec.szName or rec.dwID), fnAction)
+				LIB.Confirm(_L('Delete [%s]?', rec.szName or rec.dwID), fnAction)
 			else
 				fnAction()
 			end
@@ -524,8 +524,8 @@ function PS.OnPanelActive(frame)
 					CFG.aBuffList = GetTextList(edit:text())
 					MY_Cataclysm.UpdateBuffListCache()
 					ui:remove()
-					MY.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
-					MY.SwitchTab('MY_Cataclysm_BuffSettings', true)
+					LIB.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
+					LIB.SwitchTab('MY_Cataclysm_BuffSettings', true)
 				end,
 			})
 		end,
@@ -558,7 +558,7 @@ function PS.OnPanelActive(frame)
 		checked = CFG.bAutoBuffSize,
 		oncheck = function(bCheck)
 			CFG.bAutoBuffSize = bCheck
-			MY.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
+			LIB.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
 		end,
 	}, true):autoWidth():width() + 5
 	x = x + ui:append('WndSliderBox', {
@@ -570,7 +570,7 @@ function PS.OnPanelActive(frame)
 		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
 		onchange = function(nVal)
 			CFG.fBuffScale = nVal / 100
-			MY.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
+			LIB.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
 		end,
 		textfmt = function(val) return _L('%d%%', val) end,
 	}, true):autoWidth():width() + 10
@@ -585,7 +585,7 @@ function PS.OnPanelActive(frame)
 		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
 		onchange = function(nVal)
 			CFG.nMaxShowBuff = nVal
-			MY.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
+			LIB.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
 		end,
 	}, true):autoWidth():width() + 8
 
@@ -597,7 +597,7 @@ function PS.OnPanelActive(frame)
 		oncheck = function(bCheck)
 			CFG.bBuffPushToOfficial = bCheck
 			MY_Cataclysm.UpdateBuffListCache()
-			MY.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
+			LIB.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
 		end,
 	}, true):autoWidth():width() + 5
 	x = x + ui:append('WndCheckBox', {
@@ -605,7 +605,7 @@ function PS.OnPanelActive(frame)
 		checked = CFG.bStaring,
 		oncheck = function(bCheck)
 			CFG.bStaring = bCheck
-			MY.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
+			LIB.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
 		end,
 	}, true):autoWidth():width() + 5
 
@@ -616,7 +616,7 @@ function PS.OnPanelActive(frame)
 		checked = CFG.bShowBuffTime,
 		oncheck = function(bCheck)
 			CFG.bShowBuffTime = bCheck
-			MY.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
+			LIB.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
 		end,
 	}, true):autoWidth():width() + 5
 	x = x + ui:append('WndCheckBox', {
@@ -625,7 +625,7 @@ function PS.OnPanelActive(frame)
 		checked = not CFG.bBuffAboveMana,
 		oncheck = function(bCheck)
 			CFG.bBuffAboveMana = not bCheck
-			MY.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
+			LIB.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
 		end,
 	}, true):autoWidth():width() + 5
 
@@ -636,7 +636,7 @@ function PS.OnPanelActive(frame)
 		checked = CFG.bShowBuffNum,
 		oncheck = function(bCheck)
 			CFG.bShowBuffNum = bCheck
-			MY.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
+			LIB.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
 		end,
 	}, true):autoWidth():width() + 5
 	x = x + ui:append('WndCheckBox', {
@@ -644,7 +644,7 @@ function PS.OnPanelActive(frame)
 		checked = CFG.bShowBuffReminder,
 		oncheck = function(bCheck)
 			CFG.bShowBuffReminder = bCheck
-			MY.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
+			LIB.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
 		end,
 	}, true):autoWidth():width() + 5
 
@@ -668,7 +668,7 @@ function PS.OnPanelActive(frame)
 		oncheck = function(bCheck)
 			CFG.bBuffDataNangongbo = bCheck
 			MY_Cataclysm.UpdateBuffListCache()
-			MY.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
+			LIB.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
 		end,
 		autoenable = function() return MY_Resource and true end,
 	}, true):autoWidth():width() + 5
@@ -683,7 +683,7 @@ function PS.OnPanelActive(frame)
 		oncheck = function(bCheck)
 			CFG.bBuffDataNangongboCmd = bCheck
 			MY_Cataclysm.UpdateBuffListCache()
-			MY.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
+			LIB.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
 		end,
 		autoenable = function() return MY_Resource and CFG.bBuffDataNangongbo end,
 	}, true):autoWidth():width() + 5
@@ -695,7 +695,7 @@ function PS.OnPanelActive(frame)
 		oncheck = function(bCheck)
 			CFG.bBuffDataNangongboHeal = bCheck
 			MY_Cataclysm.UpdateBuffListCache()
-			MY.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
+			LIB.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
 		end,
 		autoenable = function() return MY_Resource and CFG.bBuffDataNangongbo end,
 	}, true):autoWidth():width() + 5
@@ -706,7 +706,7 @@ function PS.OnPanelActive(frame)
 		x = x, y = y, w = 220,
 		text = _L['Feedback @nangongbo'],
 		onclick = function()
-			MY.OpenBrowser('https://weibo.com/nangongbo')
+			LIB.OpenBrowser('https://weibo.com/nangongbo')
 		end,
 	}, true):autoHeight():width()
 	y = y + 28
@@ -714,4 +714,4 @@ end
 function PS.OnPanelDeactive()
 	l_list = nil
 end
-MY.RegisterPanel('MY_Cataclysm_BuffMonitor', _L['Buff settings'], _L['Raid'], 'ui/Image/UICommon/RaidTotal.uitex|65', PS)
+LIB.RegisterPanel('MY_Cataclysm_BuffMonitor', _L['Buff settings'], _L['Raid'], 'ui/Image/UICommon/RaidTotal.uitex|65', PS)

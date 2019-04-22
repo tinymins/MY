@@ -35,8 +35,8 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_ChatFilter/lang/')
-if not MY.AssertVersion('MY_ChatBlock', _L['MY_ChatBlock'], 0x2011800) then
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_ChatFilter/lang/')
+if not LIB.AssertVersion('MY_ChatBlock', _L['MY_ChatBlock'], 0x2011800) then
 	return
 end
 local TYPE_LIST = {
@@ -152,14 +152,14 @@ local TYPE_CHANNELMSGS_R = (function()
 end)()
 
 local function SaveBlockWords()
-	MY.SaveLUAData({'config/chatblockwords.jx3dat', PATH_TYPE.GLOBAL}, {blockwords = MY_ChatBlock.tBlockWords})
-	MY.StorageData('MY_CHAT_BLOCKWORD', MY_ChatBlock.tBlockWords)
+	LIB.SaveLUAData({'config/chatblockwords.jx3dat', PATH_TYPE.GLOBAL}, {blockwords = MY_ChatBlock.tBlockWords})
+	LIB.StorageData('MY_CHAT_BLOCKWORD', MY_ChatBlock.tBlockWords)
 end
 
 local function LoadBlockWords()
-	local szOrgPath, tOrgData = MY.GetLUADataPath('config/MY_CHAT/blockwords.$lang.jx3dat'), nil
+	local szOrgPath, tOrgData = LIB.GetLUADataPath('config/MY_CHAT/blockwords.$lang.jx3dat'), nil
 	if IsLocalFileExist(szOrgPath) then
-		tOrgData = MY.LoadLUAData(szOrgPath)
+		tOrgData = LIB.LoadLUAData(szOrgPath)
 		CPath.DelFile(szOrgPath)
 	end
 
@@ -181,10 +181,10 @@ local function LoadBlockWords()
 			end
 		end
 	end
-	local data = MY.LoadLUAData({'config/chatblockwords.jx3dat', PATH_TYPE.GLOBAL})
+	local data = LIB.LoadLUAData({'config/chatblockwords.jx3dat', PATH_TYPE.GLOBAL})
 	if data and data.blockwords then
 		for i, bw in ipairs(data.blockwords) do
-			bw = MY.FormatDataStructure(bw, DEFAULT_KW_CONFIG)
+			bw = LIB.FormatDataStructure(bw, DEFAULT_KW_CONFIG)
 			if bw.keyword ~= '' and not tKeys[bw.keyword] then
 				table.insert(MY_ChatBlock.tBlockWords, bw)
 				tKeys[bw.keyword] = true
@@ -197,12 +197,12 @@ local function LoadBlockWords()
 	end
 end
 
-MY.RegisterEvent('MY_PRIVATE_STORAGE_UPDATE', function()
+LIB.RegisterEvent('MY_PRIVATE_STORAGE_UPDATE', function()
 	if arg0 == 'MY_CHAT_BLOCKWORD' then
 		MY_ChatBlock.tBlockWords = arg1
 	end
 end)
-MY.RegisterInit('MY_CHAT_BW', LoadBlockWords)
+LIB.RegisterInit('MY_CHAT_BW', LoadBlockWords)
 
 local tNoneSpaceBlockWords = {}
 function MY_ChatBlock.MatchBlockWord(talkData, talkType, dwTalkerID)
@@ -216,7 +216,7 @@ function MY_ChatBlock.MatchBlockWord(talkData, talkType, dwTalkerID)
 	elseif type(talkData) == 'string' then
 		szText = talkData
 	end
-	local bAcquaintance = dwTalkerID and (MY.GetFriend(dwTalkerID) or MY.GetFoe(dwTalkerID) or MY.GetTongMember(dwTalkerID))
+	local bAcquaintance = dwTalkerID and (LIB.GetFriend(dwTalkerID) or LIB.GetFoe(dwTalkerID) or LIB.GetTongMember(dwTalkerID))
 
 
 	for _, bw in ipairs(MY_ChatBlock.tBlockWords) do
@@ -228,7 +228,7 @@ function MY_ChatBlock.MatchBlockWord(talkData, talkType, dwTalkerID)
 			end
 		end
 		if hasfilter and not (bw.ignoreAcquaintance and bAcquaintance)
-		and MY.StringSimpleMatch(szText, bw.keyword, not bw.ignoreCase, not bw.ignoreEnEm, bw.ignoreSpace) then
+		and LIB.StringSimpleMatch(szText, bw.keyword, not bw.ignoreCase, not bw.ignoreEnEm, bw.ignoreSpace) then
 			return true
 		end
 	end
@@ -440,4 +440,4 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 end
-MY.RegisterPanel( 'MY_ChatBlock', _L['chat filter'], _L['Chat'], 'UI/Image/Common/Money.UITex|243', PS)
+LIB.RegisterPanel( 'MY_ChatBlock', _L['chat filter'], _L['Chat'], 'UI/Image/Common/Money.UITex|243', PS)

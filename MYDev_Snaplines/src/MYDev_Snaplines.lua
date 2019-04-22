@@ -35,8 +35,8 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot..'MYDev_Snaplines/lang/')
-if not MY.AssertVersion('MYDev_Snaplines', _L['MYDev_Snaplines'], 0x2011800) then
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot..'MYDev_Snaplines/lang/')
+if not LIB.AssertVersion('MYDev_Snaplines', _L['MYDev_Snaplines'], 0x2011800) then
 	return
 end
 --------------------------------------------------------------------------
@@ -385,13 +385,13 @@ end
 MYDev_Snaplines.ReloadUI = function()
 	Wnd.CloseWindow('MYDev_Snaplines')
 	if MYDev_Snaplines.bEnable then
-		Wnd.OpenWindow(MY.GetAddonInfo().szRoot .. 'MYDev_Snaplines/ui/MYDev_Snaplines.ini', 'MYDev_Snaplines')
+		Wnd.OpenWindow(LIB.GetAddonInfo().szRoot .. 'MYDev_Snaplines/ui/MYDev_Snaplines.ini', 'MYDev_Snaplines')
 	end
 end
-MY.RegisterInit('MYDEV_SNAPLINES', MYDev_Snaplines.ReloadUI)
+LIB.RegisterInit('MYDEV_SNAPLINES', MYDev_Snaplines.ReloadUI)
 
 -- ×¢²áÃæ°å
-MY.RegisterPanel(
+LIB.RegisterPanel(
 	'Dev_Snaplines', _L['Snaplines'], _L['Development'],
 	'ui/Image/UICommon/PlugIn.UITex|1', {
 	OnPanelActive = function(wnd)
@@ -521,18 +521,18 @@ MY.RegisterPanel(
 
 		ui:append('Text', 'Text_SetHotkey'):find('#Text_SetHotkey'):pos(w-140, 20):color(255,255,0)
 		  :text(_L['>> set hotkey <<'])
-		  :click(function() MY.SetHotKey() end)
+		  :click(function() LIB.SetHotKey() end)
 	end
 })
 -- ×¢²á¿ì½İ¼ü
-MY.RegisterHotKey('MY_Dev_Snaplines'         , _L['Snaplines']           , function() MYDev_Snaplines.bEnable   = not MYDev_Snaplines.bEnable   MYDev_Snaplines.ReloadUI() end, nil)
-MY.RegisterHotKey('MY_Dev_Snaplines_ShowTip' , _L['Snaplines - ShowTip'] , function() MYDev_Snaplines.bShowTip  = not MYDev_Snaplines.bShowTip  MYDev_Snaplines.ReloadUI() end, nil)
-MY.RegisterHotKey('MY_Dev_Snaplines_ShowData', _L['Snaplines - ShowData'], function() MYDev_Snaplines.bShowData = not MYDev_Snaplines.bShowData MYDev_Snaplines.ReloadUI() end, nil)
+LIB.RegisterHotKey('MY_Dev_Snaplines'         , _L['Snaplines']           , function() MYDev_Snaplines.bEnable   = not MYDev_Snaplines.bEnable   MYDev_Snaplines.ReloadUI() end, nil)
+LIB.RegisterHotKey('MY_Dev_Snaplines_ShowTip' , _L['Snaplines - ShowTip'] , function() MYDev_Snaplines.bShowTip  = not MYDev_Snaplines.bShowTip  MYDev_Snaplines.ReloadUI() end, nil)
+LIB.RegisterHotKey('MY_Dev_Snaplines_ShowData', _L['Snaplines - ShowData'], function() MYDev_Snaplines.bShowData = not MYDev_Snaplines.bShowData MYDev_Snaplines.ReloadUI() end, nil)
 -- For Debug
 if IsDebugClient and IsDebugClient() then
-	MY.RegisterInit('Dev_Snaplines_Hotkey', function()
-		MY.SetHotKey('MY_Dev_Snaplines', 121)
-		MY.SetHotKey('MY_Dev_Snaplines_ShowTip', 122)
-		MY.SetHotKey('MY_Dev_Snaplines_ShowData', 123)
+	LIB.RegisterInit('Dev_Snaplines_Hotkey', function()
+		LIB.SetHotKey('MY_Dev_Snaplines', 121)
+		LIB.SetHotKey('MY_Dev_Snaplines_ShowTip', 122)
+		LIB.SetHotKey('MY_Dev_Snaplines_ShowData', 123)
 	end)
 end

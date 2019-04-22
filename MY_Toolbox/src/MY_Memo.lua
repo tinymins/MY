@@ -35,7 +35,7 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Toolbox/lang/')
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_Toolbox/lang/')
 local ROLE_MEMO = {
 	bEnable = false,
 	nWidth = 200,
@@ -62,7 +62,7 @@ function D.Reload(bGlobal)
 		__index = CFG_O,
 		__newindex = function(t, k, v)
 			CFG_O[k] = v
-			MY.DelayCall('MY_Memo_SaveConfig', D.SaveConfig)
+			LIB.DelayCall('MY_Memo_SaveConfig', D.SaveConfig)
 		end,
 	})
 	local NAME = bGlobal and 'MY_MemoGlobal' or 'MY_MemoRole'
@@ -111,14 +111,14 @@ function D.Reload(bGlobal)
 end
 
 function D.LoadConfig()
-	local CFG = MY.LoadLUAData({'config/memo.jx3dat', PATH_TYPE.GLOBAL})
+	local CFG = LIB.LoadLUAData({'config/memo.jx3dat', PATH_TYPE.GLOBAL})
 	if CFG then
 		for k, v in pairs(CFG) do
 			GLOBAL_MEMO[k] = v
 		end
 	end
 
-	local CFG = MY.LoadLUAData({'config/memo.jx3dat', PATH_TYPE.ROLE})
+	local CFG = LIB.LoadLUAData({'config/memo.jx3dat', PATH_TYPE.ROLE})
 	if CFG then
 		for k, v in pairs(CFG) do
 			ROLE_MEMO[k] = v
@@ -134,14 +134,14 @@ function D.SaveConfig()
 		CFG[k] = v
 	end
 	CFG.bEnableGlobal = GLOBAL_MEMO.bEnable
-	MY.SaveLUAData({'config/memo.jx3dat', PATH_TYPE.ROLE}, CFG)
+	LIB.SaveLUAData({'config/memo.jx3dat', PATH_TYPE.ROLE}, CFG)
 
 	local CFG = {}
 	for k, v in pairs(GLOBAL_MEMO) do
 		CFG[k] = v
 	end
 	CFG.bEnable = nil
-	MY.SaveLUAData({'config/memo.jx3dat', PATH_TYPE.GLOBAL}, CFG)
+	LIB.SaveLUAData({'config/memo.jx3dat', PATH_TYPE.GLOBAL}, CFG)
 end
 
 function MY_Memo.IsEnable(bGlobal)
@@ -176,5 +176,5 @@ local function onInit()
 	D.Reload(true)
 	D.Reload(false)
 end
-MY.RegisterInit('MY_ANMERKUNGEN_PLAYERNOTE', onInit)
+LIB.RegisterInit('MY_ANMERKUNGEN_PLAYERNOTE', onInit)
 end

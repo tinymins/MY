@@ -35,8 +35,8 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_TalkEx/lang/')
-if not MY.AssertVersion('MY_TalkEx', _L['MY_TalkEx'], 0x2011800) then
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_TalkEx/lang/')
+if not LIB.AssertVersion('MY_TalkEx', _L['MY_TalkEx'], 0x2011800) then
 	return
 end
 MY_TalkEx = MY_TalkEx or {}
@@ -80,12 +80,12 @@ _C.tTrickChannels = {
 local _dwTalkTick = 0
 _C.Talk = function()
 	if #MY_TalkEx.szTalk == 0 then
-		return MY.Sysmsg({_L['please input something.'], r=255, g=0, b=0})
+		return LIB.Sysmsg({_L['please input something.'], r=255, g=0, b=0})
 	end
 
-	if not MY.IsShieldedVersion() and MY.ProcessCommand
+	if not LIB.IsShieldedVersion() and LIB.ProcessCommand
 	and MY_TalkEx.szTalk:sub(1, 8) == '/script ' then
-		MY.ProcessCommand(MY_TalkEx.szTalk:sub(9))
+		LIB.ProcessCommand(MY_TalkEx.szTalk:sub(9))
 	else
 		-- 防止刷屏
 		if GetTime() - _dwTalkTick < 1000 then
@@ -94,21 +94,21 @@ _C.Talk = function()
 		_dwTalkTick = GetTime()
 		-- 近聊不放在第一个会导致发不出去
 		if MY_TalkEx.tTalkChannels[PLAYER_TALK_CHANNEL.NEARBY] then
-			MY.Talk(PLAYER_TALK_CHANNEL.NEARBY, MY_TalkEx.szTalk)
+			LIB.Talk(PLAYER_TALK_CHANNEL.NEARBY, MY_TalkEx.szTalk)
 		end
 		-- 遍历发送队列
 		for nChannel, _ in pairs(MY_TalkEx.tTalkChannels) do
 			if nChannel ~= PLAYER_TALK_CHANNEL.NEARBY then
-				MY.Talk(nChannel, MY_TalkEx.szTalk)
+				LIB.Talk(nChannel, MY_TalkEx.szTalk)
 			end
 		end
 	end
 end
-MY.RegisterHotKey('MY_TalkEx_Talk', _L['TalkEx Talk'], _C.Talk, nil)
+LIB.RegisterHotKey('MY_TalkEx_Talk', _L['TalkEx Talk'], _C.Talk, nil)
 
 _C.Trick = function()
 	if #MY_TalkEx.szTrickText == 0 then
-		return MY.Sysmsg({_L['please input something.'], r=255, g=0, b=0})
+		return LIB.Sysmsg({_L['please input something.'], r=255, g=0, b=0})
 	end
 	local t = {}
 	if MY_TalkEx.szTrickFilter == 'RAID' then
@@ -123,7 +123,7 @@ _C.Trick = function()
 			end
 		end
 	elseif MY_TalkEx.szTrickFilter == 'NEARBY' then
-		for _, p in ipairs(MY.GetNearPlayer()) do
+		for _, p in ipairs(LIB.GetNearPlayer()) do
 			if MY_TalkEx.nTrickForce == -1 or MY_TalkEx.nTrickForce == p.dwForceID then
 				table.insert(t, p.szName)
 			end
@@ -137,21 +137,21 @@ _C.Trick = function()
 	end
 	-- none target
 	if #t == 0 then
-		return MY.Sysmsg({_L['no trick target found.'], r=255, g=0, b=0},nil)
+		return LIB.Sysmsg({_L['no trick target found.'], r=255, g=0, b=0},nil)
 	end
 	-- start tricking
 	if #MY_TalkEx.szTrickTextBegin > 0 then
-		MY.Talk(MY_TalkEx.nTrickChannel, MY_TalkEx.szTrickTextBegin)
+		LIB.Talk(MY_TalkEx.nTrickChannel, MY_TalkEx.szTrickTextBegin)
 	end
 	for _, szName in ipairs(t) do
-		MY.Talk(MY_TalkEx.nTrickChannel, (MY_TalkEx.szTrickText:gsub('%$mb', '[' .. szName .. ']')))
+		LIB.Talk(MY_TalkEx.nTrickChannel, (MY_TalkEx.szTrickText:gsub('%$mb', '[' .. szName .. ']')))
 	end
 	if #MY_TalkEx.szTrickTextEnd > 0 then
-		MY.Talk(MY_TalkEx.nTrickChannel, MY_TalkEx.szTrickTextEnd)
+		LIB.Talk(MY_TalkEx.nTrickChannel, MY_TalkEx.szTrickTextEnd)
 	end
 end
 
-MY.RegisterPanel('TalkEx', _L['talk ex'], _L['Chat'], 'UI/Image/UICommon/ScienceTreeNode.UITex|123', { OnPanelActive = function(wnd)
+LIB.RegisterPanel('TalkEx', _L['talk ex'], _L['Chat'], 'UI/Image/UICommon/ScienceTreeNode.UITex|123', { OnPanelActive = function(wnd)
 	local ui = UI(wnd)
 	local w, h = ui:size()
 	-------------------------------------
@@ -180,19 +180,19 @@ MY.RegisterPanel('TalkEx', _L['talk ex'], _L['Chat'], 'UI/Image/UICommon/Science
 	  :pos(w-110,200):width(90)
 	  :text(_L['send'],{255,255,255})
 	  :click(function()
-	  	if IsAltKeyDown() and IsShiftKeyDown() and MY.ProcessCommand
+	  	if IsAltKeyDown() and IsShiftKeyDown() and LIB.ProcessCommand
 	  	and MY_TalkEx.szTalk:sub(1, 8) == '/script ' then
-	  		MY.ProcessCommand(MY_TalkEx.szTalk:sub(9))
+	  		LIB.ProcessCommand(MY_TalkEx.szTalk:sub(9))
 	  	else
 	  		_C.Talk()
 	  		local ui = UI(this)
 			ui:enable(false)
-			MY.DelayCall(1000, function()
+			LIB.DelayCall(1000, function()
 				ui:enable(true)
 			end)
 	  	end
 	  end, function()
-	  	MY.Talk(nil, MY_TalkEx.szTalk, nil, nil, nil, true)
+	  	LIB.Talk(nil, MY_TalkEx.szTalk, nil, nil, nil, true)
 	  end)
 	-------------------------------------
 	-- 调侃部分

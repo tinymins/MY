@@ -35,8 +35,8 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot..'MYDev_UITexViewer/lang/')
-if not MY.AssertVersion('MYDev_UITexViewer', _L['MYDev_UITexViewer'], 0x2011800) then
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot..'MYDev_UITexViewer/lang/')
+if not LIB.AssertVersion('MYDev_UITexViewer', _L['MYDev_UITexViewer'], 0x2011800) then
 	return
 end
 local _Cache = {}
@@ -49,7 +49,7 @@ _Cache.OnPanelActive = function(wnd)
     local w, h = ui:size()
     local x, y = 20, 20
 
-    _Cache.tUITexList = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MYDev_UITexViewer/data/data.jx3dat') or {}
+    _Cache.tUITexList = LIB.LoadLUAData(LIB.GetAddonInfo().szRoot .. 'MYDev_UITexViewer/data/data.jx3dat') or {}
 
     local uiBoard = ui:append('WndScrollBox', 'WndScrollBox_ImageList')
       :children('#WndScrollBox_ImageList')
@@ -110,6 +110,6 @@ _Cache.OnPanelDeactive = function(wnd)
     collectgarbage('collect')
 end
 
-MY.RegisterPanel( 'Dev_UITexViewer', _L['UITexViewer'], _L['Development'], 'ui/Image/UICommon/BattleFiled.UITex|7', {
+LIB.RegisterPanel( 'Dev_UITexViewer', _L['UITexViewer'], _L['Development'], 'ui/Image/UICommon/BattleFiled.UITex|7', {
     OnPanelActive = _Cache.OnPanelActive, OnPanelDeactive = _Cache.OnPanelDeactive
 })

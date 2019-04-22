@@ -35,8 +35,8 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MYDev_VarWatch/lang/')
-if not MY.AssertVersion('MYDev_VarWatch', _L['MYDev_VarWatch'], 0x2011800) then
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MYDev_VarWatch/lang/')
+if not LIB.AssertVersion('MYDev_VarWatch', _L['MYDev_VarWatch'], 0x2011800) then
 	return
 end
 local _C = {}
@@ -45,7 +45,7 @@ local srep, tostring, string2byte = string.rep, tostring, string.byte
 local tconcat, tinsert, tremove = table.concat, table.insert, table.remove
 local type, next, print, pairs, ipairs = type, next, print, pairs, ipairs
 local DATA_PATH = {'config/dev_varwatch.jx3dat', PATH_TYPE.GLOBAL}
-_C.tVarList = MY.LoadLUAData(DATA_PATH) or {}
+_C.tVarList = LIB.LoadLUAData(DATA_PATH) or {}
 
 local function var2str_x(var, indent, level) -- 只解析一层table且不解析方法
 	local function table_r(var, level, indent)
@@ -95,7 +95,7 @@ local function var2str_x(var, indent, level) -- 只解析一层table且不解析方法
 	return table_r(var, level or 0, indent)
 end
 
-MY.RegisterPanel(
+LIB.RegisterPanel(
 'Dev_VarWatch', _L['VarWatch'], _L['Development'],
 'ui/Image/UICommon/BattleFiled.UITex|7', {
 	OnPanelActive = function(wnd)
@@ -115,8 +115,8 @@ MY.RegisterPanel(
 				w = 150, h = 25,
 				color = {255, 255, 255},
 				onchange = function(text)
-					_C.tVarList[i] = MY.TrimString(text)
-					MY.SaveLUAData(DATA_PATH, _C.tVarList)
+					_C.tVarList[i] = LIB.TrimString(text)
+					LIB.SaveLUAData(DATA_PATH, _C.tVarList)
 				end,
 			}):children('#WndEditBox_K' .. i)
 
@@ -128,7 +128,7 @@ MY.RegisterPanel(
 			}):children('#WndEditBox_V' .. i)
 		end
 
-		MY.BreatheCall('DEV_VARWATCH', function()
+		LIB.BreatheCall('DEV_VARWATCH', function()
 			for i = 1, nLimit do
 				local szKey = _C.tVarList[i]
 				local hFocus = Station.GetFocusWindow()
@@ -146,13 +146,13 @@ MY.RegisterPanel(
 						end
 						tWndEditV[i]:text(tconcat(t, ', '))
 					else
-						tWndEditV[i]:text(var2str_x(MY.GetGlobalValue(szKey)))
+						tWndEditV[i]:text(var2str_x(LIB.GetGlobalValue(szKey)))
 					end
 				end
 			end
 		end)
 	end,
 	OnPanelDeactive = function()
-		MY.BreatheCall('DEV_VARWATCH', false)
+		LIB.BreatheCall('DEV_VARWATCH', false)
 	end,
 })

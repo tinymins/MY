@@ -38,7 +38,7 @@ local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_
 local LB = class()
 local HP = MY_LifeBar_HP
 local CACHE = setmetatable({}, { __mode = 'v' })
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_LifeBar/lang/')
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_LifeBar/lang/')
 
 local function InitConfigData(self)
 	-- ÅäÉ«

@@ -55,7 +55,7 @@ local WM_POINT  = {}
 MY_WorldMark = {
 	bEnable = true
 }
-MY.RegisterCustomData('MY_WorldMark')
+LIB.RegisterCustomData('MY_WorldMark')
 
 function D.OnNpcEvent()
 	local npc = GetNpc(arg0)
@@ -130,7 +130,7 @@ function D.Draw(Point, sha, col)
 end
 
 function D.GetEvent()
-	if MY_WorldMark.bEnable and not MY.IsShieldedVersion() then
+	if MY_WorldMark.bEnable and not LIB.IsShieldedVersion() then
 		return {
 			{'DO_SKILL_CAST', D.OnDoSkillCast},
 			{'NPC_LEAVE_SCENE', D.OnNpcLeave},
@@ -144,8 +144,8 @@ function D.GetEvent()
 end
 
 function MY_WorldMark.CheckEnable()
-	MY.RegisterModuleEvent('MY_WorldMark', D.GetEvent())
+	LIB.RegisterModuleEvent('MY_WorldMark', D.GetEvent())
 end
 
-MY.RegisterInit('MY_WorldMark', MY_WorldMark.CheckEnable)
-MY.RegisterEvent('MY_SHIELDED_VERSION.MY_WorldMark', MY_WorldMark.CheckEnable)
+LIB.RegisterInit('MY_WorldMark', MY_WorldMark.CheckEnable)
+LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_WorldMark', MY_WorldMark.CheckEnable)

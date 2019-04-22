@@ -35,7 +35,7 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Toolbox/lang/')
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_Toolbox/lang/')
 local QUERY_URL = 'http://data.jx3.derzh.com/api/exam?l=%s&q=%s'
 local SUBMIT_URL = 'http://data.jx3.derzh.com/api/exam'
 local l_tLocal -- 本地题库
@@ -44,7 +44,7 @@ local l_tAccept = {} -- 从服务器获取到的数据缓存
 local l_szLastQueryQues -- 最后一次网络查询的题目（防止重查）
 
 local function DisplayMessage(szText)
-	MY.Sysmsg({szText}, _L['exam tip'])
+	LIB.Sysmsg({szText}, _L['exam tip'])
 end
 
 local function IsCurrentQuestion(szQues)
@@ -81,7 +81,7 @@ local function QueryData(szQues)
 	DisplayMessage(_L['Querying, please wait...'])
 
 	if not l_tLocal then
-		l_tLocal = MY.LoadLUAData({'config/examtip.jx3dat', PATH_TYPE.GLOBAL}) or {}
+		l_tLocal = LIB.LoadLUAData({'config/examtip.jx3dat', PATH_TYPE.GLOBAL}) or {}
 	end
 	if l_tLocal[szQues] then
 		for _, szAnsw in ipairs(l_tLocal[szQues]) do
@@ -92,11 +92,11 @@ local function QueryData(szQues)
 	end
 
 	local _, _, szLang, _ = GetVersion()
-	MY.Ajax({
+	LIB.Ajax({
 		type = 'get',
-		url = QUERY_URL:format(szLang, MY.UrlEncode(szQues)),
+		url = QUERY_URL:format(szLang, LIB.UrlEncode(szQues)),
 		success = function(html, status)
-			local res = MY.JsonDecode(html)
+			local res = LIB.JsonDecode(html)
 			if not res or not IsCurrentQuestion(res.ques) then
 				return
 			end
@@ -133,7 +133,7 @@ local function QueryData(szQues)
 end
 
 local function SubmitData()
-	if MY.IsInDevMode() then
+	if LIB.IsInDevMode() then
 		return
 	end
 	local data = {}
@@ -145,7 +145,7 @@ local function SubmitData()
 	if #data == 0 then
 		return
 	end
-	MY.Ajax({
+	LIB.Ajax({
 		type = 'post/json',
 		url = SUBMIT_URL,
 		data = {
@@ -153,11 +153,11 @@ local function SubmitData()
 			data = data,
 		},
 		success = function(html, status)
-			local res = MY.JsonDecode(html)
-			if MY.IsShieldedVersion() or not res then
+			local res = LIB.JsonDecode(html)
+			if LIB.IsShieldedVersion() or not res then
 				return
 			end
-			MY.Sysmsg({_L('%s record(s) commited, %s record(s) accepted!', r.received, r.accepted)}, _L['exam tip'])
+			LIB.Sysmsg({_L('%s record(s) commited, %s record(s) accepted!', r.received, r.accepted)}, _L['exam tip'])
 		end,
 	})
 end
@@ -174,7 +174,7 @@ local function OnFrameBreathe()
 		return
 	end
 	local szQues = txtQues:GetText()
-	if not MY.IsShieldedVersion() then
+	if not LIB.IsShieldedVersion() then
 		QueryData(szQues)
 	end
 	local szAnsw
@@ -195,18 +195,18 @@ local function OnFrameCreate()
 		arg0.OnFrameBreathe = OnFrameBreathe
 	end
 end
-MY.RegisterEvent('ON_FRAME_CREATE.EXAM_TIP', OnFrameCreate)
+LIB.RegisterEvent('ON_FRAME_CREATE.EXAM_TIP', OnFrameCreate)
 
 local function OnLoot()
 	local item = GetItem(arg1)
 	if item and item.nUiId == 65814 then
 		local nBeforeExamPrintRemainSpace = l_nExamPrintRemainSpace
-		MY.DelayCall(function()
+		LIB.DelayCall(function()
 			if nBeforeExamPrintRemainSpace - GetClientPlayer().GetExamPrintRemainSpace() == 100 then
 				SubmitData()
 			end
 		end, 2000)
 	end
 end
-MY.RegisterEvent('LOOT_ITEM.MY_EXAMTIP', OnLoot)
+LIB.RegisterEvent('LOOT_ITEM.MY_EXAMTIP', OnLoot)
 end

@@ -50,8 +50,8 @@ local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_
         ...
     }
 ]]
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_ChatMonitor/lang/')
-if not MY.AssertVersion('MY_ChatMonitor', _L['MY_ChatMonitor'], 0x2011800) then
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_ChatMonitor/lang/')
+if not LIB.AssertVersion('MY_ChatMonitor', _L['MY_ChatMonitor'], 0x2011800) then
 	return
 end
 local D = {}
@@ -94,9 +94,9 @@ _C.bInited = false
 _C.ui = nil
 _C.uiBoard = nil
 _C.szLuaData = 'config/chatmonitor.jx3dat'
-do local SZ_OLD_PATH = MY.FormatPath('config/MY_CHATMONITOR/cfg_$lang.jx3dat')
+do local SZ_OLD_PATH = LIB.FormatPath('config/MY_CHATMONITOR/cfg_$lang.jx3dat')
     if IsLocalFileExist(SZ_OLD_PATH) then
-        CPath.Move(SZ_OLD_PATH, MY.FormatPath({_C.szLuaData, PATH_TYPE.GLOBAL}))
+        CPath.Move(SZ_OLD_PATH, LIB.FormatPath({_C.szLuaData, PATH_TYPE.GLOBAL}))
     end
 end
 _C.tChannelGroups = {
@@ -140,27 +140,27 @@ _C.nLastLoadDataTime = -1000000
 function D.SaveData()
     local TYPE = MY_ChatMonitor.bDistinctServer
         and PATH_TYPE.SERVER or PATH_TYPE.ROLE
-    MY.SaveLUAData({DATA_FILE, TYPE}, {list = RECORD_LIST, hash = RECORD_HASH})
+    LIB.SaveLUAData({DATA_FILE, TYPE}, {list = RECORD_LIST, hash = RECORD_HASH})
 end
-MY.RegisterExit(D.SaveData)
+LIB.RegisterExit(D.SaveData)
 
 function D.LoadData()
     local data = MY_ChatMonitor.bDistinctServer
-        and (MY.LoadLUAData({DATA_FILE, PATH_TYPE.SERVER}) or {})
-        or (MY.LoadLUAData({DATA_FILE, PATH_TYPE.ROLE}) or {})
+        and (LIB.LoadLUAData({DATA_FILE, PATH_TYPE.SERVER}) or {})
+        or (LIB.LoadLUAData({DATA_FILE, PATH_TYPE.ROLE}) or {})
     RECORD_LIST = data.list or {}
     RECORD_HASH = data.hash or {}
 end
-MY.RegisterInit(D.LoadData)
+LIB.RegisterInit(D.LoadData)
 
 function D.GetHTML(rec)
     -- render link event
-    local html = MY.RenderChatLink(rec.html)
+    local html = LIB.RenderChatLink(rec.html)
     -- render player name color
     if MY_Farbnamen and MY_Farbnamen.Render then
         html = MY_Farbnamen.Render(html)
     end
-    html = MY.GetTimeLinkText({
+    html = LIB.GetTimeLinkText({
         r = rec.r, g = rec.g, b = rec.b,
         f = rec.font, s = MY_ChatMonitor.szTimestrap,
     }, rec.time) .. html
@@ -168,10 +168,10 @@ function D.GetHTML(rec)
 end
 
 function D.OnNotifyCB()
-    MY.ShowPanel()
-    MY.FocusPanel()
-    MY.SwitchTab('MY_ChatMonitor')
-    MY.DismissNotify('MY_ChatMonitor')
+    LIB.ShowPanel()
+    LIB.FocusPanel()
+    LIB.SwitchTab('MY_ChatMonitor')
+    LIB.DismissNotify('MY_ChatMonitor')
 end
 
 -- 插入聊天内容时监控聊天信息
@@ -189,7 +189,7 @@ _C.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel)
     if bRich then
         rec.html = szMsg
         -- 格式化消息
-        local tMsgContent = MY.FormatChatContent(szMsg)
+        local tMsgContent = LIB.FormatChatContent(szMsg)
         -- 检测消息是否是插件自己产生的
         if tMsgContent[1].type == 'text' and tMsgContent[1].displayText == '' then
             return
@@ -239,7 +239,7 @@ _C.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel)
             return
         end
     else -- normal
-        if not MY.StringSimpleMatch(rec.text, MY_ChatMonitor.szKeyWords) then
+        if not LIB.StringSimpleMatch(rec.text, MY_ChatMonitor.szKeyWords) then
             return
         end
     end
@@ -268,12 +268,12 @@ _C.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel)
             _C.uiBoard:scroll(100)
         end
     end
-    MY.CreateNotify({
+    LIB.CreateNotify({
         szKey = 'MY_ChatMonitor',
         szMsg = html,
         fnAction = D.OnNotifyCB,
         bPlaySound = MY_ChatMonitor.bPlaySound,
-        szSound = MY.GetAddonInfo().szRoot .. 'MY_ChatMonitor/audio/MsgArrive.ogg',
+        szSound = LIB.GetAddonInfo().szRoot .. 'MY_ChatMonitor/audio/MsgArrive.ogg',
         szCustomSound = 'MsgArrive.ogg',
         bPopupPreview = MY_ChatMonitor.bShowPreview,
     })
@@ -316,7 +316,7 @@ _C.OnPanelActive = function(wnd)
         onchange = function(szText) MY_ChatMonitor.szKeyWords = szText end,
         onfocus = function(self)
             local source = {}
-            for _, szOpt in ipairs(MY.LoadLUAData({_C.szLuaData, PATH_TYPE.GLOBAL}) or {}) do
+            for _, szOpt in ipairs(LIB.LoadLUAData({_C.szLuaData, PATH_TYPE.GLOBAL}) or {}) do
                 if type(szOpt) == 'string' then
                     table.insert(source, szOpt)
                 end
@@ -328,7 +328,7 @@ _C.OnPanelActive = function(wnd)
                 UI(this):autocomplete('close')
             else
                 local source = {}
-                for _, szOpt in ipairs(MY.LoadLUAData({_C.szLuaData, PATH_TYPE.GLOBAL}) or {}) do
+                for _, szOpt in ipairs(LIB.LoadLUAData({_C.szLuaData, PATH_TYPE.GLOBAL}) or {}) do
                     if type(szOpt) == 'string' then
                         table.insert(source, szOpt)
                     end
@@ -348,12 +348,12 @@ _C.OnPanelActive = function(wnd)
                         GetUserInput('', function(szVal)
                             szVal = (string.gsub(szVal, '^%s*(.-)%s*$', '%1'))
                             if szVal~='' then
-                                local t = MY.LoadLUAData({_C.szLuaData, PATH_TYPE.GLOBAL}) or {}
+                                local t = LIB.LoadLUAData({_C.szLuaData, PATH_TYPE.GLOBAL}) or {}
                                 for i = #t, 1, -1 do
                                     if t[i] == szVal then return end
                                 end
                                 table.insert(t, szVal)
-                                MY.SaveLUAData({_C.szLuaData, PATH_TYPE.GLOBAL}, t)
+                                LIB.SaveLUAData({_C.szLuaData, PATH_TYPE.GLOBAL}, t)
                             end
                         end, function() end, function() end, nil, UI(wnd):text() )
                     end })
@@ -361,13 +361,13 @@ _C.OnPanelActive = function(wnd)
             },
             {
                 'option', 'beforeDelete', function(szOption, fnDoDelete, option)
-                    local t = MY.LoadLUAData({_C.szLuaData, PATH_TYPE.GLOBAL}) or {}
+                    local t = LIB.LoadLUAData({_C.szLuaData, PATH_TYPE.GLOBAL}) or {}
                     for i = #t, 1, -1 do
                         if t[i] == szOption then
                             table.remove(t, i)
                         end
                     end
-                    MY.SaveLUAData({_C.szLuaData, PATH_TYPE.GLOBAL}, t)
+                    LIB.SaveLUAData({_C.szLuaData, PATH_TYPE.GLOBAL}, t)
                 end,
             },
         },
@@ -392,7 +392,7 @@ _C.OnPanelActive = function(wnd)
         onhover = function(bIn) this:SetAlpha((bIn and 255) or 200) end,
         onclick = function()
             PopupMenu((function()
-                local t = MY.GetChatChannelMenu(function(szChannel)
+                local t = LIB.GetChatChannelMenu(function(szChannel)
                     MY_ChatMonitor.tChannels[szChannel] = not MY_ChatMonitor.tChannels[szChannel]
                     _C.RegisterMsgMonitor()
                 end, MY_ChatMonitor.tChannels)
@@ -426,7 +426,7 @@ _C.OnPanelActive = function(wnd)
                     fnAction = function()
                         GetUserInputNumber(MY_ChatMonitor.nMaxRecord, 1000, nil, function(val)
                             MY_ChatMonitor.nMaxRecord = val or MY_ChatMonitor.nMaxRecord
-                        end, nil, function() return not MY.IsPanelVisible() end)
+                        end, nil, function() return not LIB.IsPanelVisible() end)
                     end,
                 })
                 table.insert(t,{
@@ -475,7 +475,7 @@ _C.OnPanelActive = function(wnd)
                         fnAction = function()
                             MY_ChatMonitor.bDistinctServer = not MY_ChatMonitor.bDistinctServer
                             D.LoadData()
-                            MY.SwitchTab('MY_ChatMonitor', true)
+                            LIB.SwitchTab('MY_ChatMonitor', true)
                         end,
                         bCheck = true,
                         bChecked = MY_ChatMonitor.bDistinctServer
@@ -491,7 +491,7 @@ _C.OnPanelActive = function(wnd)
                         bChecked = MY_ChatMonitor.bBlockWords, {
                             szOption = _L['edit'],
                             fnAction = function()
-                                MY.SwitchTab('MY_ChatBlock')
+                                LIB.SwitchTab('MY_ChatBlock')
                             end,
                         }
                     })
@@ -564,7 +564,7 @@ _C.Init = function()
     _C.bInited = true
     _C.RegisterMsgMonitor()
 end
-MY.RegisterInit('MY_CHATMONITOR', _C.Init)
+LIB.RegisterInit('MY_CHATMONITOR', _C.Init)
 
 _C.RegisterMsgMonitor = function()
     local t = {}
@@ -575,19 +575,19 @@ _C.RegisterMsgMonitor = function()
     RegisterMsgMonitor(_C.OnMsgArrive, t)
 end
 
-MY.RegisterHotKey('MY_ChatMonitor_Hotkey', _L['chat monitor'],
+LIB.RegisterHotKey('MY_ChatMonitor_Hotkey', _L['chat monitor'],
     function()
         if MY_ChatMonitor.bCapture then
-            UI(MY.GetFrame()):find('#Button_ChatMonitor_Switcher'):text(_L['start'])
+            UI(LIB.GetFrame()):find('#Button_ChatMonitor_Switcher'):text(_L['start'])
             MY_ChatMonitor.bCapture = false
         else
-            UI(MY.GetFrame()):find('#Button_ChatMonitor_Switcher'):text(_L['stop'])
+            UI(LIB.GetFrame()):find('#Button_ChatMonitor_Switcher'):text(_L['stop'])
             MY_ChatMonitor.bCapture = true
         end
     end
 , nil)
 
-MY.RegisterPanel('MY_ChatMonitor', _L['chat monitor'], _L['Chat'], 'UI/Image/Minimap/Minimap.UITex|197', {
+LIB.RegisterPanel('MY_ChatMonitor', _L['chat monitor'], _L['Chat'], 'UI/Image/Minimap/Minimap.UITex|197', {
     OnPanelActive = _C.OnPanelActive,
     OnPanelDeactive = function()
         _C.uiBoard = nil

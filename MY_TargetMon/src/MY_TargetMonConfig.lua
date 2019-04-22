@@ -36,15 +36,15 @@ local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.Is
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
 
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_TargetMon/lang/')
-if not MY.AssertVersion('MY_TargetMon', _L['MY_TargetMon'], 0x2011800) then
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_TargetMon/lang/')
+if not LIB.AssertVersion('MY_TargetMon', _L['MY_TargetMon'], 0x2011800) then
 	return
 end
 local C, D = { PASSPHRASE = {213, 166, 13}, PASSPHRASE_EMBEDDED = {211, 98, 5} }, {}
-local INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_TargetMon/ui/MY_TargetMon.ini'
+local INI_PATH = LIB.GetAddonInfo().szRoot .. 'MY_TargetMon/ui/MY_TargetMon.ini'
 local ROLE_CONFIG_FILE = {'config/my_targetmon.jx3dat', PATH_TYPE.ROLE}
-local TEMPLATE_CONFIG_FILE = MY.GetAddonInfo().szRoot .. 'MY_TargetMon/data/template/$lang.jx3dat'
-local EMBEDDED_CONFIG_ROOT = MY.GetAddonInfo().szRoot .. 'MY_Resource/data/targetmon/'
+local TEMPLATE_CONFIG_FILE = LIB.GetAddonInfo().szRoot .. 'MY_TargetMon/data/template/$lang.jx3dat'
+local EMBEDDED_CONFIG_ROOT = LIB.GetAddonInfo().szRoot .. 'MY_Resource/data/targetmon/'
 local CUSTOM_DEFAULT_CONFIG_FILE = {'config/my_targetmon.jx3dat', PATH_TYPE.GLOBAL}
 local TARGET_TYPE_LIST = {
 	'CLIENT_PLAYER'  ,
@@ -63,7 +63,7 @@ local TARGET_TYPE_LIST = {
 	'TEAM_MARK_FAN'  ,
 }
 local CONFIG, CONFIG_CHANGED, CONFIG_BUFF_TARGET_LIST, CONFIG_SKILL_TARGET_LIST
-local CONFIG_TEMPLATE = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_TargetMon/data/template/$lang.jx3dat')
+local CONFIG_TEMPLATE = LIB.LoadLUAData(LIB.GetAddonInfo().szRoot .. 'MY_TargetMon/data/template/$lang.jx3dat')
 local MON_TEMPLATE = CONFIG_TEMPLATE.monitors.__CHILD_TEMPLATE__
 local MONID_TEMPLATE = CONFIG_TEMPLATE.monitors.__CHILD_TEMPLATE__.__VALUE__.ids.__CHILD_TEMPLATE__
 local MONLEVEL_TEMPLATE = CONFIG_TEMPLATE.monitors.__CHILD_TEMPLATE__.__VALUE__.ids.__CHILD_TEMPLATE__.levels.__CHILD_TEMPLATE__
@@ -80,24 +80,24 @@ function D.GetTargetTypeList(szType)
 end
 
 function D.GeneUUID()
-	return MY.GetUUID():gsub('-', '')
+	return LIB.GetUUID():gsub('-', '')
 end
 
 -- 格式化监控项数据
 function D.FormatConfig(config)
-	return MY.FormatDataStructure(config, CONFIG_TEMPLATE)
+	return LIB.FormatDataStructure(config, CONFIG_TEMPLATE)
 end
 
 function D.LoadEmbeddedConfig()
 	if not IsString(C.PASSPHRASE) or not IsString(C.PASSPHRASE_EMBEDDED) then
-		return MY.Debug({'Passphrase cannot be empty!'}, 'MY_TargetMonConfig', DEBUG_LEVEL.ERROR)
+		return LIB.Debug({'Passphrase cannot be empty!'}, 'MY_TargetMonConfig', DEBUG_LEVEL.ERROR)
 	end
 	do -- auto generate embedded data
 		local DAT_ROOT = 'MY_Resource/data/targetmon/'
-		local SRC_ROOT = MY.GetAddonInfo().szRoot .. '!src-dist/dat/' .. DAT_ROOT
+		local SRC_ROOT = LIB.GetAddonInfo().szRoot .. '!src-dist/dat/' .. DAT_ROOT
 		local DST_ROOT = EMBEDDED_CONFIG_ROOT
 		for _, szFile in ipairs(CPath.GetFileList(SRC_ROOT)) do
-			MY.Sysmsg(_L['Encrypt and compressing: '] .. DAT_ROOT .. szFile)
+			LIB.Sysmsg(_L['Encrypt and compressing: '] .. DAT_ROOT .. szFile)
 			local data = LoadDataFromFile(SRC_ROOT .. szFile)
 			if IsEncodedData(data) then
 				data = DecodeData(data)
@@ -108,10 +108,10 @@ function D.LoadEmbeddedConfig()
 	end
 	local aEmbedded, tEmbedded, tEmbeddedMon = {}, {}, {}
 	for _, szFile in ipairs(CPath.GetFileList(EMBEDDED_CONFIG_ROOT)) do
-		if wfind(szFile, MY.GetLang() .. '.jx3dat') then
+		if wfind(szFile, LIB.GetLang() .. '.jx3dat') then
 			for _, config in ipairs(
-				MY.LoadLUAData(EMBEDDED_CONFIG_ROOT .. szFile, { passphrase = C.PASSPHRASE_EMBEDDED })
-				or MY.LoadLUAData(EMBEDDED_CONFIG_ROOT .. szFile)
+				LIB.LoadLUAData(EMBEDDED_CONFIG_ROOT .. szFile, { passphrase = C.PASSPHRASE_EMBEDDED })
+				or LIB.LoadLUAData(EMBEDDED_CONFIG_ROOT .. szFile)
 				or {}
 			) do
 				if config and config.uuid and config.monitors then
@@ -137,7 +137,7 @@ function D.LoadEmbeddedConfig()
 	EMBEDDED_CONFIG_LIST, EMBEDDED_CONFIG_HASH, EMBEDDED_MONITOR_HASH = aEmbedded, tEmbedded, tEmbeddedMon
 end
 
-local SHIELDED_UUID = MY.ArrayToObject({
+local SHIELDED_UUID = LIB.ArrayToObject({
 	'00000223B5B291D0',
 	'00000223B5FD2010',
 	'00mu02rong04youMB',
@@ -156,7 +156,7 @@ local SHIELDED_UUID = MY.ArrayToObject({
 -- 通过内嵌数据将监控项转为Patch
 function D.PatchToConfig(patch)
 	-- 处理用户删除的内建数据和不合法的数据
-	if patch.delete or not patch.uuid or (MY.IsShieldedVersion() and not IsDebugClient() and SHIELDED_UUID[patch.uuid]) then
+	if patch.delete or not patch.uuid or (LIB.IsShieldedVersion() and not IsDebugClient() and SHIELDED_UUID[patch.uuid]) then
 		return
 	end
 	-- 合并未修改的内嵌数据
@@ -316,10 +316,10 @@ end
 function D.LoadConfig(bDefault, bOriginal)
 	local aPatch
 	if not bDefault then
-		aPatch = MY.LoadLUAData(ROLE_CONFIG_FILE, { passphrase = C.PASSPHRASE }) or MY.LoadLUAData(ROLE_CONFIG_FILE)
+		aPatch = LIB.LoadLUAData(ROLE_CONFIG_FILE, { passphrase = C.PASSPHRASE }) or LIB.LoadLUAData(ROLE_CONFIG_FILE)
 	end
 	if not aPatch and not bOriginal then
-		aPatch = MY.LoadLUAData(CUSTOM_DEFAULT_CONFIG_FILE, { passphrase = C.PASSPHRASE }) or MY.LoadLUAData(CUSTOM_DEFAULT_CONFIG_FILE)
+		aPatch = LIB.LoadLUAData(CUSTOM_DEFAULT_CONFIG_FILE, { passphrase = C.PASSPHRASE }) or LIB.LoadLUAData(CUSTOM_DEFAULT_CONFIG_FILE)
 	end
 	if not aPatch then
 		aPatch = {}
@@ -346,7 +346,7 @@ function D.LoadConfig(bDefault, bOriginal)
 	end
 	if #EMBEDDED_CONFIG_LIST == 0 then
 		OutputMessage('MSG_ANNOUNCE_RED', _L['Empty embedded config detected, did you forgot to load MY_Resource plugin?'])
-		MY.Sysmsg(_L['Empty embedded config detected, please logout and check if MY_Resource has been downloaded and loaded.'])
+		LIB.Sysmsg(_L['Empty embedded config detected, please logout and check if MY_Resource has been downloaded and loaded.'])
 	end
 	CONFIG = aConfig
 	CONFIG_CHANGED = bDefault and true or false
@@ -373,9 +373,9 @@ function D.SaveConfig(bDefault)
 		end
 	end
 	if bDefault then
-		MY.SaveLUAData(CUSTOM_DEFAULT_CONFIG_FILE, aPatch, { passphrase = C.PASSPHRASE })
+		LIB.SaveLUAData(CUSTOM_DEFAULT_CONFIG_FILE, aPatch, { passphrase = C.PASSPHRASE })
 	else
-		MY.SaveLUAData(ROLE_CONFIG_FILE, aPatch, { passphrase = C.PASSPHRASE })
+		LIB.SaveLUAData(ROLE_CONFIG_FILE, aPatch, { passphrase = C.PASSPHRASE })
 		CONFIG_CHANGED = false
 	end
 end
@@ -421,7 +421,7 @@ function D.ExportPatches(aUUID, bNoEmbedded)
 end
 
 function D.ImportPatchFile(oFilePath)
-	local aPatch = MY.LoadLUAData(oFilePath, { passphrase = C.PASSPHRASE }) or MY.LoadLUAData(oFilePath)
+	local aPatch = LIB.LoadLUAData(oFilePath, { passphrase = C.PASSPHRASE }) or LIB.LoadLUAData(oFilePath)
 	if not aPatch then
 		return
 	end
@@ -439,7 +439,7 @@ function D.ExportPatchFile(oFilePath, aUUID, szIndent, bAsEmbedded)
 		szPassphrase = C.PASSPHRASE
 	end
 	local aPatch = D.ExportPatches(aUUID, bAsEmbedded)
-	MY.SaveLUAData(oFilePath, aPatch, { indent = szIndent, crc = not szIndent, passphrase = szPassphrase })
+	LIB.SaveLUAData(oFilePath, aPatch, { indent = szIndent, crc = not szIndent, passphrase = szPassphrase })
 end
 
 do
@@ -468,7 +468,7 @@ local function onInit()
 	D.LoadEmbeddedConfig()
 	D.LoadConfig()
 end
-MY.RegisterInit('MY_TargetMonConfig', onInit)
+LIB.RegisterInit('MY_TargetMonConfig', onInit)
 
 local function onExit()
 	if not D.HasConfigChanged() then
@@ -476,7 +476,7 @@ local function onExit()
 	end
 	D.SaveConfig()
 end
-MY.RegisterExit('MY_TargetMonConfig', onExit)
+LIB.RegisterExit('MY_TargetMonConfig', onExit)
 end
 
 function D.GetConfig()
@@ -500,7 +500,7 @@ end
 -- 监控设置条操作
 ------------------------------------------------------------------------------------------------------
 function D.CreateConfig()
-	local config = MY.FormatDataStructure({
+	local config = LIB.FormatDataStructure({
 		uuid = D.GeneUUID(),
 	}, CONFIG_TEMPLATE)
 	insert(CONFIG, config)
@@ -561,7 +561,7 @@ end
 -- 监控内容数据项操作
 ------------------------------------------------------------------------------------------------------
 function D.CreateMonitor(config, name)
-	local mon = MY.FormatDataStructure({
+	local mon = LIB.FormatDataStructure({
 		name = name,
 		uuid = D.GeneUUID(),
 	}, MON_TEMPLATE)
@@ -609,7 +609,7 @@ end
 -- 监控内容数据项ID列表
 ------------------------------------------------------------------------------------------------------
 function D.CreateMonitorId(mon, dwID)
-	local monid = MY.FormatDataStructure(nil, MONID_TEMPLATE)
+	local monid = LIB.FormatDataStructure(nil, MONID_TEMPLATE)
 	mon.ids[dwID] = monid
 	D.MarkConfigChanged()
 	return monid
@@ -631,7 +631,7 @@ end
 -- 监控内容数据项ID等级列表
 ------------------------------------------------------------------------------------------------------
 function D.CreateMonitorLevel(monid, nLevel)
-	local monlevel = MY.FormatDataStructure(nil, MONLEVEL_TEMPLATE)
+	local monlevel = LIB.FormatDataStructure(nil, MONLEVEL_TEMPLATE)
 	monid.levels[nLevel] = monlevel
 	D.MarkConfigChanged()
 	return monlevel
@@ -683,5 +683,5 @@ local settings = {
 		},
 	},
 }
-MY_TargetMonConfig = MY.GeneGlobalNS(settings)
+MY_TargetMonConfig = LIB.GeneGlobalNS(settings)
 end

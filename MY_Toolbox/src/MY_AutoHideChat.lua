@@ -6,6 +6,35 @@
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
 --------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------
+-- these global functions are accessed all the time by the event handler
+-- so caching them is worth the effort
+-------------------------------------------------------------------------------------------------------------
+local setmetatable = setmetatable
+local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
+local sub, len, format, rep = string.sub, string.len, string.format, string.rep
+local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
+local type, tonumber, tostring = type, tonumber, tostring
+local huge, pi, random, abs = math.huge, math.pi, math.random, math.abs
+local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
+local pow, sqrt, sin, cos, tan = math.pow, math.sqrt, math.sin, math.cos, math.tan
+local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
+local pack, unpack = table.pack or function(...) return {...} end, table.unpack or unpack
+-- jx3 apis caching
+local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
+local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
+local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
+local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local LIB, UI, DEBUG_LEVEL, PATH_TYPE = MY, MY.UI, MY.DEBUG_LEVEL, MY.PATH_TYPE
+local var2str, str2var, clone, empty, ipairs_r = LIB.var2str, LIB.str2var, LIB.clone, LIB.empty, LIB.ipairs_r
+local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
+local GetPatch, ApplyPatch = LIB.GetPatch, LIB.ApplyPatch
+local Get, Set, RandomChild, GetTraceback = LIB.Get, LIB.Set, LIB.RandomChild, LIB.GetTraceback
+local IsArray, IsDictionary, IsEquals = LIB.IsArray, LIB.IsDictionary, LIB.IsEquals
+local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsNumber, LIB.IsFunction
+local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
+local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
+-------------------------------------------------------------------------------------------------------------
 local STATE = {
     SHOW    = 1, -- 已显示
     HIDE    = 2, -- 已隐藏
@@ -13,7 +42,7 @@ local STATE = {
     HIDDING = 4, -- 渐变隐藏中
 }
 local m_nState = STATE.SHOW
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot..'MY_Toolbox/lang/')
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot..'MY_Toolbox/lang/')
 local _Cache = {}
 MY_AutoHideChat = {}
 MY_AutoHideChat.bAutoHideChatPanel = false
@@ -47,7 +76,7 @@ MY_AutoHideChat.ShowChatPanel = function(nShowFrame, nDelayFrame, callback)
         end
     elseif m_nState == STATE.HIDDING then
         -- unregister hide animate
-        MY.BreatheCall('MY_AutoHideChat_Hide', false)
+        LIB.BreatheCall('MY_AutoHideChat_Hide', false)
     end
     m_nState = STATE.SHOWING
 
@@ -55,7 +84,7 @@ MY_AutoHideChat.ShowChatPanel = function(nShowFrame, nDelayFrame, callback)
     local nStartAlpha = Station.Lookup('Lowest1/ChatTitleBG'):GetAlpha()
     local nStartFrame = GetLogicFrameCount()
     -- register animate breathe call
-    MY.BreatheCall('MY_AutoHideChat_Show', function()
+    LIB.BreatheCall('MY_AutoHideChat_Show', function()
         local nFrame = GetLogicFrameCount()
         if nFrame - nDelayFrame < nStartFrame then
             _Cache.fAhBgAlpha = MY_AutoHideChat.GetBgAlpha()
@@ -101,7 +130,7 @@ MY_AutoHideChat.HideChatPanel = function(nHideFrame, nDelayFrame, callback)
         return
     elseif m_nState == STATE.HIDDING then
         -- unregister hide animate
-        MY.BreatheCall('MY_AutoHideChat_Hide', false)
+        LIB.BreatheCall('MY_AutoHideChat_Hide', false)
     end
     m_nState = STATE.HIDDING
 
@@ -109,7 +138,7 @@ MY_AutoHideChat.HideChatPanel = function(nHideFrame, nDelayFrame, callback)
     local nStartAlpha = Station.Lookup('Lowest1/ChatTitleBG'):GetAlpha()
     local nStartFrame = GetLogicFrameCount()
     -- register animate breathe call
-    MY.BreatheCall('MY_AutoHideChat_Hide', function()
+    LIB.BreatheCall('MY_AutoHideChat_Hide', function()
         local nFrame = GetLogicFrameCount()
         if nFrame - nDelayFrame < nStartFrame then
             _Cache.fAhBgAlpha = MY_AutoHideChat.GetBgAlpha()
@@ -162,7 +191,7 @@ MY_AutoHideChat.ApplyConfig = function()
             _Cache.bAhAnimate = _Cache.bAhAnimate or false
         end
         -- hook chat panel as event listener
-        MY.HookChatPanel('AFTER.MY_AutoHideChat', function(h)
+        LIB.HookChatPanel('AFTER.MY_AutoHideChat', function(h)
             -- if input box get focus then return
             local focus = Station.GetFocusWindow()
             if focus and focus:GetTreePath() == 'Lowest2/EditBox/Edit_Input/' then
@@ -214,9 +243,9 @@ MY_AutoHideChat.ApplyConfig = function()
             hEditInput.OnKillFocus = nil
         end
         hEditInput._MY_T_AHCP_OnKillFocus = nil
-        MY.HookChatPanel('AFTER.MY_AutoHideChat', false)
+        LIB.HookChatPanel('AFTER.MY_AutoHideChat', false)
 
         MY_AutoHideChat.ShowChatPanel()
     end
 end
-MY.RegisterInit('MY_AUTOHIDECHAT', MY_AutoHideChat.ApplyConfig)
+LIB.RegisterInit('MY_AUTOHIDECHAT', MY_AutoHideChat.ApplyConfig)

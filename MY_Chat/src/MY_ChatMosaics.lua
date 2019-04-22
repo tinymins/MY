@@ -35,8 +35,8 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Chat/lang/')
-if not MY.AssertVersion('MY_ChatMosaics', _L['MY_ChatMosaics'], 0x2011800) then
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_Chat/lang/')
+if not LIB.AssertVersion('MY_ChatMosaics', _L['MY_ChatMosaics'], 0x2011800) then
 	return
 end
 MY_ChatMosaics = {}
@@ -60,11 +60,11 @@ MY_ChatMosaics.ResetMosaics = function()
 	_C.bForceUpdate = nil
 	-- hook chat panel
 	if MY_ChatMosaics.bEnabled then
-		MY.HookChatPanel('AFTER.MY_ChatMosaics', function(h, nIndex)
+		LIB.HookChatPanel('AFTER.MY_ChatMosaics', function(h, nIndex)
 			_C.Mosaics(h, nIndex)
 		end)
 	else
-		MY.HookChatPanel('AFTER.MY_ChatMosaics', false)
+		LIB.HookChatPanel('AFTER.MY_ChatMosaics', false)
 	end
 	FireUIEvent('ON_MY_MOSAICS_RESET')
 end
@@ -124,7 +124,7 @@ _C.Mosaics = function(h, nPos, nLen)
 end
 MY_ChatMosaics.Mosaics = _C.Mosaics
 
-MY.RegisterPanel('MY_Chat_ChatMosaics', _L['chat mosaics'], _L['Chat'],
+LIB.RegisterPanel('MY_Chat_ChatMosaics', _L['chat mosaics'], _L['Chat'],
 'ui/Image/UICommon/yirong3.UITex|50', {
 OnPanelActive = function(wnd)
 	local ui = UI(wnd)
@@ -236,7 +236,7 @@ OnPanelActive = function(wnd)
 		end)(),
 		onchange = function(szText)
 			MY_ChatMosaics.tIgnoreNames = {}
-			for _, szName in ipairs(MY.SplitString(szText, ',')) do
+			for _, szName in ipairs(LIB.SplitString(szText, ',')) do
 				MY_ChatMosaics.tIgnoreNames[szName] = true
 			end
 			MY_ChatMosaics.ResetMosaics()

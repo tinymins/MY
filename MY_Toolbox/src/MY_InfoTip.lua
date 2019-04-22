@@ -35,8 +35,8 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Toolbox/lang/')
-if not MY.AssertVersion('MY_InfoTip', _L['MY_InfoTip'], 0x2011800) then
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_Toolbox/lang/')
+if not LIB.AssertVersion('MY_InfoTip', _L['MY_InfoTip'], 0x2011800) then
 	return
 end
 local _Cache = {
@@ -118,9 +118,9 @@ MY_InfoTip.Cache = {
     Distance  = { -- 目标距离
         formatString = '', title = _L['target distance'], prefix = _L['Distance: '], content = _L['%.1f Foot'],
         GetContent = function()
-            local p, s = MY.GetObject(MY.GetTarget()), _L['No Target']
+            local p, s = LIB.GetObject(LIB.GetTarget()), _L['No Target']
             if p then
-                s = string.format(MY_InfoTip.Cache.Distance.formatString, MY.GetDistance(p))
+                s = string.format(MY_InfoTip.Cache.Distance.formatString, LIB.GetDistance(p))
             end
             return s
         end
@@ -135,8 +135,8 @@ MY_InfoTip.Cache = {
     FightTime = { -- 战斗计时
         formatString = '', title = _L['fight clock'], prefix = _L['Fight Clock: '], content = '',
         GetContent = function()
-            if MY.GetFightUUID() or MY.GetLastFightUUID() then
-                return MY_InfoTip.Cache.FightTime.formatString .. MY.GetFightTime('H:mm:ss')
+            if LIB.GetFightUUID() or LIB.GetLastFightUUID() then
+                return MY_InfoTip.Cache.FightTime.formatString .. LIB.GetFightTime('H:mm:ss')
             else
                 return _L['Never Fight']
             end
@@ -185,14 +185,14 @@ MY_InfoTip.Cache = {
 }
 local _SZ_CONFIG_FILE_ = {'config/infotip.jx3dat', PATH_TYPE.ROLE}
 local _Cache = {}
-local SaveConfig = function() MY.SaveLUAData(_SZ_CONFIG_FILE_, MY_InfoTip.Config) end
+local SaveConfig = function() LIB.SaveLUAData(_SZ_CONFIG_FILE_, MY_InfoTip.Config) end
 local LoadConfig = function()
-    local szOrgFile = MY.GetLUADataPath('config/MY_INFO_TIP/$uid.$lang.jx3dat')
-    local szFilePath = MY.GetLUADataPath(_SZ_CONFIG_FILE_)
+    local szOrgFile = LIB.GetLUADataPath('config/MY_INFO_TIP/$uid.$lang.jx3dat')
+    local szFilePath = LIB.GetLUADataPath(_SZ_CONFIG_FILE_)
     if IsLocalFileExist(szOrgFile) then
         CPath.Move(szOrgFile, szFilePath)
     end
-    local config = MY.LoadLUAData(szFilePath)
+    local config = LIB.LoadLUAData(szFilePath)
     if config then
         if not MY_InfoTip.Config then
             MY_InfoTip.Config = {}
@@ -202,7 +202,7 @@ local LoadConfig = function()
         end
     end
 end
-MY.RegisterEvent('CUSTOM_UI_MODE_SET_DEFAULT', function()
+LIB.RegisterEvent('CUSTOM_UI_MODE_SET_DEFAULT', function()
     for k, v in pairs(Config_Default) do
         MY_InfoTip.Config[k].anchor = v.anchor
     end
@@ -249,13 +249,13 @@ MY_InfoTip.Reload = function()
     SaveConfig()
 end
 -- 注册INIT事件
-MY.RegisterInit('MY_INFOTIP', function()
+LIB.RegisterInit('MY_INFOTIP', function()
     LoadConfig()
     MY_InfoTip.Reload()
 end)
 
 
-MY.RegisterPanel( 'MY_InfoTip', _L['infotip'], _L['System'], 'ui/Image/UICommon/ActivePopularize2.UITex|22', { OnPanelActive = function(wnd)
+LIB.RegisterPanel( 'MY_InfoTip', _L['infotip'], _L['System'], 'ui/Image/UICommon/ActivePopularize2.UITex|22', { OnPanelActive = function(wnd)
     local ui = UI(wnd)
     local w, h = ui:size()
     local x, y = 50, 20

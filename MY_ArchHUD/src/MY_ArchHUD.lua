@@ -35,8 +35,8 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_ArchHUD/lang/')
-if not MY.AssertVersion('MY_ArchHUD', _L['MY_ArchHUD'], 0x2011800) then
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_ArchHUD/lang/')
+if not LIB.AssertVersion('MY_ArchHUD', _L['MY_ArchHUD'], 0x2011800) then
 	return
 end
 local DefaultAnchor = {s = 'CENTER', r = 'CENTER',  x = 0, y = 0}
@@ -46,8 +46,8 @@ MY_ArchHUD.Anchor = clone(DefaultAnchor)
 MY_ArchHUD.bFightShow = true
 MY_ArchHUD.bShowCastingBar = true
 MY_ArchHUD.nAlpha = 60
-local IMG_DIR = MY.GetAddonInfo().szRoot .. 'MY_ArchHUD/img/'
-local INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_ArchHUD/ui/MY_ArchHUD.ini'
+local IMG_DIR = LIB.GetAddonInfo().szRoot .. 'MY_ArchHUD/img/'
+local INI_PATH = LIB.GetAddonInfo().szRoot .. 'MY_ArchHUD/ui/MY_ArchHUD.ini'
 
 RegisterCustomData('MY_ArchHUD.bOn')
 RegisterCustomData('MY_ArchHUD.bFightShow')
@@ -60,7 +60,7 @@ function MY_ArchHUD.Reload()
 		Wnd.OpenWindow(INI_PATH, 'MY_ArchHUD')
 	end
 end
-MY.RegisterInit('MY_ArchHUD', MY_ArchHUD.Reload)
+LIB.RegisterInit('MY_ArchHUD', MY_ArchHUD.Reload)
 
 function MY_ArchHUD.UpdateAnchor(hFrame)
 	hFrame:SetPoint(MY_ArchHUD.Anchor.s, 0, 0, MY_ArchHUD.Anchor.r, MY_ArchHUD.Anchor.x, MY_ArchHUD.Anchor.y)
@@ -387,4 +387,4 @@ function PS.OnPanelActive(wnd)
 		text = _L['origin author: Sulian Yi'],
 	})
 end
-MY.RegisterPanel('MY_ArchHUD', _L['MY_ArchHUD'], _L['General'], 6767, PS)
+LIB.RegisterPanel('MY_ArchHUD', _L['MY_ArchHUD'], _L['General'], 6767, PS)

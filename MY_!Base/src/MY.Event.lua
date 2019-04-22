@@ -35,13 +35,13 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local _L = MY.LoadLangPack()
+local _L = LIB.LoadLangPack()
 ---------------------------------------------------------------------------------------------
 -- 事件注册
 ---------------------------------------------------------------------------------------------
 -- 注册游戏事件监听
--- MY.RegisterEvent(szEvent, fnAction) -- 注册
--- MY.RegisterEvent(szEvent) -- 注销
+-- LIB.RegisterEvent(szEvent, fnAction) -- 注册
+-- LIB.RegisterEvent(szEvent) -- 注销
 -- (string)  szEvent  事件，可在后面加一个点并紧跟一个标识字符串用于防止重复或取消绑定，如 LOADING_END.xxx
 -- (function)fnAction 事件处理函数，arg0 ~ arg9，传入 nil 相当于取消该事件
 --特别注意：当 fnAction 为 nil 并且 szKey 也为 nil 时会取消所有通过本函数注册的事件处理器
@@ -52,16 +52,16 @@ local function EventHandler(szEvent, ...)
 		for k, v in pairs(tEvent) do
 			local res, err = pcall(v, szEvent, ...)
 			if not res then
-				MY.Debug({GetTraceback(err)}, 'OnEvent#' .. szEvent .. '.' .. k, DEBUG_LEVEL.ERROR)
+				LIB.Debug({GetTraceback(err)}, 'OnEvent#' .. szEvent .. '.' .. k, DEBUG_LEVEL.ERROR)
 			end
 		end
 	end
 end
 
-function MY.RegisterEvent(szEvent, fnAction)
+function LIB.RegisterEvent(szEvent, fnAction)
 	if type(szEvent) == 'table' then
 		for _, szEvent in ipairs(szEvent) do
-			MY.RegisterEvent(szEvent, fnAction)
+			LIB.RegisterEvent(szEvent, fnAction)
 		end
 	elseif type(szEvent) == 'string' then
 		local szKey = nil
@@ -98,29 +98,29 @@ local function OnInit()
 	if not INIT_FUNC_LIST then
 		return
 	end
-	MY.CreateDataRoot(PATH_TYPE.ROLE)
-	MY.CreateDataRoot(PATH_TYPE.GLOBAL)
-	MY.CreateDataRoot(PATH_TYPE.SERVER)
+	LIB.CreateDataRoot(PATH_TYPE.ROLE)
+	LIB.CreateDataRoot(PATH_TYPE.GLOBAL)
+	LIB.CreateDataRoot(PATH_TYPE.SERVER)
 
 	for szKey, fnAction in pairs(INIT_FUNC_LIST) do
 		local nStartTick = GetTickCount()
 		local status, err = pcall(fnAction)
 		if not status then
-			MY.Debug({GetTraceback(err)}, 'INIT_FUNC_LIST#' .. szKey)
+			LIB.Debug({GetTraceback(err)}, 'INIT_FUNC_LIST#' .. szKey)
 		end
-		MY.Debug({_L('Initial function <%s> executed in %dms.', szKey, GetTickCount() - nStartTick)}, _L['PMTool'], DEBUG_LEVEL.LOG)
+		LIB.Debug({_L('Initial function <%s> executed in %dms.', szKey, GetTickCount() - nStartTick)}, _L['PMTool'], DEBUG_LEVEL.LOG)
 	end
 	INIT_FUNC_LIST = nil
 	-- 显示欢迎信息
-	MY.Sysmsg({_L('%s, welcome to use mingyi plugins!', GetClientPlayer().szName) .. ' v' .. MY.GetVersion() .. ' Build ' .. MY.GetAddonInfo().szBuild})
+	LIB.Sysmsg({_L('%s, welcome to use mingyi plugins!', GetClientPlayer().szName) .. ' v' .. LIB.GetVersion() .. ' Build ' .. LIB.GetAddonInfo().szBuild})
 end
-MY.RegisterEvent('LOADING_ENDING', OnInit) -- 不能用FIRST_LOADING_END 不然注册快捷键就全跪了
+LIB.RegisterEvent('LOADING_ENDING', OnInit) -- 不能用FIRST_LOADING_END 不然注册快捷键就全跪了
 
 -- 注册初始化函数
 -- RegisterInit(string id, function fn) -- 注册
 -- RegisterInit(function fn)            -- 注册
 -- RegisterInit(string id)              -- 注销
-function MY.RegisterInit(arg1, arg2)
+function LIB.RegisterInit(arg1, arg2)
 	local szKey, fnAction
 	if type(arg1) == 'string' then
 		szKey = arg1
@@ -139,7 +139,7 @@ function MY.RegisterInit(arg1, arg2)
 	end
 end
 
-function MY.IsInitialized()
+function LIB.IsInitialized()
 	return not INIT_FUNC_LIST
 end
 end
@@ -150,21 +150,21 @@ local function OnExit()
 		local nStartTick = GetTickCount()
 		local status, err = pcall(fnAction)
 		if not status then
-			MY.Debug({GetTraceback(err)}, 'EXIT_FUNC_LIST#' .. szKey)
+			LIB.Debug({GetTraceback(err)}, 'EXIT_FUNC_LIST#' .. szKey)
 		end
-		MY.Debug({_L('Exit function <%s> executed in %dms.', szKey, GetTickCount() - nStartTick)}, _L['PMTool'], DEBUG_LEVEL.LOG)
+		LIB.Debug({_L('Exit function <%s> executed in %dms.', szKey, GetTickCount() - nStartTick)}, _L['PMTool'], DEBUG_LEVEL.LOG)
 	end
 	EXIT_FUNC_LIST = nil
 end
-MY.RegisterEvent('GAME_EXIT', OnExit)
-MY.RegisterEvent('PLAYER_EXIT_GAME', OnExit)
-MY.RegisterEvent('RELOAD_UI_ADDON_BEGIN', OnExit)
+LIB.RegisterEvent('GAME_EXIT', OnExit)
+LIB.RegisterEvent('PLAYER_EXIT_GAME', OnExit)
+LIB.RegisterEvent('RELOAD_UI_ADDON_BEGIN', OnExit)
 
 -- 注册游戏结束函数
 -- RegisterExit(string id, function fn) -- 注册
 -- RegisterExit(function fn)            -- 注册
 -- RegisterExit(string id)              -- 注销
-function MY.RegisterExit(arg1, arg2)
+function LIB.RegisterExit(arg1, arg2)
 	local szKey, fnAction
 	if type(arg1) == 'string' then
 		szKey = arg1
@@ -190,19 +190,19 @@ local function OnReload()
 		local nStartTick = GetTickCount()
 		local status, err = pcall(fnAction)
 		if not status then
-			MY.Debug({GetTraceback(err)}, 'RELOAD_FUNC_LIST#' .. szKey)
+			LIB.Debug({GetTraceback(err)}, 'RELOAD_FUNC_LIST#' .. szKey)
 		end
-		MY.Debug({_L('Reload function <%s> executed in %dms.', szKey, GetTickCount() - nStartTick)}, _L['PMTool'], DEBUG_LEVEL.LOG)
+		LIB.Debug({_L('Reload function <%s> executed in %dms.', szKey, GetTickCount() - nStartTick)}, _L['PMTool'], DEBUG_LEVEL.LOG)
 	end
 	RELOAD_FUNC_LIST = nil
 end
-MY.RegisterEvent('RELOAD_UI_ADDON_BEGIN', OnReload)
+LIB.RegisterEvent('RELOAD_UI_ADDON_BEGIN', OnReload)
 
 -- 注册插件重载函数
 -- RegisterReload(string id, function fn) -- 注册
 -- RegisterReload(function fn)            -- 注册
 -- RegisterReload(string id)              -- 注销
-function MY.RegisterReload(arg1, arg2)
+function LIB.RegisterReload(arg1, arg2)
 	local szKey, fnAction
 	if type(arg1) == 'string' then
 		szKey = arg1
@@ -232,18 +232,18 @@ local function OnIdle()
 		local nStartTick = GetTickCount()
 		local status, err = pcall(fnAction)
 		if not status then
-			MY.Debug({GetTraceback(err)}, 'IDLE_FUNC_LIST#' .. szKey)
+			LIB.Debug({GetTraceback(err)}, 'IDLE_FUNC_LIST#' .. szKey)
 		end
-		MY.Debug({_L('Idle function <%s> executed in %dms.', szKey, GetTickCount() - nStartTick)}, _L['PMTool'], DEBUG_LEVEL.LOG)
+		LIB.Debug({_L('Idle function <%s> executed in %dms.', szKey, GetTickCount() - nStartTick)}, _L['PMTool'], DEBUG_LEVEL.LOG)
 	end
 	TIME = nTime
 end
-MY.RegisterEvent('ON_FRAME_CREATE', function()
+LIB.RegisterEvent('ON_FRAME_CREATE', function()
 	if arg0:GetName() == 'OptionPanel' then
 		OnIdle()
 	end
 end)
-MY.RegisterEvent('BUFF_UPDATE', function()
+LIB.RegisterEvent('BUFF_UPDATE', function()
 	if arg1 then
 		return
 	end
@@ -256,7 +256,7 @@ MY.RegisterEvent('BUFF_UPDATE', function()
 		end)
 	end
 end)
-MY.BreatheCall('MY_ON_IDLE', function()
+LIB.BreatheCall('MY_ON_IDLE', function()
 	if Station.GetIdleTime() > 300000 then
 		OnIdle()
 	end
@@ -266,7 +266,7 @@ end)
 -- RegisterIdle(string id, function fn) -- 注册
 -- RegisterIdle(function fn)            -- 注册
 -- RegisterIdle(string id)              -- 注销
-function MY.RegisterIdle(arg1, arg2)
+function LIB.RegisterIdle(arg1, arg2)
 	local szKey, fnAction
 	if type(arg1) == 'string' then
 		szKey = arg1
@@ -288,21 +288,21 @@ end
 
 do
 local MODULE_LIST = {}
-function MY.RegisterModuleEvent(arg0, arg1)
+function LIB.RegisterModuleEvent(arg0, arg1)
 	local szModule = arg0
 	if arg1 == false then
 		local tEvent, nCount = MODULE_LIST[szModule], 0
 		if tEvent then
 			for szKey, info in pairs(tEvent) do
 				if info.szEvent == "#BREATHE" then
-					MY.BreatheCall(szKey, false)
+					LIB.BreatheCall(szKey, false)
 				else
-					MY.RegisterEvent(szKey, false)
+					LIB.RegisterEvent(szKey, false)
 				end
 				nCount = nCount + 1
 			end
 			MODULE_LIST[szModule] = nil
-			MY.Debug({"Uninit # "  .. szModule .. " # Events Removed # " .. nCount}, 'MY#EVENT', DEBUG_LEVEL.LOG)
+			LIB.Debug({"Uninit # "  .. szModule .. " # Events Removed # " .. nCount}, 'MY#EVENT', DEBUG_LEVEL.LOG)
 		end
 	elseif IsTable(arg1) then
 		local nCount = 0
@@ -323,25 +323,25 @@ function MY.RegisterModuleEvent(arg0, arg1)
 				szKey = szKey .. '#' .. szSubKey
 			end
 			if szEvent == "#BREATHE" then
-				MY.BreatheCall(szKey, unpack(aParams))
+				LIB.BreatheCall(szKey, unpack(aParams))
 			else
-				MY.RegisterEvent(szKey, unpack(aParams))
+				LIB.RegisterEvent(szKey, unpack(aParams))
 			end
 			nCount = nCount + 1
 			tEvent[szKey] = { szEvent = szEvent }
 		end
-		MY.Debug({"Init # "  .. szModule .. " # Events Added # " .. nCount}, 'MY#EVENT', DEBUG_LEVEL.LOG)
+		LIB.Debug({"Init # "  .. szModule .. " # Events Added # " .. nCount}, 'MY#EVENT', DEBUG_LEVEL.LOG)
 	end
 end
 end
 
 do
 local TUTORIAL_LIST = {}
-function MY.RegisterTutorial(tOptions)
+function LIB.RegisterTutorial(tOptions)
 	if type(tOptions) ~= 'table' or not tOptions.szKey or not tOptions.szMessage then
 		return
 	end
-	insert(TUTORIAL_LIST, MY.FullClone(tOptions))
+	insert(TUTORIAL_LIST, LIB.FullClone(tOptions))
 end
 
 local CHECKED = {}
@@ -352,13 +352,13 @@ local function GetNextTutorial()
 		end
 	end
 end
-MY.RegisterInit(function()
-	CHECKED = MY.LoadLUAData({'config/tutorialed.jx3dat', PATH_TYPE.ROLE})
+LIB.RegisterInit(function()
+	CHECKED = LIB.LoadLUAData({'config/tutorialed.jx3dat', PATH_TYPE.ROLE})
 	if not IsTable(CHECKED) then
 		CHECKED = {}
 	end
 end)
-MY.RegisterExit(function() MY.SaveLUAData({'config/tutorialed.jx3dat', PATH_TYPE.ROLE}, CHECKED) end)
+LIB.RegisterExit(function() LIB.SaveLUAData({'config/tutorialed.jx3dat', PATH_TYPE.ROLE}, CHECKED) end)
 
 local function StepNext(bQuick)
 	local tutorial = GetNextTutorial()
@@ -386,7 +386,7 @@ local function StepNext(bQuick)
 		szAlignment = 'CENTER',
 	}
 	for _, p in ipairs(tutorial) do
-		local menu = MY.FullClone(p)
+		local menu = LIB.FullClone(p)
 		menu.fnAction = function()
 			if p.fnAction then
 				p.fnAction()
@@ -399,7 +399,7 @@ local function StepNext(bQuick)
 	MessageBox(tMsg)
 end
 
-function MY.CheckTutorial()
+function LIB.CheckTutorial()
 	if not GetNextTutorial() then
 		return
 	end
@@ -462,39 +462,39 @@ local function OnBgMsg()
 		if p.fnProgress then
 			local status, err = pcall(p.fnProgress, szMsgID, nChannel, dwID, szName, bSelf, nSegCount, #BG_MSG_PART[szMsgUUID], nSegIndex)
 			if not status then
-				MY.Debug({GetTraceback(err)}, 'BG_EVENT_PROGRESS#' .. szMsgID .. '.' .. szKey, DEBUG_LEVEL.ERROR)
+				LIB.Debug({GetTraceback(err)}, 'BG_EVENT_PROGRESS#' .. szMsgID .. '.' .. szKey, DEBUG_LEVEL.ERROR)
 			end
 		end
 	end
 	-- concat and decode data
 	if #BG_MSG_PART[szMsgUUID] == nSegCount then
 		local szParam = concat(BG_MSG_PART[szMsgUUID])
-		local szPlain = szParam and MY.SimpleDecryptString(szParam)
+		local szPlain = szParam and LIB.SimpleDecryptString(szParam)
 		local aParam = szPlain and str2var(szPlain)
 		if aParam then
 			for szKey, p in pairs(BG_MSG_LIST[szMsgID]) do
 				local status, err = pcall(p.fnAction, szMsgID, nChannel, dwID, szName, bSelf, unpack(aParam))
 				if not status then
-					MY.Debug({GetTraceback(err)}, 'BG_EVENT#' .. szMsgID .. '.' .. szKey, DEBUG_LEVEL.ERROR)
+					LIB.Debug({GetTraceback(err)}, 'BG_EVENT#' .. szMsgID .. '.' .. szKey, DEBUG_LEVEL.ERROR)
 				end
 			end
 		else
-			MY.Debug({GetTraceback('Cannot decode bgmsg')}, 'BG_EVENT#' .. szMsgID, DEBUG_LEVEL.ERROR)
+			LIB.Debug({GetTraceback('Cannot decode bgmsg')}, 'BG_EVENT#' .. szMsgID, DEBUG_LEVEL.ERROR)
 		end
 		BG_MSG_PART[szMsgUUID] = nil
 	end
 end
-MY.RegisterEvent('ON_BG_CHANNEL_MSG', OnBgMsg)
+LIB.RegisterEvent('ON_BG_CHANNEL_MSG', OnBgMsg)
 end
 
--- MY.RegisterBgMsg('MY_CHECK_INSTALL', function(szMsgID, nChannel, dwTalkerID, szTalkerName, bSelf, oDatas...) MY.SendBgMsg(szTalkerName, 'MY_CHECK_INSTALL_REPLY', oData) end) -- 注册
--- MY.RegisterBgMsg('MY_CHECK_INSTALL') -- 注销
--- MY.RegisterBgMsg('MY_CHECK_INSTALL.RECEIVER_01', function(szMsgID, nChannel, dwTalkerID, szTalkerName, bSelf, oDatas...) MY.SendBgMsg(szTalkerName, 'MY_CHECK_INSTALL_REPLY', oData) end) -- 注册
--- MY.RegisterBgMsg('MY_CHECK_INSTALL.RECEIVER_01') -- 注销
-function MY.RegisterBgMsg(szMsgID, fnAction, fnProgress)
+-- LIB.RegisterBgMsg('MY_CHECK_INSTALL', function(szMsgID, nChannel, dwTalkerID, szTalkerName, bSelf, oDatas...) LIB.SendBgMsg(szTalkerName, 'MY_CHECK_INSTALL_REPLY', oData) end) -- 注册
+-- LIB.RegisterBgMsg('MY_CHECK_INSTALL') -- 注销
+-- LIB.RegisterBgMsg('MY_CHECK_INSTALL.RECEIVER_01', function(szMsgID, nChannel, dwTalkerID, szTalkerName, bSelf, oDatas...) LIB.SendBgMsg(szTalkerName, 'MY_CHECK_INSTALL_REPLY', oData) end) -- 注册
+-- LIB.RegisterBgMsg('MY_CHECK_INSTALL.RECEIVER_01') -- 注销
+function LIB.RegisterBgMsg(szMsgID, fnAction, fnProgress)
 	if type(szMsgID) == 'table' then
 		for _, szMsgID in ipairs(szMsgID) do
-			MY.RegisterBgMsg(szMsgID, fnAction)
+			LIB.RegisterBgMsg(szMsgID, fnAction)
 		end
 		return
 	end
@@ -532,9 +532,9 @@ local MAX_CHANNEL_LEN = setmetatable({
 	[PLAYER_TALK_CHANNEL.RAID] = 500,
 	[PLAYER_TALK_CHANNEL.BATTLE_FIELD] = 500,
 }, { __index = function() return 300 end })
--- MY.SendBgMsg(szName, szMsgID, ...)
--- MY.SendBgMsg(nChannel, szMsgID, ...)
-function MY.SendBgMsg(nChannel, szMsgID, ...)
+-- LIB.SendBgMsg(szName, szMsgID, ...)
+-- LIB.SendBgMsg(nChannel, szMsgID, ...)
+function LIB.SendBgMsg(nChannel, szMsgID, ...)
 	local szTarget, me = '', GetClientPlayer()
 	if not (me and nChannel) then
 		return
@@ -551,8 +551,8 @@ function MY.SendBgMsg(nChannel, szMsgID, ...)
 	end
 	-- encode and pagination
 	local szMsgSID = BG_MSG_ID_PREFIX .. szMsgID .. BG_MSG_ID_SUFFIX
-	local szMsgUUID = MY.GetUUID():gsub('-', '')
-	local szArg = MY.SimpleEncryptString(var2str({...}))
+	local szMsgUUID = LIB.GetUUID():gsub('-', '')
+	local szArg = LIB.SimpleEncryptString(var2str({...}))
 	local nMsgLen = wlen(szArg)
 	local nSegLen = MAX_CHANNEL_LEN[nChannel]
 	local nSegCount = ceil(nMsgLen / nSegLen)

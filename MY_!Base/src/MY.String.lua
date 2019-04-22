@@ -42,13 +42,13 @@ local UrlEncodeString, UrlDecodeString = UrlEncode, UrlDecode
 --------------------------------------------
 
 -- 分隔字符串
--- (table) MY.SplitString(string szText, table aSpliter, bool bIgnoreEmptyPart)
--- (table) MY.SplitString(string szText, string szSpliter, bool bIgnoreEmptyPart)
+-- (table) LIB.SplitString(string szText, table aSpliter, bool bIgnoreEmptyPart)
+-- (table) LIB.SplitString(string szText, string szSpliter, bool bIgnoreEmptyPart)
 -- szText           原始字符串
 -- szSpliter        分隔符
 -- aSpliter         多个分隔符
 -- bIgnoreEmptyPart 是否忽略空字符串，即'123;234;'被';'分成{'123','234'}还是{'123','234',''}
-function MY.SplitString(szText, aSpliter, bIgnoreEmptyPart)
+function LIB.SplitString(szText, aSpliter, bIgnoreEmptyPart)
 	if IsString(aSpliter) then
 		aSpliter = {aSpliter}
 	end
@@ -78,22 +78,22 @@ function MY.SplitString(szText, aSpliter, bIgnoreEmptyPart)
 	return tResult
 end
 
-function MY.EscapeString(s)
+function LIB.EscapeString(s)
 	return (gsub(s, '([%(%)%.%%%+%-%*%?%[%^%$%]])', '%%%1'))
 end
 
-function MY.TrimString(szText)
+function LIB.TrimString(szText)
 	if not szText or szText == '' then
 		return ''
 	end
 	return (gsub(szText, '^%s*(.-)%s*$', '%1'))
 end
 
-function MY.StringLenW(str)
+function LIB.StringLenW(str)
 	return wlen(str)
 end
 
-function MY.StringSubW(str,s,e)
+function LIB.StringSubW(str,s,e)
 	if s < 0 then
 		s = wlen(str) + s
 	end
@@ -103,20 +103,20 @@ function MY.StringSubW(str,s,e)
 	return wsub(str, s, e)
 end
 
-function MY.EncryptString(szText)
+function LIB.EncryptString(szText)
 	return szText:gsub('.', function (c) return format ('%02X', (byte(c) + 13) % 256) end):gsub(' ', '+')
 end
 
-function MY.SimpleEncryptString(szText)
+function LIB.SimpleEncryptString(szText)
 	local a = {szText:byte(1, #szText)}
 	for i, v in ipairs(a) do
 		a[i] = char((v + 13) % 256)
 	end
-	return (MY.Base64Encode(concat(a)):gsub('/', '-'):gsub('+', '_'):gsub('=', '.'))
+	return (LIB.Base64Encode(concat(a)):gsub('/', '-'):gsub('+', '_'):gsub('=', '.'))
 end
 
-function MY.SimpleDecryptString(szCipher)
-	local szBin = MY.Base64Decode((szCipher:gsub('-', '/'):gsub('_', '+'):gsub('%.', '=')))
+function LIB.SimpleDecryptString(szCipher)
+	local szBin = LIB.Base64Decode((szCipher:gsub('-', '/'):gsub('_', '+'):gsub('%.', '=')))
 	if not szBin then
 		return
 	end
@@ -151,7 +151,7 @@ local function EncodePostData(data, t, prefix)
 	end
 end
 
-function MY.EncodePostData(data)
+function LIB.EncodePostData(data)
 	local t = {}
 	EncodePostData(data, t, '')
 	local text = concat(t)
@@ -175,7 +175,7 @@ local function ConvertToUTF8(data)
 		return data
 	end
 end
-MY.ConvertToUTF8 = ConvertToUTF8
+LIB.ConvertToUTF8 = ConvertToUTF8
 
 local function ConvertToAnsi(data)
 	if type(data) == 'table' then
@@ -194,7 +194,7 @@ local function ConvertToAnsi(data)
 		return data
 	end
 end
-MY.ConvertToAnsi = ConvertToAnsi
+LIB.ConvertToAnsi = ConvertToAnsi
 
 if not UrlEncodeString then
 function UrlEncodeString(szText)
@@ -225,7 +225,7 @@ local function UrlEncode(data)
 		return data
 	end
 end
-MY.UrlEncode = UrlEncode
+LIB.UrlEncode = UrlEncode
 
 local function UrlDecode(data)
 	if type(data) == 'table' then
@@ -244,10 +244,10 @@ local function UrlDecode(data)
 		return data
 	end
 end
-MY.UrlDecode = UrlDecode
+LIB.UrlDecode = UrlDecode
 
 local m_simpleMatchCache = setmetatable({}, { __mode = 'v' })
-function MY.StringSimpleMatch(szText, szFind, bDistinctCase, bDistinctEnEm, bIgnoreSpace)
+function LIB.StringSimpleMatch(szText, szFind, bDistinctCase, bDistinctEnEm, bIgnoreSpace)
 	if not bDistinctCase then
 		szFind = StringLowerW(szFind)
 		szText = StringLowerW(szText)
@@ -275,11 +275,11 @@ function MY.StringSimpleMatch(szText, szFind, bDistinctCase, bDistinctEnEm, bIgn
 	local tFind = m_simpleMatchCache[szFind]
 	if not tFind then
 		tFind = {}
-		for _, szKeywordsLine in ipairs(MY.SplitString(szFind, ';', true)) do
+		for _, szKeywordsLine in ipairs(LIB.SplitString(szFind, ';', true)) do
 			local tKeyWordsLine = {}
-			for _, szKeywords in ipairs(MY.SplitString(szKeywordsLine, ',', true)) do
+			for _, szKeywords in ipairs(LIB.SplitString(szKeywordsLine, ',', true)) do
 				local tKeyWords = {}
-				for _, szKeyword in ipairs(MY.SplitString(szKeywords, '|', true)) do
+				for _, szKeyword in ipairs(LIB.SplitString(szKeywords, '|', true)) do
 					local bNegative = szKeyword:sub(1, 1) == '!'
 					if bNegative then
 						szKeyword = szKeyword:sub(2)
@@ -304,7 +304,7 @@ function MY.StringSimpleMatch(szText, szFind, bDistinctCase, bDistinctEnEm, bIgn
 			-- 10|十人
 			local bKeyWord = false
 			for _, info in ipairs(tKeyWords) do      -- 符合一个即可
-				-- szKeyword = MY.EscapeString(szKeyword) -- 用了wstring还Escape个捷豹
+				-- szKeyword = LIB.EscapeString(szKeyword) -- 用了wstring还Escape个捷豹
 				if info.bNegative then               -- !小铁被吃了
 					if not wfind(szText, info.szKeyword) then
 						bKeyWord = true

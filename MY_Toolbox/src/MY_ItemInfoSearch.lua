@@ -28,8 +28,8 @@ local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.Is
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
 
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Toolbox/lang/')
-if not MY.AssertVersion('MY_ItemInfoSearch', _L['MY_ItemInfoSearch'], 0x2012700) then
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_Toolbox/lang/')
+if not LIB.AssertVersion('MY_ItemInfoSearch', _L['MY_ItemInfoSearch'], 0x2012700) then
 	return
 end
 local CACHE = {}
@@ -51,7 +51,7 @@ local function Init()
 					local nCount, nMaxCount = 0, 1000 -- 折半次数统计 1000次折半查找还没找到多半是BUG了 判断上限防止死循环
 					while true do
 						if nMaxL < 1 then
-							MY.Debug('ERROR CALC ITEM_TYPE_MAX: ' .. dwTabType .. ' (TOO SMALL)', DEBUG_LEVEL.ERROR)
+							LIB.Debug('ERROR CALC ITEM_TYPE_MAX: ' .. dwTabType .. ' (TOO SMALL)', DEBUG_LEVEL.ERROR)
 							break
 						elseif bMaxL and bMaxR then
 							nMaxR = nMaxR * 2
@@ -74,12 +74,12 @@ local function Init()
 									end
 								end
 							elseif not bMaxL and bMaxR then
-								MY.Debug('ERROR CALC ITEM_TYPE_MAX: ' .. dwTabType .. ' (NOT EXIST)', DEBUG_LEVEL.ERROR)
+								LIB.Debug('ERROR CALC ITEM_TYPE_MAX: ' .. dwTabType .. ' (NOT EXIST)', DEBUG_LEVEL.ERROR)
 								break
 							end
 						end
 						if nCount >= nMaxCount then
-							MY.Debug('ERROR CALC ITEM_TYPE_MAX: ' .. dwTabType .. ' (OVERFLOW)', DEBUG_LEVEL.ERROR)
+							LIB.Debug('ERROR CALC ITEM_TYPE_MAX: ' .. dwTabType .. ' (OVERFLOW)', DEBUG_LEVEL.ERROR)
 							break
 						end
 						nCount = nCount + 1
@@ -178,7 +178,7 @@ function PS.OnPanelActive(wnd)
 		text = SEARCH,
 		placeholder = _L['Please input item name or item index number'],
 		onchange = function(szSearch)
-			MY.DelayCall('MY_ItemInfoSearch', 200, function()
+			LIB.DelayCall('MY_ItemInfoSearch', 200, function()
 				Search(szSearch)
 				DrawList()
 			end)
@@ -193,14 +193,14 @@ function PS.OnPanelActive(wnd)
 			return false
 		end
 		if data and bIn and (data.itemInfo.nGenre ~= ITEM_GENRE.BOOK or data.dwRecipeID) then
-			MY.OutputItemInfoTip(data.dwTabType, data.dwIndex, data.dwRecipeID)
+			LIB.OutputItemInfoTip(data.dwTabType, data.dwIndex, data.dwRecipeID)
 		else
 			HideTip()
 		end
 	end)
 	UI_LIST:listbox('onlclick', function(list, text, id, data)
 		if data and IsCtrlKeyDown() then
-			MY.EditBoxInsertItemInfo(data.dwTabType, data.dwIndex, data.dwRecipeID)
+			LIB.EditBoxInsertItemInfo(data.dwTabType, data.dwIndex, data.dwRecipeID)
 		end
 		return false
 	end)
@@ -215,4 +215,4 @@ function PS.OnPanelDeactive()
 	UI_LIST = nil
 end
 
-MY.RegisterPanel('MY_ItemInfoSearch', _L['MY_ItemInfoSearch'], _L['System'], 'ui/Image/UICommon/ActivePopularize2.UITex|30', PS)
+LIB.RegisterPanel('MY_ItemInfoSearch', _L['MY_ItemInfoSearch'], _L['System'], 'ui/Image/UICommon/ActivePopularize2.UITex|30', PS)

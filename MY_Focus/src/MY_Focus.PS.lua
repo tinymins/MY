@@ -35,8 +35,8 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Focus/lang/')
-if not MY.AssertVersion('MY_Focus', _L['MY_Focus'], 0x2011800) then
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_Focus/lang/')
+if not LIB.AssertVersion('MY_Focus', _L['MY_Focus'], 0x2011800) then
 	return
 end
 
@@ -74,7 +74,7 @@ function PS.OnPanelActive(wnd)
 				return
 			end
 			MY_Focus.szStyle = szStyle
-			MY.SwitchTab('MY_Focus', true)
+			LIB.SwitchTab('MY_Focus', true)
 		end,
 	})
 	x, y = xl, y + 25
@@ -205,7 +205,7 @@ function PS.OnPanelActive(wnd)
 					tData.tLife.bEnable = not tData.tLife.bEnable
 				end,
 			},
-			MY.InsertOperatorMenu({
+			LIB.InsertOperatorMenu({
 				szOption = _L['Operator'],
 				fnDisable = function() return not tData.tLife.bEnable end,
 			}, tData.tLife.szOperator, function(op)
@@ -220,7 +220,7 @@ function PS.OnPanelActive(wnd)
 					GetUserInputNumber(tData.tLife.nValue, 100, nil, function(val)
 						tData.tLife.nValue = val
 						MY_Focus.SetFocusPattern(tData.szPattern, tData)
-					end, nil, function() return not MY.IsPanelVisible() end)
+					end, nil, function() return not LIB.IsPanelVisible() end)
 				end,
 				fnDisable = function() return not tData.tLife.bEnable end,
 			},
@@ -239,7 +239,7 @@ function PS.OnPanelActive(wnd)
 				GetUserInput(_L['Please input max distance, leave blank to disable:'], function(val)
 					tData.nMaxDistance = tonumber(val) or 0
 					MY_Focus.SetFocusPattern(tData.szPattern, tData)
-				end, nil, function() return not MY.IsPanelVisible() end, nil, tData.nMaxDistance)
+				end, nil, function() return not LIB.IsPanelVisible() end, nil, tData.nMaxDistance)
 			end,
 		}
 		insert(t, t1)
@@ -256,7 +256,7 @@ function PS.OnPanelActive(wnd)
 				GetUserInput(_L['Please input display name, leave blank to use its own name:'], function(val)
 					tData.szDisplay = val
 					MY_Focus.SetFocusPattern(tData.szPattern, tData)
-				end, nil, function() return not MY.IsPanelVisible() end, nil, tData.szDisplay)
+				end, nil, function() return not LIB.IsPanelVisible() end, nil, tData.szDisplay)
 			end,
 		}
 		insert(t, t1)
@@ -498,7 +498,7 @@ function PS.OnPanelActive(wnd)
 	ui:append('WndComboBox', {
 		x = x, y = y, w = wr, text = _L['Distance type'],
 		menu = function()
-			return MY.GetDistanceTypeMenu(true, MY_Focus.szDistanceType, function(p)
+			return LIB.GetDistanceTypeMenu(true, MY_Focus.szDistanceType, function(p)
 				MY_Focus.szDistanceType = p.szType
 			end)
 		end,
@@ -545,4 +545,4 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + deltaY
 end
-MY.RegisterPanel('MY_Focus', _L['focus list'], _L['Target'], 'ui/Image/button/SystemButton_1.UITex|9', PS)
+LIB.RegisterPanel('MY_Focus', _L['focus list'], _L['Target'], 'ui/Image/button/SystemButton_1.UITex|9', PS)

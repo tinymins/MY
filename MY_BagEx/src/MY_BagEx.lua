@@ -35,7 +35,7 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_BagEx/lang/')
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_BagEx/lang/')
 
 MY_BagEx = {}
 MY_BagEx.bEnable = true
@@ -58,7 +58,7 @@ local function GetItemText(item)
 			local szKey = item.dwTabType .. ',' .. item.dwIndex
 			if not l_tItemText[szKey] then
 				l_tItemText[szKey] = ''
-				l_tItemText[szKey] = MY.Xml.GetPureText(GetItemTip(item))
+				l_tItemText[szKey] = LIB.Xml.GetPureText(GetItemTip(item))
 			end
 			return l_tItemText[szKey]
 		else
@@ -69,7 +69,7 @@ local function GetItemText(item)
 	end
 end
 
-local SimpleMatch = MY.StringSimpleMatch
+local SimpleMatch = LIB.StringSimpleMatch
 local function FilterBags(szTreePath, szFilter, bTimeLtd)
 	if szFilter then
 		szFilter = szFilter:gsub('[%[%]]', '')
@@ -322,7 +322,7 @@ local function Hook()
 		HookTableFunc(frame, 'OnFrameKeyDown', OnFrameKeyDown, { bHookReturn = true })
 	end
 
-	MY.RegisterEvent('EXECUTE_BINDING.MY_BAGEX', function(e)
+	LIB.RegisterEvent('EXECUTE_BINDING.MY_BAGEX', function(e)
 		local szName, bDown = arg0, arg1
 		if Cursor.IsVisible()
 		and szName == 'OPENORCLOSEALLBAGS' and not bDown then
@@ -364,7 +364,7 @@ local function Unhook()
 		UnhookTableFunc(frame, 'OnFrameKeyDown', OnFrameKeyDown)
 	end
 
-	MY.RegisterEvent('EXECUTE_BINDING.MY_BAGEX')
+	LIB.RegisterEvent('EXECUTE_BINDING.MY_BAGEX')
 end
 
 local function Apply(bEnable)
@@ -373,10 +373,10 @@ local function Apply(bEnable)
 	end
 	if bEnable then
 		Hook()
-		MY.RegisterEvent('ON_FRAME_CREATE.MY_BAGEX', Hook)
+		LIB.RegisterEvent('ON_FRAME_CREATE.MY_BAGEX', Hook)
 	else
 		Unhook()
-		MY.RegisterEvent('ON_FRAME_CREATE.MY_BAGEX')
+		LIB.RegisterEvent('ON_FRAME_CREATE.MY_BAGEX')
 	end
 end
 
@@ -397,13 +397,13 @@ local function OnBagItemUpdate()
 		DoFilterGuildBank()
 	end
 end
-MY.RegisterEvent({'BAG_ITEM_UPDATE', 'GUILD_BANK_PANEL_UPDATE'}, function()
+LIB.RegisterEvent({'BAG_ITEM_UPDATE', 'GUILD_BANK_PANEL_UPDATE'}, function()
 	if not MY_BagEx.bEnable then
 		return
 	end
-	MY.DelayCall('MY_BagEx', 100, OnBagItemUpdate)
+	LIB.DelayCall('MY_BagEx', 100, OnBagItemUpdate)
 end)
 end
 
-MY.RegisterInit('MY_BAGEX', function() Apply() end)
-MY.RegisterReload('MY_BAGEX', function() Apply(false) end)
+LIB.RegisterInit('MY_BAGEX', function() Apply() end)
+LIB.RegisterReload('MY_BAGEX', function() Apply(false) end)

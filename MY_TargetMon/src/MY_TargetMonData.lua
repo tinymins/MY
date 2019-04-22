@@ -36,8 +36,8 @@ local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.Is
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
 
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_TargetMon/lang/')
-if not MY.AssertVersion('MY_TargetMon', _L['MY_TargetMon'], 0x2011800) then
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_TargetMon/lang/')
+if not LIB.AssertVersion('MY_TargetMon', _L['MY_TargetMon'], 0x2011800) then
 	return
 end
 local C, D = {}, {
@@ -92,16 +92,16 @@ end
 local function onFilterChange()
 	CACHE_CONFIG = nil
 end
-MY.RegisterEvent('LOADING_END.MY_TargetMonData', onFilterChange)
-MY.RegisterEvent('SKILL_MOUNT_KUNG_FU.MY_TargetMonData', onFilterChange)
-MY.RegisterEvent('SKILL_UNMOUNT_KUNG_FU.MY_TargetMonData', onFilterChange)
-MY.RegisterEvent('MY_TARGET_MON_MONITOR_CHANGE.MY_TargetMonData', onFilterChange)
+LIB.RegisterEvent('LOADING_END.MY_TargetMonData', onFilterChange)
+LIB.RegisterEvent('SKILL_MOUNT_KUNG_FU.MY_TargetMonData', onFilterChange)
+LIB.RegisterEvent('SKILL_UNMOUNT_KUNG_FU.MY_TargetMonData', onFilterChange)
+LIB.RegisterEvent('MY_TARGET_MON_MONITOR_CHANGE.MY_TargetMonData', onFilterChange)
 
 local function onTargetMonReload()
 	onFilterChange()
 	D.OnTargetMonReload()
 end
-MY.RegisterEvent('MY_TARGET_MON_CONFIG_INIT.MY_TargetMonData', onTargetMonReload)
+LIB.RegisterEvent('MY_TARGET_MON_CONFIG_INIT.MY_TargetMonData', onTargetMonReload)
 end
 
 do
@@ -123,11 +123,11 @@ function D.GetTarget(eTarType, eMonType)
 	elseif eTarType == 'CLIENT_PLAYER' then
 		return TARGET.PLAYER, UI_GetClientPlayerID()
 	elseif eTarType == 'TARGET' then
-		return MY.GetTarget()
+		return LIB.GetTarget()
 	elseif eTarType == 'TTARGET' then
-		local KTarget = MY.GetObject(MY.GetTarget())
+		local KTarget = LIB.GetObject(LIB.GetTarget())
 		if KTarget then
-			return MY.GetTarget(KTarget)
+			return LIB.GetTarget(KTarget)
 		end
 	elseif TEAM_MARK[eTarType] then
 		local mark = GetClientTeam().GetTeamMark()
@@ -164,7 +164,7 @@ do
 local SHIELDED
 function D.IsShielded()
 	if SHIELDED == nil then
-		SHIELDED = MY.IsShieldedVersion() and MY.IsInArena()
+		SHIELDED = LIB.IsShieldedVersion() and LIB.IsInArena()
 	end
 	return SHIELDED
 end
@@ -172,8 +172,8 @@ end
 local function onShieldedReset()
 	SHIELDED = nil
 end
-MY.RegisterEvent('LOADING_END.MY_TargetMonData_Shield', onShieldedReset)
-MY.RegisterEvent('MY_SHIELDED_VERSION.MY_TargetMonData_Shield', onShieldedReset)
+LIB.RegisterEvent('LOADING_END.MY_TargetMonData_Shield', onShieldedReset)
+LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_TargetMonData_Shield', onShieldedReset)
 end
 
 do
@@ -181,7 +181,7 @@ local ALIAS
 function D.IsShieldedAlias(szAlias)
 	if D.IsShielded() then
 		if not ALIAS then
-			ALIAS = MY.ArrayToObject(_L.ALIAS)
+			ALIAS = LIB.ArrayToObject(_L.ALIAS)
 		end
 		return not ALIAS[szAlias]
 	end
@@ -226,7 +226,7 @@ local function OnSysMsg(event)
 		OnSkill(arg5, arg6)
 	end
 end
-MY.RegisterEvent('SYS_MSG.MY_TargetMon_SKILL', OnSysMsg)
+LIB.RegisterEvent('SYS_MSG.MY_TargetMon_SKILL', OnSysMsg)
 end
 
 -- 更新BUFF数据 更新监控条
@@ -298,9 +298,9 @@ local function Base_MonToView(mon, info, item, KObject, nIcon, config, tMonExist
 		if tMonLast and not tMonLast[mon.uuid] and config.playSound then
 			local dwSoundID = RandomChild(mon.soundAppear)
 			if dwSoundID then
-				local szSoundPath = MY.GetSoundPath(dwSoundID)
+				local szSoundPath = LIB.GetSoundPath(dwSoundID)
 				if szSoundPath then
-					MY.PlaySound(SOUND.UI_SOUND, szSoundPath, '')
+					LIB.PlaySound(SOUND.UI_SOUND, szSoundPath, '')
 				end
 			end
 		end
@@ -536,7 +536,7 @@ function UpdateView()
 	for _, config in ipairs(D.GetConfigList()) do
 		if config.enable then
 			local dwTarType, dwTarID = D.GetTarget(config.target, config.type)
-			local KObject = MY.GetObject(dwTarType, dwTarID)
+			local KObject = LIB.GetObject(dwTarType, dwTarID)
 			local dwTarKungfuID = KObject and dwTarType == TARGET.PLAYER and KObject.GetKungfuMountID() or 0
 			local view = VIEW_LIST[nViewIndex]
 			if not view then
@@ -544,7 +544,7 @@ function UpdateView()
 				VIEW_LIST[nViewIndex] = view
 			end
 			fUIScale = (config.ignoreSystemUIScale and 1 or Station.GetUIScale()) * config.scale
-			fFontScaleBase = fUIScale * MY.GetFontScale() * config.scale
+			fFontScaleBase = fUIScale * LIB.GetFontScale() * config.scale
 			view.szUuid               = config.uuid
 			view.szType               = config.type
 			view.szTarget             = config.target
@@ -624,9 +624,9 @@ function UpdateView()
 					if not tMonExist[uuid] and config.playSound then
 						local dwSoundID = RandomChild(mon.soundDisappear)
 						if dwSoundID then
-							local szSoundPath = MY.GetSoundPath(dwSoundID)
+							local szSoundPath = LIB.GetSoundPath(dwSoundID)
 							if szSoundPath then
-								MY.PlaySound(SOUND.UI_SOUND, szSoundPath, '')
+								LIB.PlaySound(SOUND.UI_SOUND, szSoundPath, '')
 							end
 						end
 					end
@@ -647,7 +647,7 @@ local function OnBreathe()
 	-- 更新各目标BUFF数据
 	local nLogicFrame = GetLogicFrameCount()
 	for _, eType in ipairs(D.GetTargetTypeList('BUFF')) do
-		local KObject = MY.GetObject(D.GetTarget(eType, 'BUFF'))
+		local KObject = LIB.GetObject(D.GetTarget(eType, 'BUFF'))
 		if KObject then
 			local tCache = BUFF_CACHE[KObject.dwID]
 			if not tCache then
@@ -655,7 +655,7 @@ local function OnBreathe()
 				BUFF_CACHE[KObject.dwID] = tCache
 			end
 			-- 当前身上的buff
-			local aBuff, info = MY.GetBuffList(KObject)
+			local aBuff, info = LIB.GetBuffList(KObject)
 			for _, buff in ipairs(aBuff) do -- 缓存时必须复制buff表 否则buff过期后表会被回收导致显示错误的BUFF
 				-- 正向索引用于监控
 				if not tCache[buff.dwID] then
@@ -666,7 +666,7 @@ local function OnBreathe()
 					info = {}
 					tCache[buff.dwID][buff.szKey] = info
 				end
-				MY.CloneBuff(buff, info)
+				LIB.CloneBuff(buff, info)
 				info.nLeft = max(buff.nEndFrame - nLogicFrame, 0)
 				info.bCool = true
 				info.nRenderFrame = nLogicFrame
@@ -699,17 +699,17 @@ local function OnBreathe()
 		end
 	end
 	for _, eType in ipairs(D.GetTargetTypeList('SKILL')) do
-		local KObject = MY.GetObject(D.GetTarget(eType, 'SKILL'))
+		local KObject = LIB.GetObject(D.GetTarget(eType, 'SKILL'))
 		if KObject then
 			local tSkill = {}
-			local aSkill = MY.GetSkillMountList()
+			local aSkill = LIB.GetSkillMountList()
 			-- 遍历所有技能 生成反向索引
 			for _, dwID in spairs(aSkill, SKILL_EXTRA) do
 				if not tSkill[dwID] then
 					local nLevel = KObject.GetSkillLevel(dwID)
-					local KSkill, info = MY.GetSkill(dwID, nLevel)
+					local KSkill, info = LIB.GetSkill(dwID, nLevel)
 					if KSkill and info then
-						local szKey, szName = dwID, MY.GetSkillName(dwID)
+						local szKey, szName = dwID, LIB.GetSkillName(dwID)
 						if not SKILL_INFO[szName] then
 							SKILL_INFO[szName] = {}
 						end
@@ -717,7 +717,7 @@ local function OnBreathe()
 							SKILL_INFO[szName][szKey] = {}
 						end
 						local skill = SKILL_INFO[szName][szKey]
-						local bCool, szType, nLeft, nInterval, nTotal, nCount, nMaxCount, nSurfaceNum = MY.GetSkillCDProgress(KObject, dwID, nLevel, true)
+						local bCool, szType, nLeft, nInterval, nTotal, nCount, nMaxCount, nSurfaceNum = LIB.GetSkillCDProgress(KObject, dwID, nLevel, true)
 						skill.szKey = szKey
 						skill.dwID = dwID
 						skill.nLevel = info.nLevel
@@ -730,7 +730,7 @@ local function OnBreathe()
 						skill.nCdMaxCount = nMaxCount
 						skill.nSurfaceNum = nSurfaceNum
 						skill.nIcon = info.nIcon
-						skill.szName = MY.GetSkillName(dwID)
+						skill.szName = LIB.GetSkillName(dwID)
 						tSkill[szKey] = skill
 						tSkill[dwID] = skill
 						tSkill[szName] = skill
@@ -760,7 +760,7 @@ end
 function D.OnTargetMonReload()
 	OnBreathe()
 	FireUIEvent('MY_TARGET_MON_DATA_INIT')
-	MY.BreatheCall('MY_TargetMonData', OnBreathe)
+	LIB.BreatheCall('MY_TargetMonData', OnBreathe)
 end
 end
 
@@ -781,7 +781,7 @@ for i = 1, 5 do
 			'MY_TargetMon_' .. i .. '_' .. j, _L('Cancel buff %d - %d', i, j),
 			i == 1 and j == 1 and _L['MY Buff Monitor'] or '',
 			function()
-				if MY.IsShieldedVersion() and not MY.IsInDungeon() then
+				if LIB.IsShieldedVersion() and not LIB.IsInDungeon() then
 					OutputMessage('MSG_ANNOUNCE_RED', _L['Cancel buff is disabled outside dungeon.'])
 					return
 				end
@@ -790,7 +790,7 @@ for i = 1, 5 do
 					OutputMessage('MSG_ANNOUNCE_RED', _L['Hotkey cancel is only allowed for buff.'])
 					return
 				end
-				local KTarget = MY.GetObject(D.GetTarget(tViewData.szTarget, tViewData.szType))
+				local KTarget = LIB.GetObject(D.GetTarget(tViewData.szTarget, tViewData.szType))
 				if not KTarget then
 					OutputMessage('MSG_ANNOUNCE_RED', _L['Cannot find target to cancel buff.'])
 					return
@@ -800,7 +800,7 @@ for i = 1, 5 do
 					OutputMessage('MSG_ANNOUNCE_RED', _L['Cannot find buff to cancel.'])
 					return
 				end
-				MY.CancelBuff(KTarget, item.dwID, item.nLevel)
+				LIB.CancelBuff(KTarget, item.dwID, item.nLevel)
 			end, nil)
 	end
 end
@@ -819,5 +819,5 @@ local settings = {
 		},
 	},
 }
-MY_TargetMonData = MY.GeneGlobalNS(settings)
+MY_TargetMonData = LIB.GeneGlobalNS(settings)
 end

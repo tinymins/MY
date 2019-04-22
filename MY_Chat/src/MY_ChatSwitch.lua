@@ -35,11 +35,11 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Chat/lang/')
-if not MY.AssertVersion('MY_ChatSwitch', _L['MY_ChatSwitch'], 0x2011800) then
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_Chat/lang/')
+if not LIB.AssertVersion('MY_ChatSwitch', _L['MY_ChatSwitch'], 0x2011800) then
 	return
 end
-local INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_Chat/ui/MY_ChatSwitch.ini'
+local INI_PATH = LIB.GetAddonInfo().szRoot .. 'MY_Chat/ui/MY_ChatSwitch.ini'
 local CD_REFRESH_OFFSET = 7 * 60 * 60 -- 7µã¸üÐÂCD
 MY_ChatSwitch = {}
 MY_ChatSwitch.aWhisper = {}
@@ -59,14 +59,14 @@ local function UpdateChannelDailyLimit(hRadio, bPlus)
 	local info = hRadio.info
 	local nChannel = info.channel
 	if nChannel then
-		local szDate = MY.FormatTime('yyyyMMdd', GetCurrentTime() - CD_REFRESH_OFFSET)
+		local szDate = LIB.FormatTime('yyyyMMdd', GetCurrentTime() - CD_REFRESH_OFFSET)
 		if MY_ChatSwitch.tChannelCount.szDate ~= szDate then
 			MY_ChatSwitch.tChannelCount = {szDate = szDate}
 		end
 		MY_ChatSwitch.tChannelCount[nChannel] = (MY_ChatSwitch.tChannelCount[nChannel] or 0) + (bPlus and 1 or 0)
 
 		local nDailyCount = MY_ChatSwitch.tChannelCount[nChannel]
-		local nDailyLimit = MY.GetChannelDailyLimit(me.nLevel, nChannel)
+		local nDailyLimit = LIB.GetChannelDailyLimit(me.nLevel, nChannel)
 		if nDailyLimit then
 			if nDailyLimit > 0 then
 				dwPercent = (nDailyLimit - nDailyCount) / nDailyLimit
@@ -115,7 +115,7 @@ local function OnClsCheck()
 end
 
 local function OnAwayCheck()
-	MY.SwitchChat('/afk')
+	LIB.SwitchChat('/afk')
 	Station.Lookup('Lowest2/EditBox'):Show()
 	if Station.Lookup('Lowest2/EditBox/Edit_Input'):GetText() == '' then
 		Station.Lookup('Lowest2/EditBox/Edit_Input'):InsertText(MY_ChatSwitch.szAway or g_tStrings.STR_AUTO_REPLAY_LEAVE)
@@ -125,13 +125,13 @@ local function OnAwayCheck()
 end
 
 local function OnAwayUncheck()
-	MY.SwitchChat('/cafk')
+	LIB.SwitchChat('/cafk')
 end
 
 local function OnAwayTip() return MY_ChatSwitch.szAway or g_tStrings.STR_AUTO_REPLAY_LEAVE end
 
 local function OnBusyCheck()
-	MY.SwitchChat('/atr')
+	LIB.SwitchChat('/atr')
 	Station.Lookup('Lowest2/EditBox'):Show()
 	if Station.Lookup('Lowest2/EditBox/Edit_Input'):GetText() == '' then
 		Station.Lookup('Lowest2/EditBox/Edit_Input'):InsertText(MY_ChatSwitch.szBusy or g_tStrings.STR_AUTO_REPLAY_LEAVE)
@@ -141,7 +141,7 @@ local function OnBusyCheck()
 end
 
 local function OnBusyUncheck()
-	MY.SwitchChat('/catr')
+	LIB.SwitchChat('/catr')
 end
 
 local function OnBusyTip() return MY_ChatSwitch.szBusy end
@@ -164,8 +164,8 @@ local function OnWhisperCheck()
 			szOption = whisper[1],
 			rgb = info and info.rgb or {202, 126, 255},
 			fnAction = function()
-				MY.SwitchChat(whisper[1])
-				MY.DelayCall(MY.FocusChatBox)
+				LIB.SwitchChat(whisper[1])
+				LIB.DelayCall(LIB.FocusChatBox)
 			end,
 			szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',
 			nFrame = 49,
@@ -183,16 +183,16 @@ local function OnWhisperCheck()
 			end,
 			fnMouseEnter = function()
 				local t = {}
-				local today = MY.FormatTime('yyyyMMdd')
+				local today = LIB.FormatTime('yyyyMMdd')
 				local r, g, b = GetMsgFontColor('MSG_WHISPER')
 				for _, v in ipairs(whisper[2]) do
 					if IsString(v) then
 						table.insert(t, v)
 					elseif IsTable(v) and IsString(v[1]) then
-						if today == MY.FormatTime('yyyyMMdd', v[2]) then
-							table.insert(t, MY.GetTimeLinkText({r = r, g = g, b = b, s = '[hh:mm:ss]'}, v[2]) .. v[1])
+						if today == LIB.FormatTime('yyyyMMdd', v[2]) then
+							table.insert(t, LIB.GetTimeLinkText({r = r, g = g, b = b, s = '[hh:mm:ss]'}, v[2]) .. v[1])
 						else
-							table.insert(t, MY.GetTimeLinkText({r = r, g = g, b = b, s = '[M.dd.hh:mm:ss]'}, v[2]) .. v[1])
+							table.insert(t, LIB.GetTimeLinkText({r = r, g = g, b = b, s = '[M.dd.hh:mm:ss]'}, v[2]) .. v[1])
 						end
 					end
 				end
@@ -213,13 +213,13 @@ local function OnWhisperCheck()
 			szOption = g_tStrings.CHANNEL_WHISPER_SIGN,
 			rgb = {202, 126, 255},
 			fnAction = function()
-				MY.SwitchChat(PLAYER_TALK_CHANNEL.WHISPER)
-				MY.DelayCall(MY.FocusChatBox)
+				LIB.SwitchChat(PLAYER_TALK_CHANNEL.WHISPER)
+				LIB.DelayCall(LIB.FocusChatBox)
 			end,
 		})
 		PopupMenu(t)
 	else
-		MY.SwitchChat(PLAYER_TALK_CHANNEL.WHISPER)
+		LIB.SwitchChat(PLAYER_TALK_CHANNEL.WHISPER)
 	end
 	this:Check(false)
 end
@@ -261,7 +261,7 @@ RegisterCustomData('MY_ChatSwitch.tChannelCount')
 RegisterCustomData('MY_ChatSwitch.bAlertBeforeClear')
 
 local function OnChannelCheck()
-	MY.SwitchChat(this.info.channel)
+	LIB.SwitchChat(this.info.channel)
 	Station.Lookup('Lowest2/EditBox'):Show()
 	Station.SetFocusWindow('Lowest2/EditBox/Edit_Input')
 	this:Check(false)
@@ -272,13 +272,13 @@ function MY_ChatSwitch.OnFrameCreate()
 	this:RegisterEvent('UI_SCALED')
 	this:RegisterEvent('PLAYER_SAY')
 	this:RegisterEvent('CUSTOM_DATA_LOADED')
-	this:EnableDrag(not MY.GetStorage('BoolValues.MY_ChatSwitch_LockPostion'))
+	this:EnableDrag(not LIB.GetStorage('BoolValues.MY_ChatSwitch_LockPostion'))
 
 	local nWidth, nHeight = 0, 0
 	local container = this:Lookup('WndContainer_Radios')
 	container:Clear()
 	for i, v in ipairs(CHANNEL_LIST) do
-		if not MY.GetStorage('BoolValues.MY_ChatSwitch_CH' .. i) then
+		if not LIB.GetStorage('BoolValues.MY_ChatSwitch_CH' .. i) then
 			local wnd, chk, txtTitle, txtCooldown, shaCount
 			if v.head then
 				wnd = container:AppendContentFromIni(INI_PATH, 'Wnd_Channel')
@@ -413,19 +413,19 @@ end
 function MY_ChatSwitch.OnLButtonClick()
 	local name = this:GetName()
 	if name == 'Btn_Option' then
-		MY.ShowPanel()
-		MY.FocusPanel()
-		MY.SwitchTab('MY_ChatSwitch')
+		LIB.ShowPanel()
+		LIB.FocusPanel()
+		LIB.SwitchTab('MY_ChatSwitch')
 	end
 end
 
 function MY_ChatSwitch.OnFrameDragEnd()
 	this:CorrectPos()
-	MY.SetStorage('FrameAnchor.MY_ChatSwitch', GetFrameAnchor(this))
+	LIB.SetStorage('FrameAnchor.MY_ChatSwitch', GetFrameAnchor(this))
 end
 
 function MY_ChatSwitch.UpdateAnchor(this)
-	local anchor = MY.GetStorage('FrameAnchor.MY_ChatSwitch')
+	local anchor = LIB.GetStorage('FrameAnchor.MY_ChatSwitch')
 		or { x = 10, y = -60, s = 'BOTTOMLEFT', r = 'BOTTOMLEFT' }
 	this:SetPoint(anchor.s, 0, 0, anchor.r, anchor.x, anchor.y)
 	this:CorrectPos()
@@ -433,30 +433,30 @@ end
 
 local function OnChatSetAFK()
 	if type(arg0) == 'table' then
-		MY_ChatSwitch.szAway = MY.StringfyChatContent(arg0)
+		MY_ChatSwitch.szAway = LIB.StringfyChatContent(arg0)
 	else
 		MY_ChatSwitch.szAway = arg0 and tostring(arg0)
 	end
 end
-MY.RegisterEvent('ON_CHAT_SET_AFK', OnChatSetAFK)
+LIB.RegisterEvent('ON_CHAT_SET_AFK', OnChatSetAFK)
 
 local function OnChatSetATR()
 	if type(arg0) == 'table' then
-		MY_ChatSwitch.szBusy = MY.StringfyChatContent(arg0):sub(4)
+		MY_ChatSwitch.szBusy = LIB.StringfyChatContent(arg0):sub(4)
 	else
 		MY_ChatSwitch.szBusy = arg0 and tostring(arg0)
 	end
 end
-MY.RegisterEvent('ON_CHAT_SET_ATR', OnChatSetATR)
+LIB.RegisterEvent('ON_CHAT_SET_ATR', OnChatSetATR)
 
 function MY_ChatSwitch.ReInitUI()
 	Wnd.CloseWindow('MY_ChatSwitch')
-	if not MY.GetStorage('BoolValues.MY_ChatSwitch_DisplayPanel') then
+	if not LIB.GetStorage('BoolValues.MY_ChatSwitch_DisplayPanel') then
 		return
 	end
 	Wnd.OpenWindow(INI_PATH, 'MY_ChatSwitch')
 end
-MY.RegisterStorageInit('MY_CHAT', MY_ChatSwitch.ReInitUI)
+LIB.RegisterStorageInit('MY_CHAT', MY_ChatSwitch.ReInitUI)
 
 local PS = {}
 function PS.OnPanelActive(wnd)
@@ -471,15 +471,15 @@ function PS.OnPanelActive(wnd)
 		x = w - x - 80, y = y,
 		w = 80, h = 30,
 		text = _L['about...'],
-		onclick = function() MY.Alert(_L['Mingyi Plugins - Chatpanel\nThis plugin is developed by tinymins @ derzh.com.']) end,
+		onclick = function() LIB.Alert(_L['Mingyi Plugins - Chatpanel\nThis plugin is developed by tinymins @ derzh.com.']) end,
 	})
 
 	ui:append('WndCheckBox', {
 		x = x, y = y, w = 250,
 		text = _L['display panel'],
-		checked = MY.GetStorage('BoolValues.MY_ChatSwitch_DisplayPanel'),
+		checked = LIB.GetStorage('BoolValues.MY_ChatSwitch_DisplayPanel'),
 		oncheck = function(bChecked)
-			MY.SetStorage('BoolValues.MY_ChatSwitch_DisplayPanel', bChecked)
+			LIB.SetStorage('BoolValues.MY_ChatSwitch_DisplayPanel', bChecked)
 			MY_ChatSwitch.ReInitUI()
 		end,
 	})
@@ -488,13 +488,13 @@ function PS.OnPanelActive(wnd)
 	ui:append('WndCheckBox', {
 		x = x + deltaX, y = y, w = 250,
 		text = _L['lock postion'],
-		checked = MY.GetStorage('BoolValues.MY_ChatSwitch_LockPostion'),
+		checked = LIB.GetStorage('BoolValues.MY_ChatSwitch_LockPostion'),
 		oncheck = function(bChecked)
-			MY.SetStorage('BoolValues.MY_ChatSwitch_LockPostion', bChecked)
+			LIB.SetStorage('BoolValues.MY_ChatSwitch_LockPostion', bChecked)
 			MY_ChatSwitch.ReInitUI()
 		end,
 		isdisable = function()
-			return not MY.GetStorage('BoolValues.MY_ChatSwitch_DisplayPanel')
+			return not LIB.GetStorage('BoolValues.MY_ChatSwitch_DisplayPanel')
 		end,
 	})
 	y = y + deltaY
@@ -506,17 +506,17 @@ function PS.OnPanelActive(wnd)
 			local t = {
 				szOption = _L['channel setting'],
 				fnDisable = function()
-					return not MY.GetStorage('BoolValues.MY_ChatSwitch_DisplayPanel')
+					return not LIB.GetStorage('BoolValues.MY_ChatSwitch_DisplayPanel')
 				end,
 			}
 			for i, v in ipairs(CHANNEL_LIST) do
 				table.insert(t, {
 					szOption = v.title, rgb = v.color,
-					bCheck = true, bChecked = not MY.GetStorage('BoolValues.MY_ChatSwitch_CH' .. i),
+					bCheck = true, bChecked = not LIB.GetStorage('BoolValues.MY_ChatSwitch_CH' .. i),
 					fnAction = function()
-						MY.SetStorage(
+						LIB.SetStorage(
 							'BoolValues.MY_ChatSwitch_CH' .. i,
-							not MY.GetStorage('BoolValues.MY_ChatSwitch_CH' .. i)
+							not LIB.GetStorage('BoolValues.MY_ChatSwitch_CH' .. i)
 						)
 						MY_ChatSwitch.ReInitUI()
 					end,
@@ -525,7 +525,7 @@ function PS.OnPanelActive(wnd)
 			return t
 		end,
 		isdisable = function()
-			return not MY.GetStorage('BoolValues.MY_ChatSwitch_DisplayPanel')
+			return not LIB.GetStorage('BoolValues.MY_ChatSwitch_DisplayPanel')
 		end,
 	})
 	y = y + deltaY
@@ -640,4 +640,4 @@ function PS.OnPanelActive(wnd)
 		y = y + deltaY
 	end
 end
-MY.RegisterPanel('MY_ChatSwitch', _L['chat helper'], _L['Chat'], 'UI/Image/UICommon/ActivePopularize2.UITex|20', PS)
+LIB.RegisterPanel('MY_ChatSwitch', _L['chat helper'], _L['Chat'], 'UI/Image/UICommon/ActivePopularize2.UITex|20', PS)

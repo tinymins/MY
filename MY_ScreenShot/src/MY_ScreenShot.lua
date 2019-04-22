@@ -35,8 +35,8 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_ScreenShot/lang/')
-if not MY.AssertVersion('MY_ScreenShot', _L['MY_ScreenShot'], 0x2011800) then
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_ScreenShot/lang/')
+if not LIB.AssertVersion('MY_ScreenShot', _L['MY_ScreenShot'], 0x2011800) then
 	return
 end
 local _GLOBAL_CONFIG_ = {'config/screenshot.jx3dat', PATH_TYPE.GLOBAL}
@@ -51,7 +51,7 @@ MY_ScreenShot.globalConfig = {
     bAutoHideUI = false,
     szFilePath = '',
 }
-MY_ScreenShot.globalConfig = MY.LoadLUAData(_GLOBAL_CONFIG_) or MY_ScreenShot.globalConfig
+MY_ScreenShot.globalConfig = LIB.LoadLUAData(_GLOBAL_CONFIG_) or MY_ScreenShot.globalConfig
 MY_ScreenShot.bUseGlobalConfig = true
 MY_ScreenShot.privateConfig = {
     szFileExName = 'jpg',
@@ -67,7 +67,7 @@ end
 MY_ScreenShot.SetConfig = function(szKey, oValue)
     if MY_ScreenShot.bUseGlobalConfig then
         MY_ScreenShot.globalConfig[szKey] = oValue
-        MY.SaveLUAData(_GLOBAL_CONFIG_, MY_ScreenShot.globalConfig)
+        LIB.SaveLUAData(_GLOBAL_CONFIG_, MY_ScreenShot.globalConfig)
     else
         MY_ScreenShot.privateConfig[szKey] = oValue
     end
@@ -82,13 +82,13 @@ MY_ScreenShot.GetConfig = function(szKey)
 end
 _MY_ScreenShot.ShotScreen = function(szFilePath, nQuality)
     local szFullPath = ScreenShot(szFilePath, nQuality)
-    MY.Sysmsg({_L('Shot screen succeed, file saved as %s .', szFullPath)})
+    LIB.Sysmsg({_L('Shot screen succeed, file saved as %s .', szFullPath)})
 end
 MY_ScreenShot.ShotScreen = function(nShowUI)
     -- 生成可使用的完整截图目录
     local szFolderPath = MY_ScreenShot.GetConfig('szFilePath')
     if szFolderPath~='' and not (string.sub(szFolderPath,2,2)==':' and IsFileExist(szFolderPath)) then
-        MY.Sysmsg({_L('Shotscreen destination folder error: %s not exist. File has been save to default folder.', szFolderPath)})
+        LIB.Sysmsg({_L('Shotscreen destination folder error: %s not exist. File has been save to default folder.', szFolderPath)})
         szFolderPath = ''
     end
     local szFilePath
@@ -108,9 +108,9 @@ MY_ScreenShot.ShotScreen = function(nShowUI)
     if nShowUI == MY_ScreenShot.Const.HIDE_UI and bStationVisible then
         Station.Hide()
         UI.TempSetShadowHandleVisible(false)
-        MY.DelayCall(100, function()
+        LIB.DelayCall(100, function()
             _MY_ScreenShot.ShotScreen(szFilePath, MY_ScreenShot.GetConfig('nQuality'))
-            MY.DelayCall(300, function()
+            LIB.DelayCall(300, function()
                 Station.Show()
                 UI.RevertShadowHandleVisible()
             end)
@@ -118,9 +118,9 @@ MY_ScreenShot.ShotScreen = function(nShowUI)
     elseif nShowUI == MY_ScreenShot.Const.SHOW_UI and not bStationVisible then
         Station.Show()
         UI.TempSetShadowHandleVisible(true)
-        MY.DelayCall(100, function()
+        LIB.DelayCall(100, function()
             _MY_ScreenShot.ShotScreen(szFilePath, MY_ScreenShot.GetConfig('nQuality'))
-            MY.DelayCall(300, function()
+            LIB.DelayCall(300, function()
                 Station.Hide()
                 UI.RevertShadowHandleVisible()
             end)
@@ -182,17 +182,17 @@ _MY_ScreenShot.OnPanelActive = function(wnd)
 
     ui:append('WndButton', 'WndButton_HotkeyCheck'):children('#WndButton_HotkeyCheck'):pos(w-180, 30):width(170)
       :text(_L['set default screenshot tool'])
-      :click(function() MY.SetHotKey('MY_ScreenShot_Hotkey',1,44,false,false,false) end)
+      :click(function() LIB.SetHotKey('MY_ScreenShot_Hotkey',1,44,false,false,false) end)
 
     ui:append('Text', 'Text_SetHotkey'):find('#Text_SetHotkey'):pos(w-140, 60):color(255,255,0)
       :text(_L['>> set hotkey <<'])
-      :click(function() MY.SetHotKey() end)
+      :click(function() LIB.SetHotKey() end)
 
     fnRefreshPanel(ui)
 
     -- 注册默认工具检查
-    MY.BreatheCall('MY_ScreenShot_Hotkey_Check', 1000, function()
-        local nKey, nShift, nCtrl, nAlt = MY.GetHotKey('MY_ScreenShot_Hotkey')
+    LIB.BreatheCall('MY_ScreenShot_Hotkey_Check', 1000, function()
+        local nKey, nShift, nCtrl, nAlt = LIB.GetHotKey('MY_ScreenShot_Hotkey')
         if type(nKey)=='nil' or nKey==0 then
             ui:children('#WndButton_HotkeyCheck'):text(_L['set default screenshot tool']):enable(true)
         else
@@ -201,11 +201,11 @@ _MY_ScreenShot.OnPanelActive = function(wnd)
     end)
 end
 _MY_ScreenShot.OnPanelDeactive = function( ... )
-    MY.BreatheCall('MY_ScreenShot_Hotkey_Check', false)
+    LIB.BreatheCall('MY_ScreenShot_Hotkey_Check', false)
 end
 -- 快捷键绑定
 -----------------------------------------------
-MY.RegisterHotKey('MY_ScreenShot_Hotkey', _L['shotscreen'], function() MY_ScreenShot.ShotScreen((MY_ScreenShot.GetConfig('bAutoHideUI') and MY_ScreenShot.Const.HIDE_UI) or nil) end, nil)
-MY.RegisterHotKey('MY_ScreenShot_Hotkey_HideUI', _L['shotscreen without ui'], function() MY_ScreenShot.ShotScreen(MY_ScreenShot.Const.HIDE_UI) end, nil)
-MY.RegisterHotKey('MY_ScreenShot_Hotkey_ShowUI', _L['shotscreen with ui'], function() MY_ScreenShot.ShotScreen(MY_ScreenShot.Const.SHOW_UI) end, nil)
-MY.RegisterPanel( 'ScreenShot', _L['screenshot helper'], _L['System'], 'UI/Image/UICommon/Commonpanel.UITex|9', { OnPanelActive = _MY_ScreenShot.OnPanelActive, OnPanelDeactive = _MY_ScreenShot.OnPanelDeactive } )
+LIB.RegisterHotKey('MY_ScreenShot_Hotkey', _L['shotscreen'], function() MY_ScreenShot.ShotScreen((MY_ScreenShot.GetConfig('bAutoHideUI') and MY_ScreenShot.Const.HIDE_UI) or nil) end, nil)
+LIB.RegisterHotKey('MY_ScreenShot_Hotkey_HideUI', _L['shotscreen without ui'], function() MY_ScreenShot.ShotScreen(MY_ScreenShot.Const.HIDE_UI) end, nil)
+LIB.RegisterHotKey('MY_ScreenShot_Hotkey_ShowUI', _L['shotscreen with ui'], function() MY_ScreenShot.ShotScreen(MY_ScreenShot.Const.SHOW_UI) end, nil)
+LIB.RegisterPanel( 'ScreenShot', _L['screenshot helper'], _L['System'], 'UI/Image/UICommon/Commonpanel.UITex|9', { OnPanelActive = _MY_ScreenShot.OnPanelActive, OnPanelDeactive = _MY_ScreenShot.OnPanelDeactive } )

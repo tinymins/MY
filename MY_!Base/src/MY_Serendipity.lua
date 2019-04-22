@@ -35,7 +35,7 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local _L, D = MY.LoadLangPack(), {}
+local _L, D = LIB.LoadLangPack(), {}
 local SERENDIPITY_STATUS = {
 	START = 0,
 	FINISH = 1,
@@ -45,11 +45,11 @@ local SERENDIPITY_STATUS = {
 local SERENDIPITY_LIST = {}
 do
 local Xtra = {
-	bEnable     = MY.FormatDataStructure(MY.LoadLUAData({'config/show_notify.jx3dat'           , PATH_TYPE.GLOBAL}), false),
-	bSound      = MY.FormatDataStructure(MY.LoadLUAData({'config/serendipity_sound.jx3dat'     , PATH_TYPE.GLOBAL}), true ),
-	bPreview    = MY.FormatDataStructure(MY.LoadLUAData({'config/serendipity_preview.jx3dat'   , PATH_TYPE.GLOBAL}), true ),
-	bAutoShare  = MY.FormatDataStructure(MY.LoadLUAData({'config/serendipity_autoshare.jx3dat' , PATH_TYPE.GLOBAL}), false),
-	bSilentMode = MY.FormatDataStructure(MY.LoadLUAData({'config/serendipity_silentmode.jx3dat', PATH_TYPE.GLOBAL}), true ),
+	bEnable     = LIB.FormatDataStructure(LIB.LoadLUAData({'config/show_notify.jx3dat'           , PATH_TYPE.GLOBAL}), false),
+	bSound      = LIB.FormatDataStructure(LIB.LoadLUAData({'config/serendipity_sound.jx3dat'     , PATH_TYPE.GLOBAL}), true ),
+	bPreview    = LIB.FormatDataStructure(LIB.LoadLUAData({'config/serendipity_preview.jx3dat'   , PATH_TYPE.GLOBAL}), true ),
+	bAutoShare  = LIB.FormatDataStructure(LIB.LoadLUAData({'config/serendipity_autoshare.jx3dat' , PATH_TYPE.GLOBAL}), false),
+	bSilentMode = LIB.FormatDataStructure(LIB.LoadLUAData({'config/serendipity_silentmode.jx3dat', PATH_TYPE.GLOBAL}), true ),
 }
 MY_Serendipity = setmetatable({}, {
 	__index = function(t, k)
@@ -62,7 +62,7 @@ MY_Serendipity = setmetatable({}, {
 		if k == 'bEnable' then
 			if v then
 				for i, p in ipairs_r(SERENDIPITY_LIST) do
-					MY.CreateNotify({
+					LIB.CreateNotify({
 						szKey = p.szKey,
 						szMsg = p.szXml,
 						fnAction = p.fnAction,
@@ -72,18 +72,18 @@ MY_Serendipity = setmetatable({}, {
 				end
 			else
 				for i, p in ipairs_r(SERENDIPITY_LIST) do
-					MY.DismissNotify(p.szKey)
+					LIB.DismissNotify(p.szKey)
 				end
 			end
-			MY.SaveLUAData({'config/show_notify.jx3dat', PATH_TYPE.GLOBAL}, v)
+			LIB.SaveLUAData({'config/show_notify.jx3dat', PATH_TYPE.GLOBAL}, v)
 		elseif k == 'bSound' then
-			MY.SaveLUAData({'config/serendipity_sound.jx3dat', PATH_TYPE.GLOBAL}, v)
+			LIB.SaveLUAData({'config/serendipity_sound.jx3dat', PATH_TYPE.GLOBAL}, v)
 		elseif k == 'bPreview' then
-			MY.SaveLUAData({'config/serendipity_preview.jx3dat', PATH_TYPE.GLOBAL}, v)
+			LIB.SaveLUAData({'config/serendipity_preview.jx3dat', PATH_TYPE.GLOBAL}, v)
 		elseif k == 'bAutoShare' then
-			MY.SaveLUAData({'config/serendipity_autoshare.jx3dat', PATH_TYPE.GLOBAL}, v)
+			LIB.SaveLUAData({'config/serendipity_autoshare.jx3dat', PATH_TYPE.GLOBAL}, v)
 		elseif k == 'bSilentMode' then
-			MY.SaveLUAData({'config/serendipity_silentmode.jx3dat', PATH_TYPE.GLOBAL}, v)
+			LIB.SaveLUAData({'config/serendipity_silentmode.jx3dat', PATH_TYPE.GLOBAL}, v)
 		end
 		Xtra[k] = v
 	end,
@@ -98,11 +98,11 @@ local function OnMyNotifyDismiss()
 		end
 	end
 end
-MY.RegisterEvent('MY_NOTIFY_DISMISS', OnMyNotifyDismiss)
+LIB.RegisterEvent('MY_NOTIFY_DISMISS', OnMyNotifyDismiss)
 end
 
 function D.GetSerendipityShareName(fnAction, bNoConfirm)
-	local szReporter = MY.LoadLUAData({'config/realname.jx3dat', PATH_TYPE.ROLE}) or GetClientPlayer().szName:gsub('@.-$', '')
+	local szReporter = LIB.LoadLUAData({'config/realname.jx3dat', PATH_TYPE.ROLE}) or GetClientPlayer().szName:gsub('@.-$', '')
 	if bNoConfirm then
 		if fnAction then
 			fnAction(szReporter)
@@ -110,7 +110,7 @@ function D.GetSerendipityShareName(fnAction, bNoConfirm)
 	else
 		local function fnConfirm(szText)
 			if szText ~= szReporter then
-				MY.SaveLUAData({'config/realname.jx3dat', PATH_TYPE.ROLE}, szText)
+				LIB.SaveLUAData({'config/realname.jx3dat', PATH_TYPE.ROLE}, szText)
 			end
 			if fnAction then
 				fnAction(szText)
@@ -136,34 +136,34 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTi
 				if not config then
 					return
 				end
-				MY.Ajax({
+				LIB.Ajax({
 					driver = config[1],
 					type = config[2],
 					url = 'http://data.jx3.derzh.com/serendipity/?l='
-					.. MY.GetLang() .. '&m=' .. nMethod
-					.. '&data=' .. MY.EncryptString(MY.JsonEncode({
+					.. LIB.GetLang() .. '&m=' .. nMethod
+					.. '&data=' .. LIB.EncryptString(LIB.JsonEncode({
 						n = szName, N = szNameCRC, R = szReporter,
-						S = MY.GetRealServer(1), s = MY.GetRealServer(2),
+						S = LIB.GetRealServer(1), s = LIB.GetRealServer(2),
 						a = szSerendipity, f = nStatus, t = dwTime,
 					})),
-					success = function() MY.DelayCall(dc, false) end,
+					success = function() LIB.DelayCall(dc, false) end,
 					error = function() TryUploadWithNextDriver() end,
 				})
 				i = i + 1
-				dc = MY.DelayCall(6000, TryUploadWithNextDriver)
+				dc = LIB.DelayCall(6000, TryUploadWithNextDriver)
 			end
 			TryUploadWithNextDriver()
 		end
 		if szMode == 'manual' or nMethod ~= 1 then
 			DoUpload()
 		else
-			MY.DelayCall(math.random(0, 10000), DoUpload)
+			LIB.DelayCall(math.random(0, 10000), DoUpload)
 		end
 		-- if szMode == 'manual' then
 		-- 	DoUpload()
 		-- else
 		-- 	-- 战斗中移动中免打扰防止卡住
-		-- 	MY.BreatheCall(function()
+		-- 	LIB.BreatheCall(function()
 		-- 		if Cursor.IsVisible()
 		-- 		and me and not me.bFightState
 		-- 		and (
@@ -193,21 +193,21 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTi
 			ui:append('Handle', { x = 10, y = (h - 90) / 2, w = w - 20, h = h, valign = 1, halign = 1, handlestyle = 3 }, true)
 				:append('Text', {
 					text = (szName == '' and _L['Anonymous'] or szName)
-						.. '\n' .. szSerendipity .. ' - ' .. MY.FormatTime('hh:mm:ss', dwTime)
+						.. '\n' .. szSerendipity .. ' - ' .. LIB.FormatTime('hh:mm:ss', dwTime)
 						.. '\n' .. (szReporter == '' and '' or (szReporter .. _L[','])) .. _L['JX3 is pround of you!']
 						.. '\n' .. _L['Thanks for your kindness!'],
 					fontscale = 1.2,
 				})
 				:formatChildrenPos()
-			MY.DelayCall(10000, function() ui:remove() end)
-			MY.DismissNotify(szKey)
+			LIB.DelayCall(10000, function() ui:remove() end)
+			LIB.DismissNotify(szKey)
 		end
 	end
 	D.GetSerendipityShareName(fnAction, szMode ~= 'manual')
 end
 
 function D.OnSerendipity(szName, szSerendipity, nMethod, nStatus, dwTime)
-	if MY.IsInDevServer() then
+	if LIB.IsInDevServer() then
 		return
 	end
 	local szKey = szName .. '_' .. szSerendipity .. '_' .. dwTime
@@ -226,7 +226,7 @@ function D.OnSerendipity(szName, szSerendipity, nMethod, nStatus, dwTime)
 			D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTime, 'manual')
 		end
 		if MY_Serendipity.bEnable then
-			MY.CreateNotify({
+			LIB.CreateNotify({
 				szKey = szKey,
 				szMsg = szXml,
 				fnAction = fnAction,
@@ -248,7 +248,7 @@ local function GetSerendipityName(nID)
 	end
 end
 
-MY.RegisterEvent('ON_SERENDIPITY_TRIGGER.QIYU', function()
+LIB.RegisterEvent('ON_SERENDIPITY_TRIGGER.QIYU', function()
 	local me = GetClientPlayer()
 	if not me then
 		return
@@ -261,7 +261,7 @@ do
 local l_serendipities
 local function GetSerendipityInfo(dwTabType, dwIndex)
 	if not l_serendipities then
-		l_serendipities = MY.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot .. 'data/serendipities/$lang.jx3dat')
+		l_serendipities = LIB.LoadLUAData(LIB.GetAddonInfo().szFrameworkRoot .. 'data/serendipities/$lang.jx3dat')
 		l_serendipities.name = {}
 		for dwTabType, tList in pairs(l_serendipities) do
 			if dwTabType ~= 'name' then
@@ -289,7 +289,7 @@ local function GetSerendipityInfo(dwTabType, dwIndex)
 	end
 end
 
-MY.RegisterMsgMonitor('QIYU', function(szMsg, nFont, bRich, r, g, b, szChannel)
+LIB.RegisterMsgMonitor('QIYU', function(szMsg, nFont, bRich, r, g, b, szChannel)
 	local me = GetClientPlayer()
 	if not me then
 		return
@@ -316,7 +316,7 @@ MY.RegisterMsgMonitor('QIYU', function(szMsg, nFont, bRich, r, g, b, szChannel)
 	end)
 	-- 恭喜侠士江阙阙在25人英雄会战唐门中获得稀有掉落[夜话·白鹭]！
 	szMsg:gsub(_L.ADVENTURE_PATT2, function(szName, szSerendipity)
-		if not IsDebugClient() and MY.IsParty(szName) and not MY.IsFriend(szName) then
+		if not IsDebugClient() and LIB.IsParty(szName) and not LIB.IsFriend(szName) then
 			return
 		end
 		if not GetSerendipityInfo('name', szSerendipity) then -- 太多了筛选下…
@@ -326,7 +326,7 @@ MY.RegisterMsgMonitor('QIYU', function(szMsg, nFont, bRich, r, g, b, szChannel)
 	end)
 end, {'MSG_SYS'})
 
-MY.RegisterEvent('LOOT_ITEM', function()
+LIB.RegisterEvent('LOOT_ITEM', function()
 	local player = GetPlayer(arg0)
 	local item = GetItem(arg1)
 	if not player or not item then
@@ -338,7 +338,7 @@ MY.RegisterEvent('LOOT_ITEM', function()
 	end
 end)
 
-MY.RegisterEvent('QUEST_FINISHED', function()
+LIB.RegisterEvent('QUEST_FINISHED', function()
 	local me = GetClientPlayer()
 	if not me then
 		return
@@ -350,35 +350,35 @@ MY.RegisterEvent('QUEST_FINISHED', function()
 end)
 end
 
-MY.RegisterInit(function()
-	MY.RegisterTutorial({
+LIB.RegisterInit(function()
+	LIB.RegisterTutorial({
 		szKey = 'MY_Serendipity',
 		szMessage = _L['Would you like to share serendipity?'],
 		fnRequire = function()
-			return not MY.IsInDevMode() and not MY_Serendipity.bEnable
+			return not LIB.IsInDevMode() and not MY_Serendipity.bEnable
 		end,
 		{
 			szOption = _L['Yes'],
 			bDefault = true,
 			fnAction = function()
 				MY_Serendipity.bEnable = true
-				MY.RedrawTab(nil)
+				LIB.RedrawTab(nil)
 			end,
 		},
 		{
 			szOption = _L['No'],
 			fnAction = function()
 				MY_Serendipity.bEnable = false
-				MY.RedrawTab(nil)
+				LIB.RedrawTab(nil)
 			end,
 		},
 	})
 
-	MY.RegisterTutorial({
+	LIB.RegisterTutorial({
 		szKey = 'MY_Serendipity_Auto',
 		szMessage = _L['Would you like to auto share serendipity?'],
 		fnRequire = function()
-			return not MY.IsInDevMode()
+			return not LIB.IsInDevMode()
 				and MY_Serendipity.bEnable
 				and not MY_Serendipity.bAutoShare
 		end,
@@ -387,23 +387,23 @@ MY.RegisterInit(function()
 			bDefault = true,
 			fnAction = function()
 				MY_Serendipity.bAutoShare = true
-				MY.RedrawTab(nil)
+				LIB.RedrawTab(nil)
 			end,
 		},
 		{
 			szOption = _L['No'],
 			fnAction = function()
 				MY_Serendipity.bAutoShare = false
-				MY.RedrawTab(nil)
+				LIB.RedrawTab(nil)
 			end,
 		},
 	})
 
-	MY.RegisterTutorial({
+	LIB.RegisterTutorial({
 		szKey = 'MY_Serendipity_Silent',
 		szMessage = _L['Would you like to share serendipity silently?'],
 		fnRequire = function()
-			return not MY.IsInDevMode()
+			return not LIB.IsInDevMode()
 				and MY_Serendipity.bEnable
 				and MY_Serendipity.bAutoShare
 				and not MY_Serendipity.bSilentMode
@@ -413,14 +413,14 @@ MY.RegisterInit(function()
 			bDefault = true,
 			fnAction = function()
 				MY_Serendipity.bSilentMode = true
-				MY.RedrawTab(nil)
+				LIB.RedrawTab(nil)
 			end,
 		},
 		{
 			szOption = _L['No'],
 			fnAction = function()
 				MY_Serendipity.bSilentMode = false
-				MY.RedrawTab(nil)
+				LIB.RedrawTab(nil)
 			end,
 		},
 	})

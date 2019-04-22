@@ -35,8 +35,8 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/lang/')
-if not MY.AssertVersion('MY_Cataclysm', _L['MY_Cataclysm'], 0x2011800) then
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_Cataclysm/lang/')
+if not LIB.AssertVersion('MY_Cataclysm', _L['MY_Cataclysm'], 0x2011800) then
 	return
 end
 local CFG, PS = MY_Cataclysm.CFG, {}
@@ -62,7 +62,7 @@ function PS.OnPanelActive(frame)
 			if MY_Cataclysm.GetFrame() then
 				MY_CataclysmParty:CallDrawHPMP(true, true)
 			end
-			MY.SwitchTab('MY_Cataclysm_GridColor', true)
+			LIB.SwitchTab('MY_Cataclysm_GridColor', true)
 		end,
 	}, true):autoWidth():width()
 
@@ -77,7 +77,7 @@ function PS.OnPanelActive(frame)
 			if MY_Cataclysm.GetFrame() then
 				MY_CataclysmParty:CallDrawHPMP(true, true)
 			end
-			MY.SwitchTab('MY_Cataclysm_GridColor', true)
+			LIB.SwitchTab('MY_Cataclysm_GridColor', true)
 		end,
 	}, true):autoWidth():width() + 5
 
@@ -92,7 +92,7 @@ function PS.OnPanelActive(frame)
 			if MY_Cataclysm.GetFrame() then
 				MY_CataclysmParty:CallDrawHPMP(true, true)
 			end
-			MY.SwitchTab('MY_Cataclysm_GridColor', true)
+			LIB.SwitchTab('MY_Cataclysm_GridColor', true)
 		end,
 	}, true):autoWidth():width() + 5
 
@@ -107,7 +107,7 @@ function PS.OnPanelActive(frame)
 			if MY_Cataclysm.GetFrame() then
 				MY_CataclysmParty:CallDrawHPMP(true, true)
 			end
-			MY.SwitchTab('MY_Cataclysm_GridColor', true)
+			LIB.SwitchTab('MY_Cataclysm_GridColor', true)
 		end,
 	}, true):autoWidth():width() + 5
 
@@ -119,7 +119,7 @@ function PS.OnPanelActive(frame)
 			if MY_Cataclysm.GetFrame() then
 				MY_CataclysmParty:CallDrawHPMP(true, true)
 			end
-			MY.SwitchTab('MY_Cataclysm_GridColor', true)
+			LIB.SwitchTab('MY_Cataclysm_GridColor', true)
 		end,
 	}, true):autoWidth():height() + 5
 
@@ -130,7 +130,7 @@ function PS.OnPanelActive(frame)
 			x = x, y = y, text = _L['Edit Distance Level'],
 			onclick = function()
 				GetUserInput(_L['distance, distance, ...'], function(szText)
-					local t = MY.SplitString(MY.TrimString(szText), ',')
+					local t = LIB.SplitString(LIB.TrimString(szText), ',')
 					local tt = {}
 					for k, v in ipairs(t) do
 						if not tonumber(v) then
@@ -149,7 +149,7 @@ function PS.OnPanelActive(frame)
 							table.insert(CFG.tDistanceCol, tDistanceCol[i] or { 255, 255, 255 })
 							table.insert(CFG.tDistanceAlpha, tDistanceAlpha[i] or 255)
 						end
-						MY.SwitchTab('MY_Cataclysm_GridColor', true)
+						LIB.SwitchTab('MY_Cataclysm_GridColor', true)
 					end
 				end)
 			end,
@@ -347,4 +347,4 @@ function PS.OnPanelActive(frame)
 		}, true):autoWidth():width() + 5
 	end
 end
-MY.RegisterPanel('MY_Cataclysm_GridColor', _L['Grid Color'], _L['Raid'], 'ui/Image/UICommon/RaidTotal.uitex|71', PS)
+LIB.RegisterPanel('MY_Cataclysm_GridColor', _L['Grid Color'], _L['Raid'], 'ui/Image/UICommon/RaidTotal.uitex|71', PS)

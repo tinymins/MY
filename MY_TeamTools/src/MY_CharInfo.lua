@@ -35,12 +35,12 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_TeamTools/lang/')
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_TeamTools/lang/')
 
 MY_CharInfo = {
 	bEnable = true,
 }
-MY.RegisterCustomData('MY_CharInfo')
+LIB.RegisterCustomData('MY_CharInfo')
 
 local CharInfo = {}
 
@@ -83,7 +83,7 @@ function CharInfo.UpdateFrame(frame, status, data)
 	elseif status == 'PROGRESS' then
 		ui:children('#Text_Info'):text(_L('Syncing: %.2f%%.', data)):show()
 	elseif status == 'ACCEPT' and data and type(data) == 'table' then
-		local self_data = MY.GetCharInfo()
+		local self_data = LIB.GetCharInfo()
 		local function GetSelfValue(label, value)
 			for i = 1, #self_data do
 				local v = self_data[i]
@@ -98,8 +98,8 @@ function CharInfo.UpdateFrame(frame, status, data)
 			return { 255, 255, 255 }
 		end
 		-- 设置基础属性
-		ui:children('#Image_Kungfu'):icon((select(2, MY.GetSkillName(data.dwMountKungfuID, 1))))
-		ui:children('#Text_Name'):color({ MY.GetForceColor(data.dwForceID) })
+		ui:children('#Image_Kungfu'):icon((select(2, LIB.GetSkillName(data.dwMountKungfuID, 1))))
+		ui:children('#Text_Name'):color({ LIB.GetForceColor(data.dwForceID) })
 		-- 绘制属性条
 		local y0 = 20
 		for i = 1, #data do
@@ -136,7 +136,7 @@ function CharInfo.UpdateFrame(frame, status, data)
 	end
 end
 
-MY.RegisterBgMsg('CHAR_INFO', function(szMsgID, nChannel, dwID, szName, bIsSelf, szAction, dwTarID, oData)
+LIB.RegisterBgMsg('CHAR_INFO', function(szMsgID, nChannel, dwID, szName, bIsSelf, szAction, dwTarID, oData)
 	if not bIsSelf and dwTarID == UI_GetClientPlayerID() then
 		local frame = CharInfo.GetFrame(dwID)
 		if not frame then
@@ -158,7 +158,7 @@ end)
 -- public API
 function MY_CharInfo.ViewCharInfoToPlayer(dwID)
 	local nChannel, szName
-	if MY.IsParty(dwID) then
+	if LIB.IsParty(dwID) then
 		local team = GetClientTeam()
 		local info = team.GetMemberInfo(dwID)
 		if info then
@@ -181,16 +181,16 @@ function MY_CharInfo.ViewCharInfoToPlayer(dwID)
 		end
 	end
 	if not nChannel or not szName then
-		MY.Alert(_L['Party limit'])
+		LIB.Alert(_L['Party limit'])
 	else
 		CharInfo.CreateFrame(dwID, szName)
-		MY.SendBgMsg(nChannel, 'CHAR_INFO', 'ASK', dwID, MY_CharInfo.bDebug and 'DEBUG')
+		LIB.SendBgMsg(nChannel, 'CHAR_INFO', 'ASK', dwID, MY_CharInfo.bDebug and 'DEBUG')
 	end
 end
 
 do
 local function GetInfoPanelMenu()
-	local dwType, dwID = MY.GetTarget()
+	local dwType, dwID = LIB.GetTarget()
 	if dwType == TARGET.PLAYER and dwID ~= UI_GetClientPlayerID() then
 		return {
 			szOption = g_tStrings.STR_LOOK .. g_tStrings.STR_EQUIP_ATTR,
@@ -200,5 +200,5 @@ local function GetInfoPanelMenu()
 		}
 	end
 end
-MY.RegisterTargetAddonMenu('MY_CharInfo', GetInfoPanelMenu)
+LIB.RegisterTargetAddonMenu('MY_CharInfo', GetInfoPanelMenu)
 end

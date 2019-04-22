@@ -35,8 +35,8 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_Focus/ui/MY_Focus.ini'
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Focus/lang/')
+local INI_PATH = LIB.GetAddonInfo().szRoot .. 'MY_Focus/ui/MY_Focus.ini'
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_Focus/lang/')
 local D = {
 	GetDisplayList     = MY_Focus.GetDisplayList    ,
 	IsShielded         = MY_Focus.IsShielded        ,
@@ -157,10 +157,10 @@ function D.UpdateItem(hItem, p)
 	local dwType, dwID = p.dwType, p.dwID
 	local szVia, tRule = p.szVia, p.tRule
 	local bDeletable = p.bDeletable
-	local KObject, info, bInfo = MY.GetObject(dwType, dwID)
+	local KObject, info, bInfo = LIB.GetObject(dwType, dwID)
 	local szName = tRule and tRule.szDisplay
 	if not szName or szName == '' then
-		szName = MY.GetObjectName(KObject)
+		szName = LIB.GetObjectName(KObject)
 	end
 	local player = GetClientPlayer()
 	if not KObject then
@@ -184,13 +184,13 @@ function D.UpdateItem(hItem, p)
 	hInfoList:Lookup('Handle_Kungfu'):Hide()
 	if dwType == TARGET.PLAYER then
 		if bInfo and info.dwMountKungfuID then
-			hItem:Lookup('Handle_L/Handle_KungfuName/Text_Kungfu'):SetText(MY.GetKungfuName(info.dwMountKungfuID))
+			hItem:Lookup('Handle_L/Handle_KungfuName/Text_Kungfu'):SetText(LIB.GetKungfuName(info.dwMountKungfuID))
 			hInfoList:Lookup('Handle_Kungfu'):Show()
 			hInfoList:Lookup('Handle_Kungfu/Image_Kungfu'):FromIconID(Table_GetSkillIconID(info.dwMountKungfuID, 1))
 		else
 			local kungfu = KObject.GetKungfuMount()
 			if kungfu then
-				hItem:Lookup('Handle_L/Handle_KungfuName/Text_Kungfu'):SetText(MY.GetKungfuName(kungfu.dwSkillID))
+				hItem:Lookup('Handle_L/Handle_KungfuName/Text_Kungfu'):SetText(LIB.GetKungfuName(kungfu.dwSkillID))
 				hInfoList:Lookup('Handle_Kungfu'):Show()
 				hInfoList:Lookup('Handle_Kungfu/Image_Kungfu'):FromIconID(Table_GetSkillIconID(kungfu.dwSkillID, 1))
 			else
@@ -212,7 +212,7 @@ function D.UpdateItem(hItem, p)
 	-- 标记
 	hInfoList:Lookup('Handle_Mark'):Hide()
 	local KTeam = GetClientTeam()
-	if KTeam and MY.IsInParty() then
+	if KTeam and LIB.IsInParty() then
 		local tMark = KTeam.GetTeamMark()
 		if tMark then
 			local nMarkID = tMark[dwID]
@@ -229,7 +229,7 @@ function D.UpdateItem(hItem, p)
 	-- 目标距离
 	local nDistance = 0
 	if player then
-		nDistance = floor(MY.GetDistance(player, KObject, MY_Focus.szDistanceType) * 10) / 10
+		nDistance = floor(LIB.GetDistance(player, KObject, MY_Focus.szDistanceType) * 10) / 10
 	end
 	hItem:Lookup('Handle_L/Handle_Compass/Compass_Distance'):SetText(nDistance)
 	hItem:Lookup('Handle_L/Handle_School/School_Distance'):SetText(nDistance)
@@ -261,7 +261,7 @@ function D.UpdateItem(hItem, p)
 		hItem:Lookup('Handle_L/Handle_Compass/Image_PointGreen'):Hide()
 		if player and nDistance > 0 then
 			local h
-			if MY.IsEnemy(UI_GetClientPlayerID(), dwID) then
+			if LIB.IsEnemy(UI_GetClientPlayerID(), dwID) then
 				h = hItem:Lookup('Handle_L/Handle_Compass/Image_PointRed')
 			else
 				h = hItem:Lookup('Handle_L/Handle_Compass/Image_PointGreen')
@@ -296,7 +296,7 @@ function D.UpdateItem(hItem, p)
 	if dwType ~= TARGET.DOODAD then
 		local nCurrentLife, nMaxLife = info.nCurrentLife, info.nMaxLife
 		local nCurrentMana, nMaxMana = info.nCurrentMana, info.nMaxMana
-		local szLife = MY.FormatNumberDot(nCurrentLife, 1, false, true)
+		local szLife = LIB.FormatNumberDot(nCurrentLife, 1, false, true)
 		if nMaxLife > 0 then
 			local nPercent = floor(nCurrentLife / nMaxLife * 100)
 			if nPercent > 100 then
@@ -308,7 +308,7 @@ function D.UpdateItem(hItem, p)
 		end
 		if nMaxMana > 0 then
 			hItem:Lookup('Handle_R/Handle_LMN/Image_Mana'):SetPercentage(nCurrentMana / nMaxMana)
-			hItem:Lookup('Handle_R/Handle_LMN/Text_Mana'):SetText(MY.FormatNumberDot(nCurrentMana, 1, false, true) .. '/' .. MY.FormatNumberDot(nMaxMana, 1, false, true))
+			hItem:Lookup('Handle_R/Handle_LMN/Text_Mana'):SetText(LIB.FormatNumberDot(nCurrentMana, 1, false, true) .. '/' .. LIB.FormatNumberDot(nMaxMana, 1, false, true))
 		end
 	end
 	-- 读条
@@ -320,12 +320,12 @@ function D.UpdateItem(hItem, p)
 			and nType ~= CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL
 			and KObject.GetOTActionState() == 1
 		) then
-			MY.WithTarget(dwType, dwID, function()
+			LIB.WithTarget(dwType, dwID, function()
 				local nType, dwSkillID, dwSkillLevel, fProgress = KObject.GetSkillOTActionState()
 				if nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
 				or nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL then
 					hItem:Lookup('Handle_R/Handle_Progress/Image_Progress'):SetPercentage(fProgress)
-					hItem:Lookup('Handle_R/Handle_Progress/Text_Progress'):SetText((MY.GetSkillName(dwSkillID, dwSkillLevel)))
+					hItem:Lookup('Handle_R/Handle_Progress/Text_Progress'):SetText((LIB.GetSkillName(dwSkillID, dwSkillLevel)))
 				else
 					hItem:Lookup('Handle_R/Handle_Progress/Image_Progress'):SetPercentage(0)
 					hItem:Lookup('Handle_R/Handle_Progress/Text_Progress'):SetText('')
@@ -335,7 +335,7 @@ function D.UpdateItem(hItem, p)
 			if nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
 			or nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL then
 				hItem:Lookup('Handle_R/Handle_Progress/Image_Progress'):SetPercentage(fProgress)
-				hItem:Lookup('Handle_R/Handle_Progress/Text_Progress'):SetText((MY.GetSkillName(dwSkillID, dwSkillLevel)))
+				hItem:Lookup('Handle_R/Handle_Progress/Text_Progress'):SetText((LIB.GetSkillName(dwSkillID, dwSkillLevel)))
 			else
 				hItem:Lookup('Handle_R/Handle_Progress/Image_Progress'):SetPercentage(0)
 				hItem:Lookup('Handle_R/Handle_Progress/Text_Progress'):SetText('')
@@ -345,9 +345,9 @@ function D.UpdateItem(hItem, p)
 	-- 目标的目标
 	if MY_Focus.bShowTarget and dwType ~= TARGET.DOODAD then
 		local tp, id = KObject.GetTarget()
-		local tar = MY.GetObject(tp, id)
+		local tar = LIB.GetObject(tp, id)
 		if tar then
-			hItem:Lookup('Handle_R/Handle_Progress/Text_Target'):SetText(MY.GetObjectName(tar))
+			hItem:Lookup('Handle_R/Handle_Progress/Text_Target'):SetText(LIB.GetObjectName(tar))
 		else
 			hItem:Lookup('Handle_R/Handle_Progress/Text_Target'):SetText('')
 		end
@@ -424,9 +424,9 @@ end
 function D.OnFrameBreathe()
 	if not D.IsShielded() then
 		if l_dwLockType and l_dwLockID and l_lockInDisplay then
-			local dwType, dwID = MY.GetTarget()
+			local dwType, dwID = LIB.GetTarget()
 			if dwType ~= l_dwLockType or dwID ~= l_dwLockID then
-				MY.SetTarget(l_dwLockType, l_dwLockID)
+				LIB.SetTarget(l_dwLockType, l_dwLockID)
 			end
 		end
 		if MY_Focus.bSortByDistance then
@@ -510,7 +510,7 @@ function D.OnItemMouseEnter()
 	if name == 'Handle_Info' then
 		this:Lookup('Image_Hover'):Show()
 		if MY_Focus.bHealHelper then
-			TEMP_TARGET_TYPE, TEMP_TARGET_ID = MY.GetTarget()
+			TEMP_TARGET_TYPE, TEMP_TARGET_ID = LIB.GetTarget()
 			SetTarget(this.dwType, this.dwID)
 		end
 		D.OnItemRefreshTip()
@@ -520,7 +520,7 @@ end
 function D.OnItemRefreshTip()
 	local name = this:GetName()
 	if name == 'Handle_Info' then
-		MY.OutputObjectTip(this.dwType, this.dwID, nil, GetFormatText(_L['Via:'] .. this.szVia .. '\n', 82))
+		LIB.OutputObjectTip(this.dwType, this.dwID, nil, GetFormatText(_L['Via:'] .. this.szVia .. '\n', 82))
 	end
 end
 
@@ -529,7 +529,7 @@ function D.OnItemMouseLeave()
 	if name == 'Handle_Info' then
 		if this:Lookup('Image_Hover') then
 			if MY_Focus.bHealHelper and TEMP_TARGET_TYPE and TEMP_TARGET_ID then
-				MY.SetTarget(TEMP_TARGET_TYPE, TEMP_TARGET_ID)
+				LIB.SetTarget(TEMP_TARGET_TYPE, TEMP_TARGET_ID)
 				TEMP_TARGET_TYPE, TEMP_TARGET_ID = nil
 			end
 			this:Lookup('Image_Hover'):Hide()
@@ -551,7 +551,7 @@ function D.OnItemRButtonClick()
 	local name = this:GetName()
 	if name == 'Handle_Info' then
 		local dwType, dwID = this.dwType, this.dwID
-		local t = MY.GetTargetContextMenu(dwType, this:Lookup('Handle_R/Handle_LMN/Text_Name'):GetText(), dwID)
+		local t = LIB.GetTargetContextMenu(dwType, this:Lookup('Handle_R/Handle_LMN/Text_Name'):GetText(), dwID)
 		if this.bDeletable then
 			table.insert(t, 1, {
 				szOption = _L['delete focus'],
@@ -567,9 +567,9 @@ function D.OnItemRButtonClick()
 			table.insert(t, 1, {
 				szOption = _L['Option'],
 				fnAction = function()
-					MY.ShowPanel()
-					MY.FocusPanel()
-					MY.SwitchTab('MY_Focus')
+					LIB.ShowPanel()
+					LIB.FocusPanel()
+					LIB.SwitchTab('MY_Focus')
 				end,
 			})
 		end
@@ -583,7 +583,7 @@ function D.OnItemRButtonClick()
 				else
 					l_dwLockID = dwID
 					l_dwLockType = dwType
-					MY.SetTarget(dwType, dwID)
+					LIB.SetTarget(dwType, dwID)
 				end
 				FireUIEvent('MY_FOCUS_LOCK_UPDATE')
 			end,
@@ -595,9 +595,9 @@ end
 function D.OnLButtonClick()
 	local name = this:GetName()
 	if name == 'Btn_Setting' then
-		MY.ShowPanel()
-		MY.FocusPanel()
-		MY.SwitchTab('MY_Focus')
+		LIB.ShowPanel()
+		LIB.FocusPanel()
+		LIB.SwitchTab('MY_Focus')
 	elseif name == 'Btn_Close' then
 		D.Close()
 	end
@@ -619,7 +619,7 @@ function D.OnCheckBoxUncheck()
 	end
 end
 
-MY.RegisterInit('MY_FOCUS', function()
+LIB.RegisterInit('MY_FOCUS', function()
 	if MY_Focus.bEnable then
 		D.Open()
 	else
@@ -652,5 +652,5 @@ local settings = {
 		},
 	},
 }
-MY_FocusUI = MY.GeneGlobalNS(settings)
+MY_FocusUI = LIB.GeneGlobalNS(settings)
 end

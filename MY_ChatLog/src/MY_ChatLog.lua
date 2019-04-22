@@ -37,8 +37,8 @@ local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_
 -------------------------------------------------------------------------------------------------------------
 local XML_LINE_BREAKER = XML_LINE_BREAKER
 
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_ChatLog/lang/')
-if not MY.AssertVersion('MY_ChatLog', _L['MY_ChatLog'], 0x2011800) then
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_ChatLog/lang/')
+if not LIB.AssertVersion('MY_ChatLog', _L['MY_ChatLog'], 0x2011800) then
 	return
 end
 MY_ChatLog = MY_ChatLog or {}
@@ -54,9 +54,9 @@ RegisterCustomData('MY_ChatLog.tUncheckedChannel')
 ------------------------------------------------------------------------------------------------------
 -- 数据采集
 ------------------------------------------------------------------------------------------------------
-local TONG_ONLINE_MSG        = '^' .. MY.EscapeString(g_tStrings.STR_TALK_HEAD_TONG .. g_tStrings.STR_GUILD_ONLINE_MSG)
-local TONG_MEMBER_LOGIN_MSG  = '^' .. MY.EscapeString(g_tStrings.STR_GUILD_MEMBER_LOGIN):gsub('<link 0>', '.-') .. '$'
-local TONG_MEMBER_LOGOUT_MSG = '^' .. MY.EscapeString(g_tStrings.STR_GUILD_MEMBER_LOGOUT):gsub('<link 0>', '.-') .. '$'
+local TONG_ONLINE_MSG        = '^' .. LIB.EscapeString(g_tStrings.STR_TALK_HEAD_TONG .. g_tStrings.STR_GUILD_ONLINE_MSG)
+local TONG_MEMBER_LOGIN_MSG  = '^' .. LIB.EscapeString(g_tStrings.STR_GUILD_MEMBER_LOGIN):gsub('<link 0>', '.-') .. '$'
+local TONG_MEMBER_LOGOUT_MSG = '^' .. LIB.EscapeString(g_tStrings.STR_GUILD_MEMBER_LOGOUT):gsub('<link 0>', '.-') .. '$'
 
 ------------------------------------------------------------------------------------------------------
 -- 数据库核心
@@ -66,7 +66,7 @@ local EXPORT_SLICE = 100
 local PAGE_DISPLAY = 14
 local DIVIDE_TABLE_AMOUNT = 30000 -- 如果某张表大小超过30000
 local SINGLE_TABLE_AMOUNT = 20000 -- 则将最久远的20000条消息独立成表
-local SZ_INI = MY.GetAddonInfo().szRoot .. 'MY_ChatLog/ui/MY_ChatLog.ini'
+local SZ_INI = LIB.GetAddonInfo().szRoot .. 'MY_ChatLog/ui/MY_ChatLog.ini'
 local LOG_TYPE = {
 	{id = 'whisper', title = g_tStrings.tChannelName['MSG_WHISPER'       ], channels = {'MSG_WHISPER'       }},
 	{id = 'party'  , title = g_tStrings.tChannelName['MSG_PARTY'         ], channels = {'MSG_PARTY'         }},
@@ -173,7 +173,7 @@ local function CreateTable()
 end
 
 local function InitDB(force)
-	MY.Debug({'Initializing database...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
+	LIB.Debug({'Initializing database...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
 
 	-- 数据库写入基本信息
 	DB:Execute('CREATE TABLE IF NOT EXISTS ChatLogInfo (key NVARCHAR(128), value NVARCHAR(4096), PRIMARY KEY (key))')
@@ -194,14 +194,14 @@ local function InitDB(force)
 				end
 			end
 			if confirmtext then
-				MY.Confirm(confirmtext, function()
+				LIB.Confirm(confirmtext, function()
 					OptimizeDB(true)
 				end)
-				return MY.Debug({'Initializing database performance alert...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
+				return LIB.Debug({'Initializing database performance alert...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
 			end
 		end
 		-- 开始初始化
-		MY.Debug({'Creating database...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
+		LIB.Debug({'Creating database...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
 		DB:Execute('BEGIN TRANSACTION')
 		DB:Execute('DROP TABLE IF EXISTS ChatLogUser')
 		-- 创建索引表
@@ -209,25 +209,25 @@ local function InitDB(force)
 		DB:Execute('CREATE INDEX IF NOT EXISTS ChatLogIndex_stime_idx ON ChatLogIndex(stime)')
 		-- 创建第一张记录表 并迁徙历史记录
 		local name = CreateTable()
-		MY.Debug({'Importing chatlog from v1 version...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
+		LIB.Debug({'Importing chatlog from v1 version...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
 		local result = DB:Execute('SELECT name FROM sqlite_master WHERE type = \'table\' AND (name = \'ChatLog\' OR name LIKE \'ChatLog/_%/_%\' ESCAPE \'/\') ORDER BY name')
 		for _, rec in ipairs(result) do
 			DB:Execute('REPLACE INTO ' .. name .. ' SELECT * FROM ' .. rec.name)
 			DB:Execute('DROP TABLE ' .. rec.name)
 		end
 		DB:Execute('REPLACE INTO ChatLogIndex (name, stime, etime, count, detailcount) VALUES (\'' .. name .. '\', 0, -1, (SELECT count(*) FROM ' .. name .. '), \'\')')
-		MY.Debug({'Importing chatlog from v1 version finished...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
+		LIB.Debug({'Importing chatlog from v1 version finished...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
 
 		DB:Execute('END TRANSACTION')
-		MY.Debug({'Creating database finished...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
+		LIB.Debug({'Creating database finished...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
 	end
 	l_initialized = true
-	MY.Debug({'Initializing database finished...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
+	LIB.Debug({'Initializing database finished...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
 
 	-- 导入旧版数据
-	local SZ_OLD_PATH = MY.FormatPath('userdata/CHAT_LOG/$uid/') -- %s/%s.$lang.jx3dat
+	local SZ_OLD_PATH = LIB.FormatPath('userdata/CHAT_LOG/$uid/') -- %s/%s.$lang.jx3dat
 	if IsLocalFileExist(SZ_OLD_PATH) then
-		MY.Debug({'Importing old data...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
+		LIB.Debug({'Importing old data...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
 		local nScanDays = 365 * 3
 		local nDailySec = 24 * 3600
 		local date = TimeToDate(GetCurrentTime())
@@ -246,8 +246,8 @@ local function InitDB(force)
 			local SZ_CHANNEL_PATH = SZ_OLD_PATH .. szChannel .. '/'
 			if IsLocalFileExist(SZ_CHANNEL_PATH) then
 				for dwTime = dwStartTime, dwEndedTime, nDailySec do
-					local szDate = MY.FormatTime('yyyyMMdd', dwTime)
-					local data = MY.LoadLUAData(SZ_CHANNEL_PATH .. szDate .. '.$lang.jx3dat')
+					local szDate = LIB.FormatTime('yyyyMMdd', dwTime)
+					local data = LIB.LoadLUAData(SZ_CHANNEL_PATH .. szDate .. '.$lang.jx3dat')
 					if data then
 						for _, szMsg in ipairs(data) do
 							nHour, nMin, nSec, szTalker = nil
@@ -263,21 +263,21 @@ local function InitDB(force)
 		end
 		PushDB()
 		CPath.DelDir(SZ_OLD_PATH)
-		MY.Debug({'Importing old data finished...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
+		LIB.Debug({'Importing old data finished...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
 	end
 end
 
 function ConnectDB(force)
 	if not DB then
-		local DB_PATH = MY.FormatPath({'userdata/chat_log.db', PATH_TYPE.ROLE})
-		local SZ_OLD_PATH = MY.FormatPath('userdata/CHAT_LOG/$uid.db')
+		local DB_PATH = LIB.FormatPath({'userdata/chat_log.db', PATH_TYPE.ROLE})
+		local SZ_OLD_PATH = LIB.FormatPath('userdata/CHAT_LOG/$uid.db')
 		if IsLocalFileExist(SZ_OLD_PATH) then
 			CPath.Move(SZ_OLD_PATH, DB_PATH)
 		end
-		MY.ConnectDatabase(_L['chat log'], DB_PATH, function(arg0)
+		LIB.ConnectDatabase(_L['chat log'], DB_PATH, function(arg0)
 			DB = arg0
 			if not DB then
-				return MY.Debug({'Cannot connect to database!!!'}, 'MY_ChatLog', DEBUG_LEVEL.ERROR)
+				return LIB.Debug({'Cannot connect to database!!!'}, 'MY_ChatLog', DEBUG_LEVEL.ERROR)
 			end
 			InitDB(force)
 		end)
@@ -313,7 +313,7 @@ function FixSearchDB(deep)
 	if not ConnectDB(true) then
 		return
 	end
-	MY.Debug({'Fixing chatlog search indexes...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
+	LIB.Debug({'Fixing chatlog search indexes...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
 	local count = 0
 	DB:Execute('BEGIN TRANSACTION')
 	local tables = DB:Execute('SELECT * FROM ChatLogIndex ORDER BY stime ASC')
@@ -328,7 +328,7 @@ function FixSearchDB(deep)
 		count = count + #result
 	end
 	DB:Execute('END TRANSACTION')
-	MY.Debug({'Fixing chatlog search indexes finished...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
+	LIB.Debug({'Fixing chatlog search indexes finished...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
 	return count
 end
 
@@ -340,7 +340,7 @@ function OptimizeDB(deep)
 
 	-- 删除不在监控的频道
 	if deep then
-		MY.Debug({'Deleting unwatched channels...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
+		LIB.Debug({'Deleting unwatched channels...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
 		local tables = DB:Execute('SELECT * FROM ChatLogIndex ORDER BY stime ASC')
 		-- 枚举所有监控的频道
 		local where = ''
@@ -360,14 +360,14 @@ function OptimizeDB(deep)
 			DB:Execute('DELETE FROM ' .. info.name .. where)
 			DB:Execute('UPDATE ChatLogIndex SET count = (SELECT count(*) FROM ' .. info.name .. '), detailcount = \'\' WHERE name = \'' .. info.name .. '\'')
 		end
-		MY.Debug({'Deleting unwatched channels finished...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
+		LIB.Debug({'Deleting unwatched channels finished...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
 	end
 
 	-- 拆记录中的大表
 	local tables = DB:Execute('SELECT * FROM ChatLogIndex ORDER BY stime ASC')
 	for i, info in ipairs(tables) do
 		if info.count > DIVIDE_TABLE_AMOUNT then
-			MY.Debug({'Dividing large chatlog table: ' .. info.name}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
+			LIB.Debug({'Dividing large chatlog table: ' .. info.name}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
 			-- 确定分割点
 			local etime = DB:Execute('SELECT time FROM ' .. info.name .. ' ORDER BY time ASC LIMIT 1 OFFSET ' .. (SINGLE_TABLE_AMOUNT - 1))[1].time
 			-- 创建新表/调整旧表
@@ -388,7 +388,7 @@ function OptimizeDB(deep)
 			newinfo.count = DB:Execute('SELECT count(*) AS count FROM ' .. newinfo.name)[1].count
 			DB:Execute('REPLACE INTO ChatLogIndex (name, stime, etime, count, detailcount) VALUES (\''
 				.. newinfo.name .. '\', ' .. newinfo.stime .. ', ' .. newinfo.etime .. ', ' .. newinfo.count .. ', \'\')')
-			MY.Debug({'Dividing large chatlog table ' .. info.name .. ' -> ' .. newinfo.name .. ' finished...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
+			LIB.Debug({'Dividing large chatlog table ' .. info.name .. ' -> ' .. newinfo.name .. ' finished...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
 		end
 	end
 
@@ -398,32 +398,32 @@ function OptimizeDB(deep)
 		for i, info in ipairs(tables) do
 			local nextinfo = tables[i + 1]
 			if nextinfo and (info.count + nextinfo.count) <= DIVIDE_TABLE_AMOUNT then
-				MY.Debug({'Merging small chatlog table: ' .. info.name .. ', ' .. nextinfo.name}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
+				LIB.Debug({'Merging small chatlog table: ' .. info.name .. ', ' .. nextinfo.name}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
 				DB:Execute('REPLACE INTO ' .. info.name .. ' SELECT * FROM ' .. nextinfo.name)
 				DB:Execute('DROP TABLE ' .. nextinfo.name)
 				DB:Execute('UPDATE ChatLogIndex SET count = (SELECT count(*) FROM ' .. info.name .. '), detailcount = \'\', etime = ' .. nextinfo.etime .. ' WHERE name = \'' .. info.name .. '\'')
 				DB:Execute('DELETE FROM ChatLogIndex WHERE name = \'' .. nextinfo.name .. '\'')
 				remove(tables, i + 1)
-				MY.Debug({'Merging small chatlog table (' .. info.name .. ', ' .. nextinfo.name .. ') finished...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
+				LIB.Debug({'Merging small chatlog table (' .. info.name .. ', ' .. nextinfo.name .. ') finished...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
 			end
 		end
 	end
 
 	DB:Execute('END TRANSACTION')
 	if deep then
-		MY.Debug({'Compressing database...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
+		LIB.Debug({'Compressing database...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
 		DB:Execute('VACUUM')
-		MY.Debug({'Compressing database finished...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
+		LIB.Debug({'Compressing database finished...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
 	end
 end
 
 function PushDB()
 	if #aInsQueue == 0 and #aDelQueue == 0 then
-		return MY.Debug({'Pushing to database skipped due to empty queue...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
+		return LIB.Debug({'Pushing to database skipped due to empty queue...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
 	elseif not ConnectDB() then
-		return MY.Debug({'Database has not been initialized yet, PushDB failed.'}, 'MY_ChatLog', DEBUG_LEVEL.ERROR)
+		return LIB.Debug({'Database has not been initialized yet, PushDB failed.'}, 'MY_ChatLog', DEBUG_LEVEL.ERROR)
 	end
-	MY.Debug({'Pushing to database...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
+	LIB.Debug({'Pushing to database...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
 	local tables = DB:Execute('SELECT * FROM ChatLogIndex ORDER BY stime DESC')
 	DB:Execute('BEGIN TRANSACTION')
 	-- 插入记录
@@ -464,7 +464,7 @@ function PushDB()
 		end
 	end
 	DB:Execute('END TRANSACTION')
-	MY.Debug({'Pushing to database finished...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
+	LIB.Debug({'Pushing to database finished...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
 	FireUIEvent('ON_MY_CHATLOG_PUSHDB')
 end
 
@@ -473,7 +473,7 @@ local function GetChatLogTableCount(channels, search, unsaved)
 	local usearch = AnsiToUTF8('%' .. search .. '%')
 	local tables  = DB:Execute('SELECT * FROM ChatLogIndex ORDER BY stime ASC')
 	for _, info in ipairs(tables) do
-		info.detailcountcache = info.detailcount and MY.JsonDecode(info.detailcount)
+		info.detailcountcache = info.detailcount and LIB.JsonDecode(info.detailcount)
 		if not info.detailcountcache then
 			info.detailcountcache = {list = {}, cache = {}}
 		end
@@ -504,7 +504,7 @@ local function GetChatLogTableCount(channels, search, unsaved)
 				stmtUpd = DB:Prepare('UPDATE ChatLogIndex SET detailcount = ? WHERE name = ?')
 			end
 			stmtUpd:ClearBindings()
-			stmtUpd:BindAll(MY.JsonEncode(info.detailcountcache), info.name)
+			stmtUpd:BindAll(LIB.JsonEncode(info.detailcountcache), info.name)
 			stmtUpd:Execute()
 		end
 	end
@@ -637,19 +637,19 @@ local function InitMsgMon()
 		end
 		InsertMsg(CHANNELS_R[szChannel], szText, szMsg, szTalker, GetCurrentTime())
 
-		if MY_ChatLog.bRealtimeCommit and not MY.IsShieldedVersion() then
+		if MY_ChatLog.bRealtimeCommit and not LIB.IsShieldedVersion() then
 			PushDB()
 		end
 	end
-	MY.RegisterIdle('MY_ChatLog_Save', function()
-		if not MY.IsShieldedVersion() then
+	LIB.RegisterIdle('MY_ChatLog_Save', function()
+		if not LIB.IsShieldedVersion() then
 			PushDB()
 		end
 	end)
-	MY.RegisterMsgMonitor('MY_ChatLog', OnMsg, aChannels)
-	MY.RegisterEvent('LOADING_ENDING.MY_ChatLog_Save', PushDB)
+	LIB.RegisterMsgMonitor('MY_ChatLog', OnMsg, aChannels)
+	LIB.RegisterEvent('LOADING_ENDING.MY_ChatLog_Save', PushDB)
 end
-MY.RegisterInit('MY_ChatLog_InitMon', InitMsgMon)
+LIB.RegisterInit('MY_ChatLog_InitMon', InitMsgMon)
 
 local function ReleaseDB()
 	if not ConnectDB(true) then
@@ -659,8 +659,8 @@ local function ReleaseDB()
 	OptimizeDB(false)
 	DB:Release()
 end
-MY.RegisterExit('MY_Chat_Release', ReleaseDB)
-MY.RegisterEvent('DISCONNECT.MY_Chat_Release', ReleaseDB)
+LIB.RegisterExit('MY_Chat_Release', ReleaseDB)
+LIB.RegisterEvent('DISCONNECT.MY_Chat_Release', ReleaseDB)
 end
 
 function MY_ChatLog.Open()
@@ -862,7 +862,7 @@ function MY_ChatLog.OnItemRButtonClick()
 			}, {
 				szOption = _L['copy this record'],
 				fnAction = function()
-					MY.CopyChatLine(this:Lookup('Handle_ChatLog_Msg'):Lookup(0), true)
+					LIB.CopyChatLine(this:Lookup('Handle_ChatLog_Msg'):Lookup(0), true)
 				end,
 			}
 		}
@@ -952,11 +952,11 @@ function MY_ChatLog.UpdatePage(frame, noscroll)
 			local r, g, b = unpack(MSGTYPE_COLOR[CHANNELS[rec.channel]])
 			local h = hItem:Lookup('Handle_ChatLog_Msg')
 			h:Clear()
-			h:AppendItemFromString(MY.GetTimeLinkText({r=r, g=g, b=b, f=f, s='[yyyy/MM/dd][hh:mm:ss]'}, rec.time))
+			h:AppendItemFromString(LIB.GetTimeLinkText({r=r, g=g, b=b, f=f, s='[yyyy/MM/dd][hh:mm:ss]'}, rec.time))
 			local nCount = h:GetItemCount()
 			h:AppendItemFromString(UTF8ToAnsi(rec.msg))
 			for i = nCount, h:GetItemCount() - 1 do
-				MY.RenderChatLink(h:Lookup(i))
+				LIB.RenderChatLink(h:Lookup(i))
 			end
 			if MY_Farbnamen and MY_Farbnamen.Render then
 				for i = nCount, h:GetItemCount() - 1 do
@@ -1011,7 +1011,7 @@ local function getHeader()
 	local szHeader = [[<!DOCTYPE html>
 <html>
 <head><meta http-equiv='Content-Type' content='text/html; charset=]]
-	.. ((MY.GetLang() == 'zhcn' and 'GBK') or 'UTF-8') .. [[' />
+	.. ((LIB.GetLang() == 'zhcn' and 'GBK') or 'UTF-8') .. [[' />
 <style>
 *{font-size: 12px}
 a{line-height: 16px}
@@ -1027,7 +1027,7 @@ span.emotion_44{width:21px; height: 21px; display: inline-block; background-imag
 ]]
 
 	for k, v in pairs(g_tStrings.tForceTitle) do
-		szHeader = szHeader .. ('.force-%s{color:#%02X%02X%02X}'):format(k, MY.GetForceColor(k, 'forecolor'))
+		szHeader = szHeader .. ('.force-%s{color:#%02X%02X%02X}'):format(k, LIB.GetForceColor(k, 'forecolor'))
 	end
 
 	szHeader = szHeader .. [[
@@ -1090,8 +1090,8 @@ span.emotion_44{width:21px; height: 21px; display: inline-block; background-imag
 	})();
 </script>
 <div>
-<a style='color: #fff;margin: 0 10px'>]] .. GetClientPlayer().szName .. ' @ ' .. MY.GetServer() ..
-' Exported at ' .. MY.FormatTime('yyyyMMdd hh:mm:ss', GetCurrentTime()) .. '</a><hr />'
+<a style='color: #fff;margin: 0 10px'>]] .. GetClientPlayer().szName .. ' @ ' .. LIB.GetServer() ..
+' Exported at ' .. LIB.FormatTime('yyyyMMdd hh:mm:ss', GetCurrentTime()) .. '</a><hr />'
 
 	return szHeader
 end
@@ -1112,7 +1112,7 @@ local function getDateTitle(szDate)
 end
 
 local function convertXml2Html(szXml)
-	local aXml = MY.Xml.Decode(szXml)
+	local aXml = LIB.Xml.Decode(szXml)
 	local t = {}
 	if aXml then
 		local text, name
@@ -1154,7 +1154,7 @@ end
 local l_bExporting
 function MY_ChatLog.ExportConfirm()
 	if l_bExporting then
-		return MY.Sysmsg({_L['Already exporting, please wait.']})
+		return LIB.Sysmsg({_L['Already exporting, please wait.']})
 	end
 	local ui = UI.CreateFrame('MY_ChatLog_Export', {
 		simple = true, esc = true, close = true, w = 140,
@@ -1201,7 +1201,7 @@ function MY_ChatLog.ExportConfirm()
 				end
 			end
 			MY_ChatLog.Export(
-				MY.FormatPath({'export/ChatLog/$name@$server@' .. MY.FormatTime('yyyyMMddhhmmss') .. '.html', PATH_TYPE.ROLE}),
+				LIB.FormatPath({'export/ChatLog/$name@$server@' .. LIB.FormatTime('yyyyMMddhhmmss') .. '.html', PATH_TYPE.ROLE}),
 				aChannels, 10,
 				function(title, progress)
 					OutputMessage('MSG_ANNOUNCE_YELLOW', _L('Exporting chatlog: %s, %.2f%%.', title, progress * 100))
@@ -1217,7 +1217,7 @@ end
 
 function MY_ChatLog.Export(szExportFile, aChannels, nPerSec, onProgress)
 	if l_bExporting then
-		return MY.Sysmsg({_L['Already exporting, please wait.']})
+		return LIB.Sysmsg({_L['Already exporting, please wait.']})
 	end
 	if not ConnectDB(true) then
 		return
@@ -1227,7 +1227,7 @@ function MY_ChatLog.Export(szExportFile, aChannels, nPerSec, onProgress)
 	end
 	local status = Log(szExportFile, getHeader(), 'clear')
 	if status ~= 'SUCCEED' then
-		return MY.Sysmsg({_L('Error: open file error %s [%s]', szExportFile, status)})
+		return LIB.Sysmsg({_L('Error: open file error %s [%s]', szExportFile, status)})
 	end
 	l_bExporting = true
 
@@ -1240,15 +1240,15 @@ function MY_ChatLog.Export(szExportFile, aChannels, nPerSec, onProgress)
 				onProgress(_L['Export succeed'], 1)
 			end
 			local szFile = GetRootPath() .. szExportFile:gsub('/', '\\')
-			MY.Alert(_L('Chatlog export succeed, file saved as %s', szFile))
-			MY.Sysmsg({_L('Chatlog export succeed, file saved as %s', szFile)})
+			LIB.Alert(_L('Chatlog export succeed, file saved as %s', szFile))
+			LIB.Sysmsg({_L('Chatlog export succeed, file saved as %s', szFile)})
 			return 0
 		end
 		local data = GetChatLog(aChannels, '', nPage * EXPORT_SLICE, EXPORT_SLICE)
 		for i, rec in ipairs(data) do
 			local f = GetMsgFont(CHANNELS[rec.channel])
 			local r, g, b = unpack(MSGTYPE_COLOR[CHANNELS[rec.channel]])
-			Log(szExportFile, convertXml2Html(MY.GetTimeLinkText({r=r, g=g, b=b, f=f, s='[yyyy/MM/dd][hh:mm:ss]'}, rec.time)))
+			Log(szExportFile, convertXml2Html(LIB.GetTimeLinkText({r=r, g=g, b=b, f=f, s='[yyyy/MM/dd][hh:mm:ss]'}, rec.time)))
 			Log(szExportFile, convertXml2Html(UTF8ToAnsi(rec.msg)))
 		end
 		if onProgress then
@@ -1256,7 +1256,7 @@ function MY_ChatLog.Export(szExportFile, aChannels, nPerSec, onProgress)
 		end
 		nPage = nPage + 1
 	end
-	MY.BreatheCall('MY_ChatLog_Export', Export)
+	LIB.BreatheCall('MY_ChatLog_Export', Export)
 end
 
 ------------------------------------------------------------------------------------------------------
@@ -1267,9 +1267,9 @@ local menu = {
 	szOption = _L['chat log'],
 	fnAction = function() MY_ChatLog.Toggle() end,
 }
-MY.RegisterAddonMenu('MY_CHATLOG_MENU', menu)
+LIB.RegisterAddonMenu('MY_CHATLOG_MENU', menu)
 end
-MY.RegisterHotKey('MY_ChatLog', _L['chat log'], MY_ChatLog.Toggle, nil)
+LIB.RegisterHotKey('MY_ChatLog', _L['chat log'], MY_ChatLog.Toggle, nil)
 
 local PS = {}
 function PS.OnPanelActive(wnd)
@@ -1299,7 +1299,7 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + dy
 
-	if not MY.IsShieldedVersion() then
+	if not LIB.IsShieldedVersion() then
 		ui:append('WndCheckBox', {
 			x = x, y = y, w = wr,
 			text = _L['realtime database commit'],
@@ -1333,10 +1333,10 @@ function PS.OnPanelActive(wnd)
 		x = x, y = y, w = 150,
 		text = _L['optimize/compress datebase'],
 		onclick = function()
-			MY.Confirm(_L['optimize/compress datebase will take a long time and may cause a disconnection, are you sure to continue?'], function()
-				MY.Confirm(_L['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'], function()
+			LIB.Confirm(_L['optimize/compress datebase will take a long time and may cause a disconnection, are you sure to continue?'], function()
+				LIB.Confirm(_L['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'], function()
 					OptimizeDB(true)
-					MY.Alert(_L['Optimize finished!'])
+					LIB.Alert(_L['Optimize finished!'])
 				end)
 			end)
 		end,
@@ -1347,9 +1347,9 @@ function PS.OnPanelActive(wnd)
 		x = x, y = y, w = 150,
 		text = _L['fix search datebase'],
 		onclick = function()
-			MY.Confirm(_L['fix search datebase may take a long time and cause a disconnection, are you sure to continue?'], function()
-				MY.Confirm(_L['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'], function()
-					MY.Alert(_L('%d chatlogs fixed!', FixSearchDB()))
+			LIB.Confirm(_L['fix search datebase may take a long time and cause a disconnection, are you sure to continue?'], function()
+				LIB.Confirm(_L['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'], function()
+					LIB.Alert(_L('%d chatlogs fixed!', FixSearchDB()))
 				end)
 			end)
 		end,
@@ -1360,9 +1360,9 @@ function PS.OnPanelActive(wnd)
 		x = x, y = y, w = 150,
 		text = _L['reindex search datebase'],
 		onclick = function()
-			MY.Confirm(_L['reindex search datebase may take a long time and cause a disconnection, are you sure to continue?'], function()
-				MY.Confirm(_L['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'], function()
-					MY.Alert(_L('%d chatlogs reindexed!', FixSearchDB(true)))
+			LIB.Confirm(_L['reindex search datebase may take a long time and cause a disconnection, are you sure to continue?'], function()
+				LIB.Confirm(_L['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'], function()
+					LIB.Alert(_L('%d chatlogs reindexed!', FixSearchDB(true)))
 				end)
 			end)
 		end,
@@ -1373,14 +1373,14 @@ function PS.OnPanelActive(wnd)
 		x = x, y = y, w = 150,
 		text = _L['import chatlog'],
 		onclick = function()
-			local file = GetOpenFileName(_L['Please select your chatlog database file.'], 'Database File(*.db)\0*.db\0All Files(*.*)\0*.*\0\0', MY.FormatPath({'userdata/', PATH_TYPE.ROLE}))
+			local file = GetOpenFileName(_L['Please select your chatlog database file.'], 'Database File(*.db)\0*.db\0All Files(*.*)\0*.*\0\0', LIB.FormatPath({'userdata/', PATH_TYPE.ROLE}))
 			if not empty(file) then
-				MY.Confirm(_L['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'], function()
-						MY.Alert(_L('%d chatlogs imported!', ImportDB(file)))
+				LIB.Confirm(_L['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'], function()
+						LIB.Alert(_L('%d chatlogs imported!', ImportDB(file)))
 				end)
 			end
 		end,
 	})
 	y = y + dy
 end
-MY.RegisterPanel( 'ChatLog', _L['chat log'], _L['Chat'], 'ui/Image/button/SystemButton.UITex|43', PS)
+LIB.RegisterPanel( 'ChatLog', _L['chat log'], _L['Chat'], 'ui/Image/button/SystemButton.UITex|43', PS)

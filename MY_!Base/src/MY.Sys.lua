@@ -36,24 +36,24 @@ local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.Is
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
 MY = MY or {}
-local _L, _C = MY.LoadLangPack(), {}
+local _L, _C = LIB.LoadLangPack(), {}
 
 -- 获取游戏语言
-function MY.GetLang()
+function LIB.GetLang()
 	local _, _, lang = GetVersion()
 	return lang
 end
 
 -- 获取功能屏蔽状态
 do
-local SHIELDED_VERSION = MY.GetLang() == 'zhcn' -- 屏蔽被河蟹的功能（国服启用）
-function MY.IsShieldedVersion(bShieldedVersion)
+local SHIELDED_VERSION = LIB.GetLang() == 'zhcn' -- 屏蔽被河蟹的功能（国服启用）
+function LIB.IsShieldedVersion(bShieldedVersion)
 	if bShieldedVersion == nil then
 		return SHIELDED_VERSION
 	else
 		SHIELDED_VERSION = bShieldedVersion
-		if MY.IsPanelOpened() then
-			MY.ReopenPanel()
+		if LIB.IsPanelOpened() then
+			LIB.ReopenPanel()
 		end
 		FireUIEvent('MY_SHIELDED_VERSION')
 	end
@@ -76,14 +76,14 @@ end
 -- #######################################################################################################
 do local HOTKEY_CACHE = {}
 -- 增加系统快捷键
--- (void) MY.RegisterHotKey(string szName, string szTitle, func fnAction)   -- 增加系统快捷键
-function MY.RegisterHotKey(szName, szTitle, fnAction)
+-- (void) LIB.RegisterHotKey(string szName, string szTitle, func fnAction)   -- 增加系统快捷键
+function LIB.RegisterHotKey(szName, szTitle, fnAction)
 	insert(HOTKEY_CACHE, { szName = szName, szTitle = szTitle, fnAction = fnAction })
 end
 
 -- 获取快捷键名称
--- (string) MY.GetHotKeyDisplay(string szName, boolean bBracket, boolean bShort)      -- 取得快捷键名称
-function MY.GetHotKeyDisplay(szName, bBracket, bShort)
+-- (string) LIB.GetHotKeyDisplay(string szName, boolean bBracket, boolean bShort)      -- 取得快捷键名称
+function LIB.GetHotKeyDisplay(szName, bBracket, bShort)
 	local nKey, bShift, bCtrl, bAlt = Hotkey.Get(szName)
 	local szDisplay = GetKeyShow(nKey, bShift, bCtrl, bAlt, bShort == true)
 	if szDisplay ~= '' and bBracket then
@@ -93,9 +93,9 @@ function MY.GetHotKeyDisplay(szName, bBracket, bShort)
 end
 
 -- 获取快捷键
--- (table) MY.GetHotKey(string szName, true , true )       -- 取得快捷键
--- (number nKey, boolean bShift, boolean bCtrl, boolean bAlt) MY.GetHotKey(string szName, true , fasle)        -- 取得快捷键
-function MY.GetHotKey(szName, bBracket, bShort)
+-- (table) LIB.GetHotKey(string szName, true , true )       -- 取得快捷键
+-- (number nKey, boolean bShift, boolean bCtrl, boolean bAlt) LIB.GetHotKey(string szName, true , fasle)        -- 取得快捷键
+function LIB.GetHotKey(szName, bBracket, bShort)
 	local nKey, bShift, bCtrl, bAlt = Hotkey.Get(szName)
 	if nKey==0 then return nil end
 	if bBracket then
@@ -106,18 +106,18 @@ function MY.GetHotKey(szName, bBracket, bShort)
 end
 
 -- 设置快捷键/打开快捷键设置面板    -- HM里面抠出来的
--- (void) MY.SetHotKey()                               -- 打开快捷键设置面板
--- (void) MY.SetHotKey(string szGroup)     -- 打开快捷键设置面板并定位到 szGroup 分组（不可用）
--- (void) MY.SetHotKey(string szCommand, number nKey )     -- 设置快捷键
--- (void) MY.SetHotKey(string szCommand, number nIndex, number nKey [, boolean bShift [, boolean bCtrl [, boolean bAlt] ] ])       -- 设置快捷键
-function MY.SetHotKey(szCommand, nIndex, nKey, bShift, bCtrl, bAlt)
+-- (void) LIB.SetHotKey()                               -- 打开快捷键设置面板
+-- (void) LIB.SetHotKey(string szGroup)     -- 打开快捷键设置面板并定位到 szGroup 分组（不可用）
+-- (void) LIB.SetHotKey(string szCommand, number nKey )     -- 设置快捷键
+-- (void) LIB.SetHotKey(string szCommand, number nIndex, number nKey [, boolean bShift [, boolean bCtrl [, boolean bAlt] ] ])       -- 设置快捷键
+function LIB.SetHotKey(szCommand, nIndex, nKey, bShift, bCtrl, bAlt)
 	if nIndex then
 		if not nKey then
 			nIndex, nKey = 1, nIndex
 		end
 		Hotkey.Set(szCommand, nIndex, nKey, bShift == true, bCtrl == true, bAlt == true)
 	else
-		local szGroup = szCommand or MY.GetAddonInfo().szName
+		local szGroup = szCommand or LIB.GetAddonInfo().szName
 
 		local frame = Station.Lookup('Topmost/HotkeyPanel')
 		if not frame then
@@ -243,9 +243,9 @@ function MY.SetHotKey(szCommand, nIndex, nKey, bShift, bCtrl, bAlt)
 	end
 end
 
-MY.RegisterInit('MYLIB#BIND_HOTKEY', function()
+LIB.RegisterInit(LIB.GetAddonInfo().szNameSpace .. '#BIND_HOTKEY', function()
 	-- hotkey
-	Hotkey.AddBinding('MY_Total', _L['Open/Close main panel'], MY.GetAddonInfo().szName, MY.TogglePanel, nil)
+	Hotkey.AddBinding('MY_Total', _L['Open/Close main panel'], LIB.GetAddonInfo().szName, LIB.TogglePanel, nil)
 	for _, v in ipairs(HOTKEY_CACHE) do
 		Hotkey.AddBinding(v.szName, v.szTitle, '', v.fnAction, nil)
 	end
@@ -253,7 +253,7 @@ MY.RegisterInit('MYLIB#BIND_HOTKEY', function()
 		Hotkey.AddBinding('MY_HotKey_Null_'..i, _L['none-function hotkey'], '', function() end, nil)
 	end
 end)
-MY.RegisterHotKey('MY_STOP_CASTING', _L['Stop cast skill'], function() GetClientPlayer().StopCurrentAction() end)
+LIB.RegisterHotKey('MY_STOP_CASTING', _L['Stop cast skill'], function() GetClientPlayer().StopCurrentAction() end)
 end
 
 -- Save & Load Lua Data
@@ -271,16 +271,16 @@ end
 --       # #       #   #         #   #   # # # # #       #         #                 #     #   #
 --   # #     #   #       #     # # #     #       #       #       # #                 #   #       #
 -- ##################################################################################################
-if IsLocalFileExist(MY.GetAddonInfo().szRoot .. '@DATA/') then
-	CPath.Move(MY.GetAddonInfo().szRoot .. '@DATA/', MY.GetAddonInfo().szInterfaceRoot .. 'MY#DATA/')
+if IsLocalFileExist(LIB.GetAddonInfo().szRoot .. '@DATA/') then
+	CPath.Move(LIB.GetAddonInfo().szRoot .. '@DATA/', LIB.GetAddonInfo().szInterfaceRoot .. 'MY#DATA/')
 end
 
 -- 格式化数据文件路径（替换$uid、$lang、$server以及补全相对路径）
--- (string) MY.GetLUADataPath(oFilePath)
+-- (string) LIB.GetLUADataPath(oFilePath)
 --   当路径为绝对路径时(以斜杠开头)不作处理
 --   当路径为相对路径时 相对于插件`MY@DATA`目录
 --   可以传入表{szPath, ePathType}
-function MY.FormatPath(oFilePath, tParams)
+function LIB.FormatPath(oFilePath, tParams)
 	if not tParams then
 		tParams = {}
 	end
@@ -301,19 +301,19 @@ function MY.FormatPath(oFilePath, tParams)
 		elseif ePathType == PATH_TYPE.SERVER then
 			szFilePath = '#$relserver@$lang/' .. szFilePath
 		end
-		szFilePath = MY.GetAddonInfo().szInterfaceRoot .. 'MY#DATA/' .. szFilePath
+		szFilePath = LIB.GetAddonInfo().szInterfaceRoot .. 'MY#DATA/' .. szFilePath
 	end
 	-- if exist $uid then add user role identity
 	if string.find(szFilePath, '%$uid') then
-		szFilePath = szFilePath:gsub('%$uid', tParams['uid'] or MY.GetClientUUID())
+		szFilePath = szFilePath:gsub('%$uid', tParams['uid'] or LIB.GetClientUUID())
 	end
 	-- if exist $name then add user role identity
 	if string.find(szFilePath, '%$name') then
-		szFilePath = szFilePath:gsub('%$name', tParams['name'] or MY.GetClientInfo().szName or MY.GetClientUUID())
+		szFilePath = szFilePath:gsub('%$name', tParams['name'] or LIB.GetClientInfo().szName or LIB.GetClientUUID())
 	end
 	-- if exist $lang then add language identity
 	if string.find(szFilePath, '%$lang') then
-		szFilePath = szFilePath:gsub('%$lang', tParams['lang'] or string.lower(MY.GetLang()))
+		szFilePath = szFilePath:gsub('%$lang', tParams['lang'] or string.lower(LIB.GetLang()))
 	end
 	-- if exist $version then add version identity
 	if string.find(szFilePath, '%$version') then
@@ -321,15 +321,15 @@ function MY.FormatPath(oFilePath, tParams)
 	end
 	-- if exist $date then add date identity
 	if string.find(szFilePath, '%$date') then
-		szFilePath = szFilePath:gsub('%$date', tParams['date'] or MY.FormatTime('yyyyMMdd', GetCurrentTime()))
+		szFilePath = szFilePath:gsub('%$date', tParams['date'] or LIB.FormatTime('yyyyMMdd', GetCurrentTime()))
 	end
 	-- if exist $server then add server identity
 	if string.find(szFilePath, '%$server') then
-		szFilePath = szFilePath:gsub('%$server', tParams['server'] or ((MY.GetServer()):gsub('[/\\|:%*%?"<>]', '')))
+		szFilePath = szFilePath:gsub('%$server', tParams['server'] or ((LIB.GetServer()):gsub('[/\\|:%*%?"<>]', '')))
 	end
 	-- if exist $relserver then add relserver identity
 	if string.find(szFilePath, '%$relserver') then
-		szFilePath = szFilePath:gsub('%$relserver', tParams['relserver'] or ((MY.GetRealServer()):gsub('[/\\|:%*%?"<>]', '')))
+		szFilePath = szFilePath:gsub('%$relserver', tParams['relserver'] or ((LIB.GetRealServer()):gsub('[/\\|:%*%?"<>]', '')))
 	end
 	local rootPath = GetRootPath():gsub('\\', '/')
 	if szFilePath:find(rootPath) == 1 then
@@ -338,17 +338,17 @@ function MY.FormatPath(oFilePath, tParams)
 	return szFilePath
 end
 
-function MY.GetRelativePath(oPath, oRoot)
-	local szPath = MY.FormatPath(oPath)
-	local szRoot = MY.FormatPath(oRoot)
+function LIB.GetRelativePath(oPath, oRoot)
+	local szPath = LIB.FormatPath(oPath)
+	local szRoot = LIB.FormatPath(oRoot)
 	if wstring.find(szPath:lower(), szRoot:lower()) ~= 1 then
 		return
 	end
 	return szPath:sub(#szRoot + 1)
 end
 
-function MY.GetLUADataPath(oFilePath)
-	local szFilePath = MY.FormatPath(oFilePath)
+function LIB.GetLUADataPath(oFilePath)
+	local szFilePath = LIB.FormatPath(oFilePath)
 	-- ensure has file name
 	if string.sub(szFilePath, -1) == '/' then
 		szFilePath = szFilePath .. 'data'
@@ -360,7 +360,7 @@ function MY.GetLUADataPath(oFilePath)
 	return szFilePath
 end
 
-function MY.ConcatPath(...)
+function LIB.ConcatPath(...)
 	local aPath = {...}
 	local szPath = ''
 	for _, s in ipairs(aPath) do
@@ -377,33 +377,33 @@ function MY.ConcatPath(...)
 end
 
 -- 保存数据文件
-function MY.SaveLUAData(oFilePath, ...)
+function LIB.SaveLUAData(oFilePath, ...)
 	local nStartTick = GetTickCount()
 	-- format uri
-	local szFilePath = MY.GetLUADataPath(oFilePath)
+	local szFilePath = LIB.GetLUADataPath(oFilePath)
 	-- save data
 	local data = SaveLUAData(szFilePath, ...)
 	-- performance monitor
-	MY.Debug({_L('%s saved during %dms.', szFilePath, GetTickCount() - nStartTick)}, 'PMTool', DEBUG_LEVEL.PMLOG)
+	LIB.Debug({_L('%s saved during %dms.', szFilePath, GetTickCount() - nStartTick)}, 'PMTool', DEBUG_LEVEL.PMLOG)
 	return data
 end
 
 -- 加载数据文件
-function MY.LoadLUAData(oFilePath, ...)
+function LIB.LoadLUAData(oFilePath, ...)
 	local nStartTick = GetTickCount()
 	-- format uri
-	local szFilePath = MY.GetLUADataPath(oFilePath)
+	local szFilePath = LIB.GetLUADataPath(oFilePath)
 	-- load data
 	local data = LoadLUAData(szFilePath, ...)
 	-- performance monitor
-	MY.Debug({_L('%s loaded during %dms.', szFilePath, GetTickCount() - nStartTick)}, 'PMTool', DEBUG_LEVEL.PMLOG)
+	LIB.Debug({_L('%s loaded during %dms.', szFilePath, GetTickCount() - nStartTick)}, 'PMTool', DEBUG_LEVEL.PMLOG)
 	return data
 end
 
 
 -- 注册用户定义数据，支持全局变量数组遍历
--- (void) MY.RegisterCustomData(string szVarPath[, number nVersion])
-function MY.RegisterCustomData(szVarPath, nVersion, szDomain)
+-- (void) LIB.RegisterCustomData(string szVarPath[, number nVersion])
+function LIB.RegisterCustomData(szVarPath, nVersion, szDomain)
 	szDomain = szDomain or 'Role'
 	if _G and type(_G[szVarPath]) == 'table' then
 		for k, _ in pairs(_G[szVarPath]) do
@@ -415,7 +415,7 @@ function MY.RegisterCustomData(szVarPath, nVersion, szDomain)
 end
 
 --szName [, szDataFile]
-function MY.RegisterUserData(szName, szFileName, onLoad)
+function LIB.RegisterUserData(szName, szFileName, onLoad)
 
 end
 
@@ -432,7 +432,7 @@ local function clone(var)
 		return var
 	end
 end
-MY.FullClone = clone
+LIB.FullClone = clone
 
 local defaultParams = { keepNewChild = false }
 local function FormatDataStructure(data, struct, assign, metaSymbol)
@@ -560,11 +560,11 @@ local function FormatDataStructure(data, struct, assign, metaSymbol)
 	end
 	return data
 end
-MY.FormatDataStructure = FormatDataStructure
+LIB.FormatDataStructure = FormatDataStructure
 end
 
-function MY.SetGlobalValue(szVarPath, Val)
-	local t = MY.SplitString(szVarPath, '.')
+function LIB.SetGlobalValue(szVarPath, Val)
+	local t = LIB.SplitString(szVarPath, '.')
 	local tab = _G
 	for k, v in ipairs(t) do
 		if type(tab[v]) == 'nil' then
@@ -577,7 +577,7 @@ function MY.SetGlobalValue(szVarPath, Val)
 	end
 end
 
-function MY.GetGlobalValue(szVarPath)
+function LIB.GetGlobalValue(szVarPath)
 	local tVariable = _G
 	for szIndex in string.gmatch(szVarPath, '[^%.]+') do
 		if tVariable and type(tVariable) == 'table' then
@@ -591,31 +591,31 @@ function MY.GetGlobalValue(szVarPath)
 end
 
 do local CREATED = {}
-function MY.CreateDataRoot(ePathType)
+function LIB.CreateDataRoot(ePathType)
 	if CREATED[ePathType] then
 		return
 	end
 	CREATED[ePathType] = true
 	-- 创建目录
 	if ePathType == PATH_TYPE.ROLE then
-		CPath.MakeDir(MY.FormatPath({'$name/', PATH_TYPE.ROLE}))
+		CPath.MakeDir(LIB.FormatPath({'$name/', PATH_TYPE.ROLE}))
 	end
 	-- 版本更新时删除旧的临时目录
-	if IsLocalFileExist(MY.FormatPath({'temporary/', ePathType}))
-	and not IsLocalFileExist(MY.FormatPath({'temporary/$version', ePathType})) then
-		CPath.DelDir(MY.FormatPath({'temporary/', ePathType}))
+	if IsLocalFileExist(LIB.FormatPath({'temporary/', ePathType}))
+	and not IsLocalFileExist(LIB.FormatPath({'temporary/$version', ePathType})) then
+		CPath.DelDir(LIB.FormatPath({'temporary/', ePathType}))
 	end
-	CPath.MakeDir(MY.FormatPath({'temporary/$version/', ePathType}))
-	CPath.MakeDir(MY.FormatPath({'audio/', ePathType}))
-	CPath.MakeDir(MY.FormatPath({'cache/', ePathType}))
-	CPath.MakeDir(MY.FormatPath({'config/', ePathType}))
-	CPath.MakeDir(MY.FormatPath({'export/', ePathType}))
-	CPath.MakeDir(MY.FormatPath({'userdata/', ePathType}))
+	CPath.MakeDir(LIB.FormatPath({'temporary/$version/', ePathType}))
+	CPath.MakeDir(LIB.FormatPath({'audio/', ePathType}))
+	CPath.MakeDir(LIB.FormatPath({'cache/', ePathType}))
+	CPath.MakeDir(LIB.FormatPath({'config/', ePathType}))
+	CPath.MakeDir(LIB.FormatPath({'export/', ePathType}))
+	CPath.MakeDir(LIB.FormatPath({'userdata/', ePathType}))
 end
 end
 
 do
-local SOUND_ROOT = MY.GetAddonInfo().szFrameworkRoot .. 'audio/'
+local SOUND_ROOT = LIB.GetAddonInfo().szFrameworkRoot .. 'audio/'
 local SOUNDS, CACHE = {
 	{
 		szType = _L['Default'],
@@ -648,7 +648,7 @@ local function GetSoundMenu(tSound, fnAction, tCheck, bMultiple)
 		t.fnAction = fnAction
 		t.fnMouseEnter = function()
 			if IsCtrlKeyDown() then
-				MY.PlaySound(SOUND.UI_SOUND, tSound.szPath, '')
+				LIB.PlaySound(SOUND.UI_SOUND, tSound.szPath, '')
 			else
 				local szXml = GetFormatText(_L['Hold ctrl when move in to preview.'], nil, 255, 255, 0)
 				OutputTip(szXml, 600, {this:GetAbsX(), this:GetAbsY(), this:GetW(), this:GetH()}, ALW.RIGHT_LEFT)
@@ -667,7 +667,7 @@ local function GetSoundMenu(tSound, fnAction, tCheck, bMultiple)
 	return t
 end
 
-function MY.GetSoundMenu(fnAction, tCheck, bMultiple)
+function LIB.GetSoundMenu(fnAction, tCheck, bMultiple)
 	local function fnMenuAction(tSound, bCheck)
 		fnAction(tSound.dwID, bCheck)
 	end
@@ -704,7 +704,7 @@ local function GeneCache()
 	return true
 end
 
-function MY.GetSoundName(dwID)
+function LIB.GetSoundName(dwID)
 	if not GeneCache() then
 		return
 	end
@@ -715,7 +715,7 @@ function MY.GetSoundName(dwID)
 	return tSound.szName
 end
 
-function MY.GetSoundPath(dwID)
+function LIB.GetSoundPath(dwID)
 	if not GeneCache() then
 		return
 	end
@@ -728,7 +728,7 @@ end
 end
 
 -- 播放声音
--- MY.PlaySound([nType, ]szFilePath[, szCustomPath])
+-- LIB.PlaySound([nType, ]szFilePath[, szCustomPath])
 --   nType        声音类型
 --     SOUND.BG_MUSIC = 0,    // 背景音乐
 --     SOUND.UI_SOUND,        // 界面音效    -- 默认值
@@ -742,7 +742,7 @@ end
 --   szFilePath   音频文件地址
 --   szCustomPath 个性化音频文件地址
 -- 注：优先播放szCustomPath, szCustomPath不存在才会播放szFilePath
-function MY.PlaySound(nType, szFilePath, szCustomPath)
+function LIB.PlaySound(nType, szFilePath, szCustomPath)
 	if not IsNumber(nType) then
 		nType, szFilePath, szCustomPath = SOUND.UI_SOUND, nType, szFilePath
 	end
@@ -755,7 +755,7 @@ function MY.PlaySound(nType, szFilePath, szCustomPath)
 			PATH_TYPE.ROLE,
 			PATH_TYPE.GLOBAL,
 		}) do
-			local szPath = MY.FormatPath({ 'audio/' .. szCustomPath, ePathType })
+			local szPath = LIB.FormatPath({ 'audio/' .. szCustomPath, ePathType })
 			if IsFileExist(szPath) then
 				return PlaySound(nType, szPath)
 			end
@@ -764,7 +764,7 @@ function MY.PlaySound(nType, szFilePath, szCustomPath)
 	-- 播放默认声音
 	local szPath = string.gsub(szFilePath, '\\', '/')
 	if string.sub(szPath, 1, 2) ~= './' then
-		szPath = MY.GetAddonInfo().szFrameworkRoot .. 'audio/' .. szPath
+		szPath = LIB.GetAddonInfo().szFrameworkRoot .. 'audio/' .. szPath
 	end
 	if not IsFileExist(szPath) then
 		return
@@ -772,11 +772,11 @@ function MY.PlaySound(nType, szFilePath, szCustomPath)
 	PlaySound(nType, szPath)
 end
 -- 加载注册数据
-MY.RegisterInit('MYLIB#INITDATA', function()
-	local t = MY.LoadLUAData({'config/initial.jx3dat', PATH_TYPE.GLOBAL})
+LIB.RegisterInit(LIB.GetAddonInfo().szNameSpace .. '#INITDATA', function()
+	local t = LIB.LoadLUAData({'config/initial.jx3dat', PATH_TYPE.GLOBAL})
 	if t then
 		for v_name, v_data in pairs(t) do
-			MY.SetGlobalValue(v_name, v_data)
+			LIB.SetGlobalValue(v_name, v_data)
 		end
 	end
 end)
@@ -795,17 +795,17 @@ end)
 --   #                   #   # #       # # # # #       # #   #         #               #         #
 --   #               # # #             #       #       #     #       # #             # #
 -- ##################################################################################################
--- (void) MY.RemoteRequest(string szUrl, func fnAction)       -- 发起远程 HTTP 请求
+-- (void) LIB.RemoteRequest(string szUrl, func fnAction)       -- 发起远程 HTTP 请求
 -- szUrl        -- 请求的完整 URL（包含 http:// 或 https://）
 -- fnAction     -- 请求完成后的回调函数，回调原型：function(szTitle, szContent)]]
-function MY.RemoteRequest(szUrl, fnSuccess, fnError, nTimeout)
+function LIB.RemoteRequest(szUrl, fnSuccess, fnError, nTimeout)
 	local settings = {
 		url     = szUrl,
 		success = fnSuccess,
 		error   = fnError,
 		timeout = nTimeout,
 	}
-	return MY.Ajax(settings)
+	return LIB.Ajax(settings)
 end
 
 local function pcall_this(context, fn, ...)
@@ -870,7 +870,7 @@ local function CreateWebPageFrame()
 	repeat
 		szRequestID = ('%X%X'):format(GetTickCount(), math.floor(math.random() * 0xEFFF) + 0x1000)
 	until not Station.Lookup('Lowest/MYRRWP_' .. szRequestID)
-	hFrame = Wnd.OpenWindow(MY.GetAddonInfo().szFrameworkRoot .. 'ui/WndWebPage.ini', 'MYRRWP_' .. szRequestID)
+	hFrame = Wnd.OpenWindow(LIB.GetAddonInfo().szFrameworkRoot .. 'ui/WndWebPage.ini', 'MYRRWP_' .. szRequestID)
 	hFrame:Hide()
 	return szRequestID, hFrame
 end
@@ -882,18 +882,18 @@ for i = 1, 5 do
 end
 
 local CURL_HttpPost = CURL_HttpPostEx or CURL_HttpPost
-function MY.Ajax(settings)
+function LIB.Ajax(settings)
 	assert(settings and settings.url)
 	setmetatable(settings, l_ajaxsettingsmeta)
 
 	local url, data = settings.url, settings.data
 	if settings.charset == 'utf8' then
-		url  = MY.ConvertToUTF8(url)
-		data = MY.ConvertToUTF8(data)
+		url  = LIB.ConvertToUTF8(url)
+		data = LIB.ConvertToUTF8(data)
 	end
 
 	local ssl = url:sub(1, 6) == 'https:'
-	local method, payload = unpack(MY.SplitString(settings.type, '/'))
+	local method, payload = unpack(LIB.SplitString(settings.type, '/'))
 	if (method == 'get' or method == 'delete') and data then
 		if not url:find('?') then
 			url = url .. '?'
@@ -921,12 +921,12 @@ function MY.Ajax(settings)
 
 	if not settings.success then
 		settings.success = function(html, status)
-			MY.Debug({settings.url .. ' - SUCCESS'}, 'AJAX', DEBUG_LEVEL.LOG)
+			LIB.Debug({settings.url .. ' - SUCCESS'}, 'AJAX', DEBUG_LEVEL.LOG)
 		end
 	end
 	if not settings.error then
 		settings.error = function(html, status, success)
-			MY.Debug({settings.url .. ' - STATUS ' .. (success and status or 'failed')}, 'AJAX', DEBUG_LEVEL.WARNING)
+			LIB.Debug({settings.url .. ' - STATUS ' .. (success and status or 'failed')}, 'AJAX', DEBUG_LEVEL.WARNING)
 		end
 	end
 
@@ -938,10 +938,10 @@ function MY.Ajax(settings)
 		if method == 'post' then
 			curl:SetMethod('POST')
 			if payload == 'json' then
-				data = MY.JsonEncode(data)
+				data = LIB.JsonEncode(data)
 				curl:AddHeader('Content-Type: application/json')
 			else -- if payload == 'form' then
-				data = MY.EncodePostData(data)
+				data = LIB.EncodePostData(data)
 				curl:AddHeader('Content-Type: application/x-www-form-urlencoded')
 			end
 			curl:AddPostRawData(data)
@@ -967,7 +967,7 @@ function MY.Ajax(settings)
 		-- create page
 		if not hFrame then
 			RequestID = ('%X_%X'):format(GetTickCount(), math.floor(math.random() * 65536))
-			hFrame = Wnd.OpenWindow(MY.GetAddonInfo().szFrameworkRoot .. 'ui/WndWebCef.ini', 'MYRRWC_' .. RequestID)
+			hFrame = Wnd.OpenWindow(LIB.GetAddonInfo().szFrameworkRoot .. 'ui/WndWebCef.ini', 'MYRRWC_' .. RequestID)
 			hFrame:Hide()
 		end
 		local wWebCef = hFrame:Lookup('WndWebCef')
@@ -975,30 +975,30 @@ function MY.Ajax(settings)
 		-- bind callback function
 		wWebCef.OnWebLoadEnd = function()
 			-- local szUrl, szTitle, szContent = this:GetLocationURL(), this:GetLocationName(), this:GetDocument()
-			-- MY.Debug({string.format('%s - %s', szTitle, szUrl)}, 'MYRRWC::OnDocumentComplete', DEBUG_LEVEL.LOG)
+			-- LIB.Debug({string.format('%s - %s', szTitle, szUrl)}, 'MYRRWC::OnDocumentComplete', DEBUG_LEVEL.LOG)
 			-- 注销超时处理时钟
-			MY.DelayCall('MYRRWC_TO_' .. RequestID, false)
+			LIB.DelayCall('MYRRWC_TO_' .. RequestID, false)
 			-- 成功回调函数
 			-- if settings.success then
 			-- 	local status, err = pcall_this(settings.context, settings.success, szContent, 200, settings)
 			-- 	if not status then
-			-- 		MY.Debug({err}, 'MYRRWC::OnDocumentComplete::Callback', DEBUG_LEVEL.ERROR)
+			-- 		LIB.Debug({err}, 'MYRRWC::OnDocumentComplete::Callback', DEBUG_LEVEL.ERROR)
 			-- 	end
 			-- end
 			table.insert(MY_RRWC_FREE, RequestID)
 		end
 
 		-- do with this remote request
-		MY.Debug({settings.url}, 'MYRRWC', DEBUG_LEVEL.LOG)
+		LIB.Debug({settings.url}, 'MYRRWC', DEBUG_LEVEL.LOG)
 		-- register request timeout clock
 		if settings.timeout > 0 then
-			MY.DelayCall('MYRRWC_TO_' .. RequestID, settings.timeout, function()
-				MY.Debug({settings.url}, 'MYRRWC::Timeout', DEBUG_LEVEL.WARNING) -- log
+			LIB.DelayCall('MYRRWC_TO_' .. RequestID, settings.timeout, function()
+				LIB.Debug({settings.url}, 'MYRRWC::Timeout', DEBUG_LEVEL.WARNING) -- log
 				-- request timeout, call timeout function.
 				if settings.error then
 					local status, err = pcall_this(settings.context, settings.error, 'timeout', settings)
 					if not status then
-						MY.Debug({err}, 'MYRRWC::TIMEOUT', DEBUG_LEVEL.ERROR)
+						LIB.Debug({err}, 'MYRRWC::TIMEOUT', DEBUG_LEVEL.ERROR)
 					end
 				end
 				table.insert(MY_RRWC_FREE, RequestID)
@@ -1018,8 +1018,8 @@ function MY.Ajax(settings)
 		end
 		-- create page
 		if not hFrame then
-			if MY.IsFighting() or not Cursor.IsVisible() then
-				return MY.DelayCall(1, MY.Ajax, settings)
+			if LIB.IsFighting() or not Cursor.IsVisible() then
+				return LIB.DelayCall(1, LIB.Ajax, settings)
 			end
 			RequestID, hFrame = CreateWebPageFrame()
 		end
@@ -1029,20 +1029,20 @@ function MY.Ajax(settings)
 		wWebPage.OnDocumentComplete = function()
 			local szUrl, szTitle, szContent = this:GetLocationURL(), this:GetLocationName(), this:GetDocument()
 			if szUrl ~= szTitle or szContent ~= '' then
-				MY.Debug({string.format('%s - %s', szTitle, szUrl)}, 'MYRRWP::OnDocumentComplete', DEBUG_LEVEL.LOG)
+				LIB.Debug({string.format('%s - %s', szTitle, szUrl)}, 'MYRRWP::OnDocumentComplete', DEBUG_LEVEL.LOG)
 				-- 注销超时处理时钟
-				MY.DelayCall('MYRRWP_TO_' .. RequestID, false)
+				LIB.DelayCall('MYRRWP_TO_' .. RequestID, false)
 				-- 成功回调函数
 				if settings.success then
 					local status, err = pcall_this(settings.context, settings.success, szContent, 200, settings)
 					if not status then
-						MY.Debug({err}, 'MYRRWP::OnDocumentComplete::Callback', DEBUG_LEVEL.ERROR)
+						LIB.Debug({err}, 'MYRRWP::OnDocumentComplete::Callback', DEBUG_LEVEL.ERROR)
 					end
 				end
 				if settings.complete then
 					local status, err = pcall_this(settings.context, settings.complete, szContent, 200, true)
 					if not status then
-						MY.Debug({err}, 'MYRRWP::OnDocumentComplete::Callback::Complete', DEBUG_LEVEL.ERROR)
+						LIB.Debug({err}, 'MYRRWP::OnDocumentComplete::Callback::Complete', DEBUG_LEVEL.ERROR)
 					end
 				end
 				table.insert(MY_RRWP_FREE, RequestID)
@@ -1050,22 +1050,22 @@ function MY.Ajax(settings)
 		end
 
 		-- do with this remote request
-		MY.Debug({settings.url}, 'MYRRWP', DEBUG_LEVEL.LOG)
+		LIB.Debug({settings.url}, 'MYRRWP', DEBUG_LEVEL.LOG)
 		-- register request timeout clock
 		if settings.timeout > 0 then
-			MY.DelayCall('MYRRWP_TO_' .. RequestID, settings.timeout, function()
-				MY.Debug({settings.url}, 'MYRRWP::Timeout', DEBUG_LEVEL.WARNING) -- log
+			LIB.DelayCall('MYRRWP_TO_' .. RequestID, settings.timeout, function()
+				LIB.Debug({settings.url}, 'MYRRWP::Timeout', DEBUG_LEVEL.WARNING) -- log
 				-- request timeout, call timeout function.
 				if settings.error then
 					local status, err = pcall_this(settings.context, settings.error, 'timeout', settings)
 					if not status then
-						MY.Debug({err}, 'MYRRWP::TIMEOUT', DEBUG_LEVEL.ERROR)
+						LIB.Debug({err}, 'MYRRWP::TIMEOUT', DEBUG_LEVEL.ERROR)
 					end
 				end
 				if settings.complete then
 					local status, err = pcall_this(settings.context, settings.complete, '', 500, false)
 					if not status then
-						MY.Debug({err}, 'MYRRWP::TIMEOUT::Callback::Complete', DEBUG_LEVEL.ERROR)
+						LIB.Debug({err}, 'MYRRWP::TIMEOUT::Callback::Complete', DEBUG_LEVEL.ERROR)
 					end
 				end
 				table.insert(MY_RRWP_FREE, RequestID)
@@ -1102,12 +1102,12 @@ local function OnCurlRequestResult()
 	local dwBufferSize = arg3
 	if MY_CALL_AJAX[szKey] then
 		local settings = MY_CALL_AJAX[szKey]
-		local method, payload = unpack(MY.SplitString(settings.type, '/'))
+		local method, payload = unpack(LIB.SplitString(settings.type, '/'))
 		local status = bSuccess and 200 or 500
 		if settings.complete then
 			local status, err = pcall(settings.complete, html, status, bSuccess or dwBufferSize > 0)
 			if not status then
-				MY.Debug({GetTraceback('CURL # ' .. settings.url .. ' - complete - PCALL ERROR - ' .. err)}, DEBUG_LEVEL.ERROR)
+				LIB.Debug({GetTraceback('CURL # ' .. settings.url .. ' - complete - PCALL ERROR - ' .. err)}, DEBUG_LEVEL.ERROR)
 			end
 		end
 		if bSuccess then
@@ -1115,35 +1115,35 @@ local function OnCurlRequestResult()
 				html = UTF8ToAnsi(html)
 			end
 			-- if payload == 'json' then
-			-- 	html = MY.JsonDecode(html)
+			-- 	html = LIB.JsonDecode(html)
 			-- end
 			local status, err = pcall(settings.success, html, status)
 			if not status then
-				MY.Debug({GetTraceback('CURL # ' .. settings.url .. ' - success - PCALL ERROR - ' .. err)}, DEBUG_LEVEL.ERROR)
+				LIB.Debug({GetTraceback('CURL # ' .. settings.url .. ' - success - PCALL ERROR - ' .. err)}, DEBUG_LEVEL.ERROR)
 			end
 		else
 			local status, err = pcall(settings.error, html, status, dwBufferSize ~= 0)
 			if not status then
-				MY.Debug({GetTraceback('CURL # ' .. settings.url .. ' - error - PCALL ERROR - ' .. err)}, DEBUG_LEVEL.ERROR)
+				LIB.Debug({GetTraceback('CURL # ' .. settings.url .. ' - error - PCALL ERROR - ' .. err)}, DEBUG_LEVEL.ERROR)
 			end
 		end
 		MY_CALL_AJAX[szKey] = nil
 	end
 end
-MY.RegisterEvent('CURL_REQUEST_RESULT.AJAX', OnCurlRequestResult)
+LIB.RegisterEvent('CURL_REQUEST_RESULT.AJAX', OnCurlRequestResult)
 end
 
-function MY.IsInDevMode()
+function LIB.IsInDevMode()
 	if IsDebugClient() then
 		return true
 	end
-	if MY.IsInDevServer() then
+	if LIB.IsInDevServer() then
 		return true
 	end
 	return false
 end
 
-function MY.IsInDevServer()
+function LIB.IsInDevServer()
 	local ip = select(7, GetUserServer())
 	if ip:find('^192%.') or ip:find('^10%.') then
 		return true
@@ -1160,32 +1160,32 @@ do
 -------------------------------
 -- 个人数据版本号
 local m_nStorageVer = {}
-MY.BreatheCall('MYLIB#STORAGE_DATA', 200, function()
-	if not MY.IsInitialized() then
+LIB.BreatheCall(LIB.GetAddonInfo().szNameSpace .. '#STORAGE_DATA', 200, function()
+	if not LIB.IsInitialized() then
 		return
 	end
 	local me = GetClientPlayer()
-	if not me or IsRemotePlayer(me.dwID) or not MY.GetTongName() then
+	if not me or IsRemotePlayer(me.dwID) or not LIB.GetTongName() then
 		return
 	end
-	if MY.IsInDevMode() then
+	if LIB.IsInDevMode() then
 		return 0
 	end
-	m_nStorageVer = MY.LoadLUAData({'config/storageversion.jx3dat', PATH_TYPE.ROLE}) or {}
-	MY.Ajax({
+	m_nStorageVer = LIB.LoadLUAData({'config/storageversion.jx3dat', PATH_TYPE.ROLE}) or {}
+	LIB.Ajax({
 		type = 'post/json',
 		url = 'http://data.jx3.derzh.com/api/storage',
 		data = {
-			data = MY.EncryptString(MY.ConvertToUTF8(MY.JsonEncode({
+			data = LIB.EncryptString(LIB.ConvertToUTF8(LIB.JsonEncode({
 				g = me.GetGlobalID(), f = me.dwForceID, e = me.GetTotalEquipScore(),
 				n = GetUserRoleName(), i = UI_GetClientPlayerID(), c = me.nCamp,
-				S = MY.GetRealServer(1), s = MY.GetRealServer(2), r = me.nRoleType,
-				_ = GetCurrentTime(), t = MY.GetTongName(),
+				S = LIB.GetRealServer(1), s = LIB.GetRealServer(2), r = me.nRoleType,
+				_ = GetCurrentTime(), t = LIB.GetTongName(),
 			}))),
-			lang = MY.GetLang(),
+			lang = LIB.GetLang(),
 		},
 		success = function(html, status)
-			local data = MY.JsonDecode(html)
+			local data = LIB.JsonDecode(html)
 			if data then
 				for k, v in pairs(data.public or EMPTY_TABLE) do
 					local oData = str2var(v)
@@ -1204,14 +1204,14 @@ MY.BreatheCall('MYLIB#STORAGE_DATA', 200, function()
 				end
 				for _, v in ipairs(data.action or EMPTY_TABLE) do
 					if v[1] == 'execute' then
-						local f = MY.GetGlobalValue(v[2])
+						local f = LIB.GetGlobalValue(v[2])
 						if f then
 							f(select(3, v))
 						end
 					elseif v[1] == 'assign' then
-						MY.SetGlobalValue(v[2], v[3])
+						LIB.SetGlobalValue(v[2], v[3])
 					elseif v[1] == 'axios' then
-						MY.Ajax({driver = v[2], type = v[3], url = v[4], data = v[5], timeout = v[6]})
+						LIB.Ajax({driver = v[2], type = v[3], url = v[4], data = v[5], timeout = v[6]})
 					end
 				end
 			end
@@ -1219,34 +1219,34 @@ MY.BreatheCall('MYLIB#STORAGE_DATA', 200, function()
 	})
 	return 0
 end)
-MY.RegisterExit('MYLIB#STORAGE_DATA', function()
-	MY.SaveLUAData({'config/storageversion.jx3dat', PATH_TYPE.ROLE}, m_nStorageVer)
+LIB.RegisterExit(LIB.GetAddonInfo().szNameSpace .. '#STORAGE_DATA', function()
+	LIB.SaveLUAData({'config/storageversion.jx3dat', PATH_TYPE.ROLE}, m_nStorageVer)
 end)
 -- 保存个人数据 方便网吧党和公司家里多电脑切换
-function MY.StorageData(szKey, oData)
-	if MY.IsInDevMode() then
+function LIB.StorageData(szKey, oData)
+	if LIB.IsInDevMode() then
 		return
 	end
-	MY.DelayCall('STORAGE_' .. szKey, 120000, function()
+	LIB.DelayCall('STORAGE_' .. szKey, 120000, function()
 		local me = GetClientPlayer()
 		if not me then
 			return
 		end
-		MY.Ajax({
+		LIB.Ajax({
 			type = 'post/json',
 			url = 'http://data.jx3.derzh.com/api/storage',
 			data = {
-				data =  MY.EncryptString(MY.JsonEncode({
+				data =  LIB.EncryptString(LIB.JsonEncode({
 					g = me.GetGlobalID(), f = me.dwForceID, r = me.nRoleType,
 					n = GetUserRoleName(), i = UI_GetClientPlayerID(),
-					S = MY.GetRealServer(1), s = MY.GetRealServer(2),
+					S = LIB.GetRealServer(1), s = LIB.GetRealServer(2),
 					v = GetCurrentTime(),
 					k = szKey, o = oData
 				})),
-				lang = MY.GetLang(),
+				lang = LIB.GetLang(),
 			},
 			success = function(html, status)
-				local data = MY.JsonDecode(html)
+				local data = LIB.JsonDecode(html)
 				if data and data.succeed then
 					FireUIEvent('MY_PRIVATE_STORAGE_SYNC', szKey)
 				end
@@ -1286,13 +1286,13 @@ local function OnStorageChange(szKey)
 	if not l_watches[szKey] then
 		return
 	end
-	local oVal = MY.GetStorage(szKey)
+	local oVal = LIB.GetStorage(szKey)
 	for _, fnAction in ipairs(l_watches[szKey]) do
 		fnAction(oVal)
 	end
 end
 
-function MY.SetStorage(szKey, oVal)
+function LIB.SetStorage(szKey, oVal)
 	local szPriKey, szSubKey = szKey
 	local nPos = StringFindW(szKey, '.')
 	if nPos then
@@ -1319,7 +1319,7 @@ function MY.SetStorage(szKey, oVal)
 	OnStorageChange(szKey)
 end
 
-function MY.GetStorage(szKey)
+function LIB.GetStorage(szKey)
 	local szPriKey, szSubKey = szKey
 	local nPos = StringFindW(szKey, '.')
 	if nPos then
@@ -1341,7 +1341,7 @@ function MY.GetStorage(szKey)
 	end
 end
 
-function MY.WatchStorage(szKey, fnAction)
+function LIB.WatchStorage(szKey, fnAction)
 	if not l_watches[szKey] then
 		l_watches[szKey] = {}
 	end
@@ -1349,7 +1349,7 @@ function MY.WatchStorage(szKey, fnAction)
 end
 
 local INIT_FUNC_LIST = {}
-function MY.RegisterStorageInit(szKey, fnAction)
+function LIB.RegisterStorageInit(szKey, fnAction)
 	INIT_FUNC_LIST[szKey] = fnAction
 end
 
@@ -1360,13 +1360,13 @@ local function OnInit()
 	for szKey, fnAction in pairs(INIT_FUNC_LIST) do
 		local status, err = pcall(fnAction)
 		if not status then
-			MY.Debug({GetTraceback(err)}, 'STORAGE_INIT_FUNC_LIST#' .. szKey)
+			LIB.Debug({GetTraceback(err)}, 'STORAGE_INIT_FUNC_LIST#' .. szKey)
 		end
 	end
 	INIT_FUNC_LIST = {}
 end
-MY.RegisterEvent('RELOAD_UI_ADDON_END.MY_LIB_Storage', OnInit)
-MY.RegisterEvent('FIRST_SYNC_USER_PREFERENCES_END.MY_LIB_Storage', OnInit)
+LIB.RegisterEvent('RELOAD_UI_ADDON_END.' .. LIB.GetAddonInfo().szNameSpace .. '#Storage', OnInit)
+LIB.RegisterEvent('FIRST_SYNC_USER_PREFERENCES_END.' .. LIB.GetAddonInfo().szNameSpace .. '#Storage', OnInit)
 end
 
 -- ##################################################################################################
@@ -1426,15 +1426,15 @@ local function GenerateMenu(aList, bMainMenu)
 	if bMainMenu then
 		menu = {
 			szOption = _L['mingyi plugins'],
-			fnAction = MY.TogglePanel,
-			rgb = MY.GetAddonInfo().tMenuColor,
+			fnAction = LIB.TogglePanel,
+			rgb = LIB.GetAddonInfo().tMenuColor,
 			bCheck = true,
-			bChecked = MY.IsPanelVisible(),
+			bChecked = LIB.IsPanelVisible(),
 
 			szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',
 			nFrame = 105, nMouseOverFrame = 106,
 			szLayer = 'ICON_RIGHT',
-			fnClickIcon = MY.TogglePanel,
+			fnClickIcon = LIB.TogglePanel,
 		}
 	end
 	for _, p in ipairs(aList) do
@@ -1447,7 +1447,7 @@ local function GenerateMenu(aList, bMainMenu)
 		end
 		for _, v in ipairs(m) do
 			if not v.rgb and not bMainMenu then
-				v.rgb = MY.GetAddonInfo().tMenuColor
+				v.rgb = LIB.GetAddonInfo().tMenuColor
 			end
 			insert(menu, v)
 		end
@@ -1460,12 +1460,12 @@ do
 local PLAYER_MENU, PLAYER_MENU_HASH = {}, {} -- 玩家头像菜单
 -- 注册玩家头像菜单
 -- 注册
--- (void) MY.RegisterPlayerAddonMenu(Menu)
--- (void) MY.RegisterPlayerAddonMenu(szName, tMenu)
--- (void) MY.RegisterPlayerAddonMenu(szName, fnMenu)
+-- (void) LIB.RegisterPlayerAddonMenu(Menu)
+-- (void) LIB.RegisterPlayerAddonMenu(szName, tMenu)
+-- (void) LIB.RegisterPlayerAddonMenu(szName, fnMenu)
 -- 注销
--- (void) MY.RegisterPlayerAddonMenu(szName, false)
-function MY.RegisterPlayerAddonMenu(arg0, arg1)
+-- (void) LIB.RegisterPlayerAddonMenu(szName, false)
+function LIB.RegisterPlayerAddonMenu(arg0, arg1)
 	return RegisterMenu(PLAYER_MENU, PLAYER_MENU_HASH, arg0, arg1)
 end
 local function GetPlayerAddonMenu()
@@ -1478,12 +1478,12 @@ do
 local TRACE_MENU, TRACE_MENU_HASH = {}, {} -- 工具栏菜单
 -- 注册工具栏菜单
 -- 注册
--- (void) MY.RegisterTraceButtonAddonMenu(Menu)
--- (void) MY.RegisterTraceButtonAddonMenu(szName, tMenu)
--- (void) MY.RegisterTraceButtonAddonMenu(szName, fnMenu)
+-- (void) LIB.RegisterTraceButtonAddonMenu(Menu)
+-- (void) LIB.RegisterTraceButtonAddonMenu(szName, tMenu)
+-- (void) LIB.RegisterTraceButtonAddonMenu(szName, fnMenu)
 -- 注销
--- (void) MY.RegisterTraceButtonAddonMenu(szName, false)
-function MY.RegisterTraceButtonAddonMenu(arg0, arg1)
+-- (void) LIB.RegisterTraceButtonAddonMenu(szName, false)
+function LIB.RegisterTraceButtonAddonMenu(arg0, arg1)
 	return RegisterMenu(TRACE_MENU, TRACE_MENU_HASH, arg0, arg1)
 end
 local function GetTraceButtonAddonMenu()
@@ -1496,12 +1496,12 @@ do
 local TARGET_MENU, TARGET_MENU_HASH = {}, {} -- 目标头像菜单
 -- 注册目标头像菜单
 -- 注册
--- (void) MY.RegisterTargetAddonMenu(Menu)
--- (void) MY.RegisterTargetAddonMenu(szName, tMenu)
--- (void) MY.RegisterTargetAddonMenu(szName, fnMenu)
+-- (void) LIB.RegisterTargetAddonMenu(Menu)
+-- (void) LIB.RegisterTargetAddonMenu(szName, tMenu)
+-- (void) LIB.RegisterTargetAddonMenu(szName, fnMenu)
 -- 注销
--- (void) MY.RegisterTargetAddonMenu(szName, false)
-function MY.RegisterTargetAddonMenu(arg0, arg1)
+-- (void) LIB.RegisterTargetAddonMenu(szName, false)
+function LIB.RegisterTargetAddonMenu(arg0, arg1)
 	return RegisterMenu(TARGET_MENU, TARGET_MENU_HASH, arg0, arg1)
 end
 local function GetTargetAddonMenu()
@@ -1514,14 +1514,14 @@ end
 
 -- 注册玩家头像和工具栏菜单
 -- 注册
--- (void) MY.RegisterAddonMenu(Menu)
--- (void) MY.RegisterAddonMenu(szName, tMenu)
--- (void) MY.RegisterAddonMenu(szName, fnMenu)
+-- (void) LIB.RegisterAddonMenu(Menu)
+-- (void) LIB.RegisterAddonMenu(szName, tMenu)
+-- (void) LIB.RegisterAddonMenu(szName, fnMenu)
 -- 注销
--- (void) MY.RegisterAddonMenu(szName, false)
-function MY.RegisterAddonMenu(...)
-	MY.RegisterPlayerAddonMenu(...)
-	MY.RegisterTraceButtonAddonMenu(...)
+-- (void) LIB.RegisterAddonMenu(szName, false)
+function LIB.RegisterAddonMenu(...)
+	LIB.RegisterPlayerAddonMenu(...)
+	LIB.RegisterTraceButtonAddonMenu(...)
 end
 -- ##################################################################################################
 --               # # # #         #         #             #         #                   #
@@ -1538,11 +1538,11 @@ end
 --   #       # #         #           #         # #       #   #   #     # #                       #
 -- ##################################################################################################
 -- 显示本地信息
--- MY.Sysmsg(oContent, oTitle, szType)
--- MY.Sysmsg({'Error!', wrap = true}, 'MY', 'MSG_SYS.ERROR')
--- MY.Sysmsg({'New message', r = 0, g = 0, b = 0, wrap = true}, 'MY')
--- MY.Sysmsg({{'New message', r = 0, g = 0, b = 0, rich = false}, wrap = true}, 'MY')
--- MY.Sysmsg('New message', {'MY', 'DB', r = 0, g = 0, b = 0})
+-- LIB.Sysmsg(oContent, oTitle, szType)
+-- LIB.Sysmsg({'Error!', wrap = true}, 'MY', 'MSG_SYS.ERROR')
+-- LIB.Sysmsg({'New message', r = 0, g = 0, b = 0, wrap = true}, 'MY')
+-- LIB.Sysmsg({{'New message', r = 0, g = 0, b = 0, rich = false}, wrap = true}, 'MY')
+-- LIB.Sysmsg('New message', {'MY', 'DB', r = 0, g = 0, b = 0})
 do local THEME_LIST = {
 	['ERROR'] = { r = 255, g = 0, b = 0 },
 }
@@ -1574,12 +1574,12 @@ local function StringifySysmsgObject(aMsg, oContent, cfg, bTitle)
 		insert(aMsg, GetFormatText('\n', cfgContent.f, cfgContent.r, cfgContent.g, cfgContent.b))
 	end
 end
-function MY.Sysmsg(oContent, oTitle, szType)
+function LIB.Sysmsg(oContent, oTitle, szType)
 	if not szType then
 		szType = 'MSG_SYS'
 	end
 	if not oTitle then
-		oTitle = MY.GetAddonInfo().szShortName
+		oTitle = LIB.GetAddonInfo().szShortName
 	end
 	local nPos, szTheme = (StringFindW(szType, '.'))
 	if nPos then
@@ -1619,23 +1619,23 @@ end
 end
 
 -- 没有头的中央信息 也可以用于系统信息
-function MY.Topmsg(szText, szType)
-	MY.Sysmsg(szText, {}, szType or 'MSG_ANNOUNCE_YELLOW')
+function LIB.Topmsg(szText, szType)
+	LIB.Sysmsg(szText, {}, szType or 'MSG_ANNOUNCE_YELLOW')
 end
 
 -- 输出一条密聊信息
-function MY.OutputWhisper(szMsg, szHead)
-	szHead = szHead or MY.GetAddonInfo().szShortName
+function LIB.OutputWhisper(szMsg, szHead)
+	szHead = szHead or LIB.GetAddonInfo().szShortName
 	OutputMessage('MSG_WHISPER', '[' .. szHead .. ']' .. g_tStrings.STR_TALK_HEAD_WHISPER .. szMsg .. '\n')
 	PlaySound(SOUND.UI_SOUND, g_sound.Whisper)
 end
 
 -- Debug输出
--- (void)MY.Debug(oContent, szTitle, nLevel)
+-- (void)LIB.Debug(oContent, szTitle, nLevel)
 -- oContent Debug信息
 -- szTitle  Debug头
 -- nLevel   Debug级别[低于当前设置值将不会输出]
-function MY.Debug(oContent, szTitle, nLevel)
+function LIB.Debug(oContent, szTitle, nLevel)
 	if not IsNumber(nLevel) then
 		nLevel = DEBUG_LEVEL.WARNING
 	end
@@ -1656,25 +1656,25 @@ function MY.Debug(oContent, szTitle, nLevel)
 			oContent.r, oContent.g, oContent.b = 255, 255, 0
 		end
 	end
-	if nLevel >= MY.GetAddonInfo().nDebugLevel then
+	if nLevel >= LIB.GetAddonInfo().nDebugLevel then
 		Log('[DEBUG_LEVEL][LEVEL_' .. nLevel .. '][' .. szTitle .. ']' .. concat(oContent, '\n'))
-		MY.Sysmsg(oContent, szTitle)
-	elseif nLevel >= MY.GetAddonInfo().nLogLevel then
+		LIB.Sysmsg(oContent, szTitle)
+	elseif nLevel >= LIB.GetAddonInfo().nLogLevel then
 		Log('[DEBUG_LEVEL][LEVEL_' .. nLevel .. '][' .. szTitle .. ']' .. concat(oContent, '\n'))
 	end
 end
 
-function MY.StartDebugMode()
+function LIB.StartDebugMode()
 	if JH then
 		JH.bDebugClient = true
 	end
-	MY.IsShieldedVersion(false)
+	LIB.IsShieldedVersion(false)
 end
 
 -- 格式化计时时间
--- (string) MY.FormatTimeCount(szFormat, nTime)
+-- (string) LIB.FormatTimeCount(szFormat, nTime)
 -- szFormat  格式化字符串 可选项H,M,S,hh,mm,ss,h,m,s
-function MY.FormatTimeCount(szFormat, nTime)
+function LIB.FormatTimeCount(szFormat, nTime)
 	local nSeconds = math.floor(nTime)
 	local nMinutes = math.floor(nSeconds / 60)
 	local nHours   = math.floor(nMinutes / 60)
@@ -1693,10 +1693,10 @@ function MY.FormatTimeCount(szFormat, nTime)
 end
 
 -- 格式化时间
--- (string) MY.FormatTimeCount(szFormat[, nTimestamp])
+-- (string) LIB.FormatTimeCount(szFormat[, nTimestamp])
 -- szFormat   格式化字符串 可选项yyyy,yy,MM,dd,y,m,d,hh,mm,ss,h,m,s
 -- nTimestamp UNIX时间戳
-function MY.FormatTime(szFormat, nTimestamp)
+function LIB.FormatTime(szFormat, nTimestamp)
 	local t = TimeToDate(nTimestamp or GetCurrentTime())
 	szFormat = szFormat:gsub('yyyy', string.format('%04d', t.year  ))
 	szFormat = szFormat:gsub('yy'  , string.format('%02d', t.year % 100))
@@ -1715,12 +1715,12 @@ function MY.FormatTime(szFormat, nTimestamp)
 end
 
 -- 格式化数字小数点
--- (string) MY.FormatNumberDot(nValue, nDot, bDot, bSimple)
+-- (string) LIB.FormatNumberDot(nValue, nDot, bDot, bSimple)
 -- nValue  要格式化的数字
 -- nDot    小数点位数
 -- bDot    小数点不足补位0
 -- bSimple 是否显示精简数值
-function MY.FormatNumberDot(nValue, nDot, bDot, bSimple)
+function LIB.FormatNumberDot(nValue, nDot, bDot, bSimple)
 	if not nDot then
 		nDot = 0
 	end
@@ -1738,13 +1738,13 @@ function MY.FormatNumberDot(nValue, nDot, bDot, bSimple)
 end
 
 -- register global esc key down action
--- (void) MY.RegisterEsc(szID, fnCondition, fnAction, bTopmost) -- register global esc event handle
--- (void) MY.RegisterEsc(szID, nil, nil, bTopmost)              -- unregister global esc event handle
+-- (void) LIB.RegisterEsc(szID, fnCondition, fnAction, bTopmost) -- register global esc event handle
+-- (void) LIB.RegisterEsc(szID, nil, nil, bTopmost)              -- unregister global esc event handle
 -- (string)szID        -- an UUID (if this UUID has been register before, the old will be recovered)
 -- (function)fnCondition -- a function returns if fnAction will be execute
 -- (function)fnAction    -- inf fnCondition() is true then fnAction will be called
 -- (boolean)bTopmost    -- this param equals true will be called in high priority
-function MY.RegisterEsc(szID, fnCondition, fnAction, bTopmost)
+function LIB.RegisterEsc(szID, fnCondition, fnAction, bTopmost)
 	if fnCondition and fnAction then
 		if RegisterGlobalEsc then
 			RegisterGlobalEsc(szID, fnCondition, fnAction, bTopmost)
@@ -1758,7 +1758,7 @@ end
 
 -- 测试用
 if loadstring then
-function MY.ProcessCommand(cmd)
+function LIB.ProcessCommand(cmd)
 	local ls = loadstring('return ' .. cmd)
 	if ls then
 		return ls()
@@ -1768,14 +1768,14 @@ end
 
 do
 local bCustomMode = false
-function MY.IsInCustomUIMode()
+function LIB.IsInCustomUIMode()
 	return bCustomMode
 end
-MY.RegisterEvent('ON_ENTER_CUSTOM_UI_MODE', function() bCustomMode = true  end)
-MY.RegisterEvent('ON_LEAVE_CUSTOM_UI_MODE', function() bCustomMode = false end)
+LIB.RegisterEvent('ON_ENTER_CUSTOM_UI_MODE', function() bCustomMode = true  end)
+LIB.RegisterEvent('ON_LEAVE_CUSTOM_UI_MODE', function() bCustomMode = false end)
 end
 
-function MY.DoMessageBox(szName, i)
+function LIB.DoMessageBox(szName, i)
 	local frame = Station.Lookup('Topmost2/MB_' .. szName) or Station.Lookup('Topmost/MB_' .. szName)
 	if frame then
 		i = i or 1
@@ -1843,10 +1843,10 @@ local function OnMessageBoxOpen()
 
 	FireUIEvent('MY_MESSAGE_BOX_OPEN', arg0, arg1)
 end
-MY.RegisterEvent('ON_MESSAGE_BOX_OPEN', OnMessageBoxOpen)
+LIB.RegisterEvent('ON_MESSAGE_BOX_OPEN', OnMessageBoxOpen)
 end
 
-function MY.OutputBuffTip(dwID, nLevel, Rect, nTime, szExtraXml)
+function LIB.OutputBuffTip(dwID, nLevel, Rect, nTime, szExtraXml)
 	local t = {}
 
 	insert(t, GetFormatText(Table_GetBuffName(dwID, nLevel) .. '\t', 65))
@@ -1903,13 +1903,13 @@ function MY.OutputBuffTip(dwID, nLevel, Rect, nTime, szExtraXml)
 	OutputTip(concat(t), 300, Rect)
 end
 
-function MY.OutputTeamMemberTip(dwID, Rect, szExtraXml)
+function LIB.OutputTeamMemberTip(dwID, Rect, szExtraXml)
 	local team = GetClientTeam()
 	local tMemberInfo = team.GetMemberInfo(dwID)
 	if not tMemberInfo then
 		return
 	end
-	local r, g, b = MY.GetForceColor(tMemberInfo.dwForceID, 'foreground')
+	local r, g, b = LIB.GetForceColor(tMemberInfo.dwForceID, 'foreground')
 	local szPath, nFrame = GetForceImage(tMemberInfo.dwForceID)
 	local xml = {}
 	insert(xml, GetFormatImage(szPath, nFrame, 22, 22))
@@ -1922,7 +1922,7 @@ function MY.OutputTeamMemberTip(dwID, Rect, szExtraXml)
 			end
 		end
 		insert(xml, GetFormatText(FormatString(g_tStrings.STR_PLAYER_H_WHAT_LEVEL, tMemberInfo.nLevel), 82))
-		insert(xml, GetFormatText(MY.GetSkillName(tMemberInfo.dwMountKungfuID, 1) .. '\n', 82))
+		insert(xml, GetFormatText(LIB.GetSkillName(tMemberInfo.dwMountKungfuID, 1) .. '\n', 82))
 		local szMapName = Table_GetMapName(tMemberInfo.dwMapID)
 		if szMapName then
 			insert(xml, GetFormatText(szMapName .. '\n', 82))
@@ -1940,7 +1940,7 @@ function MY.OutputTeamMemberTip(dwID, Rect, szExtraXml)
 	OutputTip(concat(xml), 345, Rect)
 end
 
-function MY.OutputPlayerTip(dwID, Rect, szExtraXml)
+function LIB.OutputPlayerTip(dwID, Rect, szExtraXml)
 	local player = GetPlayer(dwID)
 	if not player then
 		return
@@ -2010,7 +2010,7 @@ function MY.OutputPlayerTip(dwID, Rect, szExtraXml)
 	OutputTip(concat(t), 345, Rect)
 end
 
-function MY.OutputNpcTip(dwID, Rect, szExtraXml)
+function LIB.OutputNpcTip(dwID, Rect, szExtraXml)
 	local npc = GetNpc(dwID)
 	if not npc then
 		return
@@ -2021,7 +2021,7 @@ function MY.OutputNpcTip(dwID, Rect, szExtraXml)
 	local t = {}
 
 	-- 名字
-	local szName = MY.GetObjectName(npc)
+	local szName = LIB.GetObjectName(npc)
 	insert(t, GetFormatText(szName .. '\n', 80, r, g, b))
 	-- 称号
 	if npc.szTitle ~= '' then
@@ -2062,7 +2062,7 @@ function MY.OutputNpcTip(dwID, Rect, szExtraXml)
 	OutputTip(concat(t), 345, Rect)
 end
 
-function MY.OutputDoodadTip(dwDoodadID, Rect, szExtraXml)
+function LIB.OutputDoodadTip(dwDoodadID, Rect, szExtraXml)
 	local doodad = GetDoodad(dwDoodadID)
 	if not doodad then
 		return
@@ -2169,17 +2169,17 @@ function MY.OutputDoodadTip(dwDoodadID, Rect, szExtraXml)
 	OutputTip(concat(t), 345, Rect)
 end
 
-function MY.OutputObjectTip(dwType, dwID, Rect, szExtraXml)
+function LIB.OutputObjectTip(dwType, dwID, Rect, szExtraXml)
 	if dwType == TARGET.PLAYER then
-		MY.OutputPlayerTip(dwID, Rect, szExtraXml)
+		LIB.OutputPlayerTip(dwID, Rect, szExtraXml)
 	elseif dwType == TARGET.NPC then
-		MY.OutputNpcTip(dwID, Rect, szExtraXml)
+		LIB.OutputNpcTip(dwID, Rect, szExtraXml)
 	elseif dwType == TARGET.DOODAD then
-		MY.OutputDoodadTip(dwID, Rect, szExtraXml)
+		LIB.OutputDoodadTip(dwID, Rect, szExtraXml)
 	end
 end
 
-function MY.OutputItemInfoTip(dwTabType, dwIndex, nBookInfo, Rect)
+function LIB.OutputItemInfoTip(dwTabType, dwIndex, nBookInfo, Rect)
 	local szXml = GetItemInfoTip(0, dwTabType, dwIndex, nil, nil, nBookInfo)
 	if not Rect then
 		local x, y = Cursor.GetPos()
@@ -2189,7 +2189,7 @@ function MY.OutputItemInfoTip(dwTabType, dwIndex, nBookInfo, Rect)
 	OutputTip(szXml, 345, Rect)
 end
 
-function MY.Alert(szMsg, fnAction, szSure, fnCancelAction)
+function LIB.Alert(szMsg, fnAction, szSure, fnCancelAction)
 	local nW, nH = Station.GetClientSize()
 	local tMsg = {
 		x = nW / 2, y = nH / 3,
@@ -2205,7 +2205,7 @@ function MY.Alert(szMsg, fnAction, szSure, fnCancelAction)
 	MessageBox(tMsg)
 end
 
-function MY.Confirm(szMsg, fnAction, fnCancel, szSure, szCancel, fnCancelAction)
+function LIB.Confirm(szMsg, fnAction, fnCancel, szSure, szCancel, fnCancelAction)
 	local nW, nH = Station.GetClientSize()
 	local tMsg = {
 		x = nW / 2, y = nH / 3,
@@ -2224,7 +2224,7 @@ function MY.Confirm(szMsg, fnAction, fnCancel, szSure, szCancel, fnCancelAction)
 	MessageBox(tMsg)
 end
 
-function MY.Dialog(szMsg, aOptions, fnCancelAction)
+function LIB.Dialog(szMsg, aOptions, fnCancelAction)
 	local nW, nH = Station.GetClientSize()
 	local tMsg = {
 		x = nW / 2, y = nH / 3,
@@ -2251,7 +2251,7 @@ function MY.Dialog(szMsg, aOptions, fnCancelAction)
 end
 
 do
-function MY.Hex2RGB(hex)
+function LIB.Hex2RGB(hex)
 	local s, r, g, b, a = (hex:gsub('#', ''))
 	if #s == 3 then
 		r, g, b = s:sub(1, 1):rep(2), s:sub(2, 2):rep(2), s:sub(3, 3):rep(2)
@@ -2277,7 +2277,7 @@ function MY.Hex2RGB(hex)
 	return r, g, b, a
 end
 
-function MY.RGB2Hex(r, g, b, a)
+function LIB.RGB2Hex(r, g, b, a)
 	if a then
 		return (('#%02X%02X%02X%02X'):format(r, g, b, a))
 	end
@@ -2286,9 +2286,9 @@ end
 
 local COLOR_NAME_RGB = {}
 do
-	local tColor = MY.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot .. 'data/colors.jx3dat')
+	local tColor = LIB.LoadLUAData(LIB.GetAddonInfo().szFrameworkRoot .. 'data/colors.jx3dat')
 	for id, col in pairs(tColor) do
-		local r, g, b = MY.Hex2RGB(col)
+		local r, g, b = LIB.Hex2RGB(col)
 		if r then
 			if _L.COLOR_NAME[id] then
 				COLOR_NAME_RGB[_L.COLOR_NAME[id]] = {r, g, b}
@@ -2298,7 +2298,7 @@ do
 	end
 end
 
-function MY.ColorName2RGB(name)
+function LIB.ColorName2RGB(name)
 	if not COLOR_NAME_RGB[name] then
 		return
 	end
@@ -2306,7 +2306,7 @@ function MY.ColorName2RGB(name)
 end
 
 local HUMAN_COLOR_CACHE = setmetatable({}, {__mode = 'v', __index = COLOR_NAME_RGB})
-function MY.HumanColor2RGB(name)
+function LIB.HumanColor2RGB(name)
 	if IsTable(name) then
 		if name.r then
 			return name.r, name.g, name.b
@@ -2314,14 +2314,14 @@ function MY.HumanColor2RGB(name)
 		return unpack(name)
 	end
 	if not HUMAN_COLOR_CACHE[name] then
-		local r, g, b, a = MY.Hex2RGB(name)
+		local r, g, b, a = LIB.Hex2RGB(name)
 		HUMAN_COLOR_CACHE[name] = {r, g, b, a}
 	end
 	return unpack(HUMAN_COLOR_CACHE[name])
 end
 end
 
-function MY.ExecuteWithThis(element, fnAction, ...)
+function LIB.ExecuteWithThis(element, fnAction, ...)
 	if not (element and element:IsValid()) then
 		-- Log('[UI ERROR]Invalid element on executing ui event!')
 		return false
@@ -2347,7 +2347,7 @@ function MY.ExecuteWithThis(element, fnAction, ...)
 	return true, unpack(rets)
 end
 
-function MY.InsertOperatorMenu(t, opt, action, opts, L)
+function LIB.InsertOperatorMenu(t, opt, action, opts, L)
 	for _, op in ipairs(opts or { '==', '!=', '<', '>=', '>', '<=' }) do
 		insert(t, {
 			szOption = L and L[op] or _L.OPERATOR[op],
@@ -2359,7 +2359,7 @@ function MY.InsertOperatorMenu(t, opt, action, opts, L)
 	return t
 end
 
-function MY.JudgeOperator(opt, lval, rval, ...)
+function LIB.JudgeOperator(opt, lval, rval, ...)
 	if opt == '>' then
 		return lval > rval
 	elseif opt == '>=' then
@@ -2376,15 +2376,15 @@ function MY.JudgeOperator(opt, lval, rval, ...)
 end
 
 -- 跨线程实时获取目标界面位置
--- 注册：MY.CThreadCoor(dwType, dwID, szKey, true)
--- 注销：MY.CThreadCoor(dwType, dwID, szKey, false)
--- 获取：MY.CThreadCoor(dwType, dwID) -- 必须已注册才能获取
--- 注册：MY.CThreadCoor(dwType, nX, nY, nZ, szKey, true)
--- 注销：MY.CThreadCoor(dwType, nX, nY, nZ, szKey, false)
--- 获取：MY.CThreadCoor(dwType, nX, nY, nZ) -- 必须已注册才能获取
+-- 注册：LIB.CThreadCoor(dwType, dwID, szKey, true)
+-- 注销：LIB.CThreadCoor(dwType, dwID, szKey, false)
+-- 获取：LIB.CThreadCoor(dwType, dwID) -- 必须已注册才能获取
+-- 注册：LIB.CThreadCoor(dwType, nX, nY, nZ, szKey, true)
+-- 注销：LIB.CThreadCoor(dwType, nX, nY, nZ, szKey, false)
+-- 获取：LIB.CThreadCoor(dwType, nX, nY, nZ) -- 必须已注册才能获取
 do
 local CACHE = {}
-function MY.CThreadCoor(arg0, arg1, arg2, arg3, arg4, arg5)
+function LIB.CThreadCoor(arg0, arg1, arg2, arg3, arg4, arg5)
 	local dwType, dwID, nX, nY, nZ, szCtcKey, szKey, bReg = arg0
 	if dwType == CTCT.CHARACTER_TOP_2_SCREEN_POS or dwType == CTCT.CHARACTER_POS_2_SCREEN_POS or dwType == CTCT.DOODAD_POS_2_SCREEN_POS then
 		dwID, szKey, bReg = arg1, arg2, arg3
@@ -2418,18 +2418,18 @@ function MY.CThreadCoor(arg0, arg1, arg2, arg3, arg4, arg5)
 	else
 		local cache = CACHE[szCtcKey]
 		if not cache then
-			MY.Debug({_L('Error: `%s` has not be registed!', szCtcKey)}, 'MY#SYS', DEBUG_LEVEL.ERROR)
+			LIB.Debug({_L('Error: `%s` has not be registed!', szCtcKey)}, 'MY#SYS', DEBUG_LEVEL.ERROR)
 		end
 		return CThreadCoor_Get(cache.ctcid) -- nX, nY, bFront
 	end
 end
 end
 
-function MY.GetUIScale()
+function LIB.GetUIScale()
 	return Station.GetUIScale()
 end
 
-function MY.GetOriginUIScale()
+function LIB.GetOriginUIScale()
 	-- 线性拟合出来的公式 -- 不知道不同机器会不会不一样
 	-- 源数据
 	-- 0.63, 0.7
@@ -2443,7 +2443,7 @@ function MY.GetOriginUIScale()
 	return GetUserPreferences(3775, 'c') / 100
 end
 
-function MY.GetFontScale(nOffset)
+function LIB.GetFontScale(nOffset)
 	return 1 + (nOffset or Font.GetOffset()) * 0.07
 end
 
@@ -2463,11 +2463,11 @@ local function RenameDatabase(szCaption, szPath)
 end
 
 local function DuplicateDatabase(DB_SRC, DB_DST)
-	MY.Debug({'Duplicate database start.'}, szCaption, DEBUG_LEVEL.LOG)
+	LIB.Debug({'Duplicate database start.'}, szCaption, DEBUG_LEVEL.LOG)
 	-- 运行 DDL 语句 创建表和索引等
 	for _, rec in ipairs(DB_SRC:Execute('SELECT sql FROM sqlite_master')) do
 		DB_DST:Execute(rec.sql)
-		MY.Debug({'Duplicating database: ' .. rec.sql}, szCaption, DEBUG_LEVEL.LOG)
+		LIB.Debug({'Duplicating database: ' .. rec.sql}, szCaption, DEBUG_LEVEL.LOG)
 	end
 	-- 读取表名 依次复制
 	for _, rec in ipairs(DB_SRC:Execute('SELECT name FROM sqlite_master WHERE type=\'table\'')) do
@@ -2480,7 +2480,7 @@ local function DuplicateDatabase(DB_SRC, DB_DST)
 		local szColumns, szPlaceholders = concat(aColumns, ', '), concat(aPlaceholders, ', ')
 		local nCount, nPageSize = Get(DB_SRC:Execute('SELECT COUNT(*) AS count FROM ' .. szTableName), {1, 'count'}, 0), 10000
 		local DB_W = DB_DST:Prepare('REPLACE INTO ' .. szTableName .. ' (' .. szColumns .. ') VALUES (' .. szPlaceholders .. ')')
-		MY.Debug({'Duplicating table: ' .. szTableName .. ' (cols)' .. szColumns .. ' (count)' .. nCount}, szCaption, DEBUG_LEVEL.LOG)
+		LIB.Debug({'Duplicating table: ' .. szTableName .. ' (cols)' .. szColumns .. ' (count)' .. nCount}, szCaption, DEBUG_LEVEL.LOG)
 		-- 开始读取和写入数据
 		DB_DST:Execute('BEGIN TRANSACTION')
 		for i = 0, nCount / nPageSize do
@@ -2495,15 +2495,15 @@ local function DuplicateDatabase(DB_SRC, DB_DST)
 			end
 		end
 		DB_DST:Execute('END TRANSACTION')
-		MY.Debug({'Duplicating table finished: ' .. szTableName}, szCaption, DEBUG_LEVEL.LOG)
+		LIB.Debug({'Duplicating table finished: ' .. szTableName}, szCaption, DEBUG_LEVEL.LOG)
 	end
 end
 
 local function ConnectMalformedDatabase(szCaption, szPath, bAlert)
-	MY.Debug({'Fixing malformed database...'}, szCaption, DEBUG_LEVEL.LOG)
+	LIB.Debug({'Fixing malformed database...'}, szCaption, DEBUG_LEVEL.LOG)
 	local szMalformedPath = RenameDatabase(szCaption, szPath)
 	if not szMalformedPath then
-		MY.Debug({'Fixing malformed database failed... Move file failed...'}, szCaption, DEBUG_LEVEL.LOG)
+		LIB.Debug({'Fixing malformed database failed... Move file failed...'}, szCaption, DEBUG_LEVEL.LOG)
 		return 'FILE_LOCKED'
 	else
 		local DB_DST = SQLite3_Open(szPath)
@@ -2512,19 +2512,19 @@ local function ConnectMalformedDatabase(szCaption, szPath, bAlert)
 			DuplicateDatabase(DB_SRC, DB_DST)
 			DB_SRC:Release()
 			CPath.DelFile(szMalformedPath)
-			MY.Debug({'Fixing malformed database finished...'}, szCaption, DEBUG_LEVEL.LOG)
+			LIB.Debug({'Fixing malformed database finished...'}, szCaption, DEBUG_LEVEL.LOG)
 			return 'SUCCESS', DB_DST
 		elseif not DB_SRC then
-			MY.Debug({'Connect malformed database failed...'}, szCaption, DEBUG_LEVEL.LOG)
+			LIB.Debug({'Connect malformed database failed...'}, szCaption, DEBUG_LEVEL.LOG)
 			return 'TRANSFER_FAILED', DB_DST
 		end
 	end
 end
 
-function MY.ConnectDatabase(szCaption, oPath, fnAction)
+function LIB.ConnectDatabase(szCaption, oPath, fnAction)
 	-- 尝试连接数据库
-	local szPath = MY.FormatPath(oPath)
-	MY.Debug({'Connect database: ' .. szPath}, szCaption, DEBUG_LEVEL.LOG)
+	local szPath = LIB.FormatPath(oPath)
+	LIB.Debug({'Connect database: ' .. szPath}, szCaption, DEBUG_LEVEL.LOG)
 	local DB = SQLite3_Open(szPath)
 	if not DB then
 		-- 连不上直接重命名原始文件并重新连接
@@ -2532,7 +2532,7 @@ function MY.ConnectDatabase(szCaption, oPath, fnAction)
 			DB = SQLite3_Open(szPath)
 		end
 		if not DB then
-			MY.Debug({'Cannot connect to database!!!'}, szCaption, DEBUG_LEVEL.ERROR)
+			LIB.Debug({'Cannot connect to database!!!'}, szCaption, DEBUG_LEVEL.ERROR)
 			if fnAction then
 				fnAction()
 			end
@@ -2548,19 +2548,19 @@ function MY.ConnectDatabase(szCaption, oPath, fnAction)
 		end
 		return DB
 	else
-		MY.Debug({'Malformed database detected...'}, szCaption, DEBUG_LEVEL.ERROR)
+		LIB.Debug({'Malformed database detected...'}, szCaption, DEBUG_LEVEL.ERROR)
 		for _, rec in ipairs(aRes or {}) do
-			MY.Debug({var2str(rec)}, szCaption, DEBUG_LEVEL.ERROR)
+			LIB.Debug({var2str(rec)}, szCaption, DEBUG_LEVEL.ERROR)
 		end
 		DB:Release()
 		if fnAction then
-			MY.Confirm(_L('%s Database is malformed, do you want to repair database now? Repair database may take a long time and cause a disconnection.', szCaption), function()
-				MY.Confirm(_L['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'], function()
+			LIB.Confirm(_L('%s Database is malformed, do you want to repair database now? Repair database may take a long time and cause a disconnection.', szCaption), function()
+				LIB.Confirm(_L['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'], function()
 					local szStatus, DB = ConnectMalformedDatabase(szCaption, szPath)
 					if szStatus == 'FILE_LOCKED' then
-						MY.Alert(_L('Database file locked, repair database failed! : %s', szPath))
+						LIB.Alert(_L('Database file locked, repair database failed! : %s', szPath))
 					else
-						MY.Alert(_L('%s Database repair finished!', szCaption))
+						LIB.Alert(_L('%s Database repair finished!', szCaption))
 					end
 					fnAction(DB)
 				end)
@@ -2572,11 +2572,11 @@ function MY.ConnectDatabase(szCaption, oPath, fnAction)
 end
 end
 
-function MY.OpenBrowser(szAddr)
+function LIB.OpenBrowser(szAddr)
 	OpenBrowser(szAddr)
 end
 
-function MY.ArrayToObject(arr)
+function LIB.ArrayToObject(arr)
 	if not arr then
 		return
 	end
@@ -2592,7 +2592,7 @@ function MY.ArrayToObject(arr)
 end
 
 -- Global exports
-function MY.GeneGlobalNS(options)
+function LIB.GeneGlobalNS(options)
 	local exports = Get(options, 'exports', {})
 	local function getter(_, k)
 		local found, v, trigger, getter = false

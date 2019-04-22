@@ -35,8 +35,8 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_RollMonitor/lang/')
-if not MY.AssertVersion('MY_RollMonitor', _L['MY_RollMonitor'], 0x2011800) then
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_RollMonitor/lang/')
+if not LIB.AssertVersion('MY_RollMonitor', _L['MY_RollMonitor'], 0x2011800) then
 	return
 end
 local SORT_TYPE = {
@@ -155,9 +155,9 @@ local _C = {}
 -- 打开面板
 -- (void) MY_RollMonitor.OpenPanel()
 function MY_RollMonitor.OpenPanel()
-	MY.ShowPanel()
-	MY.FocusPanel()
-	MY.SwitchTab('RollMonitor')
+	LIB.ShowPanel()
+	LIB.FocusPanel()
+	LIB.SwitchTab('RollMonitor')
 end
 
 -- 清空ROLL点
@@ -170,7 +170,7 @@ function MY_RollMonitor.Clear(bEcho, nChannel)
 	end
 	if bEcho then
 		nChannel = nChannel or MY_RollMonitor.nPublishChannel
-		MY.Talk(nChannel, _L['----------- roll restart -----------'] .. '\n')
+		LIB.Talk(nChannel, _L['----------- roll restart -----------'] .. '\n')
 	end
 	m_tRecords = {}
 	MY_RollMonitor.DrawBoard()
@@ -254,16 +254,16 @@ function MY_RollMonitor.Echo(nSortType, nLimit, nChannel, bShowUnroll)
 	nLimit    = nLimit    or MY_RollMonitor.nPublish
 	nChannel  = nChannel  or MY_RollMonitor.nPublishChannel
 
-	MY.Talk(nChannel, ('[%s][%s][%s]%s\n'):format(
+	LIB.Talk(nChannel, ('[%s][%s][%s]%s\n'):format(
 		_L['mingyi plugin'], _L['roll monitor'],
 		TIME_LIMIT_TITLE[MY_RollMonitor.nTimeLimit],
 		SORT_TYPE_INFO[nSortType].szName
 	), nil, true)
-	MY.Talk(nChannel, _L['-------------------------------'] .. '\n')
+	LIB.Talk(nChannel, _L['-------------------------------'] .. '\n')
 	local tNames = {}
 	for i, aRecord in ipairs(MY_RollMonitor.GetResult(nSortType)) do
 		if nLimit <= 0 or i <= nLimit then
-			MY.Talk(nChannel, _L('[%s] rolls for %d times, valid score is %s.', aRecord.szName, aRecord.nCount, string.gsub(aRecord.nRoll, '(%d+%.%d%d)%d+','%1')) .. '\n')
+			LIB.Talk(nChannel, _L('[%s] rolls for %d times, valid score is %s.', aRecord.szName, aRecord.nCount, string.gsub(aRecord.nRoll, '(%d+%.%d%d)%d+','%1')) .. '\n')
 		end
 		tNames[aRecord.szName] = true
 	end
@@ -277,10 +277,10 @@ function MY_RollMonitor.Echo(nSortType, nLimit, nChannel, bShowUnroll)
 			end
 		end
 		if szUnrolledNames~='' then
-			MY.Talk(nChannel, szUnrolledNames .. _L['haven\'t roll yet.']..'\n')
+			LIB.Talk(nChannel, szUnrolledNames .. _L['haven\'t roll yet.']..'\n')
 		end
 	end
-	MY.Talk(nChannel, _L['-------------------------------'] .. '\n')
+	LIB.Talk(nChannel, _L['-------------------------------'] .. '\n')
 end
 
 -- 重新绘制结果显示区域
@@ -295,7 +295,7 @@ function MY_RollMonitor.DrawBoard(ui)
 		local tNames = {}
 		for _, aRecord in ipairs(MY_RollMonitor.GetResult()) do
 			szHTML = szHTML ..
-				MY.GetCopyLinkText() ..
+				LIB.GetCopyLinkText() ..
 				GetFormatText('['..aRecord.szName..']', nil, nil, nil, nil, 515, nil, 'namelink_0') ..
 				GetFormatText(_L( ' rolls for %d times, valid score is %s.', aRecord.nCount, (string.gsub(aRecord.nRoll,'(%d+%.%d%d)%d+','%1')) ) .. '\n')
 			for _, nTime in ipairs(aRecord.aTime) do
@@ -315,11 +315,11 @@ function MY_RollMonitor.DrawBoard(ui)
 			end
 			if szUnrolledNames ~= '' then
 				szHTML = szHTML ..
-				MY.GetCopyLinkText() ..
+				LIB.GetCopyLinkText() ..
 				szUnrolledNames .. GetFormatText(_L['haven\'t roll yet.'])
 			end
 		end
-		szHTML = MY.RenderChatLink(szHTML)
+		szHTML = LIB.RenderChatLink(szHTML)
 		if MY_Farbnamen and MY_Farbnamen.Render then
 			szHTML = MY_Farbnamen.Render(szHTML)
 		end
@@ -478,12 +478,12 @@ function PS.OnPanelActive(wnd)
 		handlestyle = 3, text = _L['average score with out pole']
 	}, true)
 	MY_RollMonitor.DrawBoard()
-	MY.BreatheCall('MY_RollMonitorRedraw', 1000, CheckBoardRedraw)
+	LIB.BreatheCall('MY_RollMonitorRedraw', 1000, CheckBoardRedraw)
 end
 
 function PS.OnPanelDeactive()
 	m_uiBoard = nil
-	MY.BreatheCall('MY_RollMonitorRedraw', false)
+	LIB.BreatheCall('MY_RollMonitorRedraw', false)
 end
 
-MY.RegisterPanel('RollMonitor', _L['roll monitor'], _L['General'], 'UI/Image/UICommon/LoginCommon.UITex|30', PS)
+LIB.RegisterPanel('RollMonitor', _L['roll monitor'], _L['General'], 'UI/Image/UICommon/LoginCommon.UITex|30', PS)

@@ -7,18 +7,45 @@
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
 --------------------------------------------------------
 ---------------------------------------------------------------------------
--- local lua_value = MY.JsonDecode(raw_json_text)
--- local raw_json_text = MY.JsonEncode(lua_table_or_value)
--- local pretty_json_text = MY.JsonEncode(lua_table_or_value, true)
+-- local lua_value = LIB.JsonDecode(raw_json_text)
+-- local raw_json_text = LIB.JsonEncode(lua_table_or_value)
+-- local pretty_json_text = LIB.JsonEncode(lua_table_or_value, true)
 ---------------------------------------------------------------------------
-MY = MY or {}
-MY.Json = MY.Json or {}
+-------------------------------------------------------------------------------------------------------------
+-- these global functions are accessed all the time by the event handler
+-- so caching them is worth the effort
+-------------------------------------------------------------------------------------------------------------
+local setmetatable = setmetatable
+local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
+local sub, len, format, rep = string.sub, string.len, string.format, string.rep
+local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
+local type, tonumber, tostring = type, tonumber, tostring
+local huge, pi, random, abs = math.huge, math.pi, math.random, math.abs
+local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
+local pow, sqrt, sin, cos, tan = math.pow, math.sqrt, math.sin, math.cos, math.tan
+local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
+local pack, unpack = table.pack or function(...) return {...} end, table.unpack or unpack
+-- jx3 apis caching
+local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
+local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
+local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
+local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local LIB, UI, DEBUG_LEVEL, PATH_TYPE = MY, MY.UI, MY.DEBUG_LEVEL, MY.PATH_TYPE
+local var2str, str2var, clone, empty, ipairs_r = LIB.var2str, LIB.str2var, LIB.clone, LIB.empty, LIB.ipairs_r
+local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
+local GetPatch, ApplyPatch = LIB.GetPatch, LIB.ApplyPatch
+local Get, Set, RandomChild, GetTraceback = LIB.Get, LIB.Set, LIB.RandomChild, LIB.GetTraceback
+local IsArray, IsDictionary, IsEquals = LIB.IsArray, LIB.IsDictionary, LIB.IsEquals
+local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsNumber, LIB.IsFunction
+local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
+local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
+-------------------------------------------------------------------------------------------------------------
 
 -- if JsonEncode and JsonDecode then
--- 	MY.JsonEncode  = JsonEncode
--- 	MY.JsonEncode = JsonEncode
--- 	MY.JsonDecode  = JsonDecode
--- 	MY.JsonDecode = JsonDecode
+-- 	LIB.JsonEncode  = JsonEncode
+-- 	LIB.JsonEncode = JsonEncode
+-- 	LIB.JsonDecode  = JsonDecode
+-- 	LIB.JsonDecode = JsonDecode
 -- else
 --
 -- Simple JSON encoding and decoding in pure Lua.
@@ -26,9 +53,9 @@ MY.Json = MY.Json or {}
 -- @author hightman, Jeffrey Friedl
 -- @refer http://regex.info/blog/
 --
--- local lua_value = MY.JsonDecode(raw_json_text)
--- local raw_json_text = MY.JsonEncode(lua_table_or_value)
--- local pretty_json_text = MY.JsonEncode(lua_table_or_value, true)
+-- local lua_value = LIB.JsonDecode(raw_json_text)
+-- local raw_json_text = LIB.JsonEncode(lua_table_or_value)
+-- local pretty_json_text = LIB.JsonEncode(lua_table_or_value, true)
 ---------------------------------------------------------------------------
 local pairs, ipairs = pairs, ipairs
 local char, srep = string.char, string.rep
@@ -466,16 +493,16 @@ local function encode_value(value, parents, indent)
 end
 
 -- 编码 JSON 数据，成功返回 JSON 字符串，失败返回 nil
--- (string) MY.JsonEncode(vData[, bPretty])
+-- (string) LIB.JsonEncode(vData[, bPretty])
 -- vData 变量数据，支持字符串、数字、Table/Userdata
 -- bPretty 是否增加缩进美化，默认为 false
-function MY.JsonEncode(vData, bPretty)
+function LIB.JsonEncode(vData, bPretty)
 	return encode_value(vData, {}, bPretty and '')
 end
 
 -- 解析 JSON 数据，成功返回数据，失败返回 nil 加错误信息
--- (mixed) MY.JsonDecode(string szData)
-function MY.JsonDecode(value)
+-- (mixed) LIB.JsonDecode(string szData)
+function LIB.JsonDecode(value)
 	return decode_value(value)
 end
 

@@ -35,13 +35,13 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Target/lang/')
-if not MY.AssertVersion('MY_TargetDirection', _L['MY_TargetDirection'], 0x2011800) then
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_Target/lang/')
+if not LIB.AssertVersion('MY_TargetDirection', _L['MY_TargetDirection'], 0x2011800) then
 	return
 end
 
-local INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_Target/ui/MY_TargetDirection.ini'
-local IMG_PATH = MY.GetAddonInfo().szRoot .. 'MY_Target/img/MY_TargetDirection.uitex'
+local INI_PATH = LIB.GetAddonInfo().szRoot .. 'MY_Target/ui/MY_TargetDirection.ini'
+local IMG_PATH = LIB.GetAddonInfo().szRoot .. 'MY_Target/img/MY_TargetDirection.uitex'
 
 local O = {
 	bEnable = false,
@@ -158,8 +158,8 @@ end
 
 function D.OnFrameBreathe()
 	local me = GetClientPlayer()
-	local dwType, dwID = MY.GetTarget()
-	local tar, info, bInfo = MY.GetObject(dwType, dwID)
+	local dwType, dwID = LIB.GetTarget()
+	local tar, info, bInfo = LIB.GetObject(dwType, dwID)
 	if tar and tar.dwID ~= me.dwID then
 		-- Í·Ïñ
 		SetObjectAvatar(this:Lookup('', 'Handle_Main/Image_Force'), tar, info)
@@ -169,9 +169,9 @@ function D.OnFrameBreathe()
 		this:Lookup('', 'Handle_Main/Image_Arrow'):SetRotate(1.5 * math.pi + dwRad2 - dwRad1)
 		-- ÑÕÉ«
 		local nFrame = 4
-		if me.IsInParty() and MY.IsParty(tar.dwID) then
+		if me.IsInParty() and LIB.IsParty(tar.dwID) then
 			nFrame = 3
-		elseif MY.IsEnemy(me.dwID, tar.dwID) then
+		elseif LIB.IsEnemy(me.dwID, tar.dwID) then
 			nFrame = 1
 		elseif IsAlly(me.dwID, tar.dwID) then
 			nFrame = 2
@@ -188,7 +188,7 @@ function D.OnFrameBreathe()
 		end
 		txtState:SetText(szState or '')
 		-- ¾àÀë
-		this:Lookup('', 'Handle_Main/Text_Distance'):SetText(_L('%.1f feet', MY.GetDistance(me, tar, O.eDistanceType)))
+		this:Lookup('', 'Handle_Main/Text_Distance'):SetText(_L('%.1f feet', LIB.GetDistance(me, tar, O.eDistanceType)))
 		this:Show()
 	else
 		this:Hide()
@@ -245,5 +245,5 @@ local settings = {
 		},
 	},
 }
-MY_TargetDirection = MY.GeneGlobalNS(settings)
+MY_TargetDirection = LIB.GeneGlobalNS(settings)
 end

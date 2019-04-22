@@ -40,11 +40,11 @@ MY_Notify = {}
 MY_Notify.anchor = { x = -100, y = -150, s = 'BOTTOMRIGHT', r = 'BOTTOMRIGHT' }
 RegisterCustomData('MY_Notify.anchor')
 
-local _L = MY.LoadLangPack()
+local _L = LIB.LoadLangPack()
 local D = {}
 local NOTIFY_LIST = {}
-local INI_PATH = MY.GetAddonInfo().szFrameworkRoot .. 'ui/MY_Notify.ini'
-local ENTRY_INI_PATH = MY.GetAddonInfo().szFrameworkRoot .. 'ui/MY_NotifyIcon.ini'
+local INI_PATH = LIB.GetAddonInfo().szFrameworkRoot .. 'ui/MY_Notify.ini'
+local ENTRY_INI_PATH = LIB.GetAddonInfo().szFrameworkRoot .. 'ui/MY_NotifyIcon.ini'
 
 function MY_Notify.Create(opt)
 	insert(NOTIFY_LIST, {
@@ -60,11 +60,11 @@ function MY_Notify.Create(opt)
 		D.ShowTip(opt.szMsg)
 	end
 	if opt.bPlaySound then
-		MY.PlaySound(opt.szSound or 'Notify.ogg', opt.szCustomSound)
+		LIB.PlaySound(opt.szSound or 'Notify.ogg', opt.szCustomSound)
 	end
 	return szKey
 end
-MY.CreateNotify = MY_Notify.Create
+LIB.CreateNotify = MY_Notify.Create
 
 function MY_Notify.Dismiss(szKey, bOnlyData)
 	for i, v in ipairs_r(NOTIFY_LIST) do
@@ -79,7 +79,7 @@ function MY_Notify.Dismiss(szKey, bOnlyData)
 	D.UpdateEntry()
 	D.DrawNotifies(true)
 end
-MY.DismissNotify = MY_Notify.Dismiss
+LIB.DismissNotify = MY_Notify.Dismiss
 
 function MY_Notify.OpenPanel()
 	Wnd.OpenWindow(INI_PATH, 'MY_Notify')
@@ -126,7 +126,7 @@ function D.UpdateEntry()
 		container:FormatAllContentPos()
 	end
 end
-MY.RegisterInit('MY_Notify', D.UpdateEntry)
+LIB.RegisterInit('MY_Notify', D.UpdateEntry)
 
 function D.RemoveEntry()
 	local container = Station.Lookup('Normal/TopMenu/WndContainer_List')
@@ -139,7 +139,7 @@ function D.RemoveEntry()
 		container:FormatAllContentPos()
 	end
 end
-MY.RegisterReload('MY_Notify', D.RemoveEntry)
+LIB.RegisterReload('MY_Notify', D.RemoveEntry)
 
 function D.DrawNotifies(bAutoClose)
 	if bAutoClose and #NOTIFY_LIST == 0 then
@@ -232,9 +232,9 @@ function D.ShowTip(szMsg)
 	l_uiFrame:fadeTo(500, 255)
 	local szHoverFrame = Station.GetMouseOverWindow() and Station.GetMouseOverWindow():GetRoot():GetName()
 	if szHoverFrame == 'MY_NotifyTip' then
-		MY.DelayCall('MY_NotifyTip_Hide', 5000)
+		LIB.DelayCall('MY_NotifyTip_Hide', 5000)
 	else
-		MY.DelayCall('MY_NotifyTip_Hide', 5000, function()
+		LIB.DelayCall('MY_NotifyTip_Hide', 5000, function()
 			l_uiFrame:fadeOut(500)
 		end)
 	end
@@ -251,7 +251,7 @@ local function OnInit()
 		events = {{ 'UI_SCALED', function() l_uiFrame:anchor(MY_Notify.anchor) end }},
 	})
 	:customMode(_L['MY_Notify'], function()
-		MY.DelayCall('MY_NotifyTip_Hide')
+		LIB.DelayCall('MY_NotifyTip_Hide')
 		l_uiFrame:show():alpha(255)
 	end, function()
 		MY_Notify.anchor = l_uiFrame:anchor()
@@ -262,26 +262,26 @@ local function OnInit()
 	l_uiTipBoard = l_uiFrame:append('WndScrollBox', {
 		handlestyle = 3, x = 0, y = 0, w = 250, h = 150,
 		onclick = function()
-			if MY.IsInCustomUIMode() then
+			if LIB.IsInCustomUIMode() then
 				return
 			end
 			MY_Notify.OpenPanel()
 			l_uiFrame:fadeOut(500)
 		end,
 		onhover = function(bIn)
-			if MY.IsInCustomUIMode() then
+			if LIB.IsInCustomUIMode() then
 				return
 			end
 			if bIn then
-				MY.DelayCall('MY_NotifyTip_Hide')
+				LIB.DelayCall('MY_NotifyTip_Hide')
 				l_uiFrame:fadeIn(500)
 			else
-				MY.DelayCall('MY_NotifyTip_Hide', function()
+				LIB.DelayCall('MY_NotifyTip_Hide', function()
 					l_uiFrame:fadeOut(500)
 				end, 5000)
 			end
 		end,
 	}, true)
 end
-MY.RegisterInit('MY_NotifyTip', OnInit)
+LIB.RegisterInit('MY_NotifyTip', OnInit)
 end

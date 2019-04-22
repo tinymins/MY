@@ -72,7 +72,7 @@ function MY_WebBase.OnLButtonClick()
 	elseif name == 'Btn_GoTo' then
 		UpdateControls(frame, 'go')
 	elseif name == 'Btn_OuterOpen' then
-		MY.OpenBrowser(frame.url)
+		LIB.OpenBrowser(frame.url)
 	elseif name == 'Btn_Close' then
 		MY_Web.Close(frame)
 	end
@@ -179,7 +179,7 @@ function MY_Web.Open(url, options)
 	if WINDOWS[szKey] then
 		Wnd.CloseWindow(WINDOWS[szKey])
 	end
-	WINDOWS[szKey] = Wnd.OpenWindow(MY.GetAddonInfo().szFrameworkRoot .. 'ui/MY_Web.ini', 'MY_Web#' .. szKey)
+	WINDOWS[szKey] = Wnd.OpenWindow(LIB.GetAddonInfo().szFrameworkRoot .. 'ui/MY_Web.ini', 'MY_Web#' .. szKey)
 
 	local frame = WINDOWS[szKey]
 	local ui = UI(frame)

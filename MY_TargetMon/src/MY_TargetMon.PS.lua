@@ -36,8 +36,8 @@ local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.Is
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
 
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_TargetMon/lang/')
-if not MY.AssertVersion('MY_TargetMon', _L['MY_TargetMon'], 0x2011800) then
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_TargetMon/lang/')
+if not LIB.AssertVersion('MY_TargetMon', _L['MY_TargetMon'], 0x2011800) then
 	return
 end
 local C, D = {}, {
@@ -94,15 +94,15 @@ local CUSTOM_BOX_EXTENT_ANIMATE = {
 	{'ui/Image/Common/Box.UITex|20'},
 }
 local CUSTOM_CDBAR_STYLES = {
-	MY.GetAddonInfo().szUITexST .. '|' .. 0,
-	MY.GetAddonInfo().szUITexST .. '|' .. 1,
-	MY.GetAddonInfo().szUITexST .. '|' .. 2,
-	MY.GetAddonInfo().szUITexST .. '|' .. 3,
-	MY.GetAddonInfo().szUITexST .. '|' .. 4,
-	MY.GetAddonInfo().szUITexST .. '|' .. 5,
-	MY.GetAddonInfo().szUITexST .. '|' .. 6,
-	MY.GetAddonInfo().szUITexST .. '|' .. 7,
-	MY.GetAddonInfo().szUITexST .. '|' .. 8,
+	LIB.GetAddonInfo().szUITexST .. '|' .. 0,
+	LIB.GetAddonInfo().szUITexST .. '|' .. 1,
+	LIB.GetAddonInfo().szUITexST .. '|' .. 2,
+	LIB.GetAddonInfo().szUITexST .. '|' .. 3,
+	LIB.GetAddonInfo().szUITexST .. '|' .. 4,
+	LIB.GetAddonInfo().szUITexST .. '|' .. 5,
+	LIB.GetAddonInfo().szUITexST .. '|' .. 6,
+	LIB.GetAddonInfo().szUITexST .. '|' .. 7,
+	LIB.GetAddonInfo().szUITexST .. '|' .. 8,
 	'/ui/Image/Common/Money.UITex|168',
 	'/ui/Image/Common/Money.UITex|203',
 	'/ui/Image/Common/Money.UITex|204',
@@ -343,11 +343,11 @@ local function DrawDetail(ui)
 				end,
 			},
 		}
-		for _, dwForceID in ipairs(MY.GetForceList()) do
-			for i, dwKungfuID in ipairs(MY.GetForceKungfuList(dwForceID) or {}) do
+		for _, dwForceID in ipairs(LIB.GetForceList()) do
+			for i, dwKungfuID in ipairs(LIB.GetForceKungfuList(dwForceID) or {}) do
 				insert(t2, {
-					szOption = MY.GetSkillName(dwKungfuID, 1),
-					rgb = {MY.GetForceColor(dwForceID, 'foreground')},
+					szOption = LIB.GetSkillName(dwKungfuID, 1),
+					rgb = {LIB.GetForceColor(dwForceID, 'foreground')},
 					bCheck = true,
 					bChecked = mon.kungfus[dwKungfuID],
 					fnAction = function()
@@ -381,11 +381,11 @@ local function DrawDetail(ui)
 				fnDisable = function() return mon.tarkungfus.all or IsEmpty(mon.tarkungfus) end,
 			},
 		}
-		for _, dwForceID in ipairs(MY.GetForceList()) do
-			for i, dwKungfuID in ipairs(MY.GetForceKungfuList(dwForceID) or {}) do
+		for _, dwForceID in ipairs(LIB.GetForceList()) do
+			for i, dwKungfuID in ipairs(LIB.GetForceKungfuList(dwForceID) or {}) do
 				insert(t2, {
-					szOption = MY.GetSkillName(dwKungfuID, 1),
-					rgb = {MY.GetForceColor(dwForceID, 'foreground')},
+					szOption = LIB.GetSkillName(dwKungfuID, 1),
+					rgb = {LIB.GetForceColor(dwForceID, 'foreground')},
 					bCheck = true,
 					bChecked = mon.tarkungfus[dwKungfuID],
 					fnAction = function()
@@ -397,7 +397,7 @@ local function DrawDetail(ui)
 		end
 		insert(t1, t2)
 		-- 地图要求
-		local t2 = MY.GetDungeonMenu(function(p)
+		local t2 = LIB.GetDungeonMenu(function(p)
 			D.ModifyMonitor(mon, {'maps', p.dwID}, not mon.maps[p.dwID])
 		end, false, mon.maps)
 		for i, p in ipairs(t2) do
@@ -434,7 +434,7 @@ local function DrawDetail(ui)
 			})
 		end
 		-- 出现声音
-		local t2 = MY.GetSoundMenu(function(dwID, bCheck)
+		local t2 = LIB.GetSoundMenu(function(dwID, bCheck)
 			if not bCheck then
 				for i, v in ipairs_r(mon.soundAppear) do
 					if v == dwID then
@@ -445,11 +445,11 @@ local function DrawDetail(ui)
 				insert(mon.soundAppear, dwID)
 			end
 			D.ModifyMonitor(mon, 'soundAppear', mon.soundAppear)
-		end, MY.ArrayToObject(mon.soundAppear), true)
+		end, LIB.ArrayToObject(mon.soundAppear), true)
 		t2.szOption = _L['Play sound when appear']
 		insert(t1, t2)
 		-- 消失声音
-		local t2 = MY.GetSoundMenu(function(dwID, bCheck)
+		local t2 = LIB.GetSoundMenu(function(dwID, bCheck)
 			if not bCheck then
 				for i, v in ipairs_r(mon.soundDisappear) do
 					if v == dwID then
@@ -460,7 +460,7 @@ local function DrawDetail(ui)
 				insert(mon.soundDisappear, dwID)
 			end
 			D.ModifyMonitor(mon, 'soundDisappear', mon.soundDisappear)
-		end, MY.ArrayToObject(mon.soundDisappear), true)
+		end, LIB.ArrayToObject(mon.soundDisappear), true)
 		t2.szOption = _L['Play sound when disappear']
 		insert(t1, t2)
 		-- 显示特效框
@@ -706,7 +706,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		text = _L['Move Up'],
 		onclick = function()
 			D.MoveConfig(config, -1)
-			MY.SwitchTab('MY_TargetMon', true)
+			LIB.SwitchTab('MY_TargetMon', true)
 		end,
 	})
 	uiWnd:append('WndButton2', {
@@ -715,7 +715,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		text = _L['Move Down'],
 		onclick = function()
 			D.MoveConfig(config, 1)
-			MY.SwitchTab('MY_TargetMon', true)
+			LIB.SwitchTab('MY_TargetMon', true)
 		end,
 	})
 	uiWnd:append('WndButton2', {
@@ -724,7 +724,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		text = _L['Delete'],
 		onclick = function()
 			D.DeleteConfig(config)
-			MY.SwitchTab('MY_TargetMon', true)
+			LIB.SwitchTab('MY_TargetMon', true)
 		end,
 	})
 	y = y + 30
@@ -1092,7 +1092,7 @@ local function DrawControls(ui, OpenDetail)
 			local file = GetOpenFileName(
 				_L['Please select import target monitor data file.'],
 				'JX3 File(*.jx3dat)\0*.jx3dat\0All Files(*.*)\0*.*\0\0',
-				MY.FormatPath({ 'export/TargetMon', PATH_TYPE.GLOBAL })
+				LIB.FormatPath({ 'export/TargetMon', PATH_TYPE.GLOBAL })
 			)
 			if file == '' then
 				return
@@ -1101,13 +1101,13 @@ local function DrawControls(ui, OpenDetail)
 			local szTip
 			if nImportCount then
 				if nImportCount > 0 then
-					MY.SwitchTab('MY_TargetMon', true)
+					LIB.SwitchTab('MY_TargetMon', true)
 				end
 				szTip = _L('Import successed, %d imported and %d replaced.', nImportCount, nReplaceCount)
 			else
 				szTip = _L['Import failed, cannot decode file.']
 			end
-			MY.Sysmsg({ szTip })
+			LIB.Sysmsg({ szTip })
 			OutputMessage('MSG_ANNOUNCE_YELLOW', szTip)
 		end,
 	})
@@ -1144,17 +1144,17 @@ local function DrawControls(ui, OpenDetail)
 					and _L['Ensure export (as embedded)']
 					or (szIndent and _L['Ensure export (with indent)'] or _L['Ensure export']),
 				fnAction = function()
-					local file = MY.FormatPath({
+					local file = LIB.FormatPath({
 						'export/TargetMon/'
 							.. (bAsEmbedded and 'embedded/' or '')
 							.. '$name@$server@'
-							.. MY.FormatTime('yyyyMMddhhmmss')
+							.. LIB.FormatTime('yyyyMMddhhmmss')
 							.. (bAsEmbedded and '.$lang' or '')
 							.. '.jx3dat',
 						PATH_TYPE.GLOBAL,
 					})
 					D.ExportPatchFile(file, aUUID, szIndent, bAsEmbedded)
-					MY.Sysmsg({ _L('Data exported, file saved at %s.', file) })
+					LIB.Sysmsg({ _L('Data exported, file saved at %s.', file) })
 					OutputMessage('MSG_ANNOUNCE_YELLOW', _L('Data exported, file saved at %s.', file))
 				end,
 				fnDisable = function()
@@ -1170,7 +1170,7 @@ local function DrawControls(ui, OpenDetail)
 		w = 80, h = 30,
 		text = _L['Save As Default'],
 		onclick = function()
-			MY.Confirm(_L['Sure to save as default?'], function()
+			LIB.Confirm(_L['Sure to save as default?'], function()
 				D.SaveConfig(true)
 			end)
 		end,
@@ -1181,19 +1181,19 @@ local function DrawControls(ui, OpenDetail)
 		w = 80, h = 30,
 		text = _L['Reset Default'],
 		onclick = function()
-			MY.Dialog(_L['Sure to reset default?'], {
+			LIB.Dialog(_L['Sure to reset default?'], {
 				{
 					szOption = _L['Origin config'],
 					fnAction = function()
 						D.LoadConfig(true, true)
-						MY.SwitchTab('MY_TargetMon', true)
+						LIB.SwitchTab('MY_TargetMon', true)
 					end,
 				},
 				{
 					szOption = _L['Default config'],
 					fnAction = function()
 						D.LoadConfig(true, false)
-						MY.SwitchTab('MY_TargetMon', true)
+						LIB.SwitchTab('MY_TargetMon', true)
 					end,
 				},
 				{ szOption = g_tStrings.STR_HOTKEY_CANCEL },
@@ -1223,4 +1223,4 @@ end
 function PS.OnPanelScroll(wnd, scrollX, scrollY)
 	wnd:Lookup('WndWindow_Wrapper'):SetRelPos(scrollX, scrollY)
 end
-MY.RegisterPanel('MY_TargetMon', _L['Target monitor'], _L['Target'], 'ui/Image/ChannelsPanel/NewChannels.UITex|141', PS)
+LIB.RegisterPanel('MY_TargetMon', _L['Target monitor'], _L['Target'], 'ui/Image/ChannelsPanel/NewChannels.UITex|141', PS)

@@ -37,9 +37,9 @@ local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_
 -------------------------------------------------------------------------------------------------------------
 -- 早期代码 需要重写
 ---------------------------------------------------------------------------------------------------
-local PATH_ROOT = MY.GetAddonInfo().szRoot .. 'MY_GKP/'
-local _L = MY.LoadLangPack(PATH_ROOT .. 'lang/')
-if not MY.AssertVersion('MY_GKP', _L['MY_GKP'], 0x2011800) then
+local PATH_ROOT = LIB.GetAddonInfo().szRoot .. 'MY_GKP/'
+local _L = LIB.LoadLangPack(PATH_ROOT .. 'lang/')
+if not LIB.AssertVersion('MY_GKP', _L['MY_GKP'], 0x2011800) then
 	return
 end
 
@@ -54,7 +54,7 @@ MY_GKP = {
 	bAutoSync            = true,  -- 自动接收分配者的同步信息
 	bShowGoldBrick       = true,
 }
-MY.RegisterCustomData('MY_GKP')
+LIB.RegisterCustomData('MY_GKP')
 ---------------------------------------------------------------------->
 -- 本地函数与变量
 ----------------------------------------------------------------------<
@@ -69,7 +69,7 @@ local _GKP = {
 	Config = {
 		Subsidies = {
 			{ _L['Treasure Chests'], '', true},
-			-- { MY.GetItemName(73214), '', true},
+			-- { LIB.GetItemName(73214), '', true},
 			{ _L['Boss'], '', true},
 			{ _L['Banquet Allowance'], -1000, true},
 			{ _L['Fines'], '', true},
@@ -93,7 +93,7 @@ local _GKP = {
 		},
 	},
 }
-_GKP.Config = MY.LoadLUAData({'config/gkp.cfg', PATH_TYPE.GLOBAL}) or _GKP.Config
+_GKP.Config = LIB.LoadLUAData({'config/gkp.cfg', PATH_TYPE.GLOBAL}) or _GKP.Config
 ---------------------------------------------------------------------->
 -- 数据处理
 ----------------------------------------------------------------------<
@@ -178,24 +178,24 @@ function _GKP.GeneDataInfo()
 end
 
 function _GKP.SaveConfig()
-	MY.SaveLUAData({'config/gkp.cfg', PATH_TYPE.GLOBAL}, _GKP.Config)
+	LIB.SaveLUAData({'config/gkp.cfg', PATH_TYPE.GLOBAL}, _GKP.Config)
 end
 
 function _GKP.SaveData(bStorage)
 	local szPath = 'userdata/gkp/current.gkp'
 	if bStorage then
-		MY.SaveLUAData({szPath, PATH_TYPE.ROLE}, nil) -- 存储模式时清空当前存盘数据
+		LIB.SaveLUAData({szPath, PATH_TYPE.ROLE}, nil) -- 存储模式时清空当前存盘数据
 		local i = 0
 		repeat
 			szPath = 'userdata/gkp/'
-				.. MY.FormatTime('yyyy-MM-dd-hh-mm-ss', MY_GKP('GKP_Time') or GetCurrentTime())
+				.. LIB.FormatTime('yyyy-MM-dd-hh-mm-ss', MY_GKP('GKP_Time') or GetCurrentTime())
 				.. (i == 0 and '' or ('-' .. i))
 				.. '_' .. MY_GKP('GKP_Map')
 				.. '.gkp'
 			i = i + 1
-		until not IsLocalFileExist(MY.FormatPath(szPath) .. '.jx3dat')
+		until not IsLocalFileExist(LIB.FormatPath(szPath) .. '.jx3dat')
 	end
-	MY.SaveLUAData({szPath, PATH_TYPE.ROLE}, {
+	LIB.SaveLUAData({szPath, PATH_TYPE.ROLE}, {
 		GKP_Map = MY_GKP('GKP_Map'),
 		GKP_Time = MY_GKP('GKP_Time'),
 		GKP_Record = MY_GKP('GKP_Record'),
@@ -209,7 +209,7 @@ function _GKP.LoadData(szFile, bAbs)
 	if not bAbs then
 		szFile = {'userdata/' .. szFile .. '.gkp', PATH_TYPE.ROLE}
 	end
-	local t = MY.LoadLUAData(szFile)
+	local t = LIB.LoadLUAData(szFile)
 	if t then
 		_GKP.GKP_Map = t.GKP_Map or ''
 		_GKP.GKP_Time = t.GKP_Time or 0
@@ -228,7 +228,7 @@ function _GKP.UpdateTitle()
 	local nTime = MY_GKP('GKP_Time')
 	local szText = _L['GKP Golden Team Record']
 		.. (szMap ~= '' and (' - ' .. szMap) or '')
-		.. (nTime ~= 0 and (' - ' .. MY.FormatTime('yyyy-MM-dd-hh-mm-ss', nTime)) or '')
+		.. (nTime ~= 0 and (' - ' .. LIB.FormatTime('yyyy-MM-dd-hh-mm-ss', nTime)) or '')
 	txtTitle:SetText(szText)
 end
 
@@ -237,7 +237,7 @@ function _GKP.UpdateStat()
 	local c, d = _GKP.GetAccountSum()
 	local hStat = Station.Lookup('Normal/MY_GKP', 'Handle_Record_Stat')
 	local szXml = GetFormatText(_L['Reall Salary:'], 41) .. _GKP.GetMoneyTipText(a + b)
-	if MY.IsDistributer() or not MY.IsInParty() then
+	if LIB.IsDistributer() or not LIB.IsInParty() then
 		if c + d < 0 then
 			szXml = szXml .. GetFormatText(' || ' .. _L['Spending:'], 41) .. _GKP.GetMoneyTipText(d)
 		elseif c ~= 0 then
@@ -262,7 +262,7 @@ function _GKP.UpdateStat()
 				szXml = szXml .. GetFormatText(_L['Reall Salary:'], 41) .. _GKP.GetMoneyTipText(a + b) .. br
 			end
 		end
-		if (MY.IsDistributer() or not MY.IsInParty()) and c > 0 then
+		if (LIB.IsDistributer() or not LIB.IsInParty()) and c > 0 then
 			szXml = szXml .. GetFormatText(_L['Total income:'], 41) .. _GKP.GetMoneyTipText(c) .. br
 			if d ~= 0 then
 				szXml = szXml .. GetFormatText(_L['Spending:'], 41) .. _GKP.GetMoneyTipText(d) .. br
@@ -313,9 +313,9 @@ function _GKP.Init()
 	local function onDelay() -- Init延后 避免和进入副本冲突
 		_GKP.LoadData('gkp/current')
 	end
-	MY.DelayCall(125, onDelay)
+	LIB.DelayCall(125, onDelay)
 end
-MY.RegisterEvent('FIRST_LOADING_END', _GKP.Init)
+LIB.RegisterEvent('FIRST_LOADING_END', _GKP.Init)
 
 function _GKP.GetRecordWindow()
 	return Station.Lookup('Normal/GKP_Record')
@@ -332,7 +332,7 @@ function _GKP.Random() -- 生成一个随机字符串 这还能重复我吃翔
 end
 
 function _GKP.Sysmsg(szMsg)
-	MY.Sysmsg({szMsg}, '[MY_GKP]')
+	LIB.Sysmsg({szMsg}, '[MY_GKP]')
 end
 
 function _GKP.GetTimeString(nTime, year)
@@ -395,19 +395,19 @@ function MY_GKP.OnFrameCreate()
 		x = 875, y = 48, w = 100, h = 35,
 		text = g_tStrings.STR_LOG_SET,
 		onclick = function()
-			MY.ShowPanel()
-			MY.FocusPanel()
-			MY.SwitchTab('MY_GKP')
+			LIB.ShowPanel()
+			LIB.FocusPanel()
+			LIB.SwitchTab('MY_GKP')
 		end,
 	})
 	ui:append('WndButton3', {
 		x = 15, y = 660, text = _L['Add Manually'],
 		onclick = function()
 			if _GKP.GetRecordWindow() then
-				return MY.Alert(_L['No Record For Current Object.'])
+				return LIB.Alert(_L['No Record For Current Object.'])
 			end
-			if not MY.IsDistributer() and not MY_GKP.bDebug then -- debug
-				return MY.Alert(_L['You are not the distrubutor.'])
+			if not LIB.IsDistributer() and not MY_GKP.bDebug then -- debug
+				return LIB.Alert(_L['You are not the distrubutor.'])
 			end
 			_GKP.Record()
 		end,
@@ -427,7 +427,7 @@ function MY_GKP.OnFrameCreate()
 	local hPageSet = ui:children('#PageSet_Menu')
 	hPageSet:children('#WndCheck_GKP_Record'):children('#Text_GKP_Record'):text(g_tStrings.GOLD_BID_RECORD_STATIC_TITLE)
 	hPageSet:children('#WndCheck_GKP_Account'):children('#Text_GKP_Account'):text(g_tStrings.GOLD_BID_RPAY_STATIC_TITLE)
-	MY.RegisterEsc('MY_GKP', _GKP.IsOpened, _GKP.ClosePanel)
+	LIB.RegisterEsc('MY_GKP', _GKP.IsOpened, _GKP.ClosePanel)
 	-- 排序
 	local page = this:Lookup('PageSet_Menu/Page_GKP_Record')
 	local t = {
@@ -523,7 +523,7 @@ function MY_GKP.OnItemMouseEnter()
 	if this:GetName() == 'Text_Name' then
 		local data = this.data
 		local szIcon, nFrame = GetForceImage(data.dwForceID)
-		local r, g, b = MY.GetForceColor(data.dwForceID)
+		local r, g, b = LIB.GetForceColor(data.dwForceID)
 		local szXml = GetFormatImage(szIcon,nFrame,20,20) .. GetFormatText('  ' .. data.szPlayer .. g_tStrings.STR_COLON .. '\n', 136, r, g, b)
 		if IsCtrlKeyDown() then
 			szXml = szXml .. GetFormatText(g_tStrings.DEBUG_INFO_ITEM_TIP .. '\n', 136, 255, 0, 0)
@@ -655,7 +655,7 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + 28
 
-	if not MY.IsShieldedVersion() then
+	if not LIB.IsShieldedVersion() then
 		x = X
 		ui:append('Text', { x = x, y = y, text = _L['GKP Loot'], font = 27 })
 		y = y + 28
@@ -676,7 +676,7 @@ function PS.OnPanelActive(wnd)
 		y = y + 28
 	end
 end
-MY.RegisterPanel('MY_GKP', _L['GKP Golden Team Record'], _L['General'], 2490, PS)
+LIB.RegisterPanel('MY_GKP', _L['GKP Golden Team Record'], _L['General'], 2490, PS)
 
 ---------------------------------------------------------------------->
 -- 获取补贴方案菜单
@@ -688,7 +688,7 @@ function _GKP.GetSubsidiesMenu()
 		rgb = { 255, 255, 0 },
 		fnAction = function()
 			GetUserInput(_L['New Protocol  Format: Protocol\'s Name, Money'], function(txt)
-				local t = MY.SplitString(txt, ',')
+				local t = LIB.SplitString(txt, ',')
 				table.insert(_GKP.Config.Subsidies, { t[1], tonumber(t[2]) or '', true })
 				_GKP.SaveConfig()
 			end)
@@ -718,7 +718,7 @@ function _GKP.GetSchemeMenu()
 		rgb = { 255, 255, 0 },
 		fnAction = function()
 			GetUserInput(_L['New Protocol Format: Money, Money, Money'], function(txt)
-				local t = MY.SplitString(txt, ',')
+				local t = LIB.SplitString(txt, ',')
 				_GKP.Config.Scheme = {}
 				for k, v in ipairs(t) do
 					table.insert(_GKP.Config.Scheme, { tonumber(v) or 0, true })
@@ -777,16 +777,16 @@ function _GKP.DrawRecord(key, sort)
 			end
 			item:RegisterEvent(32)
 			item.OnItemRButtonClick = function()
-				if not MY.IsDistributer() and not MY_GKP.bDebug then
-					return MY.Alert(_L['You are not the distrubutor.'])
+				if not LIB.IsDistributer() and not MY_GKP.bDebug then
+					return LIB.Alert(_L['You are not the distrubutor.'])
 				end
 				_GKP.Record(v, k)
 			end
 			item:Lookup('Text_No'):SetText(k)
 			item:Lookup('Image_NameIcon'):FromUITex(GetForceImage(v.dwForceID))
 			item:Lookup('Text_Name'):SetText(v.szPlayer)
-			item:Lookup('Text_Name'):SetFontColor(MY.GetForceColor(v.dwForceID))
-			local szName = v.szName or MY.GetItemName(v.nUiId)
+			item:Lookup('Text_Name'):SetFontColor(LIB.GetForceColor(v.dwForceID))
+			local szName = v.szName or LIB.GetItemName(v.nUiId)
 			item:Lookup('Text_ItemName'):SetText(szName)
 			if v.nQuality then
 				item:Lookup('Text_ItemName'):SetFontColor(GetItemFontColorByQuality(v.nQuality))
@@ -824,12 +824,12 @@ function _GKP.DrawRecord(key, sort)
 				end
 			end
 			wnd:Lookup('WndButton_Delete').OnLButtonClick = function()
-				if not MY.IsDistributer() and not MY_GKP.bDebug then
-					return MY.Alert(_L['You are not the distrubutor.'])
+				if not LIB.IsDistributer() and not MY_GKP.bDebug then
+					return LIB.Alert(_L['You are not the distrubutor.'])
 				end
 				local tab = MY_GKP('GKP_Record', 'del', k)
-				if MY.IsDistributer() then
-					MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'del', tab)
+				if LIB.IsDistributer() then
+					LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'del', tab)
 				end
 			end
 			-- tip
@@ -844,12 +844,12 @@ end
 
 function _GKP.Bidding()
 	local team = GetClientTeam()
-	if not MY.IsDistributer() then
-		return MY.Alert(_L['You are not the distrubutor.'])
+	if not LIB.IsDistributer() then
+		return LIB.Alert(_L['You are not the distrubutor.'])
 	end
 	local nGold = _GKP.GetRecordSum(true)
 	if nGold <= 0 then
-		return MY.Alert(_L['Auction Money <=0.'])
+		return LIB.Alert(_L['Auction Money <=0.'])
 	end
 	local t, fnAction = {}, nil
 	InsertDistributeMenu(t, false)
@@ -891,7 +891,7 @@ function MY_GKP.GetTeamMemberMenu(fnAction, bDisable, bSelf)
 				bDisable = bDisable and not v.bIsOnLine,
 				szIcon   = szIcon,
 				nFrame   = nFrame,
-				rgb      = { MY.GetForceColor(v.dwForce) },
+				rgb      = { LIB.GetForceColor(v.dwForce) },
 				fnAction = function()
 					fnAction(v)
 				end
@@ -908,28 +908,28 @@ function _GKP.OnSyncFromMenu()
 	local me = GetClientPlayer()
 	if me.IsInParty() then
 		local menu = MY_GKP.GetTeamMemberMenu(function(v)
-			MY.Confirm(_L('Wheater replace the current record with the synchronization [%s]\'s record?\n Please notice, this means you are going to lose the information of current record.', v.szName), function()
-				MY.Alert(_L('Asking for the sychoronization information...\n If no response in longtime, it may because [%s] is not using MY_GKP plugin or not responding.', v.szName))
-				MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_Sync', v.szName) -- 请求同步信息
+			LIB.Confirm(_L('Wheater replace the current record with the synchronization [%s]\'s record?\n Please notice, this means you are going to lose the information of current record.', v.szName), function()
+				LIB.Alert(_L('Asking for the sychoronization information...\n If no response in longtime, it may because [%s] is not using MY_GKP plugin or not responding.', v.szName))
+				LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_Sync', v.szName) -- 请求同步信息
 			end)
 		end, true)
 		table.insert(menu, 1, { bDevide = true })
 		table.insert(menu, 1, { szOption = _L['Please select which will be the one you are going to ask record for.'], bDisable = true })
 		return menu
 	else
-		MY.Alert(_L['You are not in the team.'])
+		LIB.Alert(_L['You are not in the team.'])
 	end
 end
 
 function _GKP.OnSyncToMenu()
 	local me = GetClientPlayer()
 	if not me.IsInParty() then
-		MY.Alert(_L['You are not in the team.'])
-	elseif not MY.IsDistributer() and not MY_GKP.bDebug then
-		MY.Alert(_L['You are not the distrubutor.'])
+		LIB.Alert(_L['You are not in the team.'])
+	elseif not LIB.IsDistributer() and not MY_GKP.bDebug then
+		LIB.Alert(_L['You are not the distrubutor.'])
 	else
 		local menu = MY_GKP.GetTeamMemberMenu(function(v)
-			MY.Confirm(_L('Wheater synchronize your record to [%s]?\n Please notice, this means the opposite sites are going to lose their information of current record.', v.szName), function()
+			LIB.Confirm(_L('Wheater synchronize your record to [%s]?\n Please notice, this means the opposite sites are going to lose their information of current record.', v.szName), function()
 				_GKP.SyncSend(v.dwID)
 			end)
 		end, true)
@@ -937,7 +937,7 @@ function _GKP.OnSyncToMenu()
 		table.insert(menu, {
 			szOption = _L['Full raid.'],
 			fnAction = function()
-				MY.Confirm(_L['Wheater synchronize your record to full raid?\n Please notice, this means the opposite sites are going to lose their information of current record.'], function()
+				LIB.Confirm(_L['Wheater synchronize your record to full raid?\n Please notice, this means the opposite sites are going to lose their information of current record.'], function()
 					_GKP.SyncSend(0)
 				end)
 			end,
@@ -953,20 +953,20 @@ function _GKP.SyncSend(dwID)
 		GKP_Record  = MY_GKP('GKP_Record'),
 		GKP_Account = MY_GKP('GKP_Account'),
 	}
-	local str = MY.JsonEncode(tab)
+	local str = LIB.JsonEncode(tab)
 	local nMax = 500
 	local nTotle = math.ceil(#str / nMax)
 	-- 密聊频道限制了字数 发起来太慢了
-	MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_Sync_Start', dwID, nTotle)
+	LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_Sync_Start', dwID, nTotle)
 	for i = 1, nTotle do
-		MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_Sync_Content', dwID, string.sub(str ,(i-1) * nMax + 1, i * nMax))
+		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_Sync_Content', dwID, string.sub(str ,(i-1) * nMax + 1, i * nMax))
 	end
-	MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_Sync_Stop', dwID)
+	LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_Sync_Stop', dwID)
 end
 
 local SYNC_LENG = 0
 
-MY.RegisterEvent('ON_BG_CHANNEL_MSG.LR_GKP', function()
+LIB.RegisterEvent('ON_BG_CHANNEL_MSG.LR_GKP', function()
 	local szMsgID, nChannel, dwID, szName, data, bSelf = arg0, arg1, arg2, arg3, arg4, arg2 == UI_GetClientPlayerID()
 	if szMsgID ~= 'LR_GKP' or bSelf then
 		return
@@ -1008,11 +1008,11 @@ MY.RegisterEvent('ON_BG_CHANNEL_MSG.LR_GKP', function()
 		else
 			MY_GKP('GKP_Record', tab)
 		end
-		MY.Debug({'#MY_GKP# Sync From LR Success'}, 'MY_GKP', DEBUG_LEVEL.LOG)
+		LIB.Debug({'#MY_GKP# Sync From LR Success'}, 'MY_GKP', DEBUG_LEVEL.LOG)
 	end
 end)
 
-MY.RegisterBgMsg('MY_GKP', function(_, nChannel, dwID, szName, bIsSelf, ...)
+LIB.RegisterBgMsg('MY_GKP', function(_, nChannel, dwID, szName, bIsSelf, ...)
 	local data = {...}
 	local me = GetClientPlayer()
 	local team = GetClientTeam()
@@ -1025,7 +1025,7 @@ MY.RegisterBgMsg('MY_GKP', function(_, nChannel, dwID, szName, bIsSelf, ...)
 			if data[2] == me.dwID or data[2] == 0 then
 				if data[1] == 'GKP_Sync_Start' then
 					if data[2] ~= 0 then
-						MY.Alert(_L['Start Sychoronizing...'])
+						LIB.Alert(_L['Start Sychoronizing...'])
 					end
 					_GKP.bSync, SYNC_LENG = true, data[3]
 				end
@@ -1034,21 +1034,21 @@ MY.RegisterBgMsg('MY_GKP', function(_, nChannel, dwID, szName, bIsSelf, ...)
 					table.insert(_GKP.tSyncQueue, data[3])
 					if SYNC_LENG ~= 0 then
 						local percent = #_GKP.tSyncQueue / SYNC_LENG
-						MY.Topmsg({_L('Sychoronizing data please wait %d%% loaded.', percent * 100)})
+						LIB.Topmsg({_L('Sychoronizing data please wait %d%% loaded.', percent * 100)})
 					end
 				end
 				if data[1] == 'GKP_Sync_Stop' then
 					local str = table.concat(_GKP.tSyncQueue)
 					_GKP.tSyncQueue = {}
 					_GKP.bSync, SYNC_LENG = false, 0
-					MY.Alert(_L['Sychoronization Complete'])
-					MY.Topmsg({_L['Sychoronization Complete']})
-					local tData, err = MY.JsonDecode(str)
+					LIB.Alert(_L['Sychoronization Complete'])
+					LIB.Topmsg({_L['Sychoronization Complete']})
+					local tData, err = LIB.JsonDecode(str)
 					if err then
-						MY.Debug({err}, 'MY_GKP', DEBUG_LEVEL.ERROR)
+						LIB.Debug({err}, 'MY_GKP', DEBUG_LEVEL.ERROR)
 						return _GKP.Sysmsg(_L['Abnormal with Data Sharing, Please contact and make feed back with the writer.'])
 					end
-					MY.Confirm(_L('Data Sharing Finished, you have one last chance to confirm wheather cover the current data with [%s]\'s data or not? \n data of team bidding: %s\n transation data: %s', szName, #tData.GKP_Record, #tData.GKP_Account), function()
+					LIB.Confirm(_L('Data Sharing Finished, you have one last chance to confirm wheather cover the current data with [%s]\'s data or not? \n data of team bidding: %s\n transation data: %s', szName, #tData.GKP_Record, #tData.GKP_Account), function()
 						_GKP.GKP_Record  = tData.GKP_Record
 						_GKP.GKP_Account = tData.GKP_Account
 						_GKP.DrawRecord()
@@ -1070,7 +1070,7 @@ MY.RegisterBgMsg('MY_GKP', function(_, nChannel, dwID, szName, bIsSelf, ...)
 						end
 					end
 				end
-				MY.Debug({'#MY_GKP# Sync Success'}, 'MY_GKP', DEBUG_LEVEL.LOG)
+				LIB.Debug({'#MY_GKP# Sync Success'}, 'MY_GKP', DEBUG_LEVEL.LOG)
 			end
 		end
 		if data[1] == 'GKP_INFO' then
@@ -1090,10 +1090,10 @@ MY.RegisterBgMsg('MY_GKP', function(_, nChannel, dwID, szName, bIsSelf, ...)
 					local btn           = this
 					local path          = GetRootPath() .. string.format('\\ScreenShot\\GKP_Ticket_%s.png', FormatTime('%Y-%m-%d_%H.%M.%S', GetCurrentTime()))
 					btn:Hide()
-					MY.DelayCall(function()
+					LIB.DelayCall(function()
 						ScreenShot(path, 100, scale * left, scale * top, scale * right, scale * bottom)
-						MY.DelayCall(function()
-							MY.Alert(_L('Shot screen succeed, file saved as %s .', path))
+						LIB.DelayCall(function()
+							LIB.Alert(_L('Shot screen succeed, file saved as %s .', path))
 							btn:Show()
 						end)
 					end, 50)
@@ -1103,7 +1103,7 @@ MY.RegisterBgMsg('MY_GKP', function(_, nChannel, dwID, szName, bIsSelf, ...)
 			end
 			if data[2] == 'Info' then
 				if data[3] == me.szName and tonumber(data[4]) and tonumber(data[4]) <= -100 then
-					MY.OutputWhisper(data[3] .. g_tStrings.STR_COLON .. data[4] .. g_tStrings.STR_GOLD, 'MY_GKP')
+					LIB.OutputWhisper(data[3] .. g_tStrings.STR_COLON .. data[4] .. g_tStrings.STR_GOLD, 'MY_GKP')
 				end
 				local frm = Station.Lookup('Normal/GKP_info')
 				if frm and frm.done then
@@ -1139,7 +1139,7 @@ MY.RegisterBgMsg('MY_GKP', function(_, nChannel, dwID, szName, bIsSelf, ...)
 					if dwForceID ~= -1 then
 						ui:append('Image', { w = 28, h = 28, x = x + 30, y = y + 71 + 30 * n }):image(GetForceImage(dwForceID))
 					end
-					ui:append('Text', { w = 140, h = 30, x = x + 60, y = y + 70 + 30 * n, text = data[3], color = { MY.GetForceColor(dwForceID) } })
+					ui:append('Text', { w = 140, h = 30, x = x + 60, y = y + 70 + 30 * n, text = data[3], color = { LIB.GetForceColor(dwForceID) } })
 					local handle = ui:append('Handle', { w = 130, h = 20, x = x + 200, y = y + 70 + 30 * n, handlestyle = 3 }, true)[1]
 					handle:AppendItemFromString(_GKP.GetMoneyTipText(tonumber(data[4])))
 					handle:FormatAllItemPos()
@@ -1180,11 +1180,11 @@ MY.RegisterBgMsg('MY_GKP', function(_, nChannel, dwID, szName, bIsSelf, ...)
 						local handle = ui:append('Handle', { w = 230, h = 20, x = x + 30, y = y + 70 + 30 * n + 5, handlestyle = 3 }, true)[1]
 						handle:AppendItemFromString(GetFormatText(_L['Total Auction:'], 41) .. _GKP.GetMoneyTipText(tonumber(data[4])))
 						handle:FormatAllItemPos()
-						if MY.IsDistributer() then
+						if LIB.IsDistributer() then
 							ui:append('WndButton4', {
 								w = 91, h = 26, x = x + 620, y = y + 70 + 30 * n + 5, text = _L['salary'],
 								onclick = function()
-									MY.Confirm(_L['Confirm?'], _GKP.Bidding)
+									LIB.Confirm(_L['Confirm?'], _GKP.Bidding)
 								end,
 							})
 						end
@@ -1212,7 +1212,7 @@ MY.RegisterBgMsg('MY_GKP', function(_, nChannel, dwID, szName, bIsSelf, ...)
 							end
 							local img = ui:append('Image', {
 								x = x + 590, y = y + n * 30 - 30, w = 150, h = 150, alpha = 180,
-								image = MY.GetAddonInfo().szRoot .. 'MY_GKP/img/GKPSeal.uitex', imageframe = nFrame,
+								image = LIB.GetAddonInfo().szRoot .. 'MY_GKP/img/GKPSeal.uitex', imageframe = nFrame,
 								hover = function(bHover)
 									if bHover then
 										this:SetAlpha(30)
@@ -1250,7 +1250,7 @@ function _GKP.RecoveryMenu()
 	local me = GetClientPlayer()
 	local menu = {}
 	local aFiles = {}
-	local szPath = MY.FormatPath({'userdata/gkp/', PATH_TYPE.ROLE}):sub(3):gsub('/', '\\'):sub(1, -2)
+	local szPath = LIB.FormatPath({'userdata/gkp/', PATH_TYPE.ROLE}):sub(3):gsub('/', '\\'):sub(1, -2)
 	for i, filename in ipairs(CPath.GetFileList(szPath)) do
 		local year, month, day, hour, minute, second, index = filename:match('^(%d+)%-(%d+)%-(%d+)%-(%d+)%-(%d+)%-(%d+)%-(%d+).-%.gkp.jx3dat')
 		if not year then
@@ -1304,9 +1304,9 @@ function _GKP.RecoveryMenu()
 		table.insert(menu, {
 			szOption = szFile .. '.gkp',
 			fnAction = function()
-				MY.Confirm(_L['Are you sure to cover the current information with the last record data?'], function()
+				LIB.Confirm(_L['Are you sure to cover the current information with the last record data?'], function()
 					_GKP.LoadData('gkp/' .. szFile)
-					MY.Alert(_L['Reocrd Recovered.'])
+					LIB.Alert(_L['Reocrd Recovered.'])
 				end)
 			end,
 		})
@@ -1322,12 +1322,12 @@ function _GKP.RecoveryMenu()
 			local file = GetOpenFileName(
 				_L['Please select gkp file.'],
 				'GKP File(*.gkp,*.gkp.jx3dat)\0*.gkp;*.gkp.jx3dat\0All Files(*.*)\0*.*\0\0',
-				MY.FormatPath({'userdata/gkp', PATH_TYPE.ROLE})
+				LIB.FormatPath({'userdata/gkp', PATH_TYPE.ROLE})
 			)
 			if not empty(file) then
-				MY.Confirm(_L['Are you sure to cover the current information with the last record data?'], function()
+				LIB.Confirm(_L['Are you sure to cover the current information with the last record data?'], function()
 					_GKP.LoadData(file, true)
-					MY.Alert(_L['Reocrd Recovered.'])
+					LIB.Alert(_L['Reocrd Recovered.'])
 				end)
 			end
 		end
@@ -1351,12 +1351,12 @@ function _GKP.ClearData(bConfirm)
 		_GKP.UpdateStat()
 		_GKP.UpdateTitle()
 		FireUIEvent('MY_GKP_LOOT_BOSS')
-		MY.Alert(_L['Records are wiped'])
+		LIB.Alert(_L['Records are wiped'])
 	end
 	if bConfirm then
 		fnAction()
 	else
-		MY.Confirm(_L['Are you sure to wipe all of the records?'], fnAction)
+		LIB.Confirm(_L['Are you sure to wipe all of the records?'], fnAction)
 	end
 end
 ---------------------------------------------------------------------->
@@ -1364,13 +1364,13 @@ end
 ----------------------------------------------------------------------<
 function _GKP.OweList()
 	local me = GetClientPlayer()
-	if not me.IsInParty() and not MY_GKP.bDebug then return MY.Alert(_L['You are not in the team.']) end
+	if not me.IsInParty() and not MY_GKP.bDebug then return LIB.Alert(_L['You are not in the team.']) end
 	local tMember = {}
 	if IsEmpty(MY_GKP('GKP_Record')) then
-		return MY.Alert(_L['No Record'])
+		return LIB.Alert(_L['No Record'])
 	end
-	if not MY.IsDistributer() and not MY_GKP.bDebug then
-		return MY.Alert(_L['You are not the distrubutor.'])
+	if not LIB.IsDistributer() and not MY_GKP.bDebug then
+		return LIB.Alert(_L['You are not the distrubutor.'])
 	end
 	_GKP.SetButton(false)
 	for k,v in ipairs(MY_GKP('GKP_Record')) do
@@ -1411,15 +1411,15 @@ function _GKP.OweList()
 	end
 
 	table.sort(tMember2, function(a,b) return a.nGold < b.nGold end)
-	MY.Talk(PLAYER_TALK_CHANNEL.RAID, _L['Information on Debt'])
-	MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_INFO', 'Start', 'Information on Debt')
+	LIB.Talk(PLAYER_TALK_CHANNEL.RAID, _L['Information on Debt'])
+	LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_INFO', 'Start', 'Information on Debt')
 	for k,v in pairs(tMember2) do
 		if v.nGold < 0 then
-			MY.Talk(PLAYER_TALK_CHANNEL.RAID, { _GKP.GetFormatLink(v.szName, true), _GKP.GetFormatLink(g_tStrings.STR_TALK_HEAD_SAY1 .. v.nGold .. g_tStrings.STR_GOLD .. g_tStrings.STR_FULL_STOP) })
-			MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_INFO', 'Info', v.szName, v.nGold, '-')
+			LIB.Talk(PLAYER_TALK_CHANNEL.RAID, { _GKP.GetFormatLink(v.szName, true), _GKP.GetFormatLink(g_tStrings.STR_TALK_HEAD_SAY1 .. v.nGold .. g_tStrings.STR_GOLD .. g_tStrings.STR_FULL_STOP) })
+			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_INFO', 'Info', v.szName, v.nGold, '-')
 		else
-			MY.Talk(PLAYER_TALK_CHANNEL.RAID, { _GKP.GetFormatLink(v.szName, true), _GKP.GetFormatLink(g_tStrings.STR_TALK_HEAD_SAY1 .. '+' .. v.nGold .. g_tStrings.STR_GOLD .. g_tStrings.STR_FULL_STOP) })
-			MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_INFO', 'Info', v.szName, v.nGold, '+')
+			LIB.Talk(PLAYER_TALK_CHANNEL.RAID, { _GKP.GetFormatLink(v.szName, true), _GKP.GetFormatLink(g_tStrings.STR_TALK_HEAD_SAY1 .. '+' .. v.nGold .. g_tStrings.STR_GOLD .. g_tStrings.STR_FULL_STOP) })
+			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_INFO', 'Info', v.szName, v.nGold, '+')
 		end
 	end
 	local nGold, nGold2 = 0, 0
@@ -1435,12 +1435,12 @@ function _GKP.OweList()
 		end
 	end
 	if nGold ~= 0 then
-		MY.Talk(PLAYER_TALK_CHANNEL.RAID, _L('Received: %d Gold.', nGold))
+		LIB.Talk(PLAYER_TALK_CHANNEL.RAID, _L('Received: %d Gold.', nGold))
 	end
 	if nGold2 ~= 0 then
-		MY.Talk(PLAYER_TALK_CHANNEL.RAID, _L('Spending: %d Gold.', nGold2 * -1))
+		LIB.Talk(PLAYER_TALK_CHANNEL.RAID, _L('Spending: %d Gold.', nGold2 * -1))
 	end
-	MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_INFO', 'End', _L('Received: %d Gold.', nGold))
+	LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_INFO', 'End', _L('Received: %d Gold.', nGold))
 end
 ---------------------------------------------------------------------->
 -- 获取工资总额
@@ -1486,13 +1486,13 @@ end
 ----------------------------------------------------------------------<
 function _GKP.SpendingList()
 	local me = GetClientPlayer()
-	if not me.IsInParty() and not MY_GKP.bDebug then return MY.Alert(_L['You are not in the team.']) end
+	if not me.IsInParty() and not MY_GKP.bDebug then return LIB.Alert(_L['You are not in the team.']) end
 	local tMember = {}
 	if IsEmpty(MY_GKP('GKP_Record')) then
-		return MY.Alert(_L['No Record'])
+		return LIB.Alert(_L['No Record'])
 	end
-	if not MY.IsDistributer() and not MY_GKP.bDebug then
-		return MY.Alert(_L['You are not the distrubutor.'])
+	if not LIB.IsDistributer() and not MY_GKP.bDebug then
+		return LIB.Alert(_L['You are not the distrubutor.'])
 	end
 	_GKP.SetButton(false)
 	local tTime = {}
@@ -1512,8 +1512,8 @@ function _GKP.SpendingList()
 	end)
 	local nTime = tTime[#tTime].nTime - tTime[1].nTime -- 所花费的时间
 
-	MY.Talk(PLAYER_TALK_CHANNEL.RAID, _L['--- Consumption ---'])
-	MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_INFO', 'Start', '--- Consumption ---')
+	LIB.Talk(PLAYER_TALK_CHANNEL.RAID, _L['--- Consumption ---'])
+	LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_INFO', 'Start', '--- Consumption ---')
 	local sort = {}
 	for k,v in pairs(tMember) do
 		table.insert(sort,{ szName = k, nGold = v })
@@ -1522,38 +1522,38 @@ function _GKP.SpendingList()
 	table.sort(sort,function(a,b) return a.nGold < b.nGold end)
 	for k, v in ipairs(sort) do
 		if v.nGold > 0 then
-			MY.Talk(PLAYER_TALK_CHANNEL.RAID, { _GKP.GetFormatLink(v.szName, true), _GKP.GetFormatLink(g_tStrings.STR_TALK_HEAD_SAY1 .. v.nGold .. g_tStrings.STR_GOLD .. g_tStrings.STR_FULL_STOP) })
+			LIB.Talk(PLAYER_TALK_CHANNEL.RAID, { _GKP.GetFormatLink(v.szName, true), _GKP.GetFormatLink(g_tStrings.STR_TALK_HEAD_SAY1 .. v.nGold .. g_tStrings.STR_GOLD .. g_tStrings.STR_FULL_STOP) })
 		end
-		MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_INFO', 'Info', v.szName, v.nGold)
+		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_INFO', 'Info', v.szName, v.nGold)
 	end
-	MY.Talk(PLAYER_TALK_CHANNEL.RAID, _L('Total Auction: %d Gold.', _GKP.GetRecordSum()))
-	MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_INFO', 'End', _L('Total Auction: %d Gold.', _GKP.GetRecordSum()), _GKP.GetRecordSum(), nTime)
+	LIB.Talk(PLAYER_TALK_CHANNEL.RAID, _L('Total Auction: %d Gold.', _GKP.GetRecordSum()))
+	LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_INFO', 'End', _L('Total Auction: %d Gold.', _GKP.GetRecordSum()), _GKP.GetRecordSum(), nTime)
 end
 ---------------------------------------------------------------------->
 -- 结算工资按钮
 ----------------------------------------------------------------------<
 function _GKP.Calculation()
 	local me = GetClientPlayer()
-	if not me.IsInParty() and not MY_GKP.bDebug then return MY.Alert(_L['You are not in the team.']) end
+	if not me.IsInParty() and not MY_GKP.bDebug then return LIB.Alert(_L['You are not in the team.']) end
 	local team = GetClientTeam()
 	if IsEmpty(MY_GKP('GKP_Record')) then
-		return MY.Alert(_L['No Record'])
+		return LIB.Alert(_L['No Record'])
 	end
-	if not MY.IsDistributer() and not MY_GKP.bDebug then
-		return MY.Alert(_L['You are not the distrubutor.'])
+	if not LIB.IsDistributer() and not MY_GKP.bDebug then
+		return LIB.Alert(_L['You are not the distrubutor.'])
 	end
 	GetUserInput(_L['Total Amount of People with Output Settle Account'],function(num)
 		if not tonumber(num) then return end
 		local a,b = _GKP.GetRecordSum()
-		MY.Talk(PLAYER_TALK_CHANNEL.RAID, _L['Salary Settle Account'])
-		MY.Talk(PLAYER_TALK_CHANNEL.RAID, _L('Salary Statistic: income  %d Gold.',a))
-		MY.Talk(PLAYER_TALK_CHANNEL.RAID, _L('Salary Allowance: %d Gold.',b))
-		MY.Talk(PLAYER_TALK_CHANNEL.RAID, _L('Reall Salary: %d Gold.',a+b,a,b))
+		LIB.Talk(PLAYER_TALK_CHANNEL.RAID, _L['Salary Settle Account'])
+		LIB.Talk(PLAYER_TALK_CHANNEL.RAID, _L('Salary Statistic: income  %d Gold.',a))
+		LIB.Talk(PLAYER_TALK_CHANNEL.RAID, _L('Salary Allowance: %d Gold.',b))
+		LIB.Talk(PLAYER_TALK_CHANNEL.RAID, _L('Reall Salary: %d Gold.',a+b,a,b))
 		if a+b >= 0 then
-			MY.Talk(PLAYER_TALK_CHANNEL.RAID, _L('Amount of People with Settle Account: %d',num))
-			MY.Talk(PLAYER_TALK_CHANNEL.RAID, _L('Actual per person: %d Gold.',math.floor((a+b)/num)))
+			LIB.Talk(PLAYER_TALK_CHANNEL.RAID, _L('Amount of People with Settle Account: %d',num))
+			LIB.Talk(PLAYER_TALK_CHANNEL.RAID, _L('Actual per person: %d Gold.',math.floor((a+b)/num)))
 		else
-			MY.Talk(PLAYER_TALK_CHANNEL.RAID, _L['The Account is Negative, no money is coming out!'])
+			LIB.Talk(PLAYER_TALK_CHANNEL.RAID, _L['The Account is Negative, no money is coming out!'])
 		end
 	end, nil, nil, nil, team.GetTeamSize())
 end
@@ -1592,7 +1592,7 @@ function _GKP.Record(tab, item, bEnter)
 		menu = function()
 			return MY_GKP.GetTeamMemberMenu(function(v)
 				local hTeamList = ui:children('#PlayerList')
-				hTeamList:text(v.szName):color(MY.GetForceColor(v.dwForce))
+				hTeamList:text(v.szName):color(LIB.GetForceColor(v.dwForce))
 				dwForceID = v.dwForce
 			end, false, true)
 		end,
@@ -1662,14 +1662,14 @@ function _GKP.Record(tab, item, bEnter)
 				this.szText = szText
 				ui:color(_GKP.GetMoneyCol(szText))
 			else
-				MY.Sysmsg({_L['Please enter numbers']})
+				LIB.Sysmsg({_L['Please enter numbers']})
 				ui:text(this.szText or '')
 			end
 		end,
 	}, true)
 	-- set frame
 	if tab and type(item) == 'userdata' then
-		hPlayer:text(tab.szPlayer):color(MY.GetForceColor(tab.dwForceID))
+		hPlayer:text(tab.szPlayer):color(LIB.GetForceColor(tab.dwForceID))
 		hName:text(tab.szName):enable(false)
 		hSource:text(tab.szNpcName):enable(false)
 		ui[1].userdata = true
@@ -1678,9 +1678,9 @@ function _GKP.Record(tab, item, bEnter)
 		hSource:text(_L['Add Manually']):enable(false)
 	end
 	if tab and type(item) == 'number' then -- 编辑
-		hPlayer:text(tab.szPlayer):color(MY.GetForceColor(tab.dwForceID))
+		hPlayer:text(tab.szPlayer):color(LIB.GetForceColor(tab.dwForceID))
 		dwForceID = tab.dwForceID
-		hName:text(tab.szName or MY.GetItemName(tab.nUiId))
+		hName:text(tab.szName or LIB.GetItemName(tab.nUiId))
 		hMoney:text(tab.nMoney)
 		hSource:text(tab.szNpcName)
 	end
@@ -1714,10 +1714,10 @@ function _GKP.Record(tab, item, bEnter)
 		local nMoney = tonumber(hMoney:text()) or 0
 		local szPlayer = hPlayer:text()
 		if hName:text() == '' then
-			return MY.Alert(_L['Please entry the name of the item'])
+			return LIB.Alert(_L['Please entry the name of the item'])
 		end
 		if szPlayer == g_tStrings.PLAYER_NOT_EMPTY then
-			return MY.Alert(_L['Select a member who is in charge of account and put money in his account.'])
+			return LIB.Alert(_L['Select a member who is in charge of account and put money in his account.'])
 		end
 		tab.szNpcName = hSource:text()
 		tab.nMoney    = nMoney
@@ -1725,37 +1725,37 @@ function _GKP.Record(tab, item, bEnter)
 		tab.key       = tab.key or tab.nUiId .. _GKP.Random()
 		tab.dwForceID = dwForceID or tab.dwForceID or 0
 		if tab and type(item) == 'userdata' then
-			if MY.IsDistributer() then
-				MY.Talk(PLAYER_TALK_CHANNEL.RAID, {
+			if LIB.IsDistributer() then
+				LIB.Talk(PLAYER_TALK_CHANNEL.RAID, {
 					_GKP.GetFormatLink(tab),
 					_GKP.GetFormatLink(' '.. nMoney .. g_tStrings.STR_GOLD),
 					_GKP.GetFormatLink(_L[' Distribute to ']),
 					_GKP.GetFormatLink(tab.szPlayer, true)
 				})
-				MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'add', tab)
+				LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'add', tab)
 			end
 		elseif tab and type(item) == 'number' then
 			tab.szName = hName:text()
 			tab.dwForceID = dwForceID or tab.dwForceID or 0
 			tab.bEdit = true
-			if MY.IsDistributer() then
-				MY.Talk(PLAYER_TALK_CHANNEL.RAID, {
+			if LIB.IsDistributer() then
+				LIB.Talk(PLAYER_TALK_CHANNEL.RAID, {
 					_GKP.GetFormatLink(tab.szPlayer, true),
 					_GKP.GetFormatLink(' '.. tab.szName),
 					_GKP.GetFormatLink(' '.. nMoney ..g_tStrings.STR_GOLD),
 					_GKP.GetFormatLink(_L['Make changes to the record.']),
 				})
-				MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'edit', tab)
+				LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'edit', tab)
 			end
 		else
-			if MY.IsDistributer() then
-				MY.Talk(PLAYER_TALK_CHANNEL.RAID, {
+			if LIB.IsDistributer() then
+				LIB.Talk(PLAYER_TALK_CHANNEL.RAID, {
 					_GKP.GetFormatLink(tab.szName),
 					_GKP.GetFormatLink(' '.. nMoney ..g_tStrings.STR_GOLD),
 					_GKP.GetFormatLink(_L['Manually make record to']),
 					_GKP.GetFormatLink(tab.szPlayer, true)
 				})
-				MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'add', tab)
+				LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'add', tab)
 			end
 		end
 		if ui:children('#WndCheckBox'):check() then
@@ -1798,13 +1798,13 @@ function _GKP.MoneyUpdate(nGold, nSilver, nCopper)
 	})
 	if _GKP.TradingTarget.szName and MY_GKP.bMoneyTalk then
 		if nGold > 0 then
-			MY.Talk(PLAYER_TALK_CHANNEL.RAID, {
+			LIB.Talk(PLAYER_TALK_CHANNEL.RAID, {
 				_GKP.GetFormatLink(_L['Received']),
 				_GKP.GetFormatLink(_GKP.TradingTarget.szName, true),
 				_GKP.GetFormatLink(_L['The'] .. nGold ..g_tStrings.STR_GOLD .. g_tStrings.STR_FULL_STOP),
 			})
 		else
-			MY.Talk(PLAYER_TALK_CHANNEL.RAID, {
+			LIB.Talk(PLAYER_TALK_CHANNEL.RAID, {
 				_GKP.GetFormatLink(_L['Pay to']),
 				_GKP.GetFormatLink(_GKP.TradingTarget.szName, true),
 				_GKP.GetFormatLink(' ' .. nGold * -1 ..g_tStrings.STR_GOLD .. g_tStrings.STR_FULL_STOP),
@@ -1834,7 +1834,7 @@ function _GKP.DrawAccount(key,sort)
 			item:Lookup('Image_NameIcon'):FromUITex(GetForceImage(v.dwForceID))
 			item:Lookup('Text_Name'):SetText(v.szPlayer)
 			item:Lookup('Text_Change'):SetText(_L['Player\'s transation'])
-			item:Lookup('Text_Name'):SetFontColor(MY.GetForceColor(v.dwForceID))
+			item:Lookup('Text_Name'):SetFontColor(LIB.GetForceColor(v.dwForceID))
 		else
 			item:Lookup('Image_NameIcon'):FromUITex('ui/Image/uicommon/commonpanel4.UITex',3)
 			item:Lookup('Text_Name'):SetText(_L['System'])
@@ -1854,23 +1854,23 @@ function _GKP.DrawAccount(key,sort)
 	_GKP.hAccountContainer:FormatAllContentPos()
 end
 
-MY.RegisterEvent('TRADING_OPEN_NOTIFY',function() -- 交易开始
+LIB.RegisterEvent('TRADING_OPEN_NOTIFY',function() -- 交易开始
 	_GKP.TradingTarget = GetPlayer(arg0)
 end)
-MY.RegisterEvent('TRADING_CLOSE',function() -- 交易结束
+LIB.RegisterEvent('TRADING_CLOSE',function() -- 交易结束
 	_GKP.TradingTarget = {}
 end)
-MY.RegisterEvent('MONEY_UPDATE',function() --金钱变动
+LIB.RegisterEvent('MONEY_UPDATE',function() --金钱变动
 	_GKP.MoneyUpdate(arg0, arg1, arg2)
 end)
 
-MY.RegisterHotKey('MY_GKP', _L['Open/Close Golden Team Record'], _GKP.TogglePanel)
-MY.RegisterAddonMenu({ szOption = _L['Golden Team Record'], fnAction = _GKP.OpenPanel })
+LIB.RegisterHotKey('MY_GKP', _L['Open/Close Golden Team Record'], _GKP.TogglePanel)
+LIB.RegisterAddonMenu({ szOption = _L['Golden Team Record'], fnAction = _GKP.OpenPanel })
 
-MY.RegisterEvent('LOADING_END',function()
+LIB.RegisterEvent('LOADING_END',function()
 	if not IsEmpty(MY_GKP('GKP_Record')) or not IsEmpty(MY_GKP('GKP_Account')) then
-		if MY.IsInDungeon() and MY_GKP.bAlertMessage then
-			MY.Confirm(_L['Do you want to wipe the previous data when you enter the dungeon\'s map?'],function() _GKP.ClearData(true) end)
+		if LIB.IsInDungeon() and MY_GKP.bAlertMessage then
+			LIB.Confirm(_L['Do you want to wipe the previous data when you enter the dungeon\'s map?'],function() _GKP.ClearData(true) end)
 		end
 	else
 		MY_GKP('GKP_Time', GetCurrentTime())

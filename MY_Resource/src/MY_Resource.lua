@@ -35,8 +35,8 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Resource/lang/')
-if not MY.AssertVersion('MY_Resource', _L['MY_Resource'], 0x2011800) then
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_Resource/lang/')
+if not LIB.AssertVersion('MY_Resource', _L['MY_Resource'], 0x2011800) then
 	return
 end
 
@@ -51,7 +51,7 @@ C.aSound = {
 }
 
 do
-local root = MY.GetAddonInfo().szRoot .. 'MY_Resource/audio/'
+local root = LIB.GetAddonInfo().szRoot .. 'MY_Resource/audio/'
 local function GetSoundList(tSound)
 	local t = {}
 	if tSound.type then
@@ -86,5 +86,5 @@ local settings = {
 		},
 	},
 }
-MY_Resource = MY.GeneGlobalNS(settings)
+MY_Resource = LIB.GeneGlobalNS(settings)
 end

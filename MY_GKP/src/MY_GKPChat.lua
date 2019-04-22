@@ -35,8 +35,8 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local PATH_ROOT = MY.GetAddonInfo().szRoot .. 'MY_GKP/'
-local _L = MY.LoadLangPack(PATH_ROOT .. 'lang/')
+local PATH_ROOT = LIB.GetAddonInfo().szRoot .. 'MY_GKP/'
+local _L = LIB.LoadLangPack(PATH_ROOT .. 'lang/')
 
 local Chat = {}
 MY_GKP_Chat   = {}
@@ -68,8 +68,8 @@ function Chat.OnMsgArrive(szMsg)
 			return GetFormatText(string.format(' %02d:%02d:%02d ', t.hour, t.minute, t.second), 10, 255, 255, 255)
 		end
 		szMsg = AppendText() .. szMsg
-		if MY and MY.Chat and MY.RenderChatLink then
-			szMsg =  MY.RenderChatLink(szMsg)
+		if MY and LIB.Chat and LIB.RenderChatLink then
+			szMsg =  LIB.RenderChatLink(szMsg)
 		end
 		if MY_Farbnamen and MY_Farbnamen.Render then
 			szMsg = MY_Farbnamen.Render(szMsg)
@@ -102,20 +102,20 @@ function MY_GKP.DistributionItem()
 	if member then
 		GKP_Loot.GetMessageBox(member.dwID, data.dwDoodadID, data.data.dwID, data.data)
 	else
-		return MY.Alert(_L['No Pick up Object, may due to Network off - line'])
+		return LIB.Alert(_L['No Pick up Object, may due to Network off - line'])
 	end
 end
 
 function Chat.OpenFrame(item, menu, data)
 	local frame = Chat.GetFrame()
 	if not frame then
-		frame = Wnd.OpenWindow(MY.GetAddonInfo().szRoot .. 'MY_GKP/ui/MY_GKP_Chat.ini', 'MY_GKP_Chat')
+		frame = Wnd.OpenWindow(LIB.GetAddonInfo().szRoot .. 'MY_GKP/ui/MY_GKP_Chat.ini', 'MY_GKP_Chat')
 		UI(frame):anchor('CENTER')
 			:append('WndButton2', {
 				x = 380, y = 38, text = _L['Stop Bidding'],
 				onclick = function()
-					MY.Talk(PLAYER_TALK_CHANNEL.RAID, _L['--- Stop Bidding ---'])
-					MY.DelayCall(1000, function() UnRegisterMsgMonitor(Chat.OnMsgArrive) end)
+					LIB.Talk(PLAYER_TALK_CHANNEL.RAID, _L['--- Stop Bidding ---'])
+					LIB.DelayCall(1000, function() UnRegisterMsgMonitor(Chat.OnMsgArrive) end)
 				end,
 			})
 			:children('#Btn_Close'):click(Chat.CloseFrame)

@@ -38,30 +38,30 @@ local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_
 -----------------------------------------------
 -- 本地函数和变量
 -----------------------------------------------
-local _L = MY.LoadLangPack()
+local _L = LIB.LoadLangPack()
 local EMPTY_TABLE = SetmetaReadonly({})
 
 -- 海鳗里面抠出来的
 -- 聊天复制并发布
-function MY.RepeatChatLine(hTime)
+function LIB.RepeatChatLine(hTime)
 	local edit = Station.Lookup('Lowest2/EditBox/Edit_Input')
 	if not edit then
 		return
 	end
-	MY.CopyChatLine(hTime)
+	LIB.CopyChatLine(hTime)
 	local tMsg = edit:GetTextStruct()
 	if #tMsg == 0 then
 		return
 	end
 	local nChannel, szName = EditBox_GetChannel()
-	if MY.CanTalk(nChannel) then
+	if LIB.CanTalk(nChannel) then
 		GetClientPlayer().Talk(nChannel, szName or '', tMsg)
 		edit:ClearText()
 	end
 end
 
 -- 聊天删除行
-function MY.RemoveChatLine(hTime)
+function LIB.RemoveChatLine(hTime)
 	local nIndex   = hTime:GetIndex()
 	local hHandle  = hTime:GetParent()
 	local nCount   = hHandle:GetItemCount()
@@ -86,31 +86,48 @@ function MY.RemoveChatLine(hTime)
 end
 
 -- 获取复制聊天行Text
-function MY.GetCopyLinkText(szText, rgbf)
-	szText = szText or _L[' * ']
-	rgbf   = rgbf   or { f = 10 }
-
+function LIB.GetCopyLinkText(szText, rgbf)
+	if not IsString(szText) then
+		szText = _L[' * ']
+	end
+	if not IsTable(rgbf) then
+		rgbf = { f = 10 }
+	end
+	local handlerEntry = LIB.GetAddonInfo().szNameSpace .. '.ChatLinkEventHandlers'
 	return GetFormatText(szText, rgbf.f, rgbf.r, rgbf.g, rgbf.b, 82691,
-		'this.bMyChatRendered=true\nthis.OnItemLButtonDown=MY.ChatLinkEventHandlers.OnCopyLClick\nthis.OnItemMButtonDown=MY.ChatLinkEventHandlers.OnCopyMClick\nthis.OnItemRButtonDown=MY.ChatLinkEventHandlers.OnCopyRClick\nthis.OnItemMouseEnter=MY.ChatLinkEventHandlers.OnCopyMouseEnter\nthis.OnItemMouseLeave=MY.ChatLinkEventHandlers.OnCopyMouseLeave',
+		'this.bMyChatRendered=true;this.OnItemLButtonDown='
+			.. handlerEntry .. '.OnCopyLClick;this.OnItemMButtonDown='
+			.. handlerEntry .. '.OnCopyMClick;this.OnItemRButtonDown='
+			.. handlerEntry .. '.OnCopyRClick;this.OnItemMouseEnter='
+			.. handlerEntry .. '.OnCopyMouseEnter;this.OnItemMouseLeave='
+			.. handlerEntry .. '.OnCopyMouseLeave',
 		'copylink')
 end
 
 -- 获取复制聊天行Text
-function MY.GetTimeLinkText(rgbfs, dwTime)
+function LIB.GetTimeLinkText(rgbfs, dwTime)
 	if not dwTime then
 		dwTime = GetCurrentTime()
 	end
-	rgbfs = rgbfs or { f = 10 }
+	if not IsTable(rgbf) then
+		rgbf = { f = 10 }
+	end
+	local handlerEntry = LIB.GetAddonInfo().szNameSpace .. '.ChatLinkEventHandlers'
 	return GetFormatText(
-		MY.FormatTime(rgbfs.s or '[hh:mm.ss]', dwTime),
+		LIB.FormatTime(rgbfs.s or '[hh:mm.ss]', dwTime),
 		rgbfs.f, rgbfs.r, rgbfs.g, rgbfs.b, 82691,
-		'this.bMyChatRendered=true\nthis.OnItemLButtonDown=MY.ChatLinkEventHandlers.OnCopyLClick\nthis.OnItemMButtonDown=MY.ChatLinkEventHandlers.OnCopyMClick\nthis.OnItemRButtonDown=MY.ChatLinkEventHandlers.OnCopyRClick\nthis.OnItemMouseEnter=MY.ChatLinkEventHandlers.OnCopyMouseEnter\nthis.OnItemMouseLeave=MY.ChatLinkEventHandlers.OnCopyMouseLeave',
+		'this.bMyChatRendered=true;this.OnItemLButtonDown='
+			.. handlerEntry .. '.OnCopyLClick;this.OnItemMButtonDown='
+			.. handlerEntry .. '.OnCopyMClick;this.OnItemRButtonDown='
+			.. handlerEntry .. '.OnCopyRClick;this.OnItemMouseEnter='
+			.. handlerEntry .. '.OnCopyMouseEnter;this.OnItemMouseLeave='
+			.. handlerEntry .. '.OnCopyMouseLeave',
 		'timelink'
 	)
 end
 
 -- 复制聊天行
-function MY.CopyChatLine(hTime, bTextEditor)
+function LIB.CopyChatLine(hTime, bTextEditor)
 	local edit = Station.Lookup('Lowest2/EditBox/Edit_Input')
 	if bTextEditor then
 		edit = UI.OpenTextEditor():find('.WndEdit')[1]
@@ -187,7 +204,7 @@ function MY.CopyChatLine(hTime, bTextEditor)
 		elseif p:GetType() == 'Image' or p:GetType() == 'Animate' then
 			local dwID = tonumber((p:GetName():gsub('^emotion_', '')))
 			if dwID then
-				local emo = MY.GetChatEmotion(dwID)
+				local emo = LIB.GetChatEmotion(dwID)
 				if emo then
 					edit:InsertObj(emo.szCmd, { type = 'emotion', text = emo.szCmd, id = emo.dwID })
 				end
@@ -198,7 +215,7 @@ function MY.CopyChatLine(hTime, bTextEditor)
 end
 
 do local ChatLinkEvents, PEEK_PLAYER = {}, {}
-MY.RegisterEvent('PEEK_OTHER_PLAYER', function()
+LIB.RegisterEvent('PEEK_OTHER_PLAYER', function()
 	if not PEEK_PLAYER[arg1] then
 		return
 	end
@@ -222,9 +239,9 @@ function ChatLinkEvents.OnNameLClick(element, link)
 		InsertInviteTeamMenu(menu, (UI(link):text():gsub('[%[%]]', '')))
 		menu[1].fnAction()
 	elseif IsCtrlKeyDown() then
-		MY.CopyChatItem(link)
+		LIB.CopyChatItem(link)
 	elseif IsShiftKeyDown() then
-		MY.SetTarget(TARGET.PLAYER, UI(link):text())
+		LIB.SetTarget(TARGET.PLAYER, UI(link):text())
 	elseif IsAltKeyDown() then
 		if MY_Farbnamen and MY_Farbnamen.Get then
 			local info = MY_Farbnamen.Get((UI(link):text():gsub('[%[%]]', '')))
@@ -234,7 +251,7 @@ function ChatLinkEvents.OnNameLClick(element, link)
 			end
 		end
 	else
-		MY.SwitchChat(UI(link):text())
+		LIB.SwitchChat(UI(link):text())
 		local edit = Station.Lookup('Lowest2/EditBox/Edit_Input')
 		if edit then
 			Station.SetFocusWindow(edit)
@@ -245,25 +262,25 @@ function ChatLinkEvents.OnNameRClick(element, link)
 	if not link then
 		link = element
 	end
-	PopupMenu(MY.GetTargetContextMenu(TARGET.PLAYER, (UI(link):text():gsub('[%[%]]', ''))))
+	PopupMenu(LIB.GetTargetContextMenu(TARGET.PLAYER, (UI(link):text():gsub('[%[%]]', ''))))
 end
 function ChatLinkEvents.OnCopyLClick(element, link)
 	if not link then
 		link = element
 	end
-	MY.CopyChatLine(link, IsCtrlKeyDown())
+	LIB.CopyChatLine(link, IsCtrlKeyDown())
 end
 function ChatLinkEvents.OnCopyMClick(element, link)
 	if not link then
 		link = element
 	end
-	MY.RemoveChatLine(link)
+	LIB.RemoveChatLine(link)
 end
 function ChatLinkEvents.OnCopyRClick(element, link)
 	if not link then
 		link = element
 	end
-	MY.RepeatChatLine(link)
+	LIB.RepeatChatLine(link)
 end
 function ChatLinkEvents.OnCopyMouseEnter(element, link)
 	if not link then
@@ -291,10 +308,10 @@ function ChatLinkEvents.OnItemRClick(element, link)
 		link = element
 	end
 	if IsCtrlKeyDown() then
-		MY.CopyChatItem(link)
+		LIB.CopyChatItem(link)
 	end
 end
-MY.ChatLinkEvents = ChatLinkEvents
+LIB.ChatLinkEvents = ChatLinkEvents
 
 local ChatLinkEventHandlers = {}
 function ChatLinkEventHandlers.OnNameLClick() ChatLinkEvents.OnNameLClick(this) end
@@ -306,19 +323,19 @@ function ChatLinkEventHandlers.OnCopyMouseEnter() ChatLinkEvents.OnCopyMouseEnte
 function ChatLinkEventHandlers.OnCopyMouseLeave() ChatLinkEvents.OnCopyMouseLeave(this) end
 function ChatLinkEventHandlers.OnItemLClick() ChatLinkEvents.OnItemLClick(this) end
 function ChatLinkEventHandlers.OnItemRClick() ChatLinkEvents.OnItemRClick(this) end
-MY.ChatLinkEventHandlers = ChatLinkEventHandlers
+LIB.ChatLinkEventHandlers = ChatLinkEventHandlers
 
 -- 绑定link事件响应
--- (userdata) MY.RenderChatLink(userdata link)                   处理link的各种事件绑定 namelink是一个超链接Text元素
--- (userdata) MY.RenderChatLink(userdata element, userdata link) 处理element的各种事件绑定 数据源是link
--- (string) MY.RenderChatLink(string szMsg)                      格式化szMsg 处理里面的超链接 添加时间相应
+-- (userdata) LIB.RenderChatLink(userdata link)                   处理link的各种事件绑定 namelink是一个超链接Text元素
+-- (userdata) LIB.RenderChatLink(userdata element, userdata link) 处理element的各种事件绑定 数据源是link
+-- (string) LIB.RenderChatLink(string szMsg)                      格式化szMsg 处理里面的超链接 添加时间相应
 -- link   : 一个超链接Text元素
 -- element: 一个可以挂鼠标消息响应的UI元素
 -- szMsg  : 格式化的UIXML消息
-function MY.RenderChatLink(arg1, arg2)
+function LIB.RenderChatLink(arg1, arg2)
 	if type(arg1) == 'string' then -- szMsg
 		local szMsg = arg1
-		local xmls = MY.Xml.Decode(szMsg)
+		local xmls = LIB.Xml.Decode(szMsg)
 		if xmls then
 			for i, xml in ipairs(xmls) do
 				if xml and xml['.'] == 'text' and xml[''] and xml[''].name then
@@ -329,12 +346,22 @@ function MY.RenderChatLink(arg1, arg2)
 						script = ''
 					end
 
+					local handlerEntry = LIB.GetAddonInfo().szNameSpace .. '.ChatLinkEventHandlers'
 					if name:sub(1, 8) == 'namelink' then
-						script = script .. 'this.bMyChatRendered=true\nthis.OnItemLButtonDown=MY.ChatLinkEventHandlers.OnNameLClick\nthis.OnItemRButtonDown=MY.ChatLinkEventHandlers.OnNameRClick'
+						script = script .. 'this.bMyChatRendered=true;this.OnItemLButtonDown='
+							.. handlerEntry .. '.OnNameLClick;this.OnItemRButtonDown='
+							.. handlerEntry .. '.OnNameRClick'
 					elseif name == 'copy' or name == 'copylink' or name == 'timelink' then
-						script = script .. 'this.bMyChatRendered=true\nthis.OnItemLButtonDown=MY.ChatLinkEventHandlers.OnCopyLClick\nthis.OnItemMButtonDown=MY.ChatLinkEventHandlers.OnCopyMClick\nthis.OnItemRButtonDown=MY.ChatLinkEventHandlers.OnCopyRClick\nthis.OnItemMouseEnter=MY.ChatLinkEventHandlers.OnCopyMouseEnter\nthis.OnItemMouseLeave=MY.ChatLinkEventHandlers.OnCopyMouseLeave'
+						script = script .. 'this.bMyChatRendered=true;this.OnItemLButtonDown='
+							.. handlerEntry .. '.OnCopyLClick;this.OnItemMButtonDown='
+							.. handlerEntry .. '.OnCopyMClick;this.OnItemRButtonDown='
+							.. handlerEntry .. '.OnCopyRClick;this.OnItemMouseEnter='
+							.. handlerEntry .. '.OnCopyMouseEnter;this.OnItemMouseLeave='
+							.. handlerEntry .. '.OnCopyMouseLeave'
 					else
-						script = script .. 'this.bMyChatRendered=true\nthis.OnItemLButtonDown=MY.ChatLinkEventHandlers.OnItemLClick\nthis.OnItemRButtonDown=MY.ChatLinkEventHandlers.OnItemRClick'
+						script = script .. 'this.bMyChatRendered=true;this.OnItemLButtonDown='
+							.. handlerEntry .. '.OnItemLClick;this.OnItemRButtonDown='
+							.. handlerEntry .. '.OnItemRClick'
 					end
 
 					if #script > 0 then
@@ -343,7 +370,7 @@ function MY.RenderChatLink(arg1, arg2)
 					end
 				end
 			end
-			szMsg = MY.Xml.Encode(xmls)
+			szMsg = LIB.Xml.Encode(xmls)
 		end
 		return szMsg
 	elseif type(arg1) == 'table' and type(arg1.GetName) == 'function' then
@@ -372,7 +399,7 @@ end
 end
 
 -- 复制Item到输入框
-function MY.CopyChatItem(p)
+function LIB.CopyChatItem(p)
 	local edit = Station.Lookup('Lowest2/EditBox/Edit_Input')
 	if not edit then
 		return
@@ -411,22 +438,22 @@ function MY.CopyChatItem(p)
 end
 
 --解析消息
-function MY.FormatChatContent(szMsg)
-	local t = MY.Xml.Decode(szMsg)
+function LIB.FormatChatContent(szMsg)
+	local t = LIB.Xml.Decode(szMsg)
 	-- Output(t)
 	local t2 = {}
 	for _, node in ipairs(t) do
-		local ntype = MY.Xml.GetNodeType(node)
-		local ndata = MY.Xml.GetNodeData(node)
+		local ntype = LIB.Xml.GetNodeType(node)
+		local ndata = LIB.Xml.GetNodeData(node)
 		-- 静态表情
 		if ntype == 'image' then
-			local emo = MY.GetChatEmotion(ndata.path, ndata.frame, 'image')
+			local emo = LIB.GetChatEmotion(ndata.path, ndata.frame, 'image')
 			if emo then
 				table.insert(t2, {type = 'emotion', text = emo.szCmd, innerText = emo.szCmd, id = emo.dwID})
 			end
 		-- 动态表情
 		elseif ntype == 'animate' then
-			local emo = MY.GetChatEmotion(ndata.path, ndata.group, 'animate')
+			local emo = LIB.GetChatEmotion(ndata.path, ndata.group, 'animate')
 			if emo then
 				table.insert(t2, {type = 'emotion', text = emo.szCmd, innerText = emo.szCmd, id = emo.dwID})
 			end
@@ -504,7 +531,7 @@ function MY.FormatChatContent(szMsg)
 end
 
 -- 字符串化一个聊天table结构体
-function MY.StringfyChatContent(t)
+function LIB.StringfyChatContent(t)
 	local t1 = {}
 	for _, v in ipairs(t) do
 		table.insert(t1, v.text)
@@ -513,8 +540,8 @@ function MY.StringfyChatContent(t)
 end
 
 -- 判断某个频道能否发言
--- (bool) MY.CanTalk(number nChannel)
-function MY.CanTalk(nChannel)
+-- (bool) LIB.CanTalk(number nChannel)
+function LIB.CanTalk(nChannel)
 	for _, v in ipairs({'WHISPER', 'TEAM', 'RAID', 'BATTLE_FIELD', 'NEARBY', 'TONG', 'TONG_ALLIANCE' }) do
 		if nChannel == PLAYER_TALK_CHANNEL[v] then
 			return true
@@ -539,10 +566,10 @@ local TALK_CHANNEL_HEADER = {
 	[PLAYER_TALK_CHANNEL.WORLD] = '/h ',
 }
 -- 切换聊天频道
--- (void) MY.SwitchChat(number nChannel)
--- (void) MY.SwitchChat(string szHeader)
--- (void) MY.SwitchChat(string szName)
-function MY.SwitchChat(nChannel)
+-- (void) LIB.SwitchChat(number nChannel)
+-- (void) LIB.SwitchChat(string szHeader)
+-- (void) LIB.SwitchChat(string szName)
+function LIB.SwitchChat(nChannel)
 	local szHeader = TALK_CHANNEL_HEADER[nChannel]
 	if szHeader then
 		SwitchChatChannel(szHeader)
@@ -554,7 +581,7 @@ function MY.SwitchChat(nChannel)
 		if string.sub(nChannel, 1, 1) == '/' then
 			if nChannel == '/cafk' or nChannel == '/catr' then
 				SwitchChatChannel(nChannel)
-				MY.Talk(nil, nChannel, nil, nil, nil, true)
+				LIB.Talk(nil, nChannel, nil, nil, nil, true)
 				Station.Lookup('Lowest2/EditBox'):Show()
 			else
 				SwitchChatChannel(nChannel..' ')
@@ -567,7 +594,7 @@ end
 end
 
 -- 将焦点设置到聊天栏
-function MY.FocusChatBox()
+function LIB.FocusChatBox()
 	Station.SetFocusWindow('Lowest2/EditBox/Edit_Input')
 end
 
@@ -597,10 +624,10 @@ end
 
 -- 获取聊天表情列表
 -- typedef emo table
--- (emo[]) MY.GetChatEmotion()                             -- 返回所有表情列表
--- (emo)   MY.GetChatEmotion(szCommand)                    -- 返回指定Cmd的表情
--- (emo)   MY.GetChatEmotion(szImageFile, nFrame, szType)  -- 返回指定图标的表情
-function MY.GetChatEmotion(arg0, arg1, arg2)
+-- (emo[]) LIB.GetChatEmotion()                             -- 返回所有表情列表
+-- (emo)   LIB.GetChatEmotion(szCommand)                    -- 返回指定Cmd的表情
+-- (emo)   LIB.GetChatEmotion(szImageFile, nFrame, szType)  -- 返回指定图标的表情
+function LIB.GetChatEmotion(arg0, arg1, arg2)
 	InitEmotion()
 	local t
 	if not arg0 then
@@ -638,7 +665,7 @@ local function ParseFaceIcon(t)
 					szText = string.sub(szText, nPos)
 					for i = math.min(MAX_EMOTION_LEN, wstring.len(szText)), 2, -1 do
 						local szTest = wstring.sub(szText, 1, i)
-						local emo = MY.GetChatEmotion(szTest)
+						local emo = LIB.GetChatEmotion(szTest)
 						if emo then
 							szFace, dwFaceID = szTest, emo.dwID
 							szText = szText:sub(szFace:len() + 1)
@@ -668,7 +695,7 @@ end
 -- parse name in talking message
 local function ParseName(t)
 	local me = GetClientPlayer()
-	local tar = MY.GetObject(me.GetTarget())
+	local tar = LIB.GetObject(me.GetTarget())
 	for i, v in ipairs(t) do
 		if v.type == 'text' then
 			v.text = string.gsub(v.text, '%$zj', '[' .. me.szName .. ']')
@@ -750,8 +777,8 @@ local function ParseAntiSWS(t)
 end
 
 -- 发布聊天内容
--- (void) MY.Talk(string szTarget, string szText[, boolean bNoEscape, [boolean bSaveDeny, [boolean bPushToChatBox] ] ])
--- (void) MY.Talk([number nChannel, ] string szText[, boolean bNoEscape[boolean bSaveDeny, [boolean bPushToChatBox] ] ])
+-- (void) LIB.Talk(string szTarget, string szText[, boolean bNoEscape, [boolean bSaveDeny, [boolean bPushToChatBox] ] ])
+-- (void) LIB.Talk([number nChannel, ] string szText[, boolean bNoEscape[boolean bSaveDeny, [boolean bPushToChatBox] ] ])
 -- szTarget       -- 密聊的目标角色名
 -- szText         -- 聊天内容，（亦可为兼容 KPlayer.Talk 的 table）
 -- nChannel       -- *可选* 聊天频道，PLAYER_TALK_CHANNLE.*，默认为近聊
@@ -759,7 +786,7 @@ end
 -- bSaveDeny      -- *可选* 在聊天输入栏保留不可发言的频道内容，默认为 false
 -- bPushToChatBox -- *可选* 仅推送到聊天框，默认为 false
 -- 特别注意：nChannel, szText 两者的参数顺序可以调换，战场/团队聊天频道智能切换
-function MY.Talk(nChannel, szText, szUUID, bNoEscape, bSaveDeny, bPushToChatBox)
+function LIB.Talk(nChannel, szText, szUUID, bNoEscape, bSaveDeny, bPushToChatBox)
 	local szTarget, me = '', GetClientPlayer()
 	-- channel
 	if not nChannel then
@@ -777,7 +804,7 @@ function MY.Talk(nChannel, szText, szUUID, bNoEscape, bSaveDeny, bPushToChatBox)
 	elseif nChannel == PLAYER_TALK_CHANNEL.RAID and me.GetScene().nType == MAP_TYPE.BATTLE_FIELD then
 		nChannel = PLAYER_TALK_CHANNEL.BATTLE_FIELD
 	elseif nChannel == PLAYER_TALK_CHANNEL.LOCAL_SYS then
-		return MY.Sysmsg({szText}, '')
+		return LIB.Sysmsg({szText}, '')
 	end
 	-- say body
 	local tSay = nil
@@ -791,14 +818,14 @@ function MY.Talk(nChannel, szText, szUUID, bNoEscape, bSaveDeny, bPushToChatBox)
 		tSay = ParseName(tSay)
 	end
 	tSay = ParseAntiSWS(tSay)
-	if MY.IsShieldedVersion() then
+	if LIB.IsShieldedVersion() then
 		local nLen = 0
 		for i, v in ipairs(tSay) do
 			if nLen <= 64 then
-				nLen = nLen + MY.StringLenW(v.text or v.name or '')
+				nLen = nLen + LIB.StringLenW(v.text or v.name or '')
 				if nLen > 64 then
-					if v.text then v.text = MY.StringSubW(v.text, 1, 64 - nLen ) end
-					if v.name then v.name = MY.StringSubW(v.name, 1, 64 - nLen ) end
+					if v.text then v.text = LIB.StringSubW(v.text, 1, 64 - nLen ) end
+					if v.name then v.name = LIB.StringSubW(v.name, 1, 64 - nLen ) end
 					for j=#tSay, i+1, -1 do
 						table.remove(tSay, j)
 					end
@@ -806,14 +833,14 @@ function MY.Talk(nChannel, szText, szUUID, bNoEscape, bSaveDeny, bPushToChatBox)
 			end
 		end
 	end
-	if bPushToChatBox or (bSaveDeny and not MY.CanTalk(nChannel)) then
+	if bPushToChatBox or (bSaveDeny and not LIB.CanTalk(nChannel)) then
 		local edit = Station.Lookup('Lowest2/EditBox/Edit_Input')
 		edit:ClearText()
 		for _, v in ipairs(tSay) do
 			edit:InsertObj(v.text, v)
 		end
 		-- change to this channel
-		MY.SwitchChat(nChannel)
+		LIB.SwitchChat(nChannel)
 		-- set focus
 		Station.SetFocusWindow(edit)
 	else
@@ -822,7 +849,7 @@ function MY.Talk(nChannel, szText, szUUID, bNoEscape, bSaveDeny, bPushToChatBox)
 		or tSay[1].type ~= 'eventlink' then
 			table.insert(tSay, 1, {
 				type = 'eventlink', name = '',
-				linkinfo = MY.JsonEncode({
+				linkinfo = LIB.JsonEncode({
 					via = 'MY',
 					uuid = szUUID and tostring(szUUID),
 				})
@@ -833,7 +860,7 @@ function MY.Talk(nChannel, szText, szUUID, bNoEscape, bSaveDeny, bPushToChatBox)
 end
 end
 
-function MY.EditBoxInsertItemInfo(dwTabType, dwIndex, nBookInfo, nVersion)
+function LIB.EditBoxInsertItemInfo(dwTabType, dwIndex, nBookInfo, nVersion)
 	local itemInfo = GetItemInfo(dwTabType, dwIndex)
 	if not itemInfo then
 		return false
@@ -878,7 +905,7 @@ local metaAlignment = { __index = function() return 'L' end }
 local function MergeHW(s)
 	return s:gsub(W_SPACE, 'W'):gsub(' (W*) ', W_SPACE .. '%1'):gsub('W', W_SPACE)
 end
-function MY.TabTalk(nChannel, aTable, aAlignment)
+function LIB.TabTalk(nChannel, aTable, aAlignment)
 	local aLenHW, aMaxLenHW = {}, {}
 	for i, aText in ipairs(aTable) do
 		aLenHW[i] = {}
@@ -907,8 +934,8 @@ function MY.TabTalk(nChannel, aTable, aAlignment)
 				aTalk[j] = szText .. MergeHW(szFixL .. szFixR)
 			end
 		end
-		-- MY.Sysmsg({(concat(aTalk, '|'))})
-		MY.Talk(nChannel, (concat(aTalk, ' ')))
+		-- LIB.Sysmsg({(concat(aTalk, '|'))})
+		LIB.Talk(nChannel, (concat(aTalk, ' ')))
 	end
 end
 end
@@ -993,7 +1020,7 @@ local DAILY_LIMIT_TABLE_KEY = {
 	[PLAYER_TALK_CHANNEL.NEARBY ] = 'NearbyChannelDailyLimit',
 	[PLAYER_TALK_CHANNEL.WHISPER] = 'WhisperDailyLimit',
 }
-function MY.GetChannelDailyLimit(nLevel, nChannel)
+function LIB.GetChannelDailyLimit(nLevel, nChannel)
 	local LevelUpData = GetRegisterChannelLimitTable()
 	if not LevelUpData then
 		return false
@@ -1047,7 +1074,7 @@ local CHANNEL_GROUP = {
         },
     }
 }
-function MY.GetChatChannelMenu(fnAction, tChecked)
+function LIB.GetChatChannelMenu(fnAction, tChecked)
 	local t = {}
 	for _, cg in ipairs(CHANNEL_GROUP) do
 		local t1 = { szOption = cg.szCaption }
@@ -1086,11 +1113,11 @@ function MY.GetChatChannelMenu(fnAction, tChecked)
 end
 end
 
--- Register:   MY.RegisterMsgMonitor(string szKey, function fnAction, table tChannels)
---             MY.RegisterMsgMonitor(function fnAction, table tChannels)
--- Unregister: MY.RegisterMsgMonitor(string szKey)
+-- Register:   LIB.RegisterMsgMonitor(string szKey, function fnAction, table tChannels)
+--             LIB.RegisterMsgMonitor(function fnAction, table tChannels)
+-- Unregister: LIB.RegisterMsgMonitor(string szKey)
 do local MSG_MONITOR_FUNC = {}
-function MY.RegisterMsgMonitor(arg0, arg1, arg2)
+function LIB.RegisterMsgMonitor(arg0, arg1, arg2)
 	local szKey, fnAction, tChannels
 	local tp0, tp1, tp2 = type(arg0), type(arg1), type(arg2)
 	if tp0 == 'string' and tp1 == 'function' and tp2 == 'table' then
@@ -1125,7 +1152,7 @@ local CHAT_HOOK = {
 	AFTER = {},
 	FILTER = {},
 }
-function MY.HookChatPanel(szType, fnAction)
+function LIB.HookChatPanel(szType, fnAction)
 	local szKey = nil
 	local nPos = StringFindW(szType, '.')
 	if nPos then
@@ -1161,13 +1188,13 @@ local function BeforeChatAppendItemFromString(h, szMsg, ...) -- h, szMsg, szChan
 				return h, '', ...
 			end
 		else
-			MY.Debug({msg}, 'HookChatPanel.FILTER#' .. szKey, DEBUG_LEVEL.ERROR)
+			LIB.Debug({msg}, 'HookChatPanel.FILTER#' .. szKey, DEBUG_LEVEL.ERROR)
 		end
 	end
 	for szKey, fnAction in pairs(CHAT_HOOK.BEFORE) do
 		local status = pcall(fnAction, h, szMsg, ...)
 		if not status then
-			MY.Debug({msg}, 'HookChatPanel.BEFORE#' .. szKey, DEBUG_LEVEL.ERROR)
+			LIB.Debug({msg}, 'HookChatPanel.BEFORE#' .. szKey, DEBUG_LEVEL.ERROR)
 		end
 	end
 	local nCount = h:GetItemCount()
@@ -1194,7 +1221,7 @@ local function AfterChatAppendItemFromString(h, ...)
 		for szKey, fnAction in pairs(CHAT_HOOK.AFTER) do
 			local status = pcall(fnAction, h, nStart, ...)
 			if not status then
-				MY.Debug({msg}, 'HookChatPanel.AFTER#' .. szKey, DEBUG_LEVEL.ERROR)
+				LIB.Debug({msg}, 'HookChatPanel.AFTER#' .. szKey, DEBUG_LEVEL.ERROR)
 			end
 		end
 	end
@@ -1210,7 +1237,7 @@ local function Hook(i)
 		HookTableFunc(h, 'AppendItemFromString', AfterChatAppendItemFromString, { bAfterOrigin = true, bHookParams = true })
 	end
 end
-MY.RegisterEvent('CHAT_PANEL_OPEN.ChatPanelHook', function(event) Hook(arg0) end)
+LIB.RegisterEvent('CHAT_PANEL_OPEN.ChatPanelHook', function(event) Hook(arg0) end)
 
 local function Unhook(i)
 	local h = Station.Lookup('Lowest2/ChatPanel' .. i .. '/Wnd_Message', 'Handle_Message')
@@ -1227,16 +1254,16 @@ local function HookAll()
 	end
 end
 HookAll()
-MY.RegisterEvent('CHAT_PANEL_INIT.ChatPanelHook', HookAll)
-MY.RegisterEvent('RELOAD_UI_ADDON_END.ChatPanelHook', HookAll)
+LIB.RegisterEvent('CHAT_PANEL_INIT.ChatPanelHook', HookAll)
+LIB.RegisterEvent('RELOAD_UI_ADDON_END.ChatPanelHook', HookAll)
 
 local function UnhookAll()
 	for i = 1, 10 do
 		Unhook(i)
 	end
 end
-MY.RegisterExit('ChatPanelHook', UnhookAll)
-MY.RegisterReload('ChatPanelHook', UnhookAll)
+LIB.RegisterExit('ChatPanelHook', UnhookAll)
+LIB.RegisterReload('ChatPanelHook', UnhookAll)
 end
 
 do
@@ -1244,10 +1271,10 @@ local function OnChatPanelNamelinkLButtonDown(...)
 	if this.__MY_OnItemLButtonDown then
 		this.__MY_OnItemLButtonDown(...)
 	end
-	MY.ChatLinkEventHandlers.OnNameLClick(...)
+	LIB.ChatLinkEventHandlers.OnNameLClick(...)
 end
 
-MY.HookChatPanel('AFTER.MYLIB_HOOKNAME', function(h, nIndex)
+LIB.HookChatPanel('AFTER.' .. LIB.GetAddonInfo().szNameSpace .. '#HOOKNAME', function(h, nIndex)
 	for i = nIndex, h:GetItemCount() - 1 do
 		local hItem = h:Lookup(i)
 		if hItem:GetName():find('^namelink_%d+$') and not hItem.bMyChatRendered then

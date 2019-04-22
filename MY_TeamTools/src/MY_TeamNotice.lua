@@ -35,22 +35,22 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_TeamTools/lang/')
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_TeamTools/lang/')
 local TI = {}
 
 MY_TeamNotice = {
 	bEnable = true,
 	anchor = { s = 'CENTER', r = 'CENTER', x = 0, y = 0 },
 }
-MY.RegisterCustomData('MY_TeamNotice')
+LIB.RegisterCustomData('MY_TeamNotice')
 
 function TI.SaveList()
-	MY.SaveLUAData({'config/yy.jx3dat', PATH_TYPE.GLOBAL}, TI.tList, '\t', false)
+	LIB.SaveLUAData({'config/yy.jx3dat', PATH_TYPE.GLOBAL}, TI.tList, '\t', false)
 end
 
 function TI.GetList()
 	if not TI.tList then
-		TI.tList = MY.LoadLUAData({'config/yy.jx3dat', PATH_TYPE.GLOBAL}) or {}
+		TI.tList = LIB.LoadLUAData({'config/yy.jx3dat', PATH_TYPE.GLOBAL}) or {}
 	end
 	return TI.tList
 end
@@ -60,7 +60,7 @@ function TI.GetFrame()
 end
 
 function TI.CreateFrame(a, b)
-	if MY.IsInZombieMap() then
+	if LIB.IsInZombieMap() then
 		return
 	end
 	local ui = TI.GetFrame()
@@ -75,9 +75,9 @@ function TI.CreateFrame(a, b)
 			anchor = MY_TeamNotice.anchor,
 			simple = true, close = true, close = true,
 			setting = function()
-				MY.ShowPanel()
-				MY.FocusPanel()
-				MY.SwitchTab('MY_TeamTools')
+				LIB.ShowPanel()
+				LIB.FocusPanel()
+				LIB.SwitchTab('MY_TeamTools')
 			end,
 		})
 		local x, y = 10, 5
@@ -89,7 +89,7 @@ function TI.CreateFrame(a, b)
 			onclick = function()
 				if IsPopupMenuOpened() then
 					UI(this):autocomplete('close')
-				elseif MY.IsLeader() then
+				elseif LIB.IsLeader() then
 					UI(this):autocomplete('search', '')
 				end
 			end,
@@ -97,9 +97,9 @@ function TI.CreateFrame(a, b)
 				if TI.szYY == szText then
 					return
 				end
-				if MY.IsLeader() then
+				if LIB.IsLeader() then
 					TI.szYY = szText
-					MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', 'Edit', szText, ui:children('#Message'):text())
+					LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', 'Edit', szText, ui:children('#Message'):text())
 				else
 					ui:children('#YY'):text(TI.szYY, WNDEVENT_FIRETYPE.PREVENT)
 				end
@@ -107,7 +107,7 @@ function TI.CreateFrame(a, b)
 			autocomplete = {
 				{
 					'option', 'beforeSearch', function(raw, option, text)
-						if MY.IsLeader() then
+						if LIB.IsLeader() then
 							TI.tList = TI.GetList()
 							option.source = {}
 							for k, v in pairs(TI.tList) do
@@ -142,12 +142,12 @@ function TI.CreateFrame(a, b)
 				end
 				if yy ~= '' then
 					for i = 0, 2 do -- 发三次
-						MY.Talk(PLAYER_TALK_CHANNEL.RAID, yy)
+						LIB.Talk(PLAYER_TALK_CHANNEL.RAID, yy)
 					end
 				end
 				local message = ui:children('#Message'):text():gsub('\n', ' ')
 				if message ~= '' then
-					MY.Talk(PLAYER_TALK_CHANNEL.RAID, message)
+					LIB.Talk(PLAYER_TALK_CHANNEL.RAID, message)
 				end
 			end,
 		}, true):height() + 5
@@ -160,9 +160,9 @@ function TI.CreateFrame(a, b)
 				if TI.szNote == szText then
 					return
 				end
-				if MY.IsLeader() then
+				if LIB.IsLeader() then
 					TI.szNote = szText
-					MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', 'Edit', ui:children('#YY'):text(), szText)
+					LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', 'Edit', ui:children('#YY'):text(), szText)
 				else
 					ui:children('#Message'):text(TI.szNote, WNDEVENT_FIRETYPE.PREVENT)
 				end
@@ -177,7 +177,7 @@ function TI.CreateFrame(a, b)
 				if MY_GKP then
 					MY_GKP.TogglePanel()
 				else
-					MY.Alert(_L['You haven\'t had MY_GKP installed and loaded yet.'])
+					LIB.Alert(_L['You haven\'t had MY_GKP installed and loaded yet.'])
 				end
 			end,
 		}, true):autoWidth():width() + 5
@@ -199,8 +199,8 @@ function TI.CreateFrame(a, b)
 					ui:remove()
 				end
 			elseif szEvent == 'PARTY_ADD_MEMBER' then
-				if MY.IsLeader() then
-					MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', 'reply', arg1, TI.szYY, TI.szNote)
+				if LIB.IsLeader() then
+					LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', 'reply', arg1, TI.szYY, TI.szNote)
 				end
 			elseif szEvent == 'UI_SCALED' then
 				ui:anchor(MY_TeamNotice.anchor)
@@ -217,51 +217,51 @@ function TI.CreateFrame(a, b)
 end
 
 function TI.OpenFrame()
-	if MY.IsInZombieMap() then
-		return MY.Topmsg(_L['TeamNotice is disabled in this map.'])
+	if LIB.IsInZombieMap() then
+		return LIB.Topmsg(_L['TeamNotice is disabled in this map.'])
 	end
 	local me = GetClientPlayer()
 	MY_TeamNotice.bEnable = true
 	if me.IsInRaid() then
-		if MY.IsLeader() then
+		if LIB.IsLeader() then
 			TI.CreateFrame()
 		else
-			MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', 'ASK')
-			MY.Sysmsg({_L['Asking..., If no response in longtime, team leader not enable plug-in.']})
+			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', 'ASK')
+			LIB.Sysmsg({_L['Asking..., If no response in longtime, team leader not enable plug-in.']})
 		end
 	end
 end
 
-MY.RegisterEvent('PARTY_LEVEL_UP_RAID.TEAM_NOTICE', function()
-	if MY.IsInZombieMap() then
+LIB.RegisterEvent('PARTY_LEVEL_UP_RAID.TEAM_NOTICE', function()
+	if LIB.IsInZombieMap() then
 		return
 	end
-	if MY.IsLeader() then
-		MY.Confirm(_L['Edit team info?'], function()
+	if LIB.IsLeader() then
+		LIB.Confirm(_L['Edit team info?'], function()
 			MY_TeamNotice.bEnable = true
 			TI.CreateFrame()
 		end)
 	end
 end)
-MY.RegisterEvent('FIRST_LOADING_END.TEAM_NOTICE', function()
+LIB.RegisterEvent('FIRST_LOADING_END.TEAM_NOTICE', function()
 	if not MY_TeamNotice.bEnable then
 		return
 	end
 	-- 不存在队长不队长的问题了
 	local me = GetClientPlayer()
 	if me.IsInRaid() then
-		MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', 'ASK')
+		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', 'ASK')
 	end
 end)
-MY.RegisterEvent('LOADING_END.TEAM_NOTICE', function()
+LIB.RegisterEvent('LOADING_END.TEAM_NOTICE', function()
 	local frame = TI.GetFrame()
-	if frame and MY.IsInZombieMap() then
+	if frame and LIB.IsInZombieMap() then
 		Wnd.CloseWindow(frame)
-		MY.Topmsg(_L['TeamNotice is disabled in this map.'])
+		LIB.Topmsg(_L['TeamNotice is disabled in this map.'])
 	end
 end)
 
-MY.RegisterEvent('ON_BG_CHANNEL_MSG.LR_TeamNotice', function()
+LIB.RegisterEvent('ON_BG_CHANNEL_MSG.LR_TeamNotice', function()
 	if not MY_TeamNotice.bEnable then
 		return
 	end
@@ -275,7 +275,7 @@ MY.RegisterEvent('ON_BG_CHANNEL_MSG.LR_TeamNotice', function()
 	end
 end)
 
-MY.RegisterBgMsg('TI', function(_, nChannel, dwID, szName, bIsSelf, ...)
+LIB.RegisterBgMsg('TI', function(_, nChannel, dwID, szName, bIsSelf, ...)
 	if not MY_TeamNotice.bEnable then
 		return
 	end
@@ -284,14 +284,14 @@ MY.RegisterBgMsg('TI', function(_, nChannel, dwID, szName, bIsSelf, ...)
 		local me = GetClientPlayer()
 		local team = GetClientTeam()
 		if team then
-			if data[1] == 'ASK' and MY.IsLeader() then
+			if data[1] == 'ASK' and LIB.IsLeader() then
 				if TI.GetFrame() then
-					MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', 'reply', szName, TI.szYY, TI.szNote)
+					LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', 'reply', szName, TI.szYY, TI.szNote)
 				end
 			elseif data[1] == 'Edit' then
 				TI.CreateFrame(data[2], data[3])
 			elseif data[1] == 'reply' and (tonumber(data[2]) == UI_GetClientPlayerID() or data[2] == me.szName) then
-				if MY.TrimString(data[3]) ~= '' or MY.TrimString(data[4]) ~= '' then
+				if LIB.TrimString(data[3]) ~= '' or LIB.TrimString(data[4]) ~= '' then
 					TI.CreateFrame(data[3], data[4])
 				end
 			end
@@ -310,7 +310,7 @@ local function GetMenu()
 		fnAction = TI.OpenFrame,
 	}}
 end
-MY.RegisterAddonMenu(GetMenu)
+LIB.RegisterAddonMenu(GetMenu)
 
 local function GetMenuTB()
 	local menu = GetMenu()

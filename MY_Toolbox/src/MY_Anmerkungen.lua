@@ -35,8 +35,8 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Toolbox/lang/')
-if not MY.AssertVersion('MY_Anmerkungen', _L['MY_Anmerkungen'], 0x2011800) then
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_Toolbox/lang/')
+if not LIB.AssertVersion('MY_Anmerkungen', _L['MY_Anmerkungen'], 0x2011800) then
 	return
 end
 local _C = {}
@@ -53,7 +53,7 @@ MY_Anmerkungen = MY_Anmerkungen or {}
 -- 打开一个玩家的记录编辑器
 function MY_Anmerkungen.OpenPlayerNoteEditPanel(dwID, szName)
 	if not MY_Farbnamen then
-		return MY.Alert(_L['MY_Farbnamen not detected! Please check addon load!'])
+		return LIB.Alert(_L['MY_Farbnamen not detected! Please check addon load!'])
 	end
 	local note = MY_Anmerkungen.GetPlayerNote(dwID) or {}
 
@@ -70,10 +70,10 @@ function MY_Anmerkungen.OpenPlayerNoteEditPanel(dwID, szName)
 		ui:remove()
 		return true
 	end
-	MY.RegisterEsc('MY_Anmerkungen_PlayerNoteEditPanel', IsValid, RemoveFrame)
+	LIB.RegisterEsc('MY_Anmerkungen_PlayerNoteEditPanel', IsValid, RemoveFrame)
 
 	local function onRemove()
-		MY.RegisterEsc('MY_Anmerkungen_PlayerNoteEditPanel')
+		LIB.RegisterEsc('MY_Anmerkungen_PlayerNoteEditPanel')
 		PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
 	end
 	ui:remove(onRemove)
@@ -177,32 +177,32 @@ end
 
 do
 local function onMenu()
-	local dwType, dwID = MY.GetTarget()
+	local dwType, dwID = LIB.GetTarget()
 	if dwType == TARGET.PLAYER then
-		local p = MY.GetObject(dwType, dwID)
+		local p = LIB.GetObject(dwType, dwID)
 		return {
 			szOption = _L['edit player note'],
 			fnAction = function()
-				MY.DelayCall(1, function()
+				LIB.DelayCall(1, function()
 					MY_Anmerkungen.OpenPlayerNoteEditPanel(p.dwID, p.szName)
 				end)
 			end
 		}
 	end
 end
-MY.RegisterTargetAddonMenu('MY_Anmerkungen_PlayerNotes', onMenu)
+LIB.RegisterTargetAddonMenu('MY_Anmerkungen_PlayerNotes', onMenu)
 end
 
 do
 local menu = {
 	szOption = _L['View anmerkungen'],
 	fnAction = function()
-		MY.ShowPanel()
-		MY.FocusPanel()
-		MY.SwitchTab('MY_Anmerkungen')
+		LIB.ShowPanel()
+		LIB.FocusPanel()
+		LIB.SwitchTab('MY_Anmerkungen')
 	end,
 }
-MY.RegisterAddonMenu('MY_Anmerkungen_PlayerNotes', menu)
+LIB.RegisterAddonMenu('MY_Anmerkungen_PlayerNotes', menu)
 end
 
 -- 获取一个玩家的记录
@@ -296,7 +296,7 @@ local function CheckPartyPlayer(dwID)
 			})
 		end
 		if t.bTipWhenGroup then
-			MY.Sysmsg({_L('Tip: [%s] is in your team.\nNote: %s', t.szName, t.szContent)})
+			LIB.Sysmsg({_L('Tip: [%s] is in your team.\nNote: %s', t.szName, t.szContent)})
 		end
 	end
 end
@@ -305,8 +305,8 @@ do
 local function OnPartyAddMember()
 	CheckPartyPlayer(arg1)
 end
-MY.RegisterEvent('PARTY_ADD_MEMBER', OnPartyAddMember)
--- MY.RegisterEvent('PARTY_SYNC_MEMBER_DATA', OnPartyAddMember)
+LIB.RegisterEvent('PARTY_ADD_MEMBER', OnPartyAddMember)
+-- LIB.RegisterEvent('PARTY_SYNC_MEMBER_DATA', OnPartyAddMember)
 end
 
 -- 当进队时
@@ -320,35 +320,35 @@ local function OnEnterParty()
 		CheckPartyPlayer(dwID)
 	end
 end
-MY.RegisterEvent('PARTY_UPDATE_BASE_INFO.MY_Anmerkungen', OnEnterParty)
+LIB.RegisterEvent('PARTY_UPDATE_BASE_INFO.MY_Anmerkungen', OnEnterParty)
 end
 end
 
 -- 读取公共数据
 function MY_Anmerkungen.LoadConfig()
 	if not GetClientPlayer() then
-		return MY.Debug({'Client player not exist! Cannot load config!'}, 'MY_Anmerkungen.LoadConfig', DEBUG_LEVEL.ERROR)
+		return LIB.Debug({'Client player not exist! Cannot load config!'}, 'MY_Anmerkungen.LoadConfig', DEBUG_LEVEL.ERROR)
 	end
-	local data = MY.LoadLUAData({'config/anmerkungen_static.jx3dat', PATH_TYPE.SERVER})
+	local data = LIB.LoadLUAData({'config/anmerkungen_static.jx3dat', PATH_TYPE.SERVER})
 	if data then
 		STATIC_PLAYER_IDS = data.ids or {}
 		STATIC_PLAYER_NOTES = data.data or {}
 	end
 
-	local data = MY.LoadLUAData({'config/anmerkungen.jx3dat', PATH_TYPE.SERVER})
+	local data = LIB.LoadLUAData({'config/anmerkungen.jx3dat', PATH_TYPE.SERVER})
 	if data then
 		PUBLIC_PLAYER_IDS = data.ids or {}
 		PUBLIC_PLAYER_NOTES = data.data or {}
 	end
-	local szOrgFile = MY.GetLUADataPath('config/PLAYER_NOTES/$relserver.$lang.jx3dat')
-	local szFilePath = MY.GetLUADataPath({'config/playernotes.jx3dat', PATH_TYPE.SERVER})
+	local szOrgFile = LIB.GetLUADataPath('config/PLAYER_NOTES/$relserver.$lang.jx3dat')
+	local szFilePath = LIB.GetLUADataPath({'config/playernotes.jx3dat', PATH_TYPE.SERVER})
 	if IsLocalFileExist(szOrgFile) then
 		CPath.Move(szOrgFile, szFilePath)
 	end
 	if IsLocalFileExist(szFilePath) then
-		local data = MY.LoadLUAData(szFilePath) or {}
+		local data = LIB.LoadLUAData(szFilePath) or {}
 		if type(data) == 'string' then
-			data = MY.JsonDecode(data)
+			data = LIB.JsonDecode(data)
 		end
 		for k, v in pairs(data) do
 			if type(v) == 'table' then
@@ -363,20 +363,20 @@ function MY_Anmerkungen.LoadConfig()
 		MY_Anmerkungen.SaveConfig()
 	end
 
-	local data = MY.LoadLUAData({'config/anmerkungen.jx3dat', PATH_TYPE.ROLE})
+	local data = LIB.LoadLUAData({'config/anmerkungen.jx3dat', PATH_TYPE.ROLE})
 	if data then
 		PRIVATE_PLAYER_IDS = data.ids or {}
 		PRIVATE_PLAYER_NOTES = data.data or {}
 	end
-	local szOrgFile = MY.GetLUADataPath('config/PLAYER_NOTES/$uid.$lang.jx3dat')
-	local szFilePath = MY.GetLUADataPath({'config/playernotes.jx3dat', PATH_TYPE.ROLE})
+	local szOrgFile = LIB.GetLUADataPath('config/PLAYER_NOTES/$uid.$lang.jx3dat')
+	local szFilePath = LIB.GetLUADataPath({'config/playernotes.jx3dat', PATH_TYPE.ROLE})
 	if IsLocalFileExist(szOrgFile) then
 		CPath.Move(szOrgFile, szFilePath)
 	end
 	if IsLocalFileExist(szFilePath) then
-		local data = MY.LoadLUAData(szFilePath) or {}
+		local data = LIB.LoadLUAData(szFilePath) or {}
 		if type(data) == 'string' then
-			data = MY.JsonDecode(data)
+			data = LIB.JsonDecode(data)
 		end
 		for k, v in pairs(data) do
 			if type(v) == 'table' then
@@ -398,15 +398,15 @@ function MY_Anmerkungen.SaveConfig()
 		ids = PUBLIC_PLAYER_IDS,
 		data = PUBLIC_PLAYER_NOTES,
 	}
-	MY.SaveLUAData({'config/anmerkungen.jx3dat', PATH_TYPE.SERVER}, data)
+	LIB.SaveLUAData({'config/anmerkungen.jx3dat', PATH_TYPE.SERVER}, data)
 
 	local data = {
 		ids = PRIVATE_PLAYER_IDS,
 		data = PRIVATE_PLAYER_NOTES,
 	}
-	MY.SaveLUAData({'config/anmerkungen.jx3dat', PATH_TYPE.ROLE}, data)
+	LIB.SaveLUAData({'config/anmerkungen.jx3dat', PATH_TYPE.ROLE}, data)
 end
-MY.RegisterInit('MY_ANMERKUNGEN', MY_Anmerkungen.LoadConfig)
+LIB.RegisterInit('MY_ANMERKUNGEN', MY_Anmerkungen.LoadConfig)
 
 local PS = {}
 function PS.OnPanelActive(wnd)
@@ -429,8 +429,8 @@ function PS.OnPanelActive(wnd)
 			GetUserInput(_L['please input import data:'], function(szVal)
 				local config = str2var(szVal)
 				if config and config.server and config.public and config.private then
-					if config.server ~= MY.GetRealServer() then
-						return MY.Alert(_L['Server not match!'])
+					if config.server ~= LIB.GetRealServer() then
+						return LIB.Alert(_L['Server not match!'])
 					end
 					local function Next(usenew)
 						for k, v in pairs(config.public) do
@@ -478,12 +478,12 @@ function PS.OnPanelActive(wnd)
 							end
 						end
 						MY_Anmerkungen.SaveConfig()
-						MY.SwitchTab('MY_Anmerkungen_Player_Note', true)
+						LIB.SwitchTab('MY_Anmerkungen_Player_Note', true)
 					end
-					MY.Confirm(_L['Prefer old data or new data?'], function() Next(false) end,
+					LIB.Confirm(_L['Prefer old data or new data?'], function() Next(false) end,
 						function() Next(true) end, _L['Old data'], _L['New data'])
 				else
-					MY.Alert(_L['Decode data failed!'])
+					LIB.Alert(_L['Decode data failed!'])
 				end
 			end, function() end, function() end, nil, '' )
 		end,
@@ -494,7 +494,7 @@ function PS.OnPanelActive(wnd)
 		text = _L['Export'],
 		onclick = function()
 			UI.OpenTextEditor(var2str({
-				server   = MY.GetRealServer(),
+				server   = LIB.GetRealServer(),
 				publici  = PUBLIC_PLAYER_IDS,
 				publicd  = PUBLIC_PLAYER_NOTES,
 				privatei = PRIVATE_PLAYER_IDS,
@@ -525,4 +525,4 @@ end
 function PS.OnPanelDeactive()
 	_C.list = nil
 end
-MY.RegisterPanel( 'MY_Anmerkungen_Player_Note', _L['player note'], _L['Target'], 'ui/Image/button/ShopButton.UITex|12', PS)
+LIB.RegisterPanel( 'MY_Anmerkungen_Player_Note', _L['player note'], _L['Target'], 'ui/Image/button/ShopButton.UITex|12', PS)

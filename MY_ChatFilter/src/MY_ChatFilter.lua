@@ -35,8 +35,8 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_ChatFilter/lang/')
-if not MY.AssertVersion('MY_ChatFilter', _L['MY_ChatFilter'], 0x2011800) then
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_ChatFilter/lang/')
+if not LIB.AssertVersion('MY_ChatFilter', _L['MY_ChatFilter'], 0x2011800) then
 	return
 end
 MY_ChatFilter = {}
@@ -91,17 +91,17 @@ local l_tChannelHeader = {
 	['MSG_NPC_PARTY'] = g_tStrings.STR_TALK_HEAD_SAY1,
 }
 
-MY.HookChatPanel('FILTER.MY_ChatFilter', function(h, szMsg, szChannel, dwTime)
+LIB.HookChatPanel('FILTER.MY_ChatFilter', function(h, szMsg, szChannel, dwTime)
 	-- 插件消息UUID过滤
 	if MY_ChatFilter.bFilterDuplicateAddonTalk then
 		local me = GetClientPlayer()
-		local tSay = MY.FormatChatContent(szMsg)
+		local tSay = LIB.FormatChatContent(szMsg)
 		if not h.MY_tDuplicateUUID then
 			h.MY_tDuplicateUUID = {}
 		end
 		for _, element in ipairs(tSay) do
 			if element.type == 'eventlink' and element.name == '' then
-				local data = MY.JsonDecode(element.linkinfo)
+				local data = LIB.JsonDecode(element.linkinfo)
 				if data and data.uuid then
 					local szUUID = data.uuid
 					if szUUID then
@@ -170,7 +170,7 @@ MY.HookChatPanel('FILTER.MY_ChatFilter', function(h, szMsg, szChannel, dwTime)
 	return true
 end)
 
-MY.RegisterPanel('MY_DuplicateChatFilter', _L['duplicate chat filter'], _L['Chat'],
+LIB.RegisterPanel('MY_DuplicateChatFilter', _L['duplicate chat filter'], _L['Chat'],
 'ui/Image/UICommon/yirong3.UITex|104', {OnPanelActive = function(wnd)
 	local ui = UI(wnd)
 	local w, h = ui:size()

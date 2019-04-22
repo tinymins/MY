@@ -35,8 +35,8 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/lang/')
-if not MY.AssertVersion('MY_Cataclysm', _L['MY_Cataclysm'], 0x2011800) then
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_Cataclysm/lang/')
+if not LIB.AssertVersion('MY_Cataclysm', _L['MY_Cataclysm'], 0x2011800) then
 	return
 end
 local CFG, PS = MY_Cataclysm.CFG, {}
@@ -57,7 +57,7 @@ function PS.OnPanelActive(frame)
 		x = x, y = y + 3, w = 200, h = 25,
 		text = MY_Cataclysm.szConfigName,
 		onchange = function(txt)
-			szConfigName = MY.TrimString(txt)
+			szConfigName = LIB.TrimString(txt)
 		end,
 		onblur = function()
 			if szConfigName == MY_Cataclysm.szConfigName then
@@ -65,7 +65,7 @@ function PS.OnPanelActive(frame)
 			end
 			MY_Cataclysm.SetConfigureName(szConfigName)
 			MY_Cataclysm.CheckEnableTeamPanel()
-			MY.SwitchTab('MY_Cataclysm', true)
+			LIB.SwitchTab('MY_Cataclysm', true)
 		end,
 	}, true):width() + 5
 	end
@@ -168,7 +168,7 @@ function PS.OnPanelActive(frame)
 	if me.dwForceID == FORCE_TYPE.WU_DU then
 		x = x + ui:append('WndCheckBox', {
 			x = x, y = y, text = _L['ZuiWu Effect'],
-			color = { MY.GetForceColor(6) },
+			color = { LIB.GetForceColor(6) },
 			checked = CFG.bShowEffect,
 			oncheck = function(bCheck)
 				CFG.bShowEffect = bCheck
@@ -271,4 +271,4 @@ function PS.OnPanelActive(frame)
 	-- end, true):Pos_()
 	y = y + 25
 end
-MY.RegisterPanel('MY_Cataclysm', _L['Cataclysm'], _L['Raid'], 'ui/Image/UICommon/RaidTotal.uitex|62', PS)
+LIB.RegisterPanel('MY_Cataclysm', _L['Cataclysm'], _L['Raid'], 'ui/Image/UICommon/RaidTotal.uitex|62', PS)

@@ -45,10 +45,10 @@ local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_
 -- RenderCall  渲染调用   每次渲染调用   毫秒       1 / 每秒渲染次数
 ---------------------------------------------------------------------
 if DelayCall and BreatheCall and FrameCall and RenderCall then
-	MY.DelayCall   = DelayCall
-	MY.BreatheCall = BreatheCall
-	MY.FrameCall   = FrameCall
-	MY.RenderCall  = RenderCall
+	LIB.DelayCall   = DelayCall
+	LIB.BreatheCall = BreatheCall
+	LIB.FrameCall   = FrameCall
+	LIB.RenderCall  = RenderCall
 else
 
 local _time      -- current time
@@ -82,7 +82,7 @@ local function onDelayCall()
 		if dc.nNext <= _time then
 			local res, err = pcall(dc.fnAction, dc.oArg)
 			if not res then
-				MY.Debug({GetTraceback(err)}, 'onDelayCall#' .. szKey, DEBUG_LEVEL.ERROR)
+				LIB.Debug({GetTraceback(err)}, 'onDelayCall#' .. szKey, DEBUG_LEVEL.ERROR)
 			end
 			_count = _count - 1
 			_delaycall_t = _tDelayCall[szKey]
@@ -95,7 +95,7 @@ local function onDelayCall()
 	end
 end
 
-function MY.DelayCall(szKey, nInterval, fnAction, oArg)
+function LIB.DelayCall(szKey, nInterval, fnAction, oArg)
 	local bUnreg
 	if type(szKey) == 'function' then
 		-- DelayCall(fnAction[, oArg])
@@ -183,7 +183,7 @@ local function onBreatheCall()
 			bc.nNext = _time + bc.nInterval
 			local res, err = pcall(bc.fnAction, bc.oArg)
 			if not res then
-				MY.Debug({GetTraceback(err)}, 'onBreatheCall#' .. szKey, DEBUG_LEVEL.ERROR)
+				LIB.Debug({GetTraceback(err)}, 'onBreatheCall#' .. szKey, DEBUG_LEVEL.ERROR)
 			elseif err == 0 then
 				_count = _count - 1
 				_breathecall_t = _tBreatheCall[szKey]
@@ -197,7 +197,7 @@ local function onBreatheCall()
 	end
 end
 
-function MY.BreatheCall(szKey, nInterval, fnAction, oArg)
+function LIB.BreatheCall(szKey, nInterval, fnAction, oArg)
 	local bOnce, bUnreg
 	if type(szKey) == 'function' then
 		-- BreatheCall(fnAction[, oArg])
@@ -288,7 +288,7 @@ local function onFrameCall()
 			fc.nNext = _framecount + fc.nInterval
 			local res, err = pcall(fc.fnAction, fc.oArg)
 			if not res then
-				MY.Debug({GetTraceback(err)}, 'onFrameCall#' .. szKey, DEBUG_LEVEL.ERROR)
+				LIB.Debug({GetTraceback(err)}, 'onFrameCall#' .. szKey, DEBUG_LEVEL.ERROR)
 			elseif err == 0 then
 				_count = _count - 1
 				_framecall_t = _tFrameCall[szKey]
@@ -302,7 +302,7 @@ local function onFrameCall()
 	end
 end
 
-function MY.FrameCall(szKey, nInterval, fnAction, oArg)
+function LIB.FrameCall(szKey, nInterval, fnAction, oArg)
 	local bOnce, bUnreg
 	if type(szKey) == 'function' then
 		-- FrameCall(fnAction[, oArg])
@@ -394,7 +394,7 @@ local function onRenderCall()
 			rc.nNext = _time + rc.nInterval
 			local res, err = pcall(rc.fnAction, rc.oArg)
 			if not res then
-				MY.Debug({GetTraceback(err)}, 'onRenderCall#' .. szKey, DEBUG_LEVEL.ERROR)
+				LIB.Debug({GetTraceback(err)}, 'onRenderCall#' .. szKey, DEBUG_LEVEL.ERROR)
 			elseif err == 0 then
 				_rendercall_c = _rendercall_c - 1
 				_rendercall_t = _tRenderCall[szKey]
@@ -409,7 +409,7 @@ local function onRenderCall()
 	end
 end
 
-function MY.RenderCall(szKey, nInterval, fnAction, oArg)
+function LIB.RenderCall(szKey, nInterval, fnAction, oArg)
 	local bOnce, bUnreg
 	if type(szKey) == 'function' then
 		-- RenderCall(fnAction[, oArg])
@@ -446,7 +446,7 @@ function MY.RenderCall(szKey, nInterval, fnAction, oArg)
 		rc.nNext = GetTime()
 		rc.nInterval = nInterval or 0
 		if not _rendercall_ref then
-			_rendercall_ref = MY.RegisterEvent('RENDER_FRAME_UPDATE', onRenderCall)
+			_rendercall_ref = LIB.RegisterEvent('RENDER_FRAME_UPDATE', onRenderCall)
 		end
 	elseif nInterval then -- modify
 		local rc = _tRenderCall[szKey]
@@ -488,7 +488,7 @@ local function __OnActive()
 	onBreatheCall()
 end
 
-local frame = Wnd.OpenWindow(MY.GetAddonInfo().szFrameworkRoot .. 'ui/WndFrameEmpty.ini', 'MYLIB_Interval')
+local frame = Wnd.OpenWindow(LIB.GetAddonInfo().szFrameworkRoot .. 'ui/WndFrameEmpty.ini', LIB.GetAddonInfo().szNameSpace .. '#Interval')
 frame.OnFrameBreathe = __OnActive
 frame:Hide()
 

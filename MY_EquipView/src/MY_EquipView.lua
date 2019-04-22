@@ -35,10 +35,10 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local EQUIPMENT_SUIT_COUNT = MY.EQUIPMENT_SUIT_COUNT
+local EQUIPMENT_SUIT_COUNT = LIB.EQUIPMENT_SUIT_COUNT
 ------------------------------------------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_EquipView/lang/')
-if not MY.AssertVersion('MY_EquipView', _L['MY_EquipView'], 0x2011800) then
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_EquipView/lang/')
+if not LIB.AssertVersion('MY_EquipView', _L['MY_EquipView'], 0x2011800) then
 	return
 end
 local _C = {}
@@ -86,7 +86,7 @@ _C.UpdateAllEquipBox = function() -- update boxes
 		end
 	end
 end
-MY.RegisterEvent('BAG_ITEM_UPDATE', _C.UpdateAllEquipBox)
+LIB.RegisterEvent('BAG_ITEM_UPDATE', _C.UpdateAllEquipBox)
 
 _C.PS = {
 	OnPanelActive = function(wnd) -- append ui items
@@ -123,4 +123,4 @@ _C.PS = {
 	end
 }
 
-MY.RegisterPanel('MY_EquipView', _L['equip view'], _L['General'], 'ui/Image/UICommon/CommonPanel7.UITex|23', _C.PS)
+LIB.RegisterPanel('MY_EquipView', _L['equip view'], _L['General'], 'ui/Image/UICommon/CommonPanel7.UITex|23', _C.PS)

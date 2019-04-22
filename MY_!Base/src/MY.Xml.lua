@@ -8,10 +8,38 @@
 ---------------------------------------------------------
 -- Simple JX3 XML decoding and encoding in pure Lua.
 ---------------------------------------------------------
--- local lua_value = MY.Xml.Decode(raw_xml_text)
--- local raw_xml_text = MY.Xml.Encode(lua_table_or_value)
+-- local lua_value = LIB.Xml.Decode(raw_xml_text)
+-- local raw_xml_text = LIB.Xml.Encode(lua_table_or_value)
 ---------------------------------------------------------
-local tinsert, tremove, tconcat = table.insert, table.remove, table.concat
+-------------------------------------------------------------------------------------------------------------
+-- these global functions are accessed all the time by the event handler
+-- so caching them is worth the effort
+-------------------------------------------------------------------------------------------------------------
+local setmetatable = setmetatable
+local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
+local sub, len, format, rep = string.sub, string.len, string.format, string.rep
+local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
+local type, tonumber, tostring = type, tonumber, tostring
+local huge, pi, random, abs = math.huge, math.pi, math.random, math.abs
+local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
+local pow, sqrt, sin, cos, tan = math.pow, math.sqrt, math.sin, math.cos, math.tan
+local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
+local pack, unpack = table.pack or function(...) return {...} end, table.unpack or unpack
+-- jx3 apis caching
+local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
+local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
+local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
+local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local LIB, UI, DEBUG_LEVEL, PATH_TYPE = MY, MY.UI, MY.DEBUG_LEVEL, MY.PATH_TYPE
+local var2str, str2var, clone, empty, ipairs_r = LIB.var2str, LIB.str2var, LIB.clone, LIB.empty, LIB.ipairs_r
+local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
+local GetPatch, ApplyPatch = LIB.GetPatch, LIB.ApplyPatch
+local Get, Set, RandomChild, GetTraceback = LIB.Get, LIB.Set, LIB.RandomChild, LIB.GetTraceback
+local IsArray, IsDictionary, IsEquals = LIB.IsArray, LIB.IsDictionary, LIB.IsEquals
+local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsNumber, LIB.IsFunction
+local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
+local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
+-------------------------------------------------------------------------------------------------------------
 
 local xmlDecode = function(xml)
 	local function str2var(str)
@@ -23,17 +51,17 @@ local xmlDecode = function(xml)
 			return tonumber(str)
 		end
 	end
-	local tinsert, tremove, tconcat = table.insert, table.remove, table.concat
+	local insert, remove, concat = table.insert, table.remove, table.concat
 	local find, sub, gsub, char, byte = string.find, string.sub, string.gsub, string.char, string.byte
 	local function bytes2string(bytes)
 		local count = #bytes
 		if count > 100 then
 			local t, i = {}, 1
 			while i <= count do
-				tinsert(t, char(unpack(bytes, i, math.min(i + 99, count))))
+				insert(t, char(unpack(bytes, i, math.min(i + 99, count))))
 				i = i + 100
 			end
-			return tconcat(t)
+			return concat(t)
 		else
 			return char(unpack(bytes))
 		end
@@ -73,20 +101,20 @@ local xmlDecode = function(xml)
 			if byte_current == byte_gt then
 				state = 'text'
 				p1 = { ['.'] = xml:sub(pos1, pos - 1), [''] = {} }
-				tinsert(stack, p1)
-				tinsert(p, p1)
+				insert(stack, p1)
+				insert(p, p1)
 				p = p1
 			elseif byte_current == byte_space then
 				state = 'attribute'
 				p1 = { ['.'] = xml:sub(pos1, pos - 1), [''] = {} }
-				tinsert(stack, p1)
-				tinsert(p, p1)
+				insert(stack, p1)
+				insert(p, p1)
 				p = p1
 			end
 		elseif state == 'label_closing' then
 			if byte_current == byte_gt then
 				state = 'text'
-				tremove(stack)
+				remove(stack)
 				p = stack[#stack] or t
 			end
 		elseif state == 'attribute' then
@@ -131,14 +159,14 @@ local xmlDecode = function(xml)
 				elseif byte_current == byte_char_t then
 					byte_current = byte_tab
 				end
-				tinsert(bytes_string, byte_current)
+				insert(bytes_string, byte_current)
 			elseif byte_current == byte_escape then
 				b_escaping = true
 			elseif byte_current == byte_quote then
 				p[key] = bytes2string(bytes_string)
 				state = 'attribute'
 			else
-				tinsert(bytes_string, byte_current)
+				insert(bytes_string, byte_current)
 			end
 		elseif state == 'attribute_value' then
 			if byte_current == byte_space then
@@ -183,14 +211,14 @@ local xmlDecode = function(xml)
 				elseif byte_current == byte_char_t then
 					byte_current = byte_tab
 				end
-				tinsert(bytes_string, byte_current)
+				insert(bytes_string, byte_current)
 			elseif byte_current == byte_escape then
 				b_escaping = true
 			elseif byte_current == byte_quote then
 				p[''][key] = bytes2string(bytes_string)
 				state = 'text'
 			else
-				tinsert(bytes_string, byte_current)
+				insert(bytes_string, byte_current)
 			end
 		elseif state == 'text_value' then
 			if byte_current == byte_space then
@@ -214,22 +242,22 @@ local xmlEscape = function(str)
 end
 
 local bytes2string = function(bytes)
-	local char, tinsert, tconcat, unpack = string.char, tinsert, tconcat, unpack
+	local char, insert, concat, unpack = string.char, insert, concat, unpack
 	local count = #bytes
 	if count > 100 then
 		local t, i = {}, 1
 		while i <= count do
-			tinsert(t, char(unpack(bytes, i, math.min(i + 99, count))))
+			insert(t, char(unpack(bytes, i, math.min(i + 99, count))))
 			i = i + 100
 		end
-		return tconcat(t)
+		return concat(t)
 	else
 		return char(unpack(bytes))
 	end
 end
 
 local xmlUnescape = function(str)
-	local bytes2string, tinsert, byte = bytes2string, tinsert, string.byte
+	local bytes2string, insert, byte = bytes2string, insert, string.byte
 	local bytes_string, b_escaping, len, byte_current = {}, false, #str
 	local byte_char_n, byte_char_t, byte_lf, byte_tab, byte_escape = (byte('n')), (byte('t')), (byte('\n')), (byte('\t')), (byte('\\'))
 	for i = 1, len do
@@ -241,11 +269,11 @@ local xmlUnescape = function(str)
 			elseif byte_current == byte_char_t then
 				byte_current = byte_tab
 			end
-			tinsert(bytes_string, byte_current)
+			insert(bytes_string, byte_current)
 		elseif byte_current == byte_escape then
 			b_escaping = true
 		else
-			tinsert(bytes_string, byte_current)
+			insert(bytes_string, byte_current)
 		end
 	end
 	return bytes2string(bytes_string)
@@ -257,61 +285,61 @@ xmlEncode = function(xml)
 
 	-- head
 	if xml['.'] then
-		tinsert(t, '<')
-		tinsert(t, xml['.'])
+		insert(t, '<')
+		insert(t, xml['.'])
 
 		-- attributes
 		local attr = ''
 		for k, v in pairs(xml) do
 			if type(k) == 'string' and string.find(k, '^[a-zA-Z0-9_]+$') then
-				tinsert(t, ' ')
-				tinsert(t, k)
-				tinsert(t, '=')
+				insert(t, ' ')
+				insert(t, k)
+				insert(t, '=')
 				if type(v) == 'string' then
-					tinsert(t, '"')
-					tinsert(t, xmlEscape(v))
-					tinsert(t, '"')
+					insert(t, '"')
+					insert(t, xmlEscape(v))
+					insert(t, '"')
 				elseif type(v) == 'boolean' then
-					tinsert(t, (( v and 'true' ) or 'false'))
+					insert(t, (( v and 'true' ) or 'false'))
 				else
-					tinsert(t, tostring(v))
+					insert(t, tostring(v))
 				end
 			end
 		end
 
-		tinsert(t, '>')
+		insert(t, '>')
 	end
 	-- inner attritubes
 	local text = ''
 	if xml[''] then
 		for k, v in pairs(xml['']) do
-			tinsert(t, ' ')
-			tinsert(t, k)
-			tinsert(t, '=')
+			insert(t, ' ')
+			insert(t, k)
+			insert(t, '=')
 			if type(v) == 'string' then
-				tinsert(t, '"')
-				tinsert(t, xmlEscape(v))
-				tinsert(t, '"')
+				insert(t, '"')
+				insert(t, xmlEscape(v))
+				insert(t, '"')
 			elseif type(v) == 'boolean' then
-				tinsert(t, (( v and 'true' ) or 'false'))
+				insert(t, (( v and 'true' ) or 'false'))
 			else
-				tinsert(t, tostring(v))
+				insert(t, tostring(v))
 			end
 		end
 	end
 
 	-- children
 	for _, v in ipairs(xml) do
-		tinsert(t, xmlEncode(v))
+		insert(t, xmlEncode(v))
 	end
 
 	if xml['.'] then
-		tinsert(t, '</')
-		tinsert(t, xml['.'])
-		tinsert(t, '>')
+		insert(t, '</')
+		insert(t, xml['.'])
+		insert(t, '>')
 	end
 
-	return (tconcat(t))
+	return (concat(t))
 end
 
 local xml2Text = function(xml)
@@ -320,11 +348,11 @@ local xml2Text = function(xml)
 	if xmls then
 		for _, xml in ipairs(xmls) do
 			if xml[''] then
-				tinsert(t, xml[''].text)
+				insert(t, xml[''].text)
 			end
 		end
 	end
-	return tconcat(t)
+	return concat(t)
 end
 
 local function GetNodeType(node)
@@ -337,30 +365,30 @@ end
 
 -- public API
 MY = MY or {}
-MY.Xml = MY.Xml or {}
+LIB.Xml = LIB.Xml or {}
 
 -- 解析 XML 数据，成功返回数据，失败返回 nil 加错误信息
--- (mixed) MY.Xml.Decode(string szData)
-MY.Xml.Decode = xmlDecode
+-- (mixed) LIB.Xml.Decode(string szData)
+LIB.Xml.Decode = xmlDecode
 
 -- 编码 XML 数据，成功返回 XML 字符串，失败返回 nil
--- (string) MY.Xml.Encode(tData)
+-- (string) LIB.Xml.Encode(tData)
 -- tData 变量数据，Table保存的XML数据
-MY.Xml.Encode = xmlEncode
+LIB.Xml.Encode = xmlEncode
 
 -- 转义 XML 字符串
--- (string) MY.Xml.Escape(raw_str)
-MY.Xml.Escape = xmlEscape
+-- (string) LIB.Xml.Escape(raw_str)
+LIB.Xml.Escape = xmlEscape
 
 -- 反转义 XML 字符串
--- (string) MY.Xml.Unescape(escaped_str)
-MY.Xml.Unescape = xmlUnescape
+-- (string) LIB.Xml.Unescape(escaped_str)
+LIB.Xml.Unescape = xmlUnescape
 
 -- xml转纯文字
-MY.Xml.GetPureText = xml2Text
+LIB.Xml.GetPureText = xml2Text
 
 -- xml节点类型
-MY.Xml.GetNodeType = GetNodeType
+LIB.Xml.GetNodeType = GetNodeType
 
 -- xml节点属性
-MY.Xml.GetNodeData = GetNodeData
+LIB.Xml.GetNodeData = GetNodeData
