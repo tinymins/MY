@@ -25,7 +25,7 @@ local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
-local MY, UI = MY, MY.UI
+local MY, UI, DEBUG_LEVEL, PATH_TYPE = MY, MY.UI, MY.DEBUG_LEVEL, MY.PATH_TYPE
 local var2str, str2var, clone, empty, ipairs_r = MY.var2str, MY.str2var, MY.clone, MY.empty, MY.ipairs_r
 local spairs, spairs_r, sipairs, sipairs_r = MY.spairs, MY.spairs_r, MY.sipairs, MY.sipairs_r
 local GetPatch, ApplyPatch = MY.GetPatch, MY.ApplyPatch
@@ -173,7 +173,7 @@ local function CreateTable()
 end
 
 local function InitDB(force)
-	MY.Debug({'Initializing database...'}, 'MY_ChatLog', MY_DEBUG.LOG)
+	MY.Debug({'Initializing database...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
 
 	-- 数据库写入基本信息
 	DB:Execute('CREATE TABLE IF NOT EXISTS ChatLogInfo (key NVARCHAR(128), value NVARCHAR(4096), PRIMARY KEY (key))')
@@ -197,11 +197,11 @@ local function InitDB(force)
 				MY.Confirm(confirmtext, function()
 					OptimizeDB(true)
 				end)
-				return MY.Debug({'Initializing database performance alert...'}, 'MY_ChatLog', MY_DEBUG.LOG)
+				return MY.Debug({'Initializing database performance alert...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
 			end
 		end
 		-- 开始初始化
-		MY.Debug({'Creating database...'}, 'MY_ChatLog', MY_DEBUG.LOG)
+		MY.Debug({'Creating database...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
 		DB:Execute('BEGIN TRANSACTION')
 		DB:Execute('DROP TABLE IF EXISTS ChatLogUser')
 		-- 创建索引表
@@ -209,25 +209,25 @@ local function InitDB(force)
 		DB:Execute('CREATE INDEX IF NOT EXISTS ChatLogIndex_stime_idx ON ChatLogIndex(stime)')
 		-- 创建第一张记录表 并迁徙历史记录
 		local name = CreateTable()
-		MY.Debug({'Importing chatlog from v1 version...'}, 'MY_ChatLog', MY_DEBUG.LOG)
+		MY.Debug({'Importing chatlog from v1 version...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
 		local result = DB:Execute('SELECT name FROM sqlite_master WHERE type = \'table\' AND (name = \'ChatLog\' OR name LIKE \'ChatLog/_%/_%\' ESCAPE \'/\') ORDER BY name')
 		for _, rec in ipairs(result) do
 			DB:Execute('REPLACE INTO ' .. name .. ' SELECT * FROM ' .. rec.name)
 			DB:Execute('DROP TABLE ' .. rec.name)
 		end
 		DB:Execute('REPLACE INTO ChatLogIndex (name, stime, etime, count, detailcount) VALUES (\'' .. name .. '\', 0, -1, (SELECT count(*) FROM ' .. name .. '), \'\')')
-		MY.Debug({'Importing chatlog from v1 version finished...'}, 'MY_ChatLog', MY_DEBUG.LOG)
+		MY.Debug({'Importing chatlog from v1 version finished...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
 
 		DB:Execute('END TRANSACTION')
-		MY.Debug({'Creating database finished...'}, 'MY_ChatLog', MY_DEBUG.LOG)
+		MY.Debug({'Creating database finished...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
 	end
 	l_initialized = true
-	MY.Debug({'Initializing database finished...'}, 'MY_ChatLog', MY_DEBUG.LOG)
+	MY.Debug({'Initializing database finished...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
 
 	-- 导入旧版数据
 	local SZ_OLD_PATH = MY.FormatPath('userdata/CHAT_LOG/$uid/') -- %s/%s.$lang.jx3dat
 	if IsLocalFileExist(SZ_OLD_PATH) then
-		MY.Debug({'Importing old data...'}, 'MY_ChatLog', MY_DEBUG.LOG)
+		MY.Debug({'Importing old data...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
 		local nScanDays = 365 * 3
 		local nDailySec = 24 * 3600
 		local date = TimeToDate(GetCurrentTime())
@@ -263,13 +263,13 @@ local function InitDB(force)
 		end
 		PushDB()
 		CPath.DelDir(SZ_OLD_PATH)
-		MY.Debug({'Importing old data finished...'}, 'MY_ChatLog', MY_DEBUG.LOG)
+		MY.Debug({'Importing old data finished...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
 	end
 end
 
 function ConnectDB(force)
 	if not DB then
-		local DB_PATH = MY.FormatPath({'userdata/chat_log.db', MY_DATA_PATH.ROLE})
+		local DB_PATH = MY.FormatPath({'userdata/chat_log.db', PATH_TYPE.ROLE})
 		local SZ_OLD_PATH = MY.FormatPath('userdata/CHAT_LOG/$uid.db')
 		if IsLocalFileExist(SZ_OLD_PATH) then
 			CPath.Move(SZ_OLD_PATH, DB_PATH)
@@ -277,7 +277,7 @@ function ConnectDB(force)
 		MY.ConnectDatabase(_L['chat log'], DB_PATH, function(arg0)
 			DB = arg0
 			if not DB then
-				return MY.Debug({'Cannot connect to database!!!'}, 'MY_ChatLog', MY_DEBUG.ERROR)
+				return MY.Debug({'Cannot connect to database!!!'}, 'MY_ChatLog', DEBUG_LEVEL.ERROR)
 			end
 			InitDB(force)
 		end)
@@ -313,7 +313,7 @@ function FixSearchDB(deep)
 	if not ConnectDB(true) then
 		return
 	end
-	MY.Debug({'Fixing chatlog search indexes...'}, 'MY_ChatLog', MY_DEBUG.LOG)
+	MY.Debug({'Fixing chatlog search indexes...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
 	local count = 0
 	DB:Execute('BEGIN TRANSACTION')
 	local tables = DB:Execute('SELECT * FROM ChatLogIndex ORDER BY stime ASC')
@@ -328,7 +328,7 @@ function FixSearchDB(deep)
 		count = count + #result
 	end
 	DB:Execute('END TRANSACTION')
-	MY.Debug({'Fixing chatlog search indexes finished...'}, 'MY_ChatLog', MY_DEBUG.LOG)
+	MY.Debug({'Fixing chatlog search indexes finished...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
 	return count
 end
 
@@ -340,7 +340,7 @@ function OptimizeDB(deep)
 
 	-- 删除不在监控的频道
 	if deep then
-		MY.Debug({'Deleting unwatched channels...'}, 'MY_ChatLog', MY_DEBUG.LOG)
+		MY.Debug({'Deleting unwatched channels...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
 		local tables = DB:Execute('SELECT * FROM ChatLogIndex ORDER BY stime ASC')
 		-- 枚举所有监控的频道
 		local where = ''
@@ -360,14 +360,14 @@ function OptimizeDB(deep)
 			DB:Execute('DELETE FROM ' .. info.name .. where)
 			DB:Execute('UPDATE ChatLogIndex SET count = (SELECT count(*) FROM ' .. info.name .. '), detailcount = \'\' WHERE name = \'' .. info.name .. '\'')
 		end
-		MY.Debug({'Deleting unwatched channels finished...'}, 'MY_ChatLog', MY_DEBUG.LOG)
+		MY.Debug({'Deleting unwatched channels finished...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
 	end
 
 	-- 拆记录中的大表
 	local tables = DB:Execute('SELECT * FROM ChatLogIndex ORDER BY stime ASC')
 	for i, info in ipairs(tables) do
 		if info.count > DIVIDE_TABLE_AMOUNT then
-			MY.Debug({'Dividing large chatlog table: ' .. info.name}, 'MY_ChatLog', MY_DEBUG.LOG)
+			MY.Debug({'Dividing large chatlog table: ' .. info.name}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
 			-- 确定分割点
 			local etime = DB:Execute('SELECT time FROM ' .. info.name .. ' ORDER BY time ASC LIMIT 1 OFFSET ' .. (SINGLE_TABLE_AMOUNT - 1))[1].time
 			-- 创建新表/调整旧表
@@ -388,7 +388,7 @@ function OptimizeDB(deep)
 			newinfo.count = DB:Execute('SELECT count(*) AS count FROM ' .. newinfo.name)[1].count
 			DB:Execute('REPLACE INTO ChatLogIndex (name, stime, etime, count, detailcount) VALUES (\''
 				.. newinfo.name .. '\', ' .. newinfo.stime .. ', ' .. newinfo.etime .. ', ' .. newinfo.count .. ', \'\')')
-			MY.Debug({'Dividing large chatlog table ' .. info.name .. ' -> ' .. newinfo.name .. ' finished...'}, 'MY_ChatLog', MY_DEBUG.LOG)
+			MY.Debug({'Dividing large chatlog table ' .. info.name .. ' -> ' .. newinfo.name .. ' finished...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
 		end
 	end
 
@@ -398,32 +398,32 @@ function OptimizeDB(deep)
 		for i, info in ipairs(tables) do
 			local nextinfo = tables[i + 1]
 			if nextinfo and (info.count + nextinfo.count) <= DIVIDE_TABLE_AMOUNT then
-				MY.Debug({'Merging small chatlog table: ' .. info.name .. ', ' .. nextinfo.name}, 'MY_ChatLog', MY_DEBUG.LOG)
+				MY.Debug({'Merging small chatlog table: ' .. info.name .. ', ' .. nextinfo.name}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
 				DB:Execute('REPLACE INTO ' .. info.name .. ' SELECT * FROM ' .. nextinfo.name)
 				DB:Execute('DROP TABLE ' .. nextinfo.name)
 				DB:Execute('UPDATE ChatLogIndex SET count = (SELECT count(*) FROM ' .. info.name .. '), detailcount = \'\', etime = ' .. nextinfo.etime .. ' WHERE name = \'' .. info.name .. '\'')
 				DB:Execute('DELETE FROM ChatLogIndex WHERE name = \'' .. nextinfo.name .. '\'')
 				remove(tables, i + 1)
-				MY.Debug({'Merging small chatlog table (' .. info.name .. ', ' .. nextinfo.name .. ') finished...'}, 'MY_ChatLog', MY_DEBUG.LOG)
+				MY.Debug({'Merging small chatlog table (' .. info.name .. ', ' .. nextinfo.name .. ') finished...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
 			end
 		end
 	end
 
 	DB:Execute('END TRANSACTION')
 	if deep then
-		MY.Debug({'Compressing database...'}, 'MY_ChatLog', MY_DEBUG.LOG)
+		MY.Debug({'Compressing database...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
 		DB:Execute('VACUUM')
-		MY.Debug({'Compressing database finished...'}, 'MY_ChatLog', MY_DEBUG.LOG)
+		MY.Debug({'Compressing database finished...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
 	end
 end
 
 function PushDB()
 	if #aInsQueue == 0 and #aDelQueue == 0 then
-		return MY.Debug({'Pushing to database skipped due to empty queue...'}, 'MY_ChatLog', MY_DEBUG.LOG)
+		return MY.Debug({'Pushing to database skipped due to empty queue...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
 	elseif not ConnectDB() then
-		return MY.Debug({'Database has not been initialized yet, PushDB failed.'}, 'MY_ChatLog', MY_DEBUG.ERROR)
+		return MY.Debug({'Database has not been initialized yet, PushDB failed.'}, 'MY_ChatLog', DEBUG_LEVEL.ERROR)
 	end
-	MY.Debug({'Pushing to database...'}, 'MY_ChatLog', MY_DEBUG.LOG)
+	MY.Debug({'Pushing to database...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
 	local tables = DB:Execute('SELECT * FROM ChatLogIndex ORDER BY stime DESC')
 	DB:Execute('BEGIN TRANSACTION')
 	-- 插入记录
@@ -464,7 +464,7 @@ function PushDB()
 		end
 	end
 	DB:Execute('END TRANSACTION')
-	MY.Debug({'Pushing to database finished...'}, 'MY_ChatLog', MY_DEBUG.LOG)
+	MY.Debug({'Pushing to database finished...'}, 'MY_ChatLog', DEBUG_LEVEL.LOG)
 	FireUIEvent('ON_MY_CHATLOG_PUSHDB')
 end
 
@@ -1201,7 +1201,7 @@ function MY_ChatLog.ExportConfirm()
 				end
 			end
 			MY_ChatLog.Export(
-				MY.FormatPath({'export/ChatLog/$name@$server@' .. MY.FormatTime('yyyyMMddhhmmss') .. '.html', MY_DATA_PATH.ROLE}),
+				MY.FormatPath({'export/ChatLog/$name@$server@' .. MY.FormatTime('yyyyMMddhhmmss') .. '.html', PATH_TYPE.ROLE}),
 				aChannels, 10,
 				function(title, progress)
 					OutputMessage('MSG_ANNOUNCE_YELLOW', _L('Exporting chatlog: %s, %.2f%%.', title, progress * 100))
@@ -1373,7 +1373,7 @@ function PS.OnPanelActive(wnd)
 		x = x, y = y, w = 150,
 		text = _L['import chatlog'],
 		onclick = function()
-			local file = GetOpenFileName(_L['Please select your chatlog database file.'], 'Database File(*.db)\0*.db\0All Files(*.*)\0*.*\0\0', MY.FormatPath({'userdata/', MY_DATA_PATH.ROLE}))
+			local file = GetOpenFileName(_L['Please select your chatlog database file.'], 'Database File(*.db)\0*.db\0All Files(*.*)\0*.*\0\0', MY.FormatPath({'userdata/', PATH_TYPE.ROLE}))
 			if not empty(file) then
 				MY.Confirm(_L['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'], function()
 						MY.Alert(_L('%d chatlogs imported!', ImportDB(file)))

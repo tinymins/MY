@@ -25,7 +25,7 @@ local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
-local MY, UI = MY, MY.UI
+local MY, UI, DEBUG_LEVEL, PATH_TYPE = MY, MY.UI, MY.DEBUG_LEVEL, MY.PATH_TYPE
 local var2str, str2var, clone, empty, ipairs_r = MY.var2str, MY.str2var, MY.clone, MY.empty, MY.ipairs_r
 local spairs, spairs_r, sipairs, sipairs_r = MY.spairs, MY.spairs_r, MY.sipairs, MY.sipairs_r
 local GetPatch, ApplyPatch = MY.GetPatch, MY.ApplyPatch
@@ -327,21 +327,21 @@ end
 -- 读取公共数据
 function MY_Anmerkungen.LoadConfig()
 	if not GetClientPlayer() then
-		return MY.Debug({'Client player not exist! Cannot load config!'}, 'MY_Anmerkungen.LoadConfig', MY_DEBUG.ERROR)
+		return MY.Debug({'Client player not exist! Cannot load config!'}, 'MY_Anmerkungen.LoadConfig', DEBUG_LEVEL.ERROR)
 	end
-	local data = MY.LoadLUAData({'config/anmerkungen_static.jx3dat', MY_DATA_PATH.SERVER})
+	local data = MY.LoadLUAData({'config/anmerkungen_static.jx3dat', PATH_TYPE.SERVER})
 	if data then
 		STATIC_PLAYER_IDS = data.ids or {}
 		STATIC_PLAYER_NOTES = data.data or {}
 	end
 
-	local data = MY.LoadLUAData({'config/anmerkungen.jx3dat', MY_DATA_PATH.SERVER})
+	local data = MY.LoadLUAData({'config/anmerkungen.jx3dat', PATH_TYPE.SERVER})
 	if data then
 		PUBLIC_PLAYER_IDS = data.ids or {}
 		PUBLIC_PLAYER_NOTES = data.data or {}
 	end
 	local szOrgFile = MY.GetLUADataPath('config/PLAYER_NOTES/$relserver.$lang.jx3dat')
-	local szFilePath = MY.GetLUADataPath({'config/playernotes.jx3dat', MY_DATA_PATH.SERVER})
+	local szFilePath = MY.GetLUADataPath({'config/playernotes.jx3dat', PATH_TYPE.SERVER})
 	if IsLocalFileExist(szOrgFile) then
 		CPath.Move(szOrgFile, szFilePath)
 	end
@@ -363,13 +363,13 @@ function MY_Anmerkungen.LoadConfig()
 		MY_Anmerkungen.SaveConfig()
 	end
 
-	local data = MY.LoadLUAData({'config/anmerkungen.jx3dat', MY_DATA_PATH.ROLE})
+	local data = MY.LoadLUAData({'config/anmerkungen.jx3dat', PATH_TYPE.ROLE})
 	if data then
 		PRIVATE_PLAYER_IDS = data.ids or {}
 		PRIVATE_PLAYER_NOTES = data.data or {}
 	end
 	local szOrgFile = MY.GetLUADataPath('config/PLAYER_NOTES/$uid.$lang.jx3dat')
-	local szFilePath = MY.GetLUADataPath({'config/playernotes.jx3dat', MY_DATA_PATH.ROLE})
+	local szFilePath = MY.GetLUADataPath({'config/playernotes.jx3dat', PATH_TYPE.ROLE})
 	if IsLocalFileExist(szOrgFile) then
 		CPath.Move(szOrgFile, szFilePath)
 	end
@@ -398,13 +398,13 @@ function MY_Anmerkungen.SaveConfig()
 		ids = PUBLIC_PLAYER_IDS,
 		data = PUBLIC_PLAYER_NOTES,
 	}
-	MY.SaveLUAData({'config/anmerkungen.jx3dat', MY_DATA_PATH.SERVER}, data)
+	MY.SaveLUAData({'config/anmerkungen.jx3dat', PATH_TYPE.SERVER}, data)
 
 	local data = {
 		ids = PRIVATE_PLAYER_IDS,
 		data = PRIVATE_PLAYER_NOTES,
 	}
-	MY.SaveLUAData({'config/anmerkungen.jx3dat', MY_DATA_PATH.ROLE}, data)
+	MY.SaveLUAData({'config/anmerkungen.jx3dat', PATH_TYPE.ROLE}, data)
 end
 MY.RegisterInit('MY_ANMERKUNGEN', MY_Anmerkungen.LoadConfig)
 

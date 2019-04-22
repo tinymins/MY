@@ -25,7 +25,7 @@ local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
-local MY, UI = MY, MY.UI
+local MY, UI, DEBUG_LEVEL, PATH_TYPE = MY, MY.UI, MY.DEBUG_LEVEL, MY.PATH_TYPE
 local var2str, str2var, clone, empty, ipairs_r = MY.var2str, MY.str2var, MY.clone, MY.empty, MY.ipairs_r
 local spairs, spairs_r, sipairs, sipairs_r = MY.spairs, MY.spairs_r, MY.sipairs, MY.sipairs_r
 local GetPatch, ApplyPatch = MY.GetPatch, MY.ApplyPatch
@@ -35,10 +35,10 @@ local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumb
 local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = MY.MENU_DIVIDER, MY.EMPTY_TABLE, MY.XML_LINE_BREAKER
 --------------------------------------------------------------------------------------------------------
-MY.CreateDataRoot(MY_DATA_PATH.GLOBAL)
+MY.CreateDataRoot(PATH_TYPE.GLOBAL)
 
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_BagEx/lang/')
-local DB = MY.ConnectDatabase(_L['MY_BagStatistics'], {'userdata/bagstatistics.db', MY_DATA_PATH.GLOBAL})
+local DB = MY.ConnectDatabase(_L['MY_BagStatistics'], {'userdata/bagstatistics.db', PATH_TYPE.GLOBAL})
 if not DB then
 	return MY.Sysmsg({_L['Cannot connect to database!!!'], r = 255, g = 0, b = 0}, _L['MY_BagStatistics'])
 end
@@ -114,7 +114,7 @@ end
 MY.RegisterEvent('UPDATE_TONG_REPERTORY_PAGE.MY_BagStatistics', UpdateTongRepertoryPage)
 
 function PushDB()
-	MY.Debug({'Pushing to database...'}, 'MY_BagStatistics', MY_DEBUG.LOG)
+	MY.Debug({'Pushing to database...'}, 'MY_BagStatistics', DEBUG_LEVEL.LOG)
 	local me = GetClientPlayer()
 	local time = GetCurrentTime()
 	local ownerkey = AnsiToUTF8(me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName)
@@ -185,7 +185,7 @@ function PushDB()
 	end
 
 	DB:Execute('END TRANSACTION')
-	MY.Debug({'Pushing to database finished...'}, 'MY_BagStatistics', MY_DEBUG.LOG)
+	MY.Debug({'Pushing to database finished...'}, 'MY_BagStatistics', DEBUG_LEVEL.LOG)
 end
 MY.RegisterEvent('PLAYER_LEAVE_GAME.MY_BagStatistics', PushDB)
 end
@@ -368,7 +368,7 @@ function MY_BagStatistics.UpdateItems(frame)
 				hItem:Lookup('Shadow_ItemHover'):SetH(hItem:GetH())
 			end
 		else
-			MY.Debug({'KItemInfo not found: ' .. rec.tabtype .. ', ' .. rec.tabindex}, 'MY_BagStatistics', MY_DEBUG.WARNING)
+			MY.Debug({'KItemInfo not found: ' .. rec.tabtype .. ', ' .. rec.tabindex}, 'MY_BagStatistics', DEBUG_LEVEL.WARNING)
 		end
 	end
 	handle:FormatAllItemPos()

@@ -25,7 +25,7 @@ local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
-local MY, UI = MY, MY.UI
+local MY, UI, DEBUG_LEVEL, PATH_TYPE = MY, MY.UI, MY.DEBUG_LEVEL, MY.PATH_TYPE
 local var2str, str2var, clone, empty, ipairs_r = MY.var2str, MY.str2var, MY.clone, MY.empty, MY.ipairs_r
 local spairs, spairs_r, sipairs, sipairs_r = MY.spairs, MY.spairs_r, MY.sipairs, MY.sipairs_r
 local GetPatch, ApplyPatch = MY.GetPatch, MY.ApplyPatch
@@ -93,7 +93,7 @@ local _GKP = {
 		},
 	},
 }
-_GKP.Config = MY.LoadLUAData({'config/gkp.cfg', MY_DATA_PATH.GLOBAL}) or _GKP.Config
+_GKP.Config = MY.LoadLUAData({'config/gkp.cfg', PATH_TYPE.GLOBAL}) or _GKP.Config
 ---------------------------------------------------------------------->
 -- 数据处理
 ----------------------------------------------------------------------<
@@ -178,13 +178,13 @@ function _GKP.GeneDataInfo()
 end
 
 function _GKP.SaveConfig()
-	MY.SaveLUAData({'config/gkp.cfg', MY_DATA_PATH.GLOBAL}, _GKP.Config)
+	MY.SaveLUAData({'config/gkp.cfg', PATH_TYPE.GLOBAL}, _GKP.Config)
 end
 
 function _GKP.SaveData(bStorage)
 	local szPath = 'userdata/gkp/current.gkp'
 	if bStorage then
-		MY.SaveLUAData({szPath, MY_DATA_PATH.ROLE}, nil) -- 存储模式时清空当前存盘数据
+		MY.SaveLUAData({szPath, PATH_TYPE.ROLE}, nil) -- 存储模式时清空当前存盘数据
 		local i = 0
 		repeat
 			szPath = 'userdata/gkp/'
@@ -195,7 +195,7 @@ function _GKP.SaveData(bStorage)
 			i = i + 1
 		until not IsLocalFileExist(MY.FormatPath(szPath) .. '.jx3dat')
 	end
-	MY.SaveLUAData({szPath, MY_DATA_PATH.ROLE}, {
+	MY.SaveLUAData({szPath, PATH_TYPE.ROLE}, {
 		GKP_Map = MY_GKP('GKP_Map'),
 		GKP_Time = MY_GKP('GKP_Time'),
 		GKP_Record = MY_GKP('GKP_Record'),
@@ -207,7 +207,7 @@ end
 
 function _GKP.LoadData(szFile, bAbs)
 	if not bAbs then
-		szFile = {'userdata/' .. szFile .. '.gkp', MY_DATA_PATH.ROLE}
+		szFile = {'userdata/' .. szFile .. '.gkp', PATH_TYPE.ROLE}
 	end
 	local t = MY.LoadLUAData(szFile)
 	if t then
@@ -1008,7 +1008,7 @@ MY.RegisterEvent('ON_BG_CHANNEL_MSG.LR_GKP', function()
 		else
 			MY_GKP('GKP_Record', tab)
 		end
-		MY.Debug({'#MY_GKP# Sync From LR Success'}, 'MY_GKP', MY_DEBUG.LOG)
+		MY.Debug({'#MY_GKP# Sync From LR Success'}, 'MY_GKP', DEBUG_LEVEL.LOG)
 	end
 end)
 
@@ -1045,7 +1045,7 @@ MY.RegisterBgMsg('MY_GKP', function(_, nChannel, dwID, szName, bIsSelf, ...)
 					MY.Topmsg({_L['Sychoronization Complete']})
 					local tData, err = MY.JsonDecode(str)
 					if err then
-						MY.Debug({err}, 'MY_GKP', MY_DEBUG.ERROR)
+						MY.Debug({err}, 'MY_GKP', DEBUG_LEVEL.ERROR)
 						return _GKP.Sysmsg(_L['Abnormal with Data Sharing, Please contact and make feed back with the writer.'])
 					end
 					MY.Confirm(_L('Data Sharing Finished, you have one last chance to confirm wheather cover the current data with [%s]\'s data or not? \n data of team bidding: %s\n transation data: %s', szName, #tData.GKP_Record, #tData.GKP_Account), function()
@@ -1070,7 +1070,7 @@ MY.RegisterBgMsg('MY_GKP', function(_, nChannel, dwID, szName, bIsSelf, ...)
 						end
 					end
 				end
-				MY.Debug({'#MY_GKP# Sync Success'}, 'MY_GKP', MY_DEBUG.LOG)
+				MY.Debug({'#MY_GKP# Sync Success'}, 'MY_GKP', DEBUG_LEVEL.LOG)
 			end
 		end
 		if data[1] == 'GKP_INFO' then
@@ -1250,7 +1250,7 @@ function _GKP.RecoveryMenu()
 	local me = GetClientPlayer()
 	local menu = {}
 	local aFiles = {}
-	local szPath = MY.FormatPath({'userdata/gkp/', MY_DATA_PATH.ROLE}):sub(3):gsub('/', '\\'):sub(1, -2)
+	local szPath = MY.FormatPath({'userdata/gkp/', PATH_TYPE.ROLE}):sub(3):gsub('/', '\\'):sub(1, -2)
 	for i, filename in ipairs(CPath.GetFileList(szPath)) do
 		local year, month, day, hour, minute, second, index = filename:match('^(%d+)%-(%d+)%-(%d+)%-(%d+)%-(%d+)%-(%d+)%-(%d+).-%.gkp.jx3dat')
 		if not year then
@@ -1322,7 +1322,7 @@ function _GKP.RecoveryMenu()
 			local file = GetOpenFileName(
 				_L['Please select gkp file.'],
 				'GKP File(*.gkp,*.gkp.jx3dat)\0*.gkp;*.gkp.jx3dat\0All Files(*.*)\0*.*\0\0',
-				MY.FormatPath({'userdata/gkp', MY_DATA_PATH.ROLE})
+				MY.FormatPath({'userdata/gkp', PATH_TYPE.ROLE})
 			)
 			if not empty(file) then
 				MY.Confirm(_L['Are you sure to cover the current information with the last record data?'], function()

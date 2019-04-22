@@ -6,19 +6,35 @@
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
 --------------------------------------------------------
+--------------------------------------------------------------------------------------------------------
+-- these global functions are accessed all the time by the event handler
+-- so caching them is worth the effort
+--------------------------------------------------------------------------------------------------------
 local setmetatable = setmetatable
 local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
-local insert, remove, concat = table.insert, table.remove, table.concat
 local sub, len, format, rep = string.sub, string.len, string.format, string.rep
 local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
-local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local type, tonumber, tostring = type, tonumber, tostring
+local huge, pi, random, abs = math.huge, math.pi, math.random, math.abs
+local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
+local pow, sqrt, sin, cos, tan = math.pow, math.sqrt, math.sin, math.cos, math.tan
+local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
+local pack, unpack = table.pack or function(...) return {...} end, table.unpack or unpack
+-- jx3 apis caching
+local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
-local floor, min, max, ceil = math.floor, math.min, math.max, math.ceil
-local pow, sqrt, pi, cos, sin, atan = math.pow, math.sqrt, math.pi, math.cos, math.sin, math.atan
-local GetClientPlayer, GetPlayer, GetNpc = GetClientPlayer, GetPlayer, GetNpc
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-
+local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local MY, UI, DEBUG_LEVEL, PATH_TYPE = MY, MY.UI, MY.DEBUG_LEVEL, MY.PATH_TYPE
+local var2str, str2var, clone, empty, ipairs_r = MY.var2str, MY.str2var, MY.clone, MY.empty, MY.ipairs_r
+local spairs, spairs_r, sipairs, sipairs_r = MY.spairs, MY.spairs_r, MY.sipairs, MY.sipairs_r
+local GetPatch, ApplyPatch = MY.GetPatch, MY.ApplyPatch
+local Get, Set, RandomChild, GetTraceback = MY.Get, MY.Set, MY.RandomChild, MY.GetTraceback
+local IsArray, IsDictionary, IsEquals = MY.IsArray, MY.IsDictionary, MY.IsEquals
+local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumber, MY.IsFunction
+local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
+local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = MY.MENU_DIVIDER, MY.EMPTY_TABLE, MY.XML_LINE_BREAKER
+--------------------------------------------------------------------------------------------------------
 local PATH_ROOT = MY.GetAddonInfo().szRoot .. 'MY_GKP/'
 local _L = MY.LoadLangPack(PATH_ROOT .. 'lang/')
 
@@ -401,7 +417,7 @@ function MY_GKP_Loot.OnItemLButtonClick()
 		end
 		if data.bDist then
 			if not doodad then
-				MY.Debug({'Doodad does not exist!'}, 'MY_GKP_Loot:OnItemLButtonClick', MY_DEBUG.WARNING)
+				MY.Debug({'Doodad does not exist!'}, 'MY_GKP_Loot:OnItemLButtonClick', DEBUG_LEVEL.WARNING)
 				return Loot.RemoveLootList(dwDoodadID)
 			end
 			if not Loot.AuthCheck(dwDoodadID) then
@@ -577,7 +593,7 @@ function Loot.AuthCheck(dwID)
 	local me, team       = GetClientPlayer(), GetClientTeam()
 	local doodad         = GetDoodad(dwID)
 	if not doodad then
-		return MY.Debug({'Doodad does not exist!'}, 'MY_GKP_Loot:AuthCheck', MY_DEBUG.WARNING)
+		return MY.Debug({'Doodad does not exist!'}, 'MY_GKP_Loot:AuthCheck', DEBUG_LEVEL.WARNING)
 	end
 	local nLootMode      = team.nLootMode
 	local dwBelongTeamID = doodad.GetBelongTeamID()
@@ -625,12 +641,12 @@ function Loot.DistributeItem(dwID, dwDoodadID, dwItemID, info, bShift)
 	local me = GetClientPlayer()
 	local item = GetItem(dwItemID)
 	if not item then
-		MY.Debug({'Item does not exist, check!!'}, 'MY_GKP_Loot', MY_DEBUG.WARNING)
+		MY.Debug({'Item does not exist, check!!'}, 'MY_GKP_Loot', DEBUG_LEVEL.WARNING)
 		local szName, aItemData = Loot.GetDoodad(dwDoodadID)
 		for k, v in ipairs(aItemData) do
 			if v.nQuality == info.nQuality and GetItemNameByItem(v.item) == info.szName then
 				dwItemID = v.item.dwID
-				MY.Debug({'Item matching, ' .. GetItemNameByItem(v.item)}, 'MY_GKP_Loot', MY_DEBUG.LOG)
+				MY.Debug({'Item matching, ' .. GetItemNameByItem(v.item)}, 'MY_GKP_Loot', DEBUG_LEVEL.LOG)
 				break
 			end
 		end
@@ -825,13 +841,13 @@ function Loot.DrawLootList(dwID)
 			end
 		end
 	end
-	MY.Debug({(string.format('Doodad %d, items %d.', dwID, nCount))}, 'MY_GKP_Loot', MY_DEBUG.LOG)
+	MY.Debug({(string.format('Doodad %d, items %d.', dwID, nCount))}, 'MY_GKP_Loot', DEBUG_LEVEL.LOG)
 
 	if not szName or nCount == 0 then
 		if frame then
 			Loot.RemoveLootList(dwID)
 		end
-		return MY.Debug({'Doodad does not exist!'}, 'MY_GKP_Loot:DrawLootList', MY_DEBUG.LOG)
+		return MY.Debug({'Doodad does not exist!'}, 'MY_GKP_Loot:DrawLootList', DEBUG_LEVEL.LOG)
 	end
 
 	-- 获取/创建UI元素
@@ -999,7 +1015,7 @@ MY.RegisterEvent('OPEN_DOODAD', function()
 			return Loot.RemoveLootList(arg0)
 		end
 		Loot.DrawLootList(arg0)
-		MY.Debug({'Open Doodad: ' .. arg0}, 'MY_GKP_Loot', MY_DEBUG.LOG)
+		MY.Debug({'Open Doodad: ' .. arg0}, 'MY_GKP_Loot', DEBUG_LEVEL.LOG)
 		local hLoot = Station.Lookup('Normal/LootList')
 		if hLoot then
 			hLoot:SetAbsPos(4096, 4096)

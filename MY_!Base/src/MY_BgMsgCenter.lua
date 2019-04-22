@@ -25,7 +25,7 @@ local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
-local MY, UI = MY, MY.UI
+local MY, UI, DEBUG_LEVEL, PATH_TYPE = MY, MY.UI, MY.DEBUG_LEVEL, MY.PATH_TYPE
 local var2str, str2var, clone, empty, ipairs_r = MY.var2str, MY.str2var, MY.clone, MY.empty, MY.ipairs_r
 local spairs, spairs_r, sipairs, sipairs_r = MY.spairs, MY.spairs_r, MY.sipairs, MY.sipairs_r
 local GetPatch, ApplyPatch = MY.GetPatch, MY.ApplyPatch
@@ -161,7 +161,7 @@ local function OnSwitchMap(dwMapID, dwID, dwCopyID)
 	if not MY.IsInParty() then
 		return
 	end
-	MY.Debug({'Switch dungeon :' .. dwMapID}, 'MYLIB', MY_DEBUG.LOG)
+	MY.Debug({'Switch dungeon :' .. dwMapID}, 'MYLIB', DEBUG_LEVEL.LOG)
 	MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_SWITCH_MAP', dwMapID, dwID, dwCopyID)
 end
 
@@ -196,7 +196,7 @@ MY.RegisterEvent('ON_FRAME_CREATE.MYLIB#CD', function()
 	if btn then
 		HookTableFunc(btn, 'OnLButtonUp', OnCrossMapGoFB, { bAfterOrigin = true })
 	end
-	MY.Debug({'Cross panel hooked.'}, 'MYLIB', MY_DEBUG.LOG)
+	MY.Debug({'Cross panel hooked.'}, 'MYLIB', DEBUG_LEVEL.LOG)
 end)
 
 MY.RegisterEvent('MY_MESSAGE_BOX_ACTION.MYLIB#CD', function()

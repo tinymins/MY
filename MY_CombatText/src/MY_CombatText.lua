@@ -25,7 +25,7 @@ local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
-local MY, UI = MY, MY.UI
+local MY, UI, DEBUG_LEVEL, PATH_TYPE = MY, MY.UI, MY.DEBUG_LEVEL, MY.PATH_TYPE
 local var2str, str2var, clone, empty, ipairs_r = MY.var2str, MY.str2var, MY.clone, MY.empty, MY.ipairs_r
 local spairs, spairs_r, sipairs, sipairs_r = MY.spairs, MY.spairs_r, MY.sipairs, MY.sipairs_r
 local GetPatch, ApplyPatch = MY.GetPatch, MY.ApplyPatch
@@ -1203,9 +1203,9 @@ local function GetPlayerID()
 	local me = GetControlPlayer()
 	if me then
 		COMBAT_TEXT_PLAYERID = me.dwID
-		-- MY.Debug('CombatText get player id ' .. me.dwID, MY_DEBUG.LOG)
+		-- MY.Debug('CombatText get player id ' .. me.dwID, DEBUG_LEVEL.LOG)
 	else
-		MY.Sysmsg({'CombatText get player id failed!!! try again'}, MY_DEBUG.ERROR)
+		MY.Sysmsg({'CombatText get player id failed!!! try again'}, DEBUG_LEVEL.ERROR)
 		MY.DelayCall(1000, GetPlayerID)
 	end
 end

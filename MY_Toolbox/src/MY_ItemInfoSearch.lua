@@ -17,7 +17,7 @@ local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
-local MY, UI = MY, MY.UI
+local MY, UI, DEBUG_LEVEL, PATH_TYPE = MY, MY.UI, MY.DEBUG_LEVEL, MY.PATH_TYPE
 local var2str, str2var, clone, empty, ipairs_r = MY.var2str, MY.str2var, MY.clone, MY.empty, MY.ipairs_r
 local spairs, spairs_r, sipairs, sipairs_r = MY.spairs, MY.spairs_r, MY.sipairs, MY.sipairs_r
 local GetPatch, ApplyPatch = MY.GetPatch, MY.ApplyPatch
@@ -51,7 +51,7 @@ local function Init()
 					local nCount, nMaxCount = 0, 1000 -- 折半次数统计 1000次折半查找还没找到多半是BUG了 判断上限防止死循环
 					while true do
 						if nMaxL < 1 then
-							MY.Debug('ERROR CALC ITEM_TYPE_MAX: ' .. dwTabType .. ' (TOO SMALL)', MY_DEBUG.ERROR)
+							MY.Debug('ERROR CALC ITEM_TYPE_MAX: ' .. dwTabType .. ' (TOO SMALL)', DEBUG_LEVEL.ERROR)
 							break
 						elseif bMaxL and bMaxR then
 							nMaxR = nMaxR * 2
@@ -74,12 +74,12 @@ local function Init()
 									end
 								end
 							elseif not bMaxL and bMaxR then
-								MY.Debug('ERROR CALC ITEM_TYPE_MAX: ' .. dwTabType .. ' (NOT EXIST)', MY_DEBUG.ERROR)
+								MY.Debug('ERROR CALC ITEM_TYPE_MAX: ' .. dwTabType .. ' (NOT EXIST)', DEBUG_LEVEL.ERROR)
 								break
 							end
 						end
 						if nCount >= nMaxCount then
-							MY.Debug('ERROR CALC ITEM_TYPE_MAX: ' .. dwTabType .. ' (OVERFLOW)', MY_DEBUG.ERROR)
+							MY.Debug('ERROR CALC ITEM_TYPE_MAX: ' .. dwTabType .. ' (OVERFLOW)', DEBUG_LEVEL.ERROR)
 							break
 						end
 						nCount = nCount + 1

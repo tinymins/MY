@@ -630,23 +630,23 @@ MY = {
 	ApplyPatch   = ApplyPatch  ,
 	RandomChild  = RandomChild ,
 	GetTraceback = GetTraceback,
+	DEBUG_LEVEL = SetmetaReadonly({
+		LOG     = 0,
+		PMLOG   = 0,
+		WARNING = 1,
+		ERROR   = 2,
+	}),
+	PATH_TYPE = SetmetaReadonly({
+		NORMAL = 0,
+		ROLE   = 1,
+		GLOBAL = 2,
+		SERVER = 3,
+	}),
 	MENU_DIVIDER     = MENU_DIVIDER    ,
 	EMPTY_TABLE      = EMPTY_TABLE     ,
 	XML_LINE_BREAKER = XML_LINE_BREAKER,
 	EQUIPMENT_SUIT_COUNT = EQUIPMENT_SUIT_COUNT or 4,
 }
-MY_DEBUG = SetmetaReadonly({
-	LOG     = 0,
-	PMLOG   = 0,
-	WARNING = 1,
-	ERROR   = 2,
-})
-MY_DATA_PATH = SetmetaReadonly({
-	NORMAL = 0,
-	ROLE   = 1,
-	GLOBAL = 2,
-	SERVER = 3,
-})
 ---------------------------------------------------------------------------------------------
 -- 本地函数变量
 ---------------------------------------------------------------------------------------------

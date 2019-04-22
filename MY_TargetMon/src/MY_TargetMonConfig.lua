@@ -25,7 +25,7 @@ local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
-local MY, UI = MY, MY.UI
+local MY, UI, DEBUG_LEVEL, PATH_TYPE = MY, MY.UI, MY.DEBUG_LEVEL, MY.PATH_TYPE
 local var2str, str2var, clone, empty, ipairs_r = MY.var2str, MY.str2var, MY.clone, MY.empty, MY.ipairs_r
 local spairs, spairs_r, sipairs, sipairs_r = MY.spairs, MY.spairs_r, MY.sipairs, MY.sipairs_r
 local GetPatch, ApplyPatch = MY.GetPatch, MY.ApplyPatch
@@ -42,10 +42,10 @@ if not MY.AssertVersion('MY_TargetMon', _L['MY_TargetMon'], 0x2011800) then
 end
 local C, D = { PASSPHRASE = {213, 166, 13}, PASSPHRASE_EMBEDDED = {211, 98, 5} }, {}
 local INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_TargetMon/ui/MY_TargetMon.ini'
-local ROLE_CONFIG_FILE = {'config/my_targetmon.jx3dat', MY_DATA_PATH.ROLE}
+local ROLE_CONFIG_FILE = {'config/my_targetmon.jx3dat', PATH_TYPE.ROLE}
 local TEMPLATE_CONFIG_FILE = MY.GetAddonInfo().szRoot .. 'MY_TargetMon/data/template/$lang.jx3dat'
 local EMBEDDED_CONFIG_ROOT = MY.GetAddonInfo().szRoot .. 'MY_Resource/data/targetmon/'
-local CUSTOM_DEFAULT_CONFIG_FILE = {'config/my_targetmon.jx3dat', MY_DATA_PATH.GLOBAL}
+local CUSTOM_DEFAULT_CONFIG_FILE = {'config/my_targetmon.jx3dat', PATH_TYPE.GLOBAL}
 local TARGET_TYPE_LIST = {
 	'CLIENT_PLAYER'  ,
 	'CONTROL_PLAYER' ,
@@ -90,7 +90,7 @@ end
 
 function D.LoadEmbeddedConfig()
 	if not IsString(C.PASSPHRASE) or not IsString(C.PASSPHRASE_EMBEDDED) then
-		return MY.Debug({'Passphrase cannot be empty!'}, 'MY_TargetMonConfig', MY_DEBUG.ERROR)
+		return MY.Debug({'Passphrase cannot be empty!'}, 'MY_TargetMonConfig', DEBUG_LEVEL.ERROR)
 	end
 	do -- auto generate embedded data
 		local DAT_ROOT = 'MY_Resource/data/targetmon/'

@@ -25,7 +25,7 @@ local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
-local MY, UI = MY, MY.UI
+local MY, UI, DEBUG_LEVEL, PATH_TYPE = MY, MY.UI, MY.DEBUG_LEVEL, MY.PATH_TYPE
 local var2str, str2var, clone, empty, ipairs_r = MY.var2str, MY.str2var, MY.clone, MY.empty, MY.ipairs_r
 local spairs, spairs_r, sipairs, sipairs_r = MY.spairs, MY.spairs_r, MY.sipairs, MY.sipairs_r
 local GetPatch, ApplyPatch = MY.GetPatch, MY.ApplyPatch
@@ -53,13 +53,13 @@ RegisterCustomData('MY_AutoChat.bAutoSelect1')
 
 function MY_AutoChat.LoadData()
 	local szOrgPath = MY.GetLUADataPath('config/AUTO_CHAT/data.$lang.jx3dat')
-	local szFilePath = MY.GetLUADataPath({'config/autochat.jx3dat', MY_DATA_PATH.GLOBAL})
+	local szFilePath = MY.GetLUADataPath({'config/autochat.jx3dat', PATH_TYPE.GLOBAL})
 	if IsLocalFileExist(szOrgPath) then
 		CPath.Move(szOrgPath, szFilePath)
 	end
 	_C.Data = MY.LoadLUAData(szFilePath) or MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_ToolBox/data/interact/$lang.jx3dat') or _C.Data
 end
-function MY_AutoChat.SaveData() MY.SaveLUAData({'config/autochat.jx3dat', MY_DATA_PATH.GLOBAL}, _C.Data) end
+function MY_AutoChat.SaveData() MY.SaveLUAData({'config/autochat.jx3dat', PATH_TYPE.GLOBAL}, _C.Data) end
 function MY_AutoChat.GetName(dwType, dwID)
 	if dwID == UI_GetClientPlayerID() then
 		return _L['Common'], _L['Common']
@@ -125,7 +125,7 @@ local function GetActiveDialoguePanel()
 end
 
 local function WindowSelect(dwIndex, dwID)
-	MY.Debug({'WindowSelect ' .. dwIndex .. ',' .. dwID}, 'AUTO_CHAT', MY_DEBUG.LOG)
+	MY.Debug({'WindowSelect ' .. dwIndex .. ',' .. dwID}, 'AUTO_CHAT', DEBUG_LEVEL.LOG)
 	return GetClientPlayer().WindowSelect(dwIndex, dwID)
 end
 

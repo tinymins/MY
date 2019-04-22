@@ -25,7 +25,7 @@ local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
-local MY, UI = MY, MY.UI
+local MY, UI, DEBUG_LEVEL, PATH_TYPE = MY, MY.UI, MY.DEBUG_LEVEL, MY.PATH_TYPE
 local var2str, str2var, clone, empty, ipairs_r = MY.var2str, MY.str2var, MY.clone, MY.empty, MY.ipairs_r
 local spairs, spairs_r, sipairs, sipairs_r = MY.spairs, MY.spairs_r, MY.sipairs, MY.sipairs_r
 local GetPatch, ApplyPatch = MY.GetPatch, MY.ApplyPatch
@@ -44,7 +44,7 @@ end
 ---------------------------------------------------------------
 -- 设置和数据
 ---------------------------------------------------------------
-MY.CreateDataRoot(MY_DATA_PATH.SERVER)
+MY.CreateDataRoot(PATH_TYPE.SERVER)
 
 MY_Farbnamen = MY_Farbnamen or {
 	bEnabled = true,
@@ -72,7 +72,7 @@ local function InitDB()
 	if DB_ERR_COUNT > DB_MAX_ERR_COUNT then
 		return false
 	end
-	DB = MY.ConnectDatabase(_L['MY_Farbnamen'], {'cache/player_info.v2.db', MY_DATA_PATH.SERVER})
+	DB = MY.ConnectDatabase(_L['MY_Farbnamen'], {'cache/player_info.v2.db', PATH_TYPE.SERVER})
 	if not DB then
 		local szMsg = _L['Cannot connect to database!!!']
 		if DB_ERR_COUNT > 0 then
@@ -94,7 +94,7 @@ local function InitDB()
 	-- 旧版文件缓存转换
 	local SZ_IC_PATH = MY.FormatPath('cache/PLAYER_INFO/$relserver/')
 	if IsLocalFileExist(SZ_IC_PATH) then
-		MY.Debug({'Farbnamen info cache trans from file to sqlite start!'}, 'MY_Farbnamen', MY_DEBUG.LOG)
+		MY.Debug({'Farbnamen info cache trans from file to sqlite start!'}, 'MY_Farbnamen', DEBUG_LEVEL.LOG)
 		DB:Execute('BEGIN TRANSACTION')
 		for i = 0, 999 do
 			local data = MY.LoadLUAData('cache/PLAYER_INFO/$relserver/DAT2/' .. i .. '.$lang.jx3dat')
@@ -107,9 +107,9 @@ local function InitDB()
 			end
 		end
 		DB:Execute('END TRANSACTION')
-		MY.Debug({'Farbnamen info cache trans from file to sqlite finished!'}, 'MY_Farbnamen', MY_DEBUG.LOG)
+		MY.Debug({'Farbnamen info cache trans from file to sqlite finished!'}, 'MY_Farbnamen', DEBUG_LEVEL.LOG)
 
-		MY.Debug({'Farbnamen tong cache trans from file to sqlite start!'}, 'MY_Farbnamen', MY_DEBUG.LOG)
+		MY.Debug({'Farbnamen tong cache trans from file to sqlite start!'}, 'MY_Farbnamen', DEBUG_LEVEL.LOG)
 		DB:Execute('BEGIN TRANSACTION')
 		for i = 0, 128 do
 			for j = 0, 128 do
@@ -124,15 +124,15 @@ local function InitDB()
 			end
 		end
 		DB:Execute('END TRANSACTION')
-		MY.Debug({'Farbnamen tong cache trans from file to sqlite finished!'}, 'MY_Farbnamen', MY_DEBUG.LOG)
+		MY.Debug({'Farbnamen tong cache trans from file to sqlite finished!'}, 'MY_Farbnamen', DEBUG_LEVEL.LOG)
 
-		MY.Debug({'Farbnamen cleaning file cache start: ' .. SZ_IC_PATH}, 'MY_Farbnamen', MY_DEBUG.LOG)
+		MY.Debug({'Farbnamen cleaning file cache start: ' .. SZ_IC_PATH}, 'MY_Farbnamen', DEBUG_LEVEL.LOG)
 		CPath.DelDir(SZ_IC_PATH)
-		MY.Debug({'Farbnamen cleaning file cache finished!'}, 'MY_Farbnamen', MY_DEBUG.LOG)
+		MY.Debug({'Farbnamen cleaning file cache finished!'}, 'MY_Farbnamen', DEBUG_LEVEL.LOG)
 	end
 
 	-- 转移V1旧版数据
-	local DB_V1_PATH = MY.FormatPath({'cache/player_info.db', MY_DATA_PATH.SERVER})
+	local DB_V1_PATH = MY.FormatPath({'cache/player_info.db', PATH_TYPE.SERVER})
 	if IsLocalFileExist(DB_V1_PATH) then
 		local DB_V1 = SQLite3_Open(DB_V1_PATH)
 		if DB_V1 then

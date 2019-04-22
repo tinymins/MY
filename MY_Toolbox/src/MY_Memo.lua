@@ -25,7 +25,7 @@ local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
-local MY, UI = MY, MY.UI
+local MY, UI, DEBUG_LEVEL, PATH_TYPE = MY, MY.UI, MY.DEBUG_LEVEL, MY.PATH_TYPE
 local var2str, str2var, clone, empty, ipairs_r = MY.var2str, MY.str2var, MY.clone, MY.empty, MY.ipairs_r
 local spairs, spairs_r, sipairs, sipairs_r = MY.spairs, MY.spairs_r, MY.sipairs, MY.sipairs_r
 local GetPatch, ApplyPatch = MY.GetPatch, MY.ApplyPatch
@@ -111,14 +111,14 @@ function D.Reload(bGlobal)
 end
 
 function D.LoadConfig()
-	local CFG = MY.LoadLUAData({'config/memo.jx3dat', MY_DATA_PATH.GLOBAL})
+	local CFG = MY.LoadLUAData({'config/memo.jx3dat', PATH_TYPE.GLOBAL})
 	if CFG then
 		for k, v in pairs(CFG) do
 			GLOBAL_MEMO[k] = v
 		end
 	end
 
-	local CFG = MY.LoadLUAData({'config/memo.jx3dat', MY_DATA_PATH.ROLE})
+	local CFG = MY.LoadLUAData({'config/memo.jx3dat', PATH_TYPE.ROLE})
 	if CFG then
 		for k, v in pairs(CFG) do
 			ROLE_MEMO[k] = v
@@ -134,14 +134,14 @@ function D.SaveConfig()
 		CFG[k] = v
 	end
 	CFG.bEnableGlobal = GLOBAL_MEMO.bEnable
-	MY.SaveLUAData({'config/memo.jx3dat', MY_DATA_PATH.ROLE}, CFG)
+	MY.SaveLUAData({'config/memo.jx3dat', PATH_TYPE.ROLE}, CFG)
 
 	local CFG = {}
 	for k, v in pairs(GLOBAL_MEMO) do
 		CFG[k] = v
 	end
 	CFG.bEnable = nil
-	MY.SaveLUAData({'config/memo.jx3dat', MY_DATA_PATH.GLOBAL}, CFG)
+	MY.SaveLUAData({'config/memo.jx3dat', PATH_TYPE.GLOBAL}, CFG)
 end
 
 function MY_Memo.IsEnable(bGlobal)

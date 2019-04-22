@@ -25,7 +25,7 @@ local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
-local MY, UI = MY, MY.UI
+local MY, UI, DEBUG_LEVEL, PATH_TYPE = MY, MY.UI, MY.DEBUG_LEVEL, MY.PATH_TYPE
 local var2str, str2var, clone, empty, ipairs_r = MY.var2str, MY.str2var, MY.clone, MY.empty, MY.ipairs_r
 local spairs, spairs_r, sipairs, sipairs_r = MY.spairs, MY.spairs_r, MY.sipairs, MY.sipairs_r
 local GetPatch, ApplyPatch = MY.GetPatch, MY.ApplyPatch
@@ -39,9 +39,9 @@ local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_MiddleMapMark/lang/')
 if not MY.AssertVersion('MY_MiddleMapMark', _L['MY_MiddleMapMark'], 0x2011800) then
 	return
 end
-MY.CreateDataRoot(MY_DATA_PATH.GLOBAL)
+MY.CreateDataRoot(PATH_TYPE.GLOBAL)
 local l_szKeyword, l_dwMapID, l_nMapIndex, l_renderTime = '', nil, nil, 0
-local DB = MY.ConnectDatabase(_L['MY_MiddleMapMark'], {'cache/npc_doodad_rec.v2.db', MY_DATA_PATH.GLOBAL})
+local DB = MY.ConnectDatabase(_L['MY_MiddleMapMark'], {'cache/npc_doodad_rec.v2.db', PATH_TYPE.GLOBAL})
 if not DB then
 	return MY.Sysmsg({_L['Cannot connect to database!!!'], r = 255, g = 0, b = 0}, _L['MY_MiddleMapMark'])
 end
@@ -103,7 +103,7 @@ if IsLocalFileExist(MY.FormatPath(SZ_CACHE_PATH)) then
 				DBD_W:BindAll(p.dwTemplateID, GeneDoodadInfoPosKey(dwMapID, p.nX, p.nY), dwMapID, p.nX, p.nY, AnsiToUTF8(p.szName))
 				DBD_W:Execute()
 			end
-			MY.Debug({'MiddleMapMark cache trans from file to sqlite finished!'}, 'MY_MiddleMapMark', MY_DEBUG.LOG)
+			MY.Debug({'MiddleMapMark cache trans from file to sqlite finished!'}, 'MY_MiddleMapMark', DEBUG_LEVEL.LOG)
 		end
 	end
 	DB:Execute('END TRANSACTION')

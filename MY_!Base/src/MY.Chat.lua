@@ -25,7 +25,7 @@ local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
-local MY, UI = MY, MY.UI
+local MY, UI, DEBUG_LEVEL, PATH_TYPE = MY, MY.UI, MY.DEBUG_LEVEL, MY.PATH_TYPE
 local var2str, str2var, clone, empty, ipairs_r = MY.var2str, MY.str2var, MY.clone, MY.empty, MY.ipairs_r
 local spairs, spairs_r, sipairs, sipairs_r = MY.spairs, MY.spairs_r, MY.sipairs, MY.sipairs_r
 local GetPatch, ApplyPatch = MY.GetPatch, MY.ApplyPatch
@@ -1161,13 +1161,13 @@ local function BeforeChatAppendItemFromString(h, szMsg, ...) -- h, szMsg, szChan
 				return h, '', ...
 			end
 		else
-			MY.Debug({msg}, 'HookChatPanel.FILTER#' .. szKey, MY_DEBUG.ERROR)
+			MY.Debug({msg}, 'HookChatPanel.FILTER#' .. szKey, DEBUG_LEVEL.ERROR)
 		end
 	end
 	for szKey, fnAction in pairs(CHAT_HOOK.BEFORE) do
 		local status = pcall(fnAction, h, szMsg, ...)
 		if not status then
-			MY.Debug({msg}, 'HookChatPanel.BEFORE#' .. szKey, MY_DEBUG.ERROR)
+			MY.Debug({msg}, 'HookChatPanel.BEFORE#' .. szKey, DEBUG_LEVEL.ERROR)
 		end
 	end
 	local nCount = h:GetItemCount()
@@ -1194,7 +1194,7 @@ local function AfterChatAppendItemFromString(h, ...)
 		for szKey, fnAction in pairs(CHAT_HOOK.AFTER) do
 			local status = pcall(fnAction, h, nStart, ...)
 			if not status then
-				MY.Debug({msg}, 'HookChatPanel.AFTER#' .. szKey, MY_DEBUG.ERROR)
+				MY.Debug({msg}, 'HookChatPanel.AFTER#' .. szKey, DEBUG_LEVEL.ERROR)
 			end
 		end
 	end

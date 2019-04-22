@@ -25,7 +25,7 @@ local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
-local MY, UI = MY, MY.UI
+local MY, UI, DEBUG_LEVEL, PATH_TYPE = MY, MY.UI, MY.DEBUG_LEVEL, MY.PATH_TYPE
 local var2str, str2var, clone, empty, ipairs_r = MY.var2str, MY.str2var, MY.clone, MY.empty, MY.ipairs_r
 local spairs, spairs_r, sipairs, sipairs_r = MY.spairs, MY.spairs_r, MY.sipairs, MY.sipairs_r
 local GetPatch, ApplyPatch = MY.GetPatch, MY.ApplyPatch
@@ -288,17 +288,17 @@ function MY.FormatPath(oFilePath, tParams)
 	if type(oFilePath) == 'table' then
 		szFilePath, ePathType = unpack(oFilePath)
 	else
-		szFilePath, ePathType = oFilePath, MY_DATA_PATH.NORMAL
+		szFilePath, ePathType = oFilePath, PATH_TYPE.NORMAL
 	end
 	-- Unified the directory separator
 	szFilePath = string.gsub(szFilePath, '\\', '/')
 	-- if it's relative path then complete path with '/MY@DATA/'
 	if szFilePath:sub(1, 2) ~= './' and szFilePath:sub(2, 3) ~= ':/' then
-		if ePathType == MY_DATA_PATH.GLOBAL then
+		if ePathType == PATH_TYPE.GLOBAL then
 			szFilePath = '!all-users@$lang/' .. szFilePath
-		elseif ePathType == MY_DATA_PATH.ROLE then
+		elseif ePathType == PATH_TYPE.ROLE then
 			szFilePath = '$uid@$lang/' .. szFilePath
-		elseif ePathType == MY_DATA_PATH.SERVER then
+		elseif ePathType == PATH_TYPE.SERVER then
 			szFilePath = '#$relserver@$lang/' .. szFilePath
 		end
 		szFilePath = MY.GetAddonInfo().szInterfaceRoot .. 'MY#DATA/' .. szFilePath
@@ -384,7 +384,7 @@ function MY.SaveLUAData(oFilePath, ...)
 	-- save data
 	local data = SaveLUAData(szFilePath, ...)
 	-- performance monitor
-	MY.Debug({_L('%s saved during %dms.', szFilePath, GetTickCount() - nStartTick)}, 'PMTool', MY_DEBUG.PMLOG)
+	MY.Debug({_L('%s saved during %dms.', szFilePath, GetTickCount() - nStartTick)}, 'PMTool', DEBUG_LEVEL.PMLOG)
 	return data
 end
 
@@ -396,7 +396,7 @@ function MY.LoadLUAData(oFilePath, ...)
 	-- load data
 	local data = LoadLUAData(szFilePath, ...)
 	-- performance monitor
-	MY.Debug({_L('%s loaded during %dms.', szFilePath, GetTickCount() - nStartTick)}, 'PMTool', MY_DEBUG.PMLOG)
+	MY.Debug({_L('%s loaded during %dms.', szFilePath, GetTickCount() - nStartTick)}, 'PMTool', DEBUG_LEVEL.PMLOG)
 	return data
 end
 
@@ -597,8 +597,8 @@ function MY.CreateDataRoot(ePathType)
 	end
 	CREATED[ePathType] = true
 	-- 创建目录
-	if ePathType == MY_DATA_PATH.ROLE then
-		CPath.MakeDir(MY.FormatPath({'$name/', MY_DATA_PATH.ROLE}))
+	if ePathType == PATH_TYPE.ROLE then
+		CPath.MakeDir(MY.FormatPath({'$name/', PATH_TYPE.ROLE}))
 	end
 	-- 版本更新时删除旧的临时目录
 	if IsLocalFileExist(MY.FormatPath({'temporary/', ePathType}))
@@ -752,8 +752,8 @@ function MY.PlaySound(nType, szFilePath, szCustomPath)
 	-- 播放自定义声音
 	if szCustomPath ~= '' then
 		for _, ePathType in ipairs({
-			MY_DATA_PATH.ROLE,
-			MY_DATA_PATH.GLOBAL,
+			PATH_TYPE.ROLE,
+			PATH_TYPE.GLOBAL,
 		}) do
 			local szPath = MY.FormatPath({ 'audio/' .. szCustomPath, ePathType })
 			if IsFileExist(szPath) then
@@ -773,7 +773,7 @@ function MY.PlaySound(nType, szFilePath, szCustomPath)
 end
 -- 加载注册数据
 MY.RegisterInit('MYLIB#INITDATA', function()
-	local t = MY.LoadLUAData({'config/initial.jx3dat', MY_DATA_PATH.GLOBAL})
+	local t = MY.LoadLUAData({'config/initial.jx3dat', PATH_TYPE.GLOBAL})
 	if t then
 		for v_name, v_data in pairs(t) do
 			MY.SetGlobalValue(v_name, v_data)
@@ -921,12 +921,12 @@ function MY.Ajax(settings)
 
 	if not settings.success then
 		settings.success = function(html, status)
-			MY.Debug({settings.url .. ' - SUCCESS'}, 'AJAX', MY_DEBUG.LOG)
+			MY.Debug({settings.url .. ' - SUCCESS'}, 'AJAX', DEBUG_LEVEL.LOG)
 		end
 	end
 	if not settings.error then
 		settings.error = function(html, status, success)
-			MY.Debug({settings.url .. ' - STATUS ' .. (success and status or 'failed')}, 'AJAX', MY_DEBUG.WARNING)
+			MY.Debug({settings.url .. ' - STATUS ' .. (success and status or 'failed')}, 'AJAX', DEBUG_LEVEL.WARNING)
 		end
 	end
 
@@ -975,30 +975,30 @@ function MY.Ajax(settings)
 		-- bind callback function
 		wWebCef.OnWebLoadEnd = function()
 			-- local szUrl, szTitle, szContent = this:GetLocationURL(), this:GetLocationName(), this:GetDocument()
-			-- MY.Debug({string.format('%s - %s', szTitle, szUrl)}, 'MYRRWC::OnDocumentComplete', MY_DEBUG.LOG)
+			-- MY.Debug({string.format('%s - %s', szTitle, szUrl)}, 'MYRRWC::OnDocumentComplete', DEBUG_LEVEL.LOG)
 			-- 注销超时处理时钟
 			MY.DelayCall('MYRRWC_TO_' .. RequestID, false)
 			-- 成功回调函数
 			-- if settings.success then
 			-- 	local status, err = pcall_this(settings.context, settings.success, szContent, 200, settings)
 			-- 	if not status then
-			-- 		MY.Debug({err}, 'MYRRWC::OnDocumentComplete::Callback', MY_DEBUG.ERROR)
+			-- 		MY.Debug({err}, 'MYRRWC::OnDocumentComplete::Callback', DEBUG_LEVEL.ERROR)
 			-- 	end
 			-- end
 			table.insert(MY_RRWC_FREE, RequestID)
 		end
 
 		-- do with this remote request
-		MY.Debug({settings.url}, 'MYRRWC', MY_DEBUG.LOG)
+		MY.Debug({settings.url}, 'MYRRWC', DEBUG_LEVEL.LOG)
 		-- register request timeout clock
 		if settings.timeout > 0 then
 			MY.DelayCall('MYRRWC_TO_' .. RequestID, settings.timeout, function()
-				MY.Debug({settings.url}, 'MYRRWC::Timeout', MY_DEBUG.WARNING) -- log
+				MY.Debug({settings.url}, 'MYRRWC::Timeout', DEBUG_LEVEL.WARNING) -- log
 				-- request timeout, call timeout function.
 				if settings.error then
 					local status, err = pcall_this(settings.context, settings.error, 'timeout', settings)
 					if not status then
-						MY.Debug({err}, 'MYRRWC::TIMEOUT', MY_DEBUG.ERROR)
+						MY.Debug({err}, 'MYRRWC::TIMEOUT', DEBUG_LEVEL.ERROR)
 					end
 				end
 				table.insert(MY_RRWC_FREE, RequestID)
@@ -1029,20 +1029,20 @@ function MY.Ajax(settings)
 		wWebPage.OnDocumentComplete = function()
 			local szUrl, szTitle, szContent = this:GetLocationURL(), this:GetLocationName(), this:GetDocument()
 			if szUrl ~= szTitle or szContent ~= '' then
-				MY.Debug({string.format('%s - %s', szTitle, szUrl)}, 'MYRRWP::OnDocumentComplete', MY_DEBUG.LOG)
+				MY.Debug({string.format('%s - %s', szTitle, szUrl)}, 'MYRRWP::OnDocumentComplete', DEBUG_LEVEL.LOG)
 				-- 注销超时处理时钟
 				MY.DelayCall('MYRRWP_TO_' .. RequestID, false)
 				-- 成功回调函数
 				if settings.success then
 					local status, err = pcall_this(settings.context, settings.success, szContent, 200, settings)
 					if not status then
-						MY.Debug({err}, 'MYRRWP::OnDocumentComplete::Callback', MY_DEBUG.ERROR)
+						MY.Debug({err}, 'MYRRWP::OnDocumentComplete::Callback', DEBUG_LEVEL.ERROR)
 					end
 				end
 				if settings.complete then
 					local status, err = pcall_this(settings.context, settings.complete, szContent, 200, true)
 					if not status then
-						MY.Debug({err}, 'MYRRWP::OnDocumentComplete::Callback::Complete', MY_DEBUG.ERROR)
+						MY.Debug({err}, 'MYRRWP::OnDocumentComplete::Callback::Complete', DEBUG_LEVEL.ERROR)
 					end
 				end
 				table.insert(MY_RRWP_FREE, RequestID)
@@ -1050,22 +1050,22 @@ function MY.Ajax(settings)
 		end
 
 		-- do with this remote request
-		MY.Debug({settings.url}, 'MYRRWP', MY_DEBUG.LOG)
+		MY.Debug({settings.url}, 'MYRRWP', DEBUG_LEVEL.LOG)
 		-- register request timeout clock
 		if settings.timeout > 0 then
 			MY.DelayCall('MYRRWP_TO_' .. RequestID, settings.timeout, function()
-				MY.Debug({settings.url}, 'MYRRWP::Timeout', MY_DEBUG.WARNING) -- log
+				MY.Debug({settings.url}, 'MYRRWP::Timeout', DEBUG_LEVEL.WARNING) -- log
 				-- request timeout, call timeout function.
 				if settings.error then
 					local status, err = pcall_this(settings.context, settings.error, 'timeout', settings)
 					if not status then
-						MY.Debug({err}, 'MYRRWP::TIMEOUT', MY_DEBUG.ERROR)
+						MY.Debug({err}, 'MYRRWP::TIMEOUT', DEBUG_LEVEL.ERROR)
 					end
 				end
 				if settings.complete then
 					local status, err = pcall_this(settings.context, settings.complete, '', 500, false)
 					if not status then
-						MY.Debug({err}, 'MYRRWP::TIMEOUT::Callback::Complete', MY_DEBUG.ERROR)
+						MY.Debug({err}, 'MYRRWP::TIMEOUT::Callback::Complete', DEBUG_LEVEL.ERROR)
 					end
 				end
 				table.insert(MY_RRWP_FREE, RequestID)
@@ -1107,7 +1107,7 @@ local function OnCurlRequestResult()
 		if settings.complete then
 			local status, err = pcall(settings.complete, html, status, bSuccess or dwBufferSize > 0)
 			if not status then
-				MY.Debug({GetTraceback('CURL # ' .. settings.url .. ' - complete - PCALL ERROR - ' .. err)}, MY_DEBUG.ERROR)
+				MY.Debug({GetTraceback('CURL # ' .. settings.url .. ' - complete - PCALL ERROR - ' .. err)}, DEBUG_LEVEL.ERROR)
 			end
 		end
 		if bSuccess then
@@ -1119,12 +1119,12 @@ local function OnCurlRequestResult()
 			-- end
 			local status, err = pcall(settings.success, html, status)
 			if not status then
-				MY.Debug({GetTraceback('CURL # ' .. settings.url .. ' - success - PCALL ERROR - ' .. err)}, MY_DEBUG.ERROR)
+				MY.Debug({GetTraceback('CURL # ' .. settings.url .. ' - success - PCALL ERROR - ' .. err)}, DEBUG_LEVEL.ERROR)
 			end
 		else
 			local status, err = pcall(settings.error, html, status, dwBufferSize ~= 0)
 			if not status then
-				MY.Debug({GetTraceback('CURL # ' .. settings.url .. ' - error - PCALL ERROR - ' .. err)}, MY_DEBUG.ERROR)
+				MY.Debug({GetTraceback('CURL # ' .. settings.url .. ' - error - PCALL ERROR - ' .. err)}, DEBUG_LEVEL.ERROR)
 			end
 		end
 		MY_CALL_AJAX[szKey] = nil
@@ -1171,7 +1171,7 @@ MY.BreatheCall('MYLIB#STORAGE_DATA', 200, function()
 	if MY.IsInDevMode() then
 		return 0
 	end
-	m_nStorageVer = MY.LoadLUAData({'config/storageversion.jx3dat', MY_DATA_PATH.ROLE}) or {}
+	m_nStorageVer = MY.LoadLUAData({'config/storageversion.jx3dat', PATH_TYPE.ROLE}) or {}
 	MY.Ajax({
 		type = 'post/json',
 		url = 'http://data.jx3.derzh.com/api/storage',
@@ -1220,7 +1220,7 @@ MY.BreatheCall('MYLIB#STORAGE_DATA', 200, function()
 	return 0
 end)
 MY.RegisterExit('MYLIB#STORAGE_DATA', function()
-	MY.SaveLUAData({'config/storageversion.jx3dat', MY_DATA_PATH.ROLE}, m_nStorageVer)
+	MY.SaveLUAData({'config/storageversion.jx3dat', PATH_TYPE.ROLE}, m_nStorageVer)
 end)
 -- 保存个人数据 方便网吧党和公司家里多电脑切换
 function MY.StorageData(szKey, oData)
@@ -1637,7 +1637,7 @@ end
 -- nLevel   Debug级别[低于当前设置值将不会输出]
 function MY.Debug(oContent, szTitle, nLevel)
 	if not IsNumber(nLevel) then
-		nLevel = MY_DEBUG.WARNING
+		nLevel = DEBUG_LEVEL.WARNING
 	end
 	if not IsString(szTitle) then
 		szTitle = 'MY DEBUG'
@@ -1646,21 +1646,21 @@ function MY.Debug(oContent, szTitle, nLevel)
 		oContent = { oContent }
 	end
 	if not oContent.r then
-		if nLevel == MY_DEBUG.LOG then
+		if nLevel == DEBUG_LEVEL.LOG then
 			oContent.r, oContent.g, oContent.b =   0, 255, 127
-		elseif nLevel == MY_DEBUG.WARNING then
+		elseif nLevel == DEBUG_LEVEL.WARNING then
 			oContent.r, oContent.g, oContent.b = 255, 170, 170
-		elseif nLevel == MY_DEBUG.ERROR then
+		elseif nLevel == DEBUG_LEVEL.ERROR then
 			oContent.r, oContent.g, oContent.b = 255,  86,  86
 		else
 			oContent.r, oContent.g, oContent.b = 255, 255, 0
 		end
 	end
 	if nLevel >= MY.GetAddonInfo().nDebugLevel then
-		Log('[MY_DEBUG][LEVEL_' .. nLevel .. '][' .. szTitle .. ']' .. concat(oContent, '\n'))
+		Log('[DEBUG_LEVEL][LEVEL_' .. nLevel .. '][' .. szTitle .. ']' .. concat(oContent, '\n'))
 		MY.Sysmsg(oContent, szTitle)
 	elseif nLevel >= MY.GetAddonInfo().nLogLevel then
-		Log('[MY_DEBUG][LEVEL_' .. nLevel .. '][' .. szTitle .. ']' .. concat(oContent, '\n'))
+		Log('[DEBUG_LEVEL][LEVEL_' .. nLevel .. '][' .. szTitle .. ']' .. concat(oContent, '\n'))
 	end
 end
 
@@ -2418,7 +2418,7 @@ function MY.CThreadCoor(arg0, arg1, arg2, arg3, arg4, arg5)
 	else
 		local cache = CACHE[szCtcKey]
 		if not cache then
-			MY.Debug({_L('Error: `%s` has not be registed!', szCtcKey)}, 'MY#SYS', MY_DEBUG.ERROR)
+			MY.Debug({_L('Error: `%s` has not be registed!', szCtcKey)}, 'MY#SYS', DEBUG_LEVEL.ERROR)
 		end
 		return CThreadCoor_Get(cache.ctcid) -- nX, nY, bFront
 	end
@@ -2463,11 +2463,11 @@ local function RenameDatabase(szCaption, szPath)
 end
 
 local function DuplicateDatabase(DB_SRC, DB_DST)
-	MY.Debug({'Duplicate database start.'}, szCaption, MY_DEBUG.LOG)
+	MY.Debug({'Duplicate database start.'}, szCaption, DEBUG_LEVEL.LOG)
 	-- 运行 DDL 语句 创建表和索引等
 	for _, rec in ipairs(DB_SRC:Execute('SELECT sql FROM sqlite_master')) do
 		DB_DST:Execute(rec.sql)
-		MY.Debug({'Duplicating database: ' .. rec.sql}, szCaption, MY_DEBUG.LOG)
+		MY.Debug({'Duplicating database: ' .. rec.sql}, szCaption, DEBUG_LEVEL.LOG)
 	end
 	-- 读取表名 依次复制
 	for _, rec in ipairs(DB_SRC:Execute('SELECT name FROM sqlite_master WHERE type=\'table\'')) do
@@ -2480,7 +2480,7 @@ local function DuplicateDatabase(DB_SRC, DB_DST)
 		local szColumns, szPlaceholders = concat(aColumns, ', '), concat(aPlaceholders, ', ')
 		local nCount, nPageSize = Get(DB_SRC:Execute('SELECT COUNT(*) AS count FROM ' .. szTableName), {1, 'count'}, 0), 10000
 		local DB_W = DB_DST:Prepare('REPLACE INTO ' .. szTableName .. ' (' .. szColumns .. ') VALUES (' .. szPlaceholders .. ')')
-		MY.Debug({'Duplicating table: ' .. szTableName .. ' (cols)' .. szColumns .. ' (count)' .. nCount}, szCaption, MY_DEBUG.LOG)
+		MY.Debug({'Duplicating table: ' .. szTableName .. ' (cols)' .. szColumns .. ' (count)' .. nCount}, szCaption, DEBUG_LEVEL.LOG)
 		-- 开始读取和写入数据
 		DB_DST:Execute('BEGIN TRANSACTION')
 		for i = 0, nCount / nPageSize do
@@ -2495,15 +2495,15 @@ local function DuplicateDatabase(DB_SRC, DB_DST)
 			end
 		end
 		DB_DST:Execute('END TRANSACTION')
-		MY.Debug({'Duplicating table finished: ' .. szTableName}, szCaption, MY_DEBUG.LOG)
+		MY.Debug({'Duplicating table finished: ' .. szTableName}, szCaption, DEBUG_LEVEL.LOG)
 	end
 end
 
 local function ConnectMalformedDatabase(szCaption, szPath, bAlert)
-	MY.Debug({'Fixing malformed database...'}, szCaption, MY_DEBUG.LOG)
+	MY.Debug({'Fixing malformed database...'}, szCaption, DEBUG_LEVEL.LOG)
 	local szMalformedPath = RenameDatabase(szCaption, szPath)
 	if not szMalformedPath then
-		MY.Debug({'Fixing malformed database failed... Move file failed...'}, szCaption, MY_DEBUG.LOG)
+		MY.Debug({'Fixing malformed database failed... Move file failed...'}, szCaption, DEBUG_LEVEL.LOG)
 		return 'FILE_LOCKED'
 	else
 		local DB_DST = SQLite3_Open(szPath)
@@ -2512,10 +2512,10 @@ local function ConnectMalformedDatabase(szCaption, szPath, bAlert)
 			DuplicateDatabase(DB_SRC, DB_DST)
 			DB_SRC:Release()
 			CPath.DelFile(szMalformedPath)
-			MY.Debug({'Fixing malformed database finished...'}, szCaption, MY_DEBUG.LOG)
+			MY.Debug({'Fixing malformed database finished...'}, szCaption, DEBUG_LEVEL.LOG)
 			return 'SUCCESS', DB_DST
 		elseif not DB_SRC then
-			MY.Debug({'Connect malformed database failed...'}, szCaption, MY_DEBUG.LOG)
+			MY.Debug({'Connect malformed database failed...'}, szCaption, DEBUG_LEVEL.LOG)
 			return 'TRANSFER_FAILED', DB_DST
 		end
 	end
@@ -2524,7 +2524,7 @@ end
 function MY.ConnectDatabase(szCaption, oPath, fnAction)
 	-- 尝试连接数据库
 	local szPath = MY.FormatPath(oPath)
-	MY.Debug({'Connect database: ' .. szPath}, szCaption, MY_DEBUG.LOG)
+	MY.Debug({'Connect database: ' .. szPath}, szCaption, DEBUG_LEVEL.LOG)
 	local DB = SQLite3_Open(szPath)
 	if not DB then
 		-- 连不上直接重命名原始文件并重新连接
@@ -2532,7 +2532,7 @@ function MY.ConnectDatabase(szCaption, oPath, fnAction)
 			DB = SQLite3_Open(szPath)
 		end
 		if not DB then
-			MY.Debug({'Cannot connect to database!!!'}, szCaption, MY_DEBUG.ERROR)
+			MY.Debug({'Cannot connect to database!!!'}, szCaption, DEBUG_LEVEL.ERROR)
 			if fnAction then
 				fnAction()
 			end
@@ -2548,9 +2548,9 @@ function MY.ConnectDatabase(szCaption, oPath, fnAction)
 		end
 		return DB
 	else
-		MY.Debug({'Malformed database detected...'}, szCaption, MY_DEBUG.ERROR)
+		MY.Debug({'Malformed database detected...'}, szCaption, DEBUG_LEVEL.ERROR)
 		for _, rec in ipairs(aRes or {}) do
-			MY.Debug({var2str(rec)}, szCaption, MY_DEBUG.ERROR)
+			MY.Debug({var2str(rec)}, szCaption, DEBUG_LEVEL.ERROR)
 		end
 		DB:Release()
 		if fnAction then

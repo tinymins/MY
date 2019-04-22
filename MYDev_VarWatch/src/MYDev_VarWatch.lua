@@ -25,7 +25,7 @@ local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
-local MY, UI = MY, MY.UI
+local MY, UI, DEBUG_LEVEL, PATH_TYPE = MY, MY.UI, MY.DEBUG_LEVEL, MY.PATH_TYPE
 local var2str, str2var, clone, empty, ipairs_r = MY.var2str, MY.str2var, MY.clone, MY.empty, MY.ipairs_r
 local spairs, spairs_r, sipairs, sipairs_r = MY.spairs, MY.spairs_r, MY.sipairs, MY.sipairs_r
 local GetPatch, ApplyPatch = MY.GetPatch, MY.ApplyPatch
@@ -44,7 +44,7 @@ local XML_LINE_BREAKER = XML_LINE_BREAKER
 local srep, tostring, string2byte = string.rep, tostring, string.byte
 local tconcat, tinsert, tremove = table.concat, table.insert, table.remove
 local type, next, print, pairs, ipairs = type, next, print, pairs, ipairs
-local DATA_PATH = {'config/dev_varwatch.jx3dat', MY_DATA_PATH.GLOBAL}
+local DATA_PATH = {'config/dev_varwatch.jx3dat', PATH_TYPE.GLOBAL}
 _C.tVarList = MY.LoadLUAData(DATA_PATH) or {}
 
 local function var2str_x(var, indent, level) -- 只解析一层table且不解析方法

@@ -25,7 +25,7 @@ local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
-local MY, UI = MY, MY.UI
+local MY, UI, DEBUG_LEVEL, PATH_TYPE = MY, MY.UI, MY.DEBUG_LEVEL, MY.PATH_TYPE
 local var2str, str2var, clone, empty, ipairs_r = MY.var2str, MY.str2var, MY.clone, MY.empty, MY.ipairs_r
 local spairs, spairs_r, sipairs, sipairs_r = MY.spairs, MY.spairs_r, MY.sipairs, MY.sipairs_r
 local GetPatch, ApplyPatch = MY.GetPatch, MY.ApplyPatch
@@ -45,11 +45,11 @@ local SERENDIPITY_STATUS = {
 local SERENDIPITY_LIST = {}
 do
 local Xtra = {
-	bEnable     = MY.FormatDataStructure(MY.LoadLUAData({'config/show_notify.jx3dat'           , MY_DATA_PATH.GLOBAL}), false),
-	bSound      = MY.FormatDataStructure(MY.LoadLUAData({'config/serendipity_sound.jx3dat'     , MY_DATA_PATH.GLOBAL}), true ),
-	bPreview    = MY.FormatDataStructure(MY.LoadLUAData({'config/serendipity_preview.jx3dat'   , MY_DATA_PATH.GLOBAL}), true ),
-	bAutoShare  = MY.FormatDataStructure(MY.LoadLUAData({'config/serendipity_autoshare.jx3dat' , MY_DATA_PATH.GLOBAL}), false),
-	bSilentMode = MY.FormatDataStructure(MY.LoadLUAData({'config/serendipity_silentmode.jx3dat', MY_DATA_PATH.GLOBAL}), true ),
+	bEnable     = MY.FormatDataStructure(MY.LoadLUAData({'config/show_notify.jx3dat'           , PATH_TYPE.GLOBAL}), false),
+	bSound      = MY.FormatDataStructure(MY.LoadLUAData({'config/serendipity_sound.jx3dat'     , PATH_TYPE.GLOBAL}), true ),
+	bPreview    = MY.FormatDataStructure(MY.LoadLUAData({'config/serendipity_preview.jx3dat'   , PATH_TYPE.GLOBAL}), true ),
+	bAutoShare  = MY.FormatDataStructure(MY.LoadLUAData({'config/serendipity_autoshare.jx3dat' , PATH_TYPE.GLOBAL}), false),
+	bSilentMode = MY.FormatDataStructure(MY.LoadLUAData({'config/serendipity_silentmode.jx3dat', PATH_TYPE.GLOBAL}), true ),
 }
 MY_Serendipity = setmetatable({}, {
 	__index = function(t, k)
@@ -75,15 +75,15 @@ MY_Serendipity = setmetatable({}, {
 					MY.DismissNotify(p.szKey)
 				end
 			end
-			MY.SaveLUAData({'config/show_notify.jx3dat', MY_DATA_PATH.GLOBAL}, v)
+			MY.SaveLUAData({'config/show_notify.jx3dat', PATH_TYPE.GLOBAL}, v)
 		elseif k == 'bSound' then
-			MY.SaveLUAData({'config/serendipity_sound.jx3dat', MY_DATA_PATH.GLOBAL}, v)
+			MY.SaveLUAData({'config/serendipity_sound.jx3dat', PATH_TYPE.GLOBAL}, v)
 		elseif k == 'bPreview' then
-			MY.SaveLUAData({'config/serendipity_preview.jx3dat', MY_DATA_PATH.GLOBAL}, v)
+			MY.SaveLUAData({'config/serendipity_preview.jx3dat', PATH_TYPE.GLOBAL}, v)
 		elseif k == 'bAutoShare' then
-			MY.SaveLUAData({'config/serendipity_autoshare.jx3dat', MY_DATA_PATH.GLOBAL}, v)
+			MY.SaveLUAData({'config/serendipity_autoshare.jx3dat', PATH_TYPE.GLOBAL}, v)
 		elseif k == 'bSilentMode' then
-			MY.SaveLUAData({'config/serendipity_silentmode.jx3dat', MY_DATA_PATH.GLOBAL}, v)
+			MY.SaveLUAData({'config/serendipity_silentmode.jx3dat', PATH_TYPE.GLOBAL}, v)
 		end
 		Xtra[k] = v
 	end,
@@ -102,7 +102,7 @@ MY.RegisterEvent('MY_NOTIFY_DISMISS', OnMyNotifyDismiss)
 end
 
 function D.GetSerendipityShareName(fnAction, bNoConfirm)
-	local szReporter = MY.LoadLUAData({'config/realname.jx3dat', MY_DATA_PATH.ROLE}) or GetClientPlayer().szName:gsub('@.-$', '')
+	local szReporter = MY.LoadLUAData({'config/realname.jx3dat', PATH_TYPE.ROLE}) or GetClientPlayer().szName:gsub('@.-$', '')
 	if bNoConfirm then
 		if fnAction then
 			fnAction(szReporter)
@@ -110,7 +110,7 @@ function D.GetSerendipityShareName(fnAction, bNoConfirm)
 	else
 		local function fnConfirm(szText)
 			if szText ~= szReporter then
-				MY.SaveLUAData({'config/realname.jx3dat', MY_DATA_PATH.ROLE}, szText)
+				MY.SaveLUAData({'config/realname.jx3dat', PATH_TYPE.ROLE}, szText)
 			end
 			if fnAction then
 				fnAction(szText)

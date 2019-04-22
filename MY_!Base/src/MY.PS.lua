@@ -25,7 +25,7 @@ local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
-local MY, UI = MY, MY.UI
+local MY, UI, DEBUG_LEVEL, PATH_TYPE = MY, MY.UI, MY.DEBUG_LEVEL, MY.PATH_TYPE
 local var2str, str2var, clone, empty, ipairs_r = MY.var2str, MY.str2var, MY.clone, MY.empty, MY.ipairs_r
 local spairs, spairs_r, sipairs, sipairs_r = MY.spairs, MY.spairs_r, MY.sipairs, MY.sipairs_r
 local GetPatch, ApplyPatch = MY.GetPatch, MY.ApplyPatch
@@ -325,7 +325,7 @@ function MY.SwitchTab(szID, bForceUpdate)
 			end
 		end
 		if not tab then
-			MY.Debug({_L('Cannot find tab: %s', szID)}, 'MY.SwitchTab#' .. szID, MY_DEBUG.WARNING)
+			MY.Debug({_L('Cannot find tab: %s', szID)}, 'MY.SwitchTab#' .. szID, DEBUG_LEVEL.WARNING)
 		end
 	end
 
@@ -371,7 +371,7 @@ function MY.SwitchTab(szID, bForceUpdate)
 	if wnd.OnPanelDeactive then
 		local res, err = pcall(wnd.OnPanelDeactive, wnd)
 		if not res then
-			MY.Debug({GetTraceback(err)}, 'MY#OnPanelDeactive', MY_DEBUG.ERROR)
+			MY.Debug({GetTraceback(err)}, 'MY#OnPanelDeactive', DEBUG_LEVEL.ERROR)
 		end
 	end
 	-- clear all events
@@ -436,9 +436,9 @@ function MY.SwitchTab(szID, bForceUpdate)
 			tip = _L['Realname, leave blank for anonymous.'],
 			tippostype = MY_TIP_POSTYPE.BOTTOM_TOP,
 			limit = 6,
-			text = MY.LoadLUAData({'config/realname.jx3dat', MY_DATA_PATH.ROLE}) or GetClientPlayer().szName:gsub('@.-$', ''),
+			text = MY.LoadLUAData({'config/realname.jx3dat', PATH_TYPE.ROLE}) or GetClientPlayer().szName:gsub('@.-$', ''),
 			onchange = function(szText)
-				MY.SaveLUAData({'config/realname.jx3dat', MY_DATA_PATH.ROLE}, szText)
+				MY.SaveLUAData({'config/realname.jx3dat', PATH_TYPE.ROLE}, szText)
 			end,
 			autovisible = function() return MY_Serendipity.bAutoShare end,
 		}, true):width()
@@ -479,7 +479,7 @@ function MY.SwitchTab(szID, bForceUpdate)
 			name = 'WndButton_UserPreferenceFolder',
 			text = _L['Open user preference folder'],
 			onclick = function()
-				local szRoot = MY.FormatPath({'', MY_DATA_PATH.ROLE})
+				local szRoot = MY.FormatPath({'', PATH_TYPE.ROLE})
 				if OpenFolder then
 					OpenFolder(szRoot)
 				end
@@ -491,7 +491,7 @@ function MY.SwitchTab(szID, bForceUpdate)
 			name = 'WndButton_ServerPreferenceFolder',
 			text = _L['Open server preference folder'],
 			onclick = function()
-				local szRoot = MY.FormatPath({'', MY_DATA_PATH.SERVER})
+				local szRoot = MY.FormatPath({'', PATH_TYPE.SERVER})
 				if OpenFolder then
 					OpenFolder(szRoot)
 				end
@@ -503,7 +503,7 @@ function MY.SwitchTab(szID, bForceUpdate)
 			name = 'WndButton_GlobalPreferenceFolder',
 			text = _L['Open global preference folder'],
 			onclick = function()
-				local szRoot = MY.FormatPath({'', MY_DATA_PATH.GLOBAL})
+				local szRoot = MY.FormatPath({'', PATH_TYPE.GLOBAL})
 				if OpenFolder then
 					OpenFolder(szRoot)
 				end
@@ -552,7 +552,7 @@ function MY.SwitchTab(szID, bForceUpdate)
 		if tab.fn.OnPanelActive then
 			local res, err = pcall(tab.fn.OnPanelActive, wnd)
 			if not res then
-				MY.Debug({GetTraceback(err)}, 'MY#OnPanelActive', MY_DEBUG.ERROR)
+				MY.Debug({GetTraceback(err)}, 'MY#OnPanelActive', DEBUG_LEVEL.ERROR)
 			end
 			wnd:FormatAllContentPos()
 		end
@@ -694,21 +694,21 @@ local function OnSizeChanged()
 	if hWndMainPanel.OnPanelResize then
 		local res, err = pcall(hWndMainPanel.OnPanelResize, hWndMainPanel)
 		if not res then
-			MY.Debug({GetTraceback(err)}, 'MY#OnPanelResize', MY_DEBUG.ERROR)
+			MY.Debug({GetTraceback(err)}, 'MY#OnPanelResize', DEBUG_LEVEL.ERROR)
 		end
 		hWndMainPanel:FormatAllContentPos()
 	elseif hWndMainPanel.OnPanelActive then
 		if hWndMainPanel.OnPanelDeactive then
 			local res, err = pcall(hWndMainPanel.OnPanelDeactive, hWndMainPanel)
 			if not res then
-				MY.Debug({GetTraceback(err)}, 'MY#OnPanelResize->OnPanelDeactive', MY_DEBUG.ERROR)
+				MY.Debug({GetTraceback(err)}, 'MY#OnPanelResize->OnPanelDeactive', DEBUG_LEVEL.ERROR)
 			end
 		end
 		hWndMainPanel:Clear()
 		hWndMainPanel:Lookup('', ''):Clear()
 		local res, err = pcall(hWndMainPanel.OnPanelActive, hWndMainPanel)
 		if not res then
-			MY.Debug({GetTraceback(err)}, 'MY#OnPanelResize->OnPanelActive', MY_DEBUG.ERROR)
+			MY.Debug({GetTraceback(err)}, 'MY#OnPanelResize->OnPanelActive', DEBUG_LEVEL.ERROR)
 		end
 		hWndMainPanel:FormatAllContentPos()
 	end

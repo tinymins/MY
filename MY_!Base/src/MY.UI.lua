@@ -25,7 +25,7 @@ local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
-local MY, UI = MY, MY.UI
+local MY, UI, DEBUG_LEVEL, PATH_TYPE = MY, MY.UI, MY.DEBUG_LEVEL, MY.PATH_TYPE
 local var2str, str2var, clone, empty, ipairs_r = MY.var2str, MY.str2var, MY.clone, MY.empty, MY.ipairs_r
 local spairs, spairs_r, sipairs, sipairs_r = MY.spairs, MY.spairs_r, MY.sipairs, MY.sipairs_r
 local GetPatch, ApplyPatch = MY.GetPatch, MY.ApplyPatch
@@ -1012,11 +1012,11 @@ function UI:append(arg0, arg1, arg2)
 				end
 				local frame = Wnd.OpenWindow(szFile, 'MY_TempWnd')
 				if not frame then
-					return MY.Debug({ _L('unable to open ini file [%s]', szFile) }, 'MY#UI#append', MY_DEBUG.ERROR)
+					return MY.Debug({ _L('unable to open ini file [%s]', szFile) }, 'MY#UI#append', DEBUG_LEVEL.ERROR)
 				end
 				local raw = frame:Lookup(szComponet)
 				if not raw then
-					MY.Debug({_L('can not find wnd component [%s:%s]', szFile, szComponet)}, 'MY#UI#append', MY_DEBUG.ERROR)
+					MY.Debug({_L('can not find wnd component [%s:%s]', szFile, szComponet)}, 'MY#UI#append', DEBUG_LEVEL.ERROR)
 				else
 					InitComponent(raw, szType)
 					raw:ChangeRelation(parentWnd, true, true)
@@ -1027,7 +1027,7 @@ function UI:append(arg0, arg1, arg2)
 			elseif sub(szType, 1, 3) ~= 'Wnd' and parentHandle then
 				raw = parentHandle:AppendItemFromIni(_szItemINI, szType)
 				if not raw then
-					return MY.Debug({ _L('unable to append handle item [%s]', szType) }, 'MY#UI:append', MY_DEBUG.ERROR)
+					return MY.Debug({ _L('unable to append handle item [%s]', szType) }, 'MY#UI:append', DEBUG_LEVEL.ERROR)
 				else
 					ui = ui:add(raw)
 				end
@@ -1877,7 +1877,7 @@ function UI:fadeTo(nTime, nOpacity, callback)
 				ui:show()
 				local nCurrentAlpha = fnCurrent(nStartAlpha, nOpacity, nTime, GetTime() - nStartTime)
 				ui:alpha(nCurrentAlpha)
-				-- MY.Debug(format('%d %d %d %d\n', nStartAlpha, nOpacity, nCurrentAlpha, (nStartAlpha - nCurrentAlpha)*(nCurrentAlpha - nOpacity)), 'fade', MY_DEBUG.LOG)
+				-- MY.Debug(format('%d %d %d %d\n', nStartAlpha, nOpacity, nCurrentAlpha, (nStartAlpha - nCurrentAlpha)*(nCurrentAlpha - nOpacity)), 'fade', DEBUG_LEVEL.LOG)
 				if (nStartAlpha - nCurrentAlpha)*(nCurrentAlpha - nOpacity) <= 0 then
 					ui:alpha(nOpacity)
 					pcall(callback, ui)
@@ -1934,7 +1934,7 @@ function UI:slideTo(nTime, nHeight, callback)
 				ui:show()
 				local nCurrentValue = fnCurrent(nStartValue, nHeight, nTime, GetTime()-nStartTime)
 				ui:height(nCurrentValue)
-				-- MY.Debug(format('%d %d %d %d\n', nStartValue, nHeight, nCurrentValue, (nStartValue - nCurrentValue)*(nCurrentValue - nHeight)), 'slide', MY_DEBUG.LOG)
+				-- MY.Debug(format('%d %d %d %d\n', nStartValue, nHeight, nCurrentValue, (nStartValue - nCurrentValue)*(nCurrentValue - nHeight)), 'slide', DEBUG_LEVEL.LOG)
 				if (nStartValue - nCurrentValue)*(nCurrentValue - nHeight) <= 0 then
 					ui:height(nHeight):toggle( nHeight ~= 0 )
 					pcall(callback)
@@ -2925,7 +2925,7 @@ function UI:itemInfo(...)
 				end
 				local res, err = pcall(UpdataItemInfoBoxObject, raw, unpack(data)) -- 防止itemtab不一样
 				if not res then
-					MY.Debug({ GetTraceback(err) }, 'MY#UI:itemInfo', MY_DEBUG.ERROR)
+					MY.Debug({ GetTraceback(err) }, 'MY#UI:itemInfo', DEBUG_LEVEL.ERROR)
 				end
 			end
 		end
@@ -2944,7 +2944,7 @@ function UI:boxInfo(nType, ...)
 			else
 				local res, err = pcall(UpdateBoxObject, raw, nType, ...) -- 防止itemtab内外网不一样
 				if not res then
-					MY.Debug({ GetTraceback(err) }, 'MY#UI:boxInfo', MY_DEBUG.ERROR)
+					MY.Debug({ GetTraceback(err) }, 'MY#UI:boxInfo', DEBUG_LEVEL.ERROR)
 				end
 			end
 		end
@@ -3243,7 +3243,7 @@ function UI:uievent(szEvent, fnEvent)
 								if #rets > 0 then
 									MY.Debug(
 										{ _L('Set return value failed, cause another hook has alreay take a returnval. [Path] %s', UI.GetTreePath(raw)) },
-										'UI:uievent#' .. szEvent .. ':' .. (p.id or 'Unnamed'), MY_DEBUG.WARNING
+										'UI:uievent#' .. szEvent .. ':' .. (p.id or 'Unnamed'), DEBUG_LEVEL.WARNING
 									)
 								else
 									rets = res
@@ -3640,7 +3640,7 @@ function UI:check(fnCheck, fnUncheck, bNoAutoBind)
 			end
 		end
 	else
-		MY.Debug({'fnCheck:'..type(fnCheck)..' fnUncheck:'..type(fnUncheck)}, 'ERROR UI:check', MY_DEBUG.ERROR)
+		MY.Debug({'fnCheck:'..type(fnCheck)..' fnUncheck:'..type(fnUncheck)}, 'ERROR UI:check', DEBUG_LEVEL.ERROR)
 	end
 end
 
@@ -4329,7 +4329,7 @@ function UI.OpenIconPanel(fnAction)
 							end
 						end
 					elseif not bMaxL and bMaxR then
-						MY.Debug('ERROR CALC MAX_ICON!', MY_DEBUG.ERROR)
+						MY.Debug('ERROR CALC MAX_ICON!', DEBUG_LEVEL.ERROR)
 						break
 					end
 				end
@@ -4700,7 +4700,7 @@ function UI.GetShadowHandle(szName)
 	local sh = frame:Lookup('', szName)
 	if not sh then
 		frame:Lookup('', ''):AppendItemFromString(format('<handle> name="%s" </handle>', szName))
-		MY.Debug({'Create sh # ' .. szName}, 'UI', MY_DEBUG.LOG)
+		MY.Debug({'Create sh # ' .. szName}, 'UI', DEBUG_LEVEL.LOG)
 		sh = frame:Lookup('', szName)
 	end
 	return sh

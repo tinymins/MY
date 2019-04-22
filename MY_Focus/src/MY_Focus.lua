@@ -25,7 +25,7 @@ local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
-local MY, UI = MY, MY.UI
+local MY, UI, DEBUG_LEVEL, PATH_TYPE = MY, MY.UI, MY.DEBUG_LEVEL, MY.PATH_TYPE
 local var2str, str2var, clone, empty, ipairs_r = MY.var2str, MY.str2var, MY.clone, MY.empty, MY.ipairs_r
 local spairs, spairs_r, sipairs, sipairs_r = MY.spairs, MY.spairs_r, MY.sipairs, MY.sipairs_r
 local GetPatch, ApplyPatch = MY.GetPatch, MY.ApplyPatch
@@ -139,7 +139,7 @@ function D.LoadStyleConfig()
 	if STYLE_CONFIG_CHANGED then
 		D.SaveConfig()
 	end
-	local config = MY.LoadLUAData({'config/focus/' .. O.szStyle .. '.jx3dat', MY_DATA_PATH.GLOBAL}) or {}
+	local config = MY.LoadLUAData({'config/focus/' .. O.szStyle .. '.jx3dat', PATH_TYPE.GLOBAL}) or {}
 	for k, v in pairs(STYLE_DEFAULT) do
 		if IsNil(config[k]) then
 			O[k] = clone(v)
@@ -159,12 +159,12 @@ function D.SaveStyleConfig()
 	for k, v in pairs(STYLE_DEFAULT) do
 		config[k] = O[k]
 	end
-	MY.SaveLUAData({'config/focus/' .. O.szStyle .. '.jx3dat', MY_DATA_PATH.GLOBAL}, config)
+	MY.SaveLUAData({'config/focus/' .. O.szStyle .. '.jx3dat', PATH_TYPE.GLOBAL}, config)
 	STYLE_CONFIG_CHANGED = false
 end
 
 function D.LoadConfig()
-	local config = MY.LoadLUAData({'config/focus.jx3dat', MY_DATA_PATH.ROLE}) or {}
+	local config = MY.LoadLUAData({'config/focus.jx3dat', PATH_TYPE.ROLE}) or {}
 	for k, v in pairs(BASIC_DEFAULT) do
 		if IsNil(config[k]) then
 			O[k] = clone(v)
@@ -181,7 +181,7 @@ function D.SaveConfig()
 		for k, v in pairs(BASIC_DEFAULT) do
 			config[k] = O[k]
 		end
-		MY.SaveLUAData({'config/focus.jx3dat', MY_DATA_PATH.ROLE}, config)
+		MY.SaveLUAData({'config/focus.jx3dat', PATH_TYPE.ROLE}, config)
 		BASIC_CONFIG_CHANGED = false
 	end
 	D.SaveStyleConfig()

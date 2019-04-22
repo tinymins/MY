@@ -25,7 +25,7 @@ local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
-local MY, UI = MY, MY.UI
+local MY, UI, DEBUG_LEVEL, PATH_TYPE = MY, MY.UI, MY.DEBUG_LEVEL, MY.PATH_TYPE
 local var2str, str2var, clone, empty, ipairs_r = MY.var2str, MY.str2var, MY.clone, MY.empty, MY.ipairs_r
 local spairs, spairs_r, sipairs, sipairs_r = MY.spairs, MY.spairs_r, MY.sipairs, MY.sipairs_r
 local GetPatch, ApplyPatch = MY.GetPatch, MY.ApplyPatch
@@ -96,7 +96,7 @@ _C.uiBoard = nil
 _C.szLuaData = 'config/chatmonitor.jx3dat'
 do local SZ_OLD_PATH = MY.FormatPath('config/MY_CHATMONITOR/cfg_$lang.jx3dat')
     if IsLocalFileExist(SZ_OLD_PATH) then
-        CPath.Move(SZ_OLD_PATH, MY.FormatPath({_C.szLuaData, MY_DATA_PATH.GLOBAL}))
+        CPath.Move(SZ_OLD_PATH, MY.FormatPath({_C.szLuaData, PATH_TYPE.GLOBAL}))
     end
 end
 _C.tChannelGroups = {
@@ -139,15 +139,15 @@ _C.nLastLoadDataTime = -1000000
 
 function D.SaveData()
     local TYPE = MY_ChatMonitor.bDistinctServer
-        and MY_DATA_PATH.SERVER or MY_DATA_PATH.ROLE
+        and PATH_TYPE.SERVER or PATH_TYPE.ROLE
     MY.SaveLUAData({DATA_FILE, TYPE}, {list = RECORD_LIST, hash = RECORD_HASH})
 end
 MY.RegisterExit(D.SaveData)
 
 function D.LoadData()
     local data = MY_ChatMonitor.bDistinctServer
-        and (MY.LoadLUAData({DATA_FILE, MY_DATA_PATH.SERVER}) or {})
-        or (MY.LoadLUAData({DATA_FILE, MY_DATA_PATH.ROLE}) or {})
+        and (MY.LoadLUAData({DATA_FILE, PATH_TYPE.SERVER}) or {})
+        or (MY.LoadLUAData({DATA_FILE, PATH_TYPE.ROLE}) or {})
     RECORD_LIST = data.list or {}
     RECORD_HASH = data.hash or {}
 end
@@ -316,7 +316,7 @@ _C.OnPanelActive = function(wnd)
         onchange = function(szText) MY_ChatMonitor.szKeyWords = szText end,
         onfocus = function(self)
             local source = {}
-            for _, szOpt in ipairs(MY.LoadLUAData({_C.szLuaData, MY_DATA_PATH.GLOBAL}) or {}) do
+            for _, szOpt in ipairs(MY.LoadLUAData({_C.szLuaData, PATH_TYPE.GLOBAL}) or {}) do
                 if type(szOpt) == 'string' then
                     table.insert(source, szOpt)
                 end
@@ -328,7 +328,7 @@ _C.OnPanelActive = function(wnd)
                 UI(this):autocomplete('close')
             else
                 local source = {}
-                for _, szOpt in ipairs(MY.LoadLUAData({_C.szLuaData, MY_DATA_PATH.GLOBAL}) or {}) do
+                for _, szOpt in ipairs(MY.LoadLUAData({_C.szLuaData, PATH_TYPE.GLOBAL}) or {}) do
                     if type(szOpt) == 'string' then
                         table.insert(source, szOpt)
                     end
@@ -348,12 +348,12 @@ _C.OnPanelActive = function(wnd)
                         GetUserInput('', function(szVal)
                             szVal = (string.gsub(szVal, '^%s*(.-)%s*$', '%1'))
                             if szVal~='' then
-                                local t = MY.LoadLUAData({_C.szLuaData, MY_DATA_PATH.GLOBAL}) or {}
+                                local t = MY.LoadLUAData({_C.szLuaData, PATH_TYPE.GLOBAL}) or {}
                                 for i = #t, 1, -1 do
                                     if t[i] == szVal then return end
                                 end
                                 table.insert(t, szVal)
-                                MY.SaveLUAData({_C.szLuaData, MY_DATA_PATH.GLOBAL}, t)
+                                MY.SaveLUAData({_C.szLuaData, PATH_TYPE.GLOBAL}, t)
                             end
                         end, function() end, function() end, nil, UI(wnd):text() )
                     end })
@@ -361,13 +361,13 @@ _C.OnPanelActive = function(wnd)
             },
             {
                 'option', 'beforeDelete', function(szOption, fnDoDelete, option)
-                    local t = MY.LoadLUAData({_C.szLuaData, MY_DATA_PATH.GLOBAL}) or {}
+                    local t = MY.LoadLUAData({_C.szLuaData, PATH_TYPE.GLOBAL}) or {}
                     for i = #t, 1, -1 do
                         if t[i] == szOption then
                             table.remove(t, i)
                         end
                     end
-                    MY.SaveLUAData({_C.szLuaData, MY_DATA_PATH.GLOBAL}, t)
+                    MY.SaveLUAData({_C.szLuaData, PATH_TYPE.GLOBAL}, t)
                 end,
             },
         },

@@ -25,7 +25,7 @@ local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
-local MY, UI = MY, MY.UI
+local MY, UI, DEBUG_LEVEL, PATH_TYPE = MY, MY.UI, MY.DEBUG_LEVEL, MY.PATH_TYPE
 local var2str, str2var, clone, empty, ipairs_r = MY.var2str, MY.str2var, MY.clone, MY.empty, MY.ipairs_r
 local spairs, spairs_r, sipairs, sipairs_r = MY.spairs, MY.spairs_r, MY.sipairs, MY.sipairs_r
 local GetPatch, ApplyPatch = MY.GetPatch, MY.ApplyPatch
@@ -52,7 +52,7 @@ local function EventHandler(szEvent, ...)
 		for k, v in pairs(tEvent) do
 			local res, err = pcall(v, szEvent, ...)
 			if not res then
-				MY.Debug({GetTraceback(err)}, 'OnEvent#' .. szEvent .. '.' .. k, MY_DEBUG.ERROR)
+				MY.Debug({GetTraceback(err)}, 'OnEvent#' .. szEvent .. '.' .. k, DEBUG_LEVEL.ERROR)
 			end
 		end
 	end
@@ -98,9 +98,9 @@ local function OnInit()
 	if not INIT_FUNC_LIST then
 		return
 	end
-	MY.CreateDataRoot(MY_DATA_PATH.ROLE)
-	MY.CreateDataRoot(MY_DATA_PATH.GLOBAL)
-	MY.CreateDataRoot(MY_DATA_PATH.SERVER)
+	MY.CreateDataRoot(PATH_TYPE.ROLE)
+	MY.CreateDataRoot(PATH_TYPE.GLOBAL)
+	MY.CreateDataRoot(PATH_TYPE.SERVER)
 
 	for szKey, fnAction in pairs(INIT_FUNC_LIST) do
 		local nStartTick = GetTickCount()
@@ -108,7 +108,7 @@ local function OnInit()
 		if not status then
 			MY.Debug({GetTraceback(err)}, 'INIT_FUNC_LIST#' .. szKey)
 		end
-		MY.Debug({_L('Initial function <%s> executed in %dms.', szKey, GetTickCount() - nStartTick)}, _L['PMTool'], MY_DEBUG.LOG)
+		MY.Debug({_L('Initial function <%s> executed in %dms.', szKey, GetTickCount() - nStartTick)}, _L['PMTool'], DEBUG_LEVEL.LOG)
 	end
 	INIT_FUNC_LIST = nil
 	-- œ‘ æª∂”≠–≈œ¢
@@ -152,7 +152,7 @@ local function OnExit()
 		if not status then
 			MY.Debug({GetTraceback(err)}, 'EXIT_FUNC_LIST#' .. szKey)
 		end
-		MY.Debug({_L('Exit function <%s> executed in %dms.', szKey, GetTickCount() - nStartTick)}, _L['PMTool'], MY_DEBUG.LOG)
+		MY.Debug({_L('Exit function <%s> executed in %dms.', szKey, GetTickCount() - nStartTick)}, _L['PMTool'], DEBUG_LEVEL.LOG)
 	end
 	EXIT_FUNC_LIST = nil
 end
@@ -192,7 +192,7 @@ local function OnReload()
 		if not status then
 			MY.Debug({GetTraceback(err)}, 'RELOAD_FUNC_LIST#' .. szKey)
 		end
-		MY.Debug({_L('Reload function <%s> executed in %dms.', szKey, GetTickCount() - nStartTick)}, _L['PMTool'], MY_DEBUG.LOG)
+		MY.Debug({_L('Reload function <%s> executed in %dms.', szKey, GetTickCount() - nStartTick)}, _L['PMTool'], DEBUG_LEVEL.LOG)
 	end
 	RELOAD_FUNC_LIST = nil
 end
@@ -234,7 +234,7 @@ local function OnIdle()
 		if not status then
 			MY.Debug({GetTraceback(err)}, 'IDLE_FUNC_LIST#' .. szKey)
 		end
-		MY.Debug({_L('Idle function <%s> executed in %dms.', szKey, GetTickCount() - nStartTick)}, _L['PMTool'], MY_DEBUG.LOG)
+		MY.Debug({_L('Idle function <%s> executed in %dms.', szKey, GetTickCount() - nStartTick)}, _L['PMTool'], DEBUG_LEVEL.LOG)
 	end
 	TIME = nTime
 end
@@ -302,7 +302,7 @@ function MY.RegisterModuleEvent(arg0, arg1)
 				nCount = nCount + 1
 			end
 			MODULE_LIST[szModule] = nil
-			MY.Debug({"Uninit # "  .. szModule .. " # Events Removed # " .. nCount}, 'MY#EVENT', MY_DEBUG.LOG)
+			MY.Debug({"Uninit # "  .. szModule .. " # Events Removed # " .. nCount}, 'MY#EVENT', DEBUG_LEVEL.LOG)
 		end
 	elseif IsTable(arg1) then
 		local nCount = 0
@@ -330,7 +330,7 @@ function MY.RegisterModuleEvent(arg0, arg1)
 			nCount = nCount + 1
 			tEvent[szKey] = { szEvent = szEvent }
 		end
-		MY.Debug({"Init # "  .. szModule .. " # Events Added # " .. nCount}, 'MY#EVENT', MY_DEBUG.LOG)
+		MY.Debug({"Init # "  .. szModule .. " # Events Added # " .. nCount}, 'MY#EVENT', DEBUG_LEVEL.LOG)
 	end
 end
 end
@@ -353,12 +353,12 @@ local function GetNextTutorial()
 	end
 end
 MY.RegisterInit(function()
-	CHECKED = MY.LoadLUAData({'config/tutorialed.jx3dat', MY_DATA_PATH.ROLE})
+	CHECKED = MY.LoadLUAData({'config/tutorialed.jx3dat', PATH_TYPE.ROLE})
 	if not IsTable(CHECKED) then
 		CHECKED = {}
 	end
 end)
-MY.RegisterExit(function() MY.SaveLUAData({'config/tutorialed.jx3dat', MY_DATA_PATH.ROLE}, CHECKED) end)
+MY.RegisterExit(function() MY.SaveLUAData({'config/tutorialed.jx3dat', PATH_TYPE.ROLE}, CHECKED) end)
 
 local function StepNext(bQuick)
 	local tutorial = GetNextTutorial()
@@ -462,7 +462,7 @@ local function OnBgMsg()
 		if p.fnProgress then
 			local status, err = pcall(p.fnProgress, szMsgID, nChannel, dwID, szName, bSelf, nSegCount, #BG_MSG_PART[szMsgUUID], nSegIndex)
 			if not status then
-				MY.Debug({GetTraceback(err)}, 'BG_EVENT_PROGRESS#' .. szMsgID .. '.' .. szKey, MY_DEBUG.ERROR)
+				MY.Debug({GetTraceback(err)}, 'BG_EVENT_PROGRESS#' .. szMsgID .. '.' .. szKey, DEBUG_LEVEL.ERROR)
 			end
 		end
 	end
@@ -475,11 +475,11 @@ local function OnBgMsg()
 			for szKey, p in pairs(BG_MSG_LIST[szMsgID]) do
 				local status, err = pcall(p.fnAction, szMsgID, nChannel, dwID, szName, bSelf, unpack(aParam))
 				if not status then
-					MY.Debug({GetTraceback(err)}, 'BG_EVENT#' .. szMsgID .. '.' .. szKey, MY_DEBUG.ERROR)
+					MY.Debug({GetTraceback(err)}, 'BG_EVENT#' .. szMsgID .. '.' .. szKey, DEBUG_LEVEL.ERROR)
 				end
 			end
 		else
-			MY.Debug({GetTraceback('Cannot decode bgmsg')}, 'BG_EVENT#' .. szMsgID, MY_DEBUG.ERROR)
+			MY.Debug({GetTraceback('Cannot decode bgmsg')}, 'BG_EVENT#' .. szMsgID, DEBUG_LEVEL.ERROR)
 		end
 		BG_MSG_PART[szMsgUUID] = nil
 	end

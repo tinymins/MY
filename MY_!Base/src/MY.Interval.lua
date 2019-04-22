@@ -25,7 +25,7 @@ local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
-local MY, UI = MY, MY.UI
+local MY, UI, DEBUG_LEVEL, PATH_TYPE = MY, MY.UI, MY.DEBUG_LEVEL, MY.PATH_TYPE
 local var2str, str2var, clone, empty, ipairs_r = MY.var2str, MY.str2var, MY.clone, MY.empty, MY.ipairs_r
 local spairs, spairs_r, sipairs, sipairs_r = MY.spairs, MY.spairs_r, MY.sipairs, MY.sipairs_r
 local GetPatch, ApplyPatch = MY.GetPatch, MY.ApplyPatch
@@ -82,7 +82,7 @@ local function onDelayCall()
 		if dc.nNext <= _time then
 			local res, err = pcall(dc.fnAction, dc.oArg)
 			if not res then
-				MY.Debug({GetTraceback(err)}, 'onDelayCall#' .. szKey, MY_DEBUG.ERROR)
+				MY.Debug({GetTraceback(err)}, 'onDelayCall#' .. szKey, DEBUG_LEVEL.ERROR)
 			end
 			_count = _count - 1
 			_delaycall_t = _tDelayCall[szKey]
@@ -183,7 +183,7 @@ local function onBreatheCall()
 			bc.nNext = _time + bc.nInterval
 			local res, err = pcall(bc.fnAction, bc.oArg)
 			if not res then
-				MY.Debug({GetTraceback(err)}, 'onBreatheCall#' .. szKey, MY_DEBUG.ERROR)
+				MY.Debug({GetTraceback(err)}, 'onBreatheCall#' .. szKey, DEBUG_LEVEL.ERROR)
 			elseif err == 0 then
 				_count = _count - 1
 				_breathecall_t = _tBreatheCall[szKey]
@@ -288,7 +288,7 @@ local function onFrameCall()
 			fc.nNext = _framecount + fc.nInterval
 			local res, err = pcall(fc.fnAction, fc.oArg)
 			if not res then
-				MY.Debug({GetTraceback(err)}, 'onFrameCall#' .. szKey, MY_DEBUG.ERROR)
+				MY.Debug({GetTraceback(err)}, 'onFrameCall#' .. szKey, DEBUG_LEVEL.ERROR)
 			elseif err == 0 then
 				_count = _count - 1
 				_framecall_t = _tFrameCall[szKey]
@@ -394,7 +394,7 @@ local function onRenderCall()
 			rc.nNext = _time + rc.nInterval
 			local res, err = pcall(rc.fnAction, rc.oArg)
 			if not res then
-				MY.Debug({GetTraceback(err)}, 'onRenderCall#' .. szKey, MY_DEBUG.ERROR)
+				MY.Debug({GetTraceback(err)}, 'onRenderCall#' .. szKey, DEBUG_LEVEL.ERROR)
 			elseif err == 0 then
 				_rendercall_c = _rendercall_c - 1
 				_rendercall_t = _tRenderCall[szKey]

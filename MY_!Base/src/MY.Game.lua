@@ -25,7 +25,7 @@ local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
-local MY, UI = MY, MY.UI
+local MY, UI, DEBUG_LEVEL, PATH_TYPE = MY, MY.UI, MY.DEBUG_LEVEL, MY.PATH_TYPE
 local var2str, str2var, clone, empty, ipairs_r = MY.var2str, MY.str2var, MY.clone, MY.empty, MY.ipairs_r
 local spairs, spairs_r, sipairs, sipairs_r = MY.spairs, MY.spairs_r, MY.sipairs, MY.sipairs_r
 local GetPatch, ApplyPatch = MY.GetPatch, MY.ApplyPatch
@@ -117,7 +117,7 @@ end
 
 do
 local DISTANCE_TYPE
-local PATH = {'config/distance_type.jx3dat', MY_DATA_PATH.ROLE}
+local PATH = {'config/distance_type.jx3dat', PATH_TYPE.ROLE}
 function MY.GetGlobalDistanceType()
 	if not DISTANCE_TYPE then
 		DISTANCE_TYPE = MY.LoadLUAData(PATH) or 'gwwean'
@@ -461,8 +461,8 @@ end
 
 -- 地图BOSS列表
 do local BOSS_LIST, BOSS_LIST_CUSTOM
-local CACHE_PATH = {'temporary/bosslist.jx3dat', MY_DATA_PATH.GLOBAL}
-local CUSTOM_PATH = {'config/bosslist.jx3dat', MY_DATA_PATH.GLOBAL}
+local CACHE_PATH = {'temporary/bosslist.jx3dat', PATH_TYPE.GLOBAL}
+local CUSTOM_PATH = {'config/bosslist.jx3dat', PATH_TYPE.GLOBAL}
 local function LoadCustomList()
 	if not BOSS_LIST_CUSTOM then
 		BOSS_LIST_CUSTOM = MY.LoadLUAData(CUSTOM_PATH) or {}
@@ -476,7 +476,7 @@ local function GenerateList(bForceRefresh)
 	if BOSS_LIST and not bForceRefresh then
 		return
 	end
-	MY.CreateDataRoot(MY_DATA_PATH.GLOBAL)
+	MY.CreateDataRoot(PATH_TYPE.GLOBAL)
 	BOSS_LIST = MY.LoadLUAData(CACHE_PATH)
 	if bForceRefresh or not BOSS_LIST then
 		BOSS_LIST = {}
@@ -579,14 +579,14 @@ end
 
 -- 地图重要NPC列表
 do local INPC_LIST, INPC_LIST_CUSTOM
-local CACHE_PATH = {'temporary/inpclist.jx3dat', MY_DATA_PATH.GLOBAL}
+local CACHE_PATH = {'temporary/inpclist.jx3dat', PATH_TYPE.GLOBAL}
 local function LoadCustomList()
 	if not INPC_LIST_CUSTOM then
-		INPC_LIST_CUSTOM = MY.LoadLUAData({'config/inpclist.jx3dat', MY_DATA_PATH.GLOBAL}) or {}
+		INPC_LIST_CUSTOM = MY.LoadLUAData({'config/inpclist.jx3dat', PATH_TYPE.GLOBAL}) or {}
 	end
 end
 local function SaveCustomList()
-	MY.SaveLUAData({'config/inpclist.jx3dat', MY_DATA_PATH.GLOBAL}, INPC_LIST_CUSTOM, IsDebugClient() and '\t' or nil)
+	MY.SaveLUAData({'config/inpclist.jx3dat', PATH_TYPE.GLOBAL}, INPC_LIST_CUSTOM, IsDebugClient() and '\t' or nil)
 end
 local function GenerateList(bForceRefresh)
 	LoadCustomList()
@@ -705,7 +705,7 @@ local MY_FORCE_COLOR_FG_DEFAULT = setmetatable({
 	end,
 	__metatable = true,
 })
-local MY_FORCE_COLOR_FG_GLOBAL = MY.LoadLUAData({SZ_FORCE_COLOR_FG, MY_DATA_PATH.GLOBAL}) or {}
+local MY_FORCE_COLOR_FG_GLOBAL = MY.LoadLUAData({SZ_FORCE_COLOR_FG, PATH_TYPE.GLOBAL}) or {}
 local MY_FORCE_COLOR_FG_CUSTOM = {}
 local MY_FORCE_COLOR_FG = setmetatable({}, {
 	__index = function(t, k)
@@ -736,7 +736,7 @@ local MY_FORCE_COLOR_BG_DEFAULT = setmetatable({
 	end,
 	__metatable = true,
 })
-local MY_FORCE_COLOR_BG_GLOBAL = MY.LoadLUAData({SZ_FORCE_COLOR_BG, MY_DATA_PATH.GLOBAL}) or {}
+local MY_FORCE_COLOR_BG_GLOBAL = MY.LoadLUAData({SZ_FORCE_COLOR_BG, PATH_TYPE.GLOBAL}) or {}
 local MY_FORCE_COLOR_BG_CUSTOM = {}
 local MY_FORCE_COLOR_BG = setmetatable({}, {
 	__index = function(t, k)
@@ -745,8 +745,8 @@ local MY_FORCE_COLOR_BG = setmetatable({}, {
 })
 
 local function initForceCustom()
-	MY_FORCE_COLOR_FG_CUSTOM = MY.LoadLUAData({SZ_FORCE_COLOR_FG, MY_DATA_PATH.ROLE}) or {}
-	MY_FORCE_COLOR_BG_CUSTOM = MY.LoadLUAData({SZ_FORCE_COLOR_BG, MY_DATA_PATH.ROLE}) or {}
+	MY_FORCE_COLOR_FG_CUSTOM = MY.LoadLUAData({SZ_FORCE_COLOR_FG, PATH_TYPE.ROLE}) or {}
+	MY_FORCE_COLOR_BG_CUSTOM = MY.LoadLUAData({SZ_FORCE_COLOR_BG, PATH_TYPE.ROLE}) or {}
 	FireUIEvent('MY_FORCE_COLOR_UPDATE')
 end
 MY.RegisterInit(initForceCustom)
@@ -765,14 +765,14 @@ function MY.SetForceColor(dwForce, szType, tCol)
 	if dwForce == 'reset' then
 		MY_FORCE_COLOR_BG_CUSTOM = {}
 		MY_FORCE_COLOR_FG_CUSTOM = {}
-		MY.SaveLUAData({SZ_FORCE_COLOR_BG, MY_DATA_PATH.ROLE}, MY_FORCE_COLOR_BG_CUSTOM)
-		MY.SaveLUAData({SZ_FORCE_COLOR_FG, MY_DATA_PATH.ROLE}, MY_FORCE_COLOR_FG_CUSTOM)
+		MY.SaveLUAData({SZ_FORCE_COLOR_BG, PATH_TYPE.ROLE}, MY_FORCE_COLOR_BG_CUSTOM)
+		MY.SaveLUAData({SZ_FORCE_COLOR_FG, PATH_TYPE.ROLE}, MY_FORCE_COLOR_FG_CUSTOM)
 	elseif szType == 'background' then
 		MY_FORCE_COLOR_BG_CUSTOM[dwForce] = tCol
-		MY.SaveLUAData({SZ_FORCE_COLOR_BG, MY_DATA_PATH.ROLE}, MY_FORCE_COLOR_BG_CUSTOM)
+		MY.SaveLUAData({SZ_FORCE_COLOR_BG, PATH_TYPE.ROLE}, MY_FORCE_COLOR_BG_CUSTOM)
 	else
 		MY_FORCE_COLOR_FG_CUSTOM[dwForce] = tCol
-		MY.SaveLUAData({SZ_FORCE_COLOR_FG, MY_DATA_PATH.ROLE}, MY_FORCE_COLOR_FG_CUSTOM)
+		MY.SaveLUAData({SZ_FORCE_COLOR_FG, PATH_TYPE.ROLE}, MY_FORCE_COLOR_FG_CUSTOM)
 	end
 	FireUIEvent('MY_FORCE_COLOR_UPDATE')
 end
@@ -788,7 +788,7 @@ local MY_CAMP_COLOR_FG_DEFAULT = setmetatable({
 	end,
 	__metatable = true,
 })
-local MY_CAMP_COLOR_FG_GLOBAL = MY.LoadLUAData({SZ_CAMP_COLOR_FG, MY_DATA_PATH.GLOBAL}) or {}
+local MY_CAMP_COLOR_FG_GLOBAL = MY.LoadLUAData({SZ_CAMP_COLOR_FG, PATH_TYPE.GLOBAL}) or {}
 local MY_CAMP_COLOR_FG_CUSTOM = {}
 local MY_CAMP_COLOR_FG = setmetatable({}, {
 	__index = function(t, k)
@@ -807,7 +807,7 @@ local MY_CAMP_COLOR_BG_DEFAULT = setmetatable({
 	end,
 	__metatable = true,
 })
-local MY_CAMP_COLOR_BG_GLOBAL = MY.LoadLUAData({SZ_CAMP_COLOR_BG, MY_DATA_PATH.GLOBAL}) or {}
+local MY_CAMP_COLOR_BG_GLOBAL = MY.LoadLUAData({SZ_CAMP_COLOR_BG, PATH_TYPE.GLOBAL}) or {}
 local MY_CAMP_COLOR_BG_CUSTOM = {}
 local MY_CAMP_COLOR_BG = setmetatable({}, {
 	__index = function(t, k)
@@ -816,8 +816,8 @@ local MY_CAMP_COLOR_BG = setmetatable({}, {
 })
 
 local function initCampCustom()
-	MY_CAMP_COLOR_FG_CUSTOM = MY.LoadLUAData({SZ_CAMP_COLOR_FG, MY_DATA_PATH.ROLE}) or {}
-	MY_CAMP_COLOR_BG_CUSTOM = MY.LoadLUAData({SZ_CAMP_COLOR_BG, MY_DATA_PATH.ROLE}) or {}
+	MY_CAMP_COLOR_FG_CUSTOM = MY.LoadLUAData({SZ_CAMP_COLOR_FG, PATH_TYPE.ROLE}) or {}
+	MY_CAMP_COLOR_BG_CUSTOM = MY.LoadLUAData({SZ_CAMP_COLOR_BG, PATH_TYPE.ROLE}) or {}
 	FireUIEvent('MY_FORCE_COLOR_UPDATE')
 end
 MY.RegisterInit(initCampCustom)
@@ -836,14 +836,14 @@ function MY.SetCampColor(nCamp, szType, tCol)
 	if nCamp == 'reset' then
 		MY_CAMP_COLOR_BG_CUSTOM = {}
 		MY_CAMP_COLOR_FG_CUSTOM = {}
-		MY.SaveLUAData({SZ_CAMP_COLOR_BG, MY_DATA_PATH.ROLE}, MY_CAMP_COLOR_BG_CUSTOM)
-		MY.SaveLUAData({SZ_CAMP_COLOR_FG, MY_DATA_PATH.ROLE}, MY_CAMP_COLOR_FG_CUSTOM)
+		MY.SaveLUAData({SZ_CAMP_COLOR_BG, PATH_TYPE.ROLE}, MY_CAMP_COLOR_BG_CUSTOM)
+		MY.SaveLUAData({SZ_CAMP_COLOR_FG, PATH_TYPE.ROLE}, MY_CAMP_COLOR_FG_CUSTOM)
 	elseif szType == 'background' then
 		MY_CAMP_COLOR_BG_CUSTOM[nCamp] = tCol
-		MY.SaveLUAData({SZ_CAMP_COLOR_BG, MY_DATA_PATH.ROLE}, MY_CAMP_COLOR_BG_CUSTOM)
+		MY.SaveLUAData({SZ_CAMP_COLOR_BG, PATH_TYPE.ROLE}, MY_CAMP_COLOR_BG_CUSTOM)
 	else
 		MY_CAMP_COLOR_FG_CUSTOM[nCamp] = tCol
-		MY.SaveLUAData({SZ_CAMP_COLOR_FG, MY_DATA_PATH.ROLE}, MY_CAMP_COLOR_FG_CUSTOM)
+		MY.SaveLUAData({SZ_CAMP_COLOR_FG, PATH_TYPE.ROLE}, MY_CAMP_COLOR_FG_CUSTOM)
 	end
 	FireUIEvent('MY_CAMP_COLOR_UPDATE')
 end
@@ -1875,7 +1875,7 @@ local function WithTargetHandle()
 	MY.SetTempTarget(r.dwType, r.dwID)
 	local status, err = pcall(r.callback)
 	if not status then
-		MY.Debug({GetTraceback(err)}, 'MYLIB#WithTarget', MY_DEBUG.ERROR)
+		MY.Debug({GetTraceback(err)}, 'MYLIB#WithTarget', DEBUG_LEVEL.ERROR)
 	end
 	MY.ResumeTarget()
 
@@ -2066,7 +2066,7 @@ function MY.GetBuff(KObject, dwID, nLevel, dwSkillSrcID)
 			end
 		else
 			if not KObject.GetBuff then
-				return MY.Debug({'KObject neither has a function named GetBuffByOwner nor named GetBuff.'}, 'MY.GetBuff', MY_DEBUG.ERROR)
+				return MY.Debug({'KObject neither has a function named GetBuffByOwner nor named GetBuff.'}, 'MY.GetBuff', DEBUG_LEVEL.ERROR)
 			end
 			for _, buff in ipairs(MY.GetBuffList(KObject)) do
 				if (tBuff[buff.dwID] == buff.nLevel or tBuff[buff.dwID] == 0) and buff.dwSkillSrcID == dwSkillSrcID then
@@ -2094,11 +2094,11 @@ function MY.GetBuff(KObject, dwID, nLevel, dwSkillSrcID)
 					return tProxy[buff.szKey]
 				end
 			end
-			-- return MY.Debug({'KObject do not have a function named GetBuffByOwner.'}, 'MY.GetBuff', MY_DEBUG.ERROR)
+			-- return MY.Debug({'KObject do not have a function named GetBuffByOwner.'}, 'MY.GetBuff', DEBUG_LEVEL.ERROR)
 		end
 	else
 		if not KObject.GetBuff then
-			return MY.Debug({'KObject do not have a function named GetBuff.'}, 'MY.GetBuff', MY_DEBUG.ERROR)
+			return MY.Debug({'KObject do not have a function named GetBuff.'}, 'MY.GetBuff', DEBUG_LEVEL.ERROR)
 		end
 		for k, v in pairs(tBuff) do
 			local KBuff = KObject.GetBuff(k, v)

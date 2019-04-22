@@ -25,7 +25,7 @@ local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
-local MY, UI = MY, MY.UI
+local MY, UI, DEBUG_LEVEL, PATH_TYPE = MY, MY.UI, MY.DEBUG_LEVEL, MY.PATH_TYPE
 local var2str, str2var, clone, empty, ipairs_r = MY.var2str, MY.str2var, MY.clone, MY.empty, MY.ipairs_r
 local spairs, spairs_r, sipairs, sipairs_r = MY.spairs, MY.spairs_r, MY.sipairs, MY.sipairs_r
 local GetPatch, ApplyPatch = MY.GetPatch, MY.ApplyPatch
@@ -51,7 +51,7 @@ local C = {
 }
 local OBJ = {}
 -- º”‘ÿ◊÷ÃÂ≈‰÷√
-local CONFIG_PATH = {'config/fontconfig.jx3dat', MY_DATA_PATH.GLOBAL}
+local CONFIG_PATH = {'config/fontconfig.jx3dat', PATH_TYPE.GLOBAL}
 do
 	local szOrgFile = MY.GetLUADataPath('config/MY_FONT/$lang.jx3dat')
 	local szFilePath = MY.GetLUADataPath(CONFIG_PATH)

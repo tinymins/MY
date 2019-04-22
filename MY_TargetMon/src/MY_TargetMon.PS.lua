@@ -25,7 +25,7 @@ local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
-local MY, UI = MY, MY.UI
+local MY, UI, DEBUG_LEVEL, PATH_TYPE = MY, MY.UI, MY.DEBUG_LEVEL, MY.PATH_TYPE
 local var2str, str2var, clone, empty, ipairs_r = MY.var2str, MY.str2var, MY.clone, MY.empty, MY.ipairs_r
 local spairs, spairs_r, sipairs, sipairs_r = MY.spairs, MY.spairs_r, MY.sipairs, MY.sipairs_r
 local GetPatch, ApplyPatch = MY.GetPatch, MY.ApplyPatch
@@ -1092,7 +1092,7 @@ local function DrawControls(ui, OpenDetail)
 			local file = GetOpenFileName(
 				_L['Please select import target monitor data file.'],
 				'JX3 File(*.jx3dat)\0*.jx3dat\0All Files(*.*)\0*.*\0\0',
-				MY.FormatPath({ 'export/TargetMon', MY_DATA_PATH.GLOBAL })
+				MY.FormatPath({ 'export/TargetMon', PATH_TYPE.GLOBAL })
 			)
 			if file == '' then
 				return
@@ -1151,7 +1151,7 @@ local function DrawControls(ui, OpenDetail)
 							.. MY.FormatTime('yyyyMMddhhmmss')
 							.. (bAsEmbedded and '.$lang' or '')
 							.. '.jx3dat',
-						MY_DATA_PATH.GLOBAL,
+						PATH_TYPE.GLOBAL,
 					})
 					D.ExportPatchFile(file, aUUID, szIndent, bAsEmbedded)
 					MY.Sysmsg({ _L('Data exported, file saved at %s.', file) })

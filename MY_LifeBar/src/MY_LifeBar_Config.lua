@@ -25,7 +25,7 @@ local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
-local MY, UI = MY, MY.UI
+local MY, UI, DEBUG_LEVEL, PATH_TYPE = MY, MY.UI, MY.DEBUG_LEVEL, MY.PATH_TYPE
 local var2str, str2var, clone, empty, ipairs_r = MY.var2str, MY.str2var, MY.clone, MY.empty, MY.ipairs_r
 local spairs, spairs_r, sipairs, sipairs_r = MY.spairs, MY.spairs_r, MY.sipairs, MY.sipairs_r
 local GetPatch, ApplyPatch = MY.GetPatch, MY.ApplyPatch
@@ -90,7 +90,7 @@ local CONFIG_DEFAULTS = setmetatable({
 })
 
 if not CONFIG_DEFAULTS.DEFAULT then
-	return MY.Debug({_L['Default config cannot be loaded, please reinstall!!!']}, _L['MY_LifeBar'], MY_DEBUG.ERROR)
+	return MY.Debug({_L['Default config cannot be loaded, please reinstall!!!']}, _L['MY_LifeBar'], DEBUG_LEVEL.ERROR)
 end
 local Config, ConfigLoaded = CONFIG_DEFAULTS('DEFAULT'), false
 local CONFIG_PATH = 'config/xlifebar/%s.jx3dat'
@@ -136,7 +136,7 @@ function D.LoadConfig(szConfig)
 				MY_LifeBar.szConfig = szConfig
 			end
 		end
-		Config = MY.LoadLUAData({ D.GetConfigPath(), MY_DATA_PATH.GLOBAL })
+		Config = MY.LoadLUAData({ D.GetConfigPath(), PATH_TYPE.GLOBAL })
 	end
 	if Config and not Config.fDesignUIScale then -- ºÊ»›¿œ ˝æ›
 		for _, key in ipairs({'ShowName', 'ShowTong', 'ShowTitle', 'ShowLife', 'ShowLifePer'}) do
@@ -162,7 +162,7 @@ function D.SaveConfig()
 	if not ConfigLoaded then
 		return
 	end
-	MY.SaveLUAData({ D.GetConfigPath(), MY_DATA_PATH.GLOBAL }, Config)
+	MY.SaveLUAData({ D.GetConfigPath(), PATH_TYPE.GLOBAL }, Config)
 end
 MY.RegisterExit(D.SaveConfig)
 
