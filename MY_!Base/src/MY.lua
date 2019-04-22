@@ -117,6 +117,23 @@ local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientPlayer, GetPlayer, GetNpc = GetClientPlayer, GetPlayer, GetNpc
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 ---------------------------------------------------------------------------------------------
+-- 本地函数变量
+---------------------------------------------------------------------------------------------
+local _BUILD_ = '20190417'
+local _VERSION_ = 0x2012600
+local _DEBUGLV_ = tonumber(LoadLUAData('interface/my.debug.level') or nil) or 4
+local _DELOGLV_ = tonumber(LoadLUAData('interface/my.delog.level') or nil) or 4
+local _NORESTM_ = tonumber(LoadLUAData('interface/my.nrtim.level') or nil) or -1
+local _INTERFACE_ROOT_ = './Interface/'
+local _NAME_SPACE_     = 'MY'
+local _ADDON_ROOT_     = _INTERFACE_ROOT_ .. 'MY/'
+local _FRAMEWORK_ROOT_ = _INTERFACE_ROOT_ .. 'MY/MY_!Base/'
+local _PSS_ST_         = _FRAMEWORK_ROOT_ .. 'image/ST.pss'
+local _UITEX_ST_       = _FRAMEWORK_ROOT_ .. 'image/ST_UI.UITex'
+local _UITEX_POSTER_   = _FRAMEWORK_ROOT_ .. 'image/Poster.UITex'
+local _UITEX_COMMON_   = _FRAMEWORK_ROOT_ .. 'image/UICommon.UITex'
+Log('[MY] Debug level ' .. _DEBUGLV_ .. ' / delog level ' .. _DELOGLV_)
+---------------------------------------------------------------------------------------------
 local function clone(var)
 	local szType = type(var)
 	if szType == 'nil'
@@ -602,7 +619,7 @@ local MENU_DIVIDER = { bDevide = true }
 local EMPTY_TABLE = SetmetaReadonly({})
 local XML_LINE_BREAKER = GetFormatText('\n')
 ---------------------------------------------------------------------------------------------
-MY = {
+local LIB = {
 	clone        = clone       ,
 	empty        = empty       ,
 	var2str      = var2str     ,
@@ -647,27 +664,12 @@ MY = {
 	XML_LINE_BREAKER = XML_LINE_BREAKER,
 	EQUIPMENT_SUIT_COUNT = EQUIPMENT_SUIT_COUNT or 4,
 }
----------------------------------------------------------------------------------------------
--- 本地函数变量
----------------------------------------------------------------------------------------------
-local _BUILD_ = '20190417'
-local _VERSION_ = 0x2012600
-local _DEBUGLV_ = tonumber(LoadLUAData('interface/my.debug.level') or nil) or 4
-local _DELOGLV_ = tonumber(LoadLUAData('interface/my.delog.level') or nil) or 4
-local _NORESTM_ = tonumber(LoadLUAData('interface/my.nrtim.level') or nil) or -1
-local _INTERFACE_ROOT_ = './Interface/'
-local _ADDON_ROOT_     = _INTERFACE_ROOT_ .. 'MY/'
-local _FRAMEWORK_ROOT_ = _INTERFACE_ROOT_ .. 'MY/MY_!Base/'
-local _PSS_ST_         = _FRAMEWORK_ROOT_ .. 'image/ST.pss'
-local _UITEX_ST_       = _FRAMEWORK_ROOT_ .. 'image/ST_UI.UITex'
-local _UITEX_POSTER_   = _FRAMEWORK_ROOT_ .. 'image/Poster.UITex'
-local _UITEX_COMMON_   = _FRAMEWORK_ROOT_ .. 'image/UICommon.UITex'
-Log('[MY] Debug level ' .. _DEBUGLV_ .. ' / delog level ' .. _DELOGLV_)
+_G[_NAME_SPACE_] = LIB
 ---------------------------------------------------------------------------------------------
 
 -- 多语言处理
--- (table) MY.LoadLangPack(void)
-function MY.LoadLangPack(szLangFolder)
+-- (table) LIB.LoadLangPack(void)
+function LIB.LoadLangPack(szLangFolder)
 	local _, _, szLang = GetVersion()
 	local t0 = LoadLUAData(_FRAMEWORK_ROOT_..'lang/default') or {}
 	local t1 = LoadLUAData(_FRAMEWORK_ROOT_..'lang/' .. szLang) or {}
@@ -691,7 +693,7 @@ function MY.LoadLangPack(szLangFolder)
 	})
 	return t0
 end
-local _L = MY.LoadLangPack()
+local _L = LIB.LoadLangPack()
 local _NAME_       = _L['mingyi plugins']
 local _SHORT_NAME_ = _L['mingyi plugin']
 local _AUTHOR_     = _L['MingYi @ Double Dream Town']
@@ -708,6 +710,7 @@ do local AddonInfo = SetmetaReadonly({
 	szUITexST       = _UITEX_ST_      ,
 	dwVersion       = _VERSION_       ,
 	szBuild         = _BUILD_         ,
+	szNameSpace     = _NAME_SPACE_    ,
 	nDebugLevel     = _DEBUGLV_       ,
 	nLogLevel       = _DELOGLV_       ,
 	szInterfaceRoot = _INTERFACE_ROOT_,
@@ -729,7 +732,7 @@ do local AddonInfo = SetmetaReadonly({
 	tMenuColor       = _MENU_COLOR_      ,
 	dwMaxPlayerLevel = _MAX_PLAYER_LEVEL_,
 })
-function MY.GetAddonInfo()
+function LIB.GetAddonInfo()
 	return AddonInfo
 end
 local function onPlayerEnterScene()
@@ -738,8 +741,8 @@ end
 RegisterEvent('PLAYER_ENTER_SCENE', onPlayerEnterScene)
 end
 
--- (string, number) MY.GetVersion()
-function MY.GetVersion(dwVersion)
+-- (string, number) LIB.GetVersion()
+function LIB.GetVersion(dwVersion)
 	local dwVersion = dwVersion or _VERSION_
 	local szVersion = string.format('%X.%X.%02X', dwVersion / 0x1000000,
 		math.floor(dwVersion / 0x10000) % 0x100, math.floor(dwVersion / 0x100) % 0x100)
@@ -749,11 +752,11 @@ function MY.GetVersion(dwVersion)
 	return szVersion, dwVersion
 end
 
-function MY.AssertVersion(szKey, szCaption, dwMinVersion)
+function LIB.AssertVersion(szKey, szCaption, dwMinVersion)
 	if _VERSION_ < dwMinVersion then
-		MY.Sysmsg({
+		LIB.Sysmsg({
 			_L('%s requires base library version upper than v%s, current at v%s.',
-			szCaption, MY.GetVersion(dwMinVersion), MY.GetVersion()
+			szCaption, LIB.GetVersion(dwMinVersion), LIB.GetVersion()
 		)})
 		if not IsDebugClient() then
 			return false
