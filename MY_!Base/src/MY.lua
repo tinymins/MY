@@ -119,20 +119,50 @@ local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 ---------------------------------------------------------------------------------------------
 -- 本地函数变量
 ---------------------------------------------------------------------------------------------
-local _BUILD_ = '20190417'
-local _VERSION_ = 0x2012600
-local _DEBUGLV_ = tonumber(LoadLUAData('interface/my.debug.level') or nil) or 4
-local _DELOGLV_ = tonumber(LoadLUAData('interface/my.delog.level') or nil) or 4
-local _NORESTM_ = tonumber(LoadLUAData('interface/my.nrtim.level') or nil) or -1
-local _INTERFACE_ROOT_ = './Interface/'
-local _NAME_SPACE_     = 'MY'
-local _ADDON_ROOT_     = _INTERFACE_ROOT_ .. 'MY/'
-local _FRAMEWORK_ROOT_ = _INTERFACE_ROOT_ .. 'MY/MY_!Base/'
-local _PSS_ST_         = _FRAMEWORK_ROOT_ .. 'image/ST.pss'
-local _UITEX_ST_       = _FRAMEWORK_ROOT_ .. 'image/ST_UI.UITex'
-local _UITEX_POSTER_   = _FRAMEWORK_ROOT_ .. 'image/Poster.UITex'
-local _UITEX_COMMON_   = _FRAMEWORK_ROOT_ .. 'image/UICommon.UITex'
-Log('[MY] Debug level ' .. _DEBUGLV_ .. ' / delog level ' .. _DELOGLV_)
+local _BUILD_            = '20190417'
+local _VERSION_          = 0x2012600
+local _DEBUG_LEVEL_      = tonumber(LoadLUAData('interface/my.debug.level') or nil) or 4
+local _DELOG_LEVEL_      = tonumber(LoadLUAData('interface/my.delog.level') or nil) or 4
+local _NORESTIME_        = tonumber(LoadLUAData('interface/my.nrtim.level') or nil) or -1
+local _MENU_COLOR_       = {35, 180, 246}
+local _MAX_PLAYER_LEVEL_ = 100
+local _INTERFACE_ROOT_   = './Interface/'
+local _NAME_SPACE_       = 'MY'
+local _ADDON_ROOT_       = _INTERFACE_ROOT_ .. 'MY/'
+local _FRAMEWORK_ROOT_   = _INTERFACE_ROOT_ .. 'MY/MY_!Base/'
+local _PSS_ST_           = _FRAMEWORK_ROOT_ .. 'image/ST.pss'
+local _UITEX_ST_         = _FRAMEWORK_ROOT_ .. 'image/ST_UI.UITex'
+local _UITEX_POSTER_     = _FRAMEWORK_ROOT_ .. 'image/Poster.UITex'
+local _UITEX_COMMON_     = _FRAMEWORK_ROOT_ .. 'image/UICommon.UITex'
+local function LoadLangPack(szLangFolder)
+	local _, _, szLang = GetVersion()
+	local t0 = LoadLUAData(_FRAMEWORK_ROOT_..'lang/default') or {}
+	local t1 = LoadLUAData(_FRAMEWORK_ROOT_..'lang/' .. szLang) or {}
+	for k, v in pairs(t1) do
+		t0[k] = v
+	end
+	if type(szLangFolder)=='string' then
+		szLangFolder = string.gsub(szLangFolder,'[/\\]+$','')
+		local t2 = LoadLUAData(szLangFolder..'/default') or {}
+		for k, v in pairs(t2) do
+			t0[k] = v
+		end
+		local t3 = LoadLUAData(szLangFolder..'/' .. szLang) or {}
+		for k, v in pairs(t3) do
+			t0[k] = v
+		end
+	end
+	setmetatable(t0, {
+		__index = function(t, k) return k end,
+		__call = function(t, k, ...) return string.format(t[k], ...) end,
+	})
+	return t0
+end
+local _L = LoadLangPack()
+local _NAME_             = _L['mingyi plugins']
+local _SHORT_NAME_       = _L['mingyi plugin']
+local _AUTHOR_           = _L['MingYi @ Double Dream Town']
+Log('[MY] Debug level ' .. _DEBUG_LEVEL_ .. ' / delog level ' .. _DELOG_LEVEL_)
 ---------------------------------------------------------------------------------------------
 local function clone(var)
 	local szType = type(var)
@@ -647,6 +677,7 @@ local LIB = {
 	ApplyPatch   = ApplyPatch  ,
 	RandomChild  = RandomChild ,
 	GetTraceback = GetTraceback,
+	LoadLangPack = LoadLangPack,
 	DEBUG_LEVEL = SetmetaReadonly({
 		LOG     = 0,
 		PMLOG   = 0,
@@ -667,38 +698,6 @@ local LIB = {
 _G[_NAME_SPACE_] = LIB
 ---------------------------------------------------------------------------------------------
 
--- 多语言处理
--- (table) LIB.LoadLangPack(void)
-function LIB.LoadLangPack(szLangFolder)
-	local _, _, szLang = GetVersion()
-	local t0 = LoadLUAData(_FRAMEWORK_ROOT_..'lang/default') or {}
-	local t1 = LoadLUAData(_FRAMEWORK_ROOT_..'lang/' .. szLang) or {}
-	for k, v in pairs(t1) do
-		t0[k] = v
-	end
-	if type(szLangFolder)=='string' then
-		szLangFolder = string.gsub(szLangFolder,'[/\\]+$','')
-		local t2 = LoadLUAData(szLangFolder..'/default') or {}
-		for k, v in pairs(t2) do
-			t0[k] = v
-		end
-		local t3 = LoadLUAData(szLangFolder..'/' .. szLang) or {}
-		for k, v in pairs(t3) do
-			t0[k] = v
-		end
-	end
-	setmetatable(t0, {
-		__index = function(t, k) return k end,
-		__call = function(t, k, ...) return string.format(t[k], ...) end,
-	})
-	return t0
-end
-local _L = LIB.LoadLangPack()
-local _NAME_       = _L['mingyi plugins']
-local _SHORT_NAME_ = _L['mingyi plugin']
-local _AUTHOR_     = _L['MingYi @ Double Dream Town']
-local _MENU_COLOR_ = {35, 180, 246}
-local _MAX_PLAYER_LEVEL_ = 100
 -----------------------------------------------
 -- 私有函数
 -----------------------------------------------
@@ -711,8 +710,8 @@ do local AddonInfo = SetmetaReadonly({
 	dwVersion       = _VERSION_       ,
 	szBuild         = _BUILD_         ,
 	szNameSpace     = _NAME_SPACE_    ,
-	nDebugLevel     = _DEBUGLV_       ,
-	nLogLevel       = _DELOGLV_       ,
+	nDebugLevel     = _DEBUG_LEVEL_   ,
+	nLogLevel       = _DELOG_LEVEL_   ,
 	szInterfaceRoot = _INTERFACE_ROOT_,
 	szRoot          = _ADDON_ROOT_    ,
 	szFrameworkRoot = _FRAMEWORK_ROOT_,
@@ -768,7 +767,7 @@ end
 ---------------------------------------------------
 -- 事件、快捷键、菜单注册
 ---------------------------------------------------
-if _DEBUGLV_ < 3 then
+if _DEBUG_LEVEL_ < 3 then
 	if not (IsDebugClient and IsDebugClient()) then
 		RegisterEvent('CALL_LUA_ERROR', function()
 			print(arg0)
@@ -783,7 +782,7 @@ if _DEBUGLV_ < 3 then
 	}})
 end
 
-if _NORESTM_ >= 0 then
+if _NORESTIME_ >= 0 then
 	local time = GetTime()
 
 	local function OnExit()
@@ -794,11 +793,11 @@ if _NORESTM_ >= 0 then
 	local function OnBreathe()
 		time = GetTime()
 	end
-	BreatheCall('_NORESTM_', OnBreathe)
+	BreatheCall('_NORESTIME_', OnBreathe)
 
 	local function trace_line(event, line)
 		local delay = GetTime() - time
-		if delay < _NORESTM_ then
+		if delay < _NORESTIME_ then
 			return
 		end
 		Log('Response over ' .. delay .. ', ' .. debug.getinfo(2).short_src .. ':' .. line)
