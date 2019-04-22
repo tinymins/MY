@@ -6,10 +6,10 @@
 -- @Last modified by:   tinymins
 -- @Last modified time: 2016-12-29 14:24:10
 --------------------------------------------
---------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
---------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------
 local setmetatable = setmetatable
 local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
 local sub, len, format, rep = string.sub, string.len, string.format, string.rep
@@ -25,16 +25,16 @@ local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
-local MY, UI, DEBUG_LEVEL, PATH_TYPE = MY, MY.UI, MY.DEBUG_LEVEL, MY.PATH_TYPE
-local var2str, str2var, clone, empty, ipairs_r = MY.var2str, MY.str2var, MY.clone, MY.empty, MY.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = MY.spairs, MY.spairs_r, MY.sipairs, MY.sipairs_r
-local GetPatch, ApplyPatch = MY.GetPatch, MY.ApplyPatch
-local Get, Set, RandomChild, GetTraceback = MY.Get, MY.Set, MY.RandomChild, MY.GetTraceback
-local IsArray, IsDictionary, IsEquals = MY.IsArray, MY.IsDictionary, MY.IsEquals
-local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumber, MY.IsFunction
-local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
-local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = MY.MENU_DIVIDER, MY.EMPTY_TABLE, MY.XML_LINE_BREAKER
---------------------------------------------------------------------------------------------------------
+local LIB, UI, DEBUG_LEVEL, PATH_TYPE = MY, MY.UI, MY.DEBUG_LEVEL, MY.PATH_TYPE
+local var2str, str2var, clone, empty, ipairs_r = LIB.var2str, LIB.str2var, LIB.clone, LIB.empty, LIB.ipairs_r
+local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
+local GetPatch, ApplyPatch = LIB.GetPatch, LIB.ApplyPatch
+local Get, Set, RandomChild, GetTraceback = LIB.Get, LIB.Set, LIB.RandomChild, LIB.GetTraceback
+local IsArray, IsDictionary, IsEquals = LIB.IsArray, LIB.IsDictionary, LIB.IsEquals
+local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsNumber, LIB.IsFunction
+local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
+local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
+-------------------------------------------------------------------------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_ChatFilter/lang/')
 if not MY.AssertVersion('MY_ChatBlock', _L['MY_ChatBlock'], 0x2011800) then
 	return
