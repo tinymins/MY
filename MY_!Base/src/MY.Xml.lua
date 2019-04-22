@@ -364,7 +364,6 @@ local function GetNodeData(node)
 end
 
 -- public API
-MY = MY or {}
 LIB.Xml = LIB.Xml or {}
 
 -- 解析 XML 数据，成功返回数据，失败返回 nil 加错误信息

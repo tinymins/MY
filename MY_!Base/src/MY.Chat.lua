@@ -35,11 +35,7 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
------------------------------------------------
--- 本地函数和变量
------------------------------------------------
 local _L = LIB.LoadLangPack()
-local EMPTY_TABLE = SetmetaReadonly({})
 
 -- 海鳗里面抠出来的
 -- 聊天复制并发布
@@ -109,8 +105,8 @@ function LIB.GetTimeLinkText(rgbfs, dwTime)
 	if not dwTime then
 		dwTime = GetCurrentTime()
 	end
-	if not IsTable(rgbf) then
-		rgbf = { f = 10 }
+	if not IsTable(rgbfs) then
+		rgbfs = { f = 10 }
 	end
 	local handlerEntry = LIB.GetAddonInfo().szNameSpace .. '.ChatLinkEventHandlers'
 	return GetFormatText(

@@ -248,7 +248,7 @@ LIB.RegisterEvent('BUFF_UPDATE', function()
 		return
 	end
 	if arg0 == UI_GetClientPlayerID() and arg4 == 103 then
-		DelayCall('MY_ON_IDLE', math.random(0, 10000), function()
+		DelayCall(LIB.GetAddonInfo().szNameSpace .. '#ON_IDLE', math.random(0, 10000), function()
 			local me = GetClientPlayer()
 			if me and me.GetBuff(103, 0) then
 				OnIdle()
@@ -256,7 +256,7 @@ LIB.RegisterEvent('BUFF_UPDATE', function()
 		end)
 	end
 end)
-LIB.BreatheCall('MY_ON_IDLE', function()
+LIB.BreatheCall(LIB.GetAddonInfo().szNameSpace .. '#ON_IDLE', function()
 	if Station.GetIdleTime() > 300000 then
 		OnIdle()
 	end
@@ -426,7 +426,7 @@ end
 end
 
 do
-local BG_MSG_ID_PREFIX = 'MY:'
+local BG_MSG_ID_PREFIX = LIB.GetAddonInfo().szNameSpace .. ':'
 local BG_MSG_ID_SUFFIX = ':V1'
 do
 local BG_MSG_LIST = {}

@@ -35,8 +35,8 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-MY = MY or {}
 local _L, _C = LIB.LoadLangPack(), {}
+---------------------------------------------------------------------------------------------------
 
 -- 获取游戏语言
 function LIB.GetLang()
@@ -55,7 +55,7 @@ function LIB.IsShieldedVersion(bShieldedVersion)
 		if LIB.IsPanelOpened() then
 			LIB.ReopenPanel()
 		end
-		FireUIEvent('MY_SHIELDED_VERSION')
+		FireUIEvent(LIB.GetAddonInfo().szNameSpace .. '_SHIELDED_VERSION')
 	end
 end
 end
@@ -245,15 +245,15 @@ end
 
 LIB.RegisterInit(LIB.GetAddonInfo().szNameSpace .. '#BIND_HOTKEY', function()
 	-- hotkey
-	Hotkey.AddBinding('MY_Total', _L['Open/Close main panel'], LIB.GetAddonInfo().szName, LIB.TogglePanel, nil)
+	Hotkey.AddBinding(LIB.GetAddonInfo().szNameSpace .. '_Total', _L['Open/Close main panel'], LIB.GetAddonInfo().szName, LIB.TogglePanel, nil)
 	for _, v in ipairs(HOTKEY_CACHE) do
 		Hotkey.AddBinding(v.szName, v.szTitle, '', v.fnAction, nil)
 	end
 	for i = 1, 5 do
-		Hotkey.AddBinding('MY_HotKey_Null_'..i, _L['none-function hotkey'], '', function() end, nil)
+		Hotkey.AddBinding(LIB.GetAddonInfo().szNameSpace .. '_HotKey_Null_'..i, _L['none-function hotkey'], '', function() end, nil)
 	end
 end)
-LIB.RegisterHotKey('MY_STOP_CASTING', _L['Stop cast skill'], function() GetClientPlayer().StopCurrentAction() end)
+LIB.RegisterHotKey(LIB.GetAddonInfo().szNameSpace .. '_STOP_CASTING', _L['Stop cast skill'], function() GetClientPlayer().StopCurrentAction() end)
 end
 
 -- Save & Load Lua Data
@@ -272,7 +272,7 @@ end
 --   # #     #   #       #     # # #     #       #       #       # #                 #   #       #
 -- ##################################################################################################
 if IsLocalFileExist(LIB.GetAddonInfo().szRoot .. '@DATA/') then
-	CPath.Move(LIB.GetAddonInfo().szRoot .. '@DATA/', LIB.GetAddonInfo().szInterfaceRoot .. 'MY#DATA/')
+	CPath.Move(LIB.GetAddonInfo().szRoot .. '@DATA/', LIB.GetAddonInfo().szInterfaceRoot .. LIB.GetAddonInfo().szNameSpace .. '#DATA/')
 end
 
 -- 格式化数据文件路径（替换$uid、$lang、$server以及补全相对路径）
@@ -292,7 +292,7 @@ function LIB.FormatPath(oFilePath, tParams)
 	end
 	-- Unified the directory separator
 	szFilePath = string.gsub(szFilePath, '\\', '/')
-	-- if it's relative path then complete path with '/MY@DATA/'
+	-- if it's relative path then complete path with '/{NS}@DATA/'
 	if szFilePath:sub(1, 2) ~= './' and szFilePath:sub(2, 3) ~= ':/' then
 		if ePathType == PATH_TYPE.GLOBAL then
 			szFilePath = '!all-users@$lang/' .. szFilePath
@@ -301,7 +301,7 @@ function LIB.FormatPath(oFilePath, tParams)
 		elseif ePathType == PATH_TYPE.SERVER then
 			szFilePath = '#$relserver@$lang/' .. szFilePath
 		end
-		szFilePath = LIB.GetAddonInfo().szInterfaceRoot .. 'MY#DATA/' .. szFilePath
+		szFilePath = LIB.GetAddonInfo().szInterfaceRoot .. LIB.GetAddonInfo().szNameSpace .. '#DATA/' .. szFilePath
 	end
 	-- if exist $uid then add user role identity
 	if string.find(szFilePath, '%$uid') then

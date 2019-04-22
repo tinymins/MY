@@ -38,9 +38,6 @@ local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_
 -----------------------------------------------
 -- 本地函数和变量
 -----------------------------------------------
-if not MY then
-	return OutputMessage('MSG_SYS', '[' .. LIB.GetAddonInfo().szNameSpace .. '#GAME] Fatal error! ' .. LIB.GetAddonInfo().szNameSpace .. ' namespace does not exist!\n')
-end
 local _L = LIB.LoadLangPack()
 
 -- #######################################################################################################
@@ -1270,7 +1267,7 @@ end
 
 LIB.RegisterEvent('NPC_ENTER_SCENE', function()
 	local npc = GetNpc(arg0)
-	if npc.dwEmployer ~= 0 then
+	if npc and npc.dwEmployer ~= 0 then
 		NEARBY_PET[arg0] = npc
 	end
 	NEARBY_NPC[arg0] = npc
@@ -1805,6 +1802,9 @@ function LIB.SetTarget(arg0, arg1)
 	if not dwID and not szNames then
 		return
 	end
+	if dwID and not dwType then
+		dwType = IsPlayer(dwID) and TARGET.PLAYER or TARGET.NPC
+	end
 	if szNames then
 		local tTarget = {}
 		for _, szName in pairs(LIB.SplitString(szNames:gsub('[%[%]]', ''), '|')) do
@@ -1956,7 +1956,7 @@ end
 do
 local BUFF_LIST_CACHE = setmetatable({}, { __mode = 'v' })
 local BUFF_LIST_PROXY = setmetatable({}, { __mode = 'v' })
-local function reject() assert(false, 'Modify buff list from LIB.GetBuffList is forbidden!') end
+local function reject() assert(false, 'Modify buff list from ' .. LIB.GetAddonInfo().szNameSpace .. '.GetBuffList is forbidden!') end
 -- 获取对象的buff列表
 -- (table) LIB.GetBuffList(KObject)
 function LIB.GetBuffList(...)
@@ -2035,7 +2035,7 @@ end
 do
 local BUFF_CACHE = setmetatable({}, { __mode = 'v' })
 local BUFF_PROXY = setmetatable({}, { __mode = 'v' })
-local function reject() assert(false, 'Modify buff from LIB.GetBuff is forbidden!') end
+local function reject() assert(false, 'Modify buff from ' .. LIB.GetAddonInfo().szNameSpace .. '.GetBuff is forbidden!') end
 -- 获取对象的buff
 -- tBuff: {[dwID1] = nLevel1, [dwID2] = nLevel2}
 -- (table) LIB.GetBuff(dwID[, nLevel[, dwSkillSrcID]])
@@ -2522,7 +2522,6 @@ function LIB.IsInArena()
 		me.GetMapID() == 181         -- 狼影殿
 	)
 end
-LIB.IsInArena = LIB.IsInArena
 
 -- 判断当前地图是不是战场
 -- (bool) LIB.IsInBattleField()
@@ -2568,7 +2567,6 @@ end
 function LIB.IsDungeonRoleProgressMap(dwMapID)
 	return (select(8, GetMapParams(dwMapID)))
 end
-LIB.IsDungeonRoleProgressMap = LIB.IsDungeonRoleProgressMap
 
 -- 判断当前地图是不是副本
 -- (bool) LIB.IsInDungeon(bool bRaid)

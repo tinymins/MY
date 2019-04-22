@@ -635,7 +635,8 @@ function Class(className, super)
 end
 end
 local function GetTraceback(str)
-	local traceback = debug and debug.traceback and debug.traceback():gsub('traceback:.*MY%.lua:%d+:%sin%sfunction%s\'GetTraceback\'[^\n]*', 'traceback:')
+	local traceback = debug and debug.traceback and debug.traceback():gsub('traceback:.*'
+		.. _NAME_SPACE_ .. '%.lua:%d+:%sin%sfunction%s\'GetTraceback\'[^\n]*', 'traceback:')
 	if traceback then
 		if str then
 			str = str .. '\n' .. traceback
