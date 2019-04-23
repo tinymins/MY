@@ -252,6 +252,10 @@ function MY_CombatText.OnFrameCreate()
 	this:RegisterEvent('LOADING_END')
 	this:RegisterEvent('NPC_ENTER_SCENE')
 	this:RegisterEvent('ON_EXP_LOG')
+	this:RegisterEvent('COINSHOP_ON_OPEN')
+	this:RegisterEvent('COINSHOP_ON_CLOSE')
+	this:RegisterEvent('ENTER_STORY_MODE')
+	this:RegisterEvent('LEAVE_STORY_MODE')
 	CombatText.handle = this:Lookup('', '')
 	-- uninit
 	local frame = Station.Lookup('Lowest/CombatText')
@@ -322,7 +326,14 @@ function MY_CombatText.OnEvent(szEvent)
 			end
 		end
 	elseif szEvent == 'LOADING_END' then
+		this:Show()
 		CombatText.FreeQueue()
+	elseif szEvent == 'COINSHOP_ON_OPEN' then
+	elseif szEvent == 'ENTER_STORY_MODE' then
+		this:Hide()
+	elseif szEvent == 'COINSHOP_ON_CLOSE' then
+	elseif szEvent == 'LEAVE_STORY_MODE' then
+		this:Show()
 	end
 end
 
