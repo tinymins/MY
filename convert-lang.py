@@ -9,9 +9,7 @@
 import sys, os, codecs, re, time, json, zlib
 from l_convert import zhcn2zhtw
 
-root = os.path.dirname(os.path.abspath(__file__))
-crc_file = os.path.join(root, '__pycache__/lang.crc.json')
-
+PACKAGE_NAME = 'MY'
 FILE_MAPPING = {
     'zhcn.lang': { 'out': 'zhtw.lang', 'type': 'lang' },
     'zhcn.jx3dat': { 'out': 'zhtw.jx3dat', 'type': 'lang' },
@@ -20,11 +18,32 @@ FILE_MAPPING = {
 }
 IGNORE_FOLDER = ['.git', '@DATA']
 
+# get interface root path and crc file path
+root = os.path.dirname(os.path.abspath(__file__))
+if os.path.basename(root).lower() != 'interface' and os.path.basename(os.path.dirname(root)) == 'interface':
+    root = os.path.dirname(root)
+crc_file = os.path.join(root, '__pycache__' + os.path.sep + 'file.crc.json')
+
 def crc(fileName):
     prev = 0
     for eachLine in open(fileName,'rb'):
         prev = zlib.crc32(eachLine, prev)
     return '%X'%(prev & 0xFFFFFFFF)
+
+def is_path_include(cwd, d):
+    if os.path.basename(cwd).lower() == 'interface' and os.path.isfile(os.path.join(cwd, d)):
+        return False
+    if d in IGNORE_FOLDER:
+        return False
+    if os.path.basename(os.path.dirname(cwd)).lower() == 'interface':
+        if os.path.basename(cwd) == PACKAGE_NAME:
+            return True
+        elif os.path.exists(os.path.join(cwd, 'package.ini')):
+            return 'dependence=' + PACKAGE_NAME in open(os.path.join(cwd, 'package.ini')).read()
+        elif os.path.exists(os.path.join(cwd, 'info.ini')):
+            return 'dependence=' + PACKAGE_NAME in open(os.path.join(cwd, 'info.ini')).read()
+        return False
+    return True
 
 crcs = {}
 
@@ -37,11 +56,15 @@ cpkg = ''
 cpkg_path = '?'
 
 for cwd, dirs, files in os.walk(root):
-    dirs[:] = [d for d in dirs if d not in IGNORE_FOLDER]
+    dirs[:] = [d for d in dirs if is_path_include(cwd, d)]
+    files[:] = [d for d in files if is_path_include(cwd, d)]
 
-    #for dirname in  dirs:
+    #for dirname in dirs:
     #    print("cwd is:" + cwd)
     #    print("dirname is" + dirname)
+
+    # for filename in files:
+    #     print(cwd, filename)
 
     for filename in files:
         basename, extname = os.path.splitext(filename)
@@ -54,6 +77,7 @@ for cwd, dirs, files in os.walk(root):
             if filename == 'package.ini':
                 cpkg = cwd[cwd.rfind('\\') + 1:]
                 cpkg_path = cwd
+            print('-----------------------')
             print('file loading: ' + filepath)
 
             crc_text = crc(filepath)
@@ -88,10 +112,11 @@ for cwd, dirs, files in os.walk(root):
                         print('file saved: ' + destfile)
                 except:
                     pass
-
                 crcs[relpath] = crc_text
-            print('-----------------------')
 
 with open(crc_file, 'w') as file:
+    print('-----------------------')
     file.write(json.dumps(crcs))
     print('crc cache saved: ' + crc_file)
+
+print('-----------------------')
