@@ -769,12 +769,15 @@ end
 -- 事件、快捷键、菜单注册
 ---------------------------------------------------
 if _DEBUG_LEVEL_ < 3 then
-	if not (IsDebugClient and IsDebugClient()) then
-		RegisterEvent('CALL_LUA_ERROR', function()
+	if not ECHO_LUA_ERROR then
+		ECHO_LUA_ERROR = LIB.GetAddonInfo().szNameSpace
+	end
+	RegisterEvent('CALL_LUA_ERROR', function()
+		if ECHO_LUA_ERROR == LIB.GetAddonInfo().szNameSpace then
 			print(arg0)
 			OutputMessage('MSG_SYS', arg0)
-		end)
-	end
+		end
+	end)
 	TraceButton_AppendAddonMenu({{
 		szOption = 'ReloadUIAddon',
 		fnAction = function()
