@@ -7,7 +7,6 @@
 '''
 
 import sys, os, codecs, re, time, json, zlib
-from l_convert import zhcn2zhtw
 
 FILE_MAPPING = {
     'zhcn.lang': { 'out': 'zhtw.lang', 'type': 'lang' },
@@ -16,6 +15,15 @@ FILE_MAPPING = {
     'package.ini': { 'out': 'package.ini.zh_TW', 'type': 'package' },
 }
 IGNORE_FOLDER = ['.git', '@DATA']
+
+def zhcn2zhtw(sentence):
+    from l_converter import Converter
+    '''
+    将sentence中的简体字转为繁体字
+    :param sentence: 待转换的句子
+    :return: 将句子中简体字转换为繁体字之后的句子
+    '''
+    return Converter('zh-TW').convert(sentence)
 
 # get interface root path and crc file path
 pkg_name = ''

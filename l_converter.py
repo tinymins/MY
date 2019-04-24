@@ -10,7 +10,7 @@ try:
 except:
     pass
 
-from l_mapping import zh2Hant, zh2Hans
+from l_mapping import zh2Hant, zh2Hans, zh2TW, zh2HK, zh2CN, zh2SG
 
 import sys
 py3k = sys.version_info >= (3, 0, 0)
@@ -18,12 +18,16 @@ py3k = sys.version_info >= (3, 0, 0)
 if py3k:
     UEMPTY = ''
 else:
-    _zh2Hant, _zh2Hans = {}, {}
-    for old, new in ((zh2Hant, _zh2Hant), (zh2Hans, _zh2Hans)):
+    _zh2Hant, _zh2Hans, _zh2TW, _zh2HK, _zh2CN, _zh2SG = {}, {}, {}
+    for old, new in ((zh2Hant, _zh2Hant), (zh2Hans, _zh2Hans), (zh2TW, _zh2TW), (zh2HK, _zh2HK), (zh2CN, _zh2CN), (zh2SG, _zh2SG)):
         for k, v in old.items():
             new[k.decode('utf8')] = v.decode('utf8')
     zh2Hant = _zh2Hant
     zh2Hans = _zh2Hans
+    zh2TW = _zh2TW
+    zh2HK = _zh2HK
+    zh2CN = _zh2CN
+    zh2SG = _zh2SG
     UEMPTY = ''.decode('utf8')
 
 # states
@@ -96,6 +100,15 @@ class ConvertMap(object):
 
     def __len__(self):
         return len(self._map)
+
+def registeryLanguageMap(name, mapping):
+    global MAPS
+    MAPS[name] = { 'name': name, 'mapping': mapping, 'map': None }
+
+def fetchLanguageMap(name):
+    if not MAPS[name]['map']:
+        MAPS[name]['map'] = ConvertMap(name, MAPS[name]['mapping'])
+    return MAPS[name]['map']
 
 class StatesMachineException(Exception): pass
 
@@ -178,7 +191,7 @@ class StatesMachine(object):
 class Converter(object):
     def __init__(self, to_encoding):
         self.to_encoding = to_encoding
-        self.map = MAPS[to_encoding]
+        self.map = fetchLanguageMap(to_encoding)
         self.start()
 
     def feed(self, char):
@@ -224,14 +237,13 @@ class Converter(object):
     def get_result(self):
         return self.final
 
-
-def registery(name, mapping):
-    global MAPS
-    MAPS[name] = ConvertMap(name, mapping)
-
-registery('zh-hant', zh2Hant)
-registery('zh-hans', zh2Hans)
-del zh2Hant, zh2Hans
+registeryLanguageMap('zh-hant', zh2Hant)
+registeryLanguageMap('zh-hans', zh2Hans)
+registeryLanguageMap('zh-TW', zh2TW)
+registeryLanguageMap('zh-HK', zh2HK)
+registeryLanguageMap('zh-CN', zh2CN)
+registeryLanguageMap('zh-SG', zh2SG)
+del zh2Hant, zh2Hans, zh2TW, zh2HK, zh2CN, zh2SG
 
 
 def run():
