@@ -7,7 +7,7 @@ data = {
 
     ['ignore spaces'] = '忽略空格',
     ['ignore case'] = '忽略大寫小寫',
-    ['ignore enem'] = '忽略全角半角',
+    ['ignore enem'] = '忽略全形半形',
     ['ignore acquaintance'] = '忽略認識的人',
     ['Type keyword, right click list to config.'] = '輸入關鍵字添加 右鍵列表可配置詳情',
 
@@ -41,8 +41,8 @@ data = {
     ['part mosaics B (mosaics except 1st character)'         ] = '打碼模式B（第一個字不打碼）',
     ['part mosaics C (mosaics except last character)'        ] = '打碼模式C（最後一個字不打碼）',
     ['part mosaics D (mosaics all character)'                ] = '打碼模式D（所有字打碼）',
-    ['mosaics character'] = '輸入馬賽克字符',
-    ['unmosaics names (split by comma)'] = '不打碼的名字（英文半角逗號','分隔多個名字）',
+    ['mosaics character'] = '輸入馬賽克字元',
+    ['unmosaics names (split by comma)'] = '不打碼的名字（英文半形逗號','分隔多個名字）',
 
     ['hide blockwords'] = '關鍵字屏蔽',
     ['edit'] = '編輯',

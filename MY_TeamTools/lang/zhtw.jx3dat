@@ -53,7 +53,7 @@ data = {
 	['Ask details'] = '詢問詳情',
 	['Press ctrl and click to ask detail.'] = '按住CTRL點擊左鍵可詢問詳情',
 	['loading...'] = '讀取中..',
-	['If it is always loading, the target may not install plugin or refuse.'] = '如果一直提示加載中，可能是對方沒有安裝插件或者拒絕了您的請求',
+	['If it is always loading, the target may not install plugin or refuse.'] = '如果一直提示載入中，可能是對方沒有安裝插件或者拒絕了您的請求',
 	['Allow view charinfo'] = '允許其他人查看屬性',
 	['World mark enhance'] = '世界標記增強',
 	['Auto refuse low level player'] = '自動拒絕未滿級玩家',
@@ -84,7 +84,7 @@ data = {
 	['YY:'] = 'YY:',
 	['Paste YY'] = '發佈YY',
 	['GKP Golden Team Record'] = '金團記錄',
-	['You haven\'t had MY_GKP installed and loaded yet.'] = '喂！你並沒有安裝和加載茗伊金團記錄！小退檢查下插件吧╭(╯^╰)╮',
+	['You haven\'t had MY_GKP installed and loaded yet.'] = '喂！你並沒有安裝和載入茗伊金團記錄！小退檢查下插件吧╭(╯^╰)╮',
 	['Import Data'] = '導入數據',
 
 	['TeamNotice is disabled in this map.'] = '本地圖禁止使用團隊告示',

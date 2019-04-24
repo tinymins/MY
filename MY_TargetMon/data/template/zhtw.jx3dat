@@ -44,8 +44,8 @@ return {
 				rgbLongAlias = {255, 255, 0},
 				shortAlias = {__META__, {"nil", "string"}, nil},
 				rgbShortAlias = {255, 255, 0},
-				rHideVoid = false, -- 翻轉主配置hideVoid字段
-				rHideOthers = false, -- 翻轉當和主配置hideOthers字段
+				rHideVoid = false, -- 翻轉主配置hideVoid欄位
+				rHideOthers = false, -- 翻轉當和主配置hideOthers欄位
 				extentAnimate = {__META__, {"nil", "string"}, nil}, -- BOX特效
 				soundAppear = {
 					__META__,

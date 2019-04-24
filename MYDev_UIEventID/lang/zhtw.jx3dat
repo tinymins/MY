@@ -18,9 +18,9 @@ data = {
 	['OnMButtonClick'   ] = '中鍵點擊',
 	['OnMButtonDbClick' ] = '中鍵雙擊',
 	['OnMButtonDrag'    ] = '中鍵拖拽',
-	['OnMouseEnterLeave'] = '鼠標進出',
-	['OnMouseArea'      ] = '鼠標區域',
-	['OnMouseMove'      ] = '鼠標移動',
-	['OnMouseHover'     ] = '鼠標懸停',
+	['OnMouseEnterLeave'] = '滑鼠進出',
+	['OnMouseArea'      ] = '滑鼠區域',
+	['OnMouseMove'      ] = '滑鼠移動',
+	['OnMouseHover'     ] = '滑鼠懸停',
 	['OnScroll'         ] = '滾輪事件',
 }

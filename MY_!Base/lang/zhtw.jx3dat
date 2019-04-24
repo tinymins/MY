@@ -120,7 +120,7 @@ data = {
 	['unable to open ini file [%s]'             ] = '無法打開界面 INI 文件 [%s]',
 	['can not find wnd component [%s]'          ] = '找不到窗體組件 [%s]',
 	['unable to append handle item [%s]'        ] = '無法追加容器組件 [%s]',
-	['unable to append handle item from string.'] = '從字符串追加容器組件失敗。',
+	['unable to append handle item from string.'] = '從字元串追加容器組件失敗。',
 	['Icon Picker'                              ] = '圖標選擇器',
 	['Font picker'                              ] = '字體選擇器',
 	['color picker'                             ] = '顏色選擇器',
@@ -189,7 +189,7 @@ data = {
 	['Config and storage data of plugins'] = '插件的本地數據配置',
 	['Global storage'] = '公共數據',
 	['All characters public data'] = '所有角色公共數據存檔',
-	['All characters in this server'] = '所有該服務器公共數據存檔',
+	['All characters in this server'] = '所有該伺服器公共數據存檔',
 
 	COLOR_NAME = {
 		['aliceblue'] = '艾莉斯藍',
@@ -359,7 +359,7 @@ data = {
 	['[%s] finished %s, would you like to share?'] = '[%s]獲得了%s，是否願意點擊分享到公共數據查詢中？',
 	['Please input your realname, left blank for anonymous report:'] = '輸入您希望顯示的分享者名稱，匿名分享請留空：',
 	['Open user preference folder'] = '角色數據文件夾',
-	['Open server preference folder'] = '服務器數據文件夾',
+	['Open server preference folder'] = '伺服器數據文件夾',
 	['Open global preference folder'] = '全局數據文件夾',
 
 	['Welcome to use MY plugin, would you like to start quick tutorial now?'] = '歡迎使用茗伊插件集，部分設置尚未初始化，是否立即開始個性化嚮導？',
@@ -379,10 +379,10 @@ data = {
 
 
 	['%s requires base library version upper than v%s, current at v%s.'] = '%s依賴茗伊基礎庫且要求版本不低於v%s，當前基礎庫版本為v%s。',
-	['%s Database is malformed, do you want to repair database now? Repair database may take a long time and cause a disconnection.'] = '%s數據庫已損壞，需要修複後方可使用，但是修複可能造成臨時頓卡掉線,是否立即修複？',
-	['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'] = '接下來如有頓卡請耐心等待，不要結束進程，否則您的數據庫可能造成不可逆的數據損壞，點擊確認開始操作。',
-	['Database file locked, repair database failed! : %s'] = '數據庫文件被占用，修複失敗！(%s)',
-	['%s Database repair finished!'] = '%s數據庫修複完成！',
+	['%s Database is malformed, do you want to repair database now? Repair database may take a long time and cause a disconnection.'] = '%s資料庫已損壞，需要修複後方可使用，但是修複可能造成臨時頓卡掉線,是否立即修複？',
+	['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'] = '接下來如有頓卡請耐心等待，不要結束進程，否則您的資料庫可能造成不可逆的數據損壞，點擊確認開始操作。',
+	['Database file locked, repair database failed! : %s'] = '資料庫文件被占用，修複失敗！(%s)',
+	['%s Database repair finished!'] = '%s資料庫修複完成！',
 
 	['Default'] = '默認',
 	['Bing.ogg'] = '呯',

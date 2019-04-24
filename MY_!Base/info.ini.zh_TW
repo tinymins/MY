@@ -1,6 +1,6 @@
 [MY_!Base]
 name=茗伊基礎庫
-desc=茗伊插件依賴此庫，必須加載
+desc=茗伊插件依賴此庫，必須載入
 default=1
 version=1.0
 lua_0=src\Compatible.lua

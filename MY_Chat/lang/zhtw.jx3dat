@@ -53,6 +53,6 @@ data = {
     ['part mosaics B (mosaics except 1st character)'         ] = '打碼模式B（第一個字不打碼）',
     ['part mosaics C (mosaics except last character)'        ] = '打碼模式C（最後一個字不打碼）',
     ['part mosaics D (mosaics all character)'                ] = '打碼模式D（所有字打碼）',
-    ['mosaics character'] = '輸入馬賽克字符',
-    ['unmosaics names (split by comma)'] = '不打碼的名字（英文半角逗號','分隔多個名字）',
+    ['mosaics character'] = '輸入馬賽克字元',
+    ['unmosaics names (split by comma)'] = '不打碼的名字（英文半形逗號','分隔多個名字）',
 }

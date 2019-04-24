@@ -83,7 +83,7 @@ data = {
     ['hide when unfight'] = '脫戰時隱藏',
     ['hide decimal'] = '不顯示小數',
 
-    ['Default config cannot be loaded, please reinstall!!!'] = '默認配置加載失敗，請重新安裝！',
+    ['Default config cannot be loaded, please reinstall!!!'] = '默認配置載入失敗，請重新安裝！',
     ['Unified force color'] = '統一染色',
     ['Differentiate force color'] = '門派染色',
 
