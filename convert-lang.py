@@ -20,6 +20,7 @@ IGNORE_FOLDER = ['.git', '@DATA']
 # get interface root path and crc file path
 pkg_name = ''
 root_path = os.path.dirname(os.path.abspath(__file__))
+header_file = os.path.join(root_path, 'header.tpl.lua')
 if os.path.basename(root_path).lower() != 'interface' and os.path.basename(os.path.dirname(root_path)) == 'interface':
     pkg_name = os.path.basename(root_path)
     root_path = os.path.dirname(root_path)
@@ -46,12 +47,24 @@ def is_path_include(cwd, d):
         return False
     return True
 
+print('-----------------------')
 crcs = {}
-
 if os.path.isfile(crc_file):
     with open(crc_file, 'r') as f:
         crcs = json.load(f)
-        print('crc cache loaded: ' + crc_file)
+        print('Crc cache loaded: ' + crc_file)
+
+header = ''
+header_changed = False
+if os.path.exists(header_file):
+    for _, line in enumerate(codecs.open(header_file,'r',encoding='gbk')):
+        header = header + line
+    print('Header loaded: ' + header_file)
+    crc_header = crc(header_file)
+    relpath = header_file.replace(root_path, '')
+    if crc_header != crcs.get(relpath):
+        header_changed = True
+        crcs[relpath] = crc_header
 
 cpkg = ''
 cpkg_path = '?'
@@ -69,22 +82,44 @@ for cwd, dirs, files in os.walk(root_path):
 
     for filename in files:
         basename, extname = os.path.splitext(filename)
-        is_info_file = filename in ['info.ini', 'package.ini']
-        if filename in FILE_MAPPING:
-            info = FILE_MAPPING[filename]
-            filepath = os.path.join(cwd, filename)
-            relpath = filepath.replace(root_path, '')
+        filepath = os.path.join(cwd, filename)
+        relpath = filepath.replace(root_path, '')
+        crc_changed = False
 
+        if extname == '.lua' and basename != pkg_name and filename != 'Compatible.lua':
+            print('-----------------------')
+            print('Update header: ' + filepath)
+            crc_text = crc(filepath)
+            if not crc_changed:
+                crc_changed = crc_text != crcs.get(relpath)
+            if header_changed or crc_changed:
+                all_the_text = ''
+                for count, line in enumerate(codecs.open(filepath,'r',encoding='gbk')):
+                    all_the_text = all_the_text + line
+                ret_text = re.sub(r'(?s)([-]+)\n-- these global functions are accessed all the time by the event handler\n-- so caching them is worth the effort\n\1.*?\n\1\n', header, all_the_text)
+
+                if all_the_text != ret_text:
+                    print('File saving...')
+                    with codecs.open(filepath,'w',encoding='gbk') as f:
+                        f.write(ret_text)
+                        print('File saved...')
+                else:
+                    print('Already up to date.')
+                crcs[relpath] = crc_text
+            else:
+                print('Already up to date.')
+
+        if filename in FILE_MAPPING:
+            print('-----------------------')
+            print('Convert language: ' + filepath)
+            info = FILE_MAPPING[filename]
+            crc_text = crc(filepath)
+            if not crc_changed:
+                crc_changed = crc_text != crcs.get(relpath)
             if filename == 'package.ini':
                 cpkg = cwd[cwd.rfind('\\') + 1:]
                 cpkg_path = cwd
-            print('-----------------------')
-            print('file loading: ' + filepath)
-
-            crc_text = crc(filepath)
-            if crc_text == crcs.get(relpath):
-                print('file not changed.')
-            else:
+            if crc_changed:
                 try:
                     # all_the_text = "-- language data (zhtw) updated at " + time.strftime('%Y-%m-%d %H:%I:%M',time.localtime(time.time())) + "\r\n"
                     all_the_text = ""
@@ -93,31 +128,33 @@ for cwd, dirs, files in os.walk(root_path):
                             all_the_text = line.replace('zhcn', 'zhtw')
                         else:
                             all_the_text = all_the_text + line
-                    print('file converting...')
+                    print('File converting...')
 
                     # fill missing package
                     if filename == 'info.ini' and cwd.find(cpkg_path) == 0 and all_the_text.find('package=') == -1:
                         all_the_text = all_the_text.rstrip() + '\npackage=' + cpkg + '\n'
                         with codecs.open(filepath,'w',encoding='gbk') as f:
                             f.write(all_the_text)
-                            print('file saved: ' + filepath)
+                            print('File saved: ' + filepath)
                         crc_text = crc(filepath)
 
                     # all_the_text = all_the_text.decode('gbk')
                     all_the_text = zhcn2zhtw(all_the_text)
 
-                    print('file saving...')
+                    print('File saving...')
                     destfile = info['out']
                     with codecs.open(os.path.join(cwd, destfile),'w',encoding='utf8') as f:
                         f.write(all_the_text)
-                        print('file saved: ' + destfile)
+                        print('File saved: ' + destfile)
                 except:
                     pass
                 crcs[relpath] = crc_text
+            else:
+                print('Already up to date.')
 
 with open(crc_file, 'w') as file:
     print('-----------------------')
     file.write(json.dumps(crcs))
-    print('crc cache saved: ' + crc_file)
+    print('Crc cache saved: ' + crc_file)
 
 print('-----------------------')
