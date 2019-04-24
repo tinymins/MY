@@ -29,7 +29,7 @@ def zhcn2zhtw(sentence):
 
 # get interface root path
 pkg_name = ''
-root_path = os.path.dirname(os.path.abspath(os.getcwd()))
+root_path = os.path.abspath(os.getcwd())
 header_file = os.path.join(root_path, 'header.tpl.lua')
 if os.path.basename(root_path).lower() != 'interface' and os.path.basename(os.path.dirname(root_path)) == 'interface':
     pkg_name = os.path.basename(root_path)
@@ -62,6 +62,7 @@ def is_path_include(cwd, d):
 
 print('-----------------------')
 print('Working DIR: ' + root_path)
+print('Working PKG: ' + (pkg_name or 'ALL'))
 crcs = {}
 if os.path.isfile(crc_file):
     with open(crc_file, 'r') as f:
