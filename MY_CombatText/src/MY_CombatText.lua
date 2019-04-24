@@ -328,12 +328,10 @@ function MY_CombatText.OnEvent(szEvent)
 	elseif szEvent == 'LOADING_END' then
 		this:Show()
 		CombatText.FreeQueue()
-	elseif szEvent == 'COINSHOP_ON_OPEN' then
-	elseif szEvent == 'ENTER_STORY_MODE' then
-		this:Hide()
-	elseif szEvent == 'COINSHOP_ON_CLOSE' then
-	elseif szEvent == 'LEAVE_STORY_MODE' then
-		this:Show()
+	elseif szEvent == 'COINSHOP_ON_OPEN' or szEvent == 'ENTER_STORY_MODE' then
+		this:HideWhenUIHide()
+	elseif szEvent == 'COINSHOP_ON_CLOSE' or szEvent == 'LEAVE_STORY_MODE' then
+		this:ShowWhenUIHide()
 	end
 end
 

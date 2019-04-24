@@ -4685,12 +4685,10 @@ end
 function MY_Shadows.OnEvent(event)
 	if event == 'LOADING_END' then
 		this:Show()
-	elseif event == 'COINSHOP_ON_OPEN' then
-	elseif event == 'ENTER_STORY_MODE' then
-		this:Hide()
-	elseif event == 'COINSHOP_ON_CLOSE' then
-	elseif event == 'LEAVE_STORY_MODE' then
-		this:Show()
+	elseif event == 'COINSHOP_ON_OPEN' or event == 'ENTER_STORY_MODE' then
+		this:HideWhenUIHide()
+	elseif event == 'COINSHOP_ON_CLOSE' or event == 'LEAVE_STORY_MODE' then
+		this:ShowWhenUIHide()
 	elseif event == 'ON_FRAME_CREATE' then
 		UI(this):bringToBottom()
 	end
