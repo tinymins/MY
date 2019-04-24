@@ -115,7 +115,7 @@ class StatesMachineException(Exception): pass
 class StatesMachine(object):
     def __init__(self):
         self.state = START
-        self.final = UEMPTY
+        self.final = []
         self.len = 0
         self.pool = UEMPTY
 
@@ -149,21 +149,21 @@ class StatesMachine(object):
             if self.state == WAIT_TAIL and node.is_original_long_word():
                 self.state = FAIL
             else:
-                self.final += node.to_word
+                self.final.append(node.to_word)
                 self.len += 1
                 self.pool = UEMPTY
                 self.state = END
         elif self.state == START or self.state == WAIT_TAIL:
             if cond == MATCHED_SWITCH:
                 new = self.clone(node.from_word)
-                self.final += node.to_word
+                self.final.append(node.to_word)
                 self.len += 1
                 self.state = END
                 self.pool = UEMPTY
             elif cond == UNMATCHED_SWITCH or cond == CONNECTOR:
                 if self.state == START:
                     new = self.clone(node.from_word)
-                    self.final += node.to_word
+                    self.final.append(node.to_word)
                     self.len += 1
                     self.state = END
                 else:
@@ -185,7 +185,7 @@ class StatesMachine(object):
 
     def __str__(self):
         return '<StatesMachine %s, pool: "%s", state: %s, final: %s>' % (
-                id(self), self.pool, self.state, self.final)
+                id(self), self.pool, self.state, ''.join(self.final))
     __repr__ = __str__
 
 class Converter(object):
@@ -209,18 +209,17 @@ class Converter(object):
                 all_ok = False
         if all_ok:
             self._clean()
-        return self.get_result()
 
     def _clean(self):
         if len(self.machines):
             self.machines.sort(key=lambda x: len(x))
             # self.machines.sort(cmp=lambda x,y: cmp(len(x), len(y)))
-            self.final += self.machines[0].final
+            self.final.extend(self.machines[0].final)
         self.machines = [StatesMachine()]
 
     def start(self):
         self.machines = [StatesMachine()]
-        self.final = UEMPTY
+        self.final = []
 
     def end(self):
         self.machines = [fsm for fsm in self.machines
@@ -235,7 +234,7 @@ class Converter(object):
         return self.get_result()
 
     def get_result(self):
-        return self.final
+        return ''.join(self.final)
 
 registeryLanguageMap('zh-hant', zh2Hant)
 registeryLanguageMap('zh-hans', zh2Hans)
