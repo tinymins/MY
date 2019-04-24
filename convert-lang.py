@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# pip install pyinstaller
+# pyinstaller --onefile convert-lang.py
 
 '''
     File name: convert-lang.py
@@ -25,13 +27,16 @@ def zhcn2zhtw(sentence):
     '''
     return Converter('zh-TW').convert(sentence)
 
-# get interface root path and crc file path
+# get interface root path
 pkg_name = ''
-root_path = os.path.dirname(os.path.abspath(__file__))
+root_path = os.path.dirname(os.path.abspath(os.getcwd()))
 header_file = os.path.join(root_path, 'header.tpl.lua')
 if os.path.basename(root_path).lower() != 'interface' and os.path.basename(os.path.dirname(root_path)) == 'interface':
     pkg_name = os.path.basename(root_path)
     root_path = os.path.dirname(root_path)
+# get crc cache file path
+if not os.path.exists(os.path.join(root_path, '__pycache__')):
+    os.mkdir(os.path.join(root_path, '__pycache__'))
 crc_file = os.path.join(root_path, '__pycache__' + os.path.sep + 'file.crc.json')
 
 def crc(fileName):
@@ -56,6 +61,7 @@ def is_path_include(cwd, d):
     return True
 
 print('-----------------------')
+print('Working DIR: ' + root_path)
 crcs = {}
 if os.path.isfile(crc_file):
     with open(crc_file, 'r') as f:
@@ -94,7 +100,7 @@ for cwd, dirs, files in os.walk(root_path):
         relpath = filepath.replace(root_path, '')
         crc_changed = False
 
-        if extname == '.lua' and basename != pkg_name and filename != 'Compatible.lua':
+        if extname == '.lua' and header != '' and basename != pkg_name and filename != 'Compatible.lua':
             print('-----------------------')
             print('Update header: ' + filepath)
             crc_text = crc(filepath)
@@ -166,3 +172,6 @@ with open(crc_file, 'w') as file:
     print('Crc cache saved: ' + crc_file)
 
 print('-----------------------')
+print('Process finished...')
+print('-----------------------')
+time.sleep(10)
