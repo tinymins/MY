@@ -9,7 +9,6 @@
 import sys, os, codecs, re, time, json, zlib
 from l_convert import zhcn2zhtw
 
-PACKAGE_NAME = 'MY'
 FILE_MAPPING = {
     'zhcn.lang': { 'out': 'zhtw.lang', 'type': 'lang' },
     'zhcn.jx3dat': { 'out': 'zhtw.jx3dat', 'type': 'lang' },
@@ -19,10 +18,12 @@ FILE_MAPPING = {
 IGNORE_FOLDER = ['.git', '@DATA']
 
 # get interface root path and crc file path
-root = os.path.dirname(os.path.abspath(__file__))
-if os.path.basename(root).lower() != 'interface' and os.path.basename(os.path.dirname(root)) == 'interface':
-    root = os.path.dirname(root)
-crc_file = os.path.join(root, '__pycache__' + os.path.sep + 'file.crc.json')
+pkg_name = ''
+root_path = os.path.dirname(os.path.abspath(__file__))
+if os.path.basename(root_path).lower() != 'interface' and os.path.basename(os.path.dirname(root_path)) == 'interface':
+    pkg_name = os.path.basename(root_path)
+    root_path = os.path.dirname(root_path)
+crc_file = os.path.join(root_path, '__pycache__' + os.path.sep + 'file.crc.json')
 
 def crc(fileName):
     prev = 0
@@ -35,13 +36,13 @@ def is_path_include(cwd, d):
         return False
     if d in IGNORE_FOLDER:
         return False
-    if os.path.basename(os.path.dirname(cwd)).lower() == 'interface':
-        if os.path.basename(cwd) == PACKAGE_NAME:
+    if os.path.basename(os.path.dirname(cwd)).lower() == 'interface' and pkg_name != '':
+        if os.path.basename(cwd) == pkg_name:
             return True
         elif os.path.exists(os.path.join(cwd, 'package.ini')):
-            return 'dependence=' + PACKAGE_NAME in open(os.path.join(cwd, 'package.ini')).read()
+            return 'dependence=' + pkg_name in open(os.path.join(cwd, 'package.ini')).read()
         elif os.path.exists(os.path.join(cwd, 'info.ini')):
-            return 'dependence=' + PACKAGE_NAME in open(os.path.join(cwd, 'info.ini')).read()
+            return 'dependence=' + pkg_name in open(os.path.join(cwd, 'info.ini')).read()
         return False
     return True
 
@@ -55,7 +56,7 @@ if os.path.isfile(crc_file):
 cpkg = ''
 cpkg_path = '?'
 
-for cwd, dirs, files in os.walk(root):
+for cwd, dirs, files in os.walk(root_path):
     dirs[:] = [d for d in dirs if is_path_include(cwd, d)]
     files[:] = [d for d in files if is_path_include(cwd, d)]
 
@@ -72,7 +73,7 @@ for cwd, dirs, files in os.walk(root):
         if filename in FILE_MAPPING:
             info = FILE_MAPPING[filename]
             filepath = os.path.join(cwd, filename)
-            relpath = filepath.replace(root, '')
+            relpath = filepath.replace(root_path, '')
 
             if filename == 'package.ini':
                 cpkg = cwd[cwd.rfind('\\') + 1:]
