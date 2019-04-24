@@ -683,7 +683,7 @@ function D.GetTargetMenu(dwType, dwID)
 		fnAction = function()
 			if not O.bEnable then
 				O.bEnable = true
-				MY_Focus.Open()
+				MY_FocusUI.Open()
 			end
 			D.SetFocusID(dwType, dwID)
 		end,
@@ -692,7 +692,7 @@ function D.GetTargetMenu(dwType, dwID)
 		fnAction = function()
 			if not O.bEnable then
 				O.bEnable = true
-				MY_Focus.Open()
+				MY_FocusUI.Open()
 			end
 			D.SetFocusID(dwType, dwID, true)
 		end,
@@ -809,7 +809,7 @@ LIB.RegisterTutorial({
 		fnAction = function()
 			O.bEnable = true
 			STYLE_CONFIG_CHANGED = true
-			MY_Focus.Open()
+			MY_FocusUI.Open()
 			LIB.RedrawTab('MY_Focus')
 		end,
 	},
