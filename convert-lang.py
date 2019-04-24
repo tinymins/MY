@@ -27,6 +27,8 @@ def zhcn2zhtw(sentence):
     '''
     return Converter('zh-TW').convert(sentence)
 
+start_time = time.time() * 1000
+
 # get interface root path
 pkg_name = ''
 root_path = os.path.abspath(os.getcwd())
@@ -161,9 +163,9 @@ for cwd, dirs, files in os.walk(root_path):
                     with codecs.open(os.path.join(cwd, destfile),'w',encoding='utf8') as f:
                         f.write(all_the_text)
                         print('File saved: ' + destfile)
-                except:
-                    pass
-                crcs[relpath] = crc_text
+                    crcs[relpath] = crc_text
+                except Exception as e:
+                    crcs[relpath] = str(e)
             else:
                 print('Already up to date.')
 
@@ -174,5 +176,6 @@ with open(crc_file, 'w') as file:
 
 print('-----------------------')
 print('Process finished...')
+print('Time cost %dms...' % (time.time() * 1000 - start_time))
 print('-----------------------')
 time.sleep(10)
