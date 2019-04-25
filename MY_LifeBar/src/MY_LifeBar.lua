@@ -709,7 +709,7 @@ local function onSwitch()
 	MY_LifeBar.bEnabled = not MY_LifeBar.bEnabled
 	D.Reset(true)
 end
-LIB.RegisterHotKey('MY_LifeBar_S', _L['x lifebar'], onSwitch)
+LIB.RegisterHotKey('MY_LifeBar_S', _L['MY_LifeBar'], onSwitch)
 
 setmetatable(MY_LifeBar, {
 	__index = {
