@@ -161,6 +161,9 @@ function D.InfoToDialog(aInfo, dwTargetType, dwTargetId)
 			szContext = v.attribute.text
 		elseif v.name == 'text' then -- 文本
 			szContext = v.context
+		elseif v.name == 'MT' then -- 交通
+			insert(aDialog, { context = v.context })
+			szContextPool, szImage, nImageFrame = ''
 		end
 		if id then
 			-- 如果选项条文本为空 则使用前面文本池作为文本（沉浸式对话）
