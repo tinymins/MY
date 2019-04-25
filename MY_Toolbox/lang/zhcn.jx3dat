@@ -105,6 +105,7 @@ data = {
     ['autochat'                                        ] = '自动对话',
     ['Common'                                          ] = '通用',
     ['Auto interact disabled due to SHIFT key pressed.'] = '你按住了Shift键，自动对话被禁用。',
+    ['Conversation with [%s]: %s'                      ] = '对话[%s]：%s',
     ['Conversation with [%s] auto chose: %s'           ] = '对话[%s]自动选择了：%s',
     ['echo when autochat'                              ] = '输出选择的选项',
     ['auto chat when only one selection'               ] = '只有一个选项时自动选择',

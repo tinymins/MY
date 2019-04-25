@@ -129,21 +129,27 @@ end
 
 -- 将服务器返回的对话Info解析为内容和交互选项
 function D.InfoToDialog(aInfo, dwTargetType, dwTargetId)
-	local aDialog = { context = '' }
+	local aDialog = { szContext = '' }
 	-- 分析交互选项和文字内容
 	for _, v in ipairs(aInfo) do
 		if v.name == '$'  -- 选项
-		or v.name == 'W'  -- 需要确认的选项
-		or v.name == 'T' then -- 图片
-			-- if v.name == 'T' then
-			-- 	for iconid in string.gmatch(v.context, '%$ (%d+)') do
-			-- 		szImage = 'fromiconid'
-			-- 		nImageFrame = iconid
-			-- 	end
-			-- end
-			insert(aDialog, { id = v.attribute.id, context = v.context })
+		or v.name == 'W' then  -- 需要确认的选项
+			if v.name == 'T' then
+				for iconid in string.gmatch(v.context, '%$ (%d+)') do
+					szImage = 'fromiconid'
+					nImageFrame = iconid
+				end
+			end
+			insert(aDialog, { dwID = v.attribute.id, szContext = v.context })
+		elseif v.name == 'T' then -- 图片
+			local szImage, nImageFrame
+			for iconid in string.gmatch(v.context, '%$ (%d+)') do
+				szImage = 'fromiconid'
+				nImageFrame = iconid
+			end
+			insert(aDialog, { dwID = v.attribute.id, szContext = v.context, szImage = szImage, nImageFrame = nImageFrame })
 		elseif v.name == 'M' then -- 商店
-			insert(aDialog, { context = v.context })
+			insert(aDialog, { szContext = v.context })
 		elseif v.name == 'Q' then -- 任务对话
 			local dwQuestId = tonumber(v.attribute.questid)
 			local tQuestInfo = Table_GetQuestStringInfo(dwQuestId)
@@ -156,24 +162,27 @@ function D.InfoToDialog(aInfo, dwTargetType, dwTargetId)
 				or eQuestState == QUEST_STATE_BLUE_EXCLAMATION
 				or eQuestState == QUEST_STATE_WHITE_QUESTION
 				or eQuestState == QUEST_STATE_DUN_DIA then
-					insert(aDialog, { context = tQuestInfo.szName })
+					insert(aDialog, { szContext = tQuestInfo.szName })
 				end
 			end
-		elseif v.name == 'F' then -- 名字
-			aDialog.context = aDialog.context .. v.attribute.text
+		elseif v.name == 'F' then -- 字体
+			aDialog.szContext = aDialog.szContext .. v.attribute.text
 		elseif v.name == 'text' then -- 文本
-			aDialog.context = aDialog.context .. v.context
+			aDialog.szContext = aDialog.szContext .. v.context
 		elseif v.name == 'MT' then -- 交通
-			insert(aDialog, { context = v.context })
-		end
-	end
-	-- 没有内容的交互选项代表是沉浸式对话的默认行为 使用对话内容代替选项文字
-	for _, v in ipairs(aDialog) do
-		if v.id and (not v.context or v.context == '') then
-			v.context = aDialog.context
+			insert(aDialog, { szContext = v.context })
 		end
 	end
 	return aDialog
+end
+
+function D.EchoDialog(szName, aDialog, tOption)
+	if MY_AutoChat.bEchoOn then
+		LIB.Sysmsg({_L('Conversation with [%s]: %s', szName, aDialog.szContext:gsub('%s', ''))})
+		if tOption.szContext and tOption.szContext ~= '' then
+			LIB.Sysmsg({_L('Conversation with [%s] auto chose: %s', szName, tOption.szContext)})
+		end
+	end
 end
 
 function D.Choose(szType, dwTarType, dwTarID, dwIndex, aInfo)
@@ -183,33 +192,28 @@ function D.Choose(szType, dwTarType, dwTarID, dwIndex, aInfo)
 	end
 	local tChat = (CHAT[szMap] or EMPTY_TABLE)[szName] or EMPTY_TABLE
 
-	local nCount, szContext, dwID = 0
+	local nCount, tDefaultOption = 0
 	local aDialog = D.InfoToDialog(aInfo, dwTarType, dwTarID)
-	for i, info in ipairs(aDialog) do
-		if info.id and tChat[info.context] and tChat[info.context] > 0 then
-			if info.id > 0 then
-				for i = 1, tChat[info.context] do
-					WindowSelect(dwIndex, info.id)
+	for i, tOption in ipairs(aDialog) do
+		if tOption.dwID and tChat[tOption.szContext] and tChat[tOption.szContext] > 0 then
+			if tOption.dwID > 0 then
+				for i = 1, tChat[tOption.szContext] do
+					WindowSelect(dwIndex, tOption.dwID)
 				end
 			end
-			if MY_AutoChat.bEchoOn then
-				LIB.Sysmsg({_L('Conversation with [%s] auto chose: %s', szName, info.context)})
-			end
+			D.EchoDialog(szName, aDialog, tOption)
 			return true
 		else
-			if info.id then
-				dwID = info.id
-				szContext = info.context
+			if tOption.dwID then
+				tDefaultOption = tOption
 			end
 			nCount = nCount + 1
 		end
 	end
 
-	if MY_AutoChat.bAutoSelectSg and dwID and nCount == 1 and not LIB.IsInDungeon() then
-		WindowSelect(dwIndex, dwID)
-		if MY_AutoChat.bEchoOn then
-			LIB.Sysmsg({_L('Conversation with [%s] auto chose: %s', szName, szContext)})
-		end
+	if MY_AutoChat.bAutoSelectSg and tDefaultOption and nCount == 1 and not LIB.IsInDungeon() then
+		WindowSelect(dwIndex, tDefaultOption.dwID)
+		D.EchoDialog(szName, aDialog, tDefaultOption)
 		return true
 	end
 end
@@ -352,35 +356,33 @@ do
 local function GetDialoguePanelMenuItem(szMap, szName, dialogueInfo)
 	local r, g, b = 255, 255, 255
 	local szIcon, nFrame, nMouseOverFrame, szLayer, fnClickIcon, fnAction
-	if CHAT[szMap] and CHAT[szMap][szName] and CHAT[szMap][szName][dialogueInfo.context] then
+	if CHAT[szMap] and CHAT[szMap][szName] and CHAT[szMap][szName][dialogueInfo.szContext] then
 		szIcon = 'ui/Image/UICommon/Feedanimials.UITex'
 		nFrame = 86
 		nMouseOverFrame = 87
 		szLayer = 'ICON_RIGHT'
 		fnClickIcon = function()
-			D.DelData(szMap, szName, dialogueInfo.context)
+			D.DelData(szMap, szName, dialogueInfo.szContext)
 			Wnd.CloseWindow('PopupMenuPanel')
 		end
-		if CHAT[szMap][szName][dialogueInfo.context] > 0 then
+		if CHAT[szMap][szName][dialogueInfo.szContext] > 0 then
 			r, g, b = 255, 0, 255
-			fnAction = function() D.DisableData(szMap, szName, dialogueInfo.context) end
+			fnAction = function() D.DisableData(szMap, szName, dialogueInfo.szContext) end
 		else
 			r, g, b = 255, 255, 255
-			fnAction = function() D.AddData(szMap, szName, dialogueInfo.context) end
+			fnAction = function() D.AddData(szMap, szName, dialogueInfo.szContext) end
 		end
 	else
-		fnAction = function() D.AddData(szMap, szName, dialogueInfo.context) end
+		fnAction = function() D.AddData(szMap, szName, dialogueInfo.szContext) end
 	end
-	if dialogueInfo.name == 'T' then
-		for szIconID in string.gmatch(dialogueInfo.context, '%$ (%d+)') do
-			szIcon = 'fromiconid'
-			nFrame = szIconID
-			szLayer = 'ICON_RIGHT'
-		end
+	if dialogueInfo.szImage then
+		szIcon = dialogueInfo.szImage
+		nFrame = dialogueInfo.nImageFrame
+		szLayer = 'ICON_RIGHT'
 	end
 	return {
 		r = r, g = g, b = b,
-		szOption =  (IsCtrlKeyDown() and dialogueInfo.id and ('(' .. dialogueInfo.id .. ') ') or '') .. dialogueInfo.context,
+		szOption =  (IsCtrlKeyDown() and dialogueInfo.dwID and ('(' .. dialogueInfo.dwID .. ') ') or '') .. dialogueInfo.szContext,
 		fnAction = fnAction,
 		szIcon = szIcon, nFrame = nFrame, nMouseOverFrame = nMouseOverFrame,
 		szLayer = szLayer, fnClickIcon = fnClickIcon,
@@ -398,13 +400,13 @@ local function GetDialoguePanelMenu(frame)
 			local aDialog = D.InfoToDialog(frame.aInfo, dwTarType, dwTarID)
 			for i, info in ipairs(aDialog) do
 				table.insert(t, GetDialoguePanelMenuItem(szMap, szName, info))
-				tChat[info.context] = true
+				tChat[info.szContext] = true
 			end
 			-- 保存的自动对话
 			if CHAT[szMap] and CHAT[szMap][szName] then
 				for szContext, nCount in pairs(CHAT[szMap][szName]) do
 					if not tChat[szContext] then
-						table.insert(t, GetDialoguePanelMenuItem(szMap, szName, { name = '$', context = szContext }))
+						table.insert(t, GetDialoguePanelMenuItem(szMap, szName, { szContext = szContext }))
 						tChat[szContext] = true
 					end
 				end
