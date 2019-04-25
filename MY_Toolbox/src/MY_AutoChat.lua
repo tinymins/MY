@@ -144,71 +144,6 @@ local function GetActiveQuestPanel()
 	return GetActivePanel('quest')
 end
 
-function D.CreateEntry()
-	if LIB.IsShieldedVersion() then
-		return
-	end
-	for _, p in ipairs(ENTRY_LIST) do
-		local frame = Station.Lookup(p.root)
-		if frame and (not p.el or not p.el:IsValid()) then
-			local wnd = frame
-			if p.path then
-				wnd = frame:Lookup(p.path)
-			end
-			p.el = UI(wnd):append('WndButton', {
-				name = 'WndButton_AutoChat',
-				text = _L['autochat'],
-				tip = _L['Left click to config autochat.\nRight click to edit global config.'],
-				tippostype = MY_TIP_POSTYPE.TOP_BOTTOM,
-				lmenu = function() return GetDialoguePanelMenu(frame) end,
-				rmenu = GetSettingMenu,
-			}, true):raw()
-		end
-	end
-	D.UpdateEntryPos()
-end
-LIB.RegisterInit('MY_AutoChat', D.CreateEntry)
-
-function D.UpdateEntryPos()
-	if LIB.IsShieldedVersion() then
-		return
-	end
-	for _, p in ipairs(ENTRY_LIST) do
-		local frame = Station.Lookup(p.root)
-		if frame and p.el and p.el:IsValid() then
-			local wnd = frame
-			if p.path then
-				wnd = frame:Lookup(p.path)
-			end
-			local ref = frame
-			if p.ref then
-				ref = frame:Lookup(p.ref)
-			end
-			local x = p.x + (ref:GetAbsX() - frame:GetAbsX())
-			local y = p.y + (ref:GetAbsY() - frame:GetAbsY())
-			local point = p.point or 'TOPLEFT'
-			if point:find('RIGHT') then
-				x = x + ref:GetW()
-			end
-			if point:find('BOTTOM') then
-				y = y + ref:GetH()
-			end
-			p.el:SetRelPos(x, y)
-		end
-	end
-end
-MY.RegisterEvent('UI_SCALED.MY_AutoChat', D.UpdateEntryPos)
-
-function D.RemoveEntry()
-	for i, p in ipairs(ENTRY_LIST) do
-		if p.el and p.el:IsValid() then
-			p.el:Destroy()
-		end
-		p.el = nil
-	end
-end
-LIB.RegisterReload('MY_AutoChat', D.RemoveEntry)
-
 local function WindowSelect(dwIndex, dwID)
 	LIB.Debug({'WindowSelect ' .. dwIndex .. ',' .. dwID}, 'AUTO_CHAT', DEBUG_LEVEL.LOG)
 	return GetClientPlayer().WindowSelect(dwIndex, dwID)
@@ -402,6 +337,7 @@ end)
 ---------------------------------------------------------------------------
 -- 对话面板HOOK 添加自动对话设置按钮
 ---------------------------------------------------------------------------
+do
 local function GetDialoguePanelMenuItem(szMap, szName, dialogueInfo)
 	local r, g, b = 255, 255, 255
 	local szIcon, nFrame, nMouseOverFrame, szLayer, fnClickIcon, fnAction
@@ -467,6 +403,72 @@ local function GetDialoguePanelMenu(frame)
 			return t
 		end
 	end
+end
+
+function D.CreateEntry()
+	if LIB.IsShieldedVersion() then
+		return
+	end
+	for _, p in ipairs(ENTRY_LIST) do
+		local frame = Station.Lookup(p.root)
+		if frame and (not p.el or not p.el:IsValid()) then
+			local wnd = frame
+			if p.path then
+				wnd = frame:Lookup(p.path)
+			end
+			p.el = UI(wnd):append('WndButton', {
+				name = 'WndButton_AutoChat',
+				text = _L['autochat'],
+				tip = _L['Left click to config autochat.\nRight click to edit global config.'],
+				tippostype = MY_TIP_POSTYPE.TOP_BOTTOM,
+				lmenu = function() return GetDialoguePanelMenu(frame) end,
+				rmenu = GetSettingMenu,
+			}, true):raw()
+		end
+	end
+	D.UpdateEntryPos()
+end
+LIB.RegisterInit('MY_AutoChat', D.CreateEntry)
+
+function D.UpdateEntryPos()
+	if LIB.IsShieldedVersion() then
+		return
+	end
+	for _, p in ipairs(ENTRY_LIST) do
+		local frame = Station.Lookup(p.root)
+		if frame and p.el and p.el:IsValid() then
+			local wnd = frame
+			if p.path then
+				wnd = frame:Lookup(p.path)
+			end
+			local ref = frame
+			if p.ref then
+				ref = frame:Lookup(p.ref)
+			end
+			local x = p.x + (ref:GetAbsX() - frame:GetAbsX())
+			local y = p.y + (ref:GetAbsY() - frame:GetAbsY())
+			local point = p.point or 'TOPLEFT'
+			if point:find('RIGHT') then
+				x = x + ref:GetW()
+			end
+			if point:find('BOTTOM') then
+				y = y + ref:GetH()
+			end
+			p.el:SetRelPos(x, y)
+		end
+	end
+end
+MY.RegisterEvent('UI_SCALED.MY_AutoChat', D.UpdateEntryPos)
+
+function D.RemoveEntry()
+	for i, p in ipairs(ENTRY_LIST) do
+		if p.el and p.el:IsValid() then
+			p.el:Destroy()
+		end
+		p.el = nil
+	end
+end
+LIB.RegisterReload('MY_AutoChat', D.RemoveEntry)
 end
 
 do
