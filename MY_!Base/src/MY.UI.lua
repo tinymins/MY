@@ -818,6 +818,11 @@ function UI:find(filter)
 	return UI(raws):filter(filter)
 end
 
+function UI:raw(nIndex)
+	self:_checksum()
+	return self.raws[nIndex or 1]
+end
+
 -- filter mouse in component
 function UI:ptIn()
 	self:_checksum()
