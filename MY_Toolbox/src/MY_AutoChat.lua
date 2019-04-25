@@ -45,11 +45,13 @@ MY_AutoChat.bEnableShift = true
 MY_AutoChat.bAutoSelect1 = false
 MY_AutoChat.Conents = nil
 MY_AutoChat.CurrentWindow = 0
+MY_AutoChat.bSkipQuestTalk = false
 RegisterCustomData('MY_AutoChat.bEnable')
 RegisterCustomData('MY_AutoChat.bEchoOn', 1)
 RegisterCustomData('MY_AutoChat.bAutoClose', 1)
 RegisterCustomData('MY_AutoChat.bEnableShift')
 RegisterCustomData('MY_AutoChat.bAutoSelect1')
+RegisterCustomData('MY_AutoChat.bSkipQuestTalk')
 
 function MY_AutoChat.LoadData()
 	local szOrgPath = LIB.GetLUADataPath('config/AUTO_CHAT/data.$lang.jx3dat')
@@ -112,16 +114,25 @@ function MY_AutoChat.DelData(szMap, szName, szKey)
 end
 
 local HOOK_LIST = {
-	{ root = 'Normal/DialoguePanel', x = 53, y = 4 },
-	{ root = 'Lowest2/PlotDialoguePanel', path = 'WndScroll_Options', x = 340, y = 10 },
+	{ root = 'Normal/DialoguePanel', x = 53, y = 4, type = 'dialog' },
+	{ root = 'Lowest2/PlotDialoguePanel', path = 'WndScroll_Options', x = 340, y = 10, type = 'dialog' },
+	{ root = 'Lowest2/QuestAcceptPanel', path = 'Wnd_Dialogue', x = 840, y = -40, type = 'quest' },
 }
-local function GetActiveDialoguePanel()
+local function GetActivePanel(type)
 	for _, p in ipairs(HOOK_LIST) do
-		local frame = Station.Lookup(p.root)
-		if frame and frame:IsVisible() then
-			return frame
+		if p.type == type then
+			local frame = Station.Lookup(p.root)
+			if frame and frame:IsVisible() then
+				return frame
+			end
 		end
 	end
+end
+local function GetActiveDialoguePanel()
+	return GetActivePanel('dialog')
+end
+local function GetActiveQuestPanel()
+	return GetActivePanel('quest')
 end
 
 local function WindowSelect(dwIndex, dwID)
@@ -205,13 +216,27 @@ function MY_AutoChat.DoSomething()
 		LIB.Sysmsg({_L['Auto interact disabled due to SHIFT key pressed.']})
 		return
 	end
+	local frame = GetActiveQuestPanel()
+	if frame and frame:IsVisible() then
+		MY_AutoChat.SkipQuestTalk()
+	end
 	local frame = GetActiveDialoguePanel()
 	if frame and frame:IsVisible() then
 		if MY_AutoChat.Choose(frame.dwTargetType, frame.dwTargetId, frame.dwIndex, frame.aInfo)
 		and MY_AutoChat.bAutoClose then
 			frame:Hide()
+			Station.Show()
 		end
 	end
+end
+
+function MY_AutoChat.SkipQuestTalk()
+	local frame = Station.Lookup('Lowest2/QuestAcceptPanel')
+	if not frame then
+		return
+	end
+	frame:Lookup("Btn_Reward"):Show()
+	frame:Lookup("Btn_Accept"):Show()
 end
 
 ---------------------------------------------------------------------------
@@ -248,6 +273,12 @@ local function GetSettingMenu()
 			bCheck = true, bChecked = MY_AutoChat.bAutoClose,
 			fnAction = function()
 				MY_AutoChat.bAutoClose = not MY_AutoChat.bAutoClose
+			end
+		}, {
+			szOption = _L['Skip quest talk'],
+			bCheck = true, bChecked = MY_AutoChat.bSkipQuestTalk,
+			fnAction = function()
+				MY_AutoChat.bSkipQuestTalk = not MY_AutoChat.bSkipQuestTalk
 			end
 		},
 	}
@@ -363,11 +394,11 @@ local function onOpenWindow()
 		MY_AutoChat.LoadData()
 	end
 	HookDialoguePanel()
+	MY_AutoChat.CurrentWindow = arg0
+	MY_AutoChat.Conents = arg1
 	if not MY_AutoChat.bEnable then
 		return
 	end
-	MY_AutoChat.CurrentWindow = arg0
-	MY_AutoChat.Conents = arg1
 	MY_AutoChat.DoSomething()
 end
 LIB.RegisterEvent('OPEN_WINDOW.MY_AutoChat', onOpenWindow)

@@ -110,6 +110,7 @@ data = {
     ['auto chat when only one selection'               ] = '只有一個選項時自動選擇',
     ['disable when shift key pressed'                  ] = '按住SHIFT時禁用自動對話',
     ['close after auto chat'                           ] = '自動對話後關閉窗口',
+    ['Skip quest talk'                                 ] = '跳過接受任務劇情對話',
     ['Left click to config autochat.\nRight click to edit global config.'] = '左鍵點擊配置該對話框的自動對話\n右鍵點擊配置全局自動對話設定',
 
     ['NAME_PATTERN_LIST'] = {
