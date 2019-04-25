@@ -36,33 +36,42 @@ local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.Is
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
 local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot..'MY_Toolbox/lang/')
-local _C = { Data = {} }
+local D = {}
+local CHAT
+local CURRENT_WINDOW
+local CURRENT_CONTENTS
+
 MY_AutoChat = {}
 MY_AutoChat.bEnable = false
 MY_AutoChat.bEchoOn = true
 MY_AutoChat.bAutoClose = true
 MY_AutoChat.bEnableShift = true
-MY_AutoChat.bAutoSelect1 = false
-MY_AutoChat.Conents = nil
-MY_AutoChat.CurrentWindow = 0
+MY_AutoChat.bAutoSelectSg = false
 MY_AutoChat.bSkipQuestTalk = false
 RegisterCustomData('MY_AutoChat.bEnable')
 RegisterCustomData('MY_AutoChat.bEchoOn', 1)
 RegisterCustomData('MY_AutoChat.bAutoClose', 1)
 RegisterCustomData('MY_AutoChat.bEnableShift')
-RegisterCustomData('MY_AutoChat.bAutoSelect1')
+RegisterCustomData('MY_AutoChat.bAutoSelectSg')
 RegisterCustomData('MY_AutoChat.bSkipQuestTalk')
 
-function MY_AutoChat.LoadData()
+function D.LoadData()
 	local szOrgPath = LIB.GetLUADataPath('config/AUTO_CHAT/data.$lang.jx3dat')
 	local szFilePath = LIB.GetLUADataPath({'config/autochat.jx3dat', PATH_TYPE.GLOBAL})
 	if IsLocalFileExist(szOrgPath) then
 		CPath.Move(szOrgPath, szFilePath)
 	end
-	_C.Data = LIB.LoadLUAData(szFilePath) or LIB.LoadLUAData(LIB.GetAddonInfo().szRoot .. 'MY_ToolBox/data/interact/$lang.jx3dat') or _C.Data
+	CHAT = LIB.LoadLUAData(szFilePath) or LIB.LoadLUAData(LIB.GetAddonInfo().szRoot .. 'MY_ToolBox/data/interact/$lang.jx3dat')
 end
-function MY_AutoChat.SaveData() LIB.SaveLUAData({'config/autochat.jx3dat', PATH_TYPE.GLOBAL}, _C.Data) end
-function MY_AutoChat.GetName(dwType, dwID)
+
+function D.SaveData()
+	if not CHAT then
+		return
+	end
+	LIB.SaveLUAData({'config/autochat.jx3dat', PATH_TYPE.GLOBAL}, CHAT)
+end
+
+function D.GetName(dwType, dwID)
 	if dwID == UI_GetClientPlayerID() then
 		return _L['Common'], _L['Common']
 	else
@@ -75,42 +84,42 @@ function MY_AutoChat.GetName(dwType, dwID)
 	end
 end
 
-function MY_AutoChat.AddData(szMap, szName, szKey)
-	if not _C.Data[szMap] then
-		_C.Data[szMap] = { [szName] = { [szKey] = 1 } }
-	elseif not _C.Data[szMap][szName] then
-		_C.Data[szMap][szName] = { [szKey] = 1 }
-	elseif not _C.Data[szMap][szName][szKey] then
-		_C.Data[szMap][szName][szKey] = 1
+function D.AddData(szMap, szName, szKey)
+	if not CHAT[szMap] then
+		CHAT[szMap] = { [szName] = { [szKey] = 1 } }
+	elseif not CHAT[szMap][szName] then
+		CHAT[szMap][szName] = { [szKey] = 1 }
+	elseif not CHAT[szMap][szName][szKey] then
+		CHAT[szMap][szName][szKey] = 1
 	else
-		_C.Data[szMap][szName][szKey] = _C.Data[szMap][szName][szKey] + 1
+		CHAT[szMap][szName][szKey] = CHAT[szMap][szName][szKey] + 1
 	end
-	MY_AutoChat.SaveData()
-	MY_AutoChat.DoSomething()
+	D.SaveData()
+	D.DoSomething()
 end
 
-function MY_AutoChat.DisableData(szMap, szName, szKey)
-	if _C.Data[szMap]
-	and _C.Data[szMap][szName]
-	and _C.Data[szMap][szName][szKey] then
-		_C.Data[szMap][szName][szKey] = 0
+function D.DisableData(szMap, szName, szKey)
+	if CHAT[szMap]
+	and CHAT[szMap][szName]
+	and CHAT[szMap][szName][szKey] then
+		CHAT[szMap][szName][szKey] = 0
 	end
-	MY_AutoChat.SaveData()
+	D.SaveData()
 end
 
-function MY_AutoChat.DelData(szMap, szName, szKey)
-	if not _C.Data[szMap] or not _C.Data[szMap][szName] or not _C.Data[szMap][szName][szKey] then
+function D.DelData(szMap, szName, szKey)
+	if not CHAT[szMap] or not CHAT[szMap][szName] or not CHAT[szMap][szName][szKey] then
 		return
 	else
-		_C.Data[szMap][szName][szKey] = nil
-		if empty(_C.Data[szMap][szName]) then
-			_C.Data[szMap][szName] = nil
-			if empty(_C.Data[szMap]) then
-				_C.Data[szMap] = nil
+		CHAT[szMap][szName][szKey] = nil
+		if empty(CHAT[szMap][szName]) then
+			CHAT[szMap][szName] = nil
+			if empty(CHAT[szMap]) then
+				CHAT[szMap] = nil
 			end
 		end
 	end
-	MY_AutoChat.SaveData()
+	D.SaveData()
 end
 
 local HOOK_LIST = {
@@ -172,12 +181,12 @@ local function GetDialogueInfo(v, dwTargetType, dwTargetId)
 	return context and { id = id, context = context } or nil
 end
 
-function MY_AutoChat.Choose(dwType, dwID, dwIndex, aInfo)
-	local szName, szMap = MY_AutoChat.GetName(dwType, dwID)
+function D.Choose(dwType, dwID, dwIndex, aInfo)
+	local szName, szMap = D.GetName(dwType, dwID)
 	if not (szMap and szName and dwIndex and aInfo) then
 		return
 	end
-	local tChat = (_C.Data[szMap] or EMPTY_TABLE)[szName] or EMPTY_TABLE
+	local tChat = (CHAT[szMap] or EMPTY_TABLE)[szName] or EMPTY_TABLE
 
 	local nCount, szContext, dwID = 0
 	for i, v in ipairs(aInfo) do
@@ -201,7 +210,7 @@ function MY_AutoChat.Choose(dwType, dwID, dwIndex, aInfo)
 		end
 	end
 
-	if MY_AutoChat.bAutoSelect1 and dwID and nCount == 1 and not LIB.IsInDungeon() then
+	if MY_AutoChat.bAutoSelectSg and dwID and nCount == 1 and not LIB.IsInDungeon() then
 		WindowSelect(dwIndex, dwID)
 		if MY_AutoChat.bEchoOn then
 			LIB.Sysmsg({_L('Conversation with [%s] auto chose: %s', szName, szContext)})
@@ -210,15 +219,18 @@ function MY_AutoChat.Choose(dwType, dwID, dwIndex, aInfo)
 	end
 end
 
-function MY_AutoChat.DoSomething()
-	-- Output(MY_AutoChat.Conents, MY_AutoChat.CurrentWindow)
+function D.DoSomething()
+	-- Output(CURRENT_CONTENTS, CURRENT_WINDOW)
+	if not CHAT then
+		D.LoadData()
+	end
 	if MY_AutoChat.bEnableShift and IsShiftKeyDown() then
 		LIB.Sysmsg({_L['Auto interact disabled due to SHIFT key pressed.']})
 		return
 	end
 	local frame = GetActiveDialoguePanel()
 	if frame and frame:IsVisible() then
-		if MY_AutoChat.Choose(frame.dwTargetType, frame.dwTargetId, frame.dwIndex, frame.aInfo)
+		if D.Choose(frame.dwTargetType, frame.dwTargetId, frame.dwIndex, frame.aInfo)
 		and MY_AutoChat.bAutoClose then
 			frame:Hide()
 			Station.Show()
@@ -289,9 +301,9 @@ local function GetSettingMenu()
 			end
 		}, {
 			szOption = _L['auto chat when only one selection'],
-			bCheck = true, bChecked = MY_AutoChat.bAutoSelect1,
+			bCheck = true, bChecked = MY_AutoChat.bAutoSelectSg,
 			fnAction = function()
-				MY_AutoChat.bAutoSelect1 = not MY_AutoChat.bAutoSelect1
+				MY_AutoChat.bAutoSelectSg = not MY_AutoChat.bAutoSelectSg
 			end
 		}, {
 			szOption = _L['disable when shift key pressed'],
@@ -328,24 +340,24 @@ end)
 local function GetDialoguePanelMenuItem(szMap, szName, dialogueInfo)
 	local r, g, b = 255, 255, 255
 	local szIcon, nFrame, nMouseOverFrame, szLayer, fnClickIcon, fnAction
-	if _C.Data[szMap] and _C.Data[szMap][szName] and _C.Data[szMap][szName][dialogueInfo.context] then
+	if CHAT[szMap] and CHAT[szMap][szName] and CHAT[szMap][szName][dialogueInfo.context] then
 		szIcon = 'ui/Image/UICommon/Feedanimials.UITex'
 		nFrame = 86
 		nMouseOverFrame = 87
 		szLayer = 'ICON_RIGHT'
 		fnClickIcon = function()
-			MY_AutoChat.DelData(szMap, szName, dialogueInfo.context)
+			D.DelData(szMap, szName, dialogueInfo.context)
 			Wnd.CloseWindow('PopupMenuPanel')
 		end
-		if _C.Data[szMap][szName][dialogueInfo.context] > 0 then
+		if CHAT[szMap][szName][dialogueInfo.context] > 0 then
 			r, g, b = 255, 0, 255
-			fnAction = function() MY_AutoChat.DisableData(szMap, szName, dialogueInfo.context) end
+			fnAction = function() D.DisableData(szMap, szName, dialogueInfo.context) end
 		else
 			r, g, b = 255, 255, 255
-			fnAction = function() MY_AutoChat.AddData(szMap, szName, dialogueInfo.context) end
+			fnAction = function() D.AddData(szMap, szName, dialogueInfo.context) end
 		end
 	else
-		fnAction = function() MY_AutoChat.AddData(szMap, szName, dialogueInfo.context) end
+		fnAction = function() D.AddData(szMap, szName, dialogueInfo.context) end
 	end
 	if dialogueInfo.name == 'T' then
 		for szIconID in string.gmatch(dialogueInfo.context, '%$ (%d+)') do
@@ -365,7 +377,7 @@ end
 
 local function GetDialoguePanelMenu(frame)
 	local dwType, dwID, dwIdx = frame.dwTargetType, frame.dwTargetId, frame.dwIndex
-	local szName, szMap = MY_AutoChat.GetName(dwType, dwID)
+	local szName, szMap = D.GetName(dwType, dwID)
 	if szName and szMap then
 		if frame.aInfo then
 			local t = { {szOption = szName .. (IsCtrlKeyDown() and (' (' .. dwIdx .. ')') or ''), bDisable = true}, { bDevide = true } }
@@ -379,8 +391,8 @@ local function GetDialoguePanelMenu(frame)
 				end
 			end
 			-- 保存的自动对话
-			if _C.Data[szMap] and _C.Data[szMap][szName] then
-				for szContext, nCount in pairs(_C.Data[szMap][szName]) do
+			if CHAT[szMap] and CHAT[szMap][szName] then
+				for szContext, nCount in pairs(CHAT[szMap][szName]) do
 					if not tChat[szContext] then
 						table.insert(t, GetDialoguePanelMenuItem(szMap, szName, { name = '$', context = szContext }))
 						tChat[szContext] = true
@@ -447,16 +459,13 @@ local function onOpenWindow()
 	if LIB.IsShieldedVersion() then
 		return
 	end
-	if empty(_C.Data) then
-		MY_AutoChat.LoadData()
-	end
 	HookDialoguePanel()
-	MY_AutoChat.CurrentWindow = arg0
-	MY_AutoChat.Conents = arg1
+	CURRENT_WINDOW = arg0
+	CURRENT_CONTENTS = arg1
 	if not MY_AutoChat.bEnable then
 		return
 	end
-	MY_AutoChat.DoSomething()
+	D.DoSomething()
 end
 LIB.RegisterEvent('OPEN_WINDOW.MY_AutoChat', onOpenWindow)
 
