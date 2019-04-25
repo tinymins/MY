@@ -971,6 +971,7 @@ local _tItemXML = {
 	['Handle'] = '<handle>firstpostype=0 w=10 h=10</handle>',
 }
 local _szItemINI = LIB.GetAddonInfo().szFrameworkRoot .. 'ui\\HandleItems.ini'
+local _nTempWndCount = 0
 -- append
 -- similar as jQuery.append()
 -- Instance:append(szXml[, bReturnNewItem])
@@ -1015,10 +1016,11 @@ function UI:append(arg0, arg1, arg2)
 				else
 					szFile = LIB.GetAddonInfo().szFrameworkRoot .. 'ui\\' .. szFile .. '.ini'
 				end
-				local frame = Wnd.OpenWindow(szFile, 'MY_TempWnd')
+				local frame = Wnd.OpenWindow(szFile, 'MY_TempWnd#' .. _nTempWndCount)
 				if not frame then
 					return LIB.Debug({ _L('unable to open ini file [%s]', szFile) }, 'MY#UI#append', DEBUG_LEVEL.ERROR)
 				end
+				_nTempWndCount = _nTempWndCount + 1
 				local raw = frame:Lookup(szComponet)
 				if not raw then
 					LIB.Debug({_L('can not find wnd component [%s:%s]', szFile, szComponet)}, 'MY#UI#append', DEBUG_LEVEL.ERROR)
