@@ -114,13 +114,13 @@ function MY_AutoChat.DelData(szMap, szName, szKey)
 end
 
 local HOOK_LIST = {
-	{ root = 'Normal/DialoguePanel', x = 53, y = 4, type = 'dialog' },
-	{ root = 'Lowest2/PlotDialoguePanel', path = 'WndScroll_Options', x = 340, y = 10, type = 'dialog' },
-	{ root = 'Lowest2/QuestAcceptPanel', path = 'Wnd_Dialogue', x = 840, y = -40, type = 'quest' },
+	{ root = 'Normal/DialoguePanel', x = 53, y = 4, dialog = true },
+	{ root = 'Lowest2/PlotDialoguePanel', ref = 'WndScroll_Options', point = 'TOPRIGHT', x = -50, y = 10, dialog = true },
+	{ root = 'Lowest2/QuestAcceptPanel', ref = 'Btn_Accept', point = 'TOPRIGHT', x = -30, y = 10, dialog = true, quest = true },
 }
 local function GetActivePanel(type)
 	for _, p in ipairs(HOOK_LIST) do
-		if p.type == type then
+		if p[type] then
 			local frame = Station.Lookup(p.root)
 			if frame and frame:IsVisible() then
 				return frame
@@ -216,10 +216,6 @@ function MY_AutoChat.DoSomething()
 		LIB.Sysmsg({_L['Auto interact disabled due to SHIFT key pressed.']})
 		return
 	end
-	local frame = GetActiveQuestPanel()
-	if frame and frame:IsVisible() then
-		MY_AutoChat.SkipQuestTalk()
-	end
 	local frame = GetActiveDialoguePanel()
 	if frame and frame:IsVisible() then
 		if MY_AutoChat.Choose(frame.dwTargetType, frame.dwTargetId, frame.dwIndex, frame.aInfo)
@@ -230,13 +226,48 @@ function MY_AutoChat.DoSomething()
 	end
 end
 
-function MY_AutoChat.SkipQuestTalk()
+do
+local function UnhookSkipQuestTalk()
+	if frame.__SkipQuestHackEl then
+		frame.__SkipQuestEl = nil
+		frame.__SkipQuestHackEl:Destroy()
+		frame.__SkipQuestHackEl = nil
+	end
+end
+LIB.RegisterReload('MY_AutoChat#SkipQuestTalk', UnhookSkipQuestTalk)
+
+local function HookSkipQuestTalk()
 	local frame = Station.Lookup('Lowest2/QuestAcceptPanel')
 	if not frame then
-		return
+		return 0
 	end
-	frame:Lookup("Btn_Reward"):Show()
-	frame:Lookup("Btn_Accept"):Show()
+	if MY_AutoChat.bSkipQuestTalk then
+		if not frame.__SkipQuestHackEl then
+			local w, h = Station.GetClientSize()
+			frame.__SkipQuestEl = frame:Lookup('Btn_Skip')
+			frame.__SkipQuestHackEl = UI(frame):append('WndWindow', {
+				name = 'Btn_Skip',
+				x = 0, y = 0, w = w, h = h,
+			}, true):raw()
+		end
+		frame.__SkipQuestHackEl:SetVisible(frame.__SkipQuestEl:IsVisible())
+	else
+		UnhookSkipQuestTalk()
+	end
+end
+
+local function onInit()
+	LIB.BreatheCall('MY_AutoChat#SkipQuestTalk', HookSkipQuestTalk)
+end
+LIB.RegisterInit('MY_AutoChat#SkipQuestTalk', onInit)
+
+local function onFrameCreate()
+	local name = arg0:GetName()
+	if name == 'QuestAcceptPanel' then
+		LIB.BreatheCall('MY_AutoChat#SkipQuestTalk', HookSkipQuestTalk)
+	end
+end
+LIB.RegisterEvent('ON_FRAME_CREATE.MY_AutoChat#SkipQuestTalk', onFrameCreate)
 end
 
 ---------------------------------------------------------------------------
@@ -367,14 +398,27 @@ local function HookDialoguePanel()
 	end
 	for _, p in ipairs(HOOK_LIST) do
 		local frame = Station.Lookup(p.root)
-		if frame and frame:IsVisible() and not frame.bMYHooked then
+		if frame and not frame.bMYHooked then
 			local wnd = frame
 			if p.path then
 				wnd = frame:Lookup(p.path)
 			end
+			local ref = frame
+			if p.ref then
+				ref = frame:Lookup(p.ref)
+			end
+			local x = p.x + (ref:GetAbsX() - frame:GetAbsX())
+			local y = p.y + (ref:GetAbsY() - frame:GetAbsY())
+			local point = p.point or 'TOPLEFT'
+			if point:find('RIGHT') then
+				x = x + ref:GetW()
+			end
+			if point:find('BOTTOM') then
+				y = y + ref:GetH()
+			end
 			UI(wnd):append('WndButton', {
 				name = 'WndButton_AutoChat',
-				x = p.x, y = p.y, w = 80, text = _L['autochat'],
+				x = x, y = y, w = 80, text = _L['autochat'],
 				tip = _L['Left click to config autochat.\nRight click to edit global config.'],
 				tippostype = MY_TIP_POSTYPE.TOP_BOTTOM,
 				lmenu = function() return GetDialoguePanelMenu(frame) end,
@@ -385,6 +429,19 @@ local function HookDialoguePanel()
 	end
 end
 LIB.RegisterInit('MY_AutoChat', HookDialoguePanel)
+
+do
+local function onFrameCreate()
+	local name = arg0:GetName()
+	for _, p in ipairs(HOOK_LIST) do
+		if p.root:gsub('.*/', '') == name then
+			HookDialoguePanel()
+			return
+		end
+	end
+end
+LIB.RegisterEvent('ON_FRAME_CREATE.MY_AutoChat', onFrameCreate)
+end
 
 local function onOpenWindow()
 	if LIB.IsShieldedVersion() then
