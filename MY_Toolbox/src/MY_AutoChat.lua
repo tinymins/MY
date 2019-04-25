@@ -127,21 +127,23 @@ local function WindowSelect(dwIndex, dwID)
 	return GetClientPlayer().WindowSelect(dwIndex, dwID)
 end
 
+-- 将服务器返回的对话Info解析为内容和交互选项
 function D.InfoToDialog(aInfo, dwTargetType, dwTargetId)
-	local aDialog, szContextPool, szImage, nImageFrame = {}, ''
+	local aDialog = { context = '' }
+	-- 分析交互选项和文字内容
 	for _, v in ipairs(aInfo) do
-		local id, szContext
-		if v.name == '$' or v.name == 'W' or v.name == 'T' then
-			if v.name == 'T' then
-				for iconid in string.gmatch(v.context, '%$ (%d+)') do
-					szImage = 'fromiconid'
-					nImageFrame = iconid
-				end
-			end
-			id = v.attribute.id
-			szContext = v.context
+		if v.name == '$'  -- 选项
+		or v.name == 'W'  -- 需要确认的选项
+		or v.name == 'T' then -- 图片
+			-- if v.name == 'T' then
+			-- 	for iconid in string.gmatch(v.context, '%$ (%d+)') do
+			-- 		szImage = 'fromiconid'
+			-- 		nImageFrame = iconid
+			-- 	end
+			-- end
+			insert(aDialog, { id = v.attribute.id, context = v.context })
 		elseif v.name == 'M' then -- 商店
-			szContext = v.context
+			insert(aDialog, { context = v.context })
 		elseif v.name == 'Q' then -- 任务对话
 			local dwQuestId = tonumber(v.attribute.questid)
 			local tQuestInfo = Table_GetQuestStringInfo(dwQuestId)
@@ -154,31 +156,22 @@ function D.InfoToDialog(aInfo, dwTargetType, dwTargetId)
 				or eQuestState == QUEST_STATE_BLUE_EXCLAMATION
 				or eQuestState == QUEST_STATE_WHITE_QUESTION
 				or eQuestState == QUEST_STATE_DUN_DIA then
-					szContext = tQuestInfo.szName
+					insert(aDialog, { context = tQuestInfo.szName })
 				end
 			end
 		elseif v.name == 'F' then -- 名字
-			szContext = v.attribute.text
+			aDialog.context = aDialog.context .. v.attribute.text
 		elseif v.name == 'text' then -- 文本
-			szContext = v.context
+			aDialog.context = aDialog.context .. v.context
 		elseif v.name == 'MT' then -- 交通
 			insert(aDialog, { context = v.context })
-			szContextPool, szImage, nImageFrame = ''
-		end
-		if id then
-			-- 如果选项条文本为空 则使用前面文本池作为文本（沉浸式对话）
-			if not szContext or szContext == '' then
-				szContext = szContextPool
-			end
-			insert(aDialog, { id = id, context = szContext })
-			szContextPool, szImage, nImageFrame = ''
-		elseif szContext then
-			-- 不是选项条 文本加入文本池
-			szContextPool = szContextPool .. szContext
 		end
 	end
-	if szContextPool ~= '' and #aDialog == 0 then
-		insert(aDialog, { id = -1, context = szContextPool })
+	-- 没有内容的交互选项代表是沉浸式对话的默认行为 使用对话内容代替选项文字
+	for _, v in ipairs(aDialog) do
+		if v.id and (not v.context or v.context == '') then
+			v.context = aDialog.context
+		end
 	end
 	return aDialog
 end
