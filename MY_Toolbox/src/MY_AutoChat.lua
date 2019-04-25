@@ -122,13 +122,13 @@ function D.DelData(szMap, szName, szKey)
 	D.SaveData()
 end
 
-local HOOK_LIST = {
+local ENTRY_LIST = {
 	{ root = 'Normal/DialoguePanel', x = 53, y = 4, dialog = true },
 	{ root = 'Lowest2/PlotDialoguePanel', ref = 'WndScroll_Options', point = 'TOPRIGHT', x = -50, y = 10, dialog = true },
 	{ root = 'Lowest2/QuestAcceptPanel', ref = 'Btn_Accept', point = 'TOPRIGHT', x = -30, y = 10, dialog = true, quest = true },
 }
 local function GetActivePanel(type)
-	for _, p in ipairs(HOOK_LIST) do
+	for _, p in ipairs(ENTRY_LIST) do
 		if p[type] then
 			local frame = Station.Lookup(p.root)
 			if frame and frame:IsVisible() then
@@ -143,6 +143,71 @@ end
 local function GetActiveQuestPanel()
 	return GetActivePanel('quest')
 end
+
+function D.CreateEntry()
+	if LIB.IsShieldedVersion() then
+		return
+	end
+	for _, p in ipairs(ENTRY_LIST) do
+		local frame = Station.Lookup(p.root)
+		if frame and (not p.el or not p.el:IsValid()) then
+			local wnd = frame
+			if p.path then
+				wnd = frame:Lookup(p.path)
+			end
+			p.el = UI(wnd):append('WndButton', {
+				name = 'WndButton_AutoChat',
+				text = _L['autochat'],
+				tip = _L['Left click to config autochat.\nRight click to edit global config.'],
+				tippostype = MY_TIP_POSTYPE.TOP_BOTTOM,
+				lmenu = function() return GetDialoguePanelMenu(frame) end,
+				rmenu = GetSettingMenu,
+			}, true):raw()
+		end
+	end
+	D.UpdateEntryPos()
+end
+LIB.RegisterInit('MY_AutoChat', D.CreateEntry)
+
+function D.UpdateEntryPos()
+	if LIB.IsShieldedVersion() then
+		return
+	end
+	for _, p in ipairs(ENTRY_LIST) do
+		local frame = Station.Lookup(p.root)
+		if frame and p.el and p.el:IsValid() then
+			local wnd = frame
+			if p.path then
+				wnd = frame:Lookup(p.path)
+			end
+			local ref = frame
+			if p.ref then
+				ref = frame:Lookup(p.ref)
+			end
+			local x = p.x + (ref:GetAbsX() - frame:GetAbsX())
+			local y = p.y + (ref:GetAbsY() - frame:GetAbsY())
+			local point = p.point or 'TOPLEFT'
+			if point:find('RIGHT') then
+				x = x + ref:GetW()
+			end
+			if point:find('BOTTOM') then
+				y = y + ref:GetH()
+			end
+			p.el:SetRelPos(x, y)
+		end
+	end
+end
+MY.RegisterEvent('UI_SCALED.MY_AutoChat', D.UpdateEntryPos)
+
+function D.RemoveEntry()
+	for i, p in ipairs(ENTRY_LIST) do
+		if p.el and p.el:IsValid() then
+			p.el:Destroy()
+		end
+		p.el = nil
+	end
+end
+LIB.RegisterReload('MY_AutoChat', D.RemoveEntry)
 
 local function WindowSelect(dwIndex, dwID)
 	LIB.Debug({'WindowSelect ' .. dwIndex .. ',' .. dwID}, 'AUTO_CHAT', DEBUG_LEVEL.LOG)
@@ -404,50 +469,12 @@ local function GetDialoguePanelMenu(frame)
 	end
 end
 
-local function HookDialoguePanel()
-	if LIB.IsShieldedVersion() then
-		return
-	end
-	for _, p in ipairs(HOOK_LIST) do
-		local frame = Station.Lookup(p.root)
-		if frame and not frame.bMYHooked then
-			local wnd = frame
-			if p.path then
-				wnd = frame:Lookup(p.path)
-			end
-			local ref = frame
-			if p.ref then
-				ref = frame:Lookup(p.ref)
-			end
-			local x = p.x + (ref:GetAbsX() - frame:GetAbsX())
-			local y = p.y + (ref:GetAbsY() - frame:GetAbsY())
-			local point = p.point or 'TOPLEFT'
-			if point:find('RIGHT') then
-				x = x + ref:GetW()
-			end
-			if point:find('BOTTOM') then
-				y = y + ref:GetH()
-			end
-			UI(wnd):append('WndButton', {
-				name = 'WndButton_AutoChat',
-				x = x, y = y, w = 80, text = _L['autochat'],
-				tip = _L['Left click to config autochat.\nRight click to edit global config.'],
-				tippostype = MY_TIP_POSTYPE.TOP_BOTTOM,
-				lmenu = function() return GetDialoguePanelMenu(frame) end,
-				rmenu = GetSettingMenu,
-			})
-			frame.bMYHooked = true
-		end
-	end
-end
-LIB.RegisterInit('MY_AutoChat', HookDialoguePanel)
-
 do
 local function onFrameCreate()
 	local name = arg0:GetName()
-	for _, p in ipairs(HOOK_LIST) do
+	for _, p in ipairs(ENTRY_LIST) do
 		if p.root:gsub('.*/', '') == name then
-			HookDialoguePanel()
+			D.CreateEntry()
 			return
 		end
 	end
@@ -459,7 +486,7 @@ local function onOpenWindow()
 	if LIB.IsShieldedVersion() then
 		return
 	end
-	HookDialoguePanel()
+	D.CreateEntry()
 	CURRENT_WINDOW = arg0
 	CURRENT_CONTENTS = arg1
 	if not MY_AutoChat.bEnable then
@@ -469,29 +496,11 @@ local function onOpenWindow()
 end
 LIB.RegisterEvent('OPEN_WINDOW.MY_AutoChat', onOpenWindow)
 
-local function UnhookDialoguePanel()
-	for _, p in ipairs(HOOK_LIST) do
-		local frame = Station.Lookup(p.root)
-		if frame and frame.bMYHooked then
-			local wnd = frame
-			if p.path then
-				wnd = frame:Lookup(p.path)
-			end
-			if wnd then
-				UI(wnd):children('#WndButton_AutoChat'):remove()
-			end
-			frame.bMYHooked = false
-		end
-	end
-end
-LIB.RegisterReload('MY_AutoChat', UnhookDialoguePanel)
-
-
 local function OnShieldedVersion()
 	if LIB.IsShieldedVersion() then
-		UnhookDialoguePanel()
+		D.RemoveEntry()
 	else
-		HookDialoguePanel()
+		D.CreateEntry()
 	end
 end
 LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_AutoChat', OnShieldedVersion)
