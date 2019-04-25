@@ -122,91 +122,90 @@ function D.DelData(szMap, szName, szKey)
 	D.SaveData()
 end
 
-local ENTRY_LIST = {
-	{ root = 'Normal/DialoguePanel', x = 53, y = 4, dialog = true },
-	{ root = 'Lowest2/PlotDialoguePanel', ref = 'WndScroll_Options', point = 'TOPRIGHT', x = -50, y = 10, dialog = true },
-	{ root = 'Lowest2/QuestAcceptPanel', ref = 'Btn_Accept', point = 'TOPRIGHT', x = -30, y = 10, dialog = true, quest = true },
-}
-local function GetActivePanel(type)
-	for _, p in ipairs(ENTRY_LIST) do
-		if p[type] then
-			local frame = Station.Lookup(p.root)
-			if frame and frame:IsVisible() then
-				return frame
-			end
-		end
-	end
-end
-local function GetActiveDialoguePanel()
-	return GetActivePanel('dialog')
-end
-local function GetActiveQuestPanel()
-	return GetActivePanel('quest')
-end
-
 local function WindowSelect(dwIndex, dwID)
 	LIB.Debug({'WindowSelect ' .. dwIndex .. ',' .. dwID}, 'AUTO_CHAT', DEBUG_LEVEL.LOG)
 	return GetClientPlayer().WindowSelect(dwIndex, dwID)
 end
 
-local function GetDialogueInfo(v, dwTargetType, dwTargetId)
-	local id, context, image, imageframe
-	if v.name == '$' or v.name == 'W' or v.name == 'T' then
-		if v.name == 'T' then
-			for iconid in string.gmatch(v.context, '%$ (%d+)') do
-				image = 'fromiconid'
-				imageframe = iconid
+function D.InfoToDialog(aInfo, dwTargetType, dwTargetId)
+	local aDialog, szContextPool, szImage, nImageFrame = {}, ''
+	for _, v in ipairs(aInfo) do
+		local id, szContext
+		if v.name == '$' or v.name == 'W' or v.name == 'T' then
+			if v.name == 'T' then
+				for iconid in string.gmatch(v.context, '%$ (%d+)') do
+					szImage = 'fromiconid'
+					nImageFrame = iconid
+				end
 			end
+			id = v.attribute.id
+			szContext = v.context
+		elseif v.name == 'M' then -- 商店
+			szContext = v.context
+		elseif v.name == 'Q' then -- 任务对话
+			local dwQuestId = tonumber(v.attribute.questid)
+			local tQuestInfo = Table_GetQuestStringInfo(dwQuestId)
+			if tQuestInfo then
+				local eQuestState, nLevel = GetQuestState(dwQuestId, dwTargetType, dwTargetId)
+				if eQuestState == QUEST_STATE_YELLOW_QUESTION
+				or eQuestState == QUEST_STATE_BLUE_QUESTION
+				or eQuestState == QUEST_STATE_HIDE
+				or eQuestState == QUEST_STATE_YELLOW_EXCLAMATION
+				or eQuestState == QUEST_STATE_BLUE_EXCLAMATION
+				or eQuestState == QUEST_STATE_WHITE_QUESTION
+				or eQuestState == QUEST_STATE_DUN_DIA then
+					szContext = tQuestInfo.szName
+				end
+			end
+		elseif v.name == 'F' then -- 名字
+			szContext = v.attribute.text
+		elseif v.name == 'text' then -- 文本
+			szContext = v.context
 		end
-		id = v.attribute.id
-		context = v.context
-	elseif v.name == 'M' then -- 商店
-		context = v.context
-	elseif v.name == 'Q' then -- 任务对话
-		local dwQuestId = tonumber(v.attribute.questid)
-		local tQuestInfo = Table_GetQuestStringInfo(dwQuestId)
-		if tQuestInfo then
-			local eQuestState, nLevel = GetQuestState(dwQuestId, dwTargetType, dwTargetId)
-			if eQuestState == QUEST_STATE_YELLOW_QUESTION
-			or eQuestState == QUEST_STATE_BLUE_QUESTION
-			or eQuestState == QUEST_STATE_HIDE
-			or eQuestState == QUEST_STATE_YELLOW_EXCLAMATION
-			or eQuestState == QUEST_STATE_BLUE_EXCLAMATION
-			or eQuestState == QUEST_STATE_WHITE_QUESTION
-			or eQuestState == QUEST_STATE_DUN_DIA then
-				context = tQuestInfo.szName
+		if id then
+			-- 如果选项条文本为空 则使用前面文本池作为文本（沉浸式对话）
+			if not szContext or szContext == '' then
+				szContext = szContextPool
 			end
+			insert(aDialog, { id = id, context = szContext })
+			szContextPool, szImage, nImageFrame = ''
+		elseif szContext then
+			-- 不是选项条 文本加入文本池
+			szContextPool = szContextPool .. szContext
 		end
 	end
-	return context and { id = id, context = context } or nil
+	if szContextPool ~= '' and #aDialog == 0 then
+		insert(aDialog, { id = -1, context = szContextPool })
+	end
+	return aDialog
 end
 
-function D.Choose(dwType, dwID, dwIndex, aInfo)
-	local szName, szMap = D.GetName(dwType, dwID)
+function D.Choose(szType, dwTarType, dwTarID, dwIndex, aInfo)
+	local szName, szMap = D.GetName(dwTarType, dwTarID)
 	if not (szMap and szName and dwIndex and aInfo) then
 		return
 	end
 	local tChat = (CHAT[szMap] or EMPTY_TABLE)[szName] or EMPTY_TABLE
 
 	local nCount, szContext, dwID = 0
-	for i, v in ipairs(aInfo) do
-		local info = GetDialogueInfo(v, dwType, dwID)
-		if info then
-			if info.id and tChat[info.context] and tChat[info.context] > 0 then
+	local aDialog = D.InfoToDialog(aInfo, dwTarType, dwTarID)
+	for i, info in ipairs(aDialog) do
+		if info.id and tChat[info.context] and tChat[info.context] > 0 then
+			if info.id > 0 then
 				for i = 1, tChat[info.context] do
 					WindowSelect(dwIndex, info.id)
 				end
-				if MY_AutoChat.bEchoOn then
-					LIB.Sysmsg({_L('Conversation with [%s] auto chose: %s', szName, info.context)})
-				end
-				return true
-			else
-				if info.id then
-					dwID = info.id
-					szContext = v.context
-				end
-				nCount = nCount + 1
 			end
+			if MY_AutoChat.bEchoOn then
+				LIB.Sysmsg({_L('Conversation with [%s] auto chose: %s', szName, info.context)})
+			end
+			return true
+		else
+			if info.id then
+				dwID = info.id
+				szContext = info.context
+			end
+			nCount = nCount + 1
 		end
 	end
 
@@ -228,13 +227,22 @@ function D.DoSomething()
 		LIB.Sysmsg({_L['Auto interact disabled due to SHIFT key pressed.']})
 		return
 	end
-	local frame = GetActiveDialoguePanel()
+	local frame = Station.Lookup('Normal/DialoguePanel')
 	if frame and frame:IsVisible() then
-		if D.Choose(frame.dwTargetType, frame.dwTargetId, frame.dwIndex, frame.aInfo)
+		if D.Choose('Dialog', frame.dwTargetType, frame.dwTargetId, frame.dwIndex, frame.aInfo)
+		and MY_AutoChat.bAutoClose then
+			frame:Hide()
+		end
+		return
+	end
+	local frame = Station.Lookup('Lowest2/PlotDialoguePanel')
+	if frame and frame:IsVisible() then
+		if D.Choose('PlotDialog', frame.dwTargetType, frame.dwTargetId, frame.dwIndex, frame.aInfo)
 		and MY_AutoChat.bAutoClose then
 			frame:Hide()
 			Station.Show()
 		end
+		return
 	end
 end
 
@@ -261,6 +269,13 @@ local function HookSkipQuestTalk()
 				name = 'Btn_Skip',
 				x = 0, y = 0, w = w, h = h,
 			}, true):raw()
+		end
+		if frame.dwShowIndex == 1 and IsTable(frame.tQuestRpg) then
+			local nCount = 2
+			while frame.tQuestRpg['szText' .. nCount] and frame.tQuestRpg[nCount] ~= '' do
+				nCount = nCount + 1
+			end
+			frame.dwShowIndex = nCount - 1
 		end
 		frame.__SkipQuestHackEl:SetVisible(frame.__SkipQuestEl:IsVisible())
 	else
@@ -377,19 +392,17 @@ local function GetDialoguePanelMenuItem(szMap, szName, dialogueInfo)
 end
 
 local function GetDialoguePanelMenu(frame)
-	local dwType, dwID, dwIdx = frame.dwTargetType, frame.dwTargetId, frame.dwIndex
-	local szName, szMap = D.GetName(dwType, dwID)
+	local dwTarType, dwTarID, dwIdx = frame.dwTargetType, frame.dwTargetId, frame.dwIndex
+	local szName, szMap = D.GetName(dwTarType, dwTarID)
 	if szName and szMap then
 		if frame.aInfo then
 			local t = { {szOption = szName .. (IsCtrlKeyDown() and (' (' .. dwIdx .. ')') or ''), bDisable = true}, { bDevide = true } }
 			local tChat = {}
 			-- 面板上的对话
-			for i, v in ipairs(frame.aInfo) do
-				local info = GetDialogueInfo(v, dwType, dwID)
-				if info and info.id then
-					table.insert(t, GetDialoguePanelMenuItem(szMap, szName, info))
-					tChat[info.context] = true
-				end
+			local aDialog = D.InfoToDialog(frame.aInfo, dwTarType, dwTarID)
+			for i, info in ipairs(aDialog) do
+				table.insert(t, GetDialoguePanelMenuItem(szMap, szName, info))
+				tChat[info.context] = true
 			end
 			-- 保存的自动对话
 			if CHAT[szMap] and CHAT[szMap][szName] then
@@ -405,6 +418,12 @@ local function GetDialoguePanelMenu(frame)
 	end
 end
 
+do
+local ENTRY_LIST = {
+	{ root = 'Normal/DialoguePanel', x = 53, y = 4, dialog = true },
+	{ root = 'Lowest2/PlotDialoguePanel', ref = 'WndScroll_Options', point = 'TOPRIGHT', x = -50, y = 10, dialog = true },
+	{ root = 'Lowest2/QuestAcceptPanel', ref = 'Btn_Accept', point = 'TOPRIGHT', x = -30, y = 10, dialog = true, quest = true },
+}
 function D.CreateEntry()
 	if LIB.IsShieldedVersion() then
 		return
@@ -429,6 +448,16 @@ function D.CreateEntry()
 	D.UpdateEntryPos()
 end
 LIB.RegisterInit('MY_AutoChat', D.CreateEntry)
+
+local function onFrameCreate()
+	for _, p in ipairs(ENTRY_LIST) do
+		if Station.Lookup(p.root) == arg0 then
+			D.CreateEntry()
+			return
+		end
+	end
+end
+LIB.RegisterEvent('ON_FRAME_CREATE.MY_AutoChat', onFrameCreate)
 
 function D.UpdateEntryPos()
 	if LIB.IsShieldedVersion() then
@@ -470,18 +499,6 @@ function D.RemoveEntry()
 end
 LIB.RegisterReload('MY_AutoChat', D.RemoveEntry)
 end
-
-do
-local function onFrameCreate()
-	local name = arg0:GetName()
-	for _, p in ipairs(ENTRY_LIST) do
-		if p.root:gsub('.*/', '') == name then
-			D.CreateEntry()
-			return
-		end
-	end
-end
-LIB.RegisterEvent('ON_FRAME_CREATE.MY_AutoChat', onFrameCreate)
 end
 
 local function onOpenWindow()
