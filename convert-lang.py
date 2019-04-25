@@ -62,7 +62,7 @@ def is_path_include(cwd, d):
         return False
     return True
 
-print('-----------------------')
+print('--------------------------------')
 print('Working DIR: ' + root_path)
 print('Working PKG: ' + (pkg_name or 'ALL'))
 crcs = {}
@@ -104,7 +104,7 @@ for cwd, dirs, files in os.walk(root_path):
         crc_changed = False
 
         if extname == '.lua' and header != '' and basename != pkg_name and filename != 'Compatible.lua':
-            print('-----------------------')
+            print('--------------------------------')
             print('Update header: ' + filepath)
             crc_text = crc(filepath)
             if not crc_changed:
@@ -127,7 +127,7 @@ for cwd, dirs, files in os.walk(root_path):
                 print('Already up to date.')
 
         if filename in FILE_MAPPING:
-            print('-----------------------')
+            print('--------------------------------')
             print('Convert language: ' + filepath)
             info = FILE_MAPPING[filename]
             crc_text = crc(filepath)
@@ -170,12 +170,11 @@ for cwd, dirs, files in os.walk(root_path):
                 print('Already up to date.')
 
 with open(crc_file, 'w') as file:
-    print('-----------------------')
+    print('--------------------------------')
     file.write(json.dumps(crcs))
     print('Crc cache saved: ' + crc_file)
 
-print('-----------------------')
-print('Process finished...')
-print('Time cost %dms...' % (time.time() * 1000 - start_time))
-print('-----------------------')
+print('--------------------------------')
+print('Process finished in %dms...' % (time.time() * 1000 - start_time))
+print('--------------------------------')
 time.sleep(10)
