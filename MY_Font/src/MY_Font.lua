@@ -63,7 +63,13 @@ end
 -- 加载字体列表
 local FONT_PATH = LIB.GetAddonInfo().szRoot .. 'MY_Font/font/$lang.jx3dat'
 for _, v in ipairs(LIB.LoadLUAData(FONT_PATH) or {}) do
-	table.insert(C.tFontList, v)
+	insert(C.tFontList, v)
+end
+-- 移除不存在的字体
+for i, p in ipairs_r(C.tFontList) do
+	if not IsFileExist(p.szFile) then
+		remove(C.tFontList, i)
+	end
 end
 for _, p in ipairs(C.tFontList) do
 	table.insert(C.aFontPath, p.szFile)
@@ -73,8 +79,10 @@ end
 -- 初始化设置
 for dwID, tConfig in pairs(C.tFontConfig) do
 	local szName, szFile, nSize, tStyle  = unpack(tConfig)
-	local szName1, szFile1, nSize1, tStyle1 = Font.GetFont(dwID)
-	Font.SetFont(dwID, szName or szName1, szFile or szFile1, nSize or nSize1, tStyle or tStyle1)
+	if IsFileExist(szFile) then
+		local szName1, szFile1, nSize1, tStyle1 = Font.GetFont(dwID)
+		Font.SetFont(dwID, szName or szName1, szFile or szFile1, nSize or nSize1, tStyle or tStyle1)
+	end
 end
 Station.SetUIScale(Station.GetUIScale(), true)
 
