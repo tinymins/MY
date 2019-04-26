@@ -95,7 +95,7 @@ function D.AddData(szMap, szName, szKey)
 		CHAT[szMap][szName][szKey] = CHAT[szMap][szName][szKey] + 1
 	end
 	D.SaveData()
-	D.DoSomething()
+	D.AutoChat()
 end
 
 function D.DisableData(szMap, szName, szKey)
@@ -122,14 +122,10 @@ function D.DelData(szMap, szName, szKey)
 	D.SaveData()
 end
 
-local function WindowSelect(dwIndex, dwID)
-	LIB.Debug({'WindowSelect ' .. dwIndex .. ',' .. dwID}, 'AUTO_CHAT', DEBUG_LEVEL.LOG)
-	return GetClientPlayer().WindowSelect(dwIndex, dwID)
-end
-
 -- 将服务器返回的对话Info解析为内容和交互选项
-function D.InfoToDialog(aInfo, dwTargetType, dwTargetId)
-	local aDialog = { szContext = '' }
+function D.DecodeDialogInfo(aInfo, dwTargetType, dwTargetId)
+	local szName, szMap = D.GetName(dwTarType, dwTarID)
+	local dialog = { szMap = szMap, szName = szName, szContext = '', aOptions = {} }
 	-- 分析交互选项和文字内容
 	for _, v in ipairs(aInfo) do
 		if v.name == '$'  -- 选项
@@ -140,16 +136,16 @@ function D.InfoToDialog(aInfo, dwTargetType, dwTargetId)
 					nImageFrame = iconid
 				end
 			end
-			insert(aDialog, { dwID = v.attribute.id, szContext = v.context })
+			insert(dialog.aOptions, { dwID = tonumber(v.attribute.id) or 0, szContext = v.context })
 		elseif v.name == 'T' then -- 图片
 			local szImage, nImageFrame
 			for iconid in string.gmatch(v.context, '%$ (%d+)') do
 				szImage = 'fromiconid'
 				nImageFrame = iconid
 			end
-			insert(aDialog, { dwID = v.attribute.id, szContext = v.context, szImage = szImage, nImageFrame = nImageFrame })
+			insert(dialog.aOptions, { dwID = tonumber(v.attribute.id) or 0, szContext = v.context, szImage = szImage, nImageFrame = nImageFrame })
 		elseif v.name == 'M' then -- 商店
-			insert(aDialog, { szContext = v.context })
+			insert(dialog.aOptions, { szContext = v.context })
 		elseif v.name == 'Q' then -- 任务对话
 			local dwQuestId = tonumber(v.attribute.questid)
 			local tQuestInfo = Table_GetQuestStringInfo(dwQuestId)
@@ -162,63 +158,58 @@ function D.InfoToDialog(aInfo, dwTargetType, dwTargetId)
 				or eQuestState == QUEST_STATE_BLUE_EXCLAMATION
 				or eQuestState == QUEST_STATE_WHITE_QUESTION
 				or eQuestState == QUEST_STATE_DUN_DIA then
-					insert(aDialog, { szContext = tQuestInfo.szName })
+					insert(dialog.aOptions, { szContext = tQuestInfo.szName })
 				end
 			end
 		elseif v.name == 'F' then -- 字体
-			aDialog.szContext = aDialog.szContext .. v.attribute.text
+			dialog.szContext = dialog.szContext .. v.attribute.text
 		elseif v.name == 'text' then -- 文本
-			aDialog.szContext = aDialog.szContext .. v.context
+			dialog.szContext = dialog.szContext .. v.context
 		elseif v.name == 'MT' then -- 交通
-			insert(aDialog, { szContext = v.context })
+			insert(dialog.aOptions, { szContext = v.context })
 		end
 	end
-	return aDialog
+	return dialog
 end
 
-function D.EchoDialog(szName, aDialog, tOption)
-	if MY_AutoChat.bEchoOn then
-		LIB.Sysmsg({_L('Conversation with [%s]: %s', szName, aDialog.szContext:gsub('%s', ''))})
-		if tOption.szContext and tOption.szContext ~= '' then
-			LIB.Sysmsg({_L('Conversation with [%s] auto chose: %s', szName, tOption.szContext)})
-		end
-	end
-end
-
-function D.Choose(szType, dwTarType, dwTarID, dwIndex, aInfo)
-	local szName, szMap = D.GetName(dwTarType, dwTarID)
-	if not (szMap and szName and dwIndex and aInfo) then
+function D.ProcessDialogInfo(aInfo, dwTarType, dwTarID, dwIndex)
+	local dialog = D.DecodeDialogInfo(aInfo, dwTarType, dwTarID)
+	if not (dialog.szMap and dialog.szName and dwIndex and aInfo) then
 		return
 	end
-	local tChat = (CHAT[szMap] or EMPTY_TABLE)[szName] or EMPTY_TABLE
-
-	local nCount, tDefaultOption = 0
-	local aDialog = D.InfoToDialog(aInfo, dwTarType, dwTarID)
-	for i, tOption in ipairs(aDialog) do
-		if tOption.dwID and tChat[tOption.szContext] and tChat[tOption.szContext] > 0 then
-			if tOption.dwID > 0 then
-				for i = 1, tChat[tOption.szContext] do
-					WindowSelect(dwIndex, tOption.dwID)
-				end
+	local option, nRepeat
+	local tChat = CHAT[dialog.szMap] and CHAT[dialog.szMap][dialog.szName]
+	if tChat then
+		for i, p in ipairs(dialog.aOptions) do
+			if p.dwID and tChat[p.szContext] and tChat[p.szContext] > 0 then
+				option = p
+				nRepeat = tChat[p.szContext]
+				break
 			end
-			D.EchoDialog(szName, aDialog, tOption)
-			return true
-		else
-			if tOption.dwID then
-				tDefaultOption = tOption
-			end
-			nCount = nCount + 1
 		end
 	end
-
-	if MY_AutoChat.bAutoSelectSg and tDefaultOption and nCount == 1 and not LIB.IsInDungeon() then
-		WindowSelect(dwIndex, tDefaultOption.dwID)
-		D.EchoDialog(szName, aDialog, tDefaultOption)
+	if not option and MY_AutoChat.bAutoSelectSg and not LIB.IsInDungeon() then
+		option = dialog.aOptions[1]
+		nRepeat = 1
+	end
+	if option then
+		if option.dwID > 0 then
+			for i = 1, nRepeat do
+				GetClientPlayer().WindowSelect(dwIndex, option.dwID)
+			end
+			LIB.Debug({'WindowSelect ' .. dwIndex .. ',' .. dwID .. 'x' .. nRepeat}, 'AUTO_CHAT', DEBUG_LEVEL.LOG)
+		end
+		if MY_AutoChat.bEchoOn then
+			LIB.Sysmsg({_L('Conversation with [%s]: %s', dialog.szName, dialog.szContext:gsub('%s', ''))})
+			if option.szContext and option.szContext ~= '' then
+				LIB.Sysmsg({_L('Conversation with [%s] auto chose: %s', dialog.szName, option.szContext)})
+			end
+		end
 		return true
 	end
 end
 
-function D.DoSomething()
+function D.AutoChat()
 	-- Output(CURRENT_CONTENTS, CURRENT_WINDOW)
 	if not CHAT then
 		D.LoadData()
@@ -229,7 +220,7 @@ function D.DoSomething()
 	end
 	local frame = Station.Lookup('Normal/DialoguePanel')
 	if frame and frame:IsVisible() then
-		if D.Choose('Dialog', frame.dwTargetType, frame.dwTargetId, frame.dwIndex, frame.aInfo)
+		if D.ProcessDialogInfo(frame.aInfo, frame.dwTargetType, frame.dwTargetId, frame.dwIndex)
 		and MY_AutoChat.bAutoClose then
 			frame:Hide()
 		end
@@ -237,7 +228,7 @@ function D.DoSomething()
 	end
 	local frame = Station.Lookup('Lowest2/PlotDialoguePanel')
 	if frame and frame:IsVisible() then
-		if D.Choose('PlotDialog', frame.dwTargetType, frame.dwTargetId, frame.dwIndex, frame.aInfo)
+		if D.ProcessDialogInfo(frame.aInfo, frame.dwTargetType, frame.dwTargetId, frame.dwIndex)
 		and MY_AutoChat.bAutoClose then
 			frame:Hide()
 			Station.Show()
@@ -397,8 +388,8 @@ local function GetDialoguePanelMenu(frame)
 			local t = { {szOption = szName .. (IsCtrlKeyDown() and (' (' .. dwIdx .. ')') or ''), bDisable = true}, { bDevide = true } }
 			local tChat = {}
 			-- 面板上的对话
-			local aDialog = D.InfoToDialog(frame.aInfo, dwTarType, dwTarID)
-			for i, info in ipairs(aDialog) do
+			local dialog = D.DecodeDialogInfo(frame.aInfo, dwTarType, dwTarID)
+			for i, info in ipairs(dialog.aOptions) do
 				table.insert(t, GetDialoguePanelMenuItem(szMap, szName, info))
 				tChat[info.szContext] = true
 			end
@@ -509,7 +500,7 @@ local function onOpenWindow()
 	if not MY_AutoChat.bEnable then
 		return
 	end
-	D.DoSomething()
+	D.AutoChat()
 end
 LIB.RegisterEvent('OPEN_WINDOW.MY_AutoChat', onOpenWindow)
 
