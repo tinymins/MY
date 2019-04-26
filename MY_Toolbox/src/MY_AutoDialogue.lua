@@ -181,11 +181,11 @@ function D.ProcessDialogInfo(aInfo, dwTarType, dwTarID, dwIndex)
 		nRepeat = 1
 	end
 	if option then
-		if option.dwID > 0 then
+		if option.dwID then
 			for i = 1, nRepeat do
 				GetClientPlayer().WindowSelect(dwIndex, option.dwID)
 			end
-			LIB.Debug({'WindowSelect ' .. dwIndex .. ',' .. dwID .. 'x' .. nRepeat}, 'AUTO_CHAT', DEBUG_LEVEL.LOG)
+			LIB.Debug({'WindowSelect ' .. dwIndex .. ',' .. option.dwID .. 'x' .. nRepeat}, 'AUTO_CHAT', DEBUG_LEVEL.LOG)
 		end
 		if MY_AutoDialogue.bEchoOn then
 			LIB.Sysmsg({_L('Conversation with [%s]: %s', dialog.szName, dialog.szContext:gsub('%s', ''))})
@@ -316,7 +316,7 @@ function D.GetDialogueMenu(aInfo, dwTargetType, dwTargetID, dwIndex)
 		szCaption = szCaption .. ')'
 	end
 	if IsCtrlKeyDown() then
-		szCaption = szCaption .. ' (' .. dwIndex .. ')'
+		szCaption = '(' .. dwIndex .. ') ' .. szCaption
 	end
 	-- 计算选项列表
 	local tOption, aOption = {}, {}
