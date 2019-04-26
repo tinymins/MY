@@ -773,6 +773,23 @@ function LIB.PlaySound(nType, szFilePath, szCustomPath)
 	PlaySound(nType, szPath)
 end
 
+function LIB.GetFontList()
+	if MY_FontResource then
+		return MY_FontResource.GetList()
+	else
+		local aList, tExist = {}, {}
+		for _, p in ipairs(Font.GetFontPathList() or {}) do
+			local szFile = p.szFile:gsub('/', '\\')
+			local szKey = szFile:lower()
+			if not tExist[szKey] then
+				insert(aList, { szName = p.szName, szFile = szFile })
+				tExist[szKey] = true
+			end
+		end
+		return aList
+	end
+end
+
 -- МгдизЂВсЪ§Он
 LIB.RegisterInit(LIB.GetAddonInfo().szNameSpace .. '#INITDATA', function()
 	local t = LIB.LoadLUAData({'config/initial.jx3dat', PATH_TYPE.GLOBAL})
