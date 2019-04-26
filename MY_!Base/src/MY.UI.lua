@@ -1472,7 +1472,7 @@ function UI:autocomplete(method, arg1, arg2)
 					-- create menu
 					local menu = {}
 					for _, src in ipairs(aSrc) do
-						local szText, szOption, bDivide, bRichText
+						local szText, szDisplay, szOption, bDivide, bRichText
 						if type(src) == 'table' then
 							szText = src.text
 							szDisplay = src.display or szText
