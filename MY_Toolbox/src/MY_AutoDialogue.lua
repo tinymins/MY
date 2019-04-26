@@ -41,19 +41,19 @@ local CHAT
 local CURRENT_WINDOW
 local CURRENT_CONTENTS
 
-MY_AutoChat = {}
-MY_AutoChat.bEnable = false
-MY_AutoChat.bEchoOn = true
-MY_AutoChat.bAutoClose = true
-MY_AutoChat.bEnableShift = true
-MY_AutoChat.bAutoSelectSg = false
-MY_AutoChat.bSkipQuestTalk = false
-RegisterCustomData('MY_AutoChat.bEnable')
-RegisterCustomData('MY_AutoChat.bEchoOn', 1)
-RegisterCustomData('MY_AutoChat.bAutoClose', 1)
-RegisterCustomData('MY_AutoChat.bEnableShift')
-RegisterCustomData('MY_AutoChat.bAutoSelectSg')
-RegisterCustomData('MY_AutoChat.bSkipQuestTalk')
+MY_AutoDialogue = {}
+MY_AutoDialogue.bEnable = false
+MY_AutoDialogue.bEchoOn = true
+MY_AutoDialogue.bAutoClose = true
+MY_AutoDialogue.bEnableShift = true
+MY_AutoDialogue.bAutoSelectSg = false
+MY_AutoDialogue.bSkipQuestTalk = false
+RegisterCustomData('MY_AutoDialogue.bEnable')
+RegisterCustomData('MY_AutoDialogue.bEchoOn', 1)
+RegisterCustomData('MY_AutoDialogue.bAutoClose', 1)
+RegisterCustomData('MY_AutoDialogue.bEnableShift')
+RegisterCustomData('MY_AutoDialogue.bAutoSelectSg')
+RegisterCustomData('MY_AutoDialogue.bSkipQuestTalk')
 
 function D.LoadData()
 	local szOrgPath = LIB.GetLUADataPath('config/AUTO_CHAT/data.$lang.jx3dat')
@@ -188,7 +188,7 @@ function D.ProcessDialogInfo(aInfo, dwTarType, dwTarID, dwIndex)
 			end
 		end
 	end
-	if not option and MY_AutoChat.bAutoSelectSg and not LIB.IsInDungeon() then
+	if not option and MY_AutoDialogue.bAutoSelectSg and not LIB.IsInDungeon() then
 		option = dialog.aOptions[1]
 		nRepeat = 1
 	end
@@ -199,7 +199,7 @@ function D.ProcessDialogInfo(aInfo, dwTarType, dwTarID, dwIndex)
 			end
 			LIB.Debug({'WindowSelect ' .. dwIndex .. ',' .. dwID .. 'x' .. nRepeat}, 'AUTO_CHAT', DEBUG_LEVEL.LOG)
 		end
-		if MY_AutoChat.bEchoOn then
+		if MY_AutoDialogue.bEchoOn then
 			LIB.Sysmsg({_L('Conversation with [%s]: %s', dialog.szName, dialog.szContext:gsub('%s', ''))})
 			if option.szContext and option.szContext ~= '' then
 				LIB.Sysmsg({_L('Conversation with [%s] auto chose: %s', dialog.szName, option.szContext)})
@@ -214,14 +214,14 @@ function D.AutoChat()
 	if not CHAT then
 		D.LoadData()
 	end
-	if MY_AutoChat.bEnableShift and IsShiftKeyDown() then
+	if MY_AutoDialogue.bEnableShift and IsShiftKeyDown() then
 		LIB.Sysmsg({_L['Auto interact disabled due to SHIFT key pressed.']})
 		return
 	end
 	local frame = Station.Lookup('Normal/DialoguePanel')
 	if frame and frame:IsVisible() then
 		if D.ProcessDialogInfo(frame.aInfo, frame.dwTargetType, frame.dwTargetId, frame.dwIndex)
-		and MY_AutoChat.bAutoClose then
+		and MY_AutoDialogue.bAutoClose then
 			frame:Hide()
 		end
 		return
@@ -229,7 +229,7 @@ function D.AutoChat()
 	local frame = Station.Lookup('Lowest2/PlotDialoguePanel')
 	if frame and frame:IsVisible() then
 		if D.ProcessDialogInfo(frame.aInfo, frame.dwTargetType, frame.dwTargetId, frame.dwIndex)
-		and MY_AutoChat.bAutoClose then
+		and MY_AutoDialogue.bAutoClose then
 			frame:Hide()
 			Station.Show()
 		end
@@ -245,14 +245,14 @@ local function UnhookSkipQuestTalk()
 		frame.__SkipQuestHackEl = nil
 	end
 end
-LIB.RegisterReload('MY_AutoChat#SkipQuestTalk', UnhookSkipQuestTalk)
+LIB.RegisterReload('MY_AutoDialogue#SkipQuestTalk', UnhookSkipQuestTalk)
 
 local function HookSkipQuestTalk()
 	local frame = Station.Lookup('Lowest2/QuestAcceptPanel')
 	if not frame then
 		return 0
 	end
-	if MY_AutoChat.bSkipQuestTalk then
+	if MY_AutoDialogue.bSkipQuestTalk then
 		if not frame.__SkipQuestHackEl then
 			local w, h = Station.GetClientSize()
 			frame.__SkipQuestEl = frame:Lookup('Btn_Skip')
@@ -275,17 +275,17 @@ local function HookSkipQuestTalk()
 end
 
 local function onInit()
-	LIB.BreatheCall('MY_AutoChat#SkipQuestTalk', HookSkipQuestTalk)
+	LIB.BreatheCall('MY_AutoDialogue#SkipQuestTalk', HookSkipQuestTalk)
 end
-LIB.RegisterInit('MY_AutoChat#SkipQuestTalk', onInit)
+LIB.RegisterInit('MY_AutoDialogue#SkipQuestTalk', onInit)
 
 local function onFrameCreate()
 	local name = arg0:GetName()
 	if name == 'QuestAcceptPanel' then
-		LIB.BreatheCall('MY_AutoChat#SkipQuestTalk', HookSkipQuestTalk)
+		LIB.BreatheCall('MY_AutoDialogue#SkipQuestTalk', HookSkipQuestTalk)
 	end
 end
-LIB.RegisterEvent('ON_FRAME_CREATE.MY_AutoChat#SkipQuestTalk', onFrameCreate)
+LIB.RegisterEvent('ON_FRAME_CREATE.MY_AutoDialogue#SkipQuestTalk', onFrameCreate)
 end
 
 ---------------------------------------------------------------------------
@@ -295,45 +295,45 @@ local function GetSettingMenu()
 	return {
 		szOption = _L['autochat'], {
 			szOption = _L['enable'],
-			bCheck = true, bChecked = MY_AutoChat.bEnable,
+			bCheck = true, bChecked = MY_AutoDialogue.bEnable,
 			fnAction = function()
-				MY_AutoChat.bEnable = not MY_AutoChat.bEnable
+				MY_AutoDialogue.bEnable = not MY_AutoDialogue.bEnable
 			end
 		}, {
 			szOption = _L['echo when autochat'],
-			bCheck = true, bChecked = MY_AutoChat.bEchoOn,
+			bCheck = true, bChecked = MY_AutoDialogue.bEchoOn,
 			fnAction = function()
-				MY_AutoChat.bEchoOn = not MY_AutoChat.bEchoOn
+				MY_AutoDialogue.bEchoOn = not MY_AutoDialogue.bEchoOn
 			end
 		}, {
 			szOption = _L['auto chat when only one selection'],
-			bCheck = true, bChecked = MY_AutoChat.bAutoSelectSg,
+			bCheck = true, bChecked = MY_AutoDialogue.bAutoSelectSg,
 			fnAction = function()
-				MY_AutoChat.bAutoSelectSg = not MY_AutoChat.bAutoSelectSg
+				MY_AutoDialogue.bAutoSelectSg = not MY_AutoDialogue.bAutoSelectSg
 			end
 		}, {
 			szOption = _L['disable when shift key pressed'],
-			bCheck = true, bChecked = MY_AutoChat.bEnableShift,
+			bCheck = true, bChecked = MY_AutoDialogue.bEnableShift,
 			fnAction = function()
-				MY_AutoChat.bEnableShift = not MY_AutoChat.bEnableShift
+				MY_AutoDialogue.bEnableShift = not MY_AutoDialogue.bEnableShift
 			end
 		}, {
 			szOption = _L['close after auto chat'],
-			bCheck = true, bChecked = MY_AutoChat.bAutoClose,
+			bCheck = true, bChecked = MY_AutoDialogue.bAutoClose,
 			fnAction = function()
-				MY_AutoChat.bAutoClose = not MY_AutoChat.bAutoClose
+				MY_AutoDialogue.bAutoClose = not MY_AutoDialogue.bAutoClose
 			end
 		}, {
 			szOption = _L['Skip quest talk'],
-			bCheck = true, bChecked = MY_AutoChat.bSkipQuestTalk,
+			bCheck = true, bChecked = MY_AutoDialogue.bSkipQuestTalk,
 			fnAction = function()
-				MY_AutoChat.bSkipQuestTalk = not MY_AutoChat.bSkipQuestTalk
+				MY_AutoDialogue.bSkipQuestTalk = not MY_AutoDialogue.bSkipQuestTalk
 			end
 		},
 	}
 end
 
-LIB.RegisterAddonMenu('MY_AutoChat', function()
+LIB.RegisterAddonMenu('MY_AutoDialogue', function()
 	if LIB.IsShieldedVersion() then
 		return
 	end
@@ -436,7 +436,7 @@ function D.CreateEntry()
 	end
 	D.UpdateEntryPos()
 end
-LIB.RegisterInit('MY_AutoChat', D.CreateEntry)
+LIB.RegisterInit('MY_AutoDialogue', D.CreateEntry)
 
 local function onFrameCreate()
 	for _, p in ipairs(ENTRY_LIST) do
@@ -446,7 +446,7 @@ local function onFrameCreate()
 		end
 	end
 end
-LIB.RegisterEvent('ON_FRAME_CREATE.MY_AutoChat', onFrameCreate)
+LIB.RegisterEvent('ON_FRAME_CREATE.MY_AutoDialogue', onFrameCreate)
 
 function D.UpdateEntryPos()
 	if LIB.IsShieldedVersion() then
@@ -476,7 +476,7 @@ function D.UpdateEntryPos()
 		end
 	end
 end
-MY.RegisterEvent('UI_SCALED.MY_AutoChat', D.UpdateEntryPos)
+MY.RegisterEvent('UI_SCALED.MY_AutoDialogue', D.UpdateEntryPos)
 
 function D.RemoveEntry()
 	for i, p in ipairs(ENTRY_LIST) do
@@ -486,7 +486,7 @@ function D.RemoveEntry()
 		p.el = nil
 	end
 end
-LIB.RegisterReload('MY_AutoChat', D.RemoveEntry)
+LIB.RegisterReload('MY_AutoDialogue', D.RemoveEntry)
 end
 end
 
@@ -497,12 +497,12 @@ local function onOpenWindow()
 	D.CreateEntry()
 	CURRENT_WINDOW = arg0
 	CURRENT_CONTENTS = arg1
-	if not MY_AutoChat.bEnable then
+	if not MY_AutoDialogue.bEnable then
 		return
 	end
 	D.AutoChat()
 end
-LIB.RegisterEvent('OPEN_WINDOW.MY_AutoChat', onOpenWindow)
+LIB.RegisterEvent('OPEN_WINDOW.MY_AutoDialogue', onOpenWindow)
 
 local function OnShieldedVersion()
 	if LIB.IsShieldedVersion() then
@@ -511,4 +511,4 @@ local function OnShieldedVersion()
 		D.CreateEntry()
 	end
 end
-LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_AutoChat', OnShieldedVersion)
+LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_AutoDialogue', OnShieldedVersion)
