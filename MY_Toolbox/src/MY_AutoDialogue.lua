@@ -275,7 +275,7 @@ local function HookSkipQuestTalk()
 			end
 			frame.dwShowIndex = nCount - 1
 		end
-		frame.__SkipQuestHackEl:SetVisible(frame.__SkipQuestEl:IsVisible())
+		frame.__SkipQuestHackEl:SetVisible(frame.__SkipQuestEl:IsVisible() and frame.tQuestRpg and frame.tQuestRpg.szText2 and frame.tQuestRpg.szText2 ~= '')
 	else
 		UnhookSkipQuestTalk()
 	end
