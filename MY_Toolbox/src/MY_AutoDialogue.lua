@@ -37,7 +37,7 @@ local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_
 -------------------------------------------------------------------------------------------------------------
 local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot..'MY_Toolbox/lang/')
 local D = {}
-local CHAT
+local DIALOGUE
 local CURRENT_WINDOW
 local CURRENT_CONTENTS
 
@@ -55,20 +55,20 @@ RegisterCustomData('MY_AutoDialogue.bEnableShift')
 RegisterCustomData('MY_AutoDialogue.bAutoSelectSg')
 RegisterCustomData('MY_AutoDialogue.bSkipQuestTalk')
 
+---------------------------------------------------------------------------
+-- 数据存储
+---------------------------------------------------------------------------
 function D.LoadData()
-	local szOrgPath = LIB.GetLUADataPath('config/AUTO_CHAT/data.$lang.jx3dat')
-	local szFilePath = LIB.GetLUADataPath({'config/autochat.jx3dat', PATH_TYPE.GLOBAL})
-	if IsLocalFileExist(szOrgPath) then
-		CPath.Move(szOrgPath, szFilePath)
-	end
-	CHAT = LIB.LoadLUAData(szFilePath) or LIB.LoadLUAData(LIB.GetAddonInfo().szRoot .. 'MY_ToolBox/data/interact/$lang.jx3dat')
+	DIALOGUE = LIB.LoadLUAData({'config/auto_dialogue.jx3dat', PATH_TYPE.GLOBAL})
+		or LIB.LoadLUAData(LIB.GetAddonInfo().szRoot .. 'MY_ToolBox/data/auto_dialogue/$lang.jx3dat')
+		or {}
 end
 
 function D.SaveData()
-	if not CHAT then
+	if not DIALOGUE then
 		return
 	end
-	LIB.SaveLUAData({'config/autochat.jx3dat', PATH_TYPE.GLOBAL}, CHAT)
+	LIB.SaveLUAData({'config/auto_dialogue.jx3dat', PATH_TYPE.GLOBAL}, DIALOGUE)
 end
 
 function D.GetName(dwType, dwID)
@@ -85,43 +85,47 @@ function D.GetName(dwType, dwID)
 end
 
 function D.AddData(szMap, szName, szKey)
-	if not CHAT[szMap] then
-		CHAT[szMap] = { [szName] = { [szKey] = 1 } }
-	elseif not CHAT[szMap][szName] then
-		CHAT[szMap][szName] = { [szKey] = 1 }
-	elseif not CHAT[szMap][szName][szKey] then
-		CHAT[szMap][szName][szKey] = 1
+	if not DIALOGUE[szMap] then
+		DIALOGUE[szMap] = { [szName] = { [szKey] = 1 } }
+	elseif not DIALOGUE[szMap][szName] then
+		DIALOGUE[szMap][szName] = { [szKey] = 1 }
+	elseif not DIALOGUE[szMap][szName][szKey] then
+		DIALOGUE[szMap][szName][szKey] = 1
 	else
-		CHAT[szMap][szName][szKey] = CHAT[szMap][szName][szKey] + 1
+		DIALOGUE[szMap][szName][szKey] = DIALOGUE[szMap][szName][szKey] + 1
 	end
 	D.SaveData()
-	D.AutoChat()
+	D.AutoDialogue()
 end
 
 function D.DisableData(szMap, szName, szKey)
-	if CHAT[szMap]
-	and CHAT[szMap][szName]
-	and CHAT[szMap][szName][szKey] then
-		CHAT[szMap][szName][szKey] = 0
+	if DIALOGUE[szMap]
+	and DIALOGUE[szMap][szName]
+	and DIALOGUE[szMap][szName][szKey] then
+		DIALOGUE[szMap][szName][szKey] = 0
 	end
 	D.SaveData()
 end
 
 function D.DelData(szMap, szName, szKey)
-	if not CHAT[szMap] or not CHAT[szMap][szName] or not CHAT[szMap][szName][szKey] then
+	if not DIALOGUE[szMap] or not DIALOGUE[szMap][szName] or not DIALOGUE[szMap][szName][szKey] then
 		return
 	else
-		CHAT[szMap][szName][szKey] = nil
-		if empty(CHAT[szMap][szName]) then
-			CHAT[szMap][szName] = nil
-			if empty(CHAT[szMap]) then
-				CHAT[szMap] = nil
+		DIALOGUE[szMap][szName][szKey] = nil
+		if empty(DIALOGUE[szMap][szName]) then
+			DIALOGUE[szMap][szName] = nil
+			if empty(DIALOGUE[szMap]) then
+				DIALOGUE[szMap] = nil
 			end
 		end
 	end
 	D.SaveData()
 end
 
+---------------------------------------------------------------------------
+-- 自动对话核心逻辑
+---------------------------------------------------------------------------
+do
 -- 将服务器返回的对话Info解析为内容和交互选项
 function D.DecodeDialogInfo(aInfo, dwTargetType, dwTargetId)
 	local szName, szMap = D.GetName(dwTarType, dwTarID)
@@ -178,7 +182,7 @@ function D.ProcessDialogInfo(aInfo, dwTarType, dwTarID, dwIndex)
 		return
 	end
 	local option, nRepeat
-	local tChat = CHAT[dialog.szMap] and CHAT[dialog.szMap][dialog.szName]
+	local tChat = DIALOGUE[dialog.szMap] and DIALOGUE[dialog.szMap][dialog.szName]
 	if tChat then
 		for i, p in ipairs(dialog.aOptions) do
 			if p.dwID and tChat[p.szContext] and tChat[p.szContext] > 0 then
@@ -209,9 +213,9 @@ function D.ProcessDialogInfo(aInfo, dwTarType, dwTarID, dwIndex)
 	end
 end
 
-function D.AutoChat()
+function D.AutoDialogue()
 	-- Output(CURRENT_CONTENTS, CURRENT_WINDOW)
-	if not CHAT then
+	if not DIALOGUE then
 		D.LoadData()
 	end
 	if MY_AutoDialogue.bEnableShift and IsShiftKeyDown() then
@@ -237,6 +241,23 @@ function D.AutoChat()
 	end
 end
 
+local function onOpenWindow()
+	if LIB.IsShieldedVersion() then
+		return
+	end
+	CURRENT_WINDOW = arg0
+	CURRENT_CONTENTS = arg1
+	if not MY_AutoDialogue.bEnable then
+		return
+	end
+	D.AutoDialogue()
+end
+LIB.RegisterEvent('OPEN_WINDOW.MY_AutoDialogue', onOpenWindow)
+end
+
+---------------------------------------------------------------------------
+-- 精简任务对话核心逻辑
+---------------------------------------------------------------------------
 do
 local function UnhookSkipQuestTalk()
 	if frame.__SkipQuestHackEl then
@@ -289,9 +310,174 @@ LIB.RegisterEvent('ON_FRAME_CREATE.MY_AutoDialogue#SkipQuestTalk', onFrameCreate
 end
 
 ---------------------------------------------------------------------------
+-- 设置按钮入口
+---------------------------------------------------------------------------
+do
+local function GetDialoguePanelMenuItem(szMap, szName, dialogueInfo)
+	local r, g, b = 255, 255, 255
+	local szIcon, nFrame, nMouseOverFrame, szLayer, fnClickIcon, fnAction
+	if DIALOGUE[szMap] and DIALOGUE[szMap][szName] and DIALOGUE[szMap][szName][dialogueInfo.szContext] then
+		szIcon = 'ui/Image/UICommon/Feedanimials.UITex'
+		nFrame = 86
+		nMouseOverFrame = 87
+		szLayer = 'ICON_RIGHT'
+		fnClickIcon = function()
+			D.DelData(szMap, szName, dialogueInfo.szContext)
+			Wnd.CloseWindow('PopupMenuPanel')
+		end
+		if DIALOGUE[szMap][szName][dialogueInfo.szContext] > 0 then
+			r, g, b = 255, 0, 255
+			fnAction = function() D.DisableData(szMap, szName, dialogueInfo.szContext) end
+		else
+			r, g, b = 255, 255, 255
+			fnAction = function() D.AddData(szMap, szName, dialogueInfo.szContext) end
+		end
+	else
+		fnAction = function() D.AddData(szMap, szName, dialogueInfo.szContext) end
+	end
+	if dialogueInfo.szImage then
+		szIcon = dialogueInfo.szImage
+		nFrame = dialogueInfo.nImageFrame
+		szLayer = 'ICON_RIGHT'
+	end
+	return {
+		r = r, g = g, b = b,
+		szOption =  (IsCtrlKeyDown() and dialogueInfo.dwID and ('(' .. dialogueInfo.dwID .. ') ') or '') .. dialogueInfo.szContext,
+		fnAction = fnAction,
+		szIcon = szIcon, nFrame = nFrame, nMouseOverFrame = nMouseOverFrame,
+		szLayer = szLayer, fnClickIcon = fnClickIcon,
+	}
+end
+
+local function GetDialoguePanelMenu(frame)
+	local dwTarType, dwTarID, dwIdx = frame.dwTargetType, frame.dwTargetId, frame.dwIndex
+	local szName, szMap = D.GetName(dwTarType, dwTarID)
+	if szName and szMap then
+		if frame.aInfo then
+			local t = { {szOption = szName .. (IsCtrlKeyDown() and (' (' .. dwIdx .. ')') or ''), bDisable = true}, { bDevide = true } }
+			local tChat = {}
+			-- 面板上的对话
+			local dialog = D.DecodeDialogInfo(frame.aInfo, dwTarType, dwTarID)
+			for i, info in ipairs(dialog.aOptions) do
+				table.insert(t, GetDialoguePanelMenuItem(szMap, szName, info))
+				tChat[info.szContext] = true
+			end
+			-- 保存的自动对话
+			if DIALOGUE[szMap] and DIALOGUE[szMap][szName] then
+				for szContext, nCount in pairs(DIALOGUE[szMap][szName]) do
+					if not tChat[szContext] then
+						table.insert(t, GetDialoguePanelMenuItem(szMap, szName, { szContext = szContext }))
+						tChat[szContext] = true
+					end
+				end
+			end
+			return t
+		end
+	end
+end
+
+local ENTRY_LIST = {
+	{ root = 'Normal/DialoguePanel', x = 53, y = 4, dialog = true },
+	{ root = 'Lowest2/PlotDialoguePanel', ref = 'WndScroll_Options', point = 'TOPRIGHT', x = -50, y = 10, dialog = true },
+	{ root = 'Lowest2/QuestAcceptPanel', ref = 'Btn_Accept', point = 'TOPRIGHT', x = -30, y = 10, dialog = true, quest = true },
+}
+function D.CreateEntry()
+	if LIB.IsShieldedVersion() then
+		return
+	end
+	for _, p in ipairs(ENTRY_LIST) do
+		local frame = Station.Lookup(p.root)
+		if frame and (not p.el or not p.el:IsValid()) then
+			local wnd = frame
+			if p.path then
+				wnd = frame:Lookup(p.path)
+			end
+			p.el = UI(wnd):append('WndButton', {
+				name = 'WndButton_AutoChat',
+				text = _L['autochat'],
+				tip = _L['Left click to config autochat.\nRight click to edit global config.'],
+				tippostype = MY_TIP_POSTYPE.TOP_BOTTOM,
+				lmenu = function() return GetDialoguePanelMenu(frame) end,
+				rmenu = D.GetConfigMenu,
+			}, true):raw()
+		end
+	end
+	D.UpdateEntryPos()
+end
+LIB.RegisterInit('MY_AutoDialogue', D.CreateEntry)
+
+local function onFrameCreate()
+	for _, p in ipairs(ENTRY_LIST) do
+		if Station.Lookup(p.root) == arg0 then
+			D.CreateEntry()
+			return
+		end
+	end
+end
+LIB.RegisterEvent('ON_FRAME_CREATE.MY_AutoDialogue#ENTRY', onFrameCreate)
+
+function D.UpdateEntryPos()
+	if LIB.IsShieldedVersion() then
+		return
+	end
+	for _, p in ipairs(ENTRY_LIST) do
+		local frame = Station.Lookup(p.root)
+		if frame and p.el and p.el:IsValid() then
+			local wnd = frame
+			if p.path then
+				wnd = frame:Lookup(p.path)
+			end
+			local ref = frame
+			if p.ref then
+				ref = frame:Lookup(p.ref)
+			end
+			local x = p.x + (ref:GetAbsX() - frame:GetAbsX())
+			local y = p.y + (ref:GetAbsY() - frame:GetAbsY())
+			local point = p.point or 'TOPLEFT'
+			if point:find('RIGHT') then
+				x = x + ref:GetW()
+			end
+			if point:find('BOTTOM') then
+				y = y + ref:GetH()
+			end
+			p.el:SetRelPos(x, y)
+		end
+	end
+end
+MY.RegisterEvent('UI_SCALED.MY_AutoDialogue#ENTRY', D.UpdateEntryPos)
+
+function D.RemoveEntry()
+	for i, p in ipairs(ENTRY_LIST) do
+		if p.el and p.el:IsValid() then
+			p.el:Destroy()
+		end
+		p.el = nil
+	end
+end
+LIB.RegisterReload('MY_AutoDialogue#ENTRY', D.RemoveEntry)
+
+local function onOpenWindow()
+	if LIB.IsShieldedVersion() then
+		return
+	end
+	D.CreateEntry()
+end
+LIB.RegisterEvent('OPEN_WINDOW.MY_AutoDialogue#ENTRY', onOpenWindow)
+
+local function onShieldedVersion()
+	if LIB.IsShieldedVersion() then
+		D.RemoveEntry()
+	else
+		D.CreateEntry()
+	end
+end
+LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_AutoDialogue#ENTRY', onShieldedVersion)
+end
+
+---------------------------------------------------------------------------
 -- 头像设置菜单
 ---------------------------------------------------------------------------
-local function GetSettingMenu()
+function D.GetConfigMenu()
 	return {
 		szOption = _L['autochat'], {
 			szOption = _L['enable'],
@@ -337,178 +523,5 @@ LIB.RegisterAddonMenu('MY_AutoDialogue', function()
 	if LIB.IsShieldedVersion() then
 		return
 	end
-	return GetSettingMenu()
+	return D.GetConfigMenu()
 end)
-
----------------------------------------------------------------------------
--- 对话面板HOOK 添加自动对话设置按钮
----------------------------------------------------------------------------
-do
-local function GetDialoguePanelMenuItem(szMap, szName, dialogueInfo)
-	local r, g, b = 255, 255, 255
-	local szIcon, nFrame, nMouseOverFrame, szLayer, fnClickIcon, fnAction
-	if CHAT[szMap] and CHAT[szMap][szName] and CHAT[szMap][szName][dialogueInfo.szContext] then
-		szIcon = 'ui/Image/UICommon/Feedanimials.UITex'
-		nFrame = 86
-		nMouseOverFrame = 87
-		szLayer = 'ICON_RIGHT'
-		fnClickIcon = function()
-			D.DelData(szMap, szName, dialogueInfo.szContext)
-			Wnd.CloseWindow('PopupMenuPanel')
-		end
-		if CHAT[szMap][szName][dialogueInfo.szContext] > 0 then
-			r, g, b = 255, 0, 255
-			fnAction = function() D.DisableData(szMap, szName, dialogueInfo.szContext) end
-		else
-			r, g, b = 255, 255, 255
-			fnAction = function() D.AddData(szMap, szName, dialogueInfo.szContext) end
-		end
-	else
-		fnAction = function() D.AddData(szMap, szName, dialogueInfo.szContext) end
-	end
-	if dialogueInfo.szImage then
-		szIcon = dialogueInfo.szImage
-		nFrame = dialogueInfo.nImageFrame
-		szLayer = 'ICON_RIGHT'
-	end
-	return {
-		r = r, g = g, b = b,
-		szOption =  (IsCtrlKeyDown() and dialogueInfo.dwID and ('(' .. dialogueInfo.dwID .. ') ') or '') .. dialogueInfo.szContext,
-		fnAction = fnAction,
-		szIcon = szIcon, nFrame = nFrame, nMouseOverFrame = nMouseOverFrame,
-		szLayer = szLayer, fnClickIcon = fnClickIcon,
-	}
-end
-
-local function GetDialoguePanelMenu(frame)
-	local dwTarType, dwTarID, dwIdx = frame.dwTargetType, frame.dwTargetId, frame.dwIndex
-	local szName, szMap = D.GetName(dwTarType, dwTarID)
-	if szName and szMap then
-		if frame.aInfo then
-			local t = { {szOption = szName .. (IsCtrlKeyDown() and (' (' .. dwIdx .. ')') or ''), bDisable = true}, { bDevide = true } }
-			local tChat = {}
-			-- 面板上的对话
-			local dialog = D.DecodeDialogInfo(frame.aInfo, dwTarType, dwTarID)
-			for i, info in ipairs(dialog.aOptions) do
-				table.insert(t, GetDialoguePanelMenuItem(szMap, szName, info))
-				tChat[info.szContext] = true
-			end
-			-- 保存的自动对话
-			if CHAT[szMap] and CHAT[szMap][szName] then
-				for szContext, nCount in pairs(CHAT[szMap][szName]) do
-					if not tChat[szContext] then
-						table.insert(t, GetDialoguePanelMenuItem(szMap, szName, { szContext = szContext }))
-						tChat[szContext] = true
-					end
-				end
-			end
-			return t
-		end
-	end
-end
-
-do
-local ENTRY_LIST = {
-	{ root = 'Normal/DialoguePanel', x = 53, y = 4, dialog = true },
-	{ root = 'Lowest2/PlotDialoguePanel', ref = 'WndScroll_Options', point = 'TOPRIGHT', x = -50, y = 10, dialog = true },
-	{ root = 'Lowest2/QuestAcceptPanel', ref = 'Btn_Accept', point = 'TOPRIGHT', x = -30, y = 10, dialog = true, quest = true },
-}
-function D.CreateEntry()
-	if LIB.IsShieldedVersion() then
-		return
-	end
-	for _, p in ipairs(ENTRY_LIST) do
-		local frame = Station.Lookup(p.root)
-		if frame and (not p.el or not p.el:IsValid()) then
-			local wnd = frame
-			if p.path then
-				wnd = frame:Lookup(p.path)
-			end
-			p.el = UI(wnd):append('WndButton', {
-				name = 'WndButton_AutoChat',
-				text = _L['autochat'],
-				tip = _L['Left click to config autochat.\nRight click to edit global config.'],
-				tippostype = MY_TIP_POSTYPE.TOP_BOTTOM,
-				lmenu = function() return GetDialoguePanelMenu(frame) end,
-				rmenu = GetSettingMenu,
-			}, true):raw()
-		end
-	end
-	D.UpdateEntryPos()
-end
-LIB.RegisterInit('MY_AutoDialogue', D.CreateEntry)
-
-local function onFrameCreate()
-	for _, p in ipairs(ENTRY_LIST) do
-		if Station.Lookup(p.root) == arg0 then
-			D.CreateEntry()
-			return
-		end
-	end
-end
-LIB.RegisterEvent('ON_FRAME_CREATE.MY_AutoDialogue', onFrameCreate)
-
-function D.UpdateEntryPos()
-	if LIB.IsShieldedVersion() then
-		return
-	end
-	for _, p in ipairs(ENTRY_LIST) do
-		local frame = Station.Lookup(p.root)
-		if frame and p.el and p.el:IsValid() then
-			local wnd = frame
-			if p.path then
-				wnd = frame:Lookup(p.path)
-			end
-			local ref = frame
-			if p.ref then
-				ref = frame:Lookup(p.ref)
-			end
-			local x = p.x + (ref:GetAbsX() - frame:GetAbsX())
-			local y = p.y + (ref:GetAbsY() - frame:GetAbsY())
-			local point = p.point or 'TOPLEFT'
-			if point:find('RIGHT') then
-				x = x + ref:GetW()
-			end
-			if point:find('BOTTOM') then
-				y = y + ref:GetH()
-			end
-			p.el:SetRelPos(x, y)
-		end
-	end
-end
-MY.RegisterEvent('UI_SCALED.MY_AutoDialogue', D.UpdateEntryPos)
-
-function D.RemoveEntry()
-	for i, p in ipairs(ENTRY_LIST) do
-		if p.el and p.el:IsValid() then
-			p.el:Destroy()
-		end
-		p.el = nil
-	end
-end
-LIB.RegisterReload('MY_AutoDialogue', D.RemoveEntry)
-end
-end
-
-local function onOpenWindow()
-	if LIB.IsShieldedVersion() then
-		return
-	end
-	D.CreateEntry()
-	CURRENT_WINDOW = arg0
-	CURRENT_CONTENTS = arg1
-	if not MY_AutoDialogue.bEnable then
-		return
-	end
-	D.AutoChat()
-end
-LIB.RegisterEvent('OPEN_WINDOW.MY_AutoDialogue', onOpenWindow)
-
-local function OnShieldedVersion()
-	if LIB.IsShieldedVersion() then
-		D.RemoveEntry()
-	else
-		D.CreateEntry()
-	end
-end
-LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_AutoDialogue', OnShieldedVersion)
