@@ -71,53 +71,31 @@ function D.SaveData()
 	LIB.SaveLUAData({'config/auto_dialogue.jx3dat', PATH_TYPE.GLOBAL}, DIALOGUE)
 end
 
-function D.GetName(dwType, dwID)
-	if dwID == UI_GetClientPlayerID() then
-		return _L['Common'], _L['Common']
-	else
-		local szMap  = _L['Common']
-		local szName = LIB.GetObjectName(LIB.GetObject(dwType, dwID), 'never') or _L['Common']
-		if dwType ~= TARGET.ITEM then
-			szMap = Table_GetMapName(GetClientPlayer().GetMapID())
-		end
-		return szName, szMap
-	end
-end
-
-function D.AddData(szMap, szName, szKey)
-	if not DIALOGUE[szMap] then
-		DIALOGUE[szMap] = { [szName] = { [szKey] = 1 } }
-	elseif not DIALOGUE[szMap][szName] then
-		DIALOGUE[szMap][szName] = { [szKey] = 1 }
-	elseif not DIALOGUE[szMap][szName][szKey] then
-		DIALOGUE[szMap][szName][szKey] = 1
-	else
-		DIALOGUE[szMap][szName][szKey] = DIALOGUE[szMap][szName][szKey] + 1
-	end
+function D.EnableDialogueData(szMap, szName, szContext, szKey)
+	Set(DIALOGUE, {szMap, szName, szContext, szKey}, 1)
 	D.SaveData()
 	D.AutoDialogue()
 end
 
-function D.DisableData(szMap, szName, szKey)
-	if DIALOGUE[szMap]
-	and DIALOGUE[szMap][szName]
-	and DIALOGUE[szMap][szName][szKey] then
-		DIALOGUE[szMap][szName][szKey] = 0
+function D.DisableDialogueData(szMap, szName, szContext, szKey)
+	if Get(DIALOGUE, {szMap, szName, szContext, szKey}) then
+		Set(DIALOGUE, {szMap, szName, szContext, szKey}, 0)
 	end
 	D.SaveData()
 end
 
-function D.DelData(szMap, szName, szKey)
-	if not DIALOGUE[szMap] or not DIALOGUE[szMap][szName] or not DIALOGUE[szMap][szName][szKey] then
-		return
-	else
-		DIALOGUE[szMap][szName][szKey] = nil
-		if empty(DIALOGUE[szMap][szName]) then
-			DIALOGUE[szMap][szName] = nil
-			if empty(DIALOGUE[szMap]) then
-				DIALOGUE[szMap] = nil
-			end
-		end
+function D.RemoveDialogueData(szMap, szName, szContext, szKey)
+	if Get(DIALOGUE, {szMap, szName, szContext, szKey}) then
+		Set(DIALOGUE, {szMap, szName, szContext, szKey}, nil)
+	end
+	if IsEmpty(Get(DIALOGUE, {szMap, szName, szContext})) then
+		Set(DIALOGUE, {szMap, szName, szContext}, nil)
+	end
+	if IsEmpty(Get(DIALOGUE, {szMap, szName})) then
+		Set(DIALOGUE, {szMap, szName}, nil)
+	end
+	if IsEmpty(Get(DIALOGUE, {szMap})) then
+		Set(DIALOGUE, {szMap}, nil)
 	end
 	D.SaveData()
 end
@@ -127,8 +105,14 @@ end
 ---------------------------------------------------------------------------
 do
 -- 将服务器返回的对话Info解析为内容和交互选项
-function D.DecodeDialogInfo(aInfo, dwTargetType, dwTargetId)
-	local szName, szMap = D.GetName(dwTarType, dwTarID)
+function D.DecodeDialogInfo(aInfo, dwTarType, dwTarID)
+	local szName, szMap = _L['Common'], _L['Common']
+	if dwTarID ~= UI_GetClientPlayerID() then
+		szName = LIB.GetObjectName(LIB.GetObject(dwTarType, dwTarID), 'never') or _L['Common']
+		if dwTarType ~= TARGET.ITEM then
+			szMap = Table_GetMapName(GetClientPlayer().GetMapID())
+		end
+	end
 	local dialog = { szMap = szMap, szName = szName, szContext = '', aOptions = {} }
 	-- 分析交互选项和文字内容
 	for _, v in ipairs(aInfo) do
@@ -154,7 +138,7 @@ function D.DecodeDialogInfo(aInfo, dwTargetType, dwTargetId)
 			local dwQuestId = tonumber(v.attribute.questid)
 			local tQuestInfo = Table_GetQuestStringInfo(dwQuestId)
 			if tQuestInfo then
-				local eQuestState, nLevel = GetQuestState(dwQuestId, dwTargetType, dwTargetId)
+				local eQuestState, nLevel = GetQuestState(dwQuestId, dwTarType, dwTarID)
 				if eQuestState == QUEST_STATE_YELLOW_QUESTION
 				or eQuestState == QUEST_STATE_BLUE_QUESTION
 				or eQuestState == QUEST_STATE_HIDE
@@ -182,7 +166,7 @@ function D.ProcessDialogInfo(aInfo, dwTarType, dwTarID, dwIndex)
 		return
 	end
 	local option, nRepeat
-	local tChat = DIALOGUE[dialog.szMap] and DIALOGUE[dialog.szMap][dialog.szName]
+	local tChat = Get(DIALOGUE, {dialog.szMap, dialog.szName, dialog.szContext})
 	if tChat then
 		for i, p in ipairs(dialog.aOptions) do
 			if p.dwID and tChat[p.szContext] and tChat[p.szContext] > 0 then
@@ -313,67 +297,75 @@ end
 -- 设置按钮入口
 ---------------------------------------------------------------------------
 do
-local function GetDialoguePanelMenuItem(szMap, szName, dialogueInfo)
-	local r, g, b = 255, 255, 255
-	local szIcon, nFrame, nMouseOverFrame, szLayer, fnClickIcon, fnAction
-	if DIALOGUE[szMap] and DIALOGUE[szMap][szName] and DIALOGUE[szMap][szName][dialogueInfo.szContext] then
-		szIcon = 'ui/Image/UICommon/Feedanimials.UITex'
-		nFrame = 86
-		nMouseOverFrame = 87
-		szLayer = 'ICON_RIGHT'
-		fnClickIcon = function()
-			D.DelData(szMap, szName, dialogueInfo.szContext)
-			Wnd.CloseWindow('PopupMenuPanel')
-		end
-		if DIALOGUE[szMap][szName][dialogueInfo.szContext] > 0 then
-			r, g, b = 255, 0, 255
-			fnAction = function() D.DisableData(szMap, szName, dialogueInfo.szContext) end
-		else
-			r, g, b = 255, 255, 255
-			fnAction = function() D.AddData(szMap, szName, dialogueInfo.szContext) end
-		end
-	else
-		fnAction = function() D.AddData(szMap, szName, dialogueInfo.szContext) end
-	end
-	if dialogueInfo.szImage then
-		szIcon = dialogueInfo.szImage
-		nFrame = dialogueInfo.nImageFrame
-		szLayer = 'ICON_RIGHT'
-	end
-	return {
-		r = r, g = g, b = b,
-		szOption =  (IsCtrlKeyDown() and dialogueInfo.dwID and ('(' .. dialogueInfo.dwID .. ') ') or '') .. dialogueInfo.szContext,
-		fnAction = fnAction,
-		szIcon = szIcon, nFrame = nFrame, nMouseOverFrame = nMouseOverFrame,
-		szLayer = szLayer, fnClickIcon = fnClickIcon,
-	}
-end
-
 local function GetDialoguePanelMenu(frame)
-	local dwTarType, dwTarID, dwIdx = frame.dwTargetType, frame.dwTargetId, frame.dwIndex
-	local szName, szMap = D.GetName(dwTarType, dwTarID)
-	if szName and szMap then
-		if frame.aInfo then
-			local t = { {szOption = szName .. (IsCtrlKeyDown() and (' (' .. dwIdx .. ')') or ''), bDisable = true}, { bDevide = true } }
-			local tChat = {}
-			-- 面板上的对话
-			local dialog = D.DecodeDialogInfo(frame.aInfo, dwTarType, dwTarID)
-			for i, info in ipairs(dialog.aOptions) do
-				table.insert(t, GetDialoguePanelMenuItem(szMap, szName, info))
-				tChat[info.szContext] = true
+	if not frame.aInfo then
+		return
+	end
+	local dialog = D.DecodeDialogInfo(frame.aInfo, frame.dwTargetType, frame.dwTargetId)
+	if not dialog.szName or not dialog.szMap then
+		return
+	end
+	-- 显示标题
+	local szCaption = dialog.szName
+	if dialog.szContext ~= '' then
+		szCaption = szCaption .. '(' .. wsub(dialog.szContext:gsub('%s', ''), 1, 8)
+		if wlen(dialog.szContext) > 8 then
+			szCaption = szCaption .. '...'
+		end
+		szCaption = szCaption .. ')'
+	end
+	if IsCtrlKeyDown() then
+		szCaption = szCaption .. ' (' .. frame.dwIndex .. ')'
+	end
+	-- 计算选项列表
+	local tOption, aOption = {}, {}
+	for i, option in ipairs(dialog.aOptions) do -- 面板上的对话
+		insert(aOption, option)
+		tOption[option.szContext] = true
+	end
+	local aList = Get(DIALOGUE, {dialog.szMap, dialog.szName, dialog.szContext}) -- 保存的自动对话
+	if aList then
+		for szContext, nCount in pairs(aList) do
+			if not tOption[szContext] then
+				insert(aOption, { szContext = szContext })
+				tOption[szContext] = true
 			end
-			-- 保存的自动对话
-			if DIALOGUE[szMap] and DIALOGUE[szMap][szName] then
-				for szContext, nCount in pairs(DIALOGUE[szMap][szName]) do
-					if not tChat[szContext] then
-						table.insert(t, GetDialoguePanelMenuItem(szMap, szName, { szContext = szContext }))
-						tChat[szContext] = true
-					end
-				end
-			end
-			return t
 		end
 	end
+	-- 数据转菜单项
+	local menu = {{ szOption = szCaption, bDisable = true }, { bDevide = true }}
+	for _, option in ipairs(aOption) do
+		local szCaption = option.szContext
+		if IsCtrlKeyDown() and option.dwID then
+			szCaption = '(' .. option.dwID .. ') ' .. szCaption
+		end
+		local menuSub = { szOption = szCaption, r = 255, g = 255, b = 255 }
+		local nRepeat = Get(DIALOGUE, {dialog.szMap, dialog.szName, dialog.szContext, option.szContext})
+		if nRepeat then
+			menuSub.szIcon = 'ui/Image/UICommon/Feedanimials.UITex'
+			menuSub.nFrame = 86
+			menuSub.nMouseOverFrame = 87
+			menuSub.szLayer = 'ICON_RIGHT'
+			menuSub.fnClickIcon = function()
+				D.RemoveDialogueData(dialog.szMap, dialog.szName, dialog.szContext, option.szContext)
+				Wnd.CloseWindow('PopupMenuPanel')
+			end
+		end
+		if nRepeat and nRepeat > 0 then
+			menuSub.r, menuSub.g, menuSub.b = 255, 0, 255
+			menuSub.fnAction = function() D.DisableDialogueData(dialog.szMap, dialog.szName, dialog.szContext, option.szContext) end
+		else
+			menuSub.r, menuSub.g, menuSub.b = 255, 255, 255
+			menuSub.fnAction = function() D.EnableDialogueData(dialog.szMap, dialog.szName, dialog.szContext, option.szContext) end
+		end
+		if option.szImage then
+			menuSub.szIcon = option.szImage
+			menuSub.nFrame = option.nImageFrame
+			menuSub.szLayer = 'ICON_RIGHT'
+		end
+		insert(menu, menuSub)
+	end
+	return menu
 end
 
 local ENTRY_LIST = {
