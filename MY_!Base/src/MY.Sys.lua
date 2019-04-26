@@ -293,15 +293,16 @@ function LIB.FormatPath(oFilePath, tParams)
 	-- Unified the directory separator
 	szFilePath = string.gsub(szFilePath, '\\', '/')
 	-- if it's relative path then complete path with '/{NS}@DATA/'
-	if szFilePath:sub(1, 2) ~= './' and szFilePath:sub(2, 3) ~= ':/' then
-		if ePathType == PATH_TYPE.GLOBAL then
-			szFilePath = '!all-users@$lang/' .. szFilePath
+	if szFilePath:sub(2, 3) ~= ':/' then
+		if ePathType == PATH_TYPE.DATA then
+			szFilePath = LIB.GetAddonInfo().szInterfaceRoot .. LIB.GetAddonInfo().szNameSpace .. '#DATA/' .. szFilePath
+		elseif ePathType == PATH_TYPE.GLOBAL then
+			szFilePath = LIB.GetAddonInfo().szInterfaceRoot .. LIB.GetAddonInfo().szNameSpace .. '#DATA/!all-users@$lang/' .. szFilePath
 		elseif ePathType == PATH_TYPE.ROLE then
-			szFilePath = '$uid@$lang/' .. szFilePath
+			szFilePath = LIB.GetAddonInfo().szInterfaceRoot .. LIB.GetAddonInfo().szNameSpace .. '#DATA/$uid@$lang/' .. szFilePath
 		elseif ePathType == PATH_TYPE.SERVER then
-			szFilePath = '#$relserver@$lang/' .. szFilePath
+			szFilePath = LIB.GetAddonInfo().szInterfaceRoot .. LIB.GetAddonInfo().szNameSpace .. '#DATA/#$relserver@$lang/' .. szFilePath
 		end
-		szFilePath = LIB.GetAddonInfo().szInterfaceRoot .. LIB.GetAddonInfo().szNameSpace .. '#DATA/' .. szFilePath
 	end
 	-- if exist $uid then add user role identity
 	if string.find(szFilePath, '%$uid') then
@@ -771,6 +772,7 @@ function LIB.PlaySound(nType, szFilePath, szCustomPath)
 	end
 	PlaySound(nType, szPath)
 end
+
 -- ¼ÓÔØ×¢²áÊý¾Ý
 LIB.RegisterInit(LIB.GetAddonInfo().szNameSpace .. '#INITDATA', function()
 	local t = LIB.LoadLUAData({'config/initial.jx3dat', PATH_TYPE.GLOBAL})

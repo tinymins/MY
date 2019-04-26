@@ -687,9 +687,10 @@ local LIB = {
 	}),
 	PATH_TYPE = SetmetaReadonly({
 		NORMAL = 0,
-		ROLE   = 1,
-		GLOBAL = 2,
-		SERVER = 3,
+		DATA   = 1,
+		ROLE   = 2,
+		GLOBAL = 3,
+		SERVER = 4,
 	}),
 	MENU_DIVIDER     = MENU_DIVIDER    ,
 	EMPTY_TABLE      = EMPTY_TABLE     ,
