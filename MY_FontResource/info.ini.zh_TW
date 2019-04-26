@@ -1,0 +1,8 @@
+[MY_FontResource]
+name=字體資源包
+desc=提供更多的字體選擇
+default=1
+version=1.0
+dependence=MY_!Base
+package=MY
+lua_0=src/MY_FontResource.lua

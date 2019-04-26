@@ -1,0 +1,57 @@
+return {
+	{
+		szLang = "zhcn",
+		szName = "方正剪紙",
+		szFile = "/ui/font/fzjz.ttf",
+	},
+	{
+		szLang = "zhcn",
+		szName = "方正行楷",
+		szFile = "/ui/Font/fzxk.ttf",
+	},
+	{
+		szLang = "zhcn",
+		szName = "方正黑體",
+		szFile = "/ui/Font/fzht_GBK.TTF",
+	},
+	{
+		szLang = "zhcn",
+		szName = "方正粗圓",
+		szFile = "./FangZhengCuYuan.ttf",
+	},
+	{
+		szLang = "zhtw",
+		szName = "微軟正黑",
+		szFile = "/ui/Font/MSJH.TTF",
+	},
+	{
+		szLang = "zhtw",
+		szName = "翩翩體",
+		szFile = "./PianPianTi.ttf",
+	},
+	{
+		szLang = "zhtw",
+		szName = "雅痞體",
+		szFile = "./YaPiTi.ttf",
+	},
+	{
+		szLang = "zhtw",
+		szName = "萌妹體",
+		szFile = "./MengMeiTi.ttf",
+	},
+	{
+		szLang = "zhtw",
+		szName = "浪漫雅圓",
+		szFile = "./LangManYaYuan.ttf",
+	},
+	{
+		szLang = "zhtw",
+		szName = "王漢宗特黑",
+		szFile = "./HanWangHeiHeavy.ttf",
+	},
+	{
+		szLang = "zhtw",
+		szName = "蒙納盈富體",
+		szFile = "./MengNaYingFuTi.ttf",
+	},
+}
