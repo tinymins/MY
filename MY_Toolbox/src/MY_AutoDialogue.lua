@@ -298,12 +298,11 @@ end
 ---------------------------------------------------------------------------
 -- 设置按钮入口
 ---------------------------------------------------------------------------
-do
-local function GetDialoguePanelMenu(frame)
-	if not frame.aInfo then
+function D.GetDialogueMenu(aInfo, dwTargetType, dwTargetID, dwIndex)
+	if not aInfo then
 		return
 	end
-	local dialog = D.DecodeDialogInfo(frame.aInfo, frame.dwTargetType, frame.dwTargetId)
+	local dialog = D.DecodeDialogInfo(aInfo, dwTargetType, dwTargetID)
 	if not dialog.szName or not dialog.szMap then
 		return
 	end
@@ -317,7 +316,7 @@ local function GetDialoguePanelMenu(frame)
 		szCaption = szCaption .. ')'
 	end
 	if IsCtrlKeyDown() then
-		szCaption = szCaption .. ' (' .. frame.dwIndex .. ')'
+		szCaption = szCaption .. ' (' .. dwIndex .. ')'
 	end
 	-- 计算选项列表
 	local tOption, aOption = {}, {}
@@ -370,10 +369,22 @@ local function GetDialoguePanelMenu(frame)
 	return menu
 end
 
+do
 local ENTRY_LIST = {
-	{ root = 'Normal/DialoguePanel', x = 53, y = 4, dialog = true },
-	{ root = 'Lowest2/PlotDialoguePanel', ref = 'WndScroll_Options', point = 'TOPRIGHT', x = -50, y = 10, dialog = true },
-	{ root = 'Lowest2/QuestAcceptPanel', ref = 'Btn_Accept', point = 'TOPRIGHT', x = -30, y = 10, dialog = true, quest = true },
+	{
+		root = 'Normal/DialoguePanel', x = 53, y = 4,
+		keys = { info = 'aInfo', tartype = 'dwTargetType', tarid = 'dwTargetId', winidx = 'dwIndex'},
+	},
+	{
+		root = 'Lowest2/PlotDialoguePanel',
+		ref = 'WndScroll_Options', point = 'TOPRIGHT', x = -50, y = 10,
+		keys = { info = 'aInfo', tartype = 'dwTargetType', tarid = 'dwTargetId', winidx = 'dwIndex'},
+	},
+	{
+		root = 'Lowest2/QuestAcceptPanel',
+		ref = 'Btn_Accept', point = 'TOPRIGHT', x = -30, y = 10,
+		keys = { info = 'aInfo', tartype = 'dwTargetType', tarid = 'dwTargetID', winidx = 'dwIndex'},
+	},
 }
 function D.CreateEntry()
 	if LIB.IsShieldedVersion() then
@@ -391,7 +402,9 @@ function D.CreateEntry()
 				text = _L['autochat'],
 				tip = _L['Left click to config autochat.\nRight click to edit global config.'],
 				tippostype = MY_TIP_POSTYPE.TOP_BOTTOM,
-				lmenu = function() return GetDialoguePanelMenu(frame) end,
+				lmenu = function()
+					return D.GetDialogueMenu(frame[p.keys.info], frame[p.keys.tartype], frame[p.keys.tarid], frame[p.keys.winidx])
+				end,
 				rmenu = D.GetConfigMenu,
 			}, true):raw()
 		end
