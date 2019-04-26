@@ -232,7 +232,20 @@ end
 
 function D.GetRequestStatus(info)
 	local szStatus, szMsg = 'normal'
-	if not info.bFriend and not info.bTongMember then
+	if MY_PartyRequest.bAcceptAll then
+		szStatus = 'accept'
+		szMsg = _L('Auto accept %s(%s %d%s) party request, go to MY/raid/teamtools panel if you want to turn off this feature.',
+			info.szName, g_tStrings.tForceTitle[info.dwForce], info.nLevel, g_tStrings.STR_LEVEL)
+	elseif info.bFriend and MY_PartyRequest.bAcceptFriend then
+		szStatus = 'accept'
+		szMsg = _L('Auto accept friend %s(%s %d%s) party request, go to MY/raid/teamtools panel if you want to turn off this feature.',
+			info.szName, g_tStrings.tForceTitle[info.dwForce], info.nLevel, g_tStrings.STR_LEVEL)
+	elseif info.bTongMember and MY_PartyRequest.bAcceptTong then
+		szStatus = 'accept'
+		szMsg = _L('Auto tong member friend %s(%s %d%s) party request, go to MY/raid/teamtools panel if you want to turn off this feature.',
+			info.szName, g_tStrings.tForceTitle[info.dwForce], info.nLevel, g_tStrings.STR_LEVEL)
+	end
+	if szStatus == 'normal' and not info.bFriend and not info.bTongMember then
 		if MY_PartyRequest.bRefuseRobot and info.dwID then
 			local me = GetClientPlayer()
 			local tar = GetPlayer(info.dwID)
@@ -250,21 +263,6 @@ function D.GetRequestStatus(info)
 		if MY_PartyRequest.bRefuseLowLv and info.nLevel < LIB.GetAddonInfo().dwMaxPlayerLevel then
 			szStatus = 'refuse'
 			szMsg = _L('Auto refuse %s(%s %d%s) party request, go to MY/raid/teamtools panel if you want to turn off this feature.',
-				info.szName, g_tStrings.tForceTitle[info.dwForce], info.nLevel, g_tStrings.STR_LEVEL)
-		end
-	end
-	if szStatus == 'normal' then
-		if info.bAcceptAll then
-			szStatus = 'accept'
-			szMsg = _L('Auto accept %s(%s %d%s) party request, go to MY/raid/teamtools panel if you want to turn off this feature.',
-				info.szName, g_tStrings.tForceTitle[info.dwForce], info.nLevel, g_tStrings.STR_LEVEL)
-		elseif info.bFriend and MY_PartyRequest.bAcceptFriend then
-			szStatus = 'accept'
-			szMsg = _L('Auto accept friend %s(%s %d%s) party request, go to MY/raid/teamtools panel if you want to turn off this feature.',
-				info.szName, g_tStrings.tForceTitle[info.dwForce], info.nLevel, g_tStrings.STR_LEVEL)
-		elseif info.bTongMember and MY_PartyRequest.bAcceptTong then
-			szStatus = 'accept'
-			szMsg = _L('Auto tong member friend %s(%s %d%s) party request, go to MY/raid/teamtools panel if you want to turn off this feature.',
 				info.szName, g_tStrings.tForceTitle[info.dwForce], info.nLevel, g_tStrings.STR_LEVEL)
 		end
 	end
