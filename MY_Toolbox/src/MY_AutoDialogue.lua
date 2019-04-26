@@ -176,16 +176,13 @@ function D.ProcessDialogInfo(aInfo, dwTarType, dwTarID, dwIndex)
 			end
 		end
 	end
-	if not option and MY_AutoDialogue.bAutoSelectSg and not LIB.IsInDungeon() then
+	if not option and MY_AutoDialogue.bAutoSelectSg and #dialog.aOptions == 1 and not LIB.IsInDungeon() then
 		option = dialog.aOptions[1]
 		nRepeat = 1
 	end
-	if option then
-		if option.dwID then
-			for i = 1, nRepeat do
-				GetClientPlayer().WindowSelect(dwIndex, option.dwID)
-			end
-			LIB.Debug({'WindowSelect ' .. dwIndex .. ',' .. option.dwID .. 'x' .. nRepeat}, 'AUTO_CHAT', DEBUG_LEVEL.LOG)
+	if option and option.dwID then
+		for i = 1, nRepeat do
+			GetClientPlayer().WindowSelect(dwIndex, option.dwID)
 		end
 		if MY_AutoDialogue.bEchoOn then
 			LIB.Sysmsg({_L('Conversation with [%s]: %s', dialog.szName, dialog.szContext:gsub('%s', ''))})
@@ -193,6 +190,7 @@ function D.ProcessDialogInfo(aInfo, dwTarType, dwTarID, dwIndex)
 				LIB.Sysmsg({_L('Conversation with [%s] auto chose: %s', dialog.szName, option.szContext)})
 			end
 		end
+		LIB.Debug({'WindowSelect ' .. dwIndex .. ',' .. option.dwID .. 'x' .. nRepeat}, 'AUTO_CHAT', DEBUG_LEVEL.LOG)
 		return true
 	end
 end
@@ -321,8 +319,10 @@ function D.GetDialogueMenu(aInfo, dwTargetType, dwTargetID, dwIndex)
 	-- 计算选项列表
 	local tOption, aOption = {}, {}
 	for i, option in ipairs(dialog.aOptions) do -- 面板上的对话
-		insert(aOption, option)
-		tOption[option.szContext] = true
+		if option.dwID then
+			insert(aOption, option)
+			tOption[option.szContext] = true
+		end
 	end
 	local aList = Get(DIALOGUE, {dialog.szMap, dialog.szName, dialog.szContext}) -- 保存的自动对话
 	if aList then
