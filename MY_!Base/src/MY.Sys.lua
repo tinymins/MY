@@ -342,6 +342,13 @@ end
 function LIB.GetRelativePath(oPath, oRoot)
 	local szPath = LIB.FormatPath(oPath)
 	local szRoot = LIB.FormatPath(oRoot)
+	local szRootPath = GetRootPath():gsub('\\', '/')
+	if wfind(szPath:lower(), szRootPath:lower()) == 1 then
+		szPath = szPath:sub(szRootPath:len() + 1)
+	end
+	if wfind(szRoot:lower(), szRootPath:lower()) == 1 then
+		szRoot = szRoot:sub(szRootPath:len() + 1)
+	end
 	if wstring.find(szPath:lower(), szRoot:lower()) ~= 1 then
 		return
 	end
