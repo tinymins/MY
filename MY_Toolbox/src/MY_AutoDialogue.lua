@@ -162,7 +162,7 @@ function D.DecodeDialogInfo(aInfo, dwTarType, dwTarID)
 	return dialog
 end
 
-function D.ProcessDialogInfo(aInfo, dwTarType, dwTarID, dwIndex)
+function D.ProcessDialogInfo(frame, aInfo, dwTarType, dwTarID, dwIndex)
 	local dialog = D.DecodeDialogInfo(aInfo, dwTarType, dwTarID)
 	if not (dialog.szMap and dialog.szName and dwIndex and aInfo) then
 		return
@@ -183,6 +183,13 @@ function D.ProcessDialogInfo(aInfo, dwTarType, dwTarID, dwIndex)
 		nRepeat = 1
 	end
 	if option and option.dwID then
+		if MY_AutoDialogue.bAutoClose then
+			frame:Hide()
+			D.ShowStation()
+			rlcmd('dialogue with npc 0')
+			-- 延迟一点点显示Station 防止连续对话导致主场景闪烁
+			-- LIB.DelayCall('MY_AutoDialogue#ShowStation', 200, D.ShowStation)
+		end
 		for i = 1, nRepeat do
 			GetClientPlayer().WindowSelect(dwIndex, option.dwID)
 		end
@@ -208,20 +215,11 @@ function D.AutoDialogue()
 	end
 	local frame = Station.Lookup('Normal/DialoguePanel')
 	if frame and frame:IsVisible() then
-		if D.ProcessDialogInfo(frame.aInfo, frame.dwTargetType, frame.dwTargetId, frame.dwIndex)
-		and MY_AutoDialogue.bAutoClose then
-			frame:Hide()
-		end
-		return
+		return D.ProcessDialogInfo(frame, frame.aInfo, frame.dwTargetType, frame.dwTargetId, frame.dwIndex)
 	end
 	local frame = Station.Lookup('Lowest2/PlotDialoguePanel')
 	if frame and frame:IsVisible() then
-		if D.ProcessDialogInfo(frame.aInfo, frame.dwTargetType, frame.dwTargetId, frame.dwIndex)
-		and MY_AutoDialogue.bAutoClose then
-			frame:Hide()
-			Station.Show()
-		end
-		return
+		return D.ProcessDialogInfo(frame, frame.aInfo, frame.dwTargetType, frame.dwTargetId, frame.dwIndex)
 	end
 end
 
@@ -453,7 +451,7 @@ function D.UpdateEntryPos()
 		end
 	end
 end
-MY.RegisterEvent('UI_SCALED.MY_AutoDialogue#ENTRY', D.UpdateEntryPos)
+LIB.RegisterEvent('UI_SCALED.MY_AutoDialogue#ENTRY', D.UpdateEntryPos)
 
 function D.RemoveEntry()
 	for i, p in ipairs(ENTRY_LIST) do
@@ -464,6 +462,16 @@ function D.RemoveEntry()
 	end
 end
 LIB.RegisterReload('MY_AutoDialogue#ENTRY', D.RemoveEntry)
+
+function D.ShowStation()
+	for i, p in ipairs(ENTRY_LIST) do
+		local frame = Station.Lookup(p.root)
+		if frame and frame:IsValid() and frame:IsVisible() then
+			return
+		end
+	end
+	Station.Show()
+end
 
 local function onOpenWindow()
 	if LIB.IsShieldedVersion() then
