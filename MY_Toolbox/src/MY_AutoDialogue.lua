@@ -155,6 +155,8 @@ function D.DecodeDialogInfo(aInfo, dwTarType, dwTarID)
 			dialog.szContext = dialog.szContext .. v.context
 		elseif v.name == 'MT' then -- 交通
 			insert(dialog.aOptions, { szContext = v.context })
+		elseif v.name == 'U' then -- 跨地图交通
+			insert(dialog.aOptions, { szContext = v.context })
 		end
 	end
 	return dialog
