@@ -244,11 +244,13 @@ end
 ---------------------------------------------------------------------------
 do
 local function UnhookSkipQuestTalk()
-	if frame.__SkipQuestHackEl then
-		frame.__SkipQuestEl = nil
-		frame.__SkipQuestHackEl:Destroy()
-		frame.__SkipQuestHackEl = nil
+	local frame = Station.Lookup('Lowest2/QuestAcceptPanel')
+	if not frame or not frame.__SkipQuestHackEl then
+		return 0
 	end
+	frame.__SkipQuestEl = nil
+	frame.__SkipQuestHackEl:Destroy()
+	frame.__SkipQuestHackEl = nil
 end
 LIB.RegisterReload('MY_AutoDialogue#SkipQuestTalk', UnhookSkipQuestTalk)
 
