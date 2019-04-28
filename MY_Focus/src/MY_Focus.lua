@@ -44,7 +44,9 @@ local l_tTempFocusList = {
 	[TARGET.NPC]    = {},   -- dwTemplateID
 	[TARGET.DOODAD] = {},   -- dwTemplateID
 }
+local BAISC_CONFIG_LOADED = false
 local BASIC_CONFIG_CHANGED = false
+local STYLE_CONFIG_LOADED = false
 local STYLE_CONFIG_CHANGED = false
 local l_dwLockType, l_dwLockID, l_lockInDisplay
 local O, D = {}, { PASSPHRASE = {111, 198, 5} }
@@ -147,13 +149,14 @@ function D.LoadStyleConfig()
 			O[k] = config[k]
 		end
 	end
+	STYLE_CONFIG_LOADED = true
 	D.OnSetAncientPatternFocus()
 	D.OnSetAncientStaticFocus()
 	D.RescanNearby()
 end
 
 function D.SaveStyleConfig()
-	if not STYLE_CONFIG_CHANGED then
+	if not STYLE_CONFIG_LOADED or not STYLE_CONFIG_CHANGED then
 		return
 	end
 	local config = {}
@@ -173,11 +176,12 @@ function D.LoadConfig()
 			O[k] = config[k]
 		end
 	end
+	BAISC_CONFIG_LOADED = true
 	D.LoadStyleConfig()
 end
 
 function D.SaveConfig()
-	if BASIC_CONFIG_CHANGED then
+	if BAISC_CONFIG_LOADED and BASIC_CONFIG_CHANGED then
 		local config = {}
 		for k, v in pairs(BASIC_DEFAULT) do
 			config[k] = O[k]
