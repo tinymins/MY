@@ -684,6 +684,7 @@ local LIB = {
 		PMLOG   = 0,
 		WARNING = 1,
 		ERROR   = 2,
+		DEBUG   = 2,
 	}),
 	PATH_TYPE = SetmetaReadonly({
 		NORMAL = 0,

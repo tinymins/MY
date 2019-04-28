@@ -133,7 +133,7 @@ local function QueryData(szQues)
 end
 
 local function SubmitData()
-	if LIB.IsInDevMode() then
+	if LIB.IsDebugServer() then
 		return
 	end
 	local data = {}

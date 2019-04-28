@@ -207,7 +207,7 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTi
 end
 
 function D.OnSerendipity(szName, szSerendipity, nMethod, nStatus, dwTime)
-	if LIB.IsInDevServer() then
+	if LIB.IsDebugServer() then
 		return
 	end
 	local szKey = szName .. '_' .. szSerendipity .. '_' .. dwTime
@@ -355,7 +355,7 @@ LIB.RegisterInit(function()
 		szKey = 'MY_Serendipity',
 		szMessage = _L['Would you like to share serendipity?'],
 		fnRequire = function()
-			return not LIB.IsInDevMode() and not MY_Serendipity.bEnable
+			return not LIB.IsDebugServer() and not MY_Serendipity.bEnable
 		end,
 		{
 			szOption = _L['Yes'],
@@ -378,7 +378,7 @@ LIB.RegisterInit(function()
 		szKey = 'MY_Serendipity_Auto',
 		szMessage = _L['Would you like to auto share serendipity?'],
 		fnRequire = function()
-			return not LIB.IsInDevMode()
+			return not LIB.IsDebugServer()
 				and MY_Serendipity.bEnable
 				and not MY_Serendipity.bAutoShare
 		end,
@@ -403,7 +403,7 @@ LIB.RegisterInit(function()
 		szKey = 'MY_Serendipity_Silent',
 		szMessage = _L['Would you like to share serendipity silently?'],
 		fnRequire = function()
-			return not LIB.IsInDevMode()
+			return not LIB.IsDebugServer()
 				and MY_Serendipity.bEnable
 				and MY_Serendipity.bAutoShare
 				and not MY_Serendipity.bSilentMode

@@ -44,20 +44,39 @@ function LIB.GetLang()
 	return lang
 end
 
--- 获取功能屏蔽状态
+-- 获取功能屏蔽等级
 do
-local SHIELDED_VERSION = LIB.GetLang() == 'zhcn' -- 屏蔽被河蟹的功能（国服启用）
-function LIB.IsShieldedVersion(bShieldedVersion)
-	if bShieldedVersion == nil then
-		return SHIELDED_VERSION
-	else
-		SHIELDED_VERSION = bShieldedVersion
+local SHIELDED_LEVEL = LIB.GetLang() == 'zhcn' and 0 or 1 -- 屏蔽被河蟹的功能（国服启用）
+function LIB.IsShieldedVersion(nLevel, bSet)
+	if not IsNumber(nLevel) then
+		nLevel = 0
+	end
+	if bSet then
+		SHIELDED_LEVEL = nLevel
 		if LIB.IsPanelOpened() then
 			LIB.ReopenPanel()
 		end
 		FireUIEvent(LIB.GetAddonInfo().szNameSpace .. '_SHIELDED_VERSION')
 	end
+	return SHIELDED_LEVEL <= nLevel
 end
+end
+
+-- 获取是否测试客户端
+function LIB.IsDebugClient()
+	if IsDebugClient() then
+		return true
+	end
+	return false
+end
+
+-- 获取是否测试服务器
+function LIB.IsDebugServer()
+	local ip = select(7, GetUserServer())
+	if ip:find('^192%.') or ip:find('^10%.') then
+		return true
+	end
+	return false
 end
 
 -- #######################################################################################################
@@ -1159,24 +1178,6 @@ end
 LIB.RegisterEvent('CURL_REQUEST_RESULT.AJAX', OnCurlRequestResult)
 end
 
-function LIB.IsInDevMode()
-	if IsDebugClient() then
-		return true
-	end
-	if LIB.IsInDevServer() then
-		return true
-	end
-	return false
-end
-
-function LIB.IsInDevServer()
-	local ip = select(7, GetUserServer())
-	if ip:find('^192%.') or ip:find('^10%.') then
-		return true
-	end
-	return false
-end
-
 do
 -------------------------------
 -- remote data storage online
@@ -1194,7 +1195,7 @@ LIB.BreatheCall(LIB.GetAddonInfo().szNameSpace .. '#STORAGE_DATA', 200, function
 	if not me or IsRemotePlayer(me.dwID) or not LIB.GetTongName() then
 		return
 	end
-	if LIB.IsInDevMode() then
+	if LIB.IsDebugServer() then
 		return 0
 	end
 	m_nStorageVer = LIB.LoadLUAData({'config/storageversion.jx3dat', PATH_TYPE.ROLE}) or {}
@@ -1250,7 +1251,7 @@ LIB.RegisterExit(LIB.GetAddonInfo().szNameSpace .. '#STORAGE_DATA', function()
 end)
 -- 保存个人数据 方便网吧党和公司家里多电脑切换
 function LIB.StorageData(szKey, oData)
-	if LIB.IsInDevMode() then
+	if LIB.IsDebugServer() then
 		return
 	end
 	LIB.DelayCall('STORAGE_' .. szKey, 120000, function()
@@ -1688,13 +1689,6 @@ function LIB.Debug(oContent, szTitle, nLevel)
 	elseif nLevel >= LIB.GetAddonInfo().nLogLevel then
 		Log('[DEBUG_LEVEL][LEVEL_' .. nLevel .. '][' .. szTitle .. ']' .. concat(oContent, '\n'))
 	end
-end
-
-function LIB.StartDebugMode()
-	if JH then
-		JH.bDebugClient = true
-	end
-	LIB.IsShieldedVersion(false)
 end
 
 -- 格式化计时时间
