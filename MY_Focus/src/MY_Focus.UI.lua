@@ -511,7 +511,7 @@ function D.OnItemMouseEnter()
 		this:Lookup('Image_Hover'):Show()
 		if MY_Focus.bHealHelper then
 			TEMP_TARGET_TYPE, TEMP_TARGET_ID = LIB.GetTarget()
-			SetTarget(this.dwType, this.dwID)
+			LIB.SetTarget(this.dwType, this.dwID)
 		end
 		D.OnItemRefreshTip()
 	end
@@ -543,7 +543,7 @@ function D.OnItemLButtonClick()
 		if MY_Focus.bHealHelper then
 			TEMP_TARGET_TYPE, TEMP_TARGET_ID = nil
 		end
-		SetTarget(this.dwType, this.dwID)
+		LIB.SetTarget(this.dwType, this.dwID)
 	end
 end
 
