@@ -25,7 +25,8 @@ local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
-local LIB, UI, DEBUG_LEVEL, PATH_TYPE = MY, MY.UI, MY.DEBUG_LEVEL, MY.PATH_TYPE
+local LIB = MY
+local UI, DEBUG_LEVEL, PATH_TYPE = LIB.UI, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
 local var2str, str2var, clone, empty, ipairs_r = LIB.var2str, LIB.str2var, LIB.clone, LIB.empty, LIB.ipairs_r
 local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
 local GetPatch, ApplyPatch = LIB.GetPatch, LIB.ApplyPatch
@@ -41,11 +42,11 @@ if not LIB.AssertVersion('MY_Resource', _L['MY_Resource'], 0x2011800) then
 end
 
 local D = {}
-local FONT_DIR = MY.GetAddonInfo().szRoot:gsub('%./', '/') .. 'MY_FontResource/font/'
-local FONT_LIST = MY.LoadLUAData(FONT_DIR .. '$lang.jx3dat') or {}
+local FONT_DIR = LIB.GetAddonInfo().szRoot:gsub('%./', '/') .. 'MY_FontResource/font/'
+local FONT_LIST = LIB.LoadLUAData(FONT_DIR .. '$lang.jx3dat') or {}
 
 function D.GetList()
-	local aList, tExist, szLang = {}, {}, MY.GetLang()
+	local aList, tExist, szLang = {}, {}, LIB.GetLang()
 	for _, p in ipairs(Font.GetFontPathList() or {}) do
 		local szFile = p.szFile:gsub('/', '\\')
 		local szKey = szFile:lower()
