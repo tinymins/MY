@@ -186,10 +186,9 @@ function D.ProcessDialogInfo(frame, aInfo, dwTarType, dwTarID, dwIndex)
 	if option and option.dwID then
 		if MY_AutoDialogue.bAutoClose then
 			frame:Hide()
-			D.ShowStation()
+			D.AutoSetStationVisible()
 			rlcmd('dialogue with npc 0')
-			-- 延迟一点点显示Station 防止连续对话导致主场景闪烁
-			-- LIB.DelayCall('MY_AutoDialogue#ShowStation', 200, D.ShowStation)
+			LIB.DelayCall('MY_AutoDialogue#ShowStation', 50, D.AutoSetStationVisible) -- 防止连续对话切换到任务导致主场景错误出现
 		end
 		for i = 1, nRepeat do
 			GetClientPlayer().WindowSelect(dwIndex, option.dwID)
@@ -378,12 +377,12 @@ local ENTRY_LIST = {
 	},
 	{
 		root = 'Lowest2/PlotDialoguePanel',
-		ref = 'WndScroll_Options', point = 'TOPRIGHT', x = -50, y = 10,
+		ref = 'WndScroll_Options', point = 'TOPRIGHT', x = -50, y = 10, plot = true,
 		keys = { info = 'aInfo', tartype = 'dwTargetType', tarid = 'dwTargetId', winidx = 'dwIndex'},
 	},
 	{
 		root = 'Lowest2/QuestAcceptPanel',
-		ref = 'Btn_Accept', point = 'TOPRIGHT', x = -30, y = 10,
+		ref = 'Btn_Accept', point = 'TOPRIGHT', x = -30, y = 10, plot = true,
 		keys = { info = 'aInfo', tartype = 'dwTargetType', tarid = 'dwTargetID', winidx = 'dwIndex'},
 	},
 }
@@ -464,11 +463,14 @@ function D.RemoveEntry()
 end
 LIB.RegisterReload('MY_AutoDialogue#ENTRY', D.RemoveEntry)
 
-function D.ShowStation()
+function D.AutoSetStationVisible()
 	for i, p in ipairs(ENTRY_LIST) do
-		local frame = Station.Lookup(p.root)
-		if frame and frame:IsValid() and frame:IsVisible() then
-			return
+		if p.plot then
+			local frame = Station.Lookup(p.root)
+			if frame and frame:IsValid() and frame:IsVisible() then
+				Station.Hide()
+				return
+			end
 		end
 	end
 	Station.Show()
