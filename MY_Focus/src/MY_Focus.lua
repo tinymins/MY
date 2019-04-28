@@ -147,8 +147,9 @@ function D.LoadStyleConfig()
 			O[k] = config[k]
 		end
 	end
+	D.OnSetAncientPatternFocus()
+	D.OnSetAncientStaticFocus()
 	D.RescanNearby()
-	STYLE_CONFIG_CHANGED = false
 end
 
 function D.SaveStyleConfig()
@@ -194,7 +195,7 @@ function D.BeforeConfigChange(k)
 	end
 end
 
-function D.OnConfigChange(k)
+function D.OnConfigChange(k, v)
 	if not IsNil(BASIC_DEFAULT[k]) then
 		BASIC_CONFIG_CHANGED = true
 	elseif not IsNil(STYLE_DEFAULT[k]) then
@@ -699,31 +700,35 @@ function D.GetTargetMenu(dwType, dwID)
 	}}
 end
 
-function D.OnSetOldConfig()
-	if not O.tAutoFocus and not O.tFocusList then
+function D.OnSetAncientPatternFocus()
+	if not IsTable(O.tAutoFocus) then
 		return
 	end
-	if O.tAutoFocus then
-		if IsTable(O.tAutoFocus) then
-			for _, v in ipairs(O.tAutoFocus) do
-				insert(O.aPatternFocus, FormatAutoFocusData(v))
-			end
-		end
-		O.tAutoFocus = nil
-		D.OnConfigChange('aPatternFocus', O.aPatternFocus)
+	local tExist = {}
+	for _, p in ipairs(O.aPatternFocus) do
+		tExist[p.szPattern] = true
 	end
-	if O.tFocusList then
-		if IsTable(O.tAutoFocus) then
-			for dwType, tFocus in pairs(O.tFocusList) do
-				if O.tStaticFocus[dwType] then
-					for dwID, bFocus in pairs(tFocus) do
-						O.tStaticFocus[dwType][dwID] = bFocus
-					end
-				end
+	for _, v in ipairs(O.tAutoFocus) do
+		local p = FormatAutoFocusData(v)
+		if not tExist[p.szPattern] then
+			insert(O.aPatternFocus, p)
+			tExist[p.szPattern] = true
+			D.OnConfigChange('aPatternFocus', O.aPatternFocus)
+		end
+	end
+end
+
+function D.OnSetAncientStaticFocus()
+	if not IsTable(O.tAutoFocus) then
+		return
+	end
+	for dwType, tFocus in pairs(O.tFocusList) do
+		if O.tStaticFocus[dwType] then
+			for dwID, bFocus in pairs(tFocus) do
+				O.tStaticFocus[dwType][dwID] = bFocus
+				D.OnConfigChange('tStaticFocus', O.tStaticFocus)
 			end
 		end
-		O.tFocusList = nil
-		D.OnConfigChange('tStaticFocus', O.tStaticFocus)
 	end
 end
 
@@ -935,8 +940,8 @@ local settings = {
 				bEnableSceneNavi = D.OnConfigChange,
 				fScaleX = D.OnConfigChange,
 				fScaleY = D.OnConfigChange,
-				tAutoFocus = D.OnSetOldConfig,
-				tFocusList = D.OnSetOldConfig,
+				tAutoFocus = D.OnSetAncientPatternFocus,
+				tFocusList = D.OnSetAncientStaticFocus,
 			},
 			root = O,
 		},
