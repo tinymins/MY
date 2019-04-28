@@ -1,5 +1,6 @@
 -- language data (zhtw) updated at 2014-4-10 03:38:11
 data = {
+    ['MY_Focus'] = '焦點列表',
     ['focus list'] = '焦點列表',
     ['enable'] = '啟用',
     ['Option'] = '設置',

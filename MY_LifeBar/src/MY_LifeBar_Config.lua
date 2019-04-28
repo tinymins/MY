@@ -36,10 +36,12 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local _L, D = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_LifeBar/lang/'), {}
-if not LIB.AssertVersion('MY_LifeBar', _L['MY_LifeBar'], 0x2012400) then
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_LifeBar/lang/')
+if not LIB.AssertVersion('MY_LifeBar', _L['MY_LifeBar'], 0x2012800) then
 	return
 end
+
+local D = {}
 
 do -- auto generate embedded data
 for _, DAT_ROOT in ipairs({

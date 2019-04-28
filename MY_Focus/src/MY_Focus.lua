@@ -36,9 +36,13 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
+local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_Focus/lang/')
+if not LIB.AssertVersion('MY_Focus', _L['MY_Focus'], 0x2012800) then
+	return
+end
+
 local CHANGGE_REAL_SHADOW_TPLID = 46140 -- 清绝歌影 的主体影子
 local INI_PATH = LIB.GetAddonInfo().szRoot .. 'MY_Focus/ui/MY_Focus.ini'
-local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_Focus/lang/')
 local FOCUS_LIST = {}
 local l_tTempFocusList = {
 	[TARGET.PLAYER] = {},   -- dwID

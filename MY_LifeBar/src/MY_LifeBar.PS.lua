@@ -37,7 +37,7 @@ local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.Is
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
 local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_LifeBar/lang/')
-if not LIB.AssertVersion('MY_LifeBar', _L['MY_LifeBar'], 0x2011800) then
+if not LIB.AssertVersion('MY_LifeBar', _L['MY_LifeBar'], 0x2012800) then
 	return
 end
 

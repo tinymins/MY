@@ -37,7 +37,7 @@ local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.Is
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
 local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_Resource/lang/')
-if not LIB.AssertVersion('MY_Resource', _L['MY_Resource'], 0x2011800) then
+if not LIB.AssertVersion('MY_Resource', _L['MY_Resource'], 0x2012800) then
 	return
 end
 
