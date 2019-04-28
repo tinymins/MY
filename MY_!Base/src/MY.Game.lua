@@ -1941,15 +1941,15 @@ end
 function LIB.Equip(szName)
 	local me = GetClientPlayer()
 	for i=1,6 do
-		if me.GetBoxSize(i)>0 then
-			for j=0, me.GetBoxSize(i)-1 do
-				local item = me.GetItem(i,j)
+		if me.GetBoxSize(i) > 0 then
+			for j = 0, me.GetBoxSize(i) - 1 do
+				local item = me.GetItem(i, j)
 				if item == nil then
-					j=j+1
-				elseif Table_GetItemName(item.nUiId)==szName then -- GetItemNameByItem(item)
+					j=j + 1
+				elseif Table_GetItemName(item.nUiId) == szName then -- GetItemNameByItem(item)
 					local eRetCode, nEquipPos = me.GetEquipPos(i, j)
-					if szName==_L['ji guan'] or szName==_L['nu jian'] then
-						for k=0,15 do
+					if szName == _L['ji guan'] or szName == _L['nu jian'] then
+						for k = 0,15 do
 							if me.GetItem(INVENTORY_INDEX.BULLET_PACKAGE, k) == nil then
 								OnExchangeItem(i, j, INVENTORY_INDEX.BULLET_PACKAGE, k)
 								return
