@@ -40,78 +40,138 @@ local _L = LIB.LoadLangPack()
 ---------------------------------------------------------------------------------------------
 -- ÊÂ¼þ×¢²á
 ---------------------------------------------------------------------------------------------
--- ×¢²áÓÎÏ·ÊÂ¼þ¼àÌý
--- LIB.RegisterEvent(szEvent, fnAction) -- ×¢²á
--- LIB.RegisterEvent(szEvent) -- ×¢Ïú
--- (string)  szEvent  ÊÂ¼þ£¬¿ÉÔÚºóÃæ¼ÓÒ»¸öµã²¢½ô¸úÒ»¸ö±êÊ¶×Ö·û´®ÓÃÓÚ·ÀÖ¹ÖØ¸´»òÈ¡Ïû°ó¶¨£¬Èç LOADING_END.xxx
--- (function)fnAction ÊÂ¼þ´¦Àíº¯Êý£¬arg0 ~ arg9£¬´«Èë nil Ïàµ±ÓÚÈ¡Ïû¸ÃÊÂ¼þ
---ÌØ±ð×¢Òâ£ºµ± fnAction Îª nil ²¢ÇÒ szKey Ò²Îª nil Ê±»áÈ¡ÏûËùÓÐÍ¨¹ý±¾º¯Êý×¢²áµÄÊÂ¼þ´¦ÀíÆ÷
-do local EVENT_LIST = {}
-local function EventHandler(szEvent, ...)
-	local tEvent = EVENT_LIST[szEvent]
-	if tEvent then
-		for k, v in pairs(tEvent) do
-			local res, err = pcall(v, szEvent, ...)
-			if not res then
-				LIB.Debug({GetTraceback(err)}, 'OnEvent#' .. szEvent .. '.' .. k, DEBUG_LEVEL.ERROR)
-			end
+-- Í¨ÓÃ×¢²áº¯Êý
+-- CommonEventRegister(E, szID, fnAction)
+-- table    E              ÊÂ¼þÃèÊöÐÅÏ¢
+-- boolean  E.bSingleEvent ¸ÃÊÂ¼þÃ»ÓÐ×ÓÊÂ¼þ£¬¼´ szID È«²¿¸³Öµ¸ø szKey¡¢ szEvent Îª¶¨Öµ
+-- string   szID           ÊÂ¼þID
+-- function fnAction       ÊÂ¼þÏìÓ¦º¯Êý
+-- Íâ²¿Ê¹ÓÃÎÄµµ£º
+--   RegisterXXX(string id, function fn) -- ×¢²á
+--   RegisterXXX(function fn)            -- ×¢²á
+--   RegisterXXX(string id)              -- ²éÑ¯
+--   RegisterXXX(string id, false)       -- ×¢Ïú
+-- ×¢£º
+--   µ± E.bSingleEvent Îª true Ê±£¬¿ÉÔÚidºóÃæ¼ÓÒ»¸öµã²¢½ô¸ú
+--   Ò»¸ö±êÊ¶×Ö·û´®ÓÃÓÚ·ÀÖ¹ÖØ¸´»òÈ¡Ïû°ó¶¨£¬Èç LOADING_END.xxx
+local function CommonEventRegister(E, szID, fnAction)
+	if IsTable(szID) then
+		for _, szID in ipairs(szID) do
+			CommonEventRegister(E, szID, fnAction)
+		end
+		return
+	end
+	local szKey, szEvent
+	if E.bSingleEvent then
+		szKey = szID
+		szEvent = 'SINGLE_EVENT'
+	else
+		local nPos = StringFindW(szID, '.')
+		if nPos then
+			szKey = sub(szID, nPos + 1)
+			szEvent = sub(szID, 1, nPos - 1)
+		else
+			szEvent = szID
 		end
 	end
-end
-
-function LIB.RegisterEvent(szEvent, fnAction)
-	if type(szEvent) == 'table' then
-		for _, szEvent in ipairs(szEvent) do
-			LIB.RegisterEvent(szEvent, fnAction)
+	if IsFunction(fnAction) then
+		if not E.tList then
+			E.tList = {}
 		end
-	elseif type(szEvent) == 'string' then
-		local szKey = nil
-		local nPos = StringFindW(szEvent, '.')
-		if nPos then
-			szKey = string.sub(szEvent, nPos + 1)
-			szEvent = string.sub(szEvent, 1, nPos - 1)
+		if not E.tList[szEvent] then
+			E.tList[szEvent] = {}
+			if E.OnCreateEvent then
+				E.OnCreateEvent(szEvent)
+			end
 		end
-		if fnAction then
-			if not EVENT_LIST[szEvent] then
-				EVENT_LIST[szEvent] = {}
-				RegisterEvent(szEvent, EventHandler)
+		if not IsString(szKey) then
+			szKey = GetTickCount() * 1000
+			while E.tList[szEvent][tostring(szKey)] do
+				szKey = szKey + 1
 			end
-			if szKey then
-				EVENT_LIST[szEvent][szKey] = fnAction
-			else
-				table.insert(EVENT_LIST[szEvent], fnAction)
-			end
+			szKey = tostring(szKey)
+		end
+		if szEvent == 'SINGLE_EVENT' then
+			szID = szKey
 		else
+			szID = szID .. '.' .. szKey
+		end
+		E.tList[szEvent][szKey] = { szID = szID, fnAction = fnAction }
+	elseif fnAction == false then
+		if E.tList and E.tList[szEvent] then
 			if szKey then
-				if EVENT_LIST[szEvent] then
-					EVENT_LIST[szEvent][szKey] = nil
+				E.tList[szEvent][szKey] = nil
+				if IsEmpty(E.tList[szEvent]) then
+					E.tList[szEvent] = nil
 				end
 			else
-				EVENT_LIST[szEvent] = {}
+				E.tList[szEvent] = nil
 			end
+			if not E.tList[szEvent] and E.OnRemoveEvent then
+				E.OnRemoveEvent(szEvent)
+			end
+			if IsEmpty(E.tList) then
+				E.tList = nil
+			end
+		end
+	elseif szKey and E.tList and E.tList[szEvent] and E.tList[szEvent][szKey] then
+		return true
+	end
+	return szKey
+end
+
+local function CommonEventFirer(E, arg0, ...)
+	local szEvent = E.bSingleEvent and 'SINGLE_EVENT' or arg0
+	local tEvent = E.tList[szEvent]
+	if tEvent then
+		for szKey, p in pairs(tEvent) do
+			local nStartTick = GetTickCount()
+			local status, err = pcall(p.fnAction, arg0, ...)
+			if not status then
+				LIB.Debug({GetTraceback(err)}, 'On' .. E.szName .. '#' .. p.szID, DEBUG_LEVEL.ERROR)
+			end
+			LIB.Debug({_L('%s function <%s> executed in %dms.', E.szName, szKey, GetTickCount() - nStartTick)}, _L['PMTool'], DEBUG_LEVEL.LOG)
 		end
 	end
 end
+
+-- ×¢²áÓÎÏ·ÊÂ¼þ¼àÌý
+-- LIB.RegisterEvent(szEvent, fnAction) -- ×¢²á
+-- LIB.RegisterEvent(szEvent, false) -- ×¢Ïú
+-- (string)   szEvent  ÊÂ¼þ£¬¿ÉÔÚºóÃæ¼ÓÒ»¸öµã²¢½ô¸úÒ»¸ö±êÊ¶×Ö·û´®ÓÃÓÚ·ÀÖ¹ÖØ¸´»òÈ¡Ïû°ó¶¨£¬Èç LOADING_END.xxx
+-- (function) fnAction ÊÂ¼þ´¦Àíº¯Êý£¬´«Èë false Ïàµ±ÓÚÈ¡Ïû¸ÃÊÂ¼þ
+--ÌØ±ð×¢Òâ£ºµ± fnAction Îª false ²¢ÇÒ szKey Îª nil Ê±»áÈ¡ÏûËùÓÐÍ¨¹ý±¾º¯Êý×¢²áµÄÊÂ¼þ´¦ÀíÆ÷
+do
+local GLBAL_EVENT = { szName = 'Event' }
+local function EventHandler(szEvent, ...)
+	CommonEventFirer(GLBAL_EVENT, szEvent, ...)
+end
+function GLBAL_EVENT.OnCreateEvent(szEvent)
+	RegisterEvent(szEvent, EventHandler)
+end
+function GLBAL_EVENT.OnRemoveEvent(szEvent)
+	if not szEvent then
+		return
+	end
+	UnRegisterEvent(szEvent, EventHandler)
+end
+function LIB.RegisterEvent(szEvent, fnAction)
+	return CommonEventRegister(GLBAL_EVENT, szEvent, fnAction)
+end
 end
 
-do local INIT_FUNC_LIST = {}
+do
+local INIT_EVENT = { szName = 'Initial', bSingleEvent = true }
 local function OnInit()
-	if not INIT_FUNC_LIST then
+	if not INIT_EVENT then
 		return
 	end
 	LIB.CreateDataRoot(PATH_TYPE.ROLE)
 	LIB.CreateDataRoot(PATH_TYPE.GLOBAL)
 	LIB.CreateDataRoot(PATH_TYPE.SERVER)
 
-	for szKey, fnAction in pairs(INIT_FUNC_LIST) do
-		local nStartTick = GetTickCount()
-		local status, err = pcall(fnAction)
-		if not status then
-			LIB.Debug({GetTraceback(err)}, 'INIT_FUNC_LIST#' .. szKey)
-		end
-		LIB.Debug({_L('Initial function <%s> executed in %dms.', szKey, GetTickCount() - nStartTick)}, _L['PMTool'], DEBUG_LEVEL.LOG)
-	end
-	INIT_FUNC_LIST = nil
+	CommonEventFirer(INIT_EVENT)
+	INIT_EVENT = nil
 	-- ÏÔÊ¾»¶Ó­ÐÅÏ¢
 	LIB.Sysmsg({_L('%s, welcome to use mingyi plugins!', GetClientPlayer().szName) .. ' v' .. LIB.GetVersion() .. ' Build ' .. LIB.GetAddonInfo().szBuild})
 end
@@ -120,42 +180,20 @@ LIB.RegisterEvent('LOADING_ENDING', OnInit) -- ²»ÄÜÓÃFIRST_LOADING_END ²»È»×¢²á¿
 -- ×¢²á³õÊ¼»¯º¯Êý
 -- RegisterInit(string id, function fn) -- ×¢²á
 -- RegisterInit(function fn)            -- ×¢²á
--- RegisterInit(string id)              -- ×¢Ïú
-function LIB.RegisterInit(arg1, arg2)
-	local szKey, fnAction
-	if type(arg1) == 'string' then
-		szKey = arg1
-		fnAction = arg2
-	elseif type(arg1) == 'function' then
-		fnAction = arg1
-	end
-	if fnAction then
-		if szKey then
-			INIT_FUNC_LIST[szKey] = fnAction
-		else
-			table.insert(INIT_FUNC_LIST, fnAction)
-		end
-	elseif szKey then
-		INIT_FUNC_LIST[szKey] = nil
-	end
+-- RegisterInit(string id, false)       -- ×¢Ïú
+function LIB.RegisterInit(...)
+	return CommonEventRegister(INIT_EVENT, ...)
 end
 
 function LIB.IsInitialized()
-	return not INIT_FUNC_LIST
+	return not INIT_EVENT
 end
 end
 
-do local EXIT_FUNC_LIST = {}
+do
+local EXIT_EVENT = { szName = 'Exit', bSingleEvent = true }
 local function OnExit()
-	for szKey, fnAction in pairs(EXIT_FUNC_LIST) do
-		local nStartTick = GetTickCount()
-		local status, err = pcall(fnAction)
-		if not status then
-			LIB.Debug({GetTraceback(err)}, 'EXIT_FUNC_LIST#' .. szKey)
-		end
-		LIB.Debug({_L('Exit function <%s> executed in %dms.', szKey, GetTickCount() - nStartTick)}, _L['PMTool'], DEBUG_LEVEL.LOG)
-	end
-	EXIT_FUNC_LIST = nil
+	CommonEventFirer(EXIT_EVENT)
 end
 LIB.RegisterEvent('GAME_EXIT', OnExit)
 LIB.RegisterEvent('PLAYER_EXIT_GAME', OnExit)
@@ -164,80 +202,37 @@ LIB.RegisterEvent('RELOAD_UI_ADDON_BEGIN', OnExit)
 -- ×¢²áÓÎÏ·½áÊøº¯Êý
 -- RegisterExit(string id, function fn) -- ×¢²á
 -- RegisterExit(function fn)            -- ×¢²á
--- RegisterExit(string id)              -- ×¢Ïú
-function LIB.RegisterExit(arg1, arg2)
-	local szKey, fnAction
-	if type(arg1) == 'string' then
-		szKey = arg1
-		fnAction = arg2
-	elseif type(arg1) == 'function' then
-		fnAction = arg1
-	end
-	if fnAction then
-		if szKey then
-			EXIT_FUNC_LIST[szKey] = fnAction
-		else
-			table.insert(EXIT_FUNC_LIST, fnAction)
-		end
-	elseif szKey then
-		EXIT_FUNC_LIST[szKey] = nil
-	end
+-- RegisterExit(string id, false)       -- ×¢Ïú
+function LIB.RegisterExit(...)
+	return CommonEventRegister(EXIT_EVENT, ...)
 end
 end
 
-do local RELOAD_FUNC_LIST = {}
+do
+local RELOAD_EVENT = { szName = 'Reload', bSingleEvent = true }
 local function OnReload()
-	for szKey, fnAction in pairs(RELOAD_FUNC_LIST) do
-		local nStartTick = GetTickCount()
-		local status, err = pcall(fnAction)
-		if not status then
-			LIB.Debug({GetTraceback(err)}, 'RELOAD_FUNC_LIST#' .. szKey)
-		end
-		LIB.Debug({_L('Reload function <%s> executed in %dms.', szKey, GetTickCount() - nStartTick)}, _L['PMTool'], DEBUG_LEVEL.LOG)
-	end
-	RELOAD_FUNC_LIST = nil
+	CommonEventFirer(RELOAD_EVENT)
 end
 LIB.RegisterEvent('RELOAD_UI_ADDON_BEGIN', OnReload)
 
 -- ×¢²á²å¼þÖØÔØº¯Êý
 -- RegisterReload(string id, function fn) -- ×¢²á
 -- RegisterReload(function fn)            -- ×¢²á
--- RegisterReload(string id)              -- ×¢Ïú
-function LIB.RegisterReload(arg1, arg2)
-	local szKey, fnAction
-	if type(arg1) == 'string' then
-		szKey = arg1
-		fnAction = arg2
-	elseif type(arg1) == 'function' then
-		fnAction = arg1
-	end
-	if fnAction then
-		if szKey then
-			RELOAD_FUNC_LIST[szKey] = fnAction
-		else
-			table.insert(RELOAD_FUNC_LIST, fnAction)
-		end
-	elseif szKey then
-		RELOAD_FUNC_LIST[szKey] = nil
-	end
+-- RegisterReload(string id, false)       -- ×¢Ïú
+function LIB.RegisterReload(...)
+	return CommonEventRegister(RELOAD_EVENT, ...)
 end
 end
 
-do local IDLE_FUNC_LIST, TIME = {}, 0
+do
+local IDLE_EVENT, TIME = { szName = 'Idle', bSingleEvent = true }, 0
 local function OnIdle()
 	local nTime = GetTime()
 	if nTime - TIME < 20000 then
 		return
 	end
-	for szKey, fnAction in pairs(IDLE_FUNC_LIST) do
-		local nStartTick = GetTickCount()
-		local status, err = pcall(fnAction)
-		if not status then
-			LIB.Debug({GetTraceback(err)}, 'IDLE_FUNC_LIST#' .. szKey)
-		end
-		LIB.Debug({_L('Idle function <%s> executed in %dms.', szKey, GetTickCount() - nStartTick)}, _L['PMTool'], DEBUG_LEVEL.LOG)
-	end
 	TIME = nTime
+	CommonEventFirer(IDLE_EVENT)
 end
 LIB.RegisterEvent('ON_FRAME_CREATE', function()
 	if arg0:GetName() == 'OptionPanel' then
@@ -266,24 +261,9 @@ end)
 -- ×¢²áÓÎÏ·¿ÕÏÐº¯Êý -- ÓÃ»§´æ´¢Êý¾ÝµÈ²Ù×÷
 -- RegisterIdle(string id, function fn) -- ×¢²á
 -- RegisterIdle(function fn)            -- ×¢²á
--- RegisterIdle(string id)              -- ×¢Ïú
-function LIB.RegisterIdle(arg1, arg2)
-	local szKey, fnAction
-	if type(arg1) == 'string' then
-		szKey = arg1
-		fnAction = arg2
-	elseif type(arg1) == 'function' then
-		fnAction = arg1
-	end
-	if fnAction then
-		if szKey then
-			IDLE_FUNC_LIST[szKey] = fnAction
-		else
-			table.insert(IDLE_FUNC_LIST, fnAction)
-		end
-	elseif szKey then
-		IDLE_FUNC_LIST[szKey] = nil
-	end
+-- RegisterIdle(string id, false)       -- ×¢Ïú
+function LIB.RegisterIdle(...)
+	return CommonEventRegister(IDLE_EVENT, ...)
 end
 end
 
@@ -430,7 +410,8 @@ do
 local BG_MSG_ID_PREFIX = LIB.GetAddonInfo().szNameSpace .. ':'
 local BG_MSG_ID_SUFFIX = ':V1'
 do
-local BG_MSG_LIST = {}
+local BG_MSG_EVENT = { szName = 'BgMsg' }
+local BG_MSG_PROGRESS_EVENT = { szName = 'BgMsgProgress' }
 ------------------------------------
 --            ±³¾°Í¨Ñ¶             --
 ------------------------------------
@@ -449,7 +430,7 @@ local function OnBgMsg()
 		return
 	end
 	local szMsgID = szMsgSID:sub(#BG_MSG_ID_PREFIX + 1, -#BG_MSG_ID_SUFFIX - 1)
-	if not BG_MSG_LIST[szMsgID] then
+	if not CommonEventRegister(BG_MSG_EVENT, szMsgID) then
 		return
 	end
 	-- pagination
@@ -459,26 +440,14 @@ local function OnBgMsg()
 	end
 	BG_MSG_PART[szMsgUUID][nSegIndex] = szPart
 	-- fire progress event
-	for szKey, p in pairs(BG_MSG_LIST[szMsgID]) do
-		if p.fnProgress then
-			local status, err = pcall(p.fnProgress, szMsgID, nChannel, dwID, szName, bSelf, nSegCount, #BG_MSG_PART[szMsgUUID], nSegIndex)
-			if not status then
-				LIB.Debug({GetTraceback(err)}, 'BG_EVENT_PROGRESS#' .. szMsgID .. '.' .. szKey, DEBUG_LEVEL.ERROR)
-			end
-		end
-	end
+	CommonEventFirer(BG_MSG_PROGRESS_EVENT, szMsgID, nChannel, dwID, szName, bSelf, nSegCount, #BG_MSG_PART[szMsgUUID], nSegIndex)
 	-- concat and decode data
 	if #BG_MSG_PART[szMsgUUID] == nSegCount then
 		local szParam = concat(BG_MSG_PART[szMsgUUID])
 		local szPlain = szParam and LIB.SimpleDecryptString(szParam)
 		local aParam = szPlain and str2var(szPlain)
 		if aParam then
-			for szKey, p in pairs(BG_MSG_LIST[szMsgID]) do
-				local status, err = pcall(p.fnAction, szMsgID, nChannel, dwID, szName, bSelf, unpack(aParam))
-				if not status then
-					LIB.Debug({GetTraceback(err)}, 'BG_EVENT#' .. szMsgID .. '.' .. szKey, DEBUG_LEVEL.ERROR)
-				end
-			end
+			CommonEventFirer(BG_MSG_EVENT, szMsgID, nChannel, dwID, szName, bSelf, unpack(aParam))
 		else
 			LIB.Debug({GetTraceback('Cannot decode bgmsg')}, 'BG_EVENT#' .. szMsgID, DEBUG_LEVEL.ERROR)
 		end
@@ -493,38 +462,8 @@ end
 -- LIB.RegisterBgMsg('MY_CHECK_INSTALL.RECEIVER_01', function(szMsgID, nChannel, dwTalkerID, szTalkerName, bSelf, oDatas...) LIB.SendBgMsg(szTalkerName, 'MY_CHECK_INSTALL_REPLY', oData) end) -- ×¢²á
 -- LIB.RegisterBgMsg('MY_CHECK_INSTALL.RECEIVER_01') -- ×¢Ïú
 function LIB.RegisterBgMsg(szMsgID, fnAction, fnProgress)
-	if type(szMsgID) == 'table' then
-		for _, szMsgID in ipairs(szMsgID) do
-			LIB.RegisterBgMsg(szMsgID, fnAction)
-		end
-		return
-	end
-	local szKey = nil
-	local nPos = StringFindW(szMsgID, '.')
-	if nPos then
-		szKey = string.sub(szMsgID, nPos + 1)
-		szMsgID = string.sub(szMsgID, 1, nPos - 1)
-	end
-	if fnAction then
-		if not BG_MSG_LIST[szMsgID] then
-			BG_MSG_LIST[szMsgID] = {}
-		end
-		if not szKey then
-			szKey = GetTickCount()
-			while BG_MSG_LIST[szMsgID][tostring(szKey)] do
-				szKey = szKey + 0.1
-			end
-			szKey = tostring(szKey)
-		end
-		BG_MSG_LIST[szMsgID][szKey] = { fnAction = fnAction, fnProgress = fnProgress }
-	elseif BG_MSG_LIST[szMsgID] then
-		if szKey then
-			BG_MSG_LIST[szMsgID][szKey] = nil
-		else
-			BG_MSG_LIST[szMsgID] = nil
-		end
-	end
-	return szKey
+	local szID = CommonEventRegister(BG_MSG_EVENT, szMsgID, fnAction)
+	return CommonEventRegister(BG_MSG_PROGRESS_EVENT, szID, fnProgress)
 end
 end
 
