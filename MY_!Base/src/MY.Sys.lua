@@ -406,6 +406,31 @@ function LIB.RegisterUserData(szName, szFileName, onLoad)
 
 end
 
+do local USER_DB
+function LIB.LoadDataBase()
+	if USER_DB then
+		return
+	end
+	USER_DB = UnQLite_Open(LIB.FormatPath({'userdata/base.udb', PATH_TYPE.ROLE}))
+end
+
+function LIB.ReleaseDataBase()
+	if not USER_DB then
+		return
+	end
+	USER_DB:Release()
+	USER_DB = nil
+end
+
+function LIB.GetUserData(szKey)
+	return USER_DB:Get(szKey)
+end
+
+function LIB.SetUserData(szKey, oValue)
+	return USER_DB:Set(szKey, oValue)
+end
+end
+
 -- Format data's structure as struct descripted.
 do
 local function clone(var)
@@ -1412,7 +1437,7 @@ local function GenerateMenu(aList, bMainMenu)
 	local menu = {}
 	if bMainMenu then
 		menu = {
-			szOption = _L['mingyi plugins'],
+			szOption = LIB.GetAddonInfo().szName,
 			fnAction = LIB.TogglePanel,
 			rgb = LIB.GetAddonInfo().tMenuColor,
 			bCheck = true,

@@ -169,7 +169,7 @@ local function OnInit()
 	LIB.CreateDataRoot(PATH_TYPE.ROLE)
 	LIB.CreateDataRoot(PATH_TYPE.GLOBAL)
 	LIB.CreateDataRoot(PATH_TYPE.SERVER)
-
+	LIB.LoadDataBase()
 	CommonEventFirer(INIT_EVENT)
 	INIT_EVENT = nil
 	-- œ‘ æª∂”≠–≈œ¢
@@ -194,6 +194,7 @@ do
 local EXIT_EVENT = { szName = 'Exit', bSingleEvent = true }
 local function OnExit()
 	CommonEventFirer(EXIT_EVENT)
+	LIB.ReleaseDataBase()
 end
 LIB.RegisterEvent('GAME_EXIT', OnExit)
 LIB.RegisterEvent('PLAYER_EXIT_GAME', OnExit)
