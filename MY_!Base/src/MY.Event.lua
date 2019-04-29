@@ -60,6 +60,8 @@ local function CommonEventRegister(E, szID, fnAction)
 			CommonEventRegister(E, szID, fnAction)
 		end
 		return
+	elseif IsFunction(szID) then
+		szID, fnAction = nil, szID
 	end
 	local szKey, szEvent
 	if E.bSingleEvent then
@@ -94,7 +96,7 @@ local function CommonEventRegister(E, szID, fnAction)
 		if szEvent == 'SINGLE_EVENT' then
 			szID = szKey
 		else
-			szID = szID .. '.' .. szKey
+			szID = szEvent .. '.' .. szKey
 		end
 		E.tList[szEvent][szKey] = { szID = szID, fnAction = fnAction }
 	elseif fnAction == false then
