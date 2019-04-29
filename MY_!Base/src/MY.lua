@@ -646,6 +646,20 @@ local function GetTraceback(str)
 	end
 	return str or ''
 end
+local DEBUG_LEVEL = SetmetaReadonly({
+	LOG     = 0,
+	PMLOG   = 0,
+	WARNING = 1,
+	ERROR   = 2,
+	DEBUG   = 3,
+})
+local PATH_TYPE = SetmetaReadonly({
+	NORMAL = 0,
+	DATA   = 1,
+	ROLE   = 2,
+	GLOBAL = 3,
+	SERVER = 4,
+})
 local MENU_DIVIDER = { bDevide = true }
 local EMPTY_TABLE = SetmetaReadonly({})
 local XML_LINE_BREAKER = GetFormatText('\n')
@@ -679,20 +693,8 @@ local LIB = {
 	RandomChild  = RandomChild ,
 	GetTraceback = GetTraceback,
 	LoadLangPack = LoadLangPack,
-	DEBUG_LEVEL = SetmetaReadonly({
-		LOG     = 0,
-		PMLOG   = 0,
-		WARNING = 1,
-		ERROR   = 2,
-		DEBUG   = 2,
-	}),
-	PATH_TYPE = SetmetaReadonly({
-		NORMAL = 0,
-		DATA   = 1,
-		ROLE   = 2,
-		GLOBAL = 3,
-		SERVER = 4,
-	}),
+	DEBUG_LEVEL      = DEBUG_LEVEL     ,
+	PATH_TYPE        = PATH_TYPE       ,
 	MENU_DIVIDER     = MENU_DIVIDER    ,
 	EMPTY_TABLE      = EMPTY_TABLE     ,
 	XML_LINE_BREAKER = XML_LINE_BREAKER,
@@ -770,7 +772,7 @@ end
 ---------------------------------------------------
 -- 事件、快捷键、菜单注册
 ---------------------------------------------------
-if _DEBUG_LEVEL_ < 3 then
+if _DEBUG_LEVEL_ <= DEBUG_LEVEL.DEBUG then
 	if not ECHO_LUA_ERROR then
 		ECHO_LUA_ERROR = LIB.GetAddonInfo().szNameSpace
 	end
