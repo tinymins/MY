@@ -328,10 +328,14 @@ function LIB.GetRelativePath(oPath, oRoot)
 	if wfind(szRoot:lower(), szRootPath:lower()) == 1 then
 		szRoot = szRoot:sub(szRootPath:len() + 1)
 	end
-	if wstring.find(szPath:lower(), szRoot:lower()) ~= 1 then
+	if wfind(szPath:lower(), szRoot:lower()) ~= 1 then
 		return
 	end
 	return szPath:sub(#szRoot + 1)
+end
+
+function LIB.GetAbsolutePath(oPath, oRoot)
+	return GetRootPath():gsub('\\', '/') .. '/' .. LIB.GetRelativePath(oPath, oRoot):gsub('^[./\\]', '')
 end
 
 function LIB.GetLUADataPath(oFilePath)

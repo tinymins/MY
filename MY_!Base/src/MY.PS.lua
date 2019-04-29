@@ -480,7 +480,7 @@ function LIB.SwitchTab(szID, bForceUpdate)
 			name = 'WndButton_UserPreferenceFolder',
 			text = _L['Open user preference folder'],
 			onclick = function()
-				local szRoot = LIB.FormatPath({'', PATH_TYPE.ROLE})
+				local szRoot = LIB.GetAbsolutePath({'', PATH_TYPE.ROLE}, {'', PATH_TYPE.NORMAL}):gsub('/', '\\')
 				if OpenFolder then
 					OpenFolder(szRoot)
 				end
@@ -492,7 +492,7 @@ function LIB.SwitchTab(szID, bForceUpdate)
 			name = 'WndButton_ServerPreferenceFolder',
 			text = _L['Open server preference folder'],
 			onclick = function()
-				local szRoot = LIB.FormatPath({'', PATH_TYPE.SERVER})
+				local szRoot = LIB.GetAbsolutePath({'', PATH_TYPE.SERVER}, {'', PATH_TYPE.NORMAL}):gsub('/', '\\')
 				if OpenFolder then
 					OpenFolder(szRoot)
 				end
@@ -504,7 +504,7 @@ function LIB.SwitchTab(szID, bForceUpdate)
 			name = 'WndButton_GlobalPreferenceFolder',
 			text = _L['Open global preference folder'],
 			onclick = function()
-				local szRoot = LIB.FormatPath({'', PATH_TYPE.GLOBAL})
+				local szRoot = LIB.GetAbsolutePath({'', PATH_TYPE.GLOBAL}, {'', PATH_TYPE.NORMAL}):gsub('/', '\\')
 				if OpenFolder then
 					OpenFolder(szRoot)
 				end
