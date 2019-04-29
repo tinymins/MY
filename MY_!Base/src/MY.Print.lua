@@ -141,7 +141,7 @@ function LIB.Debug(oContent, szTitle, nLevel)
 		nLevel = DEBUG_LEVEL.WARNING
 	end
 	if not IsString(szTitle) then
-		szTitle = 'MY DEBUG'
+		szTitle = LIB.GetAddonInfo().szNameSpace .. '_DEBUG'
 	end
 	if not IsTable(oContent) then
 		oContent = { oContent }
