@@ -304,7 +304,7 @@ function MY_Recount.DrawUI(data)
 	if not data then
 		data = DataDisplay
 	end
-	if not (m_frame and data) then
+	if not (m_frame and data and _C.tCss) then
 		return
 	end
 
