@@ -122,7 +122,7 @@ end
 
 local function CommonEventFirer(E, arg0, ...)
 	local szEvent = E.bSingleEvent and 'SINGLE_EVENT' or arg0
-	local tEvent = E.tList[szEvent]
+	local tEvent = E.tList and szEvent and E.tList[szEvent]
 	if tEvent then
 		for szKey, p in pairs(tEvent) do
 			local nStartTick = GetTickCount()
@@ -506,5 +506,37 @@ function LIB.SendBgMsg(nChannel, szMsgID, ...)
 		me.Talk(nChannel, szTarget, aSay)
 	end
 end
+end
+end
+
+do
+local FRAME_CREATE_EVENT = { szName = 'FrameCreate' }
+local function OnFrameCreate()
+	CommonEventFirer(FRAME_CREATE_EVENT, arg0:GetName(), arg0)
+end
+LIB.RegisterEvent('ON_FRAME_CREATE', OnFrameCreate)
+
+-- ×¢²á²å¼þÖØÔØº¯Êý
+-- RegisterFrameCreate(string id, function fn) -- ×¢²á
+-- RegisterFrameCreate(function fn)            -- ×¢²á
+-- RegisterFrameCreate(string id, false)       -- ×¢Ïú
+function LIB.RegisterFrameCreate(...)
+	return CommonEventRegister(FRAME_CREATE_EVENT, ...)
+end
+end
+
+do
+local FRAME_DESTROY_EVENT = { szName = 'FrameCreate' }
+local function OnFrameDestroy()
+	CommonEventFirer(FRAME_DESTROY_EVENT, arg0:GetName(), arg0)
+end
+LIB.RegisterEvent('ON_FRAME_DESTROY', OnFrameDestroy)
+
+-- ×¢²á²å¼þÖØÔØº¯Êý
+-- RegisterFrameDestroy(string id, function fn) -- ×¢²á
+-- RegisterFrameDestroy(function fn)            -- ×¢²á
+-- RegisterFrameDestroy(string id, false)       -- ×¢Ïú
+function LIB.RegisterFrameDestroy(...)
+	return CommonEventRegister(FRAME_DESTROY_EVENT, ...)
 end
 end
