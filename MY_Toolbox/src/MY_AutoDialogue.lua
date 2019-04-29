@@ -186,9 +186,8 @@ function D.ProcessDialogInfo(frame, aInfo, dwTarType, dwTarID, dwIndex)
 	if option and option.dwID then
 		if MY_AutoDialogue.bAutoClose then
 			frame:Hide()
-			D.AutoSetStationVisible()
+			Station.Show()
 			rlcmd('dialogue with npc 0')
-			LIB.DelayCall('MY_AutoDialogue#ShowStation', 50, D.AutoSetStationVisible) -- 防止连续对话切换到任务导致主场景错误出现
 		end
 		for i = 1, nRepeat do
 			GetClientPlayer().WindowSelect(dwIndex, option.dwID)
@@ -372,16 +371,16 @@ end
 do
 local ENTRY_LIST = {
 	{
-		root = 'Normal/DialoguePanel', x = 53, y = 4,
+		name = 'DialoguePanel', root = 'Normal/DialoguePanel', x = 53, y = 4,
 		keys = { info = 'aInfo', tartype = 'dwTargetType', tarid = 'dwTargetId', winidx = 'dwIndex'},
 	},
 	{
-		root = 'Lowest2/PlotDialoguePanel',
+		name = 'PlotDialoguePanel', root = 'Lowest2/PlotDialoguePanel',
 		ref = 'WndScroll_Options', point = 'TOPRIGHT', x = -50, y = 10, plot = true,
 		keys = { info = 'aInfo', tartype = 'dwTargetType', tarid = 'dwTargetId', winidx = 'dwIndex'},
 	},
 	{
-		root = 'Lowest2/QuestAcceptPanel',
+		name = 'QuestAcceptPanel', root = 'Lowest2/QuestAcceptPanel',
 		ref = 'Btn_Accept', point = 'TOPRIGHT', x = -30, y = 10, plot = true,
 		keys = { info = 'aInfo', tartype = 'dwTargetType', tarid = 'dwTargetID', winidx = 'dwIndex'},
 	},
@@ -463,17 +462,15 @@ function D.RemoveEntry()
 end
 LIB.RegisterReload('MY_AutoDialogue#ENTRY', D.RemoveEntry)
 
-function D.AutoSetStationVisible()
-	for i, p in ipairs(ENTRY_LIST) do
-		if p.plot then
-			local frame = Station.Lookup(p.root)
-			if frame and frame:IsValid() and frame:IsVisible() then
-				Station.Hide()
-				return
-			end
-		end
+do
+local function HookPlotPanel(szName, frame)
+	HookTableFunc(frame, 'Show', Station.Hide)
+end
+for _, p in ipairs(ENTRY_LIST) do
+	if p.plot then
+		MY.RegisterFrameCreate(p.name .. '.MY_AutoDialogue#AutoSetStationVisible', HookPlotPanel)
 	end
-	Station.Show()
+end
 end
 
 local function onOpenWindow()
