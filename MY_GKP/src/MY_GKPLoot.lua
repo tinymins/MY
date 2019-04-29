@@ -43,11 +43,12 @@ local GKP_LOOT_ANCHOR  = { s = 'CENTER', r = 'CENTER', x = 0, y = 0 }
 local GKP_LOOT_INIFILE = PATH_ROOT .. 'ui/MY_GKP_Loot.ini'
 local MY_GKP_LOOT_BOSS -- 散件老板
 
-local GKP_LOOT_HUANGBABA = {
+local GKP_LOOT_HUANGBABA = { -- 玄晶
 	[LIB.GetItemName(72592)]  = true,
 	[LIB.GetItemName(68363)]  = true,
 	[LIB.GetItemName(66190)]  = true,
 	[LIB.GetItemName(153897)] = true,
+	[LIB.GetItemName(160306)] = true,
 }
 local GKP_LOOT_AUTO = {}
 local GKP_LOOT_AUTO_LIST = { -- 记录分配上次的物品
