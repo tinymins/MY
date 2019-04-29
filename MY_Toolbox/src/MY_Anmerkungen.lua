@@ -354,8 +354,10 @@ function MY_Anmerkungen.LoadConfig()
 		for k, v in pairs(data) do
 			if type(v) == 'table' then
 				k = tonumber(k)
-				v.dwID = tonumber(v.dwID)
-				PUBLIC_PLAYER_NOTES[k] = v
+				if k then
+					v.dwID = tonumber(v.dwID)
+					PUBLIC_PLAYER_NOTES[k] = v
+				end
 			else
 				PUBLIC_PLAYER_IDS[k] = tonumber(v)
 			end
@@ -382,8 +384,10 @@ function MY_Anmerkungen.LoadConfig()
 		for k, v in pairs(data) do
 			if type(v) == 'table' then
 				k = tonumber(k)
-				v.dwID = tonumber(v.dwID)
-				PRIVATE_PLAYER_NOTES[k] = v
+				if k then
+					v.dwID = tonumber(v.dwID)
+					PRIVATE_PLAYER_NOTES[k] = v
+				end
 			else
 				PRIVATE_PLAYER_IDS[k] = tonumber(v)
 			end
