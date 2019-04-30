@@ -531,7 +531,7 @@ end
 do
 local FRAME_DESTROY_EVENT = { szName = 'FrameCreate' }
 local function OnFrameDestroy()
-	CommonEventFirer(FRAME_DESTROY_EVENT, arg0:GetName(), arg0)
+	CommonEventFirer(FRAME_DESTROY_EVENT, arg0, arg0:GetName())
 end
 LIB.RegisterEvent('ON_FRAME_DESTROY', OnFrameDestroy)
 
