@@ -228,7 +228,7 @@ MY_Recount.Data.bDistinctEffectID = false
 local _Cache = {}
 local Data          -- 当前战斗数据记录
 local History = {}  -- 历史战斗记录
-local SZ_REC_FILE = '$uid@$lang/cache/fight_recount_log.jx3dat'
+local SZ_REC_FILE = {'cache/fight_recount_log.jx3dat', PATH_TYPE.ROLE}
 
 -- ##################################################################################################
 --             #                 #         #             #         #                 # # # # # # #
