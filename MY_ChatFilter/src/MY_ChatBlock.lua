@@ -158,7 +158,7 @@ local function SaveBlockWords()
 end
 
 local function LoadBlockWords()
-	local szOrgPath, tOrgData = LIB.GetLUADataPath('config/MY_CHAT/blockwords.$lang.jx3dat'), nil
+	local szOrgPath, tOrgData = LIB.GetLUADataPath({'config/MY_CHAT/blockwords.$lang.jx3dat', PATH_TYPE.DATA}), nil
 	if IsLocalFileExist(szOrgPath) then
 		tOrgData = LIB.LoadLUAData(szOrgPath)
 		CPath.DelFile(szOrgPath)

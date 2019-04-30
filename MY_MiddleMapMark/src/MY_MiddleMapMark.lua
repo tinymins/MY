@@ -86,10 +86,10 @@ local function GeneDoodadInfoPosKey(mapid, x, y)
 end
 
 local SZ_CACHE_PATH = 'cache/NPC_DOODAD_REC/'
-if IsLocalFileExist(LIB.FormatPath(SZ_CACHE_PATH)) then
+if IsLocalFileExist(LIB.FormatPath({SZ_CACHE_PATH, PATH_TYPE.DATA})) then
 	DB:Execute('BEGIN TRANSACTION')
 	for _, dwMapID in ipairs(GetMapList()) do
-		local data = LIB.LoadLUAData(SZ_CACHE_PATH .. dwMapID .. '.$lang.jx3dat')
+		local data = LIB.LoadLUAData({SZ_CACHE_PATH .. dwMapID .. '.$lang.jx3dat', PATH_TYPE.DATA})
 		if type(data) == 'string' then
 			data = LIB.JsonDecode(data)
 		end
@@ -108,7 +108,7 @@ if IsLocalFileExist(LIB.FormatPath(SZ_CACHE_PATH)) then
 		end
 	end
 	DB:Execute('END TRANSACTION')
-	CPath.DelDir(LIB.FormatPath(SZ_CACHE_PATH))
+	CPath.DelDir(LIB.FormatPath({SZ_CACHE_PATH, PATH_TYPE.DATA}))
 end
 
 ---------------------------------------------------------------
