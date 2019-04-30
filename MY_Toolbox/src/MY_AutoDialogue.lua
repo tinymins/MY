@@ -463,8 +463,14 @@ end
 LIB.RegisterReload('MY_AutoDialogue#ENTRY', D.RemoveEntry)
 
 do
+local function OnPlotShow()
+	if MY.IsShieldedVersion() then
+		return
+	end
+	Station.Hide()
+end
 local function HookPlotPanel(szName, frame)
-	HookTableFunc(frame, 'Show', Station.Hide)
+	HookTableFunc(frame, 'Show', OnPlotShow)
 end
 for _, p in ipairs(ENTRY_LIST) do
 	if p.plot then
