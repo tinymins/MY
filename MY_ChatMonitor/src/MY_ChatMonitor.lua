@@ -192,7 +192,7 @@ _C.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel)
         -- 格式化消息
         local tMsgContent = LIB.FormatChatContent(szMsg)
         -- 检测消息是否是插件自己产生的
-        if tMsgContent[1].type == 'text' and tMsgContent[1].displayText == '' then
+        if tMsgContent[1] and tMsgContent[1].type == 'text' and tMsgContent[1].innerText == '' then
             return
         end
         -- 拼接消息
