@@ -54,6 +54,7 @@ local _L = LIB.LoadLangPack()
 -- 注：
 --   当 E.bSingleEvent 为 true 时，可在id后面加一个点并紧跟
 --   一个标识字符串用于防止重复或取消绑定，如 LOADING_END.xxx
+-- 特别注意：当 fnAction 为 false 并且 szKey 为 nil 时会取消所有通过本函数注册的事件处理器
 local function CommonEventRegister(E, szID, fnAction)
 	if IsTable(szID) then
 		for _, szID in ipairs(szID) do
@@ -137,12 +138,9 @@ local function CommonEventFirer(E, arg0, ...)
 	end
 end
 
--- 注册游戏事件监听
--- LIB.RegisterEvent(szEvent, fnAction) -- 注册
--- LIB.RegisterEvent(szEvent, false) -- 注销
--- (string)   szEvent  事件，可在后面加一个点并紧跟一个标识字符串用于防止重复或取消绑定，如 LOADING_END.xxx
--- (function) fnAction 事件处理函数，传入 false 相当于取消该事件
---特别注意：当 fnAction 为 false 并且 szKey 为 nil 时会取消所有通过本函数注册的事件处理器
+---------------------------------------------------------------------------------------------
+-- 监听游戏事件
+---------------------------------------------------------------------------------------------
 do
 local GLBAL_EVENT = { szName = 'Event' }
 local function EventHandler(szEvent, ...)
@@ -162,6 +160,9 @@ function LIB.RegisterEvent(szEvent, fnAction)
 end
 end
 
+---------------------------------------------------------------------------------------------
+-- 监听初始化完成事件
+---------------------------------------------------------------------------------------------
 do
 local INIT_EVENT = { szName = 'Initial', bSingleEvent = true }
 local function OnInit()
@@ -179,10 +180,6 @@ local function OnInit()
 end
 LIB.RegisterEvent('LOADING_ENDING', OnInit) -- 不能用FIRST_LOADING_END 不然注册快捷键就全跪了
 
--- 注册初始化函数
--- RegisterInit(string id, function fn) -- 注册
--- RegisterInit(function fn)            -- 注册
--- RegisterInit(string id, false)       -- 注销
 function LIB.RegisterInit(...)
 	return CommonEventRegister(INIT_EVENT, ...)
 end
@@ -192,6 +189,9 @@ function LIB.IsInitialized()
 end
 end
 
+---------------------------------------------------------------------------------------------
+-- 监听游戏结束事件
+---------------------------------------------------------------------------------------------
 do
 local EXIT_EVENT = { szName = 'Exit', bSingleEvent = true }
 local function OnExit()
@@ -202,15 +202,14 @@ LIB.RegisterEvent('GAME_EXIT', OnExit)
 LIB.RegisterEvent('PLAYER_EXIT_GAME', OnExit)
 LIB.RegisterEvent('RELOAD_UI_ADDON_BEGIN', OnExit)
 
--- 注册游戏结束函数
--- RegisterExit(string id, function fn) -- 注册
--- RegisterExit(function fn)            -- 注册
--- RegisterExit(string id, false)       -- 注销
 function LIB.RegisterExit(...)
 	return CommonEventRegister(EXIT_EVENT, ...)
 end
 end
 
+---------------------------------------------------------------------------------------------
+-- 监听插件重载事件
+---------------------------------------------------------------------------------------------
 do
 local RELOAD_EVENT = { szName = 'Reload', bSingleEvent = true }
 local function OnReload()
@@ -218,15 +217,44 @@ local function OnReload()
 end
 LIB.RegisterEvent('RELOAD_UI_ADDON_BEGIN', OnReload)
 
--- 注册插件重载函数
--- RegisterReload(string id, function fn) -- 注册
--- RegisterReload(function fn)            -- 注册
--- RegisterReload(string id, false)       -- 注销
 function LIB.RegisterReload(...)
 	return CommonEventRegister(RELOAD_EVENT, ...)
 end
 end
 
+---------------------------------------------------------------------------------------------
+-- 监听面板打开事件
+---------------------------------------------------------------------------------------------
+do
+local FRAME_CREATE_EVENT = { szName = 'FrameCreate' }
+local function OnFrameCreate()
+	CommonEventFirer(FRAME_CREATE_EVENT, arg0, arg0:GetName())
+end
+LIB.RegisterEvent('ON_FRAME_CREATE', OnFrameCreate)
+
+function LIB.RegisterFrameCreate(...)
+	return CommonEventRegister(FRAME_CREATE_EVENT, ...)
+end
+end
+
+---------------------------------------------------------------------------------------------
+-- 监听面板关闭事件
+---------------------------------------------------------------------------------------------
+do
+local FRAME_DESTROY_EVENT = { szName = 'FrameCreate' }
+local function OnFrameDestroy()
+	CommonEventFirer(FRAME_DESTROY_EVENT, arg0, arg0:GetName())
+end
+LIB.RegisterEvent('ON_FRAME_DESTROY', OnFrameDestroy)
+
+function LIB.RegisterFrameDestroy(...)
+	return CommonEventRegister(FRAME_DESTROY_EVENT, ...)
+end
+end
+
+---------------------------------------------------------------------------------------------
+-- 监听游戏空闲事件
+---------------------------------------------------------------------------------------------
 do
 local IDLE_EVENT, TIME = { szName = 'Idle', bSingleEvent = true }, 0
 local function OnIdle()
@@ -237,11 +265,6 @@ local function OnIdle()
 	TIME = nTime
 	CommonEventFirer(IDLE_EVENT)
 end
-LIB.RegisterEvent('ON_FRAME_CREATE', function()
-	if arg0:GetName() == 'OptionPanel' then
-		OnIdle()
-	end
-end)
 LIB.RegisterEvent('BUFF_UPDATE', function()
 	if arg1 then
 		return
@@ -260,16 +283,16 @@ LIB.BreatheCall(LIB.GetAddonInfo().szNameSpace .. '#ON_IDLE', function()
 		OnIdle()
 	end
 end)
+LIB.RegisterFrameCreate('OptionPanel', OnIdle)
 
--- 注册游戏空闲函数 -- 用户存储数据等操作
--- RegisterIdle(string id, function fn) -- 注册
--- RegisterIdle(function fn)            -- 注册
--- RegisterIdle(string id, false)       -- 注销
 function LIB.RegisterIdle(...)
 	return CommonEventRegister(IDLE_EVENT, ...)
 end
 end
 
+---------------------------------------------------------------------------------------------
+-- 注册模块
+---------------------------------------------------------------------------------------------
 do
 local MODULE_LIST = {}
 function LIB.RegisterModuleEvent(arg0, arg1)
@@ -319,6 +342,9 @@ function LIB.RegisterModuleEvent(arg0, arg1)
 end
 end
 
+---------------------------------------------------------------------------------------------
+-- 注册新手引导
+---------------------------------------------------------------------------------------------
 do
 local TUTORIAL_LIST = {}
 function LIB.RegisterTutorial(tOptions)
@@ -409,6 +435,9 @@ function LIB.CheckTutorial()
 end
 end
 
+---------------------------------------------------------------------------------------------
+-- 背景通讯
+---------------------------------------------------------------------------------------------
 do
 local BG_MSG_ID_PREFIX = LIB.GetAddonInfo().szNameSpace .. ':'
 local BG_MSG_ID_SUFFIX = ':V1'
@@ -509,37 +538,5 @@ function LIB.SendBgMsg(nChannel, szMsgID, ...)
 		me.Talk(nChannel, szTarget, aSay)
 	end
 end
-end
-end
-
-do
-local FRAME_CREATE_EVENT = { szName = 'FrameCreate' }
-local function OnFrameCreate()
-	CommonEventFirer(FRAME_CREATE_EVENT, arg0, arg0:GetName())
-end
-LIB.RegisterEvent('ON_FRAME_CREATE', OnFrameCreate)
-
--- 注册插件重载函数
--- RegisterFrameCreate(string id, function fn) -- 注册
--- RegisterFrameCreate(function fn)            -- 注册
--- RegisterFrameCreate(string id, false)       -- 注销
-function LIB.RegisterFrameCreate(...)
-	return CommonEventRegister(FRAME_CREATE_EVENT, ...)
-end
-end
-
-do
-local FRAME_DESTROY_EVENT = { szName = 'FrameCreate' }
-local function OnFrameDestroy()
-	CommonEventFirer(FRAME_DESTROY_EVENT, arg0, arg0:GetName())
-end
-LIB.RegisterEvent('ON_FRAME_DESTROY', OnFrameDestroy)
-
--- 注册插件重载函数
--- RegisterFrameDestroy(string id, function fn) -- 注册
--- RegisterFrameDestroy(function fn)            -- 注册
--- RegisterFrameDestroy(string id, false)       -- 注销
-function LIB.RegisterFrameDestroy(...)
-	return CommonEventRegister(FRAME_DESTROY_EVENT, ...)
 end
 end
