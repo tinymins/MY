@@ -454,7 +454,7 @@ LIB.RegisterReload('MY_AutoDialogue#ENTRY', D.RemoveEntry)
 
 do
 local function OnPlotShow()
-	if MY.IsShieldedVersion() then
+	if LIB.IsShieldedVersion() then
 		return
 	end
 	Station.Hide()
@@ -464,7 +464,7 @@ local function HookPlotPanel(frame)
 end
 for _, p in ipairs(ENTRY_LIST) do
 	if p.plot then
-		MY.RegisterFrameCreate(p.name .. '.MY_AutoDialogue#AutoSetStationVisible', HookPlotPanel)
+		LIB.RegisterFrameCreate(p.name .. '.MY_AutoDialogue#AutoSetStationVisible', HookPlotPanel)
 	end
 end
 end
