@@ -76,4 +76,5 @@ local function onFrameCreate()
 		})
 	end
 end
-LIB.RegisterEvent('ON_FRAME_CREATE.MY_PlayerViewMagnifier', onFrameCreate)
+LIB.RegisterFrameCreate('PlayerView.MY_PlayerViewMagnifier', onFrameCreate)
+LIB.RegisterFrameCreate('ExteriorView.MY_PlayerViewMagnifier', onFrameCreate)

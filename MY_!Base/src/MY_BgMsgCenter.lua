@@ -184,16 +184,13 @@ local function OnFBAppendItemFromIni(hList)
 	end
 end
 
-LIB.RegisterEvent('ON_FRAME_CREATE.' .. LIB.GetAddonInfo().szNameSpace .. '#CD', function()
-	if arg0:GetName() ~= 'CrossMap' then
-		return
-	end
-	local hList = arg0:Lookup('Wnd_CrossFB', 'Handle_DifficultyList')
+LIB.RegisterFrameCreate('CrossMap.' .. LIB.GetAddonInfo().szNameSpace .. '#CD', function(frame)
+	local hList = frame:Lookup('Wnd_CrossFB', 'Handle_DifficultyList')
 	if hList then
 		OnFBAppendItemFromIni(hList)
 		HookTableFunc(hList, 'AppendItemFromIni', OnFBAppendItemFromIni, { bAfterOrigin = true })
 	end
-	local btn = arg0:Lookup('Wnd_CrossFB/Btn_GoGoGo')
+	local btn = frame:Lookup('Wnd_CrossFB/Btn_GoGoGo')
 	if btn then
 		HookTableFunc(btn, 'OnLButtonUp', OnCrossMapGoFB, { bAfterOrigin = true })
 	end

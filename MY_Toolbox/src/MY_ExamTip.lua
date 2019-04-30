@@ -191,12 +191,10 @@ local function OnFrameBreathe()
 	l_nExamPrintRemainSpace = GetClientPlayer().GetExamPrintRemainSpace()
 end
 
-local function OnFrameCreate()
-	if arg0:GetName() == 'ExaminationPanel' then
-		arg0.OnFrameBreathe = OnFrameBreathe
-	end
+local function OnFrameCreate(frame)
+	frame.OnFrameBreathe = OnFrameBreathe
 end
-LIB.RegisterEvent('ON_FRAME_CREATE.EXAM_TIP', OnFrameCreate)
+LIB.RegisterFrameCreate('ExaminationPanel.EXAM_TIP', OnFrameCreate)
 
 local function OnLoot()
 	local item = GetItem(arg1)

@@ -573,9 +573,9 @@ end
 
 -- 大战没交
 local m_aBigWars = { 19191, 19192, 19195, 19196, 19197 }
-LIB.RegisterEvent('ON_FRAME_CREATE.BIG_WAR_CHECK', function()
+LIB.RegisterFrameCreate('ExitPanel.BIG_WAR_CHECK', function(frame)
 	local me = GetClientPlayer()
-	if me and arg0:GetName() == 'ExitPanel' then
+	if me then
 		for _, dwQuestID in ipairs(m_aBigWars) do
 			local info = me.GetQuestTraceInfo(dwQuestID)
 			if info then
@@ -591,7 +591,7 @@ LIB.RegisterEvent('ON_FRAME_CREATE.BIG_WAR_CHECK', function()
 					end
 				end
 				if finished then
-					local ui = UI(arg0)
+					local ui = UI(frame)
 					if ui:children('#Text_MY_Tip'):count() == 0 then
 						ui:append('Text', { name = 'Text_MY_Tip',y = ui:height(), w = ui:width(), color = {255, 255, 0}, font = 199, halign = 1})
 					end

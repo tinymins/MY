@@ -284,12 +284,9 @@ end
 LIB.RegisterInit('MY_AutoDialogue#SkipQuestTalk', onInit)
 
 local function onFrameCreate()
-	local name = arg0:GetName()
-	if name == 'QuestAcceptPanel' then
-		LIB.BreatheCall('MY_AutoDialogue#SkipQuestTalk', HookSkipQuestTalk)
-	end
+	LIB.BreatheCall('MY_AutoDialogue#SkipQuestTalk', HookSkipQuestTalk)
 end
-LIB.RegisterEvent('ON_FRAME_CREATE.MY_AutoDialogue#SkipQuestTalk', onFrameCreate)
+LIB.RegisterFrameCreate('QuestAcceptPanel.MY_AutoDialogue#SkipQuestTalk', onFrameCreate)
 end
 
 ---------------------------------------------------------------------------
@@ -410,17 +407,10 @@ function D.CreateEntry()
 	end
 	D.UpdateEntryPos()
 end
-LIB.RegisterInit('MY_AutoDialogue', D.CreateEntry)
-
-local function onFrameCreate()
-	for _, p in ipairs(ENTRY_LIST) do
-		if Station.Lookup(p.root) == arg0 then
-			D.CreateEntry()
-			return
-		end
-	end
+for _, p in ipairs(ENTRY_LIST) do
+	LIB.RegisterFrameCreate(p.name .. '.MY_AutoDialogue#ENTRY', D.CreateEntry)
 end
-LIB.RegisterEvent('ON_FRAME_CREATE.MY_AutoDialogue#ENTRY', onFrameCreate)
+LIB.RegisterInit('MY_AutoDialogue', D.CreateEntry)
 
 function D.UpdateEntryPos()
 	if LIB.IsShieldedVersion() then

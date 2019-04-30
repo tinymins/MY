@@ -119,11 +119,11 @@ LIB.RegisterInit('MY_AchievementWiki', OnInit)
 end
 
 do
-local function OnFrameCreate()
-	if LIB.IsShieldedVersion() or arg0:GetName() ~= 'AchievementPanel' then
+local function OnFrameCreate(frame)
+	if LIB.IsShieldedVersion() then
 		return
 	end
-	HookFrame(arg0)
+	HookFrame(frame)
 end
-LIB.RegisterEvent('ON_FRAME_CREATE.MY_AchievementWiki', OnFrameCreate)
+LIB.RegisterFrameCreate('AchievementPanel.MY_AchievementWiki', OnFrameCreate)
 end

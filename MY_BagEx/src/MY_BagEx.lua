@@ -374,10 +374,14 @@ local function Apply(bEnable)
 	end
 	if bEnable then
 		Hook()
-		LIB.RegisterEvent('ON_FRAME_CREATE.MY_BAGEX', Hook)
+		LIB.RegisterFrameCreate('BigBagPanel.MY_BAGEX', Hook)
+		LIB.RegisterFrameCreate('BigBankPanel.MY_BAGEX', Hook)
+		LIB.RegisterFrameCreate('GuildBankPanel.MY_BAGEX', Hook)
 	else
 		Unhook()
-		LIB.RegisterEvent('ON_FRAME_CREATE.MY_BAGEX')
+		LIB.RegisterFrameCreate('BigBagPanel.MY_BAGEX', false)
+		LIB.RegisterFrameCreate('BigBankPanel.MY_BAGEX', false)
+		LIB.RegisterFrameCreate('GuildBankPanel.MY_BAGEX', false)
 	end
 end
 

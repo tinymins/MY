@@ -53,10 +53,8 @@ FireUIEvent(LIB.GetAddonInfo().szNameSpace .. '_BASE_LOADING_END')
 -- 修复剑心导致玩家头像越来越大的问题。。。
 do
 local nInitWidth, nFinalWidth
-LIB.RegisterEvent('ON_FRAME_CREATE.FixJXPlayer', function()
-	if arg0:GetName() == 'Player' then
-		nInitWidth = arg0:GetW()
-	end
+LIB.RegisterFrameCreate('Player.FixJXPlayer', function(frame)
+	nInitWidth = frame:GetW()
 end)
 local function RevertWidth()
 	local frame = Station.Lookup('Normal/Player')
