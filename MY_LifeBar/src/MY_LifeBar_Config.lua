@@ -130,6 +130,7 @@ end
 function D.LoadConfig(szConfig)
 	if IsTable(szConfig) then
 		Config = szConfig
+		ConfigLoaded = true
 	else
 		if IsString(szConfig) then
 			if MY_LifeBar.szConfig ~= szConfig then
@@ -159,7 +160,7 @@ function D.LoadConfig(szConfig)
 	ConfigLoaded = true
 	FireUIEvent('MY_LIFEBAR_CONFIG_LOADED')
 end
-LIB.RegisterInit(D.LoadConfig)
+LIB.RegisterInit('MY_LifeBar_Config', function() D.LoadConfig() end)
 
 function D.SaveConfig()
 	if not ConfigLoaded then
