@@ -335,7 +335,7 @@ function LIB.GetRelativePath(oPath, oRoot)
 end
 
 function LIB.GetAbsolutePath(oPath, oRoot)
-	return GetRootPath():gsub('\\', '/') .. '/' .. LIB.GetRelativePath(oPath, oRoot):gsub('^[./\\]', '')
+	return GetRootPath():gsub('\\', '/') .. '/' .. LIB.GetRelativePath(oPath, oRoot):gsub('^[./\\]*', '')
 end
 
 function LIB.GetLUADataPath(oFilePath)
