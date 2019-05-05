@@ -998,6 +998,51 @@ function PS.OnPanelActive(wnd)
 			end,
 		}, true):autoWidth():width() + 10
 	end
+	x, y = X, y + 30
+
+	ui:append('Text', {
+		x = X - 10, y = y,
+		text = _L['System Info'],
+		color = { 255, 255, 0 },
+	}, true):autoWidth()
+	y = y + 30
+
+	local uiMemory = ui:append('Text', {
+		x = x, y = y, w = 150,
+		alpha = 150, font = 162,
+	}, true)
+	y = y + 25
+
+	local uiSize = ui:append('Text', {
+		x = x, y = y, w = 150,
+		alpha = 150, font = 162,
+	}, true)
+	y = y + 25
+
+	local uiUIScale = ui:append('Text', {
+		x = x, y = y, w = 150,
+		alpha = 150, font = 162,
+	}, true)
+	y = y + 25
+
+	local uiFontScale = ui:append('Text', {
+		x = x, y = y, w = 150,
+		alpha = 150, font = 162,
+	}, true)
+	y = y + 25
+
+	local function onRefresh()
+		uiMemory:text(format('Memory: %.2fMB', collectgarbage('count') / 1024))
+		uiSize:text(format('UISize: %.2fx%.2f', Station.GetClientSize()))
+		uiUIScale:text(format('UIScale: %.2f (%.2f)', LIB.GetUIScale(), LIB.GetOriginUIScale()))
+		uiFontScale:text(format('FontScale: %.2f (%.2f)', LIB.GetFontScale(), Font.GetOffset()))
+	end
+	onRefresh()
+	LIB.BreatheCall('GlobalConfig', onRefresh)
+end
+
+function PS.OnPanelDeactive()
+	LIB.BreatheCall('GlobalConfig', false)
 end
 LIB.RegisterPanel('GlobalConfig', _L['GlobalConfig'], _L['System'], 'ui\\Image\\Minimap\\Minimap.UITex|181', PS)
 end

@@ -393,6 +393,7 @@ data = {
 
 	['GlobalConfig'] = '全局设置',
 	['Distance type'] = '默认距离计算方式',
+	['System Info'] = '系统信息',
 	DISTANCE_TYPE = {
 		['gwwean'] = '郭氏距离',
 		['euclidean'] = '欧氏距离',
