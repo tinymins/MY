@@ -104,7 +104,7 @@ end
 
 -- 根据玩家自定义界面缩放设置反向缩放 实现默认设置不受用户缩放影响
 function D.AutoAdjustScale()
-	local fUIScale = LIB.GetOriginUIScale()
+	local fUIScale = LIB.GetUIScale()
 	if Config.fDesignUIScale ~= fUIScale then
 		Config.fGlobalUIScale = Config.fGlobalUIScale * Config.fDesignUIScale / fUIScale
 		Config.fDesignUIScale = fUIScale
@@ -152,7 +152,7 @@ function D.LoadConfig(szConfig)
 				end
 			end
 		end
-		Config.fDesignUIScale = LIB.GetOriginUIScale()
+		Config.fDesignUIScale = LIB.GetUIScale()
 		Config.fMatchedFontOffset = Font.GetOffset()
 	end
 	Config = CONFIG_DEFAULTS('DEFAULT', Config)

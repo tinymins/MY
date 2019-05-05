@@ -551,7 +551,7 @@ function CheckInvalidRect(dwType, dwID, me, object)
 			lb:ClearSFX()
 		end
 		-- 各种数据生效
-		lb:SetScale((Config.bSystemUIScale and LIB.GetUIScale() or 1) * Config.fGlobalUIScale)
+		lb:SetScale((Config.bSystemUIScale and 1 or LIB.GetUIScale()) * Config.fGlobalUIScale)
 		lb:SetColor(r, g, b, Config.nAlpha)
 		lb:SetColorFx(
 			object.nMoveState == MOVE_STATE.ON_DEATH
