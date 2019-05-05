@@ -56,10 +56,14 @@ local STYLE_CONFIG_CHANGED = false
 local l_dwLockType, l_dwLockID, l_lockInDisplay
 local O, D = {}, { PASSPHRASE = {111, 198, 5} }
 local BASIC_DEFAULT = {
-	bEnable   = false   , -- 是否启用
-	szStyle   = 'common', -- 样式
-	bMinimize = false   , -- 是否最小化
-	anchor    = { x=-300, y=220, s='TOPRIGHT', r='TOPRIGHT' }, -- 默认坐标
+	bEnable     = false   , -- 是否启用
+	szStyle     = 'common', -- 样式
+	bMinimize   = false   , -- 是否最小化
+	bAutoHide   = true    , -- 无焦点时隐藏
+	nMaxDisplay = 5       , -- 最大显示数量
+	fScaleX     = 1       , -- 缩放比例
+	fScaleY     = 1       , -- 缩放比例
+	anchor      = { x=-300, y=220, s='TOPRIGHT', r='TOPRIGHT' }, -- 默认坐标
 }
 local STYLE_DEFAULT = {
 	bFocusINpc         = true    , -- 焦点重要NPC
@@ -69,8 +73,6 @@ local STYLE_DEFAULT = {
 	bSortByDistance    = false   , -- 优先焦点近距离目标
 	bFocusEnemy        = false   , -- 焦点敌对玩家
 	bFocusAnmerkungen  = true    , -- 焦点记在小本本里的玩家
-	bAutoHide          = true    , -- 无焦点时隐藏
-	nMaxDisplay        = 5       , -- 最大显示数量
 	bAutoFocus         = true    , -- 启用默认焦点
 	bEmbeddedFocus     = true    , -- 启用内嵌默认焦点
 	bHideDeath         = false   , -- 隐藏死亡目标
@@ -82,8 +84,6 @@ local STYLE_DEFAULT = {
 	bTraversal         = false   , -- 遍历焦点列表
 	bHealHelper        = false   , -- 辅助治疗模式
 	bEnableSceneNavi   = false   , -- 场景追踪点
-	fScaleX            = 1       , -- 缩放比例
-	fScaleY            = 1       , -- 缩放比例
 	tAutoFocus         = nil     , -- 旧版默认焦点数据
 	tFocusList         = nil     , -- 旧版永久焦点数据
 	aPatternFocus      = {}      , -- 默认焦点
