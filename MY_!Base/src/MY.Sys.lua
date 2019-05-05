@@ -2308,7 +2308,7 @@ function LIB.GetOriginUIScale()
 	-- 0.89, 1
 	-- return floor((1.13726 * Station.GetUIScale() / Station.GetMaxUIScale() - 0.011) * 100 + 0.5) / 100 -- +0.5为了四舍五入
 	-- 不同显示器GetMaxUIScale都不一样 太麻烦了 放弃 直接读配置项
-	return GetUserPreferences(3775, 'c') / 100
+	return GetUserPreferences(3775, 'c') / 100 -- TODO: 不同步设置就GG了 要通过实时数值反向计算 缺少API
 end
 
 function LIB.GetFontScale(nOffset)
