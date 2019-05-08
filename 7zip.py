@@ -40,6 +40,7 @@ def run(mode):
 			return re.sub('(?:^\\!src-dist/dat/|["/].*$)', '', path)
 		paths = {
 			'package.ini': True,
+			'package.ini.*': True,
 		}
 		print('File change list:')
 		if git_tag != '':
