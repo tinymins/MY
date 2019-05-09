@@ -789,20 +789,36 @@ function LIB.PlaySound(nType, szFilePath, szCustomPath)
 end
 
 function LIB.GetFontList()
+	local aList, tExist = {}, {}
 	if MY_FontResource then
-		return MY_FontResource.GetList()
-	else
-		local aList, tExist = {}, {}
-		for _, p in ipairs(Font.GetFontPathList() or {}) do
-			local szFile = p.szFile:gsub('/', '\\')
-			local szKey = szFile:lower()
-			if not tExist[szKey] then
-				insert(aList, { szName = p.szName, szFile = szFile })
-				tExist[szKey] = true
-			end
-		end
-		return aList
+		aList = MY_FontResource.GetList()
 	end
+	for _, p in ipairs(aList) do
+		local szFile = p.szFile:gsub('/', '\\')
+		local szKey = szFile:lower()
+		if not tExist[szKey] then
+			tExist[szKey] = true
+		end
+	end
+	for _, p in ipairs_r(Font.GetFontPathList() or {}) do
+		local szFile = p.szFile:gsub('/', '\\')
+		local szKey = szFile:lower()
+		if not tExist[szKey] then
+			insert(aList, 1, { szName = p.szName, szFile = szFile })
+			tExist[szKey] = true
+		end
+	end
+	local CUSTOM_FONT_DIR = LIB.FormatPath({'font/', PATH_TYPE.GLOBAL}):gsub('%./', '/')
+	local CUSTOM_FONT_LIST = LIB.LoadLUAData(CUSTOM_FONT_DIR .. 'list.jx3dat') or {}
+	for _, p in ipairs(CUSTOM_FONT_LIST) do
+		local szFile = p.szFile:gsub('^%./', CUSTOM_FONT_DIR):gsub('/', '\\')
+		local szKey = szFile:lower()
+		if not tExist[szKey] then
+			insert(aList, { szName = p.szName, szFile = szFile })
+			tExist[szKey] = true
+		end
+	end
+	return aList
 end
 
 -- ¼ÓÔØ×¢²áÊý¾Ý
