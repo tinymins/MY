@@ -184,7 +184,7 @@ local function OnFBAppendItemFromIni(hList)
 	end
 end
 
-LIB.RegisterFrameCreate('CrossMap.' .. LIB.GetAddonInfo().szNameSpace .. '#CD', function(frame)
+LIB.RegisterFrameCreate('CrossMap.' .. LIB.GetAddonInfo().szNameSpace .. '#CD', function(name, frame)
 	local hList = frame:Lookup('Wnd_CrossFB', 'Handle_DifficultyList')
 	if hList then
 		OnFBAppendItemFromIni(hList)

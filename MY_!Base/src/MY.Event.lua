@@ -228,7 +228,7 @@ end
 do
 local FRAME_CREATE_EVENT = { szName = 'FrameCreate' }
 local function OnFrameCreate()
-	CommonEventFirer(FRAME_CREATE_EVENT, arg0, arg0:GetName())
+	CommonEventFirer(FRAME_CREATE_EVENT, arg0:GetName(), arg0)
 end
 LIB.RegisterEvent('ON_FRAME_CREATE', OnFrameCreate)
 

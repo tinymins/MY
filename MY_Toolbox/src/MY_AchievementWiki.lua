@@ -119,7 +119,7 @@ LIB.RegisterInit('MY_AchievementWiki', OnInit)
 end
 
 do
-local function OnFrameCreate(frame)
+local function OnFrameCreate(name, frame)
 	if LIB.IsShieldedVersion() then
 		return
 	end

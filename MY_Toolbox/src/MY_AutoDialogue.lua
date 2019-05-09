@@ -459,7 +459,7 @@ local function OnPlotShow()
 	end
 	Station.Hide()
 end
-local function HookPlotPanel(frame)
+local function HookPlotPanel(name, frame)
 	HookTableFunc(frame, 'Show', OnPlotShow)
 end
 for _, p in ipairs(ENTRY_LIST) do

@@ -191,7 +191,7 @@ local function OnFrameBreathe()
 	l_nExamPrintRemainSpace = GetClientPlayer().GetExamPrintRemainSpace()
 end
 
-local function OnFrameCreate(frame)
+local function OnFrameCreate(name, frame)
 	frame.OnFrameBreathe = OnFrameBreathe
 end
 LIB.RegisterFrameCreate('ExaminationPanel.EXAM_TIP', OnFrameCreate)
