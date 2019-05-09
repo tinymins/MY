@@ -119,6 +119,8 @@ local function CommonEventRegister(E, szID, fnAction)
 		end
 	elseif szKey and E.tList and E.tList[szEvent] and E.tList[szEvent][szKey] then
 		return true
+	elseif not szKey and E.tList and E.tList[szEvent] then
+		return true
 	end
 	return szKey
 end
