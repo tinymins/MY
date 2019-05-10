@@ -115,6 +115,7 @@ data = {
 	-- MY.lua
 	PLUGIN_NAME                                   = '茗伊插件集',
 	PLUGIN_SHORT_NAME                             = '茗伊插件',
+	PLUGIN_AUTHOR                                 = '茗伊 @ 雙夢鎮',
 	PLUGIN_AUTHOR_WEIBO                           = '一名宅',
 	PLUGIN_AUTHOR_SIGNATURE                       = '茗伊 @雙夢鎮 @唯滿俠 @追風躡景',
 	['%s, welcome to use %s!'                   ] = '歡迎%s使用%s！',
@@ -130,8 +131,6 @@ data = {
 	['color picker ex'                          ] = '調色板',
 	['text editor'                              ] = '文本編輯器',
 	['Font %d'                                  ] = '字體 %d',
-
-	['MingYi @ Double Dream Town'] = '茗伊 @ 雙夢鎮',
 
 	-- MY_CheckUpdate.lua
 	['new version found.'] = '發現新版本！',
