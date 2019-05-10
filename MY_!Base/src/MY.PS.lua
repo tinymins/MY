@@ -484,7 +484,7 @@ function LIB.SwitchTab(szID, bForceUpdate)
 				if OpenFolder then
 					OpenFolder(szRoot)
 				end
-				LIB.UI.OpenTextEditor(szRoot)
+				UI.OpenTextEditor(szRoot)
 			end,
 		}, true):autoWidth()
 		ui:append('WndButton', {
@@ -496,7 +496,7 @@ function LIB.SwitchTab(szID, bForceUpdate)
 				if OpenFolder then
 					OpenFolder(szRoot)
 				end
-				LIB.UI.OpenTextEditor(szRoot)
+				UI.OpenTextEditor(szRoot)
 			end,
 		}, true):autoWidth()
 		ui:append('WndButton', {
@@ -508,7 +508,7 @@ function LIB.SwitchTab(szID, bForceUpdate)
 				if OpenFolder then
 					OpenFolder(szRoot)
 				end
-				LIB.UI.OpenTextEditor(szRoot)
+				UI.OpenTextEditor(szRoot)
 			end,
 		}, true):autoWidth()
 		wnd.OnPanelResize = function(wnd)
