@@ -539,9 +539,10 @@ function LIB.SwitchTab(szID, bForceUpdate)
 		end
 		wnd.OnPanelResize(wnd)
 		LIB.BreatheCall(LIB.GetAddonInfo().szNameSpace .. '#TAB#DEFAULT', 500, function()
-			local player = GetClientPlayer()
-			if player then
-				ui:children('#Text_Adv'):text(_L('%s, welcome to use mingyi plugins!', player.szName) .. 'v' .. LIB.GetVersion())
+			local me = GetClientPlayer()
+			if me then
+				local addon = LIB.GetAddonInfo()
+				ui:children('#Text_Adv'):text(_L('%s, welcome to use %s!', me.szName, addon.szName) .. 'v' .. LIB.GetVersion())
 			end
 			ui:children('#Text_Memory'):text(format('Memory:%.1fMB', collectgarbage('count') / 1024))
 		end)

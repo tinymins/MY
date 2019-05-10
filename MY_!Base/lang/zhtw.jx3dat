@@ -115,7 +115,7 @@ data = {
 	-- MY.lua
 	['mingyi plugin'                            ] = '茗伊插件',
 	['mingyi plugins'                           ] = '茗伊插件集',
-	['%s, welcome to use mingyi plugins!'       ] = '歡迎%s使用茗伊插件集！',
+	['%s, welcome to use %s!'                   ] = '歡迎%s使用%s！',
 	['Open/Close main panel'                    ] = '打開/關閉主界面',
 	['unable to open ini file [%s]'             ] = '無法打開界面 INI 文件 [%s]',
 	['can not find wnd component [%s]'          ] = '找不到窗體組件 [%s]',
@@ -362,7 +362,7 @@ data = {
 	['Open server preference folder'] = '伺服器數據文件夾',
 	['Open global preference folder'] = '全局數據文件夾',
 
-	['Welcome to use MY plugin, would you like to start quick tutorial now?'] = '歡迎使用茗伊插件集，部分設置尚未初始化，是否立即開始個性化嚮導？',
+	['Welcome to use %s, would you like to start quick tutorial now?'] = '歡迎使用%s，部分設置尚未初始化，是否立即開始個性化嚮導？',
 	['Quickset'] = '一鍵設置',
 	['Manually'] = '手動設置',
 	['Later'] = '以後再說',

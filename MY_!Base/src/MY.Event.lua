@@ -178,7 +178,9 @@ local function OnInit()
 	CommonEventFirer(INIT_EVENT)
 	INIT_EVENT = nil
 	-- 显示欢迎信息
-	LIB.Sysmsg({_L('%s, welcome to use mingyi plugins!', GetClientPlayer().szName) .. ' v' .. LIB.GetVersion() .. ' Build ' .. LIB.GetAddonInfo().szBuild})
+	local me = GetClientPlayer()
+	local addon = LIB.GetAddonInfo()
+	LIB.Sysmsg({_L('%s, welcome to use %s!', me.szName, addon.szName) .. ' v' .. LIB.GetVersion() .. ' Build ' .. addon.szBuild})
 end
 LIB.RegisterEvent('LOADING_ENDING', OnInit) -- 不能用FIRST_LOADING_END 不然注册快捷键就全跪了
 
@@ -419,7 +421,7 @@ function LIB.CheckTutorial()
 	local tMsg = {
 		x = nW / 2, y = nH / 3,
 		szName = 'MY_Tutorial',
-		szMessage = _L['Welcome to use MY plugin, would you like to start quick tutorial now?'],
+		szMessage = _L('Welcome to use %s, would you like to start quick tutorial now?', LIB.GetAddonInfo().szName),
 		szAlignment = 'CENTER',
 		{
 			szOption = _L['Quickset'],
