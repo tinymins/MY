@@ -16,6 +16,9 @@ FILE_MAPPING = {
     'info.ini': { 'out': 'info.ini.zh_TW', 'type': 'info' },
     'package.ini': { 'out': 'package.ini.zh_TW', 'type': 'package' },
 }
+FOLDER_MAPPING = {
+    # 'zhcn': { 'out': 'zhtw', 'type': 'lang' },
+}
 IGNORE_FOLDER = ['.git', '@DATA']
 
 def zhcn2zhtw(sentence):
@@ -98,6 +101,7 @@ for cwd, dirs, files in os.walk(root_path):
     #     print(cwd, filename)
 
     for filename in files:
+        foldername = os.path.basename(cwd)
         basename, extname = os.path.splitext(filename)
         filepath = os.path.join(cwd, filename)
         relpath = filepath.replace(root_path, '')
@@ -126,14 +130,25 @@ for cwd, dirs, files in os.walk(root_path):
             else:
                 print('Already up to date.')
 
-        if filename in FILE_MAPPING:
+        fileType = None
+        fileOut = None
+        if foldername in FOLDER_MAPPING:
+            info = FOLDER_MAPPING[foldername]
+            fileType = info['type']
+            folderOut = os.path.abspath(os.path.join(cwd, '..', info['out']))
+            fileOut = zhcn2zhtw(filename)
+        elif filename in FILE_MAPPING:
+            info = FILE_MAPPING[filename]
+            fileType = info['type']
+            folderOut = cwd
+            fileOut = info['out']
+        if fileType and folderOut and fileOut:
             print('--------------------------------')
             print('Convert language: ' + filepath)
-            info = FILE_MAPPING[filename]
             crc_text = crc(filepath)
             if not crc_changed:
                 crc_changed = crc_text != crcs.get(relpath)
-            if filename == 'package.ini':
+            if fileType == 'package':
                 cpkg = cwd[cwd.rfind('\\') + 1:]
                 cpkg_path = cwd
             if crc_changed:
@@ -141,14 +156,14 @@ for cwd, dirs, files in os.walk(root_path):
                     # all_the_text = "-- language data (zhtw) updated at " + time.strftime('%Y-%m-%d %H:%I:%M',time.localtime(time.time())) + "\r\n"
                     all_the_text = ""
                     for count, line in enumerate(codecs.open(filepath,'r',encoding='gbk')):
-                        if info['type'] == 'lang' and count == 0 and line.find('-- language data') == 0:
+                        if fileType == 'lang' and count == 0 and line.find('-- language data') == 0:
                             all_the_text = line.replace('zhcn', 'zhtw')
                         else:
                             all_the_text = all_the_text + line
                     print('File converting...')
 
                     # fill missing package
-                    if filename == 'info.ini' and cwd.find(cpkg_path) == 0 and all_the_text.find('package=') == -1:
+                    if fileType == 'info' and cwd.find(cpkg_path) == 0 and all_the_text.find('package=') == -1:
                         all_the_text = all_the_text.rstrip() + '\npackage=' + cpkg + '\n'
                         with codecs.open(filepath,'w',encoding='gbk') as f:
                             f.write(all_the_text)
@@ -159,10 +174,11 @@ for cwd, dirs, files in os.walk(root_path):
                     all_the_text = zhcn2zhtw(all_the_text)
 
                     print('File saving...')
-                    destfile = info['out']
-                    with codecs.open(os.path.join(cwd, destfile),'w',encoding='utf8') as f:
+                    if not os.path.exists(folderOut):
+                        os.mkdir(folderOut)
+                    with codecs.open(os.path.join(folderOut, fileOut),'w',encoding='utf8') as f:
                         f.write(all_the_text)
-                        print('File saved: ' + destfile)
+                        print('File saved: ' + fileOut)
                     crcs[relpath] = crc_text
                 except Exception as e:
                     crcs[relpath] = str(e)
