@@ -5,6 +5,8 @@
 __pycache__
 !src-dist
 patches
+build
+dist
 @Data
 MYDev_*
 MY_ArchHUD
