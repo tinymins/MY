@@ -234,7 +234,7 @@ function MY_Farbnamen.GetTip(szName)
 		local tTip = {}
 		-- author info
 		if tInfo.dwID and tInfo.szName and tInfo.szName == LIB.GetAddonInfo().tAuthor[tInfo.dwID] then
-			insert(tTip, GetFormatText(_L['mingyi plugins'], 8, 89, 224, 232))
+			insert(tTip, GetFormatText(LIB.GetAddonInfo().szName, 8, 89, 224, 232))
 			insert(tTip, GetFormatText(' ', 136, 89, 224, 232))
 			insert(tTip, GetFormatText(_L['[author]'], 8, 89, 224, 232))
 			insert(tTip, XML_LINE_BREAKER)

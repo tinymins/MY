@@ -795,8 +795,9 @@ function LIB.OnDragButton()
 end
 
 function LIB.OnFrameCreate()
+	local addon = LIB.GetAddonInfo()
 	local fScale = 1 + math.max(Font.GetOffset() * 0.03, 0)
-	this:Lookup('', 'Text_Title'):SetText(_L['mingyi plugins'] .. ' v' .. LIB.GetVersion() .. ' Build ' .. LIB.GetAddonInfo().szBuild)
+	this:Lookup('', 'Text_Title'):SetText(addon.szName .. ' v' .. LIB.GetVersion() .. ' Build ' .. LIB.GetAddonInfo().szBuild)
 	this:Lookup('', 'Text_Author'):SetText(_L['author\'s signature'])
 	this:Lookup('', 'Image_Icon'):SetSize(30, 30)
 	this:Lookup('', 'Image_Icon'):FromUITex(LIB.GetAddonInfo().szUITexCommon, 0)

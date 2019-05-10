@@ -256,7 +256,7 @@ function MY_RollMonitor.Echo(nSortType, nLimit, nChannel, bShowUnroll)
 	nChannel  = nChannel  or MY_RollMonitor.nPublishChannel
 
 	LIB.Talk(nChannel, ('[%s][%s][%s]%s\n'):format(
-		_L['mingyi plugin'], _L['roll monitor'],
+		LIB.GetAddonInfo().szShortName, _L['roll monitor'],
 		TIME_LIMIT_TITLE[MY_RollMonitor.nTimeLimit],
 		SORT_TYPE_INFO[nSortType].szName
 	), nil, true)
@@ -274,7 +274,7 @@ function MY_RollMonitor.Echo(nSortType, nLimit, nChannel, bShowUnroll)
 		for _, dwID in ipairs(team.GetTeamMemberList()) do
 			local szName = team.GetClientTeamMemberName(dwID)
 			if not tNames[szName] then
-			 	szUnrolledNames = szUnrolledNames .. '[' .. szName .. ']'
+				szUnrolledNames = szUnrolledNames .. '[' .. szName .. ']'
 			end
 		end
 		if szUnrolledNames~='' then

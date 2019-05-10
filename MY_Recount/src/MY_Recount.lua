@@ -1430,7 +1430,7 @@ function MY_Recount.GetPublishMenu()
 		end
 		LIB.Talk(
 			nChannel,
-			'[' .. _L['mingyi plugin'] .. ']'
+			'[' .. LIB.GetAddonInfo().szShortName .. ']'
 			.. _L['fight recount'] .. ' - '
 			.. frame:Lookup('Wnd_Title', 'Text_Title'):GetText()
 			.. ' ' .. ((DataDisplay.szBossName and ' - ' .. DataDisplay.szBossName) or '')
@@ -1522,7 +1522,7 @@ function MY_Recount.GetDetailMenu(frame)
 		local bDetail = frame:Lookup('', 'Handle_Spliter'):IsVisible()
 		LIB.Talk(
 			nChannel,
-			'[' .. _L['mingyi plugin'] .. ']'
+			'[' .. LIB.GetAddonInfo().szShortName .. ']'
 			.. _L['fight recount'] .. ' - '
 			.. frame:Lookup('', 'Text_Default'):GetText()
 			.. ' ' .. ((DataDisplay.szBossName and ' - ' .. DataDisplay.szBossName) or '')

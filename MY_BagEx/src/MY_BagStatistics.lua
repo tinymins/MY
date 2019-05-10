@@ -382,7 +382,7 @@ function MY_BagStatistics.OnFrameCreate()
 	MY_BagStatistics.UpdateNames(this)
 	this:BringToTop()
 	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
-	this:Lookup('', 'Text_Title'):SetText(_L['mingyi plugins'] .. ' - ' .. _L['MY_BagStatistics'])
+	this:Lookup('', 'Text_Title'):SetText(LIB.GetAddonInfo().szName .. ' - ' .. _L['MY_BagStatistics'])
 	this:RegisterEvent('MY_BAGSTATISTICS_MODE_CHANGE')
 end
 

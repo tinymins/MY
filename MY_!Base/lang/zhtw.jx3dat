@@ -113,8 +113,8 @@ data = {
 	['reset config'] = '恢復默認設置',
 
 	-- MY.lua
-	['mingyi plugin'                            ] = '茗伊插件',
-	['mingyi plugins'                           ] = '茗伊插件集',
+	PLUGIN_NAME                                   = '茗伊插件集',
+	PLUGIN_SHORT_NAME                             = '茗伊插件',
 	['%s, welcome to use %s!'                   ] = '歡迎%s使用%s！',
 	['Open/Close main panel'                    ] = '打開/關閉主界面',
 	['unable to open ini file [%s]'             ] = '無法打開界面 INI 文件 [%s]',

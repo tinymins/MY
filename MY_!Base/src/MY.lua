@@ -159,8 +159,8 @@ local function LoadLangPack(szLangFolder)
 	return t0
 end
 local _L = LoadLangPack()
-local _NAME_             = _L['mingyi plugins']
-local _SHORT_NAME_       = _L['mingyi plugin']
+local _NAME_             = _L.PLUGIN_NAME
+local _SHORT_NAME_       = _L.PLUGIN_SHORT_NAME
 local _AUTHOR_           = _L['MingYi @ Double Dream Town']
 Log('[MY] Debug level ' .. _DEBUG_LEVEL_ .. ' / delog level ' .. _DELOG_LEVEL_)
 ---------------------------------------------------------------------------------------------
