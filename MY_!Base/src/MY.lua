@@ -162,6 +162,7 @@ local _L = LoadLangPack()
 local _NAME_             = _L.PLUGIN_NAME
 local _SHORT_NAME_       = _L.PLUGIN_SHORT_NAME
 local _AUTHOR_           = _L['MingYi @ Double Dream Town']
+local _AUTHOR_WEIBO_     = _L.PLUGIN_AUTHOR_WEIBO
 Log('[MY] Debug level ' .. _DEBUG_LEVEL_ .. ' / delog level ' .. _DELOG_LEVEL_)
 ---------------------------------------------------------------------------------------------
 local function clone(var)
@@ -721,6 +722,7 @@ do local AddonInfo = SetmetaReadonly({
 	szRoot          = _ADDON_ROOT_    ,
 	szFrameworkRoot = _FRAMEWORK_ROOT_,
 	szAuthor        = _AUTHOR_        ,
+	szAuthorWeibo   = _AUTHOR_WEIBO_  ,
 	tAuthor         = {
 		[43567   ] = string.char( 0xDC, 0xF8, 0xD2, 0xC1 ), -- Ìå·þ
 		[3007396 ] = string.char( 0xDC, 0xF8, 0xD2, 0xC1 ), -- ·ããþ¹ÅÕò

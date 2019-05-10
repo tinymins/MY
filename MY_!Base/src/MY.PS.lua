@@ -801,7 +801,7 @@ function LIB.OnFrameCreate()
 	this:Lookup('', 'Text_Author'):SetText(_L['author\'s signature'])
 	this:Lookup('', 'Image_Icon'):SetSize(30, 30)
 	this:Lookup('', 'Image_Icon'):FromUITex(LIB.GetAddonInfo().szUITexCommon, 0)
-	this:Lookup('Wnd_Total/Btn_Weibo', 'Text_Default'):SetText(_L['author\'s weibo'])
+	this:Lookup('Wnd_Total/Btn_Weibo', 'Text_Default'):SetText(_L('Author @%s', LIB.GetAddonInfo().szAuthorWeibo))
 	this:Lookup('Btn_Drag'):RegisterLButtonDrag()
 	this.intact = true
 	LIB.RedrawCategory()
