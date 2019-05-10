@@ -163,6 +163,7 @@ local _NAME_             = _L.PLUGIN_NAME
 local _SHORT_NAME_       = _L.PLUGIN_SHORT_NAME
 local _AUTHOR_           = _L['MingYi @ Double Dream Town']
 local _AUTHOR_WEIBO_     = _L.PLUGIN_AUTHOR_WEIBO
+local _AUTHOR_SIGNATURE_ = _L.PLUGIN_AUTHOR_SIGNATURE
 Log('[MY] Debug level ' .. _DEBUG_LEVEL_ .. ' / delog level ' .. _DELOG_LEVEL_)
 ---------------------------------------------------------------------------------------------
 local function clone(var)
@@ -708,22 +709,23 @@ _G[_NAME_SPACE_] = LIB
 -- 私有函数
 -----------------------------------------------
 do local AddonInfo = SetmetaReadonly({
-	szName          = _NAME_          ,
-	szShortName     = _SHORT_NAME_    ,
-	szUITexCommon   = _UITEX_COMMON_  ,
-	szUITexPoster   = _UITEX_POSTER_  ,
-	szUITexST       = _UITEX_ST_      ,
-	dwVersion       = _VERSION_       ,
-	szBuild         = _BUILD_         ,
-	szNameSpace     = _NAME_SPACE_    ,
-	nDebugLevel     = _DEBUG_LEVEL_   ,
-	nLogLevel       = _DELOG_LEVEL_   ,
-	szInterfaceRoot = _INTERFACE_ROOT_,
-	szRoot          = _ADDON_ROOT_    ,
-	szFrameworkRoot = _FRAMEWORK_ROOT_,
-	szAuthor        = _AUTHOR_        ,
-	szAuthorWeibo   = _AUTHOR_WEIBO_  ,
-	tAuthor         = {
+	szName            = _NAME_            ,
+	szShortName       = _SHORT_NAME_      ,
+	szUITexCommon     = _UITEX_COMMON_    ,
+	szUITexPoster     = _UITEX_POSTER_    ,
+	szUITexST         = _UITEX_ST_        ,
+	dwVersion         = _VERSION_         ,
+	szBuild           = _BUILD_           ,
+	szNameSpace       = _NAME_SPACE_      ,
+	nDebugLevel       = _DEBUG_LEVEL_     ,
+	nLogLevel         = _DELOG_LEVEL_     ,
+	szInterfaceRoot   = _INTERFACE_ROOT_  ,
+	szRoot            = _ADDON_ROOT_      ,
+	szFrameworkRoot   = _FRAMEWORK_ROOT_  ,
+	szAuthor          = _AUTHOR_          ,
+	szAuthorWeibo     = _AUTHOR_WEIBO_    ,
+	szAuthorSignature = _AUTHOR_SIGNATURE_,
+	tAuthor           = {
 		[43567   ] = string.char( 0xDC, 0xF8, 0xD2, 0xC1 ), -- 体服
 		[3007396 ] = string.char( 0xDC, 0xF8, 0xD2, 0xC1 ), -- 枫泾古镇
 		[1600498 ] = string.char( 0xDC, 0xF8, 0xD2, 0xC1 ), -- 追风蹑影
@@ -735,8 +737,8 @@ do local AddonInfo = SetmetaReadonly({
 		-- [4662931] = string.char( 0xBE, 0xCD, 0xCA, 0xC7, 0xB8, 0xF6, 0xD5, 0xF3, 0xD1, 0xDB ), -- 日月明尊
 		-- [3438030] = string.char( 0xB4, 0xE5, 0xBF, 0xDA, 0xB5, 0xC4, 0xCD, 0xF5, 0xCA, 0xA6, 0xB8, 0xB5 ), -- 枫泾古镇
 	},
-	tMenuColor       = _MENU_COLOR_      ,
-	dwMaxPlayerLevel = _MAX_PLAYER_LEVEL_,
+	tMenuColor        = _MENU_COLOR_      ,
+	dwMaxPlayerLevel  = _MAX_PLAYER_LEVEL_,
 })
 function LIB.GetAddonInfo()
 	return AddonInfo
