@@ -744,7 +744,7 @@ function LIB.OnLButtonClick()
 	if name == 'Btn_Close' then
 		LIB.ClosePanel()
 	elseif name == 'Btn_Weibo' then
-		LIB.OpenBrowser('https://weibo.com/zymah')
+		LIB.OpenBrowser(LIB.GetAddonInfo().szAuthorWeiboURL)
 	end
 end
 

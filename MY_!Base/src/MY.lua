@@ -163,6 +163,7 @@ local _NAME_             = _L.PLUGIN_NAME
 local _SHORT_NAME_       = _L.PLUGIN_SHORT_NAME
 local _AUTHOR_           = _L.PLUGIN_AUTHOR
 local _AUTHOR_WEIBO_     = _L.PLUGIN_AUTHOR_WEIBO
+local _AUTHOR_WEIBO_URL_ = 'https://weibo.com/zymah'
 local _AUTHOR_SIGNATURE_ = _L.PLUGIN_AUTHOR_SIGNATURE
 Log('[MY] Debug level ' .. _DEBUG_LEVEL_ .. ' / delog level ' .. _DELOG_LEVEL_)
 ---------------------------------------------------------------------------------------------
@@ -724,6 +725,7 @@ do local AddonInfo = SetmetaReadonly({
 	szFrameworkRoot   = _FRAMEWORK_ROOT_  ,
 	szAuthor          = _AUTHOR_          ,
 	szAuthorWeibo     = _AUTHOR_WEIBO_    ,
+	szAuthorWeiboURL  = _AUTHOR_WEIBO_URL_,
 	szAuthorSignature = _AUTHOR_SIGNATURE_,
 	tAuthor           = {
 		[43567   ] = string.char( 0xDC, 0xF8, 0xD2, 0xC1 ), -- Ме·ю
