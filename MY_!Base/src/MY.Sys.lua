@@ -1768,8 +1768,56 @@ function LIB.ArrayToObject(arr)
 end
 
 -- Global exports
+do
+local PRESETS = {
+	UIEvent = LIB.ArrayToObject({
+		'OnFrameCreate',
+		'OnFrameDestroy',
+		'OnFrameBreathe',
+		'OnEvent',
+		'OnSetFocus',
+		'OnKillFocus',
+		'OnItemLButtonClick',
+		'OnItemMButtonClick',
+		'OnItemRButtonClick',
+		'OnItemMouseEnter',
+		'OnItemMouseLeave',
+		'OnItemMouseWheel',
+		'OnLButtonDown',
+		'OnLButtonUp',
+		'OnLButtonClick',
+		'OnLButtonHold',
+		'OnMButtonDown',
+		'OnMButtonUp',
+		'OnMButtonClick',
+		'OnMButtonHold',
+		'OnRButtonDown',
+		'OnRButtonUp',
+		'OnRButtonClick',
+		'OnRButtonHold',
+		'OnMouseEnter',
+		'OnMouseLeave',
+		'OnScrollBarPosChanged',
+		'OnEditChanged',
+		'OnEditSpecialKeyDown',
+	}),
+}
 function LIB.GeneGlobalNS(options)
-	local exports = Get(options, 'exports', {})
+	local exports = FullClone(Get(options, 'exports', {}))
+	for _, export in ipairs(exports) do
+		if not export.presets then
+			export.presets = {}
+		end
+		if export.preset then
+			insert(export.presets, export.preset)
+			export.preset = nil
+		end
+		for i, s in ipairs_r(export.presets) do
+			if not PRESETS[s] then
+				remove(export.presets, i)
+			end
+		end
+	end
 	local function getter(_, k)
 		local found, v, trigger, getter = false
 		for _, export in ipairs(exports) do
@@ -1785,8 +1833,21 @@ function LIB.GeneGlobalNS(options)
 			end
 			if not found then
 				v, found = Get(export, {'fields', k})
-				if v and export.root then
-					v = export.root[k]
+				if found then
+					if export.root and not IsNil(v) then
+						v = export.root[k]
+					end
+				else -- if not found
+					for _, presetName in ipairs(export.presets) do
+						local presetKeys = PRESETS[presetName]
+						if presetKeys and presetKeys[k] then
+							if IsFunction(export.root[k]) then
+								v = export.root[k]
+								found = true
+								break
+							end
+						end
+					end
 				end
 			end
 			if found then
@@ -1827,4 +1888,5 @@ function LIB.GeneGlobalNS(options)
 		end
 	end
 	return setmetatable({}, { __index = getter, __newindex = setter })
+end
 end
