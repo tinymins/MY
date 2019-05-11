@@ -189,6 +189,17 @@ local function clone(var)
 		return nil
 	end
 end
+local function FullClone(var)
+	if type(var) == 'table' then
+		local ret = {}
+		for k, v in pairs(var) do
+			ret[FullClone(k)] = FullClone(v)
+		end
+		return ret
+	else
+		return var
+	end
+end
 local function empty(var)
 	local szType = type(var)
 	if szType == 'nil' then
@@ -669,6 +680,7 @@ local XML_LINE_BREAKER = GetFormatText('\n')
 ---------------------------------------------------------------------------------------------
 local LIB = {
 	clone        = clone       ,
+	FullClone    = FullClone   ,
 	empty        = empty       ,
 	var2str      = var2str     ,
 	str2var      = str2var     ,

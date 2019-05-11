@@ -29,7 +29,7 @@ local LIB = MY
 local UI, DEBUG_LEVEL, PATH_TYPE = LIB.UI, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
 local var2str, str2var, clone, empty, ipairs_r = LIB.var2str, LIB.str2var, LIB.clone, LIB.empty, LIB.ipairs_r
 local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local GetPatch, ApplyPatch = LIB.GetPatch, LIB.ApplyPatch
+local GetPatch, ApplyPatch, FullClone = LIB.GetPatch, LIB.ApplyPatch, LIB.FullClone
 local Get, Set, RandomChild, GetTraceback = LIB.Get, LIB.Set, LIB.RandomChild, LIB.GetTraceback
 local IsArray, IsDictionary, IsEquals = LIB.IsArray, LIB.IsDictionary, LIB.IsEquals
 local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsNumber, LIB.IsFunction
@@ -437,19 +437,6 @@ end
 
 -- Format data's structure as struct descripted.
 do
-local function clone(var)
-	if type(var) == 'table' then
-		local ret = {}
-		for k, v in pairs(var) do
-			ret[clone(k)] = clone(v)
-		end
-		return ret
-	else
-		return var
-	end
-end
-LIB.FullClone = clone
-
 local defaultParams = { keepNewChild = false }
 local function FormatDataStructure(data, struct, assign, metaSymbol)
 	if metaSymbol == nil then
@@ -498,7 +485,7 @@ local function FormatDataStructure(data, struct, assign, metaSymbol)
 	-- 分别处理类型匹配与不匹配的情况
 	if dataTypeExists then
 		if not assign then
-			data = clone(data)
+			data = FullClone(data)
 		end
 		local keys, skipKeys = {}, {}
 		-- 数据类型是表且默认数据也是表 则递归检查子元素与默认子元素
@@ -571,7 +558,7 @@ local function FormatDataStructure(data, struct, assign, metaSymbol)
 				data[k] = FormatDataStructure(nil, v, true, metaSymbol)
 			end
 		else -- 默认值不是表 直接克隆数据
-			data = clone(defaultData)
+			data = FullClone(defaultData)
 		end
 	end
 	return data

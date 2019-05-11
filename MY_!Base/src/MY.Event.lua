@@ -29,7 +29,7 @@ local LIB = MY
 local UI, DEBUG_LEVEL, PATH_TYPE = LIB.UI, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
 local var2str, str2var, clone, empty, ipairs_r = LIB.var2str, LIB.str2var, LIB.clone, LIB.empty, LIB.ipairs_r
 local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local GetPatch, ApplyPatch = LIB.GetPatch, LIB.ApplyPatch
+local GetPatch, ApplyPatch, FullClone = LIB.GetPatch, LIB.ApplyPatch, LIB.FullClone
 local Get, Set, RandomChild, GetTraceback = LIB.Get, LIB.Set, LIB.RandomChild, LIB.GetTraceback
 local IsArray, IsDictionary, IsEquals = LIB.IsArray, LIB.IsDictionary, LIB.IsEquals
 local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsNumber, LIB.IsFunction
@@ -355,7 +355,7 @@ function LIB.RegisterTutorial(tOptions)
 	if type(tOptions) ~= 'table' or not tOptions.szKey or not tOptions.szMessage then
 		return
 	end
-	insert(TUTORIAL_LIST, LIB.FullClone(tOptions))
+	insert(TUTORIAL_LIST, FullClone(tOptions))
 end
 
 local CHECKED = {}
@@ -400,7 +400,7 @@ local function StepNext(bQuick)
 		szAlignment = 'CENTER',
 	}
 	for _, p in ipairs(tutorial) do
-		local menu = LIB.FullClone(p)
+		local menu = FullClone(p)
 		menu.fnAction = function()
 			if p.fnAction then
 				p.fnAction()
