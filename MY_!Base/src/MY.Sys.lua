@@ -1803,7 +1803,7 @@ local PRESETS = {
 	}),
 }
 function LIB.GeneGlobalNS(options)
-	local exports = FullClone(Get(options, 'exports', {}))
+	local exports = Get(options, 'exports', {})
 	for _, export in ipairs(exports) do
 		if not export.presets then
 			export.presets = {}
