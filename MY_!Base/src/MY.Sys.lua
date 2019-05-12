@@ -1330,12 +1330,12 @@ local function OnMessageBoxOpen()
 			local nIndex, szOption = btn.nIndex, btn.szOption
 			if btn.fnAction then
 				HookTableFunc(btn, 'fnAction', function()
-					FireUIEvent('MY_MESSAGE_BOX_ACTION', szName, 'ACTION', szOption, nIndex)
+					FireUIEvent(LIB.GetAddonInfo().szNameSpace .. '_MESSAGE_BOX_ACTION', szName, 'ACTION', szOption, nIndex)
 				end, { bAfterOrigin = true })
 			end
 			if btn.fnCountDownEnd then
 				HookTableFunc(btn, 'fnCountDownEnd', function()
-					FireUIEvent('MY_MESSAGE_BOX_ACTION', szName, 'TIME_OUT', szOption, nIndex)
+					FireUIEvent(LIB.GetAddonInfo().szNameSpace .. '_MESSAGE_BOX_ACTION', szName, 'TIME_OUT', szOption, nIndex)
 				end, { bAfterOrigin = true })
 			end
 			aMsg[i] = { nIndex = nIndex, szOption = szOption }
@@ -1347,20 +1347,20 @@ local function OnMessageBoxOpen()
 		if not msg then
 			return
 		end
-		FireUIEvent('MY_MESSAGE_BOX_ACTION', szName, 'ACTION', msg.szOption, msg.nIndex)
+		FireUIEvent(LIB.GetAddonInfo().szNameSpace .. '_MESSAGE_BOX_ACTION', szName, 'ACTION', msg.szOption, msg.nIndex)
 	end, { bAfterOrigin = true })
 
 	HookTableFunc(frame, 'fnCancelAction', function()
-		FireUIEvent('MY_MESSAGE_BOX_ACTION', szName, 'CANCEL')
+		FireUIEvent(LIB.GetAddonInfo().szNameSpace .. '_MESSAGE_BOX_ACTION', szName, 'CANCEL')
 	end, { bAfterOrigin = true })
 
 	if frame.fnAutoClose then
 		HookTableFunc(frame, 'fnAutoClose', function()
-			FireUIEvent('MY_MESSAGE_BOX_ACTION', szName, 'AUTO_CLOSE')
+			FireUIEvent(LIB.GetAddonInfo().szNameSpace .. '_MESSAGE_BOX_ACTION', szName, 'AUTO_CLOSE')
 		end, { bAfterOrigin = true })
 	end
 
-	FireUIEvent('MY_MESSAGE_BOX_OPEN', arg0, arg1)
+	FireUIEvent(LIB.GetAddonInfo().szNameSpace .. '_MESSAGE_BOX_OPEN', arg0, arg1)
 end
 LIB.RegisterEvent('ON_MESSAGE_BOX_OPEN', OnMessageBoxOpen)
 end
@@ -1369,7 +1369,7 @@ function LIB.Alert(szMsg, fnAction, szSure, fnCancelAction)
 	local nW, nH = Station.GetClientSize()
 	local tMsg = {
 		x = nW / 2, y = nH / 3,
-		szName = 'MY_Alert',
+		szName = LIB.GetAddonInfo().szNameSpace .. '_Alert',
 		szMessage = szMsg,
 		szAlignment = 'CENTER',
 		fnCancelAction = fnCancelAction,
@@ -1385,7 +1385,7 @@ function LIB.Confirm(szMsg, fnAction, fnCancel, szSure, szCancel, fnCancelAction
 	local nW, nH = Station.GetClientSize()
 	local tMsg = {
 		x = nW / 2, y = nH / 3,
-		szName = 'MY_Confirm',
+		szName = LIB.GetAddonInfo().szNameSpace .. '_Confirm',
 		szMessage = szMsg,
 		szAlignment = 'CENTER',
 		fnCancelAction = fnCancelAction,
@@ -1404,7 +1404,7 @@ function LIB.Dialog(szMsg, aOptions, fnCancelAction)
 	local nW, nH = Station.GetClientSize()
 	local tMsg = {
 		x = nW / 2, y = nH / 3,
-		szName = 'MY_Dialog',
+		szName = LIB.GetAddonInfo().szNameSpace .. '_Dialog',
 		szMessage = szMsg,
 		szAlignment = 'CENTER',
 		fnCancelAction = fnCancelAction,
