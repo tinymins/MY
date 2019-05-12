@@ -362,7 +362,7 @@ function D.UpdateFrame()
 		return D.ClosePanel(true)
 	end
 	local dwTime, dwDelayTime = GetTime(), nil
-	local container, nH = frame:Lookup('WndContainer_Request'), 0
+	local container, nH, bEmpty = frame:Lookup('WndContainer_Request'), 0, true
 	container:Clear()
 	for _, info in ipairs(PR_PARTY_REQUEST) do
 		if info.dwDelayTime and info.dwDelayTime > dwTime then
@@ -396,6 +396,7 @@ function D.UpdateFrame()
 			wnd:Lookup('Btn_Lookup', 'Text_Lookup'):SetText(info.dwID and g_tStrings.STR_LOOKUP or _L['Ask details'])
 			wnd.info = info
 			nH = nH + wnd:GetH()
+			bEmpty = false
 		end
 	end
 	if dwDelayTime then
@@ -406,6 +407,7 @@ function D.UpdateFrame()
 	frame:Lookup('', 'Image_Bg'):SetH(nH)
 	frame:SetH(nH + 30)
 	frame:SetDragArea(0, 0, frame:GetW(), frame:GetH())
+	frame:SetVisible(not bEmpty)
 end
 
 function D.Feedback(szName, data, bDetail)
