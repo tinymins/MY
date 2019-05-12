@@ -127,16 +127,16 @@ end
 
 local function CommonEventFirer(E, arg0, ...)
 	local szEvent = E.bSingleEvent and 'SINGLE_EVENT' or arg0
-	local tEvent = E.tList and szEvent and E.tList[szEvent]
-	if tEvent then
-		for szKey, p in pairs(tEvent) do
-			local nStartTick = GetTickCount()
-			local status, err = pcall(p.fnAction, arg0, ...)
-			if not status then
-				LIB.Debug({GetTraceback(err)}, 'On' .. E.szName .. '#' .. p.szID, DEBUG_LEVEL.ERROR)
-			end
-			LIB.Debug({_L('%s function <%s> executed in %dms.', E.szName, szKey, GetTickCount() - nStartTick)}, _L['PMTool'], DEBUG_LEVEL.LOG)
+	if not E.tList or not szEvent then
+		return
+	end
+	for szKey, p in spairs(E.tList[szEvent], E.tList['*']) do
+		local nStartTick = GetTickCount()
+		local status, err = pcall(p.fnAction, arg0, ...)
+		if not status then
+			LIB.Debug({GetTraceback(err)}, 'On' .. E.szName .. '#' .. p.szID, DEBUG_LEVEL.ERROR)
 		end
+		LIB.Debug({_L('%s function <%s> executed in %dms.', E.szName, szKey, GetTickCount() - nStartTick)}, _L['PMTool'], DEBUG_LEVEL.LOG)
 	end
 end
 
@@ -395,7 +395,7 @@ local function StepNext(bQuick)
 	local nW, nH = Station.GetClientSize()
 	local tMsg = {
 		x = nW / 2, y = nH / 3,
-		szName = 'MY_Tutorial',
+		szName = LIB.GetAddonInfo().szNameSpace .. '_Tutorial',
 		szMessage = tutorial.szMessage,
 		szAlignment = 'CENTER',
 	}
