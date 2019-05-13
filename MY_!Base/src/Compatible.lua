@@ -584,7 +584,9 @@ function ForceIDToKungfuIDs(dwForceID)
 end
 end
 
+if not UpdateItemInfoBoxObject then
 UpdateItemInfoBoxObject = UpdataItemInfoBoxObject
+end
 
 if not Table_SchoolToForce then
 function Table_SchoolToForce(dwSchoolID)
