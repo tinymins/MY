@@ -36,18 +36,22 @@ local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsN
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
+local PROXY = {}
 if IsDebugClient() then
-_G[LIB.GetAddonInfo().szNameSpace .. '_DebugSetVal'] = function(szKey, oVal)
-	LIB[szKey] = oVal
+function PROXY.DebugSetVal(szKey, oVal)
+	PROXY[szKey] = oVal
 end
 end
 
-_G[LIB.GetAddonInfo().szNameSpace] = setmetatable({}, {
+for k, v in pairs(LIB) do
+	PROXY[k] = v
+	LIB[k] = nil
+end
+setmetatable(LIB, {
 	__metatable = true,
-	__index = LIB,
+	__index = PROXY,
 	__newindex = function() assert(false, 'DO NOT modify ' .. LIB.GetAddonInfo().szNameSpace .. ' after initialized!!!') end
 })
-
 FireUIEvent(LIB.GetAddonInfo().szNameSpace .. '_BASE_LOADING_END')
 
 -- 修复剑心导致玩家头像越来越大的问题。。。
