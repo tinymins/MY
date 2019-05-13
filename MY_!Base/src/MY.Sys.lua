@@ -1800,6 +1800,8 @@ local PRESETS = {
 		'OnScrollBarPosChanged',
 		'OnEditChanged',
 		'OnEditSpecialKeyDown',
+		'OnCheckBoxCheck',
+		'OnCheckBoxUncheck',
 	}),
 }
 function LIB.GeneGlobalNS(options)
