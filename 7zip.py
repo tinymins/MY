@@ -2,6 +2,13 @@
 
 import time, os, re
 
+# get interface root path
+pkg_name = ''
+root_path = os.path.abspath(os.getcwd())
+if os.path.basename(root_path).lower() != 'interface' and os.path.basename(os.path.dirname(root_path)) == 'interface':
+    pkg_name = os.path.basename(root_path)
+    root_path = os.path.dirname(root_path)
+
 def run(mode):
 	# 读取Git分支
 	name_list = os.popen('git branch').read().strip().split("\n")
@@ -15,9 +22,9 @@ def run(mode):
 		print('Error: current branch(%s) is not on git stable!' % (branch_name))
 		exit()
 
-	# 读取MY.lua文件中的插件版本号
+	# 读取{NS}.lua文件中的插件版本号
 	str_version = "0x0000000"
-	for line in open("MY_!Base/src/MY.lua"):
+	for line in open("%s_!Base/src/%s.lua" % (pkg_name, pkg_name)):
 		if line[6:15] == "_VERSION_":
 			str_version = line[-6:-3]
 
@@ -65,7 +72,7 @@ def run(mode):
 		print('')
 
 		# 拼接字符串开始压缩文件
-		dst_file = "!src-dist/releases/MY_" + time.strftime("%Y%m%d%H%M%S", time.localtime()) + "_v" + str_version + ".7z"
+		dst_file = "!src-dist/releases/%s_%s_v%s.7z" % (pkg_name, time.strftime("%Y%m%d%H%M%S", time.localtime()), str_version)
 		print("zippping...")
 		cmd = "7z a -t7z " + dst_file + " -xr!manifest.dat -xr!manifest.key -xr!publisher.key -x@7zipignore.txt"
 		for path in paths:
@@ -75,7 +82,7 @@ def run(mode):
 
 	else:
 		# 拼接字符串开始压缩文件
-		dst_file = "!src-dist/releases/MY_" + time.strftime("%Y%m%d%H%M%S", time.localtime()) + "_v" + str_version + ".7z"
+		dst_file = "!src-dist/releases/%s_%s_v%s.7z" % (pkg_name, time.strftime("%Y%m%d%H%M%S", time.localtime()), str_version)
 		print("zippping...")
 		os.system("7z a -t7z " + dst_file + " -xr!manifest.dat -xr!manifest.key -xr!publisher.key -x@7zipignore.txt")
 
