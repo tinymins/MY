@@ -25,9 +25,12 @@ def run(mode):
 	version_list = os.popen('git tag').read().strip().split("\n")
 	max_version, git_tag = 0, ''
 	for version in version_list:
-		if max_version < int(version[1:]):
-			git_tag = version
-			max_version = int(version[1:])
+		try:
+			if max_version < int(version[1:]):
+				git_tag = version
+				max_version = int(version[1:])
+		except:
+			pass
 
 	# 判断是否忘记提升版本号
 	if int(str_version) <= max_version:
