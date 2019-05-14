@@ -36,7 +36,7 @@ start_time = time.time() * 1000
 pkg_name = ''
 root_path = os.path.abspath(os.getcwd())
 header_file = os.path.join(root_path, 'header.tpl.lua')
-if os.path.basename(root_path).lower() != 'interface' and os.path.basename(os.path.dirname(root_path)) == 'interface':
+if os.path.basename(root_path).lower() != 'interface' and os.path.basename(os.path.dirname(root_path).lower()) == 'interface':
     pkg_name = os.path.basename(root_path)
     root_path = os.path.dirname(root_path)
 # get crc cache file path
