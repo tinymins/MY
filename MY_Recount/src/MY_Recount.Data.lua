@@ -217,7 +217,9 @@ local AWAYTIME_TYPE = {
 }
 local VERSION = 1
 
-MY_Recount = MY_Recount or {}
+if not MY_Recount then
+	return
+end
 MY_Recount.Data = {}
 MY_Recount.Data.nMaxHistory       = 10
 MY_Recount.Data.nMinFightTime     = 30
