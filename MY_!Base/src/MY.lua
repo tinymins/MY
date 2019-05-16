@@ -792,10 +792,10 @@ end
 ---------------------------------------------------
 if _DEBUG_LEVEL_ <= DEBUG_LEVEL.DEBUG then
 	if not ECHO_LUA_ERROR then
-		ECHO_LUA_ERROR = LIB.GetAddonInfo().szNameSpace
+		ECHO_LUA_ERROR = { ID = LIB.GetAddonInfo().szNameSpace }
 	end
 	RegisterEvent('CALL_LUA_ERROR', function()
-		if ECHO_LUA_ERROR == LIB.GetAddonInfo().szNameSpace then
+		if ECHO_LUA_ERROR and ECHO_LUA_ERROR.ID == LIB.GetAddonInfo().szNameSpace then
 			print(arg0)
 			OutputMessage('MSG_SYS', arg0)
 		end
