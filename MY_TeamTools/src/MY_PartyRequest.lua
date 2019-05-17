@@ -41,6 +41,7 @@ local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_TeamTools/lang/')
 local D = {}
 local PR_INI_PATH = LIB.GetAddonInfo().szRoot .. 'MY_TeamTools/ui/MY_PartyRequest.ini'
 local PR_EQUIP_REQUEST = {}
+local PR_PARTY_REACT = {}
 local PR_PARTY_REQUEST = {}
 
 MY_PartyRequest = {
@@ -177,6 +178,7 @@ end
 function D.ClosePanel(bCompulsory)
 	local fnAction = function()
 		Wnd.CloseWindow(D.GetFrame())
+		PR_PARTY_REACT = {}
 		PR_PARTY_REQUEST = {}
 	end
 	if bCompulsory then
@@ -219,7 +221,7 @@ function D.AcceptRequest(info)
 			remove(PR_PARTY_REQUEST, i)
 		end
 	end
-	info.fnAction()
+	info.fnAccept()
 end
 
 function D.RefuseRequest(info)
@@ -228,7 +230,7 @@ function D.RefuseRequest(info)
 			remove(PR_PARTY_REQUEST, i)
 		end
 	end
-	info.fnCancelAction()
+	info.fnRefuse()
 end
 
 function D.GetRequestStatus(info)
@@ -294,61 +296,79 @@ function D.GetRequestInfo(key)
 	end
 end
 
+function D.OnMessageBoxOpen()
+	local szMsgName, frame = arg0, arg1
+	local szPrefix, szName = unpack(LIB.SplitString(szMsgName, '_', true, 2))
+	if not MY_PartyRequest.bEnable or not frame or not frame:IsValid()
+	or (szMsgName:sub(1, 5) ~= 'ATMP_' and szMsgName:sub(1, 5) ~= 'IMTP_') then
+		return
+	end
+	local fnAccept = Get(frame:Lookup('Wnd_All/Btn_Option1'), 'fnAction')
+	local fnRefuse = Get(frame:Lookup('Wnd_All/Btn_Option2'), 'fnAction')
+	if fnAccept and fnRefuse then
+		-- 获取组队方法
+		PR_PARTY_REACT[szName] = {
+			fnAccept = function()
+				pcall(fnAccept)
+				PR_PARTY_REACT[szName] = nil
+			end,
+			fnRefuse = function()
+				pcall(fnRefuse)
+				PR_PARTY_REACT[szName] = nil
+			end,
+		}
+		-- 关闭对话框
+		frame.fnAutoClose = nil
+		frame.fnCancelAction = nil
+		frame.szCloseSound = nil
+		Wnd.CloseWindow(frame)
+	end
+end
+
 function D.OnApplyRequest()
 	if not MY_PartyRequest.bEnable then
 		return
 	end
-	local hMsgBox = Station.Lookup('Topmost/MB_ATMP_' .. arg0) or Station.Lookup('Topmost/MB_IMTP_' .. arg0)
-	if hMsgBox then
-		local btn  = hMsgBox:Lookup('Wnd_All/Btn_Option1')
-		local btn2 = hMsgBox:Lookup('Wnd_All/Btn_Option2')
-		if btn and btn:IsEnabled() then
-			-- 判断对方是否已在进组列表中
-			local info = D.GetRequestInfo(arg0)
-			if not info then
-				info = {
-					szName      = arg0,
-					nCamp       = arg1,
-					dwForce     = arg2,
-					nLevel      = arg3,
-					bFriend     = LIB.IsFriend(arg0),
-					bTongMember = LIB.IsTongMember(arg0),
-					fnAction = function()
-						pcall(btn.fnAction)
-					end,
-					fnCancelAction = function()
-						pcall(btn2.fnAction)
-					end,
-				}
-				insert(PR_PARTY_REQUEST, info)
-			end
-			-- 获取dwID
-			local me = GetClientPlayer()
-			local tar = LIB.GetObject(TARGET.PLAYER, arg0)
-			if not info.dwID and tar then
-				info.dwID = tar.dwID
-			end
-			if not info.dwID and MY_Farbnamen and MY_Farbnamen.Get then
-				local data = MY_Farbnamen.Get(arg0)
-				if data then
-					info.dwID = data.dwID
-				end
-			end
-			-- 自动拒绝 没拒绝的自动申请装备
-			local bAction, szStatus = D.DoAutoAction(info)
-			if szStatus == 'suspicious' then
-				info.dwDelayTime = GetTime() + 2000
-			end
-			if not bAction and info.dwID then
-				D.PeekPlayer(info.dwID)
-			end
-			-- 关闭对话框 更新界面
-			hMsgBox.fnAutoClose = nil
-			hMsgBox.fnCancelAction = nil
-			hMsgBox.szCloseSound = nil
-			Wnd.CloseWindow(hMsgBox)
-			D.UpdateFrame()
+	local szName, nCamp, dwForce, nLevel, nType = arg0, arg1, arg2, arg3, arg4
+	local tReact = PR_PARTY_REACT[szName]
+	if tReact then
+		-- 判断对方是否已在进组列表中
+		local info = D.GetRequestInfo(szName)
+		if not info then
+			info = {
+				szName      = szName,
+				nCamp       = nCamp,
+				dwForce     = dwForce,
+				nLevel      = nLevel,
+				bFriend     = LIB.IsFriend(szName),
+				bTongMember = LIB.IsTongMember(szName),
+				fnAccept    = tReact.fnAccept,
+				fnRefuse    = tReact.fnRefuse,
+			}
+			insert(PR_PARTY_REQUEST, info)
 		end
+		-- 获取dwID
+		local me = GetClientPlayer()
+		local tar = LIB.GetObject(TARGET.PLAYER, szName)
+		if not info.dwID and tar then
+			info.dwID = tar.dwID
+		end
+		if not info.dwID and MY_Farbnamen and MY_Farbnamen.Get then
+			local data = MY_Farbnamen.Get(szName)
+			if data then
+				info.dwID = data.dwID
+			end
+		end
+		-- 自动拒绝 没拒绝的自动申请装备
+		local bAction, szStatus = D.DoAutoAction(info)
+		if szStatus == 'suspicious' then
+			info.dwDelayTime = GetTime() + 2000
+		end
+		if not bAction and info.dwID then
+			D.PeekPlayer(info.dwID)
+		end
+		-- 更新界面
+		D.UpdateFrame()
 	end
 end
 
@@ -427,6 +447,7 @@ end
 LIB.RegisterEvent('PEEK_OTHER_PLAYER.MY_PartyRequest'   , D.OnPeekPlayer  )
 LIB.RegisterEvent('PARTY_INVITE_REQUEST.MY_PartyRequest', D.OnApplyRequest)
 LIB.RegisterEvent('PARTY_APPLY_REQUEST.MY_PartyRequest' , D.OnApplyRequest)
+LIB.RegisterEvent('ON_MESSAGE_BOX_OPEN.MY_PartyRequest' , D.OnMessageBoxOpen)
 
 LIB.RegisterBgMsg('RL', function(_, nChannel, dwID, szName, bIsSelf, ...)
 	local data = {...}
