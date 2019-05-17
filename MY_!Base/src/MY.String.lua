@@ -49,34 +49,37 @@ local UrlEncodeString, UrlDecodeString = UrlEncode, UrlDecode
 -- szSpliter        分隔符
 -- aSpliter         多个分隔符
 -- bIgnoreEmptyPart 是否忽略空字符串，即'123;234;'被';'分成{'123','234'}还是{'123','234',''}
-function LIB.SplitString(szText, aSpliter, bIgnoreEmptyPart)
+-- nMaxPart         最多分成几份，即'1;2;3;4'被';'分隔时，如果最多三份则得到{'1','2','3;4'}
+function LIB.SplitString(szText, aSpliter, bIgnoreEmptyPart, nMaxPart)
 	if IsString(aSpliter) then
 		aSpliter = {aSpliter}
 	end
-	local nOff, tResult, szPart = 1, {}
+	local nOff, aResult, szPart = 1, {}
 	while true do
 		local nEnd, szEnd
-		for _, szSpliter in ipairs(aSpliter) do
-			local nPos = StringFindW(szText, szSpliter, nOff)
-			if nPos and (not nEnd or nPos < nEnd) then
-				nEnd, szEnd = nPos, szSpliter
+		if not nMaxPart or nMaxPart > #aResult + 1 then
+			for _, szSpliter in ipairs(aSpliter) do
+				local nPos = StringFindW(szText, szSpliter, nOff)
+				if nPos and (not nEnd or nPos < nEnd) then
+					nEnd, szEnd = nPos, szSpliter
+				end
 			end
 		end
 		if not nEnd then
 			szPart = sub(szText, nOff, len(szText))
 			if not bIgnoreEmptyPart or szPart ~= '' then
-				insert(tResult, szPart)
+				insert(aResult, szPart)
 			end
 			break
 		else
 			szPart = sub(szText, nOff, nEnd - 1)
 			if not bIgnoreEmptyPart or szPart ~= '' then
-				insert(tResult, szPart)
+				insert(aResult, szPart)
 			end
 			nOff = nEnd + len(szEnd)
 		end
 	end
-	return tResult
+	return aResult
 end
 
 function LIB.EscapeString(s)
