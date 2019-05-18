@@ -119,8 +119,8 @@ local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 ---------------------------------------------------------------------------------------------
 -- 本地函数变量
 ---------------------------------------------------------------------------------------------
-local _BUILD_            = '20190510'
-local _VERSION_          = 0x2013000
+local _BUILD_            = '20190518'
+local _VERSION_          = 0x2013100
 local _DEBUG_LEVEL_      = tonumber(LoadLUAData('interface/my.debug.level') or nil) or 4
 local _DELOG_LEVEL_      = tonumber(LoadLUAData('interface/my.delog.level') or nil) or 4
 local _NORESTIME_        = tonumber(LoadLUAData('interface/my.nrtim.level') or nil) or -1
