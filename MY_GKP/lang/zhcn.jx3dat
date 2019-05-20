@@ -151,6 +151,7 @@ data = {
 	['Confirm?'] = '确定执行这个操作？',
 	['Quality filter'] = '物品等级过滤',
 	['Auto pickup'] = '自动拾取物品',
+	['Auto pickup all'] = '自动拾取全部物品',
 	['Auto pickup this'] = '自动拾取该组物品',
 	['Will be reset when loading'] = '仅过图前有效',
 	['Confirm when distribute'] = '分配时二次确认',
