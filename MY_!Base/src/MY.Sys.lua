@@ -396,8 +396,9 @@ end
 -- (void) LIB.RegisterCustomData(string szVarPath[, number nVersion])
 function LIB.RegisterCustomData(szVarPath, nVersion, szDomain)
 	szDomain = szDomain or 'Role'
-	if _G and type(_G[szVarPath]) == 'table' then
-		for k, _ in pairs(_G[szVarPath]) do
+	local oVar = Get(_G, szVarPath)
+	if IsTable(oVar) then
+		for k, _ in pairs(oVar) do
 			RegisterCustomData(szDomain .. '/' .. szVarPath .. '.' .. k, nVersion)
 		end
 	else
