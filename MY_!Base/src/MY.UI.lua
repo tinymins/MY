@@ -924,7 +924,7 @@ function UI:remove(onRemove)
 					raw:Destroy()
 				else
 					local h = raw:GetParent()
-					if h:GetType() == 'Handle' then
+					if h and h:GetType() == 'Handle' then
 						h:RemoveItem(raw)
 						h:FormatAllItemPos()
 					end
