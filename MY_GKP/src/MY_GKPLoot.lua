@@ -86,8 +86,20 @@ local Loot = {}
 MY_GKP_Loot = {
 	bVertical = true,
 	bSetColor = true,
+	nConfirmQuality = 3,
 }
 LIB.RegisterCustomData('MY_GKP_Loot')
+
+MY_GKP_Loot.tConfirm = {
+	Huangbaba  = true,
+	Book       = true,
+	Pendant    = true,
+	Outlook    = true,
+	Pet        = true,
+	Horse      = true,
+	HorseEquip = true,
+}
+LIB.RegisterCustomData('MY_GKP_Loot.tConfirm')
 
 MY_GKP_Loot.tItemConfig = {
 	nQualityFilter = -1,
@@ -98,7 +110,7 @@ LIB.RegisterCustomData('MY_GKP_Loot.tItemConfig')
 do
 local function onLoadingEnd()
 	MY_GKP_Loot.tItemConfig.nQualityFilter = -1
-	MY_GKP_Loot.tItemConfig.nAutoPickupQuality = -1
+	-- MY_GKP_Loot.tItemConfig.nAutoPickupQuality = -1
 end
 LIB.RegisterEvent('LOADING_END.MY_GKP_Loot', onLoadingEnd)
 end
@@ -491,10 +503,17 @@ function MY_GKP_Loot.OnItemRButtonClick()
 end
 
 function Loot.GetQualityFilterMenu()
-	local t = { szOption = _L['Quality filter'] }
+	local t = {
+		szOption = _L['Quality filter'],
+		{
+			szOption = _L['Will be reset when loading'],
+			bDisable = true,
+		},
+		MENU_DIVIDER,
+	}
 	for i, p in ipairs(GKP_ITEM_QUALITIES) do
 		table.insert(t, {
-			szOption = p.szTitle,
+			szOption = p.nQuality > 0 and _L('Quality below %s', p.szTitle) or p.szTitle,
 			rgb = p.nQuality == -1 and {255, 255, 255} or { GetItemFontColorByQuality(p.nQuality) },
 			bCheck = true, bMCheck = true, bChecked = MY_GKP_Loot.tItemConfig.nQualityFilter == p.nQuality,
 			fnAction = function()
@@ -509,7 +528,7 @@ function Loot.GetAutoPickupAllMenu()
 	local t = { szOption = _L['Auto pickup all'] }
 	for i, p in ipairs(GKP_ITEM_QUALITIES) do
 		table.insert(t, {
-			szOption = p.szTitle,
+			szOption = p.nQuality > 0 and _L('Quality reach %s', p.szTitle) or p.szTitle,
 			rgb = p.nQuality == -1 and {255, 255, 255} or { GetItemFontColorByQuality(p.nQuality) },
 			bCheck = true, bMCheck = true, bChecked = MY_GKP_Loot.tItemConfig.nAutoPickupQuality == p.nQuality,
 			fnAction = function()
@@ -743,8 +762,12 @@ function Loot.GetDistributeMenu(dwDoodadID, data)
 		local frame = Loot.GetFrame()
 		local wnd = Loot.GetDoodadWnd(frame, dwDoodadID)
 		local szIcon, nFrame = GetForceImage(v.dwForceID)
+		local szOption = v.szName
+		if szName then
+			szOption = szOption .. ' - ' .. szName
+		end
 		return {
-			szOption = v.szName .. (szName and ' - ' .. szName or ''),
+			szOption = szOption,
 			bDisable = not v.bOnlineFlag,
 			rgb = { LIB.GetForceColor(v.dwForceID) },
 			szIcon = szIcon, nFrame = nFrame,
@@ -753,7 +776,30 @@ function Loot.GetDistributeMenu(dwDoodadID, data)
 			end,
 			szLayer = 'ICON_RIGHTMOST',
 			fnAction = function()
-				if data.nQuality >= 3 then
+				if data.nQuality >= MY_GKP_Loot.nConfirmQuality
+				or (MY_GKP_Loot.tConfirm.Huangbaba and GKP_LOOT_HUANGBABA[GetItemNameByItem(data.item)]) -- Ðþ¾§
+				or (MY_GKP_Loot.tConfirm.Book and data.item.nGenre == ITEM_GENRE.BOOK) -- Êé¼®
+				or (MY_GKP_Loot.tConfirm.Pendant and data.item.nGenre == ITEM_GENRE.EQUIPMENT and ( -- ¹Ò¼þ
+					data.item.nSub == WAIST_EXTEND
+					or data.item.nSub == BACK_EXTEND
+					or data.item.nSub == FACE_EXTEND
+				))
+				or (MY_GKP_Loot.tConfirm.Outlook and data.item.nGenre == ITEM_GENRE.EQUIPMENT and ( -- ¼çÊÎÅû·ç
+					data.item.nSub == EQUIPMENT_SUB.BACK_CLOAK_EXTEND
+					or data.item.nSub == EQUIPMENT_SUB.L_SHOULDER_EXTEND
+					or data.item.nSub == EQUIPMENT_SUB.R_SHOULDER_EXTEND
+				))
+				or (MY_GKP_Loot.tConfirm.Pet and ( -- ¸ú³è
+					data.item.nGenre == ITEM_GENRE.CUB
+					or (data.item.nGenre == ITEM_GENRE.EQUIPMENT and data.item.nSub == EQUIPMENT_SUB.PET)
+				))
+				or (MY_GKP_Loot.tConfirm.Horse and ( -- ×øÆï
+					data.item.nGenre == ITEM_GENRE.EQUIPMENT and data.item.nSub == EQUIPMENT_SUB.HORSE
+				))
+				or (MY_GKP_Loot.tConfirm.HorseEquip and ( -- Âí¾ß
+					data.item.nGenre == ITEM_GENRE.EQUIPMENT and data.item.nSub == EQUIPMENT_SUB.HORSE_EQUIP
+				))
+				then
 					Loot.GetMessageBox(v.dwID, dwDoodadID, data.dwID, data, szName and true)
 				else
 					Loot.DistributeItem(v.dwID, dwDoodadID, data.dwID, data, szName and true)
