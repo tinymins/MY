@@ -109,6 +109,7 @@ LIB.RegisterCustomData('MY_GKP_Loot.tConfirm')
 
 MY_GKP_Loot.tItemConfig = {
 	nQualityFilter = -1,
+	bFilterBookRead = false,
 	nAutoPickupQuality = -1,
 }
 LIB.RegisterCustomData('MY_GKP_Loot.tItemConfig')
@@ -126,7 +127,17 @@ function MY_GKP_Loot.CanDialog(tar, doodad)
 end
 
 function MY_GKP_Loot.IsItemDisplay(itemData, config)
-	return config.nQualityFilter == -1 or itemData.nQuality >= config.nQualityFilter
+	if config.nQualityFilter ~= -1 and itemData.nQuality < config.nQualityFilter then
+		return false
+	end
+	if config.bFilterBookRead and itemData.nGenre == ITEM_GENRE.BOOK then
+		local me = GetClientPlayer()
+		local nBookID, nSegmentID = GlobelRecipeID2BookID(itemData.nBookID)
+		if me and me.IsBookMemorized(nBookID, nSegmentID) then
+			return false
+		end
+	end
+	return true
 end
 
 function MY_GKP_Loot.IsItemAutoPickup(itemData, config, doodad, bCanDialog)
@@ -337,13 +348,13 @@ function MY_GKP_Loot.OnLButtonClick()
 		end
 		if not LIB.IsShieldedVersion() then
 			table.insert(menu, MENU_DIVIDER)
-			table.insert(menu, Loot.GetQualityFilterMenu())
+			table.insert(menu, Loot.GetFilterMenu())
 			table.insert(menu, Loot.GetAutoPickupAllMenu())
 
 			local t = { szOption = _L['Auto pickup this'] }
 			for i, p in ipairs(GKP_ITEM_QUALITIES) do
 				table.insert(t, {
-					szOption = p.szTitle,
+					szOption = p.nQuality > 0 and _L('Quality reach %s', p.szTitle) or p.szTitle,
 					rgb = p.nQuality == -1 and {255, 255, 255} or { GetItemFontColorByQuality(p.nQuality) },
 					bCheck = true, bMCheck = true, bChecked = wnd.tItemConfig.nAutoPickupQuality == p.nQuality,
 					fnAction = function()
@@ -508,8 +519,19 @@ function MY_GKP_Loot.OnItemRButtonClick()
 	end
 end
 
-function Loot.GetQualityFilterMenu()
+function Loot.GetFilterMenu()
 	local t = {
+		szOption = _L['Loot item filter'],
+		{
+			szOption = _L['Filter book read'],
+			bCheck = true,
+			bChecked = MY_GKP_Loot.tItemConfig.bFilterBookRead,
+			fnAction = function()
+				MY_GKP_Loot.tItemConfig.bFilterBookRead = not MY_GKP_Loot.tItemConfig.bFilterBookRead
+			end,
+		},
+	}
+	local t1 = {
 		szOption = _L['Quality filter'],
 		{
 			szOption = _L['Will be reset when loading'],
@@ -518,7 +540,7 @@ function Loot.GetQualityFilterMenu()
 		MENU_DIVIDER,
 	}
 	for i, p in ipairs(GKP_ITEM_QUALITIES) do
-		table.insert(t, {
+		table.insert(t1, {
 			szOption = p.nQuality > 0 and _L('Quality below %s', p.szTitle) or p.szTitle,
 			rgb = p.nQuality == -1 and {255, 255, 255} or { GetItemFontColorByQuality(p.nQuality) },
 			bCheck = true, bMCheck = true, bChecked = MY_GKP_Loot.tItemConfig.nQualityFilter == p.nQuality,
@@ -527,6 +549,7 @@ function Loot.GetQualityFilterMenu()
 			end,
 		})
 	end
+	insert(t, t1)
 	return t
 end
 
@@ -903,7 +926,7 @@ function Loot.DrawLootList(dwID)
 	-- º∆À„µÙ¬‰
 	local szName, aItemData, bSpecial = Loot.GetDoodad(dwID)
 	local nCount = #aItemData
-	if config.nQualityFilter ~= -1 then
+	if config.nQualityFilter ~= -1 or config.bFilterBookRead then
 		nCount = 0
 		for i, v in ipairs(aItemData) do
 			if MY_GKP_Loot.IsItemDisplay(v, config) then
@@ -1143,11 +1166,15 @@ function Loot.GetDoodad(dwID)
 					szName       = szItemName   ,
 					dwID         = item.dwID    ,
 					nGenre       = item.nGenre  ,
+					nSub         = item.nSub    ,
 					nQuality     = item.nQuality,
 					bNeedRoll    = bNeedRoll    ,
 					bDist        = bDist        ,
 					bBidding     = bBidding     ,
 				}
+				if item.nGenre == ITEM_GENRE.BOOK then
+					data.nBookID = item.nBookID
+				end
 				data.szType = GetItemDataType(data)
 				data.nWeight = ITEM_DATA_WEIGHT[data.szType]
 				table.insert(aItemData, data)
@@ -1235,7 +1262,7 @@ end)
 local ui = {
 	GetMessageBox        = Loot.GetMessageBox,
 	GetaPartyMember      = Loot.GetaPartyMember,
-	GetQualityFilterMenu = Loot.GetQualityFilterMenu,
+	GetFilterMenu        = Loot.GetFilterMenu,
 	GetAutoPickupAllMenu = Loot.GetAutoPickupAllMenu,
 }
 setmetatable(MY_GKP_Loot, { __index = ui, __newindex = function() end, __metatable = true })

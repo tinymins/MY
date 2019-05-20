@@ -710,8 +710,8 @@ function PS.OnPanelActive(wnd)
 	}, true):autoWidth():width() + 5
 	x = x + ui:append('WndComboBox', {
 		x = x, y = y, w = 200,
-		text = _L['Quality filter'],
-		menu = MY_GKP_Loot.GetQualityFilterMenu
+		text = _L['Loot item filter'],
+		menu = MY_GKP_Loot.GetFilterMenu
 	}, true):autoWidth():width() + 5
 	x = x + ui:append('WndComboBox', {
 		x = x, y = y, w = 200,
