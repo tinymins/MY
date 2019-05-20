@@ -644,9 +644,9 @@ local function ParseFaceIcon(t)
 	local t2 = {}
 	for _, v in ipairs(t) do
 		if v.type ~= 'text' then
-			if v.type == 'emotion' then
-				v.type = 'text'
-			end
+			-- if v.type == 'emotion' then
+			-- 	v.type = 'text'
+			-- end
 			table.insert(t2, v)
 		else
 			local szText = v.text
@@ -704,9 +704,9 @@ local function ParseName(t)
 	local t2 = {}
 	for _, v in ipairs(t) do
 		if v.type ~= 'text' then
-			if v.type == 'name' then
-				v = { type = 'text', text = '['..v.name..']' }
-			end
+			-- if v.type == 'name' then
+			-- 	v = { type = 'text', text = '['..v.name..']' }
+			-- end
 			table.insert(t2, v)
 		else
 			local nOff, nLen = 1, string.len(v.text)
