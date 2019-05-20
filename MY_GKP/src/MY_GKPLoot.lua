@@ -879,6 +879,22 @@ function Loot.GetDoodadWnd(frame, dwID, bCreate)
 	return wnd
 end
 
+local function IsItemDataSuitable(data)
+	local me = GetClientPlayer()
+	if not me then
+		return false, false
+	end
+	if data.szType == 'BOOK' then
+		local nBookID, nSegmentID = GlobelRecipeID2BookID(data.item.nBookID)
+		if me.IsBookMemorized(nBookID, nSegmentID) then
+			return false, false
+		else
+			return true, false
+		end
+	-- elseif data.szType == 'EQUIPMENT' or data.szType == 'WEAPON' then
+	end
+end
+
 function Loot.DrawLootList(dwID)
 	local frame = Loot.GetFrame()
 	local wnd = Loot.GetDoodadWnd(frame, dwID)
@@ -935,6 +951,9 @@ function Loot.DrawLootList(dwID)
 				end
 			end
 			if MY_GKP_Loot.bVertical then
+				local bSuit, bBetter = IsItemDataSuitable(itemData)
+				h:Lookup('Image_Suitable'):SetVisible(bSuit and not bBetter)
+				h:Lookup('Image_Better'):SetVisible(bBetter)
 				h:Lookup('Image_Spliter'):SetVisible(i ~= #aItemData)
 			else
 				txt:Hide()
