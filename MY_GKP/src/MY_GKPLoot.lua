@@ -50,6 +50,12 @@ local GKP_LOOT_HUANGBABA = { -- 玄晶
 	[LIB.GetItemName(153897)] = true,
 	[LIB.GetItemName(160306)] = true,
 }
+local GKP_LOOT_ZIBABA = { -- 小铁
+	[LIB.GetItemName(66189)]  = true,
+	[LIB.GetItemName(68362)]  = true,
+	[LIB.GetItemName(153896)] = true,
+	[LIB.GetItemName(160305)] = true,
+}
 local GKP_LOOT_AUTO = {}
 local GKP_LOOT_AUTO_LIST = { -- 记录分配上次的物品
 	-- 材料
@@ -1003,6 +1009,96 @@ function Loot.CloseFrame(dwID)
 	end
 end
 
+local ITEM_DATA_WEIGHT = {
+	COIN_SHOP      = 1,	-- 外观 披风 礼盒
+	OUTLOOK        = 1,	-- 外观 披风 礼盒
+	PENDANT        = 2,	-- 挂件
+	PET            = 3,	-- 宠物
+	HORSE          = 4,	-- 坐骑 马
+	HORSE_EQUIP    = 5,	-- 马具
+	BOOK           = 6,	-- 书籍
+	WEAPON         = 7,	-- 武器
+	EQUIPMENT_SIGN = 8,	-- 装备兑换牌
+	EQUIPMENT      = 9,	-- 散件装备
+	MATERIAL       = 10, -- 材料
+	ZIBABA         = 11, -- 小铁
+	ENCHANT_ITEM   = 12, -- 附魔
+	TASK_ITEM      = 13, -- 任务道具
+	OTHER          = 14,
+}
+local function GetItemDataType(data)
+	-- 外观 披风 礼盒
+	if data.item.nGenre == ITEM_GENRE.COIN_SHOP_QUANTITY_LIMIT_ITEM then
+		return 'COIN_SHOP'
+	end
+	if data.item.nGenre == ITEM_GENRE.EQUIPMENT and (
+		data.item.nSub == EQUIPMENT_SUB.L_SHOULDER_EXTEND
+		or data.item.nSub == EQUIPMENT_SUB.R_SHOULDER_EXTEND
+		or data.item.nSub == EQUIPMENT_SUB.BACK_CLOAK_EXTEND
+	) then
+		return 'OUTLOOK'
+	end
+	-- 挂件
+	if data.item.nGenre == ITEM_GENRE.EQUIPMENT and (
+		data.item.nSub == EQUIPMENT_SUB.WAIST_EXTEND
+		or data.item.nSub == EQUIPMENT_SUB.BACK_EXTEND
+		or data.item.nSub == EQUIPMENT_SUB.FACE_EXTEND
+	) then
+		return 'PENDANT'
+	end
+	-- 宠物
+	if (data.item.nGenre == ITEM_GENRE.CUB)
+	or (data.item.nGenre == ITEM_GENRE.EQUIPMENT and data.item.nSub == EQUIPMENT_SUB.PET) then
+		return 'PET'
+	end
+	-- 坐骑 马
+	if (data.item.nGenre == ITEM_GENRE.EQUIPMENT and data.item.nSub == EQUIPMENT_SUB.HORSE) then
+		return 'HORSE'
+	end
+	-- 马具
+	if (data.item.nGenre == ITEM_GENRE.EQUIPMENT and data.item.nSub == EQUIPMENT_SUB.HORSE_EQUIP) then
+		return 'HORSE_EQUIP'
+	end
+	-- 书籍
+	if (data.item.nGenre == ITEM_GENRE.BOOK) then
+		return 'BOOK'
+	end
+	-- 武器
+	if (data.item.nGenre == ITEM_GENRE.MELEE_WEAPON or data.item.nGenre == ITEM_GENRE.RANGE_WEAPON) then
+		return 'WEAPON'
+	end
+	-- 装备兑换牌
+	if (data.item.nGenre == ITEM_GENRE.MATERIAL and data.item.nSub == 6) then -- TODO: 枚举？
+		return 'EQUIPMENT_SIGN'
+	end
+	-- 散件装备
+	if data.item.nGenre == ITEM_GENRE.EQUIPMENT then -- TODO: 枚举？
+		return 'EQUIPMENT'
+	end
+	-- 材料
+	if data.item.nGenre == ITEM_GENRE.MATERIAL then
+		-- 小铁
+		if GKP_LOOT_ZIBABA[data.item.szName] then
+			return 'ZIBABA'
+		end
+		-- 材料
+		return 'MATERIAL'
+	end
+	-- 附魔
+	if data.item.nGenre == ITEM_GENRE.ENCHANT_ITEM then
+		return 'ENCHANT_ITEM'
+	end
+	-- 任务道具
+	if data.item.nGenre == ITEM_GENRE.TASK_ITEM then
+		return 'TASK_ITEM'
+	end
+	return 'OTHER'
+end
+
+local function LootItemSorter(data1, item2)
+	return data1.nWeight < data2.nWeight
+end
+
 -- 检查物品
 function Loot.GetDoodad(dwID)
 	local me   = GetClientPlayer()
@@ -1021,7 +1117,7 @@ function Loot.GetDoodad(dwID)
 					bSpecial = true
 				end
 				-- bSpecial = true -- debug
-				table.insert(aItemData, {
+				local data = {
 					dwDoodadID   = dwID         ,
 					szDoodadName = szName       ,
 					item         = item         ,
@@ -1032,10 +1128,14 @@ function Loot.GetDoodad(dwID)
 					bNeedRoll    = bNeedRoll    ,
 					bDist        = bDist        ,
 					bBidding     = bBidding     ,
-				})
+				}
+				data.szType = GetItemDataType(data)
+				data.nWeight = ITEM_DATA_WEIGHT[data.szType]
+				table.insert(aItemData, data)
 			end
 		end
 	end
+	sort(aItemData, LootItemSorter)
 	return szName, aItemData, bSpecial
 end
 
