@@ -2919,3 +2919,104 @@ function LIB.IsPhoneLock()
 	local me = GetClientPlayer()
 	return me and me.IsTradingMibaoSwitchOpen()
 end
+
+-- * 当前道具是否满足装备要求：包括身法，体型，门派，性别，等级，根骨，力量，体质
+function LIB.DoesEquipmentSuit(item, bIsItem, player)
+	if not player then
+		player = GetClientPlayer()
+	end
+	local requireAttrib = item.GetRequireAttrib()
+	for k, v in pairs(requireAttrib) do
+		if bIsItem and not player.SatisfyRequire(v.nID, v.nValue1, v.nValue2) then
+			return false
+		elseif not bIsItem and not player.SatisfyRequire(v.nID, v.nValue) then
+			return false
+		end
+	end
+	return true
+end
+
+-- * 获取物品对应身上装备的位置
+function LIB.GetItemEquipPos(item, nIndex)
+	if not nIndex then
+		nIndex = 1
+	end
+	local dwPackage, dwBox, nCount = INVENTORY_INDEX.EQUIP, 0, 1
+	if item.nSub == EQUIPMENT_SUB.MELEE_WEAPON then
+		if item.nDetail == WEAPON_DETAIL.BIG_SWORD then
+			dwBox = EQUIPMENT_INVENTORY.BIG_SWORD
+		else
+			dwBox = EQUIPMENT_INVENTORY.MELEE_WEAPON
+		end
+	elseif item.nSub == EQUIPMENT_SUB.RANGE_WEAPON then
+		dwBox = EQUIPMENT_INVENTORY.RANGE_WEAPON
+	elseif item.nSub == EQUIPMENT_SUB.ARROW then
+		dwBox = EQUIPMENT_INVENTORY.ARROW
+	elseif item.nSub == EQUIPMENT_SUB.CHEST then
+		dwBox = EQUIPMENT_INVENTORY.CHEST
+	elseif item.nSub == EQUIPMENT_SUB.HELM then
+		dwBox = EQUIPMENT_INVENTORY.HELM
+	elseif item.nSub == EQUIPMENT_SUB.AMULET then
+		dwBox = EQUIPMENT_INVENTORY.AMULET
+	elseif item.nSub == EQUIPMENT_SUB.RING then
+		if nIndex == 1 then
+			dwBox = EQUIPMENT_INVENTORY.LEFT_RING
+		else
+			dwBox = EQUIPMENT_INVENTORY.RIGHT_RING
+		end
+		nCount = 2
+	elseif item.nSub == EQUIPMENT_SUB.WAIST then
+		dwBox = EQUIPMENT_INVENTORY.WAIST
+	elseif item.nSub == EQUIPMENT_SUB.PENDANT then
+		dwBox = EQUIPMENT_INVENTORY.PENDANT
+	elseif item.nSub == EQUIPMENT_SUB.PANTS then
+		dwBox = EQUIPMENT_INVENTORY.PANTS
+	elseif item.nSub == EQUIPMENT_SUB.BOOTS then
+		dwBox = EQUIPMENT_INVENTORY.BOOTS
+	elseif item.nSub == EQUIPMENT_SUB.BANGLE then
+		dwBox = EQUIPMENT_INVENTORY.BANGLE
+	elseif item.nSub == EQUIPMENT_SUB.WAIST_EXTEND then
+		dwBox = EQUIPMENT_INVENTORY.WAIST_EXTEND
+	elseif item.nSub == EQUIPMENT_SUB.BACK_EXTEND then
+		dwBox = EQUIPMENT_INVENTORY.BACK_EXTEND
+	elseif item.nSub == EQUIPMENT_SUB.FACE_EXTEND then
+		dwBox = EQUIPMENT_SUB.FACE_EXTEND
+	elseif item.nSub == EQUIPMENT_SUB.HORSE then
+		dwPackage, dwBox = GetClientPlayer().GetEquippedHorsePos()
+	end
+	return dwPackage, dwBox, nIndex, nCount
+end
+
+-- * 当前装备是否是比身上已经装备的更好
+function LIB.IsBetterEquipment(item, dwPackage, dwBox)
+	if item.nGenre ~= ITEM_GENRE.EQUIPMENT
+	or item.nSub == EQUIPMENT_SUB.WAIST_EXTEND
+	or item.nSub == EQUIPMENT_SUB.BACK_EXTEND
+	or item.nSub == EQUIPMENT_SUB.FACE_EXTEND
+	or item.nSub == EQUIPMENT_SUB.BULLET
+	or item.nSub == EQUIPMENT_SUB.MINI_AVATAR
+	or item.nSub == EQUIPMENT_SUB.PET then
+		return false
+	end
+
+	if not dwPackage or not dwBox then
+		local nIndex, nCount = 0, 1
+		while nIndex < nCount do
+			dwPackage, dwBox, nIndex, nCount = LIB.GetItemEquipPos(item, nIndex + 1)
+			if LIB.IsBetterEquipment(item, dwPackage, dwBox) then
+				return true
+			end
+		end
+		return false
+	end
+
+	local me = GetClientPlayer()
+	local equipedItem = GetPlayerItem(me, dwPackage, dwBox)
+	if not equipedItem then
+		return false
+	end
+	if me.nLevel < me.nMaxLevel then
+		return item.nEquipScore > equipedItem.nEquipScore
+	end
+	return (item.nEquipScore > equipedItem.nEquipScore) or (item.nLevel > equipedItem.nLevel and item.nQuality >= equipedItem.nQuality)
+end
