@@ -914,7 +914,12 @@ local function IsItemDataSuitable(data)
 		else
 			return true, false
 		end
-	-- elseif data.szType == 'EQUIPMENT' or data.szType == 'WEAPON' then
+	else -- if data.szType == 'EQUIPMENT' or data.szType == 'WEAPON' then
+		local bSuit = LIB.DoesEquipmentSuit(data.item, true)
+		if bSuit then
+			return true, LIB.IsBetterEquipment(data.item)
+		end
+		return false, false
 	end
 end
 
