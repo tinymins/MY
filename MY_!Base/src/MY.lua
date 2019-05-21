@@ -758,7 +758,7 @@ function LIB.GetAddonInfo()
 	return AddonInfo
 end
 local function onPlayerEnterScene()
-	_MAX_PLAYER_LEVEL_ = max(_MAX_PLAYER_LEVEL_, GetClientPlayer().nLevel)
+	_MAX_PLAYER_LEVEL_ = max(_MAX_PLAYER_LEVEL_, GetClientPlayer().nMaxLevel)
 end
 RegisterEvent('PLAYER_ENTER_SCENE', onPlayerEnterScene)
 end
