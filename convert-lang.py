@@ -36,6 +36,24 @@ def __get_file_crc(fileName):
         prev = zlib.crc32(eachLine, prev)
     return '%X'%(prev & 0xFFFFFFFF)
 
+def __load_crc_cache(root_path):
+    crcs = {}
+    crc_file = os.path.join(root_path, '__pycache__' + os.path.sep + 'file.crc.json')
+    if os.path.isfile(crc_file):
+        with open(crc_file, 'r') as f:
+            print('Crc cache loaded: ' + crc_file)
+            crcs = json.load(f)
+    return crcs
+
+def __save_crc_cache(root_path, crcs):
+    if not os.path.exists(os.path.join(root_path, '__pycache__')):
+        os.mkdir(os.path.join(root_path, '__pycache__'))
+    crc_file = os.path.join(root_path, '__pycache__' + os.path.sep + 'file.crc.json')
+    with open(crc_file, 'w') as file:
+        print('--------------------------------')
+        file.write(json.dumps(crcs))
+        print('Crc cache saved: ' + crc_file)
+
 def __is_path_include(pkg_name, cwd, d):
     if os.path.basename(cwd).lower() == 'interface' and os.path.isfile(os.path.join(cwd, d)):
         return False
@@ -76,19 +94,11 @@ def convert_progress(argv):
     if os.path.basename(root_path).lower() != 'interface' and os.path.basename(os.path.dirname(root_path).lower()) == 'interface':
         pkg_name = os.path.basename(root_path)
         root_path = os.path.dirname(root_path)
-    # get crc cache file path
-    if not os.path.exists(os.path.join(root_path, '__pycache__')):
-        os.mkdir(os.path.join(root_path, '__pycache__'))
-    crc_file = os.path.join(root_path, '__pycache__' + os.path.sep + 'file.crc.json')
 
     print('--------------------------------')
     print('Working DIR: ' + root_path)
     print('Working PKG: ' + (pkg_name or 'ALL'))
-    crcs = {}
-    if not '--no-cache' in params and os.path.isfile(crc_file):
-        with open(crc_file, 'r') as f:
-            crcs = json.load(f)
-            print('Crc cache loaded: ' + crc_file)
+    crcs = __load_crc_cache(root_path) if not '--no-cache' in params else {}
 
     header = ''
     header_changed = False
@@ -201,10 +211,8 @@ def convert_progress(argv):
                 else:
                     print('Already up to date.')
 
-    with open(crc_file, 'w') as file:
-        print('--------------------------------')
-        file.write(json.dumps(crcs))
-        print('Crc cache saved: ' + crc_file)
+    if not '--no-cache' in params:
+        __save_crc_cache(root_path, crcs)
 
     print('--------------------------------')
     print('Process finished in %dms...' % (time.time() * 1000 - start_time))
