@@ -58,7 +58,6 @@ def convert_progress(argv):
 
     param_accept_arg = {
         "--path": True,
-        "--no-pause": True,
     }
 
     for idx, param in enumerate(argv):
@@ -86,7 +85,7 @@ def convert_progress(argv):
     print('Working DIR: ' + root_path)
     print('Working PKG: ' + (pkg_name or 'ALL'))
     crcs = {}
-    if os.path.isfile(crc_file):
+    if not '--no-cache' in params and os.path.isfile(crc_file):
         with open(crc_file, 'r') as f:
             crcs = json.load(f)
             print('Crc cache loaded: ' + crc_file)
