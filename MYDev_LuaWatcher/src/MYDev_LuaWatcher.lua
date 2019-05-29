@@ -95,6 +95,7 @@ function D.RemoveHook()
 	RUNNING = false
 	CALL_TIME = {}
 end
+LIB.RegisterReload('MYDev_LuaWatcher', D.RemoveHook)
 
 local UNIT = {
 	TIME = 'ms',
@@ -186,7 +187,6 @@ function PS.OnPanelActive(wnd)
 end
 
 function PS.OnPanelDeactive()
-	D.RemoveHook()
 	D.RemoveBreathe()
 end
 
