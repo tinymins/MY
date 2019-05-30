@@ -54,7 +54,7 @@ local function createInstance(c, ins, ...)
 end
 UI = setmetatable({}, {
 	__index = {},
-	__tostring = function(t) return 'MY_UI (class prototype)' end,
+	__tostring = function(t) return LIB.GetAddonInfo().szNameSpace .. '_UI (class prototype)' end,
 	__call = function (...)
 		local store = {}
 		return createInstance(setmetatable({}, {
@@ -75,7 +75,7 @@ UI = setmetatable({}, {
 					store[k] = v
 				end
 			end,
-			__tostring = function(t) return 'MY_UI (class instance)' end,
+			__tostring = function(t) return LIB.GetAddonInfo().szNameSpace .. '_UI (class instance)' end,
 		}), nil, ...)
 	end,
 })
@@ -1018,14 +1018,14 @@ function UI:append(arg0, arg1, arg2)
 				else
 					szFile = LIB.GetAddonInfo().szFrameworkRoot .. 'ui\\' .. szFile .. '.ini'
 				end
-				local frame = Wnd.OpenWindow(szFile, 'MY_TempWnd#' .. _nTempWndCount)
+				local frame = Wnd.OpenWindow(szFile, LIB.GetAddonInfo().szNameSpace .. '_TempWnd#' .. _nTempWndCount)
 				if not frame then
-					return LIB.Debug({ _L('unable to open ini file [%s]', szFile) }, 'MY#UI#append', DEBUG_LEVEL.ERROR)
+					return LIB.Debug({ _L('unable to open ini file [%s]', szFile) }, LIB.GetAddonInfo().szNameSpace .. '#UI#append', DEBUG_LEVEL.ERROR)
 				end
 				_nTempWndCount = _nTempWndCount + 1
 				local raw = frame:Lookup(szComponet)
 				if not raw then
-					LIB.Debug({_L('can not find wnd component [%s:%s]', szFile, szComponet)}, 'MY#UI#append', DEBUG_LEVEL.ERROR)
+					LIB.Debug({_L('can not find wnd component [%s:%s]', szFile, szComponet)}, LIB.GetAddonInfo().szNameSpace .. '#UI#append', DEBUG_LEVEL.ERROR)
 				else
 					InitComponent(raw, szType)
 					raw:ChangeRelation(parentWnd, true, true)
@@ -1036,7 +1036,7 @@ function UI:append(arg0, arg1, arg2)
 			elseif sub(szType, 1, 3) ~= 'Wnd' and parentHandle then
 				raw = parentHandle:AppendItemFromIni(_szItemINI, szType)
 				if not raw then
-					return LIB.Debug({ _L('unable to append handle item [%s]', szType) }, 'MY#UI:append', DEBUG_LEVEL.ERROR)
+					return LIB.Debug({ _L('unable to append handle item [%s]', szType) }, LIB.GetAddonInfo().szNameSpace .. '#UI:append', DEBUG_LEVEL.ERROR)
 				else
 					ui = ui:add(raw)
 				end
@@ -1147,7 +1147,7 @@ function UI:visible(bVisible)
 	elseif IsFunction(bVisible) then
 		for _, raw in ipairs(self.raws) do
 			raw = GetComponentElement(raw, 'CHECKBOX') or GetComponentElement(raw, 'MAIN_WINDOW') or raw
-			LIB.BreatheCall('MY_UI_VISIBLE_CHECK#' .. tostring(raw), function()
+			LIB.BreatheCall(LIB.GetAddonInfo().szNameSpace .. '_UI_VISIBLE_CHECK#' .. tostring(raw), function()
 				if IsElement(raw) then
 					raw:SetVisible(bVisible())
 				else
@@ -1228,7 +1228,7 @@ function UI:enable(...)
 		for _, raw in ipairs(self.raws) do
 			raw = GetComponentElement(raw, 'CHECKBOX') or GetComponentElement(raw, 'MAIN_WINDOW') or raw
 			if IsFunction(bEnable) then
-				LIB.BreatheCall('MY_UI_ENABLE_CHECK#' .. tostring(raw), function()
+				LIB.BreatheCall(LIB.GetAddonInfo().szNameSpace .. '_UI_ENABLE_CHECK#' .. tostring(raw), function()
 					if IsElement(raw) then
 						SetComponentEnable(raw, bEnable())
 					else
@@ -1882,7 +1882,7 @@ function UI:fadeTo(nTime, nOpacity, callback)
 			if not ui:visible() then
 				ui:alpha(0):toggle(true)
 			end
-			LIB.BreatheCall('MY_FADE_' .. tostring(ui[1]), function()
+			LIB.BreatheCall(LIB.GetAddonInfo().szNameSpace .. '_FADE_' .. tostring(ui[1]), function()
 				ui:show()
 				local nCurrentAlpha = fnCurrent(nStartAlpha, nOpacity, nTime, GetTime() - nStartTime)
 				ui:alpha(nCurrentAlpha)
@@ -2934,7 +2934,7 @@ function UI:itemInfo(...)
 				end
 				local res, err, trace = XpCall(UpdataItemInfoBoxObject, raw, unpack(data)) -- 防止itemtab不一样
 				if not res then
-					FireUIEvent('CALL_LUA_ERROR', err .. '\nMY#UI:itemInfo\n' .. trace .. '\n')
+					FireUIEvent('CALL_LUA_ERROR', err .. '\n' .. LIB.GetAddonInfo().szNameSpace .. '#UI:itemInfo\n' .. trace .. '\n')
 				end
 			end
 		end
@@ -2953,7 +2953,7 @@ function UI:boxInfo(nType, ...)
 			else
 				local res, err, trace = XpCall(UpdateBoxObject, raw, nType, ...) -- 防止itemtab内外网不一样
 				if not res then
-					FireUIEvent('CALL_LUA_ERROR', err .. '\nMY#UI:boxInfo\n' .. trace .. '\n')
+					FireUIEvent('CALL_LUA_ERROR', err .. '\n' .. LIB.GetAddonInfo().szNameSpace .. '#UI:boxInfo\n' .. trace .. '\n')
 				end
 			end
 		end
@@ -4039,7 +4039,7 @@ function  UI.CreateFrame(szName, opt)
 				if frm.OnDragResize then
 					local res, err, trace = XpCall(frm.OnDragResize, frm:Lookup('Wnd_Total'))
 					if not res then
-						FireUIEvent('CALL_LUA_ERROR', err .. '\nMY#OnDragResize\n' .. trace .. '\n')
+						FireUIEvent('CALL_LUA_ERROR', err .. '\n' .. LIB.GetAddonInfo().szNameSpace .. '#OnDragResize\n' .. trace .. '\n')
 					end
 				end
 			end
@@ -4069,7 +4069,7 @@ function UI.OpenColorPicker(callback, t)
 	if t then
 		return OpenColorTablePanel(callback,nil,nil,t)
 	end
-	local ui = UI.CreateFrame('_MY_ColorTable', { simple = true, close = true, esc = true })
+	local ui = UI.CreateFrame(LIB.GetAddonInfo().szNameSpace .. '_ColorTable', { simple = true, close = true, esc = true })
 	  :size(900, 500):text(_L['color picker']):anchor({s='CENTER', r='CENTER', x=0, y=0})
 	local fnHover = function(bHover, r, g, b)
 		if bHover then
@@ -4202,7 +4202,7 @@ function UI.OpenColorPickerEx(fnAction)
 		return floor(r * 255), floor(g * 255), floor(b * 255)
 	end
 
-	local wnd = UI.CreateFrame('MY_ColorPickerEx', { w = 346, h = 430, text = _L['color picker ex'], simple = true, close = true, esc = true, x = fX + 15, y = fY + 15 }, true)
+	local wnd = UI.CreateFrame(LIB.GetAddonInfo().szNameSpace .. '_ColorPickerEx', { w = 346, h = 430, text = _L['color picker ex'], simple = true, close = true, esc = true, x = fX + 15, y = fY + 15 }, true)
 	local fnHover = function(bHover, r, g, b)
 		if bHover then
 			wnd:children('#Select'):color(r, g, b)
@@ -4264,7 +4264,7 @@ end
 
 -- 打开字体选择
 function UI.OpenFontPicker(callback, t)
-	local ui, i = UI.CreateFrame('MY_Font_Picker', { simple = true, close = true, esc = true, text = _L['Font picker'] }), 0
+	local ui, i = UI.CreateFrame(LIB.GetAddonInfo().szNameSpace .. '_Font_Picker', { simple = true, close = true, esc = true, text = _L['Font picker'] }), 0
 	while 1 do
 		local font = i
 		local txt = ui:append('Text', {
@@ -4351,7 +4351,7 @@ function UI.OpenIconPanel(fnAction)
 		MAX_ICON = MAX_ICON or 10000
 	end
 	local nMaxIcon, boxs, txts = MAX_ICON, {}, {}
-	local ui = UI.CreateFrame('MY_IconPanel', { w = 920, h = 650, text = _L['Icon Picker'], simple = true, close = true, esc = true })
+	local ui = UI.CreateFrame(LIB.GetAddonInfo().szNameSpace .. '_IconPanel', { w = 920, h = 650, text = _L['Icon Picker'], simple = true, close = true, esc = true })
 	local function GetPage(nPage, bInit)
 		if nPage == ICON_PAGE and not bInit then
 			return
@@ -4420,7 +4420,7 @@ end
 -- 打开文本编辑器
 function UI.OpenTextEditor(szText, szFrameName)
 	if not szFrameName then
-		szFrameName = 'MY_DefaultTextEditor'
+		szFrameName = LIB.GetAddonInfo().szNameSpace .. '_DefaultTextEditor'
 	end
 	local w, h, ui = 400, 300
 	local function OnResize()
