@@ -183,13 +183,13 @@ end
 -- 官方这代码太垃圾到处报错 = =|| 加个pcall了只能 mmp
 local _GVoiceBase_IsMemberForbid = GVoiceBase_IsMemberForbid
 local function GVoiceBase_IsMemberForbid(...)
-	local status, res = pcall(_GVoiceBase_IsMemberForbid, ...)
+	local status, res = Call(_GVoiceBase_IsMemberForbid, ...)
 	return status and res
 end
 
 local _GVoiceBase_IsMemberSaying = GVoiceBase_IsMemberSaying
 local function GVoiceBase_IsMemberSaying(...)
-	local status, res = pcall(_GVoiceBase_IsMemberSaying, ...)
+	local status, res = Call(_GVoiceBase_IsMemberSaying, ...)
 	return status and res
 end
 

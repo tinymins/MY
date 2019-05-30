@@ -371,9 +371,9 @@ function LIB.SwitchTab(szID, bForceUpdate)
 	local scroll = frame:Lookup('Wnd_Total/WndScroll_MainPanel/ScrollBar_MainPanel')
 	-- fire custom registered on switch event
 	if wnd.OnPanelDeactive then
-		local res, err = pcall(wnd.OnPanelDeactive, wnd)
+		local res, err, trace = XpCall(wnd.OnPanelDeactive, wnd)
 		if not res then
-			LIB.Debug({GetTraceback(err)}, 'MY#OnPanelDeactive', DEBUG_LEVEL.ERROR)
+			FireUIEvent('CALL_LUA_ERROR', err .. '\nMY#OnPanelDeactive\n' .. trace .. '\n')
 		end
 	end
 	-- clear all events
@@ -553,9 +553,9 @@ function LIB.SwitchTab(szID, bForceUpdate)
 		wnd:FormatAllContentPos()
 	else
 		if tab.fn.OnPanelActive then
-			local res, err = pcall(tab.fn.OnPanelActive, wnd)
+			local res, err, trace = XpCall(tab.fn.OnPanelActive, wnd)
 			if not res then
-				LIB.Debug({GetTraceback(err)}, 'MY#OnPanelActive', DEBUG_LEVEL.ERROR)
+				FireUIEvent('CALL_LUA_ERROR', err .. '\nMY#OnPanelActive\n' .. trace .. '\n')
 			end
 			wnd:FormatAllContentPos()
 		end
@@ -695,23 +695,23 @@ local function OnSizeChanged()
 	wnd:Lookup('WndScroll_MainPanel/WndContainer_MainPanel', ''):SetSize(nWidth - 201, nHeight - 100)
 	local hWndMainPanel = frame:Lookup('Wnd_Total/WndScroll_MainPanel/WndContainer_MainPanel')
 	if hWndMainPanel.OnPanelResize then
-		local res, err = pcall(hWndMainPanel.OnPanelResize, hWndMainPanel)
+		local res, err, trace = XpCall(hWndMainPanel.OnPanelResize, hWndMainPanel)
 		if not res then
-			LIB.Debug({GetTraceback(err)}, 'MY#OnPanelResize', DEBUG_LEVEL.ERROR)
+			FireUIEvent('CALL_LUA_ERROR', err .. '\nMY#OnPanelResize\n' .. trace .. '\n')
 		end
 		hWndMainPanel:FormatAllContentPos()
 	elseif hWndMainPanel.OnPanelActive then
 		if hWndMainPanel.OnPanelDeactive then
-			local res, err = pcall(hWndMainPanel.OnPanelDeactive, hWndMainPanel)
+			local res, err, trace = XpCall(hWndMainPanel.OnPanelDeactive, hWndMainPanel)
 			if not res then
-				LIB.Debug({GetTraceback(err)}, 'MY#OnPanelResize->OnPanelDeactive', DEBUG_LEVEL.ERROR)
+				FireUIEvent('CALL_LUA_ERROR', err .. '\nMY#OnPanelResize->OnPanelDeactive\n' .. trace .. '\n')
 			end
 		end
 		hWndMainPanel:Clear()
 		hWndMainPanel:Lookup('', ''):Clear()
-		local res, err = pcall(hWndMainPanel.OnPanelActive, hWndMainPanel)
+		local res, err, trace = XpCall(hWndMainPanel.OnPanelActive, hWndMainPanel)
 		if not res then
-			LIB.Debug({GetTraceback(err)}, 'MY#OnPanelResize->OnPanelActive', DEBUG_LEVEL.ERROR)
+			FireUIEvent('CALL_LUA_ERROR', err .. '\nMY#OnPanelResize->OnPanelActive\n' .. trace .. '\n')
 		end
 		hWndMainPanel:FormatAllContentPos()
 	end

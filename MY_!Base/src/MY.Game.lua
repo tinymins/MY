@@ -285,7 +285,7 @@ function LIB.GetTargetContextMenu(dwType, szName, dwID)
 		--     end,
 		-- })
 		-- √‹¡ƒ ∫√”— —˚«Î»Î∞Ô ∏˙ÀÊ
-		pcall(InsertPlayerCommonMenu, t, dwID, szName)
+		Call(InsertPlayerCommonMenu, t, dwID, szName)
 		-- insert invite team
 		if szName and InsertInviteTeamMenu then
 			InsertInviteTeamMenu(t, szName)
@@ -1887,9 +1887,9 @@ local function WithTargetHandle()
 	local r = table.remove(WITH_TARGET_LIST, 1)
 
 	LIB.SetTempTarget(r.dwType, r.dwID)
-	local status, err = pcall(r.callback)
-	if not status then
-		LIB.Debug({GetTraceback(err)}, LIB.GetAddonInfo().szNameSpace .. '#WithTarget', DEBUG_LEVEL.ERROR)
+	local res, err, trace = XpCall(r.callback)
+	if not res then
+		FireUIEvent('CALL_LUA_ERROR', err .. '\n' .. LIB.GetAddonInfo().szNameSpace .. '#WithTarget' .. '\n' .. trace .. '\n')
 	end
 	LIB.ResumeTarget()
 

@@ -142,7 +142,7 @@ LIB.RegisterPanel(
 					)
 				) then
 					if loadstring then
-						local t = {select(2, pcall(loadstring('return ' .. szKey)))}
+						local t = {select(2, XpCall(loadstring('return ' .. szKey)))}
 						for k, v in pairs(t) do
 							t[k] = tostring(v)
 						end

@@ -1217,9 +1217,9 @@ local function AfterChatAppendItemFromString(h, ...)
 	end
 	if nStart >= 0 and nStart < nCount then
 		for szKey, fnAction in pairs(CHAT_HOOK.AFTER) do
-			local status = pcall(fnAction, h, nStart, ...)
-			if not status then
-				LIB.Debug({msg}, 'HookChatPanel.AFTER#' .. szKey, DEBUG_LEVEL.ERROR)
+			local res, err, trace = XpCall(fnAction, h, nStart, ...)
+			if not res then
+				FireUIEvent('CALL_LUA_ERROR', err .. '\nHookChatPanel.AFTER: ' .. szKey .. '\n' .. trace .. '\n')
 			end
 		end
 	end

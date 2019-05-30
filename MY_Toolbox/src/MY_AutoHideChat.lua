@@ -63,7 +63,7 @@ MY_AutoHideChat.ShowChatPanel = function(nShowFrame, nDelayFrame, callback)
     if m_nState == STATE.SHOW then
         -- return when chat panel is visible
         if callback then
-            pcall(callback)
+            Call(callback)
         end
         return
     elseif m_nState == STATE.SHOWING then
@@ -107,7 +107,7 @@ MY_AutoHideChat.ShowChatPanel = function(nShowFrame, nDelayFrame, callback)
         if nAlpha == 255 then
             m_nState = STATE.SHOW
             if callback then
-                pcall(callback)
+                Call(callback)
             end
             return 0
         end
@@ -127,7 +127,7 @@ MY_AutoHideChat.HideChatPanel = function(nHideFrame, nDelayFrame, callback)
     elseif m_nState == STATE.HIDE then
         -- return when chat panel is not visible
         if callback then
-            pcall(callback)
+            Call(callback)
         end
         return
     elseif m_nState == STATE.HIDDING then
@@ -177,7 +177,7 @@ MY_AutoHideChat.HideChatPanel = function(nHideFrame, nDelayFrame, callback)
         if nAlpha == 0 then
             m_nState = STATE.HIDE
             if callback then
-                pcall(callback)
+                Call(callback)
             end
             return 0
         end

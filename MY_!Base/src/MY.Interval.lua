@@ -82,9 +82,9 @@ local function onDelayCall()
 	-- traverse dc calls
 	for szKey, dc in pairs(_delaycalls) do
 		if dc.nNext <= _time then
-			local res, err = pcall(dc.fnAction, dc.oArg)
+			local res, err, trace = XpCall(dc.fnAction, dc.oArg)
 			if not res then
-				LIB.Debug({GetTraceback(err)}, 'onDelayCall#' .. szKey, DEBUG_LEVEL.ERROR)
+				FireUIEvent('CALL_LUA_ERROR', err .. '\nonDelayCall: ' .. szKey .. '\n' .. trace .. '\n')
 			end
 			_count = _count - 1
 			_delaycall_t = _tDelayCall[szKey]
@@ -183,9 +183,9 @@ local function onBreatheCall()
 	for szKey, bc in pairs(_breathecalls) do
 		if bc.nNext <= _time then
 			bc.nNext = _time + bc.nInterval
-			local res, err = pcall(bc.fnAction, bc.oArg)
+			local res, err, trace = XpCall(bc.fnAction, bc.oArg)
 			if not res then
-				LIB.Debug({GetTraceback(err)}, 'onBreatheCall#' .. szKey, DEBUG_LEVEL.ERROR)
+				FireUIEvent('CALL_LUA_ERROR', err .. '\nonBreatheCall: ' .. szKey .. '\n' .. trace .. '\n')
 			elseif err == 0 then
 				_count = _count - 1
 				_breathecall_t = _tBreatheCall[szKey]
@@ -288,9 +288,9 @@ local function onFrameCall()
 	for szKey, fc in pairs(_framecalls) do
 		if fc.nNext <= _framecount then
 			fc.nNext = _framecount + fc.nInterval
-			local res, err = pcall(fc.fnAction, fc.oArg)
+			local res, err, trace = XpCall(fc.fnAction, fc.oArg)
 			if not res then
-				LIB.Debug({GetTraceback(err)}, 'onFrameCall#' .. szKey, DEBUG_LEVEL.ERROR)
+				FireUIEvent('CALL_LUA_ERROR', err .. '\nonFrameCall: ' .. szKey .. '\n' .. trace .. '\n')
 			elseif err == 0 then
 				_count = _count - 1
 				_framecall_t = _tFrameCall[szKey]
@@ -394,9 +394,9 @@ local function onRenderCall()
 	for szKey, rc in pairs(_rendercalls) do
 		if rc.nNext <= _time then
 			rc.nNext = _time + rc.nInterval
-			local res, err = pcall(rc.fnAction, rc.oArg)
+			local res, err, trace = XpCall(rc.fnAction, rc.oArg)
 			if not res then
-				LIB.Debug({GetTraceback(err)}, 'onRenderCall#' .. szKey, DEBUG_LEVEL.ERROR)
+				FireUIEvent('CALL_LUA_ERROR', err .. '\nonRenderCall: ' .. szKey .. '\n' .. trace .. '\n')
 			elseif err == 0 then
 				_rendercall_c = _rendercall_c - 1
 				_rendercall_t = _tRenderCall[szKey]

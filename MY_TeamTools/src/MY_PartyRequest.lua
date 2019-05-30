@@ -310,11 +310,11 @@ function D.OnMessageBoxOpen()
 		-- 获取组队方法
 		PR_PARTY_REACT[szName] = {
 			fnAccept = function()
-				pcall(fnAccept)
+				Call(fnAccept)
 				PR_PARTY_REACT[szName] = nil
 			end,
 			fnRefuse = function()
-				pcall(fnRefuse)
+				Call(fnRefuse)
 				PR_PARTY_REACT[szName] = nil
 			end,
 		}

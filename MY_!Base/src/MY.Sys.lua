@@ -1027,9 +1027,9 @@ local function OnInit()
 		OnStorageChange(szKey)
 	end
 	for szKey, fnAction in pairs(INIT_FUNC_LIST) do
-		local status, err = pcall(fnAction)
-		if not status then
-			LIB.Debug({GetTraceback(err)}, 'STORAGE_INIT_FUNC_LIST#' .. szKey)
+		local res, err, trace = XpCall(fnAction)
+		if not res then
+			FireUIEvent('CALL_LUA_ERROR', err .. '\nINIT_FUNC_LIST: ' .. szKey .. '\n' .. trace .. '\n')
 		end
 	end
 	INIT_FUNC_LIST = {}

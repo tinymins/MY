@@ -1889,7 +1889,7 @@ function UI:fadeTo(nTime, nOpacity, callback)
 				-- LIB.Debug(format('%d %d %d %d\n', nStartAlpha, nOpacity, nCurrentAlpha, (nStartAlpha - nCurrentAlpha)*(nCurrentAlpha - nOpacity)), 'fade', DEBUG_LEVEL.LOG)
 				if (nStartAlpha - nCurrentAlpha)*(nCurrentAlpha - nOpacity) <= 0 then
 					ui:alpha(nOpacity)
-					pcall(callback, ui)
+					Call(callback, ui)
 					return 0
 				end
 			end)
@@ -1920,7 +1920,7 @@ function UI:fadeOut(nTime, callback)
 	end
 	self:fadeTo(nTime, 0, function(ui)
 		ui:toggle(false)
-		pcall(callback, ui)
+		Call(callback, ui)
 	end)
 	return self
 end
@@ -1946,7 +1946,7 @@ function UI:slideTo(nTime, nHeight, callback)
 				-- LIB.Debug(format('%d %d %d %d\n', nStartValue, nHeight, nCurrentValue, (nStartValue - nCurrentValue)*(nCurrentValue - nHeight)), 'slide', DEBUG_LEVEL.LOG)
 				if (nStartValue - nCurrentValue)*(nCurrentValue - nHeight) <= 0 then
 					ui:height(nHeight):toggle( nHeight ~= 0 )
-					pcall(callback)
+					Call(callback)
 					return 0
 				end
 			end)
@@ -2932,9 +2932,9 @@ function UI:itemInfo(...)
 				if KItemInfo.nGenre == ITEM_GENRE.BOOK and #data == 4 then -- 西山居BUG
 					table.insert(data, 4, 99999)
 				end
-				local res, err = pcall(UpdataItemInfoBoxObject, raw, unpack(data)) -- 防止itemtab不一样
+				local res, err, trace = XpCall(UpdataItemInfoBoxObject, raw, unpack(data)) -- 防止itemtab不一样
 				if not res then
-					LIB.Debug({ GetTraceback(err) }, 'MY#UI:itemInfo', DEBUG_LEVEL.ERROR)
+					FireUIEvent('CALL_LUA_ERROR', err .. '\nMY#UI:itemInfo\n' .. trace .. '\n')
 				end
 			end
 		end
@@ -2951,9 +2951,9 @@ function UI:boxInfo(nType, ...)
 			if IsEmpty({ ... }) then
 				UpdataItemBoxObject(raw)
 			else
-				local res, err = pcall(UpdateBoxObject, raw, nType, ...) -- 防止itemtab内外网不一样
+				local res, err, trace = XpCall(UpdateBoxObject, raw, nType, ...) -- 防止itemtab内外网不一样
 				if not res then
-					LIB.Debug({ GetTraceback(err) }, 'MY#UI:boxInfo', DEBUG_LEVEL.ERROR)
+					FireUIEvent('CALL_LUA_ERROR', err .. '\nMY#UI:boxInfo\n' .. trace .. '\n')
 				end
 			end
 		end
@@ -3473,8 +3473,8 @@ function UI:click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 			for _, raw in ipairs(self.raws) do
 				local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
 				local itm = GetComponentElement(raw, 'ITEM')
-				if wnd then local _this = this this = wnd pcall(wnd.OnLButtonClick) this = _this end
-				if itm then local _this = this this = itm pcall(itm.OnItemLButtonClick) this = _this end
+				if wnd then local _this = this this = wnd Call(wnd.OnLButtonClick) this = _this end
+				if itm then local _this = this this = itm Call(itm.OnItemLButtonClick) this = _this end
 			end
 		elseif nFlag==MY_MOUSE_EVENT.MBUTTON then
 
@@ -3482,8 +3482,8 @@ function UI:click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 			for _, raw in ipairs(self.raws) do
 				local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
 				local itm = GetComponentElement(raw, 'ITEM')
-				if wnd then local _this = this this = wnd pcall(wnd.OnRButtonClick) this = _this end
-				if itm then local _this = this this = itm pcall(itm.OnItemRButtonClick) this = _this end
+				if wnd then local _this = this this = wnd Call(wnd.OnRButtonClick) this = _this end
+				if itm then local _this = this this = itm Call(itm.OnItemRButtonClick) this = _this end
 			end
 		end
 	end
@@ -3675,14 +3675,14 @@ function UI:change(fnOnChange)
 			if edt then
 				local _this = this
 				this = edt
-				pcall(edt.OnEditChanged, raw)
+				Call(edt.OnEditChanged, raw)
 				this = _this
 			end
 			if GetComponentType(raw) == 'WndSliderBox' then
 				local sld = GetComponentElement(raw, 'SLIDER')
 				local _this = this
 				this = sld
-				pcall(sld.OnScrollBarPosChanged, raw)
+				Call(sld.OnScrollBarPosChanged, raw)
 				this = _this
 			end
 		end
@@ -3710,7 +3710,7 @@ function UI:focus(fnOnSetFocus)
 		for _, raw in ipairs(self.raws) do
 			raw = GetComponentElement(raw, 'EDIT')
 			if raw then
-				UI(raw):uievent('OnSetFocus', function() pcall(fnOnSetFocus, self) end)
+				UI(raw):uievent('OnSetFocus', function() Call(fnOnSetFocus, self) end)
 			end
 		end
 		return self
@@ -3892,7 +3892,7 @@ function  UI.CreateFrame(szName, opt)
 			return true
 		end, function()
 			if frm.OnCloseButtonClick then
-				local status, res = pcall(frm.OnCloseButtonClick)
+				local status, res = Call(frm.OnCloseButtonClick)
 				if status and res then
 					return
 				end
@@ -4037,9 +4037,9 @@ function  UI.CreateFrame(szName, opt)
 				h = math.max(h + 16, opt.minheight)
 				UI(frm):size(w, h)
 				if frm.OnDragResize then
-					local status, res = pcall(frm.OnDragResize, frm:Lookup('Wnd_Total'))
-					if status and res then
-						return
+					local res, err, trace = XpCall(frm.OnDragResize, frm:Lookup('Wnd_Total'))
+					if not res then
+						FireUIEvent('CALL_LUA_ERROR', err .. '\nMY#OnDragResize\n' .. trace .. '\n')
 					end
 				end
 			end
