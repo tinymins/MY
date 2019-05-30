@@ -725,6 +725,23 @@ local function GetTraceback(str)
 	return str or ''
 end
 -----------------------------------------------
+-- 安全调用
+-----------------------------------------------
+local XpCall
+do
+local xpAction, xpArgs
+local function xpCallHandler()
+	return xpAction(unpack(xpArgs))
+end
+local function xpErrorHandler(errMsg)
+	FireUIEvent("CALL_LUA_ERROR", GetTraceback(errMsg) .. '\n')
+end
+function XpCall(arg0, ...)
+	xpAction, xpArgs = arg0, {...}
+	return xpcall(xpCallHandler, xpErrorHandler)
+end
+end
+-----------------------------------------------
 -- 枚举
 -----------------------------------------------
 local DEBUG_LEVEL = SetmetaReadonly({
@@ -748,7 +765,6 @@ local XML_LINE_BREAKER = GetFormatText('\n')
 local LIB = {
 	clone        = clone       ,
 	FullClone    = FullClone   ,
-	empty        = empty       ,
 	var2str      = var2str     ,
 	str2var      = str2var     ,
 	ipairs_r     = ipairs_r    ,
@@ -767,6 +783,7 @@ local LIB = {
 	IsString     = IsString    ,
 	IsTable      = IsTable     ,
 	IsFunction   = IsFunction  ,
+	XpCall       = XpCall      ,
 	Set          = Set         ,
 	Get          = Get         ,
 	GetPatch     = GetPatch    ,
