@@ -727,18 +727,40 @@ end
 -----------------------------------------------
 -- 安全调用
 -----------------------------------------------
-local XpCall
+local Call, XpCall
 do
-local xpAction, xpArgs
-local function xpCallHandler()
+local xpAction, xpArgs, xpErrMsg, xpTraceback
+local function CallHandler()
 	return xpAction(unpack(xpArgs))
 end
-local function xpErrorHandler(errMsg)
+local function CallErrorHandler(errMsg)
+	xpErrMsg = errMsg
+	xpTraceback = GetTraceback()
 	FireUIEvent("CALL_LUA_ERROR", GetTraceback(errMsg) .. '\n')
 end
+local function XpCallErrorHandler(errMsg)
+	xpErrMsg = errMsg
+	xpTraceback = GetTraceback()
+end
+function Call(arg0, ...)
+	xpAction, xpArgs, xpErrMsg, xpTraceback = arg0, {...}
+	local res = {xpcall(CallHandler, ErrorHandler)}
+	if not res[1] then
+		res[2] = xpErrMsg
+		res[3] = xpTraceback
+	end
+	xpAction, xpArgs, xpErrMsg, xpTraceback = nil
+	return unpack(res)
+end
 function XpCall(arg0, ...)
-	xpAction, xpArgs = arg0, {...}
-	return xpcall(xpCallHandler, xpErrorHandler)
+	xpAction, xpArgs, xpErrMsg, xpTraceback = arg0, {...}
+	local res = {xpcall(CallHandler, XpCallErrorHandler)}
+	if not res[1] then
+		res[2] = xpErrMsg
+		res[3] = xpTraceback
+	end
+	xpAction, xpArgs, xpErrMsg, xpTraceback = nil
+	return unpack(res)
 end
 end
 -----------------------------------------------
@@ -783,6 +805,7 @@ local LIB = {
 	IsString     = IsString    ,
 	IsTable      = IsTable     ,
 	IsFunction   = IsFunction  ,
+	Call         = Call        ,
 	XpCall       = XpCall      ,
 	Set          = Set         ,
 	Get          = Get         ,
