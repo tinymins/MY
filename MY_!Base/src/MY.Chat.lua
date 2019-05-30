@@ -29,7 +29,7 @@ local LIB = MY
 local UI, DEBUG_LEVEL, PATH_TYPE = LIB.UI, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
 local var2str, str2var, ipairs_r = LIB.var2str, LIB.str2var, LIB.ipairs_r
 local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local GetTraceback, XpCall = LIB.GetTraceback, LIB.XpCall
+local GetTraceback, Call, XpCall = LIB.GetTraceback, LIB.Call, LIB.XpCall
 local Get, Set, RandomChild = LIB.Get, LIB.Set, LIB.RandomChild
 local GetPatch, ApplyPatch, clone, FullClone = LIB.GetPatch, LIB.ApplyPatch, LIB.clone, LIB.FullClone
 local IsArray, IsDictionary, IsEquals = LIB.IsArray, LIB.IsDictionary, LIB.IsEquals
@@ -1180,19 +1180,19 @@ end
 local l_hPrevItem
 local function BeforeChatAppendItemFromString(h, szMsg, ...) -- h, szMsg, szChannel, dwTime, nR, nG, nB, ...
 	for szKey, fnAction in pairs(CHAT_HOOK.FILTER) do
-		local status, invalid = pcall(fnAction, h, szMsg, ...)
+		local status, invalid = XpCall(fnAction, h, szMsg, ...)
 		if status then
 			if not invalid then
 				return h, '', ...
 			end
 		else
-			LIB.Debug({msg}, 'HookChatPanel.FILTER#' .. szKey, DEBUG_LEVEL.ERROR)
+			LIB.Debug('HookChatPanel.FILTER#' .. szKey, 'ERROR', DEBUG_LEVEL.ERROR)
 		end
 	end
 	for szKey, fnAction in pairs(CHAT_HOOK.BEFORE) do
-		local status = pcall(fnAction, h, szMsg, ...)
+		local status = XpCall(fnAction, h, szMsg, ...)
 		if not status then
-			LIB.Debug({msg}, 'HookChatPanel.BEFORE#' .. szKey, DEBUG_LEVEL.ERROR)
+			LIB.Debug('HookChatPanel.BEFORE#' .. szKey, 'ERROR', DEBUG_LEVEL.ERROR)
 		end
 	end
 	local nCount = h:GetItemCount()
