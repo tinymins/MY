@@ -126,30 +126,19 @@ local function CommonEventRegister(E, szID, fnAction)
 	return szKey
 end
 
-local CommonEventFirer
-do
-local xpName, xpKey, xpAction, xpArgs
-local function xpCallHandler()
-	return xpAction(unpack(xpArgs))
-end
-local function xpErrorHandler(errMsg)
-	FireUIEvent("CALL_LUA_ERROR", GetTraceback(errMsg .. '\nOn' .. xpName .. ': ' .. xpKey) .. '\n')
-end
-function xpCall(arg0, arg1, arg2, ...)
-	xpName, xpKey, xpAction, xpArgs = arg0, arg1, arg2, {...}
-	return xpcall(xpCallHandler, xpErrorHandler)
-end
-function CommonEventFirer(E, arg0, ...)
+local function CommonEventFirer(E, arg0, ...)
 	local szEvent = E.bSingleEvent and 'SINGLE_EVENT' or arg0
 	if not E.tList or not szEvent then
 		return
 	end
-	for szKey, p in spairs(E.tList[szEvent], E.tList['*']) do
+	for _, p in spairs(E.tList[szEvent], E.tList['*']) do
 		local nStartTick = GetTickCount()
-		local res = xpCall(E.szName, p.szID, p.fnAction, arg0, ...)
-		LIB.Debug({_L('%s function <%s> %s in %dms.', E.szName, szKey, res and _L['succeed'] or _L['failed'], GetTickCount() - nStartTick)}, _L['PMTool'], DEBUG_LEVEL.LOG)
+		local res, err, trace = XpCall(p.fnAction, arg0, ...)
+		if not res then
+			FireUIEvent('CALL_LUA_ERROR', err .. '\nOn' .. E.szName .. ': ' .. p.szID .. '\n' .. trace .. '\n')
+		end
+		LIB.Debug({_L('%s function <%s> %s in %dms.', E.szName, p.szID, res and _L['succeed'] or _L['failed'], GetTickCount() - nStartTick)}, _L['PMTool'], DEBUG_LEVEL.LOG)
 	end
-end
 end
 
 ---------------------------------------------------------------------------------------------
