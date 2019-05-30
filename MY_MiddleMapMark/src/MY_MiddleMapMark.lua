@@ -119,7 +119,7 @@ local l_doodad = {}
 local l_tempMap = false
 local MAX_RENDER_INTERVAL = GLOBAL.GAME_FPS * 5
 local function PushDB()
-	if empty(l_npc) and empty(l_doodad) then
+	if IsEmpty(l_npc) and IsEmpty(l_doodad) then
 		return
 	end
 	DB:Execute('BEGIN TRANSACTION')

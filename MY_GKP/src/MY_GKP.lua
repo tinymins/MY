@@ -1378,7 +1378,7 @@ function _GKP.RecoveryMenu()
 				'GKP File(*.gkp,*.gkp.jx3dat)\0*.gkp;*.gkp.jx3dat\0All Files(*.*)\0*.*\0\0',
 				LIB.FormatPath({'userdata/gkp', PATH_TYPE.ROLE})
 			)
-			if not empty(file) then
+			if not IsEmpty(file) then
 				LIB.Confirm(_L['Are you sure to cover the current information with the last record data?'], function()
 					_GKP.LoadData(file, true)
 					LIB.Alert(_L['Reocrd Recovered.'])

@@ -169,7 +169,7 @@ function PushDB()
 	end
 
 	-- °ï»á²Ö¿â
-	if not empty(l_guildcache) then
+	if not IsEmpty(l_guildcache) then
 		local ownerkey = 'tong' .. me.dwTongID
 		local ownername = AnsiToUTF8('[' .. LIB.GetTongName(me.dwTongID) .. ']')
 		for _, info in pairs(l_guildcache) do

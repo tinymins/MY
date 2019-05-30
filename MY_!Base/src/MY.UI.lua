@@ -946,7 +946,7 @@ local function OnCommonComponentMouseEnter()
 	end
 
 	local szText = hText:GetText()
-	if empty(szText) then
+	if IsEmpty(szText) then
 		return
 	end
 
@@ -3593,7 +3593,7 @@ function UI:tip(tip, nPosType, tOffset, bNoEncode)
 		if IsFunction(szTip) then
 			szTip = szTip(self)
 		end
-		if empty(szTip) then
+		if IsEmpty(szTip) then
 			return
 		end
 		if not bNoEncode then

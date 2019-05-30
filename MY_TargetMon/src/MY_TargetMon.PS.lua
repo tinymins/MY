@@ -486,7 +486,7 @@ local function DrawDetail(ui)
 		end
 		insert(t1, t2)
 		-- ID…Ë÷√
-		if not empty(mon.ids) then
+		if not IsEmpty(mon.ids) then
 			insert(t1, { bDevide = true })
 			insert(t1, { szOption = _L['Ids'], bDisable = true })
 			insert(t1, {
@@ -534,7 +534,7 @@ local function DrawDetail(ui)
 						Wnd.CloseWindow('PopupMenuPanel')
 					end,
 				}
-				if not empty(info.levels) then
+				if not IsEmpty(info.levels) then
 					insert(t2, { szOption = _L['Levels'], bDisable = true })
 					insert(t2, MENU_DIVIDER)
 					insert(t2, {

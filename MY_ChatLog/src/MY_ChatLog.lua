@@ -134,14 +134,14 @@ function InsertMsg(channel, text, msg, talker, time)
 	text   = AnsiToUTF8(text or '') or ''
 	hash   = GetStringCRC(msg)
 	talker = talker and AnsiToUTF8(talker or '') or ''
-	if not channel or not time or empty(msg) or not text or empty(hash) then
+	if not channel or not time or IsEmpty(msg) or not text or IsEmpty(hash) then
 		return
 	end
 	insert(aInsQueue, {hash = hash, channel = channel, time = time, talker = talker, text = text, msg = msg})
 end
 
 function DeleteMsg(hash, time)
-	if not time or empty(hash) then
+	if not time or IsEmpty(hash) then
 		return
 	end
 	table.insert(aDelQueue, {hash, time})
@@ -1375,7 +1375,7 @@ function PS.OnPanelActive(wnd)
 		text = _L['import chatlog'],
 		onclick = function()
 			local file = GetOpenFileName(_L['Please select your chatlog database file.'], 'Database File(*.db)\0*.db\0All Files(*.*)\0*.*\0\0', LIB.FormatPath({'userdata/', PATH_TYPE.ROLE}))
-			if not empty(file) then
+			if not IsEmpty(file) then
 				LIB.Confirm(_L['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'], function()
 						LIB.Alert(_L('%d chatlogs imported!', ImportDB(file)))
 				end)

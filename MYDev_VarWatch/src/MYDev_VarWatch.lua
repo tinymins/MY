@@ -65,7 +65,7 @@ local function var2str_x(var, indent, level) -- 只解析一层table且不解析方法
 			local s_tab_equ = ']='
 			if indent then
 				s_tab_equ = '] = '
-				if not empty(var) then
+				if not IsEmpty(var) then
 					tinsert(t, '\n')
 				end
 			end
@@ -82,7 +82,7 @@ local function var2str_x(var, indent, level) -- 只解析一层table且不解析方法
 					tinsert(t, '\n')
 				end
 			end
-			if indent and not empty(var) then
+			if indent and not IsEmpty(var) then
 				tinsert(t, srep(indent, level))
 			end
 			tinsert(t, '}')
@@ -133,7 +133,7 @@ LIB.RegisterPanel(
 			for i = 1, nLimit do
 				local szKey = _C.tVarList[i]
 				local hFocus = Station.GetFocusWindow()
-				if not empty(szKey) and -- 忽略空白的Key
+				if not IsEmpty(szKey) and -- 忽略空白的Key
 				wnd:GetRoot():IsVisible() and ( -- 主界面隐藏了就不要解析了
 					not hFocus or (
 						not hFocus:GetTreePath():find(tWndEditK[i]:name()) and  -- 忽略K编辑中的

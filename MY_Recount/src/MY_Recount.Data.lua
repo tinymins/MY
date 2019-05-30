@@ -934,10 +934,10 @@ function MY_Recount.Data.Push()
 	end
 
 	-- ¹ýÂË¿Õ¼ÇÂ¼
-	if empty(Data.BeDamage.Statistics)
-	and empty(Data.Damage.Statistics)
-	and empty(Data.Heal.Statistics)
-	and empty(Data.BeHeal.Statistics) then
+	if IsEmpty(Data.BeDamage.Statistics)
+	and IsEmpty(Data.Damage.Statistics)
+	and IsEmpty(Data.Heal.Statistics)
+	and IsEmpty(Data.BeHeal.Statistics) then
 		return
 	end
 

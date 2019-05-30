@@ -879,7 +879,7 @@ function CTM:RefreshAttention()
 		for _, dwTarID in ipairs(team.GetTeamMemberList()) do
 			local p = GetPlayer(dwTarID)
 			if CTM_CACHE[dwTarID] and CTM_CACHE[dwTarID]:IsValid() then
-				if p and not empty(CTM_ATTENTION_STACK[dwTarID]) then
+				if p and not IsEmpty(CTM_ATTENTION_STACK[dwTarID]) then
 					local r, g, b = LIB.HumanColor2RGB(CTM_ATTENTION_STACK[dwTarID][1].col)
 					CTM_CACHE[dwTarID]:Lookup('Shadow_Attention'):SetColorRGB(r, g, b)
 					CTM_CACHE[dwTarID]:Lookup('Shadow_Attention'):Show()
@@ -914,7 +914,7 @@ function CTM:RefreshCaution()
 			if CTM_CACHE[dwTarID] and CTM_CACHE[dwTarID]:IsValid() then
 				CTM_CACHE[dwTarID]:Lookup('Handle_Caution'):SetVisible(
 					p and (
-						(CFG.bShowCaution and not empty(CTM_CAUTION_BUFF[dwTarID]))
+						(CFG.bShowCaution and not IsEmpty(CTM_CAUTION_BUFF[dwTarID]))
 						or (CFG.bShowBossFocus and CTM_BOSS_FOCUSED_STATE[dwTarID])
 					)
 				)
