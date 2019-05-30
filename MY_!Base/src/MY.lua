@@ -648,9 +648,17 @@ function Class(className, super)
 	return classPrototype
 end
 end
+local TRACEBACK_DEL = ('\n[^\n]*' .. _NAME_SPACE_ .. '%.lua:%d+:%sin%sfunction%s\'GetTraceback\'[^\n]*'):gsub("(%%?)(.)", function(percent, letter)
+    if percent ~= "" or not letter:match("%a") then
+		-- if the '%' matched, or `letter` is not a letter, return "as is"
+		return percent .. letter
+    else
+		-- else, return a case-insensitive character class of the matched letter
+		return string.format("[%s%s]", letter:lower(), letter:upper())
+    end
+end)
 local function GetTraceback(str)
-	local traceback = debug and debug.traceback and debug.traceback():gsub('traceback:.*'
-		.. _NAME_SPACE_ .. '%.lua:%d+:%sin%sfunction%s\'GetTraceback\'[^\n]*', 'traceback:')
+	local traceback = debug and debug.traceback and debug.traceback():gsub(TRACEBACK_DEL, '')
 	if traceback then
 		if str then
 			str = str .. '\n' .. traceback
