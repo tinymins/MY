@@ -134,6 +134,9 @@ local _PSS_ST_           = _FRAMEWORK_ROOT_ .. 'image/ST.pss'
 local _UITEX_ST_         = _FRAMEWORK_ROOT_ .. 'image/ST_UI.UITex'
 local _UITEX_POSTER_     = _FRAMEWORK_ROOT_ .. 'image/Poster.UITex'
 local _UITEX_COMMON_     = _FRAMEWORK_ROOT_ .. 'image/UICommon.UITex'
+-----------------------------------------------
+-- 加载语言包
+-----------------------------------------------
 local function LoadLangPack(szLangFolder)
 	local _, _, szLang = GetVersion()
 	local t0 = LoadLUAData(_FRAMEWORK_ROOT_..'lang/default') or {}
@@ -167,6 +170,11 @@ local _AUTHOR_WEIBO_URL_ = 'https://weibo.com/zymah'
 local _AUTHOR_SIGNATURE_ = _L.PLUGIN_AUTHOR_SIGNATURE
 Log('[MY] Debug level ' .. _DEBUG_LEVEL_ .. ' / delog level ' .. _DELOG_LEVEL_)
 ---------------------------------------------------------------------------------------------
+-- 通用函数
+---------------------------------------------------------------------------------------------
+-----------------------------------------------
+-- 克隆数据（不包括函数和C对象）
+-----------------------------------------------
 local function clone(var)
 	local szType = type(var)
 	if szType == 'nil'
@@ -189,6 +197,9 @@ local function clone(var)
 		return nil
 	end
 end
+-----------------------------------------------
+-- 深度克隆数据
+-----------------------------------------------
 local function FullClone(var)
 	if type(var) == 'table' then
 		local ret = {}
@@ -200,6 +211,11 @@ local function FullClone(var)
 		return var
 	end
 end
+-----------------------------------------------
+-- Lua数据序列化
+-----------------------------------------------
+local var2str
+do
 local function empty(var)
 	local szType = type(var)
 	if szType == 'nil' then
@@ -304,9 +320,13 @@ local function table_r(var, level, indent)
 	end
 	return concat(t)
 end
-local function var2str(var, indent, level)
+function var2str(var, indent, level)
 	return table_r(var, level or 0, indent)
 end
+end
+-----------------------------------------------
+-- Lua数据反序列化
+-----------------------------------------------
 local str2var = str2var
 if not str2var then
 local szTempLog = 'interface/temp.log'
@@ -319,6 +339,9 @@ function str2var(szText)
 	return data
 end
 end
+-----------------------------------------------
+-- 读取数据
+-----------------------------------------------
 local function Get(var, keys, dft)
 	local res = false
 	if type(keys) == 'string' then
@@ -343,6 +366,9 @@ local function Get(var, keys, dft)
 	end
 	return var, res
 end
+-----------------------------------------------
+-- 设置数据
+-----------------------------------------------
 local function Set(var, keys, val)
 	local res = false
 	if type(keys) == 'string' then
@@ -372,6 +398,9 @@ local function Set(var, keys, val)
 	end
 	return res
 end
+-----------------------------------------------
+-- 判断是否为空
+-----------------------------------------------
 local function IsEmpty(var)
 	local szType = type(var)
 	if szType == 'nil' then
@@ -393,6 +422,9 @@ local function IsEmpty(var)
 		return false
 	end
 end
+-----------------------------------------------
+-- 深度判断相等
+-----------------------------------------------
 local function IsEquals(o1, o2)
 	if o1 == o2 then
 		return true
@@ -416,11 +448,17 @@ local function IsEquals(o1, o2)
 	end
 	return false
 end
+-----------------------------------------------
+-- 数组随机
+-----------------------------------------------
 local function RandomChild(var)
 	if type(var) == 'table' and #var > 0 then
 		return var[random(1, #var)]
 	end
 end
+-----------------------------------------------
+-- 基础类型判断
+-----------------------------------------------
 local function IsArray(var)
 	if type(var) ~= 'table' then
 		return false
@@ -454,6 +492,9 @@ local function IsString  (var) return type(var) == 'string'   end
 local function IsBoolean (var) return type(var) == 'boolean'  end
 local function IsFunction(var) return type(var) == 'function' end
 local function IsUserdata(var) return type(var) == 'userdata' end
+-----------------------------------------------
+-- 创建数据补丁
+-----------------------------------------------
 local function GetPatch(oBase, oData)
 	-- dictionary patch
 	if IsDictionary(oData) or (IsDictionary(oBase) and IsTable(oData) and IsEmpty(oData)) then
@@ -494,6 +535,9 @@ local function GetPatch(oBase, oData)
 	-- empty patch
 	return nil
 end
+-----------------------------------------------
+-- 数据应用补丁
+-----------------------------------------------
 local function ApplyPatch(oBase, oPatch, bNew)
 	if bNew ~= false then
 		oBase = clone(oBase)
@@ -531,8 +575,11 @@ local function ApplyPatch(oBase, oPatch, bNew)
 	-- other patch value
 	return oPatch
 end
+-----------------------------------------------
+-- 选代器 倒序
+-----------------------------------------------
 local ipairs_r
-do -- 选代器 倒序
+do
 local function fnBpairs(tab, nIndex)
 	nIndex = nIndex - 1
 	if nIndex > 0 then
@@ -543,8 +590,11 @@ function ipairs_r(tab)
 	return fnBpairs, tab, #tab + 1
 end
 end
+-----------------------------------------------
+-- 类型安全选代器
+-----------------------------------------------
 local spairs, sipairs, spairs_r, sipairs_r
-do -- 类型安全选代器
+do
 local function SafeIter(a, i)
 	i = i + 1
 	if a[i] then
@@ -610,6 +660,9 @@ function spairs_r(...)
 	return SafeIterR, iters, 0
 end
 end
+-----------------------------------------------
+-- 类
+-----------------------------------------------
 local Class
 do
 local function createInstance(c, ins, ...)
@@ -648,6 +701,9 @@ function Class(className, super)
 	return classPrototype
 end
 end
+-----------------------------------------------
+-- 获取调用栈
+-----------------------------------------------
 local TRACEBACK_DEL = ('\n[^\n]*' .. _NAME_SPACE_ .. '%.lua:%d+:%sin%sfunction%s\'GetTraceback\'[^\n]*'):gsub("(%%?)(.)", function(percent, letter)
     if percent ~= "" or not letter:match("%a") then
 		-- if the '%' matched, or `letter` is not a letter, return "as is"
@@ -668,6 +724,9 @@ local function GetTraceback(str)
 	end
 	return str or ''
 end
+-----------------------------------------------
+-- 枚举
+-----------------------------------------------
 local DEBUG_LEVEL = SetmetaReadonly({
 	LOG     = 0,
 	PMLOG   = 0,
