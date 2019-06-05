@@ -18,7 +18,7 @@ py3k = sys.version_info >= (3, 0, 0)
 if py3k:
     UEMPTY = ''
 else:
-    _zh2Hant, _zh2Hans, _zh2TW, _zh2HK, _zh2CN, _zh2SG = {}, {}, {}
+    _zh2Hant, _zh2Hans, _zh2TW, _zh2HK, _zh2CN, _zh2SG = {}, {}, {}, {}, {}, {}
     for old, new in ((zh2Hant, _zh2Hant), (zh2Hans, _zh2Hans), (zh2TW, _zh2TW), (zh2HK, _zh2HK), (zh2CN, _zh2CN), (zh2SG, _zh2SG)):
         for k, v in old.items():
             new[k.decode('utf8')] = v.decode('utf8')
