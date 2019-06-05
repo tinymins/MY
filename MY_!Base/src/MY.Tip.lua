@@ -40,6 +40,16 @@ local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_
 local _L = LIB.LoadLangPack()
 -------------------------------------------------------------------------------------------------------------
 
+-- nFont 为 true 表示传入的是Xml字符串 否则表示格式化的字体
+function LIB.OutputTip(szText, nFont, nMaxWidth)
+	local x, y = this:GetAbsPos()
+	local w, h = this:GetSize()
+	if nFont ~= true then
+		szText = GetFormatText(szText, nFont or 18)
+	end
+	return OutputTip(szText, nMaxWidth or 800, { x, y, w, h })
+end
+
 function LIB.OutputBuffTip(dwID, nLevel, Rect, nTime, szExtraXml)
 	local t = {}
 
