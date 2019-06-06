@@ -2632,7 +2632,13 @@ end
 -- 判断地图是不是功能屏蔽地图
 -- (bool) LIB.IsShieldedMap(dwMapID)
 function LIB.IsShieldedMap(dwMapID)
-	return LIB.IsPubgMap(dwMapID) or LIB.IsZombieMap(dwMapID)
+	if LIB.IsPubgMap(dwMapID) or LIB.IsZombieMap(dwMapID) then
+		return true
+	end
+	if IsAddonBanMap and IsAddonBanMap(dwMapID) then
+		return true
+	end
+	return false
 end
 
 -- 判断当前地图是不是PUBG
