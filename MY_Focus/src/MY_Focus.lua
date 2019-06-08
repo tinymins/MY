@@ -50,13 +50,13 @@ local l_tTempFocusList = {
 	[TARGET.NPC]    = {},   -- dwTemplateID
 	[TARGET.DOODAD] = {},   -- dwTemplateID
 }
-local BAISC_CONFIG_LOADED = false
-local BASIC_CONFIG_CHANGED = false
-local STYLE_CONFIG_LOADED = false
-local STYLE_CONFIG_CHANGED = false
+local PRIVATE_CONFIG_LOADED = false
+local PRIVATE_CONFIG_CHANGED = false
+local PUBLIC_CONFIG_LOADED = false
+local PUBLIC_CONFIG_CHANGED = false
 local l_dwLockType, l_dwLockID, l_lockInDisplay
 local O, D = {}, { PASSPHRASE = {111, 198, 5} }
-local BASIC_DEFAULT = {
+local PRIVATE_DEFAULT = {
 	bEnable     = false   , -- 是否启用
 	szStyle     = 'common', -- 样式
 	bMinimize   = false   , -- 是否最小化
@@ -66,7 +66,7 @@ local BASIC_DEFAULT = {
 	fScaleY     = 1       , -- 缩放比例
 	anchor      = { x=-300, y=220, s='TOPRIGHT', r='TOPRIGHT' }, -- 默认坐标
 }
-local STYLE_DEFAULT = {
+local PUBLIC_DEFAULT = {
 	bFocusINpc         = true    , -- 焦点重要NPC
 	bFocusFriend       = false   , -- 焦点附近好友
 	bFocusTong         = false   , -- 焦点帮会成员
@@ -94,10 +94,10 @@ local STYLE_DEFAULT = {
 		[TARGET.DOODAD] = {},    -- dwTemplateID
 	},
 }
-for k, v in pairs(BASIC_DEFAULT) do
+for k, v in pairs(PRIVATE_DEFAULT) do
 	O[k] = clone(v)
 end
-for k, v in pairs(STYLE_DEFAULT) do
+for k, v in pairs(PUBLIC_DEFAULT) do
 	O[k] = clone(v)
 end
 RegisterCustomData('MY_Focus.tAutoFocus')
@@ -143,59 +143,82 @@ function D.CheckFrameOpen(bForceReload)
 	end
 end
 
-function D.LoadStyleConfig()
-	if STYLE_CONFIG_CHANGED then
+function D.LoadPublicConfig()
+	if PUBLIC_CONFIG_CHANGED then
 		D.SaveConfig()
 	end
+	-- 加载全局公共配置
 	local config = LIB.LoadLUAData({'config/focus/' .. O.szStyle .. '.jx3dat', PATH_TYPE.GLOBAL}) or {}
-	for k, v in pairs(STYLE_DEFAULT) do
+	for k, v in pairs(PUBLIC_DEFAULT) do
 		if IsNil(config[k]) then
 			O[k] = clone(v)
 		else
 			O[k] = config[k]
 		end
 	end
-	STYLE_CONFIG_LOADED = true
+	-- 加载服务器全局配置
+	local config = LIB.LoadLUAData({'config/focus/' .. O.szStyle .. '.jx3dat', PATH_TYPE.SERVER}) or {}
+	-- 玩家永久焦点需要分开大区 否则会冲突
+	if config.tStaticFocus and config.tStaticFocus[TARGET.PLAYER] then
+		O.tStaticFocus[TARGET.PLAYER] = config.tStaticFocus[TARGET.PLAYER]
+	elseif not O.tStaticFocus[TARGET.PLAYER] then
+		O.tStaticFocus[TARGET.PLAYER] = {}
+	end
+	-- 设置标记位
+	PUBLIC_CONFIG_LOADED = true
+	-- 旧版数据转码
 	D.OnSetAncientPatternFocus()
 	D.OnSetAncientStaticFocus()
+	-- 扫描附近玩家
 	D.RescanNearby()
 end
 
-function D.SaveStyleConfig()
-	if not STYLE_CONFIG_LOADED or not STYLE_CONFIG_CHANGED then
+function D.SavePublicConfig()
+	if not PUBLIC_CONFIG_LOADED or not PUBLIC_CONFIG_CHANGED then
 		return
 	end
+	-- 保存全局公共配置
 	local config = {}
-	for k, v in pairs(STYLE_DEFAULT) do
+	for k, v in pairs(PUBLIC_DEFAULT) do
 		config[k] = O[k]
 	end
+	config.tStaticFocus = {
+		[TARGET.NPC] = O.tStaticFocus[TARGET.NPC],
+		[TARGET.DOODAD] = O.tStaticFocus[TARGET.DOODAD],
+	}
 	LIB.SaveLUAData({'config/focus/' .. O.szStyle .. '.jx3dat', PATH_TYPE.GLOBAL}, config)
-	STYLE_CONFIG_CHANGED = false
+	-- 保存服务器公共配置
+	local config = {
+		tStaticFocus = { [TARGET.PLAYER] = O.tStaticFocus[TARGET.PLAYER] }
+	}
+	LIB.SaveLUAData({'config/focus/' .. O.szStyle .. '.jx3dat', PATH_TYPE.SERVER}, config)
+	-- 设置标记位
+	PUBLIC_CONFIG_CHANGED = false
 end
 
 function D.LoadConfig()
 	local config = LIB.LoadLUAData({'config/focus.jx3dat', PATH_TYPE.ROLE}) or {}
-	for k, v in pairs(BASIC_DEFAULT) do
+	for k, v in pairs(PRIVATE_DEFAULT) do
 		if IsNil(config[k]) then
 			O[k] = clone(v)
 		else
 			O[k] = config[k]
 		end
 	end
-	BAISC_CONFIG_LOADED = true
-	D.LoadStyleConfig()
+	PRIVATE_CONFIG_LOADED = true
+	D.LoadPublicConfig()
 end
 
 function D.SaveConfig()
-	if BAISC_CONFIG_LOADED and BASIC_CONFIG_CHANGED then
+	if PRIVATE_CONFIG_LOADED and PRIVATE_CONFIG_CHANGED then
 		local config = {}
-		for k, v in pairs(BASIC_DEFAULT) do
+		for k, v in pairs(PRIVATE_DEFAULT) do
 			config[k] = O[k]
 		end
 		LIB.SaveLUAData({'config/focus.jx3dat', PATH_TYPE.ROLE}, config)
-		BASIC_CONFIG_CHANGED = false
+		PRIVATE_CONFIG_CHANGED = false
 	end
-	D.SaveStyleConfig()
+	D.SavePublicConfig()
 end
 LIB.RegisterIdle('MY_Focus_Save', D.SaveConfig)
 
@@ -206,13 +229,13 @@ function D.BeforeConfigChange(k)
 end
 
 function D.OnConfigChange(k, v)
-	if not IsNil(BASIC_DEFAULT[k]) then
-		BASIC_CONFIG_CHANGED = true
-	elseif not IsNil(STYLE_DEFAULT[k]) then
-		STYLE_CONFIG_CHANGED = true
+	if not IsNil(PRIVATE_DEFAULT[k]) then
+		PRIVATE_CONFIG_CHANGED = true
+	elseif not IsNil(PUBLIC_DEFAULT[k]) then
+		PUBLIC_CONFIG_CHANGED = true
 	end
 	if k == 'szStyle' then
-		D.LoadStyleConfig()
+		D.LoadPublicConfig()
 		D.CheckFrameOpen(true)
 	elseif k == 'bEnable' then
 		D.CheckFrameOpen()
@@ -237,7 +260,7 @@ function D.SetFocusPattern(szPattern, tData)
 		if v.szPattern == szPattern then
 			nIndex = i
 			remove(O.aPatternFocus, i)
-			STYLE_CONFIG_CHANGED = true
+			PUBLIC_CONFIG_CHANGED = true
 		end
 	end
 	-- 格式化数据
@@ -248,10 +271,10 @@ function D.SetFocusPattern(szPattern, tData)
 	-- 更新焦点列表
 	if nIndex then
 		insert(O.aPatternFocus, nIndex, tData)
-		STYLE_CONFIG_CHANGED = true
+		PUBLIC_CONFIG_CHANGED = true
 	else
 		insert(O.aPatternFocus, tData)
-		STYLE_CONFIG_CHANGED = true
+		PUBLIC_CONFIG_CHANGED = true
 	end
 	D.RescanNearby()
 	return tData
@@ -264,7 +287,7 @@ function D.RemoveFocusPattern(szPattern)
 		if O.aPatternFocus[i].szPattern == szPattern then
 			p = O.aPatternFocus[i]
 			remove(O.aPatternFocus, i)
-			STYLE_CONFIG_CHANGED = true
+			PUBLIC_CONFIG_CHANGED = true
 		end
 	end
 	if not p then
@@ -299,7 +322,7 @@ function D.SetFocusID(dwType, dwID, bSave)
 			return
 		end
 		O.tStaticFocus[dwType][dwTemplateID] = true
-		STYLE_CONFIG_CHANGED = true
+		PUBLIC_CONFIG_CHANGED = true
 		D.RescanNearby()
 	else
 		if l_tTempFocusList[dwType][dwID] then
@@ -321,7 +344,7 @@ function D.RemoveFocusID(dwType, dwID)
 	local dwTemplateID = dwType == TARGET.PLAYER and dwID or KObject.dwTemplateID
 	if O.tStaticFocus[dwType][dwTemplateID] then
 		O.tStaticFocus[dwType][dwTemplateID] = nil
-		STYLE_CONFIG_CHANGED = true
+		PUBLIC_CONFIG_CHANGED = true
 		D.RescanNearby()
 	end
 end
@@ -823,7 +846,7 @@ LIB.RegisterTutorial({
 		bDefault = true,
 		fnAction = function()
 			O.bEnable = true
-			STYLE_CONFIG_CHANGED = true
+			PUBLIC_CONFIG_CHANGED = true
 			MY_FocusUI.Open()
 			LIB.RedrawTab('MY_Focus')
 		end,
@@ -832,7 +855,7 @@ LIB.RegisterTutorial({
 		szOption = _L['Not use'],
 		fnAction = function()
 			O.bEnable = false
-			STYLE_CONFIG_CHANGED = true
+			PUBLIC_CONFIG_CHANGED = true
 			MY_Focus.Close()
 			LIB.RedrawTab('MY_Focus')
 		end,
