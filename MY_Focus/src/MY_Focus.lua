@@ -164,6 +164,16 @@ function D.LoadPublicConfig()
 	elseif not O.tStaticFocus[TARGET.PLAYER] then
 		O.tStaticFocus[TARGET.PLAYER] = {}
 	end
+	-- 加载服务器静态配置项
+	local config = LIB.LoadLUAData({'config/focus_static.jx3dat', PATH_TYPE.SERVER})
+	local static = Get(config, {'tStaticFocus', TARGET.PLAYER})
+	if IsTable(static) then
+		for k, v in pairs(static) do
+			if not O.tStaticFocus[TARGET.PLAYER][k] then
+				O.tStaticFocus[TARGET.PLAYER][k] = v
+			end
+		end
+	end
 	-- 设置标记位
 	PUBLIC_CONFIG_LOADED = true
 	-- 旧版数据转码
