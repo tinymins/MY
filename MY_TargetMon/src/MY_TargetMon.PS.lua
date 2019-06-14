@@ -1118,6 +1118,8 @@ local function DrawControls(ui, OpenDetail)
 		x = x, y = y,
 		w = 60, h = 30,
 		text = _L['Export'],
+		tip = _L['Press ALT to export as default data.\n Press CTRL to export as plain.'],
+		tippostype = MY_TIP_POSTYPE.BOTTOM_TOP,
 		menu = function()
 			local aUUID = {}
 			local menu = {}
