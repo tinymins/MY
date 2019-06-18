@@ -43,7 +43,6 @@ if not LIB.AssertVersion('MYDev_UIManager', _L['MYDev_UIEditor'], 0x2011800) the
 end
 
 local UI_INIFILE = LIB.GetAddonInfo().szRoot .. 'MYDev_UIManager/ui/MYDev_UIEditor.ini'
-local UI_ANCHOR  = { s = 'CENTER', r = 'CENTER', x = 0, y = 0 }
 local O = {}
 local D = {}
 
@@ -111,18 +110,18 @@ local function GetUIStru(el)
 	return data
 end
 
-MYDev_UIEditor = {}
+MYDev_UIEditor = class()
 
 function MYDev_UIEditor.OnFrameCreate()
 	this:RegisterEvent('UI_SCALED')
+	this.anchor   = { s = 'CENTER', r = 'CENTER', x = 0, y = 0 }
 	this.hNode    = this:CreateItemData(UI_INIFILE, 'TreeLeaf_Node')
 	this.hContent = this:CreateItemData(UI_INIFILE, 'TreeLeaf_Content')
 	this.hList    = this:Lookup('WndScroll_Tree', '')
 	this.hUIPos   = this:Lookup('', 'Image_UIPos')
 	this.hList:Clear()
 	this:ShowWhenUIHide()
-	local a = UI_ANCHOR
-	this:SetPoint(a.s, 0, 0, a.r, a.x, a.y)
+	this:SetPoint(this.anchor.s, 0, 0, this.anchor.r, this.anchor.x, this.anchor.y)
 end
 
 -- function MYDev_UIEditor.OnFrameBreathe()
@@ -131,19 +130,18 @@ end
 
 function MYDev_UIEditor.OnEvent(szEvent)
 	if szEvent == 'UI_SCALED' then
-		local a = UI_ANCHOR
-		this:SetPoint(a.s, 0, 0, a.r, a.x, a.y)
+		this:SetPoint(this.anchor.s, 0, 0, this.anchor.r, this.anchor.x, this.anchor.y)
 	end
 end
 
 function MYDev_UIEditor.OnFrameDragEnd()
-	UI_ANCHOR = GetFrameAnchor(this)
+	this.anchor = GetFrameAnchor(this)
 end
 
 function MYDev_UIEditor.OnLButtonClick()
-	local szName = this:GetName()
-	if szName == 'Btn_Select' then
-		local menu = D.GetMeun()
+	local name = this:GetName()
+	if name == 'Btn_Select' then
+		local menu = D.GetMeun(this:GetRoot())
 		local handle = this:Lookup('', '')
 		local nX, nY = handle:GetAbsPos()
 		local nW, nH = handle:GetSize()
@@ -151,15 +149,15 @@ function MYDev_UIEditor.OnLButtonClick()
 		menu.x = nX
 		menu.y = nY + nH
 		PopupMenu(menu)
-	elseif szName == 'Btn_Close' then
-		D.CloseFrame()
+	elseif name == 'Btn_Close' then
+		Wnd.CloseWindow(this)
 	end
 end
 
 function MYDev_UIEditor.OnItemLButtonClick()
-	local szName = this:GetName()
-	if szName == 'TreeLeaf_Node' or szName == 'TreeLeaf_Content' then
-		if szName == 'TreeLeaf_Node' then
+	local name = this:GetName()
+	if name == 'TreeLeaf_Node' or name == 'TreeLeaf_Content' then
+		if name == 'TreeLeaf_Node' then
 			if this:IsExpand() then
 				this:Collapse()
 			else
@@ -169,40 +167,40 @@ function MYDev_UIEditor.OnItemLButtonClick()
 		end
 		local el = this.dat.___id
 		if el and el:IsValid() then
-			local frame = D.GetFrame()
+			local frame = this:GetRoot()
 			local edit = frame:Lookup('Edit_Log/Edit_Default')
-			edit:SetText(GetPureText(table.concat(D.GetTipInfo(el))))
+			edit:SetText(GetPureText(concat(D.GetTipInfo(el))))
 			edit:SetCaretPos(0)
-			O.elemSel = el
+			this.elSel = el
 		end
 	end
 end
 
 function MYDev_UIEditor.OnItemMouseEnter()
-	local szName = this:GetName()
-	if szName == 'TreeLeaf_Node' or szName == 'TreeLeaf_Content' then
+	local name = this:GetName()
+	local frame = this:GetRoot()
+	if name == 'TreeLeaf_Node' or name == 'TreeLeaf_Content' then
 		local el = this.dat.___id
 		if el and el:IsValid() then
-			local szXml = table.concat(D.GetTipInfo(el))
+			local szXml = concat(D.GetTipInfo(el))
 			local x, y = Cursor.GetPos()
 			local w, h = 40, 40
-			local frame = OutputTip(szXml, 435, { x, y, w, h }, ALW.RIGHT_LEFT)
-			frame:StartMoving()
-			return D.SetUIPos(el)
+			OutputTip(szXml, 435, { x, y, w, h }, ALW.RIGHT_LEFT):StartMoving()
+			return D.SetUIPos(frame, el)
 		end
 	end
 end
 -- ReloadUIAddon()
 function MYDev_UIEditor.OnItemMouseLeave()
-	local szName = this:GetName()
-	if szName == 'TreeLeaf_Node' or szName == 'TreeLeaf_Content' then
+	local name = this:GetName()
+	local frame = this:GetRoot()
+	if name == 'TreeLeaf_Node' or name == 'TreeLeaf_Content' then
 		HideTip()
-		return D.SetUIPos()
+		return D.SetUIPos(frame)
 	end
 end
 
-function D.SetUIPos(el)
-	local frame = D.GetFrame()
+function D.SetUIPos(frame, el)
 	local hUIPos = frame.hUIPos
 	if el and el:IsValid() then
 		local x, y = el:GetAbsPos()
@@ -273,52 +271,39 @@ function D.GetTipInfo(el)
 	return xml
 end
 
-function D.OpenFrame()
-	return Wnd.OpenWindow(UI_INIFILE, 'MYDev_UIEditor')
+do
+local nIndex = 0
+function D.CreateFrame()
+	nIndex = nIndex + 1
+	return Wnd.OpenWindow(UI_INIFILE, 'MYDev_UIEditor#' .. nIndex)
+end
 end
 
-function D.CloseFrame()
-	return Wnd.CloseWindow('MYDev_UIEditor')
-end
-
-function D.GetFrame()
-	return Station.Lookup('Topmost1/MYDev_UIEditor')
-end
-D.IsOpened = D.GetFrame
-function D.ToggleFrame()
-	if D.IsOpened() then
-		D.CloseFrame()
-	else
-		D.OpenFrame()
-	end
-end
-
-function D.GetMeun()
+function D.GetMeun(frame)
 	local menu = {}
 	for k, v in ipairs({ 'Lowest', 'Lowest1', 'Lowest2', 'Normal', 'Normal1', 'Normal2', 'Topmost', 'Topmost1', 'Topmost2' })do
 		insert(menu, { szOption = v })
-		local frame = Station.Lookup(v):GetFirstChild()
-		while frame do
-			local el = frame
+		local frmIter = Station.Lookup(v):GetFirstChild()
+		while frmIter do
+			local el = frmIter
 			insert(menu[#menu], {
-				szOption = frame:GetName(),
+				szOption = frmIter:GetName(),
 				bCheck   = true,
-				bChecked = frame:IsVisible(),
-				rgb      = frame:IsAddOn() and { 255, 255, 255 } or { 255, 255, 0 },
+				bChecked = frmIter:IsVisible(),
+				rgb      = frmIter:IsAddOn() and { 255, 255, 255 } or { 255, 255, 0 },
 				fnAction = function()
-					D.UpdateTree(el)
-					local frame = D.GetFrame()
+					D.UpdateTree(frame, el)
 					frame:Lookup('Btn_Select', 'Text_Select'):SetText(el:GetTreePath())
 					Wnd.CloseWindow(GetPopupMenu())
 				end,
 				fnMouseLeave = function()
-					return D.SetUIPos()
+					return D.SetUIPos(frame)
 				end,
 				fnMouseEnter = function()
-					return D.SetUIPos(el)
+					return D.SetUIPos(frame, el)
 				end,
 			})
-			frame = frame:GetNext()
+			frmIter = frmIter:GetNext()
 		end
 	end
 	return menu
@@ -343,24 +328,23 @@ local function AppendTree(handle, tpls, data, i)
 		end
 	end
 end
-function D.UpdateTree(el, bDropSel)
-	local data   = GetUIStru(el)
-	local frame  = D.GetFrame()
+function D.UpdateTree(frame, elRoot, bDropSel)
+	local data   = GetUIStru(elRoot)
 	local handle = frame.hList
 	handle:Clear()
 	AppendTree(handle, frame, data, 0)
 	-- »Ö¸´Õ¹¿ª×´Ì¬
-	local el, tEl = O.elemSel, {}
+	local elSel, tElSel = frame.elSel, {}
 	if not bDropSel then
-		while el do
-			tEl[el] = true
-			el = el:GetParent()
+		while elSel do
+			tElSel[elSel] = true
+			elSel = elSel:GetParent()
 		end
 	end
-	handle:Lookup(0):Expand()
+	local el
 	for i = 0, handle:GetItemCount() - 1 do
 		el = handle:Lookup(i)
-		if el.dat and el.dat.___id and tEl[el.dat.___id] then
+		if el.dat and el.dat.___id and tElSel[el.dat.___id] or i == 0 then
 			el:Expand()
 		end
 	end
@@ -368,4 +352,4 @@ function D.UpdateTree(el, bDropSel)
 end
 end
 
-TraceButton_AppendAddonMenu({{ szOption = _L['MYDev_UIEditor'], fnAction = D.ToggleFrame }})
+TraceButton_AppendAddonMenu({{ szOption = _L['MYDev_UIEditor'], fnAction = D.CreateFrame }})
