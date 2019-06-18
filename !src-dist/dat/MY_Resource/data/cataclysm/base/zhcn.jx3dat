@@ -365,13 +365,63 @@ data = {
     {dwID=14528,col="#FFFF00FF",szReminder="狂",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FFFF00"},--青羽狂沙---冰火岛·荒血路
     {dwID=14554,col="#FF3232FF",szReminder="仇",nPriority=3,bScreenHead=true,colScreenHead="#FF3232"},--仇恨---冰火岛·荒血路
     {dwID=14557,col="#FF00FFFF",szReminder="追",nPriority=1,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--追逐---冰火岛·荒血路
+    {dwID=14584,col="#FF3232FF",szReminder="问",nPriority=7},--(14584)(1)拿云_提问标签---冰火岛·荒血路
+    {dwID=14613,col="#FF3232FF",szReminder="目",nPriority=7},--检测目标---冰火岛·荒血路
     {dwID=13800,col="#FFFF0000",szReminder="摧",nPriority=8},--摧形元火---冰火岛·青莲狱
+    {dwID=14527,col="#FF3232FF",szReminder="瓦",nPriority=4,bAttention=true,bCaution=true},--防御瓦解---冰火岛·青莲狱
     {dwID=13960,col="#00FFFFFF",szReminder="寒",nPriority=7},--寒玉裂片·寒意---冰火岛·青莲狱
     {dwID=14123,col="#FF800000",szReminder="流",nPriority=8},--游刃流火---冰火岛·青莲狱
     {dwID=14345,col="#FF8000FF",nPriority=7},--断火余温---冰火岛·青莲狱
     {dwID=14347,col="#0050FFFF",szReminder="裂",nPriority=7},--寒玉裂片·皲裂---冰火岛·青莲狱
     {dwID=14386,col="#00FF0000",szReminder="怒",nPriority=8},--天鹫震怒---冰火岛·青莲狱
     {dwID=14374,col="#FF00FFFF",szReminder="预",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--星陨预兆---冰火岛·青莲狱
+    {dwID=14691,col="#FF3232FF",szReminder="定",nPriority=7},--碎骨刃·定---尘归海·巨冥湾
+    {dwID=14716},--眩晕---尘归海·巨冥湾
+    {dwID=14711,col="#FFFF00FF",szReminder="标",nPriority=7},--惊鸿标记---尘归海·巨冥湾
+    {dwID=14731,col="#FF00FFFF",szReminder="毒",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--蛊毒---尘归海·巨冥湾
+    {dwID=14732,col="#8055FFFF",szReminder="染",nPriority=7},--致命感染---尘归海·巨冥湾
+    {dwID=14736,col="#FFFF00FF",szReminder="吸",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--蛊毒·吸血---尘归海·巨冥湾
+    {dwID=14898,col="#FF3232FF",szReminder="危",nPriority=3,bScreenHead=true,colScreenHead="#FF3232"},--危险警告---尘归海·巨冥湾
+    {dwID=15277,col="#FFFF00FF",szReminder="嘲",nPriority=5,bCaution=true},--嘲讽---尘归海·巨冥湾
+    {dwID=14762,nLevel=1,col="#FFFF00FF",szReminder="稀",nPriority=6,bAttention=true},--空气稀薄---尘归海·巨冥湾
+    {dwID=14762,nLevel=2,col="#00FF0000",szReminder="调",nPriority=8},--调养生息---尘归海·巨冥湾
+    {dwID=14794,col="#FF3232FF",szReminder="瞄",nPriority=6,bAttention=true},--瞄准---尘归海·巨冥湾
+    {dwID=15048,col="#FF8000FF",szReminder="乱",nPriority=7},--内息紊乱---尘归海·巨冥湾
+    {dwID=14676,col="#FF00FFFF",szReminder="瞄",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--瞄准---尘归海·巨冥湾
+    {dwID=14677,col="#FF3232FF",szReminder="涌",nPriority=7},--热流暗涌---尘归海·巨冥湾
+    {dwID=14686,col="#FF3232FF",szReminder="爆",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF3232"},--热力爆发---尘归海·巨冥湾
+    {dwID=14810,col="#8055FFFF",szReminder="猎",nPriority=3,bScreenHead=true,colScreenHead="#8055FF"},--猎物---尘归海·巨冥湾
+    {dwID=14793,nLevel=2,col="#FF00FFFF",szReminder="残",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--残留戟力---尘归海·巨冥湾
+    {dwID=14793,nLevel=3,col="#FF00FFFF",szReminder="戟",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--残留戟力---尘归海·巨冥湾
+    {dwID=15036,col="#00FF00FF",nPriority=7},--类腮---尘归海·巨冥湾
+    {dwID=14690,col="#FF00FFFF",szReminder="绞",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--绞首---尘归海·巨冥湾
+    {dwID=14776,col="#FFFF00FF",nPriority=7},--晕眩---尘归海·巨冥湾
+    {dwID=14702,col="#FFFF00FF",szReminder="破",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--破阵曲.角---尘归海·巨冥湾
+    {dwID=14786,col="#FF00FFFF",szReminder="爆",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--角.爆发---尘归海·巨冥湾
+    {dwID=14860,col="#FFFF00FF",szReminder="目",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--眩晕---尘归海·巨冥湾
+    {dwID=14862,col="#FF00FFFF",szReminder="目",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--神秘人的目标---尘归海·巨冥湾
+    {dwID=14813,col="#FFFF00FF",szReminder="晕",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--眩晕---尘归海·巨冥湾
+    {dwID=14800,col="#00FF00FF",szReminder="护",nPriority=6,bAttention=true},--灵猴的庇护---尘归海·巨冥湾
+    {dwID=14997,col="#FF3232FF",szReminder="标",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF3232"},--灵猴的目标---尘归海·巨冥湾
+    {dwID=14820,col="#FF00FFFF",szReminder="标",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--标记---尘归海·巨冥湾
+    {dwID=15102,col="#FF00FFFF",szReminder="目",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--水鬼的目标---尘归海·巨冥湾
+    {dwID=14815,col="#FF3232FF",szReminder="毒",nPriority=6,bAttention=true},--愈之毒---尘归海·巨冥湾
+    {dwID=14680,col="#FF3232FF",szReminder="缢",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF3232"},--缢刑---尘归海·巨冥湾
+    {dwID=14681,col="#FFFF00FF",szReminder="窒",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--窒息---尘归海·巨冥湾
+    {dwID=14675,col="#FF00FFFF",szReminder="捏",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--捏刑---尘归海·巨冥湾
+    {dwID=14801,col="#FFFF00FF",szReminder="候",nPriority=6,bAttention=true},--戏码候选者---尘归海·巨冥湾
+    {dwID=14795,col="#FFFF00FF",szReminder="梁",nPriority=7},--死亡戏码·利刃横梁---尘归海·巨冥湾
+    {dwID=14797,col="#FF8000FF",szReminder="环",nPriority=7},--死亡戏码·狱火油环---尘归海·巨冥湾
+    {dwID=14798,col="#00FFFFFF",szReminder="刀",nPriority=7},--死亡戏码·飞刀游戏---尘归海·巨冥湾
+    {dwID=14814,col="#FF323200",szReminder="烙",nPriority=8},--烙印---尘归海·巨冥湾
+    {dwID=14692,col="#00FF00FF",szReminder="礼",nPriority=7},--晏灾的礼物---尘归海·巨冥湾
+    {dwID=14697,col="#FF3232FF",szReminder="刃",nPriority=7},--沐血暗刃---尘归海·饕餮洞
+    {dwID=14700,col="#8055FFFF",szReminder="毒",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#8055FF"},--钩心毒---尘归海·饕餮洞
+    {dwID=14701,col="#FF00FFFF",szReminder="残",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--钩心残毒---尘归海·饕餮洞
+    {dwID=14788,col="#00FFFFFF",szReminder="迷",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#00FFFF"},--暗影迷途---尘归海·饕餮洞
+    {dwID=14802,col="#00FFFFFF",szReminder="未",nPriority=6,bAttention=true},--未知---尘归海·饕餮洞
+    {dwID=14803,col="#8055FFFF",szReminder="毒",nPriority=6,bAttention=true},--毒心---尘归海·饕餮洞
+    {dwID=14804,col="#FFFFFFFF",szReminder="圣",nPriority=6,bAttention=true},--圣心---尘归海·饕餮洞
     {dwID=12788,col="#FFFF00FF",szReminder="图",nPriority=7},--图兰的挑唆---龙门绝境
     {dwID=12724},--狂沙---龙门绝境
     {dwID=12787},--追命---龙门绝境
@@ -390,9 +440,17 @@ data = {
     {dwID=8880},--鳄鱼的泡泡---其他
     {dwID=11956},--网缚---其他
     {dwID=12651},--藏匿---其他
+    {dwID=15043,nLevel=1,col="#00FFFF00",szReminder="影",nPriority=8},--影遁---其他
+    {dwID=15043,nLevel=2,col="#FF3232FF",szReminder="暴",nPriority=7},--暴露---其他
+    {dwID=15128,col="#FFFF00FF",szReminder="链",nPriority=7},--炎链---其他
     {dwID=208},--弹跳---通用
     {dwID=13584,col="#FF3232FF",nPriority=7},--狂犬病---通用
     {dwID=13587,col="#FF00FFFF",nPriority=3,bScreenHead=true,colScreenHead="#FF00FF"},--破伤风---其他
+    {dwID=14891,col="#FF3232FF",nPriority=7},--被折磨---列星岛
+    {dwID=14892,col="#FFFF00FF",szReminder="火",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--圣火---列星岛
+    {dwID=14834,col="#00FF0000",szReminder="隐",nPriority=8},--隐匿---列星岛
+    {dwID=14831,col="#FF00FFFF",szReminder="箭",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--星辉塔注视---列星岛
+    {dwID=14937,col="#00FF00FF",szReminder="回",nPriority=7},--回血光环---列星岛
     {dwID=4246},--朝圣---明教
     {dwID=9744},--朝圣---明教
     {dwID=9745},--朝圣---明教
@@ -400,5 +458,5 @@ data = {
     {dwID=9395,col="#00FF00FF",szReminder="风",nPriority=7},--风入松---长歌
     {dwID=9299,col="#FF8000FF",szReminder="杯",nPriority=7},--杯水留影---长歌
     {dwID=13771},--疾电叱羽---蓬莱
-    --【南宫伯是帅咩】更新日期0411
+    --【南宫伯是帅咩】更新日期0617
 }

@@ -193,11 +193,19 @@ data = {
     {dwID=13538,col="#00FF0000",szReminder="蔽",nPriority=8},--石块的阴影遮蔽---冰火岛·荒血路
     {dwID=14098,col="#00FF00FF",szReminder="勋",nPriority=7},--血色勋章---冰火岛·荒血路
     {dwID=13624,col="#FF3232FF",szReminder="律",nPriority=6,bAttention=true},--红衣律制---冰火岛·荒血路
-    {dwID=14294,col="#00FFFFFF",szReminder="秘",nPriority=7},--秘法门标记---冰火岛·荒血路
-    {dwID=14035,col="#FFFF00FF",szReminder="暴",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FFFF00"},--身份暴露---冰火岛·荒血路
+    {dwID=14294,col="#FFFF00FF",szReminder="秘",nPriority=7},--秘法门标记---冰火岛·荒血路
+    {dwID=14035,col="#00FFFFFF",szReminder="暴",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#00FFFF"},--身份暴露---冰火岛·荒血路
     {dwID=13639,col="#FF00FFFF",szReminder="惑",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FF00FF"},--幻惑---冰火岛·荒血路
     {dwID=13782,col="#00FF0000",nPriority=8},--勇猛---冰火岛·荒血路
     {dwID=14389,col="#FFFF0000",szReminder="痕",nPriority=8},--火流星痕---冰火岛·青莲狱
+    {dwID=14894,col="#FF3232FF",szReminder="震",nPriority=6,bAttention=true},--破军震慑---尘归海·巨冥湾
+    {dwID=14911,col="#FF00FFFF",szReminder="蛇",nPriority=7},--长吻蛇毒---尘归海·巨冥湾
+    {dwID=15070,col="#FF3232FF",szReminder="失",nPriority=7},--失血过多---尘归海·巨冥湾
+    {dwID=14849,col="#00FF00FF",szReminder="盾",nPriority=6,bAttention=true},--御箭盾墙---尘归海·巨冥湾
+    {dwID=14744,col="#00FF0000",szReminder="头",nPriority=8},--船头---尘归海·巨冥湾
+    {dwID=14747,col="#00FFFF00",szReminder="尾",nPriority=8},--船尾---尘归海·巨冥湾
+    {dwID=14938,col="#00FFFF00",szReminder="射",nPriority=8},--射戟---尘归海·巨冥湾
+    {dwID=15278,col="#00FFFF00",szReminder="汲",nPriority=8},--力量汲取---尘归海·巨冥湾
     {dwID=4398,col="#FFFF00FF",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--点名测试1---测试
     {dwID=12674,col="#FFFF00FF",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--点名测试2---测试
     {dwID=13167,col="#FFFF00FF",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--命运的纠缠---测试
@@ -228,5 +236,5 @@ data = {
     {dwID=9933,col="#00FF00FF",szReminder="笼",nPriority=7},--笼花---万花
     {dwID=9544,col="#00FF00FF",szReminder="笑",nPriority=7},--笑傲光阴---长歌
     {dwID=9265,col="#00FF00FF",szReminder="云",nPriority=7},--云生结海---长歌
-    --【南宫伯是帅咩】更新日期0411
+    --【南宫伯是帅咩】更新日期0617
 }
