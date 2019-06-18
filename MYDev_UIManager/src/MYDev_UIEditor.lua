@@ -124,9 +124,23 @@ function MYDev_UIEditor.OnFrameCreate()
 	this:SetPoint(this.anchor.s, 0, 0, this.anchor.r, this.anchor.x, this.anchor.y)
 end
 
--- function MYDev_UIEditor.OnFrameBreathe()
--- 	this:BringToTop()
--- end
+do
+local nUpdateTime = 0
+function MYDev_UIEditor.OnFrameBreathe()
+	if GetTime() - nUpdateTime > 500 then
+		local handle, el = this.hList
+		for i = 0, handle:GetItemCount() - 1 do
+			el = handle:Lookup(i)
+			if el.dat and el.dat.___id and not el.dat.___id:IsValid() then
+				D.UpdateTree(this)
+				break
+			end
+		end
+		nUpdateTime = GetTime()
+	end
+	-- this:BringToTop()
+end
+end
 
 function MYDev_UIEditor.OnEvent(szEvent)
 	if szEvent == 'UI_SCALED' then
@@ -171,7 +185,12 @@ function MYDev_UIEditor.OnItemLButtonClick()
 			local edit = frame:Lookup('Edit_Log/Edit_Default')
 			edit:SetText(GetPureText(concat(D.GetTipInfo(el))))
 			edit:SetCaretPos(0)
-			this.elSel = el
+			local elSel, tElSel = el, {}
+			while elSel do
+				tElSel[elSel] = true
+				elSel = elSel:GetParent()
+			end
+			frame.tElSel = tElSel
 		end
 	end
 end
@@ -329,22 +348,19 @@ local function AppendTree(handle, tpls, data, i)
 	end
 end
 function D.UpdateTree(frame, elRoot, bDropSel)
+	if not elRoot then
+		elRoot = frame.elRoot
+	end
 	local data   = GetUIStru(elRoot)
 	local handle = frame.hList
+	frame.elRoot = elRoot
 	handle:Clear()
 	AppendTree(handle, frame, data, 0)
 	-- »Ö¸´Õ¹¿ª×´Ì¬
-	local elSel, tElSel = frame.elSel, {}
-	if not bDropSel then
-		while elSel do
-			tElSel[elSel] = true
-			elSel = elSel:GetParent()
-		end
-	end
-	local el
+	local el, tElSel = nil, frame.tElSel or {}
 	for i = 0, handle:GetItemCount() - 1 do
 		el = handle:Lookup(i)
-		if el.dat and el.dat.___id and tElSel[el.dat.___id] or i == 0 then
+		if (not bDropSel and el.dat and el.dat.___id and tElSel[el.dat.___id]) or i == 0 then
 			el:Expand()
 		end
 	end
