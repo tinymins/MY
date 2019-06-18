@@ -42,50 +42,55 @@ if not LIB.AssertVersion('MYDev_UIManager', _L['MYDev_UIEditor'], 0x2011800) the
 	return
 end
 
+local UI_INIFILE = LIB.GetAddonInfo().szRoot .. 'MYDev_UIManager/ui/MYDev_UIEditor.ini'
+local UI_ANCHOR  = { s = 'CENTER', r = 'CENTER', x = 0, y = 0 }
+local O = {}
+local D = {}
+
 -- stack overflow
-local function GetUIStru(ui)
+local function GetUIStru(el)
 	local data = {}
-	local function GetInfo(ui)
-		local szType = ui:GetType()
-		local szName = ui:GetName()
+	local function GetInfo(el)
+		local szType = el:GetType()
+		local szName = el:GetName()
 		local bIsWnd = szType:sub(1, 3) == 'Wnd'
 		local bChild, hChildItem
 		if bIsWnd then
-			bChild     = ui:GetFirstChild() ~= nil
-			hChildItem = ui:Lookup('', '')
+			bChild     = el:GetFirstChild() ~= nil
+			hChildItem = el:Lookup('', '')
 		elseif szType == 'Handle' or szType == 'TreeLeaf' then
-			bChild = ui:Lookup(0) ~= nil
+			bChild = el:Lookup(0) ~= nil
 		end
 		local dat = {
-			___id  = ui, -- ui metatable
-			aPath  = { ui:GetTreePath() },
+			___id  = el, -- ui metatable
+			aPath  = { el:GetTreePath() },
 			szType = szType,
 			szName = szName,
 			aChild = (bChild or hChildItem) and {} or nil
 		}
 		return dat, bIsWnd, bChild, hChildItem
 	end
-	local function GetItemStru(ui, tab)
-		local dat, bIsWnd, bChild = GetInfo(ui)
+	local function GetItemStru(el, tab)
+		local dat, bIsWnd, bChild = GetInfo(el)
 		insert(tab, dat)
 		if bChild then
 			local i = 0
-			while ui:Lookup(i) do
-				local frame = ui:Lookup(i)
+			while el:Lookup(i) do
+				local frame = el:Lookup(i)
 				GetItemStru(frame, dat.aChild)
 				i = i + 1
 			end
 		end
 	end
-	local function GetWinStru(ui, tab)
-		local dat, bIsWnd, bChild, hChildItem = GetInfo(ui)
+	local function GetWinStru(el, tab)
+		local dat, bIsWnd, bChild, hChildItem = GetInfo(el)
 		insert(tab, dat)
 		if hChildItem then
 			GetItemStru(hChildItem, dat.aChild)
 		end
 		if bChild then
 			local aChild = tab[#tab]
-			local frame = ui:GetFirstChild()
+			local frame = el:GetFirstChild()
 			while frame do
 				local dat, bIsWnd = GetInfo(frame)
 				if bIsWnd then
@@ -97,18 +102,15 @@ local function GetUIStru(ui)
 			end
 		end
 	end
-	local dat, bIsWnd, bChild = GetInfo(ui)
+	local dat, bIsWnd, bChild = GetInfo(el)
 	if bIsWnd then
-		GetWinStru(ui, data)
+		GetWinStru(el, data)
 	else
-		GetItemStru(ui, data)
+		GetItemStru(el, data)
 	end
 	return data
 end
 
-local UI_INIFILE = LIB.GetAddonInfo().szRoot .. 'MYDev_UIManager/ui/MYDev_UIEditor.ini'
-local UI_ANCHOR  = { s = 'CENTER', r = 'CENTER', x = 0, y = 0 }
-local D = {}
 MYDev_UIEditor = {}
 
 function MYDev_UIEditor.OnFrameCreate()
@@ -165,12 +167,13 @@ function MYDev_UIEditor.OnItemLButtonClick()
 			end
 			this:GetParent():FormatAllItemPos()
 		end
-		local ui = this.dat.___id
-		if ui and ui:IsValid() then
+		local el = this.dat.___id
+		if el and el:IsValid() then
 			local frame = D.GetFrame()
 			local edit = frame:Lookup('Edit_Log/Edit_Default')
-			edit:SetText(GetPureText(table.concat(D.GetTipInfo(ui))))
+			edit:SetText(GetPureText(table.concat(D.GetTipInfo(el))))
 			edit:SetCaretPos(0)
+			O.elemSel = el
 		end
 	end
 end
@@ -178,14 +181,14 @@ end
 function MYDev_UIEditor.OnItemMouseEnter()
 	local szName = this:GetName()
 	if szName == 'TreeLeaf_Node' or szName == 'TreeLeaf_Content' then
-		local ui = this.dat.___id
-		if ui and ui:IsValid() then
-			local szXml = table.concat(D.GetTipInfo(ui))
+		local el = this.dat.___id
+		if el and el:IsValid() then
+			local szXml = table.concat(D.GetTipInfo(el))
 			local x, y = Cursor.GetPos()
 			local w, h = 40, 40
 			local frame = OutputTip(szXml, 435, { x, y, w, h }, ALW.RIGHT_LEFT)
 			frame:StartMoving()
-			return D.SetUIPos(ui)
+			return D.SetUIPos(el)
 		end
 	end
 end
@@ -198,16 +201,16 @@ function MYDev_UIEditor.OnItemMouseLeave()
 	end
 end
 
-function D.SetUIPos(ui)
+function D.SetUIPos(el)
 	local frame = D.GetFrame()
 	local hUIPos = frame.hUIPos
-	if ui and ui:IsValid() then
-		local x, y = ui:GetAbsPos()
-		local w, h = ui:GetSize()
+	if el and el:IsValid() then
+		local x, y = el:GetAbsPos()
+		local w, h = el:GetSize()
 		hUIPos:SetSize(w, h)
 		hUIPos:SetAbsPos(x, y)
 		hUIPos:Show()
-		if ui:IsVisible() then
+		if el:IsVisible() then
 			hUIPos:SetFrame(157)
 		else
 			hUIPos:SetFrame(158)
@@ -217,21 +220,21 @@ function D.SetUIPos(ui)
 	end
 end
 
-function D.GetTipInfo(ui)
+function D.GetTipInfo(el)
 	local xml = {
-		GetFormatText('[' .. ui:GetName() .. ']\n', 65)
+		GetFormatText('[' .. el:GetName() .. ']\n', 65)
 	}
 	insert(xml, GetFormatText('Type: ', 67))
-	insert(xml, GetFormatText(ui:GetType() .. '\n', 44))
+	insert(xml, GetFormatText(el:GetType() .. '\n', 44))
 	insert(xml, GetFormatText('Visible: ', 67))
-	insert(xml, GetFormatText(tostring(ui:IsVisible()) .. '\n', 44))
+	insert(xml, GetFormatText(tostring(el:IsVisible()) .. '\n', 44))
 	insert(xml, GetFormatText('Size: ', 67))
-	insert(xml, GetFormatText(table.concat({ ui:GetSize() }, ', ') .. '\n', 44))
+	insert(xml, GetFormatText(table.concat({ el:GetSize() }, ', ') .. '\n', 44))
 	insert(xml, GetFormatText('RelPos: ', 67))
-	insert(xml, GetFormatText(table.concat({ ui:GetRelPos() }, ', ') .. '\n', 44))
+	insert(xml, GetFormatText(table.concat({ el:GetRelPos() }, ', ') .. '\n', 44))
 	insert(xml, GetFormatText('AbsPos: ', 67))
-	insert(xml, GetFormatText(table.concat({ ui:GetAbsPos() }, ', ') .. '\n', 44))
-	local szPath1, szPath2 = ui:GetTreePath()
+	insert(xml, GetFormatText(table.concat({ el:GetAbsPos() }, ', ') .. '\n', 44))
+	local szPath1, szPath2 = el:GetTreePath()
 	insert(xml, GetFormatText('Path1: ', 67))
 	insert(xml, GetFormatText(szPath1 .. '\n', 44))
 	if szPath2 then
@@ -239,20 +242,20 @@ function D.GetTipInfo(ui)
 		insert(xml, GetFormatText(szPath2 .. '\n', 44))
 	end
 	insert(xml, GetFormatText('\n ---------- D Table --------- \n\n', 67))
-	for k, v in pairs(ui) do
+	for k, v in pairs(el) do
 		insert(xml, GetFormatText(k .. ': ', 67))
 		insert(xml, GetFormatText(tostring(v) .. '\n', 44))
 	end
-	if ui:GetType() == 'WndFrame' then
+	if el:GetType() == 'WndFrame' then
 		local G
-		if ui:IsAddOn() then
+		if el:IsAddOn() then
 			G = GetAddonEnv and GetAddonEnv() or _G
 		else
 			G = _G
 		end
-		if G and G[ui:GetName()] then
+		if G and G[el:GetName()] then
 			insert(xml, GetFormatText('\n ---------- D Global --------- \n\n', 67))
-			for k, v in pairs(G[ui:GetName()]) do
+			for k, v in pairs(G[el:GetName()]) do
 				insert(xml, GetFormatText(k .. ': ', 67))
 				insert(xml, GetFormatText(tostring(v) .. '\n', 44))
 				if debug and type(v) == 'function' then
@@ -296,23 +299,23 @@ function D.GetMeun()
 		insert(menu, { szOption = v })
 		local frame = Station.Lookup(v):GetFirstChild()
 		while frame do
-			local ui = frame
+			local el = frame
 			insert(menu[#menu], {
 				szOption = frame:GetName(),
 				bCheck   = true,
 				bChecked = frame:IsVisible(),
 				rgb      = frame:IsAddOn() and { 255, 255, 255 } or { 255, 255, 0 },
 				fnAction = function()
-					D.UpdateTree(ui)
+					D.UpdateTree(el)
 					local frame = D.GetFrame()
-					frame:Lookup('Btn_Select', 'Text_Select'):SetText(ui:GetTreePath())
+					frame:Lookup('Btn_Select', 'Text_Select'):SetText(el:GetTreePath())
 					Wnd.CloseWindow(GetPopupMenu())
 				end,
 				fnMouseLeave = function()
 					return D.SetUIPos()
 				end,
 				fnMouseEnter = function()
-					return D.SetUIPos(ui)
+					return D.SetUIPos(el)
 				end,
 			})
 			frame = frame:GetNext()
@@ -340,13 +343,27 @@ local function AppendTree(handle, tpls, data, i)
 		end
 	end
 end
-function D.UpdateTree(ui)
-	local data   = GetUIStru(ui)
+function D.UpdateTree(el, bDropSel)
+	local data   = GetUIStru(el)
 	local frame  = D.GetFrame()
 	local handle = frame.hList
 	handle:Clear()
 	AppendTree(handle, frame, data, 0)
+	-- »Ö¸´Õ¹¿ª×´Ì¬
+	local el, tEl = O.elemSel, {}
+	if not bDropSel then
+		while el do
+			tEl[el] = true
+			el = el:GetParent()
+		end
+	end
 	handle:Lookup(0):Expand()
+	for i = 0, handle:GetItemCount() - 1 do
+		el = handle:Lookup(i)
+		if el.dat and el.dat.___id and tEl[el.dat.___id] then
+			el:Expand()
+		end
+	end
 	handle:FormatAllItemPos()
 end
 end
