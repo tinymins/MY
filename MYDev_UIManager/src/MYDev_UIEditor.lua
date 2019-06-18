@@ -321,33 +321,34 @@ function D.GetMeun()
 	return menu
 end
 
+do
+local function AppendTree(handle, tpls, data, i)
+	for k, v in ipairs(data) do
+		local h
+		if v.aChild then
+			h = handle:AppendItemFromData(tpls.hNode)
+		else
+			h = handle:AppendItemFromData(tpls.hContent)
+		end
+		local txt = h:Lookup(0)
+		txt:SetText(v.szName)
+		h:SetIndent(i)
+		h:FormatAllItemPos()
+		h.dat = v
+		if v.aChild then
+			AppendTree(handle, tpls, v.aChild, i + 1)
+		end
+	end
+end
 function D.UpdateTree(ui)
 	local data   = GetUIStru(ui)
 	local frame  = D.GetFrame()
 	local handle = frame.hList
 	handle:Clear()
-	local nIndent = 0
-	local function AppendTree(data, i)
-		for k, v in ipairs(data) do
-			local h
-			if v.aChild then
-				h = handle:AppendItemFromData(frame.hNode)
-			else
-				h = handle:AppendItemFromData(frame.hContent)
-			end
-			local txt = h:Lookup(0)
-			txt:SetText(v.szName)
-			h:SetIndent(i)
-			h:FormatAllItemPos()
-			h.dat = v
-			if v.aChild then
-				AppendTree(v.aChild, i + 1)
-			end
-		end
-	end
-	AppendTree(data, nIndent)
+	AppendTree(handle, frame, data, 0)
 	handle:Lookup(0):Expand()
 	handle:FormatAllItemPos()
+end
 end
 
 TraceButton_AppendAddonMenu({{ szOption = _L['MYDev_UIEditor'], fnAction = D.ToggleFrame }})
