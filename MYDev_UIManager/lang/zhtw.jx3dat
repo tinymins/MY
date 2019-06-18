@@ -1,8 +1,8 @@
 -- language data (zhtw) updated at 2014-4-10 03:38:11
 data = {
-	['MYDev_UIEditor'] = '界面窗口查看',
-	['MYDev_UIManager'] = '界面窗口枚舉',
+	['MYDev_UIEditor'] = '窗口查看',
 
+	['MYDev_UIManager'] = '窗口枚舉',
 	UI_DESC = {
 		["Lowest/ActionBar1"         ] = "主快捷鍵欄",
 		["Lowest/ActionBar2"         ] = "副快捷鍵欄",
@@ -68,4 +68,16 @@ data = {
 		["Topmost2/GMAnnouncePanel"  ] = "系統公告跑馬燈區域",
 		["Topmost2/LoadingPanel"     ] = "游戲載入界面",
 	},
+
+	['MYDev_UIFindStation'] = '控制項查找',
+	['<Component Path>'] = '<控制項路徑>',
+
+	['Find component'] = '控制項查找',
+	['Enable button search, mouseover it will show its path'] = '啟用按鈕查找，滑鼠移上會顯示控制項路徑',
+	['Enable box search, mouseover it will show its path'] = '啟用BOX查找，滑鼠移上會顯示控制項路徑',
+	['Find by text'] = '文本查找',
+	['Keyword: '] = '關鍵詞：',
+	['Search'] = '搜 索',
+	['Searching, please wait...'] = '正在檢索，請稍候……',
+	['(Supports Lua regex)'] = '（支持 Lua 正則）',
 }
