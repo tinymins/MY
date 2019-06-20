@@ -164,7 +164,7 @@ function MYDev_UIEditor.OnLButtonClick()
 		menu.y = nY + nH
 		PopupMenu(menu)
 	elseif name == 'Btn_Close' then
-		Wnd.CloseWindow(this)
+		Wnd.CloseWindow(this:GetRoot())
 	end
 end
 
