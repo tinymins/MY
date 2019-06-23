@@ -379,7 +379,22 @@ function MY_GKP_Loot.OnItemMouseEnter()
 		local hItem = szName == 'Handle_Item' and this or this:GetParent()
 		local box   = hItem:Lookup('Box_Item')
 		if IsAltKeyDown() and not IsCtrlKeyDown() and not IsShiftKeyDown() then
-			LIB.OutputTip(this, var2str(hItem.itemData, '  '))
+			LIB.OutputTip(this, var2str(hItem.itemData, '  ') .. '\n' .. var2str({
+				nUiId = hItem.itemData.item.nUiId,
+				dwID = hItem.itemData.item.dwID,
+				nGenre = hItem.itemData.item.nGenre,
+				nSub = hItem.itemData.item.nSub,
+				nDetail = hItem.itemData.item.nDetail,
+				nLevel = hItem.itemData.item.nLevel,
+				nPrice = hItem.itemData.item.nPrice,
+				dwScriptID = hItem.itemData.item.dwScriptID,
+				nMaxDurability = hItem.itemData.item.nMaxDurability,
+				nMaxExistAmount = hItem.itemData.item.nMaxExistAmount,
+				nMaxExistTime = hItem.itemData.item.nMaxExistTime,
+				bCanTrade = hItem.itemData.item.bCanTrade,
+				bCanDestory = hItem.itemData.item.bCanDestory,
+				szName = hItem.itemData.item.szName,
+			}, '  '))
 		elseif szName == 'Handle_Item' then
 			LIB.ExecuteWithThis(box, box.OnItemMouseEnter)
 		end
