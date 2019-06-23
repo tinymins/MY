@@ -398,11 +398,14 @@ end
 function MY_GKP_Loot.OnItemMouseEnter()
 	local szName = this:GetName()
 	if szName == 'Handle_Item' or szName == 'Box_Item' then
-		if szName == 'Handle_Item' then
-			this = this:Lookup('Box_Item')
-			this.OnItemMouseEnter()
+		local hItem = szName == 'Handle_Item' and this or this:GetParent()
+		local box   = hItem:Lookup('Box_Item')
+		if IsAltKeyDown() and not IsCtrlKeyDown() and not IsShiftKeyDown() then
+			LIB.OutputTip(this, var2str(hItem.itemData, '  '))
+		elseif szName == 'Handle_Item' then
+			LIB.ExecuteWithThis(box, box.OnItemMouseEnter)
 		end
-		-- local item = this.itemData.item
+		-- local item = hItem.itemData.item
 		-- if itme and item.nGenre == ITEM_GENRE.EQUIPMENT then
 		-- 	if itme.nSub == EQUIPMENT_SUB.MELEE_WEAPON then
 		-- 		this:SetOverText(3, g_tStrings.WeapenDetail[item.nDetail])
