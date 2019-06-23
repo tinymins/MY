@@ -1007,8 +1007,12 @@ local function IsItemDataSuitable(data)
 		end
 	else
 		local bSuit = LIB.DoesEquipmentSuit(data.item, true)
-		if data.szType == 'EQUIPMENT' or data.szType == 'WEAPON' then
-			bSuit = LIB.IsItemFitKungfu(data.item)
+		if bSuit then
+			if data.szType == 'EQUIPMENT' or data.szType == 'WEAPON' then
+				bSuit = LIB.IsItemFitKungfu(data.item)
+			elseif data.szType == 'EQUIPMENT_SIGN' then
+				bSuit = wfind(data.item.szName, g_tStrings.tForceTitle[me.dwForceID])
+			end
 		end
 		if bSuit then
 			return true, LIB.IsBetterEquipment(data.item)
