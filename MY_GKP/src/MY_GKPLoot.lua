@@ -171,7 +171,7 @@ function MY_GKP_Loot.OnFrameBreathe()
 			for i = 0, hList:GetItemCount() - 1 do
 				hItem = hList:Lookup(i)
 				if MY_GKP_Loot.IsItemAutoPickup(hItem.itemData, wnd.tItemConfig, doodad, bCanDialog)
-				and GetClientTeam().nLootMode == PARTY_LOOT_MODE.FREE_FOR_ALL then
+				and not hItem.itemData.bDist and not hItem.itemData.bBidding then
 					LIB.ExecuteWithThis(hItem, MY_GKP_Loot.OnItemLButtonClick)
 				end
 			end
