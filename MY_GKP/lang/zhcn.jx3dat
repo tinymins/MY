@@ -33,7 +33,6 @@ data = {
 	['GKP Golden Team Record'] = '金团记录',
 	['Setting'] = '设置',
 	['Add Manually'] = '手动添加',
-	['No Record For Current Object.'] = '当前物品还没有记录',
 	['You are not the distrubutor.'] = '你不是分配者。',
 	['Debt Issued'] = '发布欠债记录',
 	['Clear Record'] = '清空记录',

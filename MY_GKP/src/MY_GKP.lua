@@ -327,10 +327,6 @@ function _GKP.Init()
 end
 LIB.RegisterEvent('FIRST_LOADING_END', _GKP.Init)
 
-function _GKP.GetRecordWindow()
-	return Station.Lookup('Normal/GKP_Record')
-end
-
 function _GKP.Random() -- 生成一个随机字符串 这还能重复我吃翔
 	local a = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.,_+;*-'
 	local t = {}
@@ -413,9 +409,6 @@ function MY_GKP.OnFrameCreate()
 	ui:append('WndButton3', {
 		x = 15, y = 660, text = _L['Add Manually'],
 		onclick = function()
-			if _GKP.GetRecordWindow() then
-				return LIB.Alert(_L['No Record For Current Object.'])
-			end
 			if not LIB.IsDistributer() and not MY_GKP.bDebug then -- debug
 				return LIB.Alert(_L['You are not the distrubutor.'])
 			end
@@ -1618,11 +1611,15 @@ end
 ----------------------------------------------------------------------<
 function _GKP.Record(tab, item, bEnter)
 	-- CreateFrame
-	if _GKP.GetRecordWindow() then
-		local wnd = UI(_GKP.GetRecordWindow())
-		wnd:children('#Btn_Close'):click()
+	local szKey
+	if IsTable(tab) and tab.key then
+		szKey = tab.key
+	elseif IsUserdata(item) then
+		szKey = tab.nUiId .. _GKP.Random()
+	else
+		szKey = 0 .. _GKP.Random()
 	end
-	local ui = UI.CreateFrame('GKP_Record', { h = 380, w = 400, text = _L['GKP Golden Team Record'], close = true, focus = true })
+	local ui = UI.CreateFrame('MY_GKP_Record#' .. GetStringCRC(szKey), { h = 380, w = 400, text = _L['GKP Golden Team Record'], close = true, focus = true })
 	local x, y = 10, 55
 	local nAuto = 0
 	local dwForceID
@@ -1755,6 +1752,9 @@ function _GKP.Record(tab, item, bEnter)
 		hName:focus()
 	end
 	hButton:click(function()
+		if IsCtrlKeyDown() and IsShiftKeyDown() and IsAltKeyDown() then
+			return Wnd.CloseWindow(ui[1])
+		end
 		local tab = tab or {
 			nUiId      = 0,
 			dwTabType  = 0,
@@ -1777,7 +1777,7 @@ function _GKP.Record(tab, item, bEnter)
 		tab.szNpcName = hSource:text()
 		tab.nMoney    = nMoney
 		tab.szPlayer  = szPlayer
-		tab.key       = tab.key or tab.nUiId .. _GKP.Random()
+		tab.key       = szKey
 		tab.dwForceID = dwForceID or tab.dwForceID or 0
 		if tab and type(item) == 'userdata' then
 			if LIB.IsDistributer() then
