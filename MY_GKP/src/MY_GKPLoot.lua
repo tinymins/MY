@@ -1118,7 +1118,8 @@ local function GetItemDataType(data)
 		return 'BOOK'
 	end
 	-- ÎäÆ÷
-	if (data.item.nGenre == ITEM_GENRE.MELEE_WEAPON or data.item.nGenre == ITEM_GENRE.RANGE_WEAPON) then
+	if data.item.nGenre == ITEM_GENRE.EQUIPMENT
+	and (data.item.nSub == EQUIPMENT_SUB.MELEE_WEAPON or data.item.nSub == EQUIPMENT_SUB.RANGE_WEAPON) then
 		return 'WEAPON'
 	end
 	-- ×°±¸¶Ò»»ÅÆ
