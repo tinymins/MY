@@ -41,9 +41,12 @@ local _L = LIB.LoadLangPack()
 -------------------------------------------------------------------------------------------------------------
 
 -- nFont 为 true 表示传入的是Xml字符串 否则表示格式化的字体
-function LIB.OutputTip(szText, nFont, nMaxWidth)
-	local x, y = this:GetAbsPos()
-	local w, h = this:GetSize()
+function LIB.OutputTip(el, szText, nFont, nMaxWidth)
+	if IsString(el) then
+		el, szText, nFont, nMaxWidth = this, el, szText, nFont
+	end
+	local x, y = el:GetAbsPos()
+	local w, h = el:GetSize()
 	if nFont ~= true then
 		szText = GetFormatText(szText, nFont or 18)
 	end
