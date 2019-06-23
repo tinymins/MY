@@ -2943,6 +2943,66 @@ function LIB.DoesEquipmentSuit(item, bIsItem, player)
 	return true
 end
 
+-- * 当前装备是否适合当前内功
+do
+local CACHE = {}
+function LIB.IsItemFitKungfu(itemInfo, kungfu)
+	if tostring(itemInfo):find('^KGItem:') then
+		itemInfo = GetItemInfo(itemInfo.dwTabType, itemInfo.dwIndex)
+	end
+	if itemInfo.nSub == EQUIPMENT_SUB.MELEE_WEAPON then
+		local player = GetClientPlayer()
+		local skill  = kungfu or player.GetKungfuMount()
+		if not skill then
+			return false
+		end
+		if itemInfo.nDetail == WEAPON_DETAIL.BIG_SWORD and skill.dwMountType == 6 then
+			return true
+		end
+
+		if (m_MountTypeToWeapon[skill.dwMountType] ~= itemInfo.nDetail) then
+			return false
+		end
+
+		if not itemInfo.nRecommendID or itemInfo.nRecommendID == 0 then
+			return true
+		end
+	end
+
+	if not itemInfo.nRecommendID then
+		return
+	end
+	local aRecommendKungfuID = CACHE[itemInfo.nRecommendID]
+	if not aRecommendKungfuID then
+		local res = g_tTable.EquipRecommend:Search(itemInfo.nRecommendID)
+		aRecommendKungfuID = {}
+		for i, v in ipairs(LIB.SplitString(res.kungfu_ids, "|")) do
+			insert(aRecommendKungfuID, tonumber(v))
+		end
+		CACHE[itemInfo.nRecommendID] = aRecommendKungfuID
+	end
+
+	if not aRecommendKungfuID or not aRecommendKungfuID[1] then
+		return
+	end
+
+	if aRecommendKungfuID[1] == 0 then
+		return true
+	end
+
+	local player = GetClientPlayer()
+	local skill  = kungfu or player.GetKungfuMount()
+	if not skill then
+		return false
+	end
+	for _, v in ipairs(aRecommendKungfuID) do
+		if v == skill.dwSkillID then
+			return true
+		end
+	end
+end
+end
+
 -- * 获取物品对应身上装备的位置
 function LIB.GetItemEquipPos(item, nIndex)
 	if not nIndex then
