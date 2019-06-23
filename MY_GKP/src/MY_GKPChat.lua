@@ -98,11 +98,10 @@ function MY_GKP.DistributionItem()
 	local me     = Station.Lookup('Normal/MY_GKP_Chat')
 	local box    = me:Lookup('', 'Box')
 	local data   = box.data
-	local doodad = GetDoodad(data.dwDoodadID)
-	local aPartyMember = GKP_Loot.GetaPartyMember(doodad)
+	local aPartyMember = MY_GKP_Loot.GetaPartyMember(data.dwDoodadID)
 	local member = aPartyMember(szName)
 	if member then
-		GKP_Loot.GetMessageBox(member.dwID, data.data)
+		MY_GKP_Loot.GetMessageBox(member.dwID, data.data)
 	else
 		return LIB.Alert(_L['No Pick up Object, may due to Network off - line'])
 	end
