@@ -1146,7 +1146,7 @@ local function GetItemDataType(data)
 	return 'OTHER'
 end
 
-local function LootItemSorter(data1, item2)
+local function LootItemSorter(data1, data2)
 	return data1.nWeight < data2.nWeight
 end
 
