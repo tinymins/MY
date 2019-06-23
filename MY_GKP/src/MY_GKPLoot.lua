@@ -57,28 +57,7 @@ local GKP_LOOT_ZIBABA = { -- 小铁
 	[LIB.GetItemName(153896)] = true,
 	[LIB.GetItemName(160305)] = true,
 }
-local GKP_LOOT_AUTO = {}
-local GKP_LOOT_AUTO_LIST = { -- 记录分配上次的物品
-	-- 材料
-	[153532] = true,
-	[153533] = true,
-	[153534] = true,
-	[153535] = true,
-	-- 五行石
-	[153190] = true,
-	-- 五彩石
-	[150241] = true,
-	[150242] = true,
-	[150243] = true,
-	-- 90
-	[72591]  = true,
-	[68362]  = true,
-	[66189]  = true,
-	[4097]   = true,
-	[73214]  = true,
-	[74368]  = true,
-	[153896] = true,
-}
+local GKP_LOOT_RECENT = {} -- 记录上次物品或物品组分配给了谁
 local GKP_ITEM_QUALITIES = {
 	{ nQuality = -1, szTitle = g_tStrings.STR_ADDON_BLOCK },
 	{ nQuality = 1, szTitle = g_tStrings.STR_WHITE },
@@ -89,7 +68,6 @@ local GKP_ITEM_QUALITIES = {
 }
 
 local Loot = {}
--- setmetatable(GKP_LOOT_AUTO_LIST, { __index = function() return true end })
 MY_GKP_Loot = {
 	bVertical = true,
 	bSetColor = true,
@@ -475,11 +453,7 @@ function MY_GKP_Loot.OnItemLButtonClick()
 			if not Loot.AuthCheck(dwDoodadID) then
 				return
 			end
-			if IsShiftKeyDown() and GKP_LOOT_AUTO[data.item.nUiId] then
-				return Loot.DistributeItem(GKP_LOOT_AUTO[data.item.nUiId], data, true)
-			else
-				return PopupMenu(Loot.GetDistributeMenu(data))
-			end
+			return PopupMenu(Loot.GetDistributeMenu(data, data.item.nUiId))
 		elseif data.bBidding then
 			if team.nLootMode ~= PARTY_LOOT_MODE.BIDDING then
 				return OutputMessage('MSG_ANNOUNCE_RED', g_tStrings.GOLD_CHANGE_BID_LOOT)
@@ -491,10 +465,9 @@ function MY_GKP_Loot.OnItemLButtonClick()
 			LootItem(dwDoodadID, data.dwID)
 		end
 	elseif szName == 'Image_GroupDistrib' then
-		local hItem      = this:GetParent()
-		local hList      = hItem:GetParent()
-		local me, team   = GetClientPlayer(), GetClientTeam()
-		local aItemData  = {}
+		local hItem     = this:GetParent()
+		local hList     = hItem:GetParent()
+		local aItemData = {}
 		for i = 0, hList:GetItemCount() - 1 do
 			local h = hList:Lookup(i)
 			if h.itemData.szType == hItem.itemData.szType then
@@ -512,7 +485,7 @@ function MY_GKP_Loot.OnItemLButtonClick()
 				return
 			end
 		end
-		return PopupMenu(Loot.GetDistributeMenu(aItemData))
+		return PopupMenu(Loot.GetDistributeMenu(aItemData, hItem.itemData.szType))
 	end
 end
 -- 右键拍卖
@@ -551,7 +524,7 @@ function MY_GKP_Loot.OnItemRButtonClick()
 				table.insert(menu, {
 					szOption = v[1],
 					fnAction = function()
-						MY_GKP_Chat.OpenFrame(data.item, Loot.GetDistributeMenu(data), {
+						MY_GKP_Chat.OpenFrame(data.item, Loot.GetDistributeMenu(data, data.nUiId), {
 							dwDoodadID = dwDoodadID,
 							data = data,
 						})
@@ -657,7 +630,7 @@ function Loot.GetBossAction(dwDoodadID, bMenu)
 				{
 					szOption = g_tStrings.STR_HOTKEY_SURE,
 					fnAction = function()
-						Loot.DistributeItem(MY_GKP_LOOT_BOSS, aEquipmentItemData, true)
+						Loot.DistributeItem(MY_GKP_LOOT_BOSS, aEquipmentItemData)
 					end
 				},
 				{
@@ -746,10 +719,10 @@ function Loot.GetaPartyMember(aDoodadID)
 	return aPartyMember
 end
 -- 严格判断
-function Loot.DistributeItem(dwID, info, bShift)
+function Loot.DistributeItem(dwID, info, szAutoDistType)
 	if IsArray(info) then
 		for _, p in ipairs(info) do
-			Loot.DistributeItem(dwID, p, bShift)
+			Loot.DistributeItem(dwID, p, szAutoDistType)
 		end
 		return
 	end
@@ -805,13 +778,13 @@ function Loot.DistributeItem(dwID, info, bShift)
 			tab.nBookID = item.nBookID
 		end
 		if MY_GKP.bOn then
-			MY_GKP.Record(tab, item, IsShiftKeyDown() or bShift)
+			MY_GKP.Record(tab, item)
 		else -- 关闭的情况所有东西全部绕过
 			tab.nMoney = 0
 			MY_GKP('GKP_Record', tab)
 		end
-		if GKP_LOOT_AUTO_LIST[item.nUiId] then
-			GKP_LOOT_AUTO[item.nUiId] = dwID
+		if szAutoDistType then
+			GKP_LOOT_RECENT[szAutoDistType] = dwID
 		end
 		-- LIB.Sysmsg('LOOT: ' .. info.dwID .. '->' .. dwID) -- !!! Debug
 		doodad.DistributeItem(info.dwID, dwID)
@@ -820,7 +793,7 @@ function Loot.DistributeItem(dwID, info, bShift)
 	end
 end
 
-function Loot.GetMessageBox(dwID, aItemData, bShift)
+function Loot.GetMessageBox(dwID, aItemData, szAutoDistType)
 	if not IsArray(aItemData) then
 		aItemData = {aItemData}
 	end
@@ -844,7 +817,7 @@ function Loot.GetMessageBox(dwID, aItemData, bShift)
 		{
 			szOption = g_tStrings.STR_HOTKEY_SURE,
 			fnAction = function()
-				Loot.DistributeItem(dwID, aItemData, bShift)
+				Loot.DistributeItem(dwID, aItemData, szAutoDistType)
 			end
 		},
 		{ szOption = g_tStrings.STR_HOTKEY_CANCEL },
@@ -882,7 +855,37 @@ local function IsItemRequireConfirm(data)
 	end
 	return false
 end
-function Loot.GetDistributeMenu(aItemData)
+local function GetMemberMenu(member, aItemData, szAutoDistType)
+	local frame = Loot.GetFrame()
+	local wnd = Loot.GetDoodadWnd(frame, dwDoodadID)
+	local szIcon, nFrame = GetForceImage(member.dwForceID)
+	local szOption = member.szName
+	return {
+		szOption = szOption,
+		bDisable = not member.bOnlineFlag,
+		rgb = { LIB.GetForceColor(member.dwForceID) },
+		szIcon = szIcon, nFrame = nFrame,
+		fnAutoClose = function()
+			return not wnd or not wnd:IsValid()
+		end,
+		szLayer = 'ICON_RIGHTMOST',
+		fnAction = function()
+			local bConfirm = false
+			for _, data in ipairs(aItemData) do
+				if IsItemRequireConfirm(data) then
+					bConfirm = true
+					break
+				end
+			end
+			if bConfirm then
+				Loot.GetMessageBox(member.dwID, aItemData, szAutoDistType)
+			else
+				Loot.DistributeItem(member.dwID, aItemData, szAutoDistType)
+			end
+		end
+	}
+end
+function Loot.GetDistributeMenu(aItemData, szAutoDistType)
 	if not IsArray(aItemData) then
 		aItemData = {aItemData}
 	end
@@ -904,48 +907,19 @@ function Loot.GetDistributeMenu(aItemData)
 		{ szOption = concat(aItemName, g_tStrings.STR_PAUSE), bDisable = true },
 		{ bDevide = true }
 	}
-	local fnGetMenu = function(v, szName)
-		local frame = Loot.GetFrame()
-		local wnd = Loot.GetDoodadWnd(frame, dwDoodadID)
-		local szIcon, nFrame = GetForceImage(v.dwForceID)
-		local szOption = v.szName
-		if szName then
-			szOption = szOption .. ' - ' .. szName
-		end
-		return {
-			szOption = szOption,
-			bDisable = not v.bOnlineFlag,
-			rgb = { LIB.GetForceColor(v.dwForceID) },
-			szIcon = szIcon, nFrame = nFrame,
-			fnAutoClose = function()
-				return not wnd or not wnd:IsValid()
-			end,
-			szLayer = 'ICON_RIGHTMOST',
-			fnAction = function()
-				local bConfirm = false
-				for _, data in ipairs(aItemData) do
-					if IsItemRequireConfirm(data) then
-						bConfirm = true
-						break
-					end
-				end
-				if bConfirm then
-					Loot.GetMessageBox(v.dwID, aItemData, szName and true)
-				else
-					Loot.DistributeItem(v.dwID, aItemData, szName and true)
-				end
+	local dwAutoDistID
+	if szAutoDistType then
+		dwAutoDistID = GKP_LOOT_RECENT[szAutoDistType]
+		if dwAutoDistID then
+			local member = aPartyMember(dwAutoDistID)
+			if member then
+				table.insert(menu, GetMemberMenu(member, aItemData, szAutoDistType))
+				table.insert(menu, { bDevide = true })
 			end
-		}
-	end
-	if #aItemData == 1 and GKP_LOOT_AUTO[aItemData[1].item.nUiId] then
-		local member = aPartyMember(GKP_LOOT_AUTO[aItemData[1].item.nUiId])
-		if member then
-			table.insert(menu, fnGetMenu(member, aItemData[1].szName))
-			table.insert(menu, { bDevide = true })
 		end
 	end
-	for k, v in ipairs(aPartyMember) do
-		table.insert(menu, fnGetMenu(v))
+	for _, member in ipairs(aPartyMember) do
+		table.insert(menu, GetMemberMenu(member, aItemData, szAutoDistType))
 	end
 	return menu
 end
@@ -1100,7 +1074,7 @@ function Loot.DrawLootList(dwID)
 			-- box:SetOverText(3, '')
 			-- box:SetOverTextFontScheme(3, 15)
 			-- box:SetOverTextPosition(3, ITEM_POSITION.LEFT_TOP)
-			if GKP_LOOT_AUTO[item.nUiId] then
+			if GKP_LOOT_RECENT[item.nUiId] then
 				box:SetObjectStaring(true)
 			end
 			h.itemData = itemData
@@ -1355,7 +1329,7 @@ end)
 LIB.RegisterEvent('MY_GKP_LOOT_BOSS', function()
 	if not arg0 then
 		MY_GKP_LOOT_BOSS = nil
-		GKP_LOOT_AUTO = {}
+		GKP_LOOT_RECENT = {}
 	else
 		local team = GetClientTeam()
 		if team then
