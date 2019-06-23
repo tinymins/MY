@@ -167,11 +167,12 @@ function MY_GKP_Loot.OnFrameBreathe()
 		-- Ê°È¡ÅÐ¶¨
 		local bCanDialog = MY_GKP_Loot.CanDialog(me, doodad)
 		if not LIB.IsShieldedVersion() then
-			local hList, box = wnd:Lookup('', 'Handle_ItemList')
+			local hList, hItem = wnd:Lookup('', 'Handle_ItemList')
 			for i = 0, hList:GetItemCount() - 1 do
-				box = hList:Lookup(i):Lookup('Box_Item')
-				if MY_GKP_Loot.IsItemAutoPickup(box.itemData, wnd.tItemConfig, doodad, bCanDialog) then
-					LIB.ExecuteWithThis(box, MY_GKP_Loot.OnItemLButtonClick)
+				hItem = hList:Lookup(i)
+				if MY_GKP_Loot.IsItemAutoPickup(hItem.itemData, wnd.tItemConfig, doodad, bCanDialog)
+				and GetClientTeam().nLootMode == PARTY_LOOT_MODE.FREE_FOR_ALL then
+					LIB.ExecuteWithThis(hItem, MY_GKP_Loot.OnItemLButtonClick)
 				end
 			end
 		end
@@ -434,8 +435,9 @@ function MY_GKP_Loot.OnItemLButtonClick()
 		return
 	end
 	if szName == 'Handle_Item' or szName == 'Box_Item' then
-		local box        = szName == 'Handle_Item' and this:Lookup('Box_Item') or this
-		local data       = box.itemData
+		local hItem      = szName == 'Handle_Item' and this or this:GetParent()
+		local box        = hItem:Lookup('Box_Item')
+		local data       = hItem.itemData
 		local me, team   = GetClientPlayer(), GetClientTeam()
 		local dwDoodadID = data.dwDoodadID
 		local doodad     = GetDoodad(dwDoodadID)
@@ -476,8 +478,9 @@ end
 function MY_GKP_Loot.OnItemRButtonClick()
 	local szName = this:GetName()
 	if szName == 'Handle_Item' or szName == 'Box_Item' then
-		local box  = szName == 'Handle_Item' and this:Lookup('Box_Item') or this
-		local data = box.itemData
+		local hItem = szName == 'Handle_Item' and this or this:GetParent()
+		local box   = hItem:Lookup('Box_Item')
+		local data = hItem.itemData
 		if not data.bDist then
 			return
 		end
@@ -1000,7 +1003,7 @@ function Loot.DrawLootList(dwID)
 			if GKP_LOOT_AUTO[item.nUiId] then
 				box:SetObjectStaring(true)
 			end
-			box.itemData = itemData
+			h.itemData = itemData
 		end
 	end
 	if bSpecial then
