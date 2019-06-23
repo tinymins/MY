@@ -836,7 +836,7 @@ function Loot.GetMessageBox(dwID, aItemData, bShift)
 		szMessage = FormatLinkString(
 			g_tStrings.PARTY_DISTRIBUTE_ITEM_SURE,
 			'font=162',
-			concat(aItemName, g_tStrings.STR_PAUSE),
+			concat(aItemName, GetFormatText(g_tStrings.STR_PAUSE)),
 			GetFormatText('['.. info.szName .. ']', 162, fr, fg, fb)
 		),
 		szName = 'GKP_Distribute',
