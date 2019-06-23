@@ -274,7 +274,7 @@ function MY_GKP_Loot.OnMouseEnter()
 		local w, h = this:GetSize()
 		local szXml = ''
 		local dwDoodadID = this:GetParent().dwDoodadID
-		local aPartyMember = Loot.GetaPartyMember(GetDoodad(dwDoodadID))
+		local aPartyMember = Loot.GetaPartyMember(dwDoodadID)
 		local p = MY_GKP_LOOT_BOSS and aPartyMember(MY_GKP_LOOT_BOSS)
 		if p then
 			local r, g, b = LIB.GetForceColor(p.dwForceID)
@@ -413,6 +413,14 @@ function MY_GKP_Loot.OnItemMouseEnter()
 		-- 		this:SetOverText(3, g_tStrings.tEquipTypeNameTable[item.nSub])
 		-- 	end
 		-- end
+	elseif szName == 'Image_GroupDistrib' then
+		local hItem = this:GetParent()
+		local hList = hItem:GetParent()
+		for i = 0, hList:GetItemCount() - 1 do
+			local h = hList:Lookup(i)
+			h:Lookup('Shadow_Highlight'):SetVisible(h.itemData.szType == hItem.itemData.szType)
+		end
+		LIB.OutputTip(hItem, GetFormatText(_L['Onekey distrib this group'], 136), true)
 	end
 end
 
@@ -428,6 +436,13 @@ function MY_GKP_Loot.OnItemMouseLeave()
 		-- if this and this:IsValid() and this.SetOverText then
 		-- 	this:SetOverText(3, '')
 		-- end
+	elseif szName == 'Image_GroupDistrib' then
+		local hItem = this:GetParent()
+		local hList = hItem:GetParent()
+		for i = 0, hList:GetItemCount() - 1 do
+			hList:Lookup(i):Lookup('Shadow_Highlight'):Hide()
+		end
+		HideTip()
 	end
 end
 
@@ -461,9 +476,9 @@ function MY_GKP_Loot.OnItemLButtonClick()
 				return
 			end
 			if IsShiftKeyDown() and GKP_LOOT_AUTO[data.item.nUiId] then
-				return Loot.DistributeItem(GKP_LOOT_AUTO[data.item.nUiId], dwDoodadID, data.dwID, data, true)
+				return Loot.DistributeItem(GKP_LOOT_AUTO[data.item.nUiId], data, true)
 			else
-				return PopupMenu(Loot.GetDistributeMenu(dwDoodadID, data))
+				return PopupMenu(Loot.GetDistributeMenu(data))
 			end
 		elseif data.bBidding then
 			if team.nLootMode ~= PARTY_LOOT_MODE.BIDDING then
@@ -475,6 +490,29 @@ function MY_GKP_Loot.OnItemLButtonClick()
 		else -- 左键摸走
 			LootItem(dwDoodadID, data.dwID)
 		end
+	elseif szName == 'Image_GroupDistrib' then
+		local hItem      = this:GetParent()
+		local hList      = hItem:GetParent()
+		local me, team   = GetClientPlayer(), GetClientTeam()
+		local aItemData  = {}
+		for i = 0, hList:GetItemCount() - 1 do
+			local h = hList:Lookup(i)
+			if h.itemData.szType == hItem.itemData.szType then
+				insert(aItemData, h.itemData)
+			end
+		end
+		for _, data in ipairs(aItemData) do
+			local dwDoodadID = data.dwDoodadID
+			local doodad     = GetDoodad(dwDoodadID)
+			if not doodad then
+				LIB.Debug({'Doodad does not exist!'}, 'MY_GKP_Loot:OnItemLButtonClick', DEBUG_LEVEL.WARNING)
+				return Loot.RemoveLootList(dwDoodadID)
+			end
+			if not Loot.AuthCheck(dwDoodadID) then
+				return
+			end
+		end
+		return PopupMenu(Loot.GetDistributeMenu(aItemData))
 	end
 end
 -- 右键拍卖
@@ -513,7 +551,7 @@ function MY_GKP_Loot.OnItemRButtonClick()
 				table.insert(menu, {
 					szOption = v[1],
 					fnAction = function()
-						MY_GKP_Chat.OpenFrame(data.item, Loot.GetDistributeMenu(dwDoodadID, data), {
+						MY_GKP_Chat.OpenFrame(data.item, Loot.GetDistributeMenu(data), {
 							dwDoodadID = dwDoodadID,
 							data = data,
 						})
@@ -581,7 +619,7 @@ function Loot.GetBossAction(dwDoodadID, bMenu)
 	end
 	local szName, aItemData = Loot.GetDoodad(dwDoodadID)
 	local fnAction = function()
-		local tEquipment = {}
+		local aEquipmentItemData = {}
 		for k, v in ipairs(aItemData) do
 			if (v.item.nGenre == ITEM_GENRE.EQUIPMENT or IsCtrlKeyDown())
 				and v.item.nSub ~= EQUIPMENT_SUB.WAIST_EXTEND
@@ -594,20 +632,20 @@ function Loot.GetBossAction(dwDoodadID, bMenu)
 				and v.item.nSub ~= EQUIPMENT_SUB.BACK_CLOAK_EXTEND
 				and v.bDist
 			then -- 按住Ctrl的情况下 无视分类 否则只给装备
-				table.insert(tEquipment, v.item)
+				table.insert(aEquipmentItemData, v)
 			end
 		end
-		if #tEquipment == 0 then
+		if #aEquipmentItemData == 0 then
 			return LIB.Alert(_L['No Equiptment left for Equiptment Boss'])
 		end
-		local aPartyMember = Loot.GetaPartyMember(GetDoodad(dwDoodadID))
+		local aPartyMember = Loot.GetaPartyMember(dwDoodadID)
 		local p = aPartyMember(MY_GKP_LOOT_BOSS)
 		if p and p.bOnlineFlag then  -- 这个人存在团队的情况下
 			local szXml = GetFormatText(_L['Are you sure you want the following item\n'], 162, 255, 255, 255)
 			local r, g, b = LIB.GetForceColor(p.dwForceID)
-			for k, v in ipairs(tEquipment) do
-				local r, g, b = GetItemFontColorByQuality(v.nQuality)
-				szXml = szXml .. GetFormatText('['.. GetItemNameByItem(v) ..']\n', 166, r, g, b)
+			for k, v in ipairs(aEquipmentItemData) do
+				local r, g, b = GetItemFontColorByQuality(v.item.nQuality)
+				szXml = szXml .. GetFormatText('['.. GetItemNameByItem(v.item) ..']\n', 166, r, g, b)
 			end
 			szXml = szXml .. GetFormatText(_L['All distrubute to'], 162, 255, 255, 255)
 			szXml = szXml .. GetFormatText('['.. p.szName ..']', 162, r, g, b)
@@ -619,9 +657,7 @@ function Loot.GetBossAction(dwDoodadID, bMenu)
 				{
 					szOption = g_tStrings.STR_HOTKEY_SURE,
 					fnAction = function()
-						for k, v in ipairs(tEquipment) do
-							Loot.DistributeItem(MY_GKP_LOOT_BOSS, dwDoodadID, v.dwID, {}, true)
-						end
+						Loot.DistributeItem(MY_GKP_LOOT_BOSS, aEquipmentItemData, true)
 					end
 				},
 				{
@@ -669,11 +705,31 @@ function Loot.AuthCheck(dwID)
 	return true
 end
 -- 拾取对象
-function Loot.GetaPartyMember(doodad)
+function Loot.GetaPartyMember(aDoodadID)
+	if not IsTable(aDoodadID) then
+		aDoodadID = {aDoodadID}
+	end
 	local team = GetClientTeam()
-	local aPartyMember = doodad.GetLooterList()
-	if not aPartyMember then
-		return LIB.Sysmsg({_L['Pick up time limit exceeded, please try again.']})
+	local tDoodadID = {}
+	local tPartyMember = {}
+	local aPartyMember = {}
+	for _, dwDoodadID in ipairs(aDoodadID) do
+		if not tDoodadID[dwDoodadID] then
+			local doodad = GetDoodad(dwDoodadID)
+			if doodad then
+				local aLooterList = doodad.GetLooterList()
+				if not aLooterList then
+					LIB.Sysmsg({_L['Pick up time limit exceeded, please try again.']})
+				end
+				for _, p in ipairs(aLooterList) do
+					if not tPartyMember[p.dwID] then
+						insert(aPartyMember, p)
+						tPartyMember[p.dwID] = true
+					end
+				end
+			end
+			tDoodadID[dwDoodadID] = true
+		end
 	end
 	for k, v in ipairs(aPartyMember) do
 		local player = team.GetMemberInfo(v.dwID)
@@ -690,28 +746,34 @@ function Loot.GetaPartyMember(doodad)
 	return aPartyMember
 end
 -- 严格判断
-function Loot.DistributeItem(dwID, dwDoodadID, dwItemID, info, bShift)
-	local doodad = GetDoodad(dwDoodadID)
-	if not Loot.AuthCheck(dwDoodadID) then
+function Loot.DistributeItem(dwID, info, bShift)
+	if IsArray(info) then
+		for _, p in ipairs(info) do
+			Loot.DistributeItem(dwID, p, bShift)
+		end
+		return
+	end
+	local doodad = GetDoodad(info.dwDoodadID)
+	if not Loot.AuthCheck(info.dwDoodadID) then
 		return
 	end
 	local me = GetClientPlayer()
-	local item = GetItem(dwItemID)
+	local item = GetItem(info.dwID)
 	if not item then
 		LIB.Debug({'Item does not exist, check!!'}, 'MY_GKP_Loot', DEBUG_LEVEL.WARNING)
-		local szName, aItemData = Loot.GetDoodad(dwDoodadID)
+		local szName, aItemData = Loot.GetDoodad(info.dwDoodadID)
 		for k, v in ipairs(aItemData) do
 			if v.nQuality == info.nQuality and GetItemNameByItem(v.item) == info.szName then
-				dwItemID = v.item.dwID
+				info.dwID = v.item.dwID
 				LIB.Debug({'Item matching, ' .. GetItemNameByItem(v.item)}, 'MY_GKP_Loot', DEBUG_LEVEL.LOG)
 				break
 			end
 		end
 	end
-	local item         = GetItem(dwItemID)
+	local item         = GetItem(info.dwID)
 	local team         = GetClientTeam()
 	local player       = team.GetMemberInfo(dwID)
-	local aPartyMember = Loot.GetaPartyMember(doodad)
+	local aPartyMember = Loot.GetaPartyMember(info.dwDoodadID)
 	if item then
 		if not player or (player and not player.bIsOnLine) then -- 不在线
 			return LIB.Alert(_L['No Pick up Object, may due to Network off - line'])
@@ -751,22 +813,30 @@ function Loot.DistributeItem(dwID, dwDoodadID, dwItemID, info, bShift)
 		if GKP_LOOT_AUTO_LIST[item.nUiId] then
 			GKP_LOOT_AUTO[item.nUiId] = dwID
 		end
-		doodad.DistributeItem(dwItemID, dwID)
+		-- LIB.Sysmsg('LOOT: ' .. info.dwID .. '->' .. dwID) -- !!! Debug
+		doodad.DistributeItem(info.dwID, dwID)
 	else
 		LIB.Sysmsg({_L['Userdata is overdue, distribut failed, please try again.']})
 	end
 end
 
-function Loot.GetMessageBox(dwID, dwDoodadID, dwItemID, data, bShift)
+function Loot.GetMessageBox(dwID, aItemData, bShift)
+	if not IsArray(aItemData) then
+		aItemData = {aItemData}
+	end
 	local team = GetClientTeam()
 	local info = team.GetMemberInfo(dwID)
 	local fr, fg, fb = LIB.GetForceColor(info.dwForceID)
-	local ir, ig, ib = GetItemFontColorByQuality(data.nQuality)
+	local aItemName = {}
+	for _, data in ipairs(aItemData) do
+		local ir, ig, ib = GetItemFontColorByQuality(data.nQuality)
+		insert(aItemName, GetFormatText('['.. data.szName .. ']', 166, ir, ig, ib))
+	end
 	local msg = {
 		szMessage = FormatLinkString(
 			g_tStrings.PARTY_DISTRIBUTE_ITEM_SURE,
 			'font=162',
-			GetFormatText('['.. data.szName .. ']', 166, ir, ig, ib),
+			concat(aItemName, g_tStrings.STR_PAUSE),
 			GetFormatText('['.. info.szName .. ']', 162, fr, fg, fb)
 		),
 		szName = 'GKP_Distribute',
@@ -774,7 +844,7 @@ function Loot.GetMessageBox(dwID, dwDoodadID, dwItemID, data, bShift)
 		{
 			szOption = g_tStrings.STR_HOTKEY_SURE,
 			fnAction = function()
-				Loot.DistributeItem(dwID, dwDoodadID, dwItemID, data, bShift)
+				Loot.DistributeItem(dwID, aItemData, bShift)
 			end
 		},
 		{ szOption = g_tStrings.STR_HOTKEY_CANCEL },
@@ -782,16 +852,56 @@ function Loot.GetMessageBox(dwID, dwDoodadID, dwItemID, data, bShift)
 	MessageBox(msg)
 end
 
-function Loot.GetDistributeMenu(dwDoodadID, data)
+do
+local function IsItemRequireConfirm(data)
+	if data.nQuality >= MY_GKP_Loot.nConfirmQuality
+	or (MY_GKP_Loot.tConfirm.Huangbaba and GKP_LOOT_HUANGBABA[GetItemNameByItem(data.item)]) -- 玄晶
+	or (MY_GKP_Loot.tConfirm.Book and data.item.nGenre == ITEM_GENRE.BOOK) -- 书籍
+	or (MY_GKP_Loot.tConfirm.Pendant and data.item.nGenre == ITEM_GENRE.EQUIPMENT and ( -- 挂件
+		data.item.nSub == WAIST_EXTEND
+		or data.item.nSub == BACK_EXTEND
+		or data.item.nSub == FACE_EXTEND
+	))
+	or (MY_GKP_Loot.tConfirm.Outlook and data.item.nGenre == ITEM_GENRE.EQUIPMENT and ( -- 肩饰披风
+		data.item.nSub == EQUIPMENT_SUB.BACK_CLOAK_EXTEND
+		or data.item.nSub == EQUIPMENT_SUB.L_SHOULDER_EXTEND
+		or data.item.nSub == EQUIPMENT_SUB.R_SHOULDER_EXTEND
+	))
+	or (MY_GKP_Loot.tConfirm.Pet and ( -- 跟宠
+		data.item.nGenre == ITEM_GENRE.CUB
+		or (data.item.nGenre == ITEM_GENRE.EQUIPMENT and data.item.nSub == EQUIPMENT_SUB.PET)
+	))
+	or (MY_GKP_Loot.tConfirm.Horse and ( -- 坐骑
+		data.item.nGenre == ITEM_GENRE.EQUIPMENT and data.item.nSub == EQUIPMENT_SUB.HORSE
+	))
+	or (MY_GKP_Loot.tConfirm.HorseEquip and ( -- 马具
+		data.item.nGenre == ITEM_GENRE.EQUIPMENT and data.item.nSub == EQUIPMENT_SUB.HORSE_EQUIP
+	))
+	then
+		return true
+	end
+	return false
+end
+function Loot.GetDistributeMenu(aItemData)
+	if not IsArray(aItemData) then
+		aItemData = {aItemData}
+	end
+	local aDoodadID = {}
+	for _, p in ipairs(aItemData) do
+		insert(aDoodadID, p.dwDoodadID)
+	end
 	local me, team     = GetClientPlayer(), GetClientTeam()
 	local dwMapID      = me.GetMapID()
-	local doodad       = GetDoodad(dwDoodadID)
-	local aPartyMember = Loot.GetaPartyMember(doodad)
+	local aPartyMember = Loot.GetaPartyMember(aDoodadID)
 	table.sort(aPartyMember, function(a, b)
 		return a.dwForceID < b.dwForceID
 	end)
+	local aItemName = {}
+	for _, p in ipairs(aItemData) do
+		insert(aItemName, p.szName)
+	end
 	local menu = {
-		{ szOption = data.szName, bDisable = true },
+		{ szOption = concat(aItemName, g_tStrings.STR_PAUSE), bDisable = true },
 		{ bDevide = true }
 	}
 	local fnGetMenu = function(v, szName)
@@ -812,41 +922,25 @@ function Loot.GetDistributeMenu(dwDoodadID, data)
 			end,
 			szLayer = 'ICON_RIGHTMOST',
 			fnAction = function()
-				if data.nQuality >= MY_GKP_Loot.nConfirmQuality
-				or (MY_GKP_Loot.tConfirm.Huangbaba and GKP_LOOT_HUANGBABA[GetItemNameByItem(data.item)]) -- 玄晶
-				or (MY_GKP_Loot.tConfirm.Book and data.item.nGenre == ITEM_GENRE.BOOK) -- 书籍
-				or (MY_GKP_Loot.tConfirm.Pendant and data.item.nGenre == ITEM_GENRE.EQUIPMENT and ( -- 挂件
-					data.item.nSub == WAIST_EXTEND
-					or data.item.nSub == BACK_EXTEND
-					or data.item.nSub == FACE_EXTEND
-				))
-				or (MY_GKP_Loot.tConfirm.Outlook and data.item.nGenre == ITEM_GENRE.EQUIPMENT and ( -- 肩饰披风
-					data.item.nSub == EQUIPMENT_SUB.BACK_CLOAK_EXTEND
-					or data.item.nSub == EQUIPMENT_SUB.L_SHOULDER_EXTEND
-					or data.item.nSub == EQUIPMENT_SUB.R_SHOULDER_EXTEND
-				))
-				or (MY_GKP_Loot.tConfirm.Pet and ( -- 跟宠
-					data.item.nGenre == ITEM_GENRE.CUB
-					or (data.item.nGenre == ITEM_GENRE.EQUIPMENT and data.item.nSub == EQUIPMENT_SUB.PET)
-				))
-				or (MY_GKP_Loot.tConfirm.Horse and ( -- 坐骑
-					data.item.nGenre == ITEM_GENRE.EQUIPMENT and data.item.nSub == EQUIPMENT_SUB.HORSE
-				))
-				or (MY_GKP_Loot.tConfirm.HorseEquip and ( -- 马具
-					data.item.nGenre == ITEM_GENRE.EQUIPMENT and data.item.nSub == EQUIPMENT_SUB.HORSE_EQUIP
-				))
-				then
-					Loot.GetMessageBox(v.dwID, dwDoodadID, data.dwID, data, szName and true)
+				local bConfirm = false
+				for _, data in ipairs(aItemData) do
+					if IsItemRequireConfirm(data) then
+						bConfirm = true
+						break
+					end
+				end
+				if bConfirm then
+					Loot.GetMessageBox(v.dwID, aItemData, szName and true)
 				else
-					Loot.DistributeItem(v.dwID, dwDoodadID, data.dwID, data, szName and true)
+					Loot.DistributeItem(v.dwID, aItemData, szName and true)
 				end
 			end
 		}
 	end
-	if GKP_LOOT_AUTO[data.item.nUiId] then
-		local member = aPartyMember(GKP_LOOT_AUTO[data.item.nUiId])
+	if #aItemData == 1 and GKP_LOOT_AUTO[aItemData[1].item.nUiId] then
+		local member = aPartyMember(GKP_LOOT_AUTO[aItemData[1].item.nUiId])
 		if member then
-			table.insert(menu, fnGetMenu(member, data.szName))
+			table.insert(menu, fnGetMenu(member, aItemData[1].szName))
 			table.insert(menu, { bDevide = true })
 		end
 	end
@@ -854,6 +948,7 @@ function Loot.GetDistributeMenu(dwDoodadID, data)
 		table.insert(menu, fnGetMenu(v))
 	end
 	return menu
+end
 end
 
 function Loot.AdjustFrame(frame)
@@ -987,6 +1082,8 @@ function Loot.DrawLootList(dwID)
 			end
 			if MY_GKP_Loot.bVertical then
 				local bSuit, bBetter = IsItemDataSuitable(itemData)
+				h:Lookup('Image_GroupDistrib'):SetVisible(itemData.bDist
+					and (i == 1 or aItemData[i - 1].szType ~= itemData.szType or not aItemData[i - 1].bDist))
 				h:Lookup('Image_Suitable'):SetVisible(bSuit and not bBetter)
 				h:Lookup('Image_Better'):SetVisible(bBetter)
 				h:Lookup('Image_Spliter'):SetVisible(i ~= #aItemData)
@@ -1183,6 +1280,7 @@ function Loot.GetDoodad(dwID)
 					nQuality     = item.nQuality,
 					bNeedRoll    = bNeedRoll    ,
 					bDist        = bDist        ,
+					-- bDist        = true         , -- !!! Debug
 					bBidding     = bBidding     ,
 				}
 				if item.nGenre == ITEM_GENRE.BOOK then

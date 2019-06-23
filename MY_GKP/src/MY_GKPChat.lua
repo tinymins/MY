@@ -102,7 +102,7 @@ function MY_GKP.DistributionItem()
 	local aPartyMember = GKP_Loot.GetaPartyMember(doodad)
 	local member = aPartyMember(szName)
 	if member then
-		GKP_Loot.GetMessageBox(member.dwID, data.dwDoodadID, data.data.dwID, data.data)
+		GKP_Loot.GetMessageBox(member.dwID, data.data)
 	else
 		return LIB.Alert(_L['No Pick up Object, may due to Network off - line'])
 	end
