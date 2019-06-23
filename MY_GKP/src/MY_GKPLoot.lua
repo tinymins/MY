@@ -1067,6 +1067,7 @@ function Loot.DrawLootList(dwID)
 				box:SetRelPos(2, 2)
 				h:SetSize(52, 52)
 				h:FormatAllItemPos()
+				h:Lookup('Image_GroupDistrib'):Hide()
 				h:Lookup('Image_Spliter'):Hide()
 				h:Lookup('Image_Hover'):SetSize(0, 0)
 			end
