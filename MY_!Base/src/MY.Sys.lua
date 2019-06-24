@@ -252,13 +252,13 @@ end
 --   # #     #   #       #     # # #     #       #       #       # #                 #   #       #
 -- ##################################################################################################
 if IsLocalFileExist(LIB.GetAddonInfo().szRoot .. '@DATA/') then
-	CPath.Move(LIB.GetAddonInfo().szRoot .. '@DATA/', LIB.GetAddonInfo().szInterfaceRoot .. LIB.GetAddonInfo().szNameSpace .. '#DATA/')
+	CPath.Move(LIB.GetAddonInfo().szRoot .. '@DATA/', LIB.GetAddonInfo().szDataRoot)
 end
 
 -- 格式化数据文件路径（替换$uid、$lang、$server以及补全相对路径）
 -- (string) LIB.GetLUADataPath(oFilePath)
 --   当路径为绝对路径时(以斜杠开头)不作处理
---   当路径为相对路径时 相对于插件`MY@DATA`目录
+--   当路径为相对路径时 相对于插件`{NS}#DATA`目录
 --   可以传入表{szPath, ePathType}
 function LIB.FormatPath(oFilePath, tParams)
 	if not tParams then
@@ -272,7 +272,7 @@ function LIB.FormatPath(oFilePath, tParams)
 	end
 	-- Unified the directory separator
 	szFilePath = string.gsub(szFilePath, '\\', '/')
-	-- if it's relative path then complete path with '/{NS}@DATA/'
+	-- if it's relative path then complete path with '/{NS}#DATA/'
 	if szFilePath:sub(2, 3) ~= ':/' then
 		if ePathType == PATH_TYPE.DATA then
 			szFilePath = LIB.GetAddonInfo().szInterfaceRoot .. LIB.GetAddonInfo().szNameSpace .. '#DATA/' .. szFilePath

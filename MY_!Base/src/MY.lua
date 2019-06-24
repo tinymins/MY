@@ -121,19 +121,20 @@ local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 ---------------------------------------------------------------------------------------------
 local _BUILD_            = '20190619'
 local _VERSION_          = 0x2013300
-local _DEBUG_LEVEL_      = tonumber(LoadLUAData('interface/my.debug.level') or nil) or 4
-local _DELOG_LEVEL_      = tonumber(LoadLUAData('interface/my.delog.level') or nil) or 4
-local _NORESTIME_        = tonumber(LoadLUAData('interface/my.nrtim.level') or nil) or -1
 local _MENU_COLOR_       = {255, 165, 79}
 local _MAX_PLAYER_LEVEL_ = 100
 local _INTERFACE_ROOT_   = './Interface/'
 local _NAME_SPACE_       = 'MY'
 local _ADDON_ROOT_       = _INTERFACE_ROOT_ .. 'MY/'
+local _DATA_ROOT_        = _INTERFACE_ROOT_ .. 'MY#DATA/'
 local _FRAMEWORK_ROOT_   = _INTERFACE_ROOT_ .. 'MY/MY_!Base/'
 local _PSS_ST_           = _FRAMEWORK_ROOT_ .. 'image/ST.pss'
 local _UITEX_ST_         = _FRAMEWORK_ROOT_ .. 'image/ST_UI.UITex'
 local _UITEX_POSTER_     = _FRAMEWORK_ROOT_ .. 'image/Poster.UITex'
 local _UITEX_COMMON_     = _FRAMEWORK_ROOT_ .. 'image/UICommon.UITex'
+local _DEBUG_LEVEL_      = tonumber(LoadLUAData(_DATA_ROOT_ .. 'debug.level.jx3dat') or nil) or 4
+local _DELOG_LEVEL_      = tonumber(LoadLUAData(_DATA_ROOT_ .. 'delog.level.jx3dat') or nil) or 4
+local _NORESTIME_        = tonumber(LoadLUAData(_DATA_ROOT_ .. 'nrtim.level.jx3dat') or nil) or -1
 -----------------------------------------------
 -- º”‘ÿ”Ô—‘∞¸
 -----------------------------------------------
@@ -841,6 +842,7 @@ do local AddonInfo = SetmetaReadonly({
 	nLogLevel         = _DELOG_LEVEL_     ,
 	szInterfaceRoot   = _INTERFACE_ROOT_  ,
 	szRoot            = _ADDON_ROOT_      ,
+	szDataRoot        = _DATA_ROOT_       ,
 	szFrameworkRoot   = _FRAMEWORK_ROOT_  ,
 	szAuthor          = _AUTHOR_          ,
 	szAuthorWeibo     = _AUTHOR_WEIBO_    ,
