@@ -479,7 +479,7 @@ function MY_MiddleMapMark.Search(szKeyword)
 			end
 		end
 	end
-	local nX, nY
+	local nX, nY, item
 
 	for i, szSearch in ipairs(aKeywords) do
 		infos = MY_MiddleMapMark.SearchNpc(szSearch, dwMapID)
