@@ -40,7 +40,7 @@ local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_
 local PATH_ROOT = LIB.GetAddonInfo().szRoot .. 'MY_GKP/'
 local _L = LIB.LoadLangPack(PATH_ROOT .. 'lang/')
 
-local DEBUG_LOOT = true -- 测试拾取分配 强制进入分配模式并最终不调用分配接口
+local DEBUG_LOOT = false -- 测试拾取分配 强制进入分配模式并最终不调用分配接口
 local GKP_LOOT_ANCHOR  = { s = 'CENTER', r = 'CENTER', x = 0, y = 0 }
 local GKP_LOOT_INIFILE = PATH_ROOT .. 'ui/MY_GKP_Loot.ini'
 local MY_GKP_LOOT_BOSS -- 散件老板
