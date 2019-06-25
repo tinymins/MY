@@ -40,6 +40,7 @@ local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_
 local PATH_ROOT = LIB.GetAddonInfo().szRoot .. 'MY_GKP/'
 local _L = LIB.LoadLangPack(PATH_ROOT .. 'lang/')
 
+local DEBUG_LOOT = true -- 测试拾取分配 强制进入分配模式并最终不调用分配接口
 local GKP_LOOT_ANCHOR  = { s = 'CENTER', r = 'CENTER', x = 0, y = 0 }
 local GKP_LOOT_INIFILE = PATH_ROOT .. 'ui/MY_GKP_Loot.ini'
 local MY_GKP_LOOT_BOSS -- 散件老板
@@ -801,7 +802,9 @@ function Loot.DistributeItem(dwID, info, szAutoDistType)
 		if szAutoDistType then
 			GKP_LOOT_RECENT[szAutoDistType] = dwID
 		end
-		-- LIB.Sysmsg('LOOT: ' .. info.dwID .. '->' .. dwID) -- !!! Debug
+		if DEBUG_LOOT then
+			return LIB.Sysmsg('LOOT: ' .. info.dwID .. '->' .. dwID) -- !!! Debug
+		end
 		doodad.DistributeItem(info.dwID, dwID)
 	else
 		LIB.Sysmsg({_L['Userdata is overdue, distribut failed, please try again.']})
@@ -1078,7 +1081,7 @@ function Loot.DrawLootList(dwID)
 			end
 			if MY_GKP_Loot.bVertical then
 				local bSuit, bBetter = IsItemDataSuitable(itemData)
-				h:Lookup('Image_GroupDistrib'):SetVisible(itemData.bDist
+			h:Lookup('Image_GroupDistrib'):SetVisible(itemData.bDist
 					and (i == 1 or aItemData[i - 1].szType ~= itemData.szType or not aItemData[i - 1].bDist))
 				h:Lookup('Image_Suitable'):SetVisible(bSuit and not bBetter)
 				h:Lookup('Image_Better'):SetVisible(bBetter)
@@ -1277,9 +1280,11 @@ function Loot.GetDoodad(dwID)
 					nQuality     = item.nQuality,
 					bNeedRoll    = bNeedRoll    ,
 					bDist        = bDist        ,
-					-- bDist        = true         , -- !!! Debug
 					bBidding     = bBidding     ,
 				}
+				if DEBUG_LOOT then
+					data.bDist = true -- !!! Debug
+				end
 				if item.nGenre == ITEM_GENRE.BOOK then
 					data.nBookID = item.nBookID
 				end
