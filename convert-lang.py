@@ -8,7 +8,7 @@
     Python Version: 3.7
 '''
 
-import sys, os, codecs, re, time, json, zlib
+import sys, os, codecs, re, time, json, zlib, re
 
 FILE_MAPPING = {
     'zhcn.lang': { 'out': 'zhtw.lang', 'type': 'lang' },
@@ -16,6 +16,9 @@ FILE_MAPPING = {
     'info.ini': { 'out': 'info.ini.zh_TW', 'type': 'info' },
     'package.ini': { 'out': 'package.ini.zh_TW', 'type': 'package' },
 }
+FILE_MAPPING_RE = [
+    { 'pattern': r'(.*)\.zhcn\.jx3dat', 'out': r'\1.zhtw.jx3dat', 'type': 'lang' },
+]
 FOLDER_MAPPING = {
     # 'zhcn': { 'out': 'zhtw', 'type': 'lang' },
 }
@@ -168,6 +171,14 @@ def convert_progress(argv):
                 fileType = info['type']
                 folderOut = cwd
                 fileOut = info['out']
+            else:
+                for p in FILE_MAPPING_RE:
+                    out = re.sub(p['pattern'], p['out'], filename)
+                    if out != filename:
+                        info = p
+                        fileType = info['type']
+                        folderOut = cwd
+                        fileOut = out
             if fileType and folderOut and fileOut:
                 print('--------------------------------')
                 print('Convert language: ' + filepath)
