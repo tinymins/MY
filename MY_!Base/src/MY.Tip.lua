@@ -41,16 +41,23 @@ local _L = LIB.LoadLangPack()
 -------------------------------------------------------------------------------------------------------------
 
 -- nFont 为 true 表示传入的是Xml字符串 否则表示格式化的字体
-function LIB.OutputTip(el, szText, nFont, nMaxWidth)
+function LIB.OutputTip(el, szText, nFont, ePos, nMaxWidth)
 	if IsString(el) then
-		el, szText, nFont, nMaxWidth = this, el, szText, nFont
+		el, szText, ePos, nFont, nMaxWidth = this, el, szText, ePos, nFont
 	end
 	local x, y = el:GetAbsPos()
 	local w, h = el:GetSize()
 	if nFont ~= true then
 		szText = GetFormatText(szText, nFont or 18)
 	end
-	return OutputTip(szText, nMaxWidth or 800, { x, y, w, h })
+	if not ePos then
+		if el:GetRoot():GetName() == 'PopupMenu' then
+			ePos = ALW.RIGHT_LEFT
+		else
+			ePos = ALW.TOP_BOTTOM
+		end
+	end
+	return OutputTip(szText, nMaxWidth or 800, { x, y, w, h }, ePos)
 end
 
 function LIB.OutputBuffTip(dwID, nLevel, Rect, nTime, szExtraXml)
