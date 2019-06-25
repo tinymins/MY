@@ -2946,6 +2946,26 @@ end
 -- * 当前装备是否适合当前内功
 do
 local CACHE = {}
+local m_MountTypeToWeapon = {
+	[KUNGFU_TYPE.TIAN_CE  ] = WEAPON_DETAIL.SPEAR        , -- 天策内功=长兵类
+	[KUNGFU_TYPE.WAN_HUA  ] = WEAPON_DETAIL.PEN          , -- 万花内功=笔类
+	[KUNGFU_TYPE.CHUN_YANG] = WEAPON_DETAIL.SWORD        , -- 纯阳内功=短兵类
+	[KUNGFU_TYPE.QI_XIU   ] = WEAPON_DETAIL.DOUBLE_WEAPON, -- 七秀内功 = 双兵类
+	[KUNGFU_TYPE.SHAO_LIN ] = WEAPON_DETAIL.WAND         , -- 少林内功=棍类
+	[KUNGFU_TYPE.CANG_JIAN] = WEAPON_DETAIL.SWORD        , -- 藏剑内功=短兵类,重兵类 WEAPON_DETAIL.BIG_SWORD
+	[KUNGFU_TYPE.GAI_BANG ] = WEAPON_DETAIL.STICK        , -- 丐帮内功=短棒
+	[KUNGFU_TYPE.MING_JIAO] = WEAPON_DETAIL.KNIFE        , -- 明教内功=弯刀
+	[KUNGFU_TYPE.WU_DU    ] = WEAPON_DETAIL.FLUTE        , -- 五毒内功=笛类
+	[KUNGFU_TYPE.TANG_MEN ] = WEAPON_DETAIL.BOW          , -- 唐门内功=千机匣
+	[KUNGFU_TYPE.CANG_YUN ] = WEAPON_DETAIL.BLADE_SHIELD , -- 苍云内功=刀盾
+	[KUNGFU_TYPE.CHANG_GE ] = WEAPON_DETAIL.HEPTA_CHORD  , -- 长歌内功=琴
+	[KUNGFU_TYPE.BA_DAO   ]	= WEAPON_DETAIL.BROAD_SWORD  , -- 霸刀内功=组合刀
+	[KUNGFU_TYPE.PENG_LAI ]	= WEAPON_DETAIL.UMBRELLA     , -- 蓬莱内功=伞
+	--WEAPON_DETAIL.FIST = 拳腕
+	--WEAPON_DETAIL.DART = 弓弦
+	--WEAPON_DETAIL.MACH_DART = 机关暗器
+	--WEAPON_DETAIL.SLING_SHOT = 投掷
+}
 function LIB.IsItemFitKungfu(itemInfo, kungfu)
 	if tostring(itemInfo):find('^KGItem:') then
 		itemInfo = GetItemInfo(itemInfo.dwTabType, itemInfo.dwIndex)
