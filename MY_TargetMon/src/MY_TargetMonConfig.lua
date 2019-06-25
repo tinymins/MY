@@ -47,6 +47,8 @@ local INI_PATH = LIB.GetAddonInfo().szRoot .. 'MY_TargetMon/ui/MY_TargetMon.ini'
 local ROLE_CONFIG_FILE = {'config/my_targetmon.jx3dat', PATH_TYPE.ROLE}
 local TEMPLATE_CONFIG_FILE = LIB.GetAddonInfo().szRoot .. 'MY_TargetMon/data/template/$lang.jx3dat'
 local EMBEDDED_CONFIG_ROOT = LIB.GetAddonInfo().szRoot .. 'MY_Resource/data/targetmon/'
+local CUSTOM_EMBEDDED_CONFIG_ROOT = LIB.FormatPath({'userdata/TargetMon/', PATH_TYPE.GLOBAL})
+local EMBEDDED_CONFIG_SUFFIX = '.' .. LIB.GetLang() .. '.jx3dat'
 local CUSTOM_DEFAULT_CONFIG_FILE = {'config/my_targetmon.jx3dat', PATH_TYPE.GLOBAL}
 local TARGET_TYPE_LIST = {
 	'CLIENT_PLAYER'  ,
@@ -109,14 +111,21 @@ function D.LoadEmbeddedConfig()
 		end
 	end
 	-- 加载内置数据
-	local aConfig, szFileSuffix = {}, '.' .. LIB.GetLang() .. '.jx3dat'
-	for _, szFile in ipairs(CPath.GetFileList(EMBEDDED_CONFIG_ROOT)) do
-		if wfind(szFile, szFileSuffix) then
+	local aConfig = {}
+	for _, szFile in ipairs(CPath.GetFileList(EMBEDDED_CONFIG_ROOT) or {}) do
+		if wfind(szFile, EMBEDDED_CONFIG_SUFFIX) then
 			local config = LIB.LoadLUAData(EMBEDDED_CONFIG_ROOT .. szFile, { passphrase = C.PASSPHRASE_EMBEDDED })
 				or LIB.LoadLUAData(EMBEDDED_CONFIG_ROOT .. szFile)
-			if IsTable(config) and config.uuid and szFile:sub(1, -#szFileSuffix - 1) == config.uuid and config.monitors then
+			if IsTable(config) and config.uuid and szFile:sub(1, -#EMBEDDED_CONFIG_SUFFIX - 1) == config.uuid and config.monitors then
 				insert(aConfig, config)
 			end
+		end
+	end
+	for _, szFile in ipairs(CPath.GetFileList(CUSTOM_EMBEDDED_CONFIG_ROOT) or {}) do
+		local config = LIB.LoadLUAData(CUSTOM_EMBEDDED_CONFIG_ROOT .. szFile, { passphrase = C.PASSPHRASE_EMBEDDED })
+			or LIB.LoadLUAData(CUSTOM_EMBEDDED_CONFIG_ROOT .. szFile)
+		if IsTable(config) and config.uuid and szFile:sub(1, -#'.jx3dat' - 1) == config.uuid and config.monitors then
+			insert(aConfig, config)
 		end
 	end
 	sort(aConfig, function(a, b)
@@ -392,37 +401,54 @@ function D.SaveConfig(bDefault)
 	end
 end
 
-function D.ImportPatches(aPatch)
+function D.ImportPatches(aPatch, bAsEmbedded)
 	local nImportCount = 0
 	local nReplaceCount = 0
-	for _, patch in ipairs(aPatch) do
-		local config = D.PatchToConfig(patch)
-		if config then
-			for i, cfg in ipairs_r(CONFIG) do
-				if config.uuid and config.uuid == cfg.uuid then
-					remove(CONFIG, i)
+	if bAsEmbedded then
+		for _, embedded in ipairs(aPatch) do
+			if embedded and embedded.uuid then
+				local szFile = CUSTOM_EMBEDDED_CONFIG_ROOT .. embedded.uuid .. '.jx3dat'
+				if IsLocalFileExist(szFile) then
 					nReplaceCount = nReplaceCount + 1
 				end
+				nImportCount = nImportCount + 1
+				LIB.SaveLUAData(szFile, embedded, { passphrase = C.PASSPHRASE_EMBEDDED })
 			end
-			nImportCount = nImportCount + 1
-			insert(CONFIG, config)
 		end
-	end
-	if nImportCount > 0 then
-		CONFIG_CHANGED = true
-		D.UpdateTargetList()
-		FireUIEvent('MY_TARGET_MON_CONFIG_INIT')
+		if nImportCount > 0 then
+			D.LoadEmbeddedConfig()
+			D.LoadConfig()
+		end
+	else
+		for _, patch in ipairs(aPatch) do
+			local config = D.PatchToConfig(patch)
+			if config then
+				for i, cfg in ipairs_r(CONFIG) do
+					if config.uuid and config.uuid == cfg.uuid then
+						remove(CONFIG, i)
+						nReplaceCount = nReplaceCount + 1
+					end
+				end
+				nImportCount = nImportCount + 1
+				insert(CONFIG, config)
+			end
+		end
+		if nImportCount > 0 then
+			CONFIG_CHANGED = true
+			D.UpdateTargetList()
+			FireUIEvent('MY_TARGET_MON_CONFIG_INIT')
+		end
 	end
 	return nImportCount, nReplaceCount
 end
 
-function D.ExportPatches(aUUID, bNoEmbedded)
+function D.ExportPatches(aUUID, bAsEmbedded)
 	local aPatch = {}
 	for i, uuid in ipairs(aUUID) do
 		for i, config in ipairs(CONFIG) do
 			local patch = config.uuid == uuid and D.ConfigToPatch(config)
-			if patch and (not bNoEmbedded or not patch.embedded) then
-				if bNoEmbedded then
+			if patch and (bAsEmbedded or not patch.embedded) then
+				if bAsEmbedded then
 					patch.uuid = 'DT' .. patch.uuid
 				end
 				insert(aPatch, patch)
@@ -433,11 +459,14 @@ function D.ExportPatches(aUUID, bNoEmbedded)
 end
 
 function D.ImportPatchFile(oFilePath)
-	local aPatch = LIB.LoadLUAData(oFilePath, { passphrase = C.PASSPHRASE }) or LIB.LoadLUAData(oFilePath)
+	local aPatch, bAsEmbedded = LIB.LoadLUAData(oFilePath, { passphrase = C.PASSPHRASE }) or LIB.LoadLUAData(oFilePath), false
+	if not aPatch then
+		aPatch, bAsEmbedded = LIB.LoadLUAData(oFilePath, { passphrase = C.PASSPHRASE_EMBEDDED }), true
+	end
 	if not aPatch then
 		return
 	end
-	return D.ImportPatches(aPatch)
+	return D.ImportPatches(aPatch, bAsEmbedded)
 end
 
 function D.ExportPatchFile(oFilePath, aUUID, szIndent, bAsEmbedded)
