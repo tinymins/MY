@@ -555,7 +555,7 @@ function PS.OnPanelActive(wnd)
 	  :size(w - 32, h - 50)
 	  :listbox('onlclick', function(hItem, text, id, data, selected)
 	  	OpenMiddleMap(data.dwMapID, 0)
-	  	UI('Topmost1/MiddleMap/Wnd_Tool/Edit_Search'):text(LIB.EscapeString(data.szName))
+	  	UI('Topmost1/MiddleMap/Wnd_NormalMap/Wnd_Tool/Edit_Search'):text(LIB.EscapeString(data.szName))
 	  	Station.SetFocusWindow('Topmost1/MiddleMap')
 	  	if not selected then -- avoid unselect
 	  		return false
