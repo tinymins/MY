@@ -46,6 +46,7 @@ local C, D = { PASSPHRASE = {213, 166, 13}, PASSPHRASE_EMBEDDED = {211, 98, 5} }
 local INI_PATH = LIB.GetAddonInfo().szRoot .. 'MY_TargetMon/ui/MY_TargetMon.ini'
 local ROLE_CONFIG_FILE = {'config/my_targetmon.jx3dat', PATH_TYPE.ROLE}
 local TEMPLATE_CONFIG_FILE = LIB.GetAddonInfo().szRoot .. 'MY_TargetMon/data/template/$lang.jx3dat'
+local EMBEDDED_ENCRYPTED = false
 local EMBEDDED_CONFIG_ROOT = LIB.GetAddonInfo().szRoot .. 'MY_Resource/data/targetmon/'
 local CUSTOM_EMBEDDED_CONFIG_ROOT = LIB.FormatPath({'userdata/TargetMon/', PATH_TYPE.GLOBAL})
 local EMBEDDED_CONFIG_SUFFIX = '.' .. LIB.GetLang() .. '.jx3dat'
@@ -96,7 +97,7 @@ function D.LoadEmbeddedConfig()
 	if not IsString(C.PASSPHRASE) or not IsString(C.PASSPHRASE_EMBEDDED) then
 		return LIB.Debug({'Passphrase cannot be empty!'}, 'MY_TargetMonConfig', DEBUG_LEVEL.ERROR)
 	end
-	do -- auto generate embedded data
+	if not EMBEDDED_ENCRYPTED then -- auto generate embedded data
 		local DAT_ROOT = 'MY_Resource/data/targetmon/'
 		local SRC_ROOT = LIB.GetAddonInfo().szRoot .. '!src-dist/dat/' .. DAT_ROOT
 		local DST_ROOT = EMBEDDED_CONFIG_ROOT
@@ -109,6 +110,7 @@ function D.LoadEmbeddedConfig()
 			data = EncodeData(data, true, true)
 			SaveDataToFile(data, DST_ROOT .. szFile, C.PASSPHRASE_EMBEDDED)
 		end
+		EMBEDDED_ENCRYPTED = true
 	end
 	-- 加载内置数据
 	local aConfig = {}
@@ -417,6 +419,7 @@ function D.ImportPatches(aPatch, bAsEmbedded)
 		end
 		if nImportCount > 0 then
 			D.LoadEmbeddedConfig()
+			D.SaveConfig()
 			D.LoadConfig()
 		end
 	else
@@ -587,14 +590,22 @@ function D.ModifyConfig(config, szKey, oVal)
 	D.MarkConfigChanged()
 end
 
-function D.DeleteConfig(config)
+function D.DeleteConfig(config, bAsEmbedded)
 	for i, v in ipairs_r(CONFIG) do
 		if v == config then
 			remove(CONFIG, i)
 			D.UpdateTargetList()
 			D.MarkConfigChanged()
 			FireUIEvent('MY_TARGET_MON_CONFIG_INIT')
+			break
 		end
+	end
+	if bAsEmbedded then
+		CPath.DelFile(CUSTOM_EMBEDDED_CONFIG_ROOT .. config.uuid .. '.jx3dat')
+		CPath.DelFile(EMBEDDED_CONFIG_ROOT .. config.uuid .. EMBEDDED_CONFIG_SUFFIX)
+		D.LoadEmbeddedConfig()
+		D.SaveConfig()
+		D.LoadConfig()
 	end
 end
 

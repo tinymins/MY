@@ -729,9 +729,11 @@ local function DrawPreview(ui, config, OpenDetail)
 		w = 60, h = 25,
 		text = _L['Delete'],
 		onclick = function()
-			D.DeleteConfig(config)
+			D.DeleteConfig(config, IsCtrlKeyDown())
 			LIB.SwitchTab('MY_TargetMon', true)
 		end,
+		tip = config.embedded and _L['Press ctrl to delete embedded data permanently.'] or nil,
+		tippostype = MY_TIP_POSTYPE.BOTTOM_TOP,
 	})
 	y = y + 30
 
