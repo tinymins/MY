@@ -646,7 +646,7 @@ function Loot.GetBossAction(dwDoodadID, bMenu)
 				{
 					szOption = g_tStrings.STR_HOTKEY_SURE,
 					fnAction = function()
-						Loot.DistributeItem(MY_GKP_LOOT_BOSS, aEquipmentItemData)
+						Loot.DistributeItem(MY_GKP_LOOT_BOSS, aEquipmentItemData, nil, true)
 					end
 				},
 				{
@@ -735,10 +735,10 @@ function Loot.GetaPartyMember(aDoodadID)
 	return aPartyMember
 end
 -- 严格判断
-function Loot.DistributeItem(dwID, info, szAutoDistType)
+function Loot.DistributeItem(dwID, info, szAutoDistType, bSkipRecordPanel)
 	if IsArray(info) then
 		for _, p in ipairs(info) do
-			Loot.DistributeItem(dwID, p, szAutoDistType)
+			Loot.DistributeItem(dwID, p, szAutoDistType, bSkipRecordPanel)
 		end
 		return
 	end
@@ -794,7 +794,7 @@ function Loot.DistributeItem(dwID, info, szAutoDistType)
 			tab.nBookID = item.nBookID
 		end
 		if MY_GKP.bOn then
-			MY_GKP.Record(tab, item)
+			MY_GKP.Record(tab, item, IsShiftKeyDown() or bSkipRecordPanel)
 		else -- 关闭的情况所有东西全部绕过
 			tab.nMoney = 0
 			MY_GKP('GKP_Record', tab)
@@ -811,7 +811,7 @@ function Loot.DistributeItem(dwID, info, szAutoDistType)
 	end
 end
 
-function Loot.GetMessageBox(dwID, aItemData, szAutoDistType)
+function Loot.GetMessageBox(dwID, aItemData, szAutoDistType, bSkipRecordPanel)
 	if not IsArray(aItemData) then
 		aItemData = {aItemData}
 	end
@@ -835,7 +835,7 @@ function Loot.GetMessageBox(dwID, aItemData, szAutoDistType)
 		{
 			szOption = g_tStrings.STR_HOTKEY_SURE,
 			fnAction = function()
-				Loot.DistributeItem(dwID, aItemData, szAutoDistType)
+				Loot.DistributeItem(dwID, aItemData, szAutoDistType, bSkipRecordPanel)
 			end
 		},
 		{ szOption = g_tStrings.STR_HOTKEY_CANCEL },
@@ -896,11 +896,14 @@ local function GetMemberMenu(member, aItemData, szAutoDistType)
 				end
 			end
 			if bConfirm then
-				Loot.GetMessageBox(member.dwID, aItemData, szAutoDistType)
+				Loot.GetMessageBox(member.dwID, aItemData, szAutoDistType, IsShiftKeyDown())
 			else
-				Loot.DistributeItem(member.dwID, aItemData, szAutoDistType)
+				Loot.DistributeItem(member.dwID, aItemData, szAutoDistType, IsShiftKeyDown())
 			end
-		end
+		end,
+		fnMouseEnter = function()
+			LIB.OutputTip(_L['Hold shift click to skip gkp record panel'], 136)
+		end,
 	}
 end
 function Loot.GetDistributeMenu(aItemData, szAutoDistType)
