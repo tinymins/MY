@@ -108,31 +108,41 @@ function D.LoadEmbeddedConfig()
 			SaveDataToFile(data, DST_ROOT .. szFile, C.PASSPHRASE_EMBEDDED)
 		end
 	end
-	local aEmbedded, tEmbedded, tEmbeddedMon = {}, {}, {}
+	-- 加载内置数据
+	local aConfig, szFileSuffix = {}, '.' .. LIB.GetLang() .. '.jx3dat'
 	for _, szFile in ipairs(CPath.GetFileList(EMBEDDED_CONFIG_ROOT)) do
-		if wfind(szFile, LIB.GetLang() .. '.jx3dat') then
-			for _, config in ipairs(
-				LIB.LoadLUAData(EMBEDDED_CONFIG_ROOT .. szFile, { passphrase = C.PASSPHRASE_EMBEDDED })
+		if wfind(szFile, szFileSuffix) then
+			local config = LIB.LoadLUAData(EMBEDDED_CONFIG_ROOT .. szFile, { passphrase = C.PASSPHRASE_EMBEDDED })
 				or LIB.LoadLUAData(EMBEDDED_CONFIG_ROOT .. szFile)
-				or {}
-			) do
-				if config and config.uuid and config.monitors then
-					local embedded = D.FormatConfig(config)
-					if embedded then
-						-- 默认禁用
-						embedded.enable = false
-						-- 配置项和监控项高速缓存
-						local tMon = {}
-						for _, mon in ipairs(embedded.monitors) do
-							mon.manually = nil
-							tMon[mon.uuid] = mon
-						end
-						-- 插入结果集
-						tEmbedded[embedded.uuid] = embedded
-						tEmbeddedMon[embedded.uuid] = tMon
-						insert(aEmbedded, embedded)
-					end
+			if IsTable(config) and config.uuid and szFile:sub(1, -#szFileSuffix - 1) == config.uuid and config.monitors then
+				insert(aConfig, config)
+			end
+		end
+	end
+	sort(aConfig, function(a, b)
+		if a.group == b.group then
+			return b.sort - a.sort > 0
+		end
+		return b.group > a.group
+	end)
+	-- 格式化内置数据
+	local aEmbedded, tEmbedded, tEmbeddedMon = {}, {}, {}
+	for _, config in ipairs(aConfig) do
+		if config and config.uuid and config.monitors then
+			local embedded = D.FormatConfig(config)
+			if embedded then
+				-- 默认禁用
+				embedded.enable = false
+				-- 配置项和监控项高速缓存
+				local tMon = {}
+				for _, mon in ipairs(embedded.monitors) do
+					mon.manually = nil
+					tMon[mon.uuid] = mon
 				end
+				-- 插入结果集
+				tEmbedded[embedded.uuid] = embedded
+				tEmbeddedMon[embedded.uuid] = tMon
+				insert(aEmbedded, embedded)
 			end
 		end
 	end

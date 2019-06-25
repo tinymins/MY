@@ -2,6 +2,8 @@ local __META__ = "__META__"
 return {
 	uuid                = {__META__, {"nil", "string"}, nil},
 	embedded            = false,
+	group               = "",
+	sort                = 10000,
 	caption             = "新建目標監控",
 	type                = "BUFF",
 	target              = "CLIENT_PLAYER",

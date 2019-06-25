@@ -689,10 +689,14 @@ local function DrawPreview(ui, config, OpenDetail)
 		text = _L['*'],
 	})
 	if config.embedded then
+		local szCaption = config.caption
+		if config.group ~= '' then
+			szCaption = g_tStrings.STR_BRACKET_LEFT .. config.group .. g_tStrings.STR_BRACKET_RIGHT .. szCaption
+		end
 		uiWnd:append('Text', {
 			x = x + 20, y = y - 3, w = w - 290,
-			r = 255, g = 255, b = 0, text = config.caption,
-			tip = config.caption .. '\n' .. _L['(Embedded caption cannot be changed)'],
+			r = 255, g = 255, b = 0, text = szCaption,
+			tip = szCaption .. '\n' .. _L['(Embedded caption cannot be changed)'],
 			tippostype = MY_TIP_POSTYPE.BOTTOM_TOP,
 		}, true):autoWidth()
 	else
