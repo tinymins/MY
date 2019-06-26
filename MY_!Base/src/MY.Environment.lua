@@ -65,11 +65,11 @@ end
 end
 
 -- 获取是否测试客户端
-function LIB.IsDebugClient()
-	if IsDebugClient() then
+function LIB.IsDebugClient(bManually)
+	if not bManually and IsDebugClient() then
 		return true
 	end
-	return false
+	return LIB.GetAddonInfo().nDebugLevel <= DEBUG_LEVEL.DEBUG
 end
 
 -- 获取是否测试服务器
