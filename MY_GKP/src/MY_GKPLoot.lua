@@ -707,14 +707,15 @@ function Loot.GetaPartyMember(aDoodadID)
 			local doodad = GetDoodad(dwDoodadID)
 			if doodad then
 				local aLooterList = doodad.GetLooterList()
-				if not aLooterList then
-					LIB.Sysmsg({_L['Pick up time limit exceeded, please try again.']})
-				end
-				for _, p in ipairs(aLooterList) do
-					if not tPartyMember[p.dwID] then
-						insert(aPartyMember, p)
-						tPartyMember[p.dwID] = true
+				if aLooterList then
+					for _, p in ipairs(aLooterList) do
+						if not tPartyMember[p.dwID] then
+							insert(aPartyMember, p)
+							tPartyMember[p.dwID] = true
+						end
 					end
+				else
+					LIB.Sysmsg({_L['Pick up time limit exceeded, please try again.']})
 				end
 			end
 			tDoodadID[dwDoodadID] = true
@@ -912,7 +913,9 @@ function Loot.GetDistributeMenu(aItemData, szAutoDistType)
 	end
 	local aDoodadID = {}
 	for _, p in ipairs(aItemData) do
-		insert(aDoodadID, p.dwDoodadID)
+		if p.bDist then
+			insert(aDoodadID, p.dwDoodadID)
+		end
 	end
 	local me, team     = GetClientPlayer(), GetClientTeam()
 	local dwMapID      = me.GetMapID()
@@ -1062,6 +1065,7 @@ function Loot.DrawLootList(dwID)
 	config = wnd.tItemConfig
 
 	-- 修改UI元素
+	local bDist = false
 	local hDoodad = wnd:Lookup('', '')
 	local hList = hDoodad:Lookup('Handle_ItemList')
 	hList:Clear()
@@ -1084,7 +1088,7 @@ function Loot.DrawLootList(dwID)
 			end
 			if MY_GKP_Loot.bVertical then
 				local bSuit, bBetter = IsItemDataSuitable(itemData)
-			h:Lookup('Image_GroupDistrib'):SetVisible(itemData.bDist
+				h:Lookup('Image_GroupDistrib'):SetVisible(itemData.bDist
 					and (i == 1 or aItemData[i - 1].szType ~= itemData.szType or not aItemData[i - 1].bDist))
 				h:Lookup('Image_Suitable'):SetVisible(bSuit and not bBetter)
 				h:Lookup('Image_Better'):SetVisible(bBetter)
@@ -1106,6 +1110,9 @@ function Loot.DrawLootList(dwID)
 			if GKP_LOOT_RECENT[item.nUiId] then
 				box:SetObjectStaring(true)
 			end
+			if itemData.bDist then
+				bDist = true
+			end
 			h.itemData = itemData
 		end
 	end
@@ -1116,6 +1123,7 @@ function Loot.DrawLootList(dwID)
 		hDoodad:Lookup('SFX'):Show()
 	end
 	hDoodad:Lookup('Text_Title'):SetText(szName .. ' (' .. #aItemData ..  ')')
+	wnd:Lookup('Btn_Boss'):Enable(bDist)
 
 	-- 修改UI大小
 	Loot.AdjustWnd(wnd)
