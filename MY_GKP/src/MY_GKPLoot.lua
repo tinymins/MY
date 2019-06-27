@@ -351,6 +351,9 @@ function MY_GKP_Loot.OnLButtonClick()
 		end
 		PopupMenu(menu)
 	elseif szName == 'Btn_Boss' then
+		if not Loot.AuthCheck(this:GetParent().dwDoodadID) then
+			return LIB.Topmsg(_L['You are not the distrubutor.'])
+		end
 		Loot.GetBossAction(this:GetParent().dwDoodadID, type(MY_GKP_LOOT_BOSS) == 'nil')
 	end
 end
@@ -502,12 +505,13 @@ function MY_GKP_Loot.OnItemLButtonClick()
 				return Loot.RemoveLootList(dwDoodadID)
 			end
 			if not Loot.AuthCheck(dwDoodadID) then
-				return
+				return LIB.Topmsg(_L['You are not the distrubutor.'])
 			end
 		end
 		return PopupMenu(Loot.GetDistributeMenu(aItemData, hItem.itemData.szType))
 	end
 end
+
 -- ÓÒ¼üÅÄÂô
 function MY_GKP_Loot.OnItemRButtonClick()
 	local szName = this:GetName()
