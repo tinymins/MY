@@ -283,7 +283,11 @@ end
 function MY_GKP_Loot.OnLButtonClick()
 	local szName = this:GetName()
 	if szName == 'Btn_Close' then
-		Loot.RemoveLootList(this:GetParent().dwDoodadID)
+		if IsCtrlKeyDown() then
+			Loot.CloseFrame()
+		else
+			Loot.RemoveLootList(this:GetParent().dwDoodadID)
+		end
 	elseif szName == 'Btn_Style' then
 		local wnd = this:GetParent()
 		local dwDoodadID = wnd.dwDoodadID
