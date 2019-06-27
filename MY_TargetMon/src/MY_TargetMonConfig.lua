@@ -97,7 +97,8 @@ function D.LoadEmbeddedConfig()
 	if not IsString(C.PASSPHRASE) or not IsString(C.PASSPHRASE_EMBEDDED) then
 		return LIB.Debug({'Passphrase cannot be empty!'}, 'MY_TargetMonConfig', DEBUG_LEVEL.ERROR)
 	end
-	if not EMBEDDED_ENCRYPTED then -- auto generate embedded data
+	if not EMBEDDED_ENCRYPTED then
+		-- 自动生成内置加密数据
 		local DAT_ROOT = 'MY_Resource/data/targetmon/'
 		local SRC_ROOT = LIB.GetAddonInfo().szRoot .. '!src-dist/dat/' .. DAT_ROOT
 		local DST_ROOT = EMBEDDED_CONFIG_ROOT
@@ -109,6 +110,21 @@ function D.LoadEmbeddedConfig()
 			end
 			data = EncodeData(data, true, true)
 			SaveDataToFile(data, DST_ROOT .. szFile, C.PASSPHRASE_EMBEDDED)
+		end
+		-- 兼容旧版内置数据
+		local szV2Path = EMBEDDED_CONFIG_ROOT .. LIB.GetLang() .. '.jx3dat'
+		if IsLocalFileExist(szV2Path) then
+			local aConfig = LIB.LoadLUAData(szV2Path, { passphrase = C.PASSPHRASE_EMBEDDED }) or LIB.LoadLUAData(szV2Path)
+			if IsTable(aConfig) then
+				for i, config in ipairs(aConfig) do
+					if IsTable(config) and config.uuid then
+						config.group = ''
+						config.sort = i
+						LIB.SaveLUAData(EMBEDDED_CONFIG_ROOT .. config.uuid .. '.' .. LIB.GetLang() .. '.jx3dat', config, { passphrase = C.PASSPHRASE_EMBEDDED })
+					end
+				end
+			end
+			CPath.DelFile(szV2Path)
 		end
 		EMBEDDED_ENCRYPTED = true
 	end
@@ -126,13 +142,13 @@ function D.LoadEmbeddedConfig()
 	for _, szFile in ipairs(CPath.GetFileList(CUSTOM_EMBEDDED_CONFIG_ROOT) or {}) do
 		local config = LIB.LoadLUAData(CUSTOM_EMBEDDED_CONFIG_ROOT .. szFile, { passphrase = C.PASSPHRASE_EMBEDDED })
 			or LIB.LoadLUAData(CUSTOM_EMBEDDED_CONFIG_ROOT .. szFile)
-		if IsTable(config) and config.uuid and szFile:sub(1, -#'.jx3dat' - 1) == config.uuid and config.monitors then
+		if IsTable(config) and config.uuid and szFile:sub(1, -#'.jx3dat' - 1) == config.uuid and config.group and config.sort and config.monitors then
 			insert(aConfig, config)
 		end
 	end
 	sort(aConfig, function(a, b)
 		if a.group == b.group then
-			return b.sort - a.sort > 0
+			return b.sort > a.sort
 		end
 		return b.group > a.group
 	end)
