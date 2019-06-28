@@ -44,6 +44,7 @@ if not LIB.AssertVersion('MY_TargetMon', _L['MY_TargetMon'], 0x2011800) then
 end
 local C, D = {}, {
 	GetTargetTypeList = MY_TargetMonConfig.GetTargetTypeList,
+	GetConfigCaption = MY_TargetMonConfig.GetConfigCaption,
 	ModifyMonitor = MY_TargetMonConfig.ModifyMonitor,
 	CreateMonitorId = MY_TargetMonConfig.CreateMonitorId,
 	ModifyMonitorId = MY_TargetMonConfig.ModifyMonitorId,
@@ -550,7 +551,7 @@ function UpdateView()
 			view.szUuid               = config.uuid
 			view.szType               = config.type
 			view.szTarget             = config.target
-			view.szCaption            = config.caption
+			view.szCaption            = D.GetConfigCaption(config)
 			view.tAnchor              = config.anchor
 			view.bIgnoreSystemUIScale = config.ignoreSystemUIScale
 			view.fUIScale             = fUIScale

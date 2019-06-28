@@ -88,6 +88,14 @@ function D.GeneUUID()
 	return LIB.GetUUID():gsub('-', '')
 end
 
+function D.GetConfigCaption(config)
+	local szCaption = config.caption
+	if config.group ~= '' then
+		szCaption = g_tStrings.STR_BRACKET_LEFT .. config.group .. g_tStrings.STR_BRACKET_RIGHT .. szCaption
+	end
+	return szCaption
+end
+
 -- 格式化监控项数据
 function D.FormatConfig(config)
 	return LIB.FormatDataStructure(config, CONFIG_TEMPLATE)
@@ -256,6 +264,7 @@ function D.PatchToConfig(patch)
 			end
 		end
 		config.monitors = monitors
+		config.group = embedded.group
 		config.caption = embedded.caption
 		config.embedded = true
 	else
@@ -726,6 +735,7 @@ local settings = {
 				GetTargetTypeList  = D.GetTargetTypeList ,
 				GetConfig          = D.GetConfig         ,
 				GetConfigList      = D.GetConfigList     ,
+				GetConfigCaption   = D.GetConfigCaption  ,
 				LoadConfig         = D.LoadConfig        ,
 				SaveConfig         = D.SaveConfig        ,
 				ImportPatches      = D.ImportPatches     ,
