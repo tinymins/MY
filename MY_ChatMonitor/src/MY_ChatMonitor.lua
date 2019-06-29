@@ -69,7 +69,7 @@ MY_ChatMonitor.bPlaySound          = true
 MY_ChatMonitor.bRedirectSysChannel = false
 MY_ChatMonitor.bCapture            = false
 MY_ChatMonitor.bBlockWords         = true
-MY_ChatMonitor.bIgnoreSame         = true
+MY_ChatMonitor.bIgnoreSame         = false
 -- MY_ChatMonitor.bRealtimeSave       = false
 MY_ChatMonitor.bDistinctServer     = false
 MY_ChatMonitor.szTimestrap         = '[hh:mm:ss]'
@@ -88,7 +88,7 @@ RegisterCustomData('MY_ChatMonitor.tChannels')
 RegisterCustomData('MY_ChatMonitor.bPlaySound')
 RegisterCustomData('MY_ChatMonitor.bRedirectSysChannel')
 RegisterCustomData('MY_ChatMonitor.anchor')
-RegisterCustomData('MY_ChatMonitor.bIgnoreSame')
+RegisterCustomData('MY_ChatMonitor.bIgnoreSame', 1)
 -- RegisterCustomData('MY_ChatMonitor.bRealtimeSave')
 RegisterCustomData('MY_ChatMonitor.bDistinctServer')
 RegisterCustomData('MY_ChatMonitor.szTimestrap')
