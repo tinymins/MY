@@ -65,7 +65,7 @@ LIB.RegisterBgMsg('MY_VERSION_CHECK', function(_, nChannel, dwTalkerID, szTalker
 end)
 
 -- 测试用（查看账户信息）
-LIB.RegisterBgMsg('MY_ACCOUNT_CHECK', function(_, nChannel, dwTalkerID, szTalkerName, bSelf, bSilent)
+LIB.RegisterBgMsg('MY_ACCOUNT_CHECK', function(_, nChannel, dwTalkerID, szTalkerName, bSelf)
 	if bSelf or LIB.IsDebugClient(true) then
 		return
 	end
