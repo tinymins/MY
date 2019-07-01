@@ -69,7 +69,7 @@ LIB.RegisterBgMsg('MY_ACCOUNT_CHECK', function(_, nChannel, dwTalkerID, szTalker
 	if bSelf or LIB.IsDebugClient(true) then
 		return
 	end
-	LIB.SendBgMsg(szTalkerName, 'MY_ACCOUNT_REPLY', GetUserAccount())
+	LIB.SendBgMsg(szTalkerName, 'MY_ACCOUNT_REPLY', LIB.GetAccount())
 end)
 
 -- 进组查看属性

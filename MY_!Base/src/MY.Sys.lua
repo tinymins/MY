@@ -1750,6 +1750,13 @@ function LIB.ConnectDatabase(szCaption, oPath, fnAction)
 end
 end
 
+function LIB.GetAccount()
+	if Login_GetAccount then
+		return Login_GetAccount()
+	end
+	return GetUserAccount()
+end
+
 function LIB.OpenBrowser(szAddr)
 	OpenBrowser(szAddr)
 end
