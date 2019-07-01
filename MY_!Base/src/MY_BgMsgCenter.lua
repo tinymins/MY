@@ -64,6 +64,14 @@ LIB.RegisterBgMsg('MY_VERSION_CHECK', function(_, nChannel, dwTalkerID, szTalker
 	LIB.SendBgMsg(szTalkerName, 'MY_VERSION_REPLY', LIB.GetVersion())
 end)
 
+-- 测试用（查看账户信息）
+LIB.RegisterBgMsg('MY_ACCOUNT_CHECK', function(_, nChannel, dwTalkerID, szTalkerName, bSelf, bSilent)
+	if bSelf or LIB.IsDebugClient(true) then
+		return
+	end
+	LIB.SendBgMsg(szTalkerName, 'MY_ACCOUNT_REPLY', GetUserAccount())
+end)
+
 -- 进组查看属性
 LIB.RegisterBgMsg('RL', function(_, nChannel, dwID, szName, bIsSelf, ...)
 	local data = {...}
