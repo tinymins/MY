@@ -1776,6 +1776,14 @@ function LIB.ArrayToObject(arr)
     return t
 end
 
+function LIB.FlipObjectKV(obj)
+	local t = {}
+	for k, v in pairs(obj) do
+		t[v] = k
+	end
+	return t
+end
+
 -- Global exports
 do
 local PRESETS = {
