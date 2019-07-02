@@ -178,7 +178,7 @@ function DB:DeleteMsg(szHash, nTime)
 end
 
 function DB:PushDB()
-	if not IsEmpty(self.aInsertQueue) and not IsEmpty(self.aDeleteQueue) then
+	if not IsEmpty(self.aInsertQueue) or not IsEmpty(self.aDeleteQueue) then
 		self:Connect()
 		self.db:Execute('BEGIN TRANSACTION')
 		-- ²åÈë¼ÇÂ¼
