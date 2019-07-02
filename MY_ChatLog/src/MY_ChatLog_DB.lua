@@ -87,34 +87,28 @@ function DB:Move(szFilePath)
 	return self
 end
 
-function DB:InsertMsg(nChannel, szText, szMsg, szTalker, nTime)
-	local szHash
-	szMsg    = AnsiToUTF8(szMsg or '') or ''
-	szText   = AnsiToUTF8(szText or '') or ''
-	szHash   = GetStringCRC(szMsg)
-	szTalker = szTalker and AnsiToUTF8(szTalker or '') or ''
+function DB:InsertMsg(nChannel, szText, szMsg, szTalker, nTime, szHash)
 	if not nChannel or not nTime or IsEmpty(szMsg) or not szText or IsEmpty(szHash) then
 		return
 	end
 	insert(self.aInsertQueue, {szHash = szHash, nChannel = nChannel, nTime = nTime, szTalker = szTalker, szText = szText, szMsg = szMsg})
 end
 
-function DB:Count(aChannel, szSearch)
-	if #aChannel == 0 then
-		return 0
-	end
-	if not szSearch then
-		szSearch = ''
-	end
+function DB:CountMsg(aChannel, szSearch)
 	self:Connect():PushDB()
+	if not aChannel then
+		if not self.nCountCache then
+			self.nCountCache = Get(self.db:Execute('SELECT COUNT(*) AS nCount FROM ChatLog'), {1, 'nCount'}, 0)
+		end
+		return self.nCountCache
+	end
 	if not self.tCountCache or self.szCountCacheKey ~= szSearch then
 		local aResult
 		if szSearch == '' then
 			aResult = self.db:Execute('SELECT channel AS nChannel, COUNT(*) AS nCount FROM ChatLog GROUP BY channel')
 		else
-			local szSearchU = AnsiToUTF8('%' .. szSearch .. '%')
 			self.stmtCount:ClearBindings()
-			self.stmtCount:BindAll(szSearchU, szSearchU)
+			self.stmtCount:BindAll(szSearch, szSearch)
 			aResult = self.stmtCount:GetAll()
 		end
 		self.tCountCache = {}
@@ -131,17 +125,13 @@ function DB:Count(aChannel, szSearch)
 end
 
 function DB:SelectMsg(aChannel, szSearch, nOffset, nLimit)
-	if #aChannel == 0 then
-		return {}
-	end
-	if not szSearch then
-		szSearch = ''
-	end
 	self:Connect():PushDB()
 	local aWhere, aValue = {}, {}
-	for _, nChannel in ipairs(aChannel) do
-		insert(aWhere, 'channel = ?')
-		insert(aValue, nChannel)
+	if aChannel then
+		for _, nChannel in ipairs(aChannel) do
+			insert(aWhere, 'channel = ?')
+			insert(aValue, nChannel)
+		end
 	end
 	local szSQL  = ''
 	local szWhere = ''
@@ -153,8 +143,8 @@ function DB:SelectMsg(aChannel, szSearch, nOffset, nLimit)
 			szWhere = szWhere .. ' AND'
 		end
 		szWhere = szWhere .. ' (talker LIKE ? OR text LIKE ?)'
-		insert(aValue, AnsiToUTF8('%' .. szSearch .. '%'))
-		insert(aValue, AnsiToUTF8('%' .. szSearch .. '%'))
+		insert(aValue, szSearch)
+		insert(aValue, szSearch)
 	end
 	if #szWhere > 0 then
 		szSQL  = szSQL .. ' WHERE' .. szWhere
@@ -167,13 +157,7 @@ function DB:SelectMsg(aChannel, szSearch, nOffset, nLimit)
 	local stmt = self.db:Prepare(szSQL)
 	stmt:ClearBindings()
 	stmt:BindAll(unpack(aValue))
-	local aRes = stmt:GetAll()
-	for _, p in ipairs(aRes) do
-		p.szTalker = UTF8ToAnsi(p.szTalker)
-		p.szText = UTF8ToAnsi(p.szText)
-		p.szMsg = UTF8ToAnsi(p.szMsg)
-	end
-	return aRes
+	return (stmt:GetAll())
 end
 
 function DB:DeleteMsg(szHash, nTime)
@@ -202,6 +186,7 @@ function DB:PushDB()
 	self.aDeleteQueue = {}
 	self.db:Execute('END TRANSACTION')
 	self.tCountCache = nil
+	self.nCountCache = nil
 end
 
 function MY_ChatLog_DB(szFilePath)
