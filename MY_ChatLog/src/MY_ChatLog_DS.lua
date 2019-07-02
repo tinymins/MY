@@ -95,7 +95,7 @@ function DS:ctor(szRoot)
 	return self
 end
 
-function DS:Init()
+function DS:InitDB()
 	if not self.aDB then
 		-- 初始化数据库集群列表
 		self.aDB = {}
@@ -156,7 +156,7 @@ function DS:CountMsg(aChannel, szSearch)
 	if szSearch ~= '' then
 		szSearch = AnsiToUTF8('%' .. szSearch .. '%')
 	end
-	self:Init()
+	self:InitDB()
 	local aNChannel, nCount = SToNChannel(aChannel), 0
 	for _, db in ipairs(self.aDB) do
 		nCount = nCount + db:CountMsg(aNChannel, szSearch)
@@ -168,7 +168,7 @@ function DS:SelectMsg(aChannel, szSearch, nOffset, nLimit)
 	if #aChannel == 0 then
 		return {}
 	end
-	self:Init()
+	self:InitDB()
 	if not szSearch then
 		szSearch = ''
 	end
@@ -205,7 +205,7 @@ end
 
 function DS:PushDB()
 	if not IsEmpty(self.aInsertQueue) or not IsEmpty(self.aDeleteQueue) then
-		self:Init()
+		self:InitDB()
 		-- 插入记录
 		sort(self.aInsertQueue, function(a, b) return a.nTime < b.nTime end)
 		local i, db = 1, self.aDB[1]
