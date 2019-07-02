@@ -178,25 +178,28 @@ function DB:DeleteMsg(szHash, nTime)
 end
 
 function DB:PushDB()
-	self:Connect()
-	self.db:Execute('BEGIN TRANSACTION')
-	-- ²åÈë¼ÇÂ¼
-	for _, data in ipairs(self.aInsertQueue) do
-		self.stmtInsert:ClearBindings()
-		self.stmtInsert:BindAll(data.szHash, data.nChannel, data.nTime, data.szTalker, data.szText, data.szMsg)
-		self.stmtInsert:Execute()
+	if not IsEmpty(self.aInsertQueue) and not IsEmpty(self.aDeleteQueue) then
+		self:Connect()
+		self.db:Execute('BEGIN TRANSACTION')
+		-- ²åÈë¼ÇÂ¼
+		for _, data in ipairs(self.aInsertQueue) do
+			self.stmtInsert:ClearBindings()
+			self.stmtInsert:BindAll(data.szHash, data.nChannel, data.nTime, data.szTalker, data.szText, data.szMsg)
+			self.stmtInsert:Execute()
+		end
+		self.aInsertQueue = {}
+		-- É¾³ý¼ÇÂ¼
+		for _, data in ipairs(self.aDeleteQueue) do
+			self.stmtDelete:ClearBindings()
+			self.stmtDelete:BindAll(data.szHash, data.nTime)
+			self.stmtDelete:Execute()
+		end
+		self.aDeleteQueue = {}
+		self.db:Execute('END TRANSACTION')
+		self.tCountCache = nil
+		self.nCountCache = nil
 	end
-	self.aInsertQueue = {}
-	-- É¾³ý¼ÇÂ¼
-	for _, data in ipairs(self.aDeleteQueue) do
-		self.stmtDelete:ClearBindings()
-		self.stmtDelete:BindAll(data.szHash, data.nTime)
-		self.stmtDelete:Execute()
-	end
-	self.aDeleteQueue = {}
-	self.db:Execute('END TRANSACTION')
-	self.tCountCache = nil
-	self.nCountCache = nil
+	return self
 end
 
 function MY_ChatLog_DB(szFilePath)
