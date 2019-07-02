@@ -171,10 +171,10 @@ function DB:GetLastMsg()
 end
 
 function DB:DeleteMsg(szHash, nTime)
-	if not nTime or IsEmpty(szHash) then
-		return
+	if nTime and not IsEmpty(szHash) then
+		insert(self.aDeleteQueue, {szHash = szHash, nTime = nTime})
 	end
-	insert(self.aDeleteQueue, {szHash = szHash, nTime = nTime})
+	return self
 end
 
 function DB:PushDB()
