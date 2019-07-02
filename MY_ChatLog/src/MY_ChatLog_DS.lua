@@ -182,6 +182,8 @@ function DS:SelectMsg(aChannel, szSearch, nOffset, nLimit)
 		end
 		local res = db:SelectMsg(aNChannel, szSearch, nOffset, nLimit)
 		for _, p in ipairs(res) do
+			p.szChannel = CHANNELS[p.nChannel]
+			p.nChannel = nil
 			p.szTalker = UTF8ToAnsi(p.szTalker)
 			p.szText = UTF8ToAnsi(p.szText)
 			p.szMsg = UTF8ToAnsi(p.szMsg)
