@@ -180,20 +180,24 @@ function DS:SelectMsg(aChannel, szSearch, nOffset, nLimit)
 		if nLimit == 0 then
 			break
 		end
-		local res = db:SelectMsg(aNChannel, szSearch, nOffset, nLimit)
-		for _, p in ipairs(res) do
-			p.szChannel = CHANNELS[p.nChannel]
-			p.nChannel = nil
-			p.szTalker = UTF8ToAnsi(p.szTalker)
-			p.szText = UTF8ToAnsi(p.szText)
-			p.szMsg = UTF8ToAnsi(p.szMsg)
-			insert(aResult, p)
+		local nCount = db:CountMsg(aNChannel, szSearch)
+		if nOffset >= nCount then
+			nOffset = nOffset - nCount
+		else
+			local res = db:SelectMsg(aNChannel, szSearch, nOffset, nLimit)
+			for _, p in ipairs(res) do
+				p.szChannel = CHANNELS[p.nChannel]
+				p.nChannel = nil
+				p.szTalker = UTF8ToAnsi(p.szTalker)
+				p.szText = UTF8ToAnsi(p.szText)
+				p.szMsg = UTF8ToAnsi(p.szMsg)
+				insert(aResult, p)
+			end
+			if nOffset > 0 then
+				nOffset = max(nOffset - nCount, 0)
+			end
+			nLimit = max(nLimit - #res, 0)
 		end
-		if nOffset > 0 then
-			local nCount = db:CountMsg(aNChannel, szSearch)
-			nOffset = max(nOffset - nCount, 0)
-		end
-		nLimit = max(nLimit - #res, 0)
 	end
 	return aResult
 end
