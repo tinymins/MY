@@ -238,6 +238,16 @@ function DS:PushDB()
 	return self
 end
 
+function DS:ReleaseDB()
+	if self.aDB then
+		for _, db in ipairs(self.aDB) do
+			db:Disconnect()
+		end
+		self.aDB = nil
+	end
+	return self
+end
+
 function MY_ChatLog_DS(szRoot)
 	if not DS_CACHE[szRoot] then
 		DS_CACHE[szRoot] = DS.new(szRoot)
