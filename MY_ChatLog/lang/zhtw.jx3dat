@@ -42,4 +42,7 @@ data = {
     ['Death Log'] = '重傷記錄',
     ['Journal Log'] = '交易流水',
     ['MY Monitor'] = '聊天監控',
+
+    ['You need to upgrade chatlog database before using, that may take a while and cannot be break, do you want to do it now?'] = '聊天記錄需要優化更新資料庫後方可使用，更新可能導致客戶端無響應一段時間，希望現在開始更新嗎？',
+    ['Your client may get no responding, please wait until it finished, otherwise your chatlog data may got lost, press yes to start.'] = '請點擊確定開始更新，客戶端可能失去響應，請耐心等待。請勿結束客戶端，否則您的聊天記錄將可能會永久丟失。',
 }
