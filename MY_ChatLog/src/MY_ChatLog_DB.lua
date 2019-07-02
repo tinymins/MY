@@ -160,6 +160,16 @@ function DB:SelectMsg(aChannel, szSearch, nOffset, nLimit)
 	return (stmt:GetAll())
 end
 
+function DB:GetFirstMsg()
+	self:Connect():PushDB()
+	return self.db:Execute('SELECT hash AS szHash, channel AS nChannel, time AS nTime, talker AS szTalker, text AS szText, msg AS szMsg FROM ChatLog ORDER BY nTime ASC LIMIT 1')[1]
+end
+
+function DB:GetLastMsg()
+	self:Connect():PushDB()
+	return self.db:Execute('SELECT hash AS szHash, channel AS nChannel, time AS nTime, talker AS szTalker, text AS szText, msg AS szMsg FROM ChatLog ORDER BY nTime DESC LIMIT 1')[1]
+end
+
 function DB:DeleteMsg(szHash, nTime)
 	if not nTime or IsEmpty(szHash) then
 		return
