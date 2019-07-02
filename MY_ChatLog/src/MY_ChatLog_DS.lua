@@ -192,6 +192,7 @@ end
 function DS:PushDB()
 	if not IsEmpty(self.aInsertQueue) or not IsEmpty(self.aDeleteQueue) then
 		self:Init()
+		-- 插入记录
 		sort(self.aInsertQueue, function(a, b) return a.time < b.time end)
 		local i, db = 1, self.aDB[1]
 		for _, p in ipairs(self.aInsertQueue) do
@@ -202,6 +203,8 @@ function DS:PushDB()
 			assert(db, 'ChatLog db indexing error while PushDB: [i]' .. i .. ' [time]' .. p.nTime)
 			db:InsertMsg(p.nChannel, p.szText, p.szMsg, p.szTalker, p.nTime, p.szHash)
 		end
+		self.aInsertQueue = {}
+		-- 删除记录
 		sort(self.aDeleteQueue, function(a, b) return a.time < b.time end)
 		local i, db = 1, self.aDB[1]
 		for _, p in ipairs(self.aDeleteQueue) do
@@ -212,6 +215,8 @@ function DS:PushDB()
 			assert(db, 'ChatLog db indexing error while PushDB: [i]' .. i .. ' [time]' .. p.nTime)
 			db:DeleteMsg(p.szHash, p.nTime)
 		end
+		self.aDeleteQueue = {}
+		-- 执行数据库操作
 		for _, db in ipairs(self.aDB) do
 			db:PushDB()
 		end
