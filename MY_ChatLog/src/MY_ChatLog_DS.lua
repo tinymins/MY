@@ -86,6 +86,7 @@ local function SToNChannel(aChannel)
 end
 
 local DS = class()
+local DS_CACHE = setmetatable({}, {__mode = 'v'})
 
 function DS:ctor(szRoot)
 	self.szRoot = szRoot
@@ -96,6 +97,7 @@ end
 
 function DS:Init()
 	if not self.aDB then
+		-- 初始化数据库集群列表
 		self.aDB = {}
 		for _, szName in ipairs(CPath.GetFileList(self.szRoot) or {}) do
 			local db = MY_ChatLog_DB(self.szRoot .. szName)
@@ -105,17 +107,28 @@ function DS:Init()
 			insert(self.aDB, db)
 		end
 		sort(self.aDB, function(a, b) return a.nStartTime < b.nStartTime end)
-	end
-	local nCount = #self.aDB
-	if nCount == 0 or self.aDB[nCount].nEndTime ~= 0 then
-		local nStartTime = 0
+		-- 检查集群最新活跃节点压力是否超限
+		local nCount = #self.aDB
 		if nCount ~= 0 then
-			nStartTime = self.aDB[nCount].nEndTime + 1
+			local db = self.aDB[nCount]
+			if db.nEndTime == 0 then
+				if db:CountMsg() > SINGLE_TABLE_AMOUNT then
+					db.nEndTime = db:GetLastMsg().nTime
+					db:Move(self.szRoot .. db.nStartTime .. '_' .. db.nEndTime .. '.db')
+				end
+			end
 		end
-		local db = MY_ChatLog_DB(self.szRoot .. nStartTime .. '_0.db')
-		db.nStartTime = nStartTime
-		db.nEndTime = 0
-		insert(self.aDB, db)
+		-- 检查集群最新活跃节点是否不存在
+		if nCount == 0 or self.aDB[nCount].nEndTime ~= 0 then
+			local nStartTime = 0
+			if nCount ~= 0 then
+				nStartTime = self.aDB[nCount].nEndTime + 1
+			end
+			local db = MY_ChatLog_DB(self.szRoot .. nStartTime .. '_0.db')
+			db.nStartTime = nStartTime
+			db.nEndTime = 0
+			insert(self.aDB, db)
+		end
 	end
 	return self
 end
@@ -155,6 +168,7 @@ function DS:SelectMsg(aChannel, szSearch, nOffset, nLimit)
 	if #aChannel == 0 then
 		return {}
 	end
+	self:Init()
 	if not szSearch then
 		szSearch = ''
 	end
@@ -193,7 +207,7 @@ function DS:PushDB()
 	if not IsEmpty(self.aInsertQueue) or not IsEmpty(self.aDeleteQueue) then
 		self:Init()
 		-- 插入记录
-		sort(self.aInsertQueue, function(a, b) return a.time < b.time end)
+		sort(self.aInsertQueue, function(a, b) return a.nTime < b.nTime end)
 		local i, db = 1, self.aDB[1]
 		for _, p in ipairs(self.aInsertQueue) do
 			while db and p.nTime > db.nEndTime and db.nEndTime ~= 0 do
@@ -205,7 +219,7 @@ function DS:PushDB()
 		end
 		self.aInsertQueue = {}
 		-- 删除记录
-		sort(self.aDeleteQueue, function(a, b) return a.time < b.time end)
+		sort(self.aDeleteQueue, function(a, b) return a.nTime < b.nTime end)
 		local i, db = 1, self.aDB[1]
 		for _, p in ipairs(self.aDeleteQueue) do
 			while db and p.nTime > db.nEndTime and db.nEndTime ~= 0 do
@@ -225,5 +239,8 @@ function DS:PushDB()
 end
 
 function MY_ChatLog_DS(szRoot)
-	return DS.new(szRoot)
+	if not DS_CACHE[szRoot] then
+		DS_CACHE[szRoot] = DS.new(szRoot)
+	end
+	return DS_CACHE[szRoot]
 end
