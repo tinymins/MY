@@ -15,7 +15,7 @@ local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
 local sub, len, format, rep = string.sub, string.len, string.format, string.rep
 local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
 local type, tonumber, tostring = type, tonumber, tostring
-local huge, pi, random, abs = math.huge, math.pi, math.random, math.abs
+local HUGE, PI, random, abs = math.huge, math.pi, math.random, math.abs
 local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
 local pow, sqrt, sin, cos, tan, atan = math.pow, math.sqrt, math.sin, math.cos, math.tan, math.atan
 local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
@@ -1489,7 +1489,7 @@ function MY_Recount.GetPublishMenu()
 			szOption = g_tStrings.tChannelName[szChannel],
 			bCheck = true, -- 不设置成可选框不能点╭∩╮(︶︿︶）╭∩╮垃圾
 			fnAction = function()
-				Publish(nChannel, huge)
+				Publish(nChannel, HUGE)
 				Wnd.CloseWindow('PopupMenuPanel')
 			end,
 			rgb = GetMsgFontColor(szChannel, true),
@@ -1581,7 +1581,7 @@ function MY_Recount.GetDetailMenu(frame)
 			szOption = g_tStrings.tChannelName[szChannel],
 			bCheck = true, -- 不设置成可选框不能点╭∩╮(︶︿︶）╭∩╮垃圾
 			fnAction = function()
-				Publish(nChannel, huge)
+				Publish(nChannel, HUGE)
 				Wnd.CloseWindow('PopupMenuPanel')
 			end,
 			rgb = GetMsgFontColor(szChannel, true),

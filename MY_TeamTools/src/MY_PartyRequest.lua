@@ -15,7 +15,7 @@ local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
 local sub, len, format, rep = string.sub, string.len, string.format, string.rep
 local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
 local type, tonumber, tostring = type, tonumber, tostring
-local huge, pi, random, abs = math.huge, math.pi, math.random, math.abs
+local HUGE, PI, random, abs = math.huge, math.pi, math.random, math.abs
 local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
 local pow, sqrt, sin, cos, tan, atan = math.pow, math.sqrt, math.sin, math.cos, math.tan, math.atan
 local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
@@ -387,7 +387,7 @@ function D.UpdateFrame()
 	container:Clear()
 	for _, info in ipairs(PR_PARTY_REQUEST) do
 		if info.dwDelayTime and info.dwDelayTime > dwTime then
-			dwDelayTime = min(dwDelayTime or huge, info.dwDelayTime)
+			dwDelayTime = min(dwDelayTime or HUGE, info.dwDelayTime)
 		else
 			local wnd = container:AppendContentFromIni(PR_INI_PATH, 'WndWindow_Item')
 			local hItem = wnd:Lookup('', '')

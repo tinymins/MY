@@ -15,7 +15,7 @@ local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
 local sub, len, format, rep = string.sub, string.len, string.format, string.rep
 local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
 local type, tonumber, tostring = type, tonumber, tostring
-local huge, pi, random, abs = math.huge, math.pi, math.random, math.abs
+local HUGE, PI, random, abs = math.huge, math.pi, math.random, math.abs
 local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
 local pow, sqrt, sin, cos, tan, atan = math.pow, math.sqrt, math.sin, math.cos, math.tan, math.atan
 local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
@@ -165,7 +165,7 @@ function MY_GKP_Loot.OnFrameBreathe()
 		-- 自身面向
 		if me then
 			wnd:Lookup('', 'Handle_Compass/Image_Player'):Show()
-			wnd:Lookup('', 'Handle_Compass/Image_Player'):SetRotate( - me.nFaceDirection / 128 * pi)
+			wnd:Lookup('', 'Handle_Compass/Image_Player'):SetRotate( - me.nFaceDirection / 128 * PI)
 		end
 		-- 物品位置
 		local nRotate, nRadius = 0, 10.125
@@ -173,18 +173,18 @@ function MY_GKP_Loot.OnFrameBreathe()
 			-- 特判角度
 			if me.nX == doodad.nX then
 				if me.nY > doodad.nY then
-					nRotate = pi / 2
+					nRotate = PI / 2
 				else
-					nRotate = - pi / 2
+					nRotate = - PI / 2
 				end
 			else
 				nRotate = atan((me.nY - doodad.nY) / (me.nX - doodad.nX))
 			end
 			if nRotate < 0 then
-				nRotate = nRotate + pi
+				nRotate = nRotate + PI
 			end
 			if doodad.nY < me.nY then
-				nRotate = pi + nRotate
+				nRotate = PI + nRotate
 			end
 		end
 		local nX = nRadius + nRadius * cos(nRotate) + 2

@@ -20,7 +20,7 @@ local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
 local sub, len, format, rep = string.sub, string.len, string.format, string.rep
 local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
 local type, tonumber, tostring = type, tonumber, tostring
-local huge, pi, random, abs = math.huge, math.pi, math.random, math.abs
+local HUGE, PI, random, abs = math.huge, math.pi, math.random, math.abs
 local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
 local pow, sqrt, sin, cos, tan, atan = math.pow, math.sqrt, math.sin, math.cos, math.tan, math.atan
 local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
@@ -61,7 +61,7 @@ local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_
 ---------------------------------------------------------------------------
 local pairs, ipairs = pairs, ipairs
 local char, srep = string.char, string.rep
-local floor, huge, max = math.floor, math.huge, math.max
+local floor, HUGE, max = math.floor, math.huge, math.max
 local tonumber, tostring = tonumber, tostring
 local type = type
 local tconcat, tinsert = table.concat, table.insert
@@ -365,7 +365,7 @@ local function object_or_array(T)
 			tinsert(string_keys, key)
 		elseif type(key) == 'number' then
 			tinsert(number_keys, key)
-			if key <= 0 or key >= huge then
+			if key <= 0 or key >= HUGE then
 				number_keys_must_be_strings = true
 			elseif not maximum_number_key or key > maximum_number_key then
 				maximum_number_key = key
@@ -414,14 +414,14 @@ local function encode_value(value, parents, indent)
 			-- NaN (Not a Number).
 			-- JSON has no NaN, so we have to fudge the best we can. This should really be a package option.
 			return 'null'
-		elseif value >= huge then
+		elseif value >= HUGE then
 			-- Positive infinity. JSON has no INF, so we have to fudge the best we can. This should
 			-- really be a package option. Note: at least with some implementations, positive infinity
-			-- is both '>= huge' and '<= -huge', which makes no sense but that's how it is.
-			-- Negative infinity is properly '<= -huge'. So, we must be sure to check the '>='
+			-- is both '>= HUGE' and '<= -HUGE', which makes no sense but that's how it is.
+			-- Negative infinity is properly '<= -HUGE'. So, we must be sure to check the '>='
 			-- case first.
 			return '1e+9999'
-		elseif value <= -huge then
+		elseif value <= -HUGE then
 			-- Negative infinity.
 			-- JSON has no INF, so we have to fudge the best we can. This should really be a package option.
 			return '-1e+9999'
