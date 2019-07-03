@@ -370,7 +370,7 @@ function D.UpdatePage(frame, noscroll)
 	if not noscroll then
 		scroll:SetScrollPos(bInit and scroll:GetStepCount() or 0)
 	end
-	MY_ChatLog.tUncheckedChannel = clone(this.tUncheckedChannel)
+	MY_ChatLog.tUncheckedChannel = clone(frame.tUncheckedChannel)
 end
 
 
