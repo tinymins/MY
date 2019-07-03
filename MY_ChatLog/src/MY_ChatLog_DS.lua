@@ -101,33 +101,34 @@ function DS:InitDB()
 		-- 初始化数据库集群列表
 		self.aDB = {}
 		for _, szName in ipairs(CPath.GetFileList(self.szRoot) or {}) do
-			local db = MY_ChatLog_DB(self.szRoot .. szName)
-			local nStartTime, nEndTime = szName:match('^(%d+)%_(%d+).db')
-			db.nStartTime = tonumber(nStartTime)
-			db.nEndTime = tonumber(nEndTime)
-			insert(self.aDB, db)
+			local db = szName:find('^chatlog_[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]%.db') and MY_ChatLog_DB(self.szRoot .. szName)
+			if db then
+				insert(self.aDB, db)
+			end
 		end
-		sort(self.aDB, function(a, b) return a.nStartTime < b.nStartTime end)
+		sort(self.aDB, function(a, b) return a:GetMinTime() < b:GetMinTime() end)
 		-- 检查集群最新活跃节点压力是否超限
 		local nCount = #self.aDB
 		if nCount ~= 0 then
 			local db = self.aDB[nCount]
-			if db.nEndTime == 0 then
+			if not IsHugeNumber(db:GetMaxTime()) then
 				if db:CountMsg() > SINGLE_TABLE_AMOUNT then
-					db.nEndTime = db:GetLastMsg().nTime
-					db:Move(self.szRoot .. db.nStartTime .. '_' .. db.nEndTime .. '.db')
+					db:SetMaxTime(db:GetMaxRecTime())
 				end
 			end
 		end
 		-- 检查集群最新活跃节点是否不存在
-		if nCount == 0 or self.aDB[nCount].nEndTime ~= 0 then
-			local nStartTime = 0
+		if nCount == 0 or not IsHugeNumber(self.aDB[nCount]:GetMaxTime()) then
+			local szPath
+			repeat
+				szPath = self.szRoot .. ('chatlog_%x'):format(math.random(0x100000, 0xFFFFFF)) .. '.db'
+			until not IsLocalFileExist(szPath)
+			local db = MY_ChatLog_DB(szPath)
+			local nMinTime = 0
 			if nCount ~= 0 then
-				nStartTime = self.aDB[nCount].nEndTime + 1
+				nMinTime = self.aDB[nCount]:GetMaxTime() + 1
 			end
-			local db = MY_ChatLog_DB(self.szRoot .. nStartTime .. '_0.db')
-			db.nStartTime = nStartTime
-			db.nEndTime = 0
+			db:SetMinTime(nMinTime)
 			insert(self.aDB, db)
 		end
 	end
@@ -217,7 +218,7 @@ function DS:PushDB()
 		sort(self.aInsertQueue, function(a, b) return a.nTime < b.nTime end)
 		local i, db = 1, self.aDB[1]
 		for _, p in ipairs(self.aInsertQueue) do
-			while db and p.nTime > db.nEndTime and db.nEndTime ~= 0 do
+			while db and p.nTime > db:GetMaxTime() do
 				i = i + 1
 				db = self.aDB[i]
 			end
@@ -229,7 +230,7 @@ function DS:PushDB()
 		sort(self.aDeleteQueue, function(a, b) return a.nTime < b.nTime end)
 		local i, db = 1, self.aDB[1]
 		for _, p in ipairs(self.aDeleteQueue) do
-			while db and p.nTime > db.nEndTime and db.nEndTime ~= 0 do
+			while db and p.nTime > db:GetMaxTime() do
 				i = i + 1
 				db = self.aDB[i]
 			end

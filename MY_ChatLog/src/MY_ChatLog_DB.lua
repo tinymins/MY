@@ -49,8 +49,6 @@ local DB = class()
 local DB_CACHE = setmetatable({}, {__mode = 'v'})
 
 function DB:ctor(szFilePath)
-	self.nStartTime = nStartTime
-	self.nEndTime = nEndTime
 	self.szFilePath = szFilePath
 	self.aInsertQueue = {}
 	self.aDeleteQueue = {}
@@ -60,6 +58,9 @@ end
 function DB:Connect()
 	if not self.db then
 		self.db = LIB.ConnectDatabase(_L['chat log'], self.szFilePath)
+		self.db:Execute('CREATE TABLE IF NOT EXISTS ChatInfo (key NVARCHAR(128), value NVARCHAR(4096), PRIMARY KEY (key))')
+		self.stmtInfoGet = self.db:Prepare('SELECT value FROM ChatInfo WHERE key = ?')
+		self.stmtInfoSet = self.db:Prepare('REPLACE INTO ChatInfo (key, value) VALUES (?, ?)')
 		self.db:Execute('CREATE TABLE IF NOT EXISTS ChatLog (hash INTEGER, channel INTEGER, time INTEGER, talker NVARCHAR(20), text NVARCHAR(400) NOT NULL, msg NVARCHAR(4000) NOT NULL, PRIMARY KEY (time, hash))')
 		self.db:Execute('CREATE INDEX IF NOT EXISTS ChatLog_channel_idx ON ChatLog(channel)')
 		self.db:Execute('CREATE INDEX IF NOT EXISTS ChatLog_talker_idx ON ChatLog(talker)')
@@ -75,20 +76,69 @@ function DB:Disconnect()
 	if self.db then
 		self.db:Release()
 		self.db = nil
+		self.stmtInfoGet = nil
+		self.stmtInfoSet = nil
+		self.stmtCount = nil
+		self.stmtInsert = nil
+		self.stmtDelete = nil
 	end
 	return self
 end
 
-function DB:Move(szFilePath)
-	self:Disconnect()
-	DB_CACHE[self.szFilePath] = nil
-	CPath.Move(self.szFilePath, szFilePath)
-	self.szFilePath = szFilePath
-	DB_CACHE[self.szFilePath] = self
+function DB:SetInfo(szKey, oValue)
+	self:Connect()
+	self.stmtInfoSet:ClearBindings()
+	self.stmtInfoSet:BindAll(szKey, var2str(oValue))
+	self.stmtInfoSet:GetAll()
+end
+
+function DB:GetInfo(szKey)
+	self:Connect()
+	self.stmtInfoGet:ClearBindings()
+	self.stmtInfoGet:BindAll(szKey)
+	return Get(self.stmtInfoGet:GetAll(), {0, 'value'})
+end
+
+function DB:SetMinTime(nMinTime)
+	self:Connect():PushDB()
+	local nMinRecTime = self:GetMinRecTime()
+	assert(nMinRecTime == -1 or nMinRecTime >= nMinTime, '[MY_ChatLog_DB:SetMinTime] MinTime cannot be larger than MinRecTime.')
+	self:SetInfo('min_time', nMinTime)
+	self._nMinTime = nMinTime
 	return self
 end
 
+function DB:GetMinTime()
+	if not self._nMinTime then
+		self._nMinTime = self:GetInfo('min_time') or 0
+	end
+	return self._nMinTime
+end
+
+function DB:SetMaxTime(nMaxTime)
+	self:Connect():PushDB()
+	if nMaxTime <= 0 then
+		nMaxTime = HUGE
+	end
+	local nMaxRecTime = self:GetMaxRecTime()
+	assert(nMaxRecTime <= nMaxTime, '[MY_ChatLog_DB:SetMaxTime] MaxTime cannot be smaller than MaxRecTime.')
+	self:SetInfo('max_time', IsHugeNumber(nMaxTime) and 0 or nMaxTime)
+	self._nMaxTime = nMaxTime
+	return self
+end
+
+function DB:GetMaxTime()
+	if not self._nMaxTime then
+		self._nMaxTime = self:GetInfo('max_time') or 0
+		if self._nMaxTime == 0 then
+			self._nMaxTime = HUGE
+		end
+	end
+	return self._nMaxTime
+end
+
 function DB:InsertMsg(nChannel, szText, szMsg, szTalker, nTime, szHash)
+	assert(nTime >= self._nMinTime and nTime <= self._nMaxTime, '[MY_ChatLog_DB:InsertMsg] Time must between MinTime and MaxTime.')
 	if not nChannel or not nTime or IsEmpty(szMsg) or not szText or IsEmpty(szHash) then
 		return
 	end
@@ -161,14 +211,16 @@ function DB:SelectMsg(aChannel, szSearch, nOffset, nLimit)
 	return (stmt:GetAll())
 end
 
-function DB:GetFirstMsg()
+function DB:GetMinRecTime()
 	self:Connect():PushDB()
-	return self.db:Execute('SELECT hash AS szHash, channel AS nChannel, time AS nTime, talker AS szTalker, text AS szText, msg AS szMsg FROM ChatLog ORDER BY nTime ASC LIMIT 1')[1]
+	local rec = self.db:Execute('SELECT time AS nTime FROM ChatLog ORDER BY nTime ASC LIMIT 1')[1]
+	return rec and rec.nTime or -1
 end
 
-function DB:GetLastMsg()
+function DB:GetMaxRecTime()
 	self:Connect():PushDB()
-	return self.db:Execute('SELECT hash AS szHash, channel AS nChannel, time AS nTime, talker AS szTalker, text AS szText, msg AS szMsg FROM ChatLog ORDER BY nTime DESC LIMIT 1')[1]
+	local rec = self.db:Execute('SELECT time AS nTime FROM ChatLog ORDER BY nTime DESC LIMIT 1')[1]
+	return rec and rec.nTime or -1
 end
 
 function DB:DeleteMsg(szHash, nTime)
