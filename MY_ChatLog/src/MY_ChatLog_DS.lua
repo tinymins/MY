@@ -93,6 +93,7 @@ function DS:ctor(szRoot)
 	self.szRoot = szRoot
 	self.aInsertQueue = {}
 	self.aDeleteQueue = {}
+	self.aInsertQueueAnsi = {}
 	return self
 end
 
@@ -136,14 +137,16 @@ function DS:InitDB()
 end
 
 function DS:InsertMsg(szChannel, szText, szMsg, szTalker, nTime)
-	local szHash, nChannel
-	szMsg    = AnsiToUTF8(szMsg or '') or ''
-	szText   = AnsiToUTF8(szText or '') or ''
-	szHash   = GetStringCRC(szMsg)
-	szTalker = szTalker and AnsiToUTF8(szTalker or '') or ''
-	nChannel = CHANNELS_R[szChannel]
-	if nChannel and nTime and not IsEmpty(szMsg) and szText and not IsEmpty(szHash) then
-		insert(self.aInsertQueue, {szHash = szHash, nChannel = nChannel, nTime = nTime, szTalker = szTalker, szText = szText, szMsg = szMsg})
+	if szMsg and szText and szTalker then
+		local szuMsg    = AnsiToUTF8(szMsg)
+		local szuText   = AnsiToUTF8(szText)
+		local szHash    = GetStringCRC(szMsg)
+		local szuTalker = AnsiToUTF8(szTalker)
+		local nChannel  = CHANNELS_R[szChannel]
+		if nChannel and nTime and not IsEmpty(szMsg) and szText and not IsEmpty(szHash) then
+			insert(self.aInsertQueue, {szHash = szHash, nChannel = nChannel, nTime = nTime, szTalker = szuTalker, szText = szuText, szMsg = szuMsg})
+			insert(self.aInsertQueueAnsi, {szHash = szHash, szChannel = szChannel, nTime = nTime, szTalker = szTalker, szText = szText, szMsg = szMsg})
+		end
 	end
 	return self
 end
@@ -155,13 +158,16 @@ function DS:CountMsg(aChannel, szSearch)
 	if not szSearch then
 		szSearch = ''
 	end
-	if szSearch ~= '' then
-		szSearch = AnsiToUTF8('%' .. szSearch .. '%')
-	end
+	local szuSearch = szSearch == '' and '' or AnsiToUTF8('%' .. szSearch .. '%')
 	self:InitDB()
 	local aNChannel, nCount = SToNChannel(aChannel), 0
 	for _, db in ipairs(self.aDB) do
-		nCount = nCount + db:CountMsg(aNChannel, szSearch)
+		nCount = nCount + db:CountMsg(aNChannel, szuSearch)
+	end
+	for _, rec in ipairs(self.aInsertQueueAnsi) do
+		if wfind(rec.szText, szSearch) or wfind(rec.szTalker, szSearch) then
+			nCount = nCount + 1
+		end
 	end
 	return nCount
 end
@@ -174,19 +180,17 @@ function DS:SelectMsg(aChannel, szSearch, nOffset, nLimit)
 	if not szSearch then
 		szSearch = ''
 	end
-	if szSearch ~= '' then
-		szSearch = AnsiToUTF8('%' .. szSearch .. '%')
-	end
+	local szuSearch = szSearch == '' and '' or AnsiToUTF8('%' .. szSearch .. '%')
 	local aNChannel, aResult = SToNChannel(aChannel), {}
 	for _, db in ipairs(self.aDB) do
 		if nLimit == 0 then
 			break
 		end
-		local nCount = db:CountMsg(aNChannel, szSearch)
+		local nCount = db:CountMsg(aNChannel, szuSearch)
 		if nOffset >= nCount then
 			nOffset = nOffset - nCount
 		else
-			local res = db:SelectMsg(aNChannel, szSearch, nOffset, nLimit)
+			local res = db:SelectMsg(aNChannel, szuSearch, nOffset, nLimit)
 			for _, p in ipairs(res) do
 				p.szChannel = CHANNELS[p.nChannel]
 				p.nChannel = nil
@@ -198,8 +202,21 @@ function DS:SelectMsg(aChannel, szSearch, nOffset, nLimit)
 			if nOffset > 0 then
 				nOffset = max(nOffset - nCount, 0)
 			end
-			nLimit = max(nLimit - #res, 0)
+			nLimit = max(nLimit - nCount, 0)
 		end
+	end
+	if nLimit > 0 then
+		local nCount = 0
+		for _, rec in ipairs(self.aInsertQueueAnsi) do
+			if wfind(rec.szText, szSearch) or wfind(rec.szTalker, szSearch) then
+				insert(aResult, clone(rec))
+				nCount = nCount + 1
+			end
+		end
+		if nOffset > 0 then
+			nOffset = max(nOffset - nCount, 0)
+		end
+		nLimit = max(nLimit - nCount, 0)
 	end
 	return aResult
 end
@@ -226,6 +243,7 @@ function DS:PushDB()
 			db:InsertMsg(p.nChannel, p.szText, p.szMsg, p.szTalker, p.nTime, p.szHash)
 		end
 		self.aInsertQueue = {}
+		self.aInsertQueueAnsi = {}
 		-- É¾³ý¼ÇÂ¼
 		sort(self.aDeleteQueue, function(a, b) return a.nTime < b.nTime end)
 		local i, db = 1, self.aDB[1]
