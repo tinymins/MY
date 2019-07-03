@@ -96,7 +96,7 @@ function DB:GetInfo(szKey)
 	self:Connect()
 	self.stmtInfoGet:ClearBindings()
 	self.stmtInfoGet:BindAll(szKey)
-	return Get(self.stmtInfoGet:GetAll(), {0, 'value'})
+	return Get(self.stmtInfoGet:GetAll(), {1, 'value'})
 end
 
 function DB:SetMinTime(nMinTime)
