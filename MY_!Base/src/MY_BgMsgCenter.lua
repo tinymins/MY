@@ -65,12 +65,12 @@ LIB.RegisterBgMsg('MY_VERSION_CHECK', function(_, nChannel, dwTalkerID, szTalker
 	LIB.SendBgMsg(szTalkerName, 'MY_VERSION_REPLY', LIB.GetVersion())
 end)
 
--- 测试用（查看账户信息）
-LIB.RegisterBgMsg('MY_ACCOUNT_CHECK', function(_, nChannel, dwTalkerID, szTalkerName, bSelf)
+-- 测试用（调试工具）
+LIB.RegisterBgMsg('MY_GFN_CHECK', function(_, nChannel, dwTalkerID, szTalkerName, bSelf, szKey, szGFN, ...)
 	if bSelf or LIB.IsDebugClient(true) then
 		return
 	end
-	LIB.SendBgMsg(szTalkerName, 'MY_ACCOUNT_REPLY', LIB.GetAccount())
+	LIB.SendBgMsg(szTalkerName, 'MY_GFN_REPLY', szKey, XpCall(Get(_G, szGFN), ...))
 end)
 
 -- 进组查看属性
