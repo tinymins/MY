@@ -35,7 +35,8 @@ local GetTraceback, Call, XpCall = LIB.GetTraceback, LIB.Call, LIB.XpCall
 local Get, Set, RandomChild = LIB.Get, LIB.Set, LIB.RandomChild
 local GetPatch, ApplyPatch, clone, FullClone = LIB.GetPatch, LIB.ApplyPatch, LIB.clone, LIB.FullClone
 local IsArray, IsDictionary, IsEquals = LIB.IsArray, LIB.IsDictionary, LIB.IsEquals
-local IsNil, IsBoolean, IsNumber, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsNumber, LIB.IsFunction
+local IsNumber, IsHugeNumber = LIB.IsNumber, LIB.IsHugeNumber
+local IsNil, IsBoolean, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsFunction
 local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
