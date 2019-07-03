@@ -51,26 +51,11 @@ MY_ChatLog_UI = class()
 ------------------------------------------------------------------------------------------------------
 -- Êý¾Ý¿âºËÐÄ
 ------------------------------------------------------------------------------------------------------
+local SZ_INI = LIB.GetAddonInfo().szRoot .. 'MY_ChatLog/ui/MY_ChatLog.ini'
 local PAGE_AMOUNT = 150
 local PAGE_DISPLAY = 14
-local SZ_INI = LIB.GetAddonInfo().szRoot .. 'MY_ChatLog/ui/MY_ChatLog.ini'
-local LOG_TYPE = {
-	{id = 'whisper', title = g_tStrings.tChannelName['MSG_WHISPER'       ], channels = {'MSG_WHISPER'       }},
-	{id = 'party'  , title = g_tStrings.tChannelName['MSG_PARTY'         ], channels = {'MSG_PARTY'         }},
-	{id = 'team'   , title = g_tStrings.tChannelName['MSG_TEAM'          ], channels = {'MSG_TEAM'          }},
-	{id = 'friend' , title = g_tStrings.tChannelName['MSG_FRIEND'        ], channels = {'MSG_FRIEND'        }},
-	{id = 'guild'  , title = g_tStrings.tChannelName['MSG_GUILD'         ], channels = {'MSG_GUILD'         }},
-	{id = 'guild_a', title = g_tStrings.tChannelName['MSG_GUILD_ALLIANCE'], channels = {'MSG_GUILD_ALLIANCE'}},
-	{id = 'death'  , title = _L['Death Log'], channels = {'MSG_SELF_DEATH', 'MSG_SELF_KILL', 'MSG_PARTY_DEATH', 'MSG_PARTY_KILL'}},
-	{id = 'journal', title = _L['Journal Log'], channels = {
-		'MSG_MONEY', 'MSG_ITEM', --'MSG_EXP', 'MSG_REPUTATION', 'MSG_CONTRIBUTE', 'MSG_ATTRACTION', 'MSG_PRESTIGE',
-		-- 'MSG_TRAIN', 'MSG_MENTOR_VALUE', 'MSG_THEW_STAMINA', 'MSG_TONG_FUND'
-	}},
-	{id = 'monitor', title = _L['MY Monitor'], channels = {'MSG_MY_MONITOR'}},
-}
-local MSGTYPE_COLOR = setmetatable({
-	['MSG_MY_MONITOR'] = {255, 255, 0},
-}, {__index = function(t, k) return GetMsgFontColor(k, true) end})
+local LOG_TYPE = MY_ChatLog.LOG_TYPE
+local MSGTYPE_COLOR = MY_ChatLog.MSGTYPE_COLOR
 
 function D.SetDS(frame, szRoot)
 	frame.ds = MY_ChatLog_DS(szRoot)
