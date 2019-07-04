@@ -85,6 +85,12 @@ function DB:Disconnect()
 	return self
 end
 
+function DB:DeleteDB()
+	self:Disconnect()
+	CPath.DelFile(self.szFilePath)
+	return self
+end
+
 function DB:SetInfo(szKey, oValue)
 	self:Connect()
 	self.stmtInfoSet:ClearBindings()
