@@ -47,6 +47,7 @@ end
 -------------------------------------------------------------------------------------------------------------
 local DB = class()
 local DB_CACHE = setmetatable({}, {__mode = 'v'})
+local SELECT_MSG = 'SELECT hash AS szHash, channel AS nChannel, time AS nTime, talker AS szTalker, text AS szText, msg AS szMsg FROM ChatLog'
 
 function DB:ctor(szFilePath)
 	self.szFilePath = szFilePath
@@ -148,7 +149,9 @@ function DB:GetMaxTime()
 end
 
 function DB:InsertMsg(nChannel, szText, szMsg, szTalker, nTime, szHash)
-	assert(nTime >= self._nMinTime and nTime <= self._nMaxTime, '[MY_ChatLog_DB:InsertMsg] Time must between MinTime and MaxTime.')
+	local nMinTime, nMaxTime = self:GetMinTime(), self:GetMaxTime()
+	assert(nTime >= nMinTime and nTime <= nMaxTime,
+		'[MY_ChatLog_DB:InsertMsg] Time(' ..nTime .. ') must between MinTime(' .. nMinTime .. ') and MaxTime(' .. nMaxTime .. ').')
 	if not nChannel or not nTime or IsEmpty(szMsg) or not szText or IsEmpty(szHash) then
 		return
 	end
@@ -213,12 +216,16 @@ function DB:SelectMsg(aChannel, szSearch, nOffset, nLimit)
 	insert(aValue, nLimit)
 	insert(aValue, nOffset)
 
-	szSQL = 'SELECT hash AS szHash, channel AS nChannel, time AS nTime, talker AS szTalker, text AS szText, msg AS szMsg FROM ChatLog'
-		.. szSQL .. ' ORDER BY nTime ASC LIMIT ? OFFSET ?'
+	szSQL = SELECT_MSG .. szSQL .. ' ORDER BY nTime ASC LIMIT ? OFFSET ?'
 	local stmt = self.db:Prepare(szSQL)
 	stmt:ClearBindings()
 	stmt:BindAll(unpack(aValue))
 	return (stmt:GetAll())
+end
+
+function DB:SelectMsgByTime(szOp, nTime)
+	self:Connect():PushDB()
+	return (self.db:Execute(SELECT_MSG .. ' WHERE time ' .. szOp .. ' ' .. nTime .. ' ORDER BY nTime ASC'))
 end
 
 function DB:GetMinRecTime()
@@ -237,6 +244,12 @@ function DB:DeleteMsg(szHash, nTime)
 	if nTime and not IsEmpty(szHash) then
 		insert(self.aDeleteQueue, {szHash = szHash, nTime = nTime})
 	end
+	return self
+end
+
+function DB:DeleteMsgByTime(szOp, nTime)
+	self:Connect():PushDB()
+	self.db:Execute('DELETE FROM ChatLog WHERE time ' .. szOp .. ' ' .. nTime)
 	return self
 end
 
