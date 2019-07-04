@@ -86,6 +86,17 @@ local function SToNChannel(aChannel)
 	return aNChannel
 end
 
+local function NewDB(szRoot, nMinTime, nMaxTime)
+	local szPath
+	repeat
+		szPath = szRoot .. ('chatlog_%x'):format(math.random(0x100000, 0xFFFFFF)) .. '.db'
+	until not IsLocalFileExist(szPath)
+	local db = MY_ChatLog_DB(szPath)
+	db:SetMinTime(nMinTime)
+	db:SetMaxTime(nMaxTime)
+	return db
+end
+
 local DS = class()
 local DS_CACHE = setmetatable({}, {__mode = 'v'})
 
@@ -100,38 +111,62 @@ end
 function DS:InitDB()
 	if not self.aDB then
 		-- 初始化数据库集群列表
-		self.aDB = {}
+		local aDB = {}
 		for _, szName in ipairs(CPath.GetFileList(self.szRoot) or {}) do
 			local db = szName:find('^chatlog_[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]%.db') and MY_ChatLog_DB(self.szRoot .. szName)
 			if db then
-				insert(self.aDB, db)
+				insert(aDB, db)
 			end
 		end
-		sort(self.aDB, function(a, b) return a:GetMinTime() < b:GetMinTime() end)
-		-- 检查集群最新活跃节点压力是否超限
-		local nCount = #self.aDB
-		if nCount ~= 0 then
-			local db = self.aDB[nCount]
-			if not IsHugeNumber(db:GetMaxTime()) then
-				if db:CountMsg() > SINGLE_TABLE_AMOUNT then
-					db:SetMaxTime(db:GetMaxRecTime())
+		sort(aDB, function(a, b) return a:GetMinTime() < b:GetMinTime() end)
+		-- 删除集群中错误的空节点
+		for i, db in ipairs_r(aDB) do
+			if not (i == #aDB and IsHugeNumber(db:GetMaxTime())) and db:CountMsg() == 0 then
+				db:DeleteDB()
+				remove(aDB, i)
+			end
+		end
+		-- 修复覆盖区域不连续的节点（覆盖区中断问题、分段冲突问题）
+		for i = 1, #aDB - 1 do
+			local db1, db2 = aDB[i], aDB[i + 1]
+			-- 检测中间节点最大值
+			if IsHugeNumber(db1:GetMaxTime()) then
+				db1:SetMaxTime(db1:GetMaxRecTime())
+			end
+			-- 检测区域连续性
+			if db1:GetMaxTime() ~= db2:GetMinTime() then
+				if db1:GetMaxRecTime() <= db2:GetMinTime() then -- 覆盖区中断 扩充左侧区域
+					db1:SetMaxTime(db2:GetMinTime())
+				elseif db1:GetMaxTime() <= db2:GetMinRecTime() then -- 覆盖区中断 扩充右侧区域
+					db2:SetMinTime(db1:GetMaxTime())
+				else -- 覆盖区域冲突 将右侧节点的冲突区域数据移动到左侧节点中
+					db1:SetMaxTime(db1:GetMaxRecTime())
+					for _, rec in ipairs(db2:SelectMsgByTime('<=', db1:GetMaxTime())) do
+						db1:InsertMsg(rec.nChannel, rec.szText, rec.szMsg, rec.szTalker, rec.nTime, rec.szHash)
+					end
+					db1:PushDB()
+					db2:DeleteMsgByTime('<=', db1:GetMaxTime())
+					db2:SetMinTime(db1:GetMaxTime())
 				end
 			end
 		end
-		-- 检查集群最新活跃节点是否不存在
-		if nCount == 0 or not IsHugeNumber(self.aDB[nCount]:GetMaxTime()) then
-			local szPath
-			repeat
-				szPath = self.szRoot .. ('chatlog_%x'):format(math.random(0x100000, 0xFFFFFF)) .. '.db'
-			until not IsLocalFileExist(szPath)
-			local db = MY_ChatLog_DB(szPath)
-			local nMinTime = 0
-			if nCount ~= 0 then
-				nMinTime = self.aDB[nCount]:GetMaxTime() + 1
+		-- 检查集群最新活跃节点是否存在
+		local db = aDB[#aDB]
+		if db and IsHugeNumber(db:GetMaxTime()) then -- 存在： 检查集群最新活跃节点压力是否超限
+			if db:CountMsg() > SINGLE_TABLE_AMOUNT then
+				db:SetMaxTime(db:GetMaxRecTime())
+				insert(aDB, NewDB(self.szRoot, db:GetMaxTime(), HUGE))
 			end
-			db:SetMinTime(nMinTime)
-			insert(self.aDB, db)
+		else -- 不存在： 创建
+			local nMinTime = 0
+			if db then
+				local nMaxTime = db:GetMaxRecTime()
+				db:SetMaxTime(nMaxTime)
+				nMinTime = nMaxTime
+			end
+			insert(aDB, NewDB(self.szRoot, nMinTime, HUGE))
 		end
+		self.aDB = aDB
 	end
 	return self
 end
