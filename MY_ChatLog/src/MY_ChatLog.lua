@@ -99,7 +99,7 @@ function D.Open()
 end
 
 do
-local aMsg, ds = {}
+local l_aMsg, l_ds = {}
 local function InitDB(bFix)
 	local szPath = LIB.FormatPath({'userdata/chat_log.db', PATH_TYPE.ROLE})
 	if IsLocalFileExist(szPath) then
@@ -129,7 +129,7 @@ local function InitDB(bFix)
 		end
 		CPath.Move(szPath, szPath .. '.bak')
 	end
-	ds = MY_ChatLog_DS(D.GetRoot())
+	local ds = MY_ChatLog_DS(D.GetRoot())
 	if not ds:InitDB() then
 		if not bFix then
 			LIB.Confirm(_L['Problem(s) detected on your chatlog database and must be fixed before use, would you like to do this now?'], function()
@@ -141,10 +141,10 @@ local function InitDB(bFix)
 		end
 		ds:InitDB(true)
 	end
-	for _, a in ipairs(aMsg) do
+	for _, a in ipairs(l_aMsg) do
 		ds:InsertMsg(unpack(a))
 	end
-	aMsg = {}
+	l_ds, l_aMsg = ds, {}
 	return true
 end
 LIB.RegisterInit('MY_ChatLog_InitMon', function() InitDB() end)
@@ -167,13 +167,13 @@ local function OnMsg(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID, szTalk
 			return
 		end
 	end
-	if ds then
-		ds:InsertMsg(szChannel, szText, szMsg, szTalker, GetCurrentTime())
+	if l_ds then
+		l_ds:InsertMsg(szChannel, szText, szMsg, szTalker, GetCurrentTime())
 		if O.bRealtimeCommit and not LIB.IsShieldedVersion() then
-			ds:PushDB()
+			l_ds:PushDB()
 		end
 	else
-		insert(aMsg, {szChannel, szText, szMsg, szTalker, GetCurrentTime()})
+		insert(l_aMsg, {szChannel, szText, szMsg, szTalker, GetCurrentTime()})
 	end
 end
 local tChannels, aChannels = {}, {}
@@ -188,25 +188,25 @@ end
 LIB.RegisterMsgMonitor('MY_ChatLog', OnMsg, aChannels)
 
 local function onLoadingEnding()
-	if ds then
-		ds:PushDB()
+	if l_ds then
+		l_ds:PushDB()
 	end
 end
 LIB.RegisterEvent('LOADING_ENDING.MY_ChatLog_Save', onLoadingEnding)
 
 local function onIdle()
-	if ds and not LIB.IsShieldedVersion() then
-		ds:PushDB()
+	if l_ds and not LIB.IsShieldedVersion() then
+		l_ds:PushDB()
 	end
 end
 LIB.RegisterIdle('MY_ChatLog_Save', onIdle)
 
 local function onExit()
-	if not ds then
+	if not l_ds then
 		return
 	end
-	ds:PushDB()
-	ds:ReleaseDB()
+	l_ds:PushDB()
+	l_ds:ReleaseDB()
 end
 LIB.RegisterExit('MY_Chat_Release', onExit)
 LIB.RegisterEvent('DISCONNECT.MY_Chat_Release', onExit)
