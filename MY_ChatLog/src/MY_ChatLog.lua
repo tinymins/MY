@@ -101,6 +101,9 @@ end
 do
 local l_aMsg, l_ds = {}
 local function InitDB(bFix)
+	if l_ds then
+		return true
+	end
 	local szPath = LIB.FormatPath({'userdata/chat_log.db', PATH_TYPE.ROLE})
 	if IsLocalFileExist(szPath) then
 		if not bFix then
@@ -148,6 +151,13 @@ local function InitDB(bFix)
 	return true
 end
 LIB.RegisterInit('MY_ChatLog_InitMon', function() InitDB() end)
+
+function D.OptimizeDB()
+	if not InitDB(true) then
+		return
+	end
+	l_ds:OptimizeDB()
+end
 
 local function OnMsg(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID, szTalker)
 	local szText = szMsg
@@ -229,6 +239,7 @@ local settings = {
 			fields = {
 				Open = D.Open,
 				GetRoot = D.GetRoot,
+				OptimizeDB = D.OptimizeDB,
 				LOG_TYPE = LOG_TYPE,
 				MSGTYPE_COLOR = MSGTYPE_COLOR,
 			},

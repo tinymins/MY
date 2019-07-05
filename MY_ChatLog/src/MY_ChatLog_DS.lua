@@ -49,8 +49,7 @@ end
 -- 数据库控制器
 ------------------------------------------------------------------------------------------------------
 local EXPORT_SLICE = 100
-local DIVIDE_TABLE_AMOUNT = 25000 -- 如果某张表大小超过25000
-local SINGLE_TABLE_AMOUNT = 20000 -- 则将最久远的20000条消息独立成表
+local SINGLE_DB_AMOUNT = 20000 -- 单个数据库节点最大数量
 -- 频道对应数据库中数值 可添加 但不可随意修改
 local CHANNELS = {
 	[1] = 'MSG_WHISPER',
@@ -179,7 +178,7 @@ function DS:InitDB(bFixProblem)
 		-- 检查集群最新活跃节点是否存在
 		local db = aDB[#aDB]
 		if db and IsHugeNumber(db:GetMaxTime()) then -- 存在： 检查集群最新活跃节点压力是否超限
-			if db:CountMsg() > SINGLE_TABLE_AMOUNT then
+			if db:CountMsg() > SINGLE_DB_AMOUNT then
 				db:SetMaxTime(db:GetMaxRecTime())
 				local dbNew = NewDB(self.szRoot, db:GetMaxTime(), HUGE)
 				insert(aDB, dbNew)
@@ -204,6 +203,55 @@ function DS:InitDB(bFixProblem)
 			LIB.Debug({'Fix unexpected MinTime for first DB: ' .. db:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
 		end
 		self.aDB = aDB
+	end
+	return self
+end
+
+function DS:OptimizeDB()
+	if self:InitDB(true) then
+		LIB.Debug({'OptimizeDB Start!'}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
+		local i = 1
+		while i <= #self.aDB do
+			local db = self.aDB[i]
+			if db:CountMsg() > SINGLE_DB_AMOUNT then -- 单个节点压力过大 转移超出部分到下一个节点
+				LIB.Debug({'Node count exceed limit: ' .. db:ToString() .. ' ' .. db:CountMsg()}, _L['MY_ChatLog'], DEBUG_LEVEL.WARNING)
+				local aRec = db:SelectMsg(nil, nil, SINGLE_DB_AMOUNT)
+				local nTime = aRec[1].nTime
+				local dbNext
+				if i == #self.aDB then
+					dbNext = NewDB(self.szRoot, nTime, HUGE)
+				else
+					dbNext = self.aDB[i + 1]
+					dbNext:SetMinTime(nTime)
+				end
+				for _, rec in ipairs(aRec) do
+					dbNext:InsertMsg(rec.nChannel, rec.szText, rec.szMsg, rec.szTalker, rec.nTime, rec.szHash)
+				end
+				dbNext:Flush()
+				LIB.Debug({'Moving ' .. #aRec .. ' records from ' .. db:ToString() .. ' to ' .. dbNext:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
+				for _, rec in ipairs(aRec) do
+					db:DeleteMsg(rec.szHash, rec.nTime)
+				end
+				db:Flush()
+				db:SetMaxTime(nTime)
+				LIB.Debug({'Modify node property: ' .. db:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
+			elseif db:CountMsg() < SINGLE_DB_AMOUNT then -- 单个节点压力过小 与下个节点合并
+				if i < #self.aDB then
+					LIB.Debug({'Node count insufficient: ' .. db:ToString() .. ' ' .. db:CountMsg()}, _L['MY_ChatLog'], DEBUG_LEVEL.WARNING)
+					local dbNext = self.aDB[i + 1]
+					dbNext:SetMinTime(db:GetMinTime())
+					for _, rec in ipairs(db:SelectMsg()) do
+						dbNext:InsertMsg(rec.nChannel, rec.szText, rec.szMsg, rec.szTalker, rec.nTime, rec.szHash)
+					end
+					dbNext:Flush()
+					LIB.Debug({'Merge node ' .. db:ToString() .. ' to ' .. dbNext:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
+					db:DeleteDB()
+					remove(self.aDB, i)
+					i = i - 1
+				end
+			end
+			i = i + 1
+		end
 	end
 	return self
 end

@@ -222,6 +222,9 @@ function DB:SelectMsg(aChannel, szSearch, nOffset, nLimit)
 		szSQL = szSQL .. ' WHERE' .. szWhere
 	end
 	szSQL = szSQL .. ' ORDER BY nTime ASC'
+	if nOffset and not nLimit then
+		nLimit = -1
+	end
 	if nLimit then
 		szSQL = szSQL .. ' LIMIT ?'
 		insert(aValue, nLimit)

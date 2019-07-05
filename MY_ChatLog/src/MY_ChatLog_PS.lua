@@ -377,19 +377,19 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + dy
 
-	-- ui:append('WndButton', {
-	-- 	x = x, y = y, w = 150,
-	-- 	text = _L['optimize/compress datebase'],
-	-- 	onclick = function()
-	-- 		LIB.Confirm(_L['optimize/compress datebase will take a long time and may cause a disconnection, are you sure to continue?'], function()
-	-- 			LIB.Confirm(_L['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'], function()
-	-- 				OptimizeDB(true)
-	-- 				LIB.Alert(_L['Optimize finished!'])
-	-- 			end)
-	-- 		end)
-	-- 	end,
-	-- })
-	-- y = y + dy
+	ui:append('WndButton', {
+		x = x, y = y, w = 150,
+		text = _L['optimize/compress datebase'],
+		onclick = function()
+			LIB.Confirm(_L['optimize/compress datebase will take a long time and may cause a disconnection, are you sure to continue?'], function()
+				LIB.Confirm(_L['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'], function()
+					MY_ChatLog.OptimizeDB()
+					LIB.Alert(_L['Optimize finished!'])
+				end)
+			end)
+		end,
+	})
+	y = y + dy
 
 	-- ui:append('WndButton', {
 	-- 	x = x, y = y, w = 150,
