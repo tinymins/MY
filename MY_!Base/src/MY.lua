@@ -769,10 +769,10 @@ end
 -- Ã¶¾Ù
 -----------------------------------------------
 local DEBUG_LEVEL = SetmetaReadonly({
-	LOG     = 0,
 	PMLOG   = 0,
-	WARNING = 1,
-	ERROR   = 2,
+	LOG     = 1,
+	WARNING = 2,
+	ERROR   = 3,
 	DEBUG   = 3,
 })
 local PATH_TYPE = SetmetaReadonly({
