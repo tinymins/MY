@@ -216,24 +216,49 @@ function DS:OptimizeDB()
 			if db:CountMsg() > SINGLE_DB_AMOUNT then -- 单个节点压力过大 转移超出部分到下一个节点
 				LIB.Debug({'Node count exceed limit: ' .. db:ToString() .. ' ' .. db:CountMsg()}, _L['MY_ChatLog'], DEBUG_LEVEL.WARNING)
 				local aRec = db:SelectMsg(nil, nil, SINGLE_DB_AMOUNT)
-				local nTime = aRec[1].nTime
-				local dbNext
-				if i == #self.aDB then
-					dbNext = NewDB(self.szRoot, nTime, HUGE)
+				local nMaxTime, nMinTime = aRec[1].nTime, aRec[#aRec].nTime
+				-- 超出部分超过单个节点最大负载 直接独立节点
+				while #aRec > SINGLE_DB_AMOUNT do
+					local dbNew = NewDB(self.szRoot, aRec[1].nTime, (aRec[SINGLE_DB_AMOUNT + 1] or aRec[SINGLE_DB_AMOUNT]).nTime)
+					for i = 1, SINGLE_DB_AMOUNT do
+						local rec = remove(aRec, 1)
+						dbNew:InsertMsg(rec.nChannel, rec.szText, rec.szMsg, rec.szTalker, rec.nTime, rec.szHash)
+						db:DeleteMsg(rec.szHash, rec.nTime)
+					end
+					dbNew:Flush()
+					i = i + 1
+					insert(self.aDB, i, dbNew)
+					LIB.Debug({'Moving ' .. SINGLE_DB_AMOUNT .. ' records from ' .. db:ToString() .. ' to ' .. dbNew:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
+				end
+				-- 处理剩下不超过单个节点最大负载的结果
+				if #aRec == 0 then
+					-- 刚好没有了 且当前是活跃节点 则创建新的活跃节点
+					if i == #self.aDB then
+						local dbNew = NewDB(self.szRoot, nMinTime, HUGE)
+						i = i + 1
+						insert(self.aDB, i, dbNew)
+						LIB.Debug({'Create new active node: ' .. dbNew:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
+					end
 				else
-					dbNext = self.aDB[i + 1]
-					dbNext:SetMinTime(nTime)
-				end
-				for _, rec in ipairs(aRec) do
-					dbNext:InsertMsg(rec.nChannel, rec.szText, rec.szMsg, rec.szTalker, rec.nTime, rec.szHash)
-				end
-				dbNext:Flush()
-				LIB.Debug({'Moving ' .. #aRec .. ' records from ' .. db:ToString() .. ' to ' .. dbNext:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
-				for _, rec in ipairs(aRec) do
-					db:DeleteMsg(rec.szHash, rec.nTime)
+					-- 还有则合并到下一个节点
+					local dbNext
+					if i == #self.aDB then
+						dbNext = NewDB(self.szRoot, aRec[1].nTime, HUGE)
+						i = i + 1
+						insert(self.aDB, i, dbNext)
+					else
+						dbNext = self.aDB[i + 1]
+						dbNext:SetMinTime(aRec[1].nTime)
+					end
+					for _, rec in ipairs(aRec) do
+						db:DeleteMsg(rec.szHash, rec.nTime)
+						dbNext:InsertMsg(rec.nChannel, rec.szText, rec.szMsg, rec.szTalker, rec.nTime, rec.szHash)
+					end
+					dbNext:Flush()
+					LIB.Debug({'Moving ' .. #aRec .. ' records from ' .. db:ToString() .. ' to ' .. dbNext:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
 				end
 				db:Flush()
-				db:SetMaxTime(nTime)
+				db:SetMaxTime(nMaxTime)
 				LIB.Debug({'Modify node property: ' .. db:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
 			elseif db:CountMsg() < SINGLE_DB_AMOUNT then -- 单个节点压力过小 与下个节点合并
 				if i < #self.aDB then
@@ -252,6 +277,7 @@ function DS:OptimizeDB()
 			end
 			i = i + 1
 		end
+		LIB.Debug({'OptimizeDB Finished!'}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
 	end
 	return self
 end
