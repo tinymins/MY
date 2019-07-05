@@ -198,6 +198,7 @@ end
 
 function DB:SelectMsg(aChannel, szSearch, nOffset, nLimit)
 	self:Connect():Flush()
+	local szSQL = SELECT_MSG
 	local aWhere, aValue = {}, {}
 	if aChannel then
 		for _, nChannel in ipairs(aChannel) do
@@ -205,12 +206,11 @@ function DB:SelectMsg(aChannel, szSearch, nOffset, nLimit)
 			insert(aValue, nChannel)
 		end
 	end
-	local szSQL  = ''
 	local szWhere = ''
 	if #aWhere > 0 then
 		szWhere = szWhere .. ' (' .. concat(aWhere, ' OR ') .. ')'
 	end
-	if szSearch ~= '' then
+	if not IsEmpty(szSearch) then
 		if #szWhere > 0 then
 			szWhere = szWhere .. ' AND'
 		end
@@ -219,12 +219,17 @@ function DB:SelectMsg(aChannel, szSearch, nOffset, nLimit)
 		insert(aValue, szSearch)
 	end
 	if #szWhere > 0 then
-		szSQL  = szSQL .. ' WHERE' .. szWhere
+		szSQL = szSQL .. ' WHERE' .. szWhere
 	end
-	insert(aValue, nLimit)
-	insert(aValue, nOffset)
-
-	szSQL = SELECT_MSG .. szSQL .. ' ORDER BY nTime ASC LIMIT ? OFFSET ?'
+	szSQL = szSQL .. ' ORDER BY nTime ASC'
+	if nLimit then
+		szSQL = szSQL .. ' LIMIT ?'
+		insert(aValue, nLimit)
+	end
+	if nOffset then
+		szSQL = szSQL .. ' OFFSET ?'
+		insert(aValue, nOffset)
+	end
 	local stmt = self.db:Prepare(szSQL)
 	stmt:ClearBindings()
 	stmt:BindAll(unpack(aValue))
