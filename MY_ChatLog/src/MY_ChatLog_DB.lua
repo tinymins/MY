@@ -94,7 +94,7 @@ function DB:Disconnect()
 	return self
 end
 
-function DB:Optimize()
+function DB:GarbageCollection()
 	if not self:Connect() then
 		return
 	end
