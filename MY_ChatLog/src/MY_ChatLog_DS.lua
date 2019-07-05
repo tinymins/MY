@@ -196,6 +196,13 @@ function DS:InitDB(bFixProblem)
 			insert(aDB, dbNew)
 			LIB.Debug({'Create new empty active node ' .. db:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
 		end
+		-- 检查集群最久远节点开始时间是否为0
+		local db = aDB[1]
+		if db:GetMinTime() ~= 0 then
+			LIB.Debug({'Unexpected MinTime for first DB: ' .. db:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.WARNING)
+			db:SetMinTime(0)
+			LIB.Debug({'Fix unexpected MinTime for first DB: ' .. db:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
+		end
 		self.aDB = aDB
 	end
 	return self
