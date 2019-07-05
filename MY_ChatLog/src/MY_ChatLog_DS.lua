@@ -283,6 +283,11 @@ function DS:OptimizeDB()
 			end
 			i = i + 1
 		end
+		-- Ñ¹ËõÊý¾Ý¿â
+		LIB.Debug({'Start GC'}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
+		for _, db in ipairs(self.aDB) do
+			db:Optimize()
+		end
 		LIB.Debug({'OptimizeDB Finished!'}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
 	end
 	return self
