@@ -138,7 +138,7 @@ local function CommonEventFirer(E, arg0, ...)
 		if not res then
 			FireUIEvent('CALL_LUA_ERROR', err .. '\nOn' .. E.szName .. ': ' .. p.szID .. '\n' .. trace .. '\n')
 		end
-		LIB.Debug({_L('%s function <%s> %s in %dms.', E.szName, p.szID, res and _L['succeed'] or _L['failed'], GetTickCount() - nStartTick)}, _L['PMTool'], DEBUG_LEVEL.LOG)
+		LIB.Debug({_L('%s function <%s> %s in %dms.', E.szName, p.szID, res and _L['succeed'] or _L['failed'], GetTickCount() - nStartTick)}, _L['PMTool'], DEBUG_LEVEL.PMLOG)
 	end
 end
 
