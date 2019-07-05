@@ -218,20 +218,25 @@ function DS:OptimizeDB()
 				local aRec = db:SelectMsg(nil, nil, SINGLE_DB_AMOUNT)
 				local nMaxTime, nMinTime = aRec[1].nTime, aRec[#aRec].nTime
 				-- 超出部分超过单个节点最大负载 直接独立节点
-				while #aRec > SINGLE_DB_AMOUNT do
-					local dbNew = NewDB(self.szRoot, aRec[1].nTime, (aRec[SINGLE_DB_AMOUNT + 1] or aRec[SINGLE_DB_AMOUNT]).nTime)
+				local nCount, nOffset = #aRec, 0
+				while nOffset + SINGLE_DB_AMOUNT < nCount do
+					local dbNew, rec = NewDB(
+						self.szRoot,
+						aRec[nOffset + 1].nTime,
+						(aRec[nOffset + SINGLE_DB_AMOUNT + 1] or aRec[nOffset + SINGLE_DB_AMOUNT]).nTime)
 					for i = 1, SINGLE_DB_AMOUNT do
-						local rec = remove(aRec, 1)
+						rec = aRec[nOffset + i]
 						dbNew:InsertMsg(rec.nChannel, rec.szText, rec.szMsg, rec.szTalker, rec.nTime, rec.szHash)
 						db:DeleteMsg(rec.szHash, rec.nTime)
 					end
 					dbNew:Flush()
+					nOffset = nOffset + SINGLE_DB_AMOUNT
 					i = i + 1
 					insert(self.aDB, i, dbNew)
 					LIB.Debug({'Moving ' .. SINGLE_DB_AMOUNT .. ' records from ' .. db:ToString() .. ' to ' .. dbNew:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
 				end
 				-- 处理剩下不超过单个节点最大负载的结果
-				if #aRec == 0 then
+				if nCount - nOffset == 0 then
 					-- 刚好没有了 且当前是活跃节点 则创建新的活跃节点
 					if i == #self.aDB then
 						local dbNew = NewDB(self.szRoot, nMinTime, HUGE)
@@ -241,16 +246,17 @@ function DS:OptimizeDB()
 					end
 				else
 					-- 还有则合并到下一个节点
-					local dbNext
+					local dbNext, rec
 					if i == #self.aDB then
-						dbNext = NewDB(self.szRoot, aRec[1].nTime, HUGE)
+						dbNext = NewDB(self.szRoot, aRec[nOffset + 1].nTime, HUGE)
 						i = i + 1
 						insert(self.aDB, i, dbNext)
 					else
 						dbNext = self.aDB[i + 1]
-						dbNext:SetMinTime(aRec[1].nTime)
+						dbNext:SetMinTime(aRec[nOffset + 1].nTime)
 					end
-					for _, rec in ipairs(aRec) do
+					for i = nOffset + 1, nCount do
+						rec = aRec[i]
 						db:DeleteMsg(rec.szHash, rec.nTime)
 						dbNext:InsertMsg(rec.nChannel, rec.szText, rec.szMsg, rec.szTalker, rec.nTime, rec.szHash)
 					end
