@@ -266,6 +266,9 @@ function DS:OptimizeDB()
 				db:Flush()
 				db:SetMaxTime(nMaxTime)
 				LIB.Debug({'Modify node property: ' .. db:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
+				-- 压缩数据库
+				db:GarbageCollection()
+				LIB.Debug({'Node GarbageCollection: ' .. db:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
 			elseif db:CountMsg() < SINGLE_DB_AMOUNT then -- 单个节点压力过小 与下个节点合并
 				if i < #self.aDB then
 					LIB.Debug({'Node count insufficient: ' .. db:ToString() .. ' ' .. db:CountMsg()}, _L['MY_ChatLog'], DEBUG_LEVEL.WARNING)
@@ -282,11 +285,6 @@ function DS:OptimizeDB()
 				end
 			end
 			i = i + 1
-		end
-		-- 压缩数据库
-		LIB.Debug({'Start GC'}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
-		for _, db in ipairs(self.aDB) do
-			db:GarbageCollection()
 		end
 		LIB.Debug({'OptimizeDB Finished!'}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
 	end
