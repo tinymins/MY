@@ -122,6 +122,7 @@ function DS:InitDB(bFixProblem)
 		-- 删除集群中错误的空节点
 		for i, db in ipairs_r(aDB) do
 			if not (i == #aDB and IsHugeNumber(db:GetMaxTime())) and db:CountMsg() == 0 then
+				LIB.Debug({'Removing unexpected empty node: ' .. db:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.WARNING)
 				db:DeleteDB()
 				remove(aDB, i)
 			end
@@ -180,7 +181,9 @@ function DS:InitDB(bFixProblem)
 		if db and IsHugeNumber(db:GetMaxTime()) then -- 存在： 检查集群最新活跃节点压力是否超限
 			if db:CountMsg() > SINGLE_TABLE_AMOUNT then
 				db:SetMaxTime(db:GetMaxRecTime())
-				insert(aDB, NewDB(self.szRoot, db:GetMaxTime(), HUGE))
+				local dbNew = NewDB(self.szRoot, db:GetMaxTime(), HUGE)
+				insert(aDB, dbNew)
+				LIB.Debug({'Create new empty active node ' .. db:ToString() .. ' after ' .. db:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
 			end
 		else -- 不存在： 创建
 			local nMinTime = 0
@@ -189,7 +192,9 @@ function DS:InitDB(bFixProblem)
 				db:SetMaxTime(nMaxTime)
 				nMinTime = nMaxTime
 			end
-			insert(aDB, NewDB(self.szRoot, nMinTime, HUGE))
+			local dbNew = NewDB(self.szRoot, nMinTime, HUGE)
+			insert(aDB, dbNew)
+			LIB.Debug({'Create new empty active node ' .. db:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
 		end
 		self.aDB = aDB
 	end
