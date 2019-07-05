@@ -94,6 +94,13 @@ function DB:Disconnect()
 	return self
 end
 
+function DB:Optimize()
+	if not self:Connect() then
+		return
+	end
+	self.db:Execute('VACUUM')
+end
+
 function DB:DeleteDB()
 	self:Disconnect()
 	CPath.DelFile(self.szFilePath)
