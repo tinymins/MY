@@ -176,7 +176,7 @@ function DB:CountMsg(aChannel, szSearch)
 	end
 	if not self.tCountCache or self.szCountCacheKey ~= szSearch then
 		local aResult
-		if szSearch == '' then
+		if IsEmpty(szSearch) then
 			aResult = self.db:Execute('SELECT channel AS nChannel, COUNT(*) AS nCount FROM ChatLog GROUP BY channel')
 		else
 			self.stmtCount:ClearBindings()
