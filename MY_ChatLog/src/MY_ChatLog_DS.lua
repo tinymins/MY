@@ -138,7 +138,7 @@ function DS:InitDB(bFixProblem)
 						return false
 					end
 					db1:SetMaxTime(db1:GetMaxRecTime())
-					LIB.Debug({'Fix unexpected huge MaxTime: ' .. db1:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.WARNING)
+					LIB.Debug({'Fix unexpected huge MaxTime: ' .. db1:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
 				end
 				-- 检测区域连续性
 				if db1:GetMaxTime() ~= db2:GetMinTime() then
