@@ -120,7 +120,7 @@ local l_npc = {}
 local l_doodad = {}
 local l_tempMap = false
 local MAX_RENDER_INTERVAL = GLOBAL.GAME_FPS * 5
-local function PushDB()
+local function FlushDB()
 	if IsEmpty(l_npc) and IsEmpty(l_doodad) then
 		return
 	end
@@ -157,12 +157,12 @@ local function onLoadingEnding()
 		DBD_DM:BindAll(dwMapID)
 		DBD_DM:Execute()
 	end
-	PushDB()
+	FlushDB()
 end
 LIB.RegisterEvent('LOADING_ENDING.MY_MiddleMapMark', onLoadingEnding)
 
 local function OnExit()
-	PushDB()
+	FlushDB()
 	DB:Release()
 end
 LIB.RegisterExit('MY_MiddleMapMark_Save', OnExit)

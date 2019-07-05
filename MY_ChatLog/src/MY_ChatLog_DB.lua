@@ -111,7 +111,7 @@ function DB:GetInfo(szKey)
 end
 
 function DB:SetMinTime(nMinTime)
-	self:Connect():PushDB()
+	self:Connect():Flush()
 	local nMinRecTime = self:GetMinRecTime()
 	assert(nMinRecTime == -1 or nMinRecTime >= nMinTime, '[MY_ChatLog_DB:SetMinTime] MinTime cannot be larger than MinRecTime.')
 	self:SetInfo('min_time', nMinTime)
@@ -127,7 +127,7 @@ function DB:GetMinTime()
 end
 
 function DB:SetMaxTime(nMaxTime)
-	self:Connect():PushDB()
+	self:Connect():Flush()
 	if nMaxTime <= 0 then
 		nMaxTime = HUGE
 	end
@@ -159,7 +159,7 @@ function DB:InsertMsg(nChannel, szText, szMsg, szTalker, nTime, szHash)
 end
 
 function DB:CountMsg(aChannel, szSearch)
-	self:Connect():PushDB()
+	self:Connect():Flush()
 	if not aChannel then
 		if not self.nCountCache then
 			self.nCountCache = Get(self.db:Execute('SELECT COUNT(*) AS nCount FROM ChatLog'), {1, 'nCount'}, 0)
@@ -189,7 +189,7 @@ function DB:CountMsg(aChannel, szSearch)
 end
 
 function DB:SelectMsg(aChannel, szSearch, nOffset, nLimit)
-	self:Connect():PushDB()
+	self:Connect():Flush()
 	local aWhere, aValue = {}, {}
 	if aChannel then
 		for _, nChannel in ipairs(aChannel) do
@@ -224,18 +224,18 @@ function DB:SelectMsg(aChannel, szSearch, nOffset, nLimit)
 end
 
 function DB:SelectMsgByTime(szOp, nTime)
-	self:Connect():PushDB()
+	self:Connect():Flush()
 	return (self.db:Execute(SELECT_MSG .. ' WHERE time ' .. szOp .. ' ' .. nTime .. ' ORDER BY nTime ASC'))
 end
 
 function DB:GetMinRecTime()
-	self:Connect():PushDB()
+	self:Connect():Flush()
 	local rec = self.db:Execute('SELECT time AS nTime FROM ChatLog ORDER BY nTime ASC LIMIT 1')[1]
 	return rec and rec.nTime or -1
 end
 
 function DB:GetMaxRecTime()
-	self:Connect():PushDB()
+	self:Connect():Flush()
 	local rec = self.db:Execute('SELECT time AS nTime FROM ChatLog ORDER BY nTime DESC LIMIT 1')[1]
 	return rec and rec.nTime or -1
 end
@@ -248,12 +248,12 @@ function DB:DeleteMsg(szHash, nTime)
 end
 
 function DB:DeleteMsgByTime(szOp, nTime)
-	self:Connect():PushDB()
+	self:Connect():Flush()
 	self.db:Execute('DELETE FROM ChatLog WHERE time ' .. szOp .. ' ' .. nTime)
 	return self
 end
 
-function DB:PushDB()
+function DB:Flush()
 	if not IsEmpty(self.aInsertQueue) or not IsEmpty(self.aDeleteQueue) then
 		self:Connect()
 		self.db:Execute('BEGIN TRANSACTION')

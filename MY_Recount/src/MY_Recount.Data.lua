@@ -285,7 +285,7 @@ end
 -- 过图清除当前战斗数据
 do
 local function onLoadingEnding()
-	MY_Recount.Data.Push()
+	MY_Recount.Data.Flush()
 	MY_Recount.Data.Init(true)
 	FireUIEvent('MY_RECOUNT_NEW_FIGHT')
 end
@@ -299,7 +299,7 @@ LIB.RegisterEvent('MY_FIGHT_HINT', function(event)
 		MY_Recount.Data.Init()
 		FireUIEvent('MY_RECOUNT_NEW_FIGHT')
 	else
-		MY_Recount.Data.Push()
+		MY_Recount.Data.Flush()
 	end
 end)
 LIB.BreatheCall('MY_Recount_FightTime', 1000, function()
@@ -930,7 +930,7 @@ end
 end
 
 -- Data数据压入历史记录 并重新初始化Data
-function MY_Recount.Data.Push()
+function MY_Recount.Data.Flush()
 	if not (Data and Data.UUID) then
 		return
 	end

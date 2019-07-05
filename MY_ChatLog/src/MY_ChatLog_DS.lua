@@ -150,7 +150,7 @@ function DS:InitDB(bFixProblem)
 					for _, rec in ipairs(db2:SelectMsgByTime('<=', db1:GetMaxTime())) do
 						db1:InsertMsg(rec.nChannel, rec.szText, rec.szMsg, rec.szTalker, rec.nTime, rec.szHash)
 					end
-					db1:PushDB()
+					db1:Flush()
 					db2:DeleteMsgByTime('<=', db1:GetMaxTime())
 					db2:SetMinTime(db1:GetMaxTime())
 				end
@@ -269,7 +269,7 @@ function DS:DeleteMsg(szHash, nTime)
 	return self
 end
 
-function DS:PushDB()
+function DS:FlushDB()
 	if (not IsEmpty(self.aInsertQueue) or not IsEmpty(self.aDeleteQueue)) and self:InitDB() then
 		-- 插入记录
 		sort(self.aInsertQueue, function(a, b) return a.nTime < b.nTime end)
@@ -279,7 +279,7 @@ function DS:PushDB()
 				i = i + 1
 				db = self.aDB[i]
 			end
-			assert(db, 'ChatLog db indexing error while PushDB: [i]' .. i .. ' [time]' .. p.nTime)
+			assert(db, 'ChatLog db indexing error while FlushDB: [i]' .. i .. ' [time]' .. p.nTime)
 			db:InsertMsg(p.nChannel, p.szText, p.szMsg, p.szTalker, p.nTime, p.szHash)
 		end
 		self.aInsertQueue = {}
@@ -292,13 +292,13 @@ function DS:PushDB()
 				i = i + 1
 				db = self.aDB[i]
 			end
-			assert(db, 'ChatLog db indexing error while PushDB: [i]' .. i .. ' [time]' .. p.nTime)
+			assert(db, 'ChatLog db indexing error while FlushDB: [i]' .. i .. ' [time]' .. p.nTime)
 			db:DeleteMsg(p.szHash, p.nTime)
 		end
 		self.aDeleteQueue = {}
 		-- 执行数据库操作
 		for _, db in ipairs(self.aDB) do
-			db:PushDB()
+			db:Flush()
 		end
 	end
 	return self

@@ -71,7 +71,7 @@ MY_BagStatistics.tUncheckedNames = {}
 RegisterCustomData('Global/MY_BagStatistics.bCompactMode')
 RegisterCustomData('Global/MY_BagStatistics.tUncheckedNames')
 
-local PushDB
+local FlushDB
 do
 local GetItemText
 do
@@ -116,8 +116,8 @@ local function UpdateTongRepertoryPage()
 end
 LIB.RegisterEvent('UPDATE_TONG_REPERTORY_PAGE.MY_BagStatistics', UpdateTongRepertoryPage)
 
-function PushDB()
-	LIB.Debug({'Pushing to database...'}, 'MY_BagStatistics', DEBUG_LEVEL.LOG)
+function FlushDB()
+	LIB.Debug({'Flushing to database...'}, 'MY_BagStatistics', DEBUG_LEVEL.LOG)
 	local me = GetClientPlayer()
 	local time = GetCurrentTime()
 	local ownerkey = AnsiToUTF8(me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName)
@@ -188,9 +188,9 @@ function PushDB()
 	end
 
 	DB:Execute('END TRANSACTION')
-	LIB.Debug({'Pushing to database finished...'}, 'MY_BagStatistics', DEBUG_LEVEL.LOG)
+	LIB.Debug({'Flushing to database finished...'}, 'MY_BagStatistics', DEBUG_LEVEL.LOG)
 end
-LIB.RegisterEvent('PLAYER_LEAVE_GAME.MY_BagStatistics', PushDB)
+LIB.RegisterEvent('PLAYER_LEAVE_GAME.MY_BagStatistics', FlushDB)
 end
 
 function MY_BagStatistics.Open()
@@ -235,7 +235,7 @@ function MY_BagStatistics.UpdateNames(frame)
 end
 
 function MY_BagStatistics.UpdateItems(frame)
-	PushDB()
+	FlushDB()
 
 	local searchitem = frame:Lookup('Window_Main/Wnd_SearchItem/Edit_SearchItem'):GetText():gsub('%s+', '%%')
 	local sqlfrom = '(SELECT B.ownerkey, B.boxtype, B.boxindex, B.tabtype, B.tabindex, B.tabsubindex, B.bagcount, B.bankcount, B.time FROM BagItems AS B LEFT JOIN ItemInfo AS I ON B.tabtype = I.tabtype AND B.tabindex = I.tabindex WHERE B.tabtype != -1 AND B.tabindex != -1 AND (I.name LIKE ? OR I.desc LIKE ?)) AS C LEFT JOIN OwnerInfo AS O ON C.ownerkey = O.ownerkey WHERE '
@@ -379,7 +379,7 @@ function MY_BagStatistics.UpdateItems(frame)
 end
 
 function MY_BagStatistics.OnFrameCreate()
-	PushDB()
+	FlushDB()
 
 	MY_BagStatistics.UpdateNames(this)
 	this:BringToTop()

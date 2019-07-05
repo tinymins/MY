@@ -123,7 +123,7 @@ local function InitDB(bFix)
 				for _, p in ipairs(odb:Execute('SELECT * FROM ' .. info.name .. ' ORDER BY time ASC')) do
 					db:InsertMsg(p.channel, p.text, p.msg, p.talker, p.time, p.hash)
 				end
-				db:PushDB()
+				db:Flush()
 			end
 			odb:Release()
 		end
@@ -170,7 +170,7 @@ local function OnMsg(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID, szTalk
 	if l_ds then
 		l_ds:InsertMsg(szChannel, szText, szMsg, szTalker, GetCurrentTime())
 		if O.bRealtimeCommit and not LIB.IsShieldedVersion() then
-			l_ds:PushDB()
+			l_ds:FlushDB()
 		end
 	else
 		insert(l_aMsg, {szChannel, szText, szMsg, szTalker, GetCurrentTime()})
@@ -189,14 +189,14 @@ LIB.RegisterMsgMonitor('MY_ChatLog', OnMsg, aChannels)
 
 local function onLoadingEnding()
 	if l_ds then
-		l_ds:PushDB()
+		l_ds:FlushDB()
 	end
 end
 LIB.RegisterEvent('LOADING_ENDING.MY_ChatLog_Save', onLoadingEnding)
 
 local function onIdle()
 	if l_ds and not LIB.IsShieldedVersion() then
-		l_ds:PushDB()
+		l_ds:FlushDB()
 	end
 end
 LIB.RegisterIdle('MY_ChatLog_Save', onIdle)
@@ -205,7 +205,7 @@ local function onExit()
 	if not l_ds then
 		return
 	end
-	l_ds:PushDB()
+	l_ds:FlushDB()
 	l_ds:ReleaseDB()
 end
 LIB.RegisterExit('MY_Chat_Release', onExit)
@@ -267,5 +267,5 @@ end
 -- 	for i = 0, 20001 do
 -- 		ds:InsertMsg('MSG_WHISPER', szText, szMsg, szTalker, 110000 + i)
 -- 	end
--- 	ds:PushDB()
+-- 	ds:FlushDB()
 -- end)
