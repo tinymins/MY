@@ -60,6 +60,10 @@ function DB:GetFilePath()
 	return self.szFilePath
 end
 
+function DB:ToString()
+	return '"' .. self:GetFilePath() .. '"(' .. self:GetMinTime() .. ',' .. self:GetMaxTime() .. ')'
+end
+
 function DB:Connect()
 	if not self.db then
 		self.db = LIB.ConnectDatabase(_L['chat log'], self.szFilePath)
