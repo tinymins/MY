@@ -131,20 +131,25 @@ function DS:InitDB(bFixProblem)
 			local db1, db2 = aDB[i], aDB[i + 1]
 			-- 检测中间节点最大值
 			if IsHugeNumber(db1:GetMaxTime()) then
+				LIB.Debug({'Unexpected huge MaxTime: ' .. db1:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.WARNING)
 				if not bFixProblem then
 					return false
 				end
 				db1:SetMaxTime(db1:GetMaxRecTime())
+				LIB.Debug({'Fix unexpected huge MaxTime: ' .. db1:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.WARNING)
 			end
 			-- 检测区域连续性
 			if db1:GetMaxTime() ~= db2:GetMinTime() then
+				LIB.Debug({'Unexpected noncontinuously time between ' .. db1:ToString() .. ' and ' .. db2:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.WARNING)
 				if not bFixProblem then
 					return false
 				end
 				if db1:GetMaxRecTime() <= db2:GetMinTime() then -- 覆盖区中断 扩充左侧区域
 					db1:SetMaxTime(db2:GetMinTime())
+					LIB.Debug({'Fix noncontinuously time by modify ' .. db1:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
 				elseif db1:GetMaxTime() <= db2:GetMinRecTime() then -- 覆盖区中断 扩充右侧区域
 					db2:SetMinTime(db1:GetMaxTime())
+					LIB.Debug({'Fix noncontinuously time by modify ' .. db2:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
 				else -- 覆盖区域冲突 将右侧节点的冲突区域数据移动到左侧节点中
 					db1:SetMaxTime(db1:GetMaxRecTime())
 					for _, rec in ipairs(db2:SelectMsgByTime('<=', db1:GetMaxTime())) do
@@ -153,6 +158,7 @@ function DS:InitDB(bFixProblem)
 					db1:Flush()
 					db2:DeleteMsgByTime('<=', db1:GetMaxTime())
 					db2:SetMinTime(db1:GetMaxTime())
+					LIB.Debug({'Fix noncontinuously time by moving data from ' .. db2:ToString() .. ' to ' .. db1:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
 				end
 			end
 		end
