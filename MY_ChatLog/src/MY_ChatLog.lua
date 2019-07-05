@@ -99,71 +99,93 @@ function D.Open()
 end
 
 do
-local ds
-local function onInit()
+local aMsg, ds = {}
+local function InitDB(bFix)
 	local szPath = LIB.FormatPath({'userdata/chat_log.db', PATH_TYPE.ROLE})
 	if IsLocalFileExist(szPath) then
-		LIB.Confirm(_L['You need to upgrade chatlog database before using, that may take a while and cannot be break, do you want to do it now?'], function()
-			LIB.Alert(_L['Your client may get no responding, please wait until it finished, otherwise your chatlog data may got lost, press yes to start.'], function()
-				local odb = LIB.ConnectDatabase(_L['chat log'], szPath)
-				if odb then
-					for _, info in ipairs(odb:Execute('SELECT * FROM ChatLogIndex ORDER BY stime ASC')) do
-						if info.etime == -1 then
-							info.etime = 0
-						end
-						local db = MY_ChatLog_DB(D.GetRoot() .. info.name .. '.db')
-						db:SetMinTime(info.stime)
-						db:SetMaxTime(info.etime)
-						for _, p in ipairs(odb:Execute('SELECT * FROM ' .. info.name .. ' ORDER BY time ASC')) do
-							db:InsertMsg(p.channel, p.text, p.msg, p.talker, p.time, p.hash)
-						end
-						db:PushDB()
-					end
-					odb:Release()
-				end
-				CPath.Move(szPath, szPath .. '.bak')
-				onInit()
+		if not bFix then
+			LIB.Confirm(_L['You need to upgrade chatlog database before using, that may take a while and cannot be break, do you want to do it now?'], function()
+				LIB.Alert(_L['Your client may get no responding, please wait until it finished, otherwise your chatlog data may got lost, press yes to start.'], function()
+					InitDB(true)
+				end)
 			end)
-		end)
-		return
+			return
+		end
+		local odb = LIB.ConnectDatabase(_L['chat log'], szPath)
+		if odb then
+			for _, info in ipairs(odb:Execute('SELECT * FROM ChatLogIndex ORDER BY stime ASC')) do
+				if info.etime == -1 then
+					info.etime = 0
+				end
+				local db = MY_ChatLog_DB(D.GetRoot() .. info.name .. '.db')
+				db:SetMinTime(info.stime)
+				db:SetMaxTime(info.etime)
+				for _, p in ipairs(odb:Execute('SELECT * FROM ' .. info.name .. ' ORDER BY time ASC')) do
+					db:InsertMsg(p.channel, p.text, p.msg, p.talker, p.time, p.hash)
+				end
+				db:PushDB()
+			end
+			odb:Release()
+		end
+		CPath.Move(szPath, szPath .. '.bak')
 	end
 	ds = MY_ChatLog_DS(D.GetRoot())
-	local function OnMsg(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID, szTalker)
-		local szText = szMsg
-		if bRich then
-			szText = GetPureText(szMsg)
-		else
-			szMsg = GetFormatText(szMsg, nFont, r, g, b)
+	if not ds:InitDB() then
+		if not bFix then
+			LIB.Confirm(_L['Problem(s) detected on your chatlog database and must be fixed before use, would you like to do this now?'], function()
+				LIB.Alert(_L['Your client may get no responding, please wait until it finished, otherwise your chatlog data may got lost, press yes to start.'], function()
+					InitDB(true)
+				end)
+			end)
+			return
 		end
-		-- filters
-		if szChannel == 'MSG_GUILD' then
-			if O.bIgnoreTongOnlineMsg and szText:find(TONG_ONLINE_MSG) then
-				return
-			end
-			if O.bIgnoreTongMemberLogMsg and (
-				szText:find(TONG_MEMBER_LOGIN_MSG) or szText:find(TONG_MEMBER_LOGOUT_MSG)
-			) then
-				return
-			end
-		end
-		ds:InsertMsg(szChannel, szText, szMsg, szTalker, GetCurrentTime())
+		ds:InitDB(true)
+	end
+	for _, a in ipairs(aMsg) do
+		ds:InsertMsg(unpack(a))
+	end
+	aMsg = {}
+	return true
+end
+LIB.RegisterInit('MY_ChatLog_InitMon', function() InitDB() end)
 
+local function OnMsg(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID, szTalker)
+	local szText = szMsg
+	if bRich then
+		szText = GetPureText(szMsg)
+	else
+		szMsg = GetFormatText(szMsg, nFont, r, g, b)
+	end
+	-- filters
+	if szChannel == 'MSG_GUILD' then
+		if O.bIgnoreTongOnlineMsg and szText:find(TONG_ONLINE_MSG) then
+			return
+		end
+		if O.bIgnoreTongMemberLogMsg and (
+			szText:find(TONG_MEMBER_LOGIN_MSG) or szText:find(TONG_MEMBER_LOGOUT_MSG)
+		) then
+			return
+		end
+	end
+	if ds then
+		ds:InsertMsg(szChannel, szText, szMsg, szTalker, GetCurrentTime())
 		if O.bRealtimeCommit and not LIB.IsShieldedVersion() then
 			ds:PushDB()
 		end
+	else
+		insert(aMsg, {szChannel, szText, szMsg, szTalker, GetCurrentTime()})
 	end
-	local tChannels, aChannels = {}, {}
-	for _, info in ipairs(LOG_TYPE) do
-		for _, szChannel in ipairs(info.channels) do
-			tChannels[szChannel] = true
-		end
-	end
-	for szChannel, _ in pairs(tChannels) do
-		insert(aChannels, szChannel)
-	end
-	LIB.RegisterMsgMonitor('MY_ChatLog', OnMsg, aChannels)
 end
-LIB.RegisterInit('MY_ChatLog_InitMon', onInit)
+local tChannels, aChannels = {}, {}
+for _, info in ipairs(LOG_TYPE) do
+	for _, szChannel in ipairs(info.channels) do
+		tChannels[szChannel] = true
+	end
+end
+for szChannel, _ in pairs(tChannels) do
+	insert(aChannels, szChannel)
+end
+LIB.RegisterMsgMonitor('MY_ChatLog', OnMsg, aChannels)
 
 local function onLoadingEnding()
 	if ds then

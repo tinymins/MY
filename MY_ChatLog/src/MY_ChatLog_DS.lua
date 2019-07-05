@@ -108,7 +108,7 @@ function DS:ctor(szRoot)
 	return self
 end
 
-function DS:InitDB()
+function DS:InitDB(bFixProblem)
 	if not self.aDB then
 		-- 初始化数据库集群列表
 		local aDB = {}
@@ -131,10 +131,16 @@ function DS:InitDB()
 			local db1, db2 = aDB[i], aDB[i + 1]
 			-- 检测中间节点最大值
 			if IsHugeNumber(db1:GetMaxTime()) then
+				if not bFixProblem then
+					return false
+				end
 				db1:SetMaxTime(db1:GetMaxRecTime())
 			end
 			-- 检测区域连续性
 			if db1:GetMaxTime() ~= db2:GetMinTime() then
+				if not bFixProblem then
+					return false
+				end
 				if db1:GetMaxRecTime() <= db2:GetMinTime() then -- 覆盖区中断 扩充左侧区域
 					db1:SetMaxTime(db2:GetMinTime())
 				elseif db1:GetMaxTime() <= db2:GetMinRecTime() then -- 覆盖区中断 扩充右侧区域
@@ -190,11 +196,13 @@ function DS:CountMsg(aChannel, szSearch)
 	if #aChannel == 0 then
 		return 0
 	end
+	if not self:InitDB() then
+		return 0
+	end
 	if not szSearch then
 		szSearch = ''
 	end
 	local szuSearch = szSearch == '' and '' or AnsiToUTF8('%' .. szSearch .. '%')
-	self:InitDB()
 	local aNChannel, nCount = SToNChannel(aChannel), 0
 	for _, db in ipairs(self.aDB) do
 		nCount = nCount + db:CountMsg(aNChannel, szuSearch)
@@ -211,7 +219,9 @@ function DS:SelectMsg(aChannel, szSearch, nOffset, nLimit)
 	if #aChannel == 0 then
 		return {}
 	end
-	self:InitDB()
+	if not self:InitDB() then
+		return {}
+	end
 	if not szSearch then
 		szSearch = ''
 	end
@@ -260,8 +270,7 @@ function DS:DeleteMsg(szHash, nTime)
 end
 
 function DS:PushDB()
-	if not IsEmpty(self.aInsertQueue) or not IsEmpty(self.aDeleteQueue) then
-		self:InitDB()
+	if (not IsEmpty(self.aInsertQueue) or not IsEmpty(self.aDeleteQueue)) and self:InitDB() then
 		-- 插入记录
 		sort(self.aInsertQueue, function(a, b) return a.nTime < b.nTime end)
 		local i, db = 1, self.aDB[1]

@@ -44,5 +44,6 @@ data = {
     ['MY Monitor'] = '聊天监控',
 
     ['You need to upgrade chatlog database before using, that may take a while and cannot be break, do you want to do it now?'] = '聊天记录需要优化更新数据库后方可使用，更新可能导致客户端无响应一段时间，希望现在开始更新吗？',
-    ['Your client may get no responding, please wait until it finished, otherwise your chatlog data may got lost, press yes to start.'] = '请点击确定开始更新，客户端可能失去响应，请耐心等待。请勿结束客户端，否则您的聊天记录将可能会永久丢失。',
+    ['Problem(s) detected on your chatlog database and must be fixed before use, would you like to do this now?'] = '检测到您的聊天记录数据受损，需要修复后方可使用，修复可能导致客户端无响应一段时间，是否立即开始修复？',
+    ['Your client may get no responding, please wait until it finished, otherwise your chatlog data may got lost, press yes to start.'] = '请点击确定开始操作，客户端可能失去响应，请耐心等待。请勿随意结束客户端，否则您的聊天记录可能会永久丢失。',
 }
