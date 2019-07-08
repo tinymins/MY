@@ -29,6 +29,7 @@ data = {
     ['Error: open file error %s [%s]'] = '打開文件%s失敗：[%s]',
     ['Chatlog export succeed, file saved as %s'] = '聊天記錄導出成功：%s',
     ['Exporting chatlog: %s, %.2f%%.'] = '聊天記錄導出 - %s - %.2f%%',
+    ['Export failed, unknown suffix.'] = '記錄導出失敗，未知的後綴名。',
     ['hide blockwords'] = '關鍵字屏蔽',
     ['edit'] = '編輯',
 

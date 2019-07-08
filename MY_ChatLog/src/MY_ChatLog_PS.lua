@@ -248,22 +248,29 @@ function D.ExportConfirm()
 		x = x, y = y, w = 120,
 		text = _L['export chatlog'],
 		onclick = function()
-			local aChannels = {}
-			for nGroup, info in ipairs(LOG_TYPE) do
-				if tChannels[nGroup] then
-					for _, szChannel in ipairs(info.channels) do
-						table.insert(aChannels, szChannel)
+			local function doExport(szSuffix)
+				local aChannels = {}
+				for nGroup, info in ipairs(LOG_TYPE) do
+					if tChannels[nGroup] then
+						for _, szChannel in ipairs(info.channels) do
+							table.insert(aChannels, szChannel)
+						end
 					end
 				end
+				D.Export(
+					LIB.FormatPath({'export/ChatLog/$name@$server@' .. LIB.FormatTime('yyyyMMddhhmmss') .. szSuffix, PATH_TYPE.ROLE}),
+					aChannels, 10,
+					function(title, progress)
+						OutputMessage('MSG_ANNOUNCE_YELLOW', _L('Exporting chatlog: %s, %.2f%%.', title, progress * 100))
+					end
+				)
+				ui:remove()
 			end
-			D.Export(
-				LIB.FormatPath({'export/ChatLog/$name@$server@' .. LIB.FormatTime('yyyyMMddhhmmss') .. '.html', PATH_TYPE.ROLE}),
-				aChannels, 10,
-				function(title, progress)
-					OutputMessage('MSG_ANNOUNCE_YELLOW', _L('Exporting chatlog: %s, %.2f%%.', title, progress * 100))
-				end
-			)
-			ui:remove()
+			LIB.Confirm(
+				_L['Please choose export mode.\nHTML mode will export chatlog to human-readable file.\nDB mode will export chatlog to re-importable backup file.'],
+				function() doExport('.html') end,
+				function() doExport('.db') end,
+				_L['HTML mode'], _L['DB mode'])
 		end,
 	}, true)
 	y = y + 30
@@ -282,38 +289,72 @@ function D.Export(szExportFile, aChannels, nPerSec, onProgress)
 	if onProgress then
 		onProgress(_L['preparing'], 0)
 	end
-	local status = Log(szExportFile, getHeader(), 'clear')
-	if status ~= 'SUCCEED' then
-		return LIB.Sysmsg({_L('Error: open file error %s [%s]', szExportFile, status)})
-	end
-	l_bExporting = true
+	if szExportFile:sub(-3) == '.db' then
+		local db = MY_ChatLog_DB(szExportFile)
+		if not db:Connect() then
+			return
+		end
+		db:SetMinTime(0)
+		db:SetMaxTime(HUGE)
+		l_bExporting = true
 
-	local nPage, nPageCount = 0, ceil(ds:CountMsg(aChannels, '') / EXPORT_SLICE)
-	local function Export()
-		if nPage > nPageCount then
-			l_bExporting = false
-			Log(szExportFile, getFooter(), 'close')
-			if onProgress then
-				onProgress(_L['Export succeed'], 1)
+		local nPage, nPageCount = 0, ceil(ds:CountMsg(aChannels, '') / EXPORT_SLICE)
+		local function Export()
+			if nPage > nPageCount then
+				l_bExporting = false
+				db:Disconnect()
+				local szFile = GetRootPath() .. szExportFile:gsub('/', '\\')
+				LIB.Alert(_L('Chatlog export succeed, file saved as %s', szFile))
+				LIB.Sysmsg({_L('Chatlog export succeed, file saved as %s', szFile)})
+				return 0
 			end
-			local szFile = GetRootPath() .. szExportFile:gsub('/', '\\')
-			LIB.Alert(_L('Chatlog export succeed, file saved as %s', szFile))
-			LIB.Sysmsg({_L('Chatlog export succeed, file saved as %s', szFile)})
-			return 0
+			local data = ds:SelectMsg(aChannels, '', nPage * EXPORT_SLICE, EXPORT_SLICE, true)
+			for i, rec in ipairs(data) do
+				db:InsertMsg(rec.nChannel, rec.szText, rec.szMsg, rec.szTalker, rec.nTime, rec.szHash)
+			end
+			if onProgress then
+				onProgress(_L['exporting'], nPage / nPageCount)
+			end
+			db:Flush()
+			nPage = nPage + 1
 		end
-		local data = ds:SelectMsg(aChannels, '', nPage * EXPORT_SLICE, EXPORT_SLICE)
-		for i, rec in ipairs(data) do
-			local f = GetMsgFont(rec.szChannel)
-			local r, g, b = unpack(MSGTYPE_COLOR[rec.szChannel])
-			Log(szExportFile, convertXml2Html(LIB.GetTimeLinkText({r=r, g=g, b=b, f=f, s='[yyyy/MM/dd][hh:mm:ss]'}, rec.nTme)))
-			Log(szExportFile, convertXml2Html(rec.szMsg))
+		LIB.BreatheCall('MY_ChatLog_Export', Export)
+	elseif szExportFile:sub(-5) == '.html' then
+		local status = Log(szExportFile, getHeader(), 'clear')
+		if status ~= 'SUCCEED' then
+			return LIB.Sysmsg({_L('Error: open file error %s [%s]', szExportFile, status)})
 		end
-		if onProgress then
-			onProgress(_L['exporting'], nPage / nPageCount)
+		l_bExporting = true
+
+		local nPage, nPageCount = 0, ceil(ds:CountMsg(aChannels, '') / EXPORT_SLICE)
+		local function Export()
+			if nPage > nPageCount then
+				l_bExporting = false
+				Log(szExportFile, getFooter(), 'close')
+				if onProgress then
+					onProgress(_L['Export succeed'], 1)
+				end
+				local szFile = GetRootPath() .. szExportFile:gsub('/', '\\')
+				LIB.Alert(_L('Chatlog export succeed, file saved as %s', szFile))
+				LIB.Sysmsg({_L('Chatlog export succeed, file saved as %s', szFile)})
+				return 0
+			end
+			local data = ds:SelectMsg(aChannels, '', nPage * EXPORT_SLICE, EXPORT_SLICE)
+			for i, rec in ipairs(data) do
+				local f = GetMsgFont(rec.szChannel)
+				local r, g, b = unpack(MSGTYPE_COLOR[rec.szChannel])
+				Log(szExportFile, convertXml2Html(LIB.GetTimeLinkText({r=r, g=g, b=b, f=f, s='[yyyy/MM/dd][hh:mm:ss]'}, rec.nTme)))
+				Log(szExportFile, convertXml2Html(rec.szMsg))
+			end
+			if onProgress then
+				onProgress(_L['exporting'], nPage / nPageCount)
+			end
+			nPage = nPage + 1
 		end
-		nPage = nPage + 1
+		LIB.BreatheCall('MY_ChatLog_Export', Export)
+	else
+		onProgress(_L['Export failed, unknown suffix.'], 1)
 	end
-	LIB.BreatheCall('MY_ChatLog_Export', Export)
 end
 
 ------------------------------------------------------------------------------------------------------
