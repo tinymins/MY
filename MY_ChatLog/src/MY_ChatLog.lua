@@ -114,22 +114,7 @@ local function InitDB(bFix)
 			end)
 			return
 		end
-		local odb = LIB.ConnectDatabase(_L['chat log'], szPath)
-		if odb then
-			for _, info in ipairs(odb:Execute('SELECT * FROM ChatLogIndex ORDER BY stime ASC')) do
-				if info.etime == -1 then
-					info.etime = 0
-				end
-				local db = MY_ChatLog_DB(D.GetRoot() .. info.name .. '.db')
-				db:SetMinTime(info.stime)
-				db:SetMaxTime(info.etime)
-				for _, p in ipairs(odb:Execute('SELECT * FROM ' .. info.name .. ' ORDER BY time ASC')) do
-					db:InsertMsg(p.channel, p.text, p.msg, p.talker, p.time, p.hash)
-				end
-				db:Flush()
-			end
-			odb:Release()
-		end
+		D.ImportDB(szPath)
 		CPath.Move(szPath, szPath .. '.bak')
 	end
 	local ds = MY_ChatLog_DS(D.GetRoot())
@@ -151,6 +136,47 @@ local function InitDB(bFix)
 	return true
 end
 LIB.RegisterInit('MY_ChatLog_InitMon', function() InitDB() end)
+
+function D.ImportDB(szPath)
+	local odb = LIB.ConnectDatabase(_L['chat log'], szPath)
+	if odb then
+		-- 老版分表机制
+		for _, info in ipairs(odb:Execute('SELECT * FROM ChatLogIndex ORDER BY stime ASC') or EMPTY_TABLE) do
+			if info.etime == -1 then
+				info.etime = 0
+			end
+			local db = MY_ChatLog_DB(D.GetRoot() .. info.name .. '.db')
+			db:SetMinTime(info.stime)
+			db:SetMaxTime(info.etime)
+			for _, p in ipairs(odb:Execute('SELECT * FROM ' .. info.name .. ' ORDER BY time ASC') or EMPTY_TABLE) do
+				db:InsertMsg(p.channel, p.text, p.msg, p.talker, p.time, p.hash)
+			end
+			db:Flush()
+		end
+		-- 新版导出数据
+		local nCount = Get(odb:Execute('SELECT COUNT(*) AS nCount FROM ChatLog'), {1, 'nCount'}, 0)
+		if nCount > 0 then
+			local stmt = odb:Prepare('SELECT * FROM ChatLog ORDER BY time ASC LIMIT ' .. nLimit .. ' OFFSET ?')
+			local szRoot, nOffset, nLimit, szNewPath, dbNew = D.GetRoot(), 0, 20000
+			while nOffset < nCount do
+				repeat
+					szNewPath = szRoot .. ('chatlog_%x'):format(math.random(0x100000, 0xFFFFFF)) .. '.db'
+				until not IsLocalFileExist(szNewPath)
+				dbNew = MY_ChatLog_DB(szNewPath)
+				stmt:ClearBindings()
+				stmt:BindAll(nOffset)
+				for _, p in ipairs(stmt:GetAll()) do
+					dbNew:InsertMsg(p.channel, p.text, p.msg, p.talker, p.time, p.hash)
+				end
+				dbNew:Flush()
+				dbNew:Release()
+				nOffset = nOffset + nLimit
+			end
+		end
+		odb:Release()
+	end
+	MY_ChatLog_DS(D.GetRoot()):InitDB(true):OptimizeDB()
+end
 
 function D.OptimizeDB()
 	if not InitDB(true) then
