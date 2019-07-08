@@ -336,7 +336,7 @@ function DS:CountMsg(aChannel, szSearch)
 	return nCount
 end
 
-function DS:SelectMsg(aChannel, szSearch, nOffset, nLimit)
+function DS:SelectMsg(aChannel, szSearch, nOffset, nLimit, bUTF8)
 	if #aChannel == 0 then
 		return {}
 	end
@@ -355,13 +355,17 @@ function DS:SelectMsg(aChannel, szSearch, nOffset, nLimit)
 		local nCount = db:CountMsg(aNChannel, szuSearch)
 		if nOffset < nCount then
 			local res = db:SelectMsg(aNChannel, szuSearch, nOffset, nLimit)
-			for _, p in ipairs(res) do
-				p.szChannel = CHANNELS[p.nChannel]
-				p.nChannel = nil
-				p.szTalker = UTF8ToAnsi(p.szTalker)
-				p.szText = UTF8ToAnsi(p.szText)
-				p.szMsg = UTF8ToAnsi(p.szMsg)
-				insert(aResult, p)
+			if bUTF8 then
+				aResult = res
+			else
+				for _, p in ipairs(res) do
+					p.szChannel = CHANNELS[p.nChannel]
+					p.nChannel = nil
+					p.szTalker = UTF8ToAnsi(p.szTalker)
+					p.szText = UTF8ToAnsi(p.szText)
+					p.szMsg = UTF8ToAnsi(p.szMsg)
+					insert(aResult, p)
+				end
 			end
 			nLimit = max(nLimit - nCount + nOffset, 0)
 		end
@@ -369,9 +373,13 @@ function DS:SelectMsg(aChannel, szSearch, nOffset, nLimit)
 	end
 	if nLimit > 0 then
 		local nCount = 0
-		for _, rec in ipairs(self.aInsertQueueAnsi) do
+		for i, rec in ipairs(self.aInsertQueueAnsi) do
 			if wfind(rec.szText, szSearch) or wfind(rec.szTalker, szSearch) then
-				insert(aResult, clone(rec))
+				if bUTF8 then
+					insert(aResult, clone(self.aInsertQueue[i]))
+				else
+					insert(aResult, clone(rec))
+				end
 				nCount = nCount + 1
 			end
 		end
