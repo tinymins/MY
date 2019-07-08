@@ -432,44 +432,18 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + dy
 
-	-- ui:append('WndButton', {
-	-- 	x = x, y = y, w = 150,
-	-- 	text = _L['fix search datebase'],
-	-- 	onclick = function()
-	-- 		LIB.Confirm(_L['fix search datebase may take a long time and cause a disconnection, are you sure to continue?'], function()
-	-- 			LIB.Confirm(_L['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'], function()
-	-- 				LIB.Alert(_L('%d chatlogs fixed!', FixSearchDB()))
-	-- 			end)
-	-- 		end)
-	-- 	end,
-	-- })
-	-- y = y + dy
-
-	-- ui:append('WndButton', {
-	-- 	x = x, y = y, w = 150,
-	-- 	text = _L['reindex search datebase'],
-	-- 	onclick = function()
-	-- 		LIB.Confirm(_L['reindex search datebase may take a long time and cause a disconnection, are you sure to continue?'], function()
-	-- 			LIB.Confirm(_L['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'], function()
-	-- 				LIB.Alert(_L('%d chatlogs reindexed!', FixSearchDB(true)))
-	-- 			end)
-	-- 		end)
-	-- 	end,
-	-- })
-	-- y = y + dy
-
-	-- ui:append('WndButton', {
-	-- 	x = x, y = y, w = 150,
-	-- 	text = _L['import chatlog'],
-	-- 	onclick = function()
-	-- 		local file = GetOpenFileName(_L['Please select your chatlog database file.'], 'Database File(*.db)\0*.db\0All Files(*.*)\0*.*\0\0', LIB.FormatPath({'userdata/', PATH_TYPE.ROLE}))
-	-- 		if not IsEmpty(file) then
-	-- 			LIB.Confirm(_L['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'], function()
-	-- 					LIB.Alert(_L('%d chatlogs imported!', ImportDB(file)))
-	-- 			end)
-	-- 		end
-	-- 	end,
-	-- })
-	-- y = y + dy
+	ui:append('WndButton', {
+		x = x, y = y, w = 150,
+		text = _L['import chatlog'],
+		onclick = function()
+			local file = GetOpenFileName(_L['Please select your chatlog database file.'], 'Database File(*.db)\0*.db\0\0', LIB.FormatPath({'userdata/', PATH_TYPE.ROLE}))
+			if not IsEmpty(file) then
+				LIB.Confirm(_L['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'], function()
+						LIB.Alert(_L('%d chatlogs imported!', MY_ChatLog.ImportDB(file)))
+				end)
+			end
+		end,
+	})
+	y = y + dy
 end
 LIB.RegisterPanel( 'ChatLog', _L['chat log'], _L['Chat'], 'ui/Image/button/SystemButton.UITex|43', PS)

@@ -138,7 +138,7 @@ end
 LIB.RegisterInit('MY_ChatLog_InitMon', function() InitDB() end)
 
 function D.ImportDB(szPath)
-	local odb = LIB.ConnectDatabase(_L['chat log'], szPath)
+	local odb, nImportCount = LIB.ConnectDatabase(_L['chat log'], szPath), 0
 	if odb then
 		-- 老版分表机制
 		for _, info in ipairs(odb:Execute('SELECT * FROM ChatLogIndex ORDER BY stime ASC') or EMPTY_TABLE) do
@@ -149,6 +149,7 @@ function D.ImportDB(szPath)
 			db:SetMinTime(info.stime)
 			db:SetMaxTime(info.etime)
 			for _, p in ipairs(odb:Execute('SELECT * FROM ' .. info.name .. ' ORDER BY time ASC') or EMPTY_TABLE) do
+				nImportCount = nImportCount + 1
 				db:InsertMsg(p.channel, p.text, p.msg, p.talker, p.time, p.hash)
 			end
 			db:Flush()
@@ -157,26 +158,33 @@ function D.ImportDB(szPath)
 		-- 新版导出数据
 		local nCount = Get(odb:Execute('SELECT COUNT(*) AS nCount FROM ChatLog'), {1, 'nCount'}, 0)
 		if nCount > 0 then
-			local stmt = odb:Prepare('SELECT * FROM ChatLog ORDER BY time ASC LIMIT ' .. nLimit .. ' OFFSET ?')
 			local szRoot, nOffset, nLimit, szNewPath, dbNew = D.GetRoot(), 0, 20000
+			local stmt, aRes = odb:Prepare('SELECT * FROM ChatLog ORDER BY time ASC LIMIT ' .. nLimit .. ' OFFSET ?')
 			while nOffset < nCount do
-				repeat
-					szNewPath = szRoot .. ('chatlog_%x'):format(math.random(0x100000, 0xFFFFFF)) .. '.db'
-				until not IsLocalFileExist(szNewPath)
-				dbNew = MY_ChatLog_DB(szNewPath)
 				stmt:ClearBindings()
 				stmt:BindAll(nOffset)
-				for _, p in ipairs(stmt:GetAll()) do
-					dbNew:InsertMsg(p.channel, p.text, p.msg, p.talker, p.time, p.hash)
+				aRes = stmt:GetAll()
+				if #aRes > 0 then
+					repeat
+						szNewPath = szRoot .. ('chatlog_%x'):format(math.random(0x100000, 0xFFFFFF)) .. '.db'
+					until not IsLocalFileExist(szNewPath)
+					dbNew = MY_ChatLog_DB(szNewPath)
+					dbNew:SetMinTime(aRes[1].time)
+					dbNew:SetMaxTime(aRes[#aRes].time)
+					for _, p in ipairs(aRes) do
+						nImportCount = nImportCount + 1
+						dbNew:InsertMsg(p.channel, p.text, p.msg, p.talker, p.time, p.hash)
+					end
+					dbNew:Flush()
+					dbNew:Disconnect()
 				end
-				dbNew:Flush()
-				dbNew:Release()
 				nOffset = nOffset + nLimit
 			end
 		end
 		odb:Release()
 	end
 	MY_ChatLog_DS(D.GetRoot()):InitDB(true):OptimizeDB()
+	return nImportCount
 end
 
 function D.OptimizeDB()
@@ -267,6 +275,7 @@ local settings = {
 				Open = D.Open,
 				GetRoot = D.GetRoot,
 				OptimizeDB = D.OptimizeDB,
+				ImportDB = D.ImportDB,
 				LOG_TYPE = LOG_TYPE,
 				MSGTYPE_COLOR = MSGTYPE_COLOR,
 			},
