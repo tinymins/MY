@@ -207,6 +207,13 @@ function DS:InitDB(bFixProblem)
 	return self
 end
 
+function DS:ReinitDB(bFixProblem)
+	self:FlushDB()
+	self:ReleaseDB()
+	self.aDB = nil
+	self:InitDB(bFixProblem)
+end
+
 function DS:OptimizeDB()
 	if self:InitDB(true) then
 		LIB.Debug({'OptimizeDB Start!'}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
