@@ -103,4 +103,5 @@ data = {
     ['Keep current'] = '保持现状',
 
     ['This function has been shielded by official'] = '应官方要求，该功能已停止使用',
+    ['Compressing: '] = '压缩数据：',
 }
