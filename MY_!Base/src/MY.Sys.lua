@@ -234,6 +234,39 @@ LIB.RegisterInit(LIB.GetAddonInfo().szNameSpace .. '#BIND_HOTKEY', function()
 		Hotkey.AddBinding(LIB.GetAddonInfo().szNameSpace .. '_HotKey_Null_'..i, _L['none-function hotkey'], '', function() end, nil)
 	end
 end)
+if LIB.GetAddonInfo().nDebugLevel <= DEBUG_LEVEL.DEBUG then
+	local aFrame = {
+		'Lowest2/ChatPanel1',
+		'Lowest2/ChatPanel2',
+		'Lowest2/ChatPanel3',
+		'Lowest2/ChatPanel4',
+		'Lowest2/ChatPanel5',
+		'Lowest2/ChatPanel6',
+		'Lowest2/ChatPanel7',
+		'Lowest2/ChatPanel8',
+		'Lowest2/ChatPanel9',
+		'Lowest2/EditBox',
+	}
+	LIB.RegisterHotKey(LIB.GetAddonInfo().szNameSpace .. '_STAGE_CHAT', _L['Display only chat panel'], function()
+		if Station.IsVisible() then
+			for _, v in ipairs(aFrame) do
+				local frame = Station.Lookup(v)
+				if frame then
+					frame:ShowWhenUIHide()
+				end
+			end
+			Station.Hide()
+		else
+			for _, v in ipairs(aFrame) do
+				local frame = Station.Lookup(v)
+				if frame then
+					frame:HideWhenUIHide()
+				end
+			end
+			Station.Show()
+		end
+	end)
+end
 LIB.RegisterHotKey(LIB.GetAddonInfo().szNameSpace .. '_STOP_CASTING', _L['Stop cast skill'], function() GetClientPlayer().StopCurrentAction() end)
 end
 
