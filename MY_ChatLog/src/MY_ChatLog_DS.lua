@@ -325,6 +325,7 @@ function DS:InsertMsg(szChannel, szText, szMsg, szTalker, nTime)
 			insert(self.aInsertQueueAnsi, {szHash = szHash, szChannel = szChannel, nTime = nTime, szTalker = szTalker, szText = szText, szMsg = szMsg})
 		end
 	end
+	FireUIEvent('ON_MY_CHATLOG_INSERT_MSG', self.szRoot)
 	return self
 end
 

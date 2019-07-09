@@ -97,7 +97,7 @@ function MY_ChatLog_UI.OnFrameCreate()
 	this:Lookup('Window_Main/Wnd_Search/Edit_Search'):SetPlaceholderText(_L['Press enter to search ...'])
 
 	this:RegisterEvent('ON_MY_MOSAICS_RESET')
-	this:RegisterEvent('ON_MY_CHATLOG_PUSHDB')
+	this:RegisterEvent('ON_MY_CHATLOG_INSERT_MSG')
 
 	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
 	this:BringToTop()
@@ -107,7 +107,7 @@ end
 function MY_ChatLog_UI.OnEvent(event)
 	if event == 'ON_MY_MOSAICS_RESET' then
 		D.UpdatePage(this, true)
-	elseif event == 'ON_MY_CHATLOG_PUSHDB' then
+	elseif event == 'ON_MY_CHATLOG_INSERT_MSG' then
 		D.UpdatePage(this, true)
 	end
 end
@@ -249,7 +249,7 @@ function MY_ChatLog_UI.OnItemRButtonClick()
 	end
 end
 
-function D.UpdatePage(frame, noscroll)
+function D.UpdatePage(frame, bKeepScroll)
 	local container = frame:Lookup('Window_Main/WndScroll_ChatChanel/WndContainer_ChatChanel')
 	local aChannel = {}
 	for i = 0, container:GetAllContentCount() - 1 do
@@ -267,12 +267,8 @@ function D.UpdatePage(frame, noscroll)
 	local nCount = frame.ds:CountMsg(aChannel, szSearch)
 	local nPageCount = ceil(nCount / PAGE_AMOUNT)
 	local bInit = not frame.nCurrentPage
-	if bInit then
-		frame.nCurrentPage = nPageCount
-	else
-		frame.nCurrentPage = min(max(frame.nCurrentPage, 1), nPageCount)
-	end
-	frame:Lookup('Window_Main/Wnd_Index/Wnd_IndexEdit/WndEdit_Index'):SetText(frame.nCurrentPage)
+	local nCurrentPage = bInit and nPageCount or min(max(frame.nCurrentPage, 1), nPageCount)
+	frame:Lookup('Window_Main/Wnd_Index/Wnd_IndexEdit/WndEdit_Index'):SetText(nCurrentPage)
 	frame:Lookup('Window_Main/Wnd_Index', 'Handle_IndexCount/Text_IndexCount'):SprintfText(_L['Total %d pages'], nPageCount)
 
 	local hOuter = frame:Lookup('Window_Main/Wnd_Index', 'Handle_IndexesOuter')
@@ -282,35 +278,35 @@ function D.UpdatePage(frame, noscroll)
 			local hItem = handle:Lookup(i)
 			hItem.nPage = i + 1
 			hItem:Lookup('Text_Index'):SetText(i + 1)
-			hItem:Lookup('Text_IndexUnderline'):SetVisible(i + 1 == frame.nCurrentPage)
+			hItem:Lookup('Text_IndexUnderline'):SetVisible(i + 1 == nCurrentPage)
 			hItem:SetVisible(i < nPageCount)
 		end
 	else
 		local hItem = handle:Lookup(0)
 		hItem.nPage = 1
 		hItem:Lookup('Text_Index'):SetText(1)
-		hItem:Lookup('Text_IndexUnderline'):SetVisible(1 == frame.nCurrentPage)
+		hItem:Lookup('Text_IndexUnderline'):SetVisible(1 == nCurrentPage)
 		hItem:Show()
 
 		local hItem = handle:Lookup(PAGE_DISPLAY - 1)
 		hItem.nPage = nPageCount
 		hItem:Lookup('Text_Index'):SetText(nPageCount)
-		hItem:Lookup('Text_IndexUnderline'):SetVisible(nPageCount == frame.nCurrentPage)
+		hItem:Lookup('Text_IndexUnderline'):SetVisible(nPageCount == nCurrentPage)
 		hItem:Show()
 
 		local nStartPage
-		if frame.nCurrentPage + ceil((PAGE_DISPLAY - 2) / 2) > nPageCount then
+		if nCurrentPage + ceil((PAGE_DISPLAY - 2) / 2) > nPageCount then
 			nStartPage = nPageCount - (PAGE_DISPLAY - 2)
-		elseif frame.nCurrentPage - ceil((PAGE_DISPLAY - 2) / 2) < 2 then
+		elseif nCurrentPage - ceil((PAGE_DISPLAY - 2) / 2) < 2 then
 			nStartPage = 2
 		else
-			nStartPage = frame.nCurrentPage - ceil((PAGE_DISPLAY - 2) / 2)
+			nStartPage = nCurrentPage - ceil((PAGE_DISPLAY - 2) / 2)
 		end
 		for i = 1, PAGE_DISPLAY - 2 do
 			local hItem = handle:Lookup(i)
 			hItem.nPage = nStartPage + i - 1
 			hItem:Lookup('Text_Index'):SetText(nStartPage + i - 1)
-			hItem:Lookup('Text_IndexUnderline'):SetVisible(nStartPage + i - 1 == frame.nCurrentPage)
+			hItem:Lookup('Text_IndexUnderline'):SetVisible(nStartPage + i - 1 == nCurrentPage)
 			hItem:SetVisible(true)
 		end
 	end
@@ -319,8 +315,9 @@ function D.UpdatePage(frame, noscroll)
 	handle:SetSizeByAllItemSize()
 	hOuter:FormatAllItemPos()
 
-	local data = frame.ds:SelectMsg(aChannel, szSearch, (frame.nCurrentPage - 1) * PAGE_AMOUNT, PAGE_AMOUNT)
+	local data = frame.ds:SelectMsg(aChannel, szSearch, (nCurrentPage - 1) * PAGE_AMOUNT, PAGE_AMOUNT)
 	local scroll = frame:Lookup('Window_Main/WndScroll_ChatLog/Scroll_ChatLog')
+	local bScrollBottom = scroll:GetScrollPos() == scroll:GetStepCount()
 	local handle = frame:Lookup('Window_Main/WndScroll_ChatLog', 'Handle_ChatLogs')
 	for i = 1, PAGE_AMOUNT do
 		local rec = data[i]
@@ -367,7 +364,11 @@ function D.UpdatePage(frame, noscroll)
 	end
 	handle:FormatAllItemPos()
 
-	if not noscroll then
+	if bKeepScroll then
+		if bScrollBottom then
+			scroll:SetScrollPos(scroll:GetStepCount())
+		end
+	else
 		scroll:SetScrollPos(bInit and scroll:GetStepCount() or 0)
 	end
 	MY_ChatLog.tUncheckedChannel = clone(frame.tUncheckedChannel)
