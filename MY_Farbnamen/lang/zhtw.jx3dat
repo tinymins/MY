@@ -10,4 +10,7 @@ data = {
     ['Upgrade database finished!'] = '資料庫升級完成！',
     ['Cannot connect to database!!!'] = '無法連接到角色資料庫！',
     ['Retry time: %d'] = '第%d次重試連接……',
+    ['Unknown force'] = '未知門派',
+    ['Unknown gender'] = '未知體型',
+    ['Unknown camp'] = '未知陣營',
 }
