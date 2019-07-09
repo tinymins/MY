@@ -62,6 +62,13 @@ local function onNewChatLine(h, i, szMsg, szChannel, dwTime, nR, nG, nB)
 		end
 		-- create timestrap text
 		local szTime = ''
+		for ii = i, h:GetItemCount() - 1 do
+			local el = h:Lookup(i)
+			if el:GetType() == 'Text' and not el:GetName():find('^namelink_%d+$') then
+				nR, nG, nB = el:GetFontColor()
+				break
+			end
+		end
 		if MY_ChatCopy.bChatCopy and (MY_ChatCopy.bChatCopyAlwaysShowMask or not MY_ChatCopy.bChatTime) then
 			local _r, _g, _b = nR, nG, nB
 			if MY_ChatCopy.bChatCopyAlwaysWhite then
