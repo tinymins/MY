@@ -66,7 +66,7 @@ end
 
 function DB:Connect()
 	if not self.db then
-		self.db = LIB.ConnectDatabase(_L['chat log'], self.szFilePath)
+		self.db = LIB.ConnectDatabase(_L['MY_ChatLog'], self.szFilePath)
 		self.db:Execute('CREATE TABLE IF NOT EXISTS ChatInfo (key NVARCHAR(128), value NVARCHAR(4096), PRIMARY KEY (key))')
 		self.stmtInfoGet = self.db:Prepare('SELECT value FROM ChatInfo WHERE key = ?')
 		self.stmtInfoSet = self.db:Prepare('REPLACE INTO ChatInfo (key, value) VALUES (?, ?)')

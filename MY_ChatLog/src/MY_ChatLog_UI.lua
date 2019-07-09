@@ -94,7 +94,7 @@ function MY_ChatLog_UI.OnFrameCreate()
 	handle:FormatAllItemPos()
 
 	this:Lookup('', 'Text_Title'):SetText(_L['MY - MY_ChatLog'])
-	this:Lookup('Window_Main/Wnd_Search/Edit_Search'):SetPlaceholderText(_L['press enter to search ...'])
+	this:Lookup('Window_Main/Wnd_Search/Edit_Search'):SetPlaceholderText(_L['Press enter to search ...'])
 
 	this:RegisterEvent('ON_MY_MOSAICS_RESET')
 	this:RegisterEvent('ON_MY_CHATLOG_PUSHDB')
@@ -226,7 +226,7 @@ function MY_ChatLog_UI.OnItemRButtonClick()
 
 		local menu = {
 			{
-				szOption = _L['delete record'],
+				szOption = _L['Delete record'],
 				fnAction = function()
 					local hList, hItem = this:GetParent()
 					for i = 0, hList:GetItemCount() - 1 do
@@ -239,7 +239,7 @@ function MY_ChatLog_UI.OnItemRButtonClick()
 					D.UpdatePage(this:GetRoot(), true)
 				end,
 			}, {
-				szOption = _L['copy this record'],
+				szOption = _L['Copy this record'],
 				fnAction = function()
 					LIB.CopyChatLine(this:Lookup('Handle_ChatLog_Msg'):Lookup(0), true)
 				end,
@@ -273,7 +273,7 @@ function D.UpdatePage(frame, noscroll)
 		frame.nCurrentPage = min(max(frame.nCurrentPage, 1), nPageCount)
 	end
 	frame:Lookup('Window_Main/Wnd_Index/Wnd_IndexEdit/WndEdit_Index'):SetText(frame.nCurrentPage)
-	frame:Lookup('Window_Main/Wnd_Index', 'Handle_IndexCount/Text_IndexCount'):SprintfText(_L['total %d pages'], nPageCount)
+	frame:Lookup('Window_Main/Wnd_Index', 'Handle_IndexCount/Text_IndexCount'):SprintfText(_L['Total %d pages'], nPageCount)
 
 	local hOuter = frame:Lookup('Window_Main/Wnd_Index', 'Handle_IndexesOuter')
 	local handle = hOuter:Lookup('Handle_Indexes')

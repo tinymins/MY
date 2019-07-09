@@ -214,7 +214,7 @@ function D.ExportConfirm()
 	end
 	local ui = UI.CreateFrame('MY_ChatLog_Export', {
 		simple = true, esc = true, close = true, w = 140,
-		level = 'Normal1', text = _L['export chatlog'], alpha = 233,
+		level = 'Normal1', text = _L['Export chatlog'], alpha = 233,
 	})
 	local btnSure
 	local tChannels = {}
@@ -246,7 +246,7 @@ function D.ExportConfirm()
 
 	btnSure = ui:append('WndButton', {
 		x = x, y = y, w = 120,
-		text = _L['export chatlog'],
+		text = _L['Export chatlog'],
 		onclick = function()
 			local function doExport(szSuffix)
 				local aChannels = {}
@@ -287,7 +287,7 @@ function D.Export(szExportFile, aChannels, nPerSec, onProgress)
 		return
 	end
 	if onProgress then
-		onProgress(_L['preparing'], 0)
+		onProgress(_L['Preparing'], 0)
 	end
 	if szExportFile:sub(-3) == '.db' then
 		local db = MY_ChatLog_DB(szExportFile)
@@ -370,7 +370,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:append('WndCheckBox', {
 		x = x, y = y, w = wr,
-		text = _L['filter tong member log message'],
+		text = _L['Filter tong member log message'],
 		checked = MY_ChatLog.bIgnoreTongMemberLogMsg,
 		oncheck = function(bChecked)
 			MY_ChatLog.bIgnoreTongMemberLogMsg = bChecked
@@ -380,7 +380,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:append('WndCheckBox', {
 		x = x, y = y, w = wr,
-		text = _L['filter tong online message'],
+		text = _L['Filter tong online message'],
 		checked = MY_ChatLog.bIgnoreTongOnlineMsg,
 		oncheck = function(bChecked)
 			MY_ChatLog.bIgnoreTongOnlineMsg = bChecked
@@ -391,7 +391,7 @@ function PS.OnPanelActive(wnd)
 	if not LIB.IsShieldedVersion() then
 		ui:append('WndCheckBox', {
 			x = x, y = y, w = wr,
-			text = _L['realtime database commit'],
+			text = _L['Realtime database commit'],
 			checked = MY_ChatLog.bRealtimeCommit,
 			oncheck = function(bChecked)
 				MY_ChatLog.bRealtimeCommit = bChecked
@@ -402,7 +402,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:append('WndButton', {
 		x = x, y = y, w = 150,
-		text = _L['open chatlog'],
+		text = _L['Open chatlog'],
 		onclick = function()
 			MY_ChatLog.Open()
 		end,
@@ -411,7 +411,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:append('WndButton', {
 		x = x, y = y, w = 150,
-		text = _L['export chatlog'],
+		text = _L['Export chatlog'],
 		onclick = function()
 			D.ExportConfirm()
 		end,
@@ -420,9 +420,9 @@ function PS.OnPanelActive(wnd)
 
 	ui:append('WndButton', {
 		x = x, y = y, w = 150,
-		text = _L['optimize/compress datebase'],
+		text = _L['Optimize datebase'],
 		onclick = function()
-			LIB.Confirm(_L['optimize/compress datebase will take a long time and may cause a disconnection, are you sure to continue?'], function()
+			LIB.Confirm(_L['Optimize datebase will take a long time and may cause a disconnection, are you sure to continue?'], function()
 				LIB.Confirm(_L['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'], function()
 					MY_ChatLog.OptimizeDB()
 					LIB.Alert(_L['Optimize finished!'])
@@ -434,7 +434,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:append('WndButton', {
 		x = x, y = y, w = 150,
-		text = _L['import chatlog'],
+		text = _L['Import chatlog'],
 		onclick = function()
 			local szRoot = LIB.FormatPath({'export/ChatLog', PATH_TYPE.ROLE})
 			if not IsLocalFileExist(szRoot) then
@@ -453,4 +453,4 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + dy
 end
-LIB.RegisterPanel( 'ChatLog', _L['chat log'], _L['Chat'], 'ui/Image/button/SystemButton.UITex|43', PS)
+LIB.RegisterPanel( 'ChatLog', _L['MY_ChatLog'], _L['Chat'], 'ui/Image/button/SystemButton.UITex|43', PS)

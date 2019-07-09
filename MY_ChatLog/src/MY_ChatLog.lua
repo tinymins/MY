@@ -104,6 +104,7 @@ local function InitDB(bFix)
 	if l_ds then
 		return true
 	end
+	local szAlert
 	local szPath = LIB.FormatPath({'userdata/chat_log.db', PATH_TYPE.ROLE})
 	if IsLocalFileExist(szPath) then
 		if not bFix then
@@ -116,6 +117,7 @@ local function InitDB(bFix)
 		end
 		D.ImportDB(szPath)
 		CPath.Move(szPath, szPath .. '.bak')
+		szAlert = szAlert or _L['Upgrade succeed!']
 	end
 	local ds = MY_ChatLog_DS(D.GetRoot())
 	if not ds:InitDB() then
@@ -127,7 +129,11 @@ local function InitDB(bFix)
 			end)
 			return
 		end
-		ds:InitDB(true)
+		ds:InitDB(true):OptimizeDB()
+		szAlert = szAlert or _L['Fix succeed!']
+	end
+	if szAlert then
+		MY.Alert(szAlert)
 	end
 	for _, a in ipairs(l_aMsg) do
 		ds:InsertMsg(unpack(a))
@@ -138,7 +144,7 @@ end
 LIB.RegisterInit('MY_ChatLog_InitMon', function() InitDB() end)
 
 function D.ImportDB(szPath)
-	local odb, nImportCount = LIB.ConnectDatabase(_L['chat log'], szPath), 0
+	local odb, nImportCount = LIB.ConnectDatabase(_L['MY_ChatLog'], szPath), 0
 	if odb then
 		-- 老版分表机制
 		for _, info in ipairs(odb:Execute('SELECT * FROM ChatLogIndex ORDER BY stime ASC') or EMPTY_TABLE) do
@@ -259,12 +265,12 @@ end
 
 do
 local menu = {
-	szOption = _L['chat log'],
+	szOption = _L['MY_ChatLog'],
 	fnAction = D.Open,
 }
 LIB.RegisterAddonMenu('MY_CHATLOG_MENU', menu)
 end
-LIB.RegisterHotKey('MY_ChatLog', _L['chat log'], D.Open, nil)
+LIB.RegisterHotKey('MY_ChatLog', _L['MY_ChatLog'], D.Open, nil)
 
 -- Global exports
 do
