@@ -218,34 +218,42 @@ function D.ExportConfirm()
 	})
 	local btnSure
 	local tChannels = {}
-	local x, y = 10, 10
+	local X, Y = 10, 10
+	local x, y = X, Y
+	local nMaxWidth = 0
 	for nGroup, info in ipairs(LOG_TYPE) do
-		ui:append('WndCheckBox', {
+		x = x + ui:append('WndCheckBox', {
 			x = x, y = y, w = 100,
 			text = info.title,
 			checked = true,
-			oncheck = function(checked)
-				tChannels[nGroup] = checked
-				if checked then
-					btnSure:enable(true)
-				else
-					btnSure:enable(false)
-					for nGroup, info in ipairs(LOG_TYPE) do
+			oncheck = function(bChecked)
+				tChannels[nGroup] = bChecked
+				local bEnable = bChecked
+				if not bChecked then
+					for nGroup, _ in ipairs(LOG_TYPE) do
 						if tChannels[nGroup] then
-							btnSure:enable(true)
+							bEnable = true
 							break
 						end
 					end
 				end
+				btnSure:enable(bEnable)
 			end,
-		})
-		y = y + 30
+		}, true):autoWidth():width()
+		nMaxWidth = max(nMaxWidth, x + X)
+		if nGroup % 2 == 0 or nGroup == #LOG_TYPE then
+			x = X
+			y = y + 30
+		else
+			x = x + 5
+		end
 		tChannels[nGroup] = true
 	end
 	y = y + 10
 
+	x = X + 20
 	btnSure = ui:append('WndButton', {
-		x = x, y = y, w = 120,
+		x = x, y = y, w = nMaxWidth - x * 2, h = 35,
 		text = _L['Export chatlog'],
 		onclick = function()
 			local function doExport(szSuffix)
@@ -274,7 +282,7 @@ function D.ExportConfirm()
 		end,
 	}, true)
 	y = y + 30
-	ui:height(y + 50)
+	ui:size(nMaxWidth, y + 50)
 	ui:anchor({s = 'CENTER', r = 'CENTER', x = 0, y = 0})
 end
 
@@ -401,7 +409,7 @@ function PS.OnPanelActive(wnd)
 	end
 
 	ui:append('WndButton', {
-		x = x, y = y, w = 150,
+		x = x, y = y, w = 125, h = 35,
 		text = _L['Open chatlog'],
 		onclick = function()
 			MY_ChatLog.Open()
@@ -410,7 +418,7 @@ function PS.OnPanelActive(wnd)
 	y = y + dy
 
 	ui:append('WndButton', {
-		x = x, y = y, w = 150,
+		x = x, y = y, w = 125, h = 35,
 		text = _L['Export chatlog'],
 		onclick = function()
 			D.ExportConfirm()
@@ -419,7 +427,7 @@ function PS.OnPanelActive(wnd)
 	y = y + dy
 
 	ui:append('WndButton', {
-		x = x, y = y, w = 150,
+		x = x, y = y, w = 125, h = 35,
 		text = _L['Optimize datebase'],
 		onclick = function()
 			LIB.Confirm(_L['Optimize datebase will take a long time and may cause a disconnection, are you sure to continue?'], function()
@@ -433,7 +441,7 @@ function PS.OnPanelActive(wnd)
 	y = y + dy
 
 	ui:append('WndButton', {
-		x = x, y = y, w = 150,
+		x = x, y = y, w = 125, h = 35,
 		text = _L['Import chatlog'],
 		onclick = function()
 			local szRoot = LIB.FormatPath({'export/ChatLog', PATH_TYPE.ROLE})
