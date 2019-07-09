@@ -153,7 +153,7 @@ function D.ImportDB(szPath)
 				db:InsertMsg(p.channel, p.text, p.msg, p.talker, p.time, p.hash)
 			end
 			db:Flush()
-			db:Release()
+			db:Disconnect()
 		end
 		-- 新版导出数据
 		local nCount = Get(odb:Execute('SELECT COUNT(*) AS nCount FROM ChatLog'), {1, 'nCount'}, 0)
