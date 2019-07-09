@@ -436,7 +436,14 @@ function PS.OnPanelActive(wnd)
 		x = x, y = y, w = 150,
 		text = _L['import chatlog'],
 		onclick = function()
-			local file = GetOpenFileName(_L['Please select your chatlog database file.'], 'Database File(*.db)\0*.db\0\0', LIB.FormatPath({'userdata/', PATH_TYPE.ROLE}))
+			local szRoot = LIB.FormatPath({'export/ChatLog', PATH_TYPE.ROLE})
+			if not IsLocalFileExist(szRoot) then
+				szRoot = LIB.FormatPath({'export/', PATH_TYPE.ROLE})
+			end
+			if not IsLocalFileExist(szRoot) then
+				szRoot = LIB.FormatPath({'userdata/', PATH_TYPE.ROLE})
+			end
+			local file = GetOpenFileName(_L['Please select your chatlog database file.'], 'Database File(*.db)\0*.db\0\0', szRoot)
 			if not IsEmpty(file) then
 				LIB.Confirm(_L['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'], function()
 						LIB.Alert(_L('%d chatlogs imported!', MY_ChatLog.ImportDB(file)))
