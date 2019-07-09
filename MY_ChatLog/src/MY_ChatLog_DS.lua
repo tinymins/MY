@@ -96,6 +96,10 @@ local function NewDB(szRoot, nMinTime, nMaxTime)
 	return db
 end
 
+local function SortDB(aDB)
+	sort(aDB, function(a, b) return a:GetMinTime() < b:GetMinTime() end)
+end
+
 local DS = class()
 local DS_CACHE = setmetatable({}, {__mode = 'v'})
 
@@ -117,7 +121,7 @@ function DS:InitDB(bFixProblem)
 				insert(aDB, db)
 			end
 		end
-		sort(aDB, function(a, b) return a:GetMinTime() < b:GetMinTime() end)
+		SortDB(aDB)
 		-- 删除集群中错误的空节点
 		for i, db in ipairs_r(aDB) do
 			if not (i == #aDB and IsHugeNumber(db:GetMaxTime())) and db:CountMsg() == 0 then
@@ -217,6 +221,17 @@ end
 function DS:OptimizeDB()
 	if self:InitDB(true) then
 		LIB.Debug({'OptimizeDB Start!'}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
+		for _, db in ipairs(self.aDB) do
+			local nMinTime, nMinRecTime = db:GetMinTime(), db:GetMinRecTime()
+			if nMinTime > nMinRecTime then
+				db:SetMinTime(nMinRecTime)
+			end
+			local nMaxTime, nMaxRecTime = db:GetMaxTime(), db:GetMaxRecTime()
+			if nMaxTime < nMaxRecTime then
+				db:SetMaxTime(nMaxRecTime)
+			end
+		end
+		SortDB(self.aDB)
 		local i = 1
 		while i <= #self.aDB do
 			local db = self.aDB[i]
