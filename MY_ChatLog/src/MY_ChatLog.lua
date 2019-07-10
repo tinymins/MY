@@ -116,7 +116,7 @@ local function InitDB(bFix)
 			return
 		end
 		D.ImportDB(szPath)
-		CPath.Move(szPath, szPath .. '.bak')
+		CPath.Move(szPath, szPath .. '.bak' .. GetCurrentTime())
 		szAlert = szAlert or _L['Upgrade succeed!']
 	end
 	local ds = MY_ChatLog_DS(D.GetRoot())
