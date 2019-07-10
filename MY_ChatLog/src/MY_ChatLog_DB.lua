@@ -64,9 +64,14 @@ function DB:ToString()
 	return '"' .. self:GetFilePath() .. '"(' .. self:GetMinTime() .. ',' .. self:GetMaxTime() .. ')'
 end
 
-function DB:Connect()
+function DB:Connect(bCheck)
 	if not self.db then
-		self.db = LIB.ConnectDatabase(_L['MY_ChatLog'], self.szFilePath)
+		if bCheck then
+			self.db = LIB.ConnectDatabase(_L['MY_ChatLog'], self.szFilePath)
+		else
+			LIB.Debug({'Quick connect database: ' .. self.szFilePath}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
+			self.db = SQLite3_Open(self.szFilePath)
+		end
 		self.db:Execute('CREATE TABLE IF NOT EXISTS ChatInfo (key NVARCHAR(128), value NVARCHAR(4096), PRIMARY KEY (key))')
 		self.stmtInfoGet = self.db:Prepare('SELECT value FROM ChatInfo WHERE key = ?')
 		self.stmtInfoSet = self.db:Prepare('REPLACE INTO ChatInfo (key, value) VALUES (?, ?)')

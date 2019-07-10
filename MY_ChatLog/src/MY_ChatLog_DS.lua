@@ -115,9 +115,14 @@ function DS:InitDB(bFixProblem)
 	if not self.aDB then
 		-- 初始化数据库集群列表
 		local aDB = {}
+		LIB.Debug({'Start init node...'}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
 		for _, szName in ipairs(CPath.GetFileList(self.szRoot) or {}) do
 			local db = szName:find('^chatlog_[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]%.db') and MY_ChatLog_DB(self.szRoot .. szName)
 			if db then
+				if bFixProblem then
+					db:Connect(true)
+					LIB.Debug({'Checking malformed node ' .. db:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
+				end
 				insert(aDB, db)
 			end
 		end
@@ -215,20 +220,25 @@ function DS:ReinitDB(bFixProblem)
 	self:FlushDB()
 	self:ReleaseDB()
 	self.aDB = nil
-	self:InitDB(bFixProblem)
+	return self:InitDB(bFixProblem)
 end
 
 function DS:OptimizeDB()
-	if self:InitDB(true) then
-		LIB.Debug({'OptimizeDB Start!'}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
+	LIB.Debug({'OptimizeDB Start!'}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
+	if self:ReinitDB(true) then
+		LIB.Debug({'Checking node time zone overflow...'}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
 		for _, db in ipairs(self.aDB) do
 			local nMinTime, nMinRecTime = db:GetMinTime(), db:GetMinRecTime()
 			if nMinTime > nMinRecTime then
+				LIB.Debug({'Node logic error detected: MinTime > MinRecTime in ' .. db:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.WARNING)
 				db:SetMinTime(nMinRecTime)
+				LIB.Debug({'Fix logic error: ' .. db:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
 			end
 			local nMaxTime, nMaxRecTime = db:GetMaxTime(), db:GetMaxRecTime()
 			if nMaxTime < nMaxRecTime then
+				LIB.Debug({'Node logic error detected: MaxTime < MaxRecTime in ' .. db:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.WARNING)
 				db:SetMaxTime(nMaxRecTime)
+				LIB.Debug({'Fix logic error: ' .. db:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
 			end
 		end
 		SortDB(self.aDB)
@@ -309,6 +319,8 @@ function DS:OptimizeDB()
 			i = i + 1
 		end
 		LIB.Debug({'OptimizeDB Finished!'}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
+	else
+		LIB.Debug({'OptimizeDB Failed! ReinitDB Failed!'}, _L['MY_ChatLog'], DEBUG_LEVEL.WARNING)
 	end
 	return self
 end
