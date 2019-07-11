@@ -152,7 +152,7 @@ function D.GetRankString(key)
 end
 
 function D.SetBreathe()
-	MY.BreatheCall('MYDev_LuaWatcher', 1000, function() TXT:text(D.GetRankString(SORT_KEY)) end)
+	MY.BreatheCall('MYDev_LuaWatcher', 60000, function() TXT:text(D.GetRankString(SORT_KEY)) end)
 end
 
 function D.RemoveBreathe()
@@ -182,6 +182,13 @@ function PS.OnPanelActive(wnd)
 	}, true)
 	ui:append('WndButton', {
 		x = x + 100, y = y,
+		text = _L['Refresh'],
+		onclick = function()
+			TXT:text(D.GetRankString(SORT_KEY))
+		end,
+	})
+	ui:append('WndButton', {
+		x = x + 200, y = y,
 		text = _L['Reset'],
 		onclick = function()
 			D.Reset()
