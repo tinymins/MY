@@ -193,6 +193,19 @@ RegisterEvent('MY_BASE_LOADING_END', function()
 		})
 		ui:append('WndButton', {
 			x = x + 200, y = y,
+			text = SORT_KEY,
+			onclick = function()
+				if SORT_KEY == 'TIME' then
+					SORT_KEY = 'CALL'
+				else
+					SORT_KEY = 'TIME'
+				end
+				MY.UI(this):text(SORT_KEY)
+				TXT:text(D.GetRankString(SORT_KEY))
+			end,
+		})
+		ui:append('WndButton', {
+			x = x + 300, y = y,
 			text = _L['Reset'],
 			onclick = function()
 				D.Reset()
