@@ -47,6 +47,7 @@ local C, D = {}, {
 	GetTargetTypeList  = MY_TargetMonConfig.GetTargetTypeList ,
 	LoadConfig         = MY_TargetMonConfig.LoadConfig        ,
 	SaveConfig         = MY_TargetMonConfig.SaveConfig        ,
+	GetConfigCaption   = MY_TargetMonConfig.GetConfigCaption  ,
 	ImportPatchFile    = MY_TargetMonConfig.ImportPatchFile   ,
 	ExportPatchFile    = MY_TargetMonConfig.ExportPatchFile   ,
 	GetConfigList      = MY_TargetMonConfig.GetConfigList     ,
