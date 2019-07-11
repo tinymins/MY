@@ -246,6 +246,7 @@ if LIB.GetAddonInfo().nDebugLevel <= DEBUG_LEVEL.DEBUG then
 		'Lowest2/ChatPanel8',
 		'Lowest2/ChatPanel9',
 		'Lowest2/EditBox',
+		'Normal/' .. LIB.GetAddonInfo().szNameSpace,
 	}
 	LIB.RegisterHotKey(LIB.GetAddonInfo().szNameSpace .. '_STAGE_CHAT', _L['Display only chat panel'], function()
 		if Station.IsVisible() then
