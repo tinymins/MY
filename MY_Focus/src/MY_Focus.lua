@@ -104,34 +104,45 @@ end
 RegisterCustomData('MY_Focus.tAutoFocus')
 RegisterCustomData('MY_Focus.tFocusList')
 
-local function FormatAutoFocusData(data)
-	local ds = {
-		szMethod = 'NAME',
-		szPattern = '',
-		szDisplay = '',
-		dwMapID = -1,
-		tType = {
-			bAll = true,
-			[TARGET.NPC] = false,
-			[TARGET.PLAYER] = false,
-			[TARGET.DOODAD] = false,
-		},
-		tRelation = {
-			bAll = true,
-			bEnemy = false,
-			bAlly = false,
-		},
-		tLife = {
-			bEnable = false,
-			szOperator = '>',
-			nValue = 0,
-		},
-		nMaxDistance = 0,
-	}
-	return LIB.FormatDataStructure(data, ds)
-end
 function D.IsShielded() return LIB.IsShieldedVersion() and LIB.IsInShieldedMap() end
 function D.IsEnabled() return O.bEnable and not D.IsShielded() end
+
+do
+local ds = {
+	szMethod = 'NAME',
+	szPattern = '',
+	szDisplay = '',
+	dwMapID = -1,
+	tType = {
+		bAll = true,
+		[TARGET.NPC] = false,
+		[TARGET.PLAYER] = false,
+		[TARGET.DOODAD] = false,
+	},
+	tRelation = {
+		bAll = true,
+		bEnemy = false,
+		bAlly = false,
+	},
+	tLife = {
+		bEnable = false,
+		szOperator = '>',
+		nValue = 0,
+	},
+	nMaxDistance = 0,
+}
+function D.FormatAutoFocusData(data)
+	return LIB.FormatDataStructure(data, ds)
+end
+local dsl = {
+	'__META__',
+	__VALUE__ = {},
+	__CHILD_TEMPLATE__ = ds,
+}
+function D.FormatAutoFocusDataList(datalist)
+	return LIB.FormatDataStructure(datalist, dsl)
+end
+end
 
 function D.CheckFrameOpen(bForceReload)
 	if D.IsEnabled() then
@@ -278,7 +289,7 @@ function D.SetFocusPattern(szPattern, tData)
 	if not IsTable(tData) then
 		tData = { szPattern = szPattern }
 	end
-	tData = FormatAutoFocusData(tData)
+	tData = D.FormatAutoFocusData(tData)
 	-- 更新焦点列表
 	if nIndex then
 		insert(O.aPatternFocus, nIndex, tData)
@@ -423,11 +434,7 @@ function D.LoadEmbeddedRule()
 		return LIB.LoadLUAData(szPath, { passphrase = D.PASSPHRASE }) or LIB.LoadLUAData(szPath) or {}
 	end
 	-- load and format data
-	local data = LoadConfigData('MY_Resource/data/focus/$lang.jx3dat') or {}
-	for i, v in ipairs(data) do
-		data[i] = FormatAutoFocusData(v)
-	end
-	D.EMBEDDED_FOCUS = data
+	D.EMBEDDED_FOCUS = D.FormatAutoFocusDataList(LoadConfigData('MY_Resource/data/focus/$lang.jx3dat') or {})
 end
 
 -- 对象进入视野
@@ -753,7 +760,7 @@ function D.OnSetAncientPatternFocus()
 		tExist[p.szPattern] = true
 	end
 	for _, v in ipairs(O.tAutoFocus) do
-		local p = FormatAutoFocusData(v)
+		local p = D.FormatAutoFocusData(v)
 		if not tExist[p.szPattern] then
 			insert(O.aPatternFocus, p)
 			tExist[p.szPattern] = true
@@ -798,7 +805,7 @@ local function onInit()
 		if IsString(v) then
 			v = { szPattern = v }
 		end
-		O.aPatternFocus[i] = FormatAutoFocusData(v)
+		O.aPatternFocus[i] = D.FormatAutoFocusData(v)
 	end
 	-- 永久焦点
 	if not O.tStaticFocus then
