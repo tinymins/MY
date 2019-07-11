@@ -43,6 +43,7 @@ local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_TargetMon/lang/')
 if not LIB.AssertVersion('MY_TargetMon', _L['MY_TargetMon'], 0x2011800) then
 	return
 end
+local LANG = LIB.GetLang()
 local C, D = { PASSPHRASE = {213, 166, 13}, PASSPHRASE_EMBEDDED = {211, 98, 5} }, {}
 local INI_PATH = LIB.GetAddonInfo().szRoot .. 'MY_TargetMon/ui/MY_TargetMon.ini'
 local ROLE_CONFIG_FILE = {'config/my_targetmon.jx3dat', PATH_TYPE.ROLE}
@@ -50,7 +51,7 @@ local TEMPLATE_CONFIG_FILE = LIB.GetAddonInfo().szRoot .. 'MY_TargetMon/data/tem
 local EMBEDDED_ENCRYPTED = false
 local EMBEDDED_CONFIG_ROOT = LIB.GetAddonInfo().szRoot .. 'MY_Resource/data/targetmon/'
 local CUSTOM_EMBEDDED_CONFIG_ROOT = LIB.FormatPath({'userdata/TargetMon/', PATH_TYPE.GLOBAL})
-local EMBEDDED_CONFIG_SUFFIX = '.' .. LIB.GetLang() .. '.jx3dat'
+local EMBEDDED_CONFIG_SUFFIX = '.' .. LANG .. '.jx3dat'
 local CUSTOM_DEFAULT_CONFIG_FILE = {'config/my_targetmon.jx3dat', PATH_TYPE.GLOBAL}
 local TARGET_TYPE_LIST = {
 	'CLIENT_PLAYER'  ,
@@ -113,15 +114,27 @@ function D.LoadEmbeddedConfig()
 		local DST_ROOT = EMBEDDED_CONFIG_ROOT
 		for _, szFile in ipairs(CPath.GetFileList(SRC_ROOT)) do
 			LIB.Sysmsg(_L['Encrypt and compressing: '] .. DAT_ROOT .. szFile)
+			local lang = szFile:sub(-11, -8)
 			local data = LoadDataFromFile(SRC_ROOT .. szFile)
 			if IsEncodedData(data) then
 				data = DecodeData(data)
+			end
+			if lang == 'zhcn' then
+				data = str2var(data)
+				if IsArray(data) then
+					for k, p in ipairs(data) do
+						data[k] = D.FormatConfig(p)
+					end
+				else
+					data = D.FormatConfig(data)
+				end
+				data = 'return ' .. var2str(data)
 			end
 			data = EncodeData(data, true, true)
 			SaveDataToFile(data, DST_ROOT .. szFile, C.PASSPHRASE_EMBEDDED)
 		end
 		-- 兼容旧版内置数据
-		local szV2Path = EMBEDDED_CONFIG_ROOT .. LIB.GetLang() .. '.jx3dat'
+		local szV2Path = EMBEDDED_CONFIG_ROOT .. LANG .. '.jx3dat'
 		if IsLocalFileExist(szV2Path) then
 			local aConfig = LIB.LoadLUAData(szV2Path, { passphrase = C.PASSPHRASE_EMBEDDED }) or LIB.LoadLUAData(szV2Path)
 			if IsTable(aConfig) then
@@ -129,7 +142,7 @@ function D.LoadEmbeddedConfig()
 					if IsTable(config) and config.uuid then
 						config.group = ''
 						config.sort = i
-						LIB.SaveLUAData(EMBEDDED_CONFIG_ROOT .. config.uuid .. '.' .. LIB.GetLang() .. '.jx3dat', config, { passphrase = C.PASSPHRASE_EMBEDDED })
+						LIB.SaveLUAData(EMBEDDED_CONFIG_ROOT .. config.uuid .. '.' .. LANG .. '.jx3dat', D.FormatConfig(config), { passphrase = C.PASSPHRASE_EMBEDDED })
 					end
 				end
 			end
@@ -165,7 +178,10 @@ function D.LoadEmbeddedConfig()
 	local aEmbedded, tEmbedded, tEmbeddedMon = {}, {}, {}
 	for _, config in ipairs(aConfig) do
 		if config and config.uuid and config.monitors then
-			local embedded = D.FormatConfig(config)
+			local embedded = config
+			if LANG ~= 'zhcn' then
+				embedded = D.FormatConfig(config)
+			end
 			if embedded then
 				-- 默认禁用
 				embedded.enable = false
@@ -385,7 +401,10 @@ function D.LoadConfig(bDefault, bOriginal)
 	end
 	for i, embedded in ipairs(EMBEDDED_CONFIG_LIST) do
 		if embedded.uuid and not tLoaded[embedded.uuid] then
-			local config = D.FormatConfig(embedded)
+			local config = embedded
+			if LANG ~= 'zhcn' then
+				config = D.FormatConfig(config)
+			end
 			if config then
 				config.embedded = true
 				insert(aConfig, config)
