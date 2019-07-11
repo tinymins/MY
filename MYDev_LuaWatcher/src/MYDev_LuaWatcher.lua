@@ -110,22 +110,25 @@ function D.GetRankString(key)
 	local found = false
 	local SUM_SORT = key == 'TIME' and SUM_TIME or SUM_CALL
 	for id, time in pairs(SUM_SORT) do
-		found = false
-		for i, rid in ipairs_r(res) do
-			if time <= SUM_SORT[rid] then
-				insert(res, i + 1, id)
-				found = true
-				count = count + 1
-				break
+		if not wfind(id, 'MYDev_LuaWatcher.lua:')
+		and not wfind(id, 'Hack.lua:') then
+			found = false
+			for i, rid in ipairs_r(res) do
+				if time <= SUM_SORT[rid] then
+					insert(res, i + 1, id)
+					found = true
+					count = count + 1
+					break
+				end
 			end
-		end
-		if not found then
-			insert(res, 1, id)
-			count = count + 1
-		end
-		if count > MAX_COUNT then
-			remove(res)
-			count = count - 1
+			if not found then
+				insert(res, 1, id)
+				count = count + 1
+			end
+			if count > MAX_COUNT then
+				remove(res)
+				count = count - 1
+			end
 		end
 	end
 	for i, id in ipairs(res) do
