@@ -6,9 +6,9 @@
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
 --------------------------------------------------------
--------------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
+if not IsDebugClient() then
+	return
+end
 -------------------------------------------------------------------------------------------------------------
 local setmetatable = setmetatable
 local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
@@ -25,29 +25,14 @@ local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
-local LIB = MY
-local UI, DEBUG_LEVEL, PATH_TYPE = LIB.UI, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local var2str, str2var, ipairs_r = LIB.var2str, LIB.str2var, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local GetTraceback, Call, XpCall = LIB.GetTraceback, LIB.Call, LIB.XpCall
-local Get, Set, RandomChild = LIB.Get, LIB.Set, LIB.RandomChild
-local GetPatch, ApplyPatch, clone, FullClone = LIB.GetPatch, LIB.ApplyPatch, LIB.clone, LIB.FullClone
-local IsArray, IsDictionary, IsEquals = LIB.IsArray, LIB.IsDictionary, LIB.IsEquals
-local IsNumber, IsHugeNumber = LIB.IsNumber, LIB.IsHugeNumber
-local IsNil, IsBoolean, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsFunction
-local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
-local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
 -------------------------------------------------------------------------------------------------------------
-local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MYDev_LuaWatcher/lang/')
-if not LIB.AssertVersion('MYDev_LuaWatcher', _L['MYDev_LuaWatcher'], 0x2011800) then
-	return
-end
 local D = {}
 local MAX_COUNT = 50
 local RUNNING = false
 local SORT_KEY = 'TIME'
 local BTN, TXT
 local SUM_CALL, SUM_TIME, CALL_TIME
+local STATUS_FILE = 'interface/MY#DATA/.luawatcher.jx3dat'
 
 local wfind_c
 do
@@ -105,13 +90,22 @@ function D.SetHook()
 	debug.sethook(onHook, 'rc')
 	RUNNING = true
 end
+if LoadLUAData(STATUS_FILE) then D.SetHook() end
 
 function D.RemoveHook()
 	debug.sethook(nil, 'rc')
 	RUNNING = false
 	CALL_TIME = {}
 end
-LIB.RegisterReload('MYDev_LuaWatcher', D.RemoveHook)
+RegisterEvent('MY_BASE_LOADING_END', function() MY.RegisterReload('MY_LuaWatcher', D.RemoveHook) end)
+
+function D.SaveStatus()
+	if RUNNING then
+		SaveLUAData(STATUS_FILE, true)
+	else
+		CPath.DelFile(STATUS_FILE)
+	end
+end
 
 local UNIT = {
 	TIME = 'ms',
@@ -124,7 +118,7 @@ function D.GetRankString(key)
 	local found = false
 	local SUM_SORT = key == 'TIME' and SUM_TIME or SUM_CALL
 	for id, time in pairs(SUM_SORT) do
-		if not wfind_c(id, 'MYDev_LuaWatcher.lua:')
+		if not wfind_c(id, 'LuaWatcher.lua:')
 		and not wfind_c(id, 'Hack.lua:') then
 			found = false
 			for i, rid in ipairs_r(res) do
@@ -152,68 +146,79 @@ function D.GetRankString(key)
 end
 
 function D.SetBreathe()
-	MY.BreatheCall('MYDev_LuaWatcher', 60000, function() TXT:text(D.GetRankString(SORT_KEY)) end)
+	if not MY then
+		return
+	end
+	return MY.BreatheCall('MY_LuaWatcher', 60000, function() TXT:text(D.GetRankString(SORT_KEY)) end)
 end
 
 function D.RemoveBreathe()
-	MY.BreatheCall('MYDev_LuaWatcher', false)
+	if not MY then
+		return
+	end
+	MY.BreatheCall('MY_LuaWatcher', false)
 end
 
-local PS = {}
+RegisterEvent('MY_BASE_LOADING_END', function()
+	local _L = MY.LoadLangPack()
+	local PS = {}
 
-function PS.OnPanelActive(wnd)
-	local ui = UI(wnd)
-	local x, y = 10, 10
-	local w, h = ui:size()
+	function PS.OnPanelActive(wnd)
+		local ui = MY.UI(wnd)
+		local x, y = 10, 10
+		local w, h = ui:size()
 
-	BTN = ui:append('WndButton', {
-		x = x, y = y,
-		text = RUNNING and _L['Stop'] or _L['Start'],
-		onclick = function()
-			if RUNNING then
-				D.RemoveHook()
-				D.RemoveBreathe()
-			else
-				D.SetHook()
-				D.SetBreathe()
-			end
-			BTN:text(RUNNING and _L['Stop'] or _L['Start'])
-		end,
-	}, true)
-	ui:append('WndButton', {
-		x = x + 100, y = y,
-		text = _L['Refresh'],
-		onclick = function()
-			TXT:text(D.GetRankString(SORT_KEY))
-		end,
-	})
-	ui:append('WndButton', {
-		x = x + 200, y = y,
-		text = _L['Reset'],
-		onclick = function()
-			D.Reset()
-		end,
-	})
-	y = y + 30
+		BTN = ui:append('WndButton', {
+			x = x, y = y,
+			text = RUNNING and _L['Stop'] or _L['Start'],
+			onclick = function()
+				if RUNNING then
+					D.RemoveHook()
+					D.SaveStatus()
+					D.RemoveBreathe()
+				else
+					D.SetHook()
+					D.SaveStatus()
+					D.SetBreathe()
+				end
+				BTN:text(RUNNING and _L['Stop'] or _L['Start'])
+			end,
+		}, true)
+		ui:append('WndButton', {
+			x = x + 100, y = y,
+			text = _L['Refresh'],
+			onclick = function()
+				TXT:text(D.GetRankString(SORT_KEY))
+			end,
+		})
+		ui:append('WndButton', {
+			x = x + 200, y = y,
+			text = _L['Reset'],
+			onclick = function()
+				D.Reset()
+			end,
+		})
+		y = y + 30
 
-	TXT = ui:append('Text', {
-		x = x, y = y, w = w, h = h - y,
-		halign = 0, valign = 0,
-		multiline = true,
-		onclick = function()
-			MY.Topmsg(_L['Copied to clipboard'], _L['MYDev_LuaWatcher'])
-			UI.OpenTextEditor(D.GetRankString(SORT_KEY))
-		end,
-	}, true)
+		TXT = ui:append('Text', {
+			x = x, y = y, w = w, h = h - y,
+			halign = 0, valign = 0,
+			multiline = true,
+			onclick = function()
+				MY.Topmsg(_L['Copied to clipboard'], _L['LuaWatcher'])
+				MY.UI.OpenTextEditor(D.GetRankString(SORT_KEY))
+			end,
+		}, true)
 
-	if RUNNING then
+		if RUNNING then
+			D.SetBreathe()
+		end
 		D.SetBreathe()
 	end
-	D.SetBreathe()
-end
 
-function PS.OnPanelDeactive()
-	D.RemoveBreathe()
-end
+	function PS.OnPanelDeactive()
+		D.RemoveBreathe()
+	end
 
-LIB.RegisterPanel('MYDev_LuaWatcher', _L['MYDev_LuaWatcher'], _L['Development'], 'ui/Image/UICommon/BattleFiled.UITex|7', PS)
+	MY.RegisterPanel('MY_LuaWatcher', _L['MY_LuaWatcher'], _L['Development'], 'ui/Image/UICommon/BattleFiled.UITex|7', PS)
+end)

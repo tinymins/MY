@@ -402,4 +402,11 @@ data = {
 	},
 
 	['Encrypt and compressing: '] = '更新加密壓縮：',
+
+	-- LuaWatcher
+	['MY_LuaWatcher'] = '調用統計',
+	['Start'] = '開始',
+	['Stop'] = '結束',
+	['Refresh'] = '刷新',
+	['Reset'] = '重置',
 }
