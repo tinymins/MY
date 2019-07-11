@@ -49,6 +49,20 @@ local SORT_KEY = 'TIME'
 local BTN, TXT
 local SUM_CALL, SUM_TIME, CALL_TIME
 
+local wfind_c
+do
+local c = {}
+function wfind_c(s, i)
+	if not c[s] then
+		c[s] = {}
+	end
+	if c[s][i] == nil then
+		c[s][i] = wfind(s, i) or false
+	end
+	return c[s][i]
+end
+end
+
 function D.Reset()
 	SUM_CALL = setmetatable({}, { __index = function() return 0 end })
 	SUM_TIME = setmetatable({}, { __index = function() return 0 end })
@@ -110,8 +124,8 @@ function D.GetRankString(key)
 	local found = false
 	local SUM_SORT = key == 'TIME' and SUM_TIME or SUM_CALL
 	for id, time in pairs(SUM_SORT) do
-		if not wfind(id, 'MYDev_LuaWatcher.lua:')
-		and not wfind(id, 'Hack.lua:') then
+		if not wfind_c(id, 'MYDev_LuaWatcher.lua:')
+		and not wfind_c(id, 'Hack.lua:') then
 			found = false
 			for i, rid in ipairs_r(res) do
 				if time <= SUM_SORT[rid] then
