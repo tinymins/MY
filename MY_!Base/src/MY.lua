@@ -904,6 +904,8 @@ end
 if _DEBUG_LEVEL_ <= DEBUG_LEVEL.DEBUG then
 	if not ECHO_LUA_ERROR then
 		ECHO_LUA_ERROR = { ID = LIB.GetAddonInfo().szNameSpace }
+	elseif IsTable(ECHO_LUA_ERROR) then
+		ECHO_LUA_ERROR.ID = LIB.GetAddonInfo().szNameSpace
 	end
 	RegisterEvent('CALL_LUA_ERROR', function()
 		if ECHO_LUA_ERROR and ECHO_LUA_ERROR.ID == LIB.GetAddonInfo().szNameSpace then
