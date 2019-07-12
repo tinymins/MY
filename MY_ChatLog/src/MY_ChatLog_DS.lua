@@ -115,7 +115,7 @@ function DS:InitDB(bFixProblem)
 	if not self.aDB then
 		-- 初始化数据库集群列表
 		local aDB = {}
-		LIB.Debug({'Start init node...'}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
+		LIB.Debug({'Init node list...'}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
 		for _, szName in ipairs(CPath.GetFileList(self.szRoot) or {}) do
 			local db = szName:find('^chatlog_[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]%.db') and MY_ChatLog_DB(self.szRoot .. szName)
 			if db then
@@ -128,6 +128,7 @@ function DS:InitDB(bFixProblem)
 		end
 		SortDB(aDB)
 		-- 删除集群中错误的空节点
+		LIB.Debug({'Check empty node...'}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
 		for i, db in ipairs_r(aDB) do
 			if not (i == #aDB and IsHugeNumber(db:GetMaxTime())) and db:CountMsg() == 0 then
 				LIB.Debug({'Removing unexpected empty node: ' .. db:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.WARNING)
@@ -136,6 +137,7 @@ function DS:InitDB(bFixProblem)
 			end
 		end
 		-- 修复覆盖区域不连续的节点（覆盖区中断问题、分段冲突问题）
+		LIB.Debug({'Check node continuously...'}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
 		do
 			local i = 1
 			while i < #aDB do
@@ -185,6 +187,7 @@ function DS:InitDB(bFixProblem)
 			end
 		end
 		-- 检查集群最新活跃节点是否存在
+		LIB.Debug({'Check latest node...'}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
 		local db = aDB[#aDB]
 		if db and IsHugeNumber(db:GetMaxTime()) then -- 存在： 检查集群最新活跃节点压力是否超限
 			if db:CountMsg() > SINGLE_DB_AMOUNT then
@@ -205,6 +208,7 @@ function DS:InitDB(bFixProblem)
 			LIB.Debug({'Create new empty active node ' .. db:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
 		end
 		-- 检查集群最久远节点开始时间是否为0
+		LIB.Debug({'Check oldest node...'}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
 		local db = aDB[1]
 		if db:GetMinTime() ~= 0 then
 			LIB.Debug({'Unexpected MinTime for first DB: ' .. db:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.WARNING)

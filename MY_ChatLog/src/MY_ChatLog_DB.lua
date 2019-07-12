@@ -72,6 +72,7 @@ function DB:Connect(bCheck)
 			LIB.Debug({'Quick connect database: ' .. self.szFilePath}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
 			self.db = SQLite3_Open(self.szFilePath)
 		end
+		LIB.Debug({'Init database with STMT'}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
 		self.db:Execute('CREATE TABLE IF NOT EXISTS ChatInfo (key NVARCHAR(128), value NVARCHAR(4096), PRIMARY KEY (key))')
 		self.stmtInfoGet = self.db:Prepare('SELECT value FROM ChatInfo WHERE key = ?')
 		self.stmtInfoSet = self.db:Prepare('REPLACE INTO ChatInfo (key, value) VALUES (?, ?)')
@@ -82,6 +83,7 @@ function DB:Connect(bCheck)
 		self.stmtCount = self.db:Prepare('SELECT channel AS nChannel, COUNT(*) AS nCount FROM ChatLog WHERE talker LIKE ? OR text LIKE ? GROUP BY nChannel')
 		self.stmtInsert = self.db:Prepare('REPLACE INTO ChatLog (hash, channel, time, talker, text, msg) VALUES (?, ?, ?, ?, ?, ?)')
 		self.stmtDelete = self.db:Prepare('DELETE FROM ChatLog WHERE hash = ? AND time = ?')
+		LIB.Debug({'Init database finished.'}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
 	end
 	return self
 end
