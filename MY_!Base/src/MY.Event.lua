@@ -546,3 +546,59 @@ function LIB.SendBgMsg(nChannel, szMsgID, ...)
 end
 end
 end
+
+---------------------------------------------------------------------------------------------
+-- 注册协程
+---------------------------------------------------------------------------------------------
+do
+local COROUTINE_TIME = 1000 * 0.5 / GLOBAL.GAME_FPS -- 一次 Breathe 时最大允许执行协程时间
+local COROUTINE_LIST = {}
+function LIB.RegisterCoroutine(szKey, fnAction, fnCallback)
+	if IsTable(szKey) then
+		for _, szKey in ipairs(szKey) do
+			LIB.RegisterCoroutine(szKey, fnAction, fnCallback)
+		end
+		return
+	elseif IsFunction(szKey) then
+		szKey, fnAction = nil, szKey
+	end
+	if IsFunction(fnAction) then
+		if not IsString(szKey) then
+			szKey = GetTickCount() * 1000
+			while COROUTINE_LIST[tostring(szKey)] do
+				szKey = szKey + 1
+			end
+			szKey = tostring(szKey)
+		end
+		COROUTINE_LIST[szKey] = { szID = szKey, coAction = coroutine.create(fnAction), fnCallback = fnCallback }
+	elseif fnAction == false then
+		COROUTINE_LIST[szKey] = nil
+	elseif szKey and COROUTINE_LIST[szKey] then
+		return true
+	end
+	return szKey
+end
+local function onBreathe()
+	local nBeginTime, pCallback = GetTime()
+	while GetTime() - nBeginTime < COROUTINE_TIME and next(COROUTINE_LIST) do
+		for k, p in pairs(COROUTINE_LIST) do
+			if GetTime() - nBeginTime > COROUTINE_TIME then
+				break
+			end
+			if coroutine.status(p.coAction) == 'suspended' then
+				local status, err = coroutine.resume(p.coAction)
+				if not status then
+					FireUIEvent('CALL_LUA_ERROR',  'OnCoroutine: ' .. p.szID .. ', Error: ' .. err .. '\n')
+				end
+			end
+			if coroutine.status(p.coAction) == 'dead' then
+				if p.fnCallback then
+					Call(p.fnCallback)
+				end
+				COROUTINE_LIST[k] = nil
+			end
+		end
+	end
+end
+LIB.BreatheCall(LIB.GetAddonInfo().szNameSpace .. '#COROUTINE', onBreathe)
+end
