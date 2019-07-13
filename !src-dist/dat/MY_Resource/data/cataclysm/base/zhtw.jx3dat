@@ -383,6 +383,7 @@ data = {
     {dwID=14736,col="#FFFF00FF",szReminder="吸",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--蠱毒·吸血---塵歸海·巨冥灣
     {dwID=14898,col="#FF3232FF",szReminder="危",nPriority=3,bScreenHead=true,colScreenHead="#FF3232"},--危險警告---塵歸海·巨冥灣
     {dwID=15277,col="#FFFF00FF",szReminder="嘲",nPriority=5,bCaution=true},--嘲諷---塵歸海·巨冥灣
+    {dwID=15327,col="#FF8000FF",szReminder="傷",nPriority=7},--穿潰箭傷---塵歸海·巨冥灣
     {dwID=14762,nLevel=1,col="#FFFF00FF",szReminder="稀",nPriority=6,bAttention=true},--空氣稀薄---塵歸海·巨冥灣
     {dwID=14762,nLevel=2,col="#00FF0000",szReminder="調",nPriority=8},--調養生息---塵歸海·巨冥灣
     {dwID=14794,col="#FF3232FF",szReminder="瞄",nPriority=6,bAttention=true},--瞄準---塵歸海·巨冥灣
@@ -396,18 +397,19 @@ data = {
     {dwID=15036,col="#00FF00FF",nPriority=7},--類腮---塵歸海·巨冥灣
     {dwID=14690,col="#FF00FFFF",szReminder="絞",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--絞首---塵歸海·巨冥灣
     {dwID=14776,col="#FFFF00FF",nPriority=7},--暈眩---塵歸海·巨冥灣
-    {dwID=14702,col="#FFFF00FF",szReminder="破",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--破陣曲.角---塵歸海·巨冥灣
+    {dwID=14698,col="#8055FFFF",szReminder="羽",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#8055FF"},--破陣曲.羽---塵歸海·巨冥灣
+    {dwID=14702,col="#00FFFFFF",szReminder="角",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#00FFFF"},--破陣曲.角---塵歸海·巨冥灣
     {dwID=14786,col="#FF00FFFF",szReminder="爆",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--角.爆發---塵歸海·巨冥灣
     {dwID=14860,col="#FFFF00FF",szReminder="目",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--眩暈---塵歸海·巨冥灣
     {dwID=14862,col="#FF00FFFF",szReminder="目",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--神秘人的目標---塵歸海·巨冥灣
-    {dwID=14813,col="#FFFF00FF",szReminder="暈",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--眩暈---塵歸海·巨冥灣
+    {dwID=14813,col="#FFFF00FF",szReminder="暈",nPriority=6,bAttention=true},--眩暈---塵歸海·巨冥灣
     {dwID=14800,col="#00FF00FF",szReminder="護",nPriority=6,bAttention=true},--靈猴的庇護---塵歸海·巨冥灣
     {dwID=14997,col="#FF3232FF",szReminder="標",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF3232"},--靈猴的目標---塵歸海·巨冥灣
     {dwID=14820,col="#FF00FFFF",szReminder="標",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--標記---塵歸海·巨冥灣
     {dwID=15102,col="#FF00FFFF",szReminder="目",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--水鬼的目標---塵歸海·巨冥灣
     {dwID=14815,col="#FF3232FF",szReminder="毒",nPriority=6,bAttention=true},--愈之毒---塵歸海·巨冥灣
     {dwID=14680,col="#FF3232FF",szReminder="縊",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF3232"},--縊刑---塵歸海·巨冥灣
-    {dwID=14681,col="#FFFF00FF",szReminder="窒",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--窒息---塵歸海·巨冥灣
+    {dwID=14681,col="#FFFF00FF",szReminder="窒",nPriority=6,bAttention=true},--窒息---塵歸海·巨冥灣
     {dwID=14675,col="#FF00FFFF",szReminder="捏",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--捏刑---塵歸海·巨冥灣
     {dwID=14801,col="#FFFF00FF",szReminder="候",nPriority=6,bAttention=true},--戲碼候選者---塵歸海·巨冥灣
     {dwID=14795,col="#FFFF00FF",szReminder="梁",nPriority=7},--死亡戲碼·利刃橫梁---塵歸海·巨冥灣
@@ -419,6 +421,7 @@ data = {
     {dwID=14700,col="#8055FFFF",szReminder="毒",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#8055FF"},--鉤心毒---塵歸海·饕餮洞
     {dwID=14701,col="#FF00FFFF",szReminder="殘",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--鉤心殘毒---塵歸海·饕餮洞
     {dwID=14788,col="#00FFFFFF",szReminder="迷",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#00FFFF"},--暗影迷途---塵歸海·饕餮洞
+    {dwID=15350,col="#00FFFFFF",szReminder="印",nPriority=7},--死亡印記---塵歸海·饕餮洞
     {dwID=14802,col="#00FFFFFF",szReminder="未",nPriority=6,bAttention=true},--未知---塵歸海·饕餮洞
     {dwID=14803,col="#8055FFFF",szReminder="毒",nPriority=6,bAttention=true},--毒心---塵歸海·饕餮洞
     {dwID=14804,col="#FFFFFFFF",szReminder="聖",nPriority=6,bAttention=true},--聖心---塵歸海·饕餮洞
@@ -455,8 +458,11 @@ data = {
     {dwID=9744},--朝聖---明教
     {dwID=9745},--朝聖---明教
     {dwID=4244},--渡厄---明教
+    {dwID=1242,col="#00FF00FF",szReminder="舍",nPriority=7},--捨身---少林
+    {dwID=10208,col="#00FF00FF",szReminder="弘",nPriority=7},--弘法---少林
+    {dwID=9830,col="#00FF0000",szReminder="舍",nPriority=8},--捨生---少林
     {dwID=9395,col="#00FF00FF",szReminder="風",nPriority=7},--風入松---長歌
     {dwID=9299,col="#FF8000FF",szReminder="杯",nPriority=7},--杯水留影---長歌
     {dwID=13771},--疾電叱羽---蓬萊
-    --【南宮伯是帥咩】更新日期0617
+    --【南宮伯是帥咩】更新日期0711
 }

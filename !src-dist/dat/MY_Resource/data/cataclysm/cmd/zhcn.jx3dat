@@ -218,8 +218,7 @@ data = {
     {dwID=377},--镇山河---纯阳
     {dwID=4487},--极乐---明教
     {dwID=4439},--贪魔体---明教
-    {dwID=1242,col="#00FF00FF",szReminder="舍",nPriority=7},--舍身---少林
-    {dwID=10208,col="#00FF00FF",szReminder="弘",nPriority=7},--弘法---少林
+    {dwID=12488,col="#00FF00FF",szReminder="啸",nPriority=6,bAttention=true},--狮啸---少林
     {dwID=4101},--引羌笛---天策
     {dwID=2778},--渊---天策
     {dwID=367},--守如山---天策
@@ -236,5 +235,5 @@ data = {
     {dwID=9933,col="#00FF00FF",szReminder="笼",nPriority=7},--笼花---万花
     {dwID=9544,col="#00FF00FF",szReminder="笑",nPriority=7},--笑傲光阴---长歌
     {dwID=9265,col="#00FF00FF",szReminder="云",nPriority=7},--云生结海---长歌
-    --【南宫伯是帅咩】更新日期0617
+    --【南宫伯是帅咩】更新日期0711
 }

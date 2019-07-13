@@ -218,8 +218,7 @@ data = {
     {dwID=377},--鎮山河---純陽
     {dwID=4487},--極樂---明教
     {dwID=4439},--貪魔體---明教
-    {dwID=1242,col="#00FF00FF",szReminder="舍",nPriority=7},--捨身---少林
-    {dwID=10208,col="#00FF00FF",szReminder="弘",nPriority=7},--弘法---少林
+    {dwID=12488,col="#00FF00FF",szReminder="嘯",nPriority=6,bAttention=true},--獅嘯---少林
     {dwID=4101},--引羌笛---天策
     {dwID=2778},--淵---天策
     {dwID=367},--守如山---天策
@@ -236,5 +235,5 @@ data = {
     {dwID=9933,col="#00FF00FF",szReminder="籠",nPriority=7},--籠花---萬花
     {dwID=9544,col="#00FF00FF",szReminder="笑",nPriority=7},--笑傲光陰---長歌
     {dwID=9265,col="#00FF00FF",szReminder="雲",nPriority=7},--雲生結海---長歌
-    --【南宮伯是帥咩】更新日期0617
+    --【南宮伯是帥咩】更新日期0711
 }

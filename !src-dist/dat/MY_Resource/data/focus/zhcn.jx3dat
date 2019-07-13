@@ -935,7 +935,7 @@ data = {
 	{szMethod="TEMPLATE_ID",szPattern="65058",szDisplay="康宴别",dwMapID=364,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
 	{szMethod="TEMPLATE_ID",szPattern="65346",szDisplay="伍藏野",dwMapID=364,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
 	{szMethod="TEMPLATE_ID",szPattern="65633",szDisplay="弓箭手",dwMapID=364,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=150,tRelation = {bAll = true}},
-	{szMethod="TEMPLATE_ID",szPattern="65714",szDisplay="李如峰",dwMapID=364,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+	{szMethod="TEMPLATE_ID",szPattern="65714",szDisplay="李如峰",dwMapID=364,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=15,tRelation = {bAll = true}},
 	{szMethod="TEMPLATE_ID",szPattern="64896",szDisplay="礼",dwMapID=365,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
 	{szMethod="TEMPLATE_ID",szPattern="65926",szDisplay="晏厄的巨手",dwMapID=365,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
 	{szMethod="TEMPLATE_ID",szPattern="65931",szDisplay="钱宗龙",dwMapID=365,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
@@ -953,7 +953,7 @@ data = {
 	{szMethod="TEMPLATE_ID",szPattern="65988",szDisplay="无耻混蛋",dwMapID=365,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
 	{szMethod="TEMPLATE_ID",szPattern="66004",szDisplay="鱼枪",dwMapID=365,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
 	{szMethod="TEMPLATE_ID",szPattern="66005",szDisplay="康宴别",dwMapID=365,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
-	{szMethod="TEMPLATE_ID",szPattern="66066",szDisplay="李如峰",dwMapID=365,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+	{szMethod="TEMPLATE_ID",szPattern="66066",szDisplay="李如峰",dwMapID=365,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=15,tRelation = {bAll = true}},
 	{szMethod="TEMPLATE_ID",szPattern="64896",szDisplay="礼",dwMapID=366,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
 	{szMethod="TEMPLATE_ID",szPattern="66327",szDisplay="钱宗龙",dwMapID=366,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
 	{szMethod="TEMPLATE_ID",szPattern="66328",szDisplay="晏厄",dwMapID=366,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
@@ -971,7 +971,7 @@ data = {
 	{szMethod="TEMPLATE_ID",szPattern="66375",szDisplay="鑫鑫",dwMapID=366,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
 	{szMethod="TEMPLATE_ID",szPattern="66401",szDisplay="鱼枪",dwMapID=366,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
 	{szMethod="TEMPLATE_ID",szPattern="66402",szDisplay="康宴别",dwMapID=366,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
-	{szMethod="TEMPLATE_ID",szPattern="66458",szDisplay="李如峰",dwMapID=366,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+	{szMethod="TEMPLATE_ID",szPattern="66458",szDisplay="李如峰",dwMapID=366,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=15,tRelation = {bAll = true}},
 	{szMethod="TEMPLATE_ID",szPattern="64855",szDisplay="黄穆",dwMapID=368,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
 	{szMethod="TEMPLATE_ID",szPattern="65057",szDisplay="清心",dwMapID=368,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
 	{szMethod="TEMPLATE_ID",szPattern="65097",szDisplay="影贪（仁）",dwMapID=368,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
@@ -1012,6 +1012,6 @@ data = {
 	{szMethod="TEMPLATE_ID",szPattern="65413",szDisplay="凶星龙兽",dwMapID=412,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=40,tRelation = {bAll = true}},
 	{szMethod="TEMPLATE_ID",szPattern="65721",szDisplay="朱雀超级俑",dwMapID=412,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=40,tRelation = {bAll = true}},
 	{szMethod="TEMPLATE_ID",szPattern="65722",szDisplay="玄武超级俑",dwMapID=412,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=40,tRelation = {bAll = true}},
-	--【南宫伯是帅咩】更新日期0617
+	--【南宫伯是帅咩】更新日期0711
 
 }

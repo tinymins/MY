@@ -128,8 +128,7 @@ data = {
     {dwID=2313},--凤凰蛊---五毒
     {dwID=377},--镇山河---纯阳
     {dwID=4439},--贪魔体---明教
-    {dwID=1242,col="#00FF00FF",szReminder="舍",nPriority=7},--舍身---少林
-    {dwID=10208,col="#00FF00FF",szReminder="弘",nPriority=7},--弘法---少林
+    {dwID=12488,col="#00FF00FF",szReminder="啸",nPriority=6,bAttention=true},--狮啸---少林
     {dwID=2778},--渊---天策
     {dwID=367},--守如山---天策
     {dwID=6163},--守如山---天策
@@ -171,5 +170,5 @@ data = {
     {dwID=9336,bOnlyMine=true,col="#00FF0000",szReminder="寒",nPriority=9},--寒梅---长歌
     {dwID=9337,bOnlyMine=true,col="#00FF0000",szReminder="寒",nPriority=9},--寒梅---长歌
     {dwID=9335,bOnlyMine=true,col="#FF323200",szReminder="落",nPriority=9},--落梅---长歌
-    --【南宫伯是帅咩】更新日期0617
+    --【南宫伯是帅咩】更新日期0711
 }
