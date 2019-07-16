@@ -22,9 +22,15 @@ def run(mode):
 		print('Error: current branch(%s) is not on git stable!' % (branch_name))
 		exit()
 
+	# 判断未提交修改
+	status = os.popen('git status').read().strip().split("\n")
+	if (status[len(status) - 1] != 'nothing to commit, working tree clean'):
+		print('Error: current branch has uncommited file change(s)!')
+		exit()
+
 	# 读取{NS}.lua文件中的插件版本号
 	str_version = "0x0000000"
-	for line in open("%s_!Base/src/%s.lua" % (pkg_name, pkg_name)):
+	for line in open("%s_!Base/src/Base.lua" % pkg_name):
 		if line[6:15] == "_VERSION_":
 			str_version = line[-6:-3]
 
@@ -54,7 +60,7 @@ def run(mode):
 		}
 		print('File change list:')
 		if git_tag != '':
-			filelist = os.popen('git diff ' + git_tag + ' --name-status').read().strip().split("\n")
+			filelist = os.popen('git diff ' + git_tag + ' HEAD --name-status').read().strip().split("\n")
 			for file in filelist:
 				lst = file.split("\t")
 				if lst[0] == "A" or lst[0] == "M" or lst[0] == "D":
