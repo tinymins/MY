@@ -93,6 +93,7 @@ local function NewDB(szRoot, nMinTime, nMaxTime)
 	local db = MY_ChatLog_DB(szPath)
 	db:SetMinTime(nMinTime)
 	db:SetMaxTime(nMaxTime)
+	db:SetInfo('UserGlobalID', GetClientPlayer().GetGlobalID())
 	return db
 end
 
@@ -123,7 +124,16 @@ function DS:InitDB(bFixProblem)
 					db:Connect(true)
 					LIB.Debug({'Checking malformed node ' .. db:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
 				end
-				insert(aDB, db)
+				local dwGlobalID = db:GetInfo('UserGlobalID')
+				if not dwGlobalID and IsDebugClient() then
+					dwGlobalID = GetClientPlayer().GetGlobalID()
+					db:SetInfo('UserGlobalID', dwGlobalID)
+				end
+				if dwGlobalID == GetClientPlayer().GetGlobalID() then
+					insert(aDB, db)
+				else
+					db:Disconnect()
+				end
 			end
 		end
 		SortDB(aDB)

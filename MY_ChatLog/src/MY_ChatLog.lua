@@ -147,44 +147,50 @@ function D.ImportDB(szPath)
 	local odb, nImportCount = LIB.ConnectDatabase(_L['MY_ChatLog'], szPath), 0
 	if odb then
 		-- 老版分表机制
-		for _, info in ipairs(odb:Execute('SELECT * FROM ChatLogIndex ORDER BY stime ASC') or EMPTY_TABLE) do
-			if info.etime == -1 then
-				info.etime = 0
+		local dwGlobalID = Get(odb:Execute('SELECT * FROM ChatLogInfo WHERE key = "userguid"'), {1, 'value'})
+		if dwGlobalID == GetClientPlayer().GetGlobalID() then
+			for _, info in ipairs(odb:Execute('SELECT * FROM ChatLogIndex ORDER BY stime ASC') or EMPTY_TABLE) do
+				if info.etime == -1 then
+					info.etime = 0
+				end
+				local db = MY_ChatLog_DB(D.GetRoot() .. info.name .. '.db')
+				db:SetMinTime(info.stime)
+				db:SetMaxTime(info.etime)
+				for _, p in ipairs(odb:Execute('SELECT * FROM ' .. info.name .. ' ORDER BY time ASC') or EMPTY_TABLE) do
+					nImportCount = nImportCount + 1
+					db:InsertMsg(p.channel, p.text, p.msg, p.talker, p.time, p.hash)
+				end
+				db:Flush()
+				db:Disconnect()
 			end
-			local db = MY_ChatLog_DB(D.GetRoot() .. info.name .. '.db')
-			db:SetMinTime(info.stime)
-			db:SetMaxTime(info.etime)
-			for _, p in ipairs(odb:Execute('SELECT * FROM ' .. info.name .. ' ORDER BY time ASC') or EMPTY_TABLE) do
-				nImportCount = nImportCount + 1
-				db:InsertMsg(p.channel, p.text, p.msg, p.talker, p.time, p.hash)
-			end
-			db:Flush()
-			db:Disconnect()
 		end
 		-- 新版导出数据
-		local nCount = Get(odb:Execute('SELECT COUNT(*) AS nCount FROM ChatLog'), {1, 'nCount'}, 0)
-		if nCount > 0 then
-			local szRoot, nOffset, nLimit, szNewPath, dbNew = D.GetRoot(), 0, 20000
-			local stmt, aRes = odb:Prepare('SELECT * FROM ChatLog ORDER BY time ASC LIMIT ' .. nLimit .. ' OFFSET ?')
-			while nOffset < nCount do
-				stmt:ClearBindings()
-				stmt:BindAll(nOffset)
-				aRes = stmt:GetAll()
-				if #aRes > 0 then
-					repeat
-						szNewPath = szRoot .. ('chatlog_%x'):format(math.random(0x100000, 0xFFFFFF)) .. '.db'
-					until not IsLocalFileExist(szNewPath)
-					dbNew = MY_ChatLog_DB(szNewPath)
-					dbNew:SetMinTime(aRes[1].time)
-					dbNew:SetMaxTime(aRes[#aRes].time)
-					for _, p in ipairs(aRes) do
-						nImportCount = nImportCount + 1
-						dbNew:InsertMsg(p.channel, p.text, p.msg, p.talker, p.time, p.hash)
+		local dwGlobalID = Get(odb:Execute('SELECT value FROM ChatInfo WHERE key = "UserGlobalID"'), {1, 'value'})
+		if dwGlobalID == GetClientPlayer().GetGlobalID() then
+			local nCount = Get(odb:Execute('SELECT COUNT(*) AS nCount FROM ChatLog'), {1, 'nCount'}, 0)
+			if nCount > 0 then
+				local szRoot, nOffset, nLimit, szNewPath, dbNew = D.GetRoot(), 0, 20000
+				local stmt, aRes = odb:Prepare('SELECT * FROM ChatLog ORDER BY time ASC LIMIT ' .. nLimit .. ' OFFSET ?')
+				while nOffset < nCount do
+					stmt:ClearBindings()
+					stmt:BindAll(nOffset)
+					aRes = stmt:GetAll()
+					if #aRes > 0 then
+						repeat
+							szNewPath = szRoot .. ('chatlog_%x'):format(math.random(0x100000, 0xFFFFFF)) .. '.db'
+						until not IsLocalFileExist(szNewPath)
+						dbNew = MY_ChatLog_DB(szNewPath)
+						dbNew:SetMinTime(aRes[1].time)
+						dbNew:SetMaxTime(aRes[#aRes].time)
+						for _, p in ipairs(aRes) do
+							nImportCount = nImportCount + 1
+							dbNew:InsertMsg(p.channel, p.text, p.msg, p.talker, p.time, p.hash)
+						end
+						dbNew:Flush()
+						dbNew:Disconnect()
 					end
-					dbNew:Flush()
-					dbNew:Disconnect()
+					nOffset = nOffset + nLimit
 				end
-				nOffset = nOffset + nLimit
 			end
 		end
 		odb:Release()

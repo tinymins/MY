@@ -304,6 +304,7 @@ function D.Export(szExportFile, aChannels, nPerSec, onProgress)
 		end
 		db:SetMinTime(0)
 		db:SetMaxTime(HUGE)
+		db:SetInfo('UserGlobalID', GetClientPlayer().GetGlobalID())
 		l_bExporting = true
 
 		local nPage, nPageCount = 0, ceil(ds:CountMsg(aChannels, '') / EXPORT_SLICE)
