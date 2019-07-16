@@ -165,7 +165,7 @@ function D.ImportDB(szPath)
 			end
 		end
 		-- 新版导出数据
-		local dwGlobalID = Get(odb:Execute('SELECT value FROM ChatInfo WHERE key = "UserGlobalID"'), {1, 'value'})
+		local dwGlobalID = Get(odb:Execute('SELECT value FROM ChatInfo WHERE key = "UserGlobalID"'), {1, 'value'}, ''):gsub('"', '')
 		if dwGlobalID == GetClientPlayer().GetGlobalID() then
 			local nCount = Get(odb:Execute('SELECT COUNT(*) AS nCount FROM ChatLog'), {1, 'nCount'}, 0)
 			if nCount > 0 then
