@@ -6,6 +6,9 @@
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
 --------------------------------------------------------
+if LoadLUAData('interface/DEBUG.jx3dat') and IsLocalFileExist('ui/DEBUG.ini') then
+	Wnd.OpenWindow('ui/DEBUG.ini')
+end
 if not IsDebugClient() then
 	return
 end
