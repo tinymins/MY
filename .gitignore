@@ -6,6 +6,8 @@
 */publisher.key
 /@DATA
 /__pycache__
+/squishy
+/*/src.lua
 \!src-dist/releases/
 \!src-dist/tools/targetmon-format/*.jx3dat
 MY_LifeBar/config/*/*.jx3dat

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import time, os, re
+import time, os, re, codecs
 
 # get interface root path
 pkg_name = ''
@@ -8,6 +8,57 @@ root_path = os.path.abspath(os.getcwd())
 if os.path.basename(root_path).lower() != 'interface' and os.path.basename(os.path.dirname(root_path).lower()) == 'interface':
     pkg_name = os.path.basename(root_path)
     root_path = os.path.dirname(root_path)
+
+def __zhcn2zhtw(sentence):
+	from l_converter import Converter
+	'''
+	将sentence中的简体字转为繁体字
+	:param sentence: 待转换的句子
+	:return: 将句子中简体字转换为繁体字之后的句子
+	'''
+	return Converter('zh-TW').convert(sentence)
+
+def __compress(addon):
+	print('--------------------------------')
+	print('Compressing: %s' % addon)
+	file_count = 0
+	# 分析包信息生成压缩描述
+	with open('squishy', 'w') as squishy:
+		squishy.write('Output "./%s/src.lua"\n' % addon)
+		for line in open("%s/info.ini" % addon):
+			parts = line.strip().split('=')
+			if parts[0].find('lua_') == 0:
+				if parts[1] == 'src.lua':
+					print('Already compressed...')
+					return
+				file_path = os.path.join('.', addon, parts[1].replace('\\', '/'))
+				file_count = file_count + 1
+				squishy.write('Module "%d" "%s"\n' % (file_count, file_path))
+	# 执行压缩
+	os.popen('lua "./!src-dist/tools/react/squish.lua" --minify-level=full')
+	# 添加加载脚本
+	with open('./%s/src.lua' % addon, 'r+') as src:
+		content = src.read()
+		src.seek(0, 0)
+		src.write('local package={preload={}}\n' + content)
+	with open('./%s/src.lua' % addon, 'a') as src:
+		for i in range(1, file_count + 1):
+			src.write('\npackage.preload["%d"]()' % i)
+	print('Compress done...')
+	# 更新子插件描述文件
+	info_content = ''
+	for count, line in enumerate(codecs.open("%s/info.ini" % addon,'r',encoding='gbk')):
+		parts = line.split('=')
+		if parts[0].find('lua_') == 0:
+			if parts[0] == 'lua_0':
+				info_content = info_content + 'lua_0=src.lua\n'
+		else:
+			info_content = info_content + line
+	with codecs.open("%s/info.ini" % addon,'w',encoding='gbk') as f:
+		f.write(info_content)
+	with codecs.open("%s/info.ini.zh_TW" % addon,'w',encoding='utf8') as f:
+		f.write(__zhcn2zhtw(info_content))
+	print('Update info done...')
 
 def run(mode):
 	# 读取Git分支
@@ -49,6 +100,11 @@ def run(mode):
 	if int(str_version) <= max_version:
 		print('Error: current version(%s) is smaller than or equals with last git tagged version(%d)!' % (str_version, max_version))
 		exit()
+
+	# 优化合并源文件
+	for addon in os.listdir('./'):
+		if os.path.exists(os.path.join('./', addon, 'info.ini')):
+			__compress(addon)
 
 	if mode == 'diff':
 		# 读取Git中最大的版本号 到最新版修改文件
@@ -95,6 +151,7 @@ def run(mode):
 	print("File(s) compressing acomplete!")
 	print("Url: " + dst_file)
 
+	os.popen('git reset HEAD --hard')
 	time.sleep(5)
 	print('Exiting...')
 

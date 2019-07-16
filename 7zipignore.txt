@@ -10,6 +10,7 @@ dist
 @Data
 MYDev_*
 MY_ArchHUD
+*/src/
 7z.exe
 7zip.bat
 7zipignore.txt
