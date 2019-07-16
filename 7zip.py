@@ -31,19 +31,21 @@ def __compress(addon):
                 if parts[1] == 'src.lua':
                     print('Already compressed...')
                     return
-                file_path = os.path.join('.', addon, parts[1].replace('\\', '/'))
+                file_path = os.path.join('.', addon, parts[1]).replace('\\', '/')
                 file_count = file_count + 1
                 squishy.write('Module "%d" "%s"\n' % (file_count, file_path))
     # 执行压缩
-    os.popen('lua "./!src-dist/tools/react/squish.lua" --minify-level=full')
+    os.popen('lua "./!src-dist/tools/react/squish.lua" --minify-level=full').read()
     # 添加加载脚本
     with open('./%s/src.lua' % addon, 'r+') as src:
         content = src.read()
         src.seek(0, 0)
         src.write('local package={preload={}}\n' + content)
     with open('./%s/src.lua' % addon, 'a') as src:
+        src.write('\nfor _, k in ipairs({')
         for i in range(1, file_count + 1):
-            src.write('\npackage.preload["%d"]()' % i)
+            src.write('\'%d\',' % i)
+        src.write('}) do package.preload[k]() end')
     print('Compress done...')
     # 更新子插件描述文件
     info_content = ''
@@ -151,7 +153,7 @@ def run(mode):
     print("File(s) compressing acomplete!")
     print("Url: " + dst_file)
 
-    os.popen('git reset HEAD --hard')
+    os.system('git reset HEAD --hard')
     time.sleep(5)
     print('Exiting...')
 
