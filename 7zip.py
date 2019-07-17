@@ -35,7 +35,7 @@ def __compress(addon):
                 file_count = file_count + 1
                 squishy.write('Module "%d" "%s"\n' % (file_count, file_path))
     # 执行压缩
-    os.popen('lua "./!src-dist/tools/react/squish.lua" --minify-level=full').read()
+    os.popen('lua "./!src-dist/tools/react/squish" --minify-level=full').read()
     # 添加加载脚本
     with open('./%s/src.lua' % addon, 'r+') as src:
         content = src.read()
