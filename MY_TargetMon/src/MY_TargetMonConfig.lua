@@ -45,6 +45,7 @@ if not LIB.AssertVersion('MY_TargetMon', _L['MY_TargetMon'], 0x2011800) then
 	return
 end
 local LANG = LIB.GetLang()
+local INIT_STATE = 'NONE'
 local C, D = { PASSPHRASE = {213, 166, 13}, PASSPHRASE_EMBEDDED = {211, 98, 5} }, {}
 local INI_PATH = LIB.GetAddonInfo().szRoot .. 'MY_TargetMon/ui/MY_TargetMon.ini'
 local ROLE_CONFIG_FILE = {'config/my_targetmon.jx3dat', PATH_TYPE.ROLE}
@@ -100,11 +101,11 @@ function D.GetConfigCaption(config)
 end
 
 -- 格式化监控项数据
-function D.FormatConfig(config)
-	return LIB.FormatDataStructure(config, CONFIG_TEMPLATE)
+function D.FormatConfig(config, bCoroutine)
+	return LIB.FormatDataStructure(config, CONFIG_TEMPLATE, nil, nil, bCoroutine)
 end
 
-function D.LoadEmbeddedConfig()
+function D.LoadEmbeddedConfig(bCoroutine)
 	if not IsString(C.PASSPHRASE) or not IsString(C.PASSPHRASE_EMBEDDED) then
 		return LIB.Debug({'Passphrase cannot be empty!'}, 'MY_TargetMonConfig', DEBUG_LEVEL.ERROR)
 	end
@@ -124,10 +125,10 @@ function D.LoadEmbeddedConfig()
 				data = DecodeLUAData(data)
 				if IsArray(data) then
 					for k, p in ipairs(data) do
-						data[k] = D.FormatConfig(p)
+						data[k] = D.FormatConfig(p, bCoroutine)
 					end
 				else
-					data = D.FormatConfig(data)
+					data = D.FormatConfig(data, bCoroutine)
 				end
 				data = 'return ' .. EncodeLUAData(data)
 			end
@@ -143,7 +144,7 @@ function D.LoadEmbeddedConfig()
 					if IsTable(config) and config.uuid then
 						config.group = ''
 						config.sort = i
-						LIB.SaveLUAData(EMBEDDED_CONFIG_ROOT .. config.uuid .. '.' .. LANG .. '.jx3dat', D.FormatConfig(config), { passphrase = C.PASSPHRASE_EMBEDDED })
+						LIB.SaveLUAData(EMBEDDED_CONFIG_ROOT .. config.uuid .. '.' .. LANG .. '.jx3dat', D.FormatConfig(config, bCoroutine), { passphrase = C.PASSPHRASE_EMBEDDED })
 					end
 				end
 			end
@@ -181,7 +182,7 @@ function D.LoadEmbeddedConfig()
 		if config and config.uuid and config.monitors then
 			local embedded = config
 			if LANG ~= 'zhcn' then
-				embedded = D.FormatConfig(config)
+				embedded = D.FormatConfig(config, bCoroutine)
 			end
 			if embedded then
 				-- 默认禁用
@@ -219,7 +220,7 @@ local SHIELDED_UUID = LIB.ArrayToObject({
 	'000001B6A2BCF6F0',
 })
 -- 通过内嵌数据将监控项转为Patch
-function D.PatchToConfig(patch)
+function D.PatchToConfig(patch, bCoroutine)
 	-- 处理用户删除的内建数据和不合法的数据
 	if patch.delete or not patch.uuid or (LIB.IsShieldedVersion() and not IsDebugClient() and SHIELDED_UUID[patch.uuid]) then
 		return
@@ -294,7 +295,7 @@ function D.PatchToConfig(patch)
 			config[k] = Clone(v)
 		end
 	end
-	return D.FormatConfig(config)
+	return D.FormatConfig(config, bCoroutine)
 end
 
 -- 通过内嵌数据将Patch转为监控项
@@ -379,7 +380,7 @@ function D.UpdateTargetList()
 	CONFIG_BUFF_TARGET_LIST, CONFIG_SKILL_TARGET_LIST = aBuffTarget, aSkillTarget
 end
 
-function D.LoadConfig(bDefault, bOriginal)
+function D.LoadConfig(bDefault, bOriginal, bCoroutine)
 	local aPatch
 	if not bDefault then
 		aPatch = LIB.LoadLUAData(ROLE_CONFIG_FILE, { passphrase = C.PASSPHRASE }) or LIB.LoadLUAData(ROLE_CONFIG_FILE)
@@ -404,7 +405,7 @@ function D.LoadConfig(bDefault, bOriginal)
 		if embedded.uuid and not tLoaded[embedded.uuid] then
 			local config = embedded
 			if LANG ~= 'zhcn' then
-				config = D.FormatConfig(config)
+				config = D.FormatConfig(config, bCoroutine)
 			end
 			if config then
 				config.embedded = true
@@ -420,7 +421,9 @@ function D.LoadConfig(bDefault, bOriginal)
 	CONFIG = aConfig
 	CONFIG_CHANGED = bDefault and true or false
 	D.UpdateTargetList()
-	FireUIEvent('MY_TARGET_MON_CONFIG_INIT')
+	if INIT_STATE == 'DONE' then
+		FireUIEvent('MY_TARGET_MON_CONFIG_INIT')
+	end
 end
 
 function D.SaveConfig(bDefault)
@@ -532,34 +535,45 @@ function D.ExportPatchFile(oFilePath, aUUID, szIndent, bAsEmbedded)
 	LIB.SaveLUAData(oFilePath, aPatch, { indent = szIndent, crc = not szIndent, passphrase = szPassphrase })
 end
 
-do
-local function onInit()
-	local k = char(80, 65, 83, 83, 80, 72, 82, 65, 83, 69)
-	if IsTable(C[k]) then
-		for i = 0, 50 do
-			for j, v in ipairs({ 253, 12, 34, 56 }) do
-				insert(C[k], (i * j * ((3 * v) % 256)) % 256)
+function D.Init(bNoCoroutine)
+	if INIT_STATE == 'NONE' then
+		local k = char(80, 65, 83, 83, 80, 72, 82, 65, 83, 69)
+		if IsTable(C[k]) then
+			for i = 0, 50 do
+				for j, v in ipairs({ 253, 12, 34, 56 }) do
+					insert(C[k], (i * j * ((3 * v) % 256)) % 256)
+				end
 			end
+			C[k] = char(unpack(C[k]))
 		end
-		C[k] = char(unpack(C[k]))
-	end
-	local k = char(80, 65, 83, 83, 80, 72, 82, 65, 83, 69, 95, 69, 77, 66, 69, 68, 68, 69, 68)
-	if IsTable(C[k]) then
-		for i = 0, 50 do
-			for j, v in ipairs({ 253, 12, 34, 56 }) do
-				insert(C[k], (i * j * ((15 * v) % 256)) % 256)
+		local k = char(80, 65, 83, 83, 80, 72, 82, 65, 83, 69, 95, 69, 77, 66, 69, 68, 68, 69, 68)
+		if IsTable(C[k]) then
+			for i = 0, 50 do
+				for j, v in ipairs({ 253, 12, 34, 56 }) do
+					insert(C[k], (i * j * ((15 * v) % 256)) % 256)
+				end
 			end
+			C[k] = char(unpack(C[k]))
 		end
-		C[k] = char(unpack(C[k]))
+		INIT_STATE = 'WAIT_CONFIG'
 	end
-	if CONFIG then
-		return
+	if INIT_STATE == 'WAIT_CONFIG' then
+		LIB.RegisterCoroutine('MY_TargetMonConfig', function()
+			D.LoadEmbeddedConfig(true)
+			D.LoadConfig(nil, nil, true)
+			INIT_STATE = 'DONE'
+			FireUIEvent('MY_TARGET_MON_CONFIG_INIT')
+		end)
+		INIT_STATE = 'LOADING_CONFIG'
 	end
-	D.LoadEmbeddedConfig()
-	D.LoadConfig()
+	if INIT_STATE == 'LOADING_CONFIG' and bNoCoroutine then
+		LIB.FinishCoroutine('MY_TargetMonConfig')
+	end
+	return INIT_STATE == 'DONE'
 end
-LIB.RegisterInit('MY_TargetMonConfig', onInit)
+LIB.RegisterInit('MY_TargetMonConfig', D.Init)
 
+do
 local function onExit()
 	if not D.HasConfigChanged() then
 		return
@@ -574,6 +588,7 @@ function D.GetConfig()
 end
 
 function D.GetConfigList(bNoEmbedded)
+	D.Init(true)
 	if bNoEmbedded then
 		local a = {}
 		for _, config in ipairs(CONFIG) do
