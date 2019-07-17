@@ -31,7 +31,7 @@ local var2str, str2var, ipairs_r = LIB.var2str, LIB.str2var, LIB.ipairs_r
 local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
 local GetTraceback, Call, XpCall = LIB.GetTraceback, LIB.Call, LIB.XpCall
 local Get, Set, RandomChild = LIB.Get, LIB.Set, LIB.RandomChild
-local GetPatch, ApplyPatch, clone, FullClone = LIB.GetPatch, LIB.ApplyPatch, LIB.clone, LIB.FullClone
+local GetPatch, ApplyPatch, Clone = LIB.GetPatch, LIB.ApplyPatch, LIB.Clone
 local IsArray, IsDictionary, IsEquals = LIB.IsArray, LIB.IsDictionary, LIB.IsEquals
 local IsNumber, IsHugeNumber = LIB.IsNumber, LIB.IsHugeNumber
 local IsNil, IsBoolean, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsFunction
@@ -1421,7 +1421,7 @@ function UI:autocomplete(method, arg1, arg2)
 		-- try to get its option
 		local raw = self.raws[1]
 		if raw then
-			return clone(GetComponentProp(raw, 'autocompleteOptions'))
+			return Clone(GetComponentProp(raw, 'autocompleteOptions'))
 		end
 	else -- set
 		if method == 'option' then
@@ -1614,7 +1614,7 @@ function UI:listbox(method, arg1, arg2, arg3, arg4)
 		-- try to get its option
 		local raw = self.raws[1]
 		if raw then
-			return clone(GetComponentProp(raw, 'listboxOptions'))
+			return Clone(GetComponentProp(raw, 'listboxOptions'))
 		end
 	else -- set
 		if method == 'option' then

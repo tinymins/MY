@@ -31,7 +31,7 @@ local var2str, str2var, ipairs_r = LIB.var2str, LIB.str2var, LIB.ipairs_r
 local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
 local GetTraceback, Call, XpCall = LIB.GetTraceback, LIB.Call, LIB.XpCall
 local Get, Set, RandomChild = LIB.Get, LIB.Set, LIB.RandomChild
-local GetPatch, ApplyPatch, clone, FullClone = LIB.GetPatch, LIB.ApplyPatch, LIB.clone, LIB.FullClone
+local GetPatch, ApplyPatch, Clone = LIB.GetPatch, LIB.ApplyPatch, LIB.Clone
 local IsArray, IsDictionary, IsEquals = LIB.IsArray, LIB.IsDictionary, LIB.IsEquals
 local IsNumber, IsHugeNumber = LIB.IsNumber, LIB.IsHugeNumber
 local IsNil, IsBoolean, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsFunction
@@ -213,7 +213,7 @@ function D.SetConfigureName(szConfigName)
 		end
 		MY_Cataclysm.szConfigName = szConfigName
 	end
-	D.SetConfig(LIB.LoadLUAData(D.GetConfigurePath()) or clone(CTM_CONFIG_DEFAULT))
+	D.SetConfig(LIB.LoadLUAData(D.GetConfigurePath()) or Clone(CTM_CONFIG_DEFAULT))
 end
 
 function D.GetFrame()
@@ -1143,7 +1143,7 @@ function D.ConfirmRestoreConfig()
 		{
 			szOption = _L['Official style'],
 			fnAction = function()
-				local Config = clone(CTM_CONFIG_OFFICIAL)
+				local Config = Clone(CTM_CONFIG_OFFICIAL)
 				Config.aBuffList = CTM_CONFIG_PLAYER.aBuffList
 				D.SetConfig(Config)
 				D.CheckEnableTeamPanel()
@@ -1153,7 +1153,7 @@ function D.ConfirmRestoreConfig()
 		{
 			szOption = _L['Cataclysm style'],
 			fnAction = function()
-				local Config = clone(CTM_CONFIG_CATACLYSM)
+				local Config = Clone(CTM_CONFIG_CATACLYSM)
 				Config.aBuffList = CTM_CONFIG_PLAYER.aBuffList
 				D.SetConfig(Config)
 				D.CheckEnableTeamPanel()

@@ -31,7 +31,7 @@ local var2str, str2var, ipairs_r = LIB.var2str, LIB.str2var, LIB.ipairs_r
 local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
 local GetTraceback, Call, XpCall = LIB.GetTraceback, LIB.Call, LIB.XpCall
 local Get, Set, RandomChild = LIB.Get, LIB.Set, LIB.RandomChild
-local GetPatch, ApplyPatch, clone, FullClone = LIB.GetPatch, LIB.ApplyPatch, LIB.clone, LIB.FullClone
+local GetPatch, ApplyPatch, Clone = LIB.GetPatch, LIB.ApplyPatch, LIB.Clone
 local IsArray, IsDictionary, IsEquals = LIB.IsArray, LIB.IsDictionary, LIB.IsEquals
 local IsNumber, IsHugeNumber = LIB.IsNumber, LIB.IsHugeNumber
 local IsNil, IsBoolean, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsFunction
@@ -45,7 +45,7 @@ end
 local DefaultAnchor = {s = 'CENTER', r = 'CENTER',  x = 0, y = 0}
 MY_ArchHUD = {}
 MY_ArchHUD.bOn = false
-MY_ArchHUD.Anchor = clone(DefaultAnchor)
+MY_ArchHUD.Anchor = Clone(DefaultAnchor)
 MY_ArchHUD.bFightShow = true
 MY_ArchHUD.bShowCastingBar = true
 MY_ArchHUD.nAlpha = 60
@@ -325,7 +325,7 @@ function MY_ArchHUD.OnEvent(event)
 		MY_ArchHUD.Anchor = GetFrameAnchor(this)
 		UpdateCustomModeWindow(this, _L['MY_ArchHUD'], true)
 	elseif event == 'CUSTOM_UI_MODE_SET_DEFAULT' then
-		MY_ArchHUD.Anchor = clone(DefaultAnchor)
+		MY_ArchHUD.Anchor = Clone(DefaultAnchor)
 		MY_ArchHUD.UpdateAnchor(this)
 	end
 end

@@ -31,7 +31,7 @@ local var2str, str2var, ipairs_r = LIB.var2str, LIB.str2var, LIB.ipairs_r
 local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
 local GetTraceback, Call, XpCall = LIB.GetTraceback, LIB.Call, LIB.XpCall
 local Get, Set, RandomChild = LIB.Get, LIB.Set, LIB.RandomChild
-local GetPatch, ApplyPatch, clone, FullClone = LIB.GetPatch, LIB.ApplyPatch, LIB.clone, LIB.FullClone
+local GetPatch, ApplyPatch, Clone = LIB.GetPatch, LIB.ApplyPatch, LIB.Clone
 local IsArray, IsDictionary, IsEquals = LIB.IsArray, LIB.IsDictionary, LIB.IsEquals
 local IsNumber, IsHugeNumber = LIB.IsNumber, LIB.IsHugeNumber
 local IsNil, IsBoolean, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsFunction
@@ -522,7 +522,7 @@ local function FormatDataStructure(data, struct, assign, metaSymbol)
 	-- 分别处理类型匹配与不匹配的情况
 	if dataTypeExists then
 		if not assign then
-			data = FullClone(data)
+			data = Clone(data, true)
 		end
 		local keys, skipKeys = {}, {}
 		-- 数据类型是表且默认数据也是表 则递归检查子元素与默认子元素
@@ -595,7 +595,7 @@ local function FormatDataStructure(data, struct, assign, metaSymbol)
 				data[k] = FormatDataStructure(nil, v, true, metaSymbol)
 			end
 		else -- 默认值不是表 直接克隆数据
-			data = FullClone(defaultData)
+			data = Clone(defaultData, true)
 		end
 	end
 	return data

@@ -31,7 +31,7 @@ local var2str, str2var, ipairs_r = LIB.var2str, LIB.str2var, LIB.ipairs_r
 local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
 local GetTraceback, Call, XpCall = LIB.GetTraceback, LIB.Call, LIB.XpCall
 local Get, Set, RandomChild = LIB.Get, LIB.Set, LIB.RandomChild
-local GetPatch, ApplyPatch, clone, FullClone = LIB.GetPatch, LIB.ApplyPatch, LIB.clone, LIB.FullClone
+local GetPatch, ApplyPatch, Clone = LIB.GetPatch, LIB.ApplyPatch, LIB.Clone
 local IsArray, IsDictionary, IsEquals = LIB.IsArray, LIB.IsDictionary, LIB.IsEquals
 local IsNumber, IsHugeNumber = LIB.IsNumber, LIB.IsHugeNumber
 local IsNil, IsBoolean, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsFunction
@@ -165,7 +165,7 @@ function LIB.CopyChatLine(hTime, bTextEditor)
 				elseif szName == 'enchantlink' then
 					edit:InsertObj(szText, { type = 'enchant', text = szText, proid = p.dwProID, craftid = p.dwCraftID, recipeid = p.dwRecipeID })
 				elseif szName == 'skilllink' then
-					local o = clone(p.skillKey)
+					local o = Clone(p.skillKey)
 					o.type, o.text = 'skill', szText
 					edit:InsertObj(szText, o)
 				elseif szName =='skillrecipelink' then
@@ -418,7 +418,7 @@ function LIB.CopyChatItem(p)
 		elseif szName == 'enchantlink' then
 			edit:InsertObj(szText, { type = 'enchant', text = szText, proid = p.dwProID, craftid = p.dwCraftID, recipeid = p.dwRecipeID })
 		elseif szName == 'skilllink' then
-			local o = clone(p.skillKey)
+			local o = Clone(p.skillKey)
 			o.type, o.text = 'skill', szText
 			edit:InsertObj(szText, o)
 		elseif szName =='skillrecipelink' then
@@ -637,7 +637,7 @@ function LIB.GetChatEmotion(arg0, arg1, arg2)
 		arg0 = string.gsub(arg0, '\\\\', '\\')
 		t = EMOTION_CACHE[arg0..','..arg1..','..arg2]
 	end
-	return clone(t)
+	return Clone(t)
 end
 
 -- parse faceicon in talking message

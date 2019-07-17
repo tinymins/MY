@@ -31,7 +31,7 @@ local var2str, str2var, ipairs_r = LIB.var2str, LIB.str2var, LIB.ipairs_r
 local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
 local GetTraceback, Call, XpCall = LIB.GetTraceback, LIB.Call, LIB.XpCall
 local Get, Set, RandomChild = LIB.Get, LIB.Set, LIB.RandomChild
-local GetPatch, ApplyPatch, clone, FullClone = LIB.GetPatch, LIB.ApplyPatch, LIB.clone, LIB.FullClone
+local GetPatch, ApplyPatch, Clone = LIB.GetPatch, LIB.ApplyPatch, LIB.Clone
 local IsArray, IsDictionary, IsEquals = LIB.IsArray, LIB.IsDictionary, LIB.IsEquals
 local IsNumber, IsHugeNumber = LIB.IsNumber, LIB.IsHugeNumber
 local IsNil, IsBoolean, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsFunction
@@ -96,10 +96,10 @@ local PUBLIC_DEFAULT = {
 	},
 }
 for k, v in pairs(PRIVATE_DEFAULT) do
-	O[k] = clone(v)
+	O[k] = Clone(v)
 end
 for k, v in pairs(PUBLIC_DEFAULT) do
-	O[k] = clone(v)
+	O[k] = Clone(v)
 end
 RegisterCustomData('MY_Focus.tAutoFocus')
 RegisterCustomData('MY_Focus.tFocusList')
@@ -163,7 +163,7 @@ function D.LoadPublicConfig()
 	local config = LIB.LoadLUAData({'config/focus/' .. O.szStyle .. '.jx3dat', PATH_TYPE.GLOBAL}) or {}
 	for k, v in pairs(PUBLIC_DEFAULT) do
 		if IsNil(config[k]) then
-			O[k] = clone(v)
+			O[k] = Clone(v)
 		else
 			O[k] = config[k]
 		end
@@ -222,7 +222,7 @@ function D.LoadConfig()
 	local config = LIB.LoadLUAData({'config/focus.jx3dat', PATH_TYPE.ROLE}) or {}
 	for k, v in pairs(PRIVATE_DEFAULT) do
 		if IsNil(config[k]) then
-			O[k] = clone(v)
+			O[k] = Clone(v)
 		else
 			O[k] = config[k]
 		end
@@ -271,7 +271,7 @@ function D.OnConfigChange(k, v)
 end
 
 function D.GetAllFocusPattern()
-	return clone(O.aPatternFocus)
+	return Clone(O.aPatternFocus)
 end
 
 -- 添加、修改默认焦点

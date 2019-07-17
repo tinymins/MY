@@ -174,44 +174,9 @@ Log('[MY] Debug level ' .. _DEBUG_LEVEL_ .. ' / delog level ' .. _DELOG_LEVEL_)
 -- 通用函数
 ---------------------------------------------------------------------------------------------
 -----------------------------------------------
--- 克隆数据（不包括函数和C对象）
+-- 克隆数据
 -----------------------------------------------
-local function clone(var)
-	local szType = type(var)
-	if szType == 'nil'
-	or szType == 'boolean'
-	or szType == 'number'
-	or szType == 'string' then
-		return var
-	elseif szType == 'table' then
-		local t = {}
-		for key, val in pairs(var) do
-			key = clone(key)
-			val = clone(val)
-			t[key] = val
-		end
-		return t
-	elseif szType == 'function'
-	or szType == 'userdata' then
-		return nil
-	else
-		return nil
-	end
-end
------------------------------------------------
--- 深度克隆数据
------------------------------------------------
-local function FullClone(var)
-	if type(var) == 'table' then
-		local ret = {}
-		for k, v in pairs(var) do
-			ret[FullClone(k)] = FullClone(v)
-		end
-		return ret
-	else
-		return var
-	end
-end
+local Clone = clone
 -----------------------------------------------
 -- Lua数据序列化
 -----------------------------------------------
@@ -542,8 +507,8 @@ end
 -----------------------------------------------
 local function ApplyPatch(oBase, oPatch, bNew)
 	if bNew ~= false then
-		oBase = clone(oBase)
-		oPatch = clone(oPatch)
+		oBase = Clone(oBase)
+		oPatch = Clone(oPatch)
 	end
 	-- patch in dictionary type can only be a special value patch
 	if IsDictionary(oPatch) then
@@ -787,8 +752,7 @@ local EMPTY_TABLE = SetmetaReadonly({})
 local XML_LINE_BREAKER = GetFormatText('\n')
 ---------------------------------------------------------------------------------------------
 local LIB = {
-	clone        = clone       ,
-	FullClone    = FullClone   ,
+	Clone        = Clone       ,
 	var2str      = var2str     ,
 	str2var      = str2var     ,
 	ipairs_r     = ipairs_r    ,

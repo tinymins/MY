@@ -31,7 +31,7 @@ local var2str, str2var, ipairs_r = LIB.var2str, LIB.str2var, LIB.ipairs_r
 local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
 local GetTraceback, Call, XpCall = LIB.GetTraceback, LIB.Call, LIB.XpCall
 local Get, Set, RandomChild = LIB.Get, LIB.Set, LIB.RandomChild
-local GetPatch, ApplyPatch, clone, FullClone = LIB.GetPatch, LIB.ApplyPatch, LIB.clone, LIB.FullClone
+local GetPatch, ApplyPatch, Clone = LIB.GetPatch, LIB.ApplyPatch, LIB.Clone
 local IsArray, IsDictionary, IsEquals = LIB.IsArray, LIB.IsDictionary, LIB.IsEquals
 local IsNumber, IsHugeNumber = LIB.IsNumber, LIB.IsHugeNumber
 local IsNil, IsBoolean, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsFunction
@@ -59,7 +59,7 @@ local function StringifySysmsgObject(aMsg, oContent, cfg, bTitle)
 	end
 	-- 格式化输出正文
 	for _, v in ipairs(oContent) do
-		local tContent, aPart = setmetatable(IsTable(v) and clone(v) or {v}, { __index = cfgContent }), {}
+		local tContent, aPart = setmetatable(IsTable(v) and Clone(v) or {v}, { __index = cfgContent }), {}
 		for _, oPart in ipairs(tContent) do
 			insert(aPart, tostring(oPart))
 		end

@@ -31,7 +31,7 @@ local var2str, str2var, ipairs_r = LIB.var2str, LIB.str2var, LIB.ipairs_r
 local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
 local GetTraceback, Call, XpCall = LIB.GetTraceback, LIB.Call, LIB.XpCall
 local Get, Set, RandomChild = LIB.Get, LIB.Set, LIB.RandomChild
-local GetPatch, ApplyPatch, clone, FullClone = LIB.GetPatch, LIB.ApplyPatch, LIB.clone, LIB.FullClone
+local GetPatch, ApplyPatch, Clone = LIB.GetPatch, LIB.ApplyPatch, LIB.Clone
 local IsArray, IsDictionary, IsEquals = LIB.IsArray, LIB.IsDictionary, LIB.IsEquals
 local IsNumber, IsHugeNumber = LIB.IsNumber, LIB.IsHugeNumber
 local IsNil, IsBoolean, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsFunction
@@ -230,14 +230,14 @@ function D.PatchToConfig(patch)
 		for k, v in pairs(embedded) do
 			if k ~= 'monitors' then
 				if patch[k] == nil then
-					config[k] = clone(v)
+					config[k] = Clone(v)
 				end
 			end
 		end
 		-- 设置改变过的数据
 		for k, v in pairs(patch) do
 			if k ~= 'monitors' then
-				config[k] = clone(v)
+				config[k] = Clone(v)
 			end
 		end
 		-- 设置监控项内嵌数据删除项和自定义项
@@ -251,10 +251,10 @@ function D.PatchToConfig(patch)
 						if mon.patch then
 							insert(monitors, ApplyPatch(monEmbedded, mon.patch))
 						else
-							insert(monitors, clone(monEmbedded))
+							insert(monitors, Clone(monEmbedded))
 						end
 					elseif not mon.embedded and not mon.patch and mon.manually ~= false then -- 删除当前版本不存在的内嵌数据
-						insert(monitors, clone(mon))
+						insert(monitors, Clone(mon))
 					end
 				end
 				existMon[mon.uuid] = true
@@ -273,9 +273,9 @@ function D.PatchToConfig(patch)
 					end
 				end
 				if nIndex then
-					insert(monitors, nIndex, clone(monEmbedded))
+					insert(monitors, nIndex, Clone(monEmbedded))
 				else
-					insert(monitors, clone(monEmbedded))
+					insert(monitors, Clone(monEmbedded))
 				end
 				existMon[monEmbedded.uuid] = true
 			end
@@ -290,7 +290,7 @@ function D.PatchToConfig(patch)
 			return
 		end
 		for k, v in pairs(patch) do
-			config[k] = clone(v)
+			config[k] = Clone(v)
 		end
 	end
 	return D.FormatConfig(config)
@@ -308,7 +308,7 @@ function D.ConfigToPatch(config)
 		-- 保存修改的全局属性
 		for k, v in pairs(config) do
 			if k ~= 'monitors' and not IsEquals(v, embedded[k]) then
-				patch[k] = clone(v)
+				patch[k] = Clone(v)
 			end
 		end
 		-- 保存监控项添加以及排序修改的部分
@@ -325,7 +325,7 @@ function D.ConfigToPatch(config)
 				})
 			else
 				-- 自己添加的监控
-				insert(monitors, clone(mon))
+				insert(monitors, Clone(mon))
 			end
 			existMon[mon.uuid] = true
 		end
@@ -341,7 +341,7 @@ function D.ConfigToPatch(config)
 		patch.monitors = monitors
 	else
 		for k, v in pairs(config) do
-			patch[k] = clone(v)
+			patch[k] = Clone(v)
 		end
 	end
 	return patch

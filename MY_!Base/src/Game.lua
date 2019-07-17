@@ -31,7 +31,7 @@ local var2str, str2var, ipairs_r = LIB.var2str, LIB.str2var, LIB.ipairs_r
 local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
 local GetTraceback, Call, XpCall = LIB.GetTraceback, LIB.Call, LIB.XpCall
 local Get, Set, RandomChild = LIB.Get, LIB.Set, LIB.RandomChild
-local GetPatch, ApplyPatch, clone, FullClone = LIB.GetPatch, LIB.ApplyPatch, LIB.clone, LIB.FullClone
+local GetPatch, ApplyPatch, Clone = LIB.GetPatch, LIB.ApplyPatch, LIB.Clone
 local IsArray, IsDictionary, IsEquals = LIB.IsArray, LIB.IsDictionary, LIB.IsEquals
 local IsNumber, IsHugeNumber = LIB.IsNumber, LIB.IsHugeNumber
 local IsNil, IsBoolean, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsFunction
@@ -1441,7 +1441,7 @@ function LIB.GetFriendList(arg0)
 		elseif type(arg0) == 'string' then
 			for _, group in ipairs(FRIEND_LIST_BY_GROUP) do
 				if group.name == arg0 then
-					table.insert(tGroup, clone(group))
+					table.insert(tGroup, Clone(group))
 				end
 			end
 		else
@@ -1450,7 +1450,7 @@ function LIB.GetFriendList(arg0)
 		local n = 0
 		for _, group in ipairs(tGroup) do
 			for _, p in ipairs(group) do
-				t[p.id], n = clone(p), n + 1
+				t[p.id], n = Clone(p), n + 1
 			end
 		end
 	end
@@ -1461,9 +1461,9 @@ end
 function LIB.GetFriend(arg0)
 	if arg0 and GeneFriendListCache() then
 		if type(arg0) == 'number' then
-			return clone(FRIEND_LIST_BY_ID[arg0])
+			return Clone(FRIEND_LIST_BY_ID[arg0])
 		elseif type(arg0) == 'string' then
-			return clone(FRIEND_LIST_BY_NAME[arg0])
+			return Clone(FRIEND_LIST_BY_NAME[arg0])
 		end
 	end
 end
@@ -1507,7 +1507,7 @@ LIB.RegisterEvent('PLAYER_FOE_UPDATE', OnFoeListChange)
 -- 获取仇人列表
 function LIB.GetFoeList()
 	if GeneFoeListCache() then
-		return clone(FOE_LIST)
+		return Clone(FOE_LIST)
 	end
 end
 -- 获取仇人
@@ -2656,7 +2656,7 @@ function LIB.GetMarkName(nIndex)
 	if nIndex then
 		return MARK_NAME[nIndex]
 	else
-		return clone(MARK_NAME)
+		return Clone(MARK_NAME)
 	end
 end
 
