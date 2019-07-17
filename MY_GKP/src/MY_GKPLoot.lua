@@ -27,11 +27,12 @@ local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
 local LIB = MY
 local UI, DEBUG_LEVEL, PATH_TYPE = LIB.UI, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local var2str, str2var, ipairs_r = LIB.var2str, LIB.str2var, LIB.ipairs_r
+local ipairs_r = LIB.ipairs_r
 local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
 local GetTraceback, Call, XpCall = LIB.GetTraceback, LIB.Call, LIB.XpCall
 local Get, Set, RandomChild = LIB.Get, LIB.Set, LIB.RandomChild
 local GetPatch, ApplyPatch, Clone = LIB.GetPatch, LIB.ApplyPatch, LIB.Clone
+local EncodeLUAData, DecodeLUAData = LIB.EncodeLUAData, LIB.DecodeLUAData
 local IsArray, IsDictionary, IsEquals = LIB.IsArray, LIB.IsDictionary, LIB.IsEquals
 local IsNumber, IsHugeNumber = LIB.IsNumber, LIB.IsHugeNumber
 local IsNil, IsBoolean, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsFunction
@@ -388,7 +389,7 @@ function MY_GKP_Loot.OnItemMouseEnter()
 		local hItem = szName == 'Handle_Item' and this or this:GetParent()
 		local box   = hItem:Lookup('Box_Item')
 		if IsAltKeyDown() and not IsCtrlKeyDown() and not IsShiftKeyDown() then
-			LIB.OutputTip(this, var2str(hItem.itemData, '  ') .. '\n' .. var2str({
+			LIB.OutputTip(this, EncodeLUAData(hItem.itemData, '  ') .. '\n' .. EncodeLUAData({
 				nUiId = hItem.itemData.item.nUiId,
 				dwID = hItem.itemData.item.dwID,
 				nGenre = hItem.itemData.item.nGenre,

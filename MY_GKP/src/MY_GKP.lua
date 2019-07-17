@@ -27,11 +27,12 @@ local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
 local LIB = MY
 local UI, DEBUG_LEVEL, PATH_TYPE = LIB.UI, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local var2str, str2var, ipairs_r = LIB.var2str, LIB.str2var, LIB.ipairs_r
+local ipairs_r = LIB.ipairs_r
 local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
 local GetTraceback, Call, XpCall = LIB.GetTraceback, LIB.Call, LIB.XpCall
 local Get, Set, RandomChild = LIB.Get, LIB.Set, LIB.RandomChild
 local GetPatch, ApplyPatch, Clone = LIB.GetPatch, LIB.ApplyPatch, LIB.Clone
+local EncodeLUAData, DecodeLUAData = LIB.EncodeLUAData, LIB.DecodeLUAData
 local IsArray, IsDictionary, IsEquals = LIB.IsArray, LIB.IsDictionary, LIB.IsEquals
 local IsNumber, IsHugeNumber = LIB.IsNumber, LIB.IsHugeNumber
 local IsNil, IsBoolean, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsFunction
@@ -531,7 +532,7 @@ function MY_GKP.OnItemMouseEnter()
 		local szXml = GetFormatImage(szIcon,nFrame,20,20) .. GetFormatText('  ' .. data.szPlayer .. g_tStrings.STR_COLON .. '\n', 136, r, g, b)
 		if IsCtrlKeyDown() then
 			szXml = szXml .. GetFormatText(g_tStrings.DEBUG_INFO_ITEM_TIP .. '\n', 136, 255, 0, 0)
-			szXml = szXml .. GetFormatText(var2str(data, ' '), 136, 255, 255, 255)
+			szXml = szXml .. GetFormatText(EncodeLUAData(data, ' '), 136, 255, 255, 255)
 		else
 			szXml = szXml .. GetFormatText(_L['System Information as Shown Below\n\n'],136,255,255,255)
 			local nNum,nNum1,nNum2 = 0,0,0

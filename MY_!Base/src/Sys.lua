@@ -27,11 +27,12 @@ local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
 local LIB = MY
 local UI, DEBUG_LEVEL, PATH_TYPE = LIB.UI, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local var2str, str2var, ipairs_r = LIB.var2str, LIB.str2var, LIB.ipairs_r
+local ipairs_r = LIB.ipairs_r
 local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
 local GetTraceback, Call, XpCall = LIB.GetTraceback, LIB.Call, LIB.XpCall
 local Get, Set, RandomChild = LIB.Get, LIB.Set, LIB.RandomChild
 local GetPatch, ApplyPatch, Clone = LIB.GetPatch, LIB.ApplyPatch, LIB.Clone
+local EncodeLUAData, DecodeLUAData = LIB.EncodeLUAData, LIB.DecodeLUAData
 local IsArray, IsDictionary, IsEquals = LIB.IsArray, LIB.IsDictionary, LIB.IsEquals
 local IsNumber, IsHugeNumber = LIB.IsNumber, LIB.IsHugeNumber
 local IsNil, IsBoolean, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsFunction
@@ -892,14 +893,14 @@ LIB.BreatheCall(LIB.GetAddonInfo().szNameSpace .. '#STORAGE_DATA', 200, function
 			local data = LIB.JsonDecode(html)
 			if data then
 				for k, v in pairs(data.public or EMPTY_TABLE) do
-					local oData = str2var(v)
+					local oData = DecodeLUAData(v)
 					if oData then
 						FireUIEvent('MY_PUBLIC_STORAGE_UPDATE', k, oData)
 					end
 				end
 				for k, v in pairs(data.private or EMPTY_TABLE) do
 					if not m_nStorageVer[k] or m_nStorageVer[k] < v.v then
-						local oData = str2var(v.o)
+						local oData = DecodeLUAData(v.o)
 						if oData ~= nil then
 							FireUIEvent('MY_PRIVATE_STORAGE_UPDATE', k, oData)
 						end
@@ -1763,7 +1764,7 @@ function LIB.ConnectDatabase(szCaption, oPath, fnAction)
 	else
 		LIB.Debug({'Malformed database detected...'}, szCaption, DEBUG_LEVEL.ERROR)
 		for _, rec in ipairs(aRes or {}) do
-			LIB.Debug({var2str(rec)}, szCaption, DEBUG_LEVEL.ERROR)
+			LIB.Debug({EncodeLUAData(rec)}, szCaption, DEBUG_LEVEL.ERROR)
 		end
 		DB:Release()
 		if fnAction then

@@ -180,124 +180,15 @@ local Clone = clone
 -----------------------------------------------
 -- Lua数据序列化
 -----------------------------------------------
-local var2str
-do
-local function empty(var)
-	local szType = type(var)
-	if szType == 'nil' then
-		return true
-	elseif szType == 'boolean' then
-		return var
-	elseif szType == 'number' then
-		return var == 0
-	elseif szType == 'string' then
-		return var == ''
-	elseif szType == 'function' then
-		return false
-	elseif szType == 'table' then
-		for _, _ in pairs(var) do
-			return false
-		end
-		return true
-	else
-		return false
-	end
-end
-local function table_r(var, level, indent)
-	local t = {}
-	local szType = type(var)
-	if szType == 'nil' then
-		insert(t, 'nil')
-	elseif szType == 'number' then
-		insert(t, tostring(var))
-	elseif szType == 'string' then
-		insert(t, string.format('%q', var))
-	elseif szType == 'function' then
-		local s = string.dump(var)
-		insert(t, 'loadstring("')
-		-- 'string slice too long'
-		for i = 1, #s, 2000 do
-			insert(t, concat({'', byte(s, i, i + 2000 - 1)}, '\\'))
-		end
-		insert(t, '")')
-	elseif szType == 'boolean' then
-		insert(t, tostring(var))
-	elseif szType == 'table' then
-		insert(t, '{')
-		local s_tab_equ = '='
-		if indent then
-			s_tab_equ = ' = '
-			if not empty(var) then
-				insert(t, '\n')
-			end
-		end
-		local nohash = true
-		local key, val, lastkey, lastval, hasval
-		local tlist, thash = {}, {}
-		repeat
-			key, val = next(var, lastkey)
-			if key then
-				-- judge if this is a pure list table
-				if nohash and (
-					type(key) ~= 'number'
-					or (lastval == nil and key ~= 1) -- first loop and index is not 1 : hash table
-					or (lastkey and lastkey + 1 ~= key)
-				) then
-					nohash = false
-				end
-				-- process to insert to table
-				-- insert indent
-				if indent then
-					insert(t, rep(indent, level + 1))
-				end
-				-- insert key
-				if nohash then -- pure list: do not need a key
-				elseif type(key) == 'string' and key:find('^[a-zA-Z_][a-zA-Z0-9_]*$') then -- a = val
-					insert(t, key)
-					insert(t, s_tab_equ)
-				else -- [10010] = val -- ['.start with or contains special char'] = val
-					insert(t, '[')
-					insert(t, table_r(key, level + 1, indent))
-					insert(t, ']')
-					insert(t, s_tab_equ)
-				end
-				-- insert value
-				insert(t, table_r(val, level + 1, indent))
-				insert(t, ',')
-				if indent then
-					insert(t, '\n')
-				end
-				lastkey, lastval, hasval = key, val, true
-			end
-		until not key
-		-- remove last `,` if no indent
-		if not indent and hasval then
-			remove(t)
-		end
-		-- insert `}` with indent
-		if indent and not empty(var) then
-			insert(t, rep(indent, level))
-		end
-		insert(t, '}')
-	else --if (szType == 'userdata') then
-		insert(t, '"')
-		insert(t, tostring(var))
-		insert(t, '"')
-	end
-	return concat(t)
-end
-function var2str(var, indent, level)
-	return table_r(var, level or 0, indent)
-end
-end
+local EncodeLUAData = var2str
 -----------------------------------------------
 -- Lua数据反序列化
 -----------------------------------------------
-local str2var = str2var
-if not str2var then
+local DecodeLUAData = str2var
+if not DecodeLUAData then
 local szTempLog = 'interface/temp.log'
 local szTempJx3dat = 'interface/temp.jx3dat'
-function str2var(szText)
+function DecodeLUAData(szText)
 	Log(szTempLog, szText, 'clear close')
 	CPath.Move(szTempLog, szTempJx3dat)
 	local data = LoadLUAData(szTempJx3dat)
@@ -752,36 +643,36 @@ local EMPTY_TABLE = SetmetaReadonly({})
 local XML_LINE_BREAKER = GetFormatText('\n')
 ---------------------------------------------------------------------------------------------
 local LIB = {
-	Clone        = Clone       ,
-	var2str      = var2str     ,
-	str2var      = str2var     ,
-	ipairs_r     = ipairs_r    ,
-	spairs       = spairs      ,
-	spairs_r     = spairs_r    ,
-	sipairs      = sipairs     ,
-	sipairs_r    = sipairs_r   ,
-	IsArray      = IsArray     ,
-	IsDictionary = IsDictionary,
-	IsEquals     = IsEquals    ,
-	IsNil        = IsNil       ,
-	IsBoolean    = IsBoolean   ,
-	IsNumber     = IsNumber    ,
-	IsUserdata   = IsUserdata  ,
-	IsHugeNumber = IsHugeNumber,
-	IsEmpty      = IsEmpty     ,
-	IsString     = IsString    ,
-	IsTable      = IsTable     ,
-	IsFunction   = IsFunction  ,
-	Call         = Call        ,
-	XpCall       = XpCall      ,
-	Set          = Set         ,
-	Get          = Get         ,
-	GetPatch     = GetPatch    ,
-	Class        = Class       ,
-	ApplyPatch   = ApplyPatch  ,
-	RandomChild  = RandomChild ,
-	GetTraceback = GetTraceback,
-	LoadLangPack = LoadLangPack,
+	ipairs_r         = ipairs_r        ,
+	spairs           = spairs          ,
+	spairs_r         = spairs_r        ,
+	sipairs          = sipairs         ,
+	sipairs_r        = sipairs_r       ,
+	IsArray          = IsArray         ,
+	IsDictionary     = IsDictionary    ,
+	IsEquals         = IsEquals        ,
+	IsNil            = IsNil           ,
+	IsBoolean        = IsBoolean       ,
+	IsNumber         = IsNumber        ,
+	IsUserdata       = IsUserdata      ,
+	IsHugeNumber     = IsHugeNumber    ,
+	IsEmpty          = IsEmpty         ,
+	IsString         = IsString        ,
+	IsTable          = IsTable         ,
+	IsFunction       = IsFunction      ,
+	Clone            = Clone           ,
+	Call             = Call            ,
+	XpCall           = XpCall          ,
+	Set              = Set             ,
+	Get              = Get             ,
+	Class            = Class           ,
+	GetPatch         = GetPatch        ,
+	ApplyPatch       = ApplyPatch      ,
+	EncodeLUAData    = EncodeLUAData   ,
+	DecodeLUAData    = DecodeLUAData   ,
+	RandomChild      = RandomChild     ,
+	GetTraceback     = GetTraceback    ,
+	LoadLangPack     = LoadLangPack    ,
 	DEBUG_LEVEL      = DEBUG_LEVEL     ,
 	PATH_TYPE        = PATH_TYPE       ,
 	MENU_DIVIDER     = MENU_DIVIDER    ,
