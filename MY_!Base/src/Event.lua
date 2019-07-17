@@ -579,6 +579,22 @@ function LIB.RegisterCoroutine(szKey, fnAction, fnCallback)
 	end
 	return szKey
 end
+-- 执行一个协程直到它完成
+function LIB.FinishCoroutine(szKey)
+	local p = COROUTINE_LIST[szKey]
+	if p then
+		while coroutine.status(p.coAction) == 'suspended' do
+			local status, err = coroutine.resume(p.coAction)
+			if not status then
+				FireUIEvent('CALL_LUA_ERROR',  'OnCoroutine: ' .. p.szID .. ', Error: ' .. err .. '\n')
+			end
+		end
+		if p.fnCallback then
+			Call(p.fnCallback)
+		end
+		COROUTINE_LIST[szKey] = nil
+	end
+end
 local function onBreathe()
 	local nBeginTime, pCallback = GetTime()
 	while GetTime() - nBeginTime < COROUTINE_TIME and next(COROUTINE_LIST) do
