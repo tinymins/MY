@@ -9,6 +9,7 @@
 '''
 
 import sys, os, codecs, re, time, json, zlib, re
+from l_converter import Converter
 
 FILE_MAPPING = {
     'zhcn.lang': { 'out': 'zhtw.lang', 'type': 'lang' },
@@ -23,15 +24,6 @@ FOLDER_MAPPING = {
     # 'zhcn': { 'out': 'zhtw', 'type': 'lang' },
 }
 IGNORE_FOLDER = ['.git', '@DATA']
-
-def __zhcn2zhtw(sentence):
-    from l_converter import Converter
-    '''
-    将sentence中的简体字转为繁体字
-    :param sentence: 待转换的句子
-    :return: 将句子中简体字转换为繁体字之后的句子
-    '''
-    return Converter('zh-TW').convert(sentence)
 
 def __get_file_crc(fileName):
     prev = 0
@@ -76,6 +68,7 @@ def convert_progress(argv):
     params = {}
     cwd = os.getcwd()
     start_time = time.time() * 1000
+    converter = Converter('zh-TW')
 
     param_accept_arg = {
         "--path": True,
@@ -165,7 +158,7 @@ def convert_progress(argv):
                 info = FOLDER_MAPPING[foldername]
                 fileType = info['type']
                 folderOut = os.path.abspath(os.path.join(cwd, '..', info['out']))
-                fileOut = __zhcn2zhtw(filename)
+                fileOut = converter.convert(filename)
             elif filename in FILE_MAPPING:
                 info = FILE_MAPPING[filename]
                 fileType = info['type']
@@ -208,7 +201,7 @@ def convert_progress(argv):
                             crc_text = __get_file_crc(filepath)
 
                         # all_the_text = all_the_text.decode('gbk')
-                        all_the_text = __zhcn2zhtw(all_the_text)
+                        all_the_text = converter.convert(all_the_text)
 
                         print('File saving...')
                         if not os.path.exists(folderOut):
