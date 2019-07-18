@@ -1,31 +1,30 @@
 # -*- coding: utf-8 -*-
 
 import time, os, re, codecs
+from l_converter import Converter
 
-# get interface root path
+# Get interface root path
 pkg_name = ''
 root_path = os.path.abspath(os.getcwd())
 if os.path.basename(root_path).lower() != 'interface' and os.path.basename(os.path.dirname(root_path).lower()) == 'interface':
     pkg_name = os.path.basename(root_path)
     root_path = os.path.dirname(root_path)
 
-def __zhcn2zhtw(sentence):
-    from l_converter import Converter
-    '''
-    将sentence中的简体字转为繁体字
-    :param sentence: 待转换的句子
-    :return: 将句子中简体字转换为繁体字之后的句子
-    '''
-    return Converter('zh-TW').convert(sentence)
-
 def __compress(addon):
+    '''
+    Compress and concat addon source into one file.
+
+    Args:
+        addon: Addon name
+    '''
     print('--------------------------------')
     print('Compressing: %s' % addon)
     file_count = 0
-    # 分析包信息生成压缩描述
+    converter = Converter('zh-TW')
+    # Generate squishy file and execute squish
     with open('squishy', 'w') as squishy:
         squishy.write('Output "./%s/src.lua"\n' % addon)
-        for line in open("%s/info.ini" % addon):
+        for line in open('%s/info.ini' % addon):
             parts = line.strip().split('=')
             if parts[0].find('lua_') == 0:
                 if parts[1] == 'src.lua':
@@ -34,9 +33,8 @@ def __compress(addon):
                 file_path = os.path.join('.', addon, parts[1]).replace('\\', '/')
                 file_count = file_count + 1
                 squishy.write('Module "%d" "%s"\n' % (file_count, file_path))
-    # 执行压缩
     os.popen('lua "./!src-dist/tools/react/squish" --minify-level=full').read()
-    # 添加加载脚本
+    # Modify dist file for loading modules
     with open('./%s/src.lua' % addon, 'r+') as src:
         content = src.read()
         src.seek(0, 0)
@@ -47,72 +45,103 @@ def __compress(addon):
             src.write('\'%d\',' % i)
         src.write('}) do package.preload[k]() end')
     print('Compress done...')
-    # 更新子插件描述文件
+    # Modify info.ini file
     info_content = ''
-    for count, line in enumerate(codecs.open("%s/info.ini" % addon,'r',encoding='gbk')):
+    for _, line in enumerate(codecs.open('%s/info.ini' % addon,'r',encoding='gbk')):
         parts = line.split('=')
         if parts[0].find('lua_') == 0:
             if parts[0] == 'lua_0':
                 info_content = info_content + 'lua_0=src.lua\n'
         else:
             info_content = info_content + line
-    with codecs.open("%s/info.ini" % addon,'w',encoding='gbk') as f:
+    with codecs.open('%s/info.ini' % addon,'w',encoding='gbk') as f:
         f.write(info_content)
-    with codecs.open("%s/info.ini.zh_TW" % addon,'w',encoding='utf8') as f:
-        f.write(__zhcn2zhtw(info_content))
+    with codecs.open('%s/info.ini.zh_TW' % addon,'w',encoding='utf8') as f:
+        f.write(converter.convert(info_content))
     print('Update info done...')
 
-def run(mode):
-    # 读取Git分支
-    name_list = os.popen('git branch').read().strip().split("\n")
-    branch_name = ''
+def __is_git_clean():
+    status = os.popen('git status').read().strip().split('\n')
+    return status[len(status) - 1] == 'nothing to commit, working tree clean'
+
+def __get_current_branch():
+    name_list = os.popen('git branch').read().strip().split('\n')
     for name in name_list:
         if name[0:1] == '*':
-            branch_name = name[2:]
+            return name[2:]
+    return ''
 
-    # 判断是否忘记切换分支
-    if branch_name != 'stable':
-        print('Error: current branch(%s) is not on git stable!' % (branch_name))
-        exit()
-
-    # 判断未提交修改
-    status = os.popen('git status').read().strip().split("\n")
-    if (status[len(status) - 1] != 'nothing to commit, working tree clean'):
-        print('Error: current branch has uncommited file change(s)!')
-        exit()
-
+def __get_version_info():
+    '''Get version information'''
     # Read version from Base.lua
-    str_version = "000"
-    for line in open("%s_!Base/src/Base.lua" % pkg_name):
-        if line[6:15] == "_VERSION_":
-            str_version = line[-6:-3]
-    int_version = int(str_version)
-
-    # Read max version from git tag
-    tag_list = os.popen('git tag').read().strip().split("\n")
-    max_version, prev_version, git_tag = 0, 0, ''
-    for tag in tag_list:
+    current_version = 0
+    for line in open('%s_!Base/src/Base.lua' % pkg_name):
+        if line[6:15] == '_VERSION_':
+            current_version = int(line[-6:-3])
+    # Read max and previous release commit
+    commit_list = os.popen('git log --grep Release --pretty=format:"%s|%p"').read().split('\n')
+    max_version, prev_version, prev_version_message, prev_version_hash = 0, 0, '', ''
+    for commit in commit_list:
         try:
-            version = int(tag[1:])
-            if version < int_version and version > prev_version:
+            info = commit.split('|')
+            version = int(info[0][9:])
+            if version < current_version and version > prev_version:
                 prev_version = version
-                git_tag = tag
+                prev_version_message = info[0]
+                prev_version_hash = info[1]
             if version > max_version:
                 max_version = version
         except:
             pass
+    return { 'current': current_version, 'max': max_version, 'previous': prev_version, 'previous_message': prev_version_message, 'previous_hash': prev_version_hash }
 
-    # Check version value upgrade
-    if mode == 'diff' and int_version <= max_version:
-        print('Warning: current version(%s) is not larger than max git tagged version(%d)!' % (str_version, max_version))
+def __exit(msg):
+    print(msg)
+    exit()
 
-    # 优化合并源文件
+def __assert(condition, msg):
+    if not condition:
+        __exit(msg)
+
+def run(mode):
+    is_full = mode.find('full') >= 0
+    is_release = mode.find('release') >= 0
+    version_info = __get_version_info()
+
+    if is_release:
+        # Merge master into prelease
+        if __get_current_branch() == 'master':
+            __assert(__is_git_clean, 'Error: master branch has uncommited file change(s)!')
+            os.system('git checkout -b prelease || git checkout prelease')
+            os.system('git rebase master')
+            os.system('code "%s_!Base/src/Base.lua"' % pkg_name)
+            os.system('code "%s_CHANGELOG.txt"' % pkg_name)
+            __exit('Switched to prelease branch. Please commit release info and then run this script again!')
+
+        # Merge prelease into stable
+        if __get_current_branch() == 'prelease':
+            os.system('git reset master')
+            version_info = __get_version_info()
+            __assert(version_info.get('current') > version_info.get('max'),
+                'Error: current version(%s) must be larger than max history version(%d)!' % (version_info.get('current'), version_info.get('max')))
+            os.system('git add * && git commit -m "Release V%s"' % version_info.get('current'))
+            os.system('git checkout -b stable || git checkout stable')
+            os.system('git reset origin/stable --hard')
+            os.system('git rebase prelease')
+
+        # Check if branch
+        __assert(__is_git_clean(), 'Error: Please resolve conflict and remove uncommited changes manually!')
+        __assert(__get_current_branch() == 'stable', 'Error: current branch is not on stable!')
+
+    # Compress and concat source file
     for addon in os.listdir('./'):
         if os.path.exists(os.path.join('./', addon, 'info.ini')):
             __compress(addon)
 
-    if mode == 'diff':
-        # 读取Git中最大的版本号 到最新版修改文件
+    cmd_suffix = ''
+    diff_mode = not is_full and version_info.get('current') != '' and version_info.get('previous_hash') != ''
+    if diff_mode:
+        # Generate file change list since previous release commit
         def pathToModule(path):
             return re.sub('(?:^\\!src-dist/dat/|["/].*$)', '', path)
         paths = {
@@ -120,45 +149,37 @@ def run(mode):
             'package.ini.*': True,
         }
         print('File change list:')
-        if git_tag != '':
-            filelist = os.popen('git diff ' + git_tag + ' HEAD --name-status').read().strip().split("\n")
-            for file in filelist:
-                lst = file.split("\t")
-                if lst[0] == "A" or lst[0] == "M" or lst[0] == "D":
-                    paths[pathToModule(lst[1])] = True
-                elif lst[0][0] == "R":
-                    paths[pathToModule(lst[1])] = True
-                    paths[pathToModule(lst[2])] = True
-                print(file)
+        filelist = os.popen('git diff ' + version_info.get('previous_hash') + ' HEAD --name-status').read().strip().split('\n')
+        for file in filelist:
+            lst = file.split('\t')
+            if lst[0] == 'A' or lst[0] == 'M' or lst[0] == 'D':
+                paths[pathToModule(lst[1])] = True
+            elif lst[0][0] == 'R':
+                paths[pathToModule(lst[1])] = True
+                paths[pathToModule(lst[2])] = True
+            print(file)
         print('')
-
-        # 输出修改的子目录列表
+        # Print addon change list
         print('Subpath change list:')
         for path in paths:
             print('/' + path)
+            cmd_suffix = cmd_suffix + ' "' + path + '"'
         print('')
 
-        # 拼接字符串开始压缩文件
-        dst_file = "!src-dist/releases/%s_%s_v%s.7z" % (pkg_name, time.strftime("%Y%m%d%H%M%S", time.localtime()), str_version)
-        print("zippping...")
-        cmd = "7z a -t7z " + dst_file + " -xr!manifest.dat -xr!manifest.key -xr!publisher.key -x@7zipignore.txt"
-        for path in paths:
-            cmd = cmd + ' "' + path + '"'
-        os.system(cmd)
-        print("Based on git tag " + git_tag + ".")
+    # Prepare for 7z compressing
+    print('zippping...')
+    dst_file = '!src-dist/releases/%s_%s_v%s.7z' % (pkg_name, time.strftime('%Y%m%d%H%M%S', time.localtime()), version_info.get('current'))
+    os.system('7z a -t7z ' + dst_file + ' -xr!manifest.dat -xr!manifest.key -xr!publisher.key -x@7zipignore.txt' + cmd_suffix)
+    print('File(s) compressing acomplished!')
+    print('Url: ' + dst_file)
+    print('Based on git commit "%s(%s)".' % (version_info.get('previous_message'), version_info.get('previous_hash')) if diff_mode else 'Full package.')
 
-    else:
-        # 拼接字符串开始压缩文件
-        dst_file = "!src-dist/releases/%s_%s_v%s.7z" % (pkg_name, time.strftime("%Y%m%d%H%M%S", time.localtime()), str_version)
-        print("zippping...")
-        os.system("7z a -t7z " + dst_file + " -xr!manifest.dat -xr!manifest.key -xr!publisher.key -x@7zipignore.txt")
-
-    print("File(s) compressing acomplete!")
-    print("Url: " + dst_file)
-
+    # Revert source code modify by compressing
     os.system('git reset HEAD --hard')
+    if is_release:
+        os.system('git checkout master')
     time.sleep(5)
     print('Exiting...')
 
 if __name__ == '__main__':
-    run('diff')
+    run('diff release')
