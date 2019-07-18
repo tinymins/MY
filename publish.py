@@ -111,7 +111,7 @@ def run(mode):
     if is_release:
         # Merge master into prelease
         if __get_current_branch() == 'master':
-            __assert(__is_git_clean, 'Error: master branch has uncommited file change(s)!')
+            __assert(__is_git_clean(), 'Error: master branch has uncommited file change(s)!')
             os.system('git checkout -b prelease || git checkout prelease')
             os.system('git rebase master')
             os.system('code "%s_!Base/src/Base.lua"' % pkg_name)
@@ -130,7 +130,7 @@ def run(mode):
             os.system('git rebase prelease')
 
         # Check if branch
-        __assert(__is_git_clean(), 'Error: Please resolve conflict and remove uncommited changes manually!')
+        __assert(__is_git_clean(), 'Error: resolve conflict and remove uncommited changes first!')
         __assert(__get_current_branch() == 'stable', 'Error: current branch is not on stable!')
 
     # Compress and concat source file
