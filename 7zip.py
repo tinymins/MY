@@ -81,27 +81,30 @@ def run(mode):
         print('Error: current branch has uncommited file change(s)!')
         exit()
 
-    # 读取{NS}.lua文件中的插件版本号
-    str_version = "0x0000000"
+    # Read version from Base.lua
+    str_version = "000"
     for line in open("%s_!Base/src/Base.lua" % pkg_name):
         if line[6:15] == "_VERSION_":
             str_version = line[-6:-3]
+    int_version = int(str_version)
 
-    # 读取Git中最大的版本号
-    version_list = os.popen('git tag').read().strip().split("\n")
-    max_version, git_tag = 0, ''
-    for version in version_list:
+    # Read max version from git tag
+    tag_list = os.popen('git tag').read().strip().split("\n")
+    max_version, prev_version, git_tag = 0, 0, ''
+    for tag in tag_list:
         try:
-            if max_version < int(version[1:]):
-                git_tag = version
-                max_version = int(version[1:])
+            version = int(tag[1:])
+            if version < int_version and version > prev_version:
+                prev_version = version
+                git_tag = tag
+            if version > max_version:
+                max_version = version
         except:
             pass
 
-    # 判断是否忘记提升版本号
-    if int(str_version) <= max_version:
-        print('Error: current version(%s) is smaller than or equals with last git tagged version(%d)!' % (str_version, max_version))
-        exit()
+    # Check version value upgrade
+    if mode == 'diff' and int_version <= max_version:
+        print('Warning: current version(%s) is not larger than max git tagged version(%d)!' % (str_version, max_version))
 
     # 优化合并源文件
     for addon in os.listdir('./'):
