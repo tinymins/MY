@@ -62,6 +62,7 @@ MY_GKP = {
 	bDisplayEmptyRecords = true,  -- show 0 record
 	bAutoSync            = true,  -- 自动接收分配者的同步信息
 	bShowGoldBrick       = true,
+	bShow2ndKungfuLoot   = true,  -- 显示第二心法装备推荐提示图标
 }
 LIB.RegisterCustomData('MY_GKP')
 ---------------------------------------------------------------------->
@@ -710,6 +711,16 @@ function PS.OnPanelActive(wnd)
 		x = x, y = y, w = 200,
 		text = _L['Auto pickup'],
 		menu = MY_GKP_Loot.GetAutoPickupAllMenu
+	}, true):autoWidth():width() + 5
+	x, y = X + 10, y + 28
+
+	x = x + ui:append('WndCheckBox', {
+		x = x, y = y,
+		text = _L['Show 2nd kungfu fit icon'],
+		checked = MY_GKP.bShow2ndKungfuLoot,
+		oncheck = function()
+			MY_GKP.bShow2ndKungfuLoot = not MY_GKP.bShow2ndKungfuLoot
+		end,
 	}, true):autoWidth():width() + 5
 	x, y = X + 10, y + 28
 

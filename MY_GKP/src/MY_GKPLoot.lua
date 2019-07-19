@@ -1037,7 +1037,7 @@ local function IsItemDataSuitable(data)
 		if szSuit == 'SUITABLE' then
 			if data.szType == 'EQUIPMENT' or data.szType == 'WEAPON' then
 				szSuit = LIB.IsItemFitKungfu(data.item) and 'SUITABLE' or 'NOT_SUITABLE'
-				if szSuit == 'NOT_SUITABLE' then
+				if szSuit == 'NOT_SUITABLE' and MY_GKP.bShow2ndKungfuLoot then
 					for _, dwKungfuID in ipairs(aKungfu) do
 						if LIB.IsItemFitKungfu(data.item, dwKungfuID) then
 							szSuit = 'MAYBE_SUITABLE'

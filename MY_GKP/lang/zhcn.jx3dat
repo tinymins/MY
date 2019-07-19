@@ -155,6 +155,7 @@ data = {
 	['Auto pickup all'] = '自动拾取全部物品',
 	['Auto pickup this'] = '自动拾取该组物品',
 	['Will be reset when loading'] = '仅过图前有效',
+	['Show 2nd kungfu fit icon'] = '显示第二心法装备推荐图标',
 	['Confirm when distribute'] = '分配时二次确认',
 	['Category'] = '分类',
 	['Huangbaba' ] = '玄晶',
