@@ -1023,34 +1023,36 @@ end
 local function IsItemDataSuitable(data)
 	local me = GetClientPlayer()
 	if not me then
-		return false, false
+		return 'NOT_SUITABLE'
 	end
 	local aKungfu = LIB.ForceIDToKungfuIDs(me.dwForceID)
 	if data.szType == 'BOOK' then
 		local nBookID, nSegmentID = GlobelRecipeID2BookID(data.item.nBookID)
 		if me.IsBookMemorized(nBookID, nSegmentID) then
-			return false, false
-		else
-			return true, false
+			return 'NOT_SUITABLE'
 		end
+		return 'SUITABLE'
 	else
-		local bSuit = LIB.DoesEquipmentSuit(data.item, true)
-		if bSuit then
+		local szSuit = LIB.DoesEquipmentSuit(data.item, true) and 'SUITABLE' or 'NOT_SUITABLE'
+		if szSuit == 'SUITABLE' then
 			if data.szType == 'EQUIPMENT' or data.szType == 'WEAPON' then
-				for _, dwKungfuID in ipairs(aKungfu) do
-					if bSuit then
-						break
+				szSuit = LIB.IsItemFitKungfu(data.item) and 'SUITABLE' or 'NOT_SUITABLE'
+				if szSuit == 'NOT_SUITABLE' then
+					for _, dwKungfuID in ipairs(aKungfu) do
+						if LIB.IsItemFitKungfu(data.item, dwKungfuID) then
+							szSuit = 'MAYBE_SUITABLE'
+							break
+						end
 					end
-					bSuit = LIB.IsItemFitKungfu(data.item, dwKungfuID)
 				end
 			elseif data.szType == 'EQUIPMENT_SIGN' then
-				bSuit = wfind(data.item.szName, g_tStrings.tForceTitle[me.dwForceID])
+				szSuit = wfind(data.item.szName, g_tStrings.tForceTitle[me.dwForceID]) and 'SUITABLE' or 'NOT_SUITABLE'
 			end
 		end
-		if bSuit then
-			return true, LIB.IsBetterEquipment(data.item)
+		if szSuit == 'SUITABLE' and LIB.IsBetterEquipment(data.item) then
+			return 'BETTER'
 		end
-		return false, false
+		return szSuit
 	end
 end
 
@@ -1116,11 +1118,12 @@ function Loot.DrawLootList(dwID)
 				end
 			end
 			if MY_GKP_Loot.bVertical then
-				local bSuit, bBetter = IsItemDataSuitable(itemData)
+				local szSuit = IsItemDataSuitable(itemData)
 				h:Lookup('Image_GroupDistrib'):SetVisible(itemData.bDist
 					and (i == 1 or aItemData[i - 1].szType ~= itemData.szType or not aItemData[i - 1].bDist))
-				h:Lookup('Image_Suitable'):SetVisible(bSuit and not bBetter)
-				h:Lookup('Image_Better'):SetVisible(bBetter)
+				h:Lookup('Image_Suitable'):SetVisible(szSuit == 'SUITABLE')
+				h:Lookup('Image_MaybeSuitable'):SetVisible(szSuit == 'MAYBE_SUITABLE')
+				h:Lookup('Image_Better'):SetVisible(szSuit == 'BETTER')
 				h:Lookup('Image_Spliter'):SetVisible(i ~= #aItemData)
 			else
 				txt:Hide()
