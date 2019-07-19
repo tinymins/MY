@@ -103,6 +103,42 @@ def __get_version_info():
             pass
     return { 'current': current_version, 'max': max_version, 'previous': prev_version, 'previous_message': prev_version_message, 'previous_hash': prev_version_hash }
 
+def __7zip(file_name, base_message, base_hash):
+    cmd_suffix = ''
+    if base_hash != '':
+        # Generate file change list since previous release commit
+        def pathToModule(path):
+            return re.sub('(?:^\\!src-dist/dat/|["/].*$)', '', path)
+        paths = {
+            'package.ini': True,
+            'package.ini.*': True,
+        }
+        print('File change list:')
+        filelist = os.popen('git diff ' + base_hash + ' HEAD --name-status').read().strip().split('\n')
+        for file in filelist:
+            lst = file.split('\t')
+            if lst[0] == 'A' or lst[0] == 'M' or lst[0] == 'D':
+                paths[pathToModule(lst[1])] = True
+            elif lst[0][0] == 'R':
+                paths[pathToModule(lst[1])] = True
+                paths[pathToModule(lst[2])] = True
+            print(file)
+        print('')
+        # Print addon change list
+        print('Subpath change list:')
+        for path in paths:
+            print('/' + path)
+            cmd_suffix = cmd_suffix + ' "' + path + '"'
+        print('')
+
+    # Prepare for 7z compressing
+    print('zippping...')
+    os.system('7z a -t7z ' + file_name + ' -xr!manifest.dat -xr!manifest.key -xr!publisher.key -x@7zipignore.txt' + cmd_suffix)
+    print('File(s) compressing acomplished!')
+    print('Url: ' + file_name)
+    print('Based on git commit "%s(%s)".' % (base_message, base_hash) if base_hash != '' else 'Full package.')
+
+
 def __exit(msg):
     print(msg)
     exit()
@@ -146,41 +182,14 @@ def run(mode):
         if os.path.exists(os.path.join('./', addon, 'info.ini')):
             __compress(addon)
 
-    cmd_suffix = ''
-    diff_mode = not is_full and version_info.get('current') != '' and version_info.get('previous_hash') != ''
-    if diff_mode:
-        # Generate file change list since previous release commit
-        def pathToModule(path):
-            return re.sub('(?:^\\!src-dist/dat/|["/].*$)', '', path)
-        paths = {
-            'package.ini': True,
-            'package.ini.*': True,
-        }
-        print('File change list:')
-        filelist = os.popen('git diff ' + version_info.get('previous_hash') + ' HEAD --name-status').read().strip().split('\n')
-        for file in filelist:
-            lst = file.split('\t')
-            if lst[0] == 'A' or lst[0] == 'M' or lst[0] == 'D':
-                paths[pathToModule(lst[1])] = True
-            elif lst[0][0] == 'R':
-                paths[pathToModule(lst[1])] = True
-                paths[pathToModule(lst[2])] = True
-            print(file)
-        print('')
-        # Print addon change list
-        print('Subpath change list:')
-        for path in paths:
-            print('/' + path)
-            cmd_suffix = cmd_suffix + ' "' + path + '"'
-        print('')
-
-    # Prepare for 7z compressing
-    print('zippping...')
-    dst_file = '!src-dist/releases/%s_%s_v%s.7z' % (pkg_name, time.strftime('%Y%m%d%H%M%S', time.localtime()), version_info.get('current'))
-    os.system('7z a -t7z ' + dst_file + ' -xr!manifest.dat -xr!manifest.key -xr!publisher.key -x@7zipignore.txt' + cmd_suffix)
-    print('File(s) compressing acomplished!')
-    print('Url: ' + dst_file)
-    print('Based on git commit "%s(%s)".' % (version_info.get('previous_message'), version_info.get('previous_hash')) if diff_mode else 'Full package.')
+    # Package files
+    file_name = '!src-dist/releases/%s_%s_v%s.7z' % (pkg_name, time.strftime('%Y%m%d%H%M%S', time.localtime()), version_info.get('current'))
+    base_message = ''
+    base_hash = ''
+    if not is_full and version_info.get('current') != '' and version_info.get('previous_hash') != '':
+        base_message = version_info.get('previous_message')
+        base_hash = version_info.get('previous_hash')
+    __7zip(file_name, base_message, base_hash)
 
     # Revert source code modify by compressing
     os.system('git reset HEAD --hard')
