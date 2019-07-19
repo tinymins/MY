@@ -156,7 +156,7 @@ function LIB.GetDistanceTypeMenu(bGlobal, eValue, fnAction)
 			t1.nMouseOverFrame = 106
 			t1.szLayer = 'ICON_RIGHTMOST'
 			t1.fnClickIcon = function()
-				LIB.OpenPanel()
+				LIB.ShowPanel()
 				LIB.SwitchTab('GlobalConfig')
 				Wnd.CloseWindow('PopupMenuPanel')
 			end
