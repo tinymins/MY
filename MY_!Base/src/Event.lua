@@ -580,7 +580,7 @@ function LIB.RegisterCoroutine(szKey, fnAction, fnCallback)
 	return szKey
 end
 -- 执行一个协程直到它完成
-function LIB.FinishCoroutine(szKey)
+function LIB.FlushCoroutine(szKey)
 	local p = COROUTINE_LIST[szKey]
 	if p then
 		while coroutine.status(p.coAction) == 'suspended' do

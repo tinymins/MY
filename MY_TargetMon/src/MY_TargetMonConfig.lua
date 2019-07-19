@@ -567,7 +567,7 @@ function D.Init(bNoCoroutine)
 		INIT_STATE = 'LOADING_CONFIG'
 	end
 	if INIT_STATE == 'LOADING_CONFIG' and bNoCoroutine then
-		LIB.FinishCoroutine('MY_TargetMonConfig')
+		LIB.FlushCoroutine('MY_TargetMonConfig')
 	end
 	return INIT_STATE == 'DONE'
 end
