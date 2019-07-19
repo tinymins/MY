@@ -1025,6 +1025,7 @@ local function IsItemDataSuitable(data)
 	if not me then
 		return false, false
 	end
+	local aKungfu = LIB.ForceIDToKungfuIDs(me.dwForceID)
 	if data.szType == 'BOOK' then
 		local nBookID, nSegmentID = GlobelRecipeID2BookID(data.item.nBookID)
 		if me.IsBookMemorized(nBookID, nSegmentID) then
@@ -1036,7 +1037,12 @@ local function IsItemDataSuitable(data)
 		local bSuit = LIB.DoesEquipmentSuit(data.item, true)
 		if bSuit then
 			if data.szType == 'EQUIPMENT' or data.szType == 'WEAPON' then
-				bSuit = LIB.IsItemFitKungfu(data.item)
+				for _, dwKungfuID in ipairs(aKungfu) do
+					if bSuit then
+						break
+					end
+					bSuit = LIB.IsItemFitKungfu(data.item, dwKungfuID)
+				end
 			elseif data.szType == 'EQUIPMENT_SIGN' then
 				bSuit = wfind(data.item.szName, g_tStrings.tForceTitle[me.dwForceID])
 			end

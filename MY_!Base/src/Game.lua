@@ -2977,21 +2977,25 @@ local m_MountTypeToWeapon = {
 	--WEAPON_DETAIL.MACH_DART = »ú¹Ø°µÆ÷
 	--WEAPON_DETAIL.SLING_SHOT = Í¶ÖÀ
 }
-function LIB.IsItemFitKungfu(itemInfo, kungfu)
+function LIB.IsItemFitKungfu(itemInfo, ...)
 	if tostring(itemInfo):find('^KGItem:') then
 		itemInfo = GetItemInfo(itemInfo.dwTabType, itemInfo.dwIndex)
 	end
+	local kungfu = ...
+	if select('#', ...) == 0 then
+		kungfu = GetClientPlayer().GetKungfuMount()
+	elseif IsNumber(kungfu) then
+		kungfu = GetSkill(kungfu, 1)
+	end
 	if itemInfo.nSub == CONSTANT.EQUIPMENT_SUB.MELEE_WEAPON then
-		local player = GetClientPlayer()
-		local skill  = kungfu or player.GetKungfuMount()
-		if not skill then
+		if not kungfu then
 			return false
 		end
-		if itemInfo.nDetail == WEAPON_DETAIL.BIG_SWORD and skill.dwMountType == 6 then
+		if itemInfo.nDetail == WEAPON_DETAIL.BIG_SWORD and kungfu.dwMountType == 6 then
 			return true
 		end
 
-		if (m_MountTypeToWeapon[skill.dwMountType] ~= itemInfo.nDetail) then
+		if (m_MountTypeToWeapon[kungfu.dwMountType] ~= itemInfo.nDetail) then
 			return false
 		end
 
@@ -3021,13 +3025,11 @@ function LIB.IsItemFitKungfu(itemInfo, kungfu)
 		return true
 	end
 
-	local player = GetClientPlayer()
-	local skill  = kungfu or player.GetKungfuMount()
-	if not skill then
+	if not kungfu then
 		return false
 	end
 	for _, v in ipairs(aRecommendKungfuID) do
-		if v == skill.dwSkillID then
+		if v == kungfu.dwSkillID then
 			return true
 		end
 	end
