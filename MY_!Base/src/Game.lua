@@ -2982,10 +2982,11 @@ function LIB.IsItemFitKungfu(itemInfo, ...)
 		itemInfo = GetItemInfo(itemInfo.dwTabType, itemInfo.dwIndex)
 	end
 	local kungfu = ...
+	local me = GetClientPlayer()
 	if select('#', ...) == 0 then
-		kungfu = GetClientPlayer().GetKungfuMount()
+		kungfu = me.GetKungfuMount()
 	elseif IsNumber(kungfu) then
-		kungfu = GetSkill(kungfu, 1)
+		kungfu = GetSkill(kungfu, me.GetSkillLevel(kungfu) or 1)
 	end
 	if itemInfo.nSub == CONSTANT.EQUIPMENT_SUB.MELEE_WEAPON then
 		if not kungfu then
