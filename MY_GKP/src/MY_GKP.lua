@@ -720,6 +720,7 @@ function PS.OnPanelActive(wnd)
 		checked = MY_GKP.bShow2ndKungfuLoot,
 		oncheck = function()
 			MY_GKP.bShow2ndKungfuLoot = not MY_GKP.bShow2ndKungfuLoot
+			FireUIEvent('MY_GKP_LOOT_RELOAD')
 		end,
 	}, true):autoWidth():width() + 5
 	x, y = X + 10, y + 28
