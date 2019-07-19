@@ -891,7 +891,7 @@ LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '#STORAGE_DATA', 200, function()
 		data = {
 			data = LIB.EncryptString(LIB.ConvertToUTF8(LIB.JsonEncode({
 				g = me.GetGlobalID(), f = me.dwForceID, e = me.GetTotalEquipScore(),
-				n = GetUserRoleName(), i = UI_GetClientPlayerID(), c = me.nCamp,
+				n = LIB.GetUserRoleName(), i = UI_GetClientPlayerID(), c = me.nCamp,
 				S = LIB.GetRealServer(1), s = LIB.GetRealServer(2), r = me.nRoleType,
 				_ = GetCurrentTime(), t = LIB.GetTongName(),
 			}))),
@@ -951,7 +951,7 @@ function LIB.StorageData(szKey, oData)
 			data = {
 				data =  LIB.EncryptString(LIB.JsonEncode({
 					g = me.GetGlobalID(), f = me.dwForceID, r = me.nRoleType,
-					n = GetUserRoleName(), i = UI_GetClientPlayerID(),
+					n = LIB.GetUserRoleName(), i = UI_GetClientPlayerID(),
 					S = LIB.GetRealServer(1), s = LIB.GetRealServer(2),
 					v = GetCurrentTime(),
 					k = szKey, o = oData
@@ -1820,7 +1820,19 @@ function LIB.GetAccount()
 	if Login_GetAccount then
 		return Login_GetAccount()
 	end
-	return GetUserAccount()
+	if GetUserAccount then
+		return GetUserAccount()
+	end
+	local szAccount
+	local hFrame = Wnd.OpenWindow('LoginPassword')
+	if hFrame then
+		local hEdit = hFrame:Lookup('WndPassword/Edit_Account')
+		if hEdit then
+			szAccount = hEdit:GetText()
+		end
+		Wnd.CloseWindow(hFrame)
+	end
+	return szAccount
 end
 
 function LIB.OpenBrowser(szAddr)
@@ -1974,4 +1986,126 @@ function LIB.GeneGlobalNS(options)
 	end
 	return setmetatable({}, { __index = getter, __newindex = setter })
 end
+end
+
+if IsFunction(EditBox_AppendLinkPlayer) then
+	LIB.EditBox_AppendLinkPlayer = EditBox_AppendLinkPlayer
+else
+	function LIB.EditBox_AppendLinkPlayer(szName)
+		local edit = Station.Lookup('Lowest2/EditBox/Edit_Input')
+		edit:InsertObj('['.. szName ..']', { type = 'name', text = '['.. szName ..']', name = szName })
+		Station.SetFocusWindow(edit)
+		return true
+	end
+end
+
+if IsFunction(EditBox_AppendLinkItem) then
+	LIB.EditBox_AppendLinkItem = EditBox_AppendLinkItem
+else
+	function LIB.EditBox_AppendLinkItem(dwID)
+		local item = GetItem(dwID)
+		if not item then
+			return false
+		end
+		local szName = '[' .. LIB.GetItemNameByItem(item) ..']'
+		local edit = Station.Lookup('Lowest2/EditBox/Edit_Input')
+		edit:InsertObj(szName, { type = 'item', text = szName, item = item.dwID })
+		Station.SetFocusWindow(edit)
+		return true
+	end
+end
+
+if IsFunction(FORMAT_WMSG_RET) then
+	LIB.FORMAT_WMSG_RET = FORMAT_WMSG_RET
+else
+	function LIB.FORMAT_WMSG_RET(stop, callFrame)
+		local ret = 0
+		if stop then
+			ret = ret + 1 --01
+		end
+		if callFrame then
+			ret = ret + 2 --10
+		end
+		return ret
+	end
+end
+
+-------------------------------------------
+-- ”Ô“Ùœ‡πÿ API
+-------------------------------------------
+
+if IsFunction(GVoiceBase_IsOpen) then
+	LIB.GVoiceBase_IsOpen = GVoiceBase_IsOpen
+else
+	function LIB.GVoiceBase_IsOpen()
+		return false
+	end
+end
+
+if IsFunction(GVoiceBase_GetMicState) then
+	LIB.GVoiceBase_GetMicState = GVoiceBase_GetMicState
+else
+	function LIB.GVoiceBase_GetMicState()
+		return MIC_STATE.CLOSE_NOT_IN_ROOM
+	end
+end
+
+if IsFunction(GVoiceBase_SwitchMicState) then
+	LIB.GVoiceBase_SwitchMicState = GVoiceBase_SwitchMicState
+else
+	function LIB.GVoiceBase_SwitchMicState()
+	end
+end
+
+if IsFunction(GVoiceBase_CheckMicState) then
+	LIB.GVoiceBase_CheckMicState = GVoiceBase_CheckMicState
+else
+	function LIB.GVoiceBase_CheckMicState()
+	end
+end
+
+if IsFunction(GVoiceBase_GetSpeakerState) then
+	LIB.GVoiceBase_GetSpeakerState = GVoiceBase_GetSpeakerState
+else
+	function LIB.GVoiceBase_GetSpeakerState()
+		return CONSTANT.SPEAKER_STATE.CLOSE
+	end
+end
+
+if IsFunction(GVoiceBase_SwitchSpeakerState) then
+	LIB.GVoiceBase_SwitchSpeakerState = GVoiceBase_SwitchSpeakerState
+else
+	function LIB.GVoiceBase_SwitchSpeakerState()
+	end
+end
+
+if IsFunction(GVoiceBase_GetSaying) then
+	LIB.GVoiceBase_GetSaying = GVoiceBase_GetSaying
+else
+	function LIB.GVoiceBase_GetSaying()
+		return {}
+	end
+end
+
+if IsFunction(GVoiceBase_IsMemberSaying) then
+	LIB.GVoiceBase_IsMemberSaying = GVoiceBase_IsMemberSaying
+else
+	function LIB.GVoiceBase_IsMemberSaying(dwMemberID, sayingInfo)
+		return false
+	end
+end
+
+if IsFunction(GVoiceBase_IsMemberForbid) then
+	LIB.GVoiceBase_IsMemberForbid = GVoiceBase_IsMemberForbid
+else
+	function LIB.GVoiceBase_IsMemberForbid(dwMemberID)
+		return false
+	end
+end
+
+if IsFunction(GVoiceBase_ForbidMember) then
+	LIB.GVoiceBase_ForbidMember = GVoiceBase_ForbidMember
+else
+	function LIB.GVoiceBase_ForbidMember(dwMemberID, Forbid)
+	end
 end

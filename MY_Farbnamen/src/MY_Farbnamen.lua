@@ -498,7 +498,7 @@ end
 LIB.BreatheCall(250, onBreathe)
 
 local function OnPeekPlayer()
-	if arg0 == PEEK_OTHER_PLAYER_RESPOND.SUCCESS then
+	if arg0 == CONSTANT.PEEK_OTHER_PLAYER_RESPOND.SUCCESS then
 		l_peeklist[arg1] = 0
 	end
 end

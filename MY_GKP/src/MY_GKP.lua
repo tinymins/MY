@@ -516,7 +516,7 @@ function MY_GKP.OnItemLButtonDown()
 	local szName = this:GetName()
 	if szName == 'Text_Name' then
 		if IsCtrlKeyDown() then
-			return EditBox_AppendLinkPlayer(this:GetText())
+			return LIB.EditBox_AppendLinkPlayer(this:GetText())
 		end
 	end
 end

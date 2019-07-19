@@ -3835,12 +3835,12 @@ UI.HandlePool = setmetatable({}, { __call = function(me, ...) return HandlePool:
 -----------------------------------------------------------
 -- Ã¶¾Ù
 -----------------------------------------------------------
-MY_MOUSE_EVENT = SetmetaReadonly({
+MY_MOUSE_EVENT = LIB.SetmetaReadonly({
 	LBUTTON = 1,
 	MBUTTON = 0,
 	RBUTTON = -1,
 })
-MY_TIP_POSTYPE = SetmetaReadonly({
+MY_TIP_POSTYPE = LIB.SetmetaReadonly({
 	FOLLOW_MOUSE              = -1,
 	CENTER                    = ALW.CENTER,
 	LEFT_RIGHT                = ALW.LEFT_RIGHT,
@@ -3849,12 +3849,12 @@ MY_TIP_POSTYPE = SetmetaReadonly({
 	BOTTOM_TOP                = ALW.BOTTOM_TOP,
 	RIGHT_LEFT_AND_BOTTOM_TOP = ALW.RIGHT_LEFT_AND_BOTTOM_TOP,
 })
-MY_TIP_HIDEWAY = SetmetaReadonly({
+MY_TIP_HIDEWAY = LIB.SetmetaReadonly({
 	NO_HIDE      = 100,
 	HIDE         = 101,
 	ANIMATE_HIDE = 102,
 })
-MY_SLIDER_DISPTYPE = SetmetaReadonly({
+MY_SLIDER_DISPTYPE = LIB.SetmetaReadonly({
 	SHOW_VALUE    = false,
 	SHOW_PERCENT  = true,
 })
@@ -4787,5 +4787,7 @@ function UI.GetTempElement(szType)
 	return raw
 end
 end
+
+UI.UpdateItemInfoBoxObject = UpdateItemInfoBoxObject or UpdataItemInfoBoxObject
 
 LIB.UI = UI

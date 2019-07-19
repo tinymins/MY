@@ -183,7 +183,7 @@ local function OnCrossMapGoFB()
 	else
 		MSG_MAP_ID, MSG_ID = dwMapID, dwID
 	end
-	return FORMAT_WMSG_RET(true, true)
+	return LIB.FORMAT_WMSG_RET(true, true)
 end
 
 local function OnFBAppendItemFromIni(hList)

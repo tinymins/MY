@@ -125,7 +125,7 @@ function MY_PartyRequest.OnLButtonClick()
 		end
 	elseif this.info then
 		if IsCtrlKeyDown() then
-			EditBox_AppendLinkPlayer(this.info.szName)
+			LIB.EditBox_AppendLinkPlayer(this.info.szName)
 		elseif IsAltKeyDown() and this.info.dwID then
 			ViewInviteToPlayer(this.info.dwID)
 		end
@@ -190,7 +190,7 @@ end
 
 function D.OnPeekPlayer()
 	if PR_EQUIP_REQUEST[arg1] then
-		if arg0 == PEEK_OTHER_PLAYER_RESPOND.SUCCESS then
+		if arg0 == CONSTANT.PEEK_OTHER_PLAYER_RESPOND.SUCCESS then
 			local me = GetClientPlayer()
 			local dwType, dwID = me.GetTarget()
 			LIB.SetTarget(TARGET.PLAYER, arg1)
@@ -399,7 +399,7 @@ function D.UpdateFrame()
 			end
 			hItem:Lookup('Handle_Status/Handle_Gongzhan'):SetVisible(info.nGongZhan == 1)
 
-			local nCampFrame = GetCampImageFrame(info.nCamp)
+			local nCampFrame = LIB.GetCampImageFrame(info.nCamp)
 			if nCampFrame then
 				hItem:Lookup('Handle_Status/Handle_Camp/Image_Camp'):SetFrame(nCampFrame)
 			end

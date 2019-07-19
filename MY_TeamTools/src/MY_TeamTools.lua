@@ -272,7 +272,7 @@ end
 
 function RaidTools.OnEvent(szEvent)
 	if szEvent == 'PEEK_OTHER_PLAYER' then
-		if arg0 == PEEK_OTHER_PLAYER_RESPOND.SUCCESS then
+		if arg0 == CONSTANT.PEEK_OTHER_PLAYER_RESPOND.SUCCESS then
 			if this.tViewInvite[arg1] then
 				RT.GetEquipCache(GetPlayer(arg1)) -- 抓取所有数据
 			end
@@ -430,14 +430,14 @@ function RaidTools.OnItemLButtonClick()
 	elseif tonumber(szName:find('P(%d+)')) then
 		local dwID = tonumber(szName:match('P(%d+)'))
 		if IsCtrlKeyDown() then
-			EditBox_AppendLinkPlayer(this.szName)
+			LIB.EditBox_AppendLinkPlayer(this.szName)
 		else
 			RT.ViewInviteToPlayer(dwID)
 		end
 	elseif tonumber(szName:find('D(%d+)')) then
 		local dwID = tonumber(szName:match('D(%d+)'))
 		if IsCtrlKeyDown() then
-			EditBox_AppendLinkPlayer(this.szName)
+			LIB.EditBox_AppendLinkPlayer(this.szName)
 		else
 			RT_SELECT_DEATH = dwID
 			RT.UpdatetDeathMsg(dwID)
@@ -726,7 +726,7 @@ function RT.UpdateList()
 					local w, h = this:GetSize()
 					local desc = ''
 					if vv.CommonEnchant then
-						desc = Table_GetCommonEnchantDesc(vv.dwTemporaryEnchantID)
+						desc = LIB.Table_GetCommonEnchantDesc(vv.dwTemporaryEnchantID)
 					else
 						-- ... 官方搞的太麻烦了
 						local tEnchant = GetItemEnchantAttrib(vv.dwTemporaryEnchantID)
@@ -945,7 +945,7 @@ local function CreateItemTable(item, dwBox, dwX)
 		nIcon     = Table_GetItemIconID(item.nUiId),
 		dwID      = item.dwID,
 		nLevel    = item.nLevel,
-		szName    = Table_GetItemName(item.nUiId),
+		szName    = LIB.GetItemNameByUIID(item.nUiId),
 		nUiId     = item.nUiId,
 		nVersion  = item.nVersion,
 		dwTabType = item.dwTabType,
@@ -969,10 +969,10 @@ function RT.GetEquipCache(KPlayer)
 	for _, equip in ipairs(RT_EQUIP_TOTAL) do
 		-- if #aInfo.tEquip >= 3 then break end
 		-- 藏剑只看重剑
-		if KPlayer.dwForceID == 8 and EQUIPMENT_INVENTORY[equip] == EQUIPMENT_INVENTORY.MELEE_WEAPON then
+		if KPlayer.dwForceID == 8 and CONSTANT.EQUIPMENT_INVENTORY[equip] == CONSTANT.EQUIPMENT_INVENTORY.MELEE_WEAPON then
 			equip = 'BIG_SWORD'
 		end
-		local dwBox, dwX = INVENTORY_INDEX.EQUIP, EQUIPMENT_INVENTORY[equip]
+		local dwBox, dwX = INVENTORY_INDEX.EQUIP, CONSTANT.EQUIPMENT_INVENTORY[equip]
 		local item = KPlayer.GetItem(dwBox, dwX)
 		if item then
 			if RT_EQUIP_SPECIAL[equip] then
@@ -1006,7 +1006,7 @@ function RT.GetEquipCache(KPlayer)
 					dwTemporaryEnchantID         = item.dwTemporaryEnchantID,
 					nTemporaryEnchantLeftSeconds = item.GetTemporaryEnchantLeftSeconds()
 				}
-				if Table_GetCommonEnchantDesc(item.dwTemporaryEnchantID) then
+				if LIB.Table_GetCommonEnchantDesc(item.dwTemporaryEnchantID) then
 					dat.CommonEnchant = true
 				end
 				insert(aInfo.tTemporaryEnchant, dat)

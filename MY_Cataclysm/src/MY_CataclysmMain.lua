@@ -413,32 +413,32 @@ function D.CreateControlBar()
 		container:AppendContentFromIni(szIniFile, 'WndButton_WorldMark')
 	end
 	-- 语音按钮
-	if GVoiceBase_IsOpen() then --LIB.IsInBattleField() or LIB.IsInArena() or LIB.IsInPubg() or LIB.IsInDungeon() then
-		local nSpeakerState = GVoiceBase_GetSpeakerState()
+	if LIB.GVoiceBase_IsOpen() then --LIB.IsInBattleField() or LIB.IsInArena() or LIB.IsInPubg() or LIB.IsInDungeon() then
+		local nSpeakerState = LIB.GVoiceBase_GetSpeakerState()
 		container:AppendContentFromIni(szIniFile, 'Wnd_Speaker')
 			:Lookup('WndButton_Speaker').nSpeakerState = nSpeakerState
 		container:Lookup('Wnd_Speaker/WndButton_Speaker', 'Image_Normal')
-			:SetVisible(nSpeakerState == SPEAKER_STATE.OPEN)
+			:SetVisible(nSpeakerState == CONSTANT.SPEAKER_STATE.OPEN)
 		container:Lookup('Wnd_Speaker/WndButton_Speaker', 'Image_Close_Speaker')
-			:SetVisible(nSpeakerState == SPEAKER_STATE.CLOSE)
-		local nMicState = GVoiceBase_GetMicState()
+			:SetVisible(nSpeakerState == CONSTANT.SPEAKER_STATE.CLOSE)
+		local nMicState = LIB.GVoiceBase_GetMicState()
 		container:AppendContentFromIni(szIniFile, 'Wnd_Microphone')
 			:Lookup('WndButton_Microphone').nMicState = nMicState
 		container:Lookup('Wnd_Microphone/WndButton_Microphone', 'Animate_Input_Mic')
-			:SetVisible(nMicState == MIC_STATE.FREE)
+			:SetVisible(nMicState == CONSTANT.MIC_STATE.FREE)
 		container:Lookup('Wnd_Microphone/WndButton_Microphone', 'Image_UnInsert_Mic')
-			:SetVisible(nMicState == MIC_STATE.NOT_AVIAL)
+			:SetVisible(nMicState == CONSTANT.MIC_STATE.NOT_AVIAL)
 		container:Lookup('Wnd_Microphone/WndButton_Microphone', 'Image_Close_Mic')
-			:SetVisible(nMicState == MIC_STATE.CLOSE_NOT_IN_ROOM or nMicState == MIC_STATE.CLOSE_IN_ROOM)
+			:SetVisible(nMicState == CONSTANT.MIC_STATE.CLOSE_NOT_IN_ROOM or nMicState == CONSTANT.MIC_STATE.CLOSE_IN_ROOM)
 		local hMicFree = container:Lookup('Wnd_Microphone/WndButton_Microphone', 'Handle_Free_Mic')
 		local hMicHotKey = container:Lookup('Wnd_Microphone/WndButton_Microphone', 'Handle_HotKey')
-		hMicFree:SetVisible(nMicState == MIC_STATE.FREE)
-		hMicHotKey:SetVisible(nMicState == MIC_STATE.KEY)
+		hMicFree:SetVisible(nMicState == CONSTANT.MIC_STATE.FREE)
+		hMicHotKey:SetVisible(nMicState == CONSTANT.MIC_STATE.KEY)
 		-- 自动调整语音按钮宽度
 		local nMicWidth = hMicFree:GetRelX()
-		if nMicState == MIC_STATE.FREE then
+		if nMicState == CONSTANT.MIC_STATE.FREE then
 			nMicWidth = nMicWidth + hMicFree:GetW()
-		elseif nMicState == MIC_STATE.KEY then
+		elseif nMicState == CONSTANT.MIC_STATE.KEY then
 			nMicWidth = hMicHotKey:GetRelX() + hMicHotKey:GetW()
 		end
 		container:Lookup('Wnd_Microphone'):SetW(nMicWidth)
@@ -590,8 +590,8 @@ function MY_CataclysmMain.OnFrameCreate()
 	this:RegisterEvent('MY_CAMP_COLOR_UPDATE')
 	this:RegisterEvent('MY_FORCE_COLOR_UPDATE')
 	this:RegisterEvent('GKP_RECORD_TOTAL')
-	this:RegisterEvent('GVOICE_MIC_STATE_CHANGED')
-	this:RegisterEvent('GVOICE_SPEAKER_STATE_CHANGED')
+	this:RegisterEvent('GVOICE_CONSTANT.MIC_STATE_CHANGED')
+	this:RegisterEvent('GVOICE_CONSTANT.SPEAKER_STATE_CHANGED')
 	if GetClientPlayer() then
 		D.UpdateAnchor(this)
 		MY_CataclysmParty:AutoLinkAllPanel()
@@ -833,9 +833,9 @@ function MY_CataclysmMain.OnEvent(szEvent)
 		D.ReloadCataclysmPanel()
 	elseif szEvent == 'GKP_RECORD_TOTAL' then
 		GKP_RECORD_TOTAL = arg0
-	elseif szEvent == 'GVOICE_MIC_STATE_CHANGED' then
+	elseif szEvent == 'GVOICE_CONSTANT.MIC_STATE_CHANGED' then
 		D.CreateControlBar()
-	elseif szEvent == 'GVOICE_SPEAKER_STATE_CHANGED' then
+	elseif szEvent == 'GVOICE_CONSTANT.SPEAKER_STATE_CHANGED' then
 		D.CreateControlBar()
 	elseif szEvent == 'UI_SCALED' then
 		D.UpdateAnchor(this)
@@ -938,7 +938,7 @@ function MY_CataclysmMain.OnFrameBreathe()
 		MY_CataclysmParty:RefreshGVoice()
 		this.nBreatheTime = GetTime()
 	end
-	GVoiceBase_CheckMicState()
+	LIB.GVoiceBase_CheckMicState()
 end
 end
 
@@ -1026,9 +1026,9 @@ function MY_CataclysmMain.OnLButtonClick()
 			return LIB.Sysmsg({_L['You are not the distrubutor.']})
 		end
 	elseif szName == 'WndButton_Speaker' then
-		GVoiceBase_SwitchSpeakerState()
+		LIB.GVoiceBase_SwitchSpeakerState()
 	elseif szName == 'WndButton_Microphone' then
-		GVoiceBase_SwitchMicState()
+		LIB.GVoiceBase_SwitchMicState()
 	end
 end
 
@@ -1072,17 +1072,17 @@ function MY_CataclysmMain.OnMouseLeave()
 end
 
 local SPEAKER_TIP = {
-	[SPEAKER_STATE.OPEN ] = g_tStrings.GVOICE_SPEAKER_OPEN_TIP,
-	[SPEAKER_STATE.CLOSE] = g_tStrings.GVOICE_SPEAKER_CLOSE_TIP,
+	[CONSTANT.SPEAKER_STATE.OPEN ] = g_tStrings.GVOICE_SPEAKER_OPEN_TIP,
+	[CONSTANT.SPEAKER_STATE.CLOSE] = g_tStrings.GVOICE_SPEAKER_CLOSE_TIP,
 }
 local MIC_TIP = setmetatable({
-	[MIC_STATE.NOT_AVIAL        ] = g_tStrings.GVOICE_MIC_UNAVIAL_STATE_TIP,
-	[MIC_STATE.CLOSE_NOT_IN_ROOM] = g_tStrings.GVOICE_MIC_JOIN_STATE_TIP,
-	[MIC_STATE.CLOSE_IN_ROOM    ] = g_tStrings.GVOICE_MIC_KEY_STATE_TIP,
-	[MIC_STATE.FREE             ] = g_tStrings.GVOICE_MIC_CLOSE_STATE_TIP,
+	[CONSTANT.MIC_STATE.NOT_AVIAL        ] = g_tStrings.GVOICE_MIC_UNAVIAL_STATE_TIP,
+	[CONSTANT.MIC_STATE.CLOSE_NOT_IN_ROOM] = g_tStrings.GVOICE_MIC_JOIN_STATE_TIP,
+	[CONSTANT.MIC_STATE.CLOSE_IN_ROOM    ] = g_tStrings.GVOICE_MIC_KEY_STATE_TIP,
+	[CONSTANT.MIC_STATE.FREE             ] = g_tStrings.GVOICE_MIC_CLOSE_STATE_TIP,
 }, {
 	__index = function(t, k)
-		if k == MIC_STATE.KEY then
+		if k == CONSTANT.MIC_STATE.KEY then
 			if LIB.GetHotKey('TOGGLE_GVOCIE_SAY') then
 				return (g_tStrings.GVOICE_MIC_FREE_STATE_TIP
 					:format(LIB.GetHotKeyDisplay('TOGGLE_GVOCIE_SAY')))

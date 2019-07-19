@@ -190,6 +190,23 @@ Log('[MY] Debug level ' .. _DEBUG_LEVEL_ .. ' / delog level ' .. _DELOG_LEVEL_)
 -----------------------------------------------
 local Clone = clone
 -----------------------------------------------
+-- 数据设为只读
+-----------------------------------------------
+local SetmetaReadonly = SetmetaReadonly or function(t)
+	for k, v in pairs(t) do
+		if type(v) == 'table' then
+			t[k] = SetmetaReadonly(v)
+		end
+	end
+	return setmetatable({}, {
+		__index     = t,
+		__newindex  = function() assert(false, 'table is readonly\n') end,
+		__metatable = {
+			const_table = t,
+		},
+	})
+end
+-----------------------------------------------
 -- Lua数据序列化
 -----------------------------------------------
 local EncodeLUAData = var2str
@@ -461,6 +478,29 @@ function ipairs_r(tab)
 end
 end
 -----------------------------------------------
+-- 只读表选代器
+-----------------------------------------------
+-- -- 只读表字典枚举
+-- local pairs_c = pairs_c or function(t, ...)
+-- 	if type(t) == 'table' then
+-- 		local metatable = getmetatable(t)
+-- 		if type(metatable) == 'table' and metatable.const_table then
+-- 			return pairs(metatable.const_table, ...)
+-- 		end
+-- 	end
+-- 	return pairs(t, ...)
+-- end
+-- -- 只读表数组枚举
+-- local ipairs_c = ipairs_c or function(t, ...)
+-- 	if type(t) == 'table' then
+-- 		local metatable = getmetatable(t)
+-- 		if type(metatable) == 'table' and metatable.const_table then
+-- 			return ipairs(metatable.const_table, ...)
+-- 		end
+-- 	end
+-- 	return ipairs(t, ...)
+-- end
+-----------------------------------------------
 -- 类型安全选代器
 -----------------------------------------------
 local spairs, sipairs, spairs_r, sipairs_r
@@ -691,12 +731,156 @@ local CONSTANT = setmetatable({}, {
 		MENU_DIVIDER = SetmetaReadonly({ bDevide = true }),
 		EMPTY_TABLE = SetmetaReadonly({}),
 		XML_LINE_BREAKER = GetFormatText('\n'),
+		UI_OBJECT = UI_OBJECT or SetmetaReadonly({
+			NONE             = -1, -- 空Box
+			ITEM             = 0 , -- 身上有的物品。nUiId, dwBox, dwX, nItemVersion, nTabType, nIndex
+			SHOP_ITEM        = 1 , -- 商店里面出售的物品 nUiId, dwID, dwShopID, dwIndex
+			OTER_PLAYER_ITEM = 2 , -- 其他玩家身上的物品 nUiId, dwBox, dwX, dwPlayerID
+			ITEM_ONLY_ID     = 3 , -- 只有一个ID的物品。比如装备链接之类的。nUiId, dwID, nItemVersion, nTabType, nIndex
+			ITEM_INFO        = 4 , -- 类型物品 nUiId, nItemVersion, nTabType, nIndex, nCount(书nCount代表dwRecipeID)
+			SKILL            = 5 , -- 技能。dwSkillID, dwSkillLevel, dwOwnerID
+			CRAFT            = 6 , -- 技艺。dwProfessionID, dwBranchID, dwCraftID
+			SKILL_RECIPE     = 7 , -- 配方dwID, dwLevel
+			SYS_BTN          = 8 , -- 系统栏快捷方式dwID
+			MACRO            = 9 , -- 宏
+			MOUNT            = 10, -- 镶嵌
+			ENCHANT          = 11, -- 附魔
+			NOT_NEED_KNOWN   = 15, -- 不需要知道类型
+			PENDANT          = 16, -- 挂件
+			PET              = 17, -- 宠物
+			MEDAL            = 18, -- 宠物徽章
+			BUFF             = 19, -- BUFF
+			MONEY            = 20, -- 金钱
+			TRAIN            = 21, -- 修为
+			EMOTION_ACTION   = 22, -- 动作表情
+		}),
+		GLOBAL_HEAD = GLOBAL_HEAD or SetmetaReadonly({
+			CLIENTPLAYER = 0,
+			OTHERPLAYER  = 1,
+			NPC          = 2,
+			LIFE         = 0,
+			GUILD        = 1,
+			TITLE        = 2,
+			NAME         = 3,
+			MARK         = 4,
+		}),
+		EQUIPMENT_SUB = EQUIPMENT_SUB or SetmetaReadonly({
+			MELEE_WEAPON      = 0 , -- 近战武器
+			RANGE_WEAPON      = 1 , -- 远程武器
+			CHEST             = 2 , -- 上衣
+			HELM              = 3 , -- 头部
+			AMULET            = 4 , -- 项链
+			RING              = 5 , -- 戒指
+			WAIST             = 6 , -- 腰带
+			PENDANT           = 7 , -- 腰缀
+			PANTS             = 8 , -- 裤子
+			BOOTS             = 9 , -- 鞋子
+			BANGLE            = 10, -- 护臂
+			WAIST_EXTEND      = 11, -- 腰部挂件
+			PACKAGE           = 12, -- 包裹
+			ARROW             = 13, -- 暗器
+			BACK_EXTEND       = 14, -- 背部挂件
+			HORSE             = 15, -- 坐骑
+			BULLET            = 16, -- 弩或陷阱
+			FACE_EXTEND       = 17, -- 脸部挂件
+			MINI_AVATAR       = 18, -- 小头像
+			PET               = 19, -- 跟宠
+			L_SHOULDER_EXTEND = 20, -- 左肩挂件
+			R_SHOULDER_EXTEND = 21, -- 右肩挂件
+			BACK_CLOAK_EXTEND = 22, -- 披风
+			TOTAL             = 23, --
+		}),
+		EQUIPMENT_INVENTORY = EQUIPMENT_INVENTORY or SetmetaReadonly({
+			MELEE_WEAPON  = 1 , -- 普通近战武器
+			BIG_SWORD     = 2 , -- 重剑
+			RANGE_WEAPON  = 3 , -- 远程武器
+			CHEST         = 4 , -- 上衣
+			HELM          = 5 , -- 头部
+			AMULET        = 6 , -- 项链
+			LEFT_RING     = 7 , -- 左手戒指
+			RIGHT_RING    = 8 , -- 右手戒指
+			WAIST         = 9 , -- 腰带
+			PENDANT       = 10, -- 腰缀
+			PANTS         = 11, -- 裤子
+			BOOTS         = 12, -- 鞋子
+			BANGLE        = 13, -- 护臂
+			PACKAGE1      = 14, -- 扩展背包1
+			PACKAGE2      = 15, -- 扩展背包2
+			PACKAGE3      = 16, -- 扩展背包3
+			PACKAGE4      = 17, -- 扩展背包4
+			PACKAGE_MIBAO = 18, -- 绑定安全产品状态下赠送的额外背包格 （ItemList V9新增）
+			BANK_PACKAGE1 = 19, -- 仓库扩展背包1
+			BANK_PACKAGE2 = 20, -- 仓库扩展背包2
+			BANK_PACKAGE3 = 21, -- 仓库扩展背包3
+			BANK_PACKAGE4 = 22, -- 仓库扩展背包4
+			BANK_PACKAGE5 = 23, -- 仓库扩展背包5
+			ARROW         = 24, -- 暗器
+			TOTAL         = 25,
+		}),
+		FORCE_TYPE = FORCE_TYPE or SetmetaReadonly({
+			JIANG_HU  = 0 , -- 江湖
+			SHAO_LIN  = 1 , -- 少林
+			WAN_HUA   = 2 , -- 万花
+			TIAN_CE   = 3 , -- 天策
+			CHUN_YANG = 4 , -- 纯阳
+			QI_XIU    = 5 , -- 七秀
+			WU_DU     = 6 , -- 五毒
+			TANG_MEN  = 7 , -- 唐门
+			CANG_JIAN = 8 , -- 藏剑
+			GAI_BANG  = 9 , -- 丐帮
+			MING_JIAO = 10, -- 明教
+			CANG_YUN  = 21, -- 苍云
+		}),
+		KUNGFU_TYPE = KUNGFU_TYPE or SetmetaReadonly({
+			TIAN_CE     = 1,      -- 天策内功
+			WAN_HUA     = 2,      -- 万花内功
+			CHUN_YANG   = 3,      -- 纯阳内功
+			QI_XIU      = 4,      -- 七秀内功
+			SHAO_LIN    = 5,      -- 少林内功
+			CANG_JIAN   = 6,      -- 藏剑内功
+			GAI_BANG    = 7,      -- 丐帮内功
+			MING_JIAO   = 8,      -- 明教内功
+			WU_DU       = 9,      -- 五毒内功
+			TANG_MEN    = 10,     -- 唐门内功
+			CANG_YUN    = 18,     -- 苍云内功
+		}),
+		PEEK_OTHER_PLAYER_RESPOND = PEEK_OTHER_PLAYER_RESPOND or SetmetaReadonly({
+			INVALID             = 0,
+			SUCCESS             = 1,
+			FAILED              = 2,
+			CAN_NOT_FIND_PLAYER = 3,
+			TOO_FAR             = 4,
+		}),
+		WND_CONTAINER_STYLE = WND_CONTAINER_STYLE or SetmetaReadonly({
+			WND_CONTAINER_STYLE_CUSTOM       = 0,
+			WND_CONTAINER_STYLE_LEFT_TOP     = 1,
+			WND_CONTAINER_STYLE_LEFT_BOTTOM  = 2,
+			WND_CONTAINER_STYLE_RIGHT_TOP    = 3,
+			WND_CONTAINER_STYLE_RIGHT_BOTTOM = 4,
+			WND_CONTAINER_STYLE_END          = 5,
+		}),
+		MIC_STATE = MIC_STATE or SetmetaReadonly({
+			NOT_AVIAL = 1,
+			CLOSE_NOT_IN_ROOM = 2,
+			CLOSE_IN_ROOM = 3,
+			KEY = 4,
+			FREE = 5,
+		}),
+		SPEAKER_STATE = SPEAKER_STATE or SetmetaReadonly({
+			OPEN = 1,
+			CLOSE = 2,
+		}),
 		EQUIPMENT_SUIT_COUNT = EQUIPMENT_SUIT_COUNT or 4,
+		INVENTORY_GUILD_BANK = INVENTORY_GUILD_BANK or INVENTORY_INDEX.TOTAL + 1, --帮会仓库界面虚拟一个背包位置
+		INVENTORY_GUILD_PAGE_SIZE = INVENTORY_GUILD_PAGE_SIZE or 100,
 	},
 	__newindex = function() end,
 })
 ---------------------------------------------------------------------------------------------
 local LIB = {
+	count_c          = count_c         ,
+	pairs_c          = pairs_c         ,
+	ipairs_c         = ipairs_c        ,
 	ipairs_r         = ipairs_r        ,
 	spairs           = spairs          ,
 	spairs_r         = spairs_r        ,
@@ -717,6 +901,7 @@ local LIB = {
 	Clone            = Clone           ,
 	Call             = Call            ,
 	XpCall           = XpCall          ,
+	SetmetaReadonly  = SetmetaReadonly ,
 	Set              = Set             ,
 	Get              = Get             ,
 	Class            = Class           ,
@@ -738,6 +923,7 @@ _G[_NAME_SPACE_] = LIB
 -----------------------------------------------
 -- 基础函数
 -----------------------------------------------
+
 -- (string, number) LIB.GetVersion()
 function LIB.GetVersion(dwVersion)
 	local dwVersion = dwVersion or _VERSION_
@@ -760,6 +946,47 @@ function LIB.AssertVersion(szKey, szCaption, dwMinVersion)
 		end
 	end
 	return true
+end
+
+-----------------------------------------------
+-- HOOK 全局声音表
+-----------------------------------------------
+if not HookSound then
+	local hook = {}
+	function HookSound(szSound, szKey, fnCondition)
+		if not hook[szSound] then
+			hook[szSound] = {}
+		end
+		hook[szSound][szKey] = fnCondition
+	end
+	local sounds = {}
+	for k, v in pairs(g_sound) do
+		sounds[k], g_sound[k] = g_sound[k], nil
+	end
+	local function getsound(t, k)
+		if hook[k] then
+			for szKey, fnCondition in pairs(hook[k]) do
+				if fnCondition() then
+					return
+				end
+			end
+		end
+		return sounds[k]
+	end
+	local function setsound(t, k, v)
+		sounds[k] = v
+	end
+	setmetatable(g_sound, {__index = getsound, __newindex = setsound})
+
+	local function resumegsound()
+		setmetatable(g_sound, nil)
+		for k, v in pairs(sounds) do
+			g_sound[k] = v
+		end
+	end
+	RegisterEvent('GAME_EXIT', resumegsound)
+	RegisterEvent('PLAYER_EXIT_GAME', resumegsound)
+	RegisterEvent('RELOAD_UI_ADDON_BEGIN', resumegsound)
 end
 
 ---------------------------------------------------

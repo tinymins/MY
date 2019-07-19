@@ -381,7 +381,7 @@ local function RecruitItemToDungeonMenu(p, fnAction, tChecked)
 end
 function LIB.GetDungeonMenu(fnAction, bOnlyRaid, tChecked)
 	local t = {}
-	for _, p in ipairs(Table_GetTeamRecruit() or {}) do
+	for _, p in ipairs(LIB.Table_GetTeamRecruit() or {}) do
 		insert(t, RecruitItemToDungeonMenu(p, fnAction, tChecked))
 	end
 	return t
@@ -682,21 +682,21 @@ end
 do
 local SZ_FORCE_COLOR_FG = 'config/player_force_color.jx3dat'
 local MY_FORCE_COLOR_FG_DEFAULT = setmetatable({
-	[FORCE_TYPE.JIANG_HU ] = { 255, 255, 255 }, -- 江湖
-	[FORCE_TYPE.SHAO_LIN ] = { 255, 178, 95  }, -- 少林
-	[FORCE_TYPE.WAN_HUA  ] = { 196, 152, 255 }, -- 万花
-	[FORCE_TYPE.TIAN_CE  ] = { 255, 111, 83  }, -- 天策
-	[FORCE_TYPE.CHUN_YANG] = { 22 , 216, 216 }, -- 纯阳
-	[FORCE_TYPE.QI_XIU   ] = { 255, 129, 176 }, -- 七秀
-	[FORCE_TYPE.WU_DU    ] = { 55 , 147, 255 }, -- 五毒
-	[FORCE_TYPE.TANG_MEN ] = { 121, 183, 54  }, -- 唐门
-	[FORCE_TYPE.CANG_JIAN] = { 214, 249, 93  }, -- 藏剑
-	[FORCE_TYPE.GAI_BANG ] = { 205, 133, 63  }, -- 丐帮
-	[FORCE_TYPE.MING_JIAO] = { 240, 70 , 96  }, -- 明教
-	[FORCE_TYPE.CANG_YUN ] = { 180, 60 , 0   }, -- 苍云
-	[FORCE_TYPE.CHANG_GE ] = { 100, 250, 180 }, -- 长歌
-	[FORCE_TYPE.BA_DAO   ] = { 106 ,108, 189 }, -- 霸刀
-	[FORCE_TYPE.PENG_LAI ] = { 171 ,227, 250 }, -- 蓬莱
+	[CONSTANT.FORCE_TYPE.JIANG_HU ] = { 255, 255, 255 }, -- 江湖
+	[CONSTANT.FORCE_TYPE.SHAO_LIN ] = { 255, 178, 95  }, -- 少林
+	[CONSTANT.FORCE_TYPE.WAN_HUA  ] = { 196, 152, 255 }, -- 万花
+	[CONSTANT.FORCE_TYPE.TIAN_CE  ] = { 255, 111, 83  }, -- 天策
+	[CONSTANT.FORCE_TYPE.CHUN_YANG] = { 22 , 216, 216 }, -- 纯阳
+	[CONSTANT.FORCE_TYPE.QI_XIU   ] = { 255, 129, 176 }, -- 七秀
+	[CONSTANT.FORCE_TYPE.WU_DU    ] = { 55 , 147, 255 }, -- 五毒
+	[CONSTANT.FORCE_TYPE.TANG_MEN ] = { 121, 183, 54  }, -- 唐门
+	[CONSTANT.FORCE_TYPE.CANG_JIAN] = { 214, 249, 93  }, -- 藏剑
+	[CONSTANT.FORCE_TYPE.GAI_BANG ] = { 205, 133, 63  }, -- 丐帮
+	[CONSTANT.FORCE_TYPE.MING_JIAO] = { 240, 70 , 96  }, -- 明教
+	[CONSTANT.FORCE_TYPE.CANG_YUN ] = { 180, 60 , 0   }, -- 苍云
+	[CONSTANT.FORCE_TYPE.CHANG_GE ] = { 100, 250, 180 }, -- 长歌
+	[CONSTANT.FORCE_TYPE.BA_DAO   ] = { 106 ,108, 189 }, -- 霸刀
+	[CONSTANT.FORCE_TYPE.PENG_LAI ] = { 171 ,227, 250 }, -- 蓬莱
 }, {
 	__index = function(t, k)
 		return { 225, 225, 225 }
@@ -713,21 +713,21 @@ local MY_FORCE_COLOR_FG = setmetatable({}, {
 
 local SZ_FORCE_COLOR_BG = 'config/player_force_color_bg.jx3dat'
 local MY_FORCE_COLOR_BG_DEFAULT = setmetatable({
-	[FORCE_TYPE.JIANG_HU ] = { 255, 255, 255 }, -- 江湖
-	[FORCE_TYPE.SHAO_LIN ] = { 210, 180, 0   }, -- 少林
-	[FORCE_TYPE.WAN_HUA  ] = { 127, 31 , 223 }, -- 万花
-	[FORCE_TYPE.TIAN_CE  ] = { 160, 0  , 0   }, -- 天策
-	[FORCE_TYPE.CHUN_YANG] = { 56 , 175, 255 }, -- 纯阳 56,175,255,232
-	[FORCE_TYPE.QI_XIU   ] = { 255, 127, 255 }, -- 七秀
-	[FORCE_TYPE.WU_DU    ] = { 63 , 31 , 159 }, -- 五毒
-	[FORCE_TYPE.TANG_MEN ] = { 0  , 133, 144 }, -- 唐门
-	[FORCE_TYPE.CANG_JIAN] = { 255, 255, 0   }, -- 藏剑
-	[FORCE_TYPE.GAI_BANG ] = { 205, 133, 63  }, -- 丐帮
-	[FORCE_TYPE.MING_JIAO] = { 253, 84 , 0   }, -- 明教
-	[FORCE_TYPE.CANG_YUN ] = { 180, 60 , 0   }, -- 苍云
-	[FORCE_TYPE.CHANG_GE ] = { 100, 250, 180 }, -- 长歌
-	[FORCE_TYPE.BA_DAO   ] = { 71 , 73 , 166 }, -- 霸刀
-	[FORCE_TYPE.PENG_LAI ] = { 195, 171, 227 }, -- 蓬莱
+	[CONSTANT.FORCE_TYPE.JIANG_HU ] = { 255, 255, 255 }, -- 江湖
+	[CONSTANT.FORCE_TYPE.SHAO_LIN ] = { 210, 180, 0   }, -- 少林
+	[CONSTANT.FORCE_TYPE.WAN_HUA  ] = { 127, 31 , 223 }, -- 万花
+	[CONSTANT.FORCE_TYPE.TIAN_CE  ] = { 160, 0  , 0   }, -- 天策
+	[CONSTANT.FORCE_TYPE.CHUN_YANG] = { 56 , 175, 255 }, -- 纯阳 56,175,255,232
+	[CONSTANT.FORCE_TYPE.QI_XIU   ] = { 255, 127, 255 }, -- 七秀
+	[CONSTANT.FORCE_TYPE.WU_DU    ] = { 63 , 31 , 159 }, -- 五毒
+	[CONSTANT.FORCE_TYPE.TANG_MEN ] = { 0  , 133, 144 }, -- 唐门
+	[CONSTANT.FORCE_TYPE.CANG_JIAN] = { 255, 255, 0   }, -- 藏剑
+	[CONSTANT.FORCE_TYPE.GAI_BANG ] = { 205, 133, 63  }, -- 丐帮
+	[CONSTANT.FORCE_TYPE.MING_JIAO] = { 253, 84 , 0   }, -- 明教
+	[CONSTANT.FORCE_TYPE.CANG_YUN ] = { 180, 60 , 0   }, -- 苍云
+	[CONSTANT.FORCE_TYPE.CHANG_GE ] = { 100, 250, 180 }, -- 长歌
+	[CONSTANT.FORCE_TYPE.BA_DAO   ] = { 71 , 73 , 166 }, -- 霸刀
+	[CONSTANT.FORCE_TYPE.PENG_LAI ] = { 195, 171, 227 }, -- 蓬莱
 }, {
 	__index = function(t, k)
 		return { 225, 225, 225 }
@@ -851,8 +851,8 @@ do
 local FORCE_LIST
 function LIB.GetForceList()
 	FORCE_LIST = {}
-	for _, dwForceID in pairs_c(FORCE_TYPE) do
-		if dwForceID ~= FORCE_TYPE.JIANG_HU then
+	for _, dwForceID in pairs_c(CONSTANT.FORCE_TYPE) do
+		if dwForceID ~= CONSTANT.FORCE_TYPE.JIANG_HU then
 			insert(FORCE_LIST, dwForceID)
 		end
 	end
@@ -938,7 +938,7 @@ do
 local ITEM_CACHE = {}
 function LIB.GetItemName(nUiId)
 	if not ITEM_CACHE[nUiId] then
-		local szName = Table_GetItemName(nUiId)
+		local szName = LIB.GetItemNameByUIID(nUiId)
 		local nIcon = Table_GetItemIconID(nUiId)
 		if szName ~= '' and nIocn ~= -1 then
 			ITEM_CACHE[nUiId] = { szName, nIcon }
@@ -1074,7 +1074,7 @@ function LIB.GetObjectName(obj, eRetID)
 			end
 		end
 		if obj.dwEmployer and obj.dwEmployer ~= 0 then
-			if Table_IsSimplePlayer(obj.dwTemplateID) then -- 长歌影子
+			if LIB.Table_IsSimplePlayer(obj.dwTemplateID) then -- 长歌影子
 				szName = LIB.GetObjectName(GetPlayer(obj.dwEmployer), eRetID)
 			elseif not IsEmpty(szName) then
 				local szEmpName = LIB.GetObjectName(
@@ -1087,14 +1087,14 @@ function LIB.GetObjectName(obj, eRetID)
 	elseif szType == 'DOODAD' then -- DOODAD
 		szType = 'D'
 		if IsEmpty(szName) then
-			szName = Table_GetDoodadTemplateName(obj.dwTemplateID)
+			szName = LIB.Table_GetDoodadTemplateName(obj.dwTemplateID)
 			if szName then
 				szName = szName:gsub('^%s*(.-)%s*$', '%1')
 			end
 		end
 	elseif szType == 'ITEM' then -- ITEM
 		szType = 'I'
-		szName = GetItemNameByItem(obj)
+		szName = LIB.GetItemNameByItem(obj)
 	else
 		szType = '?'
 	end
@@ -1581,7 +1581,7 @@ function LIB.GetRelation(dwSelfID, dwPeerID)
 			dwPeerID = npc.dwEmployer
 		end
 	end
-	if IsSelf(dwSelfID, dwPeerID) then
+	if LIB.IsSelf(dwSelfID, dwPeerID) then
 		return 'Self'
 	end
 	local dwSrcID, dwTarID = dwSelfID, dwPeerID
@@ -1950,7 +1950,7 @@ function LIB.Equip(szName)
 				local item = me.GetItem(i, j)
 				if item == nil then
 					j=j + 1
-				elseif Table_GetItemName(item.nUiId) == szName then -- GetItemNameByItem(item)
+				elseif LIB.GetItemNameByUIID(item.nUiId) == szName then -- LIB.GetItemNameByItem(item)
 					local eRetCode, nEquipPos = me.GetEquipPos(i, j)
 					if szName == _L['ji guan'] or szName == _L['nu jian'] then
 						for k = 0,15 do
@@ -2298,12 +2298,12 @@ RegisterEvent("ON_SKILL_REPLACE", OnSkillReplace)
 RegisterEvent("CHANGE_SKILL_ICON", OnSkillReplace)
 function LIB.GetKungfuSkillIDs(dwKungfuID)
 	if not CACHE[dwKungfuID] then
-		local aSubKungfuID, aList = Table_GetMKungfuList(dwKungfuID), {}
+		local aSubKungfuID, aList = LIB.Table_GetMKungfuList(dwKungfuID), {}
 		for _, dwSubKungfuID in ipairs(aSubKungfuID) do
 			local aSub = { dwSubKungfuID = dwSubKungfuID }
-			local aSkillID = Table_GetNewKungfuSkill(dwKungfuID, dwSubKungfuID)
+			local aSkillID = LIB.Table_GetNewKungfuSkill(dwKungfuID, dwSubKungfuID)
 			if not aSkillID then
-				aSkillID = Table_GetKungfuSkillList(dwSubKungfuID)
+				aSkillID = LIB.Table_GetKungfuSkillList(dwSubKungfuID)
 			end
 			for _, dwSkillID in ipairs(aSkillID) do
 				if REPLACE[dwSkillID] then
@@ -2322,7 +2322,7 @@ end
 do local CACHE = {}
 function LIB.GetForceKungfuList(dwForceID)
 	if not CACHE[dwForceID] then
-		CACHE[dwForceID] = Table_GetSkillSchoolKungfu(dwForceID)
+		CACHE[dwForceID] = LIB.Table_GetSkillSchoolKungfu(dwForceID)
 	end
 	return CACHE[dwForceID]
 end
@@ -2331,7 +2331,7 @@ end
 do local CACHE = {}
 function LIB.GetSchoolForceID(dwSchoolID)
 	if not CACHE[dwSchoolID] then
-		CACHE[dwSchoolID] = Table_SchoolToForce(dwSchoolID)
+		CACHE[dwSchoolID] = LIB.Table_SchoolToForce(dwSchoolID)
 	end
 	return CACHE[dwSchoolID]
 end
@@ -2399,7 +2399,7 @@ function LIB.GetSkill(dwID, nLevel)
 			nLevel = nLevel,
 			bLearned = nLevel > 0,
 			nIcon = Table_GetSkillIconID(dwID, nLevel),
-			dwExtID = Table_GetSkillExtCDID(dwID),
+			dwExtID = LIB.Table_GetSkillExtCDID(dwID),
 			bFormation = Table_IsSkillFormation(dwID, nLevel),
 		}
 		SKILL_PROXY[szKey] = setmetatable({}, { __index = SKILL_CACHE[szKey], __newindex = reject })
@@ -2607,8 +2607,7 @@ do
 local PUBG_MAP = {}
 function LIB.IsPubgMap(dwMapID)
 	if PUBG_MAP[dwMapID] == nil then
-		PUBG_MAP[dwMapID] = Table_IsTreasureBattleFieldMap
-			and Table_IsTreasureBattleFieldMap(dwMapID) or false
+		PUBG_MAP[dwMapID] = LIB.Table_IsTreasureBattleFieldMap(dwMapID) or false
 	end
 	return PUBG_MAP[dwMapID]
 end
@@ -2959,20 +2958,20 @@ end
 do
 local CACHE = {}
 local m_MountTypeToWeapon = {
-	[KUNGFU_TYPE.TIAN_CE  ] = WEAPON_DETAIL.SPEAR        , -- 天策内功=长兵类
-	[KUNGFU_TYPE.WAN_HUA  ] = WEAPON_DETAIL.PEN          , -- 万花内功=笔类
-	[KUNGFU_TYPE.CHUN_YANG] = WEAPON_DETAIL.SWORD        , -- 纯阳内功=短兵类
-	[KUNGFU_TYPE.QI_XIU   ] = WEAPON_DETAIL.DOUBLE_WEAPON, -- 七秀内功 = 双兵类
-	[KUNGFU_TYPE.SHAO_LIN ] = WEAPON_DETAIL.WAND         , -- 少林内功=棍类
-	[KUNGFU_TYPE.CANG_JIAN] = WEAPON_DETAIL.SWORD        , -- 藏剑内功=短兵类,重兵类 WEAPON_DETAIL.BIG_SWORD
-	[KUNGFU_TYPE.GAI_BANG ] = WEAPON_DETAIL.STICK        , -- 丐帮内功=短棒
-	[KUNGFU_TYPE.MING_JIAO] = WEAPON_DETAIL.KNIFE        , -- 明教内功=弯刀
-	[KUNGFU_TYPE.WU_DU    ] = WEAPON_DETAIL.FLUTE        , -- 五毒内功=笛类
-	[KUNGFU_TYPE.TANG_MEN ] = WEAPON_DETAIL.BOW          , -- 唐门内功=千机匣
-	[KUNGFU_TYPE.CANG_YUN ] = WEAPON_DETAIL.BLADE_SHIELD , -- 苍云内功=刀盾
-	[KUNGFU_TYPE.CHANG_GE ] = WEAPON_DETAIL.HEPTA_CHORD  , -- 长歌内功=琴
-	[KUNGFU_TYPE.BA_DAO   ]	= WEAPON_DETAIL.BROAD_SWORD  , -- 霸刀内功=组合刀
-	[KUNGFU_TYPE.PENG_LAI ]	= WEAPON_DETAIL.UMBRELLA     , -- 蓬莱内功=伞
+	[CONSTANT.KUNGFU_TYPE.TIAN_CE  ] = WEAPON_DETAIL.SPEAR        , -- 天策内功=长兵类
+	[CONSTANT.KUNGFU_TYPE.WAN_HUA  ] = WEAPON_DETAIL.PEN          , -- 万花内功=笔类
+	[CONSTANT.KUNGFU_TYPE.CHUN_YANG] = WEAPON_DETAIL.SWORD        , -- 纯阳内功=短兵类
+	[CONSTANT.KUNGFU_TYPE.QI_XIU   ] = WEAPON_DETAIL.DOUBLE_WEAPON, -- 七秀内功 = 双兵类
+	[CONSTANT.KUNGFU_TYPE.SHAO_LIN ] = WEAPON_DETAIL.WAND         , -- 少林内功=棍类
+	[CONSTANT.KUNGFU_TYPE.CANG_JIAN] = WEAPON_DETAIL.SWORD        , -- 藏剑内功=短兵类,重兵类 WEAPON_DETAIL.BIG_SWORD
+	[CONSTANT.KUNGFU_TYPE.GAI_BANG ] = WEAPON_DETAIL.STICK        , -- 丐帮内功=短棒
+	[CONSTANT.KUNGFU_TYPE.MING_JIAO] = WEAPON_DETAIL.KNIFE        , -- 明教内功=弯刀
+	[CONSTANT.KUNGFU_TYPE.WU_DU    ] = WEAPON_DETAIL.FLUTE        , -- 五毒内功=笛类
+	[CONSTANT.KUNGFU_TYPE.TANG_MEN ] = WEAPON_DETAIL.BOW          , -- 唐门内功=千机匣
+	[CONSTANT.KUNGFU_TYPE.CANG_YUN ] = WEAPON_DETAIL.BLADE_SHIELD , -- 苍云内功=刀盾
+	[CONSTANT.KUNGFU_TYPE.CHANG_GE ] = WEAPON_DETAIL.HEPTA_CHORD  , -- 长歌内功=琴
+	[CONSTANT.KUNGFU_TYPE.BA_DAO   ]	= WEAPON_DETAIL.BROAD_SWORD  , -- 霸刀内功=组合刀
+	[CONSTANT.KUNGFU_TYPE.PENG_LAI ]	= WEAPON_DETAIL.UMBRELLA     , -- 蓬莱内功=伞
 	--WEAPON_DETAIL.FIST = 拳腕
 	--WEAPON_DETAIL.DART = 弓弦
 	--WEAPON_DETAIL.MACH_DART = 机关暗器
@@ -2982,7 +2981,7 @@ function LIB.IsItemFitKungfu(itemInfo, kungfu)
 	if tostring(itemInfo):find('^KGItem:') then
 		itemInfo = GetItemInfo(itemInfo.dwTabType, itemInfo.dwIndex)
 	end
-	if itemInfo.nSub == EQUIPMENT_SUB.MELEE_WEAPON then
+	if itemInfo.nSub == CONSTANT.EQUIPMENT_SUB.MELEE_WEAPON then
 		local player = GetClientPlayer()
 		local skill  = kungfu or player.GetKungfuMount()
 		if not skill then
@@ -3041,46 +3040,46 @@ function LIB.GetItemEquipPos(item, nIndex)
 		nIndex = 1
 	end
 	local dwPackage, dwBox, nCount = INVENTORY_INDEX.EQUIP, 0, 1
-	if item.nSub == EQUIPMENT_SUB.MELEE_WEAPON then
+	if item.nSub == CONSTANT.EQUIPMENT_SUB.MELEE_WEAPON then
 		if item.nDetail == WEAPON_DETAIL.BIG_SWORD then
-			dwBox = EQUIPMENT_INVENTORY.BIG_SWORD
+			dwBox = CONSTANT.EQUIPMENT_INVENTORY.BIG_SWORD
 		else
-			dwBox = EQUIPMENT_INVENTORY.MELEE_WEAPON
+			dwBox = CONSTANT.EQUIPMENT_INVENTORY.MELEE_WEAPON
 		end
-	elseif item.nSub == EQUIPMENT_SUB.RANGE_WEAPON then
-		dwBox = EQUIPMENT_INVENTORY.RANGE_WEAPON
-	elseif item.nSub == EQUIPMENT_SUB.ARROW then
-		dwBox = EQUIPMENT_INVENTORY.ARROW
-	elseif item.nSub == EQUIPMENT_SUB.CHEST then
-		dwBox = EQUIPMENT_INVENTORY.CHEST
-	elseif item.nSub == EQUIPMENT_SUB.HELM then
-		dwBox = EQUIPMENT_INVENTORY.HELM
-	elseif item.nSub == EQUIPMENT_SUB.AMULET then
-		dwBox = EQUIPMENT_INVENTORY.AMULET
-	elseif item.nSub == EQUIPMENT_SUB.RING then
+	elseif item.nSub == CONSTANT.EQUIPMENT_SUB.RANGE_WEAPON then
+		dwBox = CONSTANT.EQUIPMENT_INVENTORY.RANGE_WEAPON
+	elseif item.nSub == CONSTANT.EQUIPMENT_SUB.ARROW then
+		dwBox = CONSTANT.EQUIPMENT_INVENTORY.ARROW
+	elseif item.nSub == CONSTANT.EQUIPMENT_SUB.CHEST then
+		dwBox = CONSTANT.EQUIPMENT_INVENTORY.CHEST
+	elseif item.nSub == CONSTANT.EQUIPMENT_SUB.HELM then
+		dwBox = CONSTANT.EQUIPMENT_INVENTORY.HELM
+	elseif item.nSub == CONSTANT.EQUIPMENT_SUB.AMULET then
+		dwBox = CONSTANT.EQUIPMENT_INVENTORY.AMULET
+	elseif item.nSub == CONSTANT.EQUIPMENT_SUB.RING then
 		if nIndex == 1 then
-			dwBox = EQUIPMENT_INVENTORY.LEFT_RING
+			dwBox = CONSTANT.EQUIPMENT_INVENTORY.LEFT_RING
 		else
-			dwBox = EQUIPMENT_INVENTORY.RIGHT_RING
+			dwBox = CONSTANT.EQUIPMENT_INVENTORY.RIGHT_RING
 		end
 		nCount = 2
-	elseif item.nSub == EQUIPMENT_SUB.WAIST then
-		dwBox = EQUIPMENT_INVENTORY.WAIST
-	elseif item.nSub == EQUIPMENT_SUB.PENDANT then
-		dwBox = EQUIPMENT_INVENTORY.PENDANT
-	elseif item.nSub == EQUIPMENT_SUB.PANTS then
-		dwBox = EQUIPMENT_INVENTORY.PANTS
-	elseif item.nSub == EQUIPMENT_SUB.BOOTS then
-		dwBox = EQUIPMENT_INVENTORY.BOOTS
-	elseif item.nSub == EQUIPMENT_SUB.BANGLE then
-		dwBox = EQUIPMENT_INVENTORY.BANGLE
-	elseif item.nSub == EQUIPMENT_SUB.WAIST_EXTEND then
-		dwBox = EQUIPMENT_INVENTORY.WAIST_EXTEND
-	elseif item.nSub == EQUIPMENT_SUB.BACK_EXTEND then
-		dwBox = EQUIPMENT_INVENTORY.BACK_EXTEND
-	elseif item.nSub == EQUIPMENT_SUB.FACE_EXTEND then
-		dwBox = EQUIPMENT_SUB.FACE_EXTEND
-	elseif item.nSub == EQUIPMENT_SUB.HORSE then
+	elseif item.nSub == CONSTANT.EQUIPMENT_SUB.WAIST then
+		dwBox = CONSTANT.EQUIPMENT_INVENTORY.WAIST
+	elseif item.nSub == CONSTANT.EQUIPMENT_SUB.PENDANT then
+		dwBox = CONSTANT.EQUIPMENT_INVENTORY.PENDANT
+	elseif item.nSub == CONSTANT.EQUIPMENT_SUB.PANTS then
+		dwBox = CONSTANT.EQUIPMENT_INVENTORY.PANTS
+	elseif item.nSub == CONSTANT.EQUIPMENT_SUB.BOOTS then
+		dwBox = CONSTANT.EQUIPMENT_INVENTORY.BOOTS
+	elseif item.nSub == CONSTANT.EQUIPMENT_SUB.BANGLE then
+		dwBox = CONSTANT.EQUIPMENT_INVENTORY.BANGLE
+	elseif item.nSub == CONSTANT.EQUIPMENT_SUB.WAIST_EXTEND then
+		dwBox = CONSTANT.EQUIPMENT_INVENTORY.WAIST_EXTEND
+	elseif item.nSub == CONSTANT.EQUIPMENT_SUB.BACK_EXTEND then
+		dwBox = CONSTANT.EQUIPMENT_INVENTORY.BACK_EXTEND
+	elseif item.nSub == CONSTANT.EQUIPMENT_SUB.FACE_EXTEND then
+		dwBox = CONSTANT.EQUIPMENT_SUB.FACE_EXTEND
+	elseif item.nSub == CONSTANT.EQUIPMENT_SUB.HORSE then
 		dwPackage, dwBox = GetClientPlayer().GetEquippedHorsePos()
 	end
 	return dwPackage, dwBox, nIndex, nCount
@@ -3089,12 +3088,12 @@ end
 -- * 当前装备是否是比身上已经装备的更好
 function LIB.IsBetterEquipment(item, dwPackage, dwBox)
 	if item.nGenre ~= ITEM_GENRE.EQUIPMENT
-	or item.nSub == EQUIPMENT_SUB.WAIST_EXTEND
-	or item.nSub == EQUIPMENT_SUB.BACK_EXTEND
-	or item.nSub == EQUIPMENT_SUB.FACE_EXTEND
-	or item.nSub == EQUIPMENT_SUB.BULLET
-	or item.nSub == EQUIPMENT_SUB.MINI_AVATAR
-	or item.nSub == EQUIPMENT_SUB.PET then
+	or item.nSub == CONSTANT.EQUIPMENT_SUB.WAIST_EXTEND
+	or item.nSub == CONSTANT.EQUIPMENT_SUB.BACK_EXTEND
+	or item.nSub == CONSTANT.EQUIPMENT_SUB.FACE_EXTEND
+	or item.nSub == CONSTANT.EQUIPMENT_SUB.BULLET
+	or item.nSub == CONSTANT.EQUIPMENT_SUB.MINI_AVATAR
+	or item.nSub == CONSTANT.EQUIPMENT_SUB.PET then
 		return false
 	end
 
@@ -3118,4 +3117,132 @@ function LIB.IsBetterEquipment(item, dwPackage, dwBox)
 		return item.nEquipScore > equipedItem.nEquipScore
 	end
 	return (item.nEquipScore > equipedItem.nEquipScore) or (item.nLevel > equipedItem.nLevel and item.nQuality >= equipedItem.nQuality)
+end
+
+if IsFunction(GetCampImageFrame) then
+	LIB.GetCampImageFrame = GetCampImageFrame
+else
+	function LIB.GetCampImageFrame(eCamp, bFight) -- ui\Image\UICommon\CommonPanel2.UITex
+		local nFrame = nil
+		if eCamp == CAMP.GOOD then
+			if bFight then
+				nFrame = 117
+			else
+				nFrame = 7
+			end
+		elseif eCamp == CAMP.EVIL then
+			if bFight then
+				nFrame = 116
+			else
+				nFrame = 5
+			end
+		end
+		return nFrame
+	end
+end
+
+if IsFunction(GetCampImage) then
+	LIB.GetCampImage = GetCampImage
+else
+	function LIB.GetCampImage(eCamp, bFight)
+		local nFrame = LIB.GetCampImageFrame(eCamp, bFight)
+		if nFrame then
+			return 'ui\\Image\\UICommon\\CommonPanel2.UITex', nFrame
+		end
+	end
+end
+
+if IsFunction(GetUserRoleName) then
+	LIB.GetUserRoleName = GetUserRoleName
+else
+	local _RoleName = ''
+	function LIB.GetUserRoleName()
+		local me = GetClientPlayer()
+		if me and not IsRemotePlayer(me.dwID) then
+			_RoleName = me.szName
+		end
+		return _RoleName
+	end
+end
+
+if IsFunction(GetItemNameByItem) then
+	LIB.GetItemNameByItem = GetItemNameByItem
+else
+	function LIB.GetItemNameByItem(item)
+		if item.nGenre == ITEM_GENRE.BOOK then
+			local nBookID, nSegID = GlobelRecipeID2BookID(item.nBookID)
+			return Table_GetSegmentName(nBookID, nSegID) or g_tStrings.BOOK
+		else
+			return LIB.GetItemNameByUIID(item.nUiId)
+		end
+	end
+end
+
+if IsFunction(GetItemNameByItemInfo) then
+	LIB.GetItemNameByItemInfo = GetItemNameByItemInfo
+else
+	function LIB.GetItemNameByItemInfo(itemInfo, nBookInfo)
+		if itemInfo.nGenre == ITEM_GENRE.BOOK then
+			if nBookInfo then
+				local nBookID, nSegID = GlobelRecipeID2BookID(nBookInfo)
+				return Table_GetSegmentName(nBookID, nSegID) or g_tStrings.BOOK
+			else
+				return LIB.GetItemNameByUIID(itemInfo.nUiId)
+			end
+		else
+			return LIB.GetItemNameByUIID(itemInfo.nUiId)
+		end
+	end
+end
+
+if IsFunction(GetItemNameByUIID) then
+	LIB.GetItemNameByUIID = GetItemNameByUIID
+else
+	function LIB.GetItemNameByUIID(nUiId)
+		return Table_GetItemName(nUiId)
+	end
+end
+
+if IsFunction(GetGuildBankBagPos) then
+	LIB.GetGuildBankBagPos = GetGuildBankBagPos
+else
+	function LIB.GetGuildBankBagPos(nPage, nIndex)
+		return CONSTANT.INVENTORY_GUILD_BANK, nPage * CONSTANT.INVENTORY_GUILD_PAGE_SIZE + nIndex
+	end
+end
+
+if IsFunction(IsSelf) then
+	LIB.IsSelf = IsSelf
+else
+	function LIB.IsSelf(dwSrcID, dwTarID)
+		return dwSrcID ~= 0 and dwSrcID == dwTarID and IsPlayer(dwSrcID) and IsPlayer(dwTarID)
+	end
+end
+
+
+if IsFunction(ForceIDToKungfuIDs) then
+	LIB.ForceIDToKungfuIDs = ForceIDToKungfuIDs
+else
+	-- * 获取门派对应心法ID列表
+	local m_tForceToKungfu
+	function LIB.ForceIDToKungfuIDs(dwForceID)
+		if not m_tForceToKungfu then
+			m_tForceToKungfu = {
+				[CONSTANT.FORCE_TYPE.SHAO_LIN ] = { 10002, 10003, },
+				[CONSTANT.FORCE_TYPE.WAN_HUA  ] = { 10021, 10028, },
+				[CONSTANT.FORCE_TYPE.TIAN_CE  ] = { 10026, 10062, },
+				[CONSTANT.FORCE_TYPE.CHUN_YANG] = { 10014, 10015, },
+				[CONSTANT.FORCE_TYPE.QI_XIU   ] = { 10080, 10081, },
+				[CONSTANT.FORCE_TYPE.WU_DU    ] = { 10175, 10176, },
+				[CONSTANT.FORCE_TYPE.TANG_MEN ] = { 10224, 10225, },
+				[CONSTANT.FORCE_TYPE.CANG_JIAN] = { 10144, 10145, },
+				[CONSTANT.FORCE_TYPE.GAI_BANG ] = { 10268, },
+				[CONSTANT.FORCE_TYPE.MING_JIAO] = { 10242, 10243, },
+				[CONSTANT.FORCE_TYPE.CANG_YUN ] = { 10389, 10390, },
+				[CONSTANT.FORCE_TYPE.CHANG_GE ] = { 10447, 10448, },
+				[CONSTANT.FORCE_TYPE.BA_DAO   ] = { 10464, },
+			}
+		end
+		return m_tForceToKungfu[dwForceID] or {}
+	end
 end

@@ -122,7 +122,7 @@ function Chat.OpenFrame(item, menu, data)
 	end
 	local box = frame:Lookup('', 'Box')
 	local txt = frame:Lookup('', 'Text')
-	txt:SetText(GetItemNameByItem(item))
+	txt:SetText(LIB.GetItemNameByItem(item))
 	txt:SetFontColor(GetItemFontColorByQuality(item.nQuality))
 	local h = frame:Lookup('WndScroll_Chat'):Lookup('', '')
 	h:Clear()

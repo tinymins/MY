@@ -56,7 +56,6 @@ if not LIB.AssertVersion('MY_CombatText', _L['MY_CombatText'], 0x2011800) then
 	return
 end
 local Table_GetBuffName, Table_GetSkillName, Table_BuffIsVisible = Table_GetBuffName, Table_GetSkillName, Table_BuffIsVisible
-local GetUserRoleName = GetUserRoleName
 local pairs, ipairs, unpack = pairs, ipairs, unpack
 local tinsert, tremove, tsort = table.insert, table.remove, table.sort
 local floor, ceil, min, max = math.floor, math.ceil, math.min, math.max
@@ -694,7 +693,7 @@ function CombatText.OnSkillText(dwCasterID, dwTargetID, bCriticalStrike, nType, 
 				szCasterName = p.szName
 			end
 		end
-		if MY_CombatText.bCasterNotI and szCasterName == GetUserRoleName() then
+		if MY_CombatText.bCasterNotI and szCasterName == GetClientPlayer().szName then
 			szCasterName = ''
 		end
 		if MY_CombatText.bSnShorten2 then

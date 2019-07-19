@@ -166,7 +166,7 @@ function PS.OnPanelActive(frame)
 	}, true):autoWidth():width() + 5
 
 	local me = GetClientPlayer()
-	if me.dwForceID == FORCE_TYPE.WU_DU then
+	if me.dwForceID == CONSTANT.FORCE_TYPE.WU_DU then
 		x = x + ui:append('WndCheckBox', {
 			x = x, y = y, text = _L['ZuiWu Effect'],
 			color = { LIB.GetForceColor(6) },

@@ -308,9 +308,9 @@ function LIB.OutputDoodadTip(dwDoodadID, Rect, szExtraXml)
 				end
 
 				if doodadTemplate.dwCraftID == 1 or doodadTemplate.dwCraftID == 2 or doodadTemplate.dwCraftID == 3 then --采金 神农 庖丁
-					insert(t, GetFormatText(FormatString(g_tStrings.STR_MSG_NEED_BEST_CRAFT, Table_GetProfessionName(recipe.dwProfessionID), requireLevel), nFont))
+					insert(t, GetFormatText(FormatString(g_tStrings.STR_MSG_NEED_BEST_CRAFT, LIB.Table_GetProfessionName(recipe.dwProfessionID), requireLevel), nFont))
 				elseif doodadTemplate.dwCraftID ~= 8 then --8 读碑文
-					insert(t, GetFormatText(FormatString(g_tStrings.STR_MSG_NEED_CRAFT, Table_GetProfessionName(recipe.dwProfessionID), requireLevel), nFont))
+					insert(t, GetFormatText(FormatString(g_tStrings.STR_MSG_NEED_CRAFT, LIB.Table_GetProfessionName(recipe.dwProfessionID), requireLevel), nFont))
 				end
 
 				if recipe.nCraftType == ALL_CRAFT_TYPE.READ then
@@ -335,10 +335,10 @@ function LIB.OutputDoodadTip(dwDoodadID, Rect, szExtraXml)
 					end
 
 					if toolCommonItemInfo then
-						szText = FormatString(g_tStrings.STR_MSG_NEED_TOOL, GetItemNameByItemInfo(toolItemInfo)
-							.. g_tStrings.STR_OR .. GetItemNameByItemInfo(toolCommonItemInfo))
+						szText = FormatString(g_tStrings.STR_MSG_NEED_TOOL, LIB.GetItemNameByItemInfo(toolItemInfo)
+							.. g_tStrings.STR_OR .. LIB.GetItemNameByItemInfo(toolCommonItemInfo))
 					else
-						szText = FormatString(g_tStrings.STR_MSG_NEED_TOOL, GetItemNameByItemInfo(toolItemInfo))
+						szText = FormatString(g_tStrings.STR_MSG_NEED_TOOL, LIB.GetItemNameByItemInfo(toolItemInfo))
 					end
 					insert(t, GetFormatText(szText, nFont))
 				end

@@ -79,33 +79,33 @@ local function UpdatePlayerData(hFrame, KSelf)
 	local nCurrentExtra, nMaxExtra
 	local nExtraR, nExtraG, nExtraB
 	local szExtra, szExtraImage, nExtraFrame
-	if KSelf.dwForceID == FORCE_TYPE.SHAO_LIN then
+	if KSelf.dwForceID == CONSTANT.FORCE_TYPE.SHAO_LIN then
 		local nAccumulate = math.min(KSelf.nAccumulateValue, 3)
 		szExtra = _L['ChanNa:'] .. tostring(nAccumulate)
 		nCurrentExtra, nMaxExtra = nAccumulate, 3
 		szExtraImage, nExtraFrame = 'rRing_T.UITex', 0
 		nCurrentMana, nMaxMana = KSelf.nCurrentMana, KSelf.nMaxMana
-	elseif KSelf.dwForceID == FORCE_TYPE.CHUN_YANG then
+	elseif KSelf.dwForceID == CONSTANT.FORCE_TYPE.CHUN_YANG then
 		local nAccumulate = math.min(KSelf.nAccumulateValue, 10) / 2
 		szExtra = _L['Qi:'] .. tostring(nAccumulate)
 		nCurrentExtra, nMaxExtra = nAccumulate, 5
 		szExtraImage, nExtraFrame = 'rRing.UITex', 0
 		nCurrentMana, nMaxMana = KSelf.nCurrentMana, KSelf.nMaxMana
-	elseif KSelf.dwForceID == FORCE_TYPE.QI_XIU then
+	elseif KSelf.dwForceID == CONSTANT.FORCE_TYPE.QI_XIU then
 		local nAccumulate = math.min(KSelf.nAccumulateValue, 10)
 		szExtra = _L['JianWu:'] .. tostring(nAccumulate)
 		nCurrentExtra, nMaxExtra = nAccumulate, 10
 		szExtraImage, nExtraFrame = 'rRing.UITex', 2
 		nCurrentMana, nMaxMana = KSelf.nCurrentMana, KSelf.nMaxMana
-	elseif KSelf.dwForceID == FORCE_TYPE.TANG_MEN then
+	elseif KSelf.dwForceID == CONSTANT.FORCE_TYPE.TANG_MEN then
 		nManaR, nManaG, nManaB = 255, 255, 0
 		szManaImage, nManaFrame = 'rRing.UITex', 2
 		nCurrentMana, nMaxMana = KSelf.nCurrentEnergy, KSelf.nMaxEnergy
-	elseif KSelf.dwForceID == FORCE_TYPE.CANG_JIAN then
+	elseif KSelf.dwForceID == CONSTANT.FORCE_TYPE.CANG_JIAN then
 		nManaR, nManaG, nManaB = 255, 150, 0
 		szManaImage, nManaFrame = 'rRing.UITex', 1
 		nCurrentMana, nMaxMana = KSelf.nCurrentRage, KSelf.nMaxRage
-	elseif KSelf.dwForceID == FORCE_TYPE.MING_JIAO then
+	elseif KSelf.dwForceID == CONSTANT.FORCE_TYPE.MING_JIAO then
 		nManaR, nManaG, nManaB = 255, 255, 0
 		if KSelf.nSunPowerValue == 1 then
 			szMana = _L['ManRi!']
@@ -125,17 +125,17 @@ local function UpdatePlayerData(hFrame, KSelf)
 			szMana = _L['Ri:'] .. tostring(KSelf.nCurrentSunEnergy / 100) .. ' ' .. _L['Yue:'] .. tostring(KSelf.nCurrentMoonEnergy / 100)
 		end
 		szExtra = ''
-	elseif KSelf.dwForceID == FORCE_TYPE.CANG_YUN then
+	elseif KSelf.dwForceID == CONSTANT.FORCE_TYPE.CANG_YUN then
 		nManaR, nManaG, nManaB = 191, 63, 31
 		szManaImage, nManaFrame = 'rRing.UITex', 1
 		nCurrentMana, nMaxMana = KSelf.nCurrentRage, KSelf.nMaxRage
-	elseif KSelf.dwForceID == FORCE_TYPE.CHANG_GE then
+	elseif KSelf.dwForceID == CONSTANT.FORCE_TYPE.CHANG_GE then
 		local nAccumulate = math.min(KSelf.nAccumulateValue, 5)
 		szExtra = _L['Qu:'] .. tostring(nAccumulate)
 		nCurrentExtra, nMaxExtra = nAccumulate, 5
 		szExtraImage, nExtraFrame = 'rRing.UITex', 2
 		nCurrentMana, nMaxMana = KSelf.nCurrentMana, KSelf.nMaxMana
-	elseif KSelf.dwForceID == FORCE_TYPE.BA_DAO then
+	elseif KSelf.dwForceID == CONSTANT.FORCE_TYPE.BA_DAO then
 		if KSelf.nPoseState == POSE_TYPE.BROADSWORD then
 			nCurrentMana, nMaxMana = KSelf.nCurrentRage, KSelf.nMaxRage
 		elseif KSelf.nPoseState == POSE_TYPE.DOUBLE_BLADE then

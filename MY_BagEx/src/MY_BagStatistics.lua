@@ -96,8 +96,8 @@ end
 local l_guildcache = {}
 local function UpdateTongRepertoryPage()
 	local nPage = arg0
-	local offset = nPage * INVENTORY_GUILD_PAGE_SIZE
-	local boxtype = INVENTORY_GUILD_BANK
+	local offset = nPage * CONSTANT.INVENTORY_GUILD_PAGE_SIZE
+	local boxtype = CONSTANT.INVENTORY_GUILD_BANK
 	for boxindex = offset, offset + 7 * 14 - 1 do
 		local tabtype, tabindex, tabsubindex, name, desc, count = -1, -1, -1, '', '', 0
 		local KItem = GetPlayerItem(me, boxtype, boxindex)
@@ -339,12 +339,12 @@ function MY_BagStatistics.UpdateItems(frame)
 					count = count + rec.bankcount + rec.bagcount
 					insert(aTip, _L('%s (%s)\tBankx%d Bagx%d Totalx%d\n', UTF8ToAnsi(rec.ownername), UTF8ToAnsi(rec.servername), rec.bankcount, rec.bagcount, rec.bankcount + rec.bagcount))
 				end
-				UpdateItemInfoBoxObject(box, nil, rec.tabtype, rec.tabindex, count, rec.tabsubindex)
+				UI.UpdateItemInfoBoxObject(box, nil, rec.tabtype, rec.tabindex, count, rec.tabsubindex)
 				box.tip = GetItemInfoTip(nil, rec.tabtype, rec.tabindex, nil, nil, rec.tabsubindex) .. GetFormatText(concat(aTip))
 			else
 				local hItem = handle:AppendItemFromIni(SZ_INI, 'Handle_Item')
-				UpdateItemInfoBoxObject(hItem:Lookup('Box_Item'), nil, rec.tabtype, rec.tabindex, 1, rec.tabsubindex)
-				UpdateItemInfoBoxObject(hItem:Lookup('Handle_ItemInfo/Text_ItemName'), nil, rec.tabtype, rec.tabindex, 1, rec.tabsubindex)
+				UI.UpdateItemInfoBoxObject(hItem:Lookup('Box_Item'), nil, rec.tabtype, rec.tabindex, 1, rec.tabsubindex)
+				UI.UpdateItemInfoBoxObject(hItem:Lookup('Handle_ItemInfo/Text_ItemName'), nil, rec.tabtype, rec.tabindex, 1, rec.tabsubindex)
 				hItem:Lookup('Text_ItemStatistics'):SprintfText(_L['Bankx%d Bagx%d Totalx%d'], rec.bankcount, rec.bagcount, rec.bankcount + rec.bagcount)
 				if KItemInfo.nGenre == ITEM_GENRE.TASK_ITEM then
 					hItem:Lookup('Handle_ItemInfo/Text_ItemDesc'):SetText(g_tStrings.STR_ITEM_H_QUEST_ITEM)

@@ -151,25 +151,12 @@ local HIDE_FORCE = {
 	[10] = true,
 	[21] = true,
 }
-local KUNGFU_TYPE = {
-	TIAN_CE   = 1,      -- 天策内功
-	WAN_HUA   = 2,      -- 万花内功
-	CHUN_YANG = 3,      -- 纯阳内功
-	QI_XIU    = 4,      -- 七秀内功
-	SHAO_LIN  = 5,      -- 少林内功
-	CANG_JIAN = 6,      -- 藏剑内功
-	GAI_BANG  = 7,      -- 丐帮内功
-	MING_JIAO = 8,      -- 明教内功
-	WU_DU     = 9,      -- 五毒内功
-	TANG_MEN  = 10,     -- 唐门内功
-	CANG_YUN  = 18,     -- 苍云内功
-}
 local function IsPlayerManaHide(dwForceID, dwMountType)
 	if dwMountType then
-		if dwMountType == KUNGFU_TYPE.CANG_JIAN or           --藏剑
-			dwMountType == KUNGFU_TYPE.TANG_MEN or           --唐门
-			dwMountType == KUNGFU_TYPE.MING_JIAO or          --明教
-			dwMountType == KUNGFU_TYPE.CANG_YUN then         --苍云
+		if dwMountType == CONSTANT.KUNGFU_TYPE.CANG_JIAN or           --藏剑
+			dwMountType == CONSTANT.KUNGFU_TYPE.TANG_MEN or           --唐门
+			dwMountType == CONSTANT.KUNGFU_TYPE.MING_JIAO or          --明教
+			dwMountType == CONSTANT.KUNGFU_TYPE.CANG_YUN then         --苍云
 			return true
 		else
 			return false
@@ -180,13 +167,13 @@ local function IsPlayerManaHide(dwForceID, dwMountType)
 end
 
 -- 官方这代码太垃圾到处报错 = =|| 加个pcall了只能 mmp
-local _GVoiceBase_IsMemberForbid = GVoiceBase_IsMemberForbid
+local _GVoiceBase_IsMemberForbid = LIB.GVoiceBase_IsMemberForbid
 local function GVoiceBase_IsMemberForbid(...)
 	local status, res = Call(_GVoiceBase_IsMemberForbid, ...)
 	return status and res
 end
 
-local _GVoiceBase_IsMemberSaying = GVoiceBase_IsMemberSaying
+local _GVoiceBase_IsMemberSaying = LIB.GVoiceBase_IsMemberSaying
 local function GVoiceBase_IsMemberSaying(...)
 	local status, res = Call(_GVoiceBase_IsMemberSaying, ...)
 	return status and res
@@ -431,7 +418,7 @@ function MY_CataclysmParty_Base.OnItemLButtonClick()
 			D.SetTargetTeammate(dwID, info)
 		end
 	elseif IsCtrlKeyDown() then
-		EditBox_AppendLinkPlayer(info.szName)
+		LIB.EditBox_AppendLinkPlayer(info.szName)
 	end
 end
 
@@ -999,8 +986,8 @@ end
 
 function CTM:RefreshGVoice()
 	local team = GetClientTeam()
-	local sayingInfo = GVoiceBase_GetSaying()
-	local bInRoom = GVoiceBase_GetMicState() ~= MIC_STATE.CLOSE_NOT_IN_ROOM
+	local sayingInfo = LIB.GVoiceBase_GetSaying()
+	local bInRoom = LIB.GVoiceBase_GetMicState() ~= CONSTANT.MIC_STATE.CLOSE_NOT_IN_ROOM
 	for dwID, h in pairs(CTM_CACHE) do
 		if h:IsValid() then
 			local fScale = min(CFG.fScaleY, CFG.fScaleX)
@@ -1123,7 +1110,7 @@ function CTM:RefreshImages(h, dwID, info, tSetting, bIcon, bFormationLeader, bLa
 			elseif CFG.nShowIcon == 1 then
 				img:FromUITex(GetForceImage(info.dwForceID))
 			elseif CFG.nShowIcon == 3 then
-				img:FromUITex('ui/Image/UICommon/CommonPanel2.UITex', GetCampImageFrame(info.nCamp, false) or -1)
+				img:FromUITex('ui/Image/UICommon/CommonPanel2.UITex', LIB.GetCampImageFrame(info.nCamp, false) or -1)
 			end
 			local fScale = (CFG.fScaleY + CFG.fScaleX) / 2
 			if fScale * 0.9 > 1 then

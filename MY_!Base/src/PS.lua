@@ -386,7 +386,7 @@ function LIB.SwitchTab(szID, bForceUpdate)
 	scroll:SetScrollPos(0)
 	wnd:Clear()
 	wnd:Lookup('', ''):Clear()
-	wnd:SetContainerType(WND_CONTAINER_STYLE.WND_CONTAINER_STYLE_CUSTOM)
+	wnd:SetContainerType(CONSTANT.WND_CONTAINER_STYLE.WND_CONTAINER_STYLE_CUSTOM)
 
 	-- ready to draw
 	if not tab then
@@ -853,7 +853,7 @@ function PS.OnPanelActive(wnd)
 		color = { 255, 255, 0 },
 	}, true):autoWidth()
 	x, y = X, y + 30
-	for _, dwForceID in pairs_c(FORCE_TYPE) do
+	for _, dwForceID in pairs_c(CONSTANT.FORCE_TYPE) do
 		local x0 = x
 		local sha = ui:append('Shadow', {
 			x = x, y = y, w = 100, h = 25,

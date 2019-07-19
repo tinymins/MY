@@ -904,7 +904,7 @@ function PS.OnPanelActive(wnd)
 		tippostype = MY_TIP_POSTYPE.TOP_BOTTOM,
 		autoenable = function()
 			local me = GetClientPlayer()
-			return me and me.dwForceID == FORCE_TYPE.CHANG_GE
+			return me and me.dwForceID == CONSTANT.FORCE_TYPE.CHANG_GE
 		end,
 	}, true):width() + 5
 	x = x + ui:append('WndCheckBox', {
@@ -923,7 +923,7 @@ function PS.OnPanelActive(wnd)
 		tippostype = MY_TIP_POSTYPE.TOP_BOTTOM,
 		autoenable = function()
 			local me = GetClientPlayer()
-			return me and me.dwForceID == FORCE_TYPE.CHANG_GE
+			return me and me.dwForceID == CONSTANT.FORCE_TYPE.CHANG_GE
 		end,
 	}, true):width() + 5
 	x = x + ui:append('WndCheckBox', {
@@ -942,7 +942,7 @@ function PS.OnPanelActive(wnd)
 		tippostype = MY_TIP_POSTYPE.TOP_BOTTOM,
 		autoenable = function()
 			local me = GetClientPlayer()
-			return me and me.dwForceID == FORCE_TYPE.CHANG_GE
+			return me and me.dwForceID == CONSTANT.FORCE_TYPE.CHANG_GE
 		end,
 	}, true):width() + 5
 	ui:append('WndSliderBox', {
@@ -956,7 +956,7 @@ function PS.OnPanelActive(wnd)
 		end,
 		autoenable = function()
 			local me = GetClientPlayer()
-			return me and me.dwForceID == FORCE_TYPE.CHANG_GE
+			return me and me.dwForceID == CONSTANT.FORCE_TYPE.CHANG_GE
 		end,
 	})
 	x = X

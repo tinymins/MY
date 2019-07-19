@@ -105,7 +105,7 @@ local function DrawList()
 	for _, item in ipairs(RESULT) do
 		local opt = {}
 		opt.r, opt.g, opt.b = GetItemFontColorByQuality(item.itemInfo.nQuality, false)
-		UI_LIST:listbox('insert', ' [' .. GetItemNameByItemInfo(item.itemInfo, item.dwRecipeID) .. '] - ' .. item.itemInfo.szName, item, item, opt)
+		UI_LIST:listbox('insert', ' [' .. LIB.GetItemNameByItemInfo(item.itemInfo, item.dwRecipeID) .. '] - ' .. item.itemInfo.szName, item, item, opt)
 	end
 	if SEARCH ~= '' then
 		UI_LIST:listbox('insert', _L('Max display count %d, current %d.', MAX_DISP, #RESULT), 'count', nil, { r = 100, g = 100, b = 100 })
@@ -130,7 +130,7 @@ local function Search(szSearch)
 			local itemInfo = GetItemInfo(dwTabType, dwIndex)
 			if itemInfo and (
 				dwIndex == dwID
-				or (itemInfo.nGenre ~= ITEM_GENRE.BOOK and wfind(GetItemNameByItemInfo(itemInfo), szSearch))
+				or (itemInfo.nGenre ~= ITEM_GENRE.BOOK and wfind(LIB.GetItemNameByItemInfo(itemInfo), szSearch))
 				or wfind(itemInfo.szName, szSearch)
 			) then
 				insert(RESULT, {
@@ -152,7 +152,7 @@ local function Search(szSearch)
 			if itemInfo and (
 				dwID == itemInfo.dwID or dwID == dwRecipeID
 				or dwID == row.dwBookID or dwID == row.dwSegmentID
-				or wfind(GetItemNameByItemInfo(itemInfo, dwRecipeID), szSearch)
+				or wfind(LIB.GetItemNameByItemInfo(itemInfo, dwRecipeID), szSearch)
 			) then
 				insert(RESULT, {
 					dwTabType = 5,

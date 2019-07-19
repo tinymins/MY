@@ -216,13 +216,13 @@ LIB.RegisterEvent('PEEK_OTHER_PLAYER', function()
 	if not PEEK_PLAYER[arg1] then
 		return
 	end
-	if arg0 == PEEK_OTHER_PLAYER_RESPOND.INVALID then
+	if arg0 == CONSTANT.PEEK_OTHER_PLAYER_RESPOND.INVALID then
 		OutputMessage('MSG_ANNOUNCE_RED', _L['Invalid player ID!'])
-	elseif arg0 == PEEK_OTHER_PLAYER_RESPOND.FAILED then
+	elseif arg0 == CONSTANT.PEEK_OTHER_PLAYER_RESPOND.FAILED then
 		OutputMessage('MSG_ANNOUNCE_RED', _L['Peek other player failed!'])
-	elseif arg0 == PEEK_OTHER_PLAYER_RESPOND.CAN_NOT_FIND_PLAYER then
+	elseif arg0 == CONSTANT.PEEK_OTHER_PLAYER_RESPOND.CAN_NOT_FIND_PLAYER then
 		OutputMessage('MSG_ANNOUNCE_RED', _L['Can not find player to peek!'])
-	elseif arg0 == PEEK_OTHER_PLAYER_RESPOND.TOO_FAR then
+	elseif arg0 == CONSTANT.PEEK_OTHER_PLAYER_RESPOND.TOO_FAR then
 		OutputMessage('MSG_ANNOUNCE_RED', _L['Player is too far to peek!'])
 	end
 	PEEK_PLAYER[arg1] = nil
@@ -882,7 +882,7 @@ function LIB.EditBoxInsertItemInfo(dwTabType, dwIndex, nBookInfo, nVersion)
 		})
 		Station.SetFocusWindow(edit)
 	else
-		local szName = '[' .. GetItemNameByItemInfo(itemInfo) .. ']'
+		local szName = '[' .. LIB.GetItemNameByItemInfo(itemInfo) .. ']'
 		edit:InsertObj(szName, {
 			type = 'iteminfo',
 			text = szName,

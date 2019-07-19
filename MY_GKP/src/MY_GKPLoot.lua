@@ -407,7 +407,7 @@ function MY_GKP_Loot.OnItemMouseEnter()
 		end
 		-- local item = hItem.itemData.item
 		-- if itme and item.nGenre == ITEM_GENRE.EQUIPMENT then
-		-- 	if itme.nSub == EQUIPMENT_SUB.MELEE_WEAPON then
+		-- 	if itme.nSub == CONSTANT.EQUIPMENT_SUB.MELEE_WEAPON then
 		-- 		this:SetOverText(3, g_tStrings.WeapenDetail[item.nDetail])
 		-- 	else
 		-- 		this:SetOverText(3, g_tStrings.tEquipTypeNameTable[item.nSub])
@@ -622,14 +622,14 @@ function Loot.GetBossAction(dwDoodadID, bMenu)
 		local aEquipmentItemData = {}
 		for k, v in ipairs(aItemData) do
 			if (v.item.nGenre == ITEM_GENRE.EQUIPMENT or IsCtrlKeyDown())
-				and v.item.nSub ~= EQUIPMENT_SUB.WAIST_EXTEND
-				and v.item.nSub ~= EQUIPMENT_SUB.BACK_EXTEND
-				and v.item.nSub ~= EQUIPMENT_SUB.HORSE
-				and v.item.nSub ~= EQUIPMENT_SUB.PACKAGE
-				and v.item.nSub ~= EQUIPMENT_SUB.FACE_EXTEND
-				and v.item.nSub ~= EQUIPMENT_SUB.L_SHOULDER_EXTEND
-				and v.item.nSub ~= EQUIPMENT_SUB.R_SHOULDER_EXTEND
-				and v.item.nSub ~= EQUIPMENT_SUB.BACK_CLOAK_EXTEND
+				and v.item.nSub ~= CONSTANT.EQUIPMENT_SUB.WAIST_EXTEND
+				and v.item.nSub ~= CONSTANT.EQUIPMENT_SUB.BACK_EXTEND
+				and v.item.nSub ~= CONSTANT.EQUIPMENT_SUB.HORSE
+				and v.item.nSub ~= CONSTANT.EQUIPMENT_SUB.PACKAGE
+				and v.item.nSub ~= CONSTANT.EQUIPMENT_SUB.FACE_EXTEND
+				and v.item.nSub ~= CONSTANT.EQUIPMENT_SUB.L_SHOULDER_EXTEND
+				and v.item.nSub ~= CONSTANT.EQUIPMENT_SUB.R_SHOULDER_EXTEND
+				and v.item.nSub ~= CONSTANT.EQUIPMENT_SUB.BACK_CLOAK_EXTEND
 				and v.bDist
 			then -- 按住Ctrl的情况下 无视分类 否则只给装备
 				table.insert(aEquipmentItemData, v)
@@ -645,7 +645,7 @@ function Loot.GetBossAction(dwDoodadID, bMenu)
 			local r, g, b = LIB.GetForceColor(p.dwForceID)
 			for k, v in ipairs(aEquipmentItemData) do
 				local r, g, b = GetItemFontColorByQuality(v.item.nQuality)
-				szXml = szXml .. GetFormatText('['.. GetItemNameByItem(v.item) ..']\n', 166, r, g, b)
+				szXml = szXml .. GetFormatText('['.. LIB.GetItemNameByItem(v.item) ..']\n', 166, r, g, b)
 			end
 			szXml = szXml .. GetFormatText(_L['All distrubute to'], 162, 255, 255, 255)
 			szXml = szXml .. GetFormatText('['.. p.szName ..']', 162, r, g, b)
@@ -769,10 +769,10 @@ function Loot.DistributeItem(dwID, info, szAutoDistType, bSkipRecordPanel)
 		--[[#DEBUG END]]
 		local szName, aItemData = Loot.GetDoodad(info.dwDoodadID)
 		for k, v in ipairs(aItemData) do
-			if v.nQuality == info.nQuality and GetItemNameByItem(v.item) == info.szName then
+			if v.nQuality == info.nQuality and LIB.GetItemNameByItem(v.item) == info.szName then
 				info.dwID = v.item.dwID
 				--[[#DEBUG BEGIN]]
-				LIB.Debug({'Item matching, ' .. GetItemNameByItem(v.item)}, 'MY_GKP_Loot', DEBUG_LEVEL.LOG)
+				LIB.Debug({'Item matching, ' .. LIB.GetItemNameByItem(v.item)}, 'MY_GKP_Loot', DEBUG_LEVEL.LOG)
 				--[[#DEBUG END]]
 				break
 			end
@@ -803,7 +803,7 @@ function Loot.DistributeItem(dwID, info, szAutoDistType, bSkipRecordPanel)
 			nTime      = GetCurrentTime(),
 			nQuality   = item.nQuality,
 			dwForceID  = player.dwForceID,
-			szName     = GetItemNameByItem(item),
+			szName     = LIB.GetItemNameByItem(item),
 			nGenre     = item.nGenre,
 		}
 		if item.bCanStack and item.nStackNum > 1 then
@@ -865,7 +865,7 @@ end
 do
 local function IsItemRequireConfirm(data)
 	if data.nQuality >= MY_GKP_Loot.nConfirmQuality
-	or (MY_GKP_Loot.tConfirm.Huangbaba and GKP_LOOT_HUANGBABA[GetItemNameByItem(data.item)]) -- 玄晶
+	or (MY_GKP_Loot.tConfirm.Huangbaba and GKP_LOOT_HUANGBABA[LIB.GetItemNameByItem(data.item)]) -- 玄晶
 	or (MY_GKP_Loot.tConfirm.Book and data.item.nGenre == ITEM_GENRE.BOOK) -- 书籍
 	or (MY_GKP_Loot.tConfirm.Pendant and data.item.nGenre == ITEM_GENRE.EQUIPMENT and ( -- 挂件
 		data.item.nSub == WAIST_EXTEND
@@ -873,19 +873,19 @@ local function IsItemRequireConfirm(data)
 		or data.item.nSub == FACE_EXTEND
 	))
 	or (MY_GKP_Loot.tConfirm.Outlook and data.item.nGenre == ITEM_GENRE.EQUIPMENT and ( -- 肩饰披风
-		data.item.nSub == EQUIPMENT_SUB.BACK_CLOAK_EXTEND
-		or data.item.nSub == EQUIPMENT_SUB.L_SHOULDER_EXTEND
-		or data.item.nSub == EQUIPMENT_SUB.R_SHOULDER_EXTEND
+		data.item.nSub == CONSTANT.EQUIPMENT_SUB.BACK_CLOAK_EXTEND
+		or data.item.nSub == CONSTANT.EQUIPMENT_SUB.L_SHOULDER_EXTEND
+		or data.item.nSub == CONSTANT.EQUIPMENT_SUB.R_SHOULDER_EXTEND
 	))
 	or (MY_GKP_Loot.tConfirm.Pet and ( -- 跟宠
 		data.item.nGenre == ITEM_GENRE.CUB
-		or (data.item.nGenre == ITEM_GENRE.EQUIPMENT and data.item.nSub == EQUIPMENT_SUB.PET)
+		or (data.item.nGenre == ITEM_GENRE.EQUIPMENT and data.item.nSub == CONSTANT.EQUIPMENT_SUB.PET)
 	))
 	or (MY_GKP_Loot.tConfirm.Horse and ( -- 坐骑
-		data.item.nGenre == ITEM_GENRE.EQUIPMENT and data.item.nSub == EQUIPMENT_SUB.HORSE
+		data.item.nGenre == ITEM_GENRE.EQUIPMENT and data.item.nSub == CONSTANT.EQUIPMENT_SUB.HORSE
 	))
 	or (MY_GKP_Loot.tConfirm.HorseEquip and ( -- 马具
-		data.item.nGenre == ITEM_GENRE.EQUIPMENT and data.item.nSub == EQUIPMENT_SUB.HORSE_EQUIP
+		data.item.nGenre == ITEM_GENRE.EQUIPMENT and data.item.nSub == CONSTANT.EQUIPMENT_SUB.HORSE_EQUIP
 	))
 	then
 		return true
@@ -1095,7 +1095,7 @@ function Loot.DrawLootList(dwID)
 	for i, itemData in ipairs(aItemData) do
 		local item = itemData.item
 		if MY_GKP_Loot.IsItemDisplay(itemData, config) then
-			local szName = GetItemNameByItem(item)
+			local szName = LIB.GetItemNameByItem(item)
 			local h = hList:AppendItemFromIni(GKP_LOOT_INIFILE, 'Handle_Item')
 			local box = h:Lookup('Box_Item')
 			local txt = h:Lookup('Text_Item')
@@ -1217,31 +1217,31 @@ local function GetItemDataType(data)
 		return 'COIN_SHOP'
 	end
 	if data.item.nGenre == ITEM_GENRE.EQUIPMENT and (
-		data.item.nSub == EQUIPMENT_SUB.L_SHOULDER_EXTEND
-		or data.item.nSub == EQUIPMENT_SUB.R_SHOULDER_EXTEND
-		or data.item.nSub == EQUIPMENT_SUB.BACK_CLOAK_EXTEND
+		data.item.nSub == CONSTANT.EQUIPMENT_SUB.L_SHOULDER_EXTEND
+		or data.item.nSub == CONSTANT.EQUIPMENT_SUB.R_SHOULDER_EXTEND
+		or data.item.nSub == CONSTANT.EQUIPMENT_SUB.BACK_CLOAK_EXTEND
 	) then
 		return 'OUTLOOK'
 	end
 	-- 挂件
 	if data.item.nGenre == ITEM_GENRE.EQUIPMENT and (
-		data.item.nSub == EQUIPMENT_SUB.WAIST_EXTEND
-		or data.item.nSub == EQUIPMENT_SUB.BACK_EXTEND
-		or data.item.nSub == EQUIPMENT_SUB.FACE_EXTEND
+		data.item.nSub == CONSTANT.EQUIPMENT_SUB.WAIST_EXTEND
+		or data.item.nSub == CONSTANT.EQUIPMENT_SUB.BACK_EXTEND
+		or data.item.nSub == CONSTANT.EQUIPMENT_SUB.FACE_EXTEND
 	) then
 		return 'PENDANT'
 	end
 	-- 宠物
 	if (data.item.nGenre == ITEM_GENRE.CUB)
-	or (data.item.nGenre == ITEM_GENRE.EQUIPMENT and data.item.nSub == EQUIPMENT_SUB.PET) then
+	or (data.item.nGenre == ITEM_GENRE.EQUIPMENT and data.item.nSub == CONSTANT.EQUIPMENT_SUB.PET) then
 		return 'PET'
 	end
 	-- 坐骑 马
-	if (data.item.nGenre == ITEM_GENRE.EQUIPMENT and data.item.nSub == EQUIPMENT_SUB.HORSE) then
+	if (data.item.nGenre == ITEM_GENRE.EQUIPMENT and data.item.nSub == CONSTANT.EQUIPMENT_SUB.HORSE) then
 		return 'HORSE'
 	end
 	-- 马具
-	if (data.item.nGenre == ITEM_GENRE.EQUIPMENT and data.item.nSub == EQUIPMENT_SUB.HORSE_EQUIP) then
+	if (data.item.nGenre == ITEM_GENRE.EQUIPMENT and data.item.nSub == CONSTANT.EQUIPMENT_SUB.HORSE_EQUIP) then
 		return 'HORSE_EQUIP'
 	end
 	-- 书籍
@@ -1250,7 +1250,7 @@ local function GetItemDataType(data)
 	end
 	-- 武器
 	if data.item.nGenre == ITEM_GENRE.EQUIPMENT
-	and (data.item.nSub == EQUIPMENT_SUB.MELEE_WEAPON or data.item.nSub == EQUIPMENT_SUB.RANGE_WEAPON) then
+	and (data.item.nSub == CONSTANT.EQUIPMENT_SUB.MELEE_WEAPON or data.item.nSub == CONSTANT.EQUIPMENT_SUB.RANGE_WEAPON) then
 		return 'WEAPON'
 	end
 	-- 装备兑换牌
@@ -1298,7 +1298,7 @@ function Loot.GetDoodad(dwID)
 		for i = 0, nLootItemCount - 1 do
 			local item, bNeedRoll, bDist, bBidding = d.GetLootItem(i, me)
 			if item and item.nQuality > 0 then
-				local szItemName = GetItemNameByItem(item)
+				local szItemName = LIB.GetItemNameByItem(item)
 				if GKP_LOOT_HUANGBABA[szItemName] then
 					bSpecial = true
 				end
