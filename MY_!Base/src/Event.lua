@@ -6,10 +6,10 @@
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
 --------------------------------------------------------
--------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
 local setmetatable = setmetatable
 local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
 local sub, len, format, rep = string.sub, string.len, string.format, string.rep
@@ -26,19 +26,18 @@ local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
 local LIB = MY
-local UI, DEBUG_LEVEL, PATH_TYPE = LIB.UI, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local ipairs_r = LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
+local UI, DEBUG_LEVEL, PATH_TYPE, PACKET_INFO = LIB.UI, LIB.DEBUG_LEVEL, LIB.PATH_TYPE, LIB.PACKET_INFO
+local ipairs_r, spairs, spairs_r = LIB.ipairs_r, LIB.spairs, LIB.spairs_r
+local sipairs, sipairs_r = LIB.sipairs, LIB.sipairs_r
+local IsNil, IsBoolean, IsUserdata, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsUserdata, LIB.IsFunction
+local IsString, IsTable, IsArray, IsDictionary = LIB.IsString, LIB.IsTable, LIB.IsArray, LIB.IsDictionary
+local IsNumber, IsHugeNumber, IsEmpty, IsEquals = LIB.IsNumber, LIB.IsHugeNumber, LIB.IsEmpty, LIB.IsEquals
 local GetTraceback, Call, XpCall = LIB.GetTraceback, LIB.Call, LIB.XpCall
 local Get, Set, RandomChild = LIB.Get, LIB.Set, LIB.RandomChild
 local GetPatch, ApplyPatch, Clone = LIB.GetPatch, LIB.ApplyPatch, LIB.Clone
 local EncodeLUAData, DecodeLUAData = LIB.EncodeLUAData, LIB.DecodeLUAData
-local IsArray, IsDictionary, IsEquals = LIB.IsArray, LIB.IsDictionary, LIB.IsEquals
-local IsNumber, IsHugeNumber = LIB.IsNumber, LIB.IsHugeNumber
-local IsNil, IsBoolean, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsFunction
-local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
-local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
--------------------------------------------------------------------------------------------------------------
+local EMPTY_TABLE, MENU_DIVIDER, XML_LINE_BREAKER = LIB.EMPTY_TABLE, LIB.MENU_DIVIDER, LIB.XML_LINE_BREAKER
+-----------------------------------------------------------------------------------------------------------
 local _L = LIB.LoadLangPack()
 ---------------------------------------------------------------------------------------------
 -- 事件注册
@@ -182,8 +181,7 @@ local function OnInit()
 	INIT_EVENT = nil
 	-- 显示欢迎信息
 	local me = GetClientPlayer()
-	local addon = LIB.GetAddonInfo()
-	LIB.Sysmsg({_L('%s, welcome to use %s!', me.szName, addon.szName) .. ' v' .. LIB.GetVersion() .. ' Build ' .. addon.szBuild})
+	LIB.Sysmsg({_L('%s, welcome to use %s!', me.szName, PACKET_INFO.NAME) .. ' v' .. LIB.GetVersion() .. ' Build ' .. PACKET_INFO.BUILD})
 end
 LIB.RegisterEvent('LOADING_ENDING', OnInit) -- 不能用FIRST_LOADING_END 不然注册快捷键就全跪了
 
@@ -280,7 +278,7 @@ LIB.RegisterEvent('BUFF_UPDATE', function()
 		return
 	end
 	if arg0 == UI_GetClientPlayerID() and arg4 == 103 then
-		DelayCall(LIB.GetAddonInfo().szNameSpace .. '#ON_IDLE', math.random(0, 10000), function()
+		DelayCall(PACKET_INFO.NAME_SPACE .. '#ON_IDLE', math.random(0, 10000), function()
 			local me = GetClientPlayer()
 			if me and me.GetBuff(103, 0) then
 				OnIdle()
@@ -288,7 +286,7 @@ LIB.RegisterEvent('BUFF_UPDATE', function()
 		end)
 	end
 end)
-LIB.BreatheCall(LIB.GetAddonInfo().szNameSpace .. '#ON_IDLE', function()
+LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '#ON_IDLE', function()
 	if Station.GetIdleTime() > 300000 then
 		OnIdle()
 	end
@@ -401,7 +399,7 @@ local function StepNext(bQuick)
 	local nW, nH = Station.GetClientSize()
 	local tMsg = {
 		x = nW / 2, y = nH / 3,
-		szName = LIB.GetAddonInfo().szNameSpace .. '_Tutorial',
+		szName = PACKET_INFO.NAME_SPACE .. '_Tutorial',
 		szMessage = tutorial.szMessage,
 		szAlignment = 'CENTER',
 	}
@@ -427,7 +425,7 @@ function LIB.CheckTutorial()
 	local tMsg = {
 		x = nW / 2, y = nH / 3,
 		szName = 'MY_Tutorial',
-		szMessage = _L('Welcome to use %s, would you like to start quick tutorial now?', LIB.GetAddonInfo().szName),
+		szMessage = _L('Welcome to use %s, would you like to start quick tutorial now?', PACKET_INFO.NAME),
 		szAlignment = 'CENTER',
 		{
 			szOption = _L['Quickset'],
@@ -449,7 +447,7 @@ end
 -- 背景通讯
 ---------------------------------------------------------------------------------------------
 do
-local BG_MSG_ID_PREFIX = LIB.GetAddonInfo().szNameSpace .. ':'
+local BG_MSG_ID_PREFIX = PACKET_INFO.NAME_SPACE .. ':'
 local BG_MSG_ID_SUFFIX = ':V1'
 do
 local BG_MSG_EVENT = { szName = 'BgMsg' }
@@ -604,7 +602,7 @@ local function onBreathe()
 		end
 	end
 end
-LIB.BreatheCall(LIB.GetAddonInfo().szNameSpace .. '#COROUTINE', onBreathe)
+LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '#COROUTINE', onBreathe)
 
 -- 执行协程直到它完成
 -- 不传参表示执行所有协程并清空协程队列

@@ -6,10 +6,10 @@
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
 --------------------------------------------------------
--------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
 local setmetatable = setmetatable
 local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
 local sub, len, format, rep = string.sub, string.len, string.format, string.rep
@@ -26,19 +26,18 @@ local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
 local LIB = MY
-local UI, DEBUG_LEVEL, PATH_TYPE = LIB.UI, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local ipairs_r = LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
+local UI, DEBUG_LEVEL, PATH_TYPE, PACKET_INFO = LIB.UI, LIB.DEBUG_LEVEL, LIB.PATH_TYPE, LIB.PACKET_INFO
+local ipairs_r, spairs, spairs_r = LIB.ipairs_r, LIB.spairs, LIB.spairs_r
+local sipairs, sipairs_r = LIB.sipairs, LIB.sipairs_r
+local IsNil, IsBoolean, IsUserdata, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsUserdata, LIB.IsFunction
+local IsString, IsTable, IsArray, IsDictionary = LIB.IsString, LIB.IsTable, LIB.IsArray, LIB.IsDictionary
+local IsNumber, IsHugeNumber, IsEmpty, IsEquals = LIB.IsNumber, LIB.IsHugeNumber, LIB.IsEmpty, LIB.IsEquals
 local GetTraceback, Call, XpCall = LIB.GetTraceback, LIB.Call, LIB.XpCall
 local Get, Set, RandomChild = LIB.Get, LIB.Set, LIB.RandomChild
 local GetPatch, ApplyPatch, Clone = LIB.GetPatch, LIB.ApplyPatch, LIB.Clone
 local EncodeLUAData, DecodeLUAData = LIB.EncodeLUAData, LIB.DecodeLUAData
-local IsArray, IsDictionary, IsEquals = LIB.IsArray, LIB.IsDictionary, LIB.IsEquals
-local IsNumber, IsHugeNumber = LIB.IsNumber, LIB.IsHugeNumber
-local IsNil, IsBoolean, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsFunction
-local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
-local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
--------------------------------------------------------------------------------------------------------------
+local EMPTY_TABLE, MENU_DIVIDER, XML_LINE_BREAKER = LIB.EMPTY_TABLE, LIB.MENU_DIVIDER, LIB.XML_LINE_BREAKER
+-----------------------------------------------------------------------------------------------------------
 -- 测试用（请求共享位置）
 LIB.RegisterBgMsg('ASK_CURRENT_LOC', function(_, nChannel, dwTalkerID, szTalkerName, bSelf)
 	if bSelf then
@@ -82,7 +81,7 @@ LIB.RegisterBgMsg('RL', function(_, nChannel, dwID, szName, bIsSelf, ...)
 			LIB.Confirm(_L('[%s] want to see your info, OK?', szName), function()
 				local me = GetClientPlayer()
 				local nGongZhan = LIB.GetBuff(3219) and 1 or 0
-				local bEx = LIB.GetAddonInfo().tAuthor[me.dwID] == me.szName and 'Author' or 'Player'
+				local bEx = PACKET_INFO.AUTHOR_ROLES[me.dwID] == me.szName and 'Author' or 'Player'
 				LIB.SendBgMsg(szName, 'RL', 'Feedback', me.dwID, UI_GetPlayerMountKungfuID(), nGongZhan, bEx)
 			end)
 		end
@@ -123,7 +122,7 @@ LIB.RegisterBgMsg('MY_ABOUT', function(_, nChannel, dwID, szName, bIsSelf, ...)
 			me.GetMapID(),
 			szTong,
 			me.nRoleType,
-			LIB.GetAddonInfo().dwVersion,
+			PACKET_INFO.VERSION,
 			szServer,
 			LIB.GetBuff(3219)
 		)
@@ -173,7 +172,7 @@ local function OnSwitchMap(dwMapID, dwID, dwCopyID)
 	if not LIB.IsInParty() then
 		return
 	end
-	LIB.Debug({'Switch dungeon :' .. dwMapID}, LIB.GetAddonInfo().szNameSpace, DEBUG_LEVEL.LOG)
+	LIB.Debug({'Switch dungeon :' .. dwMapID}, PACKET_INFO.NAME_SPACE, DEBUG_LEVEL.LOG)
 	LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_SWITCH_MAP', dwMapID, dwID, dwCopyID)
 end
 
@@ -195,7 +194,7 @@ local function OnFBAppendItemFromIni(hList)
 	end
 end
 
-LIB.RegisterFrameCreate('CrossMap.' .. LIB.GetAddonInfo().szNameSpace .. '#CD', function(name, frame)
+LIB.RegisterFrameCreate('CrossMap.' .. PACKET_INFO.NAME_SPACE .. '#CD', function(name, frame)
 	local hList = frame:Lookup('Wnd_CrossFB', 'Handle_DifficultyList')
 	if hList then
 		OnFBAppendItemFromIni(hList)
@@ -205,10 +204,10 @@ LIB.RegisterFrameCreate('CrossMap.' .. LIB.GetAddonInfo().szNameSpace .. '#CD', 
 	if btn then
 		HookTableFunc(btn, 'OnLButtonUp', OnCrossMapGoFB, { bAfterOrigin = true })
 	end
-	LIB.Debug({'Cross panel hooked.'}, LIB.GetAddonInfo().szNameSpace, DEBUG_LEVEL.LOG)
+	LIB.Debug({'Cross panel hooked.'}, PACKET_INFO.NAME_SPACE, DEBUG_LEVEL.LOG)
 end)
 
-LIB.RegisterEvent('MY_MESSAGE_BOX_ACTION.' .. LIB.GetAddonInfo().szNameSpace .. '#CD', function()
+LIB.RegisterEvent('MY_MESSAGE_BOX_ACTION.' .. PACKET_INFO.NAME_SPACE .. '#CD', function()
 	if arg0 ~= 'crossmap_dungeon_reset' then
 		return
 	end

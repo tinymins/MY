@@ -6,10 +6,10 @@
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
 --------------------------------------------------------
--------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
 local setmetatable = setmetatable
 local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
 local sub, len, format, rep = string.sub, string.len, string.format, string.rep
@@ -26,19 +26,18 @@ local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
 local LIB = MY
-local UI, DEBUG_LEVEL, PATH_TYPE = LIB.UI, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local ipairs_r = LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
+local UI, DEBUG_LEVEL, PATH_TYPE, PACKET_INFO = LIB.UI, LIB.DEBUG_LEVEL, LIB.PATH_TYPE, LIB.PACKET_INFO
+local ipairs_r, spairs, spairs_r = LIB.ipairs_r, LIB.spairs, LIB.spairs_r
+local sipairs, sipairs_r = LIB.sipairs, LIB.sipairs_r
+local IsNil, IsBoolean, IsUserdata, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsUserdata, LIB.IsFunction
+local IsString, IsTable, IsArray, IsDictionary = LIB.IsString, LIB.IsTable, LIB.IsArray, LIB.IsDictionary
+local IsNumber, IsHugeNumber, IsEmpty, IsEquals = LIB.IsNumber, LIB.IsHugeNumber, LIB.IsEmpty, LIB.IsEquals
 local GetTraceback, Call, XpCall = LIB.GetTraceback, LIB.Call, LIB.XpCall
 local Get, Set, RandomChild = LIB.Get, LIB.Set, LIB.RandomChild
 local GetPatch, ApplyPatch, Clone = LIB.GetPatch, LIB.ApplyPatch, LIB.Clone
 local EncodeLUAData, DecodeLUAData = LIB.EncodeLUAData, LIB.DecodeLUAData
-local IsArray, IsDictionary, IsEquals = LIB.IsArray, LIB.IsDictionary, LIB.IsEquals
-local IsNumber, IsHugeNumber = LIB.IsNumber, LIB.IsHugeNumber
-local IsNil, IsBoolean, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsFunction
-local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
-local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
--------------------------------------------------------------------------------------------------------------
+local EMPTY_TABLE, MENU_DIVIDER, XML_LINE_BREAKER = LIB.EMPTY_TABLE, LIB.MENU_DIVIDER, LIB.XML_LINE_BREAKER
+-----------------------------------------------------------------------------------------------------------
 -- 战斗浮动文字设计思路
 --[[
 	停留时间：使用（总帧数 * 每帧时间）来决定总停留时间，
@@ -54,7 +53,7 @@ local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_
 	其他类型：使用轨迹合并16-32帧，后来的文本会顶走前面的文本，从而跳过这部分停留的帧数。
 ]]
 
-local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_CombatText/lang/')
+local _L = LIB.LoadLangPack(PACKET_INFO.ROOT .. 'MY_CombatText/lang/')
 if not LIB.AssertVersion('MY_CombatText', _L['MY_CombatText'], 0x2011800) then
 	return
 end
@@ -67,8 +66,8 @@ local GetPlayer, GetNpc, IsPlayer = GetPlayer, GetNpc, IsPlayer
 local GetSkill, GetTime, Random = GetSkill, GetTime, Random
 local SKILL_RESULT_TYPE = SKILL_RESULT_TYPE
 
-local COMBAT_TEXT_INIFILE        = LIB.GetAddonInfo().szRoot .. 'MY_CombatText/ui/MY_CombatText_Render.ini'
-local COMBAT_TEXT_CONFIG         = LIB.GetAddonInfo().szRoot .. 'MY_CombatText/config.jx3dat'
+local COMBAT_TEXT_INIFILE        = PACKET_INFO.ROOT .. 'MY_CombatText/ui/MY_CombatText_Render.ini'
+local COMBAT_TEXT_CONFIG         = PACKET_INFO.ROOT .. 'MY_CombatText/config.jx3dat'
 local COMBAT_TEXT_PLAYERID       = 0
 local COMBAT_TEXT_TOTAL          = 32
 local COMBAT_TEXT_UI_SCALE       = 1
@@ -827,9 +826,9 @@ function CombatText.CheckEnable()
 	local frame = Station.Lookup('Lowest/CombatText')
 	local ui = Station.Lookup('Lowest/MY_CombatText')
 	if MY_CombatText.bRender then
-		COMBAT_TEXT_INIFILE = LIB.GetAddonInfo().szRoot .. 'MY_CombatText/ui/MY_CombatText_Render.ini'
+		COMBAT_TEXT_INIFILE = PACKET_INFO.ROOT .. 'MY_CombatText/ui/MY_CombatText_Render.ini'
 	else
-		COMBAT_TEXT_INIFILE = LIB.GetAddonInfo().szRoot .. 'MY_CombatText/ui/MY_CombatText.ini'
+		COMBAT_TEXT_INIFILE = PACKET_INFO.ROOT .. 'MY_CombatText/ui/MY_CombatText.ini'
 	end
 	if MY_CombatText.bEnable then
 		COMBAT_TEXT_SCALE.CRITICAL = COMBAT_TEXT_STYLES[MY_CombatText.nStyle] and COMBAT_TEXT_STYLES[MY_CombatText.nStyle] or COMBAT_TEXT_STYLES[0]

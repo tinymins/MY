@@ -6,10 +6,10 @@
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
 --------------------------------------------------------
--------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
 local setmetatable = setmetatable
 local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
 local sub, len, format, rep = string.sub, string.len, string.format, string.rep
@@ -26,19 +26,18 @@ local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
 local LIB = MY
-local UI, DEBUG_LEVEL, PATH_TYPE = LIB.UI, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local ipairs_r = LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
+local UI, DEBUG_LEVEL, PATH_TYPE, PACKET_INFO = LIB.UI, LIB.DEBUG_LEVEL, LIB.PATH_TYPE, LIB.PACKET_INFO
+local ipairs_r, spairs, spairs_r = LIB.ipairs_r, LIB.spairs, LIB.spairs_r
+local sipairs, sipairs_r = LIB.sipairs, LIB.sipairs_r
+local IsNil, IsBoolean, IsUserdata, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsUserdata, LIB.IsFunction
+local IsString, IsTable, IsArray, IsDictionary = LIB.IsString, LIB.IsTable, LIB.IsArray, LIB.IsDictionary
+local IsNumber, IsHugeNumber, IsEmpty, IsEquals = LIB.IsNumber, LIB.IsHugeNumber, LIB.IsEmpty, LIB.IsEquals
 local GetTraceback, Call, XpCall = LIB.GetTraceback, LIB.Call, LIB.XpCall
 local Get, Set, RandomChild = LIB.Get, LIB.Set, LIB.RandomChild
 local GetPatch, ApplyPatch, Clone = LIB.GetPatch, LIB.ApplyPatch, LIB.Clone
 local EncodeLUAData, DecodeLUAData = LIB.EncodeLUAData, LIB.DecodeLUAData
-local IsArray, IsDictionary, IsEquals = LIB.IsArray, LIB.IsDictionary, LIB.IsEquals
-local IsNumber, IsHugeNumber = LIB.IsNumber, LIB.IsHugeNumber
-local IsNil, IsBoolean, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsFunction
-local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
-local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
--------------------------------------------------------------------------------------------------------------
+local EMPTY_TABLE, MENU_DIVIDER, XML_LINE_BREAKER = LIB.EMPTY_TABLE, LIB.MENU_DIVIDER, LIB.XML_LINE_BREAKER
+-----------------------------------------------------------------------------------------------------------
 local _L = LIB.LoadLangPack()
 
 -- 海鳗里面抠出来的
@@ -93,7 +92,7 @@ function LIB.GetCopyLinkText(szText, rgbf)
 	if not IsTable(rgbf) then
 		rgbf = { f = 10 }
 	end
-	local handlerEntry = LIB.GetAddonInfo().szNameSpace .. '.ChatLinkEventHandlers'
+	local handlerEntry = PACKET_INFO.NAME_SPACE .. '.ChatLinkEventHandlers'
 	return GetFormatText(szText, rgbf.f, rgbf.r, rgbf.g, rgbf.b, 82691,
 		'this.bMyChatRendered=true;this.OnItemLButtonDown='
 			.. handlerEntry .. '.OnCopyLClick;this.OnItemMButtonDown='
@@ -112,7 +111,7 @@ function LIB.GetTimeLinkText(rgbfs, dwTime)
 	if not IsTable(rgbfs) then
 		rgbfs = { f = 10 }
 	end
-	local handlerEntry = LIB.GetAddonInfo().szNameSpace .. '.ChatLinkEventHandlers'
+	local handlerEntry = PACKET_INFO.NAME_SPACE .. '.ChatLinkEventHandlers'
 	return GetFormatText(
 		LIB.FormatTime(rgbfs.s or '[hh:mm.ss]', dwTime),
 		rgbfs.f, rgbfs.r, rgbfs.g, rgbfs.b, 82691,
@@ -346,7 +345,7 @@ function LIB.RenderChatLink(arg1, arg2)
 						script = ''
 					end
 
-					local handlerEntry = LIB.GetAddonInfo().szNameSpace .. '.ChatLinkEventHandlers'
+					local handlerEntry = PACKET_INFO.NAME_SPACE .. '.ChatLinkEventHandlers'
 					if name:sub(1, 8) == 'namelink' then
 						script = script .. 'this.bMyChatRendered=true;this.OnItemLButtonDown='
 							.. handlerEntry .. '.OnNameLClick;this.OnItemRButtonDown='
@@ -1274,7 +1273,7 @@ local function OnChatPanelNamelinkLButtonDown(...)
 	LIB.ChatLinkEventHandlers.OnNameLClick(...)
 end
 
-LIB.HookChatPanel('AFTER.' .. LIB.GetAddonInfo().szNameSpace .. '#HOOKNAME', function(h, nIndex)
+LIB.HookChatPanel('AFTER.' .. PACKET_INFO.NAME_SPACE .. '#HOOKNAME', function(h, nIndex)
 	for i = nIndex, h:GetItemCount() - 1 do
 		local hItem = h:Lookup(i)
 		if hItem:GetName():find('^namelink_%d+$') and not hItem.bMyChatRendered then

@@ -6,10 +6,10 @@
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
 --------------------------------------------------------
--------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
 local setmetatable = setmetatable
 local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
 local sub, len, format, rep = string.sub, string.len, string.format, string.rep
@@ -26,19 +26,18 @@ local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
 local LIB = MY
-local UI, DEBUG_LEVEL, PATH_TYPE = LIB.UI, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local ipairs_r = LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
+local UI, DEBUG_LEVEL, PATH_TYPE, PACKET_INFO = LIB.UI, LIB.DEBUG_LEVEL, LIB.PATH_TYPE, LIB.PACKET_INFO
+local ipairs_r, spairs, spairs_r = LIB.ipairs_r, LIB.spairs, LIB.spairs_r
+local sipairs, sipairs_r = LIB.sipairs, LIB.sipairs_r
+local IsNil, IsBoolean, IsUserdata, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsUserdata, LIB.IsFunction
+local IsString, IsTable, IsArray, IsDictionary = LIB.IsString, LIB.IsTable, LIB.IsArray, LIB.IsDictionary
+local IsNumber, IsHugeNumber, IsEmpty, IsEquals = LIB.IsNumber, LIB.IsHugeNumber, LIB.IsEmpty, LIB.IsEquals
 local GetTraceback, Call, XpCall = LIB.GetTraceback, LIB.Call, LIB.XpCall
 local Get, Set, RandomChild = LIB.Get, LIB.Set, LIB.RandomChild
 local GetPatch, ApplyPatch, Clone = LIB.GetPatch, LIB.ApplyPatch, LIB.Clone
 local EncodeLUAData, DecodeLUAData = LIB.EncodeLUAData, LIB.DecodeLUAData
-local IsArray, IsDictionary, IsEquals = LIB.IsArray, LIB.IsDictionary, LIB.IsEquals
-local IsNumber, IsHugeNumber = LIB.IsNumber, LIB.IsHugeNumber
-local IsNil, IsBoolean, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsFunction
-local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
-local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
--------------------------------------------------------------------------------------------------------------
+local EMPTY_TABLE, MENU_DIVIDER, XML_LINE_BREAKER = LIB.EMPTY_TABLE, LIB.MENU_DIVIDER, LIB.XML_LINE_BREAKER
+-----------------------------------------------------------------------------------------------------------
 local _L = LIB.LoadLangPack()
 ---------------------------------------------------------------------------------------------------
 
@@ -99,7 +98,7 @@ function LIB.SetHotKey(szCommand, nIndex, nKey, bShift, bCtrl, bAlt)
 		end
 		Hotkey.Set(szCommand, nIndex, nKey, bShift == true, bCtrl == true, bAlt == true)
 	else
-		local szGroup = szCommand or LIB.GetAddonInfo().szName
+		local szGroup = szCommand or PACKET_INFO.NAME
 
 		local frame = Station.Lookup('Topmost/HotkeyPanel')
 		if not frame then
@@ -225,17 +224,17 @@ function LIB.SetHotKey(szCommand, nIndex, nKey, bShift, bCtrl, bAlt)
 	end
 end
 
-LIB.RegisterInit(LIB.GetAddonInfo().szNameSpace .. '#BIND_HOTKEY', function()
+LIB.RegisterInit(PACKET_INFO.NAME_SPACE .. '#BIND_HOTKEY', function()
 	-- hotkey
-	Hotkey.AddBinding(LIB.GetAddonInfo().szNameSpace .. '_Total', _L['Open/Close main panel'], LIB.GetAddonInfo().szName, LIB.TogglePanel, nil)
+	Hotkey.AddBinding(PACKET_INFO.NAME_SPACE .. '_Total', _L['Open/Close main panel'], PACKET_INFO.NAME, LIB.TogglePanel, nil)
 	for _, v in ipairs(HOTKEY_CACHE) do
 		Hotkey.AddBinding(v.szName, v.szTitle, '', v.fnAction, nil)
 	end
 	for i = 1, 5 do
-		Hotkey.AddBinding(LIB.GetAddonInfo().szNameSpace .. '_HotKey_Null_'..i, _L['none-function hotkey'], '', function() end, nil)
+		Hotkey.AddBinding(PACKET_INFO.NAME_SPACE .. '_HotKey_Null_'..i, _L['none-function hotkey'], '', function() end, nil)
 	end
 end)
-if LIB.GetAddonInfo().nDebugLevel <= DEBUG_LEVEL.DEBUG then
+if PACKET_INFO.DEBUG_LEVEL <= DEBUG_LEVEL.DEBUG then
 	local aFrame = {
 		'Lowest2/ChatPanel1',
 		'Lowest2/ChatPanel2',
@@ -247,9 +246,9 @@ if LIB.GetAddonInfo().nDebugLevel <= DEBUG_LEVEL.DEBUG then
 		'Lowest2/ChatPanel8',
 		'Lowest2/ChatPanel9',
 		'Lowest2/EditBox',
-		'Normal/' .. LIB.GetAddonInfo().szNameSpace,
+		'Normal/' .. PACKET_INFO.NAME_SPACE,
 	}
-	LIB.RegisterHotKey(LIB.GetAddonInfo().szNameSpace .. '_STAGE_CHAT', _L['Display only chat panel'], function()
+	LIB.RegisterHotKey(PACKET_INFO.NAME_SPACE .. '_STAGE_CHAT', _L['Display only chat panel'], function()
 		if Station.IsVisible() then
 			for _, v in ipairs(aFrame) do
 				local frame = Station.Lookup(v)
@@ -269,7 +268,7 @@ if LIB.GetAddonInfo().nDebugLevel <= DEBUG_LEVEL.DEBUG then
 		end
 	end)
 end
-LIB.RegisterHotKey(LIB.GetAddonInfo().szNameSpace .. '_STOP_CASTING', _L['Stop cast skill'], function() GetClientPlayer().StopCurrentAction() end)
+LIB.RegisterHotKey(PACKET_INFO.NAME_SPACE .. '_STOP_CASTING', _L['Stop cast skill'], function() GetClientPlayer().StopCurrentAction() end)
 end
 
 -- Save & Load Lua Data
@@ -287,8 +286,8 @@ end
 --       # #       #   #         #   #   # # # # #       #         #                 #     #   #
 --   # #     #   #       #     # # #     #       #       #       # #                 #   #       #
 -- ##################################################################################################
-if IsLocalFileExist(LIB.GetAddonInfo().szRoot .. '@DATA/') then
-	CPath.Move(LIB.GetAddonInfo().szRoot .. '@DATA/', LIB.GetAddonInfo().szDataRoot)
+if IsLocalFileExist(PACKET_INFO.ROOT .. '@DATA/') then
+	CPath.Move(PACKET_INFO.ROOT .. '@DATA/', PACKET_INFO.DATA_ROOT)
 end
 
 -- 格式化数据文件路径（替换$uid、$lang、$server以及补全相对路径）
@@ -311,13 +310,13 @@ function LIB.FormatPath(oFilePath, tParams)
 	-- if it's relative path then complete path with '/{NS}#DATA/'
 	if szFilePath:sub(2, 3) ~= ':/' then
 		if ePathType == PATH_TYPE.DATA then
-			szFilePath = LIB.GetAddonInfo().szInterfaceRoot .. LIB.GetAddonInfo().szNameSpace .. '#DATA/' .. szFilePath
+			szFilePath = PACKET_INFO.INTERFACE_ROOT .. PACKET_INFO.NAME_SPACE .. '#DATA/' .. szFilePath
 		elseif ePathType == PATH_TYPE.GLOBAL then
-			szFilePath = LIB.GetAddonInfo().szInterfaceRoot .. LIB.GetAddonInfo().szNameSpace .. '#DATA/!all-users@$lang/' .. szFilePath
+			szFilePath = PACKET_INFO.INTERFACE_ROOT .. PACKET_INFO.NAME_SPACE .. '#DATA/!all-users@$lang/' .. szFilePath
 		elseif ePathType == PATH_TYPE.ROLE then
-			szFilePath = LIB.GetAddonInfo().szInterfaceRoot .. LIB.GetAddonInfo().szNameSpace .. '#DATA/$uid@$lang/' .. szFilePath
+			szFilePath = PACKET_INFO.INTERFACE_ROOT .. PACKET_INFO.NAME_SPACE .. '#DATA/$uid@$lang/' .. szFilePath
 		elseif ePathType == PATH_TYPE.SERVER then
-			szFilePath = LIB.GetAddonInfo().szInterfaceRoot .. LIB.GetAddonInfo().szNameSpace .. '#DATA/#$relserver@$lang/' .. szFilePath
+			szFilePath = PACKET_INFO.INTERFACE_ROOT .. PACKET_INFO.NAME_SPACE .. '#DATA/#$relserver@$lang/' .. szFilePath
 		end
 	end
 	-- if exist $uid then add user role identity
@@ -659,7 +658,7 @@ end
 end
 
 do
-local SOUND_ROOT = LIB.GetAddonInfo().szFrameworkRoot .. 'audio/'
+local SOUND_ROOT = PACKET_INFO.FRAMEWORK_ROOT .. 'audio/'
 local SOUNDS, CACHE = {
 	{
 		szType = _L['Default'],
@@ -808,7 +807,7 @@ function LIB.PlaySound(nType, szFilePath, szCustomPath)
 	-- 播放默认声音
 	local szPath = string.gsub(szFilePath, '\\', '/')
 	if string.sub(szPath, 1, 2) ~= './' then
-		szPath = LIB.GetAddonInfo().szFrameworkRoot .. 'audio/' .. szPath
+		szPath = PACKET_INFO.FRAMEWORK_ROOT .. 'audio/' .. szPath
 	end
 	if not IsFileExist(szPath) then
 		return
@@ -850,7 +849,7 @@ function LIB.GetFontList()
 end
 
 -- 加载注册数据
-LIB.RegisterInit(LIB.GetAddonInfo().szNameSpace .. '#INITDATA', function()
+LIB.RegisterInit(PACKET_INFO.NAME_SPACE .. '#INITDATA', function()
 	local t = LIB.LoadLUAData({'config/initial.jx3dat', PATH_TYPE.GLOBAL})
 	if t then
 		for v_name, v_data in pairs(t) do
@@ -868,7 +867,7 @@ do
 -------------------------------
 -- 个人数据版本号
 local m_nStorageVer = {}
-LIB.BreatheCall(LIB.GetAddonInfo().szNameSpace .. '#STORAGE_DATA', 200, function()
+LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '#STORAGE_DATA', 200, function()
 	if not LIB.IsInitialized() then
 		return
 	end
@@ -927,7 +926,7 @@ LIB.BreatheCall(LIB.GetAddonInfo().szNameSpace .. '#STORAGE_DATA', 200, function
 	})
 	return 0
 end)
-LIB.RegisterExit(LIB.GetAddonInfo().szNameSpace .. '#STORAGE_DATA', function()
+LIB.RegisterExit(PACKET_INFO.NAME_SPACE .. '#STORAGE_DATA', function()
 	LIB.SaveLUAData({'config/storageversion.jx3dat', PATH_TYPE.ROLE}, m_nStorageVer)
 end)
 -- 保存个人数据 方便网吧党和公司家里多电脑切换
@@ -1073,8 +1072,8 @@ local function OnInit()
 	end
 	INIT_FUNC_LIST = {}
 end
-LIB.RegisterEvent('RELOAD_UI_ADDON_END.' .. LIB.GetAddonInfo().szNameSpace .. '#Storage', OnInit)
-LIB.RegisterEvent('FIRST_SYNC_USER_PREFERENCES_END.' .. LIB.GetAddonInfo().szNameSpace .. '#Storage', OnInit)
+LIB.RegisterEvent('RELOAD_UI_ADDON_END.' .. PACKET_INFO.NAME_SPACE .. '#Storage', OnInit)
+LIB.RegisterEvent('FIRST_SYNC_USER_PREFERENCES_END.' .. PACKET_INFO.NAME_SPACE .. '#Storage', OnInit)
 end
 
 -- ##################################################################################################
@@ -1133,9 +1132,9 @@ local function GenerateMenu(aList, bMainMenu)
 	local menu = {}
 	if bMainMenu then
 		menu = {
-			szOption = LIB.GetAddonInfo().szName,
+			szOption = PACKET_INFO.NAME,
 			fnAction = LIB.TogglePanel,
-			rgb = LIB.GetAddonInfo().tMenuColor,
+			rgb = PACKET_INFO.MENU_COLOR,
 			bCheck = true,
 			bChecked = LIB.IsPanelVisible(),
 
@@ -1155,7 +1154,7 @@ local function GenerateMenu(aList, bMainMenu)
 		end
 		for _, v in ipairs(m) do
 			if not v.rgb and not bMainMenu then
-				v.rgb = LIB.GetAddonInfo().tMenuColor
+				v.rgb = PACKET_INFO.MENU_COLOR
 			end
 			insert(menu, v)
 		end
@@ -1371,12 +1370,12 @@ local function OnMessageBoxOpen()
 			local nIndex, szOption = btn.nIndex, btn.szOption
 			if btn.fnAction then
 				HookTableFunc(btn, 'fnAction', function()
-					FireUIEvent(LIB.GetAddonInfo().szNameSpace .. '_MESSAGE_BOX_ACTION', szName, 'ACTION', szOption, nIndex)
+					FireUIEvent(PACKET_INFO.NAME_SPACE .. '_MESSAGE_BOX_ACTION', szName, 'ACTION', szOption, nIndex)
 				end, { bAfterOrigin = true })
 			end
 			if btn.fnCountDownEnd then
 				HookTableFunc(btn, 'fnCountDownEnd', function()
-					FireUIEvent(LIB.GetAddonInfo().szNameSpace .. '_MESSAGE_BOX_ACTION', szName, 'TIME_OUT', szOption, nIndex)
+					FireUIEvent(PACKET_INFO.NAME_SPACE .. '_MESSAGE_BOX_ACTION', szName, 'TIME_OUT', szOption, nIndex)
 				end, { bAfterOrigin = true })
 			end
 			aMsg[i] = { nIndex = nIndex, szOption = szOption }
@@ -1388,20 +1387,20 @@ local function OnMessageBoxOpen()
 		if not msg then
 			return
 		end
-		FireUIEvent(LIB.GetAddonInfo().szNameSpace .. '_MESSAGE_BOX_ACTION', szName, 'ACTION', msg.szOption, msg.nIndex)
+		FireUIEvent(PACKET_INFO.NAME_SPACE .. '_MESSAGE_BOX_ACTION', szName, 'ACTION', msg.szOption, msg.nIndex)
 	end, { bAfterOrigin = true })
 
 	HookTableFunc(frame, 'fnCancelAction', function()
-		FireUIEvent(LIB.GetAddonInfo().szNameSpace .. '_MESSAGE_BOX_ACTION', szName, 'CANCEL')
+		FireUIEvent(PACKET_INFO.NAME_SPACE .. '_MESSAGE_BOX_ACTION', szName, 'CANCEL')
 	end, { bAfterOrigin = true })
 
 	if frame.fnAutoClose then
 		HookTableFunc(frame, 'fnAutoClose', function()
-			FireUIEvent(LIB.GetAddonInfo().szNameSpace .. '_MESSAGE_BOX_ACTION', szName, 'AUTO_CLOSE')
+			FireUIEvent(PACKET_INFO.NAME_SPACE .. '_MESSAGE_BOX_ACTION', szName, 'AUTO_CLOSE')
 		end, { bAfterOrigin = true })
 	end
 
-	FireUIEvent(LIB.GetAddonInfo().szNameSpace .. '_MESSAGE_BOX_OPEN', arg0, arg1)
+	FireUIEvent(PACKET_INFO.NAME_SPACE .. '_MESSAGE_BOX_OPEN', arg0, arg1)
 end
 LIB.RegisterEvent('ON_MESSAGE_BOX_OPEN', OnMessageBoxOpen)
 end
@@ -1410,7 +1409,7 @@ function LIB.Alert(szMsg, fnAction, szSure, fnCancelAction)
 	local nW, nH = Station.GetClientSize()
 	local tMsg = {
 		x = nW / 2, y = nH / 3,
-		szName = LIB.GetAddonInfo().szNameSpace .. '_Alert',
+		szName = PACKET_INFO.NAME_SPACE .. '_Alert',
 		szMessage = szMsg,
 		szAlignment = 'CENTER',
 		fnCancelAction = fnCancelAction,
@@ -1426,7 +1425,7 @@ function LIB.Confirm(szMsg, fnAction, fnCancel, szSure, szCancel, fnCancelAction
 	local nW, nH = Station.GetClientSize()
 	local tMsg = {
 		x = nW / 2, y = nH / 3,
-		szName = LIB.GetAddonInfo().szNameSpace .. '_Confirm',
+		szName = PACKET_INFO.NAME_SPACE .. '_Confirm',
 		szMessage = szMsg,
 		szAlignment = 'CENTER',
 		fnCancelAction = fnCancelAction,
@@ -1445,7 +1444,7 @@ function LIB.Dialog(szMsg, aOptions, fnCancelAction)
 	local nW, nH = Station.GetClientSize()
 	local tMsg = {
 		x = nW / 2, y = nH / 3,
-		szName = LIB.GetAddonInfo().szNameSpace .. '_Dialog',
+		szName = PACKET_INFO.NAME_SPACE .. '_Dialog',
 		szMessage = szMsg,
 		szAlignment = 'CENTER',
 		fnCancelAction = fnCancelAction,
@@ -1503,7 +1502,7 @@ end
 
 local COLOR_NAME_RGB = {}
 do
-	local tColor = LIB.LoadLUAData(LIB.GetAddonInfo().szFrameworkRoot .. 'data/colors.jx3dat')
+	local tColor = LIB.LoadLUAData(PACKET_INFO.FRAMEWORK_ROOT .. 'data/colors.jx3dat')
 	for id, col in pairs(tColor) do
 		local r, g, b = LIB.Hex2RGB(col)
 		if r then

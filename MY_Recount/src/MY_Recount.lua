@@ -6,10 +6,10 @@
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
 --------------------------------------------------------
--------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
 local setmetatable = setmetatable
 local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
 local sub, len, format, rep = string.sub, string.len, string.format, string.rep
@@ -26,19 +26,18 @@ local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
 local LIB = MY
-local UI, DEBUG_LEVEL, PATH_TYPE = LIB.UI, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local ipairs_r = LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
+local UI, DEBUG_LEVEL, PATH_TYPE, PACKET_INFO = LIB.UI, LIB.DEBUG_LEVEL, LIB.PATH_TYPE, LIB.PACKET_INFO
+local ipairs_r, spairs, spairs_r = LIB.ipairs_r, LIB.spairs, LIB.spairs_r
+local sipairs, sipairs_r = LIB.sipairs, LIB.sipairs_r
+local IsNil, IsBoolean, IsUserdata, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsUserdata, LIB.IsFunction
+local IsString, IsTable, IsArray, IsDictionary = LIB.IsString, LIB.IsTable, LIB.IsArray, LIB.IsDictionary
+local IsNumber, IsHugeNumber, IsEmpty, IsEquals = LIB.IsNumber, LIB.IsHugeNumber, LIB.IsEmpty, LIB.IsEquals
 local GetTraceback, Call, XpCall = LIB.GetTraceback, LIB.Call, LIB.XpCall
 local Get, Set, RandomChild = LIB.Get, LIB.Set, LIB.RandomChild
 local GetPatch, ApplyPatch, Clone = LIB.GetPatch, LIB.ApplyPatch, LIB.Clone
 local EncodeLUAData, DecodeLUAData = LIB.EncodeLUAData, LIB.DecodeLUAData
-local IsArray, IsDictionary, IsEquals = LIB.IsArray, LIB.IsDictionary, LIB.IsEquals
-local IsNumber, IsHugeNumber = LIB.IsNumber, LIB.IsHugeNumber
-local IsNil, IsBoolean, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsFunction
-local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
-local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
--------------------------------------------------------------------------------------------------------------
+local EMPTY_TABLE, MENU_DIVIDER, XML_LINE_BREAKER = LIB.EMPTY_TABLE, LIB.MENU_DIVIDER, LIB.XML_LINE_BREAKER
+-----------------------------------------------------------------------------------------------------------
 local CHANNEL = { -- 统计类型
 	DPS  = 1, -- 输出统计
 	HPS  = 2, -- 治疗统计
@@ -85,11 +84,11 @@ local SZ_SKILL_RESULT = {
 	[SKILL_RESULT.CRITICAL] = g_tStrings.STR_CS_NAME      ,
 	[SKILL_RESULT.INSIGHT ] = g_tStrings.STR_MSG_INSIGHT  ,
 }
-local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_Recount/lang/')
+local _L = LIB.LoadLangPack(PACKET_INFO.ROOT .. 'MY_Recount/lang/')
 local _C = {
-	szIniRoot   = LIB.GetAddonInfo().szRoot .. 'MY_Recount/ui/',
-	szIniFile   = LIB.GetAddonInfo().szRoot .. 'MY_Recount/ui/MY_Recount.ini',
-	szIniDetail = LIB.GetAddonInfo().szRoot .. 'MY_Recount/ui/MY_Recount_Detail.ini',
+	szIniRoot   = PACKET_INFO.ROOT .. 'MY_Recount/ui/',
+	szIniFile   = PACKET_INFO.ROOT .. 'MY_Recount/ui/MY_Recount.ini',
+	szIniDetail = PACKET_INFO.ROOT .. 'MY_Recount/ui/MY_Recount_Detail.ini',
 	tRandFrame  = {
 		169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182,
 		183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193
@@ -1433,7 +1432,7 @@ function MY_Recount.GetPublishMenu()
 		end
 		LIB.Talk(
 			nChannel,
-			'[' .. LIB.GetAddonInfo().szShortName .. ']'
+			'[' .. PACKET_INFO.SHORT_NAME .. ']'
 			.. _L['fight recount'] .. ' - '
 			.. frame:Lookup('Wnd_Title', 'Text_Title'):GetText()
 			.. ' ' .. ((DataDisplay.szBossName and ' - ' .. DataDisplay.szBossName) or '')
@@ -1525,7 +1524,7 @@ function MY_Recount.GetDetailMenu(frame)
 		local bDetail = frame:Lookup('', 'Handle_Spliter'):IsVisible()
 		LIB.Talk(
 			nChannel,
-			'[' .. LIB.GetAddonInfo().szShortName .. ']'
+			'[' .. PACKET_INFO.SHORT_NAME .. ']'
 			.. _L['fight recount'] .. ' - '
 			.. frame:Lookup('', 'Text_Default'):GetText()
 			.. ' ' .. ((DataDisplay.szBossName and ' - ' .. DataDisplay.szBossName) or '')

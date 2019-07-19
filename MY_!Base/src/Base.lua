@@ -169,6 +169,18 @@ local _AUTHOR_           = _L.PLUGIN_AUTHOR
 local _AUTHOR_WEIBO_     = _L.PLUGIN_AUTHOR_WEIBO
 local _AUTHOR_WEIBO_URL_ = 'https://weibo.com/zymah'
 local _AUTHOR_SIGNATURE_ = _L.PLUGIN_AUTHOR_SIGNATURE
+local _AUTHOR_ROLES_     = {
+	[43567   ] = string.char( 0xDC, 0xF8, 0xD2, 0xC1 ), -- 体服
+	[3007396 ] = string.char( 0xDC, 0xF8, 0xD2, 0xC1 ), -- 枫泾古镇
+	[1600498 ] = string.char( 0xDC, 0xF8, 0xD2, 0xC1 ), -- 追风蹑影
+	[4664780 ] = string.char( 0xDC, 0xF8, 0xD2, 0xC1 ), -- 日月明尊
+	[17796954] = string.char( 0xDC, 0xF8, 0xD2, 0xC1, 0x40, 0xB0, 0xD7, 0xB5, 0xDB, 0xB3, 0xC7 ), -- 唯我独尊->枫泾古镇
+	[385183  ] = string.char( 0xE8, 0x8C, 0x97, 0xE4, 0xBC, 0x8A ), -- 傲血戰意
+	[1452025 ] = string.char( 0xE8, 0x8C, 0x97, 0xE4, 0xBC, 0x8A, 0xE4, 0xBC, 0x8A ), -- 巔峰再起
+	[3627405 ] = string.char( 0xC1, 0xFA, 0xB5, 0xA8, 0xC9, 0xDF, 0x40, 0xDD, 0xB6, 0xBB, 0xA8, 0xB9, 0xAC ), -- 白帝
+	-- [4662931] = string.char( 0xBE, 0xCD, 0xCA, 0xC7, 0xB8, 0xF6, 0xD5, 0xF3, 0xD1, 0xDB ), -- 日月明尊
+	-- [3438030] = string.char( 0xB4, 0xE5, 0xBF, 0xDA, 0xB5, 0xC4, 0xCD, 0xF5, 0xCA, 0xA6, 0xB8, 0xB5 ), -- 枫泾古镇
+}
 Log('[MY] Debug level ' .. _DEBUG_LEVEL_ .. ' / delog level ' .. _DELOG_LEVEL_)
 ---------------------------------------------------------------------------------------------
 -- 通用函数
@@ -622,6 +634,42 @@ function XpCall(arg0, ...)
 end
 end
 -----------------------------------------------
+-- 插件集信息
+-----------------------------------------------
+local PACKET_INFO
+do
+local tInfo = {
+	NAME             = _NAME_            ,
+	SHORT_NAME       = _SHORT_NAME_      ,
+	UITEX_COMMON     = _UITEX_COMMON_    ,
+	UITEX_POSTER     = _UITEX_POSTER_    ,
+	UITEX_ST         = _UITEX_ST_        ,
+	VERSION          = _VERSION_         ,
+	BUILD            = _BUILD_           ,
+	NAME_SPACE       = _NAME_SPACE_      ,
+	DEBUG_LEVEL      = _DEBUG_LEVEL_     ,
+	DELOG_LEVEL      = _DELOG_LEVEL_     ,
+	INTERFACE_ROOT   = _INTERFACE_ROOT_  ,
+	ROOT             = _ADDON_ROOT_      ,
+	DATA_ROOT        = _DATA_ROOT_       ,
+	FRAMEWORK_ROOT   = _FRAMEWORK_ROOT_  ,
+	AUTHOR           = _AUTHOR_          ,
+	AUTHOR_WEIBO     = _AUTHOR_WEIBO_    ,
+	AUTHOR_WEIBO_URL = _AUTHOR_WEIBO_URL_,
+	AUTHOR_SIGNATURE = _AUTHOR_SIGNATURE_,
+	AUTHOR_ROLES     = _AUTHOR_ROLES_    ,
+	MENU_COLOR       = _MENU_COLOR_      ,
+	MAX_PLAYER_LEVEL = _MAX_PLAYER_LEVEL_,
+}
+PACKET_INFO = SetmetaReadonly(tInfo)
+-- 更新最高玩家等级数据
+local function onPlayerEnterScene()
+	_MAX_PLAYER_LEVEL_ = max(_MAX_PLAYER_LEVEL_, GetClientPlayer().nMaxLevel)
+	tInfo.MAX_PLAYER_LEVEL = _MAX_PLAYER_LEVEL_
+end
+RegisterEvent('PLAYER_ENTER_SCENE', onPlayerEnterScene)
+end
+-----------------------------------------------
 -- 枚举
 -----------------------------------------------
 local DEBUG_LEVEL = SetmetaReadonly({
@@ -673,6 +721,7 @@ local LIB = {
 	RandomChild      = RandomChild     ,
 	GetTraceback     = GetTraceback    ,
 	LoadLangPack     = LoadLangPack    ,
+	PACKET_INFO      = PACKET_INFO     ,
 	DEBUG_LEVEL      = DEBUG_LEVEL     ,
 	PATH_TYPE        = PATH_TYPE       ,
 	MENU_DIVIDER     = MENU_DIVIDER    ,
@@ -684,51 +733,8 @@ _G[_NAME_SPACE_] = LIB
 ---------------------------------------------------------------------------------------------
 
 -----------------------------------------------
--- 私有函数
+-- 基础函数
 -----------------------------------------------
-do local AddonInfo = SetmetaReadonly({
-	szName            = _NAME_            ,
-	szShortName       = _SHORT_NAME_      ,
-	szUITexCommon     = _UITEX_COMMON_    ,
-	szUITexPoster     = _UITEX_POSTER_    ,
-	szUITexST         = _UITEX_ST_        ,
-	dwVersion         = _VERSION_         ,
-	szBuild           = _BUILD_           ,
-	szNameSpace       = _NAME_SPACE_      ,
-	nDebugLevel       = _DEBUG_LEVEL_     ,
-	nLogLevel         = _DELOG_LEVEL_     ,
-	szInterfaceRoot   = _INTERFACE_ROOT_  ,
-	szRoot            = _ADDON_ROOT_      ,
-	szDataRoot        = _DATA_ROOT_       ,
-	szFrameworkRoot   = _FRAMEWORK_ROOT_  ,
-	szAuthor          = _AUTHOR_          ,
-	szAuthorWeibo     = _AUTHOR_WEIBO_    ,
-	szAuthorWeiboURL  = _AUTHOR_WEIBO_URL_,
-	szAuthorSignature = _AUTHOR_SIGNATURE_,
-	tAuthor           = {
-		[43567   ] = string.char( 0xDC, 0xF8, 0xD2, 0xC1 ), -- 体服
-		[3007396 ] = string.char( 0xDC, 0xF8, 0xD2, 0xC1 ), -- 枫泾古镇
-		[1600498 ] = string.char( 0xDC, 0xF8, 0xD2, 0xC1 ), -- 追风蹑影
-		[4664780 ] = string.char( 0xDC, 0xF8, 0xD2, 0xC1 ), -- 日月明尊
-		[17796954] = string.char( 0xDC, 0xF8, 0xD2, 0xC1, 0x40, 0xB0, 0xD7, 0xB5, 0xDB, 0xB3, 0xC7 ), -- 唯我独尊->枫泾古镇
-		[385183  ] = string.char( 0xE8, 0x8C, 0x97, 0xE4, 0xBC, 0x8A ), -- 傲血戰意
-		[1452025 ] = string.char( 0xE8, 0x8C, 0x97, 0xE4, 0xBC, 0x8A, 0xE4, 0xBC, 0x8A ), -- 巔峰再起
-		[3627405 ] = string.char( 0xC1, 0xFA, 0xB5, 0xA8, 0xC9, 0xDF, 0x40, 0xDD, 0xB6, 0xBB, 0xA8, 0xB9, 0xAC ), -- 白帝
-		-- [4662931] = string.char( 0xBE, 0xCD, 0xCA, 0xC7, 0xB8, 0xF6, 0xD5, 0xF3, 0xD1, 0xDB ), -- 日月明尊
-		-- [3438030] = string.char( 0xB4, 0xE5, 0xBF, 0xDA, 0xB5, 0xC4, 0xCD, 0xF5, 0xCA, 0xA6, 0xB8, 0xB5 ), -- 枫泾古镇
-	},
-	tMenuColor        = _MENU_COLOR_      ,
-	dwMaxPlayerLevel  = _MAX_PLAYER_LEVEL_,
-})
-function LIB.GetAddonInfo()
-	return AddonInfo
-end
-local function onPlayerEnterScene()
-	_MAX_PLAYER_LEVEL_ = max(_MAX_PLAYER_LEVEL_, GetClientPlayer().nMaxLevel)
-end
-RegisterEvent('PLAYER_ENTER_SCENE', onPlayerEnterScene)
-end
-
 -- (string, number) LIB.GetVersion()
 function LIB.GetVersion(dwVersion)
 	local dwVersion = dwVersion or _VERSION_
@@ -758,12 +764,12 @@ end
 ---------------------------------------------------
 if _DEBUG_LEVEL_ <= DEBUG_LEVEL.DEBUG then
 	if not ECHO_LUA_ERROR then
-		ECHO_LUA_ERROR = { ID = LIB.GetAddonInfo().szNameSpace }
+		ECHO_LUA_ERROR = { ID = PACKET_INFO.NAME_SPACE }
 	elseif IsTable(ECHO_LUA_ERROR) then
-		ECHO_LUA_ERROR.ID = LIB.GetAddonInfo().szNameSpace
+		ECHO_LUA_ERROR.ID = PACKET_INFO.NAME_SPACE
 	end
 	RegisterEvent('CALL_LUA_ERROR', function()
-		if ECHO_LUA_ERROR and ECHO_LUA_ERROR.ID == LIB.GetAddonInfo().szNameSpace then
+		if ECHO_LUA_ERROR and ECHO_LUA_ERROR.ID == PACKET_INFO.NAME_SPACE then
 			print(arg0)
 			OutputMessage('MSG_SYS', arg0)
 		end

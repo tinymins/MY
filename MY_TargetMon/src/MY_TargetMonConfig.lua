@@ -6,10 +6,10 @@
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
 --------------------------------------------------------
--------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
 local setmetatable = setmetatable
 local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
 local sub, len, format, rep = string.sub, string.len, string.format, string.rep
@@ -26,32 +26,31 @@ local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
 local LIB = MY
-local UI, DEBUG_LEVEL, PATH_TYPE = LIB.UI, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local ipairs_r = LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
+local UI, DEBUG_LEVEL, PATH_TYPE, PACKET_INFO = LIB.UI, LIB.DEBUG_LEVEL, LIB.PATH_TYPE, LIB.PACKET_INFO
+local ipairs_r, spairs, spairs_r = LIB.ipairs_r, LIB.spairs, LIB.spairs_r
+local sipairs, sipairs_r = LIB.sipairs, LIB.sipairs_r
+local IsNil, IsBoolean, IsUserdata, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsUserdata, LIB.IsFunction
+local IsString, IsTable, IsArray, IsDictionary = LIB.IsString, LIB.IsTable, LIB.IsArray, LIB.IsDictionary
+local IsNumber, IsHugeNumber, IsEmpty, IsEquals = LIB.IsNumber, LIB.IsHugeNumber, LIB.IsEmpty, LIB.IsEquals
 local GetTraceback, Call, XpCall = LIB.GetTraceback, LIB.Call, LIB.XpCall
 local Get, Set, RandomChild = LIB.Get, LIB.Set, LIB.RandomChild
 local GetPatch, ApplyPatch, Clone = LIB.GetPatch, LIB.ApplyPatch, LIB.Clone
 local EncodeLUAData, DecodeLUAData = LIB.EncodeLUAData, LIB.DecodeLUAData
-local IsArray, IsDictionary, IsEquals = LIB.IsArray, LIB.IsDictionary, LIB.IsEquals
-local IsNumber, IsHugeNumber = LIB.IsNumber, LIB.IsHugeNumber
-local IsNil, IsBoolean, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsFunction
-local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
-local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
--------------------------------------------------------------------------------------------------------------
+local EMPTY_TABLE, MENU_DIVIDER, XML_LINE_BREAKER = LIB.EMPTY_TABLE, LIB.MENU_DIVIDER, LIB.XML_LINE_BREAKER
+-----------------------------------------------------------------------------------------------------------
 
-local _L = LIB.LoadLangPack(LIB.GetAddonInfo().szRoot .. 'MY_TargetMon/lang/')
+local _L = LIB.LoadLangPack(PACKET_INFO.ROOT .. 'MY_TargetMon/lang/')
 if not LIB.AssertVersion('MY_TargetMon', _L['MY_TargetMon'], 0x2011800) then
 	return
 end
 local LANG = LIB.GetLang()
 local INIT_STATE = 'NONE'
 local C, D = { PASSPHRASE = {213, 166, 13}, PASSPHRASE_EMBEDDED = {211, 98, 5} }, {}
-local INI_PATH = LIB.GetAddonInfo().szRoot .. 'MY_TargetMon/ui/MY_TargetMon.ini'
+local INI_PATH = PACKET_INFO.ROOT .. 'MY_TargetMon/ui/MY_TargetMon.ini'
 local ROLE_CONFIG_FILE = {'config/my_targetmon.jx3dat', PATH_TYPE.ROLE}
-local TEMPLATE_CONFIG_FILE = LIB.GetAddonInfo().szRoot .. 'MY_TargetMon/data/template/$lang.jx3dat'
+local TEMPLATE_CONFIG_FILE = PACKET_INFO.ROOT .. 'MY_TargetMon/data/template/$lang.jx3dat'
 local EMBEDDED_ENCRYPTED = false
-local EMBEDDED_CONFIG_ROOT = LIB.GetAddonInfo().szRoot .. 'MY_Resource/data/targetmon/'
+local EMBEDDED_CONFIG_ROOT = PACKET_INFO.ROOT .. 'MY_Resource/data/targetmon/'
 local CUSTOM_EMBEDDED_CONFIG_ROOT = LIB.FormatPath({'userdata/TargetMon/', PATH_TYPE.GLOBAL})
 local EMBEDDED_CONFIG_SUFFIX = '.' .. LANG .. '.jx3dat'
 local CUSTOM_DEFAULT_CONFIG_FILE = {'config/my_targetmon.jx3dat', PATH_TYPE.GLOBAL}
@@ -72,7 +71,7 @@ local TARGET_TYPE_LIST = {
 	'TEAM_MARK_FAN'  ,
 }
 local CONFIG, CONFIG_CHANGED, CONFIG_BUFF_TARGET_LIST, CONFIG_SKILL_TARGET_LIST
-local CONFIG_TEMPLATE = LIB.LoadLUAData(LIB.GetAddonInfo().szRoot .. 'MY_TargetMon/data/template/$lang.jx3dat')
+local CONFIG_TEMPLATE = LIB.LoadLUAData(PACKET_INFO.ROOT .. 'MY_TargetMon/data/template/$lang.jx3dat')
 local MON_TEMPLATE = CONFIG_TEMPLATE.monitors.__CHILD_TEMPLATE__
 local MONID_TEMPLATE = CONFIG_TEMPLATE.monitors.__CHILD_TEMPLATE__.__VALUE__.ids.__CHILD_TEMPLATE__
 local MONLEVEL_TEMPLATE = CONFIG_TEMPLATE.monitors.__CHILD_TEMPLATE__.__VALUE__.ids.__CHILD_TEMPLATE__.levels.__CHILD_TEMPLATE__
@@ -112,7 +111,7 @@ function D.LoadEmbeddedConfig(bCoroutine)
 	if not EMBEDDED_ENCRYPTED then
 		-- 自动生成内置加密数据
 		local DAT_ROOT = 'MY_Resource/data/targetmon/'
-		local SRC_ROOT = LIB.GetAddonInfo().szRoot .. '!src-dist/dat/' .. DAT_ROOT
+		local SRC_ROOT = PACKET_INFO.ROOT .. '!src-dist/dat/' .. DAT_ROOT
 		local DST_ROOT = EMBEDDED_CONFIG_ROOT
 		for _, szFile in ipairs(CPath.GetFileList(SRC_ROOT)) do
 			LIB.Sysmsg(_L['Encrypt and compressing: '] .. DAT_ROOT .. szFile)

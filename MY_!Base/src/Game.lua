@@ -6,10 +6,10 @@
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
 --------------------------------------------------------
--------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
 local setmetatable = setmetatable
 local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
 local sub, len, format, rep = string.sub, string.len, string.format, string.rep
@@ -26,19 +26,18 @@ local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
 local LIB = MY
-local UI, DEBUG_LEVEL, PATH_TYPE = LIB.UI, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local ipairs_r = LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
+local UI, DEBUG_LEVEL, PATH_TYPE, PACKET_INFO = LIB.UI, LIB.DEBUG_LEVEL, LIB.PATH_TYPE, LIB.PACKET_INFO
+local ipairs_r, spairs, spairs_r = LIB.ipairs_r, LIB.spairs, LIB.spairs_r
+local sipairs, sipairs_r = LIB.sipairs, LIB.sipairs_r
+local IsNil, IsBoolean, IsUserdata, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsUserdata, LIB.IsFunction
+local IsString, IsTable, IsArray, IsDictionary = LIB.IsString, LIB.IsTable, LIB.IsArray, LIB.IsDictionary
+local IsNumber, IsHugeNumber, IsEmpty, IsEquals = LIB.IsNumber, LIB.IsHugeNumber, LIB.IsEmpty, LIB.IsEquals
 local GetTraceback, Call, XpCall = LIB.GetTraceback, LIB.Call, LIB.XpCall
 local Get, Set, RandomChild = LIB.Get, LIB.Set, LIB.RandomChild
 local GetPatch, ApplyPatch, Clone = LIB.GetPatch, LIB.ApplyPatch, LIB.Clone
 local EncodeLUAData, DecodeLUAData = LIB.EncodeLUAData, LIB.DecodeLUAData
-local IsArray, IsDictionary, IsEquals = LIB.IsArray, LIB.IsDictionary, LIB.IsEquals
-local IsNumber, IsHugeNumber = LIB.IsNumber, LIB.IsHugeNumber
-local IsNil, IsBoolean, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsFunction
-local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
-local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
--------------------------------------------------------------------------------------------------------------
+local EMPTY_TABLE, MENU_DIVIDER, XML_LINE_BREAKER = LIB.EMPTY_TABLE, LIB.MENU_DIVIDER, LIB.XML_LINE_BREAKER
+-----------------------------------------------------------------------------------------------------------
 -----------------------------------------------
 -- 本地函数和变量
 -----------------------------------------------
@@ -500,7 +499,7 @@ local function GenerateList(bForceRefresh)
 		LIB.Sysmsg({_L('Boss list updated to v%s.', select(2, GetVersion()))})
 	end
 
-	for dwMapID, tInfo in pairs(LIB.LoadLUAData(LIB.GetAddonInfo().szFrameworkRoot .. 'data/bosslist/$lang.jx3dat') or {}) do
+	for dwMapID, tInfo in pairs(LIB.LoadLUAData(PACKET_INFO.FRAMEWORK_ROOT .. 'data/bosslist/$lang.jx3dat') or {}) do
 		if not BOSS_LIST[dwMapID] then
 			BOSS_LIST[dwMapID] = {}
 		end
@@ -525,7 +524,7 @@ function LIB.IsBoss(dwMapID, dwTemplateID)
 	) and true or false
 end
 
-LIB.RegisterTargetAddonMenu(LIB.GetAddonInfo().szNameSpace .. '#Game#Bosslist', function()
+LIB.RegisterTargetAddonMenu(PACKET_INFO.NAME_SPACE .. '#Game#Bosslist', function()
 	local dwType, dwID = LIB.GetTarget()
 	if dwType == TARGET.NPC and (IsCtrlKeyDown() or IsAltKeyDown() or IsShiftKeyDown()) then
 		GenerateList()
@@ -600,7 +599,7 @@ local function GenerateList(bForceRefresh)
 		LIB.SaveLUAData(CACHE_PATH, INPC_LIST)
 		LIB.Sysmsg({_L('Important Npc list updated to v%s.', select(2, GetVersion()))})
 	end
-	for dwMapID, tInfo in pairs(LIB.LoadLUAData(LIB.GetAddonInfo().szFrameworkRoot .. 'data/inpclist/$lang.jx3dat') or {}) do
+	for dwMapID, tInfo in pairs(LIB.LoadLUAData(PACKET_INFO.FRAMEWORK_ROOT .. 'data/inpclist/$lang.jx3dat') or {}) do
 		if not INPC_LIST[dwMapID] then
 			INPC_LIST[dwMapID] = {}
 		end
@@ -631,7 +630,7 @@ function LIB.IsShieldedNpc(dwTemplateID)
 	return Table_IsShieldedNpc and Table_IsShieldedNpc(dwTemplateID)
 end
 
-LIB.RegisterTargetAddonMenu(LIB.GetAddonInfo().szNameSpace .. '#Game#ImportantNpclist', function()
+LIB.RegisterTargetAddonMenu(PACKET_INFO.NAME_SPACE .. '#Game#ImportantNpclist', function()
 	local dwType, dwID = LIB.GetTarget()
 	if dwType == TARGET.NPC and (IsCtrlKeyDown() or IsAltKeyDown() or IsShiftKeyDown()) then
 		GenerateList()
@@ -1658,7 +1657,7 @@ local function ListenFightStateChange()
 		end
 	end
 end
-LIB.BreatheCall(LIB.GetAddonInfo().szNameSpace .. '#ListenFightStateChange', ListenFightStateChange)
+LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '#ListenFightStateChange', ListenFightStateChange)
 
 -- 获取当前战斗时间
 function LIB.GetFightTime(szFormat)
@@ -1891,7 +1890,7 @@ local function WithTargetHandle()
 	LIB.SetTempTarget(r.dwType, r.dwID)
 	local res, err, trace = XpCall(r.callback)
 	if not res then
-		FireUIEvent('CALL_LUA_ERROR', err .. '\n' .. LIB.GetAddonInfo().szNameSpace .. '#WithTarget' .. '\n' .. trace .. '\n')
+		FireUIEvent('CALL_LUA_ERROR', err .. '\n' .. PACKET_INFO.NAME_SPACE .. '#WithTarget' .. '\n' .. trace .. '\n')
 	end
 	LIB.ResumeTarget()
 
@@ -1972,7 +1971,7 @@ end
 do
 local BUFF_LIST_CACHE = setmetatable({}, { __mode = 'v' })
 local BUFF_LIST_PROXY = setmetatable({}, { __mode = 'v' })
-local function reject() assert(false, 'Modify buff list from ' .. LIB.GetAddonInfo().szNameSpace .. '.GetBuffList is forbidden!') end
+local function reject() assert(false, 'Modify buff list from ' .. PACKET_INFO.NAME_SPACE .. '.GetBuffList is forbidden!') end
 -- 获取对象的buff列表
 -- (table) LIB.GetBuffList(KObject)
 function LIB.GetBuffList(...)
@@ -2051,7 +2050,7 @@ end
 do
 local BUFF_CACHE = setmetatable({}, { __mode = 'v' })
 local BUFF_PROXY = setmetatable({}, { __mode = 'v' })
-local function reject() assert(false, 'Modify buff from ' .. LIB.GetAddonInfo().szNameSpace .. '.GetBuff is forbidden!') end
+local function reject() assert(false, 'Modify buff from ' .. PACKET_INFO.NAME_SPACE .. '.GetBuff is forbidden!') end
 -- 获取对象的buff
 -- tBuff: {[dwID1] = nLevel1, [dwID2] = nLevel2}
 -- (table) LIB.GetBuff(dwID[, nLevel[, dwSkillSrcID]])
@@ -2082,7 +2081,7 @@ function LIB.GetBuff(KObject, dwID, nLevel, dwSkillSrcID)
 			end
 		else
 			if not KObject.GetBuff then
-				return LIB.Debug({'KObject neither has a function named GetBuffByOwner nor named GetBuff.'}, LIB.GetAddonInfo().szNameSpace .. '.GetBuff', DEBUG_LEVEL.ERROR)
+				return LIB.Debug({'KObject neither has a function named GetBuffByOwner nor named GetBuff.'}, PACKET_INFO.NAME_SPACE .. '.GetBuff', DEBUG_LEVEL.ERROR)
 			end
 			for _, buff in ipairs(LIB.GetBuffList(KObject)) do
 				if (tBuff[buff.dwID] == buff.nLevel or tBuff[buff.dwID] == 0) and buff.dwSkillSrcID == dwSkillSrcID then
@@ -2110,11 +2109,11 @@ function LIB.GetBuff(KObject, dwID, nLevel, dwSkillSrcID)
 					return tProxy[buff.szKey]
 				end
 			end
-			-- return LIB.Debug({'KObject do not have a function named GetBuffByOwner.'}, LIB.GetAddonInfo().szNameSpace .. '.GetBuff', DEBUG_LEVEL.ERROR)
+			-- return LIB.Debug({'KObject do not have a function named GetBuffByOwner.'}, PACKET_INFO.NAME_SPACE .. '.GetBuff', DEBUG_LEVEL.ERROR)
 		end
 	else
 		if not KObject.GetBuff then
-			return LIB.Debug({'KObject do not have a function named GetBuff.'}, LIB.GetAddonInfo().szNameSpace .. '.GetBuff', DEBUG_LEVEL.ERROR)
+			return LIB.Debug({'KObject do not have a function named GetBuff.'}, PACKET_INFO.NAME_SPACE .. '.GetBuff', DEBUG_LEVEL.ERROR)
 		end
 		for k, v in pairs(tBuff) do
 			local KBuff = KObject.GetBuff(k, v)
@@ -2500,7 +2499,7 @@ end
 
 -- 根据技能 ID 获取引导帧数，非引导技能返回 nil
 -- (number) LIB.GetChannelSkillFrame(number dwSkillID)
-do local SKILL_EX = LIB.LoadLUAData(LIB.GetAddonInfo().szFrameworkRoot .. 'data/skill_ex.jx3dat') or {}
+do local SKILL_EX = LIB.LoadLUAData(PACKET_INFO.FRAMEWORK_ROOT .. 'data/skill_ex.jx3dat') or {}
 function LIB.GetChannelSkillFrame(dwSkillID)
 	local t = SKILL_EX[dwSkillID]
 	if t then

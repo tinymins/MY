@@ -6,10 +6,10 @@
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
 --------------------------------------------------------
--------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
 local setmetatable = setmetatable
 local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
 local sub, len, format, rep = string.sub, string.len, string.format, string.rep
@@ -26,21 +26,20 @@ local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
 local LIB = MY
-local UI, DEBUG_LEVEL, PATH_TYPE = LIB.UI, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local ipairs_r = LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
+local UI, DEBUG_LEVEL, PATH_TYPE, PACKET_INFO = LIB.UI, LIB.DEBUG_LEVEL, LIB.PATH_TYPE, LIB.PACKET_INFO
+local ipairs_r, spairs, spairs_r = LIB.ipairs_r, LIB.spairs, LIB.spairs_r
+local sipairs, sipairs_r = LIB.sipairs, LIB.sipairs_r
+local IsNil, IsBoolean, IsUserdata, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsUserdata, LIB.IsFunction
+local IsString, IsTable, IsArray, IsDictionary = LIB.IsString, LIB.IsTable, LIB.IsArray, LIB.IsDictionary
+local IsNumber, IsHugeNumber, IsEmpty, IsEquals = LIB.IsNumber, LIB.IsHugeNumber, LIB.IsEmpty, LIB.IsEquals
 local GetTraceback, Call, XpCall = LIB.GetTraceback, LIB.Call, LIB.XpCall
 local Get, Set, RandomChild = LIB.Get, LIB.Set, LIB.RandomChild
 local GetPatch, ApplyPatch, Clone = LIB.GetPatch, LIB.ApplyPatch, LIB.Clone
 local EncodeLUAData, DecodeLUAData = LIB.EncodeLUAData, LIB.DecodeLUAData
-local IsArray, IsDictionary, IsEquals = LIB.IsArray, LIB.IsDictionary, LIB.IsEquals
-local IsNumber, IsHugeNumber = LIB.IsNumber, LIB.IsHugeNumber
-local IsNil, IsBoolean, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsFunction
-local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
-local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
--------------------------------------------------------------------------------------------------------------
+local EMPTY_TABLE, MENU_DIVIDER, XML_LINE_BREAKER = LIB.EMPTY_TABLE, LIB.MENU_DIVIDER, LIB.XML_LINE_BREAKER
+-----------------------------------------------------------------------------------------------------------
 local _L = LIB.LoadLangPack()
-local INI_PATH = LIB.GetAddonInfo().szFrameworkRoot ..'ui/MY.ini'
+local INI_PATH = PACKET_INFO.FRAMEWORK_ROOT ..'ui/MY.ini'
 ---------------------------------------------------------------------------------------------
 -- 界面开关
 ---------------------------------------------------------------------------------------------
@@ -292,9 +291,9 @@ function LIB.RedrawTabs(szCategory)
 					else
 						hTab:Lookup('Image_TabIcon'):FromTextureFile(tab.szIconTex)
 					end
-					hTab:Lookup('Image_Bg'):FromUITex(LIB.GetAddonInfo().szUITexCommon, 3)
-					hTab:Lookup('Image_Bg_Active'):FromUITex(LIB.GetAddonInfo().szUITexCommon, 1)
-					hTab:Lookup('Image_Bg_Hover'):FromUITex(LIB.GetAddonInfo().szUITexCommon, 2)
+					hTab:Lookup('Image_Bg'):FromUITex(PACKET_INFO.UITEX_COMMON, 3)
+					hTab:Lookup('Image_Bg_Active'):FromUITex(PACKET_INFO.UITEX_COMMON, 1)
+					hTab:Lookup('Image_Bg_Hover'):FromUITex(PACKET_INFO.UITEX_COMMON, 2)
 					hTab.OnItemLButtonClick = function()
 						LIB.SwitchTab(this.szID)
 					end
@@ -329,7 +328,7 @@ function LIB.SwitchTab(szID, bForceUpdate)
 			end
 		end
 		if not tab then
-			LIB.Debug({_L('Cannot find tab: %s', szID)}, LIB.GetAddonInfo().szNameSpace .. '.SwitchTab#' .. szID, DEBUG_LEVEL.WARNING)
+			LIB.Debug({_L('Cannot find tab: %s', szID)}, PACKET_INFO.NAME_SPACE .. '.SwitchTab#' .. szID, DEBUG_LEVEL.WARNING)
 		end
 	end
 
@@ -394,7 +393,7 @@ function LIB.SwitchTab(szID, bForceUpdate)
 		-- 欢迎页
 		local ui = LIB.UI(wnd)
 		local w, h = ui:size()
-		ui:append('Image', { name = 'Image_Adv', x = 0, y = 0, image = LIB.GetAddonInfo().szUITexPoster, imageframe = (GetTime() % 2) })
+		ui:append('Image', { name = 'Image_Adv', x = 0, y = 0, image = PACKET_INFO.UITEX_POSTER, imageframe = (GetTime() % 2) })
 		ui:append('Text', { name = 'Text_Adv', x = 10, y = 300, w = 557, font = 200 })
 		ui:append('Text', { name = 'Text_Memory', x = 10, y = 300, w = 150, alpha = 150, font = 162, halign = 2 })
 		ui:append('Text', { name = 'Text_Svr', x = 10, y = 345, w = 557, font = 204, text = LIB.GetServer() .. ' (' .. LIB.GetRealServer() .. ')', alpha = 220 })
@@ -541,16 +540,15 @@ function LIB.SwitchTab(szID, bForceUpdate)
 			ui:children('#WndButton_GlobalPreferenceFolder'):top(scaleH + 95)
 		end
 		wnd.OnPanelResize(wnd)
-		LIB.BreatheCall(LIB.GetAddonInfo().szNameSpace .. '#TAB#DEFAULT', 500, function()
+		LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '#TAB#DEFAULT', 500, function()
 			local me = GetClientPlayer()
 			if me then
-				local addon = LIB.GetAddonInfo()
-				ui:children('#Text_Adv'):text(_L('%s, welcome to use %s!', me.szName, addon.szName) .. 'v' .. LIB.GetVersion())
+				ui:children('#Text_Adv'):text(_L('%s, welcome to use %s!', me.szName, PACKET_INFO.NAME) .. 'v' .. LIB.GetVersion())
 			end
 			ui:children('#Text_Memory'):text(format('Memory:%.1fMB', collectgarbage('count') / 1024))
 		end)
 		wnd.OnPanelDeactive = function()
-			LIB.BreatheCall(LIB.GetAddonInfo().szNameSpace .. '#TAB#DEFAULT', false)
+			LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '#TAB#DEFAULT', false)
 		end
 		wnd:FormatAllContentPos()
 	else
@@ -747,7 +745,7 @@ function LIB.OnLButtonClick()
 	if name == 'Btn_Close' then
 		LIB.ClosePanel()
 	elseif name == 'Btn_Weibo' then
-		LIB.OpenBrowser(LIB.GetAddonInfo().szAuthorWeiboURL)
+		LIB.OpenBrowser(PACKET_INFO.AUTHOR_WEIBO_URL)
 	end
 end
 
@@ -798,13 +796,12 @@ function LIB.OnDragButton()
 end
 
 function LIB.OnFrameCreate()
-	local addon = LIB.GetAddonInfo()
 	local fScale = 1 + math.max(Font.GetOffset() * 0.03, 0)
-	this:Lookup('', 'Text_Title'):SetText(addon.szName .. ' v' .. LIB.GetVersion() .. ' Build ' .. addon.szBuild)
-	this:Lookup('', 'Text_Author'):SetText('-- by ' .. addon.szAuthorSignature)
+	this:Lookup('', 'Text_Title'):SetText(PACKET_INFO.NAME .. ' v' .. LIB.GetVersion() .. ' Build ' .. PACKET_INFO.BUILD)
+	this:Lookup('', 'Text_Author'):SetText('-- by ' .. PACKET_INFO.AUTHOR_SIGNATURE)
 	this:Lookup('', 'Image_Icon'):SetSize(30, 30)
-	this:Lookup('', 'Image_Icon'):FromUITex(LIB.GetAddonInfo().szUITexCommon, 0)
-	this:Lookup('Wnd_Total/Btn_Weibo', 'Text_Default'):SetText(_L('Author @%s', LIB.GetAddonInfo().szAuthorWeibo))
+	this:Lookup('', 'Image_Icon'):FromUITex(PACKET_INFO.UITEX_COMMON, 0)
+	this:Lookup('Wnd_Total/Btn_Weibo', 'Text_Default'):SetText(_L('Author @%s', PACKET_INFO.AUTHOR_WEIBO))
 	this:Lookup('Btn_Drag'):RegisterLButtonDrag()
 	this.intact = true
 	LIB.RedrawCategory()

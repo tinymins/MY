@@ -6,10 +6,10 @@
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
 --------------------------------------------------------
--------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
 local setmetatable = setmetatable
 local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
 local sub, len, format, rep = string.sub, string.len, string.format, string.rep
@@ -26,19 +26,18 @@ local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
 local LIB = MY
-local UI, DEBUG_LEVEL, PATH_TYPE = LIB.UI, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local ipairs_r = LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
+local UI, DEBUG_LEVEL, PATH_TYPE, PACKET_INFO = LIB.UI, LIB.DEBUG_LEVEL, LIB.PATH_TYPE, LIB.PACKET_INFO
+local ipairs_r, spairs, spairs_r = LIB.ipairs_r, LIB.spairs, LIB.spairs_r
+local sipairs, sipairs_r = LIB.sipairs, LIB.sipairs_r
+local IsNil, IsBoolean, IsUserdata, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsUserdata, LIB.IsFunction
+local IsString, IsTable, IsArray, IsDictionary = LIB.IsString, LIB.IsTable, LIB.IsArray, LIB.IsDictionary
+local IsNumber, IsHugeNumber, IsEmpty, IsEquals = LIB.IsNumber, LIB.IsHugeNumber, LIB.IsEmpty, LIB.IsEquals
 local GetTraceback, Call, XpCall = LIB.GetTraceback, LIB.Call, LIB.XpCall
 local Get, Set, RandomChild = LIB.Get, LIB.Set, LIB.RandomChild
 local GetPatch, ApplyPatch, Clone = LIB.GetPatch, LIB.ApplyPatch, LIB.Clone
 local EncodeLUAData, DecodeLUAData = LIB.EncodeLUAData, LIB.DecodeLUAData
-local IsArray, IsDictionary, IsEquals = LIB.IsArray, LIB.IsDictionary, LIB.IsEquals
-local IsNumber, IsHugeNumber = LIB.IsNumber, LIB.IsHugeNumber
-local IsNil, IsBoolean, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsFunction
-local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
-local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
--------------------------------------------------------------------------------------------------------------
+local EMPTY_TABLE, MENU_DIVIDER, XML_LINE_BREAKER = LIB.EMPTY_TABLE, LIB.MENU_DIVIDER, LIB.XML_LINE_BREAKER
+-----------------------------------------------------------------------------------------------------------
 local _L = LIB.LoadLangPack()
 
 -------------------------------------
@@ -56,7 +55,7 @@ local function createInstance(c, ins, ...)
 end
 UI = setmetatable({}, {
 	__index = {},
-	__tostring = function(t) return LIB.GetAddonInfo().szNameSpace .. '_UI (class prototype)' end,
+	__tostring = function(t) return PACKET_INFO.NAME_SPACE .. '_UI (class prototype)' end,
 	__call = function (...)
 		local store = {}
 		return createInstance(setmetatable({}, {
@@ -77,7 +76,7 @@ UI = setmetatable({}, {
 					store[k] = v
 				end
 			end,
-			__tostring = function(t) return LIB.GetAddonInfo().szNameSpace .. '_UI (class instance)' end,
+			__tostring = function(t) return PACKET_INFO.NAME_SPACE .. '_UI (class instance)' end,
 		}), nil, ...)
 	end,
 })
@@ -974,7 +973,7 @@ local _tItemXML = {
 	['Shadow'] = '<shadow>w=15 h=15 eventid=277 </shadow>',
 	['Handle'] = '<handle>firstpostype=0 w=10 h=10</handle>',
 }
-local _szItemINI = LIB.GetAddonInfo().szFrameworkRoot .. 'ui\\HandleItems.ini'
+local _szItemINI = PACKET_INFO.FRAMEWORK_ROOT .. 'ui\\HandleItems.ini'
 local _nTempWndCount = 0
 -- append
 -- similar as jQuery.append()
@@ -1018,16 +1017,16 @@ function UI:append(arg0, arg1, arg2)
 					szFile = sub(szFile, 0, -#szType - 2)
 					szComponet = szFile:gsub('$.*[/\\]', ''):gsub('^[^<>?]*[/\\]', ''):sub(0, -5)
 				else
-					szFile = LIB.GetAddonInfo().szFrameworkRoot .. 'ui\\' .. szFile .. '.ini'
+					szFile = PACKET_INFO.FRAMEWORK_ROOT .. 'ui\\' .. szFile .. '.ini'
 				end
-				local frame = Wnd.OpenWindow(szFile, LIB.GetAddonInfo().szNameSpace .. '_TempWnd#' .. _nTempWndCount)
+				local frame = Wnd.OpenWindow(szFile, PACKET_INFO.NAME_SPACE .. '_TempWnd#' .. _nTempWndCount)
 				if not frame then
-					return LIB.Debug({ _L('unable to open ini file [%s]', szFile) }, LIB.GetAddonInfo().szNameSpace .. '#UI#append', DEBUG_LEVEL.ERROR)
+					return LIB.Debug({ _L('unable to open ini file [%s]', szFile) }, PACKET_INFO.NAME_SPACE .. '#UI#append', DEBUG_LEVEL.ERROR)
 				end
 				_nTempWndCount = _nTempWndCount + 1
 				local raw = frame:Lookup(szComponet)
 				if not raw then
-					LIB.Debug({_L('can not find wnd component [%s:%s]', szFile, szComponet)}, LIB.GetAddonInfo().szNameSpace .. '#UI#append', DEBUG_LEVEL.ERROR)
+					LIB.Debug({_L('can not find wnd component [%s:%s]', szFile, szComponet)}, PACKET_INFO.NAME_SPACE .. '#UI#append', DEBUG_LEVEL.ERROR)
 				else
 					InitComponent(raw, szType)
 					raw:ChangeRelation(parentWnd, true, true)
@@ -1038,7 +1037,7 @@ function UI:append(arg0, arg1, arg2)
 			elseif sub(szType, 1, 3) ~= 'Wnd' and parentHandle then
 				raw = parentHandle:AppendItemFromIni(_szItemINI, szType)
 				if not raw then
-					return LIB.Debug({ _L('unable to append handle item [%s]', szType) }, LIB.GetAddonInfo().szNameSpace .. '#UI:append', DEBUG_LEVEL.ERROR)
+					return LIB.Debug({ _L('unable to append handle item [%s]', szType) }, PACKET_INFO.NAME_SPACE .. '#UI:append', DEBUG_LEVEL.ERROR)
 				else
 					ui = ui:add(raw)
 				end
@@ -1149,7 +1148,7 @@ function UI:visible(bVisible)
 	elseif IsFunction(bVisible) then
 		for _, raw in ipairs(self.raws) do
 			raw = GetComponentElement(raw, 'CHECKBOX') or GetComponentElement(raw, 'MAIN_WINDOW') or raw
-			LIB.BreatheCall(LIB.GetAddonInfo().szNameSpace .. '_UI_VISIBLE_CHECK#' .. tostring(raw), function()
+			LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '_UI_VISIBLE_CHECK#' .. tostring(raw), function()
 				if IsElement(raw) then
 					raw:SetVisible(bVisible())
 				else
@@ -1230,7 +1229,7 @@ function UI:enable(...)
 		for _, raw in ipairs(self.raws) do
 			raw = GetComponentElement(raw, 'CHECKBOX') or GetComponentElement(raw, 'MAIN_WINDOW') or raw
 			if IsFunction(bEnable) then
-				LIB.BreatheCall(LIB.GetAddonInfo().szNameSpace .. '_UI_ENABLE_CHECK#' .. tostring(raw), function()
+				LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '_UI_ENABLE_CHECK#' .. tostring(raw), function()
 					if IsElement(raw) then
 						SetComponentEnable(raw, bEnable())
 					else
@@ -1884,7 +1883,7 @@ function UI:fadeTo(nTime, nOpacity, callback)
 			if not ui:visible() then
 				ui:alpha(0):toggle(true)
 			end
-			LIB.BreatheCall(LIB.GetAddonInfo().szNameSpace .. '_FADE_' .. tostring(ui[1]), function()
+			LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '_FADE_' .. tostring(ui[1]), function()
 				ui:show()
 				local nCurrentAlpha = fnCurrent(nStartAlpha, nOpacity, nTime, GetTime() - nStartTime)
 				ui:alpha(nCurrentAlpha)
@@ -2936,7 +2935,7 @@ function UI:itemInfo(...)
 				end
 				local res, err, trace = XpCall(UpdataItemInfoBoxObject, raw, unpack(data)) -- 防止itemtab不一样
 				if not res then
-					FireUIEvent('CALL_LUA_ERROR', err .. '\n' .. LIB.GetAddonInfo().szNameSpace .. '#UI:itemInfo\n' .. trace .. '\n')
+					FireUIEvent('CALL_LUA_ERROR', err .. '\n' .. PACKET_INFO.NAME_SPACE .. '#UI:itemInfo\n' .. trace .. '\n')
 				end
 			end
 		end
@@ -2955,7 +2954,7 @@ function UI:boxInfo(nType, ...)
 			else
 				local res, err, trace = XpCall(UpdateBoxObject, raw, nType, ...) -- 防止itemtab内外网不一样
 				if not res then
-					FireUIEvent('CALL_LUA_ERROR', err .. '\n' .. LIB.GetAddonInfo().szNameSpace .. '#UI:boxInfo\n' .. trace .. '\n')
+					FireUIEvent('CALL_LUA_ERROR', err .. '\n' .. PACKET_INFO.NAME_SPACE .. '#UI:boxInfo\n' .. trace .. '\n')
 				end
 			end
 		end
@@ -3872,11 +3871,11 @@ function  UI.CreateFrame(szName, opt)
 		opt.level = 'Normal'
 	end
 	-- calc ini file path
-	local szIniFile = LIB.GetAddonInfo().szFrameworkRoot .. 'ui\\WndFrame.ini'
+	local szIniFile = PACKET_INFO.FRAMEWORK_ROOT .. 'ui\\WndFrame.ini'
 	if opt.simple then
-		szIniFile = LIB.GetAddonInfo().szFrameworkRoot .. 'ui\\WndFrameSimple.ini'
+		szIniFile = PACKET_INFO.FRAMEWORK_ROOT .. 'ui\\WndFrameSimple.ini'
 	elseif opt.empty then
-		szIniFile = LIB.GetAddonInfo().szFrameworkRoot .. 'ui\\WndFrameEmpty.ini'
+		szIniFile = PACKET_INFO.FRAMEWORK_ROOT .. 'ui\\WndFrameEmpty.ini'
 	end
 
 	-- close and reopen exist frame
@@ -4041,7 +4040,7 @@ function  UI.CreateFrame(szName, opt)
 				if frm.OnDragResize then
 					local res, err, trace = XpCall(frm.OnDragResize, frm:Lookup('Wnd_Total'))
 					if not res then
-						FireUIEvent('CALL_LUA_ERROR', err .. '\n' .. LIB.GetAddonInfo().szNameSpace .. '#OnDragResize\n' .. trace .. '\n')
+						FireUIEvent('CALL_LUA_ERROR', err .. '\n' .. PACKET_INFO.NAME_SPACE .. '#OnDragResize\n' .. trace .. '\n')
 					end
 				end
 			end
@@ -4071,7 +4070,7 @@ function UI.OpenColorPicker(callback, t)
 	if t then
 		return OpenColorTablePanel(callback,nil,nil,t)
 	end
-	local ui = UI.CreateFrame(LIB.GetAddonInfo().szNameSpace .. '_ColorTable', { simple = true, close = true, esc = true })
+	local ui = UI.CreateFrame(PACKET_INFO.NAME_SPACE .. '_ColorTable', { simple = true, close = true, esc = true })
 	  :size(900, 500):text(_L['color picker']):anchor({s='CENTER', r='CENTER', x=0, y=0})
 	local fnHover = function(bHover, r, g, b)
 		if bHover then
@@ -4204,7 +4203,7 @@ function UI.OpenColorPickerEx(fnAction)
 		return floor(r * 255), floor(g * 255), floor(b * 255)
 	end
 
-	local wnd = UI.CreateFrame(LIB.GetAddonInfo().szNameSpace .. '_ColorPickerEx', { w = 346, h = 430, text = _L['color picker ex'], simple = true, close = true, esc = true, x = fX + 15, y = fY + 15 }, true)
+	local wnd = UI.CreateFrame(PACKET_INFO.NAME_SPACE .. '_ColorPickerEx', { w = 346, h = 430, text = _L['color picker ex'], simple = true, close = true, esc = true, x = fX + 15, y = fY + 15 }, true)
 	local fnHover = function(bHover, r, g, b)
 		if bHover then
 			wnd:children('#Select'):color(r, g, b)
@@ -4266,7 +4265,7 @@ end
 
 -- 打开字体选择
 function UI.OpenFontPicker(callback, t)
-	local ui, i = UI.CreateFrame(LIB.GetAddonInfo().szNameSpace .. '_Font_Picker', { simple = true, close = true, esc = true, text = _L['Font picker'] }), 0
+	local ui, i = UI.CreateFrame(PACKET_INFO.NAME_SPACE .. '_Font_Picker', { simple = true, close = true, esc = true, text = _L['Font picker'] }), 0
 	while 1 do
 		local font = i
 		local txt = ui:append('Text', {
@@ -4353,7 +4352,7 @@ function UI.OpenIconPanel(fnAction)
 		MAX_ICON = MAX_ICON or 10000
 	end
 	local nMaxIcon, boxs, txts = MAX_ICON, {}, {}
-	local ui = UI.CreateFrame(LIB.GetAddonInfo().szNameSpace .. '_IconPanel', { w = 920, h = 650, text = _L['Icon Picker'], simple = true, close = true, esc = true })
+	local ui = UI.CreateFrame(PACKET_INFO.NAME_SPACE .. '_IconPanel', { w = 920, h = 650, text = _L['Icon Picker'], simple = true, close = true, esc = true })
 	local function GetPage(nPage, bInit)
 		if nPage == ICON_PAGE and not bInit then
 			return
@@ -4422,7 +4421,7 @@ end
 -- 打开文本编辑器
 function UI.OpenTextEditor(szText, szFrameName)
 	if not szFrameName then
-		szFrameName = LIB.GetAddonInfo().szNameSpace .. '_DefaultTextEditor'
+		szFrameName = PACKET_INFO.NAME_SPACE .. '_DefaultTextEditor'
 	end
 	local w, h, ui = 400, 300
 	local function OnResize()
@@ -4708,7 +4707,7 @@ end
 function UI.GetShadowHandle(szName)
 	local frame = Station.Lookup('Lowest/MY_Shadows')
 	if not frame then
-		frame = Wnd.OpenWindow(LIB.GetAddonInfo().szFrameworkRoot .. 'ui/MY_Shadows.ini', 'MY_Shadows')
+		frame = Wnd.OpenWindow(PACKET_INFO.FRAMEWORK_ROOT .. 'ui/MY_Shadows.ini', 'MY_Shadows')
 	end
 	local sh = frame:Lookup('', szName)
 	if not sh then
@@ -4765,7 +4764,7 @@ function UI.GetTempElement(szType)
 	end
 	if not cache or not ui or ui:count() == 0 then
 		cache = {}
-		ui = UI.CreateFrame(LIB.GetAddonInfo().szNameSpace .. '#TempElement', { empty = true }):hide()
+		ui = UI.CreateFrame(PACKET_INFO.NAME_SPACE .. '#TempElement', { empty = true }):hide()
 	end
 	local szName = szType .. '_' .. szKey
 	local raw = cache[szName]

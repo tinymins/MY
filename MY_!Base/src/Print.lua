@@ -6,10 +6,10 @@
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
 --------------------------------------------------------
--------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
 local setmetatable = setmetatable
 local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
 local sub, len, format, rep = string.sub, string.len, string.format, string.rep
@@ -26,19 +26,18 @@ local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
 local LIB = MY
-local UI, DEBUG_LEVEL, PATH_TYPE = LIB.UI, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local ipairs_r = LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
+local UI, DEBUG_LEVEL, PATH_TYPE, PACKET_INFO = LIB.UI, LIB.DEBUG_LEVEL, LIB.PATH_TYPE, LIB.PACKET_INFO
+local ipairs_r, spairs, spairs_r = LIB.ipairs_r, LIB.spairs, LIB.spairs_r
+local sipairs, sipairs_r = LIB.sipairs, LIB.sipairs_r
+local IsNil, IsBoolean, IsUserdata, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsUserdata, LIB.IsFunction
+local IsString, IsTable, IsArray, IsDictionary = LIB.IsString, LIB.IsTable, LIB.IsArray, LIB.IsDictionary
+local IsNumber, IsHugeNumber, IsEmpty, IsEquals = LIB.IsNumber, LIB.IsHugeNumber, LIB.IsEmpty, LIB.IsEquals
 local GetTraceback, Call, XpCall = LIB.GetTraceback, LIB.Call, LIB.XpCall
 local Get, Set, RandomChild = LIB.Get, LIB.Set, LIB.RandomChild
 local GetPatch, ApplyPatch, Clone = LIB.GetPatch, LIB.ApplyPatch, LIB.Clone
 local EncodeLUAData, DecodeLUAData = LIB.EncodeLUAData, LIB.DecodeLUAData
-local IsArray, IsDictionary, IsEquals = LIB.IsArray, LIB.IsDictionary, LIB.IsEquals
-local IsNumber, IsHugeNumber = LIB.IsNumber, LIB.IsHugeNumber
-local IsNil, IsBoolean, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsFunction
-local IsEmpty, IsString, IsTable, IsUserdata = LIB.IsEmpty, LIB.IsString, LIB.IsTable, LIB.IsUserdata
-local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = LIB.MENU_DIVIDER, LIB.EMPTY_TABLE, LIB.XML_LINE_BREAKER
--------------------------------------------------------------------------------------------------------------
+local EMPTY_TABLE, MENU_DIVIDER, XML_LINE_BREAKER = LIB.EMPTY_TABLE, LIB.MENU_DIVIDER, LIB.XML_LINE_BREAKER
+-----------------------------------------------------------------------------------------------------------
 local _L = LIB.LoadLangPack()
 
 -- 显示本地信息
@@ -83,7 +82,7 @@ function LIB.Sysmsg(oContent, oTitle, szType)
 		szType = 'MSG_SYS'
 	end
 	if not oTitle then
-		oTitle = LIB.GetAddonInfo().szShortName
+		oTitle = PACKET_INFO.SHORT_NAME
 	end
 	local nPos, szTheme = (StringFindW(szType, '.'))
 	if nPos then
@@ -129,7 +128,7 @@ end
 
 -- 输出一条密聊信息
 function LIB.OutputWhisper(szMsg, szHead)
-	szHead = szHead or LIB.GetAddonInfo().szShortName
+	szHead = szHead or PACKET_INFO.SHORT_NAME
 	OutputMessage('MSG_WHISPER', '[' .. szHead .. ']' .. g_tStrings.STR_TALK_HEAD_WHISPER .. szMsg .. '\n')
 	PlaySound(SOUND.UI_SOUND, g_sound.Whisper)
 end
@@ -144,7 +143,7 @@ function LIB.Debug(oContent, szTitle, nLevel)
 		nLevel = DEBUG_LEVEL.WARNING
 	end
 	if not IsString(szTitle) then
-		szTitle = LIB.GetAddonInfo().szNameSpace .. '_DEBUG'
+		szTitle = PACKET_INFO.NAME_SPACE .. '_DEBUG'
 	end
 	if not IsTable(oContent) then
 		oContent = { oContent }
@@ -160,10 +159,10 @@ function LIB.Debug(oContent, szTitle, nLevel)
 			oContent.r, oContent.g, oContent.b = 255, 255, 0
 		end
 	end
-	if nLevel >= LIB.GetAddonInfo().nDebugLevel then
+	if nLevel >= PACKET_INFO.DEBUG_LEVEL then
 		Log('[DEBUG_LEVEL][LEVEL_' .. nLevel .. '][' .. szTitle .. ']' .. concat(oContent, '\n'))
 		LIB.Sysmsg(oContent, szTitle)
-	elseif nLevel >= LIB.GetAddonInfo().nLogLevel then
+	elseif nLevel >= PACKET_INFO.DELOG_LEVEL then
 		Log('[DEBUG_LEVEL][LEVEL_' .. nLevel .. '][' .. szTitle .. ']' .. concat(oContent, '\n'))
 	end
 end
