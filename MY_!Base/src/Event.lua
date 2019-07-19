@@ -202,6 +202,7 @@ end
 do
 local EXIT_EVENT = { szName = 'Exit', bSingleEvent = true }
 local function OnExit()
+	LIB.FlushCoroutine()
 	CommonEventFirer(EXIT_EVENT)
 	LIB.ReleaseDataBase()
 end
@@ -220,7 +221,9 @@ end
 do
 local RELOAD_EVENT = { szName = 'Reload', bSingleEvent = true }
 local function OnReload()
+	LIB.FlushCoroutine()
 	CommonEventFirer(RELOAD_EVENT)
+	LIB.ReleaseDataBase()
 end
 LIB.RegisterEvent('RELOAD_UI_ADDON_BEGIN', OnReload)
 
@@ -579,22 +582,6 @@ function LIB.RegisterCoroutine(szKey, fnAction, fnCallback)
 	end
 	return szKey
 end
--- 执行一个协程直到它完成
-function LIB.FlushCoroutine(szKey)
-	local p = COROUTINE_LIST[szKey]
-	if p then
-		while coroutine.status(p.coAction) == 'suspended' do
-			local status, err = coroutine.resume(p.coAction)
-			if not status then
-				FireUIEvent('CALL_LUA_ERROR',  'OnCoroutine: ' .. p.szID .. ', Error: ' .. err .. '\n')
-			end
-		end
-		if p.fnCallback then
-			Call(p.fnCallback)
-		end
-		COROUTINE_LIST[szKey] = nil
-	end
-end
 local function onBreathe()
 	local nBeginTime, pCallback = GetTime()
 	while GetTime() - nBeginTime < COROUTINE_TIME and next(COROUTINE_LIST) do
@@ -618,4 +605,30 @@ local function onBreathe()
 	end
 end
 LIB.BreatheCall(LIB.GetAddonInfo().szNameSpace .. '#COROUTINE', onBreathe)
+
+-- 执行协程直到它完成
+-- 不传参表示执行所有协程并清空协程队列
+-- 传参标志执行并清空指定ID的协程
+function LIB.FlushCoroutine(...)
+	if select('#', ...) == 0 then
+		while next(COROUTINE_LIST) do
+			onBreathe()
+		end
+	else
+		local szKey = ...
+		local p = szKey and COROUTINE_LIST[szKey]
+		if p then
+			while coroutine.status(p.coAction) == 'suspended' do
+				local status, err = coroutine.resume(p.coAction)
+				if not status then
+					FireUIEvent('CALL_LUA_ERROR',  'OnCoroutine: ' .. p.szID .. ', Error: ' .. err .. '\n')
+				end
+			end
+			if p.fnCallback then
+				Call(p.fnCallback)
+			end
+			COROUTINE_LIST[szKey] = nil
+		end
+	end
+end
 end
