@@ -578,27 +578,37 @@ function LIB.RegisterCoroutine(szKey, fnAction, fnCallback)
 	end
 	return szKey
 end
+local FPS_SLOW_TIME = 1000 / GLOBAL.GAME_FPS * 1.2
+local l_nLastBreatheTime = GetTime()
 local function onBreathe()
 	local nBeginTime, pCallback = GetTime()
-	while GetTime() - nBeginTime < COROUTINE_TIME and next(COROUTINE_LIST) do
-		for k, p in pairs(COROUTINE_LIST) do
-			if GetTime() - nBeginTime > COROUTINE_TIME then
-				break
-			end
-			if coroutine.status(p.coAction) == 'suspended' then
-				local status, err = coroutine.resume(p.coAction)
-				if not status then
-					FireUIEvent('CALL_LUA_ERROR',  'OnCoroutine: ' .. p.szID .. ', Error: ' .. err .. '\n')
+	if nBeginTime - l_nLastBreatheTime < FPS_SLOW_TIME then
+		while GetTime() - nBeginTime < COROUTINE_TIME and next(COROUTINE_LIST) do
+			for k, p in pairs(COROUTINE_LIST) do
+				if GetTime() - nBeginTime > COROUTINE_TIME then
+					break
 				end
-			end
-			if coroutine.status(p.coAction) == 'dead' then
-				if p.fnCallback then
-					Call(p.fnCallback)
+				if coroutine.status(p.coAction) == 'suspended' then
+					local status, err = coroutine.resume(p.coAction)
+					if not status then
+						FireUIEvent('CALL_LUA_ERROR',  'OnCoroutine: ' .. p.szID .. ', Error: ' .. err .. '\n')
+					end
 				end
-				COROUTINE_LIST[k] = nil
+				if coroutine.status(p.coAction) == 'dead' then
+					if p.fnCallback then
+						Call(p.fnCallback)
+					end
+					COROUTINE_LIST[k] = nil
+				end
 			end
 		end
 	end
+	if GetTime() - nBeginTime > COROUTINE_TIME then
+		LIB.Debug({_L('Coroutine time exceed limit: %dms.', GetTime() - nBeginTime)}, _L['PMTool'], DEBUG_LEVEL.PMLOG)
+	elseif nBeginTime - l_nLastBreatheTime > FPS_SLOW_TIME then
+		LIB.Debug({_L('System breathe too slow(%dms), coroutine suspended.', nBeginTime - l_nLastBreatheTime)}, _L['PMTool'], DEBUG_LEVEL.PMLOG)
+	end
+	l_nLastBreatheTime = nBeginTime
 end
 LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '#COROUTINE', onBreathe)
 
@@ -607,8 +617,10 @@ LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '#COROUTINE', onBreathe)
 -- 传参标志执行并清空指定ID的协程
 function LIB.FlushCoroutine(...)
 	if select('#', ...) == 0 then
-		while next(COROUTINE_LIST) do
-			onBreathe()
+		local p = next(COROUTINE_LIST)
+		while p do
+			LIB.FlushCoroutine(p.szID)
+			p = next(COROUTINE_LIST)
 		end
 	else
 		local szKey = ...
