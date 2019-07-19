@@ -170,6 +170,7 @@ data = {
 	['Quality reach %s'] = '品级达到%s',
 	['Reach %s'] = '达到%s',
 	['GKP Loot'] = '拾取助手',
+	['Config'] = '详细设置',
 	['Team Members: %d, %d agree %d%%'] = '团队共%d人，%d人已同意发放工资，当前比率%d%%。',
 	['Dungeon treasure'] = '秘境宝藏',
 	['Onekey distrib this group'] = '一键分配该组物品',

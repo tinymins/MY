@@ -321,6 +321,13 @@ function MY_GKP_Loot.OnLButtonClick()
 			},
 			{ bDevide = true },
 			{
+				szOption = _L['Config'],
+				fnAction = function()
+					LIB.ShowPanel()
+					LIB.SwitchTab('MY_GKP')
+				end,
+			},
+			{
 				szOption = _L['About'],
 				fnAction = function()
 					LIB.Alert(_L['GKP_TIPS'])
