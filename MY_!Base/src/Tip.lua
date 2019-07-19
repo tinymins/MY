@@ -32,11 +32,9 @@ local sipairs, sipairs_r = LIB.sipairs, LIB.sipairs_r
 local IsNil, IsBoolean, IsUserdata, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsUserdata, LIB.IsFunction
 local IsString, IsTable, IsArray, IsDictionary = LIB.IsString, LIB.IsTable, LIB.IsArray, LIB.IsDictionary
 local IsNumber, IsHugeNumber, IsEmpty, IsEquals = LIB.IsNumber, LIB.IsHugeNumber, LIB.IsEmpty, LIB.IsEquals
-local GetTraceback, Call, XpCall = LIB.GetTraceback, LIB.Call, LIB.XpCall
-local Get, Set, RandomChild = LIB.Get, LIB.Set, LIB.RandomChild
-local GetPatch, ApplyPatch, Clone = LIB.GetPatch, LIB.ApplyPatch, LIB.Clone
-local EncodeLUAData, DecodeLUAData = LIB.EncodeLUAData, LIB.DecodeLUAData
-local EMPTY_TABLE, MENU_DIVIDER, XML_LINE_BREAKER = LIB.EMPTY_TABLE, LIB.MENU_DIVIDER, LIB.XML_LINE_BREAKER
+local Call, XpCall, GetTraceback, RandomChild = LIB.Call, LIB.XpCall, LIB.GetTraceback, LIB.RandomChild
+local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
+local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
 -----------------------------------------------------------------------------------------------------------
 local _L = LIB.LoadLangPack()
 -------------------------------------------------------------------------------------------------------------
@@ -69,7 +67,7 @@ function LIB.OutputBuffTip(dwID, nLevel, Rect, nTime, szExtraXml)
 	if buffInfo and buffInfo.nDetachType and g_tStrings.tBuffDetachType[buffInfo.nDetachType] then
 		insert(t, GetFormatText(g_tStrings.tBuffDetachType[buffInfo.nDetachType] .. '\n', 106))
 	else
-		insert(t, XML_LINE_BREAKER)
+		insert(t, CONSTANT.XML_LINE_BREAKER)
 	end
 
 	local szDesc = GetBuffDesc(dwID, nLevel, 'desc')
@@ -79,7 +77,7 @@ function LIB.OutputBuffTip(dwID, nLevel, Rect, nTime, szExtraXml)
 
 	if nTime then
 		if nTime == 0 then
-			insert(t, XML_LINE_BREAKER)
+			insert(t, CONSTANT.XML_LINE_BREAKER)
 			insert(t, GetFormatText(g_tStrings.STR_BUFF_H_TIME_ZERO, 102))
 		else
 			local H, M, S = '', '', ''
@@ -94,25 +92,25 @@ function LIB.OutputBuffTip(dwID, nLevel, Rect, nTime, szExtraXml)
 			end
 			S = s..g_tStrings.STR_BUFF_H_TIME_S
 			if h < 720 then
-				insert(t, XML_LINE_BREAKER)
+				insert(t, CONSTANT.XML_LINE_BREAKER)
 				insert(t, GetFormatText(FormatString(g_tStrings.STR_BUFF_H_LEFT_TIME_MSG, H, M, S), 102))
 			end
 		end
 	end
 
 	if szExtraXml then
-		insert(t, XML_LINE_BREAKER)
+		insert(t, CONSTANT.XML_LINE_BREAKER)
 		insert(t, szExtraXml)
 	end
 	-- For test
 	if IsCtrlKeyDown() then
-		insert(t, XML_LINE_BREAKER)
+		insert(t, CONSTANT.XML_LINE_BREAKER)
 		insert(t, GetFormatText(g_tStrings.DEBUG_INFO_ITEM_TIP, 102))
-		insert(t, XML_LINE_BREAKER)
+		insert(t, CONSTANT.XML_LINE_BREAKER)
 		insert(t, GetFormatText('ID:     ' .. dwID, 102))
-		insert(t, XML_LINE_BREAKER)
+		insert(t, CONSTANT.XML_LINE_BREAKER)
 		insert(t, GetFormatText('Level:  ' .. nLevel, 102))
-		insert(t, XML_LINE_BREAKER)
+		insert(t, CONSTANT.XML_LINE_BREAKER)
 		insert(t, GetFormatText('IconID: ' .. tostring(Table_GetBuffIconID(dwID, nLevel)), 102))
 	end
 	OutputTip(concat(t), 300, Rect)
@@ -206,13 +204,13 @@ function LIB.OutputPlayerTip(dwID, Rect, szExtraXml)
 	if MY_Anmerkungen and MY_Anmerkungen.GetPlayerNote then
 		local note = MY_Anmerkungen.GetPlayerNote(player.dwID)
 		if note and note.szContent ~= '' then
-			insert(t, XML_LINE_BREAKER)
+			insert(t, CONSTANT.XML_LINE_BREAKER)
 			insert(t, GetFormatText(note.szContent, 0))
 		end
 	end
 	-- 自定义项
 	if szExtraXml then
-		insert(t, XML_LINE_BREAKER)
+		insert(t, CONSTANT.XML_LINE_BREAKER)
 		insert(t, szExtraXml)
 	end
 	-- 调试信息

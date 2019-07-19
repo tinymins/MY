@@ -686,9 +686,15 @@ local PATH_TYPE = SetmetaReadonly({
 	GLOBAL = 3,
 	SERVER = 4,
 })
-local MENU_DIVIDER = { bDevide = true }
-local EMPTY_TABLE = SetmetaReadonly({})
-local XML_LINE_BREAKER = GetFormatText('\n')
+local CONSTANT = setmetatable({}, {
+	__index = {
+		MENU_DIVIDER = SetmetaReadonly({ bDevide = true }),
+		EMPTY_TABLE = SetmetaReadonly({}),
+		XML_LINE_BREAKER = GetFormatText('\n'),
+		EQUIPMENT_SUIT_COUNT = EQUIPMENT_SUIT_COUNT or 4,
+	},
+	__newindex = function() end,
+})
 ---------------------------------------------------------------------------------------------
 local LIB = {
 	ipairs_r         = ipairs_r        ,
@@ -721,13 +727,10 @@ local LIB = {
 	RandomChild      = RandomChild     ,
 	GetTraceback     = GetTraceback    ,
 	LoadLangPack     = LoadLangPack    ,
-	PACKET_INFO      = PACKET_INFO     ,
-	DEBUG_LEVEL      = DEBUG_LEVEL     ,
+	CONSTANT         = CONSTANT        ,
 	PATH_TYPE        = PATH_TYPE       ,
-	MENU_DIVIDER     = MENU_DIVIDER    ,
-	EMPTY_TABLE      = EMPTY_TABLE     ,
-	XML_LINE_BREAKER = XML_LINE_BREAKER,
-	EQUIPMENT_SUIT_COUNT = EQUIPMENT_SUIT_COUNT or 4,
+	DEBUG_LEVEL      = DEBUG_LEVEL     ,
+	PACKET_INFO      = PACKET_INFO     ,
 }
 _G[_NAME_SPACE_] = LIB
 ---------------------------------------------------------------------------------------------

@@ -32,13 +32,10 @@ local sipairs, sipairs_r = LIB.sipairs, LIB.sipairs_r
 local IsNil, IsBoolean, IsUserdata, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsUserdata, LIB.IsFunction
 local IsString, IsTable, IsArray, IsDictionary = LIB.IsString, LIB.IsTable, LIB.IsArray, LIB.IsDictionary
 local IsNumber, IsHugeNumber, IsEmpty, IsEquals = LIB.IsNumber, LIB.IsHugeNumber, LIB.IsEmpty, LIB.IsEquals
-local GetTraceback, Call, XpCall = LIB.GetTraceback, LIB.Call, LIB.XpCall
-local Get, Set, RandomChild = LIB.Get, LIB.Set, LIB.RandomChild
-local GetPatch, ApplyPatch, Clone = LIB.GetPatch, LIB.ApplyPatch, LIB.Clone
-local EncodeLUAData, DecodeLUAData = LIB.EncodeLUAData, LIB.DecodeLUAData
-local EMPTY_TABLE, MENU_DIVIDER, XML_LINE_BREAKER = LIB.EMPTY_TABLE, LIB.MENU_DIVIDER, LIB.XML_LINE_BREAKER
+local Call, XpCall, GetTraceback, RandomChild = LIB.Call, LIB.XpCall, LIB.GetTraceback, LIB.RandomChild
+local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
+local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
 -----------------------------------------------------------------------------------------------------------
-local XML_LINE_BREAKER = XML_LINE_BREAKER
 local _L = LIB.LoadLangPack(PACKET_INFO.ROOT..'MY_Farbnamen/lang/')
 ---------------------------------------------------------------------------------------------------
 if not LIB.AssertVersion('MY_Farbnamen', _L['MY_Farbnamen'], 0x2011600) then
@@ -239,7 +236,7 @@ function MY_Farbnamen.GetTip(szName)
 			insert(tTip, GetFormatText(PACKET_INFO.NAME, 8, 89, 224, 232))
 			insert(tTip, GetFormatText(' ', 136, 89, 224, 232))
 			insert(tTip, GetFormatText(_L['[author]'], 8, 89, 224, 232))
-			insert(tTip, XML_LINE_BREAKER)
+			insert(tTip, CONSTANT.XML_LINE_BREAKER)
 		end
 		-- 名称 等级
 		insert(tTip, GetFormatText(('%s(%d)'):format(tInfo.szName, tInfo.nLevel), 136))
@@ -247,16 +244,16 @@ function MY_Farbnamen.GetTip(szName)
 		if UI_GetClientPlayerID() ~= tInfo.dwID and LIB.IsParty(tInfo.dwID) then
 			insert(tTip, GetFormatText(_L['[teammate]'], nil, 0, 255, 0))
 		end
-		insert(tTip, XML_LINE_BREAKER)
+		insert(tTip, CONSTANT.XML_LINE_BREAKER)
 		-- 称号
 		if tInfo.szTitle and #tInfo.szTitle > 0 then
 			insert(tTip, GetFormatText('<' .. tInfo.szTitle .. '>', 136))
-			insert(tTip, XML_LINE_BREAKER)
+			insert(tTip, CONSTANT.XML_LINE_BREAKER)
 		end
 		-- 帮会
 		if tInfo.szTongID and #tInfo.szTongID > 0 then
 			insert(tTip, GetFormatText('[' .. tInfo.szTongID .. ']', 136))
-			insert(tTip, XML_LINE_BREAKER)
+			insert(tTip, CONSTANT.XML_LINE_BREAKER)
 		end
 		-- 门派 体型 阵营
 		insert(tTip, GetFormatText(
@@ -264,18 +261,18 @@ function MY_Farbnamen.GetTip(szName)
 			(_MY_Farbnamen.tRoleType[tInfo.nRoleType] or tInfo.nRoleType or  _L['Unknown gender'])    .. _L.STR_SPLIT_DOT ..
 			(_MY_Farbnamen.tCampString[tInfo.nCamp] or tInfo.nCamp or  _L['Unknown camp']), 136
 		))
-		insert(tTip, XML_LINE_BREAKER)
+		insert(tTip, CONSTANT.XML_LINE_BREAKER)
 		-- 随身便笺
 		if MY_Anmerkungen and MY_Anmerkungen.GetPlayerNote then
 			local note = MY_Anmerkungen.GetPlayerNote(tInfo.dwID)
 			if note and note.szContent ~= '' then
 				insert(tTip, GetFormatText(note.szContent, 0))
-				insert(tTip, XML_LINE_BREAKER)
+				insert(tTip, CONSTANT.XML_LINE_BREAKER)
 			end
 		end
 		-- 调试信息
 		if IsCtrlKeyDown() then
-			insert(tTip, XML_LINE_BREAKER)
+			insert(tTip, CONSTANT.XML_LINE_BREAKER)
 			insert(tTip, GetFormatText(_L('Player ID: %d', tInfo.dwID), 102))
 		end
 		-- 组装Tip

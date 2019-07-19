@@ -32,13 +32,10 @@ local sipairs, sipairs_r = LIB.sipairs, LIB.sipairs_r
 local IsNil, IsBoolean, IsUserdata, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsUserdata, LIB.IsFunction
 local IsString, IsTable, IsArray, IsDictionary = LIB.IsString, LIB.IsTable, LIB.IsArray, LIB.IsDictionary
 local IsNumber, IsHugeNumber, IsEmpty, IsEquals = LIB.IsNumber, LIB.IsHugeNumber, LIB.IsEmpty, LIB.IsEquals
-local GetTraceback, Call, XpCall = LIB.GetTraceback, LIB.Call, LIB.XpCall
-local Get, Set, RandomChild = LIB.Get, LIB.Set, LIB.RandomChild
-local GetPatch, ApplyPatch, Clone = LIB.GetPatch, LIB.ApplyPatch, LIB.Clone
-local EncodeLUAData, DecodeLUAData = LIB.EncodeLUAData, LIB.DecodeLUAData
-local EMPTY_TABLE, MENU_DIVIDER, XML_LINE_BREAKER = LIB.EMPTY_TABLE, LIB.MENU_DIVIDER, LIB.XML_LINE_BREAKER
+local Call, XpCall, GetTraceback, RandomChild = LIB.Call, LIB.XpCall, LIB.GetTraceback, LIB.RandomChild
+local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
+local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
 -----------------------------------------------------------------------------------------------------------
-local XML_LINE_BREAKER = XML_LINE_BREAKER
 
 local _L = LIB.LoadLangPack(PACKET_INFO.ROOT .. 'MY_ChatLog/lang/')
 if not LIB.AssertVersion('MY_ChatLog', _L['MY_ChatLog'], 0x2013500) then
@@ -149,14 +146,14 @@ function D.ImportDB(szPath)
 		-- 老版分表机制
 		local dwGlobalID = Get(odb:Execute('SELECT * FROM ChatLogInfo WHERE key = "userguid"'), {1, 'value'})
 		if dwGlobalID == GetClientPlayer().GetGlobalID() then
-			for _, info in ipairs(odb:Execute('SELECT * FROM ChatLogIndex ORDER BY stime ASC') or EMPTY_TABLE) do
+			for _, info in ipairs(odb:Execute('SELECT * FROM ChatLogIndex ORDER BY stime ASC') or CONSTANT.EMPTY_TABLE) do
 				if info.etime == -1 then
 					info.etime = 0
 				end
 				local db = MY_ChatLog_DB(D.GetRoot() .. info.name .. '.db')
 				db:SetMinTime(info.stime)
 				db:SetMaxTime(info.etime)
-				for _, p in ipairs(odb:Execute('SELECT * FROM ' .. info.name .. ' ORDER BY time ASC') or EMPTY_TABLE) do
+				for _, p in ipairs(odb:Execute('SELECT * FROM ' .. info.name .. ' ORDER BY time ASC') or CONSTANT.EMPTY_TABLE) do
 					nImportCount = nImportCount + 1
 					db:InsertMsg(p.channel, p.text, p.msg, p.talker, p.time, p.hash)
 				end

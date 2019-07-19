@@ -32,11 +32,9 @@ local sipairs, sipairs_r = LIB.sipairs, LIB.sipairs_r
 local IsNil, IsBoolean, IsUserdata, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsUserdata, LIB.IsFunction
 local IsString, IsTable, IsArray, IsDictionary = LIB.IsString, LIB.IsTable, LIB.IsArray, LIB.IsDictionary
 local IsNumber, IsHugeNumber, IsEmpty, IsEquals = LIB.IsNumber, LIB.IsHugeNumber, LIB.IsEmpty, LIB.IsEquals
-local GetTraceback, Call, XpCall = LIB.GetTraceback, LIB.Call, LIB.XpCall
-local Get, Set, RandomChild = LIB.Get, LIB.Set, LIB.RandomChild
-local GetPatch, ApplyPatch, Clone = LIB.GetPatch, LIB.ApplyPatch, LIB.Clone
-local EncodeLUAData, DecodeLUAData = LIB.EncodeLUAData, LIB.DecodeLUAData
-local EMPTY_TABLE, MENU_DIVIDER, XML_LINE_BREAKER = LIB.EMPTY_TABLE, LIB.MENU_DIVIDER, LIB.XML_LINE_BREAKER
+local Call, XpCall, GetTraceback, RandomChild = LIB.Call, LIB.XpCall, LIB.GetTraceback, LIB.RandomChild
+local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
+local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
 -----------------------------------------------------------------------------------------------------------
 local PATH_ROOT = PACKET_INFO.ROOT .. 'MY_GKP/'
 local _L = LIB.LoadLangPack(PATH_ROOT .. 'lang/')
@@ -333,7 +331,7 @@ function MY_GKP_Loot.OnLButtonClick()
 			insert(menu, 1, { szOption = dwDoodadID, bDisable = true })
 		end
 		if not LIB.IsShieldedVersion() then
-			table.insert(menu, MENU_DIVIDER)
+			table.insert(menu, CONSTANT.MENU_DIVIDER)
 			table.insert(menu, Loot.GetFilterMenu())
 			table.insert(menu, Loot.GetAutoPickupAllMenu())
 
@@ -580,7 +578,7 @@ function Loot.GetFilterMenu()
 			szOption = _L['Will be reset when loading'],
 			bDisable = true,
 		},
-		MENU_DIVIDER,
+		CONSTANT.MENU_DIVIDER,
 	}
 	for i, p in ipairs(GKP_ITEM_QUALITIES) do
 		table.insert(t1, {

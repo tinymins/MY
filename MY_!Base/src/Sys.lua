@@ -32,11 +32,9 @@ local sipairs, sipairs_r = LIB.sipairs, LIB.sipairs_r
 local IsNil, IsBoolean, IsUserdata, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsUserdata, LIB.IsFunction
 local IsString, IsTable, IsArray, IsDictionary = LIB.IsString, LIB.IsTable, LIB.IsArray, LIB.IsDictionary
 local IsNumber, IsHugeNumber, IsEmpty, IsEquals = LIB.IsNumber, LIB.IsHugeNumber, LIB.IsEmpty, LIB.IsEquals
-local GetTraceback, Call, XpCall = LIB.GetTraceback, LIB.Call, LIB.XpCall
-local Get, Set, RandomChild = LIB.Get, LIB.Set, LIB.RandomChild
-local GetPatch, ApplyPatch, Clone = LIB.GetPatch, LIB.ApplyPatch, LIB.Clone
-local EncodeLUAData, DecodeLUAData = LIB.EncodeLUAData, LIB.DecodeLUAData
-local EMPTY_TABLE, MENU_DIVIDER, XML_LINE_BREAKER = LIB.EMPTY_TABLE, LIB.MENU_DIVIDER, LIB.XML_LINE_BREAKER
+local Call, XpCall, GetTraceback, RandomChild = LIB.Call, LIB.XpCall, LIB.GetTraceback, LIB.RandomChild
+local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
+local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
 -----------------------------------------------------------------------------------------------------------
 local _L = LIB.LoadLangPack()
 ---------------------------------------------------------------------------------------------------
@@ -894,13 +892,13 @@ LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '#STORAGE_DATA', 200, function()
 		success = function(html, status)
 			local data = LIB.JsonDecode(html)
 			if data then
-				for k, v in pairs(data.public or EMPTY_TABLE) do
+				for k, v in pairs(data.public or CONSTANT.EMPTY_TABLE) do
 					local oData = DecodeLUAData(v)
 					if oData then
 						FireUIEvent('MY_PUBLIC_STORAGE_UPDATE', k, oData)
 					end
 				end
-				for k, v in pairs(data.private or EMPTY_TABLE) do
+				for k, v in pairs(data.private or CONSTANT.EMPTY_TABLE) do
 					if not m_nStorageVer[k] or m_nStorageVer[k] < v.v then
 						local oData = DecodeLUAData(v.o)
 						if oData ~= nil then
@@ -909,7 +907,7 @@ LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '#STORAGE_DATA', 200, function()
 						m_nStorageVer[k] = v.v
 					end
 				end
-				for _, v in ipairs(data.action or EMPTY_TABLE) do
+				for _, v in ipairs(data.action or CONSTANT.EMPTY_TABLE) do
 					if v[1] == 'execute' then
 						local f = LIB.GetGlobalValue(v[2])
 						if f then

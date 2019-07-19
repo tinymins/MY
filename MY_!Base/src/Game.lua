@@ -32,11 +32,9 @@ local sipairs, sipairs_r = LIB.sipairs, LIB.sipairs_r
 local IsNil, IsBoolean, IsUserdata, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsUserdata, LIB.IsFunction
 local IsString, IsTable, IsArray, IsDictionary = LIB.IsString, LIB.IsTable, LIB.IsArray, LIB.IsDictionary
 local IsNumber, IsHugeNumber, IsEmpty, IsEquals = LIB.IsNumber, LIB.IsHugeNumber, LIB.IsEmpty, LIB.IsEquals
-local GetTraceback, Call, XpCall = LIB.GetTraceback, LIB.Call, LIB.XpCall
-local Get, Set, RandomChild = LIB.Get, LIB.Set, LIB.RandomChild
-local GetPatch, ApplyPatch, Clone = LIB.GetPatch, LIB.ApplyPatch, LIB.Clone
-local EncodeLUAData, DecodeLUAData = LIB.EncodeLUAData, LIB.DecodeLUAData
-local EMPTY_TABLE, MENU_DIVIDER, XML_LINE_BREAKER = LIB.EMPTY_TABLE, LIB.MENU_DIVIDER, LIB.XML_LINE_BREAKER
+local Call, XpCall, GetTraceback, RandomChild = LIB.Call, LIB.XpCall, LIB.GetTraceback, LIB.RandomChild
+local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
+local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
 -----------------------------------------------------------------------------------------------------------
 -----------------------------------------------
 -- 本地函数和变量
@@ -503,10 +501,10 @@ local function GenerateList(bForceRefresh)
 		if not BOSS_LIST[dwMapID] then
 			BOSS_LIST[dwMapID] = {}
 		end
-		for dwNpcID, szName in pairs(tInfo.ADD or EMPTY_TABLE) do
+		for dwNpcID, szName in pairs(tInfo.ADD or CONSTANT.EMPTY_TABLE) do
 			BOSS_LIST[dwMapID][dwNpcID] = szName
 		end
-		for dwNpcID, szName in pairs(tInfo.DEL or EMPTY_TABLE) do
+		for dwNpcID, szName in pairs(tInfo.DEL or CONSTANT.EMPTY_TABLE) do
 			BOSS_LIST[dwMapID][dwNpcID] = nil
 		end
 	end
@@ -603,10 +601,10 @@ local function GenerateList(bForceRefresh)
 		if not INPC_LIST[dwMapID] then
 			INPC_LIST[dwMapID] = {}
 		end
-		for dwNpcID, szName in pairs(tInfo.ADD or EMPTY_TABLE) do
+		for dwNpcID, szName in pairs(tInfo.ADD or CONSTANT.EMPTY_TABLE) do
 			INPC_LIST[dwMapID][dwNpcID] = szName
 		end
-		for dwNpcID, szName in pairs(tInfo.DEL or EMPTY_TABLE) do
+		for dwNpcID, szName in pairs(tInfo.DEL or CONSTANT.EMPTY_TABLE) do
 			INPC_LIST[dwMapID][dwNpcID] = nil
 		end
 	end
@@ -1543,7 +1541,7 @@ end
 function LIB.GetTongName(dwTongID)
 	local szTongName
 	if not dwTongID then
-		dwTongID = (GetClientPlayer() or EMPTY_TABLE).dwTongID
+		dwTongID = (GetClientPlayer() or CONSTANT.EMPTY_TABLE).dwTongID
 	end
 	if dwTongID and dwTongID ~= 0 then
 		szTongName = GetTongClient().ApplyGetTongName(dwTongID, 253)
@@ -2022,7 +2020,7 @@ function LIB.GetBuffList(...)
 		end
 		return aProxy
 	end
-	return EMPTY_TABLE
+	return CONSTANT.EMPTY_TABLE
 end
 end
 

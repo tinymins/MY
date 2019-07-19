@@ -32,11 +32,9 @@ local sipairs, sipairs_r = LIB.sipairs, LIB.sipairs_r
 local IsNil, IsBoolean, IsUserdata, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsUserdata, LIB.IsFunction
 local IsString, IsTable, IsArray, IsDictionary = LIB.IsString, LIB.IsTable, LIB.IsArray, LIB.IsDictionary
 local IsNumber, IsHugeNumber, IsEmpty, IsEquals = LIB.IsNumber, LIB.IsHugeNumber, LIB.IsEmpty, LIB.IsEquals
-local GetTraceback, Call, XpCall = LIB.GetTraceback, LIB.Call, LIB.XpCall
-local Get, Set, RandomChild = LIB.Get, LIB.Set, LIB.RandomChild
-local GetPatch, ApplyPatch, Clone = LIB.GetPatch, LIB.ApplyPatch, LIB.Clone
-local EncodeLUAData, DecodeLUAData = LIB.EncodeLUAData, LIB.DecodeLUAData
-local EMPTY_TABLE, MENU_DIVIDER, XML_LINE_BREAKER = LIB.EMPTY_TABLE, LIB.MENU_DIVIDER, LIB.XML_LINE_BREAKER
+local Call, XpCall, GetTraceback, RandomChild = LIB.Call, LIB.XpCall, LIB.GetTraceback, LIB.RandomChild
+local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
+local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
 -----------------------------------------------------------------------------------------------------------
 
 local _L = LIB.LoadLangPack(PACKET_INFO.ROOT .. 'MY_TargetMon/lang/')
@@ -539,7 +537,7 @@ local function DrawDetail(ui)
 				}
 				if not IsEmpty(info.levels) then
 					insert(t2, { szOption = _L['Levels'], bDisable = true })
-					insert(t2, MENU_DIVIDER)
+					insert(t2, CONSTANT.MENU_DIVIDER)
 					insert(t2, {
 						szOption = _L['All levels'],
 						bCheck = true,
@@ -593,7 +591,7 @@ local function DrawDetail(ui)
 					for _, p in ipairs(tLevels) do
 						insert(t2, p[2])
 					end
-					insert(t2, MENU_DIVIDER)
+					insert(t2, CONSTANT.MENU_DIVIDER)
 				end
 				insert(t2, {
 					szOption = _L['Manual add level'],
@@ -1146,7 +1144,7 @@ local function DrawControls(ui, OpenDetail)
 				})
 			end
 			if #menu > 0 then
-				insert(menu, MENU_DIVIDER)
+				insert(menu, CONSTANT.MENU_DIVIDER)
 			end
 			insert(menu, {
 				szOption = bAsEmbedded
