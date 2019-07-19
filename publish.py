@@ -192,8 +192,8 @@ def run(mode):
     __7zip(file_name, base_message, base_hash)
 
     # Revert source code modify by compressing
-    os.system('git reset HEAD --hard')
     if is_release:
+        os.system('git reset HEAD --hard')
         os.system('git checkout master')
     time.sleep(5)
     print('Exiting...')
