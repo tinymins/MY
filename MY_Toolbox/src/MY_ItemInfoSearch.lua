@@ -52,7 +52,9 @@ local function Init()
 					local nCount, nMaxCount = 0, 1000 -- 折半次数统计 1000次折半查找还没找到多半是BUG了 判断上限防止死循环
 					while true do
 						if nMaxL < 1 then
+							--[[#DEBUG BEGIN]]
 							LIB.Debug('ERROR CALC ITEM_TYPE_MAX: ' .. dwTabType .. ' (TOO SMALL)', DEBUG_LEVEL.ERROR)
+							--[[#DEBUG END]]
 							break
 						elseif bMaxL and bMaxR then
 							nMaxR = nMaxR * 2
@@ -75,12 +77,16 @@ local function Init()
 									end
 								end
 							elseif not bMaxL and bMaxR then
+								--[[#DEBUG BEGIN]]
 								LIB.Debug('ERROR CALC ITEM_TYPE_MAX: ' .. dwTabType .. ' (NOT EXIST)', DEBUG_LEVEL.ERROR)
+								--[[#DEBUG END]]
 								break
 							end
 						end
 						if nCount >= nMaxCount then
+							--[[#DEBUG BEGIN]]
 							LIB.Debug('ERROR CALC ITEM_TYPE_MAX: ' .. dwTabType .. ' (OVERFLOW)', DEBUG_LEVEL.ERROR)
+							--[[#DEBUG END]]
 							break
 						end
 						nCount = nCount + 1

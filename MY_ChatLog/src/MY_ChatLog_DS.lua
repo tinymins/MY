@@ -113,13 +113,17 @@ function DS:InitDB(bFixProblem)
 	if not self.aDB then
 		-- 初始化数据库集群列表
 		local aDB = {}
+		--[[#DEBUG BEGIN]]
 		LIB.Debug({'Init node list...'}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
 		for _, szName in ipairs(CPath.GetFileList(self.szRoot) or {}) do
 			local db = szName:find('^chatlog_[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]%.db') and MY_ChatLog_DB(self.szRoot .. szName)
 			if db then
 				if bFixProblem then
 					db:Connect(true)
+					--[[#DEBUG BEGIN]]
 					LIB.Debug({'Checking malformed node ' .. db:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
+					--[[#DEBUG END]]
 				end
 				local dwGlobalID = db:GetInfo('UserGlobalID')
 				if not dwGlobalID and IsDebugClient() then
@@ -135,48 +139,66 @@ function DS:InitDB(bFixProblem)
 		end
 		SortDB(aDB)
 		-- 删除集群中错误的空节点
+		--[[#DEBUG BEGIN]]
 		LIB.Debug({'Check empty node...'}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
 		for i, db in ipairs_r(aDB) do
 			if not (i == #aDB and IsHugeNumber(db:GetMaxTime())) and db:CountMsg() == 0 then
+				--[[#DEBUG BEGIN]]
 				LIB.Debug({'Removing unexpected empty node: ' .. db:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.WARNING)
+				--[[#DEBUG END]]
 				db:DeleteDB()
 				remove(aDB, i)
 			end
 		end
 		-- 修复覆盖区域不连续的节点（覆盖区中断问题、分段冲突问题）
+		--[[#DEBUG BEGIN]]
 		LIB.Debug({'Check node continuously...'}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
 		do
 			local i = 1
 			while i < #aDB do
 				local db1, db2 = aDB[i], aDB[i + 1]
 				-- 检测中间节点最大值
 				if IsHugeNumber(db1:GetMaxTime()) then
+					--[[#DEBUG BEGIN]]
 					LIB.Debug({'Unexpected huge MaxTime: ' .. db1:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.WARNING)
+					--[[#DEBUG END]]
 					if not bFixProblem then
 						return false
 					end
 					db1:SetMaxTime(db1:GetMaxRecTime())
+					--[[#DEBUG BEGIN]]
 					LIB.Debug({'Fix unexpected huge MaxTime: ' .. db1:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
+					--[[#DEBUG END]]
 				end
 				-- 检测区域连续性
 				if db1:GetMaxTime() ~= db2:GetMinTime() then
+					--[[#DEBUG BEGIN]]
 					LIB.Debug({'Unexpected noncontinuously time between ' .. db1:ToString() .. ' and ' .. db2:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.WARNING)
+					--[[#DEBUG END]]
 					if not bFixProblem then
 						return false
 					end
 					if db1:GetMaxRecTime() <= db2:GetMinTime() then -- 覆盖区中断 扩充左侧区域
 						db1:SetMaxTime(db2:GetMinTime())
+						--[[#DEBUG BEGIN]]
 						LIB.Debug({'Fix noncontinuously time by modify ' .. db1:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
+						--[[#DEBUG END]]
 					elseif db1:GetMaxTime() <= db2:GetMinRecTime() then -- 覆盖区中断 扩充右侧区域
 						db2:SetMinTime(db1:GetMaxTime())
+						--[[#DEBUG BEGIN]]
 						LIB.Debug({'Fix noncontinuously time by modify ' .. db2:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
+						--[[#DEBUG END]]
 					elseif db1:GetMaxTime() >= db2:GetMaxTime() then -- 覆盖区冲突 右侧区域完全被左侧区域包裹 将右侧节点并入左侧节点中
 						for _, rec in ipairs(db2:SelectMsg()) do
 							db1:InsertMsg(rec.nChannel, rec.szText, rec.szMsg, rec.szTalker, rec.nTime, rec.szHash)
 						end
 						db1:Flush()
 						db2:DeleteDB()
+						--[[#DEBUG BEGIN]]
 						LIB.Debug({'Fix noncontinuously time by merge ' .. db2:ToString() .. ' to ' .. db1:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
+						--[[#DEBUG END]]
 						remove(aDB, i + 1)
 						i = i - 1
 					else -- 覆盖区域冲突 将右侧节点的冲突区域数据移动到左侧节点中
@@ -187,21 +209,27 @@ function DS:InitDB(bFixProblem)
 						db1:Flush()
 						db2:DeleteMsgByTime('<=', db1:GetMaxTime())
 						db2:SetMinTime(db1:GetMaxTime())
+						--[[#DEBUG BEGIN]]
 						LIB.Debug({'Fix noncontinuously time by moving data from ' .. db2:ToString() .. ' to ' .. db1:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
+						--[[#DEBUG END]]
 					end
 				end
 				i = i + 1
 			end
 		end
 		-- 检查集群最新活跃节点是否存在
+		--[[#DEBUG BEGIN]]
 		LIB.Debug({'Check latest node...'}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
 		local db = aDB[#aDB]
 		if db and IsHugeNumber(db:GetMaxTime()) then -- 存在： 检查集群最新活跃节点压力是否超限
 			if db:CountMsg() > SINGLE_DB_AMOUNT then
 				db:SetMaxTime(db:GetMaxRecTime())
 				local dbNew = NewDB(self.szRoot, db:GetMaxTime(), HUGE)
 				insert(aDB, dbNew)
+				--[[#DEBUG BEGIN]]
 				LIB.Debug({'Create new empty active node ' .. db:ToString() .. ' after ' .. db:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
+				--[[#DEBUG END]]
 			end
 		else -- 不存在： 创建
 			local nMinTime = 0
@@ -212,15 +240,23 @@ function DS:InitDB(bFixProblem)
 			end
 			local dbNew = NewDB(self.szRoot, nMinTime, HUGE)
 			insert(aDB, dbNew)
+			--[[#DEBUG BEGIN]]
 			LIB.Debug({'Create new empty active node ' .. db:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
+			--[[#DEBUG END]]
 		end
 		-- 检查集群最久远节点开始时间是否为0
+		--[[#DEBUG BEGIN]]
 		LIB.Debug({'Check oldest node...'}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
 		local db = aDB[1]
 		if db:GetMinTime() ~= 0 then
+			--[[#DEBUG BEGIN]]
 			LIB.Debug({'Unexpected MinTime for first DB: ' .. db:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.WARNING)
+			--[[#DEBUG END]]
 			db:SetMinTime(0)
+			--[[#DEBUG BEGIN]]
 			LIB.Debug({'Fix unexpected MinTime for first DB: ' .. db:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
+			--[[#DEBUG END]]
 		end
 		self.aDB = aDB
 	end
@@ -235,21 +271,33 @@ function DS:ReinitDB(bFixProblem)
 end
 
 function DS:OptimizeDB()
+	--[[#DEBUG BEGIN]]
 	LIB.Debug({'OptimizeDB Start!'}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
+	--[[#DEBUG END]]
 	if self:ReinitDB(true) then
+		--[[#DEBUG BEGIN]]
 		LIB.Debug({'Checking node time zone overflow...'}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
 		for _, db in ipairs(self.aDB) do
 			local nMinTime, nMinRecTime = db:GetMinTime(), db:GetMinRecTime()
 			if nMinTime > nMinRecTime then
+				--[[#DEBUG BEGIN]]
 				LIB.Debug({'Node logic error detected: MinTime > MinRecTime in ' .. db:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.WARNING)
+				--[[#DEBUG END]]
 				db:SetMinTime(nMinRecTime)
+				--[[#DEBUG BEGIN]]
 				LIB.Debug({'Fix logic error: ' .. db:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
+				--[[#DEBUG END]]
 			end
 			local nMaxTime, nMaxRecTime = db:GetMaxTime(), db:GetMaxRecTime()
 			if nMaxTime < nMaxRecTime then
+				--[[#DEBUG BEGIN]]
 				LIB.Debug({'Node logic error detected: MaxTime < MaxRecTime in ' .. db:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.WARNING)
+				--[[#DEBUG END]]
 				db:SetMaxTime(nMaxRecTime)
+				--[[#DEBUG BEGIN]]
 				LIB.Debug({'Fix logic error: ' .. db:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
+				--[[#DEBUG END]]
 			end
 		end
 		SortDB(self.aDB)
@@ -257,7 +305,9 @@ function DS:OptimizeDB()
 		while i <= #self.aDB do
 			local db = self.aDB[i]
 			if db:CountMsg() > SINGLE_DB_AMOUNT then -- 单个节点压力过大 转移超出部分到下一个节点
+				--[[#DEBUG BEGIN]]
 				LIB.Debug({'Node count exceed limit: ' .. db:ToString() .. ' ' .. db:CountMsg()}, _L['MY_ChatLog'], DEBUG_LEVEL.WARNING)
+				--[[#DEBUG END]]
 				local aRec = db:SelectMsg(nil, nil, SINGLE_DB_AMOUNT)
 				local nMaxTime, nMinTime = aRec[1].nTime, aRec[#aRec].nTime
 				-- 超出部分超过单个节点最大负载 直接独立节点
@@ -276,7 +326,9 @@ function DS:OptimizeDB()
 					nOffset = nOffset + SINGLE_DB_AMOUNT
 					i = i + 1
 					insert(self.aDB, i, dbNew)
+					--[[#DEBUG BEGIN]]
 					LIB.Debug({'Moving ' .. SINGLE_DB_AMOUNT .. ' records from ' .. db:ToString() .. ' to ' .. dbNew:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
+					--[[#DEBUG END]]
 				end
 				-- 处理剩下不超过单个节点最大负载的结果
 				if nCount - nOffset == 0 then
@@ -285,7 +337,9 @@ function DS:OptimizeDB()
 						local dbNew = NewDB(self.szRoot, nMinTime, HUGE)
 						i = i + 1
 						insert(self.aDB, i, dbNew)
+						--[[#DEBUG BEGIN]]
 						LIB.Debug({'Create new active node: ' .. dbNew:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
+						--[[#DEBUG END]]
 					end
 				else
 					-- 还有则合并到下一个节点
@@ -304,24 +358,34 @@ function DS:OptimizeDB()
 						dbNext:InsertMsg(rec.nChannel, rec.szText, rec.szMsg, rec.szTalker, rec.nTime, rec.szHash)
 					end
 					dbNext:Flush()
+					--[[#DEBUG BEGIN]]
 					LIB.Debug({'Moving ' .. #aRec .. ' records from ' .. db:ToString() .. ' to ' .. dbNext:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
+					--[[#DEBUG END]]
 				end
 				db:Flush()
 				db:SetMaxTime(nMaxTime)
+				--[[#DEBUG BEGIN]]
 				LIB.Debug({'Modify node property: ' .. db:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
+				--[[#DEBUG END]]
 				-- 压缩数据库
 				db:GarbageCollection()
+				--[[#DEBUG BEGIN]]
 				LIB.Debug({'Node GarbageCollection: ' .. db:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
+				--[[#DEBUG END]]
 			elseif db:CountMsg() < SINGLE_DB_AMOUNT then -- 单个节点压力过小 与下个节点合并
 				if i < #self.aDB then
+					--[[#DEBUG BEGIN]]
 					LIB.Debug({'Node count insufficient: ' .. db:ToString() .. ' ' .. db:CountMsg()}, _L['MY_ChatLog'], DEBUG_LEVEL.WARNING)
+					--[[#DEBUG END]]
 					local dbNext = self.aDB[i + 1]
 					dbNext:SetMinTime(db:GetMinTime())
 					for _, rec in ipairs(db:SelectMsg()) do
 						dbNext:InsertMsg(rec.nChannel, rec.szText, rec.szMsg, rec.szTalker, rec.nTime, rec.szHash)
 					end
 					dbNext:Flush()
+					--[[#DEBUG BEGIN]]
 					LIB.Debug({'Merge node ' .. db:ToString() .. ' to ' .. dbNext:ToString()}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
+					--[[#DEBUG END]]
 					db:DeleteDB()
 					remove(self.aDB, i)
 					i = i - 1
@@ -329,9 +393,11 @@ function DS:OptimizeDB()
 			end
 			i = i + 1
 		end
+	--[[#DEBUG BEGIN]]
 		LIB.Debug({'OptimizeDB Finished!'}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
 	else
 		LIB.Debug({'OptimizeDB Failed! ReinitDB Failed!'}, _L['MY_ChatLog'], DEBUG_LEVEL.WARNING)
+	--[[#DEBUG END]]
 	end
 	return self
 end

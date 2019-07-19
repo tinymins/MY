@@ -1885,7 +1885,9 @@ function UI:fadeTo(nTime, nOpacity, callback)
 				ui:show()
 				local nCurrentAlpha = fnCurrent(nStartAlpha, nOpacity, nTime, GetTime() - nStartTime)
 				ui:alpha(nCurrentAlpha)
+				-- --[[#DEBUG BEGIN]]
 				-- LIB.Debug(format('%d %d %d %d\n', nStartAlpha, nOpacity, nCurrentAlpha, (nStartAlpha - nCurrentAlpha)*(nCurrentAlpha - nOpacity)), 'fade', DEBUG_LEVEL.LOG)
+				-- --[[#DEBUG END]]
 				if (nStartAlpha - nCurrentAlpha)*(nCurrentAlpha - nOpacity) <= 0 then
 					ui:alpha(nOpacity)
 					Call(callback, ui)
@@ -1942,7 +1944,9 @@ function UI:slideTo(nTime, nHeight, callback)
 				ui:show()
 				local nCurrentValue = fnCurrent(nStartValue, nHeight, nTime, GetTime()-nStartTime)
 				ui:height(nCurrentValue)
+				-- --[[#DEBUG BEGIN]]
 				-- LIB.Debug(format('%d %d %d %d\n', nStartValue, nHeight, nCurrentValue, (nStartValue - nCurrentValue)*(nCurrentValue - nHeight)), 'slide', DEBUG_LEVEL.LOG)
+				-- --[[#DEBUG END]]
 				if (nStartValue - nCurrentValue)*(nCurrentValue - nHeight) <= 0 then
 					ui:height(nHeight):toggle( nHeight ~= 0 )
 					Call(callback)
@@ -3248,13 +3252,15 @@ function UI:uievent(szEvent, fnEvent)
 						for _, p in ipairs(uievents[szEvent]) do
 							local res = { p.fn(...) }
 							if #res > 0 then
-								if #rets > 0 then
+								if #rets == 0 then
+									rets = res
+								--[[#DEBUG BEGIN]]
+								else
 									LIB.Debug(
 										{ _L('Set return value failed, cause another hook has alreay take a returnval. [Path] %s', UI.GetTreePath(raw)) },
 										'UI:uievent#' .. szEvent .. ':' .. (p.id or 'Unnamed'), DEBUG_LEVEL.WARNING
 									)
-								else
-									rets = res
+								--[[#DEBUG END]]
 								end
 							end
 						end
@@ -3647,8 +3653,10 @@ function UI:check(fnCheck, fnUncheck, bNoAutoBind)
 				return chk:IsCheckBoxChecked()
 			end
 		end
+	--[[#DEBUG BEGIN]]
 	else
 		LIB.Debug({'fnCheck:'..type(fnCheck)..' fnUncheck:'..type(fnUncheck)}, 'ERROR UI:check', DEBUG_LEVEL.ERROR)
+	--[[#DEBUG END]]
 	end
 end
 
@@ -4337,7 +4345,9 @@ function UI.OpenIconPanel(fnAction)
 							end
 						end
 					elseif not bMaxL and bMaxR then
+						--[[#DEBUG BEGIN]]
 						LIB.Debug('ERROR CALC MAX_ICON!', DEBUG_LEVEL.ERROR)
+						--[[#DEBUG END]]
 						break
 					end
 				end
@@ -4710,7 +4720,9 @@ function UI.GetShadowHandle(szName)
 	local sh = frame:Lookup('', szName)
 	if not sh then
 		frame:Lookup('', ''):AppendItemFromString(format('<handle> name="%s" </handle>', szName))
+		--[[#DEBUG BEGIN]]
 		LIB.Debug({'Create sh # ' .. szName}, 'UI', DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
 		sh = frame:Lookup('', szName)
 	end
 	return sh

@@ -94,7 +94,9 @@ local function InitDB()
 	-- 旧版文件缓存转换
 	local SZ_IC_PATH = LIB.FormatPath({'cache/PLAYER_INFO/$relserver/', PATH_TYPE.DATA})
 	if IsLocalFileExist(SZ_IC_PATH) then
+		--[[#DEBUG BEGIN]]
 		LIB.Debug({'Farbnamen info cache trans from file to sqlite start!'}, 'MY_Farbnamen', DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
 		DB:Execute('BEGIN TRANSACTION')
 		for i = 0, 999 do
 			local data = LIB.LoadLUAData({'cache/PLAYER_INFO/$relserver/DAT2/' .. i .. '.$lang.jx3dat', PATH_TYPE.DATA})
@@ -107,9 +109,13 @@ local function InitDB()
 			end
 		end
 		DB:Execute('END TRANSACTION')
+		--[[#DEBUG BEGIN]]
 		LIB.Debug({'Farbnamen info cache trans from file to sqlite finished!'}, 'MY_Farbnamen', DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
 
+		--[[#DEBUG BEGIN]]
 		LIB.Debug({'Farbnamen tong cache trans from file to sqlite start!'}, 'MY_Farbnamen', DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
 		DB:Execute('BEGIN TRANSACTION')
 		for i = 0, 128 do
 			for j = 0, 128 do
@@ -124,11 +130,17 @@ local function InitDB()
 			end
 		end
 		DB:Execute('END TRANSACTION')
+		--[[#DEBUG BEGIN]]
 		LIB.Debug({'Farbnamen tong cache trans from file to sqlite finished!'}, 'MY_Farbnamen', DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
 
+		--[[#DEBUG BEGIN]]
 		LIB.Debug({'Farbnamen cleaning file cache start: ' .. SZ_IC_PATH}, 'MY_Farbnamen', DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
 		CPath.DelDir(SZ_IC_PATH)
+		--[[#DEBUG BEGIN]]
 		LIB.Debug({'Farbnamen cleaning file cache finished!'}, 'MY_Farbnamen', DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
 	end
 
 	-- 转移V1旧版数据

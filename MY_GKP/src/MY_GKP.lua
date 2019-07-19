@@ -1055,7 +1055,9 @@ LIB.RegisterEvent('ON_BG_CHANNEL_MSG.LR_GKP', function()
 		else
 			MY_GKP('GKP_Record', tab)
 		end
+		--[[#DEBUG BEGIN]]
 		LIB.Debug({'#MY_GKP# Sync From LR Success'}, 'MY_GKP', DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
 	end
 end)
 
@@ -1092,7 +1094,9 @@ LIB.RegisterBgMsg('MY_GKP', function(_, nChannel, dwID, szName, bIsSelf, ...)
 					LIB.Topmsg({_L['Sychoronization Complete']})
 					local tData, err = LIB.JsonDecode(str)
 					if err then
+						--[[#DEBUG BEGIN]]
 						LIB.Debug({err}, 'MY_GKP', DEBUG_LEVEL.ERROR)
+						--[[#DEBUG END]]
 						return _GKP.Sysmsg(_L['Abnormal with Data Sharing, Please contact and make feed back with the writer.'])
 					end
 					LIB.Confirm(_L('Data Sharing Finished, you have one last chance to confirm wheather cover the current data with [%s]\'s data or not? \n data of team bidding: %s\n transation data: %s', szName, #tData.GKP_Record, #tData.GKP_Account), function()
@@ -1117,7 +1121,9 @@ LIB.RegisterBgMsg('MY_GKP', function(_, nChannel, dwID, szName, bIsSelf, ...)
 						end
 					end
 				end
+				--[[#DEBUG BEGIN]]
 				LIB.Debug({'#MY_GKP# Sync Success'}, 'MY_GKP', DEBUG_LEVEL.LOG)
+				--[[#DEBUG END]]
 			end
 		end
 		if data[1] == 'GKP_INFO' then

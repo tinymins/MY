@@ -136,7 +136,9 @@ local function CommonEventFirer(E, arg0, ...)
 		if not res then
 			FireUIEvent('CALL_LUA_ERROR', err .. '\nOn' .. E.szName .. ': ' .. p.szID .. '\n' .. trace .. '\n')
 		end
+		--[[#DEBUG BEGIN]]
 		LIB.Debug({_L('%s function <%s> %s in %dms.', E.szName, p.szID, res and _L['succeed'] or _L['failed'], GetTickCount() - nStartTick)}, _L['PMTool'], DEBUG_LEVEL.PMLOG)
+		--[[#DEBUG END]]
 	end
 end
 
@@ -315,7 +317,9 @@ function LIB.RegisterModuleEvent(arg0, arg1)
 				nCount = nCount + 1
 			end
 			MODULE_LIST[szModule] = nil
+			--[[#DEBUG BEGIN]]
 			LIB.Debug({"Uninit # "  .. szModule .. " # Events Removed # " .. nCount}, 'MY#EVENT', DEBUG_LEVEL.LOG)
+			--[[#DEBUG END]]
 		end
 	elseif IsTable(arg1) then
 		local nCount = 0
@@ -343,7 +347,9 @@ function LIB.RegisterModuleEvent(arg0, arg1)
 			nCount = nCount + 1
 			tEvent[szKey] = { szEvent = szEvent }
 		end
+		--[[#DEBUG BEGIN]]
 		LIB.Debug({"Init # "  .. szModule .. " # Events Added # " .. nCount}, 'MY#EVENT', DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
 	end
 end
 end
@@ -486,8 +492,10 @@ local function OnBgMsg()
 		local aParam = szPlain and DecodeLUAData(szPlain)
 		if aParam then
 			CommonEventFirer(BG_MSG_EVENT, szMsgID, nChannel, dwID, szName, bSelf, unpack(aParam))
+		--[[#DEBUG BEGIN]]
 		else
 			LIB.Debug({GetTraceback('Cannot decode bgmsg')}, 'BG_EVENT#' .. szMsgID, DEBUG_LEVEL.ERROR)
+		--[[#DEBUG END]]
 		end
 		BG_MSG_PART[szMsgUUID] = nil
 	end
@@ -603,11 +611,13 @@ local function onBreathe()
 			end
 		end
 	end
+	--[[#DEBUG BEGIN]]
 	if GetTime() - nBeginTime > COROUTINE_TIME then
 		LIB.Debug({_L('Coroutine time exceed limit: %dms.', GetTime() - nBeginTime)}, _L['PMTool'], DEBUG_LEVEL.PMLOG)
 	elseif nBeginTime - l_nLastBreatheTime > FPS_SLOW_TIME then
 		LIB.Debug({_L('System breathe too slow(%dms), coroutine suspended.', nBeginTime - l_nLastBreatheTime)}, _L['PMTool'], DEBUG_LEVEL.PMLOG)
 	end
+	--[[#DEBUG END]]
 	l_nLastBreatheTime = nBeginTime
 end
 LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '#COROUTINE', onBreathe)

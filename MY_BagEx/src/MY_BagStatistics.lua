@@ -115,7 +115,9 @@ end
 LIB.RegisterEvent('UPDATE_TONG_REPERTORY_PAGE.MY_BagStatistics', UpdateTongRepertoryPage)
 
 function FlushDB()
+	--[[#DEBUG BEGIN]]
 	LIB.Debug({'Flushing to database...'}, 'MY_BagStatistics', DEBUG_LEVEL.LOG)
+	--[[#DEBUG END]]
 	local me = GetClientPlayer()
 	local time = GetCurrentTime()
 	local ownerkey = AnsiToUTF8(me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName)
@@ -186,7 +188,9 @@ function FlushDB()
 	end
 
 	DB:Execute('END TRANSACTION')
+	--[[#DEBUG BEGIN]]
 	LIB.Debug({'Flushing to database finished...'}, 'MY_BagStatistics', DEBUG_LEVEL.LOG)
+	--[[#DEBUG END]]
 end
 LIB.RegisterEvent('PLAYER_LEAVE_GAME.MY_BagStatistics', FlushDB)
 end
@@ -368,8 +372,10 @@ function MY_BagStatistics.UpdateItems(frame)
 				hItem:SetH(hItem:GetH() + 7)
 				hItem:Lookup('Shadow_ItemHover'):SetH(hItem:GetH())
 			end
+		--[[#DEBUG BEGIN]]
 		else
 			LIB.Debug({'KItemInfo not found: ' .. rec.tabtype .. ', ' .. rec.tabindex}, 'MY_BagStatistics', DEBUG_LEVEL.WARNING)
+		--[[#DEBUG END]]
 		end
 	end
 	handle:FormatAllItemPos()

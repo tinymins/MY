@@ -198,7 +198,9 @@ function D.ProcessDialogInfo(frame, aInfo, dwTarType, dwTarID, dwIndex)
 				LIB.Sysmsg({_L('Conversation with [%s] auto chose: %s', dialog.szName, option.szContext)})
 			end
 		end
+		--[[#DEBUG BEGIN]]
 		LIB.Debug({'WindowSelect ' .. dwIndex .. ',' .. option.dwID .. 'x' .. nRepeat}, 'AUTO_CHAT', DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
 		return true
 	end
 end

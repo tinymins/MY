@@ -179,12 +179,16 @@ function LIB.Ajax(settings)
 
 	if not settings.success then
 		settings.success = function(html, status)
+			--[[#DEBUG BEGIN]]
 			LIB.Debug({settings.url .. ' - SUCCESS'}, 'AJAX', DEBUG_LEVEL.LOG)
+			--[[#DEBUG END]]
 		end
 	end
 	if not settings.error then
 		settings.error = function(html, status, success)
+			--[[#DEBUG BEGIN]]
 			LIB.Debug({settings.url .. ' - STATUS ' .. (success and status or 'failed')}, 'AJAX', DEBUG_LEVEL.WARNING)
+			--[[#DEBUG END]]
 		end
 	end
 
@@ -233,31 +237,41 @@ function LIB.Ajax(settings)
 		-- bind callback function
 		wWebCef.OnWebLoadEnd = function()
 			-- local szUrl, szTitle, szContent = this:GetLocationURL(), this:GetLocationName(), this:GetDocument()
+			-- --[[#DEBUG BEGIN]]
 			-- LIB.Debug({string.format('%s - %s', szTitle, szUrl)}, 'MYRRWC::OnDocumentComplete', DEBUG_LEVEL.LOG)
+			-- --[[#DEBUG END]]
 			-- 注销超时处理时钟
 			LIB.DelayCall('MYRRWC_TO_' .. RequestID, false)
 			-- 成功回调函数
 			-- if settings.success then
-			-- 	local status, err = pcall_this(settings.context, settings.success, szContent, 200, settings)
+			-- --[[#DEBUG BEGIN]]local status, err = --[[#DEBUG END]]pcall_this(settings.context, settings.success, szContent, 200, settings)
+			-- --[[#DEBUG BEGIN]]
 			-- 	if not status then
 			-- 		LIB.Debug({err}, 'MYRRWC::OnDocumentComplete::Callback', DEBUG_LEVEL.ERROR)
 			-- 	end
+			-- --[[#DEBUG END]]
 			-- end
 			table.insert(MY_RRWC_FREE, RequestID)
 		end
 
 		-- do with this remote request
+		--[[#DEBUG BEGIN]]
 		LIB.Debug({settings.url}, 'MYRRWC', DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
 		-- register request timeout clock
 		if settings.timeout > 0 then
 			LIB.DelayCall('MYRRWC_TO_' .. RequestID, settings.timeout, function()
+				--[[#DEBUG BEGIN]]
 				LIB.Debug({settings.url}, 'MYRRWC::Timeout', DEBUG_LEVEL.WARNING) -- log
+				--[[#DEBUG END]]
 				-- request timeout, call timeout function.
 				if settings.error then
-					local status, err = pcall_this(settings.context, settings.error, 'timeout', settings)
+					--[[#DEBUG BEGIN]]local status, err = --[[#DEBUG END]]pcall_this(settings.context, settings.error, 'timeout', settings)
+					--[[#DEBUG BEGIN]]
 					if not status then
 						LIB.Debug({err}, 'MYRRWC::TIMEOUT', DEBUG_LEVEL.ERROR)
 					end
+					--[[#DEBUG END]]
 				end
 				table.insert(MY_RRWC_FREE, RequestID)
 			end)
@@ -287,44 +301,58 @@ function LIB.Ajax(settings)
 		wWebPage.OnDocumentComplete = function()
 			local szUrl, szTitle, szContent = this:GetLocationURL(), this:GetLocationName(), this:GetDocument()
 			if szUrl ~= szTitle or szContent ~= '' then
+				--[[#DEBUG BEGIN]]
 				LIB.Debug({string.format('%s - %s', szTitle, szUrl)}, 'MYRRWP::OnDocumentComplete', DEBUG_LEVEL.LOG)
+				--[[#DEBUG END]]
 				-- 注销超时处理时钟
 				LIB.DelayCall('MYRRWP_TO_' .. RequestID, false)
 				-- 成功回调函数
 				if settings.success then
-					local status, err = pcall_this(settings.context, settings.success, szContent, 200, settings)
+					--[[#DEBUG BEGIN]]local status, err = --[[#DEBUG END]]pcall_this(settings.context, settings.success, szContent, 200, settings)
+					--[[#DEBUG BEGIN]]
 					if not status then
 						LIB.Debug({err}, 'MYRRWP::OnDocumentComplete::Callback', DEBUG_LEVEL.ERROR)
 					end
+					--[[#DEBUG END]]
 				end
 				if settings.complete then
-					local status, err = pcall_this(settings.context, settings.complete, szContent, 200, true)
+					--[[#DEBUG BEGIN]]local status, err = --[[#DEBUG END]]pcall_this(settings.context, settings.complete, szContent, 200, true)
+					--[[#DEBUG BEGIN]]
 					if not status then
 						LIB.Debug({err}, 'MYRRWP::OnDocumentComplete::Callback::Complete', DEBUG_LEVEL.ERROR)
 					end
+					--[[#DEBUG END]]
 				end
 				table.insert(MY_RRWP_FREE, RequestID)
 			end
 		end
 
 		-- do with this remote request
+		--[[#DEBUG BEGIN]]
 		LIB.Debug({settings.url}, 'MYRRWP', DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
 		-- register request timeout clock
 		if settings.timeout > 0 then
 			LIB.DelayCall('MYRRWP_TO_' .. RequestID, settings.timeout, function()
+				--[[#DEBUG BEGIN]]
 				LIB.Debug({settings.url}, 'MYRRWP::Timeout', DEBUG_LEVEL.WARNING) -- log
+				--[[#DEBUG END]]
 				-- request timeout, call timeout function.
 				if settings.error then
-					local status, err = pcall_this(settings.context, settings.error, 'timeout', settings)
+					--[[#DEBUG BEGIN]]local status, err = --[[#DEBUG END]]pcall_this(settings.context, settings.error, 'timeout', settings)
+					--[[#DEBUG BEGIN]]
 					if not status then
 						LIB.Debug({err}, 'MYRRWP::TIMEOUT', DEBUG_LEVEL.ERROR)
 					end
+					--[[#DEBUG END]]
 				end
 				if settings.complete then
-					local status, err = pcall_this(settings.context, settings.complete, '', 500, false)
+					--[[#DEBUG BEGIN]]local status, err = --[[#DEBUG END]]pcall_this(settings.context, settings.complete, '', 500, false)
+					--[[#DEBUG BEGIN]]
 					if not status then
 						LIB.Debug({err}, 'MYRRWP::TIMEOUT::Callback::Complete', DEBUG_LEVEL.ERROR)
 					end
+					--[[#DEBUG END]]
 				end
 				table.insert(MY_RRWP_FREE, RequestID)
 			end)
@@ -363,10 +391,12 @@ local function OnCurlRequestResult()
 		local method, payload = unpack(LIB.SplitString(settings.type, '/'))
 		local status = bSuccess and 200 or 500
 		if settings.complete then
-			local status, err = pcall(settings.complete, html, status, bSuccess or dwBufferSize > 0)
+			--[[#DEBUG BEGIN]]local status, err = --[[#DEBUG END]]pcall(settings.complete, html, status, bSuccess or dwBufferSize > 0)
+			--[[#DEBUG BEGIN]]
 			if not status then
 				LIB.Debug({GetTraceback('CURL # ' .. settings.url .. ' - complete - PCALL ERROR - ' .. err)}, DEBUG_LEVEL.ERROR)
 			end
+			--[[#DEBUG END]]
 		end
 		if bSuccess then
 			if settings.charset == 'utf8' and html ~= nil and CLIENT_LANG == 'zhcn' then
@@ -375,15 +405,19 @@ local function OnCurlRequestResult()
 			-- if payload == 'json' then
 			-- 	html = LIB.JsonDecode(html)
 			-- end
-			local status, err = pcall(settings.success, html, status)
+			--[[#DEBUG BEGIN]]local status, err = --[[#DEBUG END]]pcall(settings.success, html, status)
+			--[[#DEBUG BEGIN]]
 			if not status then
 				LIB.Debug({GetTraceback('CURL # ' .. settings.url .. ' - success - PCALL ERROR - ' .. err)}, DEBUG_LEVEL.ERROR)
 			end
+			--[[#DEBUG END]]
 		else
-			local status, err = pcall(settings.error, html, status, dwBufferSize ~= 0)
+			--[[#DEBUG BEGIN]]local status, err = --[[#DEBUG END]]pcall(settings.error, html, status, dwBufferSize ~= 0)
+			--[[#DEBUG BEGIN]]
 			if not status then
 				LIB.Debug({GetTraceback('CURL # ' .. settings.url .. ' - error - PCALL ERROR - ' .. err)}, DEBUG_LEVEL.ERROR)
 			end
+			--[[#DEBUG END]]
 		end
 		MY_CALL_AJAX[szKey] = nil
 	end

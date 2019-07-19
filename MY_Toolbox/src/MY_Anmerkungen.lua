@@ -328,7 +328,10 @@ end
 -- 读取公共数据
 function MY_Anmerkungen.LoadConfig()
 	if not GetClientPlayer() then
-		return LIB.Debug({'Client player not exist! Cannot load config!'}, 'MY_Anmerkungen.LoadConfig', DEBUG_LEVEL.ERROR)
+		--[[#DEBUG BEGIN]]
+		LIB.Debug({'Client player not exist! Cannot load config!'}, 'MY_Anmerkungen.LoadConfig', DEBUG_LEVEL.ERROR)
+		--[[#DEBUG END]]
+		return
 	end
 	local data = LIB.LoadLUAData({'config/anmerkungen_static.jx3dat', PATH_TYPE.SERVER})
 	if data then

@@ -169,8 +169,10 @@ function LIB.InfoCache(SZ_DATA_PATH, SEG_LEN, L1_SIZE, ValueComparer)
 						end
 						if tInfoModified[szSegID] then
 							LIB.SaveLUAData((SZ_DATA_PATH:gsub('<SEG>', szSegID)), tInfos[szSegID])
+						--[[#DEBUG BEGIN]]
 						else
 							LIB.Debug({'INFO Unloaded: ' .. szSegID}, 'InfoCache', DEBUG_LEVEL.LOG)
+						--[[#DEBUG END]]
 						end
 						if bCollect then
 							tInfos[szSegID] = nil

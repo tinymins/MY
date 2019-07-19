@@ -104,7 +104,10 @@ end
 
 function D.LoadEmbeddedConfig(bCoroutine)
 	if not IsString(C.PASSPHRASE) or not IsString(C.PASSPHRASE_EMBEDDED) then
-		return LIB.Debug({'Passphrase cannot be empty!'}, 'MY_TargetMonConfig', DEBUG_LEVEL.ERROR)
+		--[[#DEBUG BEGIN]]
+		LIB.Debug({'Passphrase cannot be empty!'}, 'MY_TargetMonConfig', DEBUG_LEVEL.ERROR)
+		--[[#DEBUG END]]
+		return
 	end
 	if not EMBEDDED_ENCRYPTED then
 		-- 自动生成内置加密数据

@@ -170,7 +170,9 @@ local function OnSwitchMap(dwMapID, dwID, dwCopyID)
 	if not LIB.IsInParty() then
 		return
 	end
+	--[[#DEBUG BEGIN]]
 	LIB.Debug({'Switch dungeon :' .. dwMapID}, PACKET_INFO.NAME_SPACE, DEBUG_LEVEL.LOG)
+	--[[#DEBUG END]]
 	LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_SWITCH_MAP', dwMapID, dwID, dwCopyID)
 end
 
@@ -202,7 +204,9 @@ LIB.RegisterFrameCreate('CrossMap.' .. PACKET_INFO.NAME_SPACE .. '#CD', function
 	if btn then
 		HookTableFunc(btn, 'OnLButtonUp', OnCrossMapGoFB, { bAfterOrigin = true })
 	end
+	--[[#DEBUG BEGIN]]
 	LIB.Debug({'Cross panel hooked.'}, PACKET_INFO.NAME_SPACE, DEBUG_LEVEL.LOG)
+	--[[#DEBUG END]]
 end)
 
 LIB.RegisterEvent('MY_MESSAGE_BOX_ACTION.' .. PACKET_INFO.NAME_SPACE .. '#CD', function()

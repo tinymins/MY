@@ -1834,12 +1834,16 @@ function LIB.SetTarget(arg0, arg1)
 	if dwType == TARGET.NPC then
 		local npc = GetNpc(dwID)
 		if npc and not npc.IsSelectable() and LIB.IsShieldedVersion() then
+			--[[#DEBUG BEGIN]]
 			LIB.Debug({'Set target to unselectable npc.'}, 'SetTarget', DEBUG_LEVEL.WARNING)
+			--[[#DEBUG END]]
 			return false
 		end
 	elseif dwType == TARGET.DOODAD then
 		if LIB.IsShieldedVersion() then
+			--[[#DEBUG BEGIN]]
 			LIB.Debug({'Set target to doodad.'}, 'SetTarget', DEBUG_LEVEL.WARNING)
+			--[[#DEBUG END]]
 			return false
 		end
 	end
@@ -2079,7 +2083,10 @@ function LIB.GetBuff(KObject, dwID, nLevel, dwSkillSrcID)
 			end
 		else
 			if not KObject.GetBuff then
-				return LIB.Debug({'KObject neither has a function named GetBuffByOwner nor named GetBuff.'}, PACKET_INFO.NAME_SPACE .. '.GetBuff', DEBUG_LEVEL.ERROR)
+				--[[#DEBUG BEGIN]]
+				LIB.Debug({'KObject neither has a function named GetBuffByOwner nor named GetBuff.'}, PACKET_INFO.NAME_SPACE .. '.GetBuff', DEBUG_LEVEL.ERROR)
+				--[[#DEBUG END]]
+				return
 			end
 			for _, buff in ipairs(LIB.GetBuffList(KObject)) do
 				if (tBuff[buff.dwID] == buff.nLevel or tBuff[buff.dwID] == 0) and buff.dwSkillSrcID == dwSkillSrcID then
@@ -2107,11 +2114,17 @@ function LIB.GetBuff(KObject, dwID, nLevel, dwSkillSrcID)
 					return tProxy[buff.szKey]
 				end
 			end
-			-- return LIB.Debug({'KObject do not have a function named GetBuffByOwner.'}, PACKET_INFO.NAME_SPACE .. '.GetBuff', DEBUG_LEVEL.ERROR)
+			-- --[[#DEBUG BEGIN]]
+			-- LIB.Debug({'KObject do not have a function named GetBuffByOwner.'}, PACKET_INFO.NAME_SPACE .. '.GetBuff', DEBUG_LEVEL.ERROR)
+			-- --[[#DEBUG END]]
+			-- return
 		end
 	else
 		if not KObject.GetBuff then
-			return LIB.Debug({'KObject do not have a function named GetBuff.'}, PACKET_INFO.NAME_SPACE .. '.GetBuff', DEBUG_LEVEL.ERROR)
+			--[[#DEBUG BEGIN]]
+			LIB.Debug({'KObject do not have a function named GetBuff.'}, PACKET_INFO.NAME_SPACE .. '.GetBuff', DEBUG_LEVEL.ERROR)
+			--[[#DEBUG END]]
+			return
 		end
 		for k, v in pairs(tBuff) do
 			local KBuff = KObject.GetBuff(k, v)

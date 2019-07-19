@@ -104,7 +104,9 @@ if IsLocalFileExist(LIB.FormatPath({SZ_CACHE_PATH, PATH_TYPE.DATA})) then
 				DBD_W:BindAll(p.dwTemplateID, GeneDoodadInfoPosKey(dwMapID, p.nX, p.nY), dwMapID, p.nX, p.nY, AnsiToUTF8(p.szName))
 				DBD_W:Execute()
 			end
+			--[[#DEBUG BEGIN]]
 			LIB.Debug({'MiddleMapMark cache trans from file to sqlite finished!'}, 'MY_MiddleMapMark', DEBUG_LEVEL.LOG)
+			--[[#DEBUG END]]
 		end
 	end
 	DB:Execute('END TRANSACTION')

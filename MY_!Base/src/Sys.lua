@@ -403,25 +403,33 @@ end
 
 -- 保存数据文件
 function LIB.SaveLUAData(oFilePath, ...)
+	--[[#DEBUG BEGIN]]
 	local nStartTick = GetTickCount()
+	--[[#DEBUG END]]
 	-- format uri
 	local szFilePath = LIB.GetLUADataPath(oFilePath)
 	-- save data
 	local data = SaveLUAData(szFilePath, ...)
+	--[[#DEBUG BEGIN]]
 	-- performance monitor
 	LIB.Debug({_L('%s saved during %dms.', szFilePath, GetTickCount() - nStartTick)}, 'PMTool', DEBUG_LEVEL.PMLOG)
+	--[[#DEBUG END]]
 	return data
 end
 
 -- 加载数据文件
 function LIB.LoadLUAData(oFilePath, ...)
+	--[[#DEBUG BEGIN]]
 	local nStartTick = GetTickCount()
+	--[[#DEBUG END]]
 	-- format uri
 	local szFilePath = LIB.GetLUADataPath(oFilePath)
 	-- load data
 	local data = LoadLUAData(szFilePath, ...)
+	--[[#DEBUG BEGIN]]
 	-- performance monitor
 	LIB.Debug({_L('%s loaded during %dms.', szFilePath, GetTickCount() - nStartTick)}, 'PMTool', DEBUG_LEVEL.PMLOG)
+	--[[#DEBUG END]]
 	return data
 end
 
@@ -1631,9 +1639,11 @@ function LIB.CThreadCoor(arg0, arg1, arg2, arg3, arg4, arg5)
 		end
 	else
 		local cache = CACHE[szCtcKey]
+		--[[#DEBUG BEGIN]]
 		if not cache then
 			LIB.Debug({_L('Error: `%s` has not be registed!', szCtcKey)}, 'MY#SYS', DEBUG_LEVEL.ERROR)
 		end
+		--[[#DEBUG END]]
 		return CThreadCoor_Get(cache.ctcid) -- nX, nY, bFront
 	end
 end
@@ -1677,11 +1687,15 @@ local function RenameDatabase(szCaption, szPath)
 end
 
 local function DuplicateDatabase(DB_SRC, DB_DST)
+	--[[#DEBUG BEGIN]]
 	LIB.Debug({'Duplicate database start.'}, szCaption, DEBUG_LEVEL.LOG)
+	--[[#DEBUG END]]
 	-- 运行 DDL 语句 创建表和索引等
 	for _, rec in ipairs(DB_SRC:Execute('SELECT sql FROM sqlite_master')) do
 		DB_DST:Execute(rec.sql)
+		--[[#DEBUG BEGIN]]
 		LIB.Debug({'Duplicating database: ' .. rec.sql}, szCaption, DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
 	end
 	-- 读取表名 依次复制
 	for _, rec in ipairs(DB_SRC:Execute('SELECT name FROM sqlite_master WHERE type=\'table\'')) do
@@ -1694,7 +1708,9 @@ local function DuplicateDatabase(DB_SRC, DB_DST)
 		local szColumns, szPlaceholders = concat(aColumns, ', '), concat(aPlaceholders, ', ')
 		local nCount, nPageSize = Get(DB_SRC:Execute('SELECT COUNT(*) AS count FROM ' .. szTableName), {1, 'count'}, 0), 10000
 		local DB_W = DB_DST:Prepare('REPLACE INTO ' .. szTableName .. ' (' .. szColumns .. ') VALUES (' .. szPlaceholders .. ')')
+		--[[#DEBUG BEGIN]]
 		LIB.Debug({'Duplicating table: ' .. szTableName .. ' (cols)' .. szColumns .. ' (count)' .. nCount}, szCaption, DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
 		-- 开始读取和写入数据
 		DB_DST:Execute('BEGIN TRANSACTION')
 		for i = 0, nCount / nPageSize do
@@ -1709,15 +1725,21 @@ local function DuplicateDatabase(DB_SRC, DB_DST)
 			end
 		end
 		DB_DST:Execute('END TRANSACTION')
+		--[[#DEBUG BEGIN]]
 		LIB.Debug({'Duplicating table finished: ' .. szTableName}, szCaption, DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
 	end
 end
 
 local function ConnectMalformedDatabase(szCaption, szPath, bAlert)
+	--[[#DEBUG BEGIN]]
 	LIB.Debug({'Fixing malformed database...'}, szCaption, DEBUG_LEVEL.LOG)
+	--[[#DEBUG END]]
 	local szMalformedPath = RenameDatabase(szCaption, szPath)
 	if not szMalformedPath then
+		--[[#DEBUG BEGIN]]
 		LIB.Debug({'Fixing malformed database failed... Move file failed...'}, szCaption, DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
 		return 'FILE_LOCKED'
 	else
 		local DB_DST = SQLite3_Open(szPath)
@@ -1726,10 +1748,14 @@ local function ConnectMalformedDatabase(szCaption, szPath, bAlert)
 			DuplicateDatabase(DB_SRC, DB_DST)
 			DB_SRC:Release()
 			CPath.DelFile(szMalformedPath)
+			--[[#DEBUG BEGIN]]
 			LIB.Debug({'Fixing malformed database finished...'}, szCaption, DEBUG_LEVEL.LOG)
+			--[[#DEBUG END]]
 			return 'SUCCESS', DB_DST
 		elseif not DB_SRC then
+			--[[#DEBUG BEGIN]]
 			LIB.Debug({'Connect malformed database failed...'}, szCaption, DEBUG_LEVEL.LOG)
+			--[[#DEBUG END]]
 			return 'TRANSFER_FAILED', DB_DST
 		end
 	end
@@ -1738,7 +1764,9 @@ end
 function LIB.ConnectDatabase(szCaption, oPath, fnAction)
 	-- 尝试连接数据库
 	local szPath = LIB.FormatPath(oPath)
+	--[[#DEBUG BEGIN]]
 	LIB.Debug({'Connect database: ' .. szPath}, szCaption, DEBUG_LEVEL.LOG)
+	--[[#DEBUG END]]
 	local DB = SQLite3_Open(szPath)
 	if not DB then
 		-- 连不上直接重命名原始文件并重新连接
@@ -1762,11 +1790,13 @@ function LIB.ConnectDatabase(szCaption, oPath, fnAction)
 		end
 		return DB
 	else
+		-- 记录错误日志
 		LIB.Debug({'Malformed database detected...'}, szCaption, DEBUG_LEVEL.ERROR)
 		for _, rec in ipairs(aRes or {}) do
 			LIB.Debug({EncodeLUAData(rec)}, szCaption, DEBUG_LEVEL.ERROR)
 		end
 		DB:Release()
+		-- 准备尝试修复
 		if fnAction then
 			LIB.Confirm(_L('%s Database is malformed, do you want to repair database now? Repair database may take a long time and cause a disconnection.', szCaption), function()
 				LIB.Confirm(_L['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'], function()

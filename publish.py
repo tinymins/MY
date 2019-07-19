@@ -21,6 +21,14 @@ def __compress(addon):
     print('Compressing: %s' % addon)
     file_count = 0
     converter = Converter('zh-TW')
+    # Remove debug codes in source
+    for line in open('%s/info.ini' % addon):
+        parts = line.strip().split('=')
+        if parts[0].find('lua_') == 0:
+            source_file = os.path.join(addon, parts[1])
+            source_code = codecs.open(source_file,'r',encoding='gbk').read()
+            source_code = re.sub(r'(?is)--\[\[#DEBUG BEGIN\]\].+?--\[\[#DEBUG END\]\]', '', source_code)
+            codecs.open(source_file,'w',encoding='gbk').write(source_code)
     # Generate squishy file and execute squish
     with open('squishy', 'w') as squishy:
         squishy.write('Output "./%s/src.lua"\n' % addon)

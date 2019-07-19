@@ -66,10 +66,14 @@ function DB:Connect(bCheck)
 		if bCheck then
 			self.db = LIB.ConnectDatabase(_L['MY_ChatLog'], self.szFilePath)
 		else
+			--[[#DEBUG BEGIN]]
 			LIB.Debug({'Quick connect database: ' .. self.szFilePath}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
+			--[[#DEBUG END]]
 			self.db = SQLite3_Open(self.szFilePath)
 		end
+		--[[#DEBUG BEGIN]]
 		LIB.Debug({'Init database with STMT'}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
 		self.db:Execute('CREATE TABLE IF NOT EXISTS ChatInfo (key NVARCHAR(128), value NVARCHAR(4096), PRIMARY KEY (key))')
 		self.stmtInfoGet = self.db:Prepare('SELECT value FROM ChatInfo WHERE key = ?')
 		self.stmtInfoSet = self.db:Prepare('REPLACE INTO ChatInfo (key, value) VALUES (?, ?)')
@@ -80,7 +84,9 @@ function DB:Connect(bCheck)
 		self.stmtCount = self.db:Prepare('SELECT channel AS nChannel, COUNT(*) AS nCount FROM ChatLog WHERE talker LIKE ? OR text LIKE ? GROUP BY nChannel')
 		self.stmtInsert = self.db:Prepare('REPLACE INTO ChatLog (hash, channel, time, talker, text, msg) VALUES (?, ?, ?, ?, ?, ?)')
 		self.stmtDelete = self.db:Prepare('DELETE FROM ChatLog WHERE hash = ? AND time = ?')
+		--[[#DEBUG BEGIN]]
 		LIB.Debug({'Init database finished.'}, _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
 	end
 	return self
 end
