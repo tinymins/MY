@@ -167,7 +167,7 @@ local function GetTextList(szText)
 end
 
 local l_list
-function OpenBuffEditPanel(rec)
+local function OpenBuffEditPanel(rec)
 	local w, h = 320, 320
 	local ui = UI.CreateFrame('MY_Cataclysm_BuffConfig', {
 		w = w, h = h,
