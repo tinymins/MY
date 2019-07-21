@@ -147,8 +147,6 @@ data = {
     ['Auto capture by name'] = '自动捕获ID',
     ['Search'] = '搜索',
     ['None'] = '无',
-    ['Empty embedded config detected, did you forgot to load MY_Resource plugin?'] = '未检测到默认数据，请检查是否已下载并启用茗伊"资源包"，或尝试重新下载"资源包"子插件。',
-    ['Empty embedded config detected, please logout and check if MY_Resource has been downloaded and loaded.'] = '未检测到默认数据，请返回角色选择进入插件下载界面检查是否已下载并启用茗伊"资源包"子插件。',
     ['(Embedded caption cannot be changed)'] = '（内置数据标题不可更改）',
     ['Press ctrl to delete embedded data permanently.'] = '按住CTRL点击可彻底删除该内置数据。',
 }

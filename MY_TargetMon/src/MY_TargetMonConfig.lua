@@ -113,56 +113,36 @@ function D.LoadEmbeddedConfig(bCoroutine)
 		-- 自动生成内置加密数据
 		local DAT_ROOT = 'MY_Resource/data/targetmon/'
 		local SRC_ROOT = PACKET_INFO.ROOT .. '!src-dist/dat/' .. DAT_ROOT
-		local DST_ROOT = EMBEDDED_CONFIG_ROOT
+		local DST_ZHCN_ROOT = LIB.FormatPath({'userdata/TargetMon/', PATH_TYPE.GLOBAL}, {lang = 'zhcn'})
+		local DST_ZHTW_ROOT = LIB.FormatPath({'userdata/TargetMon/', PATH_TYPE.GLOBAL}, {lang = 'zhcn'})
 		for _, szFile in ipairs(CPath.GetFileList(SRC_ROOT)) do
 			LIB.Sysmsg(_L['Encrypt and compressing: '] .. DAT_ROOT .. szFile)
+			local uuid = szFile:sub(1, -13)
 			local lang = szFile:sub(-11, -8)
-			local data = LoadDataFromFile(SRC_ROOT .. szFile)
-			if IsEncodedData(data) then
-				data = DecodeData(data)
-			end
-			if lang == 'zhcn' then
-				data = DecodeLUAData(data)
-				if IsArray(data) then
-					for k, p in ipairs(data) do
-						data[k] = D.FormatConfig(p, bCoroutine)
-					end
-				else
-					data = D.FormatConfig(data, bCoroutine)
+			if lang == 'zhcn' or lang == 'zhtw' then
+				local data = LoadDataFromFile(SRC_ROOT .. szFile)
+				if IsEncodedData(data) then
+					data = DecodeData(data)
 				end
-				data = 'return ' .. EncodeLUAData(data)
-			end
-			data = EncodeData(data, true, true)
-			SaveDataToFile(data, DST_ROOT .. szFile, C.PASSPHRASE_EMBEDDED)
-		end
-		-- 兼容旧版内置数据
-		local szV2Path = EMBEDDED_CONFIG_ROOT .. LANG .. '.jx3dat'
-		if IsLocalFileExist(szV2Path) then
-			local aConfig = LIB.LoadLUAData(szV2Path, { passphrase = C.PASSPHRASE_EMBEDDED }) or LIB.LoadLUAData(szV2Path)
-			if IsTable(aConfig) then
-				for i, config in ipairs(aConfig) do
-					if IsTable(config) and config.uuid then
-						config.group = ''
-						config.sort = i
-						LIB.SaveLUAData(EMBEDDED_CONFIG_ROOT .. config.uuid .. '.' .. LANG .. '.jx3dat', D.FormatConfig(config, bCoroutine), { passphrase = C.PASSPHRASE_EMBEDDED })
+				if lang == 'zhcn' then
+					data = DecodeLUAData(data)
+					if IsArray(data) then
+						for k, p in ipairs(data) do
+							data[k] = D.FormatConfig(p, bCoroutine)
+						end
+					else
+						data = D.FormatConfig(data, bCoroutine)
 					end
+					data = 'return ' .. EncodeLUAData(data)
 				end
+				data = EncodeData(data, true, true)
+				SaveDataToFile(data, LIB.FormatPath({'userdata/TargetMon/' .. uuid .. '.jx3dat', PATH_TYPE.GLOBAL}, {lang = lang}), C.PASSPHRASE_EMBEDDED)
 			end
-			CPath.DelFile(szV2Path)
 		end
 		EMBEDDED_ENCRYPTED = true
 	end
 	-- 加载内置数据
 	local aConfig = {}
-	for _, szFile in ipairs(CPath.GetFileList(EMBEDDED_CONFIG_ROOT) or {}) do
-		if wfind(szFile, EMBEDDED_CONFIG_SUFFIX) then
-			local config = LIB.LoadLUAData(EMBEDDED_CONFIG_ROOT .. szFile, { passphrase = C.PASSPHRASE_EMBEDDED })
-				or LIB.LoadLUAData(EMBEDDED_CONFIG_ROOT .. szFile)
-			if IsTable(config) and config.uuid and szFile:sub(1, -#EMBEDDED_CONFIG_SUFFIX - 1) == config.uuid and config.monitors then
-				insert(aConfig, config)
-			end
-		end
-	end
 	for _, szFile in ipairs(CPath.GetFileList(CUSTOM_EMBEDDED_CONFIG_ROOT) or {}) do
 		local config = LIB.LoadLUAData(CUSTOM_EMBEDDED_CONFIG_ROOT .. szFile, { passphrase = C.PASSPHRASE_EMBEDDED })
 			or LIB.LoadLUAData(CUSTOM_EMBEDDED_CONFIG_ROOT .. szFile)
@@ -413,10 +393,6 @@ function D.LoadConfig(bDefault, bOriginal, bCoroutine)
 			end
 			tLoaded[config.uuid] = true
 		end
-	end
-	if #EMBEDDED_CONFIG_LIST == 0 then
-		OutputMessage('MSG_ANNOUNCE_RED', _L['Empty embedded config detected, did you forgot to load MY_Resource plugin?'])
-		LIB.Sysmsg(_L['Empty embedded config detected, please logout and check if MY_Resource has been downloaded and loaded.'])
 	end
 	CONFIG = aConfig
 	CONFIG_CHANGED = bDefault and true or false
