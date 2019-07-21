@@ -42,8 +42,6 @@ if not LIB.AssertVersion('MY_Anmerkungen', _L['MY_Anmerkungen'], 0x2011800) then
 end
 local _C = {}
 local LOADED = false
-local STATIC_PLAYER_IDS = {}
-local STATIC_PLAYER_NOTES = {}
 local PUBLIC_PLAYER_IDS = {}
 local PUBLIC_PLAYER_NOTES = {}
 local PRIVATE_PLAYER_IDS = {}
@@ -226,12 +224,6 @@ function MY_Anmerkungen.GetPlayerNote(dwID)
 		t.bPrivate = false
 		return t
 	end
-	rec = STATIC_PLAYER_NOTES[STATIC_PLAYER_IDS[dwID] or dwID]
-	if rec then
-		t = Clone(rec)
-		t.bPrivate = false
-		return t
-	end
 end
 
 -- 设置一个玩家的记录
@@ -332,11 +324,6 @@ function MY_Anmerkungen.LoadConfig()
 		LIB.Debug({'Client player not exist! Cannot load config!'}, 'MY_Anmerkungen.LoadConfig', DEBUG_LEVEL.ERROR)
 		--[[#DEBUG END]]
 		return
-	end
-	local data = LIB.LoadLUAData({'config/anmerkungen_static.jx3dat', PATH_TYPE.SERVER})
-	if data then
-		STATIC_PLAYER_IDS = data.ids or {}
-		STATIC_PLAYER_NOTES = data.data or {}
 	end
 
 	local data = LIB.LoadLUAData({'config/anmerkungen.jx3dat', PATH_TYPE.SERVER})
