@@ -520,7 +520,7 @@ local function drawNonwarMap()
 				img.w, img.h = m.w, m.h
 				img.id, img.mapid = v.id, v.id
 				img.middlemapindex = 0
-				img.name = Table_GetMapName(v.mapid)
+				img.name = Table_GetMapName(img.mapid)
 				img.city = img.name
 				img.button = m.button
 				img.copy = true
