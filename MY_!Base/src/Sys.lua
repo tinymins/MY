@@ -490,6 +490,14 @@ function LIB.LoadLUAData(oFilePath, tConfig)
 	end
 	-- load data
 	local data = LoadLUAData(szFilePath, tConfig)
+	if data == nil and GetCurrentTime() < 1566921600 then
+		local tConfigNoPass = Clone(tConfig)
+		tConfigNoPass.passphrase = nil
+		data = LoadLUAData(szFilePath, tConfigNoPass)
+		if data then
+			LIB.SaveLUAData(oFilePath, data, tConfig)
+		end
+	end
 	--[[#DEBUG BEGIN]]
 	-- performance monitor
 	LIB.Debug({_L('%s loaded during %dms.', szFilePath, GetTickCount() - nStartTick)}, 'PMTool', DEBUG_LEVEL.PMLOG)
