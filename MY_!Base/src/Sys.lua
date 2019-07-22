@@ -437,15 +437,17 @@ local FILE_PASSPHRASE = (function()
 				end
 			end
 			-- 获取或创建密钥
+			local bNew = false
 			if not CACHE[szDomain] or not CACHE[szDomain][szPath] then
 				local szFilePath = szDataRoot .. szDomain .. '/manifest.jx3dat'
 				CACHE[szDomain] = LoadLUAData(szFilePath, { passphrase = szPassphrase }) or {}
 				if not CACHE[szDomain][szPath] then
+					bNew = true
 					CACHE[szDomain][szPath] = GetPassphrase(random(1, 0xffff), random(64, 128))
 					SaveLUAData(szFilePath, CACHE[szDomain], { passphrase = szPassphrase })
 				end
 			end
-			return CACHE[szDomain][szPath]
+			return CACHE[szDomain][szPath], bNew
 		end,
 		__newindex = function() end,
 	})
@@ -456,19 +458,13 @@ function LIB.SaveLUAData(oFilePath, oData, tConfig)
 	--[[#DEBUG BEGIN]]
 	local nStartTick = GetTickCount()
 	--[[#DEBUG END]]
-	if not tConfig then
-		tConfig = {}
-	end
-	-- format uri
+	local config, szPassphrase, bNew = Clone(tConfig) or {}
 	local szFilePath = LIB.GetLUADataPath(oFilePath)
-	-- 默认密钥
-	if tConfig and not tConfig.passphrase then
-		tConfig.passphrase = FILE_PASSPHRASE[szFilePath]
+	if not config.passphrase then
+		config.passphrase = FILE_PASSPHRASE[szFilePath]
 	end
-	-- save data
-	local data = SaveLUAData(szFilePath, oData, tConfig)
+	local data = SaveLUAData(szFilePath, oData, config)
 	--[[#DEBUG BEGIN]]
-	-- performance monitor
 	LIB.Debug({_L('%s saved during %dms.', szFilePath, GetTickCount() - nStartTick)}, 'PMTool', DEBUG_LEVEL.PMLOG)
 	--[[#DEBUG END]]
 	return data
@@ -479,27 +475,20 @@ function LIB.LoadLUAData(oFilePath, tConfig)
 	--[[#DEBUG BEGIN]]
 	local nStartTick = GetTickCount()
 	--[[#DEBUG END]]
-	if not tConfig then
-		tConfig = {}
-	end
-	-- format uri
+	local config, szPassphrase, bNew = Clone(tConfig) or {}
 	local szFilePath = LIB.GetLUADataPath(oFilePath)
-	-- 默认密钥
-	if tConfig and not tConfig.passphrase then
-		tConfig.passphrase = FILE_PASSPHRASE[szFilePath]
-	end
-	-- load data
-	local data = LoadLUAData(szFilePath, tConfig)
-	if data == nil and GetCurrentTime() < 1566921600 then
-		local tConfigNoPass = Clone(tConfig)
-		tConfigNoPass.passphrase = nil
-		data = LoadLUAData(szFilePath, tConfigNoPass)
-		if data then
-			LIB.SaveLUAData(oFilePath, data, tConfig)
+	if not config.passphrase then
+		szPassphrase, bNew = FILE_PASSPHRASE[szFilePath]
+		if not bNew then
+			config.passphrase = szPassphrase
 		end
 	end
+	local data = LoadLUAData(szFilePath, config)
+	if bNew then
+		config.passphrase = szPassphrase
+		SaveLUAData(szFilePath, data, config)
+	end
 	--[[#DEBUG BEGIN]]
-	-- performance monitor
 	LIB.Debug({_L('%s loaded during %dms.', szFilePath, GetTickCount() - nStartTick)}, 'PMTool', DEBUG_LEVEL.PMLOG)
 	--[[#DEBUG END]]
 	return data
