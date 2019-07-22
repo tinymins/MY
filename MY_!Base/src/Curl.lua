@@ -133,10 +133,12 @@ local function CreateWebPageFrame()
 	return szRequestID, hFrame
 end
 
--- 先开几个常驻防止创建时抢焦点
-for i = 1, 5 do
-	local szRequestID = CreateWebPageFrame()
-	insert(MY_RRWP_FREE, szRequestID)
+-- 先开几个常驻防止创建时抢焦点（正式环境才需要）
+if not LIB.IsDebugClient() and not LIB.IsDebugServer() then
+	for i = 1, 5 do
+		local szRequestID = CreateWebPageFrame()
+		insert(MY_RRWP_FREE, szRequestID)
+	end
 end
 
 local CURL_HttpPost = CURL_HttpPostEx or CURL_HttpPost
