@@ -1892,7 +1892,7 @@ local function WithTargetHandle()
 	LIB.SetTempTarget(r.dwType, r.dwID)
 	local res, err, trace = XpCall(r.callback)
 	if not res then
-		FireUIEvent('CALL_LUA_ERROR', err .. '\n' .. PACKET_INFO.NAME_SPACE .. '#WithTarget' .. '\n' .. trace .. '\n')
+		FireUIEvent('CALL_LUA_ERROR', err .. '\n' .. PACKET_INFO.NAME_SPACE .. '#WithTarget\n' .. trace .. '\n')
 	end
 	LIB.ResumeTarget()
 
