@@ -156,7 +156,7 @@ def run(mode):
         # Merge master into prelease
         if __get_current_branch() == 'master':
             __assert(__is_git_clean(), 'Error: master branch has uncommited file change(s)!')
-            os.system('git checkout -b prelease || git checkout prelease')
+            os.system('git checkout prelease || git checkout -b prelease')
             os.system('git rebase master')
             os.system('code "%s_!Base/src/Base.lua"' % pkg_name)
             os.system('code "%s_CHANGELOG.txt"' % pkg_name)
@@ -169,7 +169,7 @@ def run(mode):
             __assert(version_info.get('current') > version_info.get('max'),
                 'Error: current version(%s) must be larger than max history version(%d)!' % (version_info.get('current'), version_info.get('max')))
             os.system('git add * && git commit -m "Release V%s"' % version_info.get('current'))
-            os.system('git checkout -b stable || git checkout stable')
+            os.system('git checkout stable || git checkout -b stable')
             os.system('git reset origin/stable --hard')
             os.system('git rebase prelease')
 
