@@ -402,56 +402,54 @@ function LIB.ConcatPath(...)
 end
 
 -- 插件数据存储默认密钥
-local FILE_PASSPHRASE = (function()
-	local function GetPassphrase(nSeed, nLen)
-		local a = {}
-		local b, c = 0x20, 0x7e - 0x20 + 1
-		for i = 1, nLen do
-			insert(a, ((i + nSeed) % 256 * (2 * i + nSeed) % 32) % c + b)
-		end
-		return char(unpack(a))
+local GetLUADataPathPassphrase
+do
+local function GetPassphrase(nSeed, nLen)
+	local a = {}
+	local b, c = 0x20, 0x7e - 0x20 + 1
+	for i = 1, nLen do
+		insert(a, ((i + nSeed) % 256 * (2 * i + nSeed) % 32) % c + b)
 	end
-	local szDataRoot = LIB.FormatPath({'', PATH_TYPE.DATA})
-	local szPassphrase = GetPassphrase(666, 233)
-	local CACHE = {}
-	local passfile = LIB.GetLUADataPath({'config/manifest.jx3dat', PATH_TYPE.GLOBAL})
-	return setmetatable({}, {
-		__index = function(t, szPath)
-			-- 去除目录前缀
-			if szPath:sub(1, szDataRoot:len()) ~= szDataRoot then
-				return
-			end
-			szPath = szPath:sub(#szDataRoot + 1)
-			-- 拆分数据分类地址
-			local nPos = wfind(szPath, '/')
-			if not nPos or nPos == 1 then
-				return
-			end
-			local szDomain = szPath:sub(1, nPos)
-			szPath = szPath:sub(nPos + 1)
-			-- 过滤不需要加密的地址
-			local nPos = wfind(szPath, '/')
-			if nPos then
-				if szPath:sub(1, nPos - 1) == 'export' then
-					return
-				end
-			end
-			-- 获取或创建密钥
-			local bNew = false
-			if not CACHE[szDomain] or not CACHE[szDomain][szPath] then
-				local szFilePath = szDataRoot .. szDomain .. '/manifest.jx3dat'
-				CACHE[szDomain] = LoadLUAData(szFilePath, { passphrase = szPassphrase }) or {}
-				if not CACHE[szDomain][szPath] then
-					bNew = true
-					CACHE[szDomain][szPath] = GetPassphrase(random(1, 0xffff), random(64, 128))
-					SaveLUAData(szFilePath, CACHE[szDomain], { passphrase = szPassphrase })
-				end
-			end
-			return CACHE[szDomain][szPath], bNew
-		end,
-		__newindex = function() end,
-	})
-end)()
+	return char(unpack(a))
+end
+local szDataRoot = LIB.FormatPath({'', PATH_TYPE.DATA})
+local szPassphrase = GetPassphrase(666, 233)
+local CACHE = {}
+local passfile = LIB.GetLUADataPath({'config/manifest.jx3dat', PATH_TYPE.GLOBAL})
+function GetLUADataPathPassphrase(szPath)
+	-- 去除目录前缀
+	if szPath:sub(1, szDataRoot:len()) ~= szDataRoot then
+		return
+	end
+	szPath = szPath:sub(#szDataRoot + 1)
+	-- 拆分数据分类地址
+	local nPos = wfind(szPath, '/')
+	if not nPos or nPos == 1 then
+		return
+	end
+	local szDomain = szPath:sub(1, nPos)
+	szPath = szPath:sub(nPos + 1)
+	-- 过滤不需要加密的地址
+	local nPos = wfind(szPath, '/')
+	if nPos then
+		if szPath:sub(1, nPos - 1) == 'export' then
+			return
+		end
+	end
+	-- 获取或创建密钥
+	local bNew = false
+	if not CACHE[szDomain] or not CACHE[szDomain][szPath] then
+		local szFilePath = szDataRoot .. szDomain .. '/manifest.jx3dat'
+		CACHE[szDomain] = LoadLUAData(szFilePath, { passphrase = szPassphrase }) or {}
+		if not CACHE[szDomain][szPath] then
+			bNew = true
+			CACHE[szDomain][szPath] = GetPassphrase(random(1, 0xffff), random(64, 128))
+			SaveLUAData(szFilePath, CACHE[szDomain], { passphrase = szPassphrase })
+		end
+	end
+	return CACHE[szDomain][szPath], bNew
+end
+end
 
 -- 保存数据文件
 function LIB.SaveLUAData(oFilePath, oData, tConfig)
@@ -461,7 +459,7 @@ function LIB.SaveLUAData(oFilePath, oData, tConfig)
 	local config, szPassphrase, bNew = Clone(tConfig) or {}
 	local szFilePath = LIB.GetLUADataPath(oFilePath)
 	if not config.passphrase then
-		config.passphrase = FILE_PASSPHRASE[szFilePath]
+		config.passphrase = GetLUADataPathPassphrase(szFilePath)
 	end
 	local data = SaveLUAData(szFilePath, oData, config)
 	--[[#DEBUG BEGIN]]
@@ -478,7 +476,7 @@ function LIB.LoadLUAData(oFilePath, tConfig)
 	local config, szPassphrase, bNew = Clone(tConfig) or {}
 	local szFilePath = LIB.GetLUADataPath(oFilePath)
 	if not config.passphrase then
-		szPassphrase, bNew = FILE_PASSPHRASE[szFilePath]
+		szPassphrase, bNew = GetLUADataPathPassphrase(szFilePath)
 		if not bNew then
 			config.passphrase = szPassphrase
 		end
