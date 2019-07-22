@@ -417,86 +417,88 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 
-	ui:append('WndButton2', {
-		x = w - 230, y = y, w = 110,
-		text = _L['Import'],
-		onclick = function()
-			GetUserInput(_L['please input import data:'], function(szVal)
-				local config = DecodeLUAData(szVal)
-				if config and config.server and config.public and config.private then
-					if config.server ~= LIB.GetRealServer() then
-						return LIB.Alert(_L['Server not match!'])
-					end
-					local function Next(usenew)
-						for k, v in pairs(config.public) do
-							if type(v) == 'table' then
-								k = tonumber(k)
+	if not MY.IsShieldedVersion() then
+		ui:append('WndButton2', {
+			x = w - 230, y = y, w = 110,
+			text = _L['Import'],
+			onclick = function()
+				GetUserInput(_L['please input import data:'], function(szVal)
+					local config = DecodeLUAData(szVal)
+					if config and config.server and config.public and config.private then
+						if config.server ~= LIB.GetRealServer() then
+							return LIB.Alert(_L['Server not match!'])
+						end
+						local function Next(usenew)
+							for k, v in pairs(config.public) do
+								if type(v) == 'table' then
+									k = tonumber(k)
+									if not PUBLIC_PLAYER_NOTES[k] or usenew then
+										v.dwID = tonumber(v.dwID)
+										PUBLIC_PLAYER_NOTES[k] = v
+									end
+								else
+									v = tonumber(v)
+									PUBLIC_PLAYER_IDS[k] = v
+								end
+							end
+							for k, v in pairs(config.publici) do
+								if not PUBLIC_PLAYER_IDS[k] or usenew then
+									PUBLIC_PLAYER_IDS[k] = v
+								end
+							end
+							for k, v in pairs(config.publicd) do
 								if not PUBLIC_PLAYER_NOTES[k] or usenew then
-									v.dwID = tonumber(v.dwID)
 									PUBLIC_PLAYER_NOTES[k] = v
 								end
-							else
-								v = tonumber(v)
-								PUBLIC_PLAYER_IDS[k] = v
 							end
-						end
-						for k, v in pairs(config.publici) do
-							if not PUBLIC_PLAYER_IDS[k] or usenew then
-								PUBLIC_PLAYER_IDS[k] = v
+							for k, v in pairs(config.private) do
+								if type(v) == 'table' then
+									k = tonumber(k)
+									if not PRIVATE_PLAYER_NOTES[k] or usenew then
+										v.dwID = tonumber(v.dwID)
+										PRIVATE_PLAYER_NOTES[k] = v
+									end
+								else
+									v = tonumber(v)
+									PRIVATE_PLAYER_IDS[k] = v
+								end
 							end
-						end
-						for k, v in pairs(config.publicd) do
-							if not PUBLIC_PLAYER_NOTES[k] or usenew then
-								PUBLIC_PLAYER_NOTES[k] = v
+							for k, v in pairs(config.privatei) do
+								if not PRIVATE_PLAYER_IDS[k] or usenew then
+									PRIVATE_PLAYER_IDS[k] = v
+								end
 							end
-						end
-						for k, v in pairs(config.private) do
-							if type(v) == 'table' then
-								k = tonumber(k)
+							for k, v in pairs(config.privated) do
 								if not PRIVATE_PLAYER_NOTES[k] or usenew then
-									v.dwID = tonumber(v.dwID)
 									PRIVATE_PLAYER_NOTES[k] = v
 								end
-							else
-								v = tonumber(v)
-								PRIVATE_PLAYER_IDS[k] = v
 							end
+							MY_Anmerkungen.SaveConfig()
+							LIB.SwitchTab('MY_Anmerkungen_Player_Note', true)
 						end
-						for k, v in pairs(config.privatei) do
-							if not PRIVATE_PLAYER_IDS[k] or usenew then
-								PRIVATE_PLAYER_IDS[k] = v
-							end
-						end
-						for k, v in pairs(config.privated) do
-							if not PRIVATE_PLAYER_NOTES[k] or usenew then
-								PRIVATE_PLAYER_NOTES[k] = v
-							end
-						end
-						MY_Anmerkungen.SaveConfig()
-						LIB.SwitchTab('MY_Anmerkungen_Player_Note', true)
+						LIB.Confirm(_L['Prefer old data or new data?'], function() Next(false) end,
+							function() Next(true) end, _L['Old data'], _L['New data'])
+					else
+						LIB.Alert(_L['Decode data failed!'])
 					end
-					LIB.Confirm(_L['Prefer old data or new data?'], function() Next(false) end,
-						function() Next(true) end, _L['Old data'], _L['New data'])
-				else
-					LIB.Alert(_L['Decode data failed!'])
-				end
-			end, function() end, function() end, nil, '' )
-		end,
-	})
+				end, function() end, function() end, nil, '' )
+			end,
+		})
 
-	ui:append('WndButton2', {
-		x = w - 110, y = y, w = 110,
-		text = _L['Export'],
-		onclick = function()
-			UI.OpenTextEditor(EncodeLUAData({
-				server   = LIB.GetRealServer(),
-				publici  = PUBLIC_PLAYER_IDS,
-				publicd  = PUBLIC_PLAYER_NOTES,
-				privatei = PRIVATE_PLAYER_IDS,
-				privated = PRIVATE_PLAYER_NOTES,
-			}))
-		end,
-	})
+		ui:append('WndButton2', {
+			x = w - 110, y = y, w = 110,
+			text = _L['Export'],
+			onclick = function()
+				UI.OpenTextEditor(EncodeLUAData({
+					server   = LIB.GetRealServer(),
+					publici  = PUBLIC_PLAYER_IDS,
+					publicd  = PUBLIC_PLAYER_NOTES,
+					privatei = PRIVATE_PLAYER_IDS,
+					privated = PRIVATE_PLAYER_NOTES,
+				}))
+			end,
+		})
+	end
 
 	y = y + 30
 	local list = ui:append('WndListBox', {
