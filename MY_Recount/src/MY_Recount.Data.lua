@@ -248,7 +248,7 @@ local SZ_REC_FILE = {'cache/fight_recount_log.jx3dat', PATH_TYPE.ROLE}
 -- ##################################################################################################
 -- 登陆游戏加载保存的数据
 function MY_Recount.Data.LoadData(bLoadHistory)
-	local data = LIB.LoadLUAData(SZ_REC_FILE)
+	local data = LIB.LoadLUAData(SZ_REC_FILE, { passphrase = false })
 	if data then
 		if bLoadHistory then
 			History = data.History or {}
@@ -277,7 +277,7 @@ function MY_Recount.Data.SaveData(bSaveHistory)
 		bDistinctTargetID = MY_Recount.Data.bDistinctTargetID,
 		bDistinctEffectID = MY_Recount.Data.bDistinctEffectID,
 	}
-	local data = LIB.SaveLUAData(SZ_REC_FILE, data)
+	local data = LIB.SaveLUAData(SZ_REC_FILE, data, { passphrase = false })
 end
 
 -- 过图清除当前战斗数据
