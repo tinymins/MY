@@ -458,7 +458,7 @@ function LIB.SaveLUAData(oFilePath, oData, tConfig)
 	--[[#DEBUG END]]
 	local config, szPassphrase, bNew = Clone(tConfig) or {}
 	local szFilePath = LIB.GetLUADataPath(oFilePath)
-	if not config.passphrase then
+	if IsNil(config.passphrase) then
 		config.passphrase = GetLUADataPathPassphrase(szFilePath)
 	end
 	local data = SaveLUAData(szFilePath, oData, config)
@@ -475,7 +475,7 @@ function LIB.LoadLUAData(oFilePath, tConfig)
 	--[[#DEBUG END]]
 	local config, szPassphrase, bNew = Clone(tConfig) or {}
 	local szFilePath = LIB.GetLUADataPath(oFilePath)
-	if not config.passphrase then
+	if IsNil(config.passphrase) then
 		szPassphrase, bNew = GetLUADataPathPassphrase(szFilePath)
 		if not bNew then
 			config.passphrase = szPassphrase
