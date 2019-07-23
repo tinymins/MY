@@ -53,6 +53,7 @@ local PRIVATE_CONFIG_LOADED = false
 local PRIVATE_CONFIG_CHANGED = false
 local PUBLIC_CONFIG_LOADED = false
 local PUBLIC_CONFIG_CHANGED = false
+local EMBEDDED_ENCRYPTED = false
 local l_dwLockType, l_dwLockID, l_lockInDisplay
 local O, D = {}, { PASSPHRASE = {111, 198, 5} }
 local PRIVATE_DEFAULT = {
@@ -403,26 +404,28 @@ function D.GetEligibleRule(tRules, dwMapID, dwType, dwID, dwTemplateID, szName, 
 end
 
 function D.LoadEmbeddedRule()
-	-- auto generate embedded data
-	local DAT_ROOT = 'MY_Resource/data/focus/'
-	local SRC_ROOT = LIB.FormatPath(PACKET_INFO.ROOT .. '!src-dist/dat/' .. DAT_ROOT)
-	local DST_ROOT = LIB.FormatPath(PACKET_INFO.ROOT .. DAT_ROOT)
-	for _, szFile in ipairs(CPath.GetFileList(SRC_ROOT)) do
-		LIB.Sysmsg(_L['Encrypt and compressing: '] .. DAT_ROOT .. szFile)
-		local data = LoadDataFromFile(SRC_ROOT .. szFile)
-		if IsEncodedData(data) then
-			data = DecodeData(data)
+	-- 加密内置数据
+	if not EMBEDDED_ENCRYPTED then
+		local DAT_ROOT = 'MY_Resource/data/focus/'
+		local SRC_ROOT = LIB.FormatPath(PACKET_INFO.ROOT .. '!src-dist/dat/' .. DAT_ROOT)
+		local DST_ROOT = LIB.FormatPath(PACKET_INFO.ROOT .. DAT_ROOT)
+		local aFile = CPath.GetFileList(SRC_ROOT)
+		for _, szFile in ipairs(aFile) do
+			local data = LoadDataFromFile(SRC_ROOT .. szFile)
+			if IsEncodedData(data) then
+				data = DecodeData(data)
+			end
+			data = EncodeData(data, true, true)
+			SaveDataToFile(data, DST_ROOT .. szFile, D.PASSPHRASE)
 		end
-		data = EncodeData(data, true, true)
-		SaveDataToFile(data, DST_ROOT .. szFile, D.PASSPHRASE)
+		if #aFile > 0 then
+			LIB.Sysmsg(_L['Encrypt and compressing: '] .. DAT_ROOT .. ' x ' .. #aFile)
+		end
+		EMBEDDED_ENCRYPTED = true
 	end
-	-- load embedded data
-	local function LoadConfigData(szPath)
-		local szPath = PACKET_INFO.ROOT .. szPath
-		return LIB.LoadLUAData(szPath, { passphrase = D.PASSPHRASE }) or LIB.LoadLUAData(szPath) or {}
-	end
-	-- load and format data
-	D.EMBEDDED_FOCUS = D.FormatAutoFocusDataList(LoadConfigData('MY_Resource/data/focus/$lang.jx3dat') or {})
+	-- 按地图加载内置数据
+	local szPath = PACKET_INFO.ROOT .. 'MY_Resource/data/focus/' .. GetClientPlayer().GetMapID() .. '.$lang.jx3dat'
+	D.EMBEDDED_FOCUS = D.FormatAutoFocusDataList(LIB.LoadLUAData(szPath, { passphrase = D.PASSPHRASE }))
 end
 
 -- 对象进入视野
@@ -772,6 +775,16 @@ function D.OnSetAncientStaticFocus()
 end
 
 do
+local l_dwMapID
+local function onLoadingEnd()
+	local dwMapID = GetClientPlayer().GetMapID()
+	if dwMapID ~= l_dwMapID then
+		D.LoadEmbeddedRule()
+		l_dwMapID = dwMapID
+	end
+end
+LIB.RegisterEvent('LOADING_END.MY_Focus', onLoadingEnd)
+
 local function onInit()
 	-- 加载设置项数据
 	D.LoadConfig()
@@ -805,7 +818,7 @@ local function onInit()
 		end
 	end
 	-- 内嵌默认焦点
-	D.LoadEmbeddedRule()
+	onLoadingEnd()
 	D.CheckFrameOpen()
 	D.RescanNearby()
 end

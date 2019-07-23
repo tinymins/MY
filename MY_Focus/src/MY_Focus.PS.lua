@@ -307,7 +307,7 @@ function PS.OnPanelActive(wnd)
 	y = y + deltaY
 
 	ui:append('WndCheckBox', {
-		x = x, y = y, w = wr, text = _L['Embedded focus (powered by nangongbo)'],
+		x = x, y = y, w = wr, text = _L['Embedded focus'],
 		tip = _L['Embedded focus is always been collecting and updating'],
 		tippostype = MY_TIP_POSTYPE.TOP_BOTTOM,
 		checked = MY_Focus.bEmbeddedFocus,
