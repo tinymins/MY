@@ -44,27 +44,19 @@ local GKP_LOOT_ANCHOR  = { s = 'CENTER', r = 'CENTER', x = 0, y = 0 }
 local GKP_LOOT_INIFILE = PATH_ROOT .. 'ui/MY_GKP_Loot.ini'
 local MY_GKP_LOOT_BOSS -- 散件老板
 
-local GKP_LOOT_HUANGBABA = { -- 玄晶
-	[LIB.GetItemNameByUIID(72592)]  = true,
-	[LIB.GetItemNameByUIID(68363)]  = true,
-	[LIB.GetItemNameByUIID(66190)]  = true,
-	[LIB.GetItemNameByUIID(153897)] = true,
-	[LIB.GetItemNameByUIID(160306)] = true,
-}
-local GKP_LOOT_ZIBABA = { -- 小铁
-	[LIB.GetItemNameByUIID(66189)]  = true,
-	[LIB.GetItemNameByUIID(68362)]  = true,
-	[LIB.GetItemNameByUIID(153896)] = true,
-	[LIB.GetItemNameByUIID(160305)] = true,
-}
+local GKP_LOOT_HUANGBABA_ICON = 2589 -- 玄晶图标
+local GKP_LOOT_HUANGBABA_QUALITY = CONSTANT.ITEM_QUALITY.NACARAT -- 玄晶品级
+local GKP_LOOT_ZIBABA_ICON = 2588 -- 小铁图标
+local GKP_LOOT_ZIBABA_QUALITY = CONSTANT.ITEM_QUALITY.PURPLE -- 小铁品级
+
 local GKP_LOOT_RECENT = {} -- 记录上次物品或物品组分配给了谁
 local GKP_ITEM_QUALITIES = {
 	{ nQuality = -1, szTitle = g_tStrings.STR_ADDON_BLOCK },
-	{ nQuality = 1, szTitle = g_tStrings.STR_WHITE },
-	{ nQuality = 2, szTitle = g_tStrings.STR_ROLLQUALITY_GREEN },
-	{ nQuality = 3, szTitle = g_tStrings.STR_ROLLQUALITY_BLUE },
-	{ nQuality = 4, szTitle = g_tStrings.STR_ROLLQUALITY_PURPLE },
-	{ nQuality = 5, szTitle = g_tStrings.STR_ROLLQUALITY_NACARAT },
+	{ nQuality = CONSTANT.ITEM_QUALITY.WHITE  , szTitle = g_tStrings.STR_WHITE               },
+	{ nQuality = CONSTANT.ITEM_QUALITY.GREEN  , szTitle = g_tStrings.STR_ROLLQUALITY_GREEN   },
+	{ nQuality = CONSTANT.ITEM_QUALITY.BLUE   , szTitle = g_tStrings.STR_ROLLQUALITY_BLUE    },
+	{ nQuality = CONSTANT.ITEM_QUALITY.PURPLE , szTitle = g_tStrings.STR_ROLLQUALITY_PURPLE  },
+	{ nQuality = CONSTANT.ITEM_QUALITY.NACARAT, szTitle = g_tStrings.STR_ROLLQUALITY_NACARAT },
 }
 
 local Loot = {}
@@ -872,7 +864,10 @@ end
 do
 local function IsItemRequireConfirm(data)
 	if data.nQuality >= MY_GKP_Loot.nConfirmQuality
-	or (MY_GKP_Loot.tConfirm.Huangbaba and GKP_LOOT_HUANGBABA[LIB.GetItemNameByItem(data.item)]) -- 玄晶
+	or (MY_GKP_Loot.tConfirm.Huangbaba -- 玄晶
+		and data.item.nQuality == GKP_LOOT_HUANGBABA_QUALITY
+		and LIB.GetItemIconByUIID(data.item.nUiId) == GKP_LOOT_HUANGBABA_ICON
+	)
 	or (MY_GKP_Loot.tConfirm.Book and data.item.nGenre == ITEM_GENRE.BOOK) -- 书籍
 	or (MY_GKP_Loot.tConfirm.Pendant and data.item.nGenre == ITEM_GENRE.EQUIPMENT and ( -- 挂件
 		data.item.nSub == WAIST_EXTEND
@@ -1280,7 +1275,7 @@ local function GetItemDataType(data)
 	-- 材料
 	if data.item.nGenre == ITEM_GENRE.MATERIAL then
 		-- 小铁
-		if GKP_LOOT_ZIBABA[data.item.szName] then
+		if data.item.nQuality == GKP_LOOT_ZIBABA_QUALITY and LIB.GetItemIconByUIID(data.item.nUiId) == GKP_LOOT_ZIBABA_ICON then
 			return 'ZIBABA'
 		end
 		-- 材料
@@ -1315,7 +1310,7 @@ function Loot.GetDoodad(dwID)
 			local item, bNeedRoll, bDist, bBidding = d.GetLootItem(i, me)
 			if item and item.nQuality > 0 then
 				local szItemName = LIB.GetItemNameByItem(item)
-				if GKP_LOOT_HUANGBABA[szItemName] then
+				if item.nQuality == GKP_LOOT_HUANGBABA_QUALITY and LIB.GetItemIconByUIID(item.nUiId) == GKP_LOOT_HUANGBABA_ICON then
 					bSpecial = true
 				end
 				-- bSpecial = true -- debug
