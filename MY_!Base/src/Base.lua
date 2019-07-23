@@ -870,6 +870,15 @@ local CONSTANT = setmetatable({}, {
 			OPEN = 1,
 			CLOSE = 2,
 		}),
+		ITEM_QUALITY = SetmetaReadonly({
+			GRAY    = 0, -- 灰色
+			WHITE   = 1, -- 白色
+			GREEN   = 2, -- 绿色
+			BLUE    = 3, -- 蓝色
+			PURPLE  = 4, -- 紫色
+			NACARAT = 5, -- 橙色
+			GLODEN  = 6, -- 暗金
+		}),
 		EQUIPMENT_SUIT_COUNT = EQUIPMENT_SUIT_COUNT or 4,
 		INVENTORY_GUILD_BANK = INVENTORY_GUILD_BANK or INVENTORY_INDEX.TOTAL + 1, --帮会仓库界面虚拟一个背包位置
 		INVENTORY_GUILD_PAGE_SIZE = INVENTORY_GUILD_PAGE_SIZE or 100,
