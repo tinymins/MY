@@ -482,7 +482,7 @@ function LIB.LoadLUAData(oFilePath, tConfig)
 		end
 	end
 	local data = LoadLUAData(szFilePath, config)
-	if bNew then
+	if bNew and data then
 		config.passphrase = szPassphrase
 		SaveLUAData(szFilePath, data, config)
 	end
