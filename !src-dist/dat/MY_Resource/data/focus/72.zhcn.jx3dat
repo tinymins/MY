@@ -1,0 +1,7 @@
+return {
+    {szMethod="TEMPLATE_ID",szPattern="8117",szDisplay="牡丹",dwMapID=72,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="14901",szDisplay="血玉",dwMapID=72,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="14943",szDisplay="灵气内力结界",dwMapID=72,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="14962",szDisplay="冥花连舞",dwMapID=72,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="14970",szDisplay="卓婉清",dwMapID=72,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+}

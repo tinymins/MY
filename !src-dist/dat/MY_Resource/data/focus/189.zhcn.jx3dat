@@ -1,0 +1,5 @@
+return {
+    {szMethod="TEMPLATE_ID",szPattern="36680",szDisplay="野人首领",dwMapID=189,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="36688",szDisplay="老虎",dwMapID=189,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="47704",szDisplay="呼呼",dwMapID=189,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+}

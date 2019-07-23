@@ -1,0 +1,11 @@
+return {
+    {szMethod="TEMPLATE_ID",szPattern="62195",szDisplay="伊玛目",dwMapID=347,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="62672",szDisplay="祆教隐遁者",dwMapID=347,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="62673",szDisplay="祆教殉道者",dwMapID=347,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="62674",szDisplay="祆教审判者",dwMapID=347,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="62675",szDisplay="祆教揭示者",dwMapID=347,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="62677",szDisplay="祆教大力士",dwMapID=347,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="62701",szDisplay="寒玉石",dwMapID=347,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="62794",szDisplay="寒玉结晶",dwMapID=347,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="62876",szDisplay="流火化蝠",dwMapID=347,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+}

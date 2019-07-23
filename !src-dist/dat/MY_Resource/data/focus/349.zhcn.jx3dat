@@ -1,0 +1,13 @@
+return {
+    {szMethod="TEMPLATE_ID",szPattern="62830",szDisplay="冰2",dwMapID=349,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="62876",szDisplay="流火化蝠",dwMapID=349,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="64090",szDisplay="祆教隐遁者",dwMapID=349,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="64091",szDisplay="祆教殉道者",dwMapID=349,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="64092",szDisplay="祆教审判者",dwMapID=349,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="64093",szDisplay="祆教揭示者",dwMapID=349,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="64099",szDisplay="祆教大力士",dwMapID=349,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="64100",szDisplay="寒玉石",dwMapID=349,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="64121",szDisplay="伊玛目",dwMapID=349,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="64414",szDisplay="冰3",dwMapID=349,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="64415",szDisplay="冰1",dwMapID=349,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+}

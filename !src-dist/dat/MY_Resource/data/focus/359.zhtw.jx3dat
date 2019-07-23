@@ -1,0 +1,7 @@
+return {
+    {szMethod="TEMPLATE_ID",szPattern="63950",szDisplay="月籠草",dwMapID=359,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=40,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="63953",szDisplay="蒹葭",dwMapID=359,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=40,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="63954",szDisplay="殺末邪",dwMapID=359,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=40,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="63973",szDisplay="風香無情",dwMapID=359,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=40,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="63974",szDisplay="復幽草",dwMapID=359,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=40,tRelation = {bAll = true}},
+}

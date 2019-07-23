@@ -1,0 +1,14 @@
+return {
+    {szMethod="TEMPLATE_ID",szPattern="58409",szDisplay="報九楓",dwMapID=286,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="58413",szDisplay="化羽蝶·治療",dwMapID=286,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="58414",szDisplay="化羽蝶·外功",dwMapID=286,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="58415",szDisplay="化羽蝶·內功",dwMapID=286,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="58419",szDisplay="烏靈風",dwMapID=286,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="58425",szDisplay="巨蜂",dwMapID=286,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="58428",szDisplay="唐書雁",dwMapID=286,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="58444",szDisplay="也漠河",dwMapID=286,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="58445",szDisplay="巨木穿刺",dwMapID=286,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="58476",szDisplay="無支祁",dwMapID=286,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="58539",szDisplay="連弩",dwMapID=286,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="58540",szDisplay="重弩",dwMapID=286,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+}

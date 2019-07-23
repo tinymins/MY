@@ -1,0 +1,3 @@
+return {
+    {szMethod="TEMPLATE_ID",szPattern="36683",szDisplay="ÍõÊ·ÑÄ",dwMapID=190,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+}

@@ -1,0 +1,5 @@
+return {
+    {szMethod="TEMPLATE_ID",szPattern="60998",szDisplay="薑仇封",dwMapID=343,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=40,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="60999",szDisplay="魏宗明",dwMapID=343,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=40,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="61000",szDisplay="宮傲",dwMapID=343,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=40,tRelation = {bAll = true}},
+}

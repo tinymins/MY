@@ -1,0 +1,8 @@
+return {
+    {szMethod="TEMPLATE_ID",szPattern="65410",szDisplay="貪星巨猿",dwMapID=412,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=40,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="65411",szDisplay="貪星巨猿",dwMapID=412,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=40,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="65412",szDisplay="煞星龍獸",dwMapID=412,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=40,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="65413",szDisplay="凶星龍獸",dwMapID=412,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=40,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="65721",szDisplay="朱雀超級俑",dwMapID=412,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=40,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="65722",szDisplay="玄武超級俑",dwMapID=412,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=40,tRelation = {bAll = true}},
+}

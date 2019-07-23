@@ -1,0 +1,4 @@
+return {
+    {szMethod="TEMPLATE_ID",szPattern="14549",szDisplay="血玉",dwMapID=69,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="14610",szDisplay="冥花連舞",dwMapID=69,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+}

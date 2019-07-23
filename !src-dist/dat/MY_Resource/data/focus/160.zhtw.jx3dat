@@ -1,0 +1,11 @@
+return {
+    {szMethod="TEMPLATE_ID",szPattern="21880",szDisplay="卓力格圖",dwMapID=160,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=30,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="21881",szDisplay="澹台枯火",dwMapID=160,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=30,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="21882",szDisplay="聞人彥範",dwMapID=160,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=30,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="21883",szDisplay="岳承志",dwMapID=160,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=30,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="21885",szDisplay="破城錘",dwMapID=160,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=30,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="21886",szDisplay="骨牢",dwMapID=160,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=30,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="22289",szDisplay="蕭沙",dwMapID=160,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=30,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="22290",szDisplay="韋柔絲",dwMapID=160,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=30,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="25617",szDisplay="狼牙百夫長",dwMapID=160,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=30,tRelation = {bAll = true}},
+}

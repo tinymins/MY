@@ -1,0 +1,14 @@
+return {
+    {szMethod="TEMPLATE_ID",szPattern="64855",szDisplay="黄穆",dwMapID=368,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="65057",szDisplay="清心",dwMapID=368,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="65097",szDisplay="影贪（仁）",dwMapID=368,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="65104",szDisplay="影嗔（智）",dwMapID=368,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="65207",szDisplay="影痴（礼）",dwMapID=368,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="65208",szDisplay="影慢（信）",dwMapID=368,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="65209",szDisplay="影疑（义）",dwMapID=368,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="65230",szDisplay="毒心",dwMapID=368,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="65889",szDisplay="喝醉的哨兵",dwMapID=368,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=25,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="65912",szDisplay="海龙会神射手",dwMapID=368,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=25,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="65913",szDisplay="海龙会哨兵",dwMapID=368,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=25,tRelation = {bAll = true}},
+    {szMethod="TEMPLATE_ID",szPattern="65914",szDisplay="海龙会刺客",dwMapID=368,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=25,tRelation = {bAll = true}},
+}
