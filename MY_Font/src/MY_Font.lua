@@ -62,14 +62,24 @@ do
 end
 
 -- 初始化设置
-for dwID, tConfig in pairs(CONFIG) do
-	local szName, szFile, nSize, tStyle = unpack(tConfig)
-	if IsFileExist(szFile) then
-		local szName1, szFile1, nSize1, tStyle1 = Font.GetFont(dwID)
-		Font.SetFont(dwID, szName or szName1, szFile or szFile1, nSize or nSize1, tStyle or tStyle1)
+do
+	local bChanged = false
+	for dwID, tConfig in pairs(CONFIG) do
+		local szName, szFile, nSize, tStyle = unpack(tConfig)
+		if IsFileExist(szFile) then
+			local szCurName, szCurFile, nCurSize, tCurStyle = Font.GetFont(dwID)
+			local szNewName, szNewFile, nNewSize, tNewStyle = szName or szCurName, szFile or szCurFile, nSize or nCurSize, tStyle or tCurStyle
+			if not IsEquals(szNewName, szCurName) or not IsEquals(szNewFile, szCurFile)
+			or not IsEquals(nNewSize, nCurSize) or not IsEquals(tNewStyle, tCurStyle) then
+				Font.SetFont(dwID, szNewName, szNewFile, nNewSize, tNewStyle)
+				bChanged = true
+			end
+		end
+	end
+	if bChanged then
+		Station.SetUIScale(Station.GetUIScale(), true)
 	end
 end
-Station.SetUIScale(Station.GetUIScale(), true)
 
 -- 设置字体
 function OBJ.SetFont(tIDs, szName, szFile, nSize, tStyle)
@@ -88,7 +98,6 @@ function OBJ.SetFont(tIDs, szName, szFile, nSize, tStyle)
 	for _, dwID in ipairs(tIDs) do
 		local szName1, szFile1, nSize1, tStyle1 = Font.GetFont(dwID)
 		Font.SetFont(dwID, szName or szName1, szFile or szFile1, nSize or nSize1, tStyle or tStyle1)
-		Station.SetUIScale(Station.GetUIScale(), true)
 		if dwID == Font.GetChatFontID() then
 			Wnd.OpenWindow('ChatSettingPanel')
 			OutputWarningMessage('MSG_REWARD_GREEN', _L['please click apply or sure button to save change!'], 10)
@@ -96,6 +105,7 @@ function OBJ.SetFont(tIDs, szName, szFile, nSize, tStyle)
 		CONFIG[dwID] = {szName or szName1, szFile or szFile1, nSize or nSize1, tStyle or tStyle1}
 	end
 	LIB.SaveLUAData(CONFIG_PATH, CONFIG)
+	Station.SetUIScale(Station.GetUIScale(), true)
 end
 
 -- 配置界面
