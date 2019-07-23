@@ -52,7 +52,7 @@ function PS.OnPanelActive(wnd)
 	-- ×ó²à
 	local x, y = xl, yl
 	x = x + ui:append('WndCheckBox', {
-		x = x, y = y, w = 250, text = _L['enable'],
+		x = x, y = y, w = 250, text = _L['Enable'],
 		r = 255, g = 255, b = 0, checked = MY_Focus.bEnable,
 		oncheck = function(bChecked)
 			MY_Focus.bEnable = bChecked
@@ -85,7 +85,7 @@ function PS.OnPanelActive(wnd)
 	y = y + 5
 
 	ui:append('WndCheckBox', {
-		x = x, y = y, text = _L['auto focus'], checked = MY_Focus.bAutoFocus,
+		x = x, y = y, text = _L['Auto focus'], checked = MY_Focus.bAutoFocus,
 		oncheck = function(bChecked)
 			MY_Focus.bAutoFocus = bChecked
 			MY_Focus.RescanNearby()
@@ -268,7 +268,7 @@ function PS.OnPanelActive(wnd)
 		x = wl - 80, y = y, w = 80,
 		text = _L['add'],
 		onclick = function()
-			GetUserInput(_L['add auto focus'], function(szText)
+			GetUserInput(_L['Add auto focus'], function(szText)
 				local tData = MY_Focus.SetFocusPattern(szText)
 				if not tData then
 					return
@@ -284,7 +284,7 @@ function PS.OnPanelActive(wnd)
 	local x, y = xr, yr
 	local deltaY = (h - y * 2) / 21
 	ui:append('WndCheckBox', {
-		x = x, y = y, w = wr, text = _L['hide when empty'],
+		x = x, y = y, w = wr, text = _L['Hide when empty'],
 		checked = MY_Focus.bAutoHide,
 		oncheck = function(bChecked)
 			MY_Focus.bAutoHide = bChecked
@@ -294,8 +294,8 @@ function PS.OnPanelActive(wnd)
 	y = y + deltaY
 
 	ui:append('WndCheckBox', {
-		x = x, y = y, w = wr, text = _L['auto focus very important npc'],
-		tip = _L['boss list is always been collecting and updating'],
+		x = x, y = y, w = wr, text = _L['Auto focus very important npc'],
+		tip = _L['Boss list is always been collecting and updating'],
 		tippostype = MY_TIP_POSTYPE.TOP_BOTTOM,
 		checked = MY_Focus.bFocusINpc,
 		oncheck = function(bChecked)
@@ -320,7 +320,7 @@ function PS.OnPanelActive(wnd)
 	y = y + deltaY
 
 	ui:append('WndCheckBox', {
-		x = x, y = y, w = wr, text = _L['auto focus friend'],
+		x = x, y = y, w = wr, text = _L['Auto focus friend'],
 		checked = MY_Focus.bFocusFriend,
 		oncheck = function(bChecked)
 			MY_Focus.bFocusFriend = bChecked
@@ -338,7 +338,7 @@ function PS.OnPanelActive(wnd)
 	})
 
 	ui:append('WndCheckBox', {
-		x = x, y = y, w = wr, text = _L['auto focus tong'],
+		x = x, y = y, w = wr, text = _L['Auto focus tong'],
 		checked = MY_Focus.bFocusTong,
 		oncheck = function(bChecked)
 			MY_Focus.bFocusTong = bChecked
@@ -361,7 +361,7 @@ function PS.OnPanelActive(wnd)
 		autoenable = function() return MY_Focus.IsEnabled() end,
 	})
 	ui:append('WndCheckBox', {
-		x = x + 20, y = y, w = wr, text = _L['auto focus only in public map'],
+		x = x + 20, y = y, w = wr, text = _L['Auto focus only in public map'],
 		checked = MY_Focus.bOnlyPublicMap,
 		oncheck = function(bChecked)
 			MY_Focus.bOnlyPublicMap = bChecked
@@ -372,7 +372,7 @@ function PS.OnPanelActive(wnd)
 	y = y + deltaY
 
 	ui:append('WndCheckBox', {
-		x = x, y = y, w = wr, text = _L['auto focus enemy'],
+		x = x, y = y, w = wr, text = _L['Auto focus enemy'],
 		checked = MY_Focus.bFocusEnemy,
 		oncheck = function(bChecked)
 			MY_Focus.bFocusEnemy = bChecked
@@ -383,7 +383,7 @@ function PS.OnPanelActive(wnd)
 	y = y + deltaY
 
 	ui:append('WndCheckBox', {
-		x = x, y = y, w = wr, text = _L['jjc auto focus party'],
+		x = x, y = y, w = wr, text = _L['Auto focus party in arena'],
 		checked = MY_Focus.bFocusJJCParty,
 		oncheck = function(bChecked)
 			MY_Focus.bFocusJJCParty = bChecked
@@ -394,7 +394,7 @@ function PS.OnPanelActive(wnd)
 	y = y + deltaY
 
 	ui:append('WndCheckBox', {
-		x = x, y = y, w = wr, text = _L['jjc auto focus enemy'],
+		x = x, y = y, w = wr, text = _L['Auto focus enemy in arena'],
 		checked = MY_Focus.bFocusJJCEnemy,
 		oncheck = function(bChecked)
 			MY_Focus.bFocusJJCEnemy = bChecked
@@ -416,7 +416,7 @@ function PS.OnPanelActive(wnd)
 	y = y + deltaY
 
 	ui:append('WndCheckBox', {
-		x = x, y = y, w = wr, text = _L['show focus\'s target'],
+		x = x, y = y, w = wr, text = _L['Show focus\'s target'],
 		checked = MY_Focus.bShowTarget,
 		oncheck = function(bChecked)
 			MY_Focus.bShowTarget = bChecked
@@ -427,8 +427,8 @@ function PS.OnPanelActive(wnd)
 	y = y + deltaY
 
 	ui:append('WndCheckBox', {
-		x = x, y = y,w = wr, text = _L['traversal object'],
-		tip = _L['may cause some problem in dungeon map'],
+		x = x, y = y,w = wr, text = _L['Traversal object'],
+		tip = _L['May cause some problem in dungeon map'],
 		tippostype = MY_TIP_POSTYPE.BOTTOM_TOP,
 		checked = MY_Focus.bTraversal,
 		oncheck = function(bChecked)
@@ -439,7 +439,7 @@ function PS.OnPanelActive(wnd)
 	y = y + deltaY
 
 	ui:append('WndCheckBox', {
-		x = x, y = y, w = wr, text = _L['hide dead object'],
+		x = x, y = y, w = wr, text = _L['Hide dead object'],
 		checked = MY_Focus.bHideDeath,
 		oncheck = function(bChecked)
 			MY_Focus.bHideDeath = bChecked
@@ -450,7 +450,7 @@ function PS.OnPanelActive(wnd)
 	y = y + deltaY
 
 	ui:append('WndCheckBox', {
-		x = x, y = y, w = wr, text = _L['display kungfu icon instead of location'],
+		x = x, y = y, w = wr, text = _L['Display kungfu icon instead of location'],
 		checked = MY_Focus.bDisplayKungfuIcon,
 		oncheck = function(bChecked)
 			MY_Focus.bDisplayKungfuIcon = bChecked
@@ -462,7 +462,7 @@ function PS.OnPanelActive(wnd)
 	ui:append('WndCheckBox', {
 		name = 'WndCheckBox_SortByDistance',
 		x = x, y = y, w = wr,
-		text = _L['sort by distance'],
+		text = _L['Sort by distance'],
 		checked = MY_Focus.bSortByDistance,
 		oncheck = function(bChecked)
 			MY_Focus.bSortByDistance = bChecked
@@ -474,7 +474,7 @@ function PS.OnPanelActive(wnd)
 	ui:append('WndCheckBox', {
 		name = 'WndCheckBox_EnableSceneNavi',
 		x = x, y = y, w = wr,
-		text = _L['enable scene navi'],
+		text = _L['Enable scene navi'],
 		checked = MY_Focus.bEnableSceneNavi,
 		oncheck = function(bChecked)
 			MY_Focus.bEnableSceneNavi = bChecked
@@ -485,8 +485,8 @@ function PS.OnPanelActive(wnd)
 	y = y + deltaY
 
 	ui:append('WndCheckBox', {
-		x = x, y = y, w = wr, text = _L['heal healper'],
-		tip = _L['select target when mouse enter'],
+		x = x, y = y, w = wr, text = _L['Heal healper'],
+		tip = _L['Select target when mouse enter'],
 		tippostype = MY_TIP_POSTYPE.BOTTOM_TOP,
 		checked = MY_Focus.bHealHelper,
 		oncheck = function(bChecked)
@@ -509,7 +509,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:append('WndSliderBox', {
 		x = x, y = y, w = 150,
-		textfmt = function(val) return _L('max display count %d.', val) end,
+		textfmt = function(val) return _L('Max display count %d.', val) end,
 		range = {1, 20},
 		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
 		value = MY_Focus.nMaxDisplay,
@@ -522,7 +522,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:append('WndSliderBox', {
 		x = x, y = y, w = 150,
-		textfmt = function(val) return _L('current scale-x is %d%%.', val) end,
+		textfmt = function(val) return _L('Current scale-x is %d%%.', val) end,
 		range = {10, 300},
 		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
 		value = MY_Focus.fScaleX * 100,
@@ -535,7 +535,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:append('WndSliderBox', {
 		x = x, y = y, w = 150,
-		textfmt = function(val) return _L('current scale-y is %d%%.', val) end,
+		textfmt = function(val) return _L('Current scale-y is %d%%.', val) end,
 		range = {10, 300},
 		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
 		value = MY_Focus.fScaleY * 100,
@@ -546,4 +546,4 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + deltaY
 end
-LIB.RegisterPanel('MY_Focus', _L['focus list'], _L['Target'], 'ui/Image/button/SystemButton_1.UITex|9', PS)
+LIB.RegisterPanel('MY_Focus', _L['Focus list'], _L['Target'], 'ui/Image/button/SystemButton_1.UITex|9', PS)

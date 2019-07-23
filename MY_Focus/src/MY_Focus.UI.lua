@@ -455,7 +455,7 @@ function D.OnFrameCreate()
 	this:RegisterEvent('MY_FOCUS_MAX_DISPLAY_UPDATE')
 	this:RegisterEvent('MY_FOCUS_AUTO_HIDE_UPDATE')
 	this:RegisterEvent('MY_FOCUS_MINIMIZE_UPDATE')
-	this:Lookup('', 'Text_Title'):SetText(_L['focus list'])
+	this:Lookup('', 'Text_Title'):SetText(_L['Focus list'])
 
 	D.Scale(this)
 	D.CreateList(this)
@@ -558,7 +558,7 @@ function D.OnItemRButtonClick()
 		local t = LIB.GetTargetContextMenu(dwType, this:Lookup('Handle_R/Handle_LMN/Text_Name'):GetText(), dwID)
 		if this.bDeletable then
 			table.insert(t, 1, {
-				szOption = _L['delete focus'],
+				szOption = _L['Delete focus'],
 				fnAction = function()
 					if l_dwLockType == dwType and l_dwLockID == dwID then
 						l_dwLockType = nil
@@ -579,7 +579,7 @@ function D.OnItemRButtonClick()
 		end
 		local bLock = dwType == l_dwLockType and dwID == l_dwLockID
 		table.insert(t, {
-			szOption = bLock and _L['unlock focus'] or _L['lock focus'],
+			szOption = bLock and _L['Unlock focus'] or _L['Lock focus'],
 			fnAction = function()
 				if bLock then
 					l_dwLockID = nil

@@ -515,18 +515,18 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 					if O.bFocusJJCEnemy and O.bFocusJJCParty then
 						bFocus = true
 						bDeletable = false
-						szVia = _L['JJC focus']
+						szVia = _L['Auto focus in arena']
 					elseif O.bFocusJJCParty then
 						if not IsEnemy(UI_GetClientPlayerID(), dwID) then
 							bFocus = true
 							bDeletable = false
-							szVia = _L['JJC focus party']
+							szVia = _L['Auto focus party in arena']
 						end
 					elseif O.bFocusJJCEnemy then
 						if IsEnemy(UI_GetClientPlayerID(), dwID) then
 							bFocus = true
 							bDeletable = false
-							szVia = _L['JJC focus enemy']
+							szVia = _L['Auto focus enemy in arena']
 						end
 					end
 				elseif dwType == TARGET.NPC then
@@ -536,7 +536,7 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 						D.OnRemoveFocus(TARGET.PLAYER, KObject.dwEmployer)
 						bFocus = true
 						bDeletable = false
-						szVia = _L['JJC focus party']
+						szVia = _L['Auto focus party in arena']
 					end
 				end
 			else
@@ -609,7 +609,7 @@ function D.OnObjectLeaveScene(dwType, dwID)
 			if O.bFocusJJCParty
 			and KObject.dwTemplateID == CHANGGE_REAL_SHADOW_TPLID
 			and LIB.IsInArena() and not (IsEnemy(UI_GetClientPlayerID(), dwID) and LIB.IsShieldedVersion()) then
-				D.OnSetFocus(TARGET.PLAYER, KObject.dwEmployer, LIB.GetObjectName(KObject, 'never'), false, _L['JJC focus party'])
+				D.OnSetFocus(TARGET.PLAYER, KObject.dwEmployer, LIB.GetObjectName(KObject, 'never'), false, _L['Auto focus party in arena'])
 			end
 		end
 	end
@@ -722,7 +722,7 @@ end
 
 function D.GetTargetMenu(dwType, dwID)
 	return {{
-		szOption = _L['add to temp focus list'],
+		szOption = _L['Add to temp focus list'],
 		fnAction = function()
 			if not O.bEnable then
 				O.bEnable = true
@@ -731,7 +731,7 @@ function D.GetTargetMenu(dwType, dwID)
 			D.SetFocusID(dwType, dwID)
 		end,
 	}, {
-		szOption = _L['add to static focus list'],
+		szOption = _L['Add to static focus list'],
 		fnAction = function()
 			if not O.bEnable then
 				O.bEnable = true
