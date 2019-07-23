@@ -45,17 +45,17 @@ local GKP_LOOT_INIFILE = PATH_ROOT .. 'ui/MY_GKP_Loot.ini'
 local MY_GKP_LOOT_BOSS -- 散件老板
 
 local GKP_LOOT_HUANGBABA = { -- 玄晶
-	[LIB.GetItemName(72592)]  = true,
-	[LIB.GetItemName(68363)]  = true,
-	[LIB.GetItemName(66190)]  = true,
-	[LIB.GetItemName(153897)] = true,
-	[LIB.GetItemName(160306)] = true,
+	[LIB.GetItemNameByUIID(72592)]  = true,
+	[LIB.GetItemNameByUIID(68363)]  = true,
+	[LIB.GetItemNameByUIID(66190)]  = true,
+	[LIB.GetItemNameByUIID(153897)] = true,
+	[LIB.GetItemNameByUIID(160306)] = true,
 }
 local GKP_LOOT_ZIBABA = { -- 小铁
-	[LIB.GetItemName(66189)]  = true,
-	[LIB.GetItemName(68362)]  = true,
-	[LIB.GetItemName(153896)] = true,
-	[LIB.GetItemName(160305)] = true,
+	[LIB.GetItemNameByUIID(66189)]  = true,
+	[LIB.GetItemNameByUIID(68362)]  = true,
+	[LIB.GetItemNameByUIID(153896)] = true,
+	[LIB.GetItemNameByUIID(160305)] = true,
 }
 local GKP_LOOT_RECENT = {} -- 记录上次物品或物品组分配给了谁
 local GKP_ITEM_QUALITIES = {

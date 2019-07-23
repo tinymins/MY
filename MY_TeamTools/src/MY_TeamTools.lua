@@ -942,7 +942,7 @@ end
 
 local function CreateItemTable(item, dwBox, dwX)
 	return {
-		nIcon     = Table_GetItemIconID(item.nUiId),
+		nIcon     = LIB.GetItemIconByUIID(item.nUiId),
 		dwID      = item.dwID,
 		nLevel    = item.nLevel,
 		szName    = LIB.GetItemNameByUIID(item.nUiId),

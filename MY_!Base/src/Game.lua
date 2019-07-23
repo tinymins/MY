@@ -934,22 +934,6 @@ function LIB.GetKungfuName(dwKungfuID, szType)
 end
 end
 
-do
-local ITEM_CACHE = {}
-function LIB.GetItemName(nUiId)
-	if not ITEM_CACHE[nUiId] then
-		local szName = LIB.GetItemNameByUIID(nUiId)
-		local nIcon = Table_GetItemIconID(nUiId)
-		if szName ~= '' and nIocn ~= -1 then
-			ITEM_CACHE[nUiId] = { szName, nIcon }
-		else
-			ITEM_CACHE[nUiId] = { 'ITEM#' .. nUiId, 1435 }
-		end
-	end
-	return unpack(ITEM_CACHE[nUiId])
-end
-end
-
 -------------------------------------------------------------------------------------------------------
 --               #     #       #             # #                         #             #             --
 --   # # # #     #     #         #     # # #         # # # # # #         #             #             --
@@ -3201,9 +3185,31 @@ end
 if IsFunction(GetItemNameByUIID) then
 	LIB.GetItemNameByUIID = GetItemNameByUIID
 else
+	local ITEM_CACHE = {}
 	function LIB.GetItemNameByUIID(nUiId)
-		return Table_GetItemName(nUiId)
+		if not ITEM_CACHE[nUiId] then
+			local szName = Table_GetItemName(nUiId)
+			if szName == '' then
+				szName = 'ITEM#' .. nUiId
+			end
+			ITEM_CACHE[nUiId] = szName
+		end
+		return ITEM_CACHE[nUiId]
 	end
+end
+
+do
+local ITEM_CACHE = {}
+function LIB.GetItemIconByUIID(nUiId)
+	if not ITEM_CACHE[nUiId] then
+		local nIcon = Table_GetItemIconID(nUiId)
+		if nIcon == -1 then
+			nIcon = 1435
+		end
+		ITEM_CACHE[nUiId] = nIcon
+	end
+	return ITEM_CACHE[nUiId]
+end
 end
 
 if IsFunction(GetGuildBankBagPos) then

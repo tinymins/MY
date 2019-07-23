@@ -79,7 +79,7 @@ local _GKP = {
 	Config = {
 		Subsidies = {
 			{ _L['Treasure Chests'], '', true},
-			-- { LIB.GetItemName(73214), '', true},
+			-- { LIB.GetItemNameByUIID(73214), '', true},
 			{ _L['Boss'], '', true},
 			{ _L['Banquet Allowance'], -1000, true},
 			{ _L['Fines'], '', true},
@@ -845,7 +845,7 @@ function _GKP.DrawRecord(key, sort)
 			item:Lookup('Image_NameIcon'):FromUITex(GetForceImage(v.dwForceID))
 			item:Lookup('Text_Name'):SetText(v.szPlayer)
 			item:Lookup('Text_Name'):SetFontColor(LIB.GetForceColor(v.dwForceID))
-			local szName = v.szName or LIB.GetItemName(v.nUiId)
+			local szName = v.szName or LIB.GetItemNameByUIID(v.nUiId)
 			item:Lookup('Text_ItemName'):SetText(szName)
 			if v.nQuality then
 				item:Lookup('Text_ItemName'):SetFontColor(GetItemFontColorByQuality(v.nQuality))
@@ -1749,7 +1749,7 @@ function _GKP.Record(tab, item, bEnter)
 	if tab and type(item) == 'number' then -- ±à¼­
 		hPlayer:text(tab.szPlayer):color(LIB.GetForceColor(tab.dwForceID))
 		dwForceID = tab.dwForceID
-		hName:text(tab.szName or LIB.GetItemName(tab.nUiId))
+		hName:text(tab.szName or LIB.GetItemNameByUIID(tab.nUiId))
 		hMoney:text(tab.nMoney)
 		hSource:text(tab.szNpcName)
 	end
