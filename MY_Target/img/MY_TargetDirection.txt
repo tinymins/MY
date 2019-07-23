@@ -1,6 +1,6 @@
-Farme	Group	GroupIndex	GroupFrameDelay	Left	Top	Width	Height	Name
-0				0	0	160	160	
-1				162	0	160	160	
-2				324	0	160	160	
-3				0	162	160	160	
-4				162	162	160	160	
+Farme	Left	Top	Width	High	File
+0	0	0	160	160	C:\Users\root\Desktop\箭头紫.tga
+1	162	0	160	160	C:\Users\root\Desktop\箭头红.tga
+2	324	0	160	160	C:\Users\root\Desktop\箭头绿.tga
+3	0	162	160	160	C:\Users\root\Desktop\箭头蓝.tga
+4	162	162	160	160	C:\Users\root\Desktop\箭头黄.tga

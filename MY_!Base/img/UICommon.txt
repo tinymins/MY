@@ -1,7 +1,7 @@
-Farme	Group	GroupIndex	GroupFrameDelay	Left	Top	Width	Height	Name
-0	0	0	100	226	0	32	32	
-1				0	0	224	63	
-2				0	65	224	63	
-3				0	130	224	63	
-4				0	195	224	63	
-5				226	34	16	16	
+Farme	Left	Top	Width	High	File
+0	226	0	32	32	D:\Program Files\_Game\Kingsoft\jx3_dev\bin\zhcn\interface\MY\!src-dist\UITex\MY.tga
+1	0	0	224	63	D:\Program Files\_Game\Kingsoft\jx3_dev\bin\zhcn\interface\MY\!src-dist\UITex\选项卡1.tga
+2	0	65	224	63	D:\Program Files\_Game\Kingsoft\jx3_dev\bin\zhcn\interface\MY\!src-dist\UITex\选项卡2.tga
+3	0	130	224	63	D:\Program Files\_Game\Kingsoft\jx3_dev\bin\zhcn\interface\MY\!src-dist\UITex\选项卡3.tga
+4	0	195	224	63	D:\Program Files\_Game\Kingsoft\jx3_dev\bin\zhcn\interface\MY\!src-dist\UITex\选项卡4.tga
+5	226	34	16	16	D:\Program Files\_Game\Kingsoft\jx3_dev\bin\zhcn\interface\MY\!src-dist\UITex\Black.tga

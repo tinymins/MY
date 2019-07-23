@@ -1,2 +1,0 @@
-Farme	Left	Top	Width	High	File
-0	0	0	202	32	C:\Users\root\Desktop\ÊÆÁ¦µ×.TGA
