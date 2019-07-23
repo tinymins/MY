@@ -393,6 +393,7 @@ function LIB.SwitchTab(szID, bForceUpdate)
 		-- »¶Ó­Ò³
 		local ui = LIB.UI(wnd)
 		local w, h = ui:size()
+		ui:append('Shadow', { name = 'Shadow_Adv', x = 0, y = 0, color = { 140, 140, 140 } })
 		ui:append('Image', { name = 'Image_Adv', x = 0, y = 0, image = PACKET_INFO.UITEX_POSTER, imageframe = (GetTime() % 2) })
 		ui:append('Text', { name = 'Text_Adv', x = 10, y = 300, w = 557, font = 200 })
 		ui:append('Text', { name = 'Text_Memory', x = 10, y = 300, w = 150, alpha = 150, font = 162, halign = 2 })
@@ -518,11 +519,13 @@ function LIB.SwitchTab(szID, bForceUpdate)
 			local scaleH = w / 557 * 278
 			local bottomH = 90
 			if scaleH > h - bottomH then
+				ui:children('#Shadow_Adv'):size((h - bottomH) / 278 * 557, (h - bottomH))
 				ui:children('#Image_Adv'):size((h - bottomH) / 278 * 557, (h - bottomH))
 				ui:children('#Text_Memory'):pos(w - 150, h - bottomH + 10)
 				ui:children('#Text_Adv'):pos(10, h - bottomH + 10)
 				ui:children('#Text_Svr'):pos(10, h - bottomH + 35)
 			else
+				ui:children('#Shadow_Adv'):size(w, scaleH)
 				ui:children('#Image_Adv'):size(w, scaleH)
 				ui:children('#Text_Memory'):pos(w - 150, scaleH + 10)
 				ui:children('#Text_Adv'):pos(10, scaleH + 10)
