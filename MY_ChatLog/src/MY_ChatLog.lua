@@ -97,40 +97,25 @@ end
 
 do
 local l_aMsg, l_ds = {}
-local function InitDB(bFix)
+function D.InitDB(bSure)
 	if l_ds then
 		return true
 	end
-	local szAlert
-	local szPath = LIB.FormatPath({'userdata/chat_log.db', PATH_TYPE.ROLE})
-	if IsLocalFileExist(szPath) then
-		if not bFix then
-			LIB.Confirm(_L['You need to upgrade chatlog database before using, that may take a while and cannot be break, do you want to do it now?'], function()
-				LIB.Alert(_L['Your client may get no responding, please wait until it finished, otherwise your chatlog data may got lost, press yes to start.'], function()
-					InitDB(true)
-				end)
-			end)
-			return
-		end
-		D.ImportDB(szPath)
-		CPath.Move(szPath, szPath .. '.bak' .. GetCurrentTime())
-		szAlert = szAlert or _L['Upgrade succeed!']
+	if not D.UpgradeDB(bSure) then
+		return
 	end
 	local ds = MY_ChatLog_DS(D.GetRoot())
 	if not ds:InitDB() then
-		if not bFix then
+		if not bSure then
 			LIB.Confirm(_L['Problem(s) detected on your chatlog database and must be fixed before use, would you like to do this now?'], function()
 				LIB.Alert(_L['Your client may get no responding, please wait until it finished, otherwise your chatlog data may got lost, press yes to start.'], function()
-					InitDB(true)
+					D.InitDB(true)
 				end)
 			end)
 			return
 		end
 		ds:InitDB(true):OptimizeDB()
-		szAlert = szAlert or _L['Fix succeed!']
-	end
-	if szAlert then
-		MY.Alert(szAlert)
+		MY.Alert(_L['Fix succeed!'])
 	end
 	for _, a in ipairs(l_aMsg) do
 		ds:InsertMsg(unpack(a))
@@ -138,8 +123,28 @@ local function InitDB(bFix)
 	l_ds, l_aMsg = ds, {}
 	return true
 end
-LIB.RegisterInit('MY_ChatLog_InitMon', function() InitDB() end)
 
+-- 检查升级数据库版本
+function D.UpgradeDB(bSure)
+	local szPath = LIB.FormatPath({'userdata/chat_log.db', PATH_TYPE.ROLE})
+	if IsLocalFileExist(szPath) then
+		if not bSure then
+			LIB.Confirm(_L['You need to upgrade chatlog database before using, that may take a while and cannot be break, do you want to do it now?'], function()
+				LIB.Alert(_L['Your client may get no responding, please wait until it finished, otherwise your chatlog data may got lost, press yes to start.'], function()
+					D.InitDB(true)
+				end)
+			end)
+			return
+		end
+		D.ImportDB(szPath)
+		CPath.Move(szPath, szPath .. '.bak' .. GetCurrentTime())
+		MY.Alert(_L['Upgrade succeed!'])
+	end
+	return true
+end
+LIB.RegisterInit('MY_ChatLog', D.UpgradeDB)
+
+-- 导入数据
 function D.ImportDB(szPath)
 	local odb, nImportCount = LIB.ConnectDatabase(_L['MY_ChatLog'], szPath), 0
 	if odb then
@@ -197,7 +202,7 @@ function D.ImportDB(szPath)
 end
 
 function D.OptimizeDB()
-	if not InitDB(true) then
+	if not D.InitDB(true) then
 		return
 	end
 	l_ds:OptimizeDB()
@@ -283,6 +288,7 @@ local settings = {
 			fields = {
 				Open = D.Open,
 				GetRoot = D.GetRoot,
+				InitDB = D.InitDB,
 				OptimizeDB = D.OptimizeDB,
 				ImportDB = D.ImportDB,
 				LOG_TYPE = LOG_TYPE,

@@ -375,6 +375,9 @@ end
 do
 local nIndex = 0
 function MY_ChatLog_Open(szRoot)
+	if not MY_ChatLog.InitDB() then
+		return
+	end
 	nIndex = nIndex + 1
 	Wnd.OpenWindow(SZ_INI, 'MY_ChatLog#' .. nIndex):SetDS(szRoot)
 end
