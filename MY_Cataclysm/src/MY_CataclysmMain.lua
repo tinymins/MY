@@ -160,7 +160,10 @@ function D.SaveConfigure()
 	LIB.SaveLUAData(D.GetConfigurePath(), CTM_CONFIG_PLAYER)
 end
 
-function D.SetConfig(Config)
+function D.SetConfig(Config, bKeepBuff)
+	if bKeepBuff and CTM_CONFIG_PLAYER then
+		Config.aBuffList = CTM_CONFIG_PLAYER.aBuffList
+	end
 	CTM_CONFIG_LOADED = true
 	CTM_CONFIG_PLAYER = Config
 	-- update version
@@ -1141,9 +1144,7 @@ function D.ConfirmRestoreConfig()
 		{
 			szOption = _L['Official style'],
 			fnAction = function()
-				local Config = Clone(CTM_CONFIG_OFFICIAL)
-				Config.aBuffList = CTM_CONFIG_PLAYER.aBuffList
-				D.SetConfig(Config)
+				D.SetConfig(Clone(CTM_CONFIG_OFFICIAL), true)
 				D.CheckEnableTeamPanel()
 				LIB.SwitchTab('MY_Cataclysm', true)
 			end,
@@ -1151,9 +1152,7 @@ function D.ConfirmRestoreConfig()
 		{
 			szOption = _L['Cataclysm style'],
 			fnAction = function()
-				local Config = Clone(CTM_CONFIG_CATACLYSM)
-				Config.aBuffList = CTM_CONFIG_PLAYER.aBuffList
-				D.SetConfig(Config)
+				D.SetConfig(Clone(CTM_CONFIG_CATACLYSM), true)
 				D.CheckEnableTeamPanel()
 				LIB.SwitchTab('MY_Cataclysm', true)
 			end,
