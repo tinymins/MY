@@ -27,7 +27,8 @@ def __compress(addon):
         if parts[0].find('lua_') == 0:
             source_file = os.path.join(addon, parts[1])
             source_code = codecs.open(source_file,'r',encoding='gbk').read()
-            source_code = re.sub(r'(?is)--\[\[#DEBUG BEGIN\]\].+?--\[\[#DEBUG END\]\]', '', source_code)
+            source_code = re.sub(r'(?is)[^\n]*--\[\[#DEBUG LINE\]\][^\n]*\n?', '', source_code)
+            source_code = re.sub(r'(?is)\n?--\[\[#DEBUG BEGIN\]\].*?--\[\[#DEBUG END\]\]\n?', '', source_code)
             codecs.open(source_file,'w',encoding='gbk').write(source_code)
     # Generate squishy file and execute squish
     with open('squishy', 'w') as squishy:
