@@ -44,13 +44,9 @@ end
 local LANG = LIB.GetLang()
 local INIT_STATE = 'NONE'
 local C, D = { PASSPHRASE = {213, 166, 13}, PASSPHRASE_EMBEDDED = {211, 98, 5} }, {}
-local INI_PATH = PACKET_INFO.ROOT .. 'MY_TargetMon/ui/MY_TargetMon.ini'
 local ROLE_CONFIG_FILE = {'config/my_targetmon.jx3dat', PATH_TYPE.ROLE}
-local TEMPLATE_CONFIG_FILE = PACKET_INFO.ROOT .. 'MY_TargetMon/data/template/$lang.jx3dat'
 local EMBEDDED_ENCRYPTED = false
-local EMBEDDED_CONFIG_ROOT = PACKET_INFO.ROOT .. 'MY_Resource/data/targetmon/'
 local CUSTOM_EMBEDDED_CONFIG_ROOT = LIB.FormatPath({'userdata/TargetMon/', PATH_TYPE.GLOBAL})
-local EMBEDDED_CONFIG_SUFFIX = '.' .. LANG .. '.jx3dat'
 local CUSTOM_DEFAULT_CONFIG_FILE = {'config/my_targetmon.jx3dat', PATH_TYPE.GLOBAL}
 local TARGET_TYPE_LIST = {
 	'CLIENT_PLAYER'  ,
@@ -639,7 +635,6 @@ function D.DeleteConfig(config, bAsEmbedded)
 	end
 	if bAsEmbedded then
 		CPath.DelFile(CUSTOM_EMBEDDED_CONFIG_ROOT .. config.uuid .. '.jx3dat')
-		CPath.DelFile(EMBEDDED_CONFIG_ROOT .. config.uuid .. EMBEDDED_CONFIG_SUFFIX)
 		D.LoadEmbeddedConfig()
 		D.SaveConfig()
 		D.LoadConfig()
