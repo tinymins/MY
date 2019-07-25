@@ -2207,10 +2207,10 @@ function UI:pos(nLeft, nTop)
 		if raw and raw.GetRelPos then
 			local nX, nY = raw:GetRelPos()
 			if szType == 'TOPRIGHT' or szType == 'BOTTOMRIGHT' then
-				nX = nX + raw:GetW()
+				nX = nX + self:width()
 			end
 			if szType == 'BOTTOMLEFT' or szType == 'BOTTOMRIGHT' then
-				nY = nY + raw:GetH()
+				nY = nY + self:height()
 			end
 			return nX, nY
 		end
