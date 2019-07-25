@@ -58,12 +58,6 @@ local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAD
 -- local raw_json_text = LIB.JsonEncode(lua_table_or_value)
 -- local pretty_json_text = LIB.JsonEncode(lua_table_or_value, true)
 ---------------------------------------------------------------------------
-local pairs, ipairs = pairs, ipairs
-local char, srep = string.char, string.rep
-local floor, HUGE, max = math.floor, math.huge, math.max
-local tonumber, tostring = tonumber, tostring
-local type = type
-local tconcat, tinsert = table.concat, table.insert
 
 -- decode util functions
 local function unicode_codepoint_as_utf8(codepoint)
@@ -361,9 +355,9 @@ local function object_or_array(T)
 	-- fetch all keys
 	for key in pairs(T) do
 		if type(key) == 'string' then
-			tinsert(string_keys, key)
+			insert(string_keys, key)
 		elseif type(key) == 'number' then
-			tinsert(number_keys, key)
+			insert(number_keys, key)
 			if key <= 0 or key >= HUGE then
 				number_keys_must_be_strings = true
 			elseif not maximum_number_key or key > maximum_number_key then
@@ -392,7 +386,7 @@ local function object_or_array(T)
 		for _, number_key in ipairs(number_keys) do
 			local string_key = tostring(number_key)
 			if map[string_key] == nil then
-				tinsert(string_keys , string_key)
+				insert(string_keys , string_key)
 				map[string_key] = T[number_key]
 			end
 		end
@@ -445,12 +439,12 @@ local function encode_value(value, parents, indent)
 			-- An array
 			local ITEMS = {}
 			for i = 1, maximum_number_key do
-				tinsert(ITEMS, encode_value(T[i], parents, indent))
+				insert(ITEMS, encode_value(T[i], parents, indent))
 			end
 			if indent then
-				result_value = '[ ' .. tconcat(ITEMS, ', ') .. ' ]'
+				result_value = '[ ' .. concat(ITEMS, ', ') .. ' ]'
 			else
-				result_value = '[' .. tconcat(ITEMS, ',') .. ']'
+				result_value = '[' .. concat(ITEMS, ',') .. ']'
 			end
 		elseif object_keys then
 			-- An object
@@ -461,29 +455,29 @@ local function encode_value(value, parents, indent)
 				for _, key in ipairs(object_keys) do
 					local encoded = encode_value(tostring(key), parents, '')
 					max_key_length = max(max_key_length, #encoded)
-					tinsert(KEYS, encoded)
+					insert(KEYS, encoded)
 				end
 				local key_indent = indent .. '    '
-				local subtable_indent = indent .. srep(' ', max_key_length + 2 + 4)
+				local subtable_indent = indent .. rep(' ', max_key_length + 2 + 4)
 				local FORMAT = '%s%' .. string.format('%d', max_key_length) .. 's: %s'
 				local COMBINED_PARTS = {}
 				for i, key in ipairs(object_keys) do
 					local encoded_val = encode_value(TT[key], parents, subtable_indent)
 					if encoded_val then
-						tinsert(COMBINED_PARTS, string.format(FORMAT, key_indent, KEYS[i], encoded_val))
+						insert(COMBINED_PARTS, string.format(FORMAT, key_indent, KEYS[i], encoded_val))
 					end
 				end
-				result_value = '{\n' .. tconcat(COMBINED_PARTS, ',\n') .. '\n' .. indent .. '}'
+				result_value = '{\n' .. concat(COMBINED_PARTS, ',\n') .. '\n' .. indent .. '}'
 			else
 				local PARTS = {}
 				for _, key in ipairs(object_keys) do
 					local encoded_val = encode_value(TT[key], parents, indent)
 					if encoded_val then
 						local encoded_key = encode_value(tostring(key), parents, indent)
-						tinsert(PARTS, string.format('%s:%s', encoded_key, encoded_val))
+						insert(PARTS, string.format('%s:%s', encoded_key, encoded_val))
 					end
 				end
-				result_value = '{' .. tconcat(PARTS, ',') .. '}'
+				result_value = '{' .. concat(PARTS, ',') .. '}'
 			end
 		else
 			result_value = '[]'

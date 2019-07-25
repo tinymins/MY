@@ -36,14 +36,12 @@ local Call, XpCall, GetTraceback, RandomChild = LIB.Call, LIB.XpCall, LIB.GetTra
 local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
 local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
 -----------------------------------------------------------------------------------------------------------
+local SKILL_RESULT_TYPE = SKILL_RESULT_TYPE
+local GetCurrentTime = GetCurrentTime
+local MY_IsParty, MY_GetSkillName, MY_GetBuffName = LIB.IsParty, LIB.GetSkillName, LIB.GetBuffName
+
 local _L = LIB.LoadLangPack(PACKET_INFO.ROOT .. 'MY_TeamTools/lang/')
 
-local pairs, ipairs = pairs, ipairs
-local GetCurrentTime = GetCurrentTime
-local tinsert = table.insert
-local GetPlayer, GetNpc, IsPlayer = GetPlayer, GetNpc, IsPlayer
-local SKILL_RESULT_TYPE = SKILL_RESULT_TYPE
-local MY_IsParty, MY_GetSkillName, MY_GetBuffName = LIB.IsParty, LIB.GetSkillName, LIB.GetBuffName
 
 local MAX_COUNT  = 5
 local PLAYER_ID  = 0
@@ -88,7 +86,7 @@ local function OnSkillEffectLog(dwCaster, dwTarget, nEffectType, dwSkillID, dwLe
 		elseif DAMAGE_LOG[key][MAX_COUNT] then
 			DAMAGE_LOG[key][MAX_COUNT] = nil
 		end
-		tinsert(DAMAGE_LOG[key], 1, {
+		insert(DAMAGE_LOG[key], 1, {
 			nCurrentTime    = GetCurrentTime(),
 			szKiller        = szCaster,
 			szSkill         = szSkill .. (nEffectType == SKILL_EFFECT_TYPE.BUFF and '(BUFF)' or ''),
@@ -115,7 +113,7 @@ local function OnSkillEffectLog(dwCaster, dwTarget, nEffectType, dwSkillID, dwLe
 		elseif DAMAGE_LOG[key][MAX_COUNT] then
 			DAMAGE_LOG[key][MAX_COUNT] = nil
 		end
-		tinsert(DAMAGE_LOG[key], 1, {
+		insert(DAMAGE_LOG[key], 1, {
 			nCurrentTime    = GetCurrentTime(),
 			szKiller        = szTarget,
 			szSkill         = szSkill .. (nEffectType == SKILL_EFFECT_TYPE.BUFF and '(BUFF)' or ''),
@@ -142,7 +140,7 @@ local function OnCommonHealthLog(dwCharacterID, nDeltaLife)
 		elseif DAMAGE_LOG[key][MAX_COUNT] then
 			DAMAGE_LOG[key][MAX_COUNT] = nil
 		end
-		tinsert(DAMAGE_LOG[key], 1, { nCurrentTime = GetCurrentTime(), nCount = nDeltaLife * -1 })
+		insert(DAMAGE_LOG[key], 1, { nCurrentTime = GetCurrentTime(), nCount = nDeltaLife * -1 })
 	end
 end
 
@@ -156,7 +154,7 @@ local function OnSkill(dwCaster, dwSkillID, dwLevel)
 	elseif DAMAGE_LOG[key][MAX_COUNT] then
 		DAMAGE_LOG[key][MAX_COUNT] = nil
 	end
-	tinsert(DAMAGE_LOG[key], 1, {
+	insert(DAMAGE_LOG[key], 1, {
 		nCurrentTime = GetCurrentTime(),
 		szKiller     = p.szName,
 		szSkill      = MY_GetSkillName(dwSkillID, dwLevel),
@@ -172,13 +170,13 @@ local function OnDeath(dwCharacterID, dwKiller)
 		local killer = (IsPlayer(dwKiller) and GetPlayer(dwKiller)) or (not IsPlayer(dwKiller) and GetNpc(dwKiller))
 		local szKiller = killer and LIB.GetObjectName(killer)
 		if DAMAGE_LOG[dwCharacterID] then
-			tinsert(DEATH_LOG[dwCharacterID], {
+			insert(DEATH_LOG[dwCharacterID], {
 				nCurrentTime = GetCurrentTime(),
 				data         = DAMAGE_LOG[dwCharacterID],
 				szKiller     = szKiller
 			})
 		else
-			tinsert(DEATH_LOG[dwCharacterID], {
+			insert(DEATH_LOG[dwCharacterID], {
 				nCurrentTime = GetCurrentTime(),
 				data         = { szCaster = szKiller },
 				szKiller     = szKiller

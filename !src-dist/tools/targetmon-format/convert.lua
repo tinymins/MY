@@ -1,15 +1,15 @@
 
-local srep = string.rep
-local tconcat = table.concat
-local tinsert = table.insert
-local tremove = table.remove
+local rep = string.rep
+local concat = table.concat
+local insert = table.insert
+local remove = table.remove
 local type = type
 local next = next
 local print = print
 local pairs = pairs
 local ipairs = ipairs
 local tostring = tostring
-local string2byte = string.byte
+local byte = string.byte
 
 function clone(var)
 	local szType = type(var)
@@ -63,28 +63,28 @@ local function table_r(var, level, indent)
 	local t = {}
 	local szType = type(var)
 	if szType == 'nil' then
-		tinsert(t, 'nil')
+		insert(t, 'nil')
 	elseif szType == 'number' then
-		tinsert(t, tostring(var))
+		insert(t, tostring(var))
 	elseif szType == 'string' then
-		tinsert(t, string.format('%q', var))
+		insert(t, string.format('%q', var))
 	elseif szType == 'function' then
 		local s = string.dump(var)
-		tinsert(t, 'loadstring("')
+		insert(t, 'loadstring("')
 		-- 'string slice too long'
 		for i = 1, #s, 2000 do
-			tinsert(t, tconcat({'', string2byte(s, i, i + 2000 - 1)}, '\\'))
+			insert(t, concat({'', byte(s, i, i + 2000 - 1)}, '\\'))
 		end
-		tinsert(t, '")')
+		insert(t, '")')
 	elseif szType == 'boolean' then
-		tinsert(t, tostring(var))
+		insert(t, tostring(var))
 	elseif szType == 'table' then
-		tinsert(t, '{')
+		insert(t, '{')
 		local s_tab_equ = '='
 		if indent then
 			s_tab_equ = ' = '
 			if not empty(var) then
-				tinsert(t, '\n')
+				insert(t, '\n')
 			end
 		end
 		local nohash = true
@@ -104,36 +104,36 @@ local function table_r(var, level, indent)
 				-- process to insert to table
 				if nohash then -- pure list table
 					if indent then
-						tinsert(t, srep(indent, level + 1))
+						insert(t, rep(indent, level + 1))
 					end
-					tinsert(t, table_r(val, level + 1, indent))
-					tinsert(t, ',')
+					insert(t, table_r(val, level + 1, indent))
+					insert(t, ',')
 					if indent then
-						tinsert(t, '\n')
+						insert(t, '\n')
 					end
 				elseif type(key) == 'string' and key:find('^[a-zA-Z_][a-zA-Z0-9_]*$') then -- a = val
 					if indent then
-						tinsert(t, srep(indent, level + 1))
+						insert(t, rep(indent, level + 1))
 					end
-					tinsert(t, key)
-					tinsert(t, s_tab_equ) --' = '
-					tinsert(t, table_r(val, level + 1, indent))
-					tinsert(t, ',')
+					insert(t, key)
+					insert(t, s_tab_equ) --' = '
+					insert(t, table_r(val, level + 1, indent))
+					insert(t, ',')
 					if indent then
-						tinsert(t, '\n')
+						insert(t, '\n')
 					end
 				else -- [10010] = val -- ['.start with or contains special char'] = val
 					if indent then
-						tinsert(t, srep(indent, level + 1))
+						insert(t, rep(indent, level + 1))
 					end
-					tinsert(t, '[')
-					tinsert(t, table_r(key, level + 1, indent))
-					tinsert(t, ']')
-					tinsert(t, s_tab_equ) --' = '
-					tinsert(t, table_r(val, level + 1, indent))
-					tinsert(t, ',')
+					insert(t, '[')
+					insert(t, table_r(key, level + 1, indent))
+					insert(t, ']')
+					insert(t, s_tab_equ) --' = '
+					insert(t, table_r(val, level + 1, indent))
+					insert(t, ',')
 					if indent then
-						tinsert(t, '\n')
+						insert(t, '\n')
 					end
 				end
 				lastkey, lastval = key, val
@@ -141,18 +141,18 @@ local function table_r(var, level, indent)
 		until not key
 		if not empty(var) then
 			if indent then -- insert `}` with indent
-				tinsert(t, srep(indent, level))
+				insert(t, rep(indent, level))
 			else -- remove last comma when no indent
-				tremove(t)
+				remove(t)
 			end
 		end
-		tinsert(t, '}')
+		insert(t, '}')
 	else --if (szType == 'userdata') then
-		tinsert(t, '"')
-		tinsert(t, tostring(var))
-		tinsert(t, '"')
+		insert(t, '"')
+		insert(t, tostring(var))
+		insert(t, '"')
 	end
-	return tconcat(t)
+	return concat(t)
 end
 
 function var2str(var, indent, level)
@@ -184,7 +184,7 @@ function str2var(str, env)
 		if bdata then
 			datalist = {env.data}
 		else
-			tremove(datalist, 1)
+			remove(datalist, 1)
 		end
 	else
 		Log('[CALL ERROR]str2var("' .. str .. '"): \nERROR:' .. datalist[2])

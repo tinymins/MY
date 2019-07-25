@@ -41,9 +41,6 @@ if not LIB.AssertVersion('MYDev_VarWatch', _L['MYDev_VarWatch'], 0x2011800) then
 	return
 end
 local _C = {}
-local srep, tostring, string2byte = string.rep, tostring, string.byte
-local tconcat, tinsert, tremove = table.concat, table.insert, table.remove
-local type, next, print, pairs, ipairs = type, next, print, pairs, ipairs
 local DATA_PATH = {'config/dev_varwatch.jx3dat', PATH_TYPE.GLOBAL}
 _C.tVarList = LIB.LoadLUAData(DATA_PATH) or {}
 
@@ -52,45 +49,45 @@ local function var2str_x(var, indent, level) -- 只解析一层table且不解析方法
 		local t = {}
 		local szType = type(var)
 		if szType == 'nil' then
-			tinsert(t, 'nil')
+			insert(t, 'nil')
 		elseif szType == 'number' then
-			tinsert(t, tostring(var))
+			insert(t, tostring(var))
 		elseif szType == 'string' then
-			tinsert(t, string.format('%q', var))
+			insert(t, string.format('%q', var))
 		elseif szType == 'boolean' then
-			tinsert(t, tostring(var))
+			insert(t, tostring(var))
 		elseif szType == 'table' then
-			tinsert(t, '{')
+			insert(t, '{')
 			local s_tab_equ = ']='
 			if indent then
 				s_tab_equ = '] = '
 				if not IsEmpty(var) then
-					tinsert(t, '\n')
+					insert(t, '\n')
 				end
 			end
 			for key, val in pairs(var) do
 				if indent then
-					tinsert(t, srep(indent, level + 1))
+					insert(t, rep(indent, level + 1))
 				end
-				tinsert(t, '[')
-				tinsert(t, tostring(key))
-				tinsert(t, s_tab_equ) --'] = '
-				tinsert(t, tostring(val))
-				tinsert(t, ',')
+				insert(t, '[')
+				insert(t, tostring(key))
+				insert(t, s_tab_equ) --'] = '
+				insert(t, tostring(val))
+				insert(t, ',')
 				if indent then
-					tinsert(t, '\n')
+					insert(t, '\n')
 				end
 			end
 			if indent and not IsEmpty(var) then
-				tinsert(t, srep(indent, level))
+				insert(t, rep(indent, level))
 			end
-			tinsert(t, '}')
+			insert(t, '}')
 		else --if (szType == 'userdata') then
-			tinsert(t, '"')
-			tinsert(t, tostring(var))
-			tinsert(t, '"')
+			insert(t, '"')
+			insert(t, tostring(var))
+			insert(t, '"')
 		end
-		return tconcat(t)
+		return concat(t)
 	end
 	return table_r(var, level or 0, indent)
 end
@@ -144,7 +141,7 @@ LIB.RegisterPanel(
 						for k, v in pairs(t) do
 							t[k] = tostring(v)
 						end
-						tWndEditV[i]:text(tconcat(t, ', '))
+						tWndEditV[i]:text(concat(t, ', '))
 					else
 						tWndEditV[i]:text(var2str_x(LIB.GetGlobalValue(szKey)))
 					end

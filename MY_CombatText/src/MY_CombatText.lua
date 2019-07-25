@@ -36,6 +36,10 @@ local Call, XpCall, GetTraceback, RandomChild = LIB.Call, LIB.XpCall, LIB.GetTra
 local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
 local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
 -----------------------------------------------------------------------------------------------------------
+local SKILL_RESULT_TYPE = SKILL_RESULT_TYPE
+local GetSkill, Random = GetSkill, Random
+local Table_GetBuffName, Table_GetSkillName, Table_BuffIsVisible = Table_GetBuffName, Table_GetSkillName, Table_BuffIsVisible
+
 -- 战斗浮动文字设计思路
 --[[
 	停留时间：使用（总帧数 * 每帧时间）来决定总停留时间，
@@ -55,13 +59,6 @@ local _L = LIB.LoadLangPack(PACKET_INFO.ROOT .. 'MY_CombatText/lang/')
 if not LIB.AssertVersion('MY_CombatText', _L['MY_CombatText'], 0x2011800) then
 	return
 end
-local Table_GetBuffName, Table_GetSkillName, Table_BuffIsVisible = Table_GetBuffName, Table_GetSkillName, Table_BuffIsVisible
-local pairs, ipairs, unpack = pairs, ipairs, unpack
-local tinsert, tremove, tsort = table.insert, table.remove, table.sort
-local floor, ceil, min, max = math.floor, math.ceil, math.min, math.max
-local GetPlayer, GetNpc, IsPlayer = GetPlayer, GetNpc, IsPlayer
-local GetSkill, GetTime, Random = GetSkill, GetTime, Random
-local SKILL_RESULT_TYPE = SKILL_RESULT_TYPE
 
 local COMBAT_TEXT_INIFILE        = PACKET_INFO.ROOT .. 'MY_CombatText/ui/MY_CombatText_Render.ini'
 local COMBAT_TEXT_CONFIG         = PACKET_INFO.ROOT .. 'MY_CombatText/config.jx3dat'
@@ -482,7 +479,7 @@ function CombatText.OnFrameRender()
 	for k, v in pairs(COMBAT_TEXT_QUEUE) do
 		for kk, vv in pairs(v) do
 			if #vv > 0 then
-				local dat = tremove(vv, 1)
+				local dat = remove(vv, 1)
 				if dat.dat.szPoint == 'TOP' then
 					local nSort, szPoint = CombatText.GetTrajectory(dat.dat.dwTargetID)
 					dat.dat.nSort   = nSort
@@ -538,7 +535,7 @@ function CombatText.GetTrajectory(dwTargetID, bCriticalStrike)
 			end
 		end
 	end
-	tsort(tSort, TrajectorySort)
+	sort(tSort, TrajectorySort)
 	local nSort = tSort[1].nSort - 1
 	local szPoint = 'TOP'
 	if tSort[1].nCount == 1 then
@@ -579,7 +576,7 @@ function CombatText.CreateText(shadow, dwTargetID, szText, szPoint, nType, bCrit
 		COMBAT_TEXT_SHADOW[shadow] = dat
 	else
 		COMBAT_TEXT_QUEUE[szPoint][dwTargetID] = COMBAT_TEXT_QUEUE[szPoint][dwTargetID] or {}
-		tinsert(COMBAT_TEXT_QUEUE[szPoint][dwTargetID], { shadow = shadow, dat = dat })
+		insert(COMBAT_TEXT_QUEUE[szPoint][dwTargetID], { shadow = shadow, dat = dat })
 	end
 end
 
@@ -795,7 +792,7 @@ function CombatText.GetFreeShadow()
 		local sha = handle:AppendItemFromIni(COMBAT_TEXT_INIFILE, 'Shadow_Content')
 		sha:SetTriangleFan(GEOMETRY_TYPE.TEXT)
 		sha:ClearTriangleFanPoint()
-		tinsert(COMBAT_TEXT_FREE, sha)
+		insert(COMBAT_TEXT_FREE, sha)
 		return sha
 	end
 	Log('[MY] CombatText Get Free Item Failed!!!')
