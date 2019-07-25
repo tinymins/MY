@@ -2186,7 +2186,7 @@ end
 -- (self) Instance:pos(nLeft, nTop)
 function UI:pos(nLeft, nTop)
 	self:_checksum()
-	if nLeft or nTop then
+	if IsNumber(nLeft) or IsNumber(nTop) then
 		for _, raw in ipairs(self.raws) do
 			local nLeft, nTop = nLeft or raw:GetRelX(), nTop or raw:GetRelY()
 			raw:SetRelPos(nLeft, nTop)
@@ -2199,9 +2199,20 @@ function UI:pos(nLeft, nTop)
 		end
 		return self
 	else
+		local szType = 'TOPLEFT'
+		if IsString(nLeft) then
+			szType = nLeft
+		end
 		local raw = self.raws[1]
 		if raw and raw.GetRelPos then
-			return raw:GetRelPos()
+			local nX, nY = raw:GetRelPos()
+			if szType == 'TOPRIGHT' or szType == 'BOTTOMRIGHT' then
+				nX = nX + raw:GetW()
+			end
+			if szType == 'BOTTOMLEFT' or szType == 'BOTTOMRIGHT' then
+				nY = nY + raw:GetH()
+			end
+			return nX, nY
 		end
 	end
 end
@@ -2884,6 +2895,10 @@ function UI:image(szImage, nFrame)
 				if raw then
 					raw:FromUITex(szImage, nFrame)
 					raw:GetParent():FormatAllItemPos()
+				end
+				raw = GetComponentElement(raw, 'BOX')
+				if raw then
+					raw:SetExtentImage(szImage, nFrame)
 				end
 			end
 		elseif IsString(szImage) then

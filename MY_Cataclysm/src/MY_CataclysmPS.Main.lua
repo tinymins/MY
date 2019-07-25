@@ -269,7 +269,7 @@ function PS.OnPanelActive(frame)
 	-- 			MY_Cataclysm.GetFrame():UnRegisterEvent('RENDER_FRAME_UPDATE')
 	-- 		end
 	-- 	end
-	-- end, true):Pos_()
+	-- end, true, true):pos('BOTTOMRIGHT')
 	y = y + 25
 end
 LIB.RegisterPanel('MY_Cataclysm', _L['Cataclysm'], _L['Raid'], 'ui/Image/UICommon/RaidTotal.uitex|62', PS)
