@@ -409,4 +409,5 @@ data = {
 	['Stop'] = '結束',
 	['Refresh'] = '刷新',
 	['Reset'] = '重置',
+	['Recycle bin'] = '回收站',
 }
