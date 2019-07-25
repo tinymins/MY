@@ -2518,11 +2518,13 @@ local function GenerateMapInfo()
 		for _, map in ipairs({
 			{
 				dwID = -1,
+				dwMapID = -1,
 				szName = g_tStrings.CHANNEL_COMMON,
 				bDungeon = false,
 			},
 			{
 				dwID = -9,
+				dwMapID = -9,
 				szName = _L['Recycle bin'],
 				bDungeon = false,
 			},
