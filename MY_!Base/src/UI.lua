@@ -2042,7 +2042,7 @@ function UI:color(r, g, b)
 			if element then
 				return element:GetColorRGB()
 			end
-			element = GetComponentElement(raw, 'EDIT') or GetComponentElement(raw, 'TEXT')
+			element = --[[GetComponentElement(raw, 'EDIT') or ]]GetComponentElement(raw, 'TEXT')
 			if element then
 				return element:GetFontColor()
 			end
