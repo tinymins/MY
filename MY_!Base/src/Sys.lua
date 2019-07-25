@@ -1956,6 +1956,7 @@ local PRESETS = {
 		'OnEditSpecialKeyDown',
 		'OnCheckBoxCheck',
 		'OnCheckBoxUncheck',
+		'OnActivePage',
 	}),
 }
 function LIB.GeneGlobalNS(options)
