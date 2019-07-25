@@ -2540,23 +2540,53 @@ function LIB.IsInBattleField()
 	return me and me.GetScene().nType == MAP_TYPE.BATTLE_FIELD and not LIB.IsInArena()
 end
 
--- 判断一个地图是不是副本
--- (bool) LIB.IsDungeonMap(szMapName, bRaid)
--- (bool) LIB.IsDungeonMap(dwMapID, bRaid)
-do local MAP_LIST
-function LIB.IsDungeonMap(dwMapID, bRaid)
+do
+local MAP_LIST
+local function GenerateMapInfo()
 	if not MAP_LIST then
 		MAP_LIST = {}
+		for _, map in ipairs({
+			{
+				dwID = -1,
+				szName = g_tStrings.CHANNEL_COMMON,
+				bDungeon = false,
+			},
+			{
+				dwID = -9,
+				szName = _L['Recycle bin'],
+				bDungeon = false,
+			},
+		}) do
+			map = LIB.SetmetaReadonly(map)
+			MAP_LIST[map.szName] = map
+			MAP_LIST[map.dwMapID] = map
+		end
 		for _, dwMapID in ipairs(GetMapList()) do
-			local map          = { dwMapID = dwMapID }
-			local szName       = Table_GetMapName(dwMapID)
+			local map = {
+				dwID     = dwMapID,
+				dwMapID  = dwMapID,
+				szName   = Table_GetMapName(dwMapID),
+				bDungeon = false,
+			}
 			local tDungeonInfo = g_tTable.DungeonInfo:Search(dwMapID)
 			if tDungeonInfo and tDungeonInfo.dwClassID == 3 then
 				map.bDungeon = true
 			end
-			MAP_LIST[szName] = map
-			MAP_LIST[dwMapID] = map
+			map = LIB.SetmetaReadonly(map)
+			MAP_LIST[map.dwID] = map
+			MAP_LIST[map.szName] = map
 		end
+		MAP_LIST = LIB.SetmetaReadonly(MAP_LIST)
+	end
+	return MAP_LIST
+end
+
+-- 判断一个地图是不是副本
+-- (bool) LIB.IsDungeonMap(szMapName, bRaid)
+-- (bool) LIB.IsDungeonMap(dwMapID, bRaid)
+function LIB.IsDungeonMap(dwMapID, bRaid)
+	if not MAP_LIST then
+		GenerateMapInfo()
 	end
 	local map = MAP_LIST[dwMapID]
 	if map then
@@ -2570,6 +2600,32 @@ function LIB.IsDungeonMap(dwMapID, bRaid)
 		return select(2, GetMapParams(dwMapID)) == MAP_TYPE.DUNGEON
 	end
 end
+
+-- 获取一个地图的信息
+-- (table) LIB.GetMapInfo(dwMapID)
+-- (table) LIB.GetMapInfo(szMapName)
+function LIB.GetMapInfo(arg0)
+	if not MAP_LIST then
+		GenerateMapInfo()
+	end
+	local arg0 = tonumber(param) or arg0
+	if arg0 and CONSTANT.MAP_NAME_FIX[arg0] then
+		arg0 = CONSTANT.MAP_NAME_FIX[arg0]
+	end
+	return MAP_LIST[arg0]
+end
+end
+
+function LIB.GetMapNameList()
+	local aList, tMap = {}, {}
+	for k, v in ipairs_r(GetMapList()) do
+		local szName = Table_GetMapName(v)
+		if not tMap[szName] then
+			tMap[szName] = true
+			insert(aList, szName)
+		end
+	end
+	return aList
 end
 
 -- 判断一个地图是不是个人CD副本
@@ -2641,6 +2697,13 @@ end
 function LIB.IsInShieldedMap()
 	local me = GetClientPlayer()
 	return me and LIB.IsShieldedMap(me.GetMapID())
+end
+
+-- 获取主角当前所在地图
+-- (number) LIB.GetMapID(bool bFix) 是否做修正
+function LIB.GetMapID(bFix)
+	local dwMapID = GetClientPlayer().GetMapID()
+	return bFix and CONSTANT.MAP_NAME_FIX[dwMapID] or dwMapID
 end
 
 do local MARK_NAME = { _L['Cloud'], _L['Sword'], _L['Ax'], _L['Hook'], _L['Drum'], _L['Shear'], _L['Stick'], _L['Jade'], _L['Dart'], _L['Fan'] }

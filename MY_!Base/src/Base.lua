@@ -879,6 +879,15 @@ local CONSTANT = setmetatable({}, {
 			NACARAT = 5, -- 橙色
 			GLODEN  = 6, -- 暗金
 		}),
+		-- 相同名字的地图 全部指向同一个ID
+		MAP_NAME_FIX = {
+			[143] = 147,
+			[144] = 147,
+			[145] = 147,
+			[146] = 147,
+			[195] = 196,
+			[296] = 297,
+		},
 		EQUIPMENT_SUIT_COUNT = EQUIPMENT_SUIT_COUNT or 4,
 		INVENTORY_GUILD_BANK = INVENTORY_GUILD_BANK or INVENTORY_INDEX.TOTAL + 1, --帮会仓库界面虚拟一个背包位置
 		INVENTORY_GUILD_PAGE_SIZE = INVENTORY_GUILD_PAGE_SIZE or 100,
