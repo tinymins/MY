@@ -1980,6 +1980,8 @@ local PRESETS = {
 		'OnItemMouseEnter',
 		'OnItemMouseLeave',
 		'OnItemMouseWheel',
+		'OnItemLButtonDrag',
+		'OnItemLButtonDragEnd',
 		'OnLButtonDown',
 		'OnLButtonUp',
 		'OnLButtonClick',
