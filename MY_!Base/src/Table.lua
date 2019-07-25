@@ -11,7 +11,7 @@
 -- so caching them is worth the effort
 -----------------------------------------------------------------------------------------------------------
 local setmetatable = setmetatable
-local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
+local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local sub, len, format, rep = string.sub, string.len, string.format, string.rep
 local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
 local type, tonumber, tostring = type, tonumber, tostring
@@ -21,8 +21,8 @@ local pow, sqrt, sin, cos, tan, atan = math.pow, math.sqrt, math.sin, math.cos, 
 local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
 local pack, unpack = table.pack or function(...) return {...} end, table.unpack or unpack
 -- jx3 apis caching
-local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
-local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
+local wsub, wlen, wfind, wgsub = wstring.sub, wstring.len, wstring.find, StringReplaceW
+local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
 local LIB = MY
