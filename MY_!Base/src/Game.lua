@@ -861,37 +861,10 @@ end
 end
 
 do
-local ORDER = {
-	-- MT
-	10062, --[[ 铁牢 ]]
-	10243, --[[ 明尊 ]]
-	10389, --[[ 铁骨 ]]
-	10002, --[[ 少林 ]]
-	-- 治疗
-	10080, --[[ 云裳 ]]
-	10176, --[[ 补天 ]]
-	10028, --[[ 离经 ]]
-	10448, --[[ 相知 ]]
-	-- 内功
-	10225, --[[ 天罗 ]]
-	10081, --[[ 冰心 ]]
-	10175, --[[ 毒经 ]]
-	10242, --[[ 焚影 ]]
-	10014, --[[ 紫霞 ]]
-	10021, --[[ 花间 ]]
-	10003, --[[ 易经 ]]
-	10447, --[[ 莫问 ]]
-	-- 外功
-	10390, --[[ 分山 ]]
-	10224, --[[ 鲸鱼 ]]
-	10144, --[[ 问水 ]]
-	10145, --[[ 山居 ]]
-	10015, --[[ 剑纯 ]]
-	10026, --[[ 傲血 ]]
-	10268, --[[ 笑尘 ]]
-	10464, --[[ 霸刀 ]]
-	10533, --[[ 蓬莱 ]]
-}
+local ORDER = {}
+for i, p in ipairs(CONSTANT.KUNGFU_LIST) do
+	ORDER[p.dwID] = i
+end
 local KUNGFU_LIST
 function LIB.GetKungfuList()
 	if not KUNGFU_LIST then
@@ -902,16 +875,13 @@ function LIB.GetKungfuList()
 			end
 		end
 		sort(KUNGFU_LIST, function(p1, p2)
-			local i1, i2 = #ORDER + 1, #ORDER + 1
-			for i, v in ipairs(ORDER) do
-				if v == p1 then
-					i1 = i
-				end
-				if v == p2 then
-					i2 = i
-				end
+			if not ORDER[p2] then
+				return true
 			end
-			return i1 < i2
+			if not ORDER[p1] then
+				return false
+			end
+			return ORDER[p1] < ORDER[p2]
 		end)
 	end
 	return KUNGFU_LIST

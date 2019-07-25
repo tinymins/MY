@@ -888,6 +888,38 @@ local CONSTANT = setmetatable({}, {
 			[195] = 196,
 			[296] = 297,
 		},
+		-- skillid, uitex, frame
+		KUNGFU_LIST = {
+			-- MT
+			{ dwID = 10062, szUITex = 'ui/Image/icon/skill_tiance01.UITex',     nFrame = 0 }, -- 铁牢
+			{ dwID = 10243, szUITex = 'ui/Image/icon/mingjiao_taolu_7.UITex',   nFrame = 0 }, -- 明尊
+			{ dwID = 10389, szUITex = 'ui/Image/icon/Skill_CangY_33.UITex',     nFrame = 0 }, -- 铁骨
+			{ dwID = 10002, szUITex = 'ui/Image/icon/skill_shaolin14.UITex',    nFrame = 0 }, -- 少林
+			-- 治疗
+			{ dwID = 10080, szUITex = 'ui/Image/icon/skill_qixiu02.UITex',      nFrame = 0 }, -- 云裳
+			{ dwID = 10176, szUITex = 'ui/Image/icon/wudu_neigong_2.UITex',     nFrame = 0 }, -- 补天
+			{ dwID = 10028, szUITex = 'ui/Image/icon/skill_wanhua23.UITex',     nFrame = 0 }, -- 离经
+			{ dwID = 10448, szUITex = 'ui/Image/icon/skill_0514_23.UITex',      nFrame = 0 }, -- 相知
+			-- 内功
+			{ dwID = 10225, szUITex = 'ui/Image/icon/skill_tangm_20.UITex',     nFrame = 0 }, -- 天罗
+			{ dwID = 10081, szUITex = 'ui/Image/icon/skill_qixiu03.UITex',      nFrame = 0 }, -- 冰心
+			{ dwID = 10175, szUITex = 'ui/Image/icon/wudu_neigong_1.UITex',     nFrame = 0 }, -- 毒经
+			{ dwID = 10242, szUITex = 'ui/Image/icon/mingjiao_taolu_8.UITex',   nFrame = 0 }, -- 焚影
+			{ dwID = 10014, szUITex = 'ui/Image/icon/skill_chunyang21.UITex',   nFrame = 0 }, -- 紫霞
+			{ dwID = 10021, szUITex = 'ui/Image/icon/skill_wanhua17.UITex',     nFrame = 0 }, -- 花间
+			{ dwID = 10003, szUITex = 'ui/Image/icon/skill_shaolin10.UITex',    nFrame = 0 }, -- 易经
+			{ dwID = 10447, szUITex = 'ui/Image/icon/skill_0514_27.UITex',      nFrame = 0 }, -- 莫问
+			-- 外功
+			{ dwID = 10390, szUITex = 'ui/Image/icon/Skill_CangY_32.UITex',     nFrame = 0 }, -- 分山
+			{ dwID = 10224, szUITex = 'ui/Image/icon/skill_tangm_01.UITex',     nFrame = 0 }, -- 鲸鱼
+			{ dwID = 10144, szUITex = 'ui/Image/icon/cangjian_neigong_1.UITex', nFrame = 0 }, -- 问水
+			{ dwID = 10145, szUITex = 'ui/Image/icon/cangjian_neigong_2.UITex', nFrame = 0 }, -- 山居
+			{ dwID = 10015, szUITex = 'ui/Image/icon/skill_chunyang13.UITex',   nFrame = 0 }, -- 剑纯
+			{ dwID = 10026, szUITex = 'ui/Image/icon/skill_tiance02.UITex',     nFrame = 0 }, -- 傲雪
+			{ dwID = 10268, szUITex = 'ui/Image/icon/skill_GB_30.UITex',        nFrame = 0 }, -- 笑尘
+			{ dwID = 10464, szUITex = 'ui/Image/icon/daoj_16_8_25_16.UITex',    nFrame = 0 }, -- 霸刀
+			{ dwID = 10533, szUITex = '',                                       nFrame = 0 }, -- 蓬莱
+		},
 		EQUIPMENT_SUIT_COUNT = EQUIPMENT_SUIT_COUNT or 4,
 		INVENTORY_GUILD_BANK = INVENTORY_GUILD_BANK or INVENTORY_INDEX.TOTAL + 1, --帮会仓库界面虚拟一个背包位置
 		INVENTORY_GUILD_PAGE_SIZE = INVENTORY_GUILD_PAGE_SIZE or 100,
