@@ -420,6 +420,9 @@ local function InitComponent(raw, szType)
 		})
 	elseif szType == 'WndRadioBox' then
 		UI(raw):uievent('OnLButtonUp', function()
+			if not this:IsEnabled() then
+				return
+			end
 			local group = GetComponentProp(raw, 'group')
 			local p = raw:GetParent():GetFirstChild()
 			while p do
