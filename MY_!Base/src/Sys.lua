@@ -1314,15 +1314,15 @@ function LIB.FormatTimeCounter(nTime, szFormat)
 	local nMinute  = nMinutes % 60
 	local nSecond  = nSeconds % 60
 	if IsString(szFormat) then
-		szFormat = wgsub('%H', nHours)
-		szFormat = wgsub('%M', nMinutes)
-		szFormat = wgsub('%S', nSeconds)
-		szFormat = wgsub('%hh', format('%02d', nHours ))
-		szFormat = wgsub('%mm', format('%02d', nMinute))
-		szFormat = wgsub('%ss', format('%02d', nSecond))
-		szFormat = wgsub('%h', nHours)
-		szFormat = wgsub('%m', nMinute)
-		szFormat = wgsub('%s', nSecond)
+		szFormat = wgsub(szFormat, '%H', nHours)
+		szFormat = wgsub(szFormat, '%M', nMinutes)
+		szFormat = wgsub(szFormat, '%S', nSeconds)
+		szFormat = wgsub(szFormat, '%hh', format('%02d', nHours ))
+		szFormat = wgsub(szFormat, '%mm', format('%02d', nMinute))
+		szFormat = wgsub(szFormat, '%ss', format('%02d', nSecond))
+		szFormat = wgsub(szFormat, '%h', nHours)
+		szFormat = wgsub(szFormat, '%m', nMinute)
+		szFormat = wgsub(szFormat, '%s', nSecond)
 		return szFormat
 	end
 	if szFormat == 1 then -- M'ss" / s"
@@ -1365,19 +1365,19 @@ end
 --   %s    √Î÷”
 function LIB.FormatTime(nTimestamp, szFormat)
 	local t = TimeToDate(nTimestamp)
-	szFormat = wgsub('%yyyy', format('%04d', t.year  ))
-	szFormat = wgsub('%yy'  , format('%02d', t.year % 100))
-	szFormat = wgsub('%MM'  , format('%02d', t.month ))
-	szFormat = wgsub('%dd'  , format('%02d', t.day   ))
-	szFormat = wgsub('%hh'  , format('%02d', t.hour  ))
-	szFormat = wgsub('%mm'  , format('%02d', t.minute))
-	szFormat = wgsub('%ss'  , format('%02d', t.second))
-	szFormat = wgsub('%y', t.year  )
-	szFormat = wgsub('%M', t.month )
-	szFormat = wgsub('%d', t.day   )
-	szFormat = wgsub('%h', t.hour  )
-	szFormat = wgsub('%m', t.minute)
-	szFormat = wgsub('%s', t.second)
+	szFormat = wgsub(szFormat, '%yyyy', format('%04d', t.year  ))
+	szFormat = wgsub(szFormat, '%yy'  , format('%02d', t.year % 100))
+	szFormat = wgsub(szFormat, '%MM'  , format('%02d', t.month ))
+	szFormat = wgsub(szFormat, '%dd'  , format('%02d', t.day   ))
+	szFormat = wgsub(szFormat, '%hh'  , format('%02d', t.hour  ))
+	szFormat = wgsub(szFormat, '%mm'  , format('%02d', t.minute))
+	szFormat = wgsub(szFormat, '%ss'  , format('%02d', t.second))
+	szFormat = wgsub(szFormat, '%y', t.year  )
+	szFormat = wgsub(szFormat, '%M', t.month )
+	szFormat = wgsub(szFormat, '%d', t.day   )
+	szFormat = wgsub(szFormat, '%h', t.hour  )
+	szFormat = wgsub(szFormat, '%m', t.minute)
+	szFormat = wgsub(szFormat, '%s', t.second)
 	return szFormat
 end
 
