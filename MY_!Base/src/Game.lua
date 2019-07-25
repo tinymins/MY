@@ -1002,6 +1002,26 @@ function LIB.GetObject(arg0, arg1, arg2)
 	return p, info, b
 end
 
+-- 根据模板ID获取NPC真实名称
+local NPC_NAME_CACHE = {}
+function LIB.GetTemplateName(dwTemplateID)
+	local szName
+	if NPC_NAME_CACHE[dwTemplateID] then
+		szName = NPC_NAME_CACHE[dwTemplateID]
+	end
+	if not szName then
+		szName = Table_GetNpcTemplateName(dwTemplateID)
+		if szName then
+			szName = szName:gsub('^%s*(.-)%s*$', '%1')
+		end
+		NPC_NAME_CACHE[dwTemplateID] = szName or ''
+	end
+	if IsEmpty(szName) then
+		szName = nil
+	end
+	return szName
+end
+
 -- 获取指定对象的名字
 -- LIB.GetObjectName(obj, bRetID)
 -- (KObject) obj    要获取名字的对象
@@ -1022,10 +1042,7 @@ function LIB.GetObjectName(obj, eRetID)
 	elseif szType == 'NPC' then -- NPC
 		szType = 'N'
 		if IsEmpty(szName) then
-			szName = Table_GetNpcTemplateName(obj.dwTemplateID)
-			if szName then
-				szName = szName:gsub('^%s*(.-)%s*$', '%1')
-			end
+			szName = LIB.GetTemplateName(obj.dwTemplateID)
 		end
 		if obj.dwEmployer and obj.dwEmployer ~= 0 then
 			if LIB.Table_IsSimplePlayer(obj.dwTemplateID) then -- 长歌影子
