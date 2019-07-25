@@ -223,6 +223,32 @@ function LIB.OutputPlayerTip(dwID, Rect, szExtraXml)
 	OutputTip(concat(t), 345, Rect)
 end
 
+function LIB.OutputNpcTemplateTip(dwNpcTemplateID, Rect, szExtraXml)
+	local npc = GetNpcTemplate(dwNpcTemplateID)
+	if not npc then
+		return
+	end
+	local t = {}
+
+	-- 名字
+	local szName = LIB.GetTemplateName(dwNpcTemplateID) or dwNpcTemplateID
+	insert(t, GetFormatText(szName .. '\n', 80, 255, 255, 0))
+	-- 等级
+	if npc.nLevel - GetClientPlayer().nLevel > 10 then
+		insert(t, GetFormatText(g_tStrings.STR_PLAYER_H_UNKNOWN_LEVEL, 82))
+	else
+		insert(t, GetFormatText(FormatString(g_tStrings.STR_NPC_H_WHAT_LEVEL, npc.nLevel), 0))
+	end
+	-- 模版ID
+	insert(t, GetFormatText(FormatString(g_tStrings.TIP_TEMPLATE_ID_NPC_INTENSITY, npc.dwTemplateID, npc.nIntensity or 1), 101))
+	-- 自定义项
+	if szExtraXml then
+		insert(t, szExtraXml)
+	end
+	-- 格式化输出
+	OutputTip(concat(t), 345, Rect)
+end
+
 function LIB.OutputNpcTip(dwID, Rect, szExtraXml)
 	local npc = GetNpc(dwID)
 	if not npc then
