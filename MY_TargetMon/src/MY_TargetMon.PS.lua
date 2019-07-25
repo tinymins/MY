@@ -38,7 +38,7 @@ local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAD
 -----------------------------------------------------------------------------------------------------------
 
 local _L = LIB.LoadLangPack(PACKET_INFO.ROOT .. 'MY_TargetMon/lang/')
-if not LIB.AssertVersion('MY_TargetMon', _L['MY_TargetMon'], 0x2011800) then
+if not LIB.AssertVersion('MY_TargetMon', _L['MY_TargetMon'], 0x2013500) then
 	return
 end
 local C, D = {}, {
@@ -1155,7 +1155,7 @@ local function DrawControls(ui, OpenDetail)
 						'export/TargetMon/'
 							.. (bAsEmbedded and 'embedded/' or '')
 							.. '$name@$server@'
-							.. LIB.FormatTime('yyyyMMddhhmmss')
+							.. LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss')
 							.. (bAsEmbedded and '.$lang' or '')
 							.. '.jx3dat',
 						PATH_TYPE.GLOBAL,

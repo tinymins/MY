@@ -37,7 +37,7 @@ local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.G
 local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
 -----------------------------------------------------------------------------------------------------------
 local _L = LIB.LoadLangPack(PACKET_INFO.ROOT .. 'MY_Chat/lang/')
-if not LIB.AssertVersion('MY_ChatSwitch', _L['MY_ChatSwitch'], 0x2011800) then
+if not LIB.AssertVersion('MY_ChatSwitch', _L['MY_ChatSwitch'], 0x2013500) then
 	return
 end
 local INI_PATH = PACKET_INFO.ROOT .. 'MY_Chat/ui/MY_ChatSwitch.ini'
@@ -60,7 +60,7 @@ local function UpdateChannelDailyLimit(hRadio, bPlus)
 	local info = hRadio.info
 	local nChannel = info.channel
 	if nChannel then
-		local szDate = LIB.FormatTime('yyyyMMdd', GetCurrentTime() - CD_REFRESH_OFFSET)
+		local szDate = LIB.FormatTime(GetCurrentTime() - CD_REFRESH_OFFSET, '%yyyy%MM%dd')
 		if MY_ChatSwitch.tChannelCount.szDate ~= szDate then
 			MY_ChatSwitch.tChannelCount = {szDate = szDate}
 		end
@@ -184,16 +184,16 @@ local function OnWhisperCheck()
 			end,
 			fnMouseEnter = function()
 				local t = {}
-				local today = LIB.FormatTime('yyyyMMdd')
+				local today = LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd')
 				local r, g, b = GetMsgFontColor('MSG_WHISPER')
 				for _, v in ipairs(whisper[2]) do
 					if IsString(v) then
 						table.insert(t, v)
 					elseif IsTable(v) and IsString(v[1]) then
-						if today == LIB.FormatTime('yyyyMMdd', v[2]) then
-							table.insert(t, LIB.GetTimeLinkText({r = r, g = g, b = b, s = '[hh:mm:ss]'}, v[2]) .. v[1])
+						if today == LIB.FormatTime(v[2], '%yyyy%MM%dd') then
+							table.insert(t, LIB.GetTimeLinkText({r = r, g = g, b = b, s = '[%hh:%mm:%ss]'}, v[2]) .. v[1])
 						else
-							table.insert(t, LIB.GetTimeLinkText({r = r, g = g, b = b, s = '[M.dd.hh:mm:ss]'}, v[2]) .. v[1])
+							table.insert(t, LIB.GetTimeLinkText({r = r, g = g, b = b, s = '[%M.%dd.%hh:%mm:%ss]'}, v[2]) .. v[1])
 						end
 					end
 				end

@@ -194,7 +194,7 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTi
 			ui:append('Handle', { x = 10, y = (h - 90) / 2, w = w - 20, h = h, valign = 1, halign = 1, handlestyle = 3 }, true)
 				:append('Text', {
 					text = (szName == '' and _L['Anonymous'] or szName)
-						.. '\n' .. szSerendipity .. ' - ' .. LIB.FormatTime('hh:mm:ss', dwTime)
+						.. '\n' .. szSerendipity .. ' - ' .. LIB.FormatTime(dwTime, '%hh:%mm:%ss')
 						.. '\n' .. (szReporter == '' and '' or (szReporter .. _L[','])) .. _L['JX3 is pround of you!']
 						.. '\n' .. _L['Thanks for your kindness!'],
 					fontscale = 1.2,

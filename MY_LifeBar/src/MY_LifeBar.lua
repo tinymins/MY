@@ -37,7 +37,7 @@ local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.G
 local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
 -----------------------------------------------------------------------------------------------------------
 local _L = LIB.LoadLangPack(PACKET_INFO.ROOT .. 'MY_LifeBar/lang/')
-if not LIB.AssertVersion('MY_LifeBar', _L['MY_LifeBar'], 0x2012800) then
+if not LIB.AssertVersion('MY_LifeBar', _L['MY_LifeBar'], 0x2013500) then
 	return
 end
 
@@ -484,7 +484,7 @@ function CheckInvalidRect(dwType, dwID, me, object)
 				end
 				nPriority = nPriority + 100000
 				fTextScale = fTextScale * 1.15
-				szCountDown = tData.szText .. '_' .. LIB.FormatTimeCount(nSec >= 60 and 'M\'ss"' or 'ss"', min(nSec, 5999))
+				szCountDown = tData.szText .. '_' .. LIB.FormatTimeCounter(min(nSec, 5999), 1)
 				break
 			else
 				remove(aCountDown, 1)

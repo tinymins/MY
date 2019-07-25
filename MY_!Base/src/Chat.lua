@@ -111,7 +111,7 @@ function LIB.GetTimeLinkText(rgbfs, dwTime)
 	end
 	local handlerEntry = PACKET_INFO.NAME_SPACE .. '.ChatLinkEventHandlers'
 	return GetFormatText(
-		LIB.FormatTime(rgbfs.s or '[hh:mm.ss]', dwTime),
+		LIB.FormatTime(dwTime, rgbfs.s or '[%hh:%mm.%ss]'),
 		rgbfs.f, rgbfs.r, rgbfs.g, rgbfs.b, 82691,
 		'this.bMyChatRendered=true;this.OnItemLButtonDown='
 			.. handlerEntry .. '.OnCopyLClick;this.OnItemMButtonDown='

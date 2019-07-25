@@ -21,7 +21,7 @@ local pow, sqrt, sin, cos, tan, atan = math.pow, math.sqrt, math.sin, math.cos, 
 local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
 local pack, unpack = table.pack or function(...) return {...} end, table.unpack or unpack
 -- jx3 apis caching
-local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
+local wsub, wlen, wfind, wgsub = wstring.sub, wstring.len, wstring.find, wstring.replace
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
@@ -335,7 +335,7 @@ function LIB.FormatPath(oFilePath, tParams)
 	end
 	-- if exist $date then add date identity
 	if string.find(szFilePath, '%$date') then
-		szFilePath = szFilePath:gsub('%$date', tParams['date'] or LIB.FormatTime('yyyyMMdd', GetCurrentTime()))
+		szFilePath = szFilePath:gsub('%$date', tParams['date'] or LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd'))
 	end
 	-- if exist $server then add server identity
 	if string.find(szFilePath, '%$server') then
@@ -1296,45 +1296,88 @@ function LIB.RegisterAddonMenu(...)
 end
 
 -- 格式化计时时间
--- (string) LIB.FormatTimeCount(szFormat, nTime)
--- szFormat  格式化字符串 可选项H,M,S,hh,mm,ss,h,m,s
-function LIB.FormatTimeCount(szFormat, nTime)
-	local nSeconds = math.floor(nTime)
-	local nMinutes = math.floor(nSeconds / 60)
-	local nHours   = math.floor(nMinutes / 60)
+-- (string) LIB.FormatTimeCounter(nTime, szFormat)
+-- szFormat  格式化字符串 可选项：
+--   %H 总小时
+--   %M 总分钟
+--   %S 总秒数
+--   %h 小时数
+--   %m 分钟数
+--   %s 秒钟数
+--   %hh 小时数两位对齐
+--   %mm 分钟数两位对齐
+--   %ss 秒钟数两位对齐
+function LIB.FormatTimeCounter(nTime, szFormat)
+	local nSeconds = floor(nTime)
+	local nMinutes = floor(nSeconds / 60)
+	local nHours   = floor(nMinutes / 60)
 	local nMinute  = nMinutes % 60
 	local nSecond  = nSeconds % 60
-	szFormat = szFormat:gsub('H', nHours)
-	szFormat = szFormat:gsub('M', nMinutes)
-	szFormat = szFormat:gsub('S', nSeconds)
-	szFormat = szFormat:gsub('hh', string.format('%02d', nHours ))
-	szFormat = szFormat:gsub('mm', string.format('%02d', nMinute))
-	szFormat = szFormat:gsub('ss', string.format('%02d', nSecond))
-	szFormat = szFormat:gsub('h', nHours)
-	szFormat = szFormat:gsub('m', nMinute)
-	szFormat = szFormat:gsub('s', nSecond)
-	return szFormat
+	if IsString(szFormat) then
+		szFormat = wgsub('%H', nHours)
+		szFormat = wgsub('%M', nMinutes)
+		szFormat = wgsub('%S', nSeconds)
+		szFormat = wgsub('%hh', format('%02d', nHours ))
+		szFormat = wgsub('%mm', format('%02d', nMinute))
+		szFormat = wgsub('%ss', format('%02d', nSecond))
+		szFormat = wgsub('%h', nHours)
+		szFormat = wgsub('%m', nMinute)
+		szFormat = wgsub('%s', nSecond)
+		return szFormat
+	end
+	if szFormat == 1 then -- M'ss" / s"
+		if nMinutes > 0 then
+			return nMinutes .. '\'' .. format('%02d', nSecond) .. '"'
+		end
+		return nSeconds .. '"'
+	end
+	if szFormat == 2 or not szFormat then -- H:mm:ss / M:ss / s
+		local h, m, s = 'h', 'm', 's'
+		if nStyle == 2 then
+			h, m, s = g_tStrings.STR_TIME_HOUR, g_tStrings.STR_TIME_MINUTE, g_tStrings.STR_TIME_SECOND
+		end
+		if nHours > 0 then
+			return nHours .. h .. format('%02d', nMinute)  .. m .. format('%02d', nSecond) .. s
+		end
+		if nMinutes > 0 then
+			return nMinutes .. m .. format('%02d', nSecond) .. s
+		end
+		return nSeconds .. s
+	end
 end
 
 -- 格式化时间
--- (string) LIB.FormatTimeCount(szFormat[, nTimestamp])
--- szFormat   格式化字符串 可选项yyyy,yy,MM,dd,y,m,d,hh,mm,ss,h,m,s
+-- (string) LIB.FormatTime(nTimestamp, szFormat)
 -- nTimestamp UNIX时间戳
-function LIB.FormatTime(szFormat, nTimestamp)
-	local t = TimeToDate(nTimestamp or GetCurrentTime())
-	szFormat = szFormat:gsub('yyyy', string.format('%04d', t.year  ))
-	szFormat = szFormat:gsub('yy'  , string.format('%02d', t.year % 100))
-	szFormat = szFormat:gsub('MM'  , string.format('%02d', t.month ))
-	szFormat = szFormat:gsub('dd'  , string.format('%02d', t.day   ))
-	szFormat = szFormat:gsub('hh'  , string.format('%02d', t.hour  ))
-	szFormat = szFormat:gsub('mm'  , string.format('%02d', t.minute))
-	szFormat = szFormat:gsub('ss'  , string.format('%02d', t.second))
-	szFormat = szFormat:gsub('y', t.year  )
-	szFormat = szFormat:gsub('M', t.month )
-	szFormat = szFormat:gsub('d', t.day   )
-	szFormat = szFormat:gsub('h', t.hour  )
-	szFormat = szFormat:gsub('m', t.minute)
-	szFormat = szFormat:gsub('s', t.second)
+-- szFormat   格式化字符串
+--   %yyyy 年份四位对齐
+--   %yy   年份两位对齐
+--   %MM   月份两位对齐
+--   %dd   日期两位对齐
+--   %y    年份
+--   %m    月份
+--   %d    日期
+--   %hh   小时两位对齐
+--   %mm   分钟两位对齐
+--   %ss   秒钟两位对齐
+--   %h    小时
+--   %m    分钟
+--   %s    秒钟
+function LIB.FormatTime(nTimestamp, szFormat)
+	local t = TimeToDate(nTimestamp)
+	szFormat = wgsub('%yyyy', format('%04d', t.year  ))
+	szFormat = wgsub('%yy'  , format('%02d', t.year % 100))
+	szFormat = wgsub('%MM'  , format('%02d', t.month ))
+	szFormat = wgsub('%dd'  , format('%02d', t.day   ))
+	szFormat = wgsub('%hh'  , format('%02d', t.hour  ))
+	szFormat = wgsub('%mm'  , format('%02d', t.minute))
+	szFormat = wgsub('%ss'  , format('%02d', t.second))
+	szFormat = wgsub('%y', t.year  )
+	szFormat = wgsub('%M', t.month )
+	szFormat = wgsub('%d', t.day   )
+	szFormat = wgsub('%h', t.hour  )
+	szFormat = wgsub('%m', t.minute)
+	szFormat = wgsub('%s', t.second)
 	return szFormat
 end
 

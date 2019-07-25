@@ -78,9 +78,9 @@ local function onNewChatLine(h, i, szMsg, szChannel, dwTime, nR, nG, nB)
 		end
 		if MY_ChatCopy.bChatTime then
 			if MY_ChatCopy.eChatTime == 'HOUR_MIN_SEC' then
-				szTime = szTime .. LIB.GetTimeLinkText({r = nR, g = nG, b = nB, f = 10, s = '[hh:mm:ss]'}, dwTime)
+				szTime = szTime .. LIB.GetTimeLinkText({r = nR, g = nG, b = nB, f = 10, s = '[%hh:%mm:%ss]'}, dwTime)
 			else
-				szTime = szTime .. LIB.GetTimeLinkText({r = nR, g = nG, b = nB, f = 10, s = '[hh:mm]'}, dwTime)
+				szTime = szTime .. LIB.GetTimeLinkText({r = nR, g = nG, b = nB, f = 10, s = '[%hh:%mm]'}, dwTime)
 			end
 		end
 		-- insert timestrap text

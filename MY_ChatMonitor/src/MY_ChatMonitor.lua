@@ -52,7 +52,7 @@ local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAD
     }
 ]]
 local _L = LIB.LoadLangPack(PACKET_INFO.ROOT .. 'MY_ChatMonitor/lang/')
-if not LIB.AssertVersion('MY_ChatMonitor', _L['MY_ChatMonitor'], 0x2011800) then
+if not LIB.AssertVersion('MY_ChatMonitor', _L['MY_ChatMonitor'], 0x2013500) then
 	return
 end
 local D = {}
@@ -402,21 +402,21 @@ _C.OnPanelActive = function(wnd)
                     szOption = _L['timestrap format'], {
                         szOption = '[hh:mm:ss]',
                         fnAction = function()
-                            MY_ChatMonitor.szTimestrap = '[hh:mm:ss]'
+                            MY_ChatMonitor.szTimestrap = '[%hh:%mm:%ss]'
                         end,
                         bCheck = true, bMCheck = true,
-                        bChecked = MY_ChatMonitor.szTimestrap == '[hh:mm:ss]'
+                        bChecked = MY_ChatMonitor.szTimestrap == '[%hh:%mm:%ss]'
                     }, {
                         szOption = '[MM/dd hh:mm:ss]',
                         fnAction = function()
-                            MY_ChatMonitor.szTimestrap = '[MM/dd hh:mm:ss]'
+                            MY_ChatMonitor.szTimestrap = '[%MM/%dd %hh:%mm:%ss]'
                         end,
                         bCheck = true, bMCheck = true,
-                        bChecked = MY_ChatMonitor.szTimestrap == '[MM/dd hh:mm:ss]'
+                        bChecked = MY_ChatMonitor.szTimestrap == '[%MM/%dd %hh:%mm:%ss]'
                     }, {
                         szOption = _L['custom'],
                         fnAction = function()
-                            GetUserInput(_L['custom timestrap (eg:[yyyy/MM/dd_hh:mm:ss])'], function(szText)
+                            GetUserInput(_L['custom timestrap (eg:[%yyyy/%MM/%dd_%hh:%mm:%ss])'], function(szText)
                                 MY_ChatMonitor.szTimestrap = szText
                             end, nil, nil, nil, MY_ChatMonitor.szTimestrap)
                         end,

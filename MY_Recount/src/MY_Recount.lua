@@ -36,6 +36,11 @@ local Call, XpCall, GetTraceback, RandomChild = LIB.Call, LIB.XpCall, LIB.GetTra
 local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
 local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
 -----------------------------------------------------------------------------------------------------------
+local _L = LIB.LoadLangPack(PACKET_INFO.ROOT .. 'MY_Recount/lang/')
+if not LIB.AssertVersion('MY_Recount', _L['MY_Recount'], 0x2013500) then
+	return
+end
+
 local CHANNEL = { -- 统计类型
 	DPS  = 1, -- 输出统计
 	HPS  = 2, -- 治疗统计
@@ -82,7 +87,6 @@ local SZ_SKILL_RESULT = {
 	[SKILL_RESULT.CRITICAL] = g_tStrings.STR_CS_NAME      ,
 	[SKILL_RESULT.INSIGHT ] = g_tStrings.STR_MSG_INSIGHT  ,
 }
-local _L = LIB.LoadLangPack(PACKET_INFO.ROOT .. 'MY_Recount/lang/')
 local _C = {
 	szIniRoot   = PACKET_INFO.ROOT .. 'MY_Recount/ui/',
 	szIniFile   = PACKET_INFO.ROOT .. 'MY_Recount/ui/MY_Recount.ini',
@@ -339,7 +343,7 @@ function MY_Recount.UpdateUI(data)
 
 	-- 计算战斗时间
 	local nTimeCount = MY_Recount.Data.GeneFightTime(data, nil, MY_Recount.bSysTimeMode and SZ_CHANNEL_KEY[MY_Recount.nChannel])
-	local szTimeCount = LIB.FormatTimeCount('M:ss', nTimeCount)
+	local szTimeCount = LIB.FormatTimeCounter(nTimeCount, '%M:%ss')
 	if LIB.IsInArena() then
 		szTimeCount = LIB.GetFightTime('M:ss')
 	end
@@ -1360,7 +1364,7 @@ function MY_Recount.GetHistoryMenu()
 	for _, data in ipairs(MY_Recount.Data.Get()) do
 		if data.UUID and data.nTimeDuring then
 			local t1 = {
-				szOption = (data.szBossName or ''):gsub('#.*', '') .. ' (' .. LIB.FormatTimeCount('M:ss', data.nTimeDuring) .. ')',
+				szOption = (data.szBossName or ''):gsub('#.*', '') .. ' (' .. LIB.FormatTimeCounter(data.nTimeDuring, '%M:%ss') .. ')',
 				rgb = (data == DataDisplay and {255, 255, 0}) or nil,
 				fnAction = function()
 					MY_Recount.DisplayData(data)
@@ -1434,7 +1438,7 @@ function MY_Recount.GetPublishMenu()
 			.. _L['fight recount'] .. ' - '
 			.. frame:Lookup('Wnd_Title', 'Text_Title'):GetText()
 			.. ' ' .. ((DataDisplay.szBossName and ' - ' .. DataDisplay.szBossName) or '')
-			.. '(' .. LIB.FormatTimeCount('M:ss', DataDisplay.nTimeDuring) .. ')',
+			.. '(' .. LIB.FormatTimeCounter(DataDisplay.nTimeDuring, '%M:%ss') .. ')',
 			nil,
 			true
 		)
@@ -1526,7 +1530,7 @@ function MY_Recount.GetDetailMenu(frame)
 			.. _L['fight recount'] .. ' - '
 			.. frame:Lookup('', 'Text_Default'):GetText()
 			.. ' ' .. ((DataDisplay.szBossName and ' - ' .. DataDisplay.szBossName) or '')
-			.. '(' .. LIB.FormatTimeCount('M:ss', DataDisplay.nTimeDuring) .. ')',
+			.. '(' .. LIB.FormatTimeCounter(DataDisplay.nTimeDuring, '%M:%ss') .. ')',
 			nil,
 			true
 		)

@@ -40,7 +40,7 @@ local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAD
 ---------------------------------------------------------------------------------------------------
 local PATH_ROOT = PACKET_INFO.ROOT .. 'MY_GKP/'
 local _L = LIB.LoadLangPack(PATH_ROOT .. 'lang/')
-if not LIB.AssertVersion('MY_GKP', _L['MY_GKP'], 0x2011800) then
+if not LIB.AssertVersion('MY_GKP', _L['MY_GKP'], 0x2013500) then
 	return
 end
 
@@ -198,7 +198,7 @@ function _GKP.SaveData(bStorage)
 		local i = 0
 		repeat
 			szPath = 'userdata/gkp/'
-				.. LIB.FormatTime('yyyy-MM-dd-hh-mm-ss', MY_GKP('GKP_Time') or GetCurrentTime())
+				.. LIB.FormatTime(MY_GKP('GKP_Time') or GetCurrentTime(), '%yyyy-%MM-%dd-%hh-%mm-%ss')
 				.. (i == 0 and '' or ('-' .. i))
 				.. '_' .. MY_GKP('GKP_Map')
 				.. '.gkp'
@@ -238,7 +238,7 @@ function _GKP.UpdateTitle()
 	local nTime = MY_GKP('GKP_Time')
 	local szText = _L['GKP Golden Team Record']
 		.. (szMap ~= '' and (' - ' .. szMap) or '')
-		.. (nTime ~= 0 and (' - ' .. LIB.FormatTime('yyyy-MM-dd-hh-mm-ss', nTime)) or '')
+		.. (nTime ~= 0 and (' - ' .. LIB.FormatTime(nTime, '%yyyy-%MM-%dd-%hh-%mm-%ss')) or '')
 	txtTitle:SetText(szText)
 end
 

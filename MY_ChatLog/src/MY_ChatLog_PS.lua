@@ -144,7 +144,7 @@ span.emotion_44{width:21px; height: 21px; display: inline-block; background-imag
 </script>
 <div>
 <a style='color: #fff;margin: 0 10px'>]] .. GetClientPlayer().szName .. ' @ ' .. LIB.GetServer() ..
-' Exported at ' .. LIB.FormatTime('yyyyMMdd hh:mm:ss', GetCurrentTime()) .. '</a><hr />'
+' Exported at ' .. LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd %hh:%mm:%ss') .. '</a><hr />'
 
 	return szHeader
 end
@@ -263,7 +263,7 @@ function D.ExportConfirm()
 					end
 				end
 				D.Export(
-					LIB.FormatPath({'export/ChatLog/$name@$server@' .. LIB.FormatTime('yyyyMMddhhmmss') .. szSuffix, PATH_TYPE.ROLE}),
+					LIB.FormatPath({'export/ChatLog/$name@$server@' .. LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss') .. szSuffix, PATH_TYPE.ROLE}),
 					aChannels, 10,
 					function(title, progress)
 						OutputMessage('MSG_ANNOUNCE_YELLOW', _L('Exporting chatlog: %s, %.2f%%.', title, progress * 100))
@@ -349,7 +349,7 @@ function D.Export(szExportFile, aChannels, nPerSec, onProgress)
 			for i, rec in ipairs(data) do
 				local f = GetMsgFont(rec.szChannel)
 				local r, g, b = unpack(MSGTYPE_COLOR[rec.szChannel])
-				Log(szExportFile, convertXml2Html(LIB.GetTimeLinkText({r=r, g=g, b=b, f=f, s='[yyyy/MM/dd][hh:mm:ss]'}, rec.nTme)))
+				Log(szExportFile, convertXml2Html(LIB.GetTimeLinkText({r=r, g=g, b=b, f=f, s='[%yyyy/%MM/%dd][%hh:%mm:%ss]'}, rec.nTme)))
 				Log(szExportFile, convertXml2Html(rec.szMsg))
 			end
 			if onProgress then
