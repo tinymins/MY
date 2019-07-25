@@ -2894,14 +2894,14 @@ function UI:image(szImage, nFrame)
 		end
 		if IsString(szImage) and IsNumber(nFrame) then
 			for _, raw in ipairs(self.raws) do
-				raw = GetComponentElement(raw, 'IMAGE')
-				if raw then
-					raw:FromUITex(szImage, nFrame)
-					raw:GetParent():FormatAllItemPos()
+				local el = GetComponentElement(raw, 'IMAGE')
+				if el then
+					el:FromUITex(szImage, nFrame)
+					el:GetParent():FormatAllItemPos()
 				end
-				raw = GetComponentElement(raw, 'BOX')
-				if raw then
-					raw:SetExtentImage(szImage, nFrame)
+				el = GetComponentElement(raw, 'BOX')
+				if el then
+					el:SetExtentImage(szImage, nFrame)
 				end
 			end
 		elseif IsString(szImage) then
