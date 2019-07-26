@@ -793,7 +793,7 @@ function D.OutputTip(szType, data, rect)
 	elseif szType == 'NPC' then
 		LIB.OutputNpcTemplateTip(data.dwID, rect)
 	elseif szType == 'DOODAD' then
-		LIB.OutputDoodadTip(data.dwID, rect)
+		LIB.OutputDoodadTemplateTip(data.dwID, rect)
 	elseif szType == 'TALK' then
 		OutputTip(GetFormatText((data.szTarget or _L['Warning Box']) .. '\t', 41, 255, 255, 0) .. GetFormatText((D.GetMapName(data.dwMapID) or data.dwMapID) .. '\n', 41, 255, 255, 255) .. GetFormatText(data.szContent, 41, 255, 255, 255), 300, rect)
 	elseif szType == 'CHAT' then
