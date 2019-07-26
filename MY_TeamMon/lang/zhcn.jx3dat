@@ -1,5 +1,6 @@
 -- language data (zhcn) updated at 2015/02/23 10:11:27
 data = {
+	['MY_TeamMon'] = '团队监控',
 	-- MY_TeamMon_SA.lua --
 	['aim'] = '★速速集火★',
 	['Call Alert'] = '你被点名了',
