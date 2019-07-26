@@ -662,7 +662,7 @@ local function FormatDataStructure(data, struct, assign, metaSymbol)
 		else -- 默认值不是表 直接克隆数据
 			data = Clone(defaultData, true)
 		end
-		if bCoroutine then
+		if bCoroutine and coroutine then
 			coroutine.yield()
 		end
 	end

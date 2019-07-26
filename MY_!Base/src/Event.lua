@@ -578,7 +578,14 @@ function LIB.RegisterCoroutine(szKey, fnAction, fnCallback)
 			end
 			szKey = tostring(szKey)
 		end
-		COROUTINE_LIST[szKey] = { szID = szKey, coAction = coroutine.create(fnAction), fnCallback = fnCallback }
+		if not coroutine then
+			Call(fnAction)
+			if fnCallback then
+				Call(fnCallback)
+			end
+		else
+			COROUTINE_LIST[szKey] = { szID = szKey, coAction = coroutine.create(fnAction), fnCallback = fnCallback }
+		end
 	elseif fnAction == false then
 		COROUTINE_LIST[szKey] = nil
 	elseif szKey and COROUTINE_LIST[szKey] then
@@ -589,6 +596,9 @@ end
 local FPS_SLOW_TIME = 1000 / GLOBAL.GAME_FPS * 1.2
 local l_nLastBreatheTime = GetTime()
 local function onBreathe()
+	if not coroutine then
+		return
+	end
 	local nBeginTime, pCallback = GetTime()
 	if nBeginTime - l_nLastBreatheTime < FPS_SLOW_TIME then
 		while GetTime() - nBeginTime < COROUTINE_TIME and next(COROUTINE_LIST) do
@@ -626,6 +636,9 @@ LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '#COROUTINE', onBreathe)
 -- 不传参表示执行所有协程并清空协程队列
 -- 传参标志执行并清空指定ID的协程
 function LIB.FlushCoroutine(...)
+	if not coroutine then
+		return
+	end
 	if select('#', ...) == 0 then
 		local p = next(COROUTINE_LIST)
 		while p do
