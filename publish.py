@@ -43,6 +43,7 @@ def __compress(addon):
                 file_count = file_count + 1
                 squishy.write('Module "%d" "%s"\n' % (file_count, file_path))
     os.popen('lua "./!src-dist/tools/react/squish" --minify-level=full').read()
+    os.remove('squishy')
     # Modify dist file for loading modules
     with open('./%s/src.lua' % addon, 'r+') as src:
         content = src.read()
