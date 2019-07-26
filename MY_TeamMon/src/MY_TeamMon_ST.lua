@@ -40,7 +40,7 @@ local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAD
 local SplitString, TrimString, FormatTimeCounter = LIB.SplitString, LIB.TrimString, LIB.FormatTimeCounter
 
 local _L = LIB.LoadLangPack(PACKET_INFO.ROOT .. 'MY_TeamMon/lang/')
-if not LIB.AssertVersion('MY_TeamMon', _L['MY_TeamMon'], 0x2013500) then
+if not LIB.AssertVersion('MY_TeamMon_ST', _L['MY_TeamMon_ST'], 0x2013500) then
 	return
 end
 

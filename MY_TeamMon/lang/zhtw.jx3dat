@@ -1,6 +1,6 @@
 -- language data (zhtw) updated at 2015/02/23 10:11:27
 data = {
-	-- ScreenHead.lua --
+	-- MY_TeamMon_SA.lua --
 	['aim'] = '★速速集火★',
 	['Call Alert'] = '你被點名了',
 	['Draw School Color'] = '繪製門派顏色',
@@ -11,16 +11,19 @@ data = {
 	['While MP less than'] = '藍量低於',
 	['Manually add (One per line)'] = '手動添加BUFF名稱（每行一個）',
 	['Manually add Npc Name (One per line)'] = '手動添加Npc名稱（每行一個）',
-	-- PartyBuffList.lua --
-	['PartyBuffList'] = '重要BUFF列表',
+	-- MY_TeamMon_BL.lua --
+	['MY_TeamMon_BL'] = '自身BUFF列表',
+	-- MY_TeamMon_PBL.lua --
+	['MY_TeamMon_PBL'] = '團隊重要BUFF列表',
 	['Mouse Enter select'] = '滑鼠滑過選中目標',
-	-- LargeText.lua --
-	['LargeText'] = '特大文字',
+	-- MY_TeamMon_LT.lua --
+	['MY_TeamMon_LT'] = '特大文字',
 	['Font Scale'] = '字體縮放',
 	['Pause time'] = '停留時間',
 	['FadeIn time'] = '淡入時間',
 	['FadeOut time'] = '淡出時間',
-	['preview'] = '預覽',
+	['Preview'] = '預覽',
+	['PVE everyday, Xuanjing everyday!'] = '每天一個本，周周見玄晶！',
 	-- MY_TeamMon_UI.lua --
 	['Set Countdown Key'] = '設置倒計時唯一標識',
 	['Hold Countdown'] = '倒計時過圖不消失',
@@ -174,7 +177,8 @@ data = {
 	['please select interface path.'] = '請選擇interface目錄下的文件。',
 	['Data Conflict'] = '數據衝突',
 	['Data Conflict Please check.'] = '有數據衝突，請留意聊天框的提示。\n\t這種情況一般由於合併數據造成，請根據提示搜索相應ID，您會發現有多個相同的ID數據，但沒有區分其Level，請刪除相同的數據或者勾選區分Level，雖然衝突並不會影響插件正常工作，但由於插件的緩存機制，這可能導致插件抓取錯誤的緩存，從而致使衝突的監控不生效，如果您是數據作者請及時修改，並保持良好習慣，如果您是普通用戶不會修改可以選擇無視。',
-	-- ST.class.lua --
+	-- MY_TeamMon_ST.lua --
+	['MY_TeamMon_ST'] = '團隊計時',
 	['Countdown format Error'] = '倒計時格式錯誤',
 	['[%s] left over %d.'] = '【%s】 剩餘 %d 秒。',
 	['Countdown'] = '倒計時',
