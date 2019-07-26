@@ -76,17 +76,6 @@ for _, DAT_ROOT in ipairs({
 end
 end
 
-local CTM_BUFF_NGB_BASE, CTM_BUFF_NGB_CMD, CTM_BUFF_NGB_HEAL
-do
-local function LoadConfigData(szPath)
-	local szPath = PACKET_INFO.ROOT .. szPath
-	return LIB.LoadLUAData(szPath, { passphrase = PASSPHRASE }) or LIB.LoadLUAData(szPath) or {}
-end
-CTM_BUFF_NGB_BASE = LoadConfigData('MY_Resource/data/cataclysm/base/$lang.jx3dat')
-CTM_BUFF_NGB_CMD = LoadConfigData('MY_Resource/data/cataclysm/cmd/$lang.jx3dat')
-CTM_BUFF_NGB_HEAL = LoadConfigData('MY_Resource/data/cataclysm/heal/$lang.jx3dat')
-end
-
 local TEAM_VOTE_REQUEST = {}
 local BUFF_LIST = {}
 local GKP_RECORD_TOTAL = 0
@@ -126,15 +115,6 @@ local function InsertBuffListCache(aBuffList, szVia)
 end
 function D.UpdateBuffListCache()
 	BUFF_LIST = {}
-	if CFG.bBuffDataNangongbo then
-		InsertBuffListCache(CTM_BUFF_NGB_BASE, _L['From nangongbo base data'])
-		if CFG.bBuffDataNangongboCmd then
-			InsertBuffListCache(CTM_BUFF_NGB_CMD, _L['From nangongbo cmd data'])
-		end
-		if CFG.bBuffDataNangongboHeal then
-			InsertBuffListCache(CTM_BUFF_NGB_HEAL, _L['From nangongbo heal data'])
-		end
-	end
 	InsertBuffListCache(CFG.aBuffList, _L['From custom data'])
 	if CFG.bBuffPushToOfficial then
 		local aBuff = {}

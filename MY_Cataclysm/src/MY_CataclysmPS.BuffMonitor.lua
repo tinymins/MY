@@ -659,58 +659,6 @@ function PS.OnPanelActive(frame)
 		end,
 	}, true):autoWidth():width() + 5
 	y = y + 30
-
-	x = X
-	x = x + ui:append('WndCheckBox', {
-		x = x, y = y,
-		text = _L['Enable default data'], tip = _L['Default data TIP'],
-		tippostype = MY_TIP_POSTYPE.BOTTOM_TOP,
-		checked = CFG.bBuffDataNangongbo,
-		oncheck = function(bCheck)
-			CFG.bBuffDataNangongbo = bCheck
-			MY_Cataclysm.UpdateBuffListCache()
-			LIB.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
-		end,
-		autoenable = function() return MY_Resource and true end,
-	}, true):autoWidth():width() + 5
-	y = y + 30
-
-	x = X
-	x = x + ui:append('WndCheckBox', {
-		x = x, y = y,
-		text = _L['Cmd data'], tip = _L['Cmd data TIP'],
-		tippostype = MY_TIP_POSTYPE.BOTTOM_TOP,
-		checked = CFG.bBuffDataNangongboCmd,
-		oncheck = function(bCheck)
-			CFG.bBuffDataNangongboCmd = bCheck
-			MY_Cataclysm.UpdateBuffListCache()
-			LIB.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
-		end,
-		autoenable = function() return MY_Resource and CFG.bBuffDataNangongbo end,
-	}, true):autoWidth():width() + 5
-	x = x + ui:append('WndCheckBox', {
-		x = x, y = y,
-		text = _L['Heal data'], tip = _L['Heal data TIP'],
-		tippostype = MY_TIP_POSTYPE.BOTTOM_TOP,
-		checked = CFG.bBuffDataNangongboHeal,
-		oncheck = function(bCheck)
-			CFG.bBuffDataNangongboHeal = bCheck
-			MY_Cataclysm.UpdateBuffListCache()
-			LIB.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
-		end,
-		autoenable = function() return MY_Resource and CFG.bBuffDataNangongbo end,
-	}, true):autoWidth():width() + 5
-
-	x = X
-	y = y + 30
-	x = x + ui:append('WndButton2', {
-		x = x, y = y, w = 220,
-		text = _L['Feedback @nangongbo'],
-		onclick = function()
-			LIB.OpenBrowser('https://weibo.com/nangongbo')
-		end,
-	}, true):autoHeight():width()
-	y = y + 28
 end
 function PS.OnPanelDeactive()
 	l_list = nil

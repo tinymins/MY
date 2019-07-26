@@ -113,13 +113,6 @@ data = {
 	['Alpha: %d.'] = '透明度：%d。',
 	['More than %d meter'] = '%d尺以上',
 	['Alt Click Publish'] = '按住ALT点击快速发布到团队',
-	['Enable default data'] = '启用默认数据',
-	['Default data TIP'] = '含重要BUFF满足团员团长基本需求(需加载"资源包"子插件)',
-	['Cmd data'] = '指挥辅助',
-	['Cmd data TIP'] = '层数状态BUFF及罚款项等提醒(需加载"资源包"子插件)',
-	['Heal data'] = '治疗辅助',
-	['Heal data TIP'] = '大掉血及自身治疗BUFF提醒(需加载"资源包"子插件)',
-	['Feedback @nangongbo'] = '问题反馈 @剑网3南宫伯',
 	['Top'] = '上',
 	['Middle'] = '中',
 	['Bottom'] = '下',
@@ -153,9 +146,6 @@ data = {
 	['Delete'] = '删除',
 	['Delete [%s]?'] = '删除[%s]？',
 
-	['From nangongbo base data'] = '来自南宫伯基础数据',
-	['From nangongbo cmd data'] = '来自南宫伯指挥数据',
-	['From nangongbo heal data'] = '来自南宫伯治疗数据',
 	['From custom data'] = '来自用户自定义数据',
 
 	['Would you like to use MY cataclysm?'] = '是否使用茗伊团队面板？',
