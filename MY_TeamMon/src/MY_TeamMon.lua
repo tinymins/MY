@@ -1867,7 +1867,8 @@ function D.ConfirmShare()
 	end
 end
 
-function D.OnShare(nChannel, dwID, szName, data, bIsSelf)
+function D.OnShare(_, nChannel, dwID, szName, bIsSelf, ...)
+	local data = {...}
 	if not bIsSelf then
 		if (data[1] == 'CIRCLE' and type(Circle) ~= 'nil') or data[1] ~= 'CIRCLE' then
 			insert(MY_TM_SHARE_QUEUE, {
