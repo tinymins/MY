@@ -149,7 +149,7 @@ function D.OnFrameCreate()
 		local txt = this.hPageSet:Lookup('CheckBox_' .. v, 'Text_Page_' .. v)
 		txt:SetText(_L[v])
 		if v == 'CIRCLE' and type(Circle) == 'nil' then
-			this.hPageSet:Lookup('CheckBox_' .. v):Enable(false)
+			this.hPageSet:Lookup('CheckBox_' .. v):Hide()
 			txt:SetFontColor(192, 192, 192)
 		end
 	end
@@ -581,7 +581,7 @@ function D.OnItemRButtonClick()
 		insert(menu, { bDevide = true })
 		insert(menu, { szOption = _L['Share Data'], bDisable = not LIB.IsInParty(), fnAction = function()
 			if LIB.IsLeader() or LIB.IsDebugClient(true) then
-				LIB.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'MY_TM_SHARE', MY_TMUI_SELECT_TYPE, t.dwMapID, t)
+				LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TM_SHARE', MY_TMUI_SELECT_TYPE, t.dwMapID, t)
 				LIB.Topmsg(g_tStrings.STR_MAIL_SUCCEED)
 			else
 				return LIB.Alert(_L['You are not team leader.'])
