@@ -1018,7 +1018,7 @@ function UI:append(arg0, arg1, arg2)
 					szFile = sub(szFile, 0, -#szType - 2)
 					szComponet = szFile:gsub('$.*[/\\]', ''):gsub('^[^<>?]*[/\\]', ''):sub(0, -5)
 				else
-					szFile = PACKET_INFO.FRAMEWORK_ROOT .. 'ui\\' .. szFile .. '.ini'
+					szFile = PACKET_INFO.UICOMPONENT_ROOT .. szFile .. '.ini'
 				end
 				local frame = Wnd.OpenWindow(szFile, PACKET_INFO.NAME_SPACE .. '_TempWnd#' .. _nTempWndCount)
 				if not frame then
@@ -3895,11 +3895,11 @@ function  UI.CreateFrame(szName, opt)
 		opt.level = 'Normal'
 	end
 	-- calc ini file path
-	local szIniFile = PACKET_INFO.FRAMEWORK_ROOT .. 'ui\\WndFrame.ini'
+	local szIniFile = PACKET_INFO.UICOMPONENT_ROOT .. 'WndFrame.ini'
 	if opt.simple then
-		szIniFile = PACKET_INFO.FRAMEWORK_ROOT .. 'ui\\WndFrameSimple.ini'
+		szIniFile = PACKET_INFO.UICOMPONENT_ROOT .. 'WndFrameSimple.ini'
 	elseif opt.empty then
-		szIniFile = PACKET_INFO.FRAMEWORK_ROOT .. 'ui\\WndFrameEmpty.ini'
+		szIniFile = PACKET_INFO.UICOMPONENT_ROOT .. 'WndFrameEmpty.ini'
 	end
 
 	-- close and reopen exist frame
