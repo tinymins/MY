@@ -185,7 +185,7 @@ function D.OnFrameBreathe()
 			end
 		end
 	end
-	if not IsInUICustomMode() then
+	if not LIB.IsInCustomUIMode() then
 		this:SetMousePenetrable(not IsCtrlKeyDown())
 	else
 		this:SetMousePenetrable(false)
