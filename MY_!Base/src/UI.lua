@@ -303,7 +303,9 @@ local function InitComponent(raw, szType)
 	if szType == 'WndSliderBox' then
 		local scroll = raw:Lookup('WndNewScrollBar_Default')
 		SetComponentProp(raw, 'bShowPercentage', true)
-		SetComponentProp(raw, 'nOffset', 0)
+		SetComponentProp(raw, 'nSliderMin', 0)
+		SetComponentProp(raw, 'nSliderMax', 100)
+		SetComponentProp(raw, 'nSliderStepVal', 1)
 		SetComponentProp(raw, 'onChangeEvents', {})
 		SetComponentProp(raw, 'FormatText', function(value, bPercentage)
 			if bPercentage then
@@ -317,9 +319,13 @@ local function InitComponent(raw, szType)
 			this = raw
 			local nScrollPos = scroll:GetScrollPos()
 			local nStepCount = scroll:GetStepCount()
-			local nOffset = GetComponentProp(raw, 'nOffset')
-			local bShowPercentage = GetComponentProp(raw, 'bShowPercentage')
-			local nCurrentValue = bShowPercentage and (nScrollPos * 100 / nStepCount) or (nScrollPos + nOffset)
+			local nMin = GetComponentProp(raw, 'nSliderMin')
+			local nStepVal = GetComponentProp(raw, 'nSliderStepVal')
+			local nCurrentValue = nScrollPos * nStepVal + nMin
+			if GetComponentProp(raw, 'bShowPercentage') then
+				local nMax = GetComponentProp(raw, 'nSliderMax')
+				nCurrentValue = floor((nCurrentValue * 100 / nMax) * 100) / 100
+			end
 			local szText = GetComponentProp(raw, 'FormatText')(nCurrentValue, bShowPercentage)
 			raw:Lookup('', 'Text_Default'):SetText(szText)
 			if not bOnlyUI then
@@ -2812,14 +2818,19 @@ function UI:scroll(mixed)
 end
 
 -- (number, number) Instance:range()
--- (self) Instance:range(nMin, nMax)
-function UI:range(nMin, nMax)
+-- (self) Instance:range(nMin, nMax, nStep)
+function UI:range(nMin, nMax, nStep)
 	self:_checksum()
 	if IsNumber(nMin) and IsNumber(nMax) and nMax > nMin then
+		nStep = nStep or nMax - nMin
 		for _, raw in ipairs(self.raws) do
 			if GetComponentType(raw) == 'WndSliderBox' then
-				SetComponentProp(raw, 'nOffset', nMin)
-				GetComponentElement(raw, 'SLIDER'):SetStepCount(nMax - nMin)
+				SetComponentProp(raw, 'nSliderMin', nMin)
+				SetComponentProp(raw, 'nSliderMax', nMax)
+				SetComponentProp(raw, 'nSliderStep', nStep)
+				SetComponentProp(raw, 'nSliderStepVal', (nMax - nMin) / nStep)
+				SetComponentProp(raw, 'bShowPercentage', false)
+				GetComponentElement(raw, 'SLIDER'):SetStepCount(nStep)
 				GetComponentProp(raw, 'ResponseUpdateScroll')(true)
 			end
 		end
@@ -2827,8 +2838,8 @@ function UI:range(nMin, nMax)
 	else -- get
 		local raw = self.raws[1]
 		if raw and GetComponentType(raw) == 'WndSliderBox' then
-			nMin = GetComponentProp(raw, 'nOffset')
-			nMax = nMin + GetComponentElement(raw, 'SLIDER'):GetStepCount()
+			nMin = GetComponentProp(raw, 'nSliderMin')
+			nMax = GetComponentProp(raw, 'nSliderMax')
 			return nMin, nMax
 		end
 	end
@@ -2841,14 +2852,18 @@ function UI:value(nValue)
 	if nValue then
 		for _, raw in ipairs(self.raws) do
 			if GetComponentType(raw) == 'WndSliderBox' then
-				GetComponentElement(raw, 'SLIDER'):SetScrollPos(nValue - GetComponentProp(raw, 'nOffset'))
+				local nMin = GetComponentProp(raw, 'nSliderMin')
+				local nStepVal = GetComponentProp(raw, 'nSliderStepVal')
+				GetComponentElement(raw, 'SLIDER'):SetScrollPos((nValue - nMin) / nStepVal)
 			end
 		end
 		return self
 	else
 		local raw = self.raws[1]
 		if raw and GetComponentType(raw) == 'WndSliderBox' then
-			return GetComponentProp(raw, 'nOffset') + GetComponentElement(raw, 'SLIDER'):GetScrollPos()
+			local nMin = GetComponentProp(raw, 'nSliderMin')
+			local nStepVal = GetComponentProp(raw, 'nSliderStepVal')
+			return nMin + GetComponentElement(raw, 'SLIDER'):GetScrollPos() * nStepVal
 		end
 	end
 end
