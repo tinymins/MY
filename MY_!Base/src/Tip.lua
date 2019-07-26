@@ -301,6 +301,32 @@ function LIB.OutputNpcTip(dwID, Rect, szExtraXml)
 	OutputTip(concat(t), 345, Rect)
 end
 
+function LIB.OutputDoodadTemplateTip(dwTemplateID, Rect, szExtraXml)
+	local doodad = GetDoodadTemplate(dwTemplateID)
+	if not doodad then
+		return
+	end
+	local t = {}
+	-- 名字
+	local szName = doodad.szName ~= '' and doodad.szName or dwTemplateID
+	if doodad.nKind == DOODAD_KIND.CORPSE then
+		szName = szName .. g_tStrings.STR_DOODAD_CORPSE
+	end
+	insert(t, GetFormatText(szName .. '\n', 65))
+	insert(t, GetDoodadQuestTip(dwTemplateID))
+	-- 模版ID
+	insert(t, GetFormatText(FormatString(g_tStrings.TIP_TEMPLATE_ID, doodad.dwTemplateID), 101))
+	if IsCtrlKeyDown() then
+		insert(t, GetFormatText(FormatString(g_tStrings.TIP_REPRESENTID_ID, doodad.dwRepresentID), 102))
+	end
+	-- 自定义项
+	if szExtraXml then
+		insert(t, szExtraXml)
+	end
+	-- 格式化输出
+	OutputTip(concat(t), 300, Rect)
+end
+
 function LIB.OutputDoodadTip(dwDoodadID, Rect, szExtraXml)
 	local doodad = GetDoodad(dwDoodadID)
 	if not doodad then
