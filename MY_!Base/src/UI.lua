@@ -1894,9 +1894,9 @@ function UI:fadeTo(nTime, nOpacity, callback)
 				ui:show()
 				local nCurrentAlpha = fnCurrent(nStartAlpha, nOpacity, nTime, GetTime() - nStartTime)
 				ui:alpha(nCurrentAlpha)
-				-- --[[#DEBUG BEGIN]]
+				--[[#DEBUG BEGIN]]
 				-- LIB.Debug(format('%d %d %d %d\n', nStartAlpha, nOpacity, nCurrentAlpha, (nStartAlpha - nCurrentAlpha)*(nCurrentAlpha - nOpacity)), 'fade', DEBUG_LEVEL.LOG)
-				-- --[[#DEBUG END]]
+				--[[#DEBUG END]]
 				if (nStartAlpha - nCurrentAlpha)*(nCurrentAlpha - nOpacity) <= 0 then
 					ui:alpha(nOpacity)
 					Call(callback, ui)
@@ -1953,9 +1953,9 @@ function UI:slideTo(nTime, nHeight, callback)
 				ui:show()
 				local nCurrentValue = fnCurrent(nStartValue, nHeight, nTime, GetTime()-nStartTime)
 				ui:height(nCurrentValue)
-				-- --[[#DEBUG BEGIN]]
+				--[[#DEBUG BEGIN]]
 				-- LIB.Debug(format('%d %d %d %d\n', nStartValue, nHeight, nCurrentValue, (nStartValue - nCurrentValue)*(nCurrentValue - nHeight)), 'slide', DEBUG_LEVEL.LOG)
-				-- --[[#DEBUG END]]
+				--[[#DEBUG END]]
 				if (nStartValue - nCurrentValue)*(nCurrentValue - nHeight) <= 0 then
 					ui:height(nHeight):toggle( nHeight ~= 0 )
 					Call(callback)

@@ -239,19 +239,19 @@ function LIB.Ajax(settings)
 		-- bind callback function
 		wWebCef.OnWebLoadEnd = function()
 			-- local szUrl, szTitle, szContent = this:GetLocationURL(), this:GetLocationName(), this:GetDocument()
-			-- --[[#DEBUG BEGIN]]
+			--[[#DEBUG BEGIN]]
 			-- LIB.Debug({string.format('%s - %s', szTitle, szUrl)}, 'MYRRWC::OnDocumentComplete', DEBUG_LEVEL.LOG)
-			-- --[[#DEBUG END]]
+			--[[#DEBUG END]]
 			-- 注销超时处理时钟
 			LIB.DelayCall('MYRRWC_TO_' .. RequestID, false)
 			-- 成功回调函数
 			-- if settings.success then
-			-- --[[#DEBUG BEGIN]]local status, err = --[[#DEBUG END]]pcall_this(settings.context, settings.success, szContent, 200, settings)
-			-- --[[#DEBUG BEGIN]]
+			--[[#DEBUG BEGIN]]local status, err = --[[#DEBUG END]]pcall_this(settings.context, settings.success, szContent, 200, settings)
+			--[[#DEBUG BEGIN]]
 			-- 	if not status then
 			-- 		LIB.Debug({err}, 'MYRRWC::OnDocumentComplete::Callback', DEBUG_LEVEL.ERROR)
 			-- 	end
-			-- --[[#DEBUG END]]
+			--[[#DEBUG END]]
 			-- end
 			table.insert(MY_RRWC_FREE, RequestID)
 		end

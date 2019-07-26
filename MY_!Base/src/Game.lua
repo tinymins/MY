@@ -2085,9 +2085,9 @@ function LIB.GetBuff(KObject, dwID, nLevel, dwSkillSrcID)
 					return tProxy[buff.szKey]
 				end
 			end
-			-- --[[#DEBUG BEGIN]]
+			--[[#DEBUG BEGIN]]
 			-- LIB.Debug({'KObject do not have a function named GetBuffByOwner.'}, PACKET_INFO.NAME_SPACE .. '.GetBuff', DEBUG_LEVEL.ERROR)
-			-- --[[#DEBUG END]]
+			--[[#DEBUG END]]
 			-- return
 		end
 	else

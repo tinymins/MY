@@ -1209,9 +1209,9 @@ local function GetPlayerID()
 	local me = GetControlPlayer()
 	if me then
 		COMBAT_TEXT_PLAYERID = me.dwID
-		-- --[[#DEBUG BEGIN]]
+		--[[#DEBUG BEGIN]]
 		-- LIB.Debug('CombatText get player id ' .. me.dwID, DEBUG_LEVEL.LOG)
-		-- --[[#DEBUG END]]
+		--[[#DEBUG END]]
 	else
 		--[[#DEBUG BEGIN]]
 		LIB.Debug({'CombatText get player id failed!!! try again'}, DEBUG_LEVEL.ERROR)
