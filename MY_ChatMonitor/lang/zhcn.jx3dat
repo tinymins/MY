@@ -1,6 +1,7 @@
 -- language data (zhcn) updated at 2014-4-10 03:38:11
 data = {
     -- MY_ChatMonitor.lua
+    ['MY_ChatMonitor'] = '聊天监控',
     ['chat monitor'] = '聊天监控',
     ['waiting...'] = '等待中…',
     ['load preset'] = '加载预设',

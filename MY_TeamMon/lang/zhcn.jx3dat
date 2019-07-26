@@ -12,6 +12,8 @@ data = {
 	['While MP less than'] = '蓝量低于',
 	['Manually add (One per line)'] = '手动添加BUFF名称（每行一个）',
 	['Manually add Npc Name (One per line)'] = '手动添加Npc名称（每行一个）',
+	-- MY_TeamMon_CA.lua --
+	['MY_TeamMon_CA'] = '中央提醒',
 	-- MY_TeamMon_BL.lua --
 	['MY_TeamMon_BL'] = '自身BUFF列表',
 	-- MY_TeamMon_PBL.lua --

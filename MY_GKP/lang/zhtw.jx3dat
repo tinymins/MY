@@ -1,5 +1,6 @@
 -- language data (zhtw) updated at 2015/02/23 10:11:27
 data = {
+	['MY_GKP'] = '金團記錄',
 	-- GKP.lua --
 	['Set Force Color'] = '牌子按照職業顏色著色',
 	['select equip boss'] = '選擇散件老闆（右鍵可重選）',
@@ -17,7 +18,6 @@ data = {
 	['Pick up time limit exceeded, please try again.'] = '拾取時間超出限制，請再試一次。',
 	['No Pick up Object, may due to Network off - line'] = '沒有拾取對象，可能是掉線了。',
 	['Cannot distrubute items to Equipment Boss, may due to Equipment Boss is too far away or got dropline when looting.'] = '無法將物品分配給當前散件老闆，可能因為散件老闆不在線、距離太遠或者物品拾取時散件老闆掉線了。',
-
 
 	['LClick to distrubute all equipment to '] = '滑鼠左鍵點擊分配所有裝備給',
 	['Ctrl + LClick to distrubute all lootable items to '] = '按住Ctrl點擊滑鼠左鍵分配所有物品給',
