@@ -463,14 +463,24 @@ function CheckInvalidRect(dwType, dwID, me, object)
 		-- 倒计时/名字/帮会/称号部分
 		aCountDown, szCountDown = COUNTDOWN_CACHE[dwID], ''
 		while aCountDown and #aCountDown > 0 do
-			local tData, szText, nSec = aCountDown[1]
-			if tData.szType == 'BUFF' then
+			local tData, szText, nSec, fPer = aCountDown[1]
+			if tData.szType == 'BUFF' or tData.szType == 'DEBUFF' then
 				local KBuff = object.GetBuff(tData.dwBuffID, 0)
 				if KBuff then
 					nSec = (KBuff.GetEndTime() - GetLogicFrameCount()) / GLOBAL.GAME_FPS
 					szText = tData.szText
 				end
-			else
+			elseif tData.szType == 'CASTING' then
+				local nType, dwSkillID, dwSkillLevel, fCastPercent = object.GetSkillOTActionState()
+				if nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
+				or nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL then
+					fPer = fCastPercent
+					szText = tData.szText or LIB.GetSkillName(dwSkillID, dwSkillLevel)
+				end
+			elseif tData.szType == 'NPC' or tData.szType == 'DOODAD' then
+				nSec = 5999
+				szText = tData.szText or LIB.GetObjectName(object)
+			else --if tData.szType == 'TIME' then
 				if tData.nLogicFrame then
 					nSec = (tData.nLogicFrame - GetLogicFrameCount()) / GLOBAL.GAME_FPS
 				elseif tData.nTime then
@@ -478,13 +488,24 @@ function CheckInvalidRect(dwType, dwID, me, object)
 				end
 				szText = tData.szText
 			end
-			if nSec and nSec >= 0 and szText and szText ~= '' then
+			if nSec and nSec <= 0 then
+				nSec = nil
+			end
+			if fPer and fPer <= 0 then
+				fPer = nil
+			end
+			if (nSec or fPer) and szText and szText ~= '' then
 				if tData.tColor then
 					r, g, b = unpack(tData.tColor)
 				end
 				nPriority = nPriority + 100000
 				fTextScale = fTextScale * 1.15
-				szCountDown = tData.szText .. '_' .. LIB.FormatTimeCounter(min(nSec, 5999), 1)
+				if nSec then
+					szCountDown = LIB.FormatTimeCounter(min(nSec, 5999), 1)
+				else
+					szCountDown = floor(fPer * 100) .. '%'
+				end
+				szCountDown = szText .. '_' .. szCountDown
 				break
 			else
 				remove(aCountDown, 1)

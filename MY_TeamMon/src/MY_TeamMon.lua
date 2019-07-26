@@ -768,7 +768,7 @@ function D.OnBuff(dwCaster, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, d
 				end
 				-- 头顶报警
 				if O.bPushScreenHead and cfg.bScreenHead then
-					FireUIEvent('MY_LIFEBAR_COUNTDOWN', dwCaster, 'BUFF', data.dwID, {
+					FireUIEvent('MY_LIFEBAR_COUNTDOWN', dwCaster, szType, 'MY_TM_BUFF_' .. data.dwID, {
 						dwBuffID = data.dwID,
 						szText = szName,
 						col = data.col,
@@ -914,6 +914,10 @@ function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
 			end
 			-- 头顶报警
 			if O.bPushScreenHead and cfg.bScreenHead then
+				FireUIEvent('MY_LIFEBAR_COUNTDOWN', dwCaster, 'CASTING', 'MY_TM_CASTING_' .. data.dwID, {
+					szText = data.szName or szName,
+					col = data.col,
+				})
 				FireUIEvent('MY_TM_SA_CREATE', 'CASTING', dwCaster, { txt = data.szName or szName, col = data.col })
 			end
 			-- 全屏泛光
@@ -1012,7 +1016,12 @@ function D.OnNpcEvent(npc, bEnter)
 				if cfg.tMark then
 					D.SetTeamMark('NPC', cfg.tMark, npc.dwID, npc.dwTemplateID)
 				end
+				-- 头顶报警
 				if O.bPushScreenHead and cfg.bScreenHead then
+					FireUIEvent('MY_LIFEBAR_COUNTDOWN', npc.dwID, 'NPC', 'MY_TM_NPC_' .. npc.dwID, {
+						szText = data.szNote or data.szName,
+						col = data.col,
+					})
 					FireUIEvent('MY_TM_SA_CREATE', 'NPC', npc.dwID, { txt = data.szNote, col = data.col, szName = data.szName })
 				end
 			end
@@ -1136,7 +1145,12 @@ function D.OnDoodadEvent(doodad, bEnter)
 				return
 			end
 			if cfg then
+				-- 头顶报警
 				if O.bPushScreenHead and cfg.bScreenHead then
+					FireUIEvent('MY_LIFEBAR_COUNTDOWN', doodad.dwID, 'DOODAD', 'MY_TM_DOODAD_' .. doodad.dwID, {
+						szText = data.szNote or data.szName,
+						col = data.col,
+					})
 					FireUIEvent('MY_TM_SA_CREATE', 'DOODAD', doodad.dwID, { txt = data.szNote, col = data.col, szName = data.szName })
 				end
 			end
@@ -1280,7 +1294,13 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 				if O.bPushWhisperChannel and cfg.bWhisperChannel then
 					D.Talk(txt, tInfo.szName)
 				end
+				-- 头顶报警
 				if O.bPushScreenHead and cfg.bScreenHead then
+					FireUIEvent('MY_LIFEBAR_COUNTDOWN', tInfo.dwID, 'TIME', 'MY_TM_TIME_' .. tInfo.dwID, {
+						nTime = GetTime() + 5000,
+						szText = _L('%s Call Name', szNpcName or g_tStrings.SYSTEM),
+						col = data.col,
+					})
 					FireUIEvent('MY_TM_SA_CREATE', 'TIME', tInfo.dwID, { txt = _L('%s Call Name', szNpcName or g_tStrings.SYSTEM)})
 				end
 				if not LIB.IsShieldedVersion() and cfg.bSelect then
@@ -1290,7 +1310,13 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 				if O.bPushWhisperChannel and cfg.bWhisperChannel then
 					D.Talk(txt, true)
 				end
+				-- 头顶报警
 				if O.bPushScreenHead and cfg.bScreenHead then
+					FireUIEvent('MY_LIFEBAR_COUNTDOWN', dwNpcID or me.dwID, 'TIME', 'MY_TM_TIME_' .. (dwNpcID or me.dwID), {
+						nTime = GetTime() + 5000,
+						szText = txt,
+						col = data.col,
+					})
 					FireUIEvent('MY_TM_SA_CREATE', 'TIME', dwNpcID or me.dwID, { txt = txt })
 				end
 			end
@@ -1449,7 +1475,8 @@ function D.RegisterMessage(bEnable)
 			-- if not res then
 			-- 	return LIB.Sysmsg(err, DEBUG_LEVEL.WARNING)
 			-- end
-			D.OnCallMessage('CHAT', szMsg:gsub('\r', ''))
+			szMsg = szMsg:gsub('\r', '')
+			D.OnCallMessage('CHAT', szMsg)
 		end, { 'MSG_SYS' })
 	else
 		LIB.RegisterMsgMonitor('MY_TeamMon_MON')
