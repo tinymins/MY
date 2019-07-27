@@ -353,15 +353,16 @@ function LIB.FormatPath(oFilePath, tParams)
 end
 
 function LIB.GetRelativePath(oPath, oRoot)
-	local szPath = LIB.FormatPath(oPath)
-	local szRoot = LIB.FormatPath(oRoot)
+	local szPath = LIB.FormatPath(oPath):gsub('^%./', '')
+	local szRoot = LIB.FormatPath(oRoot):gsub('^%./', '')
 	local szRootPath = GetRootPath():gsub('\\', '/')
-	if wfind(szPath:lower(), szRootPath:lower()) == 1 then
-		szPath = szPath:sub(szRootPath:len() + 1)
+	if szPath:sub(2, 2) ~= ':' then
+		szPath = LIB.ConcatPath(szRootPath, szPath)
 	end
-	if wfind(szRoot:lower(), szRootPath:lower()) == 1 then
-		szRoot = szRoot:sub(szRootPath:len() + 1)
+	if szRoot:sub(2, 2) ~= ':' then
+		szRoot = LIB.ConcatPath(szRootPath, szRoot)
 	end
+	szRoot = szRoot:gsub('/$', '') .. '/'
 	if wfind(szPath:lower(), szRoot:lower()) ~= 1 then
 		return
 	end
