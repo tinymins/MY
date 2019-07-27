@@ -1,7 +1,15 @@
 Farme	Left	Top	Width	High	File
-0	226	0	32	32	D:\Program Files\_Game\Kingsoft\jx3_dev\bin\zhcn\interface\MY\!src-dist\UITex\MY.tga
+0	476	0	32	32	D:\Program Files\_Game\Kingsoft\jx3_dev\bin\zhcn\interface\MY\!src-dist\UITex\MY.tga
 1	0	0	224	63	D:\Program Files\_Game\Kingsoft\jx3_dev\bin\zhcn\interface\MY\!src-dist\UITex\选项卡1.tga
 2	0	65	224	63	D:\Program Files\_Game\Kingsoft\jx3_dev\bin\zhcn\interface\MY\!src-dist\UITex\选项卡2.tga
 3	0	130	224	63	D:\Program Files\_Game\Kingsoft\jx3_dev\bin\zhcn\interface\MY\!src-dist\UITex\选项卡3.tga
 4	0	195	224	63	D:\Program Files\_Game\Kingsoft\jx3_dev\bin\zhcn\interface\MY\!src-dist\UITex\选项卡4.tga
-5	226	34	16	16	D:\Program Files\_Game\Kingsoft\jx3_dev\bin\zhcn\interface\MY\!src-dist\UITex\Black.tga
+5	476	34	16	16	D:\Program Files\_Game\Kingsoft\jx3_dev\bin\zhcn\interface\MY\!src-dist\UITex\Black.tga
+6	226	84	104	26	C:\Users\root\Desktop\登录按钮1_0.TGA
+7	226	112	104	26	C:\Users\root\Desktop\登录按钮2_0.TGA
+8	332	84	104	26	C:\Users\root\Desktop\登录按钮3_0.tga
+9	332	112	104	26	C:\Users\root\Desktop\登录按钮4_0.tga
+10	226	0	123	40	C:\Users\root\Desktop\装饰按钮_中_1_0.tga
+11	226	42	123	40	C:\Users\root\Desktop\装饰按钮_中_2_0.tga
+12	351	0	123	40	C:\Users\root\Desktop\装饰按钮_中_3_0.tga
+13	351	42	123	40	C:\Users\root\Desktop\装饰按钮_中_4_0.tga
