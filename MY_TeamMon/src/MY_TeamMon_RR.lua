@@ -49,6 +49,7 @@ local INI_PATH = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_RR.ini'
 local MY_TM_DATA_ROOT = MY_TeamMon.MY_TM_DATA_ROOT
 local MY_TM_DATA_PASSPHRASE = '89g45ynbtldnsryu98rbny9ps7468hb6npyusiryuxoldg7lbn894bn678b496746'
 local RSS_DEFAULT = {{
+	szKey = 'DEFAULT',
 	szAuthor = _L['Default'],
 	szTitle = _L['Default monitor data'],
 	szURL = 'https://code.aliyun.com/tinymins/JX3_MY_DATA/raw/master/MY_TeamMon/',
@@ -205,6 +206,9 @@ function D.OnLButtonClick()
 	elseif name == 'Btn_RemoveUrl' then
 		if not RSS_SEL_INFO then
 			return MY.Topmsg(_L['Please select one dataset first!'])
+		end
+		if RSS_SEL_INFO.szKey == 'DEFAULT' then
+			return MY.Topmsg(_L['Default dataset cannot be removed!'])
 		end
 		LIB.Confirm(_L['Confirm?'], function()
 			local aRss = D.LoadRSSList()

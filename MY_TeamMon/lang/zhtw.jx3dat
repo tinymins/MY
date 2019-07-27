@@ -209,6 +209,7 @@ data = {
 	['Sync team'] = '同步團隊',
 	['Add url'] = '添加訂閱',
 	['Remove url'] = '刪除訂閱',
+	['Default dataset cannot be removed!'] = '默認數據不可刪除！',
 	-- Circle.lua --
 	['Team Channel'] = '團隊頻道',
 	['Whisper Channel'] = '密聊頻道',
