@@ -846,7 +846,11 @@ function D.OpenImportPanel(szDefault, szTitle, fnAction)
 	nX = ui:append('WndEditBox', { name = 'FilePtah', x = 25, y = nY, w = 450, h = 25, text = szTitle, enable = not szDefault }, true):pos('BOTTOMRIGHT')
 	nX, nY = ui:append('WndButton2', { x = nX + 5, y = nY, text = _L['Browse'], enable = not szDefault,
 		onclick = function()
-			local szFile = GetOpenFileName(_L['please select data file.'], 'JX3 File(*.jx3dat)\0*.jx3dat\0All Files(*.*)\0*.*\0\0')
+			local szFile = GetOpenFileName(
+				_L['please select data file.'],
+				'JX3 File(*.jx3dat)\0*.jx3dat\0All Files(*.*)\0*.*\0\0',
+				MY_TeamMon.MY_TM_DATA_ROOT
+			)
 			if szFile ~= '' and not szFile:lower():find('interface') then
 				LIB.Alert(_L['please select interface path.'])
 				ui:children('#FilePtah'):text('')
