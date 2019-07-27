@@ -116,9 +116,11 @@ end
 function D.DownloadData(info)
 	D.DownloadMeta(info.szURL, function(info)
 		local szUUID = 'Remote-' .. MD5(info.szURL)
-		local p = LoadLUAData(MY_TM_DATA_ROOT .. szUUID .. '.info.jx3dat')
-		if p and p.szVersion == info.szVersion then
-			return D.LoadConfigureFile(szUUID .. '.jx3dat', info)
+		local LUA_CONFIG = { passphrase = MY_TM_DATA_PASSPHRASE }
+		local p = LIB.LoadLUAData(MY_TM_DATA_ROOT .. szUUID .. '.meta.jx3dat', LUA_CONFIG)
+		if p and p.szVersion == info.szVersion
+		and IsLocalFileExist(MY_TM_DATA_ROOT .. szUUID .. '.mytm.jx3dat') then
+			return D.LoadConfigureFile(szUUID .. '.mytm.jx3dat', info)
 		end
 		if not RSS_DOWNLOADER and RSS_DOWNLOADER:IsValid() then
 			return LIB.Topmsg(_L['Downloader is not ready!'])
@@ -128,11 +130,11 @@ function D.DownloadData(info)
 		end
 		RSS_DOWNLOADER.bLock = true
 		RSS_DOWNLOADER.FromTextureFile = function(_, szPath)
-			local data = LIB.LoadLUAData(szPath, { passphrase = MY_TM_DATA_PASSPHRASE })
-			local szFile = szUUID .. '.jx3dat'
+			local data = LIB.LoadLUAData(szPath, LUA_CONFIG)
+			local szFile = szUUID .. '.mytm.jx3dat'
 			if data then
-				SaveLUAData(MY_TM_DATA_ROOT .. szUUID .. '.info.jx3dat', info)
-				LIB.SaveLUAData(MY_TM_DATA_ROOT .. szFile, data, { passphrase = MY_TM_DATA_PASSPHRASE })
+				LIB.SaveLUAData(MY_TM_DATA_ROOT .. szUUID .. '.meta.jx3dat', info, LUA_CONFIG)
+				LIB.SaveLUAData(MY_TM_DATA_ROOT .. szFile, data, LUA_CONFIG)
 				D.LoadConfigureFile(szFile, info)
 			else
 				LIB.Topmsg(_L('Decode %s failed!', info.szTitle))
