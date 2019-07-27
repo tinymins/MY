@@ -109,8 +109,6 @@ function D.LoadEmbeddedConfig(bCoroutine)
 		-- 自动生成内置加密数据
 		local DAT_ROOT = 'MY_Resource/data/targetmon/'
 		local SRC_ROOT = PACKET_INFO.ROOT .. '!src-dist/dat/' .. DAT_ROOT
-		local DST_ZHCN_ROOT = LIB.FormatPath({'userdata/TargetMon/', PATH_TYPE.GLOBAL}, {lang = 'zhcn'})
-		local DST_ZHTW_ROOT = LIB.FormatPath({'userdata/TargetMon/', PATH_TYPE.GLOBAL}, {lang = 'zhcn'})
 		for _, szFile in ipairs(CPath.GetFileList(SRC_ROOT)) do
 			LIB.Sysmsg(_L['Encrypt and compressing: '] .. DAT_ROOT .. szFile)
 			local uuid = szFile:sub(1, -13)
