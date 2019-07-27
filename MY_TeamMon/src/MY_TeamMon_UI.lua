@@ -159,10 +159,10 @@ function D.OnFrameCreate()
 		menu = function()
 			local menu = {}
 			insert(menu, { szOption = _L['Import Data (local)'], fnAction = function() D.OpenImportPanel() end }) -- 有传参 不要改
-			-- local szLang = select(3, GetVersion())
-			-- if szLang == 'zhcn' or szLang == 'zhtw' then
-			-- 	insert(menu, { szOption = _L['Import Data (web)'], fnAction = MY_TeamMon_RemoteRequest.TogglePanel })
-			-- end
+			local szLang = select(3, GetVersion())
+			if szLang == 'zhcn' or szLang == 'zhtw' then
+				insert(menu, { szOption = _L['Import Data (web)'], fnAction = MY_TeamMon_RR.OpenPanel })
+			end
 			insert(menu, { szOption = _L['Export Data'], fnAction = D.OpenExportPanel })
 			return menu
 		end,

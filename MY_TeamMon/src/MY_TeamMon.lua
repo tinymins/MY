@@ -1959,6 +1959,7 @@ local settings = {
 				SaveConfigureFile   = D.SaveConfigureFile,
 				LoadConfigureFile   = D.LoadConfigureFile,
 				Exchange            = D.Exchange         ,
+				MY_TM_DATA_ROOT     = MY_TM_DATA_ROOT    ,
 				MY_TM_TYPE          = MY_TM_TYPE         ,
 				MY_TM_SCRUTINY_TYPE = MY_TM_SCRUTINY_TYPE,
 			},
