@@ -839,7 +839,12 @@ function D.OpenImportPanel(szDefault, szTitle, fnAction)
 	local nX, nY = ui:append('Text', { x = 20, y = 50, text = _L['includes'], font = 27 }, true):pos('BOTTOMRIGHT')
 	nX = 20
 	for k, v in ipairs(MY_TMUI_TYPE) do
-		nX = ui:append('WndCheckBox', { name = v, x = nX + 5, y = nY, checked = true, text = _L[v] }, true):autoWidth():pos('BOTTOMRIGHT')
+		local u = ui:append('WndCheckBox', { name = v, x = nX + 5, y = nY, checked = true, text = _L[v] }, true)
+		if LIB.IsShieldedVersion() and v == 'CIRCLE' then
+			u:hide()
+		else
+			nX = u:autoWidth():pos('BOTTOMRIGHT')
+		end
 	end
 	nY = 110
 	nX, nY = ui:append('Text', { x = 20, y = nY, text = _L['File Name'], font = 27 }, true):pos('BOTTOMRIGHT')
@@ -918,7 +923,12 @@ function D.OpenExportPanel()
 	local nX, nY = ui:append('Text', { x = 20, y = 50, text = _L['includes'], font = 27 }, true):pos('BOTTOMRIGHT')
 	nX = 20
 	for k, v in ipairs(MY_TMUI_TYPE) do
-		nX = ui:append('WndCheckBox', { name = v, x = nX + 5, y = nY, checked = true, text = _L[v] }, true):autoWidth():pos('BOTTOMRIGHT')
+		local u = ui:append('WndCheckBox', { name = v, x = nX + 5, y = nY, checked = true, text = _L[v] }, true)
+		if LIB.IsShieldedVersion() and v == 'CIRCLE' then
+			u:hide()
+		else
+			nX = u:autoWidth():pos('BOTTOMRIGHT')
+		end
 	end
 	nY = 110
 	local szFileName = 'TM-' .. select(3, GetVersion()) .. FormatTime('-%Y%m%d_%H.%M', GetCurrentTime()) .. '.mytm.jx3dat'
