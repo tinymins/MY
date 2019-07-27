@@ -853,7 +853,7 @@ function D.OpenImportPanel(szDefault, szTitle, fnAction)
 		onclick = function()
 			local szFile = GetOpenFileName(
 				_L['please select data file.'],
-				'JX3 MYTM File(*.data.jx3dat)\0*.mytm.jx3dat\0JX3 File(*.jx3dat)\0*.jx3dat\0All Files(*.*)\0*.*\0\0',
+				'JX3DAT File(*.data.jx3dat)\0*.data.jx3dat\0JX3 File(*.jx3dat)\0*.jx3dat\0All Files(*.*)\0*.*\0\0',
 				MY_TeamMon.MY_TM_DATA_ROOT
 			)
 			if szFile ~= '' and not szFile:lower():find('interface') then
@@ -931,7 +931,7 @@ function D.OpenExportPanel()
 		end
 	end
 	nY = 110
-	local szFileName = 'TM-' .. select(3, GetVersion()) .. FormatTime('-%Y%m%d_%H.%M', GetCurrentTime()) .. '.mytm.jx3dat'
+	local szFileName = 'TM-' .. select(3, GetVersion()) .. FormatTime('-%Y%m%d_%H.%M', GetCurrentTime()) .. '.data.jx3dat'
 	nX, nY = ui:append('Text', { x = 20, y = nY, text = _L['File Name'], font = 27 }, true):pos('BOTTOMRIGHT')
 	nX, nY = ui:append('WndEditBox', {
 		x = 25, y = nY, w = 500, h = 25,

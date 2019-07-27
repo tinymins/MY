@@ -119,8 +119,8 @@ function D.DownloadData(info)
 		local LUA_CONFIG = { passphrase = MY_TM_DATA_PASSPHRASE }
 		local p = LIB.LoadLUAData(MY_TM_DATA_ROOT .. szUUID .. '.meta.jx3dat', LUA_CONFIG)
 		if p and p.szVersion == info.szVersion
-		and IsLocalFileExist(MY_TM_DATA_ROOT .. szUUID .. '.mytm.jx3dat') then
-			return D.LoadConfigureFile(szUUID .. '.mytm.jx3dat', info)
+		and IsLocalFileExist(MY_TM_DATA_ROOT .. szUUID .. '.data.jx3dat') then
+			return D.LoadConfigureFile(szUUID .. '.data.jx3dat', info)
 		end
 		if not RSS_DOWNLOADER and RSS_DOWNLOADER:IsValid() then
 			return LIB.Topmsg(_L['Downloader is not ready!'])
@@ -131,7 +131,7 @@ function D.DownloadData(info)
 		RSS_DOWNLOADER.bLock = true
 		RSS_DOWNLOADER.FromTextureFile = function(_, szPath)
 			local data = LIB.LoadLUAData(szPath, LUA_CONFIG)
-			local szFile = szUUID .. '.mytm.jx3dat'
+			local szFile = szUUID .. '.data.jx3dat'
 			if data then
 				LIB.SaveLUAData(MY_TM_DATA_ROOT .. szUUID .. '.meta.jx3dat', info, LUA_CONFIG)
 				LIB.SaveLUAData(MY_TM_DATA_ROOT .. szFile, data, LUA_CONFIG)
