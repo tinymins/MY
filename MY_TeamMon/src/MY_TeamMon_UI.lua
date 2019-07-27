@@ -948,7 +948,7 @@ function D.OpenExportPanel()
 			nType = 2
 		end,
 	}, true):autoWidth():pos('BOTTOMRIGHT')
-	ui:append('WndCheckBox', 'Format', { x = 20, y = nY + 50, text = _L['Format content'] })
+	ui:append('WndCheckBox', { name = 'Format', x = 20, y = nY + 50, text = _L['Format content'] })
 	ui:append('WndButton3', {
 		x = 285, y = nY + 30, text = g_tStrings.STR_HOTKEY_SURE,
 		onclick = function()

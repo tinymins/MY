@@ -1768,12 +1768,13 @@ function D.SaveConfigureFile(config)
 		-- Log(path, LIB.JsonEncode(data, config.bFormat), 'close')
 		-- SaveLUAData(path, LIB.JsonEncode(data, config.bFormat), nil, false)
 	else
-		local config = { passphrase = MY_TM_DATA_PASSPHRASE }
+		local option = { passphrase = MY_TM_DATA_PASSPHRASE }
 		if config.bFormat then
-			config.indent = '\t'
-			config.passphrase = false
+			option.indent = '\t'
+			option.crc = false
+			option.passphrase = false
 		end
-		LIB.SaveLUAData(path, data, config)
+		LIB.SaveLUAData(path, data, option)
 	end
 	LIB.GetAbsolutePath(path):gsub('/', '\\')
 	return root .. path
