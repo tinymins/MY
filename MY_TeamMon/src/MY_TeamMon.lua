@@ -47,6 +47,9 @@ if not LIB.AssertVersion('MY_TeamMon', _L['MY_TeamMon'], 0x2013500) then
 	return
 end
 
+local MY_TM_DATA_ROOT = LIB.FormatPath({'userdata/TeamMon/', PATH_TYPE.GLOBAL})
+local MY_TM_DATA_PASSPHRASE = '89g45ynbtldnsryu98rbny9ps7468hb6npyusiryuxoldg7lbn894bn678b496746'
+local MY_TM_DATA_EMBEDDED_ENCRYPTED = false
 local MY_TM_TYPE = {
 	OTHER           = 0,
 	BUFF_GET        = 1,
@@ -1531,6 +1534,25 @@ function D.Enable(bEnable, bFireUIEvent)
 end
 
 function D.Init()
+	if not MY_TM_DATA_EMBEDDED_ENCRYPTED then
+		-- 自动生成内置加密数据
+		local DAT_ROOT = 'MY_TeamMon/data/'
+		local SRC_ROOT = PACKET_INFO.ROOT .. '!src-dist/dat/' .. DAT_ROOT
+		for _, szFile in ipairs(CPath.GetFileList(SRC_ROOT)) do
+			LIB.Sysmsg(_L['Encrypt and compressing: '] .. DAT_ROOT .. szFile)
+			local uuid = szFile:sub(1, -13)
+			local lang = szFile:sub(-11, -8)
+			if lang == 'zhcn' or lang == 'zhtw' then
+				local data = LoadDataFromFile(SRC_ROOT .. szFile)
+				if IsEncodedData(data) then
+					data = DecodeData(data)
+				end
+				data = EncodeData(data, true, true)
+				SaveDataToFile(data, LIB.FormatPath({'userdata/TeamMon/' .. uuid .. '.jx3dat', PATH_TYPE.GLOBAL}, {lang = lang}), MY_TM_DATA_PASSPHRASE)
+			end
+		end
+		MY_TM_DATA_EMBEDDED_ENCRYPTED = true
+	end
 	D.LoadUserData()
 	Wnd.OpenWindow(MY_TM_INIFILE, 'MY_TeamMon')
 end
@@ -1659,19 +1681,15 @@ function D.LoadUserData()
 end
 
 function D.LoadConfigureFile(config)
-	local path = LIB.FormatPath({'userdata/TeamMon/' .. config.szFileName, PATH_TYPE.GLOBAL})
-	local szFullPath = config.bFullPath and config.szFileName or path
-	local szFilePath = path
-	if config.bFullPath then
-		local s, exp = szFullPath:lower():gsub('.*interface', '')
-		if exp > 0 then
-			szFilePath = 'interface' .. s
-		end
-	end
+	local szFullPath = config.szFileName:sub(2, 2) == ':'
+		and config.szFileName
+		or LIB.GetAbsolutePath(MY_TM_DATA_ROOT .. config.szFileName)
+	local szFilePath = LIB.GetRelativePath(szFullPath, {'', PATH_TYPE.NORMAL}) or szFullPath
 	if not IsFileExist(szFilePath) then
 		return false, 'the file does not exist'
 	end
-	local data = LoadLUAData(szFilePath)
+	local data = LIB.LoadLUAData(szFilePath, { passphrase = MY_TM_DATA_PASSPHRASE })
+		or LIB.LoadLUAData(szFilePath, { passphrase = false })
 	if not data then
 		return false, 'can not read data file.'
 	else
@@ -1743,14 +1761,19 @@ function D.SaveConfigureFile(config)
 		nTimeStamp = GetCurrentTime()
 	}
 	local root = GetRootPath():gsub('\\', '/')
-	local path = LIB.FormatPath({'userdata/TeamMon/' .. config.szFileName, PATH_TYPE.GLOBAL})
+	local path = MY_TM_DATA_ROOT .. config.szFileName
 	if config.bJson then
 		path = path .. '.json'
 		SaveDataToFile(LIB.JsonEncode(data, config.bFormat), path)
 		-- Log(path, LIB.JsonEncode(data, config.bFormat), 'close')
 		-- SaveLUAData(path, LIB.JsonEncode(data, config.bFormat), nil, false)
 	else
-		SaveLUAData(path, data, config.bFormat and '\t', false)
+		local config = { passphrase = MY_TM_DATA_PASSPHRASE }
+		if config.bFormat then
+			config.indent = '\t'
+			config.passphrase = false
+		end
+		LIB.SaveLUAData(path, data, config)
 	end
 	LIB.GetAbsolutePath(path):gsub('/', '\\')
 	return root .. path
