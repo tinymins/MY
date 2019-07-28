@@ -45,6 +45,7 @@ end
 
 local D = {}
 local O = {}
+local LANG = LIB.GetLang()
 local INI_PATH = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_RR.ini'
 local MY_TM_DATA_ROOT = MY_TeamMon.MY_TM_DATA_ROOT
 local MY_TM_DATA_PASSPHRASE = '89g45ynbtldnsryu98rbny9ps7468hb6npyusiryuxoldg7lbn894bn678b496746'
@@ -52,7 +53,9 @@ local RSS_DEFAULT = {{
 	szKey = 'DEFAULT',
 	szAuthor = _L['Default'],
 	szTitle = _L['Default monitor data'],
-	szURL = 'https://code.aliyun.com/tinymins/JX3_MY_DATA/raw/master/MY_TeamMon/',
+	szURL = 'https://code.aliyun.com/tinymins/JX3_MY_DATA/raw/master/MY_TeamMon/' .. LANG .. '/meta.json',
+	szDataUrl = './data.jx3dat',
+	szAbout = 'https://code.aliyun.com/tinymins/JX3_MY_DATA/blob/master/MY_TeamMon/README.md',
 }}
 local RSS_SEL_INFO, RSS_DOWNLOADER
 
@@ -76,29 +79,55 @@ function D.DownloadMeta(szURL, onSuccess, onError)
 	if not wfind(szURL, '.') and not wfind(szURL, '/') then
 		szURL = 'https://code.aliyun.com/'
 			.. szURL .. '/JX3_MY_DATA/raw/master/MY_TeamMon/'
+			.. LANG .. '/meta.json'
+		-- szURL = 'https://dev.tencent.com/u/'
+		-- 	.. szURL .. '/p/JX3_MY_DATA/git/raw/master/MY_TeamMon/'
+		-- 	.. LANG .. '/meta.json'
+		-- szURL = 'https://gitee.com/'
+		-- 	.. szURL .. '/JX3_MY_DATA/raw/master/MY_TeamMon/'
+		-- 	.. LANG .. '/meta.json'
 	end
 	LIB.Ajax({
-		url = LIB.ConcatPath(szURL, LIB.GetLang(), 'info.json'),
+		url = szURL,
 		success = function(szHTML)
 			local szJson = UTF8ToAnsi(szHTML)
 			local res = LIB.JsonDecode(szJson)
 			if not res then
 				return onError(_L['ERR: Info content is illegal!'])
 			end
+			local szDataURL = res.data_url or './data.jx3dat'
+			if szDataURL:sub(1, 2) == './' then
+				szDataURL = szDataURL:sub(3)
+				szDataURL = szURL:gsub('/[^/]*$', '/data.jx3dat')
+			end
 			local info = {
 				szURL = szURL,
+				szDataURL = szDataURL,
 				szKey = LIB.GetUUID(),
 				szAuthor = res.author or '',
 				szTitle = res.name or '',
 				szAbout = res.about or '',
 				szVersion = res.version or '',
 			}
+			local aRss = D.LoadRSSList()
+			for i, p in ipairs(aRss) do
+				if p.szURL == szURL then
+					if p.szKey then
+						info.szKey = p.szKey
+					end
+					aRss[i] = info
+				end
+			end
+			D.SaveRSSList(aRss)
 			onSuccess(info)
 		end,
 		error = function(html, status)
 			if status == 404 then
 				return onError(_L['ERR404: Rss is empty!'])
 			end
+			--[[DEBUG BEGIN]]
+			LIB.Debug('ERROR MY_TeamMon_RR Get Meta: ' .. status .. '\n' .. UTF8ToAnsi(html))
+			--[[DEBUG END]]
 			onError()
 		end,
 	})
@@ -141,7 +170,7 @@ function D.DownloadData(info)
 			end
 			RSS_DOWNLOADER.bLock = false
 		end
-		RSS_DOWNLOADER:FromRemoteFile(info.szURL .. LIB.GetLang() .. '/data.jx3dat')
+		RSS_DOWNLOADER:FromRemoteFile(info.szDataURL)
 	end, function(szErrmsg)
 		if szErrmsg then
 			LIB.Alert(szErrmsg)
@@ -190,13 +219,7 @@ function D.OnLButtonClick()
 		GetUserInput(_L['Please input rss address:'], function(szURL)
 			D.DownloadMeta(szURL, function(info)
 				local aRss = D.LoadRSSList()
-				insert(aRss, {
-					szAuthor = info.author or '',
-					szTitle = info.name or '',
-					szAbout = info.about or '',
-					szURL = szURL,
-					szKey = LIB.GetUUID(),
-				})
+				insert(aRss, info)
 				D.SaveRSSList(aRss)
 				D.UpdateList(frame)
 			end, function(szErrmsg)
