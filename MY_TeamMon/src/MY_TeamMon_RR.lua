@@ -77,6 +77,7 @@ end
 
 function D.SaveRSSList(aRss)
 	LIB.SaveLUAData({'userdata/MY_TeamMon_RSS.jx3dat', PATH_TYPE.GLOBAL}, aRss)
+	FireUIEvent('MY_TM_RR_RSS_UPDATE')
 end
 
 function D.DownloadMeta(info, onSuccess, onError)
@@ -142,6 +143,7 @@ function D.LoadConfigureFile(szFile, info)
 			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TeamMon_RR', 'LOAD', info.szTitle)
 		end
 		O.szLastKey = info.szKey
+		FireUIEvent('MY_TM_RR_RSS_UPDATE')
 	end)
 end
 
@@ -208,7 +210,14 @@ function D.OnFrameCreate()
 	this:Lookup('PageSet_Menu/Page_FileDownload', 'Text_Record_Break1'):SetText(_L['Author'])
 	this:Lookup('PageSet_Menu/Page_FileDownload', 'Text_Record_Break2'):SetText(_L['Title'])
 	D.UpdateList(this)
+	this:RegisterEvent('MY_TM_RR_RSS_UPDATE')
 	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
+end
+
+function D.OnEvent(event)
+	if event == 'MY_TM_RR_RSS_UPDATE' then
+		D.UpdateList(this)
+	end
 end
 
 function D.OnLButtonClick()
