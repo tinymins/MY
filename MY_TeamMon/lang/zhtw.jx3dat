@@ -201,6 +201,7 @@ data = {
 	['Last select'] = '上次選擇',
 	['Can update'] = '有更新',
 	['Download'] = '下載',
+	['Downloading...'] = '下載中...',
 	['You are not in the team.'] = '你不在隊伍中。',
 	['You are not team leader.'] = '你不是隊長，無法執行這個操作。',
 	['Confirm?'] = '確定執行這個操作？',

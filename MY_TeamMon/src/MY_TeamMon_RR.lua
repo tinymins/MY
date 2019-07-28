@@ -159,10 +159,10 @@ function D.DownloadData(info)
 		if not RSS_DOWNLOADER and RSS_DOWNLOADER:IsValid() then
 			return LIB.Topmsg(_L['Downloader is not ready!'])
 		end
-		if RSS_DOWNLOADER.bLock then
+		if RSS_DOWNLOADER.szDownloadingKey then
 			return LIB.Topmsg(_L['Dowloading in progress, please wait...'])
 		end
-		RSS_DOWNLOADER.bLock = true
+		RSS_DOWNLOADER.szDownloadingKey = info.szKey
 		RSS_DOWNLOADER.FromTextureFile = function(_, szPath)
 			local data = LIB.LoadLUAData(szPath, LUA_CONFIG)
 			local szFile = szUUID .. '.data.jx3dat'
@@ -173,9 +173,11 @@ function D.DownloadData(info)
 			else
 				LIB.Topmsg(_L('Decode %s failed!', info.szTitle))
 			end
-			RSS_DOWNLOADER.bLock = false
+			RSS_DOWNLOADER.szDownloadingKey = nil
+			FireUIEvent('MY_TM_RR_RSS_UPDATE')
 		end
 		RSS_DOWNLOADER:FromRemoteFile(info.szDataURL)
+		FireUIEvent('MY_TM_RR_RSS_UPDATE')
 	end, function(szErrmsg)
 		if szErrmsg then
 			LIB.Alert(szErrmsg)
@@ -196,7 +198,12 @@ function D.UpdateList(frame)
 		wnd:Lookup('', 'Text_Item_Title'):SetText(p.szTitle)
 		wnd:Lookup('Btn_Info'):SetVisible(not IsEmpty(p.szAbout))
 		wnd:Lookup('Btn_Info', 'Text_Info'):SetText(_L['See details'])
-		wnd:Lookup('Btn_Download', 'Text_Download'):SetText(p.szKey == O.szLastKey and _L['Last select'] or _L['Download'])
+		wnd:Lookup('Btn_Download', 'Text_Download'):SetText(
+			(RSS_DOWNLOADER and RSS_DOWNLOADER.szDownloadingKey == p.szKey and _L['Downloading...'])
+			or (p.szKey == O.szLastKey and _L['Last select'])
+			or _L['Download']
+		)
+		wnd:Lookup('Btn_Download'):Enable(not RSS_DOWNLOADER or RSS_DOWNLOADER.szDownloadingKey ~= p.szKey)
 		wnd.info = p
 	end
 	container:FormatAllContentPos()
