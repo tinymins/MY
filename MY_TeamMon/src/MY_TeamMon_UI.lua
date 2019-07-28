@@ -154,7 +154,7 @@ function D.OnFrameCreate()
 		end
 	end
 	ui:append('WndButton3', {
-		x = 835, y = 50, w = 150,
+		x = 840, y = 52, w = 140, h = 27,
 		text = g_tStrings.SYS_MENU,
 		menu = function()
 			local menu = {}
