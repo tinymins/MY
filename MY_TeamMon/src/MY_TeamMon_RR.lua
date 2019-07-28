@@ -61,6 +61,15 @@ local RSS_DEFAULT = {{
 	szDataUrl = './data.jx3dat',
 	szAbout = 'https://code.aliyun.com/tinymins/JX3_MY_DATA/blob/master/MY_TeamMon/README.md',
 }}
+local RSS_TEMPLATE = {
+	szURL = '',
+	szDataURL = './data.jx3dat',
+	szKey = '',
+	szAuthor = '',
+	szTitle = '',
+	szAbout = '',
+	szVersion = '',
+}
 local RSS_SEL_INFO, RSS_DOWNLOADER
 
 function D.OpenPanel()
@@ -78,6 +87,17 @@ end
 function D.SaveRSSList(aRss)
 	LIB.SaveLUAData({'userdata/MY_TeamMon_RSS.jx3dat', PATH_TYPE.GLOBAL}, aRss)
 	FireUIEvent('MY_TM_RR_RSS_UPDATE')
+end
+
+function D.AddRSSInfo(info)
+	local aRss = D.LoadRSSList()
+	for _, p in spairs(RSS_DEFAULT, aRss) do
+		if p.szURL == info.szURL then
+			return
+		end
+	end
+	insert(aRss, info)
+	D.SaveRSSList(aRss)
 end
 
 function D.DownloadMeta(info, onSuccess, onError)
@@ -237,9 +257,7 @@ function D.OnLButtonClick()
 	elseif name == 'Btn_AddUrl' then
 		GetUserInput(_L['Please input rss address:'], function(szURL)
 			D.DownloadMeta({ szURL = szURL }, function(info)
-				local aRss = D.LoadRSSList()
-				insert(aRss, info)
-				D.SaveRSSList(aRss)
+				D.AddRSSInfo(info)
 				D.UpdateList(frame)
 			end, function(szErrmsg)
 				if szErrmsg then
@@ -301,9 +319,13 @@ end
 
 LIB.RegisterBgMsg('MY_TeamMon_RR', function(_, _, _, szTalker, _, action, info)
 	if action == 'SYNC' then
-		LIB.Confirm(_L('%s request download: %s', szTalker, info.szTitle .. ' - ' .. info.szAuthor), function()
-			D.DownloadData(info)
-		end)
+		info = LIB.FormatDataStructure(info, RSS_TEMPLATE)
+		if not IsEmpty(info.szURL) and not IsEmpty(info.szTitle) then
+			LIB.Confirm(_L('%s request download: %s', szTalker, info.szTitle .. ' - ' .. info.szAuthor), function()
+				D.AddRSSInfo(info)
+				D.DownloadData(info)
+			end)
+		end
 	elseif action == 'LOAD' then
 		LIB.Sysmsg(_L('%s loaded %s', szTalker, info))
 	end
