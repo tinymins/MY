@@ -44,7 +44,11 @@ if not LIB.AssertVersion('MY_TeamMon', _L['MY_TeamMon'], 0x2013500) then
 end
 
 local D = {}
-local O = {}
+local O = {
+	szLastKey = '',
+}
+RegisterCustomData('Global/MY_TeamMon_RR.szLastKey')
+
 local LANG = LIB.GetLang()
 local INI_PATH = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_RR.ini'
 local MY_TM_DATA_ROOT = MY_TeamMon.MY_TM_DATA_ROOT
@@ -75,7 +79,8 @@ function D.SaveRSSList(aRss)
 	LIB.SaveLUAData({'userdata/MY_TeamMon_RSS.jx3dat', PATH_TYPE.GLOBAL}, aRss)
 end
 
-function D.DownloadMeta(szURL, onSuccess, onError)
+function D.DownloadMeta(info, onSuccess, onError)
+	local szURL = info.szURL
 	if not wfind(szURL, '.') and not wfind(szURL, '/') then
 		szURL = 'https://code.aliyun.com/'
 			.. szURL .. '/JX3_MY_DATA/raw/master/MY_TeamMon/'
@@ -103,7 +108,7 @@ function D.DownloadMeta(szURL, onSuccess, onError)
 			local info = {
 				szURL = szURL,
 				szDataURL = szDataURL,
-				szKey = LIB.GetUUID(),
+				szKey = info.szKey or LIB.GetUUID(),
 				szAuthor = res.author or '',
 				szTitle = res.name or '',
 				szAbout = res.about or '',
@@ -111,10 +116,7 @@ function D.DownloadMeta(szURL, onSuccess, onError)
 			}
 			local aRss = D.LoadRSSList()
 			for i, p in ipairs(aRss) do
-				if p.szURL == szURL then
-					if p.szKey then
-						info.szKey = p.szKey
-					end
+				if p.szKey == info.szKey then
 					aRss[i] = info
 				end
 			end
@@ -139,11 +141,12 @@ function D.LoadConfigureFile(szFile, info)
 		if me.IsInParty() then
 			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TeamMon_RR', 'LOAD', info.szTitle)
 		end
+		O.szLastKey = info.szKey
 	end)
 end
 
 function D.DownloadData(info)
-	D.DownloadMeta(info.szURL, function(info)
+	D.DownloadMeta(info, function(info)
 		local szUUID = 'Remote-' .. MD5(info.szURL)
 		local LUA_CONFIG = { passphrase = MY_TM_DATA_PASSPHRASE }
 		local p = LIB.LoadLUAData(MY_TM_DATA_ROOT .. szUUID .. '.meta.jx3dat', LUA_CONFIG)
@@ -191,7 +194,7 @@ function D.UpdateList(frame)
 		wnd:Lookup('', 'Text_Item_Title'):SetText(p.szTitle)
 		wnd:Lookup('Btn_Info'):SetVisible(not IsEmpty(p.szAbout))
 		wnd:Lookup('Btn_Info', 'Text_Info'):SetText(_L['See details'])
-		wnd:Lookup('Btn_Download', 'Text_Download'):SetText(_L['Download'])
+		wnd:Lookup('Btn_Download', 'Text_Download'):SetText(p.szKey == O.szLastKey and _L['Last select'] or _L['Download'])
 		wnd.info = p
 	end
 	container:FormatAllContentPos()
@@ -217,7 +220,7 @@ function D.OnLButtonClick()
 		D.DownloadData(this:GetParent().info)
 	elseif name == 'Btn_AddUrl' then
 		GetUserInput(_L['Please input rss address:'], function(szURL)
-			D.DownloadMeta(szURL, function(info)
+			D.DownloadMeta({ szURL = szURL }, function(info)
 				local aRss = D.LoadRSSList()
 				insert(aRss, info)
 				D.SaveRSSList(aRss)
@@ -305,6 +308,20 @@ local settings = {
 				IsOpened        = D.GetFrame,
 				TogglePanel     = D.TogglePanel,
 			},
+		},
+		{
+			fields = {
+				szLastKey = true,
+			},
+			root = O,
+		},
+	},
+	imports = {
+		{
+			fields = {
+				szLastKey = true,
+			},
+			root = O,
 		},
 	},
 }
