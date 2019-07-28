@@ -112,14 +112,14 @@ local function onBreathe()
 	local tar = LIB.GetObject(dwTarType, dwTarID)
 	if O.bTargetFace and tar then
 		DrawShape(tar, C.shaTargetFace, O.nSectorDegree, O.nSectorRadius, O.nSectorAlpha, O.tTargetFaceColor)
-	else
+	elseif C.shaTargetFace and C.shaTargetFace:IsValid() then
 		C.shaTargetFace:Hide()
 	end
 	-- foot shape
 	if C.bReRender then
 		if O.bTargetShape and tar then
 			DrawShape(tar, C.shaTargetShape, 360, O.nShapeRadius / 2, O.nShapeAlpha, O.tTargetShapeColor)
-		else
+		elseif C.shaTargetShape and C.shaTargetShape:IsValid() then
 			C.shaTargetShape:Hide()
 		end
 	end
@@ -129,14 +129,14 @@ local function onBreathe()
 	local bIsTarget = tar and dwTarID == dwTTarID
 	if O.bTTargetFace and ttar and (not O.bTargetFace or not bIsTarget) then
 		DrawShape(ttar, C.shaTTargetFace, O.nSectorDegree, O.nSectorRadius, O.nSectorAlpha, O.tTTargetFaceColor)
-	else
+	elseif C.shaTTargetFace and C.shaTTargetFace:IsValid() then
 		C.shaTTargetFace:Hide()
 	end
 	-- target target shape
 	if C.bReRender then
 		if O.bTTargetShape and ttar and (not O.bTargetShape or not bIsTarget) then
 			DrawShape(ttar, C.shaTTargetShape, 360, O.nShapeRadius / 2, O.nShapeAlpha, O.tTTargetShapeColor)
-		else
+		elseif C.shaTTargetShape and C.shaTTargetShape:IsValid() then
 			C.shaTTargetShape:Hide()
 		end
 	end
