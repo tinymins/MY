@@ -2534,7 +2534,7 @@ LIB.RegisterEvent('MY_TMUI_FREECACHE', function()
 	MY_TMUI_SEARCH_CACHE = {}
 end)
 LIB.RegisterAddonMenu({ szOption = _L['MY_TeamMon'], fnAction = D.TogglePanel })
-LIB.RegisterHotKey('MY_TeamMon_UI', _L['Open MY_TeamMon Panel'], D.TogglePanel)
+LIB.RegisterHotKey('MY_TeamMon_UI', _L['Open/Close MY_TeamMon'], D.TogglePanel)
 
 -- Global exports
 do
