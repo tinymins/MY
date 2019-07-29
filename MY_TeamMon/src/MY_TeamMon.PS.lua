@@ -206,7 +206,7 @@ function PS.OnPanelActive(wnd)
 		menu = function()
 			local szLang = select(3, GetVersion())
 			local menu = {}
-			table.insert(menu, { szOption = _L['Import Data (local)'], fnAction = function() MY_TeamMon.OpenImportPanel() end }) -- 有传参 不要改
+			table.insert(menu, { szOption = _L['Import Data (local)'], fnAction = function() MY_TeamMon_UI.OpenImportPanel() end }) -- 有传参 不要改
 			local szLang = select(3, GetVersion())
 			if szLang == 'zhcn' or szLang == 'zhtw' then
 				table.insert(menu, { szOption = _L['Import Data (web)'], fnAction = MY_TeamMon_RR.OpenPanel })
