@@ -556,6 +556,42 @@ end
 end
 
 ---------------------------------------------------------------------------------------------
+-- ×¢²áÁÄÌì¼àÌý
+---------------------------------------------------------------------------------------------
+-- Register:   LIB.RegisterMsgMonitor(string szKey, function fnAction, table tChannels)
+--             LIB.RegisterMsgMonitor(function fnAction, table tChannels)
+-- Unregister: LIB.RegisterMsgMonitor(string szKey)
+do
+local MSG_MONITOR_FUNC = {}
+function LIB.RegisterMsgMonitor(arg0, arg1, arg2)
+	local szKey, fnAction, tChannels
+	local tp0, tp1, tp2 = type(arg0), type(arg1), type(arg2)
+	if tp0 == 'string' and tp1 == 'function' and tp2 == 'table' then
+		szKey, fnAction, tChannels = arg0, arg1, arg2
+	elseif tp0 == 'function' and tp1 == 'table' then
+		fnAction, tChannels = arg0, arg1
+	elseif tp0 == 'string' and not arg1 then
+		szKey = arg0
+	end
+
+	if szKey and MSG_MONITOR_FUNC[szKey] then
+		UnRegisterMsgMonitor(MSG_MONITOR_FUNC[szKey].fn)
+		MSG_MONITOR_FUNC[szKey] = nil
+	end
+	if fnAction and tChannels then
+		MSG_MONITOR_FUNC[szKey] = { fn = function(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID, szName)
+			-- filter addon comm.
+			if StringFindW(szMsg, 'eventlink') and StringFindW(szMsg, _L['Addon comm.']) then
+				return
+			end
+			fnAction(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID, szName)
+		end, ch = tChannels }
+		RegisterMsgMonitor(MSG_MONITOR_FUNC[szKey].fn, MSG_MONITOR_FUNC[szKey].ch)
+	end
+end
+end
+
+---------------------------------------------------------------------------------------------
 -- ×¢²áÐ­³Ì
 ---------------------------------------------------------------------------------------------
 do

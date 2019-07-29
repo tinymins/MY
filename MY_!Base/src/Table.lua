@@ -123,8 +123,6 @@ else
 	end
 end
 
-
-
 if IsFunction(Table_SchoolToForce) then
 	LIB.Table_SchoolToForce = Table_SchoolToForce
 else
@@ -159,7 +157,6 @@ else
 		return tKungFungList
 	end
 end
-
 
 if IsFunction(Table_GetMKungfuList) then
 	LIB.Table_GetMKungfuList = Table_GetMKungfuList

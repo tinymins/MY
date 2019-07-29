@@ -92,7 +92,7 @@ function LIB.GetCopyLinkText(szText, rgbf)
 	end
 	local handlerEntry = PACKET_INFO.NAME_SPACE .. '.ChatLinkEventHandlers'
 	return GetFormatText(szText, rgbf.f, rgbf.r, rgbf.g, rgbf.b, 82691,
-		'this.bMyChatRendered=true;this.OnItemLButtonDown='
+		'this[\'b' .. PACKET_INFO.NAME_SPACE .. 'ChatRendered\']=true;this.OnItemLButtonDown='
 			.. handlerEntry .. '.OnCopyLClick;this.OnItemMButtonDown='
 			.. handlerEntry .. '.OnCopyMClick;this.OnItemRButtonDown='
 			.. handlerEntry .. '.OnCopyRClick;this.OnItemMouseEnter='
@@ -113,7 +113,7 @@ function LIB.GetTimeLinkText(rgbfs, dwTime)
 	return GetFormatText(
 		LIB.FormatTime(dwTime, rgbfs.s or '[%hh:%mm.%ss]'),
 		rgbfs.f, rgbfs.r, rgbfs.g, rgbfs.b, 82691,
-		'this.bMyChatRendered=true;this.OnItemLButtonDown='
+		'this[\'b' .. PACKET_INFO.NAME_SPACE .. 'ChatRendered\']=true;this.OnItemLButtonDown='
 			.. handlerEntry .. '.OnCopyLClick;this.OnItemMButtonDown='
 			.. handlerEntry .. '.OnCopyMClick;this.OnItemRButtonDown='
 			.. handlerEntry .. '.OnCopyRClick;this.OnItemMouseEnter='
@@ -345,18 +345,18 @@ function LIB.RenderChatLink(arg1, arg2)
 
 					local handlerEntry = PACKET_INFO.NAME_SPACE .. '.ChatLinkEventHandlers'
 					if name:sub(1, 8) == 'namelink' then
-						script = script .. 'this.bMyChatRendered=true;this.OnItemLButtonDown='
+						script = script .. 'this[\'b' .. PACKET_INFO.NAME_SPACE .. 'ChatRendered\']=true;this.OnItemLButtonDown='
 							.. handlerEntry .. '.OnNameLClick;this.OnItemRButtonDown='
 							.. handlerEntry .. '.OnNameRClick'
 					elseif name == 'copy' or name == 'copylink' or name == 'timelink' then
-						script = script .. 'this.bMyChatRendered=true;this.OnItemLButtonDown='
+						script = script .. 'this[\'b' .. PACKET_INFO.NAME_SPACE .. 'ChatRendered\']=true;this.OnItemLButtonDown='
 							.. handlerEntry .. '.OnCopyLClick;this.OnItemMButtonDown='
 							.. handlerEntry .. '.OnCopyMClick;this.OnItemRButtonDown='
 							.. handlerEntry .. '.OnCopyRClick;this.OnItemMouseEnter='
 							.. handlerEntry .. '.OnCopyMouseEnter;this.OnItemMouseLeave='
 							.. handlerEntry .. '.OnCopyMouseLeave'
 					else
-						script = script .. 'this.bMyChatRendered=true;this.OnItemLButtonDown='
+						script = script .. 'this[\'b' .. PACKET_INFO.NAME_SPACE .. 'ChatRendered\']=true;this.OnItemLButtonDown='
 							.. handlerEntry .. '.OnItemLClick;this.OnItemRButtonDown='
 							.. handlerEntry .. '.OnItemRClick'
 					end
@@ -373,7 +373,7 @@ function LIB.RenderChatLink(arg1, arg2)
 	elseif type(arg1) == 'table' and type(arg1.GetName) == 'function' then
 		local element = arg1
 		local link = arg2 or arg1
-		if element.bMyChatRendered then
+		if element['b' .. PACKET_INFO.NAME_SPACE .. 'ChatRendered'] then
 			return
 		end
 		local ui = UI(element)
@@ -389,7 +389,7 @@ function LIB.RenderChatLink(arg1, arg2)
 			ui:lclick(function() ChatLinkEvents.OnItemLClick(element, link) end)
 			ui:rclick(function() ChatLinkEvents.OnItemRClick(element, link) end)
 		end
-		element.bMyChatRendered = true
+		element['b' .. PACKET_INFO.NAME_SPACE .. 'ChatRendered'] = true
 		return element
 	end
 end
@@ -847,7 +847,7 @@ function LIB.Talk(nChannel, szText, szUUID, bNoEscape, bSaveDeny, bPushToChatBox
 			table.insert(tSay, 1, {
 				type = 'eventlink', name = '',
 				linkinfo = LIB.JsonEncode({
-					via = 'MY',
+					via = PACKET_INFO.NAME_SPACE,
 					uuid = szUUID and tostring(szUUID),
 				})
 			})
@@ -1110,38 +1110,6 @@ function LIB.GetChatChannelMenu(fnAction, tChecked)
 end
 end
 
--- Register:   LIB.RegisterMsgMonitor(string szKey, function fnAction, table tChannels)
---             LIB.RegisterMsgMonitor(function fnAction, table tChannels)
--- Unregister: LIB.RegisterMsgMonitor(string szKey)
-do local MSG_MONITOR_FUNC = {}
-function LIB.RegisterMsgMonitor(arg0, arg1, arg2)
-	local szKey, fnAction, tChannels
-	local tp0, tp1, tp2 = type(arg0), type(arg1), type(arg2)
-	if tp0 == 'string' and tp1 == 'function' and tp2 == 'table' then
-		szKey, fnAction, tChannels = arg0, arg1, arg2
-	elseif tp0 == 'function' and tp1 == 'table' then
-		fnAction, tChannels = arg0, arg1
-	elseif tp0 == 'string' and not arg1 then
-		szKey = arg0
-	end
-
-	if szKey and MSG_MONITOR_FUNC[szKey] then
-		UnRegisterMsgMonitor(MSG_MONITOR_FUNC[szKey].fn)
-		MSG_MONITOR_FUNC[szKey] = nil
-	end
-	if fnAction and tChannels then
-		MSG_MONITOR_FUNC[szKey] = { fn = function(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID, szName)
-			-- filter addon comm.
-			if StringFindW(szMsg, 'eventlink') and StringFindW(szMsg, _L['Addon comm.']) then
-				return
-			end
-			fnAction(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID, szName)
-		end, ch = tChannels }
-		RegisterMsgMonitor(MSG_MONITOR_FUNC[szKey].fn, MSG_MONITOR_FUNC[szKey].ch)
-	end
-end
-end
-
 do
 -- HOOK¡ƒÃÏ¿∏
 local CHAT_HOOK = {
@@ -1269,8 +1237,8 @@ end
 
 do
 local function OnChatPanelNamelinkLButtonDown(...)
-	if this.__MY_OnItemLButtonDown then
-		this.__MY_OnItemLButtonDown(...)
+	if this['__' .. PACKET_INFO.NAME_SPACE .. '_OnItemLButtonDown'] then
+		this['__' .. PACKET_INFO.NAME_SPACE .. '_OnItemLButtonDown'](...)
 	end
 	LIB.ChatLinkEventHandlers.OnNameLClick(...)
 end
@@ -1278,10 +1246,10 @@ end
 LIB.HookChatPanel('AFTER.' .. PACKET_INFO.NAME_SPACE .. '#HOOKNAME', function(h, nIndex)
 	for i = nIndex, h:GetItemCount() - 1 do
 		local hItem = h:Lookup(i)
-		if hItem:GetName():find('^namelink_%d+$') and not hItem.bMyChatRendered then
-			hItem.bMyChatRendered = true
+		if hItem:GetName():find('^namelink_%d+$') and not hItem['b' .. PACKET_INFO.NAME_SPACE .. 'ChatRendered'] then
+			hItem['b' .. PACKET_INFO.NAME_SPACE .. 'ChatRendered'] = true
 			if hItem.OnItemLButtonDown then
-				hItem.__MY_OnItemLButtonDown = hItem.OnItemLButtonDown
+				hItem['__' .. PACKET_INFO.NAME_SPACE .. '_OnItemLButtonDown'] = hItem.OnItemLButtonDown
 			end
 			hItem.OnItemLButtonDown = OnChatPanelNamelinkLButtonDown
 		end
