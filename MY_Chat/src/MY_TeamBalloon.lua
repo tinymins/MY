@@ -163,9 +163,9 @@ function MY_TeamBalloon.Enable(...)
 	end
 end
 
-LIB.RegisterEvent('CUSTOM_DATA_LOADED.MY_TeamBalloon', function()
-	if arg0 == 'Role' then
-		MY_TeamBalloon.Enable(MY_TeamBalloon.Enable())
-		LIB.RegisterEvent('CUSTOM_DATA_LOADED.MY_TeamBalloon')
-	end
-end)
+do
+local function Init()
+	MY_TeamBalloon.Enable(MY_TeamBalloon.bEnable)
+end
+LIB.RegisterInit('MY_TeamBalloon', Init)
+end

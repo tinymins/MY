@@ -272,7 +272,7 @@ function MY_ChatSwitch.OnFrameCreate()
 	this.tRadios = {}
 	this:RegisterEvent('UI_SCALED')
 	this:RegisterEvent('PLAYER_SAY')
-	this:RegisterEvent('CUSTOM_DATA_LOADED')
+	this:RegisterEvent('LOADING_ENDING')
 	this:EnableDrag(not LIB.GetStorage('BoolValues.MY_ChatSwitch_LockPostion'))
 
 	local nWidth, nHeight = 0, 0
@@ -375,11 +375,9 @@ function MY_ChatSwitch.OnEvent(event)
 		end
 	elseif event == 'UI_SCALED' then
 		MY_ChatSwitch.UpdateAnchor(this)
-	elseif event == 'CUSTOM_DATA_LOADED' then
-		if arg0 == 'Role' then
-			for nChannel, hRadio in pairs(this.tRadios) do
-				UpdateChannelDailyLimit(hRadio)
-			end
+	elseif event == 'LOADING_ENDING' then
+		for nChannel, hRadio in pairs(this.tRadios) do
+			UpdateChannelDailyLimit(hRadio)
 		end
 	end
 end
