@@ -1933,7 +1933,7 @@ function D.OnShare(_, nChannel, dwID, szName, bIsSelf, ...)
 	end
 end
 
-LIB.RegisterEvent('LOGIN_GAME.MY_TeamMon', D.Init)
+LIB.RegisterInit('MY_TeamMon', D.Init)
 LIB.RegisterExit('MY_TeamMon', D.SaveData)
 LIB.RegisterBgMsg('MY_TM_SHARE', D.OnShare)
 

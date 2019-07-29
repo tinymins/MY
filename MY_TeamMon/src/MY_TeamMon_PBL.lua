@@ -301,7 +301,7 @@ function D.OnTableInsert(dwID, dwBuffID, nLevel, nIcon)
 	CACHE_LIST[key] = h
 end
 
-LIB.RegisterEvent('LOGIN_GAME', D.OpenPanel)
+LIB.RegisterInit('MY_TeamMon_PBL', D.OpenPanel)
 
 -- Global exports
 do

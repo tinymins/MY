@@ -134,7 +134,7 @@ function D.OnBreathe()
 	end
 end
 
-LIB.RegisterEvent('LOGIN_GAME', D.Init)
+LIB.RegisterInit('MY_TeamMon_LT', D.Init)
 
 local PS = { bShielded = true }
 function PS.OnPanelActive(frame)

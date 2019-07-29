@@ -133,7 +133,7 @@ function D.Init()
 	frame:Hide()
 end
 
-LIB.RegisterEvent('LOGIN_GAME', D.Init)
+LIB.RegisterInit('MY_TeamMon_CA', D.Init)
 
 
 -- Global exports

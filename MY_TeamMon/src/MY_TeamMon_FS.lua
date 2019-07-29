@@ -213,7 +213,7 @@ function FS:RemoveItem()
 	end
 end
 
-LIB.RegisterEvent('LOGIN_GAME', Init)
+LIB.RegisterInit('MY_TeamMon_FS', Init)
 
 -- Global exports
 do

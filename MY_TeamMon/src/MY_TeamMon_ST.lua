@@ -367,4 +367,4 @@ function ST:RemoveItem()
 	D.handle:FormatAllItemPos()
 end
 
-LIB.RegisterEvent('LOGIN_GAME', D.Init)
+LIB.RegisterInit('MY_TeamMon_ST', D.Init)

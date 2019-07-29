@@ -1363,7 +1363,7 @@ function RT.TogglePanel()
 	end
 end
 
-LIB.RegisterEvent('LOGIN_GAME', RT.SetStyle)
+LIB.RegisterInit('MY_TeamTools', RT.SetStyle)
 
 local function onLoadingEnd()
 	RT.SetMapID(GetClientPlayer().GetMapID())

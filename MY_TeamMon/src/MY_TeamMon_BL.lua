@@ -223,7 +223,7 @@ function D.Init()
 	local frame =  Wnd.OpenWindow(BL_INIFILE, 'MY_TeamMon_BL')
 end
 
-LIB.RegisterEvent('LOGIN_GAME', D.Init)
+LIB.RegisterInit('MY_TeamMon_BL', D.Init)
 
 -- Global exports
 do
