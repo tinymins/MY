@@ -370,7 +370,7 @@ local function OpenBuffEditPanel(rec)
 			update()
 		end,
 		tip = _L['Left click to change color, right click to clear color'],
-		tippostype = MY_TIP_POSTYPE.TOP_BOTTOM,
+		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
 		autoenable = function() return not rec.bDelete end,
 	}, true):width() + 5
 	x = x + ui:append('Shadow', {
@@ -404,7 +404,7 @@ local function OpenBuffEditPanel(rec)
 	x = x + ui:append('WndSliderBox', {
 		x = x, y = y, text = '',
 		range = {0, 255},
-		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
+		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
 		value = rec.col and select(4, LIB.HumanColor2RGB(rec.col)) or rec.nColAlpha or 255,
 		onchange = function(nVal)
 			if rec.col then
@@ -568,7 +568,7 @@ function PS.OnPanelActive(frame)
 		autoenable = function() return not CFG.bAutoBuffSize end,
 		range = {50, 200},
 		value = CFG.fBuffScale * 100,
-		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
+		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
 		onchange = function(nVal)
 			CFG.fBuffScale = nVal / 100
 			LIB.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
@@ -583,7 +583,7 @@ function PS.OnPanelActive(frame)
 		x = x, y = y + 3, rw = 80, text = '',
 		range = {0, 10},
 		value = CFG.nMaxShowBuff,
-		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
+		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
 		onchange = function(nVal)
 			CFG.nMaxShowBuff = nVal
 			LIB.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)

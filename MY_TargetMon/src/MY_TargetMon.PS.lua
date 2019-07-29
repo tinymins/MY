@@ -694,7 +694,7 @@ local function DrawPreview(ui, config, OpenDetail)
 			x = x + 20, y = y - 3, w = w - 290,
 			r = 255, g = 255, b = 0, text = szCaption,
 			tip = szCaption .. '\n' .. _L['(Embedded caption cannot be changed)'],
-			tippostype = MY_TIP_POSTYPE.BOTTOM_TOP,
+			tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 		}, true):autoWidth()
 	else
 		uiWnd:append('WndEditBox', {
@@ -730,7 +730,7 @@ local function DrawPreview(ui, config, OpenDetail)
 			LIB.SwitchTab('MY_TargetMon', true)
 		end,
 		tip = config.embedded and _L['Press ctrl to delete embedded data permanently.'] or nil,
-		tippostype = MY_TIP_POSTYPE.BOTTOM_TOP,
+		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 	})
 	y = y + 30
 
@@ -749,7 +749,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		x = x + 90, y = y, w = 200,
 		text = _L['Hide others buff'],
 		tip = _L['Hide others buff TIP'],
-		tippostype = MY_TIP_POSTYPE.TOP_BOTTOM,
+		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
 		checked = config.hideOthers,
 		oncheck = function(bChecked)
 			D.ModifyConfig(config, 'hideOthers', bChecked)
@@ -985,7 +985,7 @@ local function DrawPreview(ui, config, OpenDetail)
 
 	uiWnd:append('WndSliderBox', {
 		x = w - 250, y = y,
-		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
+		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
 		range = {1, 32},
 		value = config.maxLineCount,
 		textfmt = function(val) return _L('Display %d eachline.', val) end,
@@ -998,7 +998,7 @@ local function DrawPreview(ui, config, OpenDetail)
 
 	uiWnd:append('WndSliderBox', {
 		x = w - 250, y = y,
-		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
+		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
 		range = {1, 300},
 		value = config.scale * 100,
 		textfmt = function(val) return _L('UI scale %d%%.', val) end,
@@ -1011,7 +1011,7 @@ local function DrawPreview(ui, config, OpenDetail)
 
 	uiWnd:append('WndSliderBox', {
 		x = w - 250, y = y,
-		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
+		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
 		range = {1, 300},
 		value = config.iconFontScale * 100,
 		textfmt = function(val) return _L('Icon font scale %d%%.', val) end,
@@ -1024,7 +1024,7 @@ local function DrawPreview(ui, config, OpenDetail)
 
 	uiWnd:append('WndSliderBox', {
 		x = w - 250, y = y,
-		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
+		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
 		range = {1, 300},
 		value = config.otherFontScale * 100,
 		textfmt = function(val) return _L('Other font scale %d%%.', val) end,
@@ -1037,7 +1037,7 @@ local function DrawPreview(ui, config, OpenDetail)
 
 	uiWnd:append('WndSliderBox', {
 		x = w - 250, y = y,
-		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
+		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
 		range = {50, 1000},
 		value = config.cdBarWidth,
 		textfmt = function(val) return _L('CD width %dpx.', val) end,
@@ -1050,7 +1050,7 @@ local function DrawPreview(ui, config, OpenDetail)
 
 	uiWnd:append('WndSliderBox', {
 		x = w - 250, y = y,
-		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
+		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
 		range = {-1, 30},
 		value = config.decimalTime,
 		textfmt = function(val)
@@ -1122,7 +1122,7 @@ local function DrawControls(ui, OpenDetail)
 		w = 60, h = 30,
 		text = _L['Export'],
 		tip = _L['Press ALT to export as default data.\n Press CTRL to export as plain.'],
-		tippostype = MY_TIP_POSTYPE.BOTTOM_TOP,
+		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 		menu = function()
 			local aUUID = {}
 			local menu = {}

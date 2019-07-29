@@ -907,7 +907,7 @@ function PS.OnPanelActive(frame)
 	ui:append('WndSliderBox', {
 		x = x, y = y, text = '',
 		range = {1, 255},
-		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
+		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
 		value = MY_CombatText.nMaxAlpha,
 		onchange = function(nVal)
 			MY_CombatText.nMaxAlpha = nVal
@@ -921,7 +921,7 @@ function PS.OnPanelActive(frame)
 	ui:append('WndSliderBox', {
 		x = x, y = y, textfmt = function(val) return val .. _L['ms'] end,
 		range = {700, 2500},
-		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
+		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
 		value = MY_CombatText.nTime * COMBAT_TEXT_TOTAL,
 		onchange = function(nVal)
 			MY_CombatText.nTime = nVal / COMBAT_TEXT_TOTAL
@@ -936,7 +936,7 @@ function PS.OnPanelActive(frame)
 	ui:append('WndSliderBox', {
 		x = x, y = y, textfmt = function(val) return val .. _L['Frame'] end,
 		range = {0, 15},
-		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
+		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
 		value = MY_CombatText.nFadeIn,
 		onchange = function(nVal)
 			MY_CombatText.nFadeIn = nVal
@@ -950,7 +950,7 @@ function PS.OnPanelActive(frame)
 	ui:append('WndSliderBox', {
 		x = x, y = y, textfmt = function(val) return val .. _L['Frame'] end,
 		rang = {0, 15},
-		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
+		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
 		value = MY_CombatText.nFadeOut,
 		onchange = function(nVal)
 			MY_CombatText.nFadeOut = nVal
@@ -965,7 +965,7 @@ function PS.OnPanelActive(frame)
 	ui:append('WndSliderBox', {
 		x = x, y = y, textfmt = function(val) return (val / 100) .. _L['times'] end,
 		range = {50, 200},
-		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
+		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
 		value = MY_CombatText.fScale * 100,
 		onchange = function(nVal)
 			MY_CombatText.fScale = nVal / 100
@@ -1157,7 +1157,7 @@ function PS.OnPanelActive(frame)
 			end)
 		end,
 		tip = function() return _L('Current font: %d', MY_CombatText.nFont) end,
-		tippostype = MY_TIP_POSTYPE.TOP_BOTTOM,
+		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
 		autoenable = IsEnabled,
 	})
 	y = y + deltaY

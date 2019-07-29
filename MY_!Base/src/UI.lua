@@ -52,7 +52,31 @@ local function createInstance(c, ins, ...)
 	return c
 end
 UI = setmetatable({}, {
-	__index = {},
+	__index = {
+		MOUSE_EVENT = LIB.SetmetaReadonly({
+			LBUTTON = 1,
+			MBUTTON = 0,
+			RBUTTON = -1,
+		}),
+		TIP_POSITION = LIB.SetmetaReadonly({
+			FOLLOW_MOUSE              = -1,
+			CENTER                    = ALW.CENTER,
+			LEFT_RIGHT                = ALW.LEFT_RIGHT,
+			RIGHT_LEFT                = ALW.RIGHT_LEFT,
+			TOP_BOTTOM                = ALW.TOP_BOTTOM,
+			BOTTOM_TOP                = ALW.BOTTOM_TOP,
+			RIGHT_LEFT_AND_BOTTOM_TOP = ALW.RIGHT_LEFT_AND_BOTTOM_TOP,
+		}),
+		TIP_HIDEWAY = LIB.SetmetaReadonly({
+			NO_HIDE      = 100,
+			HIDE         = 101,
+			ANIMATE_HIDE = 102,
+		}),
+		SLIDER_DISPTYPE = LIB.SetmetaReadonly({
+			SHOW_VALUE    = false,
+			SHOW_PERCENT  = true,
+		}),
+	},
 	__tostring = function(t) return PACKET_INFO.NAME_SPACE .. '_UI (class prototype)' end,
 	__call = function (...)
 		local store = {}
@@ -3124,7 +3148,7 @@ end
 -- (self) UI:sliderStyle(nSliderStyle)
 function UI:sliderStyle(nSliderStyle)
 	self:_checksum()
-	local bShowPercentage = nSliderStyle == MY_SLIDER_DISPTYPE.SHOW_PERCENT
+	local bShowPercentage = nSliderStyle == UI.SLIDER_DISPTYPE.SHOW_PERCENT
 	for _, raw in ipairs(self.raws) do
 		if GetComponentType(raw) == 'WndSliderBox' then
 			SetComponentProp(raw, 'bShowPercentage', bShowPercentage)
@@ -3452,7 +3476,7 @@ function UI:click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 					if GetComponentProp(raw, 'bEnable') == false then
 						return
 					end
-					LIB.ExecuteWithThis(raw, fnLClick, MY_MOUSE_EVENT.LBUTTON)
+					LIB.ExecuteWithThis(raw, fnLClick, UI.MOUSE_EVENT.LBUTTON)
 				end
 				if GetComponentType(raw) == 'WndScrollBox' then
 					UI(GetComponentElement(raw, 'MAIN_HANDLE')):uievent('OnItemLButtonClick', fnAction)
@@ -3482,7 +3506,7 @@ function UI:click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 					if GetComponentProp(raw, 'bEnable') == false then
 						return
 					end
-					LIB.ExecuteWithThis(raw, fnRClick, MY_MOUSE_EVENT.RBUTTON)
+					LIB.ExecuteWithThis(raw, fnRClick, UI.MOUSE_EVENT.RBUTTON)
 				end
 				if GetComponentType(raw) == 'WndScrollBox' then
 					UI(GetComponentElement(raw, 'MAIN_HANDLE')):uievent('OnItemRButtonClick', fnAction)
@@ -3506,17 +3530,17 @@ function UI:click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 			end
 		end
 	else
-		local nFlag = fnLClick or fnMClick or fnRClick or MY_MOUSE_EVENT.LBUTTON
-		if nFlag == MY_MOUSE_EVENT.LBUTTON then
+		local nFlag = fnLClick or fnMClick or fnRClick or UI.MOUSE_EVENT.LBUTTON
+		if nFlag == UI.MOUSE_EVENT.LBUTTON then
 			for _, raw in ipairs(self.raws) do
 				local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
 				local itm = GetComponentElement(raw, 'ITEM')
 				if wnd then local _this = this this = wnd Call(wnd.OnLButtonClick) this = _this end
 				if itm then local _this = this this = itm Call(itm.OnItemLButtonClick) this = _this end
 			end
-		elseif nFlag==MY_MOUSE_EVENT.MBUTTON then
+		elseif nFlag==UI.MOUSE_EVENT.MBUTTON then
 
-		elseif nFlag==MY_MOUSE_EVENT.RBUTTON then
+		elseif nFlag==UI.MOUSE_EVENT.RBUTTON then
 			for _, raw in ipairs(self.raws) do
 				local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
 				local itm = GetComponentElement(raw, 'ITEM')
@@ -3533,7 +3557,7 @@ end
 -- :lclick(fnAction) 绑定
 -- :lclick()         触发
 function UI:lclick(fnLClick)
-	return self:click(fnLClick or MY_MOUSE_EVENT.LBUTTON, nil, nil, true)
+	return self:click(fnLClick or UI.MOUSE_EVENT.LBUTTON, nil, nil, true)
 end
 
 -- rclick 鼠标右键单击事件
@@ -3541,7 +3565,7 @@ end
 -- :rclick(fnAction) 绑定
 -- :rclick()         触发
 function UI:rclick(fnRClick)
-	return self:click(nil, fnRClick or MY_MOUSE_EVENT.RBUTTON, nil, true)
+	return self:click(nil, fnRClick or UI.MOUSE_EVENT.RBUTTON, nil, true)
 end
 
 -- mclick 鼠标右键单击事件
@@ -3549,7 +3573,7 @@ end
 -- :mclick(fnAction) 绑定
 -- :mclick()         触发
 function UI:mclick(fnMClick)
-	return self:click(nil, nil, fnMClick or MY_MOUSE_EVENT.MBUTTON, true)
+	return self:click(nil, nil, fnMClick or UI.MOUSE_EVENT.MBUTTON, true)
 end
 
 -- complete 加载完成事件
@@ -3609,21 +3633,21 @@ end
 -- tip 鼠标悬停提示
 -- (self) Instance:tip( tip[, nPosType[, tOffset[, bNoEncode] ] ] ) 绑定tip事件
 -- string|function tip:要提示的文字文本或序列化的DOM文本或返回前述文本的函数
--- number nPosType:    提示位置 有效值为MY_TIP_HIDEWAY.枚举
--- table tOffset:      提示框偏移量等附加信息{ x = x, y = y, hide = MY_TIP_HIDEWAY.Hide枚举, nFont = 字体, r, g, b = 字颜色 }
+-- number nPosType:    提示位置 有效值为UI.TIP_HIDEWAY.枚举
+-- table tOffset:      提示框偏移量等附加信息{ x = x, y = y, hide = UI.TIP_HIDEWAY.Hide枚举, nFont = 字体, r, g, b = 字颜色 }
 -- boolean bNoEncode:  当szTip为纯文本时保持这个参数为false 当szTip为格式化的DOM字符串时设置该参数为true
 function UI:tip(tip, nPosType, tOffset, bNoEncode)
 	tOffset = tOffset or {}
 	tOffset.x = tOffset.x or 0
 	tOffset.y = tOffset.y or 0
 	tOffset.w = tOffset.w or 450
-	tOffset.hide = tOffset.hide or MY_TIP_HIDEWAY.HIDE
+	tOffset.hide = tOffset.hide or UI.TIP_HIDEWAY.HIDE
 	tOffset.nFont = tOffset.nFont or 136
-	nPosType = nPosType or MY_TIP_POSTYPE.FOLLOW_MOUSE
+	nPosType = nPosType or UI.TIP_POSITION.FOLLOW_MOUSE
 	return self:hover(function()
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
-		if nPosType == MY_TIP_POSTYPE.FOLLOW_MOUSE then
+		if nPosType == UI.TIP_POSITION.FOLLOW_MOUSE then
 			x, y = Cursor.GetPos()
 			x, y = x - 0, y - 40
 		end
@@ -3640,9 +3664,9 @@ function UI:tip(tip, nPosType, tOffset, bNoEncode)
 		end
 		OutputTip(szTip, tOffset.w, {x, y, w, h}, nPosType)
 	end, function()
-		if tOffset.hide == MY_TIP_HIDEWAY.HIDE then
+		if tOffset.hide == UI.TIP_HIDEWAY.HIDE then
 			HideTip(false)
-		elseif tOffset.hide == MY_TIP_HIDEWAY.ANIMATE_HIDE then
+		elseif tOffset.hide == UI.TIP_HIDEWAY.ANIMATE_HIDE then
 			HideTip(true)
 		end
 	end, true)
@@ -3864,33 +3888,6 @@ end
 -- public api, create pool
 -- (class) UI.HandlePool(userdata handle, string szXml)
 UI.HandlePool = setmetatable({}, { __call = function(me, ...) return HandlePool:ctor( ... ) end, __metatable = true, __newindex = function() end })
-
------------------------------------------------------------
--- 枚举
------------------------------------------------------------
-MY_MOUSE_EVENT = LIB.SetmetaReadonly({
-	LBUTTON = 1,
-	MBUTTON = 0,
-	RBUTTON = -1,
-})
-MY_TIP_POSTYPE = LIB.SetmetaReadonly({
-	FOLLOW_MOUSE              = -1,
-	CENTER                    = ALW.CENTER,
-	LEFT_RIGHT                = ALW.LEFT_RIGHT,
-	RIGHT_LEFT                = ALW.RIGHT_LEFT,
-	TOP_BOTTOM                = ALW.TOP_BOTTOM,
-	BOTTOM_TOP                = ALW.BOTTOM_TOP,
-	RIGHT_LEFT_AND_BOTTOM_TOP = ALW.RIGHT_LEFT_AND_BOTTOM_TOP,
-})
-MY_TIP_HIDEWAY = LIB.SetmetaReadonly({
-	NO_HIDE      = 100,
-	HIDE         = 101,
-	ANIMATE_HIDE = 102,
-})
-MY_SLIDER_DISPTYPE = LIB.SetmetaReadonly({
-	SHOW_VALUE    = false,
-	SHOW_PERCENT  = true,
-})
 
 ---------------------------------------------------
 -- create new frame
@@ -4288,7 +4285,7 @@ function UI.OpenColorPickerEx(fnAction)
 	wnd:append('WndSliderBox', {
 		x = 20, y = 35, h = 25, w = 306, rw = 272,
 		textfmt = function(val) return ('%d H'):format(val) end,
-		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
+		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
 		value = COLOR_HUE, range = {0, 360},
 		onchange = function(nVal)
 			COLOR_HUE = nVal
@@ -4450,7 +4447,7 @@ function UI.OpenIconPanel(fnAction)
 	ui:append('WndSliderBox', {
 		x = 10, y = 580, h = 25, w = 500, textfmt = ' Page: %d',
 		range = {1, math.ceil(nMaxIcon / 144)}, value = ICON_PAGE or 21,
-		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
+		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
 		onchange = function(nVal)
 			LIB.DelayCall(function() GetPage(nVal) end)
 		end,
@@ -4495,7 +4492,7 @@ function UI.OpenListEditor(szFrameName, tTextList, OnAdd, OnDel)
 				UI(this):fadeTo(500,0)
 			end
 		end):click(function(nButton)
-			if nButton == MY_MOUSE_EVENT.RBUTTON then
+			if nButton == UI.MOUSE_EVENT.RBUTTON then
 				hHandle.Selected = true
 				PopupMenu({{
 					szOption = _L['delete'],

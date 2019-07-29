@@ -82,7 +82,7 @@ function PS.OnPanelActive(frame)
 		x = x, y = y + 3, h = 25, w = 250,
 		range = {50, 250},
 		value = CFG.fScaleX * 100,
-		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
+		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
 		onchange = function(nVal)
 			nVal = nVal / 100
 			local nNewX, nNewY = nVal / CFG.fScaleX, CFG.fScaleY / CFG.fScaleY
@@ -100,7 +100,7 @@ function PS.OnPanelActive(frame)
 		x = x, y = y + 3, h = 25, w = 250,
 		range = {50, 250},
 		value = CFG.fScaleY * 100,
-		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
+		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
 		onchange = function(nVal)
 			nVal = nVal / 100
 			local nNewX, nNewY = CFG.fScaleX / CFG.fScaleX, nVal / CFG.fScaleY
@@ -132,7 +132,7 @@ function PS.OnPanelActive(frame)
 			x = x, y = y + 3,
 			range = {0, 255},
 			value = CFG.nAlpha,
-			sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
+			sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
 			onchange = function(nVal)
 				CFG.nAlpha = nVal
 				if MY_Cataclysm.GetFrame() then

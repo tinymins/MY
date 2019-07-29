@@ -108,7 +108,7 @@ function PS.OnPanelActive(wnd)
 		checked = MY_PartyRequest.bRefuseRobot,
 		text = _L['Auto refuse robot player'],
 		tip = _L['Full level and equip score less than 2/3 of yours'],
-		tippostype = MY_TIP_POSTYPE.BOTTOM_TOP,
+		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 		oncheck = function(bChecked)
 			MY_PartyRequest.bRefuseRobot = bChecked
 		end,

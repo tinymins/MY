@@ -208,7 +208,7 @@ function PS.OnPanelActive(frame)
 					x = x, y = y + 3, h = 22,
 					range = {0, 255},
 					value = CFG.tDistanceAlpha[i],
-					sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
+					sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
 					onchange = function(val)
 						CFG.tDistanceAlpha[i] = val
 						if MY_Cataclysm.GetFrame() then
@@ -254,7 +254,7 @@ function PS.OnPanelActive(frame)
 			x = x, y = y + 3, h = 22,
 			range = {0, 255},
 			value = CFG.tOtherAlpha[3],
-			sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
+			sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
 			onchange = function(val)
 				CFG.tOtherAlpha[3] = val
 				if MY_Cataclysm.GetFrame() then
@@ -290,7 +290,7 @@ function PS.OnPanelActive(frame)
 			x = x, y = y + 3, h = 22,
 			range = {0, 255},
 			value = CFG.tOtherAlpha[2],
-			sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
+			sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
 			onchange = function(val)
 				CFG.tOtherAlpha[2] = val
 				if MY_Cataclysm.GetFrame() then

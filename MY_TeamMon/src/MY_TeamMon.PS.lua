@@ -145,7 +145,7 @@ function PS.OnPanelActive(wnd)
 	nX, nY = ui:append('WndCheckBox', {
 		x = nX + 5, y = nY, text = _L['Screen Head Alarm'],
 		tip = _L['Requires MY_LifeBar loaded.'],
-		tippostype = MY_TIP_POSTYPE.BOTTOM_TOP,
+		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 		checked = MY_TeamMon.bPushScreenHead,
 		oncheck = function(bCheck)
 			MY_TeamMon.bPushScreenHead = bCheck

@@ -93,7 +93,7 @@ function PS.OnPanelActive(frame)
 		x = x, y = y - 1,
 		value = CFG.fNameFontScale * 100,
 		range = {1, 400},
-		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
+		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
 		textfmt = function(val) return _L('Scale %d%%', val) end,
 		onchange = function(val)
 			CFG.fNameFontScale = val / 100
@@ -171,7 +171,7 @@ function PS.OnPanelActive(frame)
 		x = x, y = y - 1,
 		value = CFG.fLifeFontScale * 100,
 		range = {1, 400},
-		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
+		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
 		textfmt = function(val) return _L('Scale %d%%', val) end,
 		onchange = function(val)
 			CFG.fLifeFontScale = val / 100
@@ -313,7 +313,7 @@ function PS.OnPanelActive(frame)
 		x = x, y = y - 1,
 		value = CFG.fManaFontScale * 100,
 		range = {1, 400},
-		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
+		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
 		textfmt = function(val) return _L('Scale %d%%', val) end,
 		onchange = function(val)
 			CFG.fManaFontScale = val / 100

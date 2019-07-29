@@ -409,7 +409,7 @@ function LIB.SwitchTab(szID, bForceUpdate)
 				MY_Serendipity.bEnable = not MY_Serendipity.bEnable
 			end,
 			tip = _L['Monitor serendipity and show share notify.'],
-			tippostype = MY_TIP_POSTYPE.BOTTOM_TOP,
+			tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 		}, true):autoWidth():width()
 		local xS0 = x + ui:append('WndCheckBox', {
 			x = x, y = 375,
@@ -438,7 +438,7 @@ function LIB.SwitchTab(szID, bForceUpdate)
 			name = 'WndEditBox_SerendipitySilentMode',
 			placeholder = _L['Realname, leave blank for anonymous.'],
 			tip = _L['Realname, leave blank for anonymous.'],
-			tippostype = MY_TIP_POSTYPE.BOTTOM_TOP,
+			tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 			limit = 6,
 			text = LIB.LoadLUAData({'config/realname.jx3dat', PATH_TYPE.ROLE}) or GetClientPlayer().szName:gsub('@.-$', ''),
 			onchange = function(szText)

@@ -399,7 +399,7 @@ function D.CreateEntry()
 				name = 'WndButton_AutoChat',
 				text = _L['autochat'],
 				tip = _L['Left click to config autochat.\nRight click to edit global config.'],
-				tippostype = MY_TIP_POSTYPE.TOP_BOTTOM,
+				tippostype = UI.TIP_POSITION.TOP_BOTTOM,
 				lmenu = function()
 					return D.GetDialogueMenu(frame[p.keys.info], frame[p.keys.tartype], frame[p.keys.tarid], frame[p.keys.winidx])
 				end,

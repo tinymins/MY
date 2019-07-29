@@ -169,7 +169,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:append('WndSliderBox', {
 		name = 'WndSliderBox_LifeBarWidth',
-		x = x, y = y, sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE, range = { 5, 150 },
+		x = x, y = y, sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE, range = { 5, 150 },
 		text = function(value) return _L('lifebar width: %s px.', value) end, -- 血条宽度
 		value = Config.nLifeWidth,
 		onchange = function(value)
@@ -181,7 +181,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:append('WndSliderBox', {
 		name = 'WndSliderBox_LifeBarHeight',
-		x = x, y = y, sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE, range = { 1, 150 },
+		x = x, y = y, sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE, range = { 1, 150 },
 		text = function(value) return _L('lifebar height: %s px.', value) end, -- 血条高度
 		value = Config.nLifeHeight,
 		onchange = function(value)
@@ -193,7 +193,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:append('WndSliderBox', {
 		name = 'WndSliderBox_LifeBarOffsetX',
-		x = x, y = y, sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE, range = { -150, 150 },
+		x = x, y = y, sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE, range = { -150, 150 },
 		text = function(value) return _L('lifebar offset-x: %d px.', value) end, -- 血条水平偏移
 		value = Config.nLifeOffsetX,
 		onchange = function(value)
@@ -205,7 +205,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:append('WndSliderBox', {
 		name = 'WndSliderBox_LifeBarOffsetY',
-		x = x, y = y, sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE, range = { 0, 150 },
+		x = x, y = y, sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE, range = { 0, 150 },
 		text = function(value) return _L('lifebar offset-y: %d px.', value) end, -- 血条竖直偏移
 		value = Config.nLifeOffsetY,
 		onchange = function(value)
@@ -217,7 +217,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:append('WndSliderBox', {
 		name = 'WndSliderBox_LifeBarPadding',
-		x = x, y = y, sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE, range = { 0, 10 },
+		x = x, y = y, sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE, range = { 0, 10 },
 		text = function(value) return _L('lifebar padding: %d px.', value) end, -- 血条边框宽度
 		value = Config.nLifePadding,
 		onchange = function(value)
@@ -229,7 +229,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:append('WndSliderBox', {
 		name = 'WndSliderBox_LifeBarBorder',
-		x = x, y = y, sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE, range = { 0, 10 },
+		x = x, y = y, sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE, range = { 0, 10 },
 		text = function(value) return _L('lifebar border: %d px.', value) end, -- 血条边框宽度
 		value = Config.nLifeBorder,
 		onchange = function(value)
@@ -241,7 +241,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:append('WndSliderBox', {
 		name = 'WndSliderBox_LifePerOffsetX',
-		x = x, y = y, sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE, range = { -150, 150 },
+		x = x, y = y, sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE, range = { -150, 150 },
 		text = function(value) return _L('life percentage offset-x: %d px.', value) end, -- 血量百分比水平偏移
 		value = Config.nLifePerOffsetX,
 		onchange = function(value)
@@ -253,7 +253,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:append('WndSliderBox', {
 		name = 'WndSliderBox_LifePerOffsetY',
-		x = x, y = y, sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE, range = { 0, 150 },
+		x = x, y = y, sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE, range = { 0, 150 },
 		text = function(value) return _L('life percentage offset-y: %d px.', value) end, -- 血量百分比竖直偏移
 		value = Config.nLifePerOffsetY,
 		onchange = function(value)
@@ -265,7 +265,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:append('WndSliderBox', {
 		name = 'WndSliderBox_TextOffsetY',
-		x = x, y = y, sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE, range = { 0, 150 },
+		x = x, y = y, sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE, range = { 0, 150 },
 		text = function(value) return _L('text offset-y: %d px.', value) end, -- 第一行字高度
 		value = Config.nTextOffsetY,
 		onchange = function(value)
@@ -277,7 +277,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:append('WndSliderBox', {
 		name = 'WndSliderBox_TextLineHeight',
-		x = x, y = y, sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE, range = { 0, 150 },
+		x = x, y = y, sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE, range = { 0, 150 },
 		text = function(value) return _L('text line height: %d px.', value) end, -- 字行高度
 		value = Config.nTextLineHeight,
 		onchange = function(value)
@@ -289,7 +289,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:append('WndSliderBox', {
 		name = 'WndSliderBox_TextScale',
-		x = x, y = y, sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE, range = { 0, 200 },
+		x = x, y = y, sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE, range = { 0, 200 },
 		text = function(value) return _L('text scale: %.1f%%.', value / 40 * 100) end, -- 字缩放
 		value = Config.fTextScale * 40,
 		onchange = function(value)
@@ -301,7 +301,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:append('WndSliderBox', {
 		name = 'WndSliderBox_TextSpacing',
-		x = x, y = y, sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE, range = { 0, 300 },
+		x = x, y = y, sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE, range = { 0, 300 },
 		text = function(value) return _L('text spacing: %.1f.', value / 10) end, -- 字间距
 		value = Config.fTextSpacing * 10,
 		onchange = function(value)
@@ -313,7 +313,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:append('WndSliderBox', {
 		name = 'WndSliderBox_TitleEffectScale',
-		x = x, y = y, sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE, range = { 0, 200 },
+		x = x, y = y, sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE, range = { 0, 200 },
 		text = function(value) return _L('Title effect scale: %.2f%%.', value / 100) end, -- 头顶特效缩放
 		value = Config.fTitleEffectScale * 100,
 		onchange = function(value)
@@ -325,7 +325,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:append('WndSliderBox', {
 		name = 'WndSliderBox_TitleEffectOffsetY',
-		x = x, y = y, sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE, range = { -150, 150 },
+		x = x, y = y, sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE, range = { -150, 150 },
 		text = function(value) return _L('Title effect offset y: %d px.', value) end, -- 头顶特效间距
 		value = Config.nTitleEffectOffsetY,
 		onchange = function(value)
@@ -337,7 +337,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:append('WndSliderBox', {
 		name = 'WndSliderBox_Distance',
-		x = x, y = y, sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE, range = { 0, 300 },
+		x = x, y = y, sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE, range = { 0, 300 },
 		text = function(value) return value == 0 and _L['Max Distance: Unlimited.'] or _L('Max Distance: %s foot.', value) end,
 		value = math.sqrt(Config.nDistance) / 64,
 		onchange = function(value)
@@ -349,7 +349,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:append('WndSliderBox', {
 		name = 'WndSliderBox_VerticalDistance',
-		x = x, y = y, sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE, range = { 0, 300 },
+		x = x, y = y, sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE, range = { 0, 300 },
 		text = function(value) return value == 0 and _L['Max Vertical Distance: Unlimited.'] or _L('Max Vertical Distance: %s foot.', value) end,
 		value = Config.nVerticalDistance / 8 / 64,
 		onchange = function(value)
@@ -361,7 +361,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:append('WndSliderBox', {
 		name = 'WndSliderBox_Alpha',
-		x = x, y = y, sliderstyle = MY_SLIDER_DISPTYPE.SHOW_PERCENT, range = { 0, 255 },
+		x = x, y = y, sliderstyle = UI.SLIDER_DISPTYPE.SHOW_PERCENT, range = { 0, 255 },
 		text = function(value) return _L('alpha: %.0f%%.', value) end, -- 透明度
 		value = Config.nAlpha,
 		onchange = function(value)
@@ -373,7 +373,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:append('WndSliderBox', {
 		name = 'WndSliderBox_GlobalUIScale',
-		x = x, y = y, sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE, range = { 1, 200 },
+		x = x, y = y, sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE, range = { 1, 200 },
 		text = function(value) return _L('Global UI scale: %.2f.', value / 100) end, -- 字缩放
 		value = Config.fGlobalUIScale * 100 * LIB.GetUIScale(),
 		onchange = function(value)
@@ -693,7 +693,7 @@ function PS.OnPanelActive(wnd)
 			D.Reset()
 		end,
 		tip = _L['This function has been shielded by official'],
-		tippostype = MY_TIP_POSTYPE.TOP_BOTTOM,
+		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
 		autoenable = function() return D.IsEnabled() end,
 	}, true):autoWidth():width() + 5
 	ui:append('WndCheckBox', {
@@ -706,7 +706,7 @@ function PS.OnPanelActive(wnd)
 			D.Reset()
 		end,
 		tip = _L['This function has been shielded by official'],
-		tippostype = MY_TIP_POSTYPE.TOP_BOTTOM,
+		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
 		autoenable = function() return D.IsEnabled() and Config.bShowSpecialNpc end,
 	})
 

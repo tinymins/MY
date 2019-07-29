@@ -312,7 +312,7 @@ function MY_ChatSwitch.OnFrameCreate()
 				this.tRadios[v.channel] = chk
 			end
 			if v.tip then
-				UI(chk):tip(v.tip, MY_TIP_POSTYPE.CENTER)
+				UI(chk):tip(v.tip, UI.TIP_POSITION.CENTER)
 			end
 			if txtTitle then
 				txtTitle:SetText(v.title)

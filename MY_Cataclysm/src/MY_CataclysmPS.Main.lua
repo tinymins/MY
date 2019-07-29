@@ -232,7 +232,7 @@ function PS.OnPanelActive(frame)
 		x = x, y = y - 1,
 		value = CFG.nTempTargetDelay / 75,
 		range = {0, 8},
-		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
+		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
 		onchange = function(val)
 			CFG.nTempTargetDelay = val * 75
 		end,

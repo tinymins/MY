@@ -296,7 +296,7 @@ function PS.OnPanelActive(wnd)
 	ui:append('WndCheckBox', {
 		x = x, y = y, w = wr, text = _L['Auto focus very important npc'],
 		tip = _L['Boss list is always been collecting and updating'],
-		tippostype = MY_TIP_POSTYPE.TOP_BOTTOM,
+		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
 		checked = MY_Focus.bFocusINpc,
 		oncheck = function(bChecked)
 			MY_Focus.bFocusINpc = bChecked
@@ -309,7 +309,7 @@ function PS.OnPanelActive(wnd)
 	ui:append('WndCheckBox', {
 		x = x, y = y, w = wr, text = _L['Embedded focus'],
 		tip = _L['Embedded focus is always been collecting and updating'],
-		tippostype = MY_TIP_POSTYPE.TOP_BOTTOM,
+		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
 		checked = MY_Focus.bEmbeddedFocus,
 		oncheck = function(bChecked)
 			MY_Focus.bEmbeddedFocus = bChecked
@@ -429,7 +429,7 @@ function PS.OnPanelActive(wnd)
 	ui:append('WndCheckBox', {
 		x = x, y = y,w = wr, text = _L['Traversal object'],
 		tip = _L['May cause some problem in dungeon map'],
-		tippostype = MY_TIP_POSTYPE.BOTTOM_TOP,
+		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 		checked = MY_Focus.bTraversal,
 		oncheck = function(bChecked)
 			MY_Focus.bTraversal = bChecked
@@ -487,7 +487,7 @@ function PS.OnPanelActive(wnd)
 	ui:append('WndCheckBox', {
 		x = x, y = y, w = wr, text = _L['Heal healper'],
 		tip = _L['Select target when mouse enter'],
-		tippostype = MY_TIP_POSTYPE.BOTTOM_TOP,
+		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 		checked = MY_Focus.bHealHelper,
 		oncheck = function(bChecked)
 			MY_Focus.bHealHelper = bChecked
@@ -511,7 +511,7 @@ function PS.OnPanelActive(wnd)
 		x = x, y = y, w = 150,
 		textfmt = function(val) return _L('Max display count %d.', val) end,
 		range = {1, 20},
-		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
+		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
 		value = MY_Focus.nMaxDisplay,
 		onchange = function(val)
 			MY_Focus.nMaxDisplay = val
@@ -524,7 +524,7 @@ function PS.OnPanelActive(wnd)
 		x = x, y = y, w = 150,
 		textfmt = function(val) return _L('Current scale-x is %d%%.', val) end,
 		range = {10, 300},
-		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
+		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
 		value = MY_Focus.fScaleX * 100,
 		onchange = function(val)
 			MY_Focus.fScaleX = val / 100
@@ -537,7 +537,7 @@ function PS.OnPanelActive(wnd)
 		x = x, y = y, w = 150,
 		textfmt = function(val) return _L('Current scale-y is %d%%.', val) end,
 		range = {10, 300},
-		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
+		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
 		value = MY_Focus.fScaleY * 100,
 		onchange = function(val)
 			MY_Focus.fScaleY = val / 100

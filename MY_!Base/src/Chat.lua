@@ -38,6 +38,9 @@ local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAD
 -----------------------------------------------------------------------------------------------------------
 local _L = LIB.LoadLangPack()
 
+local RENDERED_FLAG_KEY = 'b' .. PACKET_INFO.NAME_SPACE .. 'ChatRendered'
+local ITEM_LBUTTONDOWN_KEY = '__' .. PACKET_INFO.NAME_SPACE .. '_OnItemLButtonDown'
+
 -- 海鳗里面抠出来的
 -- 聊天复制并发布
 function LIB.RepeatChatLine(hTime)
@@ -286,7 +289,7 @@ function ChatLinkEvents.OnCopyMouseEnter(element, link)
 	local x, y = element:GetAbsPos()
 	local w, h = element:GetSize()
 	local szText = GetFormatText(_L['LClick to copy to editbox.\nMClick to remove this line.\nRClick to repeat this line.'], 136)
-	OutputTip(szText, 450, {x, y, w, h}, MY_TIP_POSTYPE.TOP_BOTTOM)
+	OutputTip(szText, 450, {x, y, w, h}, UI.TIP_POSITION.TOP_BOTTOM)
 end
 function ChatLinkEvents.OnCopyMouseLeave(element, link)
 	if not link then
@@ -345,18 +348,18 @@ function LIB.RenderChatLink(arg1, arg2)
 
 					local handlerEntry = PACKET_INFO.NAME_SPACE .. '.ChatLinkEventHandlers'
 					if name:sub(1, 8) == 'namelink' then
-						script = script .. 'this[\'b' .. PACKET_INFO.NAME_SPACE .. 'ChatRendered\']=true;this.OnItemLButtonDown='
+						script = script .. 'this.' .. RENDERED_FLAG_KEY .. '=true;this.OnItemLButtonDown='
 							.. handlerEntry .. '.OnNameLClick;this.OnItemRButtonDown='
 							.. handlerEntry .. '.OnNameRClick'
 					elseif name == 'copy' or name == 'copylink' or name == 'timelink' then
-						script = script .. 'this[\'b' .. PACKET_INFO.NAME_SPACE .. 'ChatRendered\']=true;this.OnItemLButtonDown='
+						script = script .. 'this.' .. RENDERED_FLAG_KEY .. '=true;this.OnItemLButtonDown='
 							.. handlerEntry .. '.OnCopyLClick;this.OnItemMButtonDown='
 							.. handlerEntry .. '.OnCopyMClick;this.OnItemRButtonDown='
 							.. handlerEntry .. '.OnCopyRClick;this.OnItemMouseEnter='
 							.. handlerEntry .. '.OnCopyMouseEnter;this.OnItemMouseLeave='
 							.. handlerEntry .. '.OnCopyMouseLeave'
 					else
-						script = script .. 'this[\'b' .. PACKET_INFO.NAME_SPACE .. 'ChatRendered\']=true;this.OnItemLButtonDown='
+						script = script .. 'this.' .. RENDERED_FLAG_KEY .. '=true;this.OnItemLButtonDown='
 							.. handlerEntry .. '.OnItemLClick;this.OnItemRButtonDown='
 							.. handlerEntry .. '.OnItemRClick'
 					end
@@ -373,7 +376,7 @@ function LIB.RenderChatLink(arg1, arg2)
 	elseif type(arg1) == 'table' and type(arg1.GetName) == 'function' then
 		local element = arg1
 		local link = arg2 or arg1
-		if element['b' .. PACKET_INFO.NAME_SPACE .. 'ChatRendered'] then
+		if element[RENDERED_FLAG_KEY] then
 			return
 		end
 		local ui = UI(element)
@@ -389,7 +392,7 @@ function LIB.RenderChatLink(arg1, arg2)
 			ui:lclick(function() ChatLinkEvents.OnItemLClick(element, link) end)
 			ui:rclick(function() ChatLinkEvents.OnItemRClick(element, link) end)
 		end
-		element['b' .. PACKET_INFO.NAME_SPACE .. 'ChatRendered'] = true
+		element[RENDERED_FLAG_KEY] = true
 		return element
 	end
 end
@@ -1237,8 +1240,8 @@ end
 
 do
 local function OnChatPanelNamelinkLButtonDown(...)
-	if this['__' .. PACKET_INFO.NAME_SPACE .. '_OnItemLButtonDown'] then
-		this['__' .. PACKET_INFO.NAME_SPACE .. '_OnItemLButtonDown'](...)
+	if this[ITEM_LBUTTONDOWN_KEY] then
+		this[ITEM_LBUTTONDOWN_KEY](...)
 	end
 	LIB.ChatLinkEventHandlers.OnNameLClick(...)
 end
@@ -1246,10 +1249,10 @@ end
 LIB.HookChatPanel('AFTER.' .. PACKET_INFO.NAME_SPACE .. '#HOOKNAME', function(h, nIndex)
 	for i = nIndex, h:GetItemCount() - 1 do
 		local hItem = h:Lookup(i)
-		if hItem:GetName():find('^namelink_%d+$') and not hItem['b' .. PACKET_INFO.NAME_SPACE .. 'ChatRendered'] then
-			hItem['b' .. PACKET_INFO.NAME_SPACE .. 'ChatRendered'] = true
+		if hItem:GetName():find('^namelink_%d+$') and not hItem[RENDERED_FLAG_KEY] then
+			hItem[RENDERED_FLAG_KEY] = true
 			if hItem.OnItemLButtonDown then
-				hItem['__' .. PACKET_INFO.NAME_SPACE .. '_OnItemLButtonDown'] = hItem.OnItemLButtonDown
+				hItem[ITEM_LBUTTONDOWN_KEY] = hItem.OnItemLButtonDown
 			end
 			hItem.OnItemLButtonDown = OnChatPanelNamelinkLButtonDown
 		end

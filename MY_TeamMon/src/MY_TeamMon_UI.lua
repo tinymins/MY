@@ -1674,7 +1674,7 @@ function D.OpenSettingPanel(data, szType)
 		end
 		nX = ui:append('WndCheckBox', {
 			x = nX + 5, y = nY, checked = cfg.bScreenHead, text = _L['Screen Head Alarm'],
-			tip = _L['Requires MY_LifeBar loaded.'], tippostype = MY_TIP_POSTYPE.BOTTOM_TOP,
+			tip = _L['Requires MY_LifeBar loaded.'], tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 			oncheck = function(bCheck)
 				SetDataClass(MY_TM_TYPE.BUFF_GET, 'bScreenHead', bCheck)
 			end,
@@ -1874,7 +1874,7 @@ function D.OpenSettingPanel(data, szType)
 			end
 			nX = ui:append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bScreenHead, text = _L['Screen Head Alarm'],
-				tip = _L['Requires MY_LifeBar loaded.'], tippostype = MY_TIP_POSTYPE.BOTTOM_TOP,
+				tip = _L['Requires MY_LifeBar loaded.'], tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 				oncheck = function(bCheck)
 					SetDataClass(MY_TM_TYPE.SKILL_BEGIN, 'bScreenHead', bCheck)
 				end,
@@ -1955,7 +1955,7 @@ function D.OpenSettingPanel(data, szType)
 		end
 		nX = ui:append('WndCheckBox', {
 			x = nX + 5, y = nY, checked = cfg.bScreenHead, text = _L['Screen Head Alarm'],
-			tip = _L['Requires MY_LifeBar loaded.'], tippostype = MY_TIP_POSTYPE.BOTTOM_TOP,
+			tip = _L['Requires MY_LifeBar loaded.'], tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 			oncheck = function(bCheck)
 				SetDataClass(MY_TM_TYPE.NPC_ENTER, 'bScreenHead', bCheck)
 			end,
@@ -2060,7 +2060,7 @@ function D.OpenSettingPanel(data, szType)
 		end
 		nX = ui:append('WndCheckBox', {
 			x = nX + 5, y = nY, checked = cfg.bScreenHead, text = _L['Screen Head Alarm'],
-			tip = _L['Requires MY_LifeBar loaded.'], tippostype = MY_TIP_POSTYPE.BOTTOM_TOP,
+			tip = _L['Requires MY_LifeBar loaded.'], tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 			oncheck = function(bCheck)
 				SetDataClass(MY_TM_TYPE.DOODAD_ENTER, 'bScreenHead', bCheck)
 			end,
@@ -2171,7 +2171,7 @@ function D.OpenSettingPanel(data, szType)
 		end
 		nX = ui:append('WndCheckBox', {
 			x = nX + 5, y = nY + 10, checked = cfg.bScreenHead, text = _L['Screen Head Alarm'],
-			tip = _L['Requires MY_LifeBar loaded.'], tippostype = MY_TIP_POSTYPE.BOTTOM_TOP,
+			tip = _L['Requires MY_LifeBar loaded.'], tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 			oncheck = function(bCheck)
 				SetDataClass(MY_TM_TYPE.TALK_MONITOR, 'bScreenHead', bCheck)
 			end,
@@ -2237,7 +2237,7 @@ function D.OpenSettingPanel(data, szType)
 		end
 		nX = ui:append('WndCheckBox', {
 			x = nX + 5, y = nY + 10, checked = cfg.bScreenHead, text = _L['Screen Head Alarm'],
-			tip = _L['Requires MY_LifeBar loaded.'], tippostype = MY_TIP_POSTYPE.BOTTOM_TOP,
+			tip = _L['Requires MY_LifeBar loaded.'], tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 			oncheck = function(bCheck)
 				SetDataClass(MY_TM_TYPE.CHAT_MONITOR, 'bScreenHead', bCheck)
 			end,

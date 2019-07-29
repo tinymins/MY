@@ -161,7 +161,7 @@ function PS.OnPanelActive(wnd)
 		x = x + 2, y = y + 2,
 		value = MY_TargetLine.nLineWidth,
 		range = {1, 5},
-		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
+		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
 		textfmt = function(val) return _L('%d px', val) end,
 		onchange = function(val) MY_TargetLine.nLineWidth = val end,
 		autoenable = function() return not MY_TargetLine.bTargetRL or not MY_TargetLine.bTTargetRL end,
@@ -190,7 +190,7 @@ function PS.OnPanelActive(wnd)
 		x = x + 2, y = y + 2,
 		value = MY_TargetLine.nLineAlpha,
 		range = {1, 255},
-		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
+		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
 		onchange = function(val) MY_TargetLine.nLineAlpha = val end,
 		autoenable = function() return not MY_TargetLine.bTargetRL or not MY_TargetLine.bTTargetRL end,
 	})
@@ -260,7 +260,7 @@ function PS.OnPanelActive(wnd)
 		x = x + 2, y = y + 2,
 		value = MY_TargetFace.nSectorDegree,
 		range = {30, 180},
-		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
+		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
 		textfmt = function(val) return _L('%d degree', val) end,
 		onchange = function(val) MY_TargetFace.nSectorDegree = val end,
 	})
@@ -272,7 +272,7 @@ function PS.OnPanelActive(wnd)
 		x = x + 2, y = y + 2,
 		value = MY_TargetFace.nSectorRadius,
 		range = {1, 26},
-		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
+		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
 		textfmt = function(val) return _L('%d feet', val) end,
 		onchange = function(val) MY_TargetFace.nSectorRadius = val end,
 	})
@@ -284,7 +284,7 @@ function PS.OnPanelActive(wnd)
 		x = x + 2, y = y + 2,
 		value = ceil((200 - MY_TargetFace.nSectorAlpha) / 2),
 		range = {0, 100},
-		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
+		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
 		textfmt = function(val) return _L('%d %%', val) end,
 		onchange = function(val) MY_TargetFace.nSectorAlpha = (100 - val) * 2 end,
 	})
@@ -337,7 +337,7 @@ function PS.OnPanelActive(wnd)
 		x = x + 2, y = y + 2,
 		value = MY_TargetFace.nShapeRadius,
 		range = {1, 26},
-		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
+		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
 		textfmt = function(val) return _L('%.1f feet', val / 2) end,
 		onchange = function(val) MY_TargetFace.nShapeRadius = val end,
 	})
@@ -349,7 +349,7 @@ function PS.OnPanelActive(wnd)
 		x = x + 2, y = y + 2,
 		value = ceil((200 - MY_TargetFace.nShapeAlpha) / 2),
 		range = {0, 100},
-		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
+		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
 		textfmt = function(val) return _L('%d %%', val) end,
 		onchange = function(val) MY_TargetFace.nShapeAlpha = (100 - val) * 2 end,
 	})
