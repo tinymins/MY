@@ -1142,8 +1142,7 @@ local function OnInit()
 	end
 	INIT_FUNC_LIST = {}
 end
-LIB.RegisterEvent('RELOAD_UI_ADDON_END.' .. PACKET_INFO.NAME_SPACE .. '#Storage', OnInit)
-LIB.RegisterEvent('FIRST_SYNC_USER_PREFERENCES_END.' .. PACKET_INFO.NAME_SPACE .. '#Storage', OnInit)
+LIB.RegisterInit('LIB#Storage', OnInit)
 end
 
 -- ##################################################################################################

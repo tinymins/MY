@@ -1225,17 +1225,16 @@ local function HookAll()
 		Hook(i)
 	end
 end
-HookAll()
+LIB.RegisterInit('LIB#ChatPanelHook', HookAll)
 LIB.RegisterEvent('CHAT_PANEL_INIT.ChatPanelHook', HookAll)
-LIB.RegisterEvent('RELOAD_UI_ADDON_END.ChatPanelHook', HookAll)
 
 local function UnhookAll()
 	for i = 1, 10 do
 		Unhook(i)
 	end
 end
-LIB.RegisterExit('ChatPanelHook', UnhookAll)
-LIB.RegisterReload('ChatPanelHook', UnhookAll)
+LIB.RegisterExit('LIB#ChatPanelHook', UnhookAll)
+LIB.RegisterReload('LIB#ChatPanelHook', UnhookAll)
 end
 
 do
