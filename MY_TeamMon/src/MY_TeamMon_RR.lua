@@ -81,27 +81,27 @@ function D.ClosePanel()
 	Wnd.CloseWindow('MY_TeamMon_RR')
 end
 
-function D.LoadMetaList()
-	return LIB.LoadLUAData({'userdata/TeamMon/MetaList.jx3dat', PATH_TYPE.GLOBAL}) or {}
+function D.LoadRssList()
+	return LIB.LoadLUAData({'userdata/TeamMon/Rss.jx3dat', PATH_TYPE.GLOBAL}) or {}
 end
 
-function D.SaveMetaList(aRss)
-	LIB.SaveLUAData({'userdata/TeamMon/MetaList.jx3dat', PATH_TYPE.GLOBAL}, aRss)
+function D.SaveRssList(aRss)
+	LIB.SaveLUAData({'userdata/TeamMon/Rss.jx3dat', PATH_TYPE.GLOBAL}, aRss)
 	FireUIEvent('MY_TM_RR_RSS_UPDATE')
 end
 
-function D.AddMetaInfo(info)
-	local aRss = D.LoadMetaList()
+function D.AddRssMeta(info)
+	local aRss = D.LoadRssList()
 	for _, p in spairs(RSS_DEFAULT, aRss) do
 		if p.szURL == info.szURL then
 			return
 		end
 	end
 	insert(aRss, info)
-	D.SaveMetaList(aRss)
+	D.SaveRssList(aRss)
 end
 
-function D.DownloadMeta(info, onSuccess, onError)
+function D.DownloadRssMeta(info, onSuccess, onError)
 	local szURL = info.szURL
 	if not wfind(szURL, '.') and not wfind(szURL, '/') then
 		szURL = 'https://code.aliyun.com/'
@@ -136,13 +136,13 @@ function D.DownloadMeta(info, onSuccess, onError)
 				szAbout = res.about or '',
 				szVersion = res.version or '',
 			}
-			local aRss = D.LoadMetaList()
+			local aRss = D.LoadRssList()
 			for i, p in ipairs(aRss) do
 				if p.szKey == info.szKey then
 					aRss[i] = info
 				end
 			end
-			D.SaveMetaList(aRss)
+			D.SaveRssList(aRss)
 			onSuccess(info)
 		end,
 		error = function(html, status)
@@ -169,7 +169,7 @@ function D.LoadConfigureFile(szFile, info)
 end
 
 function D.DownloadData(info)
-	D.DownloadMeta(info, function(info)
+	D.DownloadRssMeta(info, function(info)
 		local szUUID = 'Remote-' .. MD5(info.szURL)
 		local LUA_CONFIG = { passphrase = MY_TM_DATA_PASSPHRASE }
 		local p = LIB.LoadLUAData(MY_TM_META_ROOT .. szUUID .. '.jx3dat', LUA_CONFIG)
@@ -210,7 +210,7 @@ function D.UpdateList(frame)
 	if not frame and frame:IsValid() then
 		return
 	end
-	local aRss = D.LoadMetaList()
+	local aRss = D.LoadRssList()
 	local container = frame:Lookup('PageSet_Menu/Page_FileDownload/WndScroll_FileDownload/WndContainer_FileDownload_List')
 	container:Clear()
 	for _, p in spairs(RSS_DEFAULT, aRss) do
@@ -257,8 +257,8 @@ function D.OnLButtonClick()
 		D.DownloadData(this:GetParent().info)
 	elseif name == 'Btn_AddUrl' then
 		GetUserInput(_L['Please input rss address:'], function(szURL)
-			D.DownloadMeta({ szURL = szURL }, function(info)
-				D.AddMetaInfo(info)
+			D.DownloadRssMeta({ szURL = szURL }, function(info)
+				D.AddRssMeta(info)
 				D.UpdateList(frame)
 			end, function(szErrmsg)
 				if szErrmsg then
@@ -274,13 +274,13 @@ function D.OnLButtonClick()
 			return MY.Topmsg(_L['Default dataset cannot be removed!'])
 		end
 		LIB.Confirm(_L['Confirm?'], function()
-			local aRss = D.LoadMetaList()
+			local aRss = D.LoadRssList()
 			for i, p in ipairs_r(aRss) do
 				if p.szKey == RSS_SEL_INFO.szKey then
 					remove(aRss, i)
 				end
 			end
-			D.SaveMetaList(aRss)
+			D.SaveRssList(aRss)
 			D.UpdateList(frame)
 		end)
 	elseif name == 'Btn_Info' then
@@ -323,7 +323,7 @@ LIB.RegisterBgMsg('MY_TeamMon_RR', function(_, _, _, szTalker, _, action, info)
 		info = LIB.FormatDataStructure(info, RSS_TEMPLATE)
 		if not IsEmpty(info.szURL) and not IsEmpty(info.szTitle) then
 			LIB.Confirm(_L('%s request download: %s', szTalker, info.szTitle .. ' - ' .. info.szAuthor), function()
-				D.AddMetaInfo(info)
+				D.AddRssMeta(info)
 				D.DownloadData(info)
 			end)
 		end
