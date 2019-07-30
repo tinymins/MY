@@ -1960,17 +1960,9 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.NPC_ENTER, 'bScreenHead', bCheck)
 			end,
 		}, true):autoWidth():pos('BOTTOMRIGHT')
-		nX = ui:append('WndCheckBox', {
-			x = nX + 5, y = nY, checked = cfg.bFocus, text = _L['Focus List'],
-			tip = _L['Requires MY_Focus loaded.'], tippostype = UI.TIP_POSITION.BOTTOM_TOP,
-			oncheck = function(bCheck)
-				SetDataClass(MY_TM_TYPE.NPC_ENTER, 'bFocus', bCheck)
-			end,
-		}, true):autoWidth():pos('BOTTOMRIGHT')
 		if not LIB.IsShieldedVersion() then
-			nY = nY + CHECKBOX_HEIGHT
 			nX = ui:append('WndCheckBox', {
-				x = 30, y = nY, checked = cfg.bFullScreen, text = _L['Full Screen Alarm'],
+				x = nX + 5, y = nY, checked = cfg.bFullScreen, text = _L['Full Screen Alarm'],
 				oncheck = function(bCheck)
 					SetDataClass(MY_TM_TYPE.NPC_ENTER, 'bFullScreen', bCheck)
 				end,
@@ -2073,17 +2065,9 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.DOODAD_ENTER, 'bScreenHead', bCheck)
 			end,
 		}, true):autoWidth():pos('BOTTOMRIGHT')
-		nX = ui:append('WndCheckBox', {
-			x = nX + 5, y = nY, checked = cfg.bFocus, text = _L['Focus List'],
-			tip = _L['Requires MY_Focus loaded.'], tippostype = UI.TIP_POSITION.BOTTOM_TOP,
-			oncheck = function(bCheck)
-				SetDataClass(MY_TM_TYPE.NPC_ENTER, 'bFocus', bCheck)
-			end,
-		}, true):autoWidth():pos('BOTTOMRIGHT')
 		if not LIB.IsShieldedVersion() then
-			nY = nY + CHECKBOX_HEIGHT
 			nX = ui:append('WndCheckBox', {
-				x = 30, y = nY, checked = cfg.bFullScreen, text = _L['Full Screen Alarm'],
+				x = nX + 5, y = nY, checked = cfg.bFullScreen, text = _L['Full Screen Alarm'],
 				oncheck = function(bCheck)
 					SetDataClass(MY_TM_TYPE.DOODAD_ENTER, 'bFullScreen', bCheck)
 				end,

@@ -775,13 +775,6 @@ function D.OnSetAncientStaticFocus()
 end
 
 do
-local function onTemporary()
-	D.SetFocusID(arg0, arg1)
-end
-LIB.RegisterEvent('MY_FOCUS_TEMPORARY.MY_Focus', onTemporary)
-end
-
-do
 local l_dwMapID
 local function onLoadingEnd()
 	local dwMapID = GetClientPlayer().GetMapID()
