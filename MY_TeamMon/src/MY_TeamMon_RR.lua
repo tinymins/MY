@@ -204,6 +204,22 @@ function D.DownloadData(info)
 	end)
 end
 
+function D.ShareMetaToRaid(info, bSure)
+	if not LIB.IsInParty() then
+		return LIB.Alert(_L['You are not in the team.'])
+	end
+	if not LIB.IsLeader() and not LIB.IsDebugClient(true) then
+		return LIB.Alert(_L['You are not team leader.'])
+	end
+	if not bSure then
+		LIB.Confirm(_L['Confirm?'], function()
+			D.ShareMetaToRaid(info, true)
+		end)
+		return
+	end
+	LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TeamMon_RR', 'SYNC', META_SEL_INFO)
+end
+
 function D.UpdateList(frame)
 	if not frame and frame:IsValid() then
 		return
@@ -302,18 +318,7 @@ function D.OnLButtonClick()
 		if not META_SEL_INFO then
 			return MY.Topmsg(_L['Please select one dataset first!'])
 		end
-		if not LIB.IsInParty() then
-			return LIB.Alert(_L['You are not in the team.'])
-		end
-		if not LIB.IsLeader() and not LIB.IsDebugClient(true) then
-			return LIB.Alert(_L['You are not team leader.'])
-		end
-		LIB.Confirm(_L['Confirm?'], function()
-			if not META_SEL_INFO or not LIB.IsInParty() or (not LIB.IsLeader() and not LIB.IsDebugClient(true)) then
-				return
-			end
-			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TeamMon_RR', 'SYNC', META_SEL_INFO)
-		end)
+		D.ShareMetaToRaid(META_SEL_INFO)
 	end
 end
 
@@ -350,6 +355,12 @@ function D.OnItemRButtonClick()
 				end,
 			})
 		end
+		insert(t, {
+			szOption = _L['Sync team'],
+			fnAction = function()
+				D.ShareMetaToRaid(wnd.info)
+			end,
+		})
 		PopupMenu(t)
 	end
 end
