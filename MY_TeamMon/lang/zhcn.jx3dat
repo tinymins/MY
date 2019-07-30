@@ -185,7 +185,7 @@ data = {
 	['Countdown format Error'] = '倒计时格式错误',
 	['[%s] left over %d.'] = '【%s】 剩余 %d 秒。',
 	['Countdown'] = '倒计时',
-	-- WebSyncData.lua --
+	-- MY_TeamMon_RR.lua --
 	['Default'] = '默认',
 	['Default monitor data'] = '默认数据',
 	['ERR: Info content is illegal!'] = '错误：无法获得有效的描述文件！',
@@ -211,6 +211,10 @@ data = {
 	['Add url'] = '添加订阅',
 	['Remove url'] = '删除订阅',
 	['Default dataset cannot be removed!'] = '默认数据不可删除！',
+	['Meta URL: %s'] = '订阅地址：%s',
+	['(Short URL: %s)'] = '（短链：%s）',
+	['Copy meta url'] = '复制订阅地址',
+	['Copy short meta url'] = '复制短地址',
 	-- Circle.lua --
 	['Team Channel'] = '团队频道',
 	['Whisper Channel'] = '密聊频道',

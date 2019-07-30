@@ -71,6 +71,12 @@ local META_TEMPLATE = {
 	szAbout = '',
 	szVersion = '',
 }
+local META_URL_AUTO_PREFIX = 'https://code.aliyun.com/'
+local META_URL_AUTO_SUFFIX = '/JX3_MY_DATA/raw/master/MY_TeamMon/' .. LANG .. '/meta.json'
+-- local META_URL_AUTO_PREFIX = 'https://dev.tencent.com/u/'
+-- local META_URL_AUTO_SUFFIX = '/p/JX3_MY_DATA/git/raw/master/MY_TeamMon/' .. LANG .. '/meta.json'
+-- local META_URL_AUTO_PREFIX = 'https://gitee.com/'
+-- local META_URL_AUTO_SUFFIX = '/JX3_MY_DATA/raw/master/MY_TeamMon/' .. LANG .. '/meta.json'
 local META_SEL_INFO, META_DOWNLOADER
 
 function D.OpenPanel()
@@ -104,15 +110,7 @@ end
 function D.DownloadMeta(info, onSuccess, onError)
 	local szURL = info.szURL
 	if not wfind(szURL, '.') and not wfind(szURL, '/') then
-		szURL = 'https://code.aliyun.com/'
-			.. szURL .. '/JX3_MY_DATA/raw/master/MY_TeamMon/'
-			.. LANG .. '/meta.json'
-		-- szURL = 'https://dev.tencent.com/u/'
-		-- 	.. szURL .. '/p/JX3_MY_DATA/git/raw/master/MY_TeamMon/'
-		-- 	.. LANG .. '/meta.json'
-		-- szURL = 'https://gitee.com/'
-		-- 	.. szURL .. '/JX3_MY_DATA/raw/master/MY_TeamMon/'
-		-- 	.. LANG .. '/meta.json'
+		szURL = META_URL_AUTO_PREFIX .. szURL .. META_URL_AUTO_SUFFIX
 	end
 	LIB.Ajax({
 		url = szURL,
@@ -330,6 +328,49 @@ function D.OnItemLButtonClick()
 		end
 		META_SEL_INFO = wnd.info
 		wnd:Lookup('', 'Image_Item_Sel'):Show()
+	end
+end
+
+function D.OnItemRButtonClick()
+	local name = this:GetName()
+	if name == 'Handle_Item' then
+		local wnd = this:GetParent()
+		local t = {{
+			szOption = _L['Copy meta url'],
+			fnAction = function()
+				UI.OpenTextEditor(wnd.info.szURL)
+			end,
+		}}
+		if wnd.info.szURL:sub(1, #META_URL_AUTO_PREFIX) == META_URL_AUTO_PREFIX
+		and wnd.info.szURL:sub(-#META_URL_AUTO_SUFFIX, -1) == META_URL_AUTO_SUFFIX then
+			insert(t, {
+				szOption = _L['Copy short meta url'],
+				fnAction = function()
+					UI.OpenTextEditor(wnd.info.szURL:sub(#META_URL_AUTO_PREFIX + 1, -#META_URL_AUTO_SUFFIX - 1))
+				end,
+			})
+		end
+		PopupMenu(t)
+	end
+end
+
+function D.OnItemMouseEnter()
+	local name = this:GetName()
+	if name == 'Handle_Item' then
+		local wnd = this:GetParent()
+		local szTip = _L('Meta URL: %s', wnd.info.szURL)
+		if wnd.info.szURL:sub(1, #META_URL_AUTO_PREFIX) == META_URL_AUTO_PREFIX
+		and wnd.info.szURL:sub(-#META_URL_AUTO_SUFFIX, -1) == META_URL_AUTO_SUFFIX then
+			szTip = szTip .. _L('(Short URL: %s)', wnd.info.szURL:sub(#META_URL_AUTO_PREFIX + 1, -#META_URL_AUTO_SUFFIX - 1))
+		end
+		LIB.OutputTip(this, szTip)
+	end
+end
+
+function D.OnItemMouseLeave()
+	local name = this:GetName()
+	if name == 'Handle_Item' then
+		HideTip()
 	end
 end
 
