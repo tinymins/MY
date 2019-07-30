@@ -258,7 +258,7 @@ function D.OnLButtonClick()
 	elseif name == 'Btn_AddUrl' then
 		GetUserInput(_L['Please input meta address:'], function(szText)
 			local aErrmsg = {}
-			local aURL = LIB.SplitText(szText)
+			local aURL = LIB.SplitString(szText, ';')
 			local nPending = #aURL
 			local function onComplete()
 				nPending = nPending - 1
