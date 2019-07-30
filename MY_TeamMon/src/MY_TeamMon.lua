@@ -47,7 +47,8 @@ if not LIB.AssertVersion('MY_TeamMon', _L['MY_TeamMon'], 0x2013500) then
 	return
 end
 
-local MY_TM_DATA_ROOT = LIB.FormatPath({'userdata/TeamMon/', PATH_TYPE.GLOBAL})
+local MY_TM_META_ROOT = LIB.FormatPath({'userdata/TeamMon/Meta/', PATH_TYPE.GLOBAL})
+local MY_TM_DATA_ROOT = LIB.FormatPath({'userdata/TeamMon/Data/', PATH_TYPE.GLOBAL})
 local MY_TM_DATA_PASSPHRASE = '89g45ynbtldnsryu98rbny9ps7468hb6npyusiryuxoldg7lbn894bn678b496746'
 local MY_TM_DATA_EMBEDDED_ENCRYPTED = false
 local MY_TM_TYPE = {
@@ -176,7 +177,7 @@ RegisterCustomData('MY_TeamMon.bPushBuffList')
 RegisterCustomData('MY_TeamMon.bPushPartyBuffList')
 
 local function GetDataPath()
-	local szPath = LIB.FormatPath({'userdata/TeamMon.jx3dat', O.bCommon and PATH_TYPE.GLOBAL or PATH_TYPE.ROLE})
+	local szPath = LIB.FormatPath({'userdata/TeamMon/Config.jx3dat', O.bCommon and PATH_TYPE.GLOBAL or PATH_TYPE.ROLE})
 	Log('[MY_TeamMon] Data path: ' .. szPath)
 	return szPath
 end
@@ -1548,7 +1549,7 @@ function D.Init()
 					data = DecodeData(data)
 				end
 				data = EncodeData(data, true, true)
-				SaveDataToFile(data, LIB.FormatPath({'userdata/TeamMon/' .. uuid .. '.jx3dat', PATH_TYPE.GLOBAL}, {lang = lang}), MY_TM_DATA_PASSPHRASE)
+				SaveDataToFile(data, LIB.FormatPath({'userdata/TeamMon/Data/' .. uuid .. '.jx3dat', PATH_TYPE.GLOBAL}, {lang = lang}), MY_TM_DATA_PASSPHRASE)
 			end
 		end
 		MY_TM_DATA_EMBEDDED_ENCRYPTED = true
@@ -1960,6 +1961,7 @@ local settings = {
 				SaveConfigureFile   = D.SaveConfigureFile,
 				LoadConfigureFile   = D.LoadConfigureFile,
 				Exchange            = D.Exchange         ,
+				MY_TM_META_ROOT     = MY_TM_META_ROOT    ,
 				MY_TM_DATA_ROOT     = MY_TM_DATA_ROOT    ,
 				MY_TM_TYPE          = MY_TM_TYPE         ,
 				MY_TM_SCRUTINY_TYPE = MY_TM_SCRUTINY_TYPE,
