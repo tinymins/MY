@@ -1028,6 +1028,12 @@ function D.OnNpcEvent(npc, bEnter)
 					})
 					FireUIEvent('MY_TM_SA_CREATE', 'NPC', npc.dwID, { txt = data.szNote, col = data.col, szName = data.szName })
 				end
+				-- 焦点列表
+				if cfg.bFocus then
+					FireUIEvent('MY_FOCUS_TEMPORARY', TARGET.NPC, npc.dwID, 'MY_TM_NPC_' .. npc.dwID, {
+						szText = data.szNote or data.szName,
+					})
+				end
 			end
 			if nTime - CACHE.NPC_LIST[npc.dwTemplateID].nTime < 500 then -- 0.5秒内进入相同的NPC直接忽略
 				return -- D.Log('IGNORE NPC ENTER SCENE ID:' .. npc.dwTemplateID .. ' TIME:' .. nTime .. ' TIME2:' .. CACHE.NPC_LIST[npc.dwTemplateID].nTime)
@@ -1156,6 +1162,12 @@ function D.OnDoodadEvent(doodad, bEnter)
 						col = data.col,
 					})
 					FireUIEvent('MY_TM_SA_CREATE', 'DOODAD', doodad.dwID, { txt = data.szNote, col = data.col, szName = data.szName })
+				end
+				-- 焦点列表
+				if cfg.bFocus then
+					FireUIEvent('MY_FOCUS_TEMPORARY', TARGET.DOODAD, doodad.dwID, 'MY_TM_DOODAD_' .. npc.dwID, {
+						szText = data.szNote or data.szName,
+					})
 				end
 			end
 			if nTime - CACHE.DOODAD_LIST[doodad.dwTemplateID].nTime < 500 then
