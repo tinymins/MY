@@ -523,18 +523,6 @@ function D.OnItemLButtonClick()
 		end
 		if MY_TMUI_SELECT_TYPE == 'CIRCLE' then
 			Circle.OpenDataPanel(this.dat)
-		elseif MY_TMUI_SELECT_TYPE == 'FOCUS' then
-			local data = this.dat
-			MY_Focus.OpenRuleEditor(this.dat, function(dat)
-				if dat then
-					for k, v in pairs(dat) do
-						data[k] = v
-					end
-					FireUIEvent('MY_TM_DATA_RELOAD', { FOCUS = true })
-				else
-					D.RemoveData(data.dwMapID, data.nIndex, D.GetDataName('FOCUS', data) or _L['This data'])
-				end
-			end, true)
 		else
 			D.OpenSettingPanel(this.dat, MY_TMUI_SELECT_TYPE)
 		end
@@ -1400,6 +1388,19 @@ end
 
 -- …Ë÷√√Ê∞Â
 function D.OpenSettingPanel(data, szType)
+	if MY_TMUI_SELECT_TYPE == 'FOCUS' then
+		MY_Focus.OpenRuleEditor(data, function(dat)
+			if dat then
+				for k, v in pairs(dat) do
+					data[k] = v
+				end
+				FireUIEvent('MY_TM_DATA_RELOAD', { FOCUS = true })
+			else
+				D.RemoveData(data.dwMapID, data.nIndex, D.GetDataName('FOCUS', data) or _L['This data'])
+			end
+		end, true)
+		return
+	end
 	local function GetScrutinyTypeMenu()
 		local menu = {
 			{ szOption = g_tStrings.STR_GUILD_ALL, bMCheck = true, bChecked = type(data.nScrutinyType) == 'nil', fnAction = function() data.nScrutinyType = nil end },
