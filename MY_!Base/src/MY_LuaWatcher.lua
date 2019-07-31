@@ -9,6 +9,7 @@
 if LoadLUAData('interface/DEBUG.jx3dat') and IsLocalFileExist('ui/DEBUG.ini') then
 	Wnd.OpenWindow('ui/DEBUG.ini')
 end
+--[[#DEBUG BEGIN]]
 if not IsDebugClient() then
 	return
 end
@@ -238,3 +239,4 @@ RegisterEvent('MY_BASE_LOADING_END', function()
 
 	MY.RegisterPanel('MY_LuaWatcher', _L['MY_LuaWatcher'], _L['Development'], 'ui/Image/UICommon/BattleFiled.UITex|7', PS)
 end)
+--[[#DEBUG END]]

@@ -147,9 +147,9 @@ function D.DownloadMeta(info, onSuccess, onError)
 			if status == 404 then
 				return onError(_L['ERR404: Meta address not found!'])
 			end
-			--[[DEBUG BEGIN]]
+			--[[#DEBUG BEGIN]]
 			LIB.Debug('ERROR MY_TeamMon_RR Get Meta: ' .. status .. '\n' .. UTF8ToAnsi(html))
-			--[[DEBUG END]]
+			--[[#DEBUG END]]
 			onError()
 		end,
 	})
