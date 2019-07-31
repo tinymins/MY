@@ -744,32 +744,32 @@ function D.OpenRuleEditor(tData, onChangeNotify, bHideBase)
 			}, true):autoWidth():pos('BOTTOMRIGHT') + 5
 		end
 		nX, nY = X, nY + dY
-	end
-	-- 目标类型
-	ui:append('Text', { x = nX, y = nY, color = {255, 255, 0}, text = _L['Target type'] }, true):autoWidth()
-	nX, nY = X + 10, nY + dY
-	nX = ui:append('WndCheckBox', {
-		x = nX, y = nY,
-		text = _L['All'],
-		checked = tData.tType.bAll,
-		oncheck = function()
-			tData.tType.bAll = not tData.tType.bAll
-			onChangeNotify(tData)
-		end,
-	}, true):autoWidth():pos('BOTTOMRIGHT') + 5
-	for _, eType in ipairs({ TARGET.NPC, TARGET.PLAYER, TARGET.DOODAD }) do
+		-- 目标类型
+		ui:append('Text', { x = nX, y = nY, color = {255, 255, 0}, text = _L['Target type'] }, true):autoWidth()
+		nX, nY = X + 10, nY + dY
 		nX = ui:append('WndCheckBox', {
 			x = nX, y = nY,
-			text = _L.TARGET[eType],
-			checked = tData.tType[eType],
+			text = _L['All'],
+			checked = tData.tType.bAll,
 			oncheck = function()
-				tData.tType[eType] = not tData.tType[eType]
+				tData.tType.bAll = not tData.tType.bAll
 				onChangeNotify(tData)
 			end,
-			autoenable = function() return not tData.tType.bAll end,
 		}, true):autoWidth():pos('BOTTOMRIGHT') + 5
+		for _, eType in ipairs({ TARGET.NPC, TARGET.PLAYER, TARGET.DOODAD }) do
+			nX = ui:append('WndCheckBox', {
+				x = nX, y = nY,
+				text = _L.TARGET[eType],
+				checked = tData.tType[eType],
+				oncheck = function()
+					tData.tType[eType] = not tData.tType[eType]
+					onChangeNotify(tData)
+				end,
+				autoenable = function() return not tData.tType.bAll end,
+			}, true):autoWidth():pos('BOTTOMRIGHT') + 5
+		end
+		nX, nY = X, nY + dY
 	end
-	nX, nY = X, nY + dY
 	-- 目标关系
 	ui:append('Text', { x = nX, y = nY, color = {255, 255, 0}, text = _L['Target relation'] }, true):autoWidth()
 	nX, nY = X + 10, nY + dY
