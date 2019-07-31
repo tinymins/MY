@@ -9,6 +9,7 @@ data = {
     ['Boss list is always been collecting and updating'] = '重要NPC列表不定時自動更新\n選中目標按住SHIFT右鍵點擊目標頭像可手動添加刪除',
     ['Embedded focus'] = '自動焦點副本NPC',
     ['Embedded focus is always been collecting and updating'] = '副本NPC數據不定時維護更新\n啟用後會在自動焦點重要NPC（系統數據）基礎上進行更多個性化顯示',
+    ['TeamMon focus'] = '團隊監控焦點',
     ['Auto focus friend'] = '焦點附近好友',
     ['Auto focus tong'] = '焦點附近幫會成員',
     ['Auto focus only in public map'] = '僅在公共地圖自動焦點',
@@ -44,6 +45,7 @@ data = {
 
     ['Loop target in focus'] = '焦點列表循環選擇',
 
+    ['Focus rule editor'] = '焦點編輯',
     ['Target type'] = '目標類型',
     ['Target life percentage'] = '目標血量百分比',
     ['All'] = '全部',

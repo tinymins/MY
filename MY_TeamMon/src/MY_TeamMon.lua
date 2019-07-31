@@ -91,7 +91,7 @@ local MY_TM_MARK_FREE   = true -- 标记空闲
 local MY_TM_LEFT_LINE  = GetFormatText(_L['['], 44, 255, 255, 255)
 local MY_TM_RIGHT_LINE = GetFormatText(_L[']'], 44, 255, 255, 255)
 ----
-local MY_TM_TYPE_LIST = { 'BUFF', 'DEBUFF', 'CASTING', 'NPC', 'DOODAD', 'TALK', 'CHAT' }
+local MY_TM_TYPE_LIST = { 'BUFF', 'DEBUFF', 'CASTING', 'NPC', 'DOODAD', 'TALK', 'CHAT', 'FOCUS' }
 
 local MYTM_EVENTS = {
 	'NPC_ENTER_SCENE',
@@ -1588,7 +1588,7 @@ end
 -- 获取整个表
 function D.GetTable(szType, bTemp)
 	if bTemp then
-		if szType == 'CIRCLE' then -- 如果请求圈圈的近期数据 返回NPC的
+		if szType == 'CIRCLE' or szType == 'FOCUS' then -- 如果请求圈圈的近期数据 返回NPC的
 			szType = 'NPC'
 		end
 		return D.TEMP[szType]
@@ -1665,6 +1665,7 @@ function D.LoadUserData()
 		for k, v in pairs(D.FILE) do
 			D.FILE[k] = data[k] or {}
 		end
+		FireUIEvent('MY_TM_DATA_RELOAD', { FOCUS = true })
 	else
 		local szLang = select(3, GetVersion())
 		local config = {
@@ -1739,6 +1740,7 @@ function D.LoadConfigureFile(config)
 			end
 		end
 		FireUIEvent('MY_TM_CREATE_CACHE')
+		FireUIEvent('MY_TM_DATA_RELOAD')
 		FireUIEvent('MY_TMUI_DATA_RELOAD')
 		return true, szFullPath:gsub('\\', '/')
 	end
@@ -1803,6 +1805,7 @@ function D.RemoveData(szType, dwMapID, nIndex)
 			FireUIEvent('MY_TMUI_DATA_RELOAD')
 		end
 	end
+	FireUIEvent('MY_TM_DATA_RELOAD', { [szType] = true })
 end
 
 function D.CheckSameData(szType, dwMapID, dwID, nLevel)
@@ -1842,6 +1845,7 @@ function D.MoveData(szType, dwMapID, nIndex, dwTargetMapID, bCopy)
 		end
 		FireUIEvent('MY_TM_CREATE_CACHE')
 		FireUIEvent('MY_TMUI_DATA_RELOAD')
+		FireUIEvent('MY_TM_DATA_RELOAD', { [szType] = true })
 	end
 end
 -- 交换 其实没用 满足强迫症
@@ -1859,6 +1863,7 @@ function D.Exchange(szType, dwMapID, nIndex1, nIndex2)
 			D.FILE[szType][dwMapID][nIndex2] = data1
 			FireUIEvent('MY_TM_CREATE_CACHE')
 			FireUIEvent('MY_TMUI_DATA_RELOAD')
+			FireUIEvent('MY_TM_DATA_RELOAD', { [szType] = true })
 		end
 	end
 end
@@ -1868,11 +1873,12 @@ function D.AddData(szType, dwMapID, data)
 	insert(D.FILE[szType][dwMapID], data)
 	FireUIEvent('MY_TM_CREATE_CACHE')
 	FireUIEvent('MY_TMUI_DATA_RELOAD')
+	FireUIEvent('MY_TM_DATA_RELOAD', { [szType] = true })
 	return D.FILE[szType][dwMapID][#D.FILE[szType][dwMapID]]
 end
 
 function D.ClearTemp(szType)
-	if szType == 'CIRCLE' then -- 如果请求圈圈的近期数据 返回NPC的
+	if szType == 'CIRCLE' or szType == 'FOCUS' then -- 如果请求圈圈的近期数据 返回NPC的
 		szType = 'NPC'
 	end
 	CACHE.INTERVAL[szType] = {}
@@ -1883,7 +1889,7 @@ function D.ClearTemp(szType)
 end
 
 function D.GetIntervalData(szType, key)
-	if szType == 'CIRCLE' then -- 如果请求圈圈的近期数据 返回NPC的
+	if szType == 'CIRCLE' or szType == 'FOCUS' then -- 如果请求圈圈的近期数据 返回NPC的
 		szType = 'NPC'
 	end
 	if CACHE.INTERVAL[szType] then
@@ -1922,7 +1928,7 @@ end
 function D.OnShare(_, nChannel, dwID, szName, bIsSelf, ...)
 	local data = {...}
 	if not bIsSelf then
-		if (data[1] == 'CIRCLE' and type(Circle) ~= 'nil') or data[1] ~= 'CIRCLE' then
+		if data[1] ~= 'CIRCLE' or type(Circle) ~= 'nil' then
 			insert(MY_TM_SHARE_QUEUE, {
 				szType  = data[1],
 				tData   = data[3],

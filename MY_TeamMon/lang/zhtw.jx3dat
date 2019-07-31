@@ -45,6 +45,7 @@ data = {
 	['CIRCLE'] = '圈圈',
 	['TALK'] = '喊話',
 	['CHAT'] = '系統喊話',
+	['FOCUS'] = '焦點',
 	['Interval time'] = '間隔時間',
 	['Casting'] = '正在釋放',
 	['use of'] = '釋放了',

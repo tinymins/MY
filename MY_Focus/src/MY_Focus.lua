@@ -507,6 +507,15 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 				szVia = _L['Embedded focus']
 			end
 		end
+		-- 判断团队监控焦点
+		if not bFocus and D.TEAMMON_FOCUS then
+			tRule = D.GetEligibleRule(D.TEAMMON_FOCUS, dwMapID, dwType, dwID, dwTemplateID, szName, szTong)
+			if tRule then
+				bFocus = true
+				bDeletable = false
+				szVia = _L['TeamMon focus']
+			end
+		end
 
 		-- 判断竞技场
 		if not bFocus then
@@ -742,6 +751,153 @@ function D.GetTargetMenu(dwType, dwID)
 	}}
 end
 
+function D.OpenRuleEditor(tData, onChangeNotify)
+	local tData = D.FormatAutoFocusData(tData)
+	local frame = UI.CreateFrame('MY_Focus_Editor', { close = true, text = _L['Focus rule editor'] })
+	local ui = UI(frame)
+	local X, Y = 30, 50
+	local nX, nY = X, Y
+	local dY = 27
+	-- 匹配方式
+	ui:append('Text', { x = nX, y = nY, color = {255, 255, 0}, text = _L['Judge method'] }, true):autoWidth()
+	nX, nY = X + 10, nY + dY
+	for _, eType in ipairs({ 'NAME', 'NAME_PATT', 'ID', 'TEMPLATE_ID', 'TONG_NAME', 'TONG_NAME_PATT' }) do
+		nX = ui:append('WndRadioBox', {
+			x = nX, y = nY,
+			group = 'judge_method',
+			text = _L.JUDGE_METHOD[eType],
+			checked = tData.szMethod == eType,
+			oncheck = function()
+				tData.szMethod = eType
+				onChangeNotify(tData)
+			end,
+		}, true):autoWidth():pos('BOTTOMRIGHT') + 5
+	end
+	nX, nY = X, nY + dY
+	-- 目标类型
+	ui:append('Text', { x = nX, y = nY, color = {255, 255, 0}, text = _L['Target type'] }, true):autoWidth()
+	nX, nY = X + 10, nY + dY
+	nX = ui:append('WndCheckBox', {
+		x = nX, y = nY,
+		text = _L['All'],
+		checked = tData.tType.bAll,
+		oncheck = function()
+			tData.tType.bAll = not tData.tType.bAll
+			onChangeNotify(tData)
+		end,
+	}, true):autoWidth():pos('BOTTOMRIGHT') + 5
+	for _, eType in ipairs({ TARGET.NPC, TARGET.PLAYER, TARGET.DOODAD }) do
+		nX = ui:append('WndCheckBox', {
+			x = nX, y = nY,
+			text = _L.TARGET[eType],
+			checked = tData.tType[eType],
+			oncheck = function()
+				tData.tType[eType] = not tData.tType[eType]
+				onChangeNotify(tData)
+			end,
+			autoenable = function() return not tData.tType.bAll end,
+		}, true):autoWidth():pos('BOTTOMRIGHT') + 5
+	end
+	nX, nY = X, nY + dY
+	-- 目标关系
+	ui:append('Text', { x = nX, y = nY, color = {255, 255, 0}, text = _L['Target relation'] }, true):autoWidth()
+	nX, nY = X + 10, nY + dY
+	nX = ui:append('WndCheckBox', {
+		x = nX, y = nY,
+		text = _L['All'],
+		checked = tData.tRelation.bAll,
+		oncheck = function()
+			tData.tRelation.bAll = not tData.tRelation.bAll
+			onChangeNotify(tData)
+		end,
+	}, true):autoWidth():pos('BOTTOMRIGHT') + 5
+	for _, szRelation in ipairs({ 'Enemy', 'Ally' }) do
+		nX = ui:append('WndCheckBox', {
+			x = nX, y = nY,
+			text = _L.RELATION[szRelation],
+			checked = tData.tRelation['b' .. szRelation],
+			oncheck = function()
+				tData.tRelation['b' .. szRelation] = not tData.tRelation['b' .. szRelation]
+				onChangeNotify(tData)
+			end,
+			autoenable = function() return not tData.tRelation.bAll end,
+		}, true):autoWidth():pos('BOTTOMRIGHT') + 5
+	end
+	nX, nY = X, nY + dY
+	-- 目标血量百分比
+	ui:append('Text', { x = nX, y = nY, color = {255, 255, 0}, text = _L['Target life percentage'] }, true):autoWidth()
+	nX, nY = X + 10, nY + dY
+	nX = ui:append('WndCheckBox', {
+		x = nX, y = nY, w = 100, h = 25,
+		text = _L['Enable'],
+		checked = tData.tLife.bEnable,
+		oncheck = function()
+			tData.tLife.bEnable = not tData.tLife.bEnable
+			onChangeNotify(tData)
+		end,
+	}, true):autoWidth():pos('BOTTOMRIGHT') + 5
+	nX = ui:append('WndComboBox', {
+		x = nX, y = nY, w = 200,
+		text = _L['Operator'],
+		menu = function()
+			return LIB.InsertOperatorMenu({}, tData.tLife.szOperator, function(op)
+				tData.tLife.szOperator = op
+				onChangeNotify(tData)
+			end)
+		end,
+		autoenable = function() return tData.tLife.bEnable end,
+	}, true):autoWidth():pos('BOTTOMRIGHT') + 5
+	nX = ui:append('WndEditBox', {
+		x = nX, y = nY, w = 100, h = 25,
+		text = tData.tLife.nValue,
+		onchange = function(szText)
+			local nValue = tonumber(szText) or 0
+			tData.tLife.nValue = nValue
+			onChangeNotify(tData)
+		end,
+		autoenable = function() return tData.tLife.bEnable end,
+	}, true):autoWidth():pos('BOTTOMRIGHT') + 5
+	nX, nY = X, nY + dY
+	-- 最远距离
+	ui:append('Text', { x = nX, y = nY, color = {255, 255, 0}, text = _L['Max distance'] }, true):autoWidth()
+	nX, nY = X + 10, nY + dY
+	nX = ui:append('WndEditBox', {
+		x = nX, y = nY, w = 100, h = 25,
+		text = tData.nMaxDistance,
+		onchange = function(szText)
+			local nValue = tonumber(szText) or 0
+			tData.nMaxDistance = nValue
+			onChangeNotify(tData)
+		end,
+	}, true):autoWidth():pos('BOTTOMRIGHT') + 5
+	nX, nY = X, nY + dY
+	-- 名称显示
+	ui:append('Text', { x = nX, y = nY, color = {255, 255, 0}, text = _L['Name display'] }, true):autoWidth()
+	nX, nY = X + 10, nY + dY
+	nX = ui:append('WndEditBox', {
+		x = nX, y = nY, w = 100, h = 25,
+		text = tData.szDisplay,
+		onchange = function(szText)
+			tData.szDisplay = szText
+			onChangeNotify(tData)
+		end,
+	}, true):autoWidth():pos('BOTTOMRIGHT') + 5
+	nX, nY = X, nY + dY
+
+	nY = nY + 20
+	ui:append('WndButton2', {
+		x = 300, y = nY, text = g_tStrings.STR_FRIEND_DEL, color = { 255, 0, 0 },
+		onclick = function()
+			LIB.Confirm(_L['Sure to delete?'], function()
+				onChangeNotify()
+			end)
+		end,
+	})
+	nX, nY = X, nY + dY
+
+	ui:size(700, nY + 50)
+end
+
 function D.OnSetAncientPatternFocus()
 	if not IsTable(O.tAutoFocus) then
 		return
@@ -772,6 +928,26 @@ function D.OnSetAncientStaticFocus()
 			end
 		end
 	end
+end
+
+do
+local function onTeamMonUpdate()
+	if arg0 and not arg0.FOCUS then
+		return
+	end
+	D.TEAMMON_FOCUS = {}
+	local data = MY_TeamMon and MY_TeamMon.GetTable and MY_TeamMon.GetTable('FOCUS')
+	if data then
+		for _, p in spairs(data[-1], data[LIB.GetMapID()]) do
+			local rule = Clone(p)
+			rule.szMethod = 'TEMPLATE_ID'
+			rule.szPattern = tostring(p.dwID)
+			insert(D.TEAMMON_FOCUS, D.FormatAutoFocusData(rule))
+		end
+	end
+	D.RescanNearby()
+end
+LIB.RegisterEvent('MY_TM_DATA_RELOAD.MY_Focus', onTeamMonUpdate)
 end
 
 do
@@ -930,6 +1106,7 @@ local settings = {
 				OnObjectLeaveScene = D.OnObjectLeaveScene,
 				RemoveFocusID      = D.RemoveFocusID     ,
 				SortFocus          = D.SortFocus         ,
+				OpenRuleEditor     = D.OpenRuleEditor    ,
 			},
 		},
 	},

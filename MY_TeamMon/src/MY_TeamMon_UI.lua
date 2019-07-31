@@ -51,7 +51,7 @@ local MY_TMUI_ITEM_L      = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI_ITE
 local MY_TMUI_TALK_L      = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI_TALK_L.ini'
 local MY_TMUI_ITEM_R      = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI_ITEM_R.ini'
 local MY_TMUI_TALK_R      = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI_TALK_R.ini'
-local MY_TMUI_TYPE        = { 'BUFF', 'DEBUFF', 'CASTING', 'NPC', 'DOODAD', 'CIRCLE', 'TALK', 'CHAT' }
+local MY_TMUI_TYPE        = { 'BUFF', 'DEBUFF', 'CASTING', 'NPC', 'DOODAD', 'CIRCLE', 'TALK', 'CHAT', 'FOCUS' }
 local MY_TMUI_SELECT_TYPE = MY_TMUI_TYPE[1]
 local MY_TMUI_SELECT_MAP  = _L['All data']
 local MY_TMUI_TREE_EXPAND = { true } -- 默认第一项展开
@@ -523,6 +523,18 @@ function D.OnItemLButtonClick()
 		end
 		if MY_TMUI_SELECT_TYPE == 'CIRCLE' then
 			Circle.OpenDataPanel(this.dat)
+		elseif MY_TMUI_SELECT_TYPE == 'FOCUS' then
+			local data = this.dat
+			MY_Focus.OpenRuleEditor(this.dat, function(dat)
+				if dat then
+					for k, v in pairs(dat) do
+						data[k] = v
+					end
+					FireUIEvent('MY_TM_DATA_RELOAD', { FOCUS = true })
+				else
+					D.RemoveData(data.dwMapID, data.nIndex, D.GetDataName('FOCUS', data) or _L['This data'])
+				end
+			end)
 		else
 			D.OpenSettingPanel(this.dat, MY_TMUI_SELECT_TYPE)
 		end
@@ -694,6 +706,8 @@ function D.OnItemMouseEnter()
 		end
 		if szName == 'Handle_R' and MY_TMUI_SELECT_TYPE == 'CIRCLE' then -- circle fix
 			D.OutputTip('NPC', this.dat, { x, y, w, h })
+		elseif szName == 'Handle_R' and MY_TMUI_SELECT_TYPE == 'FOCUS' then -- focus fix
+			D.OutputTip('NPC', this.dat, { x, y, w, h })
 		else
 			D.OutputTip(MY_TMUI_SELECT_TYPE, this.dat, { x, y, w, h })
 		end
@@ -771,6 +785,10 @@ function D.OnScrollBarPosChanged()
 					elseif MY_TMUI_SELECT_TYPE == 'CIRCLE' and dir == 'L' then
 						D.SetCircleItemAction(h)
 					elseif MY_TMUI_SELECT_TYPE == 'CIRCLE' and dir == 'R'  then
+						D.SetNpcItemAction(h)
+					elseif MY_TMUI_SELECT_TYPE == 'FOCUS' and dir == 'L'  then
+						D.SetNpcItemAction(h)
+					elseif MY_TMUI_SELECT_TYPE == 'FOCUS' and dir == 'R'  then
 						D.SetNpcItemAction(h)
 					elseif MY_TMUI_SELECT_TYPE == 'TALK' then
 						D.SetTalkItemAction(h)
@@ -1043,7 +1061,7 @@ function D.GetDataName(szType, data)
 	local szName, nIcon
 	if szType == 'CASTING' then
 		szName, nIcon = LIB.GetSkillName(data.dwID, data.nLevel)
-	elseif szType == 'NPC' or szType == 'CIRCLE' then
+	elseif szType == 'NPC' or szType == 'CIRCLE' or szType == 'FOCUS' then
 		if data.dwID then
 			szName = LIB.GetTemplateName(data.dwID) or data.dwID
 			nIcon = data.nFrame
@@ -2252,6 +2270,7 @@ function D.OpenSettingPanel(data, szType)
 		end
 		nY = nY + CHECKBOX_HEIGHT
 	end
+	-- 补充报警内容
 	if szType ~= 'TALK' and szType ~= 'CHAT' then
 		nX, nY = ui:append('Text', { x = 20, y = nY, text = _L['Add content'], font = 27 }, true):pos('BOTTOMRIGHT')
 		nX, nY = ui:append('WndEditBox', {
