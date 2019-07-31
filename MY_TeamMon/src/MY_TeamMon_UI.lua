@@ -534,7 +534,7 @@ function D.OnItemLButtonClick()
 				else
 					D.RemoveData(data.dwMapID, data.nIndex, D.GetDataName('FOCUS', data) or _L['This data'])
 				end
-			end)
+			end, true)
 		else
 			D.OpenSettingPanel(this.dat, MY_TMUI_SELECT_TYPE)
 		end

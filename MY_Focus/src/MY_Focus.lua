@@ -716,29 +716,35 @@ function D.GetTargetMenu(dwType, dwID)
 	}}
 end
 
-function D.OpenRuleEditor(tData, onChangeNotify)
+function D.OpenRuleEditor(tData, onChangeNotify, bHideBase)
 	local tData = D.FormatAutoFocusData(tData)
 	local frame = UI.CreateFrame('MY_Focus_Editor', { close = true, text = _L['Focus rule editor'] })
 	local ui = UI(frame)
-	local X, Y = 30, 50
+	local X, Y, W = 30, 50, 350
 	local nX, nY = X, Y
 	local dY = 27
-	-- 匹配方式
-	ui:append('Text', { x = nX, y = nY, color = {255, 255, 0}, text = _L['Judge method'] }, true):autoWidth()
-	nX, nY = X + 10, nY + dY
-	for _, eType in ipairs({ 'NAME', 'NAME_PATT', 'ID', 'TEMPLATE_ID', 'TONG_NAME', 'TONG_NAME_PATT' }) do
-		nX = ui:append('WndRadioBox', {
-			x = nX, y = nY,
-			group = 'judge_method',
-			text = _L.JUDGE_METHOD[eType],
-			checked = tData.szMethod == eType,
-			oncheck = function()
-				tData.szMethod = eType
-				onChangeNotify(tData)
-			end,
-		}, true):autoWidth():pos('BOTTOMRIGHT') + 5
+	if not bHideBase then
+		W = 450
+		-- 匹配方式
+		ui:append('Text', { x = nX, y = nY, color = {255, 255, 0}, text = _L['Judge method'] }, true):autoWidth()
+		nX, nY = X + 10, nY + dY
+		for i, eType in ipairs({ 'NAME', 'NAME_PATT', 'ID', 'TEMPLATE_ID', 'TONG_NAME', 'TONG_NAME_PATT' }) do
+			if i == 5 then
+				nX, nY = X + 10, nY + dY
+			end
+			nX = ui:append('WndRadioBox', {
+				x = nX, y = nY,
+				group = 'judge_method',
+				text = _L.JUDGE_METHOD[eType],
+				checked = tData.szMethod == eType,
+				oncheck = function()
+					tData.szMethod = eType
+					onChangeNotify(tData)
+				end,
+			}, true):autoWidth():pos('BOTTOMRIGHT') + 5
+		end
+		nX, nY = X, nY + dY
 	end
-	nX, nY = X, nY + dY
 	-- 目标类型
 	ui:append('Text', { x = nX, y = nY, color = {255, 255, 0}, text = _L['Target type'] }, true):autoWidth()
 	nX, nY = X + 10, nY + dY
@@ -827,7 +833,7 @@ function D.OpenRuleEditor(tData, onChangeNotify)
 	ui:append('Text', { x = nX, y = nY, color = {255, 255, 0}, text = _L['Max distance'] }, true):autoWidth()
 	nX, nY = X + 10, nY + dY
 	nX = ui:append('WndEditBox', {
-		x = nX, y = nY, w = 100, h = 25,
+		x = nX, y = nY, w = 100, h = 25, w = 200,
 		text = tData.nMaxDistance,
 		onchange = function(szText)
 			local nValue = tonumber(szText) or 0
@@ -840,7 +846,7 @@ function D.OpenRuleEditor(tData, onChangeNotify)
 	ui:append('Text', { x = nX, y = nY, color = {255, 255, 0}, text = _L['Name display'] }, true):autoWidth()
 	nX, nY = X + 10, nY + dY
 	nX = ui:append('WndEditBox', {
-		x = nX, y = nY, w = 100, h = 25,
+		x = nX, y = nY, w = 100, h = 25, w = 200,
 		text = tData.szDisplay,
 		onchange = function(szText)
 			tData.szDisplay = szText
@@ -851,7 +857,8 @@ function D.OpenRuleEditor(tData, onChangeNotify)
 
 	nY = nY + 20
 	ui:append('WndButton2', {
-		x = 300, y = nY, text = g_tStrings.STR_FRIEND_DEL, color = { 255, 0, 0 },
+		x = (W - 100) / 2, y = nY, w = 100,
+		text = g_tStrings.STR_FRIEND_DEL, color = { 255, 0, 0 },
 		onclick = function()
 			LIB.Confirm(_L['Sure to delete?'], function()
 				onChangeNotify()
@@ -860,7 +867,7 @@ function D.OpenRuleEditor(tData, onChangeNotify)
 	})
 	nX, nY = X, nY + dY
 
-	ui:size(700, nY + 50)
+	ui:size(W, nY + 50):anchor('CENTER')
 end
 
 function D.OnSetAncientPatternFocus()
