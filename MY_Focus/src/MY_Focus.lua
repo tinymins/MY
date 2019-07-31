@@ -862,6 +862,7 @@ function D.OpenRuleEditor(tData, onChangeNotify, bHideBase)
 		onclick = function()
 			LIB.Confirm(_L['Sure to delete?'], function()
 				onChangeNotify()
+				ui:remove()
 			end)
 		end,
 	})

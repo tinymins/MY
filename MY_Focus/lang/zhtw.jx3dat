@@ -93,4 +93,5 @@ data = {
     ['Use'] = '使用',
     ['Not use'] = '不使用',
     ['Style'] = '樣式',
+	['Sure to delete?'] = '確認要刪除？',
 }
