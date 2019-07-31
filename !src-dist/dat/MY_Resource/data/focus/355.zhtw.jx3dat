@@ -1,8 +1,0 @@
-return {
-    {szMethod="TEMPLATE_ID",szPattern="63845",szDisplay="文閏一",dwMapID=355,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=40,tRelation = {bAll = true}},
-    {szMethod="TEMPLATE_ID",szPattern="63851",szDisplay="尹無咎",dwMapID=355,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=40,tRelation = {bAll = true}},
-    {szMethod="TEMPLATE_ID",szPattern="63852",szDisplay="尹無咎心魔",dwMapID=355,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=40,tRelation = {bAll = true}},
-    {szMethod="TEMPLATE_ID",szPattern="63855",szDisplay="魔念",dwMapID=355,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=40,tRelation = {bAll = true}},
-    {szMethod="TEMPLATE_ID",szPattern="63861",szDisplay="連玉良",dwMapID=355,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=40,tRelation = {bAll = true}},
-    {szMethod="TEMPLATE_ID",szPattern="63864",szDisplay="穆玄英",dwMapID=355,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=40,tRelation = {bAll = true}},
-}

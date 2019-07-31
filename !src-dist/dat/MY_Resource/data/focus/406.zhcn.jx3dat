@@ -1,7 +1,0 @@
-return {
-    {szMethod="TEMPLATE_ID",szPattern="64894",szDisplay="²ÜÇìË¾",dwMapID=406,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
-    {szMethod="TEMPLATE_ID",szPattern="65017",szDisplay="°×Ä­",dwMapID=406,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
-    {szMethod="TEMPLATE_ID",szPattern="65033",szDisplay="Ï¤´ïÂÞÄ¦",dwMapID=406,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
-    {szMethod="TEMPLATE_ID",szPattern="65456",szDisplay="¹í¹íËîËîµÄ¹­ÊÖ",dwMapID=406,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
-    {szMethod="TEMPLATE_ID",szPattern="65460",szDisplay="ÐÎ¼£¿ÉÒÉµÄº£¿Ü",dwMapID=406,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
-}

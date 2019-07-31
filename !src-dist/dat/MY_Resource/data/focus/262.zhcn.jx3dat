@@ -1,8 +1,0 @@
-return {
-    {szMethod="TEMPLATE_ID",szPattern="55524",szDisplay="八重妙法村正",dwMapID=262,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
-    {szMethod="TEMPLATE_ID",szPattern="55528",szDisplay="令狐伤",dwMapID=262,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
-    {szMethod="TEMPLATE_ID",szPattern="55569",szDisplay="韩梨",dwMapID=262,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
-    {szMethod="TEMPLATE_ID",szPattern="55573",szDisplay="柳雪乾",dwMapID=262,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
-    {szMethod="TEMPLATE_ID",szPattern="55595",szDisplay="柳贯角的影",dwMapID=262,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
-    {szMethod="TEMPLATE_ID",szPattern="55720",szDisplay="村正法阵",dwMapID=262,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
-}

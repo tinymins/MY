@@ -1,5 +1,0 @@
-return {
-    {szMethod="TEMPLATE_ID",szPattern="60998",szDisplay="½ª³ð·â",dwMapID=343,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=40,tRelation = {bAll = true}},
-    {szMethod="TEMPLATE_ID",szPattern="60999",szDisplay="Îº×ÚÃ÷",dwMapID=343,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=40,tRelation = {bAll = true}},
-    {szMethod="TEMPLATE_ID",szPattern="61000",szDisplay="¹¬°Á",dwMapID=343,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=40,tRelation = {bAll = true}},
-}

@@ -1,3 +1,0 @@
-return {
-    {szMethod="TEMPLATE_ID",szPattern="20562",szDisplay="恐怖處刑人",dwMapID=155,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
-}

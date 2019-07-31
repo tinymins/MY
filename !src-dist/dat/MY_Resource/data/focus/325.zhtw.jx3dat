@@ -1,7 +1,0 @@
-return {
-    {szMethod="TEMPLATE_ID",szPattern="62714",szDisplay="鐵黎",dwMapID=325,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
-    {szMethod="TEMPLATE_ID",szPattern="64011",szDisplay="“白日鬼”源義還",dwMapID=325,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
-    {szMethod="TEMPLATE_ID",szPattern="64017",szDisplay="“鎖魂獵人”劉三刀",dwMapID=325,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
-    {szMethod="TEMPLATE_ID",szPattern="64018",szDisplay="“大嘴惡犬”吳大運",dwMapID=325,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
-    {szMethod="TEMPLATE_ID",szPattern="64026",szDisplay="“橫葉一刀”服部段藏",dwMapID=325,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
-}

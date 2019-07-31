@@ -1,6 +1,0 @@
-return {
-    {szMethod="TEMPLATE_ID",szPattern="12171",szDisplay="慕容野狐",dwMapID=109,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
-    {szMethod="TEMPLATE_ID",szPattern="12173",szDisplay="殷青絲",dwMapID=109,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
-    {szMethod="TEMPLATE_ID",szPattern="12241",szDisplay="里赤梅",dwMapID=109,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
-    {szMethod="TEMPLATE_ID",szPattern="12249",szDisplay="蘇貝德哈",dwMapID=109,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
-}

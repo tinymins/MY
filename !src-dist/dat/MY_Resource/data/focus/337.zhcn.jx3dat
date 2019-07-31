@@ -1,7 +1,0 @@
-return {
-    {szMethod="TEMPLATE_ID",szPattern="60632",szDisplay="康成辩",dwMapID=337,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=40,tRelation = {bAll = true}},
-    {szMethod="TEMPLATE_ID",szPattern="60634",szDisplay="源明信",dwMapID=337,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=40,tRelation = {bAll = true}},
-    {szMethod="TEMPLATE_ID",szPattern="60635",szDisplay="康杖石",dwMapID=337,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=40,tRelation = {bAll = true}},
-    {szMethod="TEMPLATE_ID",szPattern="60668",szDisplay="雍和",dwMapID=337,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=40,tRelation = {bAll = true}},
-    {szMethod="TEMPLATE_ID",szPattern="60677",szDisplay="星体禁锢",dwMapID=337,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=40,tRelation = {bAll = true}},
-}
