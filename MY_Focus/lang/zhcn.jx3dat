@@ -10,6 +10,7 @@ data = {
     ['Embedded focus'] = '自动焦点副本NPC',
     ['Embedded focus is always been collecting and updating'] = '副本NPC数据不定时维护更新\n启用后会在自动焦点重要NPC（系统数据）基础上进行更多个性化显示',
     ['TeamMon focus'] = '团队监控焦点',
+    ['TeamMon focus is related to MY_TeamMon data.'] = '团队监控焦点依赖于“团队监控”子插件数据。',
     ['Auto focus friend'] = '焦点附近好友',
     ['Auto focus tong'] = '焦点附近帮会成员',
     ['Auto focus only in public map'] = '仅在公共地图自动焦点',

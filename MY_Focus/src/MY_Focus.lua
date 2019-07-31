@@ -76,6 +76,7 @@ local PUBLIC_DEFAULT = {
 	bFocusAnmerkungen  = true    , -- 焦点记在小本本里的玩家
 	bAutoFocus         = true    , -- 启用默认焦点
 	bEmbeddedFocus     = true    , -- 启用内嵌默认焦点
+	bTeamMonFocus      = true    , -- 启用团队监控焦点
 	bHideDeath         = false   , -- 隐藏死亡目标
 	bDisplayKungfuIcon = false   , -- 显示心法图标
 	bFocusJJCParty     = false   , -- 焦竞技场队友
@@ -508,7 +509,7 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 			end
 		end
 		-- 判断团队监控焦点
-		if not bFocus and D.TEAMMON_FOCUS then
+		if not bFocus and D.TEAMMON_FOCUS and O.bTeamMonFocus then
 			tRule = D.GetEligibleRule(D.TEAMMON_FOCUS, dwMapID, dwType, dwID, dwTemplateID, szName, szTong)
 			if tRule then
 				bFocus = true
@@ -1077,6 +1078,7 @@ local settings = {
 				nMaxDisplay = true,
 				bAutoFocus = true,
 				bEmbeddedFocus = true,
+				bTeamMonFocus = true,
 				bHideDeath = true,
 				bDisplayKungfuIcon = true,
 				bFocusJJCParty = true,
@@ -1127,6 +1129,7 @@ local settings = {
 				nMaxDisplay = true,
 				bAutoFocus = true,
 				bEmbeddedFocus = true,
+				bTeamMonFocus = true,
 				bHideDeath = true,
 				bDisplayKungfuIcon = true,
 				bFocusJJCParty = true,
@@ -1158,6 +1161,7 @@ local settings = {
 				nMaxDisplay = D.OnConfigChange,
 				bAutoFocus = D.OnConfigChange,
 				bEmbeddedFocus = D.OnConfigChange,
+				bTeamMonFocus = D.OnConfigChange,
 				bHideDeath = D.OnConfigChange,
 				bDisplayKungfuIcon = D.OnConfigChange,
 				bFocusJJCParty = D.OnConfigChange,

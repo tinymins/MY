@@ -282,7 +282,7 @@ function PS.OnPanelActive(wnd)
 
 	-- ср╡Ю
 	local x, y = xr, yr
-	local deltaY = (h - y * 2) / 21
+	local deltaY = (h - y * 2) / 22
 	ui:append('WndCheckBox', {
 		x = x, y = y, w = wr, text = _L['Hide when empty'],
 		checked = MY_Focus.bAutoHide,
@@ -313,6 +313,19 @@ function PS.OnPanelActive(wnd)
 		checked = MY_Focus.bEmbeddedFocus,
 		oncheck = function(bChecked)
 			MY_Focus.bEmbeddedFocus = bChecked
+			MY_Focus.RescanNearby()
+		end,
+		autoenable = function() return MY_Focus.IsEnabled() end,
+	})
+	y = y + deltaY
+
+	ui:append('WndCheckBox', {
+		x = x, y = y, w = wr, text = _L['TeamMon focus'],
+		tip = _L['TeamMon focus is related to MY_TeamMon data.'],
+		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
+		checked = MY_Focus.bTeamMonFocus,
+		oncheck = function(bChecked)
+			MY_Focus.bTeamMonFocus = bChecked
 			MY_Focus.RescanNearby()
 		end,
 		autoenable = function() return MY_Focus.IsEnabled() end,
