@@ -868,7 +868,7 @@ function D.OpenRuleEditor(tData, onChangeNotify, bHideBase)
 	})
 	nX, nY = X, nY + dY
 
-	ui:size(W, nY + 50):anchor('CENTER')
+	ui:size(W, nY + 40):anchor('CENTER')
 end
 
 function D.OnSetAncientPatternFocus()
