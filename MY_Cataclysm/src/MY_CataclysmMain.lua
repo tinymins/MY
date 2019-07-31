@@ -56,26 +56,6 @@ end
 PASSPHRASE = char(unpack(a))
 end
 
-do -- auto generate embedded data
-for _, DAT_ROOT in ipairs({
-	'MY_Resource/data/cataclysm/base/',
-	'MY_Resource/data/cataclysm/cmd/',
-	'MY_Resource/data/cataclysm/heal/',
-}) do
-	local SRC_ROOT = LIB.FormatPath(PACKET_INFO.ROOT .. '!src-dist/dat/' .. DAT_ROOT)
-	local DST_ROOT = LIB.FormatPath(PACKET_INFO.ROOT .. DAT_ROOT)
-	for _, szFile in ipairs(CPath.GetFileList(SRC_ROOT)) do
-		LIB.Sysmsg(_L['Encrypt and compressing: '] .. DAT_ROOT .. szFile)
-		local data = LoadDataFromFile(SRC_ROOT .. szFile)
-		if IsEncodedData(data) then
-			data = DecodeData(data)
-		end
-		data = EncodeData(data, true, true)
-		SaveDataToFile(data, DST_ROOT .. szFile, PASSPHRASE)
-	end
-end
-end
-
 local TEAM_VOTE_REQUEST = {}
 local BUFF_LIST = {}
 local GKP_RECORD_TOTAL = 0
