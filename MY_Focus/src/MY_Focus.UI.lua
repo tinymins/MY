@@ -524,7 +524,9 @@ end
 function D.OnItemRefreshTip()
 	local name = this:GetName()
 	if name == 'Handle_Info' then
-		LIB.OutputObjectTip(this.dwType, this.dwID, nil, GetFormatText(_L['Via:'] .. this.szVia .. '\n', 82))
+		local x, y = this:GetAbsPos()
+		local w, h = this:GetSize()
+		LIB.OutputObjectTip(this.dwType, this.dwID, { x, y, w, h }, GetFormatText(_L['Via:'] .. this.szVia .. '\n', 82))
 	end
 end
 
