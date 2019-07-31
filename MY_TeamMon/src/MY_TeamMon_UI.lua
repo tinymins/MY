@@ -775,7 +775,7 @@ function D.OnScrollBarPosChanged()
 					elseif MY_TMUI_SELECT_TYPE == 'CIRCLE' and dir == 'R'  then
 						D.SetNpcItemAction(h)
 					elseif MY_TMUI_SELECT_TYPE == 'FOCUS' and dir == 'L'  then
-						D.SetNpcItemAction(h)
+						D.SetFocusItemAction(h)
 					elseif MY_TMUI_SELECT_TYPE == 'FOCUS' and dir == 'R'  then
 						D.SetNpcItemAction(h)
 					elseif MY_TMUI_SELECT_TYPE == 'TALK' then
@@ -1049,10 +1049,19 @@ function D.GetDataName(szType, data)
 	local szName, nIcon
 	if szType == 'CASTING' then
 		szName, nIcon = LIB.GetSkillName(data.dwID, data.nLevel)
-	elseif szType == 'NPC' or szType == 'CIRCLE' or szType == 'FOCUS' then
+	elseif szType == 'NPC' or szType == 'CIRCLE' then
 		if data.dwID then
 			szName = LIB.GetTemplateName(data.dwID) or data.dwID
 			nIcon = data.nFrame
+		end
+	elseif szType == 'FOCUS' then
+		szName = data.szDisplay
+		nIcon = 47
+		if data.dwID then
+			if IsEmpty(szName) then
+				szName = LIB.GetTemplateName(data.dwID) or data.dwID
+			end
+			nIcon = data.nFrame or nIcon
 		end
 	elseif szType == 'DOODAD' then
 		local doodad = GetDoodadTemplate(data.dwID)
@@ -1151,6 +1160,19 @@ function D.SetCircleItemAction(h)
 	else
 		box:SetObjectIcon(2396)
 	end
+	h.bDraw = true
+end
+
+function D.SetFocusItemAction(h)
+	local dat = h.dat
+	local szName = D.GetDataName('FOCUS', dat)
+	h:Lookup('Text'):SetText(szName)
+	if dat.col then
+		h:Lookup('Text'):SetFontColor(unpack(dat.col))
+	end
+	local box = h:Lookup('Box')
+	box:ClearObjectIcon()
+	box:SetExtentImage('ui/Image/TargetPanel/Target.UITex', dat.nFrame)
 	h.bDraw = true
 end
 
