@@ -105,7 +105,7 @@ local function CreateCountdown(nType, szKey, tParam)
 			tParam.nRefresh = tParam.nRefresh or tCountdown[#tCountdown].nTime - 3 -- 最大时间内防止重复刷新 但是脱离战斗的NPC需要手动删除
 		else
 			return LIB.Sysmsg(
-				_L['Countdown format Error']
+				_L['Countdown format error']
 					.. ' TYPE: ' .. _L['Countdown TYPE ' .. nType]
 					.. ' KEY:' .. szKey .. ' Content:' .. tParam.nTime,
 				_L['MY_TeamMon'], 'MSG_SYS.ERROR')
@@ -198,7 +198,7 @@ local function SetSTAction(ui, nLeft, nPer)
 		if ui.bTalk and me.IsInParty() then
 			if not ui.szTalk or ui.szTalk ~= floor(nLeft) then
 				ui.szTalk = floor(nLeft)
-				LIB.Talk(_L('[%s] left over %d.', obj:GetName(), floor(nLeft)))
+				LIB.Talk(_L('[%s] remaining %ds.', obj:GetName(), floor(nLeft)))
 			end
 		end
 	else

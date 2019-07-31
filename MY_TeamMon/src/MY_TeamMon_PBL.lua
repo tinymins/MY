@@ -142,7 +142,7 @@ function D.OnLButtonClick()
 	local szName = this:GetName()
 	if szName == 'Btn_Style' then
 		local menu = {
-			{ szOption = _L['Mouse Enter select'], bCheck = true, bChecked = O.bHoverSelect, fnAction = function()
+			{ szOption = _L['Mouse enter select'], bCheck = true, bChecked = O.bHoverSelect, fnAction = function()
 				O.bHoverSelect = not O.bHoverSelect
 			end }
 		}

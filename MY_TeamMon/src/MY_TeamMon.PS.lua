@@ -58,7 +58,7 @@ function PS.OnPanelActive(wnd)
 
 	nX, nY = ui:append('Text', { x = X, y = Y, text = _L['Master switch'], font = 27 }, true):autoWidth():pos('BOTTOMRIGHT')
 	nX, nY = ui:append('WndCheckBox', {
-		x = X + 10, y = nY, text = _L['Enable MY_TeamMon Plugin'],
+		x = X + 10, y = nY, text = _L['Enable MY_TeamMon'],
 		checked = MY_TeamMon.bEnable,
 		oncheck = function(bCheck)
 			MY_TeamMon.Enable(bCheck, true)
@@ -89,7 +89,7 @@ function PS.OnPanelActive(wnd)
 	nX, nY = ui:append('Text', { x = X, y = nY + 5, text = _L['Enable alarm (master switch)'], font = 27 }, true):autoWidth():pos('BOTTOMRIGHT')
 	nX = ui:append('WndCheckBox', {
 		x = X + 10, y = nY,
-		text = _L['Team Channel Alarm'],
+		text = _L['Team channel alarm'],
 		color = GetMsgFontColor('MSG_TEAM', true),
 		checked = MY_TeamMon.bPushTeamChannel,
 		oncheck = function(bCheck)
@@ -98,21 +98,21 @@ function PS.OnPanelActive(wnd)
 	}, true):autoWidth():pos('BOTTOMRIGHT')
 	nX = ui:append('WndCheckBox', {
 		x = nX + 5, y = nY,
-		text = _L['Whisper Channel Alarm'], color = GetMsgFontColor('MSG_WHISPER', true),
+		text = _L['Whisper channel alarm'], color = GetMsgFontColor('MSG_WHISPER', true),
 		checked = MY_TeamMon.bPushWhisperChannel,
 		oncheck = function(bCheck)
 			MY_TeamMon.bPushWhisperChannel = bCheck
 		end,
 	}, true):autoWidth():pos('BOTTOMRIGHT')
 	nX = ui:append('WndCheckBox', {
-		x = nX + 5, y = nY, text = _L['Buff List'],
+		x = nX + 5, y = nY, text = _L['Buff list'],
 		checked = MY_TeamMon.bPushBuffList,
 		oncheck = function(bCheck)
 			MY_TeamMon.bPushBuffList = bCheck
 		end,
 	}, true):autoWidth():pos('BOTTOMRIGHT')
 	nX, nY = ui:append('WndCheckBox', {
-		x = nX + 5, y = nY, text = _L['Center Alarm'],
+		x = nX + 5, y = nY, text = _L['Center alarm'],
 		checked = MY_TeamMon.bPushCenterAlarm,
 		oncheck = function(bCheck)
 			MY_TeamMon.bPushCenterAlarm = bCheck
@@ -121,14 +121,14 @@ function PS.OnPanelActive(wnd)
 	nX = X + 5
 	if not LIB.IsShieldedVersion() then
 		nX = ui:append('WndCheckBox', {
-			x = nX + 5, y = nY, text = _L['Big Font Alarm'],
+			x = nX + 5, y = nY, text = _L['Large text alarm'],
 			checked = MY_TeamMon.bPushBigFontAlarm,
 			oncheck = function(bCheck)
 				MY_TeamMon.bPushBigFontAlarm = bCheck
 			end,
 		}, true):autoWidth():pos('BOTTOMRIGHT')
 		nX = ui:append('WndCheckBox', {
-			x = nX + 5, y = nY, text = _L['Full Screen Alarm'],
+			x = nX + 5, y = nY, text = _L['Fullscreen alarm'],
 			checked = MY_TeamMon.bPushFullScreen,
 			oncheck = function(bCheck)
 				MY_TeamMon.bPushFullScreen = bCheck
@@ -136,14 +136,14 @@ function PS.OnPanelActive(wnd)
 		}, true):autoWidth():pos('BOTTOMRIGHT')
 	end
 	nX = ui:append('WndCheckBox', {
-		x = nX + 5, y = nY, text = _L['Party Buff List'],
+		x = nX + 5, y = nY, text = _L['Party buff list'],
 		checked = MY_TeamMon.bPushPartyBuffList,
 		oncheck = function(bCheck)
 			MY_TeamMon.bPushPartyBuffList = bCheck
 		end,
 	}, true):autoWidth():pos('BOTTOMRIGHT')
 	nX, nY = ui:append('WndCheckBox', {
-		x = nX + 5, y = nY, text = _L['Screen Head Alarm'],
+		x = nX + 5, y = nY, text = _L['Lifebar alarm'],
 		tip = _L['Requires MY_LifeBar loaded.'],
 		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 		checked = MY_TeamMon.bPushScreenHead,
@@ -151,18 +151,18 @@ function PS.OnPanelActive(wnd)
 			MY_TeamMon.bPushScreenHead = bCheck
 		end,
 	}, true):autoWidth():pos('BOTTOMRIGHT')
-	nX, nY = ui:append('Text', { x = X, y = nY + 5, text = _L['Team Panel Bind Show Buff'], font = 27 }, true):autoWidth():pos('BOTTOMRIGHT')
+	nX, nY = ui:append('Text', { x = X, y = nY + 5, text = _L['Team panel bind show buff'], font = 27 }, true):autoWidth():pos('BOTTOMRIGHT')
 	nX, nY = ui:append('WndCheckBox', {
-		x = X + 10, y = nY, text = _L['Team Panel Bind Show Buff'],
+		x = X + 10, y = nY, text = _L['Team panel bind show buff'],
 		checked = MY_TeamMon.bPushTeamPanel,
 		oncheck = function(bCheck)
 			MY_TeamMon.bPushTeamPanel = bCheck
 			FireUIEvent('MY_TM_CREATE_CACHE')
 		end,
 	}, true):autoWidth():pos('BOTTOMRIGHT')
-	nX, nY = ui:append('Text', { x = X, y = nY + 5, text = _L['Buff List'], font = 27 }, true):autoWidth():pos('BOTTOMRIGHT')
+	nX, nY = ui:append('Text', { x = X, y = nY + 5, text = _L['Buff list'], font = 27 }, true):autoWidth():pos('BOTTOMRIGHT')
 	nX = ui:append('WndComboBox', {
-		x = X + 10, y = nY, text = _L['Max Buff Count'],
+		x = X + 10, y = nY, text = _L['Max buff count'],
 		menu = function()
 			local menu = {}
 			for k, v in ipairs({ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 }) do
@@ -174,7 +174,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	}, true):autoWidth():pos('BOTTOMRIGHT')
 	nX, nY = ui:append('WndComboBox', {
-		x = nX + 5, y = nY, text = _L['Buff Size'],
+		x = nX + 5, y = nY, text = _L['Buff size'],
 		menu = function()
 			local menu = {}
 			for k, v in ipairs({ 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 100 }) do
@@ -194,22 +194,22 @@ function PS.OnPanelActive(wnd)
 		end,
 	}, true):autoWidth():pos('BOTTOMRIGHT')
 	nX = ui:append('WndButton2', {
-		x = X + 5, y = nY + 15, text = _L['Data Panel'],
+		x = X + 5, y = nY + 15, text = _L['Data panel'],
 		onclick = MY_TeamMon_UI.TogglePanel,
 	}, true):autoWidth():pos('BOTTOMRIGHT')
 	nX = ui:append('WndButton2', {
-		x = nX + 5, y = nY + 15, text = _L['Export Data'],
+		x = nX + 5, y = nY + 15, text = _L['Export data'],
 		onclick = MY_TeamMon_UI.OpenExportPanel,
 	}, true):autoWidth():pos('BOTTOMRIGHT')
 	nX = ui:append('WndButton2', {
-		x = nX + 5, y = nY + 15, text = _L['Import Data'],
+		x = nX + 5, y = nY + 15, text = _L['Import data'],
 		menu = function()
 			local szLang = select(3, GetVersion())
 			local menu = {}
-			table.insert(menu, { szOption = _L['Import Data (local)'], fnAction = function() MY_TeamMon_UI.OpenImportPanel() end }) -- 有传参 不要改
+			table.insert(menu, { szOption = _L['Import data (local)'], fnAction = function() MY_TeamMon_UI.OpenImportPanel() end }) -- 有传参 不要改
 			local szLang = select(3, GetVersion())
 			if szLang == 'zhcn' or szLang == 'zhtw' then
-				table.insert(menu, { szOption = _L['Import Data (web)'], fnAction = MY_TeamMon_RR.OpenPanel })
+				table.insert(menu, { szOption = _L['Import data (web)'], fnAction = MY_TeamMon_RR.OpenPanel })
 			end
 			return menu
 		end,

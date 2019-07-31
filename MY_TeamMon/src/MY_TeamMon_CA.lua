@@ -105,7 +105,7 @@ function D.OnEvent(szEvent)
 	elseif szEvent == 'UI_SCALED' then
 		D.UpdateAnchor(this)
 	elseif szEvent == 'ON_ENTER_CUSTOM_UI_MODE' or szEvent == 'ON_LEAVE_CUSTOM_UI_MODE' then
-		UpdateCustomModeWindow(this, _L['Center Alarm'])
+		UpdateCustomModeWindow(this, _L['Center alarm'])
 		if szEvent == 'ON_ENTER_CUSTOM_UI_MODE' then
 			this:Show()
 		else

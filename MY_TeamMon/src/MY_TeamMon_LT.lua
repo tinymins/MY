@@ -143,7 +143,7 @@ function PS.OnPanelActive(frame)
 	local nX, nY = X, Y
 
 	nX, nY = ui:append('Text', { x = nX, y = nY, text = _L['MY_TeamMon_LT'], font = 27 }, true):pos('BOTTOMRIGHT')
-	nX = ui:append('Text', { text = _L['Font Scale'], x = X + 10, y = nY + 10 }, true):pos('BOTTOMRIGHT')
+	nX = ui:append('Text', { text = _L['Font scale'], x = X + 10, y = nY + 10 }, true):pos('BOTTOMRIGHT')
 	nX, nY = ui:append('WndSliderBox', {
 		x = nX + 10, y = nY + 13, text = '',
 		range = {1, 2, 10}, value = O.fScale,

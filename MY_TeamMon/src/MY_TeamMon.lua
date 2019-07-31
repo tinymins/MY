@@ -422,7 +422,7 @@ function D.CreateData(szEvent)
 	-- 重建metatable 获取ALL数据的方法 主要用于UI 逻辑中毫无作用
 	for kType, vTable in pairs(D.FILE)  do
 		setmetatable(D.FILE[kType], { __index = function(me, index)
-			if index == _L['All Data'] then
+			if index == _L['All data'] then
 				local t = {}
 				for k, v in pairs(vTable) do
 					if k ~= -9 then
@@ -462,7 +462,7 @@ function D.CreateData(szEvent)
 	pcall(Raid_MonitorBuffs) -- clear
 	-- 判断战场使用条件
 	if LIB.IsInArena() and szLang == 'zhcn' and LIB.IsShieldedVersion() then
-		LIB.Sysmsg(_L['Arena not use the plug.'])
+		LIB.Sysmsg(_L['MY_TeamMon is blocked in arena, temporary disabled.'])
 		D.Log('MAPID: ' .. dwMapID ..  ' create data Failed:' .. GetTime() - nTime  .. 'ms')
 	else
 		-- 重建MAP
@@ -737,13 +737,13 @@ function D.OnBuff(dwCaster, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, d
 			insert(xml, GetFormatText(szSrcName == MY_TM_CORE_NAME and g_tStrings.STR_YOU or szSrcName, 44, 255, 255, 0))
 			insert(xml, MY_TM_RIGHT_LINE)
 			if nClass == MY_TM_TYPE.BUFF_GET then
-				insert(xml, GetFormatText(_L['Get Buff'], 44, 255, 255, 255))
+				insert(xml, GetFormatText(_L['Get buff'], 44, 255, 255, 255))
 				insert(xml, GetFormatText(szName .. ' x' .. nCount, 44, 255, 255, 0))
 				if data.szNote then
 					insert(xml, GetFormatText(' ' .. data.szNote, 44, 255, 255, 255))
 				end
 			else
-				insert(xml, GetFormatText(_L['Lose Buff'], 44, 255, 255, 255))
+				insert(xml, GetFormatText(_L['Lose buff'], 44, 255, 255, 255))
 				insert(xml, GetFormatText(szName, 44, 255, 255, 0))
 			end
 			local txt = GetPureText(concat(xml))
@@ -888,7 +888,7 @@ function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
 			if nClass == MY_TM_TYPE.SKILL_END then
 				insert(xml, GetFormatText(_L['use of'], 44, 255, 255, 255))
 			else
-				insert(xml, GetFormatText(_L['Building'], 44, 255, 255, 255))
+				insert(xml, GetFormatText(_L['Casting'], 44, 255, 255, 255))
 			end
 			insert(xml, MY_TM_LEFT_LINE)
 			insert(xml, GetFormatText(data.szName or szName, 44, 255, 255, 0))
@@ -1051,7 +1051,7 @@ function D.OnNpcEvent(npc, bEnter)
 					insert(xml, GetFormatText(' ' .. data.szNote, 44, 255, 255, 255))
 				end
 			else
-				insert(xml, GetFormatText(_L['leave'], 44, 255, 255, 255))
+				insert(xml, GetFormatText(_L['Disappear'], 44, 255, 255, 255))
 			end
 
 			local txt = GetPureText(concat(xml))
@@ -1180,7 +1180,7 @@ function D.OnDoodadEvent(doodad, bEnter)
 					insert(xml, GetFormatText(' ' .. data.szNote, 44, 255, 255, 255))
 				end
 			else
-				insert(xml, GetFormatText(_L['leave'], 44, 255, 255, 255))
+				insert(xml, GetFormatText(_L['Disappear'], 44, 255, 255, 255))
 			end
 
 			local txt = GetPureText(concat(xml))
@@ -1302,10 +1302,10 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 				if O.bPushScreenHead and cfg.bScreenHead then
 					FireUIEvent('MY_LIFEBAR_COUNTDOWN', tInfo.dwID, 'TIME', 'MY_TM_TIME_' .. tInfo.dwID, {
 						nTime = GetTime() + 5000,
-						szText = _L('%s Call Name', szNpcName or g_tStrings.SYSTEM),
+						szText = _L('%s call name', szNpcName or g_tStrings.SYSTEM),
 						col = data.col,
 					})
-					FireUIEvent('MY_TM_SA_CREATE', 'TIME', tInfo.dwID, { txt = _L('%s Call Name', szNpcName or g_tStrings.SYSTEM)})
+					FireUIEvent('MY_TM_SA_CREATE', 'TIME', tInfo.dwID, { txt = _L('%s call name', szNpcName or g_tStrings.SYSTEM)})
 				end
 				if not LIB.IsShieldedVersion() and cfg.bSelect then
 					SetTarget(TARGET.PLAYER, tInfo.dwID)
@@ -1424,7 +1424,7 @@ function D.OnNpcInfoChange(szEvent, dwTemplateID, nPer)
 						insert(xml, MY_TM_LEFT_LINE)
 						insert(xml, GetFormatText(szName, 44, 255, 255, 0))
 						insert(xml, MY_TM_RIGHT_LINE)
-						insert(xml, GetFormatText(dwType == MY_TM_TYPE.NPC_LIFE and _L['life has left'] or _L['mana has reached'], 44, 255, 255, 255))
+						insert(xml, GetFormatText(dwType == MY_TM_TYPE.NPC_LIFE and _L['\'s life remaining to '] or _L['\'s mana reaches '], 44, 255, 255, 255))
 						insert(xml, GetFormatText(' ' .. nVper .. '%', 44, 255, 255, 0))
 						insert(xml, GetFormatText(' ' .. vv[2], 44, 255, 255, 255))
 						local txt = GetPureText(concat(xml))
@@ -1687,12 +1687,12 @@ function D.LoadConfigureFile(config)
 		or LIB.GetAbsolutePath(MY_TM_DATA_ROOT .. config.szFileName)
 	local szFilePath = LIB.GetRelativePath(szFullPath, {'', PATH_TYPE.NORMAL}) or szFullPath
 	if not IsFileExist(szFilePath) then
-		return false, 'the file does not exist'
+		return false, 'File does not exist.'
 	end
 	local data = LIB.LoadLUAData(szFilePath, { passphrase = MY_TM_DATA_PASSPHRASE })
 		or LIB.LoadLUAData(szFilePath, { passphrase = false })
 	if not data then
-		return false, 'can not read data file.'
+		return false, 'Can not read data file.'
 	else
 		if config.nMode == 1 then
 			if config.tList['CIRCLE'] then
@@ -1830,7 +1830,7 @@ function D.MoveData(szType, dwMapID, nIndex, dwTargetMapID, bCopy)
 	if D.FILE[szType][dwMapID] and D.FILE[szType][dwMapID][nIndex] then
 		local data = D.FILE[szType][dwMapID][nIndex]
 		if D.CheckSameData(szType, dwTargetMapID, data.dwID or data.szContent, data.nLevel or data.szTarget) then
-			return LIB.Alert(_L['same data Exist'])
+			return LIB.Alert(_L['Same data exist'])
 		end
 		D.FILE[szType][dwTargetMapID] = D.FILE[szType][dwTargetMapID] or {}
 		insert(D.FILE[szType][dwTargetMapID], clone(D.FILE[szType][dwMapID][nIndex]))

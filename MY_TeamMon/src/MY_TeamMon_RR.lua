@@ -389,10 +389,13 @@ LIB.RegisterBgMsg('MY_TeamMon_RR', function(_, _, _, szTalker, _, action, info)
 	if action == 'SYNC' then
 		info = LIB.FormatDataStructure(info, META_TEMPLATE)
 		if not IsEmpty(info.szURL) and not IsEmpty(info.szTitle) then
-			LIB.Confirm(_L('%s request download: %s', szTalker, info.szTitle .. ' - ' .. info.szAuthor), function()
-				D.AddMeta(info)
-				D.DownloadData(info)
-			end)
+			LIB.Confirm(_L('%s request download:', szTalker) .. '\n'
+				.. _L('Title: %s', info.szTitle) .. '\n'
+				.. _L('Author: %s', info.szAuthor) .. '\n'
+				.. _L('Meta URL: %s', info.szURL), function()
+					D.AddMeta(info)
+					D.DownloadData(info)
+				end)
 		end
 	elseif action == 'LOAD' then
 		LIB.Sysmsg(_L('%s loaded %s', szTalker, info))
