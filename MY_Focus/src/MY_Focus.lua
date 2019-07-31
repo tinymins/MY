@@ -53,9 +53,8 @@ local PRIVATE_CONFIG_LOADED = false
 local PRIVATE_CONFIG_CHANGED = false
 local PUBLIC_CONFIG_LOADED = false
 local PUBLIC_CONFIG_CHANGED = false
-local EMBEDDED_ENCRYPTED = false
 local l_dwLockType, l_dwLockID, l_lockInDisplay
-local O, D = {}, { PASSPHRASE = {111, 198, 5} }
+local O, D = {}, {}
 local PRIVATE_DEFAULT = {
 	bEnable     = false   , -- 是否启用
 	szStyle     = 'common', -- 样式
@@ -75,7 +74,6 @@ local PUBLIC_DEFAULT = {
 	bFocusEnemy        = false   , -- 焦点敌对玩家
 	bFocusAnmerkungen  = true    , -- 焦点记在小本本里的玩家
 	bAutoFocus         = true    , -- 启用默认焦点
-	bEmbeddedFocus     = true    , -- 启用内嵌默认焦点
 	bTeamMonFocus      = true    , -- 启用团队监控焦点
 	bHideDeath         = false   , -- 隐藏死亡目标
 	bDisplayKungfuIcon = false   , -- 显示心法图标
@@ -404,40 +402,15 @@ function D.GetEligibleRule(tRules, dwMapID, dwType, dwID, dwTemplateID, szName, 
 	end
 end
 
-function D.LoadEmbeddedRule()
-	-- 加密内置数据
-	if not EMBEDDED_ENCRYPTED then
-		local DAT_ROOT = 'MY_Resource/data/focus/'
-		local SRC_ROOT = LIB.FormatPath(PACKET_INFO.ROOT .. '!src-dist/dat/' .. DAT_ROOT)
-		local DST_ROOT = LIB.FormatPath(PACKET_INFO.ROOT .. DAT_ROOT)
-		local aFile = CPath.GetFileList(SRC_ROOT)
-		for _, szFile in ipairs(aFile) do
-			local data = LoadDataFromFile(SRC_ROOT .. szFile)
-			if IsEncodedData(data) then
-				data = DecodeData(data)
-			end
-			data = EncodeData(data, true, true)
-			SaveDataToFile(data, DST_ROOT .. szFile, D.PASSPHRASE)
-		end
-		if #aFile > 0 then
-			LIB.Sysmsg(_L['Encrypt and compressing: '] .. DAT_ROOT .. ' x ' .. #aFile)
-		end
-		EMBEDDED_ENCRYPTED = true
-	end
-	-- 按地图加载内置数据
-	local szPath = PACKET_INFO.ROOT .. 'MY_Resource/data/focus/' .. GetClientPlayer().GetMapID() .. '.$lang.jx3dat'
-	D.EMBEDDED_FOCUS = D.FormatAutoFocusDataList(LIB.LoadLUAData(szPath, { passphrase = D.PASSPHRASE }))
-end
-
 -- 对象进入视野
 function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 	if nRetryCount and nRetryCount > 5 then
 		return
 	end
-	if not D.EMBEDDED_FOCUS then
+	local me = GetClientPlayer()
+	if not me then
 		return LIB.DelayCall(5000, function() D.OnObjectEnterScene(dwType, dwID) end)
 	end
-	local me = GetClientPlayer()
 	local KObject = LIB.GetObject(dwType, dwID)
 	if not KObject then
 		return
@@ -497,15 +470,6 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 				bFocus = true
 				bDeletable = false
 				szVia = _L['Auto focus'] .. ' ' .. tRule.szPattern
-			end
-		end
-		-- 判断内嵌默认焦点
-		if not bFocus and O.bEmbeddedFocus then
-			tRule = D.GetEligibleRule(D.EMBEDDED_FOCUS, dwMapID, dwType, dwID, dwTemplateID, szName, szTong)
-			if tRule then
-				bFocus = true
-				bDeletable = false
-				szVia = _L['Embedded focus']
 			end
 		end
 		-- 判断团队监控焦点
@@ -952,16 +916,6 @@ LIB.RegisterEvent('MY_TM_DATA_RELOAD.MY_Focus', onTeamMonUpdate)
 end
 
 do
-local l_dwMapID
-local function onLoadingEnd()
-	local dwMapID = GetClientPlayer().GetMapID()
-	if dwMapID ~= l_dwMapID then
-		D.LoadEmbeddedRule()
-		l_dwMapID = dwMapID
-	end
-end
-LIB.RegisterEvent('LOADING_END.MY_Focus', onLoadingEnd)
-
 local function onInit()
 	-- 加载设置项数据
 	D.LoadConfig()
@@ -994,8 +948,6 @@ local function onInit()
 			O.tStaticFocus[dwType] = {}
 		end
 	end
-	-- 内嵌默认焦点
-	onLoadingEnd()
 	D.CheckFrameOpen()
 	D.RescanNearby()
 end
@@ -1077,7 +1029,6 @@ local settings = {
 				bAutoHide = true,
 				nMaxDisplay = true,
 				bAutoFocus = true,
-				bEmbeddedFocus = true,
 				bTeamMonFocus = true,
 				bHideDeath = true,
 				bDisplayKungfuIcon = true,
@@ -1128,7 +1079,6 @@ local settings = {
 				bAutoHide = true,
 				nMaxDisplay = true,
 				bAutoFocus = true,
-				bEmbeddedFocus = true,
 				bTeamMonFocus = true,
 				bHideDeath = true,
 				bDisplayKungfuIcon = true,
@@ -1160,7 +1110,6 @@ local settings = {
 				bAutoHide = D.OnConfigChange,
 				nMaxDisplay = D.OnConfigChange,
 				bAutoFocus = D.OnConfigChange,
-				bEmbeddedFocus = D.OnConfigChange,
 				bTeamMonFocus = D.OnConfigChange,
 				bHideDeath = D.OnConfigChange,
 				bDisplayKungfuIcon = D.OnConfigChange,
