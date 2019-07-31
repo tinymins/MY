@@ -694,7 +694,7 @@ function D.OnItemMouseEnter()
 		end
 		if szName == 'Handle_R' and MY_TMUI_SELECT_TYPE == 'CIRCLE' then -- circle fix
 			D.OutputTip('NPC', this.dat, { x, y, w, h })
-		elseif szName == 'Handle_R' and MY_TMUI_SELECT_TYPE == 'FOCUS' then -- focus fix
+		elseif MY_TMUI_SELECT_TYPE == 'FOCUS' then -- focus fix
 			D.OutputTip('NPC', this.dat, { x, y, w, h })
 		else
 			D.OutputTip(MY_TMUI_SELECT_TYPE, this.dat, { x, y, w, h })
