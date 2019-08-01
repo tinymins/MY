@@ -199,7 +199,7 @@ function D.ProcessDialogInfo(frame, aInfo, dwTarType, dwTarID, dwIndex)
 			end
 		end
 		--[[#DEBUG BEGIN]]
-		LIB.Debug({'WindowSelect ' .. dwIndex .. ',' .. option.dwID .. 'x' .. nRepeat}, 'AUTO_CHAT', DEBUG_LEVEL.LOG)
+		LIB.Debug('WindowSelect ' .. dwIndex .. ',' .. option.dwID .. 'x' .. nRepeat, 'AUTO_CHAT', DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		return true
 	end

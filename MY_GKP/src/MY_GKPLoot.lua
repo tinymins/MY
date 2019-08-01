@@ -469,7 +469,7 @@ function MY_GKP_Loot.OnItemLButtonClick()
 		if data.bDist then
 			if not doodad then
 				--[[#DEBUG BEGIN]]
-				LIB.Debug({'Doodad does not exist!'}, 'MY_GKP_Loot:OnItemLButtonClick', DEBUG_LEVEL.WARNING)
+				LIB.Debug('Doodad does not exist!', 'MY_GKP_Loot:OnItemLButtonClick', DEBUG_LEVEL.WARNING)
 				--[[#DEBUG END]]
 				return Loot.RemoveLootList(dwDoodadID)
 			end
@@ -502,7 +502,7 @@ function MY_GKP_Loot.OnItemLButtonClick()
 			local doodad     = GetDoodad(dwDoodadID)
 			if not doodad then
 				--[[#DEBUG BEGIN]]
-				LIB.Debug({'Doodad does not exist!'}, 'MY_GKP_Loot:OnItemLButtonClick', DEBUG_LEVEL.WARNING)
+				LIB.Debug('Doodad does not exist!', 'MY_GKP_Loot:OnItemLButtonClick', DEBUG_LEVEL.WARNING)
 				--[[#DEBUG END]]
 				return Loot.RemoveLootList(dwDoodadID)
 			end
@@ -686,7 +686,7 @@ function Loot.AuthCheck(dwID)
 	local doodad         = GetDoodad(dwID)
 	if not doodad then
 		--[[#DEBUG BEGIN]]
-		LIB.Debug({'Doodad does not exist!'}, 'MY_GKP_Loot:AuthCheck', DEBUG_LEVEL.WARNING)
+		LIB.Debug('Doodad does not exist!', 'MY_GKP_Loot:AuthCheck', DEBUG_LEVEL.WARNING)
 		--[[#DEBUG END]]
 		return
 	end
@@ -764,14 +764,14 @@ function Loot.DistributeItem(dwID, info, szAutoDistType, bSkipRecordPanel)
 	local item = GetItem(info.dwID)
 	if not item then
 		--[[#DEBUG BEGIN]]
-		LIB.Debug({'Item does not exist, check!!'}, 'MY_GKP_Loot', DEBUG_LEVEL.WARNING)
+		LIB.Debug('Item does not exist, check!!', 'MY_GKP_Loot', DEBUG_LEVEL.WARNING)
 		--[[#DEBUG END]]
 		local szName, aItemData = Loot.GetDoodad(info.dwDoodadID)
 		for k, v in ipairs(aItemData) do
 			if v.nQuality == info.nQuality and LIB.GetItemNameByItem(v.item) == info.szName then
 				info.dwID = v.item.dwID
 				--[[#DEBUG BEGIN]]
-				LIB.Debug({'Item matching, ' .. LIB.GetItemNameByItem(v.item)}, 'MY_GKP_Loot', DEBUG_LEVEL.LOG)
+				LIB.Debug('Item matching, ' .. LIB.GetItemNameByItem(v.item), 'MY_GKP_Loot', DEBUG_LEVEL.LOG)
 				--[[#DEBUG END]]
 				break
 			end
@@ -1075,7 +1075,7 @@ function Loot.DrawLootList(dwID)
 		end
 	end
 	--[[#DEBUG BEGIN]]
-	LIB.Debug({(string.format('Doodad %d, items %d.', dwID, nCount))}, 'MY_GKP_Loot', DEBUG_LEVEL.LOG)
+	LIB.Debug(('Doodad %d, items %d.'):format(dwID, nCount), 'MY_GKP_Loot', DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 
 	if not szName or nCount == 0 then
@@ -1083,7 +1083,7 @@ function Loot.DrawLootList(dwID)
 			Loot.RemoveLootList(dwID)
 		end
 		--[[#DEBUG BEGIN]]
-		LIB.Debug({'Doodad does not exist!'}, 'MY_GKP_Loot:DrawLootList', DEBUG_LEVEL.LOG)
+		LIB.Debug('Doodad does not exist!', 'MY_GKP_Loot:DrawLootList', DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		return
 	end
@@ -1368,7 +1368,7 @@ LIB.RegisterEvent('OPEN_DOODAD', function()
 		end
 		Loot.DrawLootList(arg0)
 		--[[#DEBUG BEGIN]]
-		LIB.Debug({'Open Doodad: ' .. arg0}, 'MY_GKP_Loot', DEBUG_LEVEL.LOG)
+		LIB.Debug('Open Doodad: ' .. arg0, 'MY_GKP_Loot', DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		local hLoot = Station.Lookup('Normal/LootList')
 		if hLoot then

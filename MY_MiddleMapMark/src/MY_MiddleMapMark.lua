@@ -105,7 +105,7 @@ if IsLocalFileExist(LIB.FormatPath({SZ_CACHE_PATH, PATH_TYPE.DATA})) then
 				DBD_W:Execute()
 			end
 			--[[#DEBUG BEGIN]]
-			LIB.Debug({'MiddleMapMark cache trans from file to sqlite finished!'}, 'MY_MiddleMapMark', DEBUG_LEVEL.LOG)
+			LIB.Debug('MiddleMapMark cache trans from file to sqlite finished!', 'MY_MiddleMapMark', DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
 		end
 	end

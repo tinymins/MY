@@ -194,14 +194,14 @@ function LIB.Ajax(settings)
 	if not settings.success then
 		settings.success = function(html, status)
 			--[[#DEBUG BEGIN]]
-			LIB.Debug({settings.url .. ' - SUCCESS'}, 'AJAX', DEBUG_LEVEL.LOG)
+			LIB.Debug(settings.url .. ' - SUCCESS', 'AJAX', DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
 		end
 	end
 	if not settings.error then
 		settings.error = function(html, status, success)
 			--[[#DEBUG BEGIN]]
-			LIB.Debug({settings.url .. ' - STATUS ' .. (success and status or 'failed')}, 'AJAX', DEBUG_LEVEL.WARNING)
+			LIB.Debug(settings.url .. ' - STATUS ' .. (success and status or 'failed'), 'AJAX', DEBUG_LEVEL.WARNING)
 			--[[#DEBUG END]]
 		end
 	end
@@ -252,7 +252,7 @@ function LIB.Ajax(settings)
 		wWebCef.OnWebLoadEnd = function()
 			-- local szUrl, szTitle, szContent = this:GetLocationURL(), this:GetLocationName(), this:GetDocument()
 			--[[#DEBUG BEGIN]]
-			-- LIB.Debug({string.format('%s - %s', szTitle, szUrl)}, 'MYRRWC::OnDocumentComplete', DEBUG_LEVEL.LOG)
+			-- LIB.Debug(string.format('%s - %s', szTitle, szUrl), 'MYRRWC::OnDocumentComplete', DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
 			-- 注销超时处理时钟
 			LIB.DelayCall('MYRRWC_TO_' .. RequestID, false)
@@ -261,7 +261,7 @@ function LIB.Ajax(settings)
 			--[[#DEBUG BEGIN]]local status, err = --[[#DEBUG END]]pcall_this(settings.context, settings.success, szContent, 200, settings)
 			--[[#DEBUG BEGIN]]
 			-- 	if not status then
-			-- 		LIB.Debug({err}, 'MYRRWC::OnDocumentComplete::Callback', DEBUG_LEVEL.ERROR)
+			-- 		LIB.Debug(err, 'MYRRWC::OnDocumentComplete::Callback', DEBUG_LEVEL.ERROR)
 			-- 	end
 			--[[#DEBUG END]]
 			-- end
@@ -270,20 +270,20 @@ function LIB.Ajax(settings)
 
 		-- do with this remote request
 		--[[#DEBUG BEGIN]]
-		LIB.Debug({settings.url}, 'MYRRWC', DEBUG_LEVEL.LOG)
+		LIB.Debug(settings.url, 'MYRRWC', DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		-- register request timeout clock
 		if settings.timeout > 0 then
 			LIB.DelayCall('MYRRWC_TO_' .. RequestID, settings.timeout, function()
 				--[[#DEBUG BEGIN]]
-				LIB.Debug({settings.url}, 'MYRRWC::Timeout', DEBUG_LEVEL.WARNING) -- log
+				LIB.Debug(settings.url, 'MYRRWC::Timeout', DEBUG_LEVEL.WARNING) -- log
 				--[[#DEBUG END]]
 				-- request timeout, call timeout function.
 				if settings.error then
 					--[[#DEBUG BEGIN]]local status, err = --[[#DEBUG END]]pcall_this(settings.context, settings.error, 'timeout', settings)
 					--[[#DEBUG BEGIN]]
 					if not status then
-						LIB.Debug({err}, 'MYRRWC::TIMEOUT', DEBUG_LEVEL.ERROR)
+						LIB.Debug(err, 'MYRRWC::TIMEOUT', DEBUG_LEVEL.ERROR)
 					end
 					--[[#DEBUG END]]
 				end
@@ -316,7 +316,7 @@ function LIB.Ajax(settings)
 			local szUrl, szTitle, szContent = this:GetLocationURL(), this:GetLocationName(), this:GetDocument()
 			if szUrl ~= szTitle or szContent ~= '' then
 				--[[#DEBUG BEGIN]]
-				LIB.Debug({string.format('%s - %s', szTitle, szUrl)}, 'MYRRWP::OnDocumentComplete', DEBUG_LEVEL.LOG)
+				LIB.Debug(string.format('%s - %s', szTitle, szUrl), 'MYRRWP::OnDocumentComplete', DEBUG_LEVEL.LOG)
 				--[[#DEBUG END]]
 				-- 注销超时处理时钟
 				LIB.DelayCall('MYRRWP_TO_' .. RequestID, false)
@@ -325,7 +325,7 @@ function LIB.Ajax(settings)
 					--[[#DEBUG BEGIN]]local status, err = --[[#DEBUG END]]pcall_this(settings.context, settings.success, szContent, 200, settings)
 					--[[#DEBUG BEGIN]]
 					if not status then
-						LIB.Debug({err}, 'MYRRWP::OnDocumentComplete::Callback', DEBUG_LEVEL.ERROR)
+						LIB.Debug(err, 'MYRRWP::OnDocumentComplete::Callback', DEBUG_LEVEL.ERROR)
 					end
 					--[[#DEBUG END]]
 				end
@@ -333,7 +333,7 @@ function LIB.Ajax(settings)
 					--[[#DEBUG BEGIN]]local status, err = --[[#DEBUG END]]pcall_this(settings.context, settings.complete, szContent, 200, true)
 					--[[#DEBUG BEGIN]]
 					if not status then
-						LIB.Debug({err}, 'MYRRWP::OnDocumentComplete::Callback::Complete', DEBUG_LEVEL.ERROR)
+						LIB.Debug(err, 'MYRRWP::OnDocumentComplete::Callback::Complete', DEBUG_LEVEL.ERROR)
 					end
 					--[[#DEBUG END]]
 				end
@@ -343,20 +343,20 @@ function LIB.Ajax(settings)
 
 		-- do with this remote request
 		--[[#DEBUG BEGIN]]
-		LIB.Debug({settings.url}, 'MYRRWP', DEBUG_LEVEL.LOG)
+		LIB.Debug(settings.url, 'MYRRWP', DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		-- register request timeout clock
 		if settings.timeout > 0 then
 			LIB.DelayCall('MYRRWP_TO_' .. RequestID, settings.timeout, function()
 				--[[#DEBUG BEGIN]]
-				LIB.Debug({settings.url}, 'MYRRWP::Timeout', DEBUG_LEVEL.WARNING) -- log
+				LIB.Debug(settings.url, 'MYRRWP::Timeout', DEBUG_LEVEL.WARNING) -- log
 				--[[#DEBUG END]]
 				-- request timeout, call timeout function.
 				if settings.error then
 					--[[#DEBUG BEGIN]]local status, err = --[[#DEBUG END]]pcall_this(settings.context, settings.error, 'timeout', settings)
 					--[[#DEBUG BEGIN]]
 					if not status then
-						LIB.Debug({err}, 'MYRRWP::TIMEOUT', DEBUG_LEVEL.ERROR)
+						LIB.Debug(err, 'MYRRWP::TIMEOUT', DEBUG_LEVEL.ERROR)
 					end
 					--[[#DEBUG END]]
 				end
@@ -364,7 +364,7 @@ function LIB.Ajax(settings)
 					--[[#DEBUG BEGIN]]local status, err = --[[#DEBUG END]]pcall_this(settings.context, settings.complete, '', 500, false)
 					--[[#DEBUG BEGIN]]
 					if not status then
-						LIB.Debug({err}, 'MYRRWP::TIMEOUT::Callback::Complete', DEBUG_LEVEL.ERROR)
+						LIB.Debug(err, 'MYRRWP::TIMEOUT::Callback::Complete', DEBUG_LEVEL.ERROR)
 					end
 					--[[#DEBUG END]]
 				end
@@ -410,7 +410,7 @@ local function OnCurlRequestResult()
 			--[[#DEBUG BEGIN]]local status, err = --[[#DEBUG END]]pcall(settings.complete, html, status, bSuccess or dwBufferSize > 0)
 			--[[#DEBUG BEGIN]]
 			if not status then
-				LIB.Debug({GetTraceback('CURL # ' .. settings.url .. ' - complete - PCALL ERROR - ' .. err)}, DEBUG_LEVEL.ERROR)
+				LIB.Debug(GetTraceback('CURL # ' .. settings.url .. ' - complete - PCALL ERROR - ' .. err), DEBUG_LEVEL.ERROR)
 			end
 			--[[#DEBUG END]]
 		end
@@ -421,14 +421,14 @@ local function OnCurlRequestResult()
 			--[[#DEBUG BEGIN]]local status, err = --[[#DEBUG END]]pcall(settings.success, html, status)
 			--[[#DEBUG BEGIN]]
 			if not status then
-				LIB.Debug({GetTraceback('CURL # ' .. settings.url .. ' - success - PCALL ERROR - ' .. err)}, DEBUG_LEVEL.ERROR)
+				LIB.Debug(GetTraceback('CURL # ' .. settings.url .. ' - success - PCALL ERROR - ' .. err), DEBUG_LEVEL.ERROR)
 			end
 			--[[#DEBUG END]]
 		else
 			--[[#DEBUG BEGIN]]local status, err = --[[#DEBUG END]]pcall(settings.error, html, status, dwBufferSize ~= 0)
 			--[[#DEBUG BEGIN]]
 			if not status then
-				LIB.Debug({GetTraceback('CURL # ' .. settings.url .. ' - error - PCALL ERROR - ' .. err)}, DEBUG_LEVEL.ERROR)
+				LIB.Debug(GetTraceback('CURL # ' .. settings.url .. ' - error - PCALL ERROR - ' .. err), DEBUG_LEVEL.ERROR)
 			end
 			--[[#DEBUG END]]
 		end

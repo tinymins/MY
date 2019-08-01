@@ -312,7 +312,7 @@ function D.OnEvent(szEvent)
 			local r = remove(MY_TM_MARK_QUEUE, 1)
 			local res, err = pcall(r.fnAction)
 			if not res then
-				LIB.Debug('MY_TeamMon_Mark ERROR: ' .. err)
+				LIB.Debug('MY_TeamMon_Mark ERROR: ' .. err, _L['MY_TeamMon'], DEBUG_LEVEL.WARNING)
 			end
 		else
 			MY_TM_MARK_FREE = true
@@ -323,7 +323,7 @@ function D.OnEvent(szEvent)
 			if szText and szText ~= '' then
 				D.OnCallMessage('TALK', szText, arg1, arg3 == '' and '%' or arg3)
 			else
-				LIB.Debug('GetPureText ERROR: ' .. arg0)
+				LIB.Debug('GetPureText ERROR: ' .. arg0, _L['MY_TeamMon'], DEBUG_LEVEL.WARNING)
 			end
 		end
 	elseif szEvent == 'ON_WARNING_MESSAGE' then

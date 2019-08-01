@@ -321,7 +321,7 @@ end
 function MY_Anmerkungen.LoadConfig()
 	if not GetClientPlayer() then
 		--[[#DEBUG BEGIN]]
-		LIB.Debug({'Client player not exist! Cannot load config!'}, 'MY_Anmerkungen.LoadConfig', DEBUG_LEVEL.ERROR)
+		LIB.Debug('Client player not exist! Cannot load config!', 'MY_Anmerkungen.LoadConfig', DEBUG_LEVEL.ERROR)
 		--[[#DEBUG END]]
 		return
 	end

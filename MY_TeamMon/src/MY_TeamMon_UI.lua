@@ -82,7 +82,9 @@ local MY_TMUI_DOODAD_ICON = {
 	[DOODAD_KIND.NPCDROP     ] = 381 ,
 }
 setmetatable(MY_TMUI_DOODAD_ICON, { __index = function(me, key)
-	LIB.Debug('unknown Kind' .. key)
+	--[[#DEBUG BEGIN]]
+	LIB.Debug('Unknown Kind: ' .. key, _L['MY_TeamMon'], DEBUG_LEVEL.WARNING)
+	--[[#DEBUG END]]
 	return 369
 end })
 
@@ -910,7 +912,9 @@ function D.OpenImportPanel(szDefault, szTitle, fnAction)
 				end
 			end
 			local bStatus, szMsg = MY_TeamMon.LoadConfigureFile(config)
-			LIB.Debug('#MY_TeamMon# load config: ' .. tostring(szMsg))
+			--[[#DEBUG BEGIN]]
+			LIB.Debug('Load config: ' .. tostring(szMsg), _L['MY_TeamMon_UI'], DEBUG_LEVEL.LOG)
+			--[[#DEBUG END]]
 			if bStatus then
 				LIB.Alert(_L('Import success: %s', szTitle or szMsg))
 				ui:remove()

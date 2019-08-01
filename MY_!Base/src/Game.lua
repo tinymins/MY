@@ -1806,14 +1806,14 @@ function LIB.SetTarget(arg0, arg1)
 		local npc = GetNpc(dwID)
 		if npc and not npc.IsSelectable() and LIB.IsShieldedVersion() then
 			--[[#DEBUG BEGIN]]
-			LIB.Debug({'Set target to unselectable npc.'}, 'SetTarget', DEBUG_LEVEL.WARNING)
+			LIB.Debug('Set target to unselectable npc.', 'SetTarget', DEBUG_LEVEL.WARNING)
 			--[[#DEBUG END]]
 			return false
 		end
 	elseif dwType == TARGET.DOODAD then
 		if LIB.IsShieldedVersion() then
 			--[[#DEBUG BEGIN]]
-			LIB.Debug({'Set target to doodad.'}, 'SetTarget', DEBUG_LEVEL.WARNING)
+			LIB.Debug('Set target to doodad.', 'SetTarget', DEBUG_LEVEL.WARNING)
 			--[[#DEBUG END]]
 			return false
 		end
@@ -2055,7 +2055,7 @@ function LIB.GetBuff(KObject, dwID, nLevel, dwSkillSrcID)
 		else
 			if not KObject.GetBuff then
 				--[[#DEBUG BEGIN]]
-				LIB.Debug({'KObject neither has a function named GetBuffByOwner nor named GetBuff.'}, PACKET_INFO.NAME_SPACE .. '.GetBuff', DEBUG_LEVEL.ERROR)
+				LIB.Debug('KObject neither has a function named GetBuffByOwner nor named GetBuff.', PACKET_INFO.NAME_SPACE .. '.GetBuff', DEBUG_LEVEL.ERROR)
 				--[[#DEBUG END]]
 				return
 			end
@@ -2086,14 +2086,14 @@ function LIB.GetBuff(KObject, dwID, nLevel, dwSkillSrcID)
 				end
 			end
 			--[[#DEBUG BEGIN]]
-			-- LIB.Debug({'KObject do not have a function named GetBuffByOwner.'}, PACKET_INFO.NAME_SPACE .. '.GetBuff', DEBUG_LEVEL.ERROR)
+			-- LIB.Debug('KObject do not have a function named GetBuffByOwner.', PACKET_INFO.NAME_SPACE .. '.GetBuff', DEBUG_LEVEL.ERROR)
 			--[[#DEBUG END]]
 			-- return
 		end
 	else
 		if not KObject.GetBuff then
 			--[[#DEBUG BEGIN]]
-			LIB.Debug({'KObject do not have a function named GetBuff.'}, PACKET_INFO.NAME_SPACE .. '.GetBuff', DEBUG_LEVEL.ERROR)
+			LIB.Debug('KObject do not have a function named GetBuff.', PACKET_INFO.NAME_SPACE .. '.GetBuff', DEBUG_LEVEL.ERROR)
 			--[[#DEBUG END]]
 			return
 		end

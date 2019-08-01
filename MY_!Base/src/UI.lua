@@ -1052,12 +1052,12 @@ function UI:append(arg0, arg1, arg2)
 				end
 				local frame = Wnd.OpenWindow(szFile, PACKET_INFO.NAME_SPACE .. '_TempWnd#' .. _nTempWndCount)
 				if not frame then
-					return LIB.Debug({ _L('unable to open ini file [%s]', szFile) }, PACKET_INFO.NAME_SPACE .. '#UI#append', DEBUG_LEVEL.ERROR)
+					return LIB.Debug(_L('unable to open ini file [%s]', szFile), PACKET_INFO.NAME_SPACE .. '#UI#append', DEBUG_LEVEL.ERROR)
 				end
 				_nTempWndCount = _nTempWndCount + 1
 				local raw = frame:Lookup(szComponet)
 				if not raw then
-					LIB.Debug({_L('can not find wnd component [%s:%s]', szFile, szComponet)}, PACKET_INFO.NAME_SPACE .. '#UI#append', DEBUG_LEVEL.ERROR)
+					LIB.Debug(_L('can not find wnd component [%s:%s]', szFile, szComponet), PACKET_INFO.NAME_SPACE .. '#UI#append', DEBUG_LEVEL.ERROR)
 				else
 					InitComponent(raw, szType)
 					raw:ChangeRelation(parentWnd, true, true)
@@ -1068,7 +1068,7 @@ function UI:append(arg0, arg1, arg2)
 			elseif sub(szType, 1, 3) ~= 'Wnd' and parentHandle then
 				raw = parentHandle:AppendItemFromIni(_szItemINI, szType)
 				if not raw then
-					return LIB.Debug({ _L('unable to append handle item [%s]', szType) }, PACKET_INFO.NAME_SPACE .. '#UI:append', DEBUG_LEVEL.ERROR)
+					return LIB.Debug(_L('unable to append handle item [%s]', szType), PACKET_INFO.NAME_SPACE .. '#UI:append', DEBUG_LEVEL.ERROR)
 				else
 					ui = ui:add(raw)
 				end
@@ -3314,7 +3314,7 @@ function UI:uievent(szEvent, fnEvent)
 								--[[#DEBUG BEGIN]]
 								else
 									LIB.Debug(
-										{ _L('Set return value failed, cause another hook has alreay take a returnval. [Path] %s', UI.GetTreePath(raw)) },
+										_L('Set return value failed, cause another hook has alreay take a returnval. [Path] %s', UI.GetTreePath(raw)),
 										'UI:uievent#' .. szEvent .. ':' .. (p.id or 'Unnamed'), DEBUG_LEVEL.WARNING
 									)
 								--[[#DEBUG END]]
@@ -3712,7 +3712,7 @@ function UI:check(fnCheck, fnUncheck, bNoAutoBind)
 		end
 	--[[#DEBUG BEGIN]]
 	else
-		LIB.Debug({'fnCheck:'..type(fnCheck)..' fnUncheck:'..type(fnUncheck)}, 'ERROR UI:check', DEBUG_LEVEL.ERROR)
+		LIB.Debug('fnCheck:'..type(fnCheck)..' fnUncheck:'..type(fnUncheck), 'ERROR UI:check', DEBUG_LEVEL.ERROR)
 	--[[#DEBUG END]]
 	end
 end
@@ -4751,7 +4751,7 @@ function UI.GetShadowHandle(szName)
 	if not sh then
 		frame:Lookup('', ''):AppendItemFromString(format('<handle> name="%s" </handle>', szName))
 		--[[#DEBUG BEGIN]]
-		LIB.Debug({'Create sh # ' .. szName}, 'UI', DEBUG_LEVEL.LOG)
+		LIB.Debug('Create sh # ' .. szName, 'UI', DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		sh = frame:Lookup('', szName)
 	end

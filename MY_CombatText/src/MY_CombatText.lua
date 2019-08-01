@@ -1214,7 +1214,7 @@ local function GetPlayerID()
 		--[[#DEBUG END]]
 	else
 		--[[#DEBUG BEGIN]]
-		LIB.Debug({'CombatText get player id failed!!! try again'}, DEBUG_LEVEL.ERROR)
+		LIB.Debug('CombatText get player id failed!!! try again', DEBUG_LEVEL.ERROR)
 		--[[#DEBUG END]]
 		LIB.DelayCall(1000, GetPlayerID)
 	end

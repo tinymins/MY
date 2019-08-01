@@ -101,7 +101,7 @@ end
 function D.LoadEmbeddedConfig(bCoroutine)
 	if not IsString(C.PASSPHRASE) or not IsString(C.PASSPHRASE_EMBEDDED) then
 		--[[#DEBUG BEGIN]]
-		LIB.Debug({'Passphrase cannot be empty!'}, 'MY_TargetMonConfig', DEBUG_LEVEL.ERROR)
+		LIB.Debug('Passphrase cannot be empty!', 'MY_TargetMonConfig', DEBUG_LEVEL.ERROR)
 		--[[#DEBUG END]]
 		return
 	end
