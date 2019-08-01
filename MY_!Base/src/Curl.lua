@@ -224,11 +224,30 @@ function LIB.Ajax(settings)
 		elseif method == 'get' then
 			curl:AddHeader('Content-Type: application/x-www-form-urlencoded')
 		end
-		if settings.complete then
-			curl:OnComplete(settings.complete)
-		end
-		curl:OnSuccess(settings.success)
-		curl:OnError(settings.error)
+		curl:OnComplete(function(html, code, success)
+			if settings.complete then
+				if settings.charset == 'utf8' then
+					html = UTF8ToAnsi(html)
+				end
+				settings.complete(html, code, success)
+			end
+		end)
+		curl:OnSuccess(function(html, code)
+			if settings.success then
+				if settings.charset == 'utf8' then
+					html = UTF8ToAnsi(html)
+				end
+				settings.success(html, code, settings)
+			end
+		end)
+		curl:OnError(function(html, code, success)
+			if settings.error then
+				if settings.charset == 'utf8' then
+					html = UTF8ToAnsi(html)
+				end
+				settings.error(html, code, settings)
+			end
+		end)
 		curl:SetConnTimeout(settings.timeout)
 		curl:Perform()
 	elseif driver == 'webcef' then
@@ -403,7 +422,7 @@ local function OnCurlRequestResult()
 	if MY_CALL_AJAX[szKey] then
 		local settings = MY_CALL_AJAX[szKey]
 		local status = bSuccess and 200 or 500
-		if settings.charset == 'utf8' and html ~= nil and LIB.GetLang() == 'zhcn' then
+		if settings.charset == 'utf8' and IsString(html) then
 			html = UTF8ToAnsi(html)
 		end
 		if settings.complete then
