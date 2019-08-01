@@ -406,6 +406,29 @@ function LIB.ConcatPath(...)
 	return szPath
 end
 
+-- 删除目录中的./与../
+function LIB.NormalizePath(szPath)
+	szPath = szPath:gsub('/%./', '/')
+	local nPos1, nPos2
+	while true do
+		nPos1, nPos2 = szPath:find('[^/]*/%.%./')
+		if not nPos1 then
+			break
+		end
+		szPath = szPath:sub(1, nPos1 - 1) .. szPath:sub(nPos2 + 1)
+	end
+	return szPath
+end
+
+-- 获取父层目录 注意文件和文件夹获取父层的区别
+function LIB.GetParentPath(szPath)
+	return LIB.NormalizePath(szPath):gsub('/[^/]*$', '')
+end
+
+function LIB.IsURL(szURL)
+	return szURL:sub(1, 8):lower() == 'https://' or szURL:gsub(1, 7):lower() == 'http://'
+end
+
 -- 插件数据存储默认密钥
 local GetLUADataPathPassphrase
 do
