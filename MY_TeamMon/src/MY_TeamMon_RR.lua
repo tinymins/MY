@@ -54,13 +54,131 @@ local INI_PATH = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_RR.ini'
 local MY_TM_META_ROOT = MY_TeamMon.MY_TM_META_ROOT
 local MY_TM_DATA_ROOT = MY_TeamMon.MY_TM_DATA_ROOT
 local MY_TM_DATA_PASSPHRASE = '89g45ynbtldnsryu98rbny9ps7468hb6npyusiryuxoldg7lbn894bn678b496746'
+
+-- 陆服环境下，以下缩写均对等
+-- tinymins
+-- tinymins?master
+-- tinymins/JX3_MY_DATA
+-- tinymins/JX3_MY_DATA?master
+-- tinymins@github
+-- tinymins@github?master
+-- tinymins@github:/MY_TeamMon/zhcn/meta.json
+-- tinymins@github/JX3_MY_DATA
+-- tinymins@github/JX3_MY_DATA:/MY_TeamMon/zhcn/meta.json
+-- tinymins@github/JX3_MY_DATA?master:/MY_TeamMon/zhcn/meta.json
+local GetRawURL, GetBlobURL, GetShortURL
+do
+local PROVIDER_PARAMS = {
+	github = {
+		szRawURL = 'https://raw.githubusercontent.com/%s/%s/%s/%s',
+		szRawURL_T = '^https://raw%.githubusercontent%.com/([^/]+)/([^/]+)/([^/]+)/(.+)$',
+		szBlobURL = 'https://github.com/%s/%s/blob/%s/%s',
+		szBlobURL_T = '^https://github%.com/([^/]+)/([^/]+)/blob/([^/]+)/(.+)$',
+	},
+	aliyun = {
+		szRawURL = 'https://code.aliyun.com/%s/%s/raw/%s/%s',
+		szRawURL_T = '^https://code%.aliyun%.com/([^/]+)/([^/]+)/raw/([^/]+)/(.+)$',
+		szBlobURL = 'https://code.aliyun.com/%s/%s/blob/%s/%s',
+		szBlobURL_T = '^https://code%.aliyun%.com/([^/]+)/([^/]+)/blob/([^/]+)/(.+)$',
+	},
+	gitee = {
+		szRawURL = 'https://gitee.com/%s/%s/raw/%s/%s',
+		szRawURL_T = '^https://gitee%.com/([^/]+)/([^/]+)/raw/([^/]+)/(.+)$',
+		szBlobURL = 'https://gitee.com/%s/%s/blob/%s/%s',
+		szBlobURL_T = '^https://gitee%.com/([^/]+)/([^/]+)/blob/([^/]+)/(.+)$',
+	},
+}
+local DEFAULT_PROVIDER = 'github'
+local DEFAULT_PROJECT = 'JX3_MY_DATA'
+local DEFAULT_BRANCH = 'master'
+local DEFAULT_PATH = 'MY_TeamMon/' .. LANG .. '/meta.json'
+local function GetURL(szURL, szType)
+	local szUser, szProvider, szProject, szBranch, szPath, nPos = szURL
+	if wfind(szURL, '://') then
+		for k, p in pairs(PROVIDER_PARAMS) do
+			szUser, szProject, szBranch, szPath = szURL:match(p.szRawURL_T)
+			if not szUser then
+				szUser, szProject, szBranch, szPath = szURL:match(p.szBlobURL_T)
+			end
+			if szUser then
+				szProvider = k
+				break
+			end
+		end
+	else
+		nPos = wfind(szUser, ':')
+		if nPos then
+			szPath = szUser:sub(nPos + 1):gsub('^/+', '')
+			szUser = szUser:sub(1, nPos - 1)
+		else
+			szPath = DEFAULT_PATH
+		end
+		nPos = wfind(szUser, '?')
+		if nPos then
+			szBranch = szUser:sub(nPos + 1)
+			szUser = szUser:sub(1, nPos - 1)
+		else
+			szBranch = DEFAULT_BRANCH
+		end
+		nPos = wfind(szUser, '/')
+		if nPos then
+			szProject = szUser:sub(nPos + 1)
+			szUser = szUser:sub(1, nPos - 1)
+		else
+			szProject = DEFAULT_PROJECT
+		end
+		nPos = wfind(szUser, '@')
+		if nPos then
+			szProvider = szUser:sub(nPos + 1)
+			szUser = szUser:sub(1, nPos - 1)
+		else
+			szProvider = DEFAULT_PROVIDER
+		end
+	end
+	local provider = szProvider and PROVIDER_PARAMS[szProvider]
+	if not provider then
+		return
+	end
+	if szType == 'RAW' then
+		return provider.szRawURL:format(szUser, szProject, szBranch, szPath)
+	end
+	if szType == 'BLOB' then
+		return provider.szBlobURL:format(szUser, szProject, szBranch, szPath)
+	end
+	if szType == 'SHORT' then
+		if szProvider ~= DEFAULT_PROVIDER then
+			szUser = szUser .. '@' .. szProvider
+		end
+		if szProject ~= DEFAULT_PROJECT then
+			szUser = szUser .. '/' .. szProject
+		end
+		if szBranch ~= DEFAULT_BRANCH then
+			szUser = szUser .. '?' .. szBranch
+		end
+		if szPath ~= DEFAULT_PATH then
+			szUser = szUser .. ':' .. szPath
+		end
+		return szUser
+	end
+end
+function GetRawURL(szURL)
+	return GetURL(szURL, 'RAW')
+end
+function GetBlobURL(szURL)
+	return GetURL(szURL, 'BLOB')
+end
+function GetShortURL(szURL)
+	return GetURL(szURL, 'SHORT')
+end
+end
+
 local META_DEFAULT = {{
 	szKey = 'DEFAULT',
 	szAuthor = _L['Default'],
 	szTitle = _L['Default monitor data'],
-	szURL = 'https://code.aliyun.com/tinymins/JX3_MY_DATA/raw/master/MY_TeamMon/' .. LANG .. '/meta.json',
 	szDataUrl = './data.jx3dat',
-	szAbout = 'https://code.aliyun.com/tinymins/JX3_MY_DATA/blob/master/MY_TeamMon/README.md',
+	szURL = GetRawURL('tinymins'),
+	szAbout = GetBlobURL('tinymins:MY_TeamMon/README.md'),
 }}
 local META_TEMPLATE = {
 	szURL = '',
@@ -71,12 +189,6 @@ local META_TEMPLATE = {
 	szAbout = '',
 	szVersion = '',
 }
-local META_URL_AUTO_PREFIX = 'https://code.aliyun.com/'
-local META_URL_AUTO_SUFFIX = '/JX3_MY_DATA/raw/master/MY_TeamMon/' .. LANG .. '/meta.json'
--- local META_URL_AUTO_PREFIX = 'https://dev.tencent.com/u/'
--- local META_URL_AUTO_SUFFIX = '/p/JX3_MY_DATA/git/raw/master/MY_TeamMon/' .. LANG .. '/meta.json'
--- local META_URL_AUTO_PREFIX = 'https://gitee.com/'
--- local META_URL_AUTO_SUFFIX = '/JX3_MY_DATA/raw/master/MY_TeamMon/' .. LANG .. '/meta.json'
 local META_SEL_INFO, META_DOWNLOADER
 
 function D.OpenPanel()
@@ -108,10 +220,7 @@ function D.AddMeta(info)
 end
 
 function D.DownloadMeta(info, onSuccess, onError)
-	local szURL = info.szURL
-	if not wfind(szURL, '.') and not wfind(szURL, '/') then
-		szURL = META_URL_AUTO_PREFIX .. szURL .. META_URL_AUTO_SUFFIX
-	end
+	local szURL = GetRawURL(info.szURL) or info.szURL
 	LIB.Ajax({
 		url = szURL,
 		success = function(szHTML)
@@ -278,7 +387,7 @@ function D.OnLButtonClick()
 				nPending = nPending - 1
 				if nPending == 0 then
 					if #aErrmsg > 0 then
-						LIB.Alert(concat(szErrmsg, '\n'))
+						LIB.Alert(concat(aErrmsg, '\n'))
 					end
 				end
 			end
@@ -346,12 +455,12 @@ function D.OnItemRButtonClick()
 				UI.OpenTextEditor(wnd.info.szURL)
 			end,
 		}}
-		if wnd.info.szURL:sub(1, #META_URL_AUTO_PREFIX) == META_URL_AUTO_PREFIX
-		and wnd.info.szURL:sub(-#META_URL_AUTO_SUFFIX, -1) == META_URL_AUTO_SUFFIX then
+		local szShortURL = GetShortURL(wnd.info.szURL)
+		if szShortURL then
 			insert(t, {
 				szOption = _L['Copy short meta url'],
 				fnAction = function()
-					UI.OpenTextEditor(wnd.info.szURL:sub(#META_URL_AUTO_PREFIX + 1, -#META_URL_AUTO_SUFFIX - 1))
+					UI.OpenTextEditor(szShortURL)
 				end,
 			})
 		end
@@ -370,9 +479,9 @@ function D.OnItemMouseEnter()
 	if name == 'Handle_Item' then
 		local wnd = this:GetParent()
 		local szTip = _L('Meta URL: %s', wnd.info.szURL)
-		if wnd.info.szURL:sub(1, #META_URL_AUTO_PREFIX) == META_URL_AUTO_PREFIX
-		and wnd.info.szURL:sub(-#META_URL_AUTO_SUFFIX, -1) == META_URL_AUTO_SUFFIX then
-			szTip = szTip .. _L('(Short URL: %s)', wnd.info.szURL:sub(#META_URL_AUTO_PREFIX + 1, -#META_URL_AUTO_SUFFIX - 1))
+		local szShortURL = GetShortURL(wnd.info.szURL)
+		if szShortURL then
+			szTip = szTip .. _L('(Short URL: %s)', szShortURL)
 		end
 		LIB.OutputTip(this, szTip)
 	end
