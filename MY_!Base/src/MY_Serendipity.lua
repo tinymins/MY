@@ -139,7 +139,7 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTi
 				end
 				LIB.Ajax({
 					driver = config[1],
-					type = config[2],
+					method = config[2],
 					url = 'http://data.jx3.derzh.com/serendipity/?l='
 					.. LIB.GetLang() .. '&m=' .. nMethod
 					.. '&data=' .. LIB.EncryptString(LIB.JsonEncode({

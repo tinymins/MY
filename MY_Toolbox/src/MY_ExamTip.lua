@@ -94,7 +94,7 @@ local function QueryData(szQues)
 
 	local _, _, szLang, _ = GetVersion()
 	LIB.Ajax({
-		type = 'get',
+		method = 'get',
 		url = QUERY_URL:format(szLang, LIB.UrlEncode(szQues)),
 		success = function(html, status)
 			local res = LIB.JsonDecode(html)
@@ -147,7 +147,8 @@ local function SubmitData()
 		return
 	end
 	LIB.Ajax({
-		type = 'post/json',
+		method = 'post',
+		payload = 'json',
 		url = SUBMIT_URL,
 		data = {
 			lang = select(3, GetVersion()),

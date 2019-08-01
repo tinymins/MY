@@ -85,7 +85,8 @@ local MY_CALL_AJAX = {}
 local MY_AJAX_TAG = 'MY_AJAX#'
 local l_ajaxsettingsmeta = {
 	__index = {
-		type = 'get',
+		method = 'get',
+		payload = 'form',
 		driver = 'auto',
 		timeout = 60000,
 		charset = 'utf8',
@@ -153,7 +154,7 @@ function LIB.Ajax(settings)
 	end
 
 	local ssl = url:sub(1, 6) == 'https:'
-	local method, payload = unpack(LIB.SplitString(settings.type, '/'))
+	local method = settings.method
 	if (method == 'get' or method == 'delete') and data then
 		if not url:find('?') then
 			url = url .. '?'
@@ -201,10 +202,10 @@ function LIB.Ajax(settings)
 		local curl = Curl_Create(url)
 		if method == 'post' then
 			curl:SetMethod('POST')
-			if payload == 'json' then
+			if settings.payload == 'json' then
 				data = LIB.JsonEncode(data)
 				curl:AddHeader('Content-Type: application/json')
-			else -- if payload == 'form' then
+			else -- if settings.payload == 'form' then
 				data = LIB.EncodePostData(data)
 				curl:AddHeader('Content-Type: application/x-www-form-urlencoded')
 			end
@@ -390,7 +391,6 @@ local function OnCurlRequestResult()
 	local dwBufferSize = arg3
 	if MY_CALL_AJAX[szKey] then
 		local settings = MY_CALL_AJAX[szKey]
-		local method, payload = unpack(LIB.SplitString(settings.type, '/'))
 		local status = bSuccess and 200 or 500
 		if settings.complete then
 			--[[#DEBUG BEGIN]]local status, err = --[[#DEBUG END]]pcall(settings.complete, html, status, bSuccess or dwBufferSize > 0)
@@ -404,7 +404,7 @@ local function OnCurlRequestResult()
 			if settings.charset == 'utf8' and html ~= nil and CLIENT_LANG == 'zhcn' then
 				html = UTF8ToAnsi(html)
 			end
-			-- if payload == 'json' then
+			-- if settings.payload == 'json' then
 			-- 	html = LIB.JsonDecode(html)
 			-- end
 			--[[#DEBUG BEGIN]]local status, err = --[[#DEBUG END]]pcall(settings.success, html, status)

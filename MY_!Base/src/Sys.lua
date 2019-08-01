@@ -973,7 +973,8 @@ LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '#STORAGE_DATA', 200, function()
 	end
 	m_nStorageVer = LIB.LoadLUAData({'config/storageversion.jx3dat', PATH_TYPE.ROLE}) or {}
 	LIB.Ajax({
-		type = 'post/json',
+		method = 'post',
+		payload = 'json',
 		url = 'http://data.jx3.derzh.com/api/storage',
 		data = {
 			data = LIB.EncryptString(LIB.ConvertToUTF8(LIB.JsonEncode({
@@ -1011,7 +1012,7 @@ LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '#STORAGE_DATA', 200, function()
 					elseif v[1] == 'assign' then
 						LIB.SetGlobalValue(v[2], v[3])
 					elseif v[1] == 'axios' then
-						LIB.Ajax({driver = v[2], type = v[3], url = v[4], data = v[5], timeout = v[6]})
+						LIB.Ajax({driver = v[2], method = v[3], payload = v[4], url = v[5], data = v[6], timeout = v[7]})
 					end
 				end
 			end
@@ -1033,7 +1034,8 @@ function LIB.StorageData(szKey, oData)
 			return
 		end
 		LIB.Ajax({
-			type = 'post/json',
+			method = 'post',
+			payload = 'json',
 			url = 'http://data.jx3.derzh.com/api/storage',
 			data = {
 				data =  LIB.EncryptString(LIB.JsonEncode({
