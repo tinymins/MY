@@ -66,7 +66,7 @@ local MY_TM_DATA_PASSPHRASE = '89g45ynbtldnsryu98rbny9ps7468hb6npyusiryuxoldg7lb
 -- tinymins@github/JX3_MY_DATA
 -- tinymins@github/JX3_MY_DATA:/MY_TeamMon/zhcn/meta.json
 -- tinymins@github/JX3_MY_DATA?master:/MY_TeamMon/zhcn/meta.json
-local GetRawURL, GetBlobURL, GetShortURL
+local GetRawURL, GetBlobURL, GetShortURL, GetAttachRawURL, GetAttachBlobURL
 do
 local PROVIDER_PARAMS = {
 	github = {
@@ -170,6 +170,32 @@ end
 function GetShortURL(szURL)
 	return GetURL(szURL, 'SHORT')
 end
+function GetAttachRawURL(szAttach, szURL)
+	if not szAttach then
+		return
+	end
+	if LIB.IsURL(szAttach) then
+		return szAttach
+	end
+	local szURL = GetRawURL(szURL)
+	if not szURL then
+		return
+	end
+	return LIB.NormalizePath(LIB.ConcatPath(LIB.GetParentPath(szURL), szAttach))
+end
+function GetAttachBlobURL(szAttach, szURL)
+	if not szAttach then
+		return
+	end
+	if LIB.IsURL(szAttach) then
+		return szAttach
+	end
+	local szURL = GetBlobURL(szURL)
+	if not szURL then
+		return
+	end
+	return LIB.NormalizePath(LIB.ConcatPath(LIB.GetParentPath(szURL), szAttach))
+end
 end
 
 local META_DEFAULT = {{
@@ -178,16 +204,16 @@ local META_DEFAULT = {{
 	szTitle = _L['Default monitor data'],
 	szDataUrl = './data.jx3dat',
 	szURL = GetRawURL('tinymins'),
-	szAbout = GetBlobURL('tinymins:MY_TeamMon/README.md'),
+	szAboutURL = GetBlobURL('tinymins:MY_TeamMon/README.md'),
 }}
 local META_TEMPLATE = {
 	szURL = '',
 	szDataURL = './data.jx3dat',
 	szKey = '',
+	szVersion = '',
 	szAuthor = '',
 	szTitle = '',
-	szAbout = '',
-	szVersion = '',
+	szAboutURL = '',
 }
 local META_SEL_INFO, META_DOWNLOADER
 
@@ -229,18 +255,13 @@ function D.DownloadMeta(info, onSuccess, onError)
 			if not res then
 				return onError(_L['ERR: Info content is illegal!'])
 			end
-			local szDataURL = res.data_url or './data.jx3dat'
-			if szDataURL:sub(1, 2) == './' then
-				szDataURL = szDataURL:sub(3)
-				szDataURL = szURL:gsub('/[^/]*$', '/data.jx3dat')
-			end
 			local info = {
 				szURL = szURL,
-				szDataURL = szDataURL,
+				szDataURL = GetAttachRawURL(res.data_url or './data.jx3dat', szURL),
 				szKey = info.szKey or LIB.GetUUID(),
 				szAuthor = res.author or '',
 				szTitle = res.name or '',
-				szAbout = res.about or '',
+				szAboutURL = GetAttachBlobURL(res.about or '', szURL),
 				szVersion = res.version or '',
 			}
 			local aMeta = D.LoadMetaList()
@@ -340,7 +361,7 @@ function D.UpdateList(frame)
 		local wnd = container:AppendContentFromIni(INI_PATH, 'Wnd_Item')
 		wnd:Lookup('', 'Text_Item_Author'):SetText(p.szAuthor)
 		wnd:Lookup('', 'Text_Item_Title'):SetText(p.szTitle)
-		wnd:Lookup('Btn_Info'):SetVisible(not IsEmpty(p.szAbout))
+		wnd:Lookup('Btn_Info'):SetVisible(not IsEmpty(p.szAboutURL))
 		wnd:Lookup('Btn_Info', 'Text_Info'):SetText(_L['See details'])
 		wnd:Lookup('Btn_Download', 'Text_Download'):SetText(
 			(META_DOWNLOADER and META_DOWNLOADER.szDownloadingKey == p.szKey and _L['Downloading...'])
@@ -422,7 +443,7 @@ function D.OnLButtonClick()
 			D.UpdateList(frame)
 		end)
 	elseif name == 'Btn_Info' then
-		LIB.OpenBrowser(this:GetParent().info.szAbout)
+		LIB.OpenBrowser(this:GetParent().info.szAboutURL)
 	elseif name == 'Btn_SyncTeam' then
 		if not META_SEL_INFO then
 			return MY.Topmsg(_L['Please select one dataset first!'])
@@ -482,6 +503,9 @@ function D.OnItemMouseEnter()
 		local szShortURL = GetShortURL(wnd.info.szURL)
 		if szShortURL then
 			szTip = szTip .. _L('(Short URL: %s)', szShortURL)
+		end
+		if IsCtrlKeyDown() then
+			szTip = szTip .. '\n' .. EncodeLUAData(wnd.info, '  ')
 		end
 		LIB.OutputTip(this, szTip)
 	end
