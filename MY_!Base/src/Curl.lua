@@ -155,6 +155,17 @@ function LIB.Ajax(settings)
 
 	local ssl = url:sub(1, 6) == 'https:'
 	local method = settings.method
+	if method == 'auto' then
+		if Curl_Create then
+			method = 'get'
+		elseif CURL_HttpRqst then
+			method = 'get'
+		elseif CURL_HttpPost then
+			method = 'post'
+		else
+			method = 'get'
+		end
+	end
 	if (method == 'get' or method == 'delete') and data then
 		if not url:find('?') then
 			url = url .. '?'
@@ -392,6 +403,9 @@ local function OnCurlRequestResult()
 	if MY_CALL_AJAX[szKey] then
 		local settings = MY_CALL_AJAX[szKey]
 		local status = bSuccess and 200 or 500
+		if settings.charset == 'utf8' and html ~= nil and LIB.GetLang() == 'zhcn' then
+			html = UTF8ToAnsi(html)
+		end
 		if settings.complete then
 			--[[#DEBUG BEGIN]]local status, err = --[[#DEBUG END]]pcall(settings.complete, html, status, bSuccess or dwBufferSize > 0)
 			--[[#DEBUG BEGIN]]
@@ -401,9 +415,6 @@ local function OnCurlRequestResult()
 			--[[#DEBUG END]]
 		end
 		if bSuccess then
-			if settings.charset == 'utf8' and html ~= nil and CLIENT_LANG == 'zhcn' then
-				html = UTF8ToAnsi(html)
-			end
 			-- if settings.payload == 'json' then
 			-- 	html = LIB.JsonDecode(html)
 			-- end

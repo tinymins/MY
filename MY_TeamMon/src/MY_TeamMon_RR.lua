@@ -248,10 +248,11 @@ end
 function D.DownloadMeta(info, onSuccess, onError)
 	local szURL = GetRawURL(info.szURL) or info.szURL
 	LIB.Ajax({
+		method = 'auto',
 		url = szURL,
+		charset == 'utf8',
 		success = function(szHTML)
-			local szJson = UTF8ToAnsi(szHTML)
-			local res = LIB.JsonDecode(szJson)
+			local res = LIB.JsonDecode(szHTML)
 			if not res then
 				return onError(_L['ERR: Info content is illegal!'])
 			end
