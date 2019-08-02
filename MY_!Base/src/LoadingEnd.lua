@@ -53,29 +53,3 @@ setmetatable(LIB, {
 	__newindex = function() assert(false, 'DO NOT modify ' .. PACKET_INFO.NAME_SPACE .. ' after initialized!!!') end
 })
 FireUIEvent(PACKET_INFO.NAME_SPACE .. '_BASE_LOADING_END')
-
--- 修复剑心导致玩家头像越来越大的问题。。。
-do
-local nInitWidth, nFinalWidth
-LIB.RegisterFrameCreate('Player.FixJXPlayer', function(name, frame)
-	nInitWidth = frame:GetW()
-end)
-local function RevertWidth()
-	local frame = Station.Lookup('Normal/Player')
-	if not frame or not nInitWidth then
-		return
-	end
-	nFinalWidth = frame:GetW()
-	frame:SetW(nInitWidth)
-end
-local function ApplyWidth()
-	local frame = Station.Lookup('Normal/Player')
-	if not frame or not nFinalWidth then
-		return
-	end
-	frame:SetW(nFinalWidth)
-end
-LIB.RegisterReload('FixJXPlayer', RevertWidth)
-LIB.RegisterEvent('ON_ENTER_CUSTOM_UI_MODE.FixJXPlayer', RevertWidth)
-LIB.RegisterEvent('ON_LEAVE_CUSTOM_UI_MODE.FixJXPlayer', ApplyWidth)
-end
