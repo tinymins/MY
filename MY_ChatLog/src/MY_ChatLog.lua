@@ -158,6 +158,7 @@ function D.ImportDB(szPath)
 				local db = MY_ChatLog_DB(D.GetRoot() .. info.name .. '.db')
 				db:SetMinTime(info.stime)
 				db:SetMaxTime(info.etime)
+				db:SetInfo('user_global_id', dwGlobalID)
 				for _, p in ipairs(odb:Execute('SELECT * FROM ' .. info.name .. ' ORDER BY time ASC') or CONSTANT.EMPTY_TABLE) do
 					nImportCount = nImportCount + 1
 					db:InsertMsg(p.channel, p.text, p.msg, p.talker, p.time, p.hash)
@@ -167,7 +168,7 @@ function D.ImportDB(szPath)
 			end
 		end
 		-- 新版导出数据
-		local dwGlobalID = Get(odb:Execute('SELECT value FROM ChatInfo WHERE key = "UserGlobalID"'), {1, 'value'}, ''):gsub('"', '')
+		local dwGlobalID = Get(odb:Execute('SELECT value FROM ChatInfo WHERE key = "user_global_id"'), {1, 'value'}, ''):gsub('"', '')
 		if dwGlobalID == GetClientPlayer().GetGlobalID() then
 			local nCount = Get(odb:Execute('SELECT COUNT(*) AS nCount FROM ChatLog'), {1, 'nCount'}, 0)
 			if nCount > 0 then
@@ -184,6 +185,7 @@ function D.ImportDB(szPath)
 						dbNew = MY_ChatLog_DB(szNewPath)
 						dbNew:SetMinTime(aRes[1].time)
 						dbNew:SetMaxTime(aRes[#aRes].time)
+						dbNew:SetInfo('user_global_id', dwGlobalID)
 						for _, p in ipairs(aRes) do
 							nImportCount = nImportCount + 1
 							dbNew:InsertMsg(p.channel, p.text, p.msg, p.talker, p.time, p.hash)
