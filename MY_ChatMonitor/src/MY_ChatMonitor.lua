@@ -71,7 +71,7 @@ MY_ChatMonitor.bBlockWords         = true
 MY_ChatMonitor.bIgnoreSame         = false
 -- MY_ChatMonitor.bRealtimeSave       = false
 MY_ChatMonitor.bDistinctServer     = false
-MY_ChatMonitor.szTimestrap         = '[hh:mm:ss]'
+MY_ChatMonitor.szTimestrap         = '[%hh:%mm:%ss]'
 MY_ChatMonitor.anchor              = { x = -100, y = -150, s = 'BOTTOMRIGHT', r = 'BOTTOMRIGHT' }
 MY_ChatMonitor.tChannels           = {
     ['MSG_NORMAL'] = true, ['MSG_CAMP' ] = true, ['MSG_WORLD' ] = true, ['MSG_MAP'     ] = true,
@@ -90,7 +90,7 @@ RegisterCustomData('MY_ChatMonitor.anchor')
 RegisterCustomData('MY_ChatMonitor.bIgnoreSame', 1)
 -- RegisterCustomData('MY_ChatMonitor.bRealtimeSave')
 RegisterCustomData('MY_ChatMonitor.bDistinctServer')
-RegisterCustomData('MY_ChatMonitor.szTimestrap')
+RegisterCustomData('MY_ChatMonitor.szTimestrap', 1)
 _C.bInited = false
 _C.ui = nil
 _C.uiBoard = nil
@@ -400,14 +400,14 @@ _C.OnPanelActive = function(wnd)
                 table.insert(t, { bDevide = true })
                 table.insert(t,{
                     szOption = _L['timestrap format'], {
-                        szOption = '[hh:mm:ss]',
+                        szOption = '[%hh:%mm:%ss]',
                         fnAction = function()
                             MY_ChatMonitor.szTimestrap = '[%hh:%mm:%ss]'
                         end,
                         bCheck = true, bMCheck = true,
                         bChecked = MY_ChatMonitor.szTimestrap == '[%hh:%mm:%ss]'
                     }, {
-                        szOption = '[MM/dd hh:mm:ss]',
+                        szOption = '[%MM/%dd %hh:%mm:%ss]',
                         fnAction = function()
                             MY_ChatMonitor.szTimestrap = '[%MM/%dd %hh:%mm:%ss]'
                         end,
