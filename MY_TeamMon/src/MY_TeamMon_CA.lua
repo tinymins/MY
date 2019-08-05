@@ -101,9 +101,6 @@ end
 
 function D.OnEvent(szEvent)
 	if szEvent == 'MY_TM_CA_CREATE' then
-		if LIB.IsShieldedVersion() then
-			return
-		end
 		CreateCentralAlert(arg0, arg1, arg2)
 	elseif szEvent == 'UI_SCALED' then
 		D.UpdateAnchor(this)

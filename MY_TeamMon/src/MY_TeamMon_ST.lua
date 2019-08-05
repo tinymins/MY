@@ -150,9 +150,6 @@ end
 
 function MY_TeamMon_ST.OnEvent(szEvent)
 	if szEvent == 'MY_TM_ST_CREATE' then
-		if LIB.IsShieldedVersion() then
-			return
-		end
 		CreateCountdown(arg0, arg1, arg2)
 	elseif szEvent == 'MY_TM_ST_DEL' then
 		local ui = ST_CACHE[arg0][arg1]

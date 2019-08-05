@@ -1703,13 +1703,13 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.BUFF_GET, 'bWhisperChannel', bCheck)
 			end,
 		}, true):autoWidth():pos('BOTTOMRIGHT')
+		nX = ui:append('WndCheckBox', {
+			x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
+			oncheck = function(bCheck)
+				SetDataClass(MY_TM_TYPE.BUFF_GET, 'bCenterAlarm', bCheck)
+			end,
+		}, true):autoWidth():pos('BOTTOMRIGHT')
 		if not LIB.IsShieldedVersion() then
-			nX = ui:append('WndCheckBox', {
-				x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
-				oncheck = function(bCheck)
-					SetDataClass(MY_TM_TYPE.BUFF_GET, 'bCenterAlarm', bCheck)
-				end,
-			}, true):autoWidth():pos('BOTTOMRIGHT')
 			nX = ui:append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				oncheck = function(bCheck)
@@ -1797,13 +1797,13 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.BUFF_LOSE, 'bWhisperChannel', bCheck)
 			end,
 		}, true):autoWidth():pos('BOTTOMRIGHT')
+		nX = ui:append('WndCheckBox', {
+			x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
+			oncheck = function(bCheck)
+				SetDataClass(MY_TM_TYPE.BUFF_LOSE, 'bCenterAlarm', bCheck)
+			end,
+		}, true):autoWidth():pos('BOTTOMRIGHT')
 		if not LIB.IsShieldedVersion() then
-			nX = ui:append('WndCheckBox', {
-				x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
-				oncheck = function(bCheck)
-					SetDataClass(MY_TM_TYPE.BUFF_LOSE, 'bCenterAlarm', bCheck)
-				end,
-			}, true):autoWidth():pos('BOTTOMRIGHT')
 			nX = ui:append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				oncheck = function(bCheck)
@@ -1859,13 +1859,13 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.SKILL_END, 'bWhisperChannel', bCheck)
 			end,
 		}, true):autoWidth():pos('BOTTOMRIGHT')
+		nX = ui:append('WndCheckBox', {
+			x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
+			oncheck = function(bCheck)
+				SetDataClass(MY_TM_TYPE.SKILL_END, 'bCenterAlarm', bCheck)
+			end,
+		}, true):autoWidth():pos('BOTTOMRIGHT')
 		if not LIB.IsShieldedVersion() then
-			nX = ui:append('WndCheckBox', {
-				x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
-				oncheck = function(bCheck)
-					SetDataClass(MY_TM_TYPE.SKILL_END, 'bCenterAlarm', bCheck)
-				end,
-			}, true):autoWidth():pos('BOTTOMRIGHT')
 			nX = ui:append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				oncheck = function(bCheck)
@@ -1903,13 +1903,13 @@ function D.OpenSettingPanel(data, szType)
 					SetDataClass(MY_TM_TYPE.SKILL_BEGIN, 'bWhisperChannel', bCheck)
 				end,
 			}, true):autoWidth():pos('BOTTOMRIGHT')
+			nX = ui:append('WndCheckBox', {
+				x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
+				oncheck = function(bCheck)
+					SetDataClass(MY_TM_TYPE.SKILL_BEGIN, 'bCenterAlarm', bCheck)
+				end,
+			}, true):autoWidth():pos('BOTTOMRIGHT')
 			if not LIB.IsShieldedVersion() then
-				nX = ui:append('WndCheckBox', {
-					x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
-					oncheck = function(bCheck)
-						SetDataClass(MY_TM_TYPE.SKILL_BEGIN, 'bCenterAlarm', bCheck)
-					end,
-				}, true):autoWidth():pos('BOTTOMRIGHT')
 				nX = ui:append('WndCheckBox', {
 					x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 					oncheck = function(bCheck)
@@ -1984,13 +1984,13 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.NPC_ENTER, 'bWhisperChannel', bCheck)
 			end,
 		}, true):autoWidth():pos('BOTTOMRIGHT')
+		nX = ui:append('WndCheckBox', {
+			x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
+			oncheck = function(bCheck)
+				SetDataClass(MY_TM_TYPE.NPC_ENTER, 'bCenterAlarm', bCheck)
+			end,
+		}, true):autoWidth():pos('BOTTOMRIGHT')
 		if not LIB.IsShieldedVersion() then
-			nX = ui:append('WndCheckBox', {
-				x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
-				oncheck = function(bCheck)
-					SetDataClass(MY_TM_TYPE.NPC_ENTER, 'bCenterAlarm', bCheck)
-				end,
-			}, true):autoWidth():pos('BOTTOMRIGHT')
 			nX = ui:append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				oncheck = function(bCheck)
@@ -2031,13 +2031,13 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.NPC_LEAVE, 'bWhisperChannel', bCheck)
 			end,
 		}, true):autoWidth():pos('BOTTOMRIGHT')
+		nX = ui:append('WndCheckBox', {
+			x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
+			oncheck = function(bCheck)
+				SetDataClass(MY_TM_TYPE.NPC_LEAVE, 'bCenterAlarm', bCheck)
+			end,
+		}, true):autoWidth():pos('BOTTOMRIGHT')
 		if not LIB.IsShieldedVersion() then
-			nX = ui:append('WndCheckBox', {
-				x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
-				oncheck = function(bCheck)
-					SetDataClass(MY_TM_TYPE.NPC_LEAVE, 'bCenterAlarm', bCheck)
-				end,
-			}, true):autoWidth():pos('BOTTOMRIGHT')
 			nX = ui:append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				oncheck = function(bCheck)
@@ -2089,13 +2089,13 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.DOODAD_ENTER, 'bWhisperChannel', bCheck)
 			end,
 		}, true):autoWidth():pos('BOTTOMRIGHT')
+		nX = ui:append('WndCheckBox', {
+			x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
+			oncheck = function(bCheck)
+				SetDataClass(MY_TM_TYPE.DOODAD_ENTER, 'bCenterAlarm', bCheck)
+			end,
+		}, true):autoWidth():pos('BOTTOMRIGHT')
 		if not LIB.IsShieldedVersion() then
-			nX = ui:append('WndCheckBox', {
-				x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
-				oncheck = function(bCheck)
-					SetDataClass(MY_TM_TYPE.DOODAD_ENTER, 'bCenterAlarm', bCheck)
-				end,
-			}, true):autoWidth():pos('BOTTOMRIGHT')
 			nX = ui:append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				oncheck = function(bCheck)
@@ -2136,13 +2136,13 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.DOODAD_LEAVE, 'bWhisperChannel', bCheck)
 			end,
 		}, true):autoWidth():pos('BOTTOMRIGHT')
+		nX = ui:append('WndCheckBox', {
+			x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
+			oncheck = function(bCheck)
+				SetDataClass(MY_TM_TYPE.DOODAD_LEAVE, 'bCenterAlarm', bCheck)
+			end,
+		}, true):autoWidth():pos('BOTTOMRIGHT')
 		if not LIB.IsShieldedVersion() then
-			nX = ui:append('WndCheckBox', {
-				x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
-				oncheck = function(bCheck)
-					SetDataClass(MY_TM_TYPE.DOODAD_LEAVE, 'bCenterAlarm', bCheck)
-				end,
-			}, true):autoWidth():pos('BOTTOMRIGHT')
 			nX = ui:append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				oncheck = function(bCheck)
@@ -2200,13 +2200,13 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.TALK_MONITOR, 'bWhisperChannel', bCheck)
 			end,
 		}, true):autoWidth():pos('BOTTOMRIGHT')
+		nX = ui:append('WndCheckBox', {
+			x = nX + 5, y = nY + 10, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
+			oncheck = function(bCheck)
+				SetDataClass(MY_TM_TYPE.TALK_MONITOR, 'bCenterAlarm', bCheck)
+			end,
+		}, true):autoWidth():pos('BOTTOMRIGHT')
 		if not LIB.IsShieldedVersion() then
-			nX = ui:append('WndCheckBox', {
-				x = nX + 5, y = nY + 10, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
-				oncheck = function(bCheck)
-					SetDataClass(MY_TM_TYPE.TALK_MONITOR, 'bCenterAlarm', bCheck)
-				end,
-			}, true):autoWidth():pos('BOTTOMRIGHT')
 			nX = ui:append('WndCheckBox', {
 				x = nX + 5, y = nY + 10, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				oncheck = function(bCheck)
@@ -2266,13 +2266,13 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.CHAT_MONITOR, 'bWhisperChannel', bCheck)
 			end,
 		}, true):autoWidth():pos('BOTTOMRIGHT')
+		nX = ui:append('WndCheckBox', {
+			x = nX + 5, y = nY + 10, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
+			oncheck = function(bCheck)
+				SetDataClass(MY_TM_TYPE.CHAT_MONITOR, 'bCenterAlarm', bCheck)
+			end,
+		}, true):autoWidth():pos('BOTTOMRIGHT')
 		if not LIB.IsShieldedVersion() then
-			nX = ui:append('WndCheckBox', {
-				x = nX + 5, y = nY + 10, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
-				oncheck = function(bCheck)
-					SetDataClass(MY_TM_TYPE.CHAT_MONITOR, 'bCenterAlarm', bCheck)
-				end,
-			}, true):autoWidth():pos('BOTTOMRIGHT')
 			nX = ui:append('WndCheckBox', {
 				x = nX + 5, y = nY + 10, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				oncheck = function(bCheck)
