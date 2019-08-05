@@ -1859,13 +1859,13 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.SKILL_END, 'bWhisperChannel', bCheck)
 			end,
 		}, true):autoWidth():pos('BOTTOMRIGHT')
-		nX = ui:append('WndCheckBox', {
-			x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
-			oncheck = function(bCheck)
-				SetDataClass(MY_TM_TYPE.SKILL_END, 'bCenterAlarm', bCheck)
-			end,
-		}, true):autoWidth():pos('BOTTOMRIGHT')
 		if not LIB.IsShieldedVersion() then
+			nX = ui:append('WndCheckBox', {
+				x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
+				oncheck = function(bCheck)
+					SetDataClass(MY_TM_TYPE.SKILL_END, 'bCenterAlarm', bCheck)
+				end,
+			}, true):autoWidth():pos('BOTTOMRIGHT')
 			nX = ui:append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				oncheck = function(bCheck)
@@ -1903,13 +1903,13 @@ function D.OpenSettingPanel(data, szType)
 					SetDataClass(MY_TM_TYPE.SKILL_BEGIN, 'bWhisperChannel', bCheck)
 				end,
 			}, true):autoWidth():pos('BOTTOMRIGHT')
-			nX = ui:append('WndCheckBox', {
-				x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
-				oncheck = function(bCheck)
-					SetDataClass(MY_TM_TYPE.SKILL_BEGIN, 'bCenterAlarm', bCheck)
-				end,
-			}, true):autoWidth():pos('BOTTOMRIGHT')
 			if not LIB.IsShieldedVersion() then
+				nX = ui:append('WndCheckBox', {
+					x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
+					oncheck = function(bCheck)
+						SetDataClass(MY_TM_TYPE.SKILL_BEGIN, 'bCenterAlarm', bCheck)
+					end,
+				}, true):autoWidth():pos('BOTTOMRIGHT')
 				nX = ui:append('WndCheckBox', {
 					x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 					oncheck = function(bCheck)
@@ -1984,13 +1984,13 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.NPC_ENTER, 'bWhisperChannel', bCheck)
 			end,
 		}, true):autoWidth():pos('BOTTOMRIGHT')
-		nX = ui:append('WndCheckBox', {
-			x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
-			oncheck = function(bCheck)
-				SetDataClass(MY_TM_TYPE.NPC_ENTER, 'bCenterAlarm', bCheck)
-			end,
-		}, true):autoWidth():pos('BOTTOMRIGHT')
 		if not LIB.IsShieldedVersion() then
+			nX = ui:append('WndCheckBox', {
+				x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
+				oncheck = function(bCheck)
+					SetDataClass(MY_TM_TYPE.NPC_ENTER, 'bCenterAlarm', bCheck)
+				end,
+			}, true):autoWidth():pos('BOTTOMRIGHT')
 			nX = ui:append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				oncheck = function(bCheck)
@@ -2031,13 +2031,13 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.NPC_LEAVE, 'bWhisperChannel', bCheck)
 			end,
 		}, true):autoWidth():pos('BOTTOMRIGHT')
-		nX = ui:append('WndCheckBox', {
-			x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
-			oncheck = function(bCheck)
-				SetDataClass(MY_TM_TYPE.NPC_LEAVE, 'bCenterAlarm', bCheck)
-			end,
-		}, true):autoWidth():pos('BOTTOMRIGHT')
 		if not LIB.IsShieldedVersion() then
+			nX = ui:append('WndCheckBox', {
+				x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
+				oncheck = function(bCheck)
+					SetDataClass(MY_TM_TYPE.NPC_LEAVE, 'bCenterAlarm', bCheck)
+				end,
+			}, true):autoWidth():pos('BOTTOMRIGHT')
 			nX = ui:append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				oncheck = function(bCheck)
@@ -2089,13 +2089,13 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.DOODAD_ENTER, 'bWhisperChannel', bCheck)
 			end,
 		}, true):autoWidth():pos('BOTTOMRIGHT')
-		nX = ui:append('WndCheckBox', {
-			x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
-			oncheck = function(bCheck)
-				SetDataClass(MY_TM_TYPE.DOODAD_ENTER, 'bCenterAlarm', bCheck)
-			end,
-		}, true):autoWidth():pos('BOTTOMRIGHT')
 		if not LIB.IsShieldedVersion() then
+			nX = ui:append('WndCheckBox', {
+				x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
+				oncheck = function(bCheck)
+					SetDataClass(MY_TM_TYPE.DOODAD_ENTER, 'bCenterAlarm', bCheck)
+				end,
+			}, true):autoWidth():pos('BOTTOMRIGHT')
 			nX = ui:append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				oncheck = function(bCheck)
@@ -2136,13 +2136,13 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.DOODAD_LEAVE, 'bWhisperChannel', bCheck)
 			end,
 		}, true):autoWidth():pos('BOTTOMRIGHT')
-		nX = ui:append('WndCheckBox', {
-			x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
-			oncheck = function(bCheck)
-				SetDataClass(MY_TM_TYPE.DOODAD_LEAVE, 'bCenterAlarm', bCheck)
-			end,
-		}, true):autoWidth():pos('BOTTOMRIGHT')
 		if not LIB.IsShieldedVersion() then
+			nX = ui:append('WndCheckBox', {
+				x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
+				oncheck = function(bCheck)
+					SetDataClass(MY_TM_TYPE.DOODAD_LEAVE, 'bCenterAlarm', bCheck)
+				end,
+			}, true):autoWidth():pos('BOTTOMRIGHT')
 			nX = ui:append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				oncheck = function(bCheck)
@@ -2200,13 +2200,13 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.TALK_MONITOR, 'bWhisperChannel', bCheck)
 			end,
 		}, true):autoWidth():pos('BOTTOMRIGHT')
-		nX = ui:append('WndCheckBox', {
-			x = nX + 5, y = nY + 10, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
-			oncheck = function(bCheck)
-				SetDataClass(MY_TM_TYPE.TALK_MONITOR, 'bCenterAlarm', bCheck)
-			end,
-		}, true):autoWidth():pos('BOTTOMRIGHT')
 		if not LIB.IsShieldedVersion() then
+			nX = ui:append('WndCheckBox', {
+				x = nX + 5, y = nY + 10, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
+				oncheck = function(bCheck)
+					SetDataClass(MY_TM_TYPE.TALK_MONITOR, 'bCenterAlarm', bCheck)
+				end,
+			}, true):autoWidth():pos('BOTTOMRIGHT')
 			nX = ui:append('WndCheckBox', {
 				x = nX + 5, y = nY + 10, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				oncheck = function(bCheck)
@@ -2266,13 +2266,13 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.CHAT_MONITOR, 'bWhisperChannel', bCheck)
 			end,
 		}, true):autoWidth():pos('BOTTOMRIGHT')
-		nX = ui:append('WndCheckBox', {
-			x = nX + 5, y = nY + 10, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
-			oncheck = function(bCheck)
-				SetDataClass(MY_TM_TYPE.CHAT_MONITOR, 'bCenterAlarm', bCheck)
-			end,
-		}, true):autoWidth():pos('BOTTOMRIGHT')
 		if not LIB.IsShieldedVersion() then
+			nX = ui:append('WndCheckBox', {
+				x = nX + 5, y = nY + 10, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
+				oncheck = function(bCheck)
+					SetDataClass(MY_TM_TYPE.CHAT_MONITOR, 'bCenterAlarm', bCheck)
+				end,
+			}, true):autoWidth():pos('BOTTOMRIGHT')
 			nX = ui:append('WndCheckBox', {
 				x = nX + 5, y = nY + 10, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				oncheck = function(bCheck)
@@ -2313,208 +2313,210 @@ function D.OpenSettingPanel(data, szType)
 		}, true):pos('BOTTOMRIGHT')
 	end
 	-- µ¹¼ÆÊ±
-	nX, nY = ui:append('Text', { x = 20, y = nY + 5, text = _L['Countdown'], font = 27 }, true):pos('BOTTOMRIGHT')
-	for k, v in ipairs(data.tCountdown or {}) do
-		nX = ui:append('WndComboBox', {
-			name = 'Countdown' .. k, x = 30, w = 155, h = 25, y = nY,
-			color = v.key and { 255, 255, 0 },
-			text = v.nClass == -1 and _L['Please select type'] or _L['Countdown TYPE ' ..  v.nClass],
-			menu = function()
-				local menu = {}
-				if IsCtrlKeyDown() then
-					insert(menu, { szOption = _L['Set countdown key'], rgb = { 255, 255, 0 } , fnAction = function()
-						GetUserInput(_L['Countdown key'], function(szKey)
-							if LIB.TrimString(szKey) == '' then
-								v.key = nil
-							else
-								v.key = LIB.TrimString(szKey)
-							end
-							D.OpenSettingPanel(data, szType)
-						end, nil, nil, nil, v.key)
-					end })
-					insert(menu, { bDevide = true })
-					insert(menu, { szOption = _L['Hold countdown when crossmap'], bCheck = true, bChecked = v.bHold, fnAction = function()
-						v.bHold = not v.bHold
-					end })
-					if v.nClass == MY_TM_TYPE.NPC_FIGHT then
-						insert(menu, { szOption = _L['Hold countdown when unfight'], bCheck = true, bChecked = v.bFightHold, fnAction = function()
-							v.bFightHold = not v.bFightHold
-						end })
-					end
-
-					insert(menu, { bDevide = true })
-					insert(menu, { szOption = _L['Color Picker'], bDisable = true })
-					-- Color Picker
-					for i = 0, 8 do
-						insert(menu, {
-							bMCheck = true,
-							bChecked = v.nFrame == i,
-							fnAction = function()
-								v.nFrame = i
-							end,
-							szIcon = PACKET_INFO.UITEX_ST,
-							nFrame = i,
-							szLayer = 'ICON_FILL',
-						})
-					end
-				else
-					insert(menu, { szOption = _L['Please select type'], bDisable = true, bChecked = v.nClass == -1 })
-					insert(menu, { bDevide = true })
-					if szType == 'BUFF' or szType == 'DEBUFF' then
-						for kk, vv in ipairs({ MY_TM_TYPE.BUFF_GET, MY_TM_TYPE.BUFF_LOSE }) do
-							insert(menu, { szOption = _L['Countdown TYPE ' .. vv], bMCheck = true, bChecked = v.nClass == vv, fnAction = function()
-								SetCountdownType(v, vv, ui:children('#Countdown' .. k))
-							end })
-						end
-					elseif szType == 'CASTING' then
-						insert(menu, { szOption = _L['Countdown TYPE ' .. MY_TM_TYPE.SKILL_END], bMCheck = true, bChecked = v.nClass == MY_TM_TYPE.SKILL_END, fnAction = function()
-							SetCountdownType(v, MY_TM_TYPE.SKILL_END, ui:children('#Countdown' .. k))
-						end })
-						-- if tSkillInfo and tSkillInfo.CastTime ~= 0 then
-							insert(menu, { szOption = _L['Countdown TYPE ' .. MY_TM_TYPE.SKILL_BEGIN], bMCheck = true, bChecked = v.nClass == MY_TM_TYPE.SKILL_BEGIN, fnAction = function()
-								SetCountdownType(v, MY_TM_TYPE.SKILL_BEGIN, ui:children('#Countdown' .. k))
-							end })
-						-- end
-					elseif szType == 'NPC' then
-						for kk, vv in ipairs({ MY_TM_TYPE.NPC_ENTER, MY_TM_TYPE.NPC_LEAVE, MY_TM_TYPE.NPC_ALLLEAVE, MY_TM_TYPE.NPC_FIGHT, MY_TM_TYPE.NPC_DEATH, MY_TM_TYPE.NPC_ALLDEATH, MY_TM_TYPE.NPC_LIFE, --[[MY_TM_TYPE.NPC_MANA]] }) do
-							insert(menu, { szOption = _L['Countdown TYPE ' .. vv], bMCheck = true, bChecked = v.nClass == vv, fnAction = function()
-								SetCountdownType(v, vv, ui:children('#Countdown' .. k))
-								if vv == MY_TM_TYPE.NPC_LIFE or vv == MY_TM_TYPE.NPC_MANA then
-									LIB.Alert(_L['Npc life/mana alarm has different format, recommend to reading document.'])
+	if not LIB.IsShieldedVersion() then
+		nX, nY = ui:append('Text', { x = 20, y = nY + 5, text = _L['Countdown'], font = 27 }, true):pos('BOTTOMRIGHT')
+		for k, v in ipairs(data.tCountdown or {}) do
+			nX = ui:append('WndComboBox', {
+				name = 'Countdown' .. k, x = 30, w = 155, h = 25, y = nY,
+				color = v.key and { 255, 255, 0 },
+				text = v.nClass == -1 and _L['Please select type'] or _L['Countdown TYPE ' ..  v.nClass],
+				menu = function()
+					local menu = {}
+					if IsCtrlKeyDown() then
+						insert(menu, { szOption = _L['Set countdown key'], rgb = { 255, 255, 0 } , fnAction = function()
+							GetUserInput(_L['Countdown key'], function(szKey)
+								if LIB.TrimString(szKey) == '' then
+									v.key = nil
+								else
+									v.key = LIB.TrimString(szKey)
 								end
+								D.OpenSettingPanel(data, szType)
+							end, nil, nil, nil, v.key)
+						end })
+						insert(menu, { bDevide = true })
+						insert(menu, { szOption = _L['Hold countdown when crossmap'], bCheck = true, bChecked = v.bHold, fnAction = function()
+							v.bHold = not v.bHold
+						end })
+						if v.nClass == MY_TM_TYPE.NPC_FIGHT then
+							insert(menu, { szOption = _L['Hold countdown when unfight'], bCheck = true, bChecked = v.bFightHold, fnAction = function()
+								v.bFightHold = not v.bFightHold
 							end })
 						end
-					elseif szType == 'DOODAD' then
-						for kk, vv in ipairs({ MY_TM_TYPE.DOODAD_ENTER, MY_TM_TYPE.DOODAD_LEAVE, MY_TM_TYPE.DOODAD_ALLLEAVE }) do
-							insert(menu, { szOption = _L['Countdown TYPE ' .. vv], bMCheck = true, bChecked = v.nClass == vv, fnAction = function()
-								SetCountdownType(v, vv, ui:children('#Countdown' .. k))
-							end })
-						end
-					elseif szType == 'TALK' then
-						insert(menu, { szOption = _L['Countdown TYPE ' .. MY_TM_TYPE.TALK_MONITOR], bMCheck = true, bChecked = v.nClass == MY_TM_TYPE.TALK_MONITOR, fnAction = function()
-							SetCountdownType(v, MY_TM_TYPE.TALK_MONITOR, ui:children('#Countdown' .. k))
-						end })
-					elseif szType == 'CHAT' then
-						insert(menu, { szOption = _L['Countdown TYPE ' .. MY_TM_TYPE.CHAT_MONITOR], bMCheck = true, bChecked = v.nClass == MY_TM_TYPE.CHAT_MONITOR, fnAction = function()
-							SetCountdownType(v, MY_TM_TYPE.CHAT_MONITOR, ui:children('#Countdown' .. k))
-						end })
-					end
-				end
-				return menu
-			end,
-		}, true):autoWidth():pos('BOTTOMRIGHT')
-		nX = ui:append('Box', {
-			x = nX + 5, y = nY, w = 24, h = 24, icon = v.nIcon or nIcon,
-			hover = function(bHover) this:SetObjectMouseOver(bHover) end,
-			onclick = function()
-				local box = this
-				UI.OpenIconPanel(function(nIcon)
-					v.nIcon = nIcon
-					box:SetObjectIcon(nIcon)
-				end)
-			end,
-		}, true):pos('BOTTOMRIGHT')
-		local bLife = v.nClass ~= MY_TM_TYPE.NPC_LIFE and v.nClass ~= MY_TM_TYPE.NPC_MANA and tonumber(v.nTime)
-		nX = ui:append('WndCheckBox', {
-			x = nX + 5, y = nY - 2, text = _L['TC'], color = GetMsgFontColor('MSG_TEAM', true), checked = v.bTeamChannel,
-			oncheck = function(bCheck)
-				v.bTeamChannel = bCheck and true or nil
-			end,
-		}, true):autoWidth():pos('BOTTOMRIGHT')
-		ui:append('WndEditBox', {
-			name = 'CountdownName' .. k, x = nX + 5, y = nY, w = 295, h = 25, text = v.szName,
-			visible = bLife or false,
-			onchange = function(szName)
-				v.szName = szName
-			end,
-		}, true):pos('BOTTOMRIGHT')
-		nX = ui:append('WndEditBox', {
-			name = 'CountdownTime' .. k, x = nX + 5 + (bLife and 300 or 0), y = nY, w = bLife and 100 or 400, h = 25,
-			text = v.nTime, color = (v.nClass ~= MY_TM_TYPE.NPC_LIFE and not CheckCountdown(v.nTime)) and { 255, 0, 0 },
-			onchange = function(szNum)
-				v.nTime = UI_tonumber(szNum, szNum)
-				local edit = ui:children('#CountdownTime' .. k)
-				if szNum == '' then
-					return
-				end
-				if v.nClass == MY_TM_TYPE.NPC_LIFE or v.nClass == MY_TM_TYPE.NPC_MANA then
-					return
-				else
-					if tonumber(szNum) then
-						if this:GetW() > 200 then
-							local x, y = edit:pos()
-							edit:pos(x + 300, y):size(100, 25):color(255, 255, 255)
-							ui:children('#CountdownName' .. k):visible(true):text(v.szName or g_tStrings.CHAT_NAME)
+
+						insert(menu, { bDevide = true })
+						insert(menu, { szOption = _L['Color Picker'], bDisable = true })
+						-- Color Picker
+						for i = 0, 8 do
+							insert(menu, {
+								bMCheck = true,
+								bChecked = v.nFrame == i,
+								fnAction = function()
+									v.nFrame = i
+								end,
+								szIcon = PACKET_INFO.UITEX_ST,
+								nFrame = i,
+								szLayer = 'ICON_FILL',
+							})
 						end
 					else
-						if CheckCountdown(szNum) then
-							local x, y = this:GetAbsPos()
-							local w, h = this:GetSize()
-							local xml = { GetFormatText(_L['Countdown preview'] .. '\n', 0, 255, 255, 0) }
-							for k, v in ipairs(CheckCountdown(szNum)) do
-								insert(xml, GetFormatText(v.nTime .. ' - ' .. v.szName .. '\n'))
+						insert(menu, { szOption = _L['Please select type'], bDisable = true, bChecked = v.nClass == -1 })
+						insert(menu, { bDevide = true })
+						if szType == 'BUFF' or szType == 'DEBUFF' then
+							for kk, vv in ipairs({ MY_TM_TYPE.BUFF_GET, MY_TM_TYPE.BUFF_LOSE }) do
+								insert(menu, { szOption = _L['Countdown TYPE ' .. vv], bMCheck = true, bChecked = v.nClass == vv, fnAction = function()
+									SetCountdownType(v, vv, ui:children('#Countdown' .. k))
+								end })
 							end
-							OutputTip(concat(xml), 300, { x, y, w, h }, 1, true, 'MY_TeamMon')
-							edit:color(255, 255, 255)
-						else
-							HideTip()
-							edit:color(255, 0, 0)
-						end
-						if this:GetW() < 200 then
-							local x, y = edit:pos()
-							edit:pos(x - 300, y):size(400, 25)
-							ui:children('#CountdownName' .. k):visible(false)
+						elseif szType == 'CASTING' then
+							insert(menu, { szOption = _L['Countdown TYPE ' .. MY_TM_TYPE.SKILL_END], bMCheck = true, bChecked = v.nClass == MY_TM_TYPE.SKILL_END, fnAction = function()
+								SetCountdownType(v, MY_TM_TYPE.SKILL_END, ui:children('#Countdown' .. k))
+							end })
+							-- if tSkillInfo and tSkillInfo.CastTime ~= 0 then
+								insert(menu, { szOption = _L['Countdown TYPE ' .. MY_TM_TYPE.SKILL_BEGIN], bMCheck = true, bChecked = v.nClass == MY_TM_TYPE.SKILL_BEGIN, fnAction = function()
+									SetCountdownType(v, MY_TM_TYPE.SKILL_BEGIN, ui:children('#Countdown' .. k))
+								end })
+							-- end
+						elseif szType == 'NPC' then
+							for kk, vv in ipairs({ MY_TM_TYPE.NPC_ENTER, MY_TM_TYPE.NPC_LEAVE, MY_TM_TYPE.NPC_ALLLEAVE, MY_TM_TYPE.NPC_FIGHT, MY_TM_TYPE.NPC_DEATH, MY_TM_TYPE.NPC_ALLDEATH, MY_TM_TYPE.NPC_LIFE, --[[MY_TM_TYPE.NPC_MANA]] }) do
+								insert(menu, { szOption = _L['Countdown TYPE ' .. vv], bMCheck = true, bChecked = v.nClass == vv, fnAction = function()
+									SetCountdownType(v, vv, ui:children('#Countdown' .. k))
+									if vv == MY_TM_TYPE.NPC_LIFE or vv == MY_TM_TYPE.NPC_MANA then
+										LIB.Alert(_L['Npc life/mana alarm has different format, recommend to reading document.'])
+									end
+								end })
+							end
+						elseif szType == 'DOODAD' then
+							for kk, vv in ipairs({ MY_TM_TYPE.DOODAD_ENTER, MY_TM_TYPE.DOODAD_LEAVE, MY_TM_TYPE.DOODAD_ALLLEAVE }) do
+								insert(menu, { szOption = _L['Countdown TYPE ' .. vv], bMCheck = true, bChecked = v.nClass == vv, fnAction = function()
+									SetCountdownType(v, vv, ui:children('#Countdown' .. k))
+								end })
+							end
+						elseif szType == 'TALK' then
+							insert(menu, { szOption = _L['Countdown TYPE ' .. MY_TM_TYPE.TALK_MONITOR], bMCheck = true, bChecked = v.nClass == MY_TM_TYPE.TALK_MONITOR, fnAction = function()
+								SetCountdownType(v, MY_TM_TYPE.TALK_MONITOR, ui:children('#Countdown' .. k))
+							end })
+						elseif szType == 'CHAT' then
+							insert(menu, { szOption = _L['Countdown TYPE ' .. MY_TM_TYPE.CHAT_MONITOR], bMCheck = true, bChecked = v.nClass == MY_TM_TYPE.CHAT_MONITOR, fnAction = function()
+								SetCountdownType(v, MY_TM_TYPE.CHAT_MONITOR, ui:children('#Countdown' .. k))
+							end })
 						end
 					end
-				end
-			end,
-		}, true):pos('BOTTOMRIGHT')
-		nX = ui:append('WndEditBox', {
-			x = nX + 5, y = nY, w = 30, h = 25,
-			text = v.nRefresh, edittype = 0,
-			onchange = function(szNum)
-				v.nRefresh = UI_tonumber(szNum)
-			end,
-		}, true):pos('BOTTOMRIGHT')
-		nX, nY = ui:append('Image', {
-			x = nX + 5, y = nY, w = 26, h = 26,
-			image = file, imageframe = 86,
-			hover = function(bIn)
-				if bIn then
-					this:SetFrame(87)
-				else
-					this:SetFrame(86)
-				end
-			end,
-			onclick = function()
-				if v.nClass ~= -1 then
-					local class = v.key and MY_TM_TYPE.COMMON or v.nClass
-					if data.dwID then
-						FireUIEvent('MY_TM_ST_DEL', class, v.key or (k .. '.'  .. data.dwID .. '.' .. (data.nLevel or 0)), true) -- try kill
+					return menu
+				end,
+			}, true):autoWidth():pos('BOTTOMRIGHT')
+			nX = ui:append('Box', {
+				x = nX + 5, y = nY, w = 24, h = 24, icon = v.nIcon or nIcon,
+				hover = function(bHover) this:SetObjectMouseOver(bHover) end,
+				onclick = function()
+					local box = this
+					UI.OpenIconPanel(function(nIcon)
+						v.nIcon = nIcon
+						box:SetObjectIcon(nIcon)
+					end)
+				end,
+			}, true):pos('BOTTOMRIGHT')
+			local bLife = v.nClass ~= MY_TM_TYPE.NPC_LIFE and v.nClass ~= MY_TM_TYPE.NPC_MANA and tonumber(v.nTime)
+			nX = ui:append('WndCheckBox', {
+				x = nX + 5, y = nY - 2, text = _L['TC'], color = GetMsgFontColor('MSG_TEAM', true), checked = v.bTeamChannel,
+				oncheck = function(bCheck)
+					v.bTeamChannel = bCheck and true or nil
+				end,
+			}, true):autoWidth():pos('BOTTOMRIGHT')
+			ui:append('WndEditBox', {
+				name = 'CountdownName' .. k, x = nX + 5, y = nY, w = 295, h = 25, text = v.szName,
+				visible = bLife or false,
+				onchange = function(szName)
+					v.szName = szName
+				end,
+			}, true):pos('BOTTOMRIGHT')
+			nX = ui:append('WndEditBox', {
+				name = 'CountdownTime' .. k, x = nX + 5 + (bLife and 300 or 0), y = nY, w = bLife and 100 or 400, h = 25,
+				text = v.nTime, color = (v.nClass ~= MY_TM_TYPE.NPC_LIFE and not CheckCountdown(v.nTime)) and { 255, 0, 0 },
+				onchange = function(szNum)
+					v.nTime = UI_tonumber(szNum, szNum)
+					local edit = ui:children('#CountdownTime' .. k)
+					if szNum == '' then
+						return
+					end
+					if v.nClass == MY_TM_TYPE.NPC_LIFE or v.nClass == MY_TM_TYPE.NPC_MANA then
+						return
 					else
-						FireUIEvent('MY_TM_ST_DEL', class, v.key or (data.nIndex .. '.' .. k), true) -- try kill
+						if tonumber(szNum) then
+							if this:GetW() > 200 then
+								local x, y = edit:pos()
+								edit:pos(x + 300, y):size(100, 25):color(255, 255, 255)
+								ui:children('#CountdownName' .. k):visible(true):text(v.szName or g_tStrings.CHAT_NAME)
+							end
+						else
+							if CheckCountdown(szNum) then
+								local x, y = this:GetAbsPos()
+								local w, h = this:GetSize()
+								local xml = { GetFormatText(_L['Countdown preview'] .. '\n', 0, 255, 255, 0) }
+								for k, v in ipairs(CheckCountdown(szNum)) do
+									insert(xml, GetFormatText(v.nTime .. ' - ' .. v.szName .. '\n'))
+								end
+								OutputTip(concat(xml), 300, { x, y, w, h }, 1, true, 'MY_TeamMon')
+								edit:color(255, 255, 255)
+							else
+								HideTip()
+								edit:color(255, 0, 0)
+							end
+							if this:GetW() < 200 then
+								local x, y = edit:pos()
+								edit:pos(x - 300, y):size(400, 25)
+								ui:children('#CountdownName' .. k):visible(false)
+							end
+						end
 					end
-				end
-				if #data.tCountdown == 1 then
-					data.tCountdown = nil
-				else
-					remove(data.tCountdown, k)
-				end
+				end,
+			}, true):pos('BOTTOMRIGHT')
+			nX = ui:append('WndEditBox', {
+				x = nX + 5, y = nY, w = 30, h = 25,
+				text = v.nRefresh, edittype = 0,
+				onchange = function(szNum)
+					v.nRefresh = UI_tonumber(szNum)
+				end,
+			}, true):pos('BOTTOMRIGHT')
+			nX, nY = ui:append('Image', {
+				x = nX + 5, y = nY, w = 26, h = 26,
+				image = file, imageframe = 86,
+				hover = function(bIn)
+					if bIn then
+						this:SetFrame(87)
+					else
+						this:SetFrame(86)
+					end
+				end,
+				onclick = function()
+					if v.nClass ~= -1 then
+						local class = v.key and MY_TM_TYPE.COMMON or v.nClass
+						if data.dwID then
+							FireUIEvent('MY_TM_ST_DEL', class, v.key or (k .. '.'  .. data.dwID .. '.' .. (data.nLevel or 0)), true) -- try kill
+						else
+							FireUIEvent('MY_TM_ST_DEL', class, v.key or (data.nIndex .. '.' .. k), true) -- try kill
+						end
+					end
+					if #data.tCountdown == 1 then
+						data.tCountdown = nil
+					else
+						remove(data.tCountdown, k)
+					end
+					D.OpenSettingPanel(data, szType)
+				end,
+			}, true):pos('BOTTOMRIGHT')
+		end
+		nX = ui:append('WndButton2', {
+			x = 30, y = nY + 10, text = _L['Add countdown'],
+			enable = not (data.tCountdown and #data.tCountdown > 10),
+			onclick = function()
+				data.tCountdown = data.tCountdown or {}
+				local icon = nIocn or 13
+				if szType == 'NPC' then	icon = 13 end
+				insert(data.tCountdown, { nTime = _L['10,Countdown Name;25,Countdown Name'], nClass = -1, nIcon = icon })
 				D.OpenSettingPanel(data, szType)
 			end,
 		}, true):pos('BOTTOMRIGHT')
 	end
-	nX = ui:append('WndButton2', {
-		x = 30, y = nY + 10, text = _L['Add countdown'],
-		enable = not (data.tCountdown and #data.tCountdown > 10),
-		onclick = function()
-			data.tCountdown = data.tCountdown or {}
-			local icon = nIocn or 13
-			if szType == 'NPC' then	icon = 13 end
-			insert(data.tCountdown, { nTime = _L['10,Countdown Name;25,Countdown Name'], nClass = -1, nIcon = icon })
-			D.OpenSettingPanel(data, szType)
-		end,
-	}, true):pos('BOTTOMRIGHT')
 	-- nX = ui:append('WndButton2', {
 	-- 	x = 640, y = nY + 10, text = g_tStrings.HELP_PANEL,
 	-- 	onclick = function()
