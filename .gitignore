@@ -7,6 +7,7 @@
 /@DATA
 /__pycache__
 /squishy
+/commit_msg.txt
 /*/src.lua
 \!src-dist/releases/
 \!src-dist/tools/targetmon-format/*.jx3dat

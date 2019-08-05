@@ -23,7 +23,7 @@ def __is_git_clean():
 
 def __get_release_commit_list():
     commit_list = []
-    for commit in os.popen('git log --grep Release --pretty=format:"%s|%p"').read().split('\n'):
+    for commit in os.popen('git log --grep Release --pretty=format:"%s|%h"').read().split('\n'):
         try:
             info = commit.split('|')
             version = int(info[0][9:])
@@ -91,6 +91,10 @@ if __name__ == '__main__':
             continue
 
         print('Creating tag V%d on %s...' % (changlog.get('version'), release.get('hash')))
-        os.system('git tag -a V%d %s -m "Release V%d\n%s" -f' % (changlog.get('version'), release.get('hash'), changlog.get('version'), changlog.get('message')))
+        message = 'Release V%d\n%s' % (changlog.get('version'), changlog.get('message'))
+        with codecs.open('commit_msg.txt','w',encoding='utf8') as f:
+            f.write(message)
+        os.system('git tag -a V%d %s -f -F commit_msg.txt' % (changlog.get('version'), release.get('hash')))
+        os.remove('commit_msg.txt')
 
     print('Jobs Acomplished.')
