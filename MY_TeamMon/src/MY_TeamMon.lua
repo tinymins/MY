@@ -208,8 +208,8 @@ function D.OnFrameBreathe()
 	local me = GetClientPlayer()
 	if not me then return end
 	-- local dwType, dwID = me.GetTarget()
-	for k, v in pairs(CACHE.NPC_LIST) do
-		local data = D.GetData('NPC', k)
+	for dwTemplateID, npcInfo in pairs(CACHE.NPC_LIST) do
+		local data = D.GetData('NPC', dwTemplateID)
 		if data then
 			-- local bTempTarget = false
 			-- for kk, vv in ipairs(data.tCountdown or {}) do
@@ -222,7 +222,7 @@ function D.OnFrameBreathe()
 			local fLifePer = 1
 			local fManaPer = 1
 			-- TargetPanel_SetOpenState(true)
-			for kk, vv in ipairs(v.tList) do
+			for kk, vv in ipairs(npcInfo.tList) do
 				local npc = GetNpc(vv)
 				if npc then
 					-- if bTempTarget then
@@ -245,43 +245,43 @@ function D.OnFrameBreathe()
 				end
 			end
 			-- TargetPanel_SetOpenState(false)
-			if bFightFlag ~= v.bFightState then
-				CACHE.NPC_LIST[k].bFightState = bFightFlag
+			if bFightFlag ~= npcInfo.bFightState then
+				CACHE.NPC_LIST[dwTemplateID].bFightState = bFightFlag
 			else
 				bFightFlag = nil
 			end
 			fLifePer = floor(fLifePer * 100)
 			-- fManaPer = floor(fManaPer * 100)
-			if v.nLife > fLifePer then
-				local nCount, step = v.nLife - fLifePer, 1
-				if nCount > 50 then
-					step = 2
-				end
+			if npcInfo.nLife > fLifePer then
+				local nCount, step = npcInfo.nLife - fLifePer, 1
+				-- if nCount > 50 then
+				-- 	step = 2
+				-- end
 				for i = 1, nCount, step do
-					FireUIEvent('MY_TM_NPC_LIFE_CHANGE', k, v.nLife - i)
+					FireUIEvent('MY_TM_NPC_LIFE_CHANGE', dwTemplateID, npcInfo.nLife - i)
 				end
 			end
 			-- if bTempTarget then
-			-- 	if v.nMana < fManaPer then
-			-- 		local nCount, step = fManaPer - v.nMana, 1
+			-- 	if npcInfo.nMana < fManaPer then
+			-- 		local nCount, step = fManaPer - npcInfo.nMana, 1
 			-- 		if nCount > 50 then
 			-- 			step = 2
 			-- 		end
 			-- 		for i = 1, nCount, step do
-			-- 			FireUIEvent('MY_TM_NPC_MANA_CHANGE', k, v.nMana + i)
+			-- 			FireUIEvent('MY_TM_NPC_MANA_CHANGE', dwTemplateID, npcInfo.nMana + i)
 			-- 		end
 			-- 	end
 			-- end
-			v.nLife = fLifePer
-			-- v.nMana = fManaPer
+			npcInfo.nLife = fLifePer
+			-- npcInfo.nMana = fManaPer
 			if bFightFlag then
 				local nTime = GetTime()
-				v.nSec = GetTime()
-				FireUIEvent('MY_TM_NPC_FIGHT', k, true, nTime)
+				npcInfo.nSec = GetTime()
+				FireUIEvent('MY_TM_NPC_FIGHT', dwTemplateID, true, nTime)
 			elseif bFightFlag == false then
-				local nTime = GetTime() - (v.nSec or GetTime())
-				v.nSec = nil
-				FireUIEvent('MY_TM_NPC_FIGHT', k, false, nTime)
+				local nTime = GetTime() - (npcInfo.nSec or GetTime())
+				npcInfo.nSec = nil
+				FireUIEvent('MY_TM_NPC_FIGHT', dwTemplateID, false, nTime)
 			end
 		end
 	end
@@ -1422,7 +1422,7 @@ function D.OnNpcInfoChange(szEvent, dwTemplateID, nPer)
 				for kk, vv in ipairs(tLife) do
 					local nVper = vv[1] * 100
 					if nVper == nPer then -- hit
-						local szName = v.szName or LIB.GetObjectName(dwTemplateID)
+						local szName = v.szName or LIB.GetTemplateName(dwTemplateID)
 						local xml = {}
 						insert(xml, MY_TM_LEFT_LINE)
 						insert(xml, GetFormatText(szName, 44, 255, 255, 0))
