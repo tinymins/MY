@@ -797,7 +797,7 @@ function D.OnBuff(dwCaster, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, d
 					end
 				end
 				-- 添加到团队面板
-				if O.bPushTeamPanelbPushTeamPanel and cfg.bTeamPanel and ( not cfg.bOnlySelfSrc or dwSkillSrcID == MY_TM_CORE_PLAYERID) then
+				if O.bPushTeamPanel and cfg.bTeamPanel and (not cfg.bOnlySelfSrc or dwSkillSrcID == MY_TM_CORE_PLAYERID) then
 					FireUIEvent('MY_RAID_REC_BUFF', dwCaster, {
 						dwID      = data.dwID,
 						nStackNum = data.nCount,
@@ -805,7 +805,7 @@ function D.OnBuff(dwCaster, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, d
 						nLevelEx  = data.nLevel,
 						col       = data.col,
 						nIcon     = data.nIcon,
-						bOnlySelf = cfg.bOnlySelfSrc,
+						bOnlyMine = cfg.bOnlySelfSrc,
 					})
 				end
 			end
