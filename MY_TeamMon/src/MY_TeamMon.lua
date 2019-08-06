@@ -1087,11 +1087,15 @@ function D.OnDoodadEvent(doodad, bEnter)
 	local data = D.GetData('DOODAD', doodad.dwTemplateID)
 	local nTime = GetTime()
 	if bEnter then
-		CACHE.DOODAD_LIST[doodad.dwTemplateID] = CACHE.DOODAD_LIST[doodad.dwTemplateID] or {
-			tList       = {},
-			nTime       = -1,
-		}
-		insert(CACHE.DOODAD_LIST[doodad.dwTemplateID].tList, doodad.dwID)
+		if not CACHE.DOODAD_LIST[doodad.dwTemplateID] then
+			CACHE.DOODAD_LIST[doodad.dwTemplateID] = {
+				tList       = {},
+				nTime       = -1,
+				nCount      = 0,
+			}
+		end
+		CACHE.DOODAD_LIST[doodad.dwTemplateID].tList[doodad.dwID] = {}
+		CACHE.DOODAD_LIST[doodad.dwTemplateID].nCount = CACHE.DOODAD_LIST[doodad.dwTemplateID].nCount + 1
 		if doodad.nKind ~= DOODAD_KIND.ORNAMENT or not LIB.IsShieldedVersion(2) then
 			local tWeak, tTemp = CACHE.TEMP.DOODAD, D.TEMP.DOODAD
 			if not tWeak[doodad.dwTemplateID] then
@@ -1114,16 +1118,15 @@ function D.OnDoodadEvent(doodad, bEnter)
 			CACHE.INTERVAL.DOODAD[doodad.dwTemplateID][#CACHE.INTERVAL.DOODAD[doodad.dwTemplateID] + 1] = nTime
 		end
 	else
-		if CACHE.DOODAD_LIST[doodad.dwTemplateID] and CACHE.DOODAD_LIST[doodad.dwTemplateID].tList then
-			local tab = CACHE.DOODAD_LIST[doodad.dwTemplateID]
-			for k, v in ipairs(tab.tList) do
-				if v == doodad.dwID then
-					table.remove(tab.tList, k)
-					if #tab.tList == 0 then
-						CACHE.DOODAD_LIST[doodad.dwTemplateID] = nil
-						FireUIEvent('MY_TM_DOODAD_ALL_LEAVE_SCENE', doodad.dwTemplateID)
-					end
-					break
+		local doodadInfo = CACHE.DOODAD_LIST[doodad.dwTemplateID]
+		if doodadInfo then
+			local tab = doodadInfo.tList[doodad.dwID]
+			if tab then
+				doodadInfo.tList[doodad.dwID] = nil
+				doodadInfo.nCount = doodadInfo.nCount - 1
+				if doodadInfo.nCount == 0 then
+					CACHE.DOODAD_LIST[doodad.dwTemplateID] = nil
+					FireUIEvent('MY_TM_DOODAD_ALL_LEAVE_SCENE', doodad.dwTemplateID)
 				end
 			end
 		end
@@ -1135,7 +1138,7 @@ function D.OnDoodadEvent(doodad, bEnter)
 		end
 		if bEnter then
 			cfg, nClass = data[MY_TM_TYPE.DOODAD_ENTER], MY_TM_TYPE.DOODAD_ENTER
-			nCount = #CACHE.DOODAD_LIST[doodad.dwTemplateID].tList
+			nCount = CACHE.DOODAD_LIST[doodad.dwTemplateID].nCount
 		else
 			cfg, nClass = data[MY_TM_TYPE.DOODAD_LEAVE], MY_TM_TYPE.DOODAD_LEAVE
 		end
