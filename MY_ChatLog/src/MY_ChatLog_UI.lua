@@ -232,6 +232,7 @@ function MY_ChatLog_UI.OnItemRButtonClick()
 							frame.ds:DeleteMsg(hItem.hash, hItem.time)
 						end
 					end
+					frame.ds:FlushDB()
 					this:GetRoot().nLastClickIndex = nil
 					D.UpdatePage(this:GetRoot(), true)
 				end,
