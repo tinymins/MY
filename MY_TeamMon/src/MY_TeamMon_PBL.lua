@@ -158,6 +158,7 @@ function D.OnItemLButtonDown()
 		if O.bHoverSelect then
 			TEMP_TARGET_TYPE, TEMP_TARGET_ID = nil
 		end
+		LIB.SetTarget(TARGET.PLAYER, this.data.dwID)
 	end
 end
 
@@ -167,6 +168,7 @@ function D.OnItemMouseLeave()
 			LIB.SetTarget(TEMP_TARGET_TYPE, TEMP_TARGET_ID)
 			TEMP_TARGET_TYPE, TEMP_TARGET_ID = nil
 		end
+		HideTip()
 	end
 end
 
@@ -176,6 +178,7 @@ function D.OnItemMouseEnter()
 			TEMP_TARGET_TYPE, TEMP_TARGET_ID = LIB.GetTarget()
 			LIB.SetTarget(TARGET.PLAYER, this.data.dwID)
 		end
+		LIB.OutputBuffTip(this, this.data.dwBuffID, this.data.nLevel)
 	end
 end
 
