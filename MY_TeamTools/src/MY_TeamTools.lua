@@ -654,7 +654,7 @@ function RT.UpdateList()
 						local nTime = (nEndFrame - GetLogicFrameCount()) / 16
 						local x, y = this:GetAbsPos()
 						local w, h = this:GetSize()
-						LIB.OutputBuffTip(dwID, nLevel, { x, y, w, h }, nTime)
+						LIB.OutputBuffTip({ x, y, w, h }, dwID, nLevel, nTime)
 					end
 					local nTime = (vv.nEndFrame - GetLogicFrameCount()) / 16
 					if nTime < 480 then
@@ -705,7 +705,7 @@ function RT.UpdateList()
 						local w, h = this:GetSize()
 						local kBuff = LIB.GetBuff(v.KPlayer, RT_GONGZHAN_ID)
 						if kBuff then
-							LIB.OutputBuffTip(kBuff.dwID, kBuff.nLevel, { x, y, w, h })
+							LIB.OutputBuffTip({ x, y, w, h }, kBuff.dwID, kBuff.nLevel)
 						end
 					end
 				end

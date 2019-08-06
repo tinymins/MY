@@ -39,27 +39,39 @@ local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAD
 local _L = LIB.LoadLangPack()
 -------------------------------------------------------------------------------------------------------------
 
--- nFont 为 true 表示传入的是Xml字符串 否则表示格式化的字体
-function LIB.OutputTip(el, szText, nFont, ePos, nMaxWidth)
-	if IsString(el) then
-		el, szText, ePos, nFont, nMaxWidth = this, el, szText, ePos, nFont
+-- 将输入转为 Rect 数组
+local function ConvRectEl(Rect, ePos)
+	if IsTable(Rect) and IsUserdata(Rect.___id) then
+		if not ePos then
+			if Rect:GetRoot():GetName() == 'PopupMenu' then
+				ePos = ALW.RIGHT_LEFT
+			else
+				ePos = ALW.TOP_BOTTOM
+			end
+		end
+		local x, y = Rect:GetAbsPos()
+		local w, h = Rect:GetSize()
+		Rect = { x, y, w, h }
 	end
-	local x, y = el:GetAbsPos()
-	local w, h = el:GetSize()
+	return Rect, ePos
+end
+
+-- nFont 为 true 表示传入的是Xml字符串 否则表示格式化的字体
+function LIB.OutputTip(Rect, szText, nFont, ePos, nMaxWidth)
+	if not IsTable(Rect) then
+		Rect, szText, nFont, ePos, nMaxWidth = nil, Rect, szText, nFont, ePos
+	end
 	if nFont ~= true then
 		szText = GetFormatText(szText, nFont or 18)
 	end
-	if not ePos then
-		if el:GetRoot():GetName() == 'PopupMenu' then
-			ePos = ALW.RIGHT_LEFT
-		else
-			ePos = ALW.TOP_BOTTOM
-		end
-	end
-	return OutputTip(szText, nMaxWidth or 800, { x, y, w, h }, ePos)
+	Rect, ePos = ConvRectEl(Rect, ePos)
+	return OutputTip(szText, nMaxWidth or 800, Rect, ePos)
 end
 
-function LIB.OutputBuffTip(dwID, nLevel, Rect, nTime, szExtraXml)
+function LIB.OutputBuffTip(Rect, dwID, nLevel, nTime, szExtraXml)
+	if not IsTable(Rect) then
+		Rect, dwID, nLevel, nTime, szExtraXml = nil, Rect, dwID, nLevel, nTime
+	end
 	local t = {}
 
 	insert(t, GetFormatText(Table_GetBuffName(dwID, nLevel) .. '\t', 65))
@@ -113,10 +125,14 @@ function LIB.OutputBuffTip(dwID, nLevel, Rect, nTime, szExtraXml)
 		insert(t, CONSTANT.XML_LINE_BREAKER)
 		insert(t, GetFormatText('IconID: ' .. tostring(Table_GetBuffIconID(dwID, nLevel)), 102))
 	end
+	Rect = ConvRectEl(Rect)
 	OutputTip(concat(t), 300, Rect)
 end
 
-function LIB.OutputTeamMemberTip(dwID, Rect, szExtraXml)
+function LIB.OutputTeamMemberTip(Rect, dwID, szExtraXml)
+	if not IsTable(Rect) then
+		Rect, dwID, szExtraXml = nil, Rect, dwID
+	end
 	local team = GetClientTeam()
 	local tMemberInfo = team.GetMemberInfo(dwID)
 	if not tMemberInfo then
@@ -150,10 +166,14 @@ function LIB.OutputTeamMemberTip(dwID, Rect, szExtraXml)
 	if IsCtrlKeyDown() then
 		insert(xml, GetFormatText(FormatString(g_tStrings.TIP_PLAYER_ID, dwID), 102))
 	end
+	Rect = ConvRectEl(Rect)
 	OutputTip(concat(xml), 345, Rect)
 end
 
-function LIB.OutputPlayerTip(dwID, Rect, szExtraXml)
+function LIB.OutputPlayerTip(Rect, dwID, szExtraXml)
+	if not IsTable(Rect) then
+		Rect, dwID, szExtraXml = nil, Rect, dwID
+	end
 	local player = GetPlayer(dwID)
 	if not player then
 		return
@@ -220,10 +240,14 @@ function LIB.OutputPlayerTip(dwID, Rect, szExtraXml)
 		insert(t, GetFormatText(EncodeLUAData(player.GetRepresentID(), '  '), 102))
 	end
 	-- 格式化输出
+	Rect = ConvRectEl(Rect)
 	OutputTip(concat(t), 345, Rect)
 end
 
-function LIB.OutputNpcTemplateTip(dwNpcTemplateID, Rect, szExtraXml)
+function LIB.OutputNpcTemplateTip(Rect, dwNpcTemplateID, szExtraXml)
+	if not IsTable(Rect) then
+		Rect, dwNpcTemplateID, szExtraXml = nil, Rect, dwNpcTemplateID
+	end
 	local npc = GetNpcTemplate(dwNpcTemplateID)
 	if not npc then
 		return
@@ -246,10 +270,14 @@ function LIB.OutputNpcTemplateTip(dwNpcTemplateID, Rect, szExtraXml)
 		insert(t, szExtraXml)
 	end
 	-- 格式化输出
+	Rect = ConvRectEl(Rect)
 	OutputTip(concat(t), 345, Rect)
 end
 
-function LIB.OutputNpcTip(dwID, Rect, szExtraXml)
+function LIB.OutputNpcTip(Rect, dwID, szExtraXml)
+	if not IsTable(Rect) then
+		Rect, dwID, szExtraXml = nil, Rect, dwID
+	end
 	local npc = GetNpc(dwID)
 	if not npc then
 		return
@@ -298,10 +326,14 @@ function LIB.OutputNpcTip(dwID, Rect, szExtraXml)
 		end
 	end
 	-- 格式化输出
+	Rect = ConvRectEl(Rect)
 	OutputTip(concat(t), 345, Rect)
 end
 
-function LIB.OutputDoodadTemplateTip(dwTemplateID, Rect, szExtraXml)
+function LIB.OutputDoodadTemplateTip(Rect, dwTemplateID, szExtraXml)
+	if not IsTable(Rect) then
+		Rect, dwTemplateID, szExtraXml = nil, Rect, dwTemplateID
+	end
 	local doodad = GetDoodadTemplate(dwTemplateID)
 	if not doodad then
 		return
@@ -324,10 +356,14 @@ function LIB.OutputDoodadTemplateTip(dwTemplateID, Rect, szExtraXml)
 		insert(t, szExtraXml)
 	end
 	-- 格式化输出
+	Rect = ConvRectEl(Rect)
 	OutputTip(concat(t), 300, Rect)
 end
 
-function LIB.OutputDoodadTip(dwDoodadID, Rect, szExtraXml)
+function LIB.OutputDoodadTip(Rect, dwDoodadID, szExtraXml)
+	if not IsTable(Rect) then
+		Rect, dwDoodadID, szExtraXml = nil, Rect, dwDoodadID
+	end
 	local doodad = GetDoodad(dwDoodadID)
 	if not doodad then
 		return
@@ -431,25 +467,34 @@ function LIB.OutputDoodadTip(dwDoodadID, Rect, szExtraXml)
 		local w, h = 40, 40
 		Rect = {x, y, w, h}
 	end
+	Rect = ConvRectEl(Rect)
 	OutputTip(concat(t), 345, Rect)
 end
 
-function LIB.OutputObjectTip(dwType, dwID, Rect, szExtraXml)
+function LIB.OutputObjectTip(Rect, dwType, dwID, szExtraXml)
+	if not IsTable(Rect) then
+		Rect, dwType, dwID, szExtraXml = nil, Rect, dwType, dwID
+	end
+	Rect = ConvRectEl(Rect)
 	if dwType == TARGET.PLAYER then
-		LIB.OutputPlayerTip(dwID, Rect, szExtraXml)
+		LIB.OutputPlayerTip(Rect, dwID, szExtraXml)
 	elseif dwType == TARGET.NPC then
-		LIB.OutputNpcTip(dwID, Rect, szExtraXml)
+		LIB.OutputNpcTip(Rect, dwID, szExtraXml)
 	elseif dwType == TARGET.DOODAD then
-		LIB.OutputDoodadTip(dwID, Rect, szExtraXml)
+		LIB.OutputDoodadTip(Rect, dwID, szExtraXml)
 	end
 end
 
-function LIB.OutputItemInfoTip(dwTabType, dwIndex, nBookInfo, Rect)
+function LIB.OutputItemInfoTip(Rect, dwTabType, dwIndex, nBookInfo)
+	if not IsTable(Rect) then
+		Rect, dwTabType, dwIndex, nBookInfo = nil, Rect, dwTabType, dwIndex
+	end
 	local szXml = GetItemInfoTip(0, dwTabType, dwIndex, nil, nil, nBookInfo)
 	if not Rect then
 		local x, y = Cursor.GetPos()
 		local w, h = 40, 40
 		Rect = {x, y, w, h}
 	end
+	Rect = ConvRectEl(Rect)
 	OutputTip(szXml, 345, Rect)
 end

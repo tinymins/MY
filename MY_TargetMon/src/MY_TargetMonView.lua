@@ -396,7 +396,7 @@ function MY_TargetMonView.OnItemMouseEnter()
 		if eMonType == 'BUFF' and hItem.dwID and hItem.nLevel then
 			local w, h = hItem:GetW(), hItem:GetH()
 			local x, y = hItem:GetAbsX(), hItem:GetAbsY()
-			LIB.OutputBuffTip(hItem.dwID, hItem.nLevel, {x, y, w, h}, hItem.nTimeLeft)
+			LIB.OutputBuffTip({x, y, w, h}, hItem.dwID, hItem.nLevel, hItem.nTimeLeft)
 		end
 		this:SetObjectMouseOver(1)
 	end

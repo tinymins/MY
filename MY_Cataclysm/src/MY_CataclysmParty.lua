@@ -433,9 +433,9 @@ local function OnItemRefreshTip()
 	local nX, nY = this:GetRoot():GetAbsPos()
 	local nW, nH = this:GetRoot():GetSize()
 	if this.bBuff then
-		LIB.OutputBuffTip(this.dwID, this.nLevel, { nX, nY + 5, nW, nH }, GetEndTime(this.nEndFrame), this.szVia)
+		LIB.OutputBuffTip({ nX, nY + 5, nW, nH }, this.dwID, this.nLevel, GetEndTime(this.nEndFrame), this.szVia)
 	elseif this.bRole then
-		LIB.OutputTeamMemberTip(this.dwID, { nX, nY + 5, nW, nH })
+		LIB.OutputTeamMemberTip({ nX, nY + 5, nW, nH }, this.dwID)
 	end
 end
 MY_CataclysmParty_Base.OnItemRefreshTip = OnItemRefreshTip

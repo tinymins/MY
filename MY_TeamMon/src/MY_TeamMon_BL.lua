@@ -130,7 +130,7 @@ function D.OnItemMouseEnter()
 		this:SetObjectMouseOver(true)
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
-		LIB.OutputBuffTip(KBuff.dwID, KBuff.nLevel, { x, y, w, h }, LIB.GetEndTime(KBuff.GetEndTime()))
+		LIB.OutputBuffTip({ x, y, w, h }, KBuff.dwID, KBuff.nLevel, LIB.GetEndTime(KBuff.GetEndTime()))
 	end
 end
 

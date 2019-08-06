@@ -795,13 +795,13 @@ end
 
 function D.OutputTip(szType, data, rect)
 	if szType == 'BUFF' or szType == 'DEBUFF' then
-		LIB.OutputBuffTip(data.dwID, data.nLevel, rect)
+		LIB.OutputBuffTip(rect, data.dwID, data.nLevel)
 	elseif szType == 'CASTING' then
 		OutputSkillTip(data.dwID, data.nLevel, rect)
 	elseif szType == 'NPC' then
 		LIB.OutputNpcTemplateTip(data.dwID, rect)
 	elseif szType == 'DOODAD' then
-		LIB.OutputDoodadTemplateTip(data.dwID, rect)
+		LIB.OutputDoodadTemplateTip(rect, data.dwID)
 	elseif szType == 'TALK' then
 		OutputTip(GetFormatText((data.szTarget or _L['Warning box']) .. '\t', 41, 255, 255, 0) .. GetFormatText((D.GetMapName(data.dwMapID) or data.dwMapID) .. '\n', 41, 255, 255, 255) .. GetFormatText(data.szContent, 41, 255, 255, 255), 300, rect)
 	elseif szType == 'CHAT' then
