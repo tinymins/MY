@@ -206,7 +206,9 @@ end
 
 function D.OnFrameBreathe()
 	local me = GetClientPlayer()
-	if not me then return end
+	if not me then
+		return
+	end
 	-- local dwType, dwID = me.GetTarget()
 	for dwTemplateID, npcInfo in pairs(CACHE.NPC_LIST) do
 		local data = D.GetData('NPC', dwTemplateID)
@@ -219,70 +221,63 @@ function D.OnFrameBreathe()
 			-- 	end
 			-- end
 			local bFightFlag = false
-			local fLifePer = 1
-			local fManaPer = 1
+			local fLifePer, fManaPer
 			-- TargetPanel_SetOpenState(true)
-			for kk, vv in ipairs(npcInfo.tList) do
-				local npc = GetNpc(vv)
+			for dwNpcID, tab in pairs(npcInfo.tList) do
+				local npc = GetNpc(dwNpcID)
 				if npc then
 					-- if bTempTarget then
 					-- 	LIB.SetTarget(TARGET.NPC, vv)
 					-- 	LIB.SetTarget(dwType, dwID)
 					-- end
-					local fLife = npc.nCurrentLife / npc.nMaxLife
-					local fMana = npc.nCurrentMana / npc.nMaxMana
-					if fLife < fLifePer then -- 取血量最少的NPC
-						fLifePer = fLife
+					-- 血量变化检查
+					if npc.nMaxLife > 1 then
+						local nLife = floor(npc.nCurrentLife / npc.nMaxLife * 100)
+						if tab.nLife ~= nLife then
+							local nStart = tab.nLife or nLife
+							local nStep = nLife >= nStart and 1 or -1
+							if tab.nLife then
+								nStart = nStart + nStep
+							end
+							for nLife = nStart, nLife, nStep do
+								FireUIEvent('MY_TM_NPC_LIFE_CHANGE', dwTemplateID, nLife)
+							end
+							tab.nLife = nLife
+						end
 					end
-					-- if fMana < fManaPer then -- 取蓝量最少的NPC
-					-- 	fManaPer = fMana
+					-- 蓝量变化检查
+					-- if bTempTarget then
+					if npc.nMaxMana > 1 then
+						local nMana = floor(npc.nCurrentMana / npc.nMaxMana * 100)
+						if tab.nMana ~= nMana then
+							local nStart = tab.nMana or nMana
+							local nStep = nMana >= nStart and 1 or -1
+							if tab.nMana then
+								nStart = nStart + nStep
+							end
+							for nMana = nStart, nMana, nStep do
+								FireUIEvent('MY_TM_NPC_MANA_CHANGE', dwTemplateID, nMana)
+							end
+							tab.nMana = nMana
+						end
+					end
 					-- end
 					-- 战斗标记检查
-					if npc.bFightState then
-						bFightFlag = true
-						break
+					if npc.bFightState ~= tab.bFightState then
+						if npc.bFightState then
+							local nTime = GetTime()
+							npcInfo.nSec = nTime
+							FireUIEvent('MY_TM_NPC_FIGHT', dwTemplateID, true, nTime)
+						else
+							local nTime = GetTime() - (npcInfo.nSec or GetTime())
+							npcInfo.nSec = nil
+							FireUIEvent('MY_TM_NPC_FIGHT', dwTemplateID, false, nTime)
+						end
+						npc.bFightState = tab.bFightState
 					end
 				end
 			end
 			-- TargetPanel_SetOpenState(false)
-			if bFightFlag ~= npcInfo.bFightState then
-				CACHE.NPC_LIST[dwTemplateID].bFightState = bFightFlag
-			else
-				bFightFlag = nil
-			end
-			fLifePer = floor(fLifePer * 100)
-			-- fManaPer = floor(fManaPer * 100)
-			if npcInfo.nLife > fLifePer then
-				local nCount, step = npcInfo.nLife - fLifePer, 1
-				-- if nCount > 50 then
-				-- 	step = 2
-				-- end
-				for i = 1, nCount, step do
-					FireUIEvent('MY_TM_NPC_LIFE_CHANGE', dwTemplateID, npcInfo.nLife - i)
-				end
-			end
-			-- if bTempTarget then
-			-- 	if npcInfo.nMana < fManaPer then
-			-- 		local nCount, step = fManaPer - npcInfo.nMana, 1
-			-- 		if nCount > 50 then
-			-- 			step = 2
-			-- 		end
-			-- 		for i = 1, nCount, step do
-			-- 			FireUIEvent('MY_TM_NPC_MANA_CHANGE', dwTemplateID, npcInfo.nMana + i)
-			-- 		end
-			-- 	end
-			-- end
-			npcInfo.nLife = fLifePer
-			-- npcInfo.nMana = fManaPer
-			if bFightFlag then
-				local nTime = GetTime()
-				npcInfo.nSec = GetTime()
-				FireUIEvent('MY_TM_NPC_FIGHT', dwTemplateID, true, nTime)
-			elseif bFightFlag == false then
-				local nTime = GetTime() - (npcInfo.nSec or GetTime())
-				npcInfo.nSec = nil
-				FireUIEvent('MY_TM_NPC_FIGHT', dwTemplateID, false, nTime)
-			end
 		end
 	end
 end
@@ -952,14 +947,17 @@ function D.OnNpcEvent(npc, bEnter)
 	local data = D.GetData('NPC', npc.dwTemplateID)
 	local nTime = GetTime()
 	if bEnter then
-		CACHE.NPC_LIST[npc.dwTemplateID] = CACHE.NPC_LIST[npc.dwTemplateID] or {
+		if not CACHE.NPC_LIST[npc.dwTemplateID] then
+			CACHE.NPC_LIST[npc.dwTemplateID] = {
+				tList       = {},
+				nTime       = -1,
+				nCount      = 0,
+			}
+		end
+		CACHE.NPC_LIST[npc.dwTemplateID].tList[npc.dwID] = {
 			bFightState = false,
-			tList       = {},
-			nTime       = -1,
-			nLife       = floor(npc.nCurrentLife / npc.nMaxLife * 100),
-			nMana       = floor(npc.nCurrentMana / npc.nMaxMana * 100)
 		}
-		insert(CACHE.NPC_LIST[npc.dwTemplateID].tList, npc.dwID)
+		CACHE.NPC_LIST[npc.dwTemplateID].nCount = CACHE.NPC_LIST[npc.dwTemplateID].nCount + 1
 		local tWeak, tTemp = CACHE.TEMP.NPC, D.TEMP.NPC
 		if not tWeak[npc.dwTemplateID] then
 			local t = {
@@ -982,20 +980,18 @@ function D.OnNpcEvent(npc, bEnter)
 			CACHE.INTERVAL.NPC[npc.dwTemplateID][#CACHE.INTERVAL.NPC[npc.dwTemplateID] + 1] = nTime
 		end
 	else
-		if CACHE.NPC_LIST[npc.dwTemplateID] and CACHE.NPC_LIST[npc.dwTemplateID].tList then
-			local tab = CACHE.NPC_LIST[npc.dwTemplateID]
-			for k, v in ipairs(tab.tList) do
-				if v == npc.dwID then
-					table.remove(tab.tList, k)
-					if #tab.tList == 0 then
-						local nTime = GetTime() - (tab.nSec or GetTime())
-						if tab.bFightState then
-							FireUIEvent('MY_TM_NPC_FIGHT', npc.dwTemplateID, false, nTime)
-						end
-						CACHE.NPC_LIST[npc.dwTemplateID] = nil
-						FireUIEvent('MY_TM_NPC_ALL_LEAVE_SCENE', npc.dwTemplateID)
-					end
-					break
+		local npcInfo = CACHE.NPC_LIST[npc.dwTemplateID]
+		if npcInfo then
+			local tab = npcInfo.tList[npc.dwID]
+			if tab then
+				npcInfo.tList[npc.dwID] = nil
+				npcInfo.nCount = npcInfo.nCount - 1
+				if tab.bFightState then
+					FireUIEvent('MY_TM_NPC_FIGHT', npc.dwTemplateID, false, GetTime() - (tab.nSec or GetTime()))
+				end
+				if npcInfo.nCount == 0 then
+					CACHE.NPC_LIST[npc.dwTemplateID] = nil
+					FireUIEvent('MY_TM_NPC_ALL_LEAVE_SCENE', npc.dwTemplateID)
 				end
 			end
 		end
@@ -1007,7 +1003,7 @@ function D.OnNpcEvent(npc, bEnter)
 		end
 		if bEnter then
 			cfg, nClass = data[MY_TM_TYPE.NPC_ENTER], MY_TM_TYPE.NPC_ENTER
-			nCount = #CACHE.NPC_LIST[npc.dwTemplateID].tList
+			nCount = CACHE.NPC_LIST[npc.dwTemplateID].nCount
 		else
 			cfg, nClass = data[MY_TM_TYPE.NPC_LEAVE], MY_TM_TYPE.NPC_LEAVE
 		end
@@ -1362,8 +1358,8 @@ function D.OnDeath(dwCharacterID, dwKiller)
 			D.CountdownEvent(data, MY_TM_TYPE.NPC_DEATH)
 			local bAllDeath = true
 			if CACHE.NPC_LIST[dwTemplateID] then
-				for k, v in ipairs(CACHE.NPC_LIST[dwTemplateID].tList) do
-					local npc = GetNpc(v)
+				for k, v in pairs(CACHE.NPC_LIST[dwTemplateID].tList) do
+					local npc = GetNpc(k)
 					if npc and npc.nMoveState ~= MOVE_STATE.ON_DEATH then
 						bAllDeath = false
 						break

@@ -2376,7 +2376,7 @@ function D.OpenSettingPanel(data, szType)
 							end })
 						-- end
 					elseif szType == 'NPC' then
-						for kk, vv in ipairs({ MY_TM_TYPE.NPC_ENTER, MY_TM_TYPE.NPC_LEAVE, MY_TM_TYPE.NPC_ALLLEAVE, MY_TM_TYPE.NPC_FIGHT, MY_TM_TYPE.NPC_DEATH, MY_TM_TYPE.NPC_ALLDEATH, MY_TM_TYPE.NPC_LIFE, --[[MY_TM_TYPE.NPC_MANA]] }) do
+						for kk, vv in ipairs({ MY_TM_TYPE.NPC_ENTER, MY_TM_TYPE.NPC_LEAVE, MY_TM_TYPE.NPC_ALLLEAVE, MY_TM_TYPE.NPC_FIGHT, MY_TM_TYPE.NPC_DEATH, MY_TM_TYPE.NPC_ALLDEATH, MY_TM_TYPE.NPC_LIFE, MY_TM_TYPE.NPC_MANA }) do
 							insert(menu, { szOption = _L['Countdown TYPE ' .. vv], bMCheck = true, bChecked = v.nClass == vv, fnAction = function()
 								SetCountdownType(v, vv, ui:children('#Countdown' .. k))
 								if vv == MY_TM_TYPE.NPC_LIFE or vv == MY_TM_TYPE.NPC_MANA then
