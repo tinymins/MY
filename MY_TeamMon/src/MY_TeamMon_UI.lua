@@ -848,7 +848,7 @@ function D.OpenImportPanel(szDefault, szTitle, fnAction)
 	nX = 20
 	for k, v in ipairs(MY_TMUI_TYPE) do
 		local u = ui:append('WndCheckBox', { name = v, x = nX + 5, y = nY, checked = true, text = _L[v] }, true)
-		if LIB.IsShieldedVersion() and v == 'CIRCLE' then
+		if LIB.IsShieldedVersion(2) and v == 'CIRCLE' then
 			u:hide()
 		else
 			nX = u:autoWidth():pos('BOTTOMRIGHT')
@@ -934,7 +934,7 @@ function D.OpenExportPanel()
 	nX = 20
 	for k, v in ipairs(MY_TMUI_TYPE) do
 		local u = ui:append('WndCheckBox', { name = v, x = nX + 5, y = nY, checked = true, text = _L[v] }, true)
-		if LIB.IsShieldedVersion() and v == 'CIRCLE' then
+		if LIB.IsShieldedVersion(2) and v == 'CIRCLE' then
 			u:hide()
 		else
 			nX = u:autoWidth():pos('BOTTOMRIGHT')
@@ -1709,7 +1709,7 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.BUFF_GET, 'bCenterAlarm', bCheck)
 			end,
 		}, true):autoWidth():pos('BOTTOMRIGHT')
-		if not LIB.IsShieldedVersion() then
+		if not LIB.IsShieldedVersion(2) then
 			nX = ui:append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				oncheck = function(bCheck)
@@ -1724,7 +1724,7 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.BUFF_GET, 'bScreenHead', bCheck)
 			end,
 		}, true):autoWidth():pos('BOTTOMRIGHT')
-		if not LIB.IsShieldedVersion() then
+		if not LIB.IsShieldedVersion(2) then
 			nX = ui:append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
 				oncheck = function(bCheck)
@@ -1763,7 +1763,7 @@ function D.OpenSettingPanel(data, szType)
 		}, true):autoWidth():pos('BOTTOMRIGHT')
 		nY = nY + CHECKBOX_HEIGHT
 
-		if not LIB.IsShieldedVersion() then
+		if not LIB.IsShieldedVersion(2) then
 			local _ui = ui:append('WndCheckBox', {
 				x = 30, y = nY, checked = cfg.bSelect, text = _L['Auto Select'],
 				oncheck = function(bCheck)
@@ -1803,7 +1803,7 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.BUFF_LOSE, 'bCenterAlarm', bCheck)
 			end,
 		}, true):autoWidth():pos('BOTTOMRIGHT')
-		if not LIB.IsShieldedVersion() then
+		if not LIB.IsShieldedVersion(2) then
 			nX = ui:append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				oncheck = function(bCheck)
@@ -1865,7 +1865,7 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.SKILL_END, 'bCenterAlarm', bCheck)
 			end,
 		}, true):autoWidth():pos('BOTTOMRIGHT')
-		if not LIB.IsShieldedVersion() then
+		if not LIB.IsShieldedVersion(2) then
 			nX = ui:append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				oncheck = function(bCheck)
@@ -1909,7 +1909,7 @@ function D.OpenSettingPanel(data, szType)
 					SetDataClass(MY_TM_TYPE.SKILL_BEGIN, 'bCenterAlarm', bCheck)
 				end,
 			}, true):autoWidth():pos('BOTTOMRIGHT')
-			if not LIB.IsShieldedVersion() then
+			if not LIB.IsShieldedVersion(2) then
 				nX = ui:append('WndCheckBox', {
 					x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 					oncheck = function(bCheck)
@@ -1924,7 +1924,7 @@ function D.OpenSettingPanel(data, szType)
 					SetDataClass(MY_TM_TYPE.SKILL_BEGIN, 'bScreenHead', bCheck)
 				end,
 			}, true):autoWidth():pos('BOTTOMRIGHT')
-			if not LIB.IsShieldedVersion() then
+			if not LIB.IsShieldedVersion(2) then
 				nX = ui:append('WndCheckBox', {
 					x = nX + 5, y = nY, checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
 					oncheck = function(bCheck)
@@ -1990,7 +1990,7 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.NPC_ENTER, 'bCenterAlarm', bCheck)
 			end,
 		}, true):autoWidth():pos('BOTTOMRIGHT')
-		if not LIB.IsShieldedVersion() then
+		if not LIB.IsShieldedVersion(2) then
 			nX = ui:append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				oncheck = function(bCheck)
@@ -2005,7 +2005,7 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.NPC_ENTER, 'bScreenHead', bCheck)
 			end,
 		}, true):autoWidth():pos('BOTTOMRIGHT')
-		if not LIB.IsShieldedVersion() then
+		if not LIB.IsShieldedVersion(2) then
 			nX = ui:append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
 				oncheck = function(bCheck)
@@ -2037,7 +2037,7 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.NPC_LEAVE, 'bCenterAlarm', bCheck)
 			end,
 		}, true):autoWidth():pos('BOTTOMRIGHT')
-		if not LIB.IsShieldedVersion() then
+		if not LIB.IsShieldedVersion(2) then
 			nX = ui:append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				oncheck = function(bCheck)
@@ -2095,7 +2095,7 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.DOODAD_ENTER, 'bCenterAlarm', bCheck)
 			end,
 		}, true):autoWidth():pos('BOTTOMRIGHT')
-		if not LIB.IsShieldedVersion() then
+		if not LIB.IsShieldedVersion(2) then
 			nX = ui:append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				oncheck = function(bCheck)
@@ -2110,7 +2110,7 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.DOODAD_ENTER, 'bScreenHead', bCheck)
 			end,
 		}, true):autoWidth():pos('BOTTOMRIGHT')
-		if not LIB.IsShieldedVersion() then
+		if not LIB.IsShieldedVersion(2) then
 			nX = ui:append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
 				oncheck = function(bCheck)
@@ -2142,7 +2142,7 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.DOODAD_LEAVE, 'bCenterAlarm', bCheck)
 			end,
 		}, true):autoWidth():pos('BOTTOMRIGHT')
-		if not LIB.IsShieldedVersion() then
+		if not LIB.IsShieldedVersion(2) then
 			nX = ui:append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				oncheck = function(bCheck)
@@ -2206,7 +2206,7 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.TALK_MONITOR, 'bCenterAlarm', bCheck)
 			end,
 		}, true):autoWidth():pos('BOTTOMRIGHT')
-		if not LIB.IsShieldedVersion() then
+		if not LIB.IsShieldedVersion(2) then
 			nX = ui:append('WndCheckBox', {
 				x = nX + 5, y = nY + 10, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				oncheck = function(bCheck)
@@ -2221,7 +2221,7 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.TALK_MONITOR, 'bScreenHead', bCheck)
 			end,
 		}, true):autoWidth():pos('BOTTOMRIGHT')
-		if not LIB.IsShieldedVersion() then
+		if not LIB.IsShieldedVersion(2) then
 			nX = ui:append('WndCheckBox', {
 				x = nX + 5, y = nY + 10, checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
 				oncheck = function(bCheck)
@@ -2272,7 +2272,7 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.CHAT_MONITOR, 'bCenterAlarm', bCheck)
 			end,
 		}, true):autoWidth():pos('BOTTOMRIGHT')
-		if not LIB.IsShieldedVersion() then
+		if not LIB.IsShieldedVersion(2) then
 			nX = ui:append('WndCheckBox', {
 				x = nX + 5, y = nY + 10, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				oncheck = function(bCheck)
@@ -2287,7 +2287,7 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.CHAT_MONITOR, 'bScreenHead', bCheck)
 			end,
 		}, true):autoWidth():pos('BOTTOMRIGHT')
-		if not LIB.IsShieldedVersion() then
+		if not LIB.IsShieldedVersion(2) then
 			nX = ui:append('WndCheckBox', {
 				x = nX + 5, y = nY + 10, checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
 				oncheck = function(bCheck)
@@ -2313,7 +2313,7 @@ function D.OpenSettingPanel(data, szType)
 		}, true):pos('BOTTOMRIGHT')
 	end
 	-- µ¹¼ÆÊ±
-	if not LIB.IsShieldedVersion() then
+	if not LIB.IsShieldedVersion(2) then
 		nX, nY = ui:append('Text', { x = 20, y = nY + 5, text = _L['Countdown'], font = 27 }, true):pos('BOTTOMRIGHT')
 		for k, v in ipairs(data.tCountdown or {}) do
 			nX = ui:append('WndComboBox', {

@@ -461,7 +461,7 @@ function D.CreateData(szEvent)
 	end
 	pcall(Raid_MonitorBuffs) -- clear
 	-- 判断战场使用条件
-	if LIB.IsInArena() and szLang == 'zhcn' and LIB.IsShieldedVersion() then
+	if LIB.IsInArena() and LIB.IsShieldedVersion(2) then
 		LIB.Sysmsg(_L['MY_TeamMon is blocked in arena, temporary disabled.'])
 		D.Log('MAPID: ' .. dwMapID ..  ' create data Failed:' .. GetTime() - nTime  .. 'ms')
 	else
@@ -680,7 +680,7 @@ function D.OnBuff(dwCaster, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, d
 	local nTime = GetTime()
 	if not bDelete then
 		-- 近期记录
-		if Table_BuffIsVisible(dwBuffID, nBuffLevel) or not LIB.IsShieldedVersion() then
+		if Table_BuffIsVisible(dwBuffID, nBuffLevel) or not LIB.IsShieldedVersion(2) then
 			local tWeak, tTemp = CACHE.TEMP[szType], D.TEMP[szType]
 			if not tWeak[key] then
 				local t = {
@@ -833,7 +833,7 @@ function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
 		end
 	end
 	local data = D.GetData('CASTING', dwCastID, dwLevel)
-	if Table_IsSkillShow(dwCastID, dwLevel) or not LIB.IsShieldedVersion() then
+	if Table_IsSkillShow(dwCastID, dwLevel) or not LIB.IsShieldedVersion(2) then
 		local tWeak, tTemp = CACHE.TEMP.CASTING, D.TEMP.CASTING
 		if not tWeak[key] then
 			local t = {
@@ -910,7 +910,7 @@ function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
 			if O.bPushBigFontAlarm and cfg.bBigFontAlarm then
 				FireUIEvent('MY_TM_LARGE_TEXT', txt, data.col or { GetHeadTextForceFontColor(dwCaster, MY_TM_CORE_PLAYERID) })
 			end
-			if not LIB.IsShieldedVersion() and cfg.bSelect then
+			if not LIB.IsShieldedVersion(2) and cfg.bSelect then
 				SetTarget(IsPlayer(dwCaster) and TARGET.PLAYER or TARGET.NPC, dwCaster)
 			end
 			if cfg.tMark then
@@ -1071,7 +1071,7 @@ function D.OnNpcEvent(npc, bEnter)
 			end
 
 			if nClass == MY_TM_TYPE.NPC_ENTER then
-				if not LIB.IsShieldedVersion() and cfg.bSelect then
+				if not LIB.IsShieldedVersion(2) and cfg.bSelect then
 					SetTarget(TARGET.NPC, npc.dwID)
 				end
 				if O.bPushFullScreen and cfg.bFullScreen then
@@ -1092,7 +1092,7 @@ function D.OnDoodadEvent(doodad, bEnter)
 			nTime       = -1,
 		}
 		insert(CACHE.DOODAD_LIST[doodad.dwTemplateID].tList, doodad.dwID)
-		if doodad.nKind ~= DOODAD_KIND.ORNAMENT or not LIB.IsShieldedVersion() then
+		if doodad.nKind ~= DOODAD_KIND.ORNAMENT or not LIB.IsShieldedVersion(2) then
 			local tWeak, tTemp = CACHE.TEMP.DOODAD, D.TEMP.DOODAD
 			if not tWeak[doodad.dwTemplateID] then
 				local t = {
@@ -1307,7 +1307,7 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 					})
 					FireUIEvent('MY_TM_SA_CREATE', 'TIME', tInfo.dwID, { txt = _L('%s call name', szNpcName or g_tStrings.SYSTEM)})
 				end
-				if not LIB.IsShieldedVersion() and cfg.bSelect then
+				if not LIB.IsShieldedVersion(2) and cfg.bSelect then
 					SetTarget(TARGET.PLAYER, tInfo.dwID)
 				end
 			else

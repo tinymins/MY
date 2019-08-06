@@ -119,7 +119,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	}, true):autoWidth():pos('BOTTOMRIGHT')
 	nX = X + 5
-	if not LIB.IsShieldedVersion() then
+	if not LIB.IsShieldedVersion(2) then
 		nX = ui:append('WndCheckBox', {
 			x = nX + 5, y = nY, text = _L['Large text alarm'],
 			checked = MY_TeamMon.bPushBigFontAlarm,
