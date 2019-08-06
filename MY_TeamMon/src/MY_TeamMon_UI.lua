@@ -799,7 +799,7 @@ function D.OutputTip(szType, data, rect)
 	elseif szType == 'CASTING' then
 		OutputSkillTip(data.dwID, data.nLevel, rect)
 	elseif szType == 'NPC' then
-		LIB.OutputNpcTemplateTip(data.dwID, rect)
+		LIB.OutputNpcTemplateTip(rect, data.dwID)
 	elseif szType == 'DOODAD' then
 		LIB.OutputDoodadTemplateTip(rect, data.dwID)
 	elseif szType == 'TALK' then
