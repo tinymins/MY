@@ -1697,7 +1697,7 @@ function D.LoadConfigureFile(config)
 	else
 		if config.nMode == 1 then
 			if config.tList['CIRCLE'] then
-				if type(Circle) ~= 'nil' then
+				if Circle then
 					local dat = { Circle = data['CIRCLE'] }
 					Circle.LoadCircleData(dat)
 				end
@@ -1708,7 +1708,7 @@ function D.LoadConfigureFile(config)
 			end
 		elseif config.nMode == 2 or config.nMode == 3 then
 			if config.tList['CIRCLE'] then
-				if type(Circle) ~= 'nil' then
+				if Circle then
 					local dat = { Circle = data['CIRCLE'] }
 					Circle.LoadCircleMergeData(dat, config.nMode == 3 and true or false)
 				end
@@ -1752,7 +1752,7 @@ function D.SaveConfigureFile(config)
 		data[k] = D.FILE[k]
 	end
 	if config.tList['CIRCLE'] then
-		if type(Circle) ~= 'nil' then
+		if Circle then
 			data['CIRCLE'] = Circle.GetData()
 		end
 	end

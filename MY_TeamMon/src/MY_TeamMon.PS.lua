@@ -48,6 +48,7 @@ function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
 	local X, Y = 20, 20
 	local nX, nY = X, Y
+	local nLineH = 22
 
 	-- ui:append('WndButton2', {
 	-- 	x = 400, y = 20, text = g_tStrings.HELP_PANEL,
@@ -57,7 +58,7 @@ function PS.OnPanelActive(wnd)
 	-- })
 
 	nX, nY = ui:append('Text', { x = X, y = Y, text = _L['Master switch'], font = 27 }, true):autoWidth():pos('BOTTOMRIGHT')
-	nX, nY = ui:append('WndCheckBox', {
+	nX = ui:append('WndCheckBox', {
 		x = X + 10, y = nY, text = _L['Enable MY_TeamMon'],
 		checked = MY_TeamMon.bEnable,
 		oncheck = function(bCheck)
@@ -65,8 +66,7 @@ function PS.OnPanelActive(wnd)
 			MY_TeamMon.bEnable = bCheck
 		end,
 	}, true):autoWidth():pos('BOTTOMRIGHT')
-	if Circle then
-		nY = 17
+	if Circle and not LIB.IsShieldedVersion(2) then
 		nX = ui:append('WndCheckBox', {
 			x = nX + 5, y = nY, text = _L['Circle Enable'],
 			checked = Circle.bEnable,
@@ -77,8 +77,8 @@ function PS.OnPanelActive(wnd)
 				end
 			end,
 		}, true):autoWidth():pos('BOTTOMRIGHT')
-		nX, nY = ui:append('WndCheckBox', {
-			x = nX + 5, y = nY + 10, text = _L['Circle Border'],
+		nX = ui:append('WndCheckBox', {
+			x = nX + 5, y = nY, text = _L['Circle Border'],
 			checked = Circle.bBorder,
 			oncheck = function(bCheck)
 				Circle.bBorder = bCheck
@@ -86,6 +86,8 @@ function PS.OnPanelActive(wnd)
 			end,
 		}, true):autoWidth():pos('BOTTOMRIGHT')
 	end
+	nY = nY + nLineH
+
 	nX, nY = ui:append('Text', { x = X, y = nY + 5, text = _L['Enable alarm (master switch)'], font = 27 }, true):autoWidth():pos('BOTTOMRIGHT')
 	nX = ui:append('WndCheckBox', {
 		x = X + 10, y = nY,

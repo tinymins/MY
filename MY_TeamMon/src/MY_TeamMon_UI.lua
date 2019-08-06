@@ -124,7 +124,7 @@ function D.OnFrameCreate()
 	this:RegisterEvent('MY_TMUI_TEMP_UPDATE')
 	this:RegisterEvent('MY_TMUI_TEMP_RELOAD')
 	this:RegisterEvent('MY_TMUI_DATA_RELOAD')
-	if type(Circle) ~= 'nil' then
+	if Circle and not LIB.IsShieldedVersion(2) then
 		this:RegisterEvent('CIRCLE_RELOAD')
 	end
 	this:RegisterEvent('UI_SCALED')
@@ -150,7 +150,7 @@ function D.OnFrameCreate()
 	for k, v in ipairs(MY_TMUI_TYPE) do
 		local txt = this.hPageSet:Lookup('CheckBox_' .. v, 'Text_Page_' .. v)
 		txt:SetText(_L[v])
-		if v == 'CIRCLE' and type(Circle) == 'nil' then
+		if v == 'CIRCLE' and (not Circle or LIB.IsShieldedVersion(2)) then
 			this.hPageSet:Lookup('CheckBox_' .. v):Hide()
 			txt:SetFontColor(192, 192, 192)
 		end
