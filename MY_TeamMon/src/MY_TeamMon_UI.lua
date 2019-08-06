@@ -1385,15 +1385,15 @@ function D.OpenJosnPanel(data, fnAction)
 	ui:append('WndEditBox', {
 		name = 'CODE', w = 660, h = 350, x = 30, y = 60,
 		color = { 255, 255, 0 },
-		text = JsonEncode(data, true),
+		text = EncodeLUAData(data, '\t'),
 		multiline = true, limit = 999999,
 		onchange = function()
 			local code = ui:children('#CODE')
-			local dat  = LIB.JsonDecode(code:text())
+			local dat  = DecodeLUAData(code:text())
 			if dat then
-				code:Color(255, 255, 0)
+				code:color(255, 255, 0)
 				else
-				code:Color(255, 0, 0)
+				code:color(255, 0, 0)
 			end
 		end,
 	})
@@ -1402,9 +1402,9 @@ function D.OpenJosnPanel(data, fnAction)
 		text = g_tStrings.STR_HOTKEY_SURE,
 		onclick = function()
 			LIB.Confirm(_L['Confirm?'], function()
-				local dat = LIB.JsonDecode(ui:children('#CODE'):text())
+				local dat = DecodeLUAData(ui:children('#CODE'):text())
 				if fnAction and dat then
-					ui:Remove()
+					ui:remove()
 					return fnAction(dat)
 				end
 			end)
