@@ -365,30 +365,40 @@ function D.Log(szMsg)
 	return Log('[MY_TeamMon] ' .. szMsg)
 end
 
-function D.Talk(szMsg, szTarget)
+function D.Talk(szType, szMsg, szTarget)
 	local me = GetClientPlayer()
-	if not me then return end
-	if not szTarget then
+	if not me then
+		return
+	end
+	local szKey = 'MY_TeamMon.' .. GetLogicFrameCount()
+	if szType == 'RAID' then
+		if szTarget then
+			szMsg = wgsub(szMsg, _L['['] .. szTarget .. _L[']'], ' [' .. szTarget .. '] ')
+			szMsg = wgsub(szMsg, _L['['] .. g_tStrings.STR_YOU .. _L[']'], ' [' .. szTarget .. '] ')
+		end
 		if me.IsInParty() then
-			LIB.Talk(PLAYER_TALK_CHANNEL.RAID, szMsg, 'MY_TeamMon.' .. szMsg .. GetLogicFrameCount())
+			LIB.Talk(PLAYER_TALK_CHANNEL.RAID, szMsg, szKey .. GetStringCRC(szType .. szMsg))
 		end
-	elseif type(szTarget) == 'string' then
-		local szText = szMsg:gsub(_L['['] .. szTarget .. _L[']'], _L['['] .. g_tStrings.STR_YOU ..  _L[']'])
+	elseif szType == 'WHISPER' then
+		if szTarget then
+			szMsg = wgsub(szMsg, '[' .. szTarget .. ']', _L['['] .. g_tStrings.STR_YOU .. _L[']'])
+			szMsg = wgsub(szMsg, _L['['] .. szTarget .. _L[']'], _L['['] .. g_tStrings.STR_YOU .. _L[']'])
+		end
 		if szTarget == me.szName then
-			LIB.OutputWhisper(szText, _L['MY_TeamMon'])
+			LIB.OutputWhisper(szMsg, _L['MY_TeamMon'])
 		else
-			LIB.Talk(szTarget, szText, 'MY_TeamMon.' .. szMsg .. GetLogicFrameCount())
+			LIB.Talk(szTarget, szMsg, szKey .. GetStringCRC(szType .. szMsg))
 		end
-	elseif type(szTarget) == 'boolean' then
+	elseif szType == 'RAID_WHISPER' then
 		if me.IsInParty() then
 			local team = GetClientTeam()
 			for _, v in ipairs(team.GetTeamMemberList()) do
 				local szName = team.GetClientTeamMemberName(v)
-				local szText = szMsg:gsub(_L['['] .. szName .. _L[']'], _L['['] .. g_tStrings.STR_YOU ..  _L[']'])
+				local szText = wgsub(szMsg, '[' .. szName .. ']', _L['['] .. g_tStrings.STR_YOU ..  _L[']'])
 				if szName == me.szName then
 					LIB.OutputWhisper(szText, _L['MY_TeamMon'])
 				else
-					LIB.Talk(szName, szText, 'MY_TeamMon.' .. szMsg .. GetLogicFrameCount())
+					LIB.Talk(szName, szText, szKey .. GetStringCRC(szType .. szText .. szName))
 				end
 			end
 		end
@@ -810,11 +820,10 @@ function D.OnBuff(dwCaster, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, d
 				end
 			end
 			if O.bPushTeamChannel and cfg.bTeamChannel then
-				local talk = txt:gsub(_L['['] .. g_tStrings.STR_YOU .. _L[']'], _L['['] .. szSrcName .. _L[']'])
-				D.Talk(talk)
+				D.Talk('RAID', txt, szSrcName)
 			end
 			if O.bPushWhisperChannel and cfg.bWhisperChannel then
-				D.Talk(txt, szSrcName)
+				D.Talk('WHISPER', txt, szSrcName)
 			end
 		end
 	end
@@ -929,15 +938,10 @@ function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
 				FireUIEvent('MY_TM_FS_CREATE', data.dwID .. '#SKILL#'  .. data.nLevel, { nTime = 3, col = data.col})
 			end
 			if O.bPushTeamChannel and cfg.bTeamChannel then
-				if szTargetName then
-					local talk = txt:gsub(_L['['] .. g_tStrings.STR_YOU .. _L[']'], _L['['] .. szTargetName .. _L[']'])
-					D.Talk(talk)
-				else
-					D.Talk(txt)
-				end
+				D.Talk('RAID', txt, szTargetName)
 			end
 			if O.bPushWhisperChannel and cfg.bWhisperChannel then
-				D.Talk(txt, true)
+				D.Talk('RAID_WHISPER', txt, szTargetName)
 			end
 		end
 	end
@@ -1064,10 +1068,10 @@ function D.OnNpcEvent(npc, bEnter)
 			end
 
 			if O.bPushTeamChannel and cfg.bTeamChannel then
-				D.Talk(txt)
+				D.Talk('RAID', txt)
 			end
 			if O.bPushWhisperChannel and cfg.bWhisperChannel then
-				D.Talk(txt, true)
+				D.Talk('RAID_WHISPER', txt)
 			end
 
 			if nClass == MY_TM_TYPE.NPC_ENTER then
@@ -1193,10 +1197,10 @@ function D.OnDoodadEvent(doodad, bEnter)
 			end
 
 			if O.bPushTeamChannel and cfg.bTeamChannel then
-				D.Talk(txt)
+				D.Talk('RAID', txt)
 			end
 			if O.bPushWhisperChannel and cfg.bWhisperChannel then
-				D.Talk(txt, true)
+				D.Talk('RAID_WHISPER', txt)
 			end
 
 			if nClass == MY_TM_TYPE.DOODAD_ENTER then
@@ -1296,7 +1300,7 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 			if tInfo then
 				txt = txt:gsub('$team', tInfo.szName)
 				if O.bPushWhisperChannel and cfg.bWhisperChannel then
-					D.Talk(txt, tInfo.szName)
+					D.Talk('WHISPER', txt, tInfo.szName)
 				end
 				-- 头顶报警
 				if O.bPushScreenHead and cfg.bScreenHead then
@@ -1312,7 +1316,7 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 				end
 			else
 				if O.bPushWhisperChannel and cfg.bWhisperChannel then
-					D.Talk(txt, true)
+					D.Talk('RAID_WHISPER', txt)
 				end
 				-- 头顶报警
 				if O.bPushScreenHead and cfg.bScreenHead then
@@ -1339,10 +1343,9 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 			end
 			if O.bPushTeamChannel and cfg.bTeamChannel then
 				if tInfo and not data.szNote then
-					local talk = txt:gsub(_L['['] .. g_tStrings.STR_YOU .. _L[']'], _L['['] .. tInfo.szName .. _L[']'])
-					D.Talk(talk)
+					D.Talk('RAID', txt, tInfo.szName)
 				else
-					D.Talk(txt)
+					D.Talk('RAID', txt)
 				end
 			end
 		end
@@ -1435,7 +1438,7 @@ function D.OnNpcInfoChange(szEvent, dwTemplateID, nPer)
 							FireUIEvent('MY_TM_LARGE_TEXT', txt, data.col or { 255, 128, 0 })
 						end
 						if O.bPushTeamChannel and v.bTeamChannel then
-							D.Talk(txt)
+							D.Talk('RAID', txt)
 						end
 						if vv[3] and tonumber(TrimString(vv[3])) then
 							local szKey = k .. '.' .. dwTemplateID .. '.' .. kk
