@@ -553,8 +553,8 @@ function MY_CataclysmMain.OnFrameCreate()
 	this:RegisterEvent('MY_CAMP_COLOR_UPDATE')
 	this:RegisterEvent('MY_FORCE_COLOR_UPDATE')
 	this:RegisterEvent('GKP_RECORD_TOTAL')
-	this:RegisterEvent('GVOICE_CONSTANT.MIC_STATE_CHANGED')
-	this:RegisterEvent('GVOICE_CONSTANT.SPEAKER_STATE_CHANGED')
+	this:RegisterEvent('GVOICE_MIC_STATE_CHANGED')
+	this:RegisterEvent('GVOICE_SPEAKER_STATE_CHANGED')
 	if GetClientPlayer() then
 		D.UpdateAnchor(this)
 		MY_CataclysmParty:AutoLinkAllPanel()
@@ -796,9 +796,9 @@ function MY_CataclysmMain.OnEvent(szEvent)
 		D.ReloadCataclysmPanel()
 	elseif szEvent == 'GKP_RECORD_TOTAL' then
 		GKP_RECORD_TOTAL = arg0
-	elseif szEvent == 'GVOICE_CONSTANT.MIC_STATE_CHANGED' then
+	elseif szEvent == 'GVOICE_MIC_STATE_CHANGED' then
 		D.CreateControlBar()
-	elseif szEvent == 'GVOICE_CONSTANT.SPEAKER_STATE_CHANGED' then
+	elseif szEvent == 'GVOICE_SPEAKER_STATE_CHANGED' then
 		D.CreateControlBar()
 	elseif szEvent == 'UI_SCALED' then
 		D.UpdateAnchor(this)
