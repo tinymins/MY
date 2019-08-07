@@ -52,3 +52,416 @@ MY_Cataclysm.BG_COLOR_MODE = {
 }
 RegisterCustomData('MY_Cataclysm.bEnable')
 RegisterCustomData('MY_Cataclysm.szConfigName')
+
+
+-- ½âÎö
+function MY_Cataclysm.EncodeBuffRule(v)
+	local a = {}
+	insert(a, v.szName or v.dwID)
+	if v.nLevel then
+		insert(a, 'lv' .. v.nLevel)
+	end
+	if v.nStackNum then
+		insert(a, 'sn' .. (v.szStackOp or '>=') .. v.nStackNum)
+	end
+	if v.bOnlyMe then
+		insert(a, 'me')
+	end
+	if v.bOnlyMine or v.bOnlySelf or v.bSelf then
+		insert(a, 'mine')
+	end
+	a = { concat(a, '|') }
+
+	if v.col then
+		local cols = { v.col }
+		if v.nColAlpha and v.col:sub(1, 1) ~= '#' then
+			insert(cols, v.nColAlpha)
+		end
+		insert(a, '[' .. concat(cols, '|') .. ']')
+	end
+	if not IsEmpty(v.szReminder) then
+		insert(a, '(' .. v.szReminder .. ')')
+	end
+	if v.nPriority then
+		insert(a, '#' .. v.nPriority)
+	end
+	if v.bAttention then
+		insert(a, '!!')
+	end
+	if v.bCaution then
+		insert(a, '!!!')
+	end
+	if v.bScreenHead then
+		if v.colScreenHead then
+			insert(a, '!!!!|[' .. v.colScreenHead .. ']')
+		else
+			insert(a, '!!!!')
+		end
+	end
+	if v.bDelete then
+		insert(a, '-')
+	end
+	return concat(a, ',')
+end
+
+function MY_Cataclysm.DecodeBuffRule(line)
+	line = LIB.TrimString(line)
+	if line ~= '' then
+		local tab = {}
+		local vals = LIB.SplitString(line, ',')
+		for i, val in ipairs(vals) do
+			if i == 1 then
+				local vs = LIB.SplitString(val, '|')
+				for j, v in ipairs(vs) do
+					v = LIB.TrimString(v)
+					if v ~= '' then
+						if j == 1 then
+							tab.dwID = tonumber(v)
+							if not tab.dwID then
+								tab.szName = v
+							end
+						elseif v == 'self' or v == 'mine' then
+							tab.bOnlyMine = true
+						elseif v:sub(1, 2) == 'lv' then
+							tab.nLevel = tonumber((v:sub(3)))
+						elseif v:sub(1, 2) == 'sn' then
+							if tonumber(v:sub(4, 4)) then
+								tab.szStackOp = v:sub(3, 3)
+								tab.nStackNum = tonumber((v:sub(4)))
+							else
+								tab.szStackOp = v:sub(3, 4)
+								tab.nStackNum = tonumber((v:sub(5)))
+							end
+						end
+					end
+				end
+			elseif val == '!!' then
+				tab.bAttention = true
+			elseif val == '!!!' then
+				tab.bCaution = true
+			elseif val == '!!!!' or val:sub(1, 5) == '!!!!|' then
+				tab.bScreenHead = true
+				local vs = LIB.SplitString(val, '|')
+				for _, v in ipairs(vs) do
+					if v:sub(1, 1) == '[' and v:sub(-1, -1) == ']' then
+						tab.colScreenHead = v:sub(2, -2)
+					end
+				end
+			elseif val == '-' then
+				tab.bDelete = true
+			elseif val:sub(1, 1) == '#' then
+				tab.nPriority = tonumber((val:sub(2)))
+			elseif val:sub(1, 1) == '[' and val:sub(-1, -1) == ']' then
+				val = val:sub(2, -2)
+				if val:sub(1, 1) == '#' then
+					tab.col = val
+				else
+					local vs = LIB.SplitString(val, '|')
+					tab.col = vs[1]
+					tab.nColAlpha = vs[2] and tonumber(vs[2])
+				end
+			elseif val:sub(1, 1) == '(' and val:sub(-1, -1) == ')' then
+				tab.szReminder = val:sub(2, -2)
+			end
+		end
+		if tab.dwID or tab.szName then
+			return tab
+		end
+	end
+end
+
+function MY_Cataclysm.OpenBuffRuleEditor(rec, onChangeNotify, bHideBase)
+	local w, h = 320, 320
+	local ui = UI.CreateFrame('MY_Cataclysm_BuffConfig', {
+		w = w, h = h,
+		text = _L['Edit buff'],
+		close = true, anchor = 'CENTER',
+	}):remove(function()
+		if not rec.dwID and (not rec.szName or rec.szName == '') then
+			onChangeNotify()
+		end
+	end)
+	local X, Y = 25, 60
+	local x, y = X, Y
+	if not bHideBase then
+		x = x + ui:append('Text', {
+			x = x, y = y, h = 25,
+			text = _L['Name or id'],
+		}, true):autoWidth():width() + 5
+		x = x + ui:append('WndEditBox', {
+			x = x, y = y, w = 105, h = 25,
+			text = rec.dwID or rec.szName,
+			onchange = function(text)
+				if tonumber(text) then
+					rec.dwID = tonumber(text)
+					rec.szName = nil
+				else
+					rec.dwID = nil
+					rec.szName = text
+				end
+				onChangeNotify(rec)
+			end,
+		}, true):width() + 15
+
+		x = x + ui:append('Text', {
+			x = x, y = y, h = 25,
+			text = _L['Level'],
+		}, true):autoWidth():width() + 5
+		x = x + ui:append('WndEditBox', {
+			x = x, y = y, w = 60, h = 25,
+			placeholder = _L['No limit'],
+			edittype = 0, text = rec.nLevel,
+			onchange = function(text)
+				rec.nLevel = tonumber(text)
+				onChangeNotify(rec)
+			end,
+		}, true):width() + 5
+		y = y + 30
+		y = y + 10
+	end
+
+	x = X
+	x = x + ui:append('Text', {
+		x = x, y = y, h = 25,
+		text = _L['Stacknum'],
+	}, true):autoWidth():width() + 5
+	x = x + ui:append('WndComboBox', {
+		name = 'WndComboBox_StackOp',
+		x = x, y = y, w = 90, h = 25,
+		text = rec.szStackOp or (rec.nStackNum and '>=' or _L['No limit']),
+		menu = function()
+			local this = this
+			local menu = {{
+				szOption = _L['No limit'],
+				fnAction = function()
+					rec.szStackOp = nil
+					ui:children('#WndEditBox_StackNum'):text('')
+					onChangeNotify(rec)
+					UI(this):text(_L['No limit'])
+				end,
+			}}
+			for _, op in ipairs({ '>=', '=', '!=', '<', '<=', '>', '>=' }) do
+				insert(menu, {
+					szOption = op,
+					fnAction = function()
+						rec.szStackOp = op
+						onChangeNotify(rec)
+						UI(this):text(op)
+					end,
+				})
+			end
+			return menu
+		end,
+	}, true):width() + 5
+	x = x + ui:append('WndEditBox', {
+		name = 'WndEditBox_StackNum',
+		x = x, y = y, w = 30, h = 25,
+		edittype = 0,
+		text = rec.nStackNum,
+		onchange = function(text)
+			rec.nStackNum = tonumber(text)
+			if rec.nStackNum then
+				if not rec.szStackOp then
+					rec.szStackOp = '>='
+					ui:children('#WndComboBox_StackOp'):text('>=')
+				end
+			end
+			onChangeNotify(rec)
+		end,
+	}, true):width() + 10
+
+	ui:append('WndCheckBox', {
+		x = x, y = y - 10,
+		text = _L['Only mine'],
+		checked = rec.bOnlyMine,
+		oncheck = function(bChecked)
+			rec.bOnlyMine = bChecked
+			onChangeNotify(rec)
+		end,
+	}, true):autoWidth()
+	ui:append('WndCheckBox', {
+		x = x, y = y + 10,
+		text = _L['Only me'],
+		checked = rec.bOnlyMe,
+		oncheck = function(bChecked)
+			rec.bOnlyMe = bChecked
+			onChangeNotify(rec)
+		end,
+	}, true):autoWidth()
+	y = y + 30
+	y = y + 10
+
+	if not bHideBase then
+		x = X
+		y = y + 10
+		x = x + ui:append('WndCheckBox', {
+			x = x, y = y,
+			text = _L['Hide (Can Modify Default Data)'],
+			checked = rec.bDelete,
+			oncheck = function(bChecked)
+				rec.bDelete = bChecked
+				onChangeNotify(rec)
+			end,
+		}, true):autoWidth():width() + 5
+	end
+
+	x = X
+	y = y + 30
+	y = y + 10
+	x = x + ui:append('Text', {
+		x = x, y = y, h = 25,
+		text = _L['Reminder'],
+		autoenable = function() return not rec.bDelete end,
+	}, true):autoWidth():width() + 5
+	x = x + ui:append('WndEditBox', {
+		x = x, y = y, w = 30, h = 25,
+		text = rec.szReminder,
+		onchange = function(text)
+			rec.szReminder = text
+			onChangeNotify(rec)
+		end,
+		autoenable = function() return not rec.bDelete end,
+	}, true):width() + 5
+	x = x + ui:append('Text', {
+		x = x, y = y, h = 25,
+		text = _L['Priority'],
+		autoenable = function() return not rec.bDelete end,
+	}, true):autoWidth():width() + 5
+	x = x + ui:append('WndEditBox', {
+		x = x, y = y, w = 40, h = 25,
+		edittype = 0,
+		text = rec.nPriority,
+		onchange = function(text)
+			rec.nPriority = tonumber(text)
+			onChangeNotify(rec)
+		end,
+		autoenable = function() return not rec.bDelete end,
+	}, true):width() + 5
+	x = x + ui:append('Text', {
+		x = x, y = y, h = 25,
+		text = _L['Color'],
+		autoenable = function() return not rec.bDelete end,
+	}, true):autoWidth():width() + 5
+	x = x + ui:append('Shadow', {
+		x = x, y = y + 2, w = 22, h = 22,
+		color = rec.col and {LIB.HumanColor2RGB(rec.col)} or {255, 255, 0},
+		onlclick = function()
+			local this = this
+			UI.OpenColorPicker(function(r, g, b)
+				local a = rec.col and select(4, LIB.Hex2RGB(rec.col)) or 255
+				rec.nColAlpha = a
+				rec.col = LIB.RGB2Hex(r, g, b, a)
+				UI(this):color(r, g, b)
+				onChangeNotify(rec)
+			end)
+		end,
+		onrclick = function()
+			UI(this):color(255, 255, 0)
+			rec.col = nil
+			onChangeNotify(rec)
+		end,
+		tip = _L['Left click to change color, right click to clear color'],
+		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
+		autoenable = function() return not rec.bDelete end,
+	}, true):width() + 5
+	x = x + ui:append('Shadow', {
+		x = x, y = y + 2, w = 22, h = 22,
+		color = rec.colScreenHead and {LIB.HumanColor2RGB(rec.colScreenHead)} or {255, 255, 0},
+		onlclick = function()
+			local this = this
+			UI.OpenColorPicker(function(r, g, b)
+				rec.colScreenHead = LIB.RGB2Hex(r, g, b)
+				UI(this):color(r, g, b)
+				onChangeNotify(rec)
+			end)
+		end,
+		onrclick = function()
+			UI(this):color(255, 255, 0)
+			rec.colScreenHead = nil
+			onChangeNotify(rec)
+		end,
+		tip = _L['Left click to change screen head color, right click to clear color'],
+		tippostype = ALW.TOP_BOTTOM,
+		autoenable = function() return not rec.bDelete end,
+	}, true):width() + 5
+	y = y + 30
+
+	x = X
+	x = x + ui:append('Text', {
+		x = x, y = y, h = 25,
+		text = _L['Border alpha'],
+		autoenable = function() return not rec.bDelete end,
+	}, true):autoWidth():width() + 5
+	x = x + ui:append('WndSliderBox', {
+		x = x, y = y, text = '',
+		range = {0, 255},
+		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
+		value = rec.col and select(4, LIB.HumanColor2RGB(rec.col)) or rec.nColAlpha or 255,
+		onchange = function(nVal)
+			if rec.col then
+				local r, g, b = LIB.Hex2RGB(rec.col)
+				if r and g and b then
+					rec.col = LIB.RGB2Hex(r, g, b, nVal)
+				end
+			end
+			rec.nColAlpha = nVal
+			onChangeNotify(rec)
+		end,
+		autoenable = function() return not rec.bDelete end,
+	}, true):autoWidth():width() + 5
+	y = y + 30
+
+	x = X
+	x = x + ui:append('WndCheckBox', {
+		x = x, y = y,
+		text = _L['Attention'],
+		checked = rec.bAttention,
+		oncheck = function(bChecked)
+			rec.bAttention = bChecked
+			onChangeNotify(rec)
+		end,
+		autoenable = function() return not rec.bDelete end,
+	}, true):autoWidth():width() + 5
+	x = x + ui:append('WndCheckBox', {
+		x = x, y = y,
+		text = _L['Caution'],
+		checked = rec.bCaution,
+		oncheck = function(bChecked)
+			rec.bCaution = bChecked
+			onChangeNotify(rec)
+		end,
+		autoenable = function() return not rec.bDelete end,
+	}, true):autoWidth():width() + 5
+	x = x + ui:append('WndCheckBox', {
+		x = x, y = y,
+		text = _L['Screen Head'],
+		checked = rec.bScreenHead,
+		oncheck = function(bChecked)
+			rec.bScreenHead = bChecked
+			onChangeNotify(rec)
+		end,
+		tip = _L['Requires MY_LifeBar loaded.'],
+		autoenable = function() return not rec.bDelete end,
+	}, true):autoWidth():width() + 5
+
+	y = y + 50
+	ui:append('WndButton2', {
+		x = (w - 120) / 2, y = y, w = 120,
+		text = _L['Delete'], color = {223, 63, 95},
+		onclick = function()
+			local function fnAction()
+				onChangeNotify()
+				ui:remove()
+			end
+			if rec.dwID or (rec.szName and rec.szName ~= '') then
+				LIB.Confirm(_L('Delete [%s]?', rec.szName or rec.dwID), fnAction)
+			else
+				fnAction()
+			end
+		end,
+	}, true)
+	y = y + 30
+
+	h = y + 15
+	ui:height(h)
+end
