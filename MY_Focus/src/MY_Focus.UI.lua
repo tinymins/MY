@@ -385,7 +385,7 @@ function D.UpdateList(frame)
 			D.UpdateItem(hItem, p)
 			if MY_Focus.bEnableSceneNavi and Navigator_SetID then
 				local szKey = 'MY_FOCUS.' .. p.dwType .. '_' .. p.dwID
-				local szText = p.tRule and p.tRule.szDisplay ~= '' and p.tRule.szDisplay or p.szName
+				local szText = p.tRule and p.tRule.szDisplay ~= '' and LIB.ReplaceSensitiveWord(p.tRule.szDisplay) or p.szName
 				if NAVIGATOR_CACHE[szKey] ~= szText then
 					Navigator_SetID(szKey, p.dwType, p.dwID, szText)
 				end
