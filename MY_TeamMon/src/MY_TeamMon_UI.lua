@@ -2492,7 +2492,7 @@ function D.OpenSettingPanel(data, szType)
 	if MY_Focus then
 		if szType == 'NPC' then
 			nX, nY = ui:append('Text', { x = 20, y = nY + 10, text = _L['Focuslist'], font = 27 }, true):pos('BOTTOMRIGHT')
-			nX = 30
+			nX, nY = 30, nY + 10
 			for _, p in ipairs(data.aFocus or CONSTANT.EMPTY_TABLE) do
 				nX = nX + ui:append('WndButton2', {
 					x = nX, y = nY, w = 100,
@@ -2544,7 +2544,7 @@ function D.OpenSettingPanel(data, szType)
 	if MY_Cataclysm then
 		if szType == 'BUFF' or szType == 'DEBUFF' then
 			nX, nY = ui:append('Text', { x = 20, y = nY + 10, text = _L['Team panel buff rule list'], font = 27 }, true):pos('BOTTOMRIGHT')
-			nX = 30
+			nX, nY = 30, nY + 10
 			for _, p in ipairs(data.aCataclysmBuff or CONSTANT.EMPTY_TABLE) do
 				nX = nX + ui:append('WndButton2', {
 					x = nX, y = nY, w = 100,
