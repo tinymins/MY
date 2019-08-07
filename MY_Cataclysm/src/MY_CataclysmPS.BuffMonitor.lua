@@ -260,6 +260,20 @@ function PS.OnPanelActive(frame)
 		end,
 	}, true):autoWidth():width() + 5
 	y = y + 30
+
+	x = X
+	x = x + ui:append('WndCheckBox', {
+		x = x, y = y,
+		text = _L['Enable MY_TeamMon data'],
+		checked = CFG.bBuffDataTeamMon,
+		oncheck = function(bCheck)
+			CFG.bBuffDataTeamMon = bCheck
+			MY_Cataclysm.UpdateBuffListCache()
+			LIB.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
+		end,
+		autoenable = function() return MY_Resource and true end,
+	}, true):autoWidth():width() + 5
+	y = y + 30
 end
 function PS.OnPanelDeactive()
 	l_list = nil
