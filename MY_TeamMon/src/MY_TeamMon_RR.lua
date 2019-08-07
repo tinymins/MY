@@ -299,11 +299,10 @@ end
 
 function D.DownloadData(info)
 	D.DownloadMeta(info, function(info)
-		local szUUID = 'Remote-' .. MD5(info.szURL)
+		local szUUID = 'Remote-' .. MD5(info.szURL) .. '-' .. info.szVersion
 		local LUA_CONFIG = { passphrase = MY_TM_DATA_PASSPHRASE, crc = true, compress = true }
 		local p = LIB.LoadLUAData(MY_TM_META_ROOT .. szUUID .. '.jx3dat', LUA_CONFIG)
-		if p and p.szVersion == info.szVersion
-		and IsLocalFileExist(MY_TM_DATA_ROOT .. szUUID .. '.jx3dat') then
+		if p and p.szVersion == info.szVersion and IsLocalFileExist(MY_TM_DATA_ROOT .. szUUID .. '.jx3dat') then
 			return D.LoadConfigureFile(szUUID .. '.jx3dat', info)
 		end
 		if not (META_DOWNLOADER and META_DOWNLOADER:IsValid()) then
