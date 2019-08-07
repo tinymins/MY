@@ -696,7 +696,7 @@ function D.GetDisplayList()
 				end
 			end
 			if bFocus then
-				local tRule, szVia
+				local tRule, szVia, bDeletable
 				for _, via in ipairs(p.aVia) do
 					if via.tRule then
 						local bRuleFocus = true
@@ -718,14 +718,17 @@ function D.GetDisplayList()
 						if bRuleFocus then
 							tRule = via.tRule
 							szVia = via.szVia
+							bDeletable = via.bDeletable
 							break
 						end
 					else
 						szVia = via.szVia
+						bDeletable = via.bDeletable
 					end
 				end
 				p.tRule = tRule
 				p.szVia = szVia
+				p.bDeletable = bDeletable
 			end
 			if bFocus then
 				insert(t, p)
