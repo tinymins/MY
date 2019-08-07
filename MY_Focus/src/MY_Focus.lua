@@ -385,7 +385,8 @@ function D.RescanNearby()
 end
 LIB.RegisterEvent('MY_ANMERKUNGEN_UPDATE.MY_Focus', D.RescanNearby)
 
-function D.GetEligibleRule(tRules, dwMapID, dwType, dwID, dwTemplateID, szName, szTong)
+function D.GetEligibleRules(tRules, dwMapID, dwType, dwID, dwTemplateID, szName, szTong)
+	local aRule = {}
 	for _, v in ipairs(tRules) do
 		if (v.tType.bAll or v.tType[dwType])
 		and (v.dwMapID == -1 or v.dwMapID == dwMapID)
@@ -397,9 +398,10 @@ function D.GetEligibleRule(tRules, dwMapID, dwType, dwID, dwTemplateID, szName, 
 			or (v.szMethod == 'TONG_NAME' and v.szPattern == szTong)
 			or (v.szMethod == 'TONG_NAME_PATT' and szTong:find(v.szPattern))
 		) then
-			return v
+			insert(aRule, v)
 		end
 	end
+	return aRule
 end
 
 -- 对象进入视野
@@ -426,8 +428,7 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		if not szName then
 			szName = LIB.GetObjectName(KObject, 'auto')
 		end
-		local bFocus, bDeletable = false, true
-		local szVia, tRule = '', nil
+		local bFocus, aVia = false, {}
 		local dwMapID = me.GetMapID()
 		local dwTemplateID, szTong = -1, ''
 		if dwType == TARGET.PLAYER then
@@ -444,9 +445,11 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		end
 		-- 判断临时焦点
 		if l_tTempFocusList[dwType][dwID] then
+			insert(aVia, {
+				bDeletable = true,
+				szVia = _L['Temp focus'],
+			})
 			bFocus = true
-			bDeletable = true
-			szVia = _L['Temp focus']
 		end
 		-- 判断永久焦点
 		if not bFocus then
@@ -458,27 +461,35 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 				and IsEnemy(UI_GetClientPlayerID(), dwID)
 				and LIB.IsShieldedVersion()
 			) then
+				insert(aVia, {
+					bDeletable = true,
+					szVia = _L['Static focus'],
+				})
 				bFocus = true
-				bDeletable = true
-				szVia = _L['Static focus']
 			end
 		end
 		-- 判断默认焦点
 		if not bFocus and O.bAutoFocus then
-			tRule = D.GetEligibleRule(O.aPatternFocus, dwMapID, dwType, dwID, dwTemplateID, szName, szTong)
-			if tRule then
+			local aRule = D.GetEligibleRules(O.aPatternFocus, dwMapID, dwType, dwID, dwTemplateID, szName, szTong)
+			for _, tRule in ipairs(aRule) do
+				insert(aVia, {
+					tRule = tRule,
+					bDeletable = false,
+					szVia = _L['Auto focus'] .. ' ' .. tRule.szPattern,
+				})
 				bFocus = true
-				bDeletable = false
-				szVia = _L['Auto focus'] .. ' ' .. tRule.szPattern
 			end
 		end
 		-- 判断团队监控焦点
 		if not bFocus and D.TEAMMON_FOCUS and O.bTeamMonFocus then
-			tRule = D.GetEligibleRule(D.TEAMMON_FOCUS, dwMapID, dwType, dwID, dwTemplateID, szName, szTong)
-			if tRule then
+			local aRule = D.GetEligibleRules(D.TEAMMON_FOCUS, dwMapID, dwType, dwID, dwTemplateID, szName, szTong)
+			for _, tRule in ipairs(aRule) do
+				insert(aVia, {
+					tRule = tRule,
+					bDeletable = false,
+					szVia = _L['TeamMon focus'] .. ' ' .. tRule.szPattern,
+				})
 				bFocus = true
-				bDeletable = false
-				szVia = _L['TeamMon focus']
 			end
 		end
 
@@ -487,20 +498,26 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 			if LIB.IsInArena() or LIB.IsInPubg() or LIB.IsInZombieMap() then
 				if dwType == TARGET.PLAYER then
 					if O.bFocusJJCEnemy and O.bFocusJJCParty then
+						insert(aVia, {
+							bDeletable = false,
+							szVia = _L['Auto focus in arena'],
+						})
 						bFocus = true
-						bDeletable = false
-						szVia = _L['Auto focus in arena']
 					elseif O.bFocusJJCParty then
 						if not IsEnemy(UI_GetClientPlayerID(), dwID) then
+							insert(aVia, {
+								bDeletable = false,
+								szVia = _L['Auto focus party in arena'],
+							})
 							bFocus = true
-							bDeletable = false
-							szVia = _L['Auto focus party in arena']
 						end
 					elseif O.bFocusJJCEnemy then
 						if IsEnemy(UI_GetClientPlayerID(), dwID) then
+							insert(aVia, {
+								bDeletable = false,
+								szVia = _L['Auto focus enemy in arena'],
+							})
 							bFocus = true
-							bDeletable = false
-							szVia = _L['Auto focus enemy in arena']
 						end
 					end
 				elseif dwType == TARGET.NPC then
@@ -508,9 +525,11 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 					and KObject.dwTemplateID == CHANGGE_REAL_SHADOW_TPLID
 					and not (IsEnemy(UI_GetClientPlayerID(), dwID) and LIB.IsShieldedVersion()) then
 						D.OnRemoveFocus(TARGET.PLAYER, KObject.dwEmployer)
+						insert(aVia, {
+							bDeletable = false,
+							szVia = _L['Auto focus party in arena'],
+						})
 						bFocus = true
-						bDeletable = false
-						szVia = _L['Auto focus party in arena']
 					end
 				end
 			else
@@ -519,27 +538,33 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 					if dwType == TARGET.PLAYER
 					and O.bFocusFriend
 					and LIB.GetFriend(dwID) then
+						insert(aVia, {
+							bDeletable = false,
+							szVia = _L['Friend focus'],
+						})
 						bFocus = true
-						bDeletable = false
-						szVia = _L['Friend focus']
 					end
 					-- 判断同帮会
 					if dwType == TARGET.PLAYER
 					and O.bFocusTong
 					and dwID ~= LIB.GetClientInfo().dwID
 					and LIB.GetTongMember(dwID) then
+						insert(aVia, {
+							bDeletable = false,
+							szVia = _L['Tong member focus'],
+						})
 						bFocus = true
-						bDeletable = false
-						szVia = _L['Tong member focus']
 					end
 				end
 				-- 判断敌对玩家
 				if dwType == TARGET.PLAYER
 				and O.bFocusEnemy
 				and IsEnemy(UI_GetClientPlayerID(), dwID) then
+					insert(aVia, {
+						bDeletable = false,
+						szVia = _L['Enemy focus'],
+					})
 					bFocus = true
-					bDeletable = false
-					szVia = _L['Enemy focus']
 				end
 			end
 		end
@@ -548,29 +573,32 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		if not bFocus and O.bFocusINpc
 		and dwType == TARGET.NPC
 		and LIB.IsImportantNpc(me.GetMapID(), KObject.dwTemplateID) then
+			insert(aVia, {
+				bDeletable = false,
+				szVia = _L['Important npc focus'],
+			})
 			bFocus = true
-			bDeletable = false
-			szVia = _L['Important npc focus']
 		end
 
 		-- 判断小本本
 		if not bFocus and O.bFocusAnmerkungen
 		and dwType == TARGET.PLAYER
 		and MY_Anmerkungen.GetPlayerNote(dwID) then
+			insert(aVia, {
+				bDeletable = false,
+				szVia = _L['Anmerkungen'],
+			})
 			bFocus = true
-			bDeletable = false
-			szVia = _L['Anmerkungen']
 		end
 
 		-- 判断屏蔽的NPC
 		if bFocus and dwType == TARGET.NPC and LIB.IsShieldedNpc(dwTemplateID) and LIB.IsShieldedVersion() then
 			bFocus = false
-			bDeletable = false
 		end
 
 		-- 加入焦点
 		if bFocus then
-			D.OnSetFocus(dwType, dwID, szName, bDeletable, szVia, tRule)
+			D.OnSetFocus(dwType, dwID, szName, aVia)
 		end
 	end
 end
@@ -591,7 +619,7 @@ function D.OnObjectLeaveScene(dwType, dwID)
 end
 
 -- 目标加入焦点列表
-function D.OnSetFocus(dwType, dwID, szName, bDeletable, szVia, tRule)
+function D.OnSetFocus(dwType, dwID, szName, aVia)
 	local nIndex
 	for i, p in ipairs(FOCUS_LIST) do
 		if p.dwType == dwType and p.dwID == dwID then
@@ -600,13 +628,11 @@ function D.OnSetFocus(dwType, dwID, szName, bDeletable, szVia, tRule)
 		end
 	end
 	if not nIndex then
-		table.insert(FOCUS_LIST, {
+		insert(FOCUS_LIST, {
 			dwType = dwType,
 			dwID = dwID,
 			szName = szName,
-			szVia = szVia,
-			tRule = tRule,
-			bDeletable = bDeletable,
+			aVia = aVia,
 		})
 		nIndex = #FOCUS_LIST
 	end
@@ -669,22 +695,37 @@ function D.GetDisplayList()
 					bFocus = KObject.nKind ~= DOODAD_KIND.CORPSE
 				end
 			end
-			if bFocus and p.tRule then
-				if bFocus and p.tRule.tLife.bEnable
-				and not LIB.JudgeOperator(p.tRule.tLife.szOperator, KObject.nCurrentLife / KObject.nMaxLife * 100, p.tRule.tLife.nValue) then
-					bFocus = false
-				end
-				if bFocus and p.tRule.nMaxDistance ~= 0
-				and LIB.GetDistance(me, KObject, O.szDistanceType) > p.tRule.nMaxDistance then
-					bFocus = false
-				end
-				if bFocus and not p.tRule.tRelation.bAll then
-					if LIB.IsEnemy(me.dwID, KObject.dwID) then
-						bFocus = p.tRule.tRelation.bEnemy
+			if bFocus then
+				local tRule, szVia
+				for _, via in ipairs(p.aVia) do
+					if via.tRule then
+						local bRuleFocus = true
+						if bRuleFocus and via.tRule.tLife.bEnable
+						and not LIB.JudgeOperator(via.tRule.tLife.szOperator, KObject.nCurrentLife / KObject.nMaxLife * 100, via.tRule.tLife.nValue) then
+							bRuleFocus = false
+						end
+						if bRuleFocus and via.tRule.nMaxDistance ~= 0
+						and LIB.GetDistance(me, KObject, O.szDistanceType) > via.tRule.nMaxDistance then
+							bRuleFocus = false
+						end
+						if bRuleFocus and not via.tRule.tRelation.bAll then
+							if LIB.IsEnemy(me.dwID, KObject.dwID) then
+								bRuleFocus = via.tRule.tRelation.bEnemy
+							else
+								bRuleFocus = via.tRule.tRelation.bAlly
+							end
+						end
+						if bRuleFocus then
+							tRule = via.tRule
+							szVia = via.szVia
+							break
+						end
 					else
-						bFocus = p.tRule.tRelation.bAlly
+						szVia = via.szVia
 					end
 				end
+				p.tRule = tRule
+				p.szVia = szVia
 			end
 			if bFocus then
 				insert(t, p)
