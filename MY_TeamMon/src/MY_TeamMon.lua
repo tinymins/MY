@@ -1033,10 +1033,10 @@ function D.OnNpcEvent(npc, bEnter)
 				-- 头顶报警
 				if O.bPushScreenHead and cfg.bScreenHead then
 					FireUIEvent('MY_LIFEBAR_COUNTDOWN', npc.dwID, 'NPC', 'MY_TM_NPC_' .. npc.dwID, {
-						szText = data.szNote or data.szName,
+						szText = FilterCustomText(data.szNote) or data.szName,
 						col = data.col,
 					})
-					FireUIEvent('MY_TM_SA_CREATE', 'NPC', npc.dwID, { txt = data.szNote, col = data.col, szName = data.szName })
+					FireUIEvent('MY_TM_SA_CREATE', 'NPC', npc.dwID, { txt = FilterCustomText(data.szNote), col = data.col, szName = data.szName })
 				end
 			end
 			if nTime - CACHE.NPC_LIST[npc.dwTemplateID].nTime < 500 then -- 0.5秒内进入相同的NPC直接忽略
@@ -1165,10 +1165,10 @@ function D.OnDoodadEvent(doodad, bEnter)
 				-- 头顶报警
 				if O.bPushScreenHead and cfg.bScreenHead then
 					FireUIEvent('MY_LIFEBAR_COUNTDOWN', doodad.dwID, 'DOODAD', 'MY_TM_DOODAD_' .. doodad.dwID, {
-						szText = data.szNote or data.szName,
+						szText = FilterCustomText(data.szNote) or data.szName,
 						col = data.col,
 					})
-					FireUIEvent('MY_TM_SA_CREATE', 'DOODAD', doodad.dwID, { txt = data.szNote, col = data.col, szName = data.szName })
+					FireUIEvent('MY_TM_SA_CREATE', 'DOODAD', doodad.dwID, { txt = FilterCustomText(data.szNote), col = data.col, szName = data.szName })
 				end
 			end
 			if nTime - CACHE.DOODAD_LIST[doodad.dwTemplateID].nTime < 500 then
