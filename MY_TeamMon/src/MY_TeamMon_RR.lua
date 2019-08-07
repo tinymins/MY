@@ -306,7 +306,7 @@ function D.DownloadData(info)
 		and IsLocalFileExist(MY_TM_DATA_ROOT .. szUUID .. '.jx3dat') then
 			return D.LoadConfigureFile(szUUID .. '.jx3dat', info)
 		end
-		if not META_DOWNLOADER and META_DOWNLOADER:IsValid() then
+		if not (META_DOWNLOADER and META_DOWNLOADER:IsValid()) then
 			return LIB.Topmsg(_L['Downloader is not ready!'])
 		end
 		if META_DOWNLOADER.szDownloadingKey then
@@ -527,6 +527,7 @@ LIB.RegisterBgMsg('MY_TeamMon_RR', function(_, _, _, szTalker, _, action, info)
 				.. _L('Title: %s', info.szTitle) .. '\n'
 				.. _L('Author: %s', info.szAuthor) .. '\n'
 				.. _L('Meta URL: %s', info.szURL), function()
+					D.OpenPanel()
 					D.AddMeta(info)
 					D.DownloadData(info)
 				end)
