@@ -401,29 +401,29 @@ function D.OnLButtonClick()
 		D.DownloadData(this:GetParent().info)
 	elseif name == 'Btn_AddUrl' then
 		GetUserInput(_L['Please input meta address:'], function(szText)
-			local aErrmsg = {}
 			local aURL = LIB.SplitString(szText, ';')
-			local nPending = #aURL
-			local function onComplete()
-				nPending = nPending - 1
-				if nPending == 0 then
+			local nPending = 0
+			local aErrmsg = {}
+			local function ProcessQueue()
+				nPending = nPending + 1
+				local szURL = aURL[nPending]
+				if not szURL then
 					if #aErrmsg > 0 then
 						LIB.Alert(concat(aErrmsg, '\n'))
 					end
 				end
-			end
-			for _, szURL in ipairs(aURL) do
 				D.DownloadMeta({ szURL = szURL }, function(info)
 					D.AddMeta(info)
 					D.UpdateList(frame)
-					onComplete()
+					ProcessQueue()
 				end, function(szErrmsg)
 					if szErrmsg then
 						insert(aErrmsg, szErrmsg)
 					end
-					onComplete()
+					ProcessQueue()
 				end)
 			end
+			ProcessQueue()
 		end)
 	elseif name == 'Btn_RemoveUrl' then
 		if not META_SEL_INFO then
