@@ -55,11 +55,13 @@ RegisterCustomData('MY_Cataclysm.szConfigName')
 
 
 -- ½âÎö
-function MY_Cataclysm.EncodeBuffRule(v)
+function MY_Cataclysm.EncodeBuffRule(v, bNoBasic)
 	local a = {}
-	insert(a, v.szName or v.dwID)
-	if v.nLevel then
-		insert(a, 'lv' .. v.nLevel)
+	if not bNoBasic then
+		insert(a, v.szName or v.dwID)
+		if v.nLevel then
+			insert(a, 'lv' .. v.nLevel)
+		end
 	end
 	if v.nStackNum then
 		insert(a, 'sn' .. (v.szStackOp or '>=') .. v.nStackNum)
@@ -177,7 +179,7 @@ function MY_Cataclysm.OpenBuffRuleEditor(rec, onChangeNotify, bHideBase)
 		text = _L['Edit buff'],
 		close = true, anchor = 'CENTER',
 	}):remove(function()
-		if not rec.dwID and (not rec.szName or rec.szName == '') then
+		if not bHideBase and not rec.dwID and (not rec.szName or rec.szName == '') then
 			onChangeNotify()
 		end
 	end)
@@ -303,11 +305,11 @@ function MY_Cataclysm.OpenBuffRuleEditor(rec, onChangeNotify, bHideBase)
 				onChangeNotify(rec)
 			end,
 		}, true):autoWidth():width() + 5
+		y = y + 30
+		y = y + 10
 	end
 
 	x = X
-	y = y + 30
-	y = y + 10
 	x = x + ui:append('Text', {
 		x = x, y = y, h = 25,
 		text = _L['Reminder'],
