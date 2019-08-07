@@ -2480,7 +2480,7 @@ function D.OpenSettingPanel(data, szType)
 	-- Ωπµ„¡–±Ì
 	if MY_Focus then
 		if szType == 'NPC' then
-			nX, nY = ui:append('Text', { x = 20, y = nY + 5, text = _L['Countdown'], font = 27 }, true):pos('BOTTOMRIGHT')
+			nX, nY = ui:append('Text', { x = 20, y = nY + 5, text = _L['Focuslist'], font = 27 }, true):pos('BOTTOMRIGHT')
 			nX = 30
 			for _, p in ipairs(data.aFocus or CONSTANT.EMPTY_TABLE) do
 				nX = nX + ui:append('WndButton2', {

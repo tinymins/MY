@@ -172,6 +172,7 @@ data = {
 	['Countdown format error'] = '倒计时格式错误',
 	['[%s] remaining %ds.'] = '【%s】 剩余 %d 秒。',
 	['Countdown'] = '倒计时',
+	['Focuslist'] = '焦点列表',
 	-- MY_TeamMon_RR.lua --
 	['Default'] = '默认',
 	['Default monitor data'] = '默认数据',
