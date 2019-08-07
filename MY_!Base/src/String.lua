@@ -334,3 +334,17 @@ function LIB.StringSimpleMatch(szText, szFind, bDistinctCase, bDistinctEnEm, bIg
 	end
 	return bKeyWordsLine
 end
+
+function LIB.IsSensitiveWord(szText)
+	if not TextFilterCheck then
+		return false
+	end
+	return not TextFilterCheck(szText)
+end
+
+function LIB.ReplaceSensitiveWord(szText)
+	if not TextFilterReplace then
+		return szText
+	end
+	return TextFilterReplace(szText)
+end
