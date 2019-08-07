@@ -46,6 +46,7 @@ end
 local JsonEncode = LIB.JsonEncode
 local MY_TM_TYPE          = MY_TeamMon.MY_TM_TYPE
 local MY_TM_SCRUTINY_TYPE = MY_TeamMon.MY_TM_SCRUTINY_TYPE
+local MY_TM_DATA_ROOT     = MY_TeamMon.MY_TM_DATA_ROOT
 local MY_TMUI_INIFILE     = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI.ini'
 local MY_TMUI_ITEM_L      = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI_ITEM_L.ini'
 local MY_TMUI_TALK_L      = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI_TALK_L.ini'
@@ -167,6 +168,13 @@ function D.OnFrameCreate()
 				insert(menu, { szOption = _L['Import data (web)'], fnAction = MY_TeamMon_RR.OpenPanel })
 			end
 			insert(menu, { szOption = _L['Export data'], fnAction = D.OpenExportPanel })
+			insert(menu, { szOption = _L['Open data folder'], fnAction = function()
+				local szRoot = LIB.GetAbsolutePath(MY_TM_DATA_ROOT):gsub('/', '\\')
+				if OpenFolder then
+					OpenFolder(szRoot)
+				end
+				UI.OpenTextEditor(szRoot)
+			end })
 			return menu
 		end,
 	})

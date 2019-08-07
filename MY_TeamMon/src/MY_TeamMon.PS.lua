@@ -42,6 +42,8 @@ if not LIB.AssertVersion('MY_TeamMon', _L['MY_TeamMon'], 0x2013500) then
 	return
 end
 
+local MY_TM_DATA_ROOT = MY_TeamMon.MY_TM_DATA_ROOT
+
 local PS = {}
 
 function PS.OnPanelActive(wnd)
@@ -214,6 +216,16 @@ function PS.OnPanelActive(wnd)
 				table.insert(menu, { szOption = _L['Import data (web)'], fnAction = MY_TeamMon_RR.OpenPanel })
 			end
 			return menu
+		end,
+	}, true):autoWidth():pos('BOTTOMRIGHT')
+	nX = ui:append('WndButton2', {
+		x = nX + 5, y = nY + 15, text = _L['Open data folder'],
+		onclick = function()
+			local szRoot = LIB.GetAbsolutePath(MY_TM_DATA_ROOT):gsub('/', '\\')
+			if OpenFolder then
+				OpenFolder(szRoot)
+			end
+			UI.OpenTextEditor(szRoot)
 		end,
 	}, true):autoWidth():pos('BOTTOMRIGHT')
 end

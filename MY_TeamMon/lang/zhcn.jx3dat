@@ -138,6 +138,7 @@ data = {
 	['Browse'] = '浏览',
 	['Import data (web)'] = '导入数据（联网获取文件）',
 	['Import data (local)'] = '导入数据（本地文件）',
+	['Open data folder'] = '打开数据文件夹',
 	['Includes'] = '包括',
 	['File name'] = '文件名',
 	['File format'] = '文件格式（不明白不需要更改，导入仅支持LUA TABLE）',
