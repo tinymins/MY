@@ -1849,15 +1849,24 @@ function D.RemoveData(szType, dwMapID, nIndex)
 					D.FILE[szType][dwMapID] = nil
 				end
 				FireUIEvent('MY_TM_CREATE_CACHE')
+				FireUIEvent('MY_TM_DATA_RELOAD', { [szType] = true })
 				FireUIEvent('MY_TMUI_DATA_RELOAD')
 			else
 				D.MoveData(szType, dwMapID, nIndex, -9)
 			end
 		end
-	else
+	elseif dwMapID then
 		if D.FILE[szType][dwMapID] then
 			D.FILE[szType][dwMapID] = nil
 			FireUIEvent('MY_TM_CREATE_CACHE')
+			FireUIEvent('MY_TM_DATA_RELOAD', { [szType] = true })
+			FireUIEvent('MY_TMUI_DATA_RELOAD')
+		end
+	else
+		if D.FILE[szType] then
+			D.FILE[szType] = {}
+			FireUIEvent('MY_TM_CREATE_CACHE')
+			FireUIEvent('MY_TM_DATA_RELOAD', { [szType] = true })
 			FireUIEvent('MY_TMUI_DATA_RELOAD')
 		end
 	end

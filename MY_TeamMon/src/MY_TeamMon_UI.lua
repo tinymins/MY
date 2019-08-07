@@ -543,21 +543,21 @@ end
 function D.OnItemRButtonClick()
 	local szName = this:GetName()
 	if szName == 'TreeLeaf_Content' then
-		local menu = {}
 		local dwMapID = this.dwMapID
-		if dwMapID ~= _L['All data'] then
-			local szName =
-			insert(menu, { szOption = this:Lookup(1):GetText(), bDisable = true })
-			insert(menu, { bDevide = true })
-			insert(menu, { szOption = _L['Clear this map data'], rgb = { 255, 0, 0 }, fnAction = function()
-				if MY_TMUI_SELECT_TYPE == 'CIRCLE' then
-					Circle.RemoveData(dwMapID, nil, true)
-				else
-					D.RemoveData(dwMapID, nil, LIB.GetMapInfo(dwMapID))
-				end
-			end })
-			PopupMenu(menu)
+		if dwMapID == _L['All data'] then
+			dwMapID = nil
 		end
+		local menu = {}
+		insert(menu, { szOption = this:Lookup(1):GetText(), bDisable = true })
+		insert(menu, { bDevide = true })
+		insert(menu, { szOption = _L['Clear this map data'], rgb = { 255, 0, 0 }, fnAction = function()
+			if MY_TMUI_SELECT_TYPE == 'CIRCLE' then
+				Circle.RemoveData(dwMapID, nil, true)
+			else
+				D.RemoveData(dwMapID, nil, dwMapID and Get(LIB.GetMapInfo(dwMapID), 'szName', _L['This data']) or _L['All data'])
+			end
+		end })
+		PopupMenu(menu)
 	elseif szName == 'Handle_L' then
 		local t = this.dat
 		local menu = {}
