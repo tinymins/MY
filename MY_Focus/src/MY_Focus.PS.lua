@@ -93,33 +93,13 @@ function PS.OnPanelActive(wnd)
 		autoenable = function() return MY_Focus.IsEnabled() end,
 	})
 
-	local function GeneItemText(v)
-		local szType
-		if v.tType.bAll then
-			szType = _L['All']
-		else
-			local aText = {}
-			for _, eType in ipairs({ TARGET.NPC, TARGET.PLAYER, TARGET.DOODAD }) do
-				if v.tType[eType] then
-					insert(aText, _L.TARGET[eType])
-				end
-			end
-			for _, szRelation in ipairs({ 'Enemy', 'Ally' }) do
-				if v.tRelation['b' .. szRelation] then
-					insert(aText, _L.RELATION[szRelation])
-				end
-			end
-			szType = #aText == 0 and _L['None'] or concat(aText, ',')
-		end
-		return v.szPattern .. ' (' .. szType .. ')'
-	end
 	local list = ui:append('WndListBox', {
 		x = x, y = y + 30, w = wl - x + xl, h = h - y - 40,
 		autoenable = function() return MY_Focus.IsEnabled() end,
 	}, true)
 	-- ³õÊ¼»¯list¿Ø¼þ
 	for _, v in ipairs(MY_Focus.GetAllFocusPattern()) do
-		list:listbox('insert', GeneItemText(v), v, v)
+		list:listbox('insert', MY_Focus.FormatRuleText(v), v, v)
 	end
 	list:listbox('onmenu', function(hItem, szText, oID, tData)
 		local t = {{
@@ -151,7 +131,7 @@ function PS.OnPanelActive(wnd)
 				fnAction = function()
 					tData.tType.bAll = not tData.tType.bAll
 					MY_Focus.SetFocusPattern(tData.szPattern, tData)
-					list:listbox('update', 'id', oID, {'text'}, {GeneItemText(tData)})
+					list:listbox('update', 'id', oID, {'text'}, {MY_Focus.FormatRuleText(tData)})
 				end,
 			}
 		}
@@ -162,7 +142,7 @@ function PS.OnPanelActive(wnd)
 				fnAction = function()
 					tData.tType[eType] = not tData.tType[eType]
 					MY_Focus.SetFocusPattern(tData.szPattern, tData)
-					list:listbox('update', 'id', oID, {'text'}, {GeneItemText(tData)})
+					list:listbox('update', 'id', oID, {'text'}, {MY_Focus.FormatRuleText(tData)})
 				end,
 				fnDisable = function()
 					return tData.tType.bAll
@@ -178,7 +158,7 @@ function PS.OnPanelActive(wnd)
 				fnAction = function()
 					tData.tRelation.bAll = not tData.tRelation.bAll
 					MY_Focus.SetFocusPattern(tData.szPattern, tData)
-					list:listbox('update', 'id', oID, {'text'}, {GeneItemText(tData)})
+					list:listbox('update', 'id', oID, {'text'}, {MY_Focus.FormatRuleText(tData)})
 				end,
 			}
 		}
@@ -189,7 +169,7 @@ function PS.OnPanelActive(wnd)
 				fnAction = function()
 					tData.tRelation['b' .. szRelation] = not tData.tRelation['b' .. szRelation]
 					MY_Focus.SetFocusPattern(tData.szPattern, tData)
-					list:listbox('update', 'id', oID, {'text'}, {GeneItemText(tData)})
+					list:listbox('update', 'id', oID, {'text'}, {MY_Focus.FormatRuleText(tData)})
 				end,
 				fnDisable = function()
 					return tData.tRelation.bAll
@@ -273,7 +253,7 @@ function PS.OnPanelActive(wnd)
 				if not tData then
 					return
 				end
-				list:listbox('insert', GeneItemText(tData), tData, tData)
+				list:listbox('insert', MY_Focus.FormatRuleText(tData), tData, tData)
 			end, function() end, function() end, nil, '')
 		end,
 		tip = _L['Right click list to delete'],

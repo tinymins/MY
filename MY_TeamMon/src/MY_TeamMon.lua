@@ -91,7 +91,7 @@ local MY_TM_MARK_FREE   = true -- 标记空闲
 local MY_TM_LEFT_LINE  = GetFormatText(_L['['], 44, 255, 255, 255)
 local MY_TM_RIGHT_LINE = GetFormatText(_L[']'], 44, 255, 255, 255)
 ----
-local MY_TM_TYPE_LIST = { 'BUFF', 'DEBUFF', 'CASTING', 'NPC', 'DOODAD', 'TALK', 'CHAT', 'FOCUS' }
+local MY_TM_TYPE_LIST = { 'BUFF', 'DEBUFF', 'CASTING', 'NPC', 'DOODAD', 'TALK', 'CHAT' }
 
 local MYTM_EVENTS = {
 	'NPC_ENTER_SCENE',
@@ -1590,7 +1590,7 @@ end
 -- 获取整个表
 function D.GetTable(szType, bTemp)
 	if bTemp then
-		if szType == 'CIRCLE' or szType == 'FOCUS' then -- 如果请求圈圈的近期数据 返回NPC的
+		if szType == 'CIRCLE' then -- 如果请求圈圈的近期数据 返回NPC的
 			szType = 'NPC'
 		end
 		return D.TEMP[szType]
@@ -1661,13 +1661,49 @@ function D.GetData(szType, dwID, nLevel)
 	end
 end
 
+local function UpgradeFocusData(data, aFocus)
+	if not aFocus then
+		return
+	end
+	for dwMapID, aData in pairs(aFocus) do
+		if not data['NPC'][dwMapID] then
+			data['NPC'][dwMapID] = {}
+		end
+		for _, focus in ipairs(aData) do
+			local npc
+			for _, p in ipairs(data['NPC'][dwMapID]) do
+				if p.dwID == focus.dwID then
+					npc = p
+					break
+				end
+			end
+			if not npc then
+				npc = {
+					["nFrame"] = focus.nFrame,
+					["dwID"] = focus.dwID,
+				}
+				insert(data['NPC'][dwMapID], npc)
+			end
+			if not npc.aFocus then
+				npc.aFocus = {}
+			end
+			insert(npc.aFocus, {
+				szDisplay = focus.szDisplay,
+				tRelation = focus.tRelation,
+				nMaxDistance = focus.nMaxDistance,
+			})
+		end
+	end
+end
+
 function D.LoadUserData()
 	local data = LIB.LoadLUAData(GetDataPath())
 	if data then
 		for k, v in pairs(D.FILE) do
 			D.FILE[k] = data[k] or {}
 		end
-		FireUIEvent('MY_TM_DATA_RELOAD', { FOCUS = true })
+		UpgradeFocusData(D.FILE, data['FOCUS'])
+		FireUIEvent('MY_TM_DATA_RELOAD')
 	else
 		local szLang = select(3, GetVersion())
 		local config = {
@@ -1740,6 +1776,9 @@ function D.LoadConfigureFile(config)
 				end
 				fnMergeData(tab_data)
 			end
+		end
+		if config.tList['NPC'] then
+			UpgradeFocusData(D.FILE, data['FOCUS'])
 		end
 		FireUIEvent('MY_TM_CREATE_CACHE')
 		FireUIEvent('MY_TM_DATA_RELOAD')
@@ -1885,7 +1924,7 @@ function D.AddData(szType, dwMapID, data)
 end
 
 function D.ClearTemp(szType)
-	if szType == 'CIRCLE' or szType == 'FOCUS' then -- 如果请求圈圈的近期数据 返回NPC的
+	if szType == 'CIRCLE' then -- 如果请求圈圈的近期数据 返回NPC的
 		szType = 'NPC'
 	end
 	CACHE.INTERVAL[szType] = {}
@@ -1896,7 +1935,7 @@ function D.ClearTemp(szType)
 end
 
 function D.GetIntervalData(szType, key)
-	if szType == 'CIRCLE' or szType == 'FOCUS' then -- 如果请求圈圈的近期数据 返回NPC的
+	if szType == 'CIRCLE' then -- 如果请求圈圈的近期数据 返回NPC的
 		szType = 'NPC'
 	end
 	if CACHE.INTERVAL[szType] then

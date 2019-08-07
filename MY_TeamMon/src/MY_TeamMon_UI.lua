@@ -51,7 +51,7 @@ local MY_TMUI_ITEM_L      = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI_ITE
 local MY_TMUI_TALK_L      = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI_TALK_L.ini'
 local MY_TMUI_ITEM_R      = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI_ITEM_R.ini'
 local MY_TMUI_TALK_R      = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI_TALK_R.ini'
-local MY_TMUI_TYPE        = { 'BUFF', 'DEBUFF', 'CASTING', 'NPC', 'DOODAD', 'CIRCLE', 'TALK', 'CHAT', 'FOCUS' }
+local MY_TMUI_TYPE        = { 'BUFF', 'DEBUFF', 'CASTING', 'NPC', 'DOODAD', 'CIRCLE', 'TALK', 'CHAT' }
 local MY_TMUI_SELECT_TYPE = MY_TMUI_TYPE[1]
 local MY_TMUI_SELECT_MAP  = _L['All data']
 local MY_TMUI_TREE_EXPAND = { true } -- 默认第一项展开
@@ -62,6 +62,7 @@ local MY_TMUI_SEARCH_CACHE  = {}
 local MY_TMUI_PANEL_ANCHOR  = { s = 'CENTER', r = 'CENTER', x = 0, y = 0 }
 local MY_TMUI_ANCHOR        = {}
 local CHECKBOX_HEIGHT       = 30
+local BUTTON2_HEIGHT        = 30
 local D = {}
 
 local MY_TMUI_DOODAD_ICON = {
@@ -696,8 +697,6 @@ function D.OnItemMouseEnter()
 		end
 		if szName == 'Handle_R' and MY_TMUI_SELECT_TYPE == 'CIRCLE' then -- circle fix
 			D.OutputTip('NPC', this.dat, { x, y, w, h })
-		elseif MY_TMUI_SELECT_TYPE == 'FOCUS' then -- focus fix
-			D.OutputTip('NPC', this.dat, { x, y, w, h })
 		else
 			D.OutputTip(MY_TMUI_SELECT_TYPE, this.dat, { x, y, w, h })
 		end
@@ -775,10 +774,6 @@ function D.OnScrollBarPosChanged()
 					elseif MY_TMUI_SELECT_TYPE == 'CIRCLE' and dir == 'L' then
 						D.SetCircleItemAction(h)
 					elseif MY_TMUI_SELECT_TYPE == 'CIRCLE' and dir == 'R'  then
-						D.SetNpcItemAction(h)
-					elseif MY_TMUI_SELECT_TYPE == 'FOCUS' and dir == 'L'  then
-						D.SetFocusItemAction(h)
-					elseif MY_TMUI_SELECT_TYPE == 'FOCUS' and dir == 'R'  then
 						D.SetNpcItemAction(h)
 					elseif MY_TMUI_SELECT_TYPE == 'TALK' then
 						D.SetTalkItemAction(h)
@@ -1058,15 +1053,6 @@ function D.GetDataName(szType, data)
 			szName = LIB.GetTemplateName(data.dwID) or data.dwID
 			nIcon = data.nFrame
 		end
-	elseif szType == 'FOCUS' then
-		szName = data.szDisplay
-		nIcon = 47
-		if data.dwID then
-			if IsEmpty(szName) then
-				szName = LIB.GetTemplateName(data.dwID) or data.dwID
-			end
-			nIcon = data.nFrame or nIcon
-		end
 	elseif szType == 'DOODAD' then
 		local doodad = GetDoodadTemplate(data.dwID)
 		szName = doodad.szName ~= '' and doodad.szName or data.dwID
@@ -1164,19 +1150,6 @@ function D.SetCircleItemAction(h)
 	else
 		box:SetObjectIcon(2396)
 	end
-	h.bDraw = true
-end
-
-function D.SetFocusItemAction(h)
-	local dat = h.dat
-	local szName = D.GetDataName('FOCUS', dat)
-	h:Lookup('Text'):SetText(szName)
-	if dat.col then
-		h:Lookup('Text'):SetFontColor(unpack(dat.col))
-	end
-	local box = h:Lookup('Box')
-	box:ClearObjectIcon()
-	box:SetExtentImage('ui/Image/TargetPanel/Target.UITex', dat.nFrame)
 	h.bDraw = true
 end
 
@@ -1414,19 +1387,6 @@ end
 
 -- 设置面板
 function D.OpenSettingPanel(data, szType)
-	if MY_TMUI_SELECT_TYPE == 'FOCUS' then
-		MY_Focus.OpenRuleEditor(data, function(dat)
-			if dat then
-				for k, v in pairs(dat) do
-					data[k] = v
-				end
-				FireUIEvent('MY_TM_DATA_RELOAD', { FOCUS = true })
-			else
-				D.RemoveData(data.dwMapID, data.nIndex, D.GetDataName('FOCUS', data) or _L['This data'])
-			end
-		end, true)
-		return
-	end
 	local function GetScrutinyTypeMenu()
 		local menu = {
 			{ szOption = g_tStrings.STR_GUILD_ALL, bMCheck = true, bChecked = type(data.nScrutinyType) == 'nil', fnAction = function() data.nScrutinyType = nil end },
@@ -1575,6 +1535,7 @@ function D.OpenSettingPanel(data, szType)
 		MY_TMUI_PANEL_ANCHOR = GetFrameAnchor(frame, 'LEFTTOP')
 	end
 	local nX, nY, _ = 0, 0, 0
+	local nW, nH = ui:size()
 	local function fnClickBox()
 		local menu, box = {}, this
 		if szType ~= 'TALK' and szType ~= 'CHAT' then
@@ -2515,13 +2476,65 @@ function D.OpenSettingPanel(data, szType)
 			D.OpenSettingPanel(data, szType)
 		end,
 	}, true):pos('BOTTOMRIGHT')
+	nY = nY + 35
+	-- 焦点列表
+	if MY_Focus then
+		if szType == 'NPC' then
+			nX, nY = ui:append('Text', { x = 20, y = nY + 5, text = _L['Countdown'], font = 27 }, true):pos('BOTTOMRIGHT')
+			nX = 30
+			for _, p in ipairs(data.aFocus or CONSTANT.EMPTY_TABLE) do
+				nX = nX + ui:append('WndButton2', {
+					x = nX, y = nY, w = 100,
+					text = MY_Focus.FormatRuleText(p, true),
+					onclick = function()
+						local ui = UI(this)
+						MY_Focus.OpenRuleEditor(p, function(dat)
+							if dat then
+								for k, v in pairs(dat) do
+									if k ~= 'szPattern' and k ~= 'szMethod' then
+										p[k] = v
+									end
+								end
+								ui:text(MY_Focus.FormatRuleText(dat, true))
+							else
+								for k, v in ipairs(data.aFocus) do
+									if v == p then
+										remove(data.aFocus, k)
+										break
+									end
+								end
+								D.OpenSettingPanel(data, szType)
+							end
+							FireUIEvent('MY_TM_DATA_RELOAD', { NPC = true })
+						end, true)
+					end,
+				}, true):width() + 5
+				if nX + 130 > nW then
+					nX = 30
+					nY = nY + BUTTON2_HEIGHT
+				end
+			end
+			nX = ui:append('WndButton2', {
+				x = nX, y = nY, w = 100,
+				text = _L['Add focus'],
+				onclick = function()
+					if not data.aFocus then
+						data.aFocus = {}
+					end
+					insert(data.aFocus, {})
+					D.OpenSettingPanel(data, szType)
+					FireUIEvent('MY_TM_DATA_RELOAD', { NPC = true })
+				end,
+			}, true):width() + 5
+			nY = nY + BUTTON2_HEIGHT
+		end
+	end
 	-- nX = ui:append('WndButton2', {
 	-- 	x = 640, y = nY + 10, text = g_tStrings.HELP_PANEL,
 	-- 	onclick = function()
 	-- 		OpenInternetExplorer('https://github.com/luckyyyyy/JH/blob/master/JH_DBM/README.md')
 	-- 	end,
 	-- }, true):pos('BOTTOMRIGHT')
-	nY = nY + 35
 	ui:append('WndButton2', {
 		x = 335, y = nY + 10, text = g_tStrings.STR_FRIEND_DEL, color = { 255, 0, 0 },
 		onclick = function()
@@ -2531,8 +2544,7 @@ function D.OpenSettingPanel(data, szType)
 		end,
 	})
 	nY = nY + 40
-	local w, h = ui:size()
-	ui:size(w, nY + 25):anchor(MY_TMUI_PANEL_ANCHOR)
+	ui:size(nW, nY + 25):anchor(MY_TMUI_PANEL_ANCHOR)
 end
 
 function D.UpdateAnchor(frame)

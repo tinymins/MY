@@ -716,6 +716,38 @@ function D.GetTargetMenu(dwType, dwID)
 	}}
 end
 
+function D.FormatRuleText(v, bNoBasic)
+	local aText = {}
+	if not bNoBasic then
+		if not v.tType or v.tType.bAll then
+			insert(aText, _L['All type'])
+		else
+			local aSub = {}
+			for _, eType in ipairs({ TARGET.NPC, TARGET.PLAYER, TARGET.DOODAD }) do
+				if v.tType[eType] then
+					insert(aSub, _L.TARGET[eType])
+				end
+			end
+			insert(aText, #aSub == 0 and _L['None type'] or concat(aSub, '|'))
+		end
+	end
+	if not v.tRelation or v.tRelation.bAll then
+		insert(aText, _L['All relation'])
+	else
+		local aSub = {}
+		for _, szRelation in ipairs({ 'Enemy', 'Ally' }) do
+			if v.tRelation['b' .. szRelation] then
+				insert(aSub, _L.RELATION[szRelation])
+			end
+		end
+		insert(aText, #aSub == 0 and _L['None relation'] or concat(aSub, '|'))
+	end
+	if not bNoBasic and v.szPattern then
+		return v.szPattern .. ' (' .. concat(aText, ',') .. ')'
+	end
+	return concat(aText, ',')
+end
+
 function D.OpenRuleEditor(tData, onChangeNotify, bHideBase)
 	local tData = D.FormatAutoFocusData(tData)
 	local frame = UI.CreateFrame('MY_Focus_Editor', { close = true, text = _L['Focus rule editor'] })
@@ -905,17 +937,27 @@ end
 
 do
 local function onTeamMonUpdate()
-	if arg0 and not arg0.FOCUS then
+	if arg0 and not arg0['NPC'] then
 		return
 	end
 	D.TEAMMON_FOCUS = {}
-	local data = MY_TeamMon and MY_TeamMon.GetTable and MY_TeamMon.GetTable('FOCUS')
-	if data then
-		for _, p in spairs(data[-1], data[LIB.GetMapID()]) do
-			local rule = Clone(p)
-			rule.szMethod = 'TEMPLATE_ID'
-			rule.szPattern = tostring(p.dwID)
-			insert(D.TEAMMON_FOCUS, D.FormatAutoFocusData(rule))
+	local aData = MY_TeamMon and MY_TeamMon.GetTable and MY_TeamMon.GetTable('NPC')
+	if aData then
+		for _, data in spairs(aData[-1], aData[LIB.GetMapID()]) do
+			if data.aFocus then
+				for _, p in ipairs(data.aFocus) do
+					local rule = Clone(p)
+					rule.szMethod = 'TEMPLATE_ID'
+					rule.szPattern = tostring(data.dwID)
+					rule.tType = {
+						bAll = false,
+						[TARGET.NPC] = true,
+						[TARGET.PLAYER] = false,
+						[TARGET.DOODAD] = false,
+					}
+					insert(D.TEAMMON_FOCUS, D.FormatAutoFocusData(rule))
+				end
+			end
 		end
 	end
 	D.RescanNearby()
@@ -1068,6 +1110,7 @@ local settings = {
 				RemoveFocusID      = D.RemoveFocusID     ,
 				SortFocus          = D.SortFocus         ,
 				OpenRuleEditor     = D.OpenRuleEditor    ,
+				FormatRuleText     = D.FormatRuleText    ,
 			},
 		},
 	},

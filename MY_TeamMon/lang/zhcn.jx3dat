@@ -111,6 +111,7 @@ data = {
 	['Chat content'] = '系统喊话',
 	['Trigger talk'] = '触发喊话',
 	['Trigger chat'] = '触发系统喊话',
+	['Add focus'] = '添加焦点',
 	['TC'] = '队',
 	['is calling'] = '点',
 	['\'s name.'] = '名了。',
