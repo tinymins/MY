@@ -113,6 +113,7 @@ data = {
 	['Alpha: %d.'] = '透明度：%d。',
 	['More than %d meter'] = '%d尺以上',
 	['Alt Click Publish'] = '按住ALT点击快速发布到团队',
+	['Enable MY_TeamMon data'] = '启用团队监控数据',
 	['Top'] = '上',
 	['Middle'] = '中',
 	['Bottom'] = '下',
@@ -146,6 +147,7 @@ data = {
 	['Delete'] = '删除',
 	['Delete [%s]?'] = '删除[%s]？',
 
+	['From MY_TeamMon data'] = '来自团队监控数据',
 	['From custom data'] = '来自用户自定义数据',
 
 	['Would you like to use MY cataclysm?'] = '是否使用茗伊团队面板？',

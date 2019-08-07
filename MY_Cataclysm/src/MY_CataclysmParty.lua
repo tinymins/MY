@@ -433,7 +433,7 @@ local function OnItemRefreshTip()
 	local nX, nY = this:GetRoot():GetAbsPos()
 	local nW, nH = this:GetRoot():GetSize()
 	if this.bBuff then
-		LIB.OutputBuffTip({ nX, nY + 5, nW, nH }, this.dwID, this.nLevel, GetEndTime(this.nEndFrame), this.szVia)
+		LIB.OutputBuffTip({ nX, nY + 5, nW, nH }, this.dwID, this.nLevel, GetEndTime(this.nEndFrame), GetFormatText(this.szVia, 82))
 	elseif this.bRole then
 		LIB.OutputTeamMemberTip({ nX, nY + 5, nW, nH }, this.dwID)
 	end

@@ -51,6 +51,7 @@ data = {
 	bShowBuffReminder      = true,
 	bBuffAltPublish        = true,
 	bBuffPushToOfficial    = true,
+	bBuffDataTeamMon       = true,
 	bShowAttention         = true,
 	bShowCaution           = true,
 	bShowScreenHead        = true,

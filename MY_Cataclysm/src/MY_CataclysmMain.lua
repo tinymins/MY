@@ -61,6 +61,7 @@ local BUFF_LIST = {}
 local GKP_RECORD_TOTAL = 0
 local CTM_CAPTION = ''
 local CTM_CONFIG_PLAYER, CTM_CONFIG_LOADED
+local CTM_BUFF_TEAMMON = {}
 local DEBUG = false
 
 do
@@ -95,6 +96,9 @@ local function InsertBuffListCache(aBuffList, szVia)
 end
 function D.UpdateBuffListCache()
 	BUFF_LIST = {}
+	if CFG.bBuffDataTeamMon then
+		InsertBuffListCache(CTM_BUFF_TEAMMON, _L['From MY_TeamMon data'])
+	end
 	InsertBuffListCache(CFG.aBuffList, _L['From custom data'])
 	if CFG.bBuffPushToOfficial then
 		local aBuff = {}
@@ -107,6 +111,57 @@ function D.UpdateBuffListCache()
 	end
 	FireUIEvent('CTM_BUFF_LIST_CACHE_UPDATE')
 end
+end
+
+do
+local function ScanTeamMonRule(data)
+	if not data.aCataclysmBuff then
+		return
+	end
+	for _, v in ipairs(data.aCataclysmBuff) do
+		v = Clone(v)
+		v.dwID = data.dwID
+		if data.bCheckLevel then
+			v.nLevel = data.nLevel
+		end
+		v.nIcon = data.nIcon
+		insert(CTM_BUFF_TEAMMON, v)
+	end
+end
+local function onTeamMonUpdate()
+	if arg0 and not arg0['BUFF'] and not arg0['DEBUFF'] then
+		return
+	end
+	CTM_BUFF_TEAMMON = {}
+	local aData = MY_TeamMon and MY_TeamMon.GetTable and MY_TeamMon.GetTable('BUFF')
+	if aData then
+		if aData[-1] then
+			for _, v in ipairs(aData[-1]) do
+				ScanTeamMonRule(v)
+			end
+		end
+		if aData[LIB.GetMapID()] then
+			for _, v in ipairs(aData[LIB.GetMapID()]) do
+				ScanTeamMonRule(v)
+			end
+		end
+	end
+	local aData = MY_TeamMon and MY_TeamMon.GetTable and MY_TeamMon.GetTable('DEBUFF')
+	if aData then
+		if aData[-1] then
+			for _, v in ipairs(aData[-1]) do
+				ScanTeamMonRule(v)
+			end
+		end
+		if aData[LIB.GetMapID()] then
+			for _, v in ipairs(aData[LIB.GetMapID()]) do
+				ScanTeamMonRule(v)
+			end
+		end
+	end
+	D.UpdateBuffListCache()
+end
+LIB.RegisterEvent('MY_TM_DATA_RELOAD.MY_CataclysmMain', onTeamMonUpdate)
 end
 
 function D.GetConfigurePath()

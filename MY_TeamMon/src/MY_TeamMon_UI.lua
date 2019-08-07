@@ -1586,6 +1586,7 @@ function D.OpenSettingPanel(data, szType)
 					file[data.dwMapID][data.nIndex] = dat
 				end
 				FireUIEvent('MY_TM_CREATE_CACHE')
+				FireUIEvent('MY_TM_DATA_RELOAD', { [szType] = true })
 				FireUIEvent('MY_TMUI_DATA_RELOAD')
 				D.OpenSettingPanel(file[data.dwMapID][data.nIndex], szType)
 			end)
@@ -1641,6 +1642,7 @@ function D.OpenSettingPanel(data, szType)
 			x = nX + 5, y = nY, checked = data.bCheckLevel, text = _L['Check level'],
 			oncheck = function(bCheck)
 				data.bCheckLevel = bCheck and true or nil
+				FireUIEvent('MY_TM_DATA_RELOAD', { [szType] = true })
 			end,
 		}, true):autoWidth():pos('BOTTOMRIGHT')
 		-- get buff
@@ -1791,6 +1793,7 @@ function D.OpenSettingPanel(data, szType)
 			x = nX + 5, y = nY, checked = data.bCheckLevel, text = _L['Check level'],
 			oncheck = function(bCheck)
 				data.bCheckLevel = bCheck and true or nil
+				FireUIEvent('MY_TM_DATA_RELOAD', { [szType] = true })
 			end,
 		}, true):autoWidth():pos('BOTTOMRIGHT')
 		nX, nY = ui:append('WndCheckBox', {
@@ -2480,7 +2483,7 @@ function D.OpenSettingPanel(data, szType)
 	-- 焦点列表
 	if MY_Focus then
 		if szType == 'NPC' then
-			nX, nY = ui:append('Text', { x = 20, y = nY + 5, text = _L['Focuslist'], font = 27 }, true):pos('BOTTOMRIGHT')
+			nX, nY = ui:append('Text', { x = 20, y = nY + 10, text = _L['Focuslist'], font = 27 }, true):pos('BOTTOMRIGHT')
 			nX = 30
 			for _, p in ipairs(data.aFocus or CONSTANT.EMPTY_TABLE) do
 				nX = nX + ui:append('WndButton2', {
@@ -2524,6 +2527,58 @@ function D.OpenSettingPanel(data, szType)
 					insert(data.aFocus, {})
 					D.OpenSettingPanel(data, szType)
 					FireUIEvent('MY_TM_DATA_RELOAD', { NPC = true })
+				end,
+			}, true):width() + 5
+			nY = nY + BUTTON2_HEIGHT
+		end
+	end
+	-- 团队面板条件监控
+	if MY_Cataclysm then
+		if szType == 'BUFF' or szType == 'DEBUFF' then
+			nX, nY = ui:append('Text', { x = 20, y = nY + 10, text = _L['Team panel buff rule list'], font = 27 }, true):pos('BOTTOMRIGHT')
+			nX = 30
+			for _, p in ipairs(data.aCataclysmBuff or CONSTANT.EMPTY_TABLE) do
+				nX = nX + ui:append('WndButton2', {
+					x = nX, y = nY, w = 100,
+					text = MY_Cataclysm.EncodeBuffRule(p, true),
+					onclick = function()
+						local ui = UI(this)
+						MY_Cataclysm.OpenBuffRuleEditor(p, function(dat)
+							if dat then
+								for k, v in pairs(dat) do
+									if k ~= 'dwID' and k ~= 'nLevel' then
+										p[k] = v
+									end
+								end
+								ui:text(MY_Cataclysm.EncodeBuffRule(dat, true))
+							else
+								for k, v in ipairs(data.aCataclysmBuff) do
+									if v == p then
+										remove(data.aCataclysmBuff, k)
+										break
+									end
+								end
+								D.OpenSettingPanel(data, szType)
+							end
+							FireUIEvent('MY_TM_DATA_RELOAD', { [szType] = true })
+						end, true)
+					end,
+				}, true):width() + 5
+				if nX + 130 > nW then
+					nX = 30
+					nY = nY + BUTTON2_HEIGHT
+				end
+			end
+			nX = ui:append('WndButton2', {
+				x = nX, y = nY, w = 100,
+				text = _L['Add buff rule'],
+				onclick = function()
+					if not data.aCataclysmBuff then
+						data.aCataclysmBuff = {}
+					end
+					insert(data.aCataclysmBuff, {})
+					D.OpenSettingPanel(data, szType)
+					FireUIEvent('MY_TM_DATA_RELOAD', { [szType] = true })
 				end,
 			}, true):width() + 5
 			nY = nY + BUTTON2_HEIGHT

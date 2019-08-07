@@ -805,9 +805,9 @@ function D.OnBuff(dwCaster, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, d
 				if O.bPushTeamPanel and cfg.bTeamPanel and (not cfg.bOnlySelfSrc or dwSkillSrcID == MY_TM_CORE_PLAYERID) then
 					FireUIEvent('MY_RAID_REC_BUFF', dwCaster, {
 						dwID      = data.dwID,
-						nStackNum = data.nCount,
 						nLevel    = data.bCheckLevel and data.nLevel or 0,
 						nLevelEx  = data.nLevel,
+						nStackNum = data.nCount,
 						col       = data.col,
 						nIcon     = data.nIcon,
 						bOnlyMine = cfg.bOnlySelfSrc,
