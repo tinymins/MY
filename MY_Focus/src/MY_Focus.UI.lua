@@ -162,7 +162,7 @@ function D.UpdateItem(hItem, p)
 	local szVia, tRule = p.szVia, p.tRule
 	local bDeletable = p.bDeletable
 	local KObject, info, bInfo = LIB.GetObject(dwType, dwID)
-	local szName = tRule and tRule.szDisplay
+	local szName = tRule and LIB.ReplaceSensitiveWord(tRule.szDisplay)
 	if not szName or szName == '' then
 		szName = LIB.GetObjectName(KObject)
 	end
