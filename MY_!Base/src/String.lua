@@ -346,5 +346,5 @@ function LIB.ReplaceSensitiveWord(szText)
 	if not TextFilterReplace then
 		return szText
 	end
-	return TextFilterReplace(szText)
+	return select(2, TextFilterReplace(szText))
 end
