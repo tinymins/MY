@@ -299,7 +299,7 @@ end
 
 function D.DownloadData(info)
 	D.DownloadMeta(info, function(info)
-		local szUUID = 'Remote-' .. info.szDataURL:gsub('[^a-zA-Z0-9%]', '_') .. '-' .. GetStringCRC(info.szURL) .. '-' .. GetStringCRC(info.szVersion)
+		local szUUID = 'Remote-' .. info.szDataURL:gsub('[^a-zA-Z0-9%%]', '_') .. '-' .. GetStringCRC(info.szURL) .. '-' .. GetStringCRC(info.szVersion)
 		local LUA_CONFIG = { passphrase = MY_TM_DATA_PASSPHRASE, crc = true, compress = true }
 		local p = LIB.LoadLUAData(MY_TM_META_ROOT .. szUUID .. '.jx3dat', LUA_CONFIG)
 		if p and p.szVersion == info.szVersion and IsLocalFileExist(MY_TM_DATA_ROOT .. szUUID .. '.jx3dat') then
