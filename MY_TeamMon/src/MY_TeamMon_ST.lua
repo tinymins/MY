@@ -312,7 +312,7 @@ end
 -- 设置倒计时的名称和时间 用于动态改变分段倒计时
 function ST:SetInfo(tTime, nIcon)
 	if tTime.szName then
-		self.ui.txt:SetText(tTime.szName)
+		self.ui.txt:SetText(MY_TeamMon.FilterCustomText(tTime.szName))
 	end
 	if tTime.nTime then
 		self.ui:SetUserData(math.floor(tTime.nTime))

@@ -182,6 +182,16 @@ local function GetDataPath()
 	return szPath
 end
 
+local function FilterCustomText(szText)
+	if not szText then
+		return
+	end
+	if LIB.IsShieldedVersion(2) then
+		szText = wsub(szText, 1, 8)
+	end
+	return LIB.ReplaceSensitiveWord(szText)
+end
+
 function D.OnFrameCreate()
 	this:RegisterEvent('MY_TM_LOADING_END')
 	this:RegisterEvent('MY_TM_CREATE_CACHE')
@@ -745,7 +755,7 @@ function D.OnBuff(dwCaster, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, d
 				insert(xml, GetFormatText(_L['Get buff'], 44, 255, 255, 255))
 				insert(xml, GetFormatText(szName .. ' x' .. nCount, 44, 255, 255, 0))
 				if data.szNote then
-					insert(xml, GetFormatText(' ' .. data.szNote, 44, 255, 255, 255))
+					insert(xml, GetFormatText(' ' .. FilterCustomText(data.szNote), 44, 255, 255, 255))
 				end
 			else
 				insert(xml, GetFormatText(_L['Lose buff'], 44, 255, 255, 255))
@@ -904,7 +914,7 @@ function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
 				insert(xml, MY_TM_RIGHT_LINE)
 			end
 			if data.szNote then
-				insert(xml, ' ' .. GetFormatText(data.szNote, 44, 255, 255, 255))
+				insert(xml, ' ' .. GetFormatText(FilterCustomText(data.szNote), 44, 255, 255, 255))
 			end
 			local txt = GetPureText(concat(xml))
 			if O.bPushCenterAlarm and cfg.bCenterAlarm then
@@ -1048,7 +1058,7 @@ function D.OnNpcEvent(npc, bEnter)
 					insert(xml, GetFormatText(' x' .. nCount, 44, 255, 255, 0))
 				end
 				if data.szNote then
-					insert(xml, GetFormatText(' ' .. data.szNote, 44, 255, 255, 255))
+					insert(xml, GetFormatText(' ' .. FilterCustomText(data.szNote), 44, 255, 255, 255))
 				end
 			else
 				insert(xml, GetFormatText(_L['Disappear'], 44, 255, 255, 255))
@@ -1180,7 +1190,7 @@ function D.OnDoodadEvent(doodad, bEnter)
 					insert(xml, GetFormatText(' x' .. nCount, 44, 255, 255, 0))
 				end
 				if data.szNote then
-					insert(xml, GetFormatText(' ' .. data.szNote, 44, 255, 255, 255))
+					insert(xml, GetFormatText(' ' .. FilterCustomText(data.szNote), 44, 255, 255, 255))
 				end
 			else
 				insert(xml, GetFormatText(_L['Disappear'], 44, 255, 255, 255))
@@ -1283,7 +1293,7 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 			if data.szContent:find('$me') then
 				tInfo = { dwID = me.dwID, szName = me.szName }
 			end
-			local xml, txt = {}, data.szNote or szContent
+			local xml, txt = {}, FilterCustomText(data.szNote) or szContent
 			if tInfo and not data.szNote then
 				insert(xml, MY_TM_LEFT_LINE)
 				insert(xml, GetFormatText(szNpcName or _L['JX3'], 44, 255, 255, 0))
@@ -1428,7 +1438,7 @@ function D.OnNpcInfoChange(szEvent, dwTemplateID, nPer)
 						insert(xml, MY_TM_RIGHT_LINE)
 						insert(xml, GetFormatText(dwType == MY_TM_TYPE.NPC_LIFE and _L['\'s life remaining to '] or _L['\'s mana reaches '], 44, 255, 255, 255))
 						insert(xml, GetFormatText(' ' .. nVper .. '%', 44, 255, 255, 0))
-						insert(xml, GetFormatText(' ' .. vv[2], 44, 255, 255, 255))
+						insert(xml, GetFormatText(' ' .. FilterCustomText(vv[2]), 44, 255, 255, 255))
 						local txt = GetPureText(concat(xml))
 						if O.bPushCenterAlarm then
 							FireUIEvent('MY_TM_CA_CREATE', concat(xml), 3, true)
@@ -2000,6 +2010,7 @@ local settings = {
 		},
 		{
 			fields = {
+				FilterCustomText    = FilterCustomText   ,
 				Enable              = D.Enable           ,
 				GetTable            = D.GetTable         ,
 				GetDungeon          = D.GetDungeon       ,
