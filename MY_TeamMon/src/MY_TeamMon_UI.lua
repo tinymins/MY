@@ -44,18 +44,20 @@ if not LIB.AssertVersion('MY_TeamMon', _L['MY_TeamMon'], 0x2013500) then
 end
 
 local JsonEncode = LIB.JsonEncode
-local MY_TM_TYPE          = MY_TeamMon.MY_TM_TYPE
-local MY_TM_SCRUTINY_TYPE = MY_TeamMon.MY_TM_SCRUTINY_TYPE
-local MY_TM_DATA_ROOT     = MY_TeamMon.MY_TM_DATA_ROOT
-local MY_TMUI_INIFILE     = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI.ini'
-local MY_TMUI_ITEM_L      = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI_ITEM_L.ini'
-local MY_TMUI_TALK_L      = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI_TALK_L.ini'
-local MY_TMUI_ITEM_R      = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI_ITEM_R.ini'
-local MY_TMUI_TALK_R      = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI_TALK_R.ini'
-local MY_TMUI_TYPE        = { 'BUFF', 'DEBUFF', 'CASTING', 'NPC', 'DOODAD', 'CIRCLE', 'TALK', 'CHAT' }
-local MY_TMUI_SELECT_TYPE = MY_TMUI_TYPE[1]
-local MY_TMUI_SELECT_MAP  = _L['All data']
-local MY_TMUI_TREE_EXPAND = { true } -- 默认第一项展开
+local MY_TM_TYPE            = MY_TeamMon.MY_TM_TYPE
+local MY_TM_SCRUTINY_TYPE   = MY_TeamMon.MY_TM_SCRUTINY_TYPE
+local MY_TM_DATA_ROOT       = MY_TeamMon.MY_TM_DATA_ROOT
+local MY_TMUI_INIFILE       = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI.ini'
+local MY_TMUI_ITEM_L        = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI_ITEM_L.ini'
+local MY_TMUI_TALK_L        = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI_TALK_L.ini'
+local MY_TMUI_ITEM_R        = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI_ITEM_R.ini'
+local MY_TMUI_TALK_R        = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI_TALK_R.ini'
+local MY_TMUI_TYPE          = { 'BUFF', 'DEBUFF', 'CASTING', 'NPC', 'DOODAD', 'CIRCLE', 'TALK', 'CHAT' }
+local MY_TMUI_SELECT_TYPE   = MY_TMUI_TYPE[1]
+local MY_TMUI_SELECT_MAP    = _L['All data']
+local MY_TMUI_CATEGORY_ALL  = g_tStrings.STR_GUILD_ALL .. '/' .. g_tStrings.OTHER
+local MY_TMUI_TREE_EXPAND   = { [MY_TMUI_CATEGORY_ALL] = true } -- 默认第一项展开
+local MY_TMUI_ITEM_PER_PAGE = 27
 local MY_TMUI_SEARCH
 local MY_TMUI_DRAG          = false
 local MY_TMUI_GLOBAL_SEARCH = false
@@ -138,9 +140,9 @@ function D.OnFrameCreate()
 	this.hItemR = this:CreateItemData(MY_TMUI_ITEM_R, 'Handle_R')
 	this.hTalkR = this:CreateItemData(MY_TMUI_TALK_R, 'Handle_TALK_R')
 	-- tree
-	this.hTreeT = this:CreateItemData(MY_TMUI_INIFILE, 'TreeLeaf_Node')
-	this.hTreeC = this:CreateItemData(MY_TMUI_INIFILE, 'TreeLeaf_Content')
-	this.hTreeH = this:Lookup('PageSet_Main/WndScroll_Tree', 'Handle_Tree_List')
+	this.hTreeN = this:CreateItemData(MY_TMUI_INIFILE, 'Handle_TreeNode')
+	this.hTreeI = this:CreateItemData(MY_TMUI_INIFILE, 'Handle_TreeItem')
+	this.hTreeH = this:Lookup('PageSet_Main/WndScroll_Tree', '')
 
 	MY_TMUI_SEARCH = nil -- 重置搜索
 	MY_TMUI_GLOBAL_SEARCH = false
@@ -158,7 +160,7 @@ function D.OnFrameCreate()
 		end
 	end
 	ui:append('WndButton3', {
-		x = 840, y = 52, w = 140, h = 27,
+		x = 900, y = 52, w = 140, h = 27,
 		text = g_tStrings.SYS_MENU,
 		menu = function()
 			local menu = {}
@@ -227,13 +229,13 @@ function D.OnFrameCreate()
 		end,
 	})
 	uiPageSetMain:append('WndButton2', {
-		name = 'NewFace', x = 720, y = 40, text = _L['New Face'],
+		name = 'NewFace', x = 780, y = 40, text = _L['New Face'],
 		onclick = function()
 			Circle.OpenAddPanel(nil, nil, MY_TMUI_SELECT_MAP ~= _L['All data'] and LIB.GetMapInfo(MY_TMUI_SELECT_MAP))
 		end,
 	})
 	uiPageSetMain:append('WndButton2', {
-		x = 860, y = 40, text = _L['Clear record'],
+		x = 920, y = 40, text = _L['Clear record'],
 		onclick = function()
 			LIB.Confirm(_L['Confirm?'], function()
 				MY_TeamMon.ClearTemp(MY_TMUI_SELECT_TYPE)
@@ -264,9 +266,9 @@ function D.OnEvent(szEvent)
 			MY_TMUI_SELECT_MAP = arg0
 		end
 		if szEvent == 'MY_TMUI_DATA_RELOAD' or szEvent == 'CIRCLE_RELOAD' then
-			D.RefreshTable('L')
+			D.RefreshTable(this, 'L')
 		elseif szEvent == 'MY_TMUI_TEMP_RELOAD' then
-			D.RefreshTable('R')
+			D.RefreshTable(this, 'R')
 		end
 	end
 end
@@ -275,10 +277,10 @@ function D.OnFrameDragEnd()
 	MY_TMUI_ANCHOR = GetFrameAnchor(this)
 end
 
-function D.RefreshTable(szRefresh)
+function D.RefreshTable(frame, szRefresh)
 	if szRefresh == 'L' then
 		D.UpdateLList()
-		D.UpdateTree()
+		D.UpdateTree(frame)
 	elseif szRefresh == 'R' then
 		D.UpdateRList()
 	end
@@ -326,14 +328,15 @@ end
 
 function D.OnActivePage()
 	local nPage = this:GetActivePageIndex()
+	local frame = this:GetRoot()
 	MY_TMUI_SELECT_TYPE = MY_TMUI_TYPE[nPage + 1]
 	if MY_TMUI_SELECT_TYPE ~= 'CIRCLE' then
 		this:Lookup('NewFace'):Hide()
 	else
 		this:Lookup('NewFace'):Show()
 	end
-	D.RefreshTable('L')
-	D.RefreshTable('R')
+	D.RefreshTable(frame, 'L')
+	D.RefreshTable(frame, 'R')
 	FireUIEvent('MY_TMUI_SWITCH_PAGE')
 	D.ConflictCheck()
 	D.UpdateBG()
@@ -352,114 +355,138 @@ function D.UpdateBG()
 	end
 end
 
-function D.UpdateTree()
-	local frame     = D.GetFrame()
-	local nSelectID = MY_TMUI_SELECT_MAP
-	local tDungeon  = MY_TeamMon.GetDungeon()
-	local data      = MY_TeamMon.GetTable(MY_TMUI_SELECT_TYPE)
-	local dwMapID   = LIB.GetMapID()
-	local tCount    = {}
-	local hSelect
-	local function GetCount(data)
-		local nCount = data and #data or 0
-		if MY_TMUI_SEARCH and data then
-			nCount = 0
-			for k, v in ipairs(data) do
-				if D.CheckSearch(MY_TMUI_SELECT_TYPE, v) then
-					nCount = nCount + 1
-				end
-			end
-		end
-		return nCount
-	end
-	local function Format(hTreeT, hTreeC, key, ...)
-		local nCount = GetCount(data[key])
-		local szName = D.GetMapName(key) or key
-		local tFilter = { ... }
-		for i = 1, select('#', ...) do
-			szName = szName:gsub(tFilter[i], '') or szName
-		end
-		if key ~= _L['All data'] then
-			local szClassName = hTreeT.szName or hTreeT:Lookup(1):GetText()
-			hTreeT.szName = szClassName
-			tCount[hTreeT] = tCount[hTreeT] or 0
-			tCount[hTreeT] = tCount[hTreeT] + nCount
-			hTreeT:Lookup(1):SetText(szClassName .. ' ('.. tCount[hTreeT] .. ')')
-		end
-		hTreeC:Lookup(1):SetText(szName .. ' ('.. nCount .. ')')
-		hTreeC.dwMapID = key
-		hTreeC.nCount = nCount
-		if nCount == 0 then
-			hTreeC.col = { 168, 168, 168 }
-			hTreeC:Lookup(1):SetFontColor(168, 168, 168)
-		end
-		if nSelectID == key then
-			hTreeC:Lookup(0):Show()
-			hTreeC:Lookup(1):SetFontColor(255, 255, 0)
-			frame.hTreeH.hSelect = hTreeC
-		end
-		if dwMapID == key then
-			hSelect = hTreeT
-			hTreeC.col = { 168, 168, 255 }
-			hTreeC:Lookup(1):SetFontColor(168, 168, 255)
-		end
-	end
-	frame.hTreeH:Clear()
-	local hTreeT = frame.hTreeH:AppendItemFromData(frame.hTreeT)
-	hTreeT:Lookup(1):SetText(g_tStrings.STR_GUILD_ALL .. '/' .. g_tStrings.OTHER)
-	-- 全部 / 通用
-	local hTreeC = frame.hTreeH:AppendItemFromData(frame.hTreeC)
-	Format(hTreeT, hTreeC, _L['All data'])
-	local hTreeC = frame.hTreeH:AppendItemFromData(frame.hTreeC)
-	Format(hTreeT, hTreeC, -1)
-	-- 其他
+function D.UpdateTree(frame)
+	local data, aDungeon = MY_TeamMon.GetTable(MY_TMUI_SELECT_TYPE), {}
+	-- 全部/其他
+	local tCommon = {
+		szLayer3Name = MY_TMUI_CATEGORY_ALL,
+		aList = {
+			_L['All data'], -- 全部
+			-1, -- 通用
+		},
+	}
 	for k, v in pairs(data) do
 		if (k > 0 and not LIB.IsDungeonMap(k, true)) and (tonumber(k) and k > 0) then
-			local hTreeC = frame.hTreeH:AppendItemFromData(frame.hTreeC)
-			Format(hTreeT, hTreeC, k)
+			insert(tCommon.aList, k)
 		end
 	end
-	for _, v in ipairs(tDungeon) do
-		local hTreeT = frame.hTreeH:AppendItemFromData(frame.hTreeT)
-		hTreeT:Lookup(1):SetText(v.szLayer3Name)
+	insert(aDungeon, tCommon)
+	-- 副本
+	for _, v in ipairs(MY_TeamMon.GetDungeon()) do
+		insert(aDungeon, v)
+	end
+	-- 回收站
+	insert(aDungeon, {
+		szLayer3Name = _L['Recycle bin'],
+		aList = { -9 },
+	})
+	-- 渲染列表
+	local hList, hTreeNode, hTreeItem = frame.hTreeH
+	hList:Clear()
+	for i, v in ipairs(aDungeon) do
+		hTreeNode = hList:AppendItemFromData(frame.hTreeN)
+		hTreeNode.szKey = v.szLayer3Name
+		hTreeNode:Lookup('Text_TreeNode'):SetText(v.szLayer3Name)
 		for _, vv in ipairs(v.aList) do
-			local hTreeC = frame.hTreeH:AppendItemFromData(frame.hTreeC)
-			Format(hTreeT, hTreeC, vv, _L['Battle of Taiyuan'], _L['YongWangXingGong'], v.szLayer3Name)
-		end
-	end
-	local hTreeT = frame.hTreeH:AppendItemFromData(frame.hTreeT)
-	hTreeT:Lookup(1):SetText(_L['Recycle bin'])
-	local hTreeC = frame.hTreeH:AppendItemFromData(frame.hTreeC)
-	Format(hTreeT, hTreeC, -9)
-	if hSelect then
-		local hLocation = hSelect:Lookup('Image_Location')
-		local w, h = hSelect:Lookup(1):GetTextExtent()
-		hLocation:SetRelX(w)
-		hLocation:Show()
-		hSelect:FormatAllItemPos()
-	end
-	-- 还原列表展开
-	local n = 1
-	for i = 0, frame.hTreeH:GetItemCount() - 1 do
-		local item = frame.hTreeH:Lookup(i)
-		if item and item:GetIndent() == 0 then
-			if MY_TMUI_TREE_EXPAND[n] then
-				item:Expand()
+			hTreeItem = hList:AppendItemFromData(frame.hTreeI)
+			local aData = data[vv]
+			local nCount = aData and #aData or 0
+			if MY_TMUI_SEARCH and aData then
+				nCount = 0
+				for k, v in ipairs(aData) do
+					if D.CheckSearch(MY_TMUI_SELECT_TYPE, v) then
+						nCount = nCount + 1
+					end
+				end
+			end
+			local szName = D.GetMapName(vv)
+			if szName then
+				szName = wgsub(szName, _L['Battle of Taiyuan'], '') or szName
+				szName = wgsub(szName, _L['YongWangXingGong'], '') or szName
+				szName = wgsub(szName, v.szLayer3Name, '') or szName
 			else
-				item:Collapse()
+				szName = vv
 			end
-			if tCount[item] == 0 then
-				item:Lookup(1):SetFontColor(222, 222, 222)
+			if vv ~= _L['All data'] then
+				local szClassName = hTreeNode.szName or hTreeNode:Lookup('Text_TreeNode'):GetText()
+				hTreeNode.szName = szClassName
+				if not hTreeNode.nCount then
+					hTreeNode.nCount = 0
+				end
+				hTreeNode.nCount = hTreeNode.nCount + nCount
+				hTreeNode:Lookup('Text_TreeNode'):SetText(szClassName .. ' ('.. hTreeNode.nCount .. ')')
 			end
-			n = n + 1
+			hTreeItem:Lookup('Text_TreeItem'):SetText(szName .. ' ('.. nCount .. ')')
+			hTreeItem.dwMapID = vv
+			hTreeItem.nCount = nCount
+			hTreeItem:SetVisible(MY_TMUI_TREE_EXPAND[v.szLayer3Name])
+		end
+		D.UpdateTreeNodeMouseState(hTreeNode)
+	end
+	hList:FormatAllItemPos()
+	D.UpdateTreeStatus(frame)
+end
+
+function D.UpdateTreeNodeMouseState(hTreeNode)
+	local szStatus = MY_TMUI_TREE_EXPAND[hTreeNode.szKey] and 'Expand' or 'Collapse'
+	if hTreeNode.bMouseDown then
+		szStatus = szStatus .. 'Down'
+	elseif hTreeNode:IsMouseIn() then
+		szStatus = szStatus .. 'Hover'
+	end
+	hTreeNode:Lookup('Image_TreeNodeBg_Expand'):Hide()
+	hTreeNode:Lookup('Image_TreeNodeBg_ExpandDown'):Hide()
+	hTreeNode:Lookup('Image_TreeNodeBg_ExpandHover'):Hide()
+	hTreeNode:Lookup('Image_TreeNodeBg_Collapse'):Hide()
+	hTreeNode:Lookup('Image_TreeNodeBg_CollapseDown'):Hide()
+	hTreeNode:Lookup('Image_TreeNodeBg_CollapseHover'):Hide()
+	hTreeNode:Lookup('Image_TreeNodeBg_' .. szStatus):Show()
+end
+
+function D.UpdateTreeStatus(frame)
+	local dwCurrentMapID, dwSelectMapID = LIB.GetMapID(), MY_TMUI_SELECT_MAP
+	local hList, hTreeNode, hTreeItem = frame.hTreeH, nil
+	for i = 0, hList:GetItemCount() - 1 do
+		local el = hList:Lookup(i)
+		if el:GetName() == 'Handle_TreeNode' then
+			hTreeNode = el
+			if hTreeNode.nCount == 0 then
+				if not hTreeNode.col then
+					hTreeNode.col = {hTreeNode:Lookup('Text_TreeNode'):GetFontColor()}
+				end
+				hTreeNode:Lookup('Text_TreeNode'):SetFontColor(222, 222, 222)
+			end
+			hTreeNode:Lookup('Image_TreeNodeLocation'):Hide()
+		else
+			hTreeItem = el
+			if hTreeItem.nCount == 0 then
+				if not hTreeItem.col then
+					hTreeItem.col = {hTreeItem:Lookup('Text_TreeItem'):GetFontColor()}
+				end
+				hTreeItem:Lookup('Text_TreeItem'):SetFontColor(222, 222, 222)
+			end
+			if hTreeItem.dwMapID == dwCurrentMapID then
+				hTreeNode:Lookup('Image_TreeNodeLocation'):Show()
+			end
+			hTreeItem:Lookup('Image_TreeItemBg_Sel'):SetVisible(hTreeItem.dwMapID == dwSelectMapID)
+			hTreeItem:Lookup('Image_TreeItemLocation'):SetVisible(hTreeItem.dwMapID == dwCurrentMapID)
 		end
 	end
-	frame.hTreeH:FormatAllItemPos()
+end
+
+function D.OnLButtonClick()
+	local szName = this:GetName()
+	if szName == 'Btn_Close' then
+		D.ClosePanel()
+	end
 end
 
 function D.OnItemLButtonDown()
 	local szName = this:GetName()
-	if IsCtrlKeyDown() then
+	if szName == 'Handle_TreeNode' then
+		this.bMouseDown = true
+		D.UpdateTreeNodeMouseState(this)
+	elseif IsCtrlKeyDown() then
 		if szName == 'Handle_R' or szName == 'Handle_L' then
 			local data = {}
 			local szName
@@ -489,43 +516,33 @@ function D.OnItemLButtonDown()
 	end
 end
 
-function D.OnLButtonClick()
+function D.OnItemLButtonUp()
 	local szName = this:GetName()
-	if szName == 'Btn_Close' then
-		D.ClosePanel()
+	if szName == 'Handle_TreeNode' then
+		this.bMouseDown = nil
+		D.UpdateTreeNodeMouseState(this)
 	end
 end
 
 function D.OnItemLButtonClick()
 	local szName = this:GetName()
-	if szName == 'TreeLeaf_Node' then
-		if this:IsExpand() then
-			this:Collapse()
-		else
-			this:Expand()
-		end
-		local handle = this:GetParent()
-		MY_TMUI_TREE_EXPAND = {}
-		for i = 0, handle:GetItemCount() - 1 do
-			local item = handle:Lookup(i)
-			if item and item:GetIndent() == 0 then
-				insert(MY_TMUI_TREE_EXPAND, item:IsExpand())
+	if szName == 'Handle_TreeNode' then
+		MY_TMUI_TREE_EXPAND[this.szKey] = not MY_TMUI_TREE_EXPAND[this.szKey]
+		D.UpdateTreeNodeMouseState(this)
+		local nIndex = this:GetIndex()
+		local hList = this:GetParent()
+		for i = nIndex + 1, hList:GetItemCount() - 1 do
+			local hTreeItem = hList:Lookup(i)
+			if hTreeItem:GetName() ~= 'Handle_TreeItem' then
+				break
 			end
+			hTreeItem:SetVisible(MY_TMUI_TREE_EXPAND[this.szKey])
 		end
-		handle:FormatAllItemPos()
-	elseif szName == 'TreeLeaf_Content' then
-		-- 重新着色
-		local handle = this:GetParent()
-		if handle.hSelect and handle.hSelect:IsValid() then
-			handle.hSelect:Lookup(0):Hide()
-			local col = handle.hSelect.col and handle.hSelect.col or { 255, 255, 255 }
-			handle.hSelect:Lookup(1):SetFontColor(unpack(col))
-		end
-		this:Lookup(0):Show()
-		this:Lookup(1):SetFontColor(255, 255, 0)
-		handle.hSelect = this
-		-- 刷新数据
+		hList:FormatAllItemPos()
+	elseif szName == 'Handle_TreeItem' then
+		local frame = this:GetRoot()
 		MY_TMUI_SELECT_MAP = this.dwMapID
+		D.UpdateTreeStatus(frame)
 		D.UpdateLList()
 		D.UpdateBG()
 	elseif szName == 'Handle_L' then
@@ -542,13 +559,13 @@ end
 
 function D.OnItemRButtonClick()
 	local szName = this:GetName()
-	if szName == 'TreeLeaf_Content' then
+	if szName == 'Handle_TreeItem' then
 		local dwMapID = this.dwMapID
 		if dwMapID == _L['All data'] then
 			dwMapID = nil
 		end
 		local menu = {}
-		insert(menu, { szOption = this:Lookup(1):GetText(), bDisable = true })
+		insert(menu, { szOption = this:Lookup('Text_TreeItem'):GetText(), bDisable = true })
 		insert(menu, { bDevide = true })
 		insert(menu, { szOption = _L['Clear this map data'], rgb = { 255, 0, 0 }, fnAction = function()
 			if MY_TMUI_SELECT_TYPE == 'CIRCLE' then
@@ -647,13 +664,55 @@ function D.OnItemRButtonClick()
 	end
 end
 
+function D.OnItemMouseEnter()
+	local szName = this:GetName()
+	local x, y = this:GetAbsPos()
+	local w, h = this:GetSize()
+	if szName == 'Handle_TreeNode' then
+		if MY_TMUI_TREE_EXPAND[this.szKey] then
+			this:Lookup('Image_TreeNodeBg_ExpandHover'):Show()
+		else
+			this:Lookup('Image_TreeNodeBg_CollapseHover'):Show()
+		end
+	elseif szName == 'Handle_TreeItem' then
+		local info = IsNumber(this.dwMapID) and g_tTable.DungeonInfo:Search(this.dwMapID)
+		local szXml = GetFormatText((D.GetMapName(this.dwMapID) or this.dwMapID) ..' (' .. this.nCount ..  ')\n', 47, 255, 255, 0)
+		if info and LIB.TrimString(info.szBossInfo) ~= '' then
+			local tBoss = LIB.SplitString(info.szBossInfo, ' ')
+			for k, v in ipairs(tBoss or {}) do
+				if LIB.TrimString(v) ~= '' then
+					szXml = szXml .. GetFormatText(k .. ') ' .. v .. '\n', 47, 255, 255, 255)
+				end
+			end
+			szXml = szXml .. GetFormatImage(info.szDungeonImage3, 0, 200, 200)
+		end
+		if IsCtrlKeyDown() then
+			szXml = szXml .. GetFormatText('\n\n' .. g_tStrings.DEBUG_INFO_ITEM_TIP .. '\nMapID:' .. this.dwMapID, 47, 255, 0, 0)
+		end
+		OutputTip(szXml, 300, { x, y, w, h })
+	elseif szName == 'Handle_L' or szName == 'Handle_R' then
+		if MY_TMUI_SELECT_TYPE == 'TALK' or MY_TMUI_SELECT_TYPE == 'CHAT' then
+			this:Lookup('Image_Light'):Show()
+		else
+			this:Lookup('Image'):SetFrame(8)
+			local box = this:Lookup('Box')
+			box:SetObjectMouseOver(true)
+		end
+		if szName == 'Handle_R' and MY_TMUI_SELECT_TYPE == 'CIRCLE' then -- circle fix
+			D.OutputTip('NPC', this.dat, { x, y, w, h })
+		else
+			D.OutputTip(MY_TMUI_SELECT_TYPE, this.dat, { x, y, w, h })
+		end
+
+	end
+end
+
 function D.OnItemMouseLeave()
 	local szName = this:GetName()
-	if szName == 'TreeLeaf_Node' or szName == 'TreeLeaf_Content' then
-		local handle = this:GetParent()
-		if handle.hSelect ~= this and this:IsValid() and this:Lookup(0) and this:Lookup(0):IsValid() then
-			this:Lookup(0):Hide()
-		end
+	if szName == 'Handle_TreeNode' then
+		D.UpdateTreeNodeMouseState(this)
+	elseif szName == 'Handle_TreeItem' then
+		this:Lookup('Image_TreeItemBg_Hover'):Hide()
 	elseif szName == 'Handle_L' or szName == 'Handle_R' then
 		if MY_TMUI_SELECT_TYPE == 'TALK' or MY_TMUI_SELECT_TYPE == 'CHAT' then
 			if this:Lookup('Image_Light') and this:Lookup('Image_Light'):IsValid() then
@@ -672,46 +731,6 @@ function D.OnItemMouseLeave()
 	HideTip()
 end
 
-function D.OnItemMouseEnter()
-	local szName = this:GetName()
-	local x, y = this:GetAbsPos()
-	local w, h = this:GetSize()
-	if szName == 'TreeLeaf_Node' or szName == 'TreeLeaf_Content' then
-		this:Lookup(0):Show()
-		if szName == 'TreeLeaf_Content' then
-			local info = IsNumber(this.dwMapID) and g_tTable.DungeonInfo:Search(this.dwMapID)
-			local szXml = GetFormatText((D.GetMapName(this.dwMapID) or this.dwMapID) ..' (' .. this.nCount ..  ')\n', 47, 255, 255, 0)
-			if info and LIB.TrimString(info.szBossInfo) ~= '' then
-				local tBoss = LIB.SplitString(info.szBossInfo, ' ')
-				for k, v in ipairs(tBoss or {}) do
-					if LIB.TrimString(v) ~= '' then
-						szXml = szXml .. GetFormatText(k .. ') ' .. v .. '\n', 47, 255, 255, 255)
-					end
-				end
-				szXml = szXml .. GetFormatImage(info.szDungeonImage3, 0, 200, 200)
-			end
-			if IsCtrlKeyDown() then
-				szXml = szXml .. GetFormatText('\n\n' .. g_tStrings.DEBUG_INFO_ITEM_TIP .. '\nMapID:' .. this.dwMapID, 47, 255, 0, 0)
-			end
-			OutputTip(szXml, 300, { x, y, w, h })
-		end
-	elseif szName == 'Handle_L' or szName == 'Handle_R' then
-		if MY_TMUI_SELECT_TYPE == 'TALK' or MY_TMUI_SELECT_TYPE == 'CHAT' then
-			this:Lookup('Image_Light'):Show()
-		else
-			this:Lookup('Image'):SetFrame(8)
-			local box = this:Lookup('Box')
-			box:SetObjectMouseOver(true)
-		end
-		if szName == 'Handle_R' and MY_TMUI_SELECT_TYPE == 'CIRCLE' then -- circle fix
-			D.OutputTip('NPC', this.dat, { x, y, w, h })
-		else
-			D.OutputTip(MY_TMUI_SELECT_TYPE, this.dat, { x, y, w, h })
-		end
-
-	end
-end
-
 function D.OnItemLButtonDrag()
 	local szName = this:GetName()
 	if szName == 'Handle_L' or szName == 'Handle_R' then
@@ -725,7 +744,7 @@ function D.OnItemLButtonDragEnd()
 		return
 	end
 	local data, szAction = CloseDragPanel()
-	if szName == 'TreeLeaf_Content' then
+	if szName == 'Handle_TreeItem' then
 		if szAction:find('Handle.+L') then
 			if data and data.dwMapID ~= this.dwMapID then
 				if MY_TMUI_SELECT_TYPE == 'CIRCLE' then
@@ -767,7 +786,7 @@ function D.OnScrollBarPosChanged()
 		local handle = hWndScroll:Lookup('', string.format('Handle_%s_List_%s', MY_TMUI_SELECT_TYPE, dir))
 		local nPer = this:GetScrollPos() / math.max(1, this:GetStepCount())
 		local nCount = math.ceil(handle:GetItemCount() * nPer)
-		for i = math.max(0, nCount - 21), nCount + 21, 1 do -- 每次渲染两页
+		for i = math.max(0, nCount - MY_TMUI_ITEM_PER_PAGE), nCount + MY_TMUI_ITEM_PER_PAGE, 1 do -- 每次渲染两页
 			local h = handle:Lookup(i)
 			if h then
 				if not h.bDraw then
@@ -817,7 +836,7 @@ end
 function D.InsertDungeonMenu(menu, fnAction)
 	local me = GetClientPlayer()
 	local dwMapID = me.GetMapID()
-	local tDungeon =  MY_TeamMon.GetDungeon()
+	local aDungeon =  MY_TeamMon.GetDungeon()
 	local data = MY_TeamMon.GetTable(MY_TMUI_SELECT_TYPE)
 	insert(menu, { szOption = g_tStrings.CHANNEL_COMMON .. ' (' .. (data[-1] and #data[-1] or 0) .. ')', fnAction = function()
 		if fnAction then
@@ -825,7 +844,7 @@ function D.InsertDungeonMenu(menu, fnAction)
 		end
 	end })
 	insert(menu, { bDevide = true })
-	for k, v in ipairs(tDungeon) do
+	for k, v in ipairs(aDungeon) do
 		local tMenu = { szOption = v.szLayer3Name }
 		for _, vv in ipairs(v.aList) do
 			insert(tMenu, {
