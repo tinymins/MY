@@ -975,7 +975,7 @@ LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '#STORAGE_DATA', 200, function()
 	LIB.Ajax({
 		method = 'post',
 		payload = 'json',
-		url = 'http://data.jx3.derzh.com/api/storage',
+		url = 'http://storage.jx3.derzh.com/api/storage',
 		data = {
 			data = LIB.EncryptString(LIB.ConvertToUTF8(LIB.JsonEncode({
 				g = me.GetGlobalID(), f = me.dwForceID, e = me.GetTotalEquipScore(),
@@ -1036,7 +1036,7 @@ function LIB.StorageData(szKey, oData)
 		LIB.Ajax({
 			method = 'post',
 			payload = 'json',
-			url = 'http://data.jx3.derzh.com/api/storage',
+			url = 'http://storage.jx3.derzh.com/api/storage',
 			data = {
 				data =  LIB.EncryptString(LIB.JsonEncode({
 					g = me.GetGlobalID(), f = me.dwForceID, r = me.nRoleType,
