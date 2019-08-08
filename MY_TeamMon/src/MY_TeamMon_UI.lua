@@ -356,40 +356,56 @@ function D.UpdateBG()
 end
 
 function D.UpdateTree(frame)
-	local data, aDungeon = MY_TeamMon.GetTable(MY_TMUI_SELECT_TYPE), {}
+	local data, aGroupMap = MY_TeamMon.GetTable(MY_TMUI_SELECT_TYPE), {}
 	-- 全部/其他
 	local tCommon = {
-		szLayer3Name = MY_TMUI_CATEGORY_ALL,
-		aList = {
+		szGroup = MY_TMUI_CATEGORY_ALL,
+		aMapInfo = {
 			_L['All data'], -- 全部
 			-1, -- 通用
 		},
 	}
-	for k, v in pairs(data) do
-		if (k > 0 and not LIB.IsDungeonMap(k, true)) and (tonumber(k) and k > 0) then
-			insert(tCommon.aList, k)
-		end
-	end
-	insert(aDungeon, tCommon)
+	insert(aGroupMap, tCommon)
 	-- 副本
-	for _, v in ipairs(MY_TeamMon.GetDungeon()) do
-		insert(aDungeon, v)
+	for _, v in ipairs(LIB.GetTypeGroupMap()) do
+		insert(aGroupMap, v)
 	end
 	-- 回收站
-	insert(aDungeon, {
-		szLayer3Name = _L['Recycle bin'],
-		aList = { -9 },
+	insert(aGroupMap, {
+		szGroup = _L['Recycle bin'],
+		aMapInfo = { -9 },
 	})
+	-- 未知的
+	local tMapExist = {}
+	for _, v in ipairs(aGroupMap) do
+		for _, vv in ipairs(v.aMapInfo) do
+			if IsTable(vv) then
+				vv = vv.dwID
+			end
+			tMapExist[vv] = true
+		end
+	end
+	for k, v in pairs(data) do
+		if IsNumber(k) and not tMapExist[k] then
+			insert(tCommon.aMapInfo, k)
+		end
+	end
 	-- 渲染列表
 	local hList, hTreeNode, hTreeItem = frame.hTreeH
 	hList:Clear()
-	for i, v in ipairs(aDungeon) do
+	for i, v in ipairs(aGroupMap) do
 		hTreeNode = hList:AppendItemFromData(frame.hTreeN)
-		hTreeNode.szKey = v.szLayer3Name
-		hTreeNode:Lookup('Text_TreeNode'):SetText(v.szLayer3Name)
-		for _, vv in ipairs(v.aList) do
+		hTreeNode.szKey = v.szGroup
+		hTreeNode:Lookup('Text_TreeNode'):SetText(v.szGroup)
+		for _, vv in ipairs(v.aMapInfo) do
+			if not IsTable(vv) then
+				vv = {
+					dwID = vv,
+					szName = D.GetMapName(vv) or vv,
+				}
+			end
 			hTreeItem = hList:AppendItemFromData(frame.hTreeI)
-			local aData = data[vv]
+			local aData = data[vv.dwID]
 			local nCount = aData and #aData or 0
 			if MY_TMUI_SEARCH and aData then
 				nCount = 0
@@ -399,15 +415,7 @@ function D.UpdateTree(frame)
 					end
 				end
 			end
-			local szName = D.GetMapName(vv)
-			if szName then
-				szName = wgsub(szName, _L['Battle of Taiyuan'], '') or szName
-				szName = wgsub(szName, _L['YongWangXingGong'], '') or szName
-				szName = wgsub(szName, v.szLayer3Name, '') or szName
-			else
-				szName = vv
-			end
-			if vv ~= _L['All data'] then
+			if vv.dwID ~= _L['All data'] then
 				local szClassName = hTreeNode.szName or hTreeNode:Lookup('Text_TreeNode'):GetText()
 				hTreeNode.szName = szClassName
 				if not hTreeNode.nCount then
@@ -416,10 +424,10 @@ function D.UpdateTree(frame)
 				hTreeNode.nCount = hTreeNode.nCount + nCount
 				hTreeNode:Lookup('Text_TreeNode'):SetText(szClassName .. ' ('.. hTreeNode.nCount .. ')')
 			end
-			hTreeItem:Lookup('Text_TreeItem'):SetText(szName .. ' ('.. nCount .. ')')
-			hTreeItem.dwMapID = vv
+			hTreeItem:Lookup('Text_TreeItem'):SetText(vv.szName .. ' ('.. nCount .. ')')
+			hTreeItem.dwMapID = vv.dwID
 			hTreeItem.nCount = nCount
-			hTreeItem:SetVisible(MY_TMUI_TREE_EXPAND[v.szLayer3Name])
+			hTreeItem:SetVisible(MY_TMUI_TREE_EXPAND[v.szGroup])
 		end
 		D.UpdateTreeNodeMouseState(hTreeNode)
 	end
@@ -830,9 +838,8 @@ function D.OutputTip(szType, data, rect)
 end
 
 function D.InsertDungeonMenu(menu, fnAction)
-	local me = GetClientPlayer()
-	local dwMapID = me.GetMapID()
-	local aDungeon =  MY_TeamMon.GetDungeon()
+	local dwMapID = LIB.GetMapID()
+	local aDungeon =  LIB.GetTypeGroupMap()
 	local data = MY_TeamMon.GetTable(MY_TMUI_SELECT_TYPE)
 	insert(menu, { szOption = g_tStrings.CHANNEL_COMMON .. ' (' .. (data[-1] and #data[-1] or 0) .. ')', fnAction = function()
 		if fnAction then
@@ -841,17 +848,17 @@ function D.InsertDungeonMenu(menu, fnAction)
 	end })
 	insert(menu, { bDevide = true })
 	for k, v in ipairs(aDungeon) do
-		local tMenu = { szOption = v.szLayer3Name }
-		for _, vv in ipairs(v.aList) do
+		local tMenu = { szOption = v.szGroup }
+		for _, vv in ipairs(v.aMapInfo) do
 			insert(tMenu, {
-				szOption = Table_GetMapName(vv) .. ' (' .. (data[vv] and #data[vv] or 0) .. ')',
+				szOption = Table_GetMapName(vv.dwID) .. ' (' .. (data[vv.dwID] and #data[vv.dwID] or 0) .. ')',
 				rgb      = { 255, 128, 0 },
-				szIcon   = dwMapID == vv and 'ui/Image/Minimap/Minimap.uitex',
-				szLayer  = dwMapID == vv and 'ICON_RIGHT',
-				nFrame   = dwMapID == vv and 10,
+				szIcon   = dwMapID == vv.dwID and 'ui/Image/Minimap/Minimap.uitex',
+				szLayer  = dwMapID == vv.dwID and 'ICON_RIGHT',
+				nFrame   = dwMapID == vv.dwID and 10,
 				fnAction = function()
 					if fnAction then
-						fnAction(vv)
+						fnAction(vv.dwID)
 					end
 				end
 			})
@@ -1329,18 +1336,19 @@ function D.OpenAddPanel(szType, data)
 			text = MY_TMUI_SELECT_MAP ~= _L['All data'] and D.GetMapName(MY_TMUI_SELECT_MAP) or D.GetMapName(data.dwMapID),
 			autocomplete = {{'option', 'source', LIB.GetMapNameList()}},
 			onchange = function()
-				local me = this
-				if me:GetText() == '' then
+				local el = this
+				local ui = UI(el)
+				if ui:text() == '' then
 					local menu = {}
 					D.InsertDungeonMenu(menu, function(dwMapID)
-						me:SetText(D.GetMapName(dwMapID))
+						ui:text(D.GetMapName(dwMapID))
 					end)
 					local nX, nY = this:GetAbsPos()
 					local nW, nH = this:GetSize()
 					menu.nMiniWidth = nW
 					menu.x = nX
 					menu.y = nY + nH
-					menu.fnAutoClose = function() return not me or not me:IsValid() end
+					menu.fnAutoClose = function() return not el or not el:IsValid() end
 					menu.bShowKillFocus = true
 					menu.bDisableSound = true
 					PopupMenu(menu)

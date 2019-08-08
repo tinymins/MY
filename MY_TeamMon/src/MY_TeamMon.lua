@@ -125,7 +125,6 @@ local CACHE = {
 	DOODAD_LIST = {},
 	SKILL_LIST  = {},
 	INTERVAL    = {},
-	DUNGEON     = {},
 	STR         = {},
 }
 
@@ -1574,29 +1573,6 @@ function D.SaveData()
 	LIB.SaveLUAData(GetDataPath(), D.FILE)
 end
 
-function D.GetDungeon()
-	if IsEmpty(CACHE.DUNGEON) then
-		local tCache = {}
-		for k, v in ipairs_r(GetMapList()) do
-			if not CONSTANT.MAP_NAME_FIX[v] then
-				local a = g_tTable.DungeonInfo:Search(v) or {}
-				if a.dwClassID or not LIB.IsDungeonMap(v) and LIB.IsDungeonMap(v, true) then
-					a.dwClassID = a.dwClassID or 1
-					local szLayer3Name = a.dwClassID == 3 and a.szLayer3Name or g_tStrings.STR_FT_DUNGEON
-					if not tCache[szLayer3Name] then
-						local i = #CACHE.DUNGEON + 1
-						CACHE.DUNGEON[i] = { szLayer3Name = szLayer3Name, aList = {} }
-						tCache[szLayer3Name] = CACHE.DUNGEON[i]
-					end
-					insert(tCache[szLayer3Name].aList, v)
-				end
-			end
-		end
-		table.sort(CACHE.DUNGEON, function(a, b) return a.szLayer3Name > b.szLayer3Name end)
-	end
-	return CACHE.DUNGEON
-end
-
 -- 获取整个表
 function D.GetTable(szType, bTemp)
 	if bTemp then
@@ -2022,7 +1998,6 @@ local settings = {
 				FilterCustomText    = FilterCustomText   ,
 				Enable              = D.Enable           ,
 				GetTable            = D.GetTable         ,
-				GetDungeon          = D.GetDungeon       ,
 				GetData             = D.GetData          ,
 				GetIntervalData     = D.GetIntervalData  ,
 				RemoveData          = D.RemoveData       ,
