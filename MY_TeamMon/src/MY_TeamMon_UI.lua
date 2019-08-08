@@ -1208,6 +1208,9 @@ function D.GetMapName(dwMapID)
 	if dwMapID == _L['All data'] then
 		return dwMapID
 	end
+	if dwMapID == -9 then
+		return _L['Recycle bin']
+	end
 	local map = LIB.GetMapInfo(dwMapID)
 	return map and map.szName
 end
