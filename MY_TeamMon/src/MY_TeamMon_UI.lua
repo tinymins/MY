@@ -59,6 +59,7 @@ local MY_TMUI_CATEGORY_ALL  = g_tStrings.STR_GUILD_ALL .. '/' .. g_tStrings.OTHE
 local MY_TMUI_TREE_EXPAND   = { [MY_TMUI_CATEGORY_ALL] = true } -- 默认第一项展开
 local MY_TMUI_ITEM_PER_PAGE = 27
 local MY_TMUI_SEARCH
+local MY_TMUI_MAP_SEARCH
 local MY_TMUI_DRAG          = false
 local MY_TMUI_GLOBAL_SEARCH = false
 local MY_TMUI_SEARCH_CACHE  = {}
@@ -145,10 +146,15 @@ function D.OnFrameCreate()
 	this.hTreeH = this:Lookup('PageSet_Main/WndScroll_Tree', '')
 
 	MY_TMUI_SEARCH = nil -- 重置搜索
+	MY_TMUI_MAP_SEARCH = nil -- 重置搜索
 	MY_TMUI_GLOBAL_SEARCH = false
 	MY_TMUI_DRAG = false
 
 	this.hPageSet = this:Lookup('PageSet_Main')
+
+	this:Lookup('PageSet_Main/Wnd_SearchMap/Edit_SearchMap'):SetPlaceholderText(_L['Search map'])
+	this:Lookup('PageSet_Main/Wnd_SearchContent/Edit_SearchContent'):SetPlaceholderText(_L['Search content'])
+
 	local ui = UI(this)
 	ui:text(_L['MY_TeamMon config panel'])
 	for k, v in ipairs(MY_TMUI_TYPE) do
@@ -203,25 +209,8 @@ function D.OnFrameCreate()
 		})
 	end
 	local uiPageSetMain = ui:children('#PageSet_Main')
-	local uiSearch = uiPageSetMain:append('WndEditBox', {
-		name = 'WndEdit_Search',
-		x = 50, y = 38, w = 500, h = 25,
-		text = '', placeholder = g_tStrings.SEARCH,
-		onchange = function(szText)
-			if LIB.TrimString(szText) == '' then
-				MY_TMUI_SEARCH = nil
-			else
-				MY_TMUI_SEARCH = LIB.TrimString(szText)
-			end
-			FireUIEvent('MY_TMUI_TEMP_RELOAD')
-			FireUIEvent('MY_TMUI_DATA_RELOAD')
-		end,
-		onblur = function()
-			FireUIEvent('MY_TMUI_FREECACHE')
-		end,
-	}, true)
 	uiPageSetMain:append('WndCheckBox', {
-		x = 560, y = 38, checked = MY_TMUI_GLOBAL_SEARCH, text = _L['Global search'],
+		x = 575, y = 40, checked = MY_TMUI_GLOBAL_SEARCH, text = _L['Global search'],
 		oncheck = function(bCheck)
 			MY_TMUI_GLOBAL_SEARCH = bCheck
 			FireUIEvent('MY_TMUI_TEMP_RELOAD')
@@ -390,6 +379,32 @@ function D.UpdateTree(frame)
 			insert(tCommon.aMapInfo, k)
 		end
 	end
+	-- 格式化
+	for _, v in ipairs(aGroupMap) do
+		for i, vv in ipairs(v.aMapInfo) do
+			if not IsTable(vv) then
+				v.aMapInfo[i] = {
+					dwID = vv,
+					szName = D.GetMapName(vv) or tostring(vv),
+				}
+			end
+		end
+	end
+	-- 搜索
+	if MY_TMUI_MAP_SEARCH then
+		for i, v in ipairs_r(aGroupMap) do
+			if not wfind(v.szGroup, MY_TMUI_MAP_SEARCH) then
+				for i, vv in ipairs_r(v.aMapInfo) do
+					if not wfind(vv.szName, MY_TMUI_MAP_SEARCH) then
+						remove(v.aMapInfo, i)
+					end
+				end
+				if #v.aMapInfo == 0 then
+					remove(aGroupMap, i)
+				end
+			end
+		end
+	end
 	-- 渲染列表
 	local hList, hTreeNode, hTreeItem = frame.hTreeH
 	hList:Clear()
@@ -398,12 +413,6 @@ function D.UpdateTree(frame)
 		hTreeNode.szKey = v.szGroup
 		hTreeNode:Lookup('Text_TreeNode'):SetText(v.szGroup)
 		for _, vv in ipairs(v.aMapInfo) do
-			if not IsTable(vv) then
-				vv = {
-					dwID = vv,
-					szName = D.GetMapName(vv) or vv,
-				}
-			end
 			hTreeItem = hList:AppendItemFromData(frame.hTreeI)
 			local aData = data[vv.dwID]
 			local nCount = aData and #aData or 0
@@ -441,6 +450,9 @@ function D.UpdateTreeNodeMouseState(hTreeNode)
 		szStatus = szStatus .. 'Down'
 	elseif hTreeNode:IsMouseIn() then
 		szStatus = szStatus .. 'Hover'
+	end
+	if not hTreeNode:Lookup('Image_TreeNodeBg_Expand') then
+		return
 	end
 	hTreeNode:Lookup('Image_TreeNodeBg_Expand'):Hide()
 	hTreeNode:Lookup('Image_TreeNodeBg_ExpandDown'):Hide()
@@ -778,6 +790,35 @@ function D.OnItemLButtonDragEnd()
 	LIB.DelayCall(50, function() -- 由于 click在 dragend 之后
 		MY_TMUI_DRAG = false
 	end)
+end
+
+function D.OnEditChanged()
+	local name = this:GetName()
+	if name == 'Edit_SearchMap' then
+		local szText = LIB.TrimString(this:GetText())
+		if szText == '' then
+			MY_TMUI_MAP_SEARCH = nil
+		else
+			MY_TMUI_MAP_SEARCH = szText
+		end
+		D.UpdateTree(this:GetRoot())
+	elseif name == 'Edit_SearchContent' then
+		local szText = LIB.TrimString(this:GetText())
+		if szText == '' then
+			MY_TMUI_SEARCH = nil
+		else
+			MY_TMUI_SEARCH = szText
+		end
+		FireUIEvent('MY_TMUI_TEMP_RELOAD')
+		FireUIEvent('MY_TMUI_DATA_RELOAD')
+	end
+end
+
+function D.OnKillFocus()
+	local name = this:GetName()
+	if name == 'Edit_SearchContent' then
+		FireUIEvent('MY_TMUI_FREECACHE')
+	end
 end
 
 -- 优化核心函数 根据滚动条加载内容
