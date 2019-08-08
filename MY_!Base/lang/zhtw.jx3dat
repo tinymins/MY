@@ -438,4 +438,12 @@ data = {
 		'重製版', -- 2017-12-29
 		'世外蓬萊', -- 2018-12-21
 	},
+	MAP_GROUP = {
+		['Birth / School'] = '稻香村、門派',
+		['City / Old city'] = '主城',
+		['Village / Camp'] = '野外',
+		['Battle field / Arena'] = '戰場、競技場',
+		['Other dungeon'] = '其它秘境',
+		['Other'] = '其它地圖',
+	},
 }

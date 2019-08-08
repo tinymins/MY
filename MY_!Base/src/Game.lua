@@ -405,7 +405,8 @@ function LIB.GetTypeGroupMap()
 	tWeight[_L.MAP_GROUP['City / Old city']] = 99
 	tWeight[_L.MAP_GROUP['Village / Camp']] = 98
 	tWeight[_L.MAP_GROUP['Battle field / Arena']] = 97
-	tWeight[_L.MAP_GROUP['Other']] = 96
+	tWeight[_L.MAP_GROUP['Other dungeon']] = 96
+	tWeight[_L.MAP_GROUP['Other']] = 95
 	-- 获取副本类型
 	local tDungeon = {}
 	local nCount, tLine, szVersionName, szGroup, dwMapID = g_tTable.DungeonInfo:GetRowCount()
@@ -452,6 +453,8 @@ function LIB.GetTypeGroupMap()
 			szGroup = _L.MAP_GROUP['Battle field / Arena']
 		elseif tLine.szType == 'OTHER' or tLine.szType == '' then
 			szGroup = _L.MAP_GROUP['Other']
+		elseif tLine.szType == 'DUNGEON' or tLine.szType == 'RAID' then
+			szGroup = _L.MAP_GROUP['Other dungeon']
 		else
 			szGroup = nil
 		end
