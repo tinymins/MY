@@ -445,7 +445,7 @@ function D.UpdateTree(frame)
 end
 
 function D.UpdateTreeNodeMouseState(hTreeNode)
-	local szStatus = MY_TMUI_TREE_EXPAND[hTreeNode.szKey] and 'Expand' or 'Collapse'
+	local szStatus = MY_TMUI_TREE_EXPAND[hTreeNode.szKey] and 'Collapse' or 'Expand'
 	if hTreeNode.bMouseDown then
 		szStatus = szStatus .. 'Down'
 	elseif hTreeNode:IsMouseIn() then
