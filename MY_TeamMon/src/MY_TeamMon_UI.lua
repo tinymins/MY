@@ -669,11 +669,7 @@ function D.OnItemMouseEnter()
 	local x, y = this:GetAbsPos()
 	local w, h = this:GetSize()
 	if szName == 'Handle_TreeNode' then
-		if MY_TMUI_TREE_EXPAND[this.szKey] then
-			this:Lookup('Image_TreeNodeBg_ExpandHover'):Show()
-		else
-			this:Lookup('Image_TreeNodeBg_CollapseHover'):Show()
-		end
+		D.UpdateTreeNodeMouseState(this)
 	elseif szName == 'Handle_TreeItem' then
 		local info = IsNumber(this.dwMapID) and g_tTable.DungeonInfo:Search(this.dwMapID)
 		local szXml = GetFormatText((D.GetMapName(this.dwMapID) or this.dwMapID) ..' (' .. this.nCount ..  ')\n', 47, 255, 255, 0)
