@@ -128,10 +128,7 @@ local function ScanTeamMonRule(data)
 		insert(CTM_BUFF_TEAMMON, v)
 	end
 end
-local function onTeamMonUpdate()
-	if arg0 and not arg0['BUFF'] and not arg0['DEBUFF'] then
-		return
-	end
+local function UpdateTeamMonData()
 	CTM_BUFF_TEAMMON = {}
 	local aData = MY_TeamMon and MY_TeamMon.GetTable and MY_TeamMon.GetTable('BUFF')
 	if aData then
@@ -160,6 +157,13 @@ local function onTeamMonUpdate()
 		end
 	end
 	D.UpdateBuffListCache()
+end
+LIB.RegisterEvent('LOADING_ENDING.MY_CataclysmMain', UpdateTeamMonData)
+local function onTeamMonUpdate()
+	if arg0 and not arg0['BUFF'] and not arg0['DEBUFF'] then
+		return
+	end
+	UpdateTeamMonData()
 end
 LIB.RegisterEvent('MY_TM_DATA_RELOAD.MY_CataclysmMain', onTeamMonUpdate)
 end

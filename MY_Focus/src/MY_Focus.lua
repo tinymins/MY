@@ -980,10 +980,7 @@ function D.OnSetAncientStaticFocus()
 end
 
 do
-local function onTeamMonUpdate()
-	if arg0 and not arg0['NPC'] then
-		return
-	end
+local function UpdateTeamMonData()
 	D.TEAMMON_FOCUS = {}
 	local aData = MY_TeamMon and MY_TeamMon.GetTable and MY_TeamMon.GetTable('NPC')
 	if aData then
@@ -1005,6 +1002,13 @@ local function onTeamMonUpdate()
 		end
 	end
 	D.RescanNearby()
+end
+LIB.RegisterEvent('LOADING_ENDING.MY_Focus', onTeamMonUpdate)
+local function onTeamMonUpdate()
+	if arg0 and not arg0['NPC'] then
+		return
+	end
+	UpdateTeamMonData()
 end
 LIB.RegisterEvent('MY_TM_DATA_RELOAD.MY_Focus', onTeamMonUpdate)
 end
