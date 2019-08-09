@@ -11,7 +11,3 @@
 /*/src.lua
 \!src-dist/releases/
 \!src-dist/tools/targetmon-format/*.jx3dat
-MY_LifeBar/config/*/*.jx3dat
-MY_Resource/data/focus/*.jx3dat
-MY_Resource/data/targetmon/*.jx3dat
-MY_Resource/data/cataclysm/*/*.jx3dat
