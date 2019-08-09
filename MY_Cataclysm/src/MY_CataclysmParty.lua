@@ -42,7 +42,7 @@ local _L, D = LIB.LoadLangPack(PACKET_INFO.ROOT .. 'MY_Cataclysm/lang/'), {}
 -----------------------------------------------
 local Station, SetTarget = Station, SetTarget
 local Target_GetTargetData, Table_BuffIsVisible = Target_GetTargetData, Table_BuffIsVisible
-local MY_GetDistance, MY_GetBuff, GetEndTime, MY_GetObject = LIB.GetDistance, LIB.GetBuff, LIB.GetEndTime, LIB.GetObject
+local MY_GetDistance, MY_GetBuff, MY_GetEndTime, MY_GetObject = LIB.GetDistance, LIB.GetBuff, LIB.GetEndTime, LIB.GetObject
 local CFG                    = MY_Cataclysm.CFG
 local CTM_BG_COLOR_MODE      = MY_Cataclysm.BG_COLOR_MODE
 -- global STR cache
@@ -403,7 +403,7 @@ function MY_CataclysmParty_Base.OnItemLButtonClick()
 					info.szName,
 					LIB.GetBuffName(this.dwID, this.nLevel),
 					this.nStackNum or 1,
-					GetEndTime(this.nEndFrame)
+					MY_GetEndTime(this.nEndFrame)
 				)
 			)
 		elseif this.bRole and CFG.bAltView and (CFG.bAltViewInFight or not me.bFightState) then
@@ -433,7 +433,7 @@ local function OnItemRefreshTip()
 	local nX, nY = this:GetRoot():GetAbsPos()
 	local nW, nH = this:GetRoot():GetSize()
 	if this.bBuff then
-		LIB.OutputBuffTip({ nX, nY + 5, nW, nH }, this.dwID, this.nLevel, GetEndTime(this.nEndFrame), GetFormatText(this.szVia, 82))
+		LIB.OutputBuffTip({ nX, nY + 5, nW, nH }, this.dwID, this.nLevel, MY_GetEndTime(this.nEndFrame), GetFormatText(this.szVia, 82))
 	elseif this.bRole then
 		LIB.OutputTeamMemberTip({ nX, nY + 5, nW, nH }, this.dwID)
 	end
@@ -1529,7 +1529,7 @@ function D.UpdateCharaterBuff(p, handle, key, data, KBuff)
 			-- buff time
 			local txtTime = item:Lookup('Text_Time')
 			if CFG.bShowBuffTime then
-				local nTime, r, g, b = GetEndTime(nEndFrame)
+				local nTime, r, g, b = MY_GetEndTime(nEndFrame)
 				if nTime <= 5 then
 					if nTime >= 0 then
 						r, g, b = 255, 0, 0
