@@ -468,7 +468,7 @@ function CheckInvalidRect(dwType, dwID, me, object)
 				local KBuff = object.GetBuff(tData.dwBuffID, 0)
 				if KBuff then
 					nSec = (KBuff.GetEndTime() - GetLogicFrameCount()) / GLOBAL.GAME_FPS
-					szText = tData.szText
+					szText = tData.szText or LIB.GetBuffName(KBuff.dwID, KBuff.nLevel)
 					if KBuff.nStackNum > 1 then
 						szText = szText .. 'x' .. KBuff.nStackNum
 					end
@@ -481,15 +481,14 @@ function CheckInvalidRect(dwType, dwID, me, object)
 					szText = tData.szText or LIB.GetSkillName(dwSkillID, dwSkillLevel)
 				end
 			elseif tData.szType == 'NPC' or tData.szType == 'DOODAD' then
-				nSec = 5999
-				szText = tData.szText or LIB.GetObjectName(object)
+				szText = tData.szText or ''
 			else --if tData.szType == 'TIME' then
 				if tData.nLogicFrame then
 					nSec = (tData.nLogicFrame - GetLogicFrameCount()) / GLOBAL.GAME_FPS
 				elseif tData.nTime then
 					nSec = (tData.nTime - GetTime()) / 1000
 				end
-				szText = tData.szText
+				szText = tData.szText or ''
 			end
 			if nSec and nSec <= 0 then
 				nSec = nil
@@ -497,18 +496,20 @@ function CheckInvalidRect(dwType, dwID, me, object)
 			if fPer and fPer <= 0 then
 				fPer = nil
 			end
-			if (nSec or fPer) and szText and szText ~= '' then
+			if szText then
 				if tData.tColor then
 					r, g, b = unpack(tData.tColor)
 				end
 				nPriority = nPriority + 100000
 				fTextScale = fTextScale * 1.15
-				if nSec then
-					szCountDown = LIB.FormatTimeCounter(min(nSec, 5999), 1)
-				else
-					szCountDown = floor(fPer * 100) .. '%'
+				if not IsEmpty(szText) then
+					if nSec then
+						szCountDown = LIB.FormatTimeCounter(min(nSec, 5999), 1)
+					elseif fPer then
+						szCountDown = floor(fPer * 100) .. '%'
+					end
+					szCountDown = szText .. '_' .. szCountDown
 				end
-				szCountDown = szText .. '_' .. szCountDown
 				break
 			else
 				remove(aCountDown, 1)
