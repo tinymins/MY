@@ -88,8 +88,10 @@ local MY_TM_SHARE_QUEUE = {}
 local MY_TM_MARK_QUEUE  = {}
 local MY_TM_MARK_FREE   = true -- ±ê¼Ç¿ÕÏÐ
 ----
-local MY_TM_LEFT_LINE  = GetFormatText(_L['['], 44, 255, 255, 255)
-local MY_TM_RIGHT_LINE = GetFormatText(_L[']'], 44, 255, 255, 255)
+local MY_TM_LEFT_BRACKET      = _L['[']
+local MY_TM_RIGHT_BRACKET     = _L[']']
+local MY_TM_LEFT_BRACKET_XML  = GetFormatText(MY_TM_LEFT_BRACKET, 44, 255, 255, 255)
+local MY_TM_RIGHT_BRACKET_XML = GetFormatText(MY_TM_RIGHT_BRACKET, 44, 255, 255, 255)
 ----
 local MY_TM_TYPE_LIST = { 'BUFF', 'DEBUFF', 'CASTING', 'NPC', 'DOODAD', 'TALK', 'CHAT' }
 
@@ -747,9 +749,9 @@ function D.OnBuff(dwCaster, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, d
 			nIcon  = data.nIcon or nIcon
 			local szSrcName = LIB.GetObjectName(KObject)
 			local aXml = {}
-			insert(aXml, MY_TM_LEFT_LINE)
+			insert(aXml, MY_TM_LEFT_BRACKET_XML)
 			insert(aXml, GetFormatText(szSrcName == MY_TM_CORE_NAME and g_tStrings.STR_YOU or szSrcName, 44, 255, 255, 0))
-			insert(aXml, MY_TM_RIGHT_LINE)
+			insert(aXml, MY_TM_RIGHT_BRACKET_XML)
 			if nClass == MY_TM_TYPE.BUFF_GET then
 				insert(aXml, GetFormatText(_L['Get buff'], 44, 255, 255, 255))
 				insert(aXml, GetFormatText(szName .. ' x' .. nCount, 44, 255, 255, 0))
@@ -895,22 +897,22 @@ function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
 		D.CountdownEvent(data, nClass)
 		if cfg then
 			local aXml = {}
-			insert(aXml, MY_TM_LEFT_LINE)
+			insert(aXml, MY_TM_LEFT_BRACKET_XML)
 			insert(aXml, GetFormatText(szSrcName, 44, 255, 255, 0))
-			insert(aXml, MY_TM_RIGHT_LINE)
+			insert(aXml, MY_TM_RIGHT_BRACKET_XML)
 			if nClass == MY_TM_TYPE.SKILL_END then
 				insert(aXml, GetFormatText(_L['use of'], 44, 255, 255, 255))
 			else
 				insert(aXml, GetFormatText(_L['Casting'], 44, 255, 255, 255))
 			end
-			insert(aXml, MY_TM_LEFT_LINE)
+			insert(aXml, MY_TM_LEFT_BRACKET_XML)
 			insert(aXml, GetFormatText(data.szName or szName, 44, 255, 255, 0))
-			insert(aXml, MY_TM_RIGHT_LINE)
+			insert(aXml, MY_TM_RIGHT_BRACKET_XML)
 			if data.bMonTarget and szTargetName then
 				insert(aXml, GetFormatText(g_tStrings.TARGET, 44, 255, 255, 255))
-				insert(aXml, MY_TM_LEFT_LINE)
+				insert(aXml, MY_TM_LEFT_BRACKET_XML)
 				insert(aXml, GetFormatText(szTargetName == MY_TM_CORE_NAME and g_tStrings.STR_YOU or szTargetName, 44, 255, 255, 0))
-				insert(aXml, MY_TM_RIGHT_LINE)
+				insert(aXml, MY_TM_RIGHT_BRACKET_XML)
 			end
 			if data.szNote then
 				insert(aXml, ' ' .. GetFormatText(FilterCustomText(data.szNote), 44, 255, 255, 255))
@@ -1048,9 +1050,9 @@ function D.OnNpcEvent(npc, bEnter)
 		if cfg then
 			local szName = LIB.GetObjectName(npc)
 			local aXml = {}
-			insert(aXml, MY_TM_LEFT_LINE)
+			insert(aXml, MY_TM_LEFT_BRACKET_XML)
 			insert(aXml, GetFormatText(data.szName or szName, 44, 255, 255, 0))
-			insert(aXml, MY_TM_RIGHT_LINE)
+			insert(aXml, MY_TM_RIGHT_BRACKET_XML)
 			if nClass == MY_TM_TYPE.NPC_ENTER then
 				insert(aXml, GetFormatText(_L['Appear'], 44, 255, 255, 255))
 				if nCount > 1 then
@@ -1180,9 +1182,9 @@ function D.OnDoodadEvent(doodad, bEnter)
 		if cfg then
 			local szName = doodad.szName
 			local aXml = {}
-			insert(aXml, MY_TM_LEFT_LINE)
+			insert(aXml, MY_TM_LEFT_BRACKET_XML)
 			insert(aXml, GetFormatText(data.szName or szName, 44, 255, 255, 0))
-			insert(aXml, MY_TM_RIGHT_LINE)
+			insert(aXml, MY_TM_RIGHT_BRACKET_XML)
 			if nClass == MY_TM_TYPE.DOODAD_ENTER then
 				insert(aXml, GetFormatText(_L['Appear'], 44, 255, 255, 255))
 				if nCount > 1 then
@@ -1294,13 +1296,13 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 			end
 			local aXml, szText = {}, FilterCustomText(data.szNote) or szContent
 			if tInfo and not data.szNote then
-				insert(aXml, MY_TM_LEFT_LINE)
+				insert(aXml, MY_TM_LEFT_BRACKET_XML)
 				insert(aXml, GetFormatText(szNpcName or _L['JX3'], 44, 255, 255, 0))
-				insert(aXml, MY_TM_RIGHT_LINE)
+				insert(aXml, MY_TM_RIGHT_BRACKET_XML)
 				insert(aXml, GetFormatText(_L['is calling'], 44, 255, 255, 255))
-				insert(aXml, MY_TM_LEFT_LINE)
+				insert(aXml, MY_TM_LEFT_BRACKET_XML)
 				insert(aXml, GetFormatText(tInfo.szName == me.szName and g_tStrings.STR_YOU or tInfo.szName, 44, 255, 255, 0))
-				insert(aXml, MY_TM_RIGHT_LINE)
+				insert(aXml, MY_TM_RIGHT_BRACKET_XML)
 				insert(aXml, GetFormatText(_L['\'s name.'], 44, 255, 255, 255))
 				szText = GetPureText(concat(aXml))
 			end
@@ -1432,9 +1434,9 @@ function D.OnNpcInfoChange(szEvent, dwTemplateID, nPer)
 					if nVper == nPer then -- hit
 						local szName = v.szName or LIB.GetTemplateName(dwTemplateID)
 						local aXml = {}
-						insert(aXml, MY_TM_LEFT_LINE)
+						insert(aXml, MY_TM_LEFT_BRACKET_XML)
 						insert(aXml, GetFormatText(szName, 44, 255, 255, 0))
-						insert(aXml, MY_TM_RIGHT_LINE)
+						insert(aXml, MY_TM_RIGHT_BRACKET_XML)
 						insert(aXml, GetFormatText(dwType == MY_TM_TYPE.NPC_LIFE and _L['\'s life remaining to '] or _L['\'s mana reaches '], 44, 255, 255, 255))
 						insert(aXml, GetFormatText(' ' .. nVper .. '%', 44, 255, 255, 0))
 						insert(aXml, GetFormatText(' ' .. FilterCustomText(vv[2]), 44, 255, 255, 255))
