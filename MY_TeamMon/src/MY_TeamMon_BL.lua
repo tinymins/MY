@@ -38,6 +38,7 @@ local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.G
 local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
 -----------------------------------------------------------------------------------------------------------
 local GetBuff = LIB.GetBuff
+local FilterCustomText = MY_TeamMon.FilterCustomText
 
 local _L = LIB.LoadLangPack(PACKET_INFO.ROOT .. 'MY_TeamMon/lang/')
 if not LIB.AssertVersion('MY_TeamMon_BL', _L['MY_TeamMon_BL'], 0x2013500) then
@@ -76,7 +77,7 @@ local function CreateBuffList(dwID, nLevel, col, tArgs)
 		local szName, nIcon = LIB.GetBuffName(dwID, nLevel)
 		ui.dwID = dwID
 		ui.nLevel = level
-		ui:Lookup('Text_Name'):SetText(tArgs.szName or szName)
+		ui:Lookup('Text_Name'):SetText(FilterCustomText(tArgs.szName) or szName)
 		ui:Lookup('Text_Name'):SetFontColor(unpack(col))
 		local box = ui:Lookup('Box')
 		box:SetObjectIcon(tArgs.nIcon or nIcon)
