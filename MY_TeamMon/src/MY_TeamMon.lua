@@ -38,9 +38,10 @@ local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.G
 local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
 -----------------------------------------------------------------------------------------------------------
 local FireUIEvent, Table_BuffIsVisible, Table_IsSkillShow = FireUIEvent, Table_BuffIsVisible, Table_IsSkillShow
-local GetPureText, GetFormatText, GetHeadTextForceFontColor = GetPureText, GetFormatText, GetHeadTextForceFontColor
+local GetHeadTextForceFontColor = GetHeadTextForceFontColor
 local TargetPanel_SetOpenState = TargetPanel_SetOpenState
 local SplitString, TrimString = LIB.SplitString, LIB.TrimString
+local MY_GetFormatText, MY_GetPureText = LIB.GetFormatText, LIB.GetPureText
 
 local _L = LIB.LoadLangPack(PACKET_INFO.ROOT .. 'MY_TeamMon/lang/')
 if not LIB.AssertVersion('MY_TeamMon', _L['MY_TeamMon'], 0x2013500) then
@@ -90,8 +91,8 @@ local MY_TM_MARK_FREE   = true -- 标记空闲
 ----
 local MY_TM_LEFT_BRACKET      = _L['[']
 local MY_TM_RIGHT_BRACKET     = _L[']']
-local MY_TM_LEFT_BRACKET_XML  = GetFormatText(MY_TM_LEFT_BRACKET, 44, 255, 255, 255)
-local MY_TM_RIGHT_BRACKET_XML = GetFormatText(MY_TM_RIGHT_BRACKET, 44, 255, 255, 255)
+local MY_TM_LEFT_BRACKET_XML  = MY_GetFormatText(MY_TM_LEFT_BRACKET, 44, 255, 255, 255)
+local MY_TM_RIGHT_BRACKET_XML = MY_GetFormatText(MY_TM_RIGHT_BRACKET, 44, 255, 255, 255)
 ----
 local MY_TM_TYPE_LIST = { 'BUFF', 'DEBUFF', 'CASTING', 'NPC', 'DOODAD', 'TALK', 'CHAT' }
 
@@ -191,6 +192,19 @@ local function FilterCustomText(szText)
 		szText = wsub(szText, 1, 8)
 	end
 	return LIB.ReplaceSensitiveWord(szText)
+end
+
+local function ConstructSpeech(aText, aXml, szText, nFont, nR, nG, nB)
+	if aXml then
+		if IsString(nFont) then
+			insert(aXml, nFont)
+		else
+			insert(aXml, MY_GetFormatText(szText, nFont, nR, nG, nB))
+		end
+	end
+	if aText then
+		insert(aXml, szText)
+	end
 end
 
 function D.OnFrameCreate()
@@ -325,7 +339,7 @@ function D.OnEvent(szEvent)
 		end
 	elseif szEvent == 'PLAYER_SAY' then
 		if not IsPlayer(arg1) then
-			local szText = GetPureText(arg0)
+			local szText = MY_GetPureText(arg0)
 			if szText and szText ~= '' then
 				D.OnCallMessage('TALK', szText, arg1, arg3 == '' and '%' or arg3)
 			else
@@ -748,23 +762,23 @@ function D.OnBuff(dwCaster, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, d
 			szName = data.szName or szName
 			nIcon  = data.nIcon or nIcon
 			local szSrcName = LIB.GetObjectName(KObject)
-			local aXml = {}
-			insert(aXml, MY_TM_LEFT_BRACKET_XML)
-			insert(aXml, GetFormatText(szSrcName == MY_TM_CORE_NAME and g_tStrings.STR_YOU or szSrcName, 44, 255, 255, 0))
-			insert(aXml, MY_TM_RIGHT_BRACKET_XML)
+			local aXml, aText = {}, {}
+			ConstructSpeech(aText, aXml, MY_TM_LEFT_BRACKET, MY_TM_LEFT_BRACKET_XML)
+			ConstructSpeech(aText, aXml, szSrcName == MY_TM_CORE_NAME and g_tStrings.STR_YOU or szSrcName, 44, 255, 255, 0)
+			ConstructSpeech(aText, aXml, MY_TM_RIGHT_BRACKET, MY_TM_RIGHT_BRACKET_XML)
 			if nClass == MY_TM_TYPE.BUFF_GET then
-				insert(aXml, GetFormatText(_L['Get buff'], 44, 255, 255, 255))
-				insert(aXml, GetFormatText(szName .. ' x' .. nCount, 44, 255, 255, 0))
+				ConstructSpeech(aText, aXml, _L['Get buff'], 44, 255, 255, 255)
+				ConstructSpeech(aText, aXml, szName .. ' x' .. nCount, 44, 255, 255, 0)
 				if data.szNote then
-					insert(aXml, GetFormatText(' ' .. FilterCustomText(data.szNote), 44, 255, 255, 255))
+					ConstructSpeech(aText, aXml, ' ' .. FilterCustomText(data.szNote), 44, 255, 255, 255)
 				end
 			else
-				insert(aXml, GetFormatText(_L['Lose buff'], 44, 255, 255, 255))
-				insert(aXml, GetFormatText(szName, 44, 255, 255, 0))
+				ConstructSpeech(aText, aXml, _L['Lose buff'], 44, 255, 255, 255)
+				ConstructSpeech(aText, aXml, szName, 44, 255, 255, 0)
 			end
-			local szText = GetPureText(concat(aXml))
+			local szXml, szText = concat(aXml), concat(aText)
 			if O.bPushCenterAlarm and cfg.bCenterAlarm then
-				FireUIEvent('MY_TM_CA_CREATE', concat(aXml), 3, true)
+				FireUIEvent('MY_TM_CA_CREATE', szXml, 3, true)
 			end
 			-- 特大文字
 			if O.bPushBigFontAlarm and cfg.bBigFontAlarm and (MY_TM_CORE_PLAYERID == dwCaster or not IsPlayer(dwCaster)) then
@@ -896,30 +910,30 @@ function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
 		end
 		D.CountdownEvent(data, nClass)
 		if cfg then
-			local aXml = {}
-			insert(aXml, MY_TM_LEFT_BRACKET_XML)
-			insert(aXml, GetFormatText(szSrcName, 44, 255, 255, 0))
-			insert(aXml, MY_TM_RIGHT_BRACKET_XML)
+			local aXml, aText = {}, {}
+			ConstructSpeech(aText, aXml, MY_TM_LEFT_BRACKET, MY_TM_LEFT_BRACKET_XML)
+			ConstructSpeech(aText, aXml, szSrcName, 44, 255, 255, 0)
+			ConstructSpeech(aText, aXml, MY_TM_RIGHT_BRACKET, MY_TM_RIGHT_BRACKET_XML)
 			if nClass == MY_TM_TYPE.SKILL_END then
-				insert(aXml, GetFormatText(_L['use of'], 44, 255, 255, 255))
+				ConstructSpeech(aText, aXml, _L['use of'], 44, 255, 255, 255)
 			else
-				insert(aXml, GetFormatText(_L['Casting'], 44, 255, 255, 255))
+				ConstructSpeech(aText, aXml, _L['Casting'], 44, 255, 255, 255)
 			end
-			insert(aXml, MY_TM_LEFT_BRACKET_XML)
-			insert(aXml, GetFormatText(data.szName or szName, 44, 255, 255, 0))
-			insert(aXml, MY_TM_RIGHT_BRACKET_XML)
+			ConstructSpeech(aText, aXml, MY_TM_LEFT_BRACKET, MY_TM_LEFT_BRACKET_XML)
+			ConstructSpeech(aText, aXml, data.szName or szName, 44, 255, 255, 0)
+			ConstructSpeech(aText, aXml, MY_TM_RIGHT_BRACKET, MY_TM_RIGHT_BRACKET_XML)
 			if data.bMonTarget and szTargetName then
-				insert(aXml, GetFormatText(g_tStrings.TARGET, 44, 255, 255, 255))
-				insert(aXml, MY_TM_LEFT_BRACKET_XML)
-				insert(aXml, GetFormatText(szTargetName == MY_TM_CORE_NAME and g_tStrings.STR_YOU or szTargetName, 44, 255, 255, 0))
-				insert(aXml, MY_TM_RIGHT_BRACKET_XML)
+				ConstructSpeech(aText, aXml, g_tStrings.TARGET, 44, 255, 255, 255)
+				ConstructSpeech(aText, aXml, MY_TM_LEFT_BRACKET, MY_TM_LEFT_BRACKET_XML)
+				ConstructSpeech(aText, aXml, szTargetName == MY_TM_CORE_NAME and g_tStrings.STR_YOU or szTargetName, 44, 255, 255, 0)
+				ConstructSpeech(aText, aXml, MY_TM_RIGHT_BRACKET, MY_TM_RIGHT_BRACKET_XML)
 			end
 			if data.szNote then
-				insert(aXml, ' ' .. GetFormatText(FilterCustomText(data.szNote), 44, 255, 255, 255))
+				ConstructSpeech(aText, aXml, ' ' .. FilterCustomText(data.szNote), 44, 255, 255, 255)
 			end
-			local szText = GetPureText(concat(aXml))
+			local szXml, szText = concat(aXml), concat(aText)
 			if O.bPushCenterAlarm and cfg.bCenterAlarm then
-				FireUIEvent('MY_TM_CA_CREATE', concat(aXml), 3, true)
+				FireUIEvent('MY_TM_CA_CREATE', szXml, 3, true)
 			end
 			-- 特大文字
 			if O.bPushBigFontAlarm and cfg.bBigFontAlarm then
@@ -1049,25 +1063,24 @@ function D.OnNpcEvent(npc, bEnter)
 		D.CountdownEvent(data, nClass)
 		if cfg then
 			local szName = LIB.GetObjectName(npc)
-			local aXml = {}
-			insert(aXml, MY_TM_LEFT_BRACKET_XML)
-			insert(aXml, GetFormatText(data.szName or szName, 44, 255, 255, 0))
-			insert(aXml, MY_TM_RIGHT_BRACKET_XML)
+			local aXml, aText = {}, {}
+			ConstructSpeech(aText, aXml, MY_TM_LEFT_BRACKET, MY_TM_LEFT_BRACKET_XML)
+			ConstructSpeech(aText, aXml, data.szName or szName, 44, 255, 255, 0)
+			ConstructSpeech(aText, aXml, MY_TM_RIGHT_BRACKET, MY_TM_RIGHT_BRACKET_XML)
 			if nClass == MY_TM_TYPE.NPC_ENTER then
-				insert(aXml, GetFormatText(_L['Appear'], 44, 255, 255, 255))
+				ConstructSpeech(aText, aXml, _L['Appear'], 44, 255, 255, 255)
 				if nCount > 1 then
-					insert(aXml, GetFormatText(' x' .. nCount, 44, 255, 255, 0))
+					ConstructSpeech(aText, aXml, ' x' .. nCount, 44, 255, 255, 0)
 				end
 				if data.szNote then
-					insert(aXml, GetFormatText(' ' .. FilterCustomText(data.szNote), 44, 255, 255, 255))
+					ConstructSpeech(aText, aXml, ' ' .. FilterCustomText(data.szNote), 44, 255, 255, 255)
 				end
 			else
-				insert(aXml, GetFormatText(_L['Disappear'], 44, 255, 255, 255))
+				ConstructSpeech(aText, aXml, _L['Disappear'], 44, 255, 255, 255)
 			end
-
-			local szText = GetPureText(concat(aXml))
+			local szXml, szText = concat(aXml), concat(aText)
 			if O.bPushCenterAlarm and cfg.bCenterAlarm then
-				FireUIEvent('MY_TM_CA_CREATE', concat(aXml), 3, true)
+				FireUIEvent('MY_TM_CA_CREATE', szXml, 3, true)
 			end
 			-- 特大文字
 			if O.bPushBigFontAlarm and cfg.bBigFontAlarm then
@@ -1181,25 +1194,24 @@ function D.OnDoodadEvent(doodad, bEnter)
 		D.CountdownEvent(data, nClass)
 		if cfg then
 			local szName = doodad.szName
-			local aXml = {}
-			insert(aXml, MY_TM_LEFT_BRACKET_XML)
-			insert(aXml, GetFormatText(data.szName or szName, 44, 255, 255, 0))
-			insert(aXml, MY_TM_RIGHT_BRACKET_XML)
+			local aXml, aText = {}, {}
+			ConstructSpeech(aText, aXml, MY_TM_LEFT_BRACKET, MY_TM_LEFT_BRACKET_XML)
+			ConstructSpeech(aText, aXml, data.szName or szName, 44, 255, 255, 0)
+			ConstructSpeech(aText, aXml, MY_TM_RIGHT_BRACKET, MY_TM_RIGHT_BRACKET_XML)
 			if nClass == MY_TM_TYPE.DOODAD_ENTER then
-				insert(aXml, GetFormatText(_L['Appear'], 44, 255, 255, 255))
+				ConstructSpeech(aText, aXml, _L['Appear'], 44, 255, 255, 255)
 				if nCount > 1 then
-					insert(aXml, GetFormatText(' x' .. nCount, 44, 255, 255, 0))
+					ConstructSpeech(aText, aXml, ' x' .. nCount, 44, 255, 255, 0)
 				end
 				if data.szNote then
-					insert(aXml, GetFormatText(' ' .. FilterCustomText(data.szNote), 44, 255, 255, 255))
+					ConstructSpeech(aText, aXml, ' ' .. FilterCustomText(data.szNote), 44, 255, 255, 255)
 				end
 			else
-				insert(aXml, GetFormatText(_L['Disappear'], 44, 255, 255, 255))
+				ConstructSpeech(aText, aXml, _L['Disappear'], 44, 255, 255, 255)
 			end
-
-			local szText = GetPureText(concat(aXml))
+			local szXml, szText = concat(aXml), concat(aText)
 			if O.bPushCenterAlarm and cfg.bCenterAlarm then
-				FireUIEvent('MY_TM_CA_CREATE', concat(aXml), 3, true)
+				FireUIEvent('MY_TM_CA_CREATE', szXml, 3, true)
 			end
 			-- 特大文字
 			if O.bPushBigFontAlarm and cfg.bBigFontAlarm then
@@ -1294,18 +1306,20 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 			if data.szContent:find('$me') then
 				tInfo = { dwID = me.dwID, szName = me.szName }
 			end
-			local aXml, szText = {}, FilterCustomText(data.szNote) or szContent
+			local aXml, aText = {}, {}
 			if tInfo and not data.szNote then
-				insert(aXml, MY_TM_LEFT_BRACKET_XML)
-				insert(aXml, GetFormatText(szNpcName or _L['JX3'], 44, 255, 255, 0))
-				insert(aXml, MY_TM_RIGHT_BRACKET_XML)
-				insert(aXml, GetFormatText(_L['is calling'], 44, 255, 255, 255))
-				insert(aXml, MY_TM_LEFT_BRACKET_XML)
-				insert(aXml, GetFormatText(tInfo.szName == me.szName and g_tStrings.STR_YOU or tInfo.szName, 44, 255, 255, 0))
-				insert(aXml, MY_TM_RIGHT_BRACKET_XML)
-				insert(aXml, GetFormatText(_L['\'s name.'], 44, 255, 255, 255))
-				szText = GetPureText(concat(aXml))
+				ConstructSpeech(aText, aXml, MY_TM_LEFT_BRACKET, MY_TM_LEFT_BRACKET_XML)
+				ConstructSpeech(aText, aXml, szNpcName or _L['JX3'], 44, 255, 255, 0)
+				ConstructSpeech(aText, aXml, MY_TM_RIGHT_BRACKET, MY_TM_RIGHT_BRACKET_XML)
+				ConstructSpeech(aText, aXml, _L['is calling'], 44, 255, 255, 255)
+				ConstructSpeech(aText, aXml, MY_TM_LEFT_BRACKET, MY_TM_LEFT_BRACKET_XML)
+				ConstructSpeech(aText, aXml, tInfo.szName == me.szName and g_tStrings.STR_YOU or tInfo.szName, 44, 255, 255, 0)
+				ConstructSpeech(aText, aXml, MY_TM_RIGHT_BRACKET, MY_TM_RIGHT_BRACKET_XML)
+				ConstructSpeech(aText, aXml, _L['\'s name.'], 44, 255, 255, 255)
+			else
+				ConstructSpeech(aText, aXml, FilterCustomText(data.szNote) or szContent, 44, 255, 255, 255)
 			end
+			local szXml, szText = concat(aXml), concat(aText)
 			szText = szText:gsub('$me', me.szName)
 			if tInfo then
 				szText = szText:gsub('$team', tInfo.szName)
@@ -1340,7 +1354,7 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 			end
 			-- 中央报警
 			if O.bPushCenterAlarm and cfg.bCenterAlarm then
-				FireUIEvent('MY_TM_CA_CREATE', #aXml > 0 and concat(aXml) or szText, 3, #aXml > 0)
+				FireUIEvent('MY_TM_CA_CREATE', #aXml > 0 and szXml or szText, 3, #aXml > 0)
 			end
 			-- 特大文字
 			if O.bPushBigFontAlarm and cfg.bBigFontAlarm then
@@ -1433,16 +1447,16 @@ function D.OnNpcInfoChange(szEvent, dwTemplateID, nPer)
 					local nVper = vv[1] * 100
 					if nVper == nPer then -- hit
 						local szName = v.szName or LIB.GetTemplateName(dwTemplateID)
-						local aXml = {}
-						insert(aXml, MY_TM_LEFT_BRACKET_XML)
-						insert(aXml, GetFormatText(szName, 44, 255, 255, 0))
-						insert(aXml, MY_TM_RIGHT_BRACKET_XML)
-						insert(aXml, GetFormatText(dwType == MY_TM_TYPE.NPC_LIFE and _L['\'s life remaining to '] or _L['\'s mana reaches '], 44, 255, 255, 255))
-						insert(aXml, GetFormatText(' ' .. nVper .. '%', 44, 255, 255, 0))
-						insert(aXml, GetFormatText(' ' .. FilterCustomText(vv[2]), 44, 255, 255, 255))
-						local szText = GetPureText(concat(aXml))
+						local aXml, aText = {}, {}
+						ConstructSpeech(aText, aXml, MY_TM_LEFT_BRACKET, MY_TM_LEFT_BRACKET_XML)
+						ConstructSpeech(aText, aXml, szName, 44, 255, 255, 0)
+						ConstructSpeech(aText, aXml, MY_TM_RIGHT_BRACKET, MY_TM_RIGHT_BRACKET_XML)
+						ConstructSpeech(aText, aXml, dwType == MY_TM_TYPE.NPC_LIFE and _L['\'s life remaining to '] or _L['\'s mana reaches '], 44, 255, 255, 255)
+						ConstructSpeech(aText, aXml, ' ' .. nVper .. '%', 44, 255, 255, 0)
+						ConstructSpeech(aText, aXml, ' ' .. FilterCustomText(vv[2]), 44, 255, 255, 255)
+						local szXml, szText = concat(aXml), concat(aText)
 						if O.bPushCenterAlarm then
-							FireUIEvent('MY_TM_CA_CREATE', concat(aXml), 3, true)
+							FireUIEvent('MY_TM_CA_CREATE', szXml, 3, true)
 						end
 						if O.bPushBigFontAlarm then
 							FireUIEvent('MY_TM_LARGE_TEXT', szText, data.col or { 255, 128, 0 })
@@ -1486,7 +1500,7 @@ function D.RegisterMessage(bEnable)
 				return
 			end
 			if bRich then
-				szMsg = GetPureText(szMsg)
+				szMsg = MY_GetPureText(szMsg)
 			end
 			-- local res, err = pcall(D.OnCallMessage, 'CHAT', szMsg:gsub('\r', ''))
 			-- if not res then
