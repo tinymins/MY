@@ -502,7 +502,7 @@ function CheckInvalidRect(dwType, dwID, me, object)
 				end
 				nPriority = nPriority + 100000
 				fTextScale = fTextScale * 1.15
-				if not IsEmpty(szText) then
+				if not IsEmpty(szText) and not tData.bHideProgress then
 					if nSec then
 						szCountDown = LIB.FormatTimeCounter(min(nSec, 5999), 1)
 					elseif fPer then
