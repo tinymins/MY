@@ -746,27 +746,27 @@ function D.OnBuff(dwCaster, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, d
 			szName = data.szName or szName
 			nIcon  = data.nIcon or nIcon
 			local szSrcName = LIB.GetObjectName(KObject)
-			local xml = {}
-			insert(xml, MY_TM_LEFT_LINE)
-			insert(xml, GetFormatText(szSrcName == MY_TM_CORE_NAME and g_tStrings.STR_YOU or szSrcName, 44, 255, 255, 0))
-			insert(xml, MY_TM_RIGHT_LINE)
+			local aXml = {}
+			insert(aXml, MY_TM_LEFT_LINE)
+			insert(aXml, GetFormatText(szSrcName == MY_TM_CORE_NAME and g_tStrings.STR_YOU or szSrcName, 44, 255, 255, 0))
+			insert(aXml, MY_TM_RIGHT_LINE)
 			if nClass == MY_TM_TYPE.BUFF_GET then
-				insert(xml, GetFormatText(_L['Get buff'], 44, 255, 255, 255))
-				insert(xml, GetFormatText(szName .. ' x' .. nCount, 44, 255, 255, 0))
+				insert(aXml, GetFormatText(_L['Get buff'], 44, 255, 255, 255))
+				insert(aXml, GetFormatText(szName .. ' x' .. nCount, 44, 255, 255, 0))
 				if data.szNote then
-					insert(xml, GetFormatText(' ' .. FilterCustomText(data.szNote), 44, 255, 255, 255))
+					insert(aXml, GetFormatText(' ' .. FilterCustomText(data.szNote), 44, 255, 255, 255))
 				end
 			else
-				insert(xml, GetFormatText(_L['Lose buff'], 44, 255, 255, 255))
-				insert(xml, GetFormatText(szName, 44, 255, 255, 0))
+				insert(aXml, GetFormatText(_L['Lose buff'], 44, 255, 255, 255))
+				insert(aXml, GetFormatText(szName, 44, 255, 255, 0))
 			end
-			local txt = GetPureText(concat(xml))
+			local szText = GetPureText(concat(aXml))
 			if O.bPushCenterAlarm and cfg.bCenterAlarm then
-				FireUIEvent('MY_TM_CA_CREATE', concat(xml), 3, true)
+				FireUIEvent('MY_TM_CA_CREATE', concat(aXml), 3, true)
 			end
 			-- 特大文字
 			if O.bPushBigFontAlarm and cfg.bBigFontAlarm and (MY_TM_CORE_PLAYERID == dwCaster or not IsPlayer(dwCaster)) then
-				FireUIEvent('MY_TM_LARGE_TEXT', txt, data.col or { GetHeadTextForceFontColor(dwCaster, MY_TM_CORE_PLAYERID) })
+				FireUIEvent('MY_TM_LARGE_TEXT', szText, data.col or { GetHeadTextForceFontColor(dwCaster, MY_TM_CORE_PLAYERID) })
 			end
 
 			-- 获得处理
@@ -791,7 +791,7 @@ function D.OnBuff(dwCaster, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, d
 						szText = szName,
 						col = data.col,
 					})
-					FireUIEvent('MY_TM_SA_CREATE', szType, dwCaster, { dwID = data.dwID, col = data.col, txt = szName })
+					FireUIEvent('MY_TM_SA_CREATE', szType, dwCaster, { dwID = data.dwID, col = data.col, text = szName })
 				end
 				if MY_TM_CORE_PLAYERID == dwCaster then
 					if O.bPushBuffList and cfg.bBuffList then
@@ -824,10 +824,10 @@ function D.OnBuff(dwCaster, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, d
 				end
 			end
 			if O.bPushTeamChannel and cfg.bTeamChannel then
-				D.Talk('RAID', txt, szSrcName)
+				D.Talk('RAID', szText, szSrcName)
 			end
 			if O.bPushWhisperChannel and cfg.bWhisperChannel then
-				D.Talk('WHISPER', txt, szSrcName)
+				D.Talk('WHISPER', szText, szSrcName)
 			end
 		end
 	end
@@ -894,34 +894,34 @@ function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
 		end
 		D.CountdownEvent(data, nClass)
 		if cfg then
-			local xml = {}
-			insert(xml, MY_TM_LEFT_LINE)
-			insert(xml, GetFormatText(szSrcName, 44, 255, 255, 0))
-			insert(xml, MY_TM_RIGHT_LINE)
+			local aXml = {}
+			insert(aXml, MY_TM_LEFT_LINE)
+			insert(aXml, GetFormatText(szSrcName, 44, 255, 255, 0))
+			insert(aXml, MY_TM_RIGHT_LINE)
 			if nClass == MY_TM_TYPE.SKILL_END then
-				insert(xml, GetFormatText(_L['use of'], 44, 255, 255, 255))
+				insert(aXml, GetFormatText(_L['use of'], 44, 255, 255, 255))
 			else
-				insert(xml, GetFormatText(_L['Casting'], 44, 255, 255, 255))
+				insert(aXml, GetFormatText(_L['Casting'], 44, 255, 255, 255))
 			end
-			insert(xml, MY_TM_LEFT_LINE)
-			insert(xml, GetFormatText(data.szName or szName, 44, 255, 255, 0))
-			insert(xml, MY_TM_RIGHT_LINE)
+			insert(aXml, MY_TM_LEFT_LINE)
+			insert(aXml, GetFormatText(data.szName or szName, 44, 255, 255, 0))
+			insert(aXml, MY_TM_RIGHT_LINE)
 			if data.bMonTarget and szTargetName then
-				insert(xml, GetFormatText(g_tStrings.TARGET, 44, 255, 255, 255))
-				insert(xml, MY_TM_LEFT_LINE)
-				insert(xml, GetFormatText(szTargetName == MY_TM_CORE_NAME and g_tStrings.STR_YOU or szTargetName, 44, 255, 255, 0))
-				insert(xml, MY_TM_RIGHT_LINE)
+				insert(aXml, GetFormatText(g_tStrings.TARGET, 44, 255, 255, 255))
+				insert(aXml, MY_TM_LEFT_LINE)
+				insert(aXml, GetFormatText(szTargetName == MY_TM_CORE_NAME and g_tStrings.STR_YOU or szTargetName, 44, 255, 255, 0))
+				insert(aXml, MY_TM_RIGHT_LINE)
 			end
 			if data.szNote then
-				insert(xml, ' ' .. GetFormatText(FilterCustomText(data.szNote), 44, 255, 255, 255))
+				insert(aXml, ' ' .. GetFormatText(FilterCustomText(data.szNote), 44, 255, 255, 255))
 			end
-			local txt = GetPureText(concat(xml))
+			local szText = GetPureText(concat(aXml))
 			if O.bPushCenterAlarm and cfg.bCenterAlarm then
-				FireUIEvent('MY_TM_CA_CREATE', concat(xml), 3, true)
+				FireUIEvent('MY_TM_CA_CREATE', concat(aXml), 3, true)
 			end
 			-- 特大文字
 			if O.bPushBigFontAlarm and cfg.bBigFontAlarm then
-				FireUIEvent('MY_TM_LARGE_TEXT', txt, data.col or { GetHeadTextForceFontColor(dwCaster, MY_TM_CORE_PLAYERID) })
+				FireUIEvent('MY_TM_LARGE_TEXT', szText, data.col or { GetHeadTextForceFontColor(dwCaster, MY_TM_CORE_PLAYERID) })
 			end
 			if not LIB.IsShieldedVersion(2) and cfg.bSelect then
 				SetTarget(IsPlayer(dwCaster) and TARGET.PLAYER or TARGET.NPC, dwCaster)
@@ -935,17 +935,17 @@ function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
 					szText = data.szName or szName,
 					col = data.col,
 				})
-				FireUIEvent('MY_TM_SA_CREATE', 'CASTING', dwCaster, { txt = data.szName or szName, col = data.col })
+				FireUIEvent('MY_TM_SA_CREATE', 'CASTING', dwCaster, { text = data.szName or szName, col = data.col })
 			end
 			-- 全屏泛光
 			if O.bPushFullScreen and cfg.bFullScreen then
 				FireUIEvent('MY_TM_FS_CREATE', data.dwID .. '#SKILL#'  .. data.nLevel, { nTime = 3, col = data.col})
 			end
 			if O.bPushTeamChannel and cfg.bTeamChannel then
-				D.Talk('RAID', txt, szTargetName)
+				D.Talk('RAID', szText, szTargetName)
 			end
 			if O.bPushWhisperChannel and cfg.bWhisperChannel then
-				D.Talk('RAID_WHISPER', txt, szTargetName)
+				D.Talk('RAID_WHISPER', szText, szTargetName)
 			end
 		end
 	end
@@ -1035,7 +1035,7 @@ function D.OnNpcEvent(npc, bEnter)
 						szText = FilterCustomText(data.szNote) or data.szName,
 						col = data.col,
 					})
-					FireUIEvent('MY_TM_SA_CREATE', 'NPC', npc.dwID, { txt = FilterCustomText(data.szNote), col = data.col, szName = data.szName })
+					FireUIEvent('MY_TM_SA_CREATE', 'NPC', npc.dwID, { text = FilterCustomText(data.szNote), col = data.col, szName = data.szName })
 				end
 			end
 			if nTime - CACHE.NPC_LIST[npc.dwTemplateID].nTime < 500 then -- 0.5秒内进入相同的NPC直接忽略
@@ -1047,36 +1047,36 @@ function D.OnNpcEvent(npc, bEnter)
 		D.CountdownEvent(data, nClass)
 		if cfg then
 			local szName = LIB.GetObjectName(npc)
-			local xml = {}
-			insert(xml, MY_TM_LEFT_LINE)
-			insert(xml, GetFormatText(data.szName or szName, 44, 255, 255, 0))
-			insert(xml, MY_TM_RIGHT_LINE)
+			local aXml = {}
+			insert(aXml, MY_TM_LEFT_LINE)
+			insert(aXml, GetFormatText(data.szName or szName, 44, 255, 255, 0))
+			insert(aXml, MY_TM_RIGHT_LINE)
 			if nClass == MY_TM_TYPE.NPC_ENTER then
-				insert(xml, GetFormatText(_L['Appear'], 44, 255, 255, 255))
+				insert(aXml, GetFormatText(_L['Appear'], 44, 255, 255, 255))
 				if nCount > 1 then
-					insert(xml, GetFormatText(' x' .. nCount, 44, 255, 255, 0))
+					insert(aXml, GetFormatText(' x' .. nCount, 44, 255, 255, 0))
 				end
 				if data.szNote then
-					insert(xml, GetFormatText(' ' .. FilterCustomText(data.szNote), 44, 255, 255, 255))
+					insert(aXml, GetFormatText(' ' .. FilterCustomText(data.szNote), 44, 255, 255, 255))
 				end
 			else
-				insert(xml, GetFormatText(_L['Disappear'], 44, 255, 255, 255))
+				insert(aXml, GetFormatText(_L['Disappear'], 44, 255, 255, 255))
 			end
 
-			local txt = GetPureText(concat(xml))
+			local szText = GetPureText(concat(aXml))
 			if O.bPushCenterAlarm and cfg.bCenterAlarm then
-				FireUIEvent('MY_TM_CA_CREATE', concat(xml), 3, true)
+				FireUIEvent('MY_TM_CA_CREATE', concat(aXml), 3, true)
 			end
 			-- 特大文字
 			if O.bPushBigFontAlarm and cfg.bBigFontAlarm then
-				FireUIEvent('MY_TM_LARGE_TEXT', txt, data.col or { GetHeadTextForceFontColor(npc.dwID, MY_TM_CORE_PLAYERID) })
+				FireUIEvent('MY_TM_LARGE_TEXT', szText, data.col or { GetHeadTextForceFontColor(npc.dwID, MY_TM_CORE_PLAYERID) })
 			end
 
 			if O.bPushTeamChannel and cfg.bTeamChannel then
-				D.Talk('RAID', txt)
+				D.Talk('RAID', szText)
 			end
 			if O.bPushWhisperChannel and cfg.bWhisperChannel then
-				D.Talk('RAID_WHISPER', txt)
+				D.Talk('RAID_WHISPER', szText)
 			end
 
 			if nClass == MY_TM_TYPE.NPC_ENTER then
@@ -1167,7 +1167,7 @@ function D.OnDoodadEvent(doodad, bEnter)
 						szText = FilterCustomText(data.szNote) or data.szName,
 						col = data.col,
 					})
-					FireUIEvent('MY_TM_SA_CREATE', 'DOODAD', doodad.dwID, { txt = FilterCustomText(data.szNote), col = data.col, szName = data.szName })
+					FireUIEvent('MY_TM_SA_CREATE', 'DOODAD', doodad.dwID, { text = FilterCustomText(data.szNote), col = data.col, szName = data.szName })
 				end
 			end
 			if nTime - CACHE.DOODAD_LIST[doodad.dwTemplateID].nTime < 500 then
@@ -1179,36 +1179,36 @@ function D.OnDoodadEvent(doodad, bEnter)
 		D.CountdownEvent(data, nClass)
 		if cfg then
 			local szName = doodad.szName
-			local xml = {}
-			insert(xml, MY_TM_LEFT_LINE)
-			insert(xml, GetFormatText(data.szName or szName, 44, 255, 255, 0))
-			insert(xml, MY_TM_RIGHT_LINE)
+			local aXml = {}
+			insert(aXml, MY_TM_LEFT_LINE)
+			insert(aXml, GetFormatText(data.szName or szName, 44, 255, 255, 0))
+			insert(aXml, MY_TM_RIGHT_LINE)
 			if nClass == MY_TM_TYPE.DOODAD_ENTER then
-				insert(xml, GetFormatText(_L['Appear'], 44, 255, 255, 255))
+				insert(aXml, GetFormatText(_L['Appear'], 44, 255, 255, 255))
 				if nCount > 1 then
-					insert(xml, GetFormatText(' x' .. nCount, 44, 255, 255, 0))
+					insert(aXml, GetFormatText(' x' .. nCount, 44, 255, 255, 0))
 				end
 				if data.szNote then
-					insert(xml, GetFormatText(' ' .. FilterCustomText(data.szNote), 44, 255, 255, 255))
+					insert(aXml, GetFormatText(' ' .. FilterCustomText(data.szNote), 44, 255, 255, 255))
 				end
 			else
-				insert(xml, GetFormatText(_L['Disappear'], 44, 255, 255, 255))
+				insert(aXml, GetFormatText(_L['Disappear'], 44, 255, 255, 255))
 			end
 
-			local txt = GetPureText(concat(xml))
+			local szText = GetPureText(concat(aXml))
 			if O.bPushCenterAlarm and cfg.bCenterAlarm then
-				FireUIEvent('MY_TM_CA_CREATE', concat(xml), 3, true)
+				FireUIEvent('MY_TM_CA_CREATE', concat(aXml), 3, true)
 			end
 			-- 特大文字
 			if O.bPushBigFontAlarm and cfg.bBigFontAlarm then
-				FireUIEvent('MY_TM_LARGE_TEXT', txt, data.col or { 255, 255, 0 })
+				FireUIEvent('MY_TM_LARGE_TEXT', szText, data.col or { 255, 255, 0 })
 			end
 
 			if O.bPushTeamChannel and cfg.bTeamChannel then
-				D.Talk('RAID', txt)
+				D.Talk('RAID', szText)
 			end
 			if O.bPushWhisperChannel and cfg.bWhisperChannel then
-				D.Talk('RAID_WHISPER', txt)
+				D.Talk('RAID_WHISPER', szText)
 			end
 
 			if nClass == MY_TM_TYPE.DOODAD_ENTER then
@@ -1292,23 +1292,23 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 			if data.szContent:find('$me') then
 				tInfo = { dwID = me.dwID, szName = me.szName }
 			end
-			local xml, txt = {}, FilterCustomText(data.szNote) or szContent
+			local aXml, szText = {}, FilterCustomText(data.szNote) or szContent
 			if tInfo and not data.szNote then
-				insert(xml, MY_TM_LEFT_LINE)
-				insert(xml, GetFormatText(szNpcName or _L['JX3'], 44, 255, 255, 0))
-				insert(xml, MY_TM_RIGHT_LINE)
-				insert(xml, GetFormatText(_L['is calling'], 44, 255, 255, 255))
-				insert(xml, MY_TM_LEFT_LINE)
-				insert(xml, GetFormatText(tInfo.szName == me.szName and g_tStrings.STR_YOU or tInfo.szName, 44, 255, 255, 0))
-				insert(xml, MY_TM_RIGHT_LINE)
-				insert(xml, GetFormatText(_L['\'s name.'], 44, 255, 255, 255))
-				txt = GetPureText(concat(xml))
+				insert(aXml, MY_TM_LEFT_LINE)
+				insert(aXml, GetFormatText(szNpcName or _L['JX3'], 44, 255, 255, 0))
+				insert(aXml, MY_TM_RIGHT_LINE)
+				insert(aXml, GetFormatText(_L['is calling'], 44, 255, 255, 255))
+				insert(aXml, MY_TM_LEFT_LINE)
+				insert(aXml, GetFormatText(tInfo.szName == me.szName and g_tStrings.STR_YOU or tInfo.szName, 44, 255, 255, 0))
+				insert(aXml, MY_TM_RIGHT_LINE)
+				insert(aXml, GetFormatText(_L['\'s name.'], 44, 255, 255, 255))
+				szText = GetPureText(concat(aXml))
 			end
-			txt = txt:gsub('$me', me.szName)
+			szText = szText:gsub('$me', me.szName)
 			if tInfo then
-				txt = txt:gsub('$team', tInfo.szName)
+				szText = szText:gsub('$team', tInfo.szName)
 				if O.bPushWhisperChannel and cfg.bWhisperChannel then
-					D.Talk('WHISPER', txt, tInfo.szName)
+					D.Talk('WHISPER', szText, tInfo.szName)
 				end
 				-- 头顶报警
 				if O.bPushScreenHead and cfg.bScreenHead then
@@ -1317,32 +1317,32 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 						szText = _L('%s call name', szNpcName or g_tStrings.SYSTEM),
 						col = data.col,
 					})
-					FireUIEvent('MY_TM_SA_CREATE', 'TIME', tInfo.dwID, { txt = _L('%s call name', szNpcName or g_tStrings.SYSTEM)})
+					FireUIEvent('MY_TM_SA_CREATE', 'TIME', tInfo.dwID, { text = _L('%s call name', szNpcName or g_tStrings.SYSTEM)})
 				end
 				if not LIB.IsShieldedVersion(2) and cfg.bSelect then
 					SetTarget(TARGET.PLAYER, tInfo.dwID)
 				end
 			else
 				if O.bPushWhisperChannel and cfg.bWhisperChannel then
-					D.Talk('RAID_WHISPER', txt)
+					D.Talk('RAID_WHISPER', szText)
 				end
 				-- 头顶报警
 				if O.bPushScreenHead and cfg.bScreenHead then
 					FireUIEvent('MY_LIFEBAR_COUNTDOWN', dwNpcID or me.dwID, 'TIME', 'MY_TM_TIME_' .. (dwNpcID or me.dwID), {
 						nTime = GetTime() + 5000,
-						szText = txt,
+						szText = szText,
 						col = data.col,
 					})
-					FireUIEvent('MY_TM_SA_CREATE', 'TIME', dwNpcID or me.dwID, { txt = txt })
+					FireUIEvent('MY_TM_SA_CREATE', 'TIME', dwNpcID or me.dwID, { text = szText })
 				end
 			end
 			-- 中央报警
 			if O.bPushCenterAlarm and cfg.bCenterAlarm then
-				FireUIEvent('MY_TM_CA_CREATE', #xml > 0 and concat(xml) or txt, 3, #xml > 0)
+				FireUIEvent('MY_TM_CA_CREATE', #aXml > 0 and concat(aXml) or szText, 3, #aXml > 0)
 			end
 			-- 特大文字
 			if O.bPushBigFontAlarm and cfg.bBigFontAlarm then
-				FireUIEvent('MY_TM_LARGE_TEXT', txt, data.col or { 255, 128, 0 })
+				FireUIEvent('MY_TM_LARGE_TEXT', szText, data.col or { 255, 128, 0 })
 			end
 			if O.bPushFullScreen and cfg.bFullScreen then
 				if (tInfo and tInfo.dwID == me.dwID) or not tInfo then
@@ -1351,9 +1351,9 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 			end
 			if O.bPushTeamChannel and cfg.bTeamChannel then
 				if tInfo and not data.szNote then
-					D.Talk('RAID', txt, tInfo.szName)
+					D.Talk('RAID', szText, tInfo.szName)
 				else
-					D.Talk('RAID', txt)
+					D.Talk('RAID', szText)
 				end
 			end
 		end
@@ -1431,22 +1431,22 @@ function D.OnNpcInfoChange(szEvent, dwTemplateID, nPer)
 					local nVper = vv[1] * 100
 					if nVper == nPer then -- hit
 						local szName = v.szName or LIB.GetTemplateName(dwTemplateID)
-						local xml = {}
-						insert(xml, MY_TM_LEFT_LINE)
-						insert(xml, GetFormatText(szName, 44, 255, 255, 0))
-						insert(xml, MY_TM_RIGHT_LINE)
-						insert(xml, GetFormatText(dwType == MY_TM_TYPE.NPC_LIFE and _L['\'s life remaining to '] or _L['\'s mana reaches '], 44, 255, 255, 255))
-						insert(xml, GetFormatText(' ' .. nVper .. '%', 44, 255, 255, 0))
-						insert(xml, GetFormatText(' ' .. FilterCustomText(vv[2]), 44, 255, 255, 255))
-						local txt = GetPureText(concat(xml))
+						local aXml = {}
+						insert(aXml, MY_TM_LEFT_LINE)
+						insert(aXml, GetFormatText(szName, 44, 255, 255, 0))
+						insert(aXml, MY_TM_RIGHT_LINE)
+						insert(aXml, GetFormatText(dwType == MY_TM_TYPE.NPC_LIFE and _L['\'s life remaining to '] or _L['\'s mana reaches '], 44, 255, 255, 255))
+						insert(aXml, GetFormatText(' ' .. nVper .. '%', 44, 255, 255, 0))
+						insert(aXml, GetFormatText(' ' .. FilterCustomText(vv[2]), 44, 255, 255, 255))
+						local szText = GetPureText(concat(aXml))
 						if O.bPushCenterAlarm then
-							FireUIEvent('MY_TM_CA_CREATE', concat(xml), 3, true)
+							FireUIEvent('MY_TM_CA_CREATE', concat(aXml), 3, true)
 						end
 						if O.bPushBigFontAlarm then
-							FireUIEvent('MY_TM_LARGE_TEXT', txt, data.col or { 255, 128, 0 })
+							FireUIEvent('MY_TM_LARGE_TEXT', szText, data.col or { 255, 128, 0 })
 						end
 						if O.bPushTeamChannel and v.bTeamChannel then
-							D.Talk('RAID', txt)
+							D.Talk('RAID', szText)
 						end
 						if vv[3] and tonumber(TrimString(vv[3])) then
 							local szKey = k .. '.' .. dwTemplateID .. '.' .. kk
