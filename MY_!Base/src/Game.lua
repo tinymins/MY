@@ -261,8 +261,11 @@ function LIB.GetBuffName(dwBuffID, dwLevel)
 end
 end
 
-function LIB.GetEndTime(nEndFrame)
-	return (nEndFrame - GetLogicFrameCount()) / GLOBAL.GAME_FPS
+function LIB.GetEndTime(nEndFrame, bAllowNegative)
+	if bAllowNegative then
+		return (nEndFrame - GetLogicFrameCount()) / GLOBAL.GAME_FPS
+	end
+	return max(0, nEndFrame - GetLogicFrameCount()) / GLOBAL.GAME_FPS
 end
 
 -- 获取指定名字的右键菜单
