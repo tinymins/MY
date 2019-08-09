@@ -930,10 +930,7 @@ function D.OpenImportPanel(szDefault, szTitle, fnAction)
 				'JX3 File(*.jx3dat)\0*.jx3dat\0All Files(*.*)\0*.*\0\0',
 				MY_TeamMon.MY_TM_DATA_ROOT
 			)
-			if szFile ~= '' and not szFile:lower():find('interface') then
-				LIB.Alert(_L['Please select interface path.'])
-				ui:children('#FilePtah'):text('')
-			else
+			if not IsEmpty(szFile) then
 				ui:children('#FilePtah'):text(szFile)
 			end
 		end,
