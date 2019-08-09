@@ -666,7 +666,7 @@ function D.CountdownEvent(data, nClass)
 					nFrame   = v.nFrame,
 					nTime    = v.nTime,
 					nRefresh = v.nRefresh,
-					szName   = v.szName or data.szName,
+					szName   = FilterCustomText(v.szName or data.szName),
 					nIcon    = v.nIcon or data.nIcon or 340,
 					bTalk    = v.bTeamChannel,
 					bHold    = v.bHold
@@ -758,7 +758,9 @@ function D.OnBuff(dwCaster, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, d
 			if not KObject then
 				return -- D.Log('ERROR ' .. szType .. ' object:' .. dwCaster .. ' does not exist!')
 			end
-			szName = data.szName or szName
+			if data.szName then
+				szName = FilterCustomText(data.szName)
+			end
 			nIcon  = data.nIcon or nIcon
 			local szSrcName = LIB.GetObjectName(KObject)
 			local aXml, aText = {}, {}
@@ -893,7 +895,9 @@ function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
 		if not KObject then
 			return -- D.Log('ERROR CASTING object:' .. dwCaster .. ' does not exist!')
 		end
-		szName = data.szName or szName
+		if data.szName then
+			szName = FilterCustomText(data.szName)
+		end
 		nIcon  = data.nIcon or nIcon
 		local szSrcName = LIB.GetObjectName(KObject)
 		local dwTargetType, dwTargetID = KObject.GetTarget()
@@ -919,7 +923,7 @@ function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
 				ConstructSpeech(aText, aXml, _L['Casting'], 44, 255, 255, 255)
 			end
 			ConstructSpeech(aText, aXml, MY_TM_LEFT_BRACKET, MY_TM_LEFT_BRACKET_XML)
-			ConstructSpeech(aText, aXml, data.szName or szName, 44, 255, 255, 0)
+			ConstructSpeech(aText, aXml, szName, 44, 255, 255, 0)
 			ConstructSpeech(aText, aXml, MY_TM_RIGHT_BRACKET, MY_TM_RIGHT_BRACKET_XML)
 			if data.bMonTarget and szTargetName then
 				ConstructSpeech(aText, aXml, g_tStrings.TARGET, 44, 255, 255, 255)
@@ -947,10 +951,10 @@ function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
 			-- 头顶报警
 			if O.bPushScreenHead and cfg.bScreenHead then
 				FireUIEvent('MY_LIFEBAR_COUNTDOWN', dwCaster, 'CASTING', 'MY_TM_CASTING_' .. data.dwID, {
-					szText = data.szName or szName,
+					szText = szName,
 					col = data.col,
 				})
-				FireUIEvent('MY_TM_SA_CREATE', 'CASTING', dwCaster, { text = data.szName or szName, col = data.col })
+				FireUIEvent('MY_TM_SA_CREATE', 'CASTING', dwCaster, { text = szName, col = data.col })
 			end
 			-- 全屏泛光
 			if O.bPushFullScreen and cfg.bFullScreen then
@@ -1046,15 +1050,15 @@ function D.OnNpcEvent(npc, bEnter)
 				end
 				-- 头顶报警
 				if O.bPushScreenHead and cfg.bScreenHead then
-					local szNote = nil
+					local szNote, szName = nil, FilterCustomText(data.szName)
 					if not LIB.IsShieldedVersion(2) then
-						szNote = FilterCustomText(data.szNote) or data.szName
+						szNote = FilterCustomText(data.szNote) or szName
 					end
 					FireUIEvent('MY_LIFEBAR_COUNTDOWN', npc.dwID, 'NPC', 'MY_TM_NPC_' .. npc.dwID, {
 						szText = szNote,
 						col = data.col,
 					})
-					FireUIEvent('MY_TM_SA_CREATE', 'NPC', npc.dwID, { text = szNote, col = data.col, szName = data.szName })
+					FireUIEvent('MY_TM_SA_CREATE', 'NPC', npc.dwID, { text = szNote, col = data.col, szName = szName })
 				end
 			end
 			if nTime - CACHE.NPC_LIST[npc.dwTemplateID].nTime < 500 then -- 0.5秒内进入相同的NPC直接忽略
@@ -1066,9 +1070,12 @@ function D.OnNpcEvent(npc, bEnter)
 		D.CountdownEvent(data, nClass)
 		if cfg then
 			local szName = LIB.GetObjectName(npc)
+			if data.szName then
+				szName = FilterCustomText(data.szName)
+			end
 			local aXml, aText = {}, {}
 			ConstructSpeech(aText, aXml, MY_TM_LEFT_BRACKET, MY_TM_LEFT_BRACKET_XML)
-			ConstructSpeech(aText, aXml, data.szName or szName, 44, 255, 255, 0)
+			ConstructSpeech(aText, aXml, szName, 44, 255, 255, 0)
 			ConstructSpeech(aText, aXml, MY_TM_RIGHT_BRACKET, MY_TM_RIGHT_BRACKET_XML)
 			if nClass == MY_TM_TYPE.NPC_ENTER then
 				ConstructSpeech(aText, aXml, _L['Appear'], 44, 255, 255, 255)
@@ -1181,15 +1188,15 @@ function D.OnDoodadEvent(doodad, bEnter)
 			if cfg then
 				-- 头顶报警
 				if O.bPushScreenHead and cfg.bScreenHead then
-					local szNote = nil
+					local szNote, szName = nil, FilterCustomText(data.szName)
 					if not LIB.IsShieldedVersion(2) then
-						szNote = FilterCustomText(data.szNote) or data.szName
+						szNote = FilterCustomText(data.szNote) or szName
 					end
 					FireUIEvent('MY_LIFEBAR_COUNTDOWN', doodad.dwID, 'DOODAD', 'MY_TM_DOODAD_' .. doodad.dwID, {
 						szText = szNote,
 						col = data.col,
 					})
-					FireUIEvent('MY_TM_SA_CREATE', 'DOODAD', doodad.dwID, { text = szNote, col = data.col, szName = data.szName })
+					FireUIEvent('MY_TM_SA_CREATE', 'DOODAD', doodad.dwID, { text = szNote, col = data.col, szName = szName })
 				end
 			end
 			if nTime - CACHE.DOODAD_LIST[doodad.dwTemplateID].nTime < 500 then
@@ -1201,9 +1208,12 @@ function D.OnDoodadEvent(doodad, bEnter)
 		D.CountdownEvent(data, nClass)
 		if cfg then
 			local szName = doodad.szName
+			if data.szName then
+				szName = FilterCustomText(data.szName)
+			end
 			local aXml, aText = {}, {}
 			ConstructSpeech(aText, aXml, MY_TM_LEFT_BRACKET, MY_TM_LEFT_BRACKET_XML)
-			ConstructSpeech(aText, aXml, data.szName or szName, 44, 255, 255, 0)
+			ConstructSpeech(aText, aXml, szName, 44, 255, 255, 0)
 			ConstructSpeech(aText, aXml, MY_TM_RIGHT_BRACKET, MY_TM_RIGHT_BRACKET_XML)
 			if nClass == MY_TM_TYPE.DOODAD_ENTER then
 				ConstructSpeech(aText, aXml, _L['Appear'], 44, 255, 255, 255)
