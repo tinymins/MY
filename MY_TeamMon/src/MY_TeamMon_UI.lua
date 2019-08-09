@@ -1955,7 +1955,7 @@ function D.OpenSettingPanel(data, szType)
 			end
 			nX = ui:append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
-				tip = _L['Requires MY_LifeBar loaded.'], tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+				tip = _L['Requires MY_LifeBar loaded.\nDue to official logic, only target is visible.'], tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 				oncheck = function(bCheck)
 					SetDataClass(MY_TM_TYPE.SKILL_BEGIN, 'bScreenHead', bCheck)
 				end,
@@ -2033,15 +2033,13 @@ function D.OpenSettingPanel(data, szType)
 					SetDataClass(MY_TM_TYPE.NPC_ENTER, 'bBigFontAlarm', bCheck)
 				end,
 			}, true):autoWidth():pos('BOTTOMRIGHT')
-		end
-		nX = ui:append('WndCheckBox', {
-			x = nX + 5, y = nY, checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
-			tip = _L['Requires MY_LifeBar loaded.'], tippostype = UI.TIP_POSITION.BOTTOM_TOP,
-			oncheck = function(bCheck)
-				SetDataClass(MY_TM_TYPE.NPC_ENTER, 'bScreenHead', bCheck)
-			end,
-		}, true):autoWidth():pos('BOTTOMRIGHT')
-		if not LIB.IsShieldedVersion(2) then
+			nX = ui:append('WndCheckBox', {
+				x = nX + 5, y = nY, checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
+				tip = _L['Requires MY_LifeBar loaded.'], tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+				oncheck = function(bCheck)
+					SetDataClass(MY_TM_TYPE.NPC_ENTER, 'bScreenHead', bCheck)
+				end,
+			}, true):autoWidth():pos('BOTTOMRIGHT')
 			nX = ui:append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
 				oncheck = function(bCheck)
@@ -2138,15 +2136,13 @@ function D.OpenSettingPanel(data, szType)
 					SetDataClass(MY_TM_TYPE.DOODAD_ENTER, 'bBigFontAlarm', bCheck)
 				end,
 			}, true):autoWidth():pos('BOTTOMRIGHT')
-		end
-		nX = ui:append('WndCheckBox', {
-			x = nX + 5, y = nY, checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
-			tip = _L['Requires MY_LifeBar loaded.'], tippostype = UI.TIP_POSITION.BOTTOM_TOP,
-			oncheck = function(bCheck)
-				SetDataClass(MY_TM_TYPE.DOODAD_ENTER, 'bScreenHead', bCheck)
-			end,
-		}, true):autoWidth():pos('BOTTOMRIGHT')
-		if not LIB.IsShieldedVersion(2) then
+			nX = ui:append('WndCheckBox', {
+				x = nX + 5, y = nY, checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
+				tip = _L['Requires MY_LifeBar loaded.'], tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+				oncheck = function(bCheck)
+					SetDataClass(MY_TM_TYPE.DOODAD_ENTER, 'bScreenHead', bCheck)
+				end,
+			}, true):autoWidth():pos('BOTTOMRIGHT')
 			nX = ui:append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
 				oncheck = function(bCheck)
@@ -2249,15 +2245,13 @@ function D.OpenSettingPanel(data, szType)
 					SetDataClass(MY_TM_TYPE.TALK_MONITOR, 'bBigFontAlarm', bCheck)
 				end,
 			}, true):autoWidth():pos('BOTTOMRIGHT')
-		end
-		nX = ui:append('WndCheckBox', {
-			x = nX + 5, y = nY + 10, checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
-			tip = _L['Requires MY_LifeBar loaded.'], tippostype = UI.TIP_POSITION.BOTTOM_TOP,
-			oncheck = function(bCheck)
-				SetDataClass(MY_TM_TYPE.TALK_MONITOR, 'bScreenHead', bCheck)
-			end,
-		}, true):autoWidth():pos('BOTTOMRIGHT')
-		if not LIB.IsShieldedVersion(2) then
+			nX = ui:append('WndCheckBox', {
+				x = nX + 5, y = nY + 10, checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
+				tip = _L['Requires MY_LifeBar loaded.'], tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+				oncheck = function(bCheck)
+					SetDataClass(MY_TM_TYPE.TALK_MONITOR, 'bScreenHead', bCheck)
+				end,
+			}, true):autoWidth():pos('BOTTOMRIGHT')
 			nX = ui:append('WndCheckBox', {
 				x = nX + 5, y = nY + 10, checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
 				oncheck = function(bCheck)
@@ -2315,15 +2309,13 @@ function D.OpenSettingPanel(data, szType)
 					SetDataClass(MY_TM_TYPE.CHAT_MONITOR, 'bBigFontAlarm', bCheck)
 				end,
 			}, true):autoWidth():pos('BOTTOMRIGHT')
-		end
-		nX = ui:append('WndCheckBox', {
-			x = nX + 5, y = nY + 10, checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
-			tip = _L['Requires MY_LifeBar loaded.'], tippostype = UI.TIP_POSITION.BOTTOM_TOP,
-			oncheck = function(bCheck)
-				SetDataClass(MY_TM_TYPE.CHAT_MONITOR, 'bScreenHead', bCheck)
-			end,
-		}, true):autoWidth():pos('BOTTOMRIGHT')
-		if not LIB.IsShieldedVersion(2) then
+			nX = ui:append('WndCheckBox', {
+				x = nX + 5, y = nY + 10, checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
+				tip = _L['Requires MY_LifeBar loaded.'], tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+				oncheck = function(bCheck)
+					SetDataClass(MY_TM_TYPE.CHAT_MONITOR, 'bScreenHead', bCheck)
+				end,
+			}, true):autoWidth():pos('BOTTOMRIGHT')
 			nX = ui:append('WndCheckBox', {
 				x = nX + 5, y = nY + 10, checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
 				oncheck = function(bCheck)

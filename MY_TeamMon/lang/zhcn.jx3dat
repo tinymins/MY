@@ -79,6 +79,7 @@ data = {
 	['Team panel'] = '团队面板',
 	['Only source self'] = '仅显示来源自己的气劲',
 	['Requires MY_LifeBar loaded.'] = '需加载并启用扁平血条',
+	['Requires MY_LifeBar loaded.\nDue to official logic, only target is visible.'] = '需加载并启用扁平血条\n由于官方限制，仅目标读条进度可显示',
 	['Add countdown'] = '添加倒计时',
 	['Please select type'] = '请选择类型',
 	['Countdown TYPE 0'] = '其他', -- OTHER

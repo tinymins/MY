@@ -1045,7 +1045,7 @@ function D.OnNpcEvent(npc, bEnter)
 					D.SetTeamMark('NPC', cfg.tMark, npc.dwID, npc.dwTemplateID)
 				end
 				-- 头顶报警
-				if O.bPushScreenHead and cfg.bScreenHead then
+				if O.bPushScreenHead and cfg.bScreenHead and not LIB.IsShieldedVersion(2) then
 					FireUIEvent('MY_LIFEBAR_COUNTDOWN', npc.dwID, 'NPC', 'MY_TM_NPC_' .. npc.dwID, {
 						szText = FilterCustomText(data.szNote) or data.szName,
 						col = data.col,
@@ -1176,7 +1176,7 @@ function D.OnDoodadEvent(doodad, bEnter)
 			end
 			if cfg then
 				-- 头顶报警
-				if O.bPushScreenHead and cfg.bScreenHead then
+				if O.bPushScreenHead and cfg.bScreenHead and not LIB.IsShieldedVersion(2) then
 					FireUIEvent('MY_LIFEBAR_COUNTDOWN', doodad.dwID, 'DOODAD', 'MY_TM_DOODAD_' .. doodad.dwID, {
 						szText = FilterCustomText(data.szNote) or data.szName,
 						col = data.col,
@@ -1326,7 +1326,7 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 					D.Talk('WHISPER', szText, tInfo.szName)
 				end
 				-- 头顶报警
-				if O.bPushScreenHead and cfg.bScreenHead then
+				if O.bPushScreenHead and cfg.bScreenHead and not LIB.IsShieldedVersion(2) then
 					FireUIEvent('MY_LIFEBAR_COUNTDOWN', tInfo.dwID, 'TIME', 'MY_TM_TIME_' .. tInfo.dwID, {
 						nTime = GetTime() + 5000,
 						szText = _L('%s call name', szNpcName or g_tStrings.SYSTEM),
@@ -1342,7 +1342,7 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 					D.Talk('RAID_WHISPER', szText)
 				end
 				-- 头顶报警
-				if O.bPushScreenHead and cfg.bScreenHead then
+				if O.bPushScreenHead and cfg.bScreenHead and not LIB.IsShieldedVersion(2) then
 					FireUIEvent('MY_LIFEBAR_COUNTDOWN', dwNpcID or me.dwID, 'TIME', 'MY_TM_TIME_' .. (dwNpcID or me.dwID), {
 						nTime = GetTime() + 5000,
 						szText = szText,
