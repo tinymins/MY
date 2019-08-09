@@ -169,7 +169,8 @@ function PS.OnPanelActive(wnd)
 				onclick = function()
 					local file = GetOpenFileName(_L['Please select your font file.'], 'Font File(*.ttf;*.otf;*.fon)\0*.ttf;*.otf;*.fon\0All Files(*.*)\0*.*\0\0')
 					if not IsEmpty(file) then
-						acFile:text(LIB.GetRelativePath(file, ''):gsub('/', '\\'))
+						file = LIB.GetRelativePath(file, '') or file
+						acFile:text(wgsub(file, '/', '\\'))
 					end
 				end,
 			})
