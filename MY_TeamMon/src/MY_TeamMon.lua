@@ -804,7 +804,7 @@ function D.OnBuff(dwCaster, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, d
 					FireUIEvent('MY_LIFEBAR_COUNTDOWN', dwCaster, szType, 'MY_TM_BUFF_' .. data.dwID, {
 						dwBuffID = data.dwID,
 						szText = szName,
-						col = data.col,
+						col = data.col or (szType == 'BUFF' and {0, 255, 0} or {255, 0, 0}),
 					})
 					FireUIEvent('MY_TM_SA_CREATE', szType, dwCaster, { dwID = data.dwID, col = data.col, text = szName })
 				end
