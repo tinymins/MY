@@ -37,11 +37,10 @@ local Call, XpCall, GetTraceback, RandomChild = LIB.Call, LIB.XpCall, LIB.GetTra
 local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
 local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
 -----------------------------------------------------------------------------------------------------------
-local FireUIEvent, Table_BuffIsVisible, Table_IsSkillShow = FireUIEvent, Table_BuffIsVisible, Table_IsSkillShow
-local GetHeadTextForceFontColor = GetHeadTextForceFontColor
-local TargetPanel_SetOpenState = TargetPanel_SetOpenState
-local SplitString, TrimString = LIB.SplitString, LIB.TrimString
+local MY_SplitString, MY_TrimString = LIB.SplitString, LIB.TrimString
 local MY_GetFormatText, MY_GetPureText = LIB.GetFormatText, LIB.GetPureText
+local FireUIEvent, Table_BuffIsVisible, Table_IsSkillShow = FireUIEvent, Table_BuffIsVisible, Table_IsSkillShow
+local GetHeadTextForceFontColor, TargetPanel_SetOpenState = GetHeadTextForceFontColor, TargetPanel_SetOpenState
 
 local _L = LIB.LoadLangPack(PACKET_INFO.ROOT .. 'MY_TeamMon/lang/')
 if not LIB.AssertVersion('MY_TeamMon', _L['MY_TeamMon'], 0x2013500) then
@@ -1423,11 +1422,11 @@ function D.GetStringStru(szString)
 		return CACHE.STR[szString]
 	else
 		local data = {}
-		for k, v in ipairs(SplitString(szString, ';')) do
-			local line = SplitString(v, ',')
-			if line[1] and line[2] and tonumber(TrimString(line[1])) and TrimString(line[2]) ~= '' then
-				line[1] = tonumber(TrimString(line[1]))
-				line[2] = TrimString(line[2])
+		for k, v in ipairs(MY_SplitString(szString, ';')) do
+			local line = MY_SplitString(v, ',')
+			if line[1] and line[2] and tonumber(MY_TrimString(line[1])) and MY_TrimString(line[2]) ~= '' then
+				line[1] = tonumber(MY_TrimString(line[1]))
+				line[2] = MY_TrimString(line[2])
 				insert(data, line)
 			end
 		end
@@ -1464,12 +1463,12 @@ function D.OnNpcInfoChange(szEvent, dwTemplateID, nPer)
 						if O.bPushTeamChannel and v.bTeamChannel then
 							D.Talk('RAID', szText)
 						end
-						if vv[3] and tonumber(TrimString(vv[3])) then
+						if vv[3] and tonumber(MY_TrimString(vv[3])) then
 							local szKey = k .. '.' .. dwTemplateID .. '.' .. kk
 							local tParam = {
 								key    = v.key,
 								nFrame = v.nFrame,
-								nTime  = tonumber(TrimString(vv[3])),
+								nTime  = tonumber(MY_TrimString(vv[3])),
 								szName = vv[2],
 								nIcon  = v.nIcon,
 								bTalk  = v.bTeamChannel,
