@@ -96,10 +96,12 @@ local function InsertBuffListCache(aBuffList, szVia)
 end
 function D.UpdateBuffListCache()
 	BUFF_LIST = {}
-	if CFG.bBuffDataTeamMon then
+	if CFG.bBuffDataTeamMon and CTM_BUFF_TEAMMON then
 		InsertBuffListCache(CTM_BUFF_TEAMMON, _L['From MY_TeamMon data'])
 	end
-	InsertBuffListCache(CFG.aBuffList, _L['From custom data'])
+	if CFG.aBuffList then
+		InsertBuffListCache(CFG.aBuffList, _L['From custom data'])
+	end
 	if CFG.bBuffPushToOfficial then
 		local aBuff = {}
 		for _, dwID in pairs(BUFF_LIST) do
