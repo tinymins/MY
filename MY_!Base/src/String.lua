@@ -348,3 +348,24 @@ function LIB.ReplaceSensitiveWord(szText)
 	end
 	return select(2, TextFilterReplace(szText))
 end
+
+do
+local CACHE = setmetatable({}, { __mode = 'v' })
+function LIB.GetFormatText(...)
+	local szKey = EncodeLUAData({...})
+	if not CACHE[szKey] then
+		CACHE[szKey] = {GetFormatText(...)}
+	end
+	return CACHE[szKey][1]
+end
+end
+
+do
+local CACHE = setmetatable({}, { __mode = 'v' })
+function LIB.GetPureText(szXml)
+	if not CACHE[szXml] then
+		CACHE[szXml] = {GetPureText and GetPureText(szXml) or LIB.Xml.GetPureText(szXml)}
+	end
+	return CACHE[szXml][1]
+end
+end
