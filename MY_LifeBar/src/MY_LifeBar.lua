@@ -469,6 +469,9 @@ function CheckInvalidRect(dwType, dwID, me, object)
 				if KBuff then
 					nSec = (KBuff.GetEndTime() - GetLogicFrameCount()) / GLOBAL.GAME_FPS
 					szText = tData.szText
+					if KBuff.nStackNum > 1 then
+						szText = szText .. 'x' .. KBuff.nStackNum
+					end
 				end
 			elseif tData.szType == 'CASTING' then
 				local nType, dwSkillID, dwSkillLevel, fCastPercent = object.GetSkillOTActionState()
