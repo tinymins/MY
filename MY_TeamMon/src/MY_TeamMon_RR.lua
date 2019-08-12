@@ -215,7 +215,8 @@ local META_TEMPLATE = {
 	szTitle = '',
 	szAboutURL = '',
 }
-local META_SEL_INFO, META_DOWNLOADER
+local META_SEL_INFO, DATA_DOWNLOADER
+local META_DOWNLOADING_KEY = {}
 
 function D.OpenPanel()
 	Wnd.OpenWindow(INI_PATH, 'MY_TeamMon_RR')
@@ -247,6 +248,9 @@ end
 
 function D.DownloadMeta(info, onSuccess, onError)
 	local szURL = GetRawURL(info.szURL) or info.szURL
+	if info.szKey then
+		META_DOWNLOADING_KEY[info.szKey] = true
+	end
 	LIB.Ajax({
 		method = 'auto',
 		url = szURL,
@@ -283,6 +287,12 @@ function D.DownloadMeta(info, onSuccess, onError)
 			--[[#DEBUG END]]
 			onError()
 		end,
+		complete = function()
+			if info.szKey then
+				META_DOWNLOADING_KEY[info.szKey] = nil
+			end
+			FireUIEvent('MY_TM_RR_META_LIST_UPDATE')
+		end,
 	})
 end
 
@@ -305,14 +315,14 @@ function D.DownloadData(info)
 		if p and p.szVersion == info.szVersion and IsLocalFileExist(MY_TM_DATA_ROOT .. szUUID .. '.jx3dat') then
 			return D.LoadConfigureFile(szUUID .. '.jx3dat', info)
 		end
-		if not (META_DOWNLOADER and META_DOWNLOADER:IsValid()) then
+		if not (DATA_DOWNLOADER and DATA_DOWNLOADER:IsValid()) then
 			return LIB.Topmsg(_L['Downloader is not ready!'])
 		end
-		if META_DOWNLOADER.szDownloadingKey then
+		if DATA_DOWNLOADER.szDownloadingKey then
 			return LIB.Topmsg(_L['Dowloading in progress, please wait...'])
 		end
-		META_DOWNLOADER.szDownloadingKey = info.szKey
-		META_DOWNLOADER.FromTextureFile = function(_, szPath)
+		DATA_DOWNLOADER.szDownloadingKey = info.szKey
+		DATA_DOWNLOADER.FromTextureFile = function(_, szPath)
 			local data = LIB.LoadLUAData(szPath, LUA_CONFIG)
 			if data then
 				local szFile = szUUID .. '.jx3dat'
@@ -322,10 +332,10 @@ function D.DownloadData(info)
 			else
 				LIB.Topmsg(_L('Decode %s failed!', info.szTitle))
 			end
-			META_DOWNLOADER.szDownloadingKey = nil
+			DATA_DOWNLOADER.szDownloadingKey = nil
 			FireUIEvent('MY_TM_RR_META_LIST_UPDATE')
 		end
-		META_DOWNLOADER:FromRemoteFile(info.szDataURL)
+		DATA_DOWNLOADER:FromRemoteFile(info.szDataURL)
 		FireUIEvent('MY_TM_RR_META_LIST_UPDATE')
 	end, function(szErrmsg)
 		if szErrmsg then
@@ -364,18 +374,19 @@ function D.UpdateList(frame)
 		wnd:Lookup('Btn_Info'):SetVisible(not IsEmpty(p.szAboutURL))
 		wnd:Lookup('Btn_Info', 'Text_Info'):SetText(_L['See details'])
 		wnd:Lookup('Btn_Download', 'Text_Download'):SetText(
-			(META_DOWNLOADER and META_DOWNLOADER.szDownloadingKey == p.szKey and _L['Downloading...'])
+			(META_DOWNLOADING_KEY[p.szKey] and _L['Fetching...'])
+			or (DATA_DOWNLOADER and DATA_DOWNLOADER.szDownloadingKey == p.szKey and _L['Downloading...'])
 			or (p.szKey == O.szLastKey and _L['Last select'])
 			or _L['Download']
 		)
-		wnd:Lookup('Btn_Download'):Enable(not META_DOWNLOADER or META_DOWNLOADER.szDownloadingKey ~= p.szKey)
+		wnd:Lookup('Btn_Download'):Enable(not DATA_DOWNLOADER or DATA_DOWNLOADER.szDownloadingKey ~= p.szKey)
 		wnd.info = p
 	end
 	container:FormatAllContentPos()
 end
 
 function D.OnFrameCreate()
-	META_DOWNLOADER = this:Lookup('', 'Image_Downloader')
+	DATA_DOWNLOADER = this:Lookup('', 'Image_Downloader')
 	this:Lookup('Btn_SyncTeam', 'Text_SyncTeam'):SetText(_L['Sync team'])
 	this:Lookup('Btn_AddUrl', 'Text_AddUrl'):SetText(_L['Add url'])
 	this:Lookup('Btn_RemoveUrl', 'Text_RemoveUrl'):SetText(_L['Remove url'])

@@ -200,6 +200,7 @@ data = {
 	['Last select'] = '上次选择',
 	['Can update'] = '有更新',
 	['Download'] = '下载',
+	['Fetching...'] = '获取中...',
 	['Downloading...'] = '下载中...',
 	['You are not in the team.'] = '你不在队伍中。',
 	['You are not team leader.'] = '你不是队长，无法执行这个操作。',
