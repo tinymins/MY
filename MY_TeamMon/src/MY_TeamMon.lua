@@ -1690,6 +1690,7 @@ local function UpgradeFocusData(data, aFocus)
 	if not aFocus then
 		return
 	end
+	local nCount = 0
 	for dwMapID, aData in pairs(aFocus) do
 		if not data['NPC'][dwMapID] then
 			data['NPC'][dwMapID] = {}
@@ -1717,7 +1718,11 @@ local function UpgradeFocusData(data, aFocus)
 				tRelation = focus.tRelation,
 				nMaxDistance = focus.nMaxDistance,
 			})
+			nCount = nCount + 1
 		end
+	end
+	if nCount > 0 then
+		LIB.Sysmsg(_L('%s focus rules converted, if you are data author please notice that focus auto convert will not last long, you should export your data again.', nCount), _L['MY_TeamMon'], 'MSG_SYS.ERROR')
 	end
 end
 

@@ -216,6 +216,7 @@ data = {
 	['(Short URL: %s)'] = '（短鏈：%s）',
 	['Copy meta url'] = '複製訂閱地址',
 	['Copy short meta url'] = '複製短地址',
+	['%s focus rules converted, if you are data author please notice that focus auto convert will not last long, you should export your data again.'] = '%s條焦點數據升級成功。注意：如果您是數據作者，請注意該數據升級邏輯將在未來幾個版本後移除，您需要在此之前重新導出數據，否則舊版數據中的焦點列表未來可能無法成功導入。',
 	-- Circle.lua --
 	['The map does not exist'] = '這個地圖不存在',
 	['All data'] = '全部的數據',
