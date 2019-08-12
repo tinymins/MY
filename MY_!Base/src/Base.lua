@@ -119,23 +119,26 @@ local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 ---------------------------------------------------------------------------------------------
 -- 本地函数变量
 ---------------------------------------------------------------------------------------------
-local _BUILD_            = '20190809'
-local _VERSION_          = 0x2013600
-local _MENU_COLOR_       = {255, 165, 79}
-local _MAX_PLAYER_LEVEL_ = 100
-local _INTERFACE_ROOT_   = './Interface/'
-local _NAME_SPACE_       = 'MY'
-local _ADDON_ROOT_       = _INTERFACE_ROOT_ .. 'MY/'
-local _DATA_ROOT_        = _INTERFACE_ROOT_ .. 'MY#DATA/'
-local _FRAMEWORK_ROOT_   = _INTERFACE_ROOT_ .. 'MY/MY_!Base/'
-local _PSS_ST_           = _FRAMEWORK_ROOT_ .. 'img/ST.pss'
-local _UITEX_ST_         = _FRAMEWORK_ROOT_ .. 'img/ST_UI.UITex'
-local _UITEX_COMMON_     = _FRAMEWORK_ROOT_ .. 'img/UICommon.UITex'
-local _UICOMPONENT_ROOT_ = _FRAMEWORK_ROOT_ .. 'ui/components/'
-local _UITEX_POSTER_     = _ADDON_ROOT_ .. 'MY_Resource/img/Poster.UITex'
-local _DEBUG_LEVEL_      = tonumber(LoadLUAData(_DATA_ROOT_ .. 'debug.level.jx3dat') or nil) or 4
-local _DELOG_LEVEL_      = tonumber(LoadLUAData(_DATA_ROOT_ .. 'delog.level.jx3dat') or nil) or 4
-local _NORESTIME_        = tonumber(LoadLUAData(_DATA_ROOT_ .. 'nrtim.level.jx3dat') or nil) or -1
+local _BUILD_                = '20190809'
+local _VERSION_              = 0x2013600
+local _MENU_COLOR_           = {255, 165, 79}
+local _MAX_PLAYER_LEVEL_     = 100
+local _INTERFACE_ROOT_       = './Interface/'
+local _NAME_SPACE_           = 'MY'
+local _ADDON_ROOT_           = _INTERFACE_ROOT_ .. 'MY/'
+local _DATA_ROOT_            = _INTERFACE_ROOT_ .. 'MY#DATA/'
+local _FRAMEWORK_ROOT_       = _INTERFACE_ROOT_ .. 'MY/MY_!Base/'
+local _PSS_ST_               = _FRAMEWORK_ROOT_ .. 'img/ST.pss'
+local _UITEX_ST_             = _FRAMEWORK_ROOT_ .. 'img/ST_UI.UITex'
+local _UITEX_COMMON_         = _FRAMEWORK_ROOT_ .. 'img/UICommon.UITex'
+local _UICOMPONENT_ROOT_     = _FRAMEWORK_ROOT_ .. 'ui/components/'
+local _UITEX_POSTER_         = _ADDON_ROOT_ .. 'MY_Resource/img/Poster.UITex'
+local _MAINICON_FRAME_       = 0
+local _MENUICON_FRAME_       = 14
+local _MENUICON_HOVER_FRAME_ = 14
+local _DEBUG_LEVEL_          = tonumber(LoadLUAData(_DATA_ROOT_ .. 'debug.level.jx3dat') or nil) or 4
+local _DELOG_LEVEL_          = tonumber(LoadLUAData(_DATA_ROOT_ .. 'delog.level.jx3dat') or nil) or 4
+local _NORESTIME_            = tonumber(LoadLUAData(_DATA_ROOT_ .. 'nrtim.level.jx3dat') or nil) or -1
 -----------------------------------------------
 -- 加载语言包
 -----------------------------------------------
@@ -680,28 +683,31 @@ end
 local PACKET_INFO
 do
 local tInfo = {
-	NAME             = _NAME_            ,
-	SHORT_NAME       = _SHORT_NAME_      ,
-	UITEX_COMMON     = _UITEX_COMMON_    ,
-	UITEX_POSTER     = _UITEX_POSTER_    ,
-	UITEX_ST         = _UITEX_ST_        ,
-	UICOMPONENT_ROOT = _UICOMPONENT_ROOT_,
-	VERSION          = _VERSION_         ,
-	BUILD            = _BUILD_           ,
-	NAME_SPACE       = _NAME_SPACE_      ,
-	DEBUG_LEVEL      = _DEBUG_LEVEL_     ,
-	DELOG_LEVEL      = _DELOG_LEVEL_     ,
-	INTERFACE_ROOT   = _INTERFACE_ROOT_  ,
-	ROOT             = _ADDON_ROOT_      ,
-	DATA_ROOT        = _DATA_ROOT_       ,
-	FRAMEWORK_ROOT   = _FRAMEWORK_ROOT_  ,
-	AUTHOR           = _AUTHOR_          ,
-	AUTHOR_WEIBO     = _AUTHOR_WEIBO_    ,
-	AUTHOR_WEIBO_URL = _AUTHOR_WEIBO_URL_,
-	AUTHOR_SIGNATURE = _AUTHOR_SIGNATURE_,
-	AUTHOR_ROLES     = _AUTHOR_ROLES_    ,
-	MENU_COLOR       = _MENU_COLOR_      ,
-	MAX_PLAYER_LEVEL = _MAX_PLAYER_LEVEL_,
+	NAME                 = _NAME_                ,
+	SHORT_NAME           = _SHORT_NAME_          ,
+	UITEX_COMMON         = _UITEX_COMMON_        ,
+	UITEX_POSTER         = _UITEX_POSTER_        ,
+	UITEX_ST             = _UITEX_ST_            ,
+	MAINICON_FRAME       = _MAINICON_FRAME_      ,
+	MENUICON_FRAME       = _MENUICON_FRAME_      ,
+	MENUICON_HOVER_FRAME = _MENUICON_HOVER_FRAME_,
+	UICOMPONENT_ROOT     = _UICOMPONENT_ROOT_    ,
+	VERSION              = _VERSION_             ,
+	BUILD                = _BUILD_               ,
+	NAME_SPACE           = _NAME_SPACE_          ,
+	DEBUG_LEVEL          = _DEBUG_LEVEL_         ,
+	DELOG_LEVEL          = _DELOG_LEVEL_         ,
+	INTERFACE_ROOT       = _INTERFACE_ROOT_      ,
+	ROOT                 = _ADDON_ROOT_          ,
+	DATA_ROOT            = _DATA_ROOT_           ,
+	FRAMEWORK_ROOT       = _FRAMEWORK_ROOT_      ,
+	AUTHOR               = _AUTHOR_              ,
+	AUTHOR_WEIBO         = _AUTHOR_WEIBO_        ,
+	AUTHOR_WEIBO_URL     = _AUTHOR_WEIBO_URL_    ,
+	AUTHOR_SIGNATURE     = _AUTHOR_SIGNATURE_    ,
+	AUTHOR_ROLES         = _AUTHOR_ROLES_        ,
+	MENU_COLOR           = _MENU_COLOR_          ,
+	MAX_PLAYER_LEVEL     = _MAX_PLAYER_LEVEL_    ,
 }
 PACKET_INFO = SetmetaReadonly(tInfo)
 -- 更新最高玩家等级数据

@@ -1232,8 +1232,9 @@ local function GenerateMenu(aList, bMainMenu)
 			bCheck = true,
 			bChecked = LIB.IsPanelVisible(),
 
-			szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',
-			nFrame = 105, nMouseOverFrame = 106,
+			szIcon = PACKET_INFO.UITEX_COMMON,
+			nFrame = PACKET_INFO.MENUICON_FRAME,
+			nMouseOverFrame = PACKET_INFO.MENUICON_HOVER_FRAME,
 			szLayer = 'ICON_RIGHT',
 			fnClickIcon = LIB.TogglePanel,
 		}

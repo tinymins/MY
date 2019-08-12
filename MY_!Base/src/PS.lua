@@ -803,7 +803,7 @@ function LIB.OnFrameCreate()
 	this:Lookup('', 'Text_Title'):SetText(PACKET_INFO.NAME .. ' v' .. LIB.GetVersion() .. ' Build ' .. PACKET_INFO.BUILD)
 	this:Lookup('', 'Text_Author'):SetText('-- by ' .. PACKET_INFO.AUTHOR_SIGNATURE)
 	this:Lookup('', 'Image_Icon'):SetSize(30, 30)
-	this:Lookup('', 'Image_Icon'):FromUITex(PACKET_INFO.UITEX_COMMON, 0)
+	this:Lookup('', 'Image_Icon'):FromUITex(PACKET_INFO.UITEX_COMMON, PACKET_INFO.MAINICON_FRAME)
 	this:Lookup('Wnd_Total/Btn_Weibo', 'Text_Default'):SetText(_L('Author @%s', PACKET_INFO.AUTHOR_WEIBO))
 	this:Lookup('Btn_Drag'):RegisterLButtonDrag()
 	this.intact = true
