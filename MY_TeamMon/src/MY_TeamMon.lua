@@ -202,7 +202,7 @@ local function ConstructSpeech(aText, aXml, szText, nFont, nR, nG, nB)
 		end
 	end
 	if aText then
-		insert(aXml, szText)
+		insert(aText, szText)
 	end
 end
 
