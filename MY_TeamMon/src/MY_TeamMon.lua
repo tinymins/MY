@@ -297,7 +297,7 @@ function D.OnFrameBreathe()
 							npcInfo.nSec = nil
 							FireUIEvent('MY_TM_NPC_FIGHT', dwTemplateID, false, nTime)
 						end
-						npc.bFightState = tab.bFightState
+						tab.bFightState = npc.bFightState
 					end
 				end
 			end
