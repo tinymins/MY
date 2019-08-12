@@ -2500,7 +2500,7 @@ function D.OpenSettingPanel(data, szType)
 			end,
 			tip = function()
 				if v.nClass == MY_TM_TYPE.NPC_LIFE or v.nClass == MY_TM_TYPE.NPC_MANA then
-					return _L['Life/mana statement.\n\nExample: 0.2,Remain 20%;0.5,Remain Half;0.01,Almost empty']
+					return _L['Life/mana statement.\n\nExample: 0.7,Remain 70%;0.5,Remain Half;0.01,Almost empty']
 				end
 				return _L['Simple countdown time or multi countdown statement. Input pure number for simple countdown time, otherwise for multi countdown statement.\n\nMulti countdown example: 10,Countdown1;25,Countdown2;55,Countdown3\nExplain: Countdown1 finished will start Countdown2, so as Countdown3.']
 			end,
