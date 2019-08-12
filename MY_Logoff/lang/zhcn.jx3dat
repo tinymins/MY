@@ -16,7 +16,7 @@ data = {
     ['return to game login while leaving fighting.'] = '在下一次脱离战斗的一瞬间返回账户登录页面。',
 
     ['Logoff has been cancelled.'] = '自动登出已取消。',
-    ['Logoff is ready for your casting unfight skill.'] = '脱战登出已启动，请释放脱战技能，游戏将在脱战瞬间下线。',
+    ['Logoff is ready for your casting unfight skill.'] = '脱战登出已启动，请释放脱战招式，游戏将在脱战瞬间下线。',
     ['Idle off has been cancelled.'] = '暂离登出已取消。',
     ['Idle off notice: you\'ll auto logoff if you keep idle for %ds.'] = '暂离登出提醒：如果您继续保持离开状态%d秒后，您将会自动登出游戏。',
     ['Idle off notice: you\'ll auto logoff if you keep idle for %dm %ds.'] = '暂离登出提醒：如果您继续保持离开状态%d分%d秒后，您将会自动登出游戏。',

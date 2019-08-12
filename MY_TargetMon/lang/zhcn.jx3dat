@@ -58,8 +58,8 @@ data = {
         ['TEAM_MARK_FAN'  ] = '团队标记 - 扇子',
     },
     ['TYPE'] = {
-        ['BUFF' ] = 'BUFF监控',
-        ['SKILL'] = '技能CD监控',
+        ['BUFF' ] = '气劲监控',
+        ['SKILL'] = '招式监控',
     },
     ['ALIGNMENT'] = {
         ['LEFT'] = '左对齐',

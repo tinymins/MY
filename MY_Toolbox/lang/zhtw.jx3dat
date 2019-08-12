@@ -52,7 +52,7 @@ data = {
     ['auto hide chat panel'] = '自動隱藏聊天欄',
     ['Redirect metion to whisper'] = '記錄其他頻道提及我的點名內容到密聊頻道',
 
-    ['visual skill'] = '顯示歷史技能列表',
+    ['visual skill'] = '顯示歷史招式列表',
     ['display %d skills.'] = '顯示%d格。',
 
     ['avoid blacking shenxing cd'] = '防止神行CD被吃',
