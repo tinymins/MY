@@ -1550,14 +1550,6 @@ function D.OpenSettingPanel(data, szType)
 		end
 	end
 
-	local function UI_tonumber(szNum, nDefault)
-		if tonumber(szNum) then
-			return tonumber(szNum)
-		else
-			return nDefault
-		end
-	end
-
 	local function SetCountdownType(dat, val, ui)
 		dat.nClass = val
 		ui:text(_L['Countdown TYPE ' ..  dat.nClass])
@@ -1704,7 +1696,7 @@ function D.OpenSettingPanel(data, szType)
 			x = nX + 2, y = nY + 2, w = 30, h = 26,
 			text = data.nCount or 1, edittype = 0,
 			onchange = function(nNum)
-				data.nCount = UI_tonumber(nNum)
+				data.nCount = tonumber(nNum)
 				if data.nCount == 1 then
 					data.nCount = nil
 				end
@@ -1983,7 +1975,7 @@ function D.OpenSettingPanel(data, szType)
 			x = nX + 2, y = nY + 2, w = 30, h = 26,
 			text = data.nCount or 1, edittype = 0,
 			onchange = function(nNum)
-				data.nCount = UI_tonumber(nNum)
+				data.nCount = tonumber(nNum)
 				if data.nCount == 1 then
 					data.nCount = nil
 				end
@@ -2094,7 +2086,7 @@ function D.OpenSettingPanel(data, szType)
 		nX = ui:append('WndEditBox', {
 			x = nX + 2, y = nY + 2, w = 30, h = 26, text = data.nCount or 1, edittype = 0,
 			onchange = function(nNum)
-				data.nCount = UI_tonumber(nNum)
+				data.nCount = tonumber(nNum)
 				if data.nCount == 1 then
 					data.nCount = nil
 				end
@@ -2436,7 +2428,7 @@ function D.OpenSettingPanel(data, szType)
 				end
 				return menu
 			end,
-		}, true):autoWidth():pos('BOTTOMRIGHT')
+		}, true):pos('BOTTOMRIGHT')
 		nX = ui:append('Box', {
 			x = nX + 5, y = nY, w = 24, h = 24, icon = v.nIcon or nIcon,
 			hover = function(bHover) this:SetObjectMouseOver(bHover) end,
@@ -2448,25 +2440,23 @@ function D.OpenSettingPanel(data, szType)
 				end)
 			end,
 		}, true):pos('BOTTOMRIGHT')
-		local bLife = v.nClass ~= MY_TM_TYPE.NPC_LIFE and v.nClass ~= MY_TM_TYPE.NPC_MANA and tonumber(v.nTime)
+		local bSimple = v.nClass ~= MY_TM_TYPE.NPC_LIFE and v.nClass ~= MY_TM_TYPE.NPC_MANA and (IsEmpty(v.nTime) or tonumber(v.nTime)) and true or false
+		-- 队伍频道报警
 		nX = ui:append('WndCheckBox', {
 			x = nX + 5, y = nY - 2, text = _L['TC'], color = GetMsgFontColor('MSG_TEAM', true), checked = v.bTeamChannel,
 			oncheck = function(bCheck)
 				v.bTeamChannel = bCheck and true or nil
 			end,
+			tip = _L['Raid talk warning'],
+			tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 		}, true):autoWidth():pos('BOTTOMRIGHT')
+		-- 普通倒计时时间/分段倒计时
 		ui:append('WndEditBox', {
-			name = 'CountdownName' .. k, x = nX + 5, y = nY, w = 295, h = 25, text = v.szName,
-			visible = bLife or false,
-			onchange = function(szName)
-				v.szName = szName
-			end,
-		}, true):pos('BOTTOMRIGHT')
-		nX = ui:append('WndEditBox', {
-			name = 'CountdownTime' .. k, x = nX + 5 + (bLife and 300 or 0), y = nY, w = bLife and 100 or 400, h = 25,
+			name = 'CountdownTime' .. k,
+			x = nX + 5, y = nY, w = bSimple and 100 or 400, h = 25,
 			text = v.nTime, color = (v.nClass ~= MY_TM_TYPE.NPC_LIFE and not CheckCountdown(v.nTime)) and { 255, 0, 0 },
 			onchange = function(szNum)
-				v.nTime = UI_tonumber(szNum, szNum)
+				v.nTime = tonumber(szNum) or szNum
 				local edit = ui:children('#CountdownTime' .. k)
 				if szNum == '' then
 					return
@@ -2477,7 +2467,7 @@ function D.OpenSettingPanel(data, szType)
 					if tonumber(szNum) then
 						if this:GetW() > 200 then
 							local x, y = edit:pos()
-							edit:pos(x + 300, y):size(100, 25):color(255, 255, 255)
+							edit:size(100, 25):color(255, 255, 255)
 							ui:children('#CountdownName' .. k):visible(true):text(v.szName or g_tStrings.CHAT_NAME)
 						end
 					else
@@ -2488,27 +2478,44 @@ function D.OpenSettingPanel(data, szType)
 							for k, v in ipairs(CheckCountdown(szNum)) do
 								insert(xml, GetFormatText(v.nTime .. ' - ' .. v.szName .. '\n'))
 							end
-							OutputTip(concat(xml), 300, { x, y, w, h }, 1, true, 'MY_TeamMon')
 							edit:color(255, 255, 255)
+							LIB.OutputTip(this, concat(xml), true)
 						else
 							HideTip()
 							edit:color(255, 0, 0)
 						end
 						if this:GetW() < 200 then
 							local x, y = edit:pos()
-							edit:pos(x - 300, y):size(400, 25)
+							edit:size(400, 25)
 							ui:children('#CountdownName' .. k):visible(false)
 						end
 					end
 				end
 			end,
+			tip = _L['Simple countdown time or multi countdown statement. Input pure number for simple countdown time, otherwise for multi countdown statement.\n\nMulti countdown example: 10,Countdown1;25,Countdown2;55,Countdown3\nExplain: Countdown1 finished will start Countdown2, so as Countdown3.'],
+			tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+		}, true)
+		-- 普通倒计时文本
+		nX = ui:append('WndEditBox', {
+			name = 'CountdownName' .. k,
+			x = nX + 5 + 100 + 5, y = nY, w = 295, h = 25, text = v.szName,
+			visible = bSimple,
+			onchange = function(szName)
+				v.szName = szName
+			end,
+			tip = _L['Simple countdown text'],
+			tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+			placeholder = _L['Please input simple countdown text...'],
 		}, true):pos('BOTTOMRIGHT')
+		-- 重复调用时间限制
 		nX = ui:append('WndEditBox', {
 			x = nX + 5, y = nY, w = 30, h = 25,
 			text = v.nRefresh, edittype = 0,
 			onchange = function(szNum)
-				v.nRefresh = UI_tonumber(szNum)
+				v.nRefresh = tonumber(szNum)
 			end,
+			tip = _L['Max repeat time\n\nWhen countdown get trigger again, the last countdown may get overwritten. This config is to sovle this problem, input time limit here to ensure in this time period, countdown will not be trigger again.'],
+			tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 		}, true):pos('BOTTOMRIGHT')
 		nX, nY = ui:append('Image', {
 			x = nX + 5, y = nY, w = 26, h = 26,
@@ -2545,7 +2552,7 @@ function D.OpenSettingPanel(data, szType)
 			data.tCountdown = data.tCountdown or {}
 			local icon = nIocn or 13
 			if szType == 'NPC' then	icon = 13 end
-			insert(data.tCountdown, { nTime = _L['10,Countdown Name;25,Countdown Name'], nClass = -1, nIcon = icon })
+			insert(data.tCountdown, { nTime = 10, szName = _L['Countdown name'], nClass = -1, nIcon = icon })
 			D.OpenSettingPanel(data, szType)
 		end,
 	}, true):pos('BOTTOMRIGHT')
