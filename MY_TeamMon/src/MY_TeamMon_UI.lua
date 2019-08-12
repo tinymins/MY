@@ -1550,10 +1550,18 @@ function D.OpenSettingPanel(data, szType)
 		end
 	end
 
-	local function SetCountdownType(dat, val, ui)
+	local function FormatElPosByCountdownType(dat, ui, i)
+		local bSimple = dat.nClass ~= MY_TM_TYPE.NPC_LIFE and dat.nClass ~= MY_TM_TYPE.NPC_MANA
+			and (IsEmpty(dat.nTime) or tonumber(dat.nTime)) and true or false
+		ui:children('#CountdownTime' .. i):width(bSimple and 100 or 400)
+		ui:children('#CountdownName' .. i):visible(bSimple)
+	end
+
+	local function SetCountdownType(dat, val, ui, i)
 		dat.nClass = val
-		ui:text(_L['Countdown TYPE ' ..  dat.nClass])
 		GetPopupMenu():Hide()
+		FormatElPosByCountdownType(dat, ui, i)
+		ui:children('#Countdown' .. i):text(_L['Countdown TYPE ' ..  dat.nClass])
 	end
 
 	local function CheckCountdown(tTime)
@@ -2341,6 +2349,7 @@ function D.OpenSettingPanel(data, szType)
 	-- 倒计时
 	nX, nY = ui:append('Text', { x = 20, y = nY + 5, text = _L['Countdown'], font = 27 }, true):pos('BOTTOMRIGHT')
 	for k, v in ipairs(data.tCountdown or {}) do
+		-- 类型
 		nX = ui:append('WndComboBox', {
 			name = 'Countdown' .. k, x = 30, w = 155, h = 25, y = nY,
 			color = v.key and { 255, 255, 0 },
@@ -2389,46 +2398,44 @@ function D.OpenSettingPanel(data, szType)
 					if szType == 'BUFF' or szType == 'DEBUFF' then
 						for kk, vv in ipairs({ MY_TM_TYPE.BUFF_GET, MY_TM_TYPE.BUFF_LOSE }) do
 							insert(menu, { szOption = _L['Countdown TYPE ' .. vv], bMCheck = true, bChecked = v.nClass == vv, fnAction = function()
-								SetCountdownType(v, vv, ui:children('#Countdown' .. k))
+								SetCountdownType(v, vv, ui, k)
 							end })
 						end
 					elseif szType == 'CASTING' then
 						insert(menu, { szOption = _L['Countdown TYPE ' .. MY_TM_TYPE.SKILL_END], bMCheck = true, bChecked = v.nClass == MY_TM_TYPE.SKILL_END, fnAction = function()
-							SetCountdownType(v, MY_TM_TYPE.SKILL_END, ui:children('#Countdown' .. k))
+							SetCountdownType(v, MY_TM_TYPE.SKILL_END, ui, k)
 						end })
 						-- if tSkillInfo and tSkillInfo.CastTime ~= 0 then
 							insert(menu, { szOption = _L['Countdown TYPE ' .. MY_TM_TYPE.SKILL_BEGIN], bMCheck = true, bChecked = v.nClass == MY_TM_TYPE.SKILL_BEGIN, fnAction = function()
-								SetCountdownType(v, MY_TM_TYPE.SKILL_BEGIN, ui:children('#Countdown' .. k))
+								SetCountdownType(v, MY_TM_TYPE.SKILL_BEGIN, ui, k)
 							end })
 						-- end
 					elseif szType == 'NPC' then
 						for kk, vv in ipairs({ MY_TM_TYPE.NPC_ENTER, MY_TM_TYPE.NPC_LEAVE, MY_TM_TYPE.NPC_ALLLEAVE, MY_TM_TYPE.NPC_FIGHT, MY_TM_TYPE.NPC_DEATH, MY_TM_TYPE.NPC_ALLDEATH, MY_TM_TYPE.NPC_LIFE, MY_TM_TYPE.NPC_MANA }) do
 							insert(menu, { szOption = _L['Countdown TYPE ' .. vv], bMCheck = true, bChecked = v.nClass == vv, fnAction = function()
-								SetCountdownType(v, vv, ui:children('#Countdown' .. k))
-								if vv == MY_TM_TYPE.NPC_LIFE or vv == MY_TM_TYPE.NPC_MANA then
-									LIB.Alert(_L['Npc life/mana alarm has different format, recommend to reading document.'])
-								end
+								SetCountdownType(v, vv, ui, k)
 							end })
 						end
 					elseif szType == 'DOODAD' then
 						for kk, vv in ipairs({ MY_TM_TYPE.DOODAD_ENTER, MY_TM_TYPE.DOODAD_LEAVE, MY_TM_TYPE.DOODAD_ALLLEAVE }) do
 							insert(menu, { szOption = _L['Countdown TYPE ' .. vv], bMCheck = true, bChecked = v.nClass == vv, fnAction = function()
-								SetCountdownType(v, vv, ui:children('#Countdown' .. k))
+								SetCountdownType(v, vv, ui, k)
 							end })
 						end
 					elseif szType == 'TALK' then
 						insert(menu, { szOption = _L['Countdown TYPE ' .. MY_TM_TYPE.TALK_MONITOR], bMCheck = true, bChecked = v.nClass == MY_TM_TYPE.TALK_MONITOR, fnAction = function()
-							SetCountdownType(v, MY_TM_TYPE.TALK_MONITOR, ui:children('#Countdown' .. k))
+							SetCountdownType(v, MY_TM_TYPE.TALK_MONITOR, ui, k)
 						end })
 					elseif szType == 'CHAT' then
 						insert(menu, { szOption = _L['Countdown TYPE ' .. MY_TM_TYPE.CHAT_MONITOR], bMCheck = true, bChecked = v.nClass == MY_TM_TYPE.CHAT_MONITOR, fnAction = function()
-							SetCountdownType(v, MY_TM_TYPE.CHAT_MONITOR, ui:children('#Countdown' .. k))
+							SetCountdownType(v, MY_TM_TYPE.CHAT_MONITOR, ui, k)
 						end })
 					end
 				end
 				return menu
 			end,
 		}, true):pos('BOTTOMRIGHT')
+		-- 图标
 		nX = ui:append('Box', {
 			x = nX + 5, y = nY, w = 24, h = 24, icon = v.nIcon or nIcon,
 			hover = function(bHover) this:SetObjectMouseOver(bHover) end,
@@ -2440,7 +2447,6 @@ function D.OpenSettingPanel(data, szType)
 				end)
 			end,
 		}, true):pos('BOTTOMRIGHT')
-		local bSimple = v.nClass ~= MY_TM_TYPE.NPC_LIFE and v.nClass ~= MY_TM_TYPE.NPC_MANA and (IsEmpty(v.nTime) or tonumber(v.nTime)) and true or false
 		-- 队伍频道报警
 		nX = ui:append('WndCheckBox', {
 			x = nX + 5, y = nY - 2, text = _L['TC'], color = GetMsgFontColor('MSG_TEAM', true), checked = v.bTeamChannel,
@@ -2453,7 +2459,7 @@ function D.OpenSettingPanel(data, szType)
 		-- 普通倒计时时间/分段倒计时
 		ui:append('WndEditBox', {
 			name = 'CountdownTime' .. k,
-			x = nX + 5, y = nY, w = bSimple and 100 or 400, h = 25,
+			x = nX + 5, y = nY, w = 100, h = 25,
 			text = v.nTime, color = (v.nClass ~= MY_TM_TYPE.NPC_LIFE and not CheckCountdown(v.nTime)) and { 255, 0, 0 },
 			onchange = function(szNum)
 				v.nTime = tonumber(szNum) or szNum
@@ -2492,14 +2498,18 @@ function D.OpenSettingPanel(data, szType)
 					end
 				end
 			end,
-			tip = _L['Simple countdown time or multi countdown statement. Input pure number for simple countdown time, otherwise for multi countdown statement.\n\nMulti countdown example: 10,Countdown1;25,Countdown2;55,Countdown3\nExplain: Countdown1 finished will start Countdown2, so as Countdown3.'],
+			tip = function()
+				if v.nClass == MY_TM_TYPE.NPC_LIFE or v.nClass == MY_TM_TYPE.NPC_MANA then
+					return _L['Life/mana statement.\n\nExample: 0.2,Remain 20%;0.5,Remain Half;0.01,Almost empty']
+				end
+				return _L['Simple countdown time or multi countdown statement. Input pure number for simple countdown time, otherwise for multi countdown statement.\n\nMulti countdown example: 10,Countdown1;25,Countdown2;55,Countdown3\nExplain: Countdown1 finished will start Countdown2, so as Countdown3.']
+			end,
 			tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 		}, true)
 		-- 普通倒计时文本
 		nX = ui:append('WndEditBox', {
 			name = 'CountdownName' .. k,
 			x = nX + 5 + 100 + 5, y = nY, w = 295, h = 25, text = v.szName,
-			visible = bSimple,
 			onchange = function(szName)
 				v.szName = szName
 			end,
@@ -2517,6 +2527,7 @@ function D.OpenSettingPanel(data, szType)
 			tip = _L['Max repeat time\n\nWhen countdown get trigger again, the last countdown may get overwritten. This config is to sovle this problem, input time limit here to ensure in this time period, countdown will not be trigger again.'],
 			tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 		}, true):pos('BOTTOMRIGHT')
+		-- 删除按钮
 		nX, nY = ui:append('Image', {
 			x = nX + 5, y = nY, w = 26, h = 26,
 			image = file, imageframe = 86,
@@ -2544,6 +2555,7 @@ function D.OpenSettingPanel(data, szType)
 				D.OpenSettingPanel(data, szType)
 			end,
 		}, true):pos('BOTTOMRIGHT')
+		FormatElPosByCountdownType(v, ui, k)
 	end
 	nX = ui:append('WndButton2', {
 		x = 30, y = nY + 10, text = _L['Add countdown'],
