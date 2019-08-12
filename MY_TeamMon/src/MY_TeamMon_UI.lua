@@ -1604,7 +1604,7 @@ function D.OpenSettingPanel(data, szType)
 	ui:event('MY_TMUI_DATA_RELOAD', function() ui:remove() end)
 	ui:event('MY_TMUI_SWITCH_PAGE', function() ui:remove() end)
 	frame.OnFrameDragEnd = function()
-		MY_TMUI_PANEL_ANCHOR = GetFrameAnchor(frame, 'LEFTTOP')
+		MY_TMUI_PANEL_ANCHOR = GetFrameAnchor(frame, 'CENTER')
 	end
 	local nX, nY, _ = 0, 0, 0
 	local nW, nH = ui:size()
