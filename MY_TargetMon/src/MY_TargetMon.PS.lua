@@ -983,9 +983,9 @@ local function DrawPreview(ui, config, OpenDetail)
 	})
 	y = y + 24
 
-	uiWnd:append('WndSliderBox', {
+	uiWnd:append('WndTrackbar', {
 		x = w - 250, y = y,
-		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
+		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		range = {1, 32},
 		value = config.maxLineCount,
 		textfmt = function(val) return _L('Display %d eachline.', val) end,
@@ -996,9 +996,9 @@ local function DrawPreview(ui, config, OpenDetail)
 	})
 	y = y + deltaY
 
-	uiWnd:append('WndSliderBox', {
+	uiWnd:append('WndTrackbar', {
 		x = w - 250, y = y,
-		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
+		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		range = {1, 300},
 		value = config.scale * 100,
 		textfmt = function(val) return _L('UI scale %d%%.', val) end,
@@ -1009,9 +1009,9 @@ local function DrawPreview(ui, config, OpenDetail)
 	})
 	y = y + deltaY
 
-	uiWnd:append('WndSliderBox', {
+	uiWnd:append('WndTrackbar', {
 		x = w - 250, y = y,
-		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
+		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		range = {1, 300},
 		value = config.iconFontScale * 100,
 		textfmt = function(val) return _L('Icon font scale %d%%.', val) end,
@@ -1022,9 +1022,9 @@ local function DrawPreview(ui, config, OpenDetail)
 	})
 	y = y + deltaY
 
-	uiWnd:append('WndSliderBox', {
+	uiWnd:append('WndTrackbar', {
 		x = w - 250, y = y,
-		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
+		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		range = {1, 300},
 		value = config.otherFontScale * 100,
 		textfmt = function(val) return _L('Other font scale %d%%.', val) end,
@@ -1035,9 +1035,9 @@ local function DrawPreview(ui, config, OpenDetail)
 	})
 	y = y + deltaY
 
-	uiWnd:append('WndSliderBox', {
+	uiWnd:append('WndTrackbar', {
 		x = w - 250, y = y,
-		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
+		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		range = {50, 1000},
 		value = config.cdBarWidth,
 		textfmt = function(val) return _L('CD width %dpx.', val) end,
@@ -1048,9 +1048,9 @@ local function DrawPreview(ui, config, OpenDetail)
 	})
 	y = y + deltaY
 
-	uiWnd:append('WndSliderBox', {
+	uiWnd:append('WndTrackbar', {
 		x = w - 250, y = y,
-		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
+		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		range = {-1, 30},
 		value = config.decimalTime,
 		textfmt = function(val)

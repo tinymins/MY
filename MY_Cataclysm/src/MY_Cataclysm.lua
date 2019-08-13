@@ -394,10 +394,10 @@ function MY_Cataclysm.OpenBuffRuleEditor(rec, onChangeNotify, bHideBase)
 		text = _L['Border alpha'],
 		autoenable = function() return not rec.bDelete end,
 	}, true):autoWidth():width() + 5
-	x = x + ui:append('WndSliderBox', {
+	x = x + ui:append('WndTrackbar', {
 		x = x, y = y, text = '',
 		range = {0, 255},
-		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
+		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		value = rec.col and select(4, LIB.HumanColor2RGB(rec.col)) or rec.nColAlpha or 255,
 		onchange = function(nVal)
 			if rec.col then

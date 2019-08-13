@@ -89,11 +89,11 @@ function PS.OnPanelActive(frame)
 		}, true):autoWidth():width() + 5
 	end
 
-	y = y + ui:append('WndSliderBox', {
+	y = y + ui:append('WndTrackbar', {
 		x = x, y = y - 1,
 		value = CFG.fNameFontScale * 100,
 		range = {1, 400},
-		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
+		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		textfmt = function(val) return _L('Scale %d%%', val) end,
 		onchange = function(val)
 			CFG.fNameFontScale = val / 100
@@ -167,11 +167,11 @@ function PS.OnPanelActive(frame)
 		}, true):autoWidth():width() + 5
 	end
 
-	ui:append('WndSliderBox', {
+	ui:append('WndTrackbar', {
 		x = x, y = y - 1,
 		value = CFG.fLifeFontScale * 100,
 		range = {1, 400},
-		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
+		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		textfmt = function(val) return _L('Scale %d%%', val) end,
 		onchange = function(val)
 			CFG.fLifeFontScale = val / 100
@@ -309,11 +309,11 @@ function PS.OnPanelActive(frame)
 		autoenable = function() return CFG.nShowMP end,
 	}, true):width() + 5
 
-	ui:append('WndSliderBox', {
+	ui:append('WndTrackbar', {
 		x = x, y = y - 1,
 		value = CFG.fManaFontScale * 100,
 		range = {1, 400},
-		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
+		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		textfmt = function(val) return _L('Scale %d%%', val) end,
 		onchange = function(val)
 			CFG.fManaFontScale = val / 100

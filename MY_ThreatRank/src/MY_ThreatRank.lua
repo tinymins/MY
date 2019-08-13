@@ -594,7 +594,7 @@ function PS.OnPanelActive(frame)
 	ui:append('Text', { x = x, y = y, text = g_tStrings.STR_RAID_MENU_BG_ALPHA, autoenable = IsEnabled })
 	x = x + 5
 	y = y + 28
-	ui:append('WndSliderBox', {
+	ui:append('WndTrackbar', {
 		x = x, y = y, text = '',
 		range = {0, 100},
 		value = TS.nBGAlpha,

@@ -367,7 +367,7 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + 45
 
-	ui:append('WndSliderBox', {
+	ui:append('WndTrackbar', {
 		x = x, y = y, w = 200,
 		text = _L('current alpha is %d%%.', MY_ArchHUD.nAlpha),
 		textfmt = function(val) return _L('current alpha is %d%%.', val) end,

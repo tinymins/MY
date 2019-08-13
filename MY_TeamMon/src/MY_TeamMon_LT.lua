@@ -144,7 +144,7 @@ function PS.OnPanelActive(frame)
 
 	nX, nY = ui:append('Text', { x = nX, y = nY, text = _L['MY_TeamMon_LT'], font = 27 }, true):pos('BOTTOMRIGHT')
 	nX = ui:append('Text', { text = _L['Font scale'], x = X + 10, y = nY + 10 }, true):pos('BOTTOMRIGHT')
-	nX, nY = ui:append('WndSliderBox', {
+	nX, nY = ui:append('WndTrackbar', {
 		x = nX + 10, y = nY + 13, text = '',
 		range = {1, 2, 10}, value = O.fScale,
 		onchange = function(nVal)
@@ -154,7 +154,7 @@ function PS.OnPanelActive(frame)
 	}, true):pos('BOTTOMRIGHT')
 
 	nX = ui:append('Text', { text = _L['Pause time'], x = X + 10, y = nY }, true):pos('BOTTOMRIGHT')
-	nX, nY = ui:append('WndSliderBox', {
+	nX, nY = ui:append('WndTrackbar', {
 		x = nX + 10, y = nY + 3, text = _L['s'],
 		range = {0.5, 3, 25}, value = O.fPause,
 		onchange = function(nVal)
@@ -163,7 +163,7 @@ function PS.OnPanelActive(frame)
 	}, true):pos('BOTTOMRIGHT')
 
 	nX = ui:append('Text', { text = _L['FadeOut time'], x = X + 10, y = nY }, true):pos('BOTTOMRIGHT')
-	nX, nY = ui:Append('WndSliderBox', {
+	nX, nY = ui:Append('WndTrackbar', {
 		x = nX + 10, y = nY + 3, text = _L['s'],
 		range = {0, 3, 30}, value = O.fFadeOut,
 		onchange = function(nVal)

@@ -487,11 +487,11 @@ function PS.OnPanelActive(wnd)
 	}, true):autoWidth()
 	y = y + deltaY
 
-	ui:append('WndSliderBox', {
+	ui:append('WndTrackbar', {
 		x = x, y = y, w = 150,
 		textfmt = function(val) return _L('Max display count %d.', val) end,
 		range = {1, 20},
-		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
+		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		value = MY_Focus.nMaxDisplay,
 		onchange = function(val)
 			MY_Focus.nMaxDisplay = val
@@ -500,11 +500,11 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + deltaY
 
-	ui:append('WndSliderBox', {
+	ui:append('WndTrackbar', {
 		x = x, y = y, w = 150,
 		textfmt = function(val) return _L('Current scale-x is %d%%.', val) end,
 		range = {10, 300},
-		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
+		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		value = MY_Focus.fScaleX * 100,
 		onchange = function(val)
 			MY_Focus.fScaleX = val / 100
@@ -513,11 +513,11 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + deltaY
 
-	ui:append('WndSliderBox', {
+	ui:append('WndTrackbar', {
 		x = x, y = y, w = 150,
 		textfmt = function(val) return _L('Current scale-y is %d%%.', val) end,
 		range = {10, 300},
-		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
+		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		value = MY_Focus.fScaleY * 100,
 		onchange = function(val)
 			MY_Focus.fScaleY = val / 100

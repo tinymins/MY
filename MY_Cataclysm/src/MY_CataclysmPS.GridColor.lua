@@ -204,11 +204,11 @@ function PS.OnPanelActive(frame)
 					end,
 				}, true):width() + 5
 			else
-				x = x + ui:append('WndSliderBox', {
+				x = x + ui:append('WndTrackbar', {
 					x = x, y = y + 3, h = 22,
 					range = {0, 255},
 					value = CFG.tDistanceAlpha[i],
-					sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
+					trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 					onchange = function(val)
 						CFG.tDistanceAlpha[i] = val
 						if MY_Cataclysm.GetFrame() then
@@ -250,11 +250,11 @@ function PS.OnPanelActive(frame)
 		}, true):width() + 5
 	end
 	if CFG.nBGColorMode ~= CTM_BG_COLOR_MODE.BY_DISTANCE then
-		x = x + ui:append('WndSliderBox', {
+		x = x + ui:append('WndTrackbar', {
 			x = x, y = y + 3, h = 22,
 			range = {0, 255},
 			value = CFG.tOtherAlpha[3],
-			sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
+			trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 			onchange = function(val)
 				CFG.tOtherAlpha[3] = val
 				if MY_Cataclysm.GetFrame() then
@@ -286,11 +286,11 @@ function PS.OnPanelActive(frame)
 		}, true):width() + 5
 	end
 	if CFG.nBGColorMode ~= CTM_BG_COLOR_MODE.BY_DISTANCE then
-		x = x + ui:append('WndSliderBox', {
+		x = x + ui:append('WndTrackbar', {
 			x = x, y = y + 3, h = 22,
 			range = {0, 255},
 			value = CFG.tOtherAlpha[2],
-			sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
+			trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 			onchange = function(val)
 				CFG.tOtherAlpha[2] = val
 				if MY_Cataclysm.GetFrame() then

@@ -904,10 +904,10 @@ function PS.OnPanelActive(frame)
 	x = X + 10
 	ui:append('Text', { x = x, y = y, text = g_tStrings.STR_QUESTTRACE_CHANGE_ALPHA, color = { 255, 255, 200 }, autoenable = IsEnabled })
 	x = x + 70
-	ui:append('WndSliderBox', {
+	ui:append('WndTrackbar', {
 		x = x, y = y, text = '',
 		range = {1, 255},
-		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
+		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		value = MY_CombatText.nMaxAlpha,
 		onchange = function(nVal)
 			MY_CombatText.nMaxAlpha = nVal
@@ -918,10 +918,10 @@ function PS.OnPanelActive(frame)
 	x = x + 180
 	ui:append('Text', { x = x, y = y, text = _L['Hold time'], color = { 255, 255, 200 }, autoenable = IsEnabled })
 	x = x + 70
-	ui:append('WndSliderBox', {
+	ui:append('WndTrackbar', {
 		x = x, y = y, textfmt = function(val) return val .. _L['ms'] end,
 		range = {700, 2500},
-		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
+		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		value = MY_CombatText.nTime * COMBAT_TEXT_TOTAL,
 		onchange = function(nVal)
 			MY_CombatText.nTime = nVal / COMBAT_TEXT_TOTAL
@@ -933,10 +933,10 @@ function PS.OnPanelActive(frame)
 	x = X + 10
 	ui:append('Text', { x = x, y = y, text = _L['FadeIn time'], color = { 255, 255, 200 }, autoenable = IsEnabled })
 	x = x + 70
-	ui:append('WndSliderBox', {
+	ui:append('WndTrackbar', {
 		x = x, y = y, textfmt = function(val) return val .. _L['Frame'] end,
 		range = {0, 15},
-		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
+		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		value = MY_CombatText.nFadeIn,
 		onchange = function(nVal)
 			MY_CombatText.nFadeIn = nVal
@@ -947,10 +947,10 @@ function PS.OnPanelActive(frame)
 	x = x + 180
 	ui:append('Text', { x = x, y = y, text = _L['FadeOut time'], color = { 255, 255, 200 }, autoenable = IsEnabled })
 	x = x + 70
-	ui:append('WndSliderBox', {
+	ui:append('WndTrackbar', {
 		x = x, y = y, textfmt = function(val) return val .. _L['Frame'] end,
 		rang = {0, 15},
-		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
+		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		value = MY_CombatText.nFadeOut,
 		onchange = function(nVal)
 			MY_CombatText.nFadeOut = nVal
@@ -962,10 +962,10 @@ function PS.OnPanelActive(frame)
 	x = X + 10
 	ui:append('Text', { x = x, y = y, text = _L['Font Size'], color = { 255, 255, 200 }, autoenable = IsEnabled })
 	x = x + 70
-	ui:append('WndSliderBox', {
+	ui:append('WndTrackbar', {
 		x = x, y = y, textfmt = function(val) return (val / 100) .. _L['times'] end,
 		range = {50, 200},
-		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
+		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		value = MY_CombatText.fScale * 100,
 		onchange = function(nVal)
 			MY_CombatText.fScale = nVal / 100

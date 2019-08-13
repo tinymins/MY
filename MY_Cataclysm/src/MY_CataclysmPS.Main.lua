@@ -228,11 +228,11 @@ function PS.OnPanelActive(frame)
 		end,
 	}, true):autoWidth():width() + 5
 
-	x = x + ui:append('WndSliderBox', {
+	x = x + ui:append('WndTrackbar', {
 		x = x, y = y - 1,
 		value = CFG.nTempTargetDelay / 75,
 		range = {0, 8},
-		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
+		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		onchange = function(val)
 			CFG.nTempTargetDelay = val * 75
 		end,

@@ -137,7 +137,7 @@ _MY_ScreenShot.OnPanelActive = function(wnd)
     local fnRefreshPanel = function(ui)
         ui:children('#WndCheckBox_HideUI'):check(MY_ScreenShot.GetConfig('bAutoHideUI'))
         ui:children('#WndCombo_FileExName'):text(MY_ScreenShot.GetConfig('szFileExName'))
-        ui:children('#WndSliderBox_Quality'):value(MY_ScreenShot.GetConfig('nQuality'))
+        ui:children('#WndTrackbar_Quality'):value(MY_ScreenShot.GetConfig('nQuality'))
         ui:children('#WndEditBox_SsRoot'):text(MY_ScreenShot.GetConfig('szFilePath'))
     end
 
@@ -164,8 +164,8 @@ _MY_ScreenShot.OnPanelActive = function(wnd)
       :text(MY_ScreenShot.GetConfig('szFileExName'))
 
     ui:append('Text', 'Text_Quality'):find('#Text_Quality'):text(_L['set quality (0-100)']):pos(30,150)
-    ui:append('WndSliderBox', 'WndSliderBox_Quality'):children('#WndSliderBox_Quality'):pos(180,150)
-      :sliderStyle(false):range(0, 100)
+    ui:append('WndTrackbar', 'WndTrackbar_Quality'):children('#WndTrackbar_Quality'):pos(180,150)
+      :trackbarStyle(false):range(0, 100)
       :tip(_L['Set screenshot quality(0-100): the larger number, the image will use more hdd space.'])
       :change(function(nValue) MY_ScreenShot.SetConfig('nQuality', nValue) end)
 

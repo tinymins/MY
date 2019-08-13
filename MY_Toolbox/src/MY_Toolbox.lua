@@ -803,9 +803,9 @@ function PS.OnPanelActive(wnd)
 		end,
 	}, true):width() + 5
 
-	ui:append('WndSliderBox', {
+	ui:append('WndTrackbar', {
 		x = x, y = y,
-		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE, range = {1, 32},
+		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE, range = {1, 32},
 		value = MY_VisualSkill.nVisualSkillBoxCount,
 		text = _L('display %d skills.', MY_VisualSkill.nVisualSkillBoxCount),
 		textfmt = function(val) return _L('display %d skills.', val) end,
@@ -945,11 +945,11 @@ function PS.OnPanelActive(wnd)
 			return me and me.dwForceID == CONSTANT.FORCE_TYPE.CHANG_GE
 		end,
 	}, true):width() + 5
-	ui:append('WndSliderBox', {
+	ui:append('WndTrackbar', {
 		x = x, y = y, w = 150,
 		textfmt = function(val) return _L('scale: %d%%.', val) end,
 		range = {10, 800},
-		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
+		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		value = MY_ToolBox.fChangeGeShadowScale * 100,
 		onchange = function(val)
 			MY_ToolBox.fChangeGeShadowScale = val / 100

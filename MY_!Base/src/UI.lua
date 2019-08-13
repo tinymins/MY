@@ -72,7 +72,7 @@ UI = setmetatable({}, {
 			HIDE         = 101,
 			ANIMATE_HIDE = 102,
 		}),
-		SLIDER_DISPTYPE = LIB.SetmetaReadonly({
+		TRACKBAR_STYLE = LIB.SetmetaReadonly({
 			SHOW_VALUE    = false,
 			SHOW_PERCENT  = true,
 		}),
@@ -121,7 +121,7 @@ local function ApplyUIArguments(ui, arg)
 		if arg.color              ~= nil then ui:color          (arg.color      ) end
 		if arg.r or arg.g or arg.b       then ui:color      (arg.r, arg.g, arg.b) end
 		if arg.multiline          ~= nil then ui:multiLine      (arg.multiline  ) end -- must before :text()
-		if arg.sliderstyle        ~= nil then ui:sliderStyle    (arg.sliderstyle) end -- must before :text()
+		if arg.trackbarstyle      ~= nil then ui:trackbarStyle(arg.trackbarstyle) end -- must before :text()
 		if arg.textfmt            ~= nil then ui:text           (arg.textfmt    ) end -- must before :text()
 		if arg.text               ~= nil then ui:text           (arg.text       ) end
 		if arg.placeholder        ~= nil then ui:placeholder    (arg.placeholder) end
@@ -285,8 +285,8 @@ local function GetComponentElement(raw, elementType)
 		if componentType == 'WndWebCef' then
 			element = raw
 		end
-	elseif elementType == 'SLIDER' then
-		if componentType == 'WndSliderBox' then
+	elseif elementType == 'TRACKBAR' then
+		if componentType == 'WndTrackbar' then
 			element = raw:Lookup('WndNewScrollBar_Default')
 		end
 	elseif elementType == 'TEXT' then
@@ -324,12 +324,12 @@ end
 
 local function InitComponent(raw, szType)
 	SetComponentType(raw, szType)
-	if szType == 'WndSliderBox' then
+	if szType == 'WndTrackbar' then
 		local scroll = raw:Lookup('WndNewScrollBar_Default')
 		SetComponentProp(raw, 'bShowPercentage', true)
-		SetComponentProp(raw, 'nSliderMin', 0)
-		SetComponentProp(raw, 'nSliderMax', 100)
-		SetComponentProp(raw, 'nSliderStepVal', 1)
+		SetComponentProp(raw, 'nTrackbarMin', 0)
+		SetComponentProp(raw, 'nTrackbarMax', 100)
+		SetComponentProp(raw, 'nTrackbarStepVal', 1)
 		SetComponentProp(raw, 'onChangeEvents', {})
 		SetComponentProp(raw, 'FormatText', function(value, bPercentage)
 			if bPercentage then
@@ -343,12 +343,12 @@ local function InitComponent(raw, szType)
 			this = raw
 			local nScrollPos = scroll:GetScrollPos()
 			local nStepCount = scroll:GetStepCount()
-			local nMin = GetComponentProp(raw, 'nSliderMin')
-			local nStepVal = GetComponentProp(raw, 'nSliderStepVal')
+			local nMin = GetComponentProp(raw, 'nTrackbarMin')
+			local nStepVal = GetComponentProp(raw, 'nTrackbarStepVal')
 			local nCurrentValue = nScrollPos * nStepVal + nMin
 			local bShowPercentage = GetComponentProp(raw, 'bShowPercentage')
 			if bShowPercentage then
-				local nMax = GetComponentProp(raw, 'nSliderMax')
+				local nMax = GetComponentProp(raw, 'nTrackbarMax')
 				nCurrentValue = floor((nCurrentValue * 100 / nMax) * 100) / 100
 			end
 			local szText = GetComponentProp(raw, 'FormatText')(nCurrentValue, bShowPercentage)
@@ -1238,9 +1238,9 @@ local function SetComponentEnable(raw, bEnable)
 	if combo then
 		combo:Enable(bEnable)
 	end
-	local slider = GetComponentElement(raw, 'SLIDER')
-	if slider then
-		slider:Enable(bEnable)
+	local trackbar = GetComponentElement(raw, 'TRACKBAR')
+	if trackbar then
+		trackbar:Enable(bEnable)
 	end
 	local edit = GetComponentElement(raw, 'EDIT')
 	if edit then
@@ -1360,7 +1360,7 @@ function UI:text(arg0, arg1)
 		for _, raw in ipairs(self.raws) do
 			componentType = GetComponentType(raw)
 			if IsFunction(arg0) then
-				if componentType == 'WndSliderBox' then
+				if componentType == 'WndTrackbar' then
 					SetComponentProp(raw, 'FormatText', arg0)
 					GetComponentProp(raw, 'ResponseUpdateScroll')(true)
 				end
@@ -2565,10 +2565,10 @@ function UI:size(arg0, arg1, arg2, arg3)
 				raw:Lookup('', 'Handle_Padding/Handle_Scroll'):FormatAllItemPos()
 				raw:Lookup('WndScrollBar'):SetRelX(nWidth - 20)
 				raw:Lookup('WndScrollBar'):SetH(nHeight - 20)
-			elseif componentType == 'WndSliderBox' then
+			elseif componentType == 'WndTrackbar' then
 				local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
 				local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
-				local sld = GetComponentElement(raw, 'SLIDER')
+				local sld = GetComponentElement(raw, 'TRACKBAR')
 				local txt = GetComponentElement(raw, 'TEXT')
 				local nWidth = arg0 or max(nWidth, (arg2 or 0) + 5)
 				local nHeight = arg1 or max(nHeight, (arg3 or 0) + 5)
@@ -2617,7 +2617,7 @@ function UI:size(arg0, arg1, arg2, arg3)
 			if raw.GetSize then
 				w, h = raw:GetSize()
 			end
-			raw = GetComponentElement(raw, 'SLIDER')
+			raw = GetComponentElement(raw, 'TRACKBAR')
 			if raw then
 				rw, rh = raw:GetSize()
 			end
@@ -2705,7 +2705,7 @@ local function AutoSize(raw, bAutoWidth, bAutoHeight)
 		if componentType == 'WndCheckBox'
 		or componentType == 'WndRadioBox'
 		or componentType == 'WndComboBox'
-		or componentType == 'WndSliderBox' then
+		or componentType == 'WndTrackbar' then
 			local txt = GetComponentElement(raw, 'TEXT')
 			if txt then
 				local ui = UI(raw)
@@ -2849,21 +2849,21 @@ function UI:range(nMin, nMax, nStep)
 	if IsNumber(nMin) and IsNumber(nMax) and nMax > nMin then
 		nStep = nStep or nMax - nMin
 		for _, raw in ipairs(self.raws) do
-			if GetComponentType(raw) == 'WndSliderBox' then
-				SetComponentProp(raw, 'nSliderMin', nMin)
-				SetComponentProp(raw, 'nSliderMax', nMax)
-				SetComponentProp(raw, 'nSliderStep', nStep)
-				SetComponentProp(raw, 'nSliderStepVal', (nMax - nMin) / nStep)
-				GetComponentElement(raw, 'SLIDER'):SetStepCount(nStep)
+			if GetComponentType(raw) == 'WndTrackbar' then
+				SetComponentProp(raw, 'nTrackbarMin', nMin)
+				SetComponentProp(raw, 'nTrackbarMax', nMax)
+				SetComponentProp(raw, 'nTrackbarStep', nStep)
+				SetComponentProp(raw, 'nTrackbarStepVal', (nMax - nMin) / nStep)
+				GetComponentElement(raw, 'TRACKBAR'):SetStepCount(nStep)
 				GetComponentProp(raw, 'ResponseUpdateScroll')(true)
 			end
 		end
 		return self
 	else -- get
 		local raw = self.raws[1]
-		if raw and GetComponentType(raw) == 'WndSliderBox' then
-			nMin = GetComponentProp(raw, 'nSliderMin')
-			nMax = GetComponentProp(raw, 'nSliderMax')
+		if raw and GetComponentType(raw) == 'WndTrackbar' then
+			nMin = GetComponentProp(raw, 'nTrackbarMin')
+			nMax = GetComponentProp(raw, 'nTrackbarMax')
 			return nMin, nMax
 		end
 	end
@@ -2875,19 +2875,19 @@ function UI:value(nValue)
 	self:_checksum()
 	if nValue then
 		for _, raw in ipairs(self.raws) do
-			if GetComponentType(raw) == 'WndSliderBox' then
-				local nMin = GetComponentProp(raw, 'nSliderMin')
-				local nStepVal = GetComponentProp(raw, 'nSliderStepVal')
-				GetComponentElement(raw, 'SLIDER'):SetScrollPos((nValue - nMin) / nStepVal)
+			if GetComponentType(raw) == 'WndTrackbar' then
+				local nMin = GetComponentProp(raw, 'nTrackbarMin')
+				local nStepVal = GetComponentProp(raw, 'nTrackbarStepVal')
+				GetComponentElement(raw, 'TRACKBAR'):SetScrollPos((nValue - nMin) / nStepVal)
 			end
 		end
 		return self
 	else
 		local raw = self.raws[1]
-		if raw and GetComponentType(raw) == 'WndSliderBox' then
-			local nMin = GetComponentProp(raw, 'nSliderMin')
-			local nStepVal = GetComponentProp(raw, 'nSliderStepVal')
-			return nMin + GetComponentElement(raw, 'SLIDER'):GetScrollPos() * nStepVal
+		if raw and GetComponentType(raw) == 'WndTrackbar' then
+			local nMin = GetComponentProp(raw, 'nTrackbarMin')
+			local nStepVal = GetComponentProp(raw, 'nTrackbarStepVal')
+			return nMin + GetComponentElement(raw, 'TRACKBAR'):GetScrollPos() * nStepVal
 		end
 	end
 end
@@ -3145,12 +3145,12 @@ function UI:align(halign, valign)
 	end
 end
 
--- (self) UI:sliderStyle(nSliderStyle)
-function UI:sliderStyle(nSliderStyle)
+-- (self) UI:trackbarStyle(nTrackbarStyle)
+function UI:trackbarStyle(nTrackbarStyle)
 	self:_checksum()
-	local bShowPercentage = nSliderStyle == UI.SLIDER_DISPTYPE.SHOW_PERCENT
+	local bShowPercentage = nTrackbarStyle == UI.TRACKBAR_STYLE.SHOW_PERCENT
 	for _, raw in ipairs(self.raws) do
-		if GetComponentType(raw) == 'WndSliderBox' then
+		if GetComponentType(raw) == 'WndTrackbar' then
 			SetComponentProp(raw, 'bShowPercentage', bShowPercentage)
 		end
 	end
@@ -3728,7 +3728,7 @@ function UI:change(fnOnChange)
 			if edt then
 				UI(edt):uievent('OnEditChanged', function() LIB.ExecuteWithThis(raw, fnOnChange, edt:GetText()) end)
 			end
-			if GetComponentType(raw) == 'WndSliderBox' then
+			if GetComponentType(raw) == 'WndTrackbar' then
 				insert(GetComponentProp(raw, 'onChangeEvents'), fnOnChange)
 			end
 		end
@@ -3742,8 +3742,8 @@ function UI:change(fnOnChange)
 				Call(edt.OnEditChanged, raw)
 				this = _this
 			end
-			if GetComponentType(raw) == 'WndSliderBox' then
-				local sld = GetComponentElement(raw, 'SLIDER')
+			if GetComponentType(raw) == 'WndTrackbar' then
+				local sld = GetComponentElement(raw, 'TRACKBAR')
 				local _this = this
 				this = sld
 				Call(sld.OnScrollBarPosChanged, raw)
@@ -4282,10 +4282,10 @@ function UI.OpenColorPickerEx(fnAction)
 	wnd:append('Image', { name = 'Select_Image', w = 9, h = 9, x = 0, y = 0 }, true):image('ui/Image/Common/Box.Uitex', 9):toggle(false)
 	wnd:append('Shadow', { name = 'Select', w = 25, h = 25, x = 20, y = 10, color = { 255, 255, 255 } })
 	wnd:append('Text', { name = 'Select_Text', x = 50, y = 10, text = g_tStrings.STR_NONE })
-	wnd:append('WndSliderBox', {
+	wnd:append('WndTrackbar', {
 		x = 20, y = 35, h = 25, w = 306, rw = 272,
 		textfmt = function(val) return ('%d H'):format(val) end,
-		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
+		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		value = COLOR_HUE, range = {0, 360},
 		onchange = function(nVal)
 			COLOR_HUE = nVal
@@ -4444,10 +4444,10 @@ function UI.OpenIconPanel(fnAction)
 			end
 		end,
 	})
-	ui:append('WndSliderBox', {
+	ui:append('WndTrackbar', {
 		x = 10, y = 580, h = 25, w = 500, textfmt = ' Page: %d',
 		range = {1, math.ceil(nMaxIcon / 144)}, value = ICON_PAGE or 21,
-		sliderstyle = UI.SLIDER_DISPTYPE.SHOW_VALUE,
+		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		onchange = function(nVal)
 			LIB.DelayCall(function() GetPage(nVal) end)
 		end,
