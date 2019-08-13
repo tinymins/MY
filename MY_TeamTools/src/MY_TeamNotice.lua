@@ -182,8 +182,8 @@ function TI.CreateFrame(a, b)
 				end
 			end,
 		}, true):autoWidth():width() + 5
-		if MY_TeamMon_RemoteRequest then
-			x = x + ui:append('WndButton2', { x = x, y = y, text = _L['Import Data'], onclick = MY_TeamMon_RemoteRequest.TogglePanel }, true):autoWidth():width() + 5
+		if MY_TeamMon_RR then
+			x = x + ui:append('WndButton2', { x = x, y = y, text = _L['Import Data'], onclick = MY_TeamMon_RR.OpenPanel }, true):autoWidth():width() + 5
 		end
 		-- ×¢²áÊÂ¼þ
 		local frame = TI.GetFrame()
