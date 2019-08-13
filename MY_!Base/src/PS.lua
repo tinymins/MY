@@ -211,7 +211,7 @@ function LIB.RedrawCategory(szCategory)
 	for _, ctg in ipairs(TABS_LIST) do
 		local nCount = 0
 		for i, tab in ipairs(ctg) do
-			if not (tab.bShielded and LIB.IsShieldedVersion()) then
+			if not ((tab.bShielded or tab.nShielded) and LIB.IsShieldedVersion(tab.nShielded)) then
 				nCount = nCount + 1
 			end
 		end
@@ -278,7 +278,7 @@ function LIB.RedrawTabs(szCategory)
 	for _, ctg in ipairs(TABS_LIST) do
 		if ctg.id == szCategory then
 			for i, tab in ipairs(ctg) do
-				if not (tab.bShielded and LIB.IsShieldedVersion()) then
+				if not ((tab.bShielded or tab.nShielded) and LIB.IsShieldedVersion(tab.nShielded)) then
 					local hTab = hTabs:AppendItemFromIni(INI_PATH, 'Handle_Tab')
 					hTab.szID = tab.szID
 					hTab:Lookup('Text_Tab'):SetText(tab.szTitle)
@@ -641,6 +641,7 @@ function LIB.RegisterPanel(szID, szTitle, szCategory, szIconTex, options)
 		szIconTex   = szIconTex  ,
 		dwIconFrame = dwIconFrame,
 		bShielded   = options.bShielded,
+		nShielded   = options.nShielded,
 		fn          = {
 			OnPanelResize   = options.OnPanelResize  ,
 			OnPanelActive   = options.OnPanelActive  ,

@@ -328,7 +328,7 @@ function MY_ArchHUD.OnEvent(event)
 	end
 end
 
-local PS = {}
+local PS = { bShielded = true }
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
 	local x, y = 30, 30
