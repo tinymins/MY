@@ -175,4 +175,5 @@ data = {
 	['Dungeon treasure'] = '秘境寶藏',
 	['Onekey distrib this group'] = '一鍵分配該組物品',
 	['Hold shift click to skip gkp record panel'] = '按住SHIFT點擊可跳過價格記錄界面',
+	['Auto append'] = '茗伊金團追加',
 }
