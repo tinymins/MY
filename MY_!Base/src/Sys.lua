@@ -1543,11 +1543,14 @@ end
 LIB.RegisterEvent('ON_MESSAGE_BOX_OPEN', OnMessageBoxOpen)
 end
 
+do
+local nIndex = 0
 function LIB.Alert(szMsg, fnAction, szSure, fnCancelAction)
 	local nW, nH = Station.GetClientSize()
+	local szName = PACKET_INFO.NAME_SPACE .. '_Alert' .. nIndex
 	local tMsg = {
 		x = nW / 2, y = nH / 3,
-		szName = PACKET_INFO.NAME_SPACE .. '_Alert',
+		szName = szName,
 		szMessage = szMsg,
 		szAlignment = 'CENTER',
 		fnCancelAction = fnCancelAction,
@@ -1556,7 +1559,10 @@ function LIB.Alert(szMsg, fnAction, szSure, fnCancelAction)
 			fnAction = fnAction,
 		},
 	}
+	nIndex = nIndex + 1
 	MessageBox(tMsg)
+	return szName
+end
 end
 
 function LIB.Confirm(szMsg, fnAction, fnCancel, szSure, szCancel, fnCancelAction)
