@@ -263,7 +263,7 @@ end
 LIB.RegisterIdle('MY_ChatLog_Save', onIdle)
 
 local function onExit()
-	if not l_ds then
+	if not D.InitDB() then
 		return
 	end
 	l_ds:FlushDB()
