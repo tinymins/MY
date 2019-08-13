@@ -737,7 +737,9 @@ function D.OnItemMouseLeave()
 	if szName == 'Handle_TreeNode' then
 		D.UpdateMapNodeMouseState(this)
 	elseif szName == 'Handle_TreeItem' then
-		this:Lookup('Image_TreeItemBg_Hover'):Hide()
+		if this:Lookup('Image_TreeItemBg_Hover') then
+			this:Lookup('Image_TreeItemBg_Hover'):Hide()
+		end
 	elseif szName == 'Handle_L' or szName == 'Handle_R' then
 		if MY_TMUI_SELECT_TYPE == 'TALK' or MY_TMUI_SELECT_TYPE == 'CHAT' then
 			if this:Lookup('Image_Light') and this:Lookup('Image_Light'):IsValid() then
