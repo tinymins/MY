@@ -128,7 +128,6 @@ data = {
 	['Succeed'] = '操作成功',
 	['Same data exist'] = '存在相同的数据',
 	['This data'] = '这个数据',
-	['Countdown name'] = '倒计时名称',
 	['Data panel'] = '数据设置',
 	['Open/close MY_TeamMon'] = '打开/关闭团队监控',
 	['Add'] = '添加',

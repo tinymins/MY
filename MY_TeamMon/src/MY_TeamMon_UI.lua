@@ -2623,7 +2623,7 @@ function D.OpenSettingPanel(data, szType)
 			data.tCountdown = data.tCountdown or {}
 			insert(data.tCountdown, {
 				nTime = 10,
-				szName = _L['Countdown name'] .. ' ' .. GetPatternName(),
+				szName = _L['Countdown'] .. ' ' .. GetPatternName(),
 				nClass = -1,
 				nIcon = nIcon or 13,
 			})
