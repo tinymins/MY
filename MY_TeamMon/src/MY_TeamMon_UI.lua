@@ -256,7 +256,7 @@ function D.OnEvent(szEvent)
 	elseif szEvent == 'MY_TMUI_TEMP_RELOAD' or szEvent == 'MY_TMUI_DATA_RELOAD' or szEvent == 'CIRCLE_RELOAD' then
 		if szEvent == 'CIRCLE_RELOAD' and arg0 and MY_TMUI_SELECT_TYPE == 'CIRCLE' then
 			MY_TMUI_SELECT_MAP = arg0
-			D.UpdateTreeStatus(this)
+			D.UpdateMapList(this)
 		end
 		if szEvent == 'MY_TMUI_DATA_RELOAD' or szEvent == 'CIRCLE_RELOAD' then
 			D.RefreshTable(this, 'L')
@@ -265,7 +265,7 @@ function D.OnEvent(szEvent)
 		end
 	elseif szEvent == 'MY_TMUI_SELECT_MAP' then
 		MY_TMUI_SELECT_MAP = arg0
-		D.UpdateTreeStatus(this)
+		D.UpdateMapList(this)
 		D.ScrollMapIntoView(this)
 	end
 end
@@ -277,7 +277,7 @@ end
 function D.RefreshTable(frame, szRefresh)
 	if szRefresh == 'L' then
 		D.UpdateLList()
-		D.UpdateTree(frame)
+		D.RedrawMapList(frame)
 	elseif szRefresh == 'R' then
 		D.UpdateRList()
 	end
@@ -352,7 +352,38 @@ function D.UpdateBG()
 	end
 end
 
-function D.UpdateTree(frame)
+function D.UpdateMapList(frame)
+	local dwCurrentMapID, dwSelectMapID = LIB.GetMapID(), MY_TMUI_SELECT_MAP
+	local hList, hTreeNode, hTreeItem = frame.hTreeH, nil
+	for i = 0, hList:GetItemCount() - 1 do
+		local el = hList:Lookup(i)
+		if el:GetName() == 'Handle_TreeNode' then
+			hTreeNode = el
+			if hTreeNode.nCount == 0 then
+				if not hTreeNode.col then
+					hTreeNode.col = {hTreeNode:Lookup('Text_TreeNode'):GetFontColor()}
+				end
+				hTreeNode:Lookup('Text_TreeNode'):SetFontColor(222, 222, 222)
+			end
+			hTreeNode:Lookup('Image_TreeNodeLocation'):Hide()
+		else
+			hTreeItem = el
+			if hTreeItem.nCount == 0 then
+				if not hTreeItem.col then
+					hTreeItem.col = {hTreeItem:Lookup('Text_TreeItem'):GetFontColor()}
+				end
+				hTreeItem:Lookup('Text_TreeItem'):SetFontColor(222, 222, 222)
+			end
+			if hTreeItem.dwMapID == dwCurrentMapID then
+				hTreeNode:Lookup('Image_TreeNodeLocation'):Show()
+			end
+			hTreeItem:Lookup('Image_TreeItemBg_Sel'):SetVisible(hTreeItem.dwMapID == dwSelectMapID)
+			hTreeItem:Lookup('Image_TreeItemLocation'):SetVisible(hTreeItem.dwMapID == dwCurrentMapID)
+		end
+	end
+end
+
+function D.RedrawMapList(frame)
 	local data, aGroupMap = MY_TeamMon.GetTable(MY_TMUI_SELECT_TYPE), {}
 	-- 全部/其他
 	local tCommon = {
@@ -446,13 +477,13 @@ function D.UpdateTree(frame)
 			hTreeItem.nCount = nCount
 			hTreeItem:SetVisible(MY_TMUI_TREE_EXPAND[v.szGroup])
 		end
-		D.UpdateTreeNodeMouseState(hTreeNode)
+		D.UpdateMapNodeMouseState(hTreeNode)
 	end
 	hList:FormatAllItemPos()
-	D.UpdateTreeStatus(frame)
+	D.UpdateMapList(frame)
 end
 
-function D.UpdateTreeNodeMouseState(hTreeNode)
+function D.UpdateMapNodeMouseState(hTreeNode)
 	local szStatus = MY_TMUI_TREE_EXPAND[hTreeNode.szKey] and 'Collapse' or 'Expand'
 	if hTreeNode.bMouseDown then
 		szStatus = szStatus .. 'Down'
@@ -471,37 +502,6 @@ function D.UpdateTreeNodeMouseState(hTreeNode)
 	hTreeNode:Lookup('Image_TreeNodeBg_' .. szStatus):Show()
 end
 
-function D.UpdateTreeStatus(frame)
-	local dwCurrentMapID, dwSelectMapID = LIB.GetMapID(), MY_TMUI_SELECT_MAP
-	local hList, hTreeNode, hTreeItem = frame.hTreeH, nil
-	for i = 0, hList:GetItemCount() - 1 do
-		local el = hList:Lookup(i)
-		if el:GetName() == 'Handle_TreeNode' then
-			hTreeNode = el
-			if hTreeNode.nCount == 0 then
-				if not hTreeNode.col then
-					hTreeNode.col = {hTreeNode:Lookup('Text_TreeNode'):GetFontColor()}
-				end
-				hTreeNode:Lookup('Text_TreeNode'):SetFontColor(222, 222, 222)
-			end
-			hTreeNode:Lookup('Image_TreeNodeLocation'):Hide()
-		else
-			hTreeItem = el
-			if hTreeItem.nCount == 0 then
-				if not hTreeItem.col then
-					hTreeItem.col = {hTreeItem:Lookup('Text_TreeItem'):GetFontColor()}
-				end
-				hTreeItem:Lookup('Text_TreeItem'):SetFontColor(222, 222, 222)
-			end
-			if hTreeItem.dwMapID == dwCurrentMapID then
-				hTreeNode:Lookup('Image_TreeNodeLocation'):Show()
-			end
-			hTreeItem:Lookup('Image_TreeItemBg_Sel'):SetVisible(hTreeItem.dwMapID == dwSelectMapID)
-			hTreeItem:Lookup('Image_TreeItemLocation'):SetVisible(hTreeItem.dwMapID == dwCurrentMapID)
-		end
-	end
-end
-
 function D.OnLButtonClick()
 	local szName = this:GetName()
 	if szName == 'Btn_Close' then
@@ -513,7 +513,7 @@ function D.OnItemLButtonDown()
 	local szName = this:GetName()
 	if szName == 'Handle_TreeNode' then
 		this.bMouseDown = true
-		D.UpdateTreeNodeMouseState(this)
+		D.UpdateMapNodeMouseState(this)
 	elseif IsCtrlKeyDown() then
 		if szName == 'Handle_R' or szName == 'Handle_L' then
 			local data = {}
@@ -548,7 +548,7 @@ function D.OnItemLButtonUp()
 	local szName = this:GetName()
 	if szName == 'Handle_TreeNode' then
 		this.bMouseDown = nil
-		D.UpdateTreeNodeMouseState(this)
+		D.UpdateMapNodeMouseState(this)
 	end
 end
 
@@ -556,7 +556,7 @@ function D.OnItemLButtonClick()
 	local szName = this:GetName()
 	if szName == 'Handle_TreeNode' then
 		MY_TMUI_TREE_EXPAND[this.szKey] = not MY_TMUI_TREE_EXPAND[this.szKey]
-		D.UpdateTreeNodeMouseState(this)
+		D.UpdateMapNodeMouseState(this)
 		local nIndex = this:GetIndex()
 		local hList = this:GetParent()
 		for i = nIndex + 1, hList:GetItemCount() - 1 do
@@ -570,7 +570,7 @@ function D.OnItemLButtonClick()
 	elseif szName == 'Handle_TreeItem' then
 		local frame = this:GetRoot()
 		MY_TMUI_SELECT_MAP = this.dwMapID
-		D.UpdateTreeStatus(frame)
+		D.UpdateMapList(frame)
 		D.UpdateLList()
 		D.UpdateBG()
 	elseif szName == 'Handle_L' then
@@ -697,7 +697,7 @@ function D.OnItemMouseEnter()
 	local x, y = this:GetAbsPos()
 	local w, h = this:GetSize()
 	if szName == 'Handle_TreeNode' then
-		D.UpdateTreeNodeMouseState(this)
+		D.UpdateMapNodeMouseState(this)
 	elseif szName == 'Handle_TreeItem' then
 		local info = IsNumber(this.dwMapID) and g_tTable.DungeonInfo:Search(this.dwMapID)
 		local szXml = GetFormatText((D.GetMapName(this.dwMapID) or this.dwMapID) ..' (' .. this.nCount ..  ')\n', 47, 255, 255, 0)
@@ -734,7 +734,7 @@ end
 function D.OnItemMouseLeave()
 	local szName = this:GetName()
 	if szName == 'Handle_TreeNode' then
-		D.UpdateTreeNodeMouseState(this)
+		D.UpdateMapNodeMouseState(this)
 	elseif szName == 'Handle_TreeItem' then
 		this:Lookup('Image_TreeItemBg_Hover'):Hide()
 	elseif szName == 'Handle_L' or szName == 'Handle_R' then
@@ -789,7 +789,7 @@ function D.OnItemLButtonDragEnd()
 					D.Exchange(MY_TMUI_SELECT_MAP, data.nIndex, this.dat.nIndex)
 				end
 			else
-				D.UpdateTree(this:GetRoot())
+				D.RedrawMapList(this:GetRoot())
 			end
 		elseif szAction:find('Handle.+R') then
 			D.OpenAddPanel(MY_TMUI_SELECT_TYPE, data)
@@ -809,7 +809,7 @@ function D.OnEditChanged()
 		else
 			MY_TMUI_MAP_SEARCH = szText
 		end
-		D.UpdateTree(this:GetRoot())
+		D.RedrawMapList(this:GetRoot())
 	elseif name == 'Edit_SearchContent' then
 		local szText = LIB.TrimString(this:GetText())
 		if szText == '' then
