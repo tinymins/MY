@@ -1134,6 +1134,7 @@ function D.GetDataName(szType, data)
 			nIcon = data.nFrame
 		end
 	elseif szType == 'DOODAD' then
+		local doodad = GetDoodadTemplate(data.dwID)
 		szName = LIB.GetTemplateName(TARGET.DOODAD, data.dwID) or data.dwID
 		nIcon  = MY_TMUI_DOODAD_ICON[doodad.nKind]
 	elseif szType == 'TALK' or szType == 'CHAT' then
@@ -1495,6 +1496,20 @@ end
 
 -- ÉèÖÃÃæ°å
 function D.OpenSettingPanel(data, szType)
+	local function GetPatternName()
+		if szType == 'BUFF' or szType == 'DEBUFF' then
+			return '{$B' .. data.dwID .. '}'
+		end
+		if szType == 'CASTING' then
+			return '{$S' .. data.dwID .. '}'
+		end
+		if szType == 'NPC' then
+			return '{$N' .. data.dwID .. '}'
+		end
+		if szType == 'DOODAD' then
+			return '{$D' .. data.dwID .. '}'
+		end
+	end
 	local function GetScrutinyTypeMenu()
 		local menu = {
 			{ szOption = g_tStrings.STR_GUILD_ALL, bMCheck = true, bChecked = type(data.nScrutinyType) == 'nil', fnAction = function() data.nScrutinyType = nil end },
@@ -1652,24 +1667,27 @@ function D.OpenSettingPanel(data, szType)
 				local function CloseHelp()
 					LIB.DoMessageBox(szKey)
 				end
+				local szDefault = data.szName or GetPatternName() or szName
 				GetUserInput(_L['Edit name'], function(szText)
-					if LIB.TrimString(szText) == '' then
+					szText = LIB.TrimString(szText)
+					if szText == '' or szText == szName or szText == GetPatternName() then
 						data.szName = nil
 						ui:text(szName)
 					else
 						data.szName = szText
-						ui:text(szText)
+						ui:text(FilterCustomText(szText, true))
 					end
 					CloseHelp()
-				end, CloseHelp, function() return not frame or not frame:IsValid() end, nil, data.szName or szName)
+				end, CloseHelp, function() return not frame or not frame:IsValid() end, nil, szDefault)
 			end})
 			insert(menu, { bDevide = true })
 		end
 		if szType ~= 'NPC' and szType ~= 'TALK' and szType ~= 'CHAT' then
 			insert(menu, { szOption = _L['Edit icon'], fnAction = function()
-				UI.OpenIconPanel(function(nIcon)
-					data.nIcon = nIcon
-					box:SetObjectIcon(nIcon)
+				UI.OpenIconPanel(function(nNewIcon)
+					nIcon = nNewIcon
+					data.nIcon = nNewIcon
+					box:SetObjectIcon(nNewIcon)
 				end)
 			end})
 			insert(menu, { bDevide = true })
@@ -2603,9 +2621,12 @@ function D.OpenSettingPanel(data, szType)
 		enable = not (data.tCountdown and #data.tCountdown > 10),
 		onclick = function()
 			data.tCountdown = data.tCountdown or {}
-			local icon = nIocn or 13
-			if szType == 'NPC' then	icon = 13 end
-			insert(data.tCountdown, { nTime = 10, szName = _L['Countdown name'], nClass = -1, nIcon = icon })
+			insert(data.tCountdown, {
+				nTime = 10,
+				szName = _L['Countdown name'] .. ' ' .. GetPatternName(),
+				nClass = -1,
+				nIcon = nIcon or 13,
+			})
 			D.OpenSettingPanel(data, szType)
 		end,
 	}, true):pos('BOTTOMRIGHT')
