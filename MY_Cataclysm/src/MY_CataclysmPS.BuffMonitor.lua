@@ -114,7 +114,8 @@ function PS.OnPanelActive(frame)
 			local X, Y = 20, 60
 			local x, y = X, Y
 			local edit = ui:append('WndEditBox',{
-				x = x, y = y, w = 310, h = 440, limit = 4096, multiline = true,
+				x = x, y = y, w = 310, h = 440,
+				limit = -1, multiline = true,
 				text = EncodeBuffRuleList(CFG.aBuffList),
 			}, true)
 			y = y + edit:height() + 5
