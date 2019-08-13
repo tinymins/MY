@@ -183,8 +183,14 @@ local function GetDataPath()
 	return szPath
 end
 
-local function NDNameReplacer(szType, szID)
-	local dwID = tonumber(szID)
+local function NDSBNameReplacer(szType, szContent)
+	local dwID, nLevel = unpack(MY_SplitString(szContent, ','))
+	if dwID then
+		dwID = tonumber(dwID)
+	end
+	if nLevel then
+		nLevel = tonumber(nLevel)
+	end
 	if szType == 'N' then
 		return LIB.GetTemplateName(TARGET.NPC, dwID)
 	end
@@ -192,9 +198,12 @@ local function NDNameReplacer(szType, szID)
 		return LIB.GetTemplateName(TARGET.DOODAD, dwID)
 	end
 	if szType == 'S' then
-		return LIB.GetSkillName(dwID)
+		return LIB.GetSkillName(dwID, nLevel)
 	end
-	return '$' .. szType .. szID
+	if szType == 'B' then
+		return LIB.GetBuffName(dwID, nLevel)
+	end
+	return '$' .. szType .. szContent
 end
 
 local FILTER_TEXT_CACHE = {}
@@ -206,7 +215,7 @@ local function FilterCustomText(szOrigin)
 		local szText = szOrigin
 		if IsString(szText) then
 			szText = LIB.ReplaceSensitiveWord(szText)
-				:gsub('%{%$([NDS])(%d+)%}', NDNameReplacer)
+				:gsub('%{%$([NDSB])([%d,]+)%}', NDSBNameReplacer)
 			if LIB.IsShieldedVersion(2) then
 				szText = wsub(szText, 1, 8)
 			end
