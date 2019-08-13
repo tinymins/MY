@@ -183,15 +183,39 @@ local function GetDataPath()
 	return szPath
 end
 
-local function FilterCustomText(szText)
-	if not szText then
+local function NDNameReplacer(szType, szID)
+	local dwID = tonumber(szID)
+	if szType == 'N' then
+		return LIB.GetTemplateName(TARGET.NPC, dwID)
+	end
+	if szType == 'D' then
+		return LIB.GetTemplateName(TARGET.DOODAD, dwID)
+	end
+	if szType == 'S' then
+		return LIB.GetSkillName(dwID)
+	end
+	return '$' .. szType .. szID
+end
+
+local FILTER_TEXT_CACHE = {}
+local function FilterCustomText(szOrigin)
+	if not szOrigin then
 		return
 	end
-	if LIB.IsShieldedVersion(2) then
-		szText = wsub(szText, 1, 8)
+	if not FILTER_TEXT_CACHE[szOrigin] then
+		local szText = szOrigin
+		if IsString(szText) then
+			szText = LIB.ReplaceSensitiveWord(szText)
+				:gsub('%{%$([NDS])(%d+)%}', NDNameReplacer)
+			if LIB.IsShieldedVersion(2) then
+				szText = wsub(szText, 1, 8)
+			end
+		end
+		FILTER_TEXT_CACHE[szOrigin] = szText
 	end
-	return LIB.ReplaceSensitiveWord(szText)
+	return FILTER_TEXT_CACHE[szOrigin]
 end
+LIB.RegisterEvent('MY_SHIELDED_VERSION', function() FILTER_TEXT_CACHE = {} end)
 
 local function ConstructSpeech(aText, aXml, szText, nFont, nR, nG, nB)
 	if aXml then
@@ -664,7 +688,7 @@ function D.CountdownEvent(data, nClass)
 				local tParam = {
 					key      = v.key,
 					nFrame   = v.nFrame,
-					nTime    = v.nTime,
+					nTime    = FilterCustomText(v.nTime),
 					nRefresh = v.nRefresh,
 					szName   = FilterCustomText(v.szName or data.szName),
 					nIcon    = v.nIcon or data.nIcon or 340,
