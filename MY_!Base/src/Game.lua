@@ -1105,13 +1105,13 @@ end
 -- 根据模板ID获取NPC真实名称
 local NPC_NAME_CACHE, DOODAD_NAME_CACHE = {}, {}
 function LIB.GetTemplateName(dwType, dwTemplateID)
-	local CACHE = dwType == TAEGET.NPC and NPC_NAME_CACHE or DOODAD_NAME_CACHE
+	local CACHE = dwType == TARGET.NPC and NPC_NAME_CACHE or DOODAD_NAME_CACHE
 	local szName
 	if CACHE[dwTemplateID] then
 		szName = CACHE[dwTemplateID]
 	end
 	if not szName then
-		if dwType == TAEGET.NPC then
+		if dwType == TARGET.NPC then
 			szName = Table_GetNpcTemplateName(dwTemplateID)
 		else
 			szName = Table_GetDoodadTemplateName(dwTemplateID)
@@ -1147,7 +1147,7 @@ function LIB.GetObjectName(obj, eRetID)
 	elseif szType == 'NPC' then -- NPC
 		szType = 'N'
 		if IsEmpty(szName) then
-			szName = LIB.GetTemplateName(TAEGET.NPC, obj.dwTemplateID)
+			szName = LIB.GetTemplateName(TARGET.NPC, obj.dwTemplateID)
 		end
 		if obj.dwEmployer and obj.dwEmployer ~= 0 then
 			if LIB.Table_IsSimplePlayer(obj.dwTemplateID) then -- 长歌影子
