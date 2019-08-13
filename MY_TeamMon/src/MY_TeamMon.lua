@@ -86,7 +86,7 @@ local MY_TM_INIFILE       = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon.ini'
 
 local MY_TM_SHARE_QUEUE = {}
 local MY_TM_MARK_QUEUE  = {}
-local MY_TM_MARK_FREE   = true -- 标记空闲
+local MY_TM_MARK_IDLE   = true -- 标记空闲
 ----
 local MY_TM_LEFT_BRACKET      = _L['[']
 local MY_TM_RIGHT_BRACKET     = _L[']']
@@ -116,7 +116,6 @@ local MYTM_EVENTS = {
 	'PLAYER_SAY',
 	'ON_WARNING_MESSAGE',
 
-	'MY_TM_SET_MARK',
 	'PARTY_SET_MARK',
 }
 
@@ -339,6 +338,21 @@ function D.OnFrameBreathe()
 	end
 end
 
+function D.OnSetMark(bFinish)
+	if bFinish then
+		MY_TM_MARK_IDLE = true
+	end
+	if MY_TM_MARK_IDLE and #MY_TM_MARK_QUEUE >= 1 then
+		MY_TM_MARK_IDLE = false
+		local r = remove(MY_TM_MARK_QUEUE, 1)
+		local res, err, trace = XpCall(r.fnAction)
+		if not res then
+			FireUIEvent('CALL_LUA_ERROR', 'MY_TeamMon_Mark ERROR: ' .. err .. '\n' .. trace)
+			D.OnSetMark(true)
+		end
+	end
+end
+
 function D.OnEvent(szEvent)
 	if szEvent == 'BUFF_UPDATE' then
 		D.OnBuff(arg0, arg1, arg3, arg4, arg5, arg8, arg9)
@@ -359,16 +373,8 @@ function D.OnEvent(szEvent)
 		end
 	elseif szEvent == 'DO_SKILL_CAST' then
 		D.OnSkillCast(arg0, arg1, arg2, szEvent)
-	elseif szEvent == 'PARTY_SET_MARK' or szEvent == 'MY_TM_SET_MARK' then
-		if #MY_TM_MARK_QUEUE >= 1 then
-			local r = remove(MY_TM_MARK_QUEUE, 1)
-			local res, err = pcall(r.fnAction)
-			if not res then
-				LIB.Debug('MY_TeamMon_Mark ERROR: ' .. err, _L['MY_TeamMon'], DEBUG_LEVEL.WARNING)
-			end
-		else
-			MY_TM_MARK_FREE = true
-		end
+	elseif szEvent == 'PARTY_SET_MARK' then
+		D.OnSetMark(true)
 	elseif szEvent == 'PLAYER_SAY' then
 		if not IsPlayer(arg1) then
 			local szText = MY_GetPureText(arg0)
@@ -640,53 +646,39 @@ function D.SetTeamMark(szType, tMark, dwCharacterID, dwID, nLevel)
 		return
 	end
 	local fnAction = function()
-		local team = GetClientTeam()
-		local tTeamMark, tMarkList = team.GetTeamMark(), {} -- tmd 什么鬼结构。。。
-		for k, v in pairs(tTeamMark) do
-			tMarkList[v] = k
-		end
+		local team, tar = GetClientTeam()
+		local tTeamMark = LIB.FlipObjectKV(team.GetTeamMark())
 		if szType == 'NPC' then
-			for k, v in ipairs(tMark) do
-				if v then
-					if not tMarkList[k] or tMarkList[k] == 0 or (tMarkList[k] and tMarkList[k] ~= dwCharacterID) then
-						local p = tMarkList[k] and GetNpc(tMarkList[k])
-						if not p or (p and p.dwTemplateID ~= dwID) then
-							return team.SetTeamMark(k, dwCharacterID)
-						end
+			for nMark, bMark in ipairs(tMark) do
+				if bMark and tTeamMark[nMark] ~= dwCharacterID then
+					tar = tTeamMark[nMark] and tTeamMark[nMark] ~= 0 and LIB.GetObject(tTeamMark[nMark])
+					if not tar or tar.dwTemplateID ~= dwID then
+						return team.SetTeamMark(nMark, dwCharacterID)
 					end
 				end
 			end
 		elseif szType == 'BUFF' or szType == 'DEBUFF' then
-			for k, v in ipairs(tMark) do
-				if v then
-					if not tMarkList[k] or tMarkList[k] == 0 or (tMarkList[k] and tMarkList[k] ~= dwCharacterID) then
-						local p
-						if tMarkList[k] then
-							p = IsPlayer(tMarkList[k]) and GetPlayer(tMarkList[k]) or GetNpc(tMarkList[k])
-						end
-						if not p or (p and not LIB.GetBuff(p, dwID)) then
-							return team.SetTeamMark(k, dwCharacterID)
-						end
+			for nMark, bMark in ipairs(tMark) do
+				if bMark and tTeamMark[nMark] ~= dwCharacterID then
+					tar = tTeamMark[nMark] and tTeamMark[nMark] ~= 0 and LIB.GetObject(tTeamMark[nMark])
+					if not tar or not LIB.GetBuff(tar, dwID) then
+						return team.SetTeamMark(nMark, dwCharacterID)
 					end
 				end
 			end
 		elseif szType == 'CASTING' then
-			for k, v in ipairs(tMark) do
-				if v then
-					if not tMarkList[k] or (tMarkList[k] and tMarkList[k] ~= dwCharacterID) then
-						return team.SetTeamMark(k, dwCharacterID)
-					end
+			for nMark, bMark in ipairs(tMark) do
+				if bMark and (not tTeamMark[nMark] or tTeamMark[nMark] ~= dwCharacterID) then
+					return team.SetTeamMark(nMark, dwCharacterID)
 				end
 			end
 		end
-		FireUIEvent('MY_TM_SET_MARK', false) -- 标记失败的案例
+		D.OnSetMark(true) -- 标记失败 直接处理下一个
 	end
-	insert(MY_TM_MARK_QUEUE, { fnAction = fnAction })
-	if MY_TM_MARK_FREE then
-		MY_TM_MARK_FREE = false
-		local f = table.remove(MY_TM_MARK_QUEUE, 1)
-		pcall(f.fnAction)
-	end
+	insert(MY_TM_MARK_QUEUE, {
+		fnAction = fnAction,
+	})
+	D.OnSetMark()
 end
 -- 倒计时处理 支持定义无限的倒计时
 function D.CountdownEvent(data, nClass)
