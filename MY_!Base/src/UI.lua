@@ -4818,6 +4818,28 @@ function UI.GetTempElement(szType)
 end
 end
 
+function UI.ScrollIntoView(el, scrollY, nOffsetY, scrollX, nOffsetX)
+	local elParent, nParentW, nParentH = el:GetParent()
+	local nX, nY = el:GetAbsX() - elParent:GetAbsX(), el:GetAbsY() - elParent:GetAbsY()
+	if elParent:GetType() == 'WndContainer' then
+		nParentW, nParentH = elParent:GetAllContentSize()
+	else
+		nParentW, nParentH = elParent:GetAllItemSize()
+	end
+	if nOffsetY then
+		nY = nY + nOffsetY
+	end
+	if scrollY then
+		scrollY:SetScrollPos(nY / nParentH * scrollY:GetStepCount())
+	end
+	if nOffsetX then
+		nX = nX + nOffsetX
+	end
+	if scrollX then
+		scrollX:SetScrollPos(nX / nParentW * scrollX:GetStepCount())
+	end
+end
+
 UI.UpdateItemInfoBoxObject = UpdateItemInfoBoxObject or UpdataItemInfoBoxObject
 
 LIB.UI = UI
