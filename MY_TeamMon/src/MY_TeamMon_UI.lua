@@ -129,6 +129,7 @@ function D.OnFrameCreate()
 	this:RegisterEvent('MY_TMUI_TEMP_UPDATE')
 	this:RegisterEvent('MY_TMUI_TEMP_RELOAD')
 	this:RegisterEvent('MY_TMUI_DATA_RELOAD')
+	this:RegisterEvent('MY_TMUI_SELECT_MAP')
 	if Circle and not LIB.IsShieldedVersion(2) then
 		this:RegisterEvent('CIRCLE_RELOAD')
 	end
@@ -144,6 +145,7 @@ function D.OnFrameCreate()
 	this.hTreeN = this:CreateItemData(MY_TMUI_INIFILE, 'Handle_TreeNode')
 	this.hTreeI = this:CreateItemData(MY_TMUI_INIFILE, 'Handle_TreeItem')
 	this.hTreeH = this:Lookup('PageSet_Main/WndScroll_Tree', '')
+	this.hTreeS = this:Lookup('PageSet_Main/WndScroll_Tree/Btn_Tree_All')
 
 	MY_TMUI_SEARCH = nil -- ÷ÿ÷√À—À˜
 	MY_TMUI_MAP_SEARCH = nil -- ÷ÿ÷√À—À˜
@@ -239,6 +241,7 @@ function D.OnFrameCreate()
 			break
 		end
 	end
+	D.ScrollMapIntoView(this)
 end
 
 function D.OnEvent(szEvent)
@@ -253,12 +256,17 @@ function D.OnEvent(szEvent)
 	elseif szEvent == 'MY_TMUI_TEMP_RELOAD' or szEvent == 'MY_TMUI_DATA_RELOAD' or szEvent == 'CIRCLE_RELOAD' then
 		if szEvent == 'CIRCLE_RELOAD' and arg0 and MY_TMUI_SELECT_TYPE == 'CIRCLE' then
 			MY_TMUI_SELECT_MAP = arg0
+			D.UpdateTreeStatus(this)
 		end
 		if szEvent == 'MY_TMUI_DATA_RELOAD' or szEvent == 'CIRCLE_RELOAD' then
 			D.RefreshTable(this, 'L')
 		elseif szEvent == 'MY_TMUI_TEMP_RELOAD' then
 			D.RefreshTable(this, 'R')
 		end
+	elseif szEvent == 'MY_TMUI_SELECT_MAP' then
+		MY_TMUI_SELECT_MAP = arg0
+		D.UpdateTreeStatus(this)
+		D.ScrollMapIntoView(this)
 	end
 end
 
@@ -1338,6 +1346,26 @@ function D.DrawTableR(data, bInsert)
 	D.RefreshScroll('R')
 end
 
+function D.ScrollMapIntoView(frame)
+	local hList, hNode, hItem = frame.hTreeH
+	for i = 0, hList:GetItemCount() - 1 do
+		hItem = hList:Lookup(i)
+		if hItem:GetName() == 'Handle_TreeNode' then
+			hNode = hItem
+		elseif hItem.dwMapID == MY_TMUI_SELECT_MAP then
+			break
+		end
+		hItem = nil
+	end
+	if not hItem then
+		return
+	end
+	if hNode and not MY_TMUI_TREE_EXPAND[hNode.szKey] then
+		LIB.ExecuteWithThis(hNode, D.OnItemLButtonClick)
+	end
+	UI.ScrollIntoView(hItem, frame.hTreeS)
+end
+
 -- ÃÌº”√Ê∞Â
 function D.OpenAddPanel(szType, data)
 	if szType == 'CIRCLE' then
@@ -1404,6 +1432,7 @@ function D.OpenAddPanel(szType, data)
 				local tab = select(2, MY_TeamMon.CheckSameData(szType, map.dwID, data.dwID or data.szContent, data.nLevel or data.szTarget))
 				if tab then
 					return LIB.Confirm(_L['Data exists, editor?'], function()
+						FireUIEvent('MY_TMUI_SELECT_MAP', map.dwID)
 						D.OpenSettingPanel(tab, szType)
 						ui:remove()
 					end)
@@ -1415,7 +1444,7 @@ function D.OpenAddPanel(szType, data)
 					szContent = data.szContent,
 					szTarget  = data.szTarget
 				}
-				MY_TMUI_SELECT_MAP = map.dwID
+				FireUIEvent('MY_TMUI_SELECT_MAP', map.dwID)
 				D.OpenSettingPanel(MY_TeamMon.AddData(szType, map.dwID, dat), szType)
 				ui:remove()
 			end,
