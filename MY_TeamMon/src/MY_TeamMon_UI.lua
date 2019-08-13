@@ -1648,6 +1648,10 @@ function D.OpenSettingPanel(data, szType)
 		local menu, box = {}, this
 		if szType ~= 'TALK' and szType ~= 'CHAT' then
 			insert(menu, { szOption = _L['Edit name'], fnAction = function()
+				local szKey = LIB.Alert(_L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188'])
+				local function CloseHelp()
+					LIB.DoMessageBox(szKey)
+				end
 				GetUserInput(_L['Edit name'], function(szText)
 					if LIB.TrimString(szText) == '' then
 						data.szName = nil
@@ -1656,7 +1660,8 @@ function D.OpenSettingPanel(data, szType)
 						data.szName = szText
 						ui:text(szText)
 					end
-				end, nil, nil, nil, data.szName or szName)
+					CloseHelp()
+				end, CloseHelp, function() return not frame or not frame:IsValid() end, nil, data.szName or szName)
 			end})
 			insert(menu, { bDevide = true })
 		end
@@ -2536,9 +2541,9 @@ function D.OpenSettingPanel(data, szType)
 			end,
 			tip = function()
 				if v.nClass == MY_TM_TYPE.NPC_LIFE or v.nClass == MY_TM_TYPE.NPC_MANA then
-					return _L['Life/mana statement.\n\nExample: 0.7,Remain 70%;0.5,Remain Half;0.01,Almost empty']
+					return _L['Life/mana statement.\n\nExample: 0.7,Remain 70%;0.5,Remain Half;0.01,Almost empty'] .. '\n\n' .. _L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188']
 				end
-				return _L['Simple countdown time or multi countdown statement. Input pure number for simple countdown time, otherwise for multi countdown statement.\n\nMulti countdown example: 10,Countdown1;25,Countdown2;55,Countdown3\nExplain: Countdown1 finished will start Countdown2, so as Countdown3.']
+				return _L['Simple countdown time or multi countdown statement. Input pure number for simple countdown time, otherwise for multi countdown statement.\n\nMulti countdown example: 10,Countdown1;25,Countdown2;55,Countdown3\nExplain: Countdown1 finished will start Countdown2, so as Countdown3.'] .. '\n\n' .. _L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188']
 			end,
 			tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 		}, true)
@@ -2549,7 +2554,7 @@ function D.OpenSettingPanel(data, szType)
 			onchange = function(szName)
 				v.szName = szName
 			end,
-			tip = _L['Simple countdown text'],
+			tip = _L['Simple countdown text'] .. '\n\n' .. _L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188'],
 			tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 			placeholder = _L['Please input simple countdown text...'],
 		}, true):pos('BOTTOMRIGHT')

@@ -120,6 +120,7 @@ data = {
 	['Life/mana statement.\n\nExample: 0.7,Remain 70%;0.5,Remain Half;0.01,Almost empty'] = '氣血/內力監控內容\n\n示例：0.7,剩下70%;0.5,剩下一半;0.01,快沒了\n注意：最多支持到小數點後兩位，即不支持如“0.751”寫法。',
 	['Raid talk warning'] = '團隊喊話報警',
 	['Simple countdown text'] = '普通倒計時提示語',
+	['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188'] = '註：使用ID解析串可防止內容被屏蔽，支持的模式如下（包含花括弧）：\n1. {$B188} ID為188的氣勁名稱\n2. {$S188} ID為188的武學招式名稱\n3. {$N188} 模板ID為188的系統角色名稱\n4. {$D188} 模板ID為188的交互物件名稱',
 	['Please input simple countdown text...'] = '請輸入普通倒計時提示語...',
 	['Simple countdown time or multi countdown statement. Input pure number for simple countdown time, otherwise for multi countdown statement.\n\nMulti countdown example: 10,Countdown1;25,Countdown2;55,Countdown3\nExplain: Countdown1 finished will start Countdown2, so as Countdown3.'] = '輸入純數字表示普通倒計時時間，否則表示分段倒計時。\n\n分段倒計時示例：10,倒計時1;25,倒計時2;55,倒計時3\n示例解釋：[倒計時1]結束再觸發[倒計時2]（當前倒計時設置的觸發時間-已過時間）15秒的倒計時，[倒計時2]、[倒計時3]以此類推。倒計時的數量不限，可自由填寫，常用於首領進入戰鬥後開始的階段倒計時。',
 	['Max repeat time\n\nWhen countdown get trigger again, the last countdown may get overwritten. This config is to sovle this problem, input time limit here to ensure in this time period, countdown will not be trigger again.'] = '重覆調用時間限制\n\n當倒計時被再次觸發時，可能會導致前一次倒計時被覆蓋，該設置就是解決這個問題，在此直接輸入時間即可保證在這段時間內不會再次被重覆同樣的倒計時。請注意，分段倒計時默認取最大的時間作為重覆調用時間限制，當然您也可以自由更改。',
