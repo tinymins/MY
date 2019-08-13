@@ -1103,18 +1103,23 @@ function LIB.GetObject(arg0, arg1, arg2)
 end
 
 -- 根据模板ID获取NPC真实名称
-local NPC_NAME_CACHE = {}
-function LIB.GetTemplateName(dwTemplateID)
+local NPC_NAME_CACHE, DOODAD_NAME_CACHE = {}, {}
+function LIB.GetTemplateName(dwType, dwTemplateID)
+	local CACHE = dwType == TAEGET.NPC and NPC_NAME_CACHE or DOODAD_NAME_CACHE
 	local szName
-	if NPC_NAME_CACHE[dwTemplateID] then
-		szName = NPC_NAME_CACHE[dwTemplateID]
+	if CACHE[dwTemplateID] then
+		szName = CACHE[dwTemplateID]
 	end
 	if not szName then
-		szName = Table_GetNpcTemplateName(dwTemplateID)
+		if dwType == TAEGET.NPC then
+			szName = Table_GetNpcTemplateName(dwTemplateID)
+		else
+			szName = Table_GetDoodadTemplateName(dwTemplateID)
+		end
 		if szName then
 			szName = szName:gsub('^%s*(.-)%s*$', '%1')
 		end
-		NPC_NAME_CACHE[dwTemplateID] = szName or ''
+		CACHE[dwTemplateID] = szName or ''
 	end
 	if IsEmpty(szName) then
 		szName = nil
@@ -1142,7 +1147,7 @@ function LIB.GetObjectName(obj, eRetID)
 	elseif szType == 'NPC' then -- NPC
 		szType = 'N'
 		if IsEmpty(szName) then
-			szName = LIB.GetTemplateName(obj.dwTemplateID)
+			szName = LIB.GetTemplateName(TAEGET.NPC, obj.dwTemplateID)
 		end
 		if obj.dwEmployer and obj.dwEmployer ~= 0 then
 			if LIB.Table_IsSimplePlayer(obj.dwTemplateID) then -- 长歌影子
