@@ -346,7 +346,8 @@ local function InitComponent(raw, szType)
 			local nMin = GetComponentProp(raw, 'nSliderMin')
 			local nStepVal = GetComponentProp(raw, 'nSliderStepVal')
 			local nCurrentValue = nScrollPos * nStepVal + nMin
-			if GetComponentProp(raw, 'bShowPercentage') then
+			local bShowPercentage = GetComponentProp(raw, 'bShowPercentage')
+			if bShowPercentage then
 				local nMax = GetComponentProp(raw, 'nSliderMax')
 				nCurrentValue = floor((nCurrentValue * 100 / nMax) * 100) / 100
 			end
@@ -2853,7 +2854,6 @@ function UI:range(nMin, nMax, nStep)
 				SetComponentProp(raw, 'nSliderMax', nMax)
 				SetComponentProp(raw, 'nSliderStep', nStep)
 				SetComponentProp(raw, 'nSliderStepVal', (nMax - nMin) / nStep)
-				SetComponentProp(raw, 'bShowPercentage', false)
 				GetComponentElement(raw, 'SLIDER'):SetStepCount(nStep)
 				GetComponentProp(raw, 'ResponseUpdateScroll')(true)
 			end
