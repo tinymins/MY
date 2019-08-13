@@ -14,3 +14,4 @@ Farme	Left	Top	Width	High	File
 12	351	0	123	40	C:\Users\root\Desktop\装饰按钮_中_3_0.tga
 13	351	42	123	40	C:\Users\root\Desktop\装饰按钮_中_4_0.tga
 14	226	140	100	100	D:\Tencent Files\8421854\FileRecv\猫爪.tga
+15	328	140	100	100	D:\Tencent Files\2455885700\FileRecv\玄晶-ICON.tga
