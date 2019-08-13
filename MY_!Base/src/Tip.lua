@@ -255,7 +255,7 @@ function LIB.OutputNpcTemplateTip(Rect, dwNpcTemplateID, szExtraXml)
 	local t = {}
 
 	-- Ãû×Ö
-	local szName = LIB.GetTemplateName(TAEGET.NPC, dwNpcTemplateID) or dwNpcTemplateID
+	local szName = LIB.GetTemplateName(TARGET.NPC, dwNpcTemplateID) or dwNpcTemplateID
 	insert(t, GetFormatText(szName .. '\n', 80, 255, 255, 0))
 	-- µÈ¼¶
 	if npc.nLevel - GetClientPlayer().nLevel > 10 then

@@ -1494,7 +1494,7 @@ function D.OnNpcInfoChange(szEvent, dwTemplateID, nPer)
 				for kk, vv in ipairs(tLife) do
 					local nVper = vv[1] * 100
 					if nVper == nPer then -- hit
-						local szName = v.szName or LIB.GetTemplateName(TAEGET.NPC, dwTemplateID)
+						local szName = v.szName or LIB.GetTemplateName(TARGET.NPC, dwTemplateID)
 						local aXml, aText = {}, {}
 						ConstructSpeech(aText, aXml, MY_TM_LEFT_BRACKET, MY_TM_LEFT_BRACKET_XML)
 						ConstructSpeech(aText, aXml, szName, 44, 255, 255, 0)

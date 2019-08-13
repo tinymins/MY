@@ -1126,7 +1126,7 @@ function D.GetDataName(szType, data)
 		szName, nIcon = LIB.GetSkillName(data.dwID, data.nLevel)
 	elseif szType == 'NPC' or szType == 'CIRCLE' then
 		if data.dwID then
-			szName = LIB.GetTemplateName(TAEGET.NPC, data.dwID) or data.dwID
+			szName = LIB.GetTemplateName(TARGET.NPC, data.dwID) or data.dwID
 			nIcon = data.nFrame
 		end
 	elseif szType == 'DOODAD' then
