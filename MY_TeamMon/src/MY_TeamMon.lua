@@ -207,7 +207,7 @@ local function NDSBNameReplacer(szType, szContent)
 end
 
 local FILTER_TEXT_CACHE = {}
-local function FilterCustomText(szOrigin)
+local function FilterCustomText(szOrigin, bNoLimit)
 	if not szOrigin then
 		return
 	end
@@ -216,7 +216,7 @@ local function FilterCustomText(szOrigin)
 		if IsString(szText) then
 			szText = LIB.ReplaceSensitiveWord(szText)
 				:gsub('%{%$([NDSB])([%d,]+)%}', NDSBNameReplacer)
-			if LIB.IsShieldedVersion(2) then
+			if LIB.IsShieldedVersion(2) and not bNoLimit then
 				szText = wsub(szText, 1, 8)
 			end
 		end

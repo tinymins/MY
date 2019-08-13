@@ -44,6 +44,7 @@ if not LIB.AssertVersion('MY_TeamMon', _L['MY_TeamMon'], 0x2013500) then
 end
 
 local JsonEncode = LIB.JsonEncode
+local FilterCustomText      = MY_TeamMon.FilterCustomText
 local MY_TM_TYPE            = MY_TeamMon.MY_TM_TYPE
 local MY_TM_SCRUTINY_TYPE   = MY_TeamMon.MY_TM_SCRUTINY_TYPE
 local MY_TM_DATA_ROOT       = MY_TeamMon.MY_TM_DATA_ROOT
@@ -1084,15 +1085,18 @@ function D.GetSearchCache(data)
 	if not MY_TMUI_SEARCH_CACHE[MY_TMUI_SELECT_TYPE] then
 		MY_TMUI_SEARCH_CACHE[MY_TMUI_SELECT_TYPE] = {}
 	end
-	local tab = MY_TMUI_SEARCH_CACHE[MY_TMUI_SELECT_TYPE]
+	local cache = MY_TMUI_SEARCH_CACHE[MY_TMUI_SELECT_TYPE]
 	local szString
 	if data.dwMapID and data.nIndex then
-		if tab[data.dwMapID] and tab[data.dwMapID][data.nIndex] then
-			szString = tab[data.dwMapID][data.nIndex]
+		if cache[data.dwMapID] and cache[data.dwMapID][data.nIndex] then
+			szString = cache[data.dwMapID][data.nIndex]
 		else
-			tab[data.dwMapID] = tab[data.dwMapID] or {}
-			tab[data.dwMapID][data.nIndex] = JsonEncode(data)
-			szString = tab[data.dwMapID][data.nIndex]
+			if not cache[data.dwMapID] then
+				cache[data.dwMapID] = {}
+			end
+			szString = JsonEncode(data)
+			szString = szString .. FilterCustomText(szString, true)
+			cache[data.dwMapID][data.nIndex] = szString
 		end
 	else -- 临时记录 暂时还不做缓存处理
 		szString = JsonEncode(data)
@@ -1130,16 +1134,19 @@ function D.GetDataName(szType, data)
 			nIcon = data.nFrame
 		end
 	elseif szType == 'DOODAD' then
-		local doodad = GetDoodadTemplate(data.dwID)
-		szName = doodad.szName ~= '' and doodad.szName or data.dwID
+		szName = LIB.GetTemplateName(TARGET.DOODAD, data.dwID) or data.dwID
 		nIcon  = MY_TMUI_DOODAD_ICON[doodad.nKind]
 	elseif szType == 'TALK' or szType == 'CHAT' then
 		szName = data.szContent
 	else
 		szName, nIcon = LIB.GetBuffName(data.dwID, data.nLevel)
 	end
-	nIcon  = data.nIcon  or nIcon
-	szName = data.szName or szName
+	if data.nIcon then
+		nIcon = data.nIcon
+	end
+	if data.szName then
+		szName = FilterCustomText(data.szName, true)
+	end
 	return szName, nIcon
 end
 
