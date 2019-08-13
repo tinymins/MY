@@ -228,7 +228,7 @@ function DS:InitDB(bFixProblem)
 				local dbNew = NewDB(self.szRoot, db:GetMaxTime(), HUGE)
 				insert(aDB, dbNew)
 				--[[#DEBUG BEGIN]]
-				LIB.Debug('Create new empty active node ' .. db:ToString() .. ' after ' .. db:ToString(), _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
+				LIB.Debug('Create new empty active node ' .. dbNew:ToString() .. ' after ' .. db:ToString(), _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
 				--[[#DEBUG END]]
 			end
 		else -- 不存在： 创建
@@ -241,7 +241,7 @@ function DS:InitDB(bFixProblem)
 			local dbNew = NewDB(self.szRoot, nMinTime, HUGE)
 			insert(aDB, dbNew)
 			--[[#DEBUG BEGIN]]
-			LIB.Debug('Create new empty active node ' .. db:ToString(), _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
+			LIB.Debug('Create new empty active node ' .. dbNew:ToString(), _L['MY_ChatLog'], DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
 		end
 		-- 检查集群最久远节点开始时间是否为0
