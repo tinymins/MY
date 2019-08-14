@@ -433,8 +433,9 @@ function DS:CountMsg(aChannel, szSearch)
 	for _, db in ipairs(self.aDB) do
 		nCount = nCount + db:CountMsg(aNChannel, szuSearch)
 	end
+	local tChannel = LIB.FlipObjectKV(aChannel)
 	for _, rec in ipairs(self.aInsertQueueAnsi) do
-		if wfind(rec.szText, szSearch) or wfind(rec.szTalker, szSearch) then
+		if tChannel[rec.szChannel] and (wfind(rec.szText, szSearch) or wfind(rec.szTalker, szSearch)) then
 			nCount = nCount + 1
 		end
 	end
@@ -477,9 +478,10 @@ function DS:SelectMsg(aChannel, szSearch, nOffset, nLimit, bUTF8)
 		nOffset = max(nOffset - nCount, 0)
 	end
 	if nLimit > 0 then
+		local tChannel = LIB.FlipObjectKV(aChannel)
 		local nCount = 0
 		for i, rec in ipairs(self.aInsertQueueAnsi) do
-			if wfind(rec.szText, szSearch) or wfind(rec.szTalker, szSearch) then
+			if tChannel[rec.szChannel] and (wfind(rec.szText, szSearch) or wfind(rec.szTalker, szSearch)) then
 				if bUTF8 then
 					insert(aResult, Clone(self.aInsertQueue[i]))
 				else
