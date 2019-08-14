@@ -46,6 +46,7 @@ if not LIB.AssertVersion('MY_TeamMon_BL', _L['MY_TeamMon_BL'], 0x2013500) then
 end
 
 local BL_INIFILE = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_BL.ini'
+local ANCHOR = { s = 'TOPLEFT', r = 'CENTER', x = 300, y = -200 }
 local D = {}
 local O = {
 	tAnchor = {},
@@ -212,12 +213,9 @@ function D.ReSize(fScale, nCount)
 end
 
 function D.UpdateAnchor(frame)
-	local a = O.tAnchor
-	if not IsEmpty(a) then
-		frame:SetPoint(a.s, 0, 0, a.r, a.x, a.y)
-	else
-		frame:SetPoint('CENTER', 0, 0, 'CENTER', 0, -350)
-	end
+	local a = IsEmpty(O.tAnchor) and ANCHOR or O.tAnchor
+	frame:SetPoint(a.s, 0, 0, a.r, a.x, a.y)
+	frame:CorrectPos()
 end
 
 function D.Init()

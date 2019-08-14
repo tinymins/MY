@@ -45,6 +45,7 @@ if not LIB.AssertVersion('MY_TeamMon_PBL', _L['MY_TeamMon_PBL'], 0x2013500) then
 end
 
 -- 这个需要重写 构思已有 就是没时间。。
+local ANCHOR = { s = 'CENTER', r = 'CENTER', x = 400, y = 0 } -- szSide, szRelSide, fOffsetX, fOffsetY
 local D = {}
 local O = {
 	bHoverSelect = false,
@@ -193,12 +194,9 @@ function D.OpenPanel()
 end
 
 function D.UpdateAnchor(frame)
-	local a = O.tAnchor
-	if not IsEmpty(a) then
-		frame:SetPoint(a.s, 0, 0, a.r, a.x, a.y)
-	else
-		frame:SetPoint('CENTER', 0, 0, 'CENTER', 400, 0)
-	end
+	local a = IsEmpty(O.tAnchor) and ANCHOR or O.tAnchor
+	frame:SetPoint(a.s, 0, 0, a.r, a.x, a.y)
+	frame:CorrectPos()
 end
 
 function D.SwitchSelect()

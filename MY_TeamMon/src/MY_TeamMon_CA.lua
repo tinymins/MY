@@ -44,6 +44,7 @@ if not LIB.AssertVersion('MY_TeamMon_CA', _L['MY_TeamMon_CA'], 0x2013500) then
 end
 
 local CA_INIFILE = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_CA.ini'
+local ANCHOR = { s = 'CENTER', r = 'CENTER', x = 0, y = 350 }
 local D = {}
 local O = {
 	tAnchor = {}
@@ -120,16 +121,13 @@ function D.OnFrameDragEnd()
 end
 
 function D.UpdateAnchor(frame)
-	local a = O.tAnchor
-	if not IsEmpty(a) then
-		frame:SetPoint(a.s, 0, 0, a.r, a.x, a.y)
-	else
-		frame:SetPoint('CENTER', 0, 0, 'CENTER', 0, -150)
-	end
+	local a = IsEmpty(O.tAnchor) and ANCHOR or O.tAnchor
+	frame:SetPoint(a.s, 0, 0, a.r, a.x, a.y)
+	frame:CorrectPos()
 end
 
 function D.Init()
-	local frame =  Wnd.OpenWindow(CA_INIFILE, 'MY_TeamMon_CA')
+	local frame = Wnd.OpenWindow(CA_INIFILE, 'MY_TeamMon_CA')
 	frame:Hide()
 end
 

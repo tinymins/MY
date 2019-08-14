@@ -44,6 +44,15 @@ if not LIB.AssertVersion('MY_TeamMon_ST', _L['MY_TeamMon_ST'], 0x2013500) then
 	return
 end
 
+local ANCHOR = { s = 'TOPRIGHT', r = 'CENTER', x = -250, y = -300 } -- szSide, szRelSide, fOffsetX, fOffsetY
+local D = {}
+
+MY_TeamMon_ST = {
+	bEnable = true,
+	tAnchor = {},
+}
+LIB.RegisterCustomData('MY_TeamMon_ST')
+
 -- ST class
 local ST = {}
 ST.__index = ST
@@ -127,14 +136,6 @@ local function CreateCountdown(nType, szKey, tParam)
 	end
 end
 
-MY_TeamMon_ST = {
-	bEnable = true,
-	tAnchor = {},
-}
-LIB.RegisterCustomData('MY_TeamMon_ST')
-
-local D = {}
-
 function MY_TeamMon_ST.OnFrameCreate()
 	this:RegisterEvent('LOADING_END')
 	this:RegisterEvent('UI_SCALED')
@@ -182,7 +183,7 @@ end
 
 function MY_TeamMon_ST.OnFrameDragEnd()
 	this:CorrectPos()
-	MY_TeamMon_ST.tAnchor = GetFrameAnchor(this)
+	MY_TeamMon_ST.tAnchor = GetFrameAnchor(this, 'TOPLEFT')
 end
 
 local function SetSTAction(ui, nLeft, nPer)
@@ -251,12 +252,9 @@ function MY_TeamMon_ST.OnFrameBreathe()
 end
 
 function D.UpdateAnchor(frame)
-	local a = MY_TeamMon_ST.tAnchor
-	if not IsEmpty(a) then
-		frame:SetPoint(a.s, 0, 0, a.r, a.x, a.y)
-	else
-		frame:SetPoint('CENTER', 0, 0, 'CENTER', 0, -300)
-	end
+	local a = IsEmpty(MY_TeamMon_ST.tAnchor) and ANCHOR or MY_TeamMon_ST.tAnchor
+	frame:SetPoint(a.s, 0, 0, a.r, a.x, a.y)
+	frame:CorrectPos()
 end
 
 function D.Init()
