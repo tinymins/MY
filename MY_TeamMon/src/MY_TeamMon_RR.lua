@@ -369,8 +369,8 @@ function D.UpdateList(frame)
 	container:Clear()
 	for _, p in spairs(META_DEFAULT, aMeta) do
 		local wnd = container:AppendContentFromIni(INI_PATH, 'Wnd_Item')
-		wnd:Lookup('', 'Text_Item_Author'):SetText(p.szAuthor)
-		wnd:Lookup('', 'Text_Item_Title'):SetText(p.szTitle)
+		wnd:Lookup('', 'Text_Item_Author'):SetText(LIB.ReplaceSensitiveWord(p.szAuthor))
+		wnd:Lookup('', 'Text_Item_Title'):SetText(LIB.ReplaceSensitiveWord(p.szTitle))
 		wnd:Lookup('Btn_Info'):SetVisible(not IsEmpty(p.szAboutURL))
 		wnd:Lookup('Btn_Info', 'Text_Info'):SetText(_L['See details'])
 		wnd:Lookup('Btn_Download', 'Text_Download'):SetText(
