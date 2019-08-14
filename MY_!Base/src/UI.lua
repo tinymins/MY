@@ -76,6 +76,21 @@ UI = setmetatable({}, {
 			SHOW_VALUE    = false,
 			SHOW_PERCENT  = true,
 		}),
+		WND_SIDE = LIB.SetmetaReadonly({
+			TOP          = 0,
+			BOTTOM       = 1,
+			LEFT         = 2,
+			RIGHT        = 3,
+			TOPLEFT      = 4,
+			TOPRIGHT     = 5,
+			BOTTOMLEFT   = 6,
+			BOTTOMRIGHT  = 7,
+			CENTER       = 8,
+			LEFTCENTER   = 9,
+			RIGHTCENTER  = 1,
+			TOPCENTER    = 1,
+			BOTTOMCENTER = 1,
+		}),
 	},
 	__tostring = function(t) return PACKET_INFO.NAME_SPACE .. '_UI (class prototype)' end,
 	__call = function (...)
@@ -2304,7 +2319,7 @@ end
 -- (anchor) Instance:anchor()
 -- (self) Instance:anchor(anchor)
 do
-local CENTER = { s = 'CENTER', r = 'CENTER',  x = 0, y = 0 }
+local CENTER = { s = 'CENTER', r = 'CENTER',  x = 0, y = 0 } -- szSide, szRelSide, fOffsetX, fOffsetY
 function UI:anchor(anchor)
 	self:_checksum()
 	if anchor == 'CENTER' then
