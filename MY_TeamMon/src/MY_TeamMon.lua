@@ -182,16 +182,20 @@ local function GetDataPath()
 	return szPath
 end
 
-local FilterCustomText
+local ParseCustomText, FilterCustomText
 do
-local function NDSBNameReplacer(szType, szContent, szTarName, szSelfName)
-	if szType == 'M' then
-		return szSelfName or '$me'
+local function NDSBNameReplacer(szContent, szSenderName, szReceiverName)
+	if szContent == 'me' then
+		return MY_TM_CORE_NAME
 	end
-	if szType == 'T' then
-		return szTarName or '$team'
+	if szContent == 'sender' then
+		return szSenderName
 	end
-	local dwID, nLevel = unpack(MY_SplitString(szContent, ','))
+	if szContent == 'receiver' then
+		return szReceiverName
+	end
+	local szType = szContent:sub(1, 1)
+	local dwID, nLevel = unpack(MY_SplitString(szContent:sub(2), ','))
 	if dwID then
 		dwID = tonumber(dwID)
 	end
@@ -214,26 +218,23 @@ local function NDSBNameReplacer(szType, szContent, szTarName, szSelfName)
 end
 local FILTER_TEXT_CACHE = {}
 local MAX_CUSTOM_TEXT_LEN = 8
-function FilterCustomText(szOrigin, szTarName, szSelfName, bNoLimit)
+function FilterCustomText(szOrigin, szSenderName, szReceiverName, bNoLimit)
 	if not szOrigin then
 		return
 	end
 	if not FILTER_TEXT_CACHE[szOrigin] then
 		local szText = szOrigin
 		if IsString(szText) then
-			szOrigin = wgsub(szOrigin, '$me', '{$M}')
-			szOrigin = wgsub(szOrigin, '$team', '{$T}')
 			szOrigin, szText = LIB.ReplaceSensitiveWord(szOrigin), ''
 			local nOriginLen, nLen, nPos = len(szOrigin), 0, 1
-			local szPart, nStart, nEnd, szType, szContent
+			local szPart, nStart, nEnd, szContent
 			while nPos <= nOriginLen do
-				szPart, nStart, nEnd, szType, szContent = nil
+				szPart, nStart, nEnd, szContent = nil
 				nStart = StringFindW(szOrigin, '{$', nPos)
 				if nStart then
-					szType = szOrigin:sub(nStart + 2, nStart + 2)
 					nEnd = StringFindW(szOrigin, '}', nStart + 2)
 					if nEnd then
-						szContent = szOrigin:sub(nStart + 3, nEnd - 1)
+						szContent = szOrigin:sub(nStart + 2, nEnd - 1)
 					end
 				end
 				if not nStart then
@@ -247,7 +248,7 @@ function FilterCustomText(szOrigin, szTarName, szSelfName, bNoLimit)
 					nPos = nStart
 				end
 				if szPart then
-					if nLen + wlen(szPart) > MAX_CUSTOM_TEXT_LEN then
+					if not bNoLimit and nLen + wlen(szPart) > MAX_CUSTOM_TEXT_LEN then
 						szPart = wsub(szPart, 1, MAX_CUSTOM_TEXT_LEN - nLen)
 						szText = szText .. szPart
 						nLen = MAX_CUSTOM_TEXT_LEN
@@ -257,8 +258,8 @@ function FilterCustomText(szOrigin, szTarName, szSelfName, bNoLimit)
 						nLen = nLen + wlen(szPart)
 					end
 				end
-				if szType and szContent then
-					szPart = NDSBNameReplacer(szType, szContent, szTarName, szSelfName)
+				if szContent then
+					szPart = NDSBNameReplacer(szContent, szSenderName, szReceiverName)
 					if szPart then
 						szText = szText .. szPart
 					end
@@ -269,6 +270,9 @@ function FilterCustomText(szOrigin, szTarName, szSelfName, bNoLimit)
 		FILTER_TEXT_CACHE[szOrigin] = szText
 	end
 	return FILTER_TEXT_CACHE[szOrigin]
+end
+function ParseCustomText(szOrigin, szSenderName, szReceiverName)
+	return FilterCustomText(szOrigin, szSenderName, szReceiverName, true)
 end
 LIB.RegisterEvent('MY_SHIELDED_VERSION', function() FILTER_TEXT_CACHE = {} end)
 end
@@ -729,7 +733,7 @@ function D.SetTeamMark(szType, tMark, dwCharacterID, dwID, nLevel)
 	D.OnSetMark()
 end
 -- 倒计时处理 支持定义无限的倒计时
-function D.CountdownEvent(data, nClass)
+function D.CountdownEvent(data, nClass, szSenderName, szReceiverName)
 	if data.tCountdown then
 		for k, v in ipairs(data.tCountdown) do
 			if nClass == v.nClass then
@@ -739,7 +743,7 @@ function D.CountdownEvent(data, nClass)
 					nFrame   = v.nFrame,
 					nTime    = v.nTime,
 					nRefresh = v.nRefresh,
-					szName   = FilterCustomText(v.szName or data.szName),
+					szName   = FilterCustomText(v.szName or data.szName, szSenderName, szReceiverName),
 					nIcon    = v.nIcon or data.nIcon or 340,
 					bTalk    = v.bTeamChannel,
 					bHold    = v.bHold
@@ -824,7 +828,7 @@ function D.OnBuff(dwCaster, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, d
 		else
 			cfg, nClass = data[MY_TM_TYPE.BUFF_GET], MY_TM_TYPE.BUFF_GET
 		end
-		D.CountdownEvent(data, nClass)
+		D.CountdownEvent(data, nClass, nil, szName)
 		if cfg then
 			local szName, nIcon = LIB.GetBuffName(dwBuffID, nBuffLevel)
 			local KObject = IsPlayer(dwCaster) and GetPlayer(dwCaster) or GetNpc(dwCaster)
@@ -844,7 +848,7 @@ function D.OnBuff(dwCaster, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, d
 				ConstructSpeech(aText, aXml, _L['Get buff'], 44, 255, 255, 255)
 				ConstructSpeech(aText, aXml, szName .. ' x' .. nCount, 44, 255, 255, 0)
 				if data.szNote and not LIB.IsShieldedVersion(2) then
-					ConstructSpeech(aText, aXml, ' ' .. FilterCustomText(data.szNote), 44, 255, 255, 255)
+					ConstructSpeech(aText, aXml, ' ' .. FilterCustomText(data.szNote, nil, szName), 44, 255, 255, 255)
 				end
 			else
 				ConstructSpeech(aText, aXml, _L['Lose buff'], 44, 255, 255, 255)
@@ -984,7 +988,7 @@ function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
 		else
 			cfg, nClass = data[MY_TM_TYPE.SKILL_END], MY_TM_TYPE.SKILL_END
 		end
-		D.CountdownEvent(data, nClass)
+		D.CountdownEvent(data, nClass, szSrcName, szTargetName)
 		if cfg then
 			local aXml, aText = {}, {}
 			ConstructSpeech(aText, aXml, MY_TM_LEFT_BRACKET, MY_TM_LEFT_BRACKET_XML)
@@ -1005,7 +1009,7 @@ function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
 				ConstructSpeech(aText, aXml, MY_TM_RIGHT_BRACKET, MY_TM_RIGHT_BRACKET_XML)
 			end
 			if data.szNote and not LIB.IsShieldedVersion(2) then
-				ConstructSpeech(aText, aXml, ' ' .. FilterCustomText(data.szNote), 44, 255, 255, 255)
+				ConstructSpeech(aText, aXml, ' ' .. FilterCustomText(data.szNote, szSrcName, szTargetName), 44, 255, 255, 255)
 			end
 			local szXml, szText = concat(aXml), concat(aText)
 			if O.bPushCenterAlarm and cfg.bCenterAlarm then
@@ -1126,7 +1130,7 @@ function D.OnNpcEvent(npc, bEnter)
 				if O.bPushScreenHead and cfg.bScreenHead then
 					local szNote, szName = nil, FilterCustomText(data.szName)
 					if not LIB.IsShieldedVersion(2) then
-						szNote = FilterCustomText(data.szNote) or szName
+						szNote = FilterCustomText(data.szNote, szName, nil) or szName
 					end
 					FireUIEvent('MY_LIFEBAR_COUNTDOWN', npc.dwID, 'NPC', 'MY_TM_NPC_' .. npc.dwID, {
 						szText = szNote,
@@ -1141,7 +1145,7 @@ function D.OnNpcEvent(npc, bEnter)
 				CACHE.NPC_LIST[npc.dwTemplateID].nTime = nTime
 			end
 		end
-		D.CountdownEvent(data, nClass)
+		D.CountdownEvent(data, nClass, szName, nil)
 		if cfg then
 			local szName = LIB.GetObjectName(npc)
 			if data.szName then
@@ -1157,7 +1161,7 @@ function D.OnNpcEvent(npc, bEnter)
 					ConstructSpeech(aText, aXml, ' x' .. nCount, 44, 255, 255, 0)
 				end
 				if data.szNote and not LIB.IsShieldedVersion(2) then
-					ConstructSpeech(aText, aXml, ' ' .. FilterCustomText(data.szNote), 44, 255, 255, 255)
+					ConstructSpeech(aText, aXml, ' ' .. FilterCustomText(data.szNote, szName, nil), 44, 255, 255, 255)
 				end
 			else
 				ConstructSpeech(aText, aXml, _L['Disappear'], 44, 255, 255, 255)
@@ -1264,7 +1268,7 @@ function D.OnDoodadEvent(doodad, bEnter)
 				if O.bPushScreenHead and cfg.bScreenHead then
 					local szNote, szName = nil, FilterCustomText(data.szName)
 					if not LIB.IsShieldedVersion(2) then
-						szNote = FilterCustomText(data.szNote) or szName
+						szNote = FilterCustomText(data.szNote, szName, nil) or szName
 					end
 					FireUIEvent('MY_LIFEBAR_COUNTDOWN', doodad.dwID, 'DOODAD', 'MY_TM_DOODAD_' .. doodad.dwID, {
 						szText = szNote,
@@ -1279,7 +1283,7 @@ function D.OnDoodadEvent(doodad, bEnter)
 				CACHE.DOODAD_LIST[doodad.dwTemplateID].nTime = nTime
 			end
 		end
-		D.CountdownEvent(data, nClass)
+		D.CountdownEvent(data, nClass, szName, nil)
 		if cfg then
 			local szName = doodad.szName
 			if data.szName then
@@ -1295,7 +1299,7 @@ function D.OnDoodadEvent(doodad, bEnter)
 					ConstructSpeech(aText, aXml, ' x' .. nCount, 44, 255, 255, 0)
 				end
 				if data.szNote and not LIB.IsShieldedVersion(2) then
-					ConstructSpeech(aText, aXml, ' ' .. FilterCustomText(data.szNote), 44, 255, 255, 255)
+					ConstructSpeech(aText, aXml, ' ' .. FilterCustomText(data.szNote, szName, nil), 44, 255, 255, 255)
 				end
 			else
 				ConstructSpeech(aText, aXml, _L['Disappear'], 44, 255, 255, 255)
@@ -1391,7 +1395,7 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 	end
 	if data then
 		local nClass = szEvent == 'TALK' and MY_TM_TYPE.TALK_MONITOR or MY_TM_TYPE.CHAT_MONITOR
-		D.CountdownEvent(data, nClass)
+		D.CountdownEvent(data, nClass, szNpcName or _L['JX3'], tInfo and tInfo.szName)
 		local cfg = data[nClass]
 		if cfg then
 			if data.szContent:find('$me') then
@@ -1412,7 +1416,7 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 				ConstructSpeech(aText, aXml, MY_TM_RIGHT_BRACKET, MY_TM_RIGHT_BRACKET_XML)
 				ConstructSpeech(aText, aXml, _L['\'s name.'], 44, 255, 255, 255)
 			else
-				ConstructSpeech(aText, aXml, FilterCustomText(szNote, tInfo and tInfo.szName, me.szName) or szContent, 44, 255, 255, 255)
+				ConstructSpeech(aText, aXml, FilterCustomText(szNote, szNpcName or _L['JX3'], tInfo and tInfo.szName) or szContent, 44, 255, 255, 255)
 			end
 			local szXml, szText = concat(aXml), concat(aText)
 			szText = szText:gsub('$me', me.szName)
@@ -1551,7 +1555,7 @@ function D.OnNpcInfoChange(szEvent, dwTemplateID, nPer)
 						ConstructSpeech(aText, aXml, MY_TM_RIGHT_BRACKET, MY_TM_RIGHT_BRACKET_XML)
 						ConstructSpeech(aText, aXml, dwType == MY_TM_TYPE.NPC_LIFE and _L['\'s life remaining to '] or _L['\'s mana reaches '], 44, 255, 255, 255)
 						ConstructSpeech(aText, aXml, ' ' .. nVper .. '%', 44, 255, 255, 0)
-						ConstructSpeech(aText, aXml, ' ' .. FilterCustomText(vv[2]), 44, 255, 255, 255)
+						ConstructSpeech(aText, aXml, ' ' .. FilterCustomText(vv[2], nil, szName), 44, 255, 255, 255)
 						local szXml, szText = concat(aXml), concat(aText)
 						if O.bPushCenterAlarm then
 							FireUIEvent('MY_TM_CA_CREATE', szXml, 3, true)
@@ -2115,6 +2119,7 @@ local settings = {
 		{
 			fields = {
 				FilterCustomText    = FilterCustomText   ,
+				ParseCustomText     = ParseCustomText    ,
 				Enable              = D.Enable           ,
 				GetTable            = D.GetTable         ,
 				GetData             = D.GetData          ,

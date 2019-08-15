@@ -44,7 +44,7 @@ if not LIB.AssertVersion('MY_TeamMon', _L['MY_TeamMon'], 0x2013500) then
 end
 
 local JsonEncode = LIB.JsonEncode
-local FilterCustomText      = MY_TeamMon.FilterCustomText
+local ParseCustomText       = MY_TeamMon.ParseCustomText
 local MY_TM_TYPE            = MY_TeamMon.MY_TM_TYPE
 local MY_TM_SCRUTINY_TYPE   = MY_TeamMon.MY_TM_SCRUTINY_TYPE
 local MY_TM_DATA_ROOT       = MY_TeamMon.MY_TM_DATA_ROOT
@@ -1087,7 +1087,6 @@ function D.GetSearchCache(data)
 	if not MY_TMUI_SEARCH_CACHE[MY_TMUI_SELECT_TYPE] then
 		MY_TMUI_SEARCH_CACHE[MY_TMUI_SELECT_TYPE] = {}
 	end
-	local me = GetClientPlayer()
 	local cache = MY_TMUI_SEARCH_CACHE[MY_TMUI_SELECT_TYPE]
 	local szString
 	if data.dwMapID and data.nIndex then
@@ -1098,7 +1097,7 @@ function D.GetSearchCache(data)
 				cache[data.dwMapID] = {}
 			end
 			szString = JsonEncode(data)
-			szString = szString .. FilterCustomText(szString, nil, me.szName, true)
+			szString = szString .. ParseCustomText(szString)
 			cache[data.dwMapID][data.nIndex] = szString
 		end
 	else -- 临时记录 暂时还不做缓存处理
@@ -1128,7 +1127,6 @@ function D.CheckSearch(szType, data)
 end
 
 function D.GetDataName(szType, data)
-	local me = GetClientPlayer()
 	local szName, nIcon
 	if szType == 'CASTING' then
 		szName, nIcon = LIB.GetSkillName(data.dwID, data.nLevel)
@@ -1150,7 +1148,7 @@ function D.GetDataName(szType, data)
 		nIcon = data.nIcon
 	end
 	if data.szName then
-		szName = FilterCustomText(data.szName, nil, me.szName, true)
+		szName = ParseCustomText(data.szName)
 	end
 	return szName, nIcon
 end
@@ -1667,7 +1665,7 @@ function D.OpenSettingPanel(data, szType)
 		local menu, box = {}, this
 		if szType ~= 'TALK' and szType ~= 'CHAT' then
 			insert(menu, { szOption = _L['Edit name'], fnAction = function()
-				local szKey = LIB.Alert(_L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188'])
+				local szKey = LIB.Alert(_L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188\n5. {$me} Self name\n6. {$sender} Sender name, likes caller name\n7. {$receiver} Receiver name, likes teammate be called'])
 				local function CloseHelp()
 					LIB.DoMessageBox(szKey)
 				end
@@ -1679,7 +1677,7 @@ function D.OpenSettingPanel(data, szType)
 						ui:text(szName)
 					else
 						data.szName = szText
-						ui:text(FilterCustomText(szText, nil, nil, true))
+						ui:text(ParseCustomText(szText))
 					end
 					CloseHelp()
 				end, CloseHelp, function() return not frame or not frame:IsValid() end, nil, szDefault)
@@ -2563,9 +2561,9 @@ function D.OpenSettingPanel(data, szType)
 			end,
 			tip = function()
 				if v.nClass == MY_TM_TYPE.NPC_LIFE or v.nClass == MY_TM_TYPE.NPC_MANA then
-					return _L['Life/mana statement.\n\nExample: 0.7,Remain 70%;0.5,Remain Half;0.01,Almost empty'] .. '\n\n' .. _L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188']
+					return _L['Life/mana statement.\n\nExample: 0.7,Remain 70%;0.5,Remain Half;0.01,Almost empty'] .. '\n\n' .. _L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188\n5. {$me} Self name\n6. {$sender} Sender name, likes caller name\n7. {$receiver} Receiver name, likes teammate be called']
 				end
-				return _L['Simple countdown time or multi countdown statement. Input pure number for simple countdown time, otherwise for multi countdown statement.\n\nMulti countdown example: 10,Countdown1;25,Countdown2;55,Countdown3\nExplain: Countdown1 finished will start Countdown2, so as Countdown3.'] .. '\n\n' .. _L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188']
+				return _L['Simple countdown time or multi countdown statement. Input pure number for simple countdown time, otherwise for multi countdown statement.\n\nMulti countdown example: 10,Countdown1;25,Countdown2;55,Countdown3\nExplain: Countdown1 finished will start Countdown2, so as Countdown3.'] .. '\n\n' .. _L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188\n5. {$me} Self name\n6. {$sender} Sender name, likes caller name\n7. {$receiver} Receiver name, likes teammate be called']
 			end,
 			tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 		}, true)
@@ -2576,7 +2574,7 @@ function D.OpenSettingPanel(data, szType)
 			onchange = function(szName)
 				v.szName = szName
 			end,
-			tip = _L['Simple countdown text'] .. '\n\n' .. _L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188'],
+			tip = _L['Simple countdown text'] .. '\n\n' .. _L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188\n5. {$me} Self name\n6. {$sender} Sender name, likes caller name\n7. {$receiver} Receiver name, likes teammate be called'],
 			tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 			placeholder = _L['Please input simple countdown text...'],
 		}, true):pos('BOTTOMRIGHT')
