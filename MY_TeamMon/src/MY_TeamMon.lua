@@ -184,7 +184,13 @@ end
 
 local FilterCustomText
 do
-local function NDSBNameReplacer(szType, szContent)
+local function NDSBNameReplacer(szType, szContent, szTarName, szSelfName)
+	if szType == 'M' then
+		return szSelfName or '$me'
+	end
+	if szType == 'T' then
+		return szTarName or '$team'
+	end
 	local dwID, nLevel = unpack(MY_SplitString(szContent, ','))
 	if dwID then
 		dwID = tonumber(dwID)
@@ -208,13 +214,15 @@ local function NDSBNameReplacer(szType, szContent)
 end
 local FILTER_TEXT_CACHE = {}
 local MAX_CUSTOM_TEXT_LEN = 8
-function FilterCustomText(szOrigin, bNoLimit)
+function FilterCustomText(szOrigin, szTarName, szSelfName, bNoLimit)
 	if not szOrigin then
 		return
 	end
 	if not FILTER_TEXT_CACHE[szOrigin] then
 		local szText = szOrigin
 		if IsString(szText) then
+			szOrigin = wgsub(szOrigin, '$me', '{$M}')
+			szOrigin = wgsub(szOrigin, '$team', '{$T}')
 			szOrigin, szText = LIB.ReplaceSensitiveWord(szOrigin), ''
 			local nOriginLen, nLen, nPos = len(szOrigin), 0, 1
 			local szPart, nStart, nEnd, szType, szContent
@@ -250,7 +258,7 @@ function FilterCustomText(szOrigin, bNoLimit)
 					end
 				end
 				if szType and szContent then
-					szPart = NDSBNameReplacer(szType, szContent)
+					szPart = NDSBNameReplacer(szType, szContent, szTarName, szSelfName)
 					if szPart then
 						szText = szText .. szPart
 					end

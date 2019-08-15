@@ -1087,6 +1087,7 @@ function D.GetSearchCache(data)
 	if not MY_TMUI_SEARCH_CACHE[MY_TMUI_SELECT_TYPE] then
 		MY_TMUI_SEARCH_CACHE[MY_TMUI_SELECT_TYPE] = {}
 	end
+	local me = GetClientPlayer()
 	local cache = MY_TMUI_SEARCH_CACHE[MY_TMUI_SELECT_TYPE]
 	local szString
 	if data.dwMapID and data.nIndex then
@@ -1097,7 +1098,7 @@ function D.GetSearchCache(data)
 				cache[data.dwMapID] = {}
 			end
 			szString = JsonEncode(data)
-			szString = szString .. FilterCustomText(szString, true)
+			szString = szString .. FilterCustomText(szString, nil, me.szName, true)
 			cache[data.dwMapID][data.nIndex] = szString
 		end
 	else -- 临时记录 暂时还不做缓存处理
@@ -1127,6 +1128,7 @@ function D.CheckSearch(szType, data)
 end
 
 function D.GetDataName(szType, data)
+	local me = GetClientPlayer()
 	local szName, nIcon
 	if szType == 'CASTING' then
 		szName, nIcon = LIB.GetSkillName(data.dwID, data.nLevel)
@@ -1148,7 +1150,7 @@ function D.GetDataName(szType, data)
 		nIcon = data.nIcon
 	end
 	if data.szName then
-		szName = FilterCustomText(data.szName, true)
+		szName = FilterCustomText(data.szName, nil, me.szName, true)
 	end
 	return szName, nIcon
 end
@@ -1677,7 +1679,7 @@ function D.OpenSettingPanel(data, szType)
 						ui:text(szName)
 					else
 						data.szName = szText
-						ui:text(FilterCustomText(szText, true))
+						ui:text(FilterCustomText(szText, nil, nil, true))
 					end
 					CloseHelp()
 				end, CloseHelp, function() return not frame or not frame:IsValid() end, nil, szDefault)
