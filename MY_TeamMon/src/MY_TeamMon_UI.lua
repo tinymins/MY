@@ -2622,10 +2622,17 @@ function D.OpenSettingPanel(data, szType)
 		x = 30, y = nY + 10, text = _L['Add countdown'],
 		enable = not (data.tCountdown and #data.tCountdown > 10),
 		onclick = function()
-			data.tCountdown = data.tCountdown or {}
+			if not data.tCountdown then
+				data.tCountdown = {}
+			end
+			local szCountdown = _L['Countdown']
+			local szPattern = GetPatternName()
+			if szPattern then
+				szCountdown = szCountdown .. ' ' .. szPattern
+			end
 			insert(data.tCountdown, {
 				nTime = 10,
-				szName = _L['Countdown'] .. ' ' .. GetPatternName(),
+				szName = szCountdown,
 				nClass = -1,
 				nIcon = nIcon or 13,
 			})
