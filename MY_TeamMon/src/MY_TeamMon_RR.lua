@@ -380,7 +380,7 @@ function D.UpdateList(frame)
 			or (p.szKey == O.szLastKey and _L['Last select'])
 			or _L['Download']
 		)
-		wnd:Lookup('Btn_Download'):Enable(not DATA_DOWNLOADER or DATA_DOWNLOADER.szDownloadingKey ~= p.szKey)
+		wnd:Lookup('Btn_Download'):Enable(not META_DOWNLOADING_KEY[p.szKey] and (not DATA_DOWNLOADER or DATA_DOWNLOADER.szDownloadingKey ~= p.szKey))
 		wnd.info = p
 	end
 	container:FormatAllContentPos()
