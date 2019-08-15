@@ -182,6 +182,8 @@ local function GetDataPath()
 	return szPath
 end
 
+local FilterCustomText
+do
 local function NDSBNameReplacer(szType, szContent)
 	local dwID, nLevel = unpack(MY_SplitString(szContent, ','))
 	if dwID then
@@ -202,21 +204,58 @@ local function NDSBNameReplacer(szType, szContent)
 	if szType == 'B' then
 		return LIB.GetBuffName(dwID, nLevel)
 	end
-	return '$' .. szType .. szContent
+	-- return '$' .. szType .. szContent
 end
-
 local FILTER_TEXT_CACHE = {}
-local function FilterCustomText(szOrigin, bNoLimit)
+local MAX_CUSTOM_TEXT_LEN = 8
+function FilterCustomText(szOrigin, bNoLimit)
 	if not szOrigin then
 		return
 	end
 	if not FILTER_TEXT_CACHE[szOrigin] then
 		local szText = szOrigin
 		if IsString(szText) then
-			szText = LIB.ReplaceSensitiveWord(szText)
-				:gsub('%{%$([NDSB])([%d,]+)%}', NDSBNameReplacer)
-			if LIB.IsShieldedVersion(2) and not bNoLimit then
-				szText = wsub(szText, 1, 8)
+			szOrigin, szText = LIB.ReplaceSensitiveWord(szOrigin), ''
+			local nOriginLen, nLen, nPos = len(szOrigin), 0, 1
+			local szPart, nStart, nEnd, szType, szContent
+			while nPos <= nOriginLen do
+				szPart, nStart, nEnd, szType, szContent = nil
+				nStart = StringFindW(szOrigin, '{$', nPos)
+				if nStart then
+					szType = szOrigin:sub(nStart + 2, nStart + 2)
+					nEnd = StringFindW(szOrigin, '}', nStart + 2)
+					if nEnd then
+						szContent = szOrigin:sub(nStart + 3, nEnd - 1)
+					end
+				end
+				if not nStart then
+					szPart = szOrigin:sub(nPos)
+					nPos = nOriginLen + 1
+				elseif not nEnd then
+					szPart = szOrigin:sub(nPos, nStart + 1)
+					nPos = nStart + 2
+				elseif nStart > nPos then
+					szPart = szOrigin:sub(nPos, nStart - 1)
+					nPos = nStart
+				end
+				if szPart then
+					if nLen + wlen(szPart) > MAX_CUSTOM_TEXT_LEN then
+						szPart = wsub(szPart, 1, MAX_CUSTOM_TEXT_LEN - nLen)
+						szText = szText .. szPart
+						nLen = MAX_CUSTOM_TEXT_LEN
+						break
+					else
+						szText = szText .. szPart
+						nLen = nLen + len(szPart)
+					end
+				end
+				if szType and szContent then
+					szPart = NDSBNameReplacer(szType, szContent)
+					if szPart then
+						szText = szText .. szPart
+					end
+					nPos = nEnd + 1
+				end
 			end
 		end
 		FILTER_TEXT_CACHE[szOrigin] = szText
@@ -224,6 +263,7 @@ local function FilterCustomText(szOrigin, bNoLimit)
 	return FILTER_TEXT_CACHE[szOrigin]
 end
 LIB.RegisterEvent('MY_SHIELDED_VERSION', function() FILTER_TEXT_CACHE = {} end)
+end
 
 local function ConstructSpeech(aText, aXml, szText, nFont, nR, nG, nB)
 	if aXml then
