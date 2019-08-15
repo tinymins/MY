@@ -689,7 +689,7 @@ function D.CountdownEvent(data, nClass)
 				local tParam = {
 					key      = v.key,
 					nFrame   = v.nFrame,
-					nTime    = FilterCustomText(v.nTime),
+					nTime    = v.nTime,
 					nRefresh = v.nRefresh,
 					szName   = FilterCustomText(v.szName or data.szName),
 					nIcon    = v.nIcon or data.nIcon or 340,

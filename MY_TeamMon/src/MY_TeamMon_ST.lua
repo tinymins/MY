@@ -43,6 +43,7 @@ local _L = LIB.LoadLangPack(PACKET_INFO.ROOT .. 'MY_TeamMon/lang/')
 if not LIB.AssertVersion('MY_TeamMon_ST', _L['MY_TeamMon_ST'], 0x2013500) then
 	return
 end
+local FilterCustomText = MY_TeamMon.FilterCustomText
 
 local ANCHOR = { s = 'TOPRIGHT', r = 'CENTER', x = -250, y = -300 } -- szSide, szRelSide, fOffsetX, fOffsetY
 local D = {}
@@ -78,7 +79,7 @@ local function GetCountdown(tTime)
 	for k, v in ipairs(t) do
 		local time = SplitString(v, ',')
 		if time[1] and time[2] and tonumber(TrimString(time[1])) and time[2] ~= '' then
-			insert(tab, { nTime = tonumber(time[1]), szName = time[2] })
+			insert(tab, { nTime = tonumber(time[1]), szName = FilterCustomText(time[2]) })
 		end
 	end
 	if IsEmpty(tab) then
