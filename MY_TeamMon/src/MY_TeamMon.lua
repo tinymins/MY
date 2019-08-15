@@ -1399,7 +1399,7 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 			end
 			local aXml, aText = {}, {}
 			local szNote = nil
-			if data.szNote and not LIB.IsShieldedVersion(2) then
+			if data.szNote then
 				szNote = data.szNote
 			end
 			if tInfo and not szNote then
@@ -1412,7 +1412,7 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 				ConstructSpeech(aText, aXml, MY_TM_RIGHT_BRACKET, MY_TM_RIGHT_BRACKET_XML)
 				ConstructSpeech(aText, aXml, _L['\'s name.'], 44, 255, 255, 255)
 			else
-				ConstructSpeech(aText, aXml, FilterCustomText(szNote) or szContent, 44, 255, 255, 255)
+				ConstructSpeech(aText, aXml, FilterCustomText(szNote, tInfo and tInfo.szName, me.szName) or szContent, 44, 255, 255, 255)
 			end
 			local szXml, szText = concat(aXml), concat(aText)
 			szText = szText:gsub('$me', me.szName)
