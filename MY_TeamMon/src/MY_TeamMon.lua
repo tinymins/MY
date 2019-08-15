@@ -254,7 +254,7 @@ function FilterCustomText(szOrigin, szTarName, szSelfName, bNoLimit)
 						break
 					else
 						szText = szText .. szPart
-						nLen = nLen + len(szPart)
+						nLen = nLen + wlen(szPart)
 					end
 				end
 				if szType and szContent then
