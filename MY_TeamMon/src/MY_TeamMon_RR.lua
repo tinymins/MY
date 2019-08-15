@@ -250,6 +250,7 @@ function D.DownloadMeta(info, onSuccess, onError)
 	local szURL = GetRawURL(info.szURL) or info.szURL
 	if info.szKey then
 		META_DOWNLOADING_KEY[info.szKey] = true
+		FireUIEvent('MY_TM_RR_META_LIST_UPDATE')
 	end
 	LIB.Ajax({
 		method = 'auto',
