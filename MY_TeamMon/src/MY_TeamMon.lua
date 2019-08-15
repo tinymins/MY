@@ -1016,6 +1016,7 @@ function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
 			-- Í·¶¥±¨¾¯
 			if O.bPushScreenHead and cfg.bScreenHead then
 				FireUIEvent('MY_LIFEBAR_COUNTDOWN', dwCaster, 'CASTING', 'MY_TM_CASTING_' .. data.dwID, {
+					dwSkillID = dwCastID,
 					szText = szName,
 					col = data.col,
 				})
