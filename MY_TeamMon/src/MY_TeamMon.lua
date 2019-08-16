@@ -216,22 +216,19 @@ local function NDSBNameReplacer(szContent, szSender, szReceiver)
 	end
 	-- return '$' .. szType .. szContent
 end
+local PARSE_TEXT_CACHE = {}
 local FILTER_TEXT_CACHE = {}
 local MAX_CUSTOM_TEXT_LEN = 8
 local function FormatCustomText(szOrigin, szSender, szReceiver, bNoLimit)
 	if not szOrigin then
 		return
 	end
-	if not FILTER_TEXT_CACHE[szOrigin] then
-		FILTER_TEXT_CACHE[szOrigin] = {}
-	end
-	if not FILTER_TEXT_CACHE[szOrigin][szSender] then
-		FILTER_TEXT_CACHE[szOrigin][szSender] = {}
-	end
-	if not FILTER_TEXT_CACHE[szOrigin][szSender][szReceiver] then
-		local szText = szOrigin
-		if IsString(szText) then
-			szOrigin, szText = LIB.ReplaceSensitiveWord(szOrigin), ''
+	local cache = bNoLimit and PARSE_TEXT_CACHE or FILTER_TEXT_CACHE
+	if IsNil(cache[szOrigin])
+	or (IsTable(cache[szOrigin]) and not (cache[szOrigin][szSender] and cache[szOrigin][szSender][szReceiver])) then
+		if IsString(szOrigin) then
+			szOrigin = LIB.ReplaceSensitiveWord(szOrigin)
+			local szText = ''
 			local nOriginLen, nLen, nPos = len(szOrigin), 0, 1
 			local szPart, nStart, nEnd, szContent
 			while nPos <= nOriginLen do
@@ -272,12 +269,26 @@ local function FormatCustomText(szOrigin, szSender, szReceiver, bNoLimit)
 					nPos = nEnd + 1
 				end
 			end
+			if szOrigin:find('{$me}', nil, true) or szOrigin:find('{$sender}', nil, true) or szOrigin:find('{$receiver}', nil, true) then
+				if not cache[szOrigin] then
+					cache[szOrigin] = {}
+				end
+				if not cache[szOrigin][szSender] then
+					cache[szOrigin][szSender] = {}
+				end
+				cache[szOrigin][szSender][szReceiver] = szText
+			else
+				cache[szOrigin] = szText
+			end
+		else
+			cache[szOrigin] = szOrigin
 		end
-		FILTER_TEXT_CACHE[szOrigin][szSender][szReceiver] = szText
 	end
-	return FILTER_TEXT_CACHE[szOrigin][szSender][szReceiver]
+	if IsTable(cache[szOrigin]) then
+		return cache[szOrigin][szSender][szReceiver]
+	end
+	return cache[szOrigin]
 end
-LIB.RegisterEvent('MY_SHIELDED_VERSION', function() FILTER_TEXT_CACHE = {} end)
 
 function FilterCustomText(szOrigin, szSender, szReceiver)
 	return FormatCustomText(szOrigin, szSender or '', szReceiver or '', false)
