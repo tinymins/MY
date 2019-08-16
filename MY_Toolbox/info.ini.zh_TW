@@ -15,4 +15,5 @@ lua_7=src\MY_AutoDialogue.lua
 lua_8=src\MY_PlayerViewMagnifier.lua
 lua_9=src\MY_AchievementWiki.lua
 lua_10=src\MY_ItemInfoSearch.lua
+lua_11=src\MY_HideAnnounceBg.lua
 package=MY

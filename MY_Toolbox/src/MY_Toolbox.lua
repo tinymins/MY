@@ -1003,6 +1003,16 @@ function PS.OnPanelActive(wnd)
 	y = y + 30
 
 	x = X
+	if not LIB.IsShieldedVersion() then
+		x = x + ui:append('WndCheckBox', {
+			x = x, y = y,
+			text = _L['Hide announce bg'],
+			checked = MY_HideAnnounceBg.bEnable,
+			oncheck = function(bChecked)
+				MY_HideAnnounceBg.bEnable = bChecked
+			end,
+		}, true):autoWidth():width() + 5
+	end
 end
 LIB.RegisterPanel( 'MY_ToolBox', _L['toolbox'], _L['General'], 'UI/Image/Common/Money.UITex|243', PS)
 
