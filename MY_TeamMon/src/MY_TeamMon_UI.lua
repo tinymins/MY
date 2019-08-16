@@ -45,6 +45,7 @@ end
 
 local JsonEncode = LIB.JsonEncode
 local ParseCustomText       = MY_TeamMon.ParseCustomText
+local FilterCustomText      = MY_TeamMon.FilterCustomText
 local MY_TM_TYPE            = MY_TeamMon.MY_TM_TYPE
 local MY_TM_SCRUTINY_TYPE   = MY_TeamMon.MY_TM_SCRUTINY_TYPE
 local MY_TM_DATA_ROOT       = MY_TeamMon.MY_TM_DATA_ROOT
@@ -2543,7 +2544,7 @@ function D.OpenSettingPanel(data, szType)
 							local w, h = this:GetSize()
 							local xml = { GetFormatText(_L['Countdown preview'] .. '\n', 0, 255, 255, 0) }
 							for k, v in ipairs(CheckCountdown(szNum)) do
-								insert(xml, GetFormatText(v.nTime .. ' - ' .. v.szName .. '\n'))
+								insert(xml, GetFormatText(v.nTime .. ' - ' .. FilterCustomText(v.szName, '{$sender}', '{$receiver}') .. '\n'))
 							end
 							edit:color(255, 255, 255)
 							LIB.OutputTip(this, concat(xml), true)
