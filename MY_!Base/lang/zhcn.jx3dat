@@ -446,4 +446,7 @@ data = {
 		['Other dungeon'] = '其它秘境',
 		['Other'] = '其它地图',
 	},
+
+	['Point left time: (%d+)h(%d+)m(%d+)s'] = '点卡剩余时间为：(%d+)小时(%d+)分(%d+)秒',
+	['Fee left %H:%mm:%ss'] = '计费剩余：%H小时%mm分钟%ss秒',
 }

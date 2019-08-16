@@ -391,13 +391,28 @@ function LIB.SwitchTab(szID, bForceUpdate)
 	-- ready to draw
 	if not tab then
 		-- ª∂”≠“≥
+		local function GetMemoryText()
+			return format('Memory:%.1fMB', collectgarbage('count') / 1024)
+		end
+		local function GetAdvText()
+			local me = GetClientPlayer()
+			if not me then
+				return ''
+			end
+			return _L('%s, welcome to use %s!', me.szName, PACKET_INFO.NAME) .. 'v' .. LIB.GetVersion()
+		end
+		local function GetSvrText()
+			return LIB.GetServer() .. ' (' .. LIB.GetRealServer() .. ')'
+				.. g_tStrings.STR_CONNECT
+				.. LIB.FormatTimeCounter(LIB.GetTimeOfFee() - GetCurrentTime(), _L['Fee left %H:%mm:%ss'])
+		end
 		local ui = LIB.UI(wnd)
 		local w, h = ui:size()
 		ui:append('Shadow', { name = 'Shadow_Adv', x = 0, y = 0, color = { 140, 140, 140 } })
 		ui:append('Image', { name = 'Image_Adv', x = 0, y = 0, image = PACKET_INFO.UITEX_POSTER, imageframe = (GetTime() % 2) })
-		ui:append('Text', { name = 'Text_Adv', x = 10, y = 300, w = 557, font = 200 })
-		ui:append('Text', { name = 'Text_Memory', x = 10, y = 300, w = 150, alpha = 150, font = 162, halign = 2 })
-		ui:append('Text', { name = 'Text_Svr', x = 10, y = 345, w = 557, font = 204, text = LIB.GetServer() .. ' (' .. LIB.GetRealServer() .. ')', alpha = 220 })
+		ui:append('Text', { name = 'Text_Adv', x = 10, y = 300, w = 557, font = 200, text = GetAdvText() })
+		ui:append('Text', { name = 'Text_Memory', x = 10, y = 300, w = 150, alpha = 150, font = 162, text = GetMemoryText(), halign = 2 })
+		ui:append('Text', { name = 'Text_Svr', x = 10, y = 345, w = 557, font = 204, text = GetSvrText(), alpha = 220 })
 		local x = 7
 		-- ∆Ê”ˆ∑÷œÌ
 		x = x + ui:append('WndCheckBox', {
@@ -544,11 +559,9 @@ function LIB.SwitchTab(szID, bForceUpdate)
 		end
 		wnd.OnPanelResize(wnd)
 		LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '#TAB#DEFAULT', 500, function()
-			local me = GetClientPlayer()
-			if me then
-				ui:children('#Text_Adv'):text(_L('%s, welcome to use %s!', me.szName, PACKET_INFO.NAME) .. 'v' .. LIB.GetVersion())
-			end
-			ui:children('#Text_Memory'):text(format('Memory:%.1fMB', collectgarbage('count') / 1024))
+			ui:children('#Text_Adv'):text(GetAdvText())
+			ui:children('#Text_Svr'):text(GetSvrText())
+			ui:children('#Text_Memory'):text(GetMemoryText())
 		end)
 		wnd.OnPanelDeactive = function()
 			LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '#TAB#DEFAULT', false)

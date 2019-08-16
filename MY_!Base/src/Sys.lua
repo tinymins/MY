@@ -1411,6 +1411,15 @@ function LIB.FormatTime(nTimestamp, szFormat)
 	return szFormat
 end
 
+function LIB.DateToTime(nYear, nMonth, nDay, nHour, nMin, nSec)
+	return DateToTime(nYear, nMonth, nDay, nHour, nMin, nSec)
+end
+
+function LIB.TimeToDate(nTimestamp)
+	local date = TimeToDate(nTimestamp)
+	return date.year, date.month, date.day, date.hour, date.minute, date.second
+end
+
 -- 格式化数字小数点
 -- (string) LIB.FormatNumberDot(nValue, nDot, bDot, bSimple)
 -- nValue  要格式化的数字
@@ -2257,5 +2266,46 @@ if IsFunction(GVoiceBase_ForbidMember) then
 	LIB.GVoiceBase_ForbidMember = GVoiceBase_ForbidMember
 else
 	function LIB.GVoiceBase_ForbidMember(dwMemberID, Forbid)
+	end
+end
+
+if Login_GetTimeOfFee then
+	function LIB.GetTimeOfFee()
+		-- [仅客户端使用]返回帐号月卡截止时间，计点剩余秒数，计天剩余秒数和总截止时间
+		local dwMonthEndTime, nPointLeftTime, nDayLeftTime, dwEndTime = Login_GetTimeOfFee()
+		if dwMonthEndTime <= 1229904000 then
+			dwMonthEndTime = 0
+		end
+		return dwEndTime, dwMonthEndTime, nPointLeftTime, nDayLeftTime
+	end
+else
+	local bInit, dwMonthEndTime, dwPointEndTime, dwDayEndTime = false, 0, 0, 0
+	LIB.RegisterMsgMonitor('LIB#GetTimeOfFee', function(szMsg)
+		-- 点卡剩余时间为：558小时41分33秒
+		local szHour, szMinute, szSecond = szMsg:match(_L['Point left time: (%d+)h(%d+)m(%d+)s'])
+		if szHour and szMinute and szSecond then
+			local dwTime = GetCurrentTime()
+			bInit = true
+			dwMonthEndTime = 0
+			dwPointEndTime = dwTime + tonumber(szHour) * 3600 + tonumber(szMinute) * 60 + tonumber(szSecond)
+			dwDayEndTime = 0
+		end
+		-- 包月时间截止至：xxxx年xx月xx日xx时
+		local szYear, szMonth, szDay, szHour = szMsg:match(_L['Month time to: (%d+)y(%d+)m(%d+)d(%d+)h'])
+		if szYear and szMonth and szDay and szHour then
+			local dwTime = GetCurrentTime()
+			bInit = true
+			dwMonthEndTime = LIB.DateToTime(szYear, szMonth, szDay, szHour, 0, 0)
+			dwPointEndTime = 0
+			dwDayEndTime = 0
+		end
+		if bInit then
+			LIB.RegisterMsgMonitor('LIB#GetTimeOfFee')
+		end
+	end, {'MSG_SYS'})
+	function LIB.GetTimeOfFee()
+		local dwTime = GetCurrentTime()
+		local dwEndTime = max(dwMonthEndTime, dwPointEndTime, dwDayEndTime)
+		return dwEndTime, dwMonthEndTime, max(dwPointEndTime - dwTime, 0), max(dwDayEndTime - dwTime, 0)
 	end
 end
