@@ -184,15 +184,15 @@ end
 
 local ParseCustomText, FilterCustomText
 do
-local function NDSBNameReplacer(szContent, szSenderName, szReceiverName)
+local function NDSBNameReplacer(szContent, szSender, szReceiver)
 	if szContent == 'me' then
 		return MY_TM_CORE_NAME
 	end
 	if szContent == 'sender' then
-		return szSenderName
+		return szSender
 	end
 	if szContent == 'receiver' then
-		return szReceiverName
+		return szReceiver
 	end
 	local szType = szContent:sub(1, 1)
 	local dwID, nLevel = unpack(MY_SplitString(szContent:sub(2), ','))
@@ -218,23 +218,17 @@ local function NDSBNameReplacer(szContent, szSenderName, szReceiverName)
 end
 local FILTER_TEXT_CACHE = {}
 local MAX_CUSTOM_TEXT_LEN = 8
-function FilterCustomText(szOrigin, szSenderName, szReceiverName, bNoLimit)
+local function FormatCustomText(szOrigin, szSender, szReceiver, bNoLimit)
 	if not szOrigin then
 		return
-	end
-	if not szSenderName then
-		szSenderName = ''
-	end
-	if not szReceiverName then
-		szReceiverName = ''
 	end
 	if not FILTER_TEXT_CACHE[szOrigin] then
 		FILTER_TEXT_CACHE[szOrigin] = {}
 	end
-	if not FILTER_TEXT_CACHE[szOrigin][szSenderName] then
-		FILTER_TEXT_CACHE[szOrigin][szSenderName] = {}
+	if not FILTER_TEXT_CACHE[szOrigin][szSender] then
+		FILTER_TEXT_CACHE[szOrigin][szSender] = {}
 	end
-	if not FILTER_TEXT_CACHE[szOrigin][szSenderName][szReceiverName] then
+	if not FILTER_TEXT_CACHE[szOrigin][szSender][szReceiver] then
 		local szText = szOrigin
 		if IsString(szText) then
 			szOrigin, szText = LIB.ReplaceSensitiveWord(szOrigin), ''
@@ -271,7 +265,7 @@ function FilterCustomText(szOrigin, szSenderName, szReceiverName, bNoLimit)
 					end
 				end
 				if szContent then
-					szPart = NDSBNameReplacer(szContent, szSenderName, szReceiverName)
+					szPart = NDSBNameReplacer(szContent, szSender, szReceiver)
 					if szPart then
 						szText = szText .. szPart
 					end
@@ -279,14 +273,18 @@ function FilterCustomText(szOrigin, szSenderName, szReceiverName, bNoLimit)
 				end
 			end
 		end
-		FILTER_TEXT_CACHE[szOrigin][szSenderName][szReceiverName] = szText
+		FILTER_TEXT_CACHE[szOrigin][szSender][szReceiver] = szText
 	end
-	return FILTER_TEXT_CACHE[szOrigin][szSenderName][szReceiverName]
-end
-function ParseCustomText(szOrigin, szSenderName, szReceiverName)
-	return FilterCustomText(szOrigin, szSenderName, szReceiverName, true)
+	return FILTER_TEXT_CACHE[szOrigin][szSender][szReceiver]
 end
 LIB.RegisterEvent('MY_SHIELDED_VERSION', function() FILTER_TEXT_CACHE = {} end)
+
+function FilterCustomText(szOrigin, szSender, szReceiver)
+	return FormatCustomText(szOrigin, szSender or '', szReceiver or '', false)
+end
+function ParseCustomText(szOrigin, szSender, szReceiver)
+	return FormatCustomText(szOrigin, szSender or '{$sender}', szReceiver or '{$receiver}', true)
+end
 end
 
 local function ConstructSpeech(aText, aXml, szText, nFont, nR, nG, nB)
@@ -745,7 +743,7 @@ function D.SetTeamMark(szType, tMark, dwCharacterID, dwID, nLevel)
 	D.OnSetMark()
 end
 -- 倒计时处理 支持定义无限的倒计时
-function D.CountdownEvent(data, nClass, szSenderName, szReceiverName)
+function D.CountdownEvent(data, nClass, szSender, szReceiver)
 	if data.tCountdown then
 		for k, v in ipairs(data.tCountdown) do
 			if nClass == v.nClass then
@@ -755,23 +753,23 @@ function D.CountdownEvent(data, nClass, szSenderName, szReceiverName)
 					nFrame   = v.nFrame,
 					nTime    = v.nTime,
 					nRefresh = v.nRefresh,
-					szName   = FilterCustomText(v.szName or data.szName, szSenderName, szReceiverName),
+					szName   = FilterCustomText(v.szName or data.szName, szSender, szReceiver),
 					nIcon    = v.nIcon or data.nIcon or 340,
 					bTalk    = v.bTeamChannel,
-					bHold    = v.bHold
+					bHold    = v.bHold,
 				}
-				D.FireCountdownEvent(nClass, szKey, tParam)
+				D.FireCountdownEvent(nClass, szKey, tParam, szSender, szReceiver)
 			end
 		end
 	end
 end
 
 -- 发布事件 为了方便日后修改 集中起来
-function D.FireCountdownEvent(nClass, szKey, tParam)
+function D.FireCountdownEvent(nClass, szKey, tParam, szSender, szReceiver)
 	tParam.bTalk = O.bPushTeamChannel and tParam.bTalk
 	nClass       = tParam.key and MY_TM_TYPE.COMMON or nClass
 	szKey        = tParam.key or szKey
-	FireUIEvent('MY_TM_ST_CREATE', nClass, szKey, tParam)
+	FireUIEvent('MY_TM_ST_CREATE', nClass, szKey, tParam, szSender, szReceiver)
 end
 
 function D.GetSrcName(dwID)
@@ -791,7 +789,7 @@ end
 
 -- local a=GetTime();for i=1, 10000 do FireUIEvent('BUFF_UPDATE',UI_GetClientPlayerID(),false,1,true,i,1,1,1,1,0) end;Output(GetTime()-a)
 -- 事件操作
-function D.OnBuff(dwCaster, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, dwSkillSrcID)
+function D.OnBuff(dwOwner, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, dwSkillSrcID)
 	local szType = bCanCancel and 'BUFF' or 'DEBUFF'
 	local key = dwBuffID .. '_' .. nBuffLevel
 	local data = D.GetData(szType, dwBuffID, nBuffLevel)
@@ -826,7 +824,7 @@ function D.OnBuff(dwCaster, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, d
 	end
 	if data then
 		local cfg, nClass
-		if data.nScrutinyType and not D.CheckScrutinyType(data.nScrutinyType, dwCaster) then -- 监控对象检查
+		if data.nScrutinyType and not D.CheckScrutinyType(data.nScrutinyType, dwOwner) then -- 监控对象检查
 			return
 		end
 		if data.tKungFu and not D.CheckKungFu(data.tKungFu) then -- 自身身法需求检查
@@ -840,27 +838,26 @@ function D.OnBuff(dwCaster, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, d
 		else
 			cfg, nClass = data[MY_TM_TYPE.BUFF_GET], MY_TM_TYPE.BUFF_GET
 		end
-		D.CountdownEvent(data, nClass, nil, szName)
+		local szSender = LIB.GetObjectName(LIB.GetObject(dwSkillSrcID))
+		local szReceiver = LIB.GetObjectName(LIB.GetObject(dwOwner))
+		D.CountdownEvent(data, nClass, szSender, szReceiver)
 		if cfg then
 			local szName, nIcon = LIB.GetBuffName(dwBuffID, nBuffLevel)
-			local KObject = IsPlayer(dwCaster) and GetPlayer(dwCaster) or GetNpc(dwCaster)
-			if not KObject then
-				return -- D.Log('ERROR ' .. szType .. ' object:' .. dwCaster .. ' does not exist!')
-			end
 			if data.szName then
-				szName = FilterCustomText(data.szName)
+				szName = FilterCustomText(data.szName, szSender, szReceiver)
 			end
-			nIcon  = data.nIcon or nIcon
-			local szSrcName = LIB.GetObjectName(KObject)
+			if data.nIcon then
+				nIcon = data.nIcon
+			end
 			local aXml, aText = {}, {}
 			ConstructSpeech(aText, aXml, MY_TM_LEFT_BRACKET, MY_TM_LEFT_BRACKET_XML)
-			ConstructSpeech(aText, aXml, szSrcName == MY_TM_CORE_NAME and g_tStrings.STR_YOU or szSrcName, 44, 255, 255, 0)
+			ConstructSpeech(aText, aXml, szReceiver == MY_TM_CORE_NAME and g_tStrings.STR_YOU or szReceiver, 44, 255, 255, 0)
 			ConstructSpeech(aText, aXml, MY_TM_RIGHT_BRACKET, MY_TM_RIGHT_BRACKET_XML)
 			if nClass == MY_TM_TYPE.BUFF_GET then
 				ConstructSpeech(aText, aXml, _L['Get buff'], 44, 255, 255, 255)
 				ConstructSpeech(aText, aXml, szName .. ' x' .. nCount, 44, 255, 255, 0)
 				if data.szNote and not LIB.IsShieldedVersion(2) then
-					ConstructSpeech(aText, aXml, ' ' .. FilterCustomText(data.szNote, nil, szName), 44, 255, 255, 255)
+					ConstructSpeech(aText, aXml, ' ' .. FilterCustomText(data.szNote, szSender, szReceiver), 44, 255, 255, 255)
 				end
 			else
 				ConstructSpeech(aText, aXml, _L['Lose buff'], 44, 255, 255, 255)
@@ -871,41 +868,41 @@ function D.OnBuff(dwCaster, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, d
 				FireUIEvent('MY_TM_CA_CREATE', szXml, 3, true)
 			end
 			-- 特大文字
-			if O.bPushBigFontAlarm and cfg.bBigFontAlarm and (MY_TM_CORE_PLAYERID == dwCaster or not IsPlayer(dwCaster)) then
-				FireUIEvent('MY_TM_LARGE_TEXT', szText, data.col or { GetHeadTextForceFontColor(dwCaster, MY_TM_CORE_PLAYERID) })
+			if O.bPushBigFontAlarm and cfg.bBigFontAlarm and (MY_TM_CORE_PLAYERID == dwOwner or not IsPlayer(dwOwner)) then
+				FireUIEvent('MY_TM_LARGE_TEXT', szText, data.col or { GetHeadTextForceFontColor(dwOwner, MY_TM_CORE_PLAYERID) })
 			end
 
 			-- 获得处理
 			if nClass == MY_TM_TYPE.BUFF_GET then
 				if cfg.bSelect then
-					SetTarget(IsPlayer(dwCaster) and TARGET.PLAYER or TARGET.NPC, dwCaster)
+					SetTarget(IsPlayer(dwOwner) and TARGET.PLAYER or TARGET.NPC, dwOwner)
 				end
-				if cfg.bAutoCancel and MY_TM_CORE_PLAYERID == dwCaster then
+				if cfg.bAutoCancel and MY_TM_CORE_PLAYERID == dwOwner then
 					LIB.CancelBuff(dwBuffID)
 				end
 				if cfg.tMark then
-					D.SetTeamMark(szType, cfg.tMark, dwCaster, dwBuffID, nBuffLevel)
+					D.SetTeamMark(szType, cfg.tMark, dwOwner, dwBuffID, nBuffLevel)
 				end
 				-- 重要Buff列表
-				if O.bPushPartyBuffList and IsPlayer(dwCaster) and cfg.bPartyBuffList and (LIB.IsParty(dwCaster) or MY_TM_CORE_PLAYERID == dwCaster) then
-					FireUIEvent('MY_TM_PARTY_BUFF_LIST', dwCaster, data.dwID, data.nLevel, data.nIcon)
+				if O.bPushPartyBuffList and IsPlayer(dwOwner) and cfg.bPartyBuffList and (LIB.IsParty(dwOwner) or MY_TM_CORE_PLAYERID == dwOwner) then
+					FireUIEvent('MY_TM_PARTY_BUFF_LIST', dwOwner, data.dwID, data.nLevel, data.nIcon)
 				end
 				-- 头顶报警
 				if O.bPushScreenHead and cfg.bScreenHead then
-					FireUIEvent('MY_LIFEBAR_COUNTDOWN', dwCaster, szType, 'MY_TM_BUFF_' .. data.dwID, {
+					FireUIEvent('MY_LIFEBAR_COUNTDOWN', dwOwner, szType, 'MY_TM_BUFF_' .. data.dwID, {
 						dwBuffID = data.dwID,
 						szText = szName,
 						col = data.col or (szType == 'BUFF' and {0, 255, 0} or {255, 0, 0}),
 					})
-					FireUIEvent('MY_TM_SA_CREATE', szType, dwCaster, { dwID = data.dwID, col = data.col, text = szName })
+					FireUIEvent('MY_TM_SA_CREATE', szType, dwOwner, { dwID = data.dwID, col = data.col, text = szName })
 				end
-				if MY_TM_CORE_PLAYERID == dwCaster then
+				if MY_TM_CORE_PLAYERID == dwOwner then
 					if O.bPushBuffList and cfg.bBuffList then
 						local col = szType == 'BUFF' and { 0, 255, 0 } or { 255, 0, 0 }
 						if data.col then
 							col = data.col
 						end
-						FireUIEvent('MY_TM_BL_CREATE', data.dwID, data.nLevel, col, data)
+						FireUIEvent('MY_TM_BL_CREATE', data.dwID, data.nLevel, col, data, szSender, szReceiver)
 					end
 					-- 全屏泛光
 					if O.bPushFullScreen and cfg.bFullScreen then
@@ -918,7 +915,7 @@ function D.OnBuff(dwCaster, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, d
 				end
 				-- 添加到团队面板
 				if O.bPushTeamPanel and cfg.bTeamPanel and (not cfg.bOnlySelfSrc or dwSkillSrcID == MY_TM_CORE_PLAYERID) then
-					FireUIEvent('MY_RAID_REC_BUFF', dwCaster, {
+					FireUIEvent('MY_RAID_REC_BUFF', dwOwner, {
 						dwID      = data.dwID,
 						nLevel    = data.bCheckLevel and data.nLevel or 0,
 						nLevelEx  = data.nLevel,
@@ -930,14 +927,15 @@ function D.OnBuff(dwCaster, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, d
 				end
 			end
 			if O.bPushTeamChannel and cfg.bTeamChannel then
-				D.Talk('RAID', szText, szSrcName)
+				D.Talk('RAID', szText, szReceiver)
 			end
 			if O.bPushWhisperChannel and cfg.bWhisperChannel then
-				D.Talk('WHISPER', szText, szSrcName)
+				D.Talk('WHISPER', szText, szReceiver)
 			end
 		end
 	end
 end
+
 -- 技能事件
 function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
 	local key = dwCastID .. '_' .. dwLevel
@@ -985,14 +983,10 @@ function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
 			return -- D.Log('ERROR CASTING object:' .. dwCaster .. ' does not exist!')
 		end
 		if data.szName then
-			szName = FilterCustomText(data.szName)
+			szName = FilterCustomText(data.szName, szSender, szReceiver)
 		end
-		nIcon  = data.nIcon or nIcon
-		local szSrcName = LIB.GetObjectName(KObject)
-		local dwTargetType, dwTargetID = KObject.GetTarget()
-		local szTargetName
-		if dwTargetID > 0 then
-			szTargetName = LIB.GetObjectName(IsPlayer(dwTargetID) and GetPlayer(dwTargetID) or GetNpc(dwTargetID))
+		if data.nIcon then
+			nIcon = data.nIcon
 		end
 		local cfg, nClass
 		if szEvent == 'UI_OME_SKILL_CAST_LOG' then
@@ -1000,11 +994,13 @@ function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
 		else
 			cfg, nClass = data[MY_TM_TYPE.SKILL_END], MY_TM_TYPE.SKILL_END
 		end
-		D.CountdownEvent(data, nClass, szSrcName, szTargetName)
+		local szSender = LIB.GetObjectName(KObject)
+		local szReceiver = LIB.GetObjectName(LIB.GetObject(KObject.GetTarget()))
+		D.CountdownEvent(data, nClass, szSender, szReceiver)
 		if cfg then
 			local aXml, aText = {}, {}
 			ConstructSpeech(aText, aXml, MY_TM_LEFT_BRACKET, MY_TM_LEFT_BRACKET_XML)
-			ConstructSpeech(aText, aXml, szSrcName, 44, 255, 255, 0)
+			ConstructSpeech(aText, aXml, szSender, 44, 255, 255, 0)
 			ConstructSpeech(aText, aXml, MY_TM_RIGHT_BRACKET, MY_TM_RIGHT_BRACKET_XML)
 			if nClass == MY_TM_TYPE.SKILL_END then
 				ConstructSpeech(aText, aXml, _L['use of'], 44, 255, 255, 255)
@@ -1014,14 +1010,14 @@ function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
 			ConstructSpeech(aText, aXml, MY_TM_LEFT_BRACKET, MY_TM_LEFT_BRACKET_XML)
 			ConstructSpeech(aText, aXml, szName, 44, 255, 255, 0)
 			ConstructSpeech(aText, aXml, MY_TM_RIGHT_BRACKET, MY_TM_RIGHT_BRACKET_XML)
-			if data.bMonTarget and szTargetName then
+			if data.bMonTarget and szReceiver then
 				ConstructSpeech(aText, aXml, g_tStrings.TARGET, 44, 255, 255, 255)
 				ConstructSpeech(aText, aXml, MY_TM_LEFT_BRACKET, MY_TM_LEFT_BRACKET_XML)
-				ConstructSpeech(aText, aXml, szTargetName == MY_TM_CORE_NAME and g_tStrings.STR_YOU or szTargetName, 44, 255, 255, 0)
+				ConstructSpeech(aText, aXml, szReceiver == MY_TM_CORE_NAME and g_tStrings.STR_YOU or szReceiver, 44, 255, 255, 0)
 				ConstructSpeech(aText, aXml, MY_TM_RIGHT_BRACKET, MY_TM_RIGHT_BRACKET_XML)
 			end
 			if data.szNote and not LIB.IsShieldedVersion(2) then
-				ConstructSpeech(aText, aXml, ' ' .. FilterCustomText(data.szNote, szSrcName, szTargetName), 44, 255, 255, 255)
+				ConstructSpeech(aText, aXml, ' ' .. FilterCustomText(data.szNote, szSender, szReceiver), 44, 255, 255, 255)
 			end
 			local szXml, szText = concat(aXml), concat(aText)
 			if O.bPushCenterAlarm and cfg.bCenterAlarm then
@@ -1051,10 +1047,10 @@ function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
 				FireUIEvent('MY_TM_FS_CREATE', data.dwID .. '#SKILL#'  .. data.nLevel, { nTime = 3, col = data.col})
 			end
 			if O.bPushTeamChannel and cfg.bTeamChannel then
-				D.Talk('RAID', szText, szTargetName)
+				D.Talk('RAID', szText, szReceiver)
 			end
 			if O.bPushWhisperChannel and cfg.bWhisperChannel then
-				D.Talk('RAID_WHISPER', szText, szTargetName)
+				D.Talk('RAID_WHISPER', szText, szReceiver)
 			end
 		end
 	end
@@ -1119,6 +1115,8 @@ function D.OnNpcEvent(npc, bEnter)
 		if data.tKungFu and not D.CheckKungFu(data.tKungFu) then -- 自身身法需求检查
 			return
 		end
+		local szSender = nil
+		local szReceiver = LIB.GetObjectName(npc)
 		if bEnter then
 			cfg, nClass = data[MY_TM_TYPE.NPC_ENTER], MY_TM_TYPE.NPC_ENTER
 			nCount = CACHE.NPC_LIST[npc.dwTemplateID].nCount
@@ -1140,9 +1138,9 @@ function D.OnNpcEvent(npc, bEnter)
 				end
 				-- 头顶报警
 				if O.bPushScreenHead and cfg.bScreenHead then
-					local szNote, szName = nil, FilterCustomText(data.szName)
+					local szNote, szName = nil, FilterCustomText(data.szName, szSender, szReceiver)
 					if not LIB.IsShieldedVersion(2) then
-						szNote = FilterCustomText(data.szNote, szName, nil) or szName
+						szNote = FilterCustomText(data.szNote, szSender, szReceiver) or szName
 					end
 					FireUIEvent('MY_LIFEBAR_COUNTDOWN', npc.dwID, 'NPC', 'MY_TM_NPC_' .. npc.dwID, {
 						szText = szNote,
@@ -1157,11 +1155,11 @@ function D.OnNpcEvent(npc, bEnter)
 				CACHE.NPC_LIST[npc.dwTemplateID].nTime = nTime
 			end
 		end
-		D.CountdownEvent(data, nClass, szName, nil)
+		D.CountdownEvent(data, nClass, szSender, szReceiver)
 		if cfg then
-			local szName = LIB.GetObjectName(npc)
+			local szName = szReceiver
 			if data.szName then
-				szName = FilterCustomText(data.szName)
+				szName = FilterCustomText(data.szName, szSender, szReceiver)
 			end
 			local aXml, aText = {}, {}
 			ConstructSpeech(aText, aXml, MY_TM_LEFT_BRACKET, MY_TM_LEFT_BRACKET_XML)
@@ -1173,7 +1171,7 @@ function D.OnNpcEvent(npc, bEnter)
 					ConstructSpeech(aText, aXml, ' x' .. nCount, 44, 255, 255, 0)
 				end
 				if data.szNote and not LIB.IsShieldedVersion(2) then
-					ConstructSpeech(aText, aXml, ' ' .. FilterCustomText(data.szNote, szName, nil), 44, 255, 255, 255)
+					ConstructSpeech(aText, aXml, ' ' .. FilterCustomText(data.szNote, szSender, szReceiver), 44, 255, 255, 255)
 				end
 			else
 				ConstructSpeech(aText, aXml, _L['Disappear'], 44, 255, 255, 255)
@@ -1260,6 +1258,8 @@ function D.OnDoodadEvent(doodad, bEnter)
 		if data.tKungFu and not D.CheckKungFu(data.tKungFu) then -- 自身身法需求检查
 			return
 		end
+		local szSender = nil
+		local szReceiver = LIB.GetObjectName(doodad)
 		if bEnter then
 			cfg, nClass = data[MY_TM_TYPE.DOODAD_ENTER], MY_TM_TYPE.DOODAD_ENTER
 			nCount = CACHE.DOODAD_LIST[doodad.dwTemplateID].nCount
@@ -1278,9 +1278,9 @@ function D.OnDoodadEvent(doodad, bEnter)
 			if cfg then
 				-- 头顶报警
 				if O.bPushScreenHead and cfg.bScreenHead then
-					local szNote, szName = nil, FilterCustomText(data.szName)
+					local szNote, szName = nil, FilterCustomText(data.szName, szSender, szReceiver)
 					if not LIB.IsShieldedVersion(2) then
-						szNote = FilterCustomText(data.szNote, szName, nil) or szName
+						szNote = FilterCustomText(data.szNote, szSender, szReceiver) or szName
 					end
 					FireUIEvent('MY_LIFEBAR_COUNTDOWN', doodad.dwID, 'DOODAD', 'MY_TM_DOODAD_' .. doodad.dwID, {
 						szText = szNote,
@@ -1295,11 +1295,11 @@ function D.OnDoodadEvent(doodad, bEnter)
 				CACHE.DOODAD_LIST[doodad.dwTemplateID].nTime = nTime
 			end
 		end
-		D.CountdownEvent(data, nClass, szName, nil)
+		D.CountdownEvent(data, nClass, szSender, szReceiver)
 		if cfg then
-			local szName = doodad.szName
+			local szName = szReceiver
 			if data.szName then
-				szName = FilterCustomText(data.szName)
+				szName = FilterCustomText(data.szName, szSender, szReceiver)
 			end
 			local aXml, aText = {}, {}
 			ConstructSpeech(aText, aXml, MY_TM_LEFT_BRACKET, MY_TM_LEFT_BRACKET_XML)
@@ -1311,7 +1311,7 @@ function D.OnDoodadEvent(doodad, bEnter)
 					ConstructSpeech(aText, aXml, ' x' .. nCount, 44, 255, 255, 0)
 				end
 				if data.szNote and not LIB.IsShieldedVersion(2) then
-					ConstructSpeech(aText, aXml, ' ' .. FilterCustomText(data.szNote, szName, nil), 44, 255, 255, 255)
+					ConstructSpeech(aText, aXml, ' ' .. FilterCustomText(data.szNote, szSender, szReceiver), 44, 255, 255, 255)
 				end
 			else
 				ConstructSpeech(aText, aXml, _L['Disappear'], 44, 255, 255, 255)
@@ -1344,7 +1344,9 @@ end
 function D.OnDoodadAllLeave(dwTemplateID)
 	local data = D.GetData('DOODAD', dwTemplateID)
 	if data then
-		D.CountdownEvent(data, MY_TM_TYPE.DOODAD_ALLLEAVE)
+		local szSender = nil
+		local szReceiver = LIB.GetTemplateName(TARGET.DOODAD, dwTemplateID)
+		D.CountdownEvent(data, MY_TM_TYPE.DOODAD_ALLLEAVE, szSender, szReceiver)
 	end
 end
 -- 系统和NPC喊话处理
@@ -1366,8 +1368,7 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 		tTemp[#tTemp + 1] = tWeak[key]
 		FireUIEvent('MY_TMUI_TEMP_UPDATE', szEvent, t)
 	end
-	local tInfo, data
-	local cache = CACHE.MAP[szEvent]
+	local cache, data = CACHE.MAP[szEvent], nil
 	if cache.HIT[szContent] then
 		if cache.HIT[szContent][szNpcName or 'sys'] then
 			data = cache.HIT[szContent][szNpcName or 'sys']
@@ -1376,6 +1377,7 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 		end
 	end
 	-- 不适用wstring 性能考虑为前提
+	local szSender, dwReceiverID, szReceiver = szNpcName or _L['JX3']
 	if not data then
 		local bInParty = me.IsInParty()
 		local team     = GetClientTeam()
@@ -1388,8 +1390,9 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 				local c = content
 				for kk, vv in ipairs(team.GetTeamMemberList()) do
 					if string.find(szContent, c:gsub('$team', team.GetClientTeamMemberName(vv)), nil, true) and (v.szTarget == szNpcName or v.szTarget == '%') then -- hit
-						tInfo = { dwID = vv, szName = team.GetClientTeamMemberName(vv) }
 						data = v
+						dwReceiverID = vv
+						szReceiver = team.GetClientTeamMemberName(vv)
 						break
 					end
 				end
@@ -1407,48 +1410,49 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 	end
 	if data then
 		local nClass = szEvent == 'TALK' and MY_TM_TYPE.TALK_MONITOR or MY_TM_TYPE.CHAT_MONITOR
-		D.CountdownEvent(data, nClass, szNpcName or _L['JX3'], tInfo and tInfo.szName)
+		D.CountdownEvent(data, nClass, szSender, szReceiver)
 		local cfg = data[nClass]
 		if cfg then
 			if data.szContent:find('$me') then
-				tInfo = { dwID = me.dwID, szName = me.szName }
+				dwReceiverID = me.dwID
+				szReceiver = me.szName
 			end
 			local aXml, aText = {}, {}
 			local szNote = nil
 			if data.szNote then
 				szNote = data.szNote
 			end
-			if tInfo and not szNote then
+			if szReceiver and not szNote then
 				ConstructSpeech(aText, aXml, MY_TM_LEFT_BRACKET, MY_TM_LEFT_BRACKET_XML)
 				ConstructSpeech(aText, aXml, szNpcName or _L['JX3'], 44, 255, 255, 0)
 				ConstructSpeech(aText, aXml, MY_TM_RIGHT_BRACKET, MY_TM_RIGHT_BRACKET_XML)
 				ConstructSpeech(aText, aXml, _L['is calling'], 44, 255, 255, 255)
 				ConstructSpeech(aText, aXml, MY_TM_LEFT_BRACKET, MY_TM_LEFT_BRACKET_XML)
-				ConstructSpeech(aText, aXml, tInfo.szName == me.szName and g_tStrings.STR_YOU or tInfo.szName, 44, 255, 255, 0)
+				ConstructSpeech(aText, aXml, szReceiver == me.szName and g_tStrings.STR_YOU or szReceiver, 44, 255, 255, 0)
 				ConstructSpeech(aText, aXml, MY_TM_RIGHT_BRACKET, MY_TM_RIGHT_BRACKET_XML)
 				ConstructSpeech(aText, aXml, _L['\'s name.'], 44, 255, 255, 255)
 			else
-				ConstructSpeech(aText, aXml, FilterCustomText(szNote, szNpcName or _L['JX3'], tInfo and tInfo.szName) or szContent, 44, 255, 255, 255)
+				ConstructSpeech(aText, aXml, FilterCustomText(szNote, szSender, szReceiver) or szContent, 44, 255, 255, 255)
 			end
 			local szXml, szText = concat(aXml), concat(aText)
 			szText = szText:gsub('$me', me.szName)
-			if tInfo then -- 点了人名
-				szText = szText:gsub('$team', tInfo.szName)
+			if dwReceiverID then -- 点了人名
+				szText = szText:gsub('$team', szReceiver)
 				if O.bPushWhisperChannel and cfg.bWhisperChannel then
-					D.Talk('WHISPER', szText, tInfo.szName)
+					D.Talk('WHISPER', szText, szReceiver)
 				end
 				-- 头顶报警
 				if O.bPushScreenHead and cfg.bScreenHead then
-					FireUIEvent('MY_LIFEBAR_COUNTDOWN', tInfo.dwID, 'TIME', 'MY_TM_TIME_' .. tInfo.dwID, {
+					FireUIEvent('MY_LIFEBAR_COUNTDOWN', dwReceiverID, 'TIME', 'MY_TM_TIME_' .. dwReceiverID, {
 						nTime = GetTime() + 5000,
 						szText = _L('%s call name', szNpcName or g_tStrings.SYSTEM),
 						col = data.col,
 						bHideProgress = true,
 					})
-					FireUIEvent('MY_TM_SA_CREATE', 'TIME', tInfo.dwID, { text = _L('%s call name', szNpcName or g_tStrings.SYSTEM)})
+					FireUIEvent('MY_TM_SA_CREATE', 'TIME', dwReceiverID, { text = _L('%s call name', szNpcName or g_tStrings.SYSTEM)})
 				end
 				if not LIB.IsShieldedVersion(2) and cfg.bSelect then
-					SetTarget(TARGET.PLAYER, tInfo.dwID)
+					SetTarget(TARGET.PLAYER, dwReceiverID)
 				end
 			else -- 没点名
 				if O.bPushWhisperChannel and cfg.bWhisperChannel then
@@ -1474,13 +1478,13 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 				FireUIEvent('MY_TM_LARGE_TEXT', szText, data.col or { 255, 128, 0 })
 			end
 			if O.bPushFullScreen and cfg.bFullScreen then
-				if (tInfo and tInfo.dwID == me.dwID) or not tInfo then
+				if not dwReceiverID or dwReceiverID == me.dwID then
 					FireUIEvent('MY_TM_FS_CREATE', szEvent, { nTime  = 3, col = data.col or { 0, 255, 0 }, bFlash = true })
 				end
 			end
 			if O.bPushTeamChannel and cfg.bTeamChannel then
-				if tInfo and not data.szNote then
-					D.Talk('RAID', szText, tInfo.szName)
+				if szReceiver and not data.szNote then
+					D.Talk('RAID', szText, szReceiver)
 				else
 					D.Talk('RAID', szText)
 				end
@@ -1496,7 +1500,9 @@ function D.OnDeath(dwCharacterID, dwKiller)
 		local data = D.GetData('NPC', npc.dwTemplateID)
 		if data then
 			local dwTemplateID = npc.dwTemplateID
-			D.CountdownEvent(data, MY_TM_TYPE.NPC_DEATH)
+			local szSender = LIB.GetObjectName(LIB.GetObject(dwKiller))
+			local szReceiver = LIB.GetObjectName(npc)
+			D.CountdownEvent(data, MY_TM_TYPE.NPC_DEATH, szSender, szReceiver)
 			local bAllDeath = true
 			if CACHE.NPC_LIST[dwTemplateID] then
 				for k, v in pairs(CACHE.NPC_LIST[dwTemplateID].tList) do
@@ -1508,7 +1514,7 @@ function D.OnDeath(dwCharacterID, dwKiller)
 				end
 			end
 			if bAllDeath then
-				D.CountdownEvent(data, MY_TM_TYPE.NPC_ALLDEATH)
+				D.CountdownEvent(data, MY_TM_TYPE.NPC_ALLDEATH, szSender, szReceiver)
 			end
 		end
 	end
@@ -1518,8 +1524,10 @@ end
 function D.OnNpcFight(dwTemplateID, bFight)
 	local data = D.GetData('NPC', dwTemplateID)
 	if data then
+		local szSender = nil
+		local szReceiver = LIB.GetTemplateName(TARGET.NPC, dwTemplateID)
 		if bFight then
-			D.CountdownEvent(data, MY_TM_TYPE.NPC_FIGHT)
+			D.CountdownEvent(data, MY_TM_TYPE.NPC_FIGHT, szSender, szReceiver)
 		elseif data.tCountdown then -- 脱离的时候清空下
 			for k, v in ipairs(data.tCountdown) do
 				if v.nClass == MY_TM_TYPE.NPC_FIGHT and not v.bFightHold then
@@ -1554,20 +1562,22 @@ function D.OnNpcInfoChange(szEvent, dwTemplateID, nPer)
 	local data = D.GetData('NPC', dwTemplateID)
 	if data and data.tCountdown then
 		local dwType = szEvent == 'MY_TM_NPC_LIFE_CHANGE' and MY_TM_TYPE.NPC_LIFE or MY_TM_TYPE.NPC_MANA
+		local szSender = nil
+		local szReceiver = LIB.GetTemplateName(TARGET.NPC, dwTemplateID)
 		for k, v in ipairs(data.tCountdown) do
 			if v.nClass == dwType then
 				local tLife = D.GetStringStru(v.nTime)
 				for kk, vv in ipairs(tLife) do
 					local nVper = vv[1] * 100
 					if nVper == nPer then -- hit
-						local szName = v.szName or LIB.GetTemplateName(TARGET.NPC, dwTemplateID)
+						local szName = FilterCustomText(v.szName, szSender, szReceiver) or szReceiver
 						local aXml, aText = {}, {}
 						ConstructSpeech(aText, aXml, MY_TM_LEFT_BRACKET, MY_TM_LEFT_BRACKET_XML)
 						ConstructSpeech(aText, aXml, szName, 44, 255, 255, 0)
 						ConstructSpeech(aText, aXml, MY_TM_RIGHT_BRACKET, MY_TM_RIGHT_BRACKET_XML)
 						ConstructSpeech(aText, aXml, dwType == MY_TM_TYPE.NPC_LIFE and _L['\'s life remaining to '] or _L['\'s mana reaches '], 44, 255, 255, 255)
 						ConstructSpeech(aText, aXml, ' ' .. nVper .. '%', 44, 255, 255, 0)
-						ConstructSpeech(aText, aXml, ' ' .. FilterCustomText(vv[2], nil, szName), 44, 255, 255, 255)
+						ConstructSpeech(aText, aXml, ' ' .. FilterCustomText(vv[2], szSender, szReceiver), 44, 255, 255, 255)
 						local szXml, szText = concat(aXml), concat(aText)
 						if O.bPushCenterAlarm then
 							FireUIEvent('MY_TM_CA_CREATE', szXml, 3, true)
@@ -1589,7 +1599,7 @@ function D.OnNpcInfoChange(szEvent, dwTemplateID, nPer)
 								bTalk  = v.bTeamChannel,
 								bHold  = v.bHold
 							}
-							D.FireCountdownEvent(v.nClass, szKey, tParam)
+							D.FireCountdownEvent(v.nClass, szKey, tParam, szSender, szReceiver)
 						end
 						break
 					end
@@ -1601,8 +1611,10 @@ end
 -- NPC 全部消失的倒计时处理
 function D.OnNpcAllLeave(dwTemplateID)
 	local data = D.GetData('NPC', dwTemplateID)
+	local szSender = nil
+	local szReceiver = LIB.GetTemplateName(TARGET.NPC, dwTemplateID)
 	if data then
-		D.CountdownEvent(data, MY_TM_TYPE.NPC_ALLLEAVE)
+		D.CountdownEvent(data, MY_TM_TYPE.NPC_ALLLEAVE, szSender, szReceiver)
 	end
 end
 

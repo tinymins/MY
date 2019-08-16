@@ -73,13 +73,13 @@ do
 end
 
 -- 解析分段倒计时
-local function GetCountdown(tTime)
+local function GetCountdown(tTime, szSender, szReceiver)
 	local tab = {}
 	local t = SplitString(tTime, ';')
 	for k, v in ipairs(t) do
 		local time = SplitString(v, ',')
 		if time[1] and time[2] and tonumber(TrimString(time[1])) and time[2] ~= '' then
-			insert(tab, { nTime = tonumber(time[1]), szName = FilterCustomText(time[2]) })
+			insert(tab, { nTime = tonumber(time[1]), szName = FilterCustomText(time[2], szSender, szReceiver) })
 		end
 	end
 	if IsEmpty(tab) then
@@ -101,14 +101,14 @@ end
 -- }
 -- 例子：FireUIEvent('MY_TM_ST_CREATE', 0, 'test', { nTime = '5,test;15,测试;25,c', szName = 'demo' })
 -- 性能测试：for i = 1, 200 do FireUIEvent('MY_TM_ST_CREATE', 0, i, { nTime = Random(5, 15), nIcon = i }) end
-local function CreateCountdown(nType, szKey, tParam)
+local function CreateCountdown(nType, szKey, tParam, szSender, szReceiver)
 	assert(type(tParam) == 'table', 'CreateCountdown failed!')
 	local tTime = {}
 	local nTime = GetTime()
 	if type(tParam.nTime) == 'number' then
 		tTime = tParam
 	else
-		local tCountdown = GetCountdown(tParam.nTime)
+		local tCountdown = GetCountdown(tParam.nTime, szSender, szReceiver)
 		if tCountdown then
 			tTime = tCountdown[1]
 			tParam.nTime = tCountdown
@@ -152,7 +152,7 @@ end
 
 function MY_TeamMon_ST.OnEvent(szEvent)
 	if szEvent == 'MY_TM_ST_CREATE' then
-		CreateCountdown(arg0, arg1, arg2)
+		CreateCountdown(arg0, arg1, arg2, arg3, arg4)
 	elseif szEvent == 'MY_TM_ST_DEL' then
 		local ui = ST_CACHE[arg0][arg1]
 		if ui and ui:IsValid() then

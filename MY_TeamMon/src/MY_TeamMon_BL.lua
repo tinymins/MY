@@ -58,7 +58,7 @@ RegisterCustomData('MY_TeamMon_BL.nCount')
 RegisterCustomData('MY_TeamMon_BL.fScale')
 
 -- FireUIEvent('MY_TM_BL_CREATE', 103, 1, { 255, 0, 0 })
-local function CreateBuffList(dwID, nLevel, col, tArgs)
+local function CreateBuffList(dwID, nLevel, col, tArgs, szSender, szReceiver)
 	local key = tostring(dwID) -- .. '.' .. nLevel
 	col = col or { 255, 255, 0 }
 	tArgs = tArgs or {}
@@ -78,7 +78,7 @@ local function CreateBuffList(dwID, nLevel, col, tArgs)
 		local szName, nIcon = LIB.GetBuffName(dwID, nLevel)
 		ui.dwID = dwID
 		ui.nLevel = level
-		ui:Lookup('Text_Name'):SetText(FilterCustomText(tArgs.szName) or szName)
+		ui:Lookup('Text_Name'):SetText(FilterCustomText(tArgs.szName, szSender, szReceiver) or szName)
 		ui:Lookup('Text_Name'):SetFontColor(unpack(col))
 		local box = ui:Lookup('Box')
 		box:SetObjectIcon(tArgs.nIcon or nIcon)
@@ -116,7 +116,7 @@ end
 
 function D.OnEvent(szEvent)
 	if szEvent == 'MY_TM_BL_CREATE' then
-		CreateBuffList(arg0, arg1, arg2, arg3)
+		CreateBuffList(arg0, arg1, arg2, arg3, arg4, arg5)
 	elseif szEvent == 'MY_TM_BL_RESIZE' then
 		D.ReSize(arg0, arg1)
 	elseif szEvent == 'UI_SCALED' then
