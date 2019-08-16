@@ -250,3 +250,17 @@ MY_AutoHideChat.ApplyConfig = function()
     end
 end
 LIB.RegisterInit('MY_AUTOHIDECHAT', MY_AutoHideChat.ApplyConfig)
+
+function MY_AutoHideChat.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+	ui:append('WndCheckBox', {
+		x = x, y = y, w = 'auto',
+		text = _L['auto hide chat panel'],
+		checked = MY_AutoHideChat.bAutoHideChatPanel,
+		oncheck = function(bChecked)
+			MY_AutoHideChat.bAutoHideChatPanel = bChecked
+			MY_AutoHideChat.ApplyConfig()
+		end,
+	})
+	y = y + 30
+	return x, y
+end

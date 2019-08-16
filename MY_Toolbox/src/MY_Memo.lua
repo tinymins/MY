@@ -179,3 +179,46 @@ local function onInit()
 end
 LIB.RegisterInit('MY_ANMERKUNGEN_PLAYERNOTE', onInit)
 end
+
+function MY_Memo.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+	x = x + ui:append('WndCheckBox', {
+		x = x, y = y,
+		text = _L['Memo (Role)'],
+		checked = MY_Memo.IsEnable(false),
+		oncheck = function(bChecked)
+			MY_Memo.Toggle(false, bChecked)
+		end,
+	}, true):autoWidth():width() + 5
+
+	x = x + ui:append('WndButton', {
+		x = x, y = y,
+		text = _L['Font'],
+		onclick = function()
+			UI.OpenFontPicker(function(nFont)
+				MY_Memo.SetFont(false, nFont)
+			end)
+		end,
+	}, true):autoWidth():width() + 5
+
+	x = x + ui:append('WndCheckBox', {
+		x = x, y = y,
+		text = _L['Memo (Global)'],
+		checked = MY_Memo.IsEnable(true),
+		oncheck = function(bChecked)
+			MY_Memo.Toggle(true, bChecked)
+		end,
+	}, true):autoWidth():width() + 5
+
+	x = x + ui:append('WndButton', {
+		x = x, y = y,
+		text = _L['Font'],
+		onclick = function()
+			UI.OpenFontPicker(function(nFont)
+				MY_Memo.SetFont(true, nFont)
+			end)
+		end,
+	}, true):autoWidth():width() + 5
+	y = y + 30
+	x = X
+	return x, y
+end

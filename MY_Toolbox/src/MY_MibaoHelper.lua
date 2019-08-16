@@ -1,7 +1,7 @@
 --------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
--- @desc     : 隐藏公告栏背景
+-- @desc     : 密码锁解锁提醒
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
@@ -43,31 +43,32 @@ end
 
 local D = {}
 local O = {
-	bEnable = false,
+	bEnable = true,
 }
-RegisterCustomData('MY_HideAnnounceBg.bEnable')
+RegisterCustomData('MY_MibaoHelper.bEnable')
 
-function D.Apply()
-	local h = Station.Lookup('Topmost2/GMAnnouncePanel', 'Handle_MsgBg')
-	if h then
-		h:SetVisible(not O.bEnable)
-	end
+function D.OnInit()
+	-- 刚进游戏好像获取不到锁状态 20秒之后再说吧
+	LIB.DelayCall('MY_LOCK_TIP_DELAY', 20000, function()
+		if not LIB.IsPhoneLock() then -- 手机密保还提示个鸡
+			local state, nResetTime = Lock_State()
+			if state == 'PASSWORD_LOCK' then
+				LIB.DelayCall('MY_LOCK_TIP', 100000, function()
+					local state, nResetTime = Lock_State()
+					if state == 'PASSWORD_LOCK' then
+						local me = GetClientPlayer()
+						local szText = me and me.GetGlobalID and _L.LOCK_TIP[me.GetGlobalID()] or _L['You have been loged in for 2min, you can unlock bag locker now.']
+						LIB.Sysmsg({szText})
+						OutputWarningMessage('MSG_REWARD_GREEN', szText, 10)
+					end
+				end)
+			end
+		end
+	end)
 end
-LIB.RegisterInit('MY_HideAnnounceBg', D.Apply)
-LIB.RegisterFrameCreate('GMAnnouncePanel.MY_HideAnnounceBg', D.Apply)
+LIB.RegisterInit('MY_MibaoHelper', D.OnInit)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	if not LIB.IsShieldedVersion() then
-		x = x + ui:append('WndCheckBox', {
-			x = x, y = y,
-			text = _L['Hide announce bg'],
-			checked = MY_HideAnnounceBg.bEnable,
-			oncheck = function(bChecked)
-				MY_HideAnnounceBg.bEnable = bChecked
-			end,
-		}, true):autoWidth():width() + 5
-		x, y = X, y + 30
-	end
 	return x, y
 end
 
@@ -92,12 +93,9 @@ local settings = {
 			fields = {
 				bEnable = true,
 			},
-			triggers = {
-				bEnable = D.Apply,
-			},
 			root = O,
 		},
 	},
 }
-MY_HideAnnounceBg = LIB.GeneGlobalNS(settings)
+MY_MibaoHelper = LIB.GeneGlobalNS(settings)
 end

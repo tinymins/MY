@@ -412,3 +412,16 @@ end
 
 LIB.RegisterInit('MY_BAGEX', function() Apply() end)
 LIB.RegisterReload('MY_BAGEX', function() Apply(false) end)
+
+function MY_BagEx.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+	ui:append('WndCheckBox', {
+		x = x, y = y,
+		text = _L['package searcher'],
+		checked = MY_BagEx.bEnable,
+		oncheck = function(bChecked)
+			MY_BagEx.Enable(bChecked)
+		end,
+	})
+	y = y + 30
+	return x, y
+end

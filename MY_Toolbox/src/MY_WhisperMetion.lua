@@ -1,7 +1,7 @@
 --------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
--- @desc     : 隐藏公告栏背景
+-- @desc     : 记录点名到密聊频道
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
@@ -43,31 +43,52 @@ end
 
 local D = {}
 local O = {
-	bEnable = false,
+	bEnable = true,
 }
-RegisterCustomData('MY_HideAnnounceBg.bEnable')
+RegisterCustomData('MY_WhisperMetion.bEnable')
 
 function D.Apply()
-	local h = Station.Lookup('Topmost2/GMAnnouncePanel', 'Handle_MsgBg')
-	if h then
-		h:SetVisible(not O.bEnable)
+	if O.bEnable then
+		LIB.RegisterMsgMonitor('MY_RedirectMetionToWhisper', function(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID, szName)
+			local me = GetClientPlayer()
+			if not me or me.dwID == dwTalkerID then
+				return
+			end
+			local szText = "text=" .. EncodeComponentsString("[" .. me.szName .. "]")
+			local nPos = StringFindW(szMsg, g_tStrings.STR_TALK_HEAD_SAY1)
+			if nPos and StringFindW(szMsg, szText, nPos) then
+				OutputMessage('MSG_WHISPER', szMsg, bRich, nFont, {r, g, b}, dwTalkerID, szName)
+			end
+		end, {
+			'MSG_NORMAL', 'MSG_PARTY', 'MSG_MAP', 'MSG_BATTLE_FILED', 'MSG_GUILD', 'MSG_GUILD_ALLIANCE', 'MSG_SCHOOL', 'MSG_WORLD',
+			'MSG_TEAM', 'MSG_CAMP', 'MSG_GROUP', 'MSG_SEEK_MENTOR', 'MSG_FRIEND', 'MSG_IDENTITY', 'MSG_SYS',
+			'MSG_NPC_NEARBY', 'MSG_NPC_YELL', 'MSG_NPC_PARTY', 'MSG_NPC_WHISPER',
+		})
+		LIB.HookChatPanel('FILTER.MY_RedirectMetionToWhisper', function(h, szMsg, szChannel, dwTime)
+			if h.__MY_LastMsg == szMsg and h.__MY_LastMsgChannel ~= szChannel and szChannel == 'MSG_WHISPER' then
+				return false
+			end
+			h.__MY_LastMsg = szMsg
+			h.__MY_LastMsgChannel = szChannel
+			return true
+		end)
+	else
+		LIB.HookChatPanel('FILTER.MY_RedirectMetionToWhisper', false)
+		LIB.RegisterMsgMonitor('MY_RedirectMetionToWhisper')
 	end
 end
-LIB.RegisterInit('MY_HideAnnounceBg', D.Apply)
-LIB.RegisterFrameCreate('GMAnnouncePanel.MY_HideAnnounceBg', D.Apply)
+LIB.RegisterInit('MY_WhisperMetion', D.Apply)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	if not LIB.IsShieldedVersion() then
-		x = x + ui:append('WndCheckBox', {
-			x = x, y = y,
-			text = _L['Hide announce bg'],
-			checked = MY_HideAnnounceBg.bEnable,
-			oncheck = function(bChecked)
-				MY_HideAnnounceBg.bEnable = bChecked
-			end,
-		}, true):autoWidth():width() + 5
-		x, y = X, y + 30
-	end
+	ui:append('WndCheckBox', {
+		x = x, y = y, w = 'auto',
+		text = _L['Redirect metion to whisper'],
+		checked = MY_WhisperMetion.bEnable,
+		oncheck = function(bChecked)
+			MY_WhisperMetion.bEnable = bChecked
+		end,
+	})
+	y = y + 30
 	return x, y
 end
 
@@ -99,5 +120,5 @@ local settings = {
 		},
 	},
 }
-MY_HideAnnounceBg = LIB.GeneGlobalNS(settings)
+MY_WhisperMetion = LIB.GeneGlobalNS(settings)
 end

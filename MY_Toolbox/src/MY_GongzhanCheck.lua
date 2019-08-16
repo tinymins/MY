@@ -1,7 +1,7 @@
 --------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
--- @desc     : Òþ²Ø¹«¸æÀ¸±³¾°
+-- @desc     : ¼ì²â¸½½ü¹²Õ½
 -- @author   : ÜøÒÁ @Ë«ÃÎÕò @×··çõæÓ°
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
@@ -42,32 +42,50 @@ if not LIB.AssertVersion('MY_Toolbox', _L['MY_Toolbox'], 0x2011800) then
 end
 
 local D = {}
-local O = {
-	bEnable = false,
+local O = {}
+
+local tChannels = {
+	{ nChannel = PLAYER_TALK_CHANNEL.LOCAL_SYS, szName = _L['system channel'], rgb = GetMsgFontColor('MSG_SYS'   , true) },
+	{ nChannel = PLAYER_TALK_CHANNEL.TEAM     , szName = _L['team channel'  ], rgb = GetMsgFontColor('MSG_TEAM'  , true) },
+	{ nChannel = PLAYER_TALK_CHANNEL.RAID     , szName = _L['raid channel'  ], rgb = GetMsgFontColor('MSG_TEAM'  , true) },
+	{ nChannel = PLAYER_TALK_CHANNEL.TONG     , szName = _L['tong channel'  ], rgb = GetMsgFontColor('MSG_GUILD' , true) },
 }
-RegisterCustomData('MY_HideAnnounceBg.bEnable')
-
-function D.Apply()
-	local h = Station.Lookup('Topmost2/GMAnnouncePanel', 'Handle_MsgBg')
-	if h then
-		h:SetVisible(not O.bEnable)
-	end
-end
-LIB.RegisterInit('MY_HideAnnounceBg', D.Apply)
-LIB.RegisterFrameCreate('GMAnnouncePanel.MY_HideAnnounceBg', D.Apply)
-
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	if not LIB.IsShieldedVersion() then
-		x = x + ui:append('WndCheckBox', {
-			x = x, y = y,
-			text = _L['Hide announce bg'],
-			checked = MY_HideAnnounceBg.bEnable,
-			oncheck = function(bChecked)
-				MY_HideAnnounceBg.bEnable = bChecked
-			end,
-		}, true):autoWidth():width() + 5
-		x, y = X, y + 30
-	end
+	ui:append('WndButton', {
+		x = W - 140, y = y, w = 120,
+		text = _L['check nearby gongzhan'],
+		onlclick = function()
+			local tGongZhans = {}
+			for _, p in ipairs(LIB.GetNearPlayer()) do
+				for _, buff in pairs(LIB.GetBuffList(p)) do
+					if (not buff.bCanCancel) and string.find(Table_GetBuffName(buff.dwID, buff.nLevel), _L['GongZhan']) ~= nil then
+						table.insert(tGongZhans, {p = p, time = (buff.nEndFrame - GetLogicFrameCount()) / 16})
+					end
+				end
+			end
+			local nChannel = O.nGongzhanPublishChannel or PLAYER_TALK_CHANNEL.LOCAL_SYS
+			LIB.Talk(nChannel, _L['------------------------------------'])
+			for _, r in ipairs(tGongZhans) do
+				LIB.Talk( nChannel, _L('Detected [%s] has GongZhan buff for %d sec(s).', r.p.szName, r.time) )
+			end
+			LIB.Talk(nChannel, _L('Nearby GongZhan Total Count: %d.', #tGongZhans))
+			LIB.Talk(nChannel, _L['------------------------------------'])
+		end,
+		rmenu = function()
+			local t = { { szOption = _L['send to ...'], bDisable = true }, { bDevide = true } }
+			for _, tChannel in ipairs(tChannels) do
+				table.insert( t, {
+					szOption = tChannel.szName,
+					rgb = tChannel.rgb,
+					bCheck = true, bMCheck = true, bChecked = O.nGongzhanPublishChannel == tChannel.nChannel,
+					fnAction = function()
+						O.nGongzhanPublishChannel = tChannel.nChannel
+					end
+				} )
+			end
+			return t
+		end,
+	})
 	return x, y
 end
 
@@ -80,24 +98,7 @@ local settings = {
 				OnPanelActivePartial = D.OnPanelActivePartial,
 			},
 		},
-		{
-			fields = {
-				bEnable = true,
-			},
-			root = O,
-		},
-	},
-	imports = {
-		{
-			fields = {
-				bEnable = true,
-			},
-			triggers = {
-				bEnable = D.Apply,
-			},
-			root = O,
-		},
 	},
 }
-MY_HideAnnounceBg = LIB.GeneGlobalNS(settings)
+MY_GongzhanCheck = LIB.GeneGlobalNS(settings)
 end

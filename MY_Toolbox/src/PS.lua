@@ -1,7 +1,7 @@
 --------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
--- @desc     : 隐藏公告栏背景
+-- @desc     : 常用工具
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
@@ -41,63 +41,36 @@ if not LIB.AssertVersion('MY_Toolbox', _L['MY_Toolbox'], 0x2011800) then
 	return
 end
 
-local D = {}
-local O = {
-	bEnable = false,
-}
-RegisterCustomData('MY_HideAnnounceBg.bEnable')
-
-function D.Apply()
-	local h = Station.Lookup('Topmost2/GMAnnouncePanel', 'Handle_MsgBg')
-	if h then
-		h:SetVisible(not O.bEnable)
-	end
-end
-LIB.RegisterInit('MY_HideAnnounceBg', D.Apply)
-LIB.RegisterFrameCreate('GMAnnouncePanel.MY_HideAnnounceBg', D.Apply)
-
-function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	if not LIB.IsShieldedVersion() then
-		x = x + ui:append('WndCheckBox', {
-			x = x, y = y,
-			text = _L['Hide announce bg'],
-			checked = MY_HideAnnounceBg.bEnable,
-			oncheck = function(bChecked)
-				MY_HideAnnounceBg.bEnable = bChecked
-			end,
-		}, true):autoWidth():width() + 5
-		x, y = X, y + 30
-	end
-	return x, y
-end
-
--- Global exports
 do
-local settings = {
-	exports = {
-		{
-			fields = {
-				OnPanelActivePartial = D.OnPanelActivePartial,
-			},
-		},
-		{
-			fields = {
-				bEnable = true,
-			},
-			root = O,
-		},
-	},
-	imports = {
-		{
-			fields = {
-				bEnable = true,
-			},
-			triggers = {
-				bEnable = D.Apply,
-			},
-			root = O,
-		},
-	},
-}
-MY_HideAnnounceBg = LIB.GeneGlobalNS(settings)
+local TARGET_TYPE, TARGET_ID
+local function onHotKey()
+	if TARGET_TYPE then
+		LIB.SetTarget(TARGET_TYPE, TARGET_ID)
+		TARGET_TYPE, TARGET_ID = nil
+	else
+		TARGET_TYPE, TARGET_ID = LIB.GetTarget()
+		LIB.SetTarget(TARGET.PLAYER, UI_GetClientPlayerID())
+	end
 end
+LIB.RegisterHotKey('MY_AutoLoopMeAndTarget', _L['Loop target between me and target'], onHotKey)
+end
+
+local PS = {}
+function PS.OnPanelActive(wnd)
+	local ui = UI(wnd)
+	local X, Y = 20, 30
+	local W, H = ui:size()
+	local x, y = X, Y
+	x, y = MY_GongzhanCheck.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+	x, y = MY_FooterTip.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+	x, y = MY_BagEx.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+	x, y = MY_VisualSkill.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+	x, y = MY_ShenxingHelper.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+	x, y = MY_AutoHideChat.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+	x, y = MY_WhisperMetion.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+	x, y = MY_ArenaHelper.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+	x, y = MY_ChangGeShadow.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+	x, y = MY_Memo.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+	x, y = MY_HideAnnounceBg.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+end
+LIB.RegisterPanel('MY_ToolBox', _L['toolbox'], _L['General'], 'UI/Image/Common/Money.UITex|243', PS)

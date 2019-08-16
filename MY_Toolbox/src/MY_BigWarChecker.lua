@@ -1,7 +1,7 @@
 --------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
--- @desc     : 隐藏公告栏背景
+-- @desc     : 大战没交
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
@@ -43,31 +43,47 @@ end
 
 local D = {}
 local O = {
-	bEnable = false,
+	bEnable = true,
 }
-RegisterCustomData('MY_HideAnnounceBg.bEnable')
+RegisterCustomData('MY_BigWarChecker.bEnable')
+
+-- 大战没交
+local m_aBigWars = { 19191, 19192, 19195, 19196, 19197 }
+LIB.RegisterFrameCreate('ExitPanel.BIG_WAR_CHECK', function(name, frame)
+	local me = GetClientPlayer()
+	if me then
+		for _, dwQuestID in ipairs(m_aBigWars) do
+			local info = me.GetQuestTraceInfo(dwQuestID)
+			if info then
+				local finished = false
+				if info.finish then
+					finished = true
+				elseif info.quest_state then
+					finished = true
+					for _, state in ipairs(info.quest_state) do
+						if state.need ~= state.have then
+							finished = false
+						end
+					end
+				end
+				if finished then
+					local ui = UI(frame)
+					if ui:children('#Text_MY_Tip'):count() == 0 then
+						ui:append('Text', { name = 'Text_MY_Tip',y = ui:height(), w = ui:width(), color = {255, 255, 0}, font = 199, halign = 1})
+					end
+					ui = ui:children('#Text_MY_Tip'):text(_L['Warning: Bigwar has been finished but not handed yet!']):shake(10, 10, 10, 1000)
+					break
+				end
+			end
+		end
+	end
+end)
 
 function D.Apply()
-	local h = Station.Lookup('Topmost2/GMAnnouncePanel', 'Handle_MsgBg')
-	if h then
-		h:SetVisible(not O.bEnable)
-	end
 end
-LIB.RegisterInit('MY_HideAnnounceBg', D.Apply)
-LIB.RegisterFrameCreate('GMAnnouncePanel.MY_HideAnnounceBg', D.Apply)
+LIB.RegisterInit('MY_BigWarChecker', D.Apply)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	if not LIB.IsShieldedVersion() then
-		x = x + ui:append('WndCheckBox', {
-			x = x, y = y,
-			text = _L['Hide announce bg'],
-			checked = MY_HideAnnounceBg.bEnable,
-			oncheck = function(bChecked)
-				MY_HideAnnounceBg.bEnable = bChecked
-			end,
-		}, true):autoWidth():width() + 5
-		x, y = X, y + 30
-	end
 	return x, y
 end
 
@@ -99,5 +115,5 @@ local settings = {
 		},
 	},
 }
-MY_HideAnnounceBg = LIB.GeneGlobalNS(settings)
+MY_BigWarChecker = LIB.GeneGlobalNS(settings)
 end

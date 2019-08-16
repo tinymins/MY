@@ -1,7 +1,7 @@
 --------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
--- @desc     : 隐藏公告栏背景
+-- @desc     : 玩家名字变成link方便组队
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
@@ -43,31 +43,56 @@ end
 
 local D = {}
 local O = {
-	bEnable = false,
+	bEnable = true,
 }
-RegisterCustomData('MY_HideAnnounceBg.bEnable')
+RegisterCustomData('MY_DialogNameLink.bAncientMap')
 
 function D.Apply()
-	local h = Station.Lookup('Topmost2/GMAnnouncePanel', 'Handle_MsgBg')
-	if h then
-		h:SetVisible(not O.bEnable)
-	end
+	LIB.RegisterEvent('OPEN_WINDOW.NAMELINKER', function(event)
+		local h
+		for _, p in ipairs({
+			{'Normal/DialoguePanel', '', 'Handle_Message'},
+			{'Lowest2/PlotDialoguePanel', 'Wnd_Dialogue', 'Handle_Dialogue'},
+		}) do
+			local frame = Station.Lookup(p[1])
+			if frame and frame:IsVisible() then
+				h = frame:Lookup(p[2], p[3])
+				if h then
+					break
+				end
+			end
+		end
+		if not h then
+			return
+		end
+		for i = 0, h:GetItemCount() - 1 do
+			local hItem = h:Lookup(i)
+			if hItem:GetType() == 'Text' then
+				local szText = hItem:GetText()
+				for _, szPattern in ipairs(_L.NAME_PATTERN_LIST) do
+					local _, _, szName = szText:find(szPattern)
+					if szName then
+						local nPos1, nPos2 = szText:find(szName)
+						h:InsertItemFromString(i, true, GetFormatText(szText:sub(nPos2 + 1), hItem:GetFontScheme()))
+						h:InsertItemFromString(i, true, GetFormatText('[' .. szText:sub(nPos1, nPos2) .. ']', nil, nil, nil, nil, nil, nil, 'namelink'))
+						LIB.RenderChatLink(h:Lookup(i + 1))
+						if MY_Farbnamen and MY_Farbnamen.Render then
+							MY_Farbnamen.Render(h:Lookup(i + 1))
+						end
+						hItem:SetText(szText:sub(1, nPos1 - 1))
+						hItem:SetFontColor(0, 0, 0)
+						hItem:AutoSize()
+						break
+					end
+				end
+			end
+		end
+		h:FormatAllItemPos()
+	end)
 end
-LIB.RegisterInit('MY_HideAnnounceBg', D.Apply)
-LIB.RegisterFrameCreate('GMAnnouncePanel.MY_HideAnnounceBg', D.Apply)
+LIB.RegisterInit('MY_DialogNameLink', D.Apply)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	if not LIB.IsShieldedVersion() then
-		x = x + ui:append('WndCheckBox', {
-			x = x, y = y,
-			text = _L['Hide announce bg'],
-			checked = MY_HideAnnounceBg.bEnable,
-			oncheck = function(bChecked)
-				MY_HideAnnounceBg.bEnable = bChecked
-			end,
-		}, true):autoWidth():width() + 5
-		x, y = X, y + 30
-	end
 	return x, y
 end
 
@@ -99,5 +124,5 @@ local settings = {
 		},
 	},
 }
-MY_HideAnnounceBg = LIB.GeneGlobalNS(settings)
+MY_DialogNameLink = LIB.GeneGlobalNS(settings)
 end

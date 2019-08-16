@@ -266,3 +266,30 @@ function MY_VisualSkill.Reload()
 	end
 end
 LIB.RegisterInit('MY_VISUALSKILL', MY_VisualSkill.Reload)
+
+function MY_VisualSkill.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+	x = x + ui:append('WndCheckBox', {
+		x = x, y = y, w = 'auto',
+		text = _L['visual skill'],
+		checked = MY_VisualSkill.bEnable,
+		oncheck = function(bChecked)
+			MY_VisualSkill.bEnable = bChecked
+			MY_VisualSkill.Reload()
+		end,
+	}, true):width() + 5
+
+	ui:append('WndTrackbar', {
+		x = x, y = y,
+		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE, range = {1, 32},
+		value = MY_VisualSkill.nVisualSkillBoxCount,
+		text = _L('display %d skills.', MY_VisualSkill.nVisualSkillBoxCount),
+		textfmt = function(val) return _L('display %d skills.', val) end,
+		onchange = function(val)
+			MY_VisualSkill.nVisualSkillBoxCount = val
+			MY_VisualSkill.Reload()
+		end,
+	})
+	x = X
+	y = y + 30
+	return x, y
+end
