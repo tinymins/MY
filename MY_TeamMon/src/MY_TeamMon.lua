@@ -222,7 +222,19 @@ function FilterCustomText(szOrigin, szSenderName, szReceiverName, bNoLimit)
 	if not szOrigin then
 		return
 	end
+	if not szSenderName then
+		szSenderName = ''
+	end
+	if not szReceiverName then
+		szReceiverName = ''
+	end
 	if not FILTER_TEXT_CACHE[szOrigin] then
+		FILTER_TEXT_CACHE[szOrigin] = {}
+	end
+	if not FILTER_TEXT_CACHE[szOrigin][szSenderName] then
+		FILTER_TEXT_CACHE[szOrigin][szSenderName] = {}
+	end
+	if not FILTER_TEXT_CACHE[szOrigin][szSenderName][szReceiverName] then
 		local szText = szOrigin
 		if IsString(szText) then
 			szOrigin, szText = LIB.ReplaceSensitiveWord(szOrigin), ''
@@ -267,9 +279,9 @@ function FilterCustomText(szOrigin, szSenderName, szReceiverName, bNoLimit)
 				end
 			end
 		end
-		FILTER_TEXT_CACHE[szOrigin] = szText
+		FILTER_TEXT_CACHE[szOrigin][szSenderName][szReceiverName] = szText
 	end
-	return FILTER_TEXT_CACHE[szOrigin]
+	return FILTER_TEXT_CACHE[szOrigin][szSenderName][szReceiverName]
 end
 function ParseCustomText(szOrigin, szSenderName, szReceiverName)
 	return FilterCustomText(szOrigin, szSenderName, szReceiverName, true)
