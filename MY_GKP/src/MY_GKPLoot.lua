@@ -1369,6 +1369,24 @@ function Loot.GetDoodad(dwID)
 	return szName, aItemData, bSpecial
 end
 
+function Loot.HideSystemLoot()
+	local frame = Station.Lookup('Normal/LootList')
+	if frame then
+		frame:SetAbsPos(4096, 4096)
+	end
+	-- Wnd.CloseWindow('LootList')
+end
+
+
+LIB.RegisterEvent('HELP_EVENT.MY_GKP_Loot', function()
+	if not MY_GKP.bOn then
+		return
+	end
+	if arg0 == 'OnOpenpanel' and arg1 == 'LOOT' then
+		Loot.HideSystemLoot()
+	end
+end)
+
 -- ÃþÏä×Ó
 LIB.RegisterEvent('OPEN_DOODAD', function()
 	if not MY_GKP.bOn then
@@ -1392,15 +1410,11 @@ LIB.RegisterEvent('OPEN_DOODAD', function()
 		if #data == 0 then
 			return Loot.RemoveLootList(arg0)
 		end
-		Loot.DrawLootList(arg0)
 		--[[#DEBUG BEGIN]]
 		LIB.Debug('Open Doodad: ' .. arg0, 'MY_GKP_Loot', DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
-		local hLoot = Station.Lookup('Normal/LootList')
-		if hLoot then
-			hLoot:SetAbsPos(4096, 4096)
-		end
-		-- Wnd.CloseWindow('LootList')
+		Loot.DrawLootList(arg0)
+		Loot.HideSystemLoot()
 	end
 end)
 
