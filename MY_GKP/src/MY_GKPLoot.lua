@@ -82,6 +82,7 @@ MY_GKP_Loot.tItemConfig = {
 	nQualityFilter = -1,
 	bFilterBookRead = false,
 	nAutoPickupQuality = -1,
+	bAutoPickupTaskItem = false,
 }
 LIB.RegisterCustomData('MY_GKP_Loot.tItemConfig')
 
@@ -112,7 +113,16 @@ function MY_GKP_Loot.IsItemDisplay(itemData, config)
 end
 
 function MY_GKP_Loot.IsItemAutoPickup(itemData, config, doodad, bCanDialog)
-	return bCanDialog and config.nAutoPickupQuality ~= -1 and itemData.nQuality >= config.nAutoPickupQuality
+	if not bCanDialog then
+		return false
+	end
+	if config.bAutoPickupTaskItem and itemData.nGenre == ITEM_GENRE.TASK_ITEM then
+		return true
+	end
+	if config.nAutoPickupQuality ~= -1 and itemData.nQuality >= config.nAutoPickupQuality then
+		return true
+	end
+	return false
 end
 
 function MY_GKP_Loot.OnFrameCreate()
@@ -345,6 +355,14 @@ function MY_GKP_Loot.OnLButtonClick()
 					end,
 				})
 			end
+			insert(t, CONSTANT.MENU_DIVIDER)
+			insert(t, {
+				szOption = _L['Auto pickup quest item'],
+				bCheck = true, bChecked = wnd.tItemConfig.bAutoPickupTaskItem,
+				fnAction = function()
+					wnd.tItemConfig.bAutoPickupTaskItem = not wnd.tItemConfig.bAutoPickupTaskItem
+				end,
+			})
 			table.insert(menu, t)
 		end
 		PopupMenu(menu)
@@ -609,6 +627,14 @@ function Loot.GetAutoPickupAllMenu()
 			end,
 		})
 	end
+	insert(t, CONSTANT.MENU_DIVIDER)
+	insert(t, {
+		szOption = _L['Auto pickup quest item'],
+		bCheck = true, bChecked = MY_GKP_Loot.tItemConfig.bAutoPickupTaskItem,
+		fnAction = function()
+			MY_GKP_Loot.tItemConfig.bAutoPickupTaskItem = not MY_GKP_Loot.tItemConfig.bAutoPickupTaskItem
+		end,
+	})
 	return t
 end
 
