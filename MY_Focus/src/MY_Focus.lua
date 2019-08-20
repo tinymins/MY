@@ -689,19 +689,9 @@ function D.GetDisplayList()
 			if #t >= O.nMaxDisplay then
 				break
 			end
-			local KObject, bFocus = LIB.GetObject(p.dwType, p.dwID), true
-			if not KObject then
-				bFocus = false
-			end
-			if bFocus and O.bHideDeath then
-				if p.dwType == TARGET.NPC or p.dwType == TARGET.PLAYER then
-					bFocus = KObject.nMoveState ~= MOVE_STATE.ON_DEATH
-				else--if p.dwType == TARGET.DOODAD then
-					bFocus = KObject.nKind ~= DOODAD_KIND.CORPSE
-				end
-			end
-			if bFocus then
-				local tRule, szVia, bDeletable
+			local KObject = LIB.GetObject(p.dwType, p.dwID)
+			if KObject then
+				local bFocus, tRule, szVia, bDeletable = false
 				for _, via in ipairs(p.aVia) do
 					if via.tRule then
 						local bRuleFocus = true
@@ -721,22 +711,32 @@ function D.GetDisplayList()
 							end
 						end
 						if bRuleFocus then
+							bFocus = true
 							tRule = via.tRule
 							szVia = via.szVia
 							bDeletable = via.bDeletable
 							break
 						end
 					else
+						bFocus = true
 						szVia = via.szVia
 						bDeletable = via.bDeletable
 					end
 				end
-				p.tRule = tRule
-				p.szVia = szVia
-				p.bDeletable = bDeletable
-			end
-			if bFocus then
-				insert(t, p)
+				if bFocus and O.bHideDeath then
+					if p.dwType == TARGET.NPC or p.dwType == TARGET.PLAYER then
+						bFocus = KObject.nMoveState ~= MOVE_STATE.ON_DEATH
+					else--if p.dwType == TARGET.DOODAD then
+						bFocus = KObject.nKind ~= DOODAD_KIND.CORPSE
+					end
+				end
+				if bFocus then
+					insert(t, setmetatable({
+						tRule = tRule,
+						szVia = szVia,
+						bDeletable = bDeletable,
+					}, { __index = p }))
+				end
 			end
 		end
 	end
