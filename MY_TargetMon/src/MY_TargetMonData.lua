@@ -37,8 +37,12 @@ local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.G
 local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
 -----------------------------------------------------------------------------------------------------------
 
-local _L = LIB.LoadLangPack(PACKET_INFO.ROOT .. 'MY_TargetMon/lang/')
-if not LIB.AssertVersion('MY_TargetMon', _L['MY_TargetMon'], 0x2011800) then
+local PLUGIN_NAME = 'MY_TargetMon'
+local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local MODULE_NAME = 'MY_TargetMon'
+local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+--------------------------------------------------------------------------
+if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2011800) then
 	return
 end
 local C, D = {}, {

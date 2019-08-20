@@ -36,8 +36,12 @@ local Call, XpCall, GetTraceback, RandomChild = LIB.Call, LIB.XpCall, LIB.GetTra
 local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
 local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
 -----------------------------------------------------------------------------------------------------------
-local _L = LIB.LoadLangPack(PACKET_INFO.ROOT .. 'MY_LifeBar/lang/')
-if not LIB.AssertVersion('MY_LifeBar', _L['MY_LifeBar'], 0x2013500) then
+local PLUGIN_NAME = 'MY_LifeBar'
+local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local MODULE_NAME = 'MY_LifeBar'
+local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+--------------------------------------------------------------------------
+if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013500) then
 	return
 end
 

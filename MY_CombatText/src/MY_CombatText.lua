@@ -36,6 +36,14 @@ local Call, XpCall, GetTraceback, RandomChild = LIB.Call, LIB.XpCall, LIB.GetTra
 local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
 local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
 -----------------------------------------------------------------------------------------------------------
+local PLUGIN_NAME = 'MY_CombatText'
+local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local MODULE_NAME = 'MY_CombatText'
+local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+--------------------------------------------------------------------------
+if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2011800) then
+	return
+end
 local SKILL_RESULT_TYPE = SKILL_RESULT_TYPE
 local GetSkill, Random = GetSkill, Random
 local Table_GetBuffName, Table_GetSkillName, Table_BuffIsVisible = Table_GetBuffName, Table_GetSkillName, Table_BuffIsVisible
@@ -54,11 +62,6 @@ local Table_GetBuffName, Table_GetSkillName, Table_BuffIsVisible = Table_GetBuff
 		在轨迹全部被占用后会随机分摊到屏幕顶部左右两边。
 	其他类型：使用轨迹合并16-32帧，后来的文本会顶走前面的文本，从而跳过这部分停留的帧数。
 ]]
-
-local _L = LIB.LoadLangPack(PACKET_INFO.ROOT .. 'MY_CombatText/lang/')
-if not LIB.AssertVersion('MY_CombatText', _L['MY_CombatText'], 0x2011800) then
-	return
-end
 
 local COMBAT_TEXT_INIFILE        = PACKET_INFO.ROOT .. 'MY_CombatText/ui/MY_CombatText_Render.ini'
 local COMBAT_TEXT_CONFIG         = PACKET_INFO.ROOT .. 'MY_CombatText/config.jx3dat'

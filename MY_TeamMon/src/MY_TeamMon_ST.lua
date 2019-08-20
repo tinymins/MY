@@ -37,12 +37,16 @@ local Call, XpCall, GetTraceback, RandomChild = LIB.Call, LIB.XpCall, LIB.GetTra
 local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
 local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
 -----------------------------------------------------------------------------------------------------------
-local SplitString, TrimString, FormatTimeCounter = LIB.SplitString, LIB.TrimString, LIB.FormatTimeCounter
-
-local _L = LIB.LoadLangPack(PACKET_INFO.ROOT .. 'MY_TeamMon/lang/')
-if not LIB.AssertVersion('MY_TeamMon_ST', _L['MY_TeamMon_ST'], 0x2013500) then
+local PLUGIN_NAME = 'MY_TeamMon'
+local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local MODULE_NAME = 'MY_TeamMon_ST'
+local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+--------------------------------------------------------------------------
+if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013500) then
 	return
 end
+
+local SplitString, TrimString, FormatTimeCounter = LIB.SplitString, LIB.TrimString, LIB.FormatTimeCounter
 local FilterCustomText = MY_TeamMon.FilterCustomText
 
 local ANCHOR = { s = 'TOPRIGHT', r = 'CENTER', x = -250, y = -300 } -- szSide, szRelSide, fOffsetX, fOffsetY

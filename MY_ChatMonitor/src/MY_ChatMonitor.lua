@@ -36,6 +36,14 @@ local Call, XpCall, GetTraceback, RandomChild = LIB.Call, LIB.XpCall, LIB.GetTra
 local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
 local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
 -----------------------------------------------------------------------------------------------------------
+local PLUGIN_NAME = 'MY_ChatMonitor'
+local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local MODULE_NAME = 'MY_ChatMonitor'
+local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+--------------------------------------------------------------------------
+if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013500) then
+	return
+end
 --[[
     RECORD_LIST = {
         -- （数组部分）监控记录
@@ -51,10 +59,6 @@ local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAD
         ...
     }
 ]]
-local _L = LIB.LoadLangPack(PACKET_INFO.ROOT .. 'MY_ChatMonitor/lang/')
-if not LIB.AssertVersion('MY_ChatMonitor', _L['MY_ChatMonitor'], 0x2013500) then
-	return
-end
 local D = {}
 local _C = {}
 local DATA_FILE = 'userdata/chatmonitor.jx3dat'

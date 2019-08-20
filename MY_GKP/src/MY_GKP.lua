@@ -38,9 +38,12 @@ local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAD
 -----------------------------------------------------------------------------------------------------------
 -- 早期代码 需要重写
 ---------------------------------------------------------------------------------------------------
-local PATH_ROOT = PACKET_INFO.ROOT .. 'MY_GKP/'
-local _L = LIB.LoadLangPack(PATH_ROOT .. 'lang/')
-if not LIB.AssertVersion('MY_GKP', _L['MY_GKP'], 0x2013500) then
+local PLUGIN_NAME = 'MY_GKP'
+local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local MODULE_NAME = 'MY_GKP'
+local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+--------------------------------------------------------------------------
+if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013500) then
 	return
 end
 
@@ -69,7 +72,7 @@ LIB.RegisterCustomData('MY_GKP')
 -- 本地函数与变量
 ----------------------------------------------------------------------<
 local _GKP = {
-	szIniFile   = PATH_ROOT .. 'ui/MY_GKP.ini',
+	szIniFile   = PLUGIN_ROOT .. '/ui/MY_GKP.ini',
 	tSyncQueue  = {},
 	bSync       = {},
 	GKP_Map     = '',
@@ -829,7 +832,7 @@ function _GKP.DrawRecord(key, sort)
 	_GKP.hRecordContainer:Clear()
 	for k, v in ipairs(tab) do
 		if MY_GKP.bDisplayEmptyRecords or v.nMoney ~= 0 then
-			local wnd = _GKP.hRecordContainer:AppendContentFromIni(PATH_ROOT .. 'ui/MY_GKP_Record_Item.ini', 'WndWindow', k)
+			local wnd = _GKP.hRecordContainer:AppendContentFromIni(PLUGIN_ROOT .. '/ui/MY_GKP_Record_Item.ini', 'WndWindow', k)
 			local item = wnd:Lookup('', '')
 			if k % 2 == 0 then
 				item:Lookup('Image_Line'):Hide()
@@ -1894,7 +1897,7 @@ function _GKP.DrawAccount(key,sort)
 	_GKP.hAccountContainer:Clear()
 	local tMoney = GetClientPlayer().GetMoney()
 	for k, v in ipairs(tab) do
-		local c = _GKP.hAccountContainer:AppendContentFromIni(PATH_ROOT .. 'ui/MY_GKP_Account_Item.ini', 'WndWindow', k)
+		local c = _GKP.hAccountContainer:AppendContentFromIni(PLUGIN_ROOT .. '/ui/MY_GKP_Account_Item.ini', 'WndWindow', k)
 		local item = c:Lookup('', '')
 		if k % 2 == 0 then
 			item:Lookup('Image_Line'):Hide()

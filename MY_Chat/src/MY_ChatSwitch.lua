@@ -36,8 +36,12 @@ local Call, XpCall, GetTraceback, RandomChild = LIB.Call, LIB.XpCall, LIB.GetTra
 local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
 local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
 -----------------------------------------------------------------------------------------------------------
-local _L = LIB.LoadLangPack(PACKET_INFO.ROOT .. 'MY_Chat/lang/')
-if not LIB.AssertVersion('MY_ChatSwitch', _L['MY_ChatSwitch'], 0x2013500) then
+local PLUGIN_NAME = 'MY_Chat'
+local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local MODULE_NAME = 'MY_ChatSwitch'
+local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+--------------------------------------------------------------------------
+if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013500) then
 	return
 end
 local INI_PATH = PACKET_INFO.ROOT .. 'MY_Chat/ui/MY_ChatSwitch.ini'

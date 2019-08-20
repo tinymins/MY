@@ -37,15 +37,19 @@ local Call, XpCall, GetTraceback, RandomChild = LIB.Call, LIB.XpCall, LIB.GetTra
 local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
 local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
 -----------------------------------------------------------------------------------------------------------
+local PLUGIN_NAME = 'MY_TeamMon'
+local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local MODULE_NAME = 'MY_TeamMon'
+local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+--------------------------------------------------------------------------
+if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013500) then
+	return
+end
+
 local MY_SplitString, MY_TrimString = LIB.SplitString, LIB.TrimString
 local MY_GetFormatText, MY_GetPureText = LIB.GetFormatText, LIB.GetPureText
 local FireUIEvent, Table_BuffIsVisible, Table_IsSkillShow = FireUIEvent, Table_BuffIsVisible, Table_IsSkillShow
 local GetHeadTextForceFontColor, TargetPanel_SetOpenState = GetHeadTextForceFontColor, TargetPanel_SetOpenState
-
-local _L = LIB.LoadLangPack(PACKET_INFO.ROOT .. 'MY_TeamMon/lang/')
-if not LIB.AssertVersion('MY_TeamMon', _L['MY_TeamMon'], 0x2013500) then
-	return
-end
 
 local MY_TM_META_ROOT = LIB.FormatPath({'userdata/TeamMon/Meta/', PATH_TYPE.GLOBAL})
 local MY_TM_DATA_ROOT = LIB.FormatPath({'userdata/TeamMon/Data/', PATH_TYPE.GLOBAL})
