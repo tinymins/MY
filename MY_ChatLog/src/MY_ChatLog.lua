@@ -281,6 +281,9 @@ end
 LIB.RegisterIdle('MY_ChatLog_Save', onIdle)
 
 function  D.OnInit()
+	if not GetClientPlayer() then
+		return LIB.DelayCall(500, D.OnInit)
+	end
 	if O.bAutoConnectDB then
 		D.InitDB('ask')
 	end
