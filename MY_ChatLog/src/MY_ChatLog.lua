@@ -50,11 +50,13 @@ local O = {
 	bIgnoreTongOnlineMsg    = true , -- 帮会上线通知
 	bIgnoreTongMemberLogMsg = true , -- 帮会成员上线下线提示
 	bRealtimeCommit         = false, -- 实时写入数据库
+	bAutoConnectDB          = false, -- 登录时自动连接数据库
 	tUncheckedChannel       = {}   ,
 }
 RegisterCustomData('MY_ChatLog.bIgnoreTongOnlineMsg')
 RegisterCustomData('MY_ChatLog.bIgnoreTongMemberLogMsg')
 RegisterCustomData('MY_ChatLog.bRealtimeCommit')
+RegisterCustomData('MY_ChatLog.bAutoConnectDB')
 RegisterCustomData('MY_ChatLog.tUncheckedChannel')
 
 ------------------------------------------------------------------------------------------------------
@@ -100,52 +102,64 @@ end
 
 do
 local l_aMsg, l_ds = {}
-function D.InitDB(bSure)
+function D.InitDB(szMode)
 	if l_ds then
 		return true
 	end
-	if not D.UpgradeDB(bSure) then
+	if not szMode then
+		szMode = 'ask'
+	end
+	if szMode == 'silent' and not LIB.IsShieldedVersion() then
+		szMode = 'sure'
+	end
+	if not D.UpgradeDB(szMode) then
 		return
 	end
-	local ds = MY_ChatLog_DS(D.GetRoot())
+	local ds, bSuccess = MY_ChatLog_DS(D.GetRoot()), true
 	if not ds:InitDB() then
-		if not bSure then
+		bSuccess = false
+		if szMode == 'ask' then
 			LIB.Confirm(_L['Problem(s) detected on your chatlog database and must be fixed before use, would you like to do this now?'], function()
 				LIB.Alert(_L['Your client may get no responding, please wait until it finished, otherwise your chatlog data may got lost, press yes to start.'], function()
-					D.InitDB(true)
+					D.InitDB('sure')
 				end)
 			end)
-			return
+		elseif szMode == 'sure' then
+			ds:InitDB(true):OptimizeDB()
+			MY.Alert(_L['Fix succeed!'])
+			bSuccess = true
 		end
-		ds:InitDB(true):OptimizeDB()
-		MY.Alert(_L['Fix succeed!'])
 	end
-	for _, a in ipairs(l_aMsg) do
-		ds:InsertMsg(unpack(a))
+	if bSuccess then
+		for _, a in ipairs(l_aMsg) do
+			ds:InsertMsg(unpack(a))
+		end
+		l_ds, l_aMsg = ds, {}
 	end
-	l_ds, l_aMsg = ds, {}
-	return true
+	return bSuccess
 end
 
 -- 检查升级数据库版本
-function D.UpgradeDB(bSure)
-	local szPath = LIB.FormatPath({'userdata/chat_log.db', PATH_TYPE.ROLE})
+function D.UpgradeDB(szMode)
+	local szPath, bSuccess = LIB.FormatPath({'userdata/chat_log.db', PATH_TYPE.ROLE}), true
 	if IsLocalFileExist(szPath) then
-		if not bSure then
+		bSuccess = false
+		if szMode == 'ask' then
 			LIB.Confirm(_L['You need to upgrade chatlog database before using, that may take a while and cannot be break, do you want to do it now?'], function()
 				LIB.Alert(_L['Your client may get no responding, please wait until it finished, otherwise your chatlog data may got lost, press yes to start.'], function()
-					D.InitDB(true)
+					D.InitDB('sure')
 				end)
 			end)
-			return
+		elseif szMode == 'sure' then
+			D.ImportDB(szPath)
+			CPath.Move(szPath, szPath .. '.bak' .. GetCurrentTime())
+			MY.Alert(_L['Upgrade succeed!'])
+			bSuccess = true
 		end
-		D.ImportDB(szPath)
-		CPath.Move(szPath, szPath .. '.bak' .. GetCurrentTime())
-		MY.Alert(_L['Upgrade succeed!'])
 	end
-	return true
+	return bSuccess
 end
-LIB.RegisterInit('MY_ChatLog', D.UpgradeDB)
+LIB.RegisterInit('MY_ChatLog_UpgradeDB', D.UpgradeDB)
 
 -- 导入数据
 function D.ImportDB(szPath)
@@ -207,7 +221,7 @@ function D.ImportDB(szPath)
 end
 
 function D.OptimizeDB()
-	if not D.InitDB(true) then
+	if not D.InitDB('sure') then
 		return
 	end
 	l_ds:OptimizeDB()
@@ -265,8 +279,15 @@ local function onIdle()
 end
 LIB.RegisterIdle('MY_ChatLog_Save', onIdle)
 
+function  D.OnInit()
+	if O.bAutoConnectDB then
+		D.InitDB('ask')
+	end
+end
+LIB.RegisterInit('MY_ChatLog_InitDB', D.OnInit)
+
 local function onExit()
-	if not D.InitDB() then
+	if not D.InitDB('silent') then
 		return
 	end
 	l_ds:FlushDB()
@@ -305,6 +326,7 @@ local settings = {
 				bIgnoreTongOnlineMsg    = true,
 				bIgnoreTongMemberLogMsg = true,
 				bRealtimeCommit         = true,
+				bAutoConnectDB          = true,
 				tUncheckedChannel       = true,
 			},
 			root = O,
@@ -316,7 +338,11 @@ local settings = {
 				bIgnoreTongOnlineMsg    = true,
 				bIgnoreTongMemberLogMsg = true,
 				bRealtimeCommit         = true,
+				bAutoConnectDB          = true,
 				tUncheckedChannel       = true,
+			},
+			triggers = {
+				bAutoConnectDB = D.OnInit,
 			},
 			root = O,
 		},

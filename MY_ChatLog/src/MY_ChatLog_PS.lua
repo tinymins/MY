@@ -409,6 +409,16 @@ function PS.OnPanelActive(wnd)
 		y = y + dy
 	end
 
+	ui:Append('WndCheckBox', {
+		x = x, y = y, w = wr,
+		text = _L['Auto connect database'],
+		checked = MY_ChatLog.bAutoConnectDB,
+		oncheck = function(bChecked)
+			MY_ChatLog.bAutoConnectDB = bChecked
+		end
+	})
+	y = y + dy
+
 	ui:Append('WndButton', {
 		x = x, y = y, w = 125, h = 35,
 		text = _L['Open chatlog'],

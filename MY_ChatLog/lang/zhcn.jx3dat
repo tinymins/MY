@@ -4,6 +4,7 @@ data = {
     ['Filter tong online message'] = '过滤帮会上线公告提示',
     ['Filter tong member log message'] = '过滤帮会成员上线提示',
     ['Realtime database commit'] = '聊天记录实时写入数据库',
+    ['Auto connect database'] = '登录时自动连接数据库',
     ['Export chatlog'] = '导出聊天记录',
     ['Optimize datebase'] = '优化数据库',
     ['Optimize datebase will take a long time and may cause a disconnection, are you sure to continue?'] = '优化数据库可以加快查询速度解决部分顿卡问题，但如果本地聊天记录较多操作可能会造成临时顿卡掉线，是否继续？',
