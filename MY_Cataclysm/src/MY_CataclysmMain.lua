@@ -38,7 +38,16 @@ local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAD
 -----------------------------------------------------------------------------------------------------------
 local Station, Table_BuffIsVisible, MY_GetBuffName = Station, Table_BuffIsVisible,  LIB.GetBuffName
 ---------------------------------------------------------------------------------------------------
-local _L, D = LIB.LoadLangPack(PACKET_INFO.ROOT .. 'MY_Cataclysm/lang/'), {}
+local PLUGIN_NAME = 'MY_Cataclysm'
+local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local MODULE_NAME = 'MY_Cataclysm'
+local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+--------------------------------------------------------------------------
+if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
+	return
+end
+--------------------------------------------------------------------------
+local D = {}
 local INI_ROOT = PACKET_INFO.ROOT .. 'MY_Cataclysm/ui/'
 local CFG = MY_Cataclysm.CFG
 local CTM_CONFIG_DEFAULT = LIB.LoadLUAData(PACKET_INFO.ROOT .. 'MY_Cataclysm/config/default/$lang.jx3dat')

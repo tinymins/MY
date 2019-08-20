@@ -36,6 +36,15 @@ local Call, XpCall, GetTraceback, RandomChild = LIB.Call, LIB.XpCall, LIB.GetTra
 local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
 local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
 -----------------------------------------------------------------------------------------------------------
+local PLUGIN_NAME = 'MY_TargetMon'
+local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local MODULE_NAME = 'MY_TargetMon'
+local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+--------------------------------------------------------------------------
+if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
+	return
+end
+--------------------------------------------------------------------------
 local D = {
 	ModifyConfig = MY_TargetMonConfig.ModifyConfig,
 	GetTarget = MY_TargetMonData.GetTarget,
@@ -43,7 +52,6 @@ local D = {
 	RegisterDataUpdateEvent = MY_TargetMonData.RegisterDataUpdateEvent,
 }
 local INI_PATH = PACKET_INFO.ROOT .. 'MY_TargetMon/ui/MY_TargetMon.ini'
-local _L = LIB.LoadLangPack(PACKET_INFO.ROOT .. 'MY_TargetMon/lang/')
 
 function D.UpdateItemHotkey(hItem, i, j)
 	local nKey, bShift, bCtrl, bAlt = Hotkey.Get('MY_TargetMon_' .. i .. '_' .. j)

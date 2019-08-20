@@ -36,10 +36,18 @@ local Call, XpCall, GetTraceback, RandomChild = LIB.Call, LIB.XpCall, LIB.GetTra
 local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
 local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
 -----------------------------------------------------------------------------------------------------------
+local PLUGIN_NAME = 'MY_TeamTools'
+local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local MODULE_NAME = 'MY_TeamTools'
+local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+--------------------------------------------------------------------------
+if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
+	return
+end
+--------------------------------------------------------------------------
 local SKILL_RESULT_TYPE = SKILL_RESULT_TYPE
 local MY_IsParty, MY_GetSkillName, MY_GetBuffName = LIB.IsParty, LIB.GetSkillName, LIB.GetBuffName
 
-local _L = LIB.LoadLangPack(PACKET_INFO.ROOT .. 'MY_TeamTools/lang/')
 local RT_INIFILE = PACKET_INFO.ROOT .. 'MY_TeamTools/ui/RaidTools2.ini'
 local RT_EQUIP_TOTAL = {
 	'MELEE_WEAPON', -- «·Ω£ ≤ÿΩ£»° BIG_SWORD ÷ÿΩ£

@@ -34,9 +34,10 @@ local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_ItemInfoSearch'
 local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2012700) then
+if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
 	return
 end
+--------------------------------------------------------------------------
 local CACHE = {}
 local ITEM_TYPE_MAX, UI_LIST
 local SEARCH, RESULT, MAX_DISP = '', {}, 500

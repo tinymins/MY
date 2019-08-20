@@ -36,11 +36,18 @@ local Call, XpCall, GetTraceback, RandomChild = LIB.Call, LIB.XpCall, LIB.GetTra
 local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
 local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
 -----------------------------------------------------------------------------------------------------------
-local PATH_ROOT = PACKET_INFO.ROOT .. 'MY_GKP/'
-local _L = LIB.LoadLangPack(PATH_ROOT .. 'lang/')
+local PLUGIN_NAME = 'MY_GKP'
+local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local MODULE_NAME = 'MY_GKP'
+local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+--------------------------------------------------------------------------
+if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
+	return
+end
+--------------------------------------------------------------------------
 
 local Chat = {}
-MY_GKP_Chat   = {}
+MY_GKP_Chat = {}
 function MY_GKP_Chat.OnFrameCreate()
 	this:RegisterEvent('DISTRIBUTE_ITEM')
 	this:RegisterEvent('DOODAD_LEAVE_SCENE')
