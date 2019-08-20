@@ -1008,7 +1008,7 @@ local function UpdateTeamMonData()
 	end
 	D.RescanNearby()
 end
-LIB.RegisterEvent('LOADING_ENDING.MY_Focus', onTeamMonUpdate)
+LIB.RegisterEvent('LOADING_ENDING.MY_Focus', UpdateTeamMonData)
 local function onTeamMonUpdate()
 	if arg0 and not arg0['NPC'] then
 		return
