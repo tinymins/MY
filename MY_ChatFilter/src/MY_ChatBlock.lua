@@ -305,11 +305,11 @@ end
 local PS = {}
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
-	local w, h = ui:size()
+	local w, h = ui:Size()
 	local x, y = 0, 0
 	LoadBlockWords()
 
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 70,
 		text = _L['enable'],
 		checked = MY_ChatBlock.bBlockWords,
@@ -319,19 +319,19 @@ function PS.OnPanelActive(wnd)
 	})
 	x = x + 70
 
-	local edit = ui:append('WndEditBox', {
+	local edit = ui:Append('WndEditBox', {
 		name = 'WndEditBox_Keyword',
 		x = x, y = y, w = w - 160 - x, h = 25,
 		placeholder = _L['Type keyword, right click list to config.'],
 	}, true)
 	x, y = 0, y + 30
 
-	local list = ui:append('WndListBox', { x = x, y = y, w = w, h = h - 30 }, true)
+	local list = ui:Append('WndListBox', { x = x, y = y, w = w, h = h - 30 }, true)
 	-- 初始化list控件
 	for _, bw in ipairs(MY_ChatBlock.tBlockWords) do
-		list:listbox('insert', ChatBlock2Text(bw.keyword, bw.channel), bw.keyword, bw)
+		list:ListBox('insert', ChatBlock2Text(bw.keyword, bw.channel), bw.keyword, bw)
 	end
-	list:listbox('onmenu', function(hItem, text, id, data)
+	list:ListBox('onmenu', function(hItem, text, id, data)
 		local chns = data.channel
 		local menu = {
 			szOption = _L['Channels'],
@@ -343,7 +343,7 @@ function PS.OnPanelActive(wnd)
 				bCheck = true, bChecked = chns[eType],
 				fnAction = function()
 					chns[eType] = not chns[eType]
-					UI(hItem):text(ChatBlock2Text(id, chns))
+					UI(hItem):Text(ChatBlock2Text(id, chns))
 					SaveBlockWords()
 				end,
 			})
@@ -385,7 +385,7 @@ function PS.OnPanelActive(wnd)
 		table.insert(menu, {
 			szOption = _L['delete'],
 			fnAction = function()
-				list:listbox('delete', 'id', id)
+				list:ListBox('delete', 'id', id)
 				LoadBlockWords()
 				for i = #MY_ChatBlock.tBlockWords, 1, -1 do
 					if MY_ChatBlock.tBlockWords[i].keyword == id then
@@ -396,15 +396,15 @@ function PS.OnPanelActive(wnd)
 			end,
 		})
 		return menu
-	end):listbox('onlclick', function(hItem, text, id, data, selected)
-		edit:text(id)
+	end):ListBox('onlclick', function(hItem, text, id, data, selected)
+		edit:Text(id)
 	end)
 	-- add
-	ui:append('WndButton', {
+	ui:Append('WndButton', {
 		x = w - 160, y=  0, w = 80,
 		text = _L['add'],
 		onclick = function()
-			local szText = edit:text()
+			local szText = edit:Text()
 			-- 去掉前后空格
 			szText = (string.gsub(szText, '^%s*(.-)%s*$', '%1'))
 			-- 验证是否为空
@@ -424,16 +424,16 @@ function PS.OnPanelActive(wnd)
 			table.insert(MY_ChatBlock.tBlockWords, 1, bw)
 			SaveBlockWords()
 			-- 更新UI
-			list:listbox('insert', ChatBlock2Text(bw.keyword, bw.channel), bw.keyword, bw, 1)
+			list:ListBox('insert', ChatBlock2Text(bw.keyword, bw.channel), bw.keyword, bw, 1)
 		end,
 	})
 	-- del
-	ui:append('WndButton', {
+	ui:Append('WndButton', {
 		x = w - 80, y =  0, w = 80,
 		text = _L['delete'],
 		onclick = function()
-			for _, v in ipairs(list:listbox('select', 'selected')) do
-				list:listbox('delete', 'id', v.id)
+			for _, v in ipairs(list:ListBox('select', 'selected')) do
+				list:ListBox('delete', 'id', v.id)
 				LoadBlockWords()
 				for i = #MY_ChatBlock.tBlockWords, 1, -1 do
 					if MY_ChatBlock.tBlockWords[i].keyword == v.id then

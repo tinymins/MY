@@ -78,7 +78,7 @@ _C.nEventID = 0
 _C.GetEventID = function(ui)
 	local t = {}
 	for i, event in ipairs(_C.tEventIndex) do
-		if ui:children('#Event_' .. event.bit):check() then
+		if ui:Children('#Event_' .. event.bit):Check() then
 			t[event.bit] = 1
 		else
 			t[event.bit] = 0
@@ -90,7 +90,7 @@ end
 _C.SetEventID = function(ui, nEventID)
 	local t = LIB.Number2Bitmap(nEventID)
 	for i, event in ipairs(_C.tEventIndex) do
-		ui:children('#Event_' .. event.bit):check(t[event.bit] == 1)
+		ui:Children('#Event_' .. event.bit):Check(t[event.bit] == 1)
 	end
 end
 
@@ -101,10 +101,10 @@ OnPanelActive = function(wnd)
 	local ui = UI(wnd)
 	local x, y = 10, 30
 
-	ui:append('WndEditBox', {
+	ui:Append('WndEditBox', {
 		name = 'WndEdit',
 		text = _C.nEventID, x = x, y = y, w = 150, h = 25, font = 201, color = { 255, 255, 255 }
-	}):children('#WndEdit'):change(function(text)
+	}):Children('#WndEdit'):Change(function(text)
 	  	local nEventID = tonumber(text)
 	  	if nEventID and nEventID ~= _C.nEventID then
 	  		_C.SetEventID(ui, nEventID)
@@ -113,18 +113,18 @@ OnPanelActive = function(wnd)
 
 	x, y = 5, y + 35
 	for k, event in ipairs(_C.tEventIndex) do
-		ui:append('WndCheckBox', {
+		ui:Append('WndCheckBox', {
 			name = 'Event_' .. event.bit,
 			text = event.text, x = x, y = y, w = 120
-		}):children('#Event_' .. event.bit)
-		  :check(function(bCheck)
+		}):Children('#Event_' .. event.bit)
+		  :Check(function(bCheck)
 		  	if bCheck then
-		  		ui:children('#Event_' .. event.bit):color(255, 128, 0  )
+		  		ui:Children('#Event_' .. event.bit):Color(255, 128, 0  )
 		  	else
-		  		ui:children('#Event_' .. event.bit):color(255, 255, 255)
+		  		ui:Children('#Event_' .. event.bit):Color(255, 255, 255)
 		  	end
 		  	_C.nEventID = _C.GetEventID(ui)
-		  	ui:children('#WndEdit'):text(_C.nEventID)
+		  	ui:Children('#WndEdit'):Text(_C.nEventID)
 		  end)
 		x = x + 90
 

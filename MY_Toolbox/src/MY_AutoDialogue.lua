@@ -262,10 +262,10 @@ local function HookSkipQuestTalk()
 		if not frame.__SkipQuestHackEl then
 			local w, h = Station.GetClientSize()
 			frame.__SkipQuestEl = frame:Lookup('Btn_Skip')
-			frame.__SkipQuestHackEl = UI(frame):append('WndWindow', {
+			frame.__SkipQuestHackEl = UI(frame):Append('WndWindow', {
 				name = 'Btn_Skip',
 				x = 0, y = 0, w = w, h = h,
-			}, true):raw()
+			}, true):Raw()
 		end
 		if frame.dwShowIndex == 1 and IsTable(frame.tQuestRpg) then
 			local nCount = 2
@@ -395,7 +395,7 @@ function D.CreateEntry()
 			if p.path then
 				wnd = frame:Lookup(p.path)
 			end
-			p.el = UI(wnd):append('WndButton', {
+			p.el = UI(wnd):Append('WndButton', {
 				name = 'WndButton_AutoChat',
 				text = _L['autochat'],
 				tip = _L['Left click to config autochat.\nRight click to edit global config.'],
@@ -404,7 +404,7 @@ function D.CreateEntry()
 					return D.GetDialogueMenu(frame[p.keys.info], frame[p.keys.tartype], frame[p.keys.tarid], frame[p.keys.winidx])
 				end,
 				rmenu = D.GetConfigMenu,
-			}, true):raw()
+			}, true):Raw()
 		end
 	end
 	D.UpdateEntryPos()

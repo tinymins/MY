@@ -52,11 +52,11 @@ function PS.OnPanelActive(frame)
 	local X, Y = 20, 20
 	local x, y = X, Y
 
-	y = y + ui:append('Text', { x = x, y = y, text = _L['Interface settings'], font = 27 }, true):height()
+	y = y + ui:Append('Text', { x = x, y = y, text = _L['Interface settings'], font = 27 }, true):Height()
 
 	x = X + 10
 	y = y + 3
-	x = x + ui:append('WndRadioBox', {
+	x = x + ui:Append('WndRadioBox', {
 		x = x, y = y, text = _L['Official team frame style'],
 		group = 'CSS', checked = CFG.eFrameStyle == 'OFFICIAL',
 		oncheck = function(bChecked)
@@ -66,9 +66,9 @@ function PS.OnPanelActive(frame)
 			CFG.eFrameStyle = 'OFFICIAL'
 			MY_Cataclysm.ReloadCataclysmPanel()
 		end,
-	}, true):autoWidth():width() + 5
+	}, true):AutoWidth():Width() + 5
 
-	y = y + ui:append('WndRadioBox', {
+	y = y + ui:Append('WndRadioBox', {
 		x = x, y = y, text = _L['Cataclysm team frame style'],
 		group = 'CSS', checked = CFG.eFrameStyle == 'CATACLYSM',
 		oncheck = function(bChecked)
@@ -78,11 +78,11 @@ function PS.OnPanelActive(frame)
 			CFG.eFrameStyle = 'CATACLYSM'
 			MY_Cataclysm.ReloadCataclysmPanel()
 		end,
-	}, true):autoWidth():height()
+	}, true):AutoWidth():Height()
 
 	x = X + 10
-	x = x + ui:append('Text', { x = x, y = y, text = _L['Interface Width']}, true):autoWidth():width() + 5
-	y = y + ui:append('WndTrackbar', {
+	x = x + ui:Append('Text', { x = x, y = y, text = _L['Interface Width']}, true):AutoWidth():Width() + 5
+	y = y + ui:Append('WndTrackbar', {
 		x = x, y = y + 3, h = 25, w = 250,
 		range = {50, 250},
 		value = CFG.fScaleX * 100,
@@ -96,11 +96,11 @@ function PS.OnPanelActive(frame)
 			end
 		end,
 		textfmt = function(val) return _L('%d%%', val) end,
-	}, true):height()
+	}, true):Height()
 
 	x = X + 10
-	x = x + ui:append('Text', { x = x, y = y, text = _L['Interface Height']}, true):autoWidth():width() + 5
-	y = y + ui:append('WndTrackbar', {
+	x = x + ui:Append('Text', { x = x, y = y, text = _L['Interface Height']}, true):AutoWidth():Width() + 5
+	y = y + ui:Append('WndTrackbar', {
 		x = x, y = y + 3, h = 25, w = 250,
 		range = {50, 250},
 		value = CFG.fScaleY * 100,
@@ -114,25 +114,25 @@ function PS.OnPanelActive(frame)
 			end
 		end,
 		textfmt = function(val) return _L('%d%%', val) end,
-	}, true):height()
+	}, true):Height()
 
 	x = X
 	y = y + 10
-	y = y + ui:append('Text', { x = x, y = y, text = g_tStrings.OTHER, font = 27 }, true):height()
+	y = y + ui:Append('Text', { x = x, y = y, text = g_tStrings.OTHER, font = 27 }, true):Height()
 
 	x = x + 10
-	y = y + ui:append('WndCheckBox', {
+	y = y + ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['Show Group Number'],
 		checked = CFG.bShowGroupNumber,
 		oncheck = function(bCheck)
 			CFG.bShowGroupNumber = bCheck
 			MY_Cataclysm.ReloadCataclysmPanel()
 		end,
-	}, true):height()
+	}, true):Height()
 
 	if CFG.nBGColorMode ~= CTM_BG_COLOR_MODE.OFFICIAL then
-		x = x + ui:append('Text', { x = x, y = y, text = g_tStrings.STR_ALPHA }, true):autoWidth():width() + 5
-		y = y + ui:append('WndTrackbar', {
+		x = x + ui:Append('Text', { x = x, y = y, text = g_tStrings.STR_ALPHA }, true):AutoWidth():Width() + 5
+		y = y + ui:Append('WndTrackbar', {
 			x = x, y = y + 3,
 			range = {0, 255},
 			value = CFG.nAlpha,
@@ -144,16 +144,16 @@ function PS.OnPanelActive(frame)
 				end
 			end,
 			textfmt = function(val) return _L('%d%%', val / 255 * 100) end,
-		}, true):height()
+		}, true):Height()
 	end
 
 	x = X
 	y = y + 10
-	y = y + ui:append('Text', { x = x, y = y, text = _L['Arrangement'], font = 27 }, true):height()
+	y = y + ui:Append('Text', { x = x, y = y, text = _L['Arrangement'], font = 27 }, true):Height()
 
 	x = x + 10
 	y = y + 3
-	y = y + ui:append('WndRadioBox', {
+	y = y + ui:Append('WndRadioBox', {
 		x = x, y = y, text = _L['One lines: 5/0'],
 		group = 'Arrangement', checked = CFG.nAutoLinkMode == 5,
 		oncheck = function(bChecked)
@@ -166,9 +166,9 @@ function PS.OnPanelActive(frame)
 				MY_Cataclysm.SetFrameSize()
 			end
 		end,
-	}, true):autoWidth():height() + 3
+	}, true):AutoWidth():Height() + 3
 
-	y = y + ui:append('WndRadioBox', {
+	y = y + ui:Append('WndRadioBox', {
 		x = x, y = y, text = _L['Two lines: 1/4'],
 		group = 'Arrangement', checked = CFG.nAutoLinkMode == 1,
 		oncheck = function(bChecked)
@@ -181,9 +181,9 @@ function PS.OnPanelActive(frame)
 				MY_Cataclysm.SetFrameSize()
 			end
 		end,
-	}, true):autoWidth():height() + 3
+	}, true):AutoWidth():Height() + 3
 
-	y = y + ui:append('WndRadioBox', {
+	y = y + ui:Append('WndRadioBox', {
 		x = x, y = y, text = _L['Two lines: 2/3'],
 		group = 'Arrangement', checked = CFG.nAutoLinkMode == 2,
 		oncheck = function(bChecked)
@@ -196,9 +196,9 @@ function PS.OnPanelActive(frame)
 				MY_Cataclysm.SetFrameSize()
 			end
 		end,
-	}, true):autoWidth():height() + 3
+	}, true):AutoWidth():Height() + 3
 
-	y = y + ui:append('WndRadioBox', {
+	y = y + ui:Append('WndRadioBox', {
 		x = x, y = y, text = _L['Two lines: 3/2'],
 		group = 'Arrangement', checked = CFG.nAutoLinkMode == 3,
 		oncheck = function(bChecked)
@@ -211,9 +211,9 @@ function PS.OnPanelActive(frame)
 				MY_Cataclysm.SetFrameSize()
 			end
 		end,
-	}, true):autoWidth():height() + 3
+	}, true):AutoWidth():Height() + 3
 
-	y = y + ui:append('WndRadioBox', {
+	y = y + ui:Append('WndRadioBox', {
 		x = x, y = y, text = _L['Two lines: 4/1'],
 		group = 'Arrangement', checked = CFG.nAutoLinkMode == 4,
 		oncheck = function(bChecked)
@@ -226,6 +226,6 @@ function PS.OnPanelActive(frame)
 				MY_Cataclysm.SetFrameSize()
 			end
 		end,
-	}, true):autoWidth():height() + 3
+	}, true):AutoWidth():Height() + 3
 end
 LIB.RegisterPanel('MY_Cataclysm_Interface', _L['Interface settings'], _L['Raid'], 'ui/Image/UICommon/RaidTotal.uitex|74', PS)

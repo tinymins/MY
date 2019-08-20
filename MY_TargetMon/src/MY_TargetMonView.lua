@@ -166,11 +166,11 @@ local function DrawItem(hList, hItem, nGroup, nIndex, tViewData, item, bScaleRes
 		bRequireFormatPos = true
 	end
 	if hItem.szCdBarUITex ~= tViewData.szCdBarUITex and tViewData.bCdBar then
-		UI(hItem.imgProcess):image(tViewData.szCdBarUITex)
+		UI(hItem.imgProcess):Image(tViewData.szCdBarUITex)
 		hItem.szCdBarUITex = tViewData.szCdBarUITex
 	end
 	if hItem.szBoxBgUITex ~= tViewData.szBoxBgUITex then
-		UI(hItem.imgBoxBg):image(tViewData.szBoxBgUITex)
+		UI(hItem.imgBoxBg):Image(tViewData.szBoxBgUITex)
 		hItem.szBoxBgUITex = tViewData.szBoxBgUITex
 	end
 	if item then
@@ -191,11 +191,11 @@ local function DrawItem(hList, hItem, nGroup, nIndex, tViewData, item, bScaleRes
 			hItem.fCdBar = item.fCdBar
 		end
 		if hItem.szCdBarUITex ~= tViewData.szCdBarUITex and tViewData.bCdBar then
-			UI(hItem.imgProcess):image(tViewData.szCdBarUITex)
+			UI(hItem.imgProcess):Image(tViewData.szCdBarUITex)
 			hItem.szCdBarUITex = tViewData.szCdBarUITex
 		end
 		if hItem.szBoxBgUITex ~= tViewData.szBoxBgUITex then
-			UI(hItem.imgBoxBg):image(tViewData.szBoxBgUITex)
+			UI(hItem.imgBoxBg):Image(tViewData.szBoxBgUITex)
 			hItem.szBoxBgUITex = tViewData.szBoxBgUITex
 		end
 		if hItem.bStaring ~= item.bStaring then

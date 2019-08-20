@@ -552,27 +552,27 @@ end
 local PS = {}
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
-	local x, y = ui:pos()
-	local w, h = ui:size()
+	local x, y = ui:Pos()
+	local w, h = ui:Size()
 
-	local list = ui:append('WndListBox', 'WndListBox_1'):children('#WndListBox_1')
-	  :pos(20, 35)
-	  :size(w - 32, h - 50)
-	  :listbox('onlclick', function(hItem, text, id, data, selected)
+	local list = ui:Append('WndListBox', 'WndListBox_1'):Children('#WndListBox_1')
+	  :Pos(20, 35)
+	  :Size(w - 32, h - 50)
+	  :ListBox('onlclick', function(hItem, text, id, data, selected)
 	  	OpenMiddleMap(data.dwMapID, 0)
-	  	UI('Topmost1/MiddleMap/Wnd_NormalMap/Wnd_Tool/Edit_Search'):text(LIB.EscapeString(data.szName))
+	  	UI('Topmost1/MiddleMap/Wnd_NormalMap/Wnd_Tool/Edit_Search'):Text(LIB.EscapeString(data.szName))
 	  	Station.SetFocusWindow('Topmost1/MiddleMap')
 	  	if not selected then -- avoid unselect
 	  		return false
 	  	end
 	  end)
 
-	local muProgress = ui:append('Image', 'Image_Progress'):children('#Image_Progress')
-	  :pos(20, 31)
-	  :size(w - 30, 4)
-	  :image('ui/Image/UICommon/RaidTotal.UITex|45')
+	local muProgress = ui:Append('Image', 'Image_Progress'):Children('#Image_Progress')
+	  :Pos(20, 31)
+	  :Size(w - 30, 4)
+	  :Image('ui/Image/UICommon/RaidTotal.UITex|45')
 
-	ui:append('WndEditBox', {
+	ui:Append('WndEditBox', {
 		name = 'WndEdit_Search',
 		x = 18, y = 10,
 		w = w - 26, h = 25,
@@ -585,7 +585,7 @@ function PS.OnPanelActive(wnd)
 			local nCount = 0
 			local tNames = {}
 			local infos, szName, szTitle
-			list:listbox('clear')
+			list:ListBox('clear')
 
 			infos = MY_MiddleMapMark.SearchNpc(szText)
 			nCount = nCount + #infos
@@ -593,7 +593,7 @@ function PS.OnPanelActive(wnd)
 				szName  = info.decoded and info.name  or UTF8ToAnsi(info.name)
 				szTitle = info.decoded and info.title or UTF8ToAnsi(info.title)
 				if not tNames[info.mapid .. szName] then
-					list:listbox('insert', '[' .. Table_GetMapName(info.mapid) .. '] ' .. szName ..
+					list:ListBox('insert', '[' .. Table_GetMapName(info.mapid) .. '] ' .. szName ..
 					((szTitle and #szTitle > 0 and '<' .. szTitle .. '>') or ''), nil, {
 						szName  = szName,
 						dwMapID = info.mapid,
@@ -611,7 +611,7 @@ function PS.OnPanelActive(wnd)
 			for _, info in ipairs(infos) do
 				szName = info.decoded and info.name or UTF8ToAnsi(info.name)
 				if not tNames[info.mapid .. szName] then
-					list:listbox('insert', '[' .. Table_GetMapName(info.mapid) .. '] ' .. szName, nil, {
+					list:ListBox('insert', '[' .. Table_GetMapName(info.mapid) .. '] ' .. szName, nil, {
 						szName  = szName,
 						dwMapID = info.mapid,
 					})
@@ -628,12 +628,12 @@ end
 
 function PS.OnPanelResize(wnd)
 	local ui = UI(wnd)
-	local x, y = ui:pos()
-	local w, h = ui:size()
+	local x, y = ui:Pos()
+	local w, h = ui:Size()
 
-	ui:children('#WndListBox_1'):size(w - 32, h - 50)
-	ui:children('#Image_Progress'):size(w - 30, 4)
-	ui:children('#WndEdit_Search'):size(w - 26, 25)
+	ui:Children('#WndListBox_1'):Size(w - 32, h - 50)
+	ui:Children('#Image_Progress'):Size(w - 30, 4)
+	ui:Children('#WndEdit_Search'):Size(w - 26, 25)
 end
 
 LIB.RegisterPanel('MY_MiddleMapMark', _L['middle map mark'], _L['General'], 'ui/Image/MiddleMap/MapWindow2.UITex|4', PS)

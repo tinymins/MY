@@ -192,44 +192,44 @@ function PS.OnPanelActive(frame)
 	local ui = UI(frame)
 	local X, Y = 20, 20
 	local x, y = X, Y
-	local w, h = ui:size()
+	local w, h = ui:Size()
 
-	ui:append('Text', { x = x, y = y, text = _L['Find component'], font = 27 })
-	ui:append('WndCheckBox', {
+	ui:Append('Text', { x = x, y = y, text = _L['Find component'], font = 27 })
+	ui:Append('WndCheckBox', {
 		x = x + 10, y = y + 28,
 		text = _L['Enable button search, mouseover it will show its path'],
 		checked = O.bButton, oncheck = D.UpdateButton,
-	}, true):autoWidth()
-	ui:append('WndCheckBox', {
+	}, true):AutoWidth()
+	ui:Append('WndCheckBox', {
 		x = x + 10, y = y + 56,
 		text = _L['Enable box search, mouseover it will show its path'],
 		checked = O.bBox, oncheck = D.UpdateBox,
-	}, true):autoWidth()
-	ui:append('Text', { x = x + 0, y = y + 92, text = _L['Find by text'], font = 27 })
+	}, true):AutoWidth()
+	ui:Append('Text', { x = x + 0, y = y + 92, text = _L['Find by text'], font = 27 })
 
 	local nX = X + 10
-	nX = nX + ui:append('Text', {
+	nX = nX + ui:Append('Text', {
 		x = nX, y = y + 120,
 		text = _L['Keyword: '],
-	}, true):autoWidth():width() + 5
-	nX = nX + ui:append('WndEditBox', {
+	}, true):AutoWidth():Width() + 5
+	nX = nX + ui:Append('WndEditBox', {
 		name = 'Edit_Query',
 		x = nX, y = y + 120, w = 200, h = 27,
 		limit = 256,
 		text = O.szQuery,
-	}, true):width() + 5
-	nX = nX + ui:append('WndButton', {
+	}, true):Width() + 5
+	nX = nX + ui:Append('WndButton', {
 		x = nX, y = y + 120,
 		text = _L['Search'],
 		onclick = function()
-			ui:children('#Edit_Result'):text(_L['Searching, please wait...'])
-			O.szQuery = ui:children('#Edit_Query'):text()
+			ui:Children('#Edit_Result'):Text(_L['Searching, please wait...'])
+			O.szQuery = ui:Children('#Edit_Query'):Text()
 			O.szResult = D.SearchText(O.szQuery)
-			ui:children('#Edit_Result'):text(O.szResult)
+			ui:Children('#Edit_Result'):Text(O.szResult)
 		end,
-	}, true):width() + 5
-	ui:append('Text', { x = nX, y = y + 120, text = _L['(Supports Lua regex)'] })
-	ui:append('WndEditBox', { name = 'Edit_Result', x = x + 10, y = y + 150, limit = 9999, w = 480, h = 200, multiline = true, text = O.szResult })
+	}, true):Width() + 5
+	ui:Append('Text', { x = nX, y = y + 120, text = _L['(Supports Lua regex)'] })
+	ui:Append('WndEditBox', { name = 'Edit_Result', x = x + 10, y = y + 150, limit = 9999, w = 480, h = 200, multiline = true, text = O.szResult })
 end
 
 LIB.RegisterPanel('MYDev_UIFindStation', _L['MYDev_UIFindStation'], _L['Development'], 2791, PS)

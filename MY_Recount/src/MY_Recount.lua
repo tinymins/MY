@@ -239,9 +239,9 @@ function MY_Recount.Open()
 	-- pos
 	local anchor = LIB.GetStorage('FrameAnchor.MY_Recount')
 		or { x = 0, y = -70, s = 'BOTTOMRIGHT', r = 'BOTTOMRIGHT' }
-	UI(m_frame):anchor(anchor)
+	UI(m_frame):Anchor(anchor)
 	LIB.RegisterEvent('UI_SCALED.MY_RECOUNT', function()
-		UI(m_frame):anchor(anchor)
+		UI(m_frame):Anchor(anchor)
 	end)
 	-- draw
 	MY_Recount.DrawUI()

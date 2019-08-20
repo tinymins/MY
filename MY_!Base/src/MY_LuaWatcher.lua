@@ -153,7 +153,7 @@ function D.SetBreathe()
 	if not MY then
 		return
 	end
-	return MY.BreatheCall('MY_LuaWatcher', 60000, function() TXT:text(D.GetRankString(SORT_KEY)) end)
+	return MY.BreatheCall('MY_LuaWatcher', 60000, function() TXT:Text(D.GetRankString(SORT_KEY)) end)
 end
 
 function D.RemoveBreathe()
@@ -170,9 +170,9 @@ RegisterEvent('MY_BASE_LOADING_END', function()
 	function PS.OnPanelActive(wnd)
 		local ui = MY.UI(wnd)
 		local x, y = 10, 10
-		local w, h = ui:size()
+		local w, h = ui:Size()
 
-		BTN = ui:append('WndButton', {
+		BTN = ui:Append('WndButton', {
 			x = x, y = y,
 			text = RUNNING and _L['Stop'] or _L['Start'],
 			onclick = function()
@@ -185,17 +185,17 @@ RegisterEvent('MY_BASE_LOADING_END', function()
 					D.SaveStatus()
 					D.SetBreathe()
 				end
-				BTN:text(RUNNING and _L['Stop'] or _L['Start'])
+				BTN:Text(RUNNING and _L['Stop'] or _L['Start'])
 			end,
 		}, true)
-		ui:append('WndButton', {
+		ui:Append('WndButton', {
 			x = x + 100, y = y,
 			text = _L['Refresh'],
 			onclick = function()
-				TXT:text(D.GetRankString(SORT_KEY))
+				TXT:Text(D.GetRankString(SORT_KEY))
 			end,
 		})
-		ui:append('WndButton', {
+		ui:Append('WndButton', {
 			x = x + 200, y = y,
 			text = SORT_KEY,
 			onclick = function()
@@ -204,11 +204,11 @@ RegisterEvent('MY_BASE_LOADING_END', function()
 				else
 					SORT_KEY = 'TIME'
 				end
-				MY.UI(this):text(SORT_KEY)
-				TXT:text(D.GetRankString(SORT_KEY))
+				MY.UI(this):Text(SORT_KEY)
+				TXT:Text(D.GetRankString(SORT_KEY))
 			end,
 		})
-		ui:append('WndButton', {
+		ui:Append('WndButton', {
 			x = x + 300, y = y,
 			text = _L['Reset'],
 			onclick = function()
@@ -217,7 +217,7 @@ RegisterEvent('MY_BASE_LOADING_END', function()
 		})
 		y = y + 30
 
-		TXT = ui:append('Text', {
+		TXT = ui:Append('Text', {
 			x = x, y = y, w = w, h = h - y,
 			halign = 0, valign = 0,
 			multiline = true,

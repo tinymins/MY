@@ -84,7 +84,7 @@ end
 LIB.RegisterInit('MY_WhisperMetion', D.Apply)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 'auto',
 		text = _L['Redirect metion to whisper'],
 		checked = MY_WhisperMetion.bEnable,

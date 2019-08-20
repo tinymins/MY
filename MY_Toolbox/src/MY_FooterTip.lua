@@ -189,7 +189,7 @@ LIB.RegisterInit('MY_FooterTip', D.Apply)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	-- 好友高亮
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 180,
 		text = _L['friend headtop tips'],
 		checked = MY_FooterTip.bFriend,
@@ -197,7 +197,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 			MY_FooterTip.bFriend = not MY_FooterTip.bFriend
 		end,
 	})
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		x = x + 180, y = y, w = 180,
 		text = _L['friend headtop tips nav'],
 		checked = MY_FooterTip.bFriendNav,
@@ -208,7 +208,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	y = y + 30
 
 	-- 帮会高亮
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 180,
 		text = _L['tong member headtop tips'],
 		checked = MY_FooterTip.bTongMember,
@@ -216,7 +216,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 			MY_FooterTip.bTongMember = not MY_FooterTip.bTongMember
 		end,
 	})
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		x = x + 180, y = y, w = 180,
 		text = _L['tong member headtop tips nav'],
 		checked = MY_FooterTip.bTongMemberNav,

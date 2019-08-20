@@ -56,24 +56,24 @@ function PS.OnPanelActive(wnd)
 	local nX, nY = X, Y
 	local nLineH = 22
 
-	-- ui:append('WndButton2', {
+	-- ui:Append('WndButton2', {
 	-- 	x = 400, y = 20, text = g_tStrings.HELP_PANEL,
 	-- 	onclick = function()
 	-- 		OpenInternetExplorer('https://github.com/luckyyyyy/JH/blob/dev/JH_DBM/README.md')
 	-- 	end,
 	-- })
 
-	nX, nY = ui:append('Text', { x = X, y = Y, text = _L['Master switch'], font = 27 }, true):autoWidth():pos('BOTTOMRIGHT')
-	nX = ui:append('WndCheckBox', {
+	nX, nY = ui:Append('Text', { x = X, y = Y, text = _L['Master switch'], font = 27 }, true):AutoWidth():Pos('BOTTOMRIGHT')
+	nX = ui:Append('WndCheckBox', {
 		x = X + 10, y = nY, text = _L['Enable MY_TeamMon'],
 		checked = MY_TeamMon.bEnable,
 		oncheck = function(bCheck)
 			MY_TeamMon.Enable(bCheck, true)
 			MY_TeamMon.bEnable = bCheck
 		end,
-	}, true):autoWidth():pos('BOTTOMRIGHT')
+	}, true):AutoWidth():Pos('BOTTOMRIGHT')
 	if Circle and not LIB.IsShieldedVersion(2) then
-		nX = ui:append('WndCheckBox', {
+		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY, text = _L['Circle Enable'],
 			checked = Circle.bEnable,
 			oncheck = function(bCheck)
@@ -82,20 +82,20 @@ function PS.OnPanelActive(wnd)
 					FireUIEvent('CIRCLE_RELOAD')
 				end
 			end,
-		}, true):autoWidth():pos('BOTTOMRIGHT')
-		nX = ui:append('WndCheckBox', {
+		}, true):AutoWidth():Pos('BOTTOMRIGHT')
+		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY, text = _L['Circle Border'],
 			checked = Circle.bBorder,
 			oncheck = function(bCheck)
 				Circle.bBorder = bCheck
 				FireUIEvent('CIRCLE_RELOAD')
 			end,
-		}, true):autoWidth():pos('BOTTOMRIGHT')
+		}, true):AutoWidth():Pos('BOTTOMRIGHT')
 	end
 	nY = nY + nLineH
 
-	nX, nY = ui:append('Text', { x = X, y = nY + 5, text = _L['Enable alarm (master switch)'], font = 27 }, true):autoWidth():pos('BOTTOMRIGHT')
-	nX = ui:append('WndCheckBox', {
+	nX, nY = ui:Append('Text', { x = X, y = nY + 5, text = _L['Enable alarm (master switch)'], font = 27 }, true):AutoWidth():Pos('BOTTOMRIGHT')
+	nX = ui:Append('WndCheckBox', {
 		x = X + 10, y = nY,
 		text = _L['Team channel alarm'],
 		color = GetMsgFontColor('MSG_TEAM', true),
@@ -103,54 +103,54 @@ function PS.OnPanelActive(wnd)
 		oncheck = function(bCheck)
 			MY_TeamMon.bPushTeamChannel = bCheck
 		end,
-	}, true):autoWidth():pos('BOTTOMRIGHT')
-	nX = ui:append('WndCheckBox', {
+	}, true):AutoWidth():Pos('BOTTOMRIGHT')
+	nX = ui:Append('WndCheckBox', {
 		x = nX + 5, y = nY,
 		text = _L['Whisper channel alarm'], color = GetMsgFontColor('MSG_WHISPER', true),
 		checked = MY_TeamMon.bPushWhisperChannel,
 		oncheck = function(bCheck)
 			MY_TeamMon.bPushWhisperChannel = bCheck
 		end,
-	}, true):autoWidth():pos('BOTTOMRIGHT')
-	nX = ui:append('WndCheckBox', {
+	}, true):AutoWidth():Pos('BOTTOMRIGHT')
+	nX = ui:Append('WndCheckBox', {
 		x = nX + 5, y = nY, text = _L['Buff list'],
 		checked = MY_TeamMon.bPushBuffList,
 		oncheck = function(bCheck)
 			MY_TeamMon.bPushBuffList = bCheck
 		end,
-	}, true):autoWidth():pos('BOTTOMRIGHT')
-	nX, nY = ui:append('WndCheckBox', {
+	}, true):AutoWidth():Pos('BOTTOMRIGHT')
+	nX, nY = ui:Append('WndCheckBox', {
 		x = nX + 5, y = nY, text = _L['Center alarm'],
 		checked = MY_TeamMon.bPushCenterAlarm,
 		oncheck = function(bCheck)
 			MY_TeamMon.bPushCenterAlarm = bCheck
 		end,
-	}, true):autoWidth():pos('BOTTOMRIGHT')
+	}, true):AutoWidth():Pos('BOTTOMRIGHT')
 	nX = X + 5
 	if not LIB.IsShieldedVersion(2) then
-		nX = ui:append('WndCheckBox', {
+		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY, text = _L['Large text alarm'],
 			checked = MY_TeamMon.bPushBigFontAlarm,
 			oncheck = function(bCheck)
 				MY_TeamMon.bPushBigFontAlarm = bCheck
 			end,
-		}, true):autoWidth():pos('BOTTOMRIGHT')
-		nX = ui:append('WndCheckBox', {
+		}, true):AutoWidth():Pos('BOTTOMRIGHT')
+		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY, text = _L['Fullscreen alarm'],
 			checked = MY_TeamMon.bPushFullScreen,
 			oncheck = function(bCheck)
 				MY_TeamMon.bPushFullScreen = bCheck
 			end,
-		}, true):autoWidth():pos('BOTTOMRIGHT')
+		}, true):AutoWidth():Pos('BOTTOMRIGHT')
 	end
-	nX = ui:append('WndCheckBox', {
+	nX = ui:Append('WndCheckBox', {
 		x = nX + 5, y = nY, text = _L['Party buff list'],
 		checked = MY_TeamMon.bPushPartyBuffList,
 		oncheck = function(bCheck)
 			MY_TeamMon.bPushPartyBuffList = bCheck
 		end,
-	}, true):autoWidth():pos('BOTTOMRIGHT')
-	nX, nY = ui:append('WndCheckBox', {
+	}, true):AutoWidth():Pos('BOTTOMRIGHT')
+	nX, nY = ui:Append('WndCheckBox', {
 		x = nX + 5, y = nY, text = _L['Lifebar alarm'],
 		tip = _L['Requires MY_LifeBar loaded.'],
 		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
@@ -158,18 +158,18 @@ function PS.OnPanelActive(wnd)
 		oncheck = function(bCheck)
 			MY_TeamMon.bPushScreenHead = bCheck
 		end,
-	}, true):autoWidth():pos('BOTTOMRIGHT')
-	nX, nY = ui:append('Text', { x = X, y = nY + 5, text = _L['Team panel bind show buff'], font = 27 }, true):autoWidth():pos('BOTTOMRIGHT')
-	nX, nY = ui:append('WndCheckBox', {
+	}, true):AutoWidth():Pos('BOTTOMRIGHT')
+	nX, nY = ui:Append('Text', { x = X, y = nY + 5, text = _L['Team panel bind show buff'], font = 27 }, true):AutoWidth():Pos('BOTTOMRIGHT')
+	nX, nY = ui:Append('WndCheckBox', {
 		x = X + 10, y = nY, text = _L['Team panel bind show buff'],
 		checked = MY_TeamMon.bPushTeamPanel,
 		oncheck = function(bCheck)
 			MY_TeamMon.bPushTeamPanel = bCheck
 			FireUIEvent('MY_TM_CREATE_CACHE')
 		end,
-	}, true):autoWidth():pos('BOTTOMRIGHT')
-	nX, nY = ui:append('Text', { x = X, y = nY + 5, text = _L['Buff list'], font = 27 }, true):autoWidth():pos('BOTTOMRIGHT')
-	nX = ui:append('WndComboBox', {
+	}, true):AutoWidth():Pos('BOTTOMRIGHT')
+	nX, nY = ui:Append('Text', { x = X, y = nY + 5, text = _L['Buff list'], font = 27 }, true):AutoWidth():Pos('BOTTOMRIGHT')
+	nX = ui:Append('WndComboBox', {
 		x = X + 10, y = nY, text = _L['Max buff count'],
 		menu = function()
 			local menu = {}
@@ -180,8 +180,8 @@ function PS.OnPanelActive(wnd)
 			end
 			return menu
 		end,
-	}, true):autoWidth():pos('BOTTOMRIGHT')
-	nX, nY = ui:append('WndComboBox', {
+	}, true):AutoWidth():Pos('BOTTOMRIGHT')
+	nX, nY = ui:Append('WndComboBox', {
 		x = nX + 5, y = nY, text = _L['Buff size'],
 		menu = function()
 			local menu = {}
@@ -192,24 +192,24 @@ function PS.OnPanelActive(wnd)
 			end
 			return menu
 		end,
-	}, true):autoWidth():pos('BOTTOMRIGHT')
-	nX, nY = ui:append('Text', { x = X, y = nY + 5, text = _L['Data save mode'], font = 27 }, true):autoWidth():pos('BOTTOMRIGHT')
-	nX, nY = ui:append('WndCheckBox', {
+	}, true):AutoWidth():Pos('BOTTOMRIGHT')
+	nX, nY = ui:Append('Text', { x = X, y = nY + 5, text = _L['Data save mode'], font = 27 }, true):AutoWidth():Pos('BOTTOMRIGHT')
+	nX, nY = ui:Append('WndCheckBox', {
 		x = X + 10, y = nY, text = _L['Use common data'],
 		checked = MY_TeamMon.bCommon,
 		oncheck = function(bCheck)
 			MY_TeamMon.bCommon = bCheck
 		end,
-	}, true):autoWidth():pos('BOTTOMRIGHT')
-	nX = ui:append('WndButton2', {
+	}, true):AutoWidth():Pos('BOTTOMRIGHT')
+	nX = ui:Append('WndButton2', {
 		x = X + 5, y = nY + 15, text = _L['Data panel'],
 		onclick = MY_TeamMon_UI.TogglePanel,
-	}, true):autoWidth():pos('BOTTOMRIGHT')
-	nX = ui:append('WndButton2', {
+	}, true):AutoWidth():Pos('BOTTOMRIGHT')
+	nX = ui:Append('WndButton2', {
 		x = nX + 5, y = nY + 15, text = _L['Export data'],
 		onclick = MY_TeamMon_UI.OpenExportPanel,
-	}, true):autoWidth():pos('BOTTOMRIGHT')
-	nX = ui:append('WndButton2', {
+	}, true):AutoWidth():Pos('BOTTOMRIGHT')
+	nX = ui:Append('WndButton2', {
 		x = nX + 5, y = nY + 15, text = _L['Import data'],
 		menu = function()
 			local szLang = select(3, GetVersion())
@@ -221,8 +221,8 @@ function PS.OnPanelActive(wnd)
 			end
 			return menu
 		end,
-	}, true):autoWidth():pos('BOTTOMRIGHT')
-	nX = ui:append('WndButton2', {
+	}, true):AutoWidth():Pos('BOTTOMRIGHT')
+	nX = ui:Append('WndButton2', {
 		x = nX + 5, y = nY + 15, text = _L['Open data folder'],
 		onclick = function()
 			local szRoot = LIB.GetAbsolutePath(MY_TM_DATA_ROOT):gsub('/', '\\')
@@ -231,7 +231,7 @@ function PS.OnPanelActive(wnd)
 			end
 			UI.OpenTextEditor(szRoot)
 		end,
-	}, true):autoWidth():pos('BOTTOMRIGHT')
+	}, true):AutoWidth():Pos('BOTTOMRIGHT')
 end
 
 LIB.RegisterPanel('MY_TeamMon', _L['MY_TeamMon'], _L['Raid'], 'ui/Image/UICommon/FBlist.uitex|34', PS)

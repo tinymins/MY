@@ -72,10 +72,10 @@ LIB.RegisterFrameCreate('ExitPanel.BIG_WAR_CHECK', function(name, frame)
 				end
 				if finished then
 					local ui = UI(frame)
-					if ui:children('#Text_MY_Tip'):count() == 0 then
-						ui:append('Text', { name = 'Text_MY_Tip',y = ui:height(), w = ui:width(), color = {255, 255, 0}, font = 199, halign = 1})
+					if ui:Children('#Text_MY_Tip'):Count() == 0 then
+						ui:Append('Text', { name = 'Text_MY_Tip',y = ui:Height(), w = ui:Width(), color = {255, 255, 0}, font = 199, halign = 1})
 					end
-					ui = ui:children('#Text_MY_Tip'):text(_L['Warning: Bigwar has been finished but not handed yet!']):shake(10, 10, 10, 1000)
+					ui = ui:Children('#Text_MY_Tip'):Text(_L['Warning: Bigwar has been finished but not handed yet!']):Shake(10, 10, 10, 1000)
 					break
 				end
 			end

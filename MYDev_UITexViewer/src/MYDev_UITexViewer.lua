@@ -51,21 +51,21 @@ RegisterCustomData('MYDev_UITexViewer.szUITexPath')
 
 _Cache.OnPanelActive = function(wnd)
     local ui = UI(wnd)
-    local w, h = ui:size()
+    local w, h = ui:Size()
     local x, y = 20, 20
 
     _Cache.tUITexList = LIB.LoadLUAData(PACKET_INFO.ROOT .. 'MYDev_UITexViewer/data/data.jx3dat') or {}
 
-    local uiBoard = ui:append('WndScrollBox', 'WndScrollBox_ImageList')
-      :children('#WndScrollBox_ImageList')
-      :handleStyle(3):pos(x, y+25):size(w-21, h - 70)
+    local uiBoard = ui:Append('WndScrollBox', 'WndScrollBox_ImageList')
+      :Children('#WndScrollBox_ImageList')
+      :HandleStyle(3):Pos(x, y+25):Size(w-21, h - 70)
 
-    local uiEdit = ui:append('WndEditBox', 'WndEdit_Copy'):children('#WndEdit_Copy')
-      :pos(x, h-30):size(w-20, 25):multiLine(true)
+    local uiEdit = ui:Append('WndEditBox', 'WndEdit_Copy'):Children('#WndEdit_Copy')
+      :Pos(x, h-30):Size(w-20, 25):Multiline(true)
 
-    ui:append('WndAutocomplete', 'WndAutocomplete_UITexPath'):children('#WndAutocomplete_UITexPath')
-      :pos(x, y):size(w-20, 25):text(MYDev_UITexViewer.szUITexPath)
-      :change(function(szText)
+    ui:Append('WndAutocomplete', 'WndAutocomplete_UITexPath'):Children('#WndAutocomplete_UITexPath')
+      :Pos(x, y):Size(w-20, 25):Text(MYDev_UITexViewer.szUITexPath)
+      :Change(function(szText)
         local tInfo = KG_Table.Load(szText .. '.txt', {
         -- 图片文件帧信息表的表头名字
             {f = 'i', t = 'nFrame' },             -- 图片帧 ID
@@ -80,7 +80,7 @@ _Cache.OnPanelActive = function(wnd)
         end
 
         MYDev_UITexViewer.szUITexPath = szText
-        uiBoard:clear()
+        uiBoard:Clear()
         for i = 0, 256 do
             local tLine = tInfo:Search(i)
             if not tLine then
@@ -88,26 +88,26 @@ _Cache.OnPanelActive = function(wnd)
             end
 
             if tLine.nWidth ~= 0 and tLine.nHeight ~= 0 then
-                uiBoard:append('<image>eventid=277 name="Image_'..i..'"</image>'):children('#Image_' .. i)
-                  :image(szText .. '.UITex', tLine.nFrame)
-                  :size(tLine.nWidth, tLine.nHeight)
-                  :alpha(220)
-                  :hover(function(bIn) UI(this):alpha((bIn and 255) or 220) end)
-                  :tip(szText .. '.UITex#' .. i .. '\n' .. tLine.nWidth .. 'x' .. tLine.nHeight .. '\n' .. _L['(left click to generate xml)'], UI.TIP_POSITION.TOP_BOTTOM)
-                  :click(function() uiEdit:text('<image>w='..tLine.nWidth..' h='..tLine.nHeight..' path="' .. szText .. '.UITex" frame=' .. i ..'</image>') end)
+                uiBoard:Append('<image>eventid=277 name="Image_'..i..'"</image>'):Children('#Image_' .. i)
+                  :Image(szText .. '.UITex', tLine.nFrame)
+                  :Size(tLine.nWidth, tLine.nHeight)
+                  :Alpha(220)
+                  :Hover(function(bIn) UI(this):Alpha((bIn and 255) or 220) end)
+                  :Tip(szText .. '.UITex#' .. i .. '\n' .. tLine.nWidth .. 'x' .. tLine.nHeight .. '\n' .. _L['(left click to generate xml)'], UI.TIP_POSITION.TOP_BOTTOM)
+                  :Click(function() uiEdit:Text('<image>w='..tLine.nWidth..' h='..tLine.nHeight..' path="' .. szText .. '.UITex" frame=' .. i ..'</image>') end)
             end
         end
       end)
-      :click(function(nButton)
+      :Click(function(nButton)
         if IsPopupMenuOpened() then
-            UI(this):autocomplete('close')
+            UI(this):Autocomplete('close')
         else
-            UI(this):autocomplete('search', '')
+            UI(this):Autocomplete('search', '')
         end
       end)
-      :autocomplete('option', 'maxOption', 20)
-      :autocomplete('option', 'source', _Cache.tUITexList)
-      :change()
+      :Autocomplete('option', 'maxOption', 20)
+      :Autocomplete('option', 'source', _Cache.tUITexList)
+      :Change()
 end
 
 _Cache.OnPanelDeactive = function(wnd)

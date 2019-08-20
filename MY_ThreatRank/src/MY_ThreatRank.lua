@@ -461,11 +461,11 @@ function PS.OnPanelActive(frame)
 	local X, Y = 20, 20
 	local x, y = X, Y
 
-	ui:append('Text', { x = x, y = y, text = g_tStrings.HATRED_COLLECT, font = 27 })
+	ui:Append('Text', { x = x, y = y, text = g_tStrings.HATRED_COLLECT, font = 27 })
 	x = x + 10
 	y = y + 28
 
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 130, checked = TS.bEnable, text = _L['Enable ThreatScrutiny'],
 		oncheck = function(bChecked)
 			TS.bEnable = bChecked
@@ -474,7 +474,7 @@ function PS.OnPanelActive(frame)
 	})
 	x = x + 130
 
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 250, checked = TS.bInDungeon,
 		enable = TS.bEnable,
 		text = _L['Only in the map type is Dungeon Enable plug-in'],
@@ -487,10 +487,10 @@ function PS.OnPanelActive(frame)
 	y = y + 28
 
 	x = X
-	ui:append('Text', { x = x, y = y, text = _L['Alert Setting'], font = 27, autoenable = IsEnabled })
+	ui:Append('Text', { x = x, y = y, text = _L['Alert Setting'], font = 27, autoenable = IsEnabled })
 	x = x + 10
 	y = y + 28
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		x = x, y = y, checked = TS.nOTAlertLevel == 1, text = _L['OT Alert'],
 		oncheck = function(bChecked)
 			if bChecked then -- 以后可以做% 暂时先不管
@@ -503,7 +503,7 @@ function PS.OnPanelActive(frame)
 	})
 	y = y + 28
 
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		x = x, y = y, checked = TS.bOTAlertSound, text = _L['OT Alert Sound'],
 		autoenable = function() return TS.nOTAlertLevel == 1 end,
 		oncheck = function(bChecked)
@@ -514,11 +514,11 @@ function PS.OnPanelActive(frame)
 	y = y + 28
 
 	x = X
-	ui:append('Text', { x = x, y = y, text = _L['Style Setting'], font = 27, autoenable = IsEnabled })
+	ui:Append('Text', { x = x, y = y, text = _L['Style Setting'], font = 27, autoenable = IsEnabled })
 	y = y + 28
 
 	x = x + 10
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		x = x , y = y, checked = TS.bTopTarget, text = _L['Top Target'],
 		oncheck = function(bChecked)
 			TS.bTopTarget = bChecked
@@ -527,7 +527,7 @@ function PS.OnPanelActive(frame)
 	})
 	y = y + 28
 
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		x = x , y = y, checked = TS.bForceColor, text = g_tStrings.STR_RAID_COLOR_NAME_SCHOOL,
 		oncheck = function(bChecked)
 			TS.bForceColor = bChecked
@@ -536,7 +536,7 @@ function PS.OnPanelActive(frame)
 	})
 	y = y + 28
 
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		x = x , y = y, checked = TS.bForceIcon, text = g_tStrings.STR_SHOW_KUNGFU,
 		oncheck = function(bChecked)
 			TS.bForceIcon = bChecked
@@ -545,7 +545,7 @@ function PS.OnPanelActive(frame)
 	})
 	y = y + 28
 
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		x = x , y = y, w = 200, checked = TS.bSpecialSelf, text = _L['Special Self'],
 		oncheck = function(bChecked)
 			TS.bSpecialSelf = bChecked
@@ -554,7 +554,7 @@ function PS.OnPanelActive(frame)
 	})
 	y = y + 28
 
-	ui:append('WndComboBox', {
+	ui:Append('WndComboBox', {
 		x = x, y = y, text = _L['Style Select'],
 		menu = function()
 			local t = {}
@@ -574,7 +574,7 @@ function PS.OnPanelActive(frame)
 	})
 	y = y + 28
 
-	ui:append('WndComboBox', {
+	ui:Append('WndComboBox', {
 		x = x, y = y, text = g_tStrings.STR_SHOW_HATRE_COUNTS,
 		menu = function()
 			local t = {}
@@ -595,10 +595,10 @@ function PS.OnPanelActive(frame)
 	y = y + 28
 
 	x = X
-	ui:append('Text', { x = x, y = y, text = g_tStrings.STR_RAID_MENU_BG_ALPHA, autoenable = IsEnabled })
+	ui:Append('Text', { x = x, y = y, text = g_tStrings.STR_RAID_MENU_BG_ALPHA, autoenable = IsEnabled })
 	x = x + 5
 	y = y + 28
-	ui:append('WndTrackbar', {
+	ui:Append('WndTrackbar', {
 		x = x, y = y, text = '',
 		range = {0, 100},
 		value = TS.nBGAlpha,

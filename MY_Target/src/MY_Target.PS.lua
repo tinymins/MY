@@ -52,27 +52,27 @@ function PS.OnPanelActive(wnd)
 	local X, Y = 20, 20
 	local x, y = X, Y
 	local deltaY = 26
-	ui:append('Text', { x = x, y = y, text = _L['Options'], font = 27 })
+	ui:Append('Text', { x = x, y = y, text = _L['Options'], font = 27 })
 
 	-- target direction
 	x, y = X + 10, y + deltaY
-	x = x + ui:append('WndCheckBox', {
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y,
 		text = _L['Show target direction'],
 		checked = MY_TargetDirection.bEnable,
 		oncheck = function(bChecked)
 			MY_TargetDirection.bEnable = bChecked
 		end,
-	}, true):autoWidth():width()
+	}, true):AutoWidth():Width()
 
-	ui:append('WndComboBox', {
+	ui:Append('WndComboBox', {
 		x = x, y = y, w = 200, text = _L['Distance type'],
 		menu = function()
 			return LIB.GetDistanceTypeMenu(true, MY_TargetDirection.eDistanceType, function(p)
 				MY_TargetDirection.eDistanceType = p.szType
 			end)
 		end,
-	}, true):autoWidth()
+	}, true):AutoWidth()
 
 	if LIB.IsShieldedVersion() then
 		return
@@ -80,88 +80,88 @@ function PS.OnPanelActive(wnd)
 
 	-- target line
 	x, y = X + 10, y + deltaY
-	x = x + ui:append('WndCheckBox', {
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y,
 		text = _L['Display the line from self to target'],
 		checked = MY_TargetLine.bTarget,
 		oncheck = function(bChecked)
 			MY_TargetLine.bTarget = bChecked
 		end,
-	}, true):autoWidth():width()
+	}, true):AutoWidth():Width()
 
-	x = x + ui:append('WndCheckBox', {
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y,
 		text = _L['New style'],
 		checked = MY_TargetLine.bTargetRL,
 		oncheck = function(bChecked)
 			MY_TargetLine.bTargetRL = bChecked
 		end,
-	}, true):autoWidth():width() + 10
+	}, true):AutoWidth():Width() + 10
 
-	x = x + ui:append('Shadow', {
+	x = x + ui:Append('Shadow', {
 		x = x + 2, y = y + 4, w = 18, h = 18,
 		color = MY_TargetLine.tTargetColor,
 		onclick = function()
 			local ui = UI(this)
 			UI.OpenColorPicker(function(r, g, b)
-				ui:color(r, g, b)
+				ui:Color(r, g, b)
 				MY_TargetLine.tTargetColor = { r, g, b }
 			end)
 		end,
 		autoenable = function() return not MY_TargetLine.bTargetRL end,
-	}, true):width() + 5
+	}, true):Width() + 5
 
-	x = x + ui:append('Text', {
+	x = x + ui:Append('Text', {
 		x = x, y = y - 2,
 		text = _L['Change color'],
 		autoenable = function() return not MY_TargetLine.bTargetRL end,
-	}, true):autoWidth():width()
+	}, true):AutoWidth():Width()
 
 	x, y = X + 10, y + deltaY
-	x = x + ui:append('WndCheckBox', {
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y,
 		text = _L['Display the line target self to target target'],
 		checked = MY_TargetLine.bTTarget,
 		oncheck = function(bChecked)
 			MY_TargetLine.bTTarget = bChecked
 		end,
-	}, true):autoWidth():width()
+	}, true):AutoWidth():Width()
 
-	x = x + ui:append('WndCheckBox', {
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y,
 		text = _L['New style'],
 		checked = MY_TargetLine.bTTargetRL,
 		oncheck = function(bChecked)
 			MY_TargetLine.bTTargetRL = bChecked
 		end,
-	}, true):autoWidth():width() + 10
+	}, true):AutoWidth():Width() + 10
 
-	x = x + ui:append('Shadow', {
+	x = x + ui:Append('Shadow', {
 		x = x + 2, y = y + 4, w = 18, h = 18,
 		color = MY_TargetLine.tTTargetColor,
 		onclick = function()
 			local ui = UI(this)
 			UI.OpenColorPicker(function(r, g, b)
-				ui:color(r, g, b)
+				ui:Color(r, g, b)
 				MY_TargetLine.tTTargetColor = { r, g, b }
 			end)
 		end,
 		autoenable = function() return not MY_TargetLine.bTTargetRL end,
-	}, true):width() + 5
+	}, true):Width() + 5
 
-	x = x + ui:append('Text', {
+	x = x + ui:Append('Text', {
 		x = x, y = y - 2,
 		text = _L['Change color'],
 		autoenable = function() return not MY_TargetLine.bTTargetRL end,
-	}, true):autoWidth():width()
+	}, true):AutoWidth():Width()
 
 	x, y = X + 37, y + deltaY
-	x = x + ui:append('Text', {
+	x = x + ui:Append('Text', {
 		text = _L['Line width'], x = x, y = y,
 		autoenable = function() return not MY_TargetLine.bTargetRL or not MY_TargetLine.bTTargetRL end,
-	}, true):autoWidth():width()
+	}, true):AutoWidth():Width()
 
-	ui:append('WndTrackbar', {
+	ui:Append('WndTrackbar', {
 		x = x + 2, y = y + 2,
 		value = MY_TargetLine.nLineWidth,
 		range = {1, 5},
@@ -171,7 +171,7 @@ function PS.OnPanelActive(wnd)
 		autoenable = function() return not MY_TargetLine.bTargetRL or not MY_TargetLine.bTTargetRL end,
 	})
 	x = x + 180
-	x = x + ui:append('WndRadioBox', {
+	x = x + ui:Append('WndRadioBox', {
 		x = x, y = y, w = 100, h = 25, group = 'line postype',
 		text = _L['From head to head'],
 		checked = MY_TargetLine.bAtHead,
@@ -181,16 +181,16 @@ function PS.OnPanelActive(wnd)
 			end
 			MY_TargetLine.bAtHead = true
 		end,
-	}, true):autoWidth():width() + 10
+	}, true):AutoWidth():Width() + 10
 
 
 	x, y = X + 37, y + deltaY
-	x = x + ui:append('Text', {
+	x = x + ui:Append('Text', {
 		text = _L['Line alpha'], x = x, y = y,
 		autoenable = function() return not MY_TargetLine.bTargetRL or not MY_TargetLine.bTTargetRL end,
-	}, true):autoWidth():width()
+	}, true):AutoWidth():Width()
 
-	ui:append('WndTrackbar', {
+	ui:Append('WndTrackbar', {
 		x = x + 2, y = y + 2,
 		value = MY_TargetLine.nLineAlpha,
 		range = {1, 255},
@@ -199,7 +199,7 @@ function PS.OnPanelActive(wnd)
 		autoenable = function() return not MY_TargetLine.bTargetRL or not MY_TargetLine.bTTargetRL end,
 	})
 	x = x + 180
-	x = x + ui:append('WndRadioBox', {
+	x = x + ui:Append('WndRadioBox', {
 		x = x, y = y, w = 100, h = 25, group = 'line postype',
 		text = _L['From foot to foot'],
 		checked = not MY_TargetLine.bAtHead,
@@ -209,26 +209,26 @@ function PS.OnPanelActive(wnd)
 			end
 			MY_TargetLine.bAtHead = false
 		end,
-	}, true):autoWidth():width() + 10
+	}, true):AutoWidth():Width() + 10
 
 	-- target face
 	x, y = X + 10, y + deltaY
-	x = x + ui:append('WndCheckBox', {
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y,
 		text = _L['Display the sector of target facing, change color'],
 		checked = MY_TargetFace.bTargetFace,
 		oncheck = function(bChecked)
 			MY_TargetFace.bTargetFace = bChecked
 		end,
-	}, true):autoWidth():width()
+	}, true):AutoWidth():Width()
 
-	ui:append('Shadow', {
+	ui:Append('Shadow', {
 		x = x + 2, y = y + 2, w = 18, h = 18,
 		color = MY_TargetFace.tTargetFaceColor,
 		onclick = function()
 			local ui = UI(this)
 			UI.OpenColorPicker(function(r, g, b)
-				ui:color(r, g, b)
+				ui:Color(r, g, b)
 				MY_TargetFace.tTargetFaceColor = { r, g, b }
 			end)
 		end,
@@ -236,31 +236,31 @@ function PS.OnPanelActive(wnd)
 
 	-- target target face
 	x, y = X + 10, y + deltaY
-	x = x + ui:append('WndCheckBox', {
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y,
 		text = _L['Display the sector of target target facing, change color'],
 		checked = MY_TargetFace.bTTargetFace,
 		oncheck = function(bChecked)
 			MY_TargetFace.bTTargetFace = bChecked
 		end,
-	}, true):autoWidth():width()
+	}, true):AutoWidth():Width()
 
-	ui:append('Shadow', {
+	ui:Append('Shadow', {
 		x = x + 2, y = y + 2, w = 18, h = 18,
 		color = MY_TargetFace.tTTargetFaceColor,
 		onclick = function()
 			local ui = UI(this)
 			UI.OpenColorPicker(function(r, g, b)
-				ui:color(r, g, b)
+				ui:Color(r, g, b)
 				MY_TargetFace.tTTargetFaceColor = { r, g, b }
 			end)
 		end,
 	})
 
 	x, y = X + 37, y + deltaY
-	x = x + ui:append('Text', { text = _L['The sector angle'], x = x, y = y }, true):autoWidth():width()
+	x = x + ui:Append('Text', { text = _L['The sector angle'], x = x, y = y }, true):AutoWidth():Width()
 
-	ui:append('WndTrackbar', {
+	ui:Append('WndTrackbar', {
 		x = x + 2, y = y + 2,
 		value = MY_TargetFace.nSectorDegree,
 		range = {30, 180},
@@ -270,9 +270,9 @@ function PS.OnPanelActive(wnd)
 	})
 
 	x, y = X + 37, y + deltaY
-	x = x + ui:append('Text', { text = _L['The sector radius'], x = x, y = y }, true):autoWidth():width()
+	x = x + ui:Append('Text', { text = _L['The sector radius'], x = x, y = y }, true):AutoWidth():Width()
 
-	ui:append('WndTrackbar', {
+	ui:Append('WndTrackbar', {
 		x = x + 2, y = y + 2,
 		value = MY_TargetFace.nSectorRadius,
 		range = {1, 26},
@@ -282,9 +282,9 @@ function PS.OnPanelActive(wnd)
 	})
 
 	x, y = X + 37, y + deltaY
-	x = x + ui:append('Text', { text = _L['The sector transparency'], x = x, y = y }, true):autoWidth():width()
+	x = x + ui:Append('Text', { text = _L['The sector transparency'], x = x, y = y }, true):AutoWidth():Width()
 
-	ui:append('WndTrackbar', {
+	ui:Append('WndTrackbar', {
 		x = x + 2, y = y + 2,
 		value = ceil((200 - MY_TargetFace.nSectorAlpha) / 2),
 		range = {0, 100},
@@ -295,49 +295,49 @@ function PS.OnPanelActive(wnd)
 
 	-- foot shape
 	x, y = X, y + deltaY
-	x = x + ui:append('WndCheckBox', {
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y,
 		text = _L['Display the foot shape of target, change color'],
 		checked = MY_TargetFace.bTargetShape,
 		oncheck = function(bChecked) MY_TargetFace.bTargetShape = bChecked end,
-	}, true):autoWidth():width()
+	}, true):AutoWidth():Width()
 
-	ui:append('Shadow', {
+	ui:Append('Shadow', {
 		x = x + 2, y = y + 2, w = 18, h = 18,
 		color = MY_TargetFace.tTargetShapeColor,
 		onclick = function()
 			local ui = UI(this)
 			UI.OpenColorPicker(function(r, g, b)
-				ui:color(r, g, b)
+				ui:Color(r, g, b)
 				MY_TargetFace.tTargetShapeColor = { r, g, b }
 			end)
 		end,
 	})
 
 	x, y = X, y + deltaY
-	x = x + ui:append('WndCheckBox', {
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y,
 		text = _L['Display the foot shape of target target, change color'],
 		checked = MY_TargetFace.bTTargetShape,
 		oncheck = function(bChecked) MY_TargetFace.bTTargetShape = bChecked end,
-	}, true):autoWidth():width()
+	}, true):AutoWidth():Width()
 
-	ui:append('Shadow', {
+	ui:Append('Shadow', {
 		x = x + 2, y = y + 2, w = 18, h = 18,
 		color = MY_TargetFace.tTTargetShapeColor,
 		onclick = function()
 			local ui = UI(this)
 			UI.OpenColorPicker(function(r, g, b)
-				ui:color(r, g, b)
+				ui:Color(r, g, b)
 				MY_TargetFace.tTTargetShapeColor = { r, g, b }
 			end)
 		end,
 	})
 
 	x, y = X + 37, y + deltaY
-	x = x + ui:append('Text', { text = _L['The foot shape radius'], x = x, y = y }, true):autoWidth():width()
+	x = x + ui:Append('Text', { text = _L['The foot shape radius'], x = x, y = y }, true):AutoWidth():Width()
 
-	ui:append('WndTrackbar', {
+	ui:Append('WndTrackbar', {
 		x = x + 2, y = y + 2,
 		value = MY_TargetFace.nShapeRadius,
 		range = {1, 26},
@@ -347,9 +347,9 @@ function PS.OnPanelActive(wnd)
 	})
 
 	x, y = X + 37, y + deltaY
-	x = x + ui:append('Text', { text = _L['The foot shape transparency'], x = x, y = y }, true):autoWidth():width()
+	x = x + ui:Append('Text', { text = _L['The foot shape transparency'], x = x, y = y }, true):AutoWidth():Width()
 
-	ui:append('WndTrackbar', {
+	ui:Append('WndTrackbar', {
 		x = x + 2, y = y + 2,
 		value = ceil((200 - MY_TargetFace.nShapeAlpha) / 2),
 		range = {0, 100},

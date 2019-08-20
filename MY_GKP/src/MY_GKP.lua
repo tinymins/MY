@@ -399,8 +399,8 @@ function MY_GKP.OnFrameCreate()
 	_GKP.hRecordContainer = this:Lookup('PageSet_Menu/Page_GKP_Record/WndScroll_GKP_Record/WndContainer_Record_List')
 	_GKP.hAccountContainer = this:Lookup('PageSet_Menu/Page_GKP_Account/WndScroll_GKP_Account/WndContainer_Account_List')
 	local ui = UI(this)
-	ui:text(_L['GKP Golden Team Record']):anchor('CENTER')
-	ui:append('WndButton', {
+	ui:Text(_L['GKP Golden Team Record']):Anchor('CENTER')
+	ui:Append('WndButton', {
 		x = 875, y = 48, w = 100, h = 35,
 		text = g_tStrings.STR_LOG_SET,
 		onclick = function()
@@ -409,7 +409,7 @@ function MY_GKP.OnFrameCreate()
 			LIB.SwitchTab('MY_GKP')
 		end,
 	})
-	ui:append('WndButton3', {
+	ui:Append('WndButton3', {
 		x = 15, y = 660, text = _L['Add Manually'],
 		onclick = function()
 			if not LIB.IsDistributer() and not MY_GKP.bDebug then -- debug
@@ -418,21 +418,21 @@ function MY_GKP.OnFrameCreate()
 			_GKP.Record()
 		end,
 	})
-	ui:append('WndButton3', { x = 840, y = 620, text = g_tStrings.GOLD_TEAM_SYLARY_LIST, onclick = _GKP.Calculation })
-	ui:append('WndButton3', { name = 'GOLD_TEAM_BID_LIST', x = 840, y = 660, text = g_tStrings.GOLD_TEAM_BID_LIST, onclick = _GKP.SpendingList })
-	ui:append('WndButton3', { name = 'Debt', x = 690, y = 660, text = _L['Debt Issued'], onclick = _GKP.OweList })
-	ui:append('WndButton3', { x = 540, y = 660, text = _L['Clear Record'], onclick = _GKP.ClearData })
-	ui:append('WndButton3', { x = 390, y = 660, text = _L['Loading Record'], menu = _GKP.RecoveryMenu })
-	ui:append('WndButton3', {
+	ui:Append('WndButton3', { x = 840, y = 620, text = g_tStrings.GOLD_TEAM_SYLARY_LIST, onclick = _GKP.Calculation })
+	ui:Append('WndButton3', { name = 'GOLD_TEAM_BID_LIST', x = 840, y = 660, text = g_tStrings.GOLD_TEAM_BID_LIST, onclick = _GKP.SpendingList })
+	ui:Append('WndButton3', { name = 'Debt', x = 690, y = 660, text = _L['Debt Issued'], onclick = _GKP.OweList })
+	ui:Append('WndButton3', { x = 540, y = 660, text = _L['Clear Record'], onclick = _GKP.ClearData })
+	ui:Append('WndButton3', { x = 390, y = 660, text = _L['Loading Record'], menu = _GKP.RecoveryMenu })
+	ui:Append('WndButton3', {
 		x = 240, y = 660, text = _L['Manual SYNC'],
 		lmenu = _GKP.OnSyncFromMenu, rmenu = _GKP.OnSyncToMenu,
 		tip = _L['Left click to sync from others, right click to sync to others'],
 		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
 	})
 
-	local hPageSet = ui:children('#PageSet_Menu')
-	hPageSet:children('#WndCheck_GKP_Record'):children('#Text_GKP_Record'):text(g_tStrings.GOLD_BID_RECORD_STATIC_TITLE)
-	hPageSet:children('#WndCheck_GKP_Account'):children('#Text_GKP_Account'):text(g_tStrings.GOLD_BID_RPAY_STATIC_TITLE)
+	local hPageSet = ui:Children('#PageSet_Menu')
+	hPageSet:Children('#WndCheck_GKP_Record'):Children('#Text_GKP_Record'):Text(g_tStrings.GOLD_BID_RECORD_STATIC_TITLE)
+	hPageSet:Children('#WndCheck_GKP_Account'):Children('#Text_GKP_Account'):Text(g_tStrings.GOLD_BID_RPAY_STATIC_TITLE)
 	LIB.RegisterEsc('MY_GKP', _GKP.IsOpened, _GKP.ClosePanel)
 	-- ≈≈–Ú
 	local page = this:Lookup('PageSet_Menu/Page_GKP_Record')
@@ -579,14 +579,14 @@ function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
 	local X, Y = 10, 10
 	local x, y = X, Y
-	local w, h = ui:size()
+	local w, h = ui:Size()
 
-	ui:append('Text', { x = x, y = y, text = _L['Preference Setting'], font = 27 })
-	ui:append('WndButton3', { x = w - 150, y = y, w = 150, h = 38, text = _L['Open Panel'], onclick = _GKP.OpenPanel })
+	ui:Append('Text', { x = x, y = y, text = _L['Preference Setting'], font = 27 })
+	ui:Append('WndButton3', { x = w - 150, y = y, w = 150, h = 38, text = _L['Open Panel'], onclick = _GKP.OpenPanel })
 	y = y + 28
 
 	x = x + 10
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 200,
 		text = _L['Popup Record for Distributor'], checked = MY_GKP.bOn,
 		oncheck = function(bChecked)
@@ -595,7 +595,7 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + 28
 
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 200,
 		text = _L['Clause with 0 Gold as Record'], checked = MY_GKP.bDisplayEmptyRecords,
 		oncheck = function(bChecked)
@@ -605,7 +605,7 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + 28
 
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 200,
 		color = { 255, 128, 0 } , text = _L['Show Gold Brick'], checked = MY_GKP.bShowGoldBrick,
 		oncheck = function(bChecked)
@@ -617,7 +617,7 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + 28
 
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 200,
 		text = _L['Remind Wipe Data When Enter Dungeon'], checked = MY_GKP.bAlertMessage,
 		oncheck = function(bChecked)
@@ -626,7 +626,7 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + 28
 
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 250,
 		text = _L['Automatic Reception with Record From Distributor'], checked = MY_GKP.bAutoSync,
 		oncheck = function(bChecked)
@@ -636,16 +636,16 @@ function PS.OnPanelActive(wnd)
 	y = y + 28
 
 	y = y + 5
-	ui:append('WndComboBox', { x = x, y = y, w = 150, text = _L['Edit Allowance Protocols'], menu = _GKP.GetSubsidiesMenu })
-	ui:append('WndComboBox', { x = x + 160, y = y, text = _L['Edit Auction Protocols'], menu = _GKP.GetSchemeMenu })
+	ui:Append('WndComboBox', { x = x, y = y, w = 150, text = _L['Edit Allowance Protocols'], menu = _GKP.GetSubsidiesMenu })
+	ui:Append('WndComboBox', { x = x + 160, y = y, text = _L['Edit Auction Protocols'], menu = _GKP.GetSchemeMenu })
 	y = y + 28
 
 	x = X
-	ui:append('Text', { x = x, y = y, text = _L['Money Record'], font = 27 })
+	ui:Append('Text', { x = x, y = y, text = _L['Money Record'], font = 27 })
 	y = y + 28
 
 	x = x + 10
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 150, checked = MY_GKP.bMoneySystem, text = _L['Track Money Trend in the System'],
 		oncheck = function(bChecked)
 			MY_GKP.bMoneySystem = bChecked
@@ -653,7 +653,7 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + 28
 
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 150, text = _L['Enable Money Trend'], checked = MY_GKP.bMoneyTalk,
 		oncheck = function(bChecked)
 			MY_GKP.bMoneyTalk = bChecked
@@ -662,10 +662,10 @@ function PS.OnPanelActive(wnd)
 	y = y + 28
 
 	x = X
-	ui:append('Text', { x = x, y = y, text = _L['GKP Loot'], font = 27 })
+	ui:Append('Text', { x = x, y = y, text = _L['GKP Loot'], font = 27 })
 	x, y = X + 10, y + 28
 
-	x = x + ui:append('WndComboBox', {
+	x = x + ui:Append('WndComboBox', {
 		x = x, y = y, w = 200,
 		text = _L['Confirm when distribute'],
 		lmenu = function()
@@ -704,20 +704,20 @@ function PS.OnPanelActive(wnd)
 			end
 			return t
 		end,
-	}, true):autoWidth():width() + 5
-	x = x + ui:append('WndComboBox', {
+	}, true):AutoWidth():Width() + 5
+	x = x + ui:Append('WndComboBox', {
 		x = x, y = y, w = 200,
 		text = _L['Loot item filter'],
 		menu = MY_GKP_Loot.GetFilterMenu
-	}, true):autoWidth():width() + 5
-	x = x + ui:append('WndComboBox', {
+	}, true):AutoWidth():Width() + 5
+	x = x + ui:Append('WndComboBox', {
 		x = x, y = y, w = 200,
 		text = _L['Auto pickup'],
 		menu = MY_GKP_Loot.GetAutoPickupAllMenu
-	}, true):autoWidth():width() + 5
+	}, true):AutoWidth():Width() + 5
 	x, y = X + 10, y + 28
 
-	x = x + ui:append('WndCheckBox', {
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y,
 		text = _L['Show 2nd kungfu fit icon'],
 		checked = MY_GKP.bShow2ndKungfuLoot,
@@ -725,11 +725,11 @@ function PS.OnPanelActive(wnd)
 			MY_GKP.bShow2ndKungfuLoot = not MY_GKP.bShow2ndKungfuLoot
 			FireUIEvent('MY_GKP_LOOT_RELOAD')
 		end,
-	}, true):autoWidth():width() + 5
+	}, true):AutoWidth():Width() + 5
 	x, y = X + 10, y + 28
 
 	if MY_GKP.bDebug then
-		ui:append('WndCheckBox', {
+		ui:Append('WndCheckBox', {
 			x = w - 130, y = 50, text = 'Enable Debug', checked = MY_GKP.bDebug2,
 			oncheck = function(bChecked)
 				MY_GKP.bDebug2 = bChecked
@@ -1149,11 +1149,11 @@ LIB.RegisterBgMsg('MY_GKP', function(_, nChannel, dwID, szName, bIsSelf, ...)
 				end
 				local ui = UI.CreateFrame(szFrameName, { w = 800, h = 400, text = _L['GKP Golden Team Record'], close = true, anchor = 'CENTER' })
 				local x, y = 20, 50
-				ui:append('Text', { x = x, y = y, w = 760, h = 30, text = _L[data[3]], halign = 1, font = 236, color = { 255, 255, 0 } })
-				ui:append('WndButton3', { name = 'ScreenShot', x = x + 590, y = y, text = _L['Print Ticket'] }, true):toggle(false):click(function()
+				ui:Append('Text', { x = x, y = y, w = 760, h = 30, text = _L[data[3]], halign = 1, font = 236, color = { 255, 255, 0 } })
+				ui:Append('WndButton3', { name = 'ScreenShot', x = x + 590, y = y, text = _L['Print Ticket'] }, true):Toggle(false):Click(function()
 					local scale         = Station.GetUIScale()
-					local left, top     = ui:pos()
-					local width, height = ui:size()
+					local left, top     = ui:Pos()
+					local width, height = ui:Size()
 					local right, bottom = left + width, top + height
 					local btn           = this
 					local path          = GetRootPath() .. string.format('\\ScreenShot\\GKP_Ticket_%s.png', FormatTime('%Y-%m-%d_%H.%M.%S', GetCurrentTime()))
@@ -1166,8 +1166,8 @@ LIB.RegisterBgMsg('MY_GKP', function(_, nChannel, dwID, szName, bIsSelf, ...)
 						end)
 					end, 50)
 				end)
-				ui:append('Text', { w = 120, h = 30, x = x + 40, y = y + 35, text = _L('Operator:%s', szName), font = 41 })
-				ui:append('Text', { w = 720, h = 30, x = x, halign = 2, y = y + 35, text = _L('Print Time:%s', _GKP.GetTimeString(GetCurrentTime())), font = 41 })
+				ui:Append('Text', { w = 120, h = 30, x = x + 40, y = y + 35, text = _L('Operator:%s', szName), font = 41 })
+				ui:Append('Text', { w = 720, h = 30, x = x, halign = 2, y = y + 35, text = _L('Print Time:%s', _GKP.GetTimeString(GetCurrentTime())), font = 41 })
 			end
 			if data[2] == 'Info' then
 				if data[3] == me.szName and tonumber(data[4]) and tonumber(data[4]) <= -100 then
@@ -1186,7 +1186,7 @@ LIB.RegisterBgMsg('MY_GKP', function(_, nChannel, dwID, szName, bIsSelf, ...)
 					local ui = UI(frm)
 					local x, y = 20, 50
 					if n % 2 == 0 then
-						ui:append('Image', { w = 760, h = 30, x = x, y = y + 70 + 30 * n, image = 'ui/Image/button/ShopButton.UITex', imageframe = 75 })
+						ui:Append('Image', { w = 760, h = 30, x = x, y = y + 70 + 30 * n, image = 'ui/Image/button/ShopButton.UITex', imageframe = 75 })
 					end
 					local dwForceID, tBox = -1, {}
 					if me.IsInParty() then
@@ -1205,22 +1205,22 @@ LIB.RegisterBgMsg('MY_GKP', function(_, nChannel, dwID, szName, bIsSelf, ...)
 						end
 					end
 					if dwForceID ~= -1 then
-						ui:append('Image', { w = 28, h = 28, x = x + 30, y = y + 71 + 30 * n }):image(GetForceImage(dwForceID))
+						ui:Append('Image', { w = 28, h = 28, x = x + 30, y = y + 71 + 30 * n }):Image(GetForceImage(dwForceID))
 					end
-					ui:append('Text', { w = 140, h = 30, x = x + 60, y = y + 70 + 30 * n, text = data[3], color = { LIB.GetForceColor(dwForceID) } })
-					local handle = ui:append('Handle', { w = 130, h = 20, x = x + 200, y = y + 70 + 30 * n, handlestyle = 3 }, true)[1]
+					ui:Append('Text', { w = 140, h = 30, x = x + 60, y = y + 70 + 30 * n, text = data[3], color = { LIB.GetForceColor(dwForceID) } })
+					local handle = ui:Append('Handle', { w = 130, h = 20, x = x + 200, y = y + 70 + 30 * n, handlestyle = 3 }, true)[1]
 					handle:AppendItemFromString(_GKP.GetMoneyTipText(tonumber(data[4])))
 					handle:FormatAllItemPos()
 					for k, v in ipairs(tBox) do
 						if k > 12 then
-							ui:append('Text', { x = x + 290 + k * 32 + 5, y = y + 71 + 30 * n, w = 28, h = 28, text = '.....', font = 23 })
+							ui:Append('Text', { x = x + 290 + k * 32 + 5, y = y + 71 + 30 * n, w = 28, h = 28, text = '.....', font = 23 })
 							break
 						end
-						local hBox = ui:append('Box', { x = x + 290 + k * 32, y = y + 71 + 30 * n, w = 28, h = 28, alpha = v.bDelete and 60 }, true)
+						local hBox = ui:Append('Box', { x = x + 290 + k * 32, y = y + 71 + 30 * n, w = 28, h = 28, alpha = v.bDelete and 60 }, true)
 						if v.nUiId ~= 0 then
-							hBox:itemInfo(v.nVersion, v.dwTabType, v.dwIndex, v.nStackNum or v.nBookID)
+							hBox:ItemInfo(v.nVersion, v.dwTabType, v.dwIndex, v.nStackNum or v.nBookID)
 						else
-							hBox:icon(582):hover(function(bHover)
+							hBox:Icon(582):Hover(function(bHover)
 								if bHover then
 									local x, y = this:GetAbsPos()
 									local w, h = this:GetSize()
@@ -1232,7 +1232,7 @@ LIB.RegisterBgMsg('MY_GKP', function(_, nChannel, dwID, szName, bIsSelf, ...)
 						end
 					end
 					if frm.n > 5 then
-						ui:size(800, 30 * frm.n + 250):anchor('CENTER')
+						ui:Size(800, 30 * frm.n + 250):Anchor('CENTER')
 					end
 					frm.n = frm.n + 1
 				end
@@ -1245,11 +1245,11 @@ LIB.RegisterBgMsg('MY_GKP', function(_, nChannel, dwID, szName, bIsSelf, ...)
 						local ui = UI(frm)
 						local x, y = 20, 50
 						local n = frm.n or 0
-						local handle = ui:append('Handle', { w = 230, h = 20, x = x + 30, y = y + 70 + 30 * n + 5, handlestyle = 3 }, true)[1]
+						local handle = ui:Append('Handle', { w = 230, h = 20, x = x + 30, y = y + 70 + 30 * n + 5, handlestyle = 3 }, true)[1]
 						handle:AppendItemFromString(GetFormatText(_L['Total Auction:'], 41) .. _GKP.GetMoneyTipText(tonumber(data[4])))
 						handle:FormatAllItemPos()
 						if LIB.IsDistributer() then
-							ui:append('WndButton4', {
+							ui:Append('WndButton4', {
 								w = 91, h = 26, x = x + 620, y = y + 70 + 30 * n + 5, text = _L['salary'],
 								onclick = function()
 									LIB.Confirm(_L['Confirm?'], _GKP.Bidding)
@@ -1258,9 +1258,9 @@ LIB.RegisterBgMsg('MY_GKP', function(_, nChannel, dwID, szName, bIsSelf, ...)
 						end
 						if data[5] and tonumber(data[5]) then
 							local nTime = tonumber(data[5])
-							ui:append('Text', { w = 725, h = 30, x = x + 0, y = y + 70 + 30 * n + 5, text = _L('Spend time approx %d:%d', nTime / 3600, nTime % 3600 / 60), halign = 1 })
+							ui:Append('Text', { w = 725, h = 30, x = x + 0, y = y + 70 + 30 * n + 5, text = _L('Spend time approx %d:%d', nTime / 3600, nTime % 3600 / 60), halign = 1 })
 						end
-						UI(frm):children('#ScreenShot'):toggle(true)
+						UI(frm):Children('#ScreenShot'):Toggle(true)
 						if n >= 4 then
 							local nMoney = tonumber(data[4]) or 0
 							local t = {
@@ -1278,7 +1278,7 @@ LIB.RegisterBgMsg('MY_GKP', function(_, nChannel, dwID, szName, bIsSelf, ...)
 									break
 								end
 							end
-							local img = ui:append('Image', {
+							local img = ui:Append('Image', {
 								x = x + 590, y = y + n * 30 - 30, w = 150, h = 150, alpha = 180,
 								image = PACKET_INFO.ROOT .. 'MY_GKP/img/GKPSeal.uitex', imageframe = nFrame,
 								hover = function(bHover)
@@ -1643,34 +1643,34 @@ function _GKP.Record(tab, item, bEnter)
 	local x, y = 10, 55
 	local nAuto = 0
 	local dwForceID
-	local hBox = ui:append('Box', { name = 'Box', x = x + 175, y = y + 40, h = 48, w = 48 }, true)
-	local hCheckBox = ui:append('WndCheckBox', { name = 'WndCheckBox', x = x + 50, y = y + 260, font = 65, text = _L['Equiptment Boss'] }, true)
-	local hButton = ui:append('WndButton3', { name = 'Success', x = x + 175, y = y + 260, text = g_tStrings.STR_HOTKEY_SURE }, true)
-	ui:remove(function()
+	local hBox = ui:Append('Box', { name = 'Box', x = x + 175, y = y + 40, h = 48, w = 48 }, true)
+	local hCheckBox = ui:Append('WndCheckBox', { name = 'WndCheckBox', x = x + 50, y = y + 260, font = 65, text = _L['Equiptment Boss'] }, true)
+	local hButton = ui:Append('WndButton3', { name = 'Success', x = x + 175, y = y + 260, text = g_tStrings.STR_HOTKEY_SURE }, true)
+	ui:Remove(function()
 		if ui[1].userdata then
-			ui:children('#Money'):text(0)
-			hButton:click()
+			ui:Children('#Money'):Text(0)
+			hButton:Click()
 		end
 	end)
 
-	ui:append('Text', { x = x + 65, y = y + 10, font = 65, text = _L['Keep Account to:'] })
-	ui:append('Text', { x = x + 65, y = y + 90, font = 65, text = _L['Name of the Item:'] })
-	ui:append('Text', { x = x + 65, y = y + 120, font = 65, text = _L['Route of Acquiring:'] })
-	ui:append('Text', { x = x + 65, y = y + 150, font = 65, text = _L['Auction Price:'] })
+	ui:Append('Text', { x = x + 65, y = y + 10, font = 65, text = _L['Keep Account to:'] })
+	ui:Append('Text', { x = x + 65, y = y + 90, font = 65, text = _L['Name of the Item:'] })
+	ui:Append('Text', { x = x + 65, y = y + 120, font = 65, text = _L['Route of Acquiring:'] })
+	ui:Append('Text', { x = x + 65, y = y + 150, font = 65, text = _L['Auction Price:'] })
 
-	local hPlayer = ui:append('WndComboBox', {
+	local hPlayer = ui:Append('WndComboBox', {
 		name = 'PlayerList',
 		x = x + 140, y = y + 13, text = g_tStrings.PLAYER_NOT_EMPTY,
 		menu = function()
 			return MY_GKP.GetTeamMemberMenu(function(v)
-				local hTeamList = ui:children('#PlayerList')
-				hTeamList:text(v.szName):color(LIB.GetForceColor(v.dwForce))
+				local hTeamList = ui:Children('#PlayerList')
+				hTeamList:Text(v.szName):Color(LIB.GetForceColor(v.dwForce))
 				dwForceID = v.dwForce
 			end, false, true)
 		end,
 	}, true)
-	local hSource = ui:append('WndEditBox', { name = 'Source', x = x + 140, y = y + 121, w = 185, h = 25 }, true)
-    local hName = ui:append('WndAutocomplete', {
+	local hSource = ui:Append('WndEditBox', { name = 'Source', x = x + 140, y = y + 121, w = 185, h = 25 }, true)
+    local hName = ui:Append('WndAutocomplete', {
 		name = 'Name', x = x + 140, y = y + 91, w = 185, h = 25,
 		autocomplete = {
 			{
@@ -1686,20 +1686,20 @@ function _GKP.Record(tab, item, bEnter)
 			{
 				'option', 'afterComplete', function(raw, option, text)
 					if text then
-						ui:children('#Money'):focus()
+						ui:Children('#Money'):Focus()
 					end
 				end,
 			},
 		},
 		onclick = function()
 			if IsPopupMenuOpened() then
-				UI(this):autocomplete('close')
+				UI(this):Autocomplete('close')
 			else
-				UI(this):autocomplete('search', '')
+				UI(this):Autocomplete('search', '')
 			end
 		end,
 	}, true)
-	local hMoney = ui:append('WndAutocomplete', {
+	local hMoney = ui:Append('WndAutocomplete', {
 		name = 'Money', x = x + 140, y = y + 151, w = 185, h = 25, limit = 8, edittype = 1,
 		autocomplete = {
 			{
@@ -1732,46 +1732,46 @@ function _GKP.Record(tab, item, bEnter)
 			local ui = UI(this)
 			if tonumber(szText) or szText == '' or szText == '-' then
 				this.szText = szText
-				ui:color(_GKP.GetMoneyCol(szText))
+				ui:Color(_GKP.GetMoneyCol(szText))
 			else
 				LIB.Sysmsg({_L['Please enter numbers']})
-				ui:text(this.szText or '')
+				ui:Text(this.szText or '')
 			end
 		end,
 	}, true)
 	-- set frame
 	if tab and type(item) == 'userdata' then
-		hPlayer:text(tab.szPlayer):color(LIB.GetForceColor(tab.dwForceID))
-		hName:text(tab.szName):enable(false)
-		hSource:text(tab.szNpcName):enable(false)
+		hPlayer:Text(tab.szPlayer):Color(LIB.GetForceColor(tab.dwForceID))
+		hName:Text(tab.szName):Enable(false)
+		hSource:Text(tab.szNpcName):Enable(false)
 		ui[1].userdata = true
 	else
-		hPlayer:text(g_tStrings.PLAYER_NOT_EMPTY):color(255, 255, 255)
-		hSource:text(_L['Add Manually']):enable(false)
+		hPlayer:Text(g_tStrings.PLAYER_NOT_EMPTY):Color(255, 255, 255)
+		hSource:Text(_L['Add Manually']):Enable(false)
 	end
 	if tab and type(item) == 'number' then -- ±‡º≠
-		hPlayer:text(tab.szPlayer):color(LIB.GetForceColor(tab.dwForceID))
+		hPlayer:Text(tab.szPlayer):Color(LIB.GetForceColor(tab.dwForceID))
 		dwForceID = tab.dwForceID
-		hName:text(tab.szName or LIB.GetItemNameByUIID(tab.nUiId))
-		hMoney:text(tab.nMoney)
-		hSource:text(tab.szNpcName)
+		hName:Text(tab.szName or LIB.GetItemNameByUIID(tab.nUiId))
+		hMoney:Text(tab.nMoney)
+		hSource:Text(tab.szNpcName)
 	end
 
 	if tab and tab.nVersion and tab.nUiId and tab.dwTabType and tab.dwIndex and tab.nUiId ~= 0 then
-		hBox:itemInfo(tab.nVersion, tab.dwTabType, tab.dwIndex, tab.nBookID or tab.nStackNum)
+		hBox:ItemInfo(tab.nVersion, tab.dwTabType, tab.dwIndex, tab.nBookID or tab.nStackNum)
 	else
-		hBox:itemInfo()
-		hBox:icon(582)
+		hBox:ItemInfo()
+		hBox:Icon(582)
 	end
 	if nAuto == 0 and type(item) ~= 'number' and tab then -- edit/add killfocus
-		hMoney:focus()
+		hMoney:Focus()
 	elseif nAuto > 0 and tab then
-		hMoney:text(nAuto) -- OnEditChanged kill
-		ui:focus()
+		hMoney:Text(nAuto) -- OnEditChanged kill
+		ui:Focus()
 	elseif not tab then
-		hName:focus()
+		hName:Focus()
 	end
-	hButton:click(function()
+	hButton:Click(function()
 		if IsCtrlKeyDown() and IsShiftKeyDown() and IsAltKeyDown() then
 			return Wnd.CloseWindow(ui[1])
 		end
@@ -1784,17 +1784,17 @@ function _GKP.Record(tab, item, bEnter)
 			dwIndex    = 0,
 			nTime      = GetCurrentTime(),
 			dwForceID  = dwForceID,
-			szName     = hName:text(),
+			szName     = hName:Text(),
 		}
-		local nMoney = tonumber(hMoney:text()) or 0
-		local szPlayer = hPlayer:text()
-		if hName:text() == '' then
+		local nMoney = tonumber(hMoney:Text()) or 0
+		local szPlayer = hPlayer:Text()
+		if hName:Text() == '' then
 			return LIB.Alert(_L['Please entry the name of the item'])
 		end
 		if szPlayer == g_tStrings.PLAYER_NOT_EMPTY then
 			return LIB.Alert(_L['Select a member who is in charge of account and put money in his account.'])
 		end
-		tab.szNpcName = hSource:text()
+		tab.szNpcName = hSource:Text()
 		tab.nMoney    = nMoney
 		tab.szPlayer  = szPlayer
 		tab.key       = szKey
@@ -1810,7 +1810,7 @@ function _GKP.Record(tab, item, bEnter)
 				LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'add', tab)
 			end
 		elseif tab and type(item) == 'number' then
-			tab.szName = hName:text()
+			tab.szName = hName:Text()
 			tab.dwForceID = dwForceID or tab.dwForceID or 0
 			tab.bEdit = true
 			if LIB.IsDistributer() then
@@ -1833,7 +1833,7 @@ function _GKP.Record(tab, item, bEnter)
 				LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'add', tab)
 			end
 		end
-		if ui:children('#WndCheckBox'):check() then
+		if ui:Children('#WndCheckBox'):Check() then
 			FireUIEvent('MY_GKP_LOOT_BOSS', tab.szPlayer)
 		end
 		if tab and type(item) == 'number' then
@@ -1844,7 +1844,7 @@ function _GKP.Record(tab, item, bEnter)
 		Wnd.CloseWindow(ui[1])
 	end)
 	if bEnter then
-		hButton:click()
+		hButton:Click()
 	end
 end
 

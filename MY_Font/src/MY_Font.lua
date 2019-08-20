@@ -117,7 +117,7 @@ local PS = {}
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
 	local x, y = 10, 30
-	local w, h = ui:size()
+	local w, h = ui:Size()
 	local aFontList = LIB.GetFontList()
 	local aFontName, aFontPath = {}, {}
 
@@ -129,19 +129,19 @@ function PS.OnPanelActive(wnd)
 	for _, p in ipairs(FONT_TYPE) do
 		local szName, szFile, nSize, tStyle = Font.GetFont(p.tIDs[1])
 		if tStyle then
-			-- local ui = ui:append('WndWindow', { w = w, h = 60 }, true)
+			-- local ui = ui:Append('WndWindow', { w = w, h = 60 }, true)
 			local acFile, acName, btnSure
 			local function UpdateBtnEnable()
-				local szNewFile = acFile:text()
+				local szNewFile = acFile:Text()
 				local bFileExist = IsFileExist(szNewFile)
-				acFile:color(bFileExist and {255, 255, 255} or {255, 0, 0})
-				btnSure:enable(bFileExist and szNewFile ~= szFile)
+				acFile:Color(bFileExist and {255, 255, 255} or {255, 0, 0})
+				btnSure:Enable(bFileExist and szNewFile ~= szFile)
 			end
 			x = 10
-			ui:append('Text', { text = _L[' * '] .. p.szName, x = x, y = y })
+			ui:Append('Text', { text = _L[' * '] .. p.szName, x = x, y = y })
 			y = y + 40
 
-			acFile = ui:append('WndAutocomplete', {
+			acFile = ui:Append('WndAutocomplete', {
 				x = x, y = y, w = w - 180 - 30,
 				text = szFile,
 				onchange = function(szText)
@@ -149,37 +149,37 @@ function PS.OnPanelActive(wnd)
 					szText = StringLowerW(szText)
 					for _, p in ipairs(aFontList) do
 						if StringLowerW(p.szFile) == szText then
-							if acName:text() ~= p.szName then
-								acName:text(p.szName)
+							if acName:Text() ~= p.szName then
+								acName:Text(p.szName)
 							end
 							return
 						end
 					end
-					acName:text(g_tStrings.STR_CUSTOM_TEAM)
+					acName:Text(g_tStrings.STR_CUSTOM_TEAM)
 				end,
 				onclick = function()
 					if IsPopupMenuOpened() then
-						UI(this):autocomplete('close')
+						UI(this):Autocomplete('close')
 					else
-						UI(this):autocomplete('search', '')
+						UI(this):Autocomplete('search', '')
 					end
 				end,
 				autocomplete = {{'option', 'source', aFontPath}},
 			}, true)
 
-			ui:append('WndButton', {
+			ui:Append('WndButton', {
 				x = w - 180 - x - 10, y = y, w = 25,
 				text = '...',
 				onclick = function()
 					local file = GetOpenFileName(_L['Please select your font file.'], 'Font File(*.ttf;*.otf;*.fon)\0*.ttf;*.otf;*.fon\0All Files(*.*)\0*.*\0\0')
 					if not IsEmpty(file) then
 						file = LIB.GetRelativePath(file, '') or file
-						acFile:text(wgsub(file, '/', '\\'))
+						acFile:Text(wgsub(file, '/', '\\'))
 					end
 				end,
 			})
 
-			acName = ui:append('WndAutocomplete', {
+			acName = ui:Append('WndAutocomplete', {
 				w = 100, h = 25, x = w - 180 + x, y = y,
 				text = szName,
 				onchange = function(szText)
@@ -187,27 +187,27 @@ function PS.OnPanelActive(wnd)
 					szText = StringLowerW(szText)
 					for _, p in ipairs(aFontList) do
 						if StringLowerW(p.szName) == szText
-						and acFile:text() ~= p.szFile then
-							acFile:text(p.szFile)
+						and acFile:Text() ~= p.szFile then
+							acFile:Text(p.szFile)
 							return
 						end
 					end
 				end,
 				onclick = function()
 					if IsPopupMenuOpened() then
-						UI(this):autocomplete('close')
+						UI(this):Autocomplete('close')
 					else
-						UI(this):autocomplete('search', '')
+						UI(this):Autocomplete('search', '')
 					end
 				end,
 				autocomplete = {{'option', 'source', aFontName}},
 			}, true)
 
-			btnSure = ui:append('WndButton', {
+			btnSure = ui:Append('WndButton', {
 				w = 60, h = 25, x = w - 60, y = y,
 				text = _L['apply'], enable = false,
 				onclick = function()
-					MY_Font.SetFont(p.tIDs, acName:text(), acFile:text())
+					MY_Font.SetFont(p.tIDs, acName:Text(), acFile:Text())
 					szName, szFile, nSize, tStyle = Font.GetFont(p.tIDs[1])
 					UpdateBtnEnable()
 				end

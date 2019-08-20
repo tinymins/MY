@@ -50,28 +50,28 @@ function PS.OnPanelActive(wnd)
 	local X, Y = 20, 30
 	local x, y = X, Y
 
-	y = y + ui:append('Text', { x = x, y = y, text = _L['MY_TeamTools'], font = 27 }, true):height() + 5
+	y = y + ui:Append('Text', { x = x, y = y, text = _L['MY_TeamTools'], font = 27 }, true):Height() + 5
 	x = X + 10
-	x = x + ui:append('WndCheckBox', {
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y,
 		checked = MY_TeamNotice.bEnable,
 		text = _L['Team Message'],
 		oncheck = function(bChecked)
 			MY_TeamNotice.bEnable = bChecked
 		end,
-	}, true):autoWidth():width() + 5
+	}, true):AutoWidth():Width() + 5
 
-	x = x + ui:append('WndCheckBox', {
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y,
 		checked = MY_CharInfo.bEnable,
 		text = _L['Allow view charinfo'],
 		oncheck = function(bChecked)
 			MY_CharInfo.bEnable = bChecked
 		end,
-	}, true):autoWidth():width() + 5
+	}, true):AutoWidth():Width() + 5
 
 	if not LIB.IsShieldedVersion() then
-		x = x + ui:append('WndCheckBox', {
+		x = x + ui:Append('WndCheckBox', {
 			x = x, y = y,
 			checked = MY_WorldMark.bEnable,
 			text = _L['World mark enhance'],
@@ -79,25 +79,25 @@ function PS.OnPanelActive(wnd)
 				MY_WorldMark.bEnable = bChecked
 				MY_WorldMark.CheckEnable()
 			end,
-		}, true):autoWidth():width() + 5
+		}, true):AutoWidth():Width() + 5
 	end
 	y = y + 20
 
 	x = X
 	y = y + 20
-	y = y + ui:append('Text', { x = x, y = y, text = _L['Party Request'], font = 27 }, true):height() + 5
+	y = y + ui:Append('Text', { x = x, y = y, text = _L['Party Request'], font = 27 }, true):Height() + 5
 	x = X + 10
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		x = x, y = y,
 		checked = MY_PartyRequest.bEnable,
 		text = _L['Party Request'],
 		oncheck = function(bChecked)
 			MY_PartyRequest.bEnable = bChecked
 		end,
-	}, true):autoWidth()
+	}, true):AutoWidth()
 	x = x + 10
 	y = y + 25
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		x = x, y = y,
 		checked = MY_PartyRequest.bRefuseLowLv,
 		text = _L['Auto refuse low level player'],
@@ -105,9 +105,9 @@ function PS.OnPanelActive(wnd)
 			MY_PartyRequest.bRefuseLowLv = bChecked
 		end,
 		autoenable = function() return MY_PartyRequest.bEnable end,
-	}, true):autoWidth()
+	}, true):AutoWidth()
 	y = y + 25
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		x = x, y = y,
 		checked = MY_PartyRequest.bRefuseRobot,
 		text = _L['Auto refuse robot player'],
@@ -117,9 +117,9 @@ function PS.OnPanelActive(wnd)
 			MY_PartyRequest.bRefuseRobot = bChecked
 		end,
 		autoenable = function() return MY_PartyRequest.bEnable end,
-	}, true):autoWidth()
+	}, true):AutoWidth()
 	y = y + 25
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		x = x, y = y,
 		checked = MY_PartyRequest.bAcceptFriend,
 		text = _L['Auto accept friend'],
@@ -127,9 +127,9 @@ function PS.OnPanelActive(wnd)
 			MY_PartyRequest.bAcceptFriend = bChecked
 		end,
 		autoenable = function() return MY_PartyRequest.bEnable end,
-	}, true):autoWidth()
+	}, true):AutoWidth()
 	y = y + 25
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		x = x, y = y,
 		checked = MY_PartyRequest.bAcceptTong,
 		text = _L['Auto accept tong member'],
@@ -137,9 +137,9 @@ function PS.OnPanelActive(wnd)
 			MY_PartyRequest.bAcceptTong = bChecked
 		end,
 		autoenable = function() return MY_PartyRequest.bEnable end,
-	}, true):autoWidth()
+	}, true):AutoWidth()
 	y = y + 25
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		x = x, y = y,
 		checked = MY_PartyRequest.bAcceptAll,
 		text = _L['Auto accept all'],
@@ -147,7 +147,7 @@ function PS.OnPanelActive(wnd)
 			MY_PartyRequest.bAcceptAll = bChecked
 		end,
 		autoenable = function() return MY_PartyRequest.bEnable end,
-	}, true):autoWidth()
+	}, true):AutoWidth()
 	y = y + 25
 end
 LIB.RegisterPanel('MY_TeamTools', _L['MY_TeamTools'], _L['Raid'], 5962, PS)

@@ -162,7 +162,7 @@ function LIB.ResizePanel(nWidth, nHeight)
 	if not hFrame then
 		return
 	end
-	LIB.UI(hFrame):size(nWidth, nHeight)
+	LIB.UI(hFrame):Size(nWidth, nHeight)
 end
 
 function LIB.IsPanelVisible()
@@ -407,15 +407,15 @@ function LIB.SwitchTab(szID, bForceUpdate)
 				.. LIB.FormatTimeCounter(LIB.GetTimeOfFee() - GetCurrentTime(), _L['Fee left %H:%mm:%ss'])
 		end
 		local ui = LIB.UI(wnd)
-		local w, h = ui:size()
-		ui:append('Shadow', { name = 'Shadow_Adv', x = 0, y = 0, color = { 140, 140, 140 } })
-		ui:append('Image', { name = 'Image_Adv', x = 0, y = 0, image = PACKET_INFO.UITEX_POSTER, imageframe = (GetTime() % 2) })
-		ui:append('Text', { name = 'Text_Adv', x = 10, y = 300, w = 557, font = 200, text = GetAdvText() })
-		ui:append('Text', { name = 'Text_Memory', x = 10, y = 300, w = 150, alpha = 150, font = 162, text = GetMemoryText(), halign = 2 })
-		ui:append('Text', { name = 'Text_Svr', x = 10, y = 345, w = 557, font = 204, text = GetSvrText(), alpha = 220 })
+		local w, h = ui:Size()
+		ui:Append('Shadow', { name = 'Shadow_Adv', x = 0, y = 0, color = { 140, 140, 140 } })
+		ui:Append('Image', { name = 'Image_Adv', x = 0, y = 0, image = PACKET_INFO.UITEX_POSTER, imageframe = (GetTime() % 2) })
+		ui:Append('Text', { name = 'Text_Adv', x = 10, y = 300, w = 557, font = 200, text = GetAdvText() })
+		ui:Append('Text', { name = 'Text_Memory', x = 10, y = 300, w = 150, alpha = 150, font = 162, text = GetMemoryText(), halign = 2 })
+		ui:Append('Text', { name = 'Text_Svr', x = 10, y = 345, w = 557, font = 204, text = GetSvrText(), alpha = 220 })
 		local x = 7
 		-- 奇遇分享
-		x = x + ui:append('WndCheckBox', {
+		x = x + ui:Append('WndCheckBox', {
 			x = x, y = 375,
 			name = 'WndCheckBox_SerendipityNotify',
 			text = _L['Show share notify.'],
@@ -425,8 +425,8 @@ function LIB.SwitchTab(szID, bForceUpdate)
 			end,
 			tip = _L['Monitor serendipity and show share notify.'],
 			tippostype = UI.TIP_POSITION.BOTTOM_TOP,
-		}, true):autoWidth():width()
-		local xS0 = x + ui:append('WndCheckBox', {
+		}, true):AutoWidth():Width()
+		local xS0 = x + ui:Append('WndCheckBox', {
 			x = x, y = 375,
 			name = 'WndCheckBox_SerendipityAutoShare',
 			text = _L['Auto share.'],
@@ -434,10 +434,10 @@ function LIB.SwitchTab(szID, bForceUpdate)
 			oncheck = function()
 				MY_Serendipity.bAutoShare = not MY_Serendipity.bAutoShare
 			end,
-		}, true):autoWidth():width()
+		}, true):AutoWidth():Width()
 		-- 自动分享子项
 		x = xS0
-		x = x + ui:append('WndCheckBox', {
+		x = x + ui:Append('WndCheckBox', {
 			x = x, y = 375,
 			name = 'WndCheckBox_SerendipitySilentMode',
 			text = _L['Silent mode.'],
@@ -446,9 +446,9 @@ function LIB.SwitchTab(szID, bForceUpdate)
 				MY_Serendipity.bSilentMode = not MY_Serendipity.bSilentMode
 			end,
 			autovisible = function() return MY_Serendipity.bAutoShare end,
-		}, true):autoWidth():width()
+		}, true):AutoWidth():Width()
 		x = x + 5
-		x = x + ui:append('WndEditBox', {
+		x = x + ui:Append('WndEditBox', {
 			x = x, y = 375, w = 105, h = 25,
 			name = 'WndEditBox_SerendipitySilentMode',
 			placeholder = _L['Realname, leave blank for anonymous.'],
@@ -460,10 +460,10 @@ function LIB.SwitchTab(szID, bForceUpdate)
 				LIB.SaveLUAData({'config/realname.jx3dat', PATH_TYPE.ROLE}, szText)
 			end,
 			autovisible = function() return MY_Serendipity.bAutoShare end,
-		}, true):width()
+		}, true):Width()
 		-- 手动分享子项
 		x = xS0
-		x = x + ui:append('WndCheckBox', {
+		x = x + ui:Append('WndCheckBox', {
 			x = x, y = 375,
 			name = 'WndCheckBox_SerendipityNotifyTip',
 			text = _L['Show notify tip.'],
@@ -472,8 +472,8 @@ function LIB.SwitchTab(szID, bForceUpdate)
 				MY_Serendipity.bPreview = not MY_Serendipity.bPreview
 			end,
 			autovisible = function() return not MY_Serendipity.bAutoShare end,
-		}, true):autoWidth():width()
-		x = x + ui:append('WndCheckBox', {
+		}, true):AutoWidth():Width()
+		x = x + ui:Append('WndCheckBox', {
 			x = x, y = 375,
 			name = 'WndCheckBox_SerendipityNotifySound',
 			text = _L['Play notify sound.'],
@@ -483,17 +483,17 @@ function LIB.SwitchTab(szID, bForceUpdate)
 			end,
 			autoenable = function() return not MY_Serendipity.bAutoShare end,
 			autovisible = function() return not MY_Serendipity.bAutoShare end,
-		}, true):autoWidth():width()
-		x = x + ui:append('WndButton', {
+		}, true):AutoWidth():Width()
+		x = x + ui:Append('WndButton', {
 			x = x, y = 375,
 			name = 'WndButton_SerendipitySearch',
 			text = _L['serendipity'],
 			onclick = function()
 				LIB.OpenBrowser('https://j3cx.com/serendipity')
 			end,
-		}, true):autoWidth():width()
+		}, true):AutoWidth():Width()
 		-- 用户设置
-		ui:append('WndButton', {
+		ui:Append('WndButton', {
 			x = 7, y = 405, w = 130,
 			name = 'WndButton_UserPreferenceFolder',
 			text = _L['Open user preference folder'],
@@ -504,8 +504,8 @@ function LIB.SwitchTab(szID, bForceUpdate)
 				end
 				UI.OpenTextEditor(szRoot)
 			end,
-		}, true):autoWidth()
-		ui:append('WndButton', {
+		}, true):AutoWidth()
+		ui:Append('WndButton', {
 			x = 142, y = 405, w = 130,
 			name = 'WndButton_ServerPreferenceFolder',
 			text = _L['Open server preference folder'],
@@ -516,8 +516,8 @@ function LIB.SwitchTab(szID, bForceUpdate)
 				end
 				UI.OpenTextEditor(szRoot)
 			end,
-		}, true):autoWidth()
-		ui:append('WndButton', {
+		}, true):AutoWidth()
+		ui:Append('WndButton', {
 			x = 277, y = 405, w = 130,
 			name = 'WndButton_GlobalPreferenceFolder',
 			text = _L['Open global preference folder'],
@@ -528,40 +528,40 @@ function LIB.SwitchTab(szID, bForceUpdate)
 				end
 				UI.OpenTextEditor(szRoot)
 			end,
-		}, true):autoWidth()
+		}, true):AutoWidth()
 		wnd.OnPanelResize = function(wnd)
-			local w, h = LIB.UI(wnd):size()
+			local w, h = LIB.UI(wnd):Size()
 			local scaleH = w / 557 * 278
 			local bottomH = 90
 			if scaleH > h - bottomH then
-				ui:children('#Shadow_Adv'):size((h - bottomH) / 278 * 557, (h - bottomH))
-				ui:children('#Image_Adv'):size((h - bottomH) / 278 * 557, (h - bottomH))
-				ui:children('#Text_Memory'):pos(w - 150, h - bottomH + 10)
-				ui:children('#Text_Adv'):pos(10, h - bottomH + 10)
-				ui:children('#Text_Svr'):pos(10, h - bottomH + 35)
+				ui:Children('#Shadow_Adv'):Size((h - bottomH) / 278 * 557, (h - bottomH))
+				ui:Children('#Image_Adv'):Size((h - bottomH) / 278 * 557, (h - bottomH))
+				ui:Children('#Text_Memory'):Pos(w - 150, h - bottomH + 10)
+				ui:Children('#Text_Adv'):Pos(10, h - bottomH + 10)
+				ui:Children('#Text_Svr'):Pos(10, h - bottomH + 35)
 			else
-				ui:children('#Shadow_Adv'):size(w, scaleH)
-				ui:children('#Image_Adv'):size(w, scaleH)
-				ui:children('#Text_Memory'):pos(w - 150, scaleH + 10)
-				ui:children('#Text_Adv'):pos(10, scaleH + 10)
-				ui:children('#Text_Svr'):pos(10, scaleH + 35)
+				ui:Children('#Shadow_Adv'):Size(w, scaleH)
+				ui:Children('#Image_Adv'):Size(w, scaleH)
+				ui:Children('#Text_Memory'):Pos(w - 150, scaleH + 10)
+				ui:Children('#Text_Adv'):Pos(10, scaleH + 10)
+				ui:Children('#Text_Svr'):Pos(10, scaleH + 35)
 			end
-			ui:children('#WndCheckBox_SerendipityNotify'):top(scaleH + 65)
-			ui:children('#WndCheckBox_SerendipityAutoShare'):top(scaleH + 65)
-			ui:children('#WndCheckBox_SerendipitySilentMode'):top(scaleH + 65)
-			ui:children('#WndEditBox_SerendipitySilentMode'):top(scaleH + 65)
-			ui:children('#WndCheckBox_SerendipityNotifyTip'):top(scaleH + 65)
-			ui:children('#WndCheckBox_SerendipityNotifySound'):top(scaleH + 65)
-			ui:children('#WndButton_SerendipitySearch'):top(scaleH + 65)
-			ui:children('#WndButton_UserPreferenceFolder'):top(scaleH + 95)
-			ui:children('#WndButton_ServerPreferenceFolder'):top(scaleH + 95)
-			ui:children('#WndButton_GlobalPreferenceFolder'):top(scaleH + 95)
+			ui:Children('#WndCheckBox_SerendipityNotify'):Top(scaleH + 65)
+			ui:Children('#WndCheckBox_SerendipityAutoShare'):Top(scaleH + 65)
+			ui:Children('#WndCheckBox_SerendipitySilentMode'):Top(scaleH + 65)
+			ui:Children('#WndEditBox_SerendipitySilentMode'):Top(scaleH + 65)
+			ui:Children('#WndCheckBox_SerendipityNotifyTip'):Top(scaleH + 65)
+			ui:Children('#WndCheckBox_SerendipityNotifySound'):Top(scaleH + 65)
+			ui:Children('#WndButton_SerendipitySearch'):Top(scaleH + 65)
+			ui:Children('#WndButton_UserPreferenceFolder'):Top(scaleH + 95)
+			ui:Children('#WndButton_ServerPreferenceFolder'):Top(scaleH + 95)
+			ui:Children('#WndButton_GlobalPreferenceFolder'):Top(scaleH + 95)
 		end
 		wnd.OnPanelResize(wnd)
 		LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '#TAB#DEFAULT', 500, function()
-			ui:children('#Text_Adv'):text(GetAdvText())
-			ui:children('#Text_Svr'):text(GetSvrText())
-			ui:children('#Text_Memory'):text(GetMemoryText())
+			ui:Children('#Text_Adv'):Text(GetAdvText())
+			ui:Children('#Text_Svr'):Text(GetSvrText())
+			ui:Children('#Text_Memory'):Text(GetMemoryText())
 		end)
 		wnd.OnPanelDeactive = function()
 			LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '#TAB#DEFAULT', false)
@@ -771,11 +771,11 @@ function LIB.OnCheckBoxCheck()
 	local name = this:GetName()
 	if name == 'CheckBox_Maximize' then
 		local ui = LIB.UI(this:GetRoot())
-		anchor = ui:anchor()
-		w, h = ui:size()
-		ui:pos(0, 0):event('UI_SCALED.FRAME_MAXIMIZE_RESIZE', function()
-			ui:size(Station.GetClientSize())
-		end):drag(false)
+		anchor = ui:Anchor()
+		w, h = ui:Size()
+		ui:Pos(0, 0):Event('UI_SCALED.FRAME_MAXIMIZE_RESIZE', function()
+			ui:Size(Station.GetClientSize())
+		end):Drag(false)
 		LIB.ResizePanel(Station.GetClientSize())
 	end
 end
@@ -785,9 +785,9 @@ function LIB.OnCheckBoxUncheck()
 	if name == 'CheckBox_Maximize' then
 		LIB.ResizePanel(w, h)
 		LIB.UI(this:GetRoot())
-			:event('UI_SCALED.FRAME_MAXIMIZE_RESIZE')
-			:drag(true)
-			:anchor(anchor)
+			:Event('UI_SCALED.FRAME_MAXIMIZE_RESIZE')
+			:Drag(true)
+			:Anchor(anchor)
 	end
 end
 end
@@ -796,7 +796,7 @@ function LIB.OnDragButtonBegin()
 	local name = this:GetName()
 	if name == 'Btn_Drag' then
 		this.fDragX, this.fDragY = Station.GetMessagePos()
-		this.fDragW, this.fDragH = LIB.UI(this:GetRoot()):size()
+		this.fDragW, this.fDragH = LIB.UI(this:GetRoot()):Size()
 	end
 end
 
@@ -826,7 +826,7 @@ function LIB.OnFrameCreate()
 	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
 	this:CorrectPos()
 	this:RegisterEvent('UI_SCALED')
-	LIB.UI(this):size(OnSizeChanged)
+	LIB.UI(this):Size(OnSizeChanged)
 end
 
 function LIB.OnEvent(event)
@@ -859,51 +859,51 @@ do
 local PS = {}
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
-	local w, h = ui:size()
+	local w, h = ui:Size()
 	local X, Y = 20, 20
 	local x, y = X, Y
 
-	ui:append('Text', {
+	ui:Append('Text', {
 		x = X - 10, y = y,
 		text = _L['Force color'],
 		color = { 255, 255, 0 },
-	}, true):autoWidth()
+	}, true):AutoWidth()
 	x, y = X, y + 30
 	for _, dwForceID in pairs_c(CONSTANT.FORCE_TYPE) do
 		local x0 = x
-		local sha = ui:append('Shadow', {
+		local sha = ui:Append('Shadow', {
 			x = x, y = y, w = 100, h = 25,
 			text = g_tStrings.tForceTitle[dwForceID],
 			color = { LIB.GetForceColor(dwForceID, 'background') },
 		}, true)
-		local txt = ui:append('Text', {
+		local txt = ui:Append('Text', {
 			x = x + 5, y = y, w = 100, h = 25,
 			text = g_tStrings.tForceTitle[dwForceID],
 			color = { LIB.GetForceColor(dwForceID, 'foreground') },
 		}, true)
 		x = x + 105
-		ui:append('Shadow', {
+		ui:Append('Shadow', {
 			x = x, y = y, w = 25, h = 25,
 			color = { LIB.GetForceColor(dwForceID, 'foreground') },
 			onclick = function()
 				local this = this
 				UI.OpenColorPicker(function(r, g, b)
 					LIB.SetForceColor(dwForceID, 'foreground', { r, g, b })
-					txt:color(r, g, b)
-					UI(this):color(r, g, b)
+					txt:Color(r, g, b)
+					UI(this):Color(r, g, b)
 				end)
 			end,
 		})
 		x = x + 30
-		ui:append('Shadow', {
+		ui:Append('Shadow', {
 			x = x, y = y, w = 25, h = 25,
 			color = { LIB.GetForceColor(dwForceID, 'background') },
 			onclick = function()
 				local this = this
 				UI.OpenColorPicker(function(r, g, b)
 					LIB.SetForceColor(dwForceID, 'background', { r, g, b })
-					sha:color(r, g, b)
-					UI(this):color(r, g, b)
+					sha:Color(r, g, b)
+					UI(this):Color(r, g, b)
 				end)
 			end,
 		})
@@ -914,7 +914,7 @@ function PS.OnPanelActive(wnd)
 			y = y + 35
 		end
 	end
-	ui:append('WndButton2', {
+	ui:Append('WndButton2', {
 		x = x, y = y, w = 160,
 		text = _L['Restore default'],
 		onclick = function()
@@ -924,47 +924,47 @@ function PS.OnPanelActive(wnd)
 	})
 
 	y = y + 45
-	ui:append('Text', {
+	ui:Append('Text', {
 		x = X - 10, y = y,
 		text = _L['Camp color'],
 		color = { 255, 255, 0 },
-	}, true):autoWidth()
+	}, true):AutoWidth()
 	x, y = X, y + 30
 	for _, nCamp in ipairs({ CAMP.NEUTRAL, CAMP.GOOD, CAMP.EVIL }) do
 		local x0 = x
-		local sha = ui:append('Shadow', {
+		local sha = ui:Append('Shadow', {
 			x = x, y = y, w = 100, h = 25,
 			text = g_tStrings.STR_CAMP_TITLE[nCamp],
 			color = { LIB.GetCampColor(nCamp, 'background') },
 		}, true)
-		local txt = ui:append('Text', {
+		local txt = ui:Append('Text', {
 			x = x + 5, y = y, w = 100, h = 25,
 			text = g_tStrings.STR_CAMP_TITLE[nCamp],
 			color = { LIB.GetCampColor(nCamp, 'foreground') },
 		}, true)
 		x = x + 105
-		ui:append('Shadow', {
+		ui:Append('Shadow', {
 			x = x, y = y, w = 25, h = 25,
 			color = { LIB.GetCampColor(nCamp, 'foreground') },
 			onclick = function()
 				local this = this
 				UI.OpenColorPicker(function(r, g, b)
 					LIB.SetCampColor(nCamp, 'foreground', { r, g, b })
-					txt:color(r, g, b)
-					UI(this):color(r, g, b)
+					txt:Color(r, g, b)
+					UI(this):Color(r, g, b)
 				end)
 			end,
 		})
 		x = x + 30
-		ui:append('Shadow', {
+		ui:Append('Shadow', {
 			x = x, y = y, w = 25, h = 25,
 			color = { LIB.GetCampColor(nCamp, 'background') },
 			onclick = function()
 				local this = this
 				UI.OpenColorPicker(function(r, g, b)
 					LIB.SetCampColor(nCamp, 'background', { r, g, b })
-					sha:color(r, g, b)
-					UI(this):color(r, g, b)
+					sha:Color(r, g, b)
+					UI(this):Color(r, g, b)
 				end)
 			end,
 		})
@@ -975,7 +975,7 @@ function PS.OnPanelActive(wnd)
 			y = y + 35
 		end
 	end
-	ui:append('WndButton2', {
+	ui:Append('WndButton2', {
 		x = x, y = y, w = 160,
 		text = _L['Restore default'],
 		onclick = function()
@@ -992,19 +992,19 @@ do
 local PS = {}
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
-	local w, h = ui:size()
+	local w, h = ui:Size()
 	local X, Y = 20, 20
 	local x, y = X, Y
 
-	ui:append('Text', {
+	ui:Append('Text', {
 		x = X - 10, y = y,
 		text = _L['Distance type'],
 		color = { 255, 255, 0 },
-	}, true):autoWidth()
+	}, true):AutoWidth()
 	x, y = X, y + 30
 
 	for _, p in ipairs(LIB.GetDistanceTypeList()) do
-		x = x + ui:append('WndRadioBox', {
+		x = x + ui:Append('WndRadioBox', {
 			x = x, y = y, w = 100, h = 25, group = 'distance type',
 			text = p.szText,
 			checked = LIB.GetGlobalDistanceType() == p.szType,
@@ -1014,46 +1014,46 @@ function PS.OnPanelActive(wnd)
 				end
 				LIB.SetGlobalDistanceType(p.szType)
 			end,
-		}, true):autoWidth():width() + 10
+		}, true):AutoWidth():Width() + 10
 	end
 	x, y = X, y + 30
 
-	ui:append('Text', {
+	ui:Append('Text', {
 		x = X - 10, y = y,
 		text = _L['System Info'],
 		color = { 255, 255, 0 },
-	}, true):autoWidth()
+	}, true):AutoWidth()
 	y = y + 30
 
-	local uiMemory = ui:append('Text', {
+	local uiMemory = ui:Append('Text', {
 		x = x, y = y, w = 150,
 		alpha = 150, font = 162,
 	}, true)
 	y = y + 25
 
-	local uiSize = ui:append('Text', {
+	local uiSize = ui:Append('Text', {
 		x = x, y = y, w = 150,
 		alpha = 150, font = 162,
 	}, true)
 	y = y + 25
 
-	local uiUIScale = ui:append('Text', {
+	local uiUIScale = ui:Append('Text', {
 		x = x, y = y, w = 150,
 		alpha = 150, font = 162,
 	}, true)
 	y = y + 25
 
-	local uiFontScale = ui:append('Text', {
+	local uiFontScale = ui:Append('Text', {
 		x = x, y = y, w = 150,
 		alpha = 150, font = 162,
 	}, true)
 	y = y + 25
 
 	local function onRefresh()
-		uiMemory:text(format('Memory: %.2fMB', collectgarbage('count') / 1024))
-		uiSize:text(format('UISize: %.2fx%.2f', Station.GetClientSize()))
-		uiUIScale:text(format('UIScale: %.2f (%.2f)', LIB.GetUIScale(), LIB.GetOriginUIScale()))
-		uiFontScale:text(format('FontScale: %.2f (%.2f)', LIB.GetFontScale(), Font.GetOffset()))
+		uiMemory:Text(format('Memory: %.2fMB', collectgarbage('count') / 1024))
+		uiSize:Text(format('UISize: %.2fx%.2f', Station.GetClientSize()))
+		uiUIScale:Text(format('UIScale: %.2f (%.2f)', LIB.GetUIScale(), LIB.GetOriginUIScale()))
+		uiFontScale:Text(format('FontScale: %.2f (%.2f)', LIB.GetFontScale(), Font.GetOffset()))
 	end
 	onRefresh()
 	LIB.BreatheCall('GlobalConfig', onRefresh)

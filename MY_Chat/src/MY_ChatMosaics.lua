@@ -133,10 +133,10 @@ LIB.RegisterPanel('MY_Chat_ChatMosaics', _L['chat mosaics'], _L['Chat'],
 'ui/Image/UICommon/yirong3.UITex|50', {
 OnPanelActive = function(wnd)
 	local ui = UI(wnd)
-	local w, h = ui:size()
+	local w, h = ui:Size()
 	local x, y = 20, 30
 
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		text = _L['chat mosaics (mosaics names in chat panel)'],
 		x = x, y = y, w = 400,
 		checked = MY_ChatMosaics.bEnabled,
@@ -147,7 +147,7 @@ OnPanelActive = function(wnd)
 	})
 	y = y + 30
 
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		text = _L['no mosaics on my own name'],
 		x = x, y = y, w = 400,
 		checked = MY_ChatMosaics.bIgnoreOwnName,
@@ -158,7 +158,7 @@ OnPanelActive = function(wnd)
 	})
 	y = y + 30
 
-	ui:append('WndRadioBox', {
+	ui:Append('WndRadioBox', {
 		text = _L['part mosaics A (mosaics except 1st and last character)'],
 		x = x, y = y, w = 400,
 		group = 'PART_MOSAICS',
@@ -172,7 +172,7 @@ OnPanelActive = function(wnd)
 	})
 	y = y + 30
 
-	ui:append('WndRadioBox', {
+	ui:Append('WndRadioBox', {
 		text = _L['part mosaics B (mosaics except 1st character)'],
 		x = x, y = y, w = 400,
 		group = 'PART_MOSAICS',
@@ -186,7 +186,7 @@ OnPanelActive = function(wnd)
 	})
 	y = y + 30
 
-	ui:append('WndRadioBox', {
+	ui:Append('WndRadioBox', {
 		text = _L['part mosaics C (mosaics except last character)'],
 		x = x, y = y, w = 400,
 		group = 'PART_MOSAICS',
@@ -200,7 +200,7 @@ OnPanelActive = function(wnd)
 	})
 	y = y + 30
 
-	ui:append('WndRadioBox', {
+	ui:Append('WndRadioBox', {
 		text = _L['part mosaics D (mosaics all character)'],
 		x = x, y = y, w = 400,
 		group = 'PART_MOSAICS',
@@ -214,7 +214,7 @@ OnPanelActive = function(wnd)
 	})
 	y = y + 30
 
-	ui:append('WndEditBox', {
+	ui:Append('WndEditBox', {
 		placeholder = _L['mosaics character'],
 		x = x, y = y, w = w - 2 * x, h = 25,
 		text = MY_ChatMosaics.szMosaics,
@@ -229,7 +229,7 @@ OnPanelActive = function(wnd)
 	})
 	y = y + 30
 
-	ui:append('WndEditBox', {
+	ui:Append('WndEditBox', {
 		placeholder = _L['unmosaics names (split by comma)'],
 		x = x, y = y, w = w - 2 * x, h = h - y - 50,
 		text = (function()

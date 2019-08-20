@@ -266,7 +266,7 @@ end
 LIB.RegisterInit('MY_AutoHideChat', D.Apply)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 'auto',
 		text = _L['auto hide chat panel'],
 		checked = MY_AutoHideChat.bEnable,

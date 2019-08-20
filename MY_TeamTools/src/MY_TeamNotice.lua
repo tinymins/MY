@@ -67,8 +67,8 @@ function TI.CreateFrame(a, b)
 	local ui = TI.GetFrame()
 	if ui then
 		ui = UI(ui)
-		ui:children('#YY'):text(a, WNDEVENT_FIRETYPE.PREVENT)
-		ui:children('#Message'):text(b, WNDEVENT_FIRETYPE.PREVENT)
+		ui:Children('#YY'):Text(a, WNDEVENT_FIRETYPE.PREVENT)
+		ui:Children('#Message'):Text(b, WNDEVENT_FIRETYPE.PREVENT)
 	else
 		ui = UI.CreateFrame('MY_TeamNotice', {
 			w = 320, h = 195,
@@ -82,16 +82,16 @@ function TI.CreateFrame(a, b)
 			end,
 		})
 		local x, y = 10, 5
-		x = x + ui:append('Text', { x = x, y = y - 3, text = _L['YY:'], font = 48 }, true):autoWidth():width() + 5
-		x = x + ui:append('WndAutocomplete', {
+		x = x + ui:Append('Text', { x = x, y = y - 3, text = _L['YY:'], font = 48 }, true):AutoWidth():Width() + 5
+		x = x + ui:Append('WndAutocomplete', {
 			name = 'YY',
 			w = 160, h = 26, x = x, y = y,
 			text = a, font = 48, color = { 128, 255, 0 },
 			onclick = function()
 				if IsPopupMenuOpened() then
-					UI(this):autocomplete('close')
+					UI(this):Autocomplete('close')
 				elseif LIB.IsLeader() then
-					UI(this):autocomplete('search', '')
+					UI(this):Autocomplete('search', '')
 				end
 			end,
 			onchange = function(szText)
@@ -100,9 +100,9 @@ function TI.CreateFrame(a, b)
 				end
 				if LIB.IsLeader() then
 					TI.szYY = szText
-					LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', 'Edit', szText, ui:children('#Message'):text())
+					LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', 'Edit', szText, ui:Children('#Message'):Text())
 				else
-					ui:children('#YY'):text(TI.szYY, WNDEVENT_FIRETYPE.PREVENT)
+					ui:Children('#YY'):Text(TI.szYY, WNDEVENT_FIRETYPE.PREVENT)
 				end
 			end,
 			autocomplete = {
@@ -129,11 +129,11 @@ function TI.CreateFrame(a, b)
 					end,
 				},
 			},
-		}, true):width() + 5
-		y = y + ui:append('WndButton2', {
+		}, true):Width() + 5
+		y = y + ui:Append('WndButton2', {
 			x = x, y = y, text = _L['Paste YY'],
 			onclick = function()
-				local yy = ui:children('#YY'):text()
+				local yy = ui:Children('#YY'):Text()
 				if tonumber(yy) then
 					TI.tList = TI.GetList()
 					if not TI.tList[tonumber(yy)] then
@@ -146,13 +146,13 @@ function TI.CreateFrame(a, b)
 						LIB.Talk(PLAYER_TALK_CHANNEL.RAID, yy)
 					end
 				end
-				local message = ui:children('#Message'):text():gsub('\n', ' ')
+				local message = ui:Children('#Message'):Text():gsub('\n', ' ')
 				if message ~= '' then
 					LIB.Talk(PLAYER_TALK_CHANNEL.RAID, message)
 				end
 			end,
-		}, true):height() + 5
-		ui:append('WndEditBox', {
+		}, true):Height() + 5
+		ui:Append('WndEditBox', {
 			name = 'Message',
 			w = 300, h = 80, x = 10, y = y,
 			multiline = true, limit = 512,
@@ -163,15 +163,15 @@ function TI.CreateFrame(a, b)
 				end
 				if LIB.IsLeader() then
 					TI.szNote = szText
-					LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', 'Edit', ui:children('#YY'):text(), szText)
+					LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', 'Edit', ui:Children('#YY'):Text(), szText)
 				else
-					ui:children('#Message'):text(TI.szNote, WNDEVENT_FIRETYPE.PREVENT)
+					ui:Children('#Message'):Text(TI.szNote, WNDEVENT_FIRETYPE.PREVENT)
 				end
 			end,
 		})
 		x, y = 5, 130
-		x = x + ui:append('WndButton2', { x = x, y = y, text = _L['Raid Tools'], onclick = MY_RaidTools.TogglePanel }, true):autoWidth():width() + 5
-		x = x + ui:append('WndButton2', {
+		x = x + ui:Append('WndButton2', { x = x, y = y, text = _L['Raid Tools'], onclick = MY_RaidTools.TogglePanel }, true):AutoWidth():Width() + 5
+		x = x + ui:Append('WndButton2', {
 			x = x, y = y,
 			text = _L['GKP Golden Team Record'],
 			onclick = function()
@@ -181,9 +181,9 @@ function TI.CreateFrame(a, b)
 					LIB.Alert(_L['You haven\'t had MY_GKP installed and loaded yet.'])
 				end
 			end,
-		}, true):autoWidth():width() + 5
+		}, true):AutoWidth():Width() + 5
 		if MY_TeamMon_RR then
-			x = x + ui:append('WndButton2', { x = x, y = y, text = _L['Import Data'], onclick = MY_TeamMon_RR.OpenPanel }, true):autoWidth():width() + 5
+			x = x + ui:Append('WndButton2', { x = x, y = y, text = _L['Import Data'], onclick = MY_TeamMon_RR.OpenPanel }, true):AutoWidth():Width() + 5
 		end
 		-- ×¢²áÊÂ¼þ
 		local frame = TI.GetFrame()
@@ -194,17 +194,17 @@ function TI.CreateFrame(a, b)
 		frame:RegisterEvent('UI_SCALED')
 		frame.OnEvent = function(szEvent)
 			if szEvent == 'PARTY_DISBAND' then
-				ui:remove()
+				ui:Remove()
 			elseif szEvent == 'PARTY_DELETE_MEMBER' then
 				if arg1 == UI_GetClientPlayerID() then
-					ui:remove()
+					ui:Remove()
 				end
 			elseif szEvent == 'PARTY_ADD_MEMBER' then
 				if LIB.IsLeader() then
 					LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', 'reply', arg1, TI.szYY, TI.szNote)
 				end
 			elseif szEvent == 'UI_SCALED' then
-				ui:anchor(MY_TeamNotice.anchor)
+				ui:Anchor(MY_TeamNotice.anchor)
 			end
 		end
 		frame.OnFrameDragSetPosEnd = function()

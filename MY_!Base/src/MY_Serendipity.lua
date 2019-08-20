@@ -188,19 +188,19 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTi
 				w = w, h = h, close = true, text = '', anchor = 'CENTER',
 			})
 			if szMode == 'auto' then
-				ui:alpha(200)
-				ui:anchor({ x = 0, y = -60, s = 'BOTTOMRIGHT', r = 'BOTTOMRIGHT' })
+				ui:Alpha(200)
+				ui:Anchor({ x = 0, y = -60, s = 'BOTTOMRIGHT', r = 'BOTTOMRIGHT' })
 			end
-			ui:append('Handle', { x = 10, y = (h - 90) / 2, w = w - 20, h = h, valign = 1, halign = 1, handlestyle = 3 }, true)
-				:append('Text', {
+			ui:Append('Handle', { x = 10, y = (h - 90) / 2, w = w - 20, h = h, valign = 1, halign = 1, handlestyle = 3 }, true)
+				:Append('Text', {
 					text = (szName == '' and _L['Anonymous'] or szName)
 						.. '\n' .. szSerendipity .. ' - ' .. LIB.FormatTime(dwTime, '%hh:%mm:%ss')
 						.. '\n' .. (szReporter == '' and '' or (szReporter .. _L[','])) .. _L['JX3 is pround of you!']
 						.. '\n' .. _L['Thanks for your kindness!'],
 					fontscale = 1.2,
 				})
-				:formatChildrenPos()
-			LIB.DelayCall(10000, function() ui:remove() end)
+				:FormatChildrenPos()
+			LIB.DelayCall(10000, function() ui:Remove() end)
 			LIB.DismissNotify(szKey)
 		end
 	end

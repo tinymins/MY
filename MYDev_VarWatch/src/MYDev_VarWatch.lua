@@ -102,14 +102,14 @@ LIB.RegisterPanel(
 	OnPanelActive = function(wnd)
 		local ui = UI(wnd)
 		local x, y = 10, 10
-		local w, h = ui:size()
+		local w, h = ui:Size()
 		local nLimit = 20
 
 		local tWndEditK = {}
 		local tWndEditV = {}
 
 		for i = 1, nLimit do
-			tWndEditK[i] = ui:append('WndEditBox', {
+			tWndEditK[i] = ui:Append('WndEditBox', {
 				name = 'WndEditBox_K' .. i,
 				text = _C.tVarList[i],
 				x = x, y = y + (i - 1) * 25,
@@ -119,14 +119,14 @@ LIB.RegisterPanel(
 					_C.tVarList[i] = LIB.TrimString(text)
 					LIB.SaveLUAData(DATA_PATH, _C.tVarList)
 				end,
-			}):children('#WndEditBox_K' .. i)
+			}):Children('#WndEditBox_K' .. i)
 
-			tWndEditV[i] = ui:append('WndEditBox', {
+			tWndEditV[i] = ui:Append('WndEditBox', {
 				name = 'WndEditBox_V' .. i,
 				x = x + 150, y = y + (i - 1) * 25,
 				w = w - 2 * x - 150, h = 25,
 				color = {255, 255, 255},
-			}):children('#WndEditBox_V' .. i)
+			}):Children('#WndEditBox_V' .. i)
 		end
 
 		LIB.BreatheCall('DEV_VARWATCH', function()
@@ -136,8 +136,8 @@ LIB.RegisterPanel(
 				if not IsEmpty(szKey) and -- 忽略空白的Key
 				wnd:GetRoot():IsVisible() and ( -- 主界面隐藏了就不要解析了
 					not hFocus or (
-						not hFocus:GetTreePath():find(tWndEditK[i]:name()) and  -- 忽略K编辑中的
-						not hFocus:GetTreePath():find(tWndEditV[i]:name()) -- 忽略V编辑中的
+						not hFocus:GetTreePath():find(tWndEditK[i]:Name()) and  -- 忽略K编辑中的
+						not hFocus:GetTreePath():find(tWndEditV[i]:Name()) -- 忽略V编辑中的
 					)
 				) then
 					if loadstring then
@@ -145,9 +145,9 @@ LIB.RegisterPanel(
 						for k, v in pairs(t) do
 							t[k] = tostring(v)
 						end
-						tWndEditV[i]:text(concat(t, ', '))
+						tWndEditV[i]:Text(concat(t, ', '))
 					else
-						tWndEditV[i]:text(var2str_x(LIB.GetGlobalValue(szKey)))
+						tWndEditV[i]:Text(var2str_x(LIB.GetGlobalValue(szKey)))
 					end
 				end
 			end

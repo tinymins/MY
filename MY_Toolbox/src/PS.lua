@@ -63,7 +63,7 @@ local PS = {}
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
 	local X, Y = 20, 30
-	local W, H = ui:size()
+	local W, H = ui:Size()
 	local x, y = X, Y
 	x, y = MY_GongzhanCheck.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	x, y = MY_FooterTip.OnPanelActivePartial(ui, X, Y, W, H, x, y)

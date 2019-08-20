@@ -219,36 +219,36 @@ MY_InfoTip.Reload = function()
         local cfg = MY_InfoTip.Config[id]
         local frm = UI('Normal/MY_InfoTip_'..id)
         if cfg.bEnable then
-            if frm:count()==0 then
-                frm = UI.CreateFrame('MY_InfoTip_'..id, {empty = true}):size(220,30):event('UI_SCALED', function()
-                    UI(this):anchor(cfg.anchor)
-                end):customMode(cache.title, function(anchor)
-                    UI(this):bringToTop()
+            if frm:Count()==0 then
+                frm = UI.CreateFrame('MY_InfoTip_'..id, {empty = true}):Size(220,30):Event('UI_SCALED', function()
+                    UI(this):Anchor(cfg.anchor)
+                end):CustomMode(cache.title, function(anchor)
+                    UI(this):BringToTop()
                     cfg.anchor = anchor
                     SaveConfig()
                 end, function(anchor)
                     cfg.anchor = anchor
                     SaveConfig()
-                end):drag(0,0,0,0):drag(false):penetrable(true)
-                frm:append('Image', 'Image_Default'):children('#Image_Default'):size(220,30):image('UI/Image/UICommon/Commonpanel.UITex',86):alpha(180)
-                frm:append('Text', 'Text_Default'):children('#Text_Default'):size(220,30):text(cache.title):font(2)[1]:SetHAlign(1)
-                local txt = frm:find('#Text_Default')
-                frm:breathe(function() txt:text(cache.GetContent()) end)
+                end):Drag(0,0,0,0):Drag(false):Penetrable(true)
+                frm:Append('Image', 'Image_Default'):Children('#Image_Default'):Size(220,30):Image('UI/Image/UICommon/Commonpanel.UITex',86):Alpha(180)
+                frm:Append('Text', 'Text_Default'):Children('#Text_Default'):Size(220,30):Text(cache.title):Font(2)[1]:SetHAlign(1)
+                local txt = frm:Find('#Text_Default')
+                frm:Breathe(function() txt:Text(cache.GetContent()) end)
             end
             if cfg.bShowBg then
-                frm:find('#Image_Default'):show()
+                frm:Find('#Image_Default'):Show()
             else
-                frm:find('#Image_Default'):hide()
+                frm:Find('#Image_Default'):Hide()
             end
             if cfg.bShowTitle then
                 cache.formatString = _L[cache.prefix] .. _L[cache.content]
             else
                 cache.formatString = _L[cache.content]
             end
-            frm:children('#Text_Default'):font(cfg.nFont or 0):color(cfg.rgb or {255,255,255})
-            frm:anchor(cfg.anchor)
+            frm:Children('#Text_Default'):Font(cfg.nFont or 0):Color(cfg.rgb or {255,255,255})
+            frm:Anchor(cfg.anchor)
         else
-            frm:remove()
+            frm:Remove()
         end
     end
     SaveConfig()
@@ -262,54 +262,54 @@ end)
 
 LIB.RegisterPanel( 'MY_InfoTip', _L['infotip'], _L['System'], 'ui/Image/UICommon/ActivePopularize2.UITex|22', { OnPanelActive = function(wnd)
     local ui = UI(wnd)
-    local w, h = ui:size()
+    local w, h = ui:Size()
     local x, y = 50, 20
 
-    ui:append('Text', 'Text_InfoTip'):find('#Text_InfoTip')
-      :pos(x, y):width(350)
-      :text(_L['* infomation tips']):color(255,255,0)
+    ui:Append('Text', 'Text_InfoTip'):Find('#Text_InfoTip')
+      :Pos(x, y):Width(350)
+      :Text(_L['* infomation tips']):Color(255,255,0)
     y = y + 5
 
     for id, cache in pairs(MY_InfoTip.Cache) do
         x, y = 55, y + 30
 
         local cfg = MY_InfoTip.Config[id]
-        ui:append('WndCheckBox', 'WndCheckBox_InfoTip_'..id):children('#WndCheckBox_InfoTip_'..id):pos(x, y):width(250)
-          :text(cache.title):check(cfg.bEnable or false)
-          :check(function(bChecked)
+        ui:Append('WndCheckBox', 'WndCheckBox_InfoTip_'..id):Children('#WndCheckBox_InfoTip_'..id):Pos(x, y):Width(250)
+          :Text(cache.title):Check(cfg.bEnable or false)
+          :Check(function(bChecked)
             cfg.bEnable = bChecked
             MY_InfoTip.Reload()
           end)
         x = x + 220
-        ui:append('WndCheckBox', 'WndCheckBox_InfoTipTitle_'..id):children('#WndCheckBox_InfoTipTitle_'..id):pos(x, y):width(60)
-          :text(_L['title']):check(cfg.bShowTitle or false)
-          :check(function(bChecked)
+        ui:Append('WndCheckBox', 'WndCheckBox_InfoTipTitle_'..id):Children('#WndCheckBox_InfoTipTitle_'..id):Pos(x, y):Width(60)
+          :Text(_L['title']):Check(cfg.bShowTitle or false)
+          :Check(function(bChecked)
             cfg.bShowTitle = bChecked
             MY_InfoTip.Reload()
           end)
         x = x + 70
-        ui:append('WndCheckBox', 'WndCheckBox_InfoTipBg_'..id):children('#WndCheckBox_InfoTipBg_'..id):pos(x, y):width(60)
-          :text(_L['background']):check(cfg.bShowBg or false)
-          :check(function(bChecked)
+        ui:Append('WndCheckBox', 'WndCheckBox_InfoTipBg_'..id):Children('#WndCheckBox_InfoTipBg_'..id):Pos(x, y):Width(60)
+          :Text(_L['background']):Check(cfg.bShowBg or false)
+          :Check(function(bChecked)
             cfg.bShowBg = bChecked
             MY_InfoTip.Reload()
           end)
         x = x + 70
-        ui:append('WndButton', 'WndButton_InfoTipFont_'..id):children('#WndButton_InfoTipFont_'..id):pos(x, y)
-          :width(50):text(_L['font'])
-          :click(function()
+        ui:Append('WndButton', 'WndButton_InfoTipFont_'..id):Children('#WndButton_InfoTipFont_'..id):Pos(x, y)
+          :Width(50):Text(_L['font'])
+          :Click(function()
             UI.OpenFontPicker(function(f)
                 cfg.nFont = f
                 MY_InfoTip.Reload()
             end)
           end)
         x = x + 60
-        ui:append('Shadow', 'Shadow_InfoTipColor_'..id):children('#Shadow_InfoTipColor_'..id):pos(x, y)
-          :size(20, 20):color(cfg.rgb or {255,255,255})
-          :click(function()
+        ui:Append('Shadow', 'Shadow_InfoTipColor_'..id):Children('#Shadow_InfoTipColor_'..id):Pos(x, y)
+          :Size(20, 20):Color(cfg.rgb or {255,255,255})
+          :Click(function()
             local me = this
             UI.OpenColorPicker(function(r, g, b)
-                UI(me):color(r, g, b)
+                UI(me):Color(r, g, b)
                 cfg.rgb = { r, g, b }
                 MY_InfoTip.Reload()
             end)

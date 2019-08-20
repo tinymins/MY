@@ -55,7 +55,7 @@ local tChannels = {
 	{ nChannel = PLAYER_TALK_CHANNEL.TONG     , szName = _L['tong channel'  ], rgb = GetMsgFontColor('MSG_GUILD' , true) },
 }
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	ui:append('WndButton', {
+	ui:Append('WndButton', {
 		x = W - 140, y = y, w = 120,
 		text = _L['check nearby gongzhan'],
 		onlclick = function()

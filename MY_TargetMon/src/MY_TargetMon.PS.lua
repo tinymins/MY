@@ -141,25 +141,25 @@ local PS = {}
 
 -- 绘制详细监控项设置界面
 local function DrawDetail(ui)
-	local w, h = ui:size()
+	local w, h = ui:Size()
 	local l_config, l_search, uiSearch
-	local uiWrapper = ui:append('WndWindow', { name = 'WndWindow_Wrapper', x = 0, y = 0, w = w, h = h }, true)
-	uiWrapper:append('Shadow', { x = 0, y = 0, w = w, h = h, r = 0, g = 0, b = 0, alpha = 150 })
-	uiWrapper:append('Shadow', { x = 10, y = 10, w = w - 20, h = h - 20, r = 255, g = 255, b = 255, alpha = 40 })
+	local uiWrapper = ui:Append('WndWindow', { name = 'WndWindow_Wrapper', x = 0, y = 0, w = w, h = h }, true)
+	uiWrapper:Append('Shadow', { x = 0, y = 0, w = w, h = h, r = 0, g = 0, b = 0, alpha = 150 })
+	uiWrapper:Append('Shadow', { x = 10, y = 10, w = w - 20, h = h - 20, r = 255, g = 255, b = 255, alpha = 40 })
 
 	local x0, y0 = 20, 20
 	local w0, h0 = w - 40, h - 30
 	local w1, x1 = w0 - 5, x0
-	local list = uiWrapper:append('WndListBox', { x = x1, y = y0 + 30, w = w1, h = h0 - 35 - 30 }, true)
+	local list = uiWrapper:Append('WndListBox', { x = x1, y = y0 + 30, w = w1, h = h0 - 35 - 30 }, true)
 
 	local function Search()
-		list:listbox('clear')
+		list:ListBox('clear')
 		for i, mon in ipairs(l_config.monitors) do
 			if not l_search or l_search == ''
 			or (mon.name and wfind(mon.name, l_search))
 			or (mon.longAlias and wfind(mon.longAlias, l_search))
 			or (mon.shortAlias and wfind(mon.shortAlias, l_search)) then
-				list:listbox(
+				list:ListBox(
 					'insert',
 					mon.name or mon.id,
 					mon,
@@ -184,19 +184,19 @@ local function DrawDetail(ui)
 				if index then
 					D.MoveMonitor(l_config, mon, index - #l_config.monitors)
 				end
-				list:listbox(
+				list:ListBox(
 					'insert',
 					mon.name or mon.id,
 					mon,
 					{ mon = mon },
 					index
 				)
-				uiSearch:text('')
+				uiSearch:Text('')
 			end
 		end, function() end, function() end, nil, l_search or '')
 	end
 
-	uiSearch = uiWrapper:append('WndEditBox', {
+	uiSearch = uiWrapper:Append('WndEditBox', {
 		x = x0, y = y0,
 		w = 200, h = 30, placeholder = _L['Search'],
 		onchange = function(text)
@@ -204,7 +204,7 @@ local function DrawDetail(ui)
 			Search()
 		end,
 	}, true)
-	uiWrapper:append('WndButton2', {
+	uiWrapper:Append('WndButton2', {
 		x = x1 + w1 - 60, y = y0 - 1, w = 60, h = 28,
 		text = _L['Add'], onclick = function() InsertMonitor() end,
 	})
@@ -226,7 +226,7 @@ local function DrawDetail(ui)
 				szOption = _L['Delete'],
 				fnAction = function()
 					D.DeleteMonitor(l_config, mon)
-					list:listbox('delete', 'id', mon)
+					list:ListBox('delete', 'id', mon)
 					Wnd.CloseWindow('PopupMenuPanel')
 				end,
 			},
@@ -256,7 +256,7 @@ local function DrawDetail(ui)
 						return
 					end
 					D.MoveMonitor(l_config, mon, -1)
-					list:listbox('exchange', 'index', index - 1, index)
+					list:ListBox('exchange', 'index', index - 1, index)
 				end,
 				bDisable = search,
 			},
@@ -273,7 +273,7 @@ local function DrawDetail(ui)
 						return
 					end
 					D.MoveMonitor(l_config, mon, 1)
-					list:listbox('exchange', 'index', index + 1, index)
+					list:ListBox('exchange', 'index', index + 1, index)
 				end,
 				bDisable = search,
 			},
@@ -283,7 +283,7 @@ local function DrawDetail(ui)
 					GetUserInput(_L['Please input name/id:'], function(szVal)
 						szVal = (string.gsub(szVal, '^%s*(.-)%s*$', '%1'))
 						if szVal ~= '' then
-							list:listbox(
+							list:ListBox(
 								'update',
 								'id', mon,
 								{ 'text' }, { szVal }
@@ -659,24 +659,24 @@ local function DrawDetail(ui)
 		})
 		return t1
 	end
-	list:listbox('onmenu', onMenu)
+	list:ListBox('onmenu', onMenu)
 
 	local function OpenDetail(config)
 		l_config = config
 		Search()
-		uiWrapper:show()
-		uiWrapper:bringToTop()
+		uiWrapper:Show()
+		uiWrapper:BringToTop()
 	end
 
-	uiWrapper:append('WndButton2', {
+	uiWrapper:Append('WndButton2', {
 		x = x0 + w0 / 2 - 50, y = y0 + h0 - 30,
 		w = 100, h = 30, text = _L['Close'],
 		onclick = function()
 			l_config = nil
-			uiWrapper:hide()
+			uiWrapper:Hide()
 		end,
 	})
-	uiWrapper:hide()
+	uiWrapper:Hide()
 
 	return OpenDetail
 end
@@ -685,29 +685,29 @@ end
 local function DrawPreview(ui, config, OpenDetail)
 	local X, Y = 10, 10
 	local x, y = X, Y
-	local w, h = ui:size()
-	local uiWnd = ui:append('WndWindow', { w = w, h = 190 }, true)
-	uiWnd:append('Text', {
+	local w, h = ui:Size()
+	local uiWnd = ui:Append('WndWindow', { w = w, h = 190 }, true)
+	uiWnd:Append('Text', {
 		x = x, y = y - 3, w = 20,
 		r = 255, g = 255, b = 0,
 		text = _L['*'],
 	})
 	if config.embedded then
 		local szCaption = D.GetConfigCaption(config)
-		uiWnd:append('Text', {
+		uiWnd:Append('Text', {
 			x = x + 20, y = y - 3, w = w - 290,
 			r = 255, g = 255, b = 0, text = szCaption,
 			tip = szCaption .. '\n' .. _L['(Embedded caption cannot be changed)'],
 			tippostype = UI.TIP_POSITION.BOTTOM_TOP,
-		}, true):autoWidth()
+		}, true):AutoWidth()
 	else
-		uiWnd:append('WndEditBox', {
+		uiWnd:Append('WndEditBox', {
 			x = x + 20, y = y, w = w - 290, h = 22,
 			r = 255, g = 255, b = 0, text = config.caption,
 			onchange = function(val) D.ModifyConfig(config, 'caption', val) end,
 		})
 	end
-	uiWnd:append('WndButton2', {
+	uiWnd:Append('WndButton2', {
 		x = w - 180, y = y,
 		w = 50, h = 25,
 		text = _L['Move Up'],
@@ -716,7 +716,7 @@ local function DrawPreview(ui, config, OpenDetail)
 			LIB.SwitchTab('MY_TargetMon', true)
 		end,
 	})
-	uiWnd:append('WndButton2', {
+	uiWnd:Append('WndButton2', {
 		x = w - 125, y = y,
 		w = 50, h = 25,
 		text = _L['Move Down'],
@@ -725,7 +725,7 @@ local function DrawPreview(ui, config, OpenDetail)
 			LIB.SwitchTab('MY_TargetMon', true)
 		end,
 	})
-	uiWnd:append('WndButton2', {
+	uiWnd:Append('WndButton2', {
 		x = w - 70, y = y,
 		w = 60, h = 25,
 		text = _L['Delete'],
@@ -740,7 +740,7 @@ local function DrawPreview(ui, config, OpenDetail)
 
 	local deltaY = 31
 	x = X + 20
-	uiWnd:append('WndCheckBox', {
+	uiWnd:Append('WndCheckBox', {
 		x = x, y = y,
 		text = _L['Enable'],
 		checked = config.enable,
@@ -749,7 +749,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		end,
 	})
 
-	uiWnd:append('WndCheckBox', {
+	uiWnd:Append('WndCheckBox', {
 		x = x + 90, y = y, w = 200,
 		text = _L['Hide others buff'],
 		tip = _L['Hide others buff TIP'],
@@ -763,7 +763,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		end,
 	})
 
-	uiWnd:append('WndCheckBox', {
+	uiWnd:Append('WndCheckBox', {
 		x = x + 180, y = y, w = 180,
 		text = _L['Hide void'],
 		checked = config.hideVoid,
@@ -775,7 +775,7 @@ local function DrawPreview(ui, config, OpenDetail)
 	y = y + deltaY
 
 	x = X + 20
-	uiWnd:append('WndCheckBox', {
+	uiWnd:Append('WndCheckBox', {
 		x = x, y = y, w = 90,
 		text = _L['Penetrable'],
 		checked = config.penetrable,
@@ -785,7 +785,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		autoenable = function() return config.enable end,
 	})
 
-	uiWnd:append('WndCheckBox', {
+	uiWnd:Append('WndCheckBox', {
 		x = x + 90, y = y, w = 100,
 		text = _L['Undragable'],
 		checked = not config.dragable,
@@ -795,7 +795,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		autoenable = function() return config.enable and not config.penetrable end,
 	})
 
-	uiWnd:append('WndCheckBox', {
+	uiWnd:Append('WndCheckBox', {
 		x = x + 180, y = y, w = 120,
 		text = _L['Ignore system ui scale'],
 		checked = config.ignoreSystemUIScale,
@@ -807,7 +807,7 @@ local function DrawPreview(ui, config, OpenDetail)
 	y = y + deltaY
 
 	x = X + 20
-	uiWnd:append('WndCheckBox', {
+	uiWnd:Append('WndCheckBox', {
 		x = x, y = y, w = 200,
 		text = _L['Show cd circle'],
 		checked = config.cdCircle,
@@ -817,7 +817,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		autoenable = function() return config.enable end,
 	})
 
-	uiWnd:append('WndCheckBox', {
+	uiWnd:Append('WndCheckBox', {
 		x = x + 90, y = y, w = 200,
 		text = _L['Show cd flash'],
 		checked = config.cdFlash,
@@ -827,7 +827,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		autoenable = function() return config.enable end,
 	})
 
-	uiWnd:append('WndCheckBox', {
+	uiWnd:Append('WndCheckBox', {
 		x = x + 180, y = y, w = 200,
 		text = _L['Show cd ready spark'],
 		checked = config.cdReadySpark,
@@ -839,7 +839,7 @@ local function DrawPreview(ui, config, OpenDetail)
 	y = y + deltaY
 
 	x = X + 20
-	uiWnd:append('WndCheckBox', {
+	uiWnd:Append('WndCheckBox', {
 		x = x, y = y, w = 120,
 		text = _L['Show cd bar'],
 		checked = config.cdBar,
@@ -849,7 +849,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		autoenable = function() return config.enable end,
 	})
 
-	uiWnd:append('WndCheckBox', {
+	uiWnd:Append('WndCheckBox', {
 		x = x + 90, y = y, w = 120,
 		text = _L['Show name'],
 		checked = config.showName,
@@ -859,7 +859,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		autoenable = function() return config.enable end,
 	})
 
-	uiWnd:append('WndCheckBox', {
+	uiWnd:Append('WndCheckBox', {
 		x = x + 180, y = y, w = 120,
 		text = _L['Show time'],
 		checked = config.showTime,
@@ -871,7 +871,7 @@ local function DrawPreview(ui, config, OpenDetail)
 	y = y + deltaY
 
 	x = X + 20
-	uiWnd:append('WndCheckBox', {
+	uiWnd:Append('WndCheckBox', {
 		x = x, y = y, w = 90,
 		text = _L['Play sound'],
 		checked = config.playSound,
@@ -881,7 +881,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		autoenable = function() return config.enable end,
 	})
 
-	uiWnd:append('WndComboBox', {
+	uiWnd:Append('WndComboBox', {
 		x = x + 90, y = y, w = (w - 250 - 30 - 30 - 80) / 2,
 		text = _L['Icon style'],
 		menu = function()
@@ -908,7 +908,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		end,
 		autoenable = function() return config.enable end,
 	})
-	uiWnd:append('WndComboBox', {
+	uiWnd:Append('WndComboBox', {
 		x = x + 90 + (w - 250 - 30 - 30 - 80) / 2, y = y, w = (w - 250 - 30 - 30 - 80) / 2,
 		text = _L['Countdown style'],
 		menu = function()
@@ -937,7 +937,7 @@ local function DrawPreview(ui, config, OpenDetail)
 
 	y = Y + 30
 	local deltaY = 21
-	uiWnd:append('WndComboBox', {
+	uiWnd:Append('WndComboBox', {
 		x = w - 250, y = y, w = 135,
 		text = _L['Set target'],
 		menu = function()
@@ -979,7 +979,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		end,
 		autoenable = function() return config.enable end,
 	})
-	uiWnd:append('WndButton2', {
+	uiWnd:Append('WndButton2', {
 		x = w - 110, y = y, w = 102,
 		text = _L['Set monitor'],
 		onclick = function() OpenDetail(config) end,
@@ -987,7 +987,7 @@ local function DrawPreview(ui, config, OpenDetail)
 	})
 	y = y + 24
 
-	uiWnd:append('WndTrackbar', {
+	uiWnd:Append('WndTrackbar', {
 		x = w - 250, y = y,
 		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		range = {1, 32},
@@ -1000,7 +1000,7 @@ local function DrawPreview(ui, config, OpenDetail)
 	})
 	y = y + deltaY
 
-	uiWnd:append('WndTrackbar', {
+	uiWnd:Append('WndTrackbar', {
 		x = w - 250, y = y,
 		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		range = {1, 300},
@@ -1013,7 +1013,7 @@ local function DrawPreview(ui, config, OpenDetail)
 	})
 	y = y + deltaY
 
-	uiWnd:append('WndTrackbar', {
+	uiWnd:Append('WndTrackbar', {
 		x = w - 250, y = y,
 		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		range = {1, 300},
@@ -1026,7 +1026,7 @@ local function DrawPreview(ui, config, OpenDetail)
 	})
 	y = y + deltaY
 
-	uiWnd:append('WndTrackbar', {
+	uiWnd:Append('WndTrackbar', {
 		x = w - 250, y = y,
 		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		range = {1, 300},
@@ -1039,7 +1039,7 @@ local function DrawPreview(ui, config, OpenDetail)
 	})
 	y = y + deltaY
 
-	uiWnd:append('WndTrackbar', {
+	uiWnd:Append('WndTrackbar', {
 		x = w - 250, y = y,
 		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		range = {50, 1000},
@@ -1052,7 +1052,7 @@ local function DrawPreview(ui, config, OpenDetail)
 	})
 	y = y + deltaY
 
-	uiWnd:append('WndTrackbar', {
+	uiWnd:Append('WndTrackbar', {
 		x = w - 250, y = y,
 		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		range = {-1, 30},
@@ -1077,11 +1077,11 @@ local function DrawPreview(ui, config, OpenDetail)
 end
 
 local function DrawControls(ui, OpenDetail)
-	ui:children('#Wnd_Controls'):remove()
-	local w, h = ui:size()
-	local uiWnd = ui:append('WndWindow', { name = 'Wnd_Controls', w = w, h = 80 }, true)
+	ui:Children('#Wnd_Controls'):Remove()
+	local w, h = ui:Size()
+	local uiWnd = ui:Append('WndWindow', { name = 'Wnd_Controls', w = w, h = 80 }, true)
 	local x, y = (w - 380) / 2, 10
-	uiWnd:append('WndButton2', {
+	uiWnd:Append('WndButton2', {
 		x = x, y = y,
 		w = 60, h = 30,
 		text = _L['Create'],
@@ -1089,11 +1089,11 @@ local function DrawControls(ui, OpenDetail)
 			local config = D.CreateConfig()
 			DrawPreview(ui, config, OpenDetail)
 			DrawControls(ui, OpenDetail)
-			ui:formatChildrenPos()
+			ui:FormatChildrenPos()
 		end,
 	})
 	x = x + 70
-	uiWnd:append('WndButton2', {
+	uiWnd:Append('WndButton2', {
 		x = x, y = y,
 		w = 60, h = 30,
 		text = _L['Import'],
@@ -1121,7 +1121,7 @@ local function DrawControls(ui, OpenDetail)
 		end,
 	})
 	x = x + 70
-	uiWnd:append('WndButton2', {
+	uiWnd:Append('WndButton2', {
 		x = x, y = y,
 		w = 60, h = 30,
 		text = _L['Export'],
@@ -1176,7 +1176,7 @@ local function DrawControls(ui, OpenDetail)
 		end,
 	})
 	x = x + 70
-	uiWnd:append('WndButton2', {
+	uiWnd:Append('WndButton2', {
 		x = x, y = y,
 		w = 80, h = 30,
 		text = _L['Save As Default'],
@@ -1187,7 +1187,7 @@ local function DrawControls(ui, OpenDetail)
 		end,
 	})
 	x = x + 90
-	uiWnd:append('WndButton2', {
+	uiWnd:Append('WndButton2', {
 		x = x, y = y,
 		w = 80, h = 30,
 		text = _L['Reset Default'],
@@ -1218,17 +1218,17 @@ end
 
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
-	local w, h = ui:size()
+	local w, h = ui:Size()
 	local X, Y = 20, 20
 	local x, y = X, Y
-	ui:containerType(CONSTANT.WND_CONTAINER_STYLE.WND_CONTAINER_STYLE_LEFT_TOP)
+	ui:ContainerType(CONSTANT.WND_CONTAINER_STYLE.WND_CONTAINER_STYLE_LEFT_TOP)
 
 	local OpenDetail = DrawDetail(ui)
 	for _, config in ipairs(D.GetConfigList()) do
 		DrawPreview(ui, config, OpenDetail)
 	end
 	DrawControls(ui, OpenDetail)
-	ui:formatChildrenPos()
+	ui:FormatChildrenPos()
 end
 
 function PS.OnPanelScroll(wnd, scrollX, scrollY)

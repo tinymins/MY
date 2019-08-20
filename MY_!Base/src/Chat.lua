@@ -130,7 +130,7 @@ end
 function LIB.CopyChatLine(hTime, bTextEditor)
 	local edit = Station.Lookup('Lowest2/EditBox/Edit_Input')
 	if bTextEditor then
-		edit = UI.OpenTextEditor():find('.WndEdit')[1]
+		edit = UI.OpenTextEditor():Find('.WndEdit')[1]
 	end
 	if not edit then
 		return
@@ -236,22 +236,22 @@ function ChatLinkEvents.OnNameLClick(element, link)
 	end
 	if IsCtrlKeyDown() and IsAltKeyDown() then
 		local menu = {}
-		InsertInviteTeamMenu(menu, (UI(link):text():gsub('[%[%]]', '')))
+		InsertInviteTeamMenu(menu, (UI(link):Text():gsub('[%[%]]', '')))
 		menu[1].fnAction()
 	elseif IsCtrlKeyDown() then
 		LIB.CopyChatItem(link)
 	elseif IsShiftKeyDown() then
-		LIB.SetTarget(TARGET.PLAYER, UI(link):text())
+		LIB.SetTarget(TARGET.PLAYER, UI(link):Text())
 	elseif IsAltKeyDown() then
 		if MY_Farbnamen and MY_Farbnamen.Get then
-			local info = MY_Farbnamen.Get((UI(link):text():gsub('[%[%]]', '')))
+			local info = MY_Farbnamen.Get((UI(link):Text():gsub('[%[%]]', '')))
 			if info then
 				PEEK_PLAYER[info.dwID] = true
 				ViewInviteToPlayer(info.dwID)
 			end
 		end
 	else
-		LIB.SwitchChat(UI(link):text())
+		LIB.SwitchChat(UI(link):Text())
 		local edit = Station.Lookup('Lowest2/EditBox/Edit_Input')
 		if edit then
 			Station.SetFocusWindow(edit)
@@ -262,7 +262,7 @@ function ChatLinkEvents.OnNameRClick(element, link)
 	if not link then
 		link = element
 	end
-	PopupMenu(LIB.GetTargetContextMenu(TARGET.PLAYER, (UI(link):text():gsub('[%[%]]', ''))))
+	PopupMenu(LIB.GetTargetContextMenu(TARGET.PLAYER, (UI(link):Text():gsub('[%[%]]', ''))))
 end
 function ChatLinkEvents.OnCopyLClick(element, link)
 	if not link then
@@ -380,17 +380,17 @@ function LIB.RenderChatLink(arg1, arg2)
 			return
 		end
 		local ui = UI(element)
-		local name = ui:name()
+		local name = ui:Name()
 		if name:sub(1, 8) == 'namelink' then
-			ui:lclick(function() ChatLinkEvents.OnNameLClick(element, link) end)
-			ui:rclick(function() ChatLinkEvents.OnNameRClick(element, link) end)
+			ui:LClick(function() ChatLinkEvents.OnNameLClick(element, link) end)
+			ui:RClick(function() ChatLinkEvents.OnNameRClick(element, link) end)
 		elseif name == 'copy' or name == 'copylink' then
-			ui:lclick(function() ChatLinkEvents.OnCopyLClick(element, link) end)
-			ui:rclick(function() ChatLinkEvents.OnCopyRClick(element, link) end)
-			ui:mclick(function() ChatLinkEvents.OnCopyMClick(element, link) end)
+			ui:LClick(function() ChatLinkEvents.OnCopyLClick(element, link) end)
+			ui:RClick(function() ChatLinkEvents.OnCopyRClick(element, link) end)
+			ui:MClick(function() ChatLinkEvents.OnCopyMClick(element, link) end)
 		else
-			ui:lclick(function() ChatLinkEvents.OnItemLClick(element, link) end)
-			ui:rclick(function() ChatLinkEvents.OnItemRClick(element, link) end)
+			ui:LClick(function() ChatLinkEvents.OnItemLClick(element, link) end)
+			ui:RClick(function() ChatLinkEvents.OnItemRClick(element, link) end)
 		end
 		element[RENDERED_FLAG_KEY] = true
 		return element

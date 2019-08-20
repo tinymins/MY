@@ -71,14 +71,14 @@ local function OpenBuffRuleEditor(rec)
 	MY_Cataclysm.OpenBuffRuleEditor(rec, function(p)
 		if p then
 			if l_list then
-				l_list:listbox('update', 'id', rec, {'text'}, {MY_Cataclysm.EncodeBuffRule(rec)})
+				l_list:ListBox('update', 'id', rec, {'text'}, {MY_Cataclysm.EncodeBuffRule(rec)})
 			end
 			MY_Cataclysm.UpdateBuffListCache()
 		else
 			for i, p in ipairs(CFG.aBuffList) do
 				if p == rec then
 					if l_list then
-						l_list:listbox('delete', 'id', rec)
+						l_list:ListBox('delete', 'id', rec)
 					end
 					remove(CFG.aBuffList, i)
 					MY_Cataclysm.UpdateBuffListCache()
@@ -93,20 +93,20 @@ function PS.OnPanelActive(frame)
 	local ui = UI(frame)
 	local X, Y = 10, 10
 	local x, y = X, Y
-	local w, h = ui:size()
+	local w, h = ui:Size()
 
 	x = X
-	x = x + ui:append('WndButton2', {
+	x = x + ui:Append('WndButton2', {
 		x = x, y = y, w = 100,
 		text = _L['Add'],
 		onclick = function()
 			local rec = {}
 			insert(CFG.aBuffList, rec)
-			l_list:listbox('insert', MY_Cataclysm.EncodeBuffRule(rec), rec, rec)
+			l_list:ListBox('insert', MY_Cataclysm.EncodeBuffRule(rec), rec, rec)
 			OpenBuffRuleEditor(rec)
 		end,
-	}, true):autoHeight():width() + 5
-	x = x + ui:append('WndButton2', {
+	}, true):AutoHeight():Width() + 5
+	x = x + ui:Append('WndButton2', {
 		x = x, y = y, w = 100,
 		text = _L['Edit'],
 		onclick = function()
@@ -117,30 +117,30 @@ function PS.OnPanelActive(frame)
 			})
 			local X, Y = 20, 60
 			local x, y = X, Y
-			local edit = ui:append('WndEditBox',{
+			local edit = ui:Append('WndEditBox',{
 				x = x, y = y, w = 310, h = 440,
 				limit = -1, multiline = true,
 				text = EncodeBuffRuleList(CFG.aBuffList),
 			}, true)
-			y = y + edit:height() + 5
+			y = y + edit:Height() + 5
 
-			ui:append('WndButton2', {
+			ui:Append('WndButton2', {
 				x = x, y = y, w = 310,
 				text = _L['Sure'],
 				onclick = function()
-					CFG.aBuffList = DecodeBuffRuleList(edit:text())
+					CFG.aBuffList = DecodeBuffRuleList(edit:Text())
 					MY_Cataclysm.UpdateBuffListCache()
-					ui:remove()
+					ui:Remove()
 					LIB.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
 					LIB.SwitchTab('MY_Cataclysm_BuffSettings', true)
 				end,
 			})
 		end,
-	}, true):autoHeight():width() + 5
+	}, true):AutoHeight():Width() + 5
 	x = X
 	y = y + 30
 
-	l_list = ui:append('WndListBox', {
+	l_list = ui:Append('WndListBox', {
 		x = x, y = y,
 		w = w - 240 - 20, h = h - y - 5,
 		listbox = {{
@@ -152,14 +152,14 @@ function PS.OnPanelActive(frame)
 		}},
 	}, true)
 	for _, rec in ipairs(CFG.aBuffList) do
-		l_list:listbox('insert', MY_Cataclysm.EncodeBuffRule(rec), rec, rec)
+		l_list:ListBox('insert', MY_Cataclysm.EncodeBuffRule(rec), rec, rec)
 	end
 	y = h
 
 	X = w - 240
 	x = X
 	y = Y + 25
-	x = x + ui:append('WndCheckBox', {
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y,
 		text = _L['Auto scale'],
 		checked = CFG.bAutoBuffSize,
@@ -167,8 +167,8 @@ function PS.OnPanelActive(frame)
 			CFG.bAutoBuffSize = bCheck
 			LIB.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
 		end,
-	}, true):autoWidth():width() + 5
-	x = x + ui:append('WndTrackbar', {
+	}, true):AutoWidth():Width() + 5
+	x = x + ui:Append('WndTrackbar', {
 		x = x, y = y, h = 25, rw = 80,
 		enable = not CFG.bAutoBuffSize,
 		autoenable = function() return not CFG.bAutoBuffSize end,
@@ -180,12 +180,12 @@ function PS.OnPanelActive(frame)
 			LIB.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
 		end,
 		textfmt = function(val) return _L('%d%%', val) end,
-	}, true):autoWidth():width() + 10
+	}, true):AutoWidth():Width() + 10
 
 	x = X
 	y = y + 30
-	x = x + ui:append('Text', { x = x, y = y, text = _L['Max count']}, true):autoWidth():width() + 5
-	x = x + ui:append('WndTrackbar', {
+	x = x + ui:Append('Text', { x = x, y = y, text = _L['Max count']}, true):AutoWidth():Width() + 5
+	x = x + ui:Append('WndTrackbar', {
 		x = x, y = y + 3, rw = 80, text = '',
 		range = {0, 10},
 		value = CFG.nMaxShowBuff,
@@ -194,11 +194,11 @@ function PS.OnPanelActive(frame)
 			CFG.nMaxShowBuff = nVal
 			LIB.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
 		end,
-	}, true):autoWidth():width() + 8
+	}, true):AutoWidth():Width() + 8
 
 	x = X
 	y = y + 30
-	x = x + ui:append('WndCheckBox', {
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['Push buff to official'],
 		checked = CFG.bBuffPushToOfficial,
 		oncheck = function(bCheck)
@@ -206,27 +206,27 @@ function PS.OnPanelActive(frame)
 			MY_Cataclysm.UpdateBuffListCache()
 			LIB.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
 		end,
-	}, true):autoWidth():width() + 5
-	x = x + ui:append('WndCheckBox', {
+	}, true):AutoWidth():Width() + 5
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['Buff Staring'],
 		checked = CFG.bStaring,
 		oncheck = function(bCheck)
 			CFG.bStaring = bCheck
 			LIB.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
 		end,
-	}, true):autoWidth():width() + 5
+	}, true):AutoWidth():Width() + 5
 
 	x = X
 	y = y + 30
-	x = x + ui:append('WndCheckBox', {
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['Show Buff Time'],
 		checked = CFG.bShowBuffTime,
 		oncheck = function(bCheck)
 			CFG.bShowBuffTime = bCheck
 			LIB.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
 		end,
-	}, true):autoWidth():width() + 5
-	x = x + ui:append('WndCheckBox', {
+	}, true):AutoWidth():Width() + 5
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y,
 		text = _L['Over mana bar'],
 		checked = not CFG.bBuffAboveMana,
@@ -234,40 +234,40 @@ function PS.OnPanelActive(frame)
 			CFG.bBuffAboveMana = not bCheck
 			LIB.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
 		end,
-	}, true):autoWidth():width() + 5
+	}, true):AutoWidth():Width() + 5
 
 	x = X
 	y = y + 30
-	x = x + ui:append('WndCheckBox', {
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['Show Buff Num'],
 		checked = CFG.bShowBuffNum,
 		oncheck = function(bCheck)
 			CFG.bShowBuffNum = bCheck
 			LIB.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
 		end,
-	}, true):autoWidth():width() + 5
-	x = x + ui:append('WndCheckBox', {
+	}, true):AutoWidth():Width() + 5
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['Show Buff Reminder'],
 		checked = CFG.bShowBuffReminder,
 		oncheck = function(bCheck)
 			CFG.bShowBuffReminder = bCheck
 			LIB.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
 		end,
-	}, true):autoWidth():width() + 5
+	}, true):AutoWidth():Width() + 5
 
 	x = X
 	y = y + 30
-	x = x + ui:append('WndCheckBox', {
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['Alt Click Publish'],
 		checked = CFG.bBuffAltPublish,
 		oncheck = function(bCheck)
 			CFG.bBuffAltPublish = bCheck
 		end,
-	}, true):autoWidth():width() + 5
+	}, true):AutoWidth():Width() + 5
 	y = y + 30
 
 	x = X
-	x = x + ui:append('WndCheckBox', {
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y,
 		text = _L['Enable MY_TeamMon data'],
 		checked = CFG.bBuffDataTeamMon,
@@ -277,7 +277,7 @@ function PS.OnPanelActive(frame)
 			LIB.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
 		end,
 		autoenable = function() return MY_Resource and true end,
-	}, true):autoWidth():width() + 5
+	}, true):AutoWidth():Width() + 5
 	y = y + 30
 end
 function PS.OnPanelDeactive()

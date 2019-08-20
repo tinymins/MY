@@ -47,30 +47,30 @@ local function onFrameCreate()
 	end
 	if config then
 		local frame, ui, coefficient, posx, posy = arg0, UI(arg0), config.coefficient / Station.GetUIScale()
-		ui:append(PACKET_INFO.ROOT .. 'MY_Toolbox/ui/Btn_MagnifierUp.ini:WndButton', {
+		ui:Append(PACKET_INFO.ROOT .. 'MY_Toolbox/ui/Btn_MagnifierUp.ini:WndButton', {
 			name = 'Btn_MY_MagnifierUp',
 			x = config.x, y = config.y, w = config.w, h = config.h,
 			onclick = function()
-				posx, posy = ui:pos()
+				posx, posy = ui:Pos()
 				frame:EnableDrag(true)
 				frame:SetDragArea(0, 0, frame:GetW(), 50)
 				frame:Scale(coefficient, coefficient)
 				frame:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
-				ui:find('.Text'):fontScale(coefficient)
-				ui:children('#Btn_MY_MagnifierUp'):hide()
-				ui:children('#Btn_MY_MagnifierDown'):show()
+				ui:Find('.Text'):FontScale(coefficient)
+				ui:Children('#Btn_MY_MagnifierUp'):Hide()
+				ui:Children('#Btn_MY_MagnifierDown'):Show()
 			end,
 			tip = _L['Click to enable MY player view magnifier'],
 		})
-		ui:append(PACKET_INFO.ROOT .. 'MY_Toolbox/ui/Btn_MagnifierDown.ini:WndButton', {
+		ui:Append(PACKET_INFO.ROOT .. 'MY_Toolbox/ui/Btn_MagnifierDown.ini:WndButton', {
 			name = 'Btn_MY_MagnifierDown',
 			x = config.x, y = config.y, w = config.w, h = config.h, visible = false,
 			onclick = function()
 				frame:Scale(1 / coefficient, 1 / coefficient)
-				ui:pos(posx, posy)
-				ui:find('.Text'):fontScale(1)
-				ui:children('#Btn_MY_MagnifierUp'):show()
-				ui:children('#Btn_MY_MagnifierDown'):hide()
+				ui:Pos(posx, posy)
+				ui:Find('.Text'):FontScale(1)
+				ui:Children('#Btn_MY_MagnifierUp'):Show()
+				ui:Children('#Btn_MY_MagnifierDown'):Hide()
 			end,
 			tip = _L['Click to disable MY player view magnifier'],
 		})

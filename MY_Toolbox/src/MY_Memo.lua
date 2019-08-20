@@ -68,7 +68,7 @@ function D.Reload(bGlobal)
 	})
 	local NAME = bGlobal and 'MY_MemoGlobal' or 'MY_MemoRole'
 	local TITLE = bGlobal and _L['MY Memo (Global)'] or _L['MY Memo (Role)']
-	UI('Normal/' .. NAME):remove()
+	UI('Normal/' .. NAME):Remove()
 	if CFG.bEnable then
 		if not bGlobal and CFG.szContent == ''
 		and MY_Anmerkungen and MY_Anmerkungen.szNotePanelContent then
@@ -82,26 +82,26 @@ function D.Reload(bGlobal)
 			minwidth = 180, minheight = 100,
 			onmaximize = function(wnd)
 				local ui = UI(wnd)
-				ui:children('#WndEditBox_Memo'):size(ui:size())
+				ui:Children('#WndEditBox_Memo'):Size(ui:Size())
 			end,
 			onrestore = function(wnd)
 				local ui = UI(wnd)
-				ui:children('#WndEditBox_Memo'):size(ui:size())
+				ui:Children('#WndEditBox_Memo'):Size(ui:Size())
 			end,
 			ondragresize = function(wnd)
 				local ui = UI(wnd:GetRoot())
-				CFG.nWidth  = ui:width()
-				CFG.anchor  = ui:anchor()
-				CFG.nHeight = ui:height()
+				CFG.nWidth  = ui:Width()
+				CFG.anchor  = ui:Anchor()
+				CFG.nHeight = ui:Height()
 				local ui = UI(wnd)
-				ui:children('#WndEditBox_Memo'):size(ui:size())
+				ui:Children('#WndEditBox_Memo'):Size(ui:Size())
 			end,
 			w = CFG.nWidth, h = CFG.nHeight, text = TITLE,
 			dragable = true, dragarea = {0, 0, CFG.nWidth, 30},
 			anchor = CFG.anchor,
-			events = {{ 'UI_SCALED', function() UI(this):anchor(CFG.anchor) end }},
-			uievents = {{ 'OnFrameDragEnd', function() CFG.anchor = UI('Normal/' .. NAME):anchor() end }},
-		}):append('WndEditBox', {
+			events = {{ 'UI_SCALED', function() UI(this):Anchor(CFG.anchor) end }},
+			uievents = {{ 'OnFrameDragEnd', function() CFG.anchor = UI('Normal/' .. NAME):Anchor() end }},
+		}):Append('WndEditBox', {
 			name = 'WndEditBox_Memo',
 			x = 0, y = 0, w = CFG.nWidth, h = CFG.nHeight - 30,
 			text = CFG.szContent, multiline = true,
@@ -181,16 +181,16 @@ LIB.RegisterInit('MY_ANMERKUNGEN_PLAYERNOTE', onInit)
 end
 
 function MY_Memo.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x = x + ui:append('WndCheckBox', {
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y,
 		text = _L['Memo (Role)'],
 		checked = MY_Memo.IsEnable(false),
 		oncheck = function(bChecked)
 			MY_Memo.Toggle(false, bChecked)
 		end,
-	}, true):autoWidth():width() + 5
+	}, true):AutoWidth():Width() + 5
 
-	x = x + ui:append('WndButton', {
+	x = x + ui:Append('WndButton', {
 		x = x, y = y,
 		text = _L['Font'],
 		onclick = function()
@@ -198,18 +198,18 @@ function MY_Memo.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 				MY_Memo.SetFont(false, nFont)
 			end)
 		end,
-	}, true):autoWidth():width() + 5
+	}, true):AutoWidth():Width() + 5
 
-	x = x + ui:append('WndCheckBox', {
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y,
 		text = _L['Memo (Global)'],
 		checked = MY_Memo.IsEnable(true),
 		oncheck = function(bChecked)
 			MY_Memo.Toggle(true, bChecked)
 		end,
-	}, true):autoWidth():width() + 5
+	}, true):AutoWidth():Width() + 5
 
-	x = x + ui:append('WndButton', {
+	x = x + ui:Append('WndButton', {
 		x = x, y = y,
 		text = _L['Font'],
 		onclick = function()
@@ -217,7 +217,7 @@ function MY_Memo.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 				MY_Memo.SetFont(true, nFont)
 			end)
 		end,
-	}, true):autoWidth():width() + 5
+	}, true):AutoWidth():Width() + 5
 	y = y + 30
 	x = X
 	return x, y

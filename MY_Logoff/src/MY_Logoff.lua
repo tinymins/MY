@@ -126,19 +126,19 @@ local PS = {}
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
 	local x, y = 20, 20
-	local w, h = ui:size()
+	local w, h = ui:Size()
 
 	-- 暂离登出
-	ui:append('Text', { x = x + 10, y = y, text = _L['# idle logoff'] })
+	ui:Append('Text', { x = x + 10, y = y, text = _L['# idle logoff'] })
 	y = y + 23
 
-	ui:append('Image', {
+	ui:Append('Image', {
 		x = x - 15, y = y, w = w - (x - 15) * 2, h = 1,
 		image = 'UI/Image/UICommon/ScienceTreeNode.UITex', imageframe = 62,
 	})
 	y = y + 17
 
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['enable'],
 		checked = MY_Logoff.bIdleOff,
 		oncheck = function(bChecked)
@@ -147,7 +147,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 
-	ui:append('WndTrackbar', {
+	ui:Append('WndTrackbar', {
 		x = x + 70, y = y, w = 150,
 		textfmt = function(val) return _L('Auto logoff when keep idle for %dmin.', val) end,
 		range = {1, 1440},
@@ -161,36 +161,36 @@ function PS.OnPanelActive(wnd)
 	y = y + 40
 
 	-- 快速登出
-	ui:append('Text', { x = x + 10, y = y, text = _L['# express logoff'] })
+	ui:Append('Text', { x = x + 10, y = y, text = _L['# express logoff'] })
 	y = y + 23
 
-	ui:append('Image', {
+	ui:Append('Image', {
 		x = x - 15, y = y, w = w - (x - 15) * 2, h = 1,
 		image = 'UI/Image/UICommon/ScienceTreeNode.UITex', imageframe = 62,
 	})
 	y = y + 17
 
-	ui:append('WndButton', {
+	ui:Append('WndButton', {
 		x = x, y = y, w = 120, text = _L['return to role list'],
 		onclick = function() Logoff(false) end,
 	})
 
-	ui:append('WndButton', {
+	ui:Append('WndButton', {
 		x = 145, y = y, w = 170, text = _L['return to role list while not fight'],
 		onclick = function() Logoff(false,true) end,
 	})
 
-	ui:append('Text', {
+	ui:Append('Text', {
 		x = 330, y = y, r = 255, g = 255, b = 0, text = _L['* hotkey setting'],
 		onclick = function() LIB.SetHotKey() end,
 	})
 	y = y + 30
 
-	ui:append('WndButton', {
+	ui:Append('WndButton', {
 		x = 20, y = y, w = 120, text = _L['return to game login'],
 		onclick = function() Logoff(true) end,
 	})
-	ui:append('WndButton', {
+	ui:Append('WndButton', {
 		x = 145, y = y, w = 170, text = _L['return to game login while not fight'],
 		onclick = function() Logoff(true,true) end,
 	})

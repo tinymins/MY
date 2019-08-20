@@ -229,14 +229,14 @@ end
 do
 local l_uiFrame, l_uiTipBoard
 function D.ShowTip(szMsg)
-	l_uiTipBoard:clear():append(szMsg)
-	l_uiFrame:fadeTo(500, 255)
+	l_uiTipBoard:Clear():Append(szMsg)
+	l_uiFrame:FadeTo(500, 255)
 	local szHoverFrame = Station.GetMouseOverWindow() and Station.GetMouseOverWindow():GetRoot():GetName()
 	if szHoverFrame == 'MY_NotifyTip' then
 		LIB.DelayCall('MY_NotifyTip_Hide', 5000)
 	else
 		LIB.DelayCall('MY_NotifyTip_Hide', 5000, function()
-			l_uiFrame:fadeOut(500)
+			l_uiFrame:FadeOut(500)
 		end)
 	end
 end
@@ -249,25 +249,25 @@ local function OnInit()
 	l_uiFrame = UI.CreateFrame('MY_NotifyTip', {
 		level = 'Topmost', empty = true,
 		w = 250, h = 150, visible = false,
-		events = {{ 'UI_SCALED', function() l_uiFrame:anchor(MY_Notify.anchor) end }},
+		events = {{ 'UI_SCALED', function() l_uiFrame:Anchor(MY_Notify.anchor) end }},
 	})
-	:customMode(_L['MY_Notify'], function()
+	:CustomMode(_L['MY_Notify'], function()
 		LIB.DelayCall('MY_NotifyTip_Hide')
-		l_uiFrame:show():alpha(255)
+		l_uiFrame:Show():Alpha(255)
 	end, function()
-		MY_Notify.anchor = l_uiFrame:anchor()
-		l_uiFrame:alpha(0):hide()
+		MY_Notify.anchor = l_uiFrame:Anchor()
+		l_uiFrame:Alpha(0):Hide()
 	end)
-	:anchor(MY_Notify.anchor)
+	:Anchor(MY_Notify.anchor)
 	-- init tip panel handle and bind animation function
-	l_uiTipBoard = l_uiFrame:append('WndScrollBox', {
+	l_uiTipBoard = l_uiFrame:Append('WndScrollBox', {
 		handlestyle = 3, x = 0, y = 0, w = 250, h = 150,
 		onclick = function()
 			if LIB.IsInCustomUIMode() then
 				return
 			end
 			MY_Notify.OpenPanel()
-			l_uiFrame:fadeOut(500)
+			l_uiFrame:FadeOut(500)
 		end,
 		onhover = function(bIn)
 			if LIB.IsInCustomUIMode() then
@@ -275,10 +275,10 @@ local function OnInit()
 			end
 			if bIn then
 				LIB.DelayCall('MY_NotifyTip_Hide')
-				l_uiFrame:fadeIn(500)
+				l_uiFrame:FadeIn(500)
 			else
 				LIB.DelayCall('MY_NotifyTip_Hide', function()
-					l_uiFrame:fadeOut(500)
+					l_uiFrame:FadeOut(500)
 				end, 5000)
 			end
 		end,

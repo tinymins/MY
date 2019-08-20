@@ -52,13 +52,13 @@ function PS.OnPanelActive(frame)
 	local x, y = X, Y
 
 	x = X
-	y = y + ui:append('Text', { x = x, y = y, text = _L['configure'], font = 27 }, true):height()
+	y = y + ui:Append('Text', { x = x, y = y, text = _L['configure'], font = 27 }, true):Height()
 
 	x = X + 10
-	x = x + ui:append('Text', { x = x, y = y, text = _L['Configuration name'] }, true):autoWidth():width() + 5
+	x = x + ui:Append('Text', { x = x, y = y, text = _L['Configuration name'] }, true):AutoWidth():Width() + 5
 
 	do local szConfigName = MY_Cataclysm.szConfigName
-	x = x + ui:append('WndEditBox', {
+	x = x + ui:Append('WndEditBox', {
 		x = x, y = y + 3, w = 200, h = 25,
 		text = MY_Cataclysm.szConfigName,
 		onchange = function(txt)
@@ -72,27 +72,27 @@ function PS.OnPanelActive(frame)
 			MY_Cataclysm.CheckEnableTeamPanel()
 			LIB.SwitchTab('MY_Cataclysm', true)
 		end,
-	}, true):width() + 5
+	}, true):Width() + 5
 	end
 
 	-- 恢复默认
-	y = y + ui:append('WndButton2', {
+	y = y + ui:Append('WndButton2', {
 		x = x, y = y + 3, text = _L['Restore default'],
 		onclick = function()
 			MY_Cataclysm.ConfirmRestoreConfig()
 		end,
-	}, true):height() + 20
+	}, true):Height() + 20
 
 	x = X
-	y = y + ui:append('Text', { x = x, y = y, text = _L['Cataclysm Team Panel'], font = 27 }, true):autoWidth():height()
+	y = y + ui:Append('Text', { x = x, y = y, text = _L['Cataclysm Team Panel'], font = 27 }, true):AutoWidth():Height()
 
 	x = x + 10
-	x = x + ui:append('WndCheckBox', {
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['Enable Cataclysm Team Panel'],
 		oncheck = MY_Cataclysm.ToggleTeamPanel, checked = MY_Cataclysm.bEnable,
-	}, true):autoWidth():width() + 5
+	}, true):AutoWidth():Width() + 5
 
-	x = x + ui:append('WndCheckBox', {
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['Only in team'],
 		checked = CFG.bShowInRaid,
 		oncheck = function(bCheck)
@@ -105,9 +105,9 @@ function PS.OnPanelActive(frame)
 				FireUIEvent('CTM_PANEL_TEAMATE', CFG.bShowInRaid)
 			end
 		end,
-	}, true):autoWidth():width() + 5
+	}, true):AutoWidth():Width() + 5
 
-	y = y + ui:append('WndCheckBox', {
+	y = y + ui:Append('WndCheckBox', {
 		x = x, y = y, text = g_tStrings.WINDOW_LOCK,
 		checked = not CFG.bDrag,
 		oncheck = function(bCheck)
@@ -116,41 +116,41 @@ function PS.OnPanelActive(frame)
 				MY_Cataclysm.GetFrame():EnableDrag(not bCheck)
 			end
 		end,
-	}, true):autoWidth():height() + 5
+	}, true):AutoWidth():Height() + 5
 
 	-- 提醒框
 	x = X
-	y = y + ui:append('Text', { x = x, y = y, text = g_tStrings.STR_RAID_TIP_IMAGE, font = 27 }, true):height()
+	y = y + ui:Append('Text', { x = x, y = y, text = g_tStrings.STR_RAID_TIP_IMAGE, font = 27 }, true):Height()
 
 	x = X + 10
-	x = x + ui:append('WndCheckBox', {
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['Show attention shadow'],
 		checked = CFG.bShowAttention,
 		oncheck = function(bCheck)
 			CFG.bShowAttention = bCheck
 		end,
-	}, true):autoWidth():width() + 5
+	}, true):AutoWidth():Width() + 5
 
-	x = x + ui:append('WndCheckBox', {
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['Show caution animate'],
 		checked = CFG.bShowCaution,
 		oncheck = function(bCheck)
 			CFG.bShowCaution = bCheck
 		end,
-	}, true):autoWidth():width() + 5
+	}, true):AutoWidth():Width() + 5
 
-	x = x + ui:append('WndCheckBox', {
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['Show screen head'],
 		checked = CFG.bShowScreenHead,
 		oncheck = function(bCheck)
 			CFG.bShowScreenHead = bCheck
 		end,
 		tip = _L['Requires MY_LifeBar loaded.'],
-	}, true):autoWidth():width() + 5
+	}, true):AutoWidth():Width() + 5
 
 	x = X + 10
 	y = y + 25
-	x = x + ui:append('WndCheckBox', {
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['Attack Warning'],
 		checked = CFG.bHPHitAlert,
 		oncheck = function(bCheck)
@@ -159,31 +159,31 @@ function PS.OnPanelActive(frame)
 				MY_CataclysmParty:CallDrawHPMP(true, true)
 			end
 		end,
-	}, true):autoWidth():width() + 5
+	}, true):AutoWidth():Width() + 5
 
-	x = x + ui:append('WndCheckBox', {
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['Show distance'],
 		checked = CFG.bShowDistance,
 		oncheck = function(bCheck)
 			CFG.bShowDistance = bCheck
 		end,
-	}, true):autoWidth():width() + 5
+	}, true):AutoWidth():Width() + 5
 
 	local me = GetClientPlayer()
 	if me.dwForceID == CONSTANT.FORCE_TYPE.WU_DU then
-		x = x + ui:append('WndCheckBox', {
+		x = x + ui:Append('WndCheckBox', {
 			x = x, y = y, text = _L['ZuiWu Effect'],
 			color = { LIB.GetForceColor(6) },
 			checked = CFG.bShowEffect,
 			oncheck = function(bCheck)
 				CFG.bShowEffect = bCheck
 			end,
-		}, true):autoWidth():width() + 5
+		}, true):AutoWidth():Width() + 5
 	end
 
 	x = X + 10
 	y = y + 25
-	x = x + ui:append('WndCheckBox', {
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['Show target\'s target'],
 		checked = CFG.bShowTargetTargetAni,
 		oncheck = function(bCheck)
@@ -192,47 +192,47 @@ function PS.OnPanelActive(frame)
 				MY_CataclysmParty:RefreshTTarget()
 			end
 		end,
-	}, true):autoWidth():width() + 5
+	}, true):AutoWidth():Width() + 5
 
-	x = x + ui:append('WndCheckBox', {
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['Show Boss target'],
 		checked = CFG.bShowBossTarget,
 		oncheck = function(bCheck)
 			CFG.bShowBossTarget = bCheck
 		end,
-	}, true):autoWidth():width() + 5
+	}, true):AutoWidth():Width() + 5
 
-	y = y + ui:append('WndCheckBox', {
+	y = y + ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['Show Boss focus'],
 		checked = CFG.bShowBossFocus,
 		oncheck = function(bCheck)
 			CFG.bShowBossFocus = bCheck
 		end,
-	}, true):autoWidth():height()
+	}, true):AutoWidth():Height()
 
 	-- 其他
 	x = X
 	y = y + 4
-	y = y + ui:append('Text', { x = x, y = y, text = g_tStrings.OTHER, font = 27 }, true):height()
+	y = y + ui:Append('Text', { x = x, y = y, text = g_tStrings.OTHER, font = 27 }, true):Height()
 
 	x = X + 10
-	x = x + ui:append('WndCheckBox', {
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['Don\'t show Tip in fight'],
 		checked = CFG.bHideTipInFight,
 		oncheck = function(bCheck)
 			CFG.bHideTipInFight = bCheck
 		end,
-	}, true):autoWidth():width() + 5
+	}, true):AutoWidth():Width() + 5
 
-	x = x + ui:append('WndCheckBox', {
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, text = g_tStrings.STR_RAID_TARGET_ASSIST,
 		checked = CFG.bTempTargetEnable,
 		oncheck = function(bCheck)
 			CFG.bTempTargetEnable = bCheck
 		end,
-	}, true):autoWidth():width() + 5
+	}, true):AutoWidth():Width() + 5
 
-	x = x + ui:append('WndTrackbar', {
+	x = x + ui:Append('WndTrackbar', {
 		x = x, y = y - 1,
 		value = CFG.nTempTargetDelay / 75,
 		range = {0, 8},
@@ -245,25 +245,25 @@ function PS.OnPanelActive(frame)
 				and _L['Target assist no delay.']
 				or _L('Target assist delay %dms.', val * 75)
 		end,
-	}):autoWidth():width()
+	}):AutoWidth():Width()
 
 	x = X + 10
 	y = y + 25
-	x = x + ui:append('WndCheckBox', {
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['Alt view player'],
 		checked = CFG.bAltView,
 		oncheck = function(bCheck)
 			CFG.bAltView = bCheck
 		end,
-	}, true):autoWidth():width() + 5
-	x = x + ui:append('WndCheckBox', {
+	}, true):AutoWidth():Width() + 5
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['Disable in fight'],
 		checked = not CFG.bAltViewInFight,
 		oncheck = function(bCheck)
 			CFG.bAltViewInFight = not bCheck
 		end,
-	}, true):autoWidth():width() + 5
-	-- y = y + ui:append('WndCheckBox', { x = 10, y = nY, text = _L['Faster Refresh HP(Greater performance loss)'], checked = CFG.bFasterHP, enable = false })
+	}, true):AutoWidth():Width() + 5
+	-- y = y + ui:Append('WndCheckBox', { x = 10, y = nY, text = _L['Faster Refresh HP(Greater performance loss)'], checked = CFG.bFasterHP, enable = false })
 	-- :Click(function(bCheck)
 	-- 	CFG.bFasterHP = bCheck
 	-- 	if MY_Cataclysm.GetFrame() then
@@ -273,7 +273,7 @@ function PS.OnPanelActive(frame)
 	-- 			MY_Cataclysm.GetFrame():UnRegisterEvent('RENDER_FRAME_UPDATE')
 	-- 		end
 	-- 	end
-	-- end, true, true):pos('BOTTOMRIGHT')
+	-- end, true, true):Pos('BOTTOMRIGHT')
 	y = y + 25
 end
 LIB.RegisterPanel('MY_Cataclysm', _L['Cataclysm'], _L['Raid'], 'ui/Image/UICommon/RaidTotal.uitex|62', PS)

@@ -328,7 +328,7 @@ function MY_RollMonitor.DrawBoard(ui)
 		if MY_Farbnamen and MY_Farbnamen.Render then
 			szHTML = MY_Farbnamen.Render(szHTML)
 		end
-		ui:clear():append(szHTML)
+		ui:Clear():Append(szHTML)
 	end
 end
 
@@ -369,9 +369,9 @@ RegisterMsgMonitor(OnMsgArrive, {'MSG_SYS'})
 -- 标签激活响应函数
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
-	local w, h = ui:size()
+	local w, h = ui:Size()
 	-- 记录模式
-	ui:append('WndComboBox', {
+	ui:Append('WndComboBox', {
 		x = 20, y = 10, w = 180,
 		text = SORT_TYPE_INFO[MY_RollMonitor.nSortType].szName,
 		menu = function(raw)
@@ -382,7 +382,7 @@ function PS.OnPanelActive(wnd)
 					fnAction = function()
 						MY_RollMonitor.nSortType = nSortType
 						MY_RollMonitor.DrawBoard()
-						UI(raw):text(SORT_TYPE_INFO[nSortType].szName)
+						UI(raw):Text(SORT_TYPE_INFO[nSortType].szName)
 					end,
 				})
 			end
@@ -390,7 +390,7 @@ function PS.OnPanelActive(wnd)
 		end
 	})
 	-- 有效时间
-	ui:append('WndComboBox', {
+	ui:Append('WndComboBox', {
 		x = 210, y = 10, w = 120,
 		text = TIME_LIMIT_TITLE[MY_RollMonitor.nTimeLimit],
 		menu = function(raw)
@@ -399,7 +399,7 @@ function PS.OnPanelActive(wnd)
 				table.insert(t, {
 					szOption = TIME_LIMIT_TITLE[nSec],
 					fnAction = function()
-						UI(raw):text(TIME_LIMIT_TITLE[nSec])
+						UI(raw):Text(TIME_LIMIT_TITLE[nSec])
 						MY_RollMonitor.nTimeLimit = nSec
 						MY_RollMonitor.DrawBoard()
 					end,
@@ -409,7 +409,7 @@ function PS.OnPanelActive(wnd)
 		end
 	})
 	-- 清空
-	ui:append('WndButton', {
+	ui:Append('WndButton', {
 		x = w - 176, y = 10, w = 90, text = _L['restart'],
 		onlclick = function(nButton) MY_RollMonitor.Clear() end,
 		rmenu = function()
@@ -434,7 +434,7 @@ function PS.OnPanelActive(wnd)
 		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
 	})
 	-- 发布
-	ui:append('WndButton', {
+	ui:Append('WndButton', {
 		x = w - 86, y = 10, w = 80, text = _L['publish'],
 		onlclick = function() MY_RollMonitor.Echo() end,
 		rmenu = function()
@@ -478,7 +478,7 @@ function PS.OnPanelActive(wnd)
 		tipoffset = { x = -80 },
 	})
 	-- 输出板
-	m_uiBoard = ui:append('WndScrollBox',{
+	m_uiBoard = ui:Append('WndScrollBox',{
 		x = 20,  y = 40, w = w - 26, h = h - 60,
 		handlestyle = 3, text = _L['average score with out pole']
 	}, true)

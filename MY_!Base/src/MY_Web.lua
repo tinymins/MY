@@ -97,7 +97,7 @@ function MY_WebBase.OnDragButtonBegin()
 	local name = this:GetName()
 	if name == 'Btn_Drag' then
 		this.fDragX, this.fDragY = Station.GetMessagePos()
-		this.fDragW, this.fDragH = UI(this:GetRoot()):size()
+		this.fDragW, this.fDragH = UI(this:GetRoot()):Size()
 	end
 end
 
@@ -106,10 +106,10 @@ function MY_WebBase.OnDragButton()
 	if name == 'Btn_Drag' then
 		local nX, nY = Station.GetMessagePos()
 		local nDeltaX, nDeltaY = nX - this.fDragX, nY - this.fDragY
-		local nMinW, nMinH = UI(this:GetRoot()):minSize()
+		local nMinW, nMinH = UI(this:GetRoot()):MinSize()
 		local nW = max(this.fDragW + nDeltaX, nMinW or 10)
 		local nH = max(this.fDragH + nDeltaY, nMinH or 10)
-		UI(this:GetRoot()):size(nW, nH)
+		UI(this:GetRoot()):Size(nW, nH)
 	end
 end
 
@@ -185,9 +185,9 @@ function MY_Web.Open(url, options)
 	local frame = WINDOWS[szKey]
 	local ui = UI(frame)
 	if options.driver == 'ie' then
-		ui:children('#Wnd_Web'):append('WndWebPage', { name = 'WndWeb' })
+		ui:Children('#Wnd_Web'):Append('WndWebPage', { name = 'WndWeb' })
 	else --if options.driver == 'chrome' then
-		ui:children('#Wnd_Web'):append('WndWebCef', { name = 'WndWeb' })
+		ui:Children('#Wnd_Web'):Append('WndWebCef', { name = 'WndWeb' })
 	end
 	if options.controls == false then
 		frame:Lookup('Wnd_Controls'):Hide()
@@ -197,10 +197,10 @@ function MY_Web.Open(url, options)
 		frame:Lookup('', 'Text_Title'):SetText(options.title)
 	end
 	frame:Lookup('Wnd_Controls/Edit_Input'):SetText(url)
-	ui:minSize(290, 150)
-	ui:size(OnResizePanel)
-	ui:size(options.w or 500, options.h or 600)
-	ui:anchor(options.anchor or {})
+	ui:MinSize(290, 150)
+	ui:Size(OnResizePanel)
+	ui:Size(options.w or 500, options.h or 600)
+	ui:Anchor(options.anchor or {})
 	UpdateControls(frame, 'go')
 
 	return szKey

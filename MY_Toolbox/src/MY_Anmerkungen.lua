@@ -67,10 +67,10 @@ function MY_Anmerkungen.OpenPlayerNoteEditPanel(dwID, szName)
 	})
 
 	local function IsValid()
-		return ui and ui:count() > 0
+		return ui and ui:Count() > 0
 	end
 	local function RemoveFrame()
-		ui:remove()
+		ui:Remove()
 		return true
 	end
 	LIB.RegisterEsc('MY_Anmerkungen_PlayerNoteEditPanel', IsValid, RemoveFrame)
@@ -79,11 +79,11 @@ function MY_Anmerkungen.OpenPlayerNoteEditPanel(dwID, szName)
 		LIB.RegisterEsc('MY_Anmerkungen_PlayerNoteEditPanel')
 		PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
 	end
-	ui:remove(onRemove)
+	ui:Remove(onRemove)
 
 	local x, y = 35 , 50
-	ui:append('Text', { x = x, y = y, text = _L['Name:'] })
-	ui:append('WndEditBox', {
+	ui:Append('Text', { x = x, y = y, text = _L['Name:'] })
+	ui:Append('WndEditBox', {
 		name = 'WndEditBox_Name',
 		x = x + 60, y = y, w = 200, h = 25,
 		multiline = false, text = szName or note.szName or '',
@@ -97,36 +97,36 @@ function MY_Anmerkungen.OpenPlayerNoteEditPanel(dwID, szName)
 				rec.bAlertWhenGroup = false
 			end
 			if rec.dwID then
-				ui:children('#WndButton_Submit'):enable(true)
-				ui:children('#WndEditBox_ID'):text(rec.dwID)
-				ui:children('#WndEditBox_Content'):text(rec.szContent)
-				ui:children('#WndCheckBox_TipWhenGroup'):check(rec.bTipWhenGroup)
-				ui:children('#WndCheckBox_AlertWhenGroup'):check(rec.bAlertWhenGroup)
+				ui:Children('#WndButton_Submit'):Enable(true)
+				ui:Children('#WndEditBox_ID'):Text(rec.dwID)
+				ui:Children('#WndEditBox_Content'):Text(rec.szContent)
+				ui:Children('#WndCheckBox_TipWhenGroup'):Check(rec.bTipWhenGroup)
+				ui:Children('#WndCheckBox_AlertWhenGroup'):Check(rec.bAlertWhenGroup)
 			else
-				ui:children('#WndButton_Submit'):enable(false)
-				ui:children('#WndEditBox_ID'):text(_L['Not found in local store'])
+				ui:Children('#WndButton_Submit'):Enable(false)
+				ui:Children('#WndEditBox_ID'):Text(_L['Not found in local store'])
 			end
 		end,
 	})
 	y = y + 30
 
-	ui:append('Text', { x = x, y = y, text = _L['ID:'] })
-	ui:append('WndEditBox', {
+	ui:Append('Text', { x = x, y = y, text = _L['ID:'] })
+	ui:Append('WndEditBox', {
 		name = 'WndEditBox_ID', x = x + 60, y = y, w = 200, h = 25,
 		text = dwID or note.dwID or '',
 		multiline = false, enable = false, color = {200,200,200},
 	})
 	y = y + 30
 
-	ui:append('Text', { x = x, y = y, text = _L['Content:'] })
-	ui:append('WndEditBox', {
+	ui:Append('Text', { x = x, y = y, text = _L['Content:'] })
+	ui:Append('WndEditBox', {
 		name = 'WndEditBox_Content',
 		x = x + 60, y = y, w = 200, h = 80,
 		multiline = true, text = note.szContent or '',
 	})
 	y = y + 90
 
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		name = 'WndCheckBox_AlertWhenGroup',
 		x = x + 58, y = y, w = 200,
 		text = _L['alert when group'],
@@ -134,7 +134,7 @@ function MY_Anmerkungen.OpenPlayerNoteEditPanel(dwID, szName)
 	})
 	y = y + 20
 
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		name = 'WndCheckBox_TipWhenGroup',
 		x = x + 58, y = y, w = 200,
 		text = _L['tip when group'],
@@ -142,39 +142,39 @@ function MY_Anmerkungen.OpenPlayerNoteEditPanel(dwID, szName)
 	})
 	y = y + 30
 
-	ui:append('WndButton', {
+	ui:Append('WndButton', {
 		name = 'WndButton_Submit',
 		x = x + 58, y = y, w = 80,
 		text = _L['sure'],
 		onclick = function()
 			MY_Anmerkungen.SetPlayerNote(
-				ui:children('#WndEditBox_ID'):text(),
-				ui:children('#WndEditBox_Name'):text(),
-				ui:children('#WndEditBox_Content'):text(),
-				ui:children('#WndCheckBox_TipWhenGroup'):check(),
-				ui:children('#WndCheckBox_AlertWhenGroup'):check()
+				ui:Children('#WndEditBox_ID'):Text(),
+				ui:Children('#WndEditBox_Name'):Text(),
+				ui:Children('#WndEditBox_Content'):Text(),
+				ui:Children('#WndCheckBox_TipWhenGroup'):Check(),
+				ui:Children('#WndCheckBox_AlertWhenGroup'):Check()
 			)
-			ui:remove()
+			ui:Remove()
 		end,
 	})
-	ui:append('WndButton', {
+	ui:Append('WndButton', {
 		x = x + 143, y = y, w = 80,
 		text = _L['cancel'],
-		onclick = function() ui:remove() end,
+		onclick = function() ui:Remove() end,
 	})
-	ui:append('Text', {
+	ui:Append('Text', {
 		x = x + 230, y = y - 3, w = 80, alpha = 200,
 		text = _L['delete'], color = {255,0,0},
-		onhover = function(bIn) UI(this):alpha((bIn and 255) or 200) end,
+		onhover = function(bIn) UI(this):Alpha((bIn and 255) or 200) end,
 		onclick = function()
-			MY_Anmerkungen.SetPlayerNote(ui:children('#WndEditBox_ID'):text())
-			ui:remove()
+			MY_Anmerkungen.SetPlayerNote(ui:Children('#WndEditBox_ID'):Text())
+			ui:Remove()
 		end,
 	})
 
 	-- init
 	Station.SetFocusWindow(ui[1])
-	ui:children('#WndEditBox_Name'):change()
+	ui:Children('#WndEditBox_Name'):Change()
 	PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
 end
 
@@ -265,10 +265,10 @@ function MY_Anmerkungen.SetPlayerNote(dwID, szName, szContent, bTipWhenGroup, bA
 			PUBLIC_PLAYER_IDS[szName] = dwID
 		end
 		if _C.list then
-			_C.list:listbox('update', 'id', dwID, {'text', 'data'}, { _L('[%s] %s', t.szName, t.szContent), t })
+			_C.list:ListBox('update', 'id', dwID, {'text', 'data'}, { _L('[%s] %s', t.szName, t.szContent), t })
 		end
 	elseif _C.list then
-		_C.list:listbox('delete', 'id', dwID)
+		_C.list:ListBox('delete', 'id', dwID)
 	end
 	FireUIEvent('MY_ANMERKUNGEN_UPDATE')
 	MY_Anmerkungen.SaveConfig()
@@ -410,10 +410,10 @@ LIB.RegisterInit('MY_ANMERKUNGEN', MY_Anmerkungen.LoadConfig)
 local PS = {}
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
-	local w, h = ui:size()
+	local w, h = ui:Size()
 	local x, y = 0, 0
 
-	ui:append('WndButton2', {
+	ui:Append('WndButton2', {
 		x = x, y = y, w = 110,
 		text = _L['Create'],
 		onclick = function()
@@ -422,7 +422,7 @@ function PS.OnPanelActive(wnd)
 	})
 
 	if not MY.IsShieldedVersion() then
-		ui:append('WndButton2', {
+		ui:Append('WndButton2', {
 			x = w - 230, y = y, w = 110,
 			text = _L['Import'],
 			onclick = function()
@@ -489,7 +489,7 @@ function PS.OnPanelActive(wnd)
 			end,
 		})
 
-		ui:append('WndButton2', {
+		ui:Append('WndButton2', {
 			x = w - 110, y = y, w = 110,
 			text = _L['Export'],
 			onclick = function()
@@ -505,7 +505,7 @@ function PS.OnPanelActive(wnd)
 	end
 
 	y = y + 30
-	local list = ui:append('WndListBox', {
+	local list = ui:Append('WndListBox', {
 		x = x, y = y,
 		w = w, h = h - 30,
 		listbox = {{
@@ -518,7 +518,7 @@ function PS.OnPanelActive(wnd)
 	}, true)
 	for dwID, t in pairs(PUBLIC_PLAYER_NOTES) do
 		if tonumber(dwID) then
-			list:listbox('insert', _L('[%s] %s', t.szName, t.szContent), t.dwID, t)
+			list:ListBox('insert', _L('[%s] %s', t.szName, t.szContent), t.dwID, t)
 		end
 	end
 	_C.list = list

@@ -336,9 +336,9 @@ local PS = { bShielded = true }
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
 	local x, y = 30, 30
-	local w, h = ui:size()
+	local w, h = ui:Size()
 
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 120,
 		text = _L['enable'],
 		checked = MY_ArchHUD.bOn,
@@ -349,7 +349,7 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + 45
 
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 200,
 		text = _L['hide when unfight'],
 		checked = MY_ArchHUD.bFightShow,
@@ -360,7 +360,7 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + 45
 
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 200,
 		text = _L['display target casting'],
 		checked = MY_ArchHUD.bShowCastingBar,
@@ -371,7 +371,7 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + 45
 
-	ui:append('WndTrackbar', {
+	ui:Append('WndTrackbar', {
 		x = x, y = y, w = 200,
 		text = _L('current alpha is %d%%.', MY_ArchHUD.nAlpha),
 		textfmt = function(val) return _L('current alpha is %d%%.', val) end,
@@ -387,7 +387,7 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + 45
 
-	ui:append('Text', {
+	ui:Append('Text', {
 		x = x, y = y, w = 120,
 		text = _L['origin author: Sulian Yi'],
 	})

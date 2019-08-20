@@ -53,23 +53,23 @@ function CharInfo.CreateFrame(dwID, szName)
 	local ui = UI.CreateFrame('MY_CharInfo' .. dwID, { w = 240, h = 400, text = '', close = true })
 	local frame = CharInfo.GetFrame(dwID)
 	local x, y = 20, 10
-	x = x + ui:append('Image', {
+	x = x + ui:Append('Image', {
 		name = 'Image_Kungfu',
 		x = x, y = y, w = 30, h = 30,
-	}, true):width() + 5
-	ui:append('Text', {
+	}, true):Width() + 5
+	ui:Append('Text', {
 		name = 'Text_Name',
 		x = x, y = y + 2, w = 240 - 2 * x,
 		text = wstring.sub(szName, 1, 6), halign = 1,
 	}) -- UI超了
-	ui:append('WndButton2', {
+	ui:Append('WndButton2', {
 		name = 'LOOKUP', x = 70, y = 360,
 		text = g_tStrings.STR_LOOKUP,
 		onclick = function()
 			ViewInviteToPlayer(dwID)
 		end,
 	})
-	ui:append('Text', { name = 'Text_Info', x = 20, y = 72, text = _L['Asking...'], w = 200, h = 70, font = 27, multiline = true })
+	ui:Append('Text', { name = 'Text_Info', x = 20, y = 72, text = _L['Asking...'], w = 200, h = 70, font = 27, multiline = true })
 	frame.pending = true
 end
 
@@ -79,10 +79,10 @@ function CharInfo.UpdateFrame(frame, status, data)
 	end
 	local ui = UI(frame)
 	if status == 'REFUSE' then
-		ui:children('#Text_Info'):text(_L['Refuse request']):show()
+		ui:Children('#Text_Info'):Text(_L['Refuse request']):Show()
 		frame.pending = false
 	elseif status == 'PROGRESS' then
-		ui:children('#Text_Info'):text(_L('Syncing: %.2f%%.', data)):show()
+		ui:Children('#Text_Info'):Text(_L('Syncing: %.2f%%.', data)):Show()
 	elseif status == 'ACCEPT' and data and type(data) == 'table' then
 		local self_data = LIB.GetCharInfo()
 		local function GetSelfValue(label, value)
@@ -99,17 +99,17 @@ function CharInfo.UpdateFrame(frame, status, data)
 			return { 255, 255, 255 }
 		end
 		-- 设置基础属性
-		ui:children('#Image_Kungfu'):icon((select(2, LIB.GetSkillName(data.dwMountKungfuID, 1))))
-		ui:children('#Text_Name'):color({ LIB.GetForceColor(data.dwForceID) })
+		ui:Children('#Image_Kungfu'):Icon((select(2, LIB.GetSkillName(data.dwMountKungfuID, 1))))
+		ui:Children('#Text_Name'):Color({ LIB.GetForceColor(data.dwForceID) })
 		-- 绘制属性条
 		local y0 = 20
 		for i = 1, #data do
 			local v = data[i]
 			if v.category then
-				ui:append('Text', { x = 20, y = y0 + i * 25, w = 200, h = 25, halign = 1, text = v.label })
+				ui:Append('Text', { x = 20, y = y0 + i * 25, w = 200, h = 25, halign = 1, text = v.label })
 			else
-				ui:append('Text', { x = 20, y = y0 + i * 25, w = 200, h = 25, halign = 0, text = v.label })
-				ui:append('Text', {
+				ui:Append('Text', { x = 20, y = y0 + i * 25, w = 200, h = 25, halign = 0, text = v.label })
+				ui:Append('Text', {
 					x = 20, y = y0 + i * 25, w = 200, h = 25,
 					halign = 2, text = v.value,
 					color = GetSelfValue(v.label, v.value),
@@ -129,10 +129,10 @@ function CharInfo.UpdateFrame(frame, status, data)
 			end
 		end
 		-- 避免大小不够
-		ui:size(240, y0 + 75 + #data * 25)
-		ui:children('#LOOKUP'):pos(70, y0 + 35 + #data * 25)
-		ui:anchor('CENTER')
-		ui:children('#Text_Info'):hide()
+		ui:Size(240, y0 + 75 + #data * 25)
+		ui:Children('#LOOKUP'):Pos(70, y0 + 35 + #data * 25)
+		ui:Anchor('CENTER')
+		ui:Children('#Text_Info'):Hide()
 		frame.pending = false
 	end
 end

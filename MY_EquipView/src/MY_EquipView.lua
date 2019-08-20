@@ -83,7 +83,7 @@ _C.UpdateAllEquipBox = function() -- update boxes
 	for i = 0, CONSTANT.EQUIPMENT_SUIT_COUNT - 1 do
 		local nSuitIndex, dwBox = _C.GetSuitIndex(me, i)
 		for _, nType in ipairs(_C.tEquipPos) do
-			local box = ui:children('#Box_' .. i .. '_' .. nType)[1]
+			local box = ui:Children('#Box_' .. i .. '_' .. nType)[1]
 			local item = GetPlayerItem(me, dwBox, nType)
 			UpdataItemBoxObject(box, dwBox, nType, item, nil, nSuitIndex)
 		end
@@ -97,7 +97,7 @@ _C.PS = {
 		local ui = UI(wnd)
 		for i = 0, CONSTANT.EQUIPMENT_SUIT_COUNT - 1 do
 			for _, nType in ipairs(_C.tEquipPos) do
-				ui:append('Box', 'Box_' .. i .. '_' .. nType)
+				ui:Append('Box', 'Box_' .. i .. '_' .. nType)
 			end
 		end
 		_C.PS.OnPanelResize(wnd)
@@ -105,7 +105,7 @@ _C.PS = {
 	end,
 	OnPanelResize = function(wnd) -- correct item pos
 		local ui = UI(wnd)
-		local w , h  = ui:size()
+		local w , h  = ui:Size()
 		local x0, y0 = 0 , 10
 		local x , y  = x0, y0
 		local dx, dy, dy2 = 50, 48, 52
@@ -115,7 +115,7 @@ _C.PS = {
 				if x + dx > w then
 					x, y = x0, y + dy
 				end
-				ui:children('#Box_' .. i .. '_' .. nType):pos(x, y)
+				ui:Children('#Box_' .. i .. '_' .. nType):Pos(x, y)
 				x = x + dx
 			end
 			x, y = x0, y + dy2

@@ -267,10 +267,10 @@ _C.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel)
     OutputMessage('MSG_MY_MONITOR', szMsg, true)
     -- ¸üÐÂUI
     if _C.uiBoard then
-        local nPos = _C.uiBoard:scroll()
-        _C.uiBoard:append(html)
+        local nPos = _C.uiBoard:Scroll()
+        _C.uiBoard:Append(html)
         if nPos == 100 or nPos == -1 then
-            _C.uiBoard:scroll(100)
+            _C.uiBoard:Scroll(100)
         end
     end
     LIB.CreateNotify({
@@ -300,7 +300,7 @@ _C.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel)
                 end
             end
             if _C.uiBoard then
-                _C.uiBoard:removeItemUntilNewLine()
+                _C.uiBoard:RemoveItemUntilNewLine()
             end
             table.remove(RECORD_LIST, 1)
         end
@@ -312,11 +312,11 @@ end
 
 _C.OnPanelActive = function(wnd)
     local ui = UI(wnd)
-    local w, h = ui:size()
+    local w, h = ui:Size()
 
-    ui:append('Text', { x = 22, y = 15, w = 100, h = 25, text = _L['key words:'] })
+    ui:Append('Text', { x = 22, y = 15, w = 100, h = 25, text = _L['key words:'] })
 
-    ui:append('WndAutocomplete', {
+    ui:Append('WndAutocomplete', {
         x = 80, y = 15, w = w - 226, h = 25, text = MY_ChatMonitor.szKeyWords,
         onchange = function(szText) MY_ChatMonitor.szKeyWords = szText end,
         onfocus = function(self)
@@ -326,11 +326,11 @@ _C.OnPanelActive = function(wnd)
                     table.insert(source, szOpt)
                 end
             end
-            self:autocomplete('option', 'source', source)
+            self:Autocomplete('option', 'source', source)
         end,
         onclick = function()
             if IsPopupMenuOpened() then
-                UI(this):autocomplete('close')
+                UI(this):Autocomplete('close')
             else
                 local source = {}
                 for _, szOpt in ipairs(LIB.LoadLUAData({_C.szLuaData, PATH_TYPE.GLOBAL}) or {}) do
@@ -338,8 +338,8 @@ _C.OnPanelActive = function(wnd)
                         table.insert(source, szOpt)
                     end
                 end
-                UI(this):autocomplete('option', 'source', source)
-                UI(this):autocomplete('search', '')
+                UI(this):Autocomplete('option', 'source', source)
+                UI(this):Autocomplete('search', '')
             end
         end,
         autocomplete = {
@@ -360,7 +360,7 @@ _C.OnPanelActive = function(wnd)
                                 table.insert(t, szVal)
                                 LIB.SaveLUAData({_C.szLuaData, PATH_TYPE.GLOBAL}, t)
                             end
-                        end, function() end, function() end, nil, UI(wnd):text() )
+                        end, function() end, function() end, nil, UI(wnd):Text() )
                     end })
                 end,
             },
@@ -378,7 +378,7 @@ _C.OnPanelActive = function(wnd)
         },
     })
 
-    ui:append('Image', {
+    ui:Append('Image', {
         image = 'UI/Image/UICommon/Commonpanel2.UITex', imageframe = 48,
         x = 8, y = 10, w = 25, h = 25, alpha = 180,
         onhover = function(bIn) this:SetAlpha( (bIn and 255 ) or 180) end,
@@ -390,7 +390,7 @@ _C.OnPanelActive = function(wnd)
         end,
     })
 
-    ui:append('Image', {
+    ui:Append('Image', {
         x = w - 26, y = 13,
         image = 'UI/Image/UICommon/Commonpanel.UITex', imageframe = 18,
         w = 30, h = 30, alpha = 200,
@@ -524,40 +524,40 @@ _C.OnPanelActive = function(wnd)
         end,
     })
 
-    ui:append('WndButton', {
+    ui:Append('WndButton', {
         name = 'Button_ChatMonitor_Switcher',
         x = w - 136, y = 15, w = 50,
         text = (MY_ChatMonitor.bCapture and _L['stop']) or _L['start'],
         onclick = function()
             if MY_ChatMonitor.bCapture then
-                UI(this):text(_L['start'])
+                UI(this):Text(_L['start'])
                 MY_ChatMonitor.bCapture = false
             else
-                UI(this):text(_L['stop'])
+                UI(this):Text(_L['stop'])
                 MY_ChatMonitor.bCapture = true
             end
         end,
     })
 
-    ui:append('WndButton', {
+    ui:Append('WndButton', {
         x = w - 81, y = 15, w = 50,
         text = _L['clear'],
         onclick = function()
             RECORD_LIST = {}
             RECORD_HASH = {}
-            _C.uiBoard:clear()
+            _C.uiBoard:Clear()
         end,
     })
 
-    _C.uiBoard = ui:append('WndScrollBox', {
+    _C.uiBoard = ui:Append('WndScrollBox', {
         name = 'WndScrollBox_TalkList',
         x = 20, y = 50, w = w - 21, h = h - 70, handlestyle = 3,
     }, true)
 
     for i = 1, #RECORD_LIST, 1 do
-        _C.uiBoard:append(D.GetHTML(RECORD_LIST[i]))
+        _C.uiBoard:Append(D.GetHTML(RECORD_LIST[i]))
     end
-    _C.uiBoard:scroll(100)
+    _C.uiBoard:Scroll(100)
     _C.ui = UI(wnd)
     _C.Init()
 end
@@ -583,10 +583,10 @@ end
 LIB.RegisterHotKey('MY_ChatMonitor_Hotkey', _L['chat monitor'],
     function()
         if MY_ChatMonitor.bCapture then
-            UI(LIB.GetFrame()):find('#Button_ChatMonitor_Switcher'):text(_L['start'])
+            UI(LIB.GetFrame()):Find('#Button_ChatMonitor_Switcher'):Text(_L['start'])
             MY_ChatMonitor.bCapture = false
         else
-            UI(LIB.GetFrame()):find('#Button_ChatMonitor_Switcher'):text(_L['stop'])
+            UI(LIB.GetFrame()):Find('#Button_ChatMonitor_Switcher'):Text(_L['stop'])
             MY_ChatMonitor.bCapture = true
         end
     end

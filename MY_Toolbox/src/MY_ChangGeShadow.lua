@@ -126,7 +126,7 @@ end
 LIB.RegisterInit('MY_ChangGeShadow', D.Apply)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x = x + ui:append('WndCheckBox', {
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, w = 'auto',
 		text = _L['show changge shadow index'],
 		checked = MY_ChangGeShadow.bEnable,
@@ -134,7 +134,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 			MY_ChangGeShadow.bEnable = bChecked
 		end,
 		tip = function(self)
-			if not self:enable() then
+			if not self:Enable() then
 				return _L['changge force only']
 			end
 		end,
@@ -143,8 +143,8 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 			local me = GetClientPlayer()
 			return me and me.dwForceID == CONSTANT.FORCE_TYPE.CHANG_GE
 		end,
-	}, true):width() + 5
-	x = x + ui:append('WndCheckBox', {
+	}, true):Width() + 5
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, w = 'auto',
 		text = _L['show distance'],
 		checked = MY_ChangGeShadow.bShowDistance,
@@ -152,7 +152,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 			MY_ChangGeShadow.bShowDistance = bChecked
 		end,
 		tip = function(self)
-			if not self:enable() then
+			if not self:Enable() then
 				return _L['changge force only']
 			end
 		end,
@@ -161,8 +161,8 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 			local me = GetClientPlayer()
 			return me and me.dwForceID == CONSTANT.FORCE_TYPE.CHANG_GE
 		end,
-	}, true):width() + 5
-	x = x + ui:append('WndCheckBox', {
+	}, true):Width() + 5
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, w = 'auto',
 		text = _L['show countdown'],
 		checked = MY_ChangGeShadow.bShowCD,
@@ -170,7 +170,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 			MY_ChangGeShadow.bShowCD = bChecked
 		end,
 		tip = function(self)
-			if not self:enable() then
+			if not self:Enable() then
 				return _L['changge force only']
 			end
 		end,
@@ -179,8 +179,8 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 			local me = GetClientPlayer()
 			return me and me.dwForceID == CONSTANT.FORCE_TYPE.CHANG_GE
 		end,
-	}, true):width() + 5
-	ui:append('WndTrackbar', {
+	}, true):Width() + 5
+	ui:Append('WndTrackbar', {
 		x = x, y = y, w = 150,
 		textfmt = function(val) return _L('scale: %d%%.', val) end,
 		range = {10, 800},

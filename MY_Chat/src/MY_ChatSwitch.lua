@@ -81,7 +81,7 @@ local function UpdateChannelDailyLimit(hRadio, bPlus)
 			end
 		end
 	end
-	UI(shaCount):drawCircle(nil, nil, nil, info.color[1], info.color[2], info.color[3], 100, math.pi / 2, math.pi * 2 * dwPercent)
+	UI(shaCount):DrawCircle(nil, nil, nil, info.color[1], info.color[2], info.color[3], 100, math.pi / 2, math.pi * 2 * dwPercent)
 end
 
 local function OnClsCheck()
@@ -116,7 +116,7 @@ local function OnClsCheck()
 			}, { szOption = g_tStrings.STR_HOTKEY_CANCEL },
 		})
 	end
-	UI(this):check(false)
+	UI(this):Check(false)
 end
 
 local function OnAwayCheck()
@@ -316,7 +316,7 @@ function MY_ChatSwitch.OnFrameCreate()
 				this.tRadios[v.channel] = chk
 			end
 			if v.tip then
-				UI(chk):tip(v.tip, UI.TIP_POSITION.CENTER)
+				UI(chk):Tip(v.tip, UI.TIP_POSITION.CENTER)
 			end
 			if txtTitle then
 				txtTitle:SetText(v.title)
@@ -329,7 +329,7 @@ function MY_ChatSwitch.OnFrameCreate()
 				txtCooldown:SetFontColor(unpack(v.color or {255, 255, 255}))
 			end
 			if shaCount then
-				UI(shaCount):drawCircle(0, 0, 0)
+				UI(shaCount):DrawCircle(0, 0, 0)
 			end
 			chk.info = v
 			UpdateChannelDailyLimit(chk)
@@ -464,20 +464,20 @@ LIB.RegisterStorageInit('MY_CHAT', MY_ChatSwitch.ReInitUI)
 local PS = {}
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
-	local w , h  = ui:size()
+	local w , h  = ui:Size()
 	local x0, y0 = 30, 30
 	local x , y  = x0, y0
 	local deltaX = 25
 	local deltaY = 33
 
-	ui:append('WndButton', {
+	ui:Append('WndButton', {
 		x = w - x - 80, y = y,
 		w = 80, h = 30,
 		text = _L['about...'],
 		onclick = function() LIB.Alert(_L['Mingyi Plugins - Chatpanel\nThis plugin is developed by tinymins @ derzh.com.']) end,
 	})
 
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 250,
 		text = _L['display panel'],
 		checked = LIB.GetStorage('BoolValues.MY_ChatSwitch_DisplayPanel'),
@@ -488,7 +488,7 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + deltaY
 
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		x = x + deltaX, y = y, w = 250,
 		text = _L['lock postion'],
 		checked = LIB.GetStorage('BoolValues.MY_ChatSwitch_LockPostion'),
@@ -502,7 +502,7 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + deltaY
 
-	ui:append('WndComboBox', {
+	ui:Append('WndComboBox', {
 		x = x + deltaX, y = y, w = 150, h = 25,
 		text = _L['channel setting'],
 		menu = function()
@@ -533,7 +533,7 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + deltaY
 
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 250,
 		text = _L['team balloon'],
 		checked = MY_TeamBalloon.Enable(),
@@ -543,7 +543,7 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + deltaY
 
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 250,
 		text = _L['chat time'],
 		checked = MY_ChatCopy.bChatTime,
@@ -556,7 +556,7 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + deltaY
 
-	ui:append('WndComboBox', {
+	ui:Append('WndComboBox', {
 		x = x + deltaX, y = y, w = 150,
 		text = _L['chat time format'],
 		menu = function()
@@ -585,7 +585,7 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + deltaY
 
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 250,
 		text = _L['chat copy'],
 		checked = MY_ChatCopy.bChatCopy,
@@ -595,7 +595,7 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + deltaY
 
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		x = x + deltaX, y = y, w = 250,
 		text = _L['always show *'],
 		checked = MY_ChatCopy.bChatCopyAlwaysShowMask,
@@ -608,7 +608,7 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + deltaY
 
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		x = x + deltaX, y = y, w = 250,
 		text = _L['always be white'],
 		checked = MY_ChatCopy.bChatCopyAlwaysWhite,
@@ -621,7 +621,7 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + deltaY
 
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		x = x + deltaX, y = y, w = 250,
 		text = _L['hide system msg copy'],
 		checked = MY_ChatCopy.bChatCopyNoCopySysmsg,
@@ -635,7 +635,7 @@ function PS.OnPanelActive(wnd)
 	y = y + deltaY
 
 	if (MY_Farbnamen and MY_Farbnamen.GetMenu) then
-		ui:append('WndComboBox', {
+		ui:Append('WndComboBox', {
 			x = x, y = y, w = 150,
 			text = _L['farbnamen'],
 			menu = MY_Farbnamen.GetMenu,

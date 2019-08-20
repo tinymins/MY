@@ -145,51 +145,51 @@ function PS.OnPanelActive(frame)
 	local X, Y = 20, 20
 	local nX, nY = X, Y
 
-	nX, nY = ui:append('Text', { x = nX, y = nY, text = _L['MY_TeamMon_LT'], font = 27 }, true):pos('BOTTOMRIGHT')
-	nX = ui:append('Text', { text = _L['Font scale'], x = X + 10, y = nY + 10 }, true):pos('BOTTOMRIGHT')
-	nX, nY = ui:append('WndTrackbar', {
+	nX, nY = ui:Append('Text', { x = nX, y = nY, text = _L['MY_TeamMon_LT'], font = 27 }, true):Pos('BOTTOMRIGHT')
+	nX = ui:Append('Text', { text = _L['Font scale'], x = X + 10, y = nY + 10 }, true):Pos('BOTTOMRIGHT')
+	nX, nY = ui:Append('WndTrackbar', {
 		x = nX + 10, y = nY + 13, text = '',
 		range = {1, 2, 10}, value = O.fScale,
 		onchange = function(nVal)
 			O.fScale = nVal
-			ui:children('#Text_Preview'):font(O.dwFontScheme):scale(O.fScale)
+			ui:Children('#Text_Preview'):Font(O.dwFontScheme):scale(O.fScale)
 		end,
-	}, true):pos('BOTTOMRIGHT')
+	}, true):Pos('BOTTOMRIGHT')
 
-	nX = ui:append('Text', { text = _L['Pause time'], x = X + 10, y = nY }, true):pos('BOTTOMRIGHT')
-	nX, nY = ui:append('WndTrackbar', {
+	nX = ui:Append('Text', { text = _L['Pause time'], x = X + 10, y = nY }, true):Pos('BOTTOMRIGHT')
+	nX, nY = ui:Append('WndTrackbar', {
 		x = nX + 10, y = nY + 3, text = _L['s'],
 		range = {0.5, 3, 25}, value = O.fPause,
 		onchange = function(nVal)
 			O.fPause = nVal
 		end,
-	}, true):pos('BOTTOMRIGHT')
+	}, true):Pos('BOTTOMRIGHT')
 
-	nX = ui:append('Text', { text = _L['FadeOut time'], x = X + 10, y = nY }, true):pos('BOTTOMRIGHT')
+	nX = ui:Append('Text', { text = _L['FadeOut time'], x = X + 10, y = nY }, true):Pos('BOTTOMRIGHT')
 	nX, nY = ui:Append('WndTrackbar', {
 		x = nX + 10, y = nY + 3, text = _L['s'],
 		range = {0, 3, 30}, value = O.fFadeOut,
 		onchange = function(nVal)
 			O.fFadeOut = nVal
 		end,
-	}, true):pos('BOTTOMRIGHT')
+	}, true):Pos('BOTTOMRIGHT')
 
 	nY = nY + 10
-	nX = ui:append('WndButton2', { x = X + 10, y = nY + 5, text = g_tStrings.FONT,
+	nX = ui:Append('WndButton2', { x = X + 10, y = nY + 5, text = g_tStrings.FONT,
 		onclick = function()
 			UI.OpenFontPicker(function(nFont)
 				O.dwFontScheme = nFont
-				ui:children('#Text_Preview'):font(O.dwFontScheme):scale(O.fScale)
+				ui:Children('#Text_Preview'):Font(O.dwFontScheme):scale(O.fScale)
 			end)
 		end,
-	}, true):pos('BOTTOMRIGHT')
-	ui:append('WndButton2', {
+	}, true):Pos('BOTTOMRIGHT')
+	ui:Append('WndButton2', {
 		text = _L['Preview'], x = nX + 10, y = nY + 5,
 		onclick = function()
 			D.UpdateText(_L['PVE everyday, Xuanjing everyday!'])
 		end,
 	})
-	ui:append('Text', { name = 'Text_Preview', x = 20, y = nY + 50, txt = _L['JX3'], font = O.dwFontScheme, scale = O.fScale})
+	ui:Append('Text', { name = 'Text_Preview', x = 20, y = nY + 50, txt = _L['JX3'], font = O.dwFontScheme, scale = O.fScale})
 end
 LIB.RegisterPanel('MY_TeamMon_LT', _L['MY_TeamMon_LT'], _L['Raid'], 'ui/Image/TargetPanel/Target.uitex|59', PS)
 

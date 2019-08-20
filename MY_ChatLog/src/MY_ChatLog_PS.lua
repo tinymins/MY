@@ -222,7 +222,7 @@ function D.ExportConfirm()
 	local x, y = X, Y
 	local nMaxWidth = 0
 	for nGroup, info in ipairs(LOG_TYPE) do
-		x = x + ui:append('WndCheckBox', {
+		x = x + ui:Append('WndCheckBox', {
 			x = x, y = y, w = 100,
 			text = info.title,
 			checked = true,
@@ -237,9 +237,9 @@ function D.ExportConfirm()
 						end
 					end
 				end
-				btnSure:enable(bEnable)
+				btnSure:Enable(bEnable)
 			end,
-		}, true):autoWidth():width()
+		}, true):AutoWidth():Width()
 		nMaxWidth = max(nMaxWidth, x + X)
 		if nGroup % 2 == 0 or nGroup == #LOG_TYPE then
 			x = X
@@ -252,7 +252,7 @@ function D.ExportConfirm()
 	y = y + 10
 
 	x = X + 20
-	btnSure = ui:append('WndButton', {
+	btnSure = ui:Append('WndButton', {
 		x = x, y = y, w = nMaxWidth - x * 2, h = 35,
 		text = _L['Export chatlog'],
 		onclick = function()
@@ -272,7 +272,7 @@ function D.ExportConfirm()
 						OutputMessage('MSG_ANNOUNCE_YELLOW', _L('Exporting chatlog: %s, %.2f%%.', title, progress * 100))
 					end
 				)
-				ui:remove()
+				ui:Remove()
 			end
 			LIB.Confirm(
 				_L['Please choose export mode.\nHTML mode will export chatlog to human-readable file.\nDB mode will export chatlog to re-importable backup file.'],
@@ -282,8 +282,8 @@ function D.ExportConfirm()
 		end,
 	}, true)
 	y = y + 30
-	ui:size(nMaxWidth, y + 50)
-	ui:anchor({s = 'CENTER', r = 'CENTER', x = 0, y = 0})
+	ui:Size(nMaxWidth, y + 50)
+	ui:Anchor({s = 'CENTER', r = 'CENTER', x = 0, y = 0})
 end
 
 function D.Export(szExportFile, aChannels, nPerSec, onProgress)
@@ -372,12 +372,12 @@ end
 local PS = {}
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
-	local w, h = ui:size()
+	local w, h = ui:Size()
 	local x, y = 50, 50
 	local dy = 40
 	local wr = 200
 
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		x = x, y = y, w = wr,
 		text = _L['Filter tong member log message'],
 		checked = MY_ChatLog.bIgnoreTongMemberLogMsg,
@@ -387,7 +387,7 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + dy
 
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		x = x, y = y, w = wr,
 		text = _L['Filter tong online message'],
 		checked = MY_ChatLog.bIgnoreTongOnlineMsg,
@@ -398,7 +398,7 @@ function PS.OnPanelActive(wnd)
 	y = y + dy
 
 	if not LIB.IsShieldedVersion() then
-		ui:append('WndCheckBox', {
+		ui:Append('WndCheckBox', {
 			x = x, y = y, w = wr,
 			text = _L['Realtime database commit'],
 			checked = MY_ChatLog.bRealtimeCommit,
@@ -409,7 +409,7 @@ function PS.OnPanelActive(wnd)
 		y = y + dy
 	end
 
-	ui:append('WndButton', {
+	ui:Append('WndButton', {
 		x = x, y = y, w = 125, h = 35,
 		text = _L['Open chatlog'],
 		onclick = function()
@@ -418,7 +418,7 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + dy
 
-	ui:append('WndButton', {
+	ui:Append('WndButton', {
 		x = x, y = y, w = 125, h = 35,
 		text = _L['Export chatlog'],
 		onclick = function()
@@ -427,7 +427,7 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + dy
 
-	ui:append('WndButton', {
+	ui:Append('WndButton', {
 		x = x, y = y, w = 125, h = 35,
 		text = _L['Optimize datebase'],
 		onclick = function()
@@ -441,7 +441,7 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + dy
 
-	ui:append('WndButton', {
+	ui:Append('WndButton', {
 		x = x, y = y, w = 125, h = 35,
 		text = _L['Import chatlog'],
 		onclick = function()

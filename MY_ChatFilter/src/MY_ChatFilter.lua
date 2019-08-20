@@ -178,10 +178,10 @@ end)
 LIB.RegisterPanel('MY_DuplicateChatFilter', _L['duplicate chat filter'], _L['Chat'],
 'ui/Image/UICommon/yirong3.UITex|104', {OnPanelActive = function(wnd)
 	local ui = UI(wnd)
-	local w, h = ui:size()
+	local w, h = ui:Size()
 	local x, y = 20, 30
 
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		text = _L['filter duplicate chat'],
 		x = x, y = y, w = 400,
 		checked = MY_ChatFilter.bFilterDuplicate,
@@ -191,7 +191,7 @@ LIB.RegisterPanel('MY_DuplicateChatFilter', _L['duplicate chat filter'], _L['Cha
 	})
 	y = y + 30
 
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		text = _L['filter duplicate chat ignore id'],
 		x = x, y = y, w = 400,
 		checked = MY_ChatFilter.bFilterDuplicateIgnoreID,
@@ -201,7 +201,7 @@ LIB.RegisterPanel('MY_DuplicateChatFilter', _L['duplicate chat filter'], _L['Cha
 	})
 	y = y + 30
 
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		text = _L['only filter continuous duplicate chat'],
 		x = x, y = y, w = 400,
 		checked = MY_ChatFilter.bFilterDuplicateContinuous,
@@ -211,7 +211,7 @@ LIB.RegisterPanel('MY_DuplicateChatFilter', _L['duplicate chat filter'], _L['Cha
 	})
 	y = y + 30
 
-	ui:append('WndComboBox', {
+	ui:Append('WndComboBox', {
 		x = x, y = y, w = 330, h = 25,
 		menu = function()
 			local t = {}
@@ -231,7 +231,7 @@ LIB.RegisterPanel('MY_DuplicateChatFilter', _L['duplicate chat filter'], _L['Cha
 	})
 	y = y + 50
 
-	ui:append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		text = _L['filter duplicate addon message'],
 		x = x, y = y, w = 400,
 		checked = MY_ChatFilter.bFilterDuplicateAddonTalk,

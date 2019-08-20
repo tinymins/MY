@@ -80,7 +80,7 @@ function D.AdjustScaleRatio(frame, hList)
 		end
 		hInfoList:FormatAllItemPos()
 		-- ×ÖÌå´óÐ¡
-		UI(hItem):find('.Text'):fontScale(frame.fScaleY)
+		UI(hItem):Find('.Text'):FontScale(frame.fScaleY)
 	end
 	local nW, nH = hTotal:Lookup('Image_Title'):GetSize()
 	hTotal:Lookup('Text_Title'):SetRelX(nH * 1.1)
@@ -103,7 +103,7 @@ function D.Scale(frame)
 	frame.fScaleX = MY_Focus.fScaleX
 	frame.fScaleY = MY_Focus.fScaleY
 	frame:Scale(frame.fScaleX, frame.fScaleY)
-	UI(frame):find('.Text'):fontScale(frame.fScaleY)
+	UI(frame):Find('.Text'):FontScale(frame.fScaleY)
 	D.AdjustScaleRatio(frame)
 end
 
@@ -480,7 +480,7 @@ function D.OnEvent(event)
 	if event == 'PARTY_SET_MARK' then
 		D.UpdateList(this)
 	elseif event == 'UI_SCALED' then
-		UI(this):anchor(MY_Focus.anchor)
+		UI(this):Anchor(MY_Focus.anchor)
 	elseif event == 'PLAYER_ENTER_SCENE' then
 		D.OnObjectEnterScene(TARGET.PLAYER, arg0)
 	elseif event == 'NPC_ENTER_SCENE' then
@@ -510,7 +510,7 @@ end
 
 function D.OnFrameDragSetPosEnd()
 	this:CorrectPos()
-	MY_Focus.anchor = UI(this):anchor('TOPRIGHT')
+	MY_Focus.anchor = UI(this):Anchor('TOPRIGHT')
 end
 
 function D.OnItemMouseEnter()

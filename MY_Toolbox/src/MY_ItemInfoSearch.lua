@@ -105,14 +105,14 @@ local function Init()
 end
 
 local function DrawList()
-	UI_LIST:listbox('clear')
+	UI_LIST:ListBox('clear')
 	for _, item in ipairs(RESULT) do
 		local opt = {}
 		opt.r, opt.g, opt.b = GetItemFontColorByQuality(item.itemInfo.nQuality, false)
-		UI_LIST:listbox('insert', ' [' .. LIB.GetItemNameByItemInfo(item.itemInfo, item.dwRecipeID) .. '] - ' .. item.itemInfo.szName, item, item, opt)
+		UI_LIST:ListBox('insert', ' [' .. LIB.GetItemNameByItemInfo(item.itemInfo, item.dwRecipeID) .. '] - ' .. item.itemInfo.szName, item, item, opt)
 	end
 	if SEARCH ~= '' then
-		UI_LIST:listbox('insert', _L('Max display count %d, current %d.', MAX_DISP, #RESULT), 'count', nil, { r = 100, g = 100, b = 100 })
+		UI_LIST:ListBox('insert', _L('Max display count %d, current %d.', MAX_DISP, #RESULT), 'count', nil, { r = 100, g = 100, b = 100 })
 	end
 end
 
@@ -182,9 +182,9 @@ function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
 	local X, Y = 0, 0
 	local x, y = X, Y
-	local w, h = ui:size()
+	local w, h = ui:Size()
 
-	y = y + ui:append('WndEditBox', {
+	y = y + ui:Append('WndEditBox', {
 		x = x, y = y, w = w - x, h = 25,
 		text = SEARCH,
 		placeholder = _L['Please input item name or item index number'],
@@ -194,12 +194,12 @@ function PS.OnPanelActive(wnd)
 				DrawList()
 			end)
 		end,
-	}, true):height()
+	}, true):Height()
 
-	UI_LIST = ui:append('WndListBox', {
+	UI_LIST = ui:Append('WndListBox', {
 		x = x, y = y, w = w - x, h = h - y,
 	}, true)
-	UI_LIST:listbox('onhover', function(list, bIn, text, id, data)
+	UI_LIST:ListBox('onhover', function(list, bIn, text, id, data)
 		if id == 'count' then
 			return false
 		end
@@ -209,13 +209,13 @@ function PS.OnPanelActive(wnd)
 			HideTip()
 		end
 	end)
-	UI_LIST:listbox('onlclick', function(list, text, id, data)
+	UI_LIST:ListBox('onlclick', function(list, text, id, data)
 		if data and IsCtrlKeyDown() then
 			LIB.EditBoxInsertItemInfo(data.dwTabType, data.dwIndex, data.dwRecipeID)
 		end
 		return false
 	end)
-	UI_LIST:listbox('onrclick', function(list, text, id, data)
+	UI_LIST:ListBox('onrclick', function(list, text, id, data)
 		return false
 	end)
 	Init()
