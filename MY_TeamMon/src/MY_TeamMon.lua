@@ -1436,7 +1436,10 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 			local aXml, aText = {}, {}
 			local szNote = nil
 			if data.szNote then
-				szNote = data.szNote
+				szNote = data.szNote:gsub('$me', me.szName)
+				if dwReceiverID then
+					szNote = szNote:gsub('$team', szReceiver)
+				end
 			end
 			if szReceiver and not szNote then
 				ConstructSpeech(aText, aXml, MY_TM_LEFT_BRACKET, MY_TM_LEFT_BRACKET_XML)
@@ -1451,9 +1454,7 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 				ConstructSpeech(aText, aXml, FilterCustomText(szNote, szSender, szReceiver) or szContent, 44, 255, 255, 255)
 			end
 			local szXml, szText = concat(aXml), concat(aText)
-			szText = szText:gsub('$me', me.szName)
 			if dwReceiverID then -- 点了人名
-				szText = szText:gsub('$team', szReceiver)
 				if O.bPushWhisperChannel and cfg.bWhisperChannel then
 					D.Talk('WHISPER', szText, szReceiver)
 				end
