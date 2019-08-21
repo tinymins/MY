@@ -298,7 +298,14 @@ local function onExit()
 	l_ds:ReleaseDB()
 end
 LIB.RegisterExit('MY_Chat_Release', onExit)
-LIB.RegisterEvent('DISCONNECT.MY_Chat_Release', onExit)
+
+local function onDisconnect()
+	if LIB.IsShieldedVersion() then
+		return
+	end
+	onExit()
+end
+LIB.RegisterEvent('DISCONNECT.MY_Chat_Release', onDisconnect)
 end
 
 do
