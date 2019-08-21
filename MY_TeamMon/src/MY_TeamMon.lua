@@ -1735,16 +1735,9 @@ end
 -- 获取整个表
 function D.GetTable(szType, bTemp)
 	if bTemp then
-		if szType == 'CIRCLE' then -- 如果请求圈圈的近期数据 返回NPC的
-			szType = 'NPC'
-		end
 		return D.TEMP[szType]
 	else
-		if szType == 'CIRCLE' then -- 如果请求圈圈
-			return Circle.GetData()
-		else
-			return D.FILE[szType]
-		end
+		return D.FILE[szType]
 	end
 end
 
@@ -1884,24 +1877,10 @@ function D.LoadConfigureFile(config)
 		return false, 'Can not read data file.'
 	else
 		if config.nMode == 1 then
-			if config.tList['CIRCLE'] then
-				if Circle then
-					local dat = { Circle = data['CIRCLE'] }
-					Circle.LoadCircleData(dat)
-				end
-				config.tList['CIRCLE'] = nil
-			end
 			for k, v in pairs(config.tList) do
 				D.FILE[k] = data[k] or {}
 			end
 		elseif config.nMode == 2 or config.nMode == 3 then
-			if config.tList['CIRCLE'] then
-				if Circle then
-					local dat = { Circle = data['CIRCLE'] }
-					Circle.LoadCircleMergeData(dat, config.nMode == 3 and true or false)
-				end
-				config.tList['CIRCLE'] = nil
-			end
 			local fnMergeData = function(tab_data)
 				for szType, _ in pairs(config.tList) do
 					if tab_data[szType] then
@@ -1941,11 +1920,6 @@ function D.SaveConfigureFile(config)
 	local data = {}
 	for k, v in pairs(config.tList) do
 		data[k] = D.FILE[k]
-	end
-	if config.tList['CIRCLE'] then
-		if Circle then
-			data['CIRCLE'] = Circle.GetData()
-		end
 	end
 	-- HM.20170504: add meta data
 	data['__meta'] = {
@@ -2083,9 +2057,6 @@ function D.AddData(szType, dwMapID, data)
 end
 
 function D.ClearTemp(szType)
-	if szType == 'CIRCLE' then -- 如果请求圈圈的近期数据 返回NPC的
-		szType = 'NPC'
-	end
 	CACHE.INTERVAL[szType] = {}
 	D.TEMP[szType] = {}
 	FireUIEvent('MY_TMUI_TEMP_RELOAD')
@@ -2094,9 +2065,6 @@ function D.ClearTemp(szType)
 end
 
 function D.GetIntervalData(szType, key)
-	if szType == 'CIRCLE' then -- 如果请求圈圈的近期数据 返回NPC的
-		szType = 'NPC'
-	end
 	if CACHE.INTERVAL[szType] then
 		return CACHE.INTERVAL[szType][key]
 	end
@@ -2106,21 +2074,12 @@ function D.ConfirmShare()
 	if #MY_TM_SHARE_QUEUE > 0 then
 		local t = MY_TM_SHARE_QUEUE[1]
 		LIB.Confirm(_L('%s share a %s data to you, accept?', t.szName, _L[t.szType]), function()
-			if t.szType ~= 'CIRCLE' then
-				local data = t.tData
-				local nIndex = D.CheckSameData(t.szType, t.dwMapID, data.dwID or data.szContent, data.nLevel or data.szTarget)
-				if nIndex then
-					D.RemoveData(t.szType, t.dwMapID, nIndex)
-				end
-				D.AddData(t.szType, t.dwMapID, data)
-			else
-				local data = t.tData
-				local nIndex = Circle.CheckSameData(t.dwMapID, data.key, data.dwType)
-				if nIndex then
-					Circle.RemoveData(t.dwMapID, nIndex)
-				end
-				Circle.AddData(t.dwMapID, data)
+			local data = t.tData
+			local nIndex = D.CheckSameData(t.szType, t.dwMapID, data.dwID or data.szContent, data.nLevel or data.szTarget)
+			if nIndex then
+				D.RemoveData(t.szType, t.dwMapID, nIndex)
 			end
+			D.AddData(t.szType, t.dwMapID, data)
 			table.remove(MY_TM_SHARE_QUEUE, 1)
 			LIB.DelayCall(100, D.ConfirmShare)
 		end, function()
@@ -2133,15 +2092,13 @@ end
 function D.OnShare(_, nChannel, dwID, szName, bIsSelf, ...)
 	local data = {...}
 	if not bIsSelf then
-		if data[1] ~= 'CIRCLE' or type(Circle) ~= 'nil' then
-			insert(MY_TM_SHARE_QUEUE, {
-				szType  = data[1],
-				tData   = data[3],
-				szName  = szName,
-				dwMapID = data[2]
-			})
-			D.ConfirmShare()
-		end
+		insert(MY_TM_SHARE_QUEUE, {
+			szType  = data[1],
+			tData   = data[3],
+			szName  = szName,
+			dwMapID = data[2]
+		})
+		D.ConfirmShare()
 	end
 end
 

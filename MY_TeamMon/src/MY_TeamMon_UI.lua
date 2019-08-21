@@ -58,7 +58,7 @@ local MY_TMUI_ITEM_L        = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI_I
 local MY_TMUI_TALK_L        = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI_TALK_L.ini'
 local MY_TMUI_ITEM_R        = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI_ITEM_R.ini'
 local MY_TMUI_TALK_R        = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI_TALK_R.ini'
-local MY_TMUI_TYPE          = { 'BUFF', 'DEBUFF', 'CASTING', 'NPC', 'DOODAD', 'CIRCLE', 'TALK', 'CHAT' }
+local MY_TMUI_TYPE          = { 'BUFF', 'DEBUFF', 'CASTING', 'NPC', 'DOODAD', 'TALK', 'CHAT' }
 local MY_TMUI_SELECT_TYPE   = MY_TMUI_TYPE[1]
 local MY_TMUI_SELECT_MAP    = _L['All data']
 local MY_TMUI_CATEGORY_ALL  = g_tStrings.STR_GUILD_ALL .. '/' .. g_tStrings.OTHER
@@ -136,9 +136,6 @@ function D.OnFrameCreate()
 	this:RegisterEvent('MY_TMUI_TEMP_RELOAD')
 	this:RegisterEvent('MY_TMUI_DATA_RELOAD')
 	this:RegisterEvent('MY_TMUI_SELECT_MAP')
-	if Circle and not LIB.IsShieldedVersion(2) then
-		this:RegisterEvent('CIRCLE_RELOAD')
-	end
 	this:RegisterEvent('UI_SCALED')
 	-- Esc
 	LIB.RegisterEsc('MY_TeamMon', D.IsOpened, D.ClosePanel)
@@ -166,12 +163,7 @@ function D.OnFrameCreate()
 	local ui = UI(this)
 	ui:Text(_L['MY_TeamMon config panel'])
 	for k, v in ipairs(MY_TMUI_TYPE) do
-		local txt = this.hPageSet:Lookup('CheckBox_' .. v, 'Text_Page_' .. v)
-		txt:SetText(_L[v])
-		if v == 'CIRCLE' and (not Circle or LIB.IsShieldedVersion(2)) then
-			this.hPageSet:Lookup('CheckBox_' .. v):Hide()
-			txt:SetFontColor(192, 192, 192)
-		end
+		this.hPageSet:Lookup('CheckBox_' .. v, 'Text_Page_' .. v):SetText(_L[v])
 	end
 	ui:Append('WndButton3', {
 		x = 900, y = 52, w = 140, h = 27,
@@ -226,12 +218,6 @@ function D.OnFrameCreate()
 		end,
 	})
 	uiPageSetMain:Append('WndButton2', {
-		name = 'NewFace', x = 780, y = 40, text = _L['New Face'],
-		onclick = function()
-			Circle.OpenAddPanel(nil, nil, MY_TMUI_SELECT_MAP ~= _L['All data'] and LIB.GetMapInfo(MY_TMUI_SELECT_MAP))
-		end,
-	})
-	uiPageSetMain:Append('WndButton2', {
 		x = 920, y = 40, text = _L['Clear record'],
 		onclick = function()
 			LIB.Confirm(_L['Confirm?'], function()
@@ -254,21 +240,14 @@ function D.OnEvent(szEvent)
 	if szEvent == 'UI_SCALED' then
 		D.UpdateAnchor(this)
 	elseif szEvent == 'MY_TMUI_TEMP_UPDATE' then
-		local szType = (MY_TMUI_SELECT_TYPE == 'CIRCLE' and arg0 == 'NPC') and 'CIRCLE' or arg0
-		if szType ~= MY_TMUI_SELECT_TYPE then
+		if arg0 ~= MY_TMUI_SELECT_TYPE then
 			return
 		end
 		D.UpdateRList(arg1)
-	elseif szEvent == 'MY_TMUI_TEMP_RELOAD' or szEvent == 'MY_TMUI_DATA_RELOAD' or szEvent == 'CIRCLE_RELOAD' then
-		if szEvent == 'CIRCLE_RELOAD' and arg0 and MY_TMUI_SELECT_TYPE == 'CIRCLE' then
-			MY_TMUI_SELECT_MAP = arg0
-			D.UpdateMapList(this)
-		end
-		if szEvent == 'MY_TMUI_DATA_RELOAD' or szEvent == 'CIRCLE_RELOAD' then
-			D.RefreshTable(this, 'L')
-		elseif szEvent == 'MY_TMUI_TEMP_RELOAD' then
-			D.RefreshTable(this, 'R')
-		end
+	elseif szEvent == 'MY_TMUI_DATA_RELOAD' then
+		D.RefreshTable(this, 'L')
+	elseif szEvent == 'MY_TMUI_TEMP_RELOAD' then
+		D.RefreshTable(this, 'R')
 	elseif szEvent == 'MY_TMUI_SELECT_MAP' then
 		MY_TMUI_SELECT_MAP = arg0
 		D.UpdateMapList(this)
@@ -333,11 +312,6 @@ function D.OnActivePage()
 	local nPage = this:GetActivePageIndex()
 	local frame = this:GetRoot()
 	MY_TMUI_SELECT_TYPE = MY_TMUI_TYPE[nPage + 1]
-	if MY_TMUI_SELECT_TYPE ~= 'CIRCLE' then
-		this:Lookup('NewFace'):Hide()
-	else
-		this:Lookup('NewFace'):Show()
-	end
 	D.RefreshTable(frame, 'L')
 	D.RefreshTable(frame, 'R')
 	FireUIEvent('MY_TMUI_SWITCH_PAGE')
@@ -583,11 +557,7 @@ function D.OnItemLButtonClick()
 		if MY_TMUI_DRAG or IsCtrlKeyDown() then
 			return
 		end
-		if MY_TMUI_SELECT_TYPE == 'CIRCLE' then
-			Circle.OpenDataPanel(this.dat)
-		else
-			D.OpenSettingPanel(this.dat, MY_TMUI_SELECT_TYPE)
-		end
+		D.OpenSettingPanel(this.dat, MY_TMUI_SELECT_TYPE)
 	end
 end
 
@@ -602,11 +572,7 @@ function D.OnItemRButtonClick()
 		insert(menu, { szOption = this:Lookup('Text_TreeItem'):GetText(), bDisable = true })
 		insert(menu, { bDevide = true })
 		insert(menu, { szOption = _L['Clear this map data'], rgb = { 255, 0, 0 }, fnAction = function()
-			if MY_TMUI_SELECT_TYPE == 'CIRCLE' then
-				Circle.RemoveData(dwMapID, nil, true)
-			else
-				D.RemoveData(dwMapID, nil, dwMapID and Get(LIB.GetMapInfo(dwMapID), 'szName', _L['This data']) or _L['All data'])
-			end
+			D.RemoveData(dwMapID, nil, dwMapID and Get(LIB.GetMapInfo(dwMapID), 'szName', _L['This data']) or _L['All data'])
 		end })
 		PopupMenu(menu)
 	elseif szName == 'Handle_L' then
@@ -623,22 +589,14 @@ function D.OnItemRButtonClick()
 			GetUserInput(g_tStrings.MSG_INPUT_MAP_NAME, function(szText)
 				local map = LIB.GetMapInfo(szText)
 				if map then
-					if MY_TMUI_SELECT_TYPE == 'CIRCLE' then
-						return Circle.MoveData(t.dwMapID, t.nIndex, map, IsCtrlKeyDown())
-					else
-						return D.MoveData(t.dwMapID, t.nIndex, map, IsCtrlKeyDown())
-					end
+					return D.MoveData(t.dwMapID, t.nIndex, map, IsCtrlKeyDown())
 				end
 				return LIB.Alert(_L['The map does not exist'])
 			end)
 		end })
 		insert(menu[#menu], { bDevide = true })
 		D.InsertDungeonMenu(menu[#menu], function(dwMapID)
-			if MY_TMUI_SELECT_TYPE == 'CIRCLE' then
-				Circle.MoveData(t.dwMapID, t.nIndex, dwMapID, IsCtrlKeyDown())
-			else
-				D.MoveData(t.dwMapID, t.nIndex, dwMapID, IsCtrlKeyDown())
-			end
+			D.MoveData(t.dwMapID, t.nIndex, dwMapID, IsCtrlKeyDown())
 		end)
 		insert(menu, { bDevide = true })
 		insert(menu, { szOption = _L['Share data'], bDisable = not LIB.IsInParty(), fnAction = function()
@@ -651,11 +609,7 @@ function D.OnItemRButtonClick()
 		end })
 		insert(menu, { bDevide = true })
 		insert(menu, { szOption = g_tStrings.STR_FRIEND_DEL, rgb = { 255, 0, 0 }, fnAction = function()
-			if MY_TMUI_SELECT_TYPE == 'CIRCLE' then
-				Circle.RemoveData(t.dwMapID, t.nIndex, true)
-			else
-				D.RemoveData(t.dwMapID, t.nIndex, name)
-			end
+			D.RemoveData(t.dwMapID, t.nIndex, name)
 		end })
 		PopupMenu(menu)
 	elseif szName == 'Handle_R' then
@@ -669,7 +623,7 @@ function D.OnItemRButtonClick()
 			insert(menu, { szOption = g_tStrings.CHAT_NAME .. g_tStrings.STR_COLON .. szName, bDisable = true })
 		end
 		insert(menu, { szOption = g_tStrings.MAP_TALK .. g_tStrings.STR_COLON .. Table_GetMapName(t.dwMapID), bDisable = true })
-		if MY_TMUI_SELECT_TYPE ~= 'NPC' and MY_TMUI_SELECT_TYPE ~= 'CIRCLE' and MY_TMUI_SELECT_TYPE ~= 'TALK' and MY_TMUI_SELECT_TYPE ~= 'DOODAD' then
+		if MY_TMUI_SELECT_TYPE ~= 'NPC' and MY_TMUI_SELECT_TYPE ~= 'TALK' and MY_TMUI_SELECT_TYPE ~= 'DOODAD' then
 			insert(menu, { szOption = g_tStrings.STR_SKILL_H_CAST_TIME .. (t.szSrcName or g_tStrings.STR_CRAFT_NONE) .. (t.bIsPlayer and _L['(player)'] or ''), bDisable = true })
 		end
 		if MY_TMUI_SELECT_TYPE ~= 'TALK' and MY_TMUI_SELECT_TYPE ~= 'CHAT' then
@@ -728,12 +682,7 @@ function D.OnItemMouseEnter()
 			local box = this:Lookup('Box')
 			box:SetObjectMouseOver(true)
 		end
-		if szName == 'Handle_R' and MY_TMUI_SELECT_TYPE == 'CIRCLE' then -- circle fix
-			D.OutputTip('NPC', this.dat, { x, y, w, h })
-		else
-			D.OutputTip(MY_TMUI_SELECT_TYPE, this.dat, { x, y, w, h })
-		end
-
+		D.OutputTip(MY_TMUI_SELECT_TYPE, this.dat, { x, y, w, h })
 	end
 end
 
@@ -779,11 +728,7 @@ function D.OnItemLButtonDragEnd()
 	if szName == 'Handle_TreeItem' then
 		if szAction:find('Handle.+L') then
 			if data and data.dwMapID ~= this.dwMapID then
-				if MY_TMUI_SELECT_TYPE == 'CIRCLE' then
-					Circle.MoveData(data.dwMapID, data.nIndex, this.dwMapID, IsCtrlKeyDown())
-				else
-					D.MoveData(data.dwMapID, data.nIndex, this.dwMapID, IsCtrlKeyDown())
-				end
+				D.MoveData(data.dwMapID, data.nIndex, this.dwMapID, IsCtrlKeyDown())
 			end
 		elseif szAction:find('Handle.+R') then
 			D.OpenAddPanel(MY_TMUI_SELECT_TYPE, data)
@@ -791,11 +736,7 @@ function D.OnItemLButtonDragEnd()
 	elseif szName:find('Handle.+L') then
 		if szAction:find('Handle.+L') and not szName:find('Handle.+List_L') then
 			if MY_TMUI_SELECT_MAP ~= _L['All data'] then
-				if MY_TMUI_SELECT_TYPE == 'CIRCLE' then
-					Circle.Exchange(MY_TMUI_SELECT_MAP, data.nIndex, this.dat.nIndex)
-				else
-					D.Exchange(MY_TMUI_SELECT_MAP, data.nIndex, this.dat.nIndex)
-				end
+				D.Exchange(MY_TMUI_SELECT_MAP, data.nIndex, this.dat.nIndex)
 			else
 				D.RedrawMapList(this:GetRoot())
 			end
@@ -859,10 +800,6 @@ function D.OnScrollBarPosChanged()
 						D.SetNpcItemAction(h)
 					elseif MY_TMUI_SELECT_TYPE == 'DOODAD' then
 						D.SetDoodadItemAction(h)
-					elseif MY_TMUI_SELECT_TYPE == 'CIRCLE' and dir == 'L' then
-						D.SetCircleItemAction(h)
-					elseif MY_TMUI_SELECT_TYPE == 'CIRCLE' and dir == 'R'  then
-						D.SetNpcItemAction(h)
 					elseif MY_TMUI_SELECT_TYPE == 'TALK' then
 						D.SetTalkItemAction(h)
 					elseif MY_TMUI_SELECT_TYPE == 'CHAT' then
@@ -889,8 +826,6 @@ function D.OutputTip(szType, data, rect)
 		OutputTip(GetFormatText((data.szTarget or _L['Warning box']) .. '\t', 41, 255, 255, 0) .. GetFormatText((D.GetMapName(data.dwMapID) or data.dwMapID) .. '\n', 41, 255, 255, 255) .. GetFormatText(data.szContent, 41, 255, 255, 255), 300, rect)
 	elseif szType == 'CHAT' then
 		OutputTip(GetFormatText(_L['CHAT'] .. '\t', 41, 255, 255, 0) .. GetFormatText((D.GetMapName(data.dwMapID) or data.dwMapID) .. '\n', 41, 255, 255, 255) .. GetFormatText(data.szContent, 41, 255, 255, 255), 300, rect)
-	elseif szType == 'CIRCLE' then
-		Circle.OutputTip(data, rect)
 	end
 end
 
@@ -929,12 +864,7 @@ function D.OpenImportPanel(szDefault, szTitle, fnAction)
 	local nX, nY = ui:Append('Text', { x = 20, y = 50, text = _L['Includes'], font = 27 }, true):Pos('BOTTOMRIGHT')
 	nX = 20
 	for k, v in ipairs(MY_TMUI_TYPE) do
-		local u = ui:Append('WndCheckBox', { name = v, x = nX + 5, y = nY, checked = true, text = _L[v] }, true)
-		if LIB.IsShieldedVersion(2) and v == 'CIRCLE' then
-			u:Hide()
-		else
-			nX = u:AutoWidth():Pos('BOTTOMRIGHT')
-		end
+		nX = ui:Append('WndCheckBox', { name = v, x = nX + 5, y = nY, checked = true, text = _L[v] }, true):AutoWidth():Pos('BOTTOMRIGHT')
 	end
 	nY = 110
 	nX, nY = ui:Append('Text', { x = 20, y = nY, text = _L['File name'], font = 27 }, true):Pos('BOTTOMRIGHT')
@@ -1012,12 +942,7 @@ function D.OpenExportPanel()
 	local nX, nY = ui:Append('Text', { x = 20, y = 50, text = _L['Includes'], font = 27 }, true):Pos('BOTTOMRIGHT')
 	nX = 20
 	for k, v in ipairs(MY_TMUI_TYPE) do
-		local u = ui:Append('WndCheckBox', { name = v, x = nX + 5, y = nY, checked = true, text = _L[v] }, true)
-		if LIB.IsShieldedVersion(2) and v == 'CIRCLE' then
-			u:Hide()
-		else
-			nX = u:AutoWidth():Pos('BOTTOMRIGHT')
-		end
+		nX = ui:Append('WndCheckBox', { name = v, x = nX + 5, y = nY, checked = true, text = _L[v] }, true):AutoWidth():Pos('BOTTOMRIGHT')
 	end
 	nY = 110
 	local szFileName = 'TM-' .. select(3, GetVersion()) .. FormatTime('-%Y%m%d_%H.%M', GetCurrentTime()) .. '.jx3dat'
@@ -1135,7 +1060,7 @@ function D.GetDataName(szType, data)
 	local szName, nIcon
 	if szType == 'CASTING' then
 		szName, nIcon = LIB.GetSkillName(data.dwID, data.nLevel)
-	elseif szType == 'NPC' or szType == 'CIRCLE' then
+	elseif szType == 'NPC' then
 		if data.dwID then
 			szName = LIB.GetTemplateName(TARGET.NPC, data.dwID) or data.dwID
 			nIcon = data.nFrame
@@ -1226,21 +1151,6 @@ function D.SetDoodadItemAction(h)
 	end
 	local box = h:Lookup('Box')
 	box:SetObjectIcon(nIcon)
-	h.bDraw = true
-end
-
-function D.SetCircleItemAction(h)
-	local dat = h.dat
-	h:Lookup('Text'):SetText(dat.szNote and string.format('%s (%s)', dat.key, dat.szNote) or dat.key)
-	local box = h:Lookup('Box')
-	if dat.tCircles then
-		h:Lookup('Text'):SetFontColor(unpack(dat.tCircles[1].col))
-	end
-	if dat.dwType == TARGET.NPC then
-		box:SetObjectIcon(2397)
-	else
-		box:SetObjectIcon(2396)
-	end
 	h.bDraw = true
 end
 
@@ -1383,88 +1293,84 @@ end
 
 -- 添加面板
 function D.OpenAddPanel(szType, data)
-	if szType == 'CIRCLE' then
-		Circle.OpenAddPanel(IsCtrlKeyDown() and data.dwID or D.GetDataName('NPC', data), TARGET.NPC, Table_GetMapName(data.dwMapID), MY_TMUI_SELECT_MAP)
-	else
-		local szName, nIcon = _L[szType], 340
-		if szType ~= 'TALK' and szType ~= 'CHAT' then
-			szName, nIcon = D.GetDataName(szType, data)
-		end
-		local ui = UI.CreateFrame('MY_TeamMon_NewData', { w = 380, h = 250, text = szName, focus = true, close = true })
-		local nX, nY = 0, 0
-		ui:Event('MY_TMUI_SWITCH_PAGE', function() ui:Remove() end)
-		ui:Event('MY_TMUI_TEMP_RELOAD', function() ui:Remove() end)
-		if szType ~= 'NPC' then
-			nX, nY = ui:Append('Box', { name = 'Box_Icon', w = 48, h = 48, x = 166, y = 40, icon = nIcon }, true):Pos('BOTTOMRIGHT')
-		else
-			nX, nY = ui:Append('Box', {
-				name = 'Box_Icon', w = 48, h = 48, x = 166, y = 40, icon = nIcon,
-				image = 'ui/Image/TargetPanel/Target.uitex', imageframe = data.nFrame,
-			}, true):Pos('BOTTOMRIGHT')
-		end
-		ui:Children('#Box_Icon'):Hover(function(bHover)
-			this:SetObjectMouseOver(bHover)
-			if bHover then
-				local x, y = this:GetAbsPos()
-				local w, h = this:GetSize()
-				D.OutputTip(szType, data, { x, y, w, h })
-			else
-				HideTip()
-			end
-		end)
-		nX, nY = ui:Append('WndEditBox', {
-			name = 'map', x = 100, y = nY + 15, w = 200, h = 30,
-			text = MY_TMUI_SELECT_MAP ~= _L['All data'] and D.GetMapName(MY_TMUI_SELECT_MAP) or D.GetMapName(data.dwMapID),
-			autocomplete = {{'option', 'source', LIB.GetMapNameList()}},
-			onchange = function()
-				local el = this
-				local ui = UI(el)
-				if ui:Text() == '' then
-					local menu = {}
-					D.InsertDungeonMenu(menu, function(dwMapID)
-						ui:Text(D.GetMapName(dwMapID))
-					end)
-					local nX, nY = this:GetAbsPos()
-					local nW, nH = this:GetSize()
-					menu.nMiniWidth = nW
-					menu.x = nX
-					menu.y = nY + nH
-					menu.fnAutoClose = function() return not el or not el:IsValid() end
-					menu.bShowKillFocus = true
-					menu.bDisableSound = true
-					PopupMenu(menu)
-				end
-			end,
-		}, true):Pos('BOTTOMRIGHT')
-		ui:Append('WndButton3', {
-			x = 120, y = nY + 40, text = _L['Add'],
-			onclick = function()
-				local txt = ui:Children('#map'):Text()
-				local map = LIB.GetMapInfo(txt)
-				if not map then
-					return LIB.Alert(_L['The map does not exist'])
-				end
-				local tab = select(2, MY_TeamMon.CheckSameData(szType, map.dwID, data.dwID or data.szContent, data.nLevel or data.szTarget))
-				if tab then
-					return LIB.Confirm(_L['Data exists, editor?'], function()
-						FireUIEvent('MY_TMUI_SELECT_MAP', map.dwID)
-						D.OpenSettingPanel(tab, szType)
-						ui:Remove()
-					end)
-				end
-				local dat = {
-					dwID      = data.dwID,
-					nLevel    = data.nLevel,
-					nFrame    = data.nFrame,
-					szContent = data.szContent,
-					szTarget  = data.szTarget
-				}
-				FireUIEvent('MY_TMUI_SELECT_MAP', map.dwID)
-				D.OpenSettingPanel(MY_TeamMon.AddData(szType, map.dwID, dat), szType)
-				ui:Remove()
-			end,
-		})
+	local szName, nIcon = _L[szType], 340
+	if szType ~= 'TALK' and szType ~= 'CHAT' then
+		szName, nIcon = D.GetDataName(szType, data)
 	end
+	local ui = UI.CreateFrame('MY_TeamMon_NewData', { w = 380, h = 250, text = szName, focus = true, close = true })
+	local nX, nY = 0, 0
+	ui:Event('MY_TMUI_SWITCH_PAGE', function() ui:Remove() end)
+	ui:Event('MY_TMUI_TEMP_RELOAD', function() ui:Remove() end)
+	if szType ~= 'NPC' then
+		nX, nY = ui:Append('Box', { name = 'Box_Icon', w = 48, h = 48, x = 166, y = 40, icon = nIcon }, true):Pos('BOTTOMRIGHT')
+	else
+		nX, nY = ui:Append('Box', {
+			name = 'Box_Icon', w = 48, h = 48, x = 166, y = 40, icon = nIcon,
+			image = 'ui/Image/TargetPanel/Target.uitex', imageframe = data.nFrame,
+		}, true):Pos('BOTTOMRIGHT')
+	end
+	ui:Children('#Box_Icon'):Hover(function(bHover)
+		this:SetObjectMouseOver(bHover)
+		if bHover then
+			local x, y = this:GetAbsPos()
+			local w, h = this:GetSize()
+			D.OutputTip(szType, data, { x, y, w, h })
+		else
+			HideTip()
+		end
+	end)
+	nX, nY = ui:Append('WndEditBox', {
+		name = 'map', x = 100, y = nY + 15, w = 200, h = 30,
+		text = MY_TMUI_SELECT_MAP ~= _L['All data'] and D.GetMapName(MY_TMUI_SELECT_MAP) or D.GetMapName(data.dwMapID),
+		autocomplete = {{'option', 'source', LIB.GetMapNameList()}},
+		onchange = function()
+			local el = this
+			local ui = UI(el)
+			if ui:Text() == '' then
+				local menu = {}
+				D.InsertDungeonMenu(menu, function(dwMapID)
+					ui:Text(D.GetMapName(dwMapID))
+				end)
+				local nX, nY = this:GetAbsPos()
+				local nW, nH = this:GetSize()
+				menu.nMiniWidth = nW
+				menu.x = nX
+				menu.y = nY + nH
+				menu.fnAutoClose = function() return not el or not el:IsValid() end
+				menu.bShowKillFocus = true
+				menu.bDisableSound = true
+				PopupMenu(menu)
+			end
+		end,
+	}, true):Pos('BOTTOMRIGHT')
+	ui:Append('WndButton3', {
+		x = 120, y = nY + 40, text = _L['Add'],
+		onclick = function()
+			local txt = ui:Children('#map'):Text()
+			local map = LIB.GetMapInfo(txt)
+			if not map then
+				return LIB.Alert(_L['The map does not exist'])
+			end
+			local tab = select(2, MY_TeamMon.CheckSameData(szType, map.dwID, data.dwID or data.szContent, data.nLevel or data.szTarget))
+			if tab then
+				return LIB.Confirm(_L['Data exists, editor?'], function()
+					FireUIEvent('MY_TMUI_SELECT_MAP', map.dwID)
+					D.OpenSettingPanel(tab, szType)
+					ui:Remove()
+				end)
+			end
+			local dat = {
+				dwID      = data.dwID,
+				nLevel    = data.nLevel,
+				nFrame    = data.nFrame,
+				szContent = data.szContent,
+				szTarget  = data.szTarget
+			}
+			FireUIEvent('MY_TMUI_SELECT_MAP', map.dwID)
+			D.OpenSettingPanel(MY_TeamMon.AddData(szType, map.dwID, dat), szType)
+			ui:Remove()
+		end,
+	})
 end
 -- 数据调试面板
 function D.OpenJsonPanel(data, fnAction)
@@ -1751,6 +1657,7 @@ function D.OpenSettingPanel(data, szType)
 			HideTip()
 		end
 	end):Click(fnClickBox)
+
 	if szType == 'BUFF' or szType == 'DEBUFF' then
 		nX, nY = ui:Append('Text', { x = 20, y = nY, text = g_tStrings.CHANNEL_COMMON, font = 27 }, true):Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndComboBox', {
@@ -2037,6 +1944,7 @@ function D.OpenSettingPanel(data, szType)
 			nY = nY + CHECKBOX_HEIGHT
 		-- end
 	elseif szType == 'NPC' then
+		-- 通用
 		nX, nY = ui:Append('Text', { x = 20, y = nY, text = g_tStrings.CHANNEL_COMMON, font = 27 }, true):Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndComboBox', {
 			x = 30, y = nY + 2, text = _L['Self kungfu requirement'],
@@ -2066,6 +1974,7 @@ function D.OpenSettingPanel(data, szType)
 				end
 			end,
 		}, true):Pos('BOTTOMRIGHT')
+		-- 进入场景
 		local cfg = data[MY_TM_TYPE.NPC_ENTER] or {}
 		nX = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Enter scene'], font = 27 }, true):AutoWidth():Pos('BOTTOMRIGHT')
 		nX, nY = ui:Append('WndComboBox', {
