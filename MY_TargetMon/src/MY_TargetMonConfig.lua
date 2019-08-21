@@ -442,8 +442,8 @@ function D.ImportPatches(aPatch, bAsEmbedded)
 			end
 		end
 		if nImportCount > 0 then
-			D.LoadEmbeddedConfig()
 			D.SaveConfig()
+			D.LoadEmbeddedConfig()
 			D.LoadConfig()
 		end
 	else
