@@ -1467,7 +1467,7 @@ function D.OpenAddPanel(szType, data)
 	end
 end
 -- 数据调试面板
-function D.OpenJosnPanel(data, fnAction)
+function D.OpenJsonPanel(data, fnAction)
 	local ui = UI.CreateFrame('MY_TeamMon_JsonPanel', { w = 720,h = 500, text = _L['MY_TeamMon DEBUG Panel'], close = true })
 	ui:Event('MY_TMUI_DATA_RELOAD', function() ui:Remove() end)
 	ui:Event('MY_TMUI_SWITCH_PAGE', function() ui:Remove() end)
@@ -1718,7 +1718,7 @@ function D.OpenSettingPanel(data, szType)
 		})
 		insert(menu, { bDevide = true })
 		insert(menu, { szOption = _L['Raw data, please be careful'], color = { 255, 255, 0 }, fnAction = function()
-			D.OpenJosnPanel(data, function(dat)
+			D.OpenJsonPanel(data, function(dat)
 				local file = MY_TeamMon.GetTable(MY_TMUI_SELECT_TYPE)
 				if file and file[MY_TMUI_SELECT_MAP] and file[data.dwMapID][data.nIndex] then
 					file[data.dwMapID][data.nIndex] = dat
