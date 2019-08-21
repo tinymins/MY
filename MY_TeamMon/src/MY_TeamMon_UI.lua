@@ -2558,6 +2558,138 @@ function D.OpenSettingPanel(data, szType)
 		end,
 	}, true):Pos('BOTTOMRIGHT')
 	nY = nY + 35
+	-- 圈圈连线
+	if (szType == 'NPC' or szType == 'DOODAD') and not LIB.IsShieldedVersion(2) then
+		nX, nY = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Circle and line'], font = 27 }, true):AutoWidth():Pos('BOTTOMRIGHT')
+		nX, nY = 30, nY + 5
+		if szType == 'NPC' then
+			nX = ui:Append('WndCheckBox', {
+				x = nX, y = nY, w = 160, h = 25, text = _L['Only my employer'],
+				checked = data.bDrawOnlyMyEmployer,
+				oncheck = function(bCheck)
+					data.bDrawOnlyMyEmployer = bCheck and true or nil
+					FireUIEvent('MY_TM_CC_RELOAD')
+				end,
+			}, true):AutoWidth():Pos('BOTTOMRIGHT') + 5
+		end
+		nX = ui:Append('WndCheckBox', {
+			x = nX, y = nY, w = 160, h = 25, text = _L['Draw line'],
+			checked = data.bDrawLine,
+			oncheck = function(bCheck)
+				data.bDrawLine = bCheck and true or nil
+				FireUIEvent('MY_TM_CC_RELOAD')
+			end,
+		}, true):AutoWidth():Pos('BOTTOMRIGHT') + 5
+		if szType == 'NPC' then
+			nX = ui:Append('WndCheckBox', {
+				x = nX, y = nY, w = 160, h = 25, text = _L['Only when stare me'],
+				checked = data.bDrawLineOnlyStareMe,
+				oncheck = function(bCheck)
+					data.bDrawLineOnlyStareMe = bCheck and true or nil
+					FireUIEvent('MY_TM_CC_RELOAD')
+				end,
+			}, true):AutoWidth():Pos('BOTTOMRIGHT') + 5
+		end
+		nX, nY = ui:Append('WndCheckBox', {
+			x = nX, y = nY, w = 160, h = 25, text = _L['Draw name'],
+			checked = data.bDrawName,
+			oncheck = function(bCheck)
+				data.bDrawName = bCheck and true or nil
+				FireUIEvent('MY_TM_CC_RELOAD')
+			end,
+		}, true):AutoWidth():Pos('BOTTOMRIGHT')
+		nY = nY + 10
+		-- 圈圈列表
+		if data.aCircle then
+			for _, circle in ipairs(data.aCircle) do
+				nX = ui:Append('Shadow', {
+					x = 35, y = nY + 3, w = 23, h = 23,
+					color = circle.col,
+					onclick = function()
+						local ui = UI(this)
+						UI.OpenColorPicker(function(r, g, b)
+							ui:Color(r, g, b)
+							circle.col = { r, g, b }
+							FireUIEvent('MY_TM_CC_RELOAD')
+						end)
+					end,
+				}, true):Pos('BOTTOMRIGHT')
+				nX = ui:Append('WndEditBox', {
+					x = nX + 5, y = nY + 2, w = 80, h = 26, text = circle.nAngle, edittype = 0,
+					onchange = function(nNum)
+						circle.nAngle = tonumber(nNum) or 80
+						FireUIEvent('MY_TM_CC_RELOAD')
+					end,
+				}, true):Pos('BOTTOMRIGHT')
+				nX = ui:Append('Text', { x = nX, y = nY, text = _L['Degree'] }, true):AutoWidth():Pos('BOTTOMRIGHT')
+				nX = ui:Append('WndEditBox', {
+					x = nX + 10, y = nY + 2, w = 80, h = 26, text = circle.nRadius, edittype = 0,
+					onchange = function(nNum)
+						circle.nRadius = tonumber(nNum) or 4
+						FireUIEvent('MY_TM_CC_RELOAD')
+					end,
+				}, true):Pos('BOTTOMRIGHT')
+				nX = ui:Append('Text', { x = nX, y = nY, text = _L['Meter'] }, true):AutoWidth():Pos('BOTTOMRIGHT')
+				nX = ui:Append('WndEditBox', {
+					x = nX + 10, y = nY + 2, w = 80, h = 26, text = circle.nAlpha, edittype = 0,
+					onchange = function(nNum)
+						circle.nAlpha = tonumber(nNum)
+						FireUIEvent('MY_TM_CC_RELOAD')
+					end,
+				}, true):Pos('BOTTOMRIGHT')
+				nX = ui:Append('Text', { x = nX, y = nY, text = _L['Alpha'] }, true):AutoWidth():Pos('BOTTOMRIGHT')
+				nX = ui:Append('WndCheckBox', {
+					x = nX + 10, y = nY + 1,
+					text = _L['Draw Border'],
+					checked = circle.bBorder,
+					oncheck = function(bChecked)
+						circle.bBorder = bChecked
+						FireUIEvent('MY_TM_CC_RELOAD')
+					end,
+				}, true):AutoWidth():Pos('BOTTOMRIGHT')
+				nX = ui:Append('Image', {
+					x = nX + 5, y = nY + 1,
+					w = 26, h = 26,
+					hover = function(bIn)
+						if bIn then
+							this:SetFrame(87)
+						else
+							this:SetFrame(86)
+						end
+					end,
+					onclick = function()
+						if #data.aCircle == 1 then
+							data.aCircle = nil
+						else
+							remove(data.aCircle, k)
+						end
+						FireUIEvent('MY_TM_CC_RELOAD')
+						D.OpenSettingPanel(data, szType)
+					end,
+					image = file, imageframe = 86,
+				}, true):Pos('BOTTOMRIGHT')
+				nY = nY + CHECKBOX_HEIGHT
+			end
+		end
+		nX = ui:Append('WndButton2', {
+			x = 30, y = nY + 10, text = _L['Add circle'],
+			enable = not (data.aCircle and #data.aCircle > 10),
+			onclick = function()
+				if not data.aCircle then
+					data.aCircle = {}
+				end
+				insert(data.aCircle, {
+					nAngle = 80,
+					nRadius = 4,
+					col = {0, 255, 0},
+					bBorder = true,
+				})
+				FireUIEvent('MY_TM_CC_RELOAD')
+				D.OpenSettingPanel(data, szType)
+			end,
+		}, true):Pos('BOTTOMRIGHT')
+		nY = nY + 35
+	end
 	-- 焦点列表
 	if MY_Focus then
 		if szType == 'NPC' then

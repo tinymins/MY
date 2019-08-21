@@ -73,6 +73,22 @@ function PS.OnPanelActive(wnd)
 			MY_TeamMon.bEnable = bCheck
 		end,
 	}, true):AutoWidth():Pos('BOTTOMRIGHT')
+	if not LIB.IsShieldedVersion(2) then
+		nX = ui:Append('WndCheckBox', {
+			x = nX + 5, y = nY, text = _L['Enable circle'],
+			checked = MY_TeamMon_CC.bEnable,
+			oncheck = function(bCheck)
+				MY_TeamMon_CC.bEnable = bCheck
+			end,
+		}, true):AutoWidth():Pos('BOTTOMRIGHT')
+		nX = ui:Append('WndCheckBox', {
+			x = nX + 5, y = nY, text = _L['Circle border'],
+			checked = MY_TeamMon_CC.bBorder,
+			oncheck = function(bCheck)
+				MY_TeamMon_CC.bBorder = bCheck
+			end,
+		}, true):AutoWidth():Pos('BOTTOMRIGHT')
+	end
 	nY = nY + nLineH
 
 	nX, nY = ui:Append('Text', { x = X, y = nY + 5, text = _L['Enable alarm (master switch)'], font = 27 }, true):AutoWidth():Pos('BOTTOMRIGHT')
