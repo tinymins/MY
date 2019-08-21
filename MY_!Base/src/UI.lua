@@ -746,6 +746,25 @@ function UI:Parent()
 	return UI(raws)
 end
 
+-- fetch children by name
+function UI:Fetch(szName)
+	self:_checksum()
+	local raws, el = {}
+	for _, raw in ipairs(self.raws) do
+		el = raw:Lookup(szName)
+		if not el then
+			raw = GetComponentElement(raw, 'MAIN_HANDLE')
+			if raw then
+				el = raw:Lookup(szName)
+			end
+		end
+		if el then
+			insert(raws, el)
+		end
+	end
+	return UI(raws)
+end
+
 -- get children
 -- same as jQuery.children()
 function UI:Children(filter)
