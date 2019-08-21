@@ -2263,6 +2263,8 @@ function D.OpenSettingPanel(data, szType)
 					data.szNote = szText
 				end
 			end,
+			tip = _L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188\n5. {$me} Self name\n6. {$sender} Sender name, likes caller name\n7. {$receiver} Receiver name, likes teammate be called'],
+			tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 		}, true):Pos('BOTTOMRIGHT')
 		nX = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Speaker'], font = 27 }, true):AutoWidth():Pos('BOTTOMRIGHT')
 		nX, nY = ui:Append('WndEditBox', {
@@ -2342,6 +2344,8 @@ function D.OpenSettingPanel(data, szType)
 					data.szNote = szText
 				end
 			end,
+			tip = _L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188\n5. {$me} Self name\n6. {$sender} Sender name, likes caller name\n7. {$receiver} Receiver name, likes teammate be called'],
+			tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 		}, true):Pos('BOTTOMRIGHT')
 		nX = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Chat content'], font = 27 }, true):AutoWidth():Pos('BOTTOMRIGHT')
 		_, nY = ui:Append('WndEditBox', {
