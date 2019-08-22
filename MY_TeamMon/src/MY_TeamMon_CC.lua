@@ -210,7 +210,7 @@ function D.DrawObject(dwType, dwID, KObject)
 		for _, circle in ipairs(cache.aCircle) do
 			if not circle.shaCircle or circle.shaCircle.nFaceDirection ~= KObject.nFaceDirection or CIRCLE_RESERT_DRAW then -- 第一次绘制、面向不对、强制重绘
 				if not circle.shaCircle then
-					circle.shaCircle = H_CIRCLE:AppendItemFromIni(INI_SHADOW, 'Shadow')
+					circle.shaCircle = H_CIRCLE:AppendItemFromIni(INI_SHADOW, 'Shadow', 'Shadow_Circle')
 				end
 				circle.shaCircle.nFaceDirection = KObject.nFaceDirection
 				D.DrawShape(dwType, KObject, circle.shaCircle, circle.nAngle, circle.nRadius, circle.col, circle.nAlpha)
@@ -218,7 +218,7 @@ function D.DrawObject(dwType, dwID, KObject)
 			if O.bBorder and circle.bBorder then
 				if not circle.shaBorder or circle.shaBorder.nFaceDirection ~= KObject.nFaceDirection or CIRCLE_RESERT_DRAW then -- 第一次绘制、面向不对、强制重绘
 					if not circle.shaBorder then
-						circle.shaBorder = H_CIRCLE:AppendItemFromIni(INI_SHADOW, 'Shadow')
+						circle.shaBorder = H_CIRCLE:AppendItemFromIni(INI_SHADOW, 'Shadow', 'Shadow_Border')
 					end
 					circle.shaBorder.nFaceDirection = KObject.nFaceDirection
 					D.DrawBorder(dwType, KObject, circle.shaBorder, circle.nAngle, circle.nRadius, circle.col)
@@ -236,7 +236,7 @@ function D.DrawObject(dwType, dwID, KObject)
 		and (not cache.bDrawLineOnlyStareMe or dwTarID == UI_GetClientPlayerID()) then
 			if not cache.shaLine or cache.shaLine.dwTarID ~= dwTarID then
 				if not cache.shaLine then
-					cache.shaLine = H_LINE:AppendItemFromIni(INI_SHADOW, 'Shadow')
+					cache.shaLine = H_LINE:AppendItemFromIni(INI_SHADOW, 'Shadow', 'Shadow_Line')
 				end
 				cache.shaLine.dwTarID = dwTarID
 				local r, g, b = 0, 255, 255
@@ -250,7 +250,10 @@ function D.DrawObject(dwType, dwID, KObject)
 				D.DrawLine(dwType, KObject, tar, cache.shaLine, { r, g, b })
 			end
 		elseif cache.shaLine then
-			H_LINE:RemoveItem(cache.shaLine)
+			local parent = cache.shaLine:GetParent()
+			if parent then
+				parent:RemoveItem(cache.shaLine)
+			end
 			cache.shaLine = nil
 		end
 	end
@@ -258,7 +261,7 @@ function D.DrawObject(dwType, dwID, KObject)
 		local szText = cache.szNote or LIB.GetObjectName(KObject)
 		if not cache.shaName or cache.shaName.szText ~= szText then
 			if not cache.shaName then
-				cache.shaName = H_NAME:AppendItemFromIni(INI_SHADOW, 'Shadow')
+				cache.shaName = H_NAME:AppendItemFromIni(INI_SHADOW, 'Shadow', 'Shadow_Name')
 				cache.shaName:SetTriangleFan(GEOMETRY_TYPE.TEXT)
 			end
 			local r, g, b = 255, 128, 0
@@ -290,22 +293,38 @@ function D.OnObjectEnterScene(dwType, dwID)
 end
 
 function D.OnObjectLeaveScene(dwType, dwID)
-	local cache = CIRCLE_CACHE[dwType][dwID]
+	local cache, parent = CIRCLE_CACHE[dwType][dwID]
 	if cache then
 		if cache.aCircle then
 			for _, circle in ipairs(cache.aCircle) do
 				if circle.shaCircle then
-					H_CIRCLE:RemoveItem(circle.shaCircle)
+					parent = circle.shaCircle:GetParent()
+					if parent then
+						parent:RemoveItem(circle.shaCircle)
+					end
 				end
 				circle.shaCircle = nil
+				if circle.shaBorder then
+					parent = circle.shaBorder:GetParent()
+					if parent then
+						parent:RemoveItem(circle.shaBorder)
+					end
+				end
+				circle.shaBorder = nil
 			end
 		end
 		if cache.shaLine then
-			H_LINE:RemoveItem(cache.shaLine)
+			parent = cache.shaLine:GetParent()
+			if parent then
+				parent:RemoveItem(cache.shaLine)
+			end
 			cache.shaLine = nil
 		end
 		if cache.shaName then
-			H_NAME:RemoveItem(cache.shaName)
+			parent = cache.shaName:GetParent()
+			if parent then
+				parent:RemoveItem(cache.shaName)
+			end
 			cache.shaName = nil
 		end
 		CIRCLE_CACHE[dwType][dwID] = nil
