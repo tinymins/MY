@@ -196,7 +196,7 @@ function MY_Memo.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 		oncheck = function(bChecked)
 			MY_Memo.Toggle(false, bChecked)
 		end,
-	}, true):AutoWidth():Width() + 5
+	}):AutoWidth():Width() + 5
 
 	x = x + ui:Append('WndButton', {
 		x = x, y = y,
@@ -206,7 +206,7 @@ function MY_Memo.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 				MY_Memo.SetFont(false, nFont)
 			end)
 		end,
-	}, true):AutoWidth():Width() + 5
+	}):AutoWidth():Width() + 5
 
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y,
@@ -215,7 +215,7 @@ function MY_Memo.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 		oncheck = function(bChecked)
 			MY_Memo.Toggle(true, bChecked)
 		end,
-	}, true):AutoWidth():Width() + 5
+	}):AutoWidth():Width() + 5
 
 	x = x + ui:Append('WndButton', {
 		x = x, y = y,
@@ -225,7 +225,7 @@ function MY_Memo.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 				MY_Memo.SetFont(true, nFont)
 			end)
 		end,
-	}, true):AutoWidth():Width() + 5
+	}):AutoWidth():Width() + 5
 	y = y + 30
 	x = X
 	return x, y

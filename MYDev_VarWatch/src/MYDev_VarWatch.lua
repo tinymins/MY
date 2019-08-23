@@ -120,14 +120,14 @@ LIB.RegisterPanel(
 					_C.tVarList[i] = LIB.TrimString(text)
 					LIB.SaveLUAData(DATA_PATH, _C.tVarList)
 				end,
-			}):Children('#WndEditBox_K' .. i)
+			})
 
 			tWndEditV[i] = ui:Append('WndEditBox', {
 				name = 'WndEditBox_V' .. i,
 				x = x + 150, y = y + (i - 1) * 25,
 				w = w - 2 * x - 150, h = 25,
 				color = {255, 255, 255},
-			}):Children('#WndEditBox_V' .. i)
+			})
 		end
 
 		LIB.BreatheCall('DEV_VARWATCH', function()

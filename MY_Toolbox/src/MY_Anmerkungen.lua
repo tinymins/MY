@@ -516,7 +516,7 @@ function PS.OnPanelActive(wnd)
 				return false
 			end,
 		}},
-	}, true)
+	})
 	for dwID, t in pairs(PUBLIC_PLAYER_NOTES) do
 		if tonumber(dwID) then
 			list:ListBox('insert', _L('[%s] %s', t.szName, t.szContent), t.dwID, t)

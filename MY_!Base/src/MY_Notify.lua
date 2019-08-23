@@ -282,7 +282,7 @@ local function OnInit()
 				end, 5000)
 			end
 		end,
-	}, true)
+	})
 end
 LIB.RegisterInit('MY_NotifyTip', OnInit)
 end

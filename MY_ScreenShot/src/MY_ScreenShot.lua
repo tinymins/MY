@@ -146,18 +146,18 @@ _MY_ScreenShot.OnPanelActive = function(wnd)
         ui:Children('#WndEditBox_SsRoot'):Text(MY_ScreenShot.GetConfig('szFilePath'))
     end
 
-    ui:Append('WndCheckBox', 'WndCheckBox_UseGlobal'):Children('#WndCheckBox_UseGlobal'):Pos(30,30):Width(200)
+    ui:Append('WndCheckBox', 'WndCheckBox_UseGlobal'):Pos(30,30):Width(200)
       :Text(_L['use global config']):Tip(_L['Check to use global config, otherwise use private setting.'])
       :Check(function(bChecked) MY_ScreenShot.bUseGlobalConfig = bChecked fnRefreshPanel(ui) end)
       :Check(MY_ScreenShot.bUseGlobalConfig)
 
-    ui:Append('WndCheckBox', 'WndCheckBox_HideUI'):Children('#WndCheckBox_HideUI'):Pos(30,70)
+    ui:Append('WndCheckBox', 'WndCheckBox_HideUI'):Pos(30,70)
       :Text(_L['auto hide ui while shot screen']):Tip(_L['Check it if you want to hide ui automatic.'])
       :Check(function(bChecked) MY_ScreenShot.SetConfig('bAutoHideUI', bChecked) end)
       :Check(MY_ScreenShot.GetConfig('bAutoHideUI'))
 
-    ui:Append('Text', 'Text_FileExName'):Find('#Text_FileExName'):Text(_L['file format']):Pos(30,110)
-    ui:Append('WndComboBox', 'WndCombo_FileExName'):Children('#WndCombo_FileExName'):Pos(110,110):Width(80)
+    ui:Append('Text', 'Text_FileExName'):Text(_L['file format']):Pos(30,110)
+    ui:Append('WndComboBox', 'WndCombo_FileExName'):Pos(110,110):Width(80)
       :Menu(function()
         return {
             {szOption = 'jpg', bChecked = MY_ScreenShot.GetConfig('szFileExName')=='jpg', rgb = GetMsgFontColor('MSG_SYS', true), fnAction = function() MY_ScreenShot.SetConfig('szFileExName', 'jpg') ui:Children('#WndCombo_FileExName'):Text(MY_ScreenShot.GetConfig('szFileExName')) end, fnAutoClose = function() return true end},
@@ -168,14 +168,14 @@ _MY_ScreenShot.OnPanelActive = function(wnd)
       end)
       :Text(MY_ScreenShot.GetConfig('szFileExName'))
 
-    ui:Append('Text', 'Text_Quality'):Find('#Text_Quality'):Text(_L['set quality (0-100)']):Pos(30,150)
-    ui:Append('WndTrackbar', 'WndTrackbar_Quality'):Children('#WndTrackbar_Quality'):Pos(180,150)
+    ui:Append('Text', 'Text_Quality'):Text(_L['set quality (0-100)']):Pos(30,150)
+    ui:Append('WndTrackbar', 'WndTrackbar_Quality'):Pos(180,150)
       :TrackbarStyle(false):Range(0, 100)
       :Tip(_L['Set screenshot quality(0-100): the larger number, the image will use more hdd space.'])
       :Change(function(nValue) MY_ScreenShot.SetConfig('nQuality', nValue) end)
 
-    ui:Append('Text', 'Text_SsRoot'):Find('#Text_SsRoot'):Text(_L['set folder']):Pos(30,190)
-    ui:Append('WndEditBox', 'WndEditBox_SsRoot'):Children('#WndEditBox_SsRoot'):Pos(30,220):Size(620,100)
+    ui:Append('Text', 'Text_SsRoot'):Text(_L['set folder']):Pos(30,190)
+    ui:Append('WndEditBox', 'WndEditBox_SsRoot'):Pos(30,220):Size(620,100)
       :Text(MY_ScreenShot.GetConfig('szFilePath'))
       :Change(function(szValue)
         szValue = string.gsub(szValue, '^%s*(.-)%s*$', '%1')
@@ -186,11 +186,11 @@ _MY_ScreenShot.OnPanelActive = function(wnd)
       end)
       :Tip(_L['Set destination folder which screenshot file will be saved. Absolute path required.\nEx: D:/JX3_ScreenShot/\nAttention: let it blank will save screenshot to default folder.'],UI.TIP_POSITION.TOP_BOTTOM)
 
-    ui:Append('WndButton', 'WndButton_HotkeyCheck'):Children('#WndButton_HotkeyCheck'):Pos(w-180, 30):Width(170)
+    ui:Append('WndButton', 'WndButton_HotkeyCheck'):Pos(w-180, 30):Width(170)
       :Text(_L['set default screenshot tool'])
       :Click(function() LIB.SetHotKey('MY_ScreenShot_Hotkey',1,44,false,false,false) end)
 
-    ui:Append('Text', 'Text_SetHotkey'):Find('#Text_SetHotkey'):Pos(w-140, 60):Color(255,255,0)
+    ui:Append('Text', 'Text_SetHotkey'):Pos(w-140, 60):Color(255,255,0)
       :Text(_L['>> set hotkey <<'])
       :Click(function() LIB.SetHotKey() end)
 

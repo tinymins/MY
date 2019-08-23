@@ -807,7 +807,7 @@ function D.OpenRuleEditor(tData, onChangeNotify, bHideBase)
 	if not bHideBase then
 		W = 450
 		-- 匹配方式
-		ui:Append('Text', { x = nX, y = nY, color = {255, 255, 0}, text = _L['Judge method'] }, true):AutoWidth()
+		ui:Append('Text', { x = nX, y = nY, color = {255, 255, 0}, text = _L['Judge method'] }):AutoWidth()
 		nX, nY = X + 10, nY + dY
 		for i, eType in ipairs({ 'NAME', 'NAME_PATT', 'ID', 'TEMPLATE_ID', 'TONG_NAME', 'TONG_NAME_PATT' }) do
 			if i == 5 then
@@ -822,11 +822,11 @@ function D.OpenRuleEditor(tData, onChangeNotify, bHideBase)
 					tData.szMethod = eType
 					onChangeNotify(tData)
 				end,
-			}, true):AutoWidth():Pos('BOTTOMRIGHT') + 5
+			}):AutoWidth():Pos('BOTTOMRIGHT') + 5
 		end
 		nX, nY = X, nY + dY
 		-- 目标类型
-		ui:Append('Text', { x = nX, y = nY, color = {255, 255, 0}, text = _L['Target type'] }, true):AutoWidth()
+		ui:Append('Text', { x = nX, y = nY, color = {255, 255, 0}, text = _L['Target type'] }):AutoWidth()
 		nX, nY = X + 10, nY + dY
 		nX = ui:Append('WndCheckBox', {
 			x = nX, y = nY,
@@ -836,7 +836,7 @@ function D.OpenRuleEditor(tData, onChangeNotify, bHideBase)
 				tData.tType.bAll = not tData.tType.bAll
 				onChangeNotify(tData)
 			end,
-		}, true):AutoWidth():Pos('BOTTOMRIGHT') + 5
+		}):AutoWidth():Pos('BOTTOMRIGHT') + 5
 		for _, eType in ipairs({ TARGET.NPC, TARGET.PLAYER, TARGET.DOODAD }) do
 			nX = ui:Append('WndCheckBox', {
 				x = nX, y = nY,
@@ -847,12 +847,12 @@ function D.OpenRuleEditor(tData, onChangeNotify, bHideBase)
 					onChangeNotify(tData)
 				end,
 				autoenable = function() return not tData.tType.bAll end,
-			}, true):AutoWidth():Pos('BOTTOMRIGHT') + 5
+			}):AutoWidth():Pos('BOTTOMRIGHT') + 5
 		end
 		nX, nY = X, nY + dY
 	end
 	-- 目标关系
-	ui:Append('Text', { x = nX, y = nY, color = {255, 255, 0}, text = _L['Target relation'] }, true):AutoWidth()
+	ui:Append('Text', { x = nX, y = nY, color = {255, 255, 0}, text = _L['Target relation'] }):AutoWidth()
 	nX, nY = X + 10, nY + dY
 	nX = ui:Append('WndCheckBox', {
 		x = nX, y = nY,
@@ -862,7 +862,7 @@ function D.OpenRuleEditor(tData, onChangeNotify, bHideBase)
 			tData.tRelation.bAll = not tData.tRelation.bAll
 			onChangeNotify(tData)
 		end,
-	}, true):AutoWidth():Pos('BOTTOMRIGHT') + 5
+	}):AutoWidth():Pos('BOTTOMRIGHT') + 5
 	for _, szRelation in ipairs({ 'Enemy', 'Ally' }) do
 		nX = ui:Append('WndCheckBox', {
 			x = nX, y = nY,
@@ -873,11 +873,11 @@ function D.OpenRuleEditor(tData, onChangeNotify, bHideBase)
 				onChangeNotify(tData)
 			end,
 			autoenable = function() return not tData.tRelation.bAll end,
-		}, true):AutoWidth():Pos('BOTTOMRIGHT') + 5
+		}):AutoWidth():Pos('BOTTOMRIGHT') + 5
 	end
 	nX, nY = X, nY + dY
 	-- 目标血量百分比
-	ui:Append('Text', { x = nX, y = nY, color = {255, 255, 0}, text = _L['Target life percentage'] }, true):AutoWidth()
+	ui:Append('Text', { x = nX, y = nY, color = {255, 255, 0}, text = _L['Target life percentage'] }):AutoWidth()
 	nX, nY = X + 10, nY + dY
 	nX = ui:Append('WndCheckBox', {
 		x = nX, y = nY, w = 100, h = 25,
@@ -887,7 +887,7 @@ function D.OpenRuleEditor(tData, onChangeNotify, bHideBase)
 			tData.tLife.bEnable = not tData.tLife.bEnable
 			onChangeNotify(tData)
 		end,
-	}, true):AutoWidth():Pos('BOTTOMRIGHT') + 5
+	}):AutoWidth():Pos('BOTTOMRIGHT') + 5
 	nX = ui:Append('WndComboBox', {
 		x = nX, y = nY, w = 200,
 		text = _L['Operator'],
@@ -898,7 +898,7 @@ function D.OpenRuleEditor(tData, onChangeNotify, bHideBase)
 			end)
 		end,
 		autoenable = function() return tData.tLife.bEnable end,
-	}, true):AutoWidth():Pos('BOTTOMRIGHT') + 5
+	}):AutoWidth():Pos('BOTTOMRIGHT') + 5
 	nX = ui:Append('WndEditBox', {
 		x = nX, y = nY, w = 100, h = 25,
 		text = tData.tLife.nValue,
@@ -908,10 +908,10 @@ function D.OpenRuleEditor(tData, onChangeNotify, bHideBase)
 			onChangeNotify(tData)
 		end,
 		autoenable = function() return tData.tLife.bEnable end,
-	}, true):AutoWidth():Pos('BOTTOMRIGHT') + 5
+	}):AutoWidth():Pos('BOTTOMRIGHT') + 5
 	nX, nY = X, nY + dY
 	-- 最远距离
-	ui:Append('Text', { x = nX, y = nY, color = {255, 255, 0}, text = _L['Max distance'] }, true):AutoWidth()
+	ui:Append('Text', { x = nX, y = nY, color = {255, 255, 0}, text = _L['Max distance'] }):AutoWidth()
 	nX, nY = X + 10, nY + dY
 	nX = ui:Append('WndEditBox', {
 		x = nX, y = nY, w = 100, h = 25, w = 200,
@@ -921,10 +921,10 @@ function D.OpenRuleEditor(tData, onChangeNotify, bHideBase)
 			tData.nMaxDistance = nValue
 			onChangeNotify(tData)
 		end,
-	}, true):AutoWidth():Pos('BOTTOMRIGHT') + 5
+	}):AutoWidth():Pos('BOTTOMRIGHT') + 5
 	nX, nY = X, nY + dY
 	-- 名称显示
-	ui:Append('Text', { x = nX, y = nY, color = {255, 255, 0}, text = _L['Name display'] }, true):AutoWidth()
+	ui:Append('Text', { x = nX, y = nY, color = {255, 255, 0}, text = _L['Name display'] }):AutoWidth()
 	nX, nY = X + 10, nY + dY
 	nX = ui:Append('WndEditBox', {
 		x = nX, y = nY, w = 100, h = 25, w = 200,
@@ -933,7 +933,7 @@ function D.OpenRuleEditor(tData, onChangeNotify, bHideBase)
 			tData.szDisplay = szText
 			onChangeNotify(tData)
 		end,
-	}, true):AutoWidth():Pos('BOTTOMRIGHT') + 5
+	}):AutoWidth():Pos('BOTTOMRIGHT') + 5
 	nX, nY = X, nY + dY
 
 	nY = nY + 20

@@ -90,7 +90,7 @@ function TI.CreateFrame(a, b)
 			end,
 		})
 		local x, y = 10, 5
-		x = x + ui:Append('Text', { x = x, y = y - 3, text = _L['YY:'], font = 48 }, true):AutoWidth():Width() + 5
+		x = x + ui:Append('Text', { x = x, y = y - 3, text = _L['YY:'], font = 48 }):AutoWidth():Width() + 5
 		x = x + ui:Append('WndAutocomplete', {
 			name = 'YY',
 			w = 160, h = 26, x = x, y = y,
@@ -137,7 +137,7 @@ function TI.CreateFrame(a, b)
 					end,
 				},
 			},
-		}, true):Width() + 5
+		}):Width() + 5
 		y = y + ui:Append('WndButton2', {
 			x = x, y = y, text = _L['Paste YY'],
 			onclick = function()
@@ -159,7 +159,7 @@ function TI.CreateFrame(a, b)
 					LIB.Talk(PLAYER_TALK_CHANNEL.RAID, message)
 				end
 			end,
-		}, true):Height() + 5
+		}):Height() + 5
 		ui:Append('WndEditBox', {
 			name = 'Message',
 			w = 300, h = 80, x = 10, y = y,
@@ -178,7 +178,7 @@ function TI.CreateFrame(a, b)
 			end,
 		})
 		x, y = 5, 130
-		x = x + ui:Append('WndButton2', { x = x, y = y, text = _L['Raid Tools'], onclick = MY_RaidTools.TogglePanel }, true):AutoWidth():Width() + 5
+		x = x + ui:Append('WndButton2', { x = x, y = y, text = _L['Raid Tools'], onclick = MY_RaidTools.TogglePanel }):AutoWidth():Width() + 5
 		x = x + ui:Append('WndButton2', {
 			x = x, y = y,
 			text = _L['GKP Golden Team Record'],
@@ -189,9 +189,9 @@ function TI.CreateFrame(a, b)
 					LIB.Alert(_L['You haven\'t had MY_GKP installed and loaded yet.'])
 				end
 			end,
-		}, true):AutoWidth():Width() + 5
+		}):AutoWidth():Width() + 5
 		if MY_TeamMon_RR then
-			x = x + ui:Append('WndButton2', { x = x, y = y, text = _L['Import Data'], onclick = MY_TeamMon_RR.OpenPanel }, true):AutoWidth():Width() + 5
+			x = x + ui:Append('WndButton2', { x = x, y = y, text = _L['Import Data'], onclick = MY_TeamMon_RR.OpenPanel }):AutoWidth():Width() + 5
 		end
 		-- ×¢²áÊÂ¼þ
 		local frame = TI.GetFrame()

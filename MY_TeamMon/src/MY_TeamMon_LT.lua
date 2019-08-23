@@ -146,8 +146,8 @@ function PS.OnPanelActive(frame)
 	local X, Y = 20, 20
 	local nX, nY = X, Y
 
-	nX, nY = ui:Append('Text', { x = nX, y = nY, text = _L['MY_TeamMon_LT'], font = 27 }, true):Pos('BOTTOMRIGHT')
-	nX = ui:Append('Text', { text = _L['Font scale'], x = X + 10, y = nY + 10 }, true):Pos('BOTTOMRIGHT')
+	nX, nY = ui:Append('Text', { x = nX, y = nY, text = _L['MY_TeamMon_LT'], font = 27 }):Pos('BOTTOMRIGHT')
+	nX = ui:Append('Text', { text = _L['Font scale'], x = X + 10, y = nY + 10 }):Pos('BOTTOMRIGHT')
 	nX, nY = ui:Append('WndTrackbar', {
 		x = nX + 10, y = nY + 13, text = '',
 		range = {1, 2, 10}, value = O.fScale,
@@ -155,25 +155,25 @@ function PS.OnPanelActive(frame)
 			O.fScale = nVal
 			ui:Children('#Text_Preview'):Font(O.dwFontScheme):scale(O.fScale)
 		end,
-	}, true):Pos('BOTTOMRIGHT')
+	}):Pos('BOTTOMRIGHT')
 
-	nX = ui:Append('Text', { text = _L['Pause time'], x = X + 10, y = nY }, true):Pos('BOTTOMRIGHT')
+	nX = ui:Append('Text', { text = _L['Pause time'], x = X + 10, y = nY }):Pos('BOTTOMRIGHT')
 	nX, nY = ui:Append('WndTrackbar', {
 		x = nX + 10, y = nY + 3, text = _L['s'],
 		range = {0.5, 3, 25}, value = O.fPause,
 		onchange = function(nVal)
 			O.fPause = nVal
 		end,
-	}, true):Pos('BOTTOMRIGHT')
+	}):Pos('BOTTOMRIGHT')
 
-	nX = ui:Append('Text', { text = _L['FadeOut time'], x = X + 10, y = nY }, true):Pos('BOTTOMRIGHT')
+	nX = ui:Append('Text', { text = _L['FadeOut time'], x = X + 10, y = nY }):Pos('BOTTOMRIGHT')
 	nX, nY = ui:Append('WndTrackbar', {
 		x = nX + 10, y = nY + 3, text = _L['s'],
 		range = {0, 3, 30}, value = O.fFadeOut,
 		onchange = function(nVal)
 			O.fFadeOut = nVal
 		end,
-	}, true):Pos('BOTTOMRIGHT')
+	}):Pos('BOTTOMRIGHT')
 
 	nY = nY + 10
 	nX = ui:Append('WndButton2', { x = X + 10, y = nY + 5, text = g_tStrings.FONT,
@@ -183,7 +183,7 @@ function PS.OnPanelActive(frame)
 				ui:Children('#Text_Preview'):Font(O.dwFontScheme):scale(O.fScale)
 			end)
 		end,
-	}, true):Pos('BOTTOMRIGHT')
+	}):Pos('BOTTOMRIGHT')
 	ui:Append('WndButton2', {
 		text = _L['Preview'], x = nX + 10, y = nY + 5,
 		onclick = function()

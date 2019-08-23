@@ -284,7 +284,7 @@ function MY_VisualSkill.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 			MY_VisualSkill.bEnable = bChecked
 			MY_VisualSkill.Reload()
 		end,
-	}, true):Width() + 5
+	}):Width() + 5
 
 	ui:Append('WndTrackbar', {
 		x = x, y = y,

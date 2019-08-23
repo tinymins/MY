@@ -197,7 +197,7 @@ function MY_Cataclysm.OpenBuffRuleEditor(rec, onChangeNotify, bHideBase)
 		x = x + ui:Append('Text', {
 			x = x, y = y, h = 25,
 			text = _L['Name or id'],
-		}, true):AutoWidth():Width() + 5
+		}):AutoWidth():Width() + 5
 		x = x + ui:Append('WndEditBox', {
 			x = x, y = y, w = 105, h = 25,
 			text = rec.dwID or rec.szName,
@@ -211,12 +211,12 @@ function MY_Cataclysm.OpenBuffRuleEditor(rec, onChangeNotify, bHideBase)
 				end
 				onChangeNotify(rec)
 			end,
-		}, true):Width() + 15
+		}):Width() + 15
 
 		x = x + ui:Append('Text', {
 			x = x, y = y, h = 25,
 			text = _L['Level'],
-		}, true):AutoWidth():Width() + 5
+		}):AutoWidth():Width() + 5
 		x = x + ui:Append('WndEditBox', {
 			x = x, y = y, w = 60, h = 25,
 			placeholder = _L['No limit'],
@@ -225,7 +225,7 @@ function MY_Cataclysm.OpenBuffRuleEditor(rec, onChangeNotify, bHideBase)
 				rec.nLevel = tonumber(text)
 				onChangeNotify(rec)
 			end,
-		}, true):Width() + 5
+		}):Width() + 5
 		y = y + 30
 		y = y + 10
 	end
@@ -234,7 +234,7 @@ function MY_Cataclysm.OpenBuffRuleEditor(rec, onChangeNotify, bHideBase)
 	x = x + ui:Append('Text', {
 		x = x, y = y, h = 25,
 		text = _L['Stacknum'],
-	}, true):AutoWidth():Width() + 5
+	}):AutoWidth():Width() + 5
 	x = x + ui:Append('WndComboBox', {
 		name = 'WndComboBox_StackOp',
 		x = x, y = y, w = 90, h = 25,
@@ -262,7 +262,7 @@ function MY_Cataclysm.OpenBuffRuleEditor(rec, onChangeNotify, bHideBase)
 			end
 			return menu
 		end,
-	}, true):Width() + 5
+	}):Width() + 5
 	x = x + ui:Append('WndEditBox', {
 		name = 'WndEditBox_StackNum',
 		x = x, y = y, w = 30, h = 25,
@@ -278,7 +278,7 @@ function MY_Cataclysm.OpenBuffRuleEditor(rec, onChangeNotify, bHideBase)
 			end
 			onChangeNotify(rec)
 		end,
-	}, true):Width() + 10
+	}):Width() + 10
 
 	ui:Append('WndCheckBox', {
 		x = x, y = y - 10,
@@ -288,7 +288,7 @@ function MY_Cataclysm.OpenBuffRuleEditor(rec, onChangeNotify, bHideBase)
 			rec.bOnlyMine = bChecked
 			onChangeNotify(rec)
 		end,
-	}, true):AutoWidth()
+	}):AutoWidth()
 	ui:Append('WndCheckBox', {
 		x = x, y = y + 10,
 		text = _L['Only me'],
@@ -297,7 +297,7 @@ function MY_Cataclysm.OpenBuffRuleEditor(rec, onChangeNotify, bHideBase)
 			rec.bOnlyMe = bChecked
 			onChangeNotify(rec)
 		end,
-	}, true):AutoWidth()
+	}):AutoWidth()
 	y = y + 30
 	y = y + 10
 
@@ -312,7 +312,7 @@ function MY_Cataclysm.OpenBuffRuleEditor(rec, onChangeNotify, bHideBase)
 				rec.bDelete = bChecked
 				onChangeNotify(rec)
 			end,
-		}, true):AutoWidth():Width() + 5
+		}):AutoWidth():Width() + 5
 		y = y + 30
 		y = y + 10
 	end
@@ -322,7 +322,7 @@ function MY_Cataclysm.OpenBuffRuleEditor(rec, onChangeNotify, bHideBase)
 		x = x, y = y, h = 25,
 		text = _L['Reminder'],
 		autoenable = function() return not rec.bDelete end,
-	}, true):AutoWidth():Width() + 5
+	}):AutoWidth():Width() + 5
 	x = x + ui:Append('WndEditBox', {
 		x = x, y = y, w = 30, h = 25,
 		text = rec.szReminder,
@@ -331,12 +331,12 @@ function MY_Cataclysm.OpenBuffRuleEditor(rec, onChangeNotify, bHideBase)
 			onChangeNotify(rec)
 		end,
 		autoenable = function() return not rec.bDelete end,
-	}, true):Width() + 5
+	}):Width() + 5
 	x = x + ui:Append('Text', {
 		x = x, y = y, h = 25,
 		text = _L['Priority'],
 		autoenable = function() return not rec.bDelete end,
-	}, true):AutoWidth():Width() + 5
+	}):AutoWidth():Width() + 5
 	x = x + ui:Append('WndEditBox', {
 		x = x, y = y, w = 40, h = 25,
 		edittype = 0,
@@ -346,12 +346,12 @@ function MY_Cataclysm.OpenBuffRuleEditor(rec, onChangeNotify, bHideBase)
 			onChangeNotify(rec)
 		end,
 		autoenable = function() return not rec.bDelete end,
-	}, true):Width() + 5
+	}):Width() + 5
 	x = x + ui:Append('Text', {
 		x = x, y = y, h = 25,
 		text = _L['Color'],
 		autoenable = function() return not rec.bDelete end,
-	}, true):AutoWidth():Width() + 5
+	}):AutoWidth():Width() + 5
 	x = x + ui:Append('Shadow', {
 		x = x, y = y + 2, w = 22, h = 22,
 		color = rec.col and {LIB.HumanColor2RGB(rec.col)} or {255, 255, 0},
@@ -373,7 +373,7 @@ function MY_Cataclysm.OpenBuffRuleEditor(rec, onChangeNotify, bHideBase)
 		tip = _L['Left click to change color, right click to clear color'],
 		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
 		autoenable = function() return not rec.bDelete end,
-	}, true):Width() + 5
+	}):Width() + 5
 	x = x + ui:Append('Shadow', {
 		x = x, y = y + 2, w = 22, h = 22,
 		color = rec.colScreenHead and {LIB.HumanColor2RGB(rec.colScreenHead)} or {255, 255, 0},
@@ -393,7 +393,7 @@ function MY_Cataclysm.OpenBuffRuleEditor(rec, onChangeNotify, bHideBase)
 		tip = _L['Left click to change screen head color, right click to clear color'],
 		tippostype = ALW.TOP_BOTTOM,
 		autoenable = function() return not rec.bDelete end,
-	}, true):Width() + 5
+	}):Width() + 5
 	y = y + 30
 
 	x = X
@@ -401,7 +401,7 @@ function MY_Cataclysm.OpenBuffRuleEditor(rec, onChangeNotify, bHideBase)
 		x = x, y = y, h = 25,
 		text = _L['Border alpha'],
 		autoenable = function() return not rec.bDelete end,
-	}, true):AutoWidth():Width() + 5
+	}):AutoWidth():Width() + 5
 	x = x + ui:Append('WndTrackbar', {
 		x = x, y = y, text = '',
 		range = {0, 255},
@@ -418,7 +418,7 @@ function MY_Cataclysm.OpenBuffRuleEditor(rec, onChangeNotify, bHideBase)
 			onChangeNotify(rec)
 		end,
 		autoenable = function() return not rec.bDelete end,
-	}, true):AutoWidth():Width() + 5
+	}):AutoWidth():Width() + 5
 	y = y + 30
 
 	x = X
@@ -431,7 +431,7 @@ function MY_Cataclysm.OpenBuffRuleEditor(rec, onChangeNotify, bHideBase)
 			onChangeNotify(rec)
 		end,
 		autoenable = function() return not rec.bDelete end,
-	}, true):AutoWidth():Width() + 5
+	}):AutoWidth():Width() + 5
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y,
 		text = _L['Caution'],
@@ -441,7 +441,7 @@ function MY_Cataclysm.OpenBuffRuleEditor(rec, onChangeNotify, bHideBase)
 			onChangeNotify(rec)
 		end,
 		autoenable = function() return not rec.bDelete end,
-	}, true):AutoWidth():Width() + 5
+	}):AutoWidth():Width() + 5
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y,
 		text = _L['Screen Head'],
@@ -452,7 +452,7 @@ function MY_Cataclysm.OpenBuffRuleEditor(rec, onChangeNotify, bHideBase)
 		end,
 		tip = _L['Requires MY_LifeBar loaded.'],
 		autoenable = function() return not rec.bDelete end,
-	}, true):AutoWidth():Width() + 5
+	}):AutoWidth():Width() + 5
 
 	y = y + 50
 	ui:Append('WndButton2', {
@@ -469,7 +469,7 @@ function MY_Cataclysm.OpenBuffRuleEditor(rec, onChangeNotify, bHideBase)
 				fnAction()
 			end
 		end,
-	}, true)
+	})
 	y = y + 30
 
 	h = y + 15

@@ -324,10 +324,10 @@ function PS.OnPanelActive(wnd)
 		name = 'WndEditBox_Keyword',
 		x = x, y = y, w = w - 160 - x, h = 25,
 		placeholder = _L['Type keyword, right click list to config.'],
-	}, true)
+	})
 	x, y = 0, y + 30
 
-	local list = ui:Append('WndListBox', { x = x, y = y, w = w, h = h - 30 }, true)
+	local list = ui:Append('WndListBox', { x = x, y = y, w = w, h = h - 30 })
 	-- ³õÊ¼»¯list¿Ø¼þ
 	for _, bw in ipairs(MY_ChatBlock.tBlockWords) do
 		list:ListBox('insert', ChatBlock2Text(bw.keyword, bw.channel), bw.keyword, bw)

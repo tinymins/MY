@@ -187,7 +187,7 @@ RegisterEvent('MY_BASE_LOADING_END', function()
 				end
 				BTN:Text(RUNNING and _L['Stop'] or _L['Start'])
 			end,
-		}, true)
+		})
 		ui:Append('WndButton', {
 			x = x + 100, y = y,
 			text = _L['Refresh'],
@@ -225,7 +225,7 @@ RegisterEvent('MY_BASE_LOADING_END', function()
 				MY.Topmsg(_L['Copied to clipboard'], _L['LuaWatcher'])
 				MY.UI.OpenTextEditor(D.GetRankString(SORT_KEY))
 			end,
-		}, true)
+		})
 
 		if RUNNING then
 			D.SetBreathe()

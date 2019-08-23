@@ -240,7 +240,7 @@ function D.ExportConfirm()
 				end
 				btnSure:Enable(bEnable)
 			end,
-		}, true):AutoWidth():Width()
+		}):AutoWidth():Width()
 		nMaxWidth = max(nMaxWidth, x + X)
 		if nGroup % 2 == 0 or nGroup == #LOG_TYPE then
 			x = X
@@ -281,7 +281,7 @@ function D.ExportConfirm()
 				function() doExport('.db') end,
 				_L['HTML mode'], _L['DB mode'])
 		end,
-	}, true)
+	})
 	y = y + 30
 	ui:Size(nMaxWidth, y + 50)
 	ui:Anchor({s = 'CENTER', r = 'CENTER', x = 0, y = 0})

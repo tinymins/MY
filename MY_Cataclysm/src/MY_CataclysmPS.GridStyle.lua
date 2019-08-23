@@ -52,7 +52,7 @@ function PS.OnPanelActive(frame)
 	local X, Y = 20, 20
 	local x, y = X, Y
 
-	y = y + ui:Append('Text', { x = x, y = y, text = _L['Grid Style'], font = 27 }, true):Height()
+	y = y + ui:Append('Text', { x = x, y = y, text = _L['Grid Style'], font = 27 }):Height()
 
 	y = y + 5
 
@@ -64,14 +64,14 @@ function PS.OnPanelActive(frame)
 			CFG.bShowAllGrid = bCheck
 			MY_Cataclysm.ReloadCataclysmPanel()
 		end,
-	}, true):AutoWidth():Height() + 5
+	}):AutoWidth():Height() + 5
 
 	x = X
 	y = y + 10
 
 	-- 名字、图标、内力和血量显示方案
 	x = X
-	y = y + ui:Append('Text', { x = x, y = y, text = _L['Name/Icon/Mana/Life Display'], font = 27 }, true):Height()
+	y = y + ui:Append('Text', { x = x, y = y, text = _L['Name/Icon/Mana/Life Display'], font = 27 }):Height()
 
 	-- 名字
 	x = X + 10
@@ -91,7 +91,7 @@ function PS.OnPanelActive(frame)
 					MY_CataclysmParty:CallDrawHPMP(true ,true)
 				end
 			end,
-		}, true):AutoWidth():Width() + 5
+		}):AutoWidth():Width() + 5
 	end
 
 	y = y + ui:Append('WndTrackbar', {
@@ -106,7 +106,7 @@ function PS.OnPanelActive(frame)
 				MY_CataclysmParty:CallRefreshImages(nil, nil, nil, nil, true)
 			end
 		end,
-	}, true):Height()
+	}):Height()
 
 	x = X + 10
 	for _, p in ipairs({
@@ -121,7 +121,7 @@ function PS.OnPanelActive(frame)
 				CFG.nNameVAlignment = p[1]
 				MY_CataclysmParty:CallRefreshImages(true, false, true, nil, true)
 			end,
-		}, true):AutoWidth():Width() + 5
+		}):AutoWidth():Width() + 5
 	end
 	for _, p in ipairs({
 		{ 0, _L['Left'] },
@@ -135,7 +135,7 @@ function PS.OnPanelActive(frame)
 				CFG.nNameHAlignment = p[1]
 				MY_CataclysmParty:CallRefreshImages(true, false, true, nil, true)
 			end,
-		}, true):AutoWidth():Width() + 5
+		}):AutoWidth():Width() + 5
 	end
 	-- 名字字体修改
 	x = x + ui:Append('WndButton2', {
@@ -149,7 +149,7 @@ function PS.OnPanelActive(frame)
 				end
 			end)
 		end,
-	}, true):AutoWidth():Width() + 5
+	}):AutoWidth():Width() + 5
 	y = y + 25
 
 	-- 血量显示方式
@@ -169,7 +169,7 @@ function PS.OnPanelActive(frame)
 					MY_CataclysmParty:CallDrawHPMP(true, true)
 				end
 			end,
-		}, true):AutoWidth():Width() + 5
+		}):AutoWidth():Width() + 5
 	end
 
 	ui:Append('WndTrackbar', {
@@ -185,7 +185,7 @@ function PS.OnPanelActive(frame)
 			end
 		end,
 		autoenable = function() return CFG.nHPShownMode2 ~= 0 end,
-	}, true)
+	})
 	y = y + 25
 
 	-- 血量数值显示方案
@@ -205,7 +205,7 @@ function PS.OnPanelActive(frame)
 					MY_CataclysmParty:CallDrawHPMP(true, true)
 				end
 			end,
-		}, true):AutoWidth():Width() + 5
+		}):AutoWidth():Width() + 5
 	end
 
 	x = x + ui:Append('WndCheckBox', {
@@ -217,7 +217,7 @@ function PS.OnPanelActive(frame)
 				MY_CataclysmParty:CallDrawHPMP(true, true)
 			end
 		end,
-	}, true):AutoWidth():Width() + 5
+	}):AutoWidth():Width() + 5
 	y = y + 25
 
 	x = X + 10
@@ -234,7 +234,7 @@ function PS.OnPanelActive(frame)
 				CFG.nHPVAlignment = p[1]
 				MY_CataclysmParty:CallRefreshImages(true, false, true, nil, true)
 			end,
-		}, true):AutoWidth():Width() + 5
+		}):AutoWidth():Width() + 5
 	end
 	for _, p in ipairs({
 		{ 0, _L['Left'] },
@@ -249,7 +249,7 @@ function PS.OnPanelActive(frame)
 				CFG.nHPHAlignment = p[1]
 				MY_CataclysmParty:CallRefreshImages(true, false, true, nil, true)
 			end,
-		}, true):AutoWidth():Width() + 5
+		}):AutoWidth():Width() + 5
 	end
 	ui:Append('WndButton2', {
 		x = x, y = y - 1, text = _L['Life font'],
@@ -262,7 +262,7 @@ function PS.OnPanelActive(frame)
 			end)
 		end,
 		autoenable = function() return CFG.nHPShownMode2 ~= 0 end,
-	}, true):AutoWidth()
+	}):AutoWidth()
 	y = y + 25
 
 	-- 图标显示方案
@@ -284,7 +284,7 @@ function PS.OnPanelActive(frame)
 					MY_CataclysmParty:CallDrawHPMP(true, true)
 				end
 			end,
-		}, true):AutoWidth():Width() + 5
+		}):AutoWidth():Width() + 5
 	end
 	y = y + 25
 
@@ -299,7 +299,7 @@ function PS.OnPanelActive(frame)
 				MY_CataclysmParty:CallDrawHPMP(true, true)
 			end
 		end,
-	}, true):AutoWidth():Width() + 5
+	}):AutoWidth():Width() + 5
 
 	x = x + ui:Append('WndButton2', {
 		x = x, y = y, text = g_tStrings.STR_SKILL_MANA .. g_tStrings.FONT,
@@ -312,7 +312,7 @@ function PS.OnPanelActive(frame)
 			end)
 		end,
 		autoenable = function() return CFG.nShowMP end,
-	}, true):Width() + 5
+	}):Width() + 5
 
 	ui:Append('WndTrackbar', {
 		x = x, y = y - 1,
@@ -327,7 +327,7 @@ function PS.OnPanelActive(frame)
 			end
 		end,
 		autoenable = function() return CFG.nShowMP end,
-	}, true)
+	})
 	y = y + 25
 end
 LIB.RegisterPanel('MY_Cataclysm_GridStyle', _L['Grid Style'], _L['Raid'], 'ui/Image/UICommon/RaidTotal.uitex|68', PS)

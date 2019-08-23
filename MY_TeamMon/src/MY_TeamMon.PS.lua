@@ -64,7 +64,7 @@ function PS.OnPanelActive(wnd)
 	-- 	end,
 	-- })
 
-	nX, nY = ui:Append('Text', { x = X, y = Y, text = _L['Master switch'], font = 27 }, true):AutoWidth():Pos('BOTTOMRIGHT')
+	nX, nY = ui:Append('Text', { x = X, y = Y, text = _L['Master switch'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
 	nX = ui:Append('WndCheckBox', {
 		x = X + 10, y = nY, text = _L['Enable MY_TeamMon'],
 		checked = MY_TeamMon.bEnable,
@@ -72,7 +72,7 @@ function PS.OnPanelActive(wnd)
 			MY_TeamMon.Enable(bCheck, true)
 			MY_TeamMon.bEnable = bCheck
 		end,
-	}, true):AutoWidth():Pos('BOTTOMRIGHT')
+	}):AutoWidth():Pos('BOTTOMRIGHT')
 	if not LIB.IsShieldedVersion(2) then
 		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY, text = _L['Enable circle'],
@@ -80,18 +80,18 @@ function PS.OnPanelActive(wnd)
 			oncheck = function(bCheck)
 				MY_TeamMon_CC.bEnable = bCheck
 			end,
-		}, true):AutoWidth():Pos('BOTTOMRIGHT')
+		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY, text = _L['Circle border'],
 			checked = MY_TeamMon_CC.bBorder,
 			oncheck = function(bCheck)
 				MY_TeamMon_CC.bBorder = bCheck
 			end,
-		}, true):AutoWidth():Pos('BOTTOMRIGHT')
+		}):AutoWidth():Pos('BOTTOMRIGHT')
 	end
 	nY = nY + nLineH
 
-	nX, nY = ui:Append('Text', { x = X, y = nY + 5, text = _L['Enable alarm (master switch)'], font = 27 }, true):AutoWidth():Pos('BOTTOMRIGHT')
+	nX, nY = ui:Append('Text', { x = X, y = nY + 5, text = _L['Enable alarm (master switch)'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
 	nX = ui:Append('WndCheckBox', {
 		x = X + 10, y = nY,
 		text = _L['Team channel alarm'],
@@ -100,7 +100,7 @@ function PS.OnPanelActive(wnd)
 		oncheck = function(bCheck)
 			MY_TeamMon.bPushTeamChannel = bCheck
 		end,
-	}, true):AutoWidth():Pos('BOTTOMRIGHT')
+	}):AutoWidth():Pos('BOTTOMRIGHT')
 	nX = ui:Append('WndCheckBox', {
 		x = nX + 5, y = nY,
 		text = _L['Whisper channel alarm'], color = GetMsgFontColor('MSG_WHISPER', true),
@@ -108,21 +108,21 @@ function PS.OnPanelActive(wnd)
 		oncheck = function(bCheck)
 			MY_TeamMon.bPushWhisperChannel = bCheck
 		end,
-	}, true):AutoWidth():Pos('BOTTOMRIGHT')
+	}):AutoWidth():Pos('BOTTOMRIGHT')
 	nX = ui:Append('WndCheckBox', {
 		x = nX + 5, y = nY, text = _L['Buff list'],
 		checked = MY_TeamMon.bPushBuffList,
 		oncheck = function(bCheck)
 			MY_TeamMon.bPushBuffList = bCheck
 		end,
-	}, true):AutoWidth():Pos('BOTTOMRIGHT')
+	}):AutoWidth():Pos('BOTTOMRIGHT')
 	nX, nY = ui:Append('WndCheckBox', {
 		x = nX + 5, y = nY, text = _L['Center alarm'],
 		checked = MY_TeamMon.bPushCenterAlarm,
 		oncheck = function(bCheck)
 			MY_TeamMon.bPushCenterAlarm = bCheck
 		end,
-	}, true):AutoWidth():Pos('BOTTOMRIGHT')
+	}):AutoWidth():Pos('BOTTOMRIGHT')
 	nX = X + 5
 	if not LIB.IsShieldedVersion(2) then
 		nX = ui:Append('WndCheckBox', {
@@ -131,14 +131,14 @@ function PS.OnPanelActive(wnd)
 			oncheck = function(bCheck)
 				MY_TeamMon.bPushBigFontAlarm = bCheck
 			end,
-		}, true):AutoWidth():Pos('BOTTOMRIGHT')
+		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY, text = _L['Fullscreen alarm'],
 			checked = MY_TeamMon.bPushFullScreen,
 			oncheck = function(bCheck)
 				MY_TeamMon.bPushFullScreen = bCheck
 			end,
-		}, true):AutoWidth():Pos('BOTTOMRIGHT')
+		}):AutoWidth():Pos('BOTTOMRIGHT')
 	end
 	nX = ui:Append('WndCheckBox', {
 		x = nX + 5, y = nY, text = _L['Party buff list'],
@@ -146,7 +146,7 @@ function PS.OnPanelActive(wnd)
 		oncheck = function(bCheck)
 			MY_TeamMon.bPushPartyBuffList = bCheck
 		end,
-	}, true):AutoWidth():Pos('BOTTOMRIGHT')
+	}):AutoWidth():Pos('BOTTOMRIGHT')
 	nX, nY = ui:Append('WndCheckBox', {
 		x = nX + 5, y = nY, text = _L['Lifebar alarm'],
 		tip = _L['Requires MY_LifeBar loaded.'],
@@ -155,8 +155,8 @@ function PS.OnPanelActive(wnd)
 		oncheck = function(bCheck)
 			MY_TeamMon.bPushScreenHead = bCheck
 		end,
-	}, true):AutoWidth():Pos('BOTTOMRIGHT')
-	nX, nY = ui:Append('Text', { x = X, y = nY + 5, text = _L['Team panel bind show buff'], font = 27 }, true):AutoWidth():Pos('BOTTOMRIGHT')
+	}):AutoWidth():Pos('BOTTOMRIGHT')
+	nX, nY = ui:Append('Text', { x = X, y = nY + 5, text = _L['Team panel bind show buff'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
 	nX, nY = ui:Append('WndCheckBox', {
 		x = X + 10, y = nY, text = _L['Team panel bind show buff'],
 		checked = MY_TeamMon.bPushTeamPanel,
@@ -164,8 +164,8 @@ function PS.OnPanelActive(wnd)
 			MY_TeamMon.bPushTeamPanel = bCheck
 			FireUIEvent('MY_TM_CREATE_CACHE')
 		end,
-	}, true):AutoWidth():Pos('BOTTOMRIGHT')
-	nX, nY = ui:Append('Text', { x = X, y = nY + 5, text = _L['Buff list'], font = 27 }, true):AutoWidth():Pos('BOTTOMRIGHT')
+	}):AutoWidth():Pos('BOTTOMRIGHT')
+	nX, nY = ui:Append('Text', { x = X, y = nY + 5, text = _L['Buff list'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
 	nX = ui:Append('WndComboBox', {
 		x = X + 10, y = nY, text = _L['Max buff count'],
 		menu = function()
@@ -177,7 +177,7 @@ function PS.OnPanelActive(wnd)
 			end
 			return menu
 		end,
-	}, true):AutoWidth():Pos('BOTTOMRIGHT')
+	}):AutoWidth():Pos('BOTTOMRIGHT')
 	nX, nY = ui:Append('WndComboBox', {
 		x = nX + 5, y = nY, text = _L['Buff size'],
 		menu = function()
@@ -189,23 +189,23 @@ function PS.OnPanelActive(wnd)
 			end
 			return menu
 		end,
-	}, true):AutoWidth():Pos('BOTTOMRIGHT')
-	nX, nY = ui:Append('Text', { x = X, y = nY + 5, text = _L['Data save mode'], font = 27 }, true):AutoWidth():Pos('BOTTOMRIGHT')
+	}):AutoWidth():Pos('BOTTOMRIGHT')
+	nX, nY = ui:Append('Text', { x = X, y = nY + 5, text = _L['Data save mode'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
 	nX, nY = ui:Append('WndCheckBox', {
 		x = X + 10, y = nY, text = _L['Use common data'],
 		checked = MY_TeamMon.bCommon,
 		oncheck = function(bCheck)
 			MY_TeamMon.bCommon = bCheck
 		end,
-	}, true):AutoWidth():Pos('BOTTOMRIGHT')
+	}):AutoWidth():Pos('BOTTOMRIGHT')
 	nX = ui:Append('WndButton2', {
 		x = X + 5, y = nY + 15, text = _L['Data panel'],
 		onclick = MY_TeamMon_UI.TogglePanel,
-	}, true):AutoWidth():Pos('BOTTOMRIGHT')
+	}):AutoWidth():Pos('BOTTOMRIGHT')
 	nX = ui:Append('WndButton2', {
 		x = nX + 5, y = nY + 15, text = _L['Export data'],
 		onclick = MY_TeamMon_UI.OpenExportPanel,
-	}, true):AutoWidth():Pos('BOTTOMRIGHT')
+	}):AutoWidth():Pos('BOTTOMRIGHT')
 	nX = ui:Append('WndButton2', {
 		x = nX + 5, y = nY + 15, text = _L['Import data'],
 		menu = function()
@@ -218,7 +218,7 @@ function PS.OnPanelActive(wnd)
 			end
 			return menu
 		end,
-	}, true):AutoWidth():Pos('BOTTOMRIGHT')
+	}):AutoWidth():Pos('BOTTOMRIGHT')
 	nX = ui:Append('WndButton2', {
 		x = nX + 5, y = nY + 15, text = _L['Open data folder'],
 		onclick = function()
@@ -228,7 +228,7 @@ function PS.OnPanelActive(wnd)
 			end
 			UI.OpenTextEditor(szRoot)
 		end,
-	}, true):AutoWidth():Pos('BOTTOMRIGHT')
+	}):AutoWidth():Pos('BOTTOMRIGHT')
 end
 
 LIB.RegisterPanel('MY_TeamMon', _L['MY_TeamMon'], _L['Raid'], 'ui/Image/UICommon/FBlist.uitex|34', PS)

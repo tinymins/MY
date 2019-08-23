@@ -164,7 +164,7 @@ LIB.RegisterPanel('TalkEx', _L['talk ex'], _L['Chat'], 'UI/Image/UICommon/Scienc
 	-- 喊话部分
 	-------------------------------------
 	-- 喊话输入框
-	ui:Append('WndEditBox', 'WndEdit_Talk'):Children('#WndEdit_Talk'):Pos(25,15)
+	ui:Append('WndEditBox', 'WndEdit_Talk'):Pos(25,15)
 	  :Size(w-136,208):Multiline(true)
 	  :Text(MY_TalkEx.szTalk)
 	  :Change(function(text) MY_TalkEx.szTalk = text end)
@@ -172,7 +172,7 @@ LIB.RegisterPanel('TalkEx', _L['talk ex'], _L['Chat'], 'UI/Image/UICommon/Scienc
 	local y = 12
 	local nChannelCount = #_C.tTalkChannels
 	for i, p in ipairs(_C.tTalkChannels) do
-		ui:Append('WndCheckBox', 'WndCheckBox_TalkEx_' .. p.nChannel):Children('#WndCheckBox_TalkEx_' .. p.nChannel)
+		ui:Append('WndCheckBox', 'WndCheckBox_TalkEx_' .. p.nChannel)
 		  :Pos(w - 110, y + (i - 1) * 180 / nChannelCount)
 		  :Text(g_tStrings.tChannelName[p.szID])
 		  :Color(GetMsgFontColor(p.szID, true))
@@ -182,7 +182,7 @@ LIB.RegisterPanel('TalkEx', _L['talk ex'], _L['Chat'], 'UI/Image/UICommon/Scienc
 		  :Check(MY_TalkEx.tTalkChannels[p.nChannel] or false)
 	end
 	-- 喊话按钮
-	ui:Append('WndButton', 'WndButton_Talk'):Children('#WndButton_Talk')
+	ui:Append('WndButton', 'WndButton_Talk')
 	  :Pos(w-110,200):Width(90)
 	  :Text(_L['send'],{255,255,255})
 	  :Click(function()
@@ -204,13 +204,13 @@ LIB.RegisterPanel('TalkEx', _L['talk ex'], _L['Chat'], 'UI/Image/UICommon/Scienc
 	-- 调侃部分
 	-------------------------------------
 	-- <hr />
-	ui:Append('Image', 'Image_TalkEx_Spliter'):Find('#Image_TalkEx_Spliter')
+	ui:Append('Image', 'Image_TalkEx_Spliter')
 	  :Pos(5, 235):Size(w-10, 1):Image('UI/Image/UICommon/ScienceTreeNode.UITex',62)
 	-- 文本标题
-	ui:Append('Text', 'Text_Trick_With'):Find('#Text_Trick_With')
+	ui:Append('Text', 'Text_Trick_With')
 	  :Pos(27, 240):Text(_L['have a trick with'])
 	-- 调侃对象范围过滤器
-	ui:Append('WndComboBox', 'WndComboBox_Trick_Filter'):Find('#WndComboBox_Trick_Filter')
+	ui:Append('WndComboBox', 'WndComboBox_Trick_Filter')
 	  :Pos(95, 241):Size(80,25):Menu(function()
 	  	local t = {}
 	  	for szFilterId,szTitle in pairs(_C.tTrickFilter) do
@@ -226,7 +226,7 @@ LIB.RegisterPanel('TalkEx', _L['talk ex'], _L['Chat'], 'UI/Image/UICommon/Scienc
 	  end)
 	  :Text(_C.tTrickFilter[MY_TalkEx.szTrickFilter] or '')
 	-- 调侃门派过滤器
-	ui:Append('WndComboBox', 'WndComboBox_Trick_Force'):Children('#WndComboBox_Trick_Force')
+	ui:Append('WndComboBox', 'WndComboBox_Trick_Force')
 	  :Pos(175, 241):Size(80,25)
 	  :Text(_C.tForceTitle[MY_TalkEx.nTrickForce])
 	  :Menu(function()
@@ -243,24 +243,24 @@ LIB.RegisterPanel('TalkEx', _L['talk ex'], _L['Chat'], 'UI/Image/UICommon/Scienc
 	  	return t
 	  end)
 	-- 调侃内容输入框：第一句
-	ui:Append('WndEditBox', 'WndEdit_TrickBegin'):Children('#WndEdit_TrickBegin')
+	ui:Append('WndEditBox', 'WndEdit_TrickBegin')
 	  :Pos(25, 269):Size(w-136, 25):Text(MY_TalkEx.szTrickTextBegin)
 	  :Change(function() MY_TalkEx.szTrickTextBegin = this:GetText() end)
 	-- 调侃内容输入框：调侃内容
-	ui:Append('WndEditBox', 'WndEdit_Trick'):Children('#WndEdit_Trick')
+	ui:Append('WndEditBox', 'WndEdit_Trick')
 	  :Pos(25, 294):Size(w-136, 55)
 	  :Multiline(true):Text(MY_TalkEx.szTrickText)
 	  :Change(function() MY_TalkEx.szTrickText = this:GetText() end)
 	-- 调侃内容输入框：最后一句
-	ui:Append('WndEditBox', 'WndEdit_TrickEnd'):Children('#WndEdit_TrickEnd')
+	ui:Append('WndEditBox', 'WndEdit_TrickEnd')
 	  :Pos(25, 349):Size(w-136, 25)
 	  :Text(MY_TalkEx.szTrickTextEnd)
 	  :Change(function() MY_TalkEx.szTrickTextEnd = this:GetText() end)
 	-- 调侃发送频道提示框
-	ui:Append('Text', 'Text_Trick_Sendto'):Find('#Text_Trick_Sendto')
+	ui:Append('Text', 'Text_Trick_Sendto')
 	  :Pos(27, 379):Size(100, 26):Text(_L['send to'])
 	-- 调侃发送频道
-	ui:Append('WndComboBox', 'WndComboBox_Trick_Sendto_Filter'):Children('#WndComboBox_Trick_Sendto_Filter')
+	ui:Append('WndComboBox', 'WndComboBox_Trick_Sendto_Filter')
 	  :Pos(80, 379):Size(100, 25)
 	  :Menu(function()
 	  	local t = {}
@@ -279,7 +279,7 @@ LIB.RegisterPanel('TalkEx', _L['talk ex'], _L['Chat'], 'UI/Image/UICommon/Scienc
 	  :Text(_C.tTrickChannels[MY_TalkEx.nTrickChannel].szName or '')
 	  :Color(_C.tTrickChannels[MY_TalkEx.nTrickChannel].tCol)
 	-- 调侃按钮
-	ui:Append('WndButton', 'WndButton_Trick'):Children('#WndButton_Trick')
+	ui:Append('WndButton', 'WndButton_Trick')
 	  :Pos(435, 379):Color({255,255,255})
 	  :Text(_L['have a trick with'])
 	  :Click(_C.Trick)

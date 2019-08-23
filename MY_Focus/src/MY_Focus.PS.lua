@@ -68,7 +68,7 @@ function PS.OnPanelActive(wnd)
 			end
 		end,
 		autoenable = function() return not MY_Focus.IsShielded() end,
-	}, true):AutoWidth():Width() + 10
+	}):AutoWidth():Width() + 10
 
 	ui:Append('WndEditBox', {
 		x = x, y = y, w = wl - x, h = 25,
@@ -101,7 +101,7 @@ function PS.OnPanelActive(wnd)
 	local list = ui:Append('WndListBox', {
 		x = x, y = y + 30, w = wl - x + xl, h = h - y - 40,
 		autoenable = function() return MY_Focus.IsEnabled() end,
-	}, true)
+	})
 	-- ³õÊ¼»¯list¿Ø¼þ
 	for _, v in ipairs(MY_Focus.GetAllFocusPattern()) do
 		list:ListBox('insert', MY_Focus.FormatRuleText(v), v, v)
@@ -489,7 +489,7 @@ function PS.OnPanelActive(wnd)
 			end)
 		end,
 		autoenable = function() return MY_Focus.IsEnabled() end,
-	}, true):AutoWidth()
+	}):AutoWidth()
 	y = y + deltaY
 
 	ui:Append('WndTrackbar', {

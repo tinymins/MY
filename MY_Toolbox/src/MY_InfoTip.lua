@@ -231,8 +231,8 @@ MY_InfoTip.Reload = function()
                     cfg.anchor = anchor
                     SaveConfig()
                 end):Drag(0,0,0,0):Drag(false):Penetrable(true)
-                frm:Append('Image', 'Image_Default'):Children('#Image_Default'):Size(220,30):Image('UI/Image/UICommon/Commonpanel.UITex',86):Alpha(180)
-                frm:Append('Text', 'Text_Default'):Children('#Text_Default'):Size(220,30):Text(cache.title):Font(2)[1]:SetHAlign(1)
+                frm:Append('Image', 'Image_Default'):Size(220,30):Image('UI/Image/UICommon/Commonpanel.UITex',86):Alpha(180)
+                frm:Append('Text', 'Text_Default'):Size(220,30):Text(cache.title):Font(2)[1]:SetHAlign(1)
                 local txt = frm:Find('#Text_Default')
                 frm:Breathe(function() txt:Text(cache.GetContent()) end)
             end
@@ -266,7 +266,7 @@ LIB.RegisterPanel( 'MY_InfoTip', _L['infotip'], _L['System'], 'ui/Image/UICommon
     local w, h = ui:Size()
     local x, y = 50, 20
 
-    ui:Append('Text', 'Text_InfoTip'):Find('#Text_InfoTip')
+    ui:Append('Text', 'Text_InfoTip')
       :Pos(x, y):Width(350)
       :Text(_L['* infomation tips']):Color(255,255,0)
     y = y + 5
@@ -275,28 +275,28 @@ LIB.RegisterPanel( 'MY_InfoTip', _L['infotip'], _L['System'], 'ui/Image/UICommon
         x, y = 55, y + 30
 
         local cfg = MY_InfoTip.Config[id]
-        ui:Append('WndCheckBox', 'WndCheckBox_InfoTip_'..id):Children('#WndCheckBox_InfoTip_'..id):Pos(x, y):Width(250)
+        ui:Append('WndCheckBox', 'WndCheckBox_InfoTip_'..id):Pos(x, y):Width(250)
           :Text(cache.title):Check(cfg.bEnable or false)
           :Check(function(bChecked)
             cfg.bEnable = bChecked
             MY_InfoTip.Reload()
           end)
         x = x + 220
-        ui:Append('WndCheckBox', 'WndCheckBox_InfoTipTitle_'..id):Children('#WndCheckBox_InfoTipTitle_'..id):Pos(x, y):Width(60)
+        ui:Append('WndCheckBox', 'WndCheckBox_InfoTipTitle_'..id):Pos(x, y):Width(60)
           :Text(_L['title']):Check(cfg.bShowTitle or false)
           :Check(function(bChecked)
             cfg.bShowTitle = bChecked
             MY_InfoTip.Reload()
           end)
         x = x + 70
-        ui:Append('WndCheckBox', 'WndCheckBox_InfoTipBg_'..id):Children('#WndCheckBox_InfoTipBg_'..id):Pos(x, y):Width(60)
+        ui:Append('WndCheckBox', 'WndCheckBox_InfoTipBg_'..id):Pos(x, y):Width(60)
           :Text(_L['background']):Check(cfg.bShowBg or false)
           :Check(function(bChecked)
             cfg.bShowBg = bChecked
             MY_InfoTip.Reload()
           end)
         x = x + 70
-        ui:Append('WndButton', 'WndButton_InfoTipFont_'..id):Children('#WndButton_InfoTipFont_'..id):Pos(x, y)
+        ui:Append('WndButton', 'WndButton_InfoTipFont_'..id):Pos(x, y)
           :Width(50):Text(_L['font'])
           :Click(function()
             UI.OpenFontPicker(function(f)
@@ -305,7 +305,7 @@ LIB.RegisterPanel( 'MY_InfoTip', _L['infotip'], _L['System'], 'ui/Image/UICommon
             end)
           end)
         x = x + 60
-        ui:Append('Shadow', 'Shadow_InfoTipColor_'..id):Children('#Shadow_InfoTipColor_'..id):Pos(x, y)
+        ui:Append('Shadow', 'Shadow_InfoTipColor_'..id):Pos(x, y)
           :Size(20, 20):Color(cfg.rgb or {255,255,255})
           :Click(function()
             local me = this

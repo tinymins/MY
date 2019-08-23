@@ -51,7 +51,7 @@ function PS.OnPanelActive(wnd)
 	local X, Y = 20, 30
 	local x, y = X, Y
 
-	y = y + ui:Append('Text', { x = x, y = y, text = _L['MY_TeamTools'], font = 27 }, true):Height() + 5
+	y = y + ui:Append('Text', { x = x, y = y, text = _L['MY_TeamTools'], font = 27 }):Height() + 5
 	x = X + 10
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y,
@@ -60,7 +60,7 @@ function PS.OnPanelActive(wnd)
 		oncheck = function(bChecked)
 			MY_TeamNotice.bEnable = bChecked
 		end,
-	}, true):AutoWidth():Width() + 5
+	}):AutoWidth():Width() + 5
 
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y,
@@ -69,7 +69,7 @@ function PS.OnPanelActive(wnd)
 		oncheck = function(bChecked)
 			MY_CharInfo.bEnable = bChecked
 		end,
-	}, true):AutoWidth():Width() + 5
+	}):AutoWidth():Width() + 5
 
 	if not LIB.IsShieldedVersion() then
 		x = x + ui:Append('WndCheckBox', {
@@ -80,13 +80,13 @@ function PS.OnPanelActive(wnd)
 				MY_WorldMark.bEnable = bChecked
 				MY_WorldMark.CheckEnable()
 			end,
-		}, true):AutoWidth():Width() + 5
+		}):AutoWidth():Width() + 5
 	end
 	y = y + 20
 
 	x = X
 	y = y + 20
-	y = y + ui:Append('Text', { x = x, y = y, text = _L['Party Request'], font = 27 }, true):Height() + 5
+	y = y + ui:Append('Text', { x = x, y = y, text = _L['Party Request'], font = 27 }):Height() + 5
 	x = X + 10
 	ui:Append('WndCheckBox', {
 		x = x, y = y,
@@ -95,7 +95,7 @@ function PS.OnPanelActive(wnd)
 		oncheck = function(bChecked)
 			MY_PartyRequest.bEnable = bChecked
 		end,
-	}, true):AutoWidth()
+	}):AutoWidth()
 	x = x + 10
 	y = y + 25
 	ui:Append('WndCheckBox', {
@@ -106,7 +106,7 @@ function PS.OnPanelActive(wnd)
 			MY_PartyRequest.bRefuseLowLv = bChecked
 		end,
 		autoenable = function() return MY_PartyRequest.bEnable end,
-	}, true):AutoWidth()
+	}):AutoWidth()
 	y = y + 25
 	ui:Append('WndCheckBox', {
 		x = x, y = y,
@@ -118,7 +118,7 @@ function PS.OnPanelActive(wnd)
 			MY_PartyRequest.bRefuseRobot = bChecked
 		end,
 		autoenable = function() return MY_PartyRequest.bEnable end,
-	}, true):AutoWidth()
+	}):AutoWidth()
 	y = y + 25
 	ui:Append('WndCheckBox', {
 		x = x, y = y,
@@ -128,7 +128,7 @@ function PS.OnPanelActive(wnd)
 			MY_PartyRequest.bAcceptFriend = bChecked
 		end,
 		autoenable = function() return MY_PartyRequest.bEnable end,
-	}, true):AutoWidth()
+	}):AutoWidth()
 	y = y + 25
 	ui:Append('WndCheckBox', {
 		x = x, y = y,
@@ -138,7 +138,7 @@ function PS.OnPanelActive(wnd)
 			MY_PartyRequest.bAcceptTong = bChecked
 		end,
 		autoenable = function() return MY_PartyRequest.bEnable end,
-	}, true):AutoWidth()
+	}):AutoWidth()
 	y = y + 25
 	ui:Append('WndCheckBox', {
 		x = x, y = y,
@@ -148,7 +148,7 @@ function PS.OnPanelActive(wnd)
 			MY_PartyRequest.bAcceptAll = bChecked
 		end,
 		autoenable = function() return MY_PartyRequest.bEnable end,
-	}, true):AutoWidth()
+	}):AutoWidth()
 	y = y + 25
 end
 LIB.RegisterPanel('MY_TeamTools', _L['MY_TeamTools'], _L['Raid'], 5962, PS)

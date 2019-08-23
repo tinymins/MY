@@ -556,7 +556,7 @@ function PS.OnPanelActive(wnd)
 	local x, y = ui:Pos()
 	local w, h = ui:Size()
 
-	local list = ui:Append('WndListBox', 'WndListBox_1'):Children('#WndListBox_1')
+	local list = ui:Append('WndListBox', 'WndListBox_1')
 	  :Pos(20, 35)
 	  :Size(w - 32, h - 50)
 	  :ListBox('onlclick', function(hItem, text, id, data, selected)
@@ -568,7 +568,7 @@ function PS.OnPanelActive(wnd)
 	  	end
 	  end)
 
-	local muProgress = ui:Append('Image', 'Image_Progress'):Children('#Image_Progress')
+	local muProgress = ui:Append('Image', 'Image_Progress')
 	  :Pos(20, 31)
 	  :Size(w - 30, 4)
 	  :Image('ui/Image/UICommon/RaidTotal.UITex|45')

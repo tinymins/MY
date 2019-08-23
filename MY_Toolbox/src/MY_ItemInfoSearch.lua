@@ -195,11 +195,11 @@ function PS.OnPanelActive(wnd)
 				DrawList()
 			end)
 		end,
-	}, true):Height()
+	}):Height()
 
 	UI_LIST = ui:Append('WndListBox', {
 		x = x, y = y, w = w - x, h = h - y,
-	}, true)
+	})
 	UI_LIST:ListBox('onhover', function(list, bIn, text, id, data)
 		if id == 'count' then
 			return false

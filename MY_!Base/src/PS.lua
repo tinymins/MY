@@ -425,7 +425,7 @@ function LIB.SwitchTab(szID, bForceUpdate)
 			end,
 			tip = _L['Monitor serendipity and show share notify.'],
 			tippostype = UI.TIP_POSITION.BOTTOM_TOP,
-		}, true):AutoWidth():Width()
+		}):AutoWidth():Width()
 		local xS0 = x + ui:Append('WndCheckBox', {
 			x = x, y = 375,
 			name = 'WndCheckBox_SerendipityAutoShare',
@@ -434,7 +434,7 @@ function LIB.SwitchTab(szID, bForceUpdate)
 			oncheck = function()
 				MY_Serendipity.bAutoShare = not MY_Serendipity.bAutoShare
 			end,
-		}, true):AutoWidth():Width()
+		}):AutoWidth():Width()
 		-- 自动分享子项
 		x = xS0
 		x = x + ui:Append('WndCheckBox', {
@@ -446,7 +446,7 @@ function LIB.SwitchTab(szID, bForceUpdate)
 				MY_Serendipity.bSilentMode = not MY_Serendipity.bSilentMode
 			end,
 			autovisible = function() return MY_Serendipity.bAutoShare end,
-		}, true):AutoWidth():Width()
+		}):AutoWidth():Width()
 		x = x + 5
 		x = x + ui:Append('WndEditBox', {
 			x = x, y = 375, w = 105, h = 25,
@@ -460,7 +460,7 @@ function LIB.SwitchTab(szID, bForceUpdate)
 				LIB.SaveLUAData({'config/realname.jx3dat', PATH_TYPE.ROLE}, szText)
 			end,
 			autovisible = function() return MY_Serendipity.bAutoShare end,
-		}, true):Width()
+		}):Width()
 		-- 手动分享子项
 		x = xS0
 		x = x + ui:Append('WndCheckBox', {
@@ -472,7 +472,7 @@ function LIB.SwitchTab(szID, bForceUpdate)
 				MY_Serendipity.bPreview = not MY_Serendipity.bPreview
 			end,
 			autovisible = function() return not MY_Serendipity.bAutoShare end,
-		}, true):AutoWidth():Width()
+		}):AutoWidth():Width()
 		x = x + ui:Append('WndCheckBox', {
 			x = x, y = 375,
 			name = 'WndCheckBox_SerendipityNotifySound',
@@ -483,7 +483,7 @@ function LIB.SwitchTab(szID, bForceUpdate)
 			end,
 			autoenable = function() return not MY_Serendipity.bAutoShare end,
 			autovisible = function() return not MY_Serendipity.bAutoShare end,
-		}, true):AutoWidth():Width()
+		}):AutoWidth():Width()
 		x = x + ui:Append('WndButton', {
 			x = x, y = 375,
 			name = 'WndButton_SerendipitySearch',
@@ -491,7 +491,7 @@ function LIB.SwitchTab(szID, bForceUpdate)
 			onclick = function()
 				LIB.OpenBrowser('https://j3cx.com/serendipity')
 			end,
-		}, true):AutoWidth():Width()
+		}):AutoWidth():Width()
 		-- 用户设置
 		ui:Append('WndButton', {
 			x = 7, y = 405, w = 130,
@@ -504,7 +504,7 @@ function LIB.SwitchTab(szID, bForceUpdate)
 				end
 				UI.OpenTextEditor(szRoot)
 			end,
-		}, true):AutoWidth()
+		}):AutoWidth()
 		ui:Append('WndButton', {
 			x = 142, y = 405, w = 130,
 			name = 'WndButton_ServerPreferenceFolder',
@@ -516,7 +516,7 @@ function LIB.SwitchTab(szID, bForceUpdate)
 				end
 				UI.OpenTextEditor(szRoot)
 			end,
-		}, true):AutoWidth()
+		}):AutoWidth()
 		ui:Append('WndButton', {
 			x = 277, y = 405, w = 130,
 			name = 'WndButton_GlobalPreferenceFolder',
@@ -528,7 +528,7 @@ function LIB.SwitchTab(szID, bForceUpdate)
 				end
 				UI.OpenTextEditor(szRoot)
 			end,
-		}, true):AutoWidth()
+		}):AutoWidth()
 		wnd.OnPanelResize = function(wnd)
 			local w, h = LIB.UI(wnd):Size()
 			local scaleH = w / 557 * 278
@@ -867,7 +867,7 @@ function PS.OnPanelActive(wnd)
 		x = X - 10, y = y,
 		text = _L['Force color'],
 		color = { 255, 255, 0 },
-	}, true):AutoWidth()
+	}):AutoWidth()
 	x, y = X, y + 30
 	for _, dwForceID in pairs_c(CONSTANT.FORCE_TYPE) do
 		local x0 = x
@@ -875,12 +875,12 @@ function PS.OnPanelActive(wnd)
 			x = x, y = y, w = 100, h = 25,
 			text = g_tStrings.tForceTitle[dwForceID],
 			color = { LIB.GetForceColor(dwForceID, 'background') },
-		}, true)
+		})
 		local txt = ui:Append('Text', {
 			x = x + 5, y = y, w = 100, h = 25,
 			text = g_tStrings.tForceTitle[dwForceID],
 			color = { LIB.GetForceColor(dwForceID, 'foreground') },
-		}, true)
+		})
 		x = x + 105
 		ui:Append('Shadow', {
 			x = x, y = y, w = 25, h = 25,
@@ -928,7 +928,7 @@ function PS.OnPanelActive(wnd)
 		x = X - 10, y = y,
 		text = _L['Camp color'],
 		color = { 255, 255, 0 },
-	}, true):AutoWidth()
+	}):AutoWidth()
 	x, y = X, y + 30
 	for _, nCamp in ipairs({ CAMP.NEUTRAL, CAMP.GOOD, CAMP.EVIL }) do
 		local x0 = x
@@ -936,12 +936,12 @@ function PS.OnPanelActive(wnd)
 			x = x, y = y, w = 100, h = 25,
 			text = g_tStrings.STR_CAMP_TITLE[nCamp],
 			color = { LIB.GetCampColor(nCamp, 'background') },
-		}, true)
+		})
 		local txt = ui:Append('Text', {
 			x = x + 5, y = y, w = 100, h = 25,
 			text = g_tStrings.STR_CAMP_TITLE[nCamp],
 			color = { LIB.GetCampColor(nCamp, 'foreground') },
-		}, true)
+		})
 		x = x + 105
 		ui:Append('Shadow', {
 			x = x, y = y, w = 25, h = 25,
@@ -1000,7 +1000,7 @@ function PS.OnPanelActive(wnd)
 		x = X - 10, y = y,
 		text = _L['Distance type'],
 		color = { 255, 255, 0 },
-	}, true):AutoWidth()
+	}):AutoWidth()
 	x, y = X, y + 30
 
 	for _, p in ipairs(LIB.GetDistanceTypeList()) do
@@ -1014,7 +1014,7 @@ function PS.OnPanelActive(wnd)
 				end
 				LIB.SetGlobalDistanceType(p.szType)
 			end,
-		}, true):AutoWidth():Width() + 10
+		}):AutoWidth():Width() + 10
 	end
 	x, y = X, y + 30
 
@@ -1022,31 +1022,31 @@ function PS.OnPanelActive(wnd)
 		x = X - 10, y = y,
 		text = _L['System Info'],
 		color = { 255, 255, 0 },
-	}, true):AutoWidth()
+	}):AutoWidth()
 	y = y + 30
 
 	local uiMemory = ui:Append('Text', {
 		x = x, y = y, w = 150,
 		alpha = 150, font = 162,
-	}, true)
+	})
 	y = y + 25
 
 	local uiSize = ui:Append('Text', {
 		x = x, y = y, w = 150,
 		alpha = 150, font = 162,
-	}, true)
+	})
 	y = y + 25
 
 	local uiUIScale = ui:Append('Text', {
 		x = x, y = y, w = 150,
 		alpha = 150, font = 162,
-	}, true)
+	})
 	y = y + 25
 
 	local uiFontScale = ui:Append('Text', {
 		x = x, y = y, w = 150,
 		alpha = 150, font = 162,
-	}, true)
+	})
 	y = y + 25
 
 	local function onRefresh()

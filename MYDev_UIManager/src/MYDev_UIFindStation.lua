@@ -198,25 +198,25 @@ function PS.OnPanelActive(frame)
 		x = x + 10, y = y + 28,
 		text = _L['Enable button search, mouseover it will show its path'],
 		checked = O.bButton, oncheck = D.UpdateButton,
-	}, true):AutoWidth()
+	}):AutoWidth()
 	ui:Append('WndCheckBox', {
 		x = x + 10, y = y + 56,
 		text = _L['Enable box search, mouseover it will show its path'],
 		checked = O.bBox, oncheck = D.UpdateBox,
-	}, true):AutoWidth()
+	}):AutoWidth()
 	ui:Append('Text', { x = x + 0, y = y + 92, text = _L['Find by text'], font = 27 })
 
 	local nX = X + 10
 	nX = nX + ui:Append('Text', {
 		x = nX, y = y + 120,
 		text = _L['Keyword: '],
-	}, true):AutoWidth():Width() + 5
+	}):AutoWidth():Width() + 5
 	nX = nX + ui:Append('WndEditBox', {
 		name = 'Edit_Query',
 		x = nX, y = y + 120, w = 200, h = 27,
 		limit = 256,
 		text = O.szQuery,
-	}, true):Width() + 5
+	}):Width() + 5
 	nX = nX + ui:Append('WndButton', {
 		x = nX, y = y + 120,
 		text = _L['Search'],
@@ -226,7 +226,7 @@ function PS.OnPanelActive(frame)
 			O.szResult = D.SearchText(O.szQuery)
 			ui:Children('#Edit_Result'):Text(O.szResult)
 		end,
-	}, true):Width() + 5
+	}):Width() + 5
 	ui:Append('Text', { x = nX, y = y + 120, text = _L['(Supports Lua regex)'] })
 	ui:Append('WndEditBox', { name = 'Edit_Result', x = x + 10, y = y + 150, limit = 9999, w = 480, h = 200, multiline = true, text = O.szResult })
 end

@@ -144,14 +144,14 @@ local PS = {}
 local function DrawDetail(ui)
 	local w, h = ui:Size()
 	local l_config, l_search, uiSearch
-	local uiWrapper = ui:Append('WndWindow', { name = 'WndWindow_Wrapper', x = 0, y = 0, w = w, h = h }, true)
+	local uiWrapper = ui:Append('WndWindow', { name = 'WndWindow_Wrapper', x = 0, y = 0, w = w, h = h })
 	uiWrapper:Append('Shadow', { x = 0, y = 0, w = w, h = h, r = 0, g = 0, b = 0, alpha = 150 })
 	uiWrapper:Append('Shadow', { x = 10, y = 10, w = w - 20, h = h - 20, r = 255, g = 255, b = 255, alpha = 40 })
 
 	local x0, y0 = 20, 20
 	local w0, h0 = w - 40, h - 30
 	local w1, x1 = w0 - 5, x0
-	local list = uiWrapper:Append('WndListBox', { x = x1, y = y0 + 30, w = w1, h = h0 - 35 - 30 }, true)
+	local list = uiWrapper:Append('WndListBox', { x = x1, y = y0 + 30, w = w1, h = h0 - 35 - 30 })
 
 	local function Search()
 		list:ListBox('clear')
@@ -204,7 +204,7 @@ local function DrawDetail(ui)
 			l_search = text
 			Search()
 		end,
-	}, true)
+	})
 	uiWrapper:Append('WndButton2', {
 		x = x1 + w1 - 60, y = y0 - 1, w = 60, h = 28,
 		text = _L['Add'], onclick = function() InsertMonitor() end,
@@ -687,7 +687,7 @@ local function DrawPreview(ui, config, OpenDetail)
 	local X, Y = 10, 10
 	local x, y = X, Y
 	local w, h = ui:Size()
-	local uiWnd = ui:Append('WndWindow', { w = w, h = 190 }, true)
+	local uiWnd = ui:Append('WndWindow', { w = w, h = 190 })
 	uiWnd:Append('Text', {
 		x = x, y = y - 3, w = 20,
 		r = 255, g = 255, b = 0,
@@ -700,7 +700,7 @@ local function DrawPreview(ui, config, OpenDetail)
 			r = 255, g = 255, b = 0, text = szCaption,
 			tip = szCaption .. '\n' .. _L['(Embedded caption cannot be changed)'],
 			tippostype = UI.TIP_POSITION.BOTTOM_TOP,
-		}, true):AutoWidth()
+		}):AutoWidth()
 	else
 		uiWnd:Append('WndEditBox', {
 			x = x + 20, y = y, w = w - 290, h = 22,
@@ -1080,7 +1080,7 @@ end
 local function DrawControls(ui, OpenDetail)
 	ui:Children('#Wnd_Controls'):Remove()
 	local w, h = ui:Size()
-	local uiWnd = ui:Append('WndWindow', { name = 'Wnd_Controls', w = w, h = 80 }, true)
+	local uiWnd = ui:Append('WndWindow', { name = 'Wnd_Controls', w = w, h = 80 })
 	local x, y = (w - 380) / 2, 10
 	uiWnd:Append('WndButton2', {
 		x = x, y = y,

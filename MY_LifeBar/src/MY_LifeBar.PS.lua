@@ -166,7 +166,7 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + offsety
 	-- <hr />
-	ui:Append('Image', 'Image_Spliter'):Find('#Image_Spliter'):Pos(10, y-7):Size(w - 20, 1):Image('UI/Image/UICommon/ScienceTreeNode.UITex',62)
+	ui:Append('Image', 'Image_Spliter'):Pos(10, y-7):Size(w - 20, 1):Image('UI/Image/UICommon/ScienceTreeNode.UITex',62)
 
 	X, Y = 15, 60
 	x, y = X, Y
@@ -650,7 +650,7 @@ function PS.OnPanelActive(wnd)
 			Config.bSystemUIScale = not bChecked
 		end,
 		autoenable = function() return D.IsEnabled() end,
-	}, true):AutoWidth():Width()
+	}):AutoWidth():Width()
 
 	x = X
 	y = y + offsety - 10
@@ -663,7 +663,7 @@ function PS.OnPanelActive(wnd)
 			D.UpdateShadowHandleParam()
 		end,
 		autoenable = function() return D.IsEnabled() end,
-	}, true):AutoWidth():Width()
+	}):AutoWidth():Width()
 
 	x = X
 	y = y + offsety - 10
@@ -675,7 +675,7 @@ function PS.OnPanelActive(wnd)
 			Config.bShowObjectID = bChecked
 		end,
 		autoenable = function() return D.IsEnabled() end,
-	}, true):AutoWidth():Width()
+	}):AutoWidth():Width()
 
 	x = x + ui:Append('WndCheckBox', {
 		name = 'WndCheckBox_ShowObjectIDOnlyUnnamed',
@@ -685,7 +685,7 @@ function PS.OnPanelActive(wnd)
 			Config.bShowObjectIDOnlyUnnamed = bChecked
 		end,
 		autoenable = function() return D.IsEnabled() and Config.bShowObjectID end,
-	}, true):AutoWidth():Width()
+	}):AutoWidth():Width()
 
 	x = X
 	y = y + offsety - 10
@@ -700,7 +700,7 @@ function PS.OnPanelActive(wnd)
 		tip = _L['This function has been shielded by official'],
 		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
 		autoenable = function() return D.IsEnabled() end,
-	}, true):AutoWidth():Width() + 5
+	}):AutoWidth():Width() + 5
 	ui:Append('WndCheckBox', {
 		name = 'WndCheckBox_ShowSpecialNpcOnlyEnemy',
 		x = x, y = y, w = 'auto',

@@ -144,7 +144,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 			local me = GetClientPlayer()
 			return me and me.dwForceID == CONSTANT.FORCE_TYPE.CHANG_GE
 		end,
-	}, true):Width() + 5
+	}):Width() + 5
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, w = 'auto',
 		text = _L['show distance'],
@@ -162,7 +162,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 			local me = GetClientPlayer()
 			return me and me.dwForceID == CONSTANT.FORCE_TYPE.CHANG_GE
 		end,
-	}, true):Width() + 5
+	}):Width() + 5
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, w = 'auto',
 		text = _L['show countdown'],
@@ -180,7 +180,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 			local me = GetClientPlayer()
 			return me and me.dwForceID == CONSTANT.FORCE_TYPE.CHANG_GE
 		end,
-	}, true):Width() + 5
+	}):Width() + 5
 	ui:Append('WndTrackbar', {
 		x = x, y = y, w = 150,
 		textfmt = function(val) return _L('scale: %d%%.', val) end,

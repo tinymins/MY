@@ -1043,32 +1043,27 @@ local _szItemINI = PACKET_INFO.FRAMEWORK_ROOT .. 'ui\\HandleItems.ini'
 local _nTempWndCount = 0
 -- append
 -- similar as jQuery.append()
--- Instance:Append(szXml[, bReturnNewItem])
--- Instance:Append(szType[, tArg | szName[, bReturnNewItem]])
-function UI:Append(arg0, arg1, arg2)
+-- Instance:Append(szXml)
+-- Instance:Append(szType[, tArg | szName])
+function UI:Append(arg0, arg1)
 	assert(IsString(arg0))
 	if #arg0 == 0 then
 		return
 	end
 	self:_checksum()
 
-	local ui, szXml, szType, tArg, bReturnNewItem = UI()
+	local ui, szXml, szType, tArg = UI()
 	if arg0:find('%<') then
-		szXml, bReturnNewItem = arg0, arg1
+		szXml = arg0
 	else
 		szXml = _tItemXML[arg0]
 		if not szXml then
 			szType = arg0
 		end
-		if IsBoolean(arg1) then
-			bReturnNewItem = arg1
-		else
-			if IsTable(arg1) then
-				tArg = arg1
-			elseif IsString(arg1) then
-				tArg = { name = arg1 }
-			end
-			bReturnNewItem = arg2
+		if IsTable(arg1) then
+			tArg = arg1
+		elseif IsString(arg1) then
+			tArg = { name = arg1 }
 		end
 	end
 
@@ -1124,8 +1119,7 @@ function UI:Append(arg0, arg1, arg2)
 			end
 		end
 	end
-	ApplyUIArguments(ui, tArg)
-	return bReturnNewItem and ui or self
+	return ApplyUIArguments(ui, tArg)
 end
 
 -- clear
@@ -4261,7 +4255,7 @@ function UI.OpenColorPickerEx(fnAction)
 		return floor(r * 255), floor(g * 255), floor(b * 255)
 	end
 
-	local wnd = UI.CreateFrame(PACKET_INFO.NAME_SPACE .. '_ColorPickerEx', { w = 346, h = 430, text = _L['color picker ex'], simple = true, close = true, esc = true, x = fX + 15, y = fY + 15 }, true)
+	local wnd = UI.CreateFrame(PACKET_INFO.NAME_SPACE .. '_ColorPickerEx', { w = 346, h = 430, text = _L['color picker ex'], simple = true, close = true, esc = true, x = fX + 15, y = fY + 15 })
 	local fnHover = function(bHover, r, g, b)
 		if bHover then
 			wnd:Children('#Select'):Color(r, g, b)
@@ -4295,13 +4289,13 @@ function UI.OpenColorPickerEx(fnAction)
 						onclick = function()
 							fnClick(this:GetColorRGB())
 						end,
-					}, true)
+					})
 				end
 			end
 		end
 	end
 	SetColor()
-	wnd:Append('Image', { name = 'Select_Image', w = 9, h = 9, x = 0, y = 0 }, true):Image('ui/Image/Common/Box.Uitex', 9):Toggle(false)
+	wnd:Append('Image', { name = 'Select_Image', w = 9, h = 9, x = 0, y = 0 }):Image('ui/Image/Common/Box.Uitex', 9):Toggle(false)
 	wnd:Append('Shadow', { name = 'Select', w = 25, h = 25, x = 20, y = 10, color = { 255, 255, 255 } })
 	wnd:Append('Text', { name = 'Select_Text', x = 50, y = 10, text = g_tStrings.STR_NONE })
 	wnd:Append('WndTrackbar', {
@@ -4340,7 +4334,7 @@ function UI.OpenFontPicker(callback, t)
 			onhover = function(bIn)
 				UI(this):Alpha(bIn and 255 or 200)
 			end,
-		}, true)
+		})
 		-- remove unexist font
 		if txt:Font() ~= font then
 			txt:Remove()
@@ -4448,8 +4442,8 @@ function UI.OpenIconPanel(fnAction)
 						end
 						ui:Remove()
 					end,
-				}, true)
-				txts[i] = ui:Append('Text', { w = 48, h = 20, x = x, y = y + 48, text = nStart + i, align = 1 }, true)
+				})
+				txts[i] = ui:Append('Text', { w = 48, h = 20, x = x, y = y + 48, text = nStart + i, align = 1 })
 			end
 		end
 	end
@@ -4534,8 +4528,8 @@ function UI.OpenListEditor(szFrameName, tTextList, OnAdd, OnDel)
 	end
 	local ui = UI.CreateFrame(szFrameName)
 	ui:Append('Image', { x = -10, y = 25, w = 360, h = 10, image = 'UI/Image/UICommon/Commonpanel.UITex', imageframe = 42 })
-	local muEditBox = ui:Append('WndEditBox', { x = 0, y = 0, w = 170, h = 25 }, true)
-	local muList = ui:Append('WndScrollBox', { handlestyle = 3, x = 0, y = 30, w = 340, h = 380 }, true)
+	local muEditBox = ui:Append('WndEditBox', { x = 0, y = 0, w = 170, h = 25 })
+	local muList = ui:Append('WndScrollBox', { handlestyle = 3, x = 0, y = 30, w = 340, h = 380 })
 	-- add
 	ui:Append('WndButton', {
 		x = 180, y = 0, w = 80, text = _L['add'],
@@ -4833,7 +4827,7 @@ function UI.GetTempElement(szType)
 	if not raw then
 		raw = ui:Append(szType, {
 			name = szName,
-		}, true)[1]
+		})[1]
 		cache[szName] = raw
 	end
 	return raw

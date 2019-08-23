@@ -58,13 +58,12 @@ _Cache.OnPanelActive = function(wnd)
     _Cache.tUITexList = LIB.LoadLUAData(PACKET_INFO.ROOT .. 'MYDev_UITexViewer/data/data.jx3dat') or {}
 
     local uiBoard = ui:Append('WndScrollBox', 'WndScrollBox_ImageList')
-      :Children('#WndScrollBox_ImageList')
       :HandleStyle(3):Pos(x, y+25):Size(w-21, h - 70)
 
-    local uiEdit = ui:Append('WndEditBox', 'WndEdit_Copy'):Children('#WndEdit_Copy')
+    local uiEdit = ui:Append('WndEditBox', 'WndEdit_Copy')
       :Pos(x, h-30):Size(w-20, 25):Multiline(true)
 
-    ui:Append('WndAutocomplete', 'WndAutocomplete_UITexPath'):Children('#WndAutocomplete_UITexPath')
+    ui:Append('WndAutocomplete', 'WndAutocomplete_UITexPath')
       :Pos(x, y):Size(w-20, 25):Text(MYDev_UITexViewer.szUITexPath)
       :Change(function(szText)
         local tInfo = KG_Table.Load(szText .. '.txt', {
@@ -89,7 +88,7 @@ _Cache.OnPanelActive = function(wnd)
             end
 
             if tLine.nWidth ~= 0 and tLine.nHeight ~= 0 then
-                uiBoard:Append('<image>eventid=277 name="Image_'..i..'"</image>'):Children('#Image_' .. i)
+                uiBoard:Append('<image>eventid=277 name="Image_'..i..'"</image>')
                   :Image(szText .. '.UITex', tLine.nFrame)
                   :Size(tLine.nWidth, tLine.nHeight)
                   :Alpha(220)

@@ -70,7 +70,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 			oncheck = function(bChecked)
 				MY_HideAnnounceBg.bEnable = bChecked
 			end,
-		}, true):AutoWidth():Width() + 5
+		}):AutoWidth():Width() + 5
 		x, y = X, y + 30
 	end
 	return x, y

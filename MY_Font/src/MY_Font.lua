@@ -130,7 +130,7 @@ function PS.OnPanelActive(wnd)
 	for _, p in ipairs(FONT_TYPE) do
 		local szName, szFile, nSize, tStyle = Font.GetFont(p.tIDs[1])
 		if tStyle then
-			-- local ui = ui:Append('WndWindow', { w = w, h = 60 }, true)
+			-- local ui = ui:Append('WndWindow', { w = w, h = 60 })
 			local acFile, acName, btnSure
 			local function UpdateBtnEnable()
 				local szNewFile = acFile:Text()
@@ -166,7 +166,7 @@ function PS.OnPanelActive(wnd)
 					end
 				end,
 				autocomplete = {{'option', 'source', aFontPath}},
-			}, true)
+			})
 
 			ui:Append('WndButton', {
 				x = w - 180 - x - 10, y = y, w = 25,
@@ -202,7 +202,7 @@ function PS.OnPanelActive(wnd)
 					end
 				end,
 				autocomplete = {{'option', 'source', aFontName}},
-			}, true)
+			})
 
 			btnSure = ui:Append('WndButton', {
 				w = 60, h = 25, x = w - 60, y = y,
@@ -212,7 +212,7 @@ function PS.OnPanelActive(wnd)
 					szName, szFile, nSize, tStyle = Font.GetFont(p.tIDs[1])
 					UpdateBtnEnable()
 				end
-			}, true)
+			})
 			y = y + 60
 		end
 	end

@@ -482,7 +482,7 @@ function PS.OnPanelActive(wnd)
 	m_uiBoard = ui:Append('WndScrollBox',{
 		x = 20,  y = 40, w = w - 26, h = h - 60,
 		handlestyle = 3, text = _L['average score with out pole']
-	}, true)
+	})
 	MY_RollMonitor.DrawBoard()
 	LIB.BreatheCall('MY_RollMonitorRedraw', 1000, CheckBoardRedraw)
 end

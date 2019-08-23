@@ -553,7 +553,7 @@ _C.OnPanelActive = function(wnd)
     _C.uiBoard = ui:Append('WndScrollBox', {
         name = 'WndScrollBox_TalkList',
         x = 20, y = 50, w = w - 21, h = h - 70, handlestyle = 3,
-    }, true)
+    })
 
     for i = 1, #RECORD_LIST, 1 do
         _C.uiBoard:Append(D.GetHTML(RECORD_LIST[i]))

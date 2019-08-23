@@ -53,7 +53,7 @@ function PS.OnPanelActive(frame)
 	local X, Y = 20, 20
 	local x, y = X, Y
 
-	y = y + ui:Append('Text', { x = x, y = y, text = _L['Interface settings'], font = 27 }, true):Height()
+	y = y + ui:Append('Text', { x = x, y = y, text = _L['Interface settings'], font = 27 }):Height()
 
 	x = X + 10
 	y = y + 3
@@ -67,7 +67,7 @@ function PS.OnPanelActive(frame)
 			CFG.eFrameStyle = 'OFFICIAL'
 			MY_Cataclysm.ReloadCataclysmPanel()
 		end,
-	}, true):AutoWidth():Width() + 5
+	}):AutoWidth():Width() + 5
 
 	y = y + ui:Append('WndRadioBox', {
 		x = x, y = y, text = _L['Cataclysm team frame style'],
@@ -79,10 +79,10 @@ function PS.OnPanelActive(frame)
 			CFG.eFrameStyle = 'CATACLYSM'
 			MY_Cataclysm.ReloadCataclysmPanel()
 		end,
-	}, true):AutoWidth():Height()
+	}):AutoWidth():Height()
 
 	x = X + 10
-	x = x + ui:Append('Text', { x = x, y = y, text = _L['Interface Width']}, true):AutoWidth():Width() + 5
+	x = x + ui:Append('Text', { x = x, y = y, text = _L['Interface Width']}):AutoWidth():Width() + 5
 	y = y + ui:Append('WndTrackbar', {
 		x = x, y = y + 3, h = 25, w = 250,
 		range = {50, 250},
@@ -97,10 +97,10 @@ function PS.OnPanelActive(frame)
 			end
 		end,
 		textfmt = function(val) return _L('%d%%', val) end,
-	}, true):Height()
+	}):Height()
 
 	x = X + 10
-	x = x + ui:Append('Text', { x = x, y = y, text = _L['Interface Height']}, true):AutoWidth():Width() + 5
+	x = x + ui:Append('Text', { x = x, y = y, text = _L['Interface Height']}):AutoWidth():Width() + 5
 	y = y + ui:Append('WndTrackbar', {
 		x = x, y = y + 3, h = 25, w = 250,
 		range = {50, 250},
@@ -115,11 +115,11 @@ function PS.OnPanelActive(frame)
 			end
 		end,
 		textfmt = function(val) return _L('%d%%', val) end,
-	}, true):Height()
+	}):Height()
 
 	x = X
 	y = y + 10
-	y = y + ui:Append('Text', { x = x, y = y, text = g_tStrings.OTHER, font = 27 }, true):Height()
+	y = y + ui:Append('Text', { x = x, y = y, text = g_tStrings.OTHER, font = 27 }):Height()
 
 	x = x + 10
 	y = y + ui:Append('WndCheckBox', {
@@ -129,10 +129,10 @@ function PS.OnPanelActive(frame)
 			CFG.bShowGroupNumber = bCheck
 			MY_Cataclysm.ReloadCataclysmPanel()
 		end,
-	}, true):Height()
+	}):Height()
 
 	if CFG.nBGColorMode ~= CTM_BG_COLOR_MODE.OFFICIAL then
-		x = x + ui:Append('Text', { x = x, y = y, text = g_tStrings.STR_ALPHA }, true):AutoWidth():Width() + 5
+		x = x + ui:Append('Text', { x = x, y = y, text = g_tStrings.STR_ALPHA }):AutoWidth():Width() + 5
 		y = y + ui:Append('WndTrackbar', {
 			x = x, y = y + 3,
 			range = {0, 255},
@@ -145,12 +145,12 @@ function PS.OnPanelActive(frame)
 				end
 			end,
 			textfmt = function(val) return _L('%d%%', val / 255 * 100) end,
-		}, true):Height()
+		}):Height()
 	end
 
 	x = X
 	y = y + 10
-	y = y + ui:Append('Text', { x = x, y = y, text = _L['Arrangement'], font = 27 }, true):Height()
+	y = y + ui:Append('Text', { x = x, y = y, text = _L['Arrangement'], font = 27 }):Height()
 
 	x = x + 10
 	y = y + 3
@@ -167,7 +167,7 @@ function PS.OnPanelActive(frame)
 				MY_Cataclysm.SetFrameSize()
 			end
 		end,
-	}, true):AutoWidth():Height() + 3
+	}):AutoWidth():Height() + 3
 
 	y = y + ui:Append('WndRadioBox', {
 		x = x, y = y, text = _L['Two lines: 1/4'],
@@ -182,7 +182,7 @@ function PS.OnPanelActive(frame)
 				MY_Cataclysm.SetFrameSize()
 			end
 		end,
-	}, true):AutoWidth():Height() + 3
+	}):AutoWidth():Height() + 3
 
 	y = y + ui:Append('WndRadioBox', {
 		x = x, y = y, text = _L['Two lines: 2/3'],
@@ -197,7 +197,7 @@ function PS.OnPanelActive(frame)
 				MY_Cataclysm.SetFrameSize()
 			end
 		end,
-	}, true):AutoWidth():Height() + 3
+	}):AutoWidth():Height() + 3
 
 	y = y + ui:Append('WndRadioBox', {
 		x = x, y = y, text = _L['Two lines: 3/2'],
@@ -212,7 +212,7 @@ function PS.OnPanelActive(frame)
 				MY_Cataclysm.SetFrameSize()
 			end
 		end,
-	}, true):AutoWidth():Height() + 3
+	}):AutoWidth():Height() + 3
 
 	y = y + ui:Append('WndRadioBox', {
 		x = x, y = y, text = _L['Two lines: 4/1'],
@@ -227,6 +227,6 @@ function PS.OnPanelActive(frame)
 				MY_Cataclysm.SetFrameSize()
 			end
 		end,
-	}, true):AutoWidth():Height() + 3
+	}):AutoWidth():Height() + 3
 end
 LIB.RegisterPanel('MY_Cataclysm_Interface', _L['Interface settings'], _L['Raid'], 'ui/Image/UICommon/RaidTotal.uitex|74', PS)

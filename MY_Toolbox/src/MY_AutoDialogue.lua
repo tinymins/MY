@@ -273,7 +273,7 @@ local function HookSkipQuestTalk()
 			frame.__SkipQuestHackEl = UI(frame):Append('WndWindow', {
 				name = 'Btn_Skip',
 				x = 0, y = 0, w = w, h = h,
-			}, true):Raw()
+			}):Raw()
 		end
 		if frame.dwShowIndex == 1 and IsTable(frame.tQuestRpg) then
 			local nCount = 2
@@ -412,7 +412,7 @@ function D.CreateEntry()
 					return D.GetDialogueMenu(frame[p.keys.info], frame[p.keys.tartype], frame[p.keys.tarid], frame[p.keys.winidx])
 				end,
 				rmenu = D.GetConfigMenu,
-			}, true):Raw()
+			}):Raw()
 		end
 	end
 	D.UpdateEntryPos()

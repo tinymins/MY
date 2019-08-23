@@ -64,7 +64,7 @@ function CharInfo.CreateFrame(dwID, szName)
 	x = x + ui:Append('Image', {
 		name = 'Image_Kungfu',
 		x = x, y = y, w = 30, h = 30,
-	}, true):Width() + 5
+	}):Width() + 5
 	ui:Append('Text', {
 		name = 'Text_Name',
 		x = x, y = y + 2, w = 240 - 2 * x,

@@ -53,7 +53,7 @@ function PS.OnPanelActive(frame)
 	local X, Y = 20, 20
 	local x, y = X, Y
 
-	y = y + ui:Append('Text', { x = x, y = y, text = g_tStrings.BACK_COLOR, font = 27 }, true):Height()
+	y = y + ui:Append('Text', { x = x, y = y, text = g_tStrings.BACK_COLOR, font = 27 }):Height()
 
 	x = x + 10
 	y = y + 5
@@ -70,7 +70,7 @@ function PS.OnPanelActive(frame)
 			end
 			LIB.SwitchTab('MY_Cataclysm_GridColor', true)
 		end,
-	}, true):AutoWidth():Width()
+	}):AutoWidth():Width()
 
 	x = x + ui:Append('WndRadioBox', {
 		x = x, y = y, text = _L['Colored all the same'],
@@ -85,7 +85,7 @@ function PS.OnPanelActive(frame)
 			end
 			LIB.SwitchTab('MY_Cataclysm_GridColor', true)
 		end,
-	}, true):AutoWidth():Width() + 5
+	}):AutoWidth():Width() + 5
 
 	x = x + ui:Append('WndRadioBox', {
 		x = x, y = y, text = _L['Colored according to the distance'],
@@ -100,7 +100,7 @@ function PS.OnPanelActive(frame)
 			end
 			LIB.SwitchTab('MY_Cataclysm_GridColor', true)
 		end,
-	}, true):AutoWidth():Width() + 5
+	}):AutoWidth():Width() + 5
 
 	x = x + ui:Append('WndRadioBox', {
 		x = x, y = y, text = g_tStrings.STR_RAID_COLOR_NAME_SCHOOL,
@@ -115,7 +115,7 @@ function PS.OnPanelActive(frame)
 			end
 			LIB.SwitchTab('MY_Cataclysm_GridColor', true)
 		end,
-	}, true):AutoWidth():Width() + 5
+	}):AutoWidth():Width() + 5
 
 	y = y + ui:Append('WndCheckBox', {
 		x = x, y = y, text = g_tStrings.STR_RAID_DISTANCE,
@@ -127,7 +127,7 @@ function PS.OnPanelActive(frame)
 			end
 			LIB.SwitchTab('MY_Cataclysm_GridColor', true)
 		end,
-	}, true):AutoWidth():Height() + 5
+	}):AutoWidth():Height() + 5
 
 	-- 设置分段距离等级
 	x = X + 10
@@ -159,7 +159,7 @@ function PS.OnPanelActive(frame)
 					end
 				end)
 			end,
-		}, true):Height()
+		}):Height()
 	end
 
 	-- 统一背景
@@ -180,7 +180,7 @@ function PS.OnPanelActive(frame)
 					UI(this):Color(r, g, b)
 				end)
 			end,
-		}, true):Width() + 5
+		}):Width() + 5
 		y = y + 30
 	end
 
@@ -207,7 +207,7 @@ function PS.OnPanelActive(frame)
 							UI(this):Color(r, g, b)
 						end)
 					end,
-				}, true):Width() + 5
+				}):Width() + 5
 			else
 				x = x + ui:Append('WndTrackbar', {
 					x = x, y = y + 3, h = 22,
@@ -221,7 +221,7 @@ function PS.OnPanelActive(frame)
 						end
 					end,
 					textfmt = function(val) return _L('Alpha: %d.', val) end,
-				}, true):Width() + 5
+				}):Width() + 5
 			end
 			y = y + 30
 		end
@@ -252,7 +252,7 @@ function PS.OnPanelActive(frame)
 				end)
 			end,
 			textfmt = function(val) return _L('Alpha: %d.', val) end,
-		}, true):Width() + 5
+		}):Width() + 5
 	end
 	if CFG.nBGColorMode ~= CTM_BG_COLOR_MODE.BY_DISTANCE then
 		x = x + ui:Append('WndTrackbar', {
@@ -267,13 +267,13 @@ function PS.OnPanelActive(frame)
 				end
 			end,
 			textfmt = function(val) return _L('Alpha: %d.', val) end,
-		}, true):Width() + 5
+		}):Width() + 5
 	end
 	y = y + 30
 
 	-- 离线背景
 	x = X + 20
-	ui:Append('Text', { x = x, y = y, text = g_tStrings.STR_GUILD_OFFLINE .. g_tStrings.BACK_COLOR }, true):AutoWidth()
+	ui:Append('Text', { x = x, y = y, text = g_tStrings.STR_GUILD_OFFLINE .. g_tStrings.BACK_COLOR }):AutoWidth()
 	x = 280
 	if CFG.nBGColorMode ~= CTM_BG_COLOR_MODE.OFFICIAL then
 		x = x + ui:Append('Shadow', {
@@ -288,7 +288,7 @@ function PS.OnPanelActive(frame)
 					UI(this):Color(r, g, b)
 				end)
 			end,
-		}, true):Width() + 5
+		}):Width() + 5
 	end
 	if CFG.nBGColorMode ~= CTM_BG_COLOR_MODE.BY_DISTANCE then
 		x = x + ui:Append('WndTrackbar', {
@@ -303,14 +303,14 @@ function PS.OnPanelActive(frame)
 				end
 			end,
 			textfmt = function(val) return _L('Alpha: %d.', val) end,
-		}, true):Width() + 5
+		}):Width() + 5
 	end
 	y = y + 30
 
 	-- 内力
 	x = X + 20
 	if CFG.nBGColorMode ~= CTM_BG_COLOR_MODE.OFFICIAL then
-		ui:Append('Text', { x = x, y = y, text = g_tStrings.STR_SKILL_MANA .. g_tStrings.BACK_COLOR }, true):AutoWidth()
+		ui:Append('Text', { x = x, y = y, text = g_tStrings.STR_SKILL_MANA .. g_tStrings.BACK_COLOR }):AutoWidth()
 		y = y + ui:Append('Shadow', {
 			w = 22, h = 22, x = 280, y = y + 3, color = CFG.tManaColor,
 			onclick = function()
@@ -323,7 +323,7 @@ function PS.OnPanelActive(frame)
 					UI(this):Color(r, g, b)
 				end)
 			end,
-		}, true):Height() + 5
+		}):Height() + 5
 	end
 
 	-- 血条蓝条渐变色
@@ -339,7 +339,7 @@ function PS.OnPanelActive(frame)
 					MY_CataclysmParty:CallDrawHPMP(true, true)
 				end
 			end,
-		}, true):AutoWidth():Width() + 5
+		}):AutoWidth():Width() + 5
 
 		x = x + ui:Append('WndCheckBox', {
 			x = x, y = y, text = _L['ManaBar Gradient'],
@@ -350,7 +350,7 @@ function PS.OnPanelActive(frame)
 					MY_CataclysmParty:CallDrawHPMP(true, true)
 				end
 			end,
-		}, true):AutoWidth():Width() + 5
+		}):AutoWidth():Width() + 5
 	end
 end
 LIB.RegisterPanel('MY_Cataclysm_GridColor', _L['Grid Color'], _L['Raid'], 'ui/Image/UICommon/RaidTotal.uitex|71', PS)
