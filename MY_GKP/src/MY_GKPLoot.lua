@@ -1399,30 +1399,30 @@ LIB.RegisterEvent('OPEN_DOODAD', function()
 	if not MY_GKP.bOn then
 		return
 	end
-	if arg1 == UI_GetClientPlayerID() then
-		local team = GetClientTeam()
-		if not team or team
-			and team.nLootMode ~= PARTY_LOOT_MODE.DISTRIBUTE
-			-- and not (MY_GKP.bDebug2 and MY_GKP.bDebug)
-		then
-			return
-		end
-		local doodad = GetDoodad(arg0)
-		local nM = doodad.GetLootMoney() or 0
-		if nM > 0 then
-			LootMoney(arg0)
-			PlaySound(SOUND.UI_SOUND, g_sound.PickupMoney)
-		end
-		local szName, data = Loot.GetDoodad(arg0)
-		if #data == 0 then
-			return Loot.RemoveLootList(arg0)
-		end
-		--[[#DEBUG BEGIN]]
-		LIB.Debug('Open Doodad: ' .. arg0, 'MY_GKP_Loot', DEBUG_LEVEL.LOG)
-		--[[#DEBUG END]]
-		Loot.DrawLootList(arg0)
-		Loot.HideSystemLoot()
+	if arg1 ~= UI_GetClientPlayerID() then
+		return
 	end
+	-- local team = GetClientTeam()
+	-- if not team or team.nLootMode ~= PARTY_LOOT_MODE.DISTRIBUTE
+	-- 	-- and not (MY_GKP.bDebug2 and MY_GKP.bDebug)
+	-- then
+	-- 	return
+	-- end
+	local doodad = GetDoodad(arg0)
+	local nM = doodad.GetLootMoney() or 0
+	if nM > 0 then
+		LootMoney(arg0)
+		PlaySound(SOUND.UI_SOUND, g_sound.PickupMoney)
+	end
+	local szName, data = Loot.GetDoodad(arg0)
+	if #data == 0 then
+		return Loot.RemoveLootList(arg0)
+	end
+	--[[#DEBUG BEGIN]]
+	LIB.Debug('Open Doodad: ' .. arg0, 'MY_GKP_Loot', DEBUG_LEVEL.LOG)
+	--[[#DEBUG END]]
+	Loot.DrawLootList(arg0)
+	Loot.HideSystemLoot()
 end)
 
 -- Ë¢ÐÂÏä×Ó
