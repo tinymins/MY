@@ -153,14 +153,12 @@ function MY_GKP_Loot.OnFrameBreathe()
 		local doodad = GetDoodad(wnd.dwDoodadID)
 		-- Ê°È¡ÅÐ¶¨
 		local bCanDialog = MY_GKP_Loot.CanDialog(me, doodad)
-		if not LIB.IsShieldedVersion() then
-			local hList, hItem = wnd:Lookup('', 'Handle_ItemList')
-			for i = 0, hList:GetItemCount() - 1 do
-				hItem = hList:Lookup(i)
-				if MY_GKP_Loot.IsItemAutoPickup(hItem.itemData, wnd.tItemConfig, doodad, bCanDialog)
-				and not hItem.itemData.bDist and not hItem.itemData.bBidding then
-					LIB.ExecuteWithThis(hItem, MY_GKP_Loot.OnItemLButtonClick)
-				end
+		local hList, hItem = wnd:Lookup('', 'Handle_ItemList')
+		for i = 0, hList:GetItemCount() - 1 do
+			hItem = hList:Lookup(i)
+			if MY_GKP_Loot.IsItemAutoPickup(hItem.itemData, wnd.tItemConfig, doodad, bCanDialog)
+			and not hItem.itemData.bDist and not hItem.itemData.bBidding then
+				LIB.ExecuteWithThis(hItem, MY_GKP_Loot.OnItemLButtonClick)
 			end
 		end
 		wnd:Lookup('', 'Image_DoodadTitleBg'):SetFrame(bCanDialog and 0 or 3)
@@ -346,32 +344,30 @@ function MY_GKP_Loot.OnLButtonClick()
 		if IsCtrlKeyDown() then
 			insert(menu, 1, { szOption = dwDoodadID, bDisable = true })
 		end
-		if not LIB.IsShieldedVersion() then
-			table.insert(menu, CONSTANT.MENU_DIVIDER)
-			table.insert(menu, Loot.GetFilterMenu())
-			table.insert(menu, Loot.GetAutoPickupAllMenu())
+		insert(menu, CONSTANT.MENU_DIVIDER)
+		insert(menu, Loot.GetFilterMenu())
+		insert(menu, Loot.GetAutoPickupAllMenu())
 
-			local t = { szOption = _L['Auto pickup this'] }
-			for i, p in ipairs(GKP_ITEM_QUALITIES) do
-				table.insert(t, {
-					szOption = p.nQuality > 0 and _L('Quality reach %s', p.szTitle) or p.szTitle,
-					rgb = p.nQuality == -1 and {255, 255, 255} or { GetItemFontColorByQuality(p.nQuality) },
-					bCheck = true, bMCheck = true, bChecked = wnd.tItemConfig.nAutoPickupQuality == p.nQuality,
-					fnAction = function()
-						wnd.tItemConfig.nAutoPickupQuality = p.nQuality
-					end,
-				})
-			end
-			insert(t, CONSTANT.MENU_DIVIDER)
+		local t = { szOption = _L['Auto pickup this'] }
+		for i, p in ipairs(GKP_ITEM_QUALITIES) do
 			insert(t, {
-				szOption = _L['Auto pickup quest item'],
-				bCheck = true, bChecked = wnd.tItemConfig.bAutoPickupTaskItem,
+				szOption = p.nQuality > 0 and _L('Quality reach %s', p.szTitle) or p.szTitle,
+				rgb = p.nQuality == -1 and {255, 255, 255} or { GetItemFontColorByQuality(p.nQuality) },
+				bCheck = true, bMCheck = true, bChecked = wnd.tItemConfig.nAutoPickupQuality == p.nQuality,
 				fnAction = function()
-					wnd.tItemConfig.bAutoPickupTaskItem = not wnd.tItemConfig.bAutoPickupTaskItem
+					wnd.tItemConfig.nAutoPickupQuality = p.nQuality
 				end,
 			})
-			table.insert(menu, t)
 		end
+		insert(t, CONSTANT.MENU_DIVIDER)
+		insert(t, {
+			szOption = _L['Auto pickup quest item'],
+			bCheck = true, bChecked = wnd.tItemConfig.bAutoPickupTaskItem,
+			fnAction = function()
+				wnd.tItemConfig.bAutoPickupTaskItem = not wnd.tItemConfig.bAutoPickupTaskItem
+			end,
+		})
+		insert(menu, t)
 		PopupMenu(menu)
 	elseif szName == 'Btn_Boss' then
 		if not Loot.AuthCheck(this:GetParent().dwDoodadID) then
