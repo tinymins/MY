@@ -74,9 +74,6 @@ local O = {
 RegisterCustomData('MY_TeamMon_CC.bEnable')
 RegisterCustomData('MY_TeamMon_CC.bBorder')
 
-function D.ClearDisplay()
-end
-
 function D.UpdateRule()
 	CIRCLE_RULE[TARGET.NPC] = {}
 	local aData = MY_TeamMon and MY_TeamMon.GetTable and MY_TeamMon.GetTable('NPC')
