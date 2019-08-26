@@ -160,6 +160,7 @@ local function ApplyUIArguments(ui, arg)
 		if arg.image              ~= nil then ui:Image(arg.image, arg.imageframe) end
 		if arg.icon               ~= nil then ui:Icon           (arg.icon       ) end
 		if arg.name               ~= nil then ui:Name           (arg.name       ) end
+		if arg.penetrable         ~= nil then ui:Penetrable     (arg.penetrable ) end
 		if arg.dragable           ~= nil then ui:Drag           (arg.dragable   ) end
 		if arg.dragarea           ~= nil then ui:Drag      (unpack(arg.dragarea)) end
 		if arg.w ~= nil or arg.h ~= nil or arg.rw ~= nil or arg.rh ~= nil then ui:Size(arg.w, arg.h, arg.rw, arg.rh) end -- must after :Text() because w/h can be 'auto'

@@ -63,7 +63,7 @@ end
 local PS = {}
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
-	local X, Y = 20, 30
+	local X, Y = 20, 20
 	local W, H = ui:Size()
 	local x, y = X, Y
 	x, y = MY_GongzhanCheck.OnPanelActivePartial(ui, X, Y, W, H, x, y)
@@ -77,5 +77,6 @@ function PS.OnPanelActive(wnd)
 	x, y = MY_ChangGeShadow.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	x, y = MY_Memo.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	x, y = MY_HideAnnounceBg.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+	x, y = MY_EnergyBar.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 end
 LIB.RegisterPanel('MY_ToolBox', _L['toolbox'], _L['General'], 'UI/Image/Common/Money.UITex|243', PS)

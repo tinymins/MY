@@ -145,4 +145,6 @@ data = {
     ['Max display count %d, current %d.'] = '最大显示%d条，当前结果%d条。',
 
     ['Hide announce bg'] = '隐藏官方公告区背景',
+    ['MY_EnergyBar'] = '门派能量条',
+    ['Enable MY_EnergyBar'] = '显示门派能量条',
 }
