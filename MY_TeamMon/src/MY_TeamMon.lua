@@ -131,7 +131,7 @@ local CACHE = {
 	DOODAD_LIST = {},
 	SKILL_LIST  = {},
 	INTERVAL    = {},
-	STR         = {},
+	HP_CD_STR   = {},
 }
 
 local D = {
@@ -369,12 +369,13 @@ function D.OnFrameBreathe()
 						local nLife = floor(npc.nCurrentLife / npc.nMaxLife * 100)
 						if tab.nLife ~= nLife then
 							local nStart = tab.nLife or nLife
-							local nStep = nLife >= nStart and 1 or -1
+							local bIncrease = nLife >= nStart
+							local nStep = bIncrease and 1 or -1
 							if tab.nLife then
 								nStart = nStart + nStep
 							end
 							for nLife = nStart, nLife, nStep do
-								FireUIEvent('MY_TM_NPC_LIFE_CHANGE', dwTemplateID, nLife)
+								FireUIEvent('MY_TM_NPC_LIFE_CHANGE', dwTemplateID, nLife, bIncrease)
 							end
 							tab.nLife = nLife
 						end
@@ -385,12 +386,13 @@ function D.OnFrameBreathe()
 						local nMana = floor(npc.nCurrentMana / npc.nMaxMana * 100)
 						if tab.nMana ~= nMana then
 							local nStart = tab.nMana or nMana
-							local nStep = nMana >= nStart and 1 or -1
+							local bIncrease = nMana >= nStart
+							local nStep = bIncrease and 1 or -1
 							if tab.nMana then
 								nStart = nStart + nStep
 							end
 							for nMana = nStart, nMana, nStep do
-								FireUIEvent('MY_TM_NPC_MANA_CHANGE', dwTemplateID, nMana)
+								FireUIEvent('MY_TM_NPC_MANA_CHANGE', dwTemplateID, nMana, bIncrease)
 							end
 							tab.nMana = nMana
 						end
@@ -491,7 +493,7 @@ function D.OnEvent(szEvent)
 	elseif szEvent == 'MY_TM_NPC_FIGHT' then
 		D.OnNpcFight(arg0, arg1)
 	elseif szEvent == 'MY_TM_NPC_LIFE_CHANGE' or szEvent == 'MY_TM_NPC_MANA_CHANGE' then
-		D.OnNpcInfoChange(szEvent, arg0, arg1)
+		D.OnNpcInfoChange(szEvent, arg0, arg1, arg2)
 	elseif szEvent == 'LOADING_END' or szEvent == 'MY_TM_CREATE_CACHE' or szEvent == 'MY_TM_LOADING_END' then
 		D.CreateData(szEvent)
 	end
@@ -675,7 +677,7 @@ function D.CreateData(szEvent)
 	if szEvent ~= 'MY_TM_CREATE_CACHE' then
 		CACHE.NPC_LIST   = {}
 		CACHE.SKILL_LIST = {}
-		CACHE.STR        = {}
+		CACHE.HP_CD_STR  = {}
 		D.Log('collectgarbage(\'count\') ' .. collectgarbage('count'))
 		collectgarbage('collect')
 		D.Log('collectgarbage(\'collect\') ' .. collectgarbage('count'))
@@ -1557,25 +1559,38 @@ function D.OnNpcFight(dwTemplateID, bFight)
 	end
 end
 
-function D.GetStringStru(szString)
-	if CACHE.STR[szString] then
-		return CACHE.STR[szString]
-	else
-		local data = {}
-		for k, v in ipairs(MY_SplitString(szString, ';')) do
-			local line = MY_SplitString(v, ',')
-			if line[1] and line[2] and tonumber(MY_TrimString(line[1])) and MY_TrimString(line[2]) ~= '' then
-				line[1] = tonumber(MY_TrimString(line[1]))
-				line[2] = MY_TrimString(line[2])
-				insert(data, line)
+-- 0.5-,50%,2; -> { 50, '-', '50%', 2 }
+function D.DecodeHPCountdown(szString)
+	if not CACHE.HP_CD_STR[szString] then
+		local aHPCD = {}
+		for k, v in ipairs(MY_SplitString(szString, ';', true)) do
+			local hpcd = MY_SplitString(v, ',', true)
+			if hpcd[1] then
+				hpcd[1] = MY_TrimString(hpcd[1])
+				local szSign = hpcd[1]:sub(-1)
+				if szSign == '-' or szSign == '+' then
+					hpcd[1] = hpcd[1]:sub(1, -2)
+				else
+					szSign = '*'
+				end
+				insert(hpcd, 2, szSign)
+				hpcd[1] = tonumber(hpcd[1])
+			end
+			if hpcd[1] and hpcd[3] then
+				hpcd[1] = hpcd[1] * 100
+				hpcd[3] = MY_TrimString(hpcd[3])
+				if hpcd[3] ~= '' then
+					insert(aHPCD, hpcd)
+				end
 			end
 		end
-		CACHE.STR[szString] = data
-		return data
+		CACHE.HP_CD_STR[szString] = aHPCD
 	end
+	return CACHE.HP_CD_STR[szString]
 end
+
 -- 不该放在倒计时中 需要重构
-function D.OnNpcInfoChange(szEvent, dwTemplateID, nPer)
+function D.OnNpcInfoChange(szEvent, dwTemplateID, nPer, bIncrease)
 	local data = D.GetData('NPC', dwTemplateID)
 	if data and data.tCountdown then
 		local dwType = szEvent == 'MY_TM_NPC_LIFE_CHANGE' and MY_TM_TYPE.NPC_LIFE or MY_TM_TYPE.NPC_MANA
@@ -1583,18 +1598,18 @@ function D.OnNpcInfoChange(szEvent, dwTemplateID, nPer)
 		local szReceiver = LIB.GetTemplateName(TARGET.NPC, dwTemplateID)
 		for k, v in ipairs(data.tCountdown) do
 			if v.nClass == dwType then
-				local tLife = D.GetStringStru(v.nTime)
-				for kk, vv in ipairs(tLife) do
-					local nVper = vv[1] * 100
-					if nVper == nPer then -- hit
+				local aHPCD = D.DecodeHPCountdown(v.nTime)
+				for kk, hpcd in ipairs(aHPCD) do
+					if hpcd[1] == nPer
+					and (hpcd[2] == '*' or (bIncrease and hpcd[2] == '+') or (not bIncrease and hpcd[2] == '-')) then -- hit
 						local szName = FilterCustomText(v.szName, szSender, szReceiver) or szReceiver
 						local aXml, aText = {}, {}
 						ConstructSpeech(aText, aXml, MY_TM_LEFT_BRACKET, MY_TM_LEFT_BRACKET_XML)
 						ConstructSpeech(aText, aXml, szName, 44, 255, 255, 0)
 						ConstructSpeech(aText, aXml, MY_TM_RIGHT_BRACKET, MY_TM_RIGHT_BRACKET_XML)
 						ConstructSpeech(aText, aXml, dwType == MY_TM_TYPE.NPC_LIFE and _L['\'s life remaining to '] or _L['\'s mana reaches '], 44, 255, 255, 255)
-						ConstructSpeech(aText, aXml, ' ' .. nVper .. '%', 44, 255, 255, 0)
-						ConstructSpeech(aText, aXml, ' ' .. FilterCustomText(vv[2], szSender, szReceiver), 44, 255, 255, 255)
+						ConstructSpeech(aText, aXml, ' ' .. hpcd[1] .. '%', 44, 255, 255, 0)
+						ConstructSpeech(aText, aXml, ' ' .. FilterCustomText(hpcd[3], szSender, szReceiver), 44, 255, 255, 255)
 						local szXml, szText = concat(aXml), concat(aText)
 						if O.bPushCenterAlarm then
 							FireUIEvent('MY_TM_CA_CREATE', szXml, 3, true)
@@ -1605,13 +1620,13 @@ function D.OnNpcInfoChange(szEvent, dwTemplateID, nPer)
 						if O.bPushTeamChannel and v.bTeamChannel then
 							D.Talk('RAID', szText)
 						end
-						if vv[3] and tonumber(MY_TrimString(vv[3])) then
+						if hpcd[4] and tonumber(MY_TrimString(hpcd[4])) then
 							local szKey = k .. '.' .. dwTemplateID .. '.' .. kk
 							local tParam = {
 								key    = v.key,
 								nFrame = v.nFrame,
-								nTime  = tonumber(MY_TrimString(vv[3])),
-								szName = FilterCustomText(vv[2], szSender, szReceiver),
+								nTime  = tonumber(MY_TrimString(hpcd[4])),
+								szName = FilterCustomText(hpcd[3], szSender, szReceiver),
 								nIcon  = v.nIcon,
 								bTalk  = v.bTeamChannel,
 								bHold  = v.bHold
