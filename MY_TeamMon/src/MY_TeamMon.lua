@@ -996,9 +996,13 @@ function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
 			return
 		end
 		local szName, nIcon = LIB.GetSkillName(dwCastID, dwLevel)
+		local szSender, szReceiver
 		local KObject = IsPlayer(dwCaster) and GetPlayer(dwCaster) or GetNpc(dwCaster)
-		if not KObject then
-			return -- D.Log('ERROR CASTING object:' .. dwCaster .. ' does not exist!')
+		if KObject then
+			szSender = LIB.GetObjectName(KObject)
+			szReceiver = LIB.GetObjectName(LIB.GetObject(KObject.GetTarget()))
+		else
+			szSender = LIB.GetObjectName(IsPlayer(dwCaster) and TARGET.PLAYER or TARGET.NPC, dwCaster)
 		end
 		if data.szName then
 			szName = FilterCustomText(data.szName, szSender, szReceiver)
@@ -1012,8 +1016,6 @@ function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
 		else
 			cfg, nClass = data[MY_TM_TYPE.SKILL_END], MY_TM_TYPE.SKILL_END
 		end
-		local szSender = LIB.GetObjectName(KObject)
-		local szReceiver = LIB.GetObjectName(LIB.GetObject(KObject.GetTarget()))
 		D.CountdownEvent(data, nClass, szSender, szReceiver)
 		if cfg then
 			local aXml, aText = {}, {}
