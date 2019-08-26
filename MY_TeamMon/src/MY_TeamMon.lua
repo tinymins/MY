@@ -189,7 +189,7 @@ end
 
 local ParseCustomText, FilterCustomText
 do
-local function NDSBNameReplacer(szContent, szSender, szReceiver)
+local function PatternNameReplacer(szContent, szSender, szReceiver)
 	if szContent == 'me' then
 		return MY_TM_CORE_NAME
 	end
@@ -267,7 +267,7 @@ local function FormatCustomText(szOrigin, szSender, szReceiver, bNoLimit)
 					end
 				end
 				if szContent then
-					szPart = NDSBNameReplacer(szContent, szSender, szReceiver)
+					szPart = PatternNameReplacer(szContent, szSender, szReceiver)
 					if szPart then
 						szText = szText .. szPart
 					end
