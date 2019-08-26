@@ -2413,6 +2413,8 @@ function D.OpenSettingPanel(data, szType)
 				end
 				return menu
 			end,
+			tip = _L['Press CTRL click for advance menu'],
+			tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 		}):Pos('BOTTOMRIGHT')
 		-- Í¼±ê
 		nX = ui:Append('Box', {
