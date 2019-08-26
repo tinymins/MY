@@ -1128,65 +1128,126 @@ function LIB.GetTemplateName(dwType, dwTemplateID)
 end
 
 -- 获取指定对象的名字
--- LIB.GetObjectName(obj, bRetID)
+-- LIB.GetObjectName(obj, eRetID)
+-- LIB.GetObjectName(dwType, dwID, eRetID)
 -- (KObject) obj    要获取名字的对象
 -- (string)  eRetID 是否返回对象ID信息
 --    'auto'   名字为空时返回 -- 默认值
 --    'always' 总是返回
 --    'never'  总是不返回
-function LIB.GetObjectName(obj, eRetID)
-	if not obj then
-		return nil
+local OBJECT_NAME = {
+	['PLAYER' ] = {},
+	['NPC'    ] = {},
+	['DOODAD' ] = {},
+	['ITEM'   ] = {},
+	['UNKNOWN'] = {},
+}
+function LIB.GetObjectName(arg0, arg1, arg2)
+	local KObject, szType, dwID, eRetID
+	if IsNumber(arg0) then
+		local dwType = arg0
+		dwID, eRetID = arg1, arg2
+		KObject = LIB.GetObject(dwType, dwID)
+		if dwType == TARGET.PLAYER then
+			szType = 'PLAYER'
+		elseif dwType == TARGET.NPC then
+			szType = 'NPC'
+		elseif dwType == TARGET.DOODAD then
+			szType = 'DOODAD'
+		else
+			szType = 'UNKNOWN'
+		end
+	else
+		KObject, eRetID = arg0, arg1
+		if KObject then
+			dwID = KObject.dwID
+			szType = LIB.GetObjectType(KObject)
+		end
+	end
+	if not dwID then
+		return
 	end
 	if not eRetID then
 		eRetID = 'auto'
 	end
-	local szType, szName = LIB.GetObjectType(obj), obj.szName
-	if szType == 'PLAYER' then -- PLAYER
-		szType = 'P'
-	elseif szType == 'NPC' then -- NPC
-		szType = 'N'
-		if IsEmpty(szName) then
-			szName = LIB.GetTemplateName(TARGET.NPC, obj.dwTemplateID)
+	local cache = OBJECT_NAME[szType][dwID]
+	if not cache or (KObject and not cache.bFull) then -- 计算获取名称缓存
+		local szDispType, szDispID, szName = '?', '', ''
+		if KObject then
+			szName = KObject.szName
 		end
-		if obj.dwEmployer and obj.dwEmployer ~= 0 then
-			if LIB.Table_IsSimplePlayer(obj.dwTemplateID) then -- 长歌影子
-				szName = LIB.GetObjectName(GetPlayer(obj.dwEmployer), eRetID)
-			elseif not IsEmpty(szName) then
-				local szEmpName = LIB.GetObjectName(
-					(IsPlayer(obj.dwEmployer) and GetPlayer(obj.dwEmployer)) or GetNpc(obj.dwEmployer),
-					'never'
-				) or g_tStrings.STR_SOME_BODY
-				szName =  szEmpName .. g_tStrings.STR_PET_SKILL_LOG .. szName
+		if not cache then
+			cache = { bFull = false }
+		end
+		if szType == 'PLAYER' then
+			szDispType = 'P'
+			cache.bFull = not IsEmpty(szName)
+		elseif szType == 'NPC' then
+			szDispType = 'N'
+			if KObject then
+				if IsEmpty(szName) then
+					szName = LIB.GetTemplateName(TARGET.NPC, KObject.dwTemplateID)
+				end
+				if KObject.dwEmployer and KObject.dwEmployer ~= 0 then
+					if LIB.Table_IsSimplePlayer(KObject.dwTemplateID) then -- 长歌影子
+						szName = LIB.GetObjectName(GetPlayer(KObject.dwEmployer), eRetID)
+					elseif not IsEmpty(szName) then
+						local szEmpName = LIB.GetObjectName(
+							(IsPlayer(KObject.dwEmployer) and GetPlayer(KObject.dwEmployer)) or GetNpc(KObject.dwEmployer),
+							'never'
+						)
+						if szEmpName then
+							cache.bFull = true
+						else
+							szEmpName = g_tStrings.STR_SOME_BODY
+						end
+						szName =  szEmpName .. g_tStrings.STR_PET_SKILL_LOG .. szName
+					end
+				else
+					cache.bFull = true
+				end
 			end
-		end
-	elseif szType == 'DOODAD' then -- DOODAD
-		szType = 'D'
-		if IsEmpty(szName) then
-			szName = LIB.Table_GetDoodadTemplateName(obj.dwTemplateID)
-			if szName then
-				szName = szName:gsub('^%s*(.-)%s*$', '%1')
+		elseif szType == 'DOODAD' then
+			szDispType = 'D'
+			if KObject and IsEmpty(szName) then
+				szName = LIB.Table_GetDoodadTemplateName(KObject.dwTemplateID)
+				if szName then
+					szName = szName:gsub('^%s*(.-)%s*$', '%1')
+				end
 			end
-		end
-	elseif szType == 'ITEM' then -- ITEM
-		szType = 'I'
-		szName = LIB.GetItemNameByItem(obj)
-	else
-		szType = '?'
-	end
-	if IsEmpty(szName) and eRetID ~= 'never' or eRetID == 'always' then
-		local szDispID = szType
-		if szType == 'N' then
-			szDispID = szDispID .. LIB.ConvertNpcID(obj.dwID) .. '@' .. obj.dwTemplateID
+			cache.bFull = true
+		elseif szType == 'ITEM' then
+			szDispType = 'I'
+			if KObject then
+				szName = LIB.GetItemNameByItem(KObject)
+			end
+			cache.bFull = true
 		else
-			szDispID = szDispID .. obj.dwID
+			szDispType = '?'
+			cache.bFull = true
 		end
-		szName = IsEmpty(szName) and szDispID or (szName .. '(' .. szDispID .. ')')
+		if szType == 'NPC' then
+			szDispID = LIB.ConvertNpcID(dwID)
+			if KObject then
+				szDispID = szDispID .. '@' .. KObject.dwTemplateID
+			end
+		else
+			szDispID = dwID
+		end
+		if IsEmpty(szName) then
+			szName = nil
+		end
+		cache['never'] = szName
+		if szName then
+			cache['auto'] = szName
+			cache['always'] = szName .. '(' .. szDispType .. szDispID .. ')'
+		else
+			cache['auto'] = szDispType .. szDispID
+			cache['always'] = szDispType .. szDispID
+		end
+		OBJECT_NAME[szType][dwID] = cache
 	end
-	if IsEmpty(szName) then
-		szName = nil
-	end
-	return szName
+	return cache and cache[eRetID] or nil
 end
 
 function LIB.GetObjectType(obj)
