@@ -1602,7 +1602,7 @@ function D.OnNpcInfoChange(szEvent, dwTemplateID, nPer, bIncrease)
 				for kk, hpcd in ipairs(aHPCD) do
 					if hpcd[1] == nPer
 					and (hpcd[2] == '*' or (bIncrease and hpcd[2] == '+') or (not bIncrease and hpcd[2] == '-')) then -- hit
-						local szName = FilterCustomText(v.szName, szSender, szReceiver) or szReceiver
+						local szName = FilterCustomText(data.szName, szSender, szReceiver) or szReceiver
 						local aXml, aText = {}, {}
 						ConstructSpeech(aText, aXml, MY_TM_LEFT_BRACKET, MY_TM_LEFT_BRACKET_XML)
 						ConstructSpeech(aText, aXml, szName, 44, 255, 255, 0)
