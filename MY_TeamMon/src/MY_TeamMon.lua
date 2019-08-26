@@ -1611,7 +1611,7 @@ function D.OnNpcInfoChange(szEvent, dwTemplateID, nPer)
 								key    = v.key,
 								nFrame = v.nFrame,
 								nTime  = tonumber(MY_TrimString(vv[3])),
-								szName = vv[2],
+								szName = FilterCustomText(vv[2], szSender, szReceiver),
 								nIcon  = v.nIcon,
 								bTalk  = v.bTeamChannel,
 								bHold  = v.bHold
