@@ -485,6 +485,9 @@ end
 
 -- macro command
 function D.Apply()
+	if not GetClientPlayer() then
+		return LIB.DelayCall('MY_EnergyBar#Apply', 300, D.Apply)
+	end
 	if not O.bEnable then
 		Wnd.CloseWindow('MY_EnergyBar')
 	else
