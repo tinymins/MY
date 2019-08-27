@@ -2312,15 +2312,22 @@ end
 
 do
 local KEY = wgsub(wgsub(PACKET_INFO.ROOT, './', ''), '\\', '/'):lower()
-local ERROR_MSG = {}
+local FILE_PATH = {'temporary/lua_error.jx3dat', PATH_TYPE.GLOBAL}
+local LAST_ERROR_MSG = LIB.LoadLUAData(FILE_PATH, ERROR_MSG, { passphrase = false }) or {}
+local LAST_ERROR_MSG, ERROR_MSG = {}, {}
 RegisterEvent('CALL_LUA_ERROR', function()
 	local szMsg = arg0
 	local szMsgL = wgsub(arg0:lower(), '\\', '/')
 	if wfind(szMsgL, KEY) then
 		insert(ERROR_MSG, szMsg)
 	end
+	LIB.SaveLUAData(FILE_PATH, ERROR_MSG, { passphrase = false, crc = false, indent = '\t' })
 end)
 function LIB.GetAddonErrorMessage()
-	return concat(ERROR_MSG, '\n\n')
+	local szMsg = concat(LAST_ERROR_MSG, '\n\n')
+	if not IsEmpty(szMsg) then
+		szMsg = szMsg .. '\n\n'
+	end
+	return szMsg .. concat(ERROR_MSG, '\n\n')
 end
 end
