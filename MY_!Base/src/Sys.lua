@@ -2315,8 +2315,8 @@ local KEY = wgsub(wgsub(PACKET_INFO.ROOT, './', ''), '\\', '/'):lower()
 local ERROR_MSG = {}
 RegisterEvent('CALL_LUA_ERROR', function()
 	local szMsg = arg0
-	local szMsgL = arg0:lower()
-	if wgsub(szMsgL, KEY) then
+	local szMsgL = wgsub(arg0:lower(), '\\', '/')
+	if wfind(szMsgL, KEY) then
 		insert(ERROR_MSG, szMsg)
 	end
 end)
