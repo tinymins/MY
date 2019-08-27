@@ -4487,9 +4487,10 @@ function UI.OpenTextEditor(szText, szFrameName)
 		anchor = { s='CENTER', r='CENTER', x=0, y=0 },
 		simple = true, close = true, esc = true,
 		dragresize = true, minimize = true, ondragresize = OnResize,
-	}):Append('WndEditBox', { x = 0, y = 0, multiline = true, text = szText })
+	})
+	ui:Append('WndEditBox', { x = 0, y = 0, multiline = true, text = szText })
+	ui:Focus()
 	OnResize()
-	Station.SetFocusWindow(ui[1])
 	return ui
 end
 
