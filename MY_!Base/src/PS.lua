@@ -843,6 +843,7 @@ function PS.OnPanelActive(wnd)
 			UI.OpenTextEditor(LIB.GetAddonErrorMessage())
 		end,
 	}):AutoWidth():Width() + 5
+	PS.OnPanelResize(wnd)
 end
 function PS.OnPanelResize(wnd)
 	local ui = LIB.UI(wnd)
