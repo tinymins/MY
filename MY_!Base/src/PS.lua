@@ -177,7 +177,8 @@ end
 ---------------------------------------------------------------------------------------------
 -- 选项卡
 ---------------------------------------------------------------------------------------------
-do local TABS_LIST = {
+do
+local TABS_LIST, TAB_WELCOME = {
 	{ id = _L['General'] },
 	{ id = _L['Target'] },
 	{ id = _L['Chat'] },
@@ -368,8 +369,8 @@ function LIB.SwitchTab(szID, bForceUpdate)
 	end
 
 	-- get main panel
-	local wnd = frame:Lookup('Wnd_Total/WndScroll_MainPanel/WndContainer_MainPanel')
-	local scroll = frame:Lookup('Wnd_Total/WndScroll_MainPanel/ScrollBar_MainPanel')
+	local wnd = frame.MAIN_WND
+	local scroll = frame.MAIN_SCROLL
 	-- fire custom registered on switch event
 	if wnd.OnPanelDeactive then
 		local res, err, trace = XpCall(wnd.OnPanelDeactive, wnd)
@@ -379,9 +380,10 @@ function LIB.SwitchTab(szID, bForceUpdate)
 	end
 	-- clear all events
 	wnd.OnPanelActive   = nil
-	wnd.OnPanelDeactive = nil
 	wnd.OnPanelResize   = nil
 	wnd.OnPanelScroll   = nil
+	wnd.OnPanelBreathe  = nil
+	wnd.OnPanelDeactive = nil
 	-- reset main panel status
 	scroll:SetScrollPos(0)
 	wnd:Clear()
@@ -390,195 +392,21 @@ function LIB.SwitchTab(szID, bForceUpdate)
 
 	-- ready to draw
 	if not tab then
-		-- 欢迎页
-		local function GetMemoryText()
-			return format('Memory:%.1fMB', collectgarbage('count') / 1024)
-		end
-		local function GetAdvText()
-			local me = GetClientPlayer()
-			if not me then
-				return ''
-			end
-			return _L('%s, welcome to use %s!', me.szName, PACKET_INFO.NAME) .. 'v' .. LIB.GetVersion()
-		end
-		local function GetSvrText()
-			return LIB.GetServer() .. ' (' .. LIB.GetRealServer() .. ')'
-				.. g_tStrings.STR_CONNECT
-				.. LIB.FormatTimeCounter(LIB.GetTimeOfFee() - GetCurrentTime(), _L['Fee left %H:%mm:%ss'])
-		end
-		local ui = LIB.UI(wnd)
-		local w, h = ui:Size()
-		ui:Append('Shadow', { name = 'Shadow_Adv', x = 0, y = 0, color = { 140, 140, 140 } })
-		ui:Append('Image', { name = 'Image_Adv', x = 0, y = 0, image = PACKET_INFO.UITEX_POSTER, imageframe = (GetTime() % 2) })
-		ui:Append('Text', { name = 'Text_Adv', x = 10, y = 300, w = 557, font = 200, text = GetAdvText() })
-		ui:Append('Text', { name = 'Text_Memory', x = 10, y = 300, w = 150, alpha = 150, font = 162, text = GetMemoryText(), halign = 2 })
-		ui:Append('Text', { name = 'Text_Svr', x = 10, y = 345, w = 557, font = 204, text = GetSvrText(), alpha = 220 })
-		local x = 7
-		-- 奇遇分享
-		x = x + ui:Append('WndCheckBox', {
-			x = x, y = 375,
-			name = 'WndCheckBox_SerendipityNotify',
-			text = _L['Show share notify.'],
-			checked = MY_Serendipity.bEnable,
-			oncheck = function()
-				MY_Serendipity.bEnable = not MY_Serendipity.bEnable
-			end,
-			tip = _L['Monitor serendipity and show share notify.'],
-			tippostype = UI.TIP_POSITION.BOTTOM_TOP,
-		}):AutoWidth():Width()
-		local xS0 = x + ui:Append('WndCheckBox', {
-			x = x, y = 375,
-			name = 'WndCheckBox_SerendipityAutoShare',
-			text = _L['Auto share.'],
-			checked = MY_Serendipity.bAutoShare,
-			oncheck = function()
-				MY_Serendipity.bAutoShare = not MY_Serendipity.bAutoShare
-			end,
-		}):AutoWidth():Width()
-		-- 自动分享子项
-		x = xS0
-		x = x + ui:Append('WndCheckBox', {
-			x = x, y = 375,
-			name = 'WndCheckBox_SerendipitySilentMode',
-			text = _L['Silent mode.'],
-			checked = MY_Serendipity.bSilentMode,
-			oncheck = function()
-				MY_Serendipity.bSilentMode = not MY_Serendipity.bSilentMode
-			end,
-			autovisible = function() return MY_Serendipity.bAutoShare end,
-		}):AutoWidth():Width()
-		x = x + 5
-		x = x + ui:Append('WndEditBox', {
-			x = x, y = 375, w = 105, h = 25,
-			name = 'WndEditBox_SerendipitySilentMode',
-			placeholder = _L['Realname, leave blank for anonymous.'],
-			tip = _L['Realname, leave blank for anonymous.'],
-			tippostype = UI.TIP_POSITION.BOTTOM_TOP,
-			limit = 6,
-			text = LIB.LoadLUAData({'config/realname.jx3dat', PATH_TYPE.ROLE}) or GetClientPlayer().szName:gsub('@.-$', ''),
-			onchange = function(szText)
-				LIB.SaveLUAData({'config/realname.jx3dat', PATH_TYPE.ROLE}, szText)
-			end,
-			autovisible = function() return MY_Serendipity.bAutoShare end,
-		}):Width()
-		-- 手动分享子项
-		x = xS0
-		x = x + ui:Append('WndCheckBox', {
-			x = x, y = 375,
-			name = 'WndCheckBox_SerendipityNotifyTip',
-			text = _L['Show notify tip.'],
-			checked = MY_Serendipity.bPreview,
-			oncheck = function()
-				MY_Serendipity.bPreview = not MY_Serendipity.bPreview
-			end,
-			autovisible = function() return not MY_Serendipity.bAutoShare end,
-		}):AutoWidth():Width()
-		x = x + ui:Append('WndCheckBox', {
-			x = x, y = 375,
-			name = 'WndCheckBox_SerendipityNotifySound',
-			text = _L['Play notify sound.'],
-			checked = MY_Serendipity.bSound,
-			oncheck = function()
-				MY_Serendipity.bSound = not MY_Serendipity.bSound
-			end,
-			autoenable = function() return not MY_Serendipity.bAutoShare end,
-			autovisible = function() return not MY_Serendipity.bAutoShare end,
-		}):AutoWidth():Width()
-		x = x + ui:Append('WndButton', {
-			x = x, y = 375,
-			name = 'WndButton_SerendipitySearch',
-			text = _L['serendipity'],
-			onclick = function()
-				LIB.OpenBrowser('https://j3cx.com/serendipity')
-			end,
-		}):AutoWidth():Width()
-		-- 用户设置
-		ui:Append('WndButton', {
-			x = 7, y = 405, w = 130,
-			name = 'WndButton_UserPreferenceFolder',
-			text = _L['Open user preference folder'],
-			onclick = function()
-				local szRoot = LIB.GetAbsolutePath({'', PATH_TYPE.ROLE}):gsub('/', '\\')
-				if OpenFolder then
-					OpenFolder(szRoot)
-				end
-				UI.OpenTextEditor(szRoot)
-			end,
-		}):AutoWidth()
-		ui:Append('WndButton', {
-			x = 142, y = 405, w = 130,
-			name = 'WndButton_ServerPreferenceFolder',
-			text = _L['Open server preference folder'],
-			onclick = function()
-				local szRoot = LIB.GetAbsolutePath({'', PATH_TYPE.SERVER}):gsub('/', '\\')
-				if OpenFolder then
-					OpenFolder(szRoot)
-				end
-				UI.OpenTextEditor(szRoot)
-			end,
-		}):AutoWidth()
-		ui:Append('WndButton', {
-			x = 277, y = 405, w = 130,
-			name = 'WndButton_GlobalPreferenceFolder',
-			text = _L['Open global preference folder'],
-			onclick = function()
-				local szRoot = LIB.GetAbsolutePath({'', PATH_TYPE.GLOBAL}):gsub('/', '\\')
-				if OpenFolder then
-					OpenFolder(szRoot)
-				end
-				UI.OpenTextEditor(szRoot)
-			end,
-		}):AutoWidth()
-		wnd.OnPanelResize = function(wnd)
-			local w, h = LIB.UI(wnd):Size()
-			local scaleH = w / 557 * 278
-			local bottomH = 90
-			if scaleH > h - bottomH then
-				ui:Children('#Shadow_Adv'):Size((h - bottomH) / 278 * 557, (h - bottomH))
-				ui:Children('#Image_Adv'):Size((h - bottomH) / 278 * 557, (h - bottomH))
-				ui:Children('#Text_Memory'):Pos(w - 150, h - bottomH + 10)
-				ui:Children('#Text_Adv'):Pos(10, h - bottomH + 10)
-				ui:Children('#Text_Svr'):Pos(10, h - bottomH + 35)
-			else
-				ui:Children('#Shadow_Adv'):Size(w, scaleH)
-				ui:Children('#Image_Adv'):Size(w, scaleH)
-				ui:Children('#Text_Memory'):Pos(w - 150, scaleH + 10)
-				ui:Children('#Text_Adv'):Pos(10, scaleH + 10)
-				ui:Children('#Text_Svr'):Pos(10, scaleH + 35)
-			end
-			ui:Children('#WndCheckBox_SerendipityNotify'):Top(scaleH + 65)
-			ui:Children('#WndCheckBox_SerendipityAutoShare'):Top(scaleH + 65)
-			ui:Children('#WndCheckBox_SerendipitySilentMode'):Top(scaleH + 65)
-			ui:Children('#WndEditBox_SerendipitySilentMode'):Top(scaleH + 65)
-			ui:Children('#WndCheckBox_SerendipityNotifyTip'):Top(scaleH + 65)
-			ui:Children('#WndCheckBox_SerendipityNotifySound'):Top(scaleH + 65)
-			ui:Children('#WndButton_SerendipitySearch'):Top(scaleH + 65)
-			ui:Children('#WndButton_UserPreferenceFolder'):Top(scaleH + 95)
-			ui:Children('#WndButton_ServerPreferenceFolder'):Top(scaleH + 95)
-			ui:Children('#WndButton_GlobalPreferenceFolder'):Top(scaleH + 95)
-		end
-		wnd.OnPanelResize(wnd)
-		LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '#TAB#DEFAULT', 500, function()
-			ui:Children('#Text_Adv'):Text(GetAdvText())
-			ui:Children('#Text_Svr'):Text(GetSvrText())
-			ui:Children('#Text_Memory'):Text(GetMemoryText())
-		end)
-		wnd.OnPanelDeactive = function()
-			LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '#TAB#DEFAULT', false)
-		end
-		wnd:FormatAllContentPos()
-	else
-		if tab.fn.OnPanelActive then
-			local res, err, trace = XpCall(tab.fn.OnPanelActive, wnd)
+		tab = TAB_WELCOME
+	end
+	if tab then
+		if tab.OnPanelActive then
+			local res, err, trace = XpCall(tab.OnPanelActive, wnd)
 			if not res then
 				FireUIEvent('CALL_LUA_ERROR', err .. '\nMY#OnPanelActive\n' .. trace .. '\n')
 			end
 			wnd:FormatAllContentPos()
 		end
-		wnd.OnPanelResize   = tab.fn.OnPanelResize
-		wnd.OnPanelActive   = tab.fn.OnPanelActive
-		wnd.OnPanelDeactive = tab.fn.OnPanelDeactive
-		wnd.OnPanelScroll   = tab.fn.OnPanelScroll
+		wnd.OnPanelActive   = tab.OnPanelActive
+		wnd.OnPanelResize   = tab.OnPanelResize
+		wnd.OnPanelScroll   = tab.OnPanelScroll
+		wnd.OnPanelBreathe  = tab.OnPanelBreathe
+		wnd.OnPanelDeactive = tab.OnPanelDeactive
 	end
 	wnd.szID = szID
 end
@@ -594,7 +422,7 @@ function LIB.GetCurrentTabID()
 	if not frame then
 		return
 	end
-	return frame:Lookup('Wnd_Total/WndScroll_MainPanel/WndContainer_MainPanel').szID
+	return frame.MAIN_WND.szID
 end
 
 -- 注册选项卡
@@ -610,61 +438,62 @@ end
 -- }
 -- Ex： LIB.RegisterPanel( 'Test', '测试标签', '测试', 'UI/Image/UICommon/ScienceTreeNode.UITex|123', {255,255,0,200}, { OnPanelActive = function(wnd) end } )
 function LIB.RegisterPanel(szID, szTitle, szCategory, szIconTex, options)
-	local category
-	for _, ctg in ipairs(TABS_LIST) do
-		for i = #ctg, 1, -1 do
-			if ctg[i].szID == szID then
-				table.remove(ctg, i)
-			end
-		end
-		if ctg.id == szCategory then
-			category = ctg
-		end
-	end
-	if szTitle == nil then
-		return
-	end
-
-	if not category then
-		table.insert(TABS_LIST, {
-			id = szCategory,
-		})
-		category = TABS_LIST[#TABS_LIST]
-	end
-	-- format szIconTex
-	if type(szIconTex) == 'number' then
+	-- 格式化图标信息
+	if IsNumber(szIconTex) then
 		szIconTex = 'FromIconID|' .. szIconTex
-	elseif type(szIconTex) ~= 'string' then
+	elseif not IsString(szIconTex) then
 		szIconTex = 'UI/Image/Common/Logo.UITex|6'
 	end
-	local dwIconFrame = string.gsub(szIconTex, '.*%|(%d+)', '%1')
+	local dwIconFrame = gsub(szIconTex, '.*%|(%d+)', '%1')
 	if dwIconFrame then
 		dwIconFrame = tonumber(dwIconFrame)
 	end
-	szIconTex = string.gsub(szIconTex, '%|.*', '')
+	szIconTex = gsub(szIconTex, '%|.*', '')
+	-- 创建数据结构
+	local tab = {
+		szID            = szID                   ,
+		szTitle         = szTitle                ,
+		szCategory      = szCategory             ,
+		szIconTex       = szIconTex              ,
+		dwIconFrame     = dwIconFrame            ,
+		bShielded       = options.bShielded      ,
+		nShielded       = options.nShielded      ,
+		OnPanelActive   = options.OnPanelActive  ,
+		OnPanelScroll   = options.OnPanelScroll  ,
+		OnPanelResize   = options.OnPanelResize  ,
+		OnPanelBreathe  = options.OnPanelBreathe ,
+		OnPanelDeactive = options.OnPanelDeactive,
+	}
+	-- 判断是不是欢迎页
+	if options.bWelcome then
+		-- 欢迎页直接赋值
+		if not TAB_WELCOME then
+			TAB_WELCOME = tab
+		end
+	else
+		-- 普通标签页搜索或创建分类后插入
+		local category
+		for _, ctg in ipairs(TABS_LIST) do
+			for i = #ctg, 1, -1 do
+				if ctg[i].szID == szID then
+					remove(ctg, i)
+				end
+			end
+			if ctg.id == szCategory then
+				category = ctg
+			end
+		end
+		if not category then
+			category = {
+				id = szCategory,
+			}
+			insert(TABS_LIST, category)
+		end
+		insert(category, tab)
 
-	-- format other params
-	if not IsTable(options) then
-		options = {}
-	end
-	table.insert( category, {
-		szID        = szID       ,
-		szTitle     = szTitle    ,
-		szCategory  = szCategory ,
-		szIconTex   = szIconTex  ,
-		dwIconFrame = dwIconFrame,
-		bShielded   = options.bShielded,
-		nShielded   = options.nShielded,
-		fn          = {
-			OnPanelResize   = options.OnPanelResize  ,
-			OnPanelActive   = options.OnPanelActive  ,
-			OnPanelDeactive = options.OnPanelDeactive,
-			OnPanelScroll   = options.OnPanelScroll  ,
-		},
-	})
-
-	if LIB.IsInitialized() then
-		LIB.RedrawCategory()
+		if LIB.IsInitialized() then
+			LIB.RedrawCategory()
+		end
 	end
 end
 end
@@ -706,11 +535,11 @@ local function OnSizeChanged()
 	end
 
 	wnd:Lookup('WndScroll_MainPanel'):SetSize(nWidth - 191, nHeight - 100)
-	wnd:Lookup('WndScroll_MainPanel/ScrollBar_MainPanel'):SetSize(20, nHeight - 100)
-	wnd:Lookup('WndScroll_MainPanel/ScrollBar_MainPanel'):SetRelPos(nWidth - 209, 0)
-	wnd:Lookup('WndScroll_MainPanel/WndContainer_MainPanel'):SetSize(nWidth - 201, nHeight - 100)
-	wnd:Lookup('WndScroll_MainPanel/WndContainer_MainPanel', ''):SetSize(nWidth - 201, nHeight - 100)
-	local hWndMainPanel = frame:Lookup('Wnd_Total/WndScroll_MainPanel/WndContainer_MainPanel')
+	frame.MAIN_SCROLL:SetSize(20, nHeight - 100)
+	frame.MAIN_SCROLL:SetRelPos(nWidth - 209, 0)
+	frame.MAIN_WND:SetSize(nWidth - 201, nHeight - 100)
+	frame.MAIN_HANDLE:SetSize(nWidth - 201, nHeight - 100)
+	local hWndMainPanel = frame.MAIN_WND
 	if hWndMainPanel.OnPanelResize then
 		local res, err, trace = XpCall(hWndMainPanel.OnPanelResize, hWndMainPanel)
 		if not res then
@@ -813,13 +642,16 @@ function LIB.OnDragButton()
 end
 
 function LIB.OnFrameCreate()
+	this.intact = true
+	this.MAIN_SCROLL = this:Lookup('Wnd_Total/WndScroll_MainPanel/ScrollBar_MainPanel')
+	this.MAIN_WND = this:Lookup('Wnd_Total/WndScroll_MainPanel/WndContainer_MainPanel')
+	this.MAIN_HANDLE = this:Lookup('Wnd_Total/WndScroll_MainPanel/WndContainer_MainPanel', '')
 	local fScale = 1 + math.max(Font.GetOffset() * 0.03, 0)
 	this:Lookup('', 'Text_Title'):SetText(PACKET_INFO.NAME .. ' v' .. LIB.GetVersion() .. ' Build ' .. PACKET_INFO.BUILD)
 	this:Lookup('', 'Text_Author'):SetText('-- by ' .. PACKET_INFO.AUTHOR_SIGNATURE)
 	this:Lookup('Wnd_Total/Btn_Weibo', 'Text_Default'):SetText(_L('Author @%s', PACKET_INFO.AUTHOR_WEIBO))
 	this:Lookup('Wnd_Total/Btn_Weibo', 'Image_Icon'):FromUITex(PACKET_INFO.UITEX_COMMON, PACKET_INFO.MAINICON_FRAME)
 	this:Lookup('Btn_Drag'):RegisterLButtonDrag()
-	this.intact = true
 	LIB.RedrawCategory()
 	LIB.ResizePanel(780 * fScale, 540 * fScale)
 	LIB.ExecuteWithThis(this, OnSizeChanged)
@@ -829,9 +661,15 @@ function LIB.OnFrameCreate()
 	LIB.UI(this):Size(OnSizeChanged)
 end
 
+function LIB.OnFrameBreathe()
+	if this.MAIN_WND and this.MAIN_WND.OnPanelBreathe then
+		Call(this.MAIN_WND.OnPanelBreathe, this.MAIN_WND)
+	end
+end
+
 function LIB.OnEvent(event)
 	if event == 'UI_SCALED' then
-		LIB.ExecuteWithThis(this:Lookup('Wnd_Total/WndScroll_MainPanel/ScrollBar_MainPanel'), LIB.OnScrollBarPosChanged)
+		LIB.ExecuteWithThis(this.MAIN_SCROLL, LIB.OnScrollBarPosChanged)
 		OnSizeChanged()
 	end
 end
@@ -839,10 +677,10 @@ end
 function LIB.OnScrollBarPosChanged()
 	local name = this:GetName()
 	if name == 'ScrollBar_MainPanel' then
-		local wnd = this:GetParent():Lookup('WndContainer_MainPanel')
 		if not wnd.OnPanelScroll then
 			return
 		end
+		local wnd = this:GetRoot().MAIN_WND
 		local scale = Station.GetUIScale()
 		local scrollX, scrollY = wnd:GetStartRelPos()
 		scrollX = scrollX == 0 and 0 or -scrollX / scale
@@ -854,6 +692,188 @@ end
 ---------------------------------------------------------------------------------------------
 -- 基础库界面注册
 ---------------------------------------------------------------------------------------------
+-- 欢迎页
+do
+local PS = { bWelcome = true }
+local function GetMemoryText()
+	return format('Memory:%.1fMB', collectgarbage('count') / 1024)
+end
+local function GetAdvText()
+	local me = GetClientPlayer()
+	if not me then
+		return ''
+	end
+	return _L('%s, welcome to use %s!', me.szName, PACKET_INFO.NAME) .. 'v' .. LIB.GetVersion()
+end
+local function GetSvrText()
+	return LIB.GetServer() .. ' (' .. LIB.GetRealServer() .. ')'
+		.. g_tStrings.STR_CONNECT
+		.. LIB.FormatTimeCounter(LIB.GetTimeOfFee() - GetCurrentTime(), _L['Fee left %H:%mm:%ss'])
+end
+function PS.OnPanelActive(wnd)
+	local ui = LIB.UI(wnd)
+	local w, h = ui:Size()
+	ui:Append('Shadow', { name = 'Shadow_Adv', x = 0, y = 0, color = { 140, 140, 140 } })
+	ui:Append('Image', { name = 'Image_Adv', x = 0, y = 0, image = PACKET_INFO.UITEX_POSTER, imageframe = (GetTime() % 2) })
+	ui:Append('Text', { name = 'Text_Adv', x = 10, y = 300, w = 557, font = 200, text = GetAdvText() })
+	ui:Append('Text', { name = 'Text_Memory', x = 10, y = 300, w = 150, alpha = 150, font = 162, text = GetMemoryText(), halign = 2 })
+	ui:Append('Text', { name = 'Text_Svr', x = 10, y = 345, w = 557, font = 204, text = GetSvrText(), alpha = 220 })
+	local x = 7
+	-- 奇遇分享
+	x = x + ui:Append('WndCheckBox', {
+		x = x, y = 375,
+		name = 'WndCheckBox_SerendipityNotify',
+		text = _L['Show share notify.'],
+		checked = MY_Serendipity.bEnable,
+		oncheck = function()
+			MY_Serendipity.bEnable = not MY_Serendipity.bEnable
+		end,
+		tip = _L['Monitor serendipity and show share notify.'],
+		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+	}):AutoWidth():Width()
+	local xS0 = x + ui:Append('WndCheckBox', {
+		x = x, y = 375,
+		name = 'WndCheckBox_SerendipityAutoShare',
+		text = _L['Auto share.'],
+		checked = MY_Serendipity.bAutoShare,
+		oncheck = function()
+			MY_Serendipity.bAutoShare = not MY_Serendipity.bAutoShare
+		end,
+	}):AutoWidth():Width()
+	-- 自动分享子项
+	x = xS0
+	x = x + ui:Append('WndCheckBox', {
+		x = x, y = 375,
+		name = 'WndCheckBox_SerendipitySilentMode',
+		text = _L['Silent mode.'],
+		checked = MY_Serendipity.bSilentMode,
+		oncheck = function()
+			MY_Serendipity.bSilentMode = not MY_Serendipity.bSilentMode
+		end,
+		autovisible = function() return MY_Serendipity.bAutoShare end,
+	}):AutoWidth():Width()
+	x = x + 5
+	x = x + ui:Append('WndEditBox', {
+		x = x, y = 375, w = 105, h = 25,
+		name = 'WndEditBox_SerendipitySilentMode',
+		placeholder = _L['Realname, leave blank for anonymous.'],
+		tip = _L['Realname, leave blank for anonymous.'],
+		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+		limit = 6,
+		text = LIB.LoadLUAData({'config/realname.jx3dat', PATH_TYPE.ROLE}) or GetClientPlayer().szName:gsub('@.-$', ''),
+		onchange = function(szText)
+			LIB.SaveLUAData({'config/realname.jx3dat', PATH_TYPE.ROLE}, szText)
+		end,
+		autovisible = function() return MY_Serendipity.bAutoShare end,
+	}):Width()
+	-- 手动分享子项
+	x = xS0
+	x = x + ui:Append('WndCheckBox', {
+		x = x, y = 375,
+		name = 'WndCheckBox_SerendipityNotifyTip',
+		text = _L['Show notify tip.'],
+		checked = MY_Serendipity.bPreview,
+		oncheck = function()
+			MY_Serendipity.bPreview = not MY_Serendipity.bPreview
+		end,
+		autovisible = function() return not MY_Serendipity.bAutoShare end,
+	}):AutoWidth():Width()
+	x = x + ui:Append('WndCheckBox', {
+		x = x, y = 375,
+		name = 'WndCheckBox_SerendipityNotifySound',
+		text = _L['Play notify sound.'],
+		checked = MY_Serendipity.bSound,
+		oncheck = function()
+			MY_Serendipity.bSound = not MY_Serendipity.bSound
+		end,
+		autoenable = function() return not MY_Serendipity.bAutoShare end,
+		autovisible = function() return not MY_Serendipity.bAutoShare end,
+	}):AutoWidth():Width()
+	x = x + ui:Append('WndButton', {
+		x = x, y = 375,
+		name = 'WndButton_SerendipitySearch',
+		text = _L['serendipity'],
+		onclick = function()
+			LIB.OpenBrowser('https://j3cx.com/serendipity')
+		end,
+	}):AutoWidth():Width()
+	-- 用户设置
+	x = 7
+	x = x + ui:Append('WndButton', {
+		x = x, y = 405, w = 130,
+		name = 'WndButton_UserPreferenceFolder',
+		text = _L['Open user preference folder'],
+		onclick = function()
+			local szRoot = LIB.GetAbsolutePath({'', PATH_TYPE.ROLE}):gsub('/', '\\')
+			if OpenFolder then
+				OpenFolder(szRoot)
+			end
+			UI.OpenTextEditor(szRoot)
+		end,
+	}):AutoWidth():Width() + 5
+	x = x + ui:Append('WndButton', {
+		x = x, y = 405, w = 130,
+		name = 'WndButton_ServerPreferenceFolder',
+		text = _L['Open server preference folder'],
+		onclick = function()
+			local szRoot = LIB.GetAbsolutePath({'', PATH_TYPE.SERVER}):gsub('/', '\\')
+			if OpenFolder then
+				OpenFolder(szRoot)
+			end
+			UI.OpenTextEditor(szRoot)
+		end,
+	}):AutoWidth():Width() + 5
+	x = x + ui:Append('WndButton', {
+		x = x, y = 405, w = 130,
+		name = 'WndButton_GlobalPreferenceFolder',
+		text = _L['Open global preference folder'],
+		onclick = function()
+			local szRoot = LIB.GetAbsolutePath({'', PATH_TYPE.GLOBAL}):gsub('/', '\\')
+			if OpenFolder then
+				OpenFolder(szRoot)
+			end
+			UI.OpenTextEditor(szRoot)
+		end,
+	}):AutoWidth():Width() + 5
+end
+function PS.OnPanelResize(wnd)
+	local ui = LIB.UI(wnd)
+	local w, h = ui:Size()
+	local scaleH = w / 557 * 278
+	local bottomH = 90
+	if scaleH > h - bottomH then
+		ui:Children('#Shadow_Adv'):Size((h - bottomH) / 278 * 557, (h - bottomH))
+		ui:Children('#Image_Adv'):Size((h - bottomH) / 278 * 557, (h - bottomH))
+		ui:Children('#Text_Memory'):Pos(w - 150, h - bottomH + 10)
+		ui:Children('#Text_Adv'):Pos(10, h - bottomH + 10)
+		ui:Children('#Text_Svr'):Pos(10, h - bottomH + 35)
+	else
+		ui:Children('#Shadow_Adv'):Size(w, scaleH)
+		ui:Children('#Image_Adv'):Size(w, scaleH)
+		ui:Children('#Text_Memory'):Pos(w - 150, scaleH + 10)
+		ui:Children('#Text_Adv'):Pos(10, scaleH + 10)
+		ui:Children('#Text_Svr'):Pos(10, scaleH + 35)
+	end
+	ui:Children('#WndCheckBox_SerendipityNotify'):Top(scaleH + 65)
+	ui:Children('#WndCheckBox_SerendipityAutoShare'):Top(scaleH + 65)
+	ui:Children('#WndCheckBox_SerendipitySilentMode'):Top(scaleH + 65)
+	ui:Children('#WndEditBox_SerendipitySilentMode'):Top(scaleH + 65)
+	ui:Children('#WndCheckBox_SerendipityNotifyTip'):Top(scaleH + 65)
+	ui:Children('#WndCheckBox_SerendipityNotifySound'):Top(scaleH + 65)
+	ui:Children('#WndButton_SerendipitySearch'):Top(scaleH + 65)
+	ui:Children('#WndButton_UserPreferenceFolder'):Top(scaleH + 95)
+	ui:Children('#WndButton_ServerPreferenceFolder'):Top(scaleH + 95)
+	ui:Children('#WndButton_GlobalPreferenceFolder'):Top(scaleH + 95)
+end
+function PS.OnPanelBreathe(wnd)
+	local ui = LIB.UI(wnd)
+	ui:Children('#Text_Adv'):Text(GetAdvText())
+	ui:Children('#Text_Svr'):Text(GetSvrText())
+	ui:Children('#Text_Memory'):Text(GetMemoryText())
+end
+LIB.RegisterPanel('Welcome', _L['Welcome'], _L['System'], '', PS)
+end
+
 -- 全局染色设置
 do
 local PS = {}
