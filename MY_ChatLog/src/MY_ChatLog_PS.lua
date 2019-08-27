@@ -353,7 +353,7 @@ function D.Export(szExportFile, aChannels, nPerSec, onProgress)
 			for i, rec in ipairs(data) do
 				local f = GetMsgFont(rec.szChannel)
 				local r, g, b = unpack(MSGTYPE_COLOR[rec.szChannel])
-				Log(szExportFile, convertXml2Html(LIB.GetTimeLinkText({r=r, g=g, b=b, f=f, s='[%yyyy/%MM/%dd][%hh:%mm:%ss]'}, rec.nTme)))
+				Log(szExportFile, convertXml2Html(LIB.GetTimeLinkText({r=r, g=g, b=b, f=f, s='[%yyyy/%MM/%dd][%hh:%mm:%ss]'}, rec.nTime)))
 				Log(szExportFile, convertXml2Html(rec.szMsg))
 			end
 			if onProgress then
