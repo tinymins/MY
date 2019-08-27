@@ -196,9 +196,9 @@ local function OnWhisperCheck()
 						table.insert(t, v)
 					elseif IsTable(v) and IsString(v[1]) then
 						if today == LIB.FormatTime(v[2], '%yyyy%MM%dd') then
-							table.insert(t, LIB.GetTimeLinkText({r = r, g = g, b = b, s = '[%hh:%mm:%ss]'}, v[2]) .. v[1])
+							table.insert(t, LIB.GetTimeLinkText(v[2], {r = r, g = g, b = b, s = '[%hh:%mm:%ss]'}) .. v[1])
 						else
-							table.insert(t, LIB.GetTimeLinkText({r = r, g = g, b = b, s = '[%M.%dd.%hh:%mm:%ss]'}, v[2]) .. v[1])
+							table.insert(t, LIB.GetTimeLinkText(v[2], {r = r, g = g, b = b, s = '[%M.%dd.%hh:%mm:%ss]'}) .. v[1])
 						end
 					end
 				end

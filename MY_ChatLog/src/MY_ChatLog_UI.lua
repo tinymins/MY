@@ -329,7 +329,7 @@ function D.UpdatePage(frame, bKeepScroll)
 			local r, g, b = unpack(MSGTYPE_COLOR[rec.szChannel])
 			local h = hItem:Lookup('Handle_ChatLog_Msg')
 			h:Clear()
-			h:AppendItemFromString(LIB.GetTimeLinkText({r=r, g=g, b=b, f=f, s='[%yyyy/%MM/%dd][%hh:%mm:%ss]'}, rec.nTime))
+			h:AppendItemFromString(LIB.GetTimeLinkText(rec.nTime, {r=r, g=g, b=b, f=f, s='[%yyyy/%MM/%dd][%hh:%mm:%ss]'}))
 			local nCount = h:GetItemCount()
 			h:AppendItemFromString(rec.szMsg)
 			for i = nCount, h:GetItemCount() - 1 do

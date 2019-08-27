@@ -166,10 +166,10 @@ function D.GetHTML(rec)
     if MY_Farbnamen and MY_Farbnamen.Render then
         html = MY_Farbnamen.Render(html)
     end
-    html = LIB.GetTimeLinkText({
+    html = LIB.GetTimeLinkText(rec.time, {
         r = rec.r, g = rec.g, b = rec.b,
         f = rec.font, s = MY_ChatMonitor.szTimestrap,
-    }, rec.time) .. html
+    }) .. html
     return html
 end
 

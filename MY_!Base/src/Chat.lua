@@ -105,16 +105,13 @@ function LIB.GetCopyLinkText(szText, rgbf)
 end
 
 -- 获取复制聊天行Text
-function LIB.GetTimeLinkText(rgbfs, dwTime)
-	if not dwTime then
-		dwTime = GetCurrentTime()
-	end
+function LIB.GetTimeLinkText(dwTime, rgbfs)
 	if not IsTable(rgbfs) then
 		rgbfs = { f = 10 }
 	end
 	local handlerEntry = PACKET_INFO.NAME_SPACE .. '.ChatLinkEventHandlers'
 	return GetFormatText(
-		LIB.FormatTime(dwTime, rgbfs.s or '[%hh:%mm.%ss]'),
+		LIB.FormatTime(dwTime, rgbfs.s or '[%hh:%mm:%ss]'),
 		rgbfs.f, rgbfs.r, rgbfs.g, rgbfs.b, 82691,
 		'this[\'b' .. PACKET_INFO.NAME_SPACE .. 'ChatRendered\']=true;this.OnItemLButtonDown='
 			.. handlerEntry .. '.OnCopyLClick;this.OnItemMButtonDown='
