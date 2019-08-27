@@ -835,6 +835,14 @@ function PS.OnPanelActive(wnd)
 			UI.OpenTextEditor(szRoot)
 		end,
 	}):AutoWidth():Width() + 5
+	x = x + ui:Append('WndButton', {
+		name = 'WndButton_AddonErrorMessage',
+		x = x, y = 405, w = 130,
+		text = _L['Show error message'],
+		onclick = function()
+			UI.OpenTextEditor(LIB.GetAddonErrorMessage())
+		end,
+	}):AutoWidth():Width() + 5
 end
 function PS.OnPanelResize(wnd)
 	local ui = LIB.UI(wnd)
@@ -864,6 +872,7 @@ function PS.OnPanelResize(wnd)
 	ui:Children('#WndButton_UserPreferenceFolder'):Top(scaleH + 95)
 	ui:Children('#WndButton_ServerPreferenceFolder'):Top(scaleH + 95)
 	ui:Children('#WndButton_GlobalPreferenceFolder'):Top(scaleH + 95)
+	ui:Children('#WndButton_AddonErrorMessage'):Top(scaleH + 95)
 end
 function PS.OnPanelBreathe(wnd)
 	local ui = LIB.UI(wnd)

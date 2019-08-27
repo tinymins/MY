@@ -361,6 +361,7 @@ data = {
 	['Open user preference folder'] = '角色数据文件夹',
 	['Open server preference folder'] = '服务器数据文件夹',
 	['Open global preference folder'] = '全局数据文件夹',
+	['Show error message'] = '查看错误日志',
 
 	['Welcome to use %s, would you like to start quick tutorial now?'] = '欢迎使用%s，部分设置尚未初始化，是否立即开始个性化向导？',
 	['Quickset'] = '一键设置',

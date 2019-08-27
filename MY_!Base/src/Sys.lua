@@ -2309,3 +2309,18 @@ else
 		return dwEndTime, dwMonthEndTime, max(dwPointEndTime - dwTime, 0), max(dwDayEndTime - dwTime, 0)
 	end
 end
+
+do
+local KEY = wgsub(wgsub(PACKET_INFO.ROOT, './', ''), '\\', '/'):lower()
+local ERROR_MSG = {}
+RegisterEvent('CALL_LUA_ERROR', function()
+	local szMsg = arg0
+	local szMsgL = arg0:lower()
+	if wgsub(szMsgL, KEY) then
+		insert(ERROR_MSG, szMsg)
+	end
+end)
+function LIB.GetAddonErrorMessage()
+	return concat(ERROR_MSG, '\n\n')
+end
+end
