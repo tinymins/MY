@@ -714,7 +714,7 @@ function PS.OnPanelActive(wnd)
 	x = x + ui:Append('WndComboBox', {
 		x = x, y = y, w = 200,
 		text = _L['Auto pickup'],
-		menu = MY_GKP_Loot.GetAutoPickupAllMenu
+		menu = MY_GKP_Loot.GetAutoPickupMenu
 	}):AutoWidth():Width() + 5
 	x, y = X + 10, y + 28
 

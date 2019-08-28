@@ -58,7 +58,6 @@ local GKP_LOOT_ZIBABA_QUALITY = CONSTANT.ITEM_QUALITY.PURPLE -- 小铁品级
 
 local GKP_LOOT_RECENT = {} -- 记录上次物品或物品组分配给了谁
 local GKP_ITEM_QUALITIES = {
-	{ nQuality = -1, szTitle = g_tStrings.STR_ADDON_BLOCK },
 	{ nQuality = CONSTANT.ITEM_QUALITY.WHITE  , szTitle = g_tStrings.STR_WHITE               },
 	{ nQuality = CONSTANT.ITEM_QUALITY.GREEN  , szTitle = g_tStrings.STR_ROLLQUALITY_GREEN   },
 	{ nQuality = CONSTANT.ITEM_QUALITY.BLUE   , szTitle = g_tStrings.STR_ROLLQUALITY_BLUE    },
@@ -86,17 +85,17 @@ MY_GKP_Loot.tConfirm = {
 LIB.RegisterCustomData('MY_GKP_Loot.tConfirm')
 
 MY_GKP_Loot.tItemConfig = {
-	nQualityFilter = -1,
+	tFilterQuality = {},
 	bFilterBookRead = false,
-	nAutoPickupQuality = -1,
+	tAutoPickupQuality = {},
+	tAutoPickupFilters = {},
 	bAutoPickupTaskItem = false,
 }
 LIB.RegisterCustomData('MY_GKP_Loot.tItemConfig')
 
 do
 local function onLoadingEnd()
-	MY_GKP_Loot.tItemConfig.nQualityFilter = -1
-	-- MY_GKP_Loot.tItemConfig.nAutoPickupQuality = -1
+	MY_GKP_Loot.tItemConfig.tFilterQuality = {}
 end
 LIB.RegisterEvent('LOADING_END.MY_GKP_Loot', onLoadingEnd)
 end
@@ -106,7 +105,7 @@ function MY_GKP_Loot.CanDialog(tar, doodad)
 end
 
 function MY_GKP_Loot.IsItemDisplay(itemData, config)
-	if config.nQualityFilter ~= -1 and itemData.nQuality < config.nQualityFilter then
+	if IsTable(config.tFilterQuality) and config.tFilterQuality[itemData.nQuality] then
 		return false
 	end
 	if config.bFilterBookRead and itemData.nGenre == ITEM_GENRE.BOOK then
@@ -123,10 +122,13 @@ function MY_GKP_Loot.IsItemAutoPickup(itemData, config, doodad, bCanDialog)
 	if not bCanDialog then
 		return false
 	end
+	if config.tAutoPickupFilters and config.tAutoPickupFilters[itemData.szName] then
+		return false
+	end
 	if config.bAutoPickupTaskItem and itemData.nGenre == ITEM_GENRE.TASK_ITEM then
 		return true
 	end
-	if config.nAutoPickupQuality ~= -1 and itemData.nQuality >= config.nAutoPickupQuality then
+	if config.tAutoPickupQuality[itemData.nQuality] then
 		return true
 	end
 	return false
@@ -156,7 +158,7 @@ function MY_GKP_Loot.OnFrameBreathe()
 		local hList, hItem = wnd:Lookup('', 'Handle_ItemList')
 		for i = 0, hList:GetItemCount() - 1 do
 			hItem = hList:Lookup(i)
-			if MY_GKP_Loot.IsItemAutoPickup(hItem.itemData, wnd.tItemConfig, doodad, bCanDialog)
+			if MY_GKP_Loot.IsItemAutoPickup(hItem.itemData, MY_GKP_Loot.tItemConfig, doodad, bCanDialog)
 			and not hItem.itemData.bDist and not hItem.itemData.bBidding then
 				LIB.ExecuteWithThis(hItem, MY_GKP_Loot.OnItemLButtonClick)
 			end
@@ -346,28 +348,7 @@ function MY_GKP_Loot.OnLButtonClick()
 		end
 		insert(menu, CONSTANT.MENU_DIVIDER)
 		insert(menu, Loot.GetFilterMenu())
-		insert(menu, Loot.GetAutoPickupAllMenu())
-
-		local t = { szOption = _L['Auto pickup this'] }
-		for i, p in ipairs(GKP_ITEM_QUALITIES) do
-			insert(t, {
-				szOption = p.nQuality > 0 and _L('Quality reach %s', p.szTitle) or p.szTitle,
-				rgb = p.nQuality == -1 and {255, 255, 255} or { GetItemFontColorByQuality(p.nQuality) },
-				bCheck = true, bMCheck = true, bChecked = wnd.tItemConfig.nAutoPickupQuality == p.nQuality,
-				fnAction = function()
-					wnd.tItemConfig.nAutoPickupQuality = p.nQuality
-				end,
-			})
-		end
-		insert(t, CONSTANT.MENU_DIVIDER)
-		insert(t, {
-			szOption = _L['Auto pickup quest item'],
-			bCheck = true, bChecked = wnd.tItemConfig.bAutoPickupTaskItem,
-			fnAction = function()
-				wnd.tItemConfig.bAutoPickupTaskItem = not wnd.tItemConfig.bAutoPickupTaskItem
-			end,
-		})
-		insert(menu, t)
+		insert(menu, Loot.GetAutoPickupMenu())
 		PopupMenu(menu)
 	elseif szName == 'Btn_Boss' then
 		if not Loot.AuthCheck(this:GetParent().dwDoodadID) then
@@ -606,11 +587,12 @@ function Loot.GetFilterMenu()
 	}
 	for i, p in ipairs(GKP_ITEM_QUALITIES) do
 		table.insert(t1, {
-			szOption = p.nQuality > 0 and _L('Quality below %s', p.szTitle) or p.szTitle,
-			rgb = p.nQuality == -1 and {255, 255, 255} or { GetItemFontColorByQuality(p.nQuality) },
-			bCheck = true, bMCheck = true, bChecked = MY_GKP_Loot.tItemConfig.nQualityFilter == p.nQuality,
+			szOption = p.szTitle,
+			rgb = { GetItemFontColorByQuality(p.nQuality) },
+			bCheck = true,
+			bChecked = MY_GKP_Loot.tItemConfig.tFilterQuality[p.nQuality],
 			fnAction = function()
-				MY_GKP_Loot.tItemConfig.nQualityFilter = p.nQuality
+				MY_GKP_Loot.tItemConfig.tFilterQuality[p.nQuality] = not MY_GKP_Loot.tItemConfig.tFilterQuality[p.nQuality]
 			end,
 		})
 	end
@@ -618,26 +600,49 @@ function Loot.GetFilterMenu()
 	return t
 end
 
-function Loot.GetAutoPickupAllMenu()
-	local t = { szOption = _L['Auto pickup all'] }
+function Loot.GetAutoPickupMenu()
+	local tItemConfig = MY_GKP_Loot.tItemConfig
+	local t = { szOption = _L['Auto pickup'] }
+	insert(t, {
+		szOption = _L['Auto pickup quest item'],
+		bCheck = true, bChecked = tItemConfig.bAutoPickupTaskItem,
+		fnAction = function()
+			tItemConfig.bAutoPickupTaskItem = not tItemConfig.bAutoPickupTaskItem
+		end,
+	})
+	local t1 = { szOption = _L['Auto pickup by item quality'] }
 	for i, p in ipairs(GKP_ITEM_QUALITIES) do
-		table.insert(t, {
-			szOption = p.nQuality > 0 and _L('Quality reach %s', p.szTitle) or p.szTitle,
-			rgb = p.nQuality == -1 and {255, 255, 255} or { GetItemFontColorByQuality(p.nQuality) },
-			bCheck = true, bMCheck = true, bChecked = MY_GKP_Loot.tItemConfig.nAutoPickupQuality == p.nQuality,
+		table.insert(t1, {
+			szOption = p.szTitle,
+			rgb = { GetItemFontColorByQuality(p.nQuality) },
+			bCheck = true,
+			bChecked = tItemConfig.tAutoPickupQuality[p.nQuality],
 			fnAction = function()
-				MY_GKP_Loot.tItemConfig.nAutoPickupQuality = p.nQuality
+				tItemConfig.tAutoPickupQuality[p.nQuality] = not tItemConfig.tAutoPickupQuality[p.nQuality]
 			end,
 		})
 	end
-	insert(t, CONSTANT.MENU_DIVIDER)
-	insert(t, {
-		szOption = _L['Auto pickup quest item'],
-		bCheck = true, bChecked = MY_GKP_Loot.tItemConfig.bAutoPickupTaskItem,
+	insert(t, t1)
+	local t1 = { szOption = _L['Auto pickup filters'] }
+	for s, b in pairs(tItemConfig.tAutoPickupFilters or {}) do
+		insert(t1, {
+			szOption = s,
+			bCheck = true, bChecked = b,
+			fnAction = function()
+				tItemConfig.tAutoPickupFilters[s] = not tItemConfig.tAutoPickupFilters[s]
+			end,
+		})
+	end
+	insert(t1, CONSTANT.MENU_DIVIDER)
+	insert(t1, {
+		szOption = _L['Add new'],
 		fnAction = function()
-			MY_GKP_Loot.tItemConfig.bAutoPickupTaskItem = not MY_GKP_Loot.tItemConfig.bAutoPickupTaskItem
+			GetUserInput(_L['Please input new auto pickup filter:'], function(text)
+				tItemConfig.tAutoPickupFilters[text] = true
+			end)
 		end,
 	})
+	insert(t, t1)
 	return t
 end
 
@@ -1046,7 +1051,6 @@ function Loot.GetDoodadWnd(frame, dwID, bCreate)
 	if not wnd and bCreate then
 		wnd = container:AppendContentFromIni(GKP_LOOT_INIFILE, 'Wnd_Doodad')
 		wnd.dwDoodadID = dwID
-		wnd.tItemConfig = setmetatable({}, { __index = MY_GKP_Loot.tItemConfig })
 	end
 	return wnd
 end
@@ -1090,12 +1094,12 @@ end
 function Loot.DrawLootList(dwID)
 	local frame = Loot.GetFrame()
 	local wnd = Loot.GetDoodadWnd(frame, dwID)
-	local config = wnd and wnd.tItemConfig or MY_GKP_Loot.tItemConfig
+	local config = MY_GKP_Loot.tItemConfig
 
 	-- 计算掉落
 	local szName, aItemData, bSpecial = Loot.GetDoodad(dwID)
 	local nCount = #aItemData
-	if config.nQualityFilter ~= -1 or config.bFilterBookRead then
+	if not IsEmpty(config.tFilterQuality) or config.bFilterBookRead then
 		nCount = 0
 		for i, v in ipairs(aItemData) do
 			if MY_GKP_Loot.IsItemDisplay(v, config) then
@@ -1124,7 +1128,6 @@ function Loot.DrawLootList(dwID)
 	if not wnd then
 		wnd = Loot.GetDoodadWnd(frame, dwID, true)
 	end
-	config = wnd.tItemConfig
 
 	-- 修改UI元素
 	local bDist = false
@@ -1463,9 +1466,9 @@ LIB.RegisterEvent('MY_GKP_LOOT_BOSS', function()
 end)
 
 local ui = {
-	GetMessageBox        = Loot.GetMessageBox,
-	GetaPartyMember      = Loot.GetaPartyMember,
-	GetFilterMenu        = Loot.GetFilterMenu,
-	GetAutoPickupAllMenu = Loot.GetAutoPickupAllMenu,
+	GetMessageBox     = Loot.GetMessageBox    ,
+	GetaPartyMember   = Loot.GetaPartyMember  ,
+	GetFilterMenu     = Loot.GetFilterMenu    ,
+	GetAutoPickupMenu = Loot.GetAutoPickupMenu,
 }
 setmetatable(MY_GKP_Loot, { __index = ui, __newindex = function() end, __metatable = true })
