@@ -677,10 +677,10 @@ end
 function LIB.OnScrollBarPosChanged()
 	local name = this:GetName()
 	if name == 'ScrollBar_MainPanel' then
+		local wnd = this:GetRoot().MAIN_WND
 		if not wnd.OnPanelScroll then
 			return
 		end
-		local wnd = this:GetRoot().MAIN_WND
 		local scale = Station.GetUIScale()
 		local scrollX, scrollY = wnd:GetStartRelPos()
 		scrollX = scrollX == 0 and 0 or -scrollX / scale
