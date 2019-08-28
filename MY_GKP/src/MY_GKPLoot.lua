@@ -647,7 +647,9 @@ function Loot.GetAutoPickupMenu()
 			end,
 		})
 	end
-	insert(t1, CONSTANT.MENU_DIVIDER)
+	if #t1 > 0 then
+		insert(t1, CONSTANT.MENU_DIVIDER)
+	end
 	insert(t1, {
 		szOption = _L['Add new'],
 		fnAction = function()
@@ -677,7 +679,9 @@ function Loot.GetAutoPickupMenu()
 			end,
 		})
 	end
-	insert(t1, CONSTANT.MENU_DIVIDER)
+	if #t1 > 0 then
+		insert(t1, CONSTANT.MENU_DIVIDER)
+	end
 	insert(t1, {
 		szOption = _L['Add new'],
 		fnAction = function()
