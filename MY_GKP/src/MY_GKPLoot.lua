@@ -635,6 +635,16 @@ function Loot.GetAutoPickupMenu()
 			fnAction = function()
 				tItemConfig.tAutoPickupNames[s] = not tItemConfig.tAutoPickupNames[s]
 			end,
+			szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',
+			nFrame = 49,
+			nMouseOverFrame = 51,
+			nIconWidth = 17,
+			nIconHeight = 17,
+			szLayer = 'ICON_RIGHTMOST',
+			fnClickIcon = function()
+				tItemConfig.tAutoPickupNames[s] = nil
+				Wnd.CloseWindow('PopupMenuPanel')
+			end,
 		})
 	end
 	insert(t1, CONSTANT.MENU_DIVIDER)
@@ -654,6 +664,16 @@ function Loot.GetAutoPickupMenu()
 			bCheck = true, bChecked = b,
 			fnAction = function()
 				tItemConfig.tAutoPickupFilters[s] = not tItemConfig.tAutoPickupFilters[s]
+			end,
+			szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',
+			nFrame = 49,
+			nMouseOverFrame = 51,
+			nIconWidth = 17,
+			nIconHeight = 17,
+			szLayer = 'ICON_RIGHTMOST',
+			fnClickIcon = function()
+				tItemConfig.tAutoPickupFilters[s] = nil
+				Wnd.CloseWindow('PopupMenuPanel')
 			end,
 		})
 	end
