@@ -87,9 +87,10 @@ LIB.RegisterCustomData('MY_GKP_Loot.tConfirm')
 MY_GKP_Loot.tItemConfig = {
 	tFilterQuality = {},
 	bFilterBookRead = false,
-	tAutoPickupQuality = {},
-	tAutoPickupFilters = {},
 	bAutoPickupTaskItem = false,
+	tAutoPickupQuality = {},
+	tAutoPickupNames = {},
+	tAutoPickupFilters = {},
 }
 LIB.RegisterCustomData('MY_GKP_Loot.tItemConfig')
 
@@ -121,6 +122,9 @@ end
 function MY_GKP_Loot.IsItemAutoPickup(itemData, config, doodad, bCanDialog)
 	if not bCanDialog then
 		return false
+	end
+	if config.tAutoPickupNames and config.tAutoPickupNames[itemData.szName] then
+		return true
 	end
 	if config.tAutoPickupFilters and config.tAutoPickupFilters[itemData.szName] then
 		return false
@@ -622,6 +626,26 @@ function Loot.GetAutoPickupMenu()
 			end,
 		})
 	end
+	insert(t, t1)
+	local t1 = { szOption = _L['Auto pickup names'] }
+	for s, b in pairs(tItemConfig.tAutoPickupNames or {}) do
+		insert(t1, {
+			szOption = s,
+			bCheck = true, bChecked = b,
+			fnAction = function()
+				tItemConfig.tAutoPickupNames[s] = not tItemConfig.tAutoPickupNames[s]
+			end,
+		})
+	end
+	insert(t1, CONSTANT.MENU_DIVIDER)
+	insert(t1, {
+		szOption = _L['Add new'],
+		fnAction = function()
+			GetUserInput(_L['Please input new auto pickup name:'], function(text)
+				tItemConfig.tAutoPickupNames[text] = true
+			end)
+		end,
+	})
 	insert(t, t1)
 	local t1 = { szOption = _L['Auto pickup filters'] }
 	for s, b in pairs(tItemConfig.tAutoPickupFilters or {}) do
