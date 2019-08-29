@@ -156,7 +156,7 @@ function TS.OnFrameBreathe()
 		else
 			local lifeper = p.nCurrentLife / p.nMaxLife
 			this.CastBar:Hide()
-			this.txt:SetText(MY_GetObjName(p, true) .. string.format(' (%0.1f%%)', lifeper * 100))
+			this.txt:SetText(MY_GetObjName(p) .. string.format(' (%0.1f%%)', lifeper * 100))
 			this.Life:SetPercentage(lifeper)
 		end
 
