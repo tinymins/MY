@@ -393,4 +393,4 @@ function PS.OnPanelActive(wnd)
 		text = _L['origin author: Sulian Yi'],
 	})
 end
-LIB.RegisterPanel('MY_ArchHUD', _L['MY_ArchHUD'], _L['General'], 6767, PS)
+LIB.RegisterPanel('MY_ArchHUD', _L['MY_ArchHUD'], _L['Target'], 6767, PS)

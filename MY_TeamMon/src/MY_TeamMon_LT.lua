@@ -140,7 +140,7 @@ end
 
 LIB.RegisterInit('MY_TeamMon_LT', D.Init)
 
-local PS = { bShielded = true }
+local PS = { bShielded = true, nShielded = 2 }
 function PS.OnPanelActive(frame)
 	local ui = UI(frame)
 	local X, Y = 20, 20
