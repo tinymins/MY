@@ -955,9 +955,9 @@ function MY_Recount_Detail.OnFrameBreathe()
 			for id, p in pairs(tData.Skill[szSelectedSkill].Target) do
 				local rec = {
 					szKey          = id,
-					nHitCount      = p.Count[SKILL_RESULT.HIT] or 0,
-					nMissCount     = p.Count[SKILL_RESULT.MISS] or 0,
-					nCriticalCount = p.Count[SKILL_RESULT.CRITICAL] or 0,
+					nHitCount      = MY_Recount.bShowZeroVal and (p.Count[SKILL_RESULT.HIT] or 0) or p.NzCount[SKILL_RESULT.HIT] or 0,
+					nMissCount     = MY_Recount.bShowZeroVal and (p.Count[SKILL_RESULT.MISS] or 0) or p.NzCount[SKILL_RESULT.MISS] or 0,
+					nCriticalCount = MY_Recount.bShowZeroVal and (p.Count[SKILL_RESULT.CRITICAL] or 0) or p.NzCount[SKILL_RESULT.CRITICAL] or 0,
 					nMax           = MY_Recount.bShowEffect and p.nMaxEffect or p.nMax,
 					nTotal         = MY_Recount.bShowEffect and p.nTotalEffect or p.nTotal,
 					szName         = MY_Recount.Data.GetNameAusID(id, DataDisplay),
@@ -969,9 +969,9 @@ function MY_Recount_Detail.OnFrameBreathe()
 		else
 			for szSkillName, p in pairs(tData.Target[szSelectedTarget].Skill) do
 				local rec = {
-					nHitCount      = p.Count[SKILL_RESULT.HIT] or 0,
-					nMissCount     = p.Count[SKILL_RESULT.MISS] or 0,
-					nCriticalCount = p.Count[SKILL_RESULT.CRITICAL] or 0,
+					nHitCount      = MY_Recount.bShowZeroVal and (p.Count[SKILL_RESULT.HIT] or 0) or p.NzCount[SKILL_RESULT.HIT] or 0,
+					nMissCount     = MY_Recount.bShowZeroVal and (p.Count[SKILL_RESULT.MISS] or 0) or p.NzCount[SKILL_RESULT.MISS] or 0,
+					nCriticalCount = MY_Recount.bShowZeroVal and (p.Count[SKILL_RESULT.CRITICAL] or 0) or p.NzCount[SKILL_RESULT.CRITICAL] or 0,
 					nMax           = MY_Recount.bShowEffect and p.nMaxEffect or p.nMax,
 					nTotal         = MY_Recount.bShowEffect and p.nTotalEffect or p.nTotal,
 					szName         = szSkillName,
