@@ -246,7 +246,7 @@ function D.OnAutoDoodad()
 	end
 	for k, v in pairs(D.tDoodad) do
 		local doodad, bKeep, bIntr = GetDoodad(k), false, false
-		if not doodad or not doodad.CanDialog(me) or v.other then
+		if not doodad or not doodad.CanDialog(me) then
 			-- 若存在却不能对话只简单保留
 			bKeep = doodad ~= nil
 		elseif v.loot then -- 尸体只摸一次
@@ -257,6 +257,9 @@ function D.OnAutoDoodad()
 			end
 		elseif v.craft or doodad.HaveQuest(me.dwID) then -- 任务和普通道具尝试 5 次
 			bIntr = (not me.bFightState or O.bInteractEvenFight) and not me.bOnHorse and IsAutoInteract()
+			bKeep = true
+		elseif v.other then -- 其它类型交互并保留
+			bIntr = true
 			bKeep = true
 		end
 		if not bKeep then
