@@ -1164,7 +1164,9 @@ function Loot.DrawLootList(dwID)
 			Loot.RemoveLootList(dwID)
 		end
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('Doodad does not exist!', 'MY_GKP_Loot:DrawLootList', DEBUG_LEVEL.LOG)
+		if not szName then
+			LIB.Debug('Doodad does not exist!', 'MY_GKP_Loot:DrawLootList', DEBUG_LEVEL.LOG)
+		end
 		--[[#DEBUG END]]
 		return
 	end
@@ -1415,7 +1417,9 @@ function Loot.GetDoodad(dwID)
 				end
 				data.szType = GetItemDataType(data)
 				data.nWeight = ITEM_DATA_WEIGHT[data.szType]
-				table.insert(aItemData, data)
+				if (not data.bNeedRoll and not data.bBidding) or MY_GKP.bDebug then
+					table.insert(aItemData, data)
+				end
 			end
 		end
 	end
