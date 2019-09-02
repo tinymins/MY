@@ -9,3 +9,4 @@ lua_0=src/MY_GKP.lua
 lua_1=src/MY_GKPLoot.lua
 lua_2=src/MY_GKPChat.lua
 lua_3=src/MY_GKPVote.lua
+lua_4=src/MY_GKPDoodad.lua

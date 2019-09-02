@@ -47,15 +47,6 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
 	return
 end
 --------------------------------------------------------------------------
-
-local ITEM_QUALITIE = {
-	[1] = g_tStrings.STR_WHITE,
-	[2] = g_tStrings.STR_ROLLQUALITY_GREEN,
-	[3] = g_tStrings.STR_ROLLQUALITY_BLUE,
-	[4] = g_tStrings.STR_ROLLQUALITY_PURPLE,
-	[5] = g_tStrings.STR_ROLLQUALITY_NACARAT,
-}
-
 MY_GKP = {
 	bDebug               = false,
 	bDebug2              = false,
@@ -661,73 +652,6 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	y = y + 28
-
-	x = X
-	ui:Append('Text', { x = x, y = y, text = _L['GKP Loot'], font = 27 })
-	x, y = X + 10, y + 28
-
-	x = x + ui:Append('WndComboBox', {
-		x = x, y = y, w = 200,
-		text = _L['Confirm when distribute'],
-		lmenu = function()
-			local t = {}
-			insert(t, { szOption = _L['Category'], bDisable = true })
-			for _, szKey in ipairs({
-				'Huangbaba',
-				'Book',
-				'Pendant',
-				'Outlook',
-				'Pet',
-				'Horse',
-				'HorseEquip',
-			}) do
-				insert(t, {
-					szOption = _L[szKey],
-					bCheck = true,
-					bChecked = MY_GKP_Loot.tConfirm[szKey],
-					fnAction = function()
-						MY_GKP_Loot.tConfirm[szKey] = not MY_GKP_Loot.tConfirm[szKey]
-					end,
-				})
-			end
-			insert(t, CONSTANT.MENU_DIVIDER)
-			insert(t, { szOption = _L['Quality'], bDisable = true })
-			for i = 2, 5 do
-				insert(t, {
-					szOption = _L('Reach %s', ITEM_QUALITIE[i]),
-					rgb = i == -1 and {255, 255, 255} or { GetItemFontColorByQuality(i) },
-					bCheck = true, bMCheck = true,
-					bChecked = i == MY_GKP_Loot.nConfirmQuality,
-					fnAction = function()
-						MY_GKP_Loot.nConfirmQuality = i
-					end,
-				})
-			end
-			return t
-		end,
-	}):AutoWidth():Width() + 5
-	x = x + ui:Append('WndComboBox', {
-		x = x, y = y, w = 200,
-		text = _L['Loot item filter'],
-		menu = MY_GKP_Loot.GetFilterMenu
-	}):AutoWidth():Width() + 5
-	x = x + ui:Append('WndComboBox', {
-		x = x, y = y, w = 200,
-		text = _L['Auto pickup'],
-		menu = MY_GKP_Loot.GetAutoPickupMenu
-	}):AutoWidth():Width() + 5
-	x, y = X + 10, y + 28
-
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y,
-		text = _L['Show 2nd kungfu fit icon'],
-		checked = MY_GKP.bShow2ndKungfuLoot,
-		oncheck = function()
-			MY_GKP.bShow2ndKungfuLoot = not MY_GKP.bShow2ndKungfuLoot
-			FireUIEvent('MY_GKP_LOOT_RELOAD')
-		end,
-	}):AutoWidth():Width() + 5
-	x, y = X + 10, y + 28
 
 	if MY_GKP.bDebug then
 		ui:Append('WndCheckBox', {
