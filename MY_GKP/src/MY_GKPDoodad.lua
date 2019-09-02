@@ -452,7 +452,7 @@ function PS.OnPanelActive(frame)
 		end,
 	}):AutoWidth():Width() + 10
 
-	nX, nY = X + 10, nY + 32
+	nX, nY = X + 10, nY + 28
 	nX = nX + ui:Append('WndComboBox', {
 		x = nX, y = nY, w = 200,
 		text = _L['Confirm when distribute'],
@@ -511,7 +511,7 @@ function PS.OnPanelActive(frame)
 	}):AutoWidth():Width() + 5
 
 	-- doodad
-	nX, nY = X, nY + 28
+	nX, nY = X, nY + 32
 	ui:Append('Text', { text = _L['Craft assit'], x = nX, y = nY, font = 27 })
 
 	nX, nY = X + 10, nY + 28
@@ -533,6 +533,7 @@ function PS.OnPanelActive(frame)
 				MY_GKPDoodad.tNameColor = { r, g, b }
 			end)
 		end,
+		autoenable = function() return MY_GKPDoodad.bShowName end,
 	}):Pos('BOTTOMRIGHT') + 10
 
 	nX = ui:Append('WndCheckBox', {
@@ -542,6 +543,7 @@ function PS.OnPanelActive(frame)
 		oncheck = function(bChecked)
 			MY_GKPDoodad.bMiniFlag = bChecked
 		end,
+		autoenable = function() return MY_GKPDoodad.bShowName end,
 	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
 
 	nX = ui:Append('WndCheckBox', {
@@ -587,6 +589,7 @@ function PS.OnPanelActive(frame)
 					end
 					D.RescanNearby()
 				end,
+				autoenable = function() return MY_GKPDoodad.bShowName or MY_GKPDoodad.bInteract end,
 			})
 			nX = nX + 90
 			if nX > 500 then
@@ -608,6 +611,7 @@ function PS.OnPanelActive(frame)
 		oncheck = function(bChecked)
 			MY_GKPDoodad.bQuestDoodad = bChecked
 		end,
+		autoenable = function() return MY_GKPDoodad.bShowName or MY_GKPDoodad.bInteract end,
 	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
 
 	nX = ui:Append('WndCheckBox', {
@@ -617,6 +621,7 @@ function PS.OnPanelActive(frame)
 		oncheck = function(bChecked)
 			MY_GKPDoodad.bAllDoodad = bChecked
 		end,
+		autoenable = function() return MY_GKPDoodad.bShowName or MY_GKPDoodad.bInteract end,
 	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
 
 	-- custom
@@ -629,6 +634,7 @@ function PS.OnPanelActive(frame)
 			MY_GKPDoodad.bCustom = bChecked
 			ui:Fetch('Edit_Custom'):Enable(bChecked)
 		end,
+		autoenable = function() return MY_GKPDoodad.bShowName or MY_GKPDoodad.bInteract end,
 	}):AutoWidth():Pos('BOTTOMRIGHT') + 5
 
 	ui:Append('WndEditBox', {
@@ -649,6 +655,7 @@ function PS.OnPanelActive(frame)
 		end,
 		tip = _L['Tip: Enter the name of dead animals can be automatically Paoding!'],
 		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+		autoenable = function() return (MY_GKPDoodad.bShowName or MY_GKPDoodad.bInteract) and MY_GKPDoodad.bCustom end,
 	})
 end
 LIB.RegisterPanel('MY_GKPDoodad', _L['GKP Doodad helper'], _L['General'], 90, PS)
