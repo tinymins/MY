@@ -3446,7 +3446,6 @@ else
 	end
 end
 
-
 if IsFunction(ForceIDToKungfuIDs) then
 	LIB.ForceIDToKungfuIDs = ForceIDToKungfuIDs
 else
@@ -3471,5 +3470,19 @@ else
 			}
 		end
 		return m_tForceToKungfu[dwForceID] or {}
+	end
+end
+
+-- 追加小地图标记
+-- (void) LIB.UpdateMiniFlag(number dwType, KObject tar, number nF1[, number nF2])
+-- dwType -- 类型，1 - 队友，2 - 提示点，4 - 任务 NPC，5 - Doodad，7 - 功能 NPC，8 - 红名
+-- tar    -- 目标对象 KPlayer，KNpc，KDoodad
+-- nF1    -- 图标帧次
+-- nF2    -- 箭头帧次，默认 48 就行
+function LIB.UpdateMiniFlag(dwType, tar, nF1, nF2)
+	local nX, nZ = Scene_PlaneGameWorldPosToScene(tar.nX, tar.nY)
+	local m = Station.Lookup('Normal/Minimap/Wnd_Minimap/Minimap_Map')
+	if m then
+		m:UpdataArrowPoint(dwType, tar.dwID, nF1, nF2 or 48, nX, nZ, 16)
 	end
 end
