@@ -159,9 +159,6 @@ function D.TryAdd(dwID, bDelay)
 	end
 end
 
-A=D
-_G.IsAutoInteract = IsAutoInteract
-
 -- remove doodad
 function D.Remove(dwID)
 	local data = D.tDoodad[dwID]
@@ -585,6 +582,7 @@ function PS.OnPanelActive(frame)
 					else
 						MY_GKPDoodad.tCraft[k] = nil
 					end
+					D.RescanNearby()
 				end,
 			})
 			nX = nX + 90
