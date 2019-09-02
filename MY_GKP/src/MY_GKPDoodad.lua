@@ -49,29 +49,29 @@ end
 local O = {
 	bOpenLoot = false, -- 自动打开掉落
 	bOpenLootEvenFight = false, -- 战斗中也打开
+	bShowName = false, -- 显示物品名称
+	tNameColor = { 196, 64, 255 }, -- 头顶名称颜色
+	bMiniFlag = false, -- 显示小地图标记
 	bInteract = false, -- 自动采集
 	bInteractEvenFight = false, -- 战斗中也采集
-	bInteractQuestDoodad = false, -- 自动采集任务物品
-	bInteractShowName = false, -- 显示物品名称
-	bAllDoodadShowName = false, -- 显示所有物品名称
-	bMiniFlag = false, -- 显示小地图标记
 	tCraft = {}, -- 草药、矿石列表
+	bQuestDoodad = false, -- 任务物品
+	bAllDoodad = false, -- 其它全部
 	bCustom = true, -- 启用自定义
 	tCustom = {}, -- 自定义列表
-	tNameColor = { 196, 64, 255 }, -- 头顶名称颜色
 }
 RegisterCustomData('MY_GKPDoodad.bOpenLoot')
 RegisterCustomData('MY_GKPDoodad.bOpenLootEvenFight')
+RegisterCustomData('MY_GKPDoodad.bShowName')
+RegisterCustomData('MY_GKPDoodad.tNameColor')
+RegisterCustomData('MY_GKPDoodad.bMiniFlag')
 RegisterCustomData('MY_GKPDoodad.bInteract')
 RegisterCustomData('MY_GKPDoodad.bInteractEvenFight')
-RegisterCustomData('MY_GKPDoodad.bInteractQuestDoodad')
-RegisterCustomData('MY_GKPDoodad.bInteractShowName')
-RegisterCustomData('MY_GKPDoodad.bMiniFlag')
 RegisterCustomData('MY_GKPDoodad.tCraft')
+RegisterCustomData('MY_GKPDoodad.bQuestDoodad')
+RegisterCustomData('MY_GKPDoodad.bAllDoodad')
 RegisterCustomData('MY_GKPDoodad.bCustom')
 RegisterCustomData('MY_GKPDoodad.tCustom')
-RegisterCustomData('MY_GKPDoodad.tNameColor')
-RegisterCustomData('MY_GKPDoodad.bAllDoodadShowName')
 
 ---------------------------------------------------------------------
 -- 本地函数和变量
@@ -139,17 +139,17 @@ function D.TryAdd(dwID, bDelay)
 			then
 				data = { craft = true }
 			end
-		elseif O.bInteractQuestDoodad and (doodad.dwTemplateID == 3713 or doodad.dwTemplateID == 3714) then
+		elseif O.bQuestDoodad and (doodad.dwTemplateID == 3713 or doodad.dwTemplateID == 3714) then
 			data = { craft = true }
 		elseif O.tCraft[doodad.szName] or (O.bCustom and O.tCustom[doodad.szName]) then
 			data = { craft = true }
 		elseif doodad.HaveQuest(me.dwID) then
-			if O.bInteractQuestDoodad then
+			if O.bQuestDoodad then
 				data = { quest = true }
 			end
-		elseif doodad.dwTemplateID == 4733 or doodad.dwTemplateID == 4734 and O.bInteractQuestDoodad then
+		elseif doodad.dwTemplateID == 4733 or doodad.dwTemplateID == 4734 and O.bQuestDoodad then
 			data = { craft = true }
-		elseif O.bAllDoodadShowName and CanSelectDoodad(doodad.dwID) then
+		elseif O.bAllDoodad and CanSelectDoodad(doodad.dwID) then
 			data = { other = true }
 		end
 		if data then
@@ -183,7 +183,7 @@ end
 -- switch name
 function D.CheckShowName()
 	local hName = UI.GetShadowHandle('MY_GKPDoodad')
-	if O.bInteractShowName and not D.pLabel then
+	if O.bShowName and not D.pLabel then
 		D.pLabel = hName:AppendItemFromIni(INI_SHADOW, 'Shadow', 'Shadow_Name')
 		LIB.BreatheCall('MY_GKPDoodad#HeadName', function()
 			if D.bUpdateLabel then
@@ -192,7 +192,7 @@ function D.CheckShowName()
 			end
 		end)
 		D.bUpdateLabel = true
-	elseif not O.bInteractShowName and D.pLabel then
+	elseif not O.bShowName and D.pLabel then
 		hName:Clear()
 		D.pLabel = nil
 		LIB.BreatheCall('MY_GKPDoodad#HeadName', false)
@@ -400,7 +400,7 @@ LIB.RegisterEvent('HELP_EVENT', function()
 	end
 end)
 LIB.RegisterEvent('QUEST_ACCEPTED', function()
-	if O.bInteractQuestDoodad then
+	if O.bQuestDoodad then
 		D.RescanNearby()
 	end
 end)
@@ -517,49 +517,10 @@ function PS.OnPanelActive(frame)
 	nX, nY = X + 10, nY + 28
 	nX = ui:Append('WndCheckBox', {
 		x = nX, y = nY,
-		text = _L['Auto craft'],
-		checked = MY_GKPDoodad.bInteract,
-		oncheck = function(bChecked)
-			MY_GKPDoodad.bInteract = bChecked
-			ui:Fetch('Check_Interact_Fight'):Enable(bChecked)
-		end,
-	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
-
-	nX = ui:Append('WndCheckBox', {
-		name = 'Check_Interact_Fight', x = nX, y = nY,
-		text = _L['Interact in fight'],
-		checked = MY_GKPDoodad.bInteractEvenFight,
-		enable = MY_GKPDoodad.bOpenLoot,
-		oncheck = function(bChecked)
-			MY_GKPDoodad.bInteractEvenFight = bChecked
-		end,
-	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
-
-	nX = ui:Append('WndCheckBox', {
-		x = nX, y = nY,
-		text = _L['Quest items'],
-		checked = MY_GKPDoodad.bInteractQuestDoodad,
-		oncheck = function(bChecked)
-			MY_GKPDoodad.bInteractQuestDoodad = bChecked
-		end,
-	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
-
-	nX = ui:Append('WndCheckBox', {
-		x = nX, y = nY,
-		text = _L['All other'],
-		checked = MY_GKPDoodad.bAllDoodadShowName,
-		oncheck = function(bChecked)
-			MY_GKPDoodad.bAllDoodadShowName = bChecked
-		end,
-	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
-
-	nX, nY = X + 10, nY + 28
-	nX = ui:Append('WndCheckBox', {
-		x = nX, y = nY,
 		text = _L['Show the head name'],
-		checked = MY_GKPDoodad.bInteractShowName,
+		checked = MY_GKPDoodad.bShowName,
 		oncheck = function()
-			MY_GKPDoodad.bInteractShowName = not MY_GKPDoodad.bInteractShowName
+			MY_GKPDoodad.bShowName = not MY_GKPDoodad.bShowName
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
 
@@ -580,6 +541,26 @@ function PS.OnPanelActive(frame)
 		checked = MY_GKPDoodad.bMiniFlag,
 		oncheck = function(bChecked)
 			MY_GKPDoodad.bMiniFlag = bChecked
+		end,
+	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
+
+	nX = ui:Append('WndCheckBox', {
+		x = nX, y = nY,
+		text = _L['Auto craft'],
+		checked = MY_GKPDoodad.bInteract,
+		oncheck = function(bChecked)
+			MY_GKPDoodad.bInteract = bChecked
+			ui:Fetch('Check_Interact_Fight'):Enable(bChecked)
+		end,
+	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
+
+	nX = ui:Append('WndCheckBox', {
+		name = 'Check_Interact_Fight', x = nX, y = nY,
+		text = _L['Interact in fight'],
+		checked = MY_GKPDoodad.bInteractEvenFight,
+		enable = MY_GKPDoodad.bOpenLoot,
+		oncheck = function(bChecked)
+			MY_GKPDoodad.bInteractEvenFight = bChecked
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
 
@@ -618,8 +599,27 @@ function PS.OnPanelActive(frame)
 		nY = nY + 28
 	end
 
-	-- custom
 	nX = X + 10
+	nX = ui:Append('WndCheckBox', {
+		x = nX, y = nY,
+		text = _L['Quest items'],
+		checked = MY_GKPDoodad.bQuestDoodad,
+		oncheck = function(bChecked)
+			MY_GKPDoodad.bQuestDoodad = bChecked
+		end,
+	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
+
+	nX = ui:Append('WndCheckBox', {
+		x = nX, y = nY,
+		text = _L['All other'],
+		checked = MY_GKPDoodad.bAllDoodad,
+		oncheck = function(bChecked)
+			MY_GKPDoodad.bAllDoodad = bChecked
+		end,
+	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
+
+	-- custom
+	nX, nY = X + 10, nY + 32
 	nX = ui:Append('WndCheckBox', {
 		text = _L['Customs (split by | )'],
 		x = nX, y = nY,
@@ -664,16 +664,16 @@ local settings = {
 			fields = {
 				bOpenLoot = true,
 				bOpenLootEvenFight = true,
+				bShowName = true,
+				tNameColor = true,
+				bMiniFlag = true,
 				bInteract = true,
 				bInteractEvenFight = true,
-				bInteractQuestDoodad = true,
-				bInteractShowName = true,
-				bMiniFlag = true,
 				tCraft = true,
+				bQuestDoodad = true,
+				bAllDoodad = true,
 				bCustom = true,
 				tCustom = true,
-				tNameColor = true,
-				bAllDoodadShowName = true,
 			},
 			root = O,
 		},
@@ -683,30 +683,30 @@ local settings = {
 			fields = {
 				bOpenLoot = true,
 				bOpenLootEvenFight = true,
+				bShowName = true,
+				tNameColor = true,
+				bMiniFlag = true,
 				bInteract = true,
 				bInteractEvenFight = true,
-				bInteractQuestDoodad = true,
-				bInteractShowName = true,
-				bMiniFlag = true,
 				tCraft = true,
+				bQuestDoodad = true,
+				bAllDoodad = true,
 				bCustom = true,
 				tCustom = true,
-				tNameColor = true,
-				bAllDoodadShowName = true,
 			},
 			triggers = {
 				bOpenLoot = D.RescanNearby,
 				bOpenLootEvenFight = D.RescanNearby,
+				bShowName = D.CheckShowName,
+				tNameColor = D.RescanNearby,
+				bMiniFlag = D.RescanNearby,
 				bInteract = D.RescanNearby,
 				bInteractEvenFight = D.RescanNearby,
-				bInteractQuestDoodad = D.RescanNearby,
-				bInteractShowName = D.CheckShowName,
-				bMiniFlag = D.RescanNearby,
 				tCraft = D.RescanNearby,
+				bQuestDoodad = D.RescanNearby,
+				bAllDoodad = D.RescanNearby,
 				bCustom = D.RescanNearby,
 				tCustom = D.RescanNearby,
-				tNameColor = D.RescanNearby,
-				bAllDoodadShowName = D.RescanNearby,
 			},
 			root = O,
 		},
