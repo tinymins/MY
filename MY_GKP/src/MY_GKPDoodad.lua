@@ -558,7 +558,7 @@ function PS.OnPanelActive(frame)
 		name = 'Check_Interact_Fight', x = nX, y = nY,
 		text = _L['Interact in fight'],
 		checked = MY_GKPDoodad.bInteractEvenFight,
-		enable = MY_GKPDoodad.bOpenLoot,
+		enable = MY_GKPDoodad.bInteract,
 		oncheck = function(bChecked)
 			MY_GKPDoodad.bInteractEvenFight = bChecked
 		end,
