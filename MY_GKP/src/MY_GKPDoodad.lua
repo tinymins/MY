@@ -450,9 +450,18 @@ function PS.OnPanelActive(frame)
 			MY_GKP.bShow2ndKungfuLoot = not MY_GKP.bShow2ndKungfuLoot
 			FireUIEvent('MY_GKP_LOOT_RELOAD')
 		end,
+		autoenable = function() return MY_GKP.bOn end,
 	}):AutoWidth():Width() + 10
 
 	nX, nY = X + 10, nY + 28
+	nX = ui:Append('WndCheckBox', {
+		x = nX, y = nY,
+		text = _L['Enable MY_GKP_Loot'],
+		checked = MY_GKP.bOn,
+		oncheck = function(bChecked)
+			MY_GKP.bOn = bChecked
+		end,
+	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
 	nX = nX + ui:Append('WndComboBox', {
 		x = nX, y = nY, w = 200,
 		text = _L['Confirm when distribute'],
@@ -498,16 +507,19 @@ function PS.OnPanelActive(frame)
 			end
 			return t
 		end,
+		autoenable = function() return MY_GKP.bOn end,
 	}):AutoWidth():Width() + 5
 	nX = nX + ui:Append('WndComboBox', {
 		x = nX, y = nY, w = 200,
 		text = _L['Loot item filter'],
-		menu = MY_GKP_Loot.GetFilterMenu
+		menu = MY_GKP_Loot.GetFilterMenu,
+		autoenable = function() return MY_GKP.bOn end,
 	}):AutoWidth():Width() + 5
 	nX = nX + ui:Append('WndComboBox', {
 		x = nX, y = nY, w = 200,
 		text = _L['Auto pickup'],
-		menu = MY_GKP_Loot.GetAutoPickupMenu
+		menu = MY_GKP_Loot.GetAutoPickupMenu,
+		autoenable = function() return MY_GKP.bOn end,
 	}):AutoWidth():Width() + 5
 
 	-- doodad

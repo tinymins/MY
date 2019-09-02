@@ -180,6 +180,7 @@ data = {
 	['Auto append'] = '茗伊金团追加',
 	-- Doodad
 	['GKP Doodad helper'] = '金团拾取',
+	['Enable MY_GKP_Loot'] = '启用金团拾取',
 	['Pickup helper'] = '拾取助手',
 	['Enable auto pickup'] = '自动打开掉落',
 	['Auto craft'] = '自动采集',
