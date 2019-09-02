@@ -597,7 +597,7 @@ function PS.OnPanelActive(frame)
 	end
 	nY = nY + 8
 	if nX ~= X + 10 then
-		nY = nY + 28
+		nY = nY + 24
 	end
 
 	nX = X + 10
