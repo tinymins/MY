@@ -494,7 +494,7 @@ function PS.OnPanelActive(frame)
 		name = 'Shadow_Color', x = nX + 2, y = nY + 4, w = 18, h = 18,
 		color = MY_GKPDoodad.tNameColor,
 		onclick = function()
-			OpenColorTablePanel(function(r, g, b)
+			UI.OpenColorPicker(function(r, g, b)
 				ui:Fetch('Shadow_Color'):Color(r, g, b)
 				MY_GKPDoodad.tNameColor = { r, g, b }
 			end)
