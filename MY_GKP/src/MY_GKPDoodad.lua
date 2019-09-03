@@ -71,7 +71,7 @@ RegisterCustomData('MY_GKPDoodad.tCraft')
 RegisterCustomData('MY_GKPDoodad.bQuestDoodad')
 RegisterCustomData('MY_GKPDoodad.bAllDoodad')
 RegisterCustomData('MY_GKPDoodad.bCustom')
-RegisterCustomData('MY_GKPDoodad.tCustom')
+RegisterCustomData('MY_GKPDoodad.szCustom')
 
 ---------------------------------------------------------------------
 -- 本地函数和变量
@@ -102,19 +102,6 @@ local D = {
 	nToLoot = 0,  -- 待拾取处理数量（用于修复判断）
 }
 
--- get custom text
-function D.GetCustomText()
-	local szText = ''
-	for k, _ in pairs(O.tCustom) do
-		if szText == '' then
-			szText = k
-		else
-			szText = szText .. '|' .. k
-		end
-	end
-	return szText
-end
-
 -- try to add
 function D.TryAdd(dwID, bDelay)
 	local doodad = GetDoodad(dwID)
@@ -126,14 +113,14 @@ function D.TryAdd(dwID, bDelay)
 			end
 			if O.bOpenLoot and doodad.CanLoot(me.dwID) then
 				data = { loot = true }
-			elseif O.bCustom and O.tCustom[doodad.szName]
+			elseif O.bCustom and D.tCustom[doodad.szName]
 				and GetDoodadTemplate(doodad.dwTemplateID).dwCraftID == 3
 			then
 				data = { craft = true }
 			end
 		elseif O.bQuestDoodad and (doodad.dwTemplateID == 3713 or doodad.dwTemplateID == 3714) then
 			data = { craft = true }
-		elseif O.tCraft[doodad.szName] or (O.bCustom and O.tCustom[doodad.szName]) then
+		elseif O.tCraft[doodad.szName] or (O.bCustom and D.tCustom[doodad.szName]) then
 			data = { craft = true }
 		elseif doodad.HaveQuest(me.dwID) then
 			if O.bQuestDoodad then
@@ -296,7 +283,7 @@ function D.OnOpenDoodad(dwID)
 	local doodad = GetDoodad(dwID)
 	if doodad then
 		if IsAutoInteract() and O.bCustom
-			and O.tCustom[doodad.szName] and GetDoodadTemplate(doodad.dwTemplateID).dwCraftID == 3 --庖丁
+			and D.tCustom[doodad.szName] and GetDoodadTemplate(doodad.dwTemplateID).dwCraftID == 3 --庖丁
 		then
 			D.tDoodad[dwID] = { craft = true }
 			D.bUpdateLabel = true
@@ -314,14 +301,17 @@ function D.OnLootDoodad()
 		return
 	end
 	local t = GetDoodadTemplate(doodad.dwTemplateID)
-	if t.dwCraftID >= 1 and t.dwCraftID <= 3 and not O.tCraft[doodad.szName] then
+	if (t.dwCraftID == CONSTANT.CRAFT_TYPE.MINING
+		or t.dwCraftID == CONSTANT.CRAFT_TYPE.HERBALISM
+		or t.dwCraftID == CONSTANT.CRAFT_TYPE.SKINNING)
+	and not O.tCraft[doodad.szName] then
 		for _, v in ipairs(D.tCraft) do
 			if v == doodad.dwTemplateID then
 				O.tCraft[doodad.szName] = true
 				return
 			end
 		end
-		O.tCustom[doodad.szName] = true
+		D.tCustom[doodad.szName] = true
 	end
 end
 
@@ -344,9 +334,9 @@ function D.OnUpdateMiniFlag()
 				local tpl = GetDoodadTemplate(tar.dwTemplateID)
 				if v.quest then
 					nF1 = 114
-				elseif tpl.dwCraftID == 1 then	-- 采金类
+				elseif tpl.dwCraftID == CONSTANT.CRAFT_TYPE.MINING then	-- 采金类
 					nF1, nF2 = 16, 47
-				elseif tpl.dwCraftID == 2 then	-- 神农类
+				elseif tpl.dwCraftID == CONSTANT.CRAFT_TYPE.HERBALISM then	-- 神农类
 					nF1 = 2
 				end
 				LIB.UpdateMiniFlag(dwType, tar, nF1, nF2)
