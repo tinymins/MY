@@ -887,6 +887,12 @@ local CONSTANT = setmetatable({}, {
 			NACARAT = 5, -- 橙色
 			GLODEN  = 6, -- 暗金
 		}),
+		CRAFT_TYPE = {
+			MINING = 1, --采矿
+			HERBALISM = 2, -- 神农
+			SKINNING = 3, -- 庖丁
+			READING = 8, -- 阅读
+		},
 		-- 相同名字的地图 全部指向同一个ID
 		MAP_NAME_FIX = {
 			[143] = 147, -- 试炼之地
