@@ -1146,6 +1146,9 @@ function Loot.DrawLootList(dwID)
 
 	-- ¼ÆËãµôÂä
 	local aItemData, nMoney, szName, bSpecial = Loot.GetDoodadLootInfo(dwID)
+	if nMoney > 0 then
+		LootMoney(dwID)
+	end
 	local nCount = #aItemData
 	if not IsEmpty(config.tFilterQuality) or config.bFilterBookRead then
 		nCount = 0
