@@ -204,7 +204,9 @@ function PS.OnPanelActive(wnd)
 		if id == 'count' then
 			return false
 		end
-		if data and bIn and (data.itemInfo.nGenre ~= ITEM_GENRE.BOOK or data.dwRecipeID) then
+		if bIn and IsCtrlKeyDown() and IsShiftKeyDown() then
+			LIB.OutputTip(this, EncodeLUAData(data, '  '))
+		elseif data and bIn and (data.itemInfo.nGenre ~= ITEM_GENRE.BOOK or data.dwRecipeID) then
 			LIB.OutputItemInfoTip(data.dwTabType, data.dwIndex, data.dwRecipeID)
 		else
 			HideTip()
