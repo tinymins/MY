@@ -114,7 +114,7 @@ function D.TryAdd(dwID, bDelay)
 			if O.bOpenLoot and doodad.CanLoot(me.dwID) then
 				data = { loot = true }
 			elseif O.bCustom and D.tCustom[doodad.szName]
-				and GetDoodadTemplate(doodad.dwTemplateID).dwCraftID == 3
+				and GetDoodadTemplate(doodad.dwTemplateID).dwCraftID == CONSTANT.CRAFT_TYPE.SKINNING
 			then
 				data = { craft = true }
 			end
@@ -259,12 +259,13 @@ function D.OnAutoDoodad()
 			if bIntr then
 				D.dwOpenID = k
 			end
-		elseif v.craft or doodad.HaveQuest(me.dwID) then -- 任务和普通道具尝试 5 次
+		elseif v.craft or v.other or doodad.HaveQuest(me.dwID) then -- 任务和普通道具尝试 5 次
+			bKeep = true
 			bIntr = (not me.bFightState or O.bInteractEvenFight) and not me.bOnHorse and IsAutoInteract()
-			bKeep = true
-		elseif v.other then -- 其它类型交互并保留
-			bIntr = true
-			bKeep = true
+			-- 宴席只能吃队友的
+			if doodad.dwOwnerID ~= 0 and IsPlayer(doodad.dwOwnerID) and not LIB.IsParty(doodad.dwOwnerID) then
+				bIntr = false
+			end
 		end
 		if not bKeep then
 			D.Remove(k)
