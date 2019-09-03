@@ -278,57 +278,11 @@ function D.OnOpenDoodad(dwID)
 	D.Remove(dwID) -- 从列表删除
 	local doodad = GetDoodad(dwID)
 	if doodad then
-		local bP, bClear, me = false, true, GetClientPlayer()
-		-- 如需庖丁，则不要过滤灰色
 		if IsAutoInteract() and O.bCustom
-			and O.tCustom[doodad.szName] and GetDoodadTemplate(doodad.dwTemplateID).dwCraftID == 3
+			and O.tCustom[doodad.szName] and GetDoodadTemplate(doodad.dwTemplateID).dwCraftID == 3 --庖丁
 		then
 			D.tDoodad[dwID] = { craft = true }
 			D.bUpdateLabel = true
-			bP = true
-		end
-		-- money
-		local nMoney = doodad.GetLootMoney() or 0
-		if nMoney > 0 then
-			LootMoney(doodad.dwID)
-		end
-		-- items
-		for i = 0, 31 do
-			local item, bRoll, bDist = doodad.GetLootItem(i, me)
-			if item then
-				-- 如有待分配物品，则取消庖丁并且不清空列表
-				if bDist and bClear then
-					bClear = false
-					if bP then
-						D.Remove(dwID)
-						bP = false
-					end
-				end
-				local bLoot, szName = true, GetItemNameByItem(item)
-				if bP then
-					bLoot = true
-				elseif O.bLootOnly then
-					bLoot = O.tLootOnly[szName] == true
-				elseif (item.nQuality == 0 and not O.bLootGray)
-					or (item.nQuality == 1 and not O.bLootWhite)
-					or (item.nQuality == 2 and not O.bLootGreen)
-					or O.tLootFilter[szName] == true
-				then
-					bLoot = false
-				end
-				if bLoot then
-					LootItem(doodad.dwID, item.dwID)
-					LIB.Debug('auto loot [' .. szName .. ']', _L['MY_GKPDoodad'], DEBUG_LEVEL.LOG)
-				else
-					LIB.Debug('filter loot [' .. szName .. ']', _L['MY_GKPDoodad'], DEBUG_LEVEL.LOG)
-				end
-			end
-		end
-		if bClear then
-			local hL = Station.Lookup('Normal/LootList', 'Handle_LootList')
-			if hL then
-				hL:Clear()
-			end
 		end
 	end
 end
