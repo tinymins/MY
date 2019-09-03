@@ -316,7 +316,7 @@ function MY_GKP_Loot.OnLButtonClick()
 			{
 				szOption = _L['Link All Item'],
 				fnAction = function()
-					local szName, aItemData, bSpecial = Loot.GetDoodad(dwDoodadID)
+					local aItemData = Loot.GetDoodadLootInfo(dwDoodadID)
 					local t = {}
 					for k, v in ipairs(aItemData) do
 						table.insert(t, MY_GKP.GetFormatLink(v.item))
@@ -698,7 +698,7 @@ function Loot.GetBossAction(dwDoodadID, bMenu)
 	if not Loot.AuthCheck(dwDoodadID) then
 		return
 	end
-	local szName, aItemData = Loot.GetDoodad(dwDoodadID)
+	local aItemData = Loot.GetDoodadLootInfo(dwDoodadID)
 	local fnAction = function()
 		local aEquipmentItemData = {}
 		for k, v in ipairs(aItemData) do
@@ -848,7 +848,7 @@ function Loot.DistributeItem(dwID, info, szAutoDistType, bSkipRecordPanel)
 		--[[#DEBUG BEGIN]]
 		LIB.Debug('Item does not exist, check!!', 'MY_GKP_Loot', DEBUG_LEVEL.WARNING)
 		--[[#DEBUG END]]
-		local szName, aItemData = Loot.GetDoodad(info.dwDoodadID)
+		local aItemData = Loot.GetDoodadLootInfo(info.dwDoodadID)
 		for k, v in ipairs(aItemData) do
 			if v.nQuality == info.nQuality and LIB.GetItemNameByItem(v.item) == info.szName then
 				info.dwID = v.item.dwID
@@ -1145,7 +1145,7 @@ function Loot.DrawLootList(dwID)
 	local config = MY_GKP_Loot.tItemConfig
 
 	-- 计算掉落
-	local szName, aItemData, bSpecial = Loot.GetDoodad(dwID)
+	local aItemData, nMoney, szName, bSpecial = Loot.GetDoodadLootInfo(dwID)
 	local nCount = #aItemData
 	if not IsEmpty(config.tFilterQuality) or config.bFilterBookRead then
 		nCount = 0
@@ -1379,12 +1379,13 @@ local function LootItemSorter(data1, data2)
 end
 
 -- 检查物品
-function Loot.GetDoodad(dwID)
-	local me   = GetClientPlayer()
-	local d    = GetDoodad(dwID)
+function Loot.GetDoodadLootInfo(dwID)
+	local me = GetClientPlayer()
+	local d  = GetDoodad(dwID)
 	local aItemData = {}
 	local szName
 	local bSpecial = false
+	local nMoney = 0
 	if me and d then
 		szName = d.szName
 		local nLootItemCount = d.GetItemListCount()
@@ -1422,9 +1423,10 @@ function Loot.GetDoodad(dwID)
 				end
 			end
 		end
+		nMoney = doodad.GetLootMoney() or 0
 	end
 	sort(aItemData, LootItemSorter)
-	return szName, aItemData, bSpecial
+	return aItemData, nMoney, szName, bSpecial
 end
 
 function Loot.HideSystemLoot()
@@ -1465,7 +1467,7 @@ LIB.RegisterEvent('OPEN_DOODAD', function()
 		LootMoney(arg0)
 		PlaySound(SOUND.UI_SOUND, g_sound.PickupMoney)
 	end
-	local szName, data = Loot.GetDoodad(arg0)
+	local data = Loot.GetDoodadLootInfo(arg0)
 	if #data == 0 then
 		return Loot.RemoveLootList(arg0)
 	end
@@ -1485,7 +1487,7 @@ LIB.RegisterEvent('SYNC_LOOT_LIST', function()
 	local wnd = Loot.GetDoodadWnd(frame, arg0)
 	if not wnd and not (MY_GKP.bDebug and MY_GKP.bDebug2) then
 		local bDungeonTreasure = false
-		local szName, aItemData = Loot.GetDoodad(arg0)
+		local aItemData = Loot.GetDoodadLootInfo(arg0)
 		for k, v in ipairs(aItemData) do
 			if wstring.find(v.szName, _L['Dungeon treasure']) == 1 then
 				bDungeonTreasure = true
