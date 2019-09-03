@@ -58,7 +58,7 @@ local O = {
 	bQuestDoodad = false, -- 任务物品
 	bAllDoodad = false, -- 其它全部
 	bCustom = true, -- 启用自定义
-	tCustom = {}, -- 自定义列表
+	szCustom = '', -- 自定义列表
 }
 RegisterCustomData('MY_GKPDoodad.bOpenLoot')
 RegisterCustomData('MY_GKPDoodad.bOpenLootEvenFight')
@@ -82,15 +82,6 @@ local function GetDoodadTemplateName(dwID)
 	return GetDoodadTemplate(dwID).szName
 end
 
-LIB.RegisterInit('MY_GKPDoodad', function()
-	-- 粮草堆，散落的镖银，阵营首领战利品、押运奖赏
-	if IsEmpty(O.tCustom) then
-		for _, v in ipairs({ 3874, 4255, 4315, 5622, 5732 }) do
-			O.tCustom[GetDoodadTemplateName(v)] = true
-		end
-	end
-end)
-
 local function IsAutoInteract()
 	return O.bInteract and not IsShiftKeyDown() and not Station.Lookup('Normal/MY_GKP_Loot')
 end
@@ -106,6 +97,7 @@ local D = {
 		1020, 1021, 1022, 1023, 1024, 1025, 1027, 2644, 2645,
 		4229, 4230, 5661, 5662,
 	},
+	tCustom = {}, -- 自定义列表
 	tDoodad = {}, -- 待处理的 doodad 列表
 	nToLoot = 0,  -- 待拾取处理数量（用于修复判断）
 }
@@ -176,6 +168,31 @@ function D.RescanNearby()
 	end
 	D.bUpdateLabel = true
 end
+
+function D.ReloadCustom()
+	local t = {}
+	local szText = StringReplaceW(O.szCustom, _L['|'], '|')
+	for _, v in ipairs(LIB.SplitString(szText, '|')) do
+		v = LIB.TrimString(v)
+		if v ~= '' then
+			t[v] = true
+		end
+	end
+	D.tCustom = t
+	D.RescanNearby()
+end
+
+LIB.RegisterInit('MY_GKPDoodad', function()
+	-- 粮草堆，散落的镖银，阵营首领战利品、押运奖赏
+	if IsEmpty(O.szCustom) then
+		local t = {}
+		for _, v in ipairs({ 3874, 4255, 4315, 5622, 5732 }) do
+			insert(t, GetDoodadTemplateName(v))
+		end
+		O.szCustom = concat(t, '|')
+		D.ReloadCustom()
+	end
+end)
 
 -- switch name
 function D.CheckShowName()
@@ -606,18 +623,10 @@ function PS.OnPanelActive(frame)
 	ui:Append('WndEditBox', {
 		name = 'Edit_Custom',
 		x = nX, y = nY, w = 360, h = 27,
-		limit = 1024, text = D.GetCustomText(),
+		limit = 1024, text = MY_GKPDoodad.szCustom,
 		enable = MY_GKPDoodad.bCustom,
 		onchange = function(szText)
-			local t = {}
-			szText = StringReplaceW(szText, _L['|'], '|')
-			for _, v in ipairs(LIB.SplitString(szText, '|')) do
-				v = LIB.TrimString(v)
-				if v ~= '' then
-					t[v] = true
-				end
-			end
-			MY_GKPDoodad.tCustom = t
+			MY_GKPDoodad.szCustom = szText
 		end,
 		tip = _L['Tip: Enter the name of dead animals can be automatically Paoding!'],
 		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
@@ -647,7 +656,7 @@ local settings = {
 				bQuestDoodad = true,
 				bAllDoodad = true,
 				bCustom = true,
-				tCustom = true,
+				szCustom = true,
 			},
 			root = O,
 		},
@@ -666,7 +675,7 @@ local settings = {
 				bQuestDoodad = true,
 				bAllDoodad = true,
 				bCustom = true,
-				tCustom = true,
+				szCustom = true,
 			},
 			triggers = {
 				bOpenLoot = D.RescanNearby,
@@ -680,7 +689,7 @@ local settings = {
 				bQuestDoodad = D.RescanNearby,
 				bAllDoodad = D.RescanNearby,
 				bCustom = D.RescanNearby,
-				tCustom = D.RescanNearby,
+				szCustom = D.ReloadCustom,
 			},
 			root = O,
 		},
