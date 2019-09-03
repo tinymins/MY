@@ -1703,7 +1703,7 @@ end
 
 -- 判断是不是队友
 function LIB.IsParty(dwID)
-	return GetClientPlayer().IsPlayerInMyParty(dwID)
+	return GetClientPlayer().IsPlayerInMyParty(dwID) or dwID == UI_GetClientPlayerID()
 end
 
 -- 判断关系
