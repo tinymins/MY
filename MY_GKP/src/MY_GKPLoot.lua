@@ -1426,7 +1426,7 @@ function Loot.GetDoodadLootInfo(dwID)
 				end
 			end
 		end
-		nMoney = doodad.GetLootMoney() or 0
+		nMoney = d.GetLootMoney() or 0
 	end
 	sort(aItemData, LootItemSorter)
 	return aItemData, nMoney, szName, bSpecial
