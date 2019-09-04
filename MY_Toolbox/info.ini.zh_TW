@@ -26,5 +26,6 @@ lua_18=src/MY_ShenxingHelper.lua
 lua_19=src/MY_VisualSkill.lua
 lua_20=src/MY_WhisperMetion.lua
 lua_21=src/MY_EnergyBar.lua
-lua_22=src/PS.lua
+lua_22=src/MY_Taoguan.lua
+lua_23=src/PS.lua
 package=MY
