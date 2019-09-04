@@ -205,6 +205,7 @@ data = {
 	-- MY_TeamMon_RR.lua --
 	['Default'] = '默认',
 	['Default monitor data'] = '默认数据',
+	['Data download'] = '数据下载',
 	['ERR: Info content is illegal!'] = '错误：无法获得有效的描述文件！',
 	['ERR404: Meta address not found!'] = '错误404：订阅地址不存在！',
 	['Downloader is not ready!'] = '数据下载器未就绪！',
