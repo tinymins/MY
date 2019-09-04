@@ -930,7 +930,7 @@ function MY_CataclysmMain.OnFrameBreathe()
 			if txt then
 				szPrepare = txt:GetText()
 			end
-			local img = h:Lookup('Image_Progress')
+			local img = h:Lookup('Image_Progress') or h:Lookup('Image_BarProgress')
 			if img then
 				fPrepare = img:GetPercentage()
 			end
