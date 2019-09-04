@@ -1257,8 +1257,13 @@ function LIB.GetObjectType(obj)
 		return 'NPC'
 	elseif NEARBY_DOODAD[obj.dwID] == obj then
 		return 'DOODAD'
-	elseif GetItem(obj.dwID) == obj then
-		return 'ITEM'
+	else
+		local szStr = tostring(obj)
+		if szStr:find('^KGItem:%w+$') then
+			return 'ITEM'
+		elseif szStr:find('^KGLuaItemInfo:%w+$') then
+			return 'ITEM_INFO'
+		end
 	end
 	return 'UNKNOWN'
 end
@@ -3180,7 +3185,7 @@ local m_MountTypeToWeapon = {
 	--WEAPON_DETAIL.SLING_SHOT = Õ∂÷¿
 }
 function LIB.IsItemFitKungfu(itemInfo, ...)
-	if tostring(itemInfo):find('^KGItem:') then
+	if LIB.GetObjectType(itemInfo) == 'ITEM' then
 		itemInfo = GetItemInfo(itemInfo.dwTabType, itemInfo.dwIndex)
 	end
 	local kungfu = ...
