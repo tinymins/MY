@@ -422,9 +422,9 @@ function _TS.UpdateThreatBars(tList, dwTargetID, dwApplyID)
 			item:Lookup('Text_ThreatName'):SetFontScheme(dat[6][1])
 			item:Lookup('Text_ThreatName'):SetFontColor(r, g, b)
 			if TS.bForceIcon then
-				if LIB.IsParty(v.id) and IsPlayer(v.id) then
-					local dwMountKungfuID =	team.GetMemberInfo(v.id).dwMountKungfuID
-					item:Lookup('Image_Icon'):FromIconID(Table_GetSkillIconID(dwMountKungfuID, 1))
+				local info = LIB.IsParty(v.id) and IsPlayer(v.id) and team.GetMemberInfo(v.id)
+				if info then
+					item:Lookup('Image_Icon'):FromIconID(Table_GetSkillIconID(info.dwMountKungfuID, 1))
 				elseif IsPlayer(v.id) then
 					item:Lookup('Image_Icon'):FromUITex(GetForceImage(dwForceID))
 				else
