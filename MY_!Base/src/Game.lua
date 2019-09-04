@@ -3345,67 +3345,49 @@ function LIB.GetCampImage(eCamp, bFight) -- ui\Image\UICommon\CommonPanel2.UITex
 	return szUITex, nFrame
 end
 
-if IsFunction(GetUserRoleName) then
-	LIB.GetUserRoleName = GetUserRoleName
-else
-	local _RoleName = ''
-	function LIB.GetUserRoleName()
-		local me = GetClientPlayer()
-		if me and not IsRemotePlayer(me.dwID) then
-			_RoleName = me.szName
-		end
-		return _RoleName
+do local _RoleName
+function LIB.GetUserRoleName()
+	if IsFunction(GetUserRoleName) then
+		return GetUserRoleName()
 	end
+	local me = GetClientPlayer()
+	if me and not IsRemotePlayer(me.dwID) then
+		_RoleName = me.szName
+	end
+	return _RoleName
+end
 end
 
-if IsFunction(GetItemNameByItem) then
-	LIB.GetItemNameByItem = GetItemNameByItem
-else
-	function LIB.GetItemNameByItem(item)
-		if item.nGenre == ITEM_GENRE.BOOK then
-			local nBookID, nSegID = GlobelRecipeID2BookID(item.nBookID)
-			return Table_GetSegmentName(nBookID, nSegID) or g_tStrings.BOOK
-		else
-			return LIB.GetItemNameByUIID(item.nUiId)
+do local ITEM_CACHE = {}
+function LIB.GetItemNameByUIID(nUiId)
+	if not ITEM_CACHE[nUiId] then
+		local szName = Table_GetItemName(nUiId)
+		if szName == '' then
+			szName = 'ITEM#' .. nUiId
 		end
+		ITEM_CACHE[nUiId] = szName
 	end
+	return ITEM_CACHE[nUiId]
+end
 end
 
-if IsFunction(GetItemNameByItemInfo) then
-	LIB.GetItemNameByItemInfo = GetItemNameByItemInfo
-else
-	function LIB.GetItemNameByItemInfo(itemInfo, nBookInfo)
-		if itemInfo.nGenre == ITEM_GENRE.BOOK then
-			if nBookInfo then
-				local nBookID, nSegID = GlobelRecipeID2BookID(nBookInfo)
-				return Table_GetSegmentName(nBookID, nSegID) or g_tStrings.BOOK
-			else
-				return LIB.GetItemNameByUIID(itemInfo.nUiId)
-			end
-		else
-			return LIB.GetItemNameByUIID(itemInfo.nUiId)
-		end
+function LIB.GetItemNameByItem(item)
+	if item.nGenre == ITEM_GENRE.BOOK then
+		local nBookID, nSegID = GlobelRecipeID2BookID(item.nBookID)
+		return Table_GetSegmentName(nBookID, nSegID) or g_tStrings.BOOK
 	end
+	return LIB.GetItemNameByUIID(item.nUiId)
 end
 
-if IsFunction(GetItemNameByUIID) then
-	LIB.GetItemNameByUIID = GetItemNameByUIID
-else
-	local ITEM_CACHE = {}
-	function LIB.GetItemNameByUIID(nUiId)
-		if not ITEM_CACHE[nUiId] then
-			local szName = Table_GetItemName(nUiId)
-			if szName == '' then
-				szName = 'ITEM#' .. nUiId
-			end
-			ITEM_CACHE[nUiId] = szName
-		end
-		return ITEM_CACHE[nUiId]
+function LIB.GetItemNameByItemInfo(itemInfo, nBookInfo)
+	if itemInfo.nGenre == ITEM_GENRE.BOOK and nBookInfo then
+		local nBookID, nSegID = GlobelRecipeID2BookID(nBookInfo)
+		return Table_GetSegmentName(nBookID, nSegID) or g_tStrings.BOOK
 	end
+	return LIB.GetItemNameByUIID(itemInfo.nUiId)
 end
 
-do
-local ITEM_CACHE = {}
+do local ITEM_CACHE = {}
 function LIB.GetItemIconByUIID(nUiId)
 	if not ITEM_CACHE[nUiId] then
 		local nIcon = Table_GetItemIconID(nUiId)
@@ -3418,47 +3400,42 @@ function LIB.GetItemIconByUIID(nUiId)
 end
 end
 
-if IsFunction(GetGuildBankBagPos) then
-	LIB.GetGuildBankBagPos = GetGuildBankBagPos
-else
-	function LIB.GetGuildBankBagPos(nPage, nIndex)
-		return CONSTANT.INVENTORY_GUILD_BANK, nPage * CONSTANT.INVENTORY_GUILD_PAGE_SIZE + nIndex
-	end
+function LIB.GetGuildBankBagPos(nPage, nIndex)
+	return CONSTANT.INVENTORY_GUILD_BANK, nPage * CONSTANT.INVENTORY_GUILD_PAGE_SIZE + nIndex
 end
 
-if IsFunction(IsSelf) then
-	LIB.IsSelf = IsSelf
-else
-	function LIB.IsSelf(dwSrcID, dwTarID)
-		return dwSrcID ~= 0 and dwSrcID == dwTarID and IsPlayer(dwSrcID) and IsPlayer(dwTarID)
+function LIB.IsSelf(dwSrcID, dwTarID)
+	if IsFunction(IsSelf) then
+		return IsSelf(dwSrcID, dwTarID)
 	end
+	return dwSrcID ~= 0 and dwSrcID == dwTarID and IsPlayer(dwSrcID) and IsPlayer(dwTarID)
 end
 
-if IsFunction(ForceIDToKungfuIDs) then
-	LIB.ForceIDToKungfuIDs = ForceIDToKungfuIDs
-else
-	-- * 获取门派对应心法ID列表
-	local m_tForceToKungfu
-	function LIB.ForceIDToKungfuIDs(dwForceID)
-		if not m_tForceToKungfu then
-			m_tForceToKungfu = {
-				[CONSTANT.FORCE_TYPE.SHAO_LIN ] = { 10002, 10003, },
-				[CONSTANT.FORCE_TYPE.WAN_HUA  ] = { 10021, 10028, },
-				[CONSTANT.FORCE_TYPE.TIAN_CE  ] = { 10026, 10062, },
-				[CONSTANT.FORCE_TYPE.CHUN_YANG] = { 10014, 10015, },
-				[CONSTANT.FORCE_TYPE.QI_XIU   ] = { 10080, 10081, },
-				[CONSTANT.FORCE_TYPE.WU_DU    ] = { 10175, 10176, },
-				[CONSTANT.FORCE_TYPE.TANG_MEN ] = { 10224, 10225, },
-				[CONSTANT.FORCE_TYPE.CANG_JIAN] = { 10144, 10145, },
-				[CONSTANT.FORCE_TYPE.GAI_BANG ] = { 10268, },
-				[CONSTANT.FORCE_TYPE.MING_JIAO] = { 10242, 10243, },
-				[CONSTANT.FORCE_TYPE.CANG_YUN ] = { 10389, 10390, },
-				[CONSTANT.FORCE_TYPE.CHANG_GE ] = { 10447, 10448, },
-				[CONSTANT.FORCE_TYPE.BA_DAO   ] = { 10464, },
-			}
-		end
-		return m_tForceToKungfu[dwForceID] or {}
+-- * 获取门派对应心法ID列表
+do local m_tForceToKungfu
+function LIB.ForceIDToKungfuIDs(dwForceID)
+	if IsFunction(ForceIDToKungfuIDs) then
+		return ForceIDToKungfuIDs(dwForceID)
 	end
+	if not m_tForceToKungfu then
+		m_tForceToKungfu = {
+			[CONSTANT.FORCE_TYPE.SHAO_LIN ] = { 10002, 10003, },
+			[CONSTANT.FORCE_TYPE.WAN_HUA  ] = { 10021, 10028, },
+			[CONSTANT.FORCE_TYPE.TIAN_CE  ] = { 10026, 10062, },
+			[CONSTANT.FORCE_TYPE.CHUN_YANG] = { 10014, 10015, },
+			[CONSTANT.FORCE_TYPE.QI_XIU   ] = { 10080, 10081, },
+			[CONSTANT.FORCE_TYPE.WU_DU    ] = { 10175, 10176, },
+			[CONSTANT.FORCE_TYPE.TANG_MEN ] = { 10224, 10225, },
+			[CONSTANT.FORCE_TYPE.CANG_JIAN] = { 10144, 10145, },
+			[CONSTANT.FORCE_TYPE.GAI_BANG ] = { 10268, },
+			[CONSTANT.FORCE_TYPE.MING_JIAO] = { 10242, 10243, },
+			[CONSTANT.FORCE_TYPE.CANG_YUN ] = { 10389, 10390, },
+			[CONSTANT.FORCE_TYPE.CHANG_GE ] = { 10447, 10448, },
+			[CONSTANT.FORCE_TYPE.BA_DAO   ] = { 10464, },
+		}
+	end
+	return m_tForceToKungfu[dwForceID] or {}
+end
 end
 
 -- 追加小地图标记
