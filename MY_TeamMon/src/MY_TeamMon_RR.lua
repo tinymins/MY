@@ -74,8 +74,11 @@ local GetRawURL, GetBlobURL, GetShortURL, GetAttachRawURL, GetAttachBlobURL
 do
 local PROVIDER_PARAMS = {
 	github = {
-		szRawURL = 'https://raw.githubusercontent.com/%s/%s/%s/%s',
-		szRawURL_T = '^https://raw%.githubusercontent%.com/([^/]+)/([^/]+)/([^/]+)/(.+)$',
+		szRawURL = 'https://cdn.jsdelivr.net/gh/%s/%s@%s/%s',
+		szRawURL_T = {
+			'^https://cdn.jsdelivr.net/gh/([^/]+)/([^/]+)@([^/]+)/(.+)$',
+			'^https://raw%.githubusercontent%.com/([^/]+)/([^/]+)/([^/]+)/(.+)$',
+		},
 		szBlobURL = 'https://github.com/%s/%s/blob/%s/%s',
 		szBlobURL_T = '^https://github%.com/([^/]+)/([^/]+)/blob/([^/]+)/(.+)$',
 	},
@@ -100,7 +103,16 @@ local function GetURL(szURL, szType)
 	local szUser, szProvider, szProject, szBranch, szPath, nPos = szURL
 	if wfind(szURL, '://') then
 		for k, p in pairs(PROVIDER_PARAMS) do
-			szUser, szProject, szBranch, szPath = szURL:match(p.szRawURL_T)
+			if IsTable(p.szRawURL_T) then
+				for _, s in ipairs(p.szRawURL_T) do
+					szUser, szProject, szBranch, szPath = szURL:match(s)
+					if szUser then
+						break
+					end
+				end
+			elseif IsString(p.szRawURL_T) then
+				szUser, szProject, szBranch, szPath = szURL:match(p.szRawURL_T)
+			end
 			if not szUser then
 				szUser, szProject, szBranch, szPath = szURL:match(p.szBlobURL_T)
 			end
