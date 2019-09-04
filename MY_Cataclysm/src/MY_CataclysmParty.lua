@@ -1108,7 +1108,7 @@ function CTM:RefreshImages(h, dwID, info, tSetting, bIcon, bFormationLeader, bLa
 	end
 	-- 刷新内功
 	if bIcon then -- 刷新icon
-		local img = h:Lookup('Image_Icon')
+		local img, bVisible = h:Lookup('Image_Icon'), true
 		if CFG.nShowIcon ~= 4 then
 			if CFG.nShowIcon == 2 and info.dwMountKungfuID == 0 then
 				img:FromUITex('ui/image/TargetPanel/Target.UITex', 21)
@@ -1119,17 +1119,22 @@ function CTM:RefreshImages(h, dwID, info, tSetting, bIcon, bFormationLeader, bLa
 			elseif CFG.nShowIcon == 1 then
 				img:FromUITex(GetForceImage(info.dwForceID))
 			elseif CFG.nShowIcon == 3 then
-				img:FromUITex('ui/Image/UICommon/CommonPanel2.UITex', LIB.GetCampImageFrame(info.nCamp, false) or -1)
+				local szCampImg, nCampFrame = LIB.GetCampImage(info.nCamp, false)
+				if szCampImg then
+					img:FromUITex(szCampImg, nCampFrame)
+				else
+					bVisible = false
+				end
 			end
 			local fScale = (CFG.fScaleY + CFG.fScaleX) / 2
 			if fScale * 0.9 > 1 then
 				fScale = fScale * 0.9
 			end
 			img:SetSize(28 * fScale, 28 * fScale)
-			img:Show()
 		else -- 不再由icon控制 转交给textname
-			img:Hide()
+			bVisible = false
 		end
+		img:SetVisible(bVisible)
 		bLayout = true
 	end
 	-- 刷新名字

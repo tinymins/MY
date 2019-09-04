@@ -213,10 +213,12 @@ function D.UpdateItem(hItem, p)
 	end
 	-- ÕóÓª
 	hInfoList:Lookup('Handle_Camp'):Hide()
-	if dwType == TARGET.PLAYER
-	and (KObject.nCamp == CAMP.GOOD or KObject.nCamp == CAMP.EVIL) then
-		hInfoList:Lookup('Handle_Camp'):Show()
-		hInfoList:Lookup('Handle_Camp/Image_Camp'):FromUITex(LIB.GetCampImage(KObject.nCamp, KObject.bCampFlag))
+	if dwType == TARGET.PLAYER then
+		local szCampImg, nCampFrame = LIB.GetCampImage(KObject.nCamp, KObject.bCampFlag)
+		if szCampImg then
+			hInfoList:Lookup('Handle_Camp'):Show()
+			hInfoList:Lookup('Handle_Camp/Image_Camp'):FromUITex(szCampImg, nCampFrame)
+		end
 	end
 	-- ±ê¼Ç
 	hInfoList:Lookup('Handle_Mark'):Hide()

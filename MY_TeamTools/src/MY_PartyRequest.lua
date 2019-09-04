@@ -406,11 +406,11 @@ function D.UpdateFrame()
 			end
 			hItem:Lookup('Handle_Status/Handle_Gongzhan'):SetVisible(info.nGongZhan == 1)
 
-			local nCampFrame = LIB.GetCampImageFrame(info.nCamp)
-			if nCampFrame then
-				hItem:Lookup('Handle_Status/Handle_Camp/Image_Camp'):SetFrame(nCampFrame)
+			local szCampImg, nCampFrame = LIB.GetCampImage(info.nCamp)
+			if szCampImg then
+				hItem:Lookup('Handle_Status/Handle_Camp/Image_Camp'):FromUITex(szCampImg, nCampFrame)
 			end
-			hItem:Lookup('Handle_Status/Handle_Camp'):SetVisible(not not nCampFrame)
+			hItem:Lookup('Handle_Status/Handle_Camp'):SetVisible(not not szCampImg)
 
 			if info.bDetail and info.bEx == 'Author' then
 				hItem:Lookup('Text_Name'):SetFontColor(255, 255, 0)

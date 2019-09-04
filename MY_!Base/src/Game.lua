@@ -3324,37 +3324,25 @@ function LIB.IsBetterEquipment(item, dwPackage, dwBox)
 	return (item.nEquipScore > equipedItem.nEquipScore) or (item.nLevel > equipedItem.nLevel and item.nQuality >= equipedItem.nQuality)
 end
 
-if IsFunction(GetCampImageFrame) then
-	LIB.GetCampImageFrame = GetCampImageFrame
-else
-	function LIB.GetCampImageFrame(eCamp, bFight) -- ui\Image\UICommon\CommonPanel2.UITex
-		local nFrame = nil
-		if eCamp == CAMP.GOOD then
-			if bFight then
-				nFrame = 117
-			else
-				nFrame = 7
-			end
-		elseif eCamp == CAMP.EVIL then
-			if bFight then
-				nFrame = 116
-			else
-				nFrame = 5
-			end
+function LIB.GetCampImage(eCamp, bFight) -- ui\Image\UICommon\CommonPanel2.UITex
+	local szUITex, nFrame
+	if eCamp == CAMP.GOOD then
+		if bFight then
+			nFrame = 117
+		else
+			nFrame = 7
 		end
-		return nFrame
-	end
-end
-
-if IsFunction(GetCampImage) then
-	LIB.GetCampImage = GetCampImage
-else
-	function LIB.GetCampImage(eCamp, bFight)
-		local nFrame = LIB.GetCampImageFrame(eCamp, bFight)
-		if nFrame then
-			return 'ui\\Image\\UICommon\\CommonPanel2.UITex', nFrame
+	elseif eCamp == CAMP.EVIL then
+		if bFight then
+			nFrame = 116
+		else
+			nFrame = 5
 		end
 	end
+	if nFrame then
+		szUITex = 'ui\\Image\\UICommon\\CommonPanel2.UITex'
+	end
+	return szUITex, nFrame
 end
 
 if IsFunction(GetUserRoleName) then
