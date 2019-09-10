@@ -99,11 +99,20 @@ local function CommonEventRegister(E, szID, fnAction)
 		else
 			szID = szEvent .. '.' .. szKey
 		end
-		E.tList[szEvent][szKey] = { szID = szID, fnAction = fnAction }
+		for i, p in ipairs_r(E.tList[szEvent]) do
+			if p.szKey == szKey then
+				remove(E.tList[szEvent], i)
+			end
+		end
+		insert(E.tList[szEvent], { szKey = szKey, szID = szID, fnAction = fnAction })
 	elseif fnAction == false then
 		if E.tList and E.tList[szEvent] then
 			if szKey then
-				E.tList[szEvent][szKey] = nil
+				for i, p in ipairs_r(E.tList[szEvent]) do
+					if p.szKey == szKey then
+						remove(E.tList[szEvent], i)
+					end
+				end
 				if IsEmpty(E.tList[szEvent]) then
 					E.tList[szEvent] = nil
 				end
@@ -117,12 +126,31 @@ local function CommonEventRegister(E, szID, fnAction)
 				E.tList = nil
 			end
 		end
-	elseif szKey and E.tList and E.tList[szEvent] and E.tList[szEvent][szKey] then
-		return true
+	elseif szKey and E.tList and E.tList[szEvent] then
+		for i, p in ipairs_r(E.tList[szEvent]) do
+			if p.szKey == szKey then
+				return true
+			end
+		end
+		return false
 	elseif not szKey and E.tList and E.tList[szEvent] then
 		return true
 	end
 	return szKey
+end
+
+local function FireEventRec(E, p, ...)
+	local nStartTick = GetTickCount()
+	local res, err, trace = XpCall(p.fnAction, ...)
+	if not res then
+		FireUIEvent('CALL_LUA_ERROR', err .. '\nOn' .. E.szName .. ': ' .. p.szID .. '\n' .. trace .. '\n')
+	end
+	--[[#DEBUG BEGIN]]
+	LIB.Debug(
+		_L('%s function <%s> %s in %dms.', E.szName, p.szID, res and _L['succeed'] or _L['failed'], GetTickCount() - nStartTick),
+		_L['PMTool'],
+		DEBUG_LEVEL.PMLOG)
+	--[[#DEBUG END]]
 end
 
 local function CommonEventFirer(E, arg0, ...)
@@ -130,18 +158,15 @@ local function CommonEventFirer(E, arg0, ...)
 	if not E.tList or not szEvent then
 		return
 	end
-	for _, p in spairs(E.tList[szEvent], E.tList['*']) do
-		local nStartTick = GetTickCount()
-		local res, err, trace = XpCall(p.fnAction, arg0, ...)
-		if not res then
-			FireUIEvent('CALL_LUA_ERROR', err .. '\nOn' .. E.szName .. ': ' .. p.szID .. '\n' .. trace .. '\n')
+	if E.tList[szEvent] then
+		for _, p in ipairs(E.tList[szEvent]) do
+			FireEventRec(E, p, arg0, ...)
 		end
-		--[[#DEBUG BEGIN]]
-		LIB.Debug(
-			_L('%s function <%s> %s in %dms.', E.szName, p.szID, res and _L['succeed'] or _L['failed'], GetTickCount() - nStartTick),
-			_L['PMTool'],
-			DEBUG_LEVEL.PMLOG)
-		--[[#DEBUG END]]
+	end
+	if E.tList['*'] then
+		for _, p in ipairs(E.tList['*']) do
+			FireEventRec(E, p, arg0, ...)
+		end
 	end
 end
 
