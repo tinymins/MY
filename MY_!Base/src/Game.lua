@@ -1250,28 +1250,35 @@ function LIB.GetObjectName(arg0, arg1, arg2)
 	return cache and cache[eRetID] or nil
 end
 
+do
+local CACHE = setmetatable({}, { __mode = 'v' })
 function LIB.GetObjectType(obj)
-	if NEARBY_PLAYER[obj.dwID] == obj then
-		return 'PLAYER'
-	elseif NEARBY_NPC[obj.dwID] == obj then
-		return 'NPC'
-	elseif NEARBY_DOODAD[obj.dwID] == obj then
-		return 'DOODAD'
-	else
-		local szStr = tostring(obj)
-		if szStr:find('^KGItem:%w+$') then
-			return 'ITEM'
-		elseif szStr:find('^KGLuaItemInfo:%w+$') then
-			return 'ITEM_INFO'
-		elseif szStr:find('^KDoodad:%w+$') then
-			return 'DOODAD'
-		elseif szStr:find('^KNpc:%w+$') then
-			return 'NPC'
-		elseif szStr:find('^KPlayer:%w+$') then
-			return 'PLAYER'
+	if not CACHE[obj] then
+		if NEARBY_PLAYER[obj.dwID] == obj then
+			CACHE[obj] = 'PLAYER'
+		elseif NEARBY_NPC[obj.dwID] == obj then
+			CACHE[obj] = 'NPC'
+		elseif NEARBY_DOODAD[obj.dwID] == obj then
+			CACHE[obj] = 'DOODAD'
+		else
+			local szStr = tostring(obj)
+			if szStr:find('^KGItem:%w+$') then
+				CACHE[obj] = 'ITEM'
+			elseif szStr:find('^KGLuaItemInfo:%w+$') then
+				CACHE[obj] = 'ITEM_INFO'
+			elseif szStr:find('^KDoodad:%w+$') then
+				CACHE[obj] = 'DOODAD'
+			elseif szStr:find('^KNpc:%w+$') then
+				CACHE[obj] = 'NPC'
+			elseif szStr:find('^KPlayer:%w+$') then
+				CACHE[obj] = 'PLAYER'
+			else
+				CACHE[obj] = 'UNKNOWN'
+			end
 		end
 	end
-	return 'UNKNOWN'
+	return CACHE[obj]
+end
 end
 
 -- 获取附近NPC列表
