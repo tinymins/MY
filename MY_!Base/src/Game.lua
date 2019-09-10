@@ -1224,7 +1224,7 @@ function LIB.GetObjectName(arg0, arg1, arg2)
 			cache.bFull = true
 		else
 			szDispType = '?'
-			cache.bFull = true
+			cache.bFull = false
 		end
 		if szType == 'NPC' then
 			szDispID = LIB.ConvertNpcID(dwID)
@@ -1263,6 +1263,12 @@ function LIB.GetObjectType(obj)
 			return 'ITEM'
 		elseif szStr:find('^KGLuaItemInfo:%w+$') then
 			return 'ITEM_INFO'
+		elseif szStr:find('^KDoodad:%w+$') then
+			return 'DOODAD'
+		elseif szStr:find('^KNpc:%w+$') then
+			return 'NPC'
+		elseif szStr:find('^KPlayer:%w+$') then
+			return 'PLAYER'
 		end
 	end
 	return 'UNKNOWN'
