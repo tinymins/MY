@@ -2335,3 +2335,44 @@ function LIB.GetAddonErrorMessage()
 end
 LIB.RegisterInit('LIB#AddonErrorMessage', SaveErrorMessage)
 end
+
+-----------------------------------------------
+-- 事件驱动自动回收的缓存机制
+-----------------------------------------------
+function LIB.CreateCache(aEvent, mode)
+	local t = {}
+	local mt = { __mode = mode or 'v' }
+	if IsString(aEvent) then
+		aEvent = {aEvent}
+	elseif IsArray(aEvent) then
+		aEvent = Clone(aEvent)
+	else
+		aEvent = {'LOADING_ENDING'}
+	end
+	local szKey = 'LIB#CACHE#' .. tostring(aEvent)
+	local function Register()
+		for _, szEvent in ipairs(aEvent) do
+			LIB.RegisterEvent(szEvent .. '.' .. szKey, Flush)
+		end
+	end
+	local function Unregister()
+		for _, szEvent in ipairs(aEvent) do
+			LIB.RegisterEvent(szEvent .. '.' .. szKey, false)
+		end
+	end
+	local function Flush()
+		for k, _ in pairs(t) do
+			t[k] = nil
+		end
+	end
+	function mt.__call(_, k)
+		if k == 'flush' then
+			Flush()
+		elseif k == 'register' then
+			Register()
+		elseif k == 'unregister' then
+			Unregister()
+		end
+	end
+	return setmetatable(t, mt)
+end
