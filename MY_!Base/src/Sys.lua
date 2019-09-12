@@ -394,9 +394,9 @@ function LIB.ConcatPath(...)
 	local aPath = {...}
 	local szPath = ''
 	for _, s in ipairs(aPath) do
-		s = tostring(s):gsub('^[\/]+', '')
+		s = tostring(s):gsub('^[\\/]+', '')
 		if s ~= '' then
-			szPath = szPath:gsub('[\/]+$', '')
+			szPath = szPath:gsub('[\\/]+$', '')
 			if szPath ~= '' then
 				szPath = szPath .. '/'
 			end
