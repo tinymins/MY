@@ -2339,9 +2339,18 @@ end
 -----------------------------------------------
 -- 事件驱动自动回收的缓存机制
 -----------------------------------------------
-function LIB.CreateCache(aEvent, mode)
-	local t = {}
-	local mt = { __mode = mode or 'v' }
+function LIB.CreateCache(szNameMode, aEvent)
+	-- 处理参数
+	local szName, szMode
+	if IsString(szNameMode) then
+		local nPos = StringFindW(szNameMode, '.')
+		if nPos then
+			szName = sub(szNameMode, 1, nPos - 1)
+			szMode = sub(szNameMode, nPos + 1)
+		else
+			szName = szNameMode
+		end
+	end
 	if IsString(aEvent) then
 		aEvent = {aEvent}
 	elseif IsArray(aEvent) then
@@ -2349,7 +2358,13 @@ function LIB.CreateCache(aEvent, mode)
 	else
 		aEvent = {'LOADING_ENDING'}
 	end
-	local szKey = 'LIB#CACHE#' .. tostring(aEvent)
+	local szKey = 'LIB#CACHE#' .. tostring(aEvent):sub(8)
+	if szName then
+		szKey = szKey .. '#' .. szName
+	end
+	-- 创建弱表以及事件驱动
+	local t = {}
+	local mt = { __mode = szMode }
 	local function Register()
 		for _, szEvent in ipairs(aEvent) do
 			LIB.RegisterEvent(szEvent .. '.' .. szKey, Flush)
