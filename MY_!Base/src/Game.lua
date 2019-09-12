@@ -1136,17 +1136,12 @@ end
 --    'always' 总是返回
 --    'never'  总是不返回
 local OBJECT_NAME = {
-	['PLAYER' ] = setmetatable({}, { __mode = 'v' }),
-	['NPC'    ] = setmetatable({}, { __mode = 'v' }),
-	['DOODAD' ] = setmetatable({}, { __mode = 'v' }),
-	['ITEM'   ] = setmetatable({}, { __mode = 'v' }),
-	['UNKNOWN'] = setmetatable({}, { __mode = 'v' }),
+	['PLAYER' ] = LIB.CreateCache('LIB#GetObjectName#PLAYER.v' ),
+	['NPC'    ] = LIB.CreateCache('LIB#GetObjectName#NPC.v'    ),
+	['DOODAD' ] = LIB.CreateCache('LIB#GetObjectName#DOODAD.v' ),
+	['ITEM'   ] = LIB.CreateCache('LIB#GetObjectName#ITEM.v'   ),
+	['UNKNOWN'] = LIB.CreateCache('LIB#GetObjectName#UNKNOWN.v'),
 }
-LIB.RegisterEvent('LOADING_ENDING.LIB#GetObjectName', function()
-	for _, szType in ipairs({'PLAYER', 'NPC', 'DOODAD', 'ITEM', 'UNKNOWN'}) do
-		OBJECT_NAME[szType] = setmetatable({}, { __mode = 'v' })
-	end
-end)
 function LIB.GetObjectName(arg0, arg1, arg2)
 	local KObject, szType, dwID, eRetID
 	if IsNumber(arg0) then
@@ -1256,10 +1251,7 @@ function LIB.GetObjectName(arg0, arg1, arg2)
 end
 
 do
-local CACHE = setmetatable({}, { __mode = 'v' })
-LIB.RegisterEvent('LOADING_ENDING.LIB#GetObjectType', function()
-	CACHE = setmetatable({}, { __mode = 'v' })
-end)
+local CACHE = LIB.CreateCache('LIB#GetObjectType.v')
 function LIB.GetObjectType(obj)
 	if not CACHE[obj] then
 		if NEARBY_PLAYER[obj.dwID] == obj then
