@@ -2365,6 +2365,11 @@ function LIB.CreateCache(szNameMode, aEvent)
 	-- 创建弱表以及事件驱动
 	local t = {}
 	local mt = { __mode = szMode }
+	local function Flush()
+		for k, _ in pairs(t) do
+			t[k] = nil
+		end
+	end
 	local function Register()
 		for _, szEvent in ipairs(aEvent) do
 			LIB.RegisterEvent(szEvent .. '.' .. szKey, Flush)
@@ -2373,11 +2378,6 @@ function LIB.CreateCache(szNameMode, aEvent)
 	local function Unregister()
 		for _, szEvent in ipairs(aEvent) do
 			LIB.RegisterEvent(szEvent .. '.' .. szKey, false)
-		end
-	end
-	local function Flush()
-		for k, _ in pairs(t) do
-			t[k] = nil
 		end
 	end
 	function mt.__call(_, k)
@@ -2389,5 +2389,6 @@ function LIB.CreateCache(szNameMode, aEvent)
 			Unregister()
 		end
 	end
+	Register()
 	return setmetatable(t, mt)
 end
