@@ -119,7 +119,7 @@ function D.GetState(tar)
 			return 2020, _L["Entrap"]
 		end
 		-- check speed
-		if IsPlayer(tar.dwID) and tar.nRunSpeed < 20 then
+		if IsPlayer(tar.dwID) and tar.nRunSpeed and tar.nRunSpeed < 20 then
 			return 348, _L["Slower"]
 		end
 	end
@@ -138,7 +138,7 @@ local function SetObjectAvatar(img, tar, info)
 		if bInfo and info.dwMountKungfuID then
 			img:FromIconID(Table_GetSkillIconID(info.dwMountKungfuID, 1))
 		else
-			local kungfu = tar.GetKungfuMount()
+			local kungfu = tar.GetKungfuMount and tar.GetKungfuMount()
 			if kungfu and kungfu.dwSkillID ~= 0 then
 				img:FromIconID(Table_GetSkillIconID(kungfu.dwSkillID, 1))
 			else

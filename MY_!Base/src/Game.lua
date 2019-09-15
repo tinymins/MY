@@ -1916,7 +1916,7 @@ function LIB.GetTarget(...)
 	if select('#', ...) == 0 then
 		object = GetClientPlayer()
 	end
-	if object then
+	if object and object.GetTarget then
 		return object.GetTarget()
 	else
 		return TARGET.NO_TARGET, 0
