@@ -856,8 +856,8 @@ function D.OnBuff(dwOwner, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, dw
 		else
 			cfg, nClass = data[MY_TM_TYPE.BUFF_GET], MY_TM_TYPE.BUFF_GET
 		end
-		local szSender = LIB.GetObjectName(LIB.GetObject(dwSkillSrcID))
-		local szReceiver = LIB.GetObjectName(LIB.GetObject(dwOwner))
+		local szSender = LIB.GetObjectName(IsPlayer(dwSkillSrcID) and TARGET.PLAYER or TARGET.NPC, dwSkillSrcID)
+		local szReceiver = LIB.GetObjectName(IsPlayer(dwOwner) and TARGET.PLAYER or TARGET.NPC, dwOwner)
 		D.CountdownEvent(data, nClass, szSender, szReceiver)
 		if cfg then
 			local szName, nIcon = LIB.GetBuffName(dwBuffID, nBuffLevel)
