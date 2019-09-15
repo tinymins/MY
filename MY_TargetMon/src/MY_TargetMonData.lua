@@ -184,19 +184,6 @@ LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_TargetMonData_Shield', onShieldedReset
 end
 
 do
-local ALIAS
-function D.IsShieldedAlias(szAlias)
-	if D.IsShielded() then
-		if not ALIAS then
-			ALIAS = LIB.ArrayToObject(_L.ALIAS)
-		end
-		return not ALIAS[szAlias]
-	end
-	return false
-end
-end
-
-do
 local SHIELDED_BUFF = {}
 function D.IsShieldedBuff(dwID, nLevel)
 	if D.IsShielded() then
@@ -406,16 +393,16 @@ local function Buff_MonToView(mon, buff, item, KObject, nIcon, config, tMonExist
 		item.nTimeLeft = nTimeLeft
 		item.szStackNum = buff.nStackNum > 1 and buff.nStackNum or ''
 		item.nTimeTotal = nTimeTotal
-		if mon.longAlias and not D.IsShieldedAlias(mon.longAlias) then
+		if mon.longAlias then
 			item.szLongName = mon.longAlias
-		elseif mon.nameAlias and not D.IsShieldedAlias(mon.nameAlias) then
+		elseif mon.nameAlias then
 			item.szLongName = mon.name
 		else
 			item.szLongName = buff.szName
 		end
-		if mon.shortAlias and not D.IsShieldedAlias(mon.shortAlias) then
+		if mon.shortAlias then
 			item.szShortName = mon.shortAlias
-		elseif mon.nameAlias and not D.IsShieldedAlias(mon.nameAlias) then
+		elseif mon.nameAlias then
 			item.szShortName = mon.name
 		else
 			item.szShortName = buff.szName
