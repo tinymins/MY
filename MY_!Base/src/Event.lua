@@ -82,14 +82,17 @@ local function CommonEventRegister(E, szID, fnAction)
 			E.tList = {}
 		end
 		if not E.tList[szEvent] then
-			E.tList[szEvent] = {}
+			E.tList[szEvent] = {
+				tKey = {},
+				aList = {},
+			}
 			if E.OnCreateEvent then
 				E.OnCreateEvent(szEvent)
 			end
 		end
 		if not IsString(szKey) then
 			szKey = GetTickCount() * 1000
-			while E.tList[szEvent][tostring(szKey)] do
+			while E.tList[szEvent].tKey[tostring(szKey)] do
 				szKey = szKey + 1
 			end
 			szKey = tostring(szKey)
@@ -99,21 +102,24 @@ local function CommonEventRegister(E, szID, fnAction)
 		else
 			szID = szEvent .. '.' .. szKey
 		end
-		for i, p in ipairs_r(E.tList[szEvent]) do
+		for i, p in ipairs_r(E.tList[szEvent].aList) do
 			if p.szKey == szKey then
-				remove(E.tList[szEvent], i)
+				remove(E.tList[szEvent].aList, i)
+				E.tList[szEvent].tKey[szKey] = nil
 			end
 		end
-		insert(E.tList[szEvent], { szKey = szKey, szID = szID, fnAction = fnAction })
+		insert(E.tList[szEvent].aList, { szKey = szKey, szID = szID, fnAction = fnAction })
+		E.tList[szEvent].tKey[szKey] = true
 	elseif fnAction == false then
 		if E.tList and E.tList[szEvent] then
 			if szKey then
-				for i, p in ipairs_r(E.tList[szEvent]) do
+				for i, p in ipairs_r(E.tList[szEvent].aList) do
 					if p.szKey == szKey then
-						remove(E.tList[szEvent], i)
+						remove(E.tList[szEvent].aList, i)
+						E.tList[szEvent].tKey[szKey] = nil
 					end
 				end
-				if IsEmpty(E.tList[szEvent]) then
+				if IsEmpty(E.tList[szEvent].aList) then
 					E.tList[szEvent] = nil
 				end
 			else
@@ -127,12 +133,7 @@ local function CommonEventRegister(E, szID, fnAction)
 			end
 		end
 	elseif szKey and E.tList and E.tList[szEvent] then
-		for i, p in ipairs_r(E.tList[szEvent]) do
-			if p.szKey == szKey then
-				return true
-			end
-		end
-		return false
+		return E.tList[szEvent].tKey[szKey] or false
 	elseif not szKey and E.tList and E.tList[szEvent] then
 		return true
 	end
@@ -159,12 +160,12 @@ local function CommonEventFirer(E, arg0, ...)
 		return
 	end
 	if E.tList[szEvent] then
-		for _, p in ipairs(E.tList[szEvent]) do
+		for _, p in ipairs(E.tList[szEvent].aList) do
 			FireEventRec(E, p, arg0, ...)
 		end
 	end
 	if E.tList['*'] then
-		for _, p in ipairs(E.tList['*']) do
+		for _, p in ipairs(E.tList['*'].aList) do
 			FireEventRec(E, p, arg0, ...)
 		end
 	end
