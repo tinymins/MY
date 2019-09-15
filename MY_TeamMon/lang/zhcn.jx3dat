@@ -4,9 +4,9 @@ data = {
 	-- MY_TeamMon_CA.lua --
 	['MY_TeamMon_CA'] = '中央提醒',
 	-- MY_TeamMon_BL.lua --
-	['MY_TeamMon_BL'] = '自身BUFF列表',
+	['MY_TeamMon_BL'] = '自身气劲列表',
 	-- MY_TeamMon_PBL.lua --
-	['MY_TeamMon_PBL'] = '团队重要BUFF列表',
+	['MY_TeamMon_PBL'] = '团队重要气劲列表',
 	['Mouse enter select'] = '鼠标滑过选中目标',
 	-- MY_TeamMon_LT.lua --
 	['MY_TeamMon_LT'] = '特大文字',
@@ -117,7 +117,7 @@ data = {
 	['Trigger talk'] = '触发喊话',
 	['Trigger chat'] = '触发系统喊话',
 	['Add focus'] = '添加焦点',
-	['Add cataclysm buff'] = '添加团队面板BUFF监控',
+	['Add cataclysm buff'] = '添加团队面板气劲监控',
 	['TC'] = '队',
 	['is calling'] = '点',
 	['\'s name.'] = '名了。',
@@ -172,7 +172,7 @@ data = {
 	['Enable circle'] = '启用画圈',
 	['Circle border'] = '圈圈边框',
 	['Enable alarm (master switch)'] = '启用报警模块（总开关）',
-	['Team panel bind show buff'] = '团队面板关联BUFF显示',
+	['Team panel bind show buff'] = '团队面板关联气劲显示',
 	['Max buff count'] = '最大显示数量',
 	['Buff size'] = '气劲格子大小',
 	['Data save mode'] = '数据保存模式',
