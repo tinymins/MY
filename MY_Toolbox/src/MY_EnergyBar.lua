@@ -411,7 +411,7 @@ function D.OnFrameCreate()
 	this:RegisterEvent('UI_SCALED')
 	this:RegisterEvent('LOADING_END')
 	this:RegisterEvent('ON_CHARACTER_POSE_STATE_UPDATE')
-	UpdateCustomModeWindow(this, _L['MY_EnergyBar'])
+	UpdateCustomModeWindow(this, _L['MY_EnergyBar'], true)
 	D.UpdateAnchor(this)
 	D.CopyHandle(this)
 	D.Update(this)
@@ -445,7 +445,7 @@ function D.OnEvent(event)
 	elseif event == 'UI_UPDATE_SUN_MOON_POWER_VALUE' then
 		D.UpdateMingJiao(this)
 	elseif event == 'ON_ENTER_CUSTOM_UI_MODE' or event == 'ON_LEAVE_CUSTOM_UI_MODE' then
-		UpdateCustomModeWindow(this)
+		UpdateCustomModeWindow(this, _L['MY_EnergyBar'], true)
 		this:BringToTop()
 	elseif event == 'UI_SCALED' then
 		D.UpdateAnchor(this)
