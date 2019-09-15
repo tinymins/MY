@@ -2694,7 +2694,7 @@ function D.OpenSettingPanel(data, szType)
 	end
 	-- Ωπµ„¡–±Ì
 	if MY_Focus then
-		if szType == 'NPC' then
+		if szType == 'NPC' or szType == 'DOODAD' then
 			nX, nY = ui:Append('Text', { x = 20, y = nY + 10, text = _L['Focuslist'], font = 27 }):Pos('BOTTOMRIGHT')
 			nX, nY = 30, nY + 10
 			for _, p in ipairs(data.aFocus or CONSTANT.EMPTY_TABLE) do
@@ -2720,7 +2720,7 @@ function D.OpenSettingPanel(data, szType)
 								end
 								D.OpenSettingPanel(data, szType)
 							end
-							FireUIEvent('MY_TM_DATA_RELOAD', { NPC = true })
+							FireUIEvent('MY_TM_DATA_RELOAD', { [szType] = true })
 						end, true)
 					end,
 				}):Width() + 5
@@ -2738,7 +2738,7 @@ function D.OpenSettingPanel(data, szType)
 					end
 					insert(data.aFocus, {})
 					D.OpenSettingPanel(data, szType)
-					FireUIEvent('MY_TM_DATA_RELOAD', { NPC = true })
+					FireUIEvent('MY_TM_DATA_RELOAD', { [szType] = true })
 				end,
 			}):Width() + 5
 			nY = nY + BUTTON2_HEIGHT

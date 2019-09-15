@@ -987,9 +987,20 @@ end
 do
 local function UpdateTeamMonData()
 	D.TEAMMON_FOCUS = {}
-	local aData = MY_TeamMon and MY_TeamMon.GetTable and MY_TeamMon.GetTable('NPC')
-	if aData then
-		for _, data in spairs(aData[-1], aData[LIB.GetMapID()]) do
+	local aDS = {}
+	if MY_TeamMon and MY_TeamMon.GetTable then
+		for _, p in ipairs({
+			{'NPC', TARGET.NPC},
+			{'DOODAD', TARGET.DOODAD},
+		}) do
+			local aData = MY_TeamMon.GetTable(p[1])
+			if aData then
+				insert(aDS, { dwType = p[2], aData = aData })
+			end
+		end
+	end
+	for _, ds in ipairs(aDS) do
+		for _, data in spairs(ds.aData[-1], ds.aData[LIB.GetMapID()]) do
 			if data.aFocus then
 				for _, p in ipairs(data.aFocus) do
 					local rule = Clone(p)
@@ -997,10 +1008,11 @@ local function UpdateTeamMonData()
 					rule.szPattern = tostring(data.dwID)
 					rule.tType = {
 						bAll = false,
-						[TARGET.NPC] = true,
+						[TARGET.NPC] = false,
 						[TARGET.PLAYER] = false,
 						[TARGET.DOODAD] = false,
 					}
+					rule.tType[ds.dwType] = true
 					insert(D.TEAMMON_FOCUS, D.FormatAutoFocusData(rule))
 				end
 			end
@@ -1010,7 +1022,7 @@ local function UpdateTeamMonData()
 end
 LIB.RegisterEvent('LOADING_ENDING.MY_Focus', UpdateTeamMonData)
 local function onTeamMonUpdate()
-	if arg0 and not arg0['NPC'] then
+	if arg0 and not arg0['NPC'] and not arg0['DOODAD'] then
 		return
 	end
 	UpdateTeamMonData()
