@@ -235,6 +235,10 @@ _C.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel)
     end
 
     if not MY_ChatMonitor.bIsRegexp then
+        local szChannelName = g_tStrings.tChannelName[szChannel]
+        if szChannelName then
+            rec.text = '[' .. szChannelName .. ']\t' .. rec.text
+        end
         rec.text = StringLowerW(rec.text)
     end
     rec.hash = string.gsub(rec.hash, '[\n%s]+', '')
