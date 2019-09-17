@@ -149,7 +149,9 @@ data = {
 	['[%s] want to see your info, OK?'] = '團長 [%s] 想知曉您的裝備、心法，是否告知？',
 	['I\'ve installed MY plugins v%s'] = '我已安裝茗伊插件集 v%s。',
 
-	['LClick to copy to editbox.\nMClick to remove this line.\nRClick to repeat this line.'] = '左鍵複製到聊天欄\n中鍵刪除該行文本\n右鍵複製發佈到當前聊天頻道',
+	['LClick to copy to editbox.\n'] = '左鍵複製到聊天欄\n',
+	['MClick to remove this line.\n'] = '中鍵刪除該行文本\n',
+	['RClick to repeat this line.\n'] = '右鍵發佈到當前頻道\n',
 
 
 	['Invalid player ID!']           = '您要查看裝備的玩家ID不合法！',

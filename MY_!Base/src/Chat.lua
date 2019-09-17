@@ -85,42 +85,40 @@ function LIB.RemoveChatLine(hTime)
 	hHandle:FormatAllItemPos()
 end
 
--- 获取复制聊天行Text
-function LIB.GetCopyLinkText(szText, rgbf)
+local function GetCopyLinkScript(opt)
+	local handlerEntry = PACKET_INFO.NAME_SPACE .. '.ChatLinkEventHandlers'
+	local szScript = 'this[\'b' .. PACKET_INFO.NAME_SPACE .. 'ChatRendered\']=true;this.OnItemMouseEnter='
+		.. handlerEntry .. '.OnCopyMouseEnter;this.OnItemMouseLeave=' .. handlerEntry .. '.OnCopyMouseLeave;'
+	if opt.lclick ~= false then
+		szScript = szScript .. 'this.bLButton=true;this.OnItemLButtonDown='.. handlerEntry .. '.OnCopyLClick;'
+	end
+	if opt.mclick ~= false then
+		szScript = szScript .. 'this.bMButton=true;this.OnItemMButtonDown='.. handlerEntry .. '.OnCopyMClick;'
+	end
+	if opt.rclick ~= false then
+		szScript = szScript .. 'this.bRButton=true;this.OnItemRButtonDown='.. handlerEntry .. '.OnCopyRClick;'
+	end
+	return szScript
+end
+
+-- 获取复制聊天行字符串
+function LIB.GetCopyLinkText(szText, opt)
 	if not IsString(szText) then
 		szText = _L[' * ']
 	end
-	if not IsTable(rgbf) then
-		rgbf = { f = 10 }
+	if not IsTable(opt) then
+		opt = { f = 10 }
 	end
-	local handlerEntry = PACKET_INFO.NAME_SPACE .. '.ChatLinkEventHandlers'
-	return GetFormatText(szText, rgbf.f, rgbf.r, rgbf.g, rgbf.b, 82691,
-		'this[\'b' .. PACKET_INFO.NAME_SPACE .. 'ChatRendered\']=true;this.OnItemLButtonDown='
-			.. handlerEntry .. '.OnCopyLClick;this.OnItemMButtonDown='
-			.. handlerEntry .. '.OnCopyMClick;this.OnItemRButtonDown='
-			.. handlerEntry .. '.OnCopyRClick;this.OnItemMouseEnter='
-			.. handlerEntry .. '.OnCopyMouseEnter;this.OnItemMouseLeave='
-			.. handlerEntry .. '.OnCopyMouseLeave',
-		'copylink')
+	return GetFormatText(szText, opt.f, opt.r, opt.g, opt.b, 82691, GetCopyLinkScript(opt), 'copylink')
 end
 
--- 获取复制聊天行Text
-function LIB.GetTimeLinkText(dwTime, rgbfs)
-	if not IsTable(rgbfs) then
-		rgbfs = { f = 10 }
+-- 获取复制聊天行时间串
+function LIB.GetTimeLinkText(dwTime, opt)
+	if not IsTable(opt) then
+		opt = { f = 10 }
 	end
-	local handlerEntry = PACKET_INFO.NAME_SPACE .. '.ChatLinkEventHandlers'
-	return GetFormatText(
-		LIB.FormatTime(dwTime, rgbfs.s or '[%hh:%mm:%ss]'),
-		rgbfs.f, rgbfs.r, rgbfs.g, rgbfs.b, 82691,
-		'this[\'b' .. PACKET_INFO.NAME_SPACE .. 'ChatRendered\']=true;this.OnItemLButtonDown='
-			.. handlerEntry .. '.OnCopyLClick;this.OnItemMButtonDown='
-			.. handlerEntry .. '.OnCopyMClick;this.OnItemRButtonDown='
-			.. handlerEntry .. '.OnCopyRClick;this.OnItemMouseEnter='
-			.. handlerEntry .. '.OnCopyMouseEnter;this.OnItemMouseLeave='
-			.. handlerEntry .. '.OnCopyMouseLeave',
-		'timelink'
-	)
+	local szText = LIB.FormatTime(dwTime, opt.s or '[%hh:%mm:%ss]')
+	return GetFormatText(szText, opt.f, opt.r, opt.g, opt.b, 82691, GetCopyLinkScript(opt), 'timelink')
 end
 
 -- 复制聊天行
@@ -279,13 +277,23 @@ function ChatLinkEvents.OnCopyRClick(element, link)
 	end
 	LIB.RepeatChatLine(link)
 end
-function ChatLinkEvents.OnCopyMouseEnter(element, link)
+function ChatLinkEvents.OnCopyMouseEnter(el, link)
 	if not link then
-		link = element
+		link = el
 	end
-	local x, y = element:GetAbsPos()
-	local w, h = element:GetSize()
-	local szText = GetFormatText(_L['LClick to copy to editbox.\nMClick to remove this line.\nRClick to repeat this line.'], 136)
+	local x, y = el:GetAbsPos()
+	local w, h = el:GetSize()
+	local s = ''
+	if el.bLButton then
+		s = s .. _L['LClick to copy to editbox.\n']
+	end
+	if el.bMButton then
+		s = s .. _L['MClick to remove this line.\n']
+	end
+	if el.bRButton then
+		s = s .. _L['RClick to repeat this line.\n']
+	end
+	local szText = GetFormatText(s:sub(1, -2), 136)
 	OutputTip(szText, 450, {x, y, w, h}, UI.TIP_POSITION.TOP_BOTTOM)
 end
 function ChatLinkEvents.OnCopyMouseLeave(element, link)
