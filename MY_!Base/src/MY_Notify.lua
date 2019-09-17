@@ -40,8 +40,10 @@ local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAD
 MY_Notify = {}
 MY_Notify.anchor = { x = -100, y = -150, s = 'BOTTOMRIGHT', r = 'BOTTOMRIGHT' }
 MY_Notify.bDesc = false
+MY_Notify.bDisableDismiss = false
 RegisterCustomData('MY_Notify.anchor')
 RegisterCustomData('MY_Notify.bDesc')
+RegisterCustomData('MY_Notify.bDisableDismiss')
 
 local _L = LIB.LoadLangPack()
 local D = {}
@@ -69,7 +71,7 @@ function MY_Notify.Create(opt)
 end
 LIB.CreateNotify = MY_Notify.Create
 
-function MY_Notify.Dismiss(szKey, bOnlyData)
+function D.Dismiss(szKey, bOnlyData)
 	for i, v in ipairs_r(NOTIFY_LIST) do
 		if v.szKey == szKey then
 			remove(NOTIFY_LIST, i)
@@ -81,6 +83,13 @@ function MY_Notify.Dismiss(szKey, bOnlyData)
 	end
 	D.UpdateEntry()
 	D.DrawNotifies(true)
+end
+
+function MY_Notify.Dismiss(...)
+	if MY_Notify.bDisableDismiss then
+		return
+	end
+	return D.Dismiss(...)
 end
 LIB.DismissNotify = MY_Notify.Dismiss
 
@@ -207,10 +216,10 @@ function MY_Notify.OnItemLButtonClick()
 		local bDismiss, notify
 		if name == 'Handle_Notify' then
 			notify = this.notify
-			bDismiss = not notify.fnAction or notify.fnAction(notify.szKey)
+			bDismiss = (not notify.fnAction or notify.fnAction(notify.szKey))
 		elseif name == 'Handle_Notify_View' then
 			notify = this:GetParent().notify
-			bDismiss = not notify.fnAction or notify.fnAction(notify.szKey)
+			bDismiss = (not notify.fnAction or notify.fnAction(notify.szKey))
 		elseif name == 'Handle_Notify_Dismiss' then
 			notify = this:GetParent().notify
 			if notify.fnCancel then
@@ -219,7 +228,7 @@ function MY_Notify.OnItemLButtonClick()
 			bDismiss = true
 		end
 		if bDismiss then
-			MY_Notify.Dismiss(notify.szKey, true)
+			D.Dismiss(notify.szKey, true)
 		end
 		notify.bUnread = false
 		D.UpdateEntry()

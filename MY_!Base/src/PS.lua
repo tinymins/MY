@@ -1054,7 +1054,7 @@ function PS.OnPanelActive(wnd)
 		color = { 255, 255, 0 },
 	}):AutoWidth()
 	y = y + 30
-	ui:Append('WndCheckBox', {
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, w = 100, h = 25,
 		text = _L['Order desc'],
 		checked = MY_Notify.bDesc,
@@ -1062,7 +1062,15 @@ function PS.OnPanelActive(wnd)
 			MY_Notify.bDesc = bChecked
 			MY_Notify.DrawNotifies()
 		end,
-	}):AutoWidth()
+	}):AutoWidth():Width() + 5
+	x = x + ui:Append('WndCheckBox', {
+		x = x, y = y, w = 100, h = 25,
+		text = _L['Disable dismiss'],
+		checked = MY_Notify.bDisableDismiss,
+		oncheck = function(bChecked)
+			MY_Notify.bDisableDismiss = bChecked
+		end,
+	}):AutoWidth():Width() + 5
 	x, y = X, y + 30
 
 	ui:Append('Text', {

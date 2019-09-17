@@ -398,6 +398,7 @@ data = {
 	['Distance type'] = '默认距离计算方式',
 	['Notify center'] = '消息中心',
 	['Order desc'] = '逆序显示',
+	['Disable dismiss'] = '禁止消息自动消失',
 	['System Info'] = '系统信息',
 	DISTANCE_TYPE = {
 		['gwwean'] = '郭氏距离',
