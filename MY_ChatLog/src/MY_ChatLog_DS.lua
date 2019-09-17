@@ -407,7 +407,10 @@ function DS:OptimizeDB()
 end
 
 function DS:InsertMsg(szChannel, szText, szMsg, szTalker, nTime)
-	if szMsg and szText and szTalker then
+	if not szTalker then
+		szTalker = ''
+	end
+	if szMsg and szText then
 		local szuMsg    = AnsiToUTF8(szMsg)
 		local szuText   = AnsiToUTF8(szText)
 		local szHash    = GetStringCRC(szMsg)
