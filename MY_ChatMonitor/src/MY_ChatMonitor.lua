@@ -181,7 +181,7 @@ function D.OnNotifyCB()
 end
 
 -- 插入聊天内容时监控聊天信息
-_C.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel)
+_C.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID, szName)
     -- is enabled
     if not MY_ChatMonitor.bCapture
     or not MY_ChatMonitor.szKeyWords
@@ -269,7 +269,7 @@ _C.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel)
         OutputMessage('MSG_SYS', GetFormatText('', nil, 255,255,0) .. szMsg, true)
     end
     -- 广播消息
-    OutputMessage('MSG_MY_MONITOR', szMsg, true)
+    OutputMessage('MSG_MY_MONITOR', szMsg, true, nil, nil, dwTalkerID, szName)
     -- 更新UI
     if _C.uiBoard then
         local nPos = _C.uiBoard:Scroll()
