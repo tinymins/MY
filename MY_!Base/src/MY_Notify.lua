@@ -39,7 +39,9 @@ local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAD
 
 MY_Notify = {}
 MY_Notify.anchor = { x = -100, y = -150, s = 'BOTTOMRIGHT', r = 'BOTTOMRIGHT' }
+MY_Notify.bDesc = false
 RegisterCustomData('MY_Notify.anchor')
+RegisterCustomData('MY_Notify.bDesc')
 
 local _L = LIB.LoadLangPack()
 local D = {}
@@ -92,7 +94,7 @@ function D.UpdateEntry()
 		return
 	end
 	local nUnread = 0
-	for i, v in ipairs(NOTIFY_LIST) do
+	for _, v in ipairs(NOTIFY_LIST) do
 		if v.bUnread then
 			nUnread = nUnread + 1
 		end
@@ -151,7 +153,12 @@ function D.DrawNotifies(bAutoClose)
 		return
 	end
 	hList:Clear()
-	for i, notify in ipairs(NOTIFY_LIST) do
+	local nStart, nCount, nStep = 1, min(#NOTIFY_LIST, 100), 1
+	if MY_Notify.bDesc then
+		nStart, nStep = #NOTIFY_LIST, -1
+	end
+	for nIndex = nStart, nStart + (nCount - 1) * nStep, nStep do
+		local notify = NOTIFY_LIST[nIndex]
 		local hItem = hList:AppendItemFromIni(INI_PATH, 'Handle_Notify')
 		local hMsg = hItem:Lookup('Handle_Notify_Msg')
 		local nDeltaH = hMsg:GetH()
@@ -185,6 +192,7 @@ function D.DrawNotifies(bAutoClose)
 	end
 	hList:FormatAllItemPos()
 end
+MY_Notify.DrawNotifies = D.DrawNotifies
 
 function MY_Notify.OnFrameCreate()
 	D.DrawNotifies()

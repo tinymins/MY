@@ -1050,6 +1050,23 @@ function PS.OnPanelActive(wnd)
 
 	ui:Append('Text', {
 		x = X - 10, y = y,
+		text = _L['Notify center'],
+		color = { 255, 255, 0 },
+	}):AutoWidth()
+	y = y + 30
+	ui:Append('WndCheckBox', {
+		x = x, y = y, w = 100, h = 25,
+		text = _L['Order desc'],
+		checked = MY_Notify.bDesc,
+		oncheck = function(bChecked)
+			MY_Notify.bDesc = bChecked
+			MY_Notify.DrawNotifies()
+		end,
+	}):AutoWidth()
+	x, y = X, y + 30
+
+	ui:Append('Text', {
+		x = X - 10, y = y,
 		text = _L['System Info'],
 		color = { 255, 255, 0 },
 	}):AutoWidth()

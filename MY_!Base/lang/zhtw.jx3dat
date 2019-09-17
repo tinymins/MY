@@ -396,6 +396,8 @@ data = {
 
 	['GlobalConfig'] = '全局設置',
 	['Distance type'] = '默認距離計算方式',
+	['Notify center'] = '消息中心',
+	['Order desc'] = '逆序顯示',
 	['System Info'] = '系統信息',
 	DISTANCE_TYPE = {
 		['gwwean'] = '郭氏距離',
