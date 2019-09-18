@@ -706,9 +706,10 @@ local function GetAdvText()
 	return _L('%s, welcome to use %s!', me.szName, PACKET_INFO.NAME) .. 'v' .. LIB.GetVersion()
 end
 local function GetSvrText()
+	local nFeeTime = LIB.GetTimeOfFee() - GetCurrentTime()
 	return LIB.GetServer() .. ' (' .. LIB.GetRealServer() .. ')'
 		.. g_tStrings.STR_CONNECT
-		.. LIB.FormatTimeCounter(LIB.GetTimeOfFee() - GetCurrentTime(), _L['Fee left %H:%mm:%ss'])
+		.. (nFeeTime > 0 and LIB.FormatTimeCounter(nFeeTime, _L['Fee left %H:%mm:%ss']) or _L['Fee left unknown'])
 end
 function PS.OnPanelActive(wnd)
 	local ui = LIB.UI(wnd)

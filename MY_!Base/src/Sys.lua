@@ -2290,12 +2290,12 @@ else
 			dwPointEndTime = dwTime + tonumber(szHour) * 3600 + tonumber(szMinute) * 60 + tonumber(szSecond)
 			dwDayEndTime = 0
 		end
-		-- 包月时间截止至：xxxx年xx月xx日xx时
-		local szYear, szMonth, szDay, szHour = szMsg:match(_L['Month time to: (%d+)y(%d+)m(%d+)d(%d+)h'])
-		if szYear and szMonth and szDay and szHour then
+		-- 包月时间截止至：xxxx/xx/xx xx:xx
+		local szYear, szMonth, szDay, szHour, szMinute = szMsg:match(_L['Month time to: (%d+)y(%d+)m(%d+)d (%d+)h(%d+)m'])
+		if szYear and szMonth and szDay and szHour and szMinute then
 			local dwTime = GetCurrentTime()
 			bInit = true
-			dwMonthEndTime = LIB.DateToTime(szYear, szMonth, szDay, szHour, 0, 0)
+			dwMonthEndTime = LIB.DateToTime(szYear, szMonth, szDay, szHour, szMinute, 0)
 			dwPointEndTime = 0
 			dwDayEndTime = 0
 		end
