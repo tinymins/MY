@@ -41,7 +41,7 @@ local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Toolbox'
 local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
+if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2014200) then
 	return
 end
 --------------------------------------------------------------------------
@@ -69,7 +69,7 @@ RegisterCustomData('MY_AutoDialogue.bSkipQuestTalk')
 ---------------------------------------------------------------------------
 function D.LoadData()
 	DIALOGUE = LIB.LoadLUAData({'config/auto_dialogue.jx3dat', PATH_TYPE.GLOBAL})
-		or LIB.LoadLUAData(PACKET_INFO.ROOT .. 'MY_ToolBox/data/auto_dialogue/$lang.jx3dat')
+		or LIB.LoadLUAData(PACKET_INFO.ROOT .. 'MY_ToolBox/data/auto_dialogue/${lang}.jx3dat')
 		or {}
 end
 

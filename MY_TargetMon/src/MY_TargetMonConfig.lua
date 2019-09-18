@@ -42,7 +42,7 @@ local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TargetMon'
 local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
+if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2014200) then
 	return
 end
 --------------------------------------------------------------------------
@@ -70,7 +70,7 @@ local TARGET_TYPE_LIST = {
 	'TEAM_MARK_FAN'  ,
 }
 local CONFIG, CONFIG_CHANGED, CONFIG_BUFF_TARGET_LIST, CONFIG_SKILL_TARGET_LIST
-local CONFIG_TEMPLATE = LIB.LoadLUAData(PACKET_INFO.ROOT .. 'MY_TargetMon/data/template/$lang.jx3dat')
+local CONFIG_TEMPLATE = LIB.LoadLUAData(PACKET_INFO.ROOT .. 'MY_TargetMon/data/template/${lang}.jx3dat')
 local MON_TEMPLATE = CONFIG_TEMPLATE.monitors.__CHILD_TEMPLATE__
 local MONID_TEMPLATE = CONFIG_TEMPLATE.monitors.__CHILD_TEMPLATE__.__VALUE__.ids.__CHILD_TEMPLATE__
 local MONLEVEL_TEMPLATE = CONFIG_TEMPLATE.monitors.__CHILD_TEMPLATE__.__VALUE__.ids.__CHILD_TEMPLATE__.levels.__CHILD_TEMPLATE__

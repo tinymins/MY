@@ -288,7 +288,7 @@ if IsLocalFileExist(PACKET_INFO.ROOT .. '@DATA/') then
 	CPath.Move(PACKET_INFO.ROOT .. '@DATA/', PACKET_INFO.DATA_ROOT)
 end
 
--- 格式化数据文件路径（替换$uid、$lang、$server以及补全相对路径）
+-- 格式化数据文件路径（替换${uid}、${lang}、${server}以及补全相对路径）
 -- (string) LIB.GetLUADataPath(oFilePath)
 --   当路径为绝对路径时(以斜杠开头)不作处理
 --   当路径为相对路径时 相对于插件`{NS}#DATA`目录
@@ -310,40 +310,40 @@ function LIB.FormatPath(oFilePath, tParams)
 		if ePathType == PATH_TYPE.DATA then
 			szFilePath = PACKET_INFO.INTERFACE_ROOT .. PACKET_INFO.NAME_SPACE .. '#DATA/' .. szFilePath
 		elseif ePathType == PATH_TYPE.GLOBAL then
-			szFilePath = PACKET_INFO.INTERFACE_ROOT .. PACKET_INFO.NAME_SPACE .. '#DATA/!all-users@$lang/' .. szFilePath
+			szFilePath = PACKET_INFO.INTERFACE_ROOT .. PACKET_INFO.NAME_SPACE .. '#DATA/!all-users@${lang}/' .. szFilePath
 		elseif ePathType == PATH_TYPE.ROLE then
-			szFilePath = PACKET_INFO.INTERFACE_ROOT .. PACKET_INFO.NAME_SPACE .. '#DATA/$uid@$lang/' .. szFilePath
+			szFilePath = PACKET_INFO.INTERFACE_ROOT .. PACKET_INFO.NAME_SPACE .. '#DATA/${uid}@${lang}/' .. szFilePath
 		elseif ePathType == PATH_TYPE.SERVER then
-			szFilePath = PACKET_INFO.INTERFACE_ROOT .. PACKET_INFO.NAME_SPACE .. '#DATA/#$relserver@$lang/' .. szFilePath
+			szFilePath = PACKET_INFO.INTERFACE_ROOT .. PACKET_INFO.NAME_SPACE .. '#DATA/#${relserver}@${lang}/' .. szFilePath
 		end
 	end
-	-- if exist $uid then add user role identity
-	if string.find(szFilePath, '%$uid') then
-		szFilePath = szFilePath:gsub('%$uid', tParams['uid'] or LIB.GetClientUUID())
+	-- if exist ${uid} then add user role identity
+	if find(szFilePath, '${uid}', nil, true) then
+		szFilePath = szFilePath:gsub('%${uid}', tParams['uid'] or LIB.GetClientUUID())
 	end
-	-- if exist $name then add user role identity
-	if string.find(szFilePath, '%$name') then
-		szFilePath = szFilePath:gsub('%$name', tParams['name'] or LIB.GetClientInfo().szName or LIB.GetClientUUID())
+	-- if exist ${name} then add user role identity
+	if find(szFilePath, '${name}', nil, true) then
+		szFilePath = szFilePath:gsub('%${name}', tParams['name'] or LIB.GetClientInfo().szName or LIB.GetClientUUID())
 	end
-	-- if exist $lang then add language identity
-	if string.find(szFilePath, '%$lang') then
-		szFilePath = szFilePath:gsub('%$lang', tParams['lang'] or string.lower(LIB.GetLang()))
+	-- if exist ${lang} then add language identity
+	if find(szFilePath, '${lang}', nil, true) then
+		szFilePath = szFilePath:gsub('%${lang}', tParams['lang'] or string.lower(LIB.GetLang()))
 	end
-	-- if exist $version then add version identity
-	if string.find(szFilePath, '%$version') then
-		szFilePath = szFilePath:gsub('%$version', tParams['version'] or select(2, GetVersion()))
+	-- if exist ${version} then add version identity
+	if find(szFilePath, '${version}', nil, true) then
+		szFilePath = szFilePath:gsub('%${version}', tParams['version'] or select(2, GetVersion()))
 	end
-	-- if exist $date then add date identity
-	if string.find(szFilePath, '%$date') then
-		szFilePath = szFilePath:gsub('%$date', tParams['date'] or LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd'))
+	-- if exist ${date} then add date identity
+	if find(szFilePath, '${date}', nil, true) then
+		szFilePath = szFilePath:gsub('%${date}', tParams['date'] or LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd'))
 	end
-	-- if exist $server then add server identity
-	if string.find(szFilePath, '%$server') then
-		szFilePath = szFilePath:gsub('%$server', tParams['server'] or ((LIB.GetServer()):gsub('[/\\|:%*%?"<>]', '')))
+	-- if exist ${server} then add server identity
+	if find(szFilePath, '${server}', nil, true) then
+		szFilePath = szFilePath:gsub('%${server}', tParams['server'] or ((LIB.GetServer()):gsub('[/\\|:%*%?"<>]', '')))
 	end
-	-- if exist $relserver then add relserver identity
-	if string.find(szFilePath, '%$relserver') then
-		szFilePath = szFilePath:gsub('%$relserver', tParams['relserver'] or ((LIB.GetRealServer()):gsub('[/\\|:%*%?"<>]', '')))
+	-- if exist ${relserver} then add relserver identity
+	if find(szFilePath, '${relserver}', nil, true) then
+		szFilePath = szFilePath:gsub('%${relserver}', tParams['relserver'] or ((LIB.GetRealServer()):gsub('[/\\|:%*%?"<>]', '')))
 	end
 	local rootPath = GetRootPath():gsub('\\', '/')
 	if szFilePath:find(rootPath) == 1 then
@@ -734,14 +734,14 @@ function LIB.CreateDataRoot(ePathType)
 	CREATED[ePathType] = true
 	-- 创建目录
 	if ePathType == PATH_TYPE.ROLE then
-		CPath.MakeDir(LIB.FormatPath({'$name/', PATH_TYPE.ROLE}))
+		CPath.MakeDir(LIB.FormatPath({'${name}/', PATH_TYPE.ROLE}))
 	end
 	-- 版本更新时删除旧的临时目录
 	if IsLocalFileExist(LIB.FormatPath({'temporary/', ePathType}))
-	and not IsLocalFileExist(LIB.FormatPath({'temporary/$version', ePathType})) then
+	and not IsLocalFileExist(LIB.FormatPath({'temporary/${version}', ePathType})) then
 		CPath.DelDir(LIB.FormatPath({'temporary/', ePathType}))
 	end
-	CPath.MakeDir(LIB.FormatPath({'temporary/$version/', ePathType}))
+	CPath.MakeDir(LIB.FormatPath({'temporary/${version}/', ePathType}))
 	CPath.MakeDir(LIB.FormatPath({'audio/', ePathType}))
 	CPath.MakeDir(LIB.FormatPath({'cache/', ePathType}))
 	CPath.MakeDir(LIB.FormatPath({'config/', ePathType}))

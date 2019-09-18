@@ -41,7 +41,7 @@ local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_InfoTip'
 local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
+if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2014200) then
 	return
 end
 --------------------------------------------------------------------------
@@ -193,7 +193,7 @@ local _SZ_CONFIG_FILE_ = {'config/infotip.jx3dat', PATH_TYPE.ROLE}
 local _Cache = {}
 local SaveConfig = function() LIB.SaveLUAData(_SZ_CONFIG_FILE_, MY_InfoTip.Config) end
 local LoadConfig = function()
-    local szOrgFile = LIB.GetLUADataPath({'config/MY_INFO_TIP/$uid.$lang.jx3dat', PATH_TYPE.DATA})
+    local szOrgFile = LIB.GetLUADataPath({'config/MY_INFO_TIP/${uid}.${lang}.jx3dat', PATH_TYPE.DATA})
     local szFilePath = LIB.GetLUADataPath(_SZ_CONFIG_FILE_)
     if IsLocalFileExist(szOrgFile) then
         CPath.Move(szOrgFile, szFilePath)

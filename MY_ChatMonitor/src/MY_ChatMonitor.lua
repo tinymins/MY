@@ -41,7 +41,7 @@ local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_ChatMonitor'
 local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
+if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2014200) then
 	return
 end
 --------------------------------------------------------------------------
@@ -100,7 +100,7 @@ _C.bInited = false
 _C.ui = nil
 _C.uiBoard = nil
 _C.szLuaData = 'config/chatmonitor.jx3dat'
-do local SZ_OLD_PATH = LIB.FormatPath('config/MY_CHATMONITOR/cfg_$lang.jx3dat')
+do local SZ_OLD_PATH = LIB.FormatPath('config/MY_CHATMONITOR/cfg_${lang}.jx3dat')
     if IsLocalFileExist(SZ_OLD_PATH) then
         CPath.Move(SZ_OLD_PATH, LIB.FormatPath({_C.szLuaData, PATH_TYPE.GLOBAL}))
     end
