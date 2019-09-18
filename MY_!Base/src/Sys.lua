@@ -2280,29 +2280,39 @@ if Login_GetTimeOfFee then
 	end
 else
 	local bInit, dwMonthEndTime, dwPointEndTime, dwDayEndTime = false, 0, 0, 0
-	LIB.RegisterMsgMonitor('LIB#GetTimeOfFee', function(szMsg)
-		-- 点卡剩余时间为：558小时41分33秒
-		local szHour, szMinute, szSecond = szMsg:match(_L['Point left time: (%d+)h(%d+)m(%d+)s'])
-		if szHour and szMinute and szSecond then
-			local dwTime = GetCurrentTime()
-			bInit = true
-			dwMonthEndTime = 0
-			dwPointEndTime = dwTime + tonumber(szHour) * 3600 + tonumber(szMinute) * 60 + tonumber(szSecond)
-			dwDayEndTime = 0
-		end
-		-- 包月时间截止至：xxxx/xx/xx xx:xx
-		local szYear, szMonth, szDay, szHour, szMinute = szMsg:match(_L['Month time to: (%d+)y(%d+)m(%d+)d (%d+)h(%d+)m'])
-		if szYear and szMonth and szDay and szHour and szMinute then
-			local dwTime = GetCurrentTime()
-			bInit = true
-			dwMonthEndTime = LIB.DateToTime(szYear, szMonth, szDay, szHour, szMinute, 0)
-			dwPointEndTime = 0
-			dwDayEndTime = 0
-		end
-		if bInit then
-			LIB.RegisterMsgMonitor('LIB#GetTimeOfFee')
-		end
-	end, {'MSG_SYS'})
+	local frame = Station.Lookup('Lowest/Scene')
+	local data = frame and frame[PACKET_INFO.NAME_SPACE .. '_TimeOfFee']
+	if data then
+		bInit, dwMonthEndTime, dwPointEndTime, dwDayEndTime = true, unpack(data)
+	else
+		LIB.RegisterMsgMonitor('LIB#GetTimeOfFee', function(szMsg)
+			-- 点卡剩余时间为：558小时41分33秒
+			local szHour, szMinute, szSecond = szMsg:match(_L['Point left time: (%d+)h(%d+)m(%d+)s'])
+			if szHour and szMinute and szSecond then
+				local dwTime = GetCurrentTime()
+				bInit = true
+				dwMonthEndTime = 0
+				dwPointEndTime = dwTime + tonumber(szHour) * 3600 + tonumber(szMinute) * 60 + tonumber(szSecond)
+				dwDayEndTime = 0
+			end
+			-- 包月时间截止至：xxxx/xx/xx xx:xx
+			local szYear, szMonth, szDay, szHour, szMinute = szMsg:match(_L['Month time to: (%d+)y(%d+)m(%d+)d (%d+)h(%d+)m'])
+			if szYear and szMonth and szDay and szHour and szMinute then
+				local dwTime = GetCurrentTime()
+				bInit = true
+				dwMonthEndTime = LIB.DateToTime(szYear, szMonth, szDay, szHour, szMinute, 0)
+				dwPointEndTime = 0
+				dwDayEndTime = 0
+			end
+			if bInit then
+				local frame = Station.Lookup('Lowest/Scene')
+				if frame then
+					frame[PACKET_INFO.NAME_SPACE .. '_TimeOfFee'] = {dwMonthEndTime, dwPointEndTime, dwDayEndTime}
+				end
+				LIB.RegisterMsgMonitor('LIB#GetTimeOfFee')
+			end
+		end, {'MSG_SYS'})
+	end
 	function LIB.GetTimeOfFee()
 		local dwTime = GetCurrentTime()
 		local dwEndTime = max(dwMonthEndTime, dwPointEndTime, dwDayEndTime)
