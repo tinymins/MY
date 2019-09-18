@@ -2419,7 +2419,7 @@ function D.OpenSettingPanel(data, szType)
 		-- Í¼±ê
 		nX = ui:Append('Box', {
 			x = nX + 5, y = nY, w = 24, h = 24, icon = v.nIcon or nIcon,
-			hover = function(bHover) this:SetObjectMouseOver(bHover) end,
+			onhover = function(bHover) this:SetObjectMouseOver(bHover) end,
 			onclick = function()
 				local box = this
 				UI.OpenIconPanel(function(nIcon)
@@ -2512,7 +2512,7 @@ function D.OpenSettingPanel(data, szType)
 		nX, nY = ui:Append('Image', {
 			x = nX + 5, y = nY, w = 26, h = 26,
 			image = file, imageframe = 86,
-			hover = function(bIn)
+			onhover = function(bIn)
 				if bIn then
 					this:SetFrame(87)
 				else
@@ -2652,7 +2652,7 @@ function D.OpenSettingPanel(data, szType)
 				nX = ui:Append('Image', {
 					x = nX + 5, y = nY + 1,
 					w = 26, h = 26,
-					hover = function(bIn)
+					onhover = function(bIn)
 						if bIn then
 							this:SetFrame(87)
 						else

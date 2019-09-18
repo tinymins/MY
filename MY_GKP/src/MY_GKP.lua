@@ -1206,7 +1206,7 @@ LIB.RegisterBgMsg('MY_GKP', function(_, nChannel, dwID, szName, bIsSelf, ...)
 							local img = ui:Append('Image', {
 								x = x + 590, y = y + n * 30 - 30, w = 150, h = 150, alpha = 180,
 								image = PACKET_INFO.ROOT .. 'MY_GKP/img/GKPSeal.uitex', imageframe = nFrame,
-								hover = function(bHover)
+								onhover = function(bHover)
 									if bHover then
 										this:SetAlpha(30)
 									else
