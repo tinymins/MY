@@ -1075,6 +1075,42 @@ function PS.OnPanelActive(wnd)
 
 	ui:Append('Text', {
 		x = X - 10, y = y,
+		text = _L['Hover entry'],
+		color = { 255, 255, 0 },
+	}):AutoWidth()
+	y = y + 30
+	x = x + ui:Append('WndCheckBox', {
+		x = x, y = y, w = 100, h = 25,
+		text = _L['Enable'],
+		checked = MY_HoverEntry.bEnable,
+		oncheck = function(bChecked)
+			MY_HoverEntry.bEnable = bChecked
+		end,
+	}):AutoWidth():Width() + 5
+	x = x + ui:Append('WndCheckBox', {
+		x = x, y = y, w = 100, h = 25,
+		text = _L['Hover popup'],
+		checked = MY_HoverEntry.bHoverMenu,
+		oncheck = function(bChecked)
+			MY_HoverEntry.bHoverMenu = bChecked
+		end,
+		autoenable = function() return MY_HoverEntry.bEnable end,
+	}):AutoWidth():Width() + 5
+	x = x + ui:Append('WndTrackbar', {
+		x = x, y = y, w = 100, h = 25,
+		value = MY_HoverEntry.nSize,
+		range = {1, 300},
+		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		textfmt = function(v) return _L('Size: %d', v) end,
+		onchange = function(val)
+			MY_HoverEntry.nSize = val
+		end,
+		autoenable = function() return MY_HoverEntry.bEnable end,
+	}):AutoWidth():Width() + 5
+	x, y = X, y + 30
+
+	ui:Append('Text', {
+		x = X - 10, y = y,
 		text = _L['System Info'],
 		color = { 255, 255, 0 },
 	}):AutoWidth()

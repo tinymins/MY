@@ -28,5 +28,6 @@ lua_21=src\MY_Notify.lua
 lua_22=src\LoadingEnd.lua
 lua_23=src\MY_Serendipity.lua
 lua_24=src\MY_BgMsgCenter.lua
-lua_25=src\MY_Web.lua
+lua_25=src\MY_HoverEntry.lua
+lua_26=src\MY_Web.lua
 package=MY

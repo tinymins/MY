@@ -455,4 +455,8 @@ data = {
 
 	['Point left time: (%d+)h(%d+)m(%d+)s'] = '点卡剩余时间为：(%d+)小时(%d+)分(%d+)秒',
 	['Fee left %H:%mm:%ss'] = '计费剩余：%H小时%mm分钟%ss秒',
+
+	['Hover entry'] = '悬浮入口',
+	['Hover popup'] = '鼠标滑过立即弹出',
+	['Size: %d'] = '大小：%d',
 }

@@ -1288,7 +1288,7 @@ local TRACE_MENU, TRACE_MENU_HASH = {}, {} -- ¹¤¾ßÀ¸²Ëµ¥
 function LIB.RegisterTraceButtonAddonMenu(arg0, arg1)
 	return RegisterMenu(TRACE_MENU, TRACE_MENU_HASH, arg0, arg1)
 end
-local function GetTraceButtonAddonMenu()
+function LIB.GetTraceButtonAddonMenu()
 	return GenerateMenu(TRACE_MENU, true)
 end
 TraceButton_AppendAddonMenu({GetTraceButtonAddonMenu})
