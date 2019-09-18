@@ -47,7 +47,7 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
 end
 --------------------------------------------------------------------------
 
-local ANCHOR = {x = 65, y = -100, s = 'CENTER', r = 'CENTER'}
+local ANCHOR = {x = 65, y = 250, s = 'CENTER', r = 'CENTER'}
 local O = {
 	bEnable = false,
 	tAnchor = {},
