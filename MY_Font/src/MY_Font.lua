@@ -58,7 +58,7 @@ local CONFIG
 -- º”‘ÿ◊÷ÃÂ≈‰÷√
 local CONFIG_PATH = {'config/fontconfig.jx3dat', PATH_TYPE.GLOBAL}
 do
-	local szOrgFile = LIB.GetLUADataPath({'config/MY_FONT/${lang}.jx3dat', PATH_TYPE.DATA})
+	local szOrgFile = LIB.GetLUADataPath({'config/MY_FONT/{$lang}.jx3dat', PATH_TYPE.DATA})
 	local szFilePath = LIB.GetLUADataPath(CONFIG_PATH)
 	if IsLocalFileExist(szOrgFile) then
 		CPath.Move(szOrgFile, szFilePath)

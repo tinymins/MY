@@ -336,7 +336,7 @@ function MY_Anmerkungen.LoadConfig()
 		PUBLIC_PLAYER_IDS = data.ids or {}
 		PUBLIC_PLAYER_NOTES = data.data or {}
 	end
-	local szOrgFile = LIB.GetLUADataPath({'config/PLAYER_NOTES/${relserver}.${lang}.jx3dat', PATH_TYPE.DATA})
+	local szOrgFile = LIB.GetLUADataPath({'config/PLAYER_NOTES/{$relserver}.{$lang}.jx3dat', PATH_TYPE.DATA})
 	local szFilePath = LIB.GetLUADataPath({'config/playernotes.jx3dat', PATH_TYPE.SERVER})
 	if IsLocalFileExist(szOrgFile) then
 		CPath.Move(szOrgFile, szFilePath)
@@ -366,7 +366,7 @@ function MY_Anmerkungen.LoadConfig()
 		PRIVATE_PLAYER_IDS = data.ids or {}
 		PRIVATE_PLAYER_NOTES = data.data or {}
 	end
-	local szOrgFile = LIB.GetLUADataPath({'config/PLAYER_NOTES/${uid}.${lang}.jx3dat', PATH_TYPE.DATA})
+	local szOrgFile = LIB.GetLUADataPath({'config/PLAYER_NOTES/{$uid}.{$lang}.jx3dat', PATH_TYPE.DATA})
 	local szFilePath = LIB.GetLUADataPath({'config/playernotes.jx3dat', PATH_TYPE.ROLE})
 	if IsLocalFileExist(szOrgFile) then
 		CPath.Move(szOrgFile, szFilePath)

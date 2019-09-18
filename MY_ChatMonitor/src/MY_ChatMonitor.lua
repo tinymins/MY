@@ -100,7 +100,7 @@ _C.bInited = false
 _C.ui = nil
 _C.uiBoard = nil
 _C.szLuaData = 'config/chatmonitor.jx3dat'
-do local SZ_OLD_PATH = LIB.FormatPath('config/MY_CHATMONITOR/cfg_${lang}.jx3dat')
+do local SZ_OLD_PATH = LIB.FormatPath('config/MY_CHATMONITOR/cfg_{$lang}.jx3dat')
     if IsLocalFileExist(SZ_OLD_PATH) then
         CPath.Move(SZ_OLD_PATH, LIB.FormatPath({_C.szLuaData, PATH_TYPE.GLOBAL}))
     end

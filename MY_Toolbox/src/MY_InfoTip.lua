@@ -193,7 +193,7 @@ local _SZ_CONFIG_FILE_ = {'config/infotip.jx3dat', PATH_TYPE.ROLE}
 local _Cache = {}
 local SaveConfig = function() LIB.SaveLUAData(_SZ_CONFIG_FILE_, MY_InfoTip.Config) end
 local LoadConfig = function()
-    local szOrgFile = LIB.GetLUADataPath({'config/MY_INFO_TIP/${uid}.${lang}.jx3dat', PATH_TYPE.DATA})
+    local szOrgFile = LIB.GetLUADataPath({'config/MY_INFO_TIP/{$uid}.{$lang}.jx3dat', PATH_TYPE.DATA})
     local szFilePath = LIB.GetLUADataPath(_SZ_CONFIG_FILE_)
     if IsLocalFileExist(szOrgFile) then
         CPath.Move(szOrgFile, szFilePath)

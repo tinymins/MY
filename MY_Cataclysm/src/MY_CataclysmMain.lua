@@ -50,9 +50,9 @@ end
 local D = {}
 local INI_ROOT = PACKET_INFO.ROOT .. 'MY_Cataclysm/ui/'
 local CFG = MY_Cataclysm.CFG
-local CTM_CONFIG_DEFAULT = LIB.LoadLUAData(PACKET_INFO.ROOT .. 'MY_Cataclysm/config/default/${lang}.jx3dat')
-local CTM_CONFIG_OFFICIAL = LIB.LoadLUAData(PACKET_INFO.ROOT .. 'MY_Cataclysm/config/official/${lang}.jx3dat')
-local CTM_CONFIG_CATACLYSM = LIB.LoadLUAData(PACKET_INFO.ROOT .. 'MY_Cataclysm/config/cataclysm/${lang}.jx3dat')
+local CTM_CONFIG_DEFAULT = LIB.LoadLUAData(PACKET_INFO.ROOT .. 'MY_Cataclysm/config/default/{$lang}.jx3dat')
+local CTM_CONFIG_OFFICIAL = LIB.LoadLUAData(PACKET_INFO.ROOT .. 'MY_Cataclysm/config/official/{$lang}.jx3dat')
+local CTM_CONFIG_CATACLYSM = LIB.LoadLUAData(PACKET_INFO.ROOT .. 'MY_Cataclysm/config/cataclysm/{$lang}.jx3dat')
 
 local PASSPHRASE
 do

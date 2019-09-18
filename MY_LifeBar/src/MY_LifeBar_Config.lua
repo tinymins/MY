@@ -49,7 +49,7 @@ end
 local D = {}
 
 local function LoadDefaultTemplate(szStyle)
-	local template = LIB.LoadLUAData(PACKET_INFO.ROOT .. 'MY_LifeBar/config/' .. szStyle .. '/${lang}.jx3dat')
+	local template = LIB.LoadLUAData(PACKET_INFO.ROOT .. 'MY_LifeBar/config/' .. szStyle .. '/{$lang}.jx3dat')
 	if not template then
 		return
 	end

@@ -262,7 +262,7 @@ do
 local l_serendipities
 local function GetSerendipityInfo(dwTabType, dwIndex)
 	if not l_serendipities then
-		l_serendipities = LIB.LoadLUAData(PACKET_INFO.FRAMEWORK_ROOT .. 'data/serendipities/${lang}.jx3dat')
+		l_serendipities = LIB.LoadLUAData(PACKET_INFO.FRAMEWORK_ROOT .. 'data/serendipities/{$lang}.jx3dat')
 		l_serendipities.name = {}
 		for dwTabType, tList in pairs(l_serendipities) do
 			if dwTabType ~= 'name' then

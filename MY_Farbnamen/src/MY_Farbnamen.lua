@@ -96,14 +96,14 @@ local function InitDB()
 	DBT_RI = DB:Prepare('SELECT id, name FROM TongCache WHERE id = ?')
 
 	-- ¾É°æÎÄ¼þ»º´æ×ª»»
-	local SZ_IC_PATH = LIB.FormatPath({'cache/PLAYER_INFO/${relserver}/', PATH_TYPE.DATA})
+	local SZ_IC_PATH = LIB.FormatPath({'cache/PLAYER_INFO/{$relserver}/', PATH_TYPE.DATA})
 	if IsLocalFileExist(SZ_IC_PATH) then
 		--[[#DEBUG BEGIN]]
 		LIB.Debug('Farbnamen info cache trans from file to sqlite start!', 'MY_Farbnamen', DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		DB:Execute('BEGIN TRANSACTION')
 		for i = 0, 999 do
-			local data = LIB.LoadLUAData({'cache/PLAYER_INFO/${relserver}/DAT2/' .. i .. '.${lang}.jx3dat', PATH_TYPE.DATA})
+			local data = LIB.LoadLUAData({'cache/PLAYER_INFO/{$relserver}/DAT2/' .. i .. '.{$lang}.jx3dat', PATH_TYPE.DATA})
 			if data then
 				for id, p in pairs(data) do
 					DBI_W:ClearBindings()
@@ -123,7 +123,7 @@ local function InitDB()
 		DB:Execute('BEGIN TRANSACTION')
 		for i = 0, 128 do
 			for j = 0, 128 do
-				local data = LIB.LoadLUAData({'cache/PLAYER_INFO/${relserver}/TONG/' .. i .. '-' .. j .. '.${lang}.jx3dat', PATH_TYPE.DATA})
+				local data = LIB.LoadLUAData({'cache/PLAYER_INFO/{$relserver}/TONG/' .. i .. '-' .. j .. '.{$lang}.jx3dat', PATH_TYPE.DATA})
 				if data then
 					for id, name in pairs(data) do
 						DBT_W:ClearBindings()

@@ -94,7 +94,7 @@ local SZ_CACHE_PATH = 'cache/NPC_DOODAD_REC/'
 if IsLocalFileExist(LIB.FormatPath({SZ_CACHE_PATH, PATH_TYPE.DATA})) then
 	DB:Execute('BEGIN TRANSACTION')
 	for _, dwMapID in ipairs(GetMapList()) do
-		local data = LIB.LoadLUAData({SZ_CACHE_PATH .. dwMapID .. '.${lang}.jx3dat', PATH_TYPE.DATA})
+		local data = LIB.LoadLUAData({SZ_CACHE_PATH .. dwMapID .. '.{$lang}.jx3dat', PATH_TYPE.DATA})
 		if type(data) == 'string' then
 			data = LIB.JsonDecode(data)
 		end
@@ -184,8 +184,8 @@ local function AutomaticRerender()
 	end
 end
 
-local NpcTpl = LIB.LoadLUAData(PACKET_INFO.ROOT .. 'MY_MiddleMapMark/data/npc/${lang}.jx3dat')
-local DoodadTpl = LIB.LoadLUAData(PACKET_INFO.ROOT .. 'MY_MiddleMapMark/data/doodad/${lang}.jx3dat')
+local NpcTpl = LIB.LoadLUAData(PACKET_INFO.ROOT .. 'MY_MiddleMapMark/data/npc/{$lang}.jx3dat')
+local DoodadTpl = LIB.LoadLUAData(PACKET_INFO.ROOT .. 'MY_MiddleMapMark/data/doodad/{$lang}.jx3dat')
 local function OnNpcEnterScene()
 	if l_tempMap and LIB.IsShieldedVersion() then
 		return

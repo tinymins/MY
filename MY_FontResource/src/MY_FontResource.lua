@@ -48,7 +48,7 @@ end
 
 local D = {}
 local FONT_DIR = PACKET_INFO.ROOT:gsub('%./', '/') .. 'MY_FontResource/font/'
-local FONT_LIST = LIB.LoadLUAData(FONT_DIR .. '${lang}.jx3dat') or {}
+local FONT_LIST = LIB.LoadLUAData(FONT_DIR .. '{$lang}.jx3dat') or {}
 
 function D.GetList()
 	local aList, tExist, szLang = {}, {}, LIB.GetLang()

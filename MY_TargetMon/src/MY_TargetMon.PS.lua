@@ -1159,9 +1159,9 @@ local function DrawControls(ui, OpenDetail)
 					local file = LIB.FormatPath({
 						'export/TargetMon/'
 							.. (bAsEmbedded and 'embedded/' or '')
-							.. '${name}@${server}@'
+							.. '{$name}@{$server}@'
 							.. LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss')
-							.. (bAsEmbedded and '.${lang}' or '')
+							.. (bAsEmbedded and '.{$lang}' or '')
 							.. '.jx3dat',
 						PATH_TYPE.GLOBAL,
 					})

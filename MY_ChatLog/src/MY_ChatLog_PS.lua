@@ -267,7 +267,7 @@ function D.ExportConfirm()
 					end
 				end
 				D.Export(
-					LIB.FormatPath({'export/ChatLog/${name}@${server}@' .. LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss') .. szSuffix, PATH_TYPE.ROLE}),
+					LIB.FormatPath({'export/ChatLog/{$name}@{$server}@' .. LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss') .. szSuffix, PATH_TYPE.ROLE}),
 					aChannels, 10,
 					function(title, progress)
 						OutputMessage('MSG_ANNOUNCE_YELLOW', _L('Exporting chatlog: %s, %.2f%%.', title, progress * 100))

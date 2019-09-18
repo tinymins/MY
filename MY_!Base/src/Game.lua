@@ -597,7 +597,7 @@ local function GenerateList(bForceRefresh)
 		LIB.Sysmsg({_L('Boss list updated to v%s.', select(2, GetVersion()))})
 	end
 
-	for dwMapID, tInfo in pairs(LIB.LoadLUAData(PACKET_INFO.FRAMEWORK_ROOT .. 'data/bosslist/${lang}.jx3dat') or {}) do
+	for dwMapID, tInfo in pairs(LIB.LoadLUAData(PACKET_INFO.FRAMEWORK_ROOT .. 'data/bosslist/{$lang}.jx3dat') or {}) do
 		if not BOSS_LIST[dwMapID] then
 			BOSS_LIST[dwMapID] = {}
 		end
@@ -697,7 +697,7 @@ local function GenerateList(bForceRefresh)
 		LIB.SaveLUAData(CACHE_PATH, INPC_LIST)
 		LIB.Sysmsg({_L('Important Npc list updated to v%s.', select(2, GetVersion()))})
 	end
-	for dwMapID, tInfo in pairs(LIB.LoadLUAData(PACKET_INFO.FRAMEWORK_ROOT .. 'data/inpclist/${lang}.jx3dat') or {}) do
+	for dwMapID, tInfo in pairs(LIB.LoadLUAData(PACKET_INFO.FRAMEWORK_ROOT .. 'data/inpclist/{$lang}.jx3dat') or {}) do
 		if not INPC_LIST[dwMapID] then
 			INPC_LIST[dwMapID] = {}
 		end
