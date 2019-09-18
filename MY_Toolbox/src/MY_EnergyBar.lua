@@ -47,6 +47,7 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
 end
 --------------------------------------------------------------------------
 
+local ANCHOR = {x = 65, y = -100, s = 'CENTER', r = 'CENTER'}
 local O = {
 	bEnable = false,
 	tAnchor = {},
@@ -91,10 +92,11 @@ local D = {
 
 function D.UpdateAnchor(frame)
 	local an = O.tAnchor
-	if an and not IsEmpty(an) then
-		frame:SetPoint(an.s, 0, 0, an.r, an.x, an.y)
-		frame:CorrectPos()
+	if IsEmpty(an) then
+		an = ANCHOR
 	end
+	frame:SetPoint(an.s, 0, 0, an.r, an.x, an.y)
+	frame:CorrectPos()
 end
 
 function D.UpdateAccumulateValue(frame)
@@ -412,7 +414,6 @@ function D.OnFrameCreate()
 	this:RegisterEvent('LOADING_END')
 	this:RegisterEvent('ON_CHARACTER_POSE_STATE_UPDATE')
 	UpdateCustomModeWindow(this, _L['MY_EnergyBar'], true)
-	D.UpdateAnchor(this)
 	D.CopyHandle(this)
 	D.Update(this)
 end
@@ -493,7 +494,11 @@ function D.Apply()
 	else
 		local frame = Station.Lookup('Normal/MY_EnergyBar')
 		if not frame then
-			UI.CreateFrame('MY_EnergyBar', { empty = true, w = 400, h = 60, penetrable = true })
+			local an = O.tAnchor
+			if IsEmpty(an) then
+				an = ANCHOR
+			end
+			UI.CreateFrame('MY_EnergyBar', { empty = true, w = 400, h = 60, penetrable = true, anchor = an })
 		end
 	end
 end
@@ -527,6 +532,7 @@ local settings = {
 		{
 			fields = {
 				bEnable = true,
+				tAnchor = true,
 			},
 			root = O,
 		},
@@ -535,6 +541,7 @@ local settings = {
 		{
 			fields = {
 				bEnable = true,
+				tAnchor = true,
 			},
 			triggers = {
 				bEnable = D.Apply,
