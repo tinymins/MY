@@ -1291,7 +1291,7 @@ end
 function LIB.GetTraceButtonAddonMenu()
 	return GenerateMenu(TRACE_MENU, true)
 end
-TraceButton_AppendAddonMenu({GetTraceButtonAddonMenu})
+TraceButton_AppendAddonMenu({LIB.GetTraceButtonAddonMenu})
 end
 
 do
