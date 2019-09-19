@@ -189,14 +189,24 @@ function LIB.Ajax(settings)
 	if not settings.success then
 		settings.success = function(html, status)
 			--[[#DEBUG BEGIN]]
-			LIB.Debug(settings.url .. ' - SUCCESS', 'AJAX', DEBUG_LEVEL.LOG)
+			LIB.Debug(
+				settings.url .. ' - ' .. settings.driver .. '/' .. settings.method
+					.. ' (' .. driver .. '/' .. method .. ')'
+					.. ': SUCCESS',
+				'AJAX', DEBUG_LEVEL.LOG
+			)
 			--[[#DEBUG END]]
 		end
 	end
 	if not settings.error then
 		settings.error = function(html, status, success)
 			--[[#DEBUG BEGIN]]
-			LIB.Debug(settings.url .. ' - STATUS ' .. (success and status or 'failed'), 'AJAX', DEBUG_LEVEL.WARNING)
+			LIB.Debug(
+				settings.url .. ' - ' .. settings.driver .. '/' .. settings.method
+					.. ' (' .. driver .. '/' .. method .. ')'
+					.. ': ' .. (success and status or 'FAILED'),
+				'AJAX', DEBUG_LEVEL.WARNING
+			)
 			--[[#DEBUG END]]
 		end
 	end

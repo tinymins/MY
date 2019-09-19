@@ -137,6 +137,7 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTi
 				if not config then
 					return
 				end
+				i = i + 1
 				LIB.Ajax({
 					driver = config[1],
 					method = config[2],
@@ -149,18 +150,17 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTi
 					})),
 					success = function()
 						--[[#DEBUG BEGIN]]
-						LIB.Debug('Upload serendipity succeed with mode' .. config[1] .. '/' .. config[2], nil, DEBUG_LEVEL.LOG)
+						LIB.Debug('Upload serendipity succeed with mode ' .. config[1] .. '/' .. config[2], nil, DEBUG_LEVEL.LOG)
 						--[[#DEBUG END]]
 						LIB.DelayCall(dc, false)
 					end,
 					error = function()
 						--[[#DEBUG BEGIN]]
-						LIB.Debug('Upload serendipity failed with mode' .. config[1] .. '/' .. config[2], nil, DEBUG_LEVEL.LOG)
+						LIB.Debug('Upload serendipity failed with mode ' .. config[1] .. '/' .. config[2], nil, DEBUG_LEVEL.LOG)
 						--[[#DEBUG END]]
 						TryUploadWithNextDriver()
 					end,
 				})
-				i = i + 1
 				dc = LIB.DelayCall(6000, TryUploadWithNextDriver)
 			end
 			TryUploadWithNextDriver()
