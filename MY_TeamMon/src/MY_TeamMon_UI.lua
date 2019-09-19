@@ -921,9 +921,7 @@ function D.OpenImportPanel(szDefault, szTitle, fnAction)
 				end
 			end
 			local bStatus, szMsg = MY_TeamMon.LoadConfigureFile(config)
-			--[[#DEBUG BEGIN]]
-			LIB.Debug('Load config: ' .. tostring(szMsg), _L['MY_TeamMon_UI'], DEBUG_LEVEL.LOG)
-			--[[#DEBUG END]]
+			LIB.Sysmsg(_L('Load config: %s', tostring(szMsg)), _L['MY_TeamMon'], 'MSG_SYS.SUCCESS')
 			if bStatus then
 				LIB.Alert(_L('Import success: %s', szTitle or szMsg))
 				ui:Remove()

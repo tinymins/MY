@@ -148,6 +148,7 @@ data = {
 	['Browse'] = '瀏覽',
 	['Import data (web)'] = '導入數據（聯網獲取文件）',
 	['Import data (local)'] = '導入數據（本地文件）',
+	['Load config: %s'] = '載入數據：%s',
 	['Open data folder'] = '打開數據文件夾',
 	['Includes'] = '包括',
 	['File name'] = '文件名',

@@ -45,6 +45,7 @@ local _L = LIB.LoadLangPack()
 -- LIB.Sysmsg({{'New message', r = 0, g = 0, b = 0, rich = false}, wrap = true}, 'MY')
 -- LIB.Sysmsg('New message', {'MY', 'DB', r = 0, g = 0, b = 0})
 do local THEME_LIST = {
+	['SUCCESS'] = { r = 0, g = 255, b = 127 },
 	['ERROR'] = { r = 255, g = 0, b = 0 },
 }
 local function StringifySysmsgObject(aMsg, oContent, cfg, bTitle)
