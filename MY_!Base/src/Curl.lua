@@ -129,17 +129,12 @@ local function CreateWebPageFrame()
 	repeat
 		szRequestID = ('%X%X'):format(GetTickCount(), math.floor(math.random() * 0xEFFF) + 0x1000)
 	until not Station.Lookup('Lowest/MYRRWP_' .. szRequestID)
+	--[[#DEBUG BEGIN]]
+	LIB.Debug('CreateWebPageFrame: ' .. szRequestID, nil, DEBUG_LEVEL.LOG)
+	--[[#DEBUG END]]
 	hFrame = Wnd.OpenWindow(PACKET_INFO.UICOMPONENT_ROOT .. 'WndWebPage.ini', 'MYRRWP_' .. szRequestID)
 	hFrame:Hide()
 	return szRequestID, hFrame
-end
-
--- 先开几个常驻防止创建时抢焦点（正式环境才需要）
-if not LIB.IsDebugClient() and not LIB.IsDebugServer() then
-	for i = 1, 5 do
-		local szRequestID = CreateWebPageFrame()
-		insert(MY_RRWP_FREE, szRequestID)
-	end
 end
 
 local CURL_HttpPost = CURL_HttpPostEx or CURL_HttpPost

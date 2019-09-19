@@ -131,7 +131,7 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTi
 			szName = ''
 		end
 		local function DoUpload()
-			local configs, i, dc = {{'auto', 'post'}, {'auto', 'get'}, {'webcef', 'get'}}, 1
+			local configs, i, dc = {{'curl', 'post'}, {'origin', 'post'}, {'origin', 'get'}, {'webcef', 'get'}}, 1
 			local function TryUploadWithNextDriver()
 				local config = configs[i]
 				if not config then
@@ -147,8 +147,18 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTi
 						S = LIB.GetRealServer(1), s = LIB.GetRealServer(2),
 						a = szSerendipity, f = nStatus, t = dwTime,
 					})),
-					success = function() LIB.DelayCall(dc, false) end,
-					error = function() TryUploadWithNextDriver() end,
+					success = function()
+						--[[#DEBUG BEGIN]]
+						LIB.Debug('Upload serendipity succeed with mode' .. config[1] .. '/' .. config[2], nil, DEBUG_LEVEL.LOG)
+						--[[#DEBUG END]]
+						LIB.DelayCall(dc, false)
+					end,
+					error = function()
+						--[[#DEBUG BEGIN]]
+						LIB.Debug('Upload serendipity failed with mode' .. config[1] .. '/' .. config[2], nil, DEBUG_LEVEL.LOG)
+						--[[#DEBUG END]]
+						TryUploadWithNextDriver()
+					end,
 				})
 				i = i + 1
 				dc = LIB.DelayCall(6000, TryUploadWithNextDriver)
