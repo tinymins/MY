@@ -97,7 +97,7 @@ end
 
 function D.OnEvent(event)
 	if event == 'UI_SCALED' then
-		D.UpdateAnchor(this)
+		UI(this):Anchor(O.anchor)
 	elseif event == 'ON_ENTER_CUSTOM_UI_MODE' then
 		UpdateCustomModeWindow(this, _L['MY_HoverEntry'])
 	elseif event == 'ON_LEAVE_CUSTOM_UI_MODE' then
