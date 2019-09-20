@@ -82,8 +82,12 @@ local function GetDoodadTemplateName(dwID)
 	return GetDoodadTemplate(dwID).szName
 end
 
+local function IsShielded()
+	return LIB.IsInShieldedMap() and LIB.IsShieldedVersion()
+end
+
 local function IsAutoInteract()
-	return O.bInteract and not IsShiftKeyDown() and not Station.Lookup('Normal/MY_GKP_Loot')
+	return O.bInteract and not IsShiftKeyDown() and not Station.Lookup('Normal/MY_GKP_Loot') and not IsShielded()
 end
 
 local D = {
@@ -184,7 +188,8 @@ end)
 -- switch name
 function D.CheckShowName()
 	local hName = UI.GetShadowHandle('MY_GKPDoodad')
-	if O.bShowName and not D.pLabel then
+	local bShowName = O.bShowName and not IsShielded()
+	if bShowName and not D.pLabel then
 		D.pLabel = hName:AppendItemFromIni(INI_SHADOW, 'Shadow', 'Shadow_Name')
 		LIB.BreatheCall('MY_GKPDoodad#HeadName', function()
 			if D.bUpdateLabel then
@@ -193,7 +198,7 @@ function D.CheckShowName()
 			end
 		end)
 		D.bUpdateLabel = true
-	elseif not O.bShowName and D.pLabel then
+	elseif not bShowName and D.pLabel then
 		hName:Clear()
 		D.pLabel = nil
 		LIB.BreatheCall('MY_GKPDoodad#HeadName', false)
@@ -349,7 +354,7 @@ end
 ---------------------------------------------------------------------
 -- 注册事件、初始化
 ---------------------------------------------------------------------
-LIB.RegisterEvent('PLAYER_ENTER_GAME', D.CheckShowName)
+LIB.RegisterEvent('LOADING_ENDING', D.CheckShowName)
 LIB.RegisterEvent('DOODAD_ENTER_SCENE', function() D.TryAdd(arg0, true) end)
 LIB.RegisterEvent('DOODAD_LEAVE_SCENE', function() D.Remove(arg0) end)
 LIB.RegisterEvent('OPEN_DOODAD', D.OnLootDoodad)
