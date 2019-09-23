@@ -207,10 +207,15 @@ end
 
 -- 初始化/生效 设置
 function D.Apply()
+	local shaBack = Station.Lookup('Lowest2/ChatPanel1/Wnd_Message', 'Shadow_Back')
+	local editInput = Station.Lookup('Lowest2/EditBox/Edit_Input')
+	if not shaBack or not editInput then
+		return
+	end
 	if O.bEnable then
 		-- get bg alpha
 		if not O.fAhBgAlpha then
-			O.fAhBgAlpha = Station.Lookup('Lowest2/ChatPanel1'):Lookup('Wnd_Message', 'Shadow_Back'):GetAlpha() / 255
+			O.fAhBgAlpha = shaBack:GetAlpha() / 255
 			O.bAhAnimate = O.bAhAnimate or false
 		end
 		-- hook chat panel as event listener
@@ -228,44 +233,42 @@ function D.Apply()
 		end)
 
 		-- hook chat edit box
-		local hEditInput = Station.Lookup('Lowest2/EditBox/Edit_Input')
 		-- save org
-		if hEditInput._MY_T_AHCP_OnSetFocus == nil then
-			hEditInput._MY_T_AHCP_OnSetFocus = hEditInput.OnSetFocus or false
+		if editInput._MY_T_AHCP_OnSetFocus == nil then
+			editInput._MY_T_AHCP_OnSetFocus = editInput.OnSetFocus or false
 		end
 		-- show when chat panel get focus
-		hEditInput.OnSetFocus = function()
+		editInput.OnSetFocus = function()
 			D.ShowChatPanel(GLOBAL.GAME_FPS / 4, 0)
 			if this._MY_T_AHCP_OnSetFocus then
 				this._MY_T_AHCP_OnSetFocus()
 			end
 		end
 		-- save org
-		if hEditInput._MY_T_AHCP_OnKillFocus == nil then
-			hEditInput._MY_T_AHCP_OnKillFocus = hEditInput.OnKillFocus or false
+		if editInput._MY_T_AHCP_OnKillFocus == nil then
+			editInput._MY_T_AHCP_OnKillFocus = editInput.OnKillFocus or false
 		end
 		-- hide after input box lost focus for 5 sec
-		hEditInput.OnKillFocus = function()
+		editInput.OnKillFocus = function()
 			D.HideChatPanel(GLOBAL.GAME_FPS / 2, GLOBAL.GAME_FPS * 5)
 			if this._MY_T_AHCP_OnKillFocus then
 				this._MY_T_AHCP_OnKillFocus()
 			end
 		end
 	else
-		local hEditInput = Station.Lookup('Lowest2/EditBox/Edit_Input')
-		if hEditInput._MY_T_AHCP_OnSetFocus then
-			hEditInput.OnSetFocus = hEditInput._MY_T_AHCP_OnSetFocus
+		if editInput._MY_T_AHCP_OnSetFocus then
+			editInput.OnSetFocus = editInput._MY_T_AHCP_OnSetFocus
 		else
-			hEditInput.OnSetFocus = nil
+			editInput.OnSetFocus = nil
 		end
-		hEditInput._MY_T_AHCP_OnSetFocus = nil
+		editInput._MY_T_AHCP_OnSetFocus = nil
 
-		if hEditInput._MY_T_AHCP_OnKillFocus then
-			hEditInput.OnKillFocus = hEditInput._MY_T_AHCP_OnKillFocus
+		if editInput._MY_T_AHCP_OnKillFocus then
+			editInput.OnKillFocus = editInput._MY_T_AHCP_OnKillFocus
 		else
-			hEditInput.OnKillFocus = nil
+			editInput.OnKillFocus = nil
 		end
-		hEditInput._MY_T_AHCP_OnKillFocus = nil
+		editInput._MY_T_AHCP_OnKillFocus = nil
 		LIB.HookChatPanel('AFTER.MY_AutoHideChat', false)
 
 		D.ShowChatPanel()
