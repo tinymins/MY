@@ -236,7 +236,9 @@ function ChatLinkEvents.OnNameLClick(element, link)
 	elseif IsCtrlKeyDown() then
 		LIB.CopyChatItem(link)
 	elseif IsShiftKeyDown() then
-		LIB.SetTarget(TARGET.PLAYER, UI(link):Text())
+		if not LIB.IsInShieldedMap() or not LIB.IsShieldedVersion() then
+			LIB.SetTarget(TARGET.PLAYER, UI(link):Text())
+		end
 	elseif IsAltKeyDown() then
 		if MY_Farbnamen and MY_Farbnamen.Get then
 			local info = MY_Farbnamen.Get((UI(link):Text():gsub('[%[%]]', '')))
