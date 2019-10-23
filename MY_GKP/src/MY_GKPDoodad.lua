@@ -323,7 +323,7 @@ end
 
 -- mini flag
 function D.OnUpdateMiniFlag()
-	if not O.bMiniFlag then
+	if not O.bMiniFlag or IsShielded() then
 		return
 	end
 	local me = GetClientPlayer()
