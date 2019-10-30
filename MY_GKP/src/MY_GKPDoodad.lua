@@ -87,7 +87,7 @@ local function IsShielded()
 end
 
 local function IsAutoInteract()
-	return O.bInteract and not IsShiftKeyDown() and not Station.Lookup('Normal/MY_GKP_Loot') and not IsShielded()
+	return O.bInteract and not IsShiftKeyDown() and not Station.Lookup('Normal/MY_GKP_Loot') and not LIB.IsShieldedVersion()
 end
 
 local D = {
@@ -525,25 +525,27 @@ function PS.OnPanelActive(frame)
 		autoenable = function() return MY_GKPDoodad.bShowName end,
 	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
 
-	nX = ui:Append('WndCheckBox', {
-		x = nX, y = nY,
-		text = _L['Auto craft'],
-		checked = MY_GKPDoodad.bInteract,
-		oncheck = function(bChecked)
-			MY_GKPDoodad.bInteract = bChecked
-			ui:Fetch('Check_Interact_Fight'):Enable(bChecked)
-		end,
-	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
+	if not LIB.IsShieldedVersion() then
+		nX = ui:Append('WndCheckBox', {
+			x = nX, y = nY,
+			text = _L['Auto craft'],
+			checked = MY_GKPDoodad.bInteract,
+			oncheck = function(bChecked)
+				MY_GKPDoodad.bInteract = bChecked
+				ui:Fetch('Check_Interact_Fight'):Enable(bChecked)
+			end,
+		}):AutoWidth():Pos('BOTTOMRIGHT') + 10
 
-	nX = ui:Append('WndCheckBox', {
-		name = 'Check_Interact_Fight', x = nX, y = nY,
-		text = _L['Interact in fight'],
-		checked = MY_GKPDoodad.bInteractEvenFight,
-		enable = MY_GKPDoodad.bInteract,
-		oncheck = function(bChecked)
-			MY_GKPDoodad.bInteractEvenFight = bChecked
-		end,
-	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
+		nX = ui:Append('WndCheckBox', {
+			name = 'Check_Interact_Fight', x = nX, y = nY,
+			text = _L['Interact in fight'],
+			checked = MY_GKPDoodad.bInteractEvenFight,
+			enable = MY_GKPDoodad.bInteract,
+			oncheck = function(bChecked)
+				MY_GKPDoodad.bInteractEvenFight = bChecked
+			end,
+		}):AutoWidth():Pos('BOTTOMRIGHT') + 10
+	end
 
 	-- craft
 	nX, nY = X + 10, nY + 32
