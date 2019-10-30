@@ -53,3 +53,12 @@
 * 本插件开源免费，本人出于兴趣和朋友需求制作，[作者](http://weibo.com/zymah)很懒，Markdown格式都是从[`HM`](https://haimanchajian.com)搬来的。<a target="_blank" href="http://sighttp.qq.com/authd?IDKEY=4034035048535db36d3ae3964df9944a890dbafc89852a46"><img border="0"  src="https://pub.idqqimg.com/qconn/wpa/button/button_111.gif" alt="与一名宅发起临时会话" title="与一名宅发起临时会话"/></a>
 * 本插件遵循简单实用原则，完全遵守白名单API，收集部分玩家角色公开信息如玩家ID，角色体型，帮会名称，装备分数等公开非敏感信息做玩家偏好数据统计。
 * 安装使用视为 _同意以上内容_ 。
+
+
+# 维护
+
+## 新门派
+
+* 团队面板心法简化文字 `MY_Cataclysm\lang\zhcn.jx3dat` `KUNGFU_`
+* 全局门派配色 `MY_!Base\src\Game.lua` `MY_FORCE_COLOR_BG_DEFAULT` `MY_FORCE_COLOR_FG_DEFAULT`
+* 全局门派心法枚举 `MY_!Base\src\Base.lua` `FORCE_TYPE` `KUNGFU_TYPE` `KUNGFU_TYPE`
