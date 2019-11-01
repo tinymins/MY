@@ -261,33 +261,10 @@ local function InsertChangeGroupMenu(tMenu, dwMemberID)
 end
 
 -- 有各个版本之间的文本差异，所以做到翻译中
-local CTM_KUNGFU_TEXT = {
-	[10080] = _L['KUNGFU_10080'], -- '云',
-	[10081] = _L['KUNGFU_10081'], -- '冰',
-	[10021] = _L['KUNGFU_10021'], -- '花',
-	[10028] = _L['KUNGFU_10028'], -- '离',
-	[10026] = _L['KUNGFU_10026'], -- '傲',
-	[10062] = _L['KUNGFU_10062'], -- '铁',
-	[10002] = _L['KUNGFU_10002'], -- '洗',
-	[10003] = _L['KUNGFU_10003'], -- '易',
-	[10014] = _L['KUNGFU_10014'], -- '气',
-	[10015] = _L['KUNGFU_10015'], -- '剑',
-	[10144] = _L['KUNGFU_10144'], -- '问',
-	[10145] = _L['KUNGFU_10145'], -- '山',
-	[10175] = _L['KUNGFU_10175'], -- '毒',
-	[10176] = _L['KUNGFU_10176'], -- '补',
-	[10224] = _L['KUNGFU_10224'], -- '羽',
-	[10225] = _L['KUNGFU_10225'], -- '诡',
-	[10242] = _L['KUNGFU_10242'], -- '焚',
-	[10243] = _L['KUNGFU_10243'], -- '尊',
-	[10268] = _L['KUNGFU_10268'], -- '丐',
-	[10390] = _L['KUNGFU_10390'], -- '分',
-	[10389] = _L['KUNGFU_10389'], -- '衣',
-	[10448] = _L['KUNGFU_10448'], -- '相',
-	[10447] = _L['KUNGFU_10447'], -- '莫',
-	[10464] = _L['KUNGFU_10464'], -- '刀',
-}
-setmetatable(CTM_KUNGFU_TEXT, { __index = function() return _L['KUNGFU_0'] end, __metatable = true })
+local CTM_KUNGFU_TEXT = setmetatable(Clone(_L.KUNGFU), {
+	__index = function(t) return _L.KUNGFU[0] end,
+	__metatable = true,
+})
 
 -- CODE --
 local CTM = {}
