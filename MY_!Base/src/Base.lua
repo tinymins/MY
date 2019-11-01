@@ -937,6 +937,7 @@ local CONSTANT = setmetatable({}, {
 			{ dwID = 10268, szUITex = 'ui/Image/icon/skill_GB_30.UITex',        nFrame = 0 }, -- –¶≥æ
 			{ dwID = 10464, szUITex = 'ui/Image/icon/daoj_16_8_25_16.UITex',    nFrame = 0 }, -- ∞‘µ∂
 			{ dwID = 10533, szUITex = 'ui/image/icon/jnpl_18_10_30_27.uitex',   nFrame = 45 }, -- ≈Ó¿≥
+			{ dwID = 10533, szUITex = 'ui/image/icon/jnlxg_19_10_21_9.uitex',   nFrame = 74 }, -- ¡Ë—©
 		},
 		EQUIPMENT_SUIT_COUNT = EQUIPMENT_SUIT_COUNT or 4,
 		INVENTORY_GUILD_BANK = INVENTORY_GUILD_BANK or INVENTORY_INDEX.TOTAL + 1, --∞Ôª·≤÷ø‚ΩÁ√Ê–Èƒ‚“ª∏ˆ±≥∞¸Œª÷√
