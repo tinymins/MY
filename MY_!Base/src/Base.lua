@@ -747,6 +747,7 @@ local FORCE_TYPE = FORCE_TYPE or SetmetaReadonly({
 	GAI_BANG  = 9 , -- ÿ§∞Ô
 	MING_JIAO = 10, -- √˜ΩÃ
 	CANG_YUN  = 21, -- ≤‘‘∆
+	LING_XUE  = 25, -- ¡Ë—©
 })
 local CONSTANT = setmetatable({}, {
 	__index = {
@@ -956,6 +957,7 @@ local CONSTANT = setmetatable({}, {
 			[FORCE_TYPE.CHANG_GE ] = { 100, 250, 180 }, -- ≥§∏Ë
 			[FORCE_TYPE.BA_DAO   ] = { 106 ,108, 189 }, -- ∞‘µ∂
 			[FORCE_TYPE.PENG_LAI ] = { 171 ,227, 250 }, -- ≈Ó¿≥
+			[FORCE_TYPE.LING_XUE ] = { 128,   9,  31 }, -- ¡Ë—©
 		}, {
 			__index = function(t, k)
 				return { 225, 225, 225 }
@@ -978,6 +980,7 @@ local CONSTANT = setmetatable({}, {
 			[FORCE_TYPE.CHANG_GE ] = { 100, 250, 180 }, -- ≥§∏Ë
 			[FORCE_TYPE.BA_DAO   ] = { 71 , 73 , 166 }, -- ∞‘µ∂
 			[FORCE_TYPE.PENG_LAI ] = { 195, 171, 227 }, -- ≈Ó¿≥
+			[FORCE_TYPE.LING_XUE ] = { 128,   9,  31 }, -- ¡Ë—©
 		}, {
 			__index = function(t, k)
 				return { 225, 225, 225 }
