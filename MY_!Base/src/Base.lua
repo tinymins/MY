@@ -119,8 +119,8 @@ local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 ---------------------------------------------------------------------------------------------
 -- 本地函数变量
 ---------------------------------------------------------------------------------------------
-local _BUILD_                = '20191101'
-local _VERSION_              = 0x2014600
+local _BUILD_                = '20191128'
+local _VERSION_              = 0x2014700
 local _MENU_COLOR_           = {255, 165, 79}
 local _MAX_PLAYER_LEVEL_     = 100
 local _INTERFACE_ROOT_       = './Interface/'
