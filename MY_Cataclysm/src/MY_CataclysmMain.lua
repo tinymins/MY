@@ -1037,6 +1037,9 @@ function MY_CataclysmMain.OnLButtonClick()
 		end
 		Wnd.ToggleWindow('WorldMark')
 	elseif szName == 'WndButton_GKP' then
+		if (IsCtrlKeyDown() or not MY_GKP) and OpenGoldTeam then
+			return OpenGoldTeam()
+		end
 		if not MY_GKP then
 			return LIB.Alert(_L['Please install and load GKP addon first.'])
 		end
@@ -1143,6 +1146,10 @@ function MY_CataclysmMain.OnMouseEnter()
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
 		OutputTip(GetFormatText(MIC_TIP[this.nMicState]), 400, { x, y, w, h }, ALW.TOP_BOTTOM)
+	elseif szName == 'WndButton_GKP' and MY_GKP and OpenGoldTeam then
+		local x, y = this:GetAbsPos()
+		local w, h = this:GetSize()
+		OutputTip(GetFormatText(_L['Hold ctrl when click to open system gold team.']), 400, { x, y, w, h }, ALW.TOP_BOTTOM)
 	end
 	D.SetFrameSize(true)
 end
