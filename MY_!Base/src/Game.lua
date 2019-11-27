@@ -781,64 +781,20 @@ end
 
 do
 local SZ_FORCE_COLOR_FG = 'config/player_force_color.jx3dat'
-local MY_FORCE_COLOR_FG_DEFAULT = setmetatable({
-	[CONSTANT.FORCE_TYPE.JIANG_HU ] = { 255, 255, 255 }, -- 江湖
-	[CONSTANT.FORCE_TYPE.SHAO_LIN ] = { 255, 178, 95  }, -- 少林
-	[CONSTANT.FORCE_TYPE.WAN_HUA  ] = { 196, 152, 255 }, -- 万花
-	[CONSTANT.FORCE_TYPE.TIAN_CE  ] = { 255, 111, 83  }, -- 天策
-	[CONSTANT.FORCE_TYPE.CHUN_YANG] = { 22 , 216, 216 }, -- 纯阳
-	[CONSTANT.FORCE_TYPE.QI_XIU   ] = { 255, 129, 176 }, -- 七秀
-	[CONSTANT.FORCE_TYPE.WU_DU    ] = { 55 , 147, 255 }, -- 五毒
-	[CONSTANT.FORCE_TYPE.TANG_MEN ] = { 121, 183, 54  }, -- 唐门
-	[CONSTANT.FORCE_TYPE.CANG_JIAN] = { 214, 249, 93  }, -- 藏剑
-	[CONSTANT.FORCE_TYPE.GAI_BANG ] = { 205, 133, 63  }, -- 丐帮
-	[CONSTANT.FORCE_TYPE.MING_JIAO] = { 240, 70 , 96  }, -- 明教
-	[CONSTANT.FORCE_TYPE.CANG_YUN ] = { 180, 60 , 0   }, -- 苍云
-	[CONSTANT.FORCE_TYPE.CHANG_GE ] = { 100, 250, 180 }, -- 长歌
-	[CONSTANT.FORCE_TYPE.BA_DAO   ] = { 106 ,108, 189 }, -- 霸刀
-	[CONSTANT.FORCE_TYPE.PENG_LAI ] = { 171 ,227, 250 }, -- 蓬莱
-}, {
-	__index = function(t, k)
-		return { 225, 225, 225 }
-	end,
-	__metatable = true,
-})
 local MY_FORCE_COLOR_FG_GLOBAL = LIB.LoadLUAData({SZ_FORCE_COLOR_FG, PATH_TYPE.GLOBAL}) or {}
 local MY_FORCE_COLOR_FG_CUSTOM = {}
 local MY_FORCE_COLOR_FG = setmetatable({}, {
 	__index = function(t, k)
-		return MY_FORCE_COLOR_FG_CUSTOM[k] or MY_FORCE_COLOR_FG_GLOBAL[k] or MY_FORCE_COLOR_FG_DEFAULT[k]
+		return MY_FORCE_COLOR_FG_CUSTOM[k] or MY_FORCE_COLOR_FG_GLOBAL[k] or CONSTANT.FORCE_COLOR_FG_DEFAULT[k]
 	end,
 })
 
 local SZ_FORCE_COLOR_BG = 'config/player_force_color_bg.jx3dat'
-local MY_FORCE_COLOR_BG_DEFAULT = setmetatable({
-	[CONSTANT.FORCE_TYPE.JIANG_HU ] = { 255, 255, 255 }, -- 江湖
-	[CONSTANT.FORCE_TYPE.SHAO_LIN ] = { 210, 180, 0   }, -- 少林
-	[CONSTANT.FORCE_TYPE.WAN_HUA  ] = { 127, 31 , 223 }, -- 万花
-	[CONSTANT.FORCE_TYPE.TIAN_CE  ] = { 160, 0  , 0   }, -- 天策
-	[CONSTANT.FORCE_TYPE.CHUN_YANG] = { 56 , 175, 255 }, -- 纯阳 56,175,255,232
-	[CONSTANT.FORCE_TYPE.QI_XIU   ] = { 255, 127, 255 }, -- 七秀
-	[CONSTANT.FORCE_TYPE.WU_DU    ] = { 63 , 31 , 159 }, -- 五毒
-	[CONSTANT.FORCE_TYPE.TANG_MEN ] = { 0  , 133, 144 }, -- 唐门
-	[CONSTANT.FORCE_TYPE.CANG_JIAN] = { 255, 255, 0   }, -- 藏剑
-	[CONSTANT.FORCE_TYPE.GAI_BANG ] = { 205, 133, 63  }, -- 丐帮
-	[CONSTANT.FORCE_TYPE.MING_JIAO] = { 253, 84 , 0   }, -- 明教
-	[CONSTANT.FORCE_TYPE.CANG_YUN ] = { 180, 60 , 0   }, -- 苍云
-	[CONSTANT.FORCE_TYPE.CHANG_GE ] = { 100, 250, 180 }, -- 长歌
-	[CONSTANT.FORCE_TYPE.BA_DAO   ] = { 71 , 73 , 166 }, -- 霸刀
-	[CONSTANT.FORCE_TYPE.PENG_LAI ] = { 195, 171, 227 }, -- 蓬莱
-}, {
-	__index = function(t, k)
-		return { 225, 225, 225 }
-	end,
-	__metatable = true,
-})
 local MY_FORCE_COLOR_BG_GLOBAL = LIB.LoadLUAData({SZ_FORCE_COLOR_BG, PATH_TYPE.GLOBAL}) or {}
 local MY_FORCE_COLOR_BG_CUSTOM = {}
 local MY_FORCE_COLOR_BG = setmetatable({}, {
 	__index = function(t, k)
-		return MY_FORCE_COLOR_BG_CUSTOM[k] or MY_FORCE_COLOR_BG_GLOBAL[k] or MY_FORCE_COLOR_BG_DEFAULT[k]
+		return MY_FORCE_COLOR_BG_CUSTOM[k] or MY_FORCE_COLOR_BG_GLOBAL[k] or CONSTANT.FORCE_COLOR_BG_DEFAULT[k]
 	end,
 })
 

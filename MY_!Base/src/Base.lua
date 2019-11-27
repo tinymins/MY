@@ -734,6 +734,20 @@ local PATH_TYPE = SetmetaReadonly({
 	GLOBAL = 3,
 	SERVER = 4,
 })
+local FORCE_TYPE = FORCE_TYPE or SetmetaReadonly({
+	JIANG_HU  = 0 , -- 江湖
+	SHAO_LIN  = 1 , -- 少林
+	WAN_HUA   = 2 , -- 万花
+	TIAN_CE   = 3 , -- 天策
+	CHUN_YANG = 4 , -- 纯阳
+	QI_XIU    = 5 , -- 七秀
+	WU_DU     = 6 , -- 五毒
+	TANG_MEN  = 7 , -- 唐门
+	CANG_JIAN = 8 , -- 藏剑
+	GAI_BANG  = 9 , -- 丐帮
+	MING_JIAO = 10, -- 明教
+	CANG_YUN  = 21, -- 苍云
+})
 local CONSTANT = setmetatable({}, {
 	__index = {
 		MENU_DIVIDER = SetmetaReadonly({ bDevide = true }),
@@ -825,20 +839,7 @@ local CONSTANT = setmetatable({}, {
 			ARROW         = 24, -- 暗器
 			TOTAL         = 25,
 		}),
-		FORCE_TYPE = FORCE_TYPE or SetmetaReadonly({
-			JIANG_HU  = 0 , -- 江湖
-			SHAO_LIN  = 1 , -- 少林
-			WAN_HUA   = 2 , -- 万花
-			TIAN_CE   = 3 , -- 天策
-			CHUN_YANG = 4 , -- 纯阳
-			QI_XIU    = 5 , -- 七秀
-			WU_DU     = 6 , -- 五毒
-			TANG_MEN  = 7 , -- 唐门
-			CANG_JIAN = 8 , -- 藏剑
-			GAI_BANG  = 9 , -- 丐帮
-			MING_JIAO = 10, -- 明教
-			CANG_YUN  = 21, -- 苍云
-		}),
+		FORCE_TYPE = FORCE_TYPE,
 		KUNGFU_TYPE = KUNGFU_TYPE or SetmetaReadonly({
 			TIAN_CE     = 1,      -- 天策内功
 			WAN_HUA     = 2,      -- 万花内功
@@ -939,6 +940,50 @@ local CONSTANT = setmetatable({}, {
 			{ dwID = 10533, szUITex = 'ui/image/icon/jnpl_18_10_30_27.uitex',   nFrame = 45 }, -- 蓬莱
 			{ dwID = 10585, szUITex = 'ui/image/icon/jnlxg_19_10_21_9.uitex',   nFrame = 74 }, -- 凌雪
 		},
+		FORCE_COLOR_FG_DEFAULT = setmetatable({
+			[FORCE_TYPE.JIANG_HU ] = { 255, 255, 255 }, -- 江湖
+			[FORCE_TYPE.SHAO_LIN ] = { 255, 178, 95  }, -- 少林
+			[FORCE_TYPE.WAN_HUA  ] = { 196, 152, 255 }, -- 万花
+			[FORCE_TYPE.TIAN_CE  ] = { 255, 111, 83  }, -- 天策
+			[FORCE_TYPE.CHUN_YANG] = { 22 , 216, 216 }, -- 纯阳
+			[FORCE_TYPE.QI_XIU   ] = { 255, 129, 176 }, -- 七秀
+			[FORCE_TYPE.WU_DU    ] = { 55 , 147, 255 }, -- 五毒
+			[FORCE_TYPE.TANG_MEN ] = { 121, 183, 54  }, -- 唐门
+			[FORCE_TYPE.CANG_JIAN] = { 214, 249, 93  }, -- 藏剑
+			[FORCE_TYPE.GAI_BANG ] = { 205, 133, 63  }, -- 丐帮
+			[FORCE_TYPE.MING_JIAO] = { 240, 70 , 96  }, -- 明教
+			[FORCE_TYPE.CANG_YUN ] = { 180, 60 , 0   }, -- 苍云
+			[FORCE_TYPE.CHANG_GE ] = { 100, 250, 180 }, -- 长歌
+			[FORCE_TYPE.BA_DAO   ] = { 106 ,108, 189 }, -- 霸刀
+			[FORCE_TYPE.PENG_LAI ] = { 171 ,227, 250 }, -- 蓬莱
+		}, {
+			__index = function(t, k)
+				return { 225, 225, 225 }
+			end,
+			__metatable = true,
+		}),
+		FORCE_COLOR_BG_DEFAULT = setmetatable({
+			[FORCE_TYPE.JIANG_HU ] = { 255, 255, 255 }, -- 江湖
+			[FORCE_TYPE.SHAO_LIN ] = { 210, 180, 0   }, -- 少林
+			[FORCE_TYPE.WAN_HUA  ] = { 127, 31 , 223 }, -- 万花
+			[FORCE_TYPE.TIAN_CE  ] = { 160, 0  , 0   }, -- 天策
+			[FORCE_TYPE.CHUN_YANG] = { 56 , 175, 255 }, -- 纯阳 56,175,255,232
+			[FORCE_TYPE.QI_XIU   ] = { 255, 127, 255 }, -- 七秀
+			[FORCE_TYPE.WU_DU    ] = { 63 , 31 , 159 }, -- 五毒
+			[FORCE_TYPE.TANG_MEN ] = { 0  , 133, 144 }, -- 唐门
+			[FORCE_TYPE.CANG_JIAN] = { 255, 255, 0   }, -- 藏剑
+			[FORCE_TYPE.GAI_BANG ] = { 205, 133, 63  }, -- 丐帮
+			[FORCE_TYPE.MING_JIAO] = { 253, 84 , 0   }, -- 明教
+			[FORCE_TYPE.CANG_YUN ] = { 180, 60 , 0   }, -- 苍云
+			[FORCE_TYPE.CHANG_GE ] = { 100, 250, 180 }, -- 长歌
+			[FORCE_TYPE.BA_DAO   ] = { 71 , 73 , 166 }, -- 霸刀
+			[FORCE_TYPE.PENG_LAI ] = { 195, 171, 227 }, -- 蓬莱
+		}, {
+			__index = function(t, k)
+				return { 225, 225, 225 }
+			end,
+			__metatable = true,
+		}),
 		EQUIPMENT_SUIT_COUNT = EQUIPMENT_SUIT_COUNT or 4,
 		INVENTORY_GUILD_BANK = INVENTORY_GUILD_BANK or INVENTORY_INDEX.TOTAL + 1, --帮会仓库界面虚拟一个背包位置
 		INVENTORY_GUILD_PAGE_SIZE = INVENTORY_GUILD_PAGE_SIZE or 100,
