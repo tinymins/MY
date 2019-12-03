@@ -157,6 +157,4 @@ data = {
 	['Would you like to use MY cataclysm?'] = '是否使用茗伊团队面板？',
 	['Use'] = '使用',
 	['Not use'] = '不使用',
-
-	['Hold ctrl when click to open system gold team.'] = '按住CTRL点击可打开系统金团',
 }

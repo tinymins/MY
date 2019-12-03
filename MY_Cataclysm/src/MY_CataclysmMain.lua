@@ -436,7 +436,8 @@ function D.CreateControlBar()
 	-- ∑÷≈‰ƒ£ Ω
 	local hLootMode = container:AppendContentFromIni(szIniFile, 'WndButton_LootMode')
 	hLootMode:Lookup('', 'Image_LootMode'):FromUITex(unpack(CTM_LOOT_MODE[nLootMode]))
-	if nLootMode == PARTY_LOOT_MODE.DISTRIBUTE then
+	if nLootMode == PARTY_LOOT_MODE.DISTRIBUTE
+	or (nLootMode == PARTY_LOOT_MODE.BIDDING and OpenGoldTeam) then
 		container:AppendContentFromIni(szIniFile, 'WndButton_LootQuality')
 			:Lookup('', 'Image_LootQuality'):FromIconID(CTM_LOOT_QUALITY[nRollQuality])
 		container:AppendContentFromIni(szIniFile, 'WndButton_GKP')
@@ -1037,7 +1038,9 @@ function MY_CataclysmMain.OnLButtonClick()
 		end
 		Wnd.ToggleWindow('WorldMark')
 	elseif szName == 'WndButton_GKP' then
-		if (IsCtrlKeyDown() or not MY_GKP) and OpenGoldTeam then
+		local team = GetClientTeam()
+		local nLootMode = team.nLootMode
+		if nLootMode == PARTY_LOOT_MODE.BIDDING then
 			return OpenGoldTeam()
 		end
 		if not MY_GKP then
@@ -1146,10 +1149,6 @@ function MY_CataclysmMain.OnMouseEnter()
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
 		OutputTip(GetFormatText(MIC_TIP[this.nMicState]), 400, { x, y, w, h }, ALW.TOP_BOTTOM)
-	elseif szName == 'WndButton_GKP' and MY_GKP and OpenGoldTeam then
-		local x, y = this:GetAbsPos()
-		local w, h = this:GetSize()
-		OutputTip(GetFormatText(_L['Hold ctrl when click to open system gold team.']), 400, { x, y, w, h }, ALW.TOP_BOTTOM)
 	end
 	D.SetFrameSize(true)
 end
