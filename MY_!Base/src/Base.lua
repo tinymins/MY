@@ -420,8 +420,12 @@ local function GetPatch(oBase, oData)
 		if IsNil(oData) then
 			return { t = 'nil' }
 		end
+		-- table value patch
+		if IsTable(oData) then
+			return { v = oData }
+		end
 		-- other patch value
-		return { v = oData }
+		return oData
 	end
 	-- empty patch
 	return nil
