@@ -382,7 +382,7 @@ function D.LoadConfig(bDefault, bOriginal, bCoroutine)
 	end
 	for i, embedded in ipairs(EMBEDDED_CONFIG_LIST) do
 		if embedded.uuid and not tLoaded[embedded.uuid] then
-			local config = embedded
+			local config = Clone(embedded)
 			if LANG ~= 'zhcn' then
 				config = D.FormatConfig(config, bCoroutine)
 			end
