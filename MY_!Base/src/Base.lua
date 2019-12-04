@@ -421,7 +421,7 @@ local function GetPatch(oBase, oData)
 			return { t = 'nil' }
 		end
 		-- other patch value
-		return { v= oData }
+		return { v = oData }
 	end
 	-- empty patch
 	return nil
@@ -441,7 +441,7 @@ local function ApplyPatch(oBase, oPatch, bNew)
 			return nil
 		end
 		-- raw value patch
-		if oPatch.v then
+		if not IsNil(oPatch.v) then
 			return oPatch.v
 		end
 	end
