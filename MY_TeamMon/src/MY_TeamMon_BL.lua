@@ -68,8 +68,8 @@ local function CreateBuffList(dwID, nLevel, col, tArgs, szSender, szReceiver)
 	col = col or { 255, 255, 0 }
 	tArgs = tArgs or {}
 	local level = tArgs.bCheckLevel and nLevel or nil
-	local KBuff = GetBuff(dwID, level)
-	if KBuff then
+	local buff = GetBuff(GetClientPlayer(), dwID, level)
+	if buff then
 		local ui, bScale
 		if O.handle:Lookup(key) then
 			ui = O.handle:Lookup(key)
@@ -90,8 +90,8 @@ local function CreateBuffList(dwID, nLevel, col, tArgs, szSender, szReceiver)
 		box:SetObjectSparking(true)
 		box:SetOverTextPosition(0, ITEM_POSITION.RIGHT_BOTTOM)
 		box:SetOverTextFontScheme(0, 15)
-		if KBuff.nStackNum > 1 then
-			box:SetOverText(0, KBuff.nStackNum)
+		if buff.nStackNum > 1 then
+			box:SetOverText(0, buff.nStackNum)
 		else
 			box:SetOverText(0, '')
 		end
@@ -132,18 +132,18 @@ function D.OnEvent(szEvent)
 end
 function D.OnItemMouseEnter()
 	local h = this:GetParent()
-	local KBuff = GetBuff(h.dwID, h.nLevel)
-	if KBuff then
+	local buff = GetBuff(GetClientPlayer(), h.dwID, h.nLevel)
+	if buff then
 		this:SetObjectMouseOver(true)
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
-		LIB.OutputBuffTip({ x, y, w, h }, KBuff.dwID, KBuff.nLevel, LIB.GetEndTime(KBuff.GetEndTime()))
+		LIB.OutputBuffTip({ x, y, w, h }, buff.dwID, buff.nLevel, LIB.GetEndTime(buff.nEndFrame))
 	end
 end
 
 function D.OnItemRButtonClick()
 	local h = this:GetParent()
-	LIB.CancelBuff(h.dwID, h.nLevel)
+	LIB.CancelBuff(GetClientPlayer(), h.dwID, h.nLevel)
 end
 
 function D.OnItemMouseLeave()
@@ -169,9 +169,9 @@ function D.OnFrameBreathe()
 					h:Lookup('Animate_Update'):SetAlpha(0)
 				end
 			else
-				local KBuff = GetBuff(h.dwID, h.nLevel)
-				if KBuff then
-					local nSec = LIB.GetEndTime(KBuff.GetEndTime())
+				local buff = GetBuff(me, h.dwID, h.nLevel)
+				if buff then
+					local nSec = LIB.GetEndTime(buff.nEndFrame)
 					if nSec > 24 * 60 * 60 then
 						h:Lookup('Text_Time'):SetText('')
 					else
@@ -181,8 +181,8 @@ function D.OnFrameBreathe()
 					if nAlpha > 0 then
 						h:Lookup('Animate_Update'):SetAlpha(math.max(0, nAlpha - 8))
 					end
-					if KBuff.nStackNum > 1 then
-						h:Lookup('Box'):SetOverText(0, KBuff.nStackNum)
+					if buff.nStackNum > 1 then
+						h:Lookup('Box'):SetOverText(0, buff.nStackNum)
 					else
 						h:Lookup('Box'):SetOverText(0, '')
 					end

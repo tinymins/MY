@@ -78,7 +78,7 @@ LIB.RegisterBgMsg('RL', function(_, nChannel, dwID, szName, bIsSelf, ...)
 		if data[1] == 'ASK' then
 			LIB.Confirm(_L('[%s] want to see your info, OK?', szName), function()
 				local me = GetClientPlayer()
-				local nGongZhan = LIB.GetBuff(3219) and 1 or 0
+				local nGongZhan = LIB.GetBuff(me, 3219) and 1 or 0
 				local bEx = PACKET_INFO.AUTHOR_ROLES[me.dwID] == me.szName and 'Author' or 'Player'
 				LIB.SendBgMsg(szName, 'RL', 'Feedback', me.dwID, UI_GetPlayerMountKungfuID(), nGongZhan, bEx)
 			end)
@@ -122,7 +122,7 @@ LIB.RegisterBgMsg('MY_ABOUT', function(_, nChannel, dwID, szName, bIsSelf, ...)
 			me.nRoleType,
 			PACKET_INFO.VERSION,
 			szServer,
-			LIB.GetBuff(3219)
+			LIB.GetBuff(me, 3219)
 		)
 	elseif data[1] == 'TeamAuth' then -- 防止有人睡着 遇到了不止一次了
 		local team = GetClientTeam()

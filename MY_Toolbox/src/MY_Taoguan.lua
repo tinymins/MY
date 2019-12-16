@@ -422,7 +422,9 @@ LIB.BreatheCall('MY_Taoguan', function()
 	end
 	if D.bEnable and D.nPoint >= O.nUseZJ then
 		local bJ, bZ = true, O.bNonZS == false
-		for _, buff in ipairs(LIB.GetBuffList()) do
+		local aBuff, nCount, buff = LIB.GetBuffList(GetClientPlayer())
+		for i = 1, nCount do
+			buff = aBuff[i]
 			if buff.dwID == 1660 and buff.nLevel == 3 then
 				bJ = false
 			elseif buff.dwID == 1661 and buff.nLevel == 3 then
@@ -436,10 +438,11 @@ LIB.BreatheCall('MY_Taoguan', function()
 			D.bEnable = false
 		end
 	elseif D.bEnable and D.nPoint >= O.nUseJX then
-		if not LIB.GetBuff(1660) and not D.UseBagItem(RUYIXIANGNANG) then
+		local me = GetClientPlayer()
+		if not LIB.GetBuff(me, 1660) and not D.UseBagItem(RUYIXIANGNANG) then
 			D.UseBagItem(XINYUNXIANGNANG)
 		end
-		if not LIB.GetBuff(1661) and not D.UseBagItem(RUYIJINNANG) then
+		if not LIB.GetBuff(me, 1661) and not D.UseBagItem(RUYIJINNANG) then
 			D.UseBagItem(XINYUNJINNANG)
 		end
 	end

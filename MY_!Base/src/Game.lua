@@ -2082,61 +2082,128 @@ function LIB.Equip(szName)
 end
 
 do
+-- 下标为 nIndex 的 BUFF 缓存
+local BUFF_CACHE = setmetatable({}, { __mode = 'v' })
+local BUFF_PROXY = setmetatable({}, { __mode = 'v' })
+-- 下标为 目标对象 的 BUFF列表 缓存
 local BUFF_LIST_CACHE = setmetatable({}, { __mode = 'v' })
 local BUFF_LIST_PROXY = setmetatable({}, { __mode = 'v' })
-local function reject() assert(false, 'Modify buff list from ' .. PACKET_INFO.NAME_SPACE .. '.GetBuffList is forbidden!') end
--- 获取对象的buff列表
--- (table) LIB.GetBuffList(KObject)
-function LIB.GetBuffList(...)
-	local KObject
-	if select('#', ...) == 0 then
-		KObject = GetClientPlayer()
-	else
-		KObject = ...
+-- 获取BUFF缓存标识
+local function GetBuffKey(dwID, nLevel, dwSkillSrcID)
+	return dwSkillSrcID .. ':' .. dwID .. ',' .. nLevel
+end
+-- 缓存保护
+local function Reject()
+	assert(false, 'Modify buff list from ' .. PACKET_INFO.NAME_SPACE .. '.GetBuffList is forbidden!')
+end
+-- 缓存检查
+local function GeneObjectBuffCache(KObject, nIndex)
+	-- 检查对象缓存
+	local aCache, aProxy = BUFF_LIST_CACHE[KObject], BUFF_LIST_PROXY[KObject]
+	if not aCache or not aProxy then
+		aCache = {}
+		aProxy = setmetatable({}, { __index = aCache, __newindex = Reject })
+		BUFF_LIST_CACHE[KObject] = aCache
+		BUFF_LIST_PROXY[KObject] = aProxy
 	end
-	local aBuffTable = {}
-	if KObject then
-		local aCache, aProxy = BUFF_LIST_CACHE[KObject], BUFF_LIST_PROXY[KObject]
-		if not aCache or not aProxy then
-			aCache, aProxy = {}, {}
-			BUFF_LIST_CACHE[KObject] = aCache
-			BUFF_LIST_PROXY[KObject] = aProxy
+	-- 检查BUFF缓存
+	local nCount, raw = 0
+	for i = 1, KObject.GetBuffCount() or 0 do
+		local dwID, nLevel, bCanCancel, nEndFrame, nIndex, nStackNum, dwSkillSrcID, bValid = KObject.GetBuff(i - 1)
+		if dwID then
+			if not BUFF_CACHE[nIndex] or not BUFF_PROXY[nIndex] then
+				BUFF_CACHE[nIndex] = {}
+				BUFF_PROXY[nIndex] = setmetatable({}, { __index = BUFF_CACHE[nIndex], __newindex = Reject })
+			end
+			nCount, raw = nCount + 1, BUFF_CACHE[nIndex]
+			raw.szKey        = dwSkillSrcID .. ':' .. dwID .. ',' .. nLevel
+			raw.dwID         = dwID
+			raw.nLevel       = nLevel
+			raw.szName       = szName
+			raw.nIcon        = nIcon
+			raw.bCanCancel   = bCanCancel
+			raw.nEndFrame    = nEndFrame
+			raw.nIndex       = nIndex
+			raw.nStackNum    = nStackNum
+			raw.dwSkillSrcID = dwSkillSrcID
+			raw.bValid       = bValid
+			raw.szName, raw.nIcon = LIB.GetBuffName(dwID, nLevel)
+			aCache[nCount] = BUFF_PROXY[nIndex]
 		end
-		local nCount, raw = 0
-		for i = 1, KObject.GetBuffCount() or 0 do
-			local dwID, nLevel, bCanCancel, nEndFrame, nIndex, nStackNum, dwSkillSrcID, bValid = KObject.GetBuff(i - 1)
-			if dwID then
-				nCount = nCount + 1
-				if not aCache[nCount] or not aProxy[nCount] then
-					aCache[nCount] = {}
-					aProxy[nCount] = setmetatable({}, { __index = aCache[nCount], __newindex = reject })
+	end
+	-- 删除对象过期BUFF缓存
+	for i = nCount + 1, aCache.nCount or 0 do
+		aCache[i] = nil
+	end
+	aCache.nCount = nCount
+	if nIndex then
+		return BUFF_PROXY[nIndex]
+	end
+	return aProxy, nCount
+end
+
+-- 获取对象的buff列表和数量
+-- (table, number) LIB.GetBuffList(KObject)
+-- 注意：返回表每帧会重复利用，如有缓存需求请调用LIB.CloneBuff接口固化数据
+function LIB.GetBuffList(KObject)
+	if KObject then
+		return GeneObjectBuffCache(KObject)
+	end
+	return CONSTANT.EMPTY_TABLE, 0
+end
+
+-- 获取对象的buff
+-- tBuff: {[dwID1] = nLevel1, [dwID2] = nLevel2}
+-- (table) LIB.GetBuff(dwID[, nLevel[, dwSkillSrcID]])
+-- (table) LIB.GetBuff(KObject, dwID[, nLevel[, dwSkillSrcID]])
+-- (table) LIB.GetBuff(tBuff[, dwSkillSrcID])
+-- (table) LIB.GetBuff(KObject, tBuff[, dwSkillSrcID])
+function LIB.GetBuff(KObject, dwID, nLevel, dwSkillSrcID)
+	local tBuff = {}
+	if type(dwID) == 'table' then
+		tBuff, dwSkillSrcID = dwID, nLevel
+	elseif type(dwID) == 'number' then
+		if type(nLevel) == 'number' then
+			tBuff[dwID] = nLevel
+		else
+			tBuff[dwID] = 0
+		end
+	end
+	if IsNumber(dwSkillSrcID) and dwSkillSrcID > 0 then
+		if KObject.GetBuffByOwner then
+			for k, v in pairs(tBuff) do
+				local KBuffNode = KObject.GetBuffByOwner(k, v, dwSkillSrcID)
+				if KBuffNode then
+					return GeneObjectBuffCache(KObject, KBuffNode.nIndex)
 				end
-				raw = aCache[nCount]
-				raw.szKey        = dwSkillSrcID .. ':' .. dwID .. ',' .. nLevel
-				raw.dwID         = dwID
-				raw.nLevel       = nLevel
-				raw.szName       = szName
-				raw.nIcon        = nIcon
-				raw.bCanCancel   = bCanCancel
-				raw.nEndFrame    = nEndFrame
-				raw.nIndex       = nIndex
-				raw.nStackNum    = nStackNum
-				raw.dwSkillSrcID = dwSkillSrcID
-				raw.bValid       = bValid
-				raw.nCount       = i
-				raw.szName, raw.nIcon = LIB.GetBuffName(dwID, nLevel)
+			end
+		else
+			local aBuff, nCount, buff = LIB.GetBuffList(KObject)
+			for i = 1, nCount do
+				buff = aBuff[i]
+				if (tBuff[buff.dwID] == buff.nLevel or tBuff[buff.dwID] == 0) and buff.dwSkillSrcID == dwSkillSrcID then
+					return buff
+				end
 			end
 		end
-		for i = nCount + 1, #aCache do
-			aCache[i] = nil
+	else
+		for k, v in pairs(tBuff) do
+			local KBuffNode = KObject.GetBuff(k, v)
+			if KBuffNode then
+				return GeneObjectBuffCache(KObject, KBuffNode.nIndex)
+			end
 		end
-		for i = nCount + 1, #aProxy do
-			aProxy[i] = nil
-		end
-		return aProxy
 	end
-	return CONSTANT.EMPTY_TABLE
 end
+end
+
+-- 点掉自己的buff
+-- (table) LIB.CancelBuff(KObject, dwID[, nLevel = 0])
+function LIB.CancelBuff(KObject, dwID, nLevel)
+	local KBuffNode = KObject.GetBuff(dwID, nLevel or 0)
+	if KBuffNode then
+		KObject.CancelBuff(KBuffNode.nIndex)
+	end
 end
 
 function LIB.CloneBuff(buff, dst)
@@ -2154,115 +2221,9 @@ function LIB.CloneBuff(buff, dst)
 	dst.nStackNum = buff.nStackNum
 	dst.dwSkillSrcID = buff.dwSkillSrcID
 	dst.bValid = buff.bValid
-	dst.nCount = buff.nCount
 	dst.szName = buff.szName
 	dst.nIcon = buff.nIcon
 	return dst
-end
-
-do
-local BUFF_CACHE = setmetatable({}, { __mode = 'v' })
-local BUFF_PROXY = setmetatable({}, { __mode = 'v' })
-local function reject() assert(false, 'Modify buff from ' .. PACKET_INFO.NAME_SPACE .. '.GetBuff is forbidden!') end
--- 获取对象的buff
--- tBuff: {[dwID1] = nLevel1, [dwID2] = nLevel2}
--- (table) LIB.GetBuff(dwID[, nLevel[, dwSkillSrcID]])
--- (table) LIB.GetBuff(KObject, dwID[, nLevel[, dwSkillSrcID]])
--- (table) LIB.GetBuff(tBuff[, dwSkillSrcID])
--- (table) LIB.GetBuff(KObject, tBuff[, dwSkillSrcID])
-function LIB.GetBuff(KObject, dwID, nLevel, dwSkillSrcID)
-	local tBuff = {}
-	if type(KObject) ~= 'userdata' then
-		KObject, dwID, nLevel, dwSkillSrcID = GetClientPlayer(), KObject, dwID, nLevel
-	end
-	if type(dwID) == 'table' then
-		tBuff, dwSkillSrcID = dwID, nLevel
-	elseif type(dwID) == 'number' then
-		if type(nLevel) == 'number' then
-			tBuff[dwID] = nLevel
-		else
-			tBuff[dwID] = 0
-		end
-	end
-	if IsNumber(dwSkillSrcID) and dwSkillSrcID > 0 then
-		if KObject.GetBuffByOwner then
-			for k, v in pairs(tBuff) do
-				local KBuff = KObject.GetBuffByOwner(k, v, dwSkillSrcID)
-				if KBuff then
-					return KBuff
-				end
-			end
-		else
-			if not KObject.GetBuff then
-				--[[#DEBUG BEGIN]]
-				LIB.Debug('KObject neither has a function named GetBuffByOwner nor named GetBuff.', PACKET_INFO.NAME_SPACE .. '.GetBuff', DEBUG_LEVEL.ERROR)
-				--[[#DEBUG END]]
-				return
-			end
-			for _, buff in ipairs(LIB.GetBuffList(KObject)) do
-				if (tBuff[buff.dwID] == buff.nLevel or tBuff[buff.dwID] == 0) and buff.dwSkillSrcID == dwSkillSrcID then
-					local tCache, tProxy = BUFF_CACHE[KObject], BUFF_PROXY[KObject]
-					if not tCache or not tProxy then
-						tCache, tProxy = {}, {}
-						BUFF_CACHE[KObject] = tCache
-						BUFF_PROXY[KObject] = tProxy
-					end
-					if not tCache[buff.szKey] or not tProxy[buff.szKey] then
-						tCache[buff.szKey] = {}
-						tProxy[buff.szKey] = setmetatable({}, { __index = tCache[buff.szKey], __newindex = reject })
-					end
-					local raw = tCache[buff.szKey]
-					raw.dwID         = buff.dwID
-					raw.nLevel       = buff.nLevel
-					raw.bCanCancel   = buff.bCanCancel
-					raw.nEndFrame    = buff.nEndFrame
-					raw.nIndex       = buff.nIndex
-					raw.nStackNum    = buff.nStackNum
-					raw.dwSkillSrcID = buff.dwSkillSrcID
-					raw.bValid       = buff.bValid
-					raw.nCount       = buff.nCount
-					raw.GetEndTime = function() return buff.nEndFrame end
-					return tProxy[buff.szKey]
-				end
-			end
-			--[[#DEBUG BEGIN]]
-			-- LIB.Debug('KObject do not have a function named GetBuffByOwner.', PACKET_INFO.NAME_SPACE .. '.GetBuff', DEBUG_LEVEL.ERROR)
-			--[[#DEBUG END]]
-			-- return
-		end
-	else
-		if not KObject.GetBuff then
-			--[[#DEBUG BEGIN]]
-			LIB.Debug('KObject do not have a function named GetBuff.', PACKET_INFO.NAME_SPACE .. '.GetBuff', DEBUG_LEVEL.ERROR)
-			--[[#DEBUG END]]
-			return
-		end
-		for k, v in pairs(tBuff) do
-			local KBuff = KObject.GetBuff(k, v)
-			if KBuff then
-				return KBuff
-			end
-		end
-	end
-end
-end
-
--- 点掉自己的buff
--- (table) LIB.CancelBuff([KObject = me, ]dwID[, nLevel = 0])
-function LIB.CancelBuff(KObject, dwID, nLevel)
-	if type(KObject) ~= 'userdata' then
-		KObject, dwID, nLevel = nil, KObject, dwID
-	end
-	if not KObject then
-		KObject = GetClientPlayer()
-	end
-	local tBuffs = LIB.GetBuffList(KObject)
-	for _, buff in ipairs(tBuffs) do
-		if (type(dwID) == 'string' and Table_GetBuffName(buff.dwID, buff.nLevel) == dwID or buff.dwID == dwID)
-		and (not nLevel or nLevel == 0 or buff.nLevel == nLevel) then
-			KObject.CancelBuff(buff.nIndex)
-		end
-	end
 end
 
 do

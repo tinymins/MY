@@ -1401,11 +1401,11 @@ function CTM:ClearBuff(dwMemberID)
 	CTM_BUFF_CACHE = {}
 end
 
-function D.UpdateCharaterBuff(p, handle, key, data, KBuff)
+function D.UpdateCharaterBuff(p, handle, key, data, buff)
 	local dwCharID = p.dwID
 	local item = handle:Lookup(key)
-	if KBuff then
-		local nEndFrame, nStackNum = KBuff.GetEndTime(), KBuff.nStackNum
+	if buff then
+		local nEndFrame, nStackNum = buff.nEndFrame, buff.nStackNum
 		-- check priority
 		local nPriority = data.nPriority
 		if not nPriority then
@@ -1512,8 +1512,8 @@ function D.UpdateCharaterBuff(p, handle, key, data, KBuff)
 		-- revise
 		if item then
 			-- update data
-			item.dwID = KBuff.dwID
-			item.nLevel = KBuff.nLevel
+			item.dwID = buff.dwID
+			item.nLevel = buff.nLevel
 			item.nEndFrame = nEndFrame
 			item.nStackNum = nStackNum
 			item.szVia = data.szVia
@@ -1616,18 +1616,18 @@ function CTM:RefreshBuff()
 		if CTM_CACHE[v] and CTM_CACHE[v]:IsValid() and p then
 			local handle = CTM_CACHE[v]:Lookup('Handle_Buff_Boxes')
 			for key, data in pairs(CTM_BUFF_CACHE) do
-				local KBuff = (not data.bOnlyMe or p.dwID == me.dwID)
+				local buff = (not data.bOnlyMe or p.dwID == me.dwID)
 					and MY_GetBuff(p, data.dwID, data.nLevel, data.bOnlyMine and me.dwID)
 					or nil
 				local item = handle:Lookup(key)
-				if KBuff then
-					if KBuff.nStackNum and data.nStackNum
-					and not LIB.JudgeOperator(data.szStackOp or '>=', KBuff.nStackNum, data.nStackNum) then
-						KBuff = nil
+				if buff then
+					if buff.nStackNum and data.nStackNum
+					and not LIB.JudgeOperator(data.szStackOp or '>=', buff.nStackNum, data.nStackNum) then
+						buff = nil
 					end
 					tKeep[key] = true
 				end
-				D.UpdateCharaterBuff(p, handle, key, data, KBuff)
+				D.UpdateCharaterBuff(p, handle, key, data, buff)
 			end
 		elseif CTM_CACHE[v] and CTM_CACHE[v]:IsValid() then
 			local handle = CTM_CACHE[v]:Lookup('Handle_Buff_Boxes')
@@ -1653,8 +1653,8 @@ function CTM:RefreshBossFocus()
 			local p, bFocus = GetPlayer(v), nil
 			if p then
 				for _, data in pairs(CTM_BOSS_FOCUS_BUFF) do
-					local KBuff = MY_GetBuff(p, data.dwID, data.nLevel)
-					if KBuff and KBuff.nStackNum >= data.nStackNum then
+					local buff = MY_GetBuff(p, data.dwID, data.nLevel)
+					if buff and buff.nStackNum >= data.nStackNum then
 						bFocus = true
 						break
 					end

@@ -112,11 +112,11 @@ function D.OnFrameBreathe()
 		if h and h:IsValid() then
 			local data = h.data
 			local p, info = D.GetPlayer(data.dwID)
-			local KBuff
+			local buff
 			if p then
-				KBuff = GetBuff(p, data.dwBuffID)
+				buff = GetBuff(p, data.dwBuffID)
 			end
-			if p and info and KBuff then
+			if p and info and buff then
 				local nDistance = LIB.GetDistance(p)
 				h:Lookup('Image_life'):SetPercentage(info.nCurrentLife / math.max(info.nMaxLife, 1))
 				h:Lookup('Text_Name'):SetText(i + 1 .. ' ' .. info.szName)
@@ -126,14 +126,14 @@ function D.OnFrameBreathe()
 					h:Lookup('Image_life'):SetAlpha(255)
 				end
 				local box = h:Lookup('Box_Icon')
-				local nSec = LIB.GetEndTime(KBuff.GetEndTime())
+				local nSec = LIB.GetEndTime(buff.nEndFrame)
 				if nSec < 60 then
 					box:SetOverText(1, LIB.FormatTimeCounter(min(nSec, 5999), 1))
 				else
 					box:SetOverText(1, '')
 				end
-				if KBuff.nStackNum > 1 then
-					box:SetOverText(0, KBuff.nStackNum)
+				if buff.nStackNum > 1 then
+					box:SetOverText(0, buff.nStackNum)
 				end
 			else
 				O.handle:RemoveItem(h)
@@ -267,8 +267,8 @@ function D.OnTableInsert(dwID, dwBuffID, nLevel, nIcon)
 	if CACHE_LIST[key] and CACHE_LIST[key]:IsValid() then
 		return
 	end
-	local KBuff = GetBuff(p, dwBuffID)
-	if not KBuff then
+	local buff = GetBuff(p, dwBuffID)
+	if not buff then
 		return
 	end
 	local dwTargetType, dwTargetID = Target_GetTargetData()
@@ -293,12 +293,12 @@ function D.OnTableInsert(dwID, dwBuffID, nLevel, nIcon)
 	box:SetOverTextPosition(0, ITEM_POSITION.RIGHT_BOTTOM)
 	box:SetOverTextFontScheme(1, 8)
 	box:SetOverTextFontScheme(0, 7)
-	local nSec = LIB.GetEndTime(KBuff.GetEndTime())
+	local nSec = LIB.GetEndTime(buff.nEndFrame)
 	if nSec < 60 then
 		box:SetOverText(1, math.floor(nSec) .. '\'')
 	end
-	if KBuff.nStackNum > 1 then
-		box:SetOverText(0, KBuff.nStackNum)
+	if buff.nStackNum > 1 then
+		box:SetOverText(0, buff.nStackNum)
 	end
 	h.data = data
 	h:Show()

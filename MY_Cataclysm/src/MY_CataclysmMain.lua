@@ -837,12 +837,13 @@ function MY_CataclysmMain.OnEvent(szEvent)
 			if not tar then
 				return
 			end
-			local aList = LIB.GetBuffList(tar)
-			if #aList == 0 then
+			local aList, nCount, buff = LIB.GetBuffList(tar)
+			if nCount == 0 then
 				return LIB.DelayCall(update, 75)
 			end
-			for i, p in ipairs(aList) do
-				OnBuffUpdate(dwID, p.dwID, p.nLevel, p.nStackNum, p.dwSkillSrcID)
+			for i = 1, nCount do
+				buff = aList[i]
+				OnBuffUpdate(dwID, buff.dwID, buff.nLevel, buff.nStackNum, buff.dwSkillSrcID)
 			end
 		end
 		LIB.DelayCall(update, 75)
@@ -855,8 +856,10 @@ function MY_CataclysmMain.OnEvent(szEvent)
 		for _, dwID in ipairs(team.GetTeamMemberList()) do
 			local tar = GetPlayer(dwID)
 			if tar then
-				for i, p in ipairs(LIB.GetBuffList(tar)) do
-					OnBuffUpdate(dwID, p.dwID, p.nLevel, p.nStackNum, p.dwSkillSrcID)
+				local aBuff, nCount, buff = LIB.GetBuffList(tar)
+				for i = 1, nCount do
+					buff = aBuff[i]
+					OnBuffUpdate(dwID, buff.dwID, buff.nLevel, buff.nStackNum, buff.dwSkillSrcID)
 				end
 			end
 		end
@@ -899,11 +902,10 @@ function D.FrameBuffRefreshCall()
 	end
 	local tar = GetPlayer(aList[i])
 	if tar then
-		local aBuff = LIB.GetBuffList(tar)
-		if aBuff then
-			for _, buff in ipairs(aBuff) do
-				OnBuffUpdate(tar.dwID, buff.dwID, buff.nLevel, buff.nStackNum, buff.dwSkillSrcID)
-			end
+		local aBuff, nCount, buff = LIB.GetBuffList(tar)
+		for i = 1, nCount do
+			buff = aBuff[i]
+			OnBuffUpdate(tar.dwID, buff.dwID, buff.nLevel, buff.nStackNum, buff.dwSkillSrcID)
 		end
 	end
 	i = i + 1

@@ -62,7 +62,9 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 		onlclick = function()
 			local tGongZhans = {}
 			for _, p in ipairs(LIB.GetNearPlayer()) do
-				for _, buff in pairs(LIB.GetBuffList(p)) do
+				local aBuff, nCount, buff = LIB.GetBuffList(p)
+				for i = 1, nCount do
+					buff = aBuff[i]
 					if (not buff.bCanCancel) and string.find(Table_GetBuffName(buff.dwID, buff.nLevel), _L['GongZhan']) ~= nil then
 						table.insert(tGongZhans, {p = p, time = (buff.nEndFrame - GetLogicFrameCount()) / 16})
 					end

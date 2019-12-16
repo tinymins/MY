@@ -1083,15 +1083,17 @@ function RT.GetTeam()
 		end
 		if KPlayer then
 			-- Ð¡³ÔºÍbuff
-			for _, tBuff in ipairs(LIB.GetBuffList(KPlayer)) do
-				local nType = GetBuffInfo(tBuff.dwID, tBuff.nLevel, {}).nDetachType or 0
+			local aBuff, nCount, buff, nType = LIB.GetBuffList(KPlayer)
+			for i = 1, nCount do
+				buff = aBuff[i]
+				nType = GetBuffInfo(buff.dwID, buff.nLevel, {}).nDetachType or 0
 				if RT_FOOD_TYPE[nType] then
-					insert(aInfo.tFood, tBuff)
+					insert(aInfo.tFood, buff)
 				end
-				if RT_BUFF_ID[tBuff.dwID] then
-					insert(aInfo.tBuff, tBuff)
+				if RT_BUFF_ID[buff.dwID] then
+					insert(aInfo.tBuff, buff)
 				end
-				if tBuff.dwID == RT_GONGZHAN_ID then -- grandpa
+				if buff.dwID == RT_GONGZHAN_ID then -- grandpa
 					aInfo.bGrandpa = true
 				end
 			end

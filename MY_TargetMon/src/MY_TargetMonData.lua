@@ -649,8 +649,9 @@ local function OnBreathe()
 				BUFF_CACHE[KObject.dwID] = tCache
 			end
 			-- 当前身上的buff
-			local aBuff, info = LIB.GetBuffList(KObject)
-			for _, buff in ipairs(aBuff) do -- 缓存时必须复制buff表 否则buff过期后表会被回收导致显示错误的BUFF
+			local aBuff, nCount, buff, info = LIB.GetBuffList(KObject)
+			for i = 1, nCount do -- 缓存时必须复制buff表 否则buff过期后表会被回收导致显示错误的BUFF
+				buff = aBuff[i]
 				-- 正向索引用于监控
 				if not tCache[buff.dwID] then
 					tCache[buff.dwID] = {}

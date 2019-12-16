@@ -161,7 +161,7 @@ function TS.OnFrameBreathe()
 		end
 
 		-- ŒﬁÕ˛–≤Ã·–—
-		local KBuff = MY_GetBuff({
+		local buff = MY_GetBuff(GetClientPlayer(), {
 			[917]  = 0,
 			[4487] = 0,
 			[926]  = 0,
@@ -171,9 +171,9 @@ function TS.OnFrameBreathe()
 		})
 		local hText = this:Lookup('', 'Text_Title')
 		local szText = hText.szText or ''
-		if KBuff then
-			local szName = MY_GetBuffName(KBuff.dwID, KBuff.nLevel)
-			hText:SetText(string.format('%s (%ds)', szName, math.floor(MY_GetEndTime(KBuff.GetEndTime()))) .. szText)
+		if buff then
+			local szName = MY_GetBuffName(buff.dwID, buff.nLevel)
+			hText:SetText(string.format('%s (%ds)', szName, math.floor(MY_GetEndTime(buff.nEndFrame))) .. szText)
 			hText:SetFontColor(0, 255, 0)
 		else
 			hText:SetText(HATRED_COLLECT .. szText)

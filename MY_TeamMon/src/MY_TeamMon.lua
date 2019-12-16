@@ -896,7 +896,7 @@ function D.OnBuff(dwOwner, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, dw
 					SetTarget(IsPlayer(dwOwner) and TARGET.PLAYER or TARGET.NPC, dwOwner)
 				end
 				if cfg.bAutoCancel and MY_TM_CORE_PLAYERID == dwOwner then
-					LIB.CancelBuff(dwBuffID)
+					LIB.CancelBuff(GetClientPlayer(), dwBuffID)
 				end
 				if cfg.tMark then
 					D.SetTeamMark(szType, cfg.tMark, dwOwner, dwBuffID, nBuffLevel)
