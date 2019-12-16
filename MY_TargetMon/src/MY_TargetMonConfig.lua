@@ -549,13 +549,13 @@ end
 LIB.RegisterInit('MY_TargetMonConfig', D.Init)
 
 do
-local function onExit()
+local function Flush()
 	if not D.HasConfigChanged() then
 		return
 	end
 	D.SaveConfig()
 end
-LIB.RegisterExit('MY_TargetMonConfig', onExit)
+LIB.RegisterFlush('MY_TargetMonConfig', Flush)
 end
 
 function D.GetConfig()

@@ -229,7 +229,7 @@ end
 do
 local EXIT_EVENT = { szName = 'Exit', bSingleEvent = true }
 local function OnExit()
-	LIB.FlushCoroutine()
+	LIB.FireFlush()
 	CommonEventFirer(EXIT_EVENT)
 	LIB.ReleaseDataBase()
 end
@@ -239,6 +239,18 @@ LIB.RegisterEvent('RELOAD_UI_ADDON_BEGIN', OnExit)
 
 function LIB.RegisterExit(...)
 	return CommonEventRegister(EXIT_EVENT, ...)
+end
+end
+
+do
+local FLUSH_EVENT = { szName = 'Flush', bSingleEvent = true }
+function LIB.FireFlush()
+	LIB.FlushCoroutine()
+	CommonEventFirer(FLUSH_EVENT)
+end
+
+function LIB.RegisterFlush(...)
+	return CommonEventRegister(FLUSH_EVENT, ...)
 end
 end
 
@@ -409,7 +421,7 @@ LIB.RegisterInit(function()
 		CHECKED = {}
 	end
 end)
-LIB.RegisterExit(function() LIB.SaveLUAData({'config/tutorialed.jx3dat', PATH_TYPE.ROLE}, CHECKED) end)
+LIB.RegisterFlush(function() LIB.SaveLUAData({'config/tutorialed.jx3dat', PATH_TYPE.ROLE}, CHECKED) end)
 
 local function StepNext(bQuick)
 	local tutorial = GetNextTutorial()

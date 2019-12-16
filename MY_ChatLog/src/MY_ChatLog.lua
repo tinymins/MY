@@ -280,7 +280,7 @@ local function onIdle()
 end
 LIB.RegisterIdle('MY_ChatLog_Save', onIdle)
 
-function  D.OnInit()
+function D.OnInit()
 	if not GetClientPlayer() then
 		return LIB.DelayCall(500, D.OnInit)
 	end
@@ -290,11 +290,20 @@ function  D.OnInit()
 end
 LIB.RegisterInit('MY_ChatLog_InitDB', D.OnInit)
 
-local function onExit()
+do
+local function Flush()
 	if not D.InitDB('silent') then
 		return
 	end
 	l_ds:FlushDB()
+end
+LIB.RegisterFlush('MY_Chat_Release', Flush)
+end
+
+local function onExit()
+	if not l_ds then
+		return
+	end
 	l_ds:ReleaseDB()
 end
 LIB.RegisterExit('MY_Chat_Release', onExit)

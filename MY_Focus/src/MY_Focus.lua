@@ -1068,10 +1068,10 @@ local function onInit()
 end
 LIB.RegisterInit('MY_Focus', onInit)
 
-local function onExit()
+local function Flush()
 	D.SaveConfig()
 end
-LIB.RegisterExit('MY_Focus', onExit)
+LIB.RegisterFlush('MY_Focus', Flush)
 end
 
 do

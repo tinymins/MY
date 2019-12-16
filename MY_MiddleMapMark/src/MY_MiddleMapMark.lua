@@ -166,8 +166,12 @@ local function onLoadingEnding()
 end
 LIB.RegisterEvent('LOADING_ENDING.MY_MiddleMapMark', onLoadingEnding)
 
-local function OnExit()
+local function Flush()
 	FlushDB()
+end
+LIB.RegisterFlush('MY_MiddleMapMark_Save', Flush)
+
+local function OnExit()
 	DB:Release()
 end
 LIB.RegisterExit('MY_MiddleMapMark_Save', OnExit)

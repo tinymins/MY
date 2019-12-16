@@ -1020,7 +1020,7 @@ LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '#STORAGE_DATA', 200, function()
 	})
 	return 0
 end)
-LIB.RegisterExit(PACKET_INFO.NAME_SPACE .. '#STORAGE_DATA', function()
+LIB.RegisterFlush(PACKET_INFO.NAME_SPACE .. '#STORAGE_DATA', function()
 	LIB.SaveLUAData({'config/storageversion.jx3dat', PATH_TYPE.ROLE}, m_nStorageVer)
 end)
 -- 保存个人数据 方便网吧党和公司家里多电脑切换

@@ -337,7 +337,8 @@ local function GetTongName(dwID)
 	return szTong
 end
 
-local function OnExit()
+do
+local function Flush()
 	if not InitDB() then
 		return
 	end
@@ -350,7 +351,6 @@ local function OnExit()
 		end
 		DB:Execute('END TRANSACTION')
 	end
-
 	if DBT_W then
 		DB:Execute('BEGIN TRANSACTION')
 		for id, name in pairs(l_tongnames_w) do
@@ -360,10 +360,19 @@ local function OnExit()
 		end
 		DB:Execute('END TRANSACTION')
 	end
+end
+LIB.RegisterFlush('MY_Farbnamen_Save', Flush)
+end
 
+do
+local function OnExit()
+	if not DB then
+		return
+	end
 	DB:Release()
 end
 LIB.RegisterExit('MY_Farbnamen_Save', OnExit)
+end
 
 -- 通过szName获取信息
 function MY_Farbnamen.Get(szKey)

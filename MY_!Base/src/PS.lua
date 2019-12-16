@@ -801,9 +801,11 @@ function PS.OnPanelActive(wnd)
 	-- ”√ªß…Ë÷√
 	x = 7
 	x = x + ui:Append('WndButton', {
-		x = x, y = 405, w = 130,
+		x = x, y = 405, w = 111,
 		name = 'WndButton_UserPreferenceFolder',
-		text = _L['Open user preference folder'],
+		text = _L['User preference'],
+		tip = _L['User preference'] .. _L['Storage location'],
+		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 		onclick = function()
 			local szRoot = LIB.GetAbsolutePath({'', PATH_TYPE.ROLE}):gsub('/', '\\')
 			if OpenFolder then
@@ -813,9 +815,11 @@ function PS.OnPanelActive(wnd)
 		end,
 	}):AutoWidth():Width() + 5
 	x = x + ui:Append('WndButton', {
-		x = x, y = 405, w = 130,
+		x = x, y = 405, w = 111,
 		name = 'WndButton_ServerPreferenceFolder',
-		text = _L['Open server preference folder'],
+		text = _L['Server preference'],
+		tip = _L['Server preference'] .. _L['Storage location'],
+		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 		onclick = function()
 			local szRoot = LIB.GetAbsolutePath({'', PATH_TYPE.SERVER}):gsub('/', '\\')
 			if OpenFolder then
@@ -825,9 +829,11 @@ function PS.OnPanelActive(wnd)
 		end,
 	}):AutoWidth():Width() + 5
 	x = x + ui:Append('WndButton', {
-		x = x, y = 405, w = 130,
+		x = x, y = 405, w = 111,
 		name = 'WndButton_GlobalPreferenceFolder',
-		text = _L['Open global preference folder'],
+		text = _L['Global preference'],
+		tip = _L['Global preference'] .. _L['Storage location'],
+		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 		onclick = function()
 			local szRoot = LIB.GetAbsolutePath({'', PATH_TYPE.GLOBAL}):gsub('/', '\\')
 			if OpenFolder then
@@ -838,10 +844,22 @@ function PS.OnPanelActive(wnd)
 	}):AutoWidth():Width() + 5
 	x = x + ui:Append('WndButton', {
 		name = 'WndButton_AddonErrorMessage',
-		x = x, y = 405, w = 130,
-		text = _L['Show error message'],
+		x = x, y = 405, w = 111,
+		text = _L['Error message'],
+		tip = _L['Show error message'],
+		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 		onclick = function()
 			UI.OpenTextEditor(LIB.GetAddonErrorMessage())
+		end,
+	}):AutoWidth():Width() + 5
+	x = x + ui:Append('WndButton', {
+		name = 'WndButton_Flush',
+		x = x, y = 405, w = 111,
+		text = _L['Flush data'],
+		tip = _L['Config and data will be saved when exit game, click to save immediately'],
+		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+		onclick = function()
+			LIB.FireFlush()
 		end,
 	}):AutoWidth():Width() + 5
 	PS.OnPanelResize(wnd)
@@ -875,6 +893,7 @@ function PS.OnPanelResize(wnd)
 	ui:Children('#WndButton_ServerPreferenceFolder'):Top(scaleH + 95)
 	ui:Children('#WndButton_GlobalPreferenceFolder'):Top(scaleH + 95)
 	ui:Children('#WndButton_AddonErrorMessage'):Top(scaleH + 95)
+	ui:Children('#WndButton_Flush'):Top(scaleH + 95)
 end
 function PS.OnPanelBreathe(wnd)
 	local ui = LIB.UI(wnd)

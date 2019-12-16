@@ -152,7 +152,7 @@ function D.SaveConfig()
 	end
 	LIB.SaveLUAData({ D.GetConfigPath(), PATH_TYPE.GLOBAL }, Config)
 end
-LIB.RegisterExit(D.SaveConfig)
+LIB.RegisterFlush(D.SaveConfig)
 
 MY_LifeBar_Config = setmetatable({}, {
 	__call = function(t, op, ...)

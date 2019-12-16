@@ -2120,7 +2120,7 @@ function D.OnShare(_, nChannel, dwID, szName, bIsSelf, ...)
 end
 
 LIB.RegisterInit('MY_TeamMon', D.Init)
-LIB.RegisterExit('MY_TeamMon', D.SaveData)
+LIB.RegisterFlush('MY_TeamMon', D.SaveData)
 LIB.RegisterBgMsg('MY_TM_SHARE', D.OnShare)
 
 -- Global exports

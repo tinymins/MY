@@ -148,7 +148,7 @@ function D.SaveData()
         and PATH_TYPE.SERVER or PATH_TYPE.ROLE
     LIB.SaveLUAData({DATA_FILE, TYPE}, {list = RECORD_LIST, hash = RECORD_HASH})
 end
-LIB.RegisterExit(D.SaveData)
+LIB.RegisterFlush(D.SaveData)
 
 function D.LoadData()
     local data = MY_ChatMonitor.bDistinctServer

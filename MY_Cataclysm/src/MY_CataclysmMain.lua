@@ -1256,9 +1256,8 @@ end)
 LIB.RegisterEvent('LOADING_END', D.CheckCataclysmEnable)
 
 -- ±£¥Ê∫Õ∂¡»°≈‰÷√
-LIB.RegisterExit(D.SaveConfigure)
-
 LIB.RegisterInit('MY_Cataclysm', function() D.SetConfigureName() end)
+LIB.RegisterFlush('MY_Cataclysm', D.SaveConfigure)
 
 
 LIB.RegisterAddonMenu(function()

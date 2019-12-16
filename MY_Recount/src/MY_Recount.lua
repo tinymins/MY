@@ -267,7 +267,7 @@ LIB.RegisterStorageInit('MY_RECOUNT', function()
 	end
 end)
 
-LIB.RegisterExit(function()
+LIB.RegisterFlush(function()
 	MY_Recount.Data.SaveData(MY_Recount.bSaveRecount)
 end)
 
