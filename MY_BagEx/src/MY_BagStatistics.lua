@@ -201,7 +201,7 @@ function FlushDB()
 	LIB.Debug('Flushing to database finished...', 'MY_BagStatistics', DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 end
-LIB.RegisterEvent('PLAYER_LEAVE_GAME.MY_BagStatistics', FlushDB)
+LIB.RegisterFlush('MY_BagStatistics', FlushDB)
 end
 
 function MY_BagStatistics.Open()
