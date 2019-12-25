@@ -163,6 +163,11 @@ local function UpdateTitleEffect(dwType, dwID)
 	OBJECT_TITLE_EFFECT[dwID] = nEffectID and LIB.GetGlobalEffect(nEffectID)
 	OVERWRITE_TITLE_EFFECT[dwID] = not OBJECT_TITLE_EFFECT[dwID] -- 强刷系统头顶
 end
+local function onPlayerStateUpdate()
+	UpdateTitleEffect(TARGET.PLAYER, arg0)
+end
+LIB.RegisterEvent('PLAYER_STATE_UPDATE.MY_LifeBar', onPlayerStateUpdate)
+
 local function onNpcQuestMarkUpdate()
 	UpdateTitleEffect(TARGET.NPC, arg0)
 end
