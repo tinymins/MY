@@ -148,8 +148,8 @@ local function FireEventRec(E, p, ...)
 	end
 	--[[#DEBUG BEGIN]]
 	LIB.Debug(
-		_L('%s function <%s> %s in %dms.', E.szName, p.szID, res and _L['succeed'] or _L['failed'], GetTickCount() - nStartTick),
 		_L['PMTool'],
+		_L('%s function <%s> %s in %dms.', E.szName, p.szID, res and _L['succeed'] or _L['failed'], GetTickCount() - nStartTick),
 		DEBUG_LEVEL.PMLOG)
 	--[[#DEBUG END]]
 end
@@ -210,7 +210,7 @@ local function OnInit()
 	INIT_EVENT = nil
 	-- 显示欢迎信息
 	local me = GetClientPlayer()
-	LIB.Sysmsg({_L('%s, welcome to use %s!', me.szName, PACKET_INFO.NAME) .. ' v' .. LIB.GetVersion() .. ' Build ' .. PACKET_INFO.BUILD})
+	LIB.Sysmsg(_L('%s, welcome to use %s!', me.szName, PACKET_INFO.NAME) .. ' v' .. LIB.GetVersion() .. ' Build ' .. PACKET_INFO.BUILD)
 end
 LIB.RegisterEvent('LOADING_ENDING', OnInit) -- 不能用FIRST_LOADING_END 不然注册快捷键就全跪了
 
@@ -359,7 +359,7 @@ function LIB.RegisterModuleEvent(arg0, arg1)
 			end
 			MODULE_LIST[szModule] = nil
 			--[[#DEBUG BEGIN]]
-			LIB.Debug("Uninit # "  .. szModule .. " # Events Removed # " .. nCount, 'MY#EVENT', DEBUG_LEVEL.LOG)
+			LIB.Debug('MY#EVENT', "Uninit # "  .. szModule .. " # Events Removed # " .. nCount, DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
 		end
 	elseif IsTable(arg1) then
@@ -389,7 +389,7 @@ function LIB.RegisterModuleEvent(arg0, arg1)
 			tEvent[szKey] = { szEvent = szEvent }
 		end
 		--[[#DEBUG BEGIN]]
-		LIB.Debug("Init # "  .. szModule .. " # Events Added # " .. nCount, 'MY#EVENT', DEBUG_LEVEL.LOG)
+		LIB.Debug('MY#EVENT', "Init # "  .. szModule .. " # Events Added # " .. nCount, DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 	end
 end
@@ -535,7 +535,7 @@ local function OnBgMsg()
 			CommonEventFirer(BG_MSG_EVENT, szMsgID, nChannel, dwID, szName, bSelf, unpack(aParam))
 		--[[#DEBUG BEGIN]]
 		else
-			LIB.Debug(GetTraceback('Cannot decode bgmsg'), 'BG_EVENT#' .. szMsgID, DEBUG_LEVEL.ERROR)
+			LIB.Debug('BG_EVENT#' .. szMsgID, GetTraceback('Cannot decode bgmsg'), DEBUG_LEVEL.ERROR)
 		--[[#DEBUG END]]
 		end
 		BG_MSG_PART[szMsgUUID] = nil
@@ -700,9 +700,9 @@ local function onBreathe()
 	end
 	--[[#DEBUG BEGIN]]
 	if GetTime() - nBeginTime > COROUTINE_TIME then
-		LIB.Debug(_L('Coroutine time exceed limit: %dms.', GetTime() - nBeginTime), _L['PMTool'], DEBUG_LEVEL.PMLOG)
+		LIB.Debug(_L['PMTool'], _L('Coroutine time exceed limit: %dms.', GetTime() - nBeginTime), DEBUG_LEVEL.PMLOG)
 	elseif nBeginTime - l_nLastBreatheTime > FPS_SLOW_TIME then
-		LIB.Debug(_L('System breathe too slow(%dms), coroutine suspended.', nBeginTime - l_nLastBreatheTime), _L['PMTool'], DEBUG_LEVEL.PMLOG)
+		LIB.Debug(_L['PMTool'], _L('System breathe too slow(%dms), coroutine suspended.', nBeginTime - l_nLastBreatheTime), DEBUG_LEVEL.PMLOG)
 	end
 	--[[#DEBUG END]]
 	l_nLastBreatheTime = nBeginTime

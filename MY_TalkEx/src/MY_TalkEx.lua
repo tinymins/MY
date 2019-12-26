@@ -86,7 +86,7 @@ _C.tTrickChannels = {
 local _dwTalkTick = 0
 _C.Talk = function()
 	if #MY_TalkEx.szTalk == 0 then
-		return LIB.Sysmsg({_L['please input something.'], r=255, g=0, b=0})
+		return LIB.Sysmsg(_L['please input something.'], CONSTANT.MSG_THEME.ERROR)
 	end
 
 	if not LIB.IsShieldedVersion() and LIB.ProcessCommand
@@ -114,7 +114,7 @@ LIB.RegisterHotKey('MY_TalkEx_Talk', _L['TalkEx Talk'], _C.Talk, nil)
 
 _C.Trick = function()
 	if #MY_TalkEx.szTrickText == 0 then
-		return LIB.Sysmsg({_L['please input something.'], r=255, g=0, b=0})
+		return LIB.Sysmsg(_L['please input something.'], CONSTANT.MSG_THEME.ERROR)
 	end
 	local t = {}
 	if MY_TalkEx.szTrickFilter == 'RAID' then
@@ -143,7 +143,7 @@ _C.Trick = function()
 	end
 	-- none target
 	if #t == 0 then
-		return LIB.Sysmsg({_L['no trick target found.'], r=255, g=0, b=0},nil)
+		return LIB.Sysmsg(_L['no trick target found.'], CONSTANT.MSG_THEME.ERROR)
 	end
 	-- start tricking
 	if #MY_TalkEx.szTrickTextBegin > 0 then

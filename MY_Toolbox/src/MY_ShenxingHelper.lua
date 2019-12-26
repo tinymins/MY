@@ -169,7 +169,7 @@ function D.Apply()
 			) and dwSkillID == 3691) then
 				return
 			end
-			LIB.Sysmsg({_L['Shenxing has been cancelled, cause you got the zhenyan.']})
+			LIB.Sysmsg(_L['Shenxing has been cancelled, cause you got the zhenyan.'])
 			player.StopCurrentAction()
 		end)
 	else

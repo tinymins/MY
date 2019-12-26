@@ -120,10 +120,11 @@ local function CreateCountdown(nType, szKey, tParam, szSender, szReceiver)
 			tParam.nRefresh = tParam.nRefresh or tCountdown[#tCountdown].nTime - 3 -- 最大时间内防止重复刷新 但是脱离战斗的NPC需要手动删除
 		else
 			return LIB.Sysmsg(
+				_L['MY_TeamMon'],
 				_L['Countdown format error']
 					.. ' TYPE: ' .. _L['Countdown TYPE ' .. nType]
 					.. ' KEY:' .. szKey .. ' Content:' .. tParam.nTime,
-				_L['MY_TeamMon'], 'MSG_SYS.ERROR')
+				CONSTANT.MSG_THEME.ERROR)
 		end
 	end
 	if tTime.nTime == 0 then

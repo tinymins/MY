@@ -1064,7 +1064,7 @@ function MY_CataclysmMain.OnLButtonClick()
 				PopupMenu(menu[2])
 			end
 		else
-			return LIB.Sysmsg({_L['You are not the distrubutor.']})
+			return LIB.Sysmsg(_L['You are not the distrubutor.'])
 		end
 	elseif szName == 'WndButton_Speaker' then
 		LIB.GVoiceBase_SwitchSpeakerState()

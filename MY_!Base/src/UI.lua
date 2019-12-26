@@ -1083,12 +1083,12 @@ function UI:Append(arg0, arg1)
 				end
 				local frame = Wnd.OpenWindow(szFile, PACKET_INFO.NAME_SPACE .. '_TempWnd#' .. _nTempWndCount)
 				if not frame then
-					return LIB.Debug(_L('unable to open ini file [%s]', szFile), PACKET_INFO.NAME_SPACE .. '#UI#append', DEBUG_LEVEL.ERROR)
+					return LIB.Debug(PACKET_INFO.NAME_SPACE .. '#UI#append', _L('unable to open ini file [%s]', szFile), DEBUG_LEVEL.ERROR)
 				end
 				_nTempWndCount = _nTempWndCount + 1
 				local raw = frame:Lookup(szComponet)
 				if not raw then
-					LIB.Debug(_L('can not find wnd component [%s:%s]', szFile, szComponet), PACKET_INFO.NAME_SPACE .. '#UI#append', DEBUG_LEVEL.ERROR)
+					LIB.Debug(PACKET_INFO.NAME_SPACE .. '#UI#append', _L('can not find wnd component [%s:%s]', szFile, szComponet), DEBUG_LEVEL.ERROR)
 				else
 					InitComponent(raw, szType)
 					raw:ChangeRelation(parentWnd, true, true)
@@ -1099,7 +1099,7 @@ function UI:Append(arg0, arg1)
 			elseif sub(szType, 1, 3) ~= 'Wnd' and parentHandle then
 				raw = parentHandle:AppendItemFromIni(_szItemINI, szType)
 				if not raw then
-					return LIB.Debug(_L('unable to append handle item [%s]', szType), PACKET_INFO.NAME_SPACE .. '#UI:Append', DEBUG_LEVEL.ERROR)
+					return LIB.Debug(PACKET_INFO.NAME_SPACE .. '#UI:Append', _L('unable to append handle item [%s]', szType), DEBUG_LEVEL.ERROR)
 				else
 					ui = ui:Add(raw)
 				end
@@ -1949,7 +1949,7 @@ function UI:FadeTo(nTime, nOpacity, callback)
 				local nCurrentAlpha = fnCurrent(nStartAlpha, nOpacity, nTime, GetTime() - nStartTime)
 				ui:Alpha(nCurrentAlpha)
 				--[[#DEBUG BEGIN]]
-				-- LIB.Debug(format('%d %d %d %d\n', nStartAlpha, nOpacity, nCurrentAlpha, (nStartAlpha - nCurrentAlpha)*(nCurrentAlpha - nOpacity)), 'fade', DEBUG_LEVEL.LOG)
+				-- LIB.Debug('fade', format('%d %d %d %d\n', nStartAlpha, nOpacity, nCurrentAlpha, (nStartAlpha - nCurrentAlpha)*(nCurrentAlpha - nOpacity)), DEBUG_LEVEL.LOG)
 				--[[#DEBUG END]]
 				if (nStartAlpha - nCurrentAlpha)*(nCurrentAlpha - nOpacity) <= 0 then
 					ui:Alpha(nOpacity)
@@ -2008,7 +2008,7 @@ function UI:SlideTo(nTime, nHeight, callback)
 				local nCurrentValue = fnCurrent(nStartValue, nHeight, nTime, GetTime()-nStartTime)
 				ui:Height(nCurrentValue)
 				--[[#DEBUG BEGIN]]
-				-- LIB.Debug(format('%d %d %d %d\n', nStartValue, nHeight, nCurrentValue, (nStartValue - nCurrentValue)*(nCurrentValue - nHeight)), 'slide', DEBUG_LEVEL.LOG)
+				-- LIB.Debug('slide', format('%d %d %d %d\n', nStartValue, nHeight, nCurrentValue, (nStartValue - nCurrentValue)*(nCurrentValue - nHeight)), DEBUG_LEVEL.LOG)
 				--[[#DEBUG END]]
 				if (nStartValue - nCurrentValue)*(nCurrentValue - nHeight) <= 0 then
 					ui:Height(nHeight):Toggle( nHeight ~= 0 )
@@ -3331,8 +3331,9 @@ function UI:UIEvent(szEvent, fnEvent)
 								--[[#DEBUG BEGIN]]
 								else
 									LIB.Debug(
+										'UI:UIEvent#' .. szEvent .. ':' .. (p.id or 'Unnamed'),
 										_L('Set return value failed, cause another hook has alreay take a returnval. [Path] %s', UI.GetTreePath(raw)),
-										'UI:UIEvent#' .. szEvent .. ':' .. (p.id or 'Unnamed'), DEBUG_LEVEL.WARNING
+										DEBUG_LEVEL.WARNING
 									)
 								--[[#DEBUG END]]
 								end
@@ -3729,7 +3730,7 @@ function UI:Check(fnCheck, fnUncheck, bNoAutoBind)
 		end
 	--[[#DEBUG BEGIN]]
 	else
-		LIB.Debug('fnCheck:'..type(fnCheck)..' fnUncheck:'..type(fnUncheck), 'ERROR UI:Check', DEBUG_LEVEL.ERROR)
+		LIB.Debug('ERROR UI:Check', 'fnCheck:'..type(fnCheck)..' fnUncheck:'..type(fnUncheck), DEBUG_LEVEL.ERROR)
 	--[[#DEBUG END]]
 	end
 end
@@ -4203,7 +4204,7 @@ function UI.OpenColorPicker(callback, t)
 		if GetRGBValue() then
 			fnClick(GetRGBValue())
 		else
-			LIB.Sysmsg({_L['RGB value error']})
+			LIB.Sysmsg(_L['RGB value error'])
 		end
 	end})
 	x = x + 50
@@ -4769,7 +4770,7 @@ function UI.GetShadowHandle(szName)
 	if not sh then
 		frame:Lookup('', ''):AppendItemFromString(format('<handle> name="%s" </handle>', szName))
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('Create sh # ' .. szName, 'UI', DEBUG_LEVEL.LOG)
+		LIB.Debug('UI', 'Create sh # ' .. szName, DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		sh = frame:Lookup('', szName)
 	end

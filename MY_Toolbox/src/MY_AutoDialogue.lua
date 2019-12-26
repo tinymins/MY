@@ -201,13 +201,13 @@ function D.ProcessDialogInfo(frame, aInfo, dwTarType, dwTarID, dwIndex)
 			GetClientPlayer().WindowSelect(dwIndex, option.dwID)
 		end
 		if MY_AutoDialogue.bEchoOn then
-			LIB.Sysmsg({_L('Conversation with [%s]: %s', dialog.szName, dialog.szContext:gsub('%s', ''))})
+			LIB.Sysmsg(_L('Conversation with [%s]: %s', dialog.szName, dialog.szContext:gsub('%s', '')))
 			if option.szContext and option.szContext ~= '' then
-				LIB.Sysmsg({_L('Conversation with [%s] auto chose: %s', dialog.szName, option.szContext)})
+				LIB.Sysmsg(_L('Conversation with [%s] auto chose: %s', dialog.szName, option.szContext))
 			end
 		end
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('WindowSelect ' .. dwIndex .. ',' .. option.dwID .. 'x' .. nRepeat, 'AUTO_CHAT', DEBUG_LEVEL.LOG)
+		LIB.Debug('AUTO_CHAT', 'WindowSelect ' .. dwIndex .. ',' .. option.dwID .. 'x' .. nRepeat, DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		return true
 	end
@@ -219,7 +219,7 @@ function D.AutoDialogue()
 		D.LoadData()
 	end
 	if MY_AutoDialogue.bEnableShift and IsShiftKeyDown() then
-		LIB.Sysmsg({_L['Auto interact disabled due to SHIFT key pressed.']})
+		LIB.Sysmsg(_L['Auto interact disabled due to SHIFT key pressed.'])
 		return
 	end
 	local frame = Station.Lookup('Normal/DialoguePanel')

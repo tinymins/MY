@@ -211,7 +211,7 @@ end
 local l_bExporting
 function D.ExportConfirm()
 	if l_bExporting then
-		return LIB.Sysmsg({_L['Already exporting, please wait.']})
+		return LIB.Sysmsg(_L['Already exporting, please wait.'])
 	end
 	local ui = UI.CreateFrame('MY_ChatLog_Export', {
 		simple = true, esc = true, close = true, w = 140,
@@ -289,7 +289,7 @@ end
 
 function D.Export(szExportFile, aChannels, nPerSec, onProgress)
 	if l_bExporting then
-		return LIB.Sysmsg({_L['Already exporting, please wait.']})
+		return LIB.Sysmsg(_L['Already exporting, please wait.'])
 	end
 	local ds = MY_ChatLog_DS(MY_ChatLog.GetRoot())
 	if not ds then
@@ -315,7 +315,7 @@ function D.Export(szExportFile, aChannels, nPerSec, onProgress)
 				db:Disconnect()
 				local szFile = GetRootPath() .. szExportFile:gsub('/', '\\')
 				LIB.Alert(_L('Chatlog export succeed, file saved as %s', szFile))
-				LIB.Sysmsg({_L('Chatlog export succeed, file saved as %s', szFile)})
+				LIB.Sysmsg(_L('Chatlog export succeed, file saved as %s', szFile))
 				return 0
 			end
 			local data = ds:SelectMsg(aChannels, '', nPage * EXPORT_SLICE, EXPORT_SLICE, true)
@@ -332,7 +332,7 @@ function D.Export(szExportFile, aChannels, nPerSec, onProgress)
 	elseif szExportFile:sub(-5) == '.html' then
 		local status = Log(szExportFile, getHeader(), 'clear')
 		if status ~= 'SUCCEED' then
-			return LIB.Sysmsg({_L('Error: open file error %s [%s]', szExportFile, status)})
+			return LIB.Sysmsg(_L('Error: open file error %s [%s]', szExportFile, status))
 		end
 		l_bExporting = true
 
@@ -346,7 +346,7 @@ function D.Export(szExportFile, aChannels, nPerSec, onProgress)
 				end
 				local szFile = GetRootPath() .. szExportFile:gsub('/', '\\')
 				LIB.Alert(_L('Chatlog export succeed, file saved as %s', szFile))
-				LIB.Sysmsg({_L('Chatlog export succeed, file saved as %s', szFile)})
+				LIB.Sysmsg(_L('Chatlog export succeed, file saved as %s', szFile))
 				return 0
 			end
 			local data = ds:SelectMsg(aChannels, '', nPage * EXPORT_SLICE, EXPORT_SLICE)

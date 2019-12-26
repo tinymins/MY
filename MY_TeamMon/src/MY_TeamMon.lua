@@ -461,7 +461,7 @@ function D.OnEvent(szEvent)
 			if szText and szText ~= '' then
 				D.OnCallMessage('TALK', szText, arg1, arg3 == '' and '%' or arg3)
 			else
-				LIB.Debug('GetPureText ERROR: ' .. arg0, _L['MY_TeamMon'], DEBUG_LEVEL.WARNING)
+				LIB.Debug(_L['MY_TeamMon'], 'GetPureText ERROR: ' .. arg0, DEBUG_LEVEL.WARNING)
 			end
 		end
 	elseif szEvent == 'ON_WARNING_MESSAGE' then
@@ -651,7 +651,7 @@ function D.CreateData(szEvent)
 							cache.HIT[v.szContent][v.szTarget or 'sys'] = v
 						end
 					else
-						LIB.Sysmsg('[Warning] ' .. vType .. ' data is not szContent #' .. k .. ', please do check it!', 'MY_TeamMon', DEBUG_LEVEL.WARNING)
+						LIB.Debug('MY_TeamMon', '[Warning] ' .. vType .. ' data is not szContent #' .. k .. ', please do check it!', DEBUG_LEVEL.WARNING)
 					end
 				end
 				D.Log('create ' .. vType .. ' data success!')
@@ -1664,7 +1664,7 @@ function D.RegisterMessage(bEnable)
 			end
 			-- local res, err = pcall(D.OnCallMessage, 'CHAT', szMsg:gsub('\r', ''))
 			-- if not res then
-			-- 	return LIB.Sysmsg(err, DEBUG_LEVEL.WARNING)
+			-- 	return LIB.Debug(err, DEBUG_LEVEL.WARNING)
 			-- end
 			szMsg = szMsg:gsub('\r', '')
 			D.OnCallMessage('CHAT', szMsg)
@@ -1708,7 +1708,7 @@ function D.Enable(bEnable, bFireUIEvent)
 	if bEnable then
 		local res, err = pcall(D.Open)
 		if not res then
-			return LIB.Sysmsg(err, DEBUG_LEVEL.WARNING)
+			return LIB.Debug(err, DEBUG_LEVEL.WARNING)
 		end
 		if bFireUIEvent then
 			FireUIEvent('MY_TM_LOADING_END')
@@ -1852,7 +1852,7 @@ local function UpgradeFocusData(data, aFocus)
 		end
 	end
 	if nCount > 0 then
-		LIB.Sysmsg(_L('%s focus rules converted, if you are data author please notice that focus auto convert will not last long, you should export your data again.', nCount), _L['MY_TeamMon'], 'MSG_SYS.ERROR')
+		LIB.Sysmsg(_L['MY_TeamMon'], _L('%s focus rules converted, if you are data author please notice that focus auto convert will not last long, you should export your data again.', nCount), CONSTANT.MSG_THEME.ERROR)
 	end
 end
 

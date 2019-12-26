@@ -813,9 +813,9 @@ function CombatText.LoadConfig()
 			COMBAT_TEXT_EVENT       = data.COMBAT_TEXT_EVENT       or COMBAT_TEXT_EVENT
 			COMBAT_TEXT_IGNORE_TYPE = data.COMBAT_TEXT_IGNORE_TYPE or {}
 			COMBAT_TEXT_IGNORE      = data.COMBAT_TEXT_IGNORE      or {}
-			LIB.Sysmsg({_L['CombatText Config loaded']})
+			LIB.Sysmsg(_L['CombatText Config loaded'])
 		else
-			LIB.Sysmsg({_L['CombatText Config failed']})
+			LIB.Sysmsg(_L['CombatText Config failed'])
 		end
 	end
 end

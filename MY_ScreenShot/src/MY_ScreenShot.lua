@@ -88,13 +88,13 @@ MY_ScreenShot.GetConfig = function(szKey)
 end
 _MY_ScreenShot.ShotScreen = function(szFilePath, nQuality)
     local szFullPath = ScreenShot(szFilePath, nQuality)
-    LIB.Sysmsg({_L('Shot screen succeed, file saved as %s .', szFullPath)})
+    LIB.Sysmsg(_L('Shot screen succeed, file saved as %s .', szFullPath))
 end
 MY_ScreenShot.ShotScreen = function(nShowUI)
     -- 生成可使用的完整截图目录
     local szFolderPath = MY_ScreenShot.GetConfig('szFilePath')
     if szFolderPath~='' and not (string.sub(szFolderPath,2,2)==':' and IsFileExist(szFolderPath)) then
-        LIB.Sysmsg({_L('Shotscreen destination folder error: %s not exist. File has been save to default folder.', szFolderPath)})
+        LIB.Sysmsg(_L('Shotscreen destination folder error: %s not exist. File has been save to default folder.', szFolderPath))
         szFolderPath = ''
     end
     local szFilePath

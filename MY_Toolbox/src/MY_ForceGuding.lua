@@ -76,7 +76,7 @@ RegisterCustomData('MY_ForceGuding.nManaHp')
 --[[#DEBUG BEGIN]]
 -- debug
 function D.Debug(szMsg)
-	LIB.Debug(szMsg, _L['MY_ForceGuding'], DEBUG_LEVEL.LOG)
+	LIB.Debug(_L['MY_ForceGuding'], szMsg, DEBUG_LEVEL.LOG)
 end
 --[[#DEBUG END]]
 
@@ -254,7 +254,7 @@ function D.OnUseManaChange(_, bUseMana)
 							if doo and LIB.GetDistance(doo) < 6 then
 								O.nManaFrame = GetLogicFrameCount()
 								InteractDoodad(doo.dwID)
-								LIB.Sysmsg("×Ô¶¯³ÔÏÉÍõ¹Æ¶¦")
+								LIB.Sysmsg(_L['Auto eat GUDING'])
 								break
 							end
 						end

@@ -328,7 +328,7 @@ function LIB.SwitchTab(szID, bForceUpdate)
 		end
 		--[[#DEBUG BEGIN]]
 		if not tab then
-			LIB.Debug(_L('Cannot find tab: %s', szID), PACKET_INFO.NAME_SPACE .. '.SwitchTab#' .. szID, DEBUG_LEVEL.WARNING)
+			LIB.Debug(PACKET_INFO.NAME_SPACE .. '.SwitchTab#' .. szID, _L('Cannot find tab: %s', szID), DEBUG_LEVEL.WARNING)
 		end
 		--[[#DEBUG END]]
 	end

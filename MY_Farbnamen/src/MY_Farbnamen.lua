@@ -83,7 +83,7 @@ local function InitDB()
 			szMsg = szMsg .. _L(' Retry time: %d', DB_ERR_COUNT)
 		end
 		DB_ERR_COUNT = DB_ERR_COUNT + 1
-		LIB.Sysmsg({szMsg, r = 255, g = 0, b = 0}, _L['MY_Farbnamen'])
+		LIB.Sysmsg(_L['MY_Farbnamen'], szMsg, CONSTANT.MSG_THEME.ERROR)
 		return false
 	end
 	DB:Execute('CREATE TABLE IF NOT EXISTS InfoCache (id INTEGER PRIMARY KEY, name VARCHAR(20) NOT NULL, force INTEGER, role INTEGER, level INTEGER, title VARCHAR(20), camp INTEGER, tong INTEGER)')
@@ -99,7 +99,7 @@ local function InitDB()
 	local SZ_IC_PATH = LIB.FormatPath({'cache/PLAYER_INFO/{$relserver}/', PATH_TYPE.DATA})
 	if IsLocalFileExist(SZ_IC_PATH) then
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('Farbnamen info cache trans from file to sqlite start!', 'MY_Farbnamen', DEBUG_LEVEL.LOG)
+		LIB.Debug('MY_Farbnamen', 'Farbnamen info cache trans from file to sqlite start!', DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		DB:Execute('BEGIN TRANSACTION')
 		for i = 0, 999 do
@@ -114,11 +114,11 @@ local function InitDB()
 		end
 		DB:Execute('END TRANSACTION')
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('Farbnamen info cache trans from file to sqlite finished!', 'MY_Farbnamen', DEBUG_LEVEL.LOG)
+		LIB.Debug('MY_Farbnamen', 'Farbnamen info cache trans from file to sqlite finished!', DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('Farbnamen tong cache trans from file to sqlite start!', 'MY_Farbnamen', DEBUG_LEVEL.LOG)
+		LIB.Debug('MY_Farbnamen', 'Farbnamen tong cache trans from file to sqlite start!', DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		DB:Execute('BEGIN TRANSACTION')
 		for i = 0, 128 do
@@ -135,15 +135,15 @@ local function InitDB()
 		end
 		DB:Execute('END TRANSACTION')
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('Farbnamen tong cache trans from file to sqlite finished!', 'MY_Farbnamen', DEBUG_LEVEL.LOG)
+		LIB.Debug('MY_Farbnamen', 'Farbnamen tong cache trans from file to sqlite finished!', DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('Farbnamen cleaning file cache start: ' .. SZ_IC_PATH, 'MY_Farbnamen', DEBUG_LEVEL.LOG)
+		LIB.Debug('MY_Farbnamen', 'Farbnamen cleaning file cache start: ' .. SZ_IC_PATH, DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		CPath.DelDir(SZ_IC_PATH)
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('Farbnamen cleaning file cache finished!', 'MY_Farbnamen', DEBUG_LEVEL.LOG)
+		LIB.Debug('MY_Farbnamen', 'Farbnamen cleaning file cache finished!', DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 	end
 
@@ -176,7 +176,7 @@ local function InitDB()
 			DB:Execute('END TRANSACTION')
 			DB_V1:Release()
 		end
-		LIB.Sysmsg({_L['Upgrade database finished!']}, _L['MY_Farbnamen'])
+		LIB.Sysmsg(_L['MY_Farbnamen'], _L['Upgrade database finished!'])
 		CPath.DelFile(DB_V1_PATH)
 	end
 	return true
@@ -485,7 +485,7 @@ function MY_Farbnamen.GetMenu()
 				return
 			end
 			DB:Execute('DELETE FROM InfoCache')
-			LIB.Sysmsg({_L['cache data deleted.']}, _L['MY_Farbnamen'])
+			LIB.Sysmsg(_L['MY_Farbnamen'], _L['cache data deleted.'])
 		end,
 		fnDisable = function()
 			return not MY_Farbnamen.bEnabled

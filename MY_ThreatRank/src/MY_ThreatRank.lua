@@ -196,7 +196,7 @@ function TS.OnFrameBreathe()
 						local name = MY_GetObjName(p)
 						local oContent = {_L('Well done! %s in %d group first to attack %s!!', nGroup, szMember, name), r = 150, g = 250, b = 230}
 						local oTitile = {g_tStrings.HATRED_COLLECT, r = 150, g = 250, b = 230}
-						LIB.Sysmsg(oContent, oTitile)
+						LIB.Sysmsg(oTitile, oContent)
 					end
 				end
 			end)

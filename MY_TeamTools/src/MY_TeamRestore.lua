@@ -67,7 +67,7 @@ end
 function D.Save(nIndex, szName)
 	local tList, tList2, me, team = {}, {}, GetClientPlayer(), GetClientTeam()
 	if not me or not me.IsInParty() then
-		return LIB.Sysmsg(_L['You are not in a team'])
+		return LIB.Sysmsg(_L['You are not in a team'], CONSTANT.MSG_THEME.ERROR)
 	end
 	local tSave = {}
 	tSave.szLeader = team.GetClientTeamMemberName(team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER))
@@ -141,15 +141,15 @@ function D.Restore(n)
 	D.LoadLUAData()
 
 	if not me or not me.IsInParty() then
-		return LIB.Sysmsg(_L['You are not in a team'])
+		return LIB.Sysmsg(_L['You are not in a team'], CONSTANT.MSG_THEME.ERROR)
 	elseif not O.SaveList[n] then
-		return LIB.Sysmsg(_L['You have not saved team list data'])
+		return LIB.Sysmsg(_L['You have not saved team list data'], CONSTANT.MSG_THEME.ERROR)
 	end
 	-- get perm
 	if team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER) ~= me.dwID then
 		local nGroup = team.GetMemberGroupIndex(me.dwID) + 1
 		local szLeader = team.GetClientTeamMemberName(team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER))
-		return LIB.Sysmsg(_L['You are not team leader, permission denied'])
+		return LIB.Sysmsg(_L['You are not team leader, permission denied'], CONSTANT.MSG_THEME.ERROR)
 	end
 
 	if team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.MARK) ~= me.dwID then
@@ -164,7 +164,7 @@ function D.Restore(n)
 		for _, dwID in pairs(tGroupInfo.MemberList) do
 			local szName = team.GetClientTeamMemberName(dwID)
 			if not szName then
-				LIB.Sysmsg(_L('Unable get player of %d group: #%d', nGroup + 1, dwID))
+				LIB.Sysmsg(_L('Unable get player of %d group: #%d', nGroup + 1, dwID), CONSTANT.MSG_THEME.ERROR)
 			else
 				if not tSaved[szName] then
 					szName = string.gsub(szName, '@.*', '')
@@ -238,15 +238,15 @@ function D.Restore2(n)
 	D.LoadLUAData()
 	local me, team = GetClientPlayer(), GetClientTeam()
 	if not me or not me.IsInParty() then
-		return LIB.Sysmsg(_L['You are not in a team'])
+		return LIB.Sysmsg(_L['You are not in a team'], CONSTANT.MSG_THEME.ERROR)
 	elseif not O.SaveList[n] then
-		return LIB.Sysmsg(_L['You have not saved team list data'])
+		return LIB.Sysmsg(_L['You have not saved team list data'], CONSTANT.MSG_THEME.ERROR)
 	end
 	-- get perm
 	if team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER) ~= me.dwID then
 		local nGroup = team.GetMemberGroupIndex(me.dwID) + 1
 		local szLeader = team.GetClientTeamMemberName(team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER))
-		return LIB.Sysmsg(_L['You are not team leader, permission denied'])
+		return LIB.Sysmsg(_L['You are not team leader, permission denied'], CONSTANT.MSG_THEME.ERROR)
 	end
 
 	if team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.MARK) ~= me.dwID then

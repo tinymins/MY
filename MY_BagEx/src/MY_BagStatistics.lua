@@ -50,7 +50,7 @@ LIB.CreateDataRoot(PATH_TYPE.GLOBAL)
 
 local DB = LIB.ConnectDatabase(_L['MY_BagStatistics'], {'userdata/bagstatistics.db', PATH_TYPE.GLOBAL})
 if not DB then
-	return LIB.Sysmsg({_L['Cannot connect to database!!!'], r = 255, g = 0, b = 0}, _L['MY_BagStatistics'])
+	return LIB.Sysmsg(_L['MY_BagStatistics'], _L['Cannot connect to database!!!'], CONSTANT.MSG_THEME.ERROR)
 end
 local SZ_INI = PACKET_INFO.ROOT .. 'MY_BagEx/ui/MY_BagStatistics.ini'
 local PAGE_DISPLAY = 8
@@ -125,7 +125,7 @@ LIB.RegisterEvent('UPDATE_TONG_REPERTORY_PAGE.MY_BagStatistics', UpdateTongReper
 
 function FlushDB()
 	--[[#DEBUG BEGIN]]
-	LIB.Debug('Flushing to database...', 'MY_BagStatistics', DEBUG_LEVEL.LOG)
+	LIB.Debug('MY_BagStatistics', 'Flushing to database...', DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 	local me = GetClientPlayer()
 	local time = GetCurrentTime()
@@ -198,7 +198,7 @@ function FlushDB()
 
 	DB:Execute('END TRANSACTION')
 	--[[#DEBUG BEGIN]]
-	LIB.Debug('Flushing to database finished...', 'MY_BagStatistics', DEBUG_LEVEL.LOG)
+	LIB.Debug('MY_BagStatistics', 'Flushing to database finished...', DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 end
 LIB.RegisterFlush('MY_BagStatistics', FlushDB)
@@ -383,7 +383,7 @@ function MY_BagStatistics.UpdateItems(frame)
 			end
 		--[[#DEBUG BEGIN]]
 		else
-			LIB.Debug('KItemInfo not found: ' .. rec.tabtype .. ', ' .. rec.tabindex, 'MY_BagStatistics', DEBUG_LEVEL.WARNING)
+			LIB.Debug('MY_BagStatistics', 'KItemInfo not found: ' .. rec.tabtype .. ', ' .. rec.tabindex, DEBUG_LEVEL.WARNING)
 		--[[#DEBUG END]]
 		end
 	end

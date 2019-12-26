@@ -53,7 +53,7 @@ local l_tAccept = {} -- 从服务器获取到的数据缓存
 local l_szLastQueryQues -- 最后一次网络查询的题目（防止重查）
 
 local function DisplayMessage(szText)
-	LIB.Sysmsg({szText}, _L['exam tip'])
+	LIB.Sysmsg(_L['exam tip'], szText)
 end
 
 local function IsCurrentQuestion(szQues)
@@ -167,7 +167,7 @@ local function SubmitData()
 			if LIB.IsShieldedVersion() or not res then
 				return
 			end
-			LIB.Sysmsg({_L('%s record(s) commited, %s record(s) accepted!', r.received, r.accepted)}, _L['exam tip'])
+			LIB.Sysmsg(_L['exam tip'], _L('%s record(s) commited, %s record(s) accepted!', r.received, r.accepted))
 		end,
 	})
 end

@@ -38,15 +38,19 @@ local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAD
 -----------------------------------------------------------------------------------------------------------
 local _L = LIB.LoadLangPack()
 
--- 显示本地信息
--- LIB.Sysmsg(oContent, oTitle, szType)
--- LIB.Sysmsg({'Error!', wrap = true}, 'MY', 'MSG_SYS.ERROR')
--- LIB.Sysmsg({'New message', r = 0, g = 0, b = 0, wrap = true}, 'MY')
--- LIB.Sysmsg({{'New message', r = 0, g = 0, b = 0, rich = false}, wrap = true}, 'MY')
--- LIB.Sysmsg('New message', {'MY', 'DB', r = 0, g = 0, b = 0})
-do local THEME_LIST = {
-	['SUCCESS'] = { r = 0, g = 255, b = 127 },
-	['ERROR'] = { r = 255, g = 0, b = 0 },
+-- 显示本地信息 LIB.Sysmsg(oTitle, oContent, eTheme)
+--   LIB.Sysmsg({'Error!', wrap = true}, 'MY', CONSTANT.MSG_THEME.ERROR)
+--   LIB.Sysmsg({'New message', r = 0, g = 0, b = 0, wrap = true}, 'MY')
+--   LIB.Sysmsg({{'New message', r = 0, g = 0, b = 0, rich = false}, wrap = true}, 'MY')
+--   LIB.Sysmsg('New message', {'MY', 'DB', r = 0, g = 0, b = 0})
+-- 显示中央信息 LIB.Topmsg(oTitle, oContent, eTheme)
+--   参见 LIB.Sysmsg 参数解释
+do
+local THEME_LIST = {
+	-- [CONSTANT.MSG_THEME.NORMAL ] = { r = 255, g = 255, b =   0 },
+	[CONSTANT.MSG_THEME.ERROR  ] = { r = 255, g =  86, b =  86 },
+	[CONSTANT.MSG_THEME.WARNING] = { r = 255, g = 170, b = 170 },
+	[CONSTANT.MSG_THEME.SUCCESS] = { r =   0, g = 255, b = 127 },
 }
 local function StringifySysmsgObject(aMsg, oContent, cfg, bTitle)
 	local cfgContent = setmetatable({}, { __index = cfg })
@@ -76,18 +80,7 @@ local function StringifySysmsgObject(aMsg, oContent, cfg, bTitle)
 		insert(aMsg, GetFormatText('\n', cfgContent.f, cfgContent.r, cfgContent.g, cfgContent.b))
 	end
 end
-function LIB.Sysmsg(oContent, oTitle, szType)
-	if not szType then
-		szType = 'MSG_SYS'
-	end
-	if not oTitle then
-		oTitle = PACKET_INFO.SHORT_NAME
-	end
-	local nPos, szTheme = (StringFindW(szType, '.'))
-	if nPos then
-		szTheme = sub(szType, nPos + 1)
-		szType = sub(szType, 1, nPos - 1)
-	end
+local function OutputMessageEx(szType, szTheme, oTitle, oContent)
 	local aMsg = {}
 	-- 字体颜色优先级：单个节点 > 根节点定义 > 预设样式 > 频道设置
 	-- 频道设置
@@ -118,11 +111,61 @@ function LIB.Sysmsg(oContent, oTitle, szType)
 	StringifySysmsgObject(aMsg, oContent, cfg, false)
 	OutputMessage(szType, concat(aMsg), true)
 end
+
+-- 显示本地信息
+function LIB.Sysmsg(...)
+	local argc, oTitle, oContent, eTheme = select('#', ...), nil
+	if argc == 1 then
+		oContent = ...
+		oTitle, eTheme = nil
+	elseif argc == 2 then
+		if IsNumber(select(2, ...)) then
+			oContent, eTheme = ...
+			oTitle = nil
+		else
+			oTitle, oContent = ...
+			eTheme = nil
+		end
+	elseif argc == 3 then
+		oTitle, oContent, eTheme = ...
+	end
+	if not oTitle then
+		oTitle = PACKET_INFO.SHORT_NAME
+	end
+	if not IsNumber(eTheme) then
+		eTheme = CONSTANT.MSG_THEME.NORMAL
+	end
+	return OutputMessageEx('MSG_SYS', eTheme, oTitle, oContent)
 end
 
--- 没有头的中央信息 也可以用于系统信息
-function LIB.Topmsg(szText, szType)
-	LIB.Sysmsg(szText, {}, szType or 'MSG_ANNOUNCE_YELLOW')
+-- 显示中央信息
+function LIB.Topmsg(...)
+	local argc, oTitle, oContent, eTheme = select('#', ...), nil
+	if argc == 1 then
+		oContent = ...
+		oTitle, eTheme = nil
+	elseif argc == 2 then
+		if IsNumber(select(2, ...)) then
+			oContent, eTheme = ...
+			oTitle = nil
+		else
+			oTitle, oContent = ...
+			eTheme = nil
+		end
+	elseif argc == 3 then
+		oTitle, oContent, eTheme = ...
+	end
+	if not oTitle then
+		oTitle = CONSTANT.EMPTY_TABLE
+	end
+	if not IsNumber(eTheme) then
+		eTheme = CONSTANT.MSG_THEME.NORMAL
+	end
+	local szType = eTheme == CONSTANT.MSG_THEME.ERROR
+		and 'MSG_ANNOUNCE_RED'
+		or 'MSG_ANNOUNCE_YELLOW'
+	return OutputMessageEx(szType, eTheme, oTitle, oContent)
+end
 end
 
 -- 输出一条密聊信息
@@ -133,35 +176,55 @@ function LIB.OutputWhisper(szMsg, szHead)
 end
 
 -- Debug输出
--- (void)LIB.Debug(oContent, szTitle, nLevel)
--- oContent Debug信息
+-- (void)LIB.Debug(szTitle, oContent, nLevel)
 -- szTitle  Debug头
+-- oContent Debug信息
 -- nLevel   Debug级别[低于当前设置值将不会输出]
-function LIB.Debug(oContent, szTitle, nLevel)
+function LIB.Debug(...)
+	local argc, oTitle, oContent, nLevel, szTitle, szContent, eTheme = select('#', ...), nil
+	if argc == 1 then
+		oContent = ...
+		oTitle, nLevel = nil
+	elseif argc == 2 then
+		if IsNumber(select(2, ...)) then
+			oContent, nLevel = ...
+			oTitle = nil
+		else
+			oTitle, oContent = ...
+			nLevel = nil
+		end
+	elseif argc == 3 then
+		oTitle, oContent, nLevel = ...
+	end
+	if not oTitle then
+		oTitle = PACKET_INFO.NAME_SPACE .. '_DEBUG'
+	end
 	if not IsNumber(nLevel) then
 		nLevel = DEBUG_LEVEL.WARNING
 	end
-	if not IsString(szTitle) then
-		szTitle = PACKET_INFO.NAME_SPACE .. '_DEBUG'
+	if IsTable(oTitle) then
+		szTitle = concat(oTitle, '\n')
+	else
+		szTitle = tostring(oTitle)
 	end
-	if not IsTable(oContent) then
-		oContent = { oContent }
-	end
-	if not oContent.r then
-		if nLevel == DEBUG_LEVEL.LOG then
-			oContent.r, oContent.g, oContent.b =   0, 255, 127
-		elseif nLevel == DEBUG_LEVEL.WARNING then
-			oContent.r, oContent.g, oContent.b = 255, 170, 170
-		elseif nLevel == DEBUG_LEVEL.ERROR then
-			oContent.r, oContent.g, oContent.b = 255,  86,  86
-		else
-			oContent.r, oContent.g, oContent.b = 255, 255, 0
-		end
+	if IsTable(oContent) then
+		szContent = concat(oContent, '\n')
+	else
+		szContent = tostring(oContent)
 	end
 	if nLevel >= PACKET_INFO.DEBUG_LEVEL then
-		Log('[DEBUG_LEVEL][LEVEL_' .. nLevel .. '][' .. szTitle .. ']' .. concat(oContent, '\n'))
-		LIB.Sysmsg(oContent, szTitle)
+		Log('[DEBUG_LEVEL][LEVEL_' .. nLevel .. '][' .. szTitle .. ']' .. szContent)
+		if nLevel == DEBUG_LEVEL.LOG then
+			eTheme = CONSTANT.MSG_THEME.SUCCESS
+		elseif nLevel == DEBUG_LEVEL.WARNING then
+			eTheme = CONSTANT.MSG_THEME.WARNING
+		elseif nLevel == DEBUG_LEVEL.ERROR then
+			eTheme = CONSTANT.MSG_THEME.ERROR
+		else
+			eTheme = CONSTANT.MSG_THEME.NORMAL
+		end
+		LIB.Sysmsg(szTitle, oContent, eTheme)
 	elseif nLevel >= PACKET_INFO.DELOG_LEVEL then
-		Log('[DEBUG_LEVEL][LEVEL_' .. nLevel .. '][' .. szTitle .. ']' .. concat(oContent, '\n'))
+		Log('[DEBUG_LEVEL][LEVEL_' .. nLevel .. '][' .. szTitle .. ']' .. szContent)
 	end
 end

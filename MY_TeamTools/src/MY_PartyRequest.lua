@@ -126,7 +126,7 @@ function MY_PartyRequest.OnLButtonClick()
 			LIB.SendBgMsg(info.szName, 'RL', 'ASK')
 			this:Enable(false)
 			this:Lookup('', 'Text_Lookup'):SetText(_L['loading...'])
-			LIB.Sysmsg({_L['If it is always loading, the target may not install plugin or refuse.']})
+			LIB.Sysmsg(_L['If it is always loading, the target may not install plugin or refuse.'])
 		elseif info.dwID then
 			ViewInviteToPlayer(info.dwID)
 		end

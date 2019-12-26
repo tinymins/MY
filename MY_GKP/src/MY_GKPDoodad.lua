@@ -276,7 +276,7 @@ function D.OnAutoDoodad()
 			D.Remove(k)
 		end
 		if bIntr then
-			LIB.Debug('auto interact [' .. doodad.szName .. ']', _L['MY_GKPDoodad'], DEBUG_LEVEL.LOG)
+			LIB.Debug(_L['MY_GKPDoodad'], 'auto interact [' .. doodad.szName .. ']', DEBUG_LEVEL.LOG)
 			LIB.BreatheCall('AutoDoodad', 500)
 			return InteractDoodad(k)
 		end

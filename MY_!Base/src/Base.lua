@@ -991,6 +991,12 @@ local CONSTANT = setmetatable({}, {
 			end,
 			__metatable = true,
 		}),
+		MSG_THEME = SetmetaReadonly({
+			NORMAL = 0,
+			ERROR = 1,
+			WARNING = 2,
+			SUCCESS = 3,
+		}),
 		EQUIPMENT_SUIT_COUNT = EQUIPMENT_SUIT_COUNT or 4,
 		INVENTORY_GUILD_BANK = INVENTORY_GUILD_BANK or INVENTORY_INDEX.TOTAL + 1, --帮会仓库界面虚拟一个背包位置
 		INVENTORY_GUILD_PAGE_SIZE = INVENTORY_GUILD_PAGE_SIZE or 100,
@@ -1058,10 +1064,9 @@ end
 
 function LIB.AssertVersion(szKey, szCaption, dwMinVersion)
 	if _VERSION_ < dwMinVersion then
-		LIB.Sysmsg({
-			_L('%s requires base library version upper than v%s, current at v%s.',
-			szCaption, LIB.GetVersion(dwMinVersion), LIB.GetVersion()
-		)})
+		LIB.Sysmsg(_L(
+			'%s requires base library version upper than v%s, current at v%s.',
+			szCaption, LIB.GetVersion(dwMinVersion), LIB.GetVersion()))
 		if not IsDebugClient() then
 			return false
 		end

@@ -333,7 +333,7 @@ function _GKP.Random() -- 生成一个随机字符串 这还能重复我吃翔
 end
 
 function _GKP.Sysmsg(szMsg)
-	LIB.Sysmsg({szMsg}, '[MY_GKP]')
+	LIB.Sysmsg(_L['MY GKP'], szMsg)
 end
 
 function _GKP.GetTimeString(nTime, year)
@@ -996,7 +996,7 @@ LIB.RegisterEvent('ON_BG_CHANNEL_MSG.LR_GKP', function()
 			MY_GKP('GKP_Record', tab)
 		end
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('#MY_GKP# Sync From LR Success', 'MY_GKP', DEBUG_LEVEL.LOG)
+		LIB.Debug('MY_GKP', '#MY_GKP# Sync From LR Success', DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 	end
 end)
@@ -1023,7 +1023,7 @@ LIB.RegisterBgMsg('MY_GKP', function(_, nChannel, dwID, szName, bIsSelf, ...)
 					table.insert(_GKP.tSyncQueue, data[3])
 					if SYNC_LENG ~= 0 then
 						local percent = #_GKP.tSyncQueue / SYNC_LENG
-						LIB.Topmsg({_L('Sychoronizing data please wait %d%% loaded.', percent * 100)})
+						LIB.Topmsg(_L('Sychoronizing data please wait %d%% loaded.', percent * 100))
 					end
 				end
 				if data[1] == 'GKP_Sync_Stop' then
@@ -1031,11 +1031,11 @@ LIB.RegisterBgMsg('MY_GKP', function(_, nChannel, dwID, szName, bIsSelf, ...)
 					_GKP.tSyncQueue = {}
 					_GKP.bSync, SYNC_LENG = false, 0
 					LIB.Alert(_L['Sychoronization Complete'])
-					LIB.Topmsg({_L['Sychoronization Complete']})
+					LIB.Topmsg(_L['Sychoronization Complete'])
 					local tData, err = LIB.JsonDecode(str)
 					if err then
 						--[[#DEBUG BEGIN]]
-						LIB.Debug(err, 'MY_GKP', DEBUG_LEVEL.ERROR)
+						LIB.Debug('MY_GKP', err, DEBUG_LEVEL.ERROR)
 						--[[#DEBUG END]]
 						return _GKP.Sysmsg(_L['Abnormal with Data Sharing, Please contact and make feed back with the writer.'])
 					end
@@ -1062,7 +1062,7 @@ LIB.RegisterBgMsg('MY_GKP', function(_, nChannel, dwID, szName, bIsSelf, ...)
 					end
 				end
 				--[[#DEBUG BEGIN]]
-				LIB.Debug('#MY_GKP# Sync Success', 'MY_GKP', DEBUG_LEVEL.LOG)
+				LIB.Debug('MY_GKP', '#MY_GKP# Sync Success', DEBUG_LEVEL.LOG)
 				--[[#DEBUG END]]
 			end
 		end
@@ -1659,7 +1659,7 @@ function _GKP.Record(tab, item, bEnter)
 				this.szText = szText
 				ui:Color(_GKP.GetMoneyCol(szText))
 			else
-				LIB.Sysmsg({_L['Please enter numbers']})
+				LIB.Sysmsg(_L['Please enter numbers'])
 				ui:Text(this.szText or '')
 			end
 		end,

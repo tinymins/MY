@@ -1,6 +1,7 @@
 -- language data (zhtw) updated at 2015/02/23 10:11:27
 data = {
 	['MY_GKP'] = '金團記錄',
+	['MY GKP'] = '茗伊金團',
 	-- GKP.lua --
 	['Set Force Color'] = '牌子按照職業顏色著色',
 	['select equip boss'] = '選擇散件老闆（右鍵可重選）',

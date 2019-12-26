@@ -94,7 +94,7 @@ local MY_TMUI_DOODAD_ICON = {
 }
 setmetatable(MY_TMUI_DOODAD_ICON, { __index = function(me, key)
 	--[[#DEBUG BEGIN]]
-	LIB.Debug('Unknown Kind: ' .. key, _L['MY_TeamMon'], DEBUG_LEVEL.WARNING)
+	LIB.Debug(_L['MY_TeamMon'], 'Unknown Kind: ' .. key, DEBUG_LEVEL.WARNING)
 	--[[#DEBUG END]]
 	return 369
 end })
@@ -292,9 +292,11 @@ function D.ConflictCheck()
 							if not vvv.bCheckLevel then
 								bMsg = true
 								LIB.Sysmsg(
+									_L['MY_TeamMon'],
 									_L['Data conflict'] .. ' ' .. _L[MY_TMUI_SELECT_TYPE] .. ' '
-									.. D.GetMapName(k) .. ' :: ' .. vvv.dwID .. ' :: '
-									.. (vvv.szName or D.GetDataName(MY_TMUI_SELECT_TYPE, vvv)), _L['MY_TeamMon'], 'MSG_SYS.ERROR')
+										.. D.GetMapName(k) .. ' :: ' .. vvv.dwID .. ' :: '
+										.. (vvv.szName or D.GetDataName(MY_TMUI_SELECT_TYPE, vvv)),
+									CONSTANT.MSG_THEME.ERROR)
 								break
 							end
 						end
@@ -303,7 +305,7 @@ function D.ConflictCheck()
 			end
 		end
 		if bMsg then
-			LIB.Sysmsg(_L['Data conflict, please check.'], _L['MY_TeamMon'], 'MSG_SYS.ERROR')
+			LIB.Sysmsg(_L['MY_TeamMon'], _L['Data conflict, please check.'], CONSTANT.MSG_THEME.ERROR)
 		end
 	end
 end
@@ -921,7 +923,7 @@ function D.OpenImportPanel(szDefault, szTitle, fnAction)
 				end
 			end
 			local bStatus, szMsg = MY_TeamMon.LoadConfigureFile(config)
-			LIB.Sysmsg(_L('Load config: %s', tostring(szMsg)), _L['MY_TeamMon'], 'MSG_SYS.SUCCESS')
+			LIB.Sysmsg(_L['MY_TeamMon'], _L('Load config: %s', tostring(szMsg)), CONSTANT.MSG_THEME.ERROR)
 			if bStatus then
 				LIB.Alert(_L('Import success: %s', szTitle or szMsg))
 				ui:Remove()

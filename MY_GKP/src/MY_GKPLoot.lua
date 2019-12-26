@@ -475,7 +475,7 @@ function MY_GKP_Loot.OnItemLButtonClick()
 		if data.bDist then
 			if not doodad then
 				--[[#DEBUG BEGIN]]
-				LIB.Debug('Doodad does not exist!', 'MY_GKP_Loot:OnItemLButtonClick', DEBUG_LEVEL.WARNING)
+				LIB.Debug('MY_GKP_Loot:OnItemLButtonClick', 'Doodad does not exist!', DEBUG_LEVEL.WARNING)
 				--[[#DEBUG END]]
 				return Loot.RemoveLootList(dwDoodadID)
 			end
@@ -487,7 +487,7 @@ function MY_GKP_Loot.OnItemLButtonClick()
 			if team.nLootMode ~= PARTY_LOOT_MODE.BIDDING then
 				return OutputMessage('MSG_ANNOUNCE_RED', g_tStrings.GOLD_CHANGE_BID_LOOT)
 			end
-			LIB.Sysmsg({_L['GKP does not support bidding, please re open loot list.']})
+			LIB.Sysmsg(_L['GKP does not support bidding, please re open loot list.'])
 		elseif data.bNeedRoll then
 			LIB.Topmsg(g_tStrings.ERROR_LOOT_ROLL)
 		else -- зѓМќУўзп
@@ -508,7 +508,7 @@ function MY_GKP_Loot.OnItemLButtonClick()
 			local doodad     = GetDoodad(dwDoodadID)
 			if not doodad then
 				--[[#DEBUG BEGIN]]
-				LIB.Debug('Doodad does not exist!', 'MY_GKP_Loot:OnItemLButtonClick', DEBUG_LEVEL.WARNING)
+				LIB.Debug('MY_GKP_Loot:OnItemLButtonClick', 'Doodad does not exist!', DEBUG_LEVEL.WARNING)
 				--[[#DEBUG END]]
 				return Loot.RemoveLootList(dwDoodadID)
 			end
@@ -768,7 +768,7 @@ function Loot.AuthCheck(dwID)
 	local doodad         = GetDoodad(dwID)
 	if not doodad then
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('Doodad does not exist!', 'MY_GKP_Loot:AuthCheck', DEBUG_LEVEL.WARNING)
+		LIB.Debug('MY_GKP_Loot:AuthCheck', 'Doodad does not exist!', DEBUG_LEVEL.WARNING)
 		--[[#DEBUG END]]
 		return
 	end
@@ -810,7 +810,7 @@ function Loot.GetaPartyMember(aDoodadID)
 						end
 					end
 				else
-					LIB.Sysmsg({_L['Pick up time limit exceeded, please try again.']})
+					LIB.Sysmsg(_L['Pick up time limit exceeded, please try again.'])
 				end
 			end
 			tDoodadID[dwDoodadID] = true
@@ -846,14 +846,14 @@ function Loot.DistributeItem(dwID, info, szAutoDistType, bSkipRecordPanel)
 	local item = GetItem(info.dwID)
 	if not item then
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('Item does not exist, check!!', 'MY_GKP_Loot', DEBUG_LEVEL.WARNING)
+		LIB.Debug('MY_GKP_Loot', 'Item does not exist, check!!', DEBUG_LEVEL.WARNING)
 		--[[#DEBUG END]]
 		local aItemData = Loot.GetDoodadLootInfo(info.dwDoodadID)
 		for k, v in ipairs(aItemData) do
 			if v.nQuality == info.nQuality and LIB.GetItemNameByItem(v.item) == info.szName then
 				info.dwID = v.item.dwID
 				--[[#DEBUG BEGIN]]
-				LIB.Debug('Item matching, ' .. LIB.GetItemNameByItem(v.item), 'MY_GKP_Loot', DEBUG_LEVEL.LOG)
+				LIB.Debug('MY_GKP_Loot', 'Item matching, ' .. LIB.GetItemNameByItem(v.item), DEBUG_LEVEL.LOG)
 				--[[#DEBUG END]]
 				break
 			end
@@ -907,7 +907,7 @@ function Loot.DistributeItem(dwID, info, szAutoDistType, bSkipRecordPanel)
 		end
 		doodad.DistributeItem(info.dwID, dwID)
 	else
-		LIB.Sysmsg({_L['Userdata is overdue, distribut failed, please try again.']})
+		LIB.Sysmsg(_L['Userdata is overdue, distribut failed, please try again.'])
 	end
 end
 
@@ -1159,7 +1159,7 @@ function Loot.DrawLootList(dwID)
 		end
 	end
 	--[[#DEBUG BEGIN]]
-	LIB.Debug(('Doodad %d, items %d.'):format(dwID, nCount), 'MY_GKP_Loot', DEBUG_LEVEL.LOG)
+	LIB.Debug('MY_GKP_Loot', ('Doodad %d, items %d.'):format(dwID, nCount), DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 
 	if not szName or nCount == 0 then
@@ -1168,7 +1168,7 @@ function Loot.DrawLootList(dwID)
 		end
 		--[[#DEBUG BEGIN]]
 		if not szName then
-			LIB.Debug('Doodad does not exist!', 'MY_GKP_Loot:DrawLootList', DEBUG_LEVEL.LOG)
+			LIB.Debug('MY_GKP_Loot:DrawLootList', 'Doodad does not exist!', DEBUG_LEVEL.LOG)
 		end
 		--[[#DEBUG END]]
 		return
@@ -1475,7 +1475,7 @@ LIB.RegisterEvent('OPEN_DOODAD', function()
 		return Loot.RemoveLootList(arg0)
 	end
 	--[[#DEBUG BEGIN]]
-	LIB.Debug('Open Doodad: ' .. arg0, 'MY_GKP_Loot', DEBUG_LEVEL.LOG)
+	LIB.Debug('MY_GKP_Loot', 'Open Doodad: ' .. arg0, DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 	Loot.DrawLootList(arg0)
 	Loot.HideSystemLoot()

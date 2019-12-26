@@ -186,6 +186,7 @@ data = {
 
     -- MY_ForceGuding
     ['I have put the GUDING, hurry to eat if you lack of mana. *la la la*'] = '法宝 [仙王蛊鼎] 已祭出，内力不足抓紧享用，用茗伊插件看得见~#玫瑰#玫瑰~~',
+    ['Auto eat GUDING'] = '自动吃仙王蛊鼎',
     ['MY_ForceGuding'] = '茗伊蛊鼎',
     ['Display GUDING of teammate, change color'] = '突出显示团队里的仙王蛊鼎，设置颜色',
     ['Auto talk in team channel after puting GUDING'] = '喊话提醒队友来吃',

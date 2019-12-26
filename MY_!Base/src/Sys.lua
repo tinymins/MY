@@ -491,7 +491,7 @@ function LIB.SaveLUAData(oFilePath, oData, tConfig)
 	end
 	local data = SaveLUAData(szFilePath, oData, config)
 	--[[#DEBUG BEGIN]]
-	LIB.Debug(_L('%s saved during %dms.', szFilePath, GetTickCount() - nStartTick), 'PMTool', DEBUG_LEVEL.PMLOG)
+	LIB.Debug('PMTool', _L('%s saved during %dms.', szFilePath, GetTickCount() - nStartTick), DEBUG_LEVEL.PMLOG)
 	--[[#DEBUG END]]
 	return data
 end
@@ -515,7 +515,7 @@ function LIB.LoadLUAData(oFilePath, tConfig)
 		SaveLUAData(szFilePath, data, config)
 	end
 	--[[#DEBUG BEGIN]]
-	LIB.Debug(_L('%s loaded during %dms.', szFilePath, GetTickCount() - nStartTick), 'PMTool', DEBUG_LEVEL.PMLOG)
+	LIB.Debug('PMTool', _L('%s loaded during %dms.', szFilePath, GetTickCount() - nStartTick), DEBUG_LEVEL.PMLOG)
 	--[[#DEBUG END]]
 	return data
 end
@@ -1788,7 +1788,7 @@ function LIB.CThreadCoor(arg0, arg1, arg2, arg3, arg4, arg5)
 		local cache = CACHE[szCtcKey]
 		--[[#DEBUG BEGIN]]
 		if not cache then
-			LIB.Debug(_L('Error: `%s` has not be registed!', szCtcKey), 'MY#SYS', DEBUG_LEVEL.ERROR)
+			LIB.Debug('MY#SYS', _L('Error: `%s` has not be registed!', szCtcKey), DEBUG_LEVEL.ERROR)
 		end
 		--[[#DEBUG END]]
 		return CThreadCoor_Get(cache.ctcid) -- nX, nY, bFront
@@ -1835,13 +1835,13 @@ end
 
 local function DuplicateDatabase(DB_SRC, DB_DST)
 	--[[#DEBUG BEGIN]]
-	LIB.Debug('Duplicate database start.', szCaption, DEBUG_LEVEL.LOG)
+	LIB.Debug(szCaption, 'Duplicate database start.', DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 	-- 运行 DDL 语句 创建表和索引等
 	for _, rec in ipairs(DB_SRC:Execute('SELECT sql FROM sqlite_master')) do
 		DB_DST:Execute(rec.sql)
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('Duplicating database: ' .. rec.sql, szCaption, DEBUG_LEVEL.LOG)
+		LIB.Debug(szCaption, 'Duplicating database: ' .. rec.sql, DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 	end
 	-- 读取表名 依次复制
@@ -1856,7 +1856,7 @@ local function DuplicateDatabase(DB_SRC, DB_DST)
 		local nCount, nPageSize = Get(DB_SRC:Execute('SELECT COUNT(*) AS count FROM ' .. szTableName), {1, 'count'}, 0), 10000
 		local DB_W = DB_DST:Prepare('REPLACE INTO ' .. szTableName .. ' (' .. szColumns .. ') VALUES (' .. szPlaceholders .. ')')
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('Duplicating table: ' .. szTableName .. ' (cols)' .. szColumns .. ' (count)' .. nCount, szCaption, DEBUG_LEVEL.LOG)
+		LIB.Debug(szCaption, 'Duplicating table: ' .. szTableName .. ' (cols)' .. szColumns .. ' (count)' .. nCount, DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		-- 开始读取和写入数据
 		DB_DST:Execute('BEGIN TRANSACTION')
@@ -1873,19 +1873,19 @@ local function DuplicateDatabase(DB_SRC, DB_DST)
 		end
 		DB_DST:Execute('END TRANSACTION')
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('Duplicating table finished: ' .. szTableName, szCaption, DEBUG_LEVEL.LOG)
+		LIB.Debug(szCaption, 'Duplicating table finished: ' .. szTableName, DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 	end
 end
 
 local function ConnectMalformedDatabase(szCaption, szPath, bAlert)
 	--[[#DEBUG BEGIN]]
-	LIB.Debug('Fixing malformed database...', szCaption, DEBUG_LEVEL.LOG)
+	LIB.Debug(szCaption, 'Fixing malformed database...', DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 	local szMalformedPath = RenameDatabase(szCaption, szPath)
 	if not szMalformedPath then
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('Fixing malformed database failed... Move file failed...', szCaption, DEBUG_LEVEL.LOG)
+		LIB.Debug(szCaption, 'Fixing malformed database failed... Move file failed...', DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		return 'FILE_LOCKED'
 	else
@@ -1896,12 +1896,12 @@ local function ConnectMalformedDatabase(szCaption, szPath, bAlert)
 			DB_SRC:Release()
 			CPath.DelFile(szMalformedPath)
 			--[[#DEBUG BEGIN]]
-			LIB.Debug('Fixing malformed database finished...', szCaption, DEBUG_LEVEL.LOG)
+			LIB.Debug(szCaption, 'Fixing malformed database finished...', DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
 			return 'SUCCESS', DB_DST
 		elseif not DB_SRC then
 			--[[#DEBUG BEGIN]]
-			LIB.Debug('Connect malformed database failed...', szCaption, DEBUG_LEVEL.LOG)
+			LIB.Debug(szCaption, 'Connect malformed database failed...', DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
 			return 'TRANSFER_FAILED', DB_DST
 		end
@@ -1912,7 +1912,7 @@ function LIB.ConnectDatabase(szCaption, oPath, fnAction)
 	-- 尝试连接数据库
 	local szPath = LIB.FormatPath(oPath)
 	--[[#DEBUG BEGIN]]
-	LIB.Debug('Connect database: ' .. szPath, szCaption, DEBUG_LEVEL.LOG)
+	LIB.Debug(szCaption, 'Connect database: ' .. szPath, DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 	local DB = SQLite3_Open(szPath)
 	if not DB then
@@ -1921,7 +1921,7 @@ function LIB.ConnectDatabase(szCaption, oPath, fnAction)
 			DB = SQLite3_Open(szPath)
 		end
 		if not DB then
-			LIB.Debug('Cannot connect to database!!!', szCaption, DEBUG_LEVEL.ERROR)
+			LIB.Debug(szCaption, 'Cannot connect to database!!!', DEBUG_LEVEL.ERROR)
 			if fnAction then
 				fnAction()
 			end
@@ -1938,9 +1938,9 @@ function LIB.ConnectDatabase(szCaption, oPath, fnAction)
 		return DB
 	else
 		-- 记录错误日志
-		LIB.Debug('Malformed database detected...', szCaption, DEBUG_LEVEL.ERROR)
+		LIB.Debug(szCaption, 'Malformed database detected...', DEBUG_LEVEL.ERROR)
 		for _, rec in ipairs(aRes or {}) do
-			LIB.Debug(EncodeLUAData(rec), szCaption, DEBUG_LEVEL.ERROR)
+			LIB.Debug(szCaption, EncodeLUAData(rec), DEBUG_LEVEL.ERROR)
 		end
 		DB:Release()
 		-- 准备尝试修复

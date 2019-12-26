@@ -77,7 +77,7 @@ local CONFIG_DEFAULTS = setmetatable({
 })
 
 if not CONFIG_DEFAULTS.DEFAULT then
-	return LIB.Debug(_L['Default config cannot be loaded, please reinstall!!!'], _L['MY_LifeBar'], DEBUG_LEVEL.ERROR)
+	return LIB.Debug(_L['MY_LifeBar'], _L['Default config cannot be loaded, please reinstall!!!'], DEBUG_LEVEL.ERROR)
 end
 local Config, ConfigLoaded = CONFIG_DEFAULTS('DEFAULT'), false
 local CONFIG_PATH = 'config/xlifebar/%s.jx3dat'

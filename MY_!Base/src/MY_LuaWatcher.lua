@@ -222,7 +222,7 @@ RegisterEvent('MY_BASE_LOADING_END', function()
 			halign = 0, valign = 0,
 			multiline = true,
 			onclick = function()
-				MY.Topmsg(_L['Copied to clipboard'], _L['LuaWatcher'])
+				MY.Topmsg(_L['LuaWatcher'], _L['Copied to clipboard'])
 				MY.UI.OpenTextEditor(D.GetRankString(SORT_KEY))
 			end,
 		})

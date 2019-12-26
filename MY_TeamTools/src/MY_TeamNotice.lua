@@ -236,7 +236,7 @@ function TI.OpenFrame()
 			TI.CreateFrame()
 		else
 			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', 'ASK')
-			LIB.Sysmsg({_L['Asking..., If no response in longtime, team leader not enable plug-in.']})
+			LIB.Sysmsg(_L['Asking..., If no response in longtime, team leader not enable plug-in.'])
 		end
 	end
 end

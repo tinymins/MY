@@ -58,7 +58,7 @@ local function Init()
 					while true do
 						if nMaxL < 1 then
 							--[[#DEBUG BEGIN]]
-							LIB.Debug('ERROR CALC ITEM_TYPE_MAX: ' .. dwTabType .. ' (TOO SMALL)', _L['MY_ItemInfoSearch'], DEBUG_LEVEL.ERROR)
+							LIB.Debug(_L['MY_ItemInfoSearch'], 'ERROR CALC ITEM_TYPE_MAX: ' .. dwTabType .. ' (TOO SMALL)', DEBUG_LEVEL.ERROR)
 							--[[#DEBUG END]]
 							break
 						elseif bMaxL and bMaxR then
@@ -83,14 +83,14 @@ local function Init()
 								end
 							elseif not bMaxL and bMaxR then
 								--[[#DEBUG BEGIN]]
-								LIB.Debug('ERROR CALC ITEM_TYPE_MAX: ' .. dwTabType .. ' (NOT EXIST)', _L['MY_ItemInfoSearch'], DEBUG_LEVEL.ERROR)
+								LIB.Debug(_L['MY_ItemInfoSearch'], 'ERROR CALC ITEM_TYPE_MAX: ' .. dwTabType .. ' (NOT EXIST)', DEBUG_LEVEL.ERROR)
 								--[[#DEBUG END]]
 								break
 							end
 						end
 						if nCount >= nMaxCount then
 							--[[#DEBUG BEGIN]]
-							LIB.Debug('ERROR CALC ITEM_TYPE_MAX: ' .. dwTabType .. ' (OVERFLOW)', _L['MY_ItemInfoSearch'], DEBUG_LEVEL.ERROR)
+							LIB.Debug(_L['MY_ItemInfoSearch'], 'ERROR CALC ITEM_TYPE_MAX: ' .. dwTabType .. ' (OVERFLOW)', DEBUG_LEVEL.ERROR)
 							--[[#DEBUG END]]
 							break
 						end

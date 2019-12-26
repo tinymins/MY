@@ -130,7 +130,7 @@ local function CreateWebPageFrame()
 		szRequestID = ('%X%X'):format(GetTickCount(), math.floor(math.random() * 0xEFFF) + 0x1000)
 	until not Station.Lookup('Lowest/MYRRWP_' .. szRequestID)
 	--[[#DEBUG BEGIN]]
-	LIB.Debug('CreateWebPageFrame: ' .. szRequestID, nil, DEBUG_LEVEL.LOG)
+	LIB.Debug('CreateWebPageFrame: ' .. szRequestID, DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 	hFrame = Wnd.OpenWindow(PACKET_INFO.UICOMPONENT_ROOT .. 'WndWebPage.ini', 'MYRRWP_' .. szRequestID)
 	hFrame:Hide()
@@ -190,10 +190,11 @@ function LIB.Ajax(settings)
 		settings.success = function(html, status)
 			--[[#DEBUG BEGIN]]
 			LIB.Debug(
+				'AJAX',
 				settings.url .. ' - ' .. settings.driver .. '/' .. settings.method
 					.. ' (' .. driver .. '/' .. method .. ')'
 					.. ': SUCCESS',
-				'AJAX', DEBUG_LEVEL.LOG
+				DEBUG_LEVEL.LOG
 			)
 			--[[#DEBUG END]]
 		end
@@ -202,10 +203,11 @@ function LIB.Ajax(settings)
 		settings.error = function(html, status, success)
 			--[[#DEBUG BEGIN]]
 			LIB.Debug(
+				'AJAX',
 				settings.url .. ' - ' .. settings.driver .. '/' .. settings.method
 					.. ' (' .. driver .. '/' .. method .. ')'
 					.. ': ' .. (success and status or 'FAILED'),
-				'AJAX', DEBUG_LEVEL.WARNING
+				DEBUG_LEVEL.WARNING
 			)
 			--[[#DEBUG END]]
 		end
@@ -276,7 +278,7 @@ function LIB.Ajax(settings)
 		wWebCef.OnWebLoadEnd = function()
 			-- local szUrl, szTitle, szContent = this:GetLocationURL(), this:GetLocationName(), this:GetDocument()
 			--[[#DEBUG BEGIN]]
-			-- LIB.Debug(string.format('%s - %s', szTitle, szUrl), 'MYRRWC::OnDocumentComplete', DEBUG_LEVEL.LOG)
+			-- LIB.Debug('MYRRWC::OnDocumentComplete', string.format('%s - %s', szTitle, szUrl), DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
 			-- 注销超时处理时钟
 			LIB.DelayCall('MYRRWC_TO_' .. RequestID, false)
@@ -285,7 +287,7 @@ function LIB.Ajax(settings)
 			--[[#DEBUG BEGIN]]local status, err = --[[#DEBUG END]]pcall_this(settings.context, settings.success, szContent, 200, settings)
 			--[[#DEBUG BEGIN]]
 			-- 	if not status then
-			-- 		LIB.Debug(err, 'MYRRWC::OnDocumentComplete::Callback', DEBUG_LEVEL.ERROR)
+			-- 		LIB.Debug('MYRRWC::OnDocumentComplete::Callback', err, DEBUG_LEVEL.ERROR)
 			-- 	end
 			--[[#DEBUG END]]
 			-- end
@@ -294,20 +296,20 @@ function LIB.Ajax(settings)
 
 		-- do with this remote request
 		--[[#DEBUG BEGIN]]
-		LIB.Debug(settings.url, 'MYRRWC', DEBUG_LEVEL.LOG)
+		LIB.Debug('MYRRWC', settings.url, DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		-- register request timeout clock
 		if settings.timeout > 0 then
 			LIB.DelayCall('MYRRWC_TO_' .. RequestID, settings.timeout, function()
 				--[[#DEBUG BEGIN]]
-				LIB.Debug(settings.url, 'MYRRWC::Timeout', DEBUG_LEVEL.WARNING) -- log
+				LIB.Debug('MYRRWC::Timeout', settings.url, DEBUG_LEVEL.WARNING) -- log
 				--[[#DEBUG END]]
 				-- request timeout, call timeout function.
 				if settings.error then
 					--[[#DEBUG BEGIN]]local status, err = --[[#DEBUG END]]pcall_this(settings.context, settings.error, 'timeout', settings)
 					--[[#DEBUG BEGIN]]
 					if not status then
-						LIB.Debug(err, 'MYRRWC::TIMEOUT', DEBUG_LEVEL.ERROR)
+						LIB.Debug('MYRRWC::TIMEOUT', err, DEBUG_LEVEL.ERROR)
 					end
 					--[[#DEBUG END]]
 				end
@@ -340,7 +342,7 @@ function LIB.Ajax(settings)
 			local szUrl, szTitle, szContent = this:GetLocationURL(), this:GetLocationName(), this:GetDocument()
 			if szUrl ~= szTitle or szContent ~= '' then
 				--[[#DEBUG BEGIN]]
-				LIB.Debug(string.format('%s - %s', szTitle, szUrl), 'MYRRWP::OnDocumentComplete', DEBUG_LEVEL.LOG)
+				LIB.Debug('MYRRWP::OnDocumentComplete', string.format('%s - %s', szTitle, szUrl), DEBUG_LEVEL.LOG)
 				--[[#DEBUG END]]
 				-- 注销超时处理时钟
 				LIB.DelayCall('MYRRWP_TO_' .. RequestID, false)
@@ -349,7 +351,7 @@ function LIB.Ajax(settings)
 					--[[#DEBUG BEGIN]]local status, err = --[[#DEBUG END]]pcall_this(settings.context, settings.success, szContent, 200, settings)
 					--[[#DEBUG BEGIN]]
 					if not status then
-						LIB.Debug(err, 'MYRRWP::OnDocumentComplete::Callback', DEBUG_LEVEL.ERROR)
+						LIB.Debug('MYRRWP::OnDocumentComplete::Callback', err, DEBUG_LEVEL.ERROR)
 					end
 					--[[#DEBUG END]]
 				end
@@ -357,7 +359,7 @@ function LIB.Ajax(settings)
 					--[[#DEBUG BEGIN]]local status, err = --[[#DEBUG END]]pcall_this(settings.context, settings.complete, szContent, 200, true)
 					--[[#DEBUG BEGIN]]
 					if not status then
-						LIB.Debug(err, 'MYRRWP::OnDocumentComplete::Callback::Complete', DEBUG_LEVEL.ERROR)
+						LIB.Debug('MYRRWP::OnDocumentComplete::Callback::Complete', err, DEBUG_LEVEL.ERROR)
 					end
 					--[[#DEBUG END]]
 				end
@@ -367,20 +369,20 @@ function LIB.Ajax(settings)
 
 		-- do with this remote request
 		--[[#DEBUG BEGIN]]
-		LIB.Debug(settings.url, 'MYRRWP', DEBUG_LEVEL.LOG)
+		LIB.Debug('MYRRWP', settings.url, DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		-- register request timeout clock
 		if settings.timeout > 0 then
 			LIB.DelayCall('MYRRWP_TO_' .. RequestID, settings.timeout, function()
 				--[[#DEBUG BEGIN]]
-				LIB.Debug(settings.url, 'MYRRWP::Timeout', DEBUG_LEVEL.WARNING) -- log
+				LIB.Debug('MYRRWP::Timeout', settings.url, DEBUG_LEVEL.WARNING) -- log
 				--[[#DEBUG END]]
 				-- request timeout, call timeout function.
 				if settings.error then
 					--[[#DEBUG BEGIN]]local status, err = --[[#DEBUG END]]pcall_this(settings.context, settings.error, 'timeout', settings)
 					--[[#DEBUG BEGIN]]
 					if not status then
-						LIB.Debug(err, 'MYRRWP::TIMEOUT', DEBUG_LEVEL.ERROR)
+						LIB.Debug('MYRRWP::TIMEOUT', err, DEBUG_LEVEL.ERROR)
 					end
 					--[[#DEBUG END]]
 				end
@@ -388,7 +390,7 @@ function LIB.Ajax(settings)
 					--[[#DEBUG BEGIN]]local status, err = --[[#DEBUG END]]pcall_this(settings.context, settings.complete, '', 500, false)
 					--[[#DEBUG BEGIN]]
 					if not status then
-						LIB.Debug(err, 'MYRRWP::TIMEOUT::Callback::Complete', DEBUG_LEVEL.ERROR)
+						LIB.Debug('MYRRWP::TIMEOUT::Callback::Complete', err, DEBUG_LEVEL.ERROR)
 					end
 					--[[#DEBUG END]]
 				end

@@ -150,13 +150,13 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTi
 					})),
 					success = function()
 						--[[#DEBUG BEGIN]]
-						LIB.Debug('Upload serendipity succeed with mode ' .. config[1] .. '/' .. config[2], nil, DEBUG_LEVEL.LOG)
+						LIB.Debug('Upload serendipity succeed with mode ' .. config[1] .. '/' .. config[2], DEBUG_LEVEL.LOG)
 						--[[#DEBUG END]]
 						LIB.DelayCall(dc, false)
 					end,
 					error = function()
 						--[[#DEBUG BEGIN]]
-						LIB.Debug('Upload serendipity failed with mode ' .. config[1] .. '/' .. config[2], nil, DEBUG_LEVEL.LOG)
+						LIB.Debug('Upload serendipity failed with mode ' .. config[1] .. '/' .. config[2], DEBUG_LEVEL.LOG)
 						--[[#DEBUG END]]
 						TryUploadWithNextDriver()
 					end,

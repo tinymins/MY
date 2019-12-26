@@ -811,7 +811,7 @@ function LIB.Talk(nChannel, szText, szUUID, bNoEscape, bSaveDeny, bPushToChatBox
 	elseif nChannel == PLAYER_TALK_CHANNEL.RAID and me.GetScene().nType == MAP_TYPE.BATTLE_FIELD then
 		nChannel = PLAYER_TALK_CHANNEL.BATTLE_FIELD
 	elseif nChannel == PLAYER_TALK_CHANNEL.LOCAL_SYS then
-		return LIB.Sysmsg({szText}, '')
+		return LIB.Sysmsg(CONSTANT.EMPTY_TABLE, szText)
 	end
 	-- say body
 	local tSay = nil
@@ -941,7 +941,7 @@ function LIB.TabTalk(nChannel, aTable, aAlignment)
 				aTalk[j] = szText .. MergeHW(szFixL .. szFixR)
 			end
 		end
-		-- LIB.Sysmsg({(concat(aTalk, '|'))})
+		-- LIB.Sysmsg(concat(aTalk, '|'))
 		LIB.Talk(nChannel, (concat(aTalk, ' ')))
 	end
 end
@@ -1164,7 +1164,7 @@ local function BeforeChatAppendItemFromString(h, szMsg, ...) -- h, szMsg, szChan
 			end
 		--[[#DEBUG BEGIN]]
 		else
-			LIB.Debug('HookChatPanel.FILTER#' .. szKey, 'ERROR', DEBUG_LEVEL.ERROR)
+			LIB.Debug('ERROR', 'HookChatPanel.FILTER#' .. szKey, DEBUG_LEVEL.ERROR)
 		--[[#DEBUG END]]
 		end
 	end
@@ -1172,7 +1172,7 @@ local function BeforeChatAppendItemFromString(h, szMsg, ...) -- h, szMsg, szChan
 		--[[#DEBUG BEGIN]]local status = --[[#DEBUG END]]XpCall(fnAction, h, szMsg, ...)
 		--[[#DEBUG BEGIN]]
 		if not status then
-			LIB.Debug('HookChatPanel.BEFORE#' .. szKey, 'ERROR', DEBUG_LEVEL.ERROR)
+			LIB.Debug('ERROR', 'HookChatPanel.BEFORE#' .. szKey, DEBUG_LEVEL.ERROR)
 		end
 		--[[#DEBUG END]]
 	end

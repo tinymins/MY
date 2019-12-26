@@ -1117,7 +1117,7 @@ local function DrawControls(ui, OpenDetail)
 			else
 				szTip = _L['Import failed, cannot decode file.']
 			end
-			LIB.Sysmsg({ szTip })
+			LIB.Sysmsg(szTip)
 			OutputMessage('MSG_ANNOUNCE_YELLOW', szTip)
 		end,
 	})
@@ -1166,7 +1166,7 @@ local function DrawControls(ui, OpenDetail)
 						PATH_TYPE.GLOBAL,
 					})
 					D.ExportPatchFile(file, aUUID, szIndent, bAsEmbedded)
-					LIB.Sysmsg({ _L('Data exported, file saved at %s.', file) })
+					LIB.Sysmsg(_L('Data exported, file saved at %s.', file))
 					OutputMessage('MSG_ANNOUNCE_YELLOW', _L('Data exported, file saved at %s.', file))
 				end,
 				fnDisable = function()

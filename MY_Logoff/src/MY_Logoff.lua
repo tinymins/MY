@@ -55,7 +55,7 @@ RegisterCustomData('MY_Logoff.nIdleOffTime')
 local function Logoff(bCompletely, bUnfight, bNotDead)
 	if LIB.BreatheCall('MY_LOGOFF') then
 		LIB.BreatheCall('MY_LOGOFF', false)
-		LIB.Sysmsg({_L['Logoff has been cancelled.']})
+		LIB.Sysmsg(_L['Logoff has been cancelled.'])
 		return
 	end
 	local function onBreatheCall()
@@ -73,7 +73,7 @@ local function Logoff(bCompletely, bUnfight, bNotDead)
 	end
 	onBreatheCall()
 	if bUnfight then
-		LIB.Sysmsg({_L['Logoff is ready for your casting unfight skill.']})
+		LIB.Sysmsg(_L['Logoff is ready for your casting unfight skill.'])
 	end
 	LIB.BreatheCall('MY_LOGOFF', onBreatheCall)
 end
@@ -81,7 +81,7 @@ end
 local function IdleOff()
 	if not MY_Logoff.bIdleOff then
 		if LIB.BreatheCall('MY_LOGOFF_IDLE') then
-			LIB.Sysmsg({_L['Idle off has been cancelled.']})
+			LIB.Sysmsg(_L['Idle off has been cancelled.'])
 			LIB.BreatheCall('MY_LOGOFF_IDLE', false)
 		end
 		return
@@ -109,13 +109,13 @@ local function IdleOff()
 			if remainTime <= 10 then
 				OutputMessage('MSG_ANNOUNCE_YELLOW', szMessage)
 			end
-			LIB.Sysmsg({szMessage})
+			LIB.Sysmsg(szMessage)
 		else
-			LIB.Sysmsg({_L('Idle off notice: you\'ll auto logoff if you keep idle for %dm %ds.', remainTime / 60, remainTime % 60)})
+			LIB.Sysmsg(_L('Idle off notice: you\'ll auto logoff if you keep idle for %dm %ds.', remainTime / 60, remainTime % 60))
 		end
 	end
 	LIB.BreatheCall('MY_LOGOFF_IDLE', 1000, onBreatheCall)
-	LIB.Sysmsg({_L('Idle off has been started, you\'ll auto logoff if you keep idle for %dm.', MY_Logoff.nIdleOffTime)})
+	LIB.Sysmsg(_L('Idle off has been started, you\'ll auto logoff if you keep idle for %dm.', MY_Logoff.nIdleOffTime))
 end
 
 local function onInit()

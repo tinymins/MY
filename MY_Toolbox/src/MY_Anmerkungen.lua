@@ -294,7 +294,7 @@ local function CheckPartyPlayer(dwID)
 			})
 		end
 		if t.bTipWhenGroup then
-			LIB.Sysmsg({_L('Tip: [%s] is in your team.\nNote: %s', t.szName, t.szContent)})
+			LIB.Sysmsg(_L('Tip: [%s] is in your team.\nNote: %s', t.szName, t.szContent))
 		end
 	end
 end
@@ -326,7 +326,7 @@ end
 function MY_Anmerkungen.LoadConfig()
 	if not GetClientPlayer() then
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('Client player not exist! Cannot load config!', 'MY_Anmerkungen.LoadConfig', DEBUG_LEVEL.ERROR)
+		LIB.Debug('MY_Anmerkungen.LoadConfig', 'Client player not exist! Cannot load config!', DEBUG_LEVEL.ERROR)
 		--[[#DEBUG END]]
 		return
 	end
