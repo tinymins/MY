@@ -76,7 +76,7 @@ function D.CheckEnable()
 		})
 		UI(frame):Append('Image', {
 			w = O.nSize, h = O.nSize,
-			image = PACKET_INFO.UITEX_COMMON,
+			image = PACKET_INFO.UITEX_ICON,
 			imageframe = PACKET_INFO.MAINICON_FRAME,
 			onhover = function(bIn)
 				if bIn and O.bHoverMenu then

@@ -1229,7 +1229,7 @@ local function GenerateMenu(aList, bMainMenu)
 			bCheck = true,
 			bChecked = LIB.IsPanelVisible(),
 
-			szIcon = PACKET_INFO.UITEX_COMMON,
+			szIcon = PACKET_INFO.UITEX_ICON,
 			nFrame = PACKET_INFO.MENUICON_FRAME,
 			nMouseOverFrame = PACKET_INFO.MENUICON_HOVER_FRAME,
 			szLayer = 'ICON_RIGHT',
