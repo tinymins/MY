@@ -50,6 +50,7 @@ function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
 	local X, Y = 20, 30
 	local x, y = X, Y
+	local W, H = ui:Size()
 
 	y = y + ui:Append('Text', { x = x, y = y, text = _L['MY_TeamTools'], font = 27 }):Height() + 5
 	x = X + 10
@@ -150,5 +151,7 @@ function PS.OnPanelActive(wnd)
 		autoenable = function() return MY_PartyRequest.bEnable end,
 	}):AutoWidth()
 	y = y + 25
+
+	x, y = MY_TeamRestore.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 end
 LIB.RegisterPanel('MY_TeamTools', _L['MY_TeamTools'], _L['Raid'], 5962, PS)
