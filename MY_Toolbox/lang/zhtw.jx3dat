@@ -170,4 +170,26 @@ data = {
     ['(Checked will not be picked up, if still pick please check system auto pick config)'] = '（打勾的不撿，若還撿請關係統以及其他插件自動拾取）',
     ['Start/stop break can'] = '開始/停止砸罐',
     ['Turn on/off MY_Taoguan'] = '開/關砸年獸陶罐',
+
+    -- MY_Force
+    ['MY_Force'] = '門派特色',
+    ['Your pet [%s] disappeared!'] = '您的寵物 [%s] 消失了！',
+    ['Alert when pet disappear unexpectedly (for 5D)'] = '五毒寵物意外消失提醒（獻祭、召喚除外）',
+    ['Alert when horse is hungry'] = '坐騎饑餓上馬時發出提醒',
+    ['Mark pet'] = '標記自己的寵物',
+    ['School feature'] = '職業特色輔助',
+    ['Your debuff of type [%s] reached [%d]'] = '您身上的 [%s] debuff 達到 [%d] 個',
+    ['Alert when my same type of debuff reached a certain number '] = '提醒自身同類型 debuff 達到一定數量',
+    ['Alert when I am wanted publishing online'] = '在線被懸賞時提醒自己',
+    ['Now somebody pay (%d+) gold to buy life of (.-)'] = '現有人願付(%d+)金，對(.-)進行懸賞',
+    ['Congratulations, you offered a reward [%s] gold!'] = '恭喜你被懸賞 [%s]，肥水不流外人田啊！！',
+
+    -- MY_ForceGuding
+    ['I have put the GUDING, hurry to eat if you lack of mana. *la la la*'] = '法寶 [仙王蠱鼎] 已祭出，內力不足抓緊享用，用茗伊插件看得見~#玫瑰#玫瑰~~',
+    ['MY_ForceGuding'] = '茗伊蠱鼎',
+    ['Display GUDING of teammate, change color'] = '突出顯示團隊里的仙王蠱鼎，設置顏色',
+    ['Auto talk in team channel after puting GUDING'] = '喊話提醒隊友來吃',
+    ['Talk message'] = '喊話內容',
+    ['Automatic eat GUDING when mana below '] = '自動吃蠱鼎，當藍低於',
+    [', or life below '] = '，或血低於',
 }
