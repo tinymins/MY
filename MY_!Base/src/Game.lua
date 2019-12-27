@@ -2591,16 +2591,19 @@ function LIB.GetChannelSkillFrame(dwSkillID)
 end
 end
 
-function LIB.IsMarker()
-	return GetClientTeam().GetAuthorityInfo(TEAM_AUTHORITY_TYPE.MARK) == UI_GetClientPlayerID()
+function LIB.IsMarker(...)
+	local dwID = select('#', ...) == 0 and UI_GetClientPlayerID() or ...
+	return GetClientTeam().GetAuthorityInfo(TEAM_AUTHORITY_TYPE.MARK) == dwID
 end
 
-function LIB.IsLeader()
-	return GetClientTeam().GetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER) == UI_GetClientPlayerID()
+function LIB.IsLeader(...)
+	local dwID = select('#', ...) == 0 and UI_GetClientPlayerID() or ...
+	return GetClientTeam().GetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER) == dwID
 end
 
-function LIB.IsDistributer()
-	return GetClientTeam().GetAuthorityInfo(TEAM_AUTHORITY_TYPE.DISTRIBUTE) == UI_GetClientPlayerID()
+function LIB.IsDistributer(...)
+	local dwID = select('#', ...) == 0 and UI_GetClientPlayerID() or ...
+	return GetClientTeam().GetAuthorityInfo(TEAM_AUTHORITY_TYPE.DISTRIBUTE) == dwID
 end
 
 -- 判断自己在不在队伍里
