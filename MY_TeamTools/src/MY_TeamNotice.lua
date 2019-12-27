@@ -270,6 +270,18 @@ LIB.RegisterEvent('LOADING_END.TEAM_NOTICE', function()
 	end
 end)
 
+-- 退队时清空团队告示
+LIB.RegisterEvent({'PARTY_DISBAND.TEAM_NOTICE', 'PARTY_DELETE_MEMBER.TEAM_NOTICE'}, function(e)
+	if e == 'PARTY_DISBAND' or (e == 'PARTY_DELETE_MEMBER' and arg1 == UI_GetClientPlayerID()) then
+		local frame = TI.GetFrame()
+		if frame then
+			Wnd.CloseWindow(frame)
+		end
+		TI.szYY = nil
+		TI.szNote = nil
+	end
+end)
+
 LIB.RegisterEvent('ON_BG_CHANNEL_MSG.LR_TeamNotice', function()
 	if not MY_TeamNotice.bEnable then
 		return
