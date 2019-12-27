@@ -3348,11 +3348,11 @@ function UI:UIEvent(szEvent, fnEvent)
 							local nFireType = GetComponentProp(raw, 'WNDEVENT_FIRETYPE') or WNDEVENT_FIRETYPE.AUTO
 							local szText = raw:GetText()
 							local szLastText = GetComponentProp(raw, 'LAST_TEXT')
+							SetComponentProp(raw, 'WNDEVENT_FIRETYPE', nil)
+							SetComponentProp(raw, 'LAST_TEXT', szText)
 							if nFireType == WNDEVENT_FIRETYPE.PREVENT or (nFireType == WNDEVENT_FIRETYPE.AUTO and szText == szLastText) then
 								return
 							end
-							SetComponentProp(raw, 'WNDEVENT_FIRETYPE', nil)
-							SetComponentProp(raw, 'LAST_TEXT', szText)
 							return fnHookEvent(...)
 						end
 					end
