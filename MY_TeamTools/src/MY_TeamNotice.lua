@@ -290,6 +290,9 @@ LIB.RegisterEvent('ON_BG_CHANNEL_MSG.LR_TeamNotice', function()
 	if szMsgID ~= 'LR_TeamNotice' or bSelf then
 		return
 	end
+	if not LIB.IsLeader(dwID) then
+		return
+	end
 	local szCmd, szText = aMsg[1], aMsg[2]
 	if szCmd == 'SEND' then
 		TI.CreateFrame('', szText)
@@ -309,10 +312,13 @@ LIB.RegisterBgMsg('TI', function(_, nChannel, dwID, szName, bIsSelf, ...)
 				if TI.GetFrame() then
 					LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', 'reply', szName, TI.szYY, TI.szNote)
 				end
-			elseif data[1] == 'Edit' then
-				TI.CreateFrame(data[2], data[3])
-			elseif data[1] == 'reply' and (tonumber(data[2]) == UI_GetClientPlayerID() or data[2] == me.szName) then
-				if LIB.TrimString(data[3]) ~= '' or LIB.TrimString(data[4]) ~= '' then
+			else
+				if not LIB.IsLeader(dwID) then
+					return
+				end
+				if data[1] == 'Edit' then
+					TI.CreateFrame(data[2], data[3])
+				elseif data[1] == 'reply' and (tonumber(data[2]) == UI_GetClientPlayerID() or data[2] == me.szName) then
 					TI.CreateFrame(data[3], data[4])
 				end
 			end
