@@ -490,19 +490,22 @@ function DS:SelectMsg(aChannel, szSearch, nOffset, nLimit, bUTF8)
 		local tChannel = LIB.FlipObjectKV(aChannel)
 		local nCount = 0
 		for i, rec in ipairs(self.aInsertQueueAnsi) do
+			if nLimit == 0 then
+				break
+			end
 			if tChannel[rec.szChannel] and (wfind(rec.szText, szSearch) or wfind(rec.szTalker, szSearch)) then
-				if bUTF8 then
-					insert(aResult, Clone(self.aInsertQueue[i]))
+				if nOffset > 0 then
+					nOffset = nOffset - 1
 				else
-					insert(aResult, Clone(rec))
+					if bUTF8 then
+						insert(aResult, Clone(self.aInsertQueue[i]))
+					else
+						insert(aResult, Clone(rec))
+					end
+					nLimit = nLimit - 1
 				end
-				nCount = nCount + 1
 			end
 		end
-		if nOffset > 0 then
-			nOffset = max(nOffset - nCount, 0)
-		end
-		nLimit = max(nLimit - nCount, 0)
 	end
 	return aResult
 end
