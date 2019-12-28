@@ -469,7 +469,9 @@ function DS:SelectMsg(aChannel, szSearch, nOffset, nLimit, bUTF8)
 		if nOffset < nCount then
 			local res = db:SelectMsg(aNChannel, szuSearch, nOffset, nLimit)
 			if bUTF8 then
-				aResult = res
+				for _, p in ipairs(res) do
+					insert(aResult, p)
+				end
 			else
 				for _, p in ipairs(res) do
 					p.szChannel = CHANNELS[p.nChannel]
