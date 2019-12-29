@@ -1,5 +1,5 @@
 -- language data (zhcn) updated at 2015/02/23 10:11:27
-data = {
+return {
 	['MY_GKP'] = '金团记录',
 	['MY GKP'] = '茗伊金团',
 	-- GKP.lua --

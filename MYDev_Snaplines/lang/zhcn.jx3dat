@@ -1,5 +1,5 @@
 -- language data (zhcn) updated at 2014-4-10 03:38:11
-data = {
+return {
     ['Snaplines'] = '元素辅助',
     ['Snaplines - ShowTip'] = '元素辅助 - 显示信息',
     ['Snaplines - ShowData'] = '元素辅助 - 显示数据',

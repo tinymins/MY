@@ -1,4 +1,4 @@
-data = {
+return {
 	['MY_ArchHUD'] = '弧形血条',
 	['hide when unfight'       ] = '仅战斗中显示',
 	['display target casting'  ] = '显示目标读条',

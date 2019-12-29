@@ -1,5 +1,5 @@
 -- language data (zhcn) updated at 2014-4-10 03:38:11
-data = {
+return {
     -- MY_Logoff.lua
     ['express logoff'] = '快速登出',
     ['# express logoff'] = '● 快速登出',

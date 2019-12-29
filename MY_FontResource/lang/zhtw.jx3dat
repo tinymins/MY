@@ -1,4 +1,4 @@
-data = {
+return {
 	['Default'] = '默認',
 	['alert_sound.ogg'] = '默認提示音',
 }

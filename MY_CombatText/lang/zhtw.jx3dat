@@ -1,5 +1,5 @@
 -- language data (zhtw) updated at 2015/02/23 10:11:27
-data = {
+return {
 	-- CombatText --
 	['CombatText'] = '戰鬥文字',
 	['Font Size'] = '文字大小',

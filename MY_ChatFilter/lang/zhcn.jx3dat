@@ -1,5 +1,5 @@
 -- language data (zhcn) updated at 2014-4-10 03:38:11
-data = {
+return {
     ['chat filter'] = '聊天过滤',
     ['All channels'] = '所有频道',
     ['Disabled'] = '已禁用',

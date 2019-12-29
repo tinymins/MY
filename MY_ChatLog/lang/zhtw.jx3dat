@@ -1,5 +1,5 @@
 -- language data (zhtw) updated at 2014-4-10 03:38:11
-data = {
+return {
     ['MY_ChatLog'] = '聊天記錄',
     ['Filter tong online message'] = '過濾幫會上線公告提示',
     ['Filter tong member log message'] = '過濾幫會成員上線提示',

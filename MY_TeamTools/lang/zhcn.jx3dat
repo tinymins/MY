@@ -1,5 +1,5 @@
 -- language data (zhcn) updated at 2015/02/23 10:11:27
-data = {
+return {
 	['MY_TeamTools'] = '团队工具',
 	-- RaidTools --
 	['last 5 skill damage'] = '最近5次伤害',

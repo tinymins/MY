@@ -1,5 +1,5 @@
 -- language data (zhcn) updated at 2014-4-10 03:38:11
-data = {
+return {
     -- MY_ChatMonitor.lua
     ['MY_ChatMonitor'] = 'адлЛ╪Ю©ь',
     ['chat monitor'] = 'адлЛ╪Ю©ь',

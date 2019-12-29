@@ -1,5 +1,5 @@
 -- language data (zhtw) updated at 2014-12-27 22:15:14
-data = {
+return {
     ['MY_Recount'] = '戰鬥統計',
     ['enable'] = '啟用',
     ['current fight'] = '當前統計',

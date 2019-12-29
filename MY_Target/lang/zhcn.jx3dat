@@ -1,4 +1,4 @@
-data = {
+return {
     ['MY_Target'] = '目标辅助',
     ['MY_TargetDirection'] = '目标指示',
 	['%.1f feet'] = '%.1f 尺',

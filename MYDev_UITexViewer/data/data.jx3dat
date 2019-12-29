@@ -1,4 +1,4 @@
-data = {
+return {
     "ui/Image/Active/chunjie",
     "ui/Image/Active/huachaojie",
     "ui/Image/button/CGButton",

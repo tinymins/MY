@@ -1,5 +1,5 @@
 -- language data (zhtw) updated at 2015/02/23 10:11:27
-data = {
+return {
 	['MY_GKP'] = '金團記錄',
 	['MY GKP'] = '茗伊金團',
 	-- GKP.lua --

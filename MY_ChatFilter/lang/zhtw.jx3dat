@@ -1,5 +1,5 @@
 -- language data (zhtw) updated at 2014-4-10 03:38:11
-data = {
+return {
     ['chat filter'] = '聊天過濾',
     ['All channels'] = '所有頻道',
     ['Disabled'] = '已禁用',

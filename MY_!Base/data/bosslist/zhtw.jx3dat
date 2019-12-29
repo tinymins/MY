@@ -1,4 +1,4 @@
-data = {
+return {
 	[136] = {
 		NAME = "10會戰",
 		ADD = {

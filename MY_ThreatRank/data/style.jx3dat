@@ -1,5 +1,5 @@
 -- 请注意 这个文件用于控制风格的图片和文字
-data = {
+return {
 	{
 		-- FromUITex szImage, nFrame
 		-- [1] = > 0.01

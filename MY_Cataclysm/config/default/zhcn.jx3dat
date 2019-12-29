@@ -1,4 +1,4 @@
-data = {
+return {
 	eCss                   = '',
 	eFrameStyle            = 'CATACLYSM',
 	bDrag                  = true,

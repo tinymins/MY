@@ -1,5 +1,5 @@
 -- language data (zhcn) updated at 2015/02/23 10:11:27
-data = {
+return {
 	['MY_TeamMon'] = '团队监控',
 	-- MY_TeamMon_CA.lua --
 	['MY_TeamMon_CA'] = '中央提醒',

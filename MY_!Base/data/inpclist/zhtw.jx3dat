@@ -1,4 +1,4 @@
-data = {
+return {
 	[68] = {
 		NAME = "10普通荻花聖殿",
 		ADD = {

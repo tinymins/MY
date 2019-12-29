@@ -1,5 +1,5 @@
 -- language data (zhcn) updated at 2014-4-10 03:38:11
-data = {
+return {
     ['MY_ChatLog'] = '聊天记录',
     ['Filter tong online message'] = '过滤帮会上线公告提示',
     ['Filter tong member log message'] = '过滤帮会成员上线提示',

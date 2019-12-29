@@ -1,5 +1,5 @@
 -- language data (zhtw) updated at 2014-4-10 03:38:11
-data = {
+return {
     -- MY_TalkEx.lua
     ['talk ex'] = '喊話輔助',
     ['TalkEx Talk'] = '喊話輔助 - 發送',

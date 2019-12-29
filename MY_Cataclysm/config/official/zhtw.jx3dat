@@ -1,4 +1,4 @@
-data = {
+return {
 	eCss                   = 'OFFICIAL',
 	eFrameStyle            = 'OFFICIAL',
 	bDrag                  = true,
