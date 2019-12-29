@@ -2050,6 +2050,18 @@ function LIB.GetFaceAngel(nX, nY, nFace, nTX, nTY, bAbs)
 	end
 end
 
+function LIB.GetBagPackageCount()
+	if _G.Bag_GetPacketCount then
+		return _G.Bag_GetPacketCount()
+	end
+	return 6
+end
+
+function LIB.GetBankPackageCount()
+	local me = GetClientPlayer()
+	return me.GetBankPackageCount()
+end
+
 -- 装备名为szName的装备
 -- (void) LIB.Equip(szName)
 -- szName  装备名称
