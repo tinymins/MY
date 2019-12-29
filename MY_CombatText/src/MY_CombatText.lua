@@ -81,6 +81,7 @@ local COMBAT_TEXT_CRITICAL = { -- 需要会心跳帧的伤害类型
 	[SKILL_RESULT_TYPE.REFLECTIED_DAMAGE]    = true,
 	[SKILL_RESULT_TYPE.STEAL_LIFE]           = true,
 	['EXP']                                  = true,
+	['CRITICAL_MSG']                         = true,
 }
 local COMBAT_TEXT_IGNORE_TYPE = {}
 local COMBAT_TEXT_IGNORE = {}
@@ -784,6 +785,19 @@ function CombatText.OnExpLog(dwCharacterID, nExp)
 	CombatText.CreateText(shadow, dwCharacterID, g_tStrings.STR_COMBATMSG_EXP .. nExp, 'CENTER', 'EXP', true, COMBAT_TEXT_COLOR.PURPLE)
 end
 
+function CombatText.OnCenterMsg(szText, bCritical, tCol)
+	local shadow = CombatText.GetFreeShadow()
+	if not shadow then -- 没有空闲的shadow
+		return
+	end
+	local dwID = GetControlPlayerID()
+	local szType = bCritical and 'CRITICAL_MSG' or 'MSG'
+	if not tCol then
+		tCol = bCritical and COMBAT_TEXT_COLOR.RED or COMBAT_TEXT_COLOR.YELLOW
+	end
+	CombatText.CreateText(shadow, dwID, szText, 'CENTER', szType, bCritical, tCol)
+end
+
 function CombatText.GetFreeShadow()
 	for k, v in ipairs(COMBAT_TEXT_FREE) do
 		if v.free then
@@ -1228,5 +1242,8 @@ LIB.RegisterEvent('ON_NEW_PROXY_SKILL_LIST_NOTIFY.MY_CombatText', GetPlayerID) -
 LIB.RegisterEvent('ON_CLEAR_PROXY_SKILL_LIST_NOTIFY.MY_CombatText', GetPlayerID) -- 长歌控制主体ID切换
 LIB.RegisterEvent('ON_PVP_SHOW_SELECT_PLAYER.MY_CombatText', function()
 	COMBAT_TEXT_PLAYERID = arg0
+end)
+LIB.RegisterEvent('MY_COMBATTEXT_MSG.MY_CombatText', function()
+	CombatText.OnCenterMsg(arg0, arg1, arg2)
 end)
 LIB.RegisterEvent('FIRST_LOADING_END.MY_CombatText', CombatText.CheckEnable)
