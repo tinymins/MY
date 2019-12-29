@@ -25,6 +25,10 @@ FOLDER_MAPPING = {
 }
 IGNORE_FOLDER = ['.git', '@DATA']
 
+def __is_interface(path):
+    name = os.path.basename(path).lower()
+    return name == 'interface' or name == 'interfacesource'
+
 def __get_file_crc(fileName):
     prev = 0
     for eachLine in open(fileName,'rb'):
@@ -50,11 +54,11 @@ def __save_crc_cache(root_path, crcs):
         print('Crc cache saved: ' + crc_file)
 
 def __is_path_include(pkg_name, cwd, d):
-    if os.path.basename(cwd).lower() == 'interface' and os.path.isfile(os.path.join(cwd, d)):
+    if __is_interface(cwd) and os.path.isfile(os.path.join(cwd, d)):
         return False
     if d in IGNORE_FOLDER:
         return False
-    if os.path.basename(os.path.dirname(cwd)).lower() == 'interface' and pkg_name != '':
+    if not __is_interface(cwd) and __is_interface(os.path.dirname(cwd)) and pkg_name != '':
         if os.path.basename(cwd) == pkg_name:
             return True
         elif os.path.exists(os.path.join(cwd, 'package.ini')):
@@ -87,7 +91,7 @@ def convert_progress(argv):
     pkg_name = ''
     root_path = params['--path']
     header_file = os.path.join(root_path, 'header.tpl.lua')
-    if os.path.basename(root_path).lower() != 'interface' and os.path.basename(os.path.dirname(root_path).lower()) == 'interface':
+    if (not __is_interface(root_path)) and __is_interface(os.path.dirname(root_path)):
         pkg_name = os.path.basename(root_path)
         root_path = os.path.dirname(root_path)
 
@@ -129,7 +133,7 @@ def convert_progress(argv):
             relpath = filepath.replace(root_path, '')
             crc_changed = False
 
-            if extname == '.lua' and header != '' and basename != pkg_name and filename != 'Compatible.lua' and filename != 'Base.lua':
+            if extname == '.lua' and header != '' and basename != pkg_name and filename != 'Compatible.lua' and filename != 'Base.lua' and filename != 'src.lua':
                 print('--------------------------------')
                 print('Update header: ' + filepath)
                 crc_text = __get_file_crc(filepath)
