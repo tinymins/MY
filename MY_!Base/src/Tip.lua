@@ -373,7 +373,7 @@ function LIB.OutputDoodadTip(Rect, dwDoodadID, szExtraXml)
 	-- 名字
 	local szDoodadName = Table_GetDoodadName(doodad.dwTemplateID, doodad.dwNpcTemplateID)
 	if doodad.nKind == DOODAD_KIND.CORPSE then
-		szName = szDoodadName .. g_tStrings.STR_DOODAD_CORPSE
+		szDoodadName = szDoodadName .. g_tStrings.STR_DOODAD_CORPSE
 	end
 	insert(t, GetFormatText(szDoodadName .. '\n', 37))
 	-- 采集信息
