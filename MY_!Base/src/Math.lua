@@ -122,3 +122,29 @@ function LIB.NumberBitXor(n1, n2)
 	end
 	return LIB.Bitmap2Number(t3)
 end
+
+-- (number) BitShl(number n1, number n2, number bit)
+-- ×óÒÆÔËËã
+function LIB.NumberBitShl(n1, n2, bit)
+	local t1 = LIB.Number2Bitmap(n1)
+	if not bit then
+		bit = 32
+	end
+	for i = 1, n2 do
+		insert(t1, 1, 0)
+	end
+	while #t1 > bit do
+		remove(t1)
+	end
+	return LIB.Bitmap2Number(t1)
+end
+
+-- (number) BitShr(number n1, number n2, number bit)
+-- ÓÒÒÆÔËËã
+function LIB.NumberBitShr(n1, n2)
+	local t1 = LIB.Number2Bitmap(n1)
+	for i = 1, n2 do
+		remove(t1, 1)
+	end
+	return LIB.Bitmap2Number(t1)
+end
