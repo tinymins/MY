@@ -1172,6 +1172,7 @@ local settings = {
 				GetDisplayList     = D.GetDisplayList    ,
 				OnObjectEnterScene = D.OnObjectEnterScene,
 				OnObjectLeaveScene = D.OnObjectLeaveScene,
+				SetFocusID         = D.SetFocusID        ,
 				RemoveFocusID      = D.RemoveFocusID     ,
 				SortFocus          = D.SortFocus         ,
 				OpenRuleEditor     = D.OpenRuleEditor    ,
