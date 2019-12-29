@@ -168,6 +168,11 @@ function LIB.Topmsg(...)
 end
 end
 
+function LIB.Systopmsg(...)
+	LIB.Topmsg(...)
+	LIB.Sysmsg(...)
+end
+
 -- 输出一条密聊信息
 function LIB.OutputWhisper(szMsg, szHead)
 	szHead = szHead or PACKET_INFO.SHORT_NAME
