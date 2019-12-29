@@ -479,7 +479,7 @@ function LIB.FormatChatContent(szMsg)
 				table.insert(t2, {type = 'iteminfo', text = ndata.text, innerText = ndata.text:sub(2, -2), version = version, tabtype = tab, index = index})
 			-- 姓名
 			elseif ndata.name:sub(1, 9) == 'namelink_' then
-				table.insert(t2, {type = 'name', text = ndata.text, innerText = ndata.text, name = ndata.text:sub(2, -2)})
+				table.insert(t2, {type = 'name', text = ndata.text, innerText = ndata.text, name = ndata.text:sub(2, -2), id = ndata.name:sub(10)})
 			-- 任务
 			elseif ndata.name == 'questlink' then
 				table.insert(t2, {type = 'quest', text = ndata.text, innerText = ndata.text:sub(2, -2), questid = ndata.userdata})
@@ -535,6 +535,18 @@ function LIB.FormatChatContent(szMsg)
 		end
 	end
 	return t2
+end
+
+function LIB.StringifyChatContent(t, r, g, b)
+	local aContent = {}
+	for _, v in ipairs(t) do
+		if v.type == 'text' then
+			insert(aContent, GetFormatText(v.text, nil, r, g, b))
+		elseif v.type == 'name' then
+			insert(aContent, GetFormatText(v.text, nil, r, g, b, 515, nil, 'namelink_' .. (v.id or 0)))
+		end
+	end
+	return concat(aContent)
 end
 
 -- 字符串化一个聊天table结构体
@@ -810,8 +822,6 @@ function LIB.Talk(nChannel, szText, szUUID, bNoEscape, bSaveDeny, bPushToChatBox
 		end
 	elseif nChannel == PLAYER_TALK_CHANNEL.RAID and me.GetScene().nType == MAP_TYPE.BATTLE_FIELD then
 		nChannel = PLAYER_TALK_CHANNEL.BATTLE_FIELD
-	elseif nChannel == PLAYER_TALK_CHANNEL.LOCAL_SYS then
-		return LIB.Sysmsg(CONSTANT.EMPTY_TABLE, szText)
 	end
 	-- say body
 	local tSay = nil
@@ -823,6 +833,10 @@ function LIB.Talk(nChannel, szText, szUUID, bNoEscape, bSaveDeny, bPushToChatBox
 	if not bNoEscape then
 		tSay = ParseFaceIcon(tSay)
 		tSay = ParseName(tSay)
+	end
+	if nChannel == PLAYER_TALK_CHANNEL.LOCAL_SYS then
+		local szXml = LIB.StringifyChatContent(tSay, GetMsgFontColor('MSG_SYS'))
+		return LIB.Sysmsg({ szXml, rich = true })
 	end
 	tSay = ParseAntiSWS(tSay)
 	if LIB.IsShieldedVersion() then
