@@ -128,6 +128,20 @@ function DS:InitDB(bFixProblem)
 					--[[#DEBUG BEGIN]]
 					LIB.Debug(_L['MY_ChatLog'], 'Checking malformed node ' .. db:ToString(), DEBUG_LEVEL.LOG)
 					--[[#DEBUG END]]
+					local nMinTime, nMinRecTime = db:GetMinTime(), db:GetMinRecTime()
+					if nMinRecTime < nMinTime then
+						--[[#DEBUG BEGIN]]
+						LIB.Debug(_L['MY_ChatLog'], 'Fix min time of ' .. db:ToString() .. ' from ' .. nMinTime .. ' to ' .. nMinRecTime, DEBUG_LEVEL.WARNING)
+						--[[#DEBUG END]]
+						db:SetMinTime(nMinRecTime)
+					end
+					local nMaxTime, nMaxRecTime = db:GetMaxTime(), db:GetMaxRecTime()
+					if nMaxRecTime > nMaxTime then
+						--[[#DEBUG BEGIN]]
+						LIB.Debug(_L['MY_ChatLog'], 'Fix max time of ' .. db:ToString() .. ' from ' .. nMaxTime .. ' to ' .. nMaxRecTime, DEBUG_LEVEL.WARNING)
+						--[[#DEBUG END]]
+						db:SetMaxTime(nMaxRecTime)
+					end
 				end
 				local dwGlobalID = db:GetInfo('user_global_id')
 				if not dwGlobalID then -- and IsDebugClient() then -- TODO: TEMP FIX
