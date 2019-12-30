@@ -17,8 +17,6 @@ return {
     ['ignore same message'] = '不顯示重覆',
     ['Realtime save'] = '實時存記錄',
     ['Distinct server'] = '伺服器共享',
-    ['hide blockwords'] = '關鍵字屏蔽',
-    ['edit'] = '編輯',
     ['key words:'] = '關鍵字：',
     ['Are you sure you want to turn on regex mode?\nRegex is something advanced, make sure you know what you are doing.'] = '你確定要開啟正則表達式模式嗎？\n正則表達式是一種高級匹配規則，如果您不知道這是什麼，請點擊取消。\n更多關於正則表達式請上網搜索『Lua正則表達式』。',
     ['CHAT_MONITOR_KEYWORDS_SAMPLE'] = '10|十人,血戰天策|XZTC,!小鐵被吃了,!開宴黑鐵;大戰',

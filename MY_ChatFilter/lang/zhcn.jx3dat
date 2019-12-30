@@ -43,7 +43,4 @@ return {
     ['part mosaics D (mosaics all character)'                ] = '打码模式D（所有字打码）',
     ['mosaics character'] = '输入马赛克字符',
     ['unmosaics names (split by comma)'] = '不打码的名字（英文半角逗号','分隔多个名字）',
-
-    ['hide blockwords'] = '关键字屏蔽',
-    ['edit'] = '编辑',
 }
