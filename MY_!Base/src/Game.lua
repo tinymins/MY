@@ -3092,7 +3092,7 @@ end
 
 function LIB.IsTradeLocked()
 	local me = GetClientPlayer()
-	return me.bIsBankPasswordVerified == true
+	return me.bIsBankPasswordVerified == false
 end
 
 function LIB.IsTalkLocked()
