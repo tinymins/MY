@@ -137,7 +137,9 @@ local function CreateWebPageFrame()
 	return szRequestID, hFrame
 end
 
-local CURL_HttpPost = CURL_HttpPostEx or CURL_HttpPost
+local Curl_Create = _G.Curl_Create
+local CURL_HttpRqst = _G.CURL_HttpRqst
+local CURL_HttpPost = _G.CURL_HttpPostEx or _G.CURL_HttpPost
 function LIB.Ajax(settings)
 	assert(settings and settings.url)
 	setmetatable(settings, l_ajaxsettingsmeta)
@@ -277,6 +279,7 @@ function LIB.Ajax(settings)
 		-- bind callback function
 		wWebCef.OnWebLoadEnd = function()
 			-- local szUrl, szTitle, szContent = this:GetLocationURL(), this:GetLocationName(), this:GetDocument()
+			local szContent = ''
 			--[[#DEBUG BEGIN]]
 			-- LIB.Debug('MYRRWC::OnDocumentComplete', string.format('%s - %s', szTitle, szUrl), DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]

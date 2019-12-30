@@ -1277,7 +1277,7 @@ end
 function LIB.GetNearPet(nLimit)
 	local aPet = {}
 	for k, _ in pairs(NEARBY_PET) do
-		local npc = GetPet(k)
+		local npc = GetNpc(k)
 		if not npc then
 			NEARBY_PET[k] = nil
 		else
@@ -1543,6 +1543,7 @@ LIB.RegisterEvent('FELLOWSHIP_TWOWAY_FLAG_CHANGE', OnFriendListChange)
 -- LIB.GetFriendList('挽月堂') 获取分组名称为挽月堂的好友列表
 function LIB.GetFriendList(arg0)
 	local t = {}
+	local n = 0
 	local tGroup = {}
 	if GeneFriendListCache() then
 		if type(arg0) == 'number' then
@@ -1556,7 +1557,6 @@ function LIB.GetFriendList(arg0)
 		else
 			tGroup = FRIEND_LIST_BY_GROUP
 		end
-		local n = 0
 		for _, group in ipairs(tGroup) do
 			for _, p in ipairs(group) do
 				t[p.id], n = Clone(p), n + 1
@@ -2131,8 +2131,6 @@ local function GeneObjectBuffCache(KObject, nIndex)
 			raw.szKey        = dwSkillSrcID .. ':' .. dwID .. ',' .. nLevel
 			raw.dwID         = dwID
 			raw.nLevel       = nLevel
-			raw.szName       = szName
-			raw.nIcon        = nIcon
 			raw.bCanCancel   = bCanCancel
 			raw.nEndFrame    = nEndFrame
 			raw.nIndex       = nIndex
@@ -2713,7 +2711,6 @@ function LIB.GetMapInfo(arg0)
 	if not MAP_LIST then
 		GenerateMapInfo()
 	end
-	local arg0 = tonumber(param) or arg0
 	if arg0 and CONSTANT.MAP_NAME_FIX[arg0] then
 		arg0 = CONSTANT.MAP_NAME_FIX[arg0]
 	end

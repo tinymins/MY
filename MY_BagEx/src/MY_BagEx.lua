@@ -121,8 +121,8 @@ local function DoFilterBag(bForce)
 		return
 	end
 	-- 优化性能 当过滤器为空时不遍历筛选
-	if bForce or l_szBagFilter or l_bBagTimeLtd then
-		FilterBags('Normal/BigBagPanel', l_szBagFilter, l_bBagTimeLtd)
+	if bForce or l_szBagFilter then
+		FilterBags('Normal/BigBagPanel', l_szBagFilter)
 		if l_szBagFilter == '' then
 			l_szBagFilter = nil
 		end

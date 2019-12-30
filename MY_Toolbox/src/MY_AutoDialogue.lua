@@ -127,6 +127,7 @@ function D.DecodeDialogInfo(aInfo, dwTarType, dwTarID)
 	for _, v in ipairs(aInfo) do
 		if v.name == '$'  -- 选项
 		or v.name == 'W' then  -- 需要确认的选项
+			local szImage, nImageFrame
 			if v.name == 'T' then
 				for iconid in string.gmatch(v.context, '%$ (%d+)') do
 					szImage = 'fromiconid'

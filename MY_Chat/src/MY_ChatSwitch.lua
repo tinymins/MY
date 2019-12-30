@@ -549,8 +549,8 @@ function PS.OnPanelActive(wnd)
 		text = _L['chat time'],
 		checked = MY_ChatCopy.bChatTime,
 		oncheck = function(bChecked)
-			if bChecked and HM_ToolBox then
-				HM_ToolBox.bChatTime = false
+			if bChecked and _G.HM_ToolBox then
+				_G.HM_ToolBox.bChatTime = false
 			end
 			MY_ChatCopy.bChatTime = bChecked
 		end,

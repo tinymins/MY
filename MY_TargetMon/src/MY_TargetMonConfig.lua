@@ -558,7 +558,7 @@ end
 LIB.RegisterFlush('MY_TargetMonConfig', Flush)
 end
 
-function D.GetConfig()
+function D.GetConfig(nIndex)
 	return CONFIG[nIndex]
 end
 

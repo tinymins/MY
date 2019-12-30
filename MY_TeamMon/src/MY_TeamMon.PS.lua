@@ -223,9 +223,7 @@ function PS.OnPanelActive(wnd)
 		x = nX + 5, y = nY + 15, text = _L['Open data folder'],
 		onclick = function()
 			local szRoot = LIB.GetAbsolutePath(MY_TM_DATA_ROOT):gsub('/', '\\')
-			if OpenFolder then
-				OpenFolder(szRoot)
-			end
+			LIB.OpenFolder(szRoot)
 			UI.OpenTextEditor(szRoot)
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')

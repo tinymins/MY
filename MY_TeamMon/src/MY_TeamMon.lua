@@ -1051,7 +1051,7 @@ function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
 				SetTarget(IsPlayer(dwCaster) and TARGET.PLAYER or TARGET.NPC, dwCaster)
 			end
 			if cfg.tMark then
-				D.SetTeamMark('CASTING', cfg.tMark, dwCaster, dwSkillID, dwLevel)
+				D.SetTeamMark('CASTING', cfg.tMark, dwCaster, dwCastID, dwLevel)
 			end
 			-- Í·¶¥±¨¾¯
 			if O.bPushScreenHead and cfg.bScreenHead then

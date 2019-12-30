@@ -52,6 +52,19 @@ function wfind_c(s, i)
 end
 end
 
+local ipairs_r
+do
+local function fnBpairs(tab, nIndex)
+	nIndex = nIndex - 1
+	if nIndex > 0 then
+		return nIndex, tab[nIndex]
+	end
+end
+function ipairs_r(tab)
+	return fnBpairs, tab, #tab + 1
+end
+end
+
 function D.Reset()
 	SUM_CALL = setmetatable({}, { __index = function() return 0 end })
 	SUM_TIME = setmetatable({}, { __index = function() return 0 end })

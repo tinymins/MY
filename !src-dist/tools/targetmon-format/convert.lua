@@ -34,7 +34,7 @@ function clone(var)
 	end
 end
 
-function empty(var)
+local function empty(var)
 	local szType = type(var)
 	if szType == 'nil' then
 		return true
@@ -159,6 +159,7 @@ function var2str(var, indent, level)
 	return table_r(var, level or 0, indent)
 end
 
+local str2var
 do
 local Log = print
 local envmeta = {}

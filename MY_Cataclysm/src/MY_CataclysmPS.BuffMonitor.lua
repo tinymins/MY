@@ -45,6 +45,10 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
 	return
 end
 --------------------------------------------------------------------------
+
+local D = {
+	ReloadCataclysmPanel = MY_Cataclysm.ReloadCataclysmPanel,
+}
 local CFG, PS = MY_Cataclysm.CFG, {}
 
 -- ½âÎö
@@ -132,7 +136,7 @@ function PS.OnPanelActive(frame)
 					CFG.aBuffList = DecodeBuffRuleList(edit:Text())
 					MY_Cataclysm.UpdateBuffListCache()
 					ui:Remove()
-					LIB.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
+					LIB.DelayCall('MY_Cataclysm_Reload', 300, D.ReloadCataclysmPanel)
 					LIB.SwitchTab('MY_Cataclysm_BuffSettings', true)
 				end,
 			})
@@ -166,7 +170,7 @@ function PS.OnPanelActive(frame)
 		checked = CFG.bAutoBuffSize,
 		oncheck = function(bCheck)
 			CFG.bAutoBuffSize = bCheck
-			LIB.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
+			LIB.DelayCall('MY_Cataclysm_Reload', 300, D.ReloadCataclysmPanel)
 		end,
 	}):AutoWidth():Width() + 5
 	x = x + ui:Append('WndTrackbar', {
@@ -178,7 +182,7 @@ function PS.OnPanelActive(frame)
 		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		onchange = function(nVal)
 			CFG.fBuffScale = nVal / 100
-			LIB.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
+			LIB.DelayCall('MY_Cataclysm_Reload', 300, D.ReloadCataclysmPanel)
 		end,
 		textfmt = function(val) return _L('%d%%', val) end,
 	}):AutoWidth():Width() + 10
@@ -193,7 +197,7 @@ function PS.OnPanelActive(frame)
 		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		onchange = function(nVal)
 			CFG.nMaxShowBuff = nVal
-			LIB.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
+			LIB.DelayCall('MY_Cataclysm_Reload', 300, D.ReloadCataclysmPanel)
 		end,
 	}):AutoWidth():Width() + 8
 
@@ -205,7 +209,7 @@ function PS.OnPanelActive(frame)
 		oncheck = function(bCheck)
 			CFG.bBuffPushToOfficial = bCheck
 			MY_Cataclysm.UpdateBuffListCache()
-			LIB.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
+			LIB.DelayCall('MY_Cataclysm_Reload', 300, D.ReloadCataclysmPanel)
 		end,
 	}):AutoWidth():Width() + 5
 	x = x + ui:Append('WndCheckBox', {
@@ -213,7 +217,7 @@ function PS.OnPanelActive(frame)
 		checked = CFG.bStaring,
 		oncheck = function(bCheck)
 			CFG.bStaring = bCheck
-			LIB.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
+			LIB.DelayCall('MY_Cataclysm_Reload', 300, D.ReloadCataclysmPanel)
 		end,
 	}):AutoWidth():Width() + 5
 
@@ -224,7 +228,7 @@ function PS.OnPanelActive(frame)
 		checked = CFG.bShowBuffTime,
 		oncheck = function(bCheck)
 			CFG.bShowBuffTime = bCheck
-			LIB.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
+			LIB.DelayCall('MY_Cataclysm_Reload', 300, D.ReloadCataclysmPanel)
 		end,
 	}):AutoWidth():Width() + 5
 	x = x + ui:Append('WndCheckBox', {
@@ -233,7 +237,7 @@ function PS.OnPanelActive(frame)
 		checked = not CFG.bBuffAboveMana,
 		oncheck = function(bCheck)
 			CFG.bBuffAboveMana = not bCheck
-			LIB.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
+			LIB.DelayCall('MY_Cataclysm_Reload', 300, D.ReloadCataclysmPanel)
 		end,
 	}):AutoWidth():Width() + 5
 
@@ -244,7 +248,7 @@ function PS.OnPanelActive(frame)
 		checked = CFG.bShowBuffNum,
 		oncheck = function(bCheck)
 			CFG.bShowBuffNum = bCheck
-			LIB.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
+			LIB.DelayCall('MY_Cataclysm_Reload', 300, D.ReloadCataclysmPanel)
 		end,
 	}):AutoWidth():Width() + 5
 	x = x + ui:Append('WndCheckBox', {
@@ -252,7 +256,7 @@ function PS.OnPanelActive(frame)
 		checked = CFG.bShowBuffReminder,
 		oncheck = function(bCheck)
 			CFG.bShowBuffReminder = bCheck
-			LIB.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
+			LIB.DelayCall('MY_Cataclysm_Reload', 300, D.ReloadCataclysmPanel)
 		end,
 	}):AutoWidth():Width() + 5
 
@@ -275,7 +279,7 @@ function PS.OnPanelActive(frame)
 		oncheck = function(bCheck)
 			CFG.bBuffDataTeamMon = bCheck
 			MY_Cataclysm.UpdateBuffListCache()
-			LIB.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
+			LIB.DelayCall('MY_Cataclysm_Reload', 300, D.ReloadCataclysmPanel)
 		end,
 		autoenable = function() return MY_Resource and true end,
 	}):AutoWidth():Width() + 5

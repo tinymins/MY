@@ -214,11 +214,11 @@ end
 -----------------------------------------------
 -- Lua数据序列化
 -----------------------------------------------
-local EncodeLUAData = var2str
+local EncodeLUAData = _G.var2str
 -----------------------------------------------
 -- Lua数据反序列化
 -----------------------------------------------
-local DecodeLUAData = str2var
+local DecodeLUAData = _G.str2var
 if not DecodeLUAData then
 local szTempLog = 'interface/temp.log'
 local szTempJx3dat = 'interface/temp.jx3dat'
@@ -868,7 +868,7 @@ local CONSTANT = setmetatable({}, {
 			CAN_NOT_FIND_PLAYER = 3,
 			TOO_FAR             = 4,
 		}),
-		WND_CONTAINER_STYLE = WND_CONTAINER_STYLE or SetmetaReadonly({
+		WND_CONTAINER_STYLE = _G.WND_CONTAINER_STYLE or SetmetaReadonly({
 			WND_CONTAINER_STYLE_CUSTOM       = 0,
 			WND_CONTAINER_STYLE_LEFT_TOP     = 1,
 			WND_CONTAINER_STYLE_LEFT_BOTTOM  = 2,
@@ -1023,7 +1023,7 @@ local CONSTANT = setmetatable({}, {
 			WARNING = 2,
 			SUCCESS = 3,
 		}),
-		EQUIPMENT_SUIT_COUNT = EQUIPMENT_SUIT_COUNT or 4,
+		EQUIPMENT_SUIT_COUNT = _G.EQUIPMENT_SUIT_COUNT or 4,
 		INVENTORY_GUILD_BANK = INVENTORY_GUILD_BANK or INVENTORY_INDEX.TOTAL + 1, --帮会仓库界面虚拟一个背包位置
 		INVENTORY_GUILD_PAGE_SIZE = INVENTORY_GUILD_PAGE_SIZE or 100,
 	},

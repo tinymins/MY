@@ -271,7 +271,7 @@ function D.DownloadMeta(info, onSuccess, onError)
 	LIB.Ajax({
 		method = 'auto',
 		url = szURL,
-		charset == 'utf8',
+		charset = 'utf8',
 		success = function(szHTML)
 			local res = LIB.JsonDecode(szHTML)
 			if not res then

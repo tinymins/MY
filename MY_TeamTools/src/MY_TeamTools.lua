@@ -1279,7 +1279,7 @@ function RT.UpdatetDeathMsg(dwID)
 	local team  = GetClientTeam()
 	local data  = {}
 	local key = dwID == me.dwID and 'self' or dwID
-	local tDeath = RaidTools.GetDeathLog()
+	local tDeath = Clone(RaidTools.GetDeathLog())
 	if not dwID then
 		for k, v in pairs(tDeath) do
 			for kk, vv in ipairs(v) do
@@ -1315,7 +1315,7 @@ function RT.UpdatetDeathMsg(dwID)
 			local r, g, b = LIB.GetForceColor(info and info.dwForceID or me.dwForceID)
 			insert(xml, GetFormatText('[' .. (info and info.szName or me.szName) ..']', 10, r, g, b, 16, 'this.OnItemLButtonClick = function() OnItemLinkDown(this) end', 'namelink'))
 			insert(xml, GetFormatText(g_tStrings.TRADE_BE, 10, 255, 255, 255))
-			if szKiller == '' and v.data[1].szKiller ~= '' then
+			if v.szKiller == '' and v.data[1].szKiller ~= '' then
 				insert(xml, GetFormatText('[' .. _L['OUTER GUEST'] .. g_tStrings.STR_OR .. v.data[1].szKiller ..']', 10, 13, 150, 70, 256, 'this.OnItemMouseEnter = MY_RaidTools.OnShowDeathInfo', key .. '_' .. v.nIndex))
 			else
 				insert(xml, GetFormatText('[' .. (v.szKiller ~= '' and v.szKiller or  _L['OUTER GUEST']) ..']', 10, 255, 128, 0, 256, 'this.OnItemMouseEnter = MY_RaidTools.OnShowDeathInfo', key .. '_' .. v.nIndex))

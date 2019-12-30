@@ -239,9 +239,9 @@ function MY_VisualSkill.OnEvent(event)
 			OnSkillCast(this, dwSkillID, dwSkillLevel)
 		end
 	elseif event == 'ON_ENTER_CUSTOM_UI_MODE' then
-		UpdateCustomModeWindow(this, szTip, MY_VisualSkill.bPenetrable)
+		UpdateCustomModeWindow(this, _L['visual skill'], MY_VisualSkill.bPenetrable)
 	elseif event == 'ON_LEAVE_CUSTOM_UI_MODE' then
-		UpdateCustomModeWindow(this, szTip, MY_VisualSkill.bPenetrable)
+		UpdateCustomModeWindow(this, _L['visual skill'], MY_VisualSkill.bPenetrable)
 		MY_VisualSkill.anchor = GetFrameAnchor(this)
 	elseif event == 'CUSTOM_UI_MODE_SET_DEFAULT' then
 		MY_VisualSkill.anchor = defaultAnchor

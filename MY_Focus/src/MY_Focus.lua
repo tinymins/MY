@@ -914,7 +914,7 @@ function D.OpenRuleEditor(tData, onChangeNotify, bHideBase)
 	ui:Append('Text', { x = nX, y = nY, color = {255, 255, 0}, text = _L['Max distance'] }):AutoWidth()
 	nX, nY = X + 10, nY + dY
 	nX = ui:Append('WndEditBox', {
-		x = nX, y = nY, w = 100, h = 25, w = 200,
+		x = nX, y = nY, w = 200, h = 25,
 		text = tData.nMaxDistance,
 		onchange = function(szText)
 			local nValue = tonumber(szText) or 0
@@ -927,7 +927,7 @@ function D.OpenRuleEditor(tData, onChangeNotify, bHideBase)
 	ui:Append('Text', { x = nX, y = nY, color = {255, 255, 0}, text = _L['Name display'] }):AutoWidth()
 	nX, nY = X + 10, nY + dY
 	nX = ui:Append('WndEditBox', {
-		x = nX, y = nY, w = 100, h = 25, w = 200,
+		x = nX, y = nY, w = 200, h = 25,
 		text = tData.szDisplay,
 		onchange = function(szText)
 			tData.szDisplay = szText

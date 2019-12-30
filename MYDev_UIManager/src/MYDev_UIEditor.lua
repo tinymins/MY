@@ -270,7 +270,7 @@ function D.GetTipInfo(el)
 	if el:GetType() == 'WndFrame' then
 		local G
 		if el:IsAddOn() then
-			G = GetAddonEnv and GetAddonEnv() or _G
+			G = _G.GetAddonEnv and _G.GetAddonEnv() or _G
 		else
 			G = _G
 		end

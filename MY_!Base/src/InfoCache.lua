@@ -93,7 +93,7 @@ function LIB.InfoCache(SZ_DATA_PATH, SEG_LEN, L1_SIZE, ValueComparer)
 			-- read from L1 CACHE
 			local tInfo = tCache[k]
 			local szSegID = concat({byte(k, 1, SEG_LEN)}, '-')
-			 -- read from DataBase if L1 CACHE not hit
+			-- read from DataBase if L1 CACHE not hit
 			if not tInfo then
 				if not tInfos[szSegID] then
 					tInfos[szSegID] = LIB.LoadLUAData((SZ_DATA_PATH:gsub('<SEG>', szSegID))) or {}
@@ -133,7 +133,6 @@ function LIB.InfoCache(SZ_DATA_PATH, SEG_LEN, L1_SIZE, ValueComparer)
 			if cmd == 'clear' then
 				-- clear all data file
 				tInfos, tInfoVisit, tInfoModified = {}, {}, {}
-				tName2ID, tName2IDModified = {}, {}
 				local aSeg = {}
 				for i = 1, SEG_LEN do
 					insert(aSeg, 0)

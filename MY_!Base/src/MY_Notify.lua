@@ -67,7 +67,7 @@ function MY_Notify.Create(opt)
 	if opt.bPlaySound then
 		LIB.PlaySound(opt.szSound or 'Notify.ogg', opt.szCustomSound)
 	end
-	return szKey
+	return opt.szKey
 end
 LIB.CreateNotify = MY_Notify.Create
 

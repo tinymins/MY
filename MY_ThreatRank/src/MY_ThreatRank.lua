@@ -506,11 +506,10 @@ function PS.OnPanelActive(frame)
 
 	ui:Append('WndCheckBox', {
 		x = x, y = y, checked = TS.bOTAlertSound, text = _L['OT Alert Sound'],
-		autoenable = function() return TS.nOTAlertLevel == 1 end,
 		oncheck = function(bChecked)
 			TS.bOTAlertSound = bChecked
 		end,
-		autoenable = IsEnabled,
+		autoenable = function() return IsEnabled() and TS.nOTAlertLevel == 1 end,
 	})
 	y = y + 28
 

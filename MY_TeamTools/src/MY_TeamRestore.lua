@@ -400,7 +400,6 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
 
 	nX = ui:Append('WndButton2', {
 		x = nX + 5, y = nY, text = _L['Save Team'],
-		enable = not bEnable,
 		onclick = function()
 			GetUserInput(_L['Save team name'], function(text)
 				D.Save(nil, text)

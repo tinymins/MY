@@ -36,7 +36,7 @@ local Call, XpCall, GetTraceback, RandomChild = LIB.Call, LIB.XpCall, LIB.GetTra
 local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
 local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
 -----------------------------------------------------------------------------------------------------------
-local AnsiToUTF8 = AnsiToUTF8 or ansi_to_utf8
+local AnsiToUTF8 = AnsiToUTF8 or _G.ansi_to_utf8
 local UrlEncodeString, UrlDecodeString = UrlEncode, UrlDecode
 --------------------------------------------
 -- 本地函数和变量
@@ -336,17 +336,17 @@ function LIB.StringSimpleMatch(szText, szFind, bDistinctCase, bDistinctEnEm, bIg
 end
 
 function LIB.IsSensitiveWord(szText)
-	if not TextFilterCheck then
+	if not _G.TextFilterCheck then
 		return false
 	end
-	return not TextFilterCheck(szText)
+	return not _G.TextFilterCheck(szText)
 end
 
 function LIB.ReplaceSensitiveWord(szText)
-	if not TextFilterReplace then
+	if not _G.TextFilterReplace then
 		return szText
 	end
-	return select(2, TextFilterReplace(szText))
+	return select(2, _G.TextFilterReplace(szText))
 end
 
 do

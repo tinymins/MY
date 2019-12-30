@@ -53,8 +53,15 @@ local function OnItemMouseEnter()
 	local xml = {}
 	insert(xml, GetFormatText(_L['Click for achievement wiki'], 41))
 	if IsCtrlKeyDown() then
+		local h = this:GetParent()
+		local t = {}
+		for k, v in pairs(h) do
+			if k ~= '___id' and k ~= '___type' then
+				insert(t, k .. ': ' .. EncodeLUAData(v, '  '))
+			end
+		end
 		insert(xml, GetFormatText('\n\n' .. g_tStrings.DEBUG_INFO_ITEM_TIP .. '\n', 102))
-		insert(xml, GetFormatText('ID: ' .. dwID, 102))
+		insert(xml, GetFormatText(concat(t, '\n'), 102))
 	end
 	OutputTip(concat(xml), 300, { x, y, w, h })
 end

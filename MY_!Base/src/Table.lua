@@ -37,201 +37,191 @@ local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.G
 local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
 -----------------------------------------------------------------------------------------------------------
 
-if IsFunction(Table_GetCommonEnchantDesc) then
-	LIB.Table_GetCommonEnchantDesc = Table_GetCommonEnchantDesc
-else
-	function LIB.Table_GetCommonEnchantDesc(enchant_id)
-		local res = g_tTable.CommonEnchant:Search(enchant_id)
-		if res then
-			return res.desc
-		end
+function LIB.Table_GetCommonEnchantDesc(enchant_id)
+	if IsFunction(_G.Table_GetCommonEnchantDesc) then
+		return _G.Table_GetCommonEnchantDesc(enchant_id)
+	end
+	local res = g_tTable.CommonEnchant:Search(enchant_id)
+	if res then
+		return res.desc
 	end
 end
 
-if IsFunction(Table_GetProfessionName) then
-	LIB.Table_GetProfessionName = Table_GetProfessionName
-else
-	function LIB.Table_GetProfessionName(dwProfessionID)
-		local szName = ''
-		local tProfession = g_tTable.ProfessionName:Search(dwProfessionID)
-		if tProfession then
-			szName = tProfession.szName
-		end
-		return szName
+function LIB.Table_GetProfessionName(dwProfessionID)
+	if IsFunction(_G.Table_GetProfessionName) then
+		return _G.Table_GetProfessionName(dwProfessionID)
 	end
+	local szName = ''
+	local tProfession = g_tTable.ProfessionName:Search(dwProfessionID)
+	if tProfession then
+		szName = tProfession.szName
+	end
+	return szName
 end
 
-if IsFunction(Table_GetDoodadTemplateName) then
-	LIB.Table_GetDoodadTemplateName = Table_GetDoodadTemplateName
-else
-	function LIB.Table_GetDoodadTemplateName(dwTemplateID)
-		local szName = ''
-		local tDoodad = g_tTable.DoodadTemplate:Search(dwTemplateID)
-		if tDoodad then
-			szName = tDoodad.szName
-		end
-		return szName
+function LIB.Table_GetDoodadTemplateName(dwTemplateID)
+	if IsFunction(_G.Table_GetDoodadTemplateName) then
+		return _G.Table_GetDoodadTemplateName(dwTemplateID)
 	end
+	local szName = ''
+	local tDoodad = g_tTable.DoodadTemplate:Search(dwTemplateID)
+	if tDoodad then
+		szName = tDoodad.szName
+	end
+	return szName
 end
 
-if IsFunction(Table_IsTreasureBattleFieldMap) then
-	LIB.Table_IsTreasureBattleFieldMap = Table_IsTreasureBattleFieldMap
-else
-	function LIB.Table_IsTreasureBattleFieldMap()
-		return false
+function LIB.Table_IsTreasureBattleFieldMap()
+	if IsFunction(_G.Table_IsTreasureBattleFieldMap) then
+		return _G.Table_IsTreasureBattleFieldMap()
 	end
+	return false
 end
 
-if IsFunction(Table_GetTeamRecruit) then
-	LIB.Table_GetTeamRecruit = Table_GetTeamRecruit
-else
-	function LIB.Table_GetTeamRecruit()
-		local res = {}
-		local nCount = g_tTable.TeamRecruit:GetRowCount()
-		for i = 2, nCount do
-			local tLine = g_tTable.TeamRecruit:GetRow(i)
-			local dwType = tLine.dwType
-			local szTypeName = tLine.szTypeName
+function LIB.Table_GetTeamRecruit()
+	if IsFunction(_G.Table_GetTeamRecruit) then
+		return _G.Table_GetTeamRecruit()
+	end
+	local res = {}
+	local nCount = g_tTable.TeamRecruit:GetRowCount()
+	for i = 2, nCount do
+		local tLine = g_tTable.TeamRecruit:GetRow(i)
+		local dwType = tLine.dwType
+		local szTypeName = tLine.szTypeName
 
-			if dwType > 0 then
-				res[dwType] = res[dwType] or {Type=dwType, TypeName=szTypeName}
-				res[dwType].bParent = true
-				local dwSubType = tLine.dwSubType
-				local szSubTypeName = tLine.szSubTypeName
-				if dwSubType > 0 then
-					res[dwType][dwSubType] = res[dwType][dwSubType] or {SubType=dwSubType, SubTypeName=szSubTypeName}
-					res[dwType][dwSubType].bParent = true
-					table.insert(res[dwType][dwSubType], tLine)
-				else
-					table.insert(res[dwType], tLine)
-				end
+		if dwType > 0 then
+			res[dwType] = res[dwType] or {Type=dwType, TypeName=szTypeName}
+			res[dwType].bParent = true
+			local dwSubType = tLine.dwSubType
+			local szSubTypeName = tLine.szSubTypeName
+			if dwSubType > 0 then
+				res[dwType][dwSubType] = res[dwType][dwSubType] or {SubType=dwSubType, SubTypeName=szSubTypeName}
+				res[dwType][dwSubType].bParent = true
+				table.insert(res[dwType][dwSubType], tLine)
+			else
+				table.insert(res[dwType], tLine)
 			end
 		end
-		return res
 	end
+	return res
 end
 
-if IsFunction(Table_IsSimplePlayer) then
-	LIB.Table_IsSimplePlayer = Table_IsSimplePlayer
-else
-	function LIB.Table_IsSimplePlayer(dwTemplateID)
-		local tLine = g_tTable.SimplePlayer:Search(dwTemplateID)
-		if tLine then
-			return true
+function LIB.Table_IsSimplePlayer(dwTemplateID)
+	if IsFunction(_G.Table_IsSimplePlayer) then
+		return _G.Table_IsSimplePlayer(dwTemplateID)
+	end
+	local tLine = g_tTable.SimplePlayer:Search(dwTemplateID)
+	if tLine then
+		return true
+	end
+	return false
+end
+
+function LIB.Table_SchoolToForce(dwSchoolID)
+	if IsFunction(_G.Table_SchoolToForce) then
+		return _G.Table_SchoolToForce(dwSchoolID)
+	end
+	local nCount = g_tTable.ForceToSchool:GetRowCount()
+	local dwForceID = 0
+	for i = 1, nCount do
+		local tLine = g_tTable.ForceToSchool:GetRow(i)
+		if dwSchoolID == tLine.dwSchoolID then
+			dwForceID = tLine.dwForceID
 		end
-		return false
 	end
+	return dwForceID
 end
 
-if IsFunction(Table_SchoolToForce) then
-	LIB.Table_SchoolToForce = Table_SchoolToForce
-else
-	function LIB.Table_SchoolToForce(dwSchoolID)
-		local nCount = g_tTable.ForceToSchool:GetRowCount()
-		local dwForceID = 0
-		for i = 1, nCount do
-			tLine = g_tTable.ForceToSchool:GetRow(i)
-			if dwSchoolID == tLine.dwSchoolID then
-				dwForceID = tLine.dwForceID
+function LIB.Table_GetSkillSchoolKungfu(dwSchoolID)
+	if IsFunction(_G.Table_GetSkillSchoolKungfu) then
+		return LIB.Table_GetSkillSchoolKungfu(dwSchoolID)
+	end
+	local tKungFungList = {}
+	local tLine = g_tTable.SkillSchoolKungfu:Search(dwSchoolID)
+	if tLine then
+		local szKungfu = tLine.szKungfu
+		for s in string.gmatch(szKungfu, "%d+") do
+			local dwID = tonumber(s)
+			if dwID then
+				table.insert(tKungFungList, dwID)
 			end
 		end
-		return dwForceID
 	end
+	return tKungFungList
 end
 
-if IsFunction(Table_GetSkillSchoolKungfu) then
-	LIB.Table_GetSkillSchoolKungfu = Table_GetSkillSchoolKungfu
-else
-	function LIB.Table_GetSkillSchoolKungfu(dwSchoolID)
-		local tKungFungList = {}
-		local tLine = g_tTable.SkillSchoolKungfu:Search(dwSchoolID)
-		if tLine then
-			local szKungfu = tLine.szKungfu
-			for s in string.gmatch(szKungfu, "%d+") do
-				local dwID = tonumber(s)
-				if dwID then
-					table.insert(tKungFungList, dwID)
-				end
+function LIB.Table_GetMKungfuList(dwKungfuID)
+	if IsFunction(_G.Table_GetMKungfuList) then
+		return LIB.Table_GetMKungfuList(dwKungfuID)
+	end
+	local tLine = g_tTable.MKungfuKungfu:Search(dwKungfuID)
+	local tKungfu = {}
+	if tLine and tLine.szKungfu then
+		local szKungfu = tLine.szKungfu
+		for s in string.gmatch(szKungfu, "%d+") do
+			local dwID = tonumber(s)
+			if dwID then
+				table.insert(tKungfu, dwID)
 			end
 		end
-		return tKungFungList
 	end
-end
-
-if IsFunction(Table_GetMKungfuList) then
-	LIB.Table_GetMKungfuList = Table_GetMKungfuList
-else
-	function LIB.Table_GetMKungfuList(dwKungfuID)
-		local tLine = g_tTable.MKungfuKungfu:Search(dwKungfuID)
-		local tKungfu = {}
-		if tLine and tLine.szKungfu then
-			local szKungfu = tLine.szKungfu
-			for s in string.gmatch(szKungfu, "%d+") do
-				local dwID = tonumber(s)
-				if dwID then
-					table.insert(tKungfu, dwID)
-				end
-			end
-		end
-		return tKungfu
-	end
+	return tKungfu
 end
 
 
-if IsFunction(Table_GetNewKungfuSkill) then
-	LIB.Table_GetNewKungfuSkill = Table_GetNewKungfuSkill
-else
-	function LIB.Table_GetNewKungfuSkill(dwMountKungfu, dwKungfuID)
-		local tLine = g_tTable.SkillKungFuShow:Search(dwMountKungfu) or {}
-		if empty(tLine) then
-			return nil
+function LIB.Table_GetNewKungfuSkill(dwMountKungfu, dwKungfuID)
+	if IsFunction(_G.Table_GetNewKungfuSkill) then
+		return LIB.Table_GetNewKungfuSkill(dwMountKungfu, dwKungfuID)
+	end
+	local tLine = g_tTable.SkillKungFuShow:Search(dwMountKungfu) or {}
+	if IsEmpty(tLine) then
+		return nil
+	end
+	if tLine.dwKungfu ~= dwKungfuID then
+		return nil
+	end
+	local tSkill = {}
+	local szSkill = tLine.szNewSkillID
+	for s in string.gmatch(szSkill, "%d+") do
+		local dwID = tonumber(s)
+		if dwID then
+			table.insert(tSkill, dwID)
 		end
-		if tLine.dwKungfu ~= dwKungfuID then
-			return nil
-		end
-		local tSkill = {}
-		local szSkill = tLine.szNewSkillID
+	end
+	if tSkill and not IsEmpty(tSkill) then
+		return tSkill
+	end
+	return nil
+end
+
+function LIB.Table_GetKungfuSkillList(dwKungfuID)
+	if IsFunction(_G.Table_GetKungfuSkillList) then
+		return LIB.Table_GetKungfuSkillList(dwKungfuID)
+	end
+	local tSkill = {}
+	local tLine = g_tTable.KungfuSkill:Search(dwKungfuID)
+	if tLine then
+		local szSkill = tLine.szSkill
 		for s in string.gmatch(szSkill, "%d+") do
 			local dwID = tonumber(s)
 			if dwID then
 				table.insert(tSkill, dwID)
 			end
 		end
-		if tSkill and not empty(tSkill) then
-			return tSkill
-		end
-		return nil
 	end
+	return tSkill
 end
 
-if IsFunction(Table_GetKungfuSkillList) then
-	LIB.Table_GetKungfuSkillList = Table_GetKungfuSkillList
-else
-	function LIB.Table_GetKungfuSkillList(dwKungfuID)
-		local tSkill = {}
-		local tLine = g_tTable.KungfuSkill:Search(dwKungfuID)
-		if tLine then
-			local szSkill = tLine.szSkill
-			for s in string.gmatch(szSkill, "%d+") do
-				local dwID = tonumber(s)
-				if dwID then
-					table.insert(tSkill, dwID)
-				end
-			end
-		end
-		return tSkill
+do
+local cache = {}
+function LIB.Table_GetSkillExtCDID(dwID)
+	if IsFunction(_G.Table_GetSkillExtCDID) then
+		return _G.Table_GetSkillExtCDID(dwID)
 	end
+	if cache[dwID] == nil then
+		local tLine = g_tTable.SkillExtCDID:Search(dwID)
+		cache[dwID] = tLine and tLine.dwExtID or false
+	end
+	return cache[dwID] and cache[dwID] or nil
 end
-
-if IsFunction(Table_GetSkillExtCDID) then
-	LIB.Table_GetSkillExtCDID = Table_GetSkillExtCDID
-else
-	local cache = {}
-	function LIB.Table_GetSkillExtCDID(dwID)
-		if cache[dwID] == nil then
-			local tLine = g_tTable.SkillExtCDID:Search(dwID)
-			cache[dwID] = tLine and tLine.dwExtID or false
-		end
-		return cache[dwID] and cache[dwID] or nil
-	end
 end

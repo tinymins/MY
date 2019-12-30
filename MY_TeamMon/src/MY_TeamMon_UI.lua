@@ -178,9 +178,7 @@ function D.OnFrameCreate()
 			insert(menu, { szOption = _L['Export data'], fnAction = D.OpenExportPanel })
 			insert(menu, { szOption = _L['Open data folder'], fnAction = function()
 				local szRoot = LIB.GetAbsolutePath(MY_TM_DATA_ROOT):gsub('/', '\\')
-				if OpenFolder then
-					OpenFolder(szRoot)
-				end
+				LIB.OpenFolder(szRoot)
 				UI.OpenTextEditor(szRoot)
 			end })
 			return menu
@@ -2603,7 +2601,7 @@ function D.OpenSettingPanel(data, szType)
 		nY = nY + 10
 		-- È¦È¦ÁÐ±í
 		if data.aCircle then
-			for _, circle in ipairs(data.aCircle) do
+			for k, circle in ipairs(data.aCircle) do
 				nX = ui:Append('Shadow', {
 					x = 35, y = nY + 3, w = 23, h = 23,
 					color = circle.col,

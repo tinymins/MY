@@ -82,7 +82,7 @@ function TI.CreateFrame(a, b)
 			w = 320, h = 195,
 			text = _L['Team Message'],
 			anchor = MY_TeamNotice.anchor,
-			simple = true, close = true, close = true,
+			simple = true, close = true,
 			setting = function()
 				LIB.ShowPanel()
 				LIB.FocusPanel()

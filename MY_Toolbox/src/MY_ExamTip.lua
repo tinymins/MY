@@ -167,7 +167,7 @@ local function SubmitData()
 			if LIB.IsShieldedVersion() or not res then
 				return
 			end
-			LIB.Sysmsg(_L['exam tip'], _L('%s record(s) commited, %s record(s) accepted!', r.received, r.accepted))
+			LIB.Sysmsg(_L['exam tip'], _L('%s record(s) commited, %s record(s) accepted!', res.received, res.accepted))
 		end,
 	})
 end
