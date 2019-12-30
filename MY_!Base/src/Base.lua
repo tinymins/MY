@@ -594,13 +594,14 @@ local function createInstance(c, ins, ...)
 	return c
 end
 function Class(className, super)
+	local classPrototype
 	if type(super) == 'string' then
 		className, super = super
 	end
 	if not className then
 		className = 'Unnamed Class'
 	end
-	local classPrototype = (function ()
+	classPrototype = (function ()
 		local proxys = {}
 		if super then
 			proxys.super = super
