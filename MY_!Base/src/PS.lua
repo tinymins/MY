@@ -808,9 +808,7 @@ function PS.OnPanelActive(wnd)
 		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 		onclick = function()
 			local szRoot = LIB.GetAbsolutePath({'', PATH_TYPE.ROLE}):gsub('/', '\\')
-			if OpenFolder then
-				OpenFolder(szRoot)
-			end
+			LIB.OpenFolder(szRoot)
 			UI.OpenTextEditor(szRoot)
 		end,
 	}):AutoWidth():Width() + 5
@@ -822,9 +820,7 @@ function PS.OnPanelActive(wnd)
 		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 		onclick = function()
 			local szRoot = LIB.GetAbsolutePath({'', PATH_TYPE.SERVER}):gsub('/', '\\')
-			if OpenFolder then
-				OpenFolder(szRoot)
-			end
+			LIB.OpenFolder(szRoot)
 			UI.OpenTextEditor(szRoot)
 		end,
 	}):AutoWidth():Width() + 5
@@ -836,9 +832,7 @@ function PS.OnPanelActive(wnd)
 		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 		onclick = function()
 			local szRoot = LIB.GetAbsolutePath({'', PATH_TYPE.GLOBAL}):gsub('/', '\\')
-			if OpenFolder then
-				OpenFolder(szRoot)
-			end
+			LIB.OpenFolder(szRoot)
 			UI.OpenTextEditor(szRoot)
 		end,
 	}):AutoWidth():Width() + 5

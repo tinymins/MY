@@ -425,6 +425,12 @@ function LIB.GetParentPath(szPath)
 	return LIB.NormalizePath(szPath):gsub('/[^/]*$', '')
 end
 
+function LIB.OpenFolder(szPath)
+	if _G.OpenFolder then
+		_G.OpenFolder(szPath)
+	end
+end
+
 function LIB.IsURL(szURL)
 	return szURL:sub(1, 8):lower() == 'https://' or szURL:gsub(1, 7):lower() == 'http://'
 end
