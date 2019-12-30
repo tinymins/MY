@@ -107,6 +107,7 @@ local function UpdateTongRepertoryPage()
 	local nPage = arg0
 	local offset = nPage * CONSTANT.INVENTORY_GUILD_PAGE_SIZE
 	local boxtype = CONSTANT.INVENTORY_GUILD_BANK
+	local me = GetClientPlayer()
 	for boxindex = offset, offset + 7 * 14 - 1 do
 		local tabtype, tabindex, tabsubindex, name, desc, count = -1, -1, -1, '', '', 0
 		local KItem = GetPlayerItem(me, boxtype, boxindex)
