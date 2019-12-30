@@ -3090,6 +3090,18 @@ function LIB.IsPhoneLock()
 	return me and me.IsTradingMibaoSwitchOpen()
 end
 
+function LIB.IsTradeLocked()
+	local me = GetClientPlayer()
+	return me.bIsBankPasswordVerified == true
+end
+
+function LIB.IsTalkLocked()
+	if not _G.SafeLock_IsTalkLocked then
+		return false
+	end
+	return _G.SafeLock_IsTalkLocked()
+end
+
 -- * 当前道具是否满足装备要求：包括身法，体型，门派，性别，等级，根骨，力量，体质
 function LIB.DoesEquipmentSuit(item, bIsItem, player)
 	if not player then
