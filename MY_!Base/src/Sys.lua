@@ -1057,88 +1057,88 @@ end
 end
 
 do
-local l_tBoolValues = {
-	['MY_ChatSwitch_DisplayPanel'] = 0,
-	['MY_ChatSwitch_LockPostion'] = 1,
-	['MY_Recount_Enable'] = 2,
-	['MY_ChatSwitch_CH1'] = 3,
-	['MY_ChatSwitch_CH2'] = 4,
-	['MY_ChatSwitch_CH3'] = 5,
-	['MY_ChatSwitch_CH4'] = 6,
-	['MY_ChatSwitch_CH5'] = 7,
-	['MY_ChatSwitch_CH6'] = 8,
-	['MY_ChatSwitch_CH7'] = 9,
-	['MY_ChatSwitch_CH8'] = 10,
-	['MY_ChatSwitch_CH9'] = 11,
-	['MY_ChatSwitch_CH10'] = 12,
-	['MY_ChatSwitch_CH11'] = 13,
-	['MY_ChatSwitch_CH12'] = 14,
-	['MY_ChatSwitch_CH13'] = 15,
-	['MY_ChatSwitch_CH14'] = 16,
-	['MY_ChatSwitch_CH15'] = 17,
-	['MY_ChatSwitch_CH16'] = 18,
-}
-local l_watches = {}
-local BIT_NUMBER = 8
+	local l_tBoolValues = {
+		['MY_ChatSwitch_DisplayPanel'] = 0,
+		['MY_ChatSwitch_LockPostion'] = 1,
+		['MY_Recount_Enable'] = 2,
+		['MY_ChatSwitch_CH1'] = 3,
+		['MY_ChatSwitch_CH2'] = 4,
+		['MY_ChatSwitch_CH3'] = 5,
+		['MY_ChatSwitch_CH4'] = 6,
+		['MY_ChatSwitch_CH5'] = 7,
+		['MY_ChatSwitch_CH6'] = 8,
+		['MY_ChatSwitch_CH7'] = 9,
+		['MY_ChatSwitch_CH8'] = 10,
+		['MY_ChatSwitch_CH9'] = 11,
+		['MY_ChatSwitch_CH10'] = 12,
+		['MY_ChatSwitch_CH11'] = 13,
+		['MY_ChatSwitch_CH12'] = 14,
+		['MY_ChatSwitch_CH13'] = 15,
+		['MY_ChatSwitch_CH14'] = 16,
+		['MY_ChatSwitch_CH15'] = 17,
+		['MY_ChatSwitch_CH16'] = 18,
+	}
+	local l_watches = {}
+	local BIT_NUMBER = 8
 
-local function OnStorageChange(szKey)
-	if not l_watches[szKey] then
-		return
-	end
-	local oVal = LIB.GetStorage(szKey)
-	for _, fnAction in ipairs(l_watches[szKey]) do
-		fnAction(oVal)
-	end
-end
-
-function LIB.SetStorage(szKey, oVal)
-	local szPriKey, szSubKey = szKey
-	local nPos = StringFindW(szKey, '.')
-	if nPos then
-		szSubKey = string.sub(szKey, nPos + 1)
-		szPriKey = string.sub(szKey, 1, nPos - 1)
-	end
-	if szPriKey == 'BoolValues' then
-		local nBitPos = l_tBoolValues[szSubKey]
-		if not nBitPos then
+	local function OnStorageChange(szKey)
+		if not l_watches[szKey] then
 			return
 		end
-		local nPos = math.floor(nBitPos / BIT_NUMBER)
-		local nOffset = BIT_NUMBER - nBitPos % BIT_NUMBER - 1
-		local nByte = GetAddonCustomData('MY', nPos, 1)
-		local nBit = math.floor(nByte / math.pow(2, nOffset)) % 2
-		if (nBit == 1) == (not not oVal) then
-			return
+		local oVal = LIB.GetStorage(szKey)
+		for _, fnAction in ipairs(l_watches[szKey]) do
+			fnAction(oVal)
 		end
-		nByte = nByte + (nBit == 1 and -1 or 1) * math.pow(2, nOffset)
-		SetAddonCustomData('MY', nPos, 1, nByte)
-	elseif szPriKey == 'FrameAnchor' then
-		return SetOnlineFrameAnchor(szSubKey, oVal)
 	end
-	OnStorageChange(szKey)
-end
 
-function LIB.GetStorage(szKey)
-	local szPriKey, szSubKey = szKey
-	local nPos = StringFindW(szKey, '.')
-	if nPos then
-		szSubKey = string.sub(szKey, nPos + 1)
-		szPriKey = string.sub(szKey, 1, nPos - 1)
-	end
-	if szPriKey == 'BoolValues' then
-		local nBitPos = l_tBoolValues[szSubKey]
-		if not nBitPos then
-			return
+	function LIB.SetStorage(szKey, oVal)
+		local szPriKey, szSubKey = szKey
+		local nPos = StringFindW(szKey, '.')
+		if nPos then
+			szSubKey = string.sub(szKey, nPos + 1)
+			szPriKey = string.sub(szKey, 1, nPos - 1)
 		end
-		local nPos = math.floor(nBitPos / BIT_NUMBER)
-		local nOffset = BIT_NUMBER - nBitPos % BIT_NUMBER - 1
-		local nByte = GetAddonCustomData('MY', nPos, 1)
-		local nBit = math.floor(nByte / math.pow(2, nOffset)) % 2
-		return nBit == 1
-	elseif szPriKey == 'FrameAnchor' then
-		return GetOnlineFrameAnchor(szSubKey)
+		if szPriKey == 'BoolValues' then
+			local nBitPos = l_tBoolValues[szSubKey]
+			if not nBitPos then
+				return
+			end
+			local nPos = math.floor(nBitPos / BIT_NUMBER)
+			local nOffset = BIT_NUMBER - nBitPos % BIT_NUMBER - 1
+			local nByte = GetAddonCustomData('MY', nPos, 1)
+			local nBit = math.floor(nByte / math.pow(2, nOffset)) % 2
+			if (nBit == 1) == (not not oVal) then
+				return
+			end
+			nByte = nByte + (nBit == 1 and -1 or 1) * math.pow(2, nOffset)
+			SetAddonCustomData('MY', nPos, 1, nByte)
+		elseif szPriKey == 'FrameAnchor' then
+			return SetOnlineFrameAnchor(szSubKey, oVal)
+		end
+		OnStorageChange(szKey)
 	end
-end
+
+	function LIB.GetStorage(szKey)
+		local szPriKey, szSubKey = szKey
+		local nPos = StringFindW(szKey, '.')
+		if nPos then
+			szSubKey = string.sub(szKey, nPos + 1)
+			szPriKey = string.sub(szKey, 1, nPos - 1)
+		end
+		if szPriKey == 'BoolValues' then
+			local nBitPos = l_tBoolValues[szSubKey]
+			if not nBitPos then
+				return
+			end
+			local nPos = math.floor(nBitPos / BIT_NUMBER)
+			local nOffset = BIT_NUMBER - nBitPos % BIT_NUMBER - 1
+			local nByte = GetAddonCustomData('MY', nPos, 1)
+			local nBit = math.floor(nByte / math.pow(2, nOffset)) % 2
+			return nBit == 1
+		elseif szPriKey == 'FrameAnchor' then
+			return GetOnlineFrameAnchor(szSubKey)
+		end
+	end
 
 function LIB.WatchStorage(szKey, fnAction)
 	if not l_watches[szKey] then
@@ -1219,7 +1219,7 @@ local function RegisterMenu(aList, tKey, arg0, arg1)
 	return szKey
 end
 
-local function GenerateMenu(aList, bMainMenu)
+local function GenerateMenu(aList, bMainMenu, dwTarType, dwTarID)
 	local menu = {}
 	if bMainMenu then
 		menu = {
@@ -1239,7 +1239,7 @@ local function GenerateMenu(aList, bMainMenu)
 	for _, p in ipairs(aList) do
 		local m = p.oMenu
 		if IsFunction(m) then
-			m = m()
+			m = m(dwTarType, dwTarID)
 		end
 		if not m or m.szOption then
 			m = {m}
@@ -1267,8 +1267,8 @@ local PLAYER_MENU, PLAYER_MENU_HASH = {}, {} -- 玩家头像菜单
 function LIB.RegisterPlayerAddonMenu(arg0, arg1)
 	return RegisterMenu(PLAYER_MENU, PLAYER_MENU_HASH, arg0, arg1)
 end
-local function GetPlayerAddonMenu()
-	return GenerateMenu(PLAYER_MENU, true)
+local function GetPlayerAddonMenu(dwTarID, dwTarType)
+	return GenerateMenu(PLAYER_MENU, true, dwTarType, dwTarID)
 end
 Player_AppendAddonMenu({GetPlayerAddonMenu})
 end
@@ -1285,8 +1285,8 @@ local TRACE_MENU, TRACE_MENU_HASH = {}, {} -- 工具栏菜单
 function LIB.RegisterTraceButtonAddonMenu(arg0, arg1)
 	return RegisterMenu(TRACE_MENU, TRACE_MENU_HASH, arg0, arg1)
 end
-function LIB.GetTraceButtonAddonMenu()
-	return GenerateMenu(TRACE_MENU, true)
+function LIB.GetTraceButtonAddonMenu(dwTarID, dwTarType)
+	return GenerateMenu(TRACE_MENU, true, dwTarType, dwTarID)
 end
 TraceButton_AppendAddonMenu({LIB.GetTraceButtonAddonMenu})
 end
@@ -1303,8 +1303,8 @@ local TARGET_MENU, TARGET_MENU_HASH = {}, {} -- 目标头像菜单
 function LIB.RegisterTargetAddonMenu(arg0, arg1)
 	return RegisterMenu(TARGET_MENU, TARGET_MENU_HASH, arg0, arg1)
 end
-local function GetTargetAddonMenu()
-	return GenerateMenu(TARGET_MENU, false)
+local function GetTargetAddonMenu(dwTarID, dwTarType)
+	return GenerateMenu(TARGET_MENU, false, dwTarType, dwTarID)
 end
 Target_AppendAddonMenu({GetTargetAddonMenu})
 end
