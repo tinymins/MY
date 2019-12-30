@@ -1057,88 +1057,136 @@ end
 end
 
 do
-	local l_tBoolValues = {
-		['MY_ChatSwitch_DisplayPanel'] = 0,
-		['MY_ChatSwitch_LockPostion'] = 1,
-		['MY_Recount_Enable'] = 2,
-		['MY_ChatSwitch_CH1'] = 3,
-		['MY_ChatSwitch_CH2'] = 4,
-		['MY_ChatSwitch_CH3'] = 5,
-		['MY_ChatSwitch_CH4'] = 6,
-		['MY_ChatSwitch_CH5'] = 7,
-		['MY_ChatSwitch_CH6'] = 8,
-		['MY_ChatSwitch_CH7'] = 9,
-		['MY_ChatSwitch_CH8'] = 10,
-		['MY_ChatSwitch_CH9'] = 11,
-		['MY_ChatSwitch_CH10'] = 12,
-		['MY_ChatSwitch_CH11'] = 13,
-		['MY_ChatSwitch_CH12'] = 14,
-		['MY_ChatSwitch_CH13'] = 15,
-		['MY_ChatSwitch_CH14'] = 16,
-		['MY_ChatSwitch_CH15'] = 17,
-		['MY_ChatSwitch_CH16'] = 18,
-	}
-	local l_watches = {}
-	local BIT_NUMBER = 8
+-- total bytes: 32
+-- 0 - 3 BoolValues
+-- 4 - 7 MY_Love dwID
+-- 8 - 11 MY_Love nTime
+-- 12/0 - 12/3 MY_Love bDouble
+-- 12/4 - 12/7 MY_Love crc
+local l_tBoolValues = {
+	['MY_ChatSwitch_DisplayPanel'] = 0,
+	['MY_ChatSwitch_LockPostion'] = 1,
+	['MY_Recount_Enable'] = 2,
+	['MY_ChatSwitch_CH1'] = 3,
+	['MY_ChatSwitch_CH2'] = 4,
+	['MY_ChatSwitch_CH3'] = 5,
+	['MY_ChatSwitch_CH4'] = 6,
+	['MY_ChatSwitch_CH5'] = 7,
+	['MY_ChatSwitch_CH6'] = 8,
+	['MY_ChatSwitch_CH7'] = 9,
+	['MY_ChatSwitch_CH8'] = 10,
+	['MY_ChatSwitch_CH9'] = 11,
+	['MY_ChatSwitch_CH10'] = 12,
+	['MY_ChatSwitch_CH11'] = 13,
+	['MY_ChatSwitch_CH12'] = 14,
+	['MY_ChatSwitch_CH13'] = 15,
+	['MY_ChatSwitch_CH14'] = 16,
+	['MY_ChatSwitch_CH15'] = 17,
+	['MY_ChatSwitch_CH16'] = 18,
+}
+local l_watches = {}
+local BIT_NUMBER = 8
 
-	local function OnStorageChange(szKey)
-		if not l_watches[szKey] then
+local function OnStorageChange(szKey)
+	if not l_watches[szKey] then
+		return
+	end
+	local oVal = LIB.GetStorage(szKey)
+	for _, fnAction in ipairs(l_watches[szKey]) do
+		fnAction(oVal)
+	end
+end
+
+function LIB.SetStorage(szKey, ...)
+	local szPriKey, szSubKey = szKey
+	local nPos = StringFindW(szKey, '.')
+	if nPos then
+		szSubKey = string.sub(szKey, nPos + 1)
+		szPriKey = string.sub(szKey, 1, nPos - 1)
+	end
+	if szPriKey == 'BoolValues' then
+		local nBitPos = l_tBoolValues[szSubKey]
+		if not nBitPos then
 			return
 		end
-		local oVal = LIB.GetStorage(szKey)
-		for _, fnAction in ipairs(l_watches[szKey]) do
-			fnAction(oVal)
+		local oVal = ...
+		local nPos = math.floor(nBitPos / BIT_NUMBER)
+		local nOffset = BIT_NUMBER - nBitPos % BIT_NUMBER - 1
+		local nByte = GetAddonCustomData('MY', nPos, 1)
+		local nBit = math.floor(nByte / math.pow(2, nOffset)) % 2
+		if (nBit == 1) == (not not oVal) then
+			return
 		end
+		nByte = nByte + (nBit == 1 and -1 or 1) * math.pow(2, nOffset)
+		SetAddonCustomData('MY', nPos, 1, nByte)
+	elseif szPriKey == 'FrameAnchor' then
+		local anchor = ...
+		return SetOnlineFrameAnchor(szSubKey, anchor)
+	elseif szPriKey == 'MY_Love' then
+		local dwID, nTime, nType = ...
+		assert(dwID <= 0xffffffff, 'Value of dwID out of 32bit unsigned int range!')
+		assert(nTime <= 0xffffffff, 'Value of nTime out of 32bit unsigned int range!')
+		assert(nType <= 0xf, 'Value of nTime out of range 0 - 15!')
+		local aByte, nCrc = {0, 0, 0, 0, 0, 0, 0, 0}, 6
+		for i = 1, 4 do
+			aByte[i] = LIB.NumberBitAnd(dwID, 0xff)
+			nCrc = LIB.NumberBitXor(nCrc, aByte[i])
+			dwID = LIB.NumberBitShr(dwID, 8)
+		end
+		for i = 5, 8 do
+			aByte[i] = LIB.NumberBitAnd(nTime, 0xff)
+			nCrc = LIB.NumberBitXor(nCrc, aByte[i])
+			nTime = LIB.NumberBitShr(nTime, 8)
+		end
+		nCrc = LIB.NumberBitXor(nCrc, nType)
+		nCrc = LIB.NumberBitXor(LIB.NumberBitAnd(nCrc, 0xf), LIB.NumberBitShr(nCrc, 4))
+		aByte[9] = LIB.NumberBitOr(LIB.NumberBitShl(nType, 4), nCrc)
+		SetAddonCustomData('MY', 4, 9, unpack(aByte))
 	end
+	OnStorageChange(szKey)
+end
 
-	function LIB.SetStorage(szKey, oVal)
-		local szPriKey, szSubKey = szKey
-		local nPos = StringFindW(szKey, '.')
-		if nPos then
-			szSubKey = string.sub(szKey, nPos + 1)
-			szPriKey = string.sub(szKey, 1, nPos - 1)
-		end
-		if szPriKey == 'BoolValues' then
-			local nBitPos = l_tBoolValues[szSubKey]
-			if not nBitPos then
-				return
-			end
-			local nPos = math.floor(nBitPos / BIT_NUMBER)
-			local nOffset = BIT_NUMBER - nBitPos % BIT_NUMBER - 1
-			local nByte = GetAddonCustomData('MY', nPos, 1)
-			local nBit = math.floor(nByte / math.pow(2, nOffset)) % 2
-			if (nBit == 1) == (not not oVal) then
-				return
-			end
-			nByte = nByte + (nBit == 1 and -1 or 1) * math.pow(2, nOffset)
-			SetAddonCustomData('MY', nPos, 1, nByte)
-		elseif szPriKey == 'FrameAnchor' then
-			return SetOnlineFrameAnchor(szSubKey, oVal)
-		end
-		OnStorageChange(szKey)
+function LIB.GetStorage(szKey)
+	local szPriKey, szSubKey = szKey
+	local nPos = StringFindW(szKey, '.')
+	if nPos then
+		szSubKey = string.sub(szKey, nPos + 1)
+		szPriKey = string.sub(szKey, 1, nPos - 1)
 	end
-
-	function LIB.GetStorage(szKey)
-		local szPriKey, szSubKey = szKey
-		local nPos = StringFindW(szKey, '.')
-		if nPos then
-			szSubKey = string.sub(szKey, nPos + 1)
-			szPriKey = string.sub(szKey, 1, nPos - 1)
+	if szPriKey == 'BoolValues' then
+		local nBitPos = l_tBoolValues[szSubKey]
+		if not nBitPos then
+			return
 		end
-		if szPriKey == 'BoolValues' then
-			local nBitPos = l_tBoolValues[szSubKey]
-			if not nBitPos then
-				return
-			end
-			local nPos = math.floor(nBitPos / BIT_NUMBER)
-			local nOffset = BIT_NUMBER - nBitPos % BIT_NUMBER - 1
-			local nByte = GetAddonCustomData('MY', nPos, 1)
-			local nBit = math.floor(nByte / math.pow(2, nOffset)) % 2
-			return nBit == 1
-		elseif szPriKey == 'FrameAnchor' then
-			return GetOnlineFrameAnchor(szSubKey)
+		local nPos = math.floor(nBitPos / BIT_NUMBER)
+		local nOffset = BIT_NUMBER - nBitPos % BIT_NUMBER - 1
+		local nByte = GetAddonCustomData('MY', nPos, 1)
+		local nBit = math.floor(nByte / math.pow(2, nOffset)) % 2
+		return nBit == 1
+	elseif szPriKey == 'FrameAnchor' then
+		return GetOnlineFrameAnchor(szSubKey)
+	elseif szPriKey == 'MY_Love' then
+		local dwID, nTime, nType, nCrc = 0, 0, 0, 6
+		local aByte = {GetAddonCustomData('MY', 4, 9)}
+		nType = LIB.NumberBitShr(aByte[9], 4)
+		for i = 4, 1, -1 do
+			dwID = LIB.NumberBitShl(dwID, 8)
+			nCrc = LIB.NumberBitXor(nCrc, aByte[i])
+			dwID = LIB.NumberBitOr(dwID, aByte[i])
 		end
+		for i = 8, 5, -1 do
+			nTime = LIB.NumberBitShl(nTime, 8)
+			nCrc = LIB.NumberBitXor(nCrc, aByte[i])
+			nTime = LIB.NumberBitOr(nTime, aByte[i])
+		end
+		nCrc = LIB.NumberBitXor(nCrc, nType)
+		nCrc = LIB.NumberBitXor(LIB.NumberBitAnd(nCrc, 0xf), LIB.NumberBitShr(nCrc, 4))
+		if nCrc == LIB.NumberBitAnd(aByte[9], 0xf) then
+			return dwID, nTime, nType
+		end
+		return 0, 0, 0
 	end
+end
 
 function LIB.WatchStorage(szKey, fnAction)
 	if not l_watches[szKey] then
