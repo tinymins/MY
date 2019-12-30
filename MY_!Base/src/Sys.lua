@@ -652,7 +652,7 @@ local function FormatDataStructure(data, struct, assign, metaSymbol)
 		if dataType == 'table' and arrayTemplate then
 			for i, v in pairs(data) do
 				if type(i) == 'number' then
-					if not skipKeys[k] then
+					if not skipKeys[i] then
 						keys[i] = true
 						data[i] = FormatDataStructure(data[i], arrayTemplate, true, metaSymbol)
 					end
@@ -1371,7 +1371,7 @@ function LIB.RegisterAddonMenu(...)
 end
 
 -- 格式化计时时间
--- (string) LIB.FormatTimeCounter(nTime, szFormat)
+-- (string) LIB.FormatTimeCounter(nTime, szFormat, nStyle)
 -- szFormat  格式化字符串 可选项：
 --   %H 总小时
 --   %M 总分钟
@@ -1382,7 +1382,7 @@ end
 --   %hh 小时数两位对齐
 --   %mm 分钟数两位对齐
 --   %ss 秒钟数两位对齐
-function LIB.FormatTimeCounter(nTime, szFormat)
+function LIB.FormatTimeCounter(nTime, szFormat, nStyle)
 	local nSeconds = floor(nTime)
 	local nMinutes = floor(nSeconds / 60)
 	local nHours   = floor(nMinutes / 60)
@@ -1878,7 +1878,7 @@ local function RenameDatabase(szCaption, szPath)
 	return szMalformedPath
 end
 
-local function DuplicateDatabase(DB_SRC, DB_DST)
+local function DuplicateDatabase(DB_SRC, DB_DST, szCaption)
 	--[[#DEBUG BEGIN]]
 	LIB.Debug(szCaption, 'Duplicate database start.', DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
@@ -1937,7 +1937,7 @@ local function ConnectMalformedDatabase(szCaption, szPath, bAlert)
 		local DB_DST = SQLite3_Open(szPath)
 		local DB_SRC = SQLite3_Open(szMalformedPath)
 		if DB_DST and DB_SRC then
-			DuplicateDatabase(DB_SRC, DB_DST)
+			DuplicateDatabase(DB_SRC, DB_DST, szCaption)
 			DB_SRC:Release()
 			CPath.DelFile(szMalformedPath)
 			--[[#DEBUG BEGIN]]
@@ -2192,132 +2192,110 @@ function LIB.GeneGlobalNS(options)
 end
 end
 
-if IsFunction(EditBox_AppendLinkPlayer) then
-	LIB.EditBox_AppendLinkPlayer = EditBox_AppendLinkPlayer
-else
-	function LIB.EditBox_AppendLinkPlayer(szName)
-		local edit = Station.Lookup('Lowest2/EditBox/Edit_Input')
-		edit:InsertObj('['.. szName ..']', { type = 'name', text = '['.. szName ..']', name = szName })
-		Station.SetFocusWindow(edit)
-		return true
-	end
+function LIB.EditBox_AppendLinkPlayer(szName)
+	local edit = Station.Lookup('Lowest2/EditBox/Edit_Input')
+	edit:InsertObj('['.. szName ..']', { type = 'name', text = '['.. szName ..']', name = szName })
+	Station.SetFocusWindow(edit)
+	return true
 end
 
-if IsFunction(EditBox_AppendLinkItem) then
-	LIB.EditBox_AppendLinkItem = EditBox_AppendLinkItem
-else
-	function LIB.EditBox_AppendLinkItem(dwID)
-		local item = GetItem(dwID)
-		if not item then
-			return false
-		end
-		local szName = '[' .. LIB.GetItemNameByItem(item) ..']'
-		local edit = Station.Lookup('Lowest2/EditBox/Edit_Input')
-		edit:InsertObj(szName, { type = 'item', text = szName, item = item.dwID })
-		Station.SetFocusWindow(edit)
-		return true
+function LIB.EditBox_AppendLinkItem(dwID)
+	local item = GetItem(dwID)
+	if not item then
+		return false
 	end
+	local szName = '[' .. LIB.GetItemNameByItem(item) ..']'
+	local edit = Station.Lookup('Lowest2/EditBox/Edit_Input')
+	edit:InsertObj(szName, { type = 'item', text = szName, item = item.dwID })
+	Station.SetFocusWindow(edit)
+	return true
 end
 
-if IsFunction(FORMAT_WMSG_RET) then
-	LIB.FORMAT_WMSG_RET = FORMAT_WMSG_RET
-else
-	function LIB.FORMAT_WMSG_RET(stop, callFrame)
-		local ret = 0
-		if stop then
-			ret = ret + 1 --01
-		end
-		if callFrame then
-			ret = ret + 2 --10
-		end
-		return ret
+function LIB.FORMAT_WMSG_RET(stop, callFrame)
+	local ret = 0
+	if stop then
+		ret = ret + 1 --01
 	end
+	if callFrame then
+		ret = ret + 2 --10
+	end
+	return ret
 end
 
 -------------------------------------------
 -- 语音相关 API
 -------------------------------------------
 
-if IsFunction(GVoiceBase_IsOpen) then
-	LIB.GVoiceBase_IsOpen = GVoiceBase_IsOpen
-else
-	function LIB.GVoiceBase_IsOpen()
-		return false
+function LIB.GVoiceBase_IsOpen(...)
+	if IsFunction(_G.GVoiceBase_IsOpen) then
+		return _G.GVoiceBase_IsOpen(...)
+	end
+	return false
+end
+
+function LIB.GVoiceBase_GetMicState(...)
+	if IsFunction(_G.GVoiceBase_GetMicState) then
+		return _G.GVoiceBase_GetMicState(...)
+	end
+	return MIC_STATE.CLOSE_NOT_IN_ROOM
+end
+
+function LIB.GVoiceBase_SwitchMicState(...)
+	if IsFunction(_G.GVoiceBase_SwitchMicState) then
+		return _G.GVoiceBase_SwitchMicState(...)
 	end
 end
 
-if IsFunction(GVoiceBase_GetMicState) then
-	LIB.GVoiceBase_GetMicState = GVoiceBase_GetMicState
-else
-	function LIB.GVoiceBase_GetMicState()
-		return MIC_STATE.CLOSE_NOT_IN_ROOM
+function LIB.GVoiceBase_CheckMicState(...)
+	if IsFunction(_G.GVoiceBase_CheckMicState) then
+		return _G.GVoiceBase_CheckMicState(...)
 	end
 end
 
-if IsFunction(GVoiceBase_SwitchMicState) then
-	LIB.GVoiceBase_SwitchMicState = GVoiceBase_SwitchMicState
-else
-	function LIB.GVoiceBase_SwitchMicState()
+function LIB.GVoiceBase_GetSpeakerState(...)
+	if IsFunction(_G.GVoiceBase_GetSpeakerState) then
+		return _G.GVoiceBase_GetSpeakerState(...)
+	end
+	return CONSTANT.SPEAKER_STATE.CLOSE
+end
+
+function LIB.GVoiceBase_SwitchSpeakerState(...)
+	if IsFunction(_G.GVoiceBase_SwitchSpeakerState) then
+		return _G.GVoiceBase_SwitchSpeakerState(...)
 	end
 end
 
-if IsFunction(GVoiceBase_CheckMicState) then
-	LIB.GVoiceBase_CheckMicState = GVoiceBase_CheckMicState
-else
-	function LIB.GVoiceBase_CheckMicState()
+function LIB.GVoiceBase_GetSaying(...)
+	if IsFunction(_G.GVoiceBase_GetSaying) then
+		return _G.GVoiceBase_GetSaying(...)
+	end
+	return {}
+end
+
+function LIB.GVoiceBase_IsMemberSaying(...)
+	if IsFunction(_G.GVoiceBase_IsMemberSaying) then
+		return _G.GVoiceBase_IsMemberSaying(...)
+	end
+	return false
+end
+
+function LIB.GVoiceBase_IsMemberForbid(...)
+	if IsFunction(_G.GVoiceBase_IsMemberForbid) then
+		return _G.GVoiceBase_IsMemberForbid(...)
+	end
+	return false
+end
+
+function LIB.GVoiceBase_ForbidMember(...)
+	if IsFunction(_G.GVoiceBase_ForbidMember) then
+		return _G.GVoiceBase_ForbidMember(...)
 	end
 end
 
-if IsFunction(GVoiceBase_GetSpeakerState) then
-	LIB.GVoiceBase_GetSpeakerState = GVoiceBase_GetSpeakerState
-else
-	function LIB.GVoiceBase_GetSpeakerState()
-		return CONSTANT.SPEAKER_STATE.CLOSE
-	end
-end
-
-if IsFunction(GVoiceBase_SwitchSpeakerState) then
-	LIB.GVoiceBase_SwitchSpeakerState = GVoiceBase_SwitchSpeakerState
-else
-	function LIB.GVoiceBase_SwitchSpeakerState()
-	end
-end
-
-if IsFunction(GVoiceBase_GetSaying) then
-	LIB.GVoiceBase_GetSaying = GVoiceBase_GetSaying
-else
-	function LIB.GVoiceBase_GetSaying()
-		return {}
-	end
-end
-
-if IsFunction(GVoiceBase_IsMemberSaying) then
-	LIB.GVoiceBase_IsMemberSaying = GVoiceBase_IsMemberSaying
-else
-	function LIB.GVoiceBase_IsMemberSaying(dwMemberID, sayingInfo)
-		return false
-	end
-end
-
-if IsFunction(GVoiceBase_IsMemberForbid) then
-	LIB.GVoiceBase_IsMemberForbid = GVoiceBase_IsMemberForbid
-else
-	function LIB.GVoiceBase_IsMemberForbid(dwMemberID)
-		return false
-	end
-end
-
-if IsFunction(GVoiceBase_ForbidMember) then
-	LIB.GVoiceBase_ForbidMember = GVoiceBase_ForbidMember
-else
-	function LIB.GVoiceBase_ForbidMember(dwMemberID, Forbid)
-	end
-end
-
-if Login_GetTimeOfFee then
+if _G.Login_GetTimeOfFee then
 	function LIB.GetTimeOfFee()
 		-- [仅客户端使用]返回帐号月卡截止时间，计点剩余秒数，计天剩余秒数和总截止时间
-		local dwMonthEndTime, nPointLeftTime, nDayLeftTime, dwEndTime = Login_GetTimeOfFee()
+		local dwMonthEndTime, nPointLeftTime, nDayLeftTime, dwEndTime = _G.Login_GetTimeOfFee()
 		if dwMonthEndTime <= 1229904000 then
 			dwMonthEndTime = 0
 		end
@@ -2368,8 +2346,8 @@ end
 do
 local KEY = wgsub(wgsub(PACKET_INFO.ROOT, './', ''), '\\', '/'):lower()
 local FILE_PATH = {'temporary/lua_error.jx3dat', PATH_TYPE.GLOBAL}
-local LAST_ERROR_MSG = LIB.LoadLUAData(FILE_PATH, ERROR_MSG, { passphrase = false }) or {}
-local LAST_ERROR_MSG, ERROR_MSG = {}, {}
+local LAST_ERROR_MSG = LIB.LoadLUAData(FILE_PATH, { passphrase = false }) or {}
+local ERROR_MSG = {}
 local function SaveErrorMessage()
 	LIB.SaveLUAData(FILE_PATH, ERROR_MSG, { passphrase = false, crc = false, indent = '\t' })
 end
