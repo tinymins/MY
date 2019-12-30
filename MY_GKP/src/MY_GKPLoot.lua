@@ -952,9 +952,9 @@ local function IsItemRequireConfirm(data)
 	)
 	or (MY_GKP_Loot.tConfirm.Book and data.item.nGenre == ITEM_GENRE.BOOK) --  ÈºÆ
 	or (MY_GKP_Loot.tConfirm.Pendant and data.item.nGenre == ITEM_GENRE.EQUIPMENT and ( -- π“º˛
-		data.item.nSub == WAIST_EXTEND
-		or data.item.nSub == BACK_EXTEND
-		or data.item.nSub == FACE_EXTEND
+		data.item.nSub == EQUIPMENT_REPRESENT.WAIST_EXTEND
+		or data.item.nSub == EQUIPMENT_REPRESENT.BACK_EXTEND
+		or data.item.nSub == EQUIPMENT_REPRESENT.FACE_EXTEND
 	))
 	or (MY_GKP_Loot.tConfirm.Outlook and data.item.nGenre == ITEM_GENRE.EQUIPMENT and ( -- ºÁ Œ≈˚∑Á
 		data.item.nSub == CONSTANT.EQUIPMENT_SUB.BACK_CLOAK_EXTEND
@@ -976,9 +976,8 @@ local function IsItemRequireConfirm(data)
 	end
 	return false
 end
-local function GetMemberMenu(member, aItemData, szAutoDistType)
+local function GetMemberMenu(member, aItemData, szAutoDistType, aDoodadID)
 	local frame = Loot.GetFrame()
-	local wnd = Loot.GetDoodadWnd(frame, dwDoodadID)
 	local szIcon, nFrame = GetForceImage(member.dwForceID)
 	local szOption = member.szName
 	return {
@@ -987,7 +986,12 @@ local function GetMemberMenu(member, aItemData, szAutoDistType)
 		rgb = { LIB.GetForceColor(member.dwForceID) },
 		szIcon = szIcon, nFrame = nFrame,
 		fnAutoClose = function()
-			return not wnd or not wnd:IsValid()
+			for _, v in ipairs(aDoodadID) do
+				if Loot.GetDoodadWnd(frame, v) then
+					return false
+				end
+			end
+			return true
 		end,
 		szLayer = 'ICON_RIGHTMOST',
 		fnAction = function()
@@ -1039,13 +1043,13 @@ function Loot.GetDistributeMenu(aItemData, szAutoDistType)
 		if dwAutoDistID then
 			local member = aPartyMember(dwAutoDistID)
 			if member then
-				table.insert(menu, GetMemberMenu(member, aItemData, szAutoDistType))
+				table.insert(menu, GetMemberMenu(member, aItemData, szAutoDistType, aDoodadID))
 				table.insert(menu, { bDevide = true })
 			end
 		end
 	end
 	for _, member in ipairs(aPartyMember) do
-		table.insert(menu, GetMemberMenu(member, aItemData, szAutoDistType))
+		table.insert(menu, GetMemberMenu(member, aItemData, szAutoDistType, aDoodadID))
 	end
 	return menu
 end
