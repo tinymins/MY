@@ -135,7 +135,7 @@ function PS.OnPanelActive(wnd)
 		-- show lover
 		nX = X + 10
 		nX = ui:Append('Text', { text = lover.szName, font = 19, x = nX, y = nY, r = 255, g = 128, b = 255 }):AutoWidth():Pos('BOTTOMRIGHT')
-		local map = LIB.GetMapInfo(lover.dwMapID)
+		local map = lover.bOnline and LIB.GetMapInfo(lover.dwMapID)
 		if map and map.szName then
 			ui:Append('Text', { text = '(' .. g_tStrings.STR_GUILD_ONLINE .. ': ' .. map.szName .. ')', font = 80, x= nX + 10, y = nY })
 		else

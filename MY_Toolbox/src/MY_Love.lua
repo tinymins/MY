@@ -589,6 +589,7 @@ local function OnPlayerFellowshipLogin()
 		else
 			D.OutputLoverMsg(_L('Warm tip: Your %s Lover %s offline, hurry doing like doing.', D.GetLoverType(), O.lover.szName))
 		end
+		GetClientPlayer().UpdateFellowshipInfo()
 	end
 end
 LIB.RegisterEvent('PLAYER_FELLOWSHIP_LOGIN.MY_Love', OnPlayerFellowshipLogin)
