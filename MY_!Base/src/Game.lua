@@ -3096,10 +3096,18 @@ function LIB.IsTradeLocked()
 end
 
 function LIB.IsTalkLocked()
-	if not _G.SafeLock_IsTalkLocked then
+	local me = GetClientPlayer()
+	if not me.GetSafeLockMaskInfo or not SAFE_LOCK_EFFECT_TYPE then
 		return false
 	end
-	return _G.SafeLock_IsTalkLocked()
+	local tLock = me.GetSafeLockMaskInfo()
+	if tLock then
+		return tLock[SAFE_LOCK_EFFECT_TYPE.TALK]
+	end
+	if _G.SafeLock_IsTalkLocked then
+		return _G.SafeLock_IsTalkLocked()
+	end
+	return false
 end
 
 -- * 当前道具是否满足装备要求：包括身法，体型，门派，性别，等级，根骨，力量，体质
