@@ -327,28 +327,29 @@ function D.RemoveLover()
 	if LIB.IsTradeLocked() or LIB.IsTalkLocked() then
 		return LIB.Systopmsg(_L['Remove lover is a sensitive action, please unlock to continue.'])
 	end
-	if O.lover.dwID ~= 0 then
-		local nTime = GetCurrentTime() - O.lover.nLoverTime
+	local lover = Clone(O.lover)
+	if lover.dwID ~= 0 then
+		local nTime = GetCurrentTime() - lover.nLoverTime
 		if nTime < 3600 then
 			return LIB.Alert(_L('Love can not run a red-light, wait for %s left.', D.FormatTimeCounter(3600 - nTime)))
 		end
-		LIB.Confirm(_L('Are you sure to cut love with [%s]?', O.lover.szName), function()
+		LIB.Confirm(_L('Are you sure to cut love with [%s]?', lover.szName), function()
 			LIB.DelayCall(50, function()
 				LIB.Confirm(_L['Past five hundred times looking back only in exchange for a chance encounter this life, you really decided?'], function()
 					LIB.DelayCall(50, function()
 						LIB.Confirm(_L['You do not really want to cut off love it, really sure?'], function()
 							-- 取消情缘
-							if O.lover.nLoverType == 1 then -- 双向则密聊提醒
-								LIB.Talk(O.lover.szName, _L['Sorry, I decided to just a swordman, bye my plugin lover'])
-							elseif O.lover.nLoverType == 0 then -- 单向只通知在线的
-								local aInfo = LIB.GetFriend(O.lover.dwID)
+							if lover.nLoverType == 1 then -- 双向则密聊提醒
+								LIB.Talk(lover.szName, _L['Sorry, I decided to just a swordman, bye my plugin lover'])
+							elseif lover.nLoverType == 0 then -- 单向只通知在线的
+								local aInfo = LIB.GetFriend(lover.dwID)
 								if aInfo and aInfo.isonline then
-									LIB.SendBgMsg(O.lover.szName, 'MY_LOVE', 'REMOVE0')
+									LIB.SendBgMsg(lover.szName, 'MY_LOVE', 'REMOVE0')
 								end
 							end
 							D.SaveLover('', 0, 0, 0)
-							LIB.Talk(PLAYER_TALK_CHANNEL.TONG, _L('A blade and cut, no longer meet with [%s]', O.lover.szName))
-							LIB.Sysmsg(_L['Congratulations, do not repeat the same mistakes ah'])
+							LIB.Talk(PLAYER_TALK_CHANNEL.TONG, _L('A blade and cut, no longer meet with [%s].', lover.szName))
+							LIB.Sysmsg(_L['Congratulations, do not repeat the same mistakes ah.'])
 						end)
 					end)
 				end)
@@ -506,16 +507,26 @@ local function OnBgTalk(_, nChannel, dwTalkerID, szTalkerName, bSelf, ...)
 				local aInfo = LIB.GetFriend(dwTalkerID)
 				if aInfo then
 					LIB.Confirm(_L('[%s] want to repair love relation with you, OK?', szTalkerName), function()
+						if LIB.IsTradeLocked() or LIB.IsTalkLocked() then
+							LIB.Systopmsg(_L['Fix lover is a sensitive action, please unlock to continue.'])
+							return false
+						end
 						D.SaveLover(szTalkerName, dwTalkerID, 1, tonumber(data))
 						LIB.Systopmsg(_L('Congratulations, love relation with [%s] has been fixed!', szTalkerName))
 					end)
 				end
+			elseif O.lover.dwID == dwTalkerID then
+				LIB.SendBgMsg(szTalkerName, 'MY_LOVE', 'LOVE_ANS', 'ALREADY')
 			else
 				LIB.SendBgMsg(szTalkerName, 'MY_LOVE', 'LOVE_ANS', 'EXISTS')
 			end
 		elseif szKey == 'LOVE_ANS' then
 			if data == 'EXISTS' then
 				local szMsg = _L['Unfortunately the other has lover, but you can still blind love him!']
+				LIB.Sysmsg(szMsg)
+				LIB.Alert(szMsg)
+			elseif data == 'ALREADY' then
+				local szMsg = _L['The other is already your lover!']
 				LIB.Sysmsg(szMsg)
 				LIB.Alert(szMsg)
 			elseif data == 'NO' then
