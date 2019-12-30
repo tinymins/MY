@@ -373,6 +373,7 @@ return {
 	['Quickset'] = '一键设置',
 	['Manually'] = '手动设置',
 	['Later'] = '以后再说',
+	['BgMsg cannot be send due to talk lock, data will be sent as soon as talk unlocked.'] = '聊天锁已阻止插件通信，数据已暂存等待解锁后重新发送。',
 
 	['Would you like to share serendipity?'] = '是否希望分享世界奇遇公告和自身奇遇到茗伊公共查询？',
 	['Would you like to auto share serendipity?'] = '是否希望自动分享奇遇到茗伊公共查询？',

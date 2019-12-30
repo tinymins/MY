@@ -559,11 +559,42 @@ local MAX_CHANNEL_LEN = setmetatable({
 	[PLAYER_TALK_CHANNEL.RAID] = 500,
 	[PLAYER_TALK_CHANNEL.BATTLE_FIELD] = 500,
 }, { __index = function() return 300 end })
+-- 是否可以发送消息
+local function GetSenderStatus(me)
+	if not me then
+		return 'NO_PLAYER'
+	end
+	if _G.SafeLock_IsTalkLocked and _G.SafeLock_IsTalkLocked() then
+		return 'TALK_LOCK'
+	end
+	return 'READY'
+end
+-- 无法发送时的缓存队列
+local BG_MSG_QUEUE = {}
+local function ProcessQueue()
+	if GetSenderStatus(GetClientPlayer()) ~= 'READY' then
+		return
+	end
+	local v = remove(BG_MSG_QUEUE, 1)
+	if not v then
+		return 0
+	end
+	LIB.SendBgMsg(unpack(v))
+end
 -- LIB.SendBgMsg(szName, szMsgID, ...)
 -- LIB.SendBgMsg(nChannel, szMsgID, ...)
 function LIB.SendBgMsg(nChannel, szMsgID, ...)
 	local szTarget, me = '', GetClientPlayer()
-	if not (me and nChannel) then
+	if not nChannel then
+		return
+	end
+	local szStatus = GetSenderStatus(me)
+	if szStatus ~= 'READY' then
+		if szStatus == 'TALK_LOCK' then
+			LIB.Systopmsg(_L['BgMsg cannot be send due to talk lock, data will be sent as soon as talk unlocked.'])
+		end
+		insert(BG_MSG_QUEUE, { nChannel, szMsgID, ... })
+		LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '#BG_MSG_QUEUE', ProcessQueue)
 		return
 	end
 	-- channel
