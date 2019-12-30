@@ -3401,3 +3401,44 @@ function LIB.UpdateMiniFlag(dwType, tar, nF1, nF2)
 		m:UpdataArrowPoint(dwType, tar.dwID, nF1, nF2 or 48, nX, nZ, 16)
 	end
 end
+
+-- 获取头像文件路径，帧序，是否动画
+function LIB.GetMiniAvatar(dwAvatarID, nRoleType)
+	-- mini avatar
+	local tInfo = g_tTable.RoleAvatar:Search(dwAvatarID)
+	if tInfo then
+		if nRoleType == ROLE_TYPE.STANDARD_MALE then
+			return tInfo.szM2Image, tInfo.nM2ImgFrame, tInfo.bAnimate
+		elseif nRoleType == ROLE_TYPE.STANDARD_FEMALE then
+			return tInfo.szF2Image, tInfo.nF2ImgFrame, tInfo.bAnimate
+		elseif nRoleType == ROLE_TYPE.STRONG_MALE then
+			return tInfo.szM3Image, tInfo.nM3ImgFrame, tInfo.bAnimate
+		elseif nRoleType == ROLE_TYPE.SEXY_FEMALE then
+			return tInfo.szF3Image, tInfo.nF3ImgFrame, tInfo.bAnimate
+		elseif nRoleType == ROLE_TYPE.LITTLE_BOY then
+			return tInfo.szM1Image, tInfo.nM1ImgFrame, tInfo.bAnimate
+		elseif nRoleType == ROLE_TYPE.LITTLE_GIRL then
+			return tInfo.szF1Image, tInfo.nF1ImgFrame, tInfo.bAnimate
+		end
+	end
+end
+
+-- 获取头像文件路径，帧序，是否动画
+function LIB.GetForceAvatar(dwForceID)
+	-- force avatar
+	return unpack(CONSTANT.FORCE_AVATAR[dwForceID])
+end
+
+-- 获取头像文件路径，帧序，是否动画
+function LIB.GetPlayerAvatar(dwForceID, nRoleType, dwAvatarID)
+	local szFile, nFrame, bAnimate
+	-- mini avatar
+	if dwAvatarID and dwAvatarID > 0 then
+		szFile, nFrame, bAnimate = LIB.GetMiniAvatar(dwAvatarID, nRoleType)
+	end
+	-- force avatar
+	if not szFile and dwForceID then
+		szFile, nFrame, bAnimate = LIB.GetForceAvatar(dwForceID)
+	end
+	return szFile, nFrame, bAnimate
+end
