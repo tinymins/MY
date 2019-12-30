@@ -664,7 +664,7 @@ local function XpCallErrorHandler(errMsg)
 end
 function Call(arg0, ...)
 	xpAction, xpArgs, xpErrMsg, xpTraceback = arg0, {...}
-	local res = {xpcall(CallHandler, ErrorHandler)}
+	local res = {xpcall(CallHandler, CallErrorHandler)}
 	if not res[1] then
 		res[2] = xpErrMsg
 		res[3] = xpTraceback
