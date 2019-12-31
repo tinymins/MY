@@ -71,8 +71,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 				local nStepCount = 0 -- 循环计数器
 				local nChannel = O.nGongzhanPublishChannel or PLAYER_TALK_CHANNEL.LOCAL_SYS
 				LIB.RenderCall('MY_GongzhanCheck', function()
-					nStepCount = nStepCount + 1
-					LIB.Topmsg(_L('Scanning gongzhan: %d/%d', nStepCount, nStepCount + #aPendingID + #aProcessID))
+					local bTermial, nStep = false, 0
 					if #aPendingID > 0 then -- 获取下一个有效的扫描目标
 						local dwID = aPendingID[#aPendingID]
 						local tar = GetPlayer(dwID)
@@ -80,6 +79,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 							remove(aPendingID)
 							dwID = aPendingID[#aPendingID]
 							tar = GetPlayer(dwID)
+							nStep = nStep + 1
 						end
 						if tar then
 							local dwType, dwID = LIB.GetTarget()
@@ -88,6 +88,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 							else
 								insert(aProcessID, dwID)
 								remove(aPendingID)
+								nStep = nStep + 1
 							end
 						end
 					elseif #aProcessID > 0 then -- 获取下一个有效的输出目标
@@ -97,6 +98,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 							remove(aProcessID)
 							dwID = aProcessID[#aProcessID]
 							tar = GetPlayer(dwID)
+							nStep = nStep + 1
 						end
 						if tar then
 							local dwType, dwID = LIB.GetTarget()
@@ -115,6 +117,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 									end
 								end
 								remove(aProcessID)
+								nStep = nStep + 1
 							end
 						end
 					else
@@ -125,6 +128,13 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 						LIB.Talk(nChannel, _L('Nearby GongZhan Total Count: %d.', #aGongZhan))
 						LIB.Talk(nChannel, _L['------------------------------------'])
 						LIB.SetTarget(dwTarType, dwTarID)
+						bTermial = true
+					end
+					if nStep > 0 then
+						nStepCount = nStepCount + nStep
+						LIB.Topmsg(_L('Scanning gongzhan: %d/%d', nStepCount, nStepCount + #aPendingID + #aProcessID))
+					end
+					if bTermial then
 						return 0
 					end
 				end)
