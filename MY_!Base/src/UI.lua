@@ -933,7 +933,7 @@ function UI:Slice(startpos, endpos)
 	end
 	endpos = endpos or #self.raws
 	if endpos < 0 then
-		endpos = #raws + endpos + 1
+		endpos = #self.raws + endpos + 1
 	end
 	local raws = {}
 	for i = startpos, endpos, 1 do
@@ -1346,7 +1346,7 @@ function UI:Drag(...)
 			end
 		end
 		return self
-	elseif IsNumber(arg0) or IsNumber(arg1) or IsNumber(nW) or IsNumber(nH) then
+	elseif IsNumber(arg0) or IsNumber(arg1) or IsNumber(arg2) or IsNumber(arg3) then
 		local nX, nY, nW, nH = arg0 or 0, arg1 or 0, arg2, arg3
 		for _, raw in ipairs(self.raws) do
 			if raw:GetType() == 'WndFrame' then
@@ -1519,7 +1519,7 @@ function UI:Autocomplete(method, arg1, arg2)
 					if IsFunction(opt.beforeSearch) then
 						opt.beforeSearch(raw, opt, text)
 					end
-					local needle = opt.ignoreCase and StringLowerW(needle) or text
+					local needle = opt.ignoreCase and StringLowerW(text) or text
 					local aSrc = {}
 					-- get matched list
 					for _, src in ipairs(opt.source) do
@@ -2177,7 +2177,7 @@ function UI:DrawCircle(nX, nY, nRadius, nR, nG, nB, nA, dwPitch, dwRad, nAccurac
 	return self
 end
 
-function UI:DrawGwText(szText, nX ,nY, nZ, nR, nG, nB, nA, nFont, fFontScale, fSpacing)
+function UI:DrawGwText(szText, nX ,nY, nZ, nR, nG, nB, nA, nFont, fFontScale, fSpacing, aDelta)
 	local sha
 	for _, raw in ipairs(self.raws) do
 		sha = GetComponentElement(raw, 'SHADOW')
@@ -2200,7 +2200,7 @@ function UI:DrawGwText(szText, nX ,nY, nZ, nR, nG, nB, nA, nFont, fFontScale, fS
 end
 
 function UI:DrawGwCircle(nX, nY, nZ, nRadius, nR, nG, nB, nA, dwPitch, dwRad)
-	nRadius, dwPitch, dwRad = nRadius or 64 * 3, dwPitch or 0, dwRad or (2 * PI)
+	nRadius, dwPitch, dwRad = nRadius or (64 * 3), dwPitch or 0, dwRad or (2 * PI)
 	nR, nG, nB, nA = nR or 255, nG or 255, nB or 255, nA or 120
 	local sha, dwRad1, dwRad2, nSceneX, nSceneZ, nSceneXD, nSceneZD
 	for _, raw in ipairs(self.raws) do
@@ -4594,7 +4594,7 @@ local function IE_GetNewIEFramePos()
 	end
 	if nLastIndex then
 		local frame = Station.Lookup('Topmost/IE'..nLastIndex)
-		x, y = frame:GetAbsPos()
+		local x, y = frame:GetAbsPos()
 		local wC, hC = Station.GetClientSize()
 		if x + 890 <= wC and y + 630 <= hC then
 			return x + 30, y + 30
@@ -4859,6 +4859,6 @@ function UI.ScrollIntoView(el, scrollY, nOffsetY, scrollX, nOffsetX)
 	end
 end
 
-UI.UpdateItemInfoBoxObject = UpdateItemInfoBoxObject or UpdataItemInfoBoxObject
+UI.UpdateItemInfoBoxObject = _G.UpdateItemInfoBoxObject or UpdataItemInfoBoxObject
 
 LIB.UI = UI
