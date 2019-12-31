@@ -66,7 +66,10 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 				for i = 1, nCount do
 					buff = aBuff[i]
 					if (not buff.bCanCancel) and string.find(Table_GetBuffName(buff.dwID, buff.nLevel), _L['GongZhan']) ~= nil then
-						table.insert(tGongZhans, {p = p, time = (buff.nEndFrame - GetLogicFrameCount()) / 16})
+						local info = Table_GetBuff(buff.dwID, buff.nLevel)
+						if info and info.bShow ~= 0 then
+							table.insert(tGongZhans, {p = p, time = (buff.nEndFrame - GetLogicFrameCount()) / 16})
+						end
 					end
 				end
 			end
