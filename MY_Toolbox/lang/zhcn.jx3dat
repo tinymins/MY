@@ -46,6 +46,7 @@ return {
     ['%d:%d:%d'      ] = '%d:%d:%d',
 
     ['GongZhan'] = '共战',
+    ['Scanning gongzhan: %d/%d'] = '正在扫描共战：%d/%d',
     ['Detected [%s] has GongZhan buff for %s.'] = '检测到[%s]共战BUFF剩余%s。',
     ['Nearby GongZhan Total Count: %d.'] = '附近共战数量：%d。',
     ['------------------------------------'] = '————————————————————————',
