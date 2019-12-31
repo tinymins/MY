@@ -76,7 +76,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 			local nChannel = O.nGongzhanPublishChannel or PLAYER_TALK_CHANNEL.LOCAL_SYS
 			LIB.Talk(nChannel, _L['------------------------------------'])
 			for _, r in ipairs(tGongZhans) do
-				LIB.Talk( nChannel, _L('Detected [%s] has GongZhan buff for %d sec(s).', r.p.szName, r.time) )
+				LIB.Talk( nChannel, _L('Detected [%s] has GongZhan buff for %s.', r.p.szName, LIB.FormatTimeCounter(r.time, nil, 2)) )
 			end
 			LIB.Talk(nChannel, _L('Nearby GongZhan Total Count: %d.', #tGongZhans))
 			LIB.Talk(nChannel, _L['------------------------------------'])

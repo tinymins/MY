@@ -46,7 +46,7 @@ return {
     ['%d:%d:%d'      ] = '%d:%d:%d',
 
     ['GongZhan'] = '共戰',
-    ['Detected [%s] has GongZhan buff for %d sec(s).'] = '檢測到[%s]共戰BUFF剩餘%d秒。',
+    ['Detected [%s] has GongZhan buff for %s.'] = '檢測到[%s]共戰BUFF剩餘%s。',
     ['Nearby GongZhan Total Count: %d.'] = '附近共戰數量：%d。',
     ['------------------------------------'] = '————————————————————————',
     ['auto hide chat panel'] = '自動隱藏聊天欄',
