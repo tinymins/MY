@@ -201,7 +201,7 @@ local TABS_LIST, TAB_WELCOME = {
 	}
 ]]
 local function IsTabVisible(tab)
-	if tab.bShielded then
+	if tab.bShielded and LIB.IsShieldedVersion() then
 		return false
 	end
 	if tab.nShielded and LIB.IsShieldedVersion(tab.nShielded) then
