@@ -200,6 +200,18 @@ local TABS_LIST, TAB_WELCOME = {
 		}, {...}
 	}
 ]]
+local function IsTabVisible(tab)
+	if tab.bShielded then
+		return false
+	end
+	if tab.nShielded and LIB.IsShieldedVersion(tab.nShielded) then
+		return false
+	end
+	if tab.IsShielded then
+		return not tab.IsShielded()
+	end
+	return true
+end
 function LIB.RedrawCategory(szCategory)
 	local frame = LIB.GetFrame()
 	if not frame then
@@ -212,7 +224,7 @@ function LIB.RedrawCategory(szCategory)
 	for _, ctg in ipairs(TABS_LIST) do
 		local nCount = 0
 		for i, tab in ipairs(ctg) do
-			if not ((tab.bShielded or tab.nShielded) and LIB.IsShieldedVersion(tab.nShielded)) then
+			if IsTabVisible(tab) then
 				nCount = nCount + 1
 			end
 		end
@@ -279,7 +291,7 @@ function LIB.RedrawTabs(szCategory)
 	for _, ctg in ipairs(TABS_LIST) do
 		if ctg.id == szCategory then
 			for i, tab in ipairs(ctg) do
-				if not ((tab.bShielded or tab.nShielded) and LIB.IsShieldedVersion(tab.nShielded)) then
+				if IsTabVisible(tab) then
 					local hTab = hTabs:AppendItemFromIni(INI_PATH, 'Handle_Tab')
 					hTab.szID = tab.szID
 					hTab:Lookup('Text_Tab'):SetText(tab.szTitle)
@@ -458,6 +470,7 @@ function LIB.RegisterPanel(szID, szTitle, szCategory, szIconTex, options)
 		dwIconFrame     = dwIconFrame            ,
 		bShielded       = options.bShielded      ,
 		nShielded       = options.nShielded      ,
+		IsShielded      = options.IsShielded     ,
 		OnPanelActive   = options.OnPanelActive  ,
 		OnPanelScroll   = options.OnPanelScroll  ,
 		OnPanelResize   = options.OnPanelResize  ,
