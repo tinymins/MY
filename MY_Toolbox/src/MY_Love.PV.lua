@@ -175,7 +175,7 @@ function D.HookPlayerViewPanel()
 	end
 	local szName = txtName:GetText()
 	local dwID = O.tID2Name[szName]
-	local bHook = MY_Love.bHookPlayerView and dwID and not IsRemotePlayer(dwID)
+	local bHook = MY_Love.bHookPlayerView and dwID and not IsRemotePlayer(dwID) and not MY_Love.IsShielded()
 	-- attach page
 	if bHook then
 		if not mPage.bMYLoved then
@@ -297,6 +297,9 @@ end
 -- add target menu
 do
 local function onMenu(dwTarType, dwTarID)
+	if MY_Love.IsShielded() then
+		return
+	end
 	if dwTarType ~= TARGET.PLAYER or dwTarID == UI_GetClientPlayerID() or IsRemotePlayer(dwTarID) then
 		return
 	end

@@ -69,7 +69,7 @@ LIB.RegisterEvent('MY_LOVE_UPDATE.MY_Love__PS', D.RefreshPS)
 -------------------------------------
 -- 设置界面
 -------------------------------------
-local PS = {}
+local PS = { IsShielded = MY_Love.IsShielded }
 
 -- 获取可情缘好友列表
 function D.GetLoverMenu(nType)

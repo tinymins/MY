@@ -86,7 +86,7 @@ RegisterCustomData('MY_Love.bAutoFocus')
 RegisterCustomData('MY_Love.bHookPlayerView')
 
 --[[
-海鳗情缘局
+剑侠情缘
 ========
 1. 每个角色只允许有一个情缘，情缘必须是好友
 2. 爱要坦荡荡，情缘信息无法隐藏（队友可直接查看，其它人则等您确认）
@@ -116,6 +116,14 @@ RegisterCustomData('MY_Love.bHookPlayerView')
 ---------------------------------------------------------------------
 -- 本地函数和变量
 ---------------------------------------------------------------------
+
+-- 功能内测
+function D.IsShielded()
+	if LIB.IsShieldedVersion() and not IsLocalFileExist('interface/MY#DATA/tester.jx3dat') and GetCurrentTime() < 1579708800 then -- 除夕
+		return true
+	end
+	return false
+end
 
 -- 获取背包指定名称物品
 function D.GetBagItemPos(szName)
@@ -184,6 +192,9 @@ end
 
 -- 获取情缘信息（成功返回数据 + rawInfo，失败 nil）
 function D.GetLover()
+	if MY_Love.IsShielded() then
+		return
+	end
 	local szKey, me = '#HM#LOVER#', GetClientPlayer()
 	if not me then
 		return
@@ -236,6 +247,9 @@ end
 
 -- 转换好友信息为情缘信息
 function D.UpdateLocalLover()
+	if MY_Love.IsShielded() then
+		return
+	end
 	local lover = D.GetLover()
 	if not lover then
 		lover = LOVER_DATA
@@ -430,6 +444,9 @@ end
 -- 好友数据更新，随时检查情缘变化（删除好友改备注等）
 do
 local function OnFellowshipUpdate()
+	if MY_Love.IsShielded() then
+		return
+	end
 	-- 上线提示
 	local lover = D.GetLover()
 	if lover and lover.bOnline and lover.dwMapID ~= 0
@@ -470,6 +487,9 @@ end
 -- 后台同步
 do
 local function OnBgTalk(_, nChannel, dwTalkerID, szTalkerName, bSelf, ...)
+	if MY_Love.IsShielded() then
+		return
+	end
 	if not bSelf then
 		local szKey, data = ...
 		if szKey == 'VIEW' then
@@ -581,6 +601,9 @@ end
 -- 上线，下线通知：bOnLine, szName, bFoe
 do
 local function OnPlayerFellowshipLogin()
+	if MY_Love.IsShielded() then
+		return
+	end
 	if not arg2 and arg1 == O.lover.szName and O.lover.szName ~= '' then
 		if arg0 then
 			FireUIEvent('MY_COMBATTEXT_MSG', _L('Love Tip: %s onlines now', O.lover.szName), true, { 255, 0, 255 })
@@ -622,6 +645,7 @@ local settings = {
 	exports = {
 		{
 			fields = {
+				IsShielded = D.IsShielded,
 				GetLover = D.GetLover,
 				SetLover = D.SetLover,
 				FixLover = D.FixLover,
