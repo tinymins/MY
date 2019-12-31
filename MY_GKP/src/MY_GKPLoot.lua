@@ -702,17 +702,23 @@ function Loot.GetBossAction(dwDoodadID, bMenu)
 	local fnAction = function()
 		local aEquipmentItemData = {}
 		for k, v in ipairs(aItemData) do
-			if (v.item.nGenre == ITEM_GENRE.EQUIPMENT or IsCtrlKeyDown())
-				and v.item.nSub ~= CONSTANT.EQUIPMENT_SUB.WAIST_EXTEND
-				and v.item.nSub ~= CONSTANT.EQUIPMENT_SUB.BACK_EXTEND
-				and v.item.nSub ~= CONSTANT.EQUIPMENT_SUB.HORSE
-				and v.item.nSub ~= CONSTANT.EQUIPMENT_SUB.PACKAGE
-				and v.item.nSub ~= CONSTANT.EQUIPMENT_SUB.FACE_EXTEND
-				and v.item.nSub ~= CONSTANT.EQUIPMENT_SUB.L_SHOULDER_EXTEND
-				and v.item.nSub ~= CONSTANT.EQUIPMENT_SUB.R_SHOULDER_EXTEND
-				and v.item.nSub ~= CONSTANT.EQUIPMENT_SUB.BACK_CLOAK_EXTEND
-				and v.bDist
-			then -- 按住Ctrl的情况下 无视分类 否则只给装备
+			if (
+				(v.item.nGenre == ITEM_GENRE.EQUIPMENT and (
+					v.item.nSub == CONSTANT.EQUIPMENT_SUB.MELEE_WEAPON
+					or v.item.nSub == CONSTANT.EQUIPMENT_SUB.RANGE_WEAPON
+					or v.item.nSub == CONSTANT.EQUIPMENT_SUB.CHEST
+					or v.item.nSub == CONSTANT.EQUIPMENT_SUB.HELM
+					or v.item.nSub == CONSTANT.EQUIPMENT_SUB.AMULET
+					or v.item.nSub == CONSTANT.EQUIPMENT_SUB.RING
+					or v.item.nSub == CONSTANT.EQUIPMENT_SUB.WAIST
+					or v.item.nSub == CONSTANT.EQUIPMENT_SUB.PENDANT
+					or v.item.nSub == CONSTANT.EQUIPMENT_SUB.PANTS
+					or v.item.nSub == CONSTANT.EQUIPMENT_SUB.BOOTS
+					or v.item.nSub == CONSTANT.EQUIPMENT_SUB.BANGLE
+					or v.item.nSub == CONSTANT.EQUIPMENT_SUB.ARROW
+				))
+				or IsCtrlKeyDown()
+			) and v.bDist then -- 按住Ctrl的情况下 无视分类 否则只给装备
 				table.insert(aEquipmentItemData, v)
 			end
 		end
