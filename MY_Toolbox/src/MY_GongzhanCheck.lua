@@ -64,41 +64,43 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 				LIB.BreatheCall('MY_GongzhanCheck', false)
 			else
 				-- 逻辑：两次遍历附近的人 第一次同步数据 第二次输出数据
+				local nChannel = O.nGongzhanPublishChannel or PLAYER_TALK_CHANNEL.LOCAL_SYS
 				local dwTarType, dwTarID = LIB.GetTarget()
 				local aPendingID = LIB.GetNearPlayerID() -- 等待扫描的玩家
-				local aProcessID = {} -- 等待输出的玩家
+				local aProcessID = Clone(aPendingID) -- 等待输出的玩家
 				local aGongZhan = {} -- 扫描到的共战数据
-				local nStepCount = 0 -- 循环计数器
-				local nChannel = O.nGongzhanPublishChannel or PLAYER_TALK_CHANNEL.LOCAL_SYS
+				local nCount, nIndex = #aPendingID, 1
+				local function Echo(nIndex, nCount)
+					LIB.Topmsg(_L('Scanning gongzhan: %d/%d', nIndex, nCount))
+				end
 				LIB.RenderCall('MY_GongzhanCheck', function()
-					local bTermial, nStep = false, 0
-					if #aPendingID > 0 then -- 获取下一个有效的扫描目标
-						local dwID = aPendingID[#aPendingID]
+					local bTermial, bStep
+					if nIndex <= nCount then -- 获取下一个有效的扫描目标
+						local dwID = aPendingID[nIndex]
 						local tar = GetPlayer(dwID)
-						while not tar and dwID do
-							remove(aPendingID)
-							dwID = aPendingID[#aPendingID]
+						while not tar and nIndex <= nCount do
+							Echo(nIndex, nCount * 2 + 1)
+							nIndex = nIndex + 1
+							dwID = aPendingID[nIndex]
 							tar = GetPlayer(dwID)
-							nStep = nStep + 1
 						end
 						if tar then
 							local dwType, dwID = LIB.GetTarget()
 							if dwType ~= TARGET.PLAYER or dwID ~= tar.dwID then -- 设置目标同步BUFF数据
 								LIB.SetTarget(TARGET.PLAYER, tar.dwID)
 							else
-								insert(aProcessID, dwID)
-								remove(aPendingID)
-								nStep = nStep + 1
+								Echo(nIndex, nCount * 2 + 1)
+								nIndex = nIndex + 1
 							end
 						end
-					elseif #aProcessID > 0 then -- 获取下一个有效的输出目标
-						local dwID = aProcessID[#aProcessID]
+					elseif nIndex <= nCount * 2 then -- 获取下一个有效的输出目标
+						local dwID = aProcessID[nIndex - nCount]
 						local tar = GetPlayer(dwID)
-						while not tar and dwID do
-							remove(aProcessID)
-							dwID = aProcessID[#aProcessID]
+						while not tar and nIndex <= nCount * 2 do
+							Echo(nIndex, nCount * 2 + 1)
+							nIndex = nIndex + 1
+							dwID = aProcessID[nIndex - nCount]
 							tar = GetPlayer(dwID)
-							nStep = nStep + 1
 						end
 						if tar then
 							local dwType, dwID = LIB.GetTarget()
@@ -106,8 +108,8 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 								LIB.SetTarget(TARGET.PLAYER, tar.dwID)
 							else
 								-- 检测是否有共战
-								local aBuff, nCount, buff = LIB.GetBuffList(tar)
-								for i = 1, nCount do
+								local aBuff, nBuffCount, buff = LIB.GetBuffList(tar)
+								for i = 1, nBuffCount do
 									buff = aBuff[i]
 									if (not buff.bCanCancel) and find(Table_GetBuffName(buff.dwID, buff.nLevel), _L['GongZhan']) ~= nil then
 										local info = Table_GetBuff(buff.dwID, buff.nLevel)
@@ -116,11 +118,12 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 										end
 									end
 								end
-								remove(aProcessID)
-								nStep = nStep + 1
+								Echo(nIndex, nCount * 2 + 1)
+								nIndex = nIndex + 1
 							end
 						end
 					else
+						Echo(nIndex, nCount * 2 + 1)
 						LIB.Talk(nChannel, _L['------------------------------------'])
 						for _, r in ipairs(aGongZhan) do
 							LIB.Talk(nChannel, _L('Detected [%s] has GongZhan buff for %s.', r.szName, LIB.FormatTimeCounter(r.nTime, nil, 2)))
@@ -128,13 +131,6 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 						LIB.Talk(nChannel, _L('Nearby GongZhan Total Count: %d.', #aGongZhan))
 						LIB.Talk(nChannel, _L['------------------------------------'])
 						LIB.SetTarget(dwTarType, dwTarID)
-						bTermial = true
-					end
-					if nStep > 0 then
-						nStepCount = nStepCount + nStep
-						LIB.Topmsg(_L('Scanning gongzhan: %d/%d', nStepCount, nStepCount + #aPendingID + #aProcessID))
-					end
-					if bTermial then
 						return 0
 					end
 				end)
