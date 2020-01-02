@@ -1560,8 +1560,13 @@ end
 do -- 二次封装 MessageBox 相关事件
 local function OnMessageBoxOpen()
 	local szName, frame, aMsg = arg0, arg1, {}
+	if not frame then
+		return
+	end
 	local wndAll = frame:Lookup('Wnd_All')
-
+	if not wndAll then
+		return
+	end
 	for i = 1, 5 do
 		local btn = wndAll:Lookup('Btn_Option' .. i)
 		if btn and btn.IsVisible and btn:IsVisible() then
