@@ -49,11 +49,15 @@ end
 local LOVER_DATA = {
 	dwID = 0, -- 情缘 ID
 	szName = '', -- 情缘名字
+	szTitle = '', -- 我的结缘称号
+	nSendItem = '', -- 结缘时送对方的东西
+	nReceiveItem = '', -- 结缘时对方送的东西
 	dwAvatar = 0, -- 情缘头像
 	dwForceID = 0, -- 门派
 	nRoleType = 0, -- 情缘体型（0：无情缘）
 	nLoverType = 0, -- 情缘类型（单向：0，双向：1）
 	nLoverTime = 0, -- 情缘开始时间（单位：秒）
+	szLoverTitle = '', -- 对方结缘称号
 	dwMapID = 0, -- 所在地图
 	bOnline = false, -- 是否在线
 }
@@ -67,16 +71,25 @@ local O = {
 	szSign = '', -- 情缘宣言（个性签名）
 	bAutoFocus = true, -- 自动焦点
 	bHookPlayerView = false, -- 在查看装备界面上显示情缘
+	-- 导出常量
+	nLoveAttraction = 200,
+	nDoubleLoveAttraction = 800,
 	-- 本地变量
 	aAutoSay = { -- 神秘表白语（单数：表白，双数：取消单恋通知）
-		_L['Some people fancy you'],
-		_L['Other side terminate love you'],
-		_L['Some people fall in love with you'],
-		_L['Other side gave up love you'],
+		_L['Some people fancy you.'],
+		_L['Other side terminate love you.'],
+		_L['Some people fall in love with you.'],
+		_L['Other side gave up love you.'],
 	},
 	lover = Clone(LOVER_DATA),
 	tOtherLover = {}, -- 查看的情缘数据
 	tViewer = {}, -- 等候查看您的玩家列表
+	aLoverItem = { -- 可用于结缘的烟花信息
+		-- { nUIID = 65625, szName = LIB.GetItemNameByUIID(65625), szTitle = LIB.GetItemNameByUIID(65625) }, -- 测试用 焰火棒
+		{ nUIID = 67291, szName = LIB.GetItemNameByUIID(67291), szTitle = LIB.GetItemNameByUIID(67291) },
+		{ nUIID = 160982, szName = LIB.GetItemNameByUIID(160982), szTitle = LIB.GetItemNameByUIID(160982) },
+	},
+	nPendingItem = 0, -- 请求结缘烟花Item序号缓存
 }
 RegisterCustomData('MY_Love.bQuiet')
 RegisterCustomData('MY_Love.szNone')
@@ -126,12 +139,12 @@ function D.IsShielded()
 end
 
 -- 获取背包指定名称物品
-function D.GetBagItemPos(szName)
+function D.GetBagItemPos(nUIID)
 	local me = GetClientPlayer()
 	for dwBox = 1, LIB.GetBagPackageCount() do
 		for dwX = 0, me.GetBoxSize(dwBox) - 1 do
 			local it = me.GetItem(dwBox, dwX)
-			if it and GetItemNameByItem(it) == szName then
+			if it and it.nUiId == nUIID then
 				return dwBox, dwX
 			end
 		end
@@ -151,11 +164,11 @@ function D.GetBagItemNum(dwBox, dwX)
 end
 
 -- 是否可结双向好友，并返回真橙之心的位置
-function D.GetDoubleLoveItem(aInfo)
+function D.GetDoubleLoveItem(aInfo, nUIID)
 	if aInfo then
 		local tar = GetPlayer(aInfo.id)
-		if aInfo.attraction >= 800 and tar and LIB.IsParty(tar.dwID) and LIB.GetDistance(tar) <= 4 then
-			return D.GetBagItemPos(LIB.GetItemNameByUIID(67291))
+		if aInfo.attraction >= O.nDoubleLoveAttraction and tar and LIB.IsParty(tar.dwID) and LIB.GetDistance(tar) <= 4 then
+			return D.GetBagItemPos(nUIID)
 		end
 	end
 end
@@ -199,7 +212,7 @@ function D.GetLover()
 	if not me then
 		return
 	end
-	local dwLoverID, nLoverTime, nLoverType = LIB.GetStorage('MY_Love')
+	local dwLoverID, nLoverTime, nLoverType, nSendItem, nReceiveItem = LIB.GetStorage('MY_Love')
 	local aGroup = me.GetFellowshipGroupInfo() or {}
 	insert(aGroup, 1, { id = 0, name = g_tStrings.STR_FRIEND_GOOF_FRIEND })
 	for _, v in ipairs(aGroup) do
@@ -216,7 +229,9 @@ function D.GetLover()
 				dwLoverID = info.id
 				nLoverType = tonumber(data[1]) or 0
 				nLoverTime = tonumber(data[2]) or GetCurrentTime()
-				LIB.SetStorage('MY_Love', dwLoverID, nLoverTime, nLoverType)
+				nSendItem = 0
+				nReceiveItem = 0
+				LIB.SetStorage('MY_Love', dwLoverID, nLoverTime, nLoverType, nSendItem, nReceiveItem)
 				D.SaveFellowRemark(info.id, '')
 			end
 			-- 遍历到情缘，获取基础信息并返回
@@ -230,8 +245,12 @@ function D.GetLover()
 						return {
 							dwID = dwLoverID,
 							szName = info.name,
+							szTitle = O.aLoverItem[O.lover.nSendItem] and O.aLoverItem[O.lover.nSendItem].szTitle or '',
+							nSendItem = nSendItem,
+							nReceiveItem = nReceiveItem,
 							nLoverType = nLoverType,
 							nLoverTime = nLoverTime,
+							szLoverTitle = O.aLoverItem[O.lover.nReceiveItem] and O.aLoverItem[O.lover.nReceiveItem].szTitle or '',
 							dwAvatar = card.dwMiniAvatarID,
 							dwForceID = card.dwForceID,
 							nRoleType = card.nRoleType,
@@ -299,41 +318,61 @@ function D.GetLoverTime(nTime)
 end
 
 -- 保存情缘
-function D.SaveLover(szName, dwID, nType, nTime)
-	if not nTime then
-		nTime = GetCurrentTime()
-	end
-	LIB.SetStorage('MY_Love', dwID, nTime, nType)
-	if not IsEmpty(szName) then
-		LIB.Talk(PLAYER_TALK_CHANNEL.TONG, _L('From now on, my heart lover is [%s]', szName))
-	end
+function D.SaveLover(nTime, dwID, nType, nSendItem, nReceiveItem)
+	LIB.SetStorage('MY_Love', dwID, nTime, nType, nSendItem, nReceiveItem)
 	D.UpdateLocalLover()
 end
 
 -- 设置情缘
 function D.SetLover(dwID, nType)
-	if LIB.IsTradeLocked() or LIB.IsTalkLocked() then
-		return LIB.Systopmsg(_L['Set lover is a sensitive action, please unlock to continue.'])
-	end
 	local aInfo = LIB.GetFriend(dwID)
 	if not aInfo or not aInfo.isonline then
 		return LIB.Alert(_L['Lover must be a online friend'])
 	end
-	LIB.Confirm(_L('Do you want to love with [%s]?', aInfo.name), function()
-		-- 设置成为情缘（在线好友）
-		if nType == 0 then
-			-- 单向情缘（简单）
-			D.SaveLover(aInfo.name, dwID, nType)
-			LIB.SendBgMsg(aInfo.name, 'MY_LOVE', 'LOVE0')
-		else
-			-- 双向情缘（在线，组队一起，并且在4尺内，发起方带有一个真橙之心）
-			if not D.GetDoubleLoveItem(aInfo) then
-				return LIB.Alert(_L('Inadequate conditions, requiring Lv6 friend/party/4-feet distance/%s', LIB.GetItemNameByUIID(67291)))
+	-- 设置成为情缘（在线好友）
+	if nType == 0 then
+		-- 单向情缘（简单）
+		LIB.Confirm(_L('Do you want to love with [%s]?', aInfo.name), function()
+			local aInfo = LIB.GetFriend(dwID)
+			if not aInfo or not aInfo.isonline then
+				return LIB.Alert(_L['Lover must be a online friend'])
 			end
-			LIB.SendBgMsg(aInfo.name, 'MY_LOVE', 'LOVE_ASK')
-			LIB.Systopmsg(_L('Love request has been sent to [%s], wait please', aInfo.name))
+			if aInfo.attraction < MY_Love.nLoveAttraction then
+				return LIB.Alert(_L['Inadequate conditions, requiring Lv2 friend'])
+			end
+			D.SaveLover(GetCurrentTime(), dwID, nType, 0, 0)
+			LIB.SendBgMsg(aInfo.name, 'MY_LOVE', 'LOVE0')
+		end)
+	else
+		-- 双向情缘（在线，组队一起，并且在4尺内，发起方带有一个指定烟花）
+		local ui = UI.CreateFrame('MY_Love_SetLover', { w = 220, h = 200 + #O.aLoverItem * 40, text = _L['Select a firework'] })
+		local x, y = 50, 80
+		for i, p in ipairs(O.aLoverItem) do
+			ui:Append('WndButton', {
+				x = x, y = y, w = 120, h = 30,
+				text = LIB.GetItemNameByUIID(p.nUIID),
+				enable = not not D.GetBagItemPos(p.nUIID),
+				onclick = function()
+					if LIB.IsTradeLocked() or LIB.IsTalkLocked() then
+						return LIB.Systopmsg(_L['Set lover is a sensitive action, please unlock to continue.'])
+					end
+					local aInfo = LIB.GetFriend(dwID)
+					if not aInfo or not aInfo.isonline then
+						return LIB.Alert(_L['Lover must be a online friend'])
+					end
+					LIB.Confirm(_L('Do you want to love with [%s]?', aInfo.name), function()
+						if not D.GetDoubleLoveItem(aInfo, p.nUIID) then
+							return LIB.Alert(_L('Inadequate conditions, requiring Lv6 friend/party/4-feet distance/%s', LIB.GetItemNameByUIID(p.nUIID)))
+						end
+						O.nPendingItem = i
+						LIB.SendBgMsg(aInfo.name, 'MY_LOVE', 'LOVE_ASK')
+						LIB.Systopmsg(_L('Love request has been sent to [%s], wait please', aInfo.name))
+					end)
+				end,
+			})
+			y = y + 40
 		end
-	end)
+	end
 end
 
 -- 删除情缘
@@ -361,8 +400,10 @@ function D.RemoveLover()
 									LIB.SendBgMsg(lover.szName, 'MY_LOVE', 'REMOVE0')
 								end
 							end
-							D.SaveLover('', 0, 0, 0)
-							LIB.Talk(PLAYER_TALK_CHANNEL.TONG, _L('A blade and cut, no longer meet with [%s].', lover.szName))
+							D.SaveLover(0, 0, 0, 0, 0)
+							if lover.nLoverType == 1 then
+								LIB.Talk(PLAYER_TALK_CHANNEL.TONG, _L('A blade and cut, no longer meet with [%s].', lover.szName))
+							end
 							LIB.Sysmsg(_L['Congratulations, do not repeat the same mistakes ah.'])
 						end)
 					end)
@@ -380,7 +421,11 @@ function D.FixLover()
 	if not LIB.IsParty(O.lover.dwID) then
 		return LIB.Alert(_L['Both sides must in a team to be repaired!'])
 	end
-	LIB.SendBgMsg(O.lover.szName, 'MY_LOVE', 'FIX1', O.lover.nLoverTime)
+	LIB.SendBgMsg(O.lover.szName, 'MY_LOVE', 'FIX1', {
+		O.lover.nLoverTime,
+		O.lover.nSendItem,
+		O.lover.nReceiveItem,
+	})
 	LIB.Systopmsg(_L['Repair request has been sent, wait please.'])
 end
 
@@ -479,6 +524,7 @@ function D.ReplyLove(bCancel)
 			O.lover.nRoleType or 0,
 			O.lover.nLoverType,
 			O.lover.nLoverTime,
+			O.lover.szLoverTitle,
 		})
 	end
 	O.tViewer = {}
@@ -514,13 +560,13 @@ local function OnBgTalk(_, nChannel, dwTalkerID, szTalkerName, bSelf, ...)
 		elseif szKey == 'LOVE_ASK' then
 			-- 已有情缘直接拒绝
 			if O.lover.dwID ~= 0 and (O.lover.dwID ~= dwTalkerID or O.lover.nLoverType == 1) then
-				return LIB.SendBgMsg(szTalkerName, 'MY_LOVE', 'LOVE_ANS', 'EXISTS')
+				return LIB.SendBgMsg(szTalkerName, 'MY_LOVE', 'LOVE_ANS_EXISTS')
 			end
 			-- 询问意见
 			LIB.Confirm(_L('[%s] want to mutual love with you, OK?', szTalkerName), function()
-				LIB.SendBgMsg(szTalkerName, 'MY_LOVE', 'LOVE_ANS', 'YES')
+				LIB.SendBgMsg(szTalkerName, 'MY_LOVE', 'LOVE_ANS_YES')
 			end, function()
-				LIB.SendBgMsg(szTalkerName, 'MY_LOVE', 'LOVE_ANS', 'NO')
+				LIB.SendBgMsg(szTalkerName, 'MY_LOVE', 'LOVE_ANS_NO')
 			end)
 		elseif szKey == 'FIX1' then
 			if O.lover.dwID == 0 or (O.lover.dwID == dwTalkerID and O.lover.nLoverType ~= 1) then
@@ -531,49 +577,68 @@ local function OnBgTalk(_, nChannel, dwTalkerID, szTalkerName, bSelf, ...)
 							LIB.Systopmsg(_L['Fix lover is a sensitive action, please unlock to continue.'])
 							return false
 						end
-						D.SaveLover(szTalkerName, dwTalkerID, 1, tonumber(data))
+						D.SaveLover(tonumber(data[1]), dwTalkerID, 1, data[3], data[2])
+						LIB.Talk(PLAYER_TALK_CHANNEL.TONG, _L('From now on, my heart lover is [%s]', szTalkerName))
 						LIB.Systopmsg(_L('Congratulations, love relation with [%s] has been fixed!', szTalkerName))
 					end)
 				end
 			elseif O.lover.dwID == dwTalkerID then
-				LIB.SendBgMsg(szTalkerName, 'MY_LOVE', 'LOVE_ANS', 'ALREADY')
+				LIB.SendBgMsg(szTalkerName, 'MY_LOVE', 'LOVE_ANS_ALREADY')
 			else
-				LIB.SendBgMsg(szTalkerName, 'MY_LOVE', 'LOVE_ANS', 'EXISTS')
+				LIB.SendBgMsg(szTalkerName, 'MY_LOVE', 'LOVE_ANS_EXISTS')
 			end
-		elseif szKey == 'LOVE_ANS' then
-			if data == 'EXISTS' then
-				local szMsg = _L['Unfortunately the other has lover, but you can still blind love him!']
-				LIB.Sysmsg(szMsg)
-				LIB.Alert(szMsg)
-			elseif data == 'ALREADY' then
-				local szMsg = _L['The other is already your lover!']
-				LIB.Sysmsg(szMsg)
-				LIB.Alert(szMsg)
-			elseif data == 'NO' then
-				local szMsg = _L['The other refused you without reason, but you can still blind love him!']
-				LIB.Sysmsg(szMsg)
-				LIB.Alert(szMsg)
-			elseif data == 'YES' then
-				local aInfo = LIB.GetFriend(dwTalkerID)
-				local dwBox, dwX = D.GetDoubleLoveItem(aInfo)
-				if dwBox then
-					local nNum = D.GetBagItemNum(dwBox, dwX)
-					SetTarget(TARGET.PLAYER, aInfo.id)
-					OnUseItem(dwBox, dwX)
-					LIB.DelayCall(500, function()
+		elseif szKey == 'LOVE_ANS_EXISTS' then
+			local szMsg = _L['Unfortunately the other has lover, but you can still blind love him!']
+			LIB.Sysmsg(szMsg)
+			LIB.Alert(szMsg)
+		elseif szKey == 'LOVE_ANS_ALREADY' then
+			local szMsg = _L['The other is already your lover!']
+			LIB.Sysmsg(szMsg)
+			LIB.Alert(szMsg)
+		elseif szKey == 'LOVE_ANS_NO' then
+			local szMsg = _L['The other refused you without reason, but you can still blind love him!']
+			LIB.Sysmsg(szMsg)
+			LIB.Alert(szMsg)
+		elseif szKey == 'LOVE_ANS_YES' then
+			local nItem = O.nPendingItem
+			local nUIID = nItem and O.aLoverItem[nItem] and O.aLoverItem[nItem].nUIID
+			if IsEmpty(nUIID) then
+				return
+			end
+			local aInfo = LIB.GetFriend(dwTalkerID)
+			local dwBox, dwX = D.GetDoubleLoveItem(aInfo, nUIID)
+			if dwBox then
+				local nNum = D.GetBagItemNum(dwBox, dwX)
+				SetTarget(TARGET.PLAYER, aInfo.id)
+				OnUseItem(dwBox, dwX)
+				local nFinishTime = GetTime() + 500
+				LIB.BreatheCall(function()
+					local me = GetClientPlayer()
+					if not me then
+						return 0
+					end
+					if me.GetSkillOTActionState() == 6 then -- otActionItemSkill
+						nFinishTime = GetTime() + 500
+					elseif GetTime() > nFinishTime then
 						if D.GetBagItemNum(dwBox, dwX) ~= nNum then
-							D.SaveLover(szTalkerName, dwTalkerID, 1)
-							LIB.SendBgMsg(aInfo.name, 'MY_LOVE', 'LOVE_ANS', 'CONF')
+							D.SaveLover(GetCurrentTime(), dwTalkerID, 1, nItem, 0)
+							LIB.Talk(PLAYER_TALK_CHANNEL.TONG, _L('From now on, my heart lover is [%s]', szTalkerName))
+							LIB.SendBgMsg(aInfo.name, 'MY_LOVE', 'LOVE_ANS_CONF', nItem)
 							LIB.Systopmsg(_L('Congratulations, success to attach love with [%s]!', aInfo.name))
+							Wnd.CloseWindow('MY_Love_SetLover')
+						else
+							LIB.Systopmsg(_L['Failed to attach love, light firework failed.'])
 						end
-					end)
-				end
-			elseif data == 'CONF' then
-				local aInfo = LIB.GetFriend(dwTalkerID)
-				if aInfo then
-					D.SaveLover(szTalkerName, dwTalkerID, 1)
-					LIB.Systopmsg(_L('Congratulations, success to attach love with [%s]!', aInfo.name))
-				end
+						return 0
+					end
+				end)
+			end
+		elseif szKey == 'LOVE_ANS_CONF' then
+			local aInfo = LIB.GetFriend(dwTalkerID)
+			if aInfo then
+				D.SaveLover(GetCurrentTime(), dwTalkerID, 1, 0, data)
+				LIB.Talk(PLAYER_TALK_CHANNEL.TONG, _L('From now on, my heart lover is [%s]', szTalkerName))
+				LIB.Systopmsg(_L('Congratulations, success to attach love with [%s]!', aInfo.name))
 			end
 		elseif szKey == 'REPLY' then
 			O.tOtherLover[dwTalkerID] = {
@@ -585,6 +650,7 @@ local function OnBgTalk(_, nChannel, dwTalkerID, szTalkerName, bSelf, ...)
 				nRoleType = tonumber(data[6]) or 1,
 				nLoverType = tonumber(data[7]) or 0,
 				nLoverTime = tonumber(data[8]) or 0,
+				szLoverTitle = data[9] or '',
 			}
 			FireUIEvent('MY_LOVE_OTHER_UPDATE', dwTalkerID)
 		end
@@ -665,6 +731,8 @@ local settings = {
 				szSign = true,
 				bAutoFocus = true,
 				bHookPlayerView = true,
+				nLoveAttraction = true,
+				nDoubleLoveAttraction = true,
 			},
 			root = O,
 		},

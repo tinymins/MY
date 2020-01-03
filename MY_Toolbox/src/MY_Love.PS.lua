@@ -79,7 +79,7 @@ function D.GetLoverMenu(nType)
 	for _, v in ipairs(aGroup) do
 		local aFriend = me.GetFellowshipInfo(v.id) or {}
 		for _, vv in ipairs(aFriend) do
-			if vv.attraction >= 200 and (nType ~= 1 or vv.attraction >= 800) then
+			if vv.attraction >= MY_Love.nLoveAttraction and (nType ~= 1 or vv.attraction >= MY_Love.nDoubleLoveAttraction) then
 				table.insert(m0, {
 					szOption = vv.name,
 					fnDisable = function() return not vv.isonline end,
@@ -118,7 +118,7 @@ function PS.OnPanelActive(wnd)
 			text = _L['- Select plz -'],
 			menu = function() return D.GetLoverMenu(1) end,
 		}):Pos('BOTTOMRIGHT')
-		ui:Append('Text', { text = _L('(4-feets, +%s)', LIB.GetItemNameByUIID(67291)), x = nX + 5, y = nY })
+		ui:Append('Text', { text = _L['(4-feets, with specific fireworks)'], x = nX + 5, y = nY })
 		nX = X + 10
 		nY = nY + 28
 		nX = ui:Append('Text', { text = _L['Blind love friend Lv.2: '], x = nX, y = nY }):Pos('BOTTOMRIGHT')
@@ -136,8 +136,11 @@ function PS.OnPanelActive(wnd)
 		nX = X + 10
 		nX = ui:Append('Text', { text = lover.szName, font = 19, x = nX, y = nY, r = 255, g = 128, b = 255 }):AutoWidth():Pos('BOTTOMRIGHT')
 		local map = lover.bOnline and LIB.GetMapInfo(lover.dwMapID)
+		if not IsEmpty(lover.szLoverTitle) then
+			nX = ui:Append('Text', { text = '<' .. lover.szLoverTitle .. '>', x = nX, y = nY, font = 80, r = 255, g = 128, b = 255 }):AutoWidth():Pos('BOTTOMRIGHT')
+		end
 		if map and map.szName then
-			ui:Append('Text', { text = '(' .. g_tStrings.STR_GUILD_ONLINE .. ': ' .. map.szName .. ')', font = 80, x= nX + 10, y = nY })
+			ui:Append('Text', { text = '(' .. g_tStrings.STR_GUILD_ONLINE .. ': ' .. map.szName .. ')', font = 80, x = nX + 10, y = nY })
 		else
 			ui:Append('Text', { text = '(' .. g_tStrings.STR_GUILD_OFFLINE .. ')', font = 62, x = nX + 10, y = nY })
 		end

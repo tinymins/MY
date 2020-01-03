@@ -77,7 +77,7 @@ function D.UpdatePage()
 		return p:GetRoot():Hide()
 	end
 	local h, t = p:Lookup('', ''), D.GetOtherLover(tar.dwID)
-	local bNoData, dwID, szName, dwAvatar, szSign, dwForceID, nRoleType, nLoverType, nLoverTime = not t
+	local bNoData, dwID, szName, dwAvatar, szSign, dwForceID, nRoleType, nLoverType, nLoverTime, szLoverTitle = not t
 	if t then
 		dwID = t.dwID
 		szName = t.szName
@@ -87,6 +87,7 @@ function D.UpdatePage()
 		nRoleType = t.nRoleType
 		nLoverType = t.nLoverType
 		nLoverTime = t.nLoverTime
+		szLoverTitle = t.szLoverTitle
 	end
 	h:Lookup('Text_LTitle'):SetText(_L('%s\'s Lover', tar.szName))
 	-- lover
@@ -97,6 +98,21 @@ function D.UpdatePage()
 		txt:SetText(szName or _L['...Loading...'])
 	end
 	txt.szPlayer = szName
+	-- lover title
+	local ttl = h:Lookup('Text_LoverTitle')
+	if bNoData or IsEmpty(szLoverTitle) then
+		ttl:SetText('')
+	else
+		ttl:SetFontColor(255, 128, 255)
+		ttl:SetText('<' .. szLoverTitle .. '>')
+	end
+	-- lover info
+	local inf = h:Lookup('Text_LoverInfo')
+	if nLoverType and nLoverTime and nLoverTime > 0 then
+		inf:SetText(D.GetLoverType(nLoverType) .. '   ' .. D.GetLoverTime(nLoverTime))
+	else
+		inf:SetText('')
+	end
 	-- avatar
 	local szFile, nFrame, bAnimate = LIB.GetPlayerAvatar(dwForceID, nRoleType, dwAvatar)
 	local img, ani = h:Lookup('Image_Lover'), h:Lookup('Animate_Lover')
@@ -126,19 +142,19 @@ function D.UpdatePage()
 			ani:Hide()
 			img:Show()
 		end
-		txt:SetRelPos(130, 92)
+		if bNoData or IsEmpty(szLoverTitle) then
+			txt:SetRelPos(130, 92)
+			inf:SetRelPos(130, 115)
+		else
+			txt:SetRelPos(130, 82)
+			ttl:SetRelPos(130, 105)
+			inf:SetRelPos(130, 128)
+		end
 		txt:SetSize(200, 25)
 		txt:SetHAlign(0)
 	end
 	ani.szPlayer = szName
 	img.szPlayer = szName
-	-- lover info
-	local inf = h:Lookup('Text_LoverInfo')
-	if nLoverType and nLoverTime and nLoverTime > 0 then
-		inf:SetText(D.GetLoverType(nLoverType) .. '   ' .. D.GetLoverTime(nLoverTime))
-	else
-		inf:SetText('')
-	end
 	-- sign title
 	h:Lookup('Text_SignTTL'):SetText(bNoData and '' or _L('%s\'s Love signature:', tar.szName))
 	-- sign

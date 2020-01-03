@@ -1065,10 +1065,12 @@ end
 do
 -- total bytes: 32
 -- 0 - 3 BoolValues
--- 4 - 7 MY_Love dwID
--- 8 - 11 MY_Love nTime
--- 12/0 - 12/3 MY_Love bDouble
--- 12/4 - 12/7 MY_Love crc
+-- 4 - 4 MY_Love crc
+-- 5 - 8 MY_Love dwID
+-- 9 - 12 MY_Love nTime
+-- 13/0 - 13/4 MY_Love nType
+-- 13/5 - 14/2 MY_Love nSendItem
+-- 14/3 - 14/7 MY_Love nReceiveItem
 local l_tBoolValues = {
 	['MY_ChatSwitch_DisplayPanel'] = 0,
 	['MY_ChatSwitch_LockPostion'] = 1,
@@ -1129,25 +1131,33 @@ function LIB.SetStorage(szKey, ...)
 		local anchor = ...
 		return SetOnlineFrameAnchor(szSubKey, anchor)
 	elseif szPriKey == 'MY_Love' then
-		local dwID, nTime, nType = ...
-		assert(dwID <= 0xffffffff, 'Value of dwID out of 32bit unsigned int range!')
-		assert(nTime <= 0xffffffff, 'Value of nTime out of 32bit unsigned int range!')
-		assert(nType <= 0xf, 'Value of nTime out of range 0 - 15!')
-		local aByte, nCrc = {0, 0, 0, 0, 0, 0, 0, 0}, 6
-		for i = 1, 4 do
+		local dwID, nTime, nType, nSendItem, nReceiveItem = ...
+		assert(dwID >= 0 and dwID <= 0xffffffff, 'Value of dwID out of 32bit unsigned int range!')
+		assert(nTime >= 0 and nTime <= 0xffffffff, 'Value of nTime out of 32bit unsigned int range!')
+		assert(nType >= 0 and nType <= 0xf, 'Value of nType out of range 4bit unsigned int range!')
+		assert(nSendItem >= 0 and nSendItem <= 0x3f, 'Value of nSendItem out of 6bit unsigned int range!')
+		assert(nReceiveItem >= 0 and nReceiveItem <= 0x3f, 'Value of nReceiveItem out of 6bit unsigned int range!')
+		local aByte, nCrc = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, 6
+		-- 2 - 5 dwID
+		for i = 2, 5 do
 			aByte[i] = LIB.NumberBitAnd(dwID, 0xff)
-			nCrc = LIB.NumberBitXor(nCrc, aByte[i])
 			dwID = LIB.NumberBitShr(dwID, 8)
 		end
-		for i = 5, 8 do
+		-- 6 - 9 nTime
+		for i = 6, 9 do
 			aByte[i] = LIB.NumberBitAnd(nTime, 0xff)
-			nCrc = LIB.NumberBitXor(nCrc, aByte[i])
 			nTime = LIB.NumberBitShr(nTime, 8)
 		end
-		nCrc = LIB.NumberBitXor(nCrc, nType)
-		nCrc = LIB.NumberBitXor(LIB.NumberBitAnd(nCrc, 0xf), LIB.NumberBitShr(nCrc, 4))
-		aByte[9] = LIB.NumberBitOr(LIB.NumberBitShl(nType, 4), nCrc)
-		SetAddonCustomData('MY', 4, 9, unpack(aByte))
+		-- 10 (nType << 4) | ((nSendItem >> 2) & 0xf)
+		aByte[10] = LIB.NumberBitOr(LIB.NumberBitShl(nType, 4), LIB.NumberBitAnd(LIB.NumberBitShr(nSendItem, 2), 0xf))
+		-- 11 (nSendItem & 0x3) << 6 | (nReceiveItem & 0x3f)
+		aByte[11] = LIB.NumberBitOr(LIB.NumberBitShl(LIB.NumberBitAnd(nSendItem, 0x3), 6), LIB.NumberBitAnd(nReceiveItem, 0x3f))
+		-- 1 crc
+		for i = 2, #aByte do
+			nCrc = LIB.NumberBitXor(nCrc, aByte[i])
+		end
+		aByte[1] = nCrc
+		SetAddonCustomData('MY', 4, 11, unpack(aByte))
 	end
 	OnStorageChange(szKey)
 end
@@ -1172,25 +1182,32 @@ function LIB.GetStorage(szKey)
 	elseif szPriKey == 'FrameAnchor' then
 		return GetOnlineFrameAnchor(szSubKey)
 	elseif szPriKey == 'MY_Love' then
-		local dwID, nTime, nType, nCrc = 0, 0, 0, 6
-		local aByte = {GetAddonCustomData('MY', 4, 9)}
-		nType = LIB.NumberBitShr(aByte[9], 4)
-		for i = 4, 1, -1 do
-			dwID = LIB.NumberBitShl(dwID, 8)
+		local dwID, nTime, nType, nSendItem, nReceiveItem, nCrc = 0, 0, 0, 0, 0, 6
+		local aByte = {GetAddonCustomData('MY', 4, 11)}
+		-- 1 crc
+		for i = 1, #aByte do
 			nCrc = LIB.NumberBitXor(nCrc, aByte[i])
-			dwID = LIB.NumberBitOr(dwID, aByte[i])
 		end
-		for i = 8, 5, -1 do
-			nTime = LIB.NumberBitShl(nTime, 8)
-			nCrc = LIB.NumberBitXor(nCrc, aByte[i])
-			nTime = LIB.NumberBitOr(nTime, aByte[i])
+		if nCrc == 0 then
+			-- 2 - 5 dwID
+			for i = 5, 2, -1 do
+				dwID = LIB.NumberBitShl(dwID, 8)
+				dwID = LIB.NumberBitOr(dwID, aByte[i])
+			end
+			-- 6 - 9 nTime
+			for i = 9, 6, -1 do
+				nTime = LIB.NumberBitShl(nTime, 8)
+				nTime = LIB.NumberBitOr(nTime, aByte[i])
+			end
+			-- 10 (nType << 4) | ((nSendItem >> 2) & 0xf)
+			nType = LIB.NumberBitShr(aByte[10], 4)
+			nSendItem = LIB.NumberBitShl(LIB.NumberBitAnd(aByte[10], 0xf), 2)
+			-- 11 (nSendItem & 0x3) << 6 | (nReceiveItem & 0x3f)
+			nSendItem = LIB.NumberBitOr(nSendItem, LIB.NumberBitShr(aByte[11], 6))
+			nReceiveItem = LIB.NumberBitAnd(aByte[11], 0x3f)
+			return dwID, nTime, nType, nSendItem, nReceiveItem
 		end
-		nCrc = LIB.NumberBitXor(nCrc, nType)
-		nCrc = LIB.NumberBitXor(LIB.NumberBitAnd(nCrc, 0xf), LIB.NumberBitShr(nCrc, 4))
-		if nCrc == LIB.NumberBitAnd(aByte[9], 0xf) then
-			return dwID, nTime, nType
-		end
-		return 0, 0, 0
+		return 0, 0, 0, 0, 0
 	end
 end
 
