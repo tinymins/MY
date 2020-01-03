@@ -134,7 +134,7 @@ end
 
 function LIB.Table_GetSkillSchoolKungfu(dwSchoolID)
 	if IsFunction(_G.Table_GetSkillSchoolKungfu) then
-		return LIB.Table_GetSkillSchoolKungfu(dwSchoolID)
+		return _G.Table_GetSkillSchoolKungfu(dwSchoolID)
 	end
 	local tKungFungList = {}
 	local tLine = g_tTable.SkillSchoolKungfu:Search(dwSchoolID)
@@ -152,7 +152,7 @@ end
 
 function LIB.Table_GetMKungfuList(dwKungfuID)
 	if IsFunction(_G.Table_GetMKungfuList) then
-		return LIB.Table_GetMKungfuList(dwKungfuID)
+		return _G.Table_GetMKungfuList(dwKungfuID)
 	end
 	local tLine = g_tTable.MKungfuKungfu:Search(dwKungfuID)
 	local tKungfu = {}
@@ -171,7 +171,7 @@ end
 
 function LIB.Table_GetNewKungfuSkill(dwMountKungfu, dwKungfuID)
 	if IsFunction(_G.Table_GetNewKungfuSkill) then
-		return LIB.Table_GetNewKungfuSkill(dwMountKungfu, dwKungfuID)
+		return _G.Table_GetNewKungfuSkill(dwMountKungfu, dwKungfuID)
 	end
 	local tLine = g_tTable.SkillKungFuShow:Search(dwMountKungfu) or {}
 	if IsEmpty(tLine) then
@@ -196,7 +196,7 @@ end
 
 function LIB.Table_GetKungfuSkillList(dwKungfuID)
 	if IsFunction(_G.Table_GetKungfuSkillList) then
-		return LIB.Table_GetKungfuSkillList(dwKungfuID)
+		return _G.Table_GetKungfuSkillList(dwKungfuID)
 	end
 	local tSkill = {}
 	local tLine = g_tTable.KungfuSkill:Search(dwKungfuID)
