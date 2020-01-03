@@ -1953,7 +1953,9 @@ function UI:FadeTo(nTime, nOpacity, callback)
 				--[[#DEBUG END]]
 				if (nStartAlpha - nCurrentAlpha)*(nCurrentAlpha - nOpacity) <= 0 then
 					ui:Alpha(nOpacity)
-					Call(callback, ui)
+					if callback then
+						Call(callback, ui)
+					end
 					return 0
 				end
 			end)
@@ -1984,7 +1986,9 @@ function UI:FadeOut(nTime, callback)
 	end
 	self:FadeTo(nTime, 0, function(ui)
 		ui:Toggle(false)
-		Call(callback, ui)
+		if callback then
+			Call(callback, ui)
+		end
 	end)
 	return self
 end
@@ -2012,7 +2016,9 @@ function UI:SlideTo(nTime, nHeight, callback)
 				--[[#DEBUG END]]
 				if (nStartValue - nCurrentValue)*(nCurrentValue - nHeight) <= 0 then
 					ui:Height(nHeight):Toggle( nHeight ~= 0 )
-					Call(callback)
+					if callback then
+						Call(callback)
+					end
 					return 0
 				end
 			end)
@@ -3553,8 +3559,18 @@ function UI:Click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 			for _, raw in ipairs(self.raws) do
 				local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
 				local itm = GetComponentElement(raw, 'ITEM')
-				if wnd then local _this = this this = wnd Call(wnd.OnLButtonClick) this = _this end
-				if itm then local _this = this this = itm Call(itm.OnItemLButtonClick) this = _this end
+				if wnd and wnd.OnLButtonClick then
+					local _this = this
+					this = wnd
+					Call(wnd.OnLButtonClick)
+					this = _this
+				end
+				if itm and itm.OnItemLButtonClick then
+					local _this = this
+					this = itm
+					Call(itm.OnItemLButtonClick)
+					this = _this
+				end
 			end
 		elseif nFlag==UI.MOUSE_EVENT.MBUTTON then
 
@@ -3562,8 +3578,18 @@ function UI:Click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 			for _, raw in ipairs(self.raws) do
 				local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
 				local itm = GetComponentElement(raw, 'ITEM')
-				if wnd then local _this = this this = wnd Call(wnd.OnRButtonClick) this = _this end
-				if itm then local _this = this this = itm Call(itm.OnItemRButtonClick) this = _this end
+				if wnd and wnd.OnRButtonClick then
+					local _this = this
+					this = wnd
+					Call(wnd.OnRButtonClick)
+					this = _this
+				end
+				if itm and itm.OnItemRButtonClick then
+					local _this = this
+					this = itm
+					Call(itm.OnItemRButtonClick)
+					this = _this
+				end
 			end
 		end
 	end
@@ -3754,7 +3780,7 @@ function UI:Change(fnOnChange)
 	else
 		for _, raw in ipairs(self.raws) do
 			local edt = GetComponentElement(raw, 'EDIT')
-			if edt then
+			if edt and edt.OnEditChanged then
 				local _this = this
 				this = edt
 				Call(edt.OnEditChanged, raw)
@@ -3762,10 +3788,12 @@ function UI:Change(fnOnChange)
 			end
 			if GetComponentType(raw) == 'WndTrackbar' then
 				local sld = GetComponentElement(raw, 'TRACKBAR')
-				local _this = this
-				this = sld
-				Call(sld.OnScrollBarPosChanged, raw)
-				this = _this
+				if sld and sld.OnScrollBarPosChanged then
+					local _this = this
+					this = sld
+					Call(sld.OnScrollBarPosChanged, raw)
+					this = _this
+				end
 			end
 		end
 		return self
@@ -3792,7 +3820,9 @@ function UI:Focus(fnOnSetFocus)
 		for _, raw in ipairs(self.raws) do
 			raw = GetComponentElement(raw, 'EDIT')
 			if raw then
-				UI(raw):UIEvent('OnSetFocus', function() Call(fnOnSetFocus, self) end)
+				UI(raw):UIEvent('OnSetFocus', function()
+					Call(fnOnSetFocus, self)
+				end)
 			end
 		end
 		return self
