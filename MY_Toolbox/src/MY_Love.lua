@@ -577,7 +577,9 @@ local function OnBgTalk(_, nChannel, dwTalkerID, szTalkerName, bSelf, ...)
 			PlaySound(SOUND.UI_SOUND,g_sound.Whisper)
 		elseif szKey == 'LOVE_ASK' then
 			-- 已有情缘直接拒绝
-			if O.lover.dwID ~= 0 and (O.lover.dwID ~= dwTalkerID or O.lover.nLoverType == 1) then
+			if O.lover.dwID == dwTalkerID and O.lover.nLoverType == 1 then
+				LIB.SendBgMsg(szTalkerName, 'MY_LOVE', 'LOVE_ANS_ALREADY')
+			elseif O.lover.dwID ~= 0 and (O.lover.dwID ~= dwTalkerID or O.lover.nLoverType == 1) then
 				return LIB.SendBgMsg(szTalkerName, 'MY_LOVE', 'LOVE_ANS_EXISTS')
 			end
 			-- 询问意见
