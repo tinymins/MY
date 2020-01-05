@@ -99,7 +99,7 @@ local O = {
 		{ nItem = 12, nUIID = 157378, szName = LIB.GetItemNameByUIID(157378), szTitle = _L['FIREWORK_TITLE_157378'] }, -- 素心竹月 知心人
 		{ nItem = 13, nUIID = 158339, szName = LIB.GetItemNameByUIID(158339), szTitle = _L['FIREWORK_TITLE_158339'] }, -- 流光绮梦 衷情人
 		{ nItem = 14, nUIID = 160982, szName = LIB.GetItemNameByUIID(160982), szTitle = _L['FIREWORK_TITLE_160982'] }, -- 海誓山盟
-		-- { nItem = 64, nUIID = 65625, szName = LIB.GetItemNameByUIID(65625), szTitle = LIB.GetItemNameByUIID(65625) }, -- 测试用 焰火棒
+		-- { nItem = 63, nUIID = 65625, szName = LIB.GetItemNameByUIID(65625), szTitle = LIB.GetItemNameByUIID(65625) }, -- 测试用 焰火棒
 	},
 	tLoverItem = {},
 	nPendingItem = 0, -- 请求结缘烟花nItem序号缓存
@@ -186,6 +186,44 @@ function D.GetDoubleLoveItem(aInfo, nUIID)
 		if aInfo.attraction >= O.nDoubleLoveAttraction and tar and LIB.IsParty(tar.dwID) and LIB.GetDistance(tar) <= 4 then
 			return D.GetBagItemPos(nUIID)
 		end
+	end
+end
+
+function D.UseDoubleLoveItem(aInfo, nUIID, callback)
+	local dwBox, dwX = D.GetDoubleLoveItem(aInfo, nUIID)
+	if dwBox then
+		local nNum = D.GetBagItemNum(dwBox, dwX)
+		SetTarget(TARGET.PLAYER, aInfo.id)
+		OnUseItem(dwBox, dwX)
+		local nFinishTime = GetTime() + 500
+		LIB.BreatheCall(function()
+			local me = GetClientPlayer()
+			if not me then
+				return 0
+			end
+			if me.GetSkillOTActionState() == 6 then -- otActionItemSkill
+				nFinishTime = GetTime() + 500
+			elseif GetTime() > nFinishTime then
+				callback(D.GetBagItemNum(dwBox, dwX) ~= nNum)
+				return 0
+			end
+		end)
+	end
+end
+
+function D.CreateFireworkSelect(callback)
+	local ui = UI.CreateFrame('MY_Love_SetLover', { w = 220, h = 60 + #O.aLoverItem * 40, text = _L['Select a firework'] })
+	local x, y = 50, 50
+	for _, p in ipairs(O.aLoverItem) do
+		ui:Append('WndButton', {
+			x = x, y = y, w = 120, h = 30,
+			text = LIB.GetItemNameByUIID(p.nUIID),
+			enable = not not D.GetBagItemPos(p.nUIID),
+			onclick = function() callback(p) end,
+			tip = p.szTitle,
+			tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+		})
+		y = y + 40
 	end
 end
 
@@ -345,8 +383,26 @@ function D.SetLover(dwID, nType)
 	if not aInfo or not aInfo.isonline then
 		return LIB.Alert(_L['Lover must be a online friend'])
 	end
-	-- 设置成为情缘（在线好友）
-	if nType == 0 then
+	if nType == -1 then
+		-- 重复放烟花刷新称号
+		if dwID == O.lover.dwID then
+			D.CreateFireworkSelect(function(p)
+				if LIB.IsTradeLocked() or LIB.IsTalkLocked() then
+					return LIB.Systopmsg(_L['Light firework is a sensitive action, please unlock to continue.'])
+				end
+				D.UseDoubleLoveItem(aInfo, p.nUIID, function(bSuccess)
+					if bSuccess then
+						D.SaveLover(O.lover.nLoverTime, O.lover.dwID, O.lover.nLoverType, p.nItem, O.lover.nReceiveItem)
+						LIB.SendBgMsg(aInfo.name, 'MY_LOVE', 'LOVE_FIREWORK', p.nItem)
+						Wnd.CloseWindow('MY_Love_SetLover')
+					else
+						LIB.Systopmsg(_L['Failed to light firework.'])
+					end
+				end)
+			end)
+		end
+	elseif nType == 0 then
+		-- 设置成为情缘（在线好友）
 		-- 单向情缘（简单）
 		LIB.Confirm(_L('Do you want to love with [%s]?', aInfo.name), function()
 			local aInfo = LIB.GetFriend(dwID)
@@ -360,36 +416,25 @@ function D.SetLover(dwID, nType)
 			LIB.SendBgMsg(aInfo.name, 'MY_LOVE', 'LOVE0')
 		end)
 	else
+		-- 设置成为情缘（在线好友）
 		-- 双向情缘（在线，组队一起，并且在4尺内，发起方带有一个指定烟花）
-		local ui = UI.CreateFrame('MY_Love_SetLover', { w = 220, h = 60 + #O.aLoverItem * 40, text = _L['Select a firework'] })
-		local x, y = 50, 50
-		for _, p in ipairs(O.aLoverItem) do
-			ui:Append('WndButton', {
-				x = x, y = y, w = 120, h = 30,
-				text = LIB.GetItemNameByUIID(p.nUIID),
-				enable = not not D.GetBagItemPos(p.nUIID),
-				onclick = function()
-					if LIB.IsTradeLocked() or LIB.IsTalkLocked() then
-						return LIB.Systopmsg(_L['Set lover is a sensitive action, please unlock to continue.'])
-					end
-					local aInfo = LIB.GetFriend(dwID)
-					if not aInfo or not aInfo.isonline then
-						return LIB.Alert(_L['Lover must be a online friend'])
-					end
-					LIB.Confirm(_L('Do you want to love with [%s]?', aInfo.name), function()
-						if not D.GetDoubleLoveItem(aInfo, p.nUIID) then
-							return LIB.Alert(_L('Inadequate conditions, requiring Lv6 friend/party/4-feet distance/%s', LIB.GetItemNameByUIID(p.nUIID)))
-						end
-						O.nPendingItem = p.nItem
-						LIB.SendBgMsg(aInfo.name, 'MY_LOVE', 'LOVE_ASK')
-						LIB.Systopmsg(_L('Love request has been sent to [%s], wait please', aInfo.name))
-					end)
-				end,
-				tip = p.szTitle,
-				tippostype = UI.TIP_POSITION.BOTTOM_TOP,
-			})
-			y = y + 40
-		end
+		D.CreateFireworkSelect(function(p)
+			if LIB.IsTradeLocked() or LIB.IsTalkLocked() then
+				return LIB.Systopmsg(_L['Set lover is a sensitive action, please unlock to continue.'])
+			end
+			local aInfo = LIB.GetFriend(dwID)
+			if not aInfo or not aInfo.isonline then
+				return LIB.Alert(_L['Lover must be a online friend'])
+			end
+			LIB.Confirm(_L('Do you want to love with [%s]?', aInfo.name), function()
+				if not D.GetDoubleLoveItem(aInfo, p.nUIID) then
+					return LIB.Alert(_L('Inadequate conditions, requiring Lv6 friend/party/4-feet distance/%s', LIB.GetItemNameByUIID(p.nUIID)))
+				end
+				O.nPendingItem = p.nItem
+				LIB.SendBgMsg(aInfo.name, 'MY_LOVE', 'LOVE_ASK')
+				LIB.Systopmsg(_L('Love request has been sent to [%s], wait please', aInfo.name))
+			end)
+		end)
 	end
 end
 
@@ -626,39 +671,28 @@ local function OnBgTalk(_, nChannel, dwTalkerID, szTalkerName, bSelf, ...)
 				return
 			end
 			local aInfo = LIB.GetFriend(dwTalkerID)
-			local dwBox, dwX = D.GetDoubleLoveItem(aInfo, nUIID)
-			if dwBox then
-				local nNum = D.GetBagItemNum(dwBox, dwX)
-				SetTarget(TARGET.PLAYER, aInfo.id)
-				OnUseItem(dwBox, dwX)
-				local nFinishTime = GetTime() + 500
-				LIB.BreatheCall(function()
-					local me = GetClientPlayer()
-					if not me then
-						return 0
-					end
-					if me.GetSkillOTActionState() == 6 then -- otActionItemSkill
-						nFinishTime = GetTime() + 500
-					elseif GetTime() > nFinishTime then
-						if D.GetBagItemNum(dwBox, dwX) ~= nNum then
-							D.SaveLover(GetCurrentTime(), dwTalkerID, 1, nItem, 0)
-							LIB.Talk(PLAYER_TALK_CHANNEL.TONG, _L('From now on, my heart lover is [%s]', szTalkerName))
-							LIB.SendBgMsg(aInfo.name, 'MY_LOVE', 'LOVE_ANS_CONF', nItem)
-							LIB.Systopmsg(_L('Congratulations, success to attach love with [%s]!', aInfo.name))
-							Wnd.CloseWindow('MY_Love_SetLover')
-						else
-							LIB.Systopmsg(_L['Failed to attach love, light firework failed.'])
-						end
-						return 0
-					end
-				end)
-			end
+			D.UseDoubleLoveItem(aInfo, nUIID, function(bSuccess)
+				if bSuccess then
+					D.SaveLover(GetCurrentTime(), dwTalkerID, 1, nItem, 0)
+					LIB.Talk(PLAYER_TALK_CHANNEL.TONG, _L('From now on, my heart lover is [%s]', szTalkerName))
+					LIB.SendBgMsg(aInfo.name, 'MY_LOVE', 'LOVE_ANS_CONF', nItem)
+					LIB.Systopmsg(_L('Congratulations, success to attach love with [%s]!', aInfo.name))
+					Wnd.CloseWindow('MY_Love_SetLover')
+				else
+					LIB.Systopmsg(_L['Failed to attach love, light firework failed.'])
+				end
+			end)
 		elseif szKey == 'LOVE_ANS_CONF' then
 			local aInfo = LIB.GetFriend(dwTalkerID)
 			if aInfo then
 				D.SaveLover(GetCurrentTime(), dwTalkerID, 1, 0, data)
 				LIB.Talk(PLAYER_TALK_CHANNEL.TONG, _L('From now on, my heart lover is [%s]', szTalkerName))
 				LIB.Systopmsg(_L('Congratulations, success to attach love with [%s]!', aInfo.name))
+			end
+		elseif szKey == 'LOVE_FIREWORK' then
+			local aInfo = LIB.GetFriend(dwTalkerID)
+			if aInfo and O.lover.dwID == dwTalkerID then
+				D.SaveLover(O.lover.nLoverTime, dwTalkerID, O.lover.nLoverType, O.lover.nSendItem, data)
 			end
 		elseif szKey == 'REPLY' then
 			O.tOtherLover[dwTalkerID] = {

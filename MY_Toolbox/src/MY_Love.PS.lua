@@ -148,6 +148,15 @@ function PS.OnPanelActive(wnd)
 		nY = nY + 36
 		nX = ui:Append('Text', { text = D.GetLoverType(), font = 2, x = nX, y = nY }):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('Text', { text = D.GetLoverTime(), font = 2, x = nX + 10, y = nY }):AutoWidth():Pos('BOTTOMRIGHT')
+		if lover.nLoverType == 1 then
+			nX = ui:Append('Text', {
+				x = nX + 10, y = nY,
+				text = _L['[Light firework]'],
+				onclick = function()
+					D.SetLover(lover.dwID, -1)
+				end,
+			}):AutoWidth():Pos('BOTTOMRIGHT')
+		end
 		nX = ui:Append('Text', { text = _L['[Break love]'], x = nX + 10, y = nY, onclick = D.RemoveLover }):AutoWidth():Pos('BOTTOMRIGHT')
 		if lover.nLoverType == 1 then
 			nX = ui:Append('Text', { text = _L['[Recovery]'], x = nX + 10, y = nY, onclick = D.FixLover }):AutoWidth():Pos('BOTTOMRIGHT')
