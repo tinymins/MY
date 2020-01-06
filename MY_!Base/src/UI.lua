@@ -753,15 +753,21 @@ function UI:Parent()
 end
 
 -- fetch children by name
-function UI:Fetch(szName)
+function UI:Fetch(szName, szSubName)
 	self:_checksum()
-	local raws, el = {}
+	local raws, parent, el = {}
 	for _, raw in ipairs(self.raws) do
-		el = raw:Lookup(szName)
-		if not el then
-			raw = GetComponentElement(raw, 'MAIN_HANDLE')
-			if raw then
-				el = raw:Lookup(szName)
+		parent = GetComponentElement(raw, 'MAIN_WINDOW')
+		el = parent and parent:Lookup(szName)
+		if szSubName then
+			if el then
+				parent = GetComponentElement(el, 'MAIN_HANDLE')
+				el = parent and parent:Lookup(szSubName)
+			end
+		else
+			if not el then
+				parent = GetComponentElement(raw, 'MAIN_HANDLE')
+				el = parent and parent:Lookup(szName)
 			end
 		end
 		if el then
