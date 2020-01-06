@@ -49,6 +49,8 @@ local TI = {}
 
 MY_TeamNotice = {
 	bEnable = true,
+	nWidth = 320,
+	nHeight = 195,
 	anchor = { s = 'CENTER', r = 'CENTER', x = 0, y = 0 },
 }
 LIB.RegisterCustomData('MY_TeamNotice')
@@ -78,16 +80,34 @@ function TI.CreateFrame(a, b)
 		ui:Children('#YY'):Text(a, WNDEVENT_FIRETYPE.PREVENT)
 		ui:Children('#Message'):Text(b, WNDEVENT_FIRETYPE.PREVENT)
 	else
+		local function FormatAllContentPos()
+			if not ui then
+				return
+			end
+			MY_TeamNotice.nWidth  = ui:Width()
+			MY_TeamNotice.nHeight = ui:Height()
+			MY_TeamNotice.anchor  = ui:Anchor()
+			local W, H = ui:Size(true)
+			ui:Fetch('YY'):Width(ui:Width() - 160)
+			local uiBtn = ui:Fetch('Btn_YY')
+			uiBtn:Left(W - uiBtn:Width() - 10)
+			local uiBtns = ui:Fetch('WndBtn_RaidTools'):Add(ui:Fetch('WndBtn_GKP')):Add(ui:Fetch('WndBtn_TeamMon'))
+			uiBtns:Top(H - uiBtns:Height() - 10)
+			local uiMessage = ui:Fetch('Message')
+			uiMessage:Size(W - 20, uiBtns:Top() - uiMessage:Top() - 10)
+		end
 		ui = UI.CreateFrame('MY_TeamNotice', {
-			w = 320, h = 195,
+			w = MY_TeamNotice.nWidth, h = MY_TeamNotice.nHeight,
 			text = _L['Team Message'],
 			anchor = MY_TeamNotice.anchor,
-			simple = true, close = true,
+			simple = true, close = true, dragresize = true,
+			minwidth = 320, minheight = 195,
 			setting = function()
 				LIB.ShowPanel()
 				LIB.FocusPanel()
 				LIB.SwitchTab('MY_TeamTools')
 			end,
+			ondragresize = FormatAllContentPos,
 		})
 		local x, y = 10, 5
 		x = x + ui:Append('Text', { x = x, y = y - 3, text = _L['YY:'], font = 48 }):AutoWidth():Width() + 5
@@ -184,10 +204,16 @@ function TI.CreateFrame(a, b)
 				end
 			end,
 		})
-		x, y = 5, 130
-		x = x + ui:Append('WndButton2', { x = x, y = y, text = _L['Raid Tools'], onclick = MY_RaidTools.TogglePanel }):AutoWidth():Width() + 5
+		x, y = 11, 130
 		x = x + ui:Append('WndButton2', {
-			x = x, y = y,
+			name = 'WndBtn_RaidTools',
+			x = x, y = y, w = 96,
+			text = _L['Raid Tools'],
+			onclick = MY_RaidTools.TogglePanel,
+		}):AutoWidth():Width() + 5
+		x = x + ui:Append('WndButton2', {
+			name = 'WndBtn_GKP',
+			x = x, y = y, w = 96,
 			text = _L['GKP Golden Team Record'],
 			onclick = function()
 				if MY_GKP then
@@ -198,8 +224,14 @@ function TI.CreateFrame(a, b)
 			end,
 		}):AutoWidth():Width() + 5
 		if MY_TeamMon_RR then
-			x = x + ui:Append('WndButton2', { x = x, y = y, text = _L['Import Data'], onclick = MY_TeamMon_RR.OpenPanel }):AutoWidth():Width() + 5
+			x = x + ui:Append('WndButton2', {
+				name = 'WndBtn_TeamMon',
+				x = x, y = y, w = 96,
+				text = _L['Import Data'],
+				onclick = MY_TeamMon_RR.OpenPanel,
+			}):AutoWidth():Width() + 5
 		end
+		FormatAllContentPos()
 		-- ×¢²áÊÂ¼þ
 		local frame = TI.GetFrame()
 		frame.OnFrameKeyDown = nil -- esc close --> nil
