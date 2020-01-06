@@ -265,8 +265,8 @@ function D.EncodeString(szData)
 end
 
 -- 剔除校验和提取原始数据
-function D.DecodeString(szData)
-	if string.len(szData) > 2 then
+function D.DecodeHMString(szData)
+	if not IsEmpty(szData) and IsString(szData) and len(szData) > 2 then
 		local nCrc = 0
 		for i = 3, string.len(szData) do
 			nCrc = (nCrc + string.byte(szData, i)) % 255
@@ -297,15 +297,20 @@ function D.GetLover()
 			-- fetch data
 			-- 兼容海鳗：情缘信息从好友备注中提取数据
 			if bMatch then
-				local szData = sub(info.remark, len(szKey) + 1)
-				szData = D.DecodeString(szData)
-				local data = LIB.SplitString(szData, '#')
-				dwLoverID = info.id
-				nLoverType = tonumber(data[1]) or 0
-				nLoverTime = tonumber(data[2]) or GetCurrentTime()
-				nSendItem = 0
-				nReceiveItem = 0
-				LIB.SetStorage('MY_Love', dwLoverID, nLoverTime, nLoverType, nSendItem, nReceiveItem)
+				local szData = D.DecodeHMString(sub(info.remark, len(szKey) + 1))
+				if not IsEmpty(szData) then
+					local data = LIB.SplitString(szData, '#')
+					local nType = data[1] and tonumber(data[1])
+					local nTime = data[2] and tonumber(data[2])
+					if nType and nTime and (nType == 0 or nType == 1) and (nTime > 0 and nTime < GetCurrentTime()) then
+						dwLoverID = info.id
+						nLoverType = nType
+						nLoverTime = nTime
+						nSendItem = 0
+						nReceiveItem = 0
+						LIB.SetStorage('MY_Love', dwLoverID, nLoverTime, nLoverType, nSendItem, nReceiveItem)
+					end
+				end
 				D.SaveFellowRemark(info.id, '')
 			end
 			-- 遍历到情缘，获取基础信息并返回
