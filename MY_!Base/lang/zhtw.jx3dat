@@ -107,6 +107,7 @@ return {
 	['show equipment'] = '查看裝備',
 
 	['none-function hotkey'] = '空白快捷鍵',
+	['Display only chat panel'] = '僅顯示聊天欄',
 	['set hotkey'] = '設置快捷鍵',
 	['>> set hotkey <<'] = '>> 設置快捷鍵 <<',
 	['use global config'] = '使用所有角色公共設置',
