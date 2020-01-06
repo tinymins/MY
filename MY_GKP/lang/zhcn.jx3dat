@@ -60,7 +60,7 @@ return {
 	['Auto Fill the amount of BiXi Fragment as Price'] = '自动填充碧玺碎片数量为价格',
 	['Remind Wipe Data When Enter Dungeon'] = '进入副本提醒清空数据',
 	['Automatic Reception with Record From Distributor'] = '自动接收分配者发出的记录同步',
-	['Popup Record for Distributor'] = '弹出记录（启用插件）',
+	['Popup Record for Distributor'] = '分配者弹出价格记录框',
 	['Edit Allowance Protocols'] = '编辑补贴方案',
 	['Edit Auction Protocols'] = '编辑拍卖方案',
 	['Money Record'] = '金钱记录',

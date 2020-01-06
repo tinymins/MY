@@ -67,6 +67,7 @@ local GKP_ITEM_QUALITIES = {
 
 local Loot = {}
 MY_GKP_Loot = {
+	bOn = true,
 	bVertical = true,
 	bSetColor = true,
 	nConfirmQuality = 3,
@@ -1452,7 +1453,7 @@ end
 
 
 LIB.RegisterEvent('HELP_EVENT.MY_GKP_Loot', function()
-	if not MY_GKP.bOn then
+	if not MY_GKP_Loot.bOn then
 		return
 	end
 	if arg0 == 'OnOpenpanel' and arg1 == 'LOOT' then
@@ -1462,7 +1463,7 @@ end)
 
 -- ÃþÏä×Ó
 LIB.RegisterEvent('OPEN_DOODAD', function()
-	if not MY_GKP.bOn then
+	if not MY_GKP_Loot.bOn then
 		return
 	end
 	if arg1 ~= UI_GetClientPlayerID() then
@@ -1493,7 +1494,7 @@ end)
 
 -- Ë¢ÐÂÏä×Ó
 LIB.RegisterEvent('SYNC_LOOT_LIST', function()
-	if not MY_GKP.bOn then
+	if not MY_GKP_Loot.bOn then
 		return
 	end
 	local frame = Loot.GetFrame()
