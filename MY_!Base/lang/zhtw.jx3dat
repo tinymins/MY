@@ -365,7 +365,7 @@ return {
 	['User preference'] = '角色數據',
 	['Server preference'] = '伺服器數據',
 	['Global preference'] = '全局數據',
-	['Error message'] = '錯誤日誌',
+	['Error message'] = '錯誤反饋',
 	['Show error message'] = '點擊查看錯誤日誌，請在上報問題時複製提交',
 	['Flush data'] = '保存數據',
 	['Config and data will be saved when exit game, click to save immediately'] = '設置數據將在退出游戲後自動保存，點擊立刻保存',
