@@ -54,12 +54,12 @@ MY_TeamNotice = {
 LIB.RegisterCustomData('MY_TeamNotice')
 
 function TI.SaveList()
-	LIB.SaveLUAData({'config/yy.jx3dat', PATH_TYPE.GLOBAL}, TI.tList, '\t', false)
+	LIB.SaveLUAData({'config/yy.jx3dat', PATH_TYPE.GLOBAL}, TI.tList, { indent = '\t', passphrase = false, crc = false })
 end
 
 function TI.GetList()
 	if not TI.tList then
-		TI.tList = LIB.LoadLUAData({'config/yy.jx3dat', PATH_TYPE.GLOBAL}) or {}
+		TI.tList = LIB.LoadLUAData({'config/yy.jx3dat', PATH_TYPE.GLOBAL}, { passphrase = false }) or {}
 	end
 	return TI.tList
 end
