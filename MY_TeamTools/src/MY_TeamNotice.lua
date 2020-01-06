@@ -110,7 +110,7 @@ function TI.CreateFrame(a, b)
 			ondragresize = FormatAllContentPos,
 		})
 		local x, y = 10, 5
-		x = x + ui:Append('Text', { x = x, y = y - 3, text = _L['YY:'], font = 48 }):AutoWidth():Width() + 5
+		x = x + ui:Append('Text', { x = x, y = y - 3, text = LIB.GetLang() == 'zhcn' and _L['YY:'] or _L['DC:'], font = 48 }):AutoWidth():Width() + 5
 		x = x + ui:Append('WndAutocomplete', {
 			name = 'YY',
 			w = 160, h = 26, x = x, y = y,
@@ -161,7 +161,9 @@ function TI.CreateFrame(a, b)
 		}):Width() + 5
 		y = y + ui:Append('WndButton2', {
 			name = 'Btn_YY',
-			x = x, y = y, text = LIB.IsLeader() and _L['Paste YY'] or _L['Copy YY'],
+			x = x, y = y, text = LIB.IsLeader()
+				and (LIB.GetLang() == 'zhcn' and _L['Paste YY'] or _L['Paste DC'])
+				or (LIB.GetLang() == 'zhcn' and _L['Copy YY'] or _L['Copy DC']),
 			onclick = function()
 				local yy = ui:Children('#YY'):Text()
 				if LIB.IsLeader() then
@@ -183,7 +185,7 @@ function TI.CreateFrame(a, b)
 					end
 				else
 					SetDataToClip(yy)
-					LIB.Topmsg(_L['YY number has been copied to clipboard'])
+					LIB.Topmsg(_L['Channel number has been copied to clipboard'])
 				end
 			end,
 		}):Height() + 5
