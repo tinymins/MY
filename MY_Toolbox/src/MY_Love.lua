@@ -98,17 +98,18 @@ local O = {
 		{ nItem = 11, nUIID = 157096, szName = LIB.GetItemNameByUIID(157096), szTitle = _L['FIREWORK_TITLE_157096'] }, -- 莲心并蒂 恒心人
 		{ nItem = 12, nUIID = 157378, szName = LIB.GetItemNameByUIID(157378), szTitle = _L['FIREWORK_TITLE_157378'] }, -- 素心竹月 知心人
 		{ nItem = 13, nUIID = 158339, szName = LIB.GetItemNameByUIID(158339), szTitle = _L['FIREWORK_TITLE_158339'] }, -- 流光绮梦 衷情人
-		{ nItem = 13, nUIID = 159250, szName = LIB.GetItemNameByUIID(159250), szTitle = _L['FIREWORK_TITLE_159250'] }, -- 莲心问情 倾心人
-		{ nItem = 14, nUIID = 160982, szName = LIB.GetItemNameByUIID(160982), szTitle = _L['FIREWORK_TITLE_160982'] }, -- 海誓山盟
-		{ nItem = 14, nUIID = 160993, szName = LIB.GetItemNameByUIID(160993), szTitle = _L['FIREWORK_TITLE_160993'] }, -- 鹊桥引仙 相思人
-		{ nItem = 14, nUIID = 161367, szName = LIB.GetItemNameByUIID(161367), szTitle = _L['FIREWORK_TITLE_161367'] }, -- 金缕诉情 深情人
-		{ nItem = 15, nUIID = 161887, szName = LIB.GetItemNameByUIID(161887), szTitle = _L['FIREWORK_TITLE_161887'] }, -- 蝶梦剪窗 称心人
+		{ nItem = 14, nUIID = 159250, szName = LIB.GetItemNameByUIID(159250), szTitle = _L['FIREWORK_TITLE_159250'] }, -- 莲心问情 倾心人
+		{ nItem = 15, nUIID = 160982, szName = LIB.GetItemNameByUIID(160982), szTitle = _L['FIREWORK_TITLE_160982'] }, -- 海誓山盟
+		{ nItem = 16, nUIID = 160993, szName = LIB.GetItemNameByUIID(160993), szTitle = _L['FIREWORK_TITLE_160993'] }, -- 鹊桥引仙 相思人
+		{ nItem = 17, nUIID = 161367, szName = LIB.GetItemNameByUIID(161367), szTitle = _L['FIREWORK_TITLE_161367'] }, -- 金缕诉情 深情人
+		{ nItem = 18, nUIID = 161887, szName = LIB.GetItemNameByUIID(161887), szTitle = _L['FIREWORK_TITLE_161887'] }, -- 蝶梦剪窗 称心人
 		-- { nItem = 63, nUIID = 65625, szName = LIB.GetItemNameByUIID(65625), szTitle = LIB.GetItemNameByUIID(65625) }, -- 测试用 焰火棒
 	},
 	tLoverItem = {},
 	nPendingItem = 0, -- 请求结缘烟花nItem序号缓存
 }
 for _, p in ipairs(O.aLoverItem) do
+	assert(not O.tLoverItem[p.nItem], 'MY_Love item index conflict: ' .. p.nItem)
 	O.tLoverItem[p.nItem] = p
 end
 RegisterCustomData('MY_Love.bQuiet')
@@ -216,18 +217,33 @@ function D.UseDoubleLoveItem(aInfo, nUIID, callback)
 end
 
 function D.CreateFireworkSelect(callback)
-	local ui = UI.CreateFrame('MY_Love_SetLover', { w = 220, h = 60 + #O.aLoverItem * 40, text = _L['Select a firework'] })
-	local x, y = 50, 50
-	for _, p in ipairs(O.aLoverItem) do
+	local nCol = 3 -- 按钮列数
+	local nMargin = 30 -- 左右边距
+	local nLineHeight = 40 -- 行高
+	local nItemWidth = 100 -- 按钮宽度
+	local nItemHeight = 30 -- 按钮高度
+	local nItemPadding = 10 -- 按钮间距
+	local ui = UI.CreateFrame('MY_Love_SetLover', {
+		w = nItemWidth * nCol + nMargin * 2 + nItemPadding * (nCol - 1),
+		h = 50 + ceil(#O.aLoverItem / nCol) * nLineHeight + 20,
+		text = _L['Select a firework'],
+	})
+	local nX, nY = nMargin, 50
+	for i, p in ipairs(O.aLoverItem) do
 		ui:Append('WndButton', {
-			x = x, y = y, w = 120, h = 30,
+			x = nX, y = nY + (nLineHeight - nItemHeight) / 2, w = nItemWidth, h = nItemHeight,
 			text = LIB.GetItemNameByUIID(p.nUIID),
 			enable = not not D.GetBagItemPos(p.nUIID),
 			onclick = function() callback(p) end,
 			tip = p.szTitle,
 			tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 		})
-		y = y + 40
+		if i % nCol == 0 then
+			nX = nMargin
+			nY = nY + nLineHeight
+		else
+			nX = nX + nItemWidth + nItemPadding
+		end
 	end
 end
 
