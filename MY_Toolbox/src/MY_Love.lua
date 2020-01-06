@@ -225,7 +225,7 @@ function D.CreateFireworkSelect(callback)
 	local nItemPadding = 10 -- °´Å¥¼ä¾à
 	local ui = UI.CreateFrame('MY_Love_SetLover', {
 		w = nItemWidth * nCol + nMargin * 2 + nItemPadding * (nCol - 1),
-		h = 50 + ceil(#O.aLoverItem / nCol) * nLineHeight + 20,
+		h = 50 + ceil(#O.aLoverItem / nCol) * nLineHeight + 30,
 		text = _L['Select a firework'],
 	})
 	local nX, nY = nMargin, 50
