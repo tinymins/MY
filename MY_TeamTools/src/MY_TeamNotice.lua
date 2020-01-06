@@ -140,24 +140,30 @@ function TI.CreateFrame(a, b)
 			},
 		}):Width() + 5
 		y = y + ui:Append('WndButton2', {
-			x = x, y = y, text = _L['Paste YY'],
+			name = 'Btn_YY',
+			x = x, y = y, text = LIB.IsLeader() and _L['Paste YY'] or _L['Copy YY'],
 			onclick = function()
 				local yy = ui:Children('#YY'):Text()
-				if tonumber(yy) then
-					TI.tList = TI.GetList()
-					if not TI.tList[tonumber(yy)] then
-						TI.tList[tonumber(yy)] = true
-						TI.SaveList()
+				if LIB.IsLeader() then
+					if tonumber(yy) then
+						TI.tList = TI.GetList()
+						if not TI.tList[tonumber(yy)] then
+							TI.tList[tonumber(yy)] = true
+							TI.SaveList()
+						end
 					end
-				end
-				if yy ~= '' then
-					for i = 0, 2 do -- 发三次
-						LIB.Talk(PLAYER_TALK_CHANNEL.RAID, yy)
+					if yy ~= '' then
+						for i = 0, 2 do -- 发三次
+							LIB.Talk(PLAYER_TALK_CHANNEL.RAID, yy)
+						end
 					end
-				end
-				local message = ui:Children('#Message'):Text():gsub('\n', ' ')
-				if message ~= '' then
-					LIB.Talk(PLAYER_TALK_CHANNEL.RAID, message)
+					local message = ui:Children('#Message'):Text():gsub('\n', ' ')
+					if message ~= '' then
+						LIB.Talk(PLAYER_TALK_CHANNEL.RAID, message)
+					end
+				else
+					SetDataToClip(yy)
+					LIB.Topmsg(_L['YY number has been copied to clipboard'])
 				end
 			end,
 		}):Height() + 5
@@ -201,6 +207,7 @@ function TI.CreateFrame(a, b)
 		frame:RegisterEvent('PARTY_DELETE_MEMBER')
 		frame:RegisterEvent('PARTY_ADD_MEMBER')
 		frame:RegisterEvent('UI_SCALED')
+		frame:RegisterEvent('TEAM_AUTHORITY_CHANGED')
 		frame.OnEvent = function(szEvent)
 			if szEvent == 'PARTY_DISBAND' then
 				ui:Remove()
@@ -214,6 +221,8 @@ function TI.CreateFrame(a, b)
 				end
 			elseif szEvent == 'UI_SCALED' then
 				ui:Anchor(MY_TeamNotice.anchor)
+			elseif szEvent == 'TEAM_AUTHORITY_CHANGED' then
+				ui:Fetch('Btn_YY'):Text(LIB.IsLeader() and _L['Paste YY'] or _L['Copy YY'])
 			end
 		end
 		frame.OnFrameDragSetPosEnd = function()
