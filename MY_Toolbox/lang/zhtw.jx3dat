@@ -282,7 +282,6 @@ return {
 	['1. You can break love one-sided'] = '1. 情緣可以單方面刪除，雙向情緣會通過密聊告知對方',
     ['View love info'] = '查看情緣信息',
     ['FIREWORK_TITLE_67291'] = '真橙之心',
-    ['FIREWORK_TITLE_160982'] = '海誓山盟',
     ['FIREWORK_TITLE_156446'] = '同心人',
     ['FIREWORK_TITLE_156413'] = '有福人',
     ['FIREWORK_TITLE_157096'] = '恆心人',
@@ -295,4 +294,9 @@ return {
     ['FIREWORK_TITLE_153641'] = '素月流天',
     ['FIREWORK_TITLE_154319'] = '惜福人',
     ['FIREWORK_TITLE_154320'] = '一心人',
+    ['FIREWORK_TITLE_159250'] = '傾心人',
+    ['FIREWORK_TITLE_160982'] = '海誓山盟',
+    ['FIREWORK_TITLE_160993'] = '相思人',
+    ['FIREWORK_TITLE_161367'] = '深情人',
+    ['FIREWORK_TITLE_161887'] = '稱心人',
 }

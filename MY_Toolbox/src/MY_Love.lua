@@ -98,7 +98,11 @@ local O = {
 		{ nItem = 11, nUIID = 157096, szName = LIB.GetItemNameByUIID(157096), szTitle = _L['FIREWORK_TITLE_157096'] }, -- 莲心并蒂 恒心人
 		{ nItem = 12, nUIID = 157378, szName = LIB.GetItemNameByUIID(157378), szTitle = _L['FIREWORK_TITLE_157378'] }, -- 素心竹月 知心人
 		{ nItem = 13, nUIID = 158339, szName = LIB.GetItemNameByUIID(158339), szTitle = _L['FIREWORK_TITLE_158339'] }, -- 流光绮梦 衷情人
+		{ nItem = 13, nUIID = 159250, szName = LIB.GetItemNameByUIID(159250), szTitle = _L['FIREWORK_TITLE_159250'] }, -- 莲心问情 倾心人
 		{ nItem = 14, nUIID = 160982, szName = LIB.GetItemNameByUIID(160982), szTitle = _L['FIREWORK_TITLE_160982'] }, -- 海誓山盟
+		{ nItem = 14, nUIID = 160993, szName = LIB.GetItemNameByUIID(160993), szTitle = _L['FIREWORK_TITLE_160993'] }, -- 鹊桥引仙 相思人
+		{ nItem = 14, nUIID = 161367, szName = LIB.GetItemNameByUIID(161367), szTitle = _L['FIREWORK_TITLE_161367'] }, -- 金缕诉情 深情人
+		{ nItem = 15, nUIID = 161887, szName = LIB.GetItemNameByUIID(161887), szTitle = _L['FIREWORK_TITLE_161887'] }, -- 蝶梦剪窗 称心人
 		-- { nItem = 63, nUIID = 65625, szName = LIB.GetItemNameByUIID(65625), szTitle = LIB.GetItemNameByUIID(65625) }, -- 测试用 焰火棒
 	},
 	tLoverItem = {},
