@@ -617,6 +617,11 @@ function UI:Add(mixed)
 	if IsElement(mixed) then
 		insert(raws, mixed)
 	end
+	if IsTable(mixed) and tostring(mixed) == PACKET_INFO.NAME_SPACE .. '_UI (class instance)' then
+		for i = 1, mixed:Count() do
+			insert(raws, mixed[i])
+		end
+	end
 	return UI(raws)
 end
 
