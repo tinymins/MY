@@ -4016,9 +4016,9 @@ function  UI.CreateFrame(szName, opt)
 			end
 		end
 		if not opt.setting then
-			frm:Lookup('Btn_Setting'):Destroy()
+			frm:Lookup('WndContainer_TitleBtnL/Wnd_Setting'):Destroy()
 		else
-			frm:Lookup('Btn_Setting').OnLButtonClick = opt.setting
+			frm:Lookup('WndContainer_TitleBtnL/Wnd_Setting/Btn_Setting').OnLButtonClick = opt.setting
 		end
 		if opt.onrestore then
 			UI(frm):UIEvent('OnRestore', opt.onrestore)
@@ -4129,10 +4129,18 @@ function  UI.CreateFrame(szName, opt)
 				frm:Lookup('', 'Shadow_Bg'):SetSize(w, h)
 			end
 			frm:Lookup('Btn_Drag').OnDragButtonBegin = function()
+				frm:Lookup('', 'Image_Title'):Hide()
+				frm:Lookup('', 'Text_Title'):Hide()
 				frm:Lookup('Wnd_Total'):Hide()
+				frm:Lookup('WndContainer_TitleBtnL'):Hide()
+				frm:Lookup('WndContainer_TitleBtnR'):Hide()
 			end
 			frm:Lookup('Btn_Drag').OnDragButtonEnd = function()
+				frm:Lookup('', 'Image_Title'):Show()
+				frm:Lookup('', 'Text_Title'):Show()
 				frm:Lookup('Wnd_Total'):Show()
+				frm:Lookup('WndContainer_TitleBtnL'):Show()
+				frm:Lookup('WndContainer_TitleBtnR'):Show()
 				local w, h = this:GetRelPos()
 				w = math.max(w + 16, opt.minwidth)
 				h = math.max(h + 16, opt.minheight)
