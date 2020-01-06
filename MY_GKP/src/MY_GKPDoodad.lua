@@ -384,11 +384,55 @@ function PS.OnPanelActive(frame)
 	local ui = UI(frame)
 	local X, Y = 10, 10
 	local nX, nY = X, Y
+	local nLineHeightS, nLineHeightM, nLineHeightL = 22, 28, 32
 
 	-- loot
 	ui:Append('Text', { text = _L['Pickup helper'], x = nX, y = nY, font = 27 })
 
-	nX, nY = X + 10, Y + 28
+	nX, nY = X + 10, Y + nLineHeightM
+	nX = ui:Append('WndCheckBox', {
+		x = nX, y = nY,
+		text = _L['Enable MY_GKP_Loot'],
+		checked = MY_GKP_Loot.bOn,
+		oncheck = function(bChecked)
+			MY_GKP_Loot.bOn = bChecked
+		end,
+	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
+	nX = ui:Append('WndCheckBox', {
+		x = nX, y = nY,
+		text = _L['Team dungeon'],
+		checked = MY_GKP_Loot.bOnlyInTeamDungeon,
+		oncheck = function(bChecked)
+			MY_GKP_Loot.bOnlyInTeamDungeon = bChecked
+		end,
+		tip = _L['Only enable in checked map (uncheck all for all map)'],
+		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+		autoenable = function() return MY_GKP_Loot.bOn end,
+	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
+	nX = ui:Append('WndCheckBox', {
+		x = nX, y = nY,
+		text = _L['Raid dungeon'],
+		checked = MY_GKP_Loot.bOnlyInRaidDungeon,
+		oncheck = function(bChecked)
+			MY_GKP_Loot.bOnlyInRaidDungeon = bChecked
+		end,
+		tip = _L['Only enable in checked map (uncheck all for all map)'],
+		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+		autoenable = function() return MY_GKP_Loot.bOn end,
+	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
+	nX = ui:Append('WndCheckBox', {
+		x = nX, y = nY,
+		text = _L['Battlefield'],
+		checked = MY_GKP_Loot.bOnlyInBattlefield,
+		oncheck = function(bChecked)
+			MY_GKP_Loot.bOnlyInBattlefield = bChecked
+		end,
+		tip = _L['Only enable in checked map (uncheck all for all map)'],
+		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+		autoenable = function() return MY_GKP_Loot.bOn end,
+	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
+
+	nX, nY = X + 10, nY + nLineHeightM
 	nX = ui:Append('WndCheckBox', {
 		x = nX, y = nY,
 		text = _L['Enable auto pickup'],
@@ -420,15 +464,7 @@ function PS.OnPanelActive(frame)
 		autoenable = function() return MY_GKP_Loot.bOn end,
 	}):AutoWidth():Width() + 10
 
-	nX, nY = X + 10, nY + 28
-	nX = ui:Append('WndCheckBox', {
-		x = nX, y = nY,
-		text = _L['Enable MY_GKP_Loot'],
-		checked = MY_GKP_Loot.bOn,
-		oncheck = function(bChecked)
-			MY_GKP_Loot.bOn = bChecked
-		end,
-	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
+	nX, nY = X + 10, nY + nLineHeightM
 	nX = nX + ui:Append('WndComboBox', {
 		x = nX, y = nY, w = 200,
 		text = _L['Confirm when distribute'],
@@ -490,10 +526,10 @@ function PS.OnPanelActive(frame)
 	}):AutoWidth():Width() + 5
 
 	-- doodad
-	nX, nY = X, nY + 32
+	nX, nY = X, nY + nLineHeightL
 	ui:Append('Text', { text = _L['Craft assit'], x = nX, y = nY, font = 27 })
 
-	nX, nY = X + 10, nY + 28
+	nX, nY = X + 10, nY + nLineHeightM
 	nX = ui:Append('WndCheckBox', {
 		x = nX, y = nY,
 		text = _L['Show the head name'],
@@ -548,12 +584,12 @@ function PS.OnPanelActive(frame)
 	end
 
 	-- craft
-	nX, nY = X + 10, nY + 32
+	nX, nY = X + 10, nY + nLineHeightM
 	for _, v in ipairs(D.tCraft) do
 		if v == 0 then
 			nY = nY + 8
 			if nX ~= 10 then
-				nY = nY + 24
+				nY = nY + nLineHeightS
 				nX = X + 10
 			end
 		else
@@ -575,13 +611,14 @@ function PS.OnPanelActive(frame)
 			nX = nX + 90
 			if nX > 500 then
 				nX = X + 10
-				nY = nY + 24
+				nY = nY + nLineHeightS
 			end
 		end
 	end
-	nY = nY + 8
-	if nX ~= X + 10 then
-		nY = nY + 24
+	if nX == X + 10 then
+		nY = nY - nLineHeightS + nLineHeightM
+	else
+		nY = nY + nLineHeightM
 	end
 
 	nX = X + 10
@@ -606,7 +643,7 @@ function PS.OnPanelActive(frame)
 	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
 
 	-- custom
-	nX, nY = X + 10, nY + 32
+	nX, nY = X + 10, nY + nLineHeightM
 	nX = ui:Append('WndCheckBox', {
 		text = _L['Customs (split by | )'],
 		x = nX, y = nY,

@@ -68,6 +68,9 @@ local GKP_ITEM_QUALITIES = {
 local Loot = {}
 MY_GKP_Loot = {
 	bOn = true,
+	bOnlyInTeamDungeon = false,
+	bOnlyInRaidDungeon = false,
+	bOnlyInBattlefield = false,
 	bVertical = true,
 	bSetColor = true,
 	nConfirmQuality = 3,
@@ -100,6 +103,25 @@ local function onLoadingEnd()
 	MY_GKP_Loot.tItemConfig.tFilterQuality = {}
 end
 LIB.RegisterEvent('LOADING_END.MY_GKP_Loot', onLoadingEnd)
+end
+
+function MY_GKP_Loot.IsEnabled()
+	if not MY_GKP_Loot.bOn then
+		return false
+	end
+	if not MY_GKP_Loot.bOnlyInTeamDungeon and not MY_GKP_Loot.bOnlyInRaidDungeon and not MY_GKP_Loot.bOnlyInBattlefield then
+		return true
+	end
+	if MY_GKP_Loot.bOnlyInTeamDungeon and LIB.IsInDungeon(false) then
+		return true
+	end
+	if MY_GKP_Loot.bOnlyInRaidDungeon and LIB.IsInDungeon(true) then
+		return true
+	end
+	if MY_GKP_Loot.bOnlyInBattlefield and (LIB.IsInBattleField() or LIB.IsInPubg() or LIB.IsInZombieMap()) then
+		return true
+	end
+	return false
 end
 
 function MY_GKP_Loot.CanDialog(tar, doodad)
@@ -1453,7 +1475,7 @@ end
 
 
 LIB.RegisterEvent('HELP_EVENT.MY_GKP_Loot', function()
-	if not MY_GKP_Loot.bOn then
+	if not MY_GKP_Loot.IsEnabled() then
 		return
 	end
 	if arg0 == 'OnOpenpanel' and arg1 == 'LOOT' then
@@ -1463,7 +1485,7 @@ end)
 
 -- ÃþÏä×Ó
 LIB.RegisterEvent('OPEN_DOODAD', function()
-	if not MY_GKP_Loot.bOn then
+	if not MY_GKP_Loot.IsEnabled() then
 		return
 	end
 	if arg1 ~= UI_GetClientPlayerID() then
@@ -1494,7 +1516,7 @@ end)
 
 -- Ë¢ÐÂÏä×Ó
 LIB.RegisterEvent('SYNC_LOOT_LIST', function()
-	if not MY_GKP_Loot.bOn then
+	if not MY_GKP_Loot.IsEnabled() then
 		return
 	end
 	local frame = Loot.GetFrame()

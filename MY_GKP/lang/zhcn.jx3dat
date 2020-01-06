@@ -182,6 +182,10 @@ return {
 	-- Doodad
 	['GKP Doodad helper'] = '金团拾取',
 	['Enable MY_GKP_Loot'] = '启用金团拾取',
+	['Only enable in checked map (uncheck all for all map)'] = '仅在勾选地图类型中启用（全未勾选则在所有地图启用）',
+	['Team dungeon'] = '小队秘境',
+	['Raid dungeon'] = '团队秘境',
+	['Battlefield'] = '战场',
 	['Pickup helper'] = '拾取助手',
 	['Enable auto pickup'] = '自动打开掉落',
 	['Auto craft'] = '自动采集',
