@@ -60,6 +60,7 @@ RegisterCustomData('MY_EnergyBar.tAnchor')
 ---------------------------------------------------------------------
 local D = {
 	nBombCount = 0,
+	tBombMsg = {},
 	aAccumulateShow =
 	{
 		{},
@@ -276,34 +277,75 @@ function D.UpdateBaDao(frame)
 	frame.nUpdateStatus = PlayerEnergyUI_Update(D.szShowSub, hBaDao, me)
 end
 
--- tangmen
-function D.GetBombCount()
-	if D.nBombTime and (GetTime() - D.nBombTime) < 1000 then
-		return D.nBombCount
-	end
-	local me, nCount = GetClientPlayer(), 0
-	for _, v in ipairs(LIB.GetNearNpc()) do
-		if v.dwTemplateID == 16000 and v.dwEmployer == me.dwID then
-			nCount = nCount + 1
-		end
-	end
-	D.nBombCount = nCount
-	D.nBombTime = GetTime()
-	return nCount
-end
-
+-- 唐门机关暗藏杀机 抄的官方代码
 function D.UpdateBomb(frame)
 	local h = frame:Lookup('', D.szShow)
-	if not h then
+	local me = GetClientPlayer()
+	if not h or not me then
 		return
 	end
-	local nCount = D.GetBombCount()
-	for i = 0, 2, 1 do
-		local img = frame:Lookup('', 'Image_Bomb' .. i)
-		if i < nCount then
-			img:Show()
-		else
-			img:Hide()
+	local hBombList = h:Lookup('Handle_ACSJ')
+	local ACSJ_SKILL_BUFF_LIST_ID = 2 --唐门暗藏杀机BUFF列表
+	if hBombList then
+		local tBuffList, nBombID = Table_GetCustomBuffList(ACSJ_SKILL_BUFF_LIST_ID), nil
+		for i, nBuffID in ipairs(tBuffList) do
+			local bExist = me.IsHaveBuff(nBuffID, 1)
+			if bExist then
+				local buff = LIB.GetBuff(me, nBuffID)
+				if buff then
+					local nLeftTime = floor((buff.nEndFrame - GetLogicFrameCount()) / GLOBAL.GAME_FPS)
+					if D.tBombMsg[i] and D.tBombMsg[i].nTime >= nLeftTime then
+						D.tBombMsg[i].nTime = nLeftTime
+					else
+						D.tBombMsg[i] = {nID = nBuffID, nTime = nLeftTime}
+					end
+				else
+					D.tBombMsg[i] = nil
+				end
+			else
+				D.tBombMsg[i] = nil
+			end
+		end
+
+		for i, nBuffID in ipairs(tBuffList) do
+			local pBomb, bFound = me.GetBomb(i - 1), false
+			if pBomb then
+				for _, tBomb in pairs(D.tBombMsg) do
+					if tBomb.nBombNpcID == pBomb.dwID then
+						bFound = true
+						break
+					end
+				end
+				if not bFound then
+					nBombID = pBomb.dwID
+				end
+			end
+		end
+		if nBombID then
+			for _, tBomb in pairs(D.tBombMsg) do
+				if not tBomb.nBombNpcID then
+					tBomb.nBombNpcID = nBombID
+					break
+				end
+			end
+		end
+
+		for i, nBuffID in ipairs(tBuffList) do
+			local hBomb = hBombList:Lookup(i - 1)
+			hBomb:Hide()
+			if D.tBombMsg[i] then
+				hBomb:Show()
+				hBomb:Lookup(2):SetText(tostring(D.tBombMsg[i].nTime))
+				if D.tBombMsg[i].nBombNpcID then
+					local npc = GetNpc(D.tBombMsg[i].nBombNpcID)
+					local nDistance = npc and LIB.GetDistance(npc, 'plane')
+					if nDistance and nDistance <= 30 then
+						hBomb:SetAlpha(255)
+					else
+						hBomb:SetAlpha(100)
+					end
+				end
+			end
 		end
 	end
 end
@@ -377,13 +419,7 @@ function D.CopyHandle(frame)
 			D.szShow = 'Handle_' .. D.szShowSub
 		end
 		hTotal:AppendItemFromIni('ui\\config\\default\\PlayerBar.ini', D.szShow)
-		if D.szShowSub == 'TM' then
-			local x = 125
-			for i = 0, 2, 1 do
-				hTotal:AppendItemFromString('<image>path="' .. PLUGIN_ROOT .. '/img/Ball.UiTex" frame=0 name="Image_Bomb' .. i .. '" x=' .. x .. ' y=0 w=25 h=25 lockshowhide=1 </image>')
-				x = x + 25
-			end
-		elseif D.szShowSub == 'MJ' then
+		if D.szShowSub == 'MJ' then
 			hTotal:AppendItemFromString('<text>text="" name="Text_Sun" x=87 y=10 w=144 h=20 font=163 </text>')
 			hTotal:AppendItemFromString('<text>text="" name="Text_Moon" x=87 y=52 w=144 h=20 font=202 </text>')
 		end
@@ -437,7 +473,6 @@ function D.OnEvent(event)
 				D.nBombCount = D.nBombCount + 1
 			end
 			if nBomb ~= D.nBombCount then
-				D.nBombTime = GetTime()
 				D.UpdateBomb(this)
 			end
 		end
@@ -474,7 +509,7 @@ function D.OnEvent(event)
 end
 
 function D.OnFrameBreathe()
-	if D.szShowSub == 'TM' and D.nBombTime and D.nBombTime < (GetTime() - 1000) then
+	if D.szShowSub == 'TM' then
 		D.UpdateBomb(this)
 	end
 	if this.nUpdateStatus == 1 then
