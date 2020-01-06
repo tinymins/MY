@@ -91,6 +91,11 @@ UI = setmetatable({}, {
 			TOPCENTER    = 1,
 			BOTTOMCENTER = 1,
 		}),
+		EDIT_TYPE = LIB.SetmetaReadonly({
+			NUMBER = 0, -- 数字
+			ASCII = 1, -- 英文
+			WIDE_CHAR = 2, -- 中英文
+		}),
 	},
 	__tostring = function(t) return PACKET_INFO.NAME_SPACE .. '_UI (class prototype)' end,
 	__call = function (...)
@@ -4222,13 +4227,13 @@ function UI.OpenColorPicker(callback, t)
 	end
 	local x, y = 220, 435
 	ui:Append('Text', { text = 'R', x = x, y = y, w = 10 })
-	ui:Append('WndEditBox', { name = 'R', x = x + 14, y = y + 4, w = 34, h = 25, limit = 3, edittype = 0, onchange = onChange })
+	ui:Append('WndEditBox', { name = 'R', x = x + 14, y = y + 4, w = 34, h = 25, limit = 3, edittype = UI.EDIT_TYPE.NUMBER, onchange = onChange })
 	x = x + 14 + 34
 	ui:Append('Text', { text = 'G', x = x, y = y, w = 10 })
-	ui:Append('WndEditBox', { name = 'G', x = x + 14, y = y + 4, w = 34, h = 25, limit = 3, edittype = 0, onchange = onChange })
+	ui:Append('WndEditBox', { name = 'G', x = x + 14, y = y + 4, w = 34, h = 25, limit = 3, edittype = UI.EDIT_TYPE.NUMBER, onchange = onChange })
 	x = x + 14 + 34
 	ui:Append('Text', { text = 'B', x = x, y = y, w = 10 })
-	ui:Append('WndEditBox', { name = 'B', x = x + 14, y = y + 4, w = 34, h = 25, limit = 3, edittype = 0, onchange = onChange })
+	ui:Append('WndEditBox', { name = 'B', x = x + 14, y = y + 4, w = 34, h = 25, limit = 3, edittype = UI.EDIT_TYPE.NUMBER, onchange = onChange })
 	x = x + 14 + 34
 	ui:Append('WndButton', { text = g_tStrings.STR_HOTKEY_SURE, x = x + 5, y = y + 3, w = 50, h = 30, onclick = function()
 		if GetRGBValue() then

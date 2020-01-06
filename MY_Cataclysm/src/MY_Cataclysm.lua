@@ -220,7 +220,7 @@ function MY_Cataclysm.OpenBuffRuleEditor(rec, onChangeNotify, bHideBase)
 		x = x + ui:Append('WndEditBox', {
 			x = x, y = y, w = 60, h = 25,
 			placeholder = _L['No limit'],
-			edittype = 0, text = rec.nLevel,
+			edittype = UI.EDIT_TYPE.NUMBER, text = rec.nLevel,
 			onchange = function(text)
 				rec.nLevel = tonumber(text)
 				onChangeNotify(rec)
@@ -266,7 +266,7 @@ function MY_Cataclysm.OpenBuffRuleEditor(rec, onChangeNotify, bHideBase)
 	x = x + ui:Append('WndEditBox', {
 		name = 'WndEditBox_StackNum',
 		x = x, y = y, w = 30, h = 25,
-		edittype = 0,
+		edittype = UI.EDIT_TYPE.NUMBER,
 		text = rec.nStackNum,
 		onchange = function(text)
 			rec.nStackNum = tonumber(text)
@@ -339,7 +339,7 @@ function MY_Cataclysm.OpenBuffRuleEditor(rec, onChangeNotify, bHideBase)
 	}):AutoWidth():Width() + 5
 	x = x + ui:Append('WndEditBox', {
 		x = x, y = y, w = 40, h = 25,
-		edittype = 0,
+		edittype = UI.EDIT_TYPE.NUMBER,
 		text = rec.nPriority,
 		onchange = function(text)
 			rec.nPriority = tonumber(text)

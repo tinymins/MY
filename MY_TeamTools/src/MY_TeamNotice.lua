@@ -95,7 +95,7 @@ function TI.CreateFrame(a, b)
 			name = 'YY',
 			w = 160, h = 26, x = x, y = y,
 			text = a, font = 48, color = { 128, 255, 0 },
-			edittype = 1,
+			edittype = UI.EDIT_TYPE.NUMBER,
 			onclick = function()
 				if IsPopupMenuOpened() then
 					UI(this):Autocomplete('close')

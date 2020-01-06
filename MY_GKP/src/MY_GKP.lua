@@ -1625,7 +1625,7 @@ function _GKP.Record(tab, item, bEnter)
 		end,
 	})
 	local hMoney = ui:Append('WndAutocomplete', {
-		name = 'Money', x = x + 140, y = y + 151, w = 185, h = 25, limit = 8, edittype = 1,
+		name = 'Money', x = x + 140, y = y + 151, w = 185, h = 25, limit = 8, edittype = UI.EDIT_TYPE.ASCII,
 		autocomplete = {
 			{
 				'option', 'beforeSearch', function(raw, option, text)

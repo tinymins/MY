@@ -1673,7 +1673,7 @@ function D.OpenSettingPanel(data, szType)
 		nX = ui:Append('Text', { x = nX + 5, y = nY, text = _L['Buffcount achieve'] }):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndEditBox', {
 			x = nX + 2, y = nY + 2, w = 30, h = 26,
-			text = data.nCount or 1, edittype = 0,
+			text = data.nCount or 1, edittype = UI.EDIT_TYPE.NUMBER,
 			onchange = function(nNum)
 				data.nCount = tonumber(nNum)
 				if data.nCount == 1 then
@@ -1953,7 +1953,7 @@ function D.OpenSettingPanel(data, szType)
 		nX = ui:Append('Text', { x = nX + 5, y = nY, text = _L['Count achieve'] }):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndEditBox', {
 			x = nX + 2, y = nY + 2, w = 30, h = 26,
-			text = data.nCount or 1, edittype = 0,
+			text = data.nCount or 1, edittype = UI.EDIT_TYPE.NUMBER,
 			onchange = function(nNum)
 				data.nCount = tonumber(nNum)
 				if data.nCount == 1 then
@@ -2065,7 +2065,7 @@ function D.OpenSettingPanel(data, szType)
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('Text', { x = nX + 5, y = nY, text = _L['Count achieve'] }):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndEditBox', {
-			x = nX + 2, y = nY + 2, w = 30, h = 26, text = data.nCount or 1, edittype = 0,
+			x = nX + 2, y = nY + 2, w = 30, h = 26, text = data.nCount or 1, edittype = UI.EDIT_TYPE.NUMBER,
 			onchange = function(nNum)
 				data.nCount = tonumber(nNum)
 				if data.nCount == 1 then
@@ -2499,7 +2499,7 @@ function D.OpenSettingPanel(data, szType)
 		-- 重复调用时间限制
 		nX = ui:Append('WndEditBox', {
 			x = nX + 5, y = nY, w = 30, h = 25,
-			text = v.nRefresh, edittype = 0,
+			text = v.nRefresh, edittype = UI.EDIT_TYPE.NUMBER,
 			onchange = function(szNum)
 				v.nRefresh = tonumber(szNum)
 			end,
@@ -2615,7 +2615,7 @@ function D.OpenSettingPanel(data, szType)
 					end,
 				}):Pos('BOTTOMRIGHT')
 				nX = ui:Append('WndEditBox', {
-					x = nX + 5, y = nY + 2, w = 80, h = 26, text = circle.nAngle, edittype = 0,
+					x = nX + 5, y = nY + 2, w = 80, h = 26, text = circle.nAngle, edittype = UI.EDIT_TYPE.NUMBER,
 					onchange = function(nNum)
 						circle.nAngle = tonumber(nNum) or 80
 						FireUIEvent('MY_TM_CC_RELOAD')
@@ -2623,7 +2623,7 @@ function D.OpenSettingPanel(data, szType)
 				}):Pos('BOTTOMRIGHT')
 				nX = ui:Append('Text', { x = nX, y = nY, text = _L['Degree'] }):AutoWidth():Pos('BOTTOMRIGHT')
 				nX = ui:Append('WndEditBox', {
-					x = nX + 10, y = nY + 2, w = 80, h = 26, text = circle.nRadius, edittype = 0,
+					x = nX + 10, y = nY + 2, w = 80, h = 26, text = circle.nRadius, edittype = UI.EDIT_TYPE.NUMBER,
 					onchange = function(nNum)
 						circle.nRadius = tonumber(nNum) or 4
 						FireUIEvent('MY_TM_CC_RELOAD')
@@ -2631,7 +2631,7 @@ function D.OpenSettingPanel(data, szType)
 				}):Pos('BOTTOMRIGHT')
 				nX = ui:Append('Text', { x = nX, y = nY, text = _L['Meter'] }):AutoWidth():Pos('BOTTOMRIGHT')
 				nX = ui:Append('WndEditBox', {
-					x = nX + 10, y = nY + 2, w = 80, h = 26, text = circle.nAlpha, edittype = 0,
+					x = nX + 10, y = nY + 2, w = 80, h = 26, text = circle.nAlpha, edittype = UI.EDIT_TYPE.NUMBER,
 					onchange = function(nNum)
 						circle.nAlpha = tonumber(nNum)
 						FireUIEvent('MY_TM_CC_RELOAD')
