@@ -33,4 +33,5 @@ lua_25=src/PS.lua
 lua_26=src/MY_Love.lua
 lua_27=src/MY_Love.PS.lua
 lua_28=src/MY_Love.PV.lua
+lua_29=src/MY_LockFrame.lua
 package=MY

@@ -1,7 +1,7 @@
 --------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
--- @desc     : 常用工具
+-- @desc     : 试炼之地九宫助手
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
@@ -38,7 +38,7 @@ local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAD
 -----------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Toolbox'
 local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
-local MODULE_NAME = 'MY_Toolbox'
+local MODULE_NAME = 'MY_LockFrame'
 local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
 if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
@@ -46,38 +46,130 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
 end
 --------------------------------------------------------------------------
 
-do
-local TARGET_TYPE, TARGET_ID
-local function onHotKey()
-	if TARGET_TYPE then
-		LIB.SetTarget(TARGET_TYPE, TARGET_ID)
-		TARGET_TYPE, TARGET_ID = nil
-	else
-		TARGET_TYPE, TARGET_ID = LIB.GetTarget()
-		LIB.SetTarget(TARGET.PLAYER, UI_GetClientPlayerID())
+local D = {}
+local O = {
+	bEnable = false,
+	bTempDisable = false,
+}
+RegisterCustomData('MY_LockFrame.bEnable')
+
+local HOOKED_UI = setmetatable({}, { __mode = 'k' })
+local UI_DRAGABLE = setmetatable({}, { __mode = 'k' })
+local function EnableDrag(frame, bEnable)
+	UI_DRAGABLE[frame] = bEnable
+end
+local function IsDragable(frame)
+	return UI_DRAGABLE[frame] or false
+end
+function D.LockFrame(frame)
+	if not HOOKED_UI[frame] then
+		HOOKED_UI[frame] = true
+		UI_DRAGABLE[frame] = frame:IsDragable()
+		frame:EnableDrag(false)
+		HookTableFunc(frame, 'EnableDrag', EnableDrag, { bDisableOrigin = true })
+		HookTableFunc(frame, 'IsDragable', IsDragable, { bDisableOrigin = true, bHookReturn = true })
 	end
 end
-LIB.RegisterHotKey('MY_AutoLoopMeAndTarget', _L['Loop target between me and target'], onHotKey)
+function D.UnlockFrame(frame)
+	if HOOKED_UI[frame] then
+		UnhookTableFunc(frame, 'EnableDrag', EnableDrag)
+		UnhookTableFunc(frame, 'IsDragable', IsDragable)
+		frame:EnableDrag(UI_DRAGABLE[frame])
+		HOOKED_UI[frame] = nil
+		UI_DRAGABLE[frame] = nil
+	end
 end
 
-local PS = {}
-function PS.OnPanelActive(wnd)
-	local ui = UI(wnd)
-	local X, Y = 20, 20
-	local W, H = ui:Size()
-	local x, y = X, Y
-	x, y = MY_GongzhanCheck.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_FooterTip.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_BagEx.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_VisualSkill.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_ShenxingHelper.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_AutoHideChat.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_WhisperMetion.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_ArenaHelper.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_ChangGeShadow.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_Memo.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_HideAnnounceBg.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_EnergyBar.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_LockFrame.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+function D.IsLock()
+	return O.bEnable and not O.bTempDisable
 end
-LIB.RegisterPanel('MY_ToolBox', _L['toolbox'], _L['General'], 'UI/Image/Common/Money.UITex|243', PS)
+
+function D.CheckFrame(frame)
+	local bLock = D.IsLock()
+	if bLock then
+		D.LockFrame(frame)
+	else
+		D.UnlockFrame(frame)
+	end
+end
+
+function D.CheckAllFrame()
+	local bLock = D.IsLock()
+	for _, szLayer in ipairs({'Lowest', 'Lowest1', 'Lowest2', 'Normal', 'Normal1', 'Normal2', 'Topmost', 'Topmost1', 'Topmost2'})do
+		local frmIter = Station.Lookup(szLayer):GetFirstChild()
+		while frmIter do
+			if bLock then
+				D.LockFrame(frmIter)
+			else
+				D.UnlockFrame(frmIter)
+			end
+			frmIter = frmIter:GetNext()
+		end
+	end
+	if bLock then
+		LIB.RegisterEvent('ON_FRAME_CREATE.MY_LockFrame', function()
+			D.CheckFrame(arg0)
+		end)
+		LIB.BreatheCall('MY_LockFrame', function()
+			if IsCtrlKeyDown() and (IsShiftKeyDown() or IsAltKeyDown()) then
+				if not O.bTempDisable then
+					O.bTempDisable = true
+					D.CheckAllFrame()
+				end
+			else
+				if O.bTempDisable then
+					O.bTempDisable = false
+					D.CheckAllFrame()
+				end
+			end
+		end)
+	else
+		LIB.RegisterEvent('ON_FRAME_CREATE.MY_LockFrame', false)
+	end
+end
+
+LIB.RegisterInit('MY_LockFrame', D.CheckAllFrame)
+
+function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+	ui:Append('WndCheckBox', {
+		x = x, y = y, w = 'auto',
+		text = _L['Lock all frame position (press ctrl+alt to temp unlock)'],
+		checked = MY_LockFrame.bEnable,
+		oncheck = function(bChecked)
+			MY_LockFrame.bEnable = bChecked
+		end,
+	})
+	y = y + 30
+	return x, y
+end
+
+-- Global exports
+do
+local settings = {
+	exports = {
+		{
+			fields = {
+				OnPanelActivePartial = D.OnPanelActivePartial,
+			},
+		},
+		{
+			fields = {
+				bEnable = true,
+			},
+			root = O,
+		},
+	},
+	imports = {
+		{
+			fields = {
+				bEnable = true,
+			},
+			triggers = {
+				bEnable = D.CheckAllFrame,
+			},
+			root = O,
+		},
+	},
+}
+MY_LockFrame = LIB.GeneGlobalNS(settings)
+end

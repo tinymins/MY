@@ -299,4 +299,5 @@ return {
     ['FIREWORK_TITLE_160993'] = '相思人',
     ['FIREWORK_TITLE_161367'] = '深情人',
     ['FIREWORK_TITLE_161887'] = '稱心人',
+    ['Lock all frame position (press ctrl+alt to temp unlock)'] = '鎖定所有窗口位置（按住CTRL+ALT可臨時解鎖）',
 }
