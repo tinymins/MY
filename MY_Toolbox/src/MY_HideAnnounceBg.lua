@@ -71,7 +71,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 				MY_HideAnnounceBg.bEnable = bChecked
 			end,
 		}):AutoWidth():Width() + 5
-		x, y = X, y + 30
+		x, y = X, y + 25
 	end
 	return x, y
 end

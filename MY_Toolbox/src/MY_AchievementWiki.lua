@@ -46,38 +46,48 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
 end
 --------------------------------------------------------------------------
 
+local D = {}
+local O = {
+	bEnable = false,
+}
+RegisterCustomData('MY_AchievementWiki.bEnable')
+
 local function OnItemMouseEnter()
-	this:SetObjectMouseOver(true)
-	local x, y = this:GetAbsPos()
-	local w, h = this:GetSize()
-	local xml = {}
-	insert(xml, GetFormatText(_L['Click for achievement wiki'], 41))
-	if IsCtrlKeyDown() then
-		local h = this:GetParent()
-		local t = {}
-		for k, v in pairs(h) do
-			if k ~= '___id' and k ~= '___type' then
-				insert(t, k .. ': ' .. EncodeLUAData(v, '  '))
+	if O.bEnable then
+		this:SetObjectMouseOver(true)
+		local x, y = this:GetAbsPos()
+		local w, h = this:GetSize()
+		local xml = {}
+		insert(xml, GetFormatText(_L['Click for achievement wiki'], 41))
+		if IsCtrlKeyDown() then
+			local h = this:GetParent()
+			local t = {}
+			for k, v in pairs(h) do
+				if k ~= '___id' and k ~= '___type' then
+					insert(t, k .. ': ' .. EncodeLUAData(v, '  '))
+				end
 			end
+			insert(xml, GetFormatText('\n\n' .. g_tStrings.DEBUG_INFO_ITEM_TIP .. '\n', 102))
+			insert(xml, GetFormatText(concat(t, '\n'), 102))
 		end
-		insert(xml, GetFormatText('\n\n' .. g_tStrings.DEBUG_INFO_ITEM_TIP .. '\n', 102))
-		insert(xml, GetFormatText(concat(t, '\n'), 102))
+		OutputTip(concat(xml), 300, { x, y, w, h })
 	end
-	OutputTip(concat(xml), 300, { x, y, w, h })
 end
 
 local function OnItemMouseLeave()
-	this:SetObjectMouseOver(false)
-	HideTip()
+	if O.bEnable then
+		this:SetObjectMouseOver(false)
+		HideTip()
+	end
 end
 
 local function OnItemLButtonClick()
 	local name = this:GetName()
-	if name == 'Box_AchiBox' then
+	if name == 'Box_AchiBox' and O.bEnable then
 		local hItem = this:GetParent()
 		local txtName = hItem:Lookup('Text_AchiName')
 		local txtDescribe = hItem:Lookup('Text_AchiDescribe')
-		local szURL = 'https://haimanchajian.com/jx3/wiki/details/' .. hItem.dwAchievement
+		local szURL = 'https://j3cx.com/wiki/' .. hItem.dwAchievement
 		local szKey = 'AchievementWiki_' .. hItem.dwAchievement
 		local szTitle = txtName:GetText() .. ' - ' .. txtDescribe:GetText()
 		MY_Web.Open(szURL, { key = szKey, title = szTitle, w = 850, h = 610 })
@@ -135,10 +145,48 @@ end
 
 do
 local function OnFrameCreate(name, frame)
-	if LIB.IsShieldedVersion() then
-		return
-	end
 	HookFrame(frame)
 end
 LIB.RegisterFrameCreate('AchievementPanel.MY_AchievementWiki', OnFrameCreate)
+end
+
+function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+	ui:Append('WndCheckBox', {
+		x = x, y = y, w = 'auto',
+		text = _L['Achievement wiki'],
+		checked = MY_AchievementWiki.bEnable,
+		oncheck = function(bChecked)
+			MY_AchievementWiki.bEnable = bChecked
+		end,
+	})
+	y = y + 25
+	return x, y
+end
+
+-- Global exports
+do
+local settings = {
+	exports = {
+		{
+			fields = {
+				OnPanelActivePartial = D.OnPanelActivePartial,
+			},
+		},
+		{
+			fields = {
+				bEnable = true,
+			},
+			root = O,
+		},
+	},
+	imports = {
+		{
+			fields = {
+				bEnable = true,
+			},
+			root = O,
+		},
+	},
+}
+MY_AchievementWiki = LIB.GeneGlobalNS(settings)
 end

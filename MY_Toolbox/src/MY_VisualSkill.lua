@@ -298,6 +298,6 @@ function MY_VisualSkill.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 		end,
 	})
 	x = X
-	y = y + 30
+	y = y + 25
 	return x, y
 end

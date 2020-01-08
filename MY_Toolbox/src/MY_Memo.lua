@@ -226,7 +226,7 @@ function MY_Memo.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 			end)
 		end,
 	}):AutoWidth():Width() + 5
-	y = y + 30
+	y = y + 25
 	x = X
 	return x, y
 end

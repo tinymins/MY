@@ -187,7 +187,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 			MY_ShenxingHelper.bAvoidBlackCD = bChecked
 		end,
 	})
-	y = y + 30
+	y = y + 25
 	return x, y
 end
 

@@ -157,7 +157,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 			MY_ArenaHelper.bAutoSwitchTalkChannel = bChecked
 		end,
 	})
-	y = y + 30
+	y = y + 25
 
 	-- 竞技场自动恢复队伍信息
 	ui:Append('WndCheckBox', {
@@ -168,7 +168,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 			MY_ArenaHelper.bRestoreAuthorityInfo = bChecked
 		end,
 	})
-	y = y + 30
+	y = y + 25
 
 	-- 竞技场战场自动取消屏蔽
 	ui:Append('WndCheckBox', {
@@ -179,7 +179,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 			MY_ArenaHelper.bAutoShowModel = bChecked
 		end,
 	})
-	y = y + 30
+	y = y + 25
 	return x, y
 end
 

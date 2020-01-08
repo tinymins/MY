@@ -93,7 +93,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 			MY_WhisperMetion.bEnable = bChecked
 		end,
 	})
-	y = y + 30
+	y = y + 25
 	return x, y
 end
 

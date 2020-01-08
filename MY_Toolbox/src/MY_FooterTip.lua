@@ -206,7 +206,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 			MY_FooterTip.bFriendNav = not MY_FooterTip.bFriendNav
 		end,
 	})
-	y = y + 30
+	y = y + 25
 
 	-- ∞Ôª·∏ﬂ¡¡
 	ui:Append('WndCheckBox', {
@@ -225,7 +225,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 			MY_FooterTip.bTongMemberNav = not MY_FooterTip.bTongMemberNav
 		end,
 	})
-	y = y + 30
+	y = y + 25
 	return x, y
 end
 
