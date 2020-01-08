@@ -915,6 +915,12 @@ local CONSTANT = setmetatable({}, {
 			[280] = 281, -- ÊÃ½£Ô°
 			[296] = 297, -- ÁúÃÅ¾ø¾³
 		},
+		NPC_NAME = {},
+		NPC_NAME_FIX = {
+			[58294] = 62347, -- ½£³öºèÃÉ
+		},
+		DOODAD_NAME = {},
+		DOODAD_NAME_FIX = {},
 		-- skillid, uitex, frame
 		KUNGFU_LIST = {
 			-- MT

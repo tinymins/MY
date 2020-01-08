@@ -1068,9 +1068,9 @@ function LIB.GetTemplateName(dwType, dwTemplateID)
 	end
 	if not szName then
 		if dwType == TARGET.NPC then
-			szName = Table_GetNpcTemplateName(dwTemplateID)
+			szName = CONSTANT.NPC_NAME[dwTemplateID] or Table_GetNpcTemplateName(CONSTANT.NPC_NAME_FIX[dwTemplateID] or dwTemplateID)
 		else
-			szName = Table_GetDoodadTemplateName(dwTemplateID)
+			szName = CONSTANT.DOODAD_NAME[dwTemplateID] or Table_GetDoodadTemplateName(CONSTANT.DOODAD_NAME_FIX[dwTemplateID] or dwTemplateID)
 		end
 		if szName then
 			szName = szName:gsub('^%s*(.-)%s*$', '%1')
