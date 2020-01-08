@@ -200,7 +200,7 @@ function MY_Web.Open(url, options)
 	ui:MinSize(290, 150)
 	ui:Size(OnResizePanel)
 	ui:Size(options.w or 500, options.h or 600)
-	ui:Anchor(options.anchor or {})
+	ui:Anchor(options.anchor or 'CENTER')
 	UpdateControls(frame, 'go')
 
 	return szKey
