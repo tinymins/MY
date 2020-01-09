@@ -132,9 +132,6 @@ local function QueryData(szQues)
 			end
 		end,
 		error = function(html, status, connected)
-			if not connected then
-				l_szLastQueryQues = ''
-			end
 			DisplayMessage(_L['Loading failed.'])
 		end,
 		timeout = 10000,
