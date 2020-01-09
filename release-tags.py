@@ -2,10 +2,14 @@
 
 import time, os, re, codecs
 
+def __is_interface(path):
+    name = os.path.basename(path).lower()
+    return name == 'interface' or name == 'interfacesource'
+
 # Get interface root path
 pkg_name = ''
 root_path = os.path.abspath(os.getcwd())
-if os.path.basename(root_path).lower() != 'interface' and os.path.basename(os.path.dirname(root_path).lower()) == 'interface':
+if not __is_interface(root_path) and __is_interface(os.path.dirname(root_path)):
     pkg_name = os.path.basename(root_path)
     root_path = os.path.dirname(root_path)
 
