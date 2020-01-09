@@ -280,7 +280,7 @@ function PS.OnPanelActive(wnd)
 		text = MY_Taoguan.nPausePoint,
 		menu = function()
 			local m0 = {}
-			for i = 7, 17 do
+			for i = 7, 16 do
 				local v = 10 * 2 ^ i
 				table.insert(m0, { szOption = tostring(v), fnAction = function()
 					MY_Taoguan.nPausePoint = v
