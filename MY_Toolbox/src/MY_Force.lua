@@ -375,10 +375,11 @@ function PS.OnPanelActive(frame)
 			MY_ForceGuding.szSay = szText
 		end,
 	})
+	-- crlf
+	y = y + 54
 	if not LIB.IsShieldedVersion() then
 		-- crlf
 		x = X + 10
-		y = y + 54
 		x = ui:Append('WndCheckBox', {
 			x = x, y = y,
 			checked = MY_ForceGuding.bUseMana,
@@ -405,9 +406,8 @@ function PS.OnPanelActive(frame)
 			onchange = function(nVal) MY_ForceGuding.nManaHp = nVal end,
 			autoenable = function() return MY_ForceGuding.bUseMana end,
 		}):Pos('BOTTOMRIGHT')
+		y = y + 36
 	end
-	-- crlf
-	y = y + 36
 	-- other
 	---------------
 	x = X
