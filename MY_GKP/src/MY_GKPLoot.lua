@@ -67,7 +67,7 @@ local GKP_ITEM_QUALITIES = {
 
 local D = {}
 local O = {
-	bOn = true,
+	bOn = false,
 	bOnlyInTeamDungeon = false,
 	bOnlyInRaidDungeon = false,
 	bOnlyInBattlefield = false,
