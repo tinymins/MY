@@ -92,15 +92,15 @@ local O = {
 		tAutoPickupFilters = {},
 	},
 }
-LIB.RegisterCustomData('MY_GKP_Loot.bOn')
-LIB.RegisterCustomData('MY_GKP_Loot.bOnlyInTeamDungeon')
-LIB.RegisterCustomData('MY_GKP_Loot.bOnlyInRaidDungeon')
-LIB.RegisterCustomData('MY_GKP_Loot.bOnlyInBattlefield')
-LIB.RegisterCustomData('MY_GKP_Loot.bVertical')
-LIB.RegisterCustomData('MY_GKP_Loot.bSetColor')
-LIB.RegisterCustomData('MY_GKP_Loot.nConfirmQuality')
-LIB.RegisterCustomData('MY_GKP_Loot.tConfirm')
-LIB.RegisterCustomData('MY_GKP_Loot.tItemConfig')
+RegisterCustomData('MY_GKP_Loot.bOn')
+RegisterCustomData('MY_GKP_Loot.bOnlyInTeamDungeon')
+RegisterCustomData('MY_GKP_Loot.bOnlyInRaidDungeon')
+RegisterCustomData('MY_GKP_Loot.bOnlyInBattlefield')
+RegisterCustomData('MY_GKP_Loot.bVertical')
+RegisterCustomData('MY_GKP_Loot.bSetColor')
+RegisterCustomData('MY_GKP_Loot.nConfirmQuality')
+RegisterCustomData('MY_GKP_Loot.tConfirm')
+RegisterCustomData('MY_GKP_Loot.tItemConfig')
 
 do
 local function onLoadingEnd()
