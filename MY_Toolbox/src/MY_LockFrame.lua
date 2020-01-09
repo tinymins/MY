@@ -50,6 +50,29 @@ local D = {}
 local O = {
 	bEnable = false,
 	bTempDisable = false,
+	tLockName = {
+		['JX_TargetList'] = true, -- 剑心焦点列表 [Normal/JX_TargetList]
+		['MY_FocusUI'] = true, -- 茗伊焦点列表 [Normal/MY_FocusUI]
+		['WhoSeeMe'] = true, -- 谁在看我 [Normal/WhoSeeMe]
+		['HatredPanel'] = true, -- 仇恨列表 [Normal/HatredPanel]
+		['FightingStatistic'] = true, -- 伤害统计 [Normal/FightingStatistic]
+		['MY_ThreatRank'] = true, -- 茗伊仇恨统计 [Normal/MY_ThreatRank]
+		['MY_Recount'] = true, -- 茗伊伤害统计 [Normal/MY_Recount]
+		['LR_AS_FP'] = true, -- 懒人悬浮窗 [Normal/LR_AS_FP]
+		['QuestTraceList'] = true, -- 任务追踪 [Normal/QuestTraceList]
+		['ChatPanel1'] = true, -- 聊天面板 [Lowest2/ChatPanel1]
+		['ChatPanel2'] = true, -- 聊天面板 [Lowest2/ChatPanel2]
+		['ChatPanel3'] = true, -- 聊天面板 [Lowest2/ChatPanel3]
+		['ChatPanel4'] = true, -- 聊天面板 [Lowest2/ChatPanel4]
+		['ChatPanel5'] = true, -- 聊天面板 [Lowest2/ChatPanel5]
+		['ChatPanel6'] = true, -- 聊天面板 [Lowest2/ChatPanel6]
+		['ChatPanel7'] = true, -- 聊天面板 [Lowest2/ChatPanel7]
+		['ChatPanel8'] = true, -- 聊天面板 [Lowest2/ChatPanel8]
+		['ChatPanel9'] = true, -- 聊天面板 [Lowest2/ChatPanel9]
+		['ExteriorAction'] = true, -- 外装动作 [Normal/ExteriorAction]
+		['MentorMessage'] = true, -- 师徒提示 [Normal/MentorMessage]
+		['JX_TeamCD'] = true, -- 剑心团队技能 [Normal/JX_TeamCD]
+	},
 }
 RegisterCustomData('MY_LockFrame.bEnable')
 
@@ -80,12 +103,12 @@ function D.UnlockFrame(frame)
 	end
 end
 
-function D.IsLock()
-	return O.bEnable and not O.bTempDisable
+function D.IsLock(frame)
+	return O.bEnable and not O.bTempDisable and frame and O.tLockName[frame:GetName()]
 end
 
 function D.CheckFrame(frame)
-	local bLock = D.IsLock()
+	local bLock = D.IsLock(frame)
 	if bLock then
 		D.LockFrame(frame)
 	else
@@ -94,10 +117,10 @@ function D.CheckFrame(frame)
 end
 
 function D.CheckAllFrame()
-	local bLock = D.IsLock()
 	for _, szLayer in ipairs({'Lowest', 'Lowest1', 'Lowest2', 'Normal', 'Normal1', 'Normal2', 'Topmost', 'Topmost1', 'Topmost2'})do
 		local frmIter = Station.Lookup(szLayer):GetFirstChild()
 		while frmIter do
+			local bLock = D.IsLock(frmIter)
 			if bLock then
 				D.LockFrame(frmIter)
 			else
@@ -133,7 +156,7 @@ LIB.RegisterInit('MY_LockFrame', D.CheckAllFrame)
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 'auto',
-		text = _L['Lock all frame position (press ctrl+alt to temp unlock)'],
+		text = _L['Lock some float frame position (press ctrl+alt to temp unlock)'],
 		checked = MY_LockFrame.bEnable,
 		oncheck = function(bChecked)
 			MY_LockFrame.bEnable = bChecked

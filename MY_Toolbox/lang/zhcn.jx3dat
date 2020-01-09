@@ -300,5 +300,5 @@ return {
     ['FIREWORK_TITLE_161367'] = '深情人',
     ['FIREWORK_TITLE_161887'] = '称心人',
     ['Achievement wiki'] = '点击成就界面图标显示成就百科',
-    ['Lock all frame position (press ctrl+alt to temp unlock)'] = '锁定所有窗口位置（按住CTRL+ALT可临时解锁）',
+    ['Lock some float frame position (press ctrl+alt to temp unlock)'] = '锁定部分悬浮窗口位置（按住CTRL+ALT可临时解锁）',
 }
