@@ -53,7 +53,7 @@ local O = {
 	bAutoSay = false, -- 摆鼎后自动说话
 	szSay = _L['I have put the GUDING, hurry to eat if you lack of mana. *la la la*'],
 	color = { 255, 0, 128 }, -- 名称颜色，默认绿色
-	bUseMana = true, -- 路过时自动吃毒锅
+	bUseMana = false, -- 路过时自动吃毒锅
 	nManaMp = 80, -- 自动吃的 MP 百分比
 	nManaHp = 80, -- 自动吃的 HP 百分比
 	-- 本地变量
@@ -235,7 +235,7 @@ function D.OnEnableChange(_, bEnable)
 end
 
 function D.OnUseManaChange(_, bUseMana)
-	if bUseMana then
+	if bUseMana and not LIB.IsShieldedVersion() then
 		LIB.BreatheCall('MY_ForceGuding__UseMana', function()
 			local nFrame = GetLogicFrameCount()
 			-- check to use mana
