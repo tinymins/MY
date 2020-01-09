@@ -45,8 +45,8 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
 	return
 end
 --------------------------------------------------------------------------
-local QUERY_URL = 'http://data.jx3.derzh.com/api/exam?l=%s&q=%s'
-local SUBMIT_URL = 'http://data.jx3.derzh.com/api/exam'
+local QUERY_URL = 'https://j3cx.com/api/exam?l=%s&q=%s'
+local SUBMIT_URL = 'https://j3cx.com/api/exam'
 local l_tLocal -- 本地题库
 local l_tCached = {} -- 玩家答题缓存
 local l_tAccept = {} -- 从服务器获取到的数据缓存
