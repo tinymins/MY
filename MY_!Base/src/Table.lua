@@ -71,9 +71,9 @@ function LIB.Table_GetDoodadTemplateName(dwTemplateID)
 	return szName
 end
 
-function LIB.Table_IsTreasureBattleFieldMap()
+function LIB.Table_IsTreasureBattleFieldMap(dwMapID)
 	if IsFunction(_G.Table_IsTreasureBattleFieldMap) then
-		return _G.Table_IsTreasureBattleFieldMap()
+		return _G.Table_IsTreasureBattleFieldMap(dwMapID)
 	end
 	return false
 end
