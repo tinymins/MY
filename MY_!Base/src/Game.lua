@@ -1092,14 +1092,15 @@ end
 --    'always' 总是返回
 --    'never'  总是不返回
 local OBJECT_NAME = {
-	['PLAYER' ] = LIB.CreateCache('LIB#GetObjectName#PLAYER.v' ),
-	['NPC'    ] = LIB.CreateCache('LIB#GetObjectName#NPC.v'    ),
-	['DOODAD' ] = LIB.CreateCache('LIB#GetObjectName#DOODAD.v' ),
-	['ITEM'   ] = LIB.CreateCache('LIB#GetObjectName#ITEM.v'   ),
-	['UNKNOWN'] = LIB.CreateCache('LIB#GetObjectName#UNKNOWN.v'),
+	['PLAYER'   ] = LIB.CreateCache('LIB#GetObjectName#PLAYER.v'   ),
+	['NPC'      ] = LIB.CreateCache('LIB#GetObjectName#NPC.v'      ),
+	['DOODAD'   ] = LIB.CreateCache('LIB#GetObjectName#DOODAD.v'   ),
+	['ITEM'     ] = LIB.CreateCache('LIB#GetObjectName#ITEM.v'     ),
+	['ITEM_INFO'] = LIB.CreateCache('LIB#GetObjectName#ITEM_INFO.v'),
+	['UNKNOWN'  ] = LIB.CreateCache('LIB#GetObjectName#UNKNOWN.v'  ),
 }
-function LIB.GetObjectName(arg0, arg1, arg2)
-	local KObject, szType, dwID, eRetID
+function LIB.GetObjectName(arg0, arg1, arg2, arg3, arg4)
+	local KObject, szType, dwID, nExtraID, eRetID
 	if IsNumber(arg0) then
 		local dwType = arg0
 		dwID, eRetID = arg1, arg2
@@ -1113,11 +1114,59 @@ function LIB.GetObjectName(arg0, arg1, arg2)
 		else
 			szType = 'UNKNOWN'
 		end
+	elseif IsString(arg0) then
+		if arg0 == 'PLAYER' or arg0 == 'NPC' or arg0 == 'DOODAD' then
+			local dwType = TARGET[arg0]
+			dwID, eRetID = arg1, arg2
+			KObject = LIB.GetObject(dwType, dwID)
+			szType = arg0
+		elseif arg0 == 'ITEM' then
+			if IsNumber(arg3) then
+				local p = GetPlayer(arg1)
+				if p then
+					KObject = p.GetItem(arg2, arg3)
+					if KObject then
+						dwID = KObject.dwID
+					end
+					eRetID = arg4
+				end
+			elseif IsNumber(arg2) then
+				local p = GetClientPlayer()
+				if p then
+					KObject = p.GetItem(arg1, arg2)
+					if KObject then
+						dwID = KObject.dwID
+					end
+					eRetID = arg3
+				end
+			else
+				dwID, eRetID = arg1, arg2
+				KObject = GetItem(dwID)
+			end
+			szType = 'ITEM'
+		elseif arg0 == 'ITEM_INFO' then
+			if IsNumber(arg3) then
+				dwID = arg1 .. ':' .. arg2 .. ':' .. arg3
+				nExtraID = arg3
+				eRetID = arg4
+			else
+				dwID = arg1 .. ':' .. arg2
+				eRetID = arg3
+			end
+			KObject = GetItemInfo(arg1, arg2)
+			szType = 'ITEM_INFO'
+		else
+			szType = 'UNKNOWN'
+		end
 	else
 		KObject, eRetID = arg0, arg1
 		if KObject then
-			dwID = KObject.dwID
 			szType = LIB.GetObjectType(KObject)
+			if szType == 'ITEM_INFO' then
+				dwID = KObject.nGenre .. ':' .. KObject.dwID
+			else
+				dwID = KObject.dwID
+			end
 		end
 	end
 	if not dwID then
@@ -1176,6 +1225,12 @@ function LIB.GetObjectName(arg0, arg1, arg2)
 			szDispType = 'I'
 			if KObject then
 				szName = LIB.GetItemNameByItem(KObject)
+			end
+			cache.bFull = true
+		elseif szType == 'ITEM_INFO' then
+			szDispType = 'II'
+			if KObject then
+				szName = LIB.GetItemNameByItemInfo(KObject, nExtraID)
 			end
 			cache.bFull = true
 		else
