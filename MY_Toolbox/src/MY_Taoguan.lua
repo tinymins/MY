@@ -116,6 +116,8 @@ function D.InitFilterItem()
 		[{5, 31599}] = false, -- 战魂佩
 		[{5, 30692}] = false, -- 豪侠贡
 		[{5, 6024}] = true, -- 年年有鱼灯
+		[{5, 20959}] = false, -- 年兽陶罐
+		[{5, 6027}] = false, -- 幸运香囊
 	}) do
 		local itemInfo = GetItemInfo(v[1], v[2])
 		if itemInfo then
