@@ -169,6 +169,8 @@ return {
     ['Use JinNang and XiangNang when score reaches'] = '使用錦囊和香囊，當分數達到',
     ['Pickup filters'] = '拾取過濾設置',
     ['(Checked will not be picked up, if still pick please check system auto pick config)'] = '（打勾的不撿，若還撿請關係統以及其他插件自動拾取）',
+    ['Custom add'] = '添加自定義',
+    ['Please input custom name'] = '請輸入自定義名稱',
     ['Start/stop break can'] = '開始/停止砸罐',
     ['Turn on/off MY_Taoguan'] = '開/關砸年獸陶罐',
     ['Restore default config'] = '恢復默認設置',

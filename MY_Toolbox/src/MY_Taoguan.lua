@@ -396,10 +396,39 @@ function PS.OnPanelActive(wnd)
 		menu = function()
 			local m0 = {}
 			for k, v in pairs(MY_Taoguan.tFilterItem) do
-				table.insert(m0, { szOption = k, bCheck = true, bChecked = v == true, fnAction = function(d, b)
-					MY_Taoguan.tFilterItem[k] = b
-				end })
+				local m1 = {
+					szOption = k,
+					bCheck = true, bChecked = v == true,
+					fnAction = function(d, b)
+						MY_Taoguan.tFilterItem[k] = b
+					end,
+				}
+				if DEFAULT_O.tFilterItem[k] == nil then
+					m1.szIcon = 'ui/Image/UICommon/CommonPanel2.UITex'
+					m1.nFrame = 49
+					m1.nMouseOverFrame = 51
+					m1.nIconWidth = 17
+					m1.nIconHeight = 17
+					m1.szLayer = 'ICON_RIGHTMOST'
+					m1.fnClickIcon = function()
+						MY_Taoguan.tFilterItem[k] = nil
+						Wnd.CloseWindow('PopupMenuPanel')
+					end
+				end
+				table.insert(m0, m1)
 			end
+			if #m0 > 0 then
+				insert(m0, CONSTANT.MENU_DIVIDER)
+			end
+			insert(m0, {
+				szOption = _L['Custom add'],
+				fnAction = function()
+					local function fnConfirm(szText)
+						O.tFilterItem[szText] = true
+					end
+					GetUserInput(_L['Please input custom name'], fnConfirm, nil, nil, nil, '', 20)
+				end,
+			})
 			return m0
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
