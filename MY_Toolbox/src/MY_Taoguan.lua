@@ -89,6 +89,43 @@ local D = {
 	dwDoodadID = 0,
 }
 
+function D.InitFilterItem()
+	if IsEmpty(O.tFilterItem) then
+		O.tFilterItem = {}
+	end
+	for v, b in pairs({
+		[{5, 6072}] = true, -- ±ŞÅÚ
+		[{5, 6069}] = true, -- »ğÊ÷Òø»¨
+		[{5, 6068}] = true, -- Áú·ï³ÊÏé
+		[{5, 6067}] = true, -- ²ÊÔÆÖğÔÂ
+		[{5, 6076}] = true, -- ìÚìÚÉú»Ô
+		[{5, 6073}] = true, -- Ñæ»ğ°ô
+		[{5, 6070}] = true, -- ´ÜÌìºï
+		[{5, 8025, 1168}] = true, -- ¼ôÖ½£ºÁúÌÚ
+		[{5, 8025, 1170}] = true, -- ¼ôÖ½£º·ïÎè
+		[{5, 6066}] = true, -- Ôª±¦µÆ
+		[{5, 6067}] = true, -- ÌÒ»¨µÆ
+		[{5, 6048}] = false, -- ÌÒÄ¾ÅÆ¡¤Âí
+		[{5, 6049}] = false, -- ÌÒÄ¾ÅÆ¡¤Äê
+		[{5, 6050}] = false, -- ÌÒÄ¾ÅÆ¡¤¼ª
+		[{5, 6051}] = true, -- ÌÒÄ¾ÅÆ¡¤Ïé
+		[{5, 6200}] = true, -- Í¼Ñù£º²ÊÔÆÖğÔÂ
+		[{5, 6203}] = true, -- Í¼Ñù£ºìÚìÚÉú»Ô
+		[{5, 6258}] = false, -- ¼à±¾Ó¡ÎÄ¶Ò»»È¯
+		[{5, 31599}] = false, -- Õ½»êÅå
+		[{5, 30692}] = false, -- ºÀÏÀ¹±
+		[{5, 6024}] = true, -- ÄêÄêÓĞÓãµÆ
+	}) do
+		local itemInfo = GetItemInfo(v[1], v[2])
+		if itemInfo then
+			local szName = LIB.GetItemNameByItemInfo(itemInfo, v[3])
+			if O.tFilterItem[szName] == nil then
+				O.tFilterItem[szName] = b
+			end
+		end
+	end
+end
+
 function D.UseBagItem(szName, bWarn)
 	local me = GetClientPlayer()
 	for i = 1, 6 do
@@ -383,38 +420,7 @@ LIB.RegisterPanel('MY_Taoguan', _L[MODULE_NAME], _L['Target'], 119, PS)
 ---------------------------------------------------------------------
 -- ×¢²áÊÂ¼ş¡¢³õÊ¼»¯
 ---------------------------------------------------------------------
-LIB.RegisterInit('MY_Taoguan', function()
-	if IsEmpty(O.tFilterItem) then
-		for v, b in pairs({
-			[{5, 6072}] = true, -- ±ŞÅÚ
-			[{5, 6069}] = true, -- »ğÊ÷Òø»¨
-			[{5, 6068}] = true, -- Áú·ï³ÊÏé
-			[{5, 6067}] = true, -- ²ÊÔÆÖğÔÂ
-			[{5, 6076}] = true, -- ìÚìÚÉú»Ô
-			[{5, 6073}] = true, -- Ñæ»ğ°ô
-			[{5, 6070}] = true, -- ´ÜÌìºï
-			[{5, 8025, 1168}] = true, -- ¼ôÖ½£ºÁúÌÚ
-			[{5, 8025, 1170}] = true, -- ¼ôÖ½£º·ïÎè
-			[{5, 6066}] = true, -- Ôª±¦µÆ
-			[{5, 6067}] = true, -- ÌÒ»¨µÆ
-			[{5, 6048}] = false, -- ÌÒÄ¾ÅÆ¡¤Âí
-			[{5, 6049}] = false, -- ÌÒÄ¾ÅÆ¡¤Äê
-			[{5, 6050}] = false, -- ÌÒÄ¾ÅÆ¡¤¼ª
-			[{5, 6051}] = true, -- ÌÒÄ¾ÅÆ¡¤Ïé
-			[{5, 6200}] = true, -- Í¼Ñù£º²ÊÔÆÖğÔÂ
-			[{5, 6203}] = true, -- Í¼Ñù£ºìÚìÚÉú»Ô
-			[{5, 6258}] = false, -- ¼à±¾Ó¡ÎÄ¶Ò»»È¯
-			[{5, 31599}] = false, -- Õ½»êÅå
-			[{5, 30692}] = false, -- ºÀÏÀ¹±
-			[{5, 6024}] = true, -- ÄêÄêÓĞÓãµÆ
-		}) do
-			local itemInfo = GetItemInfo(v[1], v[2])
-			if itemInfo then
-				O.tFilterItem[LIB.GetItemNameByItemInfo(itemInfo, v[3])] = b
-			end
-		end
-	end
-end)
+LIB.RegisterInit('MY_Taoguan', D.InitFilterItem)
 LIB.RegisterMsgMonitor('MY_Taoguan', D.MonitorZP, {'MSG_SYS'})
 LIB.BreatheCall('MY_Taoguan', function()
 	if D.bEnable then
@@ -491,6 +497,9 @@ local settings = {
 				bUseGold = true,
 				bUseTaoguan = true,
 				tFilterItem = true,
+			},
+			triggers = {
+				tFilterItem = D.InitFilterItem,
 			},
 			root = O,
 		},
