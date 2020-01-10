@@ -46,7 +46,7 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
 end
 --------------------------------------------------------------------------
 
-local O = {
+local DEFAULT_O = {
 	nUseGold = 320,       -- 优先使用金锤子的分数
 	nUseZJ = 1280,        -- 开始吃醉生、寄优谷的分数
 	bPauseNoZJ = true,    -- 缺少醉生、寄优时停砸
@@ -57,6 +57,7 @@ local O = {
 	bUseTaoguan = true,   -- 必要时自动使用背包的陶罐
 	tFilterItem = {},
 }
+local O = Clone(DEFAULT_O)
 RegisterCustomData('MY_Taoguan.nUseGold')
 RegisterCustomData('MY_Taoguan.nUseZJ')
 RegisterCustomData('MY_Taoguan.bPauseNoZJ')
@@ -413,6 +414,16 @@ function PS.OnPanelActive(wnd)
 		x = nX, y = nY, w = 130, h = 30,
 		text = _L['Start/stop break can'],
 		onclick = D.Switch,
+	}):Pos('BOTTOMRIGHT') + 5
+	nX = ui:Append('WndButton', {
+		x = nX, y = nY, w = 130, h = 30,
+		text = _L['Restore default config'],
+		onclick = function()
+			for k, v in pairs(DEFAULT_O) do
+				MY_Taoguan[k] = v
+			end
+			LIB.SwitchTab('MY_Taoguan', true)
+		end,
 	}):Pos('BOTTOMRIGHT')
 end
 LIB.RegisterPanel('MY_Taoguan', _L[MODULE_NAME], _L['Target'], 119, PS)

@@ -171,6 +171,7 @@ return {
     ['(Checked will not be picked up, if still pick please check system auto pick config)'] = '（打勾的不捡，若还捡请关系统以及其他插件自动拾取）',
     ['Start/stop break can'] = '开始/停止砸罐',
     ['Turn on/off MY_Taoguan'] = '开/关砸年兽陶罐',
+    ['Restore default config'] = '恢复默认设置',
 
     -- MY_Force
     ['MY_Force'] = '门派特色',
