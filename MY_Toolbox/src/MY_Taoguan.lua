@@ -55,7 +55,31 @@ local DEFAULT_O = {
 	bNonZS = false,       -- 不使用醉生
 	bUseGold = false,     -- 没银锤时使用金锤
 	bUseTaoguan = true,   -- 必要时自动使用背包的陶罐
-	tFilterItem = {},
+	tFilterItem = {
+		[LIB.GetObjectName('ITEM_INFO', 5, 6072)] = true, -- 鞭炮
+		[LIB.GetObjectName('ITEM_INFO', 5, 6069)] = true, -- 火树银花
+		[LIB.GetObjectName('ITEM_INFO', 5, 6068)] = true, -- 龙凤呈祥
+		[LIB.GetObjectName('ITEM_INFO', 5, 6067)] = true, -- 彩云逐月
+		[LIB.GetObjectName('ITEM_INFO', 5, 6076)] = true, -- 熠熠生辉
+		[LIB.GetObjectName('ITEM_INFO', 5, 6073)] = true, -- 焰火棒
+		[LIB.GetObjectName('ITEM_INFO', 5, 6070)] = true, -- 窜天猴
+		[LIB.GetObjectName('ITEM_INFO', 5, 8025, 1168)] = true, -- 剪纸：龙腾
+		[LIB.GetObjectName('ITEM_INFO', 5, 8025, 1170)] = true, -- 剪纸：凤舞
+		[LIB.GetObjectName('ITEM_INFO', 5, 6066)] = true, -- 元宝灯
+		[LIB.GetObjectName('ITEM_INFO', 5, 6067)] = true, -- 桃花灯
+		[LIB.GetObjectName('ITEM_INFO', 5, 6048)] = false, -- 桃木牌·马
+		[LIB.GetObjectName('ITEM_INFO', 5, 6049)] = false, -- 桃木牌·年
+		[LIB.GetObjectName('ITEM_INFO', 5, 6050)] = false, -- 桃木牌·吉
+		[LIB.GetObjectName('ITEM_INFO', 5, 6051)] = true, -- 桃木牌·祥
+		[LIB.GetObjectName('ITEM_INFO', 5, 6200)] = true, -- 图样：彩云逐月
+		[LIB.GetObjectName('ITEM_INFO', 5, 6203)] = true, -- 图样：熠熠生辉
+		[LIB.GetObjectName('ITEM_INFO', 5, 6258)] = false, -- 监本印文兑换券
+		[LIB.GetObjectName('ITEM_INFO', 5, 31599)] = false, -- 战魂佩
+		[LIB.GetObjectName('ITEM_INFO', 5, 30692)] = false, -- 豪侠贡
+		[LIB.GetObjectName('ITEM_INFO', 5, 6024)] = true, -- 年年有鱼灯
+		[LIB.GetObjectName('ITEM_INFO', 5, 20959)] = false, -- 年兽陶罐
+		[LIB.GetObjectName('ITEM_INFO', 5, 6027)] = false, -- 幸运香囊
+	},
 }
 local O = Clone(DEFAULT_O)
 RegisterCustomData('MY_Taoguan.nUseGold')
@@ -94,37 +118,9 @@ function D.InitFilterItem()
 	if IsEmpty(O.tFilterItem) then
 		O.tFilterItem = {}
 	end
-	for v, b in pairs({
-		[{5, 6072}] = true, -- 鞭炮
-		[{5, 6069}] = true, -- 火树银花
-		[{5, 6068}] = true, -- 龙凤呈祥
-		[{5, 6067}] = true, -- 彩云逐月
-		[{5, 6076}] = true, -- 熠熠生辉
-		[{5, 6073}] = true, -- 焰火棒
-		[{5, 6070}] = true, -- 窜天猴
-		[{5, 8025, 1168}] = true, -- 剪纸：龙腾
-		[{5, 8025, 1170}] = true, -- 剪纸：凤舞
-		[{5, 6066}] = true, -- 元宝灯
-		[{5, 6067}] = true, -- 桃花灯
-		[{5, 6048}] = false, -- 桃木牌·马
-		[{5, 6049}] = false, -- 桃木牌·年
-		[{5, 6050}] = false, -- 桃木牌·吉
-		[{5, 6051}] = true, -- 桃木牌·祥
-		[{5, 6200}] = true, -- 图样：彩云逐月
-		[{5, 6203}] = true, -- 图样：熠熠生辉
-		[{5, 6258}] = false, -- 监本印文兑换券
-		[{5, 31599}] = false, -- 战魂佩
-		[{5, 30692}] = false, -- 豪侠贡
-		[{5, 6024}] = true, -- 年年有鱼灯
-		[{5, 20959}] = false, -- 年兽陶罐
-		[{5, 6027}] = false, -- 幸运香囊
-	}) do
-		local itemInfo = GetItemInfo(v[1], v[2])
-		if itemInfo then
-			local szName = LIB.GetItemNameByItemInfo(itemInfo, v[3])
-			if O.tFilterItem[szName] == nil then
-				O.tFilterItem[szName] = b
-			end
+	for v, b in pairs(DEFAULT_O.tFilterItem) do
+		if O.tFilterItem[v] == nil then
+			O.tFilterItem[v] = b
 		end
 	end
 end
