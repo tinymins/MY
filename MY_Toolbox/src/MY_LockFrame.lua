@@ -129,7 +129,7 @@ function D.CheckAllFrame()
 			frmIter = frmIter:GetNext()
 		end
 	end
-	if bLock then
+	if O.bEnable then
 		LIB.RegisterEvent('ON_FRAME_CREATE.MY_LockFrame', function()
 			D.CheckFrame(arg0)
 		end)
