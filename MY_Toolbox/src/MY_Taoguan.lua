@@ -114,17 +114,6 @@ local D = {
 	dwDoodadID = 0,
 }
 
-function D.InitFilterItem()
-	if IsEmpty(O.tFilterItem) then
-		O.tFilterItem = {}
-	end
-	for v, b in pairs(DEFAULT_O.tFilterItem) do
-		if O.tFilterItem[v] == nil then
-			O.tFilterItem[v] = b
-		end
-	end
-end
-
 function D.UseBagItem(szName, bWarn)
 	local me = GetClientPlayer()
 	for i = 1, 6 do
@@ -458,7 +447,6 @@ LIB.RegisterPanel('MY_Taoguan', _L[MODULE_NAME], _L['Target'], 119, PS)
 ---------------------------------------------------------------------
 -- 注册事件、初始化
 ---------------------------------------------------------------------
-LIB.RegisterInit('MY_Taoguan', D.InitFilterItem)
 LIB.RegisterMsgMonitor('MY_Taoguan', D.MonitorZP, {'MSG_SYS'})
 LIB.BreatheCall('MY_Taoguan', function()
 	if D.bEnable then
@@ -537,7 +525,16 @@ local settings = {
 				tFilterItem = true,
 			},
 			triggers = {
-				tFilterItem = D.InitFilterItem,
+				tFilterItem = function()
+					if IsEmpty(O.tFilterItem) then
+						O.tFilterItem = {}
+					end
+					for v, b in pairs(DEFAULT_O.tFilterItem) do
+						if O.tFilterItem[v] == nil then
+							O.tFilterItem[v] = b
+						end
+					end
+				end,
 			},
 			root = O,
 		},
