@@ -273,6 +273,7 @@ function D.BreakCanStateTransfer()
 	end
 	-- 没有金锤也没有银锤，凉了呀
 	D.UseBagItem(XIAOYINCHUI, true)
+	D.Stop()
 end
 
 -------------------------------------
