@@ -78,6 +78,7 @@ local DEFAULT_O = {
 		[LIB.GetObjectName('ITEM_INFO', 5, 6076)] = true, -- ìÚìÚÉú»Ô
 		[LIB.GetObjectName('ITEM_INFO', 5, 6073)] = true, -- Ñæ»ğ°ô
 		[LIB.GetObjectName('ITEM_INFO', 5, 6070)] = true, -- ´ÜÌìºï
+		[LIB.GetObjectName('ITEM_INFO', 5, 6077)] = true, -- ²ÊÔÆÖğÔÂ
 		[LIB.GetObjectName('ITEM_INFO', 5, 8025, 1168)] = true, -- ¼ôÖ½£ºÁúÌÚ
 		[LIB.GetObjectName('ITEM_INFO', 5, 8025, 1170)] = true, -- ¼ôÖ½£º·ïÎè
 		[LIB.GetObjectName('ITEM_INFO', 5, 6066)] = true, -- Ôª±¦µÆ
