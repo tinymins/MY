@@ -45,16 +45,31 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
 	return
 end
 --------------------------------------------------------------------------
+-- 幸运香囊 -- 下一次有一点五倍几率砸中年兽陶罐
+-- 幸运锦囊 -- 下一次砸年兽陶罐失败则保留两点五成积分
+-- 如意香囊 -- 下一次有两点五倍几率砸中年兽陶罐
+-- 如意锦囊 -- 下一次砸年兽陶罐失败则保留一半积分
+-- 寄忧谷 -- 下一次有五倍几率砸中年兽陶罐
+-- 醉生 -- 下一次砸年兽陶罐失败则不损失积分
 
 local DEFAULT_O = {
-	nUseGold = 320,       -- 优先使用金锤子的分数
-	nUseZJ = 1280,        -- 开始吃醉生、寄优谷的分数
-	bPauseNoZJ = true,    -- 缺少醉生、寄优时停砸
-	nPausePoint = 327680, -- 停砸分数线
-	nUseJX = 80,          -- 自动用掉锦囊、香囊
-	bNonZS = false,       -- 不使用醉生
-	bUseGold = false,     -- 没银锤时使用金锤
-	bUseTaoguan = true,   -- 必要时自动使用背包的陶罐
+	nPausePoint              = 327680, -- 停砸分数线
+	bUseTaoguan              = true  , -- 必要时使用背包的陶罐
+	bNoYinchuiUseJinchui     = false , -- 没小银锤时使用小金锤
+	nUseXiaojinchui          = 320   , -- 优先使用小金锤的分数
+	bPauseNoXiaojinchui      = false , -- 缺少小金锤时停砸
+	nUseXingyunXiangnang     = 80    , -- 开始吃幸运香囊的分数
+	bPauseNoXingyunXiangnang = false , -- 缺少幸运香囊时停砸
+	nUseXingyunJinnang       = 80    , -- 开始吃幸运锦囊的分数
+	bPauseNoXingyunJinnang   = false , -- 缺少幸运锦囊时停砸
+	nUseRuyiXiangnang        = 80    , -- 开始吃如意香囊的分数
+	bPauseNoRuyiXiangnang    = false , -- 缺少如意香囊时停砸
+	nUseRuyiJinnang          = 80    , -- 开始吃如意锦囊的分数
+	bPauseNoRuyiJinnang      = false , -- 缺少如意锦囊时停砸
+	nUseJiyougu              = 1280  , -- 开始吃寄忧谷的分数
+	bPauseNoJiyougu          = true  , -- 缺少寄忧谷时停砸
+	nUseZuisheng             = 1280  , -- 开始吃醉生的分数
+	bPauseNoZuisheng         = true  , -- 缺少醉生时停砸
 	tFilterItem = {
 		[LIB.GetObjectName('ITEM_INFO', 5, 6072)] = true, -- 鞭炮
 		[LIB.GetObjectName('ITEM_INFO', 5, 6069)] = true, -- 火树银花
@@ -67,10 +82,10 @@ local DEFAULT_O = {
 		[LIB.GetObjectName('ITEM_INFO', 5, 8025, 1170)] = true, -- 剪纸：凤舞
 		[LIB.GetObjectName('ITEM_INFO', 5, 6066)] = true, -- 元宝灯
 		[LIB.GetObjectName('ITEM_INFO', 5, 6067)] = true, -- 桃花灯
-		[LIB.GetObjectName('ITEM_INFO', 5, 6048)] = false, -- 桃木牌·马
-		[LIB.GetObjectName('ITEM_INFO', 5, 6049)] = false, -- 桃木牌·年
-		[LIB.GetObjectName('ITEM_INFO', 5, 6050)] = false, -- 桃木牌·吉
-		[LIB.GetObjectName('ITEM_INFO', 5, 6051)] = false, -- 桃木牌·祥
+		[LIB.GetObjectName('ITEM_INFO', 5, 6048)] = true, -- 桃木牌·马
+		[LIB.GetObjectName('ITEM_INFO', 5, 6049)] = true, -- 桃木牌·年
+		[LIB.GetObjectName('ITEM_INFO', 5, 6050)] = true, -- 桃木牌·吉
+		[LIB.GetObjectName('ITEM_INFO', 5, 6051)] = true, -- 桃木牌·祥
 		[LIB.GetObjectName('ITEM_INFO', 5, 6200)] = true, -- 图样：彩云逐月
 		[LIB.GetObjectName('ITEM_INFO', 5, 6203)] = true, -- 图样：熠熠生辉
 		[LIB.GetObjectName('ITEM_INFO', 5, 6258)] = false, -- 监本印文兑换券
@@ -82,14 +97,23 @@ local DEFAULT_O = {
 	},
 }
 local O = Clone(DEFAULT_O)
-RegisterCustomData('MY_Taoguan.nUseGold')
-RegisterCustomData('MY_Taoguan.nUseZJ')
-RegisterCustomData('MY_Taoguan.bPauseNoZJ')
 RegisterCustomData('MY_Taoguan.nPausePoint')
-RegisterCustomData('MY_Taoguan.nUseJX')
-RegisterCustomData('MY_Taoguan.bNonZS')
-RegisterCustomData('MY_Taoguan.bUseGold')
 RegisterCustomData('MY_Taoguan.bUseTaoguan')
+RegisterCustomData('MY_Taoguan.bNoYinchuiUseJinchui')
+RegisterCustomData('MY_Taoguan.nUseXiaojinchui')
+RegisterCustomData('MY_Taoguan.bPauseNoXiaojinchui')
+RegisterCustomData('MY_Taoguan.nUseXingyunXiangnang')
+RegisterCustomData('MY_Taoguan.bPauseNoXingyunXiangnang')
+RegisterCustomData('MY_Taoguan.nUseXingyunJinnang')
+RegisterCustomData('MY_Taoguan.bPauseNoXingyunJinnang')
+RegisterCustomData('MY_Taoguan.nUseRuyiXiangnang')
+RegisterCustomData('MY_Taoguan.bPauseNoRuyiXiangnang')
+RegisterCustomData('MY_Taoguan.nUseRuyiJinnang')
+RegisterCustomData('MY_Taoguan.bPauseNoRuyiJinnang')
+RegisterCustomData('MY_Taoguan.nUseJiyougu')
+RegisterCustomData('MY_Taoguan.bPauseNoJiyougu')
+RegisterCustomData('MY_Taoguan.nUseZuisheng')
+RegisterCustomData('MY_Taoguan.bPauseNoZuisheng')
 RegisterCustomData('MY_Taoguan.tFilterItem')
 
 ---------------------------------------------------------------------
@@ -99,27 +123,55 @@ local TAOGUAN = LIB.GetItemNameByUIID(74224) -- 年兽陶罐
 local XIAOJINCHUI = LIB.GetItemNameByUIID(65611) -- 小金锤
 local XIAOYINCHUI = LIB.GetItemNameByUIID(65609) -- 小银锤
 local MEILIANGYUQIAN = LIB.GetItemNameByUIID(65589) -- 梅良玉签
+local XINGYUNXIANGNANG = LIB.GetItemNameByUIID(65578) -- 幸运香囊
+local XINGYUNJINNANG = LIB.GetItemNameByUIID(65581) -- 幸运锦囊
+local RUYIXIANGNANG = LIB.GetItemNameByUIID(65579) -- 如意香囊
+local RUYIJINNANG = LIB.GetItemNameByUIID(65582) -- 如意锦囊
 local JIYOUGU = LIB.GetItemNameByUIID(65580) -- 寄忧谷
 local ZUISHENG = LIB.GetItemNameByUIID(65583) -- 醉生
-local RUYIXIANGNANG = LIB.GetItemNameByUIID(65579) -- 如意香囊
-local XINYUNXIANGNANG = LIB.GetItemNameByUIID(65578) -- 幸运香囊
-local RUYIJINNANG = LIB.GetItemNameByUIID(65582) -- 如意锦囊
-local XINYUNJINNANG = LIB.GetItemNameByUIID(65581) -- 幸运锦囊
+local ITEM_CD = 1 * GLOBAL.GAME_FPS + 8 -- 吃药CD
+local HAMMER_CD = 5 * GLOBAL.GAME_FPS + 8 -- 锤子CD
+local MAX_POINT_POW = 16 -- 分数最高倍数（2^n）
 
 local D = {
-	bEnable = false,
-	bHaveZJ = false,
-	nPoint = 0,
-	tListed = {},
-	dwDoodadID = 0,
+	bEnable = false, -- 启用状态
+	nPoint = 0, -- 当前总分数
+	nUseItemLFC = 0, -- 上次吃药的逻辑帧
+	nUseHammerLFC = 0, -- 上次用锤子的逻辑帧
+	dwDoodadID = 0, -- 自动拾取过滤的交互物件ID
+	aUseItemPS = { -- 设置界面的物品使用条件
+		{ szName = XIAOJINCHUI, szID = 'Xiaojinchui' },
+		{ szName = XINGYUNXIANGNANG, szID = 'XingyunXiangnang' },
+		{ szName = XINGYUNJINNANG, szID = 'XingyunJinnang' },
+		{ szName = RUYIXIANGNANG, szID = 'RuyiXiangnang' },
+		{ szName = RUYIJINNANG, szID = 'RuyiJinnang' },
+		{ szName = JIYOUGU, szID = 'Jiyougu' },
+		{ szName = ZUISHENG, szID = 'Zuisheng' },
+	},
+	aUseItemOrder = { -- 状态转移函数中物品与BUFF判断逻辑
+		{
+			{ szName = JIYOUGU, szID = 'Jiyougu', dwBuffID = 1660, nBuffLevel = 3 },
+			{ szName = RUYIXIANGNANG, szID = 'RuyiXiangnang', dwBuffID = 1660, nBuffLevel = 2 },
+			{ szName = XINGYUNXIANGNANG, szID = 'XingyunXiangnang', dwBuffID = 1660, nBuffLevel = 1 },
+		},
+		{
+			{ szName = ZUISHENG, szID = 'Zuisheng', dwBuffID = 1661, nBuffLevel = 3 },
+			{ szName = RUYIJINNANG, szID = 'RuyiJinnang', dwBuffID = 1661, nBuffLevel = 2 },
+			{ szName = XINGYUNJINNANG, szID = 'XingyunJinnang', dwBuffID = 1661, nBuffLevel = 1 },
+		},
+	},
 }
 
+-- 使用背包物品
 function D.UseBagItem(szName, bWarn)
 	local me = GetClientPlayer()
 	for i = 1, 6 do
 		for j = 0, me.GetBoxSize(i) - 1 do
 		local it = GetPlayerItem(me, i, j)
 			if it and it.szName == szName then
+				--[[#DEBUG BEGIN]]
+				LIB.Debug('MY_Taoguan', 'UseItem: ' .. i .. ',' .. j .. ' ' .. szName, DEBUG_LEVEL.LOG)
+				--[[#DEBUG END]]
 				OnUseItem(i, j)
 				return true
 			end
@@ -130,32 +182,96 @@ function D.UseBagItem(szName, bWarn)
 	end
 end
 
-function D.Switch()
-	D.bEnable = not D.bEnable
-	D.bHaveZJ = false
-	if D.bEnable then
-		LIB.Sysmsg(_L['Auto taoguan: on'])
-		D.FindNear()
-	else
-		LIB.Sysmsg(_L['Auto taoguan: off'])
+-- 砸罐子状态机转移函数
+function D.BreakCanStateTransfer()
+	local me = GetClientPlayer()
+	if not me or not D.bEnable then
+		return
 	end
-end
-
-function D.FindNear()
-	local bFound = false
-	D.bReachLimit = nil
-	for k, _ in pairs(D.tListed) do
-		local npc = GetNpc(k)
-		if not npc then
-			D.tListed[k] = nil
-		elseif LIB.GetDistance(npc) < 4 then
-			bFound = true
-			FireUIEvent('NPC_ENTER_SCENE', k)
+	local nLFC = GetLogicFrameCount()
+	-- 确认掉砸金蛋确认框
+	LIB.DoMessageBox('PlayerMessageBoxCommon')
+	-- 吃药还在CD则等待
+	if nLFC - D.nUseItemLFC < ITEM_CD then
+		return
+	end
+	-- 检查吃药BUFF满足情况
+	for _, aItem in ipairs(D.aUseItemOrder) do
+		-- 每个分组优先级顺序处理
+		for _, item in ipairs(aItem) do
+			-- 符合吃药分数条件
+			if D.nPoint >= O['nUse' .. item.szID] then
+				-- 如果已经有BUFF，即吃过药了，则跳出循环
+				if LIB.GetBuff(me, item.dwBuffID, item.nBuffLevel) then
+					break
+				end
+				-- 否则尝试吃药
+				if D.UseBagItem(item.szName, O['bPauseNo' .. item.szID]) then
+					D.nUseItemLFC = nLFC
+					-- 吃成功了，等待下次状态机转移函数调用
+					return
+				end
+				if O['bPauseNo' .. item.szID] then
+					-- 吃失败了，暂停砸罐子
+					D.Stop()
+					return
+				end
+			end
 		end
 	end
-	if not bFound and O.bUseTaoguan then
-		D.UseBagItem(TAOGUAN)
+	-- 锤子还在CD则等待
+	if nLFC - D.nUseHammerLFC < HAMMER_CD then
+		return
 	end
+	-- 寻找能砸的陶罐
+	local npcTaoguan
+	for _, npc in ipairs(LIB.GetNearNpc()) do
+		if npc and npc.dwTemplateID == 6820 then
+			if LIB.GetDistance(npc) < 4 then
+				npcTaoguan = npc
+				break
+			end
+		end
+	end
+	-- 没有能砸的陶罐考虑自己放一个
+	if not npcTaoguan and O.bUseTaoguan then
+		if D.UseBagItem(TAOGUAN) then
+			D.nUseHammerLFC = nLFC
+		end
+	end
+	-- 还是没有找到罐子则等待
+	if not npcTaoguan then
+		return
+	end
+	-- 找到罐子了，设为目标
+	LIB.SetTarget(TARGET.NPC, npcTaoguan.dwID)
+	-- 需要用小金锤，砸他丫的
+	if D.nPoint >= O.nUseXiaojinchui then
+		if D.UseBagItem(XIAOJINCHUI, O.bPauseNoXiaojinchui) then
+			-- 砸成功了，等锤子CD
+			D.nUseHammerLFC = nLFC
+			return
+		end
+		if O.bPauseNoXiaojinchui then
+			-- 砸失败了，暂停砸罐子
+			D.Stop()
+			return
+		end
+	end
+	-- 需要用小银锤，砸他丫的
+	if D.UseBagItem(XIAOYINCHUI) then
+		-- 砸成功了，等锤子CD
+		D.nUseHammerLFC = nLFC
+		return
+	end
+	-- 没有小银锤时使用小金锤？
+	if O.bNoYinchuiUseJinchui and D.UseBagItem(XIAOJINCHUI) then
+		-- 砸成功了，等锤子CD
+		D.nUseHammerLFC = nLFC
+		return
+	end
+	-- 没有金锤也没有银锤，凉了呀
+	D.UseBagItem(XIAOYINCHUI, true)
 end
 
 -------------------------------------
@@ -165,48 +281,18 @@ function D.MonitorZP(szMsg)
 	local _, _, nP = string.find(szMsg, _L['Current total score:(%d+)'])
 	if nP then
 		D.nPoint = tonumber(nP)
-		D.bHaveZJ = false
 		if D.nPoint >= O.nPausePoint then
-			D.bEnable = false
+			D.Stop()
 			D.bReachLimit = true
 			LIB.Sysmsg(_L['Auto taoguan: reach limit!'])
-		else
-			-- foreced to find next
-			LIB.DelayCall(5500, D.FindNear)
 		end
-	elseif D.bEnable and StringFindW(szMsg, TAOGUAN) then
-		-- foreced to find next [年兽陶罐已破碎|请选中年兽陶罐后使用]
-		LIB.DelayCall(5500, D.FindNear)
-	end
-end
-
-function D.OnNpcEnter()
-	local npc = GetNpc(arg0)
-	if not npc or npc.dwTemplateID ~= 6820 then
-		return
-	end
-	D.tListed[arg0] = true
-	if not D.bEnable
-		or (O.bPauseNoZJ and D.nPoint >= O.nUseZJ and not D.bHaveZJ)
-	then
-		return
-	end
-	if LIB.GetDistance(npc) < 4 then
-		LIB.SetTarget(TARGET.NPC, arg0)
-		if D.nPoint < O.nUseGold or not D.UseBagItem(XIAOJINCHUI) then
-			if not D.UseBagItem(XIAOYINCHUI, true)
-				and (not O.bUseGold or not D.UseBagItem(XIAOJINCHUI, true))
-			then
-				D.bEnable = false
-			end
-		end
+		D.nUseHammerLFC = GetLogicFrameCount()
 	end
 end
 
 function D.OnLootItem()
 	if arg0 == GetClientPlayer().dwID and arg2 > 2 and GetItem(arg1).szName == MEILIANGYUQIAN then
 		D.nPoint = 0
-		D.bHaveZJ = false
 		LIB.Sysmsg(_L['Auto taoguan: score clear!'])
 	end
 end
@@ -244,7 +330,7 @@ function D.OnOpenDoodad()
 				then
 					LootItem(d.dwID, it.dwID)
 				else
-					LIB.Sysmsg(_L('Auto taoguan: filter item [%s]', szName))
+					LIB.Sysmsg(_L('Auto taoguan: filter item [%s].', szName))
 				end
 			end
 			local hL = Station.Lookup('Normal/LootList', 'Handle_LootList')
@@ -253,6 +339,51 @@ function D.OnOpenDoodad()
 			end
 		end
 		D.bReachLimit = nil
+	end
+end
+
+-- 砸罐子开始（注册事件）
+function D.Start()
+	if D.bEnable then
+		return
+	end
+	D.bEnable = true
+	LIB.RegisterMsgMonitor('MY_Taoguan', D.MonitorZP, {'MSG_SYS'})
+	LIB.BreatheCall('MY_Taoguan', D.BreakCanStateTransfer)
+	LIB.RegisterEvent('LOOT_ITEM.MY_Taoguan', D.OnLootItem)
+	LIB.RegisterEvent('DOODAD_ENTER_SCENE.MY_Taoguan', D.OnDoodadEnter)
+	LIB.RegisterEvent('HELP_EVENT.MY_Taoguan', function()
+		if arg0 == 'OnOpenpanel' and arg1 == 'LOOT'
+			and D.bEnable and D.dwDoodadID ~= 0
+		then
+			D.OnOpenDoodad()
+			D.dwDoodadID = 0
+		end
+	end)
+	LIB.Sysmsg(_L['Auto taoguan: on.'])
+end
+
+-- 砸罐子关闭（注销事件）
+function D.Stop()
+	if not D.bEnable then
+		return
+	end
+	D.bEnable = false
+	LIB.RegisterMsgMonitor('MY_Taoguan', false)
+	LIB.BreatheCall('MY_Taoguan', false)
+	LIB.RegisterEvent('NPC_ENTER_SCENE.MY_Taoguan', false)
+	LIB.RegisterEvent('LOOT_ITEM.MY_Taoguan', false)
+	LIB.RegisterEvent('DOODAD_ENTER_SCENE.MY_Taoguan', false)
+	LIB.RegisterEvent('HELP_EVENT.MY_Taoguan', false)
+	LIB.Sysmsg(_L['Auto taoguan: off.'])
+end
+
+-- 砸罐子开关
+function D.Switch()
+	if D.bEnable then
+		D.Stop()
+	else
+		D.Start()
 	end
 end
 
@@ -268,48 +399,21 @@ function PS.OnPanelActive(wnd)
 
 	ui:Append('Text', { text = _L['Feature setting'], x = nX, y = nY, font = 27 })
 
-	-- gold
-	nX = X + 10
-	nY = nY + 28
-	nX = ui:Append('Text', { text = _L['Use golden hammer when score reaches'], x = nX, y = nY }):AutoWidth():Pos('BOTTOMRIGHT') + 5
-	nX = ui:Append('WndComboBox', {
-		name = 'Combo_Size1',
-		x = nX, y = nY, w = 100, h = 25,
-		text = MY_Taoguan.nUseGold,
-		menu = function()
-			local m0 = {}
-			for i = 2, 16 do
-				local v = 10 * 2 ^ i
-				table.insert(m0, { szOption = tostring(v), fnAction = function()
-					MY_Taoguan.nUseGold = v
-					ui:Fetch('Combo_Size1'):Text(tostring(v))
-				end })
-			end
-			return m0
-		end,
-	}):Pos('BOTTOMRIGHT') + 10
-	ui:Append('WndCheckBox', {
-		x = nX, y = nY, w = 200,
-		text = _L['Use silver hammer when no golden hammer?'],
-		checked = MY_Taoguan.bUseGold,
-		oncheck = function(bChecked) MY_Taoguan.bUseGold = bChecked end,
-	}):AutoWidth()
-
-	-- max
+	-- 分数达到多少停砸
 	nX = X + 10
 	nY = nY + 28
 	nX = ui:Append('Text', { text = _L['Stop simple broken can when score reaches'], x = nX, y = nY }):AutoWidth():Pos('BOTTOMRIGHT') + 5
 	nX = ui:Append('WndComboBox', {
-		name = 'Combo_Size3',
 		x = nX, y = nY, w = 100, h = 25,
 		text = MY_Taoguan.nPausePoint,
 		menu = function()
+			local ui = UI(this)
 			local m0 = {}
-			for i = 2, 16 do
+			for i = 2, MAX_POINT_POW do
 				local v = 10 * 2 ^ i
 				table.insert(m0, { szOption = tostring(v), fnAction = function()
 					MY_Taoguan.nPausePoint = v
-					ui:Fetch('Combo_Size3'):Text(tostring(v))
+					ui:Text(tostring(v))
 				end })
 			end
 			return m0
@@ -322,63 +426,57 @@ function PS.OnPanelActive(wnd)
 		oncheck = function(bChecked) MY_Taoguan.bUseTaoguan = bChecked end,
 	}):AutoWidth()
 
-	-- zj
-	nX = X + 10
+	-- 没有小银锤时使用小金锤
+	-- nX = X + 10
 	nY = nY + 28
-	nX = ui:Append('Text', { text = _L['Use JiYouGu and ZuiSheng when score reaches'], x = nX, y = nY }):AutoWidth():Pos('BOTTOMRIGHT') + 5
-	nX = ui:Append('WndComboBox', {
-		name = 'Combo_Size2',
-		x = nX, y = nY, w = 100, h = 25,
-		text = MY_Taoguan.nUseZJ,
-		menu = function()
-			local m0 = {}
-			for i = 2, 16 do
-				local v = 10 * 2 ^ i
-				table.insert(m0, { szOption = tostring(v), fnAction = function()
-					MY_Taoguan.nUseZJ = v
-					ui:Fetch('Combo_Size2'):Text(tostring(v))
-				end })
-			end
-			return m0
-		end,
-	}):Pos('BOTTOMRIGHT') + 10
-	nX = ui:Append('WndCheckBox', {
-		x = nX, y = nY,
-		text = _L['Stop break when no item'],
-		checked = MY_Taoguan.bPauseNoZJ,
-		oncheck = function(bChecked) MY_Taoguan.bPauseNoZJ = bChecked end,
-	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
 	ui:Append('WndCheckBox', {
-		x = nX, y = nY,
-		text = _L['No ZuiSheng'],
-		checked = MY_Taoguan.bNonZS,
-		oncheck = function(bChecked) MY_Taoguan.bNonZS = bChecked end,
+		x = nX, y = nY, w = 200,
+		text = _L('When no %s use %s?', XIAOYINCHUI, XIAOJINCHUI),
+		checked = MY_Taoguan.bNoYinchuiUseJinchui,
+		oncheck = function(bChecked) MY_Taoguan.bNoYinchuiUseJinchui = bChecked end,
 	}):AutoWidth()
 
-	-- JX
-	nX = X + 10
-	nY = nY + 28
-	nX = ui:Append('Text', { text = _L['Use JinNang and XiangNang when score reaches'], x = nX, y = nY }):AutoWidth():Pos('BOTTOMRIGHT') + 5
-	ui:Append('WndComboBox', {
-		name = 'Combo_Size4',
-		x = nX, y = nY, w = 100, h = 25,
-		text = MY_Taoguan.nUseJX,
-		menu = function()
-			local m0 = {}
-			for i = 2, 16 do
-				local v = 10 * 2 ^ i
-				table.insert(m0, { szOption = tostring(v), fnAction = function()
-					MY_Taoguan.nUseJX = v
-					ui:Fetch('Combo_Size4'):Text(tostring(v))
-				end })
-			end
-			return m0
-		end,
-	})
+	-- 各种东西使用分数和缺少停砸
+	local nMaxItemNameLen = 0
+	for _, p in ipairs(D.aUseItemPS) do
+		nMaxItemNameLen = max(nMaxItemNameLen, wlen(p.szName))
+	end
+	for _, p in ipairs(D.aUseItemPS) do
+		nX = X + 10
+		nY = nY + 28
+		nX = ui:Append('Text', {
+			x = nX, y = nY,
+			text = _L('Use %s when score reaches', p.szName .. rep(g_tStrings.STR_ONE_CHINESE_SPACE, nMaxItemNameLen - wlen(p.szName))),
+		}):AutoWidth():Pos('BOTTOMRIGHT') + 5
+		nX = ui:Append('WndComboBox', {
+			x = nX, y = nY, w = 100, h = 25,
+			text = MY_Taoguan['nUse' .. p.szID],
+			menu = function()
+				local ui = UI(this)
+				local m0 = {}
+				for i = 2, MAX_POINT_POW - 1 do
+					local v = 10 * 2 ^ i
+					table.insert(m0, { szOption = tostring(v), fnAction = function()
+						MY_Taoguan['nUse' .. p.szID] = v
+						ui:Text(tostring(v))
+					end })
+				end
+				return m0
+			end,
+		}):Pos('BOTTOMRIGHT') + 10
+		nX = ui:Append('WndCheckBox', {
+			x = nX, y = nY,
+			text = _L['Stop break when no item'],
+			checked = MY_Taoguan['bPauseNo' .. p.szID],
+			oncheck = function(bChecked)
+				MY_Taoguan['bPauseNo' .. p.szID] = bChecked
+			end,
+		}):AutoWidth():Pos('BOTTOMRIGHT') + 10
+	end
 
-	-- filter
+	-- 拾取过滤
 	nX = X + 10
-	nY = nY + 28
+	nY = nY + 38
 	nX = ui:Append('WndComboBox', {
 		x = nX, y = nY, w = 150,
 		text = _L['Pickup filters'],
@@ -423,7 +521,7 @@ function PS.OnPanelActive(wnd)
 	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
 	ui:Append('Text', { x = nX, y = nY, text = _L['(Checked will not be picked up, if still pick please check system auto pick config)'] })
 
-	-- begin
+	-- 控制按钮
 	nX = X + 10
 	nY = nY + 36
 	nX = ui:Append('WndButton', {
@@ -447,49 +545,6 @@ LIB.RegisterPanel('MY_Taoguan', _L[MODULE_NAME], _L['Target'], 119, PS)
 ---------------------------------------------------------------------
 -- 注册事件、初始化
 ---------------------------------------------------------------------
-LIB.RegisterMsgMonitor('MY_Taoguan', D.MonitorZP, {'MSG_SYS'})
-LIB.BreatheCall('MY_Taoguan', function()
-	if D.bEnable then
-		LIB.DoMessageBox('PlayerMessageBoxCommon')
-	end
-	if D.bEnable and D.nPoint >= O.nUseZJ then
-		local bJ, bZ = true, O.bNonZS == false
-		local aBuff, nCount, buff = LIB.GetBuffList(GetClientPlayer())
-		for i = 1, nCount do
-			buff = aBuff[i]
-			if buff.dwID == 1660 and buff.nLevel == 3 then
-				bJ = false
-			elseif buff.dwID == 1661 and buff.nLevel == 3 then
-				bZ = false
-			end
-		end
-		D.bHaveZJ = bJ == false and bZ == false
-		if bJ and not D.UseBagItem(JIYOUGU, O.bPauseNoZJ) and O.bPauseNoZJ then
-			D.bEnable = false
-		elseif bZ and not D.UseBagItem(ZUISHENG, O.bPauseNoZJ) and O.bPauseNoZJ then
-			D.bEnable = false
-		end
-	elseif D.bEnable and D.nPoint >= O.nUseJX then
-		local me = GetClientPlayer()
-		if not LIB.GetBuff(me, 1660) and not D.UseBagItem(RUYIXIANGNANG) then
-			D.UseBagItem(XINYUNXIANGNANG)
-		end
-		if not LIB.GetBuff(me, 1661) and not D.UseBagItem(RUYIJINNANG) then
-			D.UseBagItem(XINYUNJINNANG)
-		end
-	end
-end, 1000)
-LIB.RegisterEvent('NPC_ENTER_SCENE.MY_Taoguan', D.OnNpcEnter)
-LIB.RegisterEvent('LOOT_ITEM.MY_Taoguan', D.OnLootItem)
-LIB.RegisterEvent('DOODAD_ENTER_SCENE.MY_Taoguan', D.OnDoodadEnter)
-LIB.RegisterEvent('HELP_EVENT.MY_Taoguan', function()
-	if arg0 == 'OnOpenpanel' and arg1 == 'LOOT'
-		and D.bEnable and D.dwDoodadID ~= 0
-	then
-		D.OnOpenDoodad()
-		D.dwDoodadID = 0
-	end
-end)
 
 -- Global exports
 do
@@ -497,14 +552,23 @@ local settings = {
 	exports = {
 		{
 			fields = {
-				nUseGold = true,
-				nUseZJ = true,
-				bPauseNoZJ = true,
 				nPausePoint = true,
-				nUseJX = true,
-				bNonZS = true,
-				bUseGold = true,
 				bUseTaoguan = true,
+				bNoYinchuiUseJinchui = true,
+				nUseXiaojinchui = true,
+				bPauseNoXiaojinchui = true,
+				nUseXingyunXiangnang = true,
+				bPauseNoXingyunXiangnang = true,
+				nUseXingyunJinnang = true,
+				bPauseNoXingyunJinnang = true,
+				nUseRuyiXiangnang = true,
+				bPauseNoRuyiXiangnang = true,
+				nUseRuyiJinnang = true,
+				bPauseNoRuyiJinnang = true,
+				nUseJiyougu = true,
+				bPauseNoJiyougu = true,
+				nUseZuisheng = true,
+				bPauseNoZuisheng = true,
 				tFilterItem = true,
 			},
 			root = O,
@@ -513,14 +577,23 @@ local settings = {
 	imports = {
 		{
 			fields = {
-				nUseGold = true,
-				nUseZJ = true,
-				bPauseNoZJ = true,
 				nPausePoint = true,
-				nUseJX = true,
-				bNonZS = true,
-				bUseGold = true,
 				bUseTaoguan = true,
+				bNoYinchuiUseJinchui = true,
+				nUseXiaojinchui = true,
+				bPauseNoXiaojinchui = true,
+				nUseXingyunXiangnang = true,
+				bPauseNoXingyunXiangnang = true,
+				nUseXingyunJinnang = true,
+				bPauseNoXingyunJinnang = true,
+				nUseRuyiXiangnang = true,
+				bPauseNoRuyiXiangnang = true,
+				nUseRuyiJinnang = true,
+				bPauseNoRuyiJinnang = true,
+				nUseJiyougu = true,
+				bPauseNoJiyougu = true,
+				nUseZuisheng = true,
+				bPauseNoZuisheng = true,
 				tFilterItem = true,
 			},
 			triggers = {
