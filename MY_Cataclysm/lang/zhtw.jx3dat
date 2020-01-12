@@ -104,6 +104,7 @@ return {
 	['Take back mark permission'] = '收回標記許可權',
 	['Take back distribute permission'] = '收回分配許可權',
 	['Please install and load GKP addon first.'] = '未檢測到金團記錄插件，請先返回角色選擇界面進入插件管理界面，安裝並載入茗伊金團記錄子插件。',
+	['You are not the distrubutor.'] = '你不是分配者。',
 	['Official team frame style'] = '官方樣式',
 	['Cataclysm team frame style'] = 'Cataclysm樣式',
 	['Restore default'] = '恢復默認',
