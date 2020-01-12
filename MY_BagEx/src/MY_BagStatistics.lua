@@ -495,4 +495,4 @@ local menu = {
 }
 LIB.RegisterAddonMenu('MY_BAGSTATISTICS_MENU', menu)
 end
-LIB.RegisterHotKey('Open/Close MY_BagStatistics', _L['MY_BagStatistics'], MY_BagStatistics.Toggle, nil)
+LIB.RegisterHotKey('MY_BagStatistics', _L['Open/Close MY_BagStatistics'], MY_BagStatistics.Toggle, nil)
