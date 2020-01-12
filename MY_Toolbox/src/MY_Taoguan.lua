@@ -289,7 +289,7 @@ function PS.OnPanelActive(wnd)
 		text = MY_Taoguan.nUseGold,
 		menu = function()
 			local m0 = {}
-			for i = 3, 9 do
+			for i = 2, 16 do
 				local v = 10 * 2 ^ i
 				table.insert(m0, { szOption = tostring(v), fnAction = function()
 					MY_Taoguan.nUseGold = v
@@ -316,7 +316,7 @@ function PS.OnPanelActive(wnd)
 		text = MY_Taoguan.nPausePoint,
 		menu = function()
 			local m0 = {}
-			for i = 7, 16 do
+			for i = 2, 16 do
 				local v = 10 * 2 ^ i
 				table.insert(m0, { szOption = tostring(v), fnAction = function()
 					MY_Taoguan.nPausePoint = v
@@ -343,7 +343,7 @@ function PS.OnPanelActive(wnd)
 		text = MY_Taoguan.nUseZJ,
 		menu = function()
 			local m0 = {}
-			for i = 5, 11 do
+			for i = 2, 16 do
 				local v = 10 * 2 ^ i
 				table.insert(m0, { szOption = tostring(v), fnAction = function()
 					MY_Taoguan.nUseZJ = v
@@ -376,7 +376,7 @@ function PS.OnPanelActive(wnd)
 		text = MY_Taoguan.nUseJX,
 		menu = function()
 			local m0 = {}
-			for i = 2, 10 do
+			for i = 2, 16 do
 				local v = 10 * 2 ^ i
 				table.insert(m0, { szOption = tostring(v), fnAction = function()
 					MY_Taoguan.nUseJX = v
