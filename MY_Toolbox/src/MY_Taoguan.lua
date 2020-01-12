@@ -237,7 +237,7 @@ function D.BreakCanStateTransfer()
 	-- 没有能砸的陶罐考虑自己放一个
 	if not npcTaoguan and O.bUseTaoguan then
 		if D.UseBagItem(TAOGUAN) then
-			D.nUseHammerLFC = nLFC
+			D.nUseItemLFC = nLFC
 		end
 	end
 	-- 还是没有找到罐子则等待
