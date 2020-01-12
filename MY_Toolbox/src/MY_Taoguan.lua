@@ -490,7 +490,6 @@ LIB.RegisterEvent('HELP_EVENT.MY_Taoguan', function()
 		D.dwDoodadID = 0
 	end
 end)
-LIB.RegisterHotKey('MY_Taoguan', _L['Turn on/off MY_Taoguan'], D.Switch)
 
 -- Global exports
 do

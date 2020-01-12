@@ -172,7 +172,6 @@ return {
     ['Custom add'] = '添加自定義',
     ['Please input custom name'] = '請輸入自定義名稱',
     ['Start/stop break can'] = '開始/停止砸罐',
-    ['Turn on/off MY_Taoguan'] = '開/關砸年獸陶罐',
     ['Restore default config'] = '恢復默認設置',
 
     -- MY_Force
