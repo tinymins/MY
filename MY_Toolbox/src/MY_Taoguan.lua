@@ -52,12 +52,43 @@ end
 -- ¼ÄÓÇ¹È -- ÏÂÒ»´ÎÓÐÎå±¶¼¸ÂÊÔÒÖÐÄêÊÞÌÕ¹Þ
 -- ×íÉú -- ÏÂÒ»´ÎÔÒÄêÊÞÌÕ¹ÞÊ§°ÜÔò²»ËðÊ§»ý·Ö
 
+local FILTER_ITEM = {
+	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6072), bFilter = true }, -- ±ÞÅÚ
+	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6069), bFilter = true }, -- »ðÊ÷Òø»¨
+	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6068), bFilter = true }, -- Áú·ï³ÊÏé
+	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6067), bFilter = true }, -- ²ÊÔÆÖðÔÂ
+	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6076), bFilter = true }, -- ìÚìÚÉú»Ô
+	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6073), bFilter = true }, -- Ñæ»ð°ô
+	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6070), bFilter = true }, -- ´ÜÌìºï
+	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6077), bFilter = true }, -- ²ÊÔÆÖðÔÂ
+	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 8025, 1168), bFilter = true }, -- ¼ôÖ½£ºÁúÌÚ
+	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 8025, 1170), bFilter = true }, -- ¼ôÖ½£º·ïÎè
+	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6066), bFilter = true }, -- Ôª±¦µÆ
+	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6067), bFilter = true }, -- ÌÒ»¨µÆ
+	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6024), bFilter = true }, -- ÄêÄêÓÐÓãµÆ
+	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6048), bFilter = true }, -- ÌÒÄ¾ÅÆ¡¤Âí
+	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6049), bFilter = true }, -- ÌÒÄ¾ÅÆ¡¤Äê
+	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6050), bFilter = true }, -- ÌÒÄ¾ÅÆ¡¤¼ª
+	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6051), bFilter = true }, -- ÌÒÄ¾ÅÆ¡¤Ïé
+	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6200), bFilter = true }, -- Í¼Ñù£º²ÊÔÆÖðÔÂ
+	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6203), bFilter = true }, -- Í¼Ñù£ºìÚìÚÉú»Ô
+	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6258), bFilter = false }, -- ¼à±¾Ó¡ÎÄ¶Ò»»È¯
+	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 31599), bFilter = false }, -- Õ½»êÅå
+	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 30692), bFilter = false }, -- ºÀÏÀ¹±
+	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 20959), bFilter = false }, -- ÄêÊÞÌÕ¹Þ
+	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6027), bFilter = false }, -- ÐÒÔËÏãÄÒ
+	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6030), bFilter = false }, -- ÐÒÔË½õÄÒ
+	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6028), bFilter = false }, -- ÈçÒâÏãÄÒ
+	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6031), bFilter = false }, -- ÈçÒâ½õÄÒ
+	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6043), bFilter = false }, -- Ëø×¡µÄÔÂ¹â±¦ºÐ
+}
+
 local DEFAULT_O = {
 	nPausePoint              = 327680, -- Í£ÔÒ·ÖÊýÏß
 	bUseTaoguan              = true  , -- ±ØÒªÊ±Ê¹ÓÃ±³°üµÄÌÕ¹Þ
 	bNoYinchuiUseJinchui     = false , -- Ã»Ð¡Òø´¸Ê±Ê¹ÓÃÐ¡½ð´¸
 	nUseXiaojinchui          = 320   , -- ÓÅÏÈÊ¹ÓÃÐ¡½ð´¸µÄ·ÖÊý
-	bPauseNoXiaojinchui      = false , -- È±ÉÙÐ¡½ð´¸Ê±Í£ÔÒ
+	bPauseNoXiaojinchui      = true  , -- È±ÉÙÐ¡½ð´¸Ê±Í£ÔÒ
 	nUseXingyunXiangnang     = 80    , -- ¿ªÊ¼³ÔÐÒÔËÏãÄÒµÄ·ÖÊý
 	bPauseNoXingyunXiangnang = false , -- È±ÉÙÐÒÔËÏãÄÒÊ±Í£ÔÒ
 	nUseXingyunJinnang       = 80    , -- ¿ªÊ¼³ÔÐÒÔË½õÄÒµÄ·ÖÊý
@@ -70,33 +101,11 @@ local DEFAULT_O = {
 	bPauseNoJiyougu          = true  , -- È±ÉÙ¼ÄÓÇ¹ÈÊ±Í£ÔÒ
 	nUseZuisheng             = 1280  , -- ¿ªÊ¼³Ô×íÉúµÄ·ÖÊý
 	bPauseNoZuisheng         = true  , -- È±ÉÙ×íÉúÊ±Í£ÔÒ
-	tFilterItem = {
-		[LIB.GetObjectName('ITEM_INFO', 5, 6072)] = true, -- ±ÞÅÚ
-		[LIB.GetObjectName('ITEM_INFO', 5, 6069)] = true, -- »ðÊ÷Òø»¨
-		[LIB.GetObjectName('ITEM_INFO', 5, 6068)] = true, -- Áú·ï³ÊÏé
-		[LIB.GetObjectName('ITEM_INFO', 5, 6067)] = true, -- ²ÊÔÆÖðÔÂ
-		[LIB.GetObjectName('ITEM_INFO', 5, 6076)] = true, -- ìÚìÚÉú»Ô
-		[LIB.GetObjectName('ITEM_INFO', 5, 6073)] = true, -- Ñæ»ð°ô
-		[LIB.GetObjectName('ITEM_INFO', 5, 6070)] = true, -- ´ÜÌìºï
-		[LIB.GetObjectName('ITEM_INFO', 5, 6077)] = true, -- ²ÊÔÆÖðÔÂ
-		[LIB.GetObjectName('ITEM_INFO', 5, 8025, 1168)] = true, -- ¼ôÖ½£ºÁúÌÚ
-		[LIB.GetObjectName('ITEM_INFO', 5, 8025, 1170)] = true, -- ¼ôÖ½£º·ïÎè
-		[LIB.GetObjectName('ITEM_INFO', 5, 6066)] = true, -- Ôª±¦µÆ
-		[LIB.GetObjectName('ITEM_INFO', 5, 6067)] = true, -- ÌÒ»¨µÆ
-		[LIB.GetObjectName('ITEM_INFO', 5, 6048)] = true, -- ÌÒÄ¾ÅÆ¡¤Âí
-		[LIB.GetObjectName('ITEM_INFO', 5, 6049)] = true, -- ÌÒÄ¾ÅÆ¡¤Äê
-		[LIB.GetObjectName('ITEM_INFO', 5, 6050)] = true, -- ÌÒÄ¾ÅÆ¡¤¼ª
-		[LIB.GetObjectName('ITEM_INFO', 5, 6051)] = true, -- ÌÒÄ¾ÅÆ¡¤Ïé
-		[LIB.GetObjectName('ITEM_INFO', 5, 6200)] = true, -- Í¼Ñù£º²ÊÔÆÖðÔÂ
-		[LIB.GetObjectName('ITEM_INFO', 5, 6203)] = true, -- Í¼Ñù£ºìÚìÚÉú»Ô
-		[LIB.GetObjectName('ITEM_INFO', 5, 6258)] = false, -- ¼à±¾Ó¡ÎÄ¶Ò»»È¯
-		[LIB.GetObjectName('ITEM_INFO', 5, 31599)] = false, -- Õ½»êÅå
-		[LIB.GetObjectName('ITEM_INFO', 5, 30692)] = false, -- ºÀÏÀ¹±
-		[LIB.GetObjectName('ITEM_INFO', 5, 6024)] = true, -- ÄêÄêÓÐÓãµÆ
-		[LIB.GetObjectName('ITEM_INFO', 5, 20959)] = false, -- ÄêÊÞÌÕ¹Þ
-		[LIB.GetObjectName('ITEM_INFO', 5, 6027)] = false, -- ÐÒÔËÏãÄÒ
-	},
+	tFilterItem = {},
 }
+for _, p in ipairs(FILTER_ITEM) do
+	DEFAULT_O.tFilterItem[p.szName] = p.bFilter
+end
 local O = Clone(DEFAULT_O)
 RegisterCustomData('MY_Taoguan.nPausePoint')
 RegisterCustomData('MY_Taoguan.bUseTaoguan')
@@ -484,27 +493,35 @@ function PS.OnPanelActive(wnd)
 		text = _L['Pickup filters'],
 		menu = function()
 			local m0 = {}
-			for k, v in pairs(MY_Taoguan.tFilterItem) do
-				local m1 = {
-					szOption = k,
-					bCheck = true, bChecked = v == true,
+			for _, p in ipairs(FILTER_ITEM) do
+				insert(m0, {
+					szOption = p.szName,
+					bCheck = true, bChecked = MY_Taoguan.tFilterItem[p.szName],
 					fnAction = function(d, b)
-						MY_Taoguan.tFilterItem[k] = b
+						MY_Taoguan.tFilterItem[p.szName] = b
 					end,
-				}
+				})
+			end
+			for k, v in pairs(MY_Taoguan.tFilterItem) do
 				if DEFAULT_O.tFilterItem[k] == nil then
-					m1.szIcon = 'ui/Image/UICommon/CommonPanel2.UITex'
-					m1.nFrame = 49
-					m1.nMouseOverFrame = 51
-					m1.nIconWidth = 17
-					m1.nIconHeight = 17
-					m1.szLayer = 'ICON_RIGHTMOST'
-					m1.fnClickIcon = function()
-						MY_Taoguan.tFilterItem[k] = nil
-						Wnd.CloseWindow('PopupMenuPanel')
-					end
+					insert(m0, {
+						szOption = k,
+						bCheck = true, bChecked = v,
+						fnAction = function(d, b)
+							MY_Taoguan.tFilterItem[k] = b
+						end,
+						szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',
+						nFrame = 49,
+						nMouseOverFrame = 51,
+						nIconWidth = 17,
+						nIconHeight = 17,
+						szLayer = 'ICON_RIGHTMOST',
+						fnClickIcon = function()
+							MY_Taoguan.tFilterItem[k] = nil
+							Wnd.CloseWindow('PopupMenuPanel')
+						end,
+					})
 				end
-				table.insert(m0, m1)
 			end
 			if #m0 > 0 then
 				insert(m0, CONSTANT.MENU_DIVIDER)
