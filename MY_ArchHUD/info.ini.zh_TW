@@ -1,8 +1,0 @@
-[MY_ArchHUD]
-version=1.0
-name=弧形血條
-desc=以弧形方式顯示自己和目標的血藍條
-default=1
-lua_0=src/MY_ArchHUD.lua
-dependence=MY_!Base
-package=MY
