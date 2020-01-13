@@ -179,7 +179,7 @@ function D.UseBagItem(szName, bWarn)
 		end
 	end
 	if bWarn then
-		LIB.Sysmsg(_L('Auto taoguan: missing [%s]!', szName))
+		LIB.Systopmsg(_L('Auto taoguan: missing [%s]!', szName))
 	end
 end
 
@@ -286,7 +286,7 @@ function D.MonitorZP(szMsg)
 		if D.nPoint >= O.nPausePoint then
 			D.Stop()
 			D.bReachLimit = true
-			LIB.Sysmsg(_L['Auto taoguan: reach limit!'])
+			LIB.Systopmsg(_L['Auto taoguan: reach limit!'])
 		end
 		D.nUseHammerLFC = GetLogicFrameCount()
 	end
@@ -295,7 +295,7 @@ end
 function D.OnLootItem()
 	if arg0 == GetClientPlayer().dwID and arg2 > 2 and GetItem(arg1).szName == MEILIANGYUQIAN then
 		D.nPoint = 0
-		LIB.Sysmsg(_L['Auto taoguan: score clear!'])
+		LIB.Systopmsg(_L['Auto taoguan: score clear!'])
 	end
 end
 
@@ -332,7 +332,7 @@ function D.OnOpenDoodad()
 				then
 					LootItem(d.dwID, it.dwID)
 				else
-					LIB.Sysmsg(_L('Auto taoguan: filter item [%s].', szName))
+					LIB.Systopmsg(_L('Auto taoguan: filter item [%s].', szName))
 				end
 			end
 			local hL = Station.Lookup('Normal/LootList', 'Handle_LootList')
@@ -362,7 +362,7 @@ function D.Start()
 			D.dwDoodadID = 0
 		end
 	end)
-	LIB.Sysmsg(_L['Auto taoguan: on.'])
+	LIB.Systopmsg(_L['Auto taoguan: on.'])
 end
 
 -- 砸罐子关闭（注销事件）
@@ -377,7 +377,7 @@ function D.Stop()
 	LIB.RegisterEvent('LOOT_ITEM.MY_Taoguan', false)
 	LIB.RegisterEvent('DOODAD_ENTER_SCENE.MY_Taoguan', false)
 	LIB.RegisterEvent('HELP_EVENT.MY_Taoguan', false)
-	LIB.Sysmsg(_L['Auto taoguan: off.'])
+	LIB.Systopmsg(_L['Auto taoguan: off.'])
 end
 
 -- 砸罐子开关
