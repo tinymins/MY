@@ -80,5 +80,6 @@ function PS.OnPanelActive(wnd)
 	x, y = MY_EnergyBar.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	x, y = MY_AchievementWiki.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	x, y = MY_LockFrame.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+	x, y = MY_AutoSell.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 end
 LIB.RegisterPanel('MY_ToolBox', _L['toolbox'], _L['General'], 'UI/Image/Common/Money.UITex|243', PS)

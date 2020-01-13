@@ -300,4 +300,23 @@ return {
     ['FIREWORK_TITLE_161887'] = '稱心人',
     ['Achievement wiki'] = '點擊成就界面圖標顯示成就百科',
     ['Lock some float frame position (press ctrl+alt to temp unlock)'] = '鎖定部分懸浮窗口位置（按住CTRL+ALT可臨時解鎖）',
+
+    -- MY_AutoSell
+    ['Auto sell items'] = '自動出售物品',
+    ['Auto sell when open shop'] = '打開商店後自動出售',
+    ['Enable'] = '啟用',
+    ['Sell grey items'] = '自動出售灰色物品',
+    ['Sell read white books'] = '自動出售已讀白色書籍',
+    ['Sell read green books'] = '自動出售已讀綠色書籍',
+    ['Sell read blue books'] = '自動出售已讀藍色書籍',
+    ['Sell specified items'] = '自動出售指定物品',
+    ['Protect specified items'] = '保護不被出售的物品',
+    ['* New *'] = '☆ 添加 ☆',
+    ['Name of item'] = '物品名稱',
+    ['Remove'] = '刪除',
+    ['specified'] = '指定',
+    ['read white book'] = '已讀白色書籍',
+    ['read green book'] = '已讀綠色書籍',
+    ['read blue book'] = '已讀藍色書籍',
+    ['Auto sell %s item: %s.'] = '自動出售%s物品：%s。',
 }
