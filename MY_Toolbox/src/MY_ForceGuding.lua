@@ -239,26 +239,44 @@ function D.OnUseManaChange(_, bUseMana)
 		LIB.BreatheCall('MY_ForceGuding__UseMana', function()
 			local nFrame = GetLogicFrameCount()
 			-- check to use mana
-			if O.bUseMana and (not O.nManaFrame or O.nManaFrame <= (nFrame - 4)) then
-				local aList = O.tList
-				if not IsEmpty(aList) then
-					local me = GetClientPlayer()
-					local buff = LIB.GetBuff(me, 3448)
-					if (not buff or buff.bCanCancel)
-						and not me.bOnHorse and me.nMoveState == MOVE_STATE.ON_STAND and me.GetOTActionState() == 0
-						and  ((me.nCurrentMana / me.nMaxMana) <= (O.nManaMp / 100)
-							or (me.nCurrentLife / me.nMaxLife) <= (O.nManaHp / 100))
-					then
-						for k, _ in pairs(aList) do
-							local doo = GetDoodad(k)
-							if doo and LIB.GetDistance(doo) < 6 then
-								O.nManaFrame = GetLogicFrameCount()
-								InteractDoodad(doo.dwID)
-								LIB.Sysmsg(_L['Auto eat GUDING'])
-								break
-							end
-						end
-					end
+			if not O.bUseMana or (O.nManaFrame and O.nManaFrame > (nFrame - 4)) then
+				return
+			end
+			-- 没鼎
+			local aList = O.tList
+			if IsEmpty(aList) then
+				return
+			end
+			-- 没自己
+			local me = GetClientPlayer()
+			if not me then
+				return
+			end
+			-- 不在地上
+			if me.bOnHorse or me.nMoveState ~= MOVE_STATE.ON_STAND or me.GetOTActionState() ~= 0 then
+				return
+			end
+			-- 血蓝很足
+			if (me.nCurrentMana / me.nMaxMana) > (O.nManaMp / 100) and (me.nCurrentLife / me.nMaxLife) > (O.nManaHp / 100) then
+				return
+			end
+			-- 在读条
+			if me.GetSkillOTActionState() ~= CHARACTER_OTACTION_TYPE.ACTION_IDLE then
+				return
+			end
+			-- 吃不了
+			local buff = LIB.GetBuff(me, 3448)
+			if buff and not buff.bCanCancel then
+				return
+			end
+			-- 找鼎
+			for k, _ in pairs(aList) do
+				local doo = GetDoodad(k)
+				if doo and LIB.GetDistance(doo) < 6 then
+					O.nManaFrame = GetLogicFrameCount()
+					InteractDoodad(doo.dwID)
+					LIB.Sysmsg(_L['Auto eat GUDING'])
+					break
 				end
 			end
 		end)
