@@ -340,6 +340,52 @@ end
 end
 
 ---------------------------------------------------------------------------------------------
+-- ¼àÌý CTRL ALT SHIFT °´¼ü
+---------------------------------------------------------------------------------------------
+do
+local SPECIAL_KEY_EVENT = { szName = 'Idle' }
+local ALT, SHIFT, CTRL = false, false, false
+LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '#ON_SPECIAL_KEY', function()
+	if IsShiftKeyDown() then
+		if not SHIFT then
+			SHIFT = true
+			CommonEventFirer(SPECIAL_KEY_EVENT, 'SHIFT_KEY_DOWN')
+		end
+	else
+		if SHIFT then
+			SHIFT = false
+			CommonEventFirer(SPECIAL_KEY_EVENT, 'SHIFT_KEY_UP')
+		end
+	end
+	if IsCtrlKeyDown() then
+		if not CTRL then
+			CTRL = true
+			CommonEventFirer(SPECIAL_KEY_EVENT, 'CTRL_KEY_DOWN')
+		end
+	else
+		if CTRL then
+			CTRL = false
+			CommonEventFirer(SPECIAL_KEY_EVENT, 'CTRL_KEY_UP')
+		end
+	end
+	if IsAltKeyDown() then
+		if not ALT then
+			ALT = true
+			CommonEventFirer(SPECIAL_KEY_EVENT, 'ALT_KEY_DOWN')
+		end
+	else
+		if ALT then
+			ALT = false
+			CommonEventFirer(SPECIAL_KEY_EVENT, 'ALT_KEY_UP')
+		end
+	end
+end)
+function LIB.RegisterSpecialKeyEvent(...)
+	return CommonEventRegister(SPECIAL_KEY_EVENT, ...)
+end
+end
+
+---------------------------------------------------------------------------------------------
 -- ×¢²áÄ£¿é
 ---------------------------------------------------------------------------------------------
 do
