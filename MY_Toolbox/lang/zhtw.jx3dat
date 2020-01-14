@@ -299,7 +299,26 @@ return {
     ['FIREWORK_TITLE_161367'] = '深情人',
     ['FIREWORK_TITLE_161887'] = '稱心人',
     ['Achievement wiki'] = '點擊成就界面圖標顯示成就百科',
-    ['Lock some float frame position (press ctrl+alt to temp unlock)'] = '鎖定部分懸浮窗口位置（按住CTRL+ALT可臨時解鎖）',
+
+    -- MY_LockFrame
+    ['Lock frame position'] = '鎖定窗口位置',
+    ['Enable (press ctrl+alt to temp unlock)'] = '啟用（按住CTRL+ALT可臨時解鎖）',
+    ['MY_LockFrame has been temporary disabled.'] = '鎖定窗口位置已臨時禁用',
+    ['MY_LockFrame has been enabled.'] = '鎖定窗口位置已重新啟用',
+    ['LOCK_FRAME_JX_TargetList'] = '劍心·焦點列表',
+    ['LOCK_FRAME_MY_FocusUI'] = '茗伊·焦點列表',
+    ['LOCK_FRAME_WhoSeeMe'] = '誰在看我',
+    ['LOCK_FRAME_HatredPanel'] = '仇恨列表',
+    ['LOCK_FRAME_FightingStatistic'] = '傷害統計',
+    ['LOCK_FRAME_MY_ThreatRank'] = '茗伊·仇恨統計',
+    ['LOCK_FRAME_MY_Recount'] = '茗伊·傷害統計',
+    ['LOCK_FRAME_LR_AS_FP'] = '懶人·賬本懸浮窗',
+    ['LOCK_FRAME_QuestTraceList'] = '任務追蹤',
+    ['LOCK_FRAME_ChatPanel'] = '聊天面板',
+    ['LOCK_FRAME_ExteriorAction'] = '外裝動作',
+    ['LOCK_FRAME_MentorMessage'] = '師徒提示',
+    ['LOCK_FRAME_JX_TeamCD'] = '劍心·團隊技能監控',
+    ['LOCK_FRAME_JX_HeightMeter'] = '劍心·高度標線',
 
     -- MY_AutoSell
     ['Auto sell items'] = '自動出售物品',

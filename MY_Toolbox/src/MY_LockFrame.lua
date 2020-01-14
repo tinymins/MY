@@ -48,33 +48,70 @@ end
 
 local D = {}
 local O = {
+	-- 设置项
 	bEnable = false,
+	tEnable = {
+		['JX_TargetList'] = true,
+		['MY_FocusUI'] = true,
+		['WhoSeeMe'] = true,
+		['HatredPanel'] = true,
+		['FightingStatistic'] = true,
+		['MY_ThreatRank'] = true,
+		['MY_Recount'] = true,
+		['LR_AS_FP'] = true,
+		['QuestTraceList'] = true,
+		['ChatPanel'] = true,
+		['ExteriorAction'] = true,
+		['MentorMessage'] = true,
+		['JX_TeamCD'] = true,
+		['JX_HeightMeter'] = true,
+	},
+	-- 本地变量
 	bTempDisable = false,
-	tLockName = {
-		['JX_TargetList'] = true, -- 剑心焦点列表 [Normal/JX_TargetList]
-		['MY_FocusUI'] = true, -- 茗伊焦点列表 [Normal/MY_FocusUI]
-		['WhoSeeMe'] = true, -- 谁在看我 [Normal/WhoSeeMe]
-		['HatredPanel'] = true, -- 仇恨列表 [Normal/HatredPanel]
-		['FightingStatistic'] = true, -- 伤害统计 [Normal/FightingStatistic]
-		['MY_ThreatRank'] = true, -- 茗伊仇恨统计 [Normal/MY_ThreatRank]
-		['MY_Recount'] = true, -- 茗伊伤害统计 [Normal/MY_Recount]
-		['LR_AS_FP'] = true, -- 懒人悬浮窗 [Normal/LR_AS_FP]
-		['QuestTraceList'] = true, -- 任务追踪 [Normal/QuestTraceList]
-		['ChatPanel1'] = true, -- 聊天面板 [Lowest2/ChatPanel1]
-		['ChatPanel2'] = true, -- 聊天面板 [Lowest2/ChatPanel2]
-		['ChatPanel3'] = true, -- 聊天面板 [Lowest2/ChatPanel3]
-		['ChatPanel4'] = true, -- 聊天面板 [Lowest2/ChatPanel4]
-		['ChatPanel5'] = true, -- 聊天面板 [Lowest2/ChatPanel5]
-		['ChatPanel6'] = true, -- 聊天面板 [Lowest2/ChatPanel6]
-		['ChatPanel7'] = true, -- 聊天面板 [Lowest2/ChatPanel7]
-		['ChatPanel8'] = true, -- 聊天面板 [Lowest2/ChatPanel8]
-		['ChatPanel9'] = true, -- 聊天面板 [Lowest2/ChatPanel9]
-		['ExteriorAction'] = true, -- 外装动作 [Normal/ExteriorAction]
-		['MentorMessage'] = true, -- 师徒提示 [Normal/MentorMessage]
-		['JX_TeamCD'] = true, -- 剑心团队技能 [Normal/JX_TeamCD]
+	tLockList = {
+		'WhoSeeMe',
+		'HatredPanel',
+		'FightingStatistic',
+		'QuestTraceList',
+		'ChatPanel',
+		'ExteriorAction',
+		'MentorMessage',
+		'JX_TeamCD',
+		'JX_HeightMeter',
+		'JX_TargetList',
+		'MY_FocusUI',
+		'MY_ThreatRank',
+		'MY_Recount',
+		'LR_AS_FP',
+	},
+	tLockID = {
+		['JX_TargetList'] = 'JX_TargetList', -- 剑心·焦点列表 [Normal/JX_TargetList]
+		['MY_FocusUI'] = 'MY_FocusUI', -- 茗伊·焦点列表 [Normal/MY_FocusUI]
+		['WhoSeeMe'] = 'WhoSeeMe', -- 谁在看我 [Normal/WhoSeeMe]
+		['HatredPanel'] = 'HatredPanel', -- 仇恨列表 [Normal/HatredPanel]
+		['FightingStatistic'] = 'FightingStatistic', -- 伤害统计 [Normal/FightingStatistic]
+		['MY_ThreatRank'] = 'MY_ThreatRank', -- 茗伊·仇恨统计 [Normal/MY_ThreatRank]
+		['MY_Recount'] = 'MY_Recount', -- 茗伊·伤害统计 [Normal/MY_Recount]
+		['LR_AS_FP'] = 'LR_AS_FP', -- 懒人·账本悬浮窗 [Normal/LR_AS_FP]
+		['QuestTraceList'] = 'QuestTraceList', -- 任务追踪 [Normal/QuestTraceList]
+		['ChatPanel1'] = 'ChatPanel', -- 聊天面板 [Lowest2/ChatPanel1]
+		['ChatPanel2'] = 'ChatPanel', -- 聊天面板 [Lowest2/ChatPanel2]
+		['ChatPanel3'] = 'ChatPanel', -- 聊天面板 [Lowest2/ChatPanel3]
+		['ChatPanel4'] = 'ChatPanel', -- 聊天面板 [Lowest2/ChatPanel4]
+		['ChatPanel5'] = 'ChatPanel', -- 聊天面板 [Lowest2/ChatPanel5]
+		['ChatPanel6'] = 'ChatPanel', -- 聊天面板 [Lowest2/ChatPanel6]
+		['ChatPanel7'] = 'ChatPanel', -- 聊天面板 [Lowest2/ChatPanel7]
+		['ChatPanel8'] = 'ChatPanel', -- 聊天面板 [Lowest2/ChatPanel8]
+		['ChatPanel9'] = 'ChatPanel', -- 聊天面板 [Lowest2/ChatPanel9]
+		['ChatPanel10'] = 'ChatPanel', -- 聊天面板 [Lowest2/ChatPanel10]
+		['ExteriorAction'] = 'ExteriorAction', -- 外装动作 [Normal/ExteriorAction]
+		['MentorMessage'] = 'MentorMessage', -- 师徒提示 [Normal/MentorMessage]
+		['JX_TeamCD'] = 'JX_TeamCD', -- 剑心·团队技能监控 [Normal/JX_TeamCD]
+		['JX_HeightMeter'] = 'JX_HeightMeter', -- 剑心·高度标线 [Normal/JX_HeightMeter]
 	},
 }
 RegisterCustomData('MY_LockFrame.bEnable')
+RegisterCustomData('MY_LockFrame.tEnable')
 
 local HOOKED_UI = setmetatable({}, { __mode = 'k' })
 local UI_DRAGABLE = setmetatable({}, { __mode = 'k' })
@@ -103,12 +140,16 @@ function D.UnlockFrame(frame)
 	end
 end
 
-function D.IsLock(frame)
-	return O.bEnable and not O.bTempDisable and frame and O.tLockName[frame:GetName()]
+function D.IsFrameLock(frame)
+	if not O.bEnable or O.bTempDisable or not frame then
+		return false
+	end
+	local szLock = O.tLockID[frame:GetName()]
+	return szLock and O.tEnable[szLock]
 end
 
 function D.CheckFrame(frame)
-	local bLock = D.IsLock(frame)
+	local bLock = D.IsFrameLock(frame)
 	if bLock then
 		D.LockFrame(frame)
 	else
@@ -120,7 +161,7 @@ function D.CheckAllFrame()
 	for _, szLayer in ipairs({'Lowest', 'Lowest1', 'Lowest2', 'Normal', 'Normal1', 'Normal2', 'Topmost', 'Topmost1', 'Topmost2'})do
 		local frmIter = Station.Lookup(szLayer):GetFirstChild()
 		while frmIter do
-			local bLock = D.IsLock(frmIter)
+			local bLock = D.IsFrameLock(frmIter)
 			if bLock then
 				D.LockFrame(frmIter)
 			else
@@ -136,11 +177,13 @@ function D.CheckAllFrame()
 		LIB.BreatheCall('MY_LockFrame', function()
 			if IsCtrlKeyDown() and (IsShiftKeyDown() or IsAltKeyDown()) then
 				if not O.bTempDisable then
+					LIB.Topmsg(_L['MY_LockFrame has been temporary disabled.'])
 					O.bTempDisable = true
 					D.CheckAllFrame()
 				end
 			else
 				if O.bTempDisable then
+					LIB.Topmsg(_L['MY_LockFrame has been enabled.'])
 					O.bTempDisable = false
 					D.CheckAllFrame()
 				end
@@ -154,15 +197,36 @@ end
 LIB.RegisterInit('MY_LockFrame', D.CheckAllFrame)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	ui:Append('WndCheckBox', {
-		x = x, y = y, w = 'auto',
-		text = _L['Lock some float frame position (press ctrl+alt to temp unlock)'],
-		checked = MY_LockFrame.bEnable,
-		oncheck = function(bChecked)
-			MY_LockFrame.bEnable = bChecked
+	ui:Append('WndComboBox', {
+		x = W - 150, y = 78, w = 130,
+		text = _L['Lock frame position'],
+		menu = function()
+			local t = {
+				{
+					szOption = _L['Enable (press ctrl+alt to temp unlock)'],
+					bCheck = true, bChecked = MY_LockFrame.bEnable,
+					fnAction = function(_, b)
+						MY_LockFrame.bEnable = b
+						D.CheckAllFrame()
+					end,
+				}, CONSTANT.MENU_DIVIDER,
+			}
+			for _, k in ipairs(O.tLockList) do
+				insert(t, {
+					szOption = _L['LOCK_FRAME_' .. k],
+					bCheck = true, bChecked = MY_LockFrame.tEnable[k],
+					fnAction = function(_, b)
+						MY_LockFrame.tEnable[k] = b
+						D.CheckAllFrame()
+					end,
+					fnDisable = function()
+						return not MY_LockFrame.bEnable
+					end,
+				})
+			end
+			return t
 		end,
 	})
-	y = y + 25
 	return x, y
 end
 
@@ -178,6 +242,7 @@ local settings = {
 		{
 			fields = {
 				bEnable = true,
+				tEnable = true,
 			},
 			root = O,
 		},
@@ -186,9 +251,11 @@ local settings = {
 		{
 			fields = {
 				bEnable = true,
+				tEnable = true,
 			},
 			triggers = {
 				bEnable = D.CheckAllFrame,
+				tEnable = D.CheckAllFrame,
 			},
 			root = O,
 		},
