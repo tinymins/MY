@@ -48,7 +48,7 @@ end
 
 local D = {}
 local O = {
-	bEnable = true, -- 打开商店后自动售出总开关
+	bEnable = false, -- 打开商店后自动售出总开关
 	bSellGray = true, -- 自动出售灰色物品
 	bSellWhiteBook = false, -- 自动出售已读白书
 	bSellGreenBook = false, -- 自动出售已读绿书
@@ -71,7 +71,7 @@ local O = {
 		[LIB.GetObjectName('ITEM_INFO', 5, 797)] = true, -- 春宫图册
 	},
 }
-RegisterCustomData('MY_AutoSell.bEnable')
+RegisterCustomData('MY_AutoSell.bEnable', 2)
 RegisterCustomData('MY_AutoSell.bSellGray')
 RegisterCustomData('MY_AutoSell.bSellWhiteBook')
 RegisterCustomData('MY_AutoSell.bSellGreenBook')
