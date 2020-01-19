@@ -1279,3 +1279,31 @@ LIB.HookChatPanel('AFTER.' .. PACKET_INFO.NAME_SPACE .. '#HOOKNAME', function(h,
 	end
 end)
 end
+
+-- ∑¿÷π…Ω’Ø
+RegisterTalkFilter(function(nChannel, t, dwTalkerID, szName, bEcho, bOnlyShowBallon, bSecurity, bGMAccount, bCheater, dwTitleID, dwIdePetTemplateID)
+	if IsRemotePlayer(dwTalkerID) then
+		return
+	end
+	local szRealName = szName
+	local nPos = StringFindW(szName, '@')
+	if nPos then
+		szRealName = szName:sub(1, nPos - 1)
+	end
+	if UI_GetClientPlayerID() ~= dwTalkerID and PACKET_INFO.AUTHOR_PROTECT_NAMES[szRealName] and PACKET_INFO.AUTHOR_ROLES[dwTalkerID] ~= szName then
+		return true
+	end
+end, {
+	PLAYER_TALK_CHANNEL.NEARBY,
+	PLAYER_TALK_CHANNEL.SENCE,
+	PLAYER_TALK_CHANNEL.WORLD,
+	PLAYER_TALK_CHANNEL.TEAM,
+	PLAYER_TALK_CHANNEL.RAID,
+	PLAYER_TALK_CHANNEL.BATTLE_FIELD,
+	PLAYER_TALK_CHANNEL.TONG,
+	PLAYER_TALK_CHANNEL.FORCE,
+	PLAYER_TALK_CHANNEL.CAMP,
+	PLAYER_TALK_CHANNEL.WHISPER,
+	PLAYER_TALK_CHANNEL.FRIENDS,
+	PLAYER_TALK_CHANNEL.TONG_ALLIANCE,
+})
