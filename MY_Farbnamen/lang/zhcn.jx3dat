@@ -1,7 +1,8 @@
 -- language data (zhcn) updated at 2014-4-10 03:38:11
 return {
     ['MY_Farbnamen'] = '职业染色',
-    ['[author]'] = '〔插件君〕',
+    ['[Author]'] = '〔插件君〕',
+    ['[Fake author]'] = '〔该玩家非插件君，注意谨防上当受骗〕',
     ['[teammate]'] = '〔队友〕',
     ['cache data deleted.'] = '缓存已清除。',
     ['customize color'] = '自定义颜色',

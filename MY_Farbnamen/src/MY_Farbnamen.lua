@@ -248,11 +248,23 @@ function MY_Farbnamen.GetTip(szName)
 	if tInfo then
 		local tTip = {}
 		-- author info
-		if tInfo.dwID and tInfo.szName and tInfo.szName == PACKET_INFO.AUTHOR_ROLES[tInfo.dwID] then
-			insert(tTip, GetFormatText(PACKET_INFO.NAME, 8, 89, 224, 232))
-			insert(tTip, GetFormatText(' ', 136, 89, 224, 232))
-			insert(tTip, GetFormatText(_L['[author]'], 8, 89, 224, 232))
-			insert(tTip, CONSTANT.XML_LINE_BREAKER)
+		if tInfo.dwID and tInfo.szName then
+			if tInfo.szName == PACKET_INFO.AUTHOR_ROLES[tInfo.dwID] then
+				insert(tTip, GetFormatText(PACKET_INFO.NAME, 8, 89, 224, 232))
+				insert(tTip, GetFormatText(' ', 136, 89, 224, 232))
+				insert(tTip, GetFormatText(_L['[Author]'], 8, 89, 224, 232))
+				insert(tTip, CONSTANT.XML_LINE_BREAKER)
+			else
+				local szRealName = tInfo.szName
+				local nPos = StringFindW(tInfo.szName, '@')
+				if nPos then
+					szRealName = tInfo.szName:sub(1, nPos - 1)
+				end
+				if PACKET_INFO.AUTHOR_PROTECT_NAMES[szRealName] then
+					insert(tTip, GetFormatText(_L['[Fake author]'], 8, 255, 95, 159))
+					insert(tTip, CONSTANT.XML_LINE_BREAKER)
+				end
+			end
 		end
 		-- Ãû³Æ µÈ¼¶
 		insert(tTip, GetFormatText(('%s(%d)'):format(tInfo.szName, tInfo.nLevel), 136))
