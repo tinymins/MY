@@ -343,7 +343,7 @@ end
 -- ¼àÌý CTRL ALT SHIFT °´¼ü
 ---------------------------------------------------------------------------------------------
 do
-local SPECIAL_KEY_EVENT = { szName = 'Idle' }
+local SPECIAL_KEY_EVENT = { szName = 'SpecialKey' }
 local ALT, SHIFT, CTRL = false, false, false
 LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '#ON_SPECIAL_KEY', function()
 	if IsShiftKeyDown() then
