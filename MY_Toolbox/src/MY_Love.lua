@@ -153,9 +153,6 @@ RegisterCustomData('MY_Love.bHookPlayerView')
 
 -- ¹¦ÄÜÄÚ²â
 function D.IsShielded()
-	if GetCurrentTime() < 1579795200 and LIB.IsShieldedVersion() and not IsLocalFileExist('interface/MY#DATA/tester.jx3dat') then -- ³ıÏ¦
-		return true
-	end
 	return false
 end
 
