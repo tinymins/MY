@@ -254,7 +254,7 @@ function MY_Farbnamen.GetTip(szName)
 				insert(tTip, GetFormatText(' ', 136, 89, 224, 232))
 				insert(tTip, GetFormatText(_L['[Author]'], 8, 89, 224, 232))
 				insert(tTip, CONSTANT.XML_LINE_BREAKER)
-			else
+			elseif tInfo.dwID ~= UI_GetClientPlayerID() then
 				local szRealName = tInfo.szName
 				local nPos = StringFindW(tInfo.szName, '@')
 				if nPos then
