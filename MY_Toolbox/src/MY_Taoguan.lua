@@ -66,7 +66,7 @@ local FILTER_ITEM = {
 	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6066), bFilter = true }, -- 元宝灯
 	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6067), bFilter = true }, -- 桃花灯
 	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6024), bFilter = true }, -- 年年有鱼灯
-	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6048), bFilter = true }, -- 桃木牌·马
+	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6048), bFilter = false }, -- 桃木牌·马
 	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6049), bFilter = true }, -- 桃木牌·年
 	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6050), bFilter = true }, -- 桃木牌·吉
 	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6051), bFilter = true }, -- 桃木牌·祥
