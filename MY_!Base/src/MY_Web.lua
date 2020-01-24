@@ -73,7 +73,7 @@ function MY_WebBase.OnLButtonClick()
 	elseif name == 'Btn_GoTo' then
 		UpdateControls(frame, 'go')
 	elseif name == 'Btn_OuterOpen' then
-		LIB.OpenBrowser(frame.url)
+		LIB.OpenBrowser(frame:Lookup('Wnd_Controls/Edit_Input'):GetText())
 	elseif name == 'Btn_Close' then
 		MY_Web.Close(frame)
 	end
