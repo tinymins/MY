@@ -103,6 +103,9 @@ local O = {
 		{ nItem = 16, nUIID = 160993, szName = LIB.GetItemNameByUIID(160993), szTitle = _L['FIREWORK_TITLE_160993'] }, -- 鹊桥引仙 相思人
 		{ nItem = 17, nUIID = 161367, szName = LIB.GetItemNameByUIID(161367), szTitle = _L['FIREWORK_TITLE_161367'] }, -- 金缕诉情 深情人
 		{ nItem = 18, nUIID = 161887, szName = LIB.GetItemNameByUIID(161887), szTitle = _L['FIREWORK_TITLE_161887'] }, -- 蝶梦剪窗 称心人
+		{ nItem = 19, nUIID = 162307, szName = LIB.GetItemNameByUIID(162307), szTitle = _L['FIREWORK_TITLE_162307'] }, -- 花语相思 还愿人
+		{ nItem = 20, nUIID = 162308, szName = LIB.GetItemNameByUIID(162308), szTitle = _L['FIREWORK_TITLE_162308'] }, -- 在吗
+		{ nItem = 21, nUIID = 158577, szName = LIB.GetItemNameByUIID(158577), szTitle = _L['FIREWORK_TITLE_158577'] }, -- 金鸾喻情 玲珑心
 		-- { nItem = 63, nUIID = 65625, szName = LIB.GetItemNameByUIID(65625), szTitle = LIB.GetItemNameByUIID(65625) }, -- 测试用 焰火棒
 	},
 	tLoverItem = {},

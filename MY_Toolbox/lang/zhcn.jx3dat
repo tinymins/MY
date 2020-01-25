@@ -298,6 +298,9 @@ return {
     ['FIREWORK_TITLE_160993'] = '相思人',
     ['FIREWORK_TITLE_161367'] = '深情人',
     ['FIREWORK_TITLE_161887'] = '称心人',
+    ['FIREWORK_TITLE_162307'] = '还愿人',
+    ['FIREWORK_TITLE_162308'] = '在吗？',
+    ['FIREWORK_TITLE_158577'] = '玲珑心',
     ['Achievement wiki'] = '点击成就界面图标显示成就百科',
 
     -- MY_LockFrame
