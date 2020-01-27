@@ -368,16 +368,6 @@ function D.UpdateLocalLover()
 	end
 end
 
--- 获取情缘类型
-function D.GetLoverType(nType)
-	nType = nType or O.lover.nLoverType
-	if nType == 1 then
-		return _L['Mutual love']
-	else
-		return _L['Blind love']
-	end
-end
-
 function D.FormatTimeCounter(nSec)
 	if nSec <= 60 then
 		return nSec .. _L['sec']
@@ -392,12 +382,25 @@ function D.FormatTimeCounter(nSec)
 	end
 end
 
--- 获取情缘时长
-function D.GetLoverTime(nTime)
-	if not nTime then
-		nTime = O.lover.nLoverTime
+-- 获取情缘字符串
+function D.FormatLoverString(szPatt, lover)
+	if wfind(szPatt, '{$type}') then
+		if lover.nLoverType == 1 then
+			szPatt = wgsub(szPatt, '{$type}', _L['Mutual love'])
+		else
+			szPatt = wgsub(szPatt, '{$type}', _L['Blind love'])
+		end
 	end
-	return D.FormatTimeCounter(GetCurrentTime() - nTime)
+	if wfind(szPatt, '{$time}') then
+		szPatt = wgsub(szPatt, '{$time}', D.FormatTimeCounter(GetCurrentTime() - lover.nLoverTime))
+	end
+	if wfind(szPatt, '{$name}') then
+		szPatt = wgsub(szPatt, '{$name}', lover.szName)
+	end
+	if wfind(szPatt, '{$map}') then
+		szPatt = wgsub(szPatt, '{$map}', Table_GetMapName(lover.dwMapID))
+	end
+	return szPatt
 end
 
 -- 保存情缘
@@ -588,7 +591,7 @@ local function OnFellowshipUpdate()
 	local lover = D.GetLover()
 	if lover and lover.bOnline and lover.dwMapID ~= 0
 	and (O.lover.dwID ~= lover.dwID or O.lover.bOnline ~= lover.bOnline) then
-		D.OutputLoverMsg(_L('Warm tip: Your %s Lover [%s] is happy in [%s].', D.GetLoverType(), lover.szName, Table_GetMapName(lover.dwMapID)))
+		D.OutputLoverMsg(D.FormatLoverString(_L('Warm tip: Your {$type} lover [{$name}] is happy in [{$map}].'), lover))
 	end
 	-- 载入情缘
 	D.UpdateLocalLover()
@@ -755,11 +758,11 @@ local function OnPlayerFellowshipLogin()
 	end
 	if not arg2 and arg1 == O.lover.szName and O.lover.szName ~= '' then
 		if arg0 then
-			FireUIEvent('MY_COMBATTEXT_MSG', _L('Love Tip: %s onlines now', O.lover.szName), true, { 255, 0, 255 })
+			FireUIEvent('MY_COMBATTEXT_MSG', _L('Love tip: %s onlines now', O.lover.szName), true, { 255, 0, 255 })
 			PlaySound(SOUND.UI_SOUND, g_sound.LevelUp)
-			D.OutputLoverMsg(_L('Warm tip: Your %s Lover %s online, hurry doing needy doing.', D.GetLoverType(), O.lover.szName))
+			D.OutputLoverMsg(D.FormatLoverString(_L('Warm tip: Your {$type} lover [{$name}] online, hurry doing needy doing.'), O.lover))
 		else
-			D.OutputLoverMsg(_L('Warm tip: Your %s Lover %s offline, hurry doing like doing.', D.GetLoverType(), O.lover.szName))
+			D.OutputLoverMsg(D.FormatLoverString(_L('Warm tip: Your {$type} lover [{$name}] offline, hurry doing like doing.'), O.lover))
 		end
 		GetClientPlayer().UpdateFellowshipInfo()
 	end
@@ -799,8 +802,7 @@ local settings = {
 				SetLover = D.SetLover,
 				FixLover = D.FixLover,
 				RemoveLover = D.RemoveLover,
-				GetLoverType = D.GetLoverType,
-				GetLoverTime = D.GetLoverTime,
+				FormatLoverString = D.FormatLoverString,
 				GetPlayerInfo = D.GetPlayerInfo,
 				RequestOtherLover = D.RequestOtherLover,
 				GetOtherLover = D.GetOtherLover,

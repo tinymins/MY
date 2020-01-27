@@ -47,8 +47,7 @@ end
 --------------------------------------------------------------------------
 
 local D = {
-	GetLoverType = MY_Love.GetLoverType,
-	GetLoverTime = MY_Love.GetLoverTime,
+	FormatLoverString = MY_Love.FormatLoverString,
 	GetPlayerInfo = MY_Love.GetPlayerInfo,
 	RequestOtherLover = MY_Love.RequestOtherLover,
 	GetOtherLover = MY_Love.GetOtherLover,
@@ -109,7 +108,7 @@ function D.UpdatePage()
 	-- lover info
 	local inf = h:Lookup('Text_LoverInfo')
 	if nLoverType and nLoverTime and nLoverTime > 0 then
-		inf:SetText(D.GetLoverType(nLoverType) .. '   ' .. D.GetLoverTime(nLoverTime))
+		inf:SetText(D.FormatLoverString('{$type}   {$time}', { nLoverType = nLoverType, nLoverTime = nLoverTime }))
 	else
 		inf:SetText('')
 	end

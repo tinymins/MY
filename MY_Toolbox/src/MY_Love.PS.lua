@@ -51,8 +51,7 @@ local D = {
 	SetLover = MY_Love.SetLover,
 	FixLover = MY_Love.FixLover,
 	RemoveLover = MY_Love.RemoveLover,
-	GetLoverType = MY_Love.GetLoverType,
-	GetLoverTime = MY_Love.GetLoverTime,
+	FormatLoverString = MY_Love.FormatLoverString,
 }
 local O = {
 	bPanelActive = false,
@@ -146,8 +145,7 @@ function PS.OnPanelActive(wnd)
 		end
 		nX = X + 10
 		nY = nY + 36
-		nX = ui:Append('Text', { text = D.GetLoverType(), font = 2, x = nX, y = nY }):AutoWidth():Pos('BOTTOMRIGHT')
-		nX = ui:Append('Text', { text = D.GetLoverTime(), font = 2, x = nX + 10, y = nY }):AutoWidth():Pos('BOTTOMRIGHT')
+		nX = ui:Append('Text', { text = D.FormatLoverString('{$type}{$time}', lover), font = 2, x = nX, y = nY }):AutoWidth():Pos('BOTTOMRIGHT')
 		if lover.nLoverType == 1 then
 			nX = ui:Append('Text', {
 				x = nX + 10, y = nY,
