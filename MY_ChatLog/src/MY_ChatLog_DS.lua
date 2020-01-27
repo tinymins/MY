@@ -143,12 +143,7 @@ function DS:InitDB(bFixProblem)
 						db:SetMaxTime(nMaxRecTime)
 					end
 				end
-				local dwGlobalID = db:GetInfo('user_global_id')
-				if not dwGlobalID then -- and IsDebugClient() then -- TODO: TEMP FIX
-					dwGlobalID = GetClientPlayer().GetGlobalID()
-					db:SetInfo('user_global_id', dwGlobalID)
-				end
-				if dwGlobalID == GetClientPlayer().GetGlobalID() then
+				if db:GetInfo('user_global_id') == GetClientPlayer().GetGlobalID() then
 					insert(aDB, db)
 				else
 					db:Disconnect()
