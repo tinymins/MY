@@ -121,31 +121,46 @@ function DS:InitDB(bFixProblem)
 		LIB.Debug(_L['MY_ChatLog'], 'Init node list...', DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		for _, szName in ipairs(CPath.GetFileList(self.szRoot) or {}) do
-			local db = szName:find('^chatlog_[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]%.db$') and MY_ChatLog_DB(self.szRoot .. szName)
+			local db, bConn = szName:find('^chatlog_[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]%.db$') and MY_ChatLog_DB(self.szRoot .. szName)
 			if db then
 				if bFixProblem then
-					db:Connect(true)
-					--[[#DEBUG BEGIN]]
-					LIB.Debug(_L['MY_ChatLog'], 'Checking malformed node ' .. db:ToString(), DEBUG_LEVEL.LOG)
-					--[[#DEBUG END]]
-					local nMinTime, nMinRecTime = db:GetMinTime(), db:GetMinRecTime()
-					if nMinRecTime < nMinTime then
+					bConn = db:Connect(true)
+					if bConn then
 						--[[#DEBUG BEGIN]]
-						LIB.Debug(_L['MY_ChatLog'], 'Fix min time of ' .. db:ToString() .. ' from ' .. nMinTime .. ' to ' .. nMinRecTime, DEBUG_LEVEL.WARNING)
+						LIB.Debug(_L['MY_ChatLog'], 'Checking malformed node ' .. db:ToString(), DEBUG_LEVEL.LOG)
 						--[[#DEBUG END]]
-						db:SetMinTime(nMinRecTime)
-					end
-					local nMaxTime, nMaxRecTime = db:GetMaxTime(), db:GetMaxRecTime()
-					if nMaxRecTime > nMaxTime then
+						local nMinTime, nMinRecTime = db:GetMinTime(), db:GetMinRecTime()
+						if nMinRecTime < nMinTime then
+							--[[#DEBUG BEGIN]]
+							LIB.Debug(_L['MY_ChatLog'], 'Fix min time of ' .. db:ToString() .. ' from ' .. nMinTime .. ' to ' .. nMinRecTime, DEBUG_LEVEL.WARNING)
+							--[[#DEBUG END]]
+							db:SetMinTime(nMinRecTime)
+						end
+						local nMaxTime, nMaxRecTime = db:GetMaxTime(), db:GetMaxRecTime()
+						if nMaxRecTime > nMaxTime then
+							--[[#DEBUG BEGIN]]
+							LIB.Debug(_L['MY_ChatLog'], 'Fix max time of ' .. db:ToString() .. ' from ' .. nMaxTime .. ' to ' .. nMaxRecTime, DEBUG_LEVEL.WARNING)
+							--[[#DEBUG END]]
+							db:SetMaxTime(nMaxRecTime)
+						end
+					else
 						--[[#DEBUG BEGIN]]
-						LIB.Debug(_L['MY_ChatLog'], 'Fix max time of ' .. db:ToString() .. ' from ' .. nMaxTime .. ' to ' .. nMaxRecTime, DEBUG_LEVEL.WARNING)
+						LIB.Debug(_L['MY_ChatLog'], 'Connect failed for checking malformed node ' .. db:ToString(), DEBUG_LEVEL.WARNING)
 						--[[#DEBUG END]]
-						db:SetMaxTime(nMaxRecTime)
 					end
+				else
+					bConn = db:Connect()
 				end
-				if db:GetInfo('user_global_id') == GetClientPlayer().GetGlobalID() then
+				if bConn and db:GetInfo('user_global_id') == GetClientPlayer().GetGlobalID() then
 					insert(aDB, db)
 				else
+					--[[#DEBUG BEGIN]]
+					if bConn then
+						LIB.Debug(_L['MY_ChatLog'], 'Ignore foreign node ' .. db:ToString(), DEBUG_LEVEL.WARNING)
+					else
+						LIB.Debug(_L['MY_ChatLog'], 'Ignore unconnectable node ' .. db:ToString(), DEBUG_LEVEL.WARNING)
+					end
+					--[[#DEBUG END]]
 					db:Disconnect()
 				end
 			end
