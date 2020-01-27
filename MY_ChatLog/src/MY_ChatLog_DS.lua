@@ -121,7 +121,7 @@ function DS:InitDB(bFixProblem)
 		LIB.Debug(_L['MY_ChatLog'], 'Init node list...', DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		for _, szName in ipairs(CPath.GetFileList(self.szRoot) or {}) do
-			local db = szName:find('^chatlog_[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]%.db') and MY_ChatLog_DB(self.szRoot .. szName)
+			local db = szName:find('^chatlog_[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]%.db$') and MY_ChatLog_DB(self.szRoot .. szName)
 			if db then
 				if bFixProblem then
 					db:Connect(true)
