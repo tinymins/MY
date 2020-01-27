@@ -66,7 +66,7 @@ local GKP_ITEM_QUALITIES = {
 }
 
 local D = {}
-local O = {
+local O_DEFAULT = {
 	bOn = false,
 	bOnlyInTeamDungeon = false,
 	bOnlyInRaidDungeon = false,
@@ -92,6 +92,7 @@ local O = {
 		tAutoPickupFilters = {},
 	},
 }
+local O = Clone(O_DEFAULT)
 RegisterCustomData('MY_GKP_Loot.bOn')
 RegisterCustomData('MY_GKP_Loot.bOnlyInTeamDungeon')
 RegisterCustomData('MY_GKP_Loot.bOnlyInRaidDungeon')
@@ -1619,6 +1620,17 @@ local settings = {
 				bOn = function(_, bOn)
 					if bOn then
 						LIB.SetGlobalValue('LR_Loot_Panel.UsrData.bOn', false)
+					end
+				end,
+				tItemConfig = function(_, tItemConfig)
+					if IsTable(tItemConfig) then
+						for k, v in pairs(O_DEFAULT.tItemConfig) do
+							if type(v) ~= type(tItemConfig[k]) then
+								tItemConfig[k] = Clone(v)
+							end
+						end
+					else
+						O.tItemConfig = Clone(O_DEFAULT.tItemConfig)
 					end
 				end,
 			},
