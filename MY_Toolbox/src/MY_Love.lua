@@ -85,28 +85,28 @@ local O = {
 	tOtherLover = {}, -- 查看的情缘数据
 	tViewer = {}, -- 等候查看您的玩家列表
 	aLoverItem = { -- 可用于结缘的烟花信息
-		{ nItem = 1, nUIID = 67291, szName = LIB.GetItemNameByUIID(67291), szTitle = _L['FIREWORK_TITLE_67291'] }, -- 真橙之心
-		{ nItem = 2, nUIID = 151303, szName = LIB.GetItemNameByUIID(151303), szTitle = _L['FIREWORK_TITLE_151303'] }, -- 无间长情 真心人
-		{ nItem = 3, nUIID = 151743, szName = LIB.GetItemNameByUIID(151743), szTitle = _L['FIREWORK_TITLE_151743'] }, -- 千衷不渝
-		{ nItem = 4, nUIID = 152844, szName = LIB.GetItemNameByUIID(152844), szTitle = _L['FIREWORK_TITLE_152844'] }, -- 心不释手
-		{ nItem = 5, nUIID = 154319, szName = LIB.GetItemNameByUIID(154319), szTitle = _L['FIREWORK_TITLE_154319'] }, -- 鸿福齐天 惜福人
-		{ nItem = 6, nUIID = 154320, szName = LIB.GetItemNameByUIID(154320), szTitle = _L['FIREWORK_TITLE_154320'] }, -- 情人心 一心人
-		{ nItem = 7, nUIID = 153641, szName = LIB.GetItemNameByUIID(153641), szTitle = _L['FIREWORK_TITLE_153641'] }, -- 素月流天
-		{ nItem = 8, nUIID = 153642, szName = LIB.GetItemNameByUIID(153642), szTitle = _L['FIREWORK_TITLE_153642'] }, -- 万家灯火
-		{ nItem = 9, nUIID = 156413, szName = LIB.GetItemNameByUIID(156413), szTitle = _L['FIREWORK_TITLE_156413'] }, -- 冰荷逢春 有福人
-		{ nItem = 10, nUIID = 156446, szName = LIB.GetItemNameByUIID(156446), szTitle = _L['FIREWORK_TITLE_156446'] }, -- 荷渡鸾桥 同心人
-		{ nItem = 11, nUIID = 157096, szName = LIB.GetItemNameByUIID(157096), szTitle = _L['FIREWORK_TITLE_157096'] }, -- 莲心并蒂 恒心人
-		{ nItem = 12, nUIID = 157378, szName = LIB.GetItemNameByUIID(157378), szTitle = _L['FIREWORK_TITLE_157378'] }, -- 素心竹月 知心人
-		{ nItem = 13, nUIID = 158339, szName = LIB.GetItemNameByUIID(158339), szTitle = _L['FIREWORK_TITLE_158339'] }, -- 流光绮梦 衷情人
-		{ nItem = 14, nUIID = 159250, szName = LIB.GetItemNameByUIID(159250), szTitle = _L['FIREWORK_TITLE_159250'] }, -- 莲心问情 倾心人
-		{ nItem = 15, nUIID = 160982, szName = LIB.GetItemNameByUIID(160982), szTitle = _L['FIREWORK_TITLE_160982'] }, -- 海誓山盟
-		{ nItem = 16, nUIID = 160993, szName = LIB.GetItemNameByUIID(160993), szTitle = _L['FIREWORK_TITLE_160993'] }, -- 鹊桥引仙 相思人
-		{ nItem = 17, nUIID = 161367, szName = LIB.GetItemNameByUIID(161367), szTitle = _L['FIREWORK_TITLE_161367'] }, -- 金缕诉情 深情人
-		{ nItem = 18, nUIID = 161887, szName = LIB.GetItemNameByUIID(161887), szTitle = _L['FIREWORK_TITLE_161887'] }, -- 蝶梦剪窗 称心人
-		{ nItem = 19, nUIID = 162307, szName = LIB.GetItemNameByUIID(162307), szTitle = _L['FIREWORK_TITLE_162307'] }, -- 花语相思 还愿人
-		{ nItem = 20, nUIID = 162308, szName = LIB.GetItemNameByUIID(162308), szTitle = _L['FIREWORK_TITLE_162308'] }, -- 在吗
-		{ nItem = 21, nUIID = 158577, szName = LIB.GetItemNameByUIID(158577), szTitle = _L['FIREWORK_TITLE_158577'] }, -- 金鸾喻情 玲珑心
-		-- { nItem = 63, nUIID = 65625, szName = LIB.GetItemNameByUIID(65625), szTitle = LIB.GetItemNameByUIID(65625) }, -- 测试用 焰火棒
+		{ nItem = 1, szName = LIB.GetItemNameByUIID(67291), szTitle = _L['FIREWORK_TITLE_67291'], aUIID = {67291} }, -- 真橙之心
+		{ nItem = 2, szName = LIB.GetItemNameByUIID(151303), szTitle = _L['FIREWORK_TITLE_151303'], aUIID = {151303} }, -- 无间长情 真心人
+		{ nItem = 3, szName = LIB.GetItemNameByUIID(151743), szTitle = _L['FIREWORK_TITLE_151743'], aUIID = {151743} }, -- 千衷不渝
+		{ nItem = 4, szName = LIB.GetItemNameByUIID(152844), szTitle = _L['FIREWORK_TITLE_152844'], aUIID = {152844} }, -- 心不释手
+		{ nItem = 5, szName = LIB.GetItemNameByUIID(154319), szTitle = _L['FIREWORK_TITLE_154319'], aUIID = {154319} }, -- 鸿福齐天 惜福人
+		{ nItem = 6, szName = LIB.GetItemNameByUIID(154320), szTitle = _L['FIREWORK_TITLE_154320'], aUIID = {154320} }, -- 情人心 一心人
+		{ nItem = 7, szName = LIB.GetItemNameByUIID(153641), szTitle = _L['FIREWORK_TITLE_153641'], aUIID = {153641} }, -- 素月流天
+		{ nItem = 8, szName = LIB.GetItemNameByUIID(153642), szTitle = _L['FIREWORK_TITLE_153642'], aUIID = {153642} }, -- 万家灯火
+		{ nItem = 9, szName = LIB.GetItemNameByUIID(156413), szTitle = _L['FIREWORK_TITLE_156413'], aUIID = {156413} }, -- 冰荷逢春 有福人
+		{ nItem = 10, szName = LIB.GetItemNameByUIID(156446), szTitle = _L['FIREWORK_TITLE_156446'], aUIID = {156446, 154313} }, -- 荷渡鸾桥 同心人
+		{ nItem = 11, szName = LIB.GetItemNameByUIID(157096), szTitle = _L['FIREWORK_TITLE_157096'], aUIID = {157096} }, -- 莲心并蒂 恒心人
+		{ nItem = 12, szName = LIB.GetItemNameByUIID(157378), szTitle = _L['FIREWORK_TITLE_157378'], aUIID = {157378} }, -- 素心竹月 知心人
+		{ nItem = 13, szName = LIB.GetItemNameByUIID(158339), szTitle = _L['FIREWORK_TITLE_158339'], aUIID = {158339} }, -- 流光绮梦 衷情人
+		{ nItem = 14, szName = LIB.GetItemNameByUIID(159250), szTitle = _L['FIREWORK_TITLE_159250'], aUIID = {159250} }, -- 莲心问情 倾心人
+		{ nItem = 15, szName = LIB.GetItemNameByUIID(160982), szTitle = _L['FIREWORK_TITLE_160982'], aUIID = {160982} }, -- 海誓山盟
+		{ nItem = 16, szName = LIB.GetItemNameByUIID(160993), szTitle = _L['FIREWORK_TITLE_160993'], aUIID = {160993} }, -- 鹊桥引仙 相思人
+		{ nItem = 17, szName = LIB.GetItemNameByUIID(161367), szTitle = _L['FIREWORK_TITLE_161367'], aUIID = {161367} }, -- 金缕诉情 深情人
+		{ nItem = 18, szName = LIB.GetItemNameByUIID(161887), szTitle = _L['FIREWORK_TITLE_161887'], aUIID = {161887} }, -- 蝶梦剪窗 称心人
+		{ nItem = 19, szName = LIB.GetItemNameByUIID(162307), szTitle = _L['FIREWORK_TITLE_162307'], aUIID = {162307} }, -- 花语相思 还愿人
+		{ nItem = 20, szName = LIB.GetItemNameByUIID(162308), szTitle = _L['FIREWORK_TITLE_162308'], aUIID = {162308} }, -- 在吗
+		{ nItem = 21, szName = LIB.GetItemNameByUIID(158577), szTitle = _L['FIREWORK_TITLE_158577'], aUIID = {158577} }, -- 金鸾喻情 玲珑心
+		-- { nItem = 63, szName = LIB.GetItemNameByUIID(65625), szTitle = LIB.GetItemNameByUIID(65625), aUIID = {65625} }, -- 测试用 焰火棒
 	},
 	tLoverItem = {},
 	nPendingItem = 0, -- 请求结缘烟花nItem序号缓存
@@ -159,14 +159,18 @@ function D.IsShielded()
 	return false
 end
 
--- 获取背包指定名称物品
-function D.GetBagItemPos(nUIID)
+-- 获取背包指定ID物品列表
+function D.GetBagItemPos(aUIID)
 	local me = GetClientPlayer()
 	for dwBox = 1, LIB.GetBagPackageCount() do
 		for dwX = 0, me.GetBoxSize(dwBox) - 1 do
 			local it = me.GetItem(dwBox, dwX)
-			if it and it.nUiId == nUIID then
-				return dwBox, dwX
+			if it then
+				for _, nUIID in ipairs(aUIID) do
+					if it.nUiId == nUIID then
+						return dwBox, dwX
+					end
+				end
 			end
 		end
 	end
@@ -185,17 +189,17 @@ function D.GetBagItemNum(dwBox, dwX)
 end
 
 -- 是否可结双向好友，并返回真橙之心的位置
-function D.GetDoubleLoveItem(aInfo, nUIID)
+function D.GetDoubleLoveItem(aInfo, aUIID)
 	if aInfo then
 		local tar = GetPlayer(aInfo.id)
 		if aInfo.attraction >= O.nDoubleLoveAttraction and tar and LIB.IsParty(tar.dwID) and LIB.GetDistance(tar) <= 4 then
-			return D.GetBagItemPos(nUIID)
+			return D.GetBagItemPos(aUIID)
 		end
 	end
 end
 
-function D.UseDoubleLoveItem(aInfo, nUIID, callback)
-	local dwBox, dwX = D.GetDoubleLoveItem(aInfo, nUIID)
+function D.UseDoubleLoveItem(aInfo, aUIID, callback)
+	local dwBox, dwX = D.GetDoubleLoveItem(aInfo, aUIID)
 	if dwBox then
 		local nNum = D.GetBagItemNum(dwBox, dwX)
 		SetTarget(TARGET.PLAYER, aInfo.id)
@@ -232,8 +236,8 @@ function D.CreateFireworkSelect(callback)
 	for i, p in ipairs(O.aLoverItem) do
 		ui:Append('WndButton', {
 			x = nX, y = nY + (nLineHeight - nItemHeight) / 2, w = nItemWidth, h = nItemHeight,
-			text = LIB.GetItemNameByUIID(p.nUIID),
-			enable = not not D.GetBagItemPos(p.nUIID),
+			text = p.szName,
+			enable = not not D.GetBagItemPos(p.aUIID),
 			onclick = function() callback(p) end,
 			tip = p.szTitle,
 			tippostype = UI.TIP_POSITION.BOTTOM_TOP,
@@ -415,7 +419,7 @@ function D.SetLover(dwID, nType)
 				if LIB.IsTradeLocked() or LIB.IsTalkLocked() then
 					return LIB.Systopmsg(_L['Light firework is a sensitive action, please unlock to continue.'])
 				end
-				D.UseDoubleLoveItem(aInfo, p.nUIID, function(bSuccess)
+				D.UseDoubleLoveItem(aInfo, p.aUIID, function(bSuccess)
 					if bSuccess then
 						D.SaveLover(O.lover.nLoverTime, O.lover.dwID, O.lover.nLoverType, p.nItem, O.lover.nReceiveItem)
 						LIB.SendBgMsg(aInfo.name, 'MY_LOVE', 'LOVE_FIREWORK', p.nItem)
@@ -452,8 +456,8 @@ function D.SetLover(dwID, nType)
 				return LIB.Alert(_L['Lover must be a online friend'])
 			end
 			LIB.Confirm(_L('Do you want to love with [%s]?', aInfo.name), function()
-				if not D.GetDoubleLoveItem(aInfo, p.nUIID) then
-					return LIB.Alert(_L('Inadequate conditions, requiring Lv6 friend/party/4-feet distance/%s', LIB.GetItemNameByUIID(p.nUIID)))
+				if not D.GetDoubleLoveItem(aInfo, p.aUIID) then
+					return LIB.Alert(_L('Inadequate conditions, requiring Lv6 friend/party/4-feet distance/%s', p.szName))
 				end
 				O.nPendingItem = p.nItem
 				LIB.SendBgMsg(aInfo.name, 'MY_LOVE', 'LOVE_ASK')
@@ -691,12 +695,12 @@ local function OnBgTalk(_, nChannel, dwTalkerID, szTalkerName, bSelf, ...)
 			LIB.Alert(szMsg)
 		elseif szKey == 'LOVE_ANS_YES' then
 			local nItem = O.nPendingItem
-			local nUIID = nItem and O.tLoverItem[nItem] and O.tLoverItem[nItem].nUIID
-			if IsEmpty(nUIID) then
+			local aUIID = nItem and O.tLoverItem[nItem] and O.tLoverItem[nItem].aUIID
+			if IsEmpty(aUIID) then
 				return
 			end
 			local aInfo = LIB.GetFriend(dwTalkerID)
-			D.UseDoubleLoveItem(aInfo, nUIID, function(bSuccess)
+			D.UseDoubleLoveItem(aInfo, aUIID, function(bSuccess)
 				if bSuccess then
 					D.SaveLover(GetCurrentTime(), dwTalkerID, 1, nItem, 0)
 					LIB.Talk(PLAYER_TALK_CHANNEL.TONG, _L('From now on, my heart lover is [%s]', szTalkerName))
