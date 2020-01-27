@@ -436,6 +436,9 @@ function D.SetLover(dwID, nType)
 	elseif nType == 0 then
 		-- 设置成为情缘（在线好友）
 		-- 单向情缘（简单）
+		if LIB.IsTradeLocked() or LIB.IsTalkLocked() then
+			return LIB.Systopmsg(_L['Set lover is a sensitive action, please unlock to continue.'])
+		end
 		LIB.Confirm(_L('Do you want to love with [%s]?', aInfo.name), function()
 			local aInfo = LIB.GetFriend(dwID)
 			if not aInfo or not aInfo.isonline then
