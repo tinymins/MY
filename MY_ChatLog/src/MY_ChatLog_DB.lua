@@ -65,7 +65,7 @@ function DB:ToString()
 end
 
 function DB:Connect(bCheck)
-	if not self.db then
+	if not self:IsConnected() then
 		if bCheck then
 			self.db = LIB.ConnectDatabase(_L['MY_ChatLog'], self.szFilePath)
 		else
@@ -77,21 +77,38 @@ function DB:Connect(bCheck)
 		--[[#DEBUG BEGIN]]
 		LIB.Debug(_L['MY_ChatLog'], 'Init database with STMT', DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
-		self.db:Execute('CREATE TABLE IF NOT EXISTS ChatInfo (key NVARCHAR(128), value NVARCHAR(4096), PRIMARY KEY (key))')
-		self.stmtInfoGet = self.db:Prepare('SELECT value FROM ChatInfo WHERE key = ?')
-		self.stmtInfoSet = self.db:Prepare('REPLACE INTO ChatInfo (key, value) VALUES (?, ?)')
-		self.db:Execute('CREATE TABLE IF NOT EXISTS ChatLog (hash INTEGER, channel INTEGER, time INTEGER, talker NVARCHAR(20), text NVARCHAR(400) NOT NULL, msg NVARCHAR(4000) NOT NULL, PRIMARY KEY (time, hash))')
-		self.db:Execute('CREATE INDEX IF NOT EXISTS ChatLog_channel_idx ON ChatLog(channel)')
-		self.db:Execute('CREATE INDEX IF NOT EXISTS ChatLog_talker_idx ON ChatLog(talker)')
-		self.db:Execute('CREATE INDEX IF NOT EXISTS ChatLog_text_idx ON ChatLog(text)')
-		self.stmtCount = self.db:Prepare('SELECT channel AS nChannel, COUNT(*) AS nCount FROM ChatLog WHERE talker LIKE ? OR text LIKE ? GROUP BY nChannel')
-		self.stmtInsert = self.db:Prepare('REPLACE INTO ChatLog (hash, channel, time, talker, text, msg) VALUES (?, ?, ?, ?, ?, ?)')
-		self.stmtDelete = self.db:Prepare('DELETE FROM ChatLog WHERE hash = ? AND time = ?')
+		if self.db then
+			self.db:Execute('CREATE TABLE IF NOT EXISTS ChatInfo (key NVARCHAR(128), value NVARCHAR(4096), PRIMARY KEY (key))')
+			self.stmtInfoGet = self.db:Prepare('SELECT value FROM ChatInfo WHERE key = ?')
+			self.stmtInfoSet = self.db:Prepare('REPLACE INTO ChatInfo (key, value) VALUES (?, ?)')
+			self.db:Execute('CREATE TABLE IF NOT EXISTS ChatLog (hash INTEGER, channel INTEGER, time INTEGER, talker NVARCHAR(20), text NVARCHAR(400) NOT NULL, msg NVARCHAR(4000) NOT NULL, PRIMARY KEY (time, hash))')
+			self.db:Execute('CREATE INDEX IF NOT EXISTS ChatLog_channel_idx ON ChatLog(channel)')
+			self.db:Execute('CREATE INDEX IF NOT EXISTS ChatLog_talker_idx ON ChatLog(talker)')
+			self.db:Execute('CREATE INDEX IF NOT EXISTS ChatLog_text_idx ON ChatLog(text)')
+			self.stmtCount = self.db:Prepare('SELECT channel AS nChannel, COUNT(*) AS nCount FROM ChatLog WHERE talker LIKE ? OR text LIKE ? GROUP BY nChannel')
+			self.stmtInsert = self.db:Prepare('REPLACE INTO ChatLog (hash, channel, time, talker, text, msg) VALUES (?, ?, ?, ?, ?, ?)')
+			self.stmtDelete = self.db:Prepare('DELETE FROM ChatLog WHERE hash = ? AND time = ?')
+		end
+		if self:IsConnected() then
+			--[[#DEBUG BEGIN]]
+			LIB.Debug(_L['MY_ChatLog'], 'Init database finished: ' .. self.szFilePath, DEBUG_LEVEL.LOG)
+			--[[#DEBUG END]]
+			return true
+		end
 		--[[#DEBUG BEGIN]]
-		LIB.Debug(_L['MY_ChatLog'], 'Init database finished.', DEBUG_LEVEL.LOG)
+		LIB.Debug(_L['MY_ChatLog'], 'Init database failed: ' .. self.szFilePath, DEBUG_LEVEL.WARNING)
 		--[[#DEBUG END]]
+		self:Disconnect()
+		return false
 	end
-	return self
+	return true
+end
+
+function DB:IsConnected()
+	if self.db and self.stmtInfoGet and self.stmtInfoSet and self.stmtCount and self.stmtInsert and self.stmtDelete then
+		return true
+	end
+	return false
 end
 
 function DB:Disconnect()
@@ -104,31 +121,39 @@ function DB:Disconnect()
 		self.stmtInsert = nil
 		self.stmtDelete = nil
 	end
-	return self
+	return true
 end
 
 function DB:GarbageCollection()
 	if not self:Connect() then
-		return
+		return false
 	end
 	self.db:Execute('VACUUM')
+	return true
 end
 
 function DB:DeleteDB()
-	self:Disconnect()
+	if not self:Disconnect() then
+		return false
+	end
 	CPath.DelFile(self.szFilePath)
-	return self
+	return true
 end
 
 function DB:SetInfo(szKey, oValue)
-	self:Connect()
+	if not self:Connect() then
+		return false
+	end
 	self.stmtInfoSet:ClearBindings()
 	self.stmtInfoSet:BindAll(szKey, EncodeLUAData(oValue))
 	self.stmtInfoSet:GetAll()
+	return true
 end
 
 function DB:GetInfo(szKey)
-	self:Connect()
+	if not self:Connect() then
+		return nil, false
+	end
 	self.stmtInfoGet:ClearBindings()
 	self.stmtInfoGet:BindAll(szKey)
 	local res, success = Get(self.stmtInfoGet:GetAll(), {1, 'value'})
@@ -139,12 +164,15 @@ function DB:GetInfo(szKey)
 end
 
 function DB:SetMinTime(nMinTime)
-	self:Connect():Flush()
+	if not self:Connect() then
+		return false
+	end
+	self:Flush()
 	local nMinRecTime = self:GetMinRecTime()
 	assert(nMinRecTime == -1 or nMinRecTime >= nMinTime, '[MY_ChatLog_DB:SetMinTime] MinTime cannot be larger than MinRecTime.')
 	self:SetInfo('min_time', nMinTime)
 	self._nMinTime = nMinTime
-	return self
+	return true
 end
 
 function DB:GetMinTime()
@@ -155,7 +183,10 @@ function DB:GetMinTime()
 end
 
 function DB:SetMaxTime(nMaxTime)
-	self:Connect():Flush()
+	if not self:Connect() then
+		return false
+	end
+	self:Flush()
 	if nMaxTime <= 0 then
 		nMaxTime = HUGE
 	end
@@ -163,7 +194,7 @@ function DB:SetMaxTime(nMaxTime)
 	assert(nMaxRecTime <= nMaxTime, '[MY_ChatLog_DB:SetMaxTime] MaxTime cannot be smaller than MaxRecTime.')
 	self:SetInfo('max_time', IsHugeNumber(nMaxTime) and 0 or nMaxTime)
 	self._nMaxTime = nMaxTime
-	return self
+	return true
 end
 
 function DB:GetMaxTime()
@@ -187,7 +218,10 @@ function DB:InsertMsg(nChannel, szText, szMsg, szTalker, nTime, szHash)
 end
 
 function DB:CountMsg(aChannel, szSearch)
-	self:Connect():Flush()
+	if not self:Connect() then
+		return false
+	end
+	self:Flush()
 	if not aChannel then
 		if not self.nCountCache then
 			self.nCountCache = Get(self.db:Execute('SELECT COUNT(*) AS nCount FROM ChatLog'), {1, 'nCount'}, 0)
@@ -217,7 +251,10 @@ function DB:CountMsg(aChannel, szSearch)
 end
 
 function DB:SelectMsg(aChannel, szSearch, nOffset, nLimit)
-	self:Connect():Flush()
+	if not self:Connect() then
+		return false
+	end
+	self:Flush()
 	local szSQL = SELECT_MSG
 	local aWhere, aValue = {}, {}
 	if aChannel then
@@ -260,18 +297,27 @@ function DB:SelectMsg(aChannel, szSearch, nOffset, nLimit)
 end
 
 function DB:SelectMsgByTime(szOp, nTime)
-	self:Connect():Flush()
+	if not self:Connect() then
+		return false
+	end
+	self:Flush()
 	return (self.db:Execute(SELECT_MSG .. ' WHERE time ' .. szOp .. ' ' .. nTime .. ' ORDER BY nTime ASC'))
 end
 
 function DB:GetMinRecTime()
-	self:Connect():Flush()
+	if not self:Connect() then
+		return false
+	end
+	self:Flush()
 	local rec = self.db:Execute('SELECT time AS nTime FROM ChatLog ORDER BY nTime ASC LIMIT 1')[1]
 	return rec and rec.nTime or -1
 end
 
 function DB:GetMaxRecTime()
-	self:Connect():Flush()
+	if not self:Connect() then
+		return false
+	end
+	self:Flush()
 	local rec = self.db:Execute('SELECT time AS nTime FROM ChatLog ORDER BY nTime DESC LIMIT 1')[1]
 	return rec and rec.nTime or -1
 end
@@ -280,18 +326,22 @@ function DB:DeleteMsg(szHash, nTime)
 	if nTime and not IsEmpty(szHash) then
 		insert(self.aDeleteQueue, {szHash = szHash, nTime = nTime})
 	end
-	return self
 end
 
 function DB:DeleteMsgByTime(szOp, nTime)
-	self:Connect():Flush()
+	if not self:Connect() then
+		return false
+	end
+	self:Flush()
 	self.db:Execute('DELETE FROM ChatLog WHERE time ' .. szOp .. ' ' .. nTime)
-	return self
+	return true
 end
 
 function DB:Flush()
 	if not IsEmpty(self.aInsertQueue) or not IsEmpty(self.aDeleteQueue) then
-		self:Connect()
+		if not self:Connect() then
+			return false
+		end
 		self.db:Execute('BEGIN TRANSACTION')
 		-- ²åÈë¼ÇÂ¼
 		for _, data in ipairs(self.aInsertQueue) do
@@ -311,7 +361,7 @@ function DB:Flush()
 		self.tCountCache = nil
 		self.nCountCache = nil
 	end
-	return self
+	return true
 end
 
 function MY_ChatLog_DB(szFilePath)
