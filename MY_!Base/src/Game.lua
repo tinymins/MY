@@ -3455,8 +3455,12 @@ function LIB.GetItemIconByUIID(nUiId)
 end
 end
 
+function LIB.GetGuildBankBagSize(nPage)
+	return CONSTANT.INVENTORY_GUILD_PAGE_BOX_COUNT
+end
+
 function LIB.GetGuildBankBagPos(nPage, nIndex)
-	return CONSTANT.INVENTORY_GUILD_BANK, nPage * CONSTANT.INVENTORY_GUILD_PAGE_SIZE + nIndex
+	return CONSTANT.INVENTORY_GUILD_BANK, nPage * CONSTANT.INVENTORY_GUILD_PAGE_SIZE + nIndex - 1
 end
 
 function LIB.IsSelf(dwSrcID, dwTarID)
