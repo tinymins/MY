@@ -240,7 +240,7 @@ function D.SortGuildBank()
 			if not D.IsSameItem(item, info) then
 				-- 当前格子和预期物品可堆叠 先拿个别的东西替换过来否则会导致物品合并
 				if item and info.dwID and item.nUiId == info.nUiId and item.bCanStack and item.nStackNum ~= info.nStackNum then
-					for j = i + 1, INVENTORY_GUILD_PAGE_SIZE do
+					for j = INVENTORY_GUILD_PAGE_SIZE, i + 1, -1 do
 						local dwX1 = nPage * INVENTORY_GUILD_PAGE_SIZE + j - 1
 						local item1 = GetPlayerItem(me, INVENTORY_GUILD_BANK, dwX1)
 						-- 匹配到用于交换的格子
@@ -261,7 +261,7 @@ function D.SortGuildBank()
 					return
 				end
 				-- 寻找预期物品所在位置
-				for j = i + 1, INVENTORY_GUILD_PAGE_SIZE do
+				for j = INVENTORY_GUILD_PAGE_SIZE, i + 1, -1 do
 					local dwX1 = nPage * INVENTORY_GUILD_PAGE_SIZE + j - 1
 					local item1 = GetPlayerItem(me, INVENTORY_GUILD_BANK, dwX1)
 					-- 匹配到预期物品所在位置
