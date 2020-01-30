@@ -249,12 +249,12 @@ function D.SortGuildBank()
 							szState = 'Exchanging'
 							if item then
 								--[[#DEBUG BEGIN]]
-								LIB.Debug('OnExchangeItem: GUILD,' .. dwX .. ' <-> ' .. 'GUILD,' .. dwX1 .. ' <T1>', DEBUG_LEVEL.LOG)
+								LIB.Debug('MY_BagSort', 'OnExchangeItem: GUILD,' .. dwX .. ' <-> ' .. 'GUILD,' .. dwX1 .. ' <T1>', DEBUG_LEVEL.LOG)
 								--[[#DEBUG END]]
 								OnExchangeItem(dwPos, dwX, dwPos1, dwX1)
 							else
 								--[[#DEBUG BEGIN]]
-								LIB.Debug('OnExchangeItem: GUILD,' .. dwX1 .. ' <-> ' .. 'GUILD,' .. dwX .. ' <T2>', DEBUG_LEVEL.LOG)
+								LIB.Debug('MY_BagSort', 'OnExchangeItem: GUILD,' .. dwX1 .. ' <-> ' .. 'GUILD,' .. dwX .. ' <T2>', DEBUG_LEVEL.LOG)
 								--[[#DEBUG END]]
 								OnExchangeItem(dwPos1, dwX1, dwPos, dwX)
 							end
@@ -273,12 +273,12 @@ function D.SortGuildBank()
 						szState = 'Exchanging'
 						if item then
 							--[[#DEBUG BEGIN]]
-							LIB.Debug('OnExchangeItem: GUILD,' .. dwX .. ' <-> ' .. 'GUILD,' .. dwX1 .. ' <N1>', DEBUG_LEVEL.LOG)
+							LIB.Debug('MY_BagSort', 'OnExchangeItem: GUILD,' .. dwX .. ' <-> ' .. 'GUILD,' .. dwX1 .. ' <N1>', DEBUG_LEVEL.LOG)
 							--[[#DEBUG END]]
 							OnExchangeItem(dwPos, dwX, dwPos1, dwX1)
 						else
 							--[[#DEBUG BEGIN]]
-							LIB.Debug('OnExchangeItem: GUILD,' .. dwX1 .. ' <-> ' .. 'GUILD,' .. dwX .. ' <N1>', DEBUG_LEVEL.LOG)
+							LIB.Debug('MY_BagSort', 'OnExchangeItem: GUILD,' .. dwX1 .. ' <-> ' .. 'GUILD,' .. dwX .. ' <N1>', DEBUG_LEVEL.LOG)
 							--[[#DEBUG END]]
 							OnExchangeItem(dwPos1, dwX1, dwPos, dwX)
 						end
@@ -310,7 +310,7 @@ function D.SortGuildBank()
 			LIB.Systopmsg(_L['Unknown exception occured, sort exited!'], CONSTANT.MSG_THEME.ERROR)
 			fnFinish()
 			--[[#DEBUG BEGIN]]
-			LIB.Debug('TONG_EVENT_NOTIFY: ' .. arg0, DEBUG_LEVEL.LOG)
+			LIB.Debug('MY_BagSort', 'TONG_EVENT_NOTIFY: ' .. arg0, DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
 		end
 	end)
