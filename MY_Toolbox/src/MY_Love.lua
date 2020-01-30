@@ -110,6 +110,7 @@ local O = {
 	},
 	tLoverItem = {},
 	nPendingItem = 0, -- «Î«ÛΩ·‘µ—Ãª®nItem–Ú∫≈ª∫¥Ê
+	aStorageData = nil, -- ∑¿÷π±ªª÷∏¥ΩÁ√Ê≈‰÷√¥€∏ƒ
 }
 for _, p in ipairs(O.aLoverItem) do
 	assert(not O.tLoverItem[p.nItem], 'MY_Love item index conflict: ' .. p.nItem)
@@ -306,6 +307,7 @@ function D.GetLover()
 							nSendItem = 0
 							nReceiveItem = 0
 							LIB.SetStorage('MY_Love', dwLoverID, nLoverTime, nLoverType, nSendItem, nReceiveItem)
+							D.UpdateProtectData()
 						end
 					end
 					me.SetFellowshipRemark(info.id, '')
@@ -404,6 +406,7 @@ function D.SaveLover(nTime, dwID, nType, nSendItem, nReceiveItem)
 		nTime, nType, nSendItem, nReceiveItem = 1, 1, 1, 1
 	end
 	LIB.SetStorage('MY_Love', dwID, nTime, nType, nSendItem, nReceiveItem)
+	D.UpdateProtectData()
 	D.UpdateLocalLover()
 end
 
@@ -788,6 +791,21 @@ local function OnInit()
 	D.UpdateLocalLover()
 end
 LIB.RegisterInit('MY_Love', OnInit)
+end
+
+-- protect data
+do
+function D.UpdateProtectData()
+	O.aStorageData = {LIB.GetStorage('MY_Love')}
+end
+local function onSyncUserPreferencesEnd()
+	if O.aStorageData then
+		LIB.SetStorage('MY_Love', unpack(O.aStorageData))
+	else
+		D.UpdateProtectData()
+	end
+end
+LIB.RegisterEvent('SYNC_USER_PREFERENCES_END.MY_Love', onSyncUserPreferencesEnd)
 end
 
 ---------------------------------------------------------------------
