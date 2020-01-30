@@ -251,14 +251,6 @@ function D.CreateFireworkSelect(callback)
 	end
 end
 
--- 保存好友数据
-function D.SaveFellowRemark(id, remark)
-	if not remark or remark == '' then
-		remark = ' '
-	end
-	GetClientPlayer().SetFellowshipRemark(id, remark)
-end
-
 -- 加入校验和确保数据不被篡改（0-255）
 function D.EncodeString(szData)
 	local nCrc = 0
@@ -315,7 +307,7 @@ function D.GetLover()
 						LIB.SetStorage('MY_Love', dwLoverID, nLoverTime, nLoverType, nSendItem, nReceiveItem)
 					end
 				end
-				D.SaveFellowRemark(info.id, '')
+				me.SetFellowshipRemark(info.id, '')
 			end
 			-- 遍历到情缘，获取基础信息并返回
 			if info.id == dwLoverID then
