@@ -289,25 +289,27 @@ function D.GetLover()
 		local aFriend = me.GetFellowshipInfo(v.id) or {}
 		for i = #aFriend, 1, -1 do
 			local info = aFriend[i]
-			local bMatch = sub(info.remark, 1, len(szKey)) == szKey
-			-- fetch data
-			-- 兼容海鳗：情缘信息从好友备注中提取数据
-			if bMatch then
-				local szData = D.DecodeHMString(sub(info.remark, len(szKey) + 1))
-				if not IsEmpty(szData) then
-					local data = LIB.SplitString(szData, '#')
-					local nType = data[1] and tonumber(data[1])
-					local nTime = data[2] and tonumber(data[2])
-					if nType and nTime and (nType == 0 or nType == 1) and (nTime > 0 and nTime < GetCurrentTime()) then
-						dwLoverID = info.id
-						nLoverType = nType
-						nLoverTime = nTime
-						nSendItem = 0
-						nReceiveItem = 0
-						LIB.SetStorage('MY_Love', dwLoverID, nLoverTime, nLoverType, nSendItem, nReceiveItem)
+			if nLoverTime == 0 then -- 时间为非0表示不是第一次了 拒绝加载海鳗数据
+				local bMatch = sub(info.remark, 1, len(szKey)) == szKey
+				-- fetch data
+				-- 兼容海鳗：情缘信息从好友备注中提取数据
+				if bMatch then
+					local szData = D.DecodeHMString(sub(info.remark, len(szKey) + 1))
+					if not IsEmpty(szData) then
+						local data = LIB.SplitString(szData, '#')
+						local nType = data[1] and tonumber(data[1])
+						local nTime = data[2] and tonumber(data[2])
+						if nType and nTime and (nType == 0 or nType == 1) and (nTime > 0 and nTime < GetCurrentTime()) then
+							dwLoverID = info.id
+							nLoverType = nType
+							nLoverTime = nTime
+							nSendItem = 0
+							nReceiveItem = 0
+							LIB.SetStorage('MY_Love', dwLoverID, nLoverTime, nLoverType, nSendItem, nReceiveItem)
+						end
 					end
+					me.SetFellowshipRemark(info.id, '')
 				end
-				me.SetFellowshipRemark(info.id, '')
 			end
 			-- 遍历到情缘，获取基础信息并返回
 			if info.id == dwLoverID then
@@ -397,6 +399,10 @@ end
 
 -- 保存情缘
 function D.SaveLover(nTime, dwID, nType, nSendItem, nReceiveItem)
+	-- 设为无情缘时除dwID外其他改为1由于区别未设置
+	if dwID == 0 then
+		nTime, nType, nSendItem, nReceiveItem = 1, 1, 1, 1
+	end
 	LIB.SetStorage('MY_Love', dwID, nTime, nType, nSendItem, nReceiveItem)
 	D.UpdateLocalLover()
 end
