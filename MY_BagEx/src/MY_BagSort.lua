@@ -85,16 +85,16 @@ function D.StackGuildBank()
 	local function fnLoop()
 		local me, tList = GetClientPlayer(), {}
 		bTrigger = true
-		for i = 1, INVENTORY_GUILD_PAGE_SIZE do
-			local dwX = nPage * INVENTORY_GUILD_PAGE_SIZE + i - 1
-			local item = GetPlayerItem(me, INVENTORY_GUILD_BANK, dwX)
+		for i = 1, LIB.GetGuildBankBagSize(nPage) do
+			local dwPos, dwX = LIB.GetGuildBankBagPos(nPage, i)
+			local item = GetPlayerItem(me, dwPos, dwX)
 			if item and item.bCanStack and item.nStackNum < item.nMaxStackNum then
 				local szKey = tostring(item.dwTabType) .. '_' .. tostring(item.dwIndex)
 				local dwX2 = tList[szKey]
 				if not dwX2 then
 					tList[szKey] = dwX
 				else
-					OnExchangeItem(INVENTORY_GUILD_BANK, dwX, INVENTORY_GUILD_BANK, dwX2)
+					OnExchangeItem(dwPos, dwX, INVENTORY_GUILD_BANK, dwX2)
 					return
 				end
 			end
@@ -177,9 +177,9 @@ function D.SortGuildBank()
 	local nPage, szState = frame.nPage or 0, 'Idle'
 	-- 加载格子列表
 	local me, aInfo, nItemCount = GetClientPlayer(), {}, 0
-	for i = 1, INVENTORY_GUILD_PAGE_SIZE do
-		local dwX = nPage * INVENTORY_GUILD_PAGE_SIZE + i - 1
-		local item = GetPlayerItem(me, INVENTORY_GUILD_BANK, dwX)
+	for i = 1, LIB.GetGuildBankBagSize(nPage) do
+		local dwPos, dwX = LIB.GetGuildBankBagPos(nPage, i)
+		local item = GetPlayerItem(me, dwPos, dwX)
 		if item then
 			insert(aInfo, {
 				dwID = item.dwID,
@@ -234,25 +234,28 @@ function D.SortGuildBank()
 			return
 		end
 		for i, info in ipairs(aInfo) do
-			local dwX = nPage * INVENTORY_GUILD_PAGE_SIZE + i - 1
-			local item = GetPlayerItem(me, INVENTORY_GUILD_BANK, dwX)
+			local dwPos, dwX = LIB.GetGuildBankBagPos(nPage, i)
+			local item = GetPlayerItem(me, dwPos, dwX)
 			-- 当前格子和预期不符 需要交换
 			if not D.IsSameItem(item, info) then
 				-- 当前格子和预期物品可堆叠 先拿个别的东西替换过来否则会导致物品合并
 				if item and info.dwID and item.nUiId == info.nUiId and item.bCanStack and item.nStackNum ~= info.nStackNum then
-					for j = INVENTORY_GUILD_PAGE_SIZE, i + 1, -1 do
-						local dwX1 = nPage * INVENTORY_GUILD_PAGE_SIZE + j - 1
+					for j = LIB.GetGuildBankBagSize(nPage), i + 1, -1 do
+						local dwPos1, dwX1 = LIB.GetGuildBankBagPos(nPage, j)
 						local item1 = GetPlayerItem(me, INVENTORY_GUILD_BANK, dwX1)
 						-- 匹配到用于交换的格子
 						if not item1 or item1.nUiId ~= item.nUiId then
-							--[[#DEBUG BEGIN]]
-							LIB.Debug('OnExchangeItem: GUILD,' .. dwX .. ' <-> ' .. 'GUILD,' .. dwX1 .. ' <T>', DEBUG_LEVEL.WARNING)
-							--[[#DEBUG END]]
 							szState = 'Exchanging'
 							if item then
-								OnExchangeItem(INVENTORY_GUILD_BANK, dwX, INVENTORY_GUILD_BANK, dwX1)
+								--[[#DEBUG BEGIN]]
+								LIB.Debug('OnExchangeItem: GUILD,' .. dwX .. ' <-> ' .. 'GUILD,' .. dwX1 .. ' <T1>', DEBUG_LEVEL.WARNING)
+								--[[#DEBUG END]]
+								OnExchangeItem(dwPos, dwX, dwPos1, dwX1)
 							else
-								OnExchangeItem(INVENTORY_GUILD_BANK, dwX1, INVENTORY_GUILD_BANK, dwX)
+								--[[#DEBUG BEGIN]]
+								LIB.Debug('OnExchangeItem: GUILD,' .. dwX1 .. ' <-> ' .. 'GUILD,' .. dwX .. ' <T2>', DEBUG_LEVEL.WARNING)
+								--[[#DEBUG END]]
+								OnExchangeItem(dwPos1, dwX1, dwPos, dwX)
 							end
 							return
 						end
@@ -261,19 +264,22 @@ function D.SortGuildBank()
 					return
 				end
 				-- 寻找预期物品所在位置
-				for j = INVENTORY_GUILD_PAGE_SIZE, i + 1, -1 do
-					local dwX1 = nPage * INVENTORY_GUILD_PAGE_SIZE + j - 1
-					local item1 = GetPlayerItem(me, INVENTORY_GUILD_BANK, dwX1)
+				for j = LIB.GetGuildBankBagSize(nPage), i + 1, -1 do
+					local dwPos1, dwX1 = LIB.GetGuildBankBagPos(nPage, j)
+					local item1 = GetPlayerItem(me, dwPos1, dwX1)
 					-- 匹配到预期物品所在位置
 					if D.IsSameItem(item1, info) then
-						--[[#DEBUG BEGIN]]
-						LIB.Debug('OnExchangeItem: GUILD,' .. dwX .. ' <-> ' .. 'GUILD,' .. dwX1, DEBUG_LEVEL.WARNING)
-						--[[#DEBUG END]]
 						szState = 'Exchanging'
 						if item then
-							OnExchangeItem(INVENTORY_GUILD_BANK, dwX, INVENTORY_GUILD_BANK, dwX1)
+							--[[#DEBUG BEGIN]]
+							LIB.Debug('OnExchangeItem: GUILD,' .. dwX .. ' <-> ' .. 'GUILD,' .. dwX1 .. ' <N1>', DEBUG_LEVEL.WARNING)
+							--[[#DEBUG END]]
+							OnExchangeItem(dwPos, dwX, dwPos1, dwX1)
 						else
-							OnExchangeItem(INVENTORY_GUILD_BANK, dwX1, INVENTORY_GUILD_BANK, dwX)
+							--[[#DEBUG BEGIN]]
+							LIB.Debug('OnExchangeItem: GUILD,' .. dwX1 .. ' <-> ' .. 'GUILD,' .. dwX .. ' <N1>', DEBUG_LEVEL.WARNING)
+							--[[#DEBUG END]]
+							OnExchangeItem(dwPos1, dwX1, dwPos, dwX)
 						end
 						return
 					end

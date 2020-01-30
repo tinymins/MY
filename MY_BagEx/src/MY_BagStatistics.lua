@@ -105,12 +105,11 @@ end
 local l_guildcache = {}
 local function UpdateTongRepertoryPage()
 	local nPage = arg0
-	local offset = nPage * CONSTANT.INVENTORY_GUILD_PAGE_SIZE
-	local boxtype = CONSTANT.INVENTORY_GUILD_BANK
 	local me = GetClientPlayer()
-	for boxindex = offset, offset + 7 * 14 - 1 do
+	for nIndex = 1, LIB.GetGuildBankBagSize(nPage) do
+		local dwType, dwX = LIB.GetGuildBankBagPos(nPage, nIndex)
 		local tabtype, tabindex, tabsubindex, name, desc, count = -1, -1, -1, '', '', 0
-		local KItem = GetPlayerItem(me, boxtype, boxindex)
+		local KItem = GetPlayerItem(me, dwType, dwX)
 		if KItem then
 			tabtype = KItem.dwTabType
 			tabindex = KItem.dwIndex
@@ -119,7 +118,17 @@ local function UpdateTongRepertoryPage()
 			tabsubindex = KItem.nGenre == ITEM_GENRE.BOOK and KItem.nBookID or -1
 			count = KItem.bCanStack and KItem.nStackNum or 1
 		end
-		l_guildcache[boxindex] = {boxtype = boxtype, boxindex = boxindex, tabtype = tabtype, tabindex = tabindex, tabsubindex = tabsubindex, name = name, desc = desc, count = count, time = GetCurrentTime()}
+		l_guildcache[dwX] = {
+			boxtype = dwType,
+			boxindex = dwX,
+			tabtype = tabtype,
+			tabindex = tabindex,
+			tabsubindex = tabsubindex,
+			name = name,
+			desc = desc,
+			count = count,
+			time = GetCurrentTime(),
+		}
 	end
 end
 LIB.RegisterEvent('UPDATE_TONG_REPERTORY_PAGE.MY_BagStatistics', UpdateTongRepertoryPage)
