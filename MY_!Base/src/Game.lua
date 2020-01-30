@@ -2128,6 +2128,31 @@ function LIB.GetBankPackageCount()
 	return me.GetBankPackageCount()
 end
 
+-- 获取背包空位总数
+-- (number) LIB.GetFreeBagBoxNum()
+function LIB.GetFreeBagBoxNum()
+	local me, nFree = GetClientPlayer(), 0
+	for i = 1, LIB.GetBagPackageCount() do
+		nFree = nFree + me.GetBoxFreeRoomSize(i)
+	end
+	return nFree
+end
+
+-- 获取第一个背包空位
+-- (number, number) LIB.GetFreeBagBox()
+function LIB.GetFreeBagBox()
+	local me = GetClientPlayer()
+	for i = 1, LIB.GetBagPackageCount() do
+		if me.GetBoxFreeRoomSize(i) > 0 then
+			for j = 0, me.GetBoxSize(i) - 1 do
+				if not me.GetItem(i, j) then
+					return i, j
+				end
+			end
+		end
+	end
+end
+
 -- 装备名为szName的装备
 -- (void) LIB.Equip(szName)
 -- szName  装备名称
