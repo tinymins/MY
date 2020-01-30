@@ -2454,9 +2454,6 @@ function LIB.GetKungfuSkillIDs(dwKungfuID)
 				aSkillID = LIB.Table_GetKungfuSkillList(dwSubKungfuID)
 			end
 			for _, dwSkillID in ipairs(aSkillID) do
-				if REPLACE[dwSkillID] then
-					Output(REPLACE, dwSkillID)
-				end
 				insert(aSub, REPLACE[dwSkillID] or dwSkillID)
 			end
 			insert(aList, aSub)
