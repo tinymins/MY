@@ -1116,12 +1116,20 @@ function LIB.GetObjectName(arg0, arg1, arg2, arg3, arg4)
 		end
 	elseif IsString(arg0) then
 		if arg0 == 'PLAYER' or arg0 == 'NPC' or arg0 == 'DOODAD' then
-			local dwType = TARGET[arg0]
-			dwID, eRetID = arg1, arg2
-			KObject = LIB.GetObject(dwType, dwID)
-			szType = arg0
+			if IsUserdata(arg1) then
+				KObject = arg1
+				dwID, eRetID = KObject.dwID, arg2
+			else
+				local dwType = TARGET[arg0]
+				dwID, eRetID = arg1, arg2
+				KObject = LIB.GetObject(dwType, dwID)
+				szType = arg0
+			end
 		elseif arg0 == 'ITEM' then
-			if IsNumber(arg3) then
+			if IsUserdata(arg1) then
+				KObject = arg1
+				dwID, eRetID = KObject.dwID, arg2
+			elseif IsNumber(arg3) then
 				local p = GetPlayer(arg1)
 				if p then
 					KObject = p.GetItem(arg2, arg3)
@@ -1145,7 +1153,10 @@ function LIB.GetObjectName(arg0, arg1, arg2, arg3, arg4)
 			end
 			szType = 'ITEM'
 		elseif arg0 == 'ITEM_INFO' then
-			if IsNumber(arg3) then
+			if IsUserdata(arg1) then
+				KObject = arg1
+				dwID, eRetID = KObject.dwID, arg2
+			elseif IsNumber(arg3) then
 				dwID = arg1 .. ':' .. arg2 .. ':' .. arg3
 				nExtraID = arg3
 				eRetID = arg4
