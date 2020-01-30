@@ -190,6 +190,7 @@ function D.SortGuildBank()
 				nSub = item.nSub,
 				nDetail = item.nDetail,
 				nQuality = item.nQuality,
+				bCanStack = item.bCanStack,
 				nStackNum = item.nStackNum,
 				nCurrentDurability = item.nCurrentDurability,
 				szName = LIB.GetObjectName('ITEM', item),
