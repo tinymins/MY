@@ -1105,6 +1105,7 @@ local function OnStorageChange(szKey)
 	end
 end
 
+local SetOnlineAddonCustomData = SetOnlineAddonCustomData or SetAddonCustomData
 function LIB.SetStorage(szKey, ...)
 	local szPriKey, szSubKey = szKey
 	local nPos = StringFindW(szKey, '.')
@@ -1157,11 +1158,12 @@ function LIB.SetStorage(szKey, ...)
 			nCrc = LIB.NumberBitXor(nCrc, aByte[i])
 		end
 		aByte[1] = nCrc
-		SetAddonCustomData('MY', 4, 11, unpack(aByte))
+		SetOnlineAddonCustomData('MY', 4, 11, unpack(aByte))
 	end
 	OnStorageChange(szKey)
 end
 
+local GetOnlineAddonCustomData = GetOnlineAddonCustomData or GetAddonCustomData
 function LIB.GetStorage(szKey)
 	local szPriKey, szSubKey = szKey
 	local nPos = StringFindW(szKey, '.')
@@ -1183,7 +1185,7 @@ function LIB.GetStorage(szKey)
 		return GetOnlineFrameAnchor(szSubKey)
 	elseif szPriKey == 'MY_Love' then
 		local dwID, nTime, nType, nSendItem, nReceiveItem, nCrc = 0, 0, 0, 0, 0, 6
-		local aByte = {GetAddonCustomData('MY', 4, 11)}
+		local aByte = {GetOnlineAddonCustomData('MY', 4, 11)}
 		-- 1 crc
 		for i = 1, #aByte do
 			nCrc = LIB.NumberBitXor(nCrc, aByte[i])
