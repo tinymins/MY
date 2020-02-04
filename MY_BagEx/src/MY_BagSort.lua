@@ -323,6 +323,9 @@ function D.CreateInjection()
 	local btn1 = UI('Normal/GuildBankPanel/Btn_Refresh')
 	local btn2 = UI('Normal/GuildBankPanel/Btn_MY_Sort')
 	local btn3 = UI('Normal/GuildBankPanel/Btn_MY_Stack')
+	if btn1:Count() == 0 then
+		return
+	end
 	if btn2:Count() == 0 then
 		local x, y = btn1:Pos()
 		local w, h = btn1:Size()
