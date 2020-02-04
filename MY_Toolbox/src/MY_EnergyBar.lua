@@ -213,23 +213,49 @@ function D.UpdateMingJiao(frame)
 		return
 	end
 	local me = GetClientPlayer()
-	local imgS = hMingJiao:Lookup('Image_SunEnergy')
-	local imgM = hMingJiao:Lookup('Image_MoonEnergy')
-	imgS:SetPercentage(me.nCurrentSunEnergy / me.nMaxSunEnergy)
-	imgM:SetPercentage(me.nCurrentMoonEnergy / me.nMaxMoonEnergy)
-	imgS:Show(me.nSunPowerValue <= 0 and me.nMoonPowerValue <= 0)
-	imgM:Show(me.nSunPowerValue <= 0 and me.nMoonPowerValue <= 0)
-	hMingJiao:Lookup('Image_MingJiaoBG2'):Show(me.nMoonPowerValue <= 0 and me.nSunPowerValue <= 0 and me.nCurrentSunEnergy <= 0 and me.nCurrentMoonEnergy <= 0)
-	hMingJiao:Lookup('Image_SunCao'):Show(me.nCurrentSunEnergy > 0 or me.nCurrentMoonEnergy > 0)
-	hMingJiao:Lookup('Image_MoonCao'):Show(me.nCurrentSunEnergy > 0 or me.nCurrentMoonEnergy > 0)
+
+	local hImageSunEnergy = hMingJiao:Lookup('Image_SunEnergy')
+	local hImageMoonEnergy = hMingJiao:Lookup('Image_MoonEnergy')
+	local bShowSunEnergy = (me.nCurrentSunEnergy > 0 or me.nCurrentMoonEnergy > 0)
+						and me.nCurrentSunEnergy < 10000
+	local bShowMoonEnergy = (me.nCurrentSunEnergy > 0 or me.nCurrentMoonEnergy > 0)
+						and me.nCurrentMoonEnergy < 10000
+	local sunPer, moonPer = 0, 0
+	if me.nMaxSunEnergy ~= 0 then
+		sunPer = me.nCurrentSunEnergy / me.nMaxSunEnergy
+	end
+
+	if me.nMaxMoonEnergy ~= 0 then
+		moonPer = me.nCurrentMoonEnergy / me.nMaxMoonEnergy
+	end
+
+	hImageSunEnergy:SetPercentage(sunPer)
+	hImageMoonEnergy:SetPercentage(moonPer)
+
+	hMingJiao:Lookup('Text_Sun'):Show(me.nSunPowerValue == 0 and me.nCurrentSunEnergy ~= me.nMaxSunEnergy and me.nCurrentSunEnergy ~= 0)
+	local nInteger = math.modf(sunPer * 100)
+	if nInteger > 100 then nInteger = 100 end
+	hMingJiao:Lookup('Text_Sun'):SetText(tostring(nInteger))
+	hMingJiao:Lookup('Text_Moon'):Show(me.nMoonPowerValue == 0 and me.nCurrentMoonEnergy ~= me.nMaxMoonEnergy and me.nCurrentMoonEnergy ~= 0)
+	nInteger = math.modf(moonPer * 100)
+	if nInteger > 100 then nInteger = 100 end
+	hMingJiao:Lookup('Text_Moon'):SetText(tostring(nInteger))
+
+	hImageSunEnergy:Show(me.nSunPowerValue <= 0)
+	hImageMoonEnergy:Show(me.nMoonPowerValue <= 0)
+	hMingJiao:Lookup('Image_MingJiaoBG2'):Show(
+		me.nMoonPowerValue <= 0 and
+		me.nSunPowerValue <= 0 and
+		me.nCurrentSunEnergy <= 0 and
+		me.nCurrentMoonEnergy <= 0
+	)
+	hMingJiao:Lookup('Image_SunCao'):Show(bShowSunEnergy)
 	hMingJiao:Lookup('Image_SunBG'):Show(me.nSunPowerValue > 0)
+	hMingJiao:Lookup('SFX_Sun'):Show(me.nSunPowerValue > 0)
+
+	hMingJiao:Lookup('Image_MoonCao'):Show(bShowMoonEnergy)
 	hMingJiao:Lookup('Image_MoonBG'):Show(me.nMoonPowerValue > 0)
-	hMingJiao:Lookup('Image_SunValue'):Show(me.nSunPowerValue > 0)
-	hMingJiao:Lookup('Image_MoonValue'):Show(me.nMoonPowerValue > 0)
-	hMingJiao:Lookup('Animate_SunValue'):Show(me.nSunPowerValue > 0)
-	hMingJiao:Lookup('Animate_MoonValue'):Show(me.nMoonPowerValue > 0)
-	frame:Lookup('', 'Text_Sun'):SetText(FormatString(g_tStrings.MINGJIAO_POWER_SUN, string.format('%d/%d', me.nCurrentSunEnergy / 100, me.nMaxSunEnergy / 100)))
-	frame:Lookup('', 'Text_Moon'):SetText(FormatString(g_tStrings.MINGJIAO_POWER_MOON, string.format('%d/%d', me.nCurrentMoonEnergy / 100, me.nMaxMoonEnergy / 100)))
+	hMingJiao:Lookup('SFX_Moon'):Show(me.nMoonPowerValue > 0)
 end
 
 -- cangyun pose type
@@ -419,11 +445,11 @@ function D.CopyHandle(frame)
 			D.szShow = 'Handle_' .. D.szShowSub
 		end
 		hTotal:AppendItemFromIni('ui\\config\\default\\PlayerBar.ini', D.szShow)
-		if D.szShowSub == 'MJ' then
-			hTotal:AppendItemFromString('<text>text="" name="Text_Sun" x=87 y=10 w=144 h=20 font=163 </text>')
-			hTotal:AppendItemFromString('<text>text="" name="Text_Moon" x=87 y=52 w=144 h=20 font=202 </text>')
-		end
 		local h = hTotal:Lookup(D.szShow)
+		if D.szShowSub == 'MJ' then
+			h:AppendItemFromString('<image>x=-4 y=-1 w=44 h=40 path="ui\\Image\\UICommon\\skills2.UITex" frame=11</image>')
+			h:FormatAllItemPos()
+		end
 		if D.szShowSub == 'CYUN' then
 			h:Lookup('SFX_Rang'):Hide()
 		end
