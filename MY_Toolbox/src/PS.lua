@@ -68,8 +68,12 @@ function PS.OnPanelActive(wnd)
 	local x, y = X, Y
 	x, y = MY_GongzhanCheck.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	x, y = MY_FooterTip.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_BagEx.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_BagSort.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+	if MY_BagEx then
+		x, y = MY_BagEx.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+	end
+	if MY_BagSort then
+		x, y = MY_BagSort.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+	end
 	x, y = MY_VisualSkill.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	x, y = MY_ShenxingHelper.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	x, y = MY_AutoHideChat.OnPanelActivePartial(ui, X, Y, W, H, x, y)
