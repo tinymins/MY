@@ -244,6 +244,7 @@ function MY_BagStatistics.UpdateNames(frame)
 	container:Clear()
 	for _, rec in ipairs(result) do
 		local wnd = container:AppendContentFromIni(SZ_INI, 'Wnd_Name')
+		wnd.time = rec.time
 		wnd.ownerkey   = UTF8ToAnsi(rec.ownerkey)
 		wnd.ownername  = UTF8ToAnsi(rec.ownername)
 		wnd.servername = UTF8ToAnsi(rec.servername)
@@ -496,6 +497,27 @@ MY_BagStatistics.OnItemRefreshTip = MY_BagStatistics.OnItemMouseEnter
 function MY_BagStatistics.OnItemMouseLeave()
 	HideTip()
 end
+
+function MY_BagStatistics.OnMouseEnter()
+	local name = this:GetName()
+	if name == 'Wnd_Name' then
+		local x, y = this:GetAbsPos()
+		local w, h = this:GetSize()
+		OutputTip(GetFormatText(_L(
+			this.ownername:sub(1, 1) == '['
+				and 'Tong: %s\nServer: %s\nSnapshot Time: %s'
+				or 'Character: %s\nServer: %s\nSnapshot Time: %s',
+			this.ownername,
+			this.servername,
+			LIB.FormatTime(this.time, '%yyyy-%MM-%dd %hh:%mm:%ss')), nil, 255, 255, 0), 400, {x, y, w, h, false}, nil, false)
+	elseif name == 'CheckBox_Name' then
+		LIB.ExecuteWithThis(this:GetParent(), MY_BagStatistics.OnMouseEnter)
+	end
+end
+
+-- function MY_BagStatistics.OnMouseLeave()
+-- 	HideTip()
+-- end
 
 do
 local menu = {

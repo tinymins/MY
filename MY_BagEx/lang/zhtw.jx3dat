@@ -21,6 +21,8 @@ return {
 
     ['%d pages'] = '共%d頁',
     ['%d results'] = '共%d個結果',
+    ['Character: %s\nServer: %s\nSnapshot Time: %s'] = '角色名：%s\n伺服器：%s\n快照時間：%s',
+    ['Tong: %s\nServer: %s\nSnapshot Time: %s'] = '幫會名：%s\n伺服器：%s\n快照時間：%s',
 
     ['Bankx%d Bagx%d Totalx%d'] = '倉庫x%d 背包x%d 總x%d',
     ['%s (%s)\tBankx%d Bagx%d Totalx%d\n'] = '%s (%s)\t倉庫x%d 背包x%d 總x%d\n',
