@@ -610,7 +610,7 @@ local function GetSenderStatus(me)
 	if not me then
 		return 'NO_PLAYER'
 	end
-	if _G.SafeLock_IsTalkLocked and _G.SafeLock_IsTalkLocked() then
+	if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 		return 'TALK_LOCK'
 	end
 	return 'READY'
