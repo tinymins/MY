@@ -420,7 +420,7 @@ function D.SetLover(dwID, nType)
 		-- 重复放烟花刷新称号
 		if dwID == O.lover.dwID then
 			D.CreateFireworkSelect(function(p)
-				if LIB.IsTradeLocked() or LIB.IsTalkLocked() then
+				if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) or LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 					return LIB.Systopmsg(_L['Light firework is a sensitive action, please unlock to continue.'])
 				end
 				D.UseDoubleLoveItem(aInfo, p.aUIID, function(bSuccess)
@@ -437,7 +437,7 @@ function D.SetLover(dwID, nType)
 	elseif nType == 0 then
 		-- 设置成为情缘（在线好友）
 		-- 单向情缘（简单）
-		if LIB.IsTradeLocked() or LIB.IsTalkLocked() then
+		if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) or LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 			return LIB.Systopmsg(_L['Set lover is a sensitive action, please unlock to continue.'])
 		end
 		LIB.Confirm(_L('Do you want to love with [%s]?', aInfo.name), function()
@@ -455,7 +455,7 @@ function D.SetLover(dwID, nType)
 		-- 设置成为情缘（在线好友）
 		-- 双向情缘（在线，组队一起，并且在4尺内，发起方带有一个指定烟花）
 		D.CreateFireworkSelect(function(p)
-			if LIB.IsTradeLocked() or LIB.IsTalkLocked() then
+			if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) or LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 				return LIB.Systopmsg(_L['Set lover is a sensitive action, please unlock to continue.'])
 			end
 			local aInfo = LIB.GetFriend(dwID)
@@ -476,7 +476,7 @@ end
 
 -- 删除情缘
 function D.RemoveLover()
-	if LIB.IsTradeLocked() or LIB.IsTalkLocked() then
+	if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) or LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 		return LIB.Systopmsg(_L['Remove lover is a sensitive action, please unlock to continue.'])
 	end
 	local lover = Clone(O.lover)
@@ -674,7 +674,7 @@ local function OnBgTalk(_, nChannel, dwTalkerID, szTalkerName, bSelf, ...)
 				local aInfo = LIB.GetFriend(dwTalkerID)
 				if aInfo then
 					LIB.Confirm(_L('[%s] want to repair love relation with you, OK?', szTalkerName), function()
-						if LIB.IsTradeLocked() or LIB.IsTalkLocked() then
+						if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) or LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 							LIB.Systopmsg(_L['Fix lover is a sensitive action, please unlock to continue.'])
 							return false
 						end

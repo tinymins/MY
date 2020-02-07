@@ -3175,24 +3175,37 @@ function LIB.IsPhoneLock()
 	return me and me.IsTradingMibaoSwitchOpen()
 end
 
-function LIB.IsTradeLocked()
+function LIB.IsAccountInDanger()
 	local me = GetClientPlayer()
-	return me.bIsBankPasswordVerified == false
+	return me.nAccountSecurityState == ACCOUNT_SECURITY_STATE.DANGER
 end
 
-function LIB.IsTalkLocked()
+function LIB.IsSafeLocked(nType)
 	local me = GetClientPlayer()
-	if not me.GetSafeLockMaskInfo or not SAFE_LOCK_EFFECT_TYPE then
+	if nType == SAFE_LOCK_EFFECT_TYPE.TALK then -- 聊天锁比较特殊
+		if me.GetSafeLockMaskInfo then
+			local tLock = me.GetSafeLockMaskInfo()
+			if tLock then
+				return tLock[SAFE_LOCK_EFFECT_TYPE.TALK]
+			end
+		end
+		if _G.SafeLock_IsTalkLocked then
+			return _G.SafeLock_IsTalkLocked()
+		end
 		return false
 	end
-	local tLock = me.GetSafeLockMaskInfo()
-	if tLock then
-		return tLock[SAFE_LOCK_EFFECT_TYPE.TALK]
+	if LIB.IsAccountInDanger() then
+		return true
 	end
-	if _G.SafeLock_IsTalkLocked then
-		return _G.SafeLock_IsTalkLocked()
+	return not me.CheckSafeLock(nType)
+end
+
+function LIB.IsTradeLocked()
+	if LIB.IsAccountInDanger() then
+		return true
 	end
-	return false
+	local me = GetClientPlayer()
+	return me.bIsBankPasswordVerified == false
 end
 
 -- * 当前道具是否满足装备要求：包括身法，体型，门派，性别，等级，根骨，力量，体质
