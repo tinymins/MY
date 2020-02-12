@@ -280,7 +280,7 @@ function D.GetLover()
 		return
 	end
 	local szKey, me = '#HM#LOVER#', GetClientPlayer()
-	if not me then
+	if not me or not LIB.IsRemoteStorage() then
 		return
 	end
 	local dwLoverID, nLoverTime, nLoverType, nSendItem, nReceiveItem = LIB.GetStorage('MY_Love')
@@ -412,6 +412,9 @@ end
 
 -- …Ë÷√«È‘µ
 function D.SetLover(dwID, nType)
+	if not LIB.IsRemoteStorage() then
+		return LIB.Alert(_L['Please enable sync common ui config first'])
+	end
 	local aInfo = LIB.GetFriend(dwID)
 	if not aInfo or not aInfo.isonline then
 		return LIB.Alert(_L['Lover must be a online friend'])
@@ -476,6 +479,9 @@ end
 
 -- …æ≥˝«È‘µ
 function D.RemoveLover()
+	if not LIB.IsRemoteStorage() then
+		return LIB.Alert(_L['Please enable sync common ui config first'])
+	end
 	if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) or LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 		return LIB.Systopmsg(_L['Remove lover is a sensitive action, please unlock to continue.'])
 	end

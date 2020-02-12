@@ -216,6 +216,7 @@ return {
 	['Sorry, I decided to just a swordman, bye my plugin lover'] = '对不起，我决定只剑侠不情缘了，别了情缘 #可怜',
 	['A blade and cut, no longer meet with [%s].'] = '#心碎 手起刀落，它日与 [%s] 江湖不见。',
 	['Congratulations, do not repeat the same mistakes ah.'] = '恭喜出城，别再重蹈覆辙啊。',
+	['Please enable sync common ui config first'] = '请先启用游戏界面同步设置，方可使用该功能。\n\n方法：前往【ESC-游戏设置-综合】确保【服务器同步设置】中的【界面常规设置】复选框处于勾选状态。',
 	['Lover must be a online friend'] = '情缘对象必须是在线好友',
 	['Inadequate conditions, requiring Lv2 friend'] = '单向条件不足，要求2重好感',
 	['Inadequate conditions, requiring Lv6 friend/party/4-feet distance/%s'] = '双向条件不足，要求6重好感/组队距离4尺内/揣1个%s',
