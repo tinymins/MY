@@ -1071,6 +1071,7 @@ do
 -- 13/0 - 13/4 MY_Love nType
 -- 13/5 - 14/2 MY_Love nSendItem
 -- 14/3 - 14/7 MY_Love nReceiveItem
+-- 31 - 31 检测是否同步了插件设置项
 local l_tBoolValues = {
 	['MY_ChatSwitch_DisplayPanel'] = 0,
 	['MY_ChatSwitch_LockPostion'] = 1,
@@ -1211,6 +1212,13 @@ function LIB.GetStorage(szKey)
 		end
 		return 0, 0, 0, 0, 0
 	end
+end
+
+-- 判断用户是否同步了设置项（ESC-游戏设置-综合-服务器同步设置-界面常规设置）
+function LIB.IsRemoteStorage()
+	local n = (GetUserPreferences(4347, 'c') + 1) % 256
+	SetOnlineAddonCustomData('MY', 31, 1, n)
+	return GetUserPreferences(4347, 'c') == n
 end
 
 function LIB.WatchStorage(szKey, fnAction)
