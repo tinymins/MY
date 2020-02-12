@@ -642,6 +642,10 @@ local function OnBgTalk(_, nChannel, dwTalkerID, szTalkerName, bSelf, ...)
 		return
 	end
 	if not bSelf then
+		if not LIB.IsRemoteStorage() then
+			LIB.SendBgMsg(szTalkerName, 'MY_LOVE', 'DATA_NOT_SYNC')
+			return
+		end
 		local szKey, data = ...
 		if szKey == 'VIEW' then
 			if LIB.IsParty(dwTalkerID) or data == 'Author' then
@@ -749,6 +753,8 @@ local function OnBgTalk(_, nChannel, dwTalkerID, szTalkerName, bSelf, ...)
 				szLoverTitle = data[9] or '',
 			}
 			FireUIEvent('MY_LOVE_OTHER_UPDATE', dwTalkerID)
+		elseif szKey == 'DATA_NOT_SYNC' then
+			LIB.Alert(_L('[%s] disabled ui config sync, unable to read data.', szTalkerName))
 		end
 	end
 end

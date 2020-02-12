@@ -255,6 +255,7 @@ return {
 	['The other is already your lover!'] = '对方情缘已经是你啦！',
 	['The other refused you without reason, but you can still blind love him!'] = '不知为什么对方拒绝了你，但你仍可以选择单恋 Ta！',
     ['Congratulations, success to attach love with [%s]!'] = '恭喜您，与 [%s] 结缘成功！',
+    ['[%s] disabled ui config sync, unable to read data.'] = '[%s]禁用了界面常规设置同步，无法读取数据！',
     ['Failed to attach love, light firework failed.'] = '烟花未能成功燃放，结缘失败。',
 	['Warm tip: Your {$type} lover [{$name}] online, hurry doing needy doing.'] = '温馨提醒：你的{$type}情缘[{$name}]上线啦，该干嘛赶紧干嘛。',
 	['Love tip: %s onlines now'] = '情缘提示：%s上线了',
