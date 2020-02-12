@@ -98,6 +98,7 @@ end
 -- init
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
+	local W, H = ui:Size()
 	local X, Y = 20, 20
 	local nX, nY = X, Y
 	local lover = D.GetLover()
@@ -105,107 +106,123 @@ function PS.OnPanelActive(wnd)
 	ui:Append('Text', { text = _L['Heart lover'], x = X, y = nY, font = 27 })
 	-- lover info
 	nY = nY + 36
-	if not lover or not lover.dwID or lover.dwID == 0 then
+	if not LIB.IsRemoteStorage() then
 		nX = X + 10
-		nX = ui:Append('Text', { text = _L['No lover :-('], font = 19, x = nX, y = nY }):Pos('BOTTOMRIGHT')
-		-- create lover
-		nX = X + 10
-		nY = nY + 36
-		nX = ui:Append('Text', { text = _L['Mutual love friend Lv.6: '], x = nX, y = nY }):Pos('BOTTOMRIGHT')
-		nX = ui:Append('WndComboBox', {
-			x = nX + 5, y = nY, w = 200, h = 25,
-			text = _L['- Select plz -'],
-			menu = function() return D.GetLoverMenu(1) end,
-		}):Pos('BOTTOMRIGHT')
-		ui:Append('Text', { text = _L['(4-feets, with specific fireworks)'], x = nX + 5, y = nY })
+		nY = nY + ui:Append('Text', {
+			x = nX, y = nY, w = W - nX, h = 120,
+			text = _L['Please enable sync common ui config first'],
+			font = 19, r = 255, g = 0, b = 0, multiline = true,
+		}):AutoHeight():Height() + 25
+		nY = nY + ui:Append('WndButton', {
+			x = (W - 100) / 2, y = nY, w = 100, h = 30,
+			text = _L['Refresh'],
+			onclick = function()
+				D.RefreshPS()
+			end,
+		}):Height() + 20
+	else
+		if not lover or not lover.dwID or lover.dwID == 0 then
+			nX = X + 10
+			nX = ui:Append('Text', { text = _L['No lover :-('], font = 19, x = nX, y = nY }):Pos('BOTTOMRIGHT')
+			-- create lover
+			nX = X + 10
+			nY = nY + 36
+			nX = ui:Append('Text', { text = _L['Mutual love friend Lv.6: '], x = nX, y = nY }):Pos('BOTTOMRIGHT')
+			nX = ui:Append('WndComboBox', {
+				x = nX + 5, y = nY, w = 200, h = 25,
+				text = _L['- Select plz -'],
+				menu = function() return D.GetLoverMenu(1) end,
+			}):Pos('BOTTOMRIGHT')
+			ui:Append('Text', { text = _L['(4-feets, with specific fireworks)'], x = nX + 5, y = nY })
+			nX = X + 10
+			nY = nY + 28
+			nX = ui:Append('Text', { text = _L['Blind love friend Lv.2: '], x = nX, y = nY }):Pos('BOTTOMRIGHT')
+			nX = ui:Append('WndComboBox', {
+				x = nX + 5, y = nY, w = 200, h = 25,
+				text = _L['- Select plz -'],
+				menu = function() return D.GetLoverMenu(0) end,
+			}):Pos('BOTTOMRIGHT')
+			ui:Append('Text', { text = _L['(Online required, notify anonymous)'], x = nX + 5, y = nY })
+		else
+			-- sync social data
+			Wnd.OpenWindow('SocialPanel')
+			Wnd.CloseWindow('SocialPanel')
+			-- show lover
+			nX = X + 10
+			nX = ui:Append('Text', { text = lover.szName, font = 19, x = nX, y = nY, r = 255, g = 128, b = 255 }):AutoWidth():Pos('BOTTOMRIGHT')
+			local map = lover.bOnline and LIB.GetMapInfo(lover.dwMapID)
+			if not IsEmpty(lover.szLoverTitle) then
+				nX = ui:Append('Text', { text = '<' .. lover.szLoverTitle .. '>', x = nX, y = nY, font = 80, r = 255, g = 128, b = 255 }):AutoWidth():Pos('BOTTOMRIGHT')
+			end
+			if map and map.szName then
+				ui:Append('Text', { text = '(' .. g_tStrings.STR_GUILD_ONLINE .. ': ' .. map.szName .. ')', font = 80, x = nX + 10, y = nY })
+			else
+				ui:Append('Text', { text = '(' .. g_tStrings.STR_GUILD_OFFLINE .. ')', font = 62, x = nX + 10, y = nY })
+			end
+			nX = X + 10
+			nY = nY + 36
+			nX = ui:Append('Text', { text = D.FormatLoverString('{$type}{$time}', lover), font = 2, x = nX, y = nY }):AutoWidth():Pos('BOTTOMRIGHT')
+			if lover.nLoverType == 1 then
+				nX = ui:Append('Text', {
+					x = nX + 10, y = nY,
+					text = _L['[Light firework]'],
+					onclick = function()
+						D.SetLover(lover.dwID, -1)
+					end,
+				}):AutoWidth():Pos('BOTTOMRIGHT')
+			end
+			nX = ui:Append('Text', { text = _L['[Break love]'], x = nX + 10, y = nY, onclick = D.RemoveLover }):AutoWidth():Pos('BOTTOMRIGHT')
+			if lover.nLoverType == 1 then
+				nX = ui:Append('Text', { text = _L['[Recovery]'], x = nX + 10, y = nY, onclick = D.FixLover }):AutoWidth():Pos('BOTTOMRIGHT')
+			end
+			ui:Append('WndCheckBox', {
+				x = nX + 10, y = nY + 2,
+				text = _L['Auto focus lover'],
+				checked = MY_Love.bAutoFocus,
+				oncheck = function(bChecked)
+					MY_Love.bAutoFocus = bChecked
+				end,
+			})
+			nY = nY + 10
+		end
+		-- local setting
 		nX = X + 10
 		nY = nY + 28
-		nX = ui:Append('Text', { text = _L['Blind love friend Lv.2: '], x = nX, y = nY }):Pos('BOTTOMRIGHT')
-		nX = ui:Append('WndComboBox', {
-			x = nX + 5, y = nY, w = 200, h = 25,
-			text = _L['- Select plz -'],
-			menu = function() return D.GetLoverMenu(0) end,
+		nX = ui:Append('Text', { text = _L['Non-love display: '], x = nX, y = nY }):Pos('BOTTOMRIGHT')
+		nX = ui:Append('WndEditBox', {
+			x = nX + 5, y = nY, w = 198, h = 25,
+			limit = 20, text = MY_Love.szNone,
+			onchange = function(szText) MY_Love.szNone = szText end,
 		}):Pos('BOTTOMRIGHT')
-		ui:Append('Text', { text = _L['(Online required, notify anonymous)'], x = nX + 5, y = nY })
-	else
-		-- sync social data
-		Wnd.OpenWindow('SocialPanel')
-		Wnd.CloseWindow('SocialPanel')
-		-- show lover
+		ui:Append('WndCheckBox', {
+			x = nX + 5, y = nY,
+			text = _L['Enable quiet mode'],
+			checked = MY_Love.bQuiet,
+			oncheck = function(bChecked) MY_Love.bQuiet = bChecked end,
+		})
+		-- jabber
 		nX = X + 10
-		nX = ui:Append('Text', { text = lover.szName, font = 19, x = nX, y = nY, r = 255, g = 128, b = 255 }):AutoWidth():Pos('BOTTOMRIGHT')
-		local map = lover.bOnline and LIB.GetMapInfo(lover.dwMapID)
-		if not IsEmpty(lover.szLoverTitle) then
-			nX = ui:Append('Text', { text = '<' .. lover.szLoverTitle .. '>', x = nX, y = nY, font = 80, r = 255, g = 128, b = 255 }):AutoWidth():Pos('BOTTOMRIGHT')
-		end
-		if map and map.szName then
-			ui:Append('Text', { text = '(' .. g_tStrings.STR_GUILD_ONLINE .. ': ' .. map.szName .. ')', font = 80, x = nX + 10, y = nY })
-		else
-			ui:Append('Text', { text = '(' .. g_tStrings.STR_GUILD_OFFLINE .. ')', font = 62, x = nX + 10, y = nY })
-		end
+		nY = nY + 28
+		nX = ui:Append('Text', { text = _L['Quick to accost text: '], x = nX, y = nY }):Pos('BOTTOMRIGHT')
+		ui:Append('WndEditBox', {
+			x = nX + 5, y = nY, w = 340, h = 25,
+			limit = 128, text = MY_Love.szJabber,
+			onchange = function(szText) MY_Love.szJabber = szText end,
+		})
+		-- signature
 		nX = X + 10
 		nY = nY + 36
-		nX = ui:Append('Text', { text = D.FormatLoverString('{$type}{$time}', lover), font = 2, x = nX, y = nY }):AutoWidth():Pos('BOTTOMRIGHT')
-		if lover.nLoverType == 1 then
-			nX = ui:Append('Text', {
-				x = nX + 10, y = nY,
-				text = _L['[Light firework]'],
-				onclick = function()
-					D.SetLover(lover.dwID, -1)
-				end,
-			}):AutoWidth():Pos('BOTTOMRIGHT')
-		end
-		nX = ui:Append('Text', { text = _L['[Break love]'], x = nX + 10, y = nY, onclick = D.RemoveLover }):AutoWidth():Pos('BOTTOMRIGHT')
-		if lover.nLoverType == 1 then
-			nX = ui:Append('Text', { text = _L['[Recovery]'], x = nX + 10, y = nY, onclick = D.FixLover }):AutoWidth():Pos('BOTTOMRIGHT')
-		end
-		ui:Append('WndCheckBox', {
-			x = nX + 10, y = nY + 2,
-			text = _L['Auto focus lover'],
-			checked = MY_Love.bAutoFocus,
-			oncheck = function(bChecked)
-				MY_Love.bAutoFocus = bChecked
+		nX = ui:Append('Text', { text = _L['Love signature: '], x = nX, y = nY, font = 27 }):Pos('BOTTOMRIGHT')
+		ui:Append('WndEditBox', {
+			x = nX + 5, y = nY, w = 340, h = 48,
+			limit = 42,  multi = true,
+			text = MY_Love.szSign,
+			onchange = function(szText)
+				MY_Love.szSign = LIB.ReplaceSensitiveWord(szText)
 			end,
 		})
-		nY = nY + 10
+		nY = nY + 54
 	end
-	-- local setting
-	nX = X + 10
-	nY = nY + 28
-	nX = ui:Append('Text', { text = _L['Non-love display: '], x = nX, y = nY }):Pos('BOTTOMRIGHT')
-	nX = ui:Append('WndEditBox', {
-		x = nX + 5, y = nY, w = 198, h = 25,
-		limit = 20, text = MY_Love.szNone,
-		onchange = function(szText) MY_Love.szNone = szText end,
-	}):Pos('BOTTOMRIGHT')
-	ui:Append('WndCheckBox', {
-		x = nX + 5, y = nY,
-		text = _L['Enable quiet mode'],
-		checked = MY_Love.bQuiet,
-		oncheck = function(bChecked) MY_Love.bQuiet = bChecked end,
-	})
-	-- jabber
-	nX = X + 10
-	nY = nY + 28
-	nX = ui:Append('Text', { text = _L['Quick to accost text: '], x = nX, y = nY }):Pos('BOTTOMRIGHT')
-	ui:Append('WndEditBox', {
-		x = nX + 5, y = nY, w = 340, h = 25,
-		limit = 128, text = MY_Love.szJabber,
-		onchange = function(szText) MY_Love.szJabber = szText end,
-	})
-	-- signature
-	nX = X + 10
-	nY = nY + 36
-	nX = ui:Append('Text', { text = _L['Love signature: '], x = nX, y = nY, font = 27 }):Pos('BOTTOMRIGHT')
-	ui:Append('WndEditBox', {
-		x = nX + 5, y = nY, w = 340, h = 48,
-		limit = 42,  multi = true,
-		text = MY_Love.szSign,
-		onchange = function(szText)
-			MY_Love.szSign = LIB.ReplaceSensitiveWord(szText)
-		end,
-	})
-	nY = nY + 54
 	ui:Append('WndCheckBox', {
 		x = nX + 5, y = nY, w = 200,
 		text = _L['Enable player view panel hook'],
