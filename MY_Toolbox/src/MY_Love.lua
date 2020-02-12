@@ -318,7 +318,7 @@ function D.GetLover()
 				local fellowClient = GetFellowshipCardClient()
 				if fellowClient then
 					local card = fellowClient.GetFellowshipCardInfo(info.id)
-					if not card or card.dwMapID == 0 then
+					if not card or (card.dwMapID == 0 and info.isonline) then
 						fellowClient.ApplyFellowshipCard(255, {info.id})
 					else
 						return {
