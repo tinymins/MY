@@ -119,6 +119,9 @@ local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 ---------------------------------------------------------------------------------------------
 -- 本地函数变量
 ---------------------------------------------------------------------------------------------
+local function IsStreaming()
+	return SM_IsEnable and SM_IsEnable()
+end
 local _BUILD_                = '20200212'
 local _VERSION_              = 0x2015200
 local _MENU_COLOR_           = {255, 165, 79}
@@ -126,7 +129,7 @@ local _MAX_PLAYER_LEVEL_     = 100
 local _INTERFACE_ROOT_       = './Interface/'
 local _NAME_SPACE_           = 'MY'
 local _ADDON_ROOT_           = _INTERFACE_ROOT_ .. 'MY/'
-local _DATA_ROOT_            = _INTERFACE_ROOT_ .. 'MY#DATA/'
+local _DATA_ROOT_            = IsStreaming() and (GetUserDataFolder() .. '/' .. GetUserAccount() .. '/interface/') or (_INTERFACE_ROOT_ .. 'MY#DATA/')
 local _FRAMEWORK_ROOT_       = _INTERFACE_ROOT_ .. 'MY/MY_!Base/'
 local _PSS_ST_               = _FRAMEWORK_ROOT_ .. 'img/ST.pss'
 local _UITEX_ST_             = _FRAMEWORK_ROOT_ .. 'img/ST_UI.UITex'
@@ -1076,6 +1079,7 @@ local LIB = {
 	DecodeLUAData    = DecodeLUAData   ,
 	RandomChild      = RandomChild     ,
 	GetTraceback     = GetTraceback    ,
+	IsStreaming      = IsStreaming     ,
 	LoadLangPack     = LoadLangPack    ,
 	CONSTANT         = CONSTANT        ,
 	PATH_TYPE        = PATH_TYPE       ,
