@@ -308,13 +308,13 @@ function LIB.FormatPath(oFilePath, tParams)
 	-- if it's relative path then complete path with '/{NS}#DATA/'
 	if szFilePath:sub(2, 3) ~= ':/' then
 		if ePathType == PATH_TYPE.DATA then
-			szFilePath = PACKET_INFO.INTERFACE_ROOT .. PACKET_INFO.NAME_SPACE .. '#DATA/' .. szFilePath
+			szFilePath = PACKET_INFO.DATA_ROOT .. szFilePath
 		elseif ePathType == PATH_TYPE.GLOBAL then
-			szFilePath = PACKET_INFO.INTERFACE_ROOT .. PACKET_INFO.NAME_SPACE .. '#DATA/!all-users@{$lang}/' .. szFilePath
+			szFilePath = PACKET_INFO.DATA_ROOT .. '!all-users@{$lang}/' .. szFilePath
 		elseif ePathType == PATH_TYPE.ROLE then
-			szFilePath = PACKET_INFO.INTERFACE_ROOT .. PACKET_INFO.NAME_SPACE .. '#DATA/{$uid}@{$lang}/' .. szFilePath
+			szFilePath = PACKET_INFO.DATA_ROOT .. '{$uid}@{$lang}/' .. szFilePath
 		elseif ePathType == PATH_TYPE.SERVER then
-			szFilePath = PACKET_INFO.INTERFACE_ROOT .. PACKET_INFO.NAME_SPACE .. '#DATA/#{$relserver}@{$lang}/' .. szFilePath
+			szFilePath = PACKET_INFO.DATA_ROOT .. '#{$relserver}@{$lang}/' .. szFilePath
 		end
 	end
 	-- if exist {$uid} then add user role identity
