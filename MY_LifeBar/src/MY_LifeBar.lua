@@ -468,6 +468,9 @@ function CheckInvalidRect(dwType, dwID, me, object)
 			nPriority = nPriority + 10000
 		end
 		szName = LIB.GetObjectName(object, (Config.bShowObjectID and (Config.bShowObjectIDOnlyUnnamed and 'auto' or 'always') or 'never'))
+		if dwType == TARGET.PLAYER and MY_ChatMosaics and MY_ChatMosaics.MosaicsString then
+			szName = MY_ChatMosaics.MosaicsString(szName)
+		end
 		-- 常规配色
 		r, g, b = unpack(GetConfigValue('Color', relation, force))
 		-- 倒计时/名字/帮会/称号部分
