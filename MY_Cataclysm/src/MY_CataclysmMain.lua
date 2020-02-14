@@ -626,6 +626,7 @@ function MY_CataclysmMain.OnFrameCreate()
 	this:RegisterEvent('GKP_RECORD_TOTAL')
 	this:RegisterEvent('GVOICE_MIC_STATE_CHANGED')
 	this:RegisterEvent('GVOICE_SPEAKER_STATE_CHANGED')
+	this:RegisterEvent('ON_MY_MOSAICS_RESET')
 	if GetClientPlayer() then
 		D.UpdateAnchor(this)
 		MY_CataclysmParty:AutoLinkAllPanel()
@@ -874,6 +875,8 @@ function MY_CataclysmMain.OnEvent(szEvent)
 		D.CreateControlBar()
 	elseif szEvent == 'GVOICE_SPEAKER_STATE_CHANGED' then
 		D.CreateControlBar()
+	elseif szEvent == 'ON_MY_MOSAICS_RESET' then
+		D.ReloadCataclysmPanel()
 	elseif szEvent == 'UI_SCALED' then
 		D.UpdateAnchor(this)
 		MY_CataclysmParty:RefreshSFX()

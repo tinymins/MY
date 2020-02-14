@@ -1129,7 +1129,11 @@ function CTM:RefreshImages(h, dwID, info, tSetting, bIcon, bFormationLeader, bLa
 		elseif CFG.nColoredName == 2 then
 			r, g, b = LIB.GetCampColor(info.nCamp, 'foreground')
 		end
-		txtName:SetText(info.szName)
+		local szName = info.szName
+		if MY_ChatMosaics and MY_ChatMosaics.MosaicsString then
+			szName = MY_ChatMosaics.MosaicsString(szName)
+		end
+		txtName:SetText(szName)
 		txtName:SetVAlign(CFG.nNameVAlignment)
 		txtName:SetHAlign(CFG.nNameHAlignment)
 		txtName:SetFontScheme(CFG.nNameFont)
