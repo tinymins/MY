@@ -233,6 +233,14 @@ RegisterCustomData('MY_Recount.anchor')
 local MY_Recount = MY_Recount
 local D, DataDisplay = {}
 
+local function GetShowName(szName, bPlayer)
+	szName = szName:gsub('#.*', '')
+	if bPlayer and MY_ChatMosaics and MY_ChatMosaics.MosaicsString then
+		szName = MY_ChatMosaics.MosaicsString(szName)
+	end
+	return szName
+end
+
 local m_frame
 function MY_Recount.Open()
 	-- open
@@ -454,7 +462,7 @@ function MY_Recount.UpdateUI(data)
 			hItem:Lookup('Image_PerBack'):SetAlpha((css.a or 255) / 255 * 100)
 			hItem:Lookup('Shadow_PerFore'):SetAlpha(css.a or 255)
 			hItem:Lookup('Shadow_PerBack'):SetAlpha((css.a or 255) / 255 * 100)
-			hItem:Lookup('Text_L'):SetText((p.szName:gsub('#.*', '')))
+			hItem:Lookup('Text_L'):SetText(GetShowName(p.szName, p.dwForceID ~= -1))
 			hItem.id = p.id
 		end
 		if hItem:GetIndex() ~= i - 1 then
@@ -607,6 +615,16 @@ end
 --                                     #               #           #          --
 --                                   # #               #           #          --
 -- ########################################################################## --
+function MY_Recount.OnFrameCreate()
+	this:RegisterEvent('ON_MY_MOSAICS_RESET')
+end
+
+function MY_Recount.OnEvent(event)
+	if event == 'ON_MY_MOSAICS_RESET' then
+		MY_Recount.DrawUI()
+	end
+end
+
 -- ÖÜÆÚÖØ»æ
 function MY_Recount.OnFrameBreathe()
 	if this.nLastRedrawFrame and
@@ -775,6 +793,7 @@ function MY_Recount_Detail.OnFrameCreate()
 	frame:Lookup('WndScroll_Target', 'Handle_TargetTitle/Text_TargetTitle_5'):SetText(g_tStrings.STR_HIT_NAME)
 	frame:Lookup('WndScroll_Target', 'Handle_TargetTitle/Text_TargetTitle_6'):SetText(g_tStrings.STR_CS_NAME)
 	frame:Lookup('WndScroll_Target', 'Handle_TargetTitle/Text_TargetTitle_7'):SetText(g_tStrings.STR_MSG_MISS)
+	frame:RegisterEvent('ON_MY_MOSAICS_RESET')
 	frame:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
 
 	local function canEsc()
@@ -879,7 +898,7 @@ function MY_Recount_Detail.OnFrameBreathe()
 	for i, p in ipairs(aResult) do
 		local hItem = hList:Lookup(i - 1) or hList:AppendItemFromIni(_C.szIniDetail, 'Handle_SkillItem')
 		hItem:Lookup('Text_SkillNo'):SetText(i)
-		hItem:Lookup('Text_SkillName'):SetText((p.szName:gsub('#.*', '')))
+		hItem:Lookup('Text_SkillName'):SetText(GetShowName(p.szName, szPrimarySort == 'Target' and p.dwForceID ~= -1))
 		hItem:Lookup('Text_SkillCount'):SetText(not MY_Recount.bShowZeroVal and p.nNzCount or p.nCount)
 		hItem:Lookup('Text_SkillTotal'):SetText(p.nTotal)
 		hItem:Lookup('Text_SkillPercentage'):SetText(nTotal > 0 and _L('%.1f%%', (i == 1 and ceil or floor)(p.nTotal / nTotal * 1000) / 10) or ' - ')
@@ -988,7 +1007,7 @@ function MY_Recount_Detail.OnFrameBreathe()
 		for i, p in ipairs(aResult) do
 			local hItem = hList:Lookup(i - 1) or hList:AppendItemFromIni(_C.szIniDetail, 'Handle_TargetItem')
 			hItem:Lookup('Text_TargetNo'):SetText(i)
-			hItem:Lookup('Text_TargetName'):SetText((p.szName:gsub('#.*', '')))
+			hItem:Lookup('Text_TargetName'):SetText(GetShowName(p.szName, szPrimarySort == 'Skill' and p.dwForceID ~= -1))
 			hItem:Lookup('Text_TargetTotal'):SetText(p.nTotal)
 			hItem:Lookup('Text_TargetMax'):SetText(p.nMax)
 			hItem:Lookup('Text_TargetHit'):SetText(p.nHitCount)
@@ -1012,6 +1031,12 @@ function MY_Recount_Detail.OnFrameBreathe()
 		this:Lookup('', 'Handle_Spliter'):Hide()
 	end
 
+end
+
+function MY_Recount_Detail.OnEvent(event)
+	if event == 'ON_MY_MOSAICS_RESET' then
+		this.nLastRedrawFrame = nil
+	end
 end
 
 function MY_Recount_Detail.OnLButtonClick()
