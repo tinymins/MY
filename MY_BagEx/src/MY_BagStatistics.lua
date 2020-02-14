@@ -53,9 +53,9 @@ if not DB then
 	return LIB.Sysmsg(_L['MY_BagStatistics'], _L['Cannot connect to database!!!'], CONSTANT.MSG_THEME.ERROR)
 end
 local SZ_INI = PACKET_INFO.ROOT .. 'MY_BagEx/ui/MY_BagStatistics.ini'
-local PAGE_DISPLAY = 8
+local PAGE_DISPLAY = 15
 local NORMAL_MODE_PAGE_SIZE = 50
-local COMPACT_MODE_PAGE_SIZE = 200
+local COMPACT_MODE_PAGE_SIZE = 117
 DB:Execute('CREATE TABLE IF NOT EXISTS BagItems (ownerkey NVARCHAR(20), boxtype INTEGER, boxindex INTEGER, tabtype INTEGER, tabindex INTEGER, tabsubindex INTEGER, bagcount INTEGER, bankcount INTEGER, time INTEGER, PRIMARY KEY(ownerkey, boxtype, boxindex))')
 DB:Execute('CREATE INDEX IF NOT EXISTS BagItems_tab_idx ON BagItems(tabtype, tabindex, tabsubindex)')
 local DB_ItemsW = DB:Prepare('REPLACE INTO BagItems (ownerkey, boxtype, boxindex, tabtype, tabindex, tabsubindex, bagcount, bankcount, time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
