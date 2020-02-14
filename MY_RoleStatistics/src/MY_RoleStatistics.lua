@@ -248,7 +248,11 @@ function MY_RoleStatistics.UpdateNames(frame)
 		wnd.ownerkey   = UTF8ToAnsi(rec.ownerkey)
 		wnd.ownername  = UTF8ToAnsi(rec.ownername)
 		wnd.servername = UTF8ToAnsi(rec.servername)
-		wnd:Lookup('CheckBox_Name', 'Text_Name'):SetText(wnd.ownername .. ' (' .. wnd.servername .. ')')
+		local ownername = wnd.ownername
+		if MY_ChatMosaics and MY_ChatMosaics.MosaicsString then
+			ownername = MY_ChatMosaics.MosaicsString(ownername)
+		end
+		wnd:Lookup('CheckBox_Name', 'Text_Name'):SetText(ownername .. ' (' .. wnd.servername .. ')')
 		wnd:Lookup('CheckBox_Name'):Check(not MY_RoleStatistics.tUncheckedNames[wnd.ownerkey], WNDEVENT_FIRETYPE.PREVENT)
 	end
 	container:FormatAllContentPos()
@@ -411,11 +415,14 @@ function MY_RoleStatistics.OnFrameCreate()
 	this:Lookup('', 'Text_Title'):SetText(PACKET_INFO.NAME .. ' - ' .. _L['MY_RoleStatistics'])
 	this:Lookup('PageSet_All/WndCheck_BagStat', 'Text_BagStat'):SetText(_L['Bag statistics'])
 	this:RegisterEvent('MY_BAGSTATISTICS_MODE_CHANGE')
+	this:RegisterEvent('ON_MY_MOSAICS_RESET')
 end
 
 function MY_RoleStatistics.OnEvent(event)
 	if event == 'MY_BAGSTATISTICS_MODE_CHANGE' then
 		MY_RoleStatistics.UpdateItems(this)
+	elseif event == 'ON_MY_MOSAICS_RESET' then
+		MY_RoleStatistics.UpdateNames(this)
 	end
 end
 

@@ -76,53 +76,69 @@ function D.ResetMosaics()
 end
 
 function D.NameLink_GetText(h, ...)
-	return h.__MY_szText or h.__MY_GetText(h, ...)
+	return h.__MY_ChatMosaics_szText or h.__MY_ChatMosaics_GetText(h, ...)
+end
+
+function D.MosaicsString(szText)
+	if not O.bEnabled then
+		return szText
+	end
+	local bQuote = szText:sub(1, 1) == '[' and szText:sub(-1, -1) == ']'
+	if bQuote then
+		szText = szText:sub(2, -2) -- È¥µô[]À¨ºÅ
+	end
+	if (not O.bIgnoreOwnName or szText ~= GetClientPlayer().szName) and not O.tIgnoreNames[szText] then
+		local nLen = wlen(szText)
+		if O.nMosaicsMode == 1 and nLen > 2 then
+			szText = wsub(szText, 1, 1) .. rep(O.szMosaics, nLen - 2) .. wsub(szText, nLen, nLen)
+		elseif O.nMosaicsMode == 2 and nLen > 1 then
+			szText = wsub(szText, 1, 1) .. rep(O.szMosaics, nLen - 1)
+		elseif O.nMosaicsMode == 3 and nLen > 1 then
+			szText = rep(O.szMosaics, nLen - 1) .. wsub(szText, nLen, nLen)
+		elseif O.nMosaicsMode == 4 or nLen <= 1 then
+			szText = rep(O.szMosaics, nLen)
+		else
+			szText = wsub(szText, 1, 1) .. rep(O.szMosaics, nLen - 1)
+		end
+	end
+	if bQuote then
+		szText = '[' .. szText .. ']' -- ¼Ó»Ø[]À¨ºÅ
+	end
+	return szText
 end
 
 function D.Mosaics(h, nPos, nLen)
-	if h then
+	if not h then
+		return
+	end
+	if h:GetType() == 'Text' then
+		if O.bEnabled then
+			if not h.__MY_ChatMosaics_szText or D.bForceUpdate then
+				h.__MY_ChatMosaics_szText = h.__MY_ChatMosaics_szText or h:GetText()
+				if not h.__MY_ChatMosaics_GetText then
+					h.__MY_ChatMosaics_GetText = h.GetText
+					h.GetText = D.NameLink_GetText
+				end
+				h:SetText(D.MosaicsString(h.__MY_ChatMosaics_szText))
+				h:AutoSize()
+			end
+		else
+			if h.__MY_ChatMosaics_GetText then
+				h.GetText = h.__MY_ChatMosaics_GetText
+				h.__MY_ChatMosaics_GetText = nil
+			end
+			if h.__MY_ChatMosaics_szText then
+				h:SetText(h.__MY_ChatMosaics_szText)
+				h.__MY_ChatMosaics_szText = nil
+				h:AutoSize()
+			end
+		end
+	elseif h:GetType() == 'Handle' then
 		local nEndPos = (nLen and (nPos + nLen)) or (h:GetItemCount() - 1)
 		for i = nPos or 0, nEndPos do
 			local hItem = h:Lookup(i)
 			if hItem and (hItem:GetName():sub(0, 9)) == 'namelink_' then
-				if O.bEnabled then
-					-- re mosaics
-					if D.bForceUpdate and hItem.__MY_szText then
-						hItem:SetText(hItem.__MY_szText)
-						hItem.__MY_szText = nil
-					end
-					-- mosaics
-					if not hItem.__MY_szText and (
-						not O.bIgnoreOwnName
-						or hItem:GetText() ~= '[' .. GetClientPlayer().szName .. ']'
-					) and not O.tIgnoreNames[hItem:GetText():sub(2, -2)] then
-						local szText = hItem.__MY_szText or hItem:GetText()
-						hItem.__MY_szText = szText
-						if not hItem.__MY_GetText then
-							hItem.__MY_GetText = hItem.GetText
-							hItem.GetText = D.NameLink_GetText
-						end
-						szText = szText:sub(2, -2) -- È¥µô[]À¨ºÅ
-						local nLen = wstring.len(szText)
-						if O.nMosaicsMode == 1 and nLen > 2 then
-							szText = wstring.sub(szText, 1, 1) .. string.rep(O.szMosaics, nLen - 2) .. wstring.sub(szText, nLen, nLen)
-						elseif O.nMosaicsMode == 2 and nLen > 1 then
-							szText = wstring.sub(szText, 1, 1) .. string.rep(O.szMosaics, nLen - 1)
-						elseif O.nMosaicsMode == 3 and nLen > 1 then
-							szText = string.rep(O.szMosaics, nLen - 1) .. wstring.sub(szText, nLen, nLen)
-						elseif O.nMosaicsMode == 4 or nLen <= 1 then
-							szText = string.rep(O.szMosaics, nLen)
-						else
-							szText = wstring.sub(szText, 1, 1) .. string.rep(O.szMosaics, nLen - 1)
-						end
-						hItem:SetText('[' .. szText .. ']')
-						hItem:AutoSize()
-					end
-				elseif hItem.__MY_szText then
-					hItem:SetText(hItem.__MY_szText)
-					hItem.__MY_szText = nil
-					hItem:AutoSize()
-				end
+				D.Mosaics(hItem)
 			end
 		end
 		h:FormatAllItemPos()
@@ -136,6 +152,7 @@ local settings = {
 		{
 			fields = {
 				Mosaics = D.Mosaics,
+				MosaicsString = D.MosaicsString,
 			},
 		},
 		{
