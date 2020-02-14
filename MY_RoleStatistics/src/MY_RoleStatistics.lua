@@ -55,7 +55,7 @@ end
 local SZ_INI = PACKET_INFO.ROOT .. 'MY_RoleStatistics/ui/MY_RoleStatistics.ini'
 local PAGE_DISPLAY = 15
 local NORMAL_MODE_PAGE_SIZE = 50
-local COMPACT_MODE_PAGE_SIZE = 117
+local COMPACT_MODE_PAGE_SIZE = 150
 DB:Execute('CREATE TABLE IF NOT EXISTS BagItems (ownerkey NVARCHAR(20), boxtype INTEGER, boxindex INTEGER, tabtype INTEGER, tabindex INTEGER, tabsubindex INTEGER, bagcount INTEGER, bankcount INTEGER, time INTEGER, PRIMARY KEY(ownerkey, boxtype, boxindex))')
 DB:Execute('CREATE INDEX IF NOT EXISTS BagItems_tab_idx ON BagItems(tabtype, tabindex, tabsubindex)')
 local DB_ItemsW = DB:Prepare('REPLACE INTO BagItems (ownerkey, boxtype, boxindex, tabtype, tabindex, tabsubindex, bagcount, bankcount, time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
@@ -235,12 +235,12 @@ function MY_RoleStatistics.Toggle()
 end
 
 function MY_RoleStatistics.UpdateNames(frame)
-	local searchname = frame:Lookup('Window_Main/Wnd_SearchName/Edit_SearchName'):GetText()
+	local searchname = frame:Lookup('PageSet_All/Page_BagStat/Wnd_SearchName/Edit_SearchName'):GetText()
 	DB_OwnerInfoR:ClearBindings()
 	DB_OwnerInfoR:BindAll(AnsiToUTF8('%' .. searchname .. '%'), AnsiToUTF8('%' .. searchname .. '%'))
 	local result = DB_OwnerInfoR:GetAll()
 
-	local container = frame:Lookup('Window_Main/WndScroll_Name/WndContainer_Name')
+	local container = frame:Lookup('PageSet_All/Page_BagStat/WndScroll_Name/WndContainer_Name')
 	container:Clear()
 	for _, rec in ipairs(result) do
 		local wnd = container:AppendContentFromIni(SZ_INI, 'Wnd_Name')
@@ -259,14 +259,14 @@ end
 function MY_RoleStatistics.UpdateItems(frame)
 	FlushDB()
 
-	local searchitem = frame:Lookup('Window_Main/Wnd_SearchItem/Edit_SearchItem'):GetText():gsub('%s+', '%%')
+	local searchitem = frame:Lookup('PageSet_All/Page_BagStat/Wnd_SearchItem/Edit_SearchItem'):GetText():gsub('%s+', '%%')
 	local sqlfrom = '(SELECT B.ownerkey, B.boxtype, B.boxindex, B.tabtype, B.tabindex, B.tabsubindex, B.bagcount, B.bankcount, B.time FROM BagItems AS B LEFT JOIN ItemInfo AS I ON B.tabtype = I.tabtype AND B.tabindex = I.tabindex WHERE B.tabtype != -1 AND B.tabindex != -1 AND (I.name LIKE ? OR I.desc LIKE ?)) AS C LEFT JOIN OwnerInfo AS O ON C.ownerkey = O.ownerkey WHERE '
 	local sql  = 'SELECT C.ownerkey AS ownerkey, C.boxtype AS boxtype, C.boxindex AS boxindex, C.tabtype AS tabtype, C.tabindex AS tabindex, C.tabsubindex AS tabsubindex, SUM(C.bagcount) AS bagcount, SUM(C.bankcount) AS bankcount, C.time AS time, O.ownername AS ownername, O.servername AS servername FROM' .. sqlfrom
 	local sqlc = 'SELECT COUNT(*) AS count FROM' .. sqlfrom
 	local nPageSize = MY_RoleStatistics.bCompactMode and COMPACT_MODE_PAGE_SIZE or NORMAL_MODE_PAGE_SIZE
 	local wheres = {}
 	local ownerkeys = {}
-	local container = frame:Lookup('Window_Main/WndScroll_Name/WndContainer_Name')
+	local container = frame:Lookup('PageSet_All/Page_BagStat/WndScroll_Name/WndContainer_Name')
 	for i = 0, container:GetAllContentCount() - 1 do
 		local wnd = container:LookupContent(i)
 		if wnd:Lookup('CheckBox_Name'):IsCheckBoxChecked() then
@@ -285,11 +285,11 @@ function MY_RoleStatistics.UpdateItems(frame)
 	DB_CountR:BindAll(AnsiToUTF8('%' .. searchitem .. '%'), AnsiToUTF8('%' .. searchitem .. '%'), unpack(ownerkeys))
 	local nCount = #DB_CountR:GetAll()
 	local nPageCount = floor(nCount / nPageSize) + 1
-	frame:Lookup('Window_Main/Wnd_Index/Wnd_IndexEdit/WndEdit_Index'):SetText(frame.nCurrentPage)
-	frame:Lookup('Window_Main/Wnd_Index', 'Handle_IndexCount/Text_IndexCount'):SprintfText(_L['%d pages'], nPageCount)
-	frame:Lookup('Window_Main/WndScroll_Name/Wnd_SearchInfo', 'Text_SearchInfo'):SprintfText(_L['%d results'], nCount)
+	frame:Lookup('PageSet_All/Page_BagStat/Wnd_Index/Wnd_IndexEdit/WndEdit_Index'):SetText(frame.nCurrentPage)
+	frame:Lookup('PageSet_All/Page_BagStat/Wnd_Index', 'Handle_IndexCount/Text_IndexCount'):SprintfText(_L['%d pages'], nPageCount)
+	frame:Lookup('PageSet_All/Page_BagStat/WndScroll_Name/Wnd_SearchInfo', 'Text_SearchInfo'):SprintfText(_L['%d results'], nCount)
 
-	local hOuter = frame:Lookup('Window_Main/Wnd_Index', 'Handle_IndexesOuter')
+	local hOuter = frame:Lookup('PageSet_All/Page_BagStat/Wnd_Index', 'Handle_IndexesOuter')
 	local handle = hOuter:Lookup('Handle_Indexes')
 	handle:Clear()
 	if nPageCount <= PAGE_DISPLAY then
@@ -340,8 +340,8 @@ function MY_RoleStatistics.UpdateItems(frame)
 	sqlbelongs = sqlbelongs .. ((#wheres == 0 and ' 1 = 0 ') or ('(' .. concat(wheres, ' OR ') .. ')'))
 	local DB_BelongsR = DB:Prepare(sqlbelongs)
 
-	local handle = frame:Lookup('Window_Main/WndScroll_Item', 'Handle_Items')
-	local scroll = frame:Lookup('Window_Main/WndScroll_Item/Scroll_Item')
+	local handle = frame:Lookup('PageSet_All/Page_BagStat/WndScroll_Item', 'Handle_Items')
+	local scroll = frame:Lookup('PageSet_All/Page_BagStat/WndScroll_Item/Scroll_Item')
 	handle:Clear()
 	for _, rec in ipairs(result) do
 		local KItemInfo = GetItemInfo(rec.tabtype, rec.tabindex)
@@ -409,6 +409,7 @@ function MY_RoleStatistics.OnFrameCreate()
 	this:BringToTop()
 	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
 	this:Lookup('', 'Text_Title'):SetText(PACKET_INFO.NAME .. ' - ' .. _L['MY_RoleStatistics'])
+	this:Lookup('PageSet_All/WndCheck_BagStat', 'Text_BagStat'):SetText(_L['Bag statistics'])
 	this:RegisterEvent('MY_BAGSTATISTICS_MODE_CHANGE')
 end
 
