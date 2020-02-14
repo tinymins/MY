@@ -154,12 +154,10 @@ local function OnBusyTip() return MY_ChatSwitch.szBusy end
 
 local function OnMosaicsCheck()
 	MY_ChatMosaics.bEnabled = true
-	MY_ChatMosaics.ResetMosaics()
 end
 
 local function OnMosaicsUncheck()
 	MY_ChatMosaics.bEnabled = false
-	MY_ChatMosaics.ResetMosaics()
 end
 
 local function OnWhisperCheck()

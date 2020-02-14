@@ -45,29 +45,29 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
 	return
 end
 --------------------------------------------------------------------------
-MY_ChatMosaics = {}
-local _C = {}
-local MY_ChatMosaics = MY_ChatMosaics
-MY_ChatMosaics.bEnabled = false            -- 启用状态
-MY_ChatMosaics.szMosaics = _L.MOSAICS_CHAR -- 马赛克字符
-MY_ChatMosaics.tIgnoreNames = {}           -- 忽略名单
-MY_ChatMosaics.nMosaicsMode = 1            -- 局部打码模式
-MY_ChatMosaics.bIgnoreOwnName = false      -- 不打码自己的名字
+local D = {}
+local O = {
+	bEnabled = false,            -- 启用状态
+	szMosaics = _L.MOSAICS_CHAR, -- 马赛克字符
+	tIgnoreNames = {},           -- 忽略名单
+	nMosaicsMode = 1,            -- 局部打码模式
+	bIgnoreOwnName = false,      -- 不打码自己的名字
+}
 RegisterCustomData('MY_ChatMosaics.tIgnoreNames')
 RegisterCustomData('MY_ChatMosaics.nMosaicsMode')
 RegisterCustomData('MY_ChatMosaics.bIgnoreOwnName')
 
-MY_ChatMosaics.ResetMosaics = function()
+function D.ResetMosaics()
 	-- re mosaics
-	_C.bForceUpdate = true
+	D.bForceUpdate = true
 	for i = 1, 10 do
-		_C.Mosaics(Station.Lookup('Lowest2/ChatPanel' .. i .. '/Wnd_Message', 'Handle_Message'))
+		D.Mosaics(Station.Lookup('Lowest2/ChatPanel' .. i .. '/Wnd_Message', 'Handle_Message'))
 	end
-	_C.bForceUpdate = nil
+	D.bForceUpdate = nil
 	-- hook chat panel
-	if MY_ChatMosaics.bEnabled then
+	if O.bEnabled then
 		LIB.HookChatPanel('AFTER.MY_ChatMosaics', function(h, nIndex)
-			_C.Mosaics(h, nIndex)
+			D.Mosaics(h, nIndex)
 		end)
 	else
 		LIB.HookChatPanel('AFTER.MY_ChatMosaics', false)
@@ -75,45 +75,45 @@ MY_ChatMosaics.ResetMosaics = function()
 	FireUIEvent('ON_MY_MOSAICS_RESET')
 end
 
-_C.NameLink_GetText = function(h, ...)
+function D.NameLink_GetText(h, ...)
 	return h.__MY_szText or h.__MY_GetText(h, ...)
 end
 
-_C.Mosaics = function(h, nPos, nLen)
+function D.Mosaics(h, nPos, nLen)
 	if h then
 		local nEndPos = (nLen and (nPos + nLen)) or (h:GetItemCount() - 1)
 		for i = nPos or 0, nEndPos do
 			local hItem = h:Lookup(i)
 			if hItem and (hItem:GetName():sub(0, 9)) == 'namelink_' then
-				if MY_ChatMosaics.bEnabled then
+				if O.bEnabled then
 					-- re mosaics
-					if _C.bForceUpdate and hItem.__MY_szText then
+					if D.bForceUpdate and hItem.__MY_szText then
 						hItem:SetText(hItem.__MY_szText)
 						hItem.__MY_szText = nil
 					end
 					-- mosaics
 					if not hItem.__MY_szText and (
-						not MY_ChatMosaics.bIgnoreOwnName
+						not O.bIgnoreOwnName
 						or hItem:GetText() ~= '[' .. GetClientPlayer().szName .. ']'
-					) and not MY_ChatMosaics.tIgnoreNames[hItem:GetText():sub(2, -2)] then
+					) and not O.tIgnoreNames[hItem:GetText():sub(2, -2)] then
 						local szText = hItem.__MY_szText or hItem:GetText()
 						hItem.__MY_szText = szText
 						if not hItem.__MY_GetText then
 							hItem.__MY_GetText = hItem.GetText
-							hItem.GetText = _C.NameLink_GetText
+							hItem.GetText = D.NameLink_GetText
 						end
 						szText = szText:sub(2, -2) -- 去掉[]括号
 						local nLen = wstring.len(szText)
-						if MY_ChatMosaics.nMosaicsMode == 1 and nLen > 2 then
-							szText = wstring.sub(szText, 1, 1) .. string.rep(MY_ChatMosaics.szMosaics, nLen - 2) .. wstring.sub(szText, nLen, nLen)
-						elseif MY_ChatMosaics.nMosaicsMode == 2 and nLen > 1 then
-							szText = wstring.sub(szText, 1, 1) .. string.rep(MY_ChatMosaics.szMosaics, nLen - 1)
-						elseif MY_ChatMosaics.nMosaicsMode == 3 and nLen > 1 then
-							szText = string.rep(MY_ChatMosaics.szMosaics, nLen - 1) .. wstring.sub(szText, nLen, nLen)
-						elseif MY_ChatMosaics.nMosaicsMode == 4 or nLen <= 1 then
-							szText = string.rep(MY_ChatMosaics.szMosaics, nLen)
+						if O.nMosaicsMode == 1 and nLen > 2 then
+							szText = wstring.sub(szText, 1, 1) .. string.rep(O.szMosaics, nLen - 2) .. wstring.sub(szText, nLen, nLen)
+						elseif O.nMosaicsMode == 2 and nLen > 1 then
+							szText = wstring.sub(szText, 1, 1) .. string.rep(O.szMosaics, nLen - 1)
+						elseif O.nMosaicsMode == 3 and nLen > 1 then
+							szText = string.rep(O.szMosaics, nLen - 1) .. wstring.sub(szText, nLen, nLen)
+						elseif O.nMosaicsMode == 4 or nLen <= 1 then
+							szText = string.rep(O.szMosaics, nLen)
 						else
-							szText = wstring.sub(szText, 1, 1) .. string.rep(MY_ChatMosaics.szMosaics, nLen - 1)
+							szText = wstring.sub(szText, 1, 1) .. string.rep(O.szMosaics, nLen - 1)
 						end
 						hItem:SetText('[' .. szText .. ']')
 						hItem:AutoSize()
@@ -128,11 +128,55 @@ _C.Mosaics = function(h, nPos, nLen)
 		h:FormatAllItemPos()
 	end
 end
-MY_ChatMosaics.Mosaics = _C.Mosaics
 
-LIB.RegisterPanel('MY_Chat_ChatMosaics', _L['chat mosaics'], _L['Chat'],
-'ui/Image/UICommon/yirong3.UITex|50', {
-OnPanelActive = function(wnd)
+-- Global exports
+do
+local settings = {
+	exports = {
+		{
+			fields = {
+				Mosaics = D.Mosaics,
+			},
+		},
+		{
+			root = D,
+			preset = 'UIEvent'
+		},
+		{
+			fields = {
+				bEnabled = true,
+				szMosaics = true,
+				tIgnoreNames = true,
+				nMosaicsMode = true,
+				bIgnoreOwnName = true,
+			},
+			root = O,
+		},
+	},
+	imports = {
+		{
+			fields = {
+				bEnabled = true,
+				szMosaics = true,
+				tIgnoreNames = true,
+				nMosaicsMode = true,
+				bIgnoreOwnName = true,
+			},
+			triggers = {
+				bEnabled = function ()
+					D.ResetMosaics()
+				end,
+			},
+			root = O,
+		},
+	},
+}
+MY_ChatMosaics = LIB.GeneGlobalNS(settings)
+end
+
+local PS = {}
+
+function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
 	local w, h = ui:Size()
 	local x, y = 20, 30
@@ -143,7 +187,7 @@ OnPanelActive = function(wnd)
 		checked = MY_ChatMosaics.bEnabled,
 		oncheck = function(bCheck)
 			MY_ChatMosaics.bEnabled = bCheck
-			MY_ChatMosaics.ResetMosaics()
+			D.ResetMosaics()
 		end,
 	})
 	y = y + 30
@@ -154,7 +198,7 @@ OnPanelActive = function(wnd)
 		checked = MY_ChatMosaics.bIgnoreOwnName,
 		oncheck = function(bCheck)
 			MY_ChatMosaics.bIgnoreOwnName = bCheck
-			MY_ChatMosaics.ResetMosaics()
+			D.ResetMosaics()
 		end,
 	})
 	y = y + 30
@@ -167,7 +211,7 @@ OnPanelActive = function(wnd)
 		oncheck = function(bCheck)
 			if bCheck then
 				MY_ChatMosaics.nMosaicsMode = 1
-				MY_ChatMosaics.ResetMosaics()
+				D.ResetMosaics()
 			end
 		end,
 	})
@@ -181,7 +225,7 @@ OnPanelActive = function(wnd)
 		oncheck = function(bCheck)
 			if bCheck then
 				MY_ChatMosaics.nMosaicsMode = 2
-				MY_ChatMosaics.ResetMosaics()
+				D.ResetMosaics()
 			end
 		end,
 	})
@@ -195,7 +239,7 @@ OnPanelActive = function(wnd)
 		oncheck = function(bCheck)
 			if bCheck then
 				MY_ChatMosaics.nMosaicsMode = 3
-				MY_ChatMosaics.ResetMosaics()
+				D.ResetMosaics()
 			end
 		end,
 	})
@@ -209,7 +253,7 @@ OnPanelActive = function(wnd)
 		oncheck = function(bCheck)
 			if bCheck then
 				MY_ChatMosaics.nMosaicsMode = 4
-				MY_ChatMosaics.ResetMosaics()
+				D.ResetMosaics()
 			end
 		end,
 	})
@@ -225,7 +269,7 @@ OnPanelActive = function(wnd)
 			else
 				MY_ChatMosaics.szMosaics = szText
 			end
-			MY_ChatMosaics.ResetMosaics()
+			D.ResetMosaics()
 		end,
 	})
 	y = y + 30
@@ -245,8 +289,10 @@ OnPanelActive = function(wnd)
 			for _, szName in ipairs(LIB.SplitString(szText, ',')) do
 				MY_ChatMosaics.tIgnoreNames[szName] = true
 			end
-			MY_ChatMosaics.ResetMosaics()
+			D.ResetMosaics()
 		end,
 	})
 	y = y + 30
-end})
+end
+
+LIB.RegisterPanel('MY_Chat_ChatMosaics', _L['chat mosaics'], _L['Chat'], 'ui/Image/UICommon/yirong3.UITex|50', PS)
