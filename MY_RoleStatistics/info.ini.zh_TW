@@ -1,0 +1,8 @@
+[MY_RoleStatistics]
+name=角色統計
+desc=提供角色信息背包統計等功能
+default=1
+version=1.0
+dependence=MY_!Base
+lua_0=src\MY_RoleStatistics.lua
+package=MY

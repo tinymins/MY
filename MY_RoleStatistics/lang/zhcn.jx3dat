@@ -1,0 +1,14 @@
+-- language data (zhcn) updated at 2014-4-10 03:38:11
+return {
+    ['MY_RoleStatistics'] = '角色统计',
+    ['Open/Close MY_RoleStatistics'] = '打开/关闭角色统计',
+
+    ['%d pages'] = '共%d页',
+    ['%d results'] = '共%d个结果',
+    ['Character: %s\nServer: %s\nSnapshot Time: %s'] = '角色名：%s\n服务器：%s\n快照时间：%s',
+    ['Tong: %s\nServer: %s\nSnapshot Time: %s'] = '帮会名：%s\n服务器：%s\n快照时间：%s',
+
+    ['Bankx%d Bagx%d Totalx%d'] = '仓库x%d 背包x%d 总x%d',
+    ['%s (%s)\tBankx%d Bagx%d Totalx%d\n'] = '%s (%s)\t仓库x%d 背包x%d 总x%d\n',
+    ['Are you sure to delete item record of %s?'] = '确定要清空[%s]的背包物品记录吗？',
+}

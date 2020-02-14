@@ -36,9 +36,9 @@ local Call, XpCall, GetTraceback, RandomChild = LIB.Call, LIB.XpCall, LIB.GetTra
 local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
 local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
 -----------------------------------------------------------------------------------------------------------
-local PLUGIN_NAME = 'MY_BagEx'
+local PLUGIN_NAME = 'MY_RoleStatistics'
 local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
-local MODULE_NAME = 'MY_BagStatistics'
+local MODULE_NAME = 'MY_RoleStatistics'
 local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
 if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
@@ -48,11 +48,11 @@ end
 
 LIB.CreateDataRoot(PATH_TYPE.GLOBAL)
 
-local DB = LIB.ConnectDatabase(_L['MY_BagStatistics'], {'userdata/bagstatistics.db', PATH_TYPE.GLOBAL})
+local DB = LIB.ConnectDatabase(_L['MY_RoleStatistics'], {'userdata/bagstatistics.db', PATH_TYPE.GLOBAL})
 if not DB then
-	return LIB.Sysmsg(_L['MY_BagStatistics'], _L['Cannot connect to database!!!'], CONSTANT.MSG_THEME.ERROR)
+	return LIB.Sysmsg(_L['MY_RoleStatistics'], _L['Cannot connect to database!!!'], CONSTANT.MSG_THEME.ERROR)
 end
-local SZ_INI = PACKET_INFO.ROOT .. 'MY_BagEx/ui/MY_BagStatistics.ini'
+local SZ_INI = PACKET_INFO.ROOT .. 'MY_RoleStatistics/ui/MY_RoleStatistics.ini'
 local PAGE_DISPLAY = 15
 local NORMAL_MODE_PAGE_SIZE = 50
 local COMPACT_MODE_PAGE_SIZE = 117
@@ -72,11 +72,11 @@ DB:Execute('CREATE INDEX IF NOT EXISTS ItemInfo_name_idx ON ItemInfo(name)')
 DB:Execute('CREATE INDEX IF NOT EXISTS ItemInfo_desc_idx ON ItemInfo(desc)')
 local DB_ItemInfoW = DB:Prepare('REPLACE INTO ItemInfo (tabtype, tabindex, tabsubindex, name, desc) VALUES (?, ?, ?, ?, ?)')
 
-MY_BagStatistics = {}
-MY_BagStatistics.bCompactMode = false
-MY_BagStatistics.tUncheckedNames = {}
-RegisterCustomData('Global/MY_BagStatistics.bCompactMode')
-RegisterCustomData('Global/MY_BagStatistics.tUncheckedNames')
+MY_RoleStatistics = {}
+MY_RoleStatistics.bCompactMode = false
+MY_RoleStatistics.tUncheckedNames = {}
+RegisterCustomData('Global/MY_RoleStatistics.bCompactMode')
+RegisterCustomData('Global/MY_RoleStatistics.tUncheckedNames')
 
 local FlushDB
 do
@@ -131,11 +131,11 @@ local function UpdateTongRepertoryPage()
 		}
 	end
 end
-LIB.RegisterEvent('UPDATE_TONG_REPERTORY_PAGE.MY_BagStatistics', UpdateTongRepertoryPage)
+LIB.RegisterEvent('UPDATE_TONG_REPERTORY_PAGE.MY_RoleStatistics', UpdateTongRepertoryPage)
 
 function FlushDB()
 	--[[#DEBUG BEGIN]]
-	LIB.Debug('MY_BagStatistics', 'Flushing to database...', DEBUG_LEVEL.LOG)
+	LIB.Debug('MY_RoleStatistics', 'Flushing to database...', DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 	local me = GetClientPlayer()
 	local time = GetCurrentTime()
@@ -208,33 +208,33 @@ function FlushDB()
 
 	DB:Execute('END TRANSACTION')
 	--[[#DEBUG BEGIN]]
-	LIB.Debug('MY_BagStatistics', 'Flushing to database finished...', DEBUG_LEVEL.LOG)
+	LIB.Debug('MY_RoleStatistics', 'Flushing to database finished...', DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 end
-LIB.RegisterFlush('MY_BagStatistics', FlushDB)
+LIB.RegisterFlush('MY_RoleStatistics', FlushDB)
 end
 
-function MY_BagStatistics.Open()
-	Wnd.OpenWindow(SZ_INI, 'MY_BagStatistics')
+function MY_RoleStatistics.Open()
+	Wnd.OpenWindow(SZ_INI, 'MY_RoleStatistics')
 end
 
-function MY_BagStatistics.Close()
-	Wnd.CloseWindow('MY_BagStatistics')
+function MY_RoleStatistics.Close()
+	Wnd.CloseWindow('MY_RoleStatistics')
 end
 
-function MY_BagStatistics.IsOpened()
-	return Station.Lookup('Normal/MY_BagStatistics')
+function MY_RoleStatistics.IsOpened()
+	return Station.Lookup('Normal/MY_RoleStatistics')
 end
 
-function MY_BagStatistics.Toggle()
-	if MY_BagStatistics.IsOpened() then
-		MY_BagStatistics.Close()
+function MY_RoleStatistics.Toggle()
+	if MY_RoleStatistics.IsOpened() then
+		MY_RoleStatistics.Close()
 	else
-		MY_BagStatistics.Open()
+		MY_RoleStatistics.Open()
 	end
 end
 
-function MY_BagStatistics.UpdateNames(frame)
+function MY_RoleStatistics.UpdateNames(frame)
 	local searchname = frame:Lookup('Window_Main/Wnd_SearchName/Edit_SearchName'):GetText()
 	DB_OwnerInfoR:ClearBindings()
 	DB_OwnerInfoR:BindAll(AnsiToUTF8('%' .. searchname .. '%'), AnsiToUTF8('%' .. searchname .. '%'))
@@ -249,21 +249,21 @@ function MY_BagStatistics.UpdateNames(frame)
 		wnd.ownername  = UTF8ToAnsi(rec.ownername)
 		wnd.servername = UTF8ToAnsi(rec.servername)
 		wnd:Lookup('CheckBox_Name', 'Text_Name'):SetText(wnd.ownername .. ' (' .. wnd.servername .. ')')
-		wnd:Lookup('CheckBox_Name'):Check(not MY_BagStatistics.tUncheckedNames[wnd.ownerkey], WNDEVENT_FIRETYPE.PREVENT)
+		wnd:Lookup('CheckBox_Name'):Check(not MY_RoleStatistics.tUncheckedNames[wnd.ownerkey], WNDEVENT_FIRETYPE.PREVENT)
 	end
 	container:FormatAllContentPos()
 	frame.nCurrentPage = 1
-	MY_BagStatistics.UpdateItems(frame)
+	MY_RoleStatistics.UpdateItems(frame)
 end
 
-function MY_BagStatistics.UpdateItems(frame)
+function MY_RoleStatistics.UpdateItems(frame)
 	FlushDB()
 
 	local searchitem = frame:Lookup('Window_Main/Wnd_SearchItem/Edit_SearchItem'):GetText():gsub('%s+', '%%')
 	local sqlfrom = '(SELECT B.ownerkey, B.boxtype, B.boxindex, B.tabtype, B.tabindex, B.tabsubindex, B.bagcount, B.bankcount, B.time FROM BagItems AS B LEFT JOIN ItemInfo AS I ON B.tabtype = I.tabtype AND B.tabindex = I.tabindex WHERE B.tabtype != -1 AND B.tabindex != -1 AND (I.name LIKE ? OR I.desc LIKE ?)) AS C LEFT JOIN OwnerInfo AS O ON C.ownerkey = O.ownerkey WHERE '
 	local sql  = 'SELECT C.ownerkey AS ownerkey, C.boxtype AS boxtype, C.boxindex AS boxindex, C.tabtype AS tabtype, C.tabindex AS tabindex, C.tabsubindex AS tabsubindex, SUM(C.bagcount) AS bagcount, SUM(C.bankcount) AS bankcount, C.time AS time, O.ownername AS ownername, O.servername AS servername FROM' .. sqlfrom
 	local sqlc = 'SELECT COUNT(*) AS count FROM' .. sqlfrom
-	local nPageSize = MY_BagStatistics.bCompactMode and COMPACT_MODE_PAGE_SIZE or NORMAL_MODE_PAGE_SIZE
+	local nPageSize = MY_RoleStatistics.bCompactMode and COMPACT_MODE_PAGE_SIZE or NORMAL_MODE_PAGE_SIZE
 	local wheres = {}
 	local ownerkeys = {}
 	local container = frame:Lookup('Window_Main/WndScroll_Name/WndContainer_Name')
@@ -346,7 +346,7 @@ function MY_BagStatistics.UpdateItems(frame)
 	for _, rec in ipairs(result) do
 		local KItemInfo = GetItemInfo(rec.tabtype, rec.tabindex)
 		if KItemInfo then
-			if MY_BagStatistics.bCompactMode then
+			if MY_RoleStatistics.bCompactMode then
 				local count = 0
 				local hItem = handle:AppendItemFromIni(SZ_INI, 'Handle_ItemCompact')
 				local box = hItem:Lookup('Box_ItemCompact')
@@ -394,7 +394,7 @@ function MY_BagStatistics.UpdateItems(frame)
 			end
 		--[[#DEBUG BEGIN]]
 		else
-			LIB.Debug('MY_BagStatistics', 'KItemInfo not found: ' .. rec.tabtype .. ', ' .. rec.tabindex, DEBUG_LEVEL.WARNING)
+			LIB.Debug('MY_RoleStatistics', 'KItemInfo not found: ' .. rec.tabtype .. ', ' .. rec.tabindex, DEBUG_LEVEL.WARNING)
 		--[[#DEBUG END]]
 		end
 	end
@@ -402,49 +402,49 @@ function MY_BagStatistics.UpdateItems(frame)
 	scroll:SetScrollPos(0)
 end
 
-function MY_BagStatistics.OnFrameCreate()
+function MY_RoleStatistics.OnFrameCreate()
 	FlushDB()
 
-	MY_BagStatistics.UpdateNames(this)
+	MY_RoleStatistics.UpdateNames(this)
 	this:BringToTop()
 	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
-	this:Lookup('', 'Text_Title'):SetText(PACKET_INFO.NAME .. ' - ' .. _L['MY_BagStatistics'])
+	this:Lookup('', 'Text_Title'):SetText(PACKET_INFO.NAME .. ' - ' .. _L['MY_RoleStatistics'])
 	this:RegisterEvent('MY_BAGSTATISTICS_MODE_CHANGE')
 end
 
-function MY_BagStatistics.OnEvent(event)
+function MY_RoleStatistics.OnEvent(event)
 	if event == 'MY_BAGSTATISTICS_MODE_CHANGE' then
-		MY_BagStatistics.UpdateItems(this)
+		MY_RoleStatistics.UpdateItems(this)
 	end
 end
 
-function MY_BagStatistics.OnEditSpecialKeyDown()
+function MY_RoleStatistics.OnEditSpecialKeyDown()
 	local name = this:GetName()
 	local frame = this:GetRoot()
 	local szKey = GetKeyName(Station.GetMessageKey())
 	if szKey == 'Enter' then
 		if name == 'Edit_SearchName' then
-			MY_BagStatistics.UpdateNames(frame)
+			MY_RoleStatistics.UpdateNames(frame)
 		elseif name == 'WndEdit_Index' then
 			frame.nCurrentPage = tonumber(this:GetText()) or frame.nCurrentPage
 		end
-		MY_BagStatistics.UpdateItems(frame)
+		MY_RoleStatistics.UpdateItems(frame)
 		return 1
 	end
 end
 
-function MY_BagStatistics.OnCheckBoxCheck()
-	MY_BagStatistics.UpdateItems(this:GetRoot())
+function MY_RoleStatistics.OnCheckBoxCheck()
+	MY_RoleStatistics.UpdateItems(this:GetRoot())
 end
 
-function MY_BagStatistics.OnCheckBoxUncheck()
-	MY_BagStatistics.UpdateItems(this:GetRoot())
+function MY_RoleStatistics.OnCheckBoxUncheck()
+	MY_RoleStatistics.UpdateItems(this:GetRoot())
 end
 
-function MY_BagStatistics.OnLButtonClick()
+function MY_RoleStatistics.OnLButtonClick()
 	local name = this:GetName()
 	if name == 'Btn_Close' then
-		MY_BagStatistics.Close()
+		MY_RoleStatistics.Close()
 	elseif name == 'Btn_Only' then
 		local wnd = this:GetParent()
 		local parent = wnd:GetParent()
@@ -462,10 +462,10 @@ function MY_BagStatistics.OnLButtonClick()
 			DB_OwnerInfoD:ClearBindings()
 			DB_OwnerInfoD:BindAll(wnd.ownerkey)
 			DB_OwnerInfoD:Execute()
-			MY_BagStatistics.UpdateNames(wnd:GetRoot())
+			MY_RoleStatistics.UpdateNames(wnd:GetRoot())
 		end)
 	elseif name == 'Btn_SwitchMode' then
-		MY_BagStatistics.bCompactMode = not MY_BagStatistics.bCompactMode
+		MY_RoleStatistics.bCompactMode = not MY_RoleStatistics.bCompactMode
 		FireUIEvent('MY_BAGSTATISTICS_MODE_CHANGE')
 	elseif name == 'Btn_NameAll' then
 		local parent = this:GetParent():Lookup('WndContainer_Name')
@@ -473,32 +473,32 @@ function MY_BagStatistics.OnLButtonClick()
 			local wnd = parent:LookupContent(i)
 			wnd:Lookup('CheckBox_Name'):Check(true, WNDEVENT_FIRETYPE.PREVENT)
 		end
-		MY_BagStatistics.UpdateItems(this:GetRoot())
+		MY_RoleStatistics.UpdateItems(this:GetRoot())
 	end
 end
 
-function MY_BagStatistics.OnItemLButtonClick()
+function MY_RoleStatistics.OnItemLButtonClick()
 	local name = this:GetName()
 	if name == 'Handle_Index' then
 		this:GetRoot().nCurrentPage = this.nPage
-		MY_BagStatistics.UpdateItems(this:GetRoot())
+		MY_RoleStatistics.UpdateItems(this:GetRoot())
 	end
 end
 
-function MY_BagStatistics.OnItemMouseEnter()
+function MY_RoleStatistics.OnItemMouseEnter()
 	if this.tip then
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
 		OutputTip(this.tip, 400, {x, y, w, h, false}, nil, false)
 	end
 end
-MY_BagStatistics.OnItemRefreshTip = MY_BagStatistics.OnItemMouseEnter
+MY_RoleStatistics.OnItemRefreshTip = MY_RoleStatistics.OnItemMouseEnter
 
-function MY_BagStatistics.OnItemMouseLeave()
+function MY_RoleStatistics.OnItemMouseLeave()
 	HideTip()
 end
 
-function MY_BagStatistics.OnMouseEnter()
+function MY_RoleStatistics.OnMouseEnter()
 	local name = this:GetName()
 	if name == 'Wnd_Name' then
 		local x, y = this:GetAbsPos()
@@ -511,19 +511,19 @@ function MY_BagStatistics.OnMouseEnter()
 			this.servername,
 			LIB.FormatTime(this.time, '%yyyy-%MM-%dd %hh:%mm:%ss')), nil, 255, 255, 0), 400, {x, y, w, h, false}, nil, false)
 	elseif name == 'CheckBox_Name' then
-		LIB.ExecuteWithThis(this:GetParent(), MY_BagStatistics.OnMouseEnter)
+		LIB.ExecuteWithThis(this:GetParent(), MY_RoleStatistics.OnMouseEnter)
 	end
 end
 
--- function MY_BagStatistics.OnMouseLeave()
+-- function MY_RoleStatistics.OnMouseLeave()
 -- 	HideTip()
 -- end
 
 do
 local menu = {
-	szOption = _L['MY_BagStatistics'],
-	fnAction = function() MY_BagStatistics.Toggle() end,
+	szOption = _L['MY_RoleStatistics'],
+	fnAction = function() MY_RoleStatistics.Toggle() end,
 }
 LIB.RegisterAddonMenu('MY_BAGSTATISTICS_MENU', menu)
 end
-LIB.RegisterHotKey('MY_BagStatistics', _L['Open/Close MY_BagStatistics'], MY_BagStatistics.Toggle, nil)
+LIB.RegisterHotKey('MY_RoleStatistics', _L['Open/Close MY_RoleStatistics'], MY_RoleStatistics.Toggle, nil)

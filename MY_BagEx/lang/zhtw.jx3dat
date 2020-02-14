@@ -1,8 +1,5 @@
 -- language data (zhtw) updated at 2014-4-10 03:38:11
 return {
-    ['MY_BagStatistics'] = '物品搜索',
-    ['Open/Close MY_BagStatistics'] = '打開/關閉物品搜索',
-
     ['MY_BagSort'] = '背包整理',
     ['Guild box closed or page changed, sort exited!'] = '幫會倉庫已關閉或頁碼發生變化，停止整理！',
     ['Cannot find item temp position, guild bag is full, sort exited!'] = '無法獲取臨時位置，倉庫可能已滿，停止整理！',
@@ -18,13 +15,4 @@ return {
     ['Time Limited'] = '限時',
     ['package searcher'] = '倉庫背包搜索',
     ['compare with bag'] = '對比背包',
-
-    ['%d pages'] = '共%d頁',
-    ['%d results'] = '共%d個結果',
-    ['Character: %s\nServer: %s\nSnapshot Time: %s'] = '角色名：%s\n伺服器：%s\n快照時間：%s',
-    ['Tong: %s\nServer: %s\nSnapshot Time: %s'] = '幫會名：%s\n伺服器：%s\n快照時間：%s',
-
-    ['Bankx%d Bagx%d Totalx%d'] = '倉庫x%d 背包x%d 總x%d',
-    ['%s (%s)\tBankx%d Bagx%d Totalx%d\n'] = '%s (%s)\t倉庫x%d 背包x%d 總x%d\n',
-    ['Are you sure to delete item record of %s?'] = '確定要清空[%s]的背包物品記錄嗎？',
 }
