@@ -468,7 +468,8 @@ function CheckInvalidRect(dwType, dwID, me, object)
 			nPriority = nPriority + 10000
 		end
 		szName = LIB.GetObjectName(object, (Config.bShowObjectID and (Config.bShowObjectIDOnlyUnnamed and 'auto' or 'always') or 'never'))
-		if dwType == TARGET.PLAYER and MY_ChatMosaics and MY_ChatMosaics.MosaicsString then
+		if MY_ChatMosaics and MY_ChatMosaics.MosaicsString
+		and (dwType == TARGET.PLAYER or (dwType == TARGET.NPC and object.dwEmployer ~= 0 and IsPlayer(object.dwEmployer))) then
 			szName = MY_ChatMosaics.MosaicsString(szName)
 		end
 		-- ≥£πÊ≈‰…´
