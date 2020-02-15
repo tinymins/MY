@@ -23,7 +23,7 @@ return {
     ['Force'                ] = '门派',
     ['Level'                ] = '等级',
     ['Equip score'          ] = '装分',
-    ['Pet score'            ] = '宠物分',
+    ['Pet score'            ] = '宠物',
     ['Money'                ] = '金钱',
     ['Contribution'         ] = '江贡',
     ['Contribution_remain'  ] = '江贡周',
