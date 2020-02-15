@@ -72,38 +72,37 @@ local COLUMN_LIST = {
 		end
 		return GetFormatText(name)
 	end },
-	{ id = 'force',                 szTitle = _L['Force'                ], nWidth = 100, GetFormatText = function(rec)
+	{ id = 'force',                 szTitle = _L['Force'                ], nWidth =  50, GetFormatText = function(rec)
 		return GetFormatText(g_tStrings.tForceTitle[rec.force])
 	end },
-	{ id = 'level',                 szTitle = _L['Level'                ], nWidth = 100, szKey = 'level'                 },
-	{ id = 'equip_score',           szTitle = _L['Equip score'          ], nWidth = 100, szKey = 'equip_score'           },
-	{ id = 'pet_score',             szTitle = _L['Pet score'            ], nWidth = 100, szKey = 'pet_score'             },
+	{ id = 'level',                 szTitle = _L['Level'                ], nWidth =  50, szKey = 'level'                 },
+	{ id = 'equip_score',           szTitle = _L['Equip score'          ], nWidth =  60, szKey = 'equip_score'           },
+	{ id = 'pet_score',             szTitle = _L['Pet score'            ], nWidth =  55, szKey = 'pet_score'             },
 	{ id = 'money',                 szTitle = _L['Money'                ], nWidth = 200, GetFormatText = function(rec)
 		return GetMoneyText({ nGold = rec.gold, nSilver = rec.silver, nCopper = rec.copper }, 105)
 	end },
-	{ id = 'contribution',          szTitle = _L['Contribution'         ], nWidth = 100, szKey = 'contribution'          },
-	{ id = 'contribution_remain',   szTitle = _L['Contribution_remain'  ], nWidth = 100, szKey = 'contribution_remain'   },
-	{ id = 'justice',               szTitle = _L['Justice'              ], nWidth = 100, szKey = 'justice'               },
-	{ id = 'justice_remain',        szTitle = _L['Justice remain'       ], nWidth = 100, szKey = 'justice_remain'        },
-	{ id = 'prestige',              szTitle = _L['Prestige'             ], nWidth = 100, szKey = 'prestige'              },
-	{ id = 'prestige_remain',       szTitle = _L['Prestige remain'      ], nWidth = 100, szKey = 'prestige_remain'       },
-	{ id = 'camp_point',            szTitle = _L['Camp point'           ], nWidth = 100, szKey = 'camp_point'            },
-	{ id = 'camp_point_percentage', szTitle = _L['Camp point percentage'], nWidth = 100, GetFormatText = function(rec)
-		return GetFormatText(rec.camp_point_percentage .. '%')
+	{ id = 'contribution',          szTitle = _L['Contribution'         ], nWidth =  70, szKey = 'contribution'          },
+	{ id = 'contribution_remain',   szTitle = _L['Contribution_remain'  ], nWidth =  70, szKey = 'contribution_remain'   },
+	{ id = 'justice',               szTitle = _L['Justice'              ], nWidth =  60, szKey = 'justice'               },
+	{ id = 'justice_remain',        szTitle = _L['Justice remain'       ], nWidth =  60, szKey = 'justice_remain'        },
+	{ id = 'prestige',              szTitle = _L['Prestige'             ], nWidth =  70, szKey = 'prestige'              },
+	{ id = 'prestige_remain',       szTitle = _L['Prestige remain'      ], nWidth =  70, szKey = 'prestige_remain'       },
+	{ id = 'camp_point',            szTitle = _L['Camp point'           ], nWidth =  70, szKey = 'camp_point'            },
+	{ id = 'camp_level',            szTitle = _L['Camp level'           ], nWidth =  70, GetFormatText = function(rec)
+		return GetFormatText(rec.camp_level .. ' + ' .. rec.camp_point_percentage .. '%')
 	end },
-	{ id = 'camp_level',            szTitle = _L['Camp level'           ], nWidth = 100, szKey = 'camp_level'            },
-	{ id = 'arena_award',           szTitle = _L['Arena award'          ], nWidth = 100, szKey = 'arena_award'           },
-	{ id = 'arena_award_remain',    szTitle = _L['Arena award remain'   ], nWidth = 100, szKey = 'arena_award_remain'    },
-	{ id = 'exam_print',            szTitle = _L['Exam print'           ], nWidth = 100, szKey = 'exam_print'            },
-	{ id = 'exam_print_remain',     szTitle = _L['Exam print remain'    ], nWidth = 100, szKey = 'exam_print_remain'     },
-	{ id = 'achievement_score',     szTitle = _L['Achievement score'    ], nWidth = 100, szKey = 'achievement_score'     },
-	{ id = 'coin',                  szTitle = _L['Coin'                 ], nWidth = 100, szKey = 'coin'                  },
-	{ id = 'mentor_score',          szTitle = _L['Mentor score'         ], nWidth = 100, szKey = 'mentor_score'          },
-	{ id = 'time',                  szTitle = _L['Cache time'           ], nWidth = 120, GetFormatText = function(rec)
+	{ id = 'arena_award',           szTitle = _L['Arena award'          ], nWidth =  60, szKey = 'arena_award'           },
+	{ id = 'arena_award_remain',    szTitle = _L['Arena award remain'   ], nWidth =  60, szKey = 'arena_award_remain'    },
+	{ id = 'exam_print',            szTitle = _L['Exam print'           ], nWidth =  55, szKey = 'exam_print'            },
+	{ id = 'exam_print_remain',     szTitle = _L['Exam print remain'    ], nWidth =  55, szKey = 'exam_print_remain'     },
+	{ id = 'achievement_score',     szTitle = _L['Achievement score'    ], nWidth =  70, szKey = 'achievement_score'     },
+	{ id = 'coin',                  szTitle = _L['Coin'                 ], nWidth =  70, szKey = 'coin'                  },
+	{ id = 'mentor_score',          szTitle = _L['Mentor score'         ], nWidth =  70, szKey = 'mentor_score'          },
+	{ id = 'time',                  szTitle = _L['Cache time'           ], nWidth = 165, GetFormatText = function(rec)
 		return GetFormatText(LIB.FormatTime(rec.time, '%yyyy/%MM/%dd %hh:%mm:%ss'))
 	end },
-	{ id = 'time_days',             szTitle = _L['Cache time days'      ], nWidth = 100, GetFormatText = function(rec)
-		return GetFormatText(_L('%s before', LIB.FormatTimeCounter(GetCurrentTime() - rec.time)))
+	{ id = 'time_days',             szTitle = _L['Cache time days'      ], nWidth = 120, GetFormatText = function(rec)
+		return GetFormatText(_L('%s before', LIB.FormatTimeCounter(GetCurrentTime() - rec.time, 2, 2)))
 	end },
 }
 local COLUMN_DICT = {}
@@ -116,7 +115,7 @@ local D = {}
 local O = {
 	aColumn = { 'name', 'money', 'time_days' },
 }
-RegisterCustomData('MY_RoleStatistics_RoleStat.aColumn')
+RegisterCustomData('Global/MY_RoleStatistics_RoleStat.aColumn')
 
 local function FlushDB()
 	--[[#DEBUG BEGIN]]
