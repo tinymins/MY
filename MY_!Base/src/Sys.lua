@@ -2116,6 +2116,7 @@ local PRESETS = {
 		'OnItemRButtonClick',
 		'OnItemMouseEnter',
 		'OnItemMouseLeave',
+		'OnItemRefreshTip',
 		'OnItemMouseWheel',
 		'OnItemLButtonDrag',
 		'OnItemLButtonDragEnd',
