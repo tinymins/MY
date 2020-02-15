@@ -342,6 +342,18 @@ function D.OnLButtonClick()
 	end
 end
 
+function D.OnEditSpecialKeyDown()
+	local name = this:GetName()
+	local szKey = GetKeyName(Station.GetMessageKey())
+	if szKey == 'Enter' then
+		if name == 'Edit_Search' then
+			local page = this:GetParent():GetParent():GetParent()
+			D.UpdateUI(page)
+		end
+		return 1
+	end
+end
+
 function D.OnItemMouseEnter()
 	if this.tip then
 		local x, y = this:GetAbsPos()
