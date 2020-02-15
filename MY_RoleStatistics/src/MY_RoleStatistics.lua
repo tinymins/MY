@@ -233,11 +233,11 @@ for _, szEvent in ipairs({
 		if page and page ~= this then
 			local m = O.aModule[page.nIndex]
 			if m and m.env[szEvent] then
-				m.env[szEvent](...)
+				return m.env[szEvent](...)
 			end
 		else
 			if Framework[szEvent] then
-				Framework[szEvent](...)
+				return Framework[szEvent](...)
 			end
 		end
 	end
