@@ -44,5 +44,11 @@ return {
     ['Cache time'           ] = '快照时间',
     ['Cache time days'      ] = '快照计时',
 
+    ['Columns'] = '显示列',
+    ['Move up'] = '上移',
+    ['Move down'] = '下移',
+    ['Delete'] = '删除',
+    ['Too many column selected, width overflow, please delete some!'] = '选择列过多已超出宽度限制，请先删除一些列！',
+
     ['%s before'] = '%s前',
 }

@@ -112,6 +112,7 @@ local D = {}
 local O = {
 	aColumn = { 'name', 'money', 'time_days' },
 }
+RegisterCustomData('MY_RoleStatistics_RoleStat.aColumn')
 
 local function FlushDB()
 	--[[#DEBUG BEGIN]]
@@ -241,16 +242,80 @@ function D.UpdateUI(page)
 end
 
 function D.OnInitPage()
+	local page = this
 	local frameTemp = Wnd.OpenWindow(SZ_INI, 'MY_RoleStatistics_RoleStat')
 	local wnd = frameTemp:Lookup('Wnd_Total')
-	wnd:ChangeRelation(this, true, true)
+	wnd:ChangeRelation(page, true, true)
 	Wnd.CloseWindow(frameTemp)
+
+	UI(wnd):Append('WndComboBox', {
+		x = 800, y = 20, w = 180,
+		text = _L['Columns'],
+		menu = function()
+			local t, c, nW = {}, {}, 0
+			for i, id in ipairs(O.aColumn) do
+				local col = COLUMN_DICT[id]
+				if col then
+					insert(t, {
+						szOption = col.szTitle,
+						{
+							szOption = _L['Move up'],
+							fnAction = function()
+								if i > 1 then
+									O.aColumn[i], O.aColumn[i - 1] = O.aColumn[i - 1], O.aColumn[i]
+									D.UpdateUI(page)
+								end
+								Wnd.CloseWindow('PopupMenuPanel')
+							end,
+						},
+						{
+							szOption = _L['Move down'],
+							fnAction = function()
+								if i < #O.aColumn then
+									O.aColumn[i], O.aColumn[i + 1] = O.aColumn[i + 1], O.aColumn[i]
+									D.UpdateUI(page)
+								end
+								Wnd.CloseWindow('PopupMenuPanel')
+							end,
+						},
+						{
+							szOption = _L['Delete'],
+							fnAction = function()
+								remove(O.aColumn, i)
+								D.UpdateUI(page)
+								Wnd.CloseWindow('PopupMenuPanel')
+							end,
+						},
+					})
+					c[id] = true
+					nW = nW + col.nWidth
+				end
+			end
+			for _, col in ipairs(COLUMN_LIST) do
+				if not c[col.id] then
+					insert(t, {
+						szOption = col.szTitle,
+						fnAction = function()
+							if nW + col.nWidth > EXCEL_WIDTH then
+								LIB.Alert(_L['Too many column selected, width overflow, please delete some!'])
+							else
+								insert(O.aColumn, col.id)
+							end
+							D.UpdateUI(page)
+							Wnd.CloseWindow('PopupMenuPanel')
+						end,
+					})
+				end
+			end
+			return t
+		end,
+	})
 
 	FlushDB()
 
-	D.UpdateUI(this)
+	D.UpdateUI(page)
 
-	local frame = this:GetRoot()
+	local frame = page:GetRoot()
 	frame:RegisterEvent('ON_MY_MOSAICS_RESET')
 end
 
@@ -303,4 +368,27 @@ local settings = {
 	},
 }
 MY_RoleStatistics.RegisterModule('RoleStat', _L['MY_RoleStatistics_RoleStat'], LIB.GeneGlobalNS(settings))
+end
+
+-- Global exports
+do
+local settings = {
+	exports = {
+		{
+			fields = {
+				aColumn = true,
+			},
+			root = O,
+		},
+	},
+	imports = {
+		{
+			fields = {
+				aColumn = true,
+			},
+			root = O,
+		},
+	},
+}
+MY_RoleStatistics_RoleStat = LIB.GeneGlobalNS(settings)
 end
