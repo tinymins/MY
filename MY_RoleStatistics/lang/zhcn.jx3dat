@@ -4,7 +4,6 @@ return {
     ['Open/Close MY_RoleStatistics'] = '打开/关闭角色统计',
 
     ['MY_RoleStatistics_BagStat'] = '背包统计',
-    ['Bag statistics'] = '背包统计',
 
     ['%d pages'] = '共%d页',
     ['%d results'] = '共%d个结果',

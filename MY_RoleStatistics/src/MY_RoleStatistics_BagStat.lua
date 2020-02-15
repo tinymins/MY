@@ -543,9 +543,8 @@ local settings = {
 		},
 	},
 }
-MY_RoleStatistics.RegisterModule('BagStat', _L['Bag statistics'], LIB.GeneGlobalNS(settings))
+MY_RoleStatistics.RegisterModule('BagStat', _L['MY_RoleStatistics_BagStat'], LIB.GeneGlobalNS(settings))
 end
-
 
 -- Global exports
 do
