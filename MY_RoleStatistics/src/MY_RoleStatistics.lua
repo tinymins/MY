@@ -170,7 +170,7 @@ for _, szEvent in ipairs({
 		end
 		local page = this:Lookup('PageSet_All'):GetFirstChild()
 		while page do
-			if page:GetName() == 'Page_Default' then
+			if page:GetName() == 'Page_Default' and page.bInit then
 				local m = O.aModule[page.nIndex]
 				if m and m.env[szEvent] then
 					local _this = this
