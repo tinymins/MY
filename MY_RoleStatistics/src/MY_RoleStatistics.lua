@@ -117,7 +117,7 @@ function D.InitPageSet(frame)
 	end
 	if pageAct then
 		local _this = this
-		this = pageAct
+		this = pageset
 		Framework.OnActivePage()
 		this = _this
 	end
@@ -132,12 +132,17 @@ end
 
 function Framework.OnActivePage()
 	local name = this:GetName()
-	if name == 'Page_Default' then
-		if not this.bInit then
-			local m = O.aModule[this.nIndex]
+	if name == 'PageSet_All' then
+		local page = this:GetActivePage()
+		if page.nIndex and not page.bInit then
+			local m = O.aModule[page.nIndex]
 			if m and m.env.OnInitPage then
+				local _this = this
+				this = page
 				m.env.OnInitPage()
+				this = _this
 			end
+			page.bInit = true
 		end
 	end
 end
