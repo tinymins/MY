@@ -72,7 +72,9 @@ local COLUMN_LIST = {
 		end
 		return GetFormatText(name)
 	end },
-	{ id = 'force',                 szTitle = _L['Force'                ], nWidth = 100, szKey = 'force'                 },
+	{ id = 'force',                 szTitle = _L['Force'                ], nWidth = 100, GetFormatText = function(rec)
+		return GetFormatText(g_tStrings.tForceTitle[rec.force])
+	end },
 	{ id = 'level',                 szTitle = _L['Level'                ], nWidth = 100, szKey = 'level'                 },
 	{ id = 'equip_score',           szTitle = _L['Equip score'          ], nWidth = 100, szKey = 'equip_score'           },
 	{ id = 'pet_score',             szTitle = _L['Pet score'            ], nWidth = 100, szKey = 'pet_score'             },
@@ -86,7 +88,9 @@ local COLUMN_LIST = {
 	{ id = 'prestige',              szTitle = _L['Prestige'             ], nWidth = 100, szKey = 'prestige'              },
 	{ id = 'prestige_remain',       szTitle = _L['Prestige remain'      ], nWidth = 100, szKey = 'prestige_remain'       },
 	{ id = 'camp_point',            szTitle = _L['Camp point'           ], nWidth = 100, szKey = 'camp_point'            },
-	{ id = 'camp_point_percentage', szTitle = _L['Camp point percentage'], nWidth = 100, szKey = 'camp_point_percentage' },
+	{ id = 'camp_point_percentage', szTitle = _L['Camp point percentage'], nWidth = 100, GetFormatText = function(rec)
+		return GetFormatText(rec.camp_point_percentage .. '%')
+	end },
 	{ id = 'camp_level',            szTitle = _L['Camp level'           ], nWidth = 100, szKey = 'camp_level'            },
 	{ id = 'arena_award',           szTitle = _L['Arena award'          ], nWidth = 100, szKey = 'arena_award'           },
 	{ id = 'arena_award_remain',    szTitle = _L['Arena award remain'   ], nWidth = 100, szKey = 'arena_award_remain'    },
