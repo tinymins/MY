@@ -1406,12 +1406,16 @@ end
 -- 格式化计时时间
 -- (string) LIB.FormatTimeCounter(nTime, szFormat, nStyle)
 -- szFormat  格式化字符串 可选项：
+--   %Y 总年数
+--   %D 总天数
 --   %H 总小时
 --   %M 总分钟
 --   %S 总秒数
+--   %d 天数
 --   %h 小时数
 --   %m 分钟数
 --   %s 秒钟数
+--   %dd 天数两位对齐
 --   %hh 小时数两位对齐
 --   %mm 分钟数两位对齐
 --   %ss 秒钟数两位对齐
@@ -1419,16 +1423,24 @@ function LIB.FormatTimeCounter(nTime, szFormat, nStyle)
 	local nSeconds = floor(nTime)
 	local nMinutes = floor(nSeconds / 60)
 	local nHours   = floor(nMinutes / 60)
+	local nDays    = floor(nHours / 24)
+	local nYears   = floor(nDays / 365)
+	local nDay     = nDays % 365
+	local nHour    = nHours % 24
 	local nMinute  = nMinutes % 60
 	local nSecond  = nSeconds % 60
 	if IsString(szFormat) then
+		szFormat = wgsub(szFormat, '%Y', nYears)
+		szFormat = wgsub(szFormat, '%D', nDays)
 		szFormat = wgsub(szFormat, '%H', nHours)
 		szFormat = wgsub(szFormat, '%M', nMinutes)
 		szFormat = wgsub(szFormat, '%S', nSeconds)
-		szFormat = wgsub(szFormat, '%hh', format('%02d', nHours ))
+		szFormat = wgsub(szFormat, '%dd', format('%02d', nDay   ))
+		szFormat = wgsub(szFormat, '%hh', format('%02d', nHour  ))
 		szFormat = wgsub(szFormat, '%mm', format('%02d', nMinute))
 		szFormat = wgsub(szFormat, '%ss', format('%02d', nSecond))
-		szFormat = wgsub(szFormat, '%h', nHours)
+		szFormat = wgsub(szFormat, '%d', nDay)
+		szFormat = wgsub(szFormat, '%h', nHour)
 		szFormat = wgsub(szFormat, '%m', nMinute)
 		szFormat = wgsub(szFormat, '%s', nSecond)
 		return szFormat
@@ -1440,9 +1452,15 @@ function LIB.FormatTimeCounter(nTime, szFormat, nStyle)
 		return nSeconds .. '"'
 	end
 	if szFormat == 2 or not szFormat then -- H:mm:ss / M:ss / s
-		local h, m, s = 'h', 'm', 's'
+		local y, d, h, m, s = 'y', 'd', 'h', 'm', 's'
 		if nStyle == 2 then
-			h, m, s = g_tStrings.STR_TIME_HOUR, g_tStrings.STR_TIME_MINUTE, g_tStrings.STR_TIME_SECOND
+			y, d, h, m, s = g_tStrings.STR_YEAR, g_tStrings.STR_BUFF_H_TIME_D_SHORT, g_tStrings.STR_TIME_HOUR, g_tStrings.STR_TIME_MINUTE, g_tStrings.STR_TIME_SECOND
+		end
+		if nYears > 0 then
+			return nYears .. y .. format('%02d', nDay) .. d .. format('%02d', nHour) .. h .. format('%02d', nMinute)  .. m .. format('%02d', nSecond) .. s
+		end
+		if nDays > 0 then
+			return nDays .. d .. format('%02d', nHour) .. h .. format('%02d', nMinute)  .. m .. format('%02d', nSecond) .. s
 		end
 		if nHours > 0 then
 			return nHours .. h .. format('%02d', nMinute)  .. m .. format('%02d', nSecond) .. s
