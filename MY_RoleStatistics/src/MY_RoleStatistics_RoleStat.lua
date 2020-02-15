@@ -113,7 +113,19 @@ local EXCEL_WIDTH = 960
 
 local D = {}
 local O = {
-	aColumn = { 'name', 'money', 'time_days' },
+	aColumn = {
+        'name',
+        'force',
+        'level',
+        'achievement_score',
+        'pet_score',
+        'justice',
+        'justice_remain',
+        'exam_print',
+        'coin',
+        'money',
+        'time_days',
+    },
 }
 RegisterCustomData('Global/MY_RoleStatistics_RoleStat.aColumn')
 
