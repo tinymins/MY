@@ -1,7 +1,7 @@
 --------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
--- @desc     : 背包统计
+-- @desc     : 角色统计框架
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
@@ -46,492 +46,225 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
 end
 --------------------------------------------------------------------------
 
-LIB.CreateDataRoot(PATH_TYPE.GLOBAL)
+local D = {}
+local O = {
+	aModule = {},
+}
+local Framework = {}
+local SZ_INI = PLUGIN_ROOT .. '/ui/MY_RoleStatistics.ini'
+local SZ_MOD_INI = PLUGIN_ROOT .. '/ui/MY_RoleStatistics.Mod.ini'
 
-local DB = LIB.ConnectDatabase(_L['MY_RoleStatistics'], {'userdata/bagstatistics.db', PATH_TYPE.GLOBAL})
-if not DB then
-	return LIB.Sysmsg(_L['MY_RoleStatistics'], _L['Cannot connect to database!!!'], CONSTANT.MSG_THEME.ERROR)
-end
-local SZ_INI = PACKET_INFO.ROOT .. 'MY_RoleStatistics/ui/MY_RoleStatistics.ini'
-local PAGE_DISPLAY = 15
-local NORMAL_MODE_PAGE_SIZE = 50
-local COMPACT_MODE_PAGE_SIZE = 150
-DB:Execute('CREATE TABLE IF NOT EXISTS BagItems (ownerkey NVARCHAR(20), boxtype INTEGER, boxindex INTEGER, tabtype INTEGER, tabindex INTEGER, tabsubindex INTEGER, bagcount INTEGER, bankcount INTEGER, time INTEGER, PRIMARY KEY(ownerkey, boxtype, boxindex))')
-DB:Execute('CREATE INDEX IF NOT EXISTS BagItems_tab_idx ON BagItems(tabtype, tabindex, tabsubindex)')
-local DB_ItemsW = DB:Prepare('REPLACE INTO BagItems (ownerkey, boxtype, boxindex, tabtype, tabindex, tabsubindex, bagcount, bankcount, time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
-local DB_ItemsDL = DB:Prepare('DELETE FROM BagItems WHERE ownerkey = ? AND boxtype = ? AND boxindex >= ?')
-local DB_ItemsDA = DB:Prepare('DELETE FROM BagItems WHERE ownerkey = ?')
-DB:Execute('CREATE TABLE IF NOT EXISTS OwnerInfo (ownerkey NVARCHAR(20), ownername NVARCHAR(20), servername NVARCHAR(20), time INTEGER, PRIMARY KEY(ownerkey))')
-DB:Execute('CREATE INDEX IF NOT EXISTS OwnerInfo_ownername_idx ON OwnerInfo(ownername)')
-DB:Execute('CREATE INDEX IF NOT EXISTS OwnerInfo_servername_idx ON OwnerInfo(servername)')
-local DB_OwnerInfoW = DB:Prepare('REPLACE INTO OwnerInfo (ownerkey, ownername, servername, time) VALUES (?, ?, ?, ?)')
-local DB_OwnerInfoR = DB:Prepare('SELECT * FROM OwnerInfo WHERE ownername LIKE ? OR servername LIKE ? ORDER BY time DESC')
-local DB_OwnerInfoD = DB:Prepare('DELETE FROM OwnerInfo WHERE ownerkey = ?')
-DB:Execute('CREATE TABLE IF NOT EXISTS ItemInfo (tabtype INTEGER, tabindex INTEGER, tabsubindex INTEGER, name NVARCHAR(20), desc NVARCHAR(800), PRIMARY KEY(tabtype, tabindex, tabsubindex))')
-DB:Execute('CREATE INDEX IF NOT EXISTS ItemInfo_name_idx ON ItemInfo(name)')
-DB:Execute('CREATE INDEX IF NOT EXISTS ItemInfo_desc_idx ON ItemInfo(desc)')
-local DB_ItemInfoW = DB:Prepare('REPLACE INTO ItemInfo (tabtype, tabindex, tabsubindex, name, desc) VALUES (?, ?, ?, ?, ?)')
-
-MY_RoleStatistics = {}
-MY_RoleStatistics.bCompactMode = false
-MY_RoleStatistics.tUncheckedNames = {}
-RegisterCustomData('Global/MY_RoleStatistics.bCompactMode')
-RegisterCustomData('Global/MY_RoleStatistics.tUncheckedNames')
-
-local FlushDB
-do
-local GetItemText
-do
-local l_tItemText = {}
-function GetItemText(KItem)
-	if KItem then
-		if GetItemTip then
-			local nBookID = KItem.nGenre == ITEM_GENRE.BOOK and KItem.nBookID or -1
-			local szKey = KItem.dwTabType .. ',' .. KItem.dwIndex .. ',' .. nBookID
-			if not l_tItemText[szKey] then
-				l_tItemText[szKey] = ''
-				l_tItemText[szKey] = LIB.Xml.GetPureText(GetItemTip(KItem))
-			end
-			return l_tItemText[szKey]
-		else
-			return KItem.szName
-		end
-	else
-		return ''
-	end
-end
-end
-
-local l_guildcache = {}
-local function UpdateTongRepertoryPage()
-	local nPage = arg0
-	local me = GetClientPlayer()
-	for nIndex = 1, LIB.GetGuildBankBagSize(nPage) do
-		local dwType, dwX = LIB.GetGuildBankBagPos(nPage, nIndex)
-		local tabtype, tabindex, tabsubindex, name, desc, count = -1, -1, -1, '', '', 0
-		local KItem = GetPlayerItem(me, dwType, dwX)
-		if KItem then
-			tabtype = KItem.dwTabType
-			tabindex = KItem.dwIndex
-			name = KItem.szName
-			desc = GetItemText(KItem)
-			tabsubindex = KItem.nGenre == ITEM_GENRE.BOOK and KItem.nBookID or -1
-			count = KItem.bCanStack and KItem.nStackNum or 1
-		end
-		l_guildcache[dwX] = {
-			boxtype = dwType,
-			boxindex = dwX,
-			tabtype = tabtype,
-			tabindex = tabindex,
-			tabsubindex = tabsubindex,
-			name = name,
-			desc = desc,
-			count = count,
-			time = GetCurrentTime(),
-		}
-	end
-end
-LIB.RegisterEvent('UPDATE_TONG_REPERTORY_PAGE.MY_RoleStatistics', UpdateTongRepertoryPage)
-
-function FlushDB()
-	--[[#DEBUG BEGIN]]
-	LIB.Debug('MY_RoleStatistics', 'Flushing to database...', DEBUG_LEVEL.LOG)
-	--[[#DEBUG END]]
-	local me = GetClientPlayer()
-	local time = GetCurrentTime()
-	local ownerkey = AnsiToUTF8(me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName)
-	local ownername = AnsiToUTF8(me.szName)
-	local servername = AnsiToUTF8(LIB.GetRealServer(2))
-	DB:Execute('BEGIN TRANSACTION')
-
-	-- 背包
-	for boxtype = INVENTORY_INDEX.PACKAGE, INVENTORY_INDEX.PACKAGE + 6 - 1 do
-		local count = me.GetBoxSize(boxtype)
-		for boxindex = 0, count - 1 do
-			local KItem = GetPlayerItem(me, boxtype, boxindex)
-			DB_ItemsW:ClearBindings()
-			if KItem then
-				DB_ItemInfoW:ClearBindings()
-				DB_ItemInfoW:BindAll(KItem.dwTabType, KItem.dwIndex, KItem.nGenre == ITEM_GENRE.BOOK and KItem.nBookID or -1, AnsiToUTF8(KItem.szName), AnsiToUTF8(GetItemText(KItem)))
-				DB_ItemInfoW:Execute()
-				DB_ItemsW:BindAll(ownerkey, boxtype, boxindex, KItem.dwTabType, KItem.dwIndex, KItem.nGenre == ITEM_GENRE.BOOK and KItem.nBookID or -1, KItem.bCanStack and KItem.nStackNum or 1, 0, time)
-			else
-				DB_ItemsW:BindAll(ownerkey, boxtype, boxindex, -1, -1, -1, 0, 0, time)
-			end
-			DB_ItemsW:Execute()
-		end
-		DB_ItemsDL:ClearBindings()
-		DB_ItemsDL:BindAll(ownerkey, boxtype, count)
-		DB_ItemsDL:Execute()
-	end
-	DB_OwnerInfoW:ClearBindings()
-	DB_OwnerInfoW:BindAll(ownerkey, ownername, servername, time)
-	DB_OwnerInfoW:Execute()
-
-	-- 仓库
-	for boxtype = INVENTORY_INDEX.BANK, INVENTORY_INDEX.BANK + me.GetBankPackageCount() - 1 do
-		local count = me.GetBoxSize(boxtype)
-		for boxindex = 0, count - 1 do
-			local KItem = GetPlayerItem(me, boxtype, boxindex)
-			DB_ItemsW:ClearBindings()
-			if KItem then
-				DB_ItemInfoW:ClearBindings()
-				DB_ItemInfoW:BindAll(KItem.dwTabType, KItem.dwIndex, KItem.nGenre == ITEM_GENRE.BOOK and KItem.nBookID or -1, AnsiToUTF8(KItem.szName), AnsiToUTF8(GetItemText(KItem)))
-				DB_ItemInfoW:Execute()
-				DB_ItemsW:BindAll(ownerkey, boxtype, boxindex, KItem.dwTabType, KItem.dwIndex, KItem.nGenre == ITEM_GENRE.BOOK and KItem.nBookID or -1, 0, KItem.bCanStack and KItem.nStackNum or 1, time)
-			else
-				DB_ItemsW:BindAll(ownerkey, boxtype, boxindex, -1, -1, -1, 0, 0, time)
-			end
-			DB_ItemsW:Execute()
-		end
-		DB_ItemsDL:ClearBindings()
-		DB_ItemsDL:BindAll(ownerkey, boxtype, count)
-		DB_ItemsDL:Execute()
-	end
-
-	-- 帮会仓库
-	if not IsEmpty(l_guildcache) then
-		local ownerkey = 'tong' .. me.dwTongID
-		local ownername = AnsiToUTF8('[' .. LIB.GetTongName(me.dwTongID) .. ']')
-		for _, info in pairs(l_guildcache) do
-			DB_ItemInfoW:ClearBindings()
-			DB_ItemInfoW:BindAll(info.tabtype, info.tabindex, info.tabsubindex, AnsiToUTF8(info.name), AnsiToUTF8(info.desc))
-			DB_ItemInfoW:Execute()
-			DB_ItemsW:ClearBindings()
-			DB_ItemsW:BindAll(ownerkey, info.boxtype, info.boxindex, info.tabtype, info.tabindex, info.tabsubindex, 0, info.count, time)
-			DB_ItemsW:Execute()
-		end
-		DB_OwnerInfoW:ClearBindings()
-		DB_OwnerInfoW:BindAll(ownerkey, ownername, servername, time)
-		DB_OwnerInfoW:Execute()
-	end
-
-	DB:Execute('END TRANSACTION')
-	--[[#DEBUG BEGIN]]
-	LIB.Debug('MY_RoleStatistics', 'Flushing to database finished...', DEBUG_LEVEL.LOG)
-	--[[#DEBUG END]]
-end
-LIB.RegisterFlush('MY_RoleStatistics', FlushDB)
-end
-
-function MY_RoleStatistics.Open()
+function D.Open()
 	Wnd.OpenWindow(SZ_INI, 'MY_RoleStatistics')
 end
 
-function MY_RoleStatistics.Close()
+function D.Close()
 	Wnd.CloseWindow('MY_RoleStatistics')
 end
 
-function MY_RoleStatistics.IsOpened()
+function D.IsOpened()
 	return Station.Lookup('Normal/MY_RoleStatistics')
 end
 
-function MY_RoleStatistics.Toggle()
-	if MY_RoleStatistics.IsOpened() then
-		MY_RoleStatistics.Close()
+function D.Toggle()
+	if D.IsOpened() then
+		D.Close()
 	else
-		MY_RoleStatistics.Open()
+		D.Open()
 	end
 end
 
-function MY_RoleStatistics.UpdateNames(frame)
-	local searchname = frame:Lookup('PageSet_All/Page_BagStat/Wnd_SearchName/Edit_SearchName'):GetText()
-	DB_OwnerInfoR:ClearBindings()
-	DB_OwnerInfoR:BindAll(AnsiToUTF8('%' .. searchname .. '%'), AnsiToUTF8('%' .. searchname .. '%'))
-	local result = DB_OwnerInfoR:GetAll()
-
-	local container = frame:Lookup('PageSet_All/Page_BagStat/WndScroll_Name/WndContainer_Name')
-	container:Clear()
-	for _, rec in ipairs(result) do
-		local wnd = container:AppendContentFromIni(SZ_INI, 'Wnd_Name')
-		wnd.time = rec.time
-		wnd.ownerkey   = UTF8ToAnsi(rec.ownerkey)
-		wnd.ownername  = UTF8ToAnsi(rec.ownername)
-		wnd.servername = UTF8ToAnsi(rec.servername)
-		local ownername = wnd.ownername
-		if MY_ChatMosaics and MY_ChatMosaics.MosaicsString then
-			ownername = MY_ChatMosaics.MosaicsString(ownername)
+-- 注册子模块
+function D.RegisterModule(szID, szName, env)
+	for i, v in ipairs_r(O.aModule) do
+		if v.szID == szID then
+			remove(O.aModule, i)
 		end
-		wnd:Lookup('CheckBox_Name', 'Text_Name'):SetText(ownername .. ' (' .. wnd.servername .. ')')
-		wnd:Lookup('CheckBox_Name'):Check(not MY_RoleStatistics.tUncheckedNames[wnd.ownerkey], WNDEVENT_FIRETYPE.PREVENT)
 	end
-	container:FormatAllContentPos()
-	frame.nCurrentPage = 1
-	MY_RoleStatistics.UpdateItems(frame)
+	if szName and env then
+		insert(O.aModule, {
+			szID = szID,
+			szName = szName,
+			env = env,
+		})
+	end
+	if D.IsOpened() then
+		D.Close()
+		D.Open()
+	end
 end
 
-function MY_RoleStatistics.UpdateItems(frame)
-	FlushDB()
-
-	local searchitem = frame:Lookup('PageSet_All/Page_BagStat/Wnd_SearchItem/Edit_SearchItem'):GetText():gsub('%s+', '%%')
-	local sqlfrom = '(SELECT B.ownerkey, B.boxtype, B.boxindex, B.tabtype, B.tabindex, B.tabsubindex, B.bagcount, B.bankcount, B.time FROM BagItems AS B LEFT JOIN ItemInfo AS I ON B.tabtype = I.tabtype AND B.tabindex = I.tabindex WHERE B.tabtype != -1 AND B.tabindex != -1 AND (I.name LIKE ? OR I.desc LIKE ?)) AS C LEFT JOIN OwnerInfo AS O ON C.ownerkey = O.ownerkey WHERE '
-	local sql  = 'SELECT C.ownerkey AS ownerkey, C.boxtype AS boxtype, C.boxindex AS boxindex, C.tabtype AS tabtype, C.tabindex AS tabindex, C.tabsubindex AS tabsubindex, SUM(C.bagcount) AS bagcount, SUM(C.bankcount) AS bankcount, C.time AS time, O.ownername AS ownername, O.servername AS servername FROM' .. sqlfrom
-	local sqlc = 'SELECT COUNT(*) AS count FROM' .. sqlfrom
-	local nPageSize = MY_RoleStatistics.bCompactMode and COMPACT_MODE_PAGE_SIZE or NORMAL_MODE_PAGE_SIZE
-	local wheres = {}
-	local ownerkeys = {}
-	local container = frame:Lookup('PageSet_All/Page_BagStat/WndScroll_Name/WndContainer_Name')
-	for i = 0, container:GetAllContentCount() - 1 do
-		local wnd = container:LookupContent(i)
-		if wnd:Lookup('CheckBox_Name'):IsCheckBoxChecked() then
-			insert(wheres, 'O.ownerkey = ?')
-			insert(ownerkeys, wnd.ownerkey)
+-- 初始化主界面 绘制分页按钮
+function D.InitPageSet(frame)
+	local pageAct
+	local pageset = frame:Lookup('PageSet_All')
+	for i, m in ipairs(O.aModule) do
+		local frameMod = Wnd.OpenWindow(SZ_MOD_INI, 'MY_RoleStatisticsMod')
+		local checkbox = frameMod:Lookup('PageSet_Total/WndCheck_Default')
+		local page = frameMod:Lookup('PageSet_Total/Page_Default')
+		checkbox:ChangeRelation(pageset, true, true)
+		page:ChangeRelation(pageset, true, true)
+		Wnd.CloseWindow(frameMod)
+		pageset:AddPage(page, checkbox)
+		checkbox:Show()
+		checkbox:Lookup('', 'Text_CheckDefault'):SetText(m.szName)
+		checkbox:SetRelX(checkbox:GetRelX() + checkbox:GetW() * (i - 1))
+		checkbox.nIndex = i
+		page.nIndex = i
+		if not pageAct then
+			pageAct = page
 		end
 	end
-	local sqlwhere = ((#wheres == 0 and ' 1 = 0 ') or ('(' .. concat(wheres, ' OR ') .. ')'))
-	local sqlgroup = ' GROUP BY C.tabtype, C.tabindex'
-	sql  = sql  .. sqlwhere .. sqlgroup .. ' LIMIT ' .. nPageSize .. ' OFFSET ' .. ((frame.nCurrentPage - 1) * nPageSize)
-	sqlc = sqlc .. sqlwhere .. sqlgroup
-
-	-- 绘制页码
-	local DB_CountR = DB:Prepare(sqlc)
-	DB_CountR:ClearBindings()
-	DB_CountR:BindAll(AnsiToUTF8('%' .. searchitem .. '%'), AnsiToUTF8('%' .. searchitem .. '%'), unpack(ownerkeys))
-	local nCount = #DB_CountR:GetAll()
-	local nPageCount = floor(nCount / nPageSize) + 1
-	frame:Lookup('PageSet_All/Page_BagStat/Wnd_Index/Wnd_IndexEdit/WndEdit_Index'):SetText(frame.nCurrentPage)
-	frame:Lookup('PageSet_All/Page_BagStat/Wnd_Index', 'Handle_IndexCount/Text_IndexCount'):SprintfText(_L['%d pages'], nPageCount)
-	frame:Lookup('PageSet_All/Page_BagStat/WndScroll_Name/Wnd_SearchInfo', 'Text_SearchInfo'):SprintfText(_L['%d results'], nCount)
-
-	local hOuter = frame:Lookup('PageSet_All/Page_BagStat/Wnd_Index', 'Handle_IndexesOuter')
-	local handle = hOuter:Lookup('Handle_Indexes')
-	handle:Clear()
-	if nPageCount <= PAGE_DISPLAY then
-		for i = 0, nPageCount - 1 do
-			local hItem = handle:AppendItemFromIni(SZ_INI, 'Handle_Index')
-			hItem.nPage = i + 1
-			hItem:Lookup('Text_Index'):SetText(i + 1)
-			hItem:Lookup('Text_IndexUnderline'):SetVisible(i + 1 == frame.nCurrentPage)
-		end
-	else
-		local hItem = handle:AppendItemFromIni(SZ_INI, 'Handle_Index')
-		hItem.nPage = 1
-		hItem:Lookup('Text_Index'):SetText(1)
-		hItem:Lookup('Text_IndexUnderline'):SetVisible(1 == frame.nCurrentPage)
-
-		local nStartPage
-		if frame.nCurrentPage + ceil((PAGE_DISPLAY - 2) / 2) > nPageCount then
-			nStartPage = nPageCount - (PAGE_DISPLAY - 2)
-		elseif frame.nCurrentPage - ceil((PAGE_DISPLAY - 2) / 2) < 2 then
-			nStartPage = 2
-		else
-			nStartPage = frame.nCurrentPage - ceil((PAGE_DISPLAY - 2) / 2)
-		end
-		for i = 1, PAGE_DISPLAY - 2 do
-			local hItem = handle:AppendItemFromIni(SZ_INI, 'Handle_Index')
-			hItem.nPage = nStartPage + i - 1
-			hItem:Lookup('Text_Index'):SetText(nStartPage + i - 1)
-			hItem:Lookup('Text_IndexUnderline'):SetVisible(nStartPage + i - 1 == frame.nCurrentPage)
-		end
-
-		local hItem = handle:AppendItemFromIni(SZ_INI, 'Handle_Index')
-		hItem.nPage = nPageCount
-		hItem:Lookup('Text_Index'):SetText(nPageCount)
-		hItem:Lookup('Text_IndexUnderline'):SetVisible(nPageCount == frame.nCurrentPage)
+	if pageAct then
+		local _this = this
+		this = pageAct
+		Framework.OnActivePage()
+		this = _this
 	end
-	handle:SetSize(hOuter:GetSize())
-	handle:FormatAllItemPos()
-	handle:SetSizeByAllItemSize()
-	hOuter:FormatAllItemPos()
+end
 
-	-- 绘制列表
-	local DB_ItemInfoR = DB:Prepare(sql)
-	DB_ItemInfoR:ClearBindings()
-	DB_ItemInfoR:BindAll(AnsiToUTF8('%' .. searchitem .. '%'), AnsiToUTF8('%' .. searchitem .. '%'), unpack(ownerkeys))
-	local result = DB_ItemInfoR:GetAll()
+function Framework.OnLButtonClick()
+	local name = this:GetName()
+	if name == 'Btn_Close' then
+		D.Close()
+	end
+end
 
-	local sqlbelongs = 'SELECT * FROM (SELECT ownerkey, SUM(bagcount) AS bagcount, SUM(bankcount) AS bankcount FROM BagItems WHERE tabtype = ? AND tabindex = ? AND tabsubindex = ? GROUP BY ownerkey) AS B LEFT JOIN OwnerInfo AS O ON B.ownerkey = O.ownerkey WHERE '
-	sqlbelongs = sqlbelongs .. ((#wheres == 0 and ' 1 = 0 ') or ('(' .. concat(wheres, ' OR ') .. ')'))
-	local DB_BelongsR = DB:Prepare(sqlbelongs)
-
-	local handle = frame:Lookup('PageSet_All/Page_BagStat/WndScroll_Item', 'Handle_Items')
-	local scroll = frame:Lookup('PageSet_All/Page_BagStat/WndScroll_Item/Scroll_Item')
-	handle:Clear()
-	for _, rec in ipairs(result) do
-		local KItemInfo = GetItemInfo(rec.tabtype, rec.tabindex)
-		if KItemInfo then
-			if MY_RoleStatistics.bCompactMode then
-				local count = 0
-				local hItem = handle:AppendItemFromIni(SZ_INI, 'Handle_ItemCompact')
-				local box = hItem:Lookup('Box_ItemCompact')
-
-				DB_BelongsR:ClearBindings()
-				DB_BelongsR:BindAll(rec.tabtype, rec.tabindex, rec.tabsubindex, unpack(ownerkeys))
-				local result = DB_BelongsR:GetAll()
-				local aTip = {}
-				for _, rec in ipairs(result) do
-					count = count + rec.bankcount + rec.bagcount
-					insert(aTip, _L('%s (%s)\tBankx%d Bagx%d Totalx%d\n', UTF8ToAnsi(rec.ownername), UTF8ToAnsi(rec.servername), rec.bankcount, rec.bagcount, rec.bankcount + rec.bagcount))
-				end
-				UI.UpdateItemInfoBoxObject(box, nil, rec.tabtype, rec.tabindex, count, rec.tabsubindex)
-				box.tip = GetItemInfoTip(nil, rec.tabtype, rec.tabindex, nil, nil, rec.tabsubindex) .. GetFormatText(concat(aTip))
-			else
-				local hItem = handle:AppendItemFromIni(SZ_INI, 'Handle_Item')
-				UI.UpdateItemInfoBoxObject(hItem:Lookup('Box_Item'), nil, rec.tabtype, rec.tabindex, 1, rec.tabsubindex)
-				UI.UpdateItemInfoBoxObject(hItem:Lookup('Handle_ItemInfo/Text_ItemName'), nil, rec.tabtype, rec.tabindex, 1, rec.tabsubindex)
-				hItem:Lookup('Text_ItemStatistics'):SprintfText(_L['Bankx%d Bagx%d Totalx%d'], rec.bankcount, rec.bagcount, rec.bankcount + rec.bagcount)
-				if KItemInfo.nGenre == ITEM_GENRE.TASK_ITEM then
-					hItem:Lookup('Handle_ItemInfo/Text_ItemDesc'):SetText(g_tStrings.STR_ITEM_H_QUEST_ITEM)
-				elseif KItemInfo.nBindType == ITEM_BIND.BIND_ON_PICKED then
-					hItem:Lookup('Handle_ItemInfo/Text_ItemDesc'):SetText(g_tStrings.STR_ITEM_H_BIND_AFTER_PICK)
-				elseif KItemInfo.nBindType == ITEM_BIND.BIND_ON_TIME_LIMITATION then
-					hItem:Lookup('Handle_ItemInfo/Text_ItemDesc'):SetText(g_tStrings.STR_ITEM_H_BIND_TIME_LIMITATION1)
-				else
-					hItem:Lookup('Handle_ItemInfo/Text_ItemDesc'):SetText('')
-				end
-				hItem:Lookup('Handle_ItemInfo'):FormatAllItemPos()
-
-				DB_BelongsR:ClearBindings()
-				DB_BelongsR:BindAll(rec.tabtype, rec.tabindex, rec.tabsubindex, unpack(ownerkeys))
-				local result = DB_BelongsR:GetAll()
-				local hBelongsList = hItem:Lookup('Handle_ItemBelongs')
-				hBelongsList:Clear()
-				for _, rec in ipairs(result) do
-					hBelongsList:AppendItemFromIni(SZ_INI, 'Text_ItemBelongs'):SprintfText(_L['%s (%s)\tBankx%d Bagx%d Totalx%d\n'], UTF8ToAnsi(rec.ownername), UTF8ToAnsi(rec.servername), rec.bankcount, rec.bagcount, rec.bankcount + rec.bagcount)
-				end
-				hBelongsList:FormatAllItemPos()
-				hBelongsList:SetSizeByAllItemSize()
-				hItem:Lookup('Shadow_ItemHover'):SetH(0)
-				hItem:SetSizeByAllItemSize()
-				hItem:SetH(hItem:GetH() + 7)
-				hItem:Lookup('Shadow_ItemHover'):SetH(hItem:GetH())
+function Framework.OnActivePage()
+	local name = this:GetName()
+	if name == 'Page_Default' then
+		if not this.bInit then
+			local m = O.aModule[this.nIndex]
+			if m and m.env.OnInitPage then
+				m.env.OnInitPage()
 			end
-		--[[#DEBUG BEGIN]]
-		else
-			LIB.Debug('MY_RoleStatistics', 'KItemInfo not found: ' .. rec.tabtype .. ', ' .. rec.tabindex, DEBUG_LEVEL.WARNING)
-		--[[#DEBUG END]]
 		end
 	end
-	handle:FormatAllItemPos()
-	scroll:SetScrollPos(0)
 end
 
-function MY_RoleStatistics.OnFrameCreate()
-	FlushDB()
-
-	MY_RoleStatistics.UpdateNames(this)
+function Framework.OnFrameCreate()
+	D.InitPageSet(this)
 	this:BringToTop()
 	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
 	this:Lookup('', 'Text_Title'):SetText(PACKET_INFO.NAME .. ' - ' .. _L['MY_RoleStatistics'])
-	this:Lookup('PageSet_All/WndCheck_BagStat', 'Text_BagStat'):SetText(_L['Bag statistics'])
-	this:RegisterEvent('MY_BAGSTATISTICS_MODE_CHANGE')
-	this:RegisterEvent('ON_MY_MOSAICS_RESET')
 end
 
-function MY_RoleStatistics.OnEvent(event)
-	if event == 'MY_BAGSTATISTICS_MODE_CHANGE' then
-		MY_RoleStatistics.UpdateItems(this)
-	elseif event == 'ON_MY_MOSAICS_RESET' then
-		MY_RoleStatistics.UpdateNames(this)
-	end
-end
-
-function MY_RoleStatistics.OnEditSpecialKeyDown()
-	local name = this:GetName()
-	local frame = this:GetRoot()
-	local szKey = GetKeyName(Station.GetMessageKey())
-	if szKey == 'Enter' then
-		if name == 'Edit_SearchName' then
-			MY_RoleStatistics.UpdateNames(frame)
-		elseif name == 'WndEdit_Index' then
-			frame.nCurrentPage = tonumber(this:GetText()) or frame.nCurrentPage
+-- 全局广播模块事件
+for _, szEvent in ipairs({
+	'OnFrameCreate',
+	'OnFrameDestroy',
+	'OnFrameBreathe',
+	'OnFrameRender',
+	'OnFrameDragEnd',
+	'OnFrameDragSetPosEnd',
+	'OnEvent',
+}) do
+	D[szEvent] = function(...)
+		if Framework[szEvent] then
+			Framework[szEvent](...)
 		end
-		MY_RoleStatistics.UpdateItems(frame)
-		return 1
-	end
-end
-
-function MY_RoleStatistics.OnCheckBoxCheck()
-	MY_RoleStatistics.UpdateItems(this:GetRoot())
-end
-
-function MY_RoleStatistics.OnCheckBoxUncheck()
-	MY_RoleStatistics.UpdateItems(this:GetRoot())
-end
-
-function MY_RoleStatistics.OnLButtonClick()
-	local name = this:GetName()
-	if name == 'Btn_Close' then
-		MY_RoleStatistics.Close()
-	elseif name == 'Btn_Only' then
-		local wnd = this:GetParent()
-		local parent = wnd:GetParent()
-		for i = 0, parent:GetAllContentCount() - 1 do
-			local wnd = parent:LookupContent(i)
-			wnd:Lookup('CheckBox_Name'):Check(false, WNDEVENT_FIRETYPE.PREVENT)
+		local page = this:Lookup('PageSet_All'):GetFirstChild()
+		while page do
+			if page:GetName() == 'Page_Default' then
+				local m = O.aModule[page.nIndex]
+				if m and m.env[szEvent] then
+					local _this = this
+					this = page
+					m.env[szEvent](...)
+					this = _this
+				end
+			end
+			page = page:GetNext()
 		end
-		wnd:Lookup('CheckBox_Name'):Check(true)
-	elseif name == 'Btn_Delete' then
-		local wnd = this:GetParent()
-		LIB.Confirm(_L('Are you sure to delete item record of %s?', wnd.ownername), function()
-			DB_ItemsDA:ClearBindings()
-			DB_ItemsDA:BindAll(wnd.ownerkey)
-			DB_ItemsDA:Execute()
-			DB_OwnerInfoD:ClearBindings()
-			DB_OwnerInfoD:BindAll(wnd.ownerkey)
-			DB_OwnerInfoD:Execute()
-			MY_RoleStatistics.UpdateNames(wnd:GetRoot())
-		end)
-	elseif name == 'Btn_SwitchMode' then
-		MY_RoleStatistics.bCompactMode = not MY_RoleStatistics.bCompactMode
-		FireUIEvent('MY_BAGSTATISTICS_MODE_CHANGE')
-	elseif name == 'Btn_NameAll' then
-		local parent = this:GetParent():Lookup('WndContainer_Name')
-		for i = 0, parent:GetAllContentCount() - 1 do
-			local wnd = parent:LookupContent(i)
-			wnd:Lookup('CheckBox_Name'):Check(true, WNDEVENT_FIRETYPE.PREVENT)
+	end
+end
+
+-- 根据元素位置转发对应模块事件
+for _, szEvent in ipairs({
+	'OnSetFocus',
+	'OnKillFocus',
+	'OnItemLButtonDown',
+	'OnItemMButtonDown',
+	'OnItemRButtonDown',
+	'OnItemLButtonUp',
+	'OnItemMButtonUp',
+	'OnItemRButtonUp',
+	'OnItemLButtonClick',
+	'OnItemMButtonClick',
+	'OnItemRButtonClick',
+	'OnItemMouseEnter',
+	'OnItemMouseLeave',
+	'OnItemRefreshTip',
+	'OnItemMouseWheel',
+	'OnItemLButtonDrag',
+	'OnItemLButtonDragEnd',
+	'OnLButtonDown',
+	'OnLButtonUp',
+	'OnLButtonClick',
+	'OnLButtonHold',
+	'OnMButtonDown',
+	'OnMButtonUp',
+	'OnMButtonClick',
+	'OnMButtonHold',
+	'OnRButtonDown',
+	'OnRButtonUp',
+	'OnRButtonClick',
+	'OnRButtonHold',
+	'OnMouseEnter',
+	'OnMouseLeave',
+	'OnScrollBarPosChanged',
+	'OnEditChanged',
+	'OnEditSpecialKeyDown',
+	'OnCheckBoxCheck',
+	'OnCheckBoxUncheck',
+	'OnActivePage',
+}) do
+	D[szEvent] = function(...)
+		local szPrefix = 'Normal/MY_Statistics/PageSet_All/Page_Default'
+		local page = this
+		while page and page:GetName() ~= 'Page_Default' and page:GetTreePath() ~= szPrefix do
+			page = page:GetParent()
 		end
-		MY_RoleStatistics.UpdateItems(this:GetRoot())
+		if page and page ~= this then
+			local m = O.aModule[page.nIndex]
+			if m and m.env[szEvent] then
+				m.env[szEvent](...)
+			end
+		else
+			if Framework[szEvent] then
+				Framework[szEvent](...)
+			end
+		end
 	end
 end
 
-function MY_RoleStatistics.OnItemLButtonClick()
-	local name = this:GetName()
-	if name == 'Handle_Index' then
-		this:GetRoot().nCurrentPage = this.nPage
-		MY_RoleStatistics.UpdateItems(this:GetRoot())
-	end
+-- Global exports
+do
+local settings = {
+	exports = {
+		{
+			fields = {
+				Open = D.Open,
+				Close = D.Close,
+				IsOpened = D.IsOpened,
+				Toggle = D.Toggle,
+				RegisterModule = D.RegisterModule,
+			},
+		},
+		{
+			root = D,
+			preset = 'UIEvent'
+		},
+	},
+}
+MY_RoleStatistics = LIB.GeneGlobalNS(settings)
 end
-
-function MY_RoleStatistics.OnItemMouseEnter()
-	if this.tip then
-		local x, y = this:GetAbsPos()
-		local w, h = this:GetSize()
-		OutputTip(this.tip, 400, {x, y, w, h, false}, nil, false)
-	end
-end
-MY_RoleStatistics.OnItemRefreshTip = MY_RoleStatistics.OnItemMouseEnter
-
-function MY_RoleStatistics.OnItemMouseLeave()
-	HideTip()
-end
-
-function MY_RoleStatistics.OnMouseEnter()
-	local name = this:GetName()
-	if name == 'Wnd_Name' then
-		local x, y = this:GetAbsPos()
-		local w, h = this:GetSize()
-		OutputTip(GetFormatText(_L(
-			this.ownername:sub(1, 1) == '['
-				and 'Tong: %s\nServer: %s\nSnapshot Time: %s'
-				or 'Character: %s\nServer: %s\nSnapshot Time: %s',
-			this.ownername,
-			this.servername,
-			LIB.FormatTime(this.time, '%yyyy-%MM-%dd %hh:%mm:%ss')), nil, 255, 255, 0), 400, {x, y, w, h, false}, nil, false)
-	elseif name == 'CheckBox_Name' then
-		LIB.ExecuteWithThis(this:GetParent(), MY_RoleStatistics.OnMouseEnter)
-	end
-end
-
--- function MY_RoleStatistics.OnMouseLeave()
--- 	HideTip()
--- end
 
 do
 local menu = {
 	szOption = _L['MY_RoleStatistics'],
-	fnAction = function() MY_RoleStatistics.Toggle() end,
+	fnAction = function() D.Toggle() end,
 }
 LIB.RegisterAddonMenu('MY_BAGSTATISTICS_MENU', menu)
 end
-LIB.RegisterHotKey('MY_RoleStatistics', _L['Open/Close MY_RoleStatistics'], MY_RoleStatistics.Toggle, nil)
+LIB.RegisterHotKey('MY_RoleStatistics', _L['Open/Close MY_RoleStatistics'], D.Toggle, nil)

@@ -3,6 +3,7 @@ return {
     ['MY_RoleStatistics'] = '角色統計',
     ['Open/Close MY_RoleStatistics'] = '打開/關閉角色統計',
 
+    ['MY_RoleStatistics_BagStat'] = '背包統計',
     ['Bag statistics'] = '背包統計',
 
     ['%d pages'] = '共%d頁',
