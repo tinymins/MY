@@ -65,7 +65,7 @@ local COLUMN_LIST = {
 	-- account,
 	{ id = 'region',                szTitle = _L['Region'               ], nWidth = 100, szKey = 'region'                },
 	{ id = 'server',                szTitle = _L['Server'               ], nWidth = 100, szKey = 'server'                },
-	{ id = 'name',                  szTitle = _L['Name'                 ], nWidth = 100, GetFormatText = function(rec)
+	{ id = 'name',                  szTitle = _L['Name'                 ], nWidth = 130, GetFormatText = function(rec)
 		local name = rec.name
 		if MY_ChatMosaics and MY_ChatMosaics.MosaicsString then
 			name = MY_ChatMosaics.MosaicsString(name)
