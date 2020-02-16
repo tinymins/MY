@@ -43,6 +43,13 @@ return {
     ['Cache time'           ] = '快照时间',
     ['Cache time days'      ] = '快照计时',
 
+    ['%d years %d days before'] = '%d年零%d天前',
+    ['%d days %d hours before'] = '%d天%d小时前',
+    ['%d hours %d mins before'] = '%d小时%d分钟前',
+    ['%d mins %d secs before'] = '%d分%d秒前',
+    ['%d secs before'] = '%d秒前',
+    ['Just now'] = '刚刚',
+
     ['Columns'] = '显示列',
     ['Move up'] = '上移',
     ['Move down'] = '下移',

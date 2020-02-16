@@ -293,7 +293,32 @@ local COLUMN_LIST = {
 		szTitle = _L['Cache time days'],
 		nWidth = 120,
 		GetFormatText = function(rec)
-			return GetFormatText(_L('%s before', LIB.FormatTimeCounter(GetCurrentTime() - rec.time, 2, 2)))
+			local nTime = GetCurrentTime() - rec.time
+			local nSeconds = floor(nTime)
+			local nMinutes = floor(nSeconds / 60)
+			local nHours   = floor(nMinutes / 60)
+			local nDays    = floor(nHours / 24)
+			local nYears   = floor(nDays / 365)
+			local nDay     = nDays % 365
+			local nHour    = nHours % 24
+			local nMinute  = nMinutes % 60
+			local nSecond  = nSeconds % 60
+			if nYears > 0 then
+				return GetFormatText(_L('%d years %d days before', nYears, nDay))
+			end
+			if nDays > 0 then
+				return GetFormatText(_L('%d days %d hours before', nDays, nHour))
+			end
+			if nHours > 0 then
+				return GetFormatText(_L('%d hours %d mins before', nHours, nMinute))
+			end
+			if nMinutes > 0 then
+				return GetFormatText(_L('%d mins %d secs before', nMinutes, nSecond))
+			end
+			if nSecond > 10 then
+				return GetFormatText(_L('%d secs before', nSecond))
+			end
+			return GetFormatText(_L['Just now'])
 		end,
 		Compare = GeneCommonCompare('time'),
 	},
