@@ -473,11 +473,12 @@ function D.UpdateUI(page)
 	local hList = page:Lookup('Wnd_Total/WndScroll_RoleStat', 'Handle_List')
 	hList:Clear()
 	for i, rec in ipairs(result) do
+		local hRow = hList:AppendItemFromIni(SZ_INI, 'Handle_Row')
 		rec.guid   = UTF8ToAnsi(rec.guid)
 		rec.name   = UTF8ToAnsi(rec.name)
 		rec.region = UTF8ToAnsi(rec.region)
 		rec.server = UTF8ToAnsi(rec.server)
-		local hRow = hList:AppendItemFromIni(SZ_INI, 'Handle_Row')
+		hRow.rec = rec
 		hRow:Lookup('Image_RowBg'):SetVisible(i % 2 == 1)
 		local nX = 0
 		for j, col in ipairs(aCol) do
@@ -628,7 +629,19 @@ function D.OnEditSpecialKeyDown()
 end
 
 function D.OnItemMouseEnter()
-	if this.tip then
+	local name = this:GetName()
+	if name == 'Handle_Row' then
+		local aXml = {}
+		for _, col in ipairs(COLUMN_LIST) do
+			insert(aXml, GetFormatText(col.szTitle))
+			insert(aXml, GetFormatText(':  '))
+			insert(aXml, col.GetFormatText(this.rec))
+			insert(aXml, GetFormatText('\n'))
+		end
+		local x, y = this:GetAbsPos()
+		local w, h = this:GetSize()
+		OutputTip(concat(aXml), 450, {x, y, w, h}, UI.TIP_POSITION.RIGHT_LEFT)
+	elseif this.tip then
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
 		OutputTip(this.tip, 400, {x, y, w, h, false}, nil, false)
