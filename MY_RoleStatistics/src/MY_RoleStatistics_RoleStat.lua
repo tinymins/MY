@@ -60,6 +60,28 @@ local DB_RoleInfoCoinW = DB:Prepare('UPDATE RoleInfo SET coin = ? WHERE account 
 local DB_RoleInfoR = DB:Prepare('SELECT * FROM RoleInfo WHERE account LIKE ? OR name LIKE ? OR region LIKE ? OR server LIKE ? ORDER BY time DESC')
 local DB_RoleInfoD = DB:Prepare('DELETE FROM RoleInfo WHERE guid = ?')
 
+local D = {}
+local O = {
+	aColumn = {
+		'name',
+		'force',
+		'level',
+		'achievement_score',
+		'pet_score',
+		'justice',
+		'justice_remain',
+		'exam_print',
+		'coin',
+		'money',
+		'time_days',
+	},
+	szSort = 'time_days',
+	szSortOrder = 'desc',
+}
+RegisterCustomData('Global/MY_RoleStatistics_RoleStat.aColumn')
+RegisterCustomData('Global/MY_RoleStatistics_RoleStat.szSort')
+RegisterCustomData('Global/MY_RoleStatistics_RoleStat.szSortOrder')
+
 local function GeneCommonFormatText(id)
 	return function(r)
 		return GetFormatText(r[id])
@@ -337,26 +359,6 @@ for _, p in ipairs(COLUMN_LIST) do
 end
 local EXCEL_WIDTH = 960
 
-local D = {}
-local O = {
-	aColumn = {
-		'name',
-		'force',
-		'level',
-		'achievement_score',
-		'pet_score',
-		'justice',
-		'justice_remain',
-		'exam_print',
-		'coin',
-		'money',
-		'time_days',
-	},
-	szSort = 'time_days',
-	szSortOrder = 'desc',
-}
-RegisterCustomData('Global/MY_RoleStatistics_RoleStat.aColumn')
-
 local function FlushDB()
 	--[[#DEBUG BEGIN]]
 	LIB.Debug('MY_RoleStatistics_RoleStat', 'Flushing to database...', DEBUG_LEVEL.LOG)
@@ -616,6 +618,26 @@ function D.OnItemLButtonClick()
 	end
 end
 
+function D.OnItemRButtonClick()
+	local name = this:GetName()
+	if name == 'Handle_Row' then
+		local rec = this.rec
+		local page = this:GetParent():GetParent():GetParent():GetParent():GetParent()
+		local menu = {
+			{
+				szOption = _L['Delete'],
+				fnAction = function()
+					DB_RoleInfoD:ClearBindings()
+					DB_RoleInfoD:BindAll(rec.guid)
+					DB_RoleInfoD:Execute()
+					D.UpdateUI(page)
+				end,
+			},
+		}
+		PopupMenu(menu)
+	end
+end
+
 function D.OnEditSpecialKeyDown()
 	local name = this:GetName()
 	local szKey = GetKeyName(Station.GetMessageKey())
@@ -678,6 +700,8 @@ local settings = {
 		{
 			fields = {
 				aColumn = true,
+				szSort = true,
+				szSortOrder = true,
 			},
 			root = O,
 		},
@@ -686,6 +710,8 @@ local settings = {
 		{
 			fields = {
 				aColumn = true,
+				szSort = true,
+				szSortOrder = true,
 			},
 			root = O,
 		},
