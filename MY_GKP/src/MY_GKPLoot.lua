@@ -90,6 +90,8 @@ local O_DEFAULT = {
 		tAutoPickupQuality = {},
 		tAutoPickupNames = {},
 		tAutoPickupFilters = {},
+		bNameFilter = false,
+		tNameFilter = {},
 	},
 }
 local O = Clone(O_DEFAULT)
@@ -106,6 +108,7 @@ RegisterCustomData('MY_GKP_Loot.tItemConfig')
 do
 local function onLoadingEnd()
 	MY_GKP_Loot.tItemConfig.tFilterQuality = {}
+	MY_GKP_Loot.tItemConfig.bNameFilter = false
 end
 LIB.RegisterEvent('LOADING_END.MY_GKP_Loot', onLoadingEnd)
 end
@@ -135,6 +138,9 @@ end
 
 function D.IsItemDisplay(itemData, config)
 	if IsTable(config.tFilterQuality) and config.tFilterQuality[itemData.nQuality] then
+		return false
+	end
+	if config.bNameFilter and config.tNameFilter[itemData.szName] then
 		return false
 	end
 	if config.bFilterBookRead and itemData.nGenre == ITEM_GENRE.BOOK then
@@ -628,6 +634,55 @@ function D.GetFilterMenu()
 			end,
 		})
 	end
+	insert(t, t1)
+	local t1 = {
+		szOption = _L['Name filter'],
+		{
+			szOption = _L['Will be disable when loading'],
+			bDisable = true,
+		},
+		{
+			szOption = _L['Enable'],
+			bCheck = true, bChecked = MY_GKP_Loot.tItemConfig.bNameFilter,
+			fnAction = function()
+				MY_GKP_Loot.tItemConfig.bNameFilter = not MY_GKP_Loot.tItemConfig.bNameFilter
+			end,
+		},
+		CONSTANT.MENU_DIVIDER,
+	}
+	for szName, bEnable in pairs(MY_GKP_Loot.tItemConfig.tNameFilter) do
+		table.insert(t1, {
+			szOption = szName,
+			bCheck = true,
+			bChecked = bEnable,
+			fnAction = function()
+				MY_GKP_Loot.tItemConfig.tNameFilter[szName] = not MY_GKP_Loot.tItemConfig.tNameFilter[szName]
+			end,
+			szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',
+			nFrame = 49,
+			nMouseOverFrame = 51,
+			nIconWidth = 17,
+			nIconHeight = 17,
+			szLayer = 'ICON_RIGHTMOST',
+			fnClickIcon = function()
+				MY_GKP_Loot.tItemConfig.tNameFilter[szName] = nil
+				Wnd.CloseWindow('PopupMenuPanel')
+			end,
+			fnDisable = function() return not MY_GKP_Loot.tItemConfig.bNameFilter end,
+		})
+	end
+	if not IsEmpty(MY_GKP_Loot.tItemConfig.tNameFilter) then
+		insert(t1, CONSTANT.MENU_DIVIDER)
+	end
+	insert(t1, {
+		szOption = _L['Add'],
+		fnAction = function()
+			GetUserInput(_L['Please input filter name'], function(szText)
+				MY_GKP_Loot.tItemConfig.tNameFilter[szText] = true
+			end, nil, nil, nil, '', nil)
+		end,
+		fnDisable = function() return not MY_GKP_Loot.tItemConfig.bNameFilter end,
+	})
 	insert(t, t1)
 	return t
 end
