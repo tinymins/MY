@@ -60,53 +60,254 @@ local DB_RoleInfoCoinW = DB:Prepare('UPDATE RoleInfo SET coin = ? WHERE account 
 local DB_RoleInfoR = DB:Prepare('SELECT * FROM RoleInfo WHERE account LIKE ? OR name LIKE ? OR region LIKE ? OR server LIKE ? ORDER BY time DESC')
 local DB_RoleInfoD = DB:Prepare('DELETE FROM RoleInfo WHERE guid = ?')
 
+local function GeneCommonFormatText(id)
+	return function(r)
+		return GetFormatText(r[id])
+	end
+end
+local function GeneCommonCompare(id)
+	return function(r1, r2)
+		if r1[id] == r2[id] then
+			return 0
+		end
+		return r1[id] > r2[id] and 1 or -1
+	end
+end
 local COLUMN_LIST = {
 	-- guid,
 	-- account,
-	{ id = 'region',                szTitle = _L['Region'               ], nWidth = 100, szKey = 'region'                },
-	{ id = 'server',                szTitle = _L['Server'               ], nWidth = 100, szKey = 'server'                },
-	{ id = 'name',                  szTitle = _L['Name'                 ], nWidth = 130, GetFormatText = function(rec)
-		local name = rec.name
-		if MY_ChatMosaics and MY_ChatMosaics.MosaicsString then
-			name = MY_ChatMosaics.MosaicsString(name)
-		end
-		return GetFormatText(name)
-	end },
-	{ id = 'force',                 szTitle = _L['Force'                ], nWidth =  50, GetFormatText = function(rec)
-		return GetFormatText(g_tStrings.tForceTitle[rec.force])
-	end },
-	{ id = 'level',                 szTitle = _L['Level'                ], nWidth =  50, szKey = 'level'                 },
-	{ id = 'equip_score',           szTitle = _L['Equip score'          ], nWidth =  60, szKey = 'equip_score'           },
-	{ id = 'pet_score',             szTitle = _L['Pet score'            ], nWidth =  55, szKey = 'pet_score'             },
-	{ id = 'money',                 szTitle = _L['Money'                ], nWidth = 200, GetFormatText = function(rec)
-		return GetMoneyText({ nGold = rec.gold, nSilver = rec.silver, nCopper = rec.copper }, 105)
-	end },
-	{ id = 'contribution',          szTitle = _L['Contribution'         ], nWidth =  70, szKey = 'contribution'          },
-	{ id = 'contribution_remain',   szTitle = _L['Contribution_remain'  ], nWidth =  70, szKey = 'contribution_remain'   },
-	{ id = 'justice',               szTitle = _L['Justice'              ], nWidth =  60, szKey = 'justice'               },
-	{ id = 'justice_remain',        szTitle = _L['Justice remain'       ], nWidth =  60, szKey = 'justice_remain'        },
-	{ id = 'prestige',              szTitle = _L['Prestige'             ], nWidth =  70, szKey = 'prestige'              },
-	{ id = 'prestige_remain',       szTitle = _L['Prestige remain'      ], nWidth =  70, szKey = 'prestige_remain'       },
-	{ id = 'camp_point',            szTitle = _L['Camp point'           ], nWidth =  70, szKey = 'camp_point'            },
-	{ id = 'camp_level',            szTitle = _L['Camp level'           ], nWidth =  70, GetFormatText = function(rec)
-		return GetFormatText(rec.camp_level .. ' + ' .. rec.camp_point_percentage .. '%')
-	end },
-	{ id = 'arena_award',           szTitle = _L['Arena award'          ], nWidth =  60, szKey = 'arena_award'           },
-	{ id = 'arena_award_remain',    szTitle = _L['Arena award remain'   ], nWidth =  60, szKey = 'arena_award_remain'    },
-	{ id = 'exam_print',            szTitle = _L['Exam print'           ], nWidth =  55, szKey = 'exam_print'            },
-	{ id = 'exam_print_remain',     szTitle = _L['Exam print remain'    ], nWidth =  55, szKey = 'exam_print_remain'     },
-	{ id = 'achievement_score',     szTitle = _L['Achievement score'    ], nWidth =  70, szKey = 'achievement_score'     },
-	{ id = 'coin',                  szTitle = _L['Coin'                 ], nWidth =  70, szKey = 'coin'                  },
-	{ id = 'mentor_score',          szTitle = _L['Mentor score'         ], nWidth =  70, szKey = 'mentor_score'          },
-	{ id = 'time',                  szTitle = _L['Cache time'           ], nWidth = 165, GetFormatText = function(rec)
-		return GetFormatText(LIB.FormatTime(rec.time, '%yyyy/%MM/%dd %hh:%mm:%ss'))
-	end },
-	{ id = 'time_days',             szTitle = _L['Cache time days'      ], nWidth = 120, GetFormatText = function(rec)
-		return GetFormatText(_L('%s before', LIB.FormatTimeCounter(GetCurrentTime() - rec.time, 2, 2)))
-	end },
+	{ -- 大区
+		id = 'region',
+		szTitle = _L['Region'],
+		nWidth = 100,
+		GetFormatText = GeneCommonFormatText('region'),
+		Compare = GeneCommonCompare('region'),
+	},
+	{ -- 服务器
+		id = 'server',
+		szTitle = _L['Server'],
+		nWidth = 100,
+		GetFormatText = GeneCommonFormatText('server'),
+		Compare = GeneCommonCompare('server'),
+	},
+	{ -- 名字
+		id = 'name',
+		szTitle = _L['Name'],
+		nWidth = 130,
+		GetFormatText = function(rec)
+			local name = rec.name
+			if MY_ChatMosaics and MY_ChatMosaics.MosaicsString then
+				name = MY_ChatMosaics.MosaicsString(name)
+			end
+			return GetFormatText(name)
+		end,
+	},
+	{ -- 门派
+		id = 'force',
+		szTitle = _L['Force'],
+		nWidth = 50,
+		GetFormatText = function(rec)
+			return GetFormatText(g_tStrings.tForceTitle[rec.force])
+		end,
+		Compare = GeneCommonCompare('force'),
+	},
+	{ -- 等级
+		id = 'level',
+		szTitle = _L['Level'],
+		nWidth = 50,
+		GetFormatText = GeneCommonFormatText('level'),
+		Compare = GeneCommonCompare('level'),
+	},
+	{ -- 装分
+		id = 'equip_score',
+		szTitle = _L['Equip score'],
+		nWidth = 60,
+		GetFormatText = GeneCommonFormatText('equip_score'),
+		Compare = GeneCommonCompare('equip_score'),
+	},
+	{ -- 宠物分
+		id = 'pet_score',
+		szTitle = _L['Pet score'],
+		nWidth = 55,
+		GetFormatText = GeneCommonFormatText('pet_score'),
+		Compare = GeneCommonCompare('pet_score'),
+	},
+	{ -- 金钱
+		id = 'money',
+		szTitle = _L['Money'],
+		nWidth = 200,
+		GetFormatText = function(rec)
+			return GetMoneyText({ nGold = rec.gold, nSilver = rec.silver, nCopper = rec.copper }, 105)
+		end,
+		Compare = function(r1, r2)
+			if r1.gold == r2.gold then
+				if r1.silver == r2.silver then
+					if r1.copper == r2.copper then
+						return 0
+					end
+					return r1.copper > r2.copper and 1 or -1
+				end
+				return r1.silver > r2.silver and 1 or -1
+			end
+			return r1.gold > r2.gold and 1 or -1
+		end,
+	},
+	{ -- 江贡
+		id = 'contribution',
+		szTitle = _L['Contribution'],
+		nWidth = 70,
+		GetFormatText = GeneCommonFormatText('contribution'),
+		Compare = GeneCommonCompare('contribution'),
+	},
+	{ -- 江贡周余
+		id = 'contribution_remain',
+		szTitle = _L['Contribution_remain'],
+		nWidth = 70,
+		GetFormatText = GeneCommonFormatText('contribution_remain'),
+		Compare = GeneCommonCompare('contribution_remain'),
+	},
+	{ -- 侠义
+		id = 'justice',
+		szTitle = _L['Justice'],
+		nWidth = 60,
+		GetFormatText = GeneCommonFormatText('justice'),
+		Compare = GeneCommonCompare('justice'),
+	},
+	{ -- 侠义周余
+		id = 'justice_remain',
+		szTitle = _L['Justice remain'],
+		nWidth = 60,
+		GetFormatText = GeneCommonFormatText('justice_remain'),
+		Compare = GeneCommonCompare('justice_remain'),
+	},
+	{
+		-- 威望
+		id = 'prestige',
+		szTitle = _L['Prestige'],
+		nWidth = 70,
+		GetFormatText = GeneCommonFormatText('prestige'),
+		Compare = GeneCommonCompare('prestige'),
+	},
+	{ -- 威望周余
+		id = 'prestige_remain',
+		szTitle = _L['Prestige remain'],
+		nWidth = 70,
+		GetFormatText = GeneCommonFormatText('prestige_remain'),
+		Compare = GeneCommonCompare('prestige_remain'),
+	},
+	{
+		-- 战阶积分
+		id = 'camp_point',
+		szTitle = _L['Camp point'],
+		nWidth = 70,
+		GetFormatText = GeneCommonFormatText('camp_point'),
+		Compare = GeneCommonCompare('camp_point'),
+	},
+	{
+		-- 战阶等级
+		id = 'camp_level',
+		szTitle = _L['Camp level'],
+		nWidth = 70,
+		GetFormatText = function(rec)
+			return GetFormatText(rec.camp_level .. ' + ' .. rec.camp_point_percentage .. '%')
+		end,
+		Compare = function(r1, r2)
+			if r1.camp_level == r2.camp_level then
+				if r1.camp_point_percentage == r2.camp_point_percentage then
+					return 0
+				end
+				return r1.camp_point_percentage > r2.camp_point_percentage and 1 or -1
+			end
+			return r1.camp_level > r2.camp_level and 1 or -1
+		end,
+	},
+	{
+		-- 名剑币
+		id = 'arena_award',
+		szTitle = _L['Arena award'],
+		nWidth = 60,
+		GetFormatText = GeneCommonFormatText('arena_award'),
+		Compare = GeneCommonCompare('arena_award'),
+	},
+	{
+		-- 名剑币周余
+		id = 'arena_award_remain',
+		szTitle = _L['Arena award remain'],
+		nWidth = 60,
+		GetFormatText = GeneCommonFormatText('arena_award_remain'),
+		Compare = GeneCommonCompare('arena_award_remain'),
+	},
+	{
+		-- 监本
+		id = 'exam_print',
+		szTitle = _L['Exam print'],
+		nWidth = 55,
+		GetFormatText = GeneCommonFormatText('exam_print'),
+		Compare = GeneCommonCompare('exam_print'),
+	},
+	{
+		-- 监本周余
+		id = 'exam_print_remain',
+		szTitle = _L['Exam print remain'],
+		nWidth = 55,
+		GetFormatText = GeneCommonFormatText('exam_print_remain'),
+		Compare = GeneCommonCompare('exam_print_remain'),
+	},
+	{
+		-- 资历
+		id = 'achievement_score',
+		szTitle = _L['Achievement score'],
+		nWidth = 70,
+		GetFormatText = GeneCommonFormatText('achievement_score'),
+		Compare = GeneCommonCompare('achievement_score'),
+	},
+	{
+		-- 通宝
+		id = 'coin',
+		szTitle = _L['Coin'],
+		nWidth = 70,
+		GetFormatText = GeneCommonFormatText('coin'),
+		Compare = GeneCommonCompare('coin'),
+	},
+	{
+		-- 师徒分
+		id = 'mentor_score',
+		szTitle = _L['Mentor score'],
+		nWidth = 70,
+		GetFormatText = GeneCommonFormatText('mentor_score'),
+		Compare = GeneCommonCompare('mentor_score'),
+	},
+	{
+		-- 时间
+		id = 'time',
+		szTitle = _L['Cache time'],
+		nWidth = 165,
+		GetFormatText = function(rec)
+			return GetFormatText(LIB.FormatTime(rec.time, '%yyyy/%MM/%dd %hh:%mm:%ss'))
+		end,
+		Compare = GeneCommonCompare('time'),
+	},
+	{
+		-- 时间计时
+		id = 'time_days',
+		szTitle = _L['Cache time days'],
+		nWidth = 120,
+		GetFormatText = function(rec)
+			return GetFormatText(_L('%s before', LIB.FormatTimeCounter(GetCurrentTime() - rec.time, 2, 2)))
+		end,
+		Compare = GeneCommonCompare('time'),
+	},
 }
 local COLUMN_DICT = {}
 for _, p in ipairs(COLUMN_LIST) do
+	if not p.Compare then
+		p.Compare = function(r1, r2)
+			if r1[p.szKey] == r2[p.szKey] then
+				return 0
+			end
+			return r1[p.szKey] > r2[p.szKey] and 1 or -1
+		end
+	end
 	COLUMN_DICT[p.id] = p
 end
 local EXCEL_WIDTH = 960
@@ -114,18 +315,20 @@ local EXCEL_WIDTH = 960
 local D = {}
 local O = {
 	aColumn = {
-        'name',
-        'force',
-        'level',
-        'achievement_score',
-        'pet_score',
-        'justice',
-        'justice_remain',
-        'exam_print',
-        'coin',
-        'money',
-        'time_days',
-    },
+		'name',
+		'force',
+		'level',
+		'achievement_score',
+		'pet_score',
+		'justice',
+		'justice_remain',
+		'exam_print',
+		'coin',
+		'money',
+		'time_days',
+	},
+	szSort = 'time_days',
+	szSortOrder = 'desc',
 }
 RegisterCustomData('Global/MY_RoleStatistics_RoleStat.aColumn')
 
@@ -194,23 +397,41 @@ function D.GetColumns()
 end
 
 function D.UpdateUI(page)
-	local hTitle = page:Lookup('Wnd_Total/WndScroll_RoleStat', 'Handle_RoleStatColumn')
-	hTitle:Clear()
+	local hCols = page:Lookup('Wnd_Total/WndScroll_RoleStat', 'Handle_RoleStatColumns')
+	hCols:Clear()
 
-	local aCol, nX = D.GetColumns(), 0
+	local aCol, nX, Sorter = D.GetColumns(), 0, nil
 	for i, col in ipairs(aCol) do
-		if i > 0 then
-			local img = hTitle:AppendItemFromIni(SZ_INI, 'Image_RoleStat_Break')
-			img:SetRelX(nX)
-		end
+		local hCol = hCols:AppendItemFromIni(SZ_INI, 'Handle_RoleStatColumn')
+		local txt = hCol:Lookup('Text_RoleStat_Title')
+		local imgAsc = hCol:Lookup('Image_RoleStat_Asc')
+		local imgDesc = hCol:Lookup('Image_RoleStat_Desc')
 		local nWidth = i == #aCol and (EXCEL_WIDTH - nX) or col.nWidth
-		local txt = hTitle:AppendItemFromIni(SZ_INI, 'Text_RoleStat_Title')
-		txt:SetRelX(nX)
+		local nSortDelta = nWidth > 70 and 25 or 15
+		if i == 0 then
+			hCol:Lookup('Image_RoleStat_Break'):Hide()
+		end
+		hCol.szSort = col.id
+		hCol:SetRelX(nX)
+		hCol:SetW(nWidth)
 		txt:SetW(nWidth)
 		txt:SetText(col.szTitle)
+		imgAsc:SetRelX(nWidth - nSortDelta)
+		imgDesc:SetRelX(nWidth - nSortDelta)
+		if O.szSort == col.id then
+			Sorter = function(r1, r2)
+				if O.szSortOrder == 'asc' then
+					return col.Compare(r1, r2) < 0
+				end
+				return col.Compare(r1, r2) > 0
+			end
+		end
+		imgAsc:SetVisible(O.szSort == col.id and O.szSortOrder == 'asc')
+		imgDesc:SetVisible(O.szSort == col.id and O.szSortOrder == 'desc')
+		hCol:FormatAllItemPos()
 		nX = nX + nWidth
 	end
-	hTitle:FormatAllItemPos()
+	hCols:FormatAllItemPos()
 
 
 	local szSearch = page:Lookup('Wnd_Total/Wnd_Search/Edit_Search'):GetText()
@@ -218,6 +439,10 @@ function D.UpdateUI(page)
 	DB_RoleInfoR:ClearBindings()
 	DB_RoleInfoR:BindAll(szUSearch, szUSearch, szUSearch, szUSearch)
 	local result = DB_RoleInfoR:GetAll()
+
+	if Sorter then
+		sort(result, Sorter)
+	end
 
 	local aCol = D.GetColumns()
 	local hList = page:Lookup('Wnd_Total/WndScroll_RoleStat', 'Handle_List')
@@ -233,11 +458,7 @@ function D.UpdateUI(page)
 		for j, col in ipairs(aCol) do
 			local hItem = hRow:AppendItemFromIni(SZ_INI, 'Handle_Item') -- 外部居中层
 			local hItemContent = hItem:Lookup('Handle_ItemContent') -- 内部文本布局层
-			if col.szKey then
-				hItemContent:AppendItemFromString(GetFormatText(rec[col.szKey]))
-			elseif col.GetFormatText then
-				hItemContent:AppendItemFromString(col.GetFormatText(rec))
-			end
+			hItemContent:AppendItemFromString(col.GetFormatText(rec))
 			hItemContent:SetW(99999)
 			hItemContent:FormatAllItemPos()
 			hItemContent:SetSizeByAllItemSize()
@@ -351,6 +572,21 @@ function D.OnLButtonClick()
 			DB_RoleInfoD:Execute()
 			D.UpdateUI(page)
 		end)
+	end
+end
+
+function D.OnItemLButtonClick()
+	local name = this:GetName()
+	if name == 'Handle_RoleStatColumn' then
+		if this.szSort then
+			local page = this:GetParent():GetParent():GetParent():GetParent():GetParent()
+			if O.szSort == this.szSort then
+				O.szSortOrder = O.szSortOrder == 'asc' and 'desc' or 'asc'
+			else
+				O.szSort = this.szSort
+			end
+			D.UpdateUI(page)
+		end
 	end
 end
 
