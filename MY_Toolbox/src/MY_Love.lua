@@ -117,7 +117,7 @@ for _, p in ipairs(O.aLoverItem) do
 	O.tLoverItem[p.nItem] = p
 end
 RegisterCustomData('MY_Love.bQuiet')
-RegisterCustomData('MY_Love.szNone')
+RegisterCustomData('MY_Love.szNone', 2)
 RegisterCustomData('MY_Love.szJabber')
 RegisterCustomData('MY_Love.szSign')
 RegisterCustomData('MY_Love.bAutoFocus')
@@ -155,9 +155,9 @@ RegisterCustomData('MY_Love.bHookPlayerView')
 -- 本地函数和变量
 ---------------------------------------------------------------------
 
--- 功能内测
+-- 功能屏蔽
 function D.IsShielded()
-	return false
+	return LIB.IsShieldedVersion()
 end
 
 -- 获取背包指定ID物品列表
@@ -443,7 +443,7 @@ function D.SetLover(dwID, nType)
 		if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) or LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 			return LIB.Systopmsg(_L['Set lover is a sensitive action, please unlock to continue.'])
 		end
-		LIB.Confirm(_L('Do you want to love with [%s]?', aInfo.name), function()
+		LIB.Confirm(_L('Do you want to blind love with [%s]?', aInfo.name), function()
 			local aInfo = LIB.GetFriend(dwID)
 			if not aInfo or not aInfo.isonline then
 				return LIB.Alert(_L['Lover must be a online friend'])
@@ -465,7 +465,7 @@ function D.SetLover(dwID, nType)
 			if not aInfo or not aInfo.isonline then
 				return LIB.Alert(_L['Lover must be a online friend'])
 			end
-			LIB.Confirm(_L('Do you want to love with [%s]?', aInfo.name), function()
+			LIB.Confirm(_L('Do you want to mutual love with [%s]?', aInfo.name), function()
 				if not D.GetDoubleLoveItem(aInfo, p.aUIID) then
 					return LIB.Alert(_L('Inadequate conditions, requiring Lv6 friend/party/4-feet distance/%s', p.szName))
 				end
@@ -667,36 +667,48 @@ local function OnBgTalk(_, nChannel, dwTalkerID, szTalkerName, bSelf, ...)
 			OutputMessage('MSG_WHISPER', _L['[Mystery] quietly said:'] .. O.aAutoSay[i] .. '\n')
 			PlaySound(SOUND.UI_SOUND,g_sound.Whisper)
 		elseif szKey == 'LOVE_ASK' then
-			-- 已有情缘直接拒绝
 			if O.lover.dwID == dwTalkerID and O.lover.nLoverType == 1 then
-				LIB.SendBgMsg(szTalkerName, 'MY_LOVE', 'LOVE_ANS_ALREADY')
+				-- 已是情缘发起修复
+				LIB.SendBgMsg(szTalkerName, 'MY_LOVE', 'FIX2', {
+					O.lover.nLoverTime,
+					O.lover.nSendItem,
+					O.lover.nReceiveItem,
+				})
 			elseif O.lover.dwID ~= 0 and (O.lover.dwID ~= dwTalkerID or O.lover.nLoverType == 1) then
-				return LIB.SendBgMsg(szTalkerName, 'MY_LOVE', 'LOVE_ANS_EXISTS')
+				-- 已有情缘直接拒绝
+				LIB.SendBgMsg(szTalkerName, 'MY_LOVE', 'LOVE_ANS_EXISTS')
+			else
+				-- 询问意见
+				LIB.Confirm(_L('[%s] want to mutual love with you, OK?', szTalkerName), function()
+					LIB.SendBgMsg(szTalkerName, 'MY_LOVE', 'LOVE_ANS_YES')
+				end, function()
+					LIB.SendBgMsg(szTalkerName, 'MY_LOVE', 'LOVE_ANS_NO')
+				end)
 			end
-			-- 询问意见
-			LIB.Confirm(_L('[%s] want to mutual love with you, OK?', szTalkerName), function()
-				LIB.SendBgMsg(szTalkerName, 'MY_LOVE', 'LOVE_ANS_YES')
-			end, function()
-				LIB.SendBgMsg(szTalkerName, 'MY_LOVE', 'LOVE_ANS_NO')
-			end)
-		elseif szKey == 'FIX1' then
+		elseif szKey == 'FIX1' or szKey == 'FIX2' then
 			if O.lover.dwID == 0 or (O.lover.dwID == dwTalkerID and O.lover.nLoverType ~= 1) then
 				local aInfo = LIB.GetFriend(dwTalkerID)
 				if aInfo then
-					LIB.Confirm(_L('[%s] want to repair love relation with you, OK?', szTalkerName), function()
+					local szText = szKey == 'FIX1'
+						and _L('[%s] want to repair love relation with you, OK?', szTalkerName)
+						or _L('[%s] is already your lover, fix it now?', szTalkerName)
+					LIB.Confirm(szText, function()
 						if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) or LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 							LIB.Systopmsg(_L['Fix lover is a sensitive action, please unlock to continue.'])
 							return false
 						end
+						Wnd.CloseWindow('MY_Love_SetLover')
 						D.SaveLover(tonumber(data[1]), dwTalkerID, 1, data[3], data[2])
 						LIB.Talk(PLAYER_TALK_CHANNEL.TONG, _L('From now on, my heart lover is [%s]', szTalkerName))
 						LIB.Systopmsg(_L('Congratulations, love relation with [%s] has been fixed!', szTalkerName))
 					end)
 				end
-			elseif O.lover.dwID == dwTalkerID then
-				LIB.SendBgMsg(szTalkerName, 'MY_LOVE', 'LOVE_ANS_ALREADY')
-			else
-				LIB.SendBgMsg(szTalkerName, 'MY_LOVE', 'LOVE_ANS_EXISTS')
+			elseif szKey == 'FIX1' then
+				if O.lover.dwID == dwTalkerID then
+					LIB.SendBgMsg(szTalkerName, 'MY_LOVE', 'LOVE_ANS_ALREADY')
+				else
+					LIB.SendBgMsg(szTalkerName, 'MY_LOVE', 'LOVE_ANS_EXISTS')
+				end
 			end
 		elseif szKey == 'LOVE_ANS_EXISTS' then
 			local szMsg = _L['Unfortunately the other has lover, but you can still blind love him!']
