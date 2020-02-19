@@ -310,14 +310,6 @@ function DB:SelectMsg(aChannel, szSearch, nStartTime, nEndTime, nOffset, nLimit)
 	return (stmt:GetAll())
 end
 
-function DB:SelectMsgByTime(szOp, nTime)
-	if not self:Connect() then
-		return false
-	end
-	self:Flush()
-	return (self.db:Execute(SELECT_MSG .. ' WHERE time ' .. szOp .. ' ' .. nTime .. ' ORDER BY nTime ASC'))
-end
-
 function DB:GetMinRecTime()
 	if not self:Connect() then
 		return false

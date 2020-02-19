@@ -231,7 +231,7 @@ function DS:InitDB(bFixProblem)
 						i = i - 1
 					else -- 覆盖区域冲突 将右侧节点的冲突区域数据移动到左侧节点中
 						db1:SetMaxTime(db1:GetMaxRecTime())
-						for _, rec in ipairs(db2:SelectMsgByTime('<=', db1:GetMaxTime())) do
+						for _, rec in ipairs(db2:SelectMsg(nil, nil, 0, db1:GetMaxTime())) do
 							db1:InsertMsg(rec.nChannel, rec.szText, rec.szMsg, rec.szTalker, rec.nTime, rec.szHash)
 						end
 						db1:Flush()
