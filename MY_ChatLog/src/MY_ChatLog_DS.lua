@@ -564,6 +564,22 @@ function DS:DeleteMsg(szHash, nTime)
 	return self
 end
 
+function DS:DeleteMsgInterval(aChannel, szSearch, nMinTime, nMaxTime)
+	if self:InitDB() then
+		self:FlushDB()
+		szSearch, nMinTime, nMaxTime = FormatCommonParam(szSearch, nMinTime, nMaxTime)
+		local szuSearch = IsEmpty(szSearch) and '' or AnsiToUTF8('%' .. szSearch .. '%')
+		local aNChannel = SToNChannel(aChannel)
+		for _, db in ipairs(self.aDB) do
+			if (IsEmpty(nMaxTime) or IsHugeNumber(nMaxTime) or db:GetMinTime() <= nMaxTime)
+			and (IsEmpty(nMinTime) or db:GetMaxTime() >= nMinTime) then
+				db:DeleteMsgInterval(aNChannel, szuSearch, nMinTime, nMaxTime)
+			end
+		end
+	end
+	return self
+end
+
 function DS:FlushDB()
 	if (not IsEmpty(self.aInsertQueue) or not IsEmpty(self.aDeleteQueue)) and self:InitDB() then
 		-- ²åÈë¼ÇÂ¼
