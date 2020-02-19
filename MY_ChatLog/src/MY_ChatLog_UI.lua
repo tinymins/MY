@@ -72,11 +72,11 @@ function MY_ChatLog_UI.OnFrameCreate()
 	container:Clear()
 	for _, info in pairs(LOG_TYPE) do
 		local wnd = container:AppendContentFromIni(SZ_INI, 'Wnd_ChatChannel')
-		wnd.id = info.id
-		wnd.aChannels = info.channels
-		wnd:Lookup('CheckBox_ChatChannel'):Check(not this.tUncheckedChannel[info.id], WNDEVENT_FIRETYPE.PREVENT)
-		wnd:Lookup('CheckBox_ChatChannel', 'Text_ChatChannel'):SetText(info.title)
-		wnd:Lookup('CheckBox_ChatChannel', 'Text_ChatChannel'):SetFontColor(unpack(MSGTYPE_COLOR[info.channels[1]]))
+		wnd.szKey = info.szKey
+		wnd.aChannel = info.aChannel
+		wnd:Lookup('CheckBox_ChatChannel'):Check(not this.tUncheckedChannel[info.szKey], WNDEVENT_FIRETYPE.PREVENT)
+		wnd:Lookup('CheckBox_ChatChannel', 'Text_ChatChannel'):SetText(info.szTitle)
+		wnd:Lookup('CheckBox_ChatChannel', 'Text_ChatChannel'):SetFontColor(unpack(MSGTYPE_COLOR[info.aChannel[1]]))
 	end
 	container:FormatAllContentPos()
 
@@ -257,12 +257,12 @@ function D.UpdatePage(frame, bKeepScroll)
 	for i = 0, container:GetAllContentCount() - 1 do
 		local wnd = container:LookupContent(i)
 		if wnd:Lookup('CheckBox_ChatChannel'):IsCheckBoxChecked() then
-			for _, szChannel in ipairs(wnd.aChannels) do
+			for _, szChannel in ipairs(wnd.aChannel) do
 				insert(aChannel, szChannel)
 			end
-			frame.tUncheckedChannel[wnd.id] = nil
+			frame.tUncheckedChannel[wnd.szKey] = nil
 		else
-			frame.tUncheckedChannel[wnd.id] = true
+			frame.tUncheckedChannel[wnd.szKey] = true
 		end
 	end
 	local szSearch = frame:Lookup('Window_Main/Wnd_Search/Edit_Search'):GetText()

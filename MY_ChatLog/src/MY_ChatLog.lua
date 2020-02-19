@@ -72,18 +72,18 @@ local TONG_MEMBER_LOGOUT_MSG = '^' .. LIB.EscapeString(g_tStrings.STR_GUILD_MEMB
 ------------------------------------------------------------------------------------------------------
 local EXPORT_SLICE = 100
 local LOG_TYPE = {
-	{id = 'whisper', title = g_tStrings.tChannelName['MSG_WHISPER'       ], channels = {'MSG_WHISPER'       }},
-	{id = 'party'  , title = g_tStrings.tChannelName['MSG_PARTY'         ], channels = {'MSG_PARTY'         }},
-	{id = 'team'   , title = g_tStrings.tChannelName['MSG_TEAM'          ], channels = {'MSG_TEAM'          }},
-	{id = 'friend' , title = g_tStrings.tChannelName['MSG_FRIEND'        ], channels = {'MSG_FRIEND'        }},
-	{id = 'guild'  , title = g_tStrings.tChannelName['MSG_GUILD'         ], channels = {'MSG_GUILD'         }},
-	{id = 'guild_a', title = g_tStrings.tChannelName['MSG_GUILD_ALLIANCE'], channels = {'MSG_GUILD_ALLIANCE'}},
-	{id = 'death'  , title = _L['Death Log'], channels = {'MSG_SELF_DEATH', 'MSG_SELF_KILL', 'MSG_PARTY_DEATH', 'MSG_PARTY_KILL'}},
-	{id = 'journal', title = _L['Journal Log'], channels = {
+	{ szKey = 'whisper', szTitle = g_tStrings.tChannelName['MSG_WHISPER'       ], aChannel = {'MSG_WHISPER'       }},
+	{ szKey = 'party'  , szTitle = g_tStrings.tChannelName['MSG_PARTY'         ], aChannel = {'MSG_PARTY'         }},
+	{ szKey = 'team'   , szTitle = g_tStrings.tChannelName['MSG_TEAM'          ], aChannel = {'MSG_TEAM'          }},
+	{ szKey = 'friend' , szTitle = g_tStrings.tChannelName['MSG_FRIEND'        ], aChannel = {'MSG_FRIEND'        }},
+	{ szKey = 'guild'  , szTitle = g_tStrings.tChannelName['MSG_GUILD'         ], aChannel = {'MSG_GUILD'         }},
+	{ szKey = 'guild_a', szTitle = g_tStrings.tChannelName['MSG_GUILD_ALLIANCE'], aChannel = {'MSG_GUILD_ALLIANCE'}},
+	{ szKey = 'death'  , szTitle = _L['Death Log'], aChannel = {'MSG_SELF_DEATH', 'MSG_SELF_KILL', 'MSG_PARTY_DEATH', 'MSG_PARTY_KILL'}},
+	{ szKey = 'journal', szTitle = _L['Journal Log'], aChannel = {
 		'MSG_MONEY', 'MSG_ITEM', --'MSG_EXP', 'MSG_REPUTATION', 'MSG_CONTRIBUTE', 'MSG_ATTRACTION', 'MSG_PRESTIGE',
 		-- 'MSG_TRAIN', 'MSG_MENTOR_VALUE', 'MSG_THEW_STAMINA', 'MSG_TONG_FUND'
 	}},
-	{id = 'monitor', title = _L['MY Monitor'], channels = {'MSG_MY_MONITOR'}},
+	{ szKey = 'monitor', szTitle = _L['MY Monitor'], aChannel = {'MSG_MY_MONITOR'}},
 }
 local MSGTYPE_COLOR = setmetatable({
 	['MSG_MY_MONITOR'] = {255, 255, 0},
@@ -257,7 +257,7 @@ local function OnMsg(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID, szTalk
 end
 local tChannels, aChannels = {}, {}
 for _, info in ipairs(LOG_TYPE) do
-	for _, szChannel in ipairs(info.channels) do
+	for _, szChannel in ipairs(info.aChannel) do
 		tChannels[szChannel] = true
 	end
 end

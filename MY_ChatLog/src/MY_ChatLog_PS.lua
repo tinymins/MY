@@ -225,7 +225,7 @@ function D.ExportConfirm()
 	for nGroup, info in ipairs(LOG_TYPE) do
 		x = x + ui:Append('WndCheckBox', {
 			x = x, y = y, w = 100,
-			text = info.title,
+			text = info.szTitle,
 			checked = true,
 			oncheck = function(bChecked)
 				tChannels[nGroup] = bChecked
@@ -261,7 +261,7 @@ function D.ExportConfirm()
 				local aChannels = {}
 				for nGroup, info in ipairs(LOG_TYPE) do
 					if tChannels[nGroup] then
-						for _, szChannel in ipairs(info.channels) do
+						for _, szChannel in ipairs(info.aChannel) do
 							table.insert(aChannels, szChannel)
 						end
 					end
