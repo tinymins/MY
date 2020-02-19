@@ -70,6 +70,9 @@ function D.Apply()
 		end
 		hShaList:Show()
 		local function OnPlayerEnter(dwID)
+			if LIB.IsInShieldedMap() then
+				return
+			end
 			local tar = GetPlayer(dwID)
 			if not tar then
 				return
@@ -94,6 +97,9 @@ function D.Apply()
 			end
 		end
 		local function OnPlayerLeave(dwID)
+			if LIB.IsInShieldedMap() then
+				return
+			end
 			if O.bFriendNav and Navigator_Remove then
 				Navigator_Remove('MY_FRIEND_TIP.' .. dwID)
 			else
@@ -105,6 +111,9 @@ function D.Apply()
 			end
 		end
 		local function RescanNearby()
+			if LIB.IsInShieldedMap() then
+				return
+			end
 			for _, p in ipairs(LIB.GetNearPlayer()) do
 				OnPlayerEnter(p.dwID)
 			end
@@ -134,6 +143,9 @@ function D.Apply()
 		end
 		hShaList:Show()
 		local function OnPlayerEnter(dwID, nRetryCount)
+			if LIB.IsInShieldedMap() then
+				return
+			end
 			nRetryCount = nRetryCount or 0
 			if nRetryCount > 5 then
 				return
@@ -165,6 +177,9 @@ function D.Apply()
 			end
 		end
 		local function OnPlayerLeave(dwID)
+			if LIB.IsInShieldedMap() then
+				return
+			end
 			if O.bTongMemberNav and Navigator_Remove then
 				Navigator_Remove('MY_GUILDMEMBER_TIP.' .. dwID)
 			else
@@ -176,6 +191,9 @@ function D.Apply()
 			end
 		end
 		for _, p in ipairs(LIB.GetNearPlayer()) do
+			if LIB.IsInShieldedMap() then
+				return
+			end
 			OnPlayerEnter(p.dwID)
 		end
 		LIB.RegisterEvent('PLAYER_ENTER_SCENE.MY_GUILDMEMBER_TIP', function(event) OnPlayerEnter(arg0) end)
