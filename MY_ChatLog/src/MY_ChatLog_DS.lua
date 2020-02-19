@@ -473,7 +473,7 @@ function DS:CountMsg(aChannel, szSearch)
 	return nCount
 end
 
-function DS:SelectMsg(aChannel, szSearch, nStartTime, nEndTime, nOffset, nLimit, bUTF8)
+function DS:SelectMsg(aChannel, szSearch, nMinTime, nMaxTime, nOffset, nLimit, bUTF8)
 	if #aChannel == 0 then
 		return {}
 	end
@@ -491,7 +491,7 @@ function DS:SelectMsg(aChannel, szSearch, nStartTime, nEndTime, nOffset, nLimit,
 		end
 		local nCount = db:CountMsg(aNChannel, szuSearch)
 		if nOffset < nCount then
-			local res = db:SelectMsg(aNChannel, szuSearch, nStartTime, nEndTime, nOffset, nLimit)
+			local res = db:SelectMsg(aNChannel, szuSearch, nMinTime, nMaxTime, nOffset, nLimit)
 			if bUTF8 then
 				for _, p in ipairs(res) do
 					insert(aResult, p)

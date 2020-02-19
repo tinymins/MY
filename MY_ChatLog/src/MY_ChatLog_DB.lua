@@ -50,15 +50,15 @@ local DB_CACHE = setmetatable({}, {__mode = 'v'})
 local SELECT_MSG = 'SELECT hash AS szHash, channel AS nChannel, time AS nTime, talker AS szTalker, text AS szText, msg AS szMsg FROM ChatLog'
 local DELETE_MSG = 'DELETE FROM ChatLog'
 
-local function FormatCommonParam(szSearch, nStartTime, nEndTime, nOffset, nLimit)
+local function FormatCommonParam(szSearch, nMinTime, nMaxTime, nOffset, nLimit)
 	if not szSearch then
 		szSearch = ''
 	end
-	if not nStartTime then
-		nStartTime = 0
+	if not nMinTime then
+		nMinTime = 0
 	end
-	if not nEndTime then
-		nEndTime = HUGE
+	if not nMaxTime then
+		nMaxTime = HUGE
 	end
 	if not nOffset then
 		nOffset = 0
@@ -66,10 +66,10 @@ local function FormatCommonParam(szSearch, nStartTime, nEndTime, nOffset, nLimit
 	if not nLimit then
 		nLimit = HUGE
 	end
-	return szSearch, nStartTime, nEndTime, nOffset, nLimit
+	return szSearch, nMinTime, nMaxTime, nOffset, nLimit
 end
 
-local function AppendCommonWhere(szSQL, aValue, aChannel, szSearch, nStartTime, nEndTime)
+local function AppendCommonWhere(szSQL, aValue, aChannel, szSearch, nMinTime, nMaxTime)
 	local szWhere = ''
 	local aWhere = {}
 	if aChannel then
@@ -84,19 +84,19 @@ local function AppendCommonWhere(szSQL, aValue, aChannel, szSearch, nStartTime, 
 		end
 		szWhere = szWhere .. ' (' .. concat(aWhere, ' OR ') .. ')'
 	end
-	if not IsEmpty(nStartTime) then
+	if not IsEmpty(nMinTime) then
 		if #szWhere > 0 then
 			szWhere = szWhere .. ' AND'
 		end
 		szWhere = szWhere .. ' (time >= ?)'
-		insert(aValue, nStartTime)
+		insert(aValue, nMinTime)
 	end
-	if not IsEmpty(nEndTime) and not IsHugeNumber(nEndTime) then
+	if not IsEmpty(nMaxTime) and not IsHugeNumber(nMaxTime) then
 		if #szWhere > 0 then
 			szWhere = szWhere .. ' AND'
 		end
 		szWhere = szWhere .. ' (time <= ?)'
-		insert(aValue, nEndTime)
+		insert(aValue, nMaxTime)
 	end
 	if not IsEmpty(szSearch) then
 		if #szWhere > 0 then
@@ -346,7 +346,7 @@ function DB:CountMsg(aChannel, szSearch)
 	return nCount
 end
 
-function DB:SelectMsg(aChannel, szSearch, nStartTime, nEndTime, nOffset, nLimit)
+function DB:SelectMsg(aChannel, szSearch, nMinTime, nMaxTime, nOffset, nLimit)
 	if not self:Connect() then
 		return false
 	end
@@ -354,9 +354,9 @@ function DB:SelectMsg(aChannel, szSearch, nStartTime, nEndTime, nOffset, nLimit)
 	if IsTable(aChannel) and IsEmpty(aChannel) then
 		return {}
 	end
-	szSearch, nStartTime, nEndTime, nOffset, nLimit = FormatCommonParam(szSearch, nStartTime, nEndTime, nOffset, nLimit)
+	szSearch, nMinTime, nMaxTime, nOffset, nLimit = FormatCommonParam(szSearch, nMinTime, nMaxTime, nOffset, nLimit)
 	local szSQL, aValue = SELECT_MSG, {}
-	szSQL = AppendCommonWhere(szSQL, aValue, aChannel, szSearch, nStartTime, nEndTime)
+	szSQL = AppendCommonWhere(szSQL, aValue, aChannel, szSearch, nMinTime, nMaxTime)
 	szSQL = szSQL .. ' ORDER BY nTime ASC'
 	szSQL = AppendCommonLimit(szSQL, aValue, nOffset, nLimit)
 	local stmt = self.db:Prepare(szSQL)
@@ -389,7 +389,7 @@ function DB:DeleteMsg(szHash, nTime)
 	end
 end
 
-function DB:DeleteMsgInterval(aChannel, szSearch, nStartTime, nEndTime)
+function DB:DeleteMsgInterval(aChannel, szSearch, nMinTime, nMaxTime)
 	if not self:Connect() then
 		return false
 	end
@@ -397,9 +397,9 @@ function DB:DeleteMsgInterval(aChannel, szSearch, nStartTime, nEndTime)
 	if IsTable(aChannel) and IsEmpty(aChannel) then
 		return true
 	end
-	szSearch, nStartTime, nEndTime = FormatCommonParam(szSearch, nStartTime, nEndTime)
+	szSearch, nMinTime, nMaxTime = FormatCommonParam(szSearch, nMinTime, nMaxTime)
 	local szSQL, aValue = DELETE_MSG, {}
-	szSQL = AppendCommonWhere(szSQL, aValue, aChannel, szSearch, nStartTime, nEndTime)
+	szSQL = AppendCommonWhere(szSQL, aValue, aChannel, szSearch, nMinTime, nMaxTime)
 	if szSQL ~= DELETE_MSG then
 		local stmt = self.db:Prepare(szSQL)
 		stmt:ClearBindings()
