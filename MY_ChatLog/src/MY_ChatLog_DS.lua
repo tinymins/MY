@@ -79,11 +79,33 @@ local CHANNELS = {
 local CHANNELS_R = LIB.FlipObjectKV(CHANNELS)
 
 local function SToNChannel(aChannel)
+	if not aChannel then
+		return
+	end
 	local aNChannel = {}
 	for _, szChannel in ipairs(aChannel) do
 		insert(aNChannel, CHANNELS_R[szChannel])
 	end
 	return aNChannel
+end
+
+local function FormatCommonParam(szSearch, nMinTime, nMaxTime, nOffset, nLimit)
+	if not szSearch then
+		szSearch = ''
+	end
+	if not nMinTime then
+		nMinTime = 0
+	end
+	if not nMaxTime then
+		nMaxTime = HUGE
+	end
+	if not nOffset then
+		nOffset = 0
+	end
+	if not nLimit then
+		nLimit = HUGE
+	end
+	return szSearch, nMinTime, nMaxTime, nOffset, nLimit
 end
 
 local function NewDB(szRoot, nMinTime, nMaxTime)
@@ -449,24 +471,23 @@ function DS:InsertMsg(szChannel, szText, szMsg, szTalker, nTime)
 	return self
 end
 
-function DS:CountMsg(aChannel, szSearch)
-	if #aChannel == 0 then
+function DS:CountMsg(aChannel, szSearch, nMinTime, nMaxTime)
+	if IsTable(aChannel) and IsEmpty(aChannel) then
 		return 0
 	end
 	if not self:InitDB() then
 		return 0
 	end
-	if not szSearch then
-		szSearch = ''
-	end
-	local szuSearch = szSearch == '' and '' or AnsiToUTF8('%' .. szSearch .. '%')
+	szSearch, nMinTime, nMaxTime = FormatCommonParam(szSearch, nMinTime, nMaxTime)
+	local szuSearch = IsEmpty(szSearch) and '' or AnsiToUTF8('%' .. szSearch .. '%')
 	local aNChannel, nCount = SToNChannel(aChannel), 0
 	for _, db in ipairs(self.aDB) do
-		nCount = nCount + db:CountMsg(aNChannel, szuSearch)
+		nCount = nCount + db:CountMsg(aNChannel, szuSearch, nMinTime, nMaxTime)
 	end
-	local tChannel = LIB.FlipObjectKV(aChannel)
+	local tChannel = aChannel and LIB.FlipObjectKV(aChannel)
 	for _, rec in ipairs(self.aInsertQueueAnsi) do
-		if tChannel[rec.szChannel] and (wfind(rec.szText, szSearch) or wfind(rec.szTalker, szSearch)) then
+		if (not tChannel or tChannel[rec.szChannel])
+		and (wfind(rec.szText, szSearch) or wfind(rec.szTalker, szSearch)) then
 			nCount = nCount + 1
 		end
 	end
@@ -474,22 +495,20 @@ function DS:CountMsg(aChannel, szSearch)
 end
 
 function DS:SelectMsg(aChannel, szSearch, nMinTime, nMaxTime, nOffset, nLimit, bUTF8)
-	if #aChannel == 0 then
+	if IsTable(aChannel) and IsEmpty(aChannel) then
 		return {}
 	end
 	if not self:InitDB() then
 		return {}
 	end
-	if not szSearch then
-		szSearch = ''
-	end
-	local szuSearch = szSearch == '' and '' or AnsiToUTF8('%' .. szSearch .. '%')
+	szSearch, nMinTime, nMaxTime, nOffset, nLimit = FormatCommonParam(szSearch, nMinTime, nMaxTime, nOffset, nLimit)
+	local szuSearch = IsEmpty(szSearch) and '' or AnsiToUTF8('%' .. szSearch .. '%')
 	local aNChannel, aResult = SToNChannel(aChannel), {}
 	for _, db in ipairs(self.aDB) do
 		if nLimit == 0 then
 			break
 		end
-		local nCount = db:CountMsg(aNChannel, szuSearch)
+		local nCount = db:CountMsg(aNChannel, szuSearch, nMinTime, nMaxTime)
 		if nOffset < nCount then
 			local res = db:SelectMsg(aNChannel, szuSearch, nMinTime, nMaxTime, nOffset, nLimit)
 			if bUTF8 then
@@ -506,18 +525,20 @@ function DS:SelectMsg(aChannel, szSearch, nMinTime, nMaxTime, nOffset, nLimit, b
 					insert(aResult, p)
 				end
 			end
-			nLimit = max(nLimit - nCount + nOffset, 0)
+			if not IsHugeNumber(nLimit) then
+				nLimit = max(nLimit - nCount + nOffset, 0)
+			end
 		end
 		nOffset = max(nOffset - nCount, 0)
 	end
-	if nLimit > 0 then
-		local tChannel = LIB.FlipObjectKV(aChannel)
-		local nCount = 0
+	if IsHugeNumber(nLimit) or nLimit > 0 then
+		local tChannel = aChannel and LIB.FlipObjectKV(aChannel)
 		for i, rec in ipairs(self.aInsertQueueAnsi) do
 			if nLimit == 0 then
 				break
 			end
-			if tChannel[rec.szChannel] and (wfind(rec.szText, szSearch) or wfind(rec.szTalker, szSearch)) then
+			if (not tChannel or tChannel[rec.szChannel])
+			and (wfind(rec.szText, szSearch) or wfind(rec.szTalker, szSearch)) then
 				if nOffset > 0 then
 					nOffset = nOffset - 1
 				else
@@ -526,7 +547,9 @@ function DS:SelectMsg(aChannel, szSearch, nMinTime, nMaxTime, nOffset, nLimit, b
 					else
 						insert(aResult, Clone(rec))
 					end
-					nLimit = nLimit - 1
+					if not IsHugeNumber(nLimit) then
+						nLimit = nLimit - 1
+					end
 				end
 			end
 		end
