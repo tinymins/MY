@@ -85,6 +85,16 @@ local LOG_TYPE = {
 	}},
 	{ szKey = 'monitor', szTitle = _L['MY Monitor'], aChannel = {'MSG_MY_MONITOR'}},
 }
+local LOG_LIMIT = (LIB.IsStreaming() and not LIB.IsDebugClient())
+	and {
+		{ aKey = {'whisper'}, nLimit = 5000 },
+		{ aKey = {'party', 'team'}, nLimit = 5000 },
+		{ aKey = {'friend'}, nLimit = 5000 },
+		{ aKey = {'guild', 'guild_a'}, nLimit = 1000 },
+		{ aKey = {'death', 'journal'}, nLimit = 1000 },
+		{ aKey = {'monitor'}, nLimit = 1000 },
+	}
+	or {}
 local MSGTYPE_COLOR = setmetatable({
 	['MSG_MY_MONITOR'] = {255, 255, 0},
 }, {__index = function(t, k) return GetMsgFontColor(k, true) end})
@@ -296,6 +306,31 @@ local function Flush()
 		return
 	end
 	l_ds:FlushDB()
+	-- 数据超限处理
+	local bExceed = false
+	for _, p in ipairs(LOG_LIMIT) do
+		local aChannel = {}
+		for _, szKey in ipairs(p.aKey) do
+			for _, info in ipairs(LOG_TYPE) do
+				if info.szKey == szKey then
+					for _, szChannel in ipairs(info.aChannel) do
+						insert(aChannel, szChannel)
+					end
+				end
+			end
+		end
+		local nCount = l_ds:CountMsg(aChannel)
+		if nCount > p.nLimit then
+			local aMsg = l_ds:SelectMsg(aChannel, nil, nil, nil, nCount - p.nLimit, 1)
+			if aMsg and aMsg[1] then
+				bExceed = true
+				l_ds:DeleteMsgInterval(aChannel, '', 0, aMsg[1].nTime)
+			end
+		end
+	end
+	if bExceed then
+		D.OptimizeDB()
+	end
 end
 LIB.RegisterFlush('MY_Chat_Release', Flush)
 end
