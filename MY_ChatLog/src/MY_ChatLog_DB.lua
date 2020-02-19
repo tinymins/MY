@@ -48,6 +48,88 @@ end
 local DB = class()
 local DB_CACHE = setmetatable({}, {__mode = 'v'})
 local SELECT_MSG = 'SELECT hash AS szHash, channel AS nChannel, time AS nTime, talker AS szTalker, text AS szText, msg AS szMsg FROM ChatLog'
+local DELETE_MSG = 'DELETE FROM ChatLog'
+
+local function FormatCommonParam(szSearch, nStartTime, nEndTime, nOffset, nLimit)
+	if not szSearch then
+		szSearch = ''
+	end
+	if not nStartTime then
+		nStartTime = 0
+	end
+	if not nEndTime then
+		nEndTime = HUGE
+	end
+	if not nOffset then
+		nOffset = 0
+	end
+	if not nLimit then
+		nLimit = HUGE
+	end
+	return szSearch, nStartTime, nEndTime, nOffset, nLimit
+end
+
+local function AppendCommonWhere(szSQL, aValue, aChannel, szSearch, nStartTime, nEndTime)
+	local szWhere = ''
+	local aWhere = {}
+	if aChannel then
+		for _, nChannel in ipairs(aChannel) do
+			insert(aWhere, 'channel = ?')
+			insert(aValue, nChannel)
+		end
+	end
+	if #aWhere > 0 then
+		if #szWhere > 0 then
+			szWhere = szWhere .. ' AND'
+		end
+		szWhere = szWhere .. ' (' .. concat(aWhere, ' OR ') .. ')'
+	end
+	if not IsEmpty(nStartTime) then
+		if #szWhere > 0 then
+			szWhere = szWhere .. ' AND'
+		end
+		szWhere = szWhere .. ' (time >= ?)'
+		insert(aValue, nStartTime)
+	end
+	if not IsEmpty(nEndTime) and not IsHugeNumber(nEndTime) then
+		if #szWhere > 0 then
+			szWhere = szWhere .. ' AND'
+		end
+		szWhere = szWhere .. ' (time <= ?)'
+		insert(aValue, nEndTime)
+	end
+	if not IsEmpty(szSearch) then
+		if #szWhere > 0 then
+			szWhere = szWhere .. ' AND'
+		end
+		szWhere = szWhere .. ' (talker LIKE ? OR text LIKE ?)'
+		insert(aValue, szSearch)
+		insert(aValue, szSearch)
+	end
+	if #szWhere > 0 then
+		if wfind(szSQL, ' WHERE ') then
+			szSQL = szSQL .. ' AND' .. szWhere
+		else
+			szSQL = szSQL .. ' WHERE' .. szWhere
+		end
+	end
+	return szSQL
+end
+
+local function AppendCommonLimit(szSQL, aValue, nOffset, nLimit)
+	if nOffset and not nLimit then
+		nLimit = -1
+	end
+	if nLimit then
+		szSQL = szSQL .. ' LIMIT ?'
+		insert(aValue, nLimit)
+	end
+	if nOffset then
+		szSQL = szSQL .. ' OFFSET ?'
+		insert(aValue, nOffset)
+	end
+	return szSQL
+end
 
 function DB:ctor(szFilePath)
 	self.szFilePath = szFilePath
@@ -222,13 +304,21 @@ function DB:CountMsg(aChannel, szSearch)
 		return false
 	end
 	self:Flush()
-	if not aChannel then
+	if IsTable(aChannel) and IsEmpty(aChannel) then
+		return 0
+	end
+	szSearch = FormatCommonParam(szSearch)
+	if not aChannel and IsEmpty(szSearch) then
 		if not self.nCountCache then
 			self.nCountCache = Get(self.db:Execute('SELECT COUNT(*) AS nCount FROM ChatLog'), {1, 'nCount'}, 0)
 		end
 		return self.nCountCache
 	end
-	if not self.tCountCache or self.szCountCacheKey ~= szSearch then
+	if not self.tCountCache then
+		self.tCountCache = {}
+	end
+	local tCount = self.tCountCache[szSearch]
+	if not tCount then
 		local aResult
 		if IsEmpty(szSearch) then
 			aResult = self.db:Execute('SELECT channel AS nChannel, COUNT(*) AS nCount FROM ChatLog GROUP BY channel')
@@ -237,15 +327,21 @@ function DB:CountMsg(aChannel, szSearch)
 			self.stmtCount:BindAll(szSearch, szSearch)
 			aResult = self.stmtCount:GetAll()
 		end
-		self.tCountCache = {}
+		tCount = {}
 		for _, rec in ipairs(aResult) do
-			self.tCountCache[rec.nChannel] = rec.nCount
+			tCount[rec.nChannel] = rec.nCount
 		end
-		self.szCountCacheKey = szSearch
+		self.tCountCache[szSearch] = tCount
 	end
 	local nCount = 0
-	for _, nChannel in ipairs(aChannel) do
-		nCount = nCount + (self.tCountCache[nChannel] or 0)
+	if aChannel then
+		for _, nChannel in ipairs(aChannel) do
+			nCount = nCount + (tCount[nChannel] or 0)
+		end
+	else
+		for _, n in pairs(tCount) do
+			nCount = nCount + n
+		end
 	end
 	return nCount
 end
@@ -255,55 +351,14 @@ function DB:SelectMsg(aChannel, szSearch, nStartTime, nEndTime, nOffset, nLimit)
 		return false
 	end
 	self:Flush()
-	local szSQL = SELECT_MSG
-	local aWhere, aValue = {}, {}
-	if aChannel then
-		for _, nChannel in ipairs(aChannel) do
-			insert(aWhere, 'channel = ?')
-			insert(aValue, nChannel)
-		end
+	if IsTable(aChannel) and IsEmpty(aChannel) then
+		return {}
 	end
-	local szWhere = ''
-	if #aWhere > 0 then
-		szWhere = szWhere .. ' (' .. concat(aWhere, ' OR ') .. ')'
-	end
-	if not IsEmpty(nStartTime) then
-		if #szWhere > 0 then
-			szWhere = szWhere .. ' AND'
-		end
-		szWhere = szWhere .. ' (time >= ?)'
-		insert(aValue, nStartTime)
-	end
-	if not IsEmpty(nEndTime) and not IsHugeNumber(nEndTime) then
-		if #szWhere > 0 then
-			szWhere = szWhere .. ' AND'
-		end
-		szWhere = szWhere .. ' (time <= ?)'
-		insert(aValue, nEndTime)
-	end
-	if not IsEmpty(szSearch) then
-		if #szWhere > 0 then
-			szWhere = szWhere .. ' AND'
-		end
-		szWhere = szWhere .. ' (talker LIKE ? OR text LIKE ?)'
-		insert(aValue, szSearch)
-		insert(aValue, szSearch)
-	end
-	if #szWhere > 0 then
-		szSQL = szSQL .. ' WHERE' .. szWhere
-	end
+	szSearch, nStartTime, nEndTime, nOffset, nLimit = FormatCommonParam(szSearch, nStartTime, nEndTime, nOffset, nLimit)
+	local szSQL, aValue = SELECT_MSG, {}
+	szSQL = AppendCommonWhere(szSQL, aValue, aChannel, szSearch, nStartTime, nEndTime)
 	szSQL = szSQL .. ' ORDER BY nTime ASC'
-	if nOffset and not nLimit then
-		nLimit = -1
-	end
-	if nLimit then
-		szSQL = szSQL .. ' LIMIT ?'
-		insert(aValue, nLimit)
-	end
-	if nOffset then
-		szSQL = szSQL .. ' OFFSET ?'
-		insert(aValue, nOffset)
-	end
+	szSQL = AppendCommonLimit(szSQL, aValue, nOffset, nLimit)
 	local stmt = self.db:Prepare(szSQL)
 	stmt:ClearBindings()
 	stmt:BindAll(unpack(aValue))
@@ -339,41 +394,13 @@ function DB:DeleteMsgInterval(aChannel, szSearch, nStartTime, nEndTime)
 		return false
 	end
 	self:Flush()
-	local aWhere, aValue = {}, {}
-	if aChannel then
-		for _, nChannel in ipairs(aChannel) do
-			insert(aWhere, 'channel = ?')
-			insert(aValue, nChannel)
-		end
+	if IsTable(aChannel) and IsEmpty(aChannel) then
+		return true
 	end
-	local szWhere = ''
-	if #aWhere > 0 then
-		szWhere = szWhere .. ' (' .. concat(aWhere, ' OR ') .. ')'
-	end
-	if not IsEmpty(nStartTime) then
-		if #szWhere > 0 then
-			szWhere = szWhere .. ' AND'
-		end
-		szWhere = szWhere .. ' (time >= ?)'
-		insert(aValue, nStartTime)
-	end
-	if not IsEmpty(nEndTime) then
-		if #szWhere > 0 then
-			szWhere = szWhere .. ' AND'
-		end
-		szWhere = szWhere .. ' (time <= ?)'
-		insert(aValue, nEndTime)
-	end
-	if not IsEmpty(szSearch) then
-		if #szWhere > 0 then
-			szWhere = szWhere .. ' AND'
-		end
-		szWhere = szWhere .. ' (talker LIKE ? OR text LIKE ?)'
-		insert(aValue, szSearch)
-		insert(aValue, szSearch)
-	end
-	if #szWhere > 0 then
-		local szSQL = 'DELETE FROM ChatLog WHERE' .. szWhere
+	szSearch, nStartTime, nEndTime = FormatCommonParam(szSearch, nStartTime, nEndTime)
+	local szSQL, aValue = DELETE_MSG, {}
+	szSQL = AppendCommonWhere(szSQL, aValue, aChannel, szSearch, nStartTime, nEndTime)
+	if szSQL ~= DELETE_MSG then
 		local stmt = self.db:Prepare(szSQL)
 		stmt:ClearBindings()
 		stmt:BindAll(unpack(aValue))
