@@ -334,13 +334,53 @@ function DB:DeleteMsg(szHash, nTime)
 	end
 end
 
-function DB:DeleteMsgByTime(szOp, nTime)
+function DB:DeleteMsgInterval(aChannel, szSearch, nStartTime, nEndTime)
 	if not self:Connect() then
 		return false
 	end
 	self:Flush()
-	self.db:Execute('DELETE FROM ChatLog WHERE time ' .. szOp .. ' ' .. nTime)
-	return true
+	local aWhere, aValue = {}, {}
+	if aChannel then
+		for _, nChannel in ipairs(aChannel) do
+			insert(aWhere, 'channel = ?')
+			insert(aValue, nChannel)
+		end
+	end
+	local szWhere = ''
+	if #aWhere > 0 then
+		szWhere = szWhere .. ' (' .. concat(aWhere, ' OR ') .. ')'
+	end
+	if not IsEmpty(nStartTime) then
+		if #szWhere > 0 then
+			szWhere = szWhere .. ' AND'
+		end
+		szWhere = szWhere .. ' (time >= ?)'
+		insert(aValue, nStartTime)
+	end
+	if not IsEmpty(nEndTime) then
+		if #szWhere > 0 then
+			szWhere = szWhere .. ' AND'
+		end
+		szWhere = szWhere .. ' (time <= ?)'
+		insert(aValue, nEndTime)
+	end
+	if not IsEmpty(szSearch) then
+		if #szWhere > 0 then
+			szWhere = szWhere .. ' AND'
+		end
+		szWhere = szWhere .. ' (talker LIKE ? OR text LIKE ?)'
+		insert(aValue, szSearch)
+		insert(aValue, szSearch)
+	end
+	if #szWhere > 0 then
+		local szSQL = 'DELETE FROM ChatLog WHERE' .. szWhere
+		local stmt = self.db:Prepare(szSQL)
+		stmt:ClearBindings()
+		stmt:BindAll(unpack(aValue))
+		stmt:GetAll()
+		return true
+	end
+	return false
 end
 
 function DB:Flush()

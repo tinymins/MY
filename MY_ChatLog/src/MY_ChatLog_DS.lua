@@ -235,7 +235,7 @@ function DS:InitDB(bFixProblem)
 							db1:InsertMsg(rec.nChannel, rec.szText, rec.szMsg, rec.szTalker, rec.nTime, rec.szHash)
 						end
 						db1:Flush()
-						db2:DeleteMsgByTime('<=', db1:GetMaxTime())
+						db2:DeleteMsgInterval(nil, nil, 0, db1:GetMaxTime())
 						db2:SetMinTime(db1:GetMaxTime())
 						--[[#DEBUG BEGIN]]
 						LIB.Debug(_L['MY_ChatLog'], 'Fix noncontinuously time by moving data from ' .. db2:ToString() .. ' to ' .. db1:ToString(), DEBUG_LEVEL.LOG)
