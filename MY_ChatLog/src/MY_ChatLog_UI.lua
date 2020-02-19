@@ -317,7 +317,7 @@ function D.UpdatePage(frame, bKeepScroll)
 	handle:SetSizeByAllItemSize()
 	hOuter:FormatAllItemPos()
 
-	local data = frame.ds:SelectMsg(aChannel, szSearch, (nCurrentPage - 1) * PAGE_AMOUNT, PAGE_AMOUNT)
+	local data = frame.ds:SelectMsg(aChannel, szSearch, nil, nil, (nCurrentPage - 1) * PAGE_AMOUNT, PAGE_AMOUNT)
 	local scroll = frame:Lookup('Window_Main/WndScroll_ChatLog/Scroll_ChatLog')
 	local bScrollBottom = scroll:GetScrollPos() == scroll:GetStepCount()
 	local handle = frame:Lookup('Window_Main/WndScroll_ChatLog', 'Handle_ChatLogs')

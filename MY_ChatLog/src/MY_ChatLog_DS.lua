@@ -336,7 +336,7 @@ function DS:OptimizeDB()
 				--[[#DEBUG BEGIN]]
 				LIB.Debug(_L['MY_ChatLog'], 'Node count exceed limit: ' .. db:ToString() .. ' ' .. db:CountMsg(), DEBUG_LEVEL.WARNING)
 				--[[#DEBUG END]]
-				local aRec = db:SelectMsg(nil, nil, SINGLE_DB_AMOUNT)
+				local aRec = db:SelectMsg(nil, nil, nil, nil, SINGLE_DB_AMOUNT)
 				local nMaxTime, nMinTime = aRec[1].nTime, aRec[#aRec].nTime
 				-- 超出部分超过单个节点最大负载 直接独立节点
 				local nCount, nOffset = #aRec, 0
@@ -473,7 +473,7 @@ function DS:CountMsg(aChannel, szSearch)
 	return nCount
 end
 
-function DS:SelectMsg(aChannel, szSearch, nOffset, nLimit, bUTF8)
+function DS:SelectMsg(aChannel, szSearch, nStartTime, nEndTime, nOffset, nLimit, bUTF8)
 	if #aChannel == 0 then
 		return {}
 	end
@@ -491,7 +491,7 @@ function DS:SelectMsg(aChannel, szSearch, nOffset, nLimit, bUTF8)
 		end
 		local nCount = db:CountMsg(aNChannel, szuSearch)
 		if nOffset < nCount then
-			local res = db:SelectMsg(aNChannel, szuSearch, nOffset, nLimit)
+			local res = db:SelectMsg(aNChannel, szuSearch, nStartTime, nEndTime, nOffset, nLimit)
 			if bUTF8 then
 				for _, p in ipairs(res) do
 					insert(aResult, p)

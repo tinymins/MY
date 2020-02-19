@@ -250,7 +250,7 @@ function DB:CountMsg(aChannel, szSearch)
 	return nCount
 end
 
-function DB:SelectMsg(aChannel, szSearch, nOffset, nLimit)
+function DB:SelectMsg(aChannel, szSearch, nStartTime, nEndTime, nOffset, nLimit)
 	if not self:Connect() then
 		return false
 	end
@@ -266,6 +266,20 @@ function DB:SelectMsg(aChannel, szSearch, nOffset, nLimit)
 	local szWhere = ''
 	if #aWhere > 0 then
 		szWhere = szWhere .. ' (' .. concat(aWhere, ' OR ') .. ')'
+	end
+	if not IsEmpty(nStartTime) then
+		if #szWhere > 0 then
+			szWhere = szWhere .. ' AND'
+		end
+		szWhere = szWhere .. ' (time >= ?)'
+		insert(aValue, nStartTime)
+	end
+	if not IsEmpty(nEndTime) and not IsHugeNumber(nEndTime) then
+		if #szWhere > 0 then
+			szWhere = szWhere .. ' AND'
+		end
+		szWhere = szWhere .. ' (time <= ?)'
+		insert(aValue, nEndTime)
 	end
 	if not IsEmpty(szSearch) then
 		if #szWhere > 0 then

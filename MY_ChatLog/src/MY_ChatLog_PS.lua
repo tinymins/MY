@@ -318,7 +318,7 @@ function D.Export(szExportFile, aChannels, nPerSec, onProgress)
 				LIB.Sysmsg(_L('Chatlog export succeed, file saved as %s', szFile))
 				return 0
 			end
-			local data = ds:SelectMsg(aChannels, '', nPage * EXPORT_SLICE, EXPORT_SLICE, true)
+			local data = ds:SelectMsg(aChannels, '', nil, nil, nPage * EXPORT_SLICE, EXPORT_SLICE, true)
 			for i, rec in ipairs(data) do
 				db:InsertMsg(rec.nChannel, rec.szText, rec.szMsg, rec.szTalker, rec.nTime, rec.szHash)
 			end
@@ -349,7 +349,7 @@ function D.Export(szExportFile, aChannels, nPerSec, onProgress)
 				LIB.Sysmsg(_L('Chatlog export succeed, file saved as %s', szFile))
 				return 0
 			end
-			local data = ds:SelectMsg(aChannels, '', nPage * EXPORT_SLICE, EXPORT_SLICE)
+			local data = ds:SelectMsg(aChannels, '', nil, nil, nPage * EXPORT_SLICE, EXPORT_SLICE)
 			for i, rec in ipairs(data) do
 				local f = GetMsgFont(rec.szChannel)
 				local r, g, b = unpack(MSGTYPE_COLOR[rec.szChannel])
