@@ -117,7 +117,7 @@ local function AppendCommonWhere(szSQL, aValue, aChannel, szSearch, nMinTime, nM
 end
 
 local function AppendCommonLimit(szSQL, aValue, nOffset, nLimit)
-	if nOffset and not nLimit then
+	if (nOffset and not nLimit) or IsHugeNumber(nLimit) then
 		nLimit = -1
 	end
 	if nLimit then
@@ -299,7 +299,7 @@ function DB:InsertMsg(nChannel, szText, szMsg, szTalker, nTime, szHash)
 	insert(self.aInsertQueue, {szHash = szHash, nChannel = nChannel, nTime = nTime, szTalker = szTalker, szText = szText, szMsg = szMsg})
 end
 
-function DB:CountMsg(aChannel, szSearch)
+function DB:CountMsg(aChannel, szSearch, nMinTime, nMaxTime)
 	if not self:Connect() then
 		return false
 	end
@@ -307,8 +307,10 @@ function DB:CountMsg(aChannel, szSearch)
 	if IsTable(aChannel) and IsEmpty(aChannel) then
 		return 0
 	end
-	szSearch = FormatCommonParam(szSearch)
-	if not aChannel and IsEmpty(szSearch) then
+	szSearch, nMinTime, nMaxTime = FormatCommonParam(szSearch, nMinTime, nMaxTime)
+	local bMinTime = not IsEmpty(nMinTime) and self:GetMinTime() >= nMinTime
+	local bMaxTime = not IsEmpty(nMaxTime) and not IsHugeNumber(nMaxTime) and self:GetMaxTime() >= nMaxTime
+	if not aChannel and IsEmpty(szSearch) and not bMinTime and not bMaxTime then
 		if not self.nCountCache then
 			self.nCountCache = Get(self.db:Execute('SELECT COUNT(*) AS nCount FROM ChatLog'), {1, 'nCount'}, 0)
 		end
@@ -317,11 +319,22 @@ function DB:CountMsg(aChannel, szSearch)
 	if not self.tCountCache then
 		self.tCountCache = {}
 	end
-	local tCount = self.tCountCache[szSearch]
+	local szKey = szSearch
+		.. '_' .. (bMinTime and nMinTime or '0')
+		.. '_' .. (bMaxTime and nMaxTime or '0')
+	local tCount = self.tCountCache[szKey]
 	if not tCount then
 		local aResult
 		if IsEmpty(szSearch) then
 			aResult = self.db:Execute('SELECT channel AS nChannel, COUNT(*) AS nCount FROM ChatLog GROUP BY channel')
+		elseif bMinTime or bMaxTime then
+			local szSQL = 'SELECT channel AS nChannel, COUNT(*) AS nCount FROM ChatLog'
+			local aValue = {}
+			szSQL = AppendCommonWhere(szSQL, aValue, aChannel, szSearch, nMinTime, nMaxTime)
+			local stmt = self.db:Prepare(szSQL)
+			stmt:ClearBindings()
+			stmt:BindAll(unpack(aValue))
+			aResult = stmt:GetAll()
 		else
 			self.stmtCount:ClearBindings()
 			self.stmtCount:BindAll(szSearch, szSearch)
@@ -331,7 +344,7 @@ function DB:CountMsg(aChannel, szSearch)
 		for _, rec in ipairs(aResult) do
 			tCount[rec.nChannel] = rec.nCount
 		end
-		self.tCountCache[szSearch] = tCount
+		self.tCountCache[szKey] = tCount
 	end
 	local nCount = 0
 	if aChannel then
@@ -405,6 +418,7 @@ function DB:DeleteMsgInterval(aChannel, szSearch, nMinTime, nMaxTime)
 		stmt:ClearBindings()
 		stmt:BindAll(unpack(aValue))
 		stmt:GetAll()
+		self:FlushCache()
 		return true
 	end
 	return false
@@ -431,10 +445,14 @@ function DB:Flush()
 		end
 		self.aDeleteQueue = {}
 		self.db:Execute('END TRANSACTION')
-		self.tCountCache = nil
-		self.nCountCache = nil
+		self:FlushCache()
 	end
 	return true
+end
+
+function DB:FlushCache()
+	self.tCountCache = nil
+	self.nCountCache = nil
 end
 
 function MY_ChatLog_DB(szFilePath)
