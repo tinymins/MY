@@ -557,6 +557,46 @@ LIB.RegisterEvent('ON_RESET_MAP_RESPOND', onCopyUpdated)
 LIB.RegisterEvent('ON_MAP_COPY_PROGRESS_UPDATE', onCopyUpdated)
 end
 
+-- 获取副本地图刷新时间
+-- (number nNextTime, number nCircle) LIB.GetDungeonRefreshTime(dwMapID)
+function LIB.GetDungeonRefreshTime(dwMapID)
+	local nNextTime, nCircle = 0, 0
+	local _, nMapType, nMaxPlayerCount = GetMapParams(dwMapID)
+	if nMapType == MAP_TYPE.DUNGEON then
+		local nTime = GetCurrentTime()
+		local date = TimeToDate(nTime)
+		if nMaxPlayerCount <= 5 then -- 5人本 每天7点
+			if date.hour < 7 then
+				nNextTime = nTime + (7 - date.hour) * 3600 + (0 - date.minute) * 60 + (0 - date.second)
+			else
+				nNextTime = nTime + (7 + 24 - date.hour) * 3600 + (0 - date.minute) * 60 + (0 - date.second)
+			end
+			nCircle = 86400
+		elseif nMaxPlayerCount <= 10 then -- 10人本 周一7点 周五7点
+			if ((date.weekday == 1 and date.hour >= 7) or date.weekday >= 2)
+			and ((date.weekday == 5 and date.hour < 7) or date.weekday <= 4) then -- 周一7点 - 周五7点
+				nNextTime = nTime + (5 - date.weekday) * 86400 + (7 * 3600 - date.hour * 3600) + (0 - date.minute) * 60 + (0 - date.minute)
+				nCircle = 345600
+			else
+				if date.weekday == 0 or date.weekday == 1 then -- 周日0点 - 周一7点
+					nNextTime = nTime + (1 - date.weekday) * 86400 + (7 * 3600 - date.hour * 3600) + (0 - date.minute) * 60 + (0 - date.minute)
+				else -- 周五7点 - 周六24点
+					nNextTime = nTime + (8 - date.weekday) * 86400 + (7 * 3600 - date.hour * 3600) + (0 - date.minute) * 60 + (0 - date.minute)
+				end
+				nCircle = 259200
+			end
+		else -- if nMaxPlayerCount <= 25 then -- 25人本 周一7点
+			if date.weekday == 0 or date.weekday == 1 then -- 周日0点 - 周一7点
+				nNextTime = nTime + (1 - date.weekday) * 86400 + (7 * 3600 - date.hour * 3600) + (0 - date.minute) * 60 + (0 - date.minute)
+			else -- 周一7点 - 周六24点
+				nNextTime = nTime + (8 - date.weekday) * 86400 + (7 * 3600 - date.hour * 3600) + (0 - date.minute) * 60 + (0 - date.minute)
+			end
+			nCircle = 604800
+		end
+	end
+	return nNextTime, nCircle
+end
+
 -- 地图BOSS列表
 do local BOSS_LIST, BOSS_LIST_CUSTOM
 local CACHE_PATH = {'temporary/bosslist.jx3dat', PATH_TYPE.GLOBAL}
