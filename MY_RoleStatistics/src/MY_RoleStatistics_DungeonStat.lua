@@ -368,7 +368,6 @@ function D.UpdateUI(page)
 	end
 	hCols:FormatAllItemPos()
 
-
 	local szSearch = page:Lookup('Wnd_Total/Wnd_Search/Edit_Search'):GetText()
 	local szUSearch = AnsiToUTF8('%' .. szSearch .. '%')
 	DB_DungeonInfoR:ClearBindings()
@@ -660,6 +659,11 @@ function D.OnItemMouseEnter()
 			insert(aText, boss.szName .. '\t' .. _L[rec.progress_info[this.mapid][i] and 'x' or 'r'])
 		end
 		OutputTip(GetFormatText(concat(aText, '\n')), 400, { x, y, w, h })
+	elseif name == 'Handle_DungeonStatColumn' then
+		local x, y = this:GetAbsPos()
+		local w, h = this:GetSize()
+		local szXml = GetFormatText(this:Lookup('Text_DungeonStat_Title'):GetText())
+		OutputTip(szXml, 450, {x, y, w, h}, UI.TIP_POSITION.RIGHT_LEFT)
 	elseif this.tip then
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()

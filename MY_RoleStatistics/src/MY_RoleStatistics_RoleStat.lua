@@ -663,6 +663,11 @@ function D.OnItemMouseEnter()
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
 		OutputTip(concat(aXml), 450, {x, y, w, h}, UI.TIP_POSITION.RIGHT_LEFT)
+	elseif name == 'Handle_RoleStatColumn' then
+		local x, y = this:GetAbsPos()
+		local w, h = this:GetSize()
+		local szXml = GetFormatText(this:Lookup('Text_RoleStat_Title'):GetText())
+		OutputTip(szXml, 450, {x, y, w, h}, UI.TIP_POSITION.RIGHT_LEFT)
 	elseif this.tip then
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
