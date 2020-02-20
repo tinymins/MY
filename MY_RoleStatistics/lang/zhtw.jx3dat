@@ -57,4 +57,11 @@ return {
     ['Too many column selected, width overflow, please delete some!'] = '選擇列過多已超出寬度限制，請先刪除一些列！',
 
     ['%s before'] = '%s前',
+
+    ['MY_RoleStatistics_DungeonStat'] = '副本統計',
+    ['None'] = '無',
+    ['Unknown'] = '未知',
+    ['Dungoen copy'] = '副本進度',
+	['r'] = '√',
+	['x'] = '×',
 }
