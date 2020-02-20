@@ -84,7 +84,6 @@ local O = {
 RegisterCustomData('Global/MY_RoleStatistics_BagStat.bCompactMode')
 RegisterCustomData('Global/MY_RoleStatistics_BagStat.tUncheckedNames')
 
-local FlushDB
 do
 local GetItemText
 do
@@ -139,7 +138,7 @@ local function UpdateTongRepertoryPage()
 end
 LIB.RegisterEvent('UPDATE_TONG_REPERTORY_PAGE.MY_RoleStatistics_BagStat', UpdateTongRepertoryPage)
 
-function FlushDB()
+function D.FlushDB()
 	--[[#DEBUG BEGIN]]
 	LIB.Debug('MY_RoleStatistics_BagStat', 'Flushing to database...', DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
@@ -217,7 +216,7 @@ function FlushDB()
 	LIB.Debug('MY_RoleStatistics_BagStat', 'Flushing to database finished...', DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 end
-LIB.RegisterFlush('MY_RoleStatistics_BagStat', FlushDB)
+LIB.RegisterFlush('MY_RoleStatistics_BagStat', D.FlushDB)
 end
 
 function D.UpdateNames(page)
@@ -258,7 +257,7 @@ function D.SaveNameChecks(container)
 end
 
 function D.UpdateItems(page)
-	FlushDB()
+	D.FlushDB()
 
 	local searchitem = page:Lookup('Wnd_Total/Wnd_SearchItem/Edit_SearchItem'):GetText():gsub('%s+', '%%')
 	local sqlfrom = '(SELECT B.ownerkey, B.boxtype, B.boxindex, B.tabtype, B.tabindex, B.tabsubindex, B.bagcount, B.bankcount, B.time FROM BagItems AS B LEFT JOIN ItemInfo AS I ON B.tabtype = I.tabtype AND B.tabindex = I.tabindex WHERE B.tabtype != -1 AND B.tabindex != -1 AND (I.name LIKE ? OR I.desc LIKE ?)) AS C LEFT JOIN OwnerInfo AS O ON C.ownerkey = O.ownerkey WHERE '
@@ -415,7 +414,7 @@ function D.OnInitPage()
 end
 
 function D.OnActivePage()
-	FlushDB()
+	D.FlushDB()
 	D.UpdateNames(this)
 end
 

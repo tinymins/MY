@@ -359,7 +359,7 @@ for _, p in ipairs(COLUMN_LIST) do
 end
 local EXCEL_WIDTH = 960
 
-local function FlushDB()
+function D.FlushDB()
 	--[[#DEBUG BEGIN]]
 	LIB.Debug('MY_RoleStatistics_RoleStat', 'Flushing to database...', DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
@@ -410,7 +410,7 @@ local function FlushDB()
 	LIB.Debug('MY_RoleStatistics_RoleStat', 'Flushing to database finished...', DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 end
-LIB.RegisterFlush('MY_RoleStatistics_RoleStat', FlushDB)
+LIB.RegisterFlush('MY_RoleStatistics_RoleStat', D.FlushDB)
 
 function D.GetColumns()
 	local aCol = {}
@@ -580,7 +580,7 @@ function D.OnInitPage()
 end
 
 function D.OnActivePage()
-	FlushDB()
+	D.FlushDB()
 	D.UpdateUI(this)
 end
 

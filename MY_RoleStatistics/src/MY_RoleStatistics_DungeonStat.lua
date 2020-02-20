@@ -290,7 +290,7 @@ local TIP_COLIMN = {
 	'time_days',
 }
 
-local function FlushDB()
+function D.FlushDB()
 	--[[#DEBUG BEGIN]]
 	LIB.Debug('MY_RoleStatistics_DungeonStat', 'Flushing to database...', DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
@@ -318,7 +318,7 @@ local function FlushDB()
 	LIB.Debug('MY_RoleStatistics_DungeonStat', 'Flushing to database finished...', DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 end
-LIB.RegisterFlush('MY_RoleStatistics_DungeonStat', FlushDB)
+LIB.RegisterFlush('MY_RoleStatistics_DungeonStat', D.FlushDB)
 
 function D.GetColumns()
 	local aCol = {}
@@ -530,7 +530,7 @@ function D.OnInitPage()
 					end
 				end
 				D.UpdateMapCopy()
-				FlushDB()
+				D.FlushDB()
 				D.UpdateUI(page)
 				Wnd.CloseWindow('PopupMenuPanel')
 			end, nil, tChecked)
@@ -548,7 +548,7 @@ end
 
 function D.OnActivePage()
 	D.UpdateMapCopy()
-	FlushDB()
+	D.FlushDB()
 	D.UpdateUI(this)
 end
 
@@ -557,7 +557,7 @@ function D.OnEvent(event)
 		D.UpdateUI(this)
 	elseif event == 'UPDATE_DUNGEON_ROLE_PROGRESS' or event == 'ON_APPLY_PLAYER_SAVED_COPY_RESPOND' then
 		D.UpdateMapCopy()
-		FlushDB()
+		D.FlushDB()
 		D.UpdateUI(this)
 	end
 end
