@@ -183,6 +183,9 @@ function _GKP.GeneDataInfo()
 end
 
 function _GKP.SaveConfig()
+	if LIB.IsStreaming() then
+		_GKP.LimitHistoryFile()
+	end
 	LIB.SaveLUAData({'config/gkp.cfg', PATH_TYPE.GLOBAL}, _GKP.Config)
 end
 
@@ -199,6 +202,9 @@ function _GKP.SaveData(bStorage)
 				.. '.gkp'
 			i = i + 1
 		until not IsLocalFileExist(LIB.FormatPath(szPath) .. '.jx3dat')
+	end
+	if LIB.IsStreaming() then
+		_GKP.LimitHistoryFile()
 	end
 	LIB.SaveLUAData({szPath, PATH_TYPE.ROLE}, {
 		GKP_Map = MY_GKP('GKP_Map'),
@@ -1239,12 +1245,10 @@ end
 ---------------------------------------------------------------------->
 -- »Ö¸´¼ÇÂ¼°´Å¥
 ----------------------------------------------------------------------<
-function _GKP.RecoveryMenu()
-	local me = GetClientPlayer()
-	local menu = {}
+function _GKP.GetHistoryFiles()
 	local aFiles = {}
 	local szPath = LIB.FormatPath({'userdata/gkp/', PATH_TYPE.ROLE}):sub(3):gsub('/', '\\'):sub(1, -2)
-	for i, filename in ipairs(CPath.GetFileList(szPath)) do
+	for _, filename in ipairs(CPath.GetFileList(szPath)) do
 		local year, month, day, hour, minute, second, index = filename:match('^(%d+)%-(%d+)%-(%d+)%-(%d+)%-(%d+)%-(%d+)%-(%d+).-%.gkp.jx3dat')
 		if not year then
 			year, month, day, hour, minute, second = filename:match('^(%d+)%-(%d+)%-(%d+)%-(%d+)%-(%d+)%-(%d+).-%.gkp.jx3dat')
@@ -1274,11 +1278,11 @@ function _GKP.RecoveryMenu()
 			if index then
 				index = tonumber(index)
 			end
-			table.insert(aFiles, {year, month, day, hour, minute, second, index, filename = filename:sub(1, -12)})
+			insert(aFiles, {year, month, day, hour, minute, second, index, filename = filename:sub(1, -12), fullname = filename})
 		end
 	end
 	local function sortFile(a, b)
-		local n = math.max(#a, #b)
+		local n = max(#a, #b)
 		for i = 1, n do
 			if not a[i] then
 				return true
@@ -1290,11 +1294,25 @@ function _GKP.RecoveryMenu()
 		end
 		return true
 	end
-	table.sort(aFiles, sortFile)
+	sort(aFiles, sortFile)
+	return aFiles
+end
 
-	for i = 1, math.min(#aFiles, 21) do
+function _GKP.LimitHistoryFile()
+	local aFiles = _GKP.GetHistoryFiles()
+	for i = 22, #aFiles do
+		local szFile = aFiles[i].fullname
+		local szPath = LIB.FormatPath({'userdata/gkp/' .. szFile, PATH_TYPE.ROLE}):sub(3):gsub('/', '\\')
+		CPath.DelFile(szPath)
+	end
+end
+
+function _GKP.RecoveryMenu()
+	local menu = {}
+	local aFiles = _GKP.GetHistoryFiles()
+	for i = 1, min(#aFiles, 21) do
 		local szFile = aFiles[i].filename
-		table.insert(menu, {
+		insert(menu, {
 			szOption = szFile .. '.gkp',
 			fnAction = function()
 				LIB.Confirm(_L['Are you sure to cover the current information with the last record data?'], function()
@@ -1304,11 +1322,10 @@ function _GKP.RecoveryMenu()
 			end,
 		})
 	end
-
 	if #menu > 0 then
-		table.insert(menu, CONSTANT.MENU_DIVIDER)
+		insert(menu, CONSTANT.MENU_DIVIDER)
 	end
-	table.insert(menu, {
+	insert(menu, {
 		szOption = _L['Manually load from file.'],
 		rgb = { 255, 255, 0 },
 		fnAction = function()
