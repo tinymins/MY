@@ -575,12 +575,13 @@ function D.OnInitPage()
 		end,
 	})
 
-	FlushDB()
-
-	D.UpdateUI(page)
-
 	local frame = page:GetRoot()
 	frame:RegisterEvent('ON_MY_MOSAICS_RESET')
+end
+
+function D.OnActivePage()
+	FlushDB()
+	D.UpdateUI(this)
 end
 
 function D.OnEvent(event)

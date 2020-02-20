@@ -134,15 +134,23 @@ function Framework.OnActivePage()
 	local name = this:GetName()
 	if name == 'PageSet_All' then
 		local page = this:GetActivePage()
-		if page.nIndex and not page.bInit then
+		if page.nIndex then
 			local m = O.aModule[page.nIndex]
-			if m and m.env.OnInitPage then
+			if not page.bInit then
+				if m and m.env.OnInitPage then
+					local _this = this
+					this = page
+					m.env.OnInitPage()
+					this = _this
+				end
+				page.bInit = true
+			end
+			if m and m.env.OnActivePage then
 				local _this = this
 				this = page
-				m.env.OnInitPage()
+				m.env.OnActivePage()
 				this = _this
 			end
-			page.bInit = true
 		end
 	end
 end
@@ -227,9 +235,13 @@ for _, szEvent in ipairs({
 	D[szEvent] = function(...)
 		local szPrefix = 'Normal/MY_Statistics/PageSet_All/Page_Default'
 		local page, nLimit = this, 50
-		while nLimit > 0 and page and page:GetName() ~= 'Page_Default' and page:GetTreePath() ~= szPrefix do
-			nLimit = nLimit - 1
-			page = page:GetParent()
+		while page and page:GetName() ~= 'Page_Default' and page:GetTreePath() ~= szPrefix do
+			if nLimit > 0 then
+				page = page:GetParent()
+				nLimit = nLimit - 1
+			else
+				page = nil
+			end
 		end
 		if page and page ~= this then
 			local m = O.aModule[page.nIndex]

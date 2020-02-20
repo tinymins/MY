@@ -444,7 +444,6 @@ function D.OnInitPage()
 	local wnd = frameTemp:Lookup('Wnd_Total')
 	wnd:ChangeRelation(page, true, true)
 	Wnd.CloseWindow(frameTemp)
-	D.UpdateMapCopy()
 
 	UI(wnd):Append('WndComboBox', {
 		x = 800, y = 20, w = 180,
@@ -539,10 +538,6 @@ function D.OnInitPage()
 		end,
 	})
 
-	FlushDB()
-
-	D.UpdateUI(page)
-
 	local frame = page:GetRoot()
 	frame:RegisterEvent('ON_MY_MOSAICS_RESET')
 	frame:RegisterEvent('UPDATE_DUNGEON_ROLE_PROGRESS')
@@ -551,13 +546,15 @@ end
 
 function D.OnActivePage()
 	D.UpdateMapCopy()
+	FlushDB()
+	D.UpdateUI(this)
 end
-
 
 function D.OnEvent(event)
 	if event == 'ON_MY_MOSAICS_RESET' then
 		D.UpdateUI(this)
 	elseif event == 'UPDATE_DUNGEON_ROLE_PROGRESS' or event == 'ON_APPLY_PLAYER_SAVED_COPY_RESPOND' then
+		D.UpdateMapCopy()
 		FlushDB()
 		D.UpdateUI(this)
 	end

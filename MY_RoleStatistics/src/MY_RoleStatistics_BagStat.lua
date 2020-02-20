@@ -398,13 +398,14 @@ function D.OnInitPage()
 	wnd:ChangeRelation(this, true, true)
 	Wnd.CloseWindow(frameTemp)
 
-	FlushDB()
-
-	D.UpdateNames(this)
-
 	local frame = this:GetRoot()
 	frame:RegisterEvent('MY_BAGSTATISTICS_MODE_CHANGE')
 	frame:RegisterEvent('ON_MY_MOSAICS_RESET')
+end
+
+function D.OnActivePage()
+	FlushDB()
+	D.UpdateNames(this)
 end
 
 function D.OnEvent(event)
