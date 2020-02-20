@@ -467,4 +467,6 @@ return {
 	['Hover entry'] = '悬浮入口',
 	['Hover popup'] = '鼠标滑过立即弹出',
 	['Size: %d'] = '大小：%d',
+
+	['Streaming client does not support export!'] = '云端客户端不支持导出功能！',
 }

@@ -257,6 +257,9 @@ function D.ExportConfirm()
 		x = x, y = y, w = nMaxWidth - x * 2, h = 35,
 		text = _L['Export chatlog'],
 		onclick = function()
+			if LIB.IsStreaming() then
+				return LIB.Alert(_L['Streaming client does not support export!'])
+			end
 			local function doExport(szSuffix)
 				local aChannels = {}
 				for nGroup, info in ipairs(LOG_TYPE) do
