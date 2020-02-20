@@ -901,8 +901,8 @@ function LIB.PlaySound(nType, szFilePath, szCustomPath)
 		end
 	end
 	-- ≤•∑≈ƒ¨»œ…˘“Ù
-	local szPath = string.gsub(szFilePath, '\\', '/')
-	if string.sub(szPath, 1, 2) ~= './' then
+	local szPath = wgsub(szFilePath, '\\', '/')
+	if not wfind(szPath, '/') then
 		szPath = PACKET_INFO.FRAMEWORK_ROOT .. 'audio/' .. szPath
 	end
 	if not IsFileExist(szPath) then
@@ -2401,7 +2401,7 @@ else
 end
 
 do
-local KEY = wgsub(wgsub(PACKET_INFO.ROOT, './', ''), '\\', '/'):lower()
+local KEY = wgsub(PACKET_INFO.ROOT, '\\', '/'):lower()
 local FILE_PATH = {'temporary/lua_error.jx3dat', PATH_TYPE.GLOBAL}
 local LAST_ERROR_MSG = LIB.LoadLUAData(FILE_PATH, { passphrase = false }) or {}
 local ERROR_MSG = {}

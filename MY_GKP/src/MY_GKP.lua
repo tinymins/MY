@@ -1247,7 +1247,7 @@ end
 ----------------------------------------------------------------------<
 function _GKP.GetHistoryFiles()
 	local aFiles = {}
-	local szPath = LIB.FormatPath({'userdata/gkp/', PATH_TYPE.ROLE}):sub(3):gsub('/', '\\'):sub(1, -2)
+	local szPath = LIB.FormatPath({'userdata/gkp/', PATH_TYPE.ROLE}):gsub('/', '\\'):sub(1, -2)
 	for _, filename in ipairs(CPath.GetFileList(szPath)) do
 		local year, month, day, hour, minute, second, index = filename:match('^(%d+)%-(%d+)%-(%d+)%-(%d+)%-(%d+)%-(%d+)%-(%d+).-%.gkp.jx3dat')
 		if not year then
@@ -1302,7 +1302,7 @@ function _GKP.LimitHistoryFile()
 	local aFiles = _GKP.GetHistoryFiles()
 	for i = 22, #aFiles do
 		local szFile = aFiles[i].fullname
-		local szPath = LIB.FormatPath({'userdata/gkp/' .. szFile, PATH_TYPE.ROLE}):sub(3):gsub('/', '\\')
+		local szPath = LIB.FormatPath({'userdata/gkp/' .. szFile, PATH_TYPE.ROLE}):gsub('/', '\\')
 		CPath.DelFile(szPath)
 	end
 end
