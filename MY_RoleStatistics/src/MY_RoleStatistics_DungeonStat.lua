@@ -243,14 +243,16 @@ local COLUMN_DICT = setmetatable({}, { __index = function(_, id)
 				end
 			else
 				col.GetFormatText = function(rec)
-					local nCopyID = rec.copy_info[map.dwID]
+					local aCopyID = rec.copy_info[map.dwID]
 					local nNextTime, nCircle = LIB.GetDungeonRefreshTime(map.dwID)
-					local szText = nNextTime - nCircle < rec.time and (nCopyID or _L['None']) or (_L['Unknown'])
+					local szText = nNextTime - nCircle < rec.time
+						and (aCopyID and aCopyID[1] or _L['None'])
+						or (_L['Unknown'])
 					return GetFormatText(szText, nil, nil, nil, nil, 786, 'this.mapid=' .. map.dwID, 'Text_CD')
 				end
 				col.Compare = function(r1, r2)
-					local k1 = r1.copy_info[map.dwID]
-					local k2 = r2.copy_info[map.dwID]
+					local k1 = r1.copy_info[map.dwID] and r1.copy_info[map.dwID][1]
+					local k2 = r2.copy_info[map.dwID] and r2.copy_info[map.dwID][1]
 					if k1 and not k2 then
 						return 1
 					end
