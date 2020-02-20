@@ -205,7 +205,8 @@ local COLUMN_DICT = setmetatable({}, { __index = function(_, id)
 			if LIB.IsDungeonRoleProgressMap(map.dwID) then
 				col.GetFormatText = function(rec)
 					local aBossKill = rec.progress_info[map.dwID]
-					if not aBossKill then
+					local nNextTime, nCircle = LIB.GetDungeonRefreshTime(map.dwID)
+					if not aBossKill or nNextTime - nCircle > rec.time then
 						return GetFormatText(_L['Unknown'])
 					end
 					local aXml = {}
@@ -243,7 +244,8 @@ local COLUMN_DICT = setmetatable({}, { __index = function(_, id)
 			else
 				col.GetFormatText = function(rec)
 					local nCopyID = rec.copy_info[map.dwID]
-					local szText = nCopyID or _L['None']
+					local nNextTime, nCircle = LIB.GetDungeonRefreshTime(map.dwID)
+					local szText = nNextTime - nCircle < rec.time and (nCopyID or _L['None']) or (_L['Unknown'])
 					return GetFormatText(szText, nil, nil, nil, nil, 786, 'this.mapid=' .. map.dwID, 'Text_CD')
 				end
 				col.Compare = function(r1, r2)
