@@ -239,11 +239,22 @@ function D.UpdateNames(page)
 			ownername = MY_ChatMosaics.MosaicsString(ownername)
 		end
 		wnd:Lookup('CheckBox_Name', 'Text_Name'):SetText(ownername .. ' (' .. wnd.servername .. ')')
-		wnd:Lookup('CheckBox_Name'):Check(not MY_RoleStatistics_BagStat.tUncheckedNames[wnd.ownerkey], WNDEVENT_FIRETYPE.PREVENT)
+		wnd:Lookup('CheckBox_Name'):Check(not O.tUncheckedNames[wnd.ownerkey], WNDEVENT_FIRETYPE.PREVENT)
 	end
 	container:FormatAllContentPos()
 	page.nCurrentPage = 1
 	D.UpdateItems(page)
+end
+
+function D.SaveNameChecks(container)
+	local tUncheckedNames = {}
+	for i = 0, container:GetAllContentCount() - 1 do
+		local wnd = container:LookupContent(i)
+		if not wnd:Lookup('CheckBox_Name'):IsCheckBoxChecked() then
+			tUncheckedNames[wnd.ownerkey] = true
+		end
+	end
+	O.tUncheckedNames = tUncheckedNames
 end
 
 function D.UpdateItems(page)
@@ -440,6 +451,7 @@ function D.OnCheckBoxCheck()
 	if name == 'CheckBox_Name' then
 		local page = this:GetParent():GetParent():GetParent():GetParent():GetParent()
 		D.UpdateItems(page)
+		D.SaveNameChecks(this:GetParent():GetParent())
 	end
 end
 
@@ -448,6 +460,7 @@ function D.OnCheckBoxUncheck()
 	if name == 'CheckBox_Name' then
 		local page = this:GetParent():GetParent():GetParent():GetParent():GetParent()
 		D.UpdateItems(page)
+		D.SaveNameChecks(this:GetParent():GetParent())
 	end
 end
 
@@ -483,6 +496,7 @@ function D.OnLButtonClick()
 			wnd:Lookup('CheckBox_Name'):Check(true, WNDEVENT_FIRETYPE.PREVENT)
 		end
 		D.UpdateItems(page)
+		D.SaveNameChecks(parent)
 	end
 end
 
