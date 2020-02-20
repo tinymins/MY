@@ -231,7 +231,7 @@ return {
 	['Do you want to mutual love with [%s]?'] = '確定要與[%s]攜手江湖嗎？',
 	['Do you want to blind love with [%s]?'] = '確定要單向關注[%s]嗎？',
 	['<Non-avaiable>'] = '<無合適人選>',
-	['%s\'s Lover'] = '%s的俠侶',
+	['%s\'s lover'] = '%s的俠侶',
 	['...Loading...'] = '…載入中…',
 	['...Unknown...'] = '…未知…',
     ['%s\'s Love signature:'] = '%s的俠侶宣言：',

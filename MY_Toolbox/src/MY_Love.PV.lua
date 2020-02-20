@@ -88,7 +88,7 @@ function D.UpdatePage()
 		nLoverTime = t.nLoverTime
 		szLoverTitle = t.szLoverTitle
 	end
-	h:Lookup('Text_LTitle'):SetText(_L('%s\'s Lover', tar.szName))
+	h:Lookup('Text_LTitle'):SetText(_L('%s\'s lover', tar.szName))
 	-- lover
 	local txt = h:Lookup('Text_Lover')
 	if bNoData then
