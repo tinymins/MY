@@ -291,6 +291,7 @@ local TIP_COLIMN = {
 }
 
 function D.FlushDB()
+	D.UpdateMapCopy()
 	--[[#DEBUG BEGIN]]
 	LIB.Debug('MY_RoleStatistics_DungeonStat', 'Flushing to database...', DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
@@ -529,7 +530,6 @@ function D.OnInitPage()
 						insert(O.aColumn, 'dungeon_' .. info.dwID)
 					end
 				end
-				D.UpdateMapCopy()
 				D.FlushDB()
 				D.UpdateUI(page)
 				Wnd.CloseWindow('PopupMenuPanel')
@@ -547,7 +547,6 @@ function D.OnInitPage()
 end
 
 function D.OnActivePage()
-	D.UpdateMapCopy()
 	D.FlushDB()
 	D.UpdateUI(this)
 end
@@ -556,7 +555,6 @@ function D.OnEvent(event)
 	if event == 'ON_MY_MOSAICS_RESET' then
 		D.UpdateUI(this)
 	elseif event == 'UPDATE_DUNGEON_ROLE_PROGRESS' or event == 'ON_APPLY_PLAYER_SAVED_COPY_RESPOND' then
-		D.UpdateMapCopy()
 		D.FlushDB()
 		D.UpdateUI(this)
 	end
