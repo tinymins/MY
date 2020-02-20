@@ -103,30 +103,33 @@ OnPanelActive = function(wnd)
 	local x, y = 10, 30
 
 	ui:Append('WndEditBox', {
+		x = x, y = y, w = 150, h = 25,
 		name = 'WndEdit',
-		text = _C.nEventID, x = x, y = y, w = 150, h = 25, font = 201, color = { 255, 255, 255 }
-	}):Children('#WndEdit'):Change(function(text)
-	  	local nEventID = tonumber(text)
-	  	if nEventID and nEventID ~= _C.nEventID then
-	  		_C.SetEventID(ui, nEventID)
-	  	end
-	  end)
+		text = _C.nEventID,
+		font = 201, color = { 255, 255, 255 },
+		onchange = function(text)
+			local nEventID = tonumber(text)
+			if nEventID and nEventID ~= _C.nEventID then
+				_C.SetEventID(ui, nEventID)
+			end
+		end,
+	})
 
 	x, y = 5, y + 35
 	for k, event in ipairs(_C.tEventIndex) do
 		ui:Append('WndCheckBox', {
 			name = 'Event_' .. event.bit,
-			text = event.text, x = x, y = y, w = 120
-		}):Children('#Event_' .. event.bit)
-		  :Check(function(bCheck)
-		  	if bCheck then
-		  		ui:Children('#Event_' .. event.bit):Color(255, 128, 0  )
-		  	else
-		  		ui:Children('#Event_' .. event.bit):Color(255, 255, 255)
-		  	end
-		  	_C.nEventID = _C.GetEventID(ui)
-		  	ui:Children('#WndEdit'):Text(_C.nEventID)
-		  end)
+			text = event.text, x = x, y = y, w = 120,
+			oncheck = function(bCheck)
+				if bCheck then
+					ui:Children('#Event_' .. event.bit):Color(255, 128, 0  )
+				else
+					ui:Children('#Event_' .. event.bit):Color(255, 255, 255)
+				end
+				_C.nEventID = _C.GetEventID(ui)
+				ui:Children('#WndEdit'):Text(_C.nEventID)
+			end,
+		})
 		x = x + 90
 
 		if(k - 1) % 5 == 1 or k == 2 then
