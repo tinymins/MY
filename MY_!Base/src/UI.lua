@@ -2663,7 +2663,7 @@ function UI:Size(arg0, arg1, arg2, arg3)
 				raw = GetComponentElement(raw, 'MAIN_WINDOW') or raw
 			end
 			if raw.IsDummyWnd and raw:IsDummyWnd() then
-				raw = raw:Lookup('', '')
+				raw = raw:Lookup('', '') or raw
 			end
 			if raw.GetSize then
 				w, h = raw:GetSize()
