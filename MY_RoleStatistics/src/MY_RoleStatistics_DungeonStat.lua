@@ -243,10 +243,8 @@ local COLUMN_DICT = setmetatable({}, { __index = function(_, id)
 			else
 				col.GetFormatText = function(rec)
 					local nCopyID = rec.copy_info[map.dwID]
-					if not nCopyID then
-						return GetFormatText(_L['None'])
-					end
-					return GetFormatText(nCopyID)
+					local szText = nCopyID or _L['None']
+					return GetFormatText(szText, nil, nil, nil, nil, 786, 'this.mapid=' .. map.dwID, 'Text_CD')
 				end
 				col.Compare = function(r1, r2)
 					local k1 = r1.copy_info[map.dwID]
@@ -647,14 +645,18 @@ function D.OnItemMouseEnter()
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
 		OutputTip(concat(aXml), 450, {x, y, w, h}, UI.TIP_POSITION.RIGHT_LEFT)
-	elseif name == 'Image_ProgressBoss' then
+	elseif name == 'Image_ProgressBoss' or name == 'Text_CD' then
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
 		local aText = {}
-		local rec = this:GetParent():GetParent():GetParent().rec
-		for i, boss in ipairs(Table_GetCDProcessBoss(this.mapid)) do
-			insert(aText, boss.szName .. '\t' .. _L[rec.progress_info[this.mapid][i] and 'x' or 'r'])
+		if name == 'Image_ProgressBoss' then
+			local rec = this:GetParent():GetParent():GetParent().rec
+			for i, boss in ipairs(Table_GetCDProcessBoss(this.mapid)) do
+				insert(aText, boss.szName .. '\t' .. _L[rec.progress_info[this.mapid][i] and 'x' or 'r'])
+			end
 		end
+		local nTime = LIB.GetDungeonRefreshTime(this.mapid) - GetCurrentTime()
+		insert(aText, _L('Refresh: %s', LIB.FormatTimeCounter(nTime, 2, 2)))
 		OutputTip(GetFormatText(concat(aText, '\n')), 400, { x, y, w, h })
 	elseif name == 'Handle_DungeonStatColumn' then
 		local x, y = this:GetAbsPos()
