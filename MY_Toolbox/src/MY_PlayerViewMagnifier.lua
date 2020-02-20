@@ -55,21 +55,26 @@ local function onFrameCreate()
 	end
 	if config then
 		local frame, ui, nOriX, nOriY, nOriW, nOriH = arg0, UI(arg0), 0, 0, 0, 0
+		local function Fullscreen()
+			local nCurW, nCurH = ui:Size()
+			local nCW, nCH = Station.GetClientSize()
+			local fCoefficient = min(nCW / nCurW, nCH / nCurH)
+			local fAbsCoefficient = nCurW / nOriW * fCoefficient
+			frame:EnableDrag(true)
+			frame:SetDragArea(0, 0, frame:GetW(), 50 * fAbsCoefficient)
+			frame:Scale(fCoefficient, fCoefficient)
+			ui:Find('.Text'):FontScale(fAbsCoefficient)
+			frame:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
+		end
 		ui:Append(PACKET_INFO.ROOT .. 'MY_Toolbox/ui/Btn_MagnifierUp.ini:WndButton', {
 			name = 'Btn_MY_MagnifierUp',
 			x = config.x, y = config.y, w = config.w, h = config.h,
 			onclick = function()
 				nOriX, nOriY = ui:Pos()
 				nOriW, nOriH = ui:Size()
-				local nCW, nCH = Station.GetClientSize()
-				local fCoefficient = min(nCW / nOriW, nCH / nOriH)
-				frame:EnableDrag(true)
-				frame:SetDragArea(0, 0, frame:GetW(), 50)
-				frame:Scale(fCoefficient, fCoefficient)
-				ui:Find('.Text'):FontScale(fCoefficient)
+				Fullscreen()
 				ui:Children('#Btn_MY_MagnifierUp'):Hide()
 				ui:Children('#Btn_MY_MagnifierDown'):Show()
-				frame:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
 			end,
 			tip = _L['Click to enable MY player view magnifier'],
 		})
@@ -84,9 +89,19 @@ local function onFrameCreate()
 				ui:Find('.Text'):FontScale(1)
 				ui:Children('#Btn_MY_MagnifierUp'):Show()
 				ui:Children('#Btn_MY_MagnifierDown'):Hide()
+				nOriX, nOriY, nOriW, nOriH = nil
 			end,
 			tip = _L['Click to disable MY player view magnifier'],
 		})
+		LIB.RegisterEvent('UI_SCALED.MY_PlayerViewMagnifier' .. arg0:GetName(), function()
+			if not frame or not frame:IsValid() then
+				return 0
+			end
+			if IsEmpty(nOriX) or IsEmpty(nOriY) or IsEmpty(nOriW) or IsEmpty(nOriH) then
+				return
+			end
+			Fullscreen()
+		end)
 	end
 end
 LIB.RegisterFrameCreate('PlayerView.MY_PlayerViewMagnifier', onFrameCreate)
