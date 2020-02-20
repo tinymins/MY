@@ -157,7 +157,7 @@ RegisterCustomData('MY_Love.bHookPlayerView')
 
 -- 功能屏蔽
 function D.IsShielded()
-	return LIB.IsShieldedVersion()
+	return false
 end
 
 -- 获取背包指定ID物品列表
