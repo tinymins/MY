@@ -49,24 +49,27 @@ end
 local function onFrameCreate()
 	local config
 	if arg0:GetName() == 'PlayerView' then
-		config = { x = 35, y = 8, w = 30, h = 30, coefficient = 2.45 }
+		config = { x = 35, y = 8, w = 30, h = 30 }
 	elseif arg0:GetName() == 'ExteriorView' then
-		config = { x = 20, y = 15, w = 40, h = 40, coefficient = 2.5 }
+		config = { x = 20, y = 15, w = 40, h = 40 }
 	end
 	if config then
-		local frame, ui, coefficient, posx, posy = arg0, UI(arg0), config.coefficient / Station.GetUIScale()
+		local frame, ui, nOriX, nOriY, nOriW, nOriH = arg0, UI(arg0), 0, 0, 0, 0
 		ui:Append(PACKET_INFO.ROOT .. 'MY_Toolbox/ui/Btn_MagnifierUp.ini:WndButton', {
 			name = 'Btn_MY_MagnifierUp',
 			x = config.x, y = config.y, w = config.w, h = config.h,
 			onclick = function()
-				posx, posy = ui:Pos()
+				nOriX, nOriY = ui:Pos()
+				nOriW, nOriH = ui:Size()
+				local nCW, nCH = Station.GetClientSize()
+				local fCoefficient = min(nCW / nOriW, nCH / nOriH)
 				frame:EnableDrag(true)
 				frame:SetDragArea(0, 0, frame:GetW(), 50)
-				frame:Scale(coefficient, coefficient)
-				frame:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
-				ui:Find('.Text'):FontScale(coefficient)
+				frame:Scale(fCoefficient, fCoefficient)
+				ui:Find('.Text'):FontScale(fCoefficient)
 				ui:Children('#Btn_MY_MagnifierUp'):Hide()
 				ui:Children('#Btn_MY_MagnifierDown'):Show()
+				frame:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
 			end,
 			tip = _L['Click to enable MY player view magnifier'],
 		})
@@ -74,8 +77,10 @@ local function onFrameCreate()
 			name = 'Btn_MY_MagnifierDown',
 			x = config.x, y = config.y, w = config.w, h = config.h, visible = false,
 			onclick = function()
-				frame:Scale(1 / coefficient, 1 / coefficient)
-				ui:Pos(posx, posy)
+				local nCW, nCH = ui:Size()
+				local fCoefficient = nOriW / nCW
+				frame:Scale(fCoefficient, fCoefficient)
+				ui:Pos(nOriX, nOriY)
 				ui:Find('.Text'):FontScale(1)
 				ui:Children('#Btn_MY_MagnifierUp'):Show()
 				ui:Children('#Btn_MY_MagnifierDown'):Hide()
