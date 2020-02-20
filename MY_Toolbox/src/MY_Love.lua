@@ -106,7 +106,7 @@ local O = {
 		{ nItem = 19, szName = LIB.GetItemNameByUIID(162307), szTitle = _L['FIREWORK_TITLE_162307'], aUIID = {162307} }, -- 花语相思 还愿人
 		{ nItem = 20, szName = LIB.GetItemNameByUIID(162308), szTitle = _L['FIREWORK_TITLE_162308'], aUIID = {162308} }, -- 在吗
 		{ nItem = 21, szName = LIB.GetItemNameByUIID(158577), szTitle = _L['FIREWORK_TITLE_158577'], aUIID = {158577} }, -- 金鸾喻情 玲珑心
-		-- { nItem = 63, szName = LIB.GetItemNameByUIID(65625), szTitle = LIB.GetItemNameByUIID(65625), aUIID = {65625} }, -- 测试用 焰火棒
+		{ nItem = 63, szName = LIB.GetItemNameByUIID(65625), szTitle = LIB.GetItemNameByUIID(65625), aUIID = {65625} }, -- 测试用 焰火棒
 	},
 	tLoverItem = {},
 	nPendingItem = 0, -- 请求结缘烟花nItem序号缓存
@@ -417,6 +417,9 @@ function D.SetLover(dwID, nType)
 	end
 	local aInfo = LIB.GetFriend(dwID)
 	if not aInfo or not aInfo.isonline then
+		if nType == -1 then
+			return LIB.Alert(_L['Lover must online'])
+		end
 		return LIB.Alert(_L['Lover must be a online friend'])
 	end
 	if nType == -1 then
@@ -491,30 +494,34 @@ function D.RemoveLover()
 		if nTime < 3600 then
 			return LIB.Alert(_L('Love can not run a red-light, wait for %s left.', D.FormatTimeCounter(3600 - nTime)))
 		end
-		LIB.Confirm(_L('Are you sure to cut love with [%s]?', lover.szName), function()
-			LIB.DelayCall(50, function()
-				LIB.Confirm(_L['Past five hundred times looking back only in exchange for a chance encounter this life, you really decided?'], function()
-					LIB.DelayCall(50, function()
-						LIB.Confirm(_L['You do not really want to cut off love it, really sure?'], function()
-							-- 取消情缘
-							if lover.nLoverType == 1 then -- 双向则密聊提醒
+		-- 取消情缘
+		if lover.nLoverType == 0 then -- 单向
+			LIB.Confirm(_L('Are you sure to cut blind love with [%s]?', lover.szName), function()
+				-- 单向只通知在线的
+				local aInfo = LIB.GetFriend(lover.dwID)
+				if aInfo and aInfo.isonline then
+					LIB.SendBgMsg(lover.szName, 'MY_LOVE', 'REMOVE0')
+				end
+				D.SaveLover(0, 0, 0, 0, 0)
+				LIB.Sysmsg(_L['Congratulations, cut blind love finish.'])
+			end)
+		elseif lover.nLoverType == 1 then -- 双向
+			LIB.Confirm(_L('Are you sure to cut mutual love with [%s]?', lover.szName), function()
+				LIB.DelayCall(50, function()
+					LIB.Confirm(_L['Past five hundred times looking back only in exchange for a chance encounter this life, you really decided?'], function()
+						LIB.DelayCall(50, function()
+							LIB.Confirm(_L['You do not really want to cut off love it, really sure?'], function()
+								-- 双向则密聊提醒
 								LIB.Talk(lover.szName, _L['Sorry, I decided to just a swordman, bye my plugin lover'])
-							elseif lover.nLoverType == 0 then -- 单向只通知在线的
-								local aInfo = LIB.GetFriend(lover.dwID)
-								if aInfo and aInfo.isonline then
-									LIB.SendBgMsg(lover.szName, 'MY_LOVE', 'REMOVE0')
-								end
-							end
-							D.SaveLover(0, 0, 0, 0, 0)
-							if lover.nLoverType == 1 then
+								D.SaveLover(0, 0, 0, 0, 0)
 								LIB.Talk(PLAYER_TALK_CHANNEL.TONG, _L('A blade and cut, no longer meet with [%s].', lover.szName))
-							end
-							LIB.Sysmsg(_L['Congratulations, do not repeat the same mistakes ah.'])
+								LIB.Sysmsg(_L['Congratulations, do not repeat the same mistakes ah.'])
+							end)
 						end)
 					end)
 				end)
 			end)
-		end)
+		end
 	end
 end
 
