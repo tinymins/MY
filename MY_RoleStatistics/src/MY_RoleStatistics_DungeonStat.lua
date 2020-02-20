@@ -651,12 +651,18 @@ function D.OnItemMouseEnter()
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
 		local aText = {}
+		local map = LIB.GetMapInfo(this.mapid)
+		if map then
+			insert(aText, map.szName)
+		end
 		if name == 'Image_ProgressBoss' then
+			insert(aText, '')
 			local rec = this:GetParent():GetParent():GetParent().rec
 			for i, boss in ipairs(Table_GetCDProcessBoss(this.mapid)) do
 				insert(aText, boss.szName .. '\t' .. _L[rec.progress_info[this.mapid][i] and 'x' or 'r'])
 			end
 		end
+		insert(aText, '')
 		local nTime = LIB.GetDungeonRefreshTime(this.mapid) - GetCurrentTime()
 		insert(aText, _L('Refresh: %s', LIB.FormatTimeCounter(nTime, 2, 2)))
 		OutputTip(GetFormatText(concat(aText, '\n')), 400, { x, y, w, h })
