@@ -226,8 +226,9 @@ for _, szEvent in ipairs({
 }) do
 	D[szEvent] = function(...)
 		local szPrefix = 'Normal/MY_Statistics/PageSet_All/Page_Default'
-		local page = this
-		while page and page:GetName() ~= 'Page_Default' and page:GetTreePath() ~= szPrefix do
+		local page, nLimit = this, 50
+		while nLimit > 0 and page and page:GetName() ~= 'Page_Default' and page:GetTreePath() ~= szPrefix do
+			nLimit = nLimit - 1
 			page = page:GetParent()
 		end
 		if page and page ~= this then
