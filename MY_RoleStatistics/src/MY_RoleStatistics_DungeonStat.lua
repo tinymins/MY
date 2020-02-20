@@ -529,6 +529,8 @@ function D.OnInitPage()
 						insert(O.aColumn, 'dungeon_' .. info.dwID)
 					end
 				end
+				D.UpdateMapCopy()
+				FlushDB()
 				D.UpdateUI(page)
 				Wnd.CloseWindow('PopupMenuPanel')
 			end, nil, tChecked)
