@@ -1118,8 +1118,8 @@ function RT.GetTeam()
 		end
 		-- 副本进度
 		if aInfo.bIsOnLine and bIsDungeonRoleProgressMap then
+			ApplyDungeonRoleProgress(RT_MAPID, dwID) -- 成功回调 UPDATE_DUNGEON_ROLE_PROGRESS(dwMapID, dwPlayerID)
 			for i, boss in ipairs(aProgressMapBoss) do
-				ApplyDungeonRoleProgress(RT_MAPID, dwID) -- 成功回调 UPDATE_DUNGEON_ROLE_PROGRESS(dwMapID, dwPlayerID)
 				aInfo.tBossKill[i] = GetDungeonRoleProgress(RT_MAPID, dwID, boss.dwProgressID)
 			end
 		end
