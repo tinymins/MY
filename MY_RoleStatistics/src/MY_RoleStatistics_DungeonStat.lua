@@ -75,7 +75,7 @@ local O = {
 	tMapSaveCopy = {}, -- 单副本 CD
 	tMapProgress = {}, -- 单BOSS CD
 }
--- RegisterCustomData('Global/MY_RoleStatistics_DungeonStat.aColumn')
+RegisterCustomData('Global/MY_RoleStatistics_DungeonStat.aColumn')
 RegisterCustomData('Global/MY_RoleStatistics_DungeonStat.szSort')
 RegisterCustomData('Global/MY_RoleStatistics_DungeonStat.szSortOrder')
 
