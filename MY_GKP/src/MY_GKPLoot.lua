@@ -1345,12 +1345,16 @@ local function IsItemDataSuitable(data)
 end
 
 function D.InsertLootList(dwID)
+	local bExist = false
 	for _, v in ipairs(D.aDoodadID) do
 		if v == dwID then
-			return
+			bExist = true
+			break
 		end
 	end
-	insert(D.aDoodadID, dwID)
+	if not bExist then
+		insert(D.aDoodadID, dwID)
+	end
 	D.DrawLootList(dwID)
 end
 
