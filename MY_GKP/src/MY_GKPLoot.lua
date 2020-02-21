@@ -171,11 +171,11 @@ function D.IsItemAutoPickup(itemData, config, doodad, bCanDialog)
 	if not bCanDialog then
 		return false
 	end
-	if config.tAutoPickupNames and config.tAutoPickupNames[itemData.szName] then
-		return true
-	end
 	if config.tAutoPickupFilters and config.tAutoPickupFilters[itemData.szName] then
 		return false
+	end
+	if config.tAutoPickupNames and config.tAutoPickupNames[itemData.szName] then
+		return true
 	end
 	if config.bAutoPickupTaskItem and itemData.nGenre == ITEM_GENRE.TASK_ITEM then
 		return true
@@ -620,6 +620,7 @@ end
 function D.GetFilterMenu()
 	local t = {
 		szOption = _L['Loot item filter'],
+		-- 过滤已读书籍
 		{
 			szOption = _L['Filter book read'],
 			bCheck = true,
@@ -628,6 +629,7 @@ function D.GetFilterMenu()
 				MY_GKP_Loot.tItemConfig.bFilterBookRead = not MY_GKP_Loot.tItemConfig.bFilterBookRead
 			end,
 		},
+		-- 过滤已有书籍
 		{
 			szOption = _L['Filter book have'],
 			bCheck = true,
@@ -637,6 +639,7 @@ function D.GetFilterMenu()
 			end,
 		},
 	}
+	-- 品级过滤
 	local t1 = {
 		szOption = _L['Quality filter'],
 		{
@@ -657,6 +660,7 @@ function D.GetFilterMenu()
 		})
 	end
 	insert(t, t1)
+	-- 名称过滤
 	local t1 = {
 		szOption = _L['Name filter'],
 		{
@@ -712,58 +716,9 @@ end
 function D.GetAutoPickupMenu()
 	local tItemConfig = O.tItemConfig
 	local t = { szOption = _L['Auto pickup'] }
-	insert(t, {
-		szOption = _L['Auto pickup quest item'],
-		bCheck = true, bChecked = tItemConfig.bAutoPickupTaskItem,
-		fnAction = function()
-			tItemConfig.bAutoPickupTaskItem = not tItemConfig.bAutoPickupTaskItem
-		end,
-	})
-	local t1 = { szOption = _L['Auto pickup by item quality'] }
-	for i, p in ipairs(GKP_ITEM_QUALITIES) do
-		table.insert(t1, {
-			szOption = p.szTitle,
-			rgb = { GetItemFontColorByQuality(p.nQuality) },
-			bCheck = true,
-			bChecked = tItemConfig.tAutoPickupQuality[p.nQuality],
-			fnAction = function()
-				tItemConfig.tAutoPickupQuality[p.nQuality] = not tItemConfig.tAutoPickupQuality[p.nQuality]
-			end,
-		})
-	end
-	insert(t, t1)
-	local t1 = { szOption = _L['Auto pickup names'] }
-	for s, b in pairs(tItemConfig.tAutoPickupNames or {}) do
-		insert(t1, {
-			szOption = s,
-			bCheck = true, bChecked = b,
-			fnAction = function()
-				tItemConfig.tAutoPickupNames[s] = not tItemConfig.tAutoPickupNames[s]
-			end,
-			szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',
-			nFrame = 49,
-			nMouseOverFrame = 51,
-			nIconWidth = 17,
-			nIconHeight = 17,
-			szLayer = 'ICON_RIGHTMOST',
-			fnClickIcon = function()
-				tItemConfig.tAutoPickupNames[s] = nil
-				Wnd.CloseWindow('PopupMenuPanel')
-			end,
-		})
-	end
-	if #t1 > 0 then
-		insert(t1, CONSTANT.MENU_DIVIDER)
-	end
-	insert(t1, {
-		szOption = _L['Add new'],
-		fnAction = function()
-			GetUserInput(_L['Please input new auto pickup name:'], function(text)
-				tItemConfig.tAutoPickupNames[text] = true
-			end)
-		end,
-	})
-	insert(t, t1)
+	insert(t, { szOption = _L['Filters have higher priority'], bDisable = true })
+	-- 拾取过滤
+	-- 自动拾取物品过滤
 	local t1 = { szOption = _L['Auto pickup filters'] }
 	for s, b in pairs(tItemConfig.tAutoPickupFilters or {}) do
 		insert(t1, {
@@ -792,6 +747,62 @@ function D.GetAutoPickupMenu()
 		fnAction = function()
 			GetUserInput(_L['Please input new auto pickup filter:'], function(text)
 				tItemConfig.tAutoPickupFilters[text] = true
+			end)
+		end,
+	})
+	insert(t, t1)
+	-- 自动拾取
+	insert(t, CONSTANT.MENU_DIVIDER)
+	-- 自动拾取任务物品
+	insert(t, {
+		szOption = _L['Auto pickup quest item'],
+		bCheck = true, bChecked = tItemConfig.bAutoPickupTaskItem,
+		fnAction = function()
+			tItemConfig.bAutoPickupTaskItem = not tItemConfig.bAutoPickupTaskItem
+		end,
+	})
+	local t1 = { szOption = _L['Auto pickup by item quality'] }
+	for i, p in ipairs(GKP_ITEM_QUALITIES) do
+		table.insert(t1, {
+			szOption = p.szTitle,
+			rgb = { GetItemFontColorByQuality(p.nQuality) },
+			bCheck = true,
+			bChecked = tItemConfig.tAutoPickupQuality[p.nQuality],
+			fnAction = function()
+				tItemConfig.tAutoPickupQuality[p.nQuality] = not tItemConfig.tAutoPickupQuality[p.nQuality]
+			end,
+		})
+	end
+	insert(t, t1)
+	-- 自动拾取物品名称
+	local t1 = { szOption = _L['Auto pickup names'] }
+	for s, b in pairs(tItemConfig.tAutoPickupNames or {}) do
+		insert(t1, {
+			szOption = s,
+			bCheck = true, bChecked = b,
+			fnAction = function()
+				tItemConfig.tAutoPickupNames[s] = not tItemConfig.tAutoPickupNames[s]
+			end,
+			szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',
+			nFrame = 49,
+			nMouseOverFrame = 51,
+			nIconWidth = 17,
+			nIconHeight = 17,
+			szLayer = 'ICON_RIGHTMOST',
+			fnClickIcon = function()
+				tItemConfig.tAutoPickupNames[s] = nil
+				Wnd.CloseWindow('PopupMenuPanel')
+			end,
+		})
+	end
+	if #t1 > 0 then
+		insert(t1, CONSTANT.MENU_DIVIDER)
+	end
+	insert(t1, {
+		szOption = _L['Add new'],
+		fnAction = function()
+			GetUserInput(_L['Please input new auto pickup name:'], function(text)
+				tItemConfig.tAutoPickupNames[text] = true
 			end)
 		end,
 	})
