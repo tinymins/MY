@@ -214,6 +214,13 @@ function D.IsItemAutoPickup(itemData, config, doodad, bCanDialog)
 	return false
 end
 
+function D.CloseLootWindow()
+	local me = GetClientPlayer()
+	if me and me.GetSkillOTActionState() == CHARACTER_OTACTION_TYPE.ACTION_PICKING then
+		me.OnCloseLootWindow()
+	end
+end
+
 function D.OnFrameCreate()
 	this:RegisterEvent('UI_SCALED')
 	this:RegisterEvent('PARTY_LOOT_MODE_CHANGED')
@@ -569,6 +576,7 @@ function D.OnItemLButtonClick()
 		else -- зѓМќУўзп
 			LootItem(dwDoodadID, data.dwID)
 		end
+		LIB.DelayCall('MY_GKPLoot__LootDoodad', 150, D.CloseLootWindow)
 	elseif szName == 'Image_GroupDistrib' then
 		local hItem     = this:GetParent()
 		local hList     = hItem:GetParent()
