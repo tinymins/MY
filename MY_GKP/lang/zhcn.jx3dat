@@ -160,6 +160,7 @@ return {
 	['Please input filter name'] = '请输入过滤物品名称',
 	['Auto pickup'] = '物品自动拾取',
 	['Auto pickup quest item'] = '自动拾取任务物品',
+	['Auto pickup book'] = '自动拾取书籍',
 	['Will be reset when loading'] = '仅过图前有效',
 	['Show 2nd kungfu fit icon'] = '显示第二心法装备推荐图标',
 	['Confirm when distribute'] = '分配时二次确认',

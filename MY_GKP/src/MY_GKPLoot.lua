@@ -85,13 +85,17 @@ local O_DEFAULT = {
 	},
 	tItemConfig = {
 		tFilterQuality = {},
+		bNameFilter = false,
+		tNameFilter = {},
 		bFilterBookRead = false,
+		bFilterBookHave = false,
+		bAutoPickupFilterBookRead = false,
+		bAutoPickupFilterBookHave = false,
 		bAutoPickupTaskItem = false,
+		bAutoPickupBook = false,
 		tAutoPickupQuality = {},
 		tAutoPickupNames = {},
 		tAutoPickupFilters = {},
-		bNameFilter = false,
-		tNameFilter = {},
 	},
 }
 local O = Clone(O_DEFAULT)
@@ -191,6 +195,9 @@ function D.IsItemAutoPickup(itemData, config, doodad, bCanDialog)
 				return false
 			end
 		end
+	end
+	if config.bAutoPickupBook and itemData.nGenre == ITEM_GENRE.BOOK then
+		return true
 	end
 	if config.tAutoPickupFilters and config.tAutoPickupFilters[itemData.szName] then
 		return false
@@ -800,6 +807,15 @@ function D.GetAutoPickupMenu()
 			tItemConfig.bAutoPickupTaskItem = not tItemConfig.bAutoPickupTaskItem
 		end,
 	})
+	-- 自动拾取书籍
+	insert(t, {
+		szOption = _L['Auto pickup book'],
+		bCheck = true, bChecked = tItemConfig.bAutoPickupBook,
+		fnAction = function()
+			tItemConfig.bAutoPickupBook = not tItemConfig.bAutoPickupBook
+		end,
+	})
+	-- 自动拾取品级
 	local t1 = { szOption = _L['Auto pickup by item quality'] }
 	for i, p in ipairs(GKP_ITEM_QUALITIES) do
 		table.insert(t1, {
