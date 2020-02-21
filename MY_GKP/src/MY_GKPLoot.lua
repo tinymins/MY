@@ -413,7 +413,7 @@ function D.OnLButtonClick()
 				szOption = _L['Config'],
 				fnAction = function()
 					LIB.ShowPanel()
-					LIB.SwitchTab('MY_GKP')
+					LIB.SwitchTab('MY_GKPDoodad')
 				end,
 			},
 			{
