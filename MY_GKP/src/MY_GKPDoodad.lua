@@ -253,6 +253,9 @@ function D.OnAutoDoodad()
 	then
 		return
 	end
+	if me.GetSkillOTActionState() == CHARACTER_OTACTION_TYPE.ACTION_PICK_PREPARE then
+		me.OnCloseLootWindow()
+	end
 	for k, v in pairs(D.tDoodad) do
 		local doodad, bKeep, bIntr = GetDoodad(k), false, false
 		if not doodad or not doodad.CanDialog(me) then
