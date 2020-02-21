@@ -75,7 +75,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	}):AutoWidth()
 
-	if LIB.IsShieldedVersion() then
+	if LIB.IsShieldedVersion('MY_Target') then
 		return
 	end
 

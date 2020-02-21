@@ -236,7 +236,7 @@ function ChatLinkEvents.OnNameLClick(element, link)
 	elseif IsCtrlKeyDown() then
 		LIB.CopyChatItem(link)
 	elseif IsShiftKeyDown() then
-		if not LIB.IsInShieldedMap() or not LIB.IsShieldedVersion() then
+		if not LIB.IsInShieldedMap() or not LIB.IsShieldedVersion('TARGET') then
 			LIB.SetTarget(TARGET.PLAYER, UI(link):Text())
 		end
 	elseif IsAltKeyDown() then
@@ -839,7 +839,7 @@ function LIB.Talk(nChannel, szText, szUUID, bNoEscape, bSaveDeny, bPushToChatBox
 		return LIB.Sysmsg({ szXml, rich = true })
 	end
 	tSay = ParseAntiSWS(tSay)
-	if LIB.IsShieldedVersion() then
+	if LIB.IsShieldedVersion('TALK') then
 		local nLen = 0
 		for i, v in ipairs(tSay) do
 			if nLen <= 64 then

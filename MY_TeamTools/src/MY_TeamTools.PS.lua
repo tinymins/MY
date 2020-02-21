@@ -72,7 +72,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	}):AutoWidth():Width() + 5
 
-	if not LIB.IsShieldedVersion() then
+	if not LIB.IsShieldedVersion('MY_WorldMark') then
 		x = x + ui:Append('WndCheckBox', {
 			x = x, y = y,
 			checked = MY_WorldMark.bEnable,

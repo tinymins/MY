@@ -120,7 +120,7 @@ function D.InitDB(szMode)
 	if not szMode then
 		szMode = 'ask'
 	end
-	if szMode == 'silent' and not LIB.IsShieldedVersion() then
+	if szMode == 'silent' and not LIB.IsShieldedVersion('DEVELOP') then
 		szMode = 'sure'
 	end
 	if not D.UpgradeDB(szMode) then
@@ -258,7 +258,7 @@ local function OnMsg(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID, szTalk
 	end
 	if l_ds then
 		l_ds:InsertMsg(szChannel, szText, szMsg, szTalker, GetCurrentTime())
-		if O.bRealtimeCommit and not LIB.IsShieldedVersion() then
+		if O.bRealtimeCommit and not LIB.IsShieldedVersion('MY_ChatLog') then
 			l_ds:FlushDB()
 		end
 	else
@@ -284,7 +284,7 @@ end
 LIB.RegisterEvent('LOADING_ENDING.MY_ChatLog_Save', onLoadingEnding)
 
 local function onIdle()
-	if l_ds and not LIB.IsShieldedVersion() then
+	if l_ds and not LIB.IsShieldedVersion('DEVELOP') then
 		l_ds:FlushDB()
 	end
 end
@@ -344,7 +344,7 @@ end
 LIB.RegisterExit('MY_Chat_Release', onExit)
 
 local function onDisconnect()
-	if LIB.IsShieldedVersion() then
+	if LIB.IsShieldedVersion('DEVELOP') then
 		return
 	end
 	onExit()

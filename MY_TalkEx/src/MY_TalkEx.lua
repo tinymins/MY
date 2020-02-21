@@ -89,7 +89,7 @@ _C.Talk = function()
 		return LIB.Sysmsg(_L['please input something.'], CONSTANT.MSG_THEME.ERROR)
 	end
 
-	if not LIB.IsShieldedVersion() and LIB.ProcessCommand
+	if not LIB.IsShieldedVersion('DEVELOP') and LIB.ProcessCommand
 	and MY_TalkEx.szTalk:sub(1, 8) == '/script ' then
 		LIB.ProcessCommand(MY_TalkEx.szTalk:sub(9))
 	else

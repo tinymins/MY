@@ -2050,14 +2050,14 @@ function LIB.SetTarget(arg0, arg1)
 	end
 	if dwType == TARGET.NPC then
 		local npc = GetNpc(dwID)
-		if npc and not npc.IsSelectable() and LIB.IsShieldedVersion() then
+		if npc and not npc.IsSelectable() and LIB.IsShieldedVersion('TARGET') then
 			--[[#DEBUG BEGIN]]
 			LIB.Debug('SetTarget', 'Set target to unselectable npc.', DEBUG_LEVEL.WARNING)
 			--[[#DEBUG END]]
 			return false
 		end
 	elseif dwType == TARGET.DOODAD then
-		if LIB.IsShieldedVersion() then
+		if LIB.IsShieldedVersion('TARGET') then
 			--[[#DEBUG BEGIN]]
 			LIB.Debug('SetTarget', 'Set target to doodad.', DEBUG_LEVEL.WARNING)
 			--[[#DEBUG END]]

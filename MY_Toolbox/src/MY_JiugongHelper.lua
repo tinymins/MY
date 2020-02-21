@@ -54,7 +54,7 @@ RegisterCustomData('MY_JiugongHelper.bEnable')
 
 function D.Apply()
 	LIB.RegisterEvent('OPEN_WINDOW.JIUGONG_HELPER', function(event)
-		if LIB.IsShieldedVersion() then
+		if LIB.IsShieldedVersion('MY_JiugongHelper') then
 			return
 		end
 		-- 确定当前对话对象是醉逍遥（18707）

@@ -191,7 +191,7 @@ end
 local NpcTpl = LIB.LoadLUAData(PACKET_INFO.ROOT .. 'MY_MiddleMapMark/data/npc/{$lang}.jx3dat')
 local DoodadTpl = LIB.LoadLUAData(PACKET_INFO.ROOT .. 'MY_MiddleMapMark/data/doodad/{$lang}.jx3dat')
 local function OnNpcEnterScene()
-	if l_tempMap and LIB.IsShieldedVersion() then
+	if l_tempMap and LIB.IsShieldedVersion('MY_MiddleMapMark') then
 		return
 	end
 	local npc = GetNpc(arg0)
@@ -253,7 +253,7 @@ local REC_DOODAD_TYPES = {
 	[DOODAD_KIND.SPRINT      ] = false, -- Çá¹¦Âä½Åµã
 }
 local function OnDoodadEnterScene()
-	if l_tempMap and LIB.IsShieldedVersion() then
+	if l_tempMap and LIB.IsShieldedVersion('MY_MiddleMapMark') then
 		return
 	end
 	local doodad = GetDoodad(arg0)

@@ -234,7 +234,7 @@ function D.AutoDialogue()
 end
 
 local function onOpenWindow()
-	if LIB.IsShieldedVersion() then
+	if LIB.IsShieldedVersion('MY_AutoDialogue') then
 		return
 	end
 	CURRENT_WINDOW = arg0
@@ -394,7 +394,7 @@ local ENTRY_LIST = {
 	},
 }
 function D.CreateEntry()
-	if LIB.IsShieldedVersion() then
+	if LIB.IsShieldedVersion('MY_AutoDialogue') then
 		return
 	end
 	for _, p in ipairs(ENTRY_LIST) do
@@ -424,7 +424,7 @@ end
 LIB.RegisterInit('MY_AutoDialogue', D.CreateEntry)
 
 function D.UpdateEntryPos()
-	if LIB.IsShieldedVersion() then
+	if LIB.IsShieldedVersion('MY_AutoDialogue') then
 		return
 	end
 	for _, p in ipairs(ENTRY_LIST) do
@@ -465,7 +465,7 @@ LIB.RegisterReload('MY_AutoDialogue#ENTRY', D.RemoveEntry)
 
 do
 local function OnPlotShow()
-	if LIB.IsShieldedVersion() then
+	if LIB.IsShieldedVersion('MY_AutoDialogue') then
 		return
 	end
 	Station.Hide()
@@ -481,7 +481,7 @@ end
 end
 
 local function onOpenWindow()
-	if LIB.IsShieldedVersion() then
+	if LIB.IsShieldedVersion('MY_AutoDialogue') then
 		return
 	end
 	D.CreateEntry()
@@ -489,7 +489,7 @@ end
 LIB.RegisterEvent('OPEN_WINDOW.MY_AutoDialogue#ENTRY', onOpenWindow)
 
 local function onShieldedVersion()
-	if LIB.IsShieldedVersion() then
+	if LIB.IsShieldedVersion('MY_AutoDialogue') then
 		D.RemoveEntry()
 	else
 		D.CreateEntry()
@@ -544,7 +544,7 @@ function D.GetConfigMenu()
 end
 
 LIB.RegisterAddonMenu('MY_AutoDialogue', function()
-	if LIB.IsShieldedVersion() then
+	if LIB.IsShieldedVersion('MY_AutoDialogue') then
 		return
 	end
 	return D.GetConfigMenu()

@@ -171,7 +171,7 @@ do
 local SHIELDED
 function D.IsShielded()
 	if SHIELDED == nil then
-		SHIELDED = LIB.IsShieldedVersion() and LIB.IsInArena()
+		SHIELDED = LIB.IsShieldedVersion('MY_TargetMon') and LIB.IsInArena()
 	end
 	return SHIELDED
 end
@@ -776,7 +776,7 @@ for i = 1, 5 do
 			'MY_TargetMon_' .. i .. '_' .. j, _L('Cancel buff %d - %d', i, j),
 			i == 1 and j == 1 and _L['MY Buff Monitor'] or '',
 			function()
-				if LIB.IsShieldedVersion() and not LIB.IsInDungeon() then
+				if LIB.IsShieldedVersion('MY_TargetMon') and not LIB.IsInDungeon() then
 					OutputMessage('MSG_ANNOUNCE_RED', _L['Cancel buff is disabled outside dungeon.'])
 					return
 				end

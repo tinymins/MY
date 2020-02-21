@@ -187,7 +187,7 @@ end
 end
 
 function D.CheckEnable()
-	C.bShielded = LIB.IsShieldedVersion()
+	C.bShielded = LIB.IsShieldedVersion('MY_TargetLine')
 	if (O.bTarget or O.bTTarget) and not C.bShielded then
 		LIB.BreatheCall('MY_TargetLine', D.UpdateLine)
 	else

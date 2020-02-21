@@ -67,7 +67,7 @@ local tNonwarData = {
 	{ id = 32, x =   50, y =  45 }, -- Ð¡Õ½±¦
 }
 local function drawNonwarMap()
-	if LIB.IsShieldedVersion() then
+	if LIB.IsShieldedVersion('MY_ShenxingHelper') then
 		return
 	end
 	local h = Station.Lookup('Topmost1/WorldMap/Wnd_All', 'Handle_CopyBtn')
@@ -118,7 +118,7 @@ end
 do
 local h, hList, hItem
 local function openAllMap()
-	if LIB.IsShieldedVersion() then
+	if LIB.IsShieldedVersion('MY_ShenxingHelper') then
 		return
 	end
 	h = Station.Lookup('Topmost1/WorldMap/Wnd_All', '')

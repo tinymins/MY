@@ -59,7 +59,7 @@ local FS_INIFILE = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_FS.ini'
 
 -- FireUIEvent('MY_TM_FS_CREATE', Random(50, 255), { col = { Random(50, 255), Random(50, 255), Random(50, 255) }, bFlash = true})
 local function CreateFullScreen(szKey, tArgs)
-	if LIB.IsShieldedVersion(2) then
+	if LIB.IsShieldedVersion('MY_TargetMon', 2) then
 		return
 	end
 	assert(type(tArgs) == 'table', 'CreateFullScreen failed!')

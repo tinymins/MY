@@ -149,7 +149,7 @@ local function onBreathe()
 end
 
 function D.CheckEnable()
-	if not LIB.IsShieldedVersion() and (O.bTargetFace or O.bTTargetFace or O.bTargetShape or O.bTTargetShape) then
+	if not LIB.IsShieldedVersion('MY_TargetFace') and (O.bTargetFace or O.bTTargetFace or O.bTargetShape or O.bTTargetShape) then
 		local hShaList = UI.GetShadowHandle('MY_TargetFace')
 		for _, v in ipairs({'TargetFace', 'TargetShape', 'TTargetFace', 'TTargetShape'}) do
 			local sha = hShaList:Lookup(v)

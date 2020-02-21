@@ -73,7 +73,7 @@ function PS.OnPanelActive(wnd)
 			MY_TeamMon.bEnable = bCheck
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
-	if not LIB.IsShieldedVersion(2) then
+	if not LIB.IsShieldedVersion('MY_TargetMon', 2) then
 		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY, text = _L['Enable circle'],
 			checked = MY_TeamMon_CC.bEnable,
@@ -124,7 +124,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
 	nX = X + 5
-	if not LIB.IsShieldedVersion(2) then
+	if not LIB.IsShieldedVersion('MY_TargetMon', 2) then
 		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY, text = _L['Large text alarm'],
 			checked = MY_TeamMon.bPushBigFontAlarm,

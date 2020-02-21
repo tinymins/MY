@@ -401,7 +401,7 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + dy
 
-	if not LIB.IsShieldedVersion() then
+	if not LIB.IsShieldedVersion('MY_ChatLog') then
 		ui:Append('WndCheckBox', {
 			x = x, y = y, w = wr,
 			text = _L['Realtime database commit'],

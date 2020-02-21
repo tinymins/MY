@@ -107,7 +107,7 @@ end
 RegisterCustomData('MY_Focus.tAutoFocus')
 RegisterCustomData('MY_Focus.tFocusList')
 
-function D.IsShielded() return LIB.IsShieldedVersion() and LIB.IsInShieldedMap() end
+function D.IsShielded() return LIB.IsShieldedVersion('MY_Focus') and LIB.IsInShieldedMap() end
 function D.IsEnabled() return O.bEnable and not D.IsShielded() end
 
 do
@@ -464,7 +464,7 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 				dwType == TARGET.NPC
 				and dwTemplateID == CHANGGE_REAL_SHADOW_TPLID
 				and IsEnemy(UI_GetClientPlayerID(), dwID)
-				and LIB.IsShieldedVersion()
+				and LIB.IsShieldedVersion('CHANGGE_SHADOW')
 			) then
 				insert(aVia, {
 					bDeletable = true,
@@ -528,7 +528,7 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 				elseif dwType == TARGET.NPC then
 					if O.bFocusJJCParty
 					and KObject.dwTemplateID == CHANGGE_REAL_SHADOW_TPLID
-					and not (IsEnemy(UI_GetClientPlayerID(), dwID) and LIB.IsShieldedVersion()) then
+					and not (IsEnemy(UI_GetClientPlayerID(), dwID) and LIB.IsShieldedVersion('CHANGGE_SHADOW')) then
 						D.OnRemoveFocus(TARGET.PLAYER, KObject.dwEmployer)
 						insert(aVia, {
 							bDeletable = false,
@@ -597,7 +597,7 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		end
 
 		-- ÅÐ¶ÏÆÁ±ÎµÄNPC
-		if bFocus and dwType == TARGET.NPC and LIB.IsShieldedNpc(dwTemplateID) and LIB.IsShieldedVersion() then
+		if bFocus and dwType == TARGET.NPC and LIB.IsShieldedNpc(dwTemplateID) and LIB.IsShieldedVersion('TARGET') then
 			bFocus = false
 		end
 
@@ -615,8 +615,8 @@ function D.OnObjectLeaveScene(dwType, dwID)
 		if dwType == TARGET.NPC then
 			if O.bFocusJJCParty
 			and KObject.dwTemplateID == CHANGGE_REAL_SHADOW_TPLID
-			and LIB.IsInArena() and not (IsEnemy(UI_GetClientPlayerID(), dwID) and LIB.IsShieldedVersion()) then
-				D.OnSetFocus(TARGET.PLAYER, KObject.dwEmployer, LIB.GetObjectName(KObject, 'never'), false, _L['Auto focus party in arena'])
+			and LIB.IsInArena() and not (IsEnemy(UI_GetClientPlayerID(), dwID) and LIB.IsShieldedVersion('TARGET')) then
+				D.OnSetFocus(TARGET.PLAYER, KObject.dwEmployer, LIB.GetObjectName(KObject, 'never'), _L['Auto focus party in arena'])
 			end
 		end
 	end

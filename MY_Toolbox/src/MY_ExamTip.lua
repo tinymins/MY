@@ -161,7 +161,7 @@ local function SubmitData()
 		},
 		success = function(html, status)
 			local res = LIB.JsonDecode(html)
-			if LIB.IsShieldedVersion() or not res then
+			if LIB.IsShieldedVersion('MY_ExamTip') or not res then
 				return
 			end
 			LIB.Sysmsg(_L['exam tip'], _L('%s record(s) commited, %s record(s) accepted!', res.received, res.accepted))
@@ -181,7 +181,7 @@ local function OnFrameBreathe()
 		return
 	end
 	local szQues = txtQues:GetText()
-	if not LIB.IsShieldedVersion() then
+	if not LIB.IsShieldedVersion('MY_ExamTip') then
 		QueryData(szQues)
 	end
 	local szAnsw

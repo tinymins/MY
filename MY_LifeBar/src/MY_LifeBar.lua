@@ -218,7 +218,7 @@ MY_LifeBar.szConfig = 'common'
 RegisterCustomData('MY_LifeBar.bEnabled')
 RegisterCustomData('MY_LifeBar.szConfig')
 
-function D.IsShielded() return LIB.IsShieldedVersion() and LIB.IsInShieldedMap() end
+function D.IsShielded() return LIB.IsShieldedVersion('TARGET') and LIB.IsInShieldedMap() end
 function D.IsEnabled() return MY_LifeBar.bEnabled and not D.IsShielded() end
 function D.IsMapEnabled()
 	return D.IsEnabled() and (
@@ -406,9 +406,9 @@ LIB.RegisterEvent('COINSHOP_ON_CLOSE', D.AutoSwitchSysHeadTop)
 do
 local CheckInvalidRect
 do
-local bShieldedVersion = LIB.IsShieldedVersion()
+local bShieldedVersion = LIB.IsShieldedVersion('MY_LifeBar')
 LIB.RegisterEvent('MY_SHIELDED_VERSION', function()
-	bShieldedVersion = LIB.IsShieldedVersion()
+	bShieldedVersion = LIB.IsShieldedVersion('MY_LifeBar')
 end)
 local function fxTarget(r, g, b, a) return 255 - (255 - r) * 0.3, 255 - (255 - g) * 0.3, 255 - (255 - b) * 0.3, a end
 local function fxDeath(r, g, b, a) return ceil(r * 0.4), ceil(g * 0.4), ceil(b * 0.4), a end

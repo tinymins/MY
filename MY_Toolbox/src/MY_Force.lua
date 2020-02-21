@@ -377,7 +377,7 @@ function PS.OnPanelActive(frame)
 	})
 	-- crlf
 	y = y + 54
-	if not LIB.IsShieldedVersion() then
+	if not LIB.IsShieldedVersion('MY_ForceGuding') then
 		-- crlf
 		x = X + 10
 		x = ui:Append('WndCheckBox', {

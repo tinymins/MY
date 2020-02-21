@@ -83,11 +83,11 @@ local function GetDoodadTemplateName(dwID)
 end
 
 local function IsShielded()
-	return LIB.IsInShieldedMap() and LIB.IsShieldedVersion()
+	return LIB.IsInShieldedMap() and LIB.IsShieldedVersion('TARGET')
 end
 
 local function IsAutoInteract()
-	return O.bInteract and not IsShiftKeyDown() and not Station.Lookup('Normal/MY_GKP_Loot') and not LIB.IsShieldedVersion()
+	return O.bInteract and not IsShiftKeyDown() and not Station.Lookup('Normal/MY_GKP_Loot') and not LIB.IsShieldedVersion('MY_GKPDoodad')
 end
 
 local D = {
@@ -569,7 +569,7 @@ function PS.OnPanelActive(frame)
 		autoenable = function() return MY_GKPDoodad.bShowName end,
 	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
 
-	if not LIB.IsShieldedVersion() then
+	if not LIB.IsShieldedVersion('MY_GKPDoodad') then
 		nX = ui:Append('WndCheckBox', {
 			x = nX, y = nY,
 			text = _L['Auto craft'],

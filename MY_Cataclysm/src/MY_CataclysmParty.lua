@@ -93,7 +93,7 @@ local function onNpcEnterScene()
 		CTM_BOSS_CACHE[npc.dwID] = npc
 	end
 	if npc.dwTemplateID == CHANGGE_REAL_SHADOW_TPLID then
-		if not (IsEnemy(UI_GetClientPlayerID(), arg0) and LIB.IsShieldedVersion()) then
+		if not (IsEnemy(UI_GetClientPlayerID(), arg0) and LIB.IsShieldedVersion('CHANGGE_SHADOW')) then
 			local dwType, dwID = LIB.GetTarget()
 			if dwType == TARGET.PLAYER and dwID == npc.dwEmployer then
 				LIB.SetTarget(TARGET.NPC, arg0)
@@ -108,7 +108,7 @@ LIB.RegisterEvent('NPC_ENTER_SCENE.MY_Cataclysm', onNpcEnterScene)
 local function onNpcLeaveScene()
 	local npc = GetNpc(arg0)
 	if CHANGGE_REAL_SHADOW_CACHE[arg0] then
-		if not (IsEnemy(UI_GetClientPlayerID(), arg0) and LIB.IsShieldedVersion()) then
+		if not (IsEnemy(UI_GetClientPlayerID(), arg0) and LIB.IsShieldedVersion('CHANGGE_SHADOW')) then
 			local dwType, dwID = LIB.GetTarget()
 			if dwType == TARGET.NPC and dwID == arg0 then
 				LIB.SetTarget(TARGET.PLAYER, npc.dwEmployer)

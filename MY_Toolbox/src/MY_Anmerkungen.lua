@@ -422,7 +422,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 
-	if not MY.IsShieldedVersion() then
+	if not MY.IsShieldedVersion('MY_Anmerkungen') then
 		ui:Append('WndButton2', {
 			x = w - 230, y = y, w = 110,
 			text = _L['Import'],

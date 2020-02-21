@@ -140,7 +140,7 @@ function D.Draw(Point, sha, col)
 end
 
 function D.GetEvent()
-	if MY_WorldMark.bEnable and not LIB.IsShieldedVersion() then
+	if MY_WorldMark.bEnable and not LIB.IsShieldedVersion('MY_WorldMark') then
 		return {
 			{'DO_SKILL_CAST', D.OnDoSkillCast},
 			{'NPC_LEAVE_SCENE', D.OnNpcLeave},

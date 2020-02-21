@@ -204,8 +204,14 @@ local function IsTabVisible(tab)
 	if tab.bShielded and LIB.IsShieldedVersion() then
 		return false
 	end
-	if tab.nShielded and LIB.IsShieldedVersion(tab.nShielded) then
-		return false
+	if tab.szShieldedKey then
+		if LIB.IsShieldedVersion(tab.szShieldedKey, tab.nShielded) then
+			return false
+		end
+	else
+		if tab.nShielded and LIB.IsShieldedVersion(tab.nShielded) then
+			return false
+		end
 	end
 	if tab.IsShielded then
 		return not tab.IsShielded()

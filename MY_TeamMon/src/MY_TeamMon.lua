@@ -609,7 +609,7 @@ function D.CreateData(szEvent)
 	end
 	pcall(Raid_MonitorBuffs) -- clear
 	-- 判断战场使用条件
-	if LIB.IsInArena() and LIB.IsShieldedVersion(2) then
+	if LIB.IsInArena() and LIB.IsShieldedVersion('MY_TargetMon', 2) then
 		LIB.Sysmsg(_L['MY_TeamMon is blocked in arena, temporary disabled.'])
 		D.Log('MAPID: ' .. dwMapID ..  ' create data Failed:' .. GetTime() - nTime  .. 'ms')
 	else
@@ -814,7 +814,7 @@ function D.OnBuff(dwOwner, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, dw
 	local nTime = GetTime()
 	if not bDelete then
 		-- 近期记录
-		if Table_BuffIsVisible(dwBuffID, nBuffLevel) or not LIB.IsShieldedVersion(2) then
+		if Table_BuffIsVisible(dwBuffID, nBuffLevel) or not LIB.IsShieldedVersion('MY_TargetMon', 2) then
 			local tWeak, tTemp = CACHE.TEMP[szType], D.TEMP[szType]
 			if not tWeak[key] then
 				local t = {
@@ -874,7 +874,7 @@ function D.OnBuff(dwOwner, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, dw
 			if nClass == MY_TM_TYPE.BUFF_GET then
 				ConstructSpeech(aText, aXml, _L['Get buff'], 44, 255, 255, 255)
 				ConstructSpeech(aText, aXml, szName .. ' x' .. nCount, 44, 255, 255, 0)
-				if data.szNote and not LIB.IsShieldedVersion(2) then
+				if data.szNote and not LIB.IsShieldedVersion('MY_TargetMon', 2) then
 					ConstructSpeech(aText, aXml, ' ' .. FilterCustomText(data.szNote, szSender, szReceiver), 44, 255, 255, 255)
 				end
 			else
@@ -968,7 +968,7 @@ function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
 		end
 	end
 	local data = D.GetData('CASTING', dwCastID, dwLevel)
-	if Table_IsSkillShow(dwCastID, dwLevel) or not LIB.IsShieldedVersion(2) then
+	if Table_IsSkillShow(dwCastID, dwLevel) or not LIB.IsShieldedVersion('MY_TargetMon', 2) then
 		local tWeak, tTemp = CACHE.TEMP.CASTING, D.TEMP.CASTING
 		if not tWeak[key] then
 			local t = {
@@ -1036,7 +1036,7 @@ function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
 				ConstructSpeech(aText, aXml, szReceiver == MY_TM_CORE_NAME and g_tStrings.STR_YOU or szReceiver, 44, 255, 255, 0)
 				ConstructSpeech(aText, aXml, MY_TM_RIGHT_BRACKET, MY_TM_RIGHT_BRACKET_XML)
 			end
-			if data.szNote and not LIB.IsShieldedVersion(2) then
+			if data.szNote and not LIB.IsShieldedVersion('MY_TargetMon', 2) then
 				ConstructSpeech(aText, aXml, ' ' .. FilterCustomText(data.szNote, szSender, szReceiver), 44, 255, 255, 255)
 			end
 			local szXml, szText = concat(aXml), concat(aText)
@@ -1047,7 +1047,7 @@ function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
 			if O.bPushBigFontAlarm and cfg.bBigFontAlarm then
 				FireUIEvent('MY_TM_LARGE_TEXT', szText, data.col or { GetHeadTextForceFontColor(dwCaster, MY_TM_CORE_PLAYERID) })
 			end
-			if not LIB.IsShieldedVersion(2) and cfg.bSelect then
+			if not LIB.IsShieldedVersion('MY_TargetMon', 2) and cfg.bSelect then
 				SetTarget(IsPlayer(dwCaster) and TARGET.PLAYER or TARGET.NPC, dwCaster)
 			end
 			if cfg.tMark then
@@ -1159,7 +1159,7 @@ function D.OnNpcEvent(npc, bEnter)
 				-- 头顶报警
 				if O.bPushScreenHead and cfg.bScreenHead then
 					local szNote, szName = nil, FilterCustomText(data.szName, szSender, szReceiver)
-					if not LIB.IsShieldedVersion(2) then
+					if not LIB.IsShieldedVersion('MY_TargetMon', 2) then
 						szNote = FilterCustomText(data.szNote, szSender, szReceiver) or szName
 					end
 					FireUIEvent('MY_LIFEBAR_COUNTDOWN', npc.dwID, 'NPC', 'MY_TM_NPC_' .. npc.dwID, {
@@ -1190,7 +1190,7 @@ function D.OnNpcEvent(npc, bEnter)
 				if nCount > 1 then
 					ConstructSpeech(aText, aXml, ' x' .. nCount, 44, 255, 255, 0)
 				end
-				if data.szNote and not LIB.IsShieldedVersion(2) then
+				if data.szNote and not LIB.IsShieldedVersion('MY_TargetMon', 2) then
 					ConstructSpeech(aText, aXml, ' ' .. FilterCustomText(data.szNote, szSender, szReceiver), 44, 255, 255, 255)
 				end
 			else
@@ -1213,7 +1213,7 @@ function D.OnNpcEvent(npc, bEnter)
 			end
 
 			if nClass == MY_TM_TYPE.NPC_ENTER then
-				if not LIB.IsShieldedVersion(2) and cfg.bSelect then
+				if not LIB.IsShieldedVersion('MY_TargetMon', 2) and cfg.bSelect then
 					SetTarget(TARGET.NPC, npc.dwID)
 				end
 				if O.bPushFullScreen and cfg.bFullScreen then
@@ -1238,7 +1238,7 @@ function D.OnDoodadEvent(doodad, bEnter)
 		end
 		CACHE.DOODAD_LIST[doodad.dwTemplateID].tList[doodad.dwID] = {}
 		CACHE.DOODAD_LIST[doodad.dwTemplateID].nCount = CACHE.DOODAD_LIST[doodad.dwTemplateID].nCount + 1
-		if doodad.nKind ~= DOODAD_KIND.ORNAMENT or not LIB.IsShieldedVersion(2) then
+		if doodad.nKind ~= DOODAD_KIND.ORNAMENT or not LIB.IsShieldedVersion('MY_TargetMon', 2) then
 			local tWeak, tTemp = CACHE.TEMP.DOODAD, D.TEMP.DOODAD
 			if not tWeak[doodad.dwTemplateID] then
 				local t = {
@@ -1299,7 +1299,7 @@ function D.OnDoodadEvent(doodad, bEnter)
 				-- 头顶报警
 				if O.bPushScreenHead and cfg.bScreenHead then
 					local szNote, szName = nil, FilterCustomText(data.szName, szSender, szReceiver)
-					if not LIB.IsShieldedVersion(2) then
+					if not LIB.IsShieldedVersion('MY_TargetMon', 2) then
 						szNote = FilterCustomText(data.szNote, szSender, szReceiver) or szName
 					end
 					FireUIEvent('MY_LIFEBAR_COUNTDOWN', doodad.dwID, 'DOODAD', 'MY_TM_DOODAD_' .. doodad.dwID, {
@@ -1330,7 +1330,7 @@ function D.OnDoodadEvent(doodad, bEnter)
 				if nCount > 1 then
 					ConstructSpeech(aText, aXml, ' x' .. nCount, 44, 255, 255, 0)
 				end
-				if data.szNote and not LIB.IsShieldedVersion(2) then
+				if data.szNote and not LIB.IsShieldedVersion('MY_TargetMon', 2) then
 					ConstructSpeech(aText, aXml, ' ' .. FilterCustomText(data.szNote, szSender, szReceiver), 44, 255, 255, 255)
 				end
 			else
@@ -1472,7 +1472,7 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 					})
 					FireUIEvent('MY_TM_SA_CREATE', 'TIME', dwReceiverID, { text = _L('%s call name', szNpcName or g_tStrings.SYSTEM)})
 				end
-				if not LIB.IsShieldedVersion(2) and cfg.bSelect then
+				if not LIB.IsShieldedVersion('MY_TargetMon', 2) and cfg.bSelect then
 					SetTarget(TARGET.PLAYER, dwReceiverID)
 				end
 			else -- 没点名
@@ -1480,7 +1480,7 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 					D.Talk('RAID_WHISPER', szText)
 				end
 				-- 头顶报警
-				if O.bPushScreenHead and cfg.bScreenHead and not LIB.IsShieldedVersion(2) then
+				if O.bPushScreenHead and cfg.bScreenHead and not LIB.IsShieldedVersion('MY_TargetMon', 2) then
 					FireUIEvent('MY_LIFEBAR_COUNTDOWN', dwNpcID or me.dwID, 'TIME', 'MY_TM_TIME_' .. (dwNpcID or me.dwID), {
 						nTime = GetTime() + 5000,
 						szText = szText,

@@ -346,7 +346,7 @@ function D.RescanNearby()
 	H_CIRCLE:Clear()
 	H_LINE:Clear()
 	H_NAME:Clear()
-	if LIB.IsShieldedVersion(2) then
+	if LIB.IsShieldedVersion('MY_TargetMon', 2) then
 		return
 	end
 	for _, dwID in pairs(LIB.GetNearNpcID()) do
@@ -365,7 +365,7 @@ function D.OnTMDataReload()
 end
 
 function D.CheckEnable()
-	if O.bEnable and not LIB.IsShieldedVersion(2) then
+	if O.bEnable and not LIB.IsShieldedVersion('MY_TargetMon', 2) then
 		LIB.RegisterModuleEvent('MY_TeamMon_CC', {
 			{ '#BREATHE', D.OnBreathe },
 			{ 'NPC_ENTER_SCENE', function() D.OnObjectEnterScene(TARGET.NPC, arg0) end },

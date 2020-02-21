@@ -75,7 +75,7 @@ end
 
 function D.OnEvent(szEvent)
 	if szEvent == 'ON_ENTER_CUSTOM_UI_MODE' or szEvent == 'ON_LEAVE_CUSTOM_UI_MODE' then
-		if LIB.IsShieldedVersion(2) then
+		if LIB.IsShieldedVersion('MY_TargetMon', 2) then
 			return
 		end
 		if szEvent == 'ON_LEAVE_CUSTOM_UI_MODE' then
@@ -112,7 +112,7 @@ function D.Init()
 end
 
 function D.UpdateText(txt, col)
-	if LIB.IsShieldedVersion(2) then
+	if LIB.IsShieldedVersion('MY_TargetMon', 2) then
 		return
 	end
 	if not col then
