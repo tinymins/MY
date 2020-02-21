@@ -85,7 +85,7 @@ local O_DEFAULT = {
 	},
 	tItemConfig = {
 		tFilterQuality = {},
-		bIgnoreGarbage = true,
+		bFilterGrayItem = true,
 		bNameFilter = false,
 		tNameFilter = {},
 		bFilterBookRead = false,
@@ -169,7 +169,7 @@ function D.IsItemDisplay(itemData, config)
 			end
 		end
 	end
-	if config.bIgnoreGarbage and itemData.nQuality == CONSTANT.ITEM_QUALITY.GRAY then
+	if config.bFilterGrayItem and itemData.nQuality == CONSTANT.ITEM_QUALITY.GRAY then
 		return false
 	end
 	return true
@@ -682,9 +682,9 @@ function D.GetFilterMenu()
 		{
 			szOption = _L['Filter gray item'],
 			bCheck = true,
-			bChecked = MY_GKP_Loot.tItemConfig.bIgnoreGarbage,
+			bChecked = MY_GKP_Loot.tItemConfig.bFilterGrayItem,
 			fnAction = function()
-				MY_GKP_Loot.tItemConfig.bIgnoreGarbage = not MY_GKP_Loot.tItemConfig.bIgnoreGarbage
+				MY_GKP_Loot.tItemConfig.bFilterGrayItem = not MY_GKP_Loot.tItemConfig.bFilterGrayItem
 			end,
 		},
 	}
@@ -1352,7 +1352,7 @@ function D.DrawLootList(dwID)
 		LootMoney(dwID)
 	end
 	local nCount = #aItemData
-	if not IsEmpty(config.tFilterQuality) or config.bFilterBookRead or config.bFilterBookHave then
+	if not IsEmpty(config.tFilterQuality) or config.bFilterBookRead or config.bFilterBookHave or config.bFilterGrayItem then
 		nCount = 0
 		for i, v in ipairs(aItemData) do
 			if D.IsItemDisplay(v, config) then
