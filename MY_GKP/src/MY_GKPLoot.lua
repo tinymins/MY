@@ -171,6 +171,27 @@ function D.IsItemAutoPickup(itemData, config, doodad, bCanDialog)
 	if not bCanDialog then
 		return false
 	end
+	if (config.bAutoPickupFilterBookRead or config.bAutoPickupFilterBookHave) and itemData.nGenre == ITEM_GENRE.BOOK then
+		local me = GetClientPlayer()
+		if config.bAutoPickupFilterBookRead then
+			local nBookID, nSegmentID = GlobelRecipeID2BookID(itemData.nBookID)
+			if me and me.IsBookMemorized(nBookID, nSegmentID) then
+				return false
+			end
+		end
+		if config.bAutoPickupFilterBookHave then
+			local bHave = false
+			LIB.WalkBagItem(function(item)
+				if item.nUiId == itemData.nUiId and item.nBookID == itemData.nBookID then
+					bHave = true
+					return 0
+				end
+			end)
+			if bHave then
+				return false
+			end
+		end
+	end
 	if config.tAutoPickupFilters and config.tAutoPickupFilters[itemData.szName] then
 		return false
 	end
@@ -718,6 +739,24 @@ function D.GetAutoPickupMenu()
 	local t = { szOption = _L['Auto pickup'] }
 	insert(t, { szOption = _L['Filters have higher priority'], bDisable = true })
 	-- 拾取过滤
+	-- 过滤已读书籍
+	insert(t, {
+		szOption = _L['Filter book read'],
+		bCheck = true,
+		bChecked = MY_GKP_Loot.tItemConfig.bAutoPickupFilterBookRead,
+		fnAction = function()
+			MY_GKP_Loot.tItemConfig.bAutoPickupFilterBookRead = not MY_GKP_Loot.tItemConfig.bAutoPickupFilterBookRead
+		end,
+	})
+	-- 过滤已有书籍
+	insert(t, {
+		szOption = _L['Filter book have'],
+		bCheck = true,
+		bChecked = MY_GKP_Loot.tItemConfig.bAutoPickupFilterBookHave,
+		fnAction = function()
+			MY_GKP_Loot.tItemConfig.bAutoPickupFilterBookHave = not MY_GKP_Loot.tItemConfig.bAutoPickupFilterBookHave
+		end,
+	})
 	-- 自动拾取物品过滤
 	local t1 = { szOption = _L['Auto pickup filters'] }
 	for s, b in pairs(tItemConfig.tAutoPickupFilters or {}) do
