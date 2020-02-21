@@ -152,6 +152,7 @@ return {
 	['Loot item filter'] = '拾取顯示過濾',
 	['Quality filter'] = '等級過濾',
 	['Filter book read'] = '過濾已讀書籍',
+	['Filter book have'] = '過濾已有書籍',
 	['Name filter'] = '名稱過濾',
 	['Will be disable when loading'] = '將會在過圖後禁用',
 	['Enable'] = '啟用',

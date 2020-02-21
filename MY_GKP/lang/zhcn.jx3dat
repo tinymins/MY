@@ -152,6 +152,7 @@ return {
 	['Loot item filter'] = '拾取显示过滤',
 	['Quality filter'] = '等级过滤',
 	['Filter book read'] = '过滤已读书籍',
+	['Filter book have'] = '过滤已有书籍',
 	['Name filter'] = '名称过滤',
 	['Will be disable when loading'] = '将会在过图后禁用',
 	['Enable'] = '启用',

@@ -143,11 +143,25 @@ function D.IsItemDisplay(itemData, config)
 	if config.bNameFilter and config.tNameFilter[itemData.szName] then
 		return false
 	end
-	if config.bFilterBookRead and itemData.nGenre == ITEM_GENRE.BOOK then
+	if (config.bFilterBookRead or config.bFilterBookHave) and itemData.nGenre == ITEM_GENRE.BOOK then
 		local me = GetClientPlayer()
-		local nBookID, nSegmentID = GlobelRecipeID2BookID(itemData.nBookID)
-		if me and me.IsBookMemorized(nBookID, nSegmentID) then
-			return false
+		if config.bFilterBookRead then
+			local nBookID, nSegmentID = GlobelRecipeID2BookID(itemData.nBookID)
+			if me and me.IsBookMemorized(nBookID, nSegmentID) then
+				return false
+			end
+		end
+		if config.bFilterBookHave then
+			local bHave = false
+			LIB.WalkBagItem(function(item)
+				if item.nUiId == itemData.nUiId and item.nBookID == itemData.nBookID then
+					bHave = true
+					return 0
+				end
+			end)
+			if bHave then
+				return false
+			end
 		end
 	end
 	return true
@@ -612,6 +626,14 @@ function D.GetFilterMenu()
 			bChecked = MY_GKP_Loot.tItemConfig.bFilterBookRead,
 			fnAction = function()
 				MY_GKP_Loot.tItemConfig.bFilterBookRead = not MY_GKP_Loot.tItemConfig.bFilterBookRead
+			end,
+		},
+		{
+			szOption = _L['Filter book have'],
+			bCheck = true,
+			bChecked = MY_GKP_Loot.tItemConfig.bFilterBookHave,
+			fnAction = function()
+				MY_GKP_Loot.tItemConfig.bFilterBookHave = not MY_GKP_Loot.tItemConfig.bFilterBookHave
 			end,
 		},
 	}
@@ -1243,7 +1265,7 @@ function D.DrawLootList(dwID)
 		LootMoney(dwID)
 	end
 	local nCount = #aItemData
-	if not IsEmpty(config.tFilterQuality) or config.bFilterBookRead then
+	if not IsEmpty(config.tFilterQuality) or config.bFilterBookRead or config.bFilterBookHave then
 		nCount = 0
 		for i, v in ipairs(aItemData) do
 			if D.IsItemDisplay(v, config) then
@@ -1499,6 +1521,7 @@ function D.GetDoodadLootInfo(dwID)
 					item         = item         ,
 					szName       = szItemName   ,
 					dwID         = item.dwID    ,
+					nUiId        = item.nUiId   ,
 					nGenre       = item.nGenre  ,
 					nSub         = item.nSub    ,
 					nQuality     = item.nQuality,
