@@ -2193,6 +2193,20 @@ function LIB.GetFreeBagBox()
 	end
 end
 
+-- 遍历背包物品
+-- (number dwBox, number dwX) LIB.WalkBagItem(fnWalker)
+function LIB.WalkBagItem(fnWalker)
+	local me = GetClientPlayer()
+	for dwBox = 1, LIB.GetBagPackageCount() do
+		for dwX = 0, me.GetBoxSize(dwBox) - 1 do
+			local it = me.GetItem(dwBox, dwX)
+			if it and fnWalker(it, dwBox, dwX) == 0 then
+				return
+			end
+		end
+	end
+end
+
 -- 装备名为szName的装备
 -- (void) LIB.Equip(szName)
 -- szName  装备名称
