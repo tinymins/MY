@@ -111,7 +111,7 @@ function PS.OnPanelActive(wnd)
 		nY = nY + ui:Append('Text', {
 			x = nX, y = nY, w = W - nX, h = 120,
 			text = _L['Please enable sync common ui config first'],
-			font = 19, r = 255, g = 0, b = 0, multiline = true,
+			font = 19, r = 255, g = 255, b = 0, multiline = true,
 		}):AutoHeight():Height() + 25
 		nY = nY + ui:Append('WndButton', {
 			x = (W - 100) / 2, y = nY, w = 100, h = 30,
