@@ -69,11 +69,11 @@ function LIB.IsShieldedVersion(szKey, nLevel, bSet)
 			FireUIEvent(PACKET_INFO.NAME_SPACE .. '_SHIELDED_VERSION')
 		end)
 	end
-	if GLOBAL_SHIELDED_LEVEL >= nLevel then
+	if GLOBAL_SHIELDED_LEVEL > nLevel then
 		return false
 	end
 	local nKeyLevel = FUNCTION_SHIELDED_LEVEL[szKey]
-	if nKeyLevel and nKeyLevel >= nLevel then
+	if nKeyLevel and nKeyLevel > nLevel then
 		return false
 	end
 	return true
