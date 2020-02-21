@@ -1443,7 +1443,7 @@ function D.DrawLootList(dwID)
 		hDoodad:Lookup('Text_Title'):SetAlpha(255)
 		hDoodad:Lookup('SFX'):Show()
 	end
-	hDoodad:Lookup('Text_Title'):SetText(szName .. ' (' .. #aItemData ..  ')')
+	hDoodad:Lookup('Text_Title'):SetText(szName .. ' (' .. nCount ..  ')')
 	wnd:Lookup('Btn_Boss'):Enable(bDist)
 
 	-- ÐÞ¸ÄUI´óÐ¡
