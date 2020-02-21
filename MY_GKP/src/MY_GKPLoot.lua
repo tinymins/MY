@@ -85,6 +85,7 @@ local O_DEFAULT = {
 	},
 	tItemConfig = {
 		tFilterQuality = {},
+		bIgnoreGarbage = true,
 		bNameFilter = false,
 		tNameFilter = {},
 		bFilterBookRead = false,
@@ -167,6 +168,9 @@ function D.IsItemDisplay(itemData, config)
 				return false
 			end
 		end
+	end
+	if config.bIgnoreGarbage and itemData.nQuality == CONSTANT.ITEM_QUALITY.GRAY then
+		return false
 	end
 	return true
 end
@@ -672,6 +676,15 @@ function D.GetFilterMenu()
 			bChecked = MY_GKP_Loot.tItemConfig.bFilterBookHave,
 			fnAction = function()
 				MY_GKP_Loot.tItemConfig.bFilterBookHave = not MY_GKP_Loot.tItemConfig.bFilterBookHave
+			end,
+		},
+		-- 过滤灰色物品
+		{
+			szOption = _L['Filter gray item'],
+			bCheck = true,
+			bChecked = MY_GKP_Loot.tItemConfig.bIgnoreGarbage,
+			fnAction = function()
+				MY_GKP_Loot.tItemConfig.bIgnoreGarbage = not MY_GKP_Loot.tItemConfig.bIgnoreGarbage
 			end,
 		},
 	}
@@ -1495,6 +1508,7 @@ local ITEM_DATA_WEIGHT = {
 	ENCHANT_ITEM   = 12, -- 附魔
 	TASK_ITEM      = 13, -- 任务道具
 	OTHER          = 14,
+	GARBAGE        = 15, -- 垃圾
 }
 local function GetItemDataType(data)
 	-- 外观 披风 礼盒
@@ -1563,6 +1577,10 @@ local function GetItemDataType(data)
 	if data.item.nGenre == ITEM_GENRE.TASK_ITEM then
 		return 'TASK_ITEM'
 	end
+	-- 垃圾
+	if data.item.nQuality == 0 then
+		return 'GARBAGE'
+	end
 	return 'OTHER'
 end
 
@@ -1583,7 +1601,7 @@ function D.GetDoodadLootInfo(dwID)
 		local nLootItemCount = d.GetItemListCount()
 		for i = 0, nLootItemCount - 1 do
 			local item, bNeedRoll, bDist, bBidding = d.GetLootItem(i, me)
-			if item and item.nQuality > 0 then
+			if item then
 				local szItemName = LIB.GetItemNameByItem(item)
 				if item.nQuality == GKP_LOOT_HUANGBABA_QUALITY and LIB.GetItemIconByUIID(item.nUiId) == GKP_LOOT_HUANGBABA_ICON then
 					bSpecial = true
