@@ -65,7 +65,9 @@ local GKP_ITEM_QUALITIES = {
 	{ nQuality = CONSTANT.ITEM_QUALITY.NACARAT, szTitle = g_tStrings.STR_ROLLQUALITY_NACARAT },
 }
 
-local D = {}
+local D = {
+	aDoodadID = {},
+}
 local O_DEFAULT = {
 	bOn = false,
 	bOnlyInTeamDungeon = false,
@@ -310,15 +312,7 @@ function D.OnEvent(szEvent)
 		local a = this.anchor or GKP_LOOT_ANCHOR
 		this:SetPoint(a.s, 0, 0, a.r, a.x, a.y)
 	elseif szEvent == 'MY_GKP_LOOT_RELOAD' or szEvent == 'MY_GKP_LOOT_BOSS' then
-		local wnd = this:Lookup('WndContainer_DoodadList'):LookupContent(0)
-		local aDoodadID = {}
-		while wnd do
-			table.insert(aDoodadID, wnd.dwDoodadID)
-			wnd = wnd:GetNext()
-		end
-		for _, dwDoodadID in ipairs(aDoodadID) do
-			D.DrawLootList(dwDoodadID)
-		end
+		D.ReloadFrame()
 	end
 end
 
@@ -384,6 +378,7 @@ function D.OnLButtonClick()
 	if szName == 'Btn_Close' then
 		if IsCtrlKeyDown() then
 			D.CloseFrame()
+			D.aDoodadID = {}
 		else
 			D.RemoveLootList(this:GetParent().dwDoodadID)
 		end
@@ -667,6 +662,7 @@ function D.GetFilterMenu()
 			bChecked = MY_GKP_Loot.tItemConfig.bFilterBookRead,
 			fnAction = function()
 				MY_GKP_Loot.tItemConfig.bFilterBookRead = not MY_GKP_Loot.tItemConfig.bFilterBookRead
+				D.ReloadFrame()
 			end,
 		},
 		-- 过滤已有书籍
@@ -676,6 +672,7 @@ function D.GetFilterMenu()
 			bChecked = MY_GKP_Loot.tItemConfig.bFilterBookHave,
 			fnAction = function()
 				MY_GKP_Loot.tItemConfig.bFilterBookHave = not MY_GKP_Loot.tItemConfig.bFilterBookHave
+				D.ReloadFrame()
 			end,
 		},
 		-- 过滤灰色物品
@@ -685,6 +682,7 @@ function D.GetFilterMenu()
 			bChecked = MY_GKP_Loot.tItemConfig.bFilterGrayItem,
 			fnAction = function()
 				MY_GKP_Loot.tItemConfig.bFilterGrayItem = not MY_GKP_Loot.tItemConfig.bFilterGrayItem
+				D.ReloadFrame()
 			end,
 		},
 	}
@@ -705,6 +703,7 @@ function D.GetFilterMenu()
 			bChecked = MY_GKP_Loot.tItemConfig.tFilterQuality[p.nQuality],
 			fnAction = function()
 				MY_GKP_Loot.tItemConfig.tFilterQuality[p.nQuality] = not MY_GKP_Loot.tItemConfig.tFilterQuality[p.nQuality]
+				D.ReloadFrame()
 			end,
 		})
 	end
@@ -721,6 +720,7 @@ function D.GetFilterMenu()
 			bCheck = true, bChecked = MY_GKP_Loot.tItemConfig.bNameFilter,
 			fnAction = function()
 				MY_GKP_Loot.tItemConfig.bNameFilter = not MY_GKP_Loot.tItemConfig.bNameFilter
+				D.ReloadFrame()
 			end,
 		},
 		CONSTANT.MENU_DIVIDER,
@@ -732,6 +732,7 @@ function D.GetFilterMenu()
 			bChecked = bEnable,
 			fnAction = function()
 				MY_GKP_Loot.tItemConfig.tNameFilter[szName] = not MY_GKP_Loot.tItemConfig.tNameFilter[szName]
+				D.ReloadFrame()
 			end,
 			szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',
 			nFrame = 49,
@@ -742,6 +743,7 @@ function D.GetFilterMenu()
 			fnClickIcon = function()
 				MY_GKP_Loot.tItemConfig.tNameFilter[szName] = nil
 				Wnd.CloseWindow('PopupMenuPanel')
+				D.ReloadFrame()
 			end,
 			fnDisable = function() return not MY_GKP_Loot.tItemConfig.bNameFilter end,
 		})
@@ -754,6 +756,7 @@ function D.GetFilterMenu()
 		fnAction = function()
 			GetUserInput(_L['Please input filter name'], function(szText)
 				MY_GKP_Loot.tItemConfig.tNameFilter[szText] = true
+				D.ReloadFrame()
 			end, nil, nil, nil, '', nil)
 		end,
 		fnDisable = function() return not MY_GKP_Loot.tItemConfig.bNameFilter end,
@@ -1341,9 +1344,33 @@ local function IsItemDataSuitable(data)
 	end
 end
 
-function D.DrawLootList(dwID)
+function D.InsertLootList(dwID)
+	for _, v in ipairs(D.aDoodadID) do
+		if v == dwID then
+			return
+		end
+	end
+	insert(D.aDoodadID, dwID)
+	D.DrawLootList(dwID)
+end
+
+function D.DrawLootList(dwID, bRemove)
 	local frame = D.GetFrame()
 	local wnd = D.GetDoodadWnd(frame, dwID)
+
+	if bRemove then
+		if wnd then
+			wnd:Destroy()
+			local container = frame:Lookup('WndContainer_DoodadList')
+			if container:GetAllContentCount() == 0 then
+				D.CloseFrame()
+			else
+				D.AdjustFrame(frame)
+			end
+		end
+		return
+	end
+
 	local config = O.tItemConfig
 
 	-- 计算掉落
@@ -1361,18 +1388,18 @@ function D.DrawLootList(dwID)
 		end
 	end
 	--[[#DEBUG BEGIN]]
-	LIB.Debug('MY_GKP_Loot', ('Doodad %d, items %d.'):format(dwID, nCount), DEBUG_LEVEL.LOG)
+	LIB.Debug('MY_GKP_Loot', ('Doodad %d, items %d, display %d.'):format(dwID, #aItemData, nCount), DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 
 	if not szName or nCount == 0 then
-		if frame then
-			D.RemoveLootList(dwID)
-		end
-		--[[#DEBUG BEGIN]]
 		if not szName then
+			D.RemoveLootList(dwID)
+			--[[#DEBUG BEGIN]]
 			LIB.Debug('MY_GKP_Loot:DrawLootList', 'Doodad does not exist!', DEBUG_LEVEL.LOG)
+			--[[#DEBUG END]]
+		elseif frame then
+			D.DrawLootList(dwID, true)
 		end
-		--[[#DEBUG END]]
 		return
 	end
 
@@ -1452,22 +1479,13 @@ function D.DrawLootList(dwID)
 end
 
 function D.RemoveLootList(dwID)
-	local frame = D.GetFrame()
-	if not frame then
-		return
+	for i, v in ipairs(D.aDoodadID) do
+		if dwID == v then
+			remove(D.aDoodadID, i)
+			break
+		end
 	end
-	local container = frame:Lookup('WndContainer_DoodadList')
-	local wnd = container:LookupContent(0)
-	while wnd and wnd.dwDoodadID ~= dwID do
-		wnd = wnd:GetNext()
-	end
-	if wnd then
-		wnd:Destroy()
-		D.AdjustFrame(frame)
-	end
-	if container:GetAllContentCount() == 0 then
-		return D.CloseFrame()
-	end
+	D.DrawLootList(dwID, true)
 end
 
 function D.GetFrame()
@@ -1489,6 +1507,14 @@ function D.CloseFrame(dwID)
 	if frame then
 		Wnd.CloseWindow(frame)
 		PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
+	end
+end
+
+function D.ReloadFrame()
+	D.CloseFrame()
+	D.OpenFrame()
+	for _, dwID in ipairs(D.aDoodadID) do
+		D.DrawLootList(dwID)
 	end
 end
 
@@ -1680,12 +1706,12 @@ LIB.RegisterEvent('OPEN_DOODAD', function()
 	end
 	local data = D.GetDoodadLootInfo(arg0)
 	if #data == 0 then
-		return D.RemoveLootList(arg0)
+		return D.DrawLootList(arg0, true)
 	end
 	--[[#DEBUG BEGIN]]
 	LIB.Debug('MY_GKP_Loot', 'Open Doodad: ' .. arg0, DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
-	D.DrawLootList(arg0)
+	D.InsertLootList(arg0)
 	D.HideSystemLoot()
 end)
 
@@ -1709,7 +1735,7 @@ LIB.RegisterEvent('SYNC_LOOT_LIST', function()
 			return
 		end
 	end
-	D.DrawLootList(arg0)
+	D.InsertLootList(arg0)
 end)
 
 LIB.RegisterEvent('MY_GKP_LOOT_BOSS', function()
