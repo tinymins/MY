@@ -253,41 +253,45 @@ function D.OnAutoDoodad()
 	then
 		return
 	end
-	if me.GetSkillOTActionState() == CHARACTER_OTACTION_TYPE.ACTION_PICK_PREPARE then
-		me.OnCloseLootWindow()
-	end
 	for k, v in pairs(D.tDoodad) do
-		local doodad, bKeep, bIntr = GetDoodad(k), false, false
-		if not doodad or not doodad.CanDialog(me) then
-			-- 若存在却不能对话只简单保留
-			bKeep = doodad ~= nil
-		elseif v.loot then -- 尸体只摸一次
-			bKeep = true -- 改在 opendoodad 中删除
-			bIntr = (not me.bFightState or O.bOpenLootEvenFight) and doodad.CanLoot(me.dwID)
-			if bIntr then
-				D.dwOpenID = k
-			end
-		elseif v.craft or v.other or doodad.HaveQuest(me.dwID) then -- 任务和普通道具尝试 5 次
-			bKeep = true
-			bIntr = (not me.bFightState or O.bInteractEvenFight) and not me.bOnHorse and IsAutoInteract()
-			-- 宴席只能吃队友的
-			if doodad.dwOwnerID ~= 0 and IsPlayer(doodad.dwOwnerID) and not LIB.IsParty(doodad.dwOwnerID) then
-				bIntr = false
-			end
-		end
-		if not bKeep then
+		local doodad, bIntr = GetDoodad(k), false
+		if not doodad then
 			D.Remove(k)
+		elseif doodad.CanDialog(me) then -- 若存在却不能对话只简单保留
+			if v.loot then -- 尸体只摸一次
+				bIntr = (not me.bFightState or O.bOpenLootEvenFight) and doodad.CanLoot(me.dwID)
+				if bIntr then
+					D.dwOpenID = k
+				end
+			elseif v.craft or v.other or doodad.HaveQuest(me.dwID) then -- 任务和普通道具尝试 5 次
+				bIntr = (not me.bFightState or O.bInteractEvenFight) and not me.bOnHorse and IsAutoInteract()
+				-- 宴席只能吃队友的
+				if doodad.dwOwnerID ~= 0 and IsPlayer(doodad.dwOwnerID) and not LIB.IsParty(doodad.dwOwnerID) then
+					bIntr = false
+				end
+			end
 		end
 		if bIntr then
-			LIB.Debug(_L['MY_GKPDoodad'], 'auto interact [' .. doodad.szName .. ']', DEBUG_LEVEL.LOG)
+			LIB.Debug(_L['MY_GKPDoodad'], 'Auto interact [' .. doodad.szName .. ']', DEBUG_LEVEL.LOG)
 			LIB.BreatheCall('AutoDoodad', 500)
 			return InteractDoodad(k)
 		end
 	end
 end
 
+function D.CloseLootWindow()
+	local me = GetClientPlayer()
+	if me and me.GetSkillOTActionState() == CHARACTER_OTACTION_TYPE.ACTION_PICKING then
+		me.OnCloseLootWindow()
+	end
+end
+
 -- open doodad (loot)
 function D.OnOpenDoodad(dwID)
+	-- 摸尸体且开了插件拾取框 可以安全的起身
+	if D.tDoodad[dwID] and D.tDoodad[dwID].loot and MY_GKP_Loot.IsEnabled() then
+		LIB.DelayCall('MY_GKPDoodad__OnOpenDoodad', 150, D.CloseLootWindow)
+	end
 	D.Remove(dwID) -- 从列表删除
 	local doodad = GetDoodad(dwID)
 	if doodad then
@@ -298,6 +302,7 @@ function D.OnOpenDoodad(dwID)
 			D.bUpdateLabel = true
 		end
 	end
+	LIB.Debug(_L['MY_GKPDoodad'], 'OnOpenDoodad [' .. (doodad and doodad.szName or dwID) .. ']', DEBUG_LEVEL.LOG)
 end
 
 -- save manual doodad
