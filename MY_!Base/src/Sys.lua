@@ -961,6 +961,15 @@ do
 -- focus list (working on)
 -- chat blocklist (working on)
 -------------------------------
+local function FormatStorageData(me, d)
+	return LIB.EncryptString(LIB.ConvertToUTF8(LIB.JsonEncode({
+		g = me.GetGlobalID(), f = me.dwForceID, e = me.GetTotalEquipScore(),
+		n = LIB.GetUserRoleName(), i = UI_GetClientPlayerID(), c = me.nCamp,
+		S = LIB.GetRealServer(1), s = LIB.GetRealServer(2), r = me.nRoleType,
+		_ = GetCurrentTime(), t = LIB.GetTongName(), d = d,
+		m = LIB.IsStreaming() and 1 or 0, v = select(2, LIB.GetVersion()),
+	})))
+end
 -- 个人数据版本号
 local m_nStorageVer = {}
 LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '#STORAGE_DATA', 200, function()
@@ -980,12 +989,7 @@ LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '#STORAGE_DATA', 200, function()
 		payload = 'json',
 		url = 'http://storage.jx3.derzh.com/api/storage',
 		data = {
-			data = LIB.EncryptString(LIB.ConvertToUTF8(LIB.JsonEncode({
-				g = me.GetGlobalID(), f = me.dwForceID, e = me.GetTotalEquipScore(),
-				n = LIB.GetUserRoleName(), i = UI_GetClientPlayerID(), c = me.nCamp,
-				S = LIB.GetRealServer(1), s = LIB.GetRealServer(2), r = me.nRoleType,
-				_ = GetCurrentTime(), t = LIB.GetTongName(),
-			}))),
+			data = FormatStorageData(me),
 			lang = LIB.GetLang(),
 		},
 		success = function(html, status)
@@ -1041,13 +1045,7 @@ function LIB.StorageData(szKey, oData)
 			payload = 'json',
 			url = 'http://storage.jx3.derzh.com/api/storage',
 			data = {
-				data =  LIB.EncryptString(LIB.JsonEncode({
-					g = me.GetGlobalID(), f = me.dwForceID, r = me.nRoleType,
-					n = LIB.GetUserRoleName(), i = UI_GetClientPlayerID(),
-					S = LIB.GetRealServer(1), s = LIB.GetRealServer(2),
-					v = GetCurrentTime(),
-					k = szKey, o = oData
-				})),
+				data = FormatStorageData(me, { k = szKey, o = oData }),
 				lang = LIB.GetLang(),
 			},
 			success = function(html, status)
