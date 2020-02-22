@@ -1372,114 +1372,112 @@ function D.DrawLootList(dwID, bRemove)
 				D.AdjustFrame(frame)
 			end
 		end
-		return
-	end
-
-	local config = O.tItemConfig
-
-	-- 计算掉落
-	local aItemData, nMoney, szName, bSpecial = D.GetDoodadLootInfo(dwID)
-	if nMoney > 0 then
-		LootMoney(dwID)
-	end
-	local nCount = #aItemData
-	if not IsEmpty(config.tFilterQuality) or config.bFilterBookRead or config.bFilterBookHave or config.bFilterGrayItem then
-		nCount = 0
-		for i, v in ipairs(aItemData) do
-			if D.IsItemDisplay(v, config) then
-				nCount = nCount + 1
-			end
+	else
+		local config = O.tItemConfig
+		-- 计算掉落
+		local aItemData, nMoney, szName, bSpecial = D.GetDoodadLootInfo(dwID)
+		if nMoney > 0 then
+			LootMoney(dwID)
 		end
-	end
-	--[[#DEBUG BEGIN]]
-	LIB.Debug('MY_GKP_Loot', ('Doodad %d, items %d, display %d.'):format(dwID, #aItemData, nCount), DEBUG_LEVEL.LOG)
-	--[[#DEBUG END]]
-
-	if not szName or nCount == 0 then
-		if not szName then
-			D.RemoveLootList(dwID)
-			--[[#DEBUG BEGIN]]
-			LIB.Debug('MY_GKP_Loot:DrawLootList', 'Doodad does not exist!', DEBUG_LEVEL.LOG)
-			--[[#DEBUG END]]
-		elseif frame then
-			D.DrawLootList(dwID, true)
-		end
-		return
-	end
-
-	-- 获取/创建UI元素
-	if not frame then
-		frame = D.OpenFrame()
-	end
-	if not wnd then
-		wnd = D.GetDoodadWnd(frame, dwID, true)
-	end
-
-	-- 修改UI元素
-	local bDist = false
-	local hDoodad = wnd:Lookup('', '')
-	local hList = hDoodad:Lookup('Handle_ItemList')
-	hList:Clear()
-	for i, itemData in ipairs(aItemData) do
-		local item = itemData.item
-		if D.IsItemDisplay(itemData, config) then
-			local szName = LIB.GetItemNameByItem(item)
-			local h = hList:AppendItemFromIni(GKP_LOOT_INIFILE, 'Handle_Item')
-			local box = h:Lookup('Box_Item')
-			local txt = h:Lookup('Text_Item')
-			txt:SetText(szName)
-			txt:SetFontColor(GetItemFontColorByQuality(item.nQuality))
-			if O.bSetColor and item.nGenre == ITEM_GENRE.MATERIAL then
-				for dwForceID, szForceTitle in pairs(g_tStrings.tForceTitle) do
-					if szName:find(szForceTitle) then
-						txt:SetFontColor(LIB.GetForceColor(dwForceID))
-						break
-					end
+		local nCount = #aItemData
+		if not IsEmpty(config.tFilterQuality) or config.bFilterBookRead or config.bFilterBookHave or config.bFilterGrayItem then
+			nCount = 0
+			for i, v in ipairs(aItemData) do
+				if D.IsItemDisplay(v, config) then
+					nCount = nCount + 1
 				end
 			end
-			if O.bVertical then
-				local szSuit = IsItemDataSuitable(itemData)
-				h:Lookup('Image_GroupDistrib'):SetVisible(itemData.bDist
-					and (i == 1 or aItemData[i - 1].szType ~= itemData.szType or not aItemData[i - 1].bDist))
-				h:Lookup('Image_Suitable'):SetVisible(szSuit == 'SUITABLE')
-				h:Lookup('Image_MaybeSuitable'):SetVisible(szSuit == 'MAYBE_SUITABLE')
-				h:Lookup('Image_Better'):SetVisible(szSuit == 'BETTER')
-				h:Lookup('Image_Spliter'):SetVisible(i ~= #aItemData)
-			else
-				txt:Hide()
-				box:SetSize(48, 48)
-				box:SetRelPos(2, 2)
-				h:SetSize(52, 52)
-				h:FormatAllItemPos()
-				h:Lookup('Image_GroupDistrib'):Hide()
-				h:Lookup('Image_Spliter'):Hide()
-				h:Lookup('Image_Hover'):SetSize(0, 0)
-			end
-			UpdateBoxObject(box, UI_OBJECT_ITEM_ONLY_ID, item.dwID)
-			-- box:SetOverText(3, '')
-			-- box:SetOverTextFontScheme(3, 15)
-			-- box:SetOverTextPosition(3, ITEM_POSITION.LEFT_TOP)
-			if GKP_LOOT_RECENT[item.nUiId] then
-				box:SetObjectStaring(true)
-			end
-			if itemData.bDist then
-				bDist = true
-			end
-			h.itemData = itemData
 		end
-	end
-	if bSpecial then
-		hDoodad:Lookup('Image_DoodadBg'):FromUITex('ui/Image/OperationActivity/RedEnvelope2.uitex', 14)
-		hDoodad:Lookup('Image_DoodadTitleBg'):FromUITex('ui/Image/OperationActivity/RedEnvelope2.uitex', 14)
-		hDoodad:Lookup('Text_Title'):SetAlpha(255)
-		hDoodad:Lookup('SFX'):Show()
-	end
-	hDoodad:Lookup('Text_Title'):SetText(szName .. ' (' .. nCount ..  ')')
-	wnd:Lookup('Btn_Boss'):Enable(bDist)
+		--[[#DEBUG BEGIN]]
+		LIB.Debug('MY_GKP_Loot', ('Doodad %d, items %d, display %d.'):format(dwID, #aItemData, nCount), DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
 
-	-- 修改UI大小
-	D.AdjustWnd(wnd)
-	D.AdjustFrame(frame)
+		if not szName or nCount == 0 then
+			if not szName then
+				D.RemoveLootList(dwID)
+				--[[#DEBUG BEGIN]]
+				LIB.Debug('MY_GKP_Loot:DrawLootList', 'Doodad does not exist!', DEBUG_LEVEL.LOG)
+				--[[#DEBUG END]]
+			elseif frame then
+				D.DrawLootList(dwID, true)
+			end
+			return
+		end
+
+		-- 获取/创建UI元素
+		if not frame then
+			frame = D.OpenFrame()
+		end
+		if not wnd then
+			wnd = D.GetDoodadWnd(frame, dwID, true)
+		end
+
+		-- 修改UI元素
+		local bDist = false
+		local hDoodad = wnd:Lookup('', '')
+		local hList = hDoodad:Lookup('Handle_ItemList')
+		hList:Clear()
+		for i, itemData in ipairs(aItemData) do
+			local item = itemData.item
+			if D.IsItemDisplay(itemData, config) then
+				local szName = LIB.GetItemNameByItem(item)
+				local h = hList:AppendItemFromIni(GKP_LOOT_INIFILE, 'Handle_Item')
+				local box = h:Lookup('Box_Item')
+				local txt = h:Lookup('Text_Item')
+				txt:SetText(szName)
+				txt:SetFontColor(GetItemFontColorByQuality(item.nQuality))
+				if O.bSetColor and item.nGenre == ITEM_GENRE.MATERIAL then
+					for dwForceID, szForceTitle in pairs(g_tStrings.tForceTitle) do
+						if szName:find(szForceTitle) then
+							txt:SetFontColor(LIB.GetForceColor(dwForceID))
+							break
+						end
+					end
+				end
+				if O.bVertical then
+					local szSuit = IsItemDataSuitable(itemData)
+					h:Lookup('Image_GroupDistrib'):SetVisible(itemData.bDist
+						and (i == 1 or aItemData[i - 1].szType ~= itemData.szType or not aItemData[i - 1].bDist))
+					h:Lookup('Image_Suitable'):SetVisible(szSuit == 'SUITABLE')
+					h:Lookup('Image_MaybeSuitable'):SetVisible(szSuit == 'MAYBE_SUITABLE')
+					h:Lookup('Image_Better'):SetVisible(szSuit == 'BETTER')
+					h:Lookup('Image_Spliter'):SetVisible(i ~= #aItemData)
+				else
+					txt:Hide()
+					box:SetSize(48, 48)
+					box:SetRelPos(2, 2)
+					h:SetSize(52, 52)
+					h:FormatAllItemPos()
+					h:Lookup('Image_GroupDistrib'):Hide()
+					h:Lookup('Image_Spliter'):Hide()
+					h:Lookup('Image_Hover'):SetSize(0, 0)
+				end
+				UpdateBoxObject(box, UI_OBJECT_ITEM_ONLY_ID, item.dwID)
+				-- box:SetOverText(3, '')
+				-- box:SetOverTextFontScheme(3, 15)
+				-- box:SetOverTextPosition(3, ITEM_POSITION.LEFT_TOP)
+				if GKP_LOOT_RECENT[item.nUiId] then
+					box:SetObjectStaring(true)
+				end
+				if itemData.bDist then
+					bDist = true
+				end
+				h.itemData = itemData
+			end
+		end
+		if bSpecial then
+			hDoodad:Lookup('Image_DoodadBg'):FromUITex('ui/Image/OperationActivity/RedEnvelope2.uitex', 14)
+			hDoodad:Lookup('Image_DoodadTitleBg'):FromUITex('ui/Image/OperationActivity/RedEnvelope2.uitex', 14)
+			hDoodad:Lookup('Text_Title'):SetAlpha(255)
+			hDoodad:Lookup('SFX'):Show()
+		end
+		hDoodad:Lookup('Text_Title'):SetText(szName .. ' (' .. nCount ..  ')')
+		wnd:Lookup('Btn_Boss'):Enable(bDist)
+
+		-- 修改UI大小
+		D.AdjustWnd(wnd)
+		D.AdjustFrame(frame)
+	end
 end
 
 function D.RemoveLootList(dwID)
