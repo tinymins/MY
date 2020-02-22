@@ -392,7 +392,6 @@ function D.OnLButtonClick()
 				bCheck = true, bChecked = O.bSetColor,
 				fnAction = function()
 					MY_GKP_Loot.bSetColor = not MY_GKP_Loot.bSetColor
-					FireUIEvent('MY_GKP_LOOT_RELOAD')
 				end,
 			},
 			{ bDevide = true },
@@ -412,7 +411,6 @@ function D.OnLButtonClick()
 				szOption = _L['switch styles'],
 				fnAction = function()
 					MY_GKP_Loot.bVertical = not MY_GKP_Loot.bVertical
-					FireUIEvent('MY_GKP_LOOT_RELOAD')
 				end,
 			},
 			{ bDevide = true },
@@ -1823,6 +1821,12 @@ local settings = {
 					if bOn then
 						LIB.SetGlobalValue('LR_Loot_Panel.UsrData.bOn', false)
 					end
+				end,
+				bVertical = function()
+					FireUIEvent('MY_GKP_LOOT_RELOAD')
+				end,
+				bSetColor = function()
+					FireUIEvent('MY_GKP_LOOT_RELOAD')
 				end,
 				tItemConfig = function(_, tItemConfig)
 					if IsTable(tItemConfig) then
