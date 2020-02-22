@@ -114,6 +114,7 @@ RegisterCustomData('MY_GKP_Loot.tItemConfig')
 
 do
 local function onLoadingEnd()
+	D.aDoodadID = {}
 	MY_GKP_Loot.tItemConfig.tFilterQuality = {}
 	MY_GKP_Loot.tItemConfig.bNameFilter = false
 end
