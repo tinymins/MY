@@ -1514,8 +1514,9 @@ function D.CloseFrame(dwID)
 end
 
 function D.ReloadFrame()
-	D.CloseFrame()
-	if #D.aDoodadID ~= 0 then
+	if #D.aDoodadID == 0 then
+		D.CloseFrame()
+	else
 		D.OpenFrame()
 		for _, dwID in ipairs(D.aDoodadID) do
 			D.DrawLootList(dwID)
