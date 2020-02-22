@@ -59,7 +59,14 @@ MY_GKP = {
 	bShowGoldBrick       = true,
 	bShow2ndKungfuLoot   = true,  -- 显示第二心法装备推荐提示图标
 }
-LIB.RegisterCustomData('MY_GKP')
+RegisterCustomData('MY_GKP.bOn')
+RegisterCustomData('MY_GKP.bMoneyTalk')
+RegisterCustomData('MY_GKP.bAlertMessage')
+RegisterCustomData('MY_GKP.bMoneySystem')
+RegisterCustomData('MY_GKP.bDisplayEmptyRecords')
+RegisterCustomData('MY_GKP.bAutoSync')
+RegisterCustomData('MY_GKP.bShowGoldBrick')
+RegisterCustomData('MY_GKP.bShow2ndKungfuLoot')
 ---------------------------------------------------------------------->
 -- 本地函数与变量
 ----------------------------------------------------------------------<
