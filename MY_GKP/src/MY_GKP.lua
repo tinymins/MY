@@ -49,7 +49,6 @@ end
 --------------------------------------------------------------------------
 MY_GKP = {
 	bDebug               = false,
-	bDebug2              = false,
 	bOn                  = true,  -- enable
 	bMoneyTalk           = false, -- 金钱变动喊话
 	bAlertMessage        = true,  -- 进入副本提醒清空数据
@@ -665,16 +664,6 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	y = y + 28
-
-	if MY_GKP.bDebug then
-		ui:Append('WndCheckBox', {
-			x = w - 130, y = 50, text = 'Enable Debug', checked = MY_GKP.bDebug2,
-			oncheck = function(bChecked)
-				MY_GKP.bDebug2 = bChecked
-			end,
-		})
-		y = y + 28
-	end
 end
 LIB.RegisterPanel('MY_GKP', _L['GKP Golden Team Record'], _L['General'], 2490, PS)
 

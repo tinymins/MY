@@ -545,7 +545,6 @@ function D.OnItemLButtonClick()
 		local me, team   = GetClientPlayer(), GetClientTeam()
 		local dwDoodadID = data.dwDoodadID
 		local doodad     = GetDoodad(dwDoodadID)
-		-- if data.bDist or MY_GKP.bDebug then
 		if not data.bDist and not data.bBidding then
 			if doodad.CanDialog(me) then
 				OpenDoodad(me, doodad)
@@ -988,6 +987,7 @@ function D.AuthCheck(dwID)
 	end
 	return true
 end
+
 -- 拾取对象
 function D.GetaPartyMember(aDoodadID)
 	if not IsTable(aDoodadID) then
@@ -1030,6 +1030,7 @@ function D.GetaPartyMember(aDoodadID)
 	end })
 	return aPartyMember
 end
+
 -- 严格判断
 function D.DistributeItem(dwID, info, szAutoDistType, bSkipRecordPanel)
 	if IsArray(info) then
@@ -1696,12 +1697,6 @@ LIB.RegisterEvent('OPEN_DOODAD', function()
 	if arg1 ~= UI_GetClientPlayerID() then
 		return
 	end
-	-- local team = GetClientTeam()
-	-- if not team or team.nLootMode ~= PARTY_LOOT_MODE.DISTRIBUTE
-	-- 	-- and not (MY_GKP.bDebug2 and MY_GKP.bDebug)
-	-- then
-	-- 	return
-	-- end
 	local doodad = GetDoodad(arg0)
 	local nM = doodad.GetLootMoney() or 0
 	if nM > 0 then
@@ -1726,7 +1721,7 @@ LIB.RegisterEvent('SYNC_LOOT_LIST', function()
 	end
 	local frame = D.GetFrame()
 	local wnd = D.GetDoodadWnd(frame, arg0)
-	if not wnd and not (MY_GKP.bDebug and MY_GKP.bDebug2) then
+	if not wnd and LIB.IsShieldedVersion('MY_GKPLoot', 2) then
 		local bDungeonTreasure = false
 		local aItemData = D.GetDoodadLootInfo(arg0)
 		for k, v in ipairs(aItemData) do
