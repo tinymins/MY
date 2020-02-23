@@ -48,7 +48,6 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
 end
 --------------------------------------------------------------------------
 MY_GKP = {
-	bDebug               = false,
 	bOn                  = true,  -- enable
 	bMoneyTalk           = false, -- 金钱变动喊话
 	bAlertMessage        = true,  -- 进入副本提醒清空数据
@@ -416,7 +415,7 @@ function MY_GKP.OnFrameCreate()
 	ui:Append('WndButton3', {
 		x = 15, y = 660, text = _L['Add Manually'],
 		onclick = function()
-			if not LIB.IsDistributer() and not MY_GKP.bDebug then -- debug
+			if not LIB.IsDistributer() and not LIB.IsDebugClient('MY_GKP') then -- debug
 				return LIB.Alert(_L['You are not the distrubutor.'])
 			end
 			_GKP.Record()
@@ -766,7 +765,7 @@ function _GKP.DrawRecord(key, sort)
 			end
 			item:RegisterEvent(32)
 			item.OnItemRButtonClick = function()
-				if not LIB.IsDistributer() and not MY_GKP.bDebug then
+				if not LIB.IsDistributer() and not LIB.IsDebugClient('MY_GKP') then
 					return LIB.Alert(_L['You are not the distrubutor.'])
 				end
 				_GKP.Record(v, k)
@@ -813,7 +812,7 @@ function _GKP.DrawRecord(key, sort)
 				end
 			end
 			wnd:Lookup('WndButton_Delete').OnLButtonClick = function()
-				if not LIB.IsDistributer() and not MY_GKP.bDebug then
+				if not LIB.IsDistributer() and not LIB.IsDebugClient('MY_GKP') then
 					return LIB.Alert(_L['You are not the distrubutor.'])
 				end
 				local tab = MY_GKP('GKP_Record', 'del', k)
@@ -914,7 +913,7 @@ function _GKP.OnSyncToMenu()
 	local me = GetClientPlayer()
 	if not me.IsInParty() then
 		LIB.Alert(_L['You are not in the team.'])
-	elseif not LIB.IsDistributer() and not MY_GKP.bDebug then
+	elseif not LIB.IsDistributer() and not LIB.IsDebugClient('MY_GKP') then
 		LIB.Alert(_L['You are not the distrubutor.'])
 	else
 		local menu = MY_GKP.GetTeamMemberMenu(function(v)
@@ -1370,12 +1369,14 @@ end
 ----------------------------------------------------------------------<
 function _GKP.OweList()
 	local me = GetClientPlayer()
-	if not me.IsInParty() and not MY_GKP.bDebug then return LIB.Alert(_L['You are not in the team.']) end
+	if not me.IsInParty() and not LIB.IsDebugClient('MY_GKP') then
+		return LIB.Alert(_L['You are not in the team.'])
+	end
 	local tMember = {}
 	if IsEmpty(MY_GKP('GKP_Record')) then
 		return LIB.Alert(_L['No Record'])
 	end
-	if not LIB.IsDistributer() and not MY_GKP.bDebug then
+	if not LIB.IsDistributer() and not LIB.IsDebugClient('MY_GKP') then
 		return LIB.Alert(_L['You are not the distrubutor.'])
 	end
 	_GKP.SetButton(false)
@@ -1492,12 +1493,14 @@ end
 ----------------------------------------------------------------------<
 function _GKP.SpendingList()
 	local me = GetClientPlayer()
-	if not me.IsInParty() and not MY_GKP.bDebug then return LIB.Alert(_L['You are not in the team.']) end
+	if not me.IsInParty() and not LIB.IsDebugClient('MY_GKP') then
+		return LIB.Alert(_L['You are not in the team.'])
+	end
 	local tMember = {}
 	if IsEmpty(MY_GKP('GKP_Record')) then
 		return LIB.Alert(_L['No Record'])
 	end
-	if not LIB.IsDistributer() and not MY_GKP.bDebug then
+	if not LIB.IsDistributer() and not LIB.IsDebugClient('MY_GKP') then
 		return LIB.Alert(_L['You are not the distrubutor.'])
 	end
 	_GKP.SetButton(false)
@@ -1540,12 +1543,14 @@ end
 ----------------------------------------------------------------------<
 function _GKP.Calculation()
 	local me = GetClientPlayer()
-	if not me.IsInParty() and not MY_GKP.bDebug then return LIB.Alert(_L['You are not in the team.']) end
+	if not me.IsInParty() and not LIB.IsDebugClient('MY_GKP') then
+		return LIB.Alert(_L['You are not in the team.'])
+	end
 	local team = GetClientTeam()
 	if IsEmpty(MY_GKP('GKP_Record')) then
 		return LIB.Alert(_L['No Record'])
 	end
-	if not LIB.IsDistributer() and not MY_GKP.bDebug then
+	if not LIB.IsDistributer() and not LIB.IsDebugClient('MY_GKP') then
 		return LIB.Alert(_L['You are not the distrubutor.'])
 	end
 	GetUserInput(_L['Total Amount of People with Output Settle Account'],function(num)
@@ -1889,6 +1894,7 @@ LIB.RegisterEvent('LOADING_END',function()
 		MY_GKP('GKP_Time', GetCurrentTime())
 	end
 end)
+MY_GKP.IsDebug         = _GKP.IsDebug
 MY_GKP.Record          = _GKP.Record
 MY_GKP.GetMoneyCol     = _GKP.GetMoneyCol
 MY_GKP.OpenPanel       = _GKP.OpenPanel

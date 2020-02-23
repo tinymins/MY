@@ -973,11 +973,11 @@ function D.AuthCheck(dwID)
 	end
 	local nLootMode      = team.nLootMode
 	local dwBelongTeamID = doodad.GetBelongTeamID()
-	if nLootMode ~= PARTY_LOOT_MODE.DISTRIBUTE and not MY_GKP.bDebug then -- 需要分配者模式
+	if nLootMode ~= PARTY_LOOT_MODE.DISTRIBUTE and not LIB.IsDebugClient('MY_GKP') then -- 需要分配者模式
 		OutputMessage('MSG_ANNOUNCE_RED', g_tStrings.GOLD_CHANGE_DISTRIBUTE_LOOT)
 		return false
 	end
-	if not LIB.IsDistributer() and not MY_GKP.bDebug then -- 需要自己是分配者
+	if not LIB.IsDistributer() and not LIB.IsDebugClient('MY_GKP') then -- 需要自己是分配者
 		OutputMessage('MSG_ANNOUNCE_RED', g_tStrings.ERROR_LOOT_DISTRIBUTE)
 		return false
 	end
@@ -1660,7 +1660,7 @@ function D.GetDoodadLootInfo(dwID)
 				end
 				data.szType = GetItemDataType(data)
 				data.nWeight = ITEM_DATA_WEIGHT[data.szType]
-				if (not data.bNeedRoll and not data.bBidding) or MY_GKP.bDebug then
+				if (not data.bNeedRoll and not data.bBidding) or LIB.IsDebugClient('MY_GKP') then
 					table.insert(aItemData, data)
 				end
 			end
