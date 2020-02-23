@@ -47,13 +47,19 @@ end
 
 -- 获取功能屏蔽等级
 do
+local OVERALL_SHIELDED_LEVEL = nil
 local SHIELDED_LEVEL = LIB.GetLang() == 'zhcn' and 0 or 1 -- 全部功能限制开关
 local FUNCTION_SHIELDED_LEVEL = {}
 function LIB.IsShieldedVersion(szKey, nLevel, bSet)
 	if not IsString(szKey) then
 		szKey, nLevel, bSet = nil, szKey, nLevel
 	end
-	if bSet then
+	if szKey == '*' then
+		if OVERALL_SHIELDED_LEVEL == nLevel then
+			return
+		end
+		OVERALL_SHIELDED_LEVEL = nLevel
+	elseif bSet then
 		if not nLevel then
 			return
 		end
@@ -77,6 +83,9 @@ function LIB.IsShieldedVersion(szKey, nLevel, bSet)
 	else
 		if not IsNumber(nLevel) then
 			nLevel = 1
+		end
+		if OVERALL_SHIELDED_LEVEL then
+			return OVERALL_SHIELDED_LEVEL < nLevel
 		end
 		if SHIELDED_LEVEL >= nLevel then
 			return false
