@@ -81,11 +81,23 @@ end
 end
 
 -- 获取是否测试客户端
-function LIB.IsDebugClient(bManually)
-	if not bManually and IsDebugClient() then
+-- (bool) LIB.IsDebugClient()
+-- (bool) LIB.IsDebugClient(string szKey[, bool bDebug])
+-- (bool) LIB.IsDebugClient(bool bManually)
+do
+local DEBUG = {}
+function LIB.IsDebugClient(szKey, bDebug)
+	if not szKey and IsDebugClient() then
 		return true
 	end
+	if IsString(szKey) then
+		if IsBoolean(bDebug) then
+			DEBUG[szKey] = bDebug
+		end
+		return DEBUG[szKey] or false
+	end
 	return PACKET_INFO.DEBUG_LEVEL <= DEBUG_LEVEL.DEBUG
+end
 end
 
 -- 获取是否测试服务器
