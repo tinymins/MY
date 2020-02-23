@@ -47,36 +47,46 @@ end
 
 -- 获取功能屏蔽等级
 do
-local GLOBAL_SHIELDED_LEVEL = LIB.GetLang() == 'zhcn' and 0 or 1 -- 全部功能限制开关
+local SHIELDED_LEVEL = LIB.GetLang() == 'zhcn' and 0 or 1 -- 全部功能限制开关
 local FUNCTION_SHIELDED_LEVEL = {}
 function LIB.IsShieldedVersion(szKey, nLevel, bSet)
 	if not IsString(szKey) then
 		szKey, nLevel, bSet = nil, szKey, nLevel
 	end
-	if not IsNumber(nLevel) then
-		nLevel = 0
-	end
 	if bSet then
+		if not nLevel then
+			return
+		end
 		if szKey then
+			if FUNCTION_SHIELDED_LEVEL[szKey] == nLevel then
+				return
+			end
 			FUNCTION_SHIELDED_LEVEL[szKey] = nLevel
 		else
-			GLOBAL_SHIELDED_LEVEL = nLevel
+			if SHIELDED_LEVEL == nLevel then
+				return
+			end
+			SHIELDED_LEVEL = nLevel
 		end
 		LIB.DelayCall(PACKET_INFO.NAME_SPACE .. '#SHIELDED_VERSION', 75, function()
 			if LIB.IsPanelOpened() then
 				LIB.ReopenPanel()
 			end
-			FireUIEvent(PACKET_INFO.NAME_SPACE .. '_SHIELDED_VERSION')
+			FireUIEvent(PACKET_INFO.NAME_SPACE .. '_SHIELDED_VERSION', szKey)
 		end)
+	else
+		if not IsNumber(nLevel) then
+			nLevel = 1
+		end
+		if SHIELDED_LEVEL >= nLevel then
+			return false
+		end
+		local nKeyLevel = FUNCTION_SHIELDED_LEVEL[szKey]
+		if nKeyLevel and nKeyLevel >= nLevel then
+			return false
+		end
+		return true
 	end
-	if GLOBAL_SHIELDED_LEVEL > nLevel then
-		return false
-	end
-	local nKeyLevel = FUNCTION_SHIELDED_LEVEL[szKey]
-	if nKeyLevel and nKeyLevel > nLevel then
-		return false
-	end
-	return true
 end
 end
 
