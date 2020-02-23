@@ -48,7 +48,6 @@ end
 
 MY_Cataclysm = {}
 MY_Cataclysm.CFG = {}
-MY_Cataclysm.bDebug = false
 MY_Cataclysm.bEnable = false
 MY_Cataclysm.szConfigName = 'common'
 MY_Cataclysm.bFold = false

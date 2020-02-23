@@ -1024,7 +1024,7 @@ function MY_CataclysmMain.OnLButtonClick()
 			LIB.FocusPanel()
 			LIB.SwitchTab('MY_Cataclysm')
 		end })
-		if MY_Cataclysm.bDebug then
+		if LIB.IsDebugClient(true) then
 			table.insert(menu, { bDevide = true })
 			table.insert(menu, { szOption = 'DEBUG', bCheck = true, bChecked = DEBUG, fnAction = function()
 				DEBUG = not DEBUG
@@ -1037,7 +1037,7 @@ function MY_CataclysmMain.OnLButtonClick()
 		local me  = GetClientPlayer()
 		local dwMapID = me.GetMapID()
 		local nMapType = select(2, GetMapParams(dwMapID))
-	    if not nMapType or nMapType ~= MAP_TYPE.DUNGEON then
+		if not nMapType or nMapType ~= MAP_TYPE.DUNGEON then
 			OutputMessage('MSG_ANNOUNCE_RED', g_tStrings.STR_WORLD_MARK)
 			return
 		end

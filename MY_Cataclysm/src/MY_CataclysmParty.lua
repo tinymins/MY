@@ -572,7 +572,7 @@ function MY_CataclysmParty_Base.OnItemRButtonClick()
 					team.SetAuthorityInfo(TEAM_AUTHORITY_TYPE.DISTRIBUTE, UI_GetClientPlayerID())
 				end,
 			})
-		elseif MY_Cataclysm.bDebug then
+		elseif not LIB.IsShieldedVersion('MY_CataclysmSeize', 2) then
 			table.insert(menu, { bDevide = true })
 			table.insert(menu, {
 				szOption = _L['Take back permissions'],
