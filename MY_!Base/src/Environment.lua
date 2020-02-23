@@ -47,75 +47,106 @@ end
 
 -- 获取功能屏蔽等级
 do
-local OVERALL_SHIELDED_LEVEL = nil
-local SHIELDED_LEVEL = LIB.GetLang() == 'zhcn' and 0 or 1 -- 全部功能限制开关
-local FUNCTION_SHIELDED_LEVEL = {}
+local DELAY_EVENT = {}
+local SHIELDED_LEVEL = { ['*'] = LIB.GetLang() == 'zhcn' and 0 or 1 }
 function LIB.IsShieldedVersion(szKey, nLevel, bSet)
 	if not IsString(szKey) then
-		szKey, nLevel, bSet = nil, szKey, nLevel
+		szKey, nLevel, bSet = '*', szKey, nLevel
 	end
-	if szKey == '*' then
-		if OVERALL_SHIELDED_LEVEL == nLevel then
+	if bSet then
+		-- 通用禁止设为空
+		if szKey == '*' and IsNil(nLevel) then
 			return
 		end
-		OVERALL_SHIELDED_LEVEL = nLevel
-	elseif bSet then
-		if not nLevel then
+		-- 设置值
+		if SHIELDED_LEVEL[szKey] == nLevel then
 			return
 		end
-		if szKey then
-			if FUNCTION_SHIELDED_LEVEL[szKey] == nLevel then
-				return
+		SHIELDED_LEVEL[szKey] = nLevel
+		-- 发起事件通知
+		local szEvent = PACKET_INFO.NAME_SPACE .. '#SHIELDED_VERSION'
+		if szKey == '*' or szKey == '!' then
+			for k, _ in pairs(DELAY_EVENT) do
+				LIB.DelayCall(k, false)
 			end
-			FUNCTION_SHIELDED_LEVEL[szKey] = nLevel
+			szKey = nil
 		else
-			if SHIELDED_LEVEL == nLevel then
-				return
-			end
-			SHIELDED_LEVEL = nLevel
+			szEvent = szEvent .. '#' .. szKey
 		end
-		LIB.DelayCall(PACKET_INFO.NAME_SPACE .. '#SHIELDED_VERSION', 75, function()
+		LIB.DelayCall(szEvent, 75, function()
 			if LIB.IsPanelOpened() then
 				LIB.ReopenPanel()
 			end
+			DELAY_EVENT[szEvent] = nil
 			FireUIEvent(PACKET_INFO.NAME_SPACE .. '_SHIELDED_VERSION', szKey)
 		end)
+		DELAY_EVENT[szEvent] = true
 	else
 		if not IsNumber(nLevel) then
 			nLevel = 1
 		end
-		if OVERALL_SHIELDED_LEVEL then
-			return OVERALL_SHIELDED_LEVEL < nLevel
+		if not IsNil(SHIELDED_LEVEL['!']) then
+			return SHIELDED_LEVEL['!'] < nLevel
 		end
-		if SHIELDED_LEVEL >= nLevel then
-			return false
+		if not IsNil(SHIELDED_LEVEL[szKey]) then
+			return SHIELDED_LEVEL[szKey] < nLevel
 		end
-		local nKeyLevel = FUNCTION_SHIELDED_LEVEL[szKey]
-		if nKeyLevel and nKeyLevel >= nLevel then
-			return false
-		end
-		return true
+		return SHIELDED_LEVEL['*'] < nLevel
 	end
 end
 end
 
 -- 获取是否测试客户端
 -- (bool) LIB.IsDebugClient()
--- (bool) LIB.IsDebugClient(string szKey[, bool bDebug])
--- (bool) LIB.IsDebugClient(bool bManually)
+-- (bool) LIB.IsDebugClient(bool bManually = false)
+-- (bool) LIB.IsDebugClient(string szKey[, bool bDebug, bool bSet])
 do
-local DEBUG = {}
-function LIB.IsDebugClient(szKey, bDebug)
-	if not szKey and IsDebugClient() then
-		return true
+local DELAY_EVENT = {}
+local DEBUG = { ['*'] = PACKET_INFO.DEBUG_LEVEL <= DEBUG_LEVEL.DEBUG }
+function LIB.IsDebugClient(szKey, bDebug, bSet)
+	if not IsString(szKey) then
+		szKey, bDebug, bSet = '*', szKey, bDebug
 	end
-	if IsString(szKey) then
-		if IsBoolean(bDebug) then
-			DEBUG[szKey] = bDebug
+	if bSet then
+		-- 通用禁止设为空
+		if szKey == '*' and IsNil(bDebug) then
+			return
 		end
-		return DEBUG[szKey] or false
+		-- 设置值
+		if DEBUG[szKey] == bDebug then
+			return
+		end
+		DEBUG[szKey] = bDebug
+		-- 发起事件通知
+		local szEvent = PACKET_INFO.NAME_SPACE .. '#DEBUG'
+		if szKey == '*' or szKey == '!' then
+			for k, _ in pairs(DELAY_EVENT) do
+				LIB.DelayCall(k, false)
+			end
+			szKey = nil
+		else
+			szEvent = szEvent .. '#' .. szKey
+		end
+		LIB.DelayCall(szEvent, 75, function()
+			if LIB.IsPanelOpened() then
+				LIB.ReopenPanel()
+			end
+			DELAY_EVENT[szEvent] = nil
+			FireUIEvent(PACKET_INFO.NAME_SPACE .. '_DEBUG', szKey)
+		end)
+		DELAY_EVENT[szEvent] = true
+	else
+		if not IsNil(DEBUG['!']) then
+			return DEBUG['!']
+		end
+		if szKey == '*' and not bDebug then
+			return IsDebugClient()
+		end
+		if not IsNil(DEBUG[szKey]) then
+			return DEBUG[szKey]
+		end
+		return DEBUG['*']
 	end
-	return PACKET_INFO.DEBUG_LEVEL <= DEBUG_LEVEL.DEBUG
 end
 end
 
