@@ -383,8 +383,13 @@ function D.CheckEnable()
 	end
 end
 
+LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_TeamMon_CC', function()
+	if arg0 and arg0 ~= 'MY_TargetMon' then
+		return
+	end
+	D.CheckEnable()
+end)
 LIB.RegisterInit('MY_TeamMon_CC', D.CheckEnable)
-LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_TeamMon_CC', D.CheckEnable)
 
 -- Global exports
 do

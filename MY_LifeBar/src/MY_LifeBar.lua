@@ -408,6 +408,9 @@ local CheckInvalidRect
 do
 local bShieldedVersion = LIB.IsShieldedVersion('MY_LifeBar')
 LIB.RegisterEvent('MY_SHIELDED_VERSION', function()
+	if arg0 and arg0 ~= 'MY_LifeBar' then
+		return
+	end
 	bShieldedVersion = LIB.IsShieldedVersion('MY_LifeBar')
 end)
 local function fxTarget(r, g, b, a) return 255 - (255 - r) * 0.3, 255 - (255 - g) * 0.3, 255 - (255 - b) * 0.3, a end

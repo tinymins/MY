@@ -488,14 +488,16 @@ local function onOpenWindow()
 end
 LIB.RegisterEvent('OPEN_WINDOW.MY_AutoDialogue#ENTRY', onOpenWindow)
 
-local function onShieldedVersion()
+LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_AutoDialogue#ENTRY', function()
+	if arg0 and arg0 ~= 'MY_AutoDialogue' then
+		return
+	end
 	if LIB.IsShieldedVersion('MY_AutoDialogue') then
 		D.RemoveEntry()
 	else
 		D.CreateEntry()
 	end
-end
-LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_AutoDialogue#ENTRY', onShieldedVersion)
+end)
 end
 
 ---------------------------------------------------------------------------

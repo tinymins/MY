@@ -179,8 +179,13 @@ end
 local function onShieldedReset()
 	SHIELDED = nil
 end
+LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_TargetMonData_Shield', function()
+	if arg0 and arg0 ~= 'MY_TargetMon' then
+		return
+	end
+	onShieldedReset()
+end)
 LIB.RegisterEvent('LOADING_END.MY_TargetMonData_Shield', onShieldedReset)
-LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_TargetMonData_Shield', onShieldedReset)
 end
 
 do

@@ -196,8 +196,13 @@ function D.CheckEnable()
 	D.RequireRerender()
 	D.UpdateLine()
 end
+LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_TargetLine', function()
+	if arg0 and arg0 ~= 'MY_TargetLine' then
+		return
+	end
+	D.CheckEnable()
+end)
 LIB.RegisterInit('MY_TargetLine', D.CheckEnable)
-LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_TargetLine', D.CheckEnable)
 
 -- Global exports
 do

@@ -173,8 +173,13 @@ function D.CheckEnable()
 	D.RequireRerender()
 end
 
+LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_TargetFace', function()
+	if arg0 and arg0 ~= 'MY_TargetFace' then
+		return
+	end
+	D.CheckEnable()
+end)
 LIB.RegisterInit('MY_TargetFace', D.CheckEnable)
-LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_TargetFace', D.CheckEnable)
 end
 
 -- Global exports

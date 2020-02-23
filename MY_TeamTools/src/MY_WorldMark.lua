@@ -157,5 +157,10 @@ function MY_WorldMark.CheckEnable()
 	LIB.RegisterModuleEvent('MY_WorldMark', D.GetEvent())
 end
 
+LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_WorldMark', function()
+	if arg0 and arg0 ~= 'MY_WorldMark' then
+		return
+	end
+	MY_WorldMark.CheckEnable()
+end)
 LIB.RegisterInit('MY_WorldMark', MY_WorldMark.CheckEnable)
-LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_WorldMark', MY_WorldMark.CheckEnable)
