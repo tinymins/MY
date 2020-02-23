@@ -193,7 +193,7 @@ function MY_CharInfo.ViewCharInfoToPlayer(dwID)
 		LIB.Alert(_L['Party limit'])
 	else
 		CharInfo.CreateFrame(dwID, szName)
-		LIB.SendBgMsg(nChannel, 'CHAR_INFO', 'ASK', dwID, MY_CharInfo.bDebug and 'DEBUG')
+		LIB.SendBgMsg(nChannel, 'CHAR_INFO', 'ASK', dwID, LIB.IsShieldedVersion('MY_CharInfoDaddy', 2) and 'DEBUG')
 	end
 end
 
