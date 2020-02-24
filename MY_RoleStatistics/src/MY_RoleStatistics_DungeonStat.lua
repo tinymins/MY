@@ -482,6 +482,14 @@ function D.UpdateMapCopy()
 	LIB.GetMapSaveCopy(D.OnGetMapSaveCopyResopnse)
 end
 
+-- BOSSµ¹ÁËË¢ÐÂCD
+LIB.RegisterEvent('SYNC_LOOT_LIST.MY_RoleStatistics_DungeonStat__UpdateMapCopy', function()
+	if not LIB.IsInDungeon() then
+		return
+	end
+	D.UpdateMapCopy()
+end)
+
 function D.OnInitPage()
 	local page = this
 	local frameTemp = Wnd.OpenWindow(SZ_INI, 'MY_RoleStatistics_DungeonStat')
