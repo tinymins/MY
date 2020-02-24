@@ -493,6 +493,7 @@ end
 -- WEEK_RAID_DUNGEON 周常团队本
 function LIB.GetActivityMap(szType)
 	local aMap = {}
+	local me = GetClientPlayer()
 	local date = TimeToDate(GetCurrentTime())
 	local aActive = Table_GetActivityOfDay(date.year, date.month, date.day, ACTIVITY_UI.CALENDER)
 	for _, p in ipairs(aActive) do
@@ -500,10 +501,15 @@ function LIB.GetActivityMap(szType)
 		or (szType == 'WEEK_RAID_DUNGEON' and p.szName == _L.ACTIVITY_MAP_TYPE.WEEK_RAID_DUNGEON) then
 			local aQuestID = LIB.SplitString(p.szQuestID, ';')
 			for _, szQuestID in ipairs(aQuestID) do
-				local szMap = Table_GetQuestStringInfo(tonumber(szQuestID)).szName
-				local map = LIB.GetMapInfo(szMap)
-				if map then
-					insert(aMap, map)
+				local tLine = Table_GetCalenderActivityQuest(szQuestID)
+				if tLine and tLine.nNpcTemplateID ~= -1 then
+					local nQuestID = select(2, me.RandomByDailyQuest(szQuestID, tLine.nNpcTemplateID))
+					local tInfo = nQuestID and Table_GetQuestStringInfo(nQuestID)
+					local dwMapID = tInfo and tInfo.dwDungeonID
+					local map = dwMapID and LIB.GetMapInfo(dwMapID)
+					if map then
+						insert(aMap, map)
+					end
 				end
 			end
 		end
