@@ -62,7 +62,8 @@ return {
     ['MY_RoleStatistics_DungeonStat'] = '副本統計',
     ['None'] = '無',
     ['Unknown'] = '未知',
-    ['Dungoen copy'] = '副本進度',
+    ['Dungeon copy'] = '副本進度',
 	['r'] = '√',
-	['x'] = '×',
+    ['x'] = '×',
+    ['Week routine: '] = '周常：',
 }

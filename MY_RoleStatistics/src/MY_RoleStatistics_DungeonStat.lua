@@ -64,8 +64,8 @@ local O = {
 	aColumn = {
 		'name',
 		'force',
-		'dungeon_340',
-		'dungeon_426',
+		'week_team_dungeon',
+		'week_raid_dungeon',
 		'dungeon_427',
 		'dungeon_428',
 		'time_days',
@@ -192,9 +192,27 @@ local COLUMN_LIST = {
 		Compare = GeneCommonCompare('time'),
 	},
 }
-local COLUMN_DICT = setmetatable({}, { __index = function(_, id)
-	if wfind(id, 'dungeon_') then
-		local id = tonumber(wgsub(id, 'dungeon_', ''))
+local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
+	if id == 'week_team_dungeon' then
+		return {
+			id = id,
+			szTitle = _L['Week routine: '] .. _L.ACTIVITY_MAP_TYPE.WEEK_TEAM_DUNGEON,
+			nWidth = DUNGEON_WIDTH * #LIB.GetActivityMap('WEEK_TEAM_DUNGEON'),
+		}
+	elseif id == 'week_raid_dungeon' then
+		return {
+			id = id,
+			szTitle = _L['Week routine: '] .. _L.ACTIVITY_MAP_TYPE.WEEK_RAID_DUNGEON,
+			nWidth = DUNGEON_WIDTH * #LIB.GetActivityMap('WEEK_RAID_DUNGEON'),
+		}
+	elseif wfind(id, 'dungeon_') then
+		local id, via = wgsub(id, 'dungeon_', ''), ''
+		if wfind(id, '@') then
+			local ids = LIB.SplitString(id, '@')
+			id, via = tonumber(ids[1]), ids[2]
+		else
+			id = tonumber(id)
+		end
 		local map = id and LIB.GetMapInfo(id)
 		if map then
 			local col = { -- 副本CD
@@ -202,6 +220,12 @@ local COLUMN_DICT = setmetatable({}, { __index = function(_, id)
 				szTitle = map.szName,
 				nWidth = DUNGEON_WIDTH,
 			}
+			if via then
+				local colVia = t[via]
+				if colVia then
+					col.szTitleTip = col.szTitle .. ' (' .. colVia.szTitle .. ')'
+				end
+			end
 			if LIB.IsDungeonRoleProgressMap(map.dwID) then
 				col.GetFormatText = function(rec)
 					local aBossKill = rec.progress_info[map.dwID]
@@ -326,9 +350,25 @@ LIB.RegisterFlush('MY_RoleStatistics_DungeonStat', D.FlushDB)
 function D.GetColumns()
 	local aCol = {}
 	for _, id in ipairs(O.aColumn) do
-		local col = COLUMN_DICT[id]
-		if col then
-			insert(aCol, col)
+		if id == 'week_team_dungeon' then
+			for _, map in ipairs(LIB.GetActivityMap('WEEK_TEAM_DUNGEON')) do
+				local col = COLUMN_DICT['dungeon_' .. map.dwID .. '@' .. id]
+				if col then
+					insert(aCol, col)
+				end
+			end
+		elseif id == 'week_raid_dungeon' then
+			for _, map in ipairs(LIB.GetActivityMap('WEEK_RAID_DUNGEON')) do
+				local col = COLUMN_DICT['dungeon_' .. map.dwID .. '@' .. id]
+				if col then
+					insert(aCol, col)
+				end
+			end
+		else
+			local col = COLUMN_DICT[id]
+			if col then
+				insert(aCol, col)
+			end
 		end
 	end
 	return aCol
@@ -350,6 +390,7 @@ function D.UpdateUI(page)
 			hCol:Lookup('Image_DungeonStat_Break'):Hide()
 		end
 		hCol.szSort = col.id
+		hCol.szTip = col.szTitleTip
 		hCol:SetRelX(nX)
 		hCol:SetW(nWidth)
 		txt:SetW(nWidth)
@@ -425,8 +466,8 @@ function D.OnGetMapSaveCopyResopnse(tMapCopy)
 end
 
 function D.UpdateMapCopy()
-	for _, id in ipairs(O.aColumn) do
-		local szID = wfind(id, 'dungeon_') and wgsub(id, 'dungeon_', '')
+	for _, col in ipairs(D.GetColumns()) do
+		local szID = wfind(col.id, 'dungeon_') and wgsub(col.id, 'dungeon_', '')
 		local dwID = szID and tonumber(szID)
 		local aProgressBoss = dwID and LIB.IsDungeonRoleProgressMap(dwID) and Table_GetCDProcessBoss(dwID)
 		if aProgressBoss then
@@ -452,8 +493,9 @@ function D.OnInitPage()
 		x = 800, y = 20, w = 180,
 		text = _L['Columns'],
 		menu = function()
-			local t, c, nW = {}, {}, 0
-			for i, id in ipairs(O.aColumn) do
+			local t, aColumn, tChecked, nW = {}, O.aColumn, {}, 0
+			-- 已添加的
+			for i, id in ipairs(aColumn) do
 				local col = COLUMN_DICT[id]
 				if col then
 					insert(t, {
@@ -462,7 +504,7 @@ function D.OnInitPage()
 							szOption = _L['Move up'],
 							fnAction = function()
 								if i > 1 then
-									O.aColumn[i], O.aColumn[i - 1] = O.aColumn[i - 1], O.aColumn[i]
+									aColumn[i], aColumn[i - 1] = aColumn[i - 1], aColumn[i]
 									D.UpdateUI(page)
 								end
 								Wnd.CloseWindow('PopupMenuPanel')
@@ -471,8 +513,8 @@ function D.OnInitPage()
 						{
 							szOption = _L['Move down'],
 							fnAction = function()
-								if i < #O.aColumn then
-									O.aColumn[i], O.aColumn[i + 1] = O.aColumn[i + 1], O.aColumn[i]
+								if i < #aColumn then
+									aColumn[i], aColumn[i + 1] = aColumn[i + 1], aColumn[i]
 									D.UpdateUI(page)
 								end
 								Wnd.CloseWindow('PopupMenuPanel')
@@ -481,62 +523,78 @@ function D.OnInitPage()
 						{
 							szOption = _L['Delete'],
 							fnAction = function()
-								remove(O.aColumn, i)
+								remove(aColumn, i)
 								D.UpdateUI(page)
 								Wnd.CloseWindow('PopupMenuPanel')
 							end,
 						},
 					})
-					c[id] = true
 					nW = nW + col.nWidth
 				end
+				tChecked[id] = true
 			end
-			for _, col in ipairs(COLUMN_LIST) do
-				if not c[col.id] then
-					insert(t, {
-						szOption = col.szTitle,
-						fnAction = function()
-							if nW + col.nWidth > EXCEL_WIDTH then
-								LIB.Alert(_L['Too many column selected, width overflow, please delete some!'])
-							else
-								insert(O.aColumn, col.id)
-							end
-							D.UpdateUI(page)
-							Wnd.CloseWindow('PopupMenuPanel')
-						end,
-					})
-				end
-			end
-			-- 副本选项
-			local tChecked = {}
-			for _, id in ipairs(O.aColumn) do
-				local szID = wfind(id, 'dungeon_') and wgsub(id, 'dungeon_', '')
-				local dwID = szID and tonumber(szID)
-				if dwID then
-					tChecked[dwID] = true
-				end
-			end
-			local tDungeonMenu = LIB.GetDungeonMenu(function(info)
+			-- 未添加的
+			local function fnAction(id, nWidth)
 				local bExist = false
-				for i, id in ipairs(O.aColumn) do
-					if id == 'dungeon_' .. info.dwID then
-						remove(O.aColumn, i)
+				for i, v in ipairs(aColumn) do
+					if v == id then
+						remove(aColumn, i)
 						bExist = true
 						break
 					end
 				end
 				if not bExist then
-					if nW + DUNGEON_WIDTH > EXCEL_WIDTH then
+					if nW + nWidth > EXCEL_WIDTH then
 						LIB.Alert(_L['Too many column selected, width overflow, please delete some!'])
 					else
-						insert(O.aColumn, 'dungeon_' .. info.dwID)
+						insert(aColumn, id)
 					end
 				end
 				D.FlushDB()
 				D.UpdateUI(page)
 				Wnd.CloseWindow('PopupMenuPanel')
-			end, nil, tChecked)
-			tDungeonMenu.szOption = _L['Dungoen copy']
+			end
+			-- 普通选项
+			for _, col in ipairs(COLUMN_LIST) do
+				if not tChecked[col.id] then
+					insert(t, {
+						szOption = col.szTitle,
+						fnAction = function()
+							fnAction(col.id, col.nWidth)
+						end,
+					})
+				end
+			end
+			-- 副本选项
+			local tDungeonChecked = {}
+			for _, id in ipairs(aColumn) do
+				local szID = wfind(id, 'dungeon_') and wgsub(id, 'dungeon_', '')
+				local dwID = szID and tonumber(szID)
+				if dwID then
+					tDungeonChecked[dwID] = true
+				end
+			end
+			local tDungeonMenu = LIB.GetDungeonMenu(function(info)
+				fnAction('dungeon_' .. info.dwID, DUNGEON_WIDTH)
+			end, nil, tDungeonChecked)
+			-- 动态活动副本选项
+			for _, szType in ipairs({
+				'week_team_dungeon',
+				'week_raid_dungeon',
+			}) do
+				local col = COLUMN_DICT[szType]
+				if col then
+					insert(tDungeonMenu, {
+						szOption = col.szTitle,
+						bCheck = true, bChecked = tChecked[col.id],
+						fnAction = function()
+							fnAction(col.id, col.nWidth)
+						end,
+					})
+				end
+			end
+			-- 子菜单标题
+			tDungeonMenu.szOption = _L['Dungeon copy']
 			insert(t, tDungeonMenu)
 			return t
 		end,
@@ -629,9 +687,8 @@ function D.OnItemMouseEnter()
 		local aXml = {}
 		for _, id in ipairs(TIP_COLIMN) do
 			if id == 'DUNGEON' then
-				for _, id in ipairs(O.aColumn) do
-					if wfind(id, 'dungeon_') then
-						local col = COLUMN_DICT[id]
+				for _, col in ipairs(D.GetColumns()) do
+					if wfind(col.id, 'dungeon_') then
 						insert(aXml, GetFormatText(col.szTitle))
 						insert(aXml, GetFormatText(':  '))
 						insert(aXml, col.GetFormatText(this.rec))
@@ -671,7 +728,7 @@ function D.OnItemMouseEnter()
 	elseif name == 'Handle_DungeonStatColumn' then
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
-		local szXml = GetFormatText(this:Lookup('Text_DungeonStat_Title'):GetText())
+		local szXml = GetFormatText(this.szTip or this:Lookup('Text_DungeonStat_Title'):GetText())
 		OutputTip(szXml, 450, {x, y, w, h}, UI.TIP_POSITION.TOP_BOTTOM)
 	elseif this.tip then
 		local x, y = this:GetAbsPos()
