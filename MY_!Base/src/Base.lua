@@ -142,7 +142,6 @@ local _MENUICON_FRAME_       = 14
 local _MENUICON_HOVER_FRAME_ = 14
 local _DEBUG_LEVEL_          = tonumber(LoadLUAData(_DATA_ROOT_ .. 'debug.level.jx3dat') or nil) or 4
 local _DELOG_LEVEL_          = tonumber(LoadLUAData(_DATA_ROOT_ .. 'delog.level.jx3dat') or nil) or 4
-local _NORESTIME_            = tonumber(LoadLUAData(_DATA_ROOT_ .. 'nrtim.level.jx3dat') or nil) or -1
 -----------------------------------------------
 -- º”‘ÿ”Ô—‘∞¸
 -----------------------------------------------
@@ -1178,27 +1177,4 @@ if _DEBUG_LEVEL_ <= DEBUG_LEVEL.DEBUG then
 			ReloadUIAddon()
 		end,
 	}})
-end
-
-if _NORESTIME_ >= 0 then
-	local time = GetTime()
-
-	local function OnExit()
-		debug.sethook()
-	end
-	RegisterEvent('RELOAD_UI_ADDON_BEGIN', OnExit)
-
-	local function OnBreathe()
-		time = GetTime()
-	end
-	BreatheCall('_NORESTIME_', OnBreathe)
-
-	local function trace_line(event, line)
-		local delay = GetTime() - time
-		if delay < _NORESTIME_ then
-			return
-		end
-		Log('Response over ' .. delay .. ', ' .. debug.getinfo(2).short_src .. ':' .. line)
-	end
-	debug.sethook(trace_line, 'l')
 end

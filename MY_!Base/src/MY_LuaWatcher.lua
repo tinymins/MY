@@ -31,6 +31,7 @@ local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
 -------------------------------------------------------------------------------------------------------------
 local D = {}
+local NO_RES_TIME = 6000
 local MAX_COUNT = 50
 local RUNNING = false
 local SORT_KEY = 'TIME'
@@ -63,6 +64,31 @@ end
 function ipairs_r(tab)
 	return fnBpairs, tab, #tab + 1
 end
+end
+
+function D.SetWatchLoop()
+	local nTime = GetTime()
+
+	local function OnBreathe()
+		nTime = GetTime()
+	end
+	BreatheCall('MY_LuaWatcher__NO_RES_TIME', OnBreathe)
+
+	local function trace_line(event, nLine)
+		local nDelay = GetTime() - nTime
+		if nDelay < NO_RES_TIME then
+			return
+		end
+		Log('Response over ' .. nDelay .. ', ' .. debug.getinfo(2).short_src .. ':' .. nLine)
+	end
+	debug.sethook(trace_line, 'l')
+	RegisterEvent('RELOAD_UI_ADDON_BEGIN', D.RemoveWatchLoop)
+end
+
+function D.RemoveWatchLoop()
+	debug.sethook(nil, 'l')
+	BreatheCall('MY_LuaWatcher__NO_RES_TIME', false)
+	UnRegisterEvent('RELOAD_UI_ADDON_BEGIN', D.RemoveWatchLoop)
 end
 
 function D.Reset()
