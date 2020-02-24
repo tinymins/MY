@@ -488,6 +488,29 @@ function LIB.GetTypeGroupMap()
 	return aGroup
 end
 
+-- 获取指定活动地图列表
+-- WEEK_TEAM_DUNGEON 周常小队本
+-- WEEK_RAID_DUNGEON 周常团队本
+function LIB.GetActivityMap(szType)
+	local aMap = {}
+	local date = TimeToDate(GetCurrentTime())
+	local aActive = Table_GetActivityOfDay(date.year, date.month, date.day, ACTIVITY_UI.CALENDER)
+	for _, p in ipairs(aActive) do
+		if (szType == 'WEEK_TEAM_DUNGEON' and p.szName == _L.ACTIVITY_MAP_TYPE.WEEK_TEAM_DUNGEON)
+		or (szType == 'WEEK_RAID_DUNGEON' and p.szName == _L.ACTIVITY_MAP_TYPE.WEEK_RAID_DUNGEON) then
+			local aQuestID = LIB.SplitString(p.szQuestID, ';')
+			for _, szQuestID in ipairs(aQuestID) do
+				local szMap = Table_GetQuestStringInfo(tonumber(szQuestID)).szName
+				local map = LIB.GetMapInfo(szMap)
+				if map then
+					insert(aMap, map)
+				end
+			end
+		end
+	end
+	return aMap
+end
+
 -- 获取副本CD列表（异步）
 -- (table) LIB.GetMapSaveCopy(fnAction)
 -- (number|nil) LIB.GetMapSaveCopy(dwMapID, fnAction)

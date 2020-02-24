@@ -459,6 +459,11 @@ return {
 		['Other'] = '其它地图',
 	},
 
+	ACTIVITY_MAP_TYPE = {
+		['WEEK_TEAM_DUNGEON'] = '武林通鉴·秘境',
+		['WEEK_RAID_DUNGEON'] = '武林通鉴·团队秘境',
+	},
+
 	['Point left time: (%d+)h(%d+)m(%d+)s'] = '点卡剩余时间为：(%d+)小时(%d+)分(%d+)秒',
 	['Month time to: (%d+)y(%d+)m(%d+)d (%d+)h(%d+)m'] = '包月时间截止至：(%d+)/(%d+)/(%d+) (%d+):(%d+)',
 	['Fee left %H:%mm:%ss'] = '计费剩余：%H小时%mm分钟%ss秒',
