@@ -112,9 +112,9 @@ function LIB.EncryptString(szText)
 end
 
 function LIB.SimpleEncryptString(szText)
-	local a = {szText:byte(1, #szText)}
-	for i, v in ipairs(a) do
-		a[i] = char((v + 13) % 256)
+	local a = {}
+	for i = 1, #szText do
+		a[i] = char((szText:byte(i) + 13) % 256)
 	end
 	return (LIB.Base64Encode(concat(a)):gsub('/', '-'):gsub('+', '_'):gsub('=', '.'))
 end
@@ -124,9 +124,9 @@ function LIB.SimpleDecryptString(szCipher)
 	if not szBin then
 		return
 	end
-	local a = {szBin:byte(1, #szBin)}
-	for i, v in ipairs(a) do
-		a[i] = char((v - 13 + 256) % 256)
+	local a = {}
+	for i = 1, #szBin do
+		a[i] = char((szBin:byte(i) - 13 + 256) % 256)
 	end
 	return concat(a)
 end
