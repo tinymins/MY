@@ -1798,9 +1798,6 @@ end
 _GKP.TradingTarget = {}
 
 function _GKP.MoneyUpdate(nGold, nSilver, nCopper)
-	if nGold > -20 and nGold < 20 then
-		return
-	end
 	if not _GKP.TradingTarget then
 		return
 	end
