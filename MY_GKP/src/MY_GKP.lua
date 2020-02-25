@@ -72,10 +72,6 @@ local D = {
 	szIniFile   = PLUGIN_ROOT .. '/ui/MY_GKP.ini',
 	tSyncQueue  = {},
 	bSync       = {},
-	GKP_Map     = '',
-	GKP_Time    = 0,
-	GKP_Record  = {},
-	GKP_Account = {},
 	Config = {
 		Subsidies = {
 			{ _L['Treasure Chests'], '', true},
@@ -104,17 +100,24 @@ local D = {
 	},
 }
 D.Config = LIB.LoadLUAData({'config/gkp.cfg', PATH_TYPE.GLOBAL}) or D.Config
+
+local DATA = {
+	GKP_Map     = '',
+	GKP_Time    = 0,
+	GKP_Record  = {},
+	GKP_Account = {},
+}
 ---------------------------------------------------------------------->
 -- 数据处理
 ----------------------------------------------------------------------<
 setmetatable(MY_GKP, { __call = function(me, key, value, sort)
-	if D[key] then
+	if DATA[key] then
 		if value and (key == 'GKP_Time' or key == 'GKP_Map') then
-			D[key] = value
+			DATA[key] = value
 			D.UpdateTitle()
 		elseif value and type(value) == 'table' then
 			D.GeneDataInfo()
-			table.insert(D[key], value)
+			table.insert(DATA[key], value)
 			D.SaveData()
 			if key == 'GKP_Record' then
 				D.DrawRecord()
@@ -123,7 +126,7 @@ setmetatable(MY_GKP, { __call = function(me, key, value, sort)
 			end
 		elseif value and type(value) == 'string' then
 			if sort == 'asc' or sort == 'desc' then
-				table.sort(D[key], function(a, b)
+				table.sort(DATA[key], function(a, b)
 					if a[value] and b[value] then
 						if sort == 'asc' then
 							if a[value] ~= b[value] then
@@ -148,31 +151,31 @@ setmetatable(MY_GKP, { __call = function(me, key, value, sort)
 					end
 				end)
 			elseif value == 'del' then
-				if D[key][sort] then
-					D[key][sort].bDelete = not D[key][sort].bDelete
+				if DATA[key][sort] then
+					DATA[key][sort].bDelete = not DATA[key][sort].bDelete
 					D.SaveData()
 					if key == 'GKP_Record' then
 						D.DrawRecord()
 					elseif key == 'GKP_Account' then
 						D.DrawAccount()
 					end
-					return D[key][sort]
+					return DATA[key][sort]
 				end
 			end
-			return D[key]
+			return DATA[key]
 		elseif value and type(value) == 'number' then
-			if D[key][value] then
-				D[key][value] = sort
+			if DATA[key][value] then
+				DATA[key][value] = sort
 				D.SaveData()
 				if key == 'GKP_Record' then
 					D.DrawRecord()
 				elseif key == 'GKP_Account' then
 					D.DrawAccount()
 				end
-				return D[key][value]
+				return DATA[key][value]
 			end
 		else
-			return D[key]
+			return DATA[key]
 		end
 	end
 end})
@@ -227,10 +230,10 @@ function D.LoadData(szFile, bAbs)
 	end
 	local t = LIB.LoadLUAData(szFile)
 	if t then
-		D.GKP_Map = t.GKP_Map or ''
-		D.GKP_Time = t.GKP_Time or 0
-		D.GKP_Record = t.GKP_Record or {}
-		D.GKP_Account = t.GKP_Account or {}
+		DATA.GKP_Map = t.GKP_Map or ''
+		DATA.GKP_Time = t.GKP_Time or 0
+		DATA.GKP_Record = t.GKP_Record or {}
+		DATA.GKP_Account = t.GKP_Account or {}
 	end
 	D.DrawRecord()
 	D.DrawAccount()
@@ -1041,8 +1044,8 @@ LIB.RegisterBgMsg('MY_GKP', function(_, nChannel, dwID, szName, bIsSelf, ...)
 						return D.Sysmsg(_L['Abnormal with Data Sharing, Please contact and make feed back with the writer.'])
 					end
 					LIB.Confirm(_L('Data Sharing Finished, you have one last chance to confirm wheather cover the current data with [%s]\'s data or not? \n data of team bidding: %s\n transation data: %s', szName, #tData.GKP_Record, #tData.GKP_Account), function()
-						D.GKP_Record  = tData.GKP_Record
-						D.GKP_Account = tData.GKP_Account
+						DATA.GKP_Record  = tData.GKP_Record
+						DATA.GKP_Account = tData.GKP_Account
 						D.DrawRecord()
 						D.DrawAccount()
 						D.SaveData()
@@ -1344,13 +1347,13 @@ end
 ----------------------------------------------------------------------<
 function D.ClearData(bConfirm)
 	local fnAction = function()
-		if #D.GKP_Record ~= 0 or #D.GKP_Account ~= 0 then
+		if #DATA.GKP_Record ~= 0 or #DATA.GKP_Account ~= 0 then
 			D.SaveData(true)
 		end
-		D.GKP_Map = ''
-		D.GKP_Time = GetCurrentTime()
-		D.GKP_Record = {}
-		D.GKP_Account = {}
+		DATA.GKP_Map = ''
+		DATA.GKP_Time = GetCurrentTime()
+		DATA.GKP_Record = {}
+		DATA.GKP_Account = {}
 		D.DrawRecord()
 		D.DrawAccount()
 		D.UpdateStat()
