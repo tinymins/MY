@@ -83,6 +83,7 @@ function D.UpdateMode(frame)
 	ui:Fetch('Btn_ClearRecord'):Visible(bMainInstance)
 	ui:Fetch('Btn_HistoryRecord'):Visible(bMainInstance)
 	ui:Fetch('Btn_SyncRecord'):Visible(bMainInstance)
+	ui:Fetch('Btn_SetCaption'):Visible(bMainInstance)
 	ui:Fetch('Btn_SetHistory'):Visible(not bMainInstance)
 end
 
@@ -310,7 +311,7 @@ function MY_GKP_UI.OnFrameCreate()
 	})
 	ui:Append('WndButton3', {
 		name = 'Btn_AddManually',
-		x = 15, y = 660, text = _L['Add Manually'],
+		x = 20, y = 660, w = 120, text = _L['Add Manually'],
 		onclick = function()
 			if not LIB.IsDistributer() and not LIB.IsDebugClient('MY_GKP') then -- debug
 				return LIB.Alert(_L['You are not the distrubutor.'])
@@ -318,10 +319,12 @@ function MY_GKP_UI.OnFrameCreate()
 			MY_GKP_AuctionUI.Open(this:GetRoot().ds)
 		end,
 	})
+	local nW = 980
 	-- 结算工资按钮
+	local nX = nW - 120 - 5
 	ui:Append('WndButton3', {
 		name = 'Btn_Calculate',
-		x = 840, y = 620, text = g_tStrings.GOLD_TEAM_SYLARY_LIST,
+		x = nX, y = 620, w = 120, text = g_tStrings.GOLD_TEAM_SYLARY_LIST,
 		onclick = function()
 			local ds = this:GetRoot().ds
 			local me = GetClientPlayer()
@@ -352,9 +355,10 @@ function MY_GKP_UI.OnFrameCreate()
 		end,
 	})
 	-- 消费情况按钮
+	nX = nW - 120 - 5
 	ui:Append('WndButton3', {
 		name = 'GOLD_TEAM_BID_LIST',
-		x = 840, y = 660, text = g_tStrings.GOLD_TEAM_BID_LIST,
+		x = nX, y = 660, w = 120, text = g_tStrings.GOLD_TEAM_BID_LIST,
 		onclick = function()
 			local ds = this:GetRoot().ds
 			local me = GetClientPlayer()
@@ -406,9 +410,10 @@ function MY_GKP_UI.OnFrameCreate()
 		end,
 	})
 	-- 欠费情况
+	nX = nX - 120 - 5
 	ui:Append('WndButton3', {
 		name = 'Debt',
-		x = 690, y = 660, text = _L['Debt Issued'],
+		x = nX, y = 660, w = 120, text = _L['Debt Issued'],
 		onclick = function()
 			local ds = this:GetRoot().ds
 			local me = GetClientPlayer()
@@ -496,9 +501,10 @@ function MY_GKP_UI.OnFrameCreate()
 		end,
 	})
 	-- 清空数据
+	nX = nX - 120 - 5
 	ui:Append('WndButton3', {
 		name = 'Btn_ClearRecord',
-		x = 540, y = 660, text = _L['Clear Record'],
+		x = nX, y = 660, w = 120, text = _L['Clear Record'],
 		onclick = function()
 			local fnAction = function()
 				MY_GKP_MI.NewDS()
@@ -507,9 +513,10 @@ function MY_GKP_UI.OnFrameCreate()
 		end,
 	})
 	-- 历史记录
+	nX = nX - 120 - 5
 	ui:Append('WndButton3', {
 		name = 'Btn_HistoryRecord',
-		x = 390, y = 660, text = _L['History record'],
+		x = nX, y = 660, w = 120, text = _L['History record'],
 		menu = function()
 			local menu = {}
 			local aFiles = MY_GKP.GetHistoryFiles()
@@ -556,9 +563,10 @@ function MY_GKP_UI.OnFrameCreate()
 		end,
 	})
 	-- 同步数据
+	nX = nX - 120 - 5
 	ui:Append('WndButton3', {
 		name = 'Btn_SyncRecord',
-		x = 240, y = 660, text = _L['Manual SYNC'],
+		x = nX, y = 660, w = 120, text = _L['Manual SYNC'],
 		tip = _L['Left click to sync from others, right click to sync to others'],
 		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
 		lmenu = function()
@@ -604,10 +612,26 @@ function MY_GKP_UI.OnFrameCreate()
 			end
 		end,
 	})
+	-- 重命名
+	nX = nX - 120 - 5
+	ui:Append('WndButton3', {
+		name = 'Btn_SetCaption',
+		x = nX, y = 660, w = 120, text = _L['Set record caption'],
+		menu = function()
+			local ds = this:GetRoot().ds
+			GetUserInput(_L['Please input new caption'],function(szText)
+				if IsEmpty(szText) then
+					return
+				end
+				local a, b = ds:SetMap(szText)
+			end, nil, nil, nil, ds:GetMap())
+		end,
+	})
 	-- 恢复历史记录
+	nX = (nW - 20 - 120) / 2
 	ui:Append('WndButton3', {
 		name = 'Btn_SetHistory',
-		x = 390, y = 660, text = _L['Set current record'],
+		x = nX, y = 660, w = 120, text = _L['Set current record'],
 		menu = function()
 			local frame = this:GetRoot()
 			LIB.Confirm(_L['Are you sure to cover the current information with the last record data?'], function()

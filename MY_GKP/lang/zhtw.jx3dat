@@ -100,6 +100,8 @@ return {
 	['Loading Data of the Character\'s name: %s (edit by clicking)'] = '讀取數據的角色名：%s（點擊修改）',
 	['Modify to Lead the Character\'s name'] = '修改導入角色名',
 	['Are you sure to cover the current information with the last record data?'] = '你確定載入該記錄覆蓋當前金團數據嗎？',
+	['Set record caption'] = '設置標題',
+	['Please input new caption'] = '請輸入新標題',
 	['Reocrd Recovered.'] = '記錄恢覆成功。',
 	['Records are wiped'] = '金團記錄成功清空。',
 	['Are you sure to wipe all of the records?'] = '確定清空金團記錄嗎？',
