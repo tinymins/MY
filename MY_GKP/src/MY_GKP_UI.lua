@@ -179,7 +179,12 @@ function D.DrawAuctionPage(frame, szKey, szSort)
 			if v.nQuality then
 				item:Lookup('Text_ItemName'):SetFontColor(GetItemFontColorByQuality(v.nQuality))
 			else
-				item:Lookup('Text_ItemName'):SetFontColor(255, 255, 0)
+				local KItem = v.dwTabType and v.dwIndex and GetItemInfo(v.dwTabType, v.dwIndex)
+				if KItem then
+					item:Lookup('Text_ItemName'):SetFontColor(GetItemFontColorByQuality(KItem.nQuality))
+				else
+					item:Lookup('Text_ItemName'):SetFontColor(255, 255, 0)
+				end
 			end
 			item:Lookup('Handle_Money'):AppendItemFromString(D.GetMoneyTipText(v.nMoney))
 			item:Lookup('Handle_Money'):FormatAllItemPos()
