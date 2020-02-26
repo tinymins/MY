@@ -273,7 +273,7 @@ function D.DrawPaymentPage(frame, szKey, szSort)
 			item:Lookup('Text_Name'):SetText(_L['System'])
 			item:Lookup('Text_Change'):SetText(_L['Reward & other ways'])
 		end
-		item:Lookup('Text_Map'):SetText(Table_GetMapName(v.dwMapID))
+		item:Lookup('Text_Map'):SetText(IsEmpty(v.dwMapID) and '-' or Table_GetMapName(v.dwMapID))
 		item:Lookup('Text_Time'):SetText(D.GetTimeString(v.nTime))
 		if bMainInstance then
 			c:Lookup('WndButton_Delete').OnLButtonClick = function()
