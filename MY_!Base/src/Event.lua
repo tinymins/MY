@@ -569,13 +569,12 @@ local function OnBgMsg()
 	if not BG_MSG_PART[szMsgUUID] then
 		BG_MSG_PART[szMsgUUID] = {}
 	end
-	BG_MSG_PART[szMsgUUID][nSegIndex] = szPart
+	BG_MSG_PART[szMsgUUID][nSegIndex] = LIB.SimpleDecryptString(IsString(szPart) and szPart or '')
 	-- fire progress event
 	CommonEventFirer(BG_MSG_PROGRESS_EVENT, szMsgID, nChannel, dwID, szName, bSelf, nSegCount, #BG_MSG_PART[szMsgUUID], nSegIndex)
 	-- concat and decode data
 	if #BG_MSG_PART[szMsgUUID] == nSegCount then
-		local szParam = concat(BG_MSG_PART[szMsgUUID])
-		local szPlain = szParam and LIB.SimpleDecryptString(szParam)
+		local szPlain = concat(BG_MSG_PART[szMsgUUID])
 		local aParam = szPlain and DecodeLUAData(szPlain)
 		if aParam then
 			CommonEventFirer(BG_MSG_EVENT, szMsgID, nChannel, dwID, szName, bSelf, unpack(aParam))
@@ -656,16 +655,17 @@ function LIB.SendBgMsg(nChannel, szMsgID, ...)
 	-- encode and pagination
 	local szMsgSID = BG_MSG_ID_PREFIX .. szMsgID .. BG_MSG_ID_SUFFIX
 	local szMsgUUID = LIB.GetUUID():gsub('-', '')
-	local szArg = LIB.SimpleEncryptString(EncodeLUAData({...}))
+	local szArg = EncodeLUAData({...})
 	local nMsgLen = wlen(szArg)
-	local nSegLen = MAX_CHANNEL_LEN[nChannel]
+	local nSegLen = floor(MAX_CHANNEL_LEN[nChannel] / 4 * 3) -- Base64编码会导致长度增加
 	local nSegCount = ceil(nMsgLen / nSegLen)
 	-- send msg
 	for nSegIndex = 1, nSegCount do
+		local szSeg = LIB.SimpleEncryptString((wsub(szArg, (nSegIndex - 1) * nSegLen + 1, nSegIndex * nSegLen)))
 		local aSay = {
 			{ type = 'eventlink', name = 'BG_CHANNEL_MSG', linkinfo = szMsgSID },
 			{ type = 'eventlink', name = '', linkinfo = EncodeLUAData({ u = szMsgUUID, c = nSegCount, i = nSegIndex }) },
-			{ type = 'eventlink', name = '', linkinfo = EncodeLUAData(wsub(szArg, (nSegIndex - 1) * nSegLen + 1, nSegIndex * nSegLen)) },
+			{ type = 'eventlink', name = '', linkinfo = EncodeLUAData(szSeg) },
 		}
 		me.Talk(nChannel, szTarget, aSay)
 	end
