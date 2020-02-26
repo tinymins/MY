@@ -256,6 +256,15 @@ function DS:SetPaymentRec(rec)
 	FireUIEvent('MY_GKP_DATA_UPDATE', self:GetFilePath(), 'PAYMENT')
 end
 
+-- 获取指定key的收钱记录
+function DS:GetPaymentRec(szKey)
+	for _, v in ipairs(self.DATA.GKP_Account) do
+		if v.key == szKey then
+			return v
+		end
+	end
+end
+
 -- 替换收钱记录
 function DS:SetPaymentList(aList)
 	local aList = Clone(aList)
