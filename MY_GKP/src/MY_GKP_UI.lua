@@ -515,6 +515,16 @@ function MY_GKP_UI.OnFrameCreate()
 					fnAction = function()
 						MY_GKP_Open(info.fullpath)
 					end,
+					szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',
+					nFrame = 49,
+					nMouseOverFrame = 51,
+					nIconWidth = 17,
+					nIconHeight = 17,
+					szLayer = 'ICON_RIGHTMOST',
+					fnClickIcon = function()
+						CPath.DelFile(info.fullpath)
+						Wnd.CloseWindow('PopupMenuPanel')
+					end,
 				})
 			end
 			if #menu > 0 then
@@ -535,7 +545,7 @@ function MY_GKP_UI.OnFrameCreate()
 							LIB.Alert(_L['Reocrd Recovered.'])
 						end)
 					end
-				end
+				end,
 			})
 			return menu
 		end,
