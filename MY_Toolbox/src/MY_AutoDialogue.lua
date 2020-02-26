@@ -234,15 +234,12 @@ function D.AutoDialogue()
 end
 
 local function onOpenWindow()
-	if LIB.IsShieldedVersion('MY_AutoDialogue') then
-		return
-	end
 	CURRENT_WINDOW = arg0
 	CURRENT_CONTENTS = arg1
-	if not MY_AutoDialogue.bEnable then
+	if not MY_AutoDialogue.bEnable or LIB.IsShieldedVersion('MY_AutoDialogue') then
 		return
 	end
-	D.AutoDialogue()
+	LIB.DelayCall('MY_AutoDialogue__AutoDialogue', D.AutoDialogue)
 end
 LIB.RegisterEvent('OPEN_WINDOW.MY_AutoDialogue', onOpenWindow)
 end
@@ -462,23 +459,6 @@ function D.RemoveEntry()
 	end
 end
 LIB.RegisterReload('MY_AutoDialogue#ENTRY', D.RemoveEntry)
-
-do
-local function OnPlotShow()
-	if LIB.IsShieldedVersion('MY_AutoDialogue') then
-		return
-	end
-	Station.Hide()
-end
-local function HookPlotPanel(name, frame)
-	HookTableFunc(frame, 'Show', OnPlotShow)
-end
-for _, p in ipairs(ENTRY_LIST) do
-	if p.plot then
-		LIB.RegisterFrameCreate(p.name .. '.MY_AutoDialogue#AutoSetStationVisible', HookPlotPanel)
-	end
-end
-end
 
 local function onOpenWindow()
 	if LIB.IsShieldedVersion('MY_AutoDialogue') then
