@@ -706,6 +706,9 @@ function LIB.SetGlobalValue(szVarPath, Val)
 	local t = LIB.SplitString(szVarPath, '.')
 	local tab = _G
 	for k, v in ipairs(t) do
+		if not IsTable(tab) then
+			return false
+		end
 		if type(tab[v]) == 'nil' then
 			tab[v] = {}
 		end
@@ -714,6 +717,7 @@ function LIB.SetGlobalValue(szVarPath, Val)
 		end
 		tab = tab[v]
 	end
+	return true
 end
 
 function LIB.GetGlobalValue(szVarPath)
