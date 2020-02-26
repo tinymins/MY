@@ -395,6 +395,9 @@ end)
 D.TradingTarget = {}
 
 function D.MoneyUpdate(nGold, nSilver, nCopper)
+	if nGold < 100 and not D.TradingTarget.szName then
+		return
+	end
 	if not D.TradingTarget then
 		return
 	end
@@ -435,6 +438,101 @@ end)
 LIB.RegisterEvent('MONEY_UPDATE',function() --金钱变动
 	D.MoneyUpdate(arg0, arg1, arg2)
 end)
+
+---------------------------------------------------------------------->
+-- 系统金团
+----------------------------------------------------------------------<
+function D.SyncSystemGKP()
+	local GetInfo = _G.GoldTeamBase_GetAllBiddingInfos
+	if not GetInfo then
+		local env = GetInsideEnv()
+		GetInfo = env and env.GoldTeamBase_GetAllBiddingInfos
+	end
+	local aInfo = GetInfo and GetInfo()
+	if not aInfo then
+		return
+	end
+	local ds = D.GetDS()
+	for _, v in ipairs(aInfo) do
+		local szKey = concat({
+			tostring(v.nBiddingInfoIndex),
+			tostring(v.dwItemTabType),
+			tostring(v.dwItemTabIndex),
+			tostring(v.dwDoodadID),
+			tostring(v.nType),
+			tostring(v.nLootItemIndex),
+			tostring(v.nStartTime),
+		}, ',')
+		-- 拍卖记录
+		local itemInfo = not IsEmpty(v.dwItemTabType) and not IsEmpty(v.dwItemTabIndex) and GetItemInfo(v.dwItemTabType, v.dwItemTabIndex)
+		local player = GetPlayer(v.dwDestPlayerID)
+		local dwForceID = player and player.dwForceID
+		if not dwForceID then
+			if MY_Farbnamen and MY_Farbnamen.Get then
+				local data = MY_Farbnamen.Get(v.dwDestPlayerID)
+				if data then
+					dwForceID = data.dwForceID
+				end
+			end
+		end
+		local tab = ds:GetAuctionRec(szKey) or {
+			key        = szKey,
+			nUiId      = 0,
+			dwTabType  = v.dwItemTabType or 0,
+			dwDoodadID = v.dwDoodadID or 0,
+			nQuality   = 1,
+			nVersion   = 0,
+			dwIndex    = v.dwItemTabIndex or 0,
+			nTime      = v.nStartTime or 0,
+			dwForceID  = dwForceID or 0,
+			szPlayer   = v.szDestPlayerName or 0,
+			nMoney     = v.nPrice or 0,
+			szNpcName  = IsEmpty(v.dwNpcTemplateID) and _L['Add Manually'] or LIB.GetTemplateName(TARGET.NPC, v.dwNpcTemplateID),
+		}
+		if itemInfo then
+			local szName = LIB.GetObjectName('ITEM_INFO', v.dwItemTabType, v.dwItemTabIndex, 'never')
+			if szName then
+				tab.szName = szName
+			end
+			tab.nUiId = itemInfo.nUiId
+			tab.nQuality = itemInfo.nQuality
+		end
+		if not tab.szName then
+			tab.szName = v.szComment
+		end
+		if IsEmpty(tab.dwForceID) and not IsEmpty(dwForceID) then
+			tab.dwForceID = dwForceID
+		end
+		tab.bDelete = v.nState == 0
+		ds:SetAuctionRec(tab)
+		-- 付款记录
+		if not IsEmpty(v.dwPayerID) then
+			local player = GetPlayer(v.dwDestPlayerID) -- 记账到欠款人头上方便统计
+			local dwForceID = player and player.dwForceID
+			if not dwForceID then
+				if MY_Farbnamen and MY_Farbnamen.Get then
+					local data = MY_Farbnamen.Get(v.dwDestPlayerID)
+					if data then
+						dwForceID = data.dwForceID
+					end
+				end
+			end
+			local tab = ds:GetPaymentRec(szKey) or {
+				key = szKey,
+				nGold = v.nPrice or 0,
+				szPlayer = v.szDestPlayerName or '', -- v.szPayerName
+				dwForceID = dwForceID or 0,
+				dwMapID = 0,
+				nTime = v.nStartTime or 0,
+			}
+			if IsEmpty(tab.dwForceID) and not IsEmpty(dwForceID) then
+				tab.dwForceID = dwForceID
+			end
+			ds:SetPaymentRec(tab)
+		end
+	end
+end
+LIB.RegisterEvent('BIDDING_OPERATION', D.SyncSystemGKP)
 
 ---------------------------------------------------------------------->
 -- 主界面
