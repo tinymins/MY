@@ -72,7 +72,7 @@ function D.GetDS()
 	return O.ds
 end
 
-function D.NewDS()
+function D.NewDS(bSilent)
 	local ds = D.GetDS()
 	if not ds:IsEmpty() then
 		if not IsEmpty(ds:GetTime()) and not IsEmpty(ds:GetMap()) then
@@ -94,12 +94,14 @@ function D.NewDS()
 		end
 		ds:ClearData()
 	end
-	D.UpdateDS()
+	D.UpdateDSMeta()
+	if not bSilent then
+		LIB.Alert(_L['Records are wiped'])
+	end
 	FireUIEvent('MY_GKP_LOOT_BOSS')
-	LIB.Alert(_L['Records are wiped'])
 end
 
-function D.UpdateDS()
+function D.UpdateDSMeta()
 	local ds = D.GetDS()
 	local me = GetClientPlayer()
 	ds:SetTime(GetCurrentTime())
@@ -383,7 +385,7 @@ LIB.RegisterEvent('LOADING_END',function()
 			LIB.Confirm(_L['Do you want to wipe the previous data when you enter the dungeon\'s map?'], D.NewDS)
 		end
 	else
-		D.UpdateDS()
+		D.UpdateDSMeta()
 	end
 end)
 
@@ -465,6 +467,7 @@ function D.LoadHistory(szFilePath)
 	local dsHist = MY_GKP_DS(szFilePath)
 	if dsHist then
 		local ds = D.GetDS()
+		D.NewDS(true)
 		ds:SetTime(dsHist:GetTime())
 		ds:SetMap(dsHist:GetMap())
 		ds:SetAuctionList(dsHist:GetAuctionList())
