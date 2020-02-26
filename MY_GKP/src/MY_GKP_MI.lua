@@ -204,8 +204,8 @@ LIB.RegisterBgMsg('MY_GKP', function(_, nChannel, dwID, szName, bIsSelf, ...)
 				ui:Append('Text', { w = 720, h = 30, x = x, halign = 2, y = y + 35, text = _L('Print Time:%s', D.GetTimeString(GetCurrentTime())), font = 41 })
 			end
 			if data[2] == 'Info' then
-				if data[3] == me.szName and tonumber(data[4]) and tonumber(data[4]) <= -100 then
-					LIB.OutputWhisper(data[3] .. g_tStrings.STR_COLON .. data[4] .. g_tStrings.STR_GOLD, 'MY_GKP')
+				if data[3] == me.szName and tonumber(data[4]) and tonumber(data[4]) < 0 then
+					LIB.OutputWhisper(data[3] .. g_tStrings.STR_COLON .. data[4] .. g_tStrings.STR_GOLD, _L['MY_GKP'])
 				end
 				local frm = Station.Lookup('Normal/GKP_info')
 				if frm and frm.done then
