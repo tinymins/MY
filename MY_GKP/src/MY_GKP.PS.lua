@@ -59,10 +59,11 @@ function D.GetSubsidiesMenu()
 		fnAction = function()
 			GetUserInput(_L['New Protocol  Format: Protocol\'s Name, Money'], function(txt)
 				local t = LIB.SplitString(txt, ',')
-				table.insert(MY_GKP.aSubsidies, { t[1], tonumber(t[2]) or '', true })
-				D.SaveConfig()
+				local aSubsidies = MY_GKP.aSubsidies
+				insert(aSubsidies, { t[1], tonumber(t[2]) or '', true })
+				MY_GKP.aSubsidies = aSubsidies
 			end)
-		end
+		end,
 	})
 	table.insert(menu, { bDevide = true})
 	for k, v in ipairs(MY_GKP.aSubsidies) do
@@ -72,7 +73,23 @@ function D.GetSubsidiesMenu()
 			bChecked = v[3],
 			fnAction = function()
 				v[3] = not v[3]
-				D.SaveConfig()
+				MY_GKP.aSubsidies = MY_GKP.aSubsidies
+			end,
+			szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',
+			nFrame = 49,
+			nMouseOverFrame = 51,
+			nIconWidth = 17,
+			nIconHeight = 17,
+			szLayer = 'ICON_RIGHTMOST',
+			fnClickIcon = function()
+				local aSubsidies = MY_GKP.aSubsidies
+				for ii, vv in ipairs(aSubsidies) do
+					if v == vv then
+						remove(aSubsidies, ii)
+					end
+				end
+				MY_GKP.aSubsidies = aSubsidies
+				Wnd.CloseWindow('PopupMenuPanel')
 			end,
 		})
 	end
@@ -87,14 +104,22 @@ function D.GetSchemeMenu()
 		szOption = _L['Edit All Protocols'],
 		rgb = { 255, 255, 0 },
 		fnAction = function()
+			local a = {}
+			if IsTable(MY_GKP.aScheme) then
+				for k, v in ipairs(MY_GKP.aScheme) do
+					if IsTable(v) and IsNumber(v[1]) then
+						table.insert(a, tostring(v[1]))
+					end
+				end
+			end
 			GetUserInput(_L['New Protocol Format: Money, Money, Money'], function(txt)
 				local t = LIB.SplitString(txt, ',')
-				MY_GKP.aScheme = {}
+				local aScheme = {}
 				for k, v in ipairs(t) do
-					table.insert(MY_GKP.aScheme, { tonumber(v) or 0, true })
+					table.insert(aScheme, { tonumber(v) or 0, true })
 				end
-				D.SaveConfig()
-			end)
+				MY_GKP.aScheme = aScheme
+			end, nil, nil, nil, concat(a, ','))
 		end
 	})
 	table.insert(menu, { bDevide = true })
@@ -105,7 +130,23 @@ function D.GetSchemeMenu()
 			bChecked = v[2],
 			fnAction = function()
 				v[2] = not v[2]
-				D.SaveConfig()
+				MY_GKP.aScheme = MY_GKP.aScheme
+			end,
+			szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',
+			nFrame = 49,
+			nMouseOverFrame = 51,
+			nIconWidth = 17,
+			nIconHeight = 17,
+			szLayer = 'ICON_RIGHTMOST',
+			fnClickIcon = function()
+				local aScheme = MY_GKP.aScheme
+				for ii, vv in ipairs(aScheme) do
+					if v == vv then
+						remove(aScheme, ii)
+					end
+				end
+				MY_GKP.aScheme = aScheme
+				Wnd.CloseWindow('PopupMenuPanel')
 			end,
 		})
 	end

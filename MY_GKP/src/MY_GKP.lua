@@ -361,6 +361,8 @@ local settings = {
 					FireUIEvent('MY_GKP_DATA_UPDATE', '', 'AUCTION')
 					FireUIEvent('MY_GKP_DATA_UPDATE', '', 'PAYMENT')
 				end,
+				aSubsidies = D.SaveConfig,
+				aScheme = D.SaveConfig,
 			},
 			root = O,
 		},
