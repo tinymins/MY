@@ -632,7 +632,7 @@ function D.OnItemRButtonClick()
 			end
 		})
 		table.insert(menu, { bDevide = true })
-		for k, v in ipairs(MY_GKP.GetConfig().Scheme) do
+		for k, v in ipairs(MY_GKP.aScheme) do
 			if v[2] then
 				table.insert(menu, {
 					szOption = v[1],
@@ -1076,6 +1076,7 @@ function D.DistributeItem(dwID, info, szAutoDistType, bSkipRecordPanel)
 		end
 		local tab = {
 			szPlayer   = player.szName,
+			dwID       = item.dwID,
 			nUiId      = item.nUiId,
 			szNpcName  = doodad.szName,
 			dwDoodadID = doodad.dwID,
@@ -1094,12 +1095,7 @@ function D.DistributeItem(dwID, info, szAutoDistType, bSkipRecordPanel)
 		if item.nGenre == ITEM_GENRE.BOOK then
 			tab.nBookID = item.nBookID
 		end
-		if MY_GKP.bOn then
-			MY_GKP.Record(tab, item, IsShiftKeyDown() or bSkipRecordPanel)
-		else -- 关闭的情况所有东西全部绕过
-			tab.nMoney = 0
-			MY_GKP('GKP_Record', tab)
-		end
+		MY_GKP_MI.NewAuction(tab, IsShiftKeyDown() or bSkipRecordPanel)
 		if szAutoDistType then
 			GKP_LOOT_RECENT[szAutoDistType] = dwID
 		end

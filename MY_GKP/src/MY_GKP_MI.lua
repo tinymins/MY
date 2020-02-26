@@ -1,0 +1,499 @@
+--------------------------------------------------------
+-- This file is part of the JX3 Mingyi Plugin.
+-- @link     : https://jx3.derzh.com/
+-- @desc     : 金团记录主数据源实例化逻辑 (Main Instance)
+-- @author   : 茗伊 @双梦镇 @追风蹑影
+-- @modifier : Emil Zhai (root@derzh.com)
+-- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+--------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
+-- these global functions are accessed all the time by the event handler
+-- so caching them is worth the effort
+-----------------------------------------------------------------------------------------------------------
+local setmetatable = setmetatable
+local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
+local sub, len, format, rep = string.sub, string.len, string.format, string.rep
+local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
+local type, tonumber, tostring = type, tonumber, tostring
+local HUGE, PI, random, abs = math.huge, math.pi, math.random, math.abs
+local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
+local pow, sqrt, sin, cos, tan, atan = math.pow, math.sqrt, math.sin, math.cos, math.tan, math.atan
+local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
+local pack, unpack = table.pack or function(...) return {...} end, table.unpack or unpack
+-- jx3 apis caching
+local wsub, wlen, wfind, wgsub = wstring.sub, wstring.len, wstring.find, StringReplaceW
+local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
+local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
+local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local LIB = MY
+local UI, DEBUG_LEVEL, PATH_TYPE, PACKET_INFO = LIB.UI, LIB.DEBUG_LEVEL, LIB.PATH_TYPE, LIB.PACKET_INFO
+local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
+local ipairs_r, count_c, pairs_c, ipairs_c = LIB.ipairs_r, LIB.count_c, LIB.pairs_c, LIB.ipairs_c
+local IsNil, IsBoolean, IsUserdata, IsFunction = LIB.IsNil, LIB.IsBoolean, LIB.IsUserdata, LIB.IsFunction
+local IsString, IsTable, IsArray, IsDictionary = LIB.IsString, LIB.IsTable, LIB.IsArray, LIB.IsDictionary
+local IsNumber, IsHugeNumber, IsEmpty, IsEquals = LIB.IsNumber, LIB.IsHugeNumber, LIB.IsEmpty, LIB.IsEquals
+local Call, XpCall, GetTraceback, RandomChild = LIB.Call, LIB.XpCall, LIB.GetTraceback, LIB.RandomChild
+local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
+local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
+-----------------------------------------------------------------------------------------------------------
+local PLUGIN_NAME = 'MY_GKP'
+local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local MODULE_NAME = 'MY_GKP'
+local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+--------------------------------------------------------------------------
+if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
+	return
+end
+--------------------------------------------------------------------------
+
+local D = {
+	Sysmsg = MY_GKP.Sysmsg,
+	GetTimeString = MY_GKP.GetTimeString,
+	GetMoneyTipText = MY_GKP.GetMoneyTipText,
+}
+local O = {
+	ds          = nil,
+	tSyncQueue  = {},
+	bSync       = {},
+	nSyncLen    = 0,
+}
+local DS_ROOT = {'userdata/gkp/', PATH_TYPE.ROLE}
+local DS_PATH = {'userdata/gkp/current.gkp', PATH_TYPE.ROLE}
+
+function D.Init()
+	if O.ds then
+		return
+	end
+	O.ds = MY_GKP_DS(LIB.FormatPath(DS_PATH), true)
+end
+
+function D.GetDS()
+	D.Init()
+	return O.ds
+end
+
+function D.NewDS()
+	local ds = D.GetDS()
+	if not ds:IsEmpty() then
+		if not IsEmpty(ds:GetTime()) and not IsEmpty(ds:GetMap()) then
+			local szRoot = LIB.FormatPath(DS_ROOT)
+			local i, szNewPath = 0
+			repeat
+				szNewPath = szRoot
+					.. LIB.FormatTime(ds:GetTime(), '%yyyy-%MM-%dd-%hh-%mm-%ss')
+					.. (i == 0 and '' or ('-' .. i))
+					.. '_' .. ds:GetMap()
+					.. '.gkp.jx3dat'
+				i = i + 1
+			until not IsLocalFileExist(LIB.FormatPath(szNewPath))
+			local dsNew = MY_GKP_DS(szNewPath, true)
+			dsNew:SetTime(ds:GetTime())
+			dsNew:SetMap(ds:GetMap())
+			dsNew:SetAuctionList(ds:GetAuctionList())
+			dsNew:SetPaymentList(ds:GetPaymentList())
+		end
+		ds:ClearData()
+	end
+	D.UpdateDS()
+	FireUIEvent('MY_GKP_LOOT_BOSS')
+	LIB.Alert(_L['Records are wiped'])
+end
+
+function D.UpdateDS()
+	local ds = D.GetDS()
+	local me = GetClientPlayer()
+	ds:SetTime(GetCurrentTime())
+	ds:SetMap(me and Table_GetMapName(me.GetMapID()) or '')
+end
+
+function D.NewAuction(tab, bSkipPanel)
+	local ds = D.GetDS()
+	if MY_GKP.bOn then
+		MY_GKP_AuctionUI.Open(ds, tab, bSkipPanel and 'SKIP' or '')
+	else -- 关闭的情况所有东西全部绕过
+		if not tab.nMoney then
+			tab.nMoney = 0
+		end
+		ds:SetAuctionRec(tab)
+	end
+end
+
+function D.SyncSend(dwID)
+	local ds = D.GetDS()
+	local tab = {
+		GKP_Record  = ds:GetAuctionList(),
+		GKP_Account = ds:GetPaymentList(),
+	}
+	-- 密聊频道限制了字数 发起来太慢了
+	local szKey = LIB.GetUUID():sub(1, 8)
+	LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP_SYNC_START', dwID, szKey)
+	LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP_SYNC_CONTENT_' .. szKey, dwID, tab)
+end
+
+LIB.RegisterInit('MY_GKP_MI', function()
+	D.Init()
+end)
+
+LIB.RegisterBgMsg('MY_GKP_SYNC_START', function(_, nChannel, dwID, szName, bIsSelf, dwID, szKey)
+	if dwID == UI_GetClientPlayerID() or dwID == 0 then
+		LIB.RegisterBgMsg('MY_GKP_SYNC_CONTENT_' .. szKey, function(_, nChannel, dwID, szName, bIsSelf, dwID, tab)
+			if dwID == UI_GetClientPlayerID() or dwID == 0 then
+				LIB.Topmsg(_L['Sychoronization Complete'])
+				if not tab then
+					return D.Sysmsg(_L['Abnormal with Data Sharing, Please contact and make feed back with the writer.'])
+				end
+				LIB.Confirm(_L('Data Sharing Finished, you have one last chance to confirm wheather cover the current data with [%s]\'s data or not? \n data of team bidding: %s\n transation data: %s', szName, #tab.GKP_Record, #tab.GKP_Account), function()
+					local ds = D.GetDS()
+					ds:SetAuctionList(tab.GKP_Record)
+					ds:SetPaymentList(tab.GKP_Account)
+				end)
+			end
+			LIB.RegisterBgMsg('MY_GKP_SYNC_CONTENT_' .. szKey, false)
+		end, function(szMsgID, nChannel, dwID, szName, bIsSelf, nSegCount, nSegIndex)
+			local fPercent = nSegIndex / nSegCount
+			LIB.Topmsg(_L('Sychoronizing data please wait %d%% loaded.', fPercent * 100))
+		end)
+	end
+end)
+
+
+LIB.RegisterBgMsg('MY_GKP', function(_, nChannel, dwID, szName, bIsSelf, ...)
+	local data = {...}
+	local ds = D.GetDS()
+	local me = GetClientPlayer()
+	local team = GetClientTeam()
+	if team then
+		if not bIsSelf then
+			if data[1] == 'GKP_Sync' and data[2] == me.szName then
+				D.SyncSend(dwID)
+			elseif (data[1] == 'del' or data[1] == 'edit' or data[1] == 'add') and MY_GKP.bAutoSync then
+				local tab = data[2]
+				tab.bSync = true
+				ds:SetAuctionRec(tab)
+				--[[#DEBUG BEGIN]]
+				LIB.Debug('MY_GKP', '#MY_GKP# Sync Success', DEBUG_LEVEL.LOG)
+				--[[#DEBUG END]]
+			end
+		end
+		if data[1] == 'GKP_INFO' then
+			if data[2] == 'Start' then
+				local szFrameName = data[3] == 'Information on Debt' and 'GKP_Debt' or 'GKP_info'
+				if data[3] == 'Information on Debt' and szName ~= me.szName then -- 欠债记录只自己看
+					return
+				end
+				local ui = UI.CreateFrame(szFrameName, { w = 800, h = 400, text = _L['GKP Golden Team Record'], close = true, anchor = 'CENTER' })
+				local x, y = 20, 50
+				ui:Append('Text', { x = x, y = y, w = 760, h = 30, text = _L[data[3]], halign = 1, font = 236, color = { 255, 255, 0 } })
+				ui:Append('WndButton3', { name = 'ScreenShot', x = x + 590, y = y, text = _L['Print Ticket'] }):Toggle(false):Click(function()
+					local scale         = Station.GetUIScale()
+					local left, top     = ui:Pos()
+					local width, height = ui:Size()
+					local right, bottom = left + width, top + height
+					local btn           = this
+					local path          = GetRootPath() .. string.format('\\ScreenShot\\GKP_Ticket_%s.png', FormatTime('%Y-%m-%d_%H.%M.%S', GetCurrentTime()))
+					btn:Hide()
+					LIB.DelayCall(function()
+						ScreenShot(path, 100, scale * left, scale * top, scale * right, scale * bottom)
+						LIB.DelayCall(function()
+							LIB.Alert(_L('Shot screen succeed, file saved as %s .', path))
+							btn:Show()
+						end)
+					end, 50)
+				end)
+				ui:Append('Text', { w = 120, h = 30, x = x + 40, y = y + 35, text = _L('Operator:%s', szName), font = 41 })
+				ui:Append('Text', { w = 720, h = 30, x = x, halign = 2, y = y + 35, text = _L('Print Time:%s', D.GetTimeString(GetCurrentTime())), font = 41 })
+			end
+			if data[2] == 'Info' then
+				if data[3] == me.szName and tonumber(data[4]) and tonumber(data[4]) <= -100 then
+					LIB.OutputWhisper(data[3] .. g_tStrings.STR_COLON .. data[4] .. g_tStrings.STR_GOLD, 'MY_GKP')
+				end
+				local frm = Station.Lookup('Normal/GKP_info')
+				if frm and frm.done then
+					frm = Station.Lookup('Normal/GKP_Debt')
+				end
+				if not frm and Station.Lookup('Normal/GKP_Debt') then
+					frm = Station.Lookup('Normal/GKP_Debt')
+				end
+				if frm then
+					if not frm.n then frm.n = 0 end
+					local n = frm.n
+					local ui = UI(frm)
+					local x, y = 20, 50
+					if n % 2 == 0 then
+						ui:Append('Image', { w = 760, h = 30, x = x, y = y + 70 + 30 * n, image = 'ui/Image/button/ShopButton.UITex', imageframe = 75 })
+					end
+					local dwForceID, tBox = -1, {}
+					if me.IsInParty() then
+						for k, v in ipairs(team.GetTeamMemberList()) do
+							if team.GetClientTeamMemberName(v) == data[3] then
+								dwForceID = team.GetMemberInfo(v).dwForceID
+							end
+						end
+					end
+					for k, v in ipairs(ds:GetAuctionList()) do -- 依赖于本地记录 反正也不可能差异到哪去
+						if v.szPlayer == data[3] then
+							if dwForceID == -1 then
+								dwForceID = v.dwForceID
+							end
+							table.insert(tBox, v)
+						end
+					end
+					if dwForceID ~= -1 then
+						ui:Append('Image', { w = 28, h = 28, x = x + 30, y = y + 71 + 30 * n }):Image(GetForceImage(dwForceID))
+					end
+					ui:Append('Text', { w = 140, h = 30, x = x + 60, y = y + 70 + 30 * n, text = data[3], color = { LIB.GetForceColor(dwForceID) } })
+					local handle = ui:Append('Handle', { w = 130, h = 20, x = x + 200, y = y + 70 + 30 * n, handlestyle = 3 })[1]
+					handle:AppendItemFromString(D.GetMoneyTipText(tonumber(data[4])))
+					handle:FormatAllItemPos()
+					for k, v in ipairs(tBox) do
+						if k > 12 then
+							ui:Append('Text', { x = x + 290 + k * 32 + 5, y = y + 71 + 30 * n, w = 28, h = 28, text = '.....', font = 23 })
+							break
+						end
+						local hBox = ui:Append('Box', { x = x + 290 + k * 32, y = y + 71 + 30 * n, w = 28, h = 28, alpha = v.bDelete and 60 })
+						if v.nUiId ~= 0 then
+							hBox:ItemInfo(v.nVersion, v.dwTabType, v.dwIndex, v.nStackNum or v.nBookID)
+						else
+							hBox:Icon(582):Hover(function(bHover)
+								if bHover then
+									local x, y = this:GetAbsPos()
+									local w, h = this:GetSize()
+									OutputTip(GetFormatText(v.szName .. g_tStrings.STR_TALK_HEAD_SAY1, 136) .. D.GetMoneyTipText(v.nMoney), 250, { x, y, w, h })
+								else
+									HideTip()
+								end
+							end)
+						end
+					end
+					if frm.n > 5 then
+						ui:Size(800, 30 * frm.n + 250):Anchor('CENTER')
+					end
+					frm.n = frm.n + 1
+				end
+			end
+			if data[2] == 'End' then
+				local szFrameName = data[4] and 'GKP_info' or 'GKP_Debt'
+				local frm = Station.Lookup('Normal/' .. szFrameName)
+				if frm then
+					if data[4] then
+						local ui = UI(frm)
+						local x, y = 20, 50
+						local n = frm.n or 0
+						local nMoney = tonumber(data[4]) or 0
+						local handle = ui:Append('Handle', { w = 230, h = 20, x = x + 30, y = y + 70 + 30 * n + 5, handlestyle = 3 })[1]
+						handle:AppendItemFromString(GetFormatText(_L['Total Auction:'], 41) .. D.GetMoneyTipText(nMoney))
+						handle:FormatAllItemPos()
+						if LIB.IsDistributer() then
+							ui:Append('WndButton4', {
+								w = 91, h = 26, x = x + 620, y = y + 70 + 30 * n + 5, text = _L['salary'],
+								onclick = function()
+									LIB.Confirm(_L['Confirm?'], function()
+										MY_GKP.Bidding(nMoney)
+									end)
+								end,
+							})
+						end
+						if data[5] and tonumber(data[5]) then
+							local nTime = tonumber(data[5])
+							ui:Append('Text', { w = 725, h = 30, x = x + 0, y = y + 70 + 30 * n + 5, text = _L('Spend time approx %d:%d', nTime / 3600, nTime % 3600 / 60), halign = 1 })
+						end
+						UI(frm):Children('#ScreenShot'):Toggle(true)
+						if n >= 4 then
+							local t = {
+								{ 50000,   1 }, -- 黑出翔
+								{ 100000,  0 }, -- 背锅
+								{ 250000,  2 }, -- 脸帅
+								{ 500000,  6 }, -- 自称小红手
+								{ 5000000, 3 }, -- 特别红
+								{ 5000000, 5 }, -- 玄晶专用r
+							}
+							local nFrame = 4
+							for k, v in ipairs(t) do
+								if v[1] >= nMoney then
+									nFrame = v[2]
+									break
+								end
+							end
+							local img = ui:Append('Image', {
+								x = x + 590, y = y + n * 30 - 30, w = 150, h = 150, alpha = 180,
+								image = PACKET_INFO.ROOT .. 'MY_GKP/img/GKPSeal.uitex', imageframe = nFrame,
+								onhover = function(bHover)
+									if bHover then
+										this:SetAlpha(30)
+									else
+										this:SetAlpha(180)
+									end
+								end,
+							})[1]
+							-- JH.Animate(img, 200):Scale(4)
+						end
+						frm.done = true
+					elseif szFrameName == 'GKP_Debt' and not frm:IsVisible() then
+						Wnd.CloseWindow(frm)
+					end
+				end
+				FireUIEvent('MY_GKP_SEND_FINISH')
+			end
+		end
+	end
+end)
+
+LIB.RegisterEvent('ON_BG_CHANNEL_MSG.LR_GKP', function()
+	local szMsgID, nChannel, dwID, szName, data, bSelf = arg0, arg1, arg2, arg3, arg4, arg2 == UI_GetClientPlayerID()
+	if szMsgID ~= 'LR_GKP' or bSelf then
+		return
+	end
+	if (data[1] == 'SYNC' or data[1] == 'DEL') and MY_GKP.bAutoSync then
+		local ds = D.GetDS()
+		local rawData = data[2]
+		local tab = {
+			bSync = true,
+			bEdit = true,
+			bDelete = data[1] == 'DEL',
+			szPlayer = rawData.szPurchaserName,
+			dwIndex = rawData.dwIndex,
+			dwTabType = rawData.dwTabType,
+			nQuality = rawData.nQuality,
+			nVersion = rawData.nVersion or 0,
+			nGenre = rawData.nGenre,
+			nTime = rawData.nCreateTime,
+			nMoney = rawData.nGold,
+			key = rawData.hash,
+			dwForceID = rawData.dwPurchaserForceID,
+			szName = rawData.szName,
+			dwDoodadID = rawData.dwDoodadID or 0,
+			nUiId = rawData.nUiId or 0,
+			szNpcName = rawData.szSourceName,
+			nBookID = rawData.nGenre == ITEM_GENRE.BOOK
+				and rawData.nBookID and rawData.nBookID ~= 0
+				and rawData.nBookID or nil,
+			nStackNum = rawData.nStackNum,
+		}
+		ds:SetAuctionRec(tab)
+		--[[#DEBUG BEGIN]]
+		LIB.Debug('MY_GKP', '#MY_GKP# Sync From LR Success', DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
+	end
+end)
+
+LIB.RegisterEvent('LOADING_END',function()
+	local ds = D.GetDS()
+	if not ds:IsEmpty() then
+		if LIB.IsInDungeon() and MY_GKP.bAlertMessage then
+			LIB.Confirm(_L['Do you want to wipe the previous data when you enter the dungeon\'s map?'], D.NewDS)
+		end
+	else
+		D.UpdateDS()
+	end
+end)
+
+---------------------------------------------------------------------->
+-- 金钱记录
+----------------------------------------------------------------------<
+D.TradingTarget = {}
+
+function D.MoneyUpdate(nGold, nSilver, nCopper)
+	if not D.TradingTarget then
+		return
+	end
+	if not D.TradingTarget.szName and not MY_GKP.bMoneySystem then
+		return
+	end
+	local ds = D.GetDS()
+	ds:SetPaymentRec({
+		nGold     = nGold, -- API给的有问题 …… 只算金
+		szPlayer  = D.TradingTarget.szName or 'System',
+		dwForceID = D.TradingTarget.dwForceID,
+		nTime     = GetCurrentTime(),
+		dwMapID   = GetClientPlayer().GetMapID()
+	})
+	if D.TradingTarget.szName and MY_GKP.bMoneyTalk then
+		if nGold > 0 then
+			LIB.Talk(PLAYER_TALK_CHANNEL.RAID, {
+				D.GetFormatLink(_L['Received']),
+				D.GetFormatLink(D.TradingTarget.szName, true),
+				D.GetFormatLink(_L['The'] .. nGold ..g_tStrings.STR_GOLD .. g_tStrings.STR_FULL_STOP),
+			})
+		else
+			LIB.Talk(PLAYER_TALK_CHANNEL.RAID, {
+				D.GetFormatLink(_L['Pay to']),
+				D.GetFormatLink(D.TradingTarget.szName, true),
+				D.GetFormatLink(' ' .. nGold * -1 ..g_tStrings.STR_GOLD .. g_tStrings.STR_FULL_STOP),
+			})
+		end
+	end
+end
+
+LIB.RegisterEvent('TRADING_OPEN_NOTIFY',function() -- 交易开始
+	D.TradingTarget = GetPlayer(arg0)
+end)
+LIB.RegisterEvent('TRADING_CLOSE',function() -- 交易结束
+	D.TradingTarget = {}
+end)
+LIB.RegisterEvent('MONEY_UPDATE',function() --金钱变动
+	D.MoneyUpdate(arg0, arg1, arg2)
+end)
+
+---------------------------------------------------------------------->
+-- 主界面
+----------------------------------------------------------------------<
+function D.OpenPanel()
+	MY_GKP_Open(D.GetDS():GetFilePath())
+end
+
+function D.ClosePanel()
+	local frame = Station.Lookup('Normal/MY_GKP#MI')
+	if frame then
+		frame:Hide()
+	end
+end
+
+function D.IsOpened()
+	local frame = Station.Lookup('Normal/MY_GKP#MI')
+	return frame and frame:IsVisible()
+end
+
+function D.TogglePanel()
+	if D.IsOpened() then
+		D.ClosePanel()
+	else
+		D.OpenPanel()
+	end
+end
+
+function D.LoadHistory(szFilePath)
+	local dsHist = MY_GKP_DS(szFilePath)
+	if dsHist then
+		local ds = D.GetDS()
+		ds:SetTime(dsHist:GetTime())
+		ds:SetMap(dsHist:GetMap())
+		ds:SetAuctionList(dsHist:GetAuctionList())
+		ds:SetPaymentList(dsHist:GetPaymentList())
+		CPath.DelFile(szFilePath)
+	end
+end
+
+LIB.RegisterHotKey('MY_GKP', _L['Open/Close Golden Team Record'], D.TogglePanel)
+LIB.RegisterAddonMenu({ szOption = _L['Golden Team Record'], fnAction = D.OpenPanel })
+
+-- Global exports
+do
+local settings = {
+	exports = {
+		{
+			fields = {
+				GetDS = D.GetDS,
+				NewDS = D.NewDS,
+				NewAuction = D.NewAuction,
+				SyncSend = D.SyncSend,
+				OpenPanel = D.OpenPanel,
+				ClosePanel = D.ClosePanel,
+				IsOpened = D.IsOpened,
+				TogglePanel = D.TogglePanel,
+				LoadHistory = D.LoadHistory,
+			},
+		},
+	},
+}
+MY_GKP_MI = LIB.GeneGlobalNS(settings)
+end
