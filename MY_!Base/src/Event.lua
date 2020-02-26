@@ -601,9 +601,9 @@ end
 
 do
 local MAX_CHANNEL_LEN = setmetatable({
-	[PLAYER_TALK_CHANNEL.RAID] = 500,
-	[PLAYER_TALK_CHANNEL.BATTLE_FIELD] = 500,
-}, { __index = function() return 300 end })
+	[PLAYER_TALK_CHANNEL.RAID] = 300,
+	[PLAYER_TALK_CHANNEL.BATTLE_FIELD] = 300,
+}, { __index = function() return 250 end })
 -- 是否可以发送消息
 local function GetSenderStatus(me)
 	if not me then
