@@ -843,6 +843,8 @@ function MY_GKP_Open(szFilePath)
 		nIndex = nIndex + 1
 		szName = szName .. '#' .. nIndex
 	end
-	Wnd.OpenWindow(SZ_INI, szName):SetDS(szFilePath)
+	local frame = Wnd.OpenWindow(SZ_INI, szName)
+	frame:SetDS(szFilePath)
+	frame:BringToTop()
 end
 end
