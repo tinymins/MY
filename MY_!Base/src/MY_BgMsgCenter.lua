@@ -137,6 +137,10 @@ LIB.RegisterBgMsg('MY_ABOUT', function(_, nChannel, dwID, szName, bIsSelf, ...)
 		GetClientTeam().SetAuthorityInfo(TEAM_AUTHORITY_TYPE.MARK, dwID)
 	elseif data[1] == 'TeamDistribute' then
 		GetClientTeam().SetAuthorityInfo(TEAM_AUTHORITY_TYPE.DISTRIBUTE, dwID)
+	elseif data[1] == 'SHIELDED' then
+		LIB.IsShieldedVersion(data[2], data[3], data[4])
+	elseif data[1] == 'DEBUG' then
+		LIB.IsDebugClient(data[2], data[3], data[4])
 	end
 end)
 
