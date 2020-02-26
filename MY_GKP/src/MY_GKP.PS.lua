@@ -162,7 +162,11 @@ function PS.OnPanelActive(wnd)
 	local w, h = ui:Size()
 
 	ui:Append('Text', { x = x, y = y, text = _L['Preference Setting'], font = 27 })
-	ui:Append('WndButton3', { x = w - 150, y = y, w = 150, h = 38, text = _L['Open Panel'], onclick = D.OpenPanel })
+	ui:Append('WndButton3', {
+		x = w - 150, y = y, w = 150, h = 38,
+		text = _L['Open Panel'],
+		onclick = MY_GKP_MI.OpenPanel,
+	})
 	y = y + 28
 
 	x = x + 10

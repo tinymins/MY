@@ -721,7 +721,6 @@ function MY_GKP_UI.OnFrameCreate()
 end
 
 function MY_GKP_UI.OnFrameShow()
-	this:BringToTop()
 	PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
 end
 
@@ -837,6 +836,7 @@ function MY_GKP_Open(szFilePath)
 		local frame = Station.Lookup('Normal/' .. szName)
 		if frame then
 			frame:Show()
+			frame:BringToTop()
 			return
 		end
 	else
