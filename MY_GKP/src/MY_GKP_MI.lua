@@ -464,6 +464,7 @@ function D.SyncSystemGKP()
 			tostring(v.nStartTime),
 		}, ',')
 		-- ÅÄÂô¼ÇÂ¼
+		local item = not IsEmpty(v.dwItemID) and GetItem(v.dwItemID)
 		local itemInfo = not IsEmpty(v.dwItemTabType) and not IsEmpty(v.dwItemTabIndex) and GetItemInfo(v.dwItemTabType, v.dwItemTabIndex)
 		local player = GetPlayer(v.dwDestPlayerID)
 		local dwForceID = player and player.dwForceID
@@ -489,7 +490,17 @@ function D.SyncSystemGKP()
 			nMoney     = v.nPrice or 0,
 			szNpcName  = IsEmpty(v.dwNpcTemplateID) and _L['Add Manually'] or LIB.GetTemplateName(TARGET.NPC, v.dwNpcTemplateID),
 		}
-		if itemInfo then
+		if item then
+			local szName = LIB.GetObjectName('ITEM', v.dwItemID, 'never')
+			if szName then
+				tab.szName = szName
+			end
+			if item.nGenre == ITEM_GENRE.BOOK then
+				tab.nBookID = item.nBookID
+			end
+			tab.nUiId = item.nUiId
+			tab.nQuality = item.nQuality
+		elseif itemInfo then
 			local szName = LIB.GetObjectName('ITEM_INFO', v.dwItemTabType, v.dwItemTabIndex, 'never')
 			if szName then
 				tab.szName = szName
