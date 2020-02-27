@@ -27,7 +27,7 @@ return {
     ['uncount awaytime'                 ] = '除去玩家暂离时间',
     ['show nodata teammate'             ] = '显示无数据的队友',
     ['use system time count'            ] = '使用官方时间算法',
-    ['distinct target id with same name'] = '区分同名字的目标',
+    ['Group npc with same name'         ] = '合并同名NPC数据',
     ['distinct effect id with same name'] = '区分同名字的记录',
     ['record anonymous effect'          ] = '显示没名字的记录',
     ['show zero value effect'           ] = '显示零数值的记录',

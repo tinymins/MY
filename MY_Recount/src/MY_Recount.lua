@@ -208,6 +208,7 @@ MY_Recount.nCss          = 1                    -- 当前样式表
 MY_Recount.nChannel      = CHANNEL.DPS          -- 当前显示的统计模式
 MY_Recount.bAwayMode     = true                 -- 计算DPS时是否减去暂离时间
 MY_Recount.bSysTimeMode  = false                -- 使用官方战斗统计计时方式
+MY_Recount.bGroupSameNpc = false                -- 是否合并同名NPC数据
 MY_Recount.bShowPerSec   = true                 -- 显示为每秒数据（反之显示总和）
 MY_Recount.bShowEffect   = true                 -- 显示有效伤害/治疗
 MY_Recount.bShowZeroVal  = false                -- 显示零值记录
@@ -368,7 +369,7 @@ function MY_Recount.UpdateUI(data)
 			local tRec = {
 				id           = id                                  ,
 				szMD5        = rec.szMD5                           ,
-				szName       = MY_Recount_DS.GetNameAusID(id, data),
+				szName       = MY_Recount_DS.GetNameAusID(data, id),
 				dwForceID    = data.Forcelist[id] or -1            ,
 				nValue       = rec.nTotal         or  0            ,
 				nEffectValue = rec.nTotalEffect   or  0            ,
@@ -782,7 +783,6 @@ function MY_Recount_Detail.OnFrameCreate()
 	frame.bFirstRendering = true
 	frame.szPrimarySort = ((frame.nChannel == CHANNEL.DPS or frame.nChannel == CHANNEL.HPS) and 'Skill') or 'Target'
 	frame.szSecondarySort = ((frame.nChannel == CHANNEL.DPS or frame.nChannel == CHANNEL.HPS) and 'Target') or 'Skill'
-	frame:Lookup('', 'Text_Default'):SetText(MY_Recount_DS.GetNameAusID(id, DataDisplay) .. ' ' .. SZ_CHANNEL[frame.nChannel])
 	frame:Lookup('WndScroll_Target', 'Handle_TargetTitle/Text_TargetTitle_5'):SetText(g_tStrings.STR_HIT_NAME)
 	frame:Lookup('WndScroll_Target', 'Handle_TargetTitle/Text_TargetTitle_6'):SetText(g_tStrings.STR_CS_NAME)
 	frame:Lookup('WndScroll_Target', 'Handle_TargetTitle/Text_TargetTitle_7'):SetText(g_tStrings.STR_MSG_MISS)
@@ -821,6 +821,10 @@ function MY_Recount_Detail.OnFrameBreathe()
 	if tonumber(id) then
 		id = tonumber(id)
 	end
+
+	-- 更新标题
+	this:Lookup('', 'Text_Default'):SetText(MY_Recount_DS.GetNameAusID(DataDisplay, id) .. ' ' .. SZ_CHANNEL[this.nChannel])
+
 	-- 获取数据
 	local tData = DataDisplay[szChannel].Statistics[id]
 	if not tData then
@@ -852,7 +856,7 @@ function MY_Recount_Detail.OnFrameBreathe()
 		for id, p in pairs(tData.Target) do
 			local rec = {
 				szKey  = id                              ,
-				szName = MY_Recount_DS.GetNameAusID(id, DataDisplay),
+				szName = MY_Recount_DS.GetNameAusID(DataDisplay, id),
 				nCount = not MY_Recount.bShowZeroVal and p.nNzCount or p.nCount,
 				nTotal = MY_Recount.bShowEffect and p.nTotalEffect or p.nTotal,
 			}
@@ -972,7 +976,7 @@ function MY_Recount_Detail.OnFrameBreathe()
 					nCriticalCount = MY_Recount.bShowZeroVal and (p.Count[SKILL_RESULT.CRITICAL] or 0) or p.NzCount[SKILL_RESULT.CRITICAL] or 0,
 					nMax           = MY_Recount.bShowEffect and p.nMaxEffect or p.nMax,
 					nTotal         = MY_Recount.bShowEffect and p.nTotalEffect or p.nTotal,
-					szName         = MY_Recount_DS.GetNameAusID(id, DataDisplay),
+					szName         = MY_Recount_DS.GetNameAusID(DataDisplay, id),
 				}
 				if MY_Recount.bShowZeroVal or rec.nTotal > 0 or rec.nMissCount > 0 then
 					insert(aResult, rec)
@@ -1179,11 +1183,11 @@ function MY_Recount.GetMenu()
 				return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
 			end,
 		}, {
-			szOption = _L['distinct target id with same name'],
+			szOption = _L['Group npc with same name'],
 			bCheck = true,
-			bChecked = MY_Recount_DS.bDistinctTargetID,
+			bChecked = MY_Recount.bGroupSameNpc,
 			fnAction = function()
-				MY_Recount_DS.bDistinctTargetID = not MY_Recount_DS.bDistinctTargetID
+				MY_Recount.bGroupSameNpc = not MY_Recount.bGroupSameNpc
 				MY_Recount.DrawUI()
 			end,
 			fnDisable = function()

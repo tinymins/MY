@@ -71,7 +71,6 @@ Data = {
 	nVersion = 数据版本号,
 	nTimeBegin  = 战斗开始UNIX时间戳,
 	nTimeDuring = 战斗持续秒数,
-	bDistinctTargetID = 该数据是否根据目标ID区分同名记录,
 	bDistinctEffectID = 该数据是否根据效果ID区分同名记录,
 	Awaytime = {
 		玩家的dwID = {
@@ -232,7 +231,6 @@ local O = {
 	nMaxHistory       = 10,
 	nMinFightTime     = 30,
 	bRecAnonymous     = true,
-	bDistinctTargetID = false,
 	bDistinctEffectID = false,
 	bRecEverything    = true,
 }
@@ -270,7 +268,6 @@ function D.LoadData()
 		O.nMaxHistory       = data.nMaxHistory   or 10
 		O.nMinFightTime     = data.nMinFightTime or 30
 		O.bRecAnonymous     = LIB.FormatDataStructure(data.bRecAnonymous, true)
-		O.bDistinctTargetID = LIB.FormatDataStructure(data.bDistinctTargetID, false)
 		O.bDistinctEffectID = LIB.FormatDataStructure(data.bDistinctEffectID, false)
 		O.bRecEverything    = LIB.FormatDataStructure(data.bRecEverything, false)
 	end
@@ -285,7 +282,6 @@ function D.SaveData()
 		nMaxHistory       = O.nMaxHistory,
 		nMinFightTime     = O.nMinFightTime,
 		bRecAnonymous     = O.bRecAnonymous,
-		bDistinctTargetID = O.bDistinctTargetID,
 		bDistinctEffectID = O.bDistinctEffectID,
 		bRecEverything    = O.bRecEverything,
 	}
@@ -528,46 +524,38 @@ function D.OnSkillEffect(dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLe
 	-- 识破
 	local nValue = tResult[SKILL_RESULT_TYPE.INSIGHT_DAMAGE]
 	if nValue and nValue > 0 then
-		D.AddDamageRecord(KCaster, KTarget, szDamageEffectName, nDamage, nEffectDamage, SKILL_RESULT.INSIGHT)
-	elseif nSkillResult == SKILL_RESULT.HIT or
-	nSkillResult == SKILL_RESULT.CRITICAL then -- 击中
+		D.AddDamageRecord(Data, dwCaster, dwTarget, szDamageEffectName, nDamage, nEffectDamage, SKILL_RESULT.INSIGHT)
+	elseif nSkillResult == SKILL_RESULT.HIT -- 击中
+		or nSkillResult == SKILL_RESULT.CRITICAL -- 会心
+	then
 		if nTherapy > 0 then -- 有治疗
-			D.AddHealRecord(KCaster, KTarget, szHealEffectName, nTherapy, nEffectTherapy, nSkillResult)
+			D.AddHealRecord(Data, dwCaster, dwTarget, szHealEffectName, nTherapy, nEffectTherapy, nSkillResult)
 		end
 		if nDamage > 0 or nTherapy == 0 then -- 有伤害 或者 无伤害无治疗的效果
-			D.AddDamageRecord(KCaster, KTarget, szDamageEffectName, nDamage, nEffectDamage, nSkillResult)
+			D.AddDamageRecord(Data, dwCaster, dwTarget, szDamageEffectName, nDamage, nEffectDamage, nSkillResult)
 		end
-	elseif nSkillResult == SKILL_RESULT.BLOCK or  -- 格挡
-	nSkillResult == SKILL_RESULT.SHIELD       or  -- 无效
-	nSkillResult == SKILL_RESULT.MISS         or  -- 偏离
-	nSkillResult == SKILL_RESULT.DODGE      then  -- 闪避
-		D.AddDamageRecord(KCaster, KTarget, szDamageEffectName, 0, 0, nSkillResult)
+	elseif nSkillResult == SKILL_RESULT.BLOCK  -- 格挡
+		or nSkillResult == SKILL_RESULT.SHIELD -- 无效
+		or nSkillResult == SKILL_RESULT.MISS   -- 偏离
+		or nSkillResult == SKILL_RESULT.DODGE  -- 闪避
+	then
+		D.AddDamageRecord(Data, dwCaster, dwTarget, szDamageEffectName, 0, 0, nSkillResult)
 	end
 
 	Data.nTimeDuring = GetCurrentTime() - Data.nTimeBegin
 	Data.nTickDuring = GetTime() - Data.nTickBegin
 end
 
-function D.GetNameAusID(id, data)
-	if not id or not data then
+-- 通过ID计算名字
+function D.GetNameAusID(data, dwID)
+	if not data or not dwID then
 		return
 	end
-
-	local dwID = tonumber(id)
-	local szName
-	if dwID then
-		szName = data.Namelist[dwID]
-	else
-		szName = id
-	end
-
-	if not szName then
-		szName = ''
-	end
-	return szName
+	return data.Namelist[dwID] or g_tStrings.STR_NAME_UNKNOWN
 end
 
-function D.IsParty(id, data)
+-- 判断是否是友军
+function D.IsParty(id)
 	local dwID = tonumber(id)
 	if dwID then
 		if dwID == UI_GetClientPlayerID() then
@@ -859,62 +847,52 @@ function D.InsertRecord(data, szRecordType, idRecord, idTarget, szEffectName, nV
 	end
 end
 
--- 获取索引ID
-local function GetObjectKeyID(obj)
-	if IsPlayer(obj.dwID) then
-		return obj.dwID
-	end
-	local id = LIB.GetObjectName(obj, 'never') or g_tStrings.STR_NAME_UNKNOWN
-	if Data.bDistinctTargetID then
-		id = id .. '#' .. obj.dwID
-	end
-	return id
-end
-
 -- 插入一条伤害记录
-function D.AddDamageRecord(KCaster, KTarget, szEffectName, nDamage, nEffectDamage, nSkillResult)
-	-- 获取索引ID
-	local idCaster = GetObjectKeyID(KCaster)
-	local idTarget = GetObjectKeyID(KTarget)
-
+function D.AddDamageRecord(data, dwCaster, dwTarget, szEffectName, nDamage, nEffectDamage, nSkillResult)
 	-- 添加伤害记录
-	D.InitObjectData(Data, KCaster, 'Damage')
-	D.InsertRecord(Data, 'Damage'  , idCaster, idTarget, szEffectName, nDamage, nEffectDamage, nSkillResult)
+	D.InitObjectData(data, dwCaster, 'Damage')
+	D.InsertRecord(data, 'Damage'  , dwCaster, dwTarget, szEffectName, nDamage, nEffectDamage, nSkillResult)
 	-- 添加承伤记录
-	D.InitObjectData(Data, KTarget, 'BeDamage')
-	D.InsertRecord(Data, 'BeDamage', idTarget, idCaster, szEffectName, nDamage, nEffectDamage, nSkillResult)
+	D.InitObjectData(data, dwTarget, 'BeDamage')
+	D.InsertRecord(data, 'BeDamage', dwTarget, dwCaster, szEffectName, nDamage, nEffectDamage, nSkillResult)
 end
 
 -- 插入一条治疗记录
-function D.AddHealRecord(KCaster, KTarget, szEffectName, nHeal, nEffectHeal, nSkillResult)
-	-- 获取索引ID
-	local idCaster = GetObjectKeyID(KCaster)
-	local idTarget = GetObjectKeyID(KTarget)
-
+function D.AddHealRecord(data, dwCaster, dwTarget, szEffectName, nHeal, nEffectHeal, nSkillResult)
 	-- 添加伤害记录
-	D.InitObjectData(Data, KCaster, 'Heal')
-	D.InsertRecord(Data, 'Heal'    , idCaster, idTarget, szEffectName, nHeal, nEffectHeal, nSkillResult)
+	D.InitObjectData(data, dwCaster, 'Heal')
+	D.InsertRecord(data, 'Heal'    , dwCaster, dwTarget, szEffectName, nHeal, nEffectHeal, nSkillResult)
 	-- 添加承伤记录
-	D.InitObjectData(Data, KTarget, 'BeHeal')
-	D.InsertRecord(Data, 'BeHeal'  , idTarget, idCaster, szEffectName, nHeal, nEffectHeal, nSkillResult)
+	D.InitObjectData(data, dwTarget, 'BeHeal')
+	D.InsertRecord(data, 'BeHeal'  , dwTarget, dwCaster, szEffectName, nHeal, nEffectHeal, nSkillResult)
 end
 
 -- 确认对象数据已创建（未创建则创建）
-function D.InitObjectData(data, obj, szChannel)
-	local id = GetObjectKeyID(obj)
-	if IsPlayer(obj.dwID) and not data.Namelist[id] then
-		data.Namelist[id]  = LIB.GetObjectName(obj, 'never') -- 名称缓存
-		data.Forcelist[id] = obj.dwForceID or 0           -- 势力缓存
+function D.InitObjectData(data, dwID, szChannel)
+	-- 名称缓存
+	if not data.Namelist[dwID] then
+		data.Namelist[dwID] = LIB.GetObjectName(IsPlayer(dwID) and TARGET.PLAYER or TARGET.NPC, dwID, 'never') -- 名称缓存
 	end
-
-	if not data[szChannel].Statistics[id] then
-		data[szChannel].Statistics[id] = {
-			szMD5        = obj.dwID, -- 唯一标识
-			nTotal       = 0       , -- 总输出
-			nTotalEffect = 0       , -- 有效输出
-			Detail       = {}      , -- 输出结果按技能结果分类统计
-			Skill        = {}      , -- 该玩家具体造成输出的技能统计
-			Target       = {}      , -- 该玩家具体对谁造成输出的统计
+	-- 势力缓存
+	if not data.Forcelist[dwID] then
+		if IsPlayer(dwID) then
+			local player = GetPlayer(dwID)
+			if player then
+				data.Forcelist[dwID] = player.dwForceID or 0
+			end
+		else
+			data.Forcelist[dwID] = 0
+		end
+	end
+	-- 统计结构体
+	if not data[szChannel].Statistics[dwID] then
+		data[szChannel].Statistics[dwID] = {
+			szMD5        = dwID, -- 唯一标识
+			nTotal       = 0   , -- 总输出
+			nTotalEffect = 0   , -- 有效输出
+			Detail       = {}  , -- 输出结果按技能结果分类统计
+			Skill        = {}  , -- 该玩家具体造成输出的技能统计
+			Target       = {}  , -- 该玩家具体对谁造成输出的统计
 		}
 	end
 end
@@ -936,7 +914,6 @@ function D.Init(bForceInit)
 		Data = {
 			UUID              = LIB.GetFightUUID(),                 -- 战斗唯一标识
 			nVersion          = VERSION,                           -- 数据版本号
-			bDistinctTargetID = O.bDistinctTargetID,               -- 是否根据ID区分同名目标
 			bDistinctEffectID = O.bDistinctEffectID,               -- 是否根据ID区分同名效果
 			nTimeBegin        = GetCurrentTime(),                  -- 战斗开始时间
 			nTickBegin        = GetTime(),                         -- 战斗开始毫秒时间
@@ -978,25 +955,25 @@ function D.Flush()
 	local nMaxValue, szBossName = 0, nil
 	local nEnemyMaxValue, szEnemyBossName = 0, nil
 	for id, p in pairs(Data.BeDamage.Statistics) do
-		if nEnemyMaxValue < p.nTotalEffect and not D.IsParty(id, Data) then
+		if nEnemyMaxValue < p.nTotalEffect and not D.IsParty(id) then
 			nEnemyMaxValue  = p.nTotalEffect
-			szEnemyBossName = D.GetNameAusID(id, Data)
+			szEnemyBossName = D.GetNameAusID(Data, id)
 		end
 		if nMaxValue < p.nTotalEffect and id ~= UI_GetClientPlayerID() then
 			nMaxValue  = p.nTotalEffect
-			szBossName = D.GetNameAusID(id, Data)
+			szBossName = D.GetNameAusID(Data, id)
 		end
 	end
 	-- 如果没有 则计算输出最多的NPC名字作为战斗名称
 	if not szBossName or not szEnemyBossName then
 		for id, p in pairs(Data.Damage.Statistics) do
-			if nEnemyMaxValue < p.nTotalEffect and not D.IsParty(id, Data) then
+			if nEnemyMaxValue < p.nTotalEffect and not D.IsParty(id) then
 				nEnemyMaxValue  = p.nTotalEffect
-				szEnemyBossName = D.GetNameAusID(id, Data)
+				szEnemyBossName = D.GetNameAusID(Data, id)
 			end
 			if nMaxValue < p.nTotalEffect and not tonumber(id) then
 				nMaxValue  = p.nTotalEffect
-				szBossName = D.GetNameAusID(id, Data)
+				szBossName = D.GetNameAusID(Data, id)
 			end
 		end
 	end
@@ -1228,7 +1205,6 @@ local settings = {
 				nMaxHistory       = true,
 				nMinFightTime     = true,
 				bRecAnonymous     = true,
-				bDistinctTargetID = true,
 				bDistinctEffectID = true,
 				bRecEverything    = true,
 			},
@@ -1242,7 +1218,6 @@ local settings = {
 				nMaxHistory       = true,
 				nMinFightTime     = true,
 				bRecAnonymous     = true,
-				bDistinctTargetID = true,
 				bDistinctEffectID = true,
 				bRecEverything    = true,
 			},
@@ -1251,7 +1226,6 @@ local settings = {
 				nMaxHistory       = D.SaveData,
 				nMinFightTime     = D.SaveData,
 				bRecAnonymous     = D.SaveData,
-				bDistinctTargetID = D.SaveData,
 				bDistinctEffectID = D.SaveData,
 				bRecEverything    = D.SaveData,
 			},
