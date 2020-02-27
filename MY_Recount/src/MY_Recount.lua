@@ -46,28 +46,23 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
 end
 --------------------------------------------------------------------------
 
-local CHANNEL = { -- 统计类型
+local STAT_TYPE = { -- 统计类型
 	DPS  = 1, -- 输出统计
 	HPS  = 2, -- 治疗统计
 	BDPS = 3, -- 承伤统计
 	BHPS = 4, -- 承疗统计
 }
-local SZ_CHANNEL_KEY = { -- 统计类型数组名
-	[CHANNEL.DPS ] = 'Damage',
-	[CHANNEL.HPS ] = 'Heal',
-	[CHANNEL.BDPS] = 'BeDamage',
-	[CHANNEL.BHPS] = 'BeHeal',
+local STAT_TYPE_KEY = { -- 统计类型数组名
+	[STAT_TYPE.DPS ] = 'Damage',
+	[STAT_TYPE.HPS ] = 'Heal',
+	[STAT_TYPE.BDPS] = 'BeDamage',
+	[STAT_TYPE.BHPS] = 'BeHeal',
 }
-local SZ_CHANNEL = {
-	[CHANNEL.DPS ] = g_tStrings.STR_DAMAGE_STATISTIC    , -- 伤害统计
-	[CHANNEL.HPS ] = g_tStrings.STR_THERAPY_STATISTIC   , -- 治疗统计
-	[CHANNEL.BDPS] = g_tStrings.STR_BE_DAMAGE_STATISTIC , -- 承伤统计
-	[CHANNEL.BHPS] = g_tStrings.STR_BE_THERAPY_STATISTIC, -- 承疗统计
-}
-local DISPLAY_MODE = { -- 统计显示
-	NPC    = 1, -- 只显示NPC
-	PLAYER = 2, -- 只显示玩家
-	BOTH   = 3, -- 混合显示
+local STAT_TYPE_NAME = {
+	[STAT_TYPE.DPS ] = g_tStrings.STR_DAMAGE_STATISTIC    , -- 伤害统计
+	[STAT_TYPE.HPS ] = g_tStrings.STR_THERAPY_STATISTIC   , -- 治疗统计
+	[STAT_TYPE.BDPS] = g_tStrings.STR_BE_DAMAGE_STATISTIC , -- 承伤统计
+	[STAT_TYPE.BHPS] = g_tStrings.STR_BE_THERAPY_STATISTIC, -- 承疗统计
 }
 local PUBLISH_MODE = {
 	EFFECT = 1, -- 只显示有效值
@@ -92,147 +87,16 @@ local SZ_SKILL_RESULT = {
 	[SKILL_RESULT.CRITICAL] = g_tStrings.STR_CS_NAME      ,
 	[SKILL_RESULT.INSIGHT ] = g_tStrings.STR_MSG_INSIGHT  ,
 }
-local _C = {
-	szIniRoot   = PACKET_INFO.ROOT .. 'MY_Recount/ui/',
-	szIniFile   = PACKET_INFO.ROOT .. 'MY_Recount/ui/MY_Recount.ini',
-	szIniDetail = PACKET_INFO.ROOT .. 'MY_Recount/ui/MY_Recount_Detail.ini',
-	tRandFrame  = {
-		169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182,
-		183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193
-	},
+
+local D = {}
+local O = {
+	nPublishMode = PUBLISH_MODE.EFFECT, -- 发布模式
 }
-local FORCE_BAR_CSS = {
-	{}, -- GLOBAL
-	{
-		[-1                  ] = { r = 255, g = 255, b = 255, a = 150 }, -- NPC
-		[CONSTANT.FORCE_TYPE.JIANG_HU ] = { r = 255, g = 255, b = 255, a = 255 }, -- 江湖
-		[CONSTANT.FORCE_TYPE.SHAO_LIN ] = { r = 210, g = 180, b = 0  , a = 144 }, -- 少林
-		[CONSTANT.FORCE_TYPE.WAN_HUA  ] = { r = 127, g = 31 , b = 223, a = 180 }, -- 万花
-		[CONSTANT.FORCE_TYPE.TIAN_CE  ] = { r = 160, g = 0  , b = 0  , a = 200 }, -- 天策
-		[CONSTANT.FORCE_TYPE.CHUN_YANG] = { r = 56 , g = 175, b = 255, a = 144 }, -- 纯阳 56,175,255,232
-		[CONSTANT.FORCE_TYPE.QI_XIU   ] = { r = 255, g = 127, b = 255, a = 128 }, -- 七秀
-		[CONSTANT.FORCE_TYPE.WU_DU    ] = { r = 63 , g = 31 , b = 159, a = 128 }, -- 五毒
-		[CONSTANT.FORCE_TYPE.TANG_MEN ] = { r = 0  , g = 133, b = 144, a = 180 }, -- 唐门
-		[CONSTANT.FORCE_TYPE.CANG_JIAN] = { r = 255, g = 255, b = 0  , a = 144 }, -- 藏剑
-		[CONSTANT.FORCE_TYPE.GAI_BANG ] = { r = 205, g = 133, b = 63 , a = 180 }, -- 丐帮
-		[CONSTANT.FORCE_TYPE.MING_JIAO] = { r = 253, g = 84 , b = 0  , a = 144 }, -- 明教
-		[CONSTANT.FORCE_TYPE.CANG_YUN ] = { r = 180, g = 60 , b = 0  , a = 255 }, -- 苍云
-		[CONSTANT.FORCE_TYPE.CHANG_GE ] = { r = 100, g = 250, b = 180, a = 100 }, -- 长歌
-		[CONSTANT.FORCE_TYPE.BA_DAO   ] = { r = 71 , g = 73 , b = 166, a = 128 }, -- 霸刀
-		[CONSTANT.FORCE_TYPE.PENG_LAI ] = { r = 195, g = 171, b = 227, a = 250 }, -- 蓬莱
-	},
-	{
-		[-1                  ] = { r = 255, g = 255, b = 255, a = 150 }, -- NPC
-		[CONSTANT.FORCE_TYPE.JIANG_HU ] = { r = 255, g = 255, b = 255, a = 255 }, -- 江湖
-		[CONSTANT.FORCE_TYPE.SHAO_LIN ] = { r = 210, g = 180, b = 0  , a = 144 }, -- 少林
-		[CONSTANT.FORCE_TYPE.WAN_HUA  ] = { r = 100, g = 0  , b = 150, a = 96  }, -- 万花
-		[CONSTANT.FORCE_TYPE.TIAN_CE  ] = { r = 0  , g = 128, b = 0  , a = 255 }, -- 天策
-		[CONSTANT.FORCE_TYPE.CHUN_YANG] = { r = 0  , g = 175, b = 230, a = 112 }, -- 纯阳
-		[CONSTANT.FORCE_TYPE.QI_XIU   ] = { r = 240, g = 80 , b = 240, a = 96  }, -- 七秀
-		[CONSTANT.FORCE_TYPE.WU_DU    ] = { r = 0  , g = 128, b = 255, a = 144 }, -- 五毒
-		[CONSTANT.FORCE_TYPE.TANG_MEN ] = { r = 121, g = 183, b = 54 , a = 144 }, -- 唐门
-		[CONSTANT.FORCE_TYPE.CANG_JIAN] = { r = 215, g = 241, b = 74 , a = 144 }, -- 藏剑
-		[CONSTANT.FORCE_TYPE.GAI_BANG ] = { r = 205, g = 133, b = 63 , a = 180 }, -- 丐帮
-		[CONSTANT.FORCE_TYPE.MING_JIAO] = { r = 240, g = 70 , b = 96 , a = 180 }, -- 明教
-		[CONSTANT.FORCE_TYPE.CANG_YUN ] = { r = 180, g = 60 , b = 0  , a = 255 }, -- 苍云
-		[CONSTANT.FORCE_TYPE.CHANG_GE ] = { r = 100, g = 250, b = 180, a = 150 }, -- 长歌
-		[CONSTANT.FORCE_TYPE.BA_DAO   ] = { r = 71 , g = 73 , b = 166, a = 128 }, -- 霸刀
-		[CONSTANT.FORCE_TYPE.PENG_LAI ] = { r = 195, g = 171, b = 227, a = 250 }, -- 蓬莱
-	},
-	{
-		[-1                  ] = { image = 'ui/Image/Common/Money.UITex', frame = 215 }, -- NPC
-		[CONSTANT.FORCE_TYPE.JIANG_HU ] = { image = 'ui/Image/Common/Money.UITex', frame = 210 }, -- 大侠
-		[CONSTANT.FORCE_TYPE.SHAO_LIN ] = { image = 'ui/Image/Common/Money.UITex', frame = 203 }, -- 少林
-		[CONSTANT.FORCE_TYPE.WAN_HUA  ] = { image = 'ui/Image/Common/Money.UITex', frame = 205 }, -- 万花
-		[CONSTANT.FORCE_TYPE.TIAN_CE  ] = { image = 'ui/Image/Common/Money.UITex', frame = 206 }, -- 天策
-		[CONSTANT.FORCE_TYPE.CHUN_YANG] = { image = 'ui/Image/Common/Money.UITex', frame = 209 }, -- 纯阳
-		[CONSTANT.FORCE_TYPE.QI_XIU   ] = { image = 'ui/Image/Common/Money.UITex', frame = 204 }, -- 七秀
-		[CONSTANT.FORCE_TYPE.WU_DU    ] = { image = 'ui/Image/Common/Money.UITex', frame = 208 }, -- 五毒
-		[CONSTANT.FORCE_TYPE.TANG_MEN ] = { image = 'ui/Image/Common/Money.UITex', frame = 207 }, -- 唐门
-		[CONSTANT.FORCE_TYPE.CANG_JIAN] = { image = 'ui/Image/Common/Money.UITex', frame = 168 }, -- 藏剑
-		[CONSTANT.FORCE_TYPE.GAI_BANG ] = { image = 'ui/Image/Common/Money.UITex', frame = 234 }, -- 丐帮
-		[CONSTANT.FORCE_TYPE.MING_JIAO] = { image = 'ui/Image/Common/Money.UITex', frame = 232 }, -- 明教
-		[CONSTANT.FORCE_TYPE.CANG_YUN ] = { image = 'ui/Image/Common/Money.UITex', frame = 26  }, -- 苍云
-		[CONSTANT.FORCE_TYPE.CHANG_GE ] = { image = 'ui/Image/Common/Money.UITex', frame = 30  }, -- 长歌
-		[CONSTANT.FORCE_TYPE.BA_DAO   ] = { image = 'ui/Image/Common/Money.UITex', frame = 35  }, -- 霸刀
-		[CONSTANT.FORCE_TYPE.PENG_LAI ] = { image = 'ui/Image/Common/Money.UITex', frame = 42  }, -- 蓬莱
-	},
-	{
-		[-1                  ] = { image = 'ui/Image/Common/Money.UITex', frame = 220 }, -- NPC
-		[CONSTANT.FORCE_TYPE.JIANG_HU ] = { image = 'ui/Image/Common/Money.UITex', frame = 220 }, -- 大侠
-		[CONSTANT.FORCE_TYPE.SHAO_LIN ] = { image = 'ui/Image/Common/Money.UITex', frame = 216 }, -- 少林
-		[CONSTANT.FORCE_TYPE.WAN_HUA  ] = { image = 'ui/Image/Common/Money.UITex', frame = 212 }, -- 万花
-		[CONSTANT.FORCE_TYPE.TIAN_CE  ] = { image = 'ui/Image/Common/Money.UITex', frame = 215 }, -- 天策
-		[CONSTANT.FORCE_TYPE.CHUN_YANG] = { image = 'ui/Image/Common/Money.UITex', frame = 218 }, -- 纯阳
-		[CONSTANT.FORCE_TYPE.QI_XIU   ] = { image = 'ui/Image/Common/Money.UITex', frame = 211 }, -- 七秀
-		[CONSTANT.FORCE_TYPE.WU_DU    ] = { image = 'ui/Image/Common/Money.UITex', frame = 213 }, -- 五毒
-		[CONSTANT.FORCE_TYPE.TANG_MEN ] = { image = 'ui/Image/Common/Money.UITex', frame = 214 }, -- 唐门
-		[CONSTANT.FORCE_TYPE.CANG_JIAN] = { image = 'ui/Image/Common/Money.UITex', frame = 217 }, -- 藏剑
-		[CONSTANT.FORCE_TYPE.GAI_BANG ] = { image = 'ui/Image/Common/Money.UITex', frame = 233 }, -- 丐帮
-		[CONSTANT.FORCE_TYPE.MING_JIAO] = { image = 'ui/Image/Common/Money.UITex', frame = 228 }, -- 明教
-		[CONSTANT.FORCE_TYPE.CANG_YUN ] = { image = 'ui/Image/Common/Money.UITex', frame = 219 }, -- 苍云
-		[CONSTANT.FORCE_TYPE.CHANG_GE ] = { image = 'ui/Image/Common/Money.UITex', frame = 30  }, -- 长歌
-		[CONSTANT.FORCE_TYPE.BA_DAO   ] = { image = 'ui/Image/Common/Money.UITex', frame = 35  }, -- 霸刀
-		[CONSTANT.FORCE_TYPE.PENG_LAI ] = { image = 'ui/Image/Common/Money.UITex', frame = 42  }, -- 蓬莱
-	},
-}
-
-do
-local function CalcGlobalCss()
-	local tCss = FORCE_BAR_CSS[1]
-	for _, dwForceID in pairs_c(CONSTANT.FORCE_TYPE) do
-		local r, g, b = LIB.GetForceColor(dwForceID, 'background')
-		tCss[dwForceID] = { r = r, g = g, b = b, a = 150 }
-	end
-	local r, g, b = LIB.GetForceColor(-1, 'background')
-	tCss[-1] = { r = r, g = g, b = b, a = 150 }
-end
-CalcGlobalCss()
-
-local function onForceColorUpdate()
-	CalcGlobalCss()
-	MY_Recount.DrawUI()
-end
-LIB.RegisterEvent('MY_FORCE_COLOR_UPDATE', onForceColorUpdate)
-end
-
--- 新的战斗数据时
-LIB.RegisterEvent('MY_RECOUNT_NEW_FIGHT', function()
-	if not _C.bHistoryMode then
-		MY_Recount.DisplayData(0)
-	end
-end)
-
-MY_Recount = MY_Recount or {}
-MY_Recount.nCss          = 1                    -- 当前样式表
-MY_Recount.nChannel      = CHANNEL.DPS          -- 当前显示的统计模式
-MY_Recount.bAwayMode     = true                 -- 计算DPS时是否减去暂离时间
-MY_Recount.bSysTimeMode  = false                -- 使用官方战斗统计计时方式
-MY_Recount.bGroupSameNpc = true                 -- 是否合并同名NPC数据
-MY_Recount.bShowPerSec   = true                 -- 显示为每秒数据（反之显示总和）
-MY_Recount.bShowEffect   = true                 -- 显示有效伤害/治疗
-MY_Recount.bShowZeroVal  = false                -- 显示零值记录
-MY_Recount.nDisplayMode  = DISPLAY_MODE.BOTH    -- 统计显示模式（显示NPC/玩家数据）（默认混合显示）
-MY_Recount.nPublishMode  = PUBLISH_MODE.EFFECT  -- 发布模式
-MY_Recount.nDrawInterval = GLOBAL.GAME_FPS / 2  -- UI重绘周期（帧）
-MY_Recount.bShowNodataTeammate = false  -- 显示没有数据的队友
-MY_Recount.anchor = { x=0, y=-70, s='BOTTOMRIGHT', r='BOTTOMRIGHT' } -- 默认坐标
-RegisterCustomData('MY_Recount.nCss')
-RegisterCustomData('MY_Recount.nChannel')
-RegisterCustomData('MY_Recount.bAwayMode')
-RegisterCustomData('MY_Recount.bSysTimeMode')
-RegisterCustomData('MY_Recount.bShowPerSec')
-RegisterCustomData('MY_Recount.bShowEffect')
-RegisterCustomData('MY_Recount.nDisplayMode')
 RegisterCustomData('MY_Recount.nPublishMode')
-RegisterCustomData('MY_Recount.nDrawInterval')
-RegisterCustomData('MY_Recount.bShowNodataTeammate')
-RegisterCustomData('MY_Recount.anchor')
 
-local MY_Recount = MY_Recount
-local D, DataDisplay = {}
+local DataDisplay
 
-local function GetShowName(szName, bPlayer)
+function D.GetTargetShowName(szName, bPlayer)
 	szName = szName:gsub('#.*', '')
 	if bPlayer and MY_ChatMosaics and MY_ChatMosaics.MosaicsString then
 		szName = MY_ChatMosaics.MosaicsString(szName)
@@ -240,889 +104,28 @@ local function GetShowName(szName, bPlayer)
 	return szName
 end
 
-local m_frame
-function MY_Recount.Open()
-	-- open
-	m_frame = Wnd.OpenWindow(_C.szIniFile, 'MY_Recount')
-	-- pos
-	local anchor = LIB.GetStorage('FrameAnchor.MY_Recount')
-		or { x = 0, y = -70, s = 'BOTTOMRIGHT', r = 'BOTTOMRIGHT' }
-	UI(m_frame):Anchor(anchor)
-	LIB.RegisterEvent('UI_SCALED.MY_RECOUNT', function()
-		UI(m_frame):Anchor(anchor)
-	end)
-	-- draw
-	MY_Recount.DrawUI()
-end
-
-
-function MY_Recount.Close()
-	Wnd.CloseWindow(m_frame)
-	LIB.RegisterEvent('UI_SCALED.MY_RECOUNT')
-end
-
-LIB.RegisterInit('MY_RECOUNT', function()
-	MY_Recount.LoadCustomCss()
-end)
-
-LIB.RegisterStorageInit('MY_RECOUNT', function()
-	if LIB.GetStorage('BoolValues.MY_Recount_Enable') then
-		MY_Recount.Open()
-	else
-		MY_Recount.Close()
-	end
-end)
-
--- ########################################################################## --
---                               #         #               #             #    --
---                               #       #   #         #   #             #    --
---   # #     # # # # # # #     #       #       #       # # # # #   #     #    --
---     #     #       #       #     # #           #   #     #       #     #    --
---     #     #       #       # # #     # # # # #     # # # # # # # #     #    --
---     #     #       #           #                         #       #     #    --
---     #     #       #         #                       # # # # #   #     #    --
---     #     #       #       # # #   # # # # # # #     #   #   #   #     #    --
---     #     #       #                   #             #   #   #   #     #    --
---       # #     # # # # #       #     #       #       #   #   #         #    --
---                           # #     # # # # # # #     #   # # #         #    --
---                                               #         #         # # #    --
--- ########################################################################## --
-function MY_Recount.LoadCustomCss(nCss)
-	if not nCss then
-		nCss = MY_Recount.nCss
-	else
-		MY_Recount.nCss = nCss
-	end
-	_C.tCss = FORCE_BAR_CSS[nCss] or FORCE_BAR_CSS[1]
-end
-
--- 切换绑定显示记录
--- MY_Recount.DisplayData(number nHistory): 显示第nHistory条历史记录 当nHistory等于0时显示当前记录
--- MY_Recount.DisplayData(table  data): 显示数据为data的历史记录
-function MY_Recount.DisplayData(data)
-	if type(data) == 'number' then
+-- 设置当前显示记录
+-- D.SetDisplayData(number nHistory): 显示第nHistory条历史记录 当nHistory等于0时显示当前记录
+-- D.SetDisplayData(table  data): 显示数据为data的历史记录
+function D.SetDisplayData(data)
+	if IsNumber(data) then
 		data = MY_Recount_DS.Get(data)
 	end
-	_C.bHistoryMode = (data ~= MY_Recount_DS.Get(0))
+	D.bHistoryMode = data ~= MY_Recount_DS.Get(0)
 
-	if type(data) == 'table' then
+	if IsTable(data) then
 		DataDisplay = data
-		MY_Recount.DrawUI()
+		FireUIEvent('MY_RECOUNT_DISP_DATA_UPDATE')
 	end
 end
 
-function MY_Recount.DrawUI(data)
-	if not data then
-		data = DataDisplay
-	end
-	if not (m_frame and data and _C.tCss) then
-		return
-	end
-
-	m_frame:Lookup('Wnd_Title', 'Text_Title'):SetText(SZ_CHANNEL[MY_Recount.nChannel])
-	m_frame:Lookup('Wnd_Main', 'Handle_List'):Clear()
-	m_frame:Lookup('Wnd_Main', 'Handle_Me').bInited = nil
-
-	MY_Recount.UpdateUI(data)
+-- 获取当前显示记录
+function D.GetDisplayData()
+	return DataDisplay, D.bHistoryMode
 end
 
-function MY_Recount.UpdateUI(data)
-	if not data then
-		data = DataDisplay
-	end
-
-	if not m_frame then
-		return
-	end
-
-	-- 获取统计数据
-	local tInfo, szUnit
-	if MY_Recount.nChannel == CHANNEL.DPS then       -- 伤害统计
-		tInfo, szUnit = data.Damage  , 'DPS'
-	elseif MY_Recount.nChannel == CHANNEL.HPS then   -- 治疗统计
-		tInfo, szUnit = data.Heal    , 'HPS'
-	elseif MY_Recount.nChannel == CHANNEL.BDPS then  -- 承伤统计
-		tInfo, szUnit = data.BeDamage, 'DPS'
-	elseif MY_Recount.nChannel == CHANNEL.BHPS then  -- 承疗统计
-		tInfo, szUnit = data.BeHeal  , 'HPS'
-	end
-	local tRecord = tInfo.Statistics
-
-	-- 计算战斗时间
-	local szTimeChannel = MY_Recount.bSysTimeMode and SZ_CHANNEL_KEY[MY_Recount.nChannel]
-	local nTimeCount = MY_Recount_DS.GeneFightTime(data, szTimeChannel)
-	local szTimeCount = LIB.FormatTimeCounter(nTimeCount, '%M:%ss')
-	if LIB.IsInArena() then
-		szTimeCount = LIB.GetFightTime('M:ss')
-	end
-	-- 自己的记录
-	local tMyRec
-
-	-- 整理数据 生成要显示的列表
-	local nMaxValue, aResult, tResult = 0, {}, {}
-	for dwID, rec in pairs(tRecord) do
-		if (MY_Recount.bShowZeroVal or rec[MY_Recount.bShowEffect and 'nTotalEffect' or 'nTotal'] > 0)
-		and (
-			MY_Recount.nDisplayMode == DISPLAY_MODE.BOTH or  -- 确定显示模式（显示NPC/显示玩家/全部显示）
-			(MY_Recount.nDisplayMode == DISPLAY_MODE.NPC and not IsPlayer(dwID)) or
-			(MY_Recount.nDisplayMode == DISPLAY_MODE.PLAYER and IsPlayer(dwID))
-		) then
-			local id, tRec = dwID
-			if not IsPlayer(dwID) then
-				id = MY_Recount.bGroupSameNpc and MY_Recount_DS.GetNameAusID(data, dwID) or dwID
-				tRec = tResult[id]
-			end
-			if tRec then -- 同名合并数据
-				tRec.nValue = tRec.nValue + (rec.nTotal or 0)
-				tRec.nEffectValue = tRec.nEffectValue + (rec.nTotalEffect or 0)
-			else -- 新数据
-				tRec = {
-					id           = id                                     ,
-					szMD5        = rec.szMD5                              ,
-					szName       = MY_Recount_DS.GetNameAusID(data, dwID) ,
-					dwForceID    = MY_Recount_DS.GetForceAusID(data, dwID),
-					nValue       = rec.nTotal or 0                        ,
-					nEffectValue = rec.nTotalEffect or 0                  ,
-					nTimeCount   = max( -- 计算战斗时间 防止计算DPS时除以0
-						MY_Recount.bAwayMode
-							and MY_Recount_DS.GeneFightTime(data, szTimeChannel, dwID) -- 删去死亡时间
-							or nTimeCount,
-						1), -- 不删去暂离时间
-				}
-				tResult[id] = tRec
-				insert(aResult, tRec)
-			end
-		end
-	end
-	-- 全程没数据的队友
-	if LIB.IsInParty() and MY_Recount.bShowNodataTeammate then
-		local list = GetClientTeam().GetTeamMemberList()
-		for _, dwID in ipairs(list) do
-			local info = GetClientTeam().GetMemberInfo(dwID)
-			if not tResult[dwID] then
-				insert(aResult, {
-					id             = dwID              ,
-					-- szMD5          = info.szMD5        ,
-					szName         = info.szName       ,
-					dwForceID      = info.dwForceID    ,
-					nValue         = 0                 ,
-					nEffectValue   = 0                 ,
-					nTimeCount     = max(nTimeCount, 1),
-				})
-				tResult[dwID] = aResult
-			end
-		end
-	end
-
-	-- 计算平均值、最大值
-	for _, tRec in ipairs(aResult) do
-		if MY_Recount.bShowPerSec then -- 计算平均值
-			tRec.nValuePS       = tRec.nValue / tRec.nTimeCount
-			tRec.nEffectValuePS = tRec.nEffectValue / tRec.nTimeCount
-			nMaxValue = max(nMaxValue, tRec.nValuePS, tRec.nEffectValuePS)
-		else
-			nMaxValue = max(nMaxValue, tRec.nValue, tRec.nEffectValue)
-		end
-	end
-
-	-- 列表排序
-	local szSortKey = 'nValue'
-	if MY_Recount.bShowEffect and MY_Recount.bShowPerSec then
-		szSortKey = 'nEffectValuePS'
-	elseif MY_Recount.bShowEffect then
-		szSortKey = 'nEffectValue'
-	elseif MY_Recount.bShowPerSec then
-		szSortKey = 'nValuePS'
-	end
-	sort(aResult, function(p1, p2)
-		return p1[szSortKey] > p2[szSortKey]
-	end)
-
-	-- 渲染列表
-	local hList = m_frame:Lookup('Wnd_Main', 'Handle_List')
-	for i, p in pairs(aResult) do
-		-- 自己的记录
-		if p.id == UI_GetClientPlayerID() then
-			tMyRec = p
-			tMyRec.nRank = i
-		end
-		local hItem = hList:Lookup('Handle_LI_' .. (p.szMD5 or p.id))
-		if not hItem then
-			hItem = hList:AppendItemFromIni(_C.szIniFile, 'Handle_Item')
-			hItem.OnItemRefreshTip = MY_Recount.OnItemRefreshTip
-			hItem:SetName('Handle_LI_' .. (p.szMD5 or p.id))
-			local css = _C.tCss[p.dwForceID] or {}
-			if css.image and css.frame then -- uitex, frame
-				hItem:Lookup('Image_PerFore'):FromUITex(css.image, css.frame)
-				hItem:Lookup('Image_PerBack'):FromUITex(css.image, css.frame)
-				hItem:Lookup('Shadow_PerFore'):Hide()
-				hItem:Lookup('Shadow_PerBack'):Hide()
-			else -- r, g, b
-				hItem:Lookup('Shadow_PerFore'):SetColorRGB(css.r or 0, css.g or 0, css.b or 0)
-				hItem:Lookup('Shadow_PerBack'):SetColorRGB(css.r or 0, css.g or 0, css.b or 0)
-				hItem:Lookup('Image_PerFore'):Hide()
-				hItem:Lookup('Image_PerBack'):Hide()
-			end
-			hItem:Lookup('Image_PerFore'):SetAlpha(css.a or 255)
-			hItem:Lookup('Image_PerBack'):SetAlpha((css.a or 255) / 255 * 100)
-			hItem:Lookup('Shadow_PerFore'):SetAlpha(css.a or 255)
-			hItem:Lookup('Shadow_PerBack'):SetAlpha((css.a or 255) / 255 * 100)
-			hItem:Lookup('Text_L'):SetText(GetShowName(p.szName, p.dwForceID ~= -1))
-			hItem.id = p.id
-		end
-		if hItem:GetIndex() ~= i - 1 then
-			hItem:ExchangeIndex(i - 1)
-		end
-		-- 排名
-		if _C.tRandFrame[i] then
-			hItem:Lookup('Text_Rank'):Hide()
-			hItem:Lookup('Image_Rank'):Show()
-			hItem:Lookup('Image_Rank'):SetFrame(_C.tRandFrame[i])
-		else
-			hItem:Lookup('Text_Rank'):SetText(i .. '.')
-			hItem:Lookup('Text_Rank'):Show()
-			hItem:Lookup('Image_Rank'):Hide()
-		end
-		-- 色块长度
-		local fPerBack, fPerFore = 0, 0
-		if nMaxValue > 0 then
-			if MY_Recount.bShowPerSec then
-				fPerBack = p.nValuePS / nMaxValue
-				fPerFore = p.nEffectValuePS / nMaxValue
-			else
-				fPerBack = p.nValue / nMaxValue
-				fPerFore = p.nEffectValue / nMaxValue
-			end
-			hItem:Lookup('Image_PerBack'):SetPercentage(fPerBack)
-			hItem:Lookup('Image_PerFore'):SetPercentage(fPerFore)
-			hItem:Lookup('Shadow_PerBack'):SetW(fPerBack * hItem:GetW())
-			hItem:Lookup('Shadow_PerFore'):SetW(fPerFore * hItem:GetW())
-		end
-		-- 死亡/离线 特殊颜色
-		local tAway = data.Awaytime[p.id]
-		local bAway = tAway and #tAway > 0 and not tAway[#tAway][2]
-		if hItem.bAway ~= bAway then
-			if bAway then
-				hItem:Lookup('Text_L'):SetFontColor(192, 192, 192)
-				hItem:Lookup('Text_R'):SetFontColor(192, 192, 192)
-			else
-				hItem:Lookup('Text_L'):SetFontColor(255, 255, 255)
-				hItem:Lookup('Text_R'):SetFontColor(255, 255, 255)
-			end
-		end
-		-- 数值显示
-		if MY_Recount.bShowEffect then
-			if MY_Recount.bShowPerSec then
-				hItem:Lookup('Text_R'):SetText(math.floor(p.nEffectValue / p.nTimeCount) .. ' ' .. szUnit)
-			else
-				hItem:Lookup('Text_R'):SetText(p.nEffectValue)
-			end
-		else
-			if MY_Recount.bShowPerSec then
-				hItem:Lookup('Text_R'):SetText(math.floor(p.nValue / p.nTimeCount) .. ' ' .. szUnit)
-			else
-				hItem:Lookup('Text_R'):SetText(p.nValue)
-			end
-		end
-		hItem.data = p
-	end
-	hList.szUnit     = szUnit
-	hList.nTimeCount = nTimeCount
-	hList:FormatAllItemPos()
-
-	-- 渲染底部自己的统计
-	local hItem = m_frame:Lookup('Wnd_Main', 'Handle_Me')
-	-- 初始化颜色
-	if not hItem.bInited then
-		hItem.OnItemRefreshTip = MY_Recount.OnItemRefreshTip
-		local dwForceID = (LIB.GetClientInfo() or {}).dwForceID
-		if dwForceID then
-			local css = _C.tCss[dwForceID] or {}
-			if css.image and css.frame then -- uitex, frame
-				hItem:Lookup('Image_Me_PerFore'):FromUITex(css.image, css.frame)
-				hItem:Lookup('Image_Me_PerBack'):FromUITex(css.image, css.frame)
-				hItem:Lookup('Shadow_Me_PerFore'):Hide()
-				hItem:Lookup('Shadow_Me_PerBack'):Hide()
-				hItem:Lookup('Image_Me_PerFore'):Show()
-				hItem:Lookup('Image_Me_PerBack'):Show()
-			else -- r, g, b
-				hItem:Lookup('Shadow_Me_PerFore'):SetColorRGB(css.r or 0, css.g or 0, css.b or 0)
-				hItem:Lookup('Shadow_Me_PerBack'):SetColorRGB(css.r or 0, css.g or 0, css.b or 0)
-				hItem:Lookup('Shadow_Me_PerFore'):Show()
-				hItem:Lookup('Shadow_Me_PerBack'):Show()
-				hItem:Lookup('Image_Me_PerFore'):Hide()
-				hItem:Lookup('Image_Me_PerBack'):Hide()
-			end
-			hItem:Lookup('Image_Me_PerFore'):SetAlpha(css.a or 255)
-			hItem:Lookup('Image_Me_PerBack'):SetAlpha((css.a or 255) / 255 * 100)
-			hItem:Lookup('Shadow_Me_PerFore'):SetAlpha(css.a or 255)
-			hItem:Lookup('Shadow_Me_PerBack'):SetAlpha((css.a or 255) / 255 * 100)
-			hItem.bInited = true
-		end
-	end
-	if tMyRec then
-		local fPerBack, fPerFore = 0, 0
-		if nMaxValue > 0 then
-			if MY_Recount.bShowPerSec then
-				fPerBack = tMyRec.nValuePS / nMaxValue
-				fPerFore = tMyRec.nEffectValuePS / nMaxValue
-			else
-				fPerBack = tMyRec.nValue / nMaxValue
-				fPerFore = tMyRec.nEffectValue / nMaxValue
-			end
-			hItem:Lookup('Image_Me_PerBack'):SetPercentage(fPerBack)
-			hItem:Lookup('Image_Me_PerFore'):SetPercentage(fPerFore)
-			hItem:Lookup('Shadow_Me_PerBack'):SetW(fPerBack * hItem:GetW())
-			hItem:Lookup('Shadow_Me_PerFore'):SetW(fPerFore * hItem:GetW())
-		else
-			hItem:Lookup('Image_Me_PerBack'):SetPercentage(1)
-			hItem:Lookup('Image_Me_PerFore'):SetPercentage(1)
-			hItem:Lookup('Shadow_Me_PerBack'):SetW(hItem:GetW())
-			hItem:Lookup('Shadow_Me_PerFore'):SetW(hItem:GetW())
-		end
-		-- 左侧战斗计时
-		hItem:Lookup('Text_Me_L'):SetText('[' .. tMyRec.nRank .. '] ' .. szTimeCount)
-		-- 右侧文字
-		if MY_Recount.bShowEffect then
-			if MY_Recount.bShowPerSec then
-				hItem:Lookup('Text_Me_R'):SetText(math.floor(tMyRec.nEffectValue / tMyRec.nTimeCount) .. ' ' .. szUnit)
-			else
-				hItem:Lookup('Text_Me_R'):SetText(tMyRec.nEffectValue)
-			end
-		else
-			if MY_Recount.bShowPerSec then
-				hItem:Lookup('Text_Me_R'):SetText(math.floor(tMyRec.nValue / tMyRec.nTimeCount) .. ' ' .. szUnit)
-			else
-				hItem:Lookup('Text_Me_R'):SetText(tMyRec.nValue)
-			end
-		end
-	else
-		hItem:Lookup('Text_Me_L'):SetText(szTimeCount)
-		hItem:Lookup('Text_Me_R'):SetText('')
-		hItem:Lookup('Image_Me_PerBack'):SetPercentage(1)
-		hItem:Lookup('Image_Me_PerFore'):SetPercentage(0)
-		hItem:Lookup('Shadow_Me_PerBack'):SetW(hItem:GetW())
-		hItem:Lookup('Shadow_Me_PerFore'):SetW(0)
-	end
-end
-
--- ########################################################################## --
---                                     #                 #         #          --
---                           # # # # # # # # # # #       #   #     #          --
---   # #     # # # # # # #       #     #     #         #     #     #          --
---     #     #       #           # # # # # # #         #     # # # # # # #    --
---     #     #       #                 #             # #   #       #          --
---     #     #       #         # # # # # # # # #       #           #          --
---     #     #       #                 #       #       #           #          --
---     #     #       #       # # # # # # # # # # #     #   # # # # # # # #    --
---     #     #       #                 #       #       #           #          --
---       # #     # # # # #     # # # # # # # # #       #           #          --
---                                     #               #           #          --
---                                   # #               #           #          --
--- ########################################################################## --
-function MY_Recount.OnFrameCreate()
-	this:RegisterEvent('ON_MY_MOSAICS_RESET')
-end
-
-function MY_Recount.OnEvent(event)
-	if event == 'ON_MY_MOSAICS_RESET' then
-		MY_Recount.DrawUI()
-	end
-end
-
--- 周期重绘
-function MY_Recount.OnFrameBreathe()
-	if this.nLastRedrawFrame and
-	GetLogicFrameCount() - this.nLastRedrawFrame > 0 and
-	GetLogicFrameCount() - this.nLastRedrawFrame < MY_Recount.nDrawInterval then
-		return
-	end
-	this.nLastRedrawFrame = GetLogicFrameCount()
-
-	-- 不进战时不刷新UI
-	if not _C.bHistoryMode and not LIB.GetFightUUID() then
-		return
-	end
-
-	MY_Recount.UpdateUI()
-end
-
-function MY_Recount.OnFrameDragEnd()
-	this:CorrectPos()
-	LIB.SetStorage('FrameAnchor.MY_Recount', GetFrameAnchor(this))
-end
-
-function MY_Recount.OnItemLButtonClick()
-	local id = this.id
-	local name = this:GetName()
-	if name == 'Handle_Me' then
-		id = UI_GetClientPlayerID()
-		name = 'Handle_LI_' .. UI_GetClientPlayerID()
-	end
-	if id and name:find('Handle_LI_') == 1 then
-		Wnd.OpenWindow(_C.szIniDetail, 'MY_Recount_Detail#' .. id .. '_' .. MY_Recount.nChannel)
-	end
-end
-
-function MY_Recount.OnItemRefreshTip()
-	local id = this.id
-	local name = this:GetName()
-	if name == 'Handle_Me' then
-		id = UI_GetClientPlayerID()
-		name = 'Handle_LI_' .. UI_GetClientPlayerID()
-	end
-	name:gsub('Handle_LI_(.+)', function()
-		if tonumber(id) then
-			id = tonumber(id)
-		end
-		local x, y = this:GetAbsPos()
-		local w, h = this:GetSize()
-		local tRec = DataDisplay[SZ_CHANNEL_KEY[MY_Recount.nChannel]].Statistics[id]
-		if tRec then
-			local szXml = GetFormatText((DataDisplay.Namelist[id] or id) .. '\n', 60, 255, 45, 255)
-			local szColon = g_tStrings.STR_COLON
-			local t = {}
-			for szSkillName, p in pairs(tRec.Skill) do
-				insert(t, { szName = szSkillName, rec = p })
-			end
-			sort(t, function(p1, p2)
-				return p1.rec.nTotal > p2.rec.nTotal
-			end)
-			for _, p in ipairs(t) do
-				if MY_Recount.bShowZeroVal or p.rec.nTotal > 0 then
-					szXml = szXml .. GetFormatText(p.szName .. '\n', nil, 255, 150, 0)
-					szXml = szXml .. GetFormatText(_L['total: '] .. p.rec.nTotal .. ' ' .. _L['effect: '] .. p.rec.nTotalEffect .. '\n')
-					for _, nSkillResult in ipairs({
-						SKILL_RESULT.HIT     ,
-						SKILL_RESULT.INSIGHT ,
-						SKILL_RESULT.CRITICAL,
-						SKILL_RESULT.MISS    ,
-					}) do
-						local nCount = 0
-						if p.rec.Detail[nSkillResult] then
-							nCount = not MY_Recount.bShowZeroVal
-								and p.rec.Detail[nSkillResult].nNzCount
-								or p.rec.Detail[nSkillResult].nCount
-						end
-						szXml = szXml .. GetFormatText(SZ_SKILL_RESULT[nSkillResult] .. szColon, nil, 255, 202, 126)
-						szXml = szXml .. GetFormatText(string.format('%2d', nCount) .. ' ')
-					end
-					szXml = szXml .. GetFormatText('\n')
-				end
-			end
-			if DataDisplay.Awaytime[id] then
-				szXml = szXml .. GetFormatText(_L(
-					'away count: %d, away time: %ds',
-					#DataDisplay.Awaytime[id],
-					MY_Recount_DS.GeneAwayTime(DataDisplay, id, MY_Recount.bSysTimeMode)
-				), nil, 255, 191, 255)
-			end
-			OutputTip(szXml, 500, {x, y, w, h})
-		end
-	end)
-end
-
-function MY_Recount.OnItemMouseLeave()
-	HideTip()
-end
-
-function MY_Recount.OnLButtonClick()
-	local name = this:GetName()
-	if name == 'Btn_Right' then
-		if MY_Recount.nChannel == CHANNEL.DPS then
-			MY_Recount.nChannel = CHANNEL.HPS
-		elseif MY_Recount.nChannel == CHANNEL.HPS then
-			MY_Recount.nChannel = CHANNEL.BDPS
-		elseif MY_Recount.nChannel == CHANNEL.BDPS then
-			MY_Recount.nChannel = CHANNEL.BHPS
-		elseif MY_Recount.nChannel == CHANNEL.BHPS then
-			MY_Recount.nChannel = CHANNEL.DPS
-		end
-		MY_Recount.DrawUI()
-	elseif name == 'Btn_Left' then
-		if MY_Recount.nChannel == CHANNEL.HPS then
-			MY_Recount.nChannel = CHANNEL.DPS
-		elseif MY_Recount.nChannel == CHANNEL.BDPS then
-			MY_Recount.nChannel = CHANNEL.HPS
-		elseif MY_Recount.nChannel == CHANNEL.BHPS then
-			MY_Recount.nChannel = CHANNEL.BDPS
-		elseif MY_Recount.nChannel == CHANNEL.DPS then
-			MY_Recount.nChannel = CHANNEL.BHPS
-		end
-		MY_Recount.DrawUI()
-	elseif name == 'Btn_Option' then
-		PopupMenu(MY_Recount.GetMenu())
-	elseif name == 'Btn_History' then
-		PopupMenu(MY_Recount.GetHistoryMenu())
-	elseif name == 'Btn_Empty' then
-		MY_Recount_DS.Flush()
-		MY_Recount.DisplayData(0)
-		MY_Recount.DrawUI()
-	elseif name == 'Btn_Issuance' then
-		PopupMenu(MY_Recount.GetPublishMenu())
-	end
-end
-
-function MY_Recount.OnCheckBoxCheck()
-	local name = this:GetName()
-	if name == 'CheckBox_Minimize' then
-		this:GetRoot():Lookup('Wnd_Main'):Hide()
-		this:GetRoot():SetSize(280, 30)
-		this:GetRoot():Lookup('Wnd_Title', 'Image_Bg'):Hide()
-	end
-end
-
-function MY_Recount.OnCheckBoxUncheck()
-	local name = this:GetName()
-	if name == 'CheckBox_Minimize' then
-		this:GetRoot():Lookup('Wnd_Main'):Show()
-		this:GetRoot():SetSize(280, 262)
-		this:GetRoot():Lookup('Wnd_Title', 'Image_Bg'):Show()
-	end
-end
-
--------------------------------------------------------------------------------
--- 详情面板
--------------------------------------------------------------------------------
-MY_Recount_Detail = class()
-
-function MY_Recount_Detail.OnFrameCreate()
-	local frame = this
-	local id, nChannel = this:GetName():match('^MY_Recount_Detail#([^_]+)_(%d+)$')
-	frame.id = tonumber(id) or id
-	frame.nChannel = tonumber(nChannel)
-	frame.bFirstRendering = true
-	frame.szPrimarySort = ((frame.nChannel == CHANNEL.DPS or frame.nChannel == CHANNEL.HPS) and 'Skill') or 'Target'
-	frame.szSecondarySort = ((frame.nChannel == CHANNEL.DPS or frame.nChannel == CHANNEL.HPS) and 'Target') or 'Skill'
-	frame:Lookup('WndScroll_Target', 'Handle_TargetTitle/Text_TargetTitle_5'):SetText(g_tStrings.STR_HIT_NAME)
-	frame:Lookup('WndScroll_Target', 'Handle_TargetTitle/Text_TargetTitle_6'):SetText(g_tStrings.STR_CS_NAME)
-	frame:Lookup('WndScroll_Target', 'Handle_TargetTitle/Text_TargetTitle_7'):SetText(g_tStrings.STR_MSG_MISS)
-	frame:RegisterEvent('ON_MY_MOSAICS_RESET')
-	frame:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
-
-	local function canEsc()
-		if frame and frame:IsValid() then
-			return true
-		else
-			LIB.RegisterEsc(frame:GetName())
-		end
-	end
-	local function onEsc()
-		if frame.szSelectedSkill or frame.szSelectedTarget then
-			frame.szSelectedSkill  = nil
-			frame.szSelectedTarget = nil
-		else
-			LIB.RegisterEsc(frame:GetName())
-			Wnd.CloseWindow(frame)
-		end
-	end
-	LIB.RegisterEsc(frame:GetName(), canEsc, onEsc)
-end
-
-function MY_Recount_Detail.OnFrameBreathe()
-	if this.nLastRedrawFrame and
-	GetLogicFrameCount() - this.nLastRedrawFrame > 0 and
-	GetLogicFrameCount() - this.nLastRedrawFrame < MY_Recount.nDrawInterval then
-		return
-	end
-	this.nLastRedrawFrame = GetLogicFrameCount()
-
-	local id        = this.id
-	local szChannel = SZ_CHANNEL_KEY[this.nChannel]
-	if tonumber(id) then
-		id = tonumber(id)
-	end
-
-	-- 更新标题
-	this:Lookup('', 'Text_Default'):SetText(MY_Recount_DS.GetNameAusID(DataDisplay, id) .. ' ' .. SZ_CHANNEL[this.nChannel])
-
-	-- 获取数据
-	local tData = DataDisplay[szChannel].Statistics[id]
-	if not tData then
-		this:Lookup('WndScroll_Detail', 'Handle_DetailList'):Clear()
-		this:Lookup('WndScroll_Skill' , 'Handle_SkillList' ):Clear()
-		this:Lookup('WndScroll_Target', 'Handle_TargetList'):Clear()
-		return
-	end
-
-	local szPrimarySort   = this.szPrimarySort or 'Skill'
-	local szSecondarySort = (szPrimarySort == 'Skill' and 'Target') or 'Skill'
-
-	--------------- 一、技能列表更新 -----------------
-	-- 数据收集
-	local aResult, nTotal = {}, MY_Recount.bShowEffect and tData.nTotalEffect or tData.nTotal
-	if szPrimarySort == 'Skill' then
-		for szSkillName, p in pairs(tData.Skill) do
-			local rec = {
-				szKey  = szSkillName,
-				szName = szSkillName,
-				nCount = not MY_Recount.bShowZeroVal and p.nNzCount or p.nCount,
-				nTotal = MY_Recount.bShowEffect and p.nTotalEffect or p.nTotal,
-			}
-			if MY_Recount.bShowZeroVal or rec.nTotal > 0 then
-				insert(aResult, rec)
-			end
-		end
-	else
-		for id, p in pairs(tData.Target) do
-			local rec = {
-				szKey  = id                              ,
-				szName = MY_Recount_DS.GetNameAusID(DataDisplay, id),
-				nCount = not MY_Recount.bShowZeroVal and p.nNzCount or p.nCount,
-				nTotal = MY_Recount.bShowEffect and p.nTotalEffect or p.nTotal,
-			}
-			if MY_Recount.bShowZeroVal or rec.nTotal > 0 then
-				insert(aResult, rec)
-			end
-		end
-	end
-	sort(aResult, function(p1, p2) return p1.nTotal > p2.nTotal end)
-	-- 默认选中第一个
-	if this.bFirstRendering then
-		if aResult[1] then
-			if szPrimarySort == 'Skill' then
-				this.szSelectedSkill  = aResult[1].szKey
-			else
-				this.szSelectedTarget = aResult[1].szKey
-			end
-		end
-		this.bFirstRendering = nil
-	end
-	local szSelected
-	local szSelectedSkill  = this.szSelectedSkill
-	local szSelectedTarget = this.szSelectedTarget
-	if szPrimarySort == 'Skill' then
-		szSelected = this.szSelectedSkill
-	else
-		szSelected = this.szSelectedTarget
-	end
-	-- 界面重绘
-	local hSelectedItem
-	this:Lookup('WndScroll_Skill'):SetSize(480, 96)
-	this:Lookup('WndScroll_Skill', ''):SetSize(480, 96)
-	this:Lookup('WndScroll_Skill', ''):FormatAllItemPos()
-	local hList = this:Lookup('WndScroll_Skill', 'Handle_SkillList')
-	hList:SetSize(480, 80)
-	for i, p in ipairs(aResult) do
-		local hItem = hList:Lookup(i - 1) or hList:AppendItemFromIni(_C.szIniDetail, 'Handle_SkillItem')
-		hItem:Lookup('Text_SkillNo'):SetText(i)
-		hItem:Lookup('Text_SkillName'):SetText(GetShowName(p.szName, szPrimarySort == 'Target' and p.dwForceID ~= -1))
-		hItem:Lookup('Text_SkillCount'):SetText(not MY_Recount.bShowZeroVal and p.nNzCount or p.nCount)
-		hItem:Lookup('Text_SkillTotal'):SetText(p.nTotal)
-		hItem:Lookup('Text_SkillPercentage'):SetText(nTotal > 0 and _L('%.1f%%', (i == 1 and ceil or floor)(p.nTotal / nTotal * 1000) / 10) or ' - ')
-
-		if szPrimarySort == 'Skill' and szSelectedSkill == p.szKey or
-		szPrimarySort == 'Target' and szSelectedTarget == p.szKey then
-			hSelectedItem = hItem
-			hItem:Lookup('Shadow_SkillEntry'):Show()
-		else
-			hItem:Lookup('Shadow_SkillEntry'):Hide()
-		end
-		hItem.szKey = p.szKey
-	end
-	for i = hList:GetItemCount() - 1, #aResult, -1 do
-		hList:RemoveItem(i)
-	end
-	hList:FormatAllItemPos()
-
-	if szSelected and tData[szPrimarySort][szSelected] then
-		this:Lookup('', 'Handle_Spliter'):Show()
-		--------------- 二、技能释放结果列表更新 -----------------
-		-- 数据收集
-		local aResult, nCountSum = {}, not MY_Recount.bShowZeroVal and tData[szPrimarySort][szSelected].nNzCount or tData[szPrimarySort][szSelected].nCount
-		local nTotal = tData[szPrimarySort][szSelected][MY_Recount.bShowEffect and 'nTotalEffect' or 'nTotal']
-		for nSkillResult, p in pairs(tData[szPrimarySort][szSelected].Detail) do
-			local res = {
-				nCount = not MY_Recount.bShowZeroVal and p.nNzCount or p.nCount,
-				nMin   = not MY_Recount.bShowEffect
-					and (not MY_Recount.bShowZeroVal and p.nNzMin or p.nMin)
-					or (not MY_Recount.bShowZeroVal and p.nNzMinEffect or p.nMinEffect),
-				nAvg   = not MY_Recount.bShowEffect
-					and (not MY_Recount.bShowZeroVal and p.nNzAvg or p.nAvg)
-					or (not MY_Recount.bShowZeroVal and p.nNzAvgEffect or p.nAvgEffect),
-				nMax   = MY_Recount.bShowEffect and p.nMaxEffect or p.nMax,
-				nTotal = MY_Recount.bShowEffect and p.nTotalEffect or p.nTotal,
-				szSkillResult = SZ_SKILL_RESULT[nSkillResult],
-			}
-			if res.nCount > 0 then
-				insert(aResult, res)
-			end
-		end
-		sort(aResult, function(p1, p2) return p1.nAvg > p2.nAvg end)
-		-- 界面重绘
-		this:Lookup('WndScroll_Detail'):Show()
-		local hList = this:Lookup('WndScroll_Detail', 'Handle_DetailList')
-		for i, p in ipairs(aResult) do
-			local hItem = hList:Lookup(i - 1) or hList:AppendItemFromIni(_C.szIniDetail, 'Handle_DetailItem')
-			local nCount = not MY_Recount.bShowZeroVal and p.nNzCount or p.nCount
-			hItem:Lookup('Text_DetailNo'):SetText(i)
-			hItem:Lookup('Text_DetailType'):SetText(p.szSkillResult)
-			hItem:Lookup('Text_DetailMin'):SetText(p.nMin)
-			hItem:Lookup('Text_DetailAverage'):SetText(p.nAvg)
-			hItem:Lookup('Text_DetailMax'):SetText(p.nMax)
-			hItem:Lookup('Text_DetailCount'):SetText(nCount)
-			hItem:Lookup('Text_DetailPercent'):SetText(nCountSum > 0 and _L('%.1f%%', (i == 1 and ceil or floor)(nCount / nCountSum * 1000) / 10) or ' - ')
-		end
-		for i = hList:GetItemCount() - 1, #aResult, -1 do
-			hList:RemoveItem(i)
-		end
-		hList:FormatAllItemPos()
-
-		-- 调整滚动条 增强用户体验
-		if hSelectedItem and not this:Lookup('WndScroll_Target'):IsVisible() then
-			-- 说明是刚从未选择状态切换过来 滚动条滚动到选中项
-			local hScroll = this:Lookup('WndScroll_Skill/Scroll_Skill_List')
-			hScroll:SetScrollPos(math.ceil(hScroll:GetStepCount() * hSelectedItem:GetIndex() / hSelectedItem:GetParent():GetItemCount()))
-		end
-
-		--------------- 三、技能释放结果列表更新 -----------------
-		-- 数据收集
-		local aResult, nTotal = {}, tData[szPrimarySort][szSelected][MY_Recount.bShowEffect and 'nTotalEffect' or 'nTotal']
-		if szPrimarySort == 'Skill' then
-			for id, p in pairs(tData.Skill[szSelectedSkill].Target) do
-				local rec = {
-					szKey          = id,
-					nHitCount      = MY_Recount.bShowZeroVal and (p.Count[SKILL_RESULT.HIT] or 0) or p.NzCount[SKILL_RESULT.HIT] or 0,
-					nMissCount     = MY_Recount.bShowZeroVal and (p.Count[SKILL_RESULT.MISS] or 0) or p.NzCount[SKILL_RESULT.MISS] or 0,
-					nCriticalCount = MY_Recount.bShowZeroVal and (p.Count[SKILL_RESULT.CRITICAL] or 0) or p.NzCount[SKILL_RESULT.CRITICAL] or 0,
-					nMax           = MY_Recount.bShowEffect and p.nMaxEffect or p.nMax,
-					nTotal         = MY_Recount.bShowEffect and p.nTotalEffect or p.nTotal,
-					szName         = MY_Recount_DS.GetNameAusID(DataDisplay, id),
-				}
-				if MY_Recount.bShowZeroVal or rec.nTotal > 0 or rec.nMissCount > 0 then
-					insert(aResult, rec)
-				end
-			end
-		else
-			for szSkillName, p in pairs(tData.Target[szSelectedTarget].Skill) do
-				local rec = {
-					nHitCount      = MY_Recount.bShowZeroVal and (p.Count[SKILL_RESULT.HIT] or 0) or p.NzCount[SKILL_RESULT.HIT] or 0,
-					nMissCount     = MY_Recount.bShowZeroVal and (p.Count[SKILL_RESULT.MISS] or 0) or p.NzCount[SKILL_RESULT.MISS] or 0,
-					nCriticalCount = MY_Recount.bShowZeroVal and (p.Count[SKILL_RESULT.CRITICAL] or 0) or p.NzCount[SKILL_RESULT.CRITICAL] or 0,
-					nMax           = MY_Recount.bShowEffect and p.nMaxEffect or p.nMax,
-					nTotal         = MY_Recount.bShowEffect and p.nTotalEffect or p.nTotal,
-					szName         = szSkillName,
-				}
-				if MY_Recount.bShowZeroVal or rec.nTotal > 0 or rec.nMissCount > 0 then
-					insert(aResult, rec)
-				end
-			end
-		end
-		sort(aResult, function(p1, p2) return p1.nTotal > p2.nTotal end)
-		-- 界面重绘
-		this:Lookup('WndScroll_Target'):Show()
-		local hList = this:Lookup('WndScroll_Target', 'Handle_TargetList')
-		for i, p in ipairs(aResult) do
-			local hItem = hList:Lookup(i - 1) or hList:AppendItemFromIni(_C.szIniDetail, 'Handle_TargetItem')
-			hItem:Lookup('Text_TargetNo'):SetText(i)
-			hItem:Lookup('Text_TargetName'):SetText(GetShowName(p.szName, szPrimarySort == 'Skill' and p.dwForceID ~= -1))
-			hItem:Lookup('Text_TargetTotal'):SetText(p.nTotal)
-			hItem:Lookup('Text_TargetMax'):SetText(p.nMax)
-			hItem:Lookup('Text_TargetHit'):SetText(p.nHitCount)
-			hItem:Lookup('Text_TargetCritical'):SetText(p.nCriticalCount)
-			hItem:Lookup('Text_TargetMiss'):SetText(p.nMissCount)
-			hItem:Lookup('Text_TargetPercent'):SetText((nTotal > 0 and _L('%.1f%%', (i == 1 and ceil or floor)(p.nTotal / nTotal * 1000) / 10) or ' - '))
-			hItem.szKey = p.szKey
-		end
-		for i = hList:GetItemCount() - 1, #aResult, -1 do
-			hList:RemoveItem(i)
-		end
-		hList:FormatAllItemPos()
-	else
-		this:Lookup('WndScroll_Skill'):SetSize(480, 348)
-		this:Lookup('WndScroll_Skill', ''):SetSize(480, 348)
-		this:Lookup('WndScroll_Skill', 'Handle_SkillList'):SetSize(480, 332)
-		this:Lookup('WndScroll_Skill', 'Handle_SkillList'):FormatAllItemPos()
-		this:Lookup('WndScroll_Skill', ''):FormatAllItemPos()
-		this:Lookup('WndScroll_Detail'):Hide()
-		this:Lookup('WndScroll_Target'):Hide()
-		this:Lookup('', 'Handle_Spliter'):Hide()
-	end
-
-end
-
-function MY_Recount_Detail.OnEvent(event)
-	if event == 'ON_MY_MOSAICS_RESET' then
-		this.nLastRedrawFrame = nil
-	end
-end
-
-function MY_Recount_Detail.OnLButtonClick()
-	local name = this:GetName()
-	if name == 'Btn_Close' then
-		LIB.RegisterEsc(this:GetRoot():GetTreePath())
-		Wnd.CloseWindow(this:GetRoot())
-	elseif name == 'Btn_Switch' then
-		if this:GetRoot().szPrimarySort == 'Skill' then
-			this:GetRoot().szPrimarySort = 'Target'
-		else
-			this:GetRoot().szPrimarySort = 'Skill'
-		end
-		this:GetRoot().nLastRedrawFrame = 0
-	elseif name == 'Btn_Unselect' then
-		this:GetRoot().szSelectedSkill  = nil
-		this:GetRoot().szSelectedTarget = nil
-		this:GetRoot().nLastRedrawFrame = 0
-	elseif name == 'Btn_Issuance' then
-		PopupMenu(MY_Recount.GetDetailMenu(this:GetRoot()))
-	end
-end
-
-function MY_Recount_Detail.OnItemLButtonDown()
-	local name = this:GetName()
-	if name == 'Handle_SkillItem' then
-		if this:GetRoot().szPrimarySort == 'Skill' then
-			this:GetRoot().szSelectedSkill = this.szKey
-		else
-			this:GetRoot().szSelectedTarget = this.szKey
-		end
-		this:GetRoot().nLastRedrawFrame = 0
-	end
-end
-
-function MY_Recount_Detail.OnItemRButtonClick()
-	local name = this:GetName()
-	if (name == 'Handle_SkillItem' and this:GetRoot().szPrimarySort == 'Target')
-	or (name == 'Handle_TargetItem' and this:GetRoot().szPrimarySort == 'Skill') then
-		local szKey = this.szKey
-		local menu = {}
-		menu.x, menu.y = Cursor.GetPos(true)
-		for _, nChannel in ipairs({ CHANNEL.DPS, CHANNEL.HPS, CHANNEL.BDPS, CHANNEL.BHPS }) do
-			insert(menu, {
-				szOption = SZ_CHANNEL[nChannel],
-				fnAction = function()
-					Wnd.OpenWindow(_C.szIniDetail, 'MY_Recount_Detail#' .. szKey .. '_' .. nChannel)
-				end,
-			})
-		end
-		PopupMenu(menu)
-	end
-end
-
-function MY_Recount_Detail.OnItemLButtonDBClick()
-	local name = this:GetName()
-	if (name == 'Handle_SkillItem' and this:GetRoot().szPrimarySort == 'Target')
-	or (name == 'Handle_TargetItem' and this:GetRoot().szPrimarySort == 'Skill') then
-		Wnd.OpenWindow(_C.szIniDetail, 'MY_Recount_Detail#' .. this.szKey .. '_' .. this:GetRoot().nChannel)
-	end
-end
-
--- ################################################################################################## --
---         #       #             #           #                 #                         #   #        --
---   # # # # # # # # # # #         #       #             #     #                         #     #      --
---         #       #           # # # # # # # # #         #     #               # # # # # # # # # #    --
---                 # # #       #       #       #         # # # # # # # #       #         #            --
---   # # # # # # #             # # # # # # # # #       #       #               #         #            --
---     #     #       #         #       #       #     #         #               # # # #   #     #      --
---       #     #   #           # # # # # # # # #               #               #     #   #     #      --
---             #                       #                 # # # # # # #         #     #   #   #        --
---   # # # # # # # # # # #   # # # # # # # # # # #             #               #     #     #     #    --
---         #   #   #                   #                       #               #   # #   #   #   #    --
---       #     #     #                 #                       #               #       #       # #    --
---   # #       #       # #             #             # # # # # # # # # # #   #       #           #    --
--- ################################################################################################## --
 -- 获取设置菜单
-function MY_Recount.GetMenu()
+function D.GetMenu()
 	local t = {
 		szOption = _L['fight recount'],
 		{
@@ -1132,19 +135,18 @@ function MY_Recount.GetMenu()
 			fnAction = function()
 				local bEnable = not LIB.GetStorage('BoolValues.MY_Recount_Enable')
 				if bEnable then
-					MY_Recount.Open()
+					MY_Recount_UI.Open()
 				else
-					MY_Recount.Close()
+					MY_Recount_UI.Close()
 				end
 				LIB.SetStorage('BoolValues.MY_Recount_Enable', bEnable)
 			end,
 		}, {
 			szOption = _L['display as per second'],
 			bCheck = true,
-			bChecked = MY_Recount.bShowPerSec,
+			bChecked = MY_Recount_UI.bShowPerSec,
 			fnAction = function()
-				MY_Recount.bShowPerSec = not MY_Recount.bShowPerSec
-				MY_Recount.DrawUI()
+				MY_Recount_UI.bShowPerSec = not MY_Recount_UI.bShowPerSec
 			end,
 			fnDisable = function()
 				return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
@@ -1152,10 +154,9 @@ function MY_Recount.GetMenu()
 		}, {
 			szOption = _L['display effective value'],
 			bCheck = true,
-			bChecked = MY_Recount.bShowEffect,
+			bChecked = MY_Recount_UI.bShowEffect,
 			fnAction = function()
-				MY_Recount.bShowEffect = not MY_Recount.bShowEffect
-				MY_Recount.DrawUI()
+				MY_Recount_UI.bShowEffect = not MY_Recount_UI.bShowEffect
 			end,
 			fnDisable = function()
 				return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
@@ -1163,10 +164,9 @@ function MY_Recount.GetMenu()
 		}, {
 			szOption = _L['uncount awaytime'],
 			bCheck = true,
-			bChecked = MY_Recount.bAwayMode,
+			bChecked = MY_Recount_UI.bAwayMode,
 			fnAction = function()
-				MY_Recount.bAwayMode = not MY_Recount.bAwayMode
-				MY_Recount.DrawUI()
+				MY_Recount_UI.bAwayMode = not MY_Recount_UI.bAwayMode
 			end,
 			fnDisable = function()
 				return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
@@ -1174,10 +174,9 @@ function MY_Recount.GetMenu()
 		}, {
 			szOption = _L['show nodata teammate'],
 			bCheck = true,
-			bChecked = MY_Recount.bShowNodataTeammate,
+			bChecked = MY_Recount_UI.bShowNodataTeammate,
 			fnAction = function()
-				MY_Recount.bShowNodataTeammate = not MY_Recount.bShowNodataTeammate
-				MY_Recount.DrawUI()
+				MY_Recount_UI.bShowNodataTeammate = not MY_Recount_UI.bShowNodataTeammate
 			end,
 			fnDisable = function()
 				return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
@@ -1185,10 +184,9 @@ function MY_Recount.GetMenu()
 		}, {
 			szOption = _L['use system time count'],
 			bCheck = true,
-			bChecked = MY_Recount.bSysTimeMode,
+			bChecked = MY_Recount_UI.bSysTimeMode,
 			fnAction = function()
-				MY_Recount.bSysTimeMode = not MY_Recount.bSysTimeMode
-				MY_Recount.DrawUI()
+				MY_Recount_UI.bSysTimeMode = not MY_Recount_UI.bSysTimeMode
 			end,
 			fnDisable = function()
 				return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
@@ -1196,10 +194,9 @@ function MY_Recount.GetMenu()
 		}, {
 			szOption = _L['Group npc with same name'],
 			bCheck = true,
-			bChecked = MY_Recount.bGroupSameNpc,
+			bChecked = MY_Recount_UI.bGroupSameNpc,
 			fnAction = function()
-				MY_Recount.bGroupSameNpc = not MY_Recount.bGroupSameNpc
-				MY_Recount.DrawUI()
+				MY_Recount_UI.bGroupSameNpc = not MY_Recount_UI.bGroupSameNpc
 			end,
 			fnDisable = function()
 				return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
@@ -1210,7 +207,6 @@ function MY_Recount.GetMenu()
 			bChecked = MY_Recount_DS.bDistinctEffectID,
 			fnAction = function()
 				MY_Recount_DS.bDistinctEffectID = not MY_Recount_DS.bDistinctEffectID
-				MY_Recount.DrawUI()
 			end,
 			fnDisable = function()
 				return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
@@ -1221,7 +217,6 @@ function MY_Recount.GetMenu()
 			bChecked = MY_Recount_DS.bRecAnonymous,
 			fnAction = function()
 				MY_Recount_DS.bRecAnonymous = not MY_Recount_DS.bRecAnonymous
-				MY_Recount.DrawUI()
 			end,
 			fnDisable = function()
 				return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
@@ -1229,10 +224,9 @@ function MY_Recount.GetMenu()
 		}, {
 			szOption = _L['show zero value effect'],
 			bCheck = true,
-			bChecked = MY_Recount.bShowZeroVal,
+			bChecked = MY_Recount_UI.bShowZeroVal,
 			fnAction = function()
-				MY_Recount.bShowZeroVal = not MY_Recount.bShowZeroVal
-				MY_Recount.DrawUI()
+				MY_Recount_UI.bShowZeroVal = not MY_Recount_UI.bShowZeroVal
 			end,
 			fnDisable = function()
 				return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
@@ -1253,26 +247,23 @@ function MY_Recount.GetMenu()
 			{
 				szOption = _L['display only npc record'],
 				bCheck = true, bMCheck = true,
-				bChecked = MY_Recount.nDisplayMode == DISPLAY_MODE.NPC,
+				bChecked = MY_Recount_UI.nDisplayMode == MY_Recount_UI.DISPLAY_MODE.NPC,
 				fnAction = function()
-					MY_Recount.nDisplayMode = DISPLAY_MODE.NPC
-					MY_Recount.DrawUI()
+					MY_Recount_UI.nDisplayMode = MY_Recount_UI.DISPLAY_MODE.NPC
 				end,
 			}, {
 				szOption = _L['display only player record'],
 				bCheck = true, bMCheck = true,
-				bChecked = MY_Recount.nDisplayMode == DISPLAY_MODE.PLAYER,
+				bChecked = MY_Recount_UI.nDisplayMode == MY_Recount_UI.DISPLAY_MODE.PLAYER,
 				fnAction = function()
-					MY_Recount.nDisplayMode = DISPLAY_MODE.PLAYER
-					MY_Recount.DrawUI()
+					MY_Recount_UI.nDisplayMode = MY_Recount_UI.DISPLAY_MODE.PLAYER
 				end,
 			}, {
 				szOption = _L['display all record'],
 				bCheck = true, bMCheck = true,
-				bChecked = MY_Recount.nDisplayMode == DISPLAY_MODE.BOTH,
+				bChecked = MY_Recount_UI.nDisplayMode == MY_Recount_UI.DISPLAY_MODE.BOTH,
 				fnAction = function()
-					MY_Recount.nDisplayMode = DISPLAY_MODE.BOTH
-					MY_Recount.DrawUI()
+					MY_Recount_UI.nDisplayMode = MY_Recount_UI.DISPLAY_MODE.BOTH
 				end,
 			}
 		}
@@ -1317,14 +308,13 @@ function MY_Recount.GetMenu()
 			return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
 		end,
 	}
-	for i, _ in ipairs(FORCE_BAR_CSS) do
+	for i, _ in ipairs(MY_Recount_UI.FORCE_BAR_CSS) do
 		local t2 = {
 			szOption = i,
 			bCheck = true, bMCheck = true,
-			bChecked = MY_Recount.nCss == i,
+			bChecked = MY_Recount_UI.nCss == i,
 			fnAction = function()
-				MY_Recount.LoadCustomCss(i)
-				MY_Recount.DrawUI()
+				MY_Recount_UI.nCss = i
 			end,
 			fnDisable = function()
 				return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
@@ -1363,9 +353,9 @@ function MY_Recount.GetMenu()
 		insert(t1, {
 			szOption = szOption,
 			bCheck = true, bMCheck = true,
-			bChecked = MY_Recount.nDrawInterval == i,
+			bChecked = MY_Recount_UI.nDrawInterval == i,
 			fnAction = function()
-				MY_Recount.nDrawInterval = i
+				MY_Recount_UI.nDrawInterval = i
 			end,
 			fnDisable = function()
 				return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
@@ -1400,7 +390,7 @@ function MY_Recount.GetMenu()
 end
 
 -- 获取历史记录菜单
-function MY_Recount.GetHistoryMenu()
+function D.GetHistoryMenu()
 	local t = {{
 		szOption = _L['current fight'],
 		rgb = (MY_Recount_DS.Get(0) == DataDisplay and {255, 255, 0}) or nil,
@@ -1408,7 +398,7 @@ function MY_Recount.GetHistoryMenu()
 			if IsCtrlKeyDown() then
 				MY_Recount_FP_Open(MY_Recount_DS.Get(0))
 			else
-				MY_Recount.DisplayData(0)
+				D.SetDisplayData(0)
 			end
 		end,
 	}}
@@ -1422,7 +412,7 @@ function MY_Recount.GetHistoryMenu()
 					if IsCtrlKeyDown() then
 						MY_Recount_FP_Open(data)
 					else
-						MY_Recount.DisplayData(data)
+						D.SetDisplayData(data)
 					end
 				end,
 				szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',
@@ -1453,7 +443,7 @@ function MY_Recount.GetHistoryMenu()
 end
 
 -- 获取发布菜单
-function MY_Recount.GetPublishMenu()
+function D.GetPublishMenu()
 	local t = {}
 
 	-- 发布类型
@@ -1509,7 +499,7 @@ function MY_Recount.GetPublishMenu()
 			insert(aResult, hItem.data)
 			nMaxNameLen = math.max(nMaxNameLen, wstring.len(hItem.data.szName))
 		end
-		if not MY_Recount.bShowPerSec then
+		if not MY_Recount_UI.bShowPerSec then
 			nTimeCount = 1
 			szUnit = ''
 		end
@@ -1565,96 +555,50 @@ function MY_Recount.GetPublishMenu()
 	return t
 end
 
-function D.InsertFromText(aTabTalk, h)
-	local aText = {}
-	for i = 0, h:GetItemCount() - 1 do
-		local p = h:Lookup(i)
-		if p:GetType() == 'Text' then
-			insert(aText, p:GetText())
-		end
+LIB.RegisterAddonMenu('MY_RECOUNT_MENU', D.GetMenu)
+
+-- 新的战斗数据时
+LIB.RegisterEvent('MY_RECOUNT_NEW_FIGHT', function()
+	if not D.bHistoryMode then
+		D.SetDisplayData(0)
 	end
-	insert(aTabTalk, aText)
+end)
+
+-- Global exports
+do
+local settings = {
+	exports = {
+		{
+			fields = {
+				SetDisplayData = D.SetDisplayData,
+				GetDisplayData = D.GetDisplayData,
+				GetMenu = D.GetMenu,
+				GetHistoryMenu = D.GetHistoryMenu,
+				GetPublishMenu = D.GetPublishMenu,
+				GetTargetShowName = D.GetTargetShowName,
+				STAT_TYPE = STAT_TYPE,
+				STAT_TYPE_KEY = STAT_TYPE_KEY,
+				STAT_TYPE_NAME = STAT_TYPE_NAME,
+				PUBLISH_MODE = PUBLISH_MODE,
+				SKILL_RESULT = SKILL_RESULT,
+				SKILL_RESULT_NAME = SZ_SKILL_RESULT,
+			},
+		},
+		{
+			fields = {
+				nPublishMode = true,
+			},
+			root = O,
+		},
+	},
+	imports = {
+		{
+			fields = {
+				nPublishMode = true,
+			},
+			root = O,
+		},
+	},
+}
+MY_Recount = LIB.GeneGlobalNS(settings)
 end
-
-function MY_Recount.GetDetailMenu(frame)
-	local t = {}
-	local function Publish(nChannel, nLimit)
-		local bDetail = frame:Lookup('', 'Handle_Spliter'):IsVisible()
-		LIB.Talk(
-			nChannel,
-			'[' .. PACKET_INFO.SHORT_NAME .. ']'
-			.. _L['fight recount'] .. ' - '
-			.. frame:Lookup('', 'Text_Default'):GetText()
-			.. ' ' .. ((DataDisplay.szBossName and ' - ' .. DataDisplay.szBossName) or '')
-			.. '(' .. LIB.FormatTimeCounter(DataDisplay.nTimeDuring, '%M:%ss') .. ')',
-			nil,
-			true
-		)
-		LIB.Talk(nChannel, '------------------------------')
-
-		local aTabTalk = {}
-		D.InsertFromText(aTabTalk, frame:Lookup('WndScroll_Skill', 'Handle_SkillTitle'))
-		local hList = frame:Lookup('WndScroll_Skill', 'Handle_SkillList')
-		if bDetail then
-			for i = 0, hList:GetItemCount() - 1 do
-				local hItem = hList:Lookup(i)
-				if hItem:Lookup('Shadow_SkillEntry'):IsVisible() then
-					D.InsertFromText(aTabTalk, hItem)
-					break
-				end
-			end
-		else
-			for i = 0, min(hList:GetItemCount(), nLimit) - 1 do
-				D.InsertFromText(aTabTalk, hList:Lookup(i))
-			end
-		end
-		LIB.TabTalk(nChannel, aTabTalk, {'L', 'L', 'R', 'R', 'R'})
-		LIB.Talk(nChannel, '------------------------------')
-
-		if bDetail then
-			local aTabTalk = {}
-			D.InsertFromText(aTabTalk, frame:Lookup('WndScroll_Detail', 'Handle_DetailTitle'))
-			local hList = frame:Lookup('WndScroll_Detail', 'Handle_DetailList')
-			for i = 0, hList:GetItemCount() - 1 do
-				D.InsertFromText(aTabTalk, hList:Lookup(i))
-			end
-			LIB.TabTalk(nChannel, aTabTalk, {'L', 'L', 'R', 'R', 'R', 'R', 'R'})
-			LIB.Talk(nChannel, '------------------------------')
-
-			local aTabTalk = {}
-			D.InsertFromText(aTabTalk, frame:Lookup('WndScroll_Target', 'Handle_TargetTitle'))
-			local hList = frame:Lookup('WndScroll_Target', 'Handle_TargetList')
-			for i = 0, min(hList:GetItemCount(), nLimit) - 1 do
-				D.InsertFromText(aTabTalk, hList:Lookup(i))
-			end
-			LIB.TabTalk(nChannel, aTabTalk, {'L', 'L', 'R', 'R', 'R', 'R', 'R', 'R'})
-			LIB.Talk(nChannel, '------------------------------')
-		end
-	end
-	for nChannel, szChannel in pairs({
-		[PLAYER_TALK_CHANNEL.RAID] = 'MSG_TEAM',
-		[PLAYER_TALK_CHANNEL.TEAM] = 'MSG_PARTY',
-		[PLAYER_TALK_CHANNEL.TONG] = 'MSG_GUILD',
-	}) do
-		local t1 = {
-			szOption = g_tStrings.tChannelName[szChannel],
-			bCheck = true, -- 不设置成可选框不能点╭∩╮(︶︿︶）╭∩╮垃圾
-			fnAction = function()
-				Publish(nChannel, HUGE)
-				Wnd.CloseWindow('PopupMenuPanel')
-			end,
-			rgb = GetMsgFontColor(szChannel, true),
-		}
-		for _, nLimit in ipairs({1, 2, 3, 4, 5, 8, 10, 15, 20, 30, 50, 100}) do
-			insert(t1, {
-				szOption = _L('top %d', nLimit),
-				fnAction = function() Publish(nChannel, nLimit) end,
-			})
-		end
-		insert(t, t1)
-	end
-
-	return t
-end
-
-LIB.RegisterAddonMenu('MY_RECOUNT_MENU', MY_Recount.GetMenu)
