@@ -235,6 +235,7 @@ MY_Recount.Data.nMinFightTime     = 30
 MY_Recount.Data.bRecAnonymous     = true
 MY_Recount.Data.bDistinctTargetID = false
 MY_Recount.Data.bDistinctEffectID = false
+MY_Recount.Data.bRecEverything    = true
 
 local _Cache = {}
 local Data          -- 当前战斗数据记录
@@ -272,6 +273,7 @@ function MY_Recount.Data.LoadData(bLoadHistory)
 		MY_Recount.Data.bRecAnonymous     = LIB.FormatDataStructure(data.bRecAnonymous, true)
 		MY_Recount.Data.bDistinctTargetID = LIB.FormatDataStructure(data.bDistinctTargetID, false)
 		MY_Recount.Data.bDistinctEffectID = LIB.FormatDataStructure(data.bDistinctEffectID, false)
+		MY_Recount.Data.bRecEverything    = LIB.FormatDataStructure(data.bRecEverything, false)
 	end
 	MY_Recount.Data.Init()
 end
@@ -285,6 +287,7 @@ function MY_Recount.Data.SaveData(bSaveHistory)
 		bRecAnonymous     = MY_Recount.Data.bRecAnonymous,
 		bDistinctTargetID = MY_Recount.Data.bDistinctTargetID,
 		bDistinctEffectID = MY_Recount.Data.bDistinctEffectID,
+		bRecEverything    = MY_Recount.Data.bRecEverything,
 	}
 	local data = LIB.SaveLUAData(SZ_REC_FILE, data, { passphrase = false })
 end
@@ -308,6 +311,7 @@ LIB.RegisterEvent('MY_FIGHT_HINT', function(event)
 	else
 		MY_Recount.Data.Flush()
 	end
+	_Cache.AddEverything(Data, 'FIGHT_TIME', LIB.IsFighting(), LIB.GetFightUUID(), LIB.GetFightTime())
 end)
 LIB.BreatheCall('MY_Recount_FightTime', 1000, function()
 	if LIB.IsFighting() then
@@ -462,16 +466,14 @@ function MY_Recount.Data.OnSkillEffect(dwCaster, dwTarget, nEffectType, dwEffect
 	dwTarget = KTarget.dwID
 
 	-- 获取效果名称
-	local szEffectName
+	local szEffectName, bAnonymous
 	if nEffectType == SKILL_EFFECT_TYPE.SKILL then
 		szEffectName = Table_GetSkillName(dwEffectID, dwEffectLevel)
 	elseif nEffectType == SKILL_EFFECT_TYPE.BUFF then
 		szEffectName = Table_GetBuffName(dwEffectID, dwEffectLevel)
 	end
 	if not szEffectName then
-		if not MY_Recount.Data.bRecAnonymous then
-			return
-		end
+		bAnonymous = true
 		szEffectName = '#' .. dwEffectID
 	elseif Data.bDistinctEffectID then
 		szEffectName = szEffectName .. '#' .. dwEffectID
@@ -512,6 +514,12 @@ function MY_Recount.Data.OnSkillEffect(dwCaster, dwTarget, nEffectType, dwEffect
 					(tResult[SKILL_RESULT_TYPE.POISON_DAMAGE       ] or 0) + -- 毒性伤害
 					(tResult[SKILL_RESULT_TYPE.REFLECTIED_DAMAGE   ] or 0)   -- 反弹伤害
 	local nEffectDamage = tResult[SKILL_RESULT_TYPE.EFFECTIVE_DAMAGE] or 0
+
+	_Cache.AddEverything(Data, 'SKILL_EFFECT', dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, szEffectName, nSkillResult, tResult)
+
+	if bAnonymous and not MY_Recount.Data.bRecAnonymous then
+		return
+	end
 
 	-- 识破
 	local nValue = tResult[SKILL_RESULT_TYPE.INSIGHT_DAMAGE]
@@ -565,6 +573,14 @@ function MY_Recount.Data.IsParty(id, data)
 	else
 		return false
 	end
+end
+
+-- 插入复盘数据
+function _Cache.AddEverything(data, szName, ...)
+	if not MY_Recount.Data.bRecEverything then
+		return
+	end
+	insert(data.Everything, {GetLogicFrameCount(), GetCurrentTime(), GetTime(), szName, ...})
 end
 
 -- 将一条记录插入数组
@@ -926,6 +942,7 @@ function MY_Recount.Data.Init(bForceInit)
 			Heal              = GeneTypeNS(),                      -- 治疗统计
 			BeHeal            = GeneTypeNS(),                      -- 承疗统计
 			BeDamage          = GeneTypeNS(),                      -- 承伤统计
+			Everything        = {},                                -- 战斗复盘
 		}
 	end
 

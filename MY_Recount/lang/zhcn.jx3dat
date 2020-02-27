@@ -31,6 +31,7 @@ return {
     ['distinct effect id with same name'] = '区分同名字的记录',
     ['record anonymous effect'          ] = '显示没名字的记录',
     ['show zero value effect'           ] = '显示零数值的记录',
+    ['Record everything'                ] = '记录所有复盘数据',
     ['theme'                            ] = '自定界面风格选择',
     ['max history'                      ] = '最大历史记录设置',
 

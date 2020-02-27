@@ -1229,6 +1229,16 @@ function MY_Recount.GetMenu()
 			fnDisable = function()
 				return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
 			end,
+		}, {
+			szOption = _L['Record everything'],
+			bCheck = true,
+			bChecked = MY_Recount.Data.bRecEverything,
+			fnAction = function()
+				MY_Recount.Data.bRecEverything = not MY_Recount.Data.bRecEverything
+			end,
+			fnDisable = function()
+				return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
+			end,
 		},
 		{   -- 切换统计类型
 			szOption = _L['switch recount mode'],
