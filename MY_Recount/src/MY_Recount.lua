@@ -208,7 +208,7 @@ MY_Recount.nCss          = 1                    -- 当前样式表
 MY_Recount.nChannel      = CHANNEL.DPS          -- 当前显示的统计模式
 MY_Recount.bAwayMode     = true                 -- 计算DPS时是否减去暂离时间
 MY_Recount.bSysTimeMode  = false                -- 使用官方战斗统计计时方式
-MY_Recount.bGroupSameNpc = false                -- 是否合并同名NPC数据
+MY_Recount.bGroupSameNpc = true                 -- 是否合并同名NPC数据
 MY_Recount.bShowPerSec   = true                 -- 显示为每秒数据（反之显示总和）
 MY_Recount.bShowEffect   = true                 -- 显示有效伤害/治疗
 MY_Recount.bShowZeroVal  = false                -- 显示零值记录
@@ -349,7 +349,8 @@ function MY_Recount.UpdateUI(data)
 	local tRecord = tInfo.Statistics
 
 	-- 计算战斗时间
-	local nTimeCount = MY_Recount_DS.GeneFightTime(data, nil, MY_Recount.bSysTimeMode and SZ_CHANNEL_KEY[MY_Recount.nChannel])
+	local szTimeChannel = MY_Recount.bSysTimeMode and SZ_CHANNEL_KEY[MY_Recount.nChannel]
+	local nTimeCount = MY_Recount_DS.GeneFightTime(data, szTimeChannel)
 	local szTimeCount = LIB.FormatTimeCounter(nTimeCount, '%M:%ss')
 	if LIB.IsInArena() then
 		szTimeCount = LIB.GetFightTime('M:ss')
@@ -358,38 +359,39 @@ function MY_Recount.UpdateUI(data)
 	local tMyRec
 
 	-- 整理数据 生成要显示的列表
-	local nMaxValue, aResult, tIDs = 0, {}, {}
-	for id, rec in pairs(tRecord) do
+	local nMaxValue, aResult, tResult = 0, {}, {}
+	for dwID, rec in pairs(tRecord) do
 		if (MY_Recount.bShowZeroVal or rec[MY_Recount.bShowEffect and 'nTotalEffect' or 'nTotal'] > 0)
 		and (
 			MY_Recount.nDisplayMode == DISPLAY_MODE.BOTH or  -- 确定显示模式（显示NPC/显示玩家/全部显示）
-			(MY_Recount.nDisplayMode == DISPLAY_MODE.NPC    and type(id) == 'string') or
-			(MY_Recount.nDisplayMode == DISPLAY_MODE.PLAYER and type(id) == 'number')
+			(MY_Recount.nDisplayMode == DISPLAY_MODE.NPC and not IsPlayer(dwID)) or
+			(MY_Recount.nDisplayMode == DISPLAY_MODE.PLAYER and IsPlayer(dwID))
 		) then
-			local tRec = {
-				id           = id                                  ,
-				szMD5        = rec.szMD5                           ,
-				szName       = MY_Recount_DS.GetNameAusID(data, id),
-				dwForceID    = data.Forcelist[id] or -1            ,
-				nValue       = rec.nTotal         or  0            ,
-				nEffectValue = rec.nTotalEffect   or  0            ,
-			}
-			tIDs[id] = true
-			-- 计算战斗时间
-			if MY_Recount.bAwayMode then -- 删去死亡时间 && 防止计算DPS时除以0
-				tRec.nTimeCount = math.max(MY_Recount_DS.GeneFightTime(data, id, MY_Recount.bSysTimeMode and SZ_CHANNEL_KEY[MY_Recount.nChannel]), 1)
-			else -- 不删去暂离时间
-				tRec.nTimeCount = math.max(nTimeCount, 1)
+			local id, tRec = dwID
+			if not IsPlayer(dwID) then
+				id = MY_Recount.bGroupSameNpc and MY_Recount_DS.GetNameAusID(data, dwID) or dwID
+				tRec = tResult[id]
 			end
-			-- 计算每秒数据
-			if MY_Recount.bShowPerSec then
-				tRec.nValuePS       = tRec.nValue / tRec.nTimeCount
-				tRec.nEffectValuePS = tRec.nEffectValue / tRec.nTimeCount
-				nMaxValue = math.max(nMaxValue, tRec.nValuePS, tRec.nEffectValuePS)
-			else
-				nMaxValue = math.max(nMaxValue, tRec.nValue, tRec.nEffectValue)
+			if tRec then -- 同名合并数据
+				tRec.nValue = tRec.nValue + (rec.nTotal or 0)
+				tRec.nEffectValue = tRec.nEffectValue + (rec.nTotalEffect or 0)
+			else -- 新数据
+				tRec = {
+					id           = id                                     ,
+					szMD5        = rec.szMD5                              ,
+					szName       = MY_Recount_DS.GetNameAusID(data, dwID) ,
+					dwForceID    = MY_Recount_DS.GetForceAusID(data, dwID),
+					nValue       = rec.nTotal or 0                        ,
+					nEffectValue = rec.nTotalEffect or 0                  ,
+					nTimeCount   = max( -- 计算战斗时间 防止计算DPS时除以0
+						MY_Recount.bAwayMode
+							and MY_Recount_DS.GeneFightTime(data, szTimeChannel, dwID) -- 删去死亡时间
+							or nTimeCount,
+						1), -- 不删去暂离时间
+				}
+				tResult[id] = tRec
+				insert(aResult, tRec)
 			end
-			insert(aResult, tRec)
 		end
 	end
 	-- 全程没数据的队友
@@ -397,20 +399,29 @@ function MY_Recount.UpdateUI(data)
 		local list = GetClientTeam().GetTeamMemberList()
 		for _, dwID in ipairs(list) do
 			local info = GetClientTeam().GetMemberInfo(dwID)
-			if not tIDs[dwID] then
+			if not tResult[dwID] then
 				insert(aResult, {
-					id             = dwID                   ,
-					-- szMD5          = info.szMD5             ,
-					szName         = info.szName            ,
-					dwForceID      = info.dwForceID         ,
-					nValue         = 0                      ,
-					nEffectValue   = 0                      ,
-					nTimeCount     = math.max(nTimeCount, 1),
-					nValuePS       = 0                      ,
-					nEffectValuePS = 0                      ,
+					id             = dwID              ,
+					-- szMD5          = info.szMD5        ,
+					szName         = info.szName       ,
+					dwForceID      = info.dwForceID    ,
+					nValue         = 0                 ,
+					nEffectValue   = 0                 ,
+					nTimeCount     = max(nTimeCount, 1),
 				})
-				tIDs[dwID] = true
+				tResult[dwID] = aResult
 			end
+		end
+	end
+
+	-- 计算平均值、最大值
+	for _, tRec in ipairs(aResult) do
+		if MY_Recount.bShowPerSec then -- 计算平均值
+			tRec.nValuePS       = tRec.nValue / tRec.nTimeCount
+			tRec.nEffectValuePS = tRec.nEffectValue / tRec.nTimeCount
+			nMaxValue = max(nMaxValue, tRec.nValuePS, tRec.nEffectValuePS)
+		else
+			nMaxValue = max(nMaxValue, tRec.nValue, tRec.nEffectValue)
 		end
 	end
 

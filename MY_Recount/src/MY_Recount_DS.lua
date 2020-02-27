@@ -178,7 +178,7 @@ Data = {
 							SKILL_RESULT.CRITICAL = { ... },
 						},
 						Skill = {                                 -- 该玩家四象轮回承受者统计
-							玩家dwID = {                          -- 该玩家四象轮回击中的这个玩家数据统计
+							四象轮回 = {                          -- 该玩家四象轮回击中的这个玩家数据统计
 								nMax         = 13415 ,            -- 该玩家四象轮回击中的这个玩家最大伤害
 								nMaxEffect   = 9080  ,            -- 该玩家四象轮回击中的这个玩家最大有效伤害
 								nTotal       = 23213 ,            -- 该玩家四象轮回击中的这个玩家伤害总和
@@ -189,7 +189,7 @@ Data = {
 									SKILL_RESULT.CRITICAL = 3,
 								},
 							},
-							Npc名字 = { ... },
+							两仪化形 = { ... },
 							...
 						},
 					},
@@ -395,10 +395,11 @@ end
 -- 计算战斗时间
 -- D.GeneFightTime(data, dwID, szRecordType)
 -- data: 数据
--- dwID: 计算战斗时间的角色ID 为空则计算团队的战斗时间
 -- szRecordType: 不同类型的数据在官方时间算法下计算结果可能不一样
 --               枚举暂时有 Heal Damage BeDamage BeHeal 四种
-function D.GeneFightTime(data, dwID, szRecordType)
+--               为空则计算普通时间算法
+-- dwID: 计算战斗时间的角色ID 为空则计算团队的战斗时间
+function D.GeneFightTime(data, szRecordType, dwID)
 	local nTimeDuring = data.nTimeDuring
 	local nTimeBegin  = data.nTimeBegin
 	if szRecordType and data[szRecordType] and data[szRecordType].nTimeDuring then
@@ -552,6 +553,14 @@ function D.GetNameAusID(data, dwID)
 		return
 	end
 	return data.Namelist[dwID] or g_tStrings.STR_NAME_UNKNOWN
+end
+
+-- 通过ID计算势力
+function D.GetForceAusID(data, dwID)
+	if not data or not dwID then
+		return
+	end
+	return data.Forcelist[dwID] or -1
 end
 
 -- 判断是否是友军
@@ -1196,6 +1205,7 @@ local settings = {
 				GeneAwayTime = D.GeneAwayTime,
 				GeneFightTime = D.GeneFightTime,
 				GetNameAusID = D.GetNameAusID,
+				GetForceAusID = D.GetForceAusID,
 				Flush = D.Flush,
 			},
 		},
