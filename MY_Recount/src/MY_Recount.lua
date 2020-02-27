@@ -211,7 +211,6 @@ MY_Recount.bSysTimeMode  = false                -- 使用官方战斗统计计时方式
 MY_Recount.bShowPerSec   = true                 -- 显示为每秒数据（反之显示总和）
 MY_Recount.bShowEffect   = true                 -- 显示有效伤害/治疗
 MY_Recount.bShowZeroVal  = false                -- 显示零值记录
-MY_Recount.bSaveRecount  = false                -- 退出游戏时保存战斗记录
 MY_Recount.nDisplayMode  = DISPLAY_MODE.BOTH    -- 统计显示模式（显示NPC/玩家数据）（默认混合显示）
 MY_Recount.nPublishMode  = PUBLISH_MODE.EFFECT  -- 发布模式
 MY_Recount.nDrawInterval = GLOBAL.GAME_FPS / 2  -- UI重绘周期（帧）
@@ -223,7 +222,6 @@ RegisterCustomData('MY_Recount.bAwayMode')
 RegisterCustomData('MY_Recount.bSysTimeMode')
 RegisterCustomData('MY_Recount.bShowPerSec')
 RegisterCustomData('MY_Recount.bShowEffect')
-RegisterCustomData('MY_Recount.bSaveRecount')
 RegisterCustomData('MY_Recount.nDisplayMode')
 RegisterCustomData('MY_Recount.nPublishMode')
 RegisterCustomData('MY_Recount.nDrawInterval')
@@ -264,7 +262,6 @@ end
 
 LIB.RegisterInit('MY_RECOUNT', function()
 	MY_Recount.LoadCustomCss()
-	MY_Recount.Data.LoadData(MY_Recount.bSaveRecount)
 end)
 
 LIB.RegisterStorageInit('MY_RECOUNT', function()
@@ -273,10 +270,6 @@ LIB.RegisterStorageInit('MY_RECOUNT', function()
 	else
 		MY_Recount.Close()
 	end
-end)
-
-LIB.RegisterFlush(function()
-	MY_Recount.Data.SaveData(MY_Recount.bSaveRecount)
 end)
 
 -- ########################################################################## --
@@ -307,9 +300,9 @@ end
 -- MY_Recount.DisplayData(table  data): 显示数据为data的历史记录
 function MY_Recount.DisplayData(data)
 	if type(data) == 'number' then
-		data = MY_Recount.Data.Get(data)
+		data = MY_Recount_DS.Get(data)
 	end
-	_C.bHistoryMode = (data ~= MY_Recount.Data.Get(0))
+	_C.bHistoryMode = (data ~= MY_Recount_DS.Get(0))
 
 	if type(data) == 'table' then
 		DataDisplay = data
@@ -355,7 +348,7 @@ function MY_Recount.UpdateUI(data)
 	local tRecord = tInfo.Statistics
 
 	-- 计算战斗时间
-	local nTimeCount = MY_Recount.Data.GeneFightTime(data, nil, MY_Recount.bSysTimeMode and SZ_CHANNEL_KEY[MY_Recount.nChannel])
+	local nTimeCount = MY_Recount_DS.GeneFightTime(data, nil, MY_Recount.bSysTimeMode and SZ_CHANNEL_KEY[MY_Recount.nChannel])
 	local szTimeCount = LIB.FormatTimeCounter(nTimeCount, '%M:%ss')
 	if LIB.IsInArena() then
 		szTimeCount = LIB.GetFightTime('M:ss')
@@ -373,17 +366,17 @@ function MY_Recount.UpdateUI(data)
 			(MY_Recount.nDisplayMode == DISPLAY_MODE.PLAYER and type(id) == 'number')
 		) then
 			local tRec = {
-				id           = id                                    ,
-				szMD5        = rec.szMD5                             ,
-				szName       = MY_Recount.Data.GetNameAusID(id, data),
-				dwForceID    = data.Forcelist[id] or -1              ,
-				nValue       = rec.nTotal         or  0              ,
-				nEffectValue = rec.nTotalEffect   or  0              ,
+				id           = id                                  ,
+				szMD5        = rec.szMD5                           ,
+				szName       = MY_Recount_DS.GetNameAusID(id, data),
+				dwForceID    = data.Forcelist[id] or -1            ,
+				nValue       = rec.nTotal         or  0            ,
+				nEffectValue = rec.nTotalEffect   or  0            ,
 			}
 			tIDs[id] = true
 			-- 计算战斗时间
 			if MY_Recount.bAwayMode then -- 删去死亡时间 && 防止计算DPS时除以0
-				tRec.nTimeCount = math.max(MY_Recount.Data.GeneFightTime(data, id, MY_Recount.bSysTimeMode and SZ_CHANNEL_KEY[MY_Recount.nChannel]), 1)
+				tRec.nTimeCount = math.max(MY_Recount_DS.GeneFightTime(data, id, MY_Recount.bSysTimeMode and SZ_CHANNEL_KEY[MY_Recount.nChannel]), 1)
 			else -- 不删去暂离时间
 				tRec.nTimeCount = math.max(nTimeCount, 1)
 			end
@@ -395,7 +388,7 @@ function MY_Recount.UpdateUI(data)
 			else
 				nMaxValue = math.max(nMaxValue, tRec.nValue, tRec.nEffectValue)
 			end
-			table.insert(aResult, tRec)
+			insert(aResult, tRec)
 		end
 	end
 	-- 全程没数据的队友
@@ -404,7 +397,7 @@ function MY_Recount.UpdateUI(data)
 		for _, dwID in ipairs(list) do
 			local info = GetClientTeam().GetMemberInfo(dwID)
 			if not tIDs[dwID] then
-				table.insert(aResult, {
+				insert(aResult, {
 					id             = dwID                   ,
 					-- szMD5          = info.szMD5             ,
 					szName         = info.szName            ,
@@ -429,7 +422,7 @@ function MY_Recount.UpdateUI(data)
 	elseif MY_Recount.bShowPerSec then
 		szSortKey = 'nValuePS'
 	end
-	table.sort(aResult, function(p1, p2)
+	sort(aResult, function(p1, p2)
 		return p1[szSortKey] > p2[szSortKey]
 	end)
 
@@ -678,9 +671,9 @@ function MY_Recount.OnItemRefreshTip()
 			local szColon = g_tStrings.STR_COLON
 			local t = {}
 			for szSkillName, p in pairs(tRec.Skill) do
-				table.insert(t, { szName = szSkillName, rec = p })
+				insert(t, { szName = szSkillName, rec = p })
 			end
-			table.sort(t, function(p1, p2)
+			sort(t, function(p1, p2)
 				return p1.rec.nTotal > p2.rec.nTotal
 			end)
 			for _, p in ipairs(t) do
@@ -709,7 +702,7 @@ function MY_Recount.OnItemRefreshTip()
 				szXml = szXml .. GetFormatText(_L(
 					'away count: %d, away time: %ds',
 					#DataDisplay.Awaytime[id],
-					MY_Recount.Data.GeneAwayTime(DataDisplay, id, MY_Recount.bSysTimeMode)
+					MY_Recount_DS.GeneAwayTime(DataDisplay, id, MY_Recount.bSysTimeMode)
 				), nil, 255, 191, 255)
 			end
 			OutputTip(szXml, 500, {x, y, w, h})
@@ -750,7 +743,7 @@ function MY_Recount.OnLButtonClick()
 	elseif name == 'Btn_History' then
 		PopupMenu(MY_Recount.GetHistoryMenu())
 	elseif name == 'Btn_Empty' then
-		MY_Recount.Data.Flush()
+		MY_Recount_DS.Flush()
 		MY_Recount.DisplayData(0)
 		MY_Recount.DrawUI()
 	elseif name == 'Btn_Issuance' then
@@ -789,7 +782,7 @@ function MY_Recount_Detail.OnFrameCreate()
 	frame.bFirstRendering = true
 	frame.szPrimarySort = ((frame.nChannel == CHANNEL.DPS or frame.nChannel == CHANNEL.HPS) and 'Skill') or 'Target'
 	frame.szSecondarySort = ((frame.nChannel == CHANNEL.DPS or frame.nChannel == CHANNEL.HPS) and 'Target') or 'Skill'
-	frame:Lookup('', 'Text_Default'):SetText(MY_Recount.Data.GetNameAusID(id, DataDisplay) .. ' ' .. SZ_CHANNEL[frame.nChannel])
+	frame:Lookup('', 'Text_Default'):SetText(MY_Recount_DS.GetNameAusID(id, DataDisplay) .. ' ' .. SZ_CHANNEL[frame.nChannel])
 	frame:Lookup('WndScroll_Target', 'Handle_TargetTitle/Text_TargetTitle_5'):SetText(g_tStrings.STR_HIT_NAME)
 	frame:Lookup('WndScroll_Target', 'Handle_TargetTitle/Text_TargetTitle_6'):SetText(g_tStrings.STR_CS_NAME)
 	frame:Lookup('WndScroll_Target', 'Handle_TargetTitle/Text_TargetTitle_7'):SetText(g_tStrings.STR_MSG_MISS)
@@ -852,23 +845,23 @@ function MY_Recount_Detail.OnFrameBreathe()
 				nTotal = MY_Recount.bShowEffect and p.nTotalEffect or p.nTotal,
 			}
 			if MY_Recount.bShowZeroVal or rec.nTotal > 0 then
-				table.insert(aResult, rec)
+				insert(aResult, rec)
 			end
 		end
 	else
 		for id, p in pairs(tData.Target) do
 			local rec = {
 				szKey  = id                              ,
-				szName = MY_Recount.Data.GetNameAusID(id, DataDisplay),
+				szName = MY_Recount_DS.GetNameAusID(id, DataDisplay),
 				nCount = not MY_Recount.bShowZeroVal and p.nNzCount or p.nCount,
 				nTotal = MY_Recount.bShowEffect and p.nTotalEffect or p.nTotal,
 			}
 			if MY_Recount.bShowZeroVal or rec.nTotal > 0 then
-				table.insert(aResult, rec)
+				insert(aResult, rec)
 			end
 		end
 	end
-	table.sort(aResult, function(p1, p2) return p1.nTotal > p2.nTotal end)
+	sort(aResult, function(p1, p2) return p1.nTotal > p2.nTotal end)
 	-- 默认选中第一个
 	if this.bFirstRendering then
 		if aResult[1] then
@@ -937,10 +930,10 @@ function MY_Recount_Detail.OnFrameBreathe()
 				szSkillResult = SZ_SKILL_RESULT[nSkillResult],
 			}
 			if res.nCount > 0 then
-				table.insert(aResult, res)
+				insert(aResult, res)
 			end
 		end
-		table.sort(aResult, function(p1, p2) return p1.nAvg > p2.nAvg end)
+		sort(aResult, function(p1, p2) return p1.nAvg > p2.nAvg end)
 		-- 界面重绘
 		this:Lookup('WndScroll_Detail'):Show()
 		local hList = this:Lookup('WndScroll_Detail', 'Handle_DetailList')
@@ -979,10 +972,10 @@ function MY_Recount_Detail.OnFrameBreathe()
 					nCriticalCount = MY_Recount.bShowZeroVal and (p.Count[SKILL_RESULT.CRITICAL] or 0) or p.NzCount[SKILL_RESULT.CRITICAL] or 0,
 					nMax           = MY_Recount.bShowEffect and p.nMaxEffect or p.nMax,
 					nTotal         = MY_Recount.bShowEffect and p.nTotalEffect or p.nTotal,
-					szName         = MY_Recount.Data.GetNameAusID(id, DataDisplay),
+					szName         = MY_Recount_DS.GetNameAusID(id, DataDisplay),
 				}
 				if MY_Recount.bShowZeroVal or rec.nTotal > 0 or rec.nMissCount > 0 then
-					table.insert(aResult, rec)
+					insert(aResult, rec)
 				end
 			end
 		else
@@ -996,11 +989,11 @@ function MY_Recount_Detail.OnFrameBreathe()
 					szName         = szSkillName,
 				}
 				if MY_Recount.bShowZeroVal or rec.nTotal > 0 or rec.nMissCount > 0 then
-					table.insert(aResult, rec)
+					insert(aResult, rec)
 				end
 			end
 		end
-		table.sort(aResult, function(p1, p2) return p1.nTotal > p2.nTotal end)
+		sort(aResult, function(p1, p2) return p1.nTotal > p2.nTotal end)
 		-- 界面重绘
 		this:Lookup('WndScroll_Target'):Show()
 		local hList = this:Lookup('WndScroll_Target', 'Handle_TargetList')
@@ -1188,9 +1181,9 @@ function MY_Recount.GetMenu()
 		}, {
 			szOption = _L['distinct target id with same name'],
 			bCheck = true,
-			bChecked = MY_Recount.Data.bDistinctTargetID,
+			bChecked = MY_Recount_DS.bDistinctTargetID,
 			fnAction = function()
-				MY_Recount.Data.bDistinctTargetID = not MY_Recount.Data.bDistinctTargetID
+				MY_Recount_DS.bDistinctTargetID = not MY_Recount_DS.bDistinctTargetID
 				MY_Recount.DrawUI()
 			end,
 			fnDisable = function()
@@ -1199,9 +1192,9 @@ function MY_Recount.GetMenu()
 		}, {
 			szOption = _L['distinct effect id with same name'],
 			bCheck = true,
-			bChecked = MY_Recount.Data.bDistinctEffectID,
+			bChecked = MY_Recount_DS.bDistinctEffectID,
 			fnAction = function()
-				MY_Recount.Data.bDistinctEffectID = not MY_Recount.Data.bDistinctEffectID
+				MY_Recount_DS.bDistinctEffectID = not MY_Recount_DS.bDistinctEffectID
 				MY_Recount.DrawUI()
 			end,
 			fnDisable = function()
@@ -1210,9 +1203,9 @@ function MY_Recount.GetMenu()
 		}, {
 			szOption = _L['record anonymous effect'],
 			bCheck = true,
-			bChecked = MY_Recount.Data.bRecAnonymous,
+			bChecked = MY_Recount_DS.bRecAnonymous,
 			fnAction = function()
-				MY_Recount.Data.bRecAnonymous = not MY_Recount.Data.bRecAnonymous
+				MY_Recount_DS.bRecAnonymous = not MY_Recount_DS.bRecAnonymous
 				MY_Recount.DrawUI()
 			end,
 			fnDisable = function()
@@ -1232,9 +1225,9 @@ function MY_Recount.GetMenu()
 		}, {
 			szOption = _L['Record everything'],
 			bCheck = true,
-			bChecked = MY_Recount.Data.bRecEverything,
+			bChecked = MY_Recount_DS.bRecEverything,
 			fnAction = function()
-				MY_Recount.Data.bRecEverything = not MY_Recount.Data.bRecEverything
+				MY_Recount_DS.bRecEverything = not MY_Recount_DS.bRecEverything
 			end,
 			fnDisable = function()
 				return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
@@ -1288,19 +1281,19 @@ function MY_Recount.GetMenu()
 		else
 			szOption = _L('less than %d minute', i / 60)
 		end
-		table.insert(t1, {
+		insert(t1, {
 			szOption = szOption,
 			bCheck = true, bMCheck = true,
-			bChecked = MY_Recount.Data.nMinFightTime == i,
+			bChecked = MY_Recount_DS.nMinFightTime == i,
 			fnAction = function()
-				MY_Recount.Data.nMinFightTime = i
+				MY_Recount_DS.nMinFightTime = i
 			end,
 			fnDisable = function()
 				return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
 			end,
 		})
 	end
-	table.insert(t, t1)
+	insert(t, t1)
 
 	-- 风格选择
 	local t1 = {
@@ -1334,9 +1327,9 @@ function MY_Recount.GetMenu()
 				LIB.SwitchTab('GlobalColor')
 			end
 		end
-		table.insert(t1, t2)
+		insert(t1, t2)
 	end
-	table.insert(t, t1)
+	insert(t, t1)
 
 	-- 数值刷新周期
 	local t1 = {
@@ -1352,7 +1345,7 @@ function MY_Recount.GetMenu()
 		else
 			szOption = _L('every %.1f second', i / GLOBAL.GAME_FPS)
 		end
-		table.insert(t1, {
+		insert(t1, {
 			szOption = szOption,
 			bCheck = true, bMCheck = true,
 			bChecked = MY_Recount.nDrawInterval == i,
@@ -1364,7 +1357,7 @@ function MY_Recount.GetMenu()
 			end,
 		})
 	end
-	table.insert(t, t1)
+	insert(t, t1)
 
 	-- 最大历史记录
 	local t1 = {
@@ -1374,19 +1367,19 @@ function MY_Recount.GetMenu()
 		end,
 	}
 	for i = 1, 20 do
-		table.insert(t1, {
+		insert(t1, {
 			szOption = i,
 			bCheck = true, bMCheck = true,
-			bChecked = MY_Recount.Data.nMaxHistory == i,
+			bChecked = MY_Recount_DS.nMaxHistory == i,
 			fnAction = function()
-				MY_Recount.Data.nMaxHistory = i
+				MY_Recount_DS.nMaxHistory = i
 			end,
 			fnDisable = function()
 				return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
 			end,
 		})
 	end
-	table.insert(t, t1)
+	insert(t, t1)
 
 	return t
 end
@@ -1395,13 +1388,13 @@ end
 function MY_Recount.GetHistoryMenu()
 	local t = {{
 		szOption = _L['current fight'],
-		rgb = (MY_Recount.Data.Get(0) == DataDisplay and {255, 255, 0}) or nil,
+		rgb = (MY_Recount_DS.Get(0) == DataDisplay and {255, 255, 0}) or nil,
 		fnAction = function()
 			MY_Recount.DisplayData(0)
 		end,
 	}}
 
-	for _, data in ipairs(MY_Recount.Data.Get()) do
+	for _, data in ipairs(MY_Recount_DS.Get()) do
 		if data.UUID and data.nTimeDuring then
 			local t1 = {
 				szOption = (data.szBossName or ''):gsub('#.*', '') .. ' (' .. LIB.FormatTimeCounter(data.nTimeDuring, '%M:%ss') .. ')',
@@ -1416,20 +1409,20 @@ function MY_Recount.GetHistoryMenu()
 				nIconHeight = 17,
 				szLayer = 'ICON_RIGHTMOST',
 				fnClickIcon = function()
-					MY_Recount.Data.Del(data)
+					MY_Recount_DS.Del(data)
 					Wnd.CloseWindow('PopupMenuPanel')
 				end,
 			}
-			table.insert(t, t1)
+			insert(t, t1)
 		end
 	end
 
-	table.insert(t, { bDevide = true })
-	table.insert(t, {
+	insert(t, { bDevide = true })
+	insert(t, {
 		szOption = _L['auto save data while exit game'],
-		bCheck = true, bChecked = MY_Recount.bSaveRecount,
+		bCheck = true, bChecked = MY_Recount_DS.bSaveHistory,
 		fnAction = function()
-			MY_Recount.bSaveRecount = not MY_Recount.bSaveRecount
+			MY_Recount_DS.bSaveHistory = not MY_Recount_DS.bSaveHistory
 		end,
 	})
 
@@ -1441,7 +1434,7 @@ function MY_Recount.GetPublishMenu()
 	local t = {}
 
 	-- 发布类型
-	table.insert(t, {
+	insert(t, {
 		szOption = _L['publish mode'],
 		{
 			szOption = _L['only effect value'],
@@ -1490,7 +1483,7 @@ function MY_Recount.GetPublishMenu()
 		local nMaxNameLen = 0
 		for i = 0, min(hList:GetItemCount(), nLimit) - 1 do
 			local hItem = hList:Lookup(i)
-			table.insert(aResult, hItem.data)
+			insert(aResult, hItem.data)
 			nMaxNameLen = math.max(nMaxNameLen, wstring.len(hItem.data.szName))
 		end
 		if not MY_Recount.bShowPerSec then
@@ -1543,7 +1536,7 @@ function MY_Recount.GetPublishMenu()
 				fnAction = function() Publish(nChannel, nLimit) end,
 			})
 		end
-		table.insert(t, t1)
+		insert(t, t1)
 	end
 
 	return t
@@ -1554,10 +1547,10 @@ function D.InsertFromText(aTabTalk, h)
 	for i = 0, h:GetItemCount() - 1 do
 		local p = h:Lookup(i)
 		if p:GetType() == 'Text' then
-			table.insert(aText, p:GetText())
+			insert(aText, p:GetText())
 		end
 	end
-	table.insert(aTabTalk, aText)
+	insert(aTabTalk, aText)
 end
 
 function MY_Recount.GetDetailMenu(frame)
@@ -1635,7 +1628,7 @@ function MY_Recount.GetDetailMenu(frame)
 				fnAction = function() Publish(nChannel, nLimit) end,
 			})
 		end
-		table.insert(t, t1)
+		insert(t, t1)
 	end
 
 	return t

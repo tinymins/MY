@@ -1,7 +1,7 @@
 --------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
--- @desc     : Õ½¶·Í³¼Æ Êý¾ÝÊÕ¼¯´¦Àí²¿·Ö
+-- @desc     : Õ½¶·Í³¼Æ Êý¾ÝÔ´
 -- @author   : ÜøÒÁ @Ë«ÃÎÕò @×··çõæÓ°
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
@@ -226,18 +226,16 @@ local AWAYTIME_TYPE = {
 }
 local VERSION = 1
 
-if not MY_Recount then
-	return
-end
-MY_Recount.Data = {}
-MY_Recount.Data.nMaxHistory       = 10
-MY_Recount.Data.nMinFightTime     = 30
-MY_Recount.Data.bRecAnonymous     = true
-MY_Recount.Data.bDistinctTargetID = false
-MY_Recount.Data.bDistinctEffectID = false
-MY_Recount.Data.bRecEverything    = true
-
-local _Cache = {}
+local D = {}
+local O = {
+	bSaveHistory      = false,
+	nMaxHistory       = 10,
+	nMinFightTime     = 30,
+	bRecAnonymous     = true,
+	bDistinctTargetID = false,
+	bDistinctEffectID = false,
+	bRecEverything    = true,
+}
 local Data          -- µ±Ç°Õ½¶·Êý¾Ý¼ÇÂ¼
 local History = {}  -- ÀúÊ·Õ½¶·¼ÇÂ¼
 local SZ_REC_FILE = {'cache/fight_recount_log.jx3dat', PATH_TYPE.ROLE}
@@ -257,46 +255,48 @@ local SZ_REC_FILE = {'cache/fight_recount_log.jx3dat', PATH_TYPE.ROLE}
 --           # #               #           #         #           # # # # #         # # # # # # # #
 -- ##################################################################################################
 -- µÇÂ½ÓÎÏ·¼ÓÔØ±£´æµÄÊý¾Ý
-function MY_Recount.Data.LoadData(bLoadHistory)
+function D.LoadData()
 	local data = LIB.LoadLUAData(SZ_REC_FILE, { passphrase = false })
 	if data then
-		if bLoadHistory then
+		if data.bSaveHistory or data.History then
 			History = data.History or {}
 			for i = #History, 1, -1 do
 				if History[i].nVersion ~= VERSION then
-					table.remove(History, i)
+					remove(History, i)
 				end
 			end
 		end
-		MY_Recount.Data.nMaxHistory       = data.nMaxHistory   or 10
-		MY_Recount.Data.nMinFightTime     = data.nMinFightTime or 30
-		MY_Recount.Data.bRecAnonymous     = LIB.FormatDataStructure(data.bRecAnonymous, true)
-		MY_Recount.Data.bDistinctTargetID = LIB.FormatDataStructure(data.bDistinctTargetID, false)
-		MY_Recount.Data.bDistinctEffectID = LIB.FormatDataStructure(data.bDistinctEffectID, false)
-		MY_Recount.Data.bRecEverything    = LIB.FormatDataStructure(data.bRecEverything, false)
+		O.bSaveHistory      = data.bSaveHistory or false
+		O.nMaxHistory       = data.nMaxHistory   or 10
+		O.nMinFightTime     = data.nMinFightTime or 30
+		O.bRecAnonymous     = LIB.FormatDataStructure(data.bRecAnonymous, true)
+		O.bDistinctTargetID = LIB.FormatDataStructure(data.bDistinctTargetID, false)
+		O.bDistinctEffectID = LIB.FormatDataStructure(data.bDistinctEffectID, false)
+		O.bRecEverything    = LIB.FormatDataStructure(data.bRecEverything, false)
 	end
-	MY_Recount.Data.Init()
+	D.Init()
 end
 
 -- ÍË³öÓÎÏ·±£´æÊý¾Ý
-function MY_Recount.Data.SaveData(bSaveHistory)
+function D.SaveData()
 	local data = {
-		History = bSaveHistory and History or nil,
-		nMaxHistory       = MY_Recount.Data.nMaxHistory,
-		nMinFightTime     = MY_Recount.Data.nMinFightTime,
-		bRecAnonymous     = MY_Recount.Data.bRecAnonymous,
-		bDistinctTargetID = MY_Recount.Data.bDistinctTargetID,
-		bDistinctEffectID = MY_Recount.Data.bDistinctEffectID,
-		bRecEverything    = MY_Recount.Data.bRecEverything,
+		History = O.bSaveHistory and History or nil,
+		bSaveHistory      = O.bSaveHistory,
+		nMaxHistory       = O.nMaxHistory,
+		nMinFightTime     = O.nMinFightTime,
+		bRecAnonymous     = O.bRecAnonymous,
+		bDistinctTargetID = O.bDistinctTargetID,
+		bDistinctEffectID = O.bDistinctEffectID,
+		bRecEverything    = O.bRecEverything,
 	}
-	local data = LIB.SaveLUAData(SZ_REC_FILE, data, { passphrase = false })
+	LIB.SaveLUAData(SZ_REC_FILE, data, { passphrase = false })
 end
 
 -- ¹ýÍ¼Çå³ýµ±Ç°Õ½¶·Êý¾Ý
 do
 local function onLoadingEnding()
-	MY_Recount.Data.Flush()
-	MY_Recount.Data.Init(true)
+	D.Flush()
+	D.Init(true)
 	FireUIEvent('MY_RECOUNT_NEW_FIGHT')
 end
 LIB.RegisterEvent('LOADING_ENDING', onLoadingEnding)
@@ -306,12 +306,12 @@ end
 -- ÍË³öÕ½¶· ±£´æÊý¾Ý
 LIB.RegisterEvent('MY_FIGHT_HINT', function(event)
 	if arg0 and LIB.GetFightUUID() ~= Data.UUID then -- ½øÈëÐÂµÄÕ½¶·
-		MY_Recount.Data.Init()
+		D.Init()
 		FireUIEvent('MY_RECOUNT_NEW_FIGHT')
 	else
-		MY_Recount.Data.Flush()
+		D.Flush()
 	end
-	_Cache.AddEverything(Data, 'FIGHT_TIME', LIB.IsFighting(), LIB.GetFightUUID(), LIB.GetFightTime())
+	D.InsertEverything(Data, 'FIGHT_TIME', LIB.IsFighting(), LIB.GetFightUUID(), LIB.GetFightTime())
 end)
 LIB.BreatheCall('MY_Recount_FightTime', 1000, function()
 	if LIB.IsFighting() then
@@ -330,7 +330,7 @@ LIB.BreatheCall('MY_Recount_FightTime', 1000, function()
 					nTotalEffect = v.nTotalEffect,
 				}
 			end
-			table.insert(Data[szRecordType].Snapshots, tSnapshot)
+			insert(Data[szRecordType].Snapshots, tSnapshot)
 		end
 	end
 end)
@@ -350,10 +350,10 @@ end)
 --     #           #         #     # #   #       #     # #   # # #     # #                            --
 -- ################################################################################################## --
 -- »ñÈ¡Í³¼ÆÊý¾Ý
--- (table) MY_Recount.Data.Get(nIndex) -- »ñÈ¡Ö¸¶¨¼ÇÂ¼
+-- (table) D.Get(nIndex) -- »ñÈ¡Ö¸¶¨¼ÇÂ¼
 --     (number)nIndex: ÀúÊ·¼ÇÂ¼Ë÷Òý Îª0·µ»Øµ±Ç°Í³¼Æ
--- (table) MY_Recount.Data.Get()       -- »ñÈ¡ËùÓÐÀúÊ·¼ÇÂ¼ÁÐ±í
-function MY_Recount.Data.Get(nIndex)
+-- (table) D.Get()       -- »ñÈ¡ËùÓÐÀúÊ·¼ÇÂ¼ÁÐ±í
+function D.Get(nIndex)
 	if not nIndex then
 		return History
 	elseif nIndex == 0 then
@@ -364,29 +364,29 @@ function MY_Recount.Data.Get(nIndex)
 end
 
 -- É¾³ýÀúÊ·Í³¼ÆÊý¾Ý
--- (table) MY_Recount.Data.Del(nIndex) -- É¾³ýÖ¸¶¨ÐòºÅµÄ¼ÇÂ¼
+-- (table) D.Del(nIndex) -- É¾³ýÖ¸¶¨ÐòºÅµÄ¼ÇÂ¼
 --     (number)nIndex: ÀúÊ·¼ÇÂ¼Ë÷Òý
--- (table) MY_Recount.Data.Del(data)   -- É¾³ýÖ¸¶¨¼ÇÂ¼
-function MY_Recount.Data.Del(data)
+-- (table) D.Del(data)   -- É¾³ýÖ¸¶¨¼ÇÂ¼
+function D.Del(data)
 	if type(data) == 'number' then
-		table.remove(History, data)
+		remove(History, data)
 	else
 		for i = #History, 1, -1 do
 			if History[i] == data then
-				table.remove(History, i)
+				remove(History, i)
 			end
 		end
 	end
 end
 
 -- ¼ÆËãÔÝÀëÊ±¼ä
--- MY_Recount.Data.GeneAwayTime(data, dwID, szRecordType)
+-- D.GeneAwayTime(data, dwID, szRecordType)
 -- data: Êý¾Ý
 -- dwID: ¼ÆËãÔÝÀëµÄ½ÇÉ«ID Îª¿ÕÔò¼ÆËãÍÅ¶ÓµÄÔÝÀëÊ±¼ä£¨Ä¿Ç°ÓÀÔ¶Îª0£©
 -- szRecordType: ²»Í¬ÀàÐÍµÄÊý¾ÝÔÚ¹Ù·½Ê±¼äËã·¨ÏÂ¼ÆËã½á¹û¿ÉÄÜ²»Ò»Ñù
 --               Ã¶¾ÙÔÝÊ±ÓÐ Heal Damage BeDamage BeHeal ËÄÖÖ
-function MY_Recount.Data.GeneAwayTime(data, dwID, szRecordType)
-	local nFightTime = MY_Recount.Data.GeneFightTime(data, dwID, szRecordType)
+function D.GeneAwayTime(data, dwID, szRecordType)
+	local nFightTime = D.GeneFightTime(data, dwID, szRecordType)
 	local nAwayTime
 	if szRecordType and data[szRecordType] and data[szRecordType].nTimeDuring then
 		nAwayTime = data[szRecordType].nTimeDuring - nFightTime
@@ -397,12 +397,12 @@ function MY_Recount.Data.GeneAwayTime(data, dwID, szRecordType)
 end
 
 -- ¼ÆËãÕ½¶·Ê±¼ä
--- MY_Recount.Data.GeneFightTime(data, dwID, szRecordType)
+-- D.GeneFightTime(data, dwID, szRecordType)
 -- data: Êý¾Ý
 -- dwID: ¼ÆËãÕ½¶·Ê±¼äµÄ½ÇÉ«ID Îª¿ÕÔò¼ÆËãÍÅ¶ÓµÄÕ½¶·Ê±¼ä
 -- szRecordType: ²»Í¬ÀàÐÍµÄÊý¾ÝÔÚ¹Ù·½Ê±¼äËã·¨ÏÂ¼ÆËã½á¹û¿ÉÄÜ²»Ò»Ñù
 --               Ã¶¾ÙÔÝÊ±ÓÐ Heal Damage BeDamage BeHeal ËÄÖÖ
-function MY_Recount.Data.GeneFightTime(data, dwID, szRecordType)
+function D.GeneFightTime(data, dwID, szRecordType)
 	local nTimeDuring = data.nTimeDuring
 	local nTimeBegin  = data.nTimeBegin
 	if szRecordType and data[szRecordType] and data[szRecordType].nTimeDuring then
@@ -438,7 +438,7 @@ end
 --   # #     #   #       #     # # #     #       #   #       # # # # # # #       #             #      --
 -- ################################################################################################## --
 -- ¼ÇÂ¼Ò»´ÎLOG
--- MY_Recount.OnSkillEffect(dwCaster, dwTarget, nEffectType, dwID, dwLevel, nSkillResult, nResultCount, tResult)
+-- D.OnSkillEffect(dwCaster, dwTarget, nEffectType, dwID, dwLevel, nSkillResult, nResultCount, tResult)
 -- (number) dwCaster    : ÊÍ·ÅÕßID
 -- (number) dwTarget    : ³ÐÊÜÕßID
 -- (number) nEffectType : Ôì³ÉÐ§¹ûµÄÔ­Òò£¨SKILL_EFFECT_TYPEÃ¶¾Ù ÈçSKILL,BUFF£©
@@ -447,7 +447,7 @@ end
 -- (number) nSkillResult: Ôì³ÉµÄÐ§¹û½á¹û£¨SKILL_RESULTÃ¶¾Ù ÈçHIT,MISS£©
 -- (number) nResultCount      : Ôì³ÉÐ§¹ûµÄÊýÖµÊýÁ¿£¨tResult³¤¶È£©
 -- (table ) tResult     : ËùÓÐÐ§¹ûÊýÖµ¼¯ºÏ
-function MY_Recount.Data.OnSkillEffect(dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nResultCount, tResult)
+function D.OnSkillEffect(dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nResultCount, tResult)
 	-- »ñÈ¡ÊÍ·Å¶ÔÏóºÍ³ÐÊÜ¶ÔÏó
 	local KCaster = LIB.GetObject(dwCaster)
 	if KCaster and not IsPlayer(dwCaster)
@@ -500,9 +500,9 @@ function MY_Recount.Data.OnSkillEffect(dwCaster, dwTarget, nEffectType, dwEffect
 
 	-- Î´½øÕ½Ôò³õÊ¼»¯Í³¼ÆÊý¾Ý£¨¼´Ä¬ÈÏµ±Ç°Ö¡ËùÓÐµÄ¼¼ÄÜÈÕÖ¾Îª½øÕ½¼¼ÄÜ£©
 	if not LIB.GetFightUUID() and
-	_Cache.nLastAutoInitFrame ~= GetLogicFrameCount() then
-		_Cache.nLastAutoInitFrame = GetLogicFrameCount()
-		MY_Recount.Data.Init(true)
+	D.nLastAutoInitFrame ~= GetLogicFrameCount() then
+		D.nLastAutoInitFrame = GetLogicFrameCount()
+		D.Init(true)
 	end
 
 	local nTherapy = tResult[SKILL_RESULT_TYPE.THERAPY] or 0
@@ -515,35 +515,39 @@ function MY_Recount.Data.OnSkillEffect(dwCaster, dwTarget, nEffectType, dwEffect
 					(tResult[SKILL_RESULT_TYPE.REFLECTIED_DAMAGE   ] or 0)   -- ·´µ¯ÉËº¦
 	local nEffectDamage = tResult[SKILL_RESULT_TYPE.EFFECTIVE_DAMAGE] or 0
 
-	_Cache.AddEverything(Data, 'SKILL_EFFECT', dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, szEffectName, nSkillResult, tResult)
+	D.InsertEverything(Data,
+		'SKILL_EFFECT', dwCaster, dwTarget,
+		nEffectType, dwEffectID, dwEffectLevel, szEffectName,
+		nSkillResult, nTherapy, nEffectTherapy, nDamage, nEffectDamage,
+		tResult)
 
-	if bAnonymous and not MY_Recount.Data.bRecAnonymous then
+	if bAnonymous and not O.bRecAnonymous then
 		return
 	end
 
 	-- Ê¶ÆÆ
 	local nValue = tResult[SKILL_RESULT_TYPE.INSIGHT_DAMAGE]
 	if nValue and nValue > 0 then
-		MY_Recount.Data.AddDamageRecord(KCaster, KTarget, szDamageEffectName, nDamage, nEffectDamage, SKILL_RESULT.INSIGHT)
+		D.AddDamageRecord(KCaster, KTarget, szDamageEffectName, nDamage, nEffectDamage, SKILL_RESULT.INSIGHT)
 	elseif nSkillResult == SKILL_RESULT.HIT or
 	nSkillResult == SKILL_RESULT.CRITICAL then -- »÷ÖÐ
 		if nTherapy > 0 then -- ÓÐÖÎÁÆ
-			MY_Recount.Data.AddHealRecord(KCaster, KTarget, szHealEffectName, nTherapy, nEffectTherapy, nSkillResult)
+			D.AddHealRecord(KCaster, KTarget, szHealEffectName, nTherapy, nEffectTherapy, nSkillResult)
 		end
 		if nDamage > 0 or nTherapy == 0 then -- ÓÐÉËº¦ »òÕß ÎÞÉËº¦ÎÞÖÎÁÆµÄÐ§¹û
-			MY_Recount.Data.AddDamageRecord(KCaster, KTarget, szDamageEffectName, nDamage, nEffectDamage, nSkillResult)
+			D.AddDamageRecord(KCaster, KTarget, szDamageEffectName, nDamage, nEffectDamage, nSkillResult)
 		end
 	elseif nSkillResult == SKILL_RESULT.BLOCK or  -- ¸ñµ²
 	nSkillResult == SKILL_RESULT.SHIELD       or  -- ÎÞÐ§
 	nSkillResult == SKILL_RESULT.MISS         or  -- Æ«Àë
 	nSkillResult == SKILL_RESULT.DODGE      then  -- ÉÁ±Ü
-		MY_Recount.Data.AddDamageRecord(KCaster, KTarget, szDamageEffectName, 0, 0, nSkillResult)
+		D.AddDamageRecord(KCaster, KTarget, szDamageEffectName, 0, 0, nSkillResult)
 	end
 
 	Data.nTimeDuring = GetCurrentTime() - Data.nTimeBegin
 end
 
-function MY_Recount.Data.GetNameAusID(id, data)
+function D.GetNameAusID(id, data)
 	if not id or not data then
 		return
 	end
@@ -562,7 +566,7 @@ function MY_Recount.Data.GetNameAusID(id, data)
 	return szName
 end
 
-function MY_Recount.Data.IsParty(id, data)
+function D.IsParty(id, data)
 	local dwID = tonumber(id)
 	if dwID then
 		if dwID == UI_GetClientPlayerID() then
@@ -576,15 +580,15 @@ function MY_Recount.Data.IsParty(id, data)
 end
 
 -- ²åÈë¸´ÅÌÊý¾Ý
-function _Cache.AddEverything(data, szName, ...)
-	if not MY_Recount.Data.bRecEverything then
+function D.InsertEverything(data, szName, ...)
+	if not O.bRecEverything then
 		return
 	end
 	insert(data.Everything, {GetLogicFrameCount(), GetCurrentTime(), GetTime(), szName, ...})
 end
 
 -- ½«Ò»Ìõ¼ÇÂ¼²åÈëÊý×é
-function _Cache.AddRecord(data, szRecordType, idRecord, idTarget, szEffectName, nValue, nEffectValue, nSkillResult)
+function D.InsertRecord(data, szRecordType, idRecord, idTarget, szEffectName, nValue, nEffectValue, nSkillResult)
 	local tInfo   = data[szRecordType]
 	local tRecord = tInfo.Statistics[idRecord]
 	if not szEffectName or szEffectName == '' then
@@ -867,35 +871,35 @@ local function GetObjectKeyID(obj)
 end
 
 -- ²åÈëÒ»ÌõÉËº¦¼ÇÂ¼
-function MY_Recount.Data.AddDamageRecord(KCaster, KTarget, szEffectName, nDamage, nEffectDamage, nSkillResult)
+function D.AddDamageRecord(KCaster, KTarget, szEffectName, nDamage, nEffectDamage, nSkillResult)
 	-- »ñÈ¡Ë÷ÒýID
 	local idCaster = GetObjectKeyID(KCaster)
 	local idTarget = GetObjectKeyID(KTarget)
 
 	-- Ìí¼ÓÉËº¦¼ÇÂ¼
-	_Cache.InitObjectData(Data, KCaster, 'Damage')
-	_Cache.AddRecord(Data, 'Damage'  , idCaster, idTarget, szEffectName, nDamage, nEffectDamage, nSkillResult)
+	D.InitObjectData(Data, KCaster, 'Damage')
+	D.InsertRecord(Data, 'Damage'  , idCaster, idTarget, szEffectName, nDamage, nEffectDamage, nSkillResult)
 	-- Ìí¼Ó³ÐÉË¼ÇÂ¼
-	_Cache.InitObjectData(Data, KTarget, 'BeDamage')
-	_Cache.AddRecord(Data, 'BeDamage', idTarget, idCaster, szEffectName, nDamage, nEffectDamage, nSkillResult)
+	D.InitObjectData(Data, KTarget, 'BeDamage')
+	D.InsertRecord(Data, 'BeDamage', idTarget, idCaster, szEffectName, nDamage, nEffectDamage, nSkillResult)
 end
 
 -- ²åÈëÒ»ÌõÖÎÁÆ¼ÇÂ¼
-function MY_Recount.Data.AddHealRecord(KCaster, KTarget, szEffectName, nHeal, nEffectHeal, nSkillResult)
+function D.AddHealRecord(KCaster, KTarget, szEffectName, nHeal, nEffectHeal, nSkillResult)
 	-- »ñÈ¡Ë÷ÒýID
 	local idCaster = GetObjectKeyID(KCaster)
 	local idTarget = GetObjectKeyID(KTarget)
 
 	-- Ìí¼ÓÉËº¦¼ÇÂ¼
-	_Cache.InitObjectData(Data, KCaster, 'Heal')
-	_Cache.AddRecord(Data, 'Heal'    , idCaster, idTarget, szEffectName, nHeal, nEffectHeal, nSkillResult)
+	D.InitObjectData(Data, KCaster, 'Heal')
+	D.InsertRecord(Data, 'Heal'    , idCaster, idTarget, szEffectName, nHeal, nEffectHeal, nSkillResult)
 	-- Ìí¼Ó³ÐÉË¼ÇÂ¼
-	_Cache.InitObjectData(Data, KTarget, 'BeHeal')
-	_Cache.AddRecord(Data, 'BeHeal'  , idTarget, idCaster, szEffectName, nHeal, nEffectHeal, nSkillResult)
+	D.InitObjectData(Data, KTarget, 'BeHeal')
+	D.InsertRecord(Data, 'BeHeal'  , idTarget, idCaster, szEffectName, nHeal, nEffectHeal, nSkillResult)
 end
 
 -- È·ÈÏ¶ÔÏóÊý¾ÝÒÑ´´½¨£¨Î´´´½¨Ôò´´½¨£©
-function _Cache.InitObjectData(data, obj, szChannel)
+function D.InitObjectData(data, obj, szChannel)
 	local id = GetObjectKeyID(obj)
 	if IsPlayer(obj.dwID) and not data.Namelist[id] then
 		data.Namelist[id]  = LIB.GetObjectName(obj, 'never') -- Ãû³Æ»º´æ
@@ -925,14 +929,14 @@ local function GeneTypeNS()
 		Statistics   = {},
 	}
 end
-function MY_Recount.Data.Init(bForceInit)
+function D.Init(bForceInit)
 	if bForceInit or (not Data) or
 	(Data.UUID and LIB.GetFightUUID() ~= Data.UUID) then
 		Data = {
 			UUID              = LIB.GetFightUUID(),                 -- Õ½¶·Î¨Ò»±êÊ¶
 			nVersion          = VERSION,                           -- Êý¾Ý°æ±¾ºÅ
-			bDistinctTargetID = MY_Recount.Data.bDistinctTargetID, -- ÊÇ·ñ¸ù¾ÝIDÇø·ÖÍ¬ÃûÄ¿±ê
-			bDistinctEffectID = MY_Recount.Data.bDistinctEffectID, -- ÊÇ·ñ¸ù¾ÝIDÇø·ÖÍ¬ÃûÐ§¹û
+			bDistinctTargetID = O.bDistinctTargetID,               -- ÊÇ·ñ¸ù¾ÝIDÇø·ÖÍ¬ÃûÄ¿±ê
+			bDistinctEffectID = O.bDistinctEffectID,               -- ÊÇ·ñ¸ù¾ÝIDÇø·ÖÍ¬ÃûÐ§¹û
 			nTimeBegin        = GetCurrentTime(),                  -- Õ½¶·¿ªÊ¼Ê±¼ä
 			nTimeDuring       =  0,                                -- Õ½¶·³ÖÐøÊ±¼ä
 			Awaytime          = {},                                -- ËÀÍö/µôÏßÊ±¼ä½Úµã
@@ -954,7 +958,7 @@ end
 end
 
 -- DataÊý¾ÝÑ¹ÈëÀúÊ·¼ÇÂ¼ ²¢ÖØÐÂ³õÊ¼»¯Data
-function MY_Recount.Data.Flush()
+function D.Flush()
 	if not (Data and Data.UUID) then
 		return
 	end
@@ -971,38 +975,38 @@ function MY_Recount.Data.Flush()
 	local nMaxValue, szBossName = 0, nil
 	local nEnemyMaxValue, szEnemyBossName = 0, nil
 	for id, p in pairs(Data.BeDamage.Statistics) do
-		if nEnemyMaxValue < p.nTotalEffect and not MY_Recount.Data.IsParty(id, Data) then
+		if nEnemyMaxValue < p.nTotalEffect and not D.IsParty(id, Data) then
 			nEnemyMaxValue  = p.nTotalEffect
-			szEnemyBossName = MY_Recount.Data.GetNameAusID(id, Data)
+			szEnemyBossName = D.GetNameAusID(id, Data)
 		end
 		if nMaxValue < p.nTotalEffect and id ~= UI_GetClientPlayerID() then
 			nMaxValue  = p.nTotalEffect
-			szBossName = MY_Recount.Data.GetNameAusID(id, Data)
+			szBossName = D.GetNameAusID(id, Data)
 		end
 	end
 	-- Èç¹ûÃ»ÓÐ Ôò¼ÆËãÊä³ö×î¶àµÄNPCÃû×Ö×÷ÎªÕ½¶·Ãû³Æ
 	if not szBossName or not szEnemyBossName then
 		for id, p in pairs(Data.Damage.Statistics) do
-			if nEnemyMaxValue < p.nTotalEffect and not MY_Recount.Data.IsParty(id, Data) then
+			if nEnemyMaxValue < p.nTotalEffect and not D.IsParty(id, Data) then
 				nEnemyMaxValue  = p.nTotalEffect
-				szEnemyBossName = MY_Recount.Data.GetNameAusID(id, Data)
+				szEnemyBossName = D.GetNameAusID(id, Data)
 			end
 			if nMaxValue < p.nTotalEffect and not tonumber(id) then
 				nMaxValue  = p.nTotalEffect
-				szBossName = MY_Recount.Data.GetNameAusID(id, Data)
+				szBossName = D.GetNameAusID(id, Data)
 			end
 		end
 	end
 	Data.szBossName = szEnemyBossName or szBossName or ''
 
-	if Data.nTimeDuring > MY_Recount.Data.nMinFightTime then
-		table.insert(History, 1, Data)
-		while #History > MY_Recount.Data.nMaxHistory do
-			table.remove(History)
+	if Data.nTimeDuring > O.nMinFightTime then
+		insert(History, 1, Data)
+		while #History > O.nMaxHistory do
+			remove(History)
 		end
 	end
 
-	MY_Recount.Data.Init(true)
+	D.Init(true)
 end
 
 -- ÏµÍ³ÈÕÖ¾¼à¿Ø£¨Êý¾ÝÔ´£©
@@ -1010,53 +1014,53 @@ LIB.RegisterEvent('SYS_MSG', function()
 	if arg0 == 'UI_OME_SKILL_CAST_LOG' then
 		-- ¼¼ÄÜÊ©·ÅÈÕÖ¾£»
 		-- (arg1)dwCaster£º¼¼ÄÜÊ©·ÅÕß (arg2)dwSkillID£º¼¼ÄÜID (arg3)dwLevel£º¼¼ÄÜµÈ¼¶
-		-- MY_Recount.OnSkillCast(arg1, arg2, arg3)
+		-- D.OnSkillCast(arg1, arg2, arg3)
 	elseif arg0 == 'UI_OME_SKILL_CAST_RESPOND_LOG' then
 		-- ¼¼ÄÜÊ©·Å½á¹ûÈÕÖ¾£»
 		-- (arg1)dwCaster£º¼¼ÄÜÊ©·ÅÕß (arg2)dwSkillID£º¼¼ÄÜID
 		-- (arg3)dwLevel£º¼¼ÄÜµÈ¼¶ (arg4)nRespond£º¼ûÃ¶¾ÙÐÍ[[SKILL_RESULT_CODE]]
-		-- MY_Recount.OnSkillCastRespond(arg1, arg2, arg3, arg4)
+		-- D.OnSkillCastRespond(arg1, arg2, arg3, arg4)
 	elseif arg0 == 'UI_OME_SKILL_EFFECT_LOG' then
 		-- if not LIB.IsInArena() then
 		-- ¼¼ÄÜ×îÖÕ²úÉúµÄÐ§¹û£¨ÉúÃüÖµµÄ±ä»¯£©£»
 		-- (arg1)dwCaster£ºÊ©·ÅÕß (arg2)dwTarget£ºÄ¿±ê (arg3)bReact£ºÊÇ·ñÎª·´»÷ (arg4)nType£ºEffectÀàÐÍ (arg5)dwID:EffectµÄID
 		-- (arg6)dwLevel£ºEffectµÄµÈ¼¶ (arg7)bCriticalStrike£ºÊÇ·ñ»áÐÄ (arg8)nCount£ºtResultCountÊý¾Ý±íÖÐÔªËØ¸öÊý (arg9)tResultCount£ºÊýÖµ¼¯ºÏ
-		-- MY_Recount.Data.OnSkillEffect(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
+		-- D.OnSkillEffect(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
 		if arg7 and arg7 ~= 0 then -- bCriticalStrike
-			MY_Recount.Data.OnSkillEffect(arg1, arg2, arg4, arg5, arg6, SKILL_RESULT.CRITICAL, arg8, arg9)
+			D.OnSkillEffect(arg1, arg2, arg4, arg5, arg6, SKILL_RESULT.CRITICAL, arg8, arg9)
 		else
-			MY_Recount.Data.OnSkillEffect(arg1, arg2, arg4, arg5, arg6, SKILL_RESULT.HIT, arg8, arg9)
+			D.OnSkillEffect(arg1, arg2, arg4, arg5, arg6, SKILL_RESULT.HIT, arg8, arg9)
 		end
 		-- end
 	elseif arg0 == 'UI_OME_SKILL_BLOCK_LOG' then
 		-- ¸ñµ²ÈÕÖ¾£»
 		-- (arg1)dwCaster£ºÊ©·ÅÕß (arg2)dwTarget£ºÄ¿±ê (arg3)nType£ºEffectµÄÀàÐÍ
 		-- (arg4)dwID£ºEffectµÄID (arg5)dwLevel£ºEffectµÄµÈ¼¶ (arg6)nDamageType£ºÉËº¦ÀàÐÍ£¬¼ûÃ¶¾ÙÐÍ[[SKILL_RESULT_TYPE]]
-		MY_Recount.Data.OnSkillEffect(arg1, arg2, arg3, arg4, arg5, SKILL_RESULT.BLOCK, nil, {})
+		D.OnSkillEffect(arg1, arg2, arg3, arg4, arg5, SKILL_RESULT.BLOCK, nil, {})
 	elseif arg0 == 'UI_OME_SKILL_SHIELD_LOG' then
 		-- ¼¼ÄÜ±»ÆÁ±ÎÈÕÖ¾£»
 		-- (arg1)dwCaster£ºÊ©·ÅÕß (arg2)dwTarget£ºÄ¿±ê
 		-- (arg3)nType£ºEffectµÄÀàÐÍ (arg4)dwID£ºEffectµÄID (arg5)dwLevel£ºEffectµÄµÈ¼¶
-		MY_Recount.Data.OnSkillEffect(arg1, arg2, arg3, arg4, arg5, SKILL_RESULT.SHIELD, nil, {})
+		D.OnSkillEffect(arg1, arg2, arg3, arg4, arg5, SKILL_RESULT.SHIELD, nil, {})
 	elseif arg0 == 'UI_OME_SKILL_MISS_LOG' then
 		-- ¼¼ÄÜÎ´ÃüÖÐÄ¿±êÈÕÖ¾£»
 		-- (arg1)dwCaster£ºÊ©·ÅÕß (arg2)dwTarget£ºÄ¿±ê
 		-- (arg3)nType£ºEffectµÄÀàÐÍ (arg4)dwID£ºEffectµÄID (arg5)dwLevel£ºEffectµÄµÈ¼¶
-		MY_Recount.Data.OnSkillEffect(arg1, arg2, arg3, arg4, arg5, SKILL_RESULT.MISS, nil, {})
+		D.OnSkillEffect(arg1, arg2, arg3, arg4, arg5, SKILL_RESULT.MISS, nil, {})
 	elseif arg0 == 'UI_OME_SKILL_HIT_LOG' then
 		-- ¼¼ÄÜÃüÖÐÄ¿±êÈÕÖ¾£»
 		-- (arg1)dwCaster£ºÊ©·ÅÕß (arg2)dwTarget£ºÄ¿±ê
 		-- (arg3)nType£ºEffectµÄÀàÐÍ (arg4)dwID£ºEffectµÄID (arg5)dwLevel£ºEffectµÄµÈ¼¶
-		-- MY_Recount.Data.OnSkillEffect(arg1, arg2, arg3, arg4, arg5, SKILL_RESULT.HIT, nil, {})
+		-- D.OnSkillEffect(arg1, arg2, arg3, arg4, arg5, SKILL_RESULT.HIT, nil, {})
 	elseif arg0 == 'UI_OME_SKILL_DODGE_LOG' then
 		-- ¼¼ÄÜ±»ÉÁ±ÜÈÕÖ¾£»
 		-- (arg1)dwCaster£ºÊ©·ÅÕß (arg2)dwTarget£ºÄ¿±ê
 		-- (arg3)nType£ºEffectµÄÀàÐÍ (arg4)dwID£ºEffectµÄID (arg5)dwLevel£ºEffectµÄµÈ¼¶
-		MY_Recount.Data.OnSkillEffect(arg1, arg2, arg3, arg4, arg5, SKILL_RESULT.DODGE, nil, {})
+		D.OnSkillEffect(arg1, arg2, arg3, arg4, arg5, SKILL_RESULT.DODGE, nil, {})
 	elseif arg0 == 'UI_OME_COMMON_HEALTH_LOG' then
 		-- ÆÕÍ¨ÖÎÁÆÈÕÖ¾£»
 		-- (arg1)dwCharacterID£º³ÐÁÆÍæ¼ÒID (arg2)nDeltaLife£ºÔö¼ÓÑªÁ¿Öµ
-		-- MY_Recount.OnCommonHealth(arg1, arg2)
+		-- D.OnCommonHealth(arg1, arg2)
 	end
 end)
 
@@ -1106,16 +1110,16 @@ end)
 --             tResult[SKILL_RESULT_TYPE.EFFECTIVE_DAMAGE] = 0
 --         end
 --         if bCriticalStrike then -- bCriticalStrike
---             MY_Recount.Data.OnSkillEffect(dwCasterID, dwTargetID, nEffectType, dwSkillID, dwSkillLevel, SKILL_RESULT.CRITICAL, nResultCount, tResult)
+--             D.OnSkillEffect(dwCasterID, dwTargetID, nEffectType, dwSkillID, dwSkillLevel, SKILL_RESULT.CRITICAL, nResultCount, tResult)
 --         else
---             MY_Recount.Data.OnSkillEffect(dwCasterID, dwTargetID, nEffectType, dwSkillID, dwSkillLevel, SKILL_RESULT.HIT, nResultCount, tResult)
+--             D.OnSkillEffect(dwCasterID, dwTargetID, nEffectType, dwSkillID, dwSkillLevel, SKILL_RESULT.HIT, nResultCount, tResult)
 --         end
 --     end
 -- end)
 
 
 -- ÓÐÈËËÀÁË»îÁË×öÒ»ÏÂÊ±¼äÖá¼ÇÂ¼
-function _Cache.OnTeammateStateChange(dwID, bLeave, nAwayType, bAddWhenRecEmpty)
+function D.OnTeammateStateChange(dwID, bLeave, nAwayType, bAddWhenRecEmpty)
 	if not (Data and Data.Awaytime) then
 		return
 	end
@@ -1140,10 +1144,10 @@ function _Cache.OnTeammateStateChange(dwID, bLeave, nAwayType, bAddWhenRecEmpty)
 	end
 	-- ²åÈëÊý¾Ýµ½¼ÇÂ¼
 	if bLeave then -- ÔÝÀë¿ªÊ¼
-		table.insert(rec, { GetCurrentTime(), nil, nAwayType })
+		insert(rec, { GetCurrentTime(), nil, nAwayType })
 	else -- ÔÝÀë»ØÀ´
 		if #rec == 0 then -- Ã»¼ÇÂ¼µ½ÔÝÀë¿ªÊ¼ ´´½¨Ò»¸ö´Ó±¾´ÎÕ½¶·¿ªÊ¼µÄÔÝÀë£¨Ë×³Æ»¹Ã»¿ª´òÄã¾ÍËÀÁË¡£¡££©
-			table.insert(rec, { Data.nTimeBegin, GetCurrentTime(), nAwayType })
+			insert(rec, { Data.nTimeBegin, GetCurrentTime(), nAwayType })
 		elseif not rec[#rec][2] then -- Èç¹û×îºóÒ»´ÎÔÝÀë»¹Ã»»ØÀ´ ÔòÍê³É×îºóÒ»´ÎÔÝÀëµÄ¼ÇÂ¼
 			rec[#rec][2] = GetCurrentTime()
 		end
@@ -1153,18 +1157,18 @@ LIB.RegisterEvent('PARTY_UPDATE_MEMBER_INFO', function()
 	local team = GetClientTeam()
 	local info = team.GetMemberInfo(arg1)
 	if info then
-		_Cache.OnTeammateStateChange(arg1, info.bDeathFlag, AWAYTIME_TYPE.DEATH, false)
+		D.OnTeammateStateChange(arg1, info.bDeathFlag, AWAYTIME_TYPE.DEATH, false)
 	end
 end)
 LIB.RegisterEvent('PARTY_SET_MEMBER_ONLINE_FLAG', function()
 	if arg2 == 0 then -- ÓÐÈËµôÏß
-		_Cache.OnTeammateStateChange(arg1, true, AWAYTIME_TYPE.OFFLINE, false)
+		D.OnTeammateStateChange(arg1, true, AWAYTIME_TYPE.OFFLINE, false)
 	else -- ÓÐÈËÉÏÏß
-		_Cache.OnTeammateStateChange(arg1, false, AWAYTIME_TYPE.OFFLINE, false)
+		D.OnTeammateStateChange(arg1, false, AWAYTIME_TYPE.OFFLINE, false)
 		local team = GetClientTeam()
 		local info = team.GetMemberInfo(arg1)
 		if info and info.bDeathFlag then -- ÉÏÏßËÀ×ÅµÄ ½áÊøÀëÏßÔÝÀë ¿ªÊ¼ËÀÍöÔÝÀë
-			_Cache.OnTeammateStateChange(arg1, true, AWAYTIME_TYPE.DEATH, false)
+			D.OnTeammateStateChange(arg1, true, AWAYTIME_TYPE.DEATH, false)
 		end
 	end
 end)
@@ -1176,9 +1180,9 @@ LIB.RegisterEvent('MY_RECOUNT_NEW_FIGHT', function() -- ¿ªÕ½É¨Ãè¶ÓÓÑ ¼ÇÂ¼¿ªÕ½¾ÍË
 			local info = team.GetMemberInfo(dwID)
 			if info then
 				if not info.bIsOnLine then
-					_Cache.OnTeammateStateChange(dwID, true, AWAYTIME_TYPE.OFFLINE, true)
+					D.OnTeammateStateChange(dwID, true, AWAYTIME_TYPE.OFFLINE, true)
 				elseif info.bDeathFlag then
-					_Cache.OnTeammateStateChange(dwID, true, AWAYTIME_TYPE.DEATH, true)
+					D.OnTeammateStateChange(dwID, true, AWAYTIME_TYPE.DEATH, true)
 				end
 			end
 		end
@@ -1188,9 +1192,69 @@ LIB.RegisterEvent('PARTY_ADD_MEMBER', function() -- ÖÐÍ¾ÓÐÈË½ø¶Ó ²¹ÉÏÔÝÀë¼ÇÂ¼
 	local team = GetClientTeam()
 	local info = team.GetMemberInfo(arg1)
 	if info then
-		_Cache.OnTeammateStateChange(arg1, false, AWAYTIME_TYPE.HALFWAY_JOINED, true)
+		D.OnTeammateStateChange(arg1, false, AWAYTIME_TYPE.HALFWAY_JOINED, true)
 		if info.bDeathFlag then
-			_Cache.OnTeammateStateChange(arg1, true, AWAYTIME_TYPE.DEATH, true)
+			D.OnTeammateStateChange(arg1, true, AWAYTIME_TYPE.DEATH, true)
 		end
 	end
 end)
+
+LIB.RegisterInit('MY_Recount_DS', function()
+	D.LoadData()
+end)
+
+LIB.RegisterFlush('MY_Recount_DS', D.SaveData)
+
+-- Global exports
+do
+local settings = {
+	exports = {
+		{
+			fields = {
+				Get = D.Get,
+				Del = D.Del,
+				GeneAwayTime = D.GeneAwayTime,
+				GeneFightTime = D.GeneFightTime,
+				GetNameAusID = D.GetNameAusID,
+				Flush = D.Flush,
+			},
+		},
+		{
+			fields = {
+				bSaveHistory      = true,
+				nMaxHistory       = true,
+				nMinFightTime     = true,
+				bRecAnonymous     = true,
+				bDistinctTargetID = true,
+				bDistinctEffectID = true,
+				bRecEverything    = true,
+			},
+			root = O,
+		},
+	},
+	imports = {
+		{
+			fields = {
+				bSaveHistory      = true,
+				nMaxHistory       = true,
+				nMinFightTime     = true,
+				bRecAnonymous     = true,
+				bDistinctTargetID = true,
+				bDistinctEffectID = true,
+				bRecEverything    = true,
+			},
+			triggers = {
+				bSaveHistory      = D.SaveData,
+				nMaxHistory       = D.SaveData,
+				nMinFightTime     = D.SaveData,
+				bRecAnonymous     = D.SaveData,
+				bDistinctTargetID = D.SaveData,
+				bDistinctEffectID = D.SaveData,
+				bRecEverything    = D.SaveData,
+			},
+			root = O,
+		},
+	},
+}
+MY_Recount_DS = LIB.GeneGlobalNS(settings)
+end
