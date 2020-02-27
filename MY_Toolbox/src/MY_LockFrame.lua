@@ -57,7 +57,7 @@ local O = {
 		['HatredPanel'] = true,
 		['FightingStatistic'] = true,
 		['MY_ThreatRank'] = true,
-		['MY_Recount'] = true,
+		['MY_Recount_UI'] = true,
 		['LR_AS_FP'] = true,
 		['QuestTraceList'] = true,
 		['ChatPanel'] = true,
@@ -81,7 +81,7 @@ local O = {
 		'JX_TargetList',
 		'MY_FocusUI',
 		'MY_ThreatRank',
-		'MY_Recount',
+		'MY_Recount_UI',
 		'LR_AS_FP',
 	},
 	tLockID = {
@@ -91,7 +91,7 @@ local O = {
 		['HatredPanel'] = 'HatredPanel', -- 仇恨列表 [Normal/HatredPanel]
 		['FightingStatistic'] = 'FightingStatistic', -- 伤害统计 [Normal/FightingStatistic]
 		['MY_ThreatRank'] = 'MY_ThreatRank', -- 茗伊·仇恨统计 [Normal/MY_ThreatRank]
-		['MY_Recount'] = 'MY_Recount', -- 茗伊·伤害统计 [Normal/MY_Recount]
+		['MY_Recount_UI'] = 'MY_Recount_UI', -- 茗伊·伤害统计 [Normal/MY_Recount_UI]
 		['LR_AS_FP'] = 'LR_AS_FP', -- 懒人·账本悬浮窗 [Normal/LR_AS_FP]
 		['QuestTraceList'] = 'QuestTraceList', -- 任务追踪 [Normal/QuestTraceList]
 		['ChatPanel1'] = 'ChatPanel', -- 聊天面板 [Lowest2/ChatPanel1]

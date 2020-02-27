@@ -321,7 +321,7 @@ return {
     ['LOCK_FRAME_HatredPanel'] = '仇恨列表',
     ['LOCK_FRAME_FightingStatistic'] = '伤害统计',
     ['LOCK_FRAME_MY_ThreatRank'] = '茗伊·仇恨统计',
-    ['LOCK_FRAME_MY_Recount'] = '茗伊·伤害统计',
+    ['LOCK_FRAME_MY_Recount_UI'] = '茗伊·伤害统计',
     ['LOCK_FRAME_LR_AS_FP'] = '懒人·账本悬浮窗',
     ['LOCK_FRAME_QuestTraceList'] = '任务追踪',
     ['LOCK_FRAME_ChatPanel'] = '聊天面板',
