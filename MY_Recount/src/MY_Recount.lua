@@ -1405,7 +1405,11 @@ function MY_Recount.GetHistoryMenu()
 		szOption = _L['current fight'],
 		rgb = (MY_Recount_DS.Get(0) == DataDisplay and {255, 255, 0}) or nil,
 		fnAction = function()
-			MY_Recount.DisplayData(0)
+			if IsCtrlKeyDown() then
+				MY_Recount_FP_Open(MY_Recount_DS.Get(0))
+			else
+				MY_Recount.DisplayData(0)
+			end
 		end,
 	}}
 
@@ -1415,7 +1419,11 @@ function MY_Recount.GetHistoryMenu()
 				szOption = (data.szBossName or ''):gsub('#.*', '') .. ' (' .. LIB.FormatTimeCounter(data.nTimeDuring, '%M:%ss') .. ')',
 				rgb = (data == DataDisplay and {255, 255, 0}) or nil,
 				fnAction = function()
-					MY_Recount.DisplayData(data)
+					if IsCtrlKeyDown() then
+						MY_Recount_FP_Open(data)
+					else
+						MY_Recount.DisplayData(data)
+					end
 				end,
 				szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',
 				nFrame = 49,
