@@ -545,6 +545,7 @@ function D.OnSkillEffect(dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLe
 	end
 
 	Data.nTimeDuring = GetCurrentTime() - Data.nTimeBegin
+	Data.nTickDuring = GetTime() - Data.nTickBegin
 end
 
 function D.GetNameAusID(id, data)
@@ -938,7 +939,9 @@ function D.Init(bForceInit)
 			bDistinctTargetID = O.bDistinctTargetID,               -- 是否根据ID区分同名目标
 			bDistinctEffectID = O.bDistinctEffectID,               -- 是否根据ID区分同名效果
 			nTimeBegin        = GetCurrentTime(),                  -- 战斗开始时间
+			nTickBegin        = GetTime(),                         -- 战斗开始毫秒时间
 			nTimeDuring       =  0,                                -- 战斗持续时间
+			nTickDuring       =  0,                                -- 战斗持续毫秒时间
 			Awaytime          = {},                                -- 死亡/掉线时间节点
 			Namelist          = {},                                -- 名称缓存
 			Forcelist         = {},                                -- 势力缓存
