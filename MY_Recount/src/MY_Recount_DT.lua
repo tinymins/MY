@@ -199,10 +199,13 @@ function MY_Recount_DT.OnFrameBreathe()
 	end
 
 	-- 更新标题
-	this:Lookup('', 'Text_Default'):SetText(MY_Recount_DS.GetNameAusID(DataDisplay, id) .. ' ' .. STAT_TYPE_NAME[this.nChannel])
+	local szName = IsString(id) and id or MY_Recount_DS.GetNameAusID(DataDisplay, id)
+	this:Lookup('', 'Text_Default'):SetText(szName .. ' ' .. STAT_TYPE_NAME[this.nChannel])
 
 	-- 获取数据
-	local tData = DataDisplay[szChannel].Statistics[id]
+	local tData = (MY_Recount_UI.bGroupSameNpc and IsString(id))
+		and MY_Recount_DS.GetMergeTargetData(DataDisplay, szChannel, id)
+		or DataDisplay[szChannel].Statistics[id]
 	if not tData then
 		this:Lookup('WndScroll_Detail', 'Handle_DetailList'):Clear()
 		this:Lookup('WndScroll_Skill' , 'Handle_SkillList' ):Clear()

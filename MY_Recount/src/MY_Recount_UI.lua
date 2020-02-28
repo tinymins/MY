@@ -565,7 +565,9 @@ function D.OnItemRefreshTip()
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
 		local DataDisplay = MY_Recount.GetDisplayData()
-		local tRec = DataDisplay[STAT_TYPE_KEY[MY_Recount_UI.nChannel]].Statistics[id]
+		local tRec = (O.bGroupSameNpc and IsString(id))
+			and MY_Recount_DS.GetMergeTargetData(DataDisplay, STAT_TYPE_KEY[MY_Recount_UI.nChannel], id)
+			or DataDisplay[STAT_TYPE_KEY[MY_Recount_UI.nChannel]].Statistics[id]
 		if tRec then
 			local szXml = GetFormatText((DataDisplay.Namelist[id] or id) .. '\n', 60, 255, 45, 255)
 			local szColon = g_tStrings.STR_COLON
