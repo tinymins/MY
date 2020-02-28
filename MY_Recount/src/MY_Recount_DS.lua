@@ -71,7 +71,6 @@ Data = {
 	nVersion = 数据版本号,
 	nTimeBegin  = 战斗开始UNIX时间戳,
 	nTimeDuring = 战斗持续秒数,
-	bDistinctEffectID = 该数据是否根据效果ID区分同名记录,
 	Awaytime = {
 		玩家的dwID = {
 			{ 暂离开始时间, 暂离结束时间 }, ...
@@ -231,7 +230,6 @@ local O = {
 	nMaxHistory       = 10,
 	nMinFightTime     = 30,
 	bRecAnonymous     = true,
-	bDistinctEffectID = false,
 	bRecEverything    = true,
 }
 local Data          -- 当前战斗数据记录
@@ -279,7 +277,6 @@ function D.LoadData()
 		O.nMaxHistory       = data.nMaxHistory   or 10
 		O.nMinFightTime     = data.nMinFightTime or 30
 		O.bRecAnonymous     = LIB.FormatDataStructure(data.bRecAnonymous, true)
-		O.bDistinctEffectID = LIB.FormatDataStructure(data.bDistinctEffectID, false)
 		O.bRecEverything    = LIB.FormatDataStructure(data.bRecEverything, false)
 	end
 	D.Init()
@@ -293,7 +290,6 @@ function D.SaveData()
 		nMaxHistory       = O.nMaxHistory,
 		nMinFightTime     = O.nMinFightTime,
 		bRecAnonymous     = O.bRecAnonymous,
-		bDistinctEffectID = O.bDistinctEffectID,
 		bRecEverything    = O.bRecEverything,
 	}
 	LIB.SaveLUAData(SZ_REC_FILE, data, { passphrase = false, indent = '\t' })
@@ -939,7 +935,6 @@ function D.Init(bForceInit)
 		Data = {
 			UUID              = LIB.GetFightUUID(),                 -- 战斗唯一标识
 			nVersion          = VERSION,                           -- 数据版本号
-			bDistinctEffectID = O.bDistinctEffectID,               -- 是否根据ID区分同名效果
 			nTimeBegin        = GetCurrentTime(),                  -- 战斗开始时间
 			nTickBegin        = GetTime(),                         -- 战斗开始毫秒时间
 			nTimeDuring       =  0,                                -- 战斗持续时间
@@ -1212,7 +1207,7 @@ end)
 LIB.RegisterFlush('MY_Recount_DS', D.SaveData)
 
 -- 同名目标数据合并
-function D.MergeTargetData(data, tDst, tSrc, bMergeNpc)
+function D.MergeTargetData(data, tDst, tSrc, bMergeNpc, bMergeEffect)
 	------------------------
 	-- # 节： tRecord
 	------------------------
@@ -1263,8 +1258,11 @@ function D.MergeTargetData(data, tDst, tSrc, bMergeNpc)
 	-- # 节： tRecord.Skill
 	------------------------
 	-- 合并技能统计（四象轮回、两仪化形...）
-	for szSkill, tSrcSkill in pairs(tSrc.Skill) do
-		local tDstSkill = tDst.Skill[szSkill]
+	for szEffectID, tSrcSkill in pairs(tSrc.Skill) do
+		local id = MY_Recount_UI.bGroupSameEffect
+			and D.GetEffectInfoAusID(data, szEffectID)
+			or szEffectID
+		local tDstSkill = tDst.Skill[id]
 		if not tDstSkill then
 			tDstSkill = {
 				nCount       =  0, -- 该玩家四象轮回释放次数（假设szEffectName是四象轮回）
@@ -1280,7 +1278,7 @@ function D.MergeTargetData(data, tDst, tSrc, bMergeNpc)
 				Detail       = {}, -- 该玩家四象轮回输出结果分类统计
 				Target       = {}, -- 该玩家四象轮回承受者统计
 			}
-			tDst.Skill[szSkill] = tDstSkill
+			tDst.Skill[id] = tDstSkill
 		end
 		tDstSkill.nCount       = tDstSkill.nCount + tSrcSkill.nCount
 		tDstSkill.nNzCount     = tDstSkill.nNzCount + tSrcSkill.nNzCount
@@ -1440,8 +1438,11 @@ function D.MergeTargetData(data, tDst, tSrc, bMergeNpc)
 		-- # 节： tRecord.Target[x].Skill
 		---------------------------------
 		-- 合并目标技能统计（江湖试炼木桩被四象轮回、两仪化形...）
-		for szSkill, tSrcTargetSkill in pairs(tSrcTarget.Skill) do
-			local tDstTargetSkill = tDstTarget.Skill[szSkill]
+		for szEffectID, tSrcTargetSkill in pairs(tSrcTarget.Skill) do
+			local id = MY_Recount_UI.bGroupSameEffect
+				and D.GetEffectInfoAusID(data, szEffectID)
+				or szEffectID
+			local tDstTargetSkill = tDstTarget.Skill[id]
 			if not tDstTargetSkill then
 				tDstTargetSkill = {
 					nMax         =  0, -- 该玩家击中这个玩家的四象轮回最大伤害
@@ -1451,7 +1452,7 @@ function D.MergeTargetData(data, tDst, tSrc, bMergeNpc)
 					Count        = {}, -- 该玩家击中这个玩家的四象轮回结果统计
 					NzCount      = {}, -- 该玩家非零值击中这个玩家的四象轮回结果统计
 				}
-				tDstTarget.Skill[szSkill] = tDstTargetSkill
+				tDstTarget.Skill[id] = tDstTargetSkill
 			end
 			tDstTargetSkill.nMax         = max(tDstTargetSkill.nMax, tSrcTargetSkill.nMax)
 			tDstTargetSkill.nMaxEffect   = max(tDstTargetSkill.nMaxEffect, tSrcTargetSkill.nMaxEffect)
@@ -1467,21 +1468,25 @@ function D.MergeTargetData(data, tDst, tSrc, bMergeNpc)
 	end
 end
 
-function D.GetMergeTargetData(data, szChannel, id)
+function D.GetMergeTargetData(data, szChannel, id, bMergeEffect)
 	local tData, bMergeNpc = nil, IsString(id)
-	for dwID, tSrcData in pairs(data[szChannel].Statistics) do
-		if dwID == id or D.GetNameAusID(data, dwID) == id then
-			if not tData then
-				tData = {
-					nTotal = 0,
-					nTotalEffect = 0,
-					Target = {},
-					Skill = {},
-					Detail = {},
-				}
+	if bMergeNpc or bMergeEffect then
+		for dwID, tSrcData in pairs(data[szChannel].Statistics) do
+			if dwID == id or D.GetNameAusID(data, dwID) == id then
+				if not tData then
+					tData = {
+						nTotal = 0,
+						nTotalEffect = 0,
+						Target = {},
+						Skill = {},
+						Detail = {},
+					}
+				end
+				D.MergeTargetData(data, tData, tSrcData, bMergeNpc, bMergeEffect)
 			end
-			D.MergeTargetData(data, tData, tSrcData, bMergeNpc)
 		end
+	else
+		tData = data[szChannel].Statistics[id]
 	end
 	return tData
 end
@@ -1509,7 +1514,6 @@ local settings = {
 				nMaxHistory       = true,
 				nMinFightTime     = true,
 				bRecAnonymous     = true,
-				bDistinctEffectID = true,
 				bRecEverything    = true,
 			},
 			root = O,
@@ -1522,7 +1526,6 @@ local settings = {
 				nMaxHistory       = true,
 				nMinFightTime     = true,
 				bRecAnonymous     = true,
-				bDistinctEffectID = true,
 				bRecEverything    = true,
 			},
 			triggers = {
@@ -1530,7 +1533,6 @@ local settings = {
 				nMaxHistory       = D.SaveData,
 				nMinFightTime     = D.SaveData,
 				bRecAnonymous     = D.SaveData,
-				bDistinctEffectID = D.SaveData,
 				bRecEverything    = D.SaveData,
 			},
 			root = O,

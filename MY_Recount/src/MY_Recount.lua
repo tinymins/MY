@@ -97,7 +97,6 @@ RegisterCustomData('MY_Recount.nPublishMode')
 local DataDisplay
 
 function D.GetTargetShowName(szName, bPlayer)
-	szName = szName:gsub('#.*', '')
 	if bPlayer and MY_ChatMosaics and MY_ChatMosaics.MosaicsString then
 		szName = MY_ChatMosaics.MosaicsString(szName)
 	end
@@ -202,11 +201,11 @@ function D.GetMenu()
 				return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
 			end,
 		}, {
-			szOption = _L['distinct effect id with same name'],
+			szOption = _L['Group effect with same name'],
 			bCheck = true,
-			bChecked = MY_Recount_DS.bDistinctEffectID,
+			bChecked = MY_Recount_UI.bGroupSameEffect,
 			fnAction = function()
-				MY_Recount_DS.bDistinctEffectID = not MY_Recount_DS.bDistinctEffectID
+				MY_Recount_UI.bGroupSameEffect = not MY_Recount_UI.bGroupSameEffect
 			end,
 			fnDisable = function()
 				return not LIB.GetStorage('BoolValues.MY_Recount_Enable')

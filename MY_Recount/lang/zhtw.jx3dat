@@ -28,7 +28,7 @@ return {
     ['show nodata teammate'             ] = '顯示無數據的隊友',
     ['use system time count'            ] = '使用官方時間演算法',
     ['Group npc with same name'         ] = '合併同名NPC數據',
-    ['distinct effect id with same name'] = '區分同名字的記錄',
+    ['Group effect with same name'       ] = '合併同名技能效果',
     ['record anonymous effect'          ] = '顯示沒名字的記錄',
     ['show zero value effect'           ] = '顯示零數值的記錄',
     ['Record everything'                ] = '記錄所有復盤數據',

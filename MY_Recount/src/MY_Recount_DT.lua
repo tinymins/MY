@@ -203,9 +203,7 @@ function MY_Recount_DT.OnFrameBreathe()
 	this:Lookup('', 'Text_Default'):SetText(szName .. ' ' .. STAT_TYPE_NAME[this.nChannel])
 
 	-- 获取数据
-	local tData = (MY_Recount_UI.bGroupSameNpc and IsString(id))
-		and MY_Recount_DS.GetMergeTargetData(DataDisplay, szChannel, id)
-		or DataDisplay[szChannel].Statistics[id]
+	local tData = MY_Recount_DS.GetMergeTargetData(DataDisplay, szChannel, id, MY_Recount_UI.bGroupSameEffect)
 	if not tData then
 		this:Lookup('WndScroll_Detail', 'Handle_DetailList'):Clear()
 		this:Lookup('WndScroll_Skill' , 'Handle_SkillList' ):Clear()
@@ -223,7 +221,7 @@ function MY_Recount_DT.OnFrameBreathe()
 		for szEffectID, p in pairs(tData.Skill) do
 			local rec = {
 				szKey  = szEffectID,
-				szName = MY_Recount_DS.GetEffectInfoAusID(DataDisplay, szEffectID),
+				szName = MY_Recount_DS.GetEffectInfoAusID(DataDisplay, szEffectID) or szEffectID,
 				nCount = not MY_Recount_UI.bShowZeroVal and p.nNzCount or p.nCount,
 				nTotal = MY_Recount_UI.bShowEffect and p.nTotalEffect or p.nTotal,
 			}
@@ -235,7 +233,7 @@ function MY_Recount_DT.OnFrameBreathe()
 		for id, p in pairs(tData.Target) do
 			local rec = {
 				szKey  = id                              ,
-				szName = MY_Recount_DS.GetNameAusID(DataDisplay, id),
+				szName = IsString(id) and id or MY_Recount_DS.GetNameAusID(DataDisplay, id),
 				nCount = not MY_Recount_UI.bShowZeroVal and p.nNzCount or p.nCount,
 				nTotal = MY_Recount_UI.bShowEffect and p.nTotalEffect or p.nTotal,
 			}
@@ -355,7 +353,7 @@ function MY_Recount_DT.OnFrameBreathe()
 					nCriticalCount = MY_Recount_UI.bShowZeroVal and (p.Count[SKILL_RESULT.CRITICAL] or 0) or p.NzCount[SKILL_RESULT.CRITICAL] or 0,
 					nMax           = MY_Recount_UI.bShowEffect and p.nMaxEffect or p.nMax,
 					nTotal         = MY_Recount_UI.bShowEffect and p.nTotalEffect or p.nTotal,
-					szName         = MY_Recount_DS.GetNameAusID(DataDisplay, id),
+					szName         = IsString(id) and id or MY_Recount_DS.GetNameAusID(DataDisplay, id),
 				}
 				if MY_Recount_UI.bShowZeroVal or rec.nTotal > 0 or rec.nMissCount > 0 then
 					insert(aResult, rec)
@@ -369,7 +367,7 @@ function MY_Recount_DT.OnFrameBreathe()
 					nCriticalCount = MY_Recount_UI.bShowZeroVal and (p.Count[SKILL_RESULT.CRITICAL] or 0) or p.NzCount[SKILL_RESULT.CRITICAL] or 0,
 					nMax           = MY_Recount_UI.bShowEffect and p.nMaxEffect or p.nMax,
 					nTotal         = MY_Recount_UI.bShowEffect and p.nTotalEffect or p.nTotal,
-					szName         = MY_Recount_DS.GetEffectInfoAusID(DataDisplay, szEffectID),
+					szName         = MY_Recount_DS.GetEffectInfoAusID(DataDisplay, szEffectID) or szEffectID,
 				}
 				if MY_Recount_UI.bShowZeroVal or rec.nTotal > 0 or rec.nMissCount > 0 then
 					insert(aResult, rec)

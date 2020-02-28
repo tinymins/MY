@@ -139,23 +139,25 @@ local FORCE_BAR_CSS = {
 
 local D = {}
 local O = {
-	nCss          = 1,                    -- 当前样式表
-	nChannel      = STAT_TYPE.DPS,        -- 当前显示的统计模式
-	bAwayMode     = true,                 -- 计算DPS时是否减去暂离时间
-	bSysTimeMode  = false,                -- 使用官方战斗统计计时方式
-	bGroupSameNpc = true,                 -- 是否合并同名NPC数据
-	bShowPerSec   = true,                 -- 显示为每秒数据（反之显示总和）
-	bShowEffect   = true,                 -- 显示有效伤害/治疗
-	bShowZeroVal  = false,                -- 显示零值记录
-	nDisplayMode  = DISPLAY_MODE.BOTH,    -- 统计显示模式（显示NPC/玩家数据）（默认混合显示）
-	nDrawInterval = GLOBAL.GAME_FPS / 2,  -- UI重绘周期（帧）
-	bShowNodataTeammate = false,          -- 显示没有数据的队友
+	nCss             = 1,                   -- 当前样式表
+	nChannel         = STAT_TYPE.DPS,       -- 当前显示的统计模式
+	bAwayMode        = true,                -- 计算DPS时是否减去暂离时间
+	bSysTimeMode     = false,               -- 使用官方战斗统计计时方式
+	bGroupSameNpc    = true,                -- 是否合并同名NPC数据
+	bGroupSameEffect = true,                -- 是否合并同名效果
+	bShowPerSec      = true,                -- 显示为每秒数据（反之显示总和）
+	bShowEffect      = true,                -- 显示有效伤害/治疗
+	bShowZeroVal     = false,               -- 显示零值记录
+	nDisplayMode     = DISPLAY_MODE.BOTH,   -- 统计显示模式（显示NPC/玩家数据）（默认混合显示）
+	nDrawInterval    = GLOBAL.GAME_FPS / 2, -- UI重绘周期（帧）
+	bShowNodataTeammate = false,            -- 显示没有数据的队友
 }
 RegisterCustomData('MY_Recount_UI.nCss')
 RegisterCustomData('MY_Recount_UI.nChannel')
 RegisterCustomData('MY_Recount_UI.bAwayMode')
 RegisterCustomData('MY_Recount_UI.bSysTimeMode')
 RegisterCustomData('MY_Recount_UI.bGroupSameNpc')
+RegisterCustomData('MY_Recount_UI.bGroupSameEffect')
 RegisterCustomData('MY_Recount_UI.bShowPerSec')
 RegisterCustomData('MY_Recount_UI.bShowEffect')
 RegisterCustomData('MY_Recount_UI.bShowZeroVal')
@@ -565,16 +567,14 @@ function D.OnItemRefreshTip()
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
 		local DataDisplay = MY_Recount.GetDisplayData()
-		local tRec = (O.bGroupSameNpc and IsString(id))
-			and MY_Recount_DS.GetMergeTargetData(DataDisplay, STAT_TYPE_KEY[MY_Recount_UI.nChannel], id)
-			or DataDisplay[STAT_TYPE_KEY[MY_Recount_UI.nChannel]].Statistics[id]
+		local tRec = MY_Recount_DS.GetMergeTargetData(DataDisplay, STAT_TYPE_KEY[MY_Recount_UI.nChannel], id, O.bGroupSameEffect)
 		if tRec then
 			local szXml = GetFormatText((DataDisplay.Namelist[id] or id) .. '\n', 60, 255, 45, 255)
 			local szColon = g_tStrings.STR_COLON
 			local t = {}
 			for szEffectID, p in pairs(tRec.Skill) do
 				insert(t, {
-					szName = MY_Recount_DS.GetEffectInfoAusID(DataDisplay, szEffectID),
+					szName = MY_Recount_DS.GetEffectInfoAusID(DataDisplay, szEffectID) or szEffectID,
 					rec = p,
 				})
 			end
@@ -705,6 +705,7 @@ local settings = {
 				bAwayMode = true,
 				bSysTimeMode = true,
 				bGroupSameNpc = true,
+				bGroupSameEffect = true,
 				bShowPerSec = true,
 				bShowEffect = true,
 				bShowZeroVal = true,
@@ -724,6 +725,7 @@ local settings = {
 				bAwayMode = true,
 				bSysTimeMode = true,
 				bGroupSameNpc = true,
+				bGroupSameEffect = true,
 				bShowPerSec = true,
 				bShowEffect = true,
 				bShowZeroVal = true,
@@ -737,6 +739,7 @@ local settings = {
 				bAwayMode = function() FireUIEvent('MY_RECOUNT_UI_CONFIG_UPDATE') end,
 				bSysTimeMode = function() FireUIEvent('MY_RECOUNT_UI_CONFIG_UPDATE') end,
 				bGroupSameNpc = function() FireUIEvent('MY_RECOUNT_UI_CONFIG_UPDATE') end,
+				bGroupSameEffect = function() FireUIEvent('MY_RECOUNT_UI_CONFIG_UPDATE') end,
 				bShowPerSec = function() FireUIEvent('MY_RECOUNT_UI_CONFIG_UPDATE') end,
 				bShowEffect = function() FireUIEvent('MY_RECOUNT_UI_CONFIG_UPDATE') end,
 				bShowZeroVal = function() FireUIEvent('MY_RECOUNT_UI_CONFIG_UPDATE') end,
