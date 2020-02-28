@@ -57,6 +57,7 @@ return {
     ['Fight time'] = '战斗',
     ['Fighting for %ds.'] = '当前已进入战斗%d秒。',
     ['Not fighting now.'] = '当前并没有战斗。',
+    ['Last fighting for %ds.'] = '最后一次战斗%d秒。',
     ['Fighting'] = '战斗中',
     ['Unfight'] = '脱离战斗',
     ['Time'] = '时间',

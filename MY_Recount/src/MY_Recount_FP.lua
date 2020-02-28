@@ -220,7 +220,10 @@ local COLUMN_LIST = {
 		GetFormatText = function(rec)
 			if rec[4] == EVERYTHING_TYPE.FIGHT_TIME then
 				if rec[5] then
-					return GetFormatText(_L('Fighting for %ds.', rec[7]))
+					return GetFormatText(_L('Fighting for %ds.', rec[7] / 1000))
+				end
+				if rec[7] > 0 then
+					return GetFormatText(_L('Last fighting for %ds.', rec[7] / 1000))
 				end
 				return GetFormatText(_L['Not fighting now.'])
 			end
