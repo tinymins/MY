@@ -394,6 +394,7 @@ function D.DrawData(frame)
 	handle:FormatAllItemPos()
 	handle:SetSizeByAllItemSize()
 	hOuter:FormatAllItemPos()
+	frame:Lookup('Wnd_Total/Wnd_Index', 'Handle_IndexCount/Text_IndexCount'):SprintfText(_L['Total %d pages'], nPageCount)
 end
 
 function D.OutputTip(this, rec)
@@ -480,6 +481,7 @@ function MY_Recount_FP.OnFrameCreate()
 	this.szSortKey = 'time'
 	this.szSortOrder = 'asc'
 	this:Lookup('', 'Text_Title'):SetText(_L['MY_Recount_FP'])
+	this:Lookup('Wnd_Total/Wnd_Search/Edit_Search'):SetPlaceholderText(_L['Press enter to search ...'])
 
 	local handle = this:Lookup('Wnd_Total/Wnd_Index', 'Handle_IndexesOuter/Handle_Indexes')
 	handle:Clear()
