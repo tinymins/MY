@@ -58,6 +58,7 @@ local DK_REC_STAT_SKILL_TARGET = MY_Recount_DS.DK_REC_STAT_SKILL_TARGET
 local DK_REC_STAT_TARGET = MY_Recount_DS.DK_REC_STAT_TARGET
 local DK_REC_STAT_TARGET_DETAIL = MY_Recount_DS.DK_REC_STAT_TARGET_DETAIL
 local DK_REC_STAT_TARGET_SKILL = MY_Recount_DS.DK_REC_STAT_TARGET_SKILL
+local EVERYTHING_TYPE = MY_Recount_DS.EVERYTHING_TYPE
 
 local D = {}
 local O = {}
@@ -107,10 +108,10 @@ local COLUMN_LIST = {
 		nWidth = 50,
 		szTitle = _L['Type'],
 		GetFormatText = function(rec)
-			if rec[4] == 'FIGHT_TIME' then
+			if rec[4] == EVERYTHING_TYPE.FIGHT_TIME then
 				return GetFormatText(_L['Fight time'])
 			end
-			if rec[4] == 'SKILL_EFFECT' then
+			if rec[4] == EVERYTHING_TYPE.SKILL_EFFECT then
 				if rec[7] == SKILL_EFFECT_TYPE.BUFF then
 					return GetFormatText(_L['Buff'])
 				end
@@ -128,13 +129,13 @@ local COLUMN_LIST = {
 		nWidth = 80,
 		szTitle = _L['EffectName'],
 		GetFormatText = function(rec, data)
-			if rec[4] == 'FIGHT_TIME' then
+			if rec[4] == EVERYTHING_TYPE.FIGHT_TIME then
 				if rec[5] then
 					return GetFormatText(_L['Fighting'])
 				end
 				return GetFormatText(_L['Unfight'])
 			end
-			if rec[4] == 'SKILL_EFFECT' then
+			if rec[4] == EVERYTHING_TYPE.SKILL_EFFECT then
 				local szName, bAnonymous = MY_Recount_DS.GetEffectInfoAusID(data, rec[10])
 				if IsEmpty(szName) or bAnonymous then
 					szName = rec[8] .. ',' .. rec[9]
@@ -143,7 +144,7 @@ local COLUMN_LIST = {
 			end
 			return GetFormatText('-')
 		end,
-		Compare = GeneCommonCompare('SKILL_EFFECT', 10)
+		Compare = GeneCommonCompare(EVERYTHING_TYPE.SKILL_EFFECT, 10)
 	},
 	{
 		id = 'caster',
@@ -153,7 +154,7 @@ local COLUMN_LIST = {
 		GetFormatText = function(rec, data)
 			return GetFormatText(MY_Recount_DS.GetNameAusID(data, rec[5]) or rec[5])
 		end,
-		Compare = GeneCommonCompare('SKILL_EFFECT', 5)
+		Compare = GeneCommonCompare(EVERYTHING_TYPE.SKILL_EFFECT, 5)
 	},
 	{
 		id = 'target',
@@ -163,47 +164,47 @@ local COLUMN_LIST = {
 		GetFormatText = function(rec, data)
 			return GetFormatText(MY_Recount_DS.GetNameAusID(data, rec[6]) or rec[6])
 		end,
-		Compare = GeneCommonCompare('SKILL_EFFECT', 6)
+		Compare = GeneCommonCompare(EVERYTHING_TYPE.SKILL_EFFECT, 6)
 	},
 	{
 		id = 'skillresult',
 		bSort = true,
 		nWidth = 50,
 		szTitle = _L['SkillResult'],
-		GetFormatText = GeneCommonFormatText('SKILL_EFFECT', 11),
-		Compare = GeneCommonCompare('SKILL_EFFECT', 11)
+		GetFormatText = GeneCommonFormatText(EVERYTHING_TYPE.SKILL_EFFECT, 11),
+		Compare = GeneCommonCompare(EVERYTHING_TYPE.SKILL_EFFECT, 11)
 	},
 	{
 		id = 'therapy',
 		bSort = true,
 		nWidth = 60,
 		szTitle = _L['Therapy'],
-		GetFormatText = GeneCommonFormatText('SKILL_EFFECT', 12),
-		Compare = GeneCommonCompare('SKILL_EFFECT', 12)
+		GetFormatText = GeneCommonFormatText(EVERYTHING_TYPE.SKILL_EFFECT, 12),
+		Compare = GeneCommonCompare(EVERYTHING_TYPE.SKILL_EFFECT, 12)
 	},
 	{
 		id = 'effecttherapy',
 		bSort = true,
 		nWidth = 60,
 		szTitle = _L['EffectTherapy'],
-		GetFormatText = GeneCommonFormatText('SKILL_EFFECT', 13),
-		Compare = GeneCommonCompare('SKILL_EFFECT', 13)
+		GetFormatText = GeneCommonFormatText(EVERYTHING_TYPE.SKILL_EFFECT, 13),
+		Compare = GeneCommonCompare(EVERYTHING_TYPE.SKILL_EFFECT, 13)
 	},
 	{
 		id = 'damage',
 		bSort = true,
 		nWidth = 60,
 		szTitle = _L['Damage'],
-		GetFormatText = GeneCommonFormatText('SKILL_EFFECT', 14),
-		Compare = GeneCommonCompare('SKILL_EFFECT', 14)
+		GetFormatText = GeneCommonFormatText(EVERYTHING_TYPE.SKILL_EFFECT, 14),
+		Compare = GeneCommonCompare(EVERYTHING_TYPE.SKILL_EFFECT, 14)
 	},
 	{
 		id = 'effectdamage',
 		bSort = true,
 		nWidth = 60,
 		szTitle = _L['EffectDamage'],
-		GetFormatText = GeneCommonFormatText('SKILL_EFFECT', 15),
-		Compare = GeneCommonCompare('SKILL_EFFECT', 15)
+		GetFormatText = GeneCommonFormatText(EVERYTHING_TYPE.SKILL_EFFECT, 15),
+		Compare = GeneCommonCompare(EVERYTHING_TYPE.SKILL_EFFECT, 15)
 	},
 	{
 		id = 'description',
@@ -211,7 +212,7 @@ local COLUMN_LIST = {
 		nWidth = 100,
 		szTitle = _L['Description'],
 		GetFormatText = function(rec)
-			if rec[4] == 'FIGHT_TIME' then
+			if rec[4] == EVERYTHING_TYPE.FIGHT_TIME then
 				if rec[5] then
 					return GetFormatText(_L('Fighting for %ds.', rec[7]))
 				end
@@ -275,9 +276,9 @@ function D.DrawData(frame)
 	else
 		local nSearch = tonumber(szSearch)
 		for _, rec in ipairs(data[DK.EVERYTHING]) do
-			if (szSearch == _L['Skill'] and rec[4] == 'SKILL_EFFECT' )
-			or (szSearch == _L['Fight time'] and rec[4] == 'FIGHT_TIME' )
-			or (rec[4] == 'SKILL_EFFECT' and (
+			if (szSearch == _L['Skill'] and rec[4] == EVERYTHING_TYPE.SKILL_EFFECT )
+			or (szSearch == _L['Fight time'] and rec[4] == EVERYTHING_TYPE.FIGHT_TIME )
+			or (rec[4] == EVERYTHING_TYPE.SKILL_EFFECT and (
 				nSearch == rec[8] or nSearch == rec[5] or nSearch == rec[6]
 				or szSearch == MY_Recount_DS.GetNameAusID(data, rec[5])
 				or szSearch == MY_Recount_DS.GetNameAusID(data, rec[6])
@@ -400,7 +401,7 @@ function D.OutputTip(this, rec)
 	insert(aXml, GetFormatText(':  '))
 	insert(aXml, col.GetFormatText(rec))
 	insert(aXml, GetFormatText('\n'))
-	if rec[4] == 'SKILL_EFFECT' then
+	if rec[4] == EVERYTHING_TYPE.SKILL_EFFECT then
 		-- Ãû³Æ
 		local col = COLUMN_DICT['effectname']
 		local szName, bAnonymous = MY_Recount_DS.GetEffectInfoAusID(data, rec[10])

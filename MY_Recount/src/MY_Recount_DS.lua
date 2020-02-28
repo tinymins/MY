@@ -369,6 +369,10 @@ local AWAYTIME_TYPE = {
 	OFFLINE        = 1,
 	HALFWAY_JOINED = 2,
 }
+local EVERYTHING_TYPE = {
+	SKILL_EFFECT = 1,
+	FIGHT_TIME = 2,
+}
 local VERSION = 2
 
 local D = {}
@@ -458,7 +462,7 @@ LIB.RegisterEvent('MY_FIGHT_HINT', function(event)
 	else
 		D.Flush()
 	end
-	D.InsertEverything(Data, 'FIGHT_TIME', LIB.IsFighting(), LIB.GetFightUUID(), LIB.GetFightTime())
+	D.InsertEverything(Data, EVERYTHING_TYPE.FIGHT_TIME, LIB.IsFighting(), LIB.GetFightUUID(), LIB.GetFightTime())
 end)
 LIB.BreatheCall('MY_Recount_FightTime', 1000, function()
 	if LIB.IsFighting() then
@@ -647,7 +651,7 @@ function D.OnSkillEffect(dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLe
 	local nEffectDamage = tResult[SKILL_RESULT_TYPE.EFFECTIVE_DAMAGE] or 0
 
 	D.InsertEverything(Data,
-		'SKILL_EFFECT', dwCaster, dwTarget,
+		EVERYTHING_TYPE.SKILL_EFFECT, dwCaster, dwTarget,
 		nEffectType, dwEffectID, dwEffectLevel, szEffectID,
 		nSkillResult, nTherapy, nEffectTherapy, nDamage, nEffectDamage,
 		tResult)
@@ -1670,6 +1674,7 @@ local settings = {
 				GetEffectNameAusID = D.GetEffectNameAusID,
 				Flush = D.Flush,
 				GetMergeTargetData = D.GetMergeTargetData,
+				EVERYTHING_TYPE = EVERYTHING_TYPE,
 				DK = DK,
 				DK_REC = DK_REC,
 				DK_REC_SNAPSHOT = DK_REC_SNAPSHOT,
