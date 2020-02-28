@@ -587,16 +587,19 @@ function D.OnItemRefreshTip()
 			local szColon = g_tStrings.STR_COLON
 			local t = {}
 			for szEffectID, p in pairs(tRec[DK_REC_STAT.SKILL]) do
+				local szName = MY_Recount_DS.GetEffectNameAusID(DataDisplay, szChannel, szEffectID) or szEffectID
 				insert(t, {
-					szName = MY_Recount_DS.GetEffectNameAusID(DataDisplay, szChannel, szEffectID) or szEffectID,
+					szName = szName,
 					rec = p,
+					bAnonymous = IsEmpty(szName) or szName:sub(1, 1) == '#',
 				})
 			end
 			sort(t, function(p1, p2)
 				return p1.rec[DK_REC_STAT_SKILL.TOTAL] > p2.rec[DK_REC_STAT_SKILL.TOTAL]
 			end)
 			for _, p in ipairs(t) do
-				if MY_Recount_UI.bShowZeroVal or p.rec[DK_REC_STAT_SKILL.TOTAL] > 0 then
+				if (MY_Recount_UI.bShowZeroVal or p.rec[DK_REC_STAT_SKILL.TOTAL] > 0)
+				and (not MY_Recount_UI.bHideAnonymous or not p.bAnonymous) then
 					szXml = szXml .. GetFormatText(p.szName .. '\n', nil, 255, 150, 0)
 					szXml = szXml .. GetFormatText(_L['total: '] .. p.rec[DK_REC_STAT_SKILL.TOTAL]
 						.. ' ' .. _L['effect: '] .. p.rec[DK_REC_STAT_SKILL.TOTAL_EFFECT] .. '\n')
