@@ -1061,7 +1061,7 @@ end
 function D.InitEffectData(data, nType, dwID, nLevel)
 	local szKey = nType .. ',' .. dwID .. ',' .. nLevel
 	if not data[DK.EFFECT_LIST][szKey] then
-		local szName, bAnonymous
+		local szName, bAnonymous = nil, false
 		if nType == SKILL_EFFECT_TYPE.SKILL then
 			szName = Table_GetSkillName(dwID, nLevel)
 		elseif nType == SKILL_EFFECT_TYPE.BUFF then
