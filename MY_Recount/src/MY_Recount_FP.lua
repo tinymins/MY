@@ -112,7 +112,7 @@ local COLUMN_LIST = {
 		bSort = true,
 		nWidth = 80,
 		szTitle = _L['EffectName'],
-		GetFormatText = function(rec)
+		GetFormatText = function(rec, data)
 			if rec[4] == 'FIGHT_TIME' then
 				if rec[5] then
 					return GetFormatText(_L['Fighting'])
@@ -120,7 +120,11 @@ local COLUMN_LIST = {
 				return GetFormatText(_L['Unfight'])
 			end
 			if rec[4] == 'SKILL_EFFECT' then
-				return GetFormatText(IsEmpty(rec[10]) and (rec[8] .. '/' .. rec[9]) or rec[10])
+				local szName = MY_Recount_DS.GetEffectInfoAusID(data, rec[10])
+				if IsEmpty(szName) then
+					szName = rec[8] .. ',' .. rec[9]
+				end
+				return GetFormatText(szName)
 			end
 			return GetFormatText('-')
 		end,

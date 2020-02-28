@@ -220,10 +220,10 @@ function MY_Recount_DT.OnFrameBreathe()
 	-- 数据收集
 	local aResult, nTotal = {}, MY_Recount_UI.bShowEffect and tData.nTotalEffect or tData.nTotal
 	if szPrimarySort == 'Skill' then
-		for szSkillName, p in pairs(tData.Skill) do
+		for szEffectID, p in pairs(tData.Skill) do
 			local rec = {
-				szKey  = szSkillName,
-				szName = szSkillName,
+				szKey  = szEffectID,
+				szName = MY_Recount_DS.GetEffectInfoAusID(DataDisplay, szEffectID),
 				nCount = not MY_Recount_UI.bShowZeroVal and p.nNzCount or p.nCount,
 				nTotal = MY_Recount_UI.bShowEffect and p.nTotalEffect or p.nTotal,
 			}
@@ -362,14 +362,14 @@ function MY_Recount_DT.OnFrameBreathe()
 				end
 			end
 		else
-			for szSkillName, p in pairs(tData.Target[szSelectedTarget].Skill) do
+			for szEffectID, p in pairs(tData.Target[szSelectedTarget].Skill) do
 				local rec = {
 					nHitCount      = MY_Recount_UI.bShowZeroVal and (p.Count[SKILL_RESULT.HIT] or 0) or p.NzCount[SKILL_RESULT.HIT] or 0,
 					nMissCount     = MY_Recount_UI.bShowZeroVal and (p.Count[SKILL_RESULT.MISS] or 0) or p.NzCount[SKILL_RESULT.MISS] or 0,
 					nCriticalCount = MY_Recount_UI.bShowZeroVal and (p.Count[SKILL_RESULT.CRITICAL] or 0) or p.NzCount[SKILL_RESULT.CRITICAL] or 0,
 					nMax           = MY_Recount_UI.bShowEffect and p.nMaxEffect or p.nMax,
 					nTotal         = MY_Recount_UI.bShowEffect and p.nTotalEffect or p.nTotal,
-					szName         = szSkillName,
+					szName         = MY_Recount_DS.GetEffectInfoAusID(DataDisplay, szEffectID),
 				}
 				if MY_Recount_UI.bShowZeroVal or rec.nTotal > 0 or rec.nMissCount > 0 then
 					insert(aResult, rec)

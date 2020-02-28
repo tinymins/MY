@@ -473,25 +473,6 @@ function D.OnSkillEffect(dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLe
 	dwCaster = KCaster.dwID
 	dwTarget = KTarget.dwID
 
-	-- 获取效果名称
-	local szEffectName, bAnonymous
-	if nEffectType == SKILL_EFFECT_TYPE.SKILL then
-		szEffectName = Table_GetSkillName(dwEffectID, dwEffectLevel)
-	elseif nEffectType == SKILL_EFFECT_TYPE.BUFF then
-		szEffectName = Table_GetBuffName(dwEffectID, dwEffectLevel)
-	end
-	if not szEffectName then
-		bAnonymous = true
-		szEffectName = '#' .. dwEffectID
-	elseif Data.bDistinctEffectID then
-		szEffectName = szEffectName .. '#' .. dwEffectID
-	end
-	local szDamageEffectName, szHealEffectName = szEffectName, szEffectName
-	if nEffectType == SKILL_EFFECT_TYPE.BUFF then
-		szHealEffectName = szHealEffectName .. '(HOT)'
-		szDamageEffectName = szDamageEffectName .. '(DOT)'
-	end
-
 	-- 过滤掉不是队友的以及不是BOSS的
 	local me = GetClientPlayer()
 	if dwCaster ~= me.dwID                 -- 释放者不是自己
@@ -513,6 +494,8 @@ function D.OnSkillEffect(dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLe
 		D.Init(true)
 	end
 
+	-- 获取效果名称
+	local szEffectID = D.InitEffectData(Data, nEffectType, dwEffectID, dwEffectLevel)
 	local nTherapy = tResult[SKILL_RESULT_TYPE.THERAPY] or 0
 	local nEffectTherapy = tResult[SKILL_RESULT_TYPE.EFFECTIVE_THERAPY] or 0
 	local nDamage = (tResult[SKILL_RESULT_TYPE.PHYSICS_DAMAGE      ] or 0) + -- 外功伤害
@@ -525,33 +508,29 @@ function D.OnSkillEffect(dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLe
 
 	D.InsertEverything(Data,
 		'SKILL_EFFECT', dwCaster, dwTarget,
-		nEffectType, dwEffectID, dwEffectLevel, szEffectName,
+		nEffectType, dwEffectID, dwEffectLevel, szEffectID,
 		nSkillResult, nTherapy, nEffectTherapy, nDamage, nEffectDamage,
 		tResult)
-
-	if bAnonymous and not O.bRecAnonymous then
-		return
-	end
 
 	-- 识破
 	local nValue = tResult[SKILL_RESULT_TYPE.INSIGHT_DAMAGE]
 	if nValue and nValue > 0 then
-		D.AddDamageRecord(Data, dwCaster, dwTarget, szDamageEffectName, nDamage, nEffectDamage, SKILL_RESULT.INSIGHT)
+		D.AddDamageRecord(Data, dwCaster, dwTarget, szEffectID, nDamage, nEffectDamage, SKILL_RESULT.INSIGHT)
 	elseif nSkillResult == SKILL_RESULT.HIT -- 击中
 		or nSkillResult == SKILL_RESULT.CRITICAL -- 会心
 	then
 		if nTherapy > 0 then -- 有治疗
-			D.AddHealRecord(Data, dwCaster, dwTarget, szHealEffectName, nTherapy, nEffectTherapy, nSkillResult)
+			D.AddHealRecord(Data, dwCaster, dwTarget, szEffectID, nTherapy, nEffectTherapy, nSkillResult)
 		end
 		if nDamage > 0 or nTherapy == 0 then -- 有伤害 或者 无伤害无治疗的效果
-			D.AddDamageRecord(Data, dwCaster, dwTarget, szDamageEffectName, nDamage, nEffectDamage, nSkillResult)
+			D.AddDamageRecord(Data, dwCaster, dwTarget, szEffectID, nDamage, nEffectDamage, nSkillResult)
 		end
 	elseif nSkillResult == SKILL_RESULT.BLOCK  -- 格挡
 		or nSkillResult == SKILL_RESULT.SHIELD -- 无效
 		or nSkillResult == SKILL_RESULT.MISS   -- 偏离
 		or nSkillResult == SKILL_RESULT.DODGE  -- 闪避
 	then
-		D.AddDamageRecord(Data, dwCaster, dwTarget, szDamageEffectName, 0, 0, nSkillResult)
+		D.AddDamageRecord(Data, dwCaster, dwTarget, szEffectID, 0, 0, nSkillResult)
 	end
 
 	Data.nTimeDuring = GetCurrentTime() - Data.nTimeBegin
@@ -572,6 +551,14 @@ function D.GetForceAusID(data, dwID)
 		return
 	end
 	return data.Forcelist[dwID] or -1
+end
+
+-- 通过ID计算效果信息
+function D.GetEffectInfoAusID(data, szEffectID)
+	if not data or not szEffectID then
+		return
+	end
+	return unpack(data.Effectlist[szEffectID] or CONSTANT.EMPTY_TABLE)
 end
 
 -- 判断是否是友军
@@ -868,23 +855,23 @@ function D.InsertRecord(data, szRecordType, idRecord, idTarget, szEffectName, nV
 end
 
 -- 插入一条伤害记录
-function D.AddDamageRecord(data, dwCaster, dwTarget, szEffectName, nDamage, nEffectDamage, nSkillResult)
+function D.AddDamageRecord(data, dwCaster, dwTarget, szEffectID, nDamage, nEffectDamage, nSkillResult)
 	-- 添加伤害记录
 	D.InitObjectData(data, dwCaster, 'Damage')
-	D.InsertRecord(data, 'Damage'  , dwCaster, dwTarget, szEffectName, nDamage, nEffectDamage, nSkillResult)
+	D.InsertRecord(data, 'Damage'  , dwCaster, dwTarget, szEffectID, nDamage, nEffectDamage, nSkillResult)
 	-- 添加承伤记录
 	D.InitObjectData(data, dwTarget, 'BeDamage')
-	D.InsertRecord(data, 'BeDamage', dwTarget, dwCaster, szEffectName, nDamage, nEffectDamage, nSkillResult)
+	D.InsertRecord(data, 'BeDamage', dwTarget, dwCaster, szEffectID, nDamage, nEffectDamage, nSkillResult)
 end
 
 -- 插入一条治疗记录
-function D.AddHealRecord(data, dwCaster, dwTarget, szEffectName, nHeal, nEffectHeal, nSkillResult)
+function D.AddHealRecord(data, dwCaster, dwTarget, szEffectID, nHeal, nEffectHeal, nSkillResult)
 	-- 添加伤害记录
 	D.InitObjectData(data, dwCaster, 'Heal')
-	D.InsertRecord(data, 'Heal'    , dwCaster, dwTarget, szEffectName, nHeal, nEffectHeal, nSkillResult)
+	D.InsertRecord(data, 'Heal'    , dwCaster, dwTarget, szEffectID, nHeal, nEffectHeal, nSkillResult)
 	-- 添加承伤记录
 	D.InitObjectData(data, dwTarget, 'BeHeal')
-	D.InsertRecord(data, 'BeHeal'  , dwTarget, dwCaster, szEffectName, nHeal, nEffectHeal, nSkillResult)
+	D.InsertRecord(data, 'BeHeal'  , dwTarget, dwCaster, szEffectID, nHeal, nEffectHeal, nSkillResult)
 end
 
 -- 确认对象数据已创建（未创建则创建）
@@ -917,6 +904,24 @@ function D.InitObjectData(data, dwID, szChannel)
 	end
 end
 
+function D.InitEffectData(data, nType, dwID, nLevel)
+	local szKey = nType .. ',' .. dwID .. ',' .. nLevel
+	if not data.Effectlist[szKey] then
+		local szName, bAnonymous
+		if nType == SKILL_EFFECT_TYPE.SKILL then
+			szName = Table_GetSkillName(dwID, nLevel)
+		elseif nType == SKILL_EFFECT_TYPE.BUFF then
+			szName = Table_GetBuffName(dwID, nLevel)
+		end
+		if not szName then
+			bAnonymous = true
+			szName = '#' .. dwID .. ',' .. nLevel
+		end
+		data.Effectlist[szKey] = {szName, bAnonymous, nType, dwID, nLevel}
+	end
+	return szKey
+end
+
 -- 初始化Data
 do
 local function GeneTypeNS()
@@ -942,6 +947,7 @@ function D.Init(bForceInit)
 			Awaytime          = {},                                -- 死亡/掉线时间节点
 			Namelist          = {},                                -- 名称缓存
 			Forcelist         = {},                                -- 势力缓存
+			Effectlist        = {},                                -- 效果信息缓存
 			Damage            = GeneTypeNS(),                      -- 输出统计
 			Heal              = GeneTypeNS(),                      -- 治疗统计
 			BeHeal            = GeneTypeNS(),                      -- 承疗统计
@@ -1492,6 +1498,7 @@ local settings = {
 				GeneFightTime = D.GeneFightTime,
 				GetNameAusID = D.GetNameAusID,
 				GetForceAusID = D.GetForceAusID,
+				GetEffectInfoAusID = D.GetEffectInfoAusID,
 				Flush = D.Flush,
 				GetMergeTargetData = D.GetMergeTargetData,
 			},

@@ -572,8 +572,11 @@ function D.OnItemRefreshTip()
 			local szXml = GetFormatText((DataDisplay.Namelist[id] or id) .. '\n', 60, 255, 45, 255)
 			local szColon = g_tStrings.STR_COLON
 			local t = {}
-			for szSkillName, p in pairs(tRec.Skill) do
-				insert(t, { szName = szSkillName, rec = p })
+			for szEffectID, p in pairs(tRec.Skill) do
+				insert(t, {
+					szName = MY_Recount_DS.GetEffectInfoAusID(DataDisplay, szEffectID),
+					rec = p,
+				})
 			end
 			sort(t, function(p1, p2)
 				return p1.rec.nTotal > p2.rec.nTotal
