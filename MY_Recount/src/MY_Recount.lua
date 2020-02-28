@@ -46,6 +46,7 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
 end
 --------------------------------------------------------------------------
 
+local DK = MY_Recount_DS.DK
 local STAT_TYPE = { -- 统计类型
 	DPS  = 1, -- 输出统计
 	HPS  = 2, -- 治疗统计
@@ -53,10 +54,10 @@ local STAT_TYPE = { -- 统计类型
 	BHPS = 4, -- 承疗统计
 }
 local STAT_TYPE_KEY = { -- 统计类型数组名
-	[STAT_TYPE.DPS ] = 'Damage',
-	[STAT_TYPE.HPS ] = 'Heal',
-	[STAT_TYPE.BDPS] = 'BeDamage',
-	[STAT_TYPE.BHPS] = 'BeHeal',
+	[STAT_TYPE.DPS ] = DK.DAMAGE,
+	[STAT_TYPE.HPS ] = DK.HEAL,
+	[STAT_TYPE.BDPS] = DK.BE_DAMAGE,
+	[STAT_TYPE.BHPS] = DK.BE_HEAL,
 }
 local STAT_TYPE_NAME = {
 	[STAT_TYPE.DPS ] = g_tStrings.STR_DAMAGE_STATISTIC    , -- 伤害统计
@@ -403,9 +404,9 @@ function D.GetHistoryMenu()
 	}}
 
 	for _, data in ipairs(MY_Recount_DS.Get()) do
-		if data.UUID and data.nTimeDuring then
+		if data[DK.UUID] and data[DK.TIME_DURING] then
 			local t1 = {
-				szOption = (data.szBossName or ''):gsub('#.*', '') .. ' (' .. LIB.FormatTimeCounter(data.nTimeDuring, '%M:%ss') .. ')',
+				szOption = (data.szBossName or ''):gsub('#.*', '') .. ' (' .. LIB.FormatTimeCounter(data[DK.TIME_DURING], '%M:%ss') .. ')',
 				rgb = (data == DataDisplay and {255, 255, 0}) or nil,
 				fnAction = function()
 					if IsCtrlKeyDown() then
@@ -484,7 +485,7 @@ function D.GetPublishMenu()
 			.. _L['fight recount'] .. ' - '
 			.. frame:Lookup('Wnd_Title', 'Text_Title'):GetText()
 			.. ' ' .. ((DataDisplay.szBossName and ' - ' .. DataDisplay.szBossName) or '')
-			.. '(' .. LIB.FormatTimeCounter(DataDisplay.nTimeDuring, '%M:%ss') .. ')',
+			.. '(' .. LIB.FormatTimeCounter(DataDisplay[DK.TIME_DURING], '%M:%ss') .. ')',
 			nil,
 			true
 		)

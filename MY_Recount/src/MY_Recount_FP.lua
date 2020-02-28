@@ -46,6 +46,7 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
 end
 --------------------------------------------------------------------------
 
+local DK = MY_Recount_DS.DK
 local D = {}
 local O = {}
 
@@ -82,7 +83,7 @@ local COLUMN_LIST = {
 		nWidth = 80,
 		szTitle = _L['Time (ms)'],
 		GetFormatText = function(rec, data)
-			return GetFormatText(rec[3] - data.nTickBegin)
+			return GetFormatText(rec[3] - data[DK.TICK_BEGIN])
 		end,
 		Compare = GeneCommonCompare('*', 3)
 	},
@@ -253,12 +254,12 @@ function D.DrawData(frame)
 	local szSearch = frame:Lookup('Wnd_Total/Wnd_Search/Edit_Search'):GetText()
 	local aRec = {}
 	if IsEmpty(szSearch) then
-		for k, v in ipairs(data.Everything) do
+		for k, v in ipairs(data[DK.EVERYTHING]) do
 			aRec[k] = v
 		end
 	else
 		local nSearch = tonumber(szSearch)
-		for _, rec in ipairs(data.Everything) do
+		for _, rec in ipairs(data[DK.EVERYTHING]) do
 			if (szSearch == _L['Skill'] and rec[4] == 'SKILL_EFFECT' )
 			or (szSearch == _L['Fight time'] and rec[4] == 'FIGHT_TIME' )
 			or (rec[4] == 'SKILL_EFFECT' and (

@@ -46,6 +46,9 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
 end
 --------------------------------------------------------------------------
 
+local DK = MY_Recount_DS.DK
+local DK_REC = MY_Recount_DS.DK_REC
+local DK_REC_STAT = MY_Recount_DS.DK_REC_STAT
 local DISPLAY_MODE = { -- 统计显示
 	NPC    = 1, -- 只显示NPC
 	PLAYER = 2, -- 只显示玩家
@@ -219,15 +222,15 @@ function D.UpdateUI(frame)
 	-- 获取统计数据
 	local tInfo, szUnit
 	if MY_Recount_UI.nChannel == STAT_TYPE.DPS then       -- 伤害统计
-		tInfo, szUnit = data.Damage  , 'DPS'
+		tInfo, szUnit = data[DK.DAMAGE], 'DPS'
 	elseif MY_Recount_UI.nChannel == STAT_TYPE.HPS then   -- 治疗统计
-		tInfo, szUnit = data.Heal    , 'HPS'
+		tInfo, szUnit = data[DK.HEAL], 'HPS'
 	elseif MY_Recount_UI.nChannel == STAT_TYPE.BDPS then  -- 承伤统计
-		tInfo, szUnit = data.BeDamage, 'DPS'
+		tInfo, szUnit = data[DK.BE_DAMAGE], 'DPS'
 	elseif MY_Recount_UI.nChannel == STAT_TYPE.BHPS then  -- 承疗统计
-		tInfo, szUnit = data.BeHeal  , 'HPS'
+		tInfo, szUnit = data[DK.BE_HEAL], 'HPS'
 	end
-	local tRecord = tInfo.Statistics
+	local tRecord = tInfo[DK_REC.STATISTICS]
 
 	-- 计算战斗时间
 	local szTimeChannel = MY_Recount_UI.bSysTimeMode and STAT_TYPE_KEY[MY_Recount_UI.nChannel]
@@ -242,7 +245,7 @@ function D.UpdateUI(frame)
 	-- 整理数据 生成要显示的列表
 	local nMaxValue, aResult, tResult = 0, {}, {}
 	for dwID, rec in pairs(tRecord) do
-		if (MY_Recount_UI.bShowZeroVal or rec[MY_Recount_UI.bShowEffect and 'nTotalEffect' or 'nTotal'] > 0)
+		if (MY_Recount_UI.bShowZeroVal or rec[MY_Recount_UI.bShowEffect and DK_REC_STAT.TOTAL_EFFECT or DK_REC_STAT.TOTAL] > 0)
 		and (
 			MY_Recount_UI.nDisplayMode == DISPLAY_MODE.BOTH or  -- 确定显示模式（显示NPC/显示玩家/全部显示）
 			(MY_Recount_UI.nDisplayMode == DISPLAY_MODE.NPC and not IsPlayer(dwID)) or
@@ -254,16 +257,16 @@ function D.UpdateUI(frame)
 				tRec = tResult[id]
 			end
 			if tRec then -- 同名合并数据
-				tRec.nValue = tRec.nValue + (rec.nTotal or 0)
-				tRec.nEffectValue = tRec.nEffectValue + (rec.nTotalEffect or 0)
+				tRec.nValue = tRec.nValue + (rec[DK_REC_STAT.TOTAL] or 0)
+				tRec.nEffectValue = tRec.nEffectValue + (rec[DK_REC_STAT.TOTAL_EFFECT] or 0)
 			else -- 新数据
 				tRec = {
-					id           = id                                     ,
-					szMD5        = rec.szMD5                              ,
-					szName       = MY_Recount_DS.GetNameAusID(data, dwID) ,
-					dwForceID    = MY_Recount_DS.GetForceAusID(data, dwID),
-					nValue       = rec.nTotal or 0                        ,
-					nEffectValue = rec.nTotalEffect or 0                  ,
+					id           = id                                      ,
+					szMD5        = rec.szMD5                               ,
+					szName       = MY_Recount_DS.GetNameAusID(data, dwID)  ,
+					dwForceID    = MY_Recount_DS.GetForceAusID(data, dwID) ,
+					nValue       = rec[DK_REC_STAT.TOTAL] or 0       ,
+					nEffectValue = rec[DK_REC_STAT.TOTAL_EFFECT] or 0,
 					nTimeCount   = max( -- 计算战斗时间 防止计算DPS时除以0
 						MY_Recount_UI.bAwayMode
 							and MY_Recount_DS.GeneFightTime(data, szTimeChannel, dwID) -- 删去死亡时间
@@ -380,7 +383,7 @@ function D.UpdateUI(frame)
 			hItem:Lookup('Shadow_PerFore'):SetW(fPerFore * hItem:GetW())
 		end
 		-- 死亡/离线 特殊颜色
-		local tAway = data.Awaytime[p.id]
+		local tAway = data[DK.AWAYTIME][p.id]
 		local bAway = tAway and #tAway > 0 and not tAway[#tAway][2]
 		if hItem.bAway ~= bAway then
 			if bAway then
@@ -571,10 +574,10 @@ function D.OnItemRefreshTip()
 		local DataDisplay = MY_Recount.GetDisplayData()
 		local tRec = MY_Recount_DS.GetMergeTargetData(DataDisplay, STAT_TYPE_KEY[MY_Recount_UI.nChannel], id, O.bGroupSameNpc, O.bGroupSameEffect)
 		if tRec then
-			local szXml = GetFormatText((DataDisplay.Namelist[id] or id) .. '\n', 60, 255, 45, 255)
+			local szXml = GetFormatText((DataDisplay[DK.NAME_LIST][id] or id) .. '\n', 60, 255, 45, 255)
 			local szColon = g_tStrings.STR_COLON
 			local t = {}
-			for szEffectID, p in pairs(tRec.Skill) do
+			for szEffectID, p in pairs(tRec[DK_REC_STAT.SKILL]) do
 				insert(t, {
 					szName = MY_Recount_DS.GetEffectNameAusID(DataDisplay, szEffectID) or szEffectID,
 					rec = p,
@@ -605,10 +608,10 @@ function D.OnItemRefreshTip()
 					szXml = szXml .. GetFormatText('\n')
 				end
 			end
-			if DataDisplay.Awaytime[id] then
+			if DataDisplay[DK.AWAYTIME][id] then
 				szXml = szXml .. GetFormatText(_L(
 					'away count: %d, away time: %ds',
-					#DataDisplay.Awaytime[id],
+					#DataDisplay[DK.AWAYTIME][id],
 					MY_Recount_DS.GeneAwayTime(DataDisplay, id, MY_Recount_UI.bSysTimeMode)
 				), nil, 255, 191, 255)
 			end

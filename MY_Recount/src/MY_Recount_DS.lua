@@ -45,6 +45,68 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
 	return
 end
 --------------------------------------------------------------------------
+local DK = {
+	UUID        = 'UUID'       , -- 战斗唯一标识
+	VERSION     = 'nVersion'   , -- 数据版本号
+	TIME_BEGIN  = 'nTimeBegin' , -- 战斗开始时间
+	TICK_BEGIN  = 'nTickBegin' , -- 战斗开始毫秒时间
+	TIME_DURING = 'nTimeDuring', -- 战斗持续时间
+	TICK_DURING = 'nTickDuring', -- 战斗持续毫秒时间
+	AWAYTIME    = 'Awaytime'   , -- 死亡/掉线时间节点
+	NAME_LIST   = 'Namelist'   , -- 名称缓存
+	FORCE_LIST  = 'Forcelist'  , -- 势力缓存
+	EFFECT_LIST = 'Effectlist' , -- 效果信息缓存
+	DAMAGE      = 'Damage'     , -- 输出统计
+	HEAL        = 'Heal'       , -- 治疗统计
+	BE_HEAL     = 'BeHeal'     , -- 承疗统计
+	BE_DAMAGE   = 'BeDamage'   , -- 承伤统计
+	EVERYTHING  = 'Everything' , -- 战斗复盘
+}
+
+local DK_REC = {
+	TIME_DURING = 'nTimeDuring',
+	TOTAL = 'nTotal',
+	TOTAL_EFFECT = 'nTotalEffect',
+	SNAPSHOTS = 'Snapshots',
+	STATISTICS = 'Statistics',
+}
+
+local DK_REC_SNAPSHOT = {
+	TIME_DURING = 'nTimeDuring',
+	TOTAL = 'nTotal',
+	TOTAL_EFFECT = 'nTotalEffect',
+	STATISTICS = 'Statistics',
+}
+
+local DK_REC_SNAPSHOT_STAT = {
+	TOTAL = 'nTotal',
+	TOTAL_EFFECT = 'nTotalEffect',
+}
+
+local DK_REC_STAT = {
+	TOTAL = 'nTotal',
+	TOTAL_EFFECT = 'nTotalEffect',
+	DETAIL = 'Detail',
+	SKILL = 'Skill',
+	TARGET = 'Target',
+}
+
+local DK_REC_STAT_DETAIL = {
+	COUNT         = 'nCount'      , -- 命中记录数量（假设nSkillResult是命中）
+	NZ_COUNT      = 'nNzCount'    , -- 非零值命中记录数量
+	MAX           = 'nMax'        , -- 单次命中最大值
+	MAX_EFFECT    = 'nMaxEffect'  , -- 单次命中最大有效值
+	MIN           = 'nMin'        , -- 单次命中最小值
+	NZ_MIN        = 'nNzMin'      , -- 单次非零值命中最小值
+	MIN_EFFECT    = 'nMinEffect'  , -- 单次命中最小有效值
+	NZ_MIN_EFFECT = 'nNzMinEffect', -- 单次非零值命中最小有效值
+	TOTAL         = 'nTotal'      , -- 所有命中总伤害
+	TOTAL_EFFECT  = 'nTotalEffect', -- 所有命中总有效伤害
+	AVG           = 'nAvg'        , -- 所有命中平均伤害
+	NZ_AVG        = 'nNzAvg'      , -- 所有非零值命中平均伤害
+	AVG_EFFECT    = 'nAvgEffect'  , -- 所有命中平均有效伤害
+	NZ_AVG_EFFECT = 'nNzAvgEffect', -- 所有非零值命中平均有效伤害
+}
 --[[
 [SKILL_RESULT_TYPE]枚举：
 SKILL_RESULT_TYPE.PHYSICS_DAMAGE       = 0  -- 外功伤害
@@ -67,38 +129,38 @@ SKILL_RESULT_TYPE.TRANSFER_MANA        = 16 -- 吸取内力
 
 -- Data DataDisplay History[] 数据结构
 Data = {
-	UUID = 战斗统一标示符,
-	nVersion = 数据版本号,
-	nTimeBegin  = 战斗开始UNIX时间戳,
-	nTimeDuring = 战斗持续秒数,
-	Awaytime = {
+	[DK.UUID] = 战斗统一标示符,
+	[DK.VERSION] = 数据版本号,
+	[DK.TIME_BEGIN] = 战斗开始UNIX时间戳,
+	[DK.TIME_DURING] = 战斗持续秒数,
+	[DK.AWAYTIME] = {
 		玩家的dwID = {
 			{ 暂离开始时间, 暂离结束时间 }, ...
 		}, ...
 	},
-	Damage = {                                                -- 输出统计
-		nTimeDuring = 最后一次记录时离开始的秒数,
-		nTotal = 全队的输出量,
-		nTotalEffect = 全队的有效输出量,
-		Snapshots = {
+	[DK.DAMAGE] = {                                                -- 输出统计
+		[DK_REC.TIME_DURING] = 最后一次记录时离开始的秒数,
+		[DK_REC.TOTAL] = 全队的输出量,
+		[DK_REC.TOTAL_EFFECT] = 全队的有效输出量,
+		[DK_REC.SNAPSHOTS] = {
 			{
-				nTimeDuring  = 当前快照战斗秒数,
-				nTotal       = 当前快照时间全队输出量,
-				nTotalEffect = 当前快照时间全队有效输出量,
-				Statistics   = {
+				[DK_REC_SNAPSHOT.TIME_DURING ] = 当前快照战斗秒数,
+				[DK_REC_SNAPSHOT.TOTAL       ] = 当前快照时间全队输出量,
+				[DK_REC_SNAPSHOT.TOTAL_EFFECT] = 当前快照时间全队有效输出量,
+				[DK_REC_SNAPSHOT.STATISTICS  ] = {
 					玩家的dwID = {
-						nTotal       = 当前快照时间该玩家总输出量,
-						nTotalEffect = 当前快照时间该玩家总有效输出量,
+						[DK_REC_SNAPSHOT_STAT.TOTAL       ] = 当前快照时间该玩家总输出量,
+						[DK_REC_SNAPSHOT_STAT.TOTAL_EFFECT] = 当前快照时间该玩家总有效输出量,
 					},
 					NPC的名字 = { ... },
 				},
 			}, ...
 		},
-		Statistics = {
+		[DK_REC.STATISTICS] = {
 			玩家的dwID = {                                        -- 该对象的输出统计
-				nTotal       = 2314214,                           -- 总输出
-				nTotalEffect = 132144 ,                           -- 有效输出
-				Detail = {                                        -- 输出结果分类统计
+				[DK_REC_STAT.TOTAL       ] = 2314214,       -- 总输出
+				[DK_REC_STAT.TOTAL_EFFECT] = 132144 ,       -- 有效输出
+				[DK_REC_STAT.DETAIL      ] = {              -- 输出结果分类统计
 					SKILL_RESULT.HIT = {
 						nCount       = 10    ,                    -- 命中记录数量
 						nMax         = 34210 ,                    -- 单次命中最大值
@@ -113,7 +175,7 @@ Data = {
 					SKILL_RESULT.MISS = { ... },
 					SKILL_RESULT.CRITICAL = { ... },
 				},
-				Skill = {                                         -- 该玩家具体造成输出的技能统计
+				[DK_REC_STAT.SKILL] = {                     -- 该玩家具体造成输出的技能统计
 					四象轮回 = {                                  -- 该玩家四象轮回造成的输出统计
 						nCount       = 2     ,                    -- 该玩家四象轮回输出次数
 						nMax         = 13415 ,                    -- 该玩家四象轮回最大输出量
@@ -197,9 +259,9 @@ Data = {
 			NPC的名字 = { ... },
 		},
 	},
-	Heal = { ... },
-	BeHeal = { ... },
-	BeDamage = { ... },
+	[DK.HEAL] = { ... },
+	[DK.BE_HEAL] = { ... },
+	[DK.BE_DAMAGE] = { ... },
 }
 ]]
 local SKILL_RESULT = {
@@ -267,7 +329,7 @@ function D.LoadData()
 		if data.bSaveHistory or data.History then
 			History = data.History or {}
 			for i = #History, 1, -1 do
-				if History[i].nVersion ~= VERSION then
+				if History[i][DK.VERSION] ~= VERSION then
 					remove(History, i)
 				end
 			end
@@ -289,7 +351,7 @@ function D.SaveData()
 		nMinFightTime     = O.nMinFightTime,
 		bRecEverything    = O.bRecEverything,
 	}
-	LIB.SaveLUAData(SZ_REC_FILE, data, { passphrase = false, indent = '\t' })
+	LIB.SaveLUAData(SZ_REC_FILE, data, { passphrase = false })
 end
 
 -- 过图清除当前战斗数据
@@ -305,7 +367,7 @@ end
 
 -- 退出战斗 保存数据
 LIB.RegisterEvent('MY_FIGHT_HINT', function(event)
-	if arg0 and LIB.GetFightUUID() ~= Data.UUID then -- 进入新的战斗
+	if arg0 and LIB.GetFightUUID() ~= Data[DK.UUID] then -- 进入新的战斗
 		D.Init()
 		FireUIEvent('MY_RECOUNT_NEW_FIGHT')
 	else
@@ -315,22 +377,22 @@ LIB.RegisterEvent('MY_FIGHT_HINT', function(event)
 end)
 LIB.BreatheCall('MY_Recount_FightTime', 1000, function()
 	if LIB.IsFighting() then
-		Data.nTimeDuring = GetCurrentTime() - Data.nTimeBegin
-		for _, szRecordType in ipairs({'Damage', 'Heal', 'BeDamage', 'BeHeal'}) do
+		Data[DK.TIME_DURING] = GetCurrentTime() - Data[DK.TIME_BEGIN]
+		for _, szRecordType in ipairs({DK.DAMAGE, DK.HEAL, DK.BE_DAMAGE, DK.BE_HEAL}) do
 			local tInfo = Data[szRecordType]
 			local tSnapshot = {
-				nTimeDuring  = Data.nTimeDuring,
-				nTotal       = tInfo.nTotal,
-				nTotalEffect = tInfo.nTotalEffect,
-				Statistics   = {},
+				[DK_REC_SNAPSHOT.TIME_DURING ] = Data[DK.TIME_DURING],
+				[DK_REC_SNAPSHOT.TOTAL       ] = tInfo[DK_REC.TOTAL],
+				[DK_REC_SNAPSHOT.TOTAL_EFFECT] = tInfo[DK_REC.TOTAL_EFFECT],
+				[DK_REC_SNAPSHOT.STATISTICS  ] = {},
 			}
-			for k, v in pairs(tInfo.Statistics) do
-				tSnapshot.Statistics[k] = {
-					nTotal = v.nTotal,
-					nTotalEffect = v.nTotalEffect,
+			for k, v in pairs(tInfo[DK_REC.STATISTICS]) do
+				tSnapshot[DK_REC_SNAPSHOT.STATISTICS][k] = {
+					[DK_REC_SNAPSHOT_STAT.TOTAL] = v[DK_REC_STAT.TOTAL],
+					[DK_REC_SNAPSHOT_STAT.TOTAL_EFFECT] = v.nTotalEffect,
 				}
 			end
-			insert(Data[szRecordType].Snapshots, tSnapshot)
+			insert(Data[szRecordType][DK_REC.SNAPSHOTS], tSnapshot)
 		end
 	end
 end)
@@ -384,14 +446,14 @@ end
 -- data: 数据
 -- dwID: 计算暂离的角色ID 为空则计算团队的暂离时间（目前永远为0）
 -- szRecordType: 不同类型的数据在官方时间算法下计算结果可能不一样
---               枚举暂时有 Heal Damage BeDamage BeHeal 四种
+--               枚举暂时有 DK.HEAL DK.DAMAGE DK.BE_DAMAGE DK.BE_HEAL 四种
 function D.GeneAwayTime(data, dwID, szRecordType)
 	local nFightTime = D.GeneFightTime(data, dwID, szRecordType)
 	local nAwayTime
-	if szRecordType and data[szRecordType] and data[szRecordType].nTimeDuring then
-		nAwayTime = data[szRecordType].nTimeDuring - nFightTime
+	if szRecordType and data[szRecordType] and data[szRecordType][DK_REC.TIME_DURING] then
+		nAwayTime = data[szRecordType][DK_REC.TIME_DURING] - nFightTime
 	else
-		nAwayTime = data.nTimeDuring - nFightTime
+		nAwayTime = data[DK.TIME_DURING] - nFightTime
 	end
 	return max(nAwayTime, 0)
 end
@@ -400,23 +462,23 @@ end
 -- D.GeneFightTime(data, dwID, szRecordType)
 -- data: 数据
 -- szRecordType: 不同类型的数据在官方时间算法下计算结果可能不一样
---               枚举暂时有 Heal Damage BeDamage BeHeal 四种
+--               枚举暂时有 DK.HEAL DK.DAMAGE DK.BE_DAMAGE DK.BE_HEAL 四种
 --               为空则计算普通时间算法
 -- dwID: 计算战斗时间的角色ID 为空则计算团队的战斗时间
 function D.GeneFightTime(data, szRecordType, dwID)
-	local nTimeDuring = data.nTimeDuring
-	local nTimeBegin  = data.nTimeBegin
-	if szRecordType and data[szRecordType] and data[szRecordType].nTimeDuring then
-		nTimeDuring = data[szRecordType].nTimeDuring
+	local nTimeDuring = data[DK.TIME_DURING]
+	local nTimeBegin  = data[DK.TIME_BEGIN]
+	if szRecordType and data[szRecordType] and data[szRecordType][DK_REC.TIME_DURING] then
+		nTimeDuring = data[szRecordType][DK_REC.TIME_DURING]
 	end
-	if dwID and data.Awaytime and data.Awaytime[dwID] then
-		for _, rec in ipairs(data.Awaytime[dwID]) do
+	if dwID and data[DK.AWAYTIME] and data[DK.AWAYTIME][dwID] then
+		for _, rec in ipairs(data[DK.AWAYTIME][dwID]) do
 			local nAwayBegin = max(rec[1], nTimeBegin)
 			local nAwayEnd   = rec[2]
 			if nAwayEnd then -- 完整的离开记录
 				nTimeDuring = nTimeDuring - (nAwayEnd - nAwayBegin)
 			else -- 离开了至今没回来的记录
-				nTimeDuring = nTimeDuring - (data.nTimeBegin + nTimeDuring - nAwayBegin)
+				nTimeDuring = nTimeDuring - (data[DK.TIME_BEGIN] + nTimeDuring - nAwayBegin)
 				break
 			end
 		end
@@ -526,8 +588,8 @@ function D.OnSkillEffect(dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLe
 		D.AddDamageRecord(Data, dwCaster, dwTarget, szEffectID, 0, 0, nSkillResult)
 	end
 
-	Data.nTimeDuring = GetCurrentTime() - Data.nTimeBegin
-	Data.nTickDuring = GetTime() - Data.nTickBegin
+	Data[DK.TIME_DURING] = GetCurrentTime() - Data[DK.TIME_BEGIN]
+	Data[DK.TICK_DURING] = GetTime() - Data[DK.TICK_BEGIN]
 end
 
 -- 通过ID计算名字
@@ -535,7 +597,7 @@ function D.GetNameAusID(data, dwID)
 	if not data or not dwID then
 		return
 	end
-	return data.Namelist[dwID] or g_tStrings.STR_NAME_UNKNOWN
+	return data[DK.NAME_LIST][dwID] or g_tStrings.STR_NAME_UNKNOWN
 end
 
 -- 通过ID计算势力
@@ -543,7 +605,7 @@ function D.GetForceAusID(data, dwID)
 	if not data or not dwID then
 		return
 	end
-	return data.Forcelist[dwID] or -1
+	return data[DK.FORCE_LIST][dwID] or -1
 end
 
 -- 通过ID计算效果信息
@@ -551,7 +613,7 @@ function D.GetEffectInfoAusID(data, szEffectID)
 	if not data or not szEffectID then
 		return
 	end
-	return unpack(data.Effectlist[szEffectID] or CONSTANT.EMPTY_TABLE)
+	return unpack(data[DK.EFFECT_LIST][szEffectID] or CONSTANT.EMPTY_TABLE)
 end
 
 -- 通过ID用途计算效果名
@@ -559,10 +621,10 @@ function D.GetEffectNameAusID(data, szChannel, szEffectID)
 	if not data or not szChannel or not szEffectID then
 		return
 	end
-	local info = data.Effectlist[szEffectID]
+	local info = data[DK.EFFECT_LIST][szEffectID]
 	if info and not IsEmpty(info[1]) then
 		if info[3] == SKILL_EFFECT_TYPE.BUFF then
-			if szChannel == 'Heal' or szChannel == 'BeHeal' then
+			if szChannel == DK.HEAL or szChannel == DK.BE_HEAL then
 				return info[1] .. '(HOT)'
 			end
 			return info[1] .. '(DOT)'
@@ -590,73 +652,73 @@ function D.InsertEverything(data, szName, ...)
 	if not O.bRecEverything then
 		return
 	end
-	insert(data.Everything, {GetLogicFrameCount(), GetCurrentTime(), GetTime(), szName, ...})
+	insert(data[DK.EVERYTHING], {GetLogicFrameCount(), GetCurrentTime(), GetTime(), szName, ...})
 end
 
 -- 将一条记录插入数组
 function D.InsertRecord(data, szRecordType, idRecord, idTarget, szEffectName, nValue, nEffectValue, nSkillResult)
 	local tInfo   = data[szRecordType]
-	local tRecord = tInfo.Statistics[idRecord]
+	local tRecord = tInfo[DK_REC.STATISTICS][idRecord]
 	if not szEffectName or szEffectName == '' then
 		return
 	end
 	------------------------
 	-- # 节： tInfo
 	------------------------
-	tInfo.nTimeDuring = GetCurrentTime() - data.nTimeBegin
-	tInfo.nTotal        = tInfo.nTotal + nValue
-	tInfo.nTotalEffect  = tInfo.nTotalEffect + nEffectValue
+	tInfo[DK_REC.TIME_DURING ] = GetCurrentTime() - data[DK.TIME_BEGIN]
+	tInfo[DK_REC.TOTAL       ] = tInfo[DK_REC.TOTAL] + nValue
+	tInfo[DK_REC.TOTAL_EFFECT] = tInfo[DK_REC.TOTAL_EFFECT] + nEffectValue
 	------------------------
 	-- # 节： tRecord
 	------------------------
-	tRecord.nTotal        = tRecord.nTotal + nValue
-	tRecord.nTotalEffect  = tRecord.nTotalEffect + nEffectValue
+	tRecord[DK_REC_STAT.TOTAL       ] = tRecord[DK_REC_STAT.TOTAL] + nValue
+	tRecord[DK_REC_STAT.TOTAL_EFFECT] = tRecord[DK_REC_STAT.TOTAL_EFFECT] + nEffectValue
 	------------------------
 	-- # 节： tRecord.Detail
 	------------------------
 	-- 添加/更新结果分类统计
-	if not tRecord.Detail[nSkillResult] then
-		tRecord.Detail[nSkillResult] = {
-			nCount       =  0, -- 命中记录数量（假设nSkillResult是命中）
-			nNzCount     =  0, -- 非零值命中记录数量
-			nMax         =  0, -- 单次命中最大值
-			nMaxEffect   =  0, -- 单次命中最大有效值
-			nMin         = -1, -- 单次命中最小值
-			nNzMin       = -1, -- 单次非零值命中最小值
-			nMinEffect   = -1, -- 单次命中最小有效值
-			nNzMinEffect = -1, -- 单次非零值命中最小有效值
-			nTotal       =  0, -- 所有命中总伤害
-			nTotalEffect =  0, -- 所有命中总有效伤害
-			nAvg         =  0, -- 所有命中平均伤害
-			nNzAvg       =  0, -- 所有非零值命中平均伤害
-			nAvgEffect   =  0, -- 所有命中平均有效伤害
-			nNzAvgEffect =  0, -- 所有非零值命中平均有效伤害
+	if not tRecord[DK_REC_STAT.DETAIL][nSkillResult] then
+		tRecord[DK_REC_STAT.DETAIL][nSkillResult] = {
+			[DK_REC_STAT_DETAIL.COUNT        ] =  0, -- 命中记录数量（假设nSkillResult是命中）
+			[DK_REC_STAT_DETAIL.NZ_COUNT     ] =  0, -- 非零值命中记录数量
+			[DK_REC_STAT_DETAIL.MAX          ] =  0, -- 单次命中最大值
+			[DK_REC_STAT_DETAIL.MAX_EFFECT   ] =  0, -- 单次命中最大有效值
+			[DK_REC_STAT_DETAIL.MIN          ] = -1, -- 单次命中最小值
+			[DK_REC_STAT_DETAIL.NZ_MIN       ] = -1, -- 单次非零值命中最小值
+			[DK_REC_STAT_DETAIL.MIN_EFFECT   ] = -1, -- 单次命中最小有效值
+			[DK_REC_STAT_DETAIL.NZ_MIN_EFFECT] = -1, -- 单次非零值命中最小有效值
+			[DK_REC_STAT_DETAIL.TOTAL        ] =  0, -- 所有命中总伤害
+			[DK_REC_STAT_DETAIL.TOTAL_EFFECT ] =  0, -- 所有命中总有效伤害
+			[DK_REC_STAT_DETAIL.AVG          ] =  0, -- 所有命中平均伤害
+			[DK_REC_STAT_DETAIL.NZ_AVG       ] =  0, -- 所有非零值命中平均伤害
+			[DK_REC_STAT_DETAIL.AVG_EFFECT   ] =  0, -- 所有命中平均有效伤害
+			[DK_REC_STAT_DETAIL.NZ_AVG_EFFECT] =  0, -- 所有非零值命中平均有效伤害
 		}
 	end
-	local tResult = tRecord.Detail[nSkillResult]
-	tResult.nCount       = tResult.nCount + 1                                -- 命中次数（假设nSkillResult是命中）
-	tResult.nMax         = max(tResult.nMax, nValue)                    -- 单次命中最大值
-	tResult.nMaxEffect   = max(tResult.nMaxEffect, nEffectValue)        -- 单次命中最大有效值
-	tResult.nMin         = (tResult.nMin ~= -1 and min(tResult.nMin, nValue)) or nValue                         -- 单次命中最小值
-	tResult.nMinEffect   = (tResult.nMinEffect ~= -1 and min(tResult.nMinEffect, nEffectValue)) or nEffectValue -- 单次命中最小有效值
-	tResult.nTotal       = tResult.nTotal + nValue                           -- 所以命中总伤害
-	tResult.nTotalEffect = tResult.nTotalEffect + nEffectValue               -- 所有命中总有效伤害
-	tResult.nAvg         = floor(tResult.nTotal / tResult.nCount)       -- 单次命中平均值
-	tResult.nAvgEffect   = floor(tResult.nTotalEffect / tResult.nCount) -- 单次命中平均有效值
+	local tResult = tRecord[DK_REC_STAT.DETAIL][nSkillResult]
+	tResult[DK_REC_STAT_DETAIL.COUNT     ] = tResult[DK_REC_STAT_DETAIL.COUNT] + 1 -- 命中次数（假设nSkillResult是命中）
+	tResult[DK_REC_STAT_DETAIL.MAX       ] = max(tResult[DK_REC_STAT_DETAIL.MAX], nValue) -- 单次命中最大值
+	tResult[DK_REC_STAT_DETAIL.MAX_EFFECT] = max(tResult[DK_REC_STAT_DETAIL.MAX_EFFECT], nEffectValue) -- 单次命中最大有效值
+	tResult[DK_REC_STAT_DETAIL.MIN       ] = Min(tResult[DK_REC_STAT_DETAIL.MIN], nValue) -- 单次命中最小值
+	tResult[DK_REC_STAT_DETAIL.MIN_EFFECT] = Min(tResult[DK_REC_STAT_DETAIL.MIN_EFFECT], nEffectValue) -- 单次命中最小有效值
+	tResult[DK_REC_STAT_DETAIL.TOTAL       ] = tResult[DK_REC_STAT_DETAIL.TOTAL] + nValue -- 所以命中总伤害
+	tResult[DK_REC_STAT_DETAIL.TOTAL_EFFECT] = tResult[DK_REC_STAT_DETAIL.TOTAL_EFFECT] + nEffectValue -- 所有命中总有效伤害
+	tResult[DK_REC_STAT_DETAIL.AVG         ] = floor(tResult[DK_REC_STAT_DETAIL.TOTAL] / tResult[DK_REC_STAT_DETAIL.COUNT]) -- 单次命中平均值
+	tResult[DK_REC_STAT_DETAIL.AVG_EFFECT  ] = floor(tResult[DK_REC_STAT_DETAIL.TOTAL_EFFECT] / tResult[DK_REC_STAT_DETAIL.COUNT]) -- 单次命中平均有效值
 	if nValue ~= 0 or NZ_SKILL_RESULT[nSkillResult] then
-		tResult.nNzCount     = tResult.nNzCount + 1                           -- 命中次数（假设nSkillResult是命中）
-		tResult.nNzMin       = (tResult.nNzMin ~= -1 and min(tResult.nNzMin, nValue)) or nValue                         -- 单次命中最小值
-		tResult.nNzMinEffect = (tResult.nNzMinEffect ~= -1 and min(tResult.nNzMinEffect, nEffectValue)) or nEffectValue -- 单次命中最小有效值
-		tResult.nNzAvg       = floor(tResult.nTotal / tResult.nNzCount)       -- 单次命中平均值
-		tResult.nNzAvgEffect = floor(tResult.nTotalEffect / tResult.nNzCount) -- 单次命中平均有效值
+		tResult[DK_REC_STAT_DETAIL.NZ_COUNT] = tResult[DK_REC_STAT_DETAIL.NZ_COUNT] + 1 -- 命中次数（假设nSkillResult是命中）
+		tResult[DK_REC_STAT_DETAIL.NZ_MIN  ] = Min(tResult[DK_REC_STAT_DETAIL.NZ_MIN], nValue) -- 单次命中最小值
+		tResult[DK_REC_STAT_DETAIL.NZ_MIN_EFFECT] = Min(tResult[DK_REC_STAT_DETAIL.NZ_MIN_EFFECT], nEffectValue) -- 单次命中最小有效值
+		tResult[DK_REC_STAT_DETAIL.NZ_AVG       ] = floor(tResult[DK_REC_STAT_DETAIL.TOTAL] / tResult[DK_REC_STAT_DETAIL.NZ_COUNT]) -- 单次命中平均值
+		tResult[DK_REC_STAT_DETAIL.NZ_AVG_EFFECT] = floor(tResult[DK_REC_STAT_DETAIL.TOTAL_EFFECT] / tResult[DK_REC_STAT_DETAIL.NZ_COUNT]) -- 单次命中平均有效值
 	end
 
 	------------------------
 	-- # 节： tRecord.Skill
 	------------------------
 	-- 添加具体技能记录
-	if not tRecord.Skill[szEffectName] then
-		tRecord.Skill[szEffectName] = {
+	if not tRecord[DK_REC_STAT.SKILL][szEffectName] then
+		tRecord[DK_REC_STAT.SKILL][szEffectName] = {
 			nCount       =  0, -- 该玩家四象轮回释放次数（假设szEffectName是四象轮回）
 			nNzCount     =  0, -- 该玩家非零值四象轮回释放次数
 			nMax         =  0, -- 该玩家四象轮回最大输出量
@@ -671,7 +733,7 @@ function D.InsertRecord(data, szRecordType, idRecord, idTarget, szEffectName, nV
 			Target       = {}, -- 该玩家四象轮回承受者统计
 		}
 	end
-	local tSkillRecord = tRecord.Skill[szEffectName]
+	local tSkillRecord = tRecord[DK_REC_STAT.SKILL][szEffectName]
 	tSkillRecord.nCount       = tSkillRecord.nCount + 1
 	tSkillRecord.nMax         = max(tSkillRecord.nMax, nValue)
 	tSkillRecord.nMaxEffect   = max(tSkillRecord.nMaxEffect, nEffectValue)
@@ -761,8 +823,8 @@ function D.InsertRecord(data, szRecordType, idRecord, idTarget, szEffectName, nV
 	-- # 节： tRecord.Target
 	------------------------
 	-- 添加具体承受/释放者记录
-	if not tRecord.Target[idTarget] then
-		tRecord.Target[idTarget] = {
+	if not tRecord[DK_REC_STAT.TARGET][idTarget] then
+		tRecord[DK_REC_STAT.TARGET][idTarget] = {
 			nCount       =  0, -- 该玩家对idTarget的技能释放次数
 			nNzCount     =  0, -- 该玩家对idTarget的非零值技能释放次数
 			nMax         =  0, -- 该玩家对idTarget的技能最大输出量
@@ -777,7 +839,7 @@ function D.InsertRecord(data, szRecordType, idRecord, idTarget, szEffectName, nV
 			Skill        = {}, -- 该玩家对idTarget的技能具体分别统计
 		}
 	end
-	local tTargetRecord = tRecord.Target[idTarget]
+	local tTargetRecord = tRecord[DK_REC_STAT.TARGET][idTarget]
 	tTargetRecord.nCount       = tTargetRecord.nCount + 1
 	tTargetRecord.nMax         = max(tTargetRecord.nMax, nValue)
 	tTargetRecord.nMaxEffect   = max(tTargetRecord.nMaxEffect, nEffectValue)
@@ -867,56 +929,56 @@ end
 -- 插入一条伤害记录
 function D.AddDamageRecord(data, dwCaster, dwTarget, szEffectID, nDamage, nEffectDamage, nSkillResult)
 	-- 添加伤害记录
-	D.InitObjectData(data, dwCaster, 'Damage')
-	D.InsertRecord(data, 'Damage'  , dwCaster, dwTarget, szEffectID, nDamage, nEffectDamage, nSkillResult)
+	D.InitObjectData(data, dwCaster, DK.DAMAGE)
+	D.InsertRecord(data, DK.DAMAGE, dwCaster, dwTarget, szEffectID, nDamage, nEffectDamage, nSkillResult)
 	-- 添加承伤记录
-	D.InitObjectData(data, dwTarget, 'BeDamage')
-	D.InsertRecord(data, 'BeDamage', dwTarget, dwCaster, szEffectID, nDamage, nEffectDamage, nSkillResult)
+	D.InitObjectData(data, dwTarget, DK.BE_DAMAGE)
+	D.InsertRecord(data, DK.BE_DAMAGE, dwTarget, dwCaster, szEffectID, nDamage, nEffectDamage, nSkillResult)
 end
 
 -- 插入一条治疗记录
 function D.AddHealRecord(data, dwCaster, dwTarget, szEffectID, nHeal, nEffectHeal, nSkillResult)
 	-- 添加伤害记录
-	D.InitObjectData(data, dwCaster, 'Heal')
-	D.InsertRecord(data, 'Heal'    , dwCaster, dwTarget, szEffectID, nHeal, nEffectHeal, nSkillResult)
+	D.InitObjectData(data, dwCaster, DK.HEAL)
+	D.InsertRecord(data, DK.HEAL, dwCaster, dwTarget, szEffectID, nHeal, nEffectHeal, nSkillResult)
 	-- 添加承伤记录
-	D.InitObjectData(data, dwTarget, 'BeHeal')
-	D.InsertRecord(data, 'BeHeal'  , dwTarget, dwCaster, szEffectID, nHeal, nEffectHeal, nSkillResult)
+	D.InitObjectData(data, dwTarget, DK.BE_HEAL)
+	D.InsertRecord(data, DK.BE_HEAL, dwTarget, dwCaster, szEffectID, nHeal, nEffectHeal, nSkillResult)
 end
 
 -- 确认对象数据已创建（未创建则创建）
 function D.InitObjectData(data, dwID, szChannel)
 	-- 名称缓存
-	if not data.Namelist[dwID] then
-		data.Namelist[dwID] = LIB.GetObjectName(IsPlayer(dwID) and TARGET.PLAYER or TARGET.NPC, dwID, 'never') -- 名称缓存
+	if not data[DK.NAME_LIST][dwID] then
+		data[DK.NAME_LIST][dwID] = LIB.GetObjectName(IsPlayer(dwID) and TARGET.PLAYER or TARGET.NPC, dwID, 'never') -- 名称缓存
 	end
 	-- 势力缓存
-	if not data.Forcelist[dwID] then
+	if not data[DK.FORCE_LIST][dwID] then
 		if IsPlayer(dwID) then
 			local player = GetPlayer(dwID)
 			if player then
-				data.Forcelist[dwID] = player.dwForceID or 0
+				data[DK.FORCE_LIST][dwID] = player.dwForceID or 0
 			end
 		else
-			data.Forcelist[dwID] = 0
+			data[DK.FORCE_LIST][dwID] = 0
 		end
 	end
 	-- 统计结构体
-	if not data[szChannel].Statistics[dwID] then
-		data[szChannel].Statistics[dwID] = {
+	if not data[szChannel][DK_REC.STATISTICS][dwID] then
+		data[szChannel][DK_REC.STATISTICS][dwID] = {
 			szMD5        = dwID, -- 唯一标识
-			nTotal       = 0   , -- 总输出
-			nTotalEffect = 0   , -- 有效输出
-			Detail       = {}  , -- 输出结果按技能结果分类统计
-			Skill        = {}  , -- 该玩家具体造成输出的技能统计
-			Target       = {}  , -- 该玩家具体对谁造成输出的统计
+			[DK_REC_STAT.TOTAL       ] = 0 , -- 总输出
+			[DK_REC_STAT.TOTAL_EFFECT] = 0 , -- 有效输出
+			[DK_REC_STAT.DETAIL      ] = {}, -- 输出结果按技能结果分类统计
+			[DK_REC_STAT.SKILL       ] = {}, -- 该玩家具体造成输出的技能统计
+			[DK_REC_STAT.TARGET      ] = {}, -- 该玩家具体对谁造成输出的统计
 		}
 	end
 end
 
 function D.InitEffectData(data, nType, dwID, nLevel)
 	local szKey = nType .. ',' .. dwID .. ',' .. nLevel
-	if not data.Effectlist[szKey] then
+	if not data[DK.EFFECT_LIST][szKey] then
 		local szName, bAnonymous
 		if nType == SKILL_EFFECT_TYPE.SKILL then
 			szName = Table_GetSkillName(dwID, nLevel)
@@ -927,7 +989,7 @@ function D.InitEffectData(data, nType, dwID, nLevel)
 			bAnonymous = true
 			szName = '#' .. dwID .. ',' .. nLevel
 		end
-		data.Effectlist[szKey] = {szName, bAnonymous, nType, dwID, nLevel}
+		data[DK.EFFECT_LIST][szKey] = {szName, bAnonymous, nType, dwID, nLevel}
 	end
 	return szKey
 end
@@ -936,60 +998,60 @@ end
 do
 local function GeneTypeNS()
 	return {
-		nTimeDuring  = 0,
-		nTotal       = 0,
-		nTotalEffect = 0,
-		Snapshots    = {},
-		Statistics   = {},
+		[DK_REC.TIME_DURING ] = 0,
+		[DK_REC.TOTAL       ] = 0,
+		[DK_REC.TOTAL_EFFECT] = 0,
+		[DK_REC.SNAPSHOTS   ] = {},
+		[DK_REC.STATISTICS  ] = {},
 	}
 end
 function D.Init(bForceInit)
 	if bForceInit or (not Data) or
-	(Data.UUID and LIB.GetFightUUID() ~= Data.UUID) then
+	(Data[DK.UUID] and LIB.GetFightUUID() ~= Data[DK.UUID]) then
 		Data = {
-			UUID              = LIB.GetFightUUID(),                 -- 战斗唯一标识
-			nVersion          = VERSION,                           -- 数据版本号
-			nTimeBegin        = GetCurrentTime(),                  -- 战斗开始时间
-			nTickBegin        = GetTime(),                         -- 战斗开始毫秒时间
-			nTimeDuring       =  0,                                -- 战斗持续时间
-			nTickDuring       =  0,                                -- 战斗持续毫秒时间
-			Awaytime          = {},                                -- 死亡/掉线时间节点
-			Namelist          = {},                                -- 名称缓存
-			Forcelist         = {},                                -- 势力缓存
-			Effectlist        = {},                                -- 效果信息缓存
-			Damage            = GeneTypeNS(),                      -- 输出统计
-			Heal              = GeneTypeNS(),                      -- 治疗统计
-			BeHeal            = GeneTypeNS(),                      -- 承疗统计
-			BeDamage          = GeneTypeNS(),                      -- 承伤统计
-			Everything        = {},                                -- 战斗复盘
+			[DK.UUID       ] = LIB.GetFightUUID(),                -- 战斗唯一标识
+			[DK.VERSION    ] = VERSION,                           -- 数据版本号
+			[DK.TIME_BEGIN ] = GetCurrentTime(),                  -- 战斗开始时间
+			[DK.TICK_BEGIN ] = GetTime(),                         -- 战斗开始毫秒时间
+			[DK.TIME_DURING] =  0,                                -- 战斗持续时间
+			[DK.TICK_DURING] =  0,                                -- 战斗持续毫秒时间
+			[DK.AWAYTIME   ] = {},                                -- 死亡/掉线时间节点
+			[DK.NAME_LIST  ] = {},                                -- 名称缓存
+			[DK.FORCE_LIST ] = {},                                -- 势力缓存
+			[DK.EFFECT_LIST] = {},                                -- 效果信息缓存
+			[DK.DAMAGE     ] = GeneTypeNS(),                      -- 输出统计
+			[DK.HEAL       ] = GeneTypeNS(),                      -- 治疗统计
+			[DK.BE_HEAL    ] = GeneTypeNS(),                      -- 承疗统计
+			[DK.BE_DAMAGE  ] = GeneTypeNS(),                      -- 承伤统计
+			[DK.EVERYTHING ] = {},                                -- 战斗复盘
 		}
 	end
 
-	if not Data.UUID and LIB.GetFightUUID() then
-		Data.UUID       = LIB.GetFightUUID()
-		Data.nTimeBegin = GetCurrentTime()
+	if not Data[DK.UUID] and LIB.GetFightUUID() then
+		Data[DK.UUID] = LIB.GetFightUUID()
+		Data[DK.TIME_BEGIN] = GetCurrentTime()
 	end
 end
 end
 
 -- Data数据压入历史记录 并重新初始化Data
 function D.Flush()
-	if not (Data and Data.UUID) then
+	if not (Data and Data[DK.UUID]) then
 		return
 	end
 
 	-- 过滤空记录
-	if IsEmpty(Data.BeDamage.Statistics)
-	and IsEmpty(Data.Damage.Statistics)
-	and IsEmpty(Data.Heal.Statistics)
-	and IsEmpty(Data.BeHeal.Statistics) then
+	if IsEmpty(Data[DK.BE_DAMAGE][DK_REC.STATISTICS])
+	and IsEmpty(Data[DK.DAMAGE][DK_REC.STATISTICS])
+	and IsEmpty(Data[DK.HEAL][DK_REC.STATISTICS])
+	and IsEmpty(Data[DK.BE_HEAL][DK_REC.STATISTICS]) then
 		return
 	end
 
 	-- 计算受伤最多的名字作为战斗名称
 	local nMaxValue, szBossName = 0, nil
 	local nEnemyMaxValue, szEnemyBossName = 0, nil
-	for id, p in pairs(Data.BeDamage.Statistics) do
+	for id, p in pairs(Data[DK.BE_DAMAGE][DK_REC.STATISTICS]) do
 		if nEnemyMaxValue < p.nTotalEffect and not D.IsParty(id) then
 			nEnemyMaxValue  = p.nTotalEffect
 			szEnemyBossName = D.GetNameAusID(Data, id)
@@ -1001,7 +1063,7 @@ function D.Flush()
 	end
 	-- 如果没有 则计算输出最多的NPC名字作为战斗名称
 	if not szBossName or not szEnemyBossName then
-		for id, p in pairs(Data.Damage.Statistics) do
+		for id, p in pairs(Data[DK.DAMAGE][DK_REC.STATISTICS]) do
 			if nEnemyMaxValue < p.nTotalEffect and not D.IsParty(id) then
 				nEnemyMaxValue  = p.nTotalEffect
 				szEnemyBossName = D.GetNameAusID(Data, id)
@@ -1014,7 +1076,7 @@ function D.Flush()
 	end
 	Data.szBossName = szEnemyBossName or szBossName or ''
 
-	if Data.nTimeDuring > O.nMinFightTime then
+	if Data[DK.TIME_DURING] > O.nMinFightTime then
 		insert(History, 1, Data)
 		while #History > O.nMaxHistory do
 			remove(History)
@@ -1135,17 +1197,17 @@ end)
 
 -- 有人死了活了做一下时间轴记录
 function D.OnTeammateStateChange(dwID, bLeave, nAwayType, bAddWhenRecEmpty)
-	if not (Data and Data.Awaytime) then
+	if not (Data and Data[DK.AWAYTIME]) then
 		return
 	end
 	-- 获得一个人的记录
-	local rec = Data.Awaytime[dwID]
+	local rec = Data[DK.AWAYTIME][dwID]
 	if not rec then -- 初始化一个记录
 		if not bLeave and not bAddWhenRecEmpty then
 			return -- 不是一次暂离的开始并且不强制记录则跳过
 		end
 		rec = {}
-		Data.Awaytime[dwID] = rec
+		Data[DK.AWAYTIME][dwID] = rec
 	elseif #rec > 0 then -- 检查逻辑
 		if bLeave then -- 有人死了
 			if not rec[#rec][2] then -- 并且最后一条记录还是死的
@@ -1162,7 +1224,7 @@ function D.OnTeammateStateChange(dwID, bLeave, nAwayType, bAddWhenRecEmpty)
 		insert(rec, { GetCurrentTime(), nil, nAwayType })
 	else -- 暂离回来
 		if #rec == 0 then -- 没记录到暂离开始 创建一个从本次战斗开始的暂离（俗称还没开打你就死了。。）
-			insert(rec, { Data.nTimeBegin, GetCurrentTime(), nAwayType })
+			insert(rec, { Data[DK.TIME_BEGIN], GetCurrentTime(), nAwayType })
 		elseif not rec[#rec][2] then -- 如果最后一次暂离还没回来 则完成最后一次暂离的记录
 			rec[#rec][2] = GetCurrentTime()
 		end
@@ -1226,14 +1288,14 @@ function D.MergeTargetData(tDst, tSrc, data, szChannel, bMergeNpc, bMergeEffect,
 	-- # 节： tRecord
 	------------------------
 	-- 合并总数据
-	tDst.nTotal = tDst.nTotal + tSrc.nTotal
-	tDst.nTotalEffect = tDst.nTotalEffect + tSrc.nTotalEffect
+	tDst[DK_REC_STAT.TOTAL] = tDst[DK_REC_STAT.TOTAL] + tSrc[DK_REC_STAT.TOTAL]
+	tDst[DK_REC_STAT.TOTAL_EFFECT] = tDst[DK_REC_STAT.TOTAL_EFFECT] + tSrc[DK_REC_STAT.TOTAL_EFFECT]
 	------------------------
 	-- # 节： tRecord.Detail
 	------------------------
 	-- 合并分类详情（命中、会心、偏离...）
-	for nType, tSrcDetail in pairs(tSrc.Detail) do
-		local tDstDetail = tDst.Detail[nType]
+	for nType, tSrcDetail in pairs(tSrc[DK_REC_STAT.DETAIL]) do
+		local tDstDetail = tDst[DK_REC_STAT.DETAIL][nType]
 		if not tDstDetail then
 			tDstDetail = {
 				nCount       =  0, -- 命中记录数量（假设nSkillResult是命中）
@@ -1251,7 +1313,7 @@ function D.MergeTargetData(tDst, tSrc, data, szChannel, bMergeNpc, bMergeEffect,
 				nAvgEffect   =  0, -- 所有命中平均有效伤害
 				nNzAvgEffect =  0, -- 所有非零值命中平均有效伤害
 			}
-			tDst.Detail[nType] = tDstDetail
+			tDst[DK_REC_STAT.DETAIL][nType] = tDstDetail
 		end
 		tDstDetail.nCount       = tDstDetail.nCount + tSrcDetail.nCount
 		tDstDetail.nNzCount     = tDstDetail.nNzCount + tSrcDetail.nNzCount
@@ -1272,12 +1334,12 @@ function D.MergeTargetData(tDst, tSrc, data, szChannel, bMergeNpc, bMergeEffect,
 	-- # 节： tRecord.Skill
 	------------------------
 	-- 合并技能统计（四象轮回、两仪化形...）
-	for szEffectID, tSrcSkill in pairs(tSrc.Skill) do
+	for szEffectID, tSrcSkill in pairs(tSrc[DK_REC_STAT.SKILL]) do
 		if not bHideAnonymous or not select(2, D.GetEffectInfoAusID(data, szEffectID)) then
 			local id = bMergeEffect
 				and D.GetEffectNameAusID(data, szChannel, szEffectID)
 				or szEffectID
-			local tDstSkill = tDst.Skill[id]
+			local tDstSkill = tDst[DK_REC_STAT.SKILL][id]
 			if not tDstSkill then
 				tDstSkill = {
 					nCount       =  0, -- 该玩家四象轮回释放次数（假设szEffectName是四象轮回）
@@ -1293,7 +1355,7 @@ function D.MergeTargetData(tDst, tSrc, data, szChannel, bMergeNpc, bMergeEffect,
 					Detail       = {}, -- 该玩家四象轮回输出结果分类统计
 					Target       = {}, -- 该玩家四象轮回承受者统计
 				}
-				tDst.Skill[id] = tDstSkill
+				tDst[DK_REC_STAT.SKILL][id] = tDstSkill
 			end
 			tDstSkill.nCount       = tDstSkill.nCount + tSrcSkill.nCount
 			tDstSkill.nNzCount     = tDstSkill.nNzCount + tSrcSkill.nNzCount
@@ -1380,9 +1442,9 @@ function D.MergeTargetData(tDst, tSrc, data, szChannel, bMergeNpc, bMergeEffect,
 	-- # 节： tRecord.Target
 	------------------------
 	-- 合并目标统计（江湖试炼木桩、江湖初级木桩...）
-	for dwID, tSrcTarget in pairs(tSrc.Target) do
+	for dwID, tSrcTarget in pairs(tSrc[DK_REC_STAT.TARGET]) do
 		local id = bMergeNpc and D.GetNameAusID(data, dwID) or dwID
-		local tDstTarget = tDst.Target[id]
+		local tDstTarget = tDst[DK_REC_STAT.TARGET][id]
 		if not tDstTarget then
 			tDstTarget = {
 				nCount       =  0, -- 该玩家对idTarget的技能释放次数
@@ -1398,7 +1460,7 @@ function D.MergeTargetData(tDst, tSrc, data, szChannel, bMergeNpc, bMergeEffect,
 				Detail       = {}, -- 该玩家对idTarget的技能输出结果分类统计
 				Skill        = {}, -- 该玩家对idTarget的技能具体分别统计
 			}
-			tDst.Target[id] = tDstTarget
+			tDst[DK_REC_STAT.TARGET][id] = tDstTarget
 		end
 		tDstTarget.nCount       = tDstTarget.nCount + tSrcTarget.nCount
 		tDstTarget.nNzCount     = tDstTarget.nNzCount + tSrcTarget.nNzCount
@@ -1488,18 +1550,18 @@ end
 
 function D.GetMergeTargetData(data, szChannel, id, bMergeNpc, bMergeEffect, bHideAnonymous)
 	if not bMergeNpc and not bMergeEffect and not bHideAnonymous then
-		return data[szChannel].Statistics[id]
+		return data[szChannel][DK_REC.STATISTICS][id]
 	end
 	local tData = nil
-	for dwID, tSrcData in pairs(data[szChannel].Statistics) do
+	for dwID, tSrcData in pairs(data[szChannel][DK_REC.STATISTICS]) do
 		if dwID == id or D.GetNameAusID(data, dwID) == id then
 			if not tData then
 				tData = {
-					nTotal = 0,
-					nTotalEffect = 0,
-					Target = {},
-					Skill = {},
-					Detail = {},
+					[DK_REC_STAT.TOTAL       ] = 0,
+					[DK_REC_STAT.TOTAL_EFFECT] = 0,
+					[DK_REC_STAT.TARGET      ] = {},
+					[DK_REC_STAT.SKILL       ] = {},
+					[DK_REC_STAT.DETAIL      ] = {},
 				}
 			end
 			D.MergeTargetData(tData, tSrcData, data, szChannel, bMergeNpc, bMergeEffect, bHideAnonymous)
@@ -1524,6 +1586,12 @@ local settings = {
 				GetEffectNameAusID = D.GetEffectNameAusID,
 				Flush = D.Flush,
 				GetMergeTargetData = D.GetMergeTargetData,
+				DK = DK,
+				DK_REC = DK_REC,
+				DK_REC_SNAPSHOT = DK_REC_SNAPSHOT,
+				DK_REC_SNAPSHOT_STAT = DK_REC_SNAPSHOT_STAT,
+				DK_REC_STAT = DK_REC_STAT,
+				DK_REC_STAT_DETAIL = DK_REC_STAT_DETAIL,
 			},
 		},
 		{

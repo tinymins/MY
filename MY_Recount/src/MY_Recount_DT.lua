@@ -46,6 +46,8 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
 end
 --------------------------------------------------------------------------
 
+local DK = MY_Recount_DS.DK
+local DK_REC_STAT = MY_Recount_DS.DK_REC_STAT
 local D = {}
 local O = {}
 local SZ_INI = PLUGIN_ROOT .. '/ui/MY_Recount_DT.ini'
@@ -79,7 +81,7 @@ function D.GetDetailMenu(frame)
 			.. _L['fight recount'] .. ' - '
 			.. frame:Lookup('', 'Text_Default'):GetText()
 			.. ' ' .. ((DataDisplay.szBossName and ' - ' .. DataDisplay.szBossName) or '')
-			.. '(' .. LIB.FormatTimeCounter(DataDisplay.nTimeDuring, '%M:%ss') .. ')',
+			.. '(' .. LIB.FormatTimeCounter(DataDisplay[DK.TIME_DURING], '%M:%ss') .. ')',
 			nil,
 			true
 		)
@@ -211,14 +213,14 @@ function MY_Recount_DT.OnFrameBreathe()
 		return
 	end
 
-	local szPrimarySort   = this.szPrimarySort or 'Skill'
-	local szSecondarySort = (szPrimarySort == 'Skill' and 'Target') or 'Skill'
+	local szPrimarySort   = this.szPrimarySort or DK_REC_STAT.SKILL
+	local szSecondarySort = (szPrimarySort == DK_REC_STAT.SKILL and DK_REC_STAT.TARGET) or DK_REC_STAT.SKILL -- TODO budui
 
 	--------------- 一、技能列表更新 -----------------
 	-- 数据收集
-	local aResult, nTotal = {}, MY_Recount_UI.bShowEffect and tData.nTotalEffect or tData.nTotal
-	if szPrimarySort == 'Skill' then
-		for szEffectID, p in pairs(tData.Skill) do
+	local aResult, nTotal = {}, MY_Recount_UI.bShowEffect and tData[DK_REC_STAT.TOTAL_EFFECT] or tData[DK_REC_STAT.TOTAL]
+	if szPrimarySort == DK_REC_STAT.SKILL then
+		for szEffectID, p in pairs(tData[DK_REC_STAT.SKILL]) do
 			local rec = {
 				szKey  = szEffectID,
 				szName = MY_Recount_DS.GetEffectNameAusID(DataDisplay, szEffectID) or szEffectID,
@@ -230,7 +232,7 @@ function MY_Recount_DT.OnFrameBreathe()
 			end
 		end
 	else
-		for id, p in pairs(tData.Target) do
+		for id, p in pairs(tData[DK_REC_STAT.TARGET]) do
 			local rec = {
 				szKey  = id                              ,
 				szName = IsString(id) and id or MY_Recount_DS.GetNameAusID(DataDisplay, id),
@@ -246,7 +248,7 @@ function MY_Recount_DT.OnFrameBreathe()
 	-- 默认选中第一个
 	if this.bFirstRendering then
 		if aResult[1] then
-			if szPrimarySort == 'Skill' then
+			if szPrimarySort == DK_REC_STAT.SKILL then
 				this.szSelectedSkill  = aResult[1].szKey
 			else
 				this.szSelectedTarget = aResult[1].szKey
@@ -257,7 +259,7 @@ function MY_Recount_DT.OnFrameBreathe()
 	local szSelected
 	local szSelectedSkill  = this.szSelectedSkill
 	local szSelectedTarget = this.szSelectedTarget
-	if szPrimarySort == 'Skill' then
+	if szPrimarySort == DK_REC_STAT.SKILL then
 		szSelected = this.szSelectedSkill
 	else
 		szSelected = this.szSelectedTarget
@@ -272,13 +274,13 @@ function MY_Recount_DT.OnFrameBreathe()
 	for i, p in ipairs(aResult) do
 		local hItem = hList:Lookup(i - 1) or hList:AppendItemFromIni(SZ_INI, 'Handle_SkillItem')
 		hItem:Lookup('Text_SkillNo'):SetText(i)
-		hItem:Lookup('Text_SkillName'):SetText(MY_Recount.GetTargetShowName(p.szName, szPrimarySort == 'Target' and p.dwForceID ~= -1))
+		hItem:Lookup('Text_SkillName'):SetText(MY_Recount.GetTargetShowName(p.szName, szPrimarySort == DK_REC_STAT.TARGET and p.dwForceID ~= -1))
 		hItem:Lookup('Text_SkillCount'):SetText(not MY_Recount_UI.bShowZeroVal and p.nNzCount or p.nCount)
 		hItem:Lookup('Text_SkillTotal'):SetText(p.nTotal)
 		hItem:Lookup('Text_SkillPercentage'):SetText(nTotal > 0 and _L('%.1f%%', (i == 1 and ceil or floor)(p.nTotal / nTotal * 1000) / 10) or ' - ')
 
-		if szPrimarySort == 'Skill' and szSelectedSkill == p.szKey or
-		szPrimarySort == 'Target' and szSelectedTarget == p.szKey then
+		if szPrimarySort == DK_REC_STAT.SKILL and szSelectedSkill == p.szKey
+		or szPrimarySort == DK_REC_STAT.TARGET and szSelectedTarget == p.szKey then
 			hSelectedItem = hItem
 			hItem:Lookup('Shadow_SkillEntry'):Show()
 		else
@@ -344,8 +346,8 @@ function MY_Recount_DT.OnFrameBreathe()
 		--------------- 三、技能释放结果列表更新 -----------------
 		-- 数据收集
 		local aResult, nTotal = {}, tData[szPrimarySort][szSelected][MY_Recount_UI.bShowEffect and 'nTotalEffect' or 'nTotal']
-		if szPrimarySort == 'Skill' then
-			for id, p in pairs(tData.Skill[szSelectedSkill].Target) do
+		if szPrimarySort == DK_REC_STAT.SKILL then
+			for id, p in pairs(tData[DK_REC_STAT.SKILL][szSelectedSkill].Target) do
 				local rec = {
 					szKey          = id,
 					nHitCount      = MY_Recount_UI.bShowZeroVal and (p.Count[SKILL_RESULT.HIT] or 0) or p.NzCount[SKILL_RESULT.HIT] or 0,
@@ -360,7 +362,7 @@ function MY_Recount_DT.OnFrameBreathe()
 				end
 			end
 		else
-			for szEffectID, p in pairs(tData.Target[szSelectedTarget].Skill) do
+			for szEffectID, p in pairs(tData[DK_REC_STAT.TARGET][szSelectedTarget].Skill) do
 				local rec = {
 					nHitCount      = MY_Recount_UI.bShowZeroVal and (p.Count[SKILL_RESULT.HIT] or 0) or p.NzCount[SKILL_RESULT.HIT] or 0,
 					nMissCount     = MY_Recount_UI.bShowZeroVal and (p.Count[SKILL_RESULT.MISS] or 0) or p.NzCount[SKILL_RESULT.MISS] or 0,
@@ -381,7 +383,7 @@ function MY_Recount_DT.OnFrameBreathe()
 		for i, p in ipairs(aResult) do
 			local hItem = hList:Lookup(i - 1) or hList:AppendItemFromIni(SZ_INI, 'Handle_TargetItem')
 			hItem:Lookup('Text_TargetNo'):SetText(i)
-			hItem:Lookup('Text_TargetName'):SetText(MY_Recount.GetTargetShowName(p.szName, szPrimarySort == 'Skill' and p.dwForceID ~= -1))
+			hItem:Lookup('Text_TargetName'):SetText(MY_Recount.GetTargetShowName(p.szName, szPrimarySort == DK_REC_STAT.SKILL and p.dwForceID ~= -1))
 			hItem:Lookup('Text_TargetTotal'):SetText(p.nTotal)
 			hItem:Lookup('Text_TargetMax'):SetText(p.nMax)
 			hItem:Lookup('Text_TargetHit'):SetText(p.nHitCount)
@@ -419,10 +421,10 @@ function MY_Recount_DT.OnLButtonClick()
 		LIB.RegisterEsc(this:GetRoot():GetTreePath())
 		Wnd.CloseWindow(this:GetRoot())
 	elseif name == 'Btn_Switch' then
-		if this:GetRoot().szPrimarySort == 'Skill' then
-			this:GetRoot().szPrimarySort = 'Target'
+		if this:GetRoot().szPrimarySort == DK_REC_STAT.SKILL then
+			this:GetRoot().szPrimarySort = DK_REC_STAT.TARGET
 		else
-			this:GetRoot().szPrimarySort = 'Skill'
+			this:GetRoot().szPrimarySort = DK_REC_STAT.SKILL
 		end
 		this:GetRoot().nLastRedrawFrame = 0
 	elseif name == 'Btn_Unselect' then
@@ -437,7 +439,7 @@ end
 function MY_Recount_DT.OnItemLButtonDown()
 	local name = this:GetName()
 	if name == 'Handle_SkillItem' then
-		if this:GetRoot().szPrimarySort == 'Skill' then
+		if this:GetRoot().szPrimarySort == DK_REC_STAT.SKILL then
 			this:GetRoot().szSelectedSkill = this.szKey
 		else
 			this:GetRoot().szSelectedTarget = this.szKey
@@ -448,8 +450,8 @@ end
 
 function MY_Recount_DT.OnItemRButtonClick()
 	local name = this:GetName()
-	if (name == 'Handle_SkillItem' and this:GetRoot().szPrimarySort == 'Target')
-	or (name == 'Handle_TargetItem' and this:GetRoot().szPrimarySort == 'Skill') then
+	if (name == 'Handle_SkillItem' and this:GetRoot().szPrimarySort == DK_REC_STAT.TARGET)
+	or (name == 'Handle_TargetItem' and this:GetRoot().szPrimarySort == DK_REC_STAT.SKILL) then
 		local szKey = this.szKey
 		local menu = {}
 		menu.x, menu.y = Cursor.GetPos(true)
@@ -467,8 +469,8 @@ end
 
 function MY_Recount_DT.OnItemLButtonDBClick()
 	local name = this:GetName()
-	if (name == 'Handle_SkillItem' and this:GetRoot().szPrimarySort == 'Target')
-	or (name == 'Handle_TargetItem' and this:GetRoot().szPrimarySort == 'Skill') then
+	if (name == 'Handle_SkillItem' and this:GetRoot().szPrimarySort == DK_REC_STAT.TARGET)
+	or (name == 'Handle_TargetItem' and this:GetRoot().szPrimarySort == DK_REC_STAT.SKILL) then
 		Wnd.OpenWindow(SZ_INI, 'MY_Recount_DT#' .. this.szKey .. '_' .. this:GetRoot().nChannel)
 	end
 end
