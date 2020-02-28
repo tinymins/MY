@@ -370,6 +370,8 @@ local O = {
 local Data          -- 当前战斗数据记录
 local History = {}  -- 历史战斗记录
 local SZ_REC_FILE = {'cache/fight_recount_log.jx3dat', PATH_TYPE.ROLE}
+local SKILL_EFFECT_CACHE = {} -- 最近的技能效果缓存 （进战时候将最近的数据压进来）
+local SKILL_EFFECT_REPLAY_FRAME = GLOBAL.GAME_FPS * 3 -- 进战时候将多久的数据压进来（逻辑帧）
 
 -- 输出两个数里面小一点的那个 其中-1表示极大值
 local function Min(a, b)
@@ -440,14 +442,22 @@ LIB.RegisterEvent('RELOAD_UI_ADDON_END', onLoadingEnding)
 end
 
 -- 退出战斗 保存数据
-LIB.RegisterEvent('MY_FIGHT_HINT', function(event)
-	if arg0 and LIB.GetFightUUID() ~= Data[DK.UUID] then -- 进入新的战斗
+LIB.RegisterEvent('MY_FIGHT_HINT', function()
+	local nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
+	local bFighting, szUUID, nDuring = arg0, arg1, arg2
+	if not bFighting then
+		D.InsertEverything(Data, nLFC, nTime, nTick, EVERYTHING_TYPE.FIGHT_TIME, bFighting, szUUID, nDuring)
+	end
+	if bFighting and szUUID ~= Data[DK.UUID] then -- 进入新的战斗
 		D.Init()
+		D.ReplayRecentSkillEffect()
 		FireUIEvent('MY_RECOUNT_NEW_FIGHT')
 	else
 		D.Flush()
 	end
-	D.InsertEverything(Data, EVERYTHING_TYPE.FIGHT_TIME, LIB.IsFighting(), LIB.GetFightUUID(), LIB.GetFightTime())
+	if bFighting then
+		D.InsertEverything(Data, nLFC, nTime, nTick, EVERYTHING_TYPE.FIGHT_TIME, bFighting, szUUID, nDuring)
+	end
 end)
 
 -- ################################################################################################## --
@@ -554,16 +564,16 @@ end
 --   # #     #   #       #     # # #     #       #   #       # # # # # # #       #             #      --
 -- ################################################################################################## --
 -- 记录一次LOG
--- D.OnSkillEffect(dwCaster, dwTarget, nEffectType, dwID, dwLevel, nSkillResult, nResultCount, tResult)
+-- D.ProcessSkillEffect(dwCaster, dwTarget, nEffectType, dwID, dwLevel, nSkillResult, nResultCount, tResult)
 -- (number) dwCaster    : 释放者ID
 -- (number) dwTarget    : 承受者ID
 -- (number) nEffectType : 造成效果的原因（SKILL_EFFECT_TYPE枚举 如SKILL,BUFF）
 -- (number) dwID        : 技能ID
 -- (number) dwLevel     : 技能等级
 -- (number) nSkillResult: 造成的效果结果（SKILL_RESULT枚举 如HIT,MISS）
--- (number) nResultCount      : 造成效果的数值数量（tResult长度）
+-- (number) nResultCount: 造成效果的数值数量（tResult长度）
 -- (table ) tResult     : 所有效果数值集合
-function D.OnSkillEffect(dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nResultCount, tResult)
+function D.ProcessSkillEffect(nLFC, nTime, nTick, dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nResultCount, tResult)
 	-- 获取释放对象和承受对象
 	local KCaster = LIB.GetObject(dwCaster)
 	if KCaster and not IsPlayer(dwCaster)
@@ -615,6 +625,7 @@ function D.OnSkillEffect(dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLe
 	local nEffectDamage = tResult[SKILL_RESULT_TYPE.EFFECTIVE_DAMAGE] or 0
 
 	D.InsertEverything(Data,
+		nLFC, nTime, nTick,
 		EVERYTHING_TYPE.SKILL_EFFECT, dwCaster, dwTarget,
 		nEffectType, dwEffectID, dwEffectLevel, szEffectID,
 		nSkillResult, nTherapy, nEffectTherapy, nDamage, nEffectDamage,
@@ -643,6 +654,25 @@ function D.OnSkillEffect(dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLe
 
 	Data[DK.TIME_DURING] = GetCurrentTime() - Data[DK.TIME_BEGIN]
 	Data[DK.TICK_DURING] = GetTime() - Data[DK.TICK_BEGIN]
+end
+
+function D.OnSkillEffect(dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nResultCount, tResult)
+	local nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
+	while SKILL_EFFECT_CACHE[1] and nLFC - SKILL_EFFECT_CACHE[1][1] > SKILL_EFFECT_REPLAY_FRAME do
+		remove(SKILL_EFFECT_CACHE, 1)
+	end
+	insert(SKILL_EFFECT_CACHE, {nLFC, nTime, nTick, dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nResultCount, tResult})
+	D.ProcessSkillEffect(nLFC, nTime, nTick, dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nResultCount, tResult)
+end
+
+function D.ReplayRecentSkillEffect()
+	local nCurLFC = GetLogicFrameCount()
+	for _, v in ipairs(SKILL_EFFECT_CACHE) do
+		local nLFC, nTime, nTick, dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nResultCount, tResult = unpack(v)
+		if nCurLFC - nLFC <= SKILL_EFFECT_REPLAY_FRAME then
+			D.ProcessSkillEffect(nLFC, nTime, nTick, dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nResultCount, tResult)
+		end
+	end
 end
 
 -- 通过ID计算名字
@@ -701,11 +731,11 @@ function D.IsParty(id)
 end
 
 -- 插入复盘数据
-function D.InsertEverything(data, szName, ...)
+function D.InsertEverything(data, nLFC, nTime, nTick, szName, ...)
 	if not O.bRecEverything then
 		return
 	end
-	insert(data[DK.EVERYTHING], {GetLogicFrameCount(), GetCurrentTime(), GetTime(), szName, ...})
+	insert(data[DK.EVERYTHING], {nLFC, nTime, nTick, szName, ...})
 end
 
 -- 将一条记录插入数组
