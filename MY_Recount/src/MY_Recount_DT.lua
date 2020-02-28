@@ -235,7 +235,7 @@ function MY_Recount_DT.OnFrameBreathe()
 		for szEffectID, p in pairs(tData[DK_REC_STAT.SKILL]) do
 			local rec = {
 				szKey  = szEffectID,
-				szName = MY_Recount_DS.GetEffectNameAusID(DataDisplay, szEffectID) or szEffectID,
+				szName = MY_Recount_DS.GetEffectNameAusID(DataDisplay, szChannel, szEffectID) or szEffectID,
 				nCount = not MY_Recount_UI.bShowZeroVal and p[DK_REC_STAT_SKILL.NZ_COUNT] or p[DK_REC_STAT_SKILL.COUNT],
 				nTotal = MY_Recount_UI.bShowEffect and p[DK_REC_STAT_SKILL.TOTAL_EFFECT] or p[DK_REC_STAT_SKILL.TOTAL],
 			}
@@ -419,7 +419,7 @@ function MY_Recount_DT.OnFrameBreathe()
 						or p[DK_REC_STAT_TARGET_SKILL.NZ_COUNT][SKILL_RESULT.CRITICAL] or 0,
 					nMax           = MY_Recount_UI.bShowEffect and p[DK_REC_STAT_TARGET_SKILL.MAX_EFFECT] or p[DK_REC_STAT_TARGET_SKILL.MAX],
 					nTotal         = MY_Recount_UI.bShowEffect and p[DK_REC_STAT_TARGET_SKILL.TOTAL_EFFECT] or p[DK_REC_STAT_TARGET_SKILL.TOTAL],
-					szName         = MY_Recount_DS.GetEffectNameAusID(DataDisplay, szEffectID) or szEffectID,
+					szName         = MY_Recount_DS.GetEffectNameAusID(DataDisplay, szChannel, szEffectID) or szEffectID,
 				}
 				if MY_Recount_UI.bShowZeroVal or rec.nTotal > 0 or rec.nMissCount > 0 then
 					insert(aResult, rec)
