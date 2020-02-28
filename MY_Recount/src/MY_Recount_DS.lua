@@ -45,150 +45,152 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
 	return
 end
 --------------------------------------------------------------------------
+local DEBUG = false
+
 local DK = {
-	UUID        = 'UUID'       , -- 战斗唯一标识
-	BOSSNAME    = 'szBossName' , -- 日志名字
-	VERSION     = 'nVersion'   , -- 数据版本号
-	TIME_BEGIN  = 'nTimeBegin' , -- 战斗开始时间
-	TICK_BEGIN  = 'nTickBegin' , -- 战斗开始毫秒时间
-	TIME_DURING = 'nTimeDuring', -- 战斗持续时间
-	TICK_DURING = 'nTickDuring', -- 战斗持续毫秒时间
-	AWAYTIME    = 'Awaytime'   , -- 死亡/掉线时间节点
-	NAME_LIST   = 'Namelist'   , -- 名称缓存
-	FORCE_LIST  = 'Forcelist'  , -- 势力缓存
-	EFFECT_LIST = 'Effectlist' , -- 效果信息缓存
-	DAMAGE      = 'Damage'     , -- 输出统计
-	HEAL        = 'Heal'       , -- 治疗统计
-	BE_HEAL     = 'BeHeal'     , -- 承疗统计
-	BE_DAMAGE   = 'BeDamage'   , -- 承伤统计
-	EVERYTHING  = 'Everything' , -- 战斗复盘
+	UUID        = DEBUG and 'UUID'        or  1, -- 战斗唯一标识
+	BOSSNAME    = DEBUG and 'szBossName'  or  2, -- 日志名字
+	VERSION     = DEBUG and 'nVersion'    or  3, -- 数据版本号
+	TIME_BEGIN  = DEBUG and 'nTimeBegin'  or  4, -- 战斗开始时间
+	TICK_BEGIN  = DEBUG and 'nTickBegin'  or  5, -- 战斗开始毫秒时间
+	TIME_DURING = DEBUG and 'nTimeDuring' or  6, -- 战斗持续时间
+	TICK_DURING = DEBUG and 'nTickDuring' or  7, -- 战斗持续毫秒时间
+	AWAYTIME    = DEBUG and 'Awaytime'    or  8, -- 死亡/掉线时间节点
+	NAME_LIST   = DEBUG and 'Namelist'    or  9, -- 名称缓存
+	FORCE_LIST  = DEBUG and 'Forcelist'   or 10, -- 势力缓存
+	EFFECT_LIST = DEBUG and 'Effectlist'  or 11, -- 效果信息缓存
+	DAMAGE      = DEBUG and 'Damage'      or 12, -- 输出统计
+	HEAL        = DEBUG and 'Heal'        or 13, -- 治疗统计
+	BE_HEAL     = DEBUG and 'BeHeal'      or 14, -- 承疗统计
+	BE_DAMAGE   = DEBUG and 'BeDamage'    or 15, -- 承伤统计
+	EVERYTHING  = DEBUG and 'Everything'  or 16, -- 战斗复盘
 }
 
 local DK_REC = {
-	TIME_DURING = 'nTimeDuring',
-	TOTAL = 'nTotal',
-	TOTAL_EFFECT = 'nTotalEffect',
-	SNAPSHOTS = 'Snapshots',
-	STAT = 'Statistics',
+	TIME_DURING  = DEBUG and 'nTimeDuring'  or 1,
+	TOTAL        = DEBUG and 'nTotal'       or 2,
+	TOTAL_EFFECT = DEBUG and 'nTotalEffect' or 3,
+	SNAPSHOTS    = DEBUG and 'Snapshots'    or 4,
+	STAT         = DEBUG and 'Statistics'   or 5,
 }
 
 local DK_REC_SNAPSHOT = {
-	TIME_DURING = 'nTimeDuring',
-	TOTAL = 'nTotal',
-	TOTAL_EFFECT = 'nTotalEffect',
-	STATISTICS = 'Statistics',
+	TIME_DURING  = DEBUG and 'nTimeDuring'  or 1,
+	TOTAL        = DEBUG and 'nTotal'       or 2,
+	TOTAL_EFFECT = DEBUG and 'nTotalEffect' or 3,
+	STATISTICS   = DEBUG and 'Statistics'   or 4,
 }
 
 local DK_REC_SNAPSHOT_STAT = {
-	TOTAL = 'nTotal',
-	TOTAL_EFFECT = 'nTotalEffect',
+	TOTAL        = DEBUG and 'nTotal'       or 1,
+	TOTAL_EFFECT = DEBUG and 'nTotalEffect' or 2,
 }
 
 local DK_REC_STAT = {
-	TOTAL = 'nTotal',
-	TOTAL_EFFECT = 'nTotalEffect',
-	DETAIL = 'Detail',
-	SKILL = 'Skill',
-	TARGET = 'Target',
+	TOTAL        = DEBUG and 'nTotal'       or 1,
+	TOTAL_EFFECT = DEBUG and 'nTotalEffect' or 2,
+	DETAIL       = DEBUG and 'Detail'       or 3,
+	SKILL        = DEBUG and 'Skill'        or 4,
+	TARGET       = DEBUG and 'Target'       or 5,
 }
 
 local DK_REC_STAT_DETAIL = {
-	COUNT         = 'nCount'      , -- 命中记录数量（假设nSkillResult是命中）
-	NZ_COUNT      = 'nNzCount'    , -- 非零值命中记录数量
-	MAX           = 'nMax'        , -- 单次命中最大值
-	MAX_EFFECT    = 'nMaxEffect'  , -- 单次命中最大有效值
-	MIN           = 'nMin'        , -- 单次命中最小值
-	NZ_MIN        = 'nNzMin'      , -- 单次非零值命中最小值
-	MIN_EFFECT    = 'nMinEffect'  , -- 单次命中最小有效值
-	NZ_MIN_EFFECT = 'nNzMinEffect', -- 单次非零值命中最小有效值
-	TOTAL         = 'nTotal'      , -- 所有命中总伤害
-	TOTAL_EFFECT  = 'nTotalEffect', -- 所有命中总有效伤害
-	AVG           = 'nAvg'        , -- 所有命中平均伤害
-	NZ_AVG        = 'nNzAvg'      , -- 所有非零值命中平均伤害
-	AVG_EFFECT    = 'nAvgEffect'  , -- 所有命中平均有效伤害
-	NZ_AVG_EFFECT = 'nNzAvgEffect', -- 所有非零值命中平均有效伤害
+	COUNT         = DEBUG and 'nCount'       or  1, -- 命中记录数量（假设nSkillResult是命中）
+	NZ_COUNT      = DEBUG and 'nNzCount'     or  2, -- 非零值命中记录数量
+	MAX           = DEBUG and 'nMax'         or  3, -- 单次命中最大值
+	MAX_EFFECT    = DEBUG and 'nMaxEffect'   or  4, -- 单次命中最大有效值
+	MIN           = DEBUG and 'nMin'         or  5, -- 单次命中最小值
+	NZ_MIN        = DEBUG and 'nNzMin'       or  6, -- 单次非零值命中最小值
+	MIN_EFFECT    = DEBUG and 'nMinEffect'   or  7, -- 单次命中最小有效值
+	NZ_MIN_EFFECT = DEBUG and 'nNzMinEffect' or  8, -- 单次非零值命中最小有效值
+	TOTAL         = DEBUG and 'nTotal'       or  9, -- 所有命中总伤害
+	TOTAL_EFFECT  = DEBUG and 'nTotalEffect' or 10, -- 所有命中总有效伤害
+	AVG           = DEBUG and 'nAvg'         or 11, -- 所有命中平均伤害
+	NZ_AVG        = DEBUG and 'nNzAvg'       or 12, -- 所有非零值命中平均伤害
+	AVG_EFFECT    = DEBUG and 'nAvgEffect'   or 13, -- 所有命中平均有效伤害
+	NZ_AVG_EFFECT = DEBUG and 'nNzAvgEffect' or 14, -- 所有非零值命中平均有效伤害
 }
 
 local DK_REC_STAT_SKILL = {
-	COUNT         = 'nCount'      , -- 该玩家四象轮回释放次数（假设szEffectName是四象轮回）
-	NZ_COUNT      = 'nNzCount'    , -- 该玩家非零值四象轮回释放次数
-	MAX           = 'nMax'        , -- 该玩家四象轮回最大输出量
-	MAX_EFFECT    = 'nMaxEffect'  , -- 该玩家四象轮回最大有效输出量
-	TOTAL         = 'nTotal'      , -- 该玩家四象轮回输出量总和
-	TOTAL_EFFECT  = 'nTotalEffect', -- 该玩家四象轮回有效输出量总和
-	AVG           = 'nAvg'        , -- 该玩家所有四象轮回平均伤害
-	NZ_AVG        = 'nNzAvg'      , -- 该玩家所有非零值四象轮回平均伤害
-	AVG_EFFECT    = 'nAvgEffect'  , -- 该玩家所有四象轮回平均有效伤害
-	NZ_AVG_EFFECT = 'nNzAvgEffect', -- 该玩家所有非零值四象轮回平均有效伤害
-	DETAIL        = 'Detail'      , -- 该玩家四象轮回输出结果分类统计
-	TARGET        = 'Target'      , -- 该玩家四象轮回承受者统计
+	COUNT         = DEBUG and 'nCount'       or  1, -- 该玩家四象轮回释放次数（假设szEffectName是四象轮回）
+	NZ_COUNT      = DEBUG and 'nNzCount'     or  2, -- 该玩家非零值四象轮回释放次数
+	MAX           = DEBUG and 'nMax'         or  3, -- 该玩家四象轮回最大输出量
+	MAX_EFFECT    = DEBUG and 'nMaxEffect'   or  4, -- 该玩家四象轮回最大有效输出量
+	TOTAL         = DEBUG and 'nTotal'       or  5, -- 该玩家四象轮回输出量总和
+	TOTAL_EFFECT  = DEBUG and 'nTotalEffect' or  6, -- 该玩家四象轮回有效输出量总和
+	AVG           = DEBUG and 'nAvg'         or  7, -- 该玩家所有四象轮回平均伤害
+	NZ_AVG        = DEBUG and 'nNzAvg'       or  8, -- 该玩家所有非零值四象轮回平均伤害
+	AVG_EFFECT    = DEBUG and 'nAvgEffect'   or  9, -- 该玩家所有四象轮回平均有效伤害
+	NZ_AVG_EFFECT = DEBUG and 'nNzAvgEffect' or 10, -- 该玩家所有非零值四象轮回平均有效伤害
+	DETAIL        = DEBUG and 'Detail'       or 11, -- 该玩家四象轮回输出结果分类统计
+	TARGET        = DEBUG and 'Target'       or 12, -- 该玩家四象轮回承受者统计
 }
 
 local DK_REC_STAT_SKILL_DETAIL = {
-	COUNT         = 'nCount'      , -- 命中记录数量
-	NZ_COUNT      = 'nNzCount'    , -- 非零值命中记录数量
-	MAX           = 'nMax'        , -- 单次命中最大值
-	MAX_EFFECT    = 'nMaxEffect'  , -- 单次命中最大有效值
-	MIN           = 'nMin'        , -- 单次命中最小值
-	NZ_MIN        = 'nNzMin'      , -- 单次非零值命中最小值
-	MIN_EFFECT    = 'nMinEffect'  , -- 单次命中最小有效值
-	NZ_MIN_EFFECT = 'nNzMinEffect', -- 单次非零值命中最小有效值
-	TOTAL         = 'nTotal'      , -- 所以命中总伤害
-	TOTAL_EFFECT  = 'nTotalEffect', -- 所有命中总有效伤害
-	AVG           = 'nAvg'        , -- 所有命中平均伤害
-	NZ_AVG        = 'nNzAvg'      , -- 所有非零值命中平均伤害
-	AVG_EFFECT    = 'nAvgEffect'  , -- 所有命中平均有效伤害
-	NZ_AVG_EFFECT = 'nNzAvgEffect', -- 所有非零值命中平均有效伤害
+	COUNT         = DEBUG and 'nCount'       or  1, -- 命中记录数量
+	NZ_COUNT      = DEBUG and 'nNzCount'     or  2, -- 非零值命中记录数量
+	MAX           = DEBUG and 'nMax'         or  3, -- 单次命中最大值
+	MAX_EFFECT    = DEBUG and 'nMaxEffect'   or  4, -- 单次命中最大有效值
+	MIN           = DEBUG and 'nMin'         or  5, -- 单次命中最小值
+	NZ_MIN        = DEBUG and 'nNzMin'       or  6, -- 单次非零值命中最小值
+	MIN_EFFECT    = DEBUG and 'nMinEffect'   or  7, -- 单次命中最小有效值
+	NZ_MIN_EFFECT = DEBUG and 'nNzMinEffect' or  8, -- 单次非零值命中最小有效值
+	TOTAL         = DEBUG and 'nTotal'       or  9, -- 所以命中总伤害
+	TOTAL_EFFECT  = DEBUG and 'nTotalEffect' or 10, -- 所有命中总有效伤害
+	AVG           = DEBUG and 'nAvg'         or 11, -- 所有命中平均伤害
+	NZ_AVG        = DEBUG and 'nNzAvg'       or 12, -- 所有非零值命中平均伤害
+	AVG_EFFECT    = DEBUG and 'nAvgEffect'   or 13, -- 所有命中平均有效伤害
+	NZ_AVG_EFFECT = DEBUG and 'nNzAvgEffect' or 14, -- 所有非零值命中平均有效伤害
 }
 
 local DK_REC_STAT_SKILL_TARGET = {
-	MAX          = 'nMax'        , -- 该玩家四象轮回击中的这个玩家最大伤害
-	MAX_EFFECT   = 'nMaxEffect'  , -- 该玩家四象轮回击中的这个玩家最大有效伤害
-	TOTAL        = 'nTotal'      , -- 该玩家四象轮回击中的这个玩家伤害总和
-	TOTAL_EFFECT = 'nTotalEffect', -- 该玩家四象轮回击中的这个玩家有效伤害总和
-	COUNT        = 'Count'       , -- 该玩家四象轮回击中的这个玩家结果统计
-	NZ_COUNT     = 'NzCount'     , -- 该玩家非零值四象轮回击中的这个玩家结果统计
+	MAX          = DEBUG and 'nMax'         or 1, -- 该玩家四象轮回击中的这个玩家最大伤害
+	MAX_EFFECT   = DEBUG and 'nMaxEffect'   or 2, -- 该玩家四象轮回击中的这个玩家最大有效伤害
+	TOTAL        = DEBUG and 'nTotal'       or 3, -- 该玩家四象轮回击中的这个玩家伤害总和
+	TOTAL_EFFECT = DEBUG and 'nTotalEffect' or 4, -- 该玩家四象轮回击中的这个玩家有效伤害总和
+	COUNT        = DEBUG and 'Count'        or 5, -- 该玩家四象轮回击中的这个玩家结果统计
+	NZ_COUNT     = DEBUG and 'NzCount'      or 6, -- 该玩家非零值四象轮回击中的这个玩家结果统计
 }
 
 local DK_REC_STAT_TARGET = {
-	COUNT         = 'nCount'      , -- 该玩家对idTarget的技能释放次数
-	NZ_COUNT      = 'nNzCount'    , -- 该玩家对idTarget的非零值技能释放次数
-	MAX           = 'nMax'        , -- 该玩家对idTarget的技能最大输出量
-	MAX_EFFECT    = 'nMaxEffect'  , -- 该玩家对idTarget的技能最大有效输出量
-	TOTAL         = 'nTotal'      , -- 该玩家对idTarget的技能输出量总和
-	TOTAL_EFFECT  = 'nTotalEffect', -- 该玩家对idTarget的技能有效输出量总和
-	AVG           = 'nAvg'        , -- 该玩家对idTarget的技能平均输出量
-	NZ_AVG        = 'nNzAvg'      , -- 该玩家对idTarget的非零值技能平均输出量
-	AVG_EFFECT    = 'nAvgEffect'  , -- 该玩家对idTarget的技能平均有效输出量
-	NZ_AVG_EFFECT = 'nNzAvgEffect', -- 该玩家对idTarget的非零值技能平均有效输出量
-	DETAIL        = 'Detail'      , -- 该玩家对idTarget的技能输出结果分类统计
-	SKILL         = 'Skill'       , -- 该玩家对idTarget的技能具体分别统计
+	COUNT         = DEBUG and 'nCount'       or  1, -- 该玩家对idTarget的技能释放次数
+	NZ_COUNT      = DEBUG and 'nNzCount'     or  2, -- 该玩家对idTarget的非零值技能释放次数
+	MAX           = DEBUG and 'nMax'         or  3, -- 该玩家对idTarget的技能最大输出量
+	MAX_EFFECT    = DEBUG and 'nMaxEffect'   or  4, -- 该玩家对idTarget的技能最大有效输出量
+	TOTAL         = DEBUG and 'nTotal'       or  5, -- 该玩家对idTarget的技能输出量总和
+	TOTAL_EFFECT  = DEBUG and 'nTotalEffect' or  6, -- 该玩家对idTarget的技能有效输出量总和
+	AVG           = DEBUG and 'nAvg'         or  7, -- 该玩家对idTarget的技能平均输出量
+	NZ_AVG        = DEBUG and 'nNzAvg'       or  8, -- 该玩家对idTarget的非零值技能平均输出量
+	AVG_EFFECT    = DEBUG and 'nAvgEffect'   or  9, -- 该玩家对idTarget的技能平均有效输出量
+	NZ_AVG_EFFECT = DEBUG and 'nNzAvgEffect' or 10, -- 该玩家对idTarget的非零值技能平均有效输出量
+	DETAIL        = DEBUG and 'Detail'       or 11, -- 该玩家对idTarget的技能输出结果分类统计
+	SKILL         = DEBUG and 'Skill'        or 12, -- 该玩家对idTarget的技能具体分别统计
 }
 
 local DK_REC_STAT_TARGET_DETAIL = {
-	COUNT         = 'nCount'      , -- 命中记录数量（假设nSkillResult是命中）
-	NZ_COUNT      = 'nNzCount'    , -- 非零值命中记录数量
-	MAX           = 'nMax'        , -- 单次命中最大值
-	MAX_EFFECT    = 'nMaxEffect'  , -- 单次命中最大有效值
-	MIN           = 'nMin'        , -- 单次命中最小值
-	NZ_MIN        = 'nNzMin'      , -- 单次非零值命中最小值
-	MIN_EFFECT    = 'nMinEffect'  , -- 单次命中最小有效值
-	NZ_MIN_EFFECT = 'nNzMinEffect', -- 单次非零值命中最小有效值
-	TOTAL         = 'nTotal'      , -- 所以命中总伤害
-	TOTAL_EFFECT  = 'nTotalEffect', -- 所有命中总有效伤害
-	AVG           = 'nAvg'        , -- 所有命中平均伤害
-	NZ_AVG        = 'nNzAvg'      , -- 所有非零值命中平均伤害
-	AVG_EFFECT    = 'nAvgEffect'  , -- 所有命中平均有效伤害
-	NZ_AVG_EFFECT = 'nNzAvgEffect', -- 所有非零值命中平均有效伤害
+	COUNT         = DEBUG and 'nCount'       or  1, -- 命中记录数量（假设nSkillResult是命中）
+	NZ_COUNT      = DEBUG and 'nNzCount'     or  2, -- 非零值命中记录数量
+	MAX           = DEBUG and 'nMax'         or  3, -- 单次命中最大值
+	MAX_EFFECT    = DEBUG and 'nMaxEffect'   or  4, -- 单次命中最大有效值
+	MIN           = DEBUG and 'nMin'         or  5, -- 单次命中最小值
+	NZ_MIN        = DEBUG and 'nNzMin'       or  6, -- 单次非零值命中最小值
+	MIN_EFFECT    = DEBUG and 'nMinEffect'   or  7, -- 单次命中最小有效值
+	NZ_MIN_EFFECT = DEBUG and 'nNzMinEffect' or  8, -- 单次非零值命中最小有效值
+	TOTAL         = DEBUG and 'nTotal'       or  9, -- 所以命中总伤害
+	TOTAL_EFFECT  = DEBUG and 'nTotalEffect' or 10, -- 所有命中总有效伤害
+	AVG           = DEBUG and 'nAvg'         or 11, -- 所有命中平均伤害
+	NZ_AVG        = DEBUG and 'nNzAvg'       or 12, -- 所有非零值命中平均伤害
+	AVG_EFFECT    = DEBUG and 'nAvgEffect'   or 13, -- 所有命中平均有效伤害
+	NZ_AVG_EFFECT = DEBUG and 'nNzAvgEffect' or 14, -- 所有非零值命中平均有效伤害
 }
 
 local DK_REC_STAT_TARGET_SKILL = {
-	MAX          = 'nMax'        , -- 该玩家击中这个玩家的四象轮回最大伤害
-	MAX_EFFECT   = 'nMaxEffect'  , -- 该玩家击中这个玩家的四象轮回最大有效伤害
-	TOTAL        = 'nTotal'      , -- 该玩家击中这个玩家的四象轮回伤害总和
-	TOTAL_EFFECT = 'nTotalEffect', -- 该玩家击中这个玩家的四象轮回有效伤害总和
-	COUNT        = 'Count'       , -- 该玩家击中这个玩家的四象轮回结果统计
-	NZ_COUNT     = 'NzCount'     , -- 该玩家非零值击中这个玩家的四象轮回结果统计
+	MAX          = DEBUG and 'nMax'         or  1, -- 该玩家击中这个玩家的四象轮回最大伤害
+	MAX_EFFECT   = DEBUG and 'nMaxEffect'   or  2, -- 该玩家击中这个玩家的四象轮回最大有效伤害
+	TOTAL        = DEBUG and 'nTotal'       or  3, -- 该玩家击中这个玩家的四象轮回伤害总和
+	TOTAL_EFFECT = DEBUG and 'nTotalEffect' or  4, -- 该玩家击中这个玩家的四象轮回有效伤害总和
+	COUNT        = DEBUG and 'Count'        or  5, -- 该玩家击中这个玩家的四象轮回结果统计
+	NZ_COUNT     = DEBUG and 'NzCount'      or  6, -- 该玩家非零值击中这个玩家的四象轮回结果统计
 }
 --[[
 [SKILL_RESULT_TYPE]枚举：
@@ -367,7 +369,7 @@ local AWAYTIME_TYPE = {
 	OFFLINE        = 1,
 	HALFWAY_JOINED = 2,
 }
-local VERSION = 1
+local VERSION = 2
 
 local D = {}
 local O = {
@@ -1601,7 +1603,7 @@ function D.MergeTargetData(tDst, tSrc, data, szChannel, bMergeNpc, bMergeEffect,
 		for szEffectID, tSrcTargetSkill in pairs(tSrcTarget[DK_REC_STAT_TARGET.SKILL]) do
 			if not bHideAnonymous or not select(2, D.GetEffectInfoAusID(data, szEffectID)) then
 				local id = bMergeEffect
-					and D.GetEffectNameAusID(data, szEffectID)
+					and D.GetEffectNameAusID(data, szChannel, szEffectID)
 					or szEffectID
 				local tDstTargetSkill = tDstTarget[DK_REC_STAT_TARGET.SKILL][id]
 				if not tDstTargetSkill then
