@@ -1888,7 +1888,7 @@ local function ListenFightStateChange()
 				-- 新的一轮战斗开始
 				FIGHT_BEGIN_TICK = GetTickCount()
 				FIGHT_UUID = FIGHT_BEGIN_TICK
-				FireUIEvent('MY_FIGHT_HINT', true)
+				FireUIEvent('MY_FIGHT_HINT', true, FIGHT_UUID, 0)
 			end
 		end
 	else
@@ -1897,7 +1897,7 @@ local function ListenFightStateChange()
 			FIGHT_END_TICK, FIGHTING = GetTickCount(), false
 		elseif FIGHT_UUID and GetTickCount() - FIGHT_END_TICK > 5000 then
 			LAST_FIGHT_UUID, FIGHT_UUID = FIGHT_UUID, nil
-			FireUIEvent('MY_FIGHT_HINT', false)
+			FireUIEvent('MY_FIGHT_HINT', false, LAST_FIGHT_UUID, FIGHT_END_TICK - FIGHT_BEGIN_TICK)
 		end
 	end
 end
