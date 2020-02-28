@@ -59,6 +59,7 @@ function D.Open(ds, tab, szMode)
 	local x, y = 10, 55
 	local nAuto = 0
 	local dwForceID, item
+	local bProcessed = false -- 是否已处理 没处理自动设为0价发布
 
 	if IsTable(tab) then
 		if not IsEmpty(tab.dwID) then
@@ -73,6 +74,9 @@ function D.Open(ds, tab, szMode)
 	local hCheckBox = ui:Append('WndCheckBox', { name = 'WndCheckBox', x = x + 50, y = y + 260, font = 65, text = _L['Equiptment Boss'] })
 	local hButton = ui:Append('WndButton3', { name = 'Success', x = x + 175, y = y + 260, text = g_tStrings.STR_HOTKEY_SURE })
 	ui:Remove(function()
+		if bProcessed then
+			return
+		end
 		if ui[1].userdata then
 			ui:Children('#Money'):Text(0)
 			hButton:Click()
@@ -198,8 +202,9 @@ function D.Open(ds, tab, szMode)
 		hName:Focus()
 	end
 	hButton:Click(function()
+		bProcessed = true
 		if IsCtrlKeyDown() and IsShiftKeyDown() and IsAltKeyDown() then
-			return Wnd.CloseWindow(ui[1])
+			return ui:Remove()
 		end
 		local tab = tab or {
 			nUiId      = 0,
