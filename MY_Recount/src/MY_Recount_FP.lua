@@ -276,12 +276,14 @@ function D.DrawData(frame)
 	else
 		local nSearch = tonumber(szSearch)
 		for _, rec in ipairs(data[DK.EVERYTHING]) do
-			if (szSearch == _L['Skill'] and rec[4] == EVERYTHING_TYPE.SKILL_EFFECT )
-			or (szSearch == _L['Fight time'] and rec[4] == EVERYTHING_TYPE.FIGHT_TIME )
+			if (szSearch == _L['Skill'] and rec[4] == EVERYTHING_TYPE.SKILL_EFFECT and rec[7] == SKILL_EFFECT_TYPE.SKILL)
+			or (szSearch == _L['Buff'] and rec[4] == EVERYTHING_TYPE.SKILL_EFFECT and rec[7] == SKILL_EFFECT_TYPE.BUFF)
+			or (szSearch == _L['Fight time'] and rec[4] == EVERYTHING_TYPE.FIGHT_TIME)
 			or (rec[4] == EVERYTHING_TYPE.SKILL_EFFECT and (
 				nSearch == rec[8] or nSearch == rec[5] or nSearch == rec[6]
-				or szSearch == MY_Recount_DS.GetNameAusID(data, rec[5])
-				or szSearch == MY_Recount_DS.GetNameAusID(data, rec[6])
+				or wfind(MY_Recount_DS.GetNameAusID(data, rec[5]) or '', szSearch)
+				or wfind(MY_Recount_DS.GetNameAusID(data, rec[6]) or '', szSearch)
+				or wfind(MY_Recount_DS.GetEffectInfoAusID(data, rec[10]) or '', szSearch)
 			)) then
 				insert(aRec, rec)
 			end
