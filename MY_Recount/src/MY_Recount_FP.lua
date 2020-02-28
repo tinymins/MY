@@ -277,15 +277,20 @@ function D.DrawData(frame)
 	local data = frame.data
 	local nPage = frame.nPage or 1
 	local szSearch = frame:Lookup('Wnd_Total/Wnd_Search/Edit_Search'):GetText()
+	local nSearch = tonumber(szSearch)
 	local aRec = {}
 	if IsEmpty(szSearch) then
-		for k, v in ipairs(data[DK.EVERYTHING]) do
-			aRec[k] = v
+		szSearch = nil
+	end
+	for _, rec in ipairs(data[DK.EVERYTHING]) do
+		local bMatch = true
+		if bMatch and MY_Recount_UI.bHideAnonymous
+		and rec[4] == EVERYTHING_TYPE.SKILL_EFFECT
+		and select(2, MY_Recount_DS.GetEffectInfoAusID(data, rec[10])) then
+			bMatch = false
 		end
-	else
-		local nSearch = tonumber(szSearch)
-		for _, rec in ipairs(data[DK.EVERYTHING]) do
-			if (szSearch == _L['Skill'] and rec[4] == EVERYTHING_TYPE.SKILL_EFFECT and rec[7] == SKILL_EFFECT_TYPE.SKILL)
+		if bMatch and szSearch and not (
+			(szSearch == _L['Skill'] and rec[4] == EVERYTHING_TYPE.SKILL_EFFECT and rec[7] == SKILL_EFFECT_TYPE.SKILL)
 			or (szSearch == _L['Buff'] and rec[4] == EVERYTHING_TYPE.SKILL_EFFECT and rec[7] == SKILL_EFFECT_TYPE.BUFF)
 			or (szSearch == _L['Fight time'] and rec[4] == EVERYTHING_TYPE.FIGHT_TIME)
 			or (rec[4] == EVERYTHING_TYPE.SKILL_EFFECT and (
@@ -293,9 +298,12 @@ function D.DrawData(frame)
 				or wfind(MY_Recount_DS.GetNameAusID(data, rec[5]) or '', szSearch)
 				or wfind(MY_Recount_DS.GetNameAusID(data, rec[6]) or '', szSearch)
 				or wfind(MY_Recount_DS.GetEffectInfoAusID(data, rec[10]) or '', szSearch)
-			)) then
-				insert(aRec, rec)
-			end
+			))
+		) then
+			bMatch = false
+		end
+		if bMatch then
+			insert(aRec, rec)
 		end
 	end
 	local szSortKey, szSortOrder = frame.szSortKey, frame.szSortOrder
@@ -480,9 +488,16 @@ function MY_Recount_FP.OnFrameCreate()
 	end
 	handle:FormatAllItemPos()
 
+	this:RegisterEvent('MY_RECOUNT_UI_CONFIG_UPDATE')
 	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
 	D.DrawHead(this)
 	this.SetDS = D.SetDS
+end
+
+function MY_Recount_FP.OnEvent(event)
+	if event == 'MY_RECOUNT_UI_CONFIG_UPDATE' then
+		D.DrawData(this)
+	end
 end
 
 function MY_Recount_FP.OnLButtonClick()
