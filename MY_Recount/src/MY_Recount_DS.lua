@@ -47,6 +47,7 @@ end
 --------------------------------------------------------------------------
 local DK = {
 	UUID        = 'UUID'       , -- 战斗唯一标识
+	BOSSNAME    = 'szBossName' , -- 日志名字
 	VERSION     = 'nVersion'   , -- 数据版本号
 	TIME_BEGIN  = 'nTimeBegin' , -- 战斗开始时间
 	TICK_BEGIN  = 'nTickBegin' , -- 战斗开始毫秒时间
@@ -68,7 +69,7 @@ local DK_REC = {
 	TOTAL = 'nTotal',
 	TOTAL_EFFECT = 'nTotalEffect',
 	SNAPSHOTS = 'Snapshots',
-	STATISTICS = 'Statistics',
+	STAT = 'Statistics',
 }
 
 local DK_REC_SNAPSHOT = {
@@ -106,6 +107,88 @@ local DK_REC_STAT_DETAIL = {
 	NZ_AVG        = 'nNzAvg'      , -- 所有非零值命中平均伤害
 	AVG_EFFECT    = 'nAvgEffect'  , -- 所有命中平均有效伤害
 	NZ_AVG_EFFECT = 'nNzAvgEffect', -- 所有非零值命中平均有效伤害
+}
+
+local DK_REC_STAT_SKILL = {
+	COUNT         = 'nCount'      , -- 该玩家四象轮回释放次数（假设szEffectName是四象轮回）
+	NZ_COUNT      = 'nNzCount'    , -- 该玩家非零值四象轮回释放次数
+	MAX           = 'nMax'        , -- 该玩家四象轮回最大输出量
+	MAX_EFFECT    = 'nMaxEffect'  , -- 该玩家四象轮回最大有效输出量
+	TOTAL         = 'nTotal'      , -- 该玩家四象轮回输出量总和
+	TOTAL_EFFECT  = 'nTotalEffect', -- 该玩家四象轮回有效输出量总和
+	AVG           = 'nAvg'        , -- 该玩家所有四象轮回平均伤害
+	NZ_AVG        = 'nNzAvg'      , -- 该玩家所有非零值四象轮回平均伤害
+	AVG_EFFECT    = 'nAvgEffect'  , -- 该玩家所有四象轮回平均有效伤害
+	NZ_AVG_EFFECT = 'nNzAvgEffect', -- 该玩家所有非零值四象轮回平均有效伤害
+	DETAIL        = 'Detail'      , -- 该玩家四象轮回输出结果分类统计
+	TARGET        = 'Target'      , -- 该玩家四象轮回承受者统计
+}
+
+local DK_REC_STAT_SKILL_DETAIL = {
+	COUNT         = 'nCount'      , -- 命中记录数量
+	NZ_COUNT      = 'nNzCount'    , -- 非零值命中记录数量
+	MAX           = 'nMax'        , -- 单次命中最大值
+	MAX_EFFECT    = 'nMaxEffect'  , -- 单次命中最大有效值
+	MIN           = 'nMin'        , -- 单次命中最小值
+	NZ_MIN        = 'nNzMin'      , -- 单次非零值命中最小值
+	MIN_EFFECT    = 'nMinEffect'  , -- 单次命中最小有效值
+	NZ_MIN_EFFECT = 'nNzMinEffect', -- 单次非零值命中最小有效值
+	TOTAL         = 'nTotal'      , -- 所以命中总伤害
+	TOTAL_EFFECT  = 'nTotalEffect', -- 所有命中总有效伤害
+	AVG           = 'nAvg'        , -- 所有命中平均伤害
+	NZ_AVG        = 'nNzAvg'      , -- 所有非零值命中平均伤害
+	AVG_EFFECT    = 'nAvgEffect'  , -- 所有命中平均有效伤害
+	NZ_AVG_EFFECT = 'nNzAvgEffect', -- 所有非零值命中平均有效伤害
+}
+
+local DK_REC_STAT_SKILL_TARGET = {
+	MAX          = 'nMax'        , -- 该玩家四象轮回击中的这个玩家最大伤害
+	MAX_EFFECT   = 'nMaxEffect'  , -- 该玩家四象轮回击中的这个玩家最大有效伤害
+	TOTAL        = 'nTotal'      , -- 该玩家四象轮回击中的这个玩家伤害总和
+	TOTAL_EFFECT = 'nTotalEffect', -- 该玩家四象轮回击中的这个玩家有效伤害总和
+	COUNT        = 'Count'       , -- 该玩家四象轮回击中的这个玩家结果统计
+	NZ_COUNT     = 'NzCount'     , -- 该玩家非零值四象轮回击中的这个玩家结果统计
+}
+
+local DK_REC_STAT_TARGET = {
+	COUNT         = 'nCount'      , -- 该玩家对idTarget的技能释放次数
+	NZ_COUNT      = 'nNzCount'    , -- 该玩家对idTarget的非零值技能释放次数
+	MAX           = 'nMax'        , -- 该玩家对idTarget的技能最大输出量
+	MAX_EFFECT    = 'nMaxEffect'  , -- 该玩家对idTarget的技能最大有效输出量
+	TOTAL         = 'nTotal'      , -- 该玩家对idTarget的技能输出量总和
+	TOTAL_EFFECT  = 'nTotalEffect', -- 该玩家对idTarget的技能有效输出量总和
+	AVG           = 'nAvg'        , -- 该玩家对idTarget的技能平均输出量
+	NZ_AVG        = 'nNzAvg'      , -- 该玩家对idTarget的非零值技能平均输出量
+	AVG_EFFECT    = 'nAvgEffect'  , -- 该玩家对idTarget的技能平均有效输出量
+	NZ_AVG_EFFECT = 'nNzAvgEffect', -- 该玩家对idTarget的非零值技能平均有效输出量
+	DETAIL        = 'Detail'      , -- 该玩家对idTarget的技能输出结果分类统计
+	SKILL         = 'Skill'       , -- 该玩家对idTarget的技能具体分别统计
+}
+
+local DK_REC_STAT_TARGET_DETAIL = {
+	COUNT         = 'nCount'      , -- 命中记录数量（假设nSkillResult是命中）
+	NZ_COUNT      = 'nNzCount'    , -- 非零值命中记录数量
+	MAX           = 'nMax'        , -- 单次命中最大值
+	MAX_EFFECT    = 'nMaxEffect'  , -- 单次命中最大有效值
+	MIN           = 'nMin'        , -- 单次命中最小值
+	NZ_MIN        = 'nNzMin'      , -- 单次非零值命中最小值
+	MIN_EFFECT    = 'nMinEffect'  , -- 单次命中最小有效值
+	NZ_MIN_EFFECT = 'nNzMinEffect', -- 单次非零值命中最小有效值
+	TOTAL         = 'nTotal'      , -- 所以命中总伤害
+	TOTAL_EFFECT  = 'nTotalEffect', -- 所有命中总有效伤害
+	AVG           = 'nAvg'        , -- 所有命中平均伤害
+	NZ_AVG        = 'nNzAvg'      , -- 所有非零值命中平均伤害
+	AVG_EFFECT    = 'nAvgEffect'  , -- 所有命中平均有效伤害
+	NZ_AVG_EFFECT = 'nNzAvgEffect', -- 所有非零值命中平均有效伤害
+}
+
+local DK_REC_STAT_TARGET_SKILL = {
+	MAX          = 'nMax'        , -- 该玩家击中这个玩家的四象轮回最大伤害
+	MAX_EFFECT   = 'nMaxEffect'  , -- 该玩家击中这个玩家的四象轮回最大有效伤害
+	TOTAL        = 'nTotal'      , -- 该玩家击中这个玩家的四象轮回伤害总和
+	TOTAL_EFFECT = 'nTotalEffect', -- 该玩家击中这个玩家的四象轮回有效伤害总和
+	COUNT        = 'Count'       , -- 该玩家击中这个玩家的四象轮回结果统计
+	NZ_COUNT     = 'NzCount'     , -- 该玩家非零值击中这个玩家的四象轮回结果统计
 }
 --[[
 [SKILL_RESULT_TYPE]枚举：
@@ -156,7 +239,7 @@ Data = {
 				},
 			}, ...
 		},
-		[DK_REC.STATISTICS] = {
+		[DK_REC.STAT] = {
 			玩家的dwID = {                                        -- 该对象的输出统计
 				[DK_REC_STAT.TOTAL       ] = 2314214,       -- 总输出
 				[DK_REC_STAT.TOTAL_EFFECT] = 132144 ,       -- 有效输出
@@ -386,7 +469,7 @@ LIB.BreatheCall('MY_Recount_FightTime', 1000, function()
 				[DK_REC_SNAPSHOT.TOTAL_EFFECT] = tInfo[DK_REC.TOTAL_EFFECT],
 				[DK_REC_SNAPSHOT.STATISTICS  ] = {},
 			}
-			for k, v in pairs(tInfo[DK_REC.STATISTICS]) do
+			for k, v in pairs(tInfo[DK_REC.STAT]) do
 				tSnapshot[DK_REC_SNAPSHOT.STATISTICS][k] = {
 					[DK_REC_SNAPSHOT_STAT.TOTAL] = v[DK_REC_STAT.TOTAL],
 					[DK_REC_SNAPSHOT_STAT.TOTAL_EFFECT] = v.nTotalEffect,
@@ -658,7 +741,7 @@ end
 -- 将一条记录插入数组
 function D.InsertRecord(data, szRecordType, idRecord, idTarget, szEffectName, nValue, nEffectValue, nSkillResult)
 	local tInfo   = data[szRecordType]
-	local tRecord = tInfo[DK_REC.STATISTICS][idRecord]
+	local tRecord = tInfo[DK_REC.STAT][idRecord]
 	if not szEffectName or szEffectName == '' then
 		return
 	end
@@ -719,104 +802,104 @@ function D.InsertRecord(data, szRecordType, idRecord, idTarget, szEffectName, nV
 	-- 添加具体技能记录
 	if not tRecord[DK_REC_STAT.SKILL][szEffectName] then
 		tRecord[DK_REC_STAT.SKILL][szEffectName] = {
-			nCount       =  0, -- 该玩家四象轮回释放次数（假设szEffectName是四象轮回）
-			nNzCount     =  0, -- 该玩家非零值四象轮回释放次数
-			nMax         =  0, -- 该玩家四象轮回最大输出量
-			nMaxEffect   =  0, -- 该玩家四象轮回最大有效输出量
-			nTotal       =  0, -- 该玩家四象轮回输出量总和
-			nTotalEffect =  0, -- 该玩家四象轮回有效输出量总和
-			nAvg         =  0, -- 该玩家所有四象轮回平均伤害
-			nNzAvg       =  0, -- 该玩家所有非零值四象轮回平均伤害
-			nAvgEffect   =  0, -- 该玩家所有四象轮回平均有效伤害
-			nNzAvgEffect =  0, -- 该玩家所有非零值四象轮回平均有效伤害
-			Detail       = {}, -- 该玩家四象轮回输出结果分类统计
-			Target       = {}, -- 该玩家四象轮回承受者统计
+			[DK_REC_STAT_SKILL.COUNT        ] =  0, -- 该玩家四象轮回释放次数（假设szEffectName是四象轮回）
+			[DK_REC_STAT_SKILL.NZ_COUNT     ] =  0, -- 该玩家非零值四象轮回释放次数
+			[DK_REC_STAT_SKILL.MAX          ] =  0, -- 该玩家四象轮回最大输出量
+			[DK_REC_STAT_SKILL.MAX_EFFECT   ] =  0, -- 该玩家四象轮回最大有效输出量
+			[DK_REC_STAT_SKILL.TOTAL        ] =  0, -- 该玩家四象轮回输出量总和
+			[DK_REC_STAT_SKILL.TOTAL_EFFECT ] =  0, -- 该玩家四象轮回有效输出量总和
+			[DK_REC_STAT_SKILL.AVG          ] =  0, -- 该玩家所有四象轮回平均伤害
+			[DK_REC_STAT_SKILL.NZ_AVG       ] =  0, -- 该玩家所有非零值四象轮回平均伤害
+			[DK_REC_STAT_SKILL.AVG_EFFECT   ] =  0, -- 该玩家所有四象轮回平均有效伤害
+			[DK_REC_STAT_SKILL.NZ_AVG_EFFECT] =  0, -- 该玩家所有非零值四象轮回平均有效伤害
+			[DK_REC_STAT_SKILL.DETAIL       ] = {}, -- 该玩家四象轮回输出结果分类统计
+			[DK_REC_STAT_SKILL.TARGET       ] = {}, -- 该玩家四象轮回承受者统计
 		}
 	end
 	local tSkillRecord = tRecord[DK_REC_STAT.SKILL][szEffectName]
-	tSkillRecord.nCount       = tSkillRecord.nCount + 1
-	tSkillRecord.nMax         = max(tSkillRecord.nMax, nValue)
-	tSkillRecord.nMaxEffect   = max(tSkillRecord.nMaxEffect, nEffectValue)
-	tSkillRecord.nTotal       = tSkillRecord.nTotal + nValue
-	tSkillRecord.nTotalEffect = tSkillRecord.nTotalEffect + nEffectValue
-	tSkillRecord.nAvg         = floor(tSkillRecord.nTotal / tSkillRecord.nCount)
-	tSkillRecord.nAvgEffect   = floor(tSkillRecord.nTotalEffect / tSkillRecord.nCount)
+	tSkillRecord[DK_REC_STAT_SKILL.COUNT       ] = tSkillRecord[DK_REC_STAT_SKILL.COUNT] + 1
+	tSkillRecord[DK_REC_STAT_SKILL.MAX         ] = max(tSkillRecord[DK_REC_STAT_SKILL.MAX], nValue)
+	tSkillRecord[DK_REC_STAT_SKILL.MAX_EFFECT  ] = max(tSkillRecord[DK_REC_STAT_SKILL.MAX_EFFECT], nEffectValue)
+	tSkillRecord[DK_REC_STAT_SKILL.TOTAL       ] = tSkillRecord[DK_REC_STAT_SKILL.TOTAL] + nValue
+	tSkillRecord[DK_REC_STAT_SKILL.TOTAL_EFFECT] = tSkillRecord[DK_REC_STAT_SKILL.TOTAL_EFFECT] + nEffectValue
+	tSkillRecord[DK_REC_STAT_SKILL.AVG         ] = floor(tSkillRecord[DK_REC_STAT_SKILL.TOTAL] / tSkillRecord[DK_REC_STAT_SKILL.COUNT])
+	tSkillRecord[DK_REC_STAT_SKILL.AVG_EFFECT  ] = floor(tSkillRecord[DK_REC_STAT_SKILL.TOTAL_EFFECT] / tSkillRecord[DK_REC_STAT_SKILL.COUNT])
 	if nValue ~= 0 or NZ_SKILL_RESULT[nSkillResult] then
-		tSkillRecord.nNzCount     = tSkillRecord.nNzCount + 1
-		tSkillRecord.nNzAvg       = floor(tSkillRecord.nTotal / tSkillRecord.nNzCount)
-		tSkillRecord.nNzAvgEffect = floor(tSkillRecord.nTotalEffect / tSkillRecord.nNzCount)
+		tSkillRecord[DK_REC_STAT_SKILL.NZ_COUNT]     = tSkillRecord[DK_REC_STAT_SKILL.NZ_COUNT] + 1
+		tSkillRecord[DK_REC_STAT_SKILL.NZ_AVG]       = floor(tSkillRecord[DK_REC_STAT_SKILL.TOTAL] / tSkillRecord[DK_REC_STAT_SKILL.NZ_COUNT])
+		tSkillRecord[DK_REC_STAT_SKILL.NZ_AVG_EFFECT] = floor(tSkillRecord[DK_REC_STAT_SKILL.TOTAL_EFFECT] / tSkillRecord[DK_REC_STAT_SKILL.NZ_COUNT])
 	end
 
 	---------------------------------
 	-- # 节： tRecord.Skill[x].Detail
 	---------------------------------
 	-- 添加/更新具体技能结果分类统计
-	if not tSkillRecord.Detail[nSkillResult] then
-		tSkillRecord.Detail[nSkillResult] = {
-			nCount       =  0, -- 命中记录数量
-			nNzCount     =  0, -- 非零值命中记录数量
-			nMax         =  0, -- 单次命中最大值
-			nMaxEffect   =  0, -- 单次命中最大有效值
-			nMin         = -1, -- 单次命中最小值
-			nNzMin       = -1, -- 单次非零值命中最小值
-			nMinEffect   = -1, -- 单次命中最小有效值
-			nNzMinEffect = -1, -- 单次非零值命中最小有效值
-			nTotal       =  0, -- 所以命中总伤害
-			nTotalEffect =  0, -- 所有命中总有效伤害
-			nAvg         =  0, -- 所有命中平均伤害
-			nNzAvg       =  0, -- 所有非零值命中平均伤害
-			nAvgEffect   =  0, -- 所有命中平均有效伤害
-			nNzAvgEffect =  0, -- 所有非零值命中平均有效伤害
+	if not tSkillRecord[DK_REC_STAT_SKILL.DETAIL][nSkillResult] then
+		tSkillRecord[DK_REC_STAT_SKILL.DETAIL][nSkillResult] = {
+			[DK_REC_STAT_SKILL_DETAIL.COUNT        ] =  0, -- 命中记录数量
+			[DK_REC_STAT_SKILL_DETAIL.NZ_COUNT     ] =  0, -- 非零值命中记录数量
+			[DK_REC_STAT_SKILL_DETAIL.MAX          ] =  0, -- 单次命中最大值
+			[DK_REC_STAT_SKILL_DETAIL.MAX_EFFECT   ] =  0, -- 单次命中最大有效值
+			[DK_REC_STAT_SKILL_DETAIL.MIN          ] = -1, -- 单次命中最小值
+			[DK_REC_STAT_SKILL_DETAIL.NZ_MIN       ] = -1, -- 单次非零值命中最小值
+			[DK_REC_STAT_SKILL_DETAIL.MIN_EFFECT   ] = -1, -- 单次命中最小有效值
+			[DK_REC_STAT_SKILL_DETAIL.NZ_MIN_EFFECT] = -1, -- 单次非零值命中最小有效值
+			[DK_REC_STAT_SKILL_DETAIL.TOTAL        ] =  0, -- 所以命中总伤害
+			[DK_REC_STAT_SKILL_DETAIL.TOTAL_EFFECT ] =  0, -- 所有命中总有效伤害
+			[DK_REC_STAT_SKILL_DETAIL.AVG          ] =  0, -- 所有命中平均伤害
+			[DK_REC_STAT_SKILL_DETAIL.NZ_AVG       ] =  0, -- 所有非零值命中平均伤害
+			[DK_REC_STAT_SKILL_DETAIL.AVG_EFFECT   ] =  0, -- 所有命中平均有效伤害
+			[DK_REC_STAT_SKILL_DETAIL.NZ_AVG_EFFECT] =  0, -- 所有非零值命中平均有效伤害
 		}
 	end
-	local tResult = tSkillRecord.Detail[nSkillResult]
-	tResult.nCount       = tResult.nCount + 1                           -- 命中次数（假设nSkillResult是命中）
-	tResult.nMax         = max(tResult.nMax, nValue)               -- 单次命中最大值
-	tResult.nMaxEffect   = max(tResult.nMaxEffect, nEffectValue)   -- 单次命中最大有效值
-	tResult.nMin         = (tResult.nMin ~= -1 and min(tResult.nMin, nValue)) or nValue                         -- 单次命中最小值
-	tResult.nMinEffect   = (tResult.nMinEffect ~= -1 and min(tResult.nMinEffect, nEffectValue)) or nEffectValue -- 单次命中最小有效值
-	tResult.nTotal       = tResult.nTotal + nValue                      -- 所以命中总伤害
-	tResult.nTotalEffect = tResult.nTotalEffect + nEffectValue          -- 所有命中总有效伤害
-	tResult.nAvg         = floor(tResult.nTotal / tResult.nCount)
-	tResult.nAvgEffect   = floor(tResult.nTotalEffect / tResult.nCount)
+	local tResult = tSkillRecord[DK_REC_STAT_SKILL.DETAIL][nSkillResult]
+	tResult[DK_REC_STAT_SKILL_DETAIL.COUNT       ] = tResult[DK_REC_STAT_SKILL_DETAIL.COUNT] + 1 -- 命中次数（假设nSkillResult是命中）
+	tResult[DK_REC_STAT_SKILL_DETAIL.MAX         ] = max(tResult[DK_REC_STAT_SKILL_DETAIL.MAX], nValue) -- 单次命中最大值
+	tResult[DK_REC_STAT_SKILL_DETAIL.MAX_EFFECT  ] = max(tResult[DK_REC_STAT_SKILL_DETAIL.MAX_EFFECT], nEffectValue) -- 单次命中最大有效值
+	tResult[DK_REC_STAT_SKILL_DETAIL.MIN         ] = Min(tResult[DK_REC_STAT_SKILL_DETAIL.MIN], nValue) -- 单次命中最小值
+	tResult[DK_REC_STAT_SKILL_DETAIL.MIN_EFFECT  ] = Min(tResult[DK_REC_STAT_SKILL_DETAIL.MIN_EFFECT], nEffectValue) -- 单次命中最小有效值
+	tResult[DK_REC_STAT_SKILL_DETAIL.TOTAL       ] = tResult[DK_REC_STAT_SKILL_DETAIL.TOTAL] + nValue -- 所以命中总伤害
+	tResult[DK_REC_STAT_SKILL_DETAIL.TOTAL_EFFECT] = tResult[DK_REC_STAT_SKILL_DETAIL.TOTAL_EFFECT] + nEffectValue -- 所有命中总有效伤害
+	tResult[DK_REC_STAT_SKILL_DETAIL.AVG         ] = floor(tResult[DK_REC_STAT_SKILL_DETAIL.TOTAL] / tResult[DK_REC_STAT_SKILL_DETAIL.COUNT])
+	tResult[DK_REC_STAT_SKILL_DETAIL.AVG_EFFECT  ] = floor(tResult[DK_REC_STAT_SKILL_DETAIL.TOTAL_EFFECT] / tResult[DK_REC_STAT_SKILL_DETAIL.COUNT])
 	if nValue ~= 0 or NZ_SKILL_RESULT[nSkillResult] then
-		tResult.nNzCount     = tResult.nNzCount + 1                           -- 命中次数（假设nSkillResult是命中）
-		tResult.nNzMin       = (tResult.nNzMin ~= -1 and min(tResult.nNzMin, nValue)) or nValue                         -- 单次命中最小值
-		tResult.nNzMinEffect = (tResult.nNzMinEffect ~= -1 and min(tResult.nNzMinEffect, nEffectValue)) or nEffectValue -- 单次命中最小有效值
-		tResult.nNzAvg       = floor(tResult.nTotal / tResult.nNzCount)
-		tResult.nNzAvgEffect = floor(tResult.nTotalEffect / tResult.nNzCount)
+		tResult[DK_REC_STAT_SKILL_DETAIL.NZ_COUNT     ] = tResult[DK_REC_STAT_SKILL_DETAIL.NZ_COUNT] + 1 -- 命中次数（假设nSkillResult是命中）
+		tResult[DK_REC_STAT_SKILL_DETAIL.NZ_MIN       ] = Min(tResult[DK_REC_STAT_SKILL_DETAIL.NZ_MIN], nValue) -- 单次命中最小值
+		tResult[DK_REC_STAT_SKILL_DETAIL.NZ_MIN_EFFECT] = Min(tResult[DK_REC_STAT_SKILL_DETAIL.NZ_MIN_EFFECT], nEffectValue) -- 单次命中最小有效值
+		tResult[DK_REC_STAT_SKILL_DETAIL.NZ_AVG       ] = floor(tResult[DK_REC_STAT_SKILL_DETAIL.TOTAL] / tResult[DK_REC_STAT_SKILL_DETAIL.NZ_COUNT])
+		tResult[DK_REC_STAT_SKILL_DETAIL.NZ_AVG_EFFECT] = floor(tResult[DK_REC_STAT_SKILL_DETAIL.TOTAL_EFFECT] / tResult[DK_REC_STAT_SKILL_DETAIL.NZ_COUNT])
 	end
 
 	------------------------------
 	-- # 节： tRecord.Skill.Target
 	------------------------------
 	-- 添加具体技能承受者记录
-	if not tSkillRecord.Target[idTarget] then
-		tSkillRecord.Target[idTarget] = {
-			nMax         = 0,            -- 该玩家四象轮回击中的这个玩家最大伤害
-			nMaxEffect   = 0,            -- 该玩家四象轮回击中的这个玩家最大有效伤害
-			nTotal       = 0,            -- 该玩家四象轮回击中的这个玩家伤害总和
-			nTotalEffect = 0,            -- 该玩家四象轮回击中的这个玩家有效伤害总和
-			Count = {                    -- 该玩家四象轮回击中的这个玩家结果统计
+	if not tSkillRecord[DK_REC_STAT_SKILL.TARGET][idTarget] then
+		tSkillRecord[DK_REC_STAT_SKILL.TARGET][idTarget] = {
+			[DK_REC_STAT_SKILL_TARGET.MAX         ] = 0, -- 该玩家四象轮回击中的这个玩家最大伤害
+			[DK_REC_STAT_SKILL_TARGET.MAX_EFFECT  ] = 0, -- 该玩家四象轮回击中的这个玩家最大有效伤害
+			[DK_REC_STAT_SKILL_TARGET.TOTAL       ] = 0, -- 该玩家四象轮回击中的这个玩家伤害总和
+			[DK_REC_STAT_SKILL_TARGET.TOTAL_EFFECT] = 0, -- 该玩家四象轮回击中的这个玩家有效伤害总和
+			[DK_REC_STAT_SKILL_TARGET.COUNT       ] = {  -- 该玩家四象轮回击中的这个玩家结果统计
 				-- [SKILL_RESULT.HIT     ] = 5,
 				-- [SKILL_RESULT.MISS    ] = 3,
 				-- [SKILL_RESULT.CRITICAL] = 3,
 			},
-			NzCount = {                  -- 该玩家非零值四象轮回击中的这个玩家结果统计
+			[DK_REC_STAT_SKILL_TARGET.NZ_COUNT    ] = {  -- 该玩家非零值四象轮回击中的这个玩家结果统计
 				-- [SKILL_RESULT.HIT     ] = 5,
 				-- [SKILL_RESULT.MISS    ] = 3,
 				-- [SKILL_RESULT.CRITICAL] = 3,
 			},
 		}
 	end
-	local tSkillTargetData = tSkillRecord.Target[idTarget]
-	tSkillTargetData.nMax                = max(tSkillTargetData.nMax, nValue)
-	tSkillTargetData.nMaxEffect          = max(tSkillTargetData.nMaxEffect, nEffectValue)
-	tSkillTargetData.nTotal              = tSkillTargetData.nTotal + nValue
-	tSkillTargetData.nTotalEffect        = tSkillTargetData.nTotalEffect + nEffectValue
-	tSkillTargetData.Count[nSkillResult] = (tSkillTargetData.Count[nSkillResult] or 0) + 1
+	local tSkillTargetData = tSkillRecord[DK_REC_STAT_SKILL.TARGET][idTarget]
+	tSkillTargetData[DK_REC_STAT_SKILL_TARGET.MAX         ] = max(tSkillTargetData[DK_REC_STAT_SKILL_TARGET.MAX], nValue)
+	tSkillTargetData[DK_REC_STAT_SKILL_TARGET.MAX_EFFECT  ] = max(tSkillTargetData[DK_REC_STAT_SKILL_TARGET.MAX_EFFECT], nEffectValue)
+	tSkillTargetData[DK_REC_STAT_SKILL_TARGET.TOTAL       ] = tSkillTargetData[DK_REC_STAT_SKILL_TARGET.TOTAL] + nValue
+	tSkillTargetData[DK_REC_STAT_SKILL_TARGET.TOTAL_EFFECT] = tSkillTargetData[DK_REC_STAT_SKILL_TARGET.TOTAL_EFFECT] + nEffectValue
+	tSkillTargetData[DK_REC_STAT_SKILL_TARGET.COUNT][nSkillResult] = (tSkillTargetData[DK_REC_STAT_SKILL_TARGET.COUNT][nSkillResult] or 0) + 1
 	if nValue ~= 0 then
-		tSkillTargetData.NzCount[nSkillResult] = (tSkillTargetData.NzCount[nSkillResult] or 0) + 1
+		tSkillTargetData[DK_REC_STAT_SKILL_TARGET.NZ_COUNT][nSkillResult] = (tSkillTargetData[DK_REC_STAT_SKILL_TARGET.NZ_COUNT][nSkillResult] or 0) + 1
 	end
 
 	------------------------
@@ -825,104 +908,104 @@ function D.InsertRecord(data, szRecordType, idRecord, idTarget, szEffectName, nV
 	-- 添加具体承受/释放者记录
 	if not tRecord[DK_REC_STAT.TARGET][idTarget] then
 		tRecord[DK_REC_STAT.TARGET][idTarget] = {
-			nCount       =  0, -- 该玩家对idTarget的技能释放次数
-			nNzCount     =  0, -- 该玩家对idTarget的非零值技能释放次数
-			nMax         =  0, -- 该玩家对idTarget的技能最大输出量
-			nMaxEffect   =  0, -- 该玩家对idTarget的技能最大有效输出量
-			nTotal       =  0, -- 该玩家对idTarget的技能输出量总和
-			nTotalEffect =  0, -- 该玩家对idTarget的技能有效输出量总和
-			nAvg         =  0, -- 该玩家对idTarget的技能平均输出量
-			nNzAvg       =  0, -- 该玩家对idTarget的非零值技能平均输出量
-			nAvgEffect   =  0, -- 该玩家对idTarget的技能平均有效输出量
-			nNzAvgEffect =  0, -- 该玩家对idTarget的非零值技能平均有效输出量
-			Detail       = {}, -- 该玩家对idTarget的技能输出结果分类统计
-			Skill        = {}, -- 该玩家对idTarget的技能具体分别统计
+			[DK_REC_STAT_TARGET.COUNT        ] =  0, -- 该玩家对idTarget的技能释放次数
+			[DK_REC_STAT_TARGET.NZ_COUNT     ] =  0, -- 该玩家对idTarget的非零值技能释放次数
+			[DK_REC_STAT_TARGET.MAX          ] =  0, -- 该玩家对idTarget的技能最大输出量
+			[DK_REC_STAT_TARGET.MAX_EFFECT   ] =  0, -- 该玩家对idTarget的技能最大有效输出量
+			[DK_REC_STAT_TARGET.TOTAL        ] =  0, -- 该玩家对idTarget的技能输出量总和
+			[DK_REC_STAT_TARGET.TOTAL_EFFECT ] =  0, -- 该玩家对idTarget的技能有效输出量总和
+			[DK_REC_STAT_TARGET.AVG          ] =  0, -- 该玩家对idTarget的技能平均输出量
+			[DK_REC_STAT_TARGET.NZ_AVG       ] =  0, -- 该玩家对idTarget的非零值技能平均输出量
+			[DK_REC_STAT_TARGET.AVG_EFFECT   ] =  0, -- 该玩家对idTarget的技能平均有效输出量
+			[DK_REC_STAT_TARGET.NZ_AVG_EFFECT] =  0, -- 该玩家对idTarget的非零值技能平均有效输出量
+			[DK_REC_STAT_TARGET.DETAIL       ] = {}, -- 该玩家对idTarget的技能输出结果分类统计
+			[DK_REC_STAT_TARGET.SKILL        ] = {}, -- 该玩家对idTarget的技能具体分别统计
 		}
 	end
 	local tTargetRecord = tRecord[DK_REC_STAT.TARGET][idTarget]
-	tTargetRecord.nCount       = tTargetRecord.nCount + 1
-	tTargetRecord.nMax         = max(tTargetRecord.nMax, nValue)
-	tTargetRecord.nMaxEffect   = max(tTargetRecord.nMaxEffect, nEffectValue)
-	tTargetRecord.nTotal       = tTargetRecord.nTotal + nValue
-	tTargetRecord.nTotalEffect = tTargetRecord.nTotalEffect + nEffectValue
-	tTargetRecord.nAvg         = floor(tTargetRecord.nTotal / tTargetRecord.nCount)
-	tTargetRecord.nAvgEffect   = floor(tTargetRecord.nTotalEffect / tTargetRecord.nCount)
+	tTargetRecord[DK_REC_STAT_TARGET.COUNT       ] = tTargetRecord[DK_REC_STAT_TARGET.COUNT] + 1
+	tTargetRecord[DK_REC_STAT_TARGET.MAX         ] = max(tTargetRecord[DK_REC_STAT_TARGET.MAX], nValue)
+	tTargetRecord[DK_REC_STAT_TARGET.MAX_EFFECT  ] = max(tTargetRecord[DK_REC_STAT_TARGET.MAX_EFFECT], nEffectValue)
+	tTargetRecord[DK_REC_STAT_TARGET.TOTAL       ] = tTargetRecord[DK_REC_STAT_TARGET.TOTAL] + nValue
+	tTargetRecord[DK_REC_STAT_TARGET.TOTAL_EFFECT] = tTargetRecord[DK_REC_STAT_TARGET.TOTAL_EFFECT] + nEffectValue
+	tTargetRecord[DK_REC_STAT_TARGET.AVG         ] = floor(tTargetRecord[DK_REC_STAT_TARGET.TOTAL] / tTargetRecord[DK_REC_STAT_TARGET.COUNT])
+	tTargetRecord[DK_REC_STAT_TARGET.AVG_EFFECT  ] = floor(tTargetRecord[DK_REC_STAT_TARGET.TOTAL_EFFECT] / tTargetRecord[DK_REC_STAT_TARGET.COUNT])
 	if nValue ~= 0 or NZ_SKILL_RESULT[nSkillResult] then
-		tTargetRecord.nNzCount     = tTargetRecord.nNzCount + 1
-		tTargetRecord.nNzAvg       = floor(tTargetRecord.nTotal / tTargetRecord.nNzCount)
-		tTargetRecord.nNzAvgEffect = floor(tTargetRecord.nTotalEffect / tTargetRecord.nNzCount)
+		tTargetRecord[DK_REC_STAT_TARGET.NZ_COUNT     ] = tTargetRecord[DK_REC_STAT_TARGET.NZ_COUNT] + 1
+		tTargetRecord[DK_REC_STAT_TARGET.NZ_AVG       ] = floor(tTargetRecord[DK_REC_STAT_TARGET.TOTAL] / tTargetRecord[DK_REC_STAT_TARGET.NZ_COUNT])
+		tTargetRecord[DK_REC_STAT_TARGET.NZ_AVG_EFFECT] = floor(tTargetRecord[DK_REC_STAT_TARGET.TOTAL_EFFECT] / tTargetRecord[DK_REC_STAT_TARGET.NZ_COUNT])
 	end
 
 	----------------------------------
 	-- # 节： tRecord.Target[x].Detail
 	----------------------------------
 	-- 添加/更新具体承受/释放者结果分类统计
-	if not tTargetRecord.Detail[nSkillResult] then
-		tTargetRecord.Detail[nSkillResult] = {
-			nCount       =  0, -- 命中记录数量（假设nSkillResult是命中）
-			nNzCount     =  0, -- 非零值命中记录数量
-			nMax         =  0, -- 单次命中最大值
-			nMaxEffect   =  0, -- 单次命中最大有效值
-			nMin         = -1, -- 单次命中最小值
-			nNzMin       = -1, -- 单次非零值命中最小值
-			nMinEffect   = -1, -- 单次命中最小有效值
-			nNzMinEffect = -1, -- 单次非零值命中最小有效值
-			nTotal       =  0, -- 所以命中总伤害
-			nTotalEffect =  0, -- 所有命中总有效伤害
-			nAvg         =  0, -- 所有命中平均伤害
-			nNzAvg       =  0, -- 所有非零值命中平均伤害
-			nAvgEffect   =  0, -- 所有命中平均有效伤害
-			nNzAvgEffect =  0, -- 所有非零值命中平均有效伤害
+	if not tTargetRecord[DK_REC_STAT_TARGET.DETAIL][nSkillResult] then
+		tTargetRecord[DK_REC_STAT_TARGET.DETAIL][nSkillResult] = {
+			[DK_REC_STAT_TARGET_DETAIL.COUNT        ] =  0, -- 命中记录数量（假设nSkillResult是命中）
+			[DK_REC_STAT_TARGET_DETAIL.NZ_COUNT     ] =  0, -- 非零值命中记录数量
+			[DK_REC_STAT_TARGET_DETAIL.MAX          ] =  0, -- 单次命中最大值
+			[DK_REC_STAT_TARGET_DETAIL.MAX_EFFECT   ] =  0, -- 单次命中最大有效值
+			[DK_REC_STAT_TARGET_DETAIL.MIN          ] = -1, -- 单次命中最小值
+			[DK_REC_STAT_TARGET_DETAIL.NZ_MIN       ] = -1, -- 单次非零值命中最小值
+			[DK_REC_STAT_TARGET_DETAIL.MIN_EFFECT   ] = -1, -- 单次命中最小有效值
+			[DK_REC_STAT_TARGET_DETAIL.NZ_MIN_EFFECT] = -1, -- 单次非零值命中最小有效值
+			[DK_REC_STAT_TARGET_DETAIL.TOTAL        ] =  0, -- 所以命中总伤害
+			[DK_REC_STAT_TARGET_DETAIL.TOTAL_EFFECT ] =  0, -- 所有命中总有效伤害
+			[DK_REC_STAT_TARGET_DETAIL.AVG          ] =  0, -- 所有命中平均伤害
+			[DK_REC_STAT_TARGET_DETAIL.NZ_AVG       ] =  0, -- 所有非零值命中平均伤害
+			[DK_REC_STAT_TARGET_DETAIL.AVG_EFFECT   ] =  0, -- 所有命中平均有效伤害
+			[DK_REC_STAT_TARGET_DETAIL.NZ_AVG_EFFECT] =  0, -- 所有非零值命中平均有效伤害
 		}
 	end
-	local tResult = tTargetRecord.Detail[nSkillResult]
-	tResult.nCount       = tResult.nCount + 1                           -- 命中次数（假设nSkillResult是命中）
-	tResult.nMax         = max(tResult.nMax, nValue)               -- 单次命中最大值
-	tResult.nMaxEffect   = max(tResult.nMaxEffect, nEffectValue)   -- 单次命中最大有效值
-	tResult.nMin         = (tResult.nMin ~= -1 and min(tResult.nMin, nValue)) or nValue                         -- 单次命中最小值
-	tResult.nMinEffect   = (tResult.nMinEffect ~= -1 and min(tResult.nMinEffect, nEffectValue)) or nEffectValue -- 单次命中最小有效值
-	tResult.nTotal       = tResult.nTotal + nValue                      -- 所以命中总伤害
-	tResult.nTotalEffect = tResult.nTotalEffect + nEffectValue          -- 所有命中总有效伤害
-	tResult.nAvg         = floor(tResult.nTotal / tResult.nCount)
-	tResult.nAvgEffect   = floor(tResult.nTotalEffect / tResult.nCount)
+	local tResult = tTargetRecord[DK_REC_STAT_TARGET.DETAIL][nSkillResult]
+	tResult[DK_REC_STAT_TARGET_DETAIL.COUNT       ] = tResult[DK_REC_STAT_TARGET_DETAIL.COUNT] + 1 -- 命中次数（假设nSkillResult是命中）
+	tResult[DK_REC_STAT_TARGET_DETAIL.MAX         ] = max(tResult[DK_REC_STAT_TARGET_DETAIL.MAX], nValue) -- 单次命中最大值
+	tResult[DK_REC_STAT_TARGET_DETAIL.MAX_EFFECT  ] = max(tResult[DK_REC_STAT_TARGET_DETAIL.MAX_EFFECT], nEffectValue) -- 单次命中最大有效值
+	tResult[DK_REC_STAT_TARGET_DETAIL.MIN         ] = Min(tResult[DK_REC_STAT_TARGET_DETAIL.MIN], nValue) -- 单次命中最小值
+	tResult[DK_REC_STAT_TARGET_DETAIL.MIN_EFFECT  ] = Min(tResult[DK_REC_STAT_TARGET_DETAIL.MIN_EFFECT], nEffectValue) -- 单次命中最小有效值
+	tResult[DK_REC_STAT_TARGET_DETAIL.TOTAL       ] = tResult[DK_REC_STAT_TARGET_DETAIL.TOTAL] + nValue -- 所以命中总伤害
+	tResult[DK_REC_STAT_TARGET_DETAIL.TOTAL_EFFECT] = tResult[DK_REC_STAT_TARGET_DETAIL.TOTAL_EFFECT] + nEffectValue -- 所有命中总有效伤害
+	tResult[DK_REC_STAT_TARGET_DETAIL.AVG         ] = floor(tResult[DK_REC_STAT_TARGET_DETAIL.TOTAL] / tResult[DK_REC_STAT_TARGET_DETAIL.COUNT])
+	tResult[DK_REC_STAT_TARGET_DETAIL.AVG_EFFECT  ] = floor(tResult[DK_REC_STAT_TARGET_DETAIL.TOTAL_EFFECT] / tResult[DK_REC_STAT_TARGET_DETAIL.COUNT])
 	if nValue ~= 0 or NZ_SKILL_RESULT[nSkillResult] then
-		tResult.nNzCount       = tResult.nNzCount + 1                           -- 命中次数（假设nSkillResult是命中）
-		tResult.nNzMin         = (tResult.nNzMin ~= -1 and min(tResult.nNzMin, nValue)) or nValue                         -- 单次命中最小值
-		tResult.nNzMinEffect   = (tResult.nNzMinEffect ~= -1 and min(tResult.nNzMinEffect, nEffectValue)) or nEffectValue -- 单次命中最小有效值
-		tResult.nNzAvg         = floor(tResult.nTotal / tResult.nNzCount)
-		tResult.nNzAvgEffect   = floor(tResult.nTotalEffect / tResult.nNzCount)
+		tResult[DK_REC_STAT_TARGET_DETAIL.NZ_COUNT     ] = tResult[DK_REC_STAT_TARGET_DETAIL.NZ_COUNT] + 1 -- 命中次数（假设nSkillResult是命中）
+		tResult[DK_REC_STAT_TARGET_DETAIL.NZ_MIN       ] = Min(tResult[DK_REC_STAT_TARGET_DETAIL.NZ_MIN], nValue) -- 单次命中最小值
+		tResult[DK_REC_STAT_TARGET_DETAIL.NZ_MIN_EFFECT] = Min(tResult[DK_REC_STAT_TARGET_DETAIL.NZ_MIN_EFFECT], nEffectValue) -- 单次命中最小有效值
+		tResult[DK_REC_STAT_TARGET_DETAIL.NZ_AVG       ] = floor(tResult[DK_REC_STAT_TARGET_DETAIL.TOTAL] / tResult[DK_REC_STAT_TARGET_DETAIL.NZ_COUNT])
+		tResult[DK_REC_STAT_TARGET_DETAIL.NZ_AVG_EFFECT] = floor(tResult[DK_REC_STAT_TARGET_DETAIL.TOTAL_EFFECT] / tResult[DK_REC_STAT_TARGET_DETAIL.NZ_COUNT])
 	end
 
 	---------------------------------
 	-- # 节： tRecord.Target[x].Skill
 	---------------------------------
 	-- 添加承受者具体技能记录
-	if not tTargetRecord.Skill[szEffectName] then
-		tTargetRecord.Skill[szEffectName] = {
-			nMax         = 0,            -- 该玩家击中这个玩家的四象轮回最大伤害
-			nMaxEffect   = 0,            -- 该玩家击中这个玩家的四象轮回最大有效伤害
-			nTotal       = 0,            -- 该玩家击中这个玩家的四象轮回伤害总和
-			nTotalEffect = 0,            -- 该玩家击中这个玩家的四象轮回有效伤害总和
-			Count = {                    -- 该玩家击中这个玩家的四象轮回结果统计
+	if not tTargetRecord[DK_REC_STAT_TARGET.SKILL][szEffectName] then
+		tTargetRecord[DK_REC_STAT_TARGET.SKILL][szEffectName] = {
+			[DK_REC_STAT_TARGET_SKILL.MAX         ] = 0, -- 该玩家击中这个玩家的四象轮回最大伤害
+			[DK_REC_STAT_TARGET_SKILL.MAX_EFFECT  ] = 0, -- 该玩家击中这个玩家的四象轮回最大有效伤害
+			[DK_REC_STAT_TARGET_SKILL.TOTAL       ] = 0, -- 该玩家击中这个玩家的四象轮回伤害总和
+			[DK_REC_STAT_TARGET_SKILL.TOTAL_EFFECT] = 0, -- 该玩家击中这个玩家的四象轮回有效伤害总和
+			[DK_REC_STAT_TARGET_SKILL.COUNT       ] = {  -- 该玩家击中这个玩家的四象轮回结果统计
 				-- [SKILL_RESULT.HIT     ] = 5,
 				-- [SKILL_RESULT.MISS    ] = 3,
 				-- [SKILL_RESULT.CRITICAL] = 3,
 			},
-			NzCount = {                    -- 该玩家非零值击中这个玩家的四象轮回结果统计
+			[DK_REC_STAT_TARGET_SKILL.NZ_COUNT    ] = {  -- 该玩家非零值击中这个玩家的四象轮回结果统计
 				-- [SKILL_RESULT.HIT     ] = 5,
 				-- [SKILL_RESULT.MISS    ] = 3,
 				-- [SKILL_RESULT.CRITICAL] = 3,
 			},
 		}
 	end
-	local tTargetSkillData = tTargetRecord.Skill[szEffectName]
-	tTargetSkillData.nMax                = max(tTargetSkillData.nMax, nValue)
-	tTargetSkillData.nMaxEffect          = max(tTargetSkillData.nMaxEffect, nEffectValue)
-	tTargetSkillData.nTotal              = tTargetSkillData.nTotal + nValue
-	tTargetSkillData.nTotalEffect        = tTargetSkillData.nTotalEffect + nEffectValue
-	tTargetSkillData.Count[nSkillResult] = (tTargetSkillData.Count[nSkillResult] or 0) + 1
+	local tTargetSkillData = tTargetRecord[DK_REC_STAT_TARGET.SKILL][szEffectName]
+	tTargetSkillData[DK_REC_STAT_TARGET_SKILL.MAX         ] = max(tTargetSkillData[DK_REC_STAT_TARGET_SKILL.MAX], nValue)
+	tTargetSkillData[DK_REC_STAT_TARGET_SKILL.MAX_EFFECT  ] = max(tTargetSkillData[DK_REC_STAT_TARGET_SKILL.MAX_EFFECT], nEffectValue)
+	tTargetSkillData[DK_REC_STAT_TARGET_SKILL.TOTAL       ] = tTargetSkillData[DK_REC_STAT_TARGET_SKILL.TOTAL] + nValue
+	tTargetSkillData[DK_REC_STAT_TARGET_SKILL.TOTAL_EFFECT] = tTargetSkillData[DK_REC_STAT_TARGET_SKILL.TOTAL_EFFECT] + nEffectValue
+	tTargetSkillData[DK_REC_STAT_TARGET_SKILL.COUNT][nSkillResult] = (tTargetSkillData[DK_REC_STAT_TARGET_SKILL.COUNT][nSkillResult] or 0) + 1
 	if nValue ~= 0 then
-		tTargetSkillData.NzCount[nSkillResult] = (tTargetSkillData.NzCount[nSkillResult] or 0) + 1
+		tTargetSkillData[DK_REC_STAT_TARGET_SKILL.NZ_COUNT][nSkillResult] = (tTargetSkillData[DK_REC_STAT_TARGET_SKILL.NZ_COUNT][nSkillResult] or 0) + 1
 	end
 end
 
@@ -964,9 +1047,8 @@ function D.InitObjectData(data, dwID, szChannel)
 		end
 	end
 	-- 统计结构体
-	if not data[szChannel][DK_REC.STATISTICS][dwID] then
-		data[szChannel][DK_REC.STATISTICS][dwID] = {
-			szMD5        = dwID, -- 唯一标识
+	if not data[szChannel][DK_REC.STAT][dwID] then
+		data[szChannel][DK_REC.STAT][dwID] = {
 			[DK_REC_STAT.TOTAL       ] = 0 , -- 总输出
 			[DK_REC_STAT.TOTAL_EFFECT] = 0 , -- 有效输出
 			[DK_REC_STAT.DETAIL      ] = {}, -- 输出结果按技能结果分类统计
@@ -1002,7 +1084,7 @@ local function GeneTypeNS()
 		[DK_REC.TOTAL       ] = 0,
 		[DK_REC.TOTAL_EFFECT] = 0,
 		[DK_REC.SNAPSHOTS   ] = {},
-		[DK_REC.STATISTICS  ] = {},
+		[DK_REC.STAT        ] = {},
 	}
 end
 function D.Init(bForceInit)
@@ -1041,40 +1123,40 @@ function D.Flush()
 	end
 
 	-- 过滤空记录
-	if IsEmpty(Data[DK.BE_DAMAGE][DK_REC.STATISTICS])
-	and IsEmpty(Data[DK.DAMAGE][DK_REC.STATISTICS])
-	and IsEmpty(Data[DK.HEAL][DK_REC.STATISTICS])
-	and IsEmpty(Data[DK.BE_HEAL][DK_REC.STATISTICS]) then
+	if IsEmpty(Data[DK.BE_DAMAGE][DK_REC.STAT])
+	and IsEmpty(Data[DK.DAMAGE][DK_REC.STAT])
+	and IsEmpty(Data[DK.HEAL][DK_REC.STAT])
+	and IsEmpty(Data[DK.BE_HEAL][DK_REC.STAT]) then
 		return
 	end
 
 	-- 计算受伤最多的名字作为战斗名称
 	local nMaxValue, szBossName = 0, nil
 	local nEnemyMaxValue, szEnemyBossName = 0, nil
-	for id, p in pairs(Data[DK.BE_DAMAGE][DK_REC.STATISTICS]) do
-		if nEnemyMaxValue < p.nTotalEffect and not D.IsParty(id) then
-			nEnemyMaxValue  = p.nTotalEffect
+	for id, p in pairs(Data[DK.BE_DAMAGE][DK_REC.STAT]) do
+		if nEnemyMaxValue < p[DK_REC_STAT.TOTAL_EFFECT] and not D.IsParty(id) then
+			nEnemyMaxValue  = p[DK_REC_STAT.TOTAL_EFFECT]
 			szEnemyBossName = D.GetNameAusID(Data, id)
 		end
-		if nMaxValue < p.nTotalEffect and id ~= UI_GetClientPlayerID() then
-			nMaxValue  = p.nTotalEffect
+		if nMaxValue < p[DK_REC_STAT.TOTAL_EFFECT] and id ~= UI_GetClientPlayerID() then
+			nMaxValue  = p[DK_REC_STAT.TOTAL_EFFECT]
 			szBossName = D.GetNameAusID(Data, id)
 		end
 	end
 	-- 如果没有 则计算输出最多的NPC名字作为战斗名称
 	if not szBossName or not szEnemyBossName then
-		for id, p in pairs(Data[DK.DAMAGE][DK_REC.STATISTICS]) do
-			if nEnemyMaxValue < p.nTotalEffect and not D.IsParty(id) then
-				nEnemyMaxValue  = p.nTotalEffect
+		for id, p in pairs(Data[DK.DAMAGE][DK_REC.STAT]) do
+			if nEnemyMaxValue < p[DK_REC_STAT.TOTAL_EFFECT] and not D.IsParty(id) then
+				nEnemyMaxValue  = p[DK_REC_STAT.TOTAL_EFFECT]
 				szEnemyBossName = D.GetNameAusID(Data, id)
 			end
-			if nMaxValue < p.nTotalEffect and not tonumber(id) then
-				nMaxValue  = p.nTotalEffect
+			if nMaxValue < p[DK_REC_STAT.TOTAL_EFFECT] and not tonumber(id) then
+				nMaxValue  = p[DK_REC_STAT.TOTAL_EFFECT]
 				szBossName = D.GetNameAusID(Data, id)
 			end
 		end
 	end
-	Data.szBossName = szEnemyBossName or szBossName or ''
+	Data[DK.BOSSNAME] = szEnemyBossName or szBossName or ''
 
 	if Data[DK.TIME_DURING] > O.nMinFightTime then
 		insert(History, 1, Data)
@@ -1298,37 +1380,37 @@ function D.MergeTargetData(tDst, tSrc, data, szChannel, bMergeNpc, bMergeEffect,
 		local tDstDetail = tDst[DK_REC_STAT.DETAIL][nType]
 		if not tDstDetail then
 			tDstDetail = {
-				nCount       =  0, -- 命中记录数量（假设nSkillResult是命中）
-				nNzCount     =  0, -- 非零值命中记录数量
-				nMax         =  0, -- 单次命中最大值
-				nMaxEffect   =  0, -- 单次命中最大有效值
-				nMin         = -1, -- 单次命中最小值
-				nNzMin       = -1, -- 单次非零值命中最小值
-				nMinEffect   = -1, -- 单次命中最小有效值
-				nNzMinEffect = -1, -- 单次非零值命中最小有效值
-				nTotal       =  0, -- 所有命中总伤害
-				nTotalEffect =  0, -- 所有命中总有效伤害
-				nAvg         =  0, -- 所有命中平均伤害
-				nNzAvg       =  0, -- 所有非零值命中平均伤害
-				nAvgEffect   =  0, -- 所有命中平均有效伤害
-				nNzAvgEffect =  0, -- 所有非零值命中平均有效伤害
+				[DK_REC_STAT_DETAIL.COUNT        ] =  0, -- 命中记录数量（假设nSkillResult是命中）
+				[DK_REC_STAT_DETAIL.NZ_COUNT     ] =  0, -- 非零值命中记录数量
+				[DK_REC_STAT_DETAIL.MAX          ] =  0, -- 单次命中最大值
+				[DK_REC_STAT_DETAIL.MAX_EFFECT   ] =  0, -- 单次命中最大有效值
+				[DK_REC_STAT_DETAIL.MIN          ] = -1, -- 单次命中最小值
+				[DK_REC_STAT_DETAIL.NZ_MIN       ] = -1, -- 单次非零值命中最小值
+				[DK_REC_STAT_DETAIL.MIN_EFFECT   ] = -1, -- 单次命中最小有效值
+				[DK_REC_STAT_DETAIL.NZ_MIN_EFFECT] = -1, -- 单次非零值命中最小有效值
+				[DK_REC_STAT_DETAIL.TOTAL        ] =  0, -- 所有命中总伤害
+				[DK_REC_STAT_DETAIL.TOTAL_EFFECT ] =  0, -- 所有命中总有效伤害
+				[DK_REC_STAT_DETAIL.AVG          ] =  0, -- 所有命中平均伤害
+				[DK_REC_STAT_DETAIL.NZ_AVG       ] =  0, -- 所有非零值命中平均伤害
+				[DK_REC_STAT_DETAIL.AVG_EFFECT   ] =  0, -- 所有命中平均有效伤害
+				[DK_REC_STAT_DETAIL.NZ_AVG_EFFECT] =  0, -- 所有非零值命中平均有效伤害
 			}
 			tDst[DK_REC_STAT.DETAIL][nType] = tDstDetail
 		end
-		tDstDetail.nCount       = tDstDetail.nCount + tSrcDetail.nCount
-		tDstDetail.nNzCount     = tDstDetail.nNzCount + tSrcDetail.nNzCount
-		tDstDetail.nMax         = max(tDstDetail.nMax, tSrcDetail.nMax)
-		tDstDetail.nMaxEffect   = max(tDstDetail.nMaxEffect, tSrcDetail.nMaxEffect)
-		tDstDetail.nMin         = Min(tDstDetail.nMin, tSrcDetail.nMin)
-		tDstDetail.nNzMin       = Min(tDstDetail.nNzMin, tSrcDetail.nNzMin)
-		tDstDetail.nMinEffect   = Min(tDstDetail.nMinEffect, tSrcDetail.nMinEffect)
-		tDstDetail.nNzMinEffect = Min(tDstDetail.nNzMinEffect, tSrcDetail.nNzMinEffect)
-		tDstDetail.nTotal       = tDstDetail.nTotal + tSrcDetail.nTotal
-		tDstDetail.nTotalEffect = tDstDetail.nTotalEffect + tSrcDetail.nTotalEffect
-		tDstDetail.nAvg         = floor(tDstDetail.nTotal / tDstDetail.nCount)
-		tDstDetail.nNzAvg       = floor(tDstDetail.nTotal / tDstDetail.nNzCount)
-		tDstDetail.nAvgEffect   = floor(tDstDetail.nTotalEffect / tDstDetail.nCount)
-		tDstDetail.nNzAvgEffect = floor(tDstDetail.nTotalEffect / tDstDetail.nNzCount)
+		tDstDetail[DK_REC_STAT_DETAIL.COUNT        ] = tDstDetail[DK_REC_STAT_DETAIL.COUNT] + tSrcDetail[DK_REC_STAT_DETAIL.COUNT]
+		tDstDetail[DK_REC_STAT_DETAIL.NZ_COUNT     ] = tDstDetail[DK_REC_STAT_DETAIL.NZ_COUNT] + tSrcDetail[DK_REC_STAT_DETAIL.NZ_COUNT]
+		tDstDetail[DK_REC_STAT_DETAIL.MAX          ] = max(tDstDetail[DK_REC_STAT_DETAIL.MAX], tSrcDetail[DK_REC_STAT_DETAIL.MAX])
+		tDstDetail[DK_REC_STAT_DETAIL.MAX_EFFECT   ] = max(tDstDetail[DK_REC_STAT_DETAIL.MAX_EFFECT], tSrcDetail[DK_REC_STAT_DETAIL.MAX_EFFECT])
+		tDstDetail[DK_REC_STAT_DETAIL.MIN          ] = Min(tDstDetail[DK_REC_STAT_DETAIL.MIN], tSrcDetail[DK_REC_STAT_DETAIL.MIN])
+		tDstDetail[DK_REC_STAT_DETAIL.NZ_MIN       ] = Min(tDstDetail[DK_REC_STAT_DETAIL.NZ_MIN], tSrcDetail[DK_REC_STAT_DETAIL.NZ_MIN])
+		tDstDetail[DK_REC_STAT_DETAIL.MIN_EFFECT   ] = Min(tDstDetail[DK_REC_STAT_DETAIL.MIN_EFFECT], tSrcDetail[DK_REC_STAT_DETAIL.MIN_EFFECT])
+		tDstDetail[DK_REC_STAT_DETAIL.NZ_MIN_EFFECT] = Min(tDstDetail[DK_REC_STAT_DETAIL.NZ_MIN_EFFECT], tSrcDetail[DK_REC_STAT_DETAIL.NZ_MIN_EFFECT])
+		tDstDetail[DK_REC_STAT_DETAIL.TOTAL        ] = tDstDetail[DK_REC_STAT_DETAIL.TOTAL] + tSrcDetail[DK_REC_STAT_DETAIL.TOTAL]
+		tDstDetail[DK_REC_STAT_DETAIL.TOTAL_EFFECT ] = tDstDetail[DK_REC_STAT_DETAIL.TOTAL_EFFECT] + tSrcDetail[DK_REC_STAT_DETAIL.TOTAL_EFFECT]
+		tDstDetail[DK_REC_STAT_DETAIL.AVG          ] = floor(tDstDetail[DK_REC_STAT_DETAIL.TOTAL] / tDstDetail[DK_REC_STAT_DETAIL.COUNT])
+		tDstDetail[DK_REC_STAT_DETAIL.NZ_AVG       ] = floor(tDstDetail[DK_REC_STAT_DETAIL.TOTAL] / tDstDetail[DK_REC_STAT_DETAIL.NZ_COUNT])
+		tDstDetail[DK_REC_STAT_DETAIL.AVG_EFFECT   ] = floor(tDstDetail[DK_REC_STAT_DETAIL.TOTAL_EFFECT] / tDstDetail[DK_REC_STAT_DETAIL.COUNT])
+		tDstDetail[DK_REC_STAT_DETAIL.NZ_AVG_EFFECT] = floor(tDstDetail[DK_REC_STAT_DETAIL.TOTAL_EFFECT] / tDstDetail[DK_REC_STAT_DETAIL.NZ_COUNT])
 	end
 	------------------------
 	-- # 节： tRecord.Skill
@@ -1342,98 +1424,98 @@ function D.MergeTargetData(tDst, tSrc, data, szChannel, bMergeNpc, bMergeEffect,
 			local tDstSkill = tDst[DK_REC_STAT.SKILL][id]
 			if not tDstSkill then
 				tDstSkill = {
-					nCount       =  0, -- 该玩家四象轮回释放次数（假设szEffectName是四象轮回）
-					nNzCount     =  0, -- 该玩家非零值四象轮回释放次数
-					nMax         =  0, -- 该玩家四象轮回最大输出量
-					nMaxEffect   =  0, -- 该玩家四象轮回最大有效输出量
-					nTotal       =  0, -- 该玩家四象轮回输出量总和
-					nTotalEffect =  0, -- 该玩家四象轮回有效输出量总和
-					nAvg         =  0, -- 该玩家所有四象轮回平均伤害
-					nNzAvg       =  0, -- 该玩家所有非零值四象轮回平均伤害
-					nAvgEffect   =  0, -- 该玩家所有四象轮回平均有效伤害
-					nNzAvgEffect =  0, -- 该玩家所有非零值四象轮回平均有效伤害
-					Detail       = {}, -- 该玩家四象轮回输出结果分类统计
-					Target       = {}, -- 该玩家四象轮回承受者统计
+					[DK_REC_STAT_SKILL.COUNT        ] =  0, -- 该玩家四象轮回释放次数（假设szEffectName是四象轮回）
+					[DK_REC_STAT_SKILL.NZ_COUNT     ] =  0, -- 该玩家非零值四象轮回释放次数
+					[DK_REC_STAT_SKILL.MAX          ] =  0, -- 该玩家四象轮回最大输出量
+					[DK_REC_STAT_SKILL.MAX_EFFECT   ] =  0, -- 该玩家四象轮回最大有效输出量
+					[DK_REC_STAT_SKILL.TOTAL        ] =  0, -- 该玩家四象轮回输出量总和
+					[DK_REC_STAT_SKILL.TOTAL_EFFECT ] =  0, -- 该玩家四象轮回有效输出量总和
+					[DK_REC_STAT_SKILL.AVG          ] =  0, -- 该玩家所有四象轮回平均伤害
+					[DK_REC_STAT_SKILL.NZ_AVG       ] =  0, -- 该玩家所有非零值四象轮回平均伤害
+					[DK_REC_STAT_SKILL.AVG_EFFECT   ] =  0, -- 该玩家所有四象轮回平均有效伤害
+					[DK_REC_STAT_SKILL.NZ_AVG_EFFECT] =  0, -- 该玩家所有非零值四象轮回平均有效伤害
+					[DK_REC_STAT_SKILL.DETAIL       ] = {}, -- 该玩家四象轮回输出结果分类统计
+					[DK_REC_STAT_SKILL.TARGET       ] = {}, -- 该玩家四象轮回承受者统计
 				}
 				tDst[DK_REC_STAT.SKILL][id] = tDstSkill
 			end
-			tDstSkill.nCount       = tDstSkill.nCount + tSrcSkill.nCount
-			tDstSkill.nNzCount     = tDstSkill.nNzCount + tSrcSkill.nNzCount
-			tDstSkill.nMax         = max(tDstSkill.nMax, tSrcSkill.nMax)
-			tDstSkill.nMaxEffect   = max(tDstSkill.nMaxEffect, tSrcSkill.nMaxEffect)
-			tDstSkill.nTotal       = tDstSkill.nTotal + tSrcSkill.nTotal
-			tDstSkill.nTotalEffect = tDstSkill.nTotalEffect + tSrcSkill.nTotalEffect
-			tDstSkill.nAvg         = floor(tDstSkill.nTotal / tDstSkill.nCount)
-			tDstSkill.nAvgEffect   = floor(tDstSkill.nTotalEffect / tDstSkill.nCount)
-			tDstSkill.nNzAvg       = floor(tDstSkill.nTotal / tDstSkill.nNzCount)
-			tDstSkill.nNzAvgEffect = floor(tDstSkill.nTotalEffect / tDstSkill.nNzCount)
+			tDstSkill[DK_REC_STAT_SKILL.COUNT        ] = tDstSkill[DK_REC_STAT_SKILL.COUNT] + tSrcSkill[DK_REC_STAT_SKILL.COUNT]
+			tDstSkill[DK_REC_STAT_SKILL.NZ_COUNT     ] = tDstSkill[DK_REC_STAT_SKILL.NZ_COUNT] + tSrcSkill[DK_REC_STAT_SKILL.NZ_COUNT]
+			tDstSkill[DK_REC_STAT_SKILL.MAX          ] = max(tDstSkill[DK_REC_STAT_SKILL.MAX], tSrcSkill[DK_REC_STAT_SKILL.MAX])
+			tDstSkill[DK_REC_STAT_SKILL.MAX_EFFECT   ] = max(tDstSkill[DK_REC_STAT_SKILL.MAX_EFFECT], tSrcSkill[DK_REC_STAT_SKILL.MAX_EFFECT])
+			tDstSkill[DK_REC_STAT_SKILL.TOTAL        ] = tDstSkill[DK_REC_STAT_SKILL.TOTAL] + tSrcSkill[DK_REC_STAT_SKILL.TOTAL]
+			tDstSkill[DK_REC_STAT_SKILL.TOTAL_EFFECT ] = tDstSkill[DK_REC_STAT_SKILL.TOTAL_EFFECT] + tSrcSkill[DK_REC_STAT_SKILL.TOTAL_EFFECT]
+			tDstSkill[DK_REC_STAT_SKILL.AVG          ] = floor(tDstSkill[DK_REC_STAT_SKILL.TOTAL] / tDstSkill[DK_REC_STAT_SKILL.COUNT])
+			tDstSkill[DK_REC_STAT_SKILL.AVG_EFFECT   ] = floor(tDstSkill[DK_REC_STAT_SKILL.TOTAL_EFFECT] / tDstSkill[DK_REC_STAT_SKILL.COUNT])
+			tDstSkill[DK_REC_STAT_SKILL.NZ_AVG       ] = floor(tDstSkill[DK_REC_STAT_SKILL.TOTAL] / tDstSkill[DK_REC_STAT_SKILL.NZ_COUNT])
+			tDstSkill[DK_REC_STAT_SKILL.NZ_AVG_EFFECT] = floor(tDstSkill[DK_REC_STAT_SKILL.TOTAL_EFFECT] / tDstSkill[DK_REC_STAT_SKILL.NZ_COUNT])
 			---------------------------------
 			-- # 节： tRecord.Skill[x].Detail
 			---------------------------------
 			-- 合并技能详情统计（四象轮回的命中、会心...）
-			for nType, tSrcSkillDetail in pairs(tSrcSkill.Detail) do
-				local tDstSkillDetail = tDstSkill.Detail[nType]
+			for nType, tSrcSkillDetail in pairs(tSrcSkill[DK_REC_STAT_SKILL.DETAIL]) do
+				local tDstSkillDetail = tDstSkill[DK_REC_STAT_SKILL.DETAIL][nType]
 				if not tDstSkillDetail then
 					tDstSkillDetail = {
-						nCount       =  0, -- 命中记录数量
-						nNzCount     =  0, -- 非零值命中记录数量
-						nMax         =  0, -- 单次命中最大值
-						nMaxEffect   =  0, -- 单次命中最大有效值
-						nMin         = -1, -- 单次命中最小值
-						nNzMin       = -1, -- 单次非零值命中最小值
-						nMinEffect   = -1, -- 单次命中最小有效值
-						nNzMinEffect = -1, -- 单次非零值命中最小有效值
-						nTotal       =  0, -- 所以命中总伤害
-						nTotalEffect =  0, -- 所有命中总有效伤害
-						nAvg         =  0, -- 所有命中平均伤害
-						nNzAvg       =  0, -- 所有非零值命中平均伤害
-						nAvgEffect   =  0, -- 所有命中平均有效伤害
-						nNzAvgEffect =  0, -- 所有非零值命中平均有效伤害
+						[DK_REC_STAT_SKILL_DETAIL.COUNT        ] =  0, -- 命中记录数量
+						[DK_REC_STAT_SKILL_DETAIL.NZ_COUNT     ] =  0, -- 非零值命中记录数量
+						[DK_REC_STAT_SKILL_DETAIL.MAX          ] =  0, -- 单次命中最大值
+						[DK_REC_STAT_SKILL_DETAIL.MAX_EFFECT   ] =  0, -- 单次命中最大有效值
+						[DK_REC_STAT_SKILL_DETAIL.MIN          ] = -1, -- 单次命中最小值
+						[DK_REC_STAT_SKILL_DETAIL.NZ_MIN       ] = -1, -- 单次非零值命中最小值
+						[DK_REC_STAT_SKILL_DETAIL.MIN_EFFECT   ] = -1, -- 单次命中最小有效值
+						[DK_REC_STAT_SKILL_DETAIL.NZ_MIN_EFFECT] = -1, -- 单次非零值命中最小有效值
+						[DK_REC_STAT_SKILL_DETAIL.TOTAL        ] =  0, -- 所以命中总伤害
+						[DK_REC_STAT_SKILL_DETAIL.TOTAL_EFFECT ] =  0, -- 所有命中总有效伤害
+						[DK_REC_STAT_SKILL_DETAIL.AVG          ] =  0, -- 所有命中平均伤害
+						[DK_REC_STAT_SKILL_DETAIL.NZ_AVG       ] =  0, -- 所有非零值命中平均伤害
+						[DK_REC_STAT_SKILL_DETAIL.AVG_EFFECT   ] =  0, -- 所有命中平均有效伤害
+						[DK_REC_STAT_SKILL_DETAIL.NZ_AVG_EFFECT] =  0, -- 所有非零值命中平均有效伤害
 					}
-					tDstSkill.Detail[nType] = tDstSkillDetail
+					tDstSkill[DK_REC_STAT_SKILL.DETAIL][nType] = tDstSkillDetail
 				end
-				tDstSkillDetail.nCount       = tDstSkillDetail.nCount + tSrcSkillDetail.nCount
-				tDstSkillDetail.nNzCount     = tDstSkillDetail.nNzCount + tSrcSkillDetail.nNzCount
-				tDstSkillDetail.nMax         = max(tDstSkillDetail.nMax, tSrcSkillDetail.nMax)
-				tDstSkillDetail.nMaxEffect   = max(tDstSkillDetail.nMaxEffect, tSrcSkillDetail.nMaxEffect)
-				tDstSkillDetail.nMin         = Min(tDstSkillDetail.nMin, tSrcSkillDetail.nMin)
-				tDstSkillDetail.nNzMin       = Min(tDstSkillDetail.nNzMin, tSrcSkillDetail.nNzMin)
-				tDstSkillDetail.nMinEffect   = Min(tDstSkillDetail.nMinEffect, tSrcSkillDetail.nMinEffect)
-				tDstSkillDetail.nNzMinEffect = Min(tDstSkillDetail.nNzMinEffect, tSrcSkillDetail.nNzMinEffect)
-				tDstSkillDetail.nTotal       = tDstSkillDetail.nTotal + tSrcSkillDetail.nTotal
-				tDstSkillDetail.nTotalEffect = tDstSkillDetail.nTotalEffect + tSrcSkillDetail.nTotalEffect
-				tDstSkillDetail.nAvg         = floor(tDstSkillDetail.nTotal / tDstSkillDetail.nCount)
-				tDstSkillDetail.nNzAvg       = floor(tDstSkillDetail.nTotal / tDstSkillDetail.nNzCount)
-				tDstSkillDetail.nAvgEffect   = floor(tDstSkillDetail.nTotalEffect / tDstSkillDetail.nCount)
-				tDstSkillDetail.nNzAvgEffect = floor(tDstSkillDetail.nTotalEffect / tDstSkillDetail.nNzCount)
+				tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.COUNT        ] = tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.COUNT] + tSrcSkillDetail[DK_REC_STAT_SKILL_DETAIL.COUNT]
+				tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.NZ_COUNT     ] = tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.NZ_COUNT] + tSrcSkillDetail[DK_REC_STAT_SKILL_DETAIL.NZ_COUNT]
+				tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.MAX          ] = max(tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.MAX], tSrcSkillDetail[DK_REC_STAT_SKILL_DETAIL.MAX])
+				tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.MAX_EFFECT   ] = max(tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.MAX_EFFECT], tSrcSkillDetail[DK_REC_STAT_SKILL_DETAIL.MAX_EFFECT])
+				tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.MIN          ] = Min(tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.MIN], tSrcSkillDetail[DK_REC_STAT_SKILL_DETAIL.MIN])
+				tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.NZ_MIN       ] = Min(tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.NZ_MIN], tSrcSkillDetail[DK_REC_STAT_SKILL_DETAIL.NZ_MIN])
+				tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.MIN_EFFECT   ] = Min(tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.MIN_EFFECT], tSrcSkillDetail[DK_REC_STAT_SKILL_DETAIL.MIN_EFFECT])
+				tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.NZ_MIN_EFFECT] = Min(tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.NZ_MIN_EFFECT], tSrcSkillDetail[DK_REC_STAT_SKILL_DETAIL.NZ_MIN_EFFECT])
+				tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.TOTAL        ] = tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.TOTAL] + tSrcSkillDetail[DK_REC_STAT_SKILL_DETAIL.TOTAL]
+				tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.TOTAL_EFFECT ] = tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.TOTAL_EFFECT] + tSrcSkillDetail[DK_REC_STAT_SKILL_DETAIL.TOTAL_EFFECT]
+				tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.AVG          ] = floor(tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.TOTAL] / tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.COUNT])
+				tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.NZ_AVG       ] = floor(tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.TOTAL] / tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.NZ_COUNT])
+				tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.AVG_EFFECT   ] = floor(tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.TOTAL_EFFECT] / tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.COUNT])
+				tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.NZ_AVG_EFFECT] = floor(tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.TOTAL_EFFECT] / tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.NZ_COUNT])
 			end
 			------------------------------
 			-- # 节： tRecord.Skill.Target
 			------------------------------
 			-- 合并技能目标统计（四象轮回对江湖试炼木桩、江湖初级木桩...）
-			for dwID, tSrcSkillTarget in pairs(tSrcSkill.Target) do
+			for dwID, tSrcSkillTarget in pairs(tSrcSkill[DK_REC_STAT_SKILL.TARGET]) do
 				local id = bMergeNpc and D.GetNameAusID(data, dwID) or dwID
-				local tDstSkillTarget = tDstSkill.Target[id]
+				local tDstSkillTarget = tDstSkill[DK_REC_STAT_SKILL.TARGET][id]
 				if not tDstSkillTarget then
 					tDstSkillTarget = {
-						nMax         =  0, -- 该玩家四象轮回击中的这个玩家最大伤害
-						nMaxEffect   =  0, -- 该玩家四象轮回击中的这个玩家最大有效伤害
-						nTotal       =  0, -- 该玩家四象轮回击中的这个玩家伤害总和
-						nTotalEffect =  0, -- 该玩家四象轮回击中的这个玩家有效伤害总和
-						Count        = {}, -- 该玩家四象轮回击中的这个玩家结果统计
-						NzCount      = {}, -- 该玩家非零值四象轮回击中的这个玩家结果统计
+						[DK_REC_STAT_SKILL_TARGET.MAX         ] = 0, -- 该玩家四象轮回击中的这个玩家最大伤害
+						[DK_REC_STAT_SKILL_TARGET.MAX_EFFECT  ] = 0, -- 该玩家四象轮回击中的这个玩家最大有效伤害
+						[DK_REC_STAT_SKILL_TARGET.TOTAL       ] = 0, -- 该玩家四象轮回击中的这个玩家伤害总和
+						[DK_REC_STAT_SKILL_TARGET.TOTAL_EFFECT] = 0, -- 该玩家四象轮回击中的这个玩家有效伤害总和
+						[DK_REC_STAT_SKILL_TARGET.COUNT       ] = {}, -- 该玩家四象轮回击中的这个玩家结果统计
+						[DK_REC_STAT_SKILL_TARGET.NZ_COUNT    ] = {}, -- 该玩家非零值四象轮回击中的这个玩家结果统计
 					}
-					tDstSkill.Target[id] = tDstSkillTarget
+					tDstSkill[DK_REC_STAT_SKILL.TARGET][id] = tDstSkillTarget
 				end
-				tDstSkillTarget.nMax         = tDstSkillTarget.nMax + tSrcSkillTarget.nMax
-				tDstSkillTarget.nMaxEffect   = tDstSkillTarget.nMaxEffect + tSrcSkillTarget.nMaxEffect
-				tDstSkillTarget.nTotal       = tDstSkillTarget.nTotal + tSrcSkillTarget.nTotal
-				tDstSkillTarget.nTotalEffect = tDstSkillTarget.nTotalEffect + tSrcSkillTarget.nTotalEffect
-				for k, v in pairs(tSrcSkillTarget.Count) do
-					tDstSkillTarget.Count[k] = (tDstSkillTarget.Count[k] or 0) + v
+				tDstSkillTarget[DK_REC_STAT_SKILL_TARGET.MAX         ] = tDstSkillTarget[DK_REC_STAT_SKILL_TARGET.MAX] + tSrcSkillTarget[DK_REC_STAT_SKILL_TARGET.MAX]
+				tDstSkillTarget[DK_REC_STAT_SKILL_TARGET.MAX_EFFECT  ] = tDstSkillTarget[DK_REC_STAT_SKILL_TARGET.MAX_EFFECT] + tSrcSkillTarget[DK_REC_STAT_SKILL_TARGET.MAX_EFFECT]
+				tDstSkillTarget[DK_REC_STAT_SKILL_TARGET.TOTAL       ] = tDstSkillTarget[DK_REC_STAT_SKILL_TARGET.TOTAL] + tSrcSkillTarget[DK_REC_STAT_SKILL_TARGET.TOTAL]
+				tDstSkillTarget[DK_REC_STAT_SKILL_TARGET.TOTAL_EFFECT] = tDstSkillTarget[DK_REC_STAT_SKILL_TARGET.TOTAL_EFFECT] + tSrcSkillTarget[DK_REC_STAT_SKILL_TARGET.TOTAL_EFFECT]
+				for k, v in pairs(tSrcSkillTarget[DK_REC_STAT_SKILL_TARGET.COUNT]) do
+					tDstSkillTarget[DK_REC_STAT_SKILL_TARGET.COUNT][k] = (tDstSkillTarget[DK_REC_STAT_SKILL_TARGET.COUNT][k] or 0) + v
 				end
-				for k, v in pairs(tSrcSkillTarget.NzCount) do
-					tDstSkillTarget.NzCount[k] = (tDstSkillTarget.NzCount[k] or 0) + v
+				for k, v in pairs(tSrcSkillTarget[DK_REC_STAT_SKILL_TARGET.NZ_COUNT]) do
+					tDstSkillTarget[DK_REC_STAT_SKILL_TARGET.NZ_COUNT][k] = (tDstSkillTarget[DK_REC_STAT_SKILL_TARGET.NZ_COUNT][k] or 0) + v
 				end
 			end
 		end
@@ -1447,101 +1529,101 @@ function D.MergeTargetData(tDst, tSrc, data, szChannel, bMergeNpc, bMergeEffect,
 		local tDstTarget = tDst[DK_REC_STAT.TARGET][id]
 		if not tDstTarget then
 			tDstTarget = {
-				nCount       =  0, -- 该玩家对idTarget的技能释放次数
-				nNzCount     =  0, -- 该玩家对idTarget的非零值技能释放次数
-				nMax         =  0, -- 该玩家对idTarget的技能最大输出量
-				nMaxEffect   =  0, -- 该玩家对idTarget的技能最大有效输出量
-				nTotal       =  0, -- 该玩家对idTarget的技能输出量总和
-				nTotalEffect =  0, -- 该玩家对idTarget的技能有效输出量总和
-				nAvg         =  0, -- 该玩家对idTarget的技能平均输出量
-				nNzAvg       =  0, -- 该玩家对idTarget的非零值技能平均输出量
-				nAvgEffect   =  0, -- 该玩家对idTarget的技能平均有效输出量
-				nNzAvgEffect =  0, -- 该玩家对idTarget的非零值技能平均有效输出量
-				Detail       = {}, -- 该玩家对idTarget的技能输出结果分类统计
-				Skill        = {}, -- 该玩家对idTarget的技能具体分别统计
+				[DK_REC_STAT_TARGET.COUNT        ] =  0, -- 该玩家对idTarget的技能释放次数
+				[DK_REC_STAT_TARGET.NZ_COUNT     ] =  0, -- 该玩家对idTarget的非零值技能释放次数
+				[DK_REC_STAT_TARGET.MAX          ] =  0, -- 该玩家对idTarget的技能最大输出量
+				[DK_REC_STAT_TARGET.MAX_EFFECT   ] =  0, -- 该玩家对idTarget的技能最大有效输出量
+				[DK_REC_STAT_TARGET.TOTAL        ] =  0, -- 该玩家对idTarget的技能输出量总和
+				[DK_REC_STAT_TARGET.TOTAL_EFFECT ] =  0, -- 该玩家对idTarget的技能有效输出量总和
+				[DK_REC_STAT_TARGET.AVG          ] =  0, -- 该玩家对idTarget的技能平均输出量
+				[DK_REC_STAT_TARGET.NZ_AVG       ] =  0, -- 该玩家对idTarget的非零值技能平均输出量
+				[DK_REC_STAT_TARGET.AVG_EFFECT   ] =  0, -- 该玩家对idTarget的技能平均有效输出量
+				[DK_REC_STAT_TARGET.NZ_AVG_EFFECT] =  0, -- 该玩家对idTarget的非零值技能平均有效输出量
+				[DK_REC_STAT_TARGET.DETAIL       ] = {}, -- 该玩家对idTarget的技能输出结果分类统计
+				[DK_REC_STAT_TARGET.SKILL        ] = {}, -- 该玩家对idTarget的技能具体分别统计
 			}
 			tDst[DK_REC_STAT.TARGET][id] = tDstTarget
 		end
-		tDstTarget.nCount       = tDstTarget.nCount + tSrcTarget.nCount
-		tDstTarget.nNzCount     = tDstTarget.nNzCount + tSrcTarget.nNzCount
-		tDstTarget.nMax         = max(tDstTarget.nMax, tSrcTarget.nMax)
-		tDstTarget.nMaxEffect   = max(tDstTarget.nMaxEffect, tSrcTarget.nMaxEffect)
-		tDstTarget.nTotal       = tDstTarget.nTotal + tSrcTarget.nTotal
-		tDstTarget.nTotalEffect = tDstTarget.nTotalEffect + tSrcTarget.nTotalEffect
-		tDstTarget.nAvg         = floor(tDstTarget.nTotal / tDstTarget.nCount)
-		tDstTarget.nAvgEffect   = floor(tDstTarget.nTotalEffect / tDstTarget.nCount)
-		tDstTarget.nNzAvg       = floor(tDstTarget.nTotal / tDstTarget.nNzCount)
-		tDstTarget.nNzAvgEffect = floor(tDstTarget.nTotalEffect / tDstTarget.nNzCount)
+		tDstTarget[DK_REC_STAT_TARGET.COUNT        ] = tDstTarget[DK_REC_STAT_TARGET.COUNT] + tSrcTarget[DK_REC_STAT_TARGET.COUNT]
+		tDstTarget[DK_REC_STAT_TARGET.NZ_COUNT     ] = tDstTarget[DK_REC_STAT_TARGET.NZ_COUNT] + tSrcTarget[DK_REC_STAT_TARGET.NZ_COUNT]
+		tDstTarget[DK_REC_STAT_TARGET.MAX          ] = max(tDstTarget[DK_REC_STAT_TARGET.MAX], tSrcTarget[DK_REC_STAT_TARGET.MAX])
+		tDstTarget[DK_REC_STAT_TARGET.MAX_EFFECT   ] = max(tDstTarget[DK_REC_STAT_TARGET.MAX_EFFECT], tSrcTarget[DK_REC_STAT_TARGET.MAX_EFFECT])
+		tDstTarget[DK_REC_STAT_TARGET.TOTAL        ] = tDstTarget[DK_REC_STAT_TARGET.TOTAL] + tSrcTarget[DK_REC_STAT_TARGET.TOTAL]
+		tDstTarget[DK_REC_STAT_TARGET.TOTAL_EFFECT ] = tDstTarget[DK_REC_STAT_TARGET.TOTAL_EFFECT] + tSrcTarget[DK_REC_STAT_TARGET.TOTAL_EFFECT]
+		tDstTarget[DK_REC_STAT_TARGET.AVG          ] = floor(tDstTarget[DK_REC_STAT_TARGET.TOTAL] / tDstTarget[DK_REC_STAT_TARGET.COUNT])
+		tDstTarget[DK_REC_STAT_TARGET.AVG_EFFECT   ] = floor(tDstTarget[DK_REC_STAT_TARGET.TOTAL_EFFECT] / tDstTarget[DK_REC_STAT_TARGET.COUNT])
+		tDstTarget[DK_REC_STAT_TARGET.NZ_AVG       ] = floor(tDstTarget[DK_REC_STAT_TARGET.TOTAL] / tDstTarget[DK_REC_STAT_TARGET.NZ_COUNT])
+		tDstTarget[DK_REC_STAT_TARGET.NZ_AVG_EFFECT] = floor(tDstTarget[DK_REC_STAT_TARGET.TOTAL_EFFECT] / tDstTarget[DK_REC_STAT_TARGET.NZ_COUNT])
 		----------------------------------
 		-- # 节： tRecord.Target[x].Detail
 		----------------------------------
 		-- 合并目标技能详情统计（四象轮回的命中、会心...）
-		for nType, tSrcTargetDetail in pairs(tSrcTarget.Detail) do
-			local tDstTargetDetail = tDstTarget.Detail[nType]
+		for nType, tSrcTargetDetail in pairs(tSrcTarget[DK_REC_STAT_TARGET.DETAIL]) do
+			local tDstTargetDetail = tDstTarget[DK_REC_STAT_TARGET.DETAIL][nType]
 			if not tDstTargetDetail then
 				tDstTargetDetail = {
-					nCount       =  0, -- 命中记录数量（假设nSkillResult是命中）
-					nNzCount     =  0, -- 非零值命中记录数量
-					nMax         =  0, -- 单次命中最大值
-					nMaxEffect   =  0, -- 单次命中最大有效值
-					nMin         = -1, -- 单次命中最小值
-					nNzMin       = -1, -- 单次非零值命中最小值
-					nMinEffect   = -1, -- 单次命中最小有效值
-					nNzMinEffect = -1, -- 单次非零值命中最小有效值
-					nTotal       =  0, -- 所以命中总伤害
-					nTotalEffect =  0, -- 所有命中总有效伤害
-					nAvg         =  0, -- 所有命中平均伤害
-					nNzAvg       =  0, -- 所有非零值命中平均伤害
-					nAvgEffect   =  0, -- 所有命中平均有效伤害
-					nNzAvgEffect =  0, -- 所有非零值命中平均有效伤害
+					[DK_REC_STAT_TARGET_DETAIL.COUNT        ] =  0, -- 命中记录数量（假设nSkillResult是命中）
+					[DK_REC_STAT_TARGET_DETAIL.NZ_COUNT     ] =  0, -- 非零值命中记录数量
+					[DK_REC_STAT_TARGET_DETAIL.MAX          ] =  0, -- 单次命中最大值
+					[DK_REC_STAT_TARGET_DETAIL.MAX_EFFECT   ] =  0, -- 单次命中最大有效值
+					[DK_REC_STAT_TARGET_DETAIL.MIN          ] = -1, -- 单次命中最小值
+					[DK_REC_STAT_TARGET_DETAIL.NZ_MIN       ] = -1, -- 单次非零值命中最小值
+					[DK_REC_STAT_TARGET_DETAIL.MIN_EFFECT   ] = -1, -- 单次命中最小有效值
+					[DK_REC_STAT_TARGET_DETAIL.NZ_MIN_EFFECT] = -1, -- 单次非零值命中最小有效值
+					[DK_REC_STAT_TARGET_DETAIL.TOTAL        ] =  0, -- 所以命中总伤害
+					[DK_REC_STAT_TARGET_DETAIL.TOTAL_EFFECT ] =  0, -- 所有命中总有效伤害
+					[DK_REC_STAT_TARGET_DETAIL.AVG          ] =  0, -- 所有命中平均伤害
+					[DK_REC_STAT_TARGET_DETAIL.NZ_AVG       ] =  0, -- 所有非零值命中平均伤害
+					[DK_REC_STAT_TARGET_DETAIL.AVG_EFFECT   ] =  0, -- 所有命中平均有效伤害
+					[DK_REC_STAT_TARGET_DETAIL.NZ_AVG_EFFECT] =  0, -- 所有非零值命中平均有效伤害
 				}
-				tDstTarget.Detail[nType] = tDstTargetDetail
+				tDstTarget[DK_REC_STAT_TARGET.DETAIL][nType] = tDstTargetDetail
 			end
-			tDstTargetDetail.nCount       = tDstTargetDetail.nCount + tSrcTargetDetail.nCount
-			tDstTargetDetail.nNzCount     = tDstTargetDetail.nNzCount + tSrcTargetDetail.nNzCount
-			tDstTargetDetail.nMax         = max(tDstTargetDetail.nMax, tSrcTargetDetail.nMax)
-			tDstTargetDetail.nMaxEffect   = max(tDstTargetDetail.nMaxEffect, tSrcTargetDetail.nMaxEffect)
-			tDstTargetDetail.nMin         = Min(tDstTargetDetail.nMin, tSrcTargetDetail.nMin)
-			tDstTargetDetail.nNzMin       = Min(tDstTargetDetail.nNzMin, tSrcTargetDetail.nNzMin)
-			tDstTargetDetail.nMinEffect   = Min(tDstTargetDetail.nMinEffect, tSrcTargetDetail.nMinEffect)
-			tDstTargetDetail.nNzMinEffect = Min(tDstTargetDetail.nNzMinEffect, tSrcTargetDetail.nNzMinEffect)
-			tDstTargetDetail.nTotal       = tDstTargetDetail.nTotal + tSrcTargetDetail.nTotal
-			tDstTargetDetail.nTotalEffect = tDstTargetDetail.nTotalEffect + tSrcTargetDetail.nTotalEffect
-			tDstTargetDetail.nAvg         = floor(tDstTargetDetail.nTotal / tDstTargetDetail.nCount)
-			tDstTargetDetail.nNzAvg       = floor(tDstTargetDetail.nTotal / tDstTargetDetail.nNzCount)
-			tDstTargetDetail.nAvgEffect   = floor(tDstTargetDetail.nTotalEffect / tDstTargetDetail.nCount)
-			tDstTargetDetail.nNzAvgEffect = floor(tDstTargetDetail.nTotalEffect / tDstTargetDetail.nNzCount)
+			tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.COUNT        ] = tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.COUNT] + tSrcTargetDetail[DK_REC_STAT_TARGET_DETAIL.COUNT]
+			tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.NZ_COUNT     ] = tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.NZ_COUNT] + tSrcTargetDetail[DK_REC_STAT_TARGET_DETAIL.NZ_COUNT]
+			tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.MAX          ] = max(tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.MAX], tSrcTargetDetail[DK_REC_STAT_TARGET_DETAIL.MAX])
+			tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.MAX_EFFECT   ] = max(tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.MAX_EFFECT], tSrcTargetDetail[DK_REC_STAT_TARGET_DETAIL.MAX_EFFECT])
+			tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.MIN          ] = Min(tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.MIN], tSrcTargetDetail[DK_REC_STAT_TARGET_DETAIL.MIN])
+			tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.NZ_MIN       ] = Min(tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.NZ_MIN], tSrcTargetDetail[DK_REC_STAT_TARGET_DETAIL.NZ_MIN])
+			tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.MIN_EFFECT   ] = Min(tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.MIN_EFFECT], tSrcTargetDetail[DK_REC_STAT_TARGET_DETAIL.MIN_EFFECT])
+			tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.NZ_MIN_EFFECT] = Min(tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.NZ_MIN_EFFECT], tSrcTargetDetail[DK_REC_STAT_TARGET_DETAIL.NZ_MIN_EFFECT])
+			tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.TOTAL        ] = tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.TOTAL] + tSrcTargetDetail[DK_REC_STAT_TARGET_DETAIL.TOTAL]
+			tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.TOTAL_EFFECT ] = tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.TOTAL_EFFECT] + tSrcTargetDetail[DK_REC_STAT_TARGET_DETAIL.TOTAL_EFFECT]
+			tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.AVG          ] = floor(tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.TOTAL] / tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.COUNT])
+			tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.NZ_AVG       ] = floor(tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.TOTAL] / tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.NZ_COUNT])
+			tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.AVG_EFFECT   ] = floor(tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.TOTAL_EFFECT] / tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.COUNT])
+			tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.NZ_AVG_EFFECT] = floor(tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.TOTAL_EFFECT] / tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.NZ_COUNT])
 		end
 		---------------------------------
 		-- # 节： tRecord.Target[x].Skill
 		---------------------------------
 		-- 合并目标技能统计（江湖试炼木桩被四象轮回、两仪化形...）
-		for szEffectID, tSrcTargetSkill in pairs(tSrcTarget.Skill) do
+		for szEffectID, tSrcTargetSkill in pairs(tSrcTarget[DK_REC_STAT_TARGET.SKILL]) do
 			if not bHideAnonymous or not select(2, D.GetEffectInfoAusID(data, szEffectID)) then
 				local id = bMergeEffect
 					and D.GetEffectNameAusID(data, szEffectID)
 					or szEffectID
-				local tDstTargetSkill = tDstTarget.Skill[id]
+				local tDstTargetSkill = tDstTarget[DK_REC_STAT_TARGET.SKILL][id]
 				if not tDstTargetSkill then
 					tDstTargetSkill = {
-						nMax         =  0, -- 该玩家击中这个玩家的四象轮回最大伤害
-						nMaxEffect   =  0, -- 该玩家击中这个玩家的四象轮回最大有效伤害
-						nTotal       =  0, -- 该玩家击中这个玩家的四象轮回伤害总和
-						nTotalEffect =  0, -- 该玩家击中这个玩家的四象轮回有效伤害总和
-						Count        = {}, -- 该玩家击中这个玩家的四象轮回结果统计
-						NzCount      = {}, -- 该玩家非零值击中这个玩家的四象轮回结果统计
+						[DK_REC_STAT_TARGET_SKILL.MAX         ] = 0, -- 该玩家击中这个玩家的四象轮回最大伤害
+						[DK_REC_STAT_TARGET_SKILL.MAX_EFFECT  ] = 0, -- 该玩家击中这个玩家的四象轮回最大有效伤害
+						[DK_REC_STAT_TARGET_SKILL.TOTAL       ] = 0, -- 该玩家击中这个玩家的四象轮回伤害总和
+						[DK_REC_STAT_TARGET_SKILL.TOTAL_EFFECT] = 0, -- 该玩家击中这个玩家的四象轮回有效伤害总和
+						[DK_REC_STAT_TARGET_SKILL.COUNT       ] = {}, -- 该玩家击中这个玩家的四象轮回结果统计
+						[DK_REC_STAT_TARGET_SKILL.NZ_COUNT    ] = {}, -- 该玩家非零值击中这个玩家的四象轮回结果统计
 					}
-					tDstTarget.Skill[id] = tDstTargetSkill
+					tDstTarget[DK_REC_STAT_TARGET.SKILL][id] = tDstTargetSkill
 				end
-				tDstTargetSkill.nMax         = max(tDstTargetSkill.nMax, tSrcTargetSkill.nMax)
-				tDstTargetSkill.nMaxEffect   = max(tDstTargetSkill.nMaxEffect, tSrcTargetSkill.nMaxEffect)
-				tDstTargetSkill.nTotal       = tDstTargetSkill.nTotal + tSrcTargetSkill.nTotal
-				tDstTargetSkill.nTotalEffect = tDstTargetSkill.nTotalEffect + tSrcTargetSkill.nTotalEffect
-				for k, v in pairs(tSrcTargetSkill.Count) do
-					tDstTargetSkill.Count[k] = (tDstTargetSkill.Count[k] or 0) + v
+				tDstTargetSkill[DK_REC_STAT_TARGET_SKILL.MAX         ] = max(tDstTargetSkill[DK_REC_STAT_TARGET_SKILL.MAX], tSrcTargetSkill[DK_REC_STAT_TARGET_SKILL.MAX])
+				tDstTargetSkill[DK_REC_STAT_TARGET_SKILL.MAX_EFFECT  ] = max(tDstTargetSkill[DK_REC_STAT_TARGET_SKILL.MAX_EFFECT], tSrcTargetSkill[DK_REC_STAT_TARGET_SKILL.MAX_EFFECT])
+				tDstTargetSkill[DK_REC_STAT_TARGET_SKILL.TOTAL       ] = tDstTargetSkill[DK_REC_STAT_TARGET_SKILL.TOTAL] + tSrcTargetSkill[DK_REC_STAT_TARGET_SKILL.TOTAL]
+				tDstTargetSkill[DK_REC_STAT_TARGET_SKILL.TOTAL_EFFECT] = tDstTargetSkill[DK_REC_STAT_TARGET_SKILL.TOTAL_EFFECT] + tSrcTargetSkill[DK_REC_STAT_TARGET_SKILL.TOTAL_EFFECT]
+				for k, v in pairs(tSrcTargetSkill[DK_REC_STAT_TARGET_SKILL.COUNT]) do
+					tDstTargetSkill[DK_REC_STAT_TARGET_SKILL.COUNT][k] = (tDstTargetSkill[DK_REC_STAT_TARGET_SKILL.COUNT][k] or 0) + v
 				end
-				for k, v in pairs(tSrcTargetSkill.NzCount) do
-					tDstTargetSkill.NzCount[k] = (tDstTargetSkill.NzCount[k] or 0) + v
+				for k, v in pairs(tSrcTargetSkill[DK_REC_STAT_TARGET_SKILL.NZ_COUNT]) do
+					tDstTargetSkill[DK_REC_STAT_TARGET_SKILL.NZ_COUNT][k] = (tDstTargetSkill[DK_REC_STAT_TARGET_SKILL.NZ_COUNT][k] or 0) + v
 				end
 			end
 		end
@@ -1550,10 +1632,10 @@ end
 
 function D.GetMergeTargetData(data, szChannel, id, bMergeNpc, bMergeEffect, bHideAnonymous)
 	if not bMergeNpc and not bMergeEffect and not bHideAnonymous then
-		return data[szChannel][DK_REC.STATISTICS][id]
+		return data[szChannel][DK_REC.STAT][id]
 	end
 	local tData = nil
-	for dwID, tSrcData in pairs(data[szChannel][DK_REC.STATISTICS]) do
+	for dwID, tSrcData in pairs(data[szChannel][DK_REC.STAT]) do
 		if dwID == id or D.GetNameAusID(data, dwID) == id then
 			if not tData then
 				tData = {
@@ -1592,6 +1674,12 @@ local settings = {
 				DK_REC_SNAPSHOT_STAT = DK_REC_SNAPSHOT_STAT,
 				DK_REC_STAT = DK_REC_STAT,
 				DK_REC_STAT_DETAIL = DK_REC_STAT_DETAIL,
+				DK_REC_STAT_SKILL = DK_REC_STAT_SKILL,
+				DK_REC_STAT_SKILL_DETAIL = DK_REC_STAT_SKILL_DETAIL,
+				DK_REC_STAT_SKILL_TARGET = DK_REC_STAT_SKILL_TARGET,
+				DK_REC_STAT_TARGET = DK_REC_STAT_TARGET,
+				DK_REC_STAT_TARGET_DETAIL = DK_REC_STAT_TARGET_DETAIL,
+				DK_REC_STAT_TARGET_SKILL = DK_REC_STAT_TARGET_SKILL,
 			},
 		},
 		{

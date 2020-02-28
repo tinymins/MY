@@ -47,6 +47,18 @@ end
 --------------------------------------------------------------------------
 
 local DK = MY_Recount_DS.DK
+local DK_REC = MY_Recount_DS.DK_REC
+local DK_REC_SNAPSHOT = MY_Recount_DS.DK_REC_SNAPSHOT
+local DK_REC_SNAPSHOT_STAT = MY_Recount_DS.DK_REC_SNAPSHOT_STAT
+local DK_REC_STAT = MY_Recount_DS.DK_REC_STAT
+local DK_REC_STAT_DETAIL = MY_Recount_DS.DK_REC_STAT_DETAIL
+local DK_REC_STAT_SKILL = MY_Recount_DS.DK_REC_STAT_SKILL
+local DK_REC_STAT_SKILL_DETAIL = MY_Recount_DS.DK_REC_STAT_SKILL_DETAIL
+local DK_REC_STAT_SKILL_TARGET = MY_Recount_DS.DK_REC_STAT_SKILL_TARGET
+local DK_REC_STAT_TARGET = MY_Recount_DS.DK_REC_STAT_TARGET
+local DK_REC_STAT_TARGET_DETAIL = MY_Recount_DS.DK_REC_STAT_TARGET_DETAIL
+local DK_REC_STAT_TARGET_SKILL = MY_Recount_DS.DK_REC_STAT_TARGET_SKILL
+
 local STAT_TYPE = { -- 统计类型
 	DPS  = 1, -- 输出统计
 	HPS  = 2, -- 治疗统计
@@ -406,7 +418,7 @@ function D.GetHistoryMenu()
 	for _, data in ipairs(MY_Recount_DS.Get()) do
 		if data[DK.UUID] and data[DK.TIME_DURING] then
 			local t1 = {
-				szOption = (data.szBossName or ''):gsub('#.*', '') .. ' (' .. LIB.FormatTimeCounter(data[DK.TIME_DURING], '%M:%ss') .. ')',
+				szOption = (data[DK.BOSSNAME] or ''):gsub('#.*', '') .. ' (' .. LIB.FormatTimeCounter(data[DK.TIME_DURING], '%M:%ss') .. ')',
 				rgb = (data == DataDisplay and {255, 255, 0}) or nil,
 				fnAction = function()
 					if IsCtrlKeyDown() then
@@ -484,7 +496,7 @@ function D.GetPublishMenu()
 			'[' .. PACKET_INFO.SHORT_NAME .. ']'
 			.. _L['fight recount'] .. ' - '
 			.. frame:Lookup('Wnd_Title', 'Text_Title'):GetText()
-			.. ' ' .. ((DataDisplay.szBossName and ' - ' .. DataDisplay.szBossName) or '')
+			.. ' ' .. ((DataDisplay[DK.BOSSNAME] and ' - ' .. DataDisplay[DK.BOSSNAME]) or '')
 			.. '(' .. LIB.FormatTimeCounter(DataDisplay[DK.TIME_DURING], '%M:%ss') .. ')',
 			nil,
 			true

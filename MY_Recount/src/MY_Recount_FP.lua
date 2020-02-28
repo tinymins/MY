@@ -47,6 +47,18 @@ end
 --------------------------------------------------------------------------
 
 local DK = MY_Recount_DS.DK
+local DK_REC = MY_Recount_DS.DK_REC
+local DK_REC_SNAPSHOT = MY_Recount_DS.DK_REC_SNAPSHOT
+local DK_REC_SNAPSHOT_STAT = MY_Recount_DS.DK_REC_SNAPSHOT_STAT
+local DK_REC_STAT = MY_Recount_DS.DK_REC_STAT
+local DK_REC_STAT_DETAIL = MY_Recount_DS.DK_REC_STAT_DETAIL
+local DK_REC_STAT_SKILL = MY_Recount_DS.DK_REC_STAT_SKILL
+local DK_REC_STAT_SKILL_DETAIL = MY_Recount_DS.DK_REC_STAT_SKILL_DETAIL
+local DK_REC_STAT_SKILL_TARGET = MY_Recount_DS.DK_REC_STAT_SKILL_TARGET
+local DK_REC_STAT_TARGET = MY_Recount_DS.DK_REC_STAT_TARGET
+local DK_REC_STAT_TARGET_DETAIL = MY_Recount_DS.DK_REC_STAT_TARGET_DETAIL
+local DK_REC_STAT_TARGET_SKILL = MY_Recount_DS.DK_REC_STAT_TARGET_SKILL
+
 local D = {}
 local O = {}
 local PAGE_SIZE = 300

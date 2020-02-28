@@ -48,7 +48,17 @@ end
 
 local DK = MY_Recount_DS.DK
 local DK_REC = MY_Recount_DS.DK_REC
+local DK_REC_SNAPSHOT = MY_Recount_DS.DK_REC_SNAPSHOT
+local DK_REC_SNAPSHOT_STAT = MY_Recount_DS.DK_REC_SNAPSHOT_STAT
 local DK_REC_STAT = MY_Recount_DS.DK_REC_STAT
+local DK_REC_STAT_DETAIL = MY_Recount_DS.DK_REC_STAT_DETAIL
+local DK_REC_STAT_SKILL = MY_Recount_DS.DK_REC_STAT_SKILL
+local DK_REC_STAT_SKILL_DETAIL = MY_Recount_DS.DK_REC_STAT_SKILL_DETAIL
+local DK_REC_STAT_SKILL_TARGET = MY_Recount_DS.DK_REC_STAT_SKILL_TARGET
+local DK_REC_STAT_TARGET = MY_Recount_DS.DK_REC_STAT_TARGET
+local DK_REC_STAT_TARGET_DETAIL = MY_Recount_DS.DK_REC_STAT_TARGET_DETAIL
+local DK_REC_STAT_TARGET_SKILL = MY_Recount_DS.DK_REC_STAT_TARGET_SKILL
+
 local DISPLAY_MODE = { -- 统计显示
 	NPC    = 1, -- 只显示NPC
 	PLAYER = 2, -- 只显示玩家
@@ -230,7 +240,7 @@ function D.UpdateUI(frame)
 	elseif MY_Recount_UI.nChannel == STAT_TYPE.BHPS then  -- 承疗统计
 		tInfo, szUnit = data[DK.BE_HEAL], 'HPS'
 	end
-	local tRecord = tInfo[DK_REC.STATISTICS]
+	local tRecord = tInfo[DK_REC.STAT]
 
 	-- 计算战斗时间
 	local szTimeChannel = MY_Recount_UI.bSysTimeMode and STAT_TYPE_KEY[MY_Recount_UI.nChannel]
@@ -262,11 +272,10 @@ function D.UpdateUI(frame)
 			else -- 新数据
 				tRec = {
 					id           = id                                      ,
-					szMD5        = rec.szMD5                               ,
 					szName       = MY_Recount_DS.GetNameAusID(data, dwID)  ,
 					dwForceID    = MY_Recount_DS.GetForceAusID(data, dwID) ,
-					nValue       = rec[DK_REC_STAT.TOTAL] or 0       ,
-					nEffectValue = rec[DK_REC_STAT.TOTAL_EFFECT] or 0,
+					nValue       = rec[DK_REC_STAT.TOTAL] or 0             ,
+					nEffectValue = rec[DK_REC_STAT.TOTAL_EFFECT] or 0      ,
 					nTimeCount   = max( -- 计算战斗时间 防止计算DPS时除以0
 						MY_Recount_UI.bAwayMode
 							and MY_Recount_DS.GeneFightTime(data, szTimeChannel, dwID) -- 删去死亡时间
@@ -286,7 +295,6 @@ function D.UpdateUI(frame)
 			if not tResult[dwID] then
 				insert(aResult, {
 					id             = dwID              ,
-					-- szMD5          = info.szMD5        ,
 					szName         = info.szName       ,
 					dwForceID      = info.dwForceID    ,
 					nValue         = 0                 ,
@@ -330,11 +338,11 @@ function D.UpdateUI(frame)
 			tMyRec = p
 			tMyRec.nRank = i
 		end
-		local hItem = hList:Lookup('Handle_LI_' .. (p.szMD5 or p.id))
+		local hItem = hList:Lookup('Handle_LI_' .. p.id)
 		if not hItem then
 			hItem = hList:AppendItemFromIni(SZ_INI, 'Handle_Item')
 			hItem.OnItemRefreshTip = D.OnItemRefreshTip
-			hItem:SetName('Handle_LI_' .. (p.szMD5 or p.id))
+			hItem:SetName('Handle_LI_' .. p.id)
 			local css = FORCE_BAR_CSS[O.nCss][p.dwForceID] or {}
 			if css.image and css.frame then -- uitex, frame
 				hItem:Lookup('Image_PerFore'):FromUITex(css.image, css.frame)
@@ -584,12 +592,13 @@ function D.OnItemRefreshTip()
 				})
 			end
 			sort(t, function(p1, p2)
-				return p1.rec.nTotal > p2.rec.nTotal
+				return p1.rec[DK_REC_STAT_SKILL.TOTAL] > p2.rec[DK_REC_STAT_SKILL.TOTAL]
 			end)
 			for _, p in ipairs(t) do
-				if MY_Recount_UI.bShowZeroVal or p.rec.nTotal > 0 then
+				if MY_Recount_UI.bShowZeroVal or p.rec[DK_REC_STAT_SKILL.TOTAL] > 0 then
 					szXml = szXml .. GetFormatText(p.szName .. '\n', nil, 255, 150, 0)
-					szXml = szXml .. GetFormatText(_L['total: '] .. p.rec.nTotal .. ' ' .. _L['effect: '] .. p.rec.nTotalEffect .. '\n')
+					szXml = szXml .. GetFormatText(_L['total: '] .. p.rec[DK_REC_STAT_SKILL.TOTAL]
+						.. ' ' .. _L['effect: '] .. p.rec[DK_REC_STAT_SKILL.TOTAL_EFFECT] .. '\n')
 					for _, nSkillResult in ipairs({
 						SKILL_RESULT.HIT     ,
 						SKILL_RESULT.INSIGHT ,
@@ -597,10 +606,10 @@ function D.OnItemRefreshTip()
 						SKILL_RESULT.MISS    ,
 					}) do
 						local nCount = 0
-						if p.rec.Detail[nSkillResult] then
+						if p.rec[DK_REC_STAT_SKILL.DETAIL][nSkillResult] then
 							nCount = not MY_Recount_UI.bShowZeroVal
-								and p.rec.Detail[nSkillResult].nNzCount
-								or p.rec.Detail[nSkillResult].nCount
+								and p.rec[DK_REC_STAT_SKILL.DETAIL][nSkillResult][DK_REC_STAT_SKILL_DETAIL.NZ_COUNT]
+								or p.rec[DK_REC_STAT_SKILL.DETAIL][nSkillResult][DK_REC_STAT_SKILL_DETAIL.COUNT]
 						end
 						szXml = szXml .. GetFormatText(SKILL_RESULT_NAME[nSkillResult] .. szColon, nil, 255, 202, 126)
 						szXml = szXml .. GetFormatText(string.format('%2d', nCount) .. ' ')
