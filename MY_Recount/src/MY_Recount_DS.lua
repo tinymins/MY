@@ -70,8 +70,7 @@ local DK_REC = {
 	TIME_DURING  = DEBUG and 'nTimeDuring'  or 1,
 	TOTAL        = DEBUG and 'nTotal'       or 2,
 	TOTAL_EFFECT = DEBUG and 'nTotalEffect' or 3,
-	SNAPSHOTS    = DEBUG and 'Snapshots'    or 4,
-	STAT         = DEBUG and 'Statistics'   or 5,
+	STAT         = DEBUG and 'Statistics'   or 4,
 }
 
 local DK_REC_SNAPSHOT = {
@@ -227,20 +226,6 @@ Data = {
 		[DK_REC.TIME_DURING] = 最后一次记录时离开始的秒数,
 		[DK_REC.TOTAL] = 全队的输出量,
 		[DK_REC.TOTAL_EFFECT] = 全队的有效输出量,
-		[DK_REC.SNAPSHOTS] = {
-			{
-				[DK_REC_SNAPSHOT.TIME_DURING ] = 当前快照战斗秒数,
-				[DK_REC_SNAPSHOT.TOTAL       ] = 当前快照时间全队输出量,
-				[DK_REC_SNAPSHOT.TOTAL_EFFECT] = 当前快照时间全队有效输出量,
-				[DK_REC_SNAPSHOT.STATISTICS  ] = {
-					玩家的dwID = {
-						[DK_REC_SNAPSHOT_STAT.TOTAL       ] = 当前快照时间该玩家总输出量,
-						[DK_REC_SNAPSHOT_STAT.TOTAL_EFFECT] = 当前快照时间该玩家总有效输出量,
-					},
-					NPC的名字 = { ... },
-				},
-			}, ...
-		},
 		[DK_REC.STAT] = {
 			玩家的dwID = {                                        -- 该对象的输出统计
 				[DK_REC_STAT.TOTAL       ] = 2314214,       -- 总输出
@@ -463,27 +448,6 @@ LIB.RegisterEvent('MY_FIGHT_HINT', function(event)
 		D.Flush()
 	end
 	D.InsertEverything(Data, EVERYTHING_TYPE.FIGHT_TIME, LIB.IsFighting(), LIB.GetFightUUID(), LIB.GetFightTime())
-end)
-LIB.BreatheCall('MY_Recount_FightTime', 1000, function()
-	if LIB.IsFighting() then
-		Data[DK.TIME_DURING] = GetCurrentTime() - Data[DK.TIME_BEGIN]
-		for _, szRecordType in ipairs({DK.DAMAGE, DK.HEAL, DK.BE_DAMAGE, DK.BE_HEAL}) do
-			local tInfo = Data[szRecordType]
-			local tSnapshot = {
-				[DK_REC_SNAPSHOT.TIME_DURING ] = Data[DK.TIME_DURING],
-				[DK_REC_SNAPSHOT.TOTAL       ] = tInfo[DK_REC.TOTAL],
-				[DK_REC_SNAPSHOT.TOTAL_EFFECT] = tInfo[DK_REC.TOTAL_EFFECT],
-				[DK_REC_SNAPSHOT.STATISTICS  ] = {},
-			}
-			for k, v in pairs(tInfo[DK_REC.STAT]) do
-				tSnapshot[DK_REC_SNAPSHOT.STATISTICS][k] = {
-					[DK_REC_SNAPSHOT_STAT.TOTAL] = v[DK_REC_STAT.TOTAL],
-					[DK_REC_SNAPSHOT_STAT.TOTAL_EFFECT] = v.nTotalEffect,
-				}
-			end
-			insert(Data[szRecordType][DK_REC.SNAPSHOTS], tSnapshot)
-		end
-	end
 end)
 
 -- ################################################################################################## --
@@ -1089,7 +1053,6 @@ local function GeneTypeNS()
 		[DK_REC.TIME_DURING ] = 0,
 		[DK_REC.TOTAL       ] = 0,
 		[DK_REC.TOTAL_EFFECT] = 0,
-		[DK_REC.SNAPSHOTS   ] = {},
 		[DK_REC.STAT        ] = {},
 	}
 end
