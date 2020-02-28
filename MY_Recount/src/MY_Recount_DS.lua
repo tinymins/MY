@@ -1067,7 +1067,7 @@ function D.InitEffectData(data, nType, dwID, nLevel)
 		elseif nType == SKILL_EFFECT_TYPE.BUFF then
 			szName = Table_GetBuffName(dwID, nLevel)
 		end
-		if not szName then
+		if not szName or szName == '' then
 			bAnonymous = true
 			szName = '#' .. dwID .. ',' .. nLevel
 		end
