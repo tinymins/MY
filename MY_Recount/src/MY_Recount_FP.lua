@@ -120,8 +120,8 @@ local COLUMN_LIST = {
 				return GetFormatText(_L['Unfight'])
 			end
 			if rec[4] == 'SKILL_EFFECT' then
-				local szName = MY_Recount_DS.GetEffectInfoAusID(data, rec[10])
-				if IsEmpty(szName) then
+				local szName, bAnonymous = MY_Recount_DS.GetEffectInfoAusID(data, rec[10])
+				if IsEmpty(szName) or bAnonymous then
 					szName = rec[8] .. ',' .. rec[9]
 				end
 				return GetFormatText(szName)
@@ -341,10 +341,15 @@ function D.OutputTip(this, rec)
 	if rec[4] == 'SKILL_EFFECT' then
 		-- √˚≥∆
 		local col = COLUMN_DICT['effectname']
-		local szName = rec[8] .. '/' .. rec[9]
+		local szName, bAnonymous = MY_Recount_DS.GetEffectInfoAusID(data, rec[10])
+		if IsEmpty(szName) or bAnonymous then
+			szName = rec[8] .. '/' .. rec[9]
+		else
+			szName = szName .. ' (' .. szName .. ')'
+		end
 		insert(aXml, GetFormatText(col.szTitle))
 		insert(aXml, GetFormatText(':  '))
-		insert(aXml, GetFormatText(IsEmpty(rec[10]) and szName or (rec[10] .. ' (' .. szName .. ')')))
+		insert(aXml, GetFormatText(szName))
 		insert(aXml, GetFormatText('\n'))
 		--  Õ∑≈’ﬂ
 		local col = COLUMN_DICT['caster']

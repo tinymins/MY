@@ -557,6 +557,23 @@ function D.GetEffectInfoAusID(data, szEffectID)
 	return unpack(data.Effectlist[szEffectID] or CONSTANT.EMPTY_TABLE)
 end
 
+-- 通过ID用途计算效果名
+function D.GetEffectNameAusID(data, szChannel, szEffectID)
+	if not data or not szChannel or not szEffectID then
+		return
+	end
+	local info = data.Effectlist[szEffectID]
+	if info and not IsEmpty(info[1]) then
+		if info[3] == SKILL_EFFECT_TYPE.BUFF then
+			if szChannel == 'Heal' or szChannel == 'BeHeal' then
+				return info[1] .. '(HOT)'
+			end
+			return info[1] .. '(DOT)'
+		end
+		return info[1]
+	end
+end
+
 -- 判断是否是友军
 function D.IsParty(id)
 	local dwID = tonumber(id)
@@ -1207,7 +1224,7 @@ end)
 LIB.RegisterFlush('MY_Recount_DS', D.SaveData)
 
 -- 同名目标数据合并
-function D.MergeTargetData(data, tDst, tSrc, bMergeNpc, bMergeEffect)
+function D.MergeTargetData(tDst, tSrc, data, szChannel, bMergeNpc, bMergeEffect)
 	------------------------
 	-- # 节： tRecord
 	------------------------
@@ -1259,8 +1276,8 @@ function D.MergeTargetData(data, tDst, tSrc, bMergeNpc, bMergeEffect)
 	------------------------
 	-- 合并技能统计（四象轮回、两仪化形...）
 	for szEffectID, tSrcSkill in pairs(tSrc.Skill) do
-		local id = MY_Recount_UI.bGroupSameEffect
-			and D.GetEffectInfoAusID(data, szEffectID)
+		local id = bMergeEffect
+			and D.GetEffectNameAusID(data, szChannel, szEffectID)
 			or szEffectID
 		local tDstSkill = tDst.Skill[id]
 		if not tDstSkill then
@@ -1439,7 +1456,7 @@ function D.MergeTargetData(data, tDst, tSrc, bMergeNpc, bMergeEffect)
 		---------------------------------
 		-- 合并目标技能统计（江湖试炼木桩被四象轮回、两仪化形...）
 		for szEffectID, tSrcTargetSkill in pairs(tSrcTarget.Skill) do
-			local id = MY_Recount_UI.bGroupSameEffect
+			local id = bMergeEffect
 				and D.GetEffectInfoAusID(data, szEffectID)
 				or szEffectID
 			local tDstTargetSkill = tDstTarget.Skill[id]
@@ -1482,7 +1499,7 @@ function D.GetMergeTargetData(data, szChannel, id, bMergeEffect)
 						Detail = {},
 					}
 				end
-				D.MergeTargetData(data, tData, tSrcData, bMergeNpc, bMergeEffect)
+				D.MergeTargetData(tData, tSrcData, data, szChannel, bMergeNpc, bMergeEffect)
 			end
 		end
 	else
@@ -1504,6 +1521,7 @@ local settings = {
 				GetNameAusID = D.GetNameAusID,
 				GetForceAusID = D.GetForceAusID,
 				GetEffectInfoAusID = D.GetEffectInfoAusID,
+				GetEffectNameAusID = D.GetEffectNameAusID,
 				Flush = D.Flush,
 				GetMergeTargetData = D.GetMergeTargetData,
 			},

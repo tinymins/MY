@@ -574,7 +574,7 @@ function D.OnItemRefreshTip()
 			local t = {}
 			for szEffectID, p in pairs(tRec.Skill) do
 				insert(t, {
-					szName = MY_Recount_DS.GetEffectInfoAusID(DataDisplay, szEffectID) or szEffectID,
+					szName = MY_Recount_DS.GetEffectNameAusID(DataDisplay, szEffectID) or szEffectID,
 					rec = p,
 				})
 			end
