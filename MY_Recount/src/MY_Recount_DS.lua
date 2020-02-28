@@ -1485,25 +1485,24 @@ function D.MergeTargetData(tDst, tSrc, data, szChannel, bMergeNpc, bMergeEffect)
 	end
 end
 
-function D.GetMergeTargetData(data, szChannel, id, bMergeEffect)
-	local tData, bMergeNpc = nil, IsString(id)
-	if bMergeNpc or bMergeEffect then
-		for dwID, tSrcData in pairs(data[szChannel].Statistics) do
-			if dwID == id or D.GetNameAusID(data, dwID) == id then
-				if not tData then
-					tData = {
-						nTotal = 0,
-						nTotalEffect = 0,
-						Target = {},
-						Skill = {},
-						Detail = {},
-					}
-				end
-				D.MergeTargetData(tData, tSrcData, data, szChannel, bMergeNpc, bMergeEffect)
+function D.GetMergeTargetData(data, szChannel, id, bMergeNpc, bMergeEffect)
+	if not bMergeNpc and not bMergeEffect then
+		return data[szChannel].Statistics[id]
+	end
+	local tData = nil
+	for dwID, tSrcData in pairs(data[szChannel].Statistics) do
+		if dwID == id or D.GetNameAusID(data, dwID) == id then
+			if not tData then
+				tData = {
+					nTotal = 0,
+					nTotalEffect = 0,
+					Target = {},
+					Skill = {},
+					Detail = {},
+				}
 			end
+			D.MergeTargetData(tData, tSrcData, data, szChannel, bMergeNpc, bMergeEffect)
 		end
-	else
-		tData = data[szChannel].Statistics[id]
 	end
 	return tData
 end

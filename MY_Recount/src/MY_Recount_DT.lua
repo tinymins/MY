@@ -203,7 +203,7 @@ function MY_Recount_DT.OnFrameBreathe()
 	this:Lookup('', 'Text_Default'):SetText(szName .. ' ' .. STAT_TYPE_NAME[this.nChannel])
 
 	-- 获取数据
-	local tData = MY_Recount_DS.GetMergeTargetData(DataDisplay, szChannel, id, MY_Recount_UI.bGroupSameEffect)
+	local tData = MY_Recount_DS.GetMergeTargetData(DataDisplay, szChannel, id, MY_Recount_UI.bGroupSameNpc, MY_Recount_UI.bGroupSameEffect)
 	if not tData then
 		this:Lookup('WndScroll_Detail', 'Handle_DetailList'):Clear()
 		this:Lookup('WndScroll_Skill' , 'Handle_SkillList' ):Clear()
