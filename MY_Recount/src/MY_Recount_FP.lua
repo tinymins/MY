@@ -344,9 +344,9 @@ function D.OutputTip(this, rec)
 		local col = COLUMN_DICT['effectname']
 		local szName, bAnonymous = MY_Recount_DS.GetEffectInfoAusID(data, rec[10])
 		if IsEmpty(szName) or bAnonymous then
-			szName = rec[8] .. '/' .. rec[9]
+			szName = rec[8] .. ',' .. rec[9]
 		else
-			szName = szName .. ' (' .. szName .. ')'
+			szName = szName .. ' (' .. rec[8] .. ',' .. rec[9] .. ')'
 		end
 		insert(aXml, GetFormatText(col.szTitle))
 		insert(aXml, GetFormatText(':  '))
