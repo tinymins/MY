@@ -152,7 +152,10 @@ local COLUMN_LIST = {
 		nWidth = 100,
 		szTitle = _L['Caster'],
 		GetFormatText = function(rec, data)
-			return GetFormatText(MY_Recount_DS.GetNameAusID(data, rec[5]) or rec[5])
+			if rec[4] == EVERYTHING_TYPE.SKILL_EFFECT then
+				return GetFormatText(MY_Recount_DS.GetNameAusID(data, rec[5]) or rec[5])
+			end
+			return GetFormatText('-')
 		end,
 		Compare = GeneCommonCompare(EVERYTHING_TYPE.SKILL_EFFECT, 5)
 	},
@@ -162,7 +165,10 @@ local COLUMN_LIST = {
 		nWidth = 100,
 		szTitle = _L['Target'],
 		GetFormatText = function(rec, data)
-			return GetFormatText(MY_Recount_DS.GetNameAusID(data, rec[6]) or rec[6])
+			if rec[4] == EVERYTHING_TYPE.SKILL_EFFECT then
+				return GetFormatText(MY_Recount_DS.GetNameAusID(data, rec[6]) or rec[6])
+			end
+			return GetFormatText('-')
 		end,
 		Compare = GeneCommonCompare(EVERYTHING_TYPE.SKILL_EFFECT, 6)
 	},
