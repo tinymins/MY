@@ -145,6 +145,7 @@ local O = {
 	bSysTimeMode     = false,               -- 使用官方战斗统计计时方式
 	bGroupSameNpc    = true,                -- 是否合并同名NPC数据
 	bGroupSameEffect = true,                -- 是否合并同名效果
+	bHideAnonymous   = true,                -- 隐藏没名字的数据
 	bShowPerSec      = true,                -- 显示为每秒数据（反之显示总和）
 	bShowEffect      = true,                -- 显示有效伤害/治疗
 	bShowZeroVal     = false,               -- 显示零值记录
@@ -158,6 +159,7 @@ RegisterCustomData('MY_Recount_UI.bAwayMode')
 RegisterCustomData('MY_Recount_UI.bSysTimeMode')
 RegisterCustomData('MY_Recount_UI.bGroupSameNpc')
 RegisterCustomData('MY_Recount_UI.bGroupSameEffect')
+RegisterCustomData('MY_Recount_UI.bHideAnonymous')
 RegisterCustomData('MY_Recount_UI.bShowPerSec')
 RegisterCustomData('MY_Recount_UI.bShowEffect')
 RegisterCustomData('MY_Recount_UI.bShowZeroVal')
@@ -706,6 +708,7 @@ local settings = {
 				bSysTimeMode = true,
 				bGroupSameNpc = true,
 				bGroupSameEffect = true,
+				bHideAnonymous = true,
 				bShowPerSec = true,
 				bShowEffect = true,
 				bShowZeroVal = true,
@@ -726,6 +729,7 @@ local settings = {
 				bSysTimeMode = true,
 				bGroupSameNpc = true,
 				bGroupSameEffect = true,
+				bHideAnonymous = true,
 				bShowPerSec = true,
 				bShowEffect = true,
 				bShowZeroVal = true,
@@ -740,6 +744,7 @@ local settings = {
 				bSysTimeMode = function() FireUIEvent('MY_RECOUNT_UI_CONFIG_UPDATE') end,
 				bGroupSameNpc = function() FireUIEvent('MY_RECOUNT_UI_CONFIG_UPDATE') end,
 				bGroupSameEffect = function() FireUIEvent('MY_RECOUNT_UI_CONFIG_UPDATE') end,
+				bHideAnonymous = function() FireUIEvent('MY_RECOUNT_UI_CONFIG_UPDATE') end,
 				bShowPerSec = function() FireUIEvent('MY_RECOUNT_UI_CONFIG_UPDATE') end,
 				bShowEffect = function() FireUIEvent('MY_RECOUNT_UI_CONFIG_UPDATE') end,
 				bShowZeroVal = function() FireUIEvent('MY_RECOUNT_UI_CONFIG_UPDATE') end,

@@ -211,11 +211,11 @@ function D.GetMenu()
 				return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
 			end,
 		}, {
-			szOption = _L['record anonymous effect'],
+			szOption = _L['Hide anonymous effect'],
 			bCheck = true,
-			bChecked = MY_Recount_DS.bRecAnonymous,
+			bChecked = MY_Recount_UI.bHideAnonymous,
 			fnAction = function()
-				MY_Recount_DS.bRecAnonymous = not MY_Recount_DS.bRecAnonymous
+				MY_Recount_UI.bHideAnonymous = not MY_Recount_UI.bHideAnonymous
 			end,
 			fnDisable = function()
 				return not LIB.GetStorage('BoolValues.MY_Recount_Enable')

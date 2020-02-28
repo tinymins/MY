@@ -229,7 +229,6 @@ local O = {
 	bSaveHistory      = false,
 	nMaxHistory       = 10,
 	nMinFightTime     = 30,
-	bRecAnonymous     = true,
 	bRecEverything    = true,
 }
 local Data          -- 当前战斗数据记录
@@ -276,7 +275,6 @@ function D.LoadData()
 		O.bSaveHistory      = data.bSaveHistory or false
 		O.nMaxHistory       = data.nMaxHistory   or 10
 		O.nMinFightTime     = data.nMinFightTime or 30
-		O.bRecAnonymous     = LIB.FormatDataStructure(data.bRecAnonymous, true)
 		O.bRecEverything    = LIB.FormatDataStructure(data.bRecEverything, false)
 	end
 	D.Init()
@@ -289,7 +287,6 @@ function D.SaveData()
 		bSaveHistory      = O.bSaveHistory,
 		nMaxHistory       = O.nMaxHistory,
 		nMinFightTime     = O.nMinFightTime,
-		bRecAnonymous     = O.bRecAnonymous,
 		bRecEverything    = O.bRecEverything,
 	}
 	LIB.SaveLUAData(SZ_REC_FILE, data, { passphrase = false, indent = '\t' })
@@ -1224,7 +1221,7 @@ end)
 LIB.RegisterFlush('MY_Recount_DS', D.SaveData)
 
 -- 同名目标数据合并
-function D.MergeTargetData(tDst, tSrc, data, szChannel, bMergeNpc, bMergeEffect)
+function D.MergeTargetData(tDst, tSrc, data, szChannel, bMergeNpc, bMergeEffect, bHideAnonymous)
 	------------------------
 	-- # 节： tRecord
 	------------------------
@@ -1276,104 +1273,106 @@ function D.MergeTargetData(tDst, tSrc, data, szChannel, bMergeNpc, bMergeEffect)
 	------------------------
 	-- 合并技能统计（四象轮回、两仪化形...）
 	for szEffectID, tSrcSkill in pairs(tSrc.Skill) do
-		local id = bMergeEffect
-			and D.GetEffectNameAusID(data, szChannel, szEffectID)
-			or szEffectID
-		local tDstSkill = tDst.Skill[id]
-		if not tDstSkill then
-			tDstSkill = {
-				nCount       =  0, -- 该玩家四象轮回释放次数（假设szEffectName是四象轮回）
-				nNzCount     =  0, -- 该玩家非零值四象轮回释放次数
-				nMax         =  0, -- 该玩家四象轮回最大输出量
-				nMaxEffect   =  0, -- 该玩家四象轮回最大有效输出量
-				nTotal       =  0, -- 该玩家四象轮回输出量总和
-				nTotalEffect =  0, -- 该玩家四象轮回有效输出量总和
-				nAvg         =  0, -- 该玩家所有四象轮回平均伤害
-				nNzAvg       =  0, -- 该玩家所有非零值四象轮回平均伤害
-				nAvgEffect   =  0, -- 该玩家所有四象轮回平均有效伤害
-				nNzAvgEffect =  0, -- 该玩家所有非零值四象轮回平均有效伤害
-				Detail       = {}, -- 该玩家四象轮回输出结果分类统计
-				Target       = {}, -- 该玩家四象轮回承受者统计
-			}
-			tDst.Skill[id] = tDstSkill
-		end
-		tDstSkill.nCount       = tDstSkill.nCount + tSrcSkill.nCount
-		tDstSkill.nNzCount     = tDstSkill.nNzCount + tSrcSkill.nNzCount
-		tDstSkill.nMax         = max(tDstSkill.nMax, tSrcSkill.nMax)
-		tDstSkill.nMaxEffect   = max(tDstSkill.nMaxEffect, tSrcSkill.nMaxEffect)
-		tDstSkill.nTotal       = tDstSkill.nTotal + tSrcSkill.nTotal
-		tDstSkill.nTotalEffect = tDstSkill.nTotalEffect + tSrcSkill.nTotalEffect
-		tDstSkill.nAvg         = floor(tDstSkill.nTotal / tDstSkill.nCount)
-		tDstSkill.nAvgEffect   = floor(tDstSkill.nTotalEffect / tDstSkill.nCount)
-		tDstSkill.nNzAvg       = floor(tDstSkill.nTotal / tDstSkill.nNzCount)
-		tDstSkill.nNzAvgEffect = floor(tDstSkill.nTotalEffect / tDstSkill.nNzCount)
-		---------------------------------
-		-- # 节： tRecord.Skill[x].Detail
-		---------------------------------
-		-- 合并技能详情统计（四象轮回的命中、会心...）
-		for nType, tSrcSkillDetail in pairs(tSrcSkill.Detail) do
-			local tDstSkillDetail = tDstSkill.Detail[nType]
-			if not tDstSkillDetail then
-				tDstSkillDetail = {
-					nCount       =  0, -- 命中记录数量
-					nNzCount     =  0, -- 非零值命中记录数量
-					nMax         =  0, -- 单次命中最大值
-					nMaxEffect   =  0, -- 单次命中最大有效值
-					nMin         = -1, -- 单次命中最小值
-					nNzMin       = -1, -- 单次非零值命中最小值
-					nMinEffect   = -1, -- 单次命中最小有效值
-					nNzMinEffect = -1, -- 单次非零值命中最小有效值
-					nTotal       =  0, -- 所以命中总伤害
-					nTotalEffect =  0, -- 所有命中总有效伤害
-					nAvg         =  0, -- 所有命中平均伤害
-					nNzAvg       =  0, -- 所有非零值命中平均伤害
-					nAvgEffect   =  0, -- 所有命中平均有效伤害
-					nNzAvgEffect =  0, -- 所有非零值命中平均有效伤害
+		if not bHideAnonymous or not select(2, D.GetEffectInfoAusID(data, szEffectID)) then
+			local id = bMergeEffect
+				and D.GetEffectNameAusID(data, szChannel, szEffectID)
+				or szEffectID
+			local tDstSkill = tDst.Skill[id]
+			if not tDstSkill then
+				tDstSkill = {
+					nCount       =  0, -- 该玩家四象轮回释放次数（假设szEffectName是四象轮回）
+					nNzCount     =  0, -- 该玩家非零值四象轮回释放次数
+					nMax         =  0, -- 该玩家四象轮回最大输出量
+					nMaxEffect   =  0, -- 该玩家四象轮回最大有效输出量
+					nTotal       =  0, -- 该玩家四象轮回输出量总和
+					nTotalEffect =  0, -- 该玩家四象轮回有效输出量总和
+					nAvg         =  0, -- 该玩家所有四象轮回平均伤害
+					nNzAvg       =  0, -- 该玩家所有非零值四象轮回平均伤害
+					nAvgEffect   =  0, -- 该玩家所有四象轮回平均有效伤害
+					nNzAvgEffect =  0, -- 该玩家所有非零值四象轮回平均有效伤害
+					Detail       = {}, -- 该玩家四象轮回输出结果分类统计
+					Target       = {}, -- 该玩家四象轮回承受者统计
 				}
-				tDstSkill.Detail[nType] = tDstSkillDetail
+				tDst.Skill[id] = tDstSkill
 			end
-			tDstSkillDetail.nCount       = tDstSkillDetail.nCount + tSrcSkillDetail.nCount
-			tDstSkillDetail.nNzCount     = tDstSkillDetail.nNzCount + tSrcSkillDetail.nNzCount
-			tDstSkillDetail.nMax         = max(tDstSkillDetail.nMax, tSrcSkillDetail.nMax)
-			tDstSkillDetail.nMaxEffect   = max(tDstSkillDetail.nMaxEffect, tSrcSkillDetail.nMaxEffect)
-			tDstSkillDetail.nMin         = Min(tDstSkillDetail.nMin, tSrcSkillDetail.nMin)
-			tDstSkillDetail.nNzMin       = Min(tDstSkillDetail.nNzMin, tSrcSkillDetail.nNzMin)
-			tDstSkillDetail.nMinEffect   = Min(tDstSkillDetail.nMinEffect, tSrcSkillDetail.nMinEffect)
-			tDstSkillDetail.nNzMinEffect = Min(tDstSkillDetail.nNzMinEffect, tSrcSkillDetail.nNzMinEffect)
-			tDstSkillDetail.nTotal       = tDstSkillDetail.nTotal + tSrcSkillDetail.nTotal
-			tDstSkillDetail.nTotalEffect = tDstSkillDetail.nTotalEffect + tSrcSkillDetail.nTotalEffect
-			tDstSkillDetail.nAvg         = floor(tDstSkillDetail.nTotal / tDstSkillDetail.nCount)
-			tDstSkillDetail.nNzAvg       = floor(tDstSkillDetail.nTotal / tDstSkillDetail.nNzCount)
-			tDstSkillDetail.nAvgEffect   = floor(tDstSkillDetail.nTotalEffect / tDstSkillDetail.nCount)
-			tDstSkillDetail.nNzAvgEffect = floor(tDstSkillDetail.nTotalEffect / tDstSkillDetail.nNzCount)
-		end
-		------------------------------
-		-- # 节： tRecord.Skill.Target
-		------------------------------
-		-- 合并技能目标统计（四象轮回对江湖试炼木桩、江湖初级木桩...）
-		for dwID, tSrcSkillTarget in pairs(tSrcSkill.Target) do
-			local id = bMergeNpc and D.GetNameAusID(data, dwID) or dwID
-			local tDstSkillTarget = tDstSkill.Target[id]
-			if not tDstSkillTarget then
-				tDstSkillTarget = {
-					nMax         =  0, -- 该玩家四象轮回击中的这个玩家最大伤害
-					nMaxEffect   =  0, -- 该玩家四象轮回击中的这个玩家最大有效伤害
-					nTotal       =  0, -- 该玩家四象轮回击中的这个玩家伤害总和
-					nTotalEffect =  0, -- 该玩家四象轮回击中的这个玩家有效伤害总和
-					Count        = {}, -- 该玩家四象轮回击中的这个玩家结果统计
-					NzCount      = {}, -- 该玩家非零值四象轮回击中的这个玩家结果统计
-				}
-				tDstSkill.Target[id] = tDstSkillTarget
+			tDstSkill.nCount       = tDstSkill.nCount + tSrcSkill.nCount
+			tDstSkill.nNzCount     = tDstSkill.nNzCount + tSrcSkill.nNzCount
+			tDstSkill.nMax         = max(tDstSkill.nMax, tSrcSkill.nMax)
+			tDstSkill.nMaxEffect   = max(tDstSkill.nMaxEffect, tSrcSkill.nMaxEffect)
+			tDstSkill.nTotal       = tDstSkill.nTotal + tSrcSkill.nTotal
+			tDstSkill.nTotalEffect = tDstSkill.nTotalEffect + tSrcSkill.nTotalEffect
+			tDstSkill.nAvg         = floor(tDstSkill.nTotal / tDstSkill.nCount)
+			tDstSkill.nAvgEffect   = floor(tDstSkill.nTotalEffect / tDstSkill.nCount)
+			tDstSkill.nNzAvg       = floor(tDstSkill.nTotal / tDstSkill.nNzCount)
+			tDstSkill.nNzAvgEffect = floor(tDstSkill.nTotalEffect / tDstSkill.nNzCount)
+			---------------------------------
+			-- # 节： tRecord.Skill[x].Detail
+			---------------------------------
+			-- 合并技能详情统计（四象轮回的命中、会心...）
+			for nType, tSrcSkillDetail in pairs(tSrcSkill.Detail) do
+				local tDstSkillDetail = tDstSkill.Detail[nType]
+				if not tDstSkillDetail then
+					tDstSkillDetail = {
+						nCount       =  0, -- 命中记录数量
+						nNzCount     =  0, -- 非零值命中记录数量
+						nMax         =  0, -- 单次命中最大值
+						nMaxEffect   =  0, -- 单次命中最大有效值
+						nMin         = -1, -- 单次命中最小值
+						nNzMin       = -1, -- 单次非零值命中最小值
+						nMinEffect   = -1, -- 单次命中最小有效值
+						nNzMinEffect = -1, -- 单次非零值命中最小有效值
+						nTotal       =  0, -- 所以命中总伤害
+						nTotalEffect =  0, -- 所有命中总有效伤害
+						nAvg         =  0, -- 所有命中平均伤害
+						nNzAvg       =  0, -- 所有非零值命中平均伤害
+						nAvgEffect   =  0, -- 所有命中平均有效伤害
+						nNzAvgEffect =  0, -- 所有非零值命中平均有效伤害
+					}
+					tDstSkill.Detail[nType] = tDstSkillDetail
+				end
+				tDstSkillDetail.nCount       = tDstSkillDetail.nCount + tSrcSkillDetail.nCount
+				tDstSkillDetail.nNzCount     = tDstSkillDetail.nNzCount + tSrcSkillDetail.nNzCount
+				tDstSkillDetail.nMax         = max(tDstSkillDetail.nMax, tSrcSkillDetail.nMax)
+				tDstSkillDetail.nMaxEffect   = max(tDstSkillDetail.nMaxEffect, tSrcSkillDetail.nMaxEffect)
+				tDstSkillDetail.nMin         = Min(tDstSkillDetail.nMin, tSrcSkillDetail.nMin)
+				tDstSkillDetail.nNzMin       = Min(tDstSkillDetail.nNzMin, tSrcSkillDetail.nNzMin)
+				tDstSkillDetail.nMinEffect   = Min(tDstSkillDetail.nMinEffect, tSrcSkillDetail.nMinEffect)
+				tDstSkillDetail.nNzMinEffect = Min(tDstSkillDetail.nNzMinEffect, tSrcSkillDetail.nNzMinEffect)
+				tDstSkillDetail.nTotal       = tDstSkillDetail.nTotal + tSrcSkillDetail.nTotal
+				tDstSkillDetail.nTotalEffect = tDstSkillDetail.nTotalEffect + tSrcSkillDetail.nTotalEffect
+				tDstSkillDetail.nAvg         = floor(tDstSkillDetail.nTotal / tDstSkillDetail.nCount)
+				tDstSkillDetail.nNzAvg       = floor(tDstSkillDetail.nTotal / tDstSkillDetail.nNzCount)
+				tDstSkillDetail.nAvgEffect   = floor(tDstSkillDetail.nTotalEffect / tDstSkillDetail.nCount)
+				tDstSkillDetail.nNzAvgEffect = floor(tDstSkillDetail.nTotalEffect / tDstSkillDetail.nNzCount)
 			end
-			tDstSkillTarget.nMax         = tDstSkillTarget.nMax + tSrcSkillTarget.nMax
-			tDstSkillTarget.nMaxEffect   = tDstSkillTarget.nMaxEffect + tSrcSkillTarget.nMaxEffect
-			tDstSkillTarget.nTotal       = tDstSkillTarget.nTotal + tSrcSkillTarget.nTotal
-			tDstSkillTarget.nTotalEffect = tDstSkillTarget.nTotalEffect + tSrcSkillTarget.nTotalEffect
-			for k, v in pairs(tSrcSkillTarget.Count) do
-				tDstSkillTarget.Count[k] = (tDstSkillTarget.Count[k] or 0) + v
-			end
-			for k, v in pairs(tSrcSkillTarget.NzCount) do
-				tDstSkillTarget.NzCount[k] = (tDstSkillTarget.NzCount[k] or 0) + v
+			------------------------------
+			-- # 节： tRecord.Skill.Target
+			------------------------------
+			-- 合并技能目标统计（四象轮回对江湖试炼木桩、江湖初级木桩...）
+			for dwID, tSrcSkillTarget in pairs(tSrcSkill.Target) do
+				local id = bMergeNpc and D.GetNameAusID(data, dwID) or dwID
+				local tDstSkillTarget = tDstSkill.Target[id]
+				if not tDstSkillTarget then
+					tDstSkillTarget = {
+						nMax         =  0, -- 该玩家四象轮回击中的这个玩家最大伤害
+						nMaxEffect   =  0, -- 该玩家四象轮回击中的这个玩家最大有效伤害
+						nTotal       =  0, -- 该玩家四象轮回击中的这个玩家伤害总和
+						nTotalEffect =  0, -- 该玩家四象轮回击中的这个玩家有效伤害总和
+						Count        = {}, -- 该玩家四象轮回击中的这个玩家结果统计
+						NzCount      = {}, -- 该玩家非零值四象轮回击中的这个玩家结果统计
+					}
+					tDstSkill.Target[id] = tDstSkillTarget
+				end
+				tDstSkillTarget.nMax         = tDstSkillTarget.nMax + tSrcSkillTarget.nMax
+				tDstSkillTarget.nMaxEffect   = tDstSkillTarget.nMaxEffect + tSrcSkillTarget.nMaxEffect
+				tDstSkillTarget.nTotal       = tDstSkillTarget.nTotal + tSrcSkillTarget.nTotal
+				tDstSkillTarget.nTotalEffect = tDstSkillTarget.nTotalEffect + tSrcSkillTarget.nTotalEffect
+				for k, v in pairs(tSrcSkillTarget.Count) do
+					tDstSkillTarget.Count[k] = (tDstSkillTarget.Count[k] or 0) + v
+				end
+				for k, v in pairs(tSrcSkillTarget.NzCount) do
+					tDstSkillTarget.NzCount[k] = (tDstSkillTarget.NzCount[k] or 0) + v
+				end
 			end
 		end
 	end
@@ -1456,37 +1455,39 @@ function D.MergeTargetData(tDst, tSrc, data, szChannel, bMergeNpc, bMergeEffect)
 		---------------------------------
 		-- 合并目标技能统计（江湖试炼木桩被四象轮回、两仪化形...）
 		for szEffectID, tSrcTargetSkill in pairs(tSrcTarget.Skill) do
-			local id = bMergeEffect
-				and D.GetEffectInfoAusID(data, szEffectID)
-				or szEffectID
-			local tDstTargetSkill = tDstTarget.Skill[id]
-			if not tDstTargetSkill then
-				tDstTargetSkill = {
-					nMax         =  0, -- 该玩家击中这个玩家的四象轮回最大伤害
-					nMaxEffect   =  0, -- 该玩家击中这个玩家的四象轮回最大有效伤害
-					nTotal       =  0, -- 该玩家击中这个玩家的四象轮回伤害总和
-					nTotalEffect =  0, -- 该玩家击中这个玩家的四象轮回有效伤害总和
-					Count        = {}, -- 该玩家击中这个玩家的四象轮回结果统计
-					NzCount      = {}, -- 该玩家非零值击中这个玩家的四象轮回结果统计
-				}
-				tDstTarget.Skill[id] = tDstTargetSkill
-			end
-			tDstTargetSkill.nMax         = max(tDstTargetSkill.nMax, tSrcTargetSkill.nMax)
-			tDstTargetSkill.nMaxEffect   = max(tDstTargetSkill.nMaxEffect, tSrcTargetSkill.nMaxEffect)
-			tDstTargetSkill.nTotal       = tDstTargetSkill.nTotal + tSrcTargetSkill.nTotal
-			tDstTargetSkill.nTotalEffect = tDstTargetSkill.nTotalEffect + tSrcTargetSkill.nTotalEffect
-			for k, v in pairs(tSrcTargetSkill.Count) do
-				tDstTargetSkill.Count[k] = (tDstTargetSkill.Count[k] or 0) + v
-			end
-			for k, v in pairs(tSrcTargetSkill.NzCount) do
-				tDstTargetSkill.NzCount[k] = (tDstTargetSkill.NzCount[k] or 0) + v
+			if not bHideAnonymous or not select(2, D.GetEffectInfoAusID(data, szEffectID)) then
+				local id = bMergeEffect
+					and D.GetEffectNameAusID(data, szEffectID)
+					or szEffectID
+				local tDstTargetSkill = tDstTarget.Skill[id]
+				if not tDstTargetSkill then
+					tDstTargetSkill = {
+						nMax         =  0, -- 该玩家击中这个玩家的四象轮回最大伤害
+						nMaxEffect   =  0, -- 该玩家击中这个玩家的四象轮回最大有效伤害
+						nTotal       =  0, -- 该玩家击中这个玩家的四象轮回伤害总和
+						nTotalEffect =  0, -- 该玩家击中这个玩家的四象轮回有效伤害总和
+						Count        = {}, -- 该玩家击中这个玩家的四象轮回结果统计
+						NzCount      = {}, -- 该玩家非零值击中这个玩家的四象轮回结果统计
+					}
+					tDstTarget.Skill[id] = tDstTargetSkill
+				end
+				tDstTargetSkill.nMax         = max(tDstTargetSkill.nMax, tSrcTargetSkill.nMax)
+				tDstTargetSkill.nMaxEffect   = max(tDstTargetSkill.nMaxEffect, tSrcTargetSkill.nMaxEffect)
+				tDstTargetSkill.nTotal       = tDstTargetSkill.nTotal + tSrcTargetSkill.nTotal
+				tDstTargetSkill.nTotalEffect = tDstTargetSkill.nTotalEffect + tSrcTargetSkill.nTotalEffect
+				for k, v in pairs(tSrcTargetSkill.Count) do
+					tDstTargetSkill.Count[k] = (tDstTargetSkill.Count[k] or 0) + v
+				end
+				for k, v in pairs(tSrcTargetSkill.NzCount) do
+					tDstTargetSkill.NzCount[k] = (tDstTargetSkill.NzCount[k] or 0) + v
+				end
 			end
 		end
 	end
 end
 
-function D.GetMergeTargetData(data, szChannel, id, bMergeNpc, bMergeEffect)
-	if not bMergeNpc and not bMergeEffect then
+function D.GetMergeTargetData(data, szChannel, id, bMergeNpc, bMergeEffect, bHideAnonymous)
+	if not bMergeNpc and not bMergeEffect and not bHideAnonymous then
 		return data[szChannel].Statistics[id]
 	end
 	local tData = nil
@@ -1501,7 +1502,7 @@ function D.GetMergeTargetData(data, szChannel, id, bMergeNpc, bMergeEffect)
 					Detail = {},
 				}
 			end
-			D.MergeTargetData(tData, tSrcData, data, szChannel, bMergeNpc, bMergeEffect)
+			D.MergeTargetData(tData, tSrcData, data, szChannel, bMergeNpc, bMergeEffect, bHideAnonymous)
 		end
 	end
 	return tData
@@ -1530,7 +1531,6 @@ local settings = {
 				bSaveHistory      = true,
 				nMaxHistory       = true,
 				nMinFightTime     = true,
-				bRecAnonymous     = true,
 				bRecEverything    = true,
 			},
 			root = O,
@@ -1542,14 +1542,12 @@ local settings = {
 				bSaveHistory      = true,
 				nMaxHistory       = true,
 				nMinFightTime     = true,
-				bRecAnonymous     = true,
 				bRecEverything    = true,
 			},
 			triggers = {
 				bSaveHistory      = D.SaveData,
 				nMaxHistory       = D.SaveData,
 				nMinFightTime     = D.SaveData,
-				bRecAnonymous     = D.SaveData,
 				bRecEverything    = D.SaveData,
 			},
 			root = O,
