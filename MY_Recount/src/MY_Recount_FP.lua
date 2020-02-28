@@ -49,6 +49,8 @@ end
 local DK = MY_Recount_DS.DK
 local D = {}
 local O = {}
+local PAGE_SIZE = 300
+local PAGE_DISPLAY = 19
 
 local function GeneCommonFormatText(szType, nIndex)
 	return function(r)
@@ -251,6 +253,7 @@ end
 
 function D.DrawData(frame)
 	local data = frame.data
+	local nPage = frame.nPage or 1
 	local szSearch = frame:Lookup('Wnd_Total/Wnd_Search/Edit_Search'):GetText()
 	local aRec = {}
 	if IsEmpty(szSearch) then
@@ -289,7 +292,8 @@ function D.DrawData(frame)
 	end
 	local hList = frame:Lookup('Wnd_Total/WndScroll_FP', 'Handle_List')
 	hList:Clear()
-	for _, rec in ipairs(aRec) do
+	for i = (nPage - 1) * PAGE_SIZE + 1, min(nPage * PAGE_SIZE, #aRec) do
+		local rec = aRec[i]
 		local hRow = hList:AppendItemFromIni(SZ_INI, 'Handle_Row')
 		local nX = 0
 		for j, col in ipairs(COLUMN_LIST) do
@@ -313,6 +317,51 @@ function D.DrawData(frame)
 		hRow:FormatAllItemPos()
 	end
 	hList:FormatAllItemPos()
+
+	local nPageCount = ceil(#aRec / PAGE_SIZE)
+	local hOuter = frame:Lookup('Wnd_Total/Wnd_Index', 'Handle_IndexesOuter')
+	local handle = hOuter:Lookup('Handle_Indexes')
+	if nPageCount <= PAGE_DISPLAY then
+		for i = 0, PAGE_DISPLAY - 1 do
+			local hItem = handle:Lookup(i)
+			hItem.nPage = i + 1
+			hItem:Lookup('Text_Index'):SetText(i + 1)
+			hItem:Lookup('Text_IndexUnderline'):SetVisible(i + 1 == nPage)
+			hItem:SetVisible(i < nPageCount)
+		end
+	else
+		local hItem = handle:Lookup(0)
+		hItem.nPage = 1
+		hItem:Lookup('Text_Index'):SetText(1)
+		hItem:Lookup('Text_IndexUnderline'):SetVisible(1 == nPage)
+		hItem:Show()
+
+		local hItem = handle:Lookup(PAGE_DISPLAY - 1)
+		hItem.nPage = nPageCount
+		hItem:Lookup('Text_Index'):SetText(nPageCount)
+		hItem:Lookup('Text_IndexUnderline'):SetVisible(nPageCount == nPage)
+		hItem:Show()
+
+		local nStartPage
+		if nPage + ceil((PAGE_DISPLAY - 2) / 2) > nPageCount then
+			nStartPage = nPageCount - (PAGE_DISPLAY - 2)
+		elseif nPage - ceil((PAGE_DISPLAY - 2) / 2) < 2 then
+			nStartPage = 2
+		else
+			nStartPage = nPage - ceil((PAGE_DISPLAY - 2) / 2)
+		end
+		for i = 1, PAGE_DISPLAY - 2 do
+			local hItem = handle:Lookup(i)
+			hItem.nPage = nStartPage + i - 1
+			hItem:Lookup('Text_Index'):SetText(nStartPage + i - 1)
+			hItem:Lookup('Text_IndexUnderline'):SetVisible(nStartPage + i - 1 == nPage)
+			hItem:SetVisible(true)
+		end
+	end
+	handle:SetSize(hOuter:GetSize())
+	handle:FormatAllItemPos()
+	handle:SetSizeByAllItemSize()
+	hOuter:FormatAllItemPos()
 end
 
 function D.OutputTip(this, rec)
@@ -399,6 +448,14 @@ function MY_Recount_FP.OnFrameCreate()
 	this.szSortKey = 'time'
 	this.szSortOrder = 'asc'
 	this:Lookup('', 'Text_Title'):SetText(_L['MY_Recount_FP'])
+
+	local handle = this:Lookup('Wnd_Total/Wnd_Index', 'Handle_IndexesOuter/Handle_Indexes')
+	handle:Clear()
+	for i = 1, PAGE_DISPLAY do
+		handle:AppendItemFromIni(SZ_INI, 'Handle_Index')
+	end
+	handle:FormatAllItemPos()
+
 	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
 	D.DrawHead(this)
 	this.SetDS = D.SetDS
@@ -417,6 +474,9 @@ function MY_Recount_FP.OnEditSpecialKeyDown()
 	if szKey == 'Enter' then
 		if name == 'Edit_Search' then
 			D.DrawData(this:GetRoot())
+		elseif name == 'WndEdit_Index' then
+			this:GetRoot().nPage = tonumber(this:GetText()) or this:GetRoot().nPage
+			D.DrawData(this:GetRoot())
 		end
 		return 1
 	end
@@ -425,7 +485,6 @@ end
 function MY_Recount_FP.OnItemLButtonClick()
 	local name = this:GetName()
 	if name == 'Handle_FPColumn' then
-		Output(name, this)
 		if this.szKey then
 			local frame = this:GetRoot()
 			if frame.szSortKey == this.szKey then
@@ -436,6 +495,9 @@ function MY_Recount_FP.OnItemLButtonClick()
 			D.DrawHead(frame)
 			D.DrawData(frame)
 		end
+	elseif name == 'Handle_Index' then
+		this:GetRoot().nPage = this.nPage
+		D.DrawData(this:GetRoot())
 	end
 end
 
