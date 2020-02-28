@@ -473,10 +473,11 @@ function D.GetPublishMenu()
 	})
 
 	local function Publish(nChannel, nLimit)
-		local frame = Station.Lookup('Normal/MY_Recount')
+		local frame = Station.Lookup('Normal/MY_Recount_UI')
 		if not frame then
 			return
 		end
+		local DataDisplay = MY_Recount.GetDisplayData()
 		LIB.Talk(
 			nChannel,
 			'[' .. PACKET_INFO.SHORT_NAME .. ']'
