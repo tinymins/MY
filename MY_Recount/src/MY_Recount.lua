@@ -413,6 +413,14 @@ function D.GetHistoryMenu()
 				D.SetDisplayData(0)
 			end
 		end,
+		fnMouseEnter = function()
+			if not MY_Recount_DS.bRecEverything then
+				return
+			end
+			local nX, nY = this:GetAbsX(), this:GetAbsY()
+			local nW, nH = this:GetW(), this:GetH()
+			OutputTip(GetFormatText(_L['Hold ctrl click to review whole fight'], nil, 255, 255, 0), 600, {nX, nY, nW, nH}, ALW.RIGHT_LEFT)
+		end,
 	}}
 
 	for _, data in ipairs(MY_Recount_DS.Get()) do
@@ -436,6 +444,14 @@ function D.GetHistoryMenu()
 				fnClickIcon = function()
 					MY_Recount_DS.Del(data)
 					Wnd.CloseWindow('PopupMenuPanel')
+				end,
+				fnMouseEnter = function()
+					if not MY_Recount_DS.bRecEverything then
+						return
+					end
+					local nX, nY = this:GetAbsX(), this:GetAbsY()
+					local nW, nH = this:GetW(), this:GetH()
+					OutputTip(GetFormatText(_L['Hold ctrl click to review whole fight'], nil, 255, 255, 0), 600, {nX, nY, nW, nH}, ALW.RIGHT_LEFT)
 				end,
 			}
 			insert(t, t1)

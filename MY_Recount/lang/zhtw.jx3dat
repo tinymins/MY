@@ -100,4 +100,6 @@ return {
     ['Offline'] = '離線',
     ['[%s] get online.'] = '[%s]上線了。',
     ['[%s] get offline.'] = '[%s]離線了。',
+
+    ['Hold ctrl click to review whole fight'] = '按住CTRL點擊可復盤整場戰鬥',
 }
