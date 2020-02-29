@@ -148,9 +148,11 @@ function D.IsItemDisplay(itemData, config)
 	if IsTable(config.tFilterQuality) and config.tFilterQuality[itemData.nQuality] then
 		return false
 	end
+	-- 名称过滤
 	if config.bNameFilter and config.tNameFilter[itemData.szName] then
 		return false
 	end
+	-- 过滤已读、已有书籍
 	if (config.bFilterBookRead or config.bFilterBookHave) and itemData.nGenre == ITEM_GENRE.BOOK then
 		local me = GetClientPlayer()
 		if config.bFilterBookRead then
@@ -165,6 +167,7 @@ function D.IsItemDisplay(itemData, config)
 			end
 		end
 	end
+	-- 过滤灰色物品
 	if config.bFilterGrayItem and itemData.nQuality == CONSTANT.ITEM_QUALITY.GRAY then
 		return false
 	end
@@ -175,6 +178,13 @@ function D.IsItemAutoPickup(itemData, config, doodad, bCanDialog)
 	if not bCanDialog then
 		return false
 	end
+	-- 超过可拾取上限则不捡
+	local itemInfo = GetItemInfo(itemData.dwTabType, itemData.dwIndex)
+	if itemInfo and itemInfo.nMaxExistAmount > 0
+	and LIB.GetItemAmountInAllPackages(itemData.dwTabType, itemData.dwIndex, itemData.nBookID) + itemData.nStackNum > itemInfo.nMaxExistAmount then
+		return false
+	end
+	-- 不拾取已读、已有书籍
 	if (config.bAutoPickupFilterBookRead or config.bAutoPickupFilterBookHave) and itemData.nGenre == ITEM_GENRE.BOOK then
 		local me = GetClientPlayer()
 		if config.bAutoPickupFilterBookRead then
@@ -189,18 +199,23 @@ function D.IsItemAutoPickup(itemData, config, doodad, bCanDialog)
 			end
 		end
 	end
+	-- 自动拾取书籍
 	if config.bAutoPickupBook and itemData.nGenre == ITEM_GENRE.BOOK then
 		return true
 	end
+	-- 自动拾取过滤
 	if config.tAutoPickupFilters and config.tAutoPickupFilters[itemData.szName] then
 		return false
 	end
+	-- 自动拾取名单
 	if config.tAutoPickupNames and config.tAutoPickupNames[itemData.szName] then
 		return true
 	end
+	-- 自动拾取任务物品
 	if config.bAutoPickupTaskItem and itemData.nGenre == ITEM_GENRE.TASK_ITEM then
 		return true
 	end
+	-- 自动拾取品级
 	if config.tAutoPickupQuality[itemData.nQuality] then
 		return true
 	end
@@ -1620,19 +1635,23 @@ function D.GetDoodadLootInfo(dwID)
 					bSpecial = true
 				end
 				-- bSpecial = true -- debug
+				-- itemData
 				local data = {
-					dwDoodadID   = dwID         ,
-					szDoodadName = szName       ,
-					item         = item         ,
-					szName       = szItemName   ,
-					dwID         = item.dwID    ,
-					nUiId        = item.nUiId   ,
-					nGenre       = item.nGenre  ,
-					nSub         = item.nSub    ,
-					nQuality     = item.nQuality,
-					bNeedRoll    = bNeedRoll    ,
-					bDist        = bDist        ,
-					bBidding     = bBidding     ,
+					dwDoodadID   = dwID          ,
+					szDoodadName = szName        ,
+					item         = item          ,
+					szName       = szItemName    ,
+					dwID         = item.dwID     ,
+					dwTabType    = item.dwTabType,
+					dwIndex      = item.dwIndex  ,
+					nUiId        = item.nUiId    ,
+					nGenre       = item.nGenre   ,
+					nSub         = item.nSub     ,
+					nQuality     = item.nQuality ,
+					bNeedRoll    = bNeedRoll     ,
+					bDist        = bDist         ,
+					bBidding     = bBidding      ,
+					nStackNum    = item.bCanStack and item.nStackNum or 1,
 				}
 				if DEBUG_LOOT then
 					data.bDist = true -- !!! Debug
