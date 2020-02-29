@@ -63,7 +63,7 @@ return {
     ['Fighting'] = '戰鬥中',
     ['Unfight'] = '脫離戰鬥',
     ['Time'] = '時間',
-    ['Buff'] = 'BUFF',
+    ['Buff'] = '氣勁',
     ['Skill'] = '技能',
     ['Death'] = '重傷',
     ['Time (ms)'] = '時間(ms)',
