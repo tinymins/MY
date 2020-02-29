@@ -160,14 +160,7 @@ function D.IsItemDisplay(itemData, config)
 			end
 		end
 		if config.bFilterBookHave then
-			local bHave = false
-			LIB.WalkBagItem(function(item)
-				if item.nUiId == itemData.nUiId and item.nBookID == itemData.nBookID then
-					bHave = true
-					return 0
-				end
-			end)
-			if bHave then
+			if LIB.GetItemAmountInAllPackages(itemData.dwTabType, itemData.dwIndex, itemData.nBookID) > 0 then
 				return false
 			end
 		end
@@ -191,14 +184,7 @@ function D.IsItemAutoPickup(itemData, config, doodad, bCanDialog)
 			end
 		end
 		if config.bAutoPickupFilterBookHave then
-			local bHave = false
-			LIB.WalkBagItem(function(item)
-				if item.nUiId == itemData.nUiId and item.nBookID == itemData.nBookID then
-					bHave = true
-					return 0
-				end
-			end)
-			if bHave then
+			if LIB.GetItemAmountInAllPackages(itemData.dwTabType, itemData.dwIndex, itemData.nBookID) > 0 then
 				return false
 			end
 		end
