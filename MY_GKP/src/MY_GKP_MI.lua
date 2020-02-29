@@ -546,6 +546,7 @@ end
 LIB.RegisterEvent('BIDDING_OPERATION', function()
 	LIB.DelayCall('MY_GKP_MI__SyncSystemGKP', 150, D.SyncSystemGKP)
 end)
+LIB.RegisterInit('MY_GKP_MI__SyncSystemGKP', D.SyncSystemGKP)
 
 ---------------------------------------------------------------------->
 -- Ö÷½çÃæ
