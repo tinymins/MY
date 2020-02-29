@@ -152,7 +152,7 @@ local COLUMN_LIST = {
 	{
 		id = 'caster',
 		bSort = true,
-		nWidth = 100,
+		nWidth = 130,
 		szTitle = _L['Caster'],
 		GetFormatText = function(rec, data)
 			if rec[4] == EVERYTHING_TYPE.SKILL_EFFECT then
@@ -168,7 +168,7 @@ local COLUMN_LIST = {
 	{
 		id = 'target',
 		bSort = true,
-		nWidth = 100,
+		nWidth = 130,
 		szTitle = _L['Target'],
 		GetFormatText = function(rec, data)
 			if rec[4] == EVERYTHING_TYPE.SKILL_EFFECT then
@@ -262,6 +262,7 @@ local SZ_INI = PLUGIN_ROOT .. '/ui/MY_Recount_FP.ini'
 
 function D.SetDS(frame, data)
 	frame.data = data
+	D.UpdateData(frame)
 	D.DrawData(frame)
 end
 
@@ -294,9 +295,9 @@ function D.DrawHead(frame)
 	hCols:FormatAllItemPos()
 end
 
-function D.DrawData(frame)
+-- 根据搜索和配置过滤生成显示列表
+function D.UpdateData(frame)
 	local data = frame.data
-	local nPage = frame.nPage or 1
 	local szSearch = frame:Lookup('Wnd_Total/Wnd_Search/Edit_Search'):GetText()
 	local nSearch = tonumber(szSearch)
 	local aRec = {}
@@ -344,31 +345,44 @@ function D.DrawData(frame)
 	if Sorter then
 		sort(aRec, Sorter)
 	end
+	frame.disp = aRec
+end
+
+-- 根据页码渲染列表
+function D.DrawData(frame)
+	local data = frame.data
+	local aRec = frame.disp
+	local nPage = frame.nPage or 1
 	local hList = frame:Lookup('Wnd_Total/WndScroll_FP', 'Handle_List')
-	hList:Clear()
-	for i = (nPage - 1) * PAGE_SIZE + 1, min(nPage * PAGE_SIZE, #aRec) do
-		local rec = aRec[i]
-		local hRow = hList:AppendItemFromIni(SZ_INI, 'Handle_Row')
+	local nOffset = (nPage - 1) * PAGE_SIZE
+	for i = 1, PAGE_SIZE do
+		local rec = aRec[nOffset + i]
+		local hRow = hList:Lookup(i - 1) or hList:AppendItemFromIni(SZ_INI, 'Handle_Row')
+		local hRowItemList = hRow:Lookup('Handle_RowItemList')
 		local nX = 0
-		for j, col in ipairs(COLUMN_LIST) do
-			local hItem = hRow:AppendItemFromIni(SZ_INI, 'Handle_Item') -- 外部居中层
-			local hItemContent = hItem:Lookup('Handle_ItemContent') -- 内部文本布局层
-			hItemContent:AppendItemFromString(col.GetFormatText(rec, data))
-			hItemContent:SetW(99999)
-			hItemContent:FormatAllItemPos()
-			hItemContent:SetSizeByAllItemSize()
-			local nWidth = col.nWidth
-			if j == #COLUMN_LIST then
-				nWidth = EXCEL_WIDTH - nX
+		if rec then
+			for j, col in ipairs(COLUMN_LIST) do
+				local hItem = hRowItemList:Lookup(j - 1) or hRowItemList:AppendItemFromIni(SZ_INI, 'Handle_Item') -- 外部居中层
+				local hItemContent = hItem:Lookup('Handle_ItemContent') -- 内部文本布局层
+				hItemContent:Clear()
+				hItemContent:AppendItemFromString(col.GetFormatText(rec, data))
+				hItemContent:SetW(99999)
+				hItemContent:FormatAllItemPos()
+				hItemContent:SetSizeByAllItemSize()
+				local nWidth = col.nWidth
+				if j == #COLUMN_LIST then
+					nWidth = EXCEL_WIDTH - nX
+				end
+				hItem:SetRelX(nX)
+				hItem:SetW(nWidth)
+				hItemContent:SetRelPos((nWidth - hItemContent:GetW()) / 2, (hItem:GetH() - hItemContent:GetH()) / 2)
+				hItem:FormatAllItemPos()
+				nX = nX + nWidth
 			end
-			hItem:SetRelX(nX)
-			hItem:SetW(nWidth)
-			hItemContent:SetRelPos((nWidth - hItemContent:GetW()) / 2, (hItem:GetH() - hItemContent:GetH()) / 2)
-			hItem:FormatAllItemPos()
-			nX = nX + nWidth
 		end
+		hRowItemList:FormatAllItemPos()
 		hRow.rec = rec
-		hRow:FormatAllItemPos()
+		hRow:SetVisible(rec and true or false)
 	end
 	hList:FormatAllItemPos()
 
@@ -603,6 +617,7 @@ function D.PopupRowMenu(frame, rec)
 			szOption = _L('Search for %s', szCaster),
 			fnAction = function()
 				frame:Lookup('Wnd_Total/Wnd_Search/Edit_Search'):SetText(dwCaster)
+				D.UpdateData(frame)
 				D.DrawData(frame)
 			end,
 		})
@@ -612,6 +627,7 @@ function D.PopupRowMenu(frame, rec)
 			szOption = _L('Search for %s', szTarget),
 			fnAction = function()
 				frame:Lookup('Wnd_Total/Wnd_Search/Edit_Search'):SetText(dwTarget)
+				D.UpdateData(frame)
 				D.DrawData(frame)
 			end,
 		})
@@ -639,6 +655,7 @@ end
 
 function MY_Recount_FP.OnEvent(event)
 	if event == 'MY_RECOUNT_UI_CONFIG_UPDATE' then
+		D.UpdateData(this)
 		D.DrawData(this)
 	end
 end
@@ -647,6 +664,9 @@ function MY_Recount_FP.OnLButtonClick()
 	local name = this:GetName()
 	if name == 'Btn_Close' then
 		Wnd.CloseWindow(this:GetRoot())
+	elseif name == 'Btn_Refresh' then
+		D.UpdateData(this:GetRoot())
+		D.DrawData(this:GetRoot())
 	end
 end
 
@@ -655,6 +675,7 @@ function MY_Recount_FP.OnEditSpecialKeyDown()
 	local szKey = GetKeyName(Station.GetMessageKey())
 	if szKey == 'Enter' then
 		if name == 'Edit_Search' then
+			D.UpdateData(this:GetRoot())
 			D.DrawData(this:GetRoot())
 		elseif name == 'WndEdit_Index' then
 			this:GetRoot().nPage = tonumber(this:GetText()) or this:GetRoot().nPage
@@ -675,6 +696,7 @@ function MY_Recount_FP.OnItemLButtonClick()
 				frame.szSortKey = this.szKey
 			end
 			D.DrawHead(frame)
+			D.UpdateData(frame)
 			D.DrawData(frame)
 		end
 	elseif name == 'Handle_Index' then
