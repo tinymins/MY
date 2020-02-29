@@ -101,7 +101,7 @@ end
 
 -- обр╩ж║╢Фел
 function DS:DelaySaveData()
-	LIB.BreatheCall('MY_GKP_DS#' .. self:GetFilePath(), function()
+	LIB.DelayCall('MY_GKP_DS#' .. self:GetFilePath(), function()
 		self:SaveData()
 	end)
 end
