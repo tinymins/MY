@@ -589,9 +589,20 @@ end
 -- 获取副本地图刷新时间
 -- (number nNextTime, number nCircle) LIB.GetDungeonRefreshTime(dwMapID)
 function LIB.GetDungeonRefreshTime(dwMapID)
-	local nNextTime, nCircle = 0, 0
-	local _, nMapType, nMaxPlayerCount = GetMapParams(dwMapID)
-	if nMapType == MAP_TYPE.DUNGEON then
+	local nNextTime, nCircle, nMaxPlayerCount = 0, 0, nil
+	if IsNumber(dwMapID) then
+		local _, nMapType, nMaxPlayerCount1 = GetMapParams(dwMapID)
+		if nMapType == MAP_TYPE.DUNGEON then
+			nMaxPlayerCount = nMaxPlayerCount1
+		end
+	elseif dwMapID == '5' then
+		nMaxPlayerCount = 5
+	elseif dwMapID == '10' then
+		nMaxPlayerCount = 10
+	elseif dwMapID == '25' then
+		nMaxPlayerCount = 25
+	end
+	if nMaxPlayerCount then
 		local nTime = GetCurrentTime()
 		local date = TimeToDate(nTime)
 		if nMaxPlayerCount <= 5 then -- 5人本 每天7点
