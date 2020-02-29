@@ -588,9 +588,9 @@ function D.PopupRowMenu(frame, rec)
 						or _L['Skill']
 					local szResultType = MY_Recount.SKILL_RESULT_NAME[rec[11]]
 					if szResultType and rec[11] ~= MY_Recount.SKILL_RESULT.HIT then
-						szText = szText .. _L('%s use %s %s(%s) cause %s', szCaster, szEffectType, szName, szResultType, szTarget)
+						szText = szText .. _L('%s use %s %s(%s) cause %s ', szCaster, szEffectType, szName, szResultType, szTarget)
 					else
-						szText = szText .. _L('%s use %s %s cause %s', szCaster, szEffectType, szName, szTarget)
+						szText = szText .. _L('%s use %s %s cause %s ', szCaster, szEffectType, szName, szTarget)
 					end
 					local nTherapy = rec[12]
 					local nEffectTherapy = rec[13]
