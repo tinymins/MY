@@ -1053,8 +1053,14 @@ function MY_CataclysmMain.OnLButtonClick()
 		end
 		return MY_GKP.TogglePanel()
 	elseif szName == 'Wnd_TeamTools' then
+		if not MY_RaidTools then
+			return LIB.Alert(_L['Please install and load MY_RaidTools addon first.'])
+		end
 		MY_RaidTools.TogglePanel()
 	elseif szName == 'Wnd_TeamNotice' then
+		if not MY_TeamNotice then
+			return LIB.Alert(_L['Please install and load MY_TeamNotice addon first.'])
+		end
 		MY_TeamNotice.OpenFrame()
 	elseif szName == 'WndButton_LootMode' or szName == 'WndButton_LootQuality' then
 		if LIB.IsDistributer() then
