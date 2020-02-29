@@ -358,6 +358,7 @@ local EVERYTHING_TYPE = {
 	SKILL_EFFECT = 1,
 	FIGHT_TIME = 2,
 	DEATH = 3,
+	ONLINE = 4,
 }
 local VERSION = 2
 
@@ -1335,6 +1336,14 @@ LIB.RegisterEvent('SYS_MSG', function()
 	end
 end)
 LIB.RegisterEvent('PARTY_SET_MEMBER_ONLINE_FLAG', function()
+	if LIB.IsParty(arg1) then
+		local nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
+		D.InsertEverything(
+			Data, nLFC, nTime, nTick,
+			EVERYTHING_TYPE.ONLINE, arg1, arg2,
+			LIB.GetObjectName(TARGET.PLAYER, arg1)
+		)
+	end
 	if arg2 == 0 then -- 有人掉线
 		D.OnTeammateStateChange(arg1, true, AWAYTIME_TYPE.OFFLINE, false)
 	else -- 有人上线

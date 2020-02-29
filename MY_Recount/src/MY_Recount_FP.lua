@@ -122,6 +122,12 @@ local COLUMN_LIST = {
 			if rec[4] == EVERYTHING_TYPE.DEATH then
 				return GetFormatText(_L['Death'])
 			end
+			if rec[4] == EVERYTHING_TYPE.ONLINE then
+				if rec[6] then
+					return GetFormatText(_L['Online'])
+				end
+				return GetFormatText(_L['Offline'])
+			end
 			return GetFormatText('-')
 		end,
 		Compare = GeneCommonCompare('*', 4)
@@ -321,6 +327,8 @@ function D.UpdateData(frame)
 			or (szSearch == _L['Buff'] and rec[4] == EVERYTHING_TYPE.SKILL_EFFECT and rec[7] == SKILL_EFFECT_TYPE.BUFF)
 			or (szSearch == _L['Fight time'] and rec[4] == EVERYTHING_TYPE.FIGHT_TIME)
 			or (szSearch == _L['Death'] and rec[4] == EVERYTHING_TYPE.DEATH)
+			or (szSearch == _L['Online'] and rec[4] == EVERYTHING_TYPE.ONLINE and rec[6])
+			or (szSearch == _L['Offline'] and rec[4] == EVERYTHING_TYPE.ONLINE and not rec[6])
 			or (rec[4] == EVERYTHING_TYPE.SKILL_EFFECT and (
 				nSearch == rec[8] or nSearch == rec[5] or nSearch == rec[6]
 				or wfind(MY_Recount_DS.GetNameAusID(data, rec[5]) or '', szSearch)
@@ -539,7 +547,7 @@ function D.PopupRowMenu(frame, rec)
 			szOption = g_tStrings.tChannelName[szChannel],
 			rgb = GetMsgFontColor(szChannel, true),
 			fnAction = function()
-				local szText = LIB.FormatTime(rec[2], '[%hh:%mm:%ss]')
+				local szText = LIB.FormatTime(rec[2], '[%hh:%mm:%ss] ')
 				if rec[4] == EVERYTHING_TYPE.FIGHT_TIME then
 					if rec[5] then
 						szText = szText .. _L('Fighting for %ds.', rec[7] / 1000)
@@ -562,6 +570,12 @@ function D.PopupRowMenu(frame, rec)
 							szText = szText .. _L('%s killed %s.', rec[8], rec[7])
 						end
 					end
+				elseif rec[4] == EVERYTHING_TYPE.ONLINE then
+					if rec[6] then
+						szText = szText .. _L('[%s] get online.', rec[7])
+					else
+						szText = szText .. _L('[%s] get offline.', rec[7])
+					end
 				elseif rec[4] == EVERYTHING_TYPE.SKILL_EFFECT then
 					local szName, bAnonymous = MY_Recount_DS.GetEffectInfoAusID(data, rec[10])
 					if IsEmpty(szName) or bAnonymous then
@@ -572,8 +586,12 @@ function D.PopupRowMenu(frame, rec)
 					local szEffectType = rec[7] == SKILL_EFFECT_TYPE.BUFF
 						and _L['Buff']
 						or _L['Skill']
-					szText = szText .. _L('%s use %s %s cause %s', szCaster, szEffectType, szName, szTarget)
-					local szResultType = rec[11]
+					local szResultType = MY_Recount.SKILL_RESULT_NAME[rec[11]]
+					if szResultType and rec[11] ~= MY_Recount.SKILL_RESULT.HIT then
+						szText = szText .. _L('%s use %s %s(%s) cause %s', szCaster, szEffectType, szName, szResultType, szTarget)
+					else
+						szText = szText .. _L('%s use %s %s cause %s', szCaster, szEffectType, szName, szTarget)
+					end
 					local nTherapy = rec[12]
 					local nEffectTherapy = rec[13]
 					local nDamage = rec[14]
