@@ -628,6 +628,15 @@ function D.PopupRowMenu(frame, rec)
 			end,
 		})
 	end
+	if rec[4] == EVERYTHING_TYPE.SKILL_EFFECT then
+		local szName = MY_Recount_DS.GetEffectInfoAusID(data, rec[10]) or rec[10]
+		insert(menu, {
+			szOption = _L('Search for %s', szName),
+			fnAction = function()
+				D.SetSearch(frame, szName)
+			end,
+		})
+	end
 	PopupMenu(menu)
 end
 
