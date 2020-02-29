@@ -65,6 +65,7 @@ return {
     ['Time'] = '时间',
     ['Buff'] = 'BUFF',
     ['Skill'] = '技能',
+    ['Death'] = '重伤',
     ['Time (ms)'] = '时间(ms)',
     ['Tick'] = '毫秒数',
     ['Framecount'] = '逻辑帧',
@@ -78,4 +79,8 @@ return {
     ['Damage'] = '伤害',
     ['EffectDamage'] = '有效伤害',
     ['Description'] = '描述',
+    ['%s killed %s.'] = '%s 打伤了 %s。',
+    ['[%s] killed %s.'] = '[%s] 打伤了 %s。',
+    ['%s killed [%s].'] = '%s 打伤了 [%s]。',
+    ['[%s] killed [%s].'] = '[%s] 打伤了 [%s]。',
 }

@@ -119,6 +119,9 @@ local COLUMN_LIST = {
 					return GetFormatText(_L['Skill'])
 				end
 			end
+			if rec[4] == EVERYTHING_TYPE.DEATH then
+				return GetFormatText(_L['Death'])
+			end
 			return GetFormatText('-')
 		end,
 		Compare = GeneCommonCompare('*', 4)
@@ -155,6 +158,9 @@ local COLUMN_LIST = {
 			if rec[4] == EVERYTHING_TYPE.SKILL_EFFECT then
 				return GetFormatText(MY_Recount_DS.GetNameAusID(data, rec[5]) or rec[5])
 			end
+			if rec[4] == EVERYTHING_TYPE.DEATH then
+				return GetFormatText(rec[8] or rec[6])
+			end
 			return GetFormatText('-')
 		end,
 		Compare = GeneCommonCompare(EVERYTHING_TYPE.SKILL_EFFECT, 5)
@@ -167,6 +173,9 @@ local COLUMN_LIST = {
 		GetFormatText = function(rec, data)
 			if rec[4] == EVERYTHING_TYPE.SKILL_EFFECT then
 				return GetFormatText(MY_Recount_DS.GetNameAusID(data, rec[6]) or rec[6])
+			end
+			if rec[4] == EVERYTHING_TYPE.DEATH then
+				return GetFormatText(rec[7] or rec[5])
 			end
 			return GetFormatText('-')
 		end,
@@ -226,6 +235,18 @@ local COLUMN_LIST = {
 					return GetFormatText(_L('Last fighting for %ds.', rec[7] / 1000))
 				end
 				return GetFormatText(_L['Not fighting now.'])
+			end
+			if rec[4] == EVERYTHING_TYPE.DEATH then
+				if IsPlayer(rec[5]) then
+					if IsPlayer(rec[6]) then
+						return GetFormatText(_L('[%s] killed [%s].', rec[8], rec[7]))
+					end
+					return GetFormatText(_L('%s killed [%s].', rec[8], rec[7]))
+				end
+				if IsPlayer(rec[6]) then
+					return GetFormatText(_L('[%s] killed %s.', rec[8], rec[7]))
+				end
+				return GetFormatText(_L('%s killed %s.', rec[8], rec[7]))
 			end
 			return GetFormatText('-')
 		end,
@@ -293,6 +314,7 @@ function D.DrawData(frame)
 			(szSearch == _L['Skill'] and rec[4] == EVERYTHING_TYPE.SKILL_EFFECT and rec[7] == SKILL_EFFECT_TYPE.SKILL)
 			or (szSearch == _L['Buff'] and rec[4] == EVERYTHING_TYPE.SKILL_EFFECT and rec[7] == SKILL_EFFECT_TYPE.BUFF)
 			or (szSearch == _L['Fight time'] and rec[4] == EVERYTHING_TYPE.FIGHT_TIME)
+			or (szSearch == _L['Death'] and rec[4] == EVERYTHING_TYPE.DEATH)
 			or (rec[4] == EVERYTHING_TYPE.SKILL_EFFECT and (
 				nSearch == rec[8] or nSearch == rec[5] or nSearch == rec[6]
 				or wfind(MY_Recount_DS.GetNameAusID(data, rec[5]) or '', szSearch)
@@ -394,7 +416,12 @@ function D.DrawData(frame)
 	handle:FormatAllItemPos()
 	handle:SetSizeByAllItemSize()
 	hOuter:FormatAllItemPos()
-	frame:Lookup('', 'Text_Title'):SetText(_L['MY_Recount_FP'] .. ' - ' .. data[DK.BOSSNAME])
+
+	local szTitle = _L['MY_Recount_FP']
+	if data[DK.BOSSNAME] then
+		szTitle = szTitle .. ' - ' .. data[DK.BOSSNAME]
+	end
+	frame:Lookup('', 'Text_Title'):SetText(szTitle)
 	frame:Lookup('Wnd_Total/Wnd_Index', 'Handle_IndexCount/Text_IndexCount'):SprintfText(_L['Total %d pages'], nPageCount)
 end
 

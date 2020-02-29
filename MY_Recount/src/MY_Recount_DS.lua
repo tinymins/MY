@@ -357,6 +357,7 @@ local AWAYTIME_TYPE = {
 local EVERYTHING_TYPE = {
 	SKILL_EFFECT = 1,
 	FIGHT_TIME = 2,
+	DEATH = 3,
 }
 local VERSION = 2
 
@@ -1275,7 +1276,6 @@ end)
 --     end
 -- end)
 
-
 -- 有人死了活了做一下时间轴记录
 function D.OnTeammateStateChange(dwID, bLeave, nAwayType, bAddWhenRecEmpty)
 	if not (Data and Data[DK.AWAYTIME]) then
@@ -1316,6 +1316,22 @@ LIB.RegisterEvent('PARTY_UPDATE_MEMBER_INFO', function()
 	local info = team.GetMemberInfo(arg1)
 	if info then
 		D.OnTeammateStateChange(arg1, info.bDeathFlag, AWAYTIME_TYPE.DEATH, false)
+	end
+end)
+LIB.RegisterEvent('SYS_MSG', function()
+	if arg0 ~= 'UI_OME_DEATH_NOTIFY' then
+		return
+	end
+	-- 插入数据到日志
+	local nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
+	local dwID, dwKiller = arg1, arg2
+	if LIB.IsParty(dwID) or LIB.IsParty(dwKiller) then
+		D.InsertEverything(
+			Data, nLFC, nTime, nTick,
+			EVERYTHING_TYPE.DEATH, dwID, dwKiller,
+			LIB.GetObjectName(IsPlayer(dwID) and TARGET.PLAYER or TARGET.NPC, dwID),
+			LIB.GetObjectName(IsPlayer(dwKiller) and TARGET.PLAYER or TARGET.NPC, dwKiller)
+		)
 	end
 end)
 LIB.RegisterEvent('PARTY_SET_MEMBER_ONLINE_FLAG', function()
