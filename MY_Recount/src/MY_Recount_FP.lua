@@ -505,6 +505,120 @@ function D.OutputTip(this, rec)
 	OutputTip(concat(aXml), 450, {x, y, w, h}, UI.TIP_POSITION.RIGHT_LEFT)
 end
 
+function D.PopupRowMenu(frame, rec)
+	local data = frame.data
+	local menu = {}
+	-- ¸´ÖÆ
+	local t = { szOption = _L['Copy'] }
+	for nChannel, szChannel in pairs({
+		[PLAYER_TALK_CHANNEL.RAID] = 'MSG_TEAM',
+		[PLAYER_TALK_CHANNEL.TEAM] = 'MSG_PARTY',
+		[PLAYER_TALK_CHANNEL.TONG] = 'MSG_GUILD',
+	}) do
+		insert(t, {
+			szOption = g_tStrings.tChannelName[szChannel],
+			rgb = GetMsgFontColor(szChannel, true),
+			fnAction = function()
+				local szText = LIB.FormatTime(rec[2], '[%hh:%mm:%ss]')
+				if rec[4] == EVERYTHING_TYPE.FIGHT_TIME then
+					if rec[5] then
+						szText = szText .. _L('Fighting for %ds.', rec[7] / 1000)
+					elseif rec[7] > 0 then
+						szText = szText .. _L('Last fighting for %ds.', rec[7] / 1000)
+					else
+						szText = szText .. GetFormatText(_L['Not fighting now.'])
+					end
+				elseif rec[4] == EVERYTHING_TYPE.DEATH then
+					if IsPlayer(rec[5]) then
+						if IsPlayer(rec[6]) then
+							szText = szText .. _L('[%s] killed [%s].', rec[8], rec[7])
+						else
+							szText = szText .. _L('%s killed [%s].', rec[8], rec[7])
+						end
+					else
+						if IsPlayer(rec[6]) then
+							szText = szText .. _L('[%s] killed %s.', rec[8], rec[7])
+						else
+							szText = szText .. _L('%s killed %s.', rec[8], rec[7])
+						end
+					end
+				elseif rec[4] == EVERYTHING_TYPE.SKILL_EFFECT then
+					local szName, bAnonymous = MY_Recount_DS.GetEffectInfoAusID(data, rec[10])
+					if IsEmpty(szName) or bAnonymous then
+						szName = rec[8] .. ',' .. rec[9]
+					end
+					local szCaster = MY_Recount_DS.GetNameAusID(data, rec[5]) or rec[5]
+					local szTarget = MY_Recount_DS.GetNameAusID(data, rec[6]) or rec[6]
+					local szEffectType = rec[7] == SKILL_EFFECT_TYPE.BUFF
+						and _L['Buff']
+						or _L['Skill']
+					szText = szText .. _L('%s use %s %s cause %s', szCaster, szEffectType, szName, szTarget)
+					local szResultType = rec[11]
+					local nTherapy = rec[12]
+					local nEffectTherapy = rec[13]
+					local nDamage = rec[14]
+					local nEffectDamage = rec[15]
+					if nTherapy == 0 and nDamage == 0 then
+						szText = szText .. _L['no effect']
+					else
+						if nTherapy > 0 then
+							szText = szText .. _L('get healed by %d', nTherapy)
+							if nTherapy ~= nEffectTherapy then
+								szText = szText .. _L[',']
+								szText = szText .. _L('effect healed %d', nEffectTherapy)
+							end
+						end
+						if nDamage > 0 then
+							if nTherapy > 0 then
+								szText = szText .. _L[',']
+							end
+							szText = szText .. _L('get damaged by %d', nDamage)
+							if nDamage ~= nEffectDamage then
+								szText = szText .. _L[',']
+								szText = szText .. _L('effect damaged %d', nEffectDamage)
+							end
+						end
+					end
+					szText = szText .. _L['.']
+				else
+					szText = szText .. '-'
+				end
+				LIB.Talk(nChannel, szText)
+			end,
+		})
+	end
+	insert(menu, t)
+	-- ËÑË÷
+	local dwCaster, szCaster, dwTarget, szTarget
+	if rec[4] == EVERYTHING_TYPE.DEATH then
+		dwCaster, szCaster, dwTarget, szTarget = rec[6], rec[8], rec[5], rec[7]
+	elseif rec[4] == EVERYTHING_TYPE.SKILL_EFFECT then
+		dwCaster = rec[5]
+		szCaster = MY_Recount_DS.GetNameAusID(data, rec[5]) or rec[5]
+		dwTarget = rec[6]
+		szTarget = MY_Recount_DS.GetNameAusID(data, rec[6]) or rec[6]
+	end
+	if dwCaster then
+		insert(menu, {
+			szOption = _L('Search for %s', szCaster),
+			fnAction = function()
+				frame:Lookup('Wnd_Total/Wnd_Search/Edit_Search'):SetText(dwCaster)
+				D.DrawData(frame)
+			end,
+		})
+	end
+	if dwTarget then
+		insert(menu, {
+			szOption = _L('Search for %s', szTarget),
+			fnAction = function()
+				frame:Lookup('Wnd_Total/Wnd_Search/Edit_Search'):SetText(dwTarget)
+				D.DrawData(frame)
+			end,
+		})
+	end
+	PopupMenu(menu)
+end
+
 function MY_Recount_FP.OnFrameCreate()
 	this.szSortKey = 'time'
 	this.szSortOrder = 'asc'
@@ -566,6 +680,13 @@ function MY_Recount_FP.OnItemLButtonClick()
 	elseif name == 'Handle_Index' then
 		this:GetRoot().nPage = this.nPage
 		D.DrawData(this:GetRoot())
+	end
+end
+
+function MY_Recount_FP.OnItemRButtonClick()
+	local name = this:GetName()
+	if name == 'Handle_Row' then
+		D.PopupRowMenu(this:GetRoot(), this.rec)
 	end
 end
 
