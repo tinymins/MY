@@ -95,6 +95,30 @@ local function GeneCommonCompare(id)
 		return r1[id] > r2[id] and 1 or -1
 	end
 end
+local function GeneWeeklyFormatText(id)
+	return function(r)
+		local nNextTime, nCircle = LIB.GetDungeonRefreshTime('25')
+		local szText = nNextTime - nCircle < r.time
+			and r[id]
+			or _L['Unknown']
+		return GetFormatText(szText)
+	end
+end
+local function GeneWeeklyCompare(id)
+	return function(r1, r2)
+		local nNextTime, nCircle = LIB.GetDungeonRefreshTime('25')
+		local v1 = nNextTime - nCircle < r1.time
+			and r1[id]
+			or -1
+		local v2 = nNextTime - nCircle < r2.time
+			and r2[id]
+			or -1
+		if v1 == v2 then
+			return 0
+		end
+		return v1 > v2 and 1 or -1
+	end
+end
 local COLUMN_LIST = {
 	-- guid,
 	-- account,
@@ -185,8 +209,8 @@ local COLUMN_LIST = {
 		id = 'contribution_remain',
 		szTitle = _L['Contribution_remain'],
 		nWidth = 70,
-		GetFormatText = GeneCommonFormatText('contribution_remain'),
-		Compare = GeneCommonCompare('contribution_remain'),
+		GetFormatText = GeneWeeklyFormatText('contribution_remain'),
+		Compare = GeneWeeklyCompare('contribution_remain'),
 	},
 	{ -- 侠义
 		id = 'justice',
@@ -199,8 +223,8 @@ local COLUMN_LIST = {
 		id = 'justice_remain',
 		szTitle = _L['Justice remain'],
 		nWidth = 60,
-		GetFormatText = GeneCommonFormatText('justice_remain'),
-		Compare = GeneCommonCompare('justice_remain'),
+		GetFormatText = GeneWeeklyFormatText('justice_remain'),
+		Compare = GeneWeeklyCompare('justice_remain'),
 	},
 	{
 		-- 威望
@@ -214,16 +238,16 @@ local COLUMN_LIST = {
 		id = 'prestige_remain',
 		szTitle = _L['Prestige remain'],
 		nWidth = 70,
-		GetFormatText = GeneCommonFormatText('prestige_remain'),
-		Compare = GeneCommonCompare('prestige_remain'),
+		GetFormatText = GeneWeeklyFormatText('prestige_remain'),
+		Compare = GeneWeeklyCompare('prestige_remain'),
 	},
 	{
 		-- 战阶积分
 		id = 'camp_point',
 		szTitle = _L['Camp point'],
 		nWidth = 70,
-		GetFormatText = GeneCommonFormatText('camp_point'),
-		Compare = GeneCommonCompare('camp_point'),
+		GetFormatText = GeneWeeklyFormatText('camp_point'),
+		Compare = GeneWeeklyCompare('camp_point'),
 	},
 	{
 		-- 战阶等级
@@ -256,8 +280,8 @@ local COLUMN_LIST = {
 		id = 'arena_award_remain',
 		szTitle = _L['Arena award remain'],
 		nWidth = 60,
-		GetFormatText = GeneCommonFormatText('arena_award_remain'),
-		Compare = GeneCommonCompare('arena_award_remain'),
+		GetFormatText = GeneWeeklyFormatText('arena_award_remain'),
+		Compare = GeneWeeklyCompare('arena_award_remain'),
 	},
 	{
 		-- 监本
@@ -272,8 +296,8 @@ local COLUMN_LIST = {
 		id = 'exam_print_remain',
 		szTitle = _L['Exam print remain'],
 		nWidth = 55,
-		GetFormatText = GeneCommonFormatText('exam_print_remain'),
-		Compare = GeneCommonCompare('exam_print_remain'),
+		GetFormatText = GeneWeeklyFormatText('exam_print_remain'),
+		Compare = GeneWeeklyCompare('exam_print_remain'),
 	},
 	{
 		-- 资历
