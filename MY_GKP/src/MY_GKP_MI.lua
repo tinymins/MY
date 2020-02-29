@@ -517,7 +517,7 @@ function D.SyncSystemGKP()
 		tab.bDelete = v.nState == 0
 		ds:SetAuctionRec(tab)
 		-- 付款记录
-		if not IsEmpty(v.dwPayerID) then
+		if not IsEmpty(v.dwPayerID) and not IsEmpty(v.nPrice) then
 			local player = GetPlayer(v.dwDestPlayerID) -- 记账到欠款人头上方便统计
 			local dwForceID = player and player.dwForceID
 			if not dwForceID then
