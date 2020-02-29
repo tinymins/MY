@@ -91,7 +91,7 @@ local SKILL_RESULT = {
 	CRITICAL= 5, -- »áÐÄ
 	INSIGHT = 6, -- Ê¶ÆÆ
 }
-local SZ_SKILL_RESULT = {
+local SKILL_RESULT_NAME = {
 	[SKILL_RESULT.HIT     ] = g_tStrings.STR_HIT_NAME     ,
 	[SKILL_RESULT.BLOCK   ] = g_tStrings.STR_IMMUNITY_NAME,
 	[SKILL_RESULT.SHIELD  ] = g_tStrings.STR_SHIELD_NAME  ,
@@ -594,7 +594,7 @@ local settings = {
 				STAT_TYPE_NAME = STAT_TYPE_NAME,
 				PUBLISH_MODE = PUBLISH_MODE,
 				SKILL_RESULT = SKILL_RESULT,
-				SKILL_RESULT_NAME = SZ_SKILL_RESULT,
+				SKILL_RESULT_NAME = SKILL_RESULT_NAME,
 			},
 		},
 		{

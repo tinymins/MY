@@ -186,7 +186,12 @@ local COLUMN_LIST = {
 		bSort = true,
 		nWidth = 50,
 		szTitle = _L['SkillResult'],
-		GetFormatText = GeneCommonFormatText(EVERYTHING_TYPE.SKILL_EFFECT, 11),
+		GetFormatText = function(rec)
+			if rec[4] == EVERYTHING_TYPE.SKILL_EFFECT then
+				return GetFormatText(MY_Recount.SKILL_RESULT_NAME[rec[11]] or '')
+			end
+			return GetFormatText('-')
+		end,
 		Compare = GeneCommonCompare(EVERYTHING_TYPE.SKILL_EFFECT, 11)
 	},
 	{
@@ -321,6 +326,7 @@ function D.UpdateData(frame)
 				or wfind(MY_Recount_DS.GetNameAusID(data, rec[5]) or '', szSearch)
 				or wfind(MY_Recount_DS.GetNameAusID(data, rec[6]) or '', szSearch)
 				or wfind(MY_Recount_DS.GetEffectInfoAusID(data, rec[10]) or '', szSearch)
+				or szSearch == MY_Recount.SKILL_RESULT_NAME[rec[11]]
 			))
 		) then
 			bMatch = false
