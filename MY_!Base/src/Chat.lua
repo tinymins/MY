@@ -830,6 +830,13 @@ function LIB.Talk(nChannel, szText, szUUID, bNoEscape, bSaveDeny, bPushToChatBox
 	else
 		tSay = {{ type = 'text', text = szText}}
 	end
+	if LIB.IsShieldedVersion('TALK', 2) then
+		for _, v in ipairs(tSay) do
+			if v.text then
+				v.text = wgsub(v.text, '\n', ' ')
+			end
+		end
+	end
 	if not bNoEscape then
 		tSay = ParseFaceIcon(tSay)
 		tSay = ParseName(tSay)
