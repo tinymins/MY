@@ -616,9 +616,7 @@ function D.PopupRowMenu(frame, rec)
 		insert(menu, {
 			szOption = _L('Search for %s', szCaster),
 			fnAction = function()
-				frame:Lookup('Wnd_Total/Wnd_Search/Edit_Search'):SetText(dwCaster)
-				D.UpdateData(frame)
-				D.DrawData(frame)
+				D.SetSearch(frame, dwCaster)
 			end,
 		})
 	end
@@ -626,13 +624,22 @@ function D.PopupRowMenu(frame, rec)
 		insert(menu, {
 			szOption = _L('Search for %s', szTarget),
 			fnAction = function()
-				frame:Lookup('Wnd_Total/Wnd_Search/Edit_Search'):SetText(dwTarget)
-				D.UpdateData(frame)
-				D.DrawData(frame)
+				D.SetSearch(frame, dwTarget)
 			end,
 		})
 	end
 	PopupMenu(menu)
+end
+
+function D.SetPage(frame, nPage)
+	frame.nPage = nPage
+	D.DrawData(frame)
+end
+
+function D.SetSearch(frame, szSearch)
+	frame:Lookup('Wnd_Total/Wnd_Search/Edit_Search'):SetText(szSearch)
+	D.UpdateData(frame)
+	D.SetPage(frame, 1)
 end
 
 function MY_Recount_FP.OnFrameCreate()
@@ -676,10 +683,12 @@ function MY_Recount_FP.OnEditSpecialKeyDown()
 	if szKey == 'Enter' then
 		if name == 'Edit_Search' then
 			D.UpdateData(this:GetRoot())
-			D.DrawData(this:GetRoot())
+			D.SetPage(this:GetRoot(), 1)
 		elseif name == 'WndEdit_Index' then
-			this:GetRoot().nPage = tonumber(this:GetText()) or this:GetRoot().nPage
-			D.DrawData(this:GetRoot())
+			local nPage = tonumber(this:GetText())
+			if nPage then
+				D.SetPage(this:GetRoot(), nPage)
+			end
 		end
 		return 1
 	end
@@ -700,8 +709,7 @@ function MY_Recount_FP.OnItemLButtonClick()
 			D.DrawData(frame)
 		end
 	elseif name == 'Handle_Index' then
-		this:GetRoot().nPage = this.nPage
-		D.DrawData(this:GetRoot())
+		D.SetPage(this:GetRoot(), this.nPage)
 	end
 end
 
