@@ -317,11 +317,19 @@ function D.UpdateData(frame)
 	end
 	for _, rec in ipairs(data[DK.EVERYTHING]) do
 		local bMatch = true
+		-- 零数值记录
+		if bMatch and not MY_Recount_UI.bShowZeroVal
+		and rec[4] == EVERYTHING_TYPE.SKILL_EFFECT
+		and rec[14] == 0 and rec[12] == 0 then
+			bMatch = false
+		end
+		-- 没名字记录
 		if bMatch and MY_Recount_UI.bHideAnonymous
 		and rec[4] == EVERYTHING_TYPE.SKILL_EFFECT
 		and select(2, MY_Recount_DS.GetEffectInfoAusID(data, rec[10])) then
 			bMatch = false
 		end
+		-- 搜索匹配
 		if bMatch and szSearch and not (
 			(szSearch == _L['Skill'] and rec[4] == EVERYTHING_TYPE.SKILL_EFFECT and rec[7] == SKILL_EFFECT_TYPE.SKILL)
 			or (szSearch == _L['Buff'] and rec[4] == EVERYTHING_TYPE.SKILL_EFFECT and rec[7] == SKILL_EFFECT_TYPE.BUFF)
