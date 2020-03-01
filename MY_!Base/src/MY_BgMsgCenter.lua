@@ -171,23 +171,30 @@ end)
 end
 
 -- 进入团队副本
-do local MSG_MAP_ID, MSG_ID
-local function OnSwitchMap(dwMapID, dwID, dwCopyID)
+do
+local MSG_MAP_ID, MSG_ID, CROSSING
+
+local function OnSwitchMap(dwMapID, dwID, dwCopyID, dwTime)
 	if not LIB.IsInParty() then
 		return
 	end
 	--[[#DEBUG BEGIN]]
-	LIB.Debug(PACKET_INFO.NAME_SPACE, 'Switch dungeon :' .. dwMapID, DEBUG_LEVEL.LOG)
+	LIB.Debug(PACKET_INFO.NAME_SPACE, 'Switch dungeon: ' .. dwMapID, DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
-	LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_SWITCH_MAP', dwMapID, dwID, dwCopyID)
+	LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_SWITCH_MAP', dwMapID, dwID, dwCopyID, dwTime)
 end
 
 local function OnCrossMapGoFB()
+	CROSSING = true
+	local dwTime = GetCurrentTime()
 	local dwMapID, dwID = this.tInfo.MapID, this.tInfo.ID
-	if not LIB.IsDungeonResetable(dwMapID) or (LIB.IsInParty() and not LIB.IsLeader()) then
-		OnSwitchMap(dwMapID, dwID, LIB.GetMapSaveCopy(dwMapID))
-	else
+	-- 副本可重置且是队长则会弹出重置提示框 走 crossmap_dungeon_reset 流程
+	if LIB.IsDungeonResetable(dwMapID) and LIB.IsLeader() then
 		MSG_MAP_ID, MSG_ID = dwMapID, dwID
+	else
+		LIB.GetMapSaveCopy(dwMapID, function(tMapCopy)
+			OnSwitchMap(dwMapID, dwID, tMapCopy and tMapCopy[1], dwTime)
+		end)
 	end
 	return LIB.FORMAT_WMSG_RET(true, true)
 end
@@ -220,8 +227,16 @@ LIB.RegisterEvent('MY_MESSAGE_BOX_ACTION.' .. PACKET_INFO.NAME_SPACE .. '#CD', f
 		return
 	end
 	if arg1 == 'ACTION' and arg2 == g_tStrings.STR_HOTKEY_SURE and MSG_MAP_ID then
-		OnSwitchMap(MSG_MAP_ID, MSG_ID, nil)
+		OnSwitchMap(MSG_MAP_ID, MSG_ID, nil, GetCurrentTime())
 	end
-	MSG_MAP_ID = nil
+	MSG_MAP_ID, MSG_ID = nil
+end)
+
+LIB.RegisterEvent('LOADING_END.' .. PACKET_INFO.NAME_SPACE .. '#CD', function()
+	if not CROSSING then
+		return
+	end
+	local dwMapID = GetClientPlayer().GetMapID()
+	CROSSING = false
 end)
 end
