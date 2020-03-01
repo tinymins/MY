@@ -173,14 +173,13 @@ end
 -- 切换地图
 do
 local l_nSwitchMapID, l_nSwitchSubID
-local l_bEntering, l_nEnteringMapID, l_nEnteringSubID, l_dwEnteringSwitchTime
+local l_nEnteringMapID, l_nEnteringSubID, l_dwEnteringSwitchTime
 
 -- 点击进入某地图（进入前）
 local function OnSwitchMap(dwMapID, dwSubID, aMapCopy, dwTime)
 	if not LIB.IsInParty() then
 		return
 	end
-	l_bEntering = true
 	l_nEnteringMapID = dwMapID
 	l_nEnteringSubID = dwSubID
 	l_dwEnteringSwitchTime = dwTime
@@ -272,9 +271,6 @@ LIB.RegisterEvent('MY_MESSAGE_BOX_ACTION.' .. PACKET_INFO.NAME_SPACE .. '#CD', f
 end)
 
 LIB.RegisterEvent('LOADING_ENDING.' .. PACKET_INFO.NAME_SPACE .. '#CD', function()
-	if not l_bEntering then
-		return
-	end
 	local dwTime = GetCurrentTime()
 	local dwMapID = GetClientPlayer().GetMapID()
 	LIB.GetMapSaveCopy(dwMapID, function(aMapCopy)
@@ -284,6 +280,6 @@ LIB.RegisterEvent('LOADING_ENDING.' .. PACKET_INFO.NAME_SPACE .. '#CD', function
 		end
 		OnEnterMap(dwMapID, nSubID, aMapCopy, dwTime, dwSwitchTime)
 	end)
-	l_bEntering, l_nEnteringSubID = false, nil
+	l_nEnteringSubID, l_dwEnteringSwitchTime = nil
 end)
 end
