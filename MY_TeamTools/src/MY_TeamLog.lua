@@ -170,27 +170,22 @@ end
 -- 这里的szKiller有个很大的坑
 -- 因为策划不喜欢写模板名称 导致NPC名字全是空的 摔死和淹死也是空
 -- 这就特别郁闷
-local function OnDeath(dwCharacterID, dwKiller)
-	if IsPlayer(dwCharacterID) and (MY_IsParty(dwCharacterID) or dwCharacterID == PLAYER_ID) then
-		dwCharacterID = dwCharacterID == PLAYER_ID and 'self' or dwCharacterID
-		DEATH_LOG[dwCharacterID] = DEATH_LOG[dwCharacterID] or {}
-		local killer = (IsPlayer(dwKiller) and GetPlayer(dwKiller)) or (not IsPlayer(dwKiller) and GetNpc(dwKiller))
-		local szKiller = killer and LIB.GetObjectName(killer)
-		if DAMAGE_LOG[dwCharacterID] then
-			insert(DEATH_LOG[dwCharacterID], {
-				nCurrentTime = GetCurrentTime(),
-				data         = DAMAGE_LOG[dwCharacterID],
-				szKiller     = szKiller
-			})
-		else
-			insert(DEATH_LOG[dwCharacterID], {
-				nCurrentTime = GetCurrentTime(),
-				data         = { szCaster = szKiller },
-				szKiller     = szKiller
-			})
+local function OnDeath(dwID, dwKiller)
+	if IsPlayer(dwID) and (MY_IsParty(dwID) or dwID == PLAYER_ID) then
+		local key = dwID == PLAYER_ID
+			and 'self'
+			or dwID
+		if not DEATH_LOG[key] then
+			DEATH_LOG[key] = {}
 		end
-		DAMAGE_LOG[dwCharacterID] = nil
-		FireUIEvent('MY_RAIDTOOLS_DEATH', dwCharacterID)
+		local szKiller = LIB.GetObjectName(IsPlayer(dwKiller) and TARGET.PLAYER or TARGET.NPC, dwKiller)
+		insert(DEATH_LOG[key], {
+			nCurrentTime = GetCurrentTime(),
+			data         = DAMAGE_LOG[key] or { szCaster = szKiller },
+			szKiller     = szKiller,
+		})
+		DAMAGE_LOG[key] = nil
+		FireUIEvent('MY_RAIDTOOLS_DEATH', key)
 	end
 end
 
@@ -225,8 +220,11 @@ function MY_RaidTools.ClearDeathLog()
 end
 
 LIB.RegisterBgMsg('MY_ENTER_MAP', function(_, nChannel, dwTalkerID, szTalkerName, bSelf, dwMapID, dwSubID, aMapCopy, dwTime, dwSwitchTime)
+	local key = dwTalkerID == PLAYER_ID
+		and 'self'
+		or dwTalkerID
 	insert(ENTER_MAP_LOG, {
-		dwID = dwTalkerID == PLAYER_ID and 'self' or dwTalkerID,
+		dwID = key,
 		szName = szTalkerName,
 		dwMapID = dwMapID,
 		dwSubID = dwSubID,
@@ -234,7 +232,7 @@ LIB.RegisterBgMsg('MY_ENTER_MAP', function(_, nChannel, dwTalkerID, szTalkerName
 		dwTime = dwTime or GetCurrentTime(),
 		dwSwitchTime = dwSwitchTime or GetCurrentTime(),
 	})
-	FireUIEvent('MY_RAIDTOOLS_ENTER_MAP', dwTalkerID)
+	FireUIEvent('MY_RAIDTOOLS_ENTER_MAP', key)
 end)
 
 function MY_RaidTools.GetEnterMapLog()

@@ -1280,8 +1280,8 @@ function RT.UpdatetDeathMsg(dwID)
 	local team  = GetClientTeam()
 	local aRec  = {}
 	local key = dwID == me.dwID and 'self' or dwID
-	local tDeath = Clone(RaidTools.GetDeathLog())
-	for k, v in pairs(tDeath) do
+	local aDeathLog = Clone(RaidTools.GetDeathLog())
+	for k, v in pairs(aDeathLog) do
 		if not dwID or k == key then
 			for kk, vv in ipairs(v) do
 				if k == 'self' then
@@ -1294,8 +1294,8 @@ function RT.UpdatetDeathMsg(dwID)
 			end
 		end
 	end
-	local tEnterMap = Clone(RaidTools.GetEnterMapLog())
-	for _, v in ipairs(tEnterMap) do
+	local aEnterMapLog = Clone(RaidTools.GetEnterMapLog())
+	for _, v in ipairs(aEnterMapLog) do
 		if not dwID or v.dwID == key then
 			if v.dwID == 'self' then
 				v.dwID = me.dwID
