@@ -176,18 +176,18 @@ local l_nSwitchMapID, l_nSwitchSubID
 local l_bEntering, l_nEnteringMapID, l_nEnteringSubID, l_dwEnteringSwitchTime
 
 -- 点击进入某地图（进入前）
-local function OnSwitchMap(dwMapID, dwID, dwCopyID, dwTime)
+local function OnSwitchMap(dwMapID, dwSubID, dwCopyID, dwTime)
 	if not LIB.IsInParty() then
 		return
 	end
 	l_bEntering = true
 	l_nEnteringMapID = dwMapID
-	l_nEnteringSubID = dwID
+	l_nEnteringSubID = dwSubID
 	l_dwEnteringSwitchTime = dwTime
 	--[[#DEBUG BEGIN]]
 	local szDebug = 'Switch map: ' .. dwMapID
-	if dwID then
-		szDebug = szDebug .. '(' .. dwID .. ')'
+	if dwSubID then
+		szDebug = szDebug .. '(' .. dwSubID .. ')'
 	end
 	if dwCopyID then
 		szDebug = szDebug .. ' #' .. dwCopyID
@@ -197,7 +197,7 @@ local function OnSwitchMap(dwMapID, dwID, dwCopyID, dwTime)
 	end
 	LIB.Debug(PACKET_INFO.NAME_SPACE, szDebug, DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
-	LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_SWITCH_MAP', dwMapID, dwID, dwCopyID, dwTime)
+	LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_SWITCH_MAP', dwMapID, dwSubID, dwCopyID, dwTime)
 end
 
 -- 成功进入某地图并加载完成（进入后）
