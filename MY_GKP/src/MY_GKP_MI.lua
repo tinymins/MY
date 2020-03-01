@@ -50,6 +50,7 @@ local D = {
 	Sysmsg = MY_GKP.Sysmsg,
 	GetTimeString = MY_GKP.GetTimeString,
 	GetMoneyTipText = MY_GKP.GetMoneyTipText,
+	GetFormatLink = MY_GKP.GetFormatLink,
 }
 local O = {
 	ds          = nil,
