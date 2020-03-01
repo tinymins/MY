@@ -170,27 +170,66 @@ LIB.RegisterBgMsg('MY_MAP_COPY_ID_REQUEST', function(_, nChannel, dwID, szName, 
 end)
 end
 
--- 进入团队副本
+-- 切换地图
 do
-local MSG_MAP_ID, MSG_ID, CROSSING
+local l_nSwitchMapID, l_nSwitchSubID
+local l_bEntering, l_nEnteringMapID, l_nEnteringSubID, l_dwEnteringSwitchTime
 
+-- 点击进入某地图（进入前）
 local function OnSwitchMap(dwMapID, dwID, dwCopyID, dwTime)
 	if not LIB.IsInParty() then
 		return
 	end
+	l_bEntering = true
+	l_nEnteringMapID = dwMapID
+	l_nEnteringSubID = dwID
+	l_dwEnteringSwitchTime = dwTime
 	--[[#DEBUG BEGIN]]
-	LIB.Debug(PACKET_INFO.NAME_SPACE, 'Switch dungeon: ' .. dwMapID, DEBUG_LEVEL.LOG)
+	local szDebug = 'Switch map: ' .. dwMapID
+	if dwID then
+		szDebug = szDebug .. '(' .. dwID .. ')'
+	end
+	if dwCopyID then
+		szDebug = szDebug .. ' #' .. dwCopyID
+	end
+	if dwTime then
+		szDebug = szDebug .. ' @' .. dwTime
+	end
+	LIB.Debug(PACKET_INFO.NAME_SPACE, szDebug, DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 	LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_SWITCH_MAP', dwMapID, dwID, dwCopyID, dwTime)
 end
 
+-- 成功进入某地图并加载完成（进入后）
+local function OnEnterMap(dwMapID, dwSubID, dwCopyID, dwTime, dwSwitchTime)
+	if not LIB.IsInParty() then
+		return
+	end
+	--[[#DEBUG BEGIN]]
+	local szDebug = 'Enter map: ' .. dwMapID
+	if dwSubID then
+		szDebug = szDebug .. '(' .. dwSubID .. ')'
+	end
+	if dwCopyID then
+		szDebug = szDebug .. ' #' .. dwCopyID
+	end
+	if dwTime then
+		szDebug = szDebug .. ' @' .. dwTime
+	end
+	if dwSwitchTime then
+		szDebug = szDebug .. ' <- ' .. dwSwitchTime
+	end
+	LIB.Debug(PACKET_INFO.NAME_SPACE, szDebug, DEBUG_LEVEL.LOG)
+	--[[#DEBUG END]]
+	LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_ENTER_MAP', dwMapID, dwSubID, dwCopyID, dwTime, dwSwitchTime)
+end
+
 local function OnCrossMapGoFB()
-	CROSSING = true
 	local dwTime = GetCurrentTime()
 	local dwMapID, dwID = this.tInfo.MapID, this.tInfo.ID
 	-- 副本可重置且是队长则会弹出重置提示框 走 crossmap_dungeon_reset 流程
 	if LIB.IsDungeonResetable(dwMapID) and LIB.IsLeader() then
-		MSG_MAP_ID, MSG_ID = dwMapID, dwID
+		l_nSwitchMapID, l_nSwitchSubID = dwMapID, dwID
 	else
 		LIB.GetMapSaveCopy(dwMapID, function(tMapCopy)
 			OnSwitchMap(dwMapID, dwID, tMapCopy and tMapCopy[1], dwTime)
@@ -226,17 +265,25 @@ LIB.RegisterEvent('MY_MESSAGE_BOX_ACTION.' .. PACKET_INFO.NAME_SPACE .. '#CD', f
 	if arg0 ~= 'crossmap_dungeon_reset' then
 		return
 	end
-	if arg1 == 'ACTION' and arg2 == g_tStrings.STR_HOTKEY_SURE and MSG_MAP_ID then
-		OnSwitchMap(MSG_MAP_ID, MSG_ID, nil, GetCurrentTime())
+	if arg1 == 'ACTION' and arg2 == g_tStrings.STR_HOTKEY_SURE and l_nSwitchMapID then
+		OnSwitchMap(l_nSwitchMapID, l_nSwitchSubID, nil, GetCurrentTime())
 	end
-	MSG_MAP_ID, MSG_ID = nil
+	l_nSwitchMapID, l_nSwitchSubID = nil
 end)
 
-LIB.RegisterEvent('LOADING_END.' .. PACKET_INFO.NAME_SPACE .. '#CD', function()
-	if not CROSSING then
+LIB.RegisterEvent('LOADING_ENDING.' .. PACKET_INFO.NAME_SPACE .. '#CD', function()
+	if not l_bEntering then
 		return
 	end
+	local dwTime = GetCurrentTime()
 	local dwMapID = GetClientPlayer().GetMapID()
-	CROSSING = false
+	LIB.GetMapSaveCopy(dwMapID, function(tMapCopy)
+		local nSubID, dwSwitchTime
+		if dwMapID == l_nEnteringMapID then
+			nSubID, dwSwitchTime = l_nEnteringSubID, l_dwEnteringSwitchTime
+		end
+		OnEnterMap(dwMapID, nSubID, tMapCopy and tMapCopy[1], dwTime, dwSwitchTime)
+	end)
+	l_bEntering, l_nEnteringSubID = false, nil
 end)
 end
