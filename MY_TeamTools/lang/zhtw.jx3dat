@@ -27,6 +27,8 @@ return {
 	['use'] = '使用',
 	['OUTER GUEST'] = '天外來客',
 	[' * '] = '※',
+	[' enter map %s.'] = '進入地圖 %s。',
+	[' enter map %s, copy id %d.'] = '進入地圖 %s，副本ID為%d。',
 	['Clear'] = '清空',
 	['Team strength(%d/%d)'] = '團隊實力(%d/%d)',
 	['PHYSICS_DAMAGE'] = '外功傷害',

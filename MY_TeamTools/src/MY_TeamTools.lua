@@ -165,6 +165,7 @@ function RaidTools.OnFrameCreate()
 	-- 自定义事件
 	this:RegisterEvent('MY_RAIDTOOLS_SUCCESS')
 	this:RegisterEvent('MY_RAIDTOOLS_DEATH')
+	this:RegisterEvent('MY_RAIDTOOLS_ENTER_MAP')
 	this:RegisterEvent('MY_RAIDTOOLS_MAPID_CHANGE')
 	-- 重置心法选择
 	RT_SELECT_KUNGFU = nil
@@ -323,7 +324,7 @@ function RaidTools.OnEvent(szEvent)
 			this.hList:Sort()
 			this.hList:FormatAllItemPos()
 		end
-	elseif szEvent == 'MY_RAIDTOOLS_DEATH' then
+	elseif szEvent == 'MY_RAIDTOOLS_DEATH'or szEvent == 'MY_RAIDTOOLS_ENTER_MAP' then
 		local nPage = this.hPageSet:GetActivePageIndex()
 		if nPage == 1 then
 			RT.UpdatetDeathPage()
@@ -1258,7 +1259,7 @@ function RaidTools.OnAppendEdit()
 	local handle = this:GetParent()
 	local edit = Station.Lookup('Lowest2/EditBox/Edit_Input')
 	edit:ClearText()
-	for i = this:GetIndex() + 1, handle:GetItemCount() do
+	for i = this:GetIndex(), handle:GetItemCount() do
 		local h = handle:Lookup(i)
 		local szText = h:GetText()
 		if szText == '\n' then
@@ -1277,11 +1278,11 @@ function RT.UpdatetDeathMsg(dwID)
 	local frame = RT.GetFrame()
 	local me    = GetClientPlayer()
 	local team  = GetClientTeam()
-	local data  = {}
+	local aRec  = {}
 	local key = dwID == me.dwID and 'self' or dwID
 	local tDeath = Clone(RaidTools.GetDeathLog())
-	if not dwID then
-		for k, v in pairs(tDeath) do
+	for k, v in pairs(tDeath) do
+		if not dwID or k == key then
 			for kk, vv in ipairs(v) do
 				if k == 'self' then
 					vv.dwID = me.dwID
@@ -1289,40 +1290,57 @@ function RT.UpdatetDeathMsg(dwID)
 					vv.dwID = k
 				end
 				vv.nIndex = kk
-				insert(data, vv)
+				insert(aRec, { nTime = vv.nCurrentTime, szType = 'DEATH', data = vv })
 			end
-		end
-	else
-		for k, v in ipairs(tDeath[key] or {}) do
-			if key == 'self' then
-				v.dwID = me.dwID
-			else
-				v.dwID = key
-			end
-			v.nIndex = k
-			insert(data, v)
 		end
 	end
-	table.sort(data, function(a, b) return a.nCurrentTime > b.nCurrentTime end)
+	local tEnterMap = Clone(RaidTools.GetEnterMapLog())
+	for _, v in ipairs(tEnterMap) do
+		if not dwID or v.dwID == key then
+			if v.dwID == 'self' then
+				v.dwID = me.dwID
+			end
+			insert(aRec, { nTime = v.dwSwitchTime, szType = 'ENTER_MAP', data = v })
+		end
+	end
+	table.sort(aRec, function(a, b) return a.nTime > b.nTime end)
 	frame.hDeatMsg:Clear()
-	for k, v in ipairs(data) do
-		if MY_IsParty(v.dwID) or v.dwID == me.dwID then
-			local info  = team.GetMemberInfo(v.dwID)
-			local key = v.dwID == me.dwID and 'self' or v.dwID
-			local t = TimeToDate(v.nCurrentTime)
+	for _, rec in ipairs(aRec) do
+		local data = rec.data
+		if rec.szType == 'DEATH' and MY_IsParty(data.dwID) or data.dwID == me.dwID then
+			local info = team.GetMemberInfo(data.dwID)
+			local key = data.dwID == me.dwID and 'self' or data.dwID
+			local t = TimeToDate(data.nCurrentTime)
 			local xml = {}
-			insert(xml, GetFormatText(_L[' * '] .. string.format('[%02d:%02d:%02d]', t.hour, t.minute, t.second), 10, 255, 255, 255, 16, 'this.OnItemLButtonClick = MY_RaidTools.OnAppendEdit'))
+			insert(xml, GetFormatText(_L[' * '] .. format('[%02d:%02d:%02d]', t.hour, t.minute, t.second), 10, 255, 255, 255, 16, 'this.OnItemLButtonClick = MY_RaidTools.OnAppendEdit'))
 			local r, g, b = LIB.GetForceColor(info and info.dwForceID or me.dwForceID)
 			insert(xml, GetFormatText('[' .. (info and info.szName or me.szName) ..']', 10, r, g, b, 16, 'this.OnItemLButtonClick = function() OnItemLinkDown(this) end', 'namelink'))
 			insert(xml, GetFormatText(g_tStrings.TRADE_BE, 10, 255, 255, 255))
-			if v.szKiller == '' and v.data[1].szKiller ~= '' then
-				insert(xml, GetFormatText('[' .. _L['OUTER GUEST'] .. g_tStrings.STR_OR .. v.data[1].szKiller ..']', 10, 13, 150, 70, 256, 'this.OnItemMouseEnter = MY_RaidTools.OnShowDeathInfo', key .. '_' .. v.nIndex))
+			if data.szKiller == '' and data.data[1].szKiller ~= '' then
+				insert(xml, GetFormatText('[' .. _L['OUTER GUEST'] .. g_tStrings.STR_OR .. data.data[1].szKiller ..']', 10, 13, 150, 70, 256, 'this.OnItemMouseEnter = MY_RaidTools.OnShowDeathInfo', key .. '_' .. data.nIndex))
 			else
-				insert(xml, GetFormatText('[' .. (v.szKiller ~= '' and v.szKiller or  _L['OUTER GUEST']) ..']', 10, 255, 128, 0, 256, 'this.OnItemMouseEnter = MY_RaidTools.OnShowDeathInfo', key .. '_' .. v.nIndex))
+				insert(xml, GetFormatText('[' .. (data.szKiller ~= '' and data.szKiller or  _L['OUTER GUEST']) ..']', 10, 255, 128, 0, 256, 'this.OnItemMouseEnter = MY_RaidTools.OnShowDeathInfo', key .. '_' .. data.nIndex))
 			end
 			insert(xml, GetFormatText(g_tStrings.STR_KILL .. g_tStrings.STR_FULL_STOP, 10, 255, 255, 255))
 			insert(xml, GetFormatText('\n'))
 			frame.hDeatMsg:AppendItemFromString(table.concat(xml))
+		elseif rec.szType == 'ENTER_MAP' then
+			local info = team.GetMemberInfo(data.dwID)
+			local map = LIB.GetMapInfo(data.dwMapID)
+			if map then
+				local aXml = {}
+				local t = TimeToDate(data.dwSwitchTime or data.dwTime)
+				insert(aXml, GetFormatText(_L[' * '] .. format('[%02d:%02d:%02d]', t.hour, t.minute, t.second), 10, 255, 255, 255, 16, 'this.OnItemLButtonClick = MY_RaidTools.OnAppendEdit'))
+				local r, g, b = LIB.GetForceColor(info and info.dwForceID or me.dwForceID)
+				insert(aXml, GetFormatText('[' .. data.szName ..']', 10, r, g, b, 16, 'this.OnItemLButtonClick = function() OnItemLinkDown(this) end', 'namelink'))
+				if data.dwCopyID then
+					insert(aXml, GetFormatText(_L(' enter map %s, copy id %d.', map.szName, data.dwCopyID)))
+				else
+					insert(aXml, GetFormatText(_L(' enter map %s.', map.szName)))
+				end
+				insert(aXml, GetFormatText('\n'))
+				frame.hDeatMsg:AppendItemFromString(concat(aXml))
+			end
 		end
 	end
 	frame.hDeatMsg:FormatAllItemPos()

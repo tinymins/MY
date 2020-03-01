@@ -53,6 +53,7 @@ local MAX_COUNT  = 5
 local PLAYER_ID  = 0
 local DAMAGE_LOG = {}
 local DEATH_LOG  = {}
+local ENTER_MAP_LOG = {}
 
 local function OnSkillEffectLog(dwCaster, dwTarget, nEffectType, dwSkillID, dwLevel, bCriticalStrike, nCount, tResult)
 	if not tResult[SKILL_RESULT_TYPE.REFLECTIED_DAMAGE] then -- 没有反弹的情况下
@@ -221,4 +222,26 @@ end
 function MY_RaidTools.ClearDeathLog()
 	DEATH_LOG = {}
 	FireUIEvent('MY_RAIDTOOLS_DEATH')
+end
+
+LIB.RegisterBgMsg('MY_ENTER_MAP', function(_, nChannel, dwTalkerID, szTalkerName, bSelf, dwMapID, dwSubID, dwCopyID, dwTime, dwSwitchTime)
+	insert(ENTER_MAP_LOG, {
+		dwID = dwTalkerID == PLAYER_ID and 'self' or dwTalkerID,
+		szName = szTalkerName,
+		dwMapID = dwMapID,
+		dwSubID = dwSubID,
+		dwCopyID = dwCopyID,
+		dwTime = dwTime,
+		dwSwitchTime = dwSwitchTime,
+	})
+	FireUIEvent('MY_RAIDTOOLS_ENTER_MAP', dwTalkerID)
+end)
+
+function MY_RaidTools.GetEnterMapLog()
+	return ENTER_MAP_LOG
+end
+
+function MY_RaidTools.ClearEnterMapLog()
+	ENTER_MAP_LOG = {}
+	FireUIEvent('MY_RAIDTOOLS_ENTER_MAP')
 end
