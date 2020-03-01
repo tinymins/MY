@@ -224,15 +224,15 @@ function MY_RaidTools.ClearDeathLog()
 	FireUIEvent('MY_RAIDTOOLS_DEATH')
 end
 
-LIB.RegisterBgMsg('MY_ENTER_MAP', function(_, nChannel, dwTalkerID, szTalkerName, bSelf, dwMapID, dwSubID, dwCopyID, dwTime, dwSwitchTime)
+LIB.RegisterBgMsg('MY_ENTER_MAP', function(_, nChannel, dwTalkerID, szTalkerName, bSelf, dwMapID, dwSubID, aMapCopy, dwTime, dwSwitchTime)
 	insert(ENTER_MAP_LOG, {
 		dwID = dwTalkerID == PLAYER_ID and 'self' or dwTalkerID,
 		szName = szTalkerName,
 		dwMapID = dwMapID,
 		dwSubID = dwSubID,
-		dwCopyID = dwCopyID,
-		dwTime = dwTime,
-		dwSwitchTime = dwSwitchTime,
+		aMapCopy = aMapCopy,
+		dwTime = dwTime or GetCurrentTime(),
+		dwSwitchTime = dwSwitchTime or GetCurrentTime(),
 	})
 	FireUIEvent('MY_RAIDTOOLS_ENTER_MAP', dwTalkerID)
 end)

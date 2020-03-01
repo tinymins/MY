@@ -1333,8 +1333,8 @@ function RT.UpdatetDeathMsg(dwID)
 				insert(aXml, GetFormatText(_L[' * '] .. format('[%02d:%02d:%02d]', t.hour, t.minute, t.second), 10, 255, 255, 255, 16, 'this.OnItemLButtonClick = MY_RaidTools.OnAppendEdit'))
 				local r, g, b = LIB.GetForceColor(info and info.dwForceID or me.dwForceID)
 				insert(aXml, GetFormatText('[' .. data.szName ..']', 10, r, g, b, 16, 'this.OnItemLButtonClick = function() OnItemLinkDown(this) end', 'namelink'))
-				if data.dwCopyID then
-					insert(aXml, GetFormatText(_L(' enter map %s, copy id %d.', map.szName, data.dwCopyID)))
+				if data.aMapCopy then
+					insert(aXml, GetFormatText(_L(' enter map %s, copy id %s.', map.szName, concat(data.aMapCopy, ','))))
 				else
 					insert(aXml, GetFormatText(_L(' enter map %s.', map.szName)))
 				end

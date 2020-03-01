@@ -176,7 +176,7 @@ local l_nSwitchMapID, l_nSwitchSubID
 local l_bEntering, l_nEnteringMapID, l_nEnteringSubID, l_dwEnteringSwitchTime
 
 -- 点击进入某地图（进入前）
-local function OnSwitchMap(dwMapID, dwSubID, dwCopyID, dwTime)
+local function OnSwitchMap(dwMapID, dwSubID, aMapCopy, dwTime)
 	if not LIB.IsInParty() then
 		return
 	end
@@ -189,19 +189,19 @@ local function OnSwitchMap(dwMapID, dwSubID, dwCopyID, dwTime)
 	if dwSubID then
 		szDebug = szDebug .. '(' .. dwSubID .. ')'
 	end
-	if dwCopyID then
-		szDebug = szDebug .. ' #' .. dwCopyID
+	if aMapCopy then
+		szDebug = szDebug .. ' #' .. concat(aMapCopy, ',')
 	end
 	if dwTime then
 		szDebug = szDebug .. ' @' .. dwTime
 	end
 	LIB.Debug(PACKET_INFO.NAME_SPACE, szDebug, DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
-	LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_SWITCH_MAP', dwMapID, dwSubID, dwCopyID, dwTime)
+	LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_SWITCH_MAP', dwMapID, dwSubID, aMapCopy, dwTime)
 end
 
 -- 成功进入某地图并加载完成（进入后）
-local function OnEnterMap(dwMapID, dwSubID, dwCopyID, dwTime, dwSwitchTime)
+local function OnEnterMap(dwMapID, dwSubID, aMapCopy, dwTime, dwSwitchTime)
 	if not LIB.IsInParty() then
 		return
 	end
@@ -210,8 +210,8 @@ local function OnEnterMap(dwMapID, dwSubID, dwCopyID, dwTime, dwSwitchTime)
 	if dwSubID then
 		szDebug = szDebug .. '(' .. dwSubID .. ')'
 	end
-	if dwCopyID then
-		szDebug = szDebug .. ' #' .. dwCopyID
+	if aMapCopy then
+		szDebug = szDebug .. ' #' .. concat(aMapCopy, ',')
 	end
 	if dwTime then
 		szDebug = szDebug .. ' @' .. dwTime
@@ -221,7 +221,7 @@ local function OnEnterMap(dwMapID, dwSubID, dwCopyID, dwTime, dwSwitchTime)
 	end
 	LIB.Debug(PACKET_INFO.NAME_SPACE, szDebug, DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
-	LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_ENTER_MAP', dwMapID, dwSubID, dwCopyID, dwTime, dwSwitchTime)
+	LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_ENTER_MAP', dwMapID, dwSubID, aMapCopy, dwTime, dwSwitchTime)
 end
 
 local function OnCrossMapGoFB()
@@ -231,8 +231,8 @@ local function OnCrossMapGoFB()
 	if LIB.IsDungeonResetable(dwMapID) and LIB.IsLeader() then
 		l_nSwitchMapID, l_nSwitchSubID = dwMapID, dwID
 	else
-		LIB.GetMapSaveCopy(dwMapID, function(tMapCopy)
-			OnSwitchMap(dwMapID, dwID, tMapCopy and tMapCopy[1], dwTime)
+		LIB.GetMapSaveCopy(dwMapID, function(aMapCopy)
+			OnSwitchMap(dwMapID, dwID, aMapCopy, dwTime)
 		end)
 	end
 	return LIB.FORMAT_WMSG_RET(true, true)
@@ -277,12 +277,12 @@ LIB.RegisterEvent('LOADING_ENDING.' .. PACKET_INFO.NAME_SPACE .. '#CD', function
 	end
 	local dwTime = GetCurrentTime()
 	local dwMapID = GetClientPlayer().GetMapID()
-	LIB.GetMapSaveCopy(dwMapID, function(tMapCopy)
+	LIB.GetMapSaveCopy(dwMapID, function(aMapCopy)
 		local nSubID, dwSwitchTime
 		if dwMapID == l_nEnteringMapID then
 			nSubID, dwSwitchTime = l_nEnteringSubID, l_dwEnteringSwitchTime
 		end
-		OnEnterMap(dwMapID, nSubID, tMapCopy and tMapCopy[1], dwTime, dwSwitchTime)
+		OnEnterMap(dwMapID, nSubID, aMapCopy, dwTime, dwSwitchTime)
 	end)
 	l_bEntering, l_nEnteringSubID = false, nil
 end)
