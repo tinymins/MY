@@ -1307,7 +1307,7 @@ function RT.UpdatetDeathMsg(dwID)
 	frame.hDeatMsg:Clear()
 	for _, rec in ipairs(aRec) do
 		local data = rec.data
-		if rec.szType == 'DEATH' and MY_IsParty(data.dwID) or data.dwID == me.dwID then
+		if rec.szType == 'DEATH' and (MY_IsParty(data.dwID) or data.dwID == me.dwID) then
 			local info = team.GetMemberInfo(data.dwID)
 			local key = data.dwID == me.dwID and 'self' or data.dwID
 			local t = TimeToDate(data.nCurrentTime)
