@@ -201,7 +201,7 @@ end
 
 -- 绘制选项列表
 function D.DrawScrollContainer(scroll, menu, nLevel, bInlineContainer)
-	local nMinWidth = menu.nMinWidth or 0
+	local nMinWidth = menu.nMinWidth or menu.nMiniWidth or 0
 	local nHeaderWidth, nContentWidth, nFooterWidth = 10, 0, 10
 	local container = scroll:Lookup('WndContainer_Menu')
 	container:Clear()
