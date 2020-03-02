@@ -206,9 +206,9 @@ function D.DrawScrollContainer(scroll, menu, nLevel, bInlineContainer)
 	local container = scroll:Lookup('WndContainer_Menu')
 	container:Clear()
 	for _, m in ipairs(menu) do
-		if menu.bInline then
+		if m.bInline then
 			local scroll = container:AppendContentFromIni(SZ_TPL_INI, 'WndScroll_Menu')
-			local n1, n2, n3 = D.DrawScrollContainer(scroll, menu, nLevel, true)
+			local n1, n2, n3 = D.DrawScrollContainer(scroll, m, nLevel, true)
 			nHeaderWidth = max(nHeaderWidth, n1)
 			nContentWidth = max(nContentWidth, n2)
 			nFooterWidth = max(nFooterWidth, n3)
