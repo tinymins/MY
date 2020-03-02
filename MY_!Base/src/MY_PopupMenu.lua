@@ -43,6 +43,8 @@ local D = {}
 local SZ_INI = PACKET_INFO.FRAMEWORK_ROOT .. 'ui/MY_PopupMenu.ini'
 local SZ_TPL_INI = PACKET_INFO.FRAMEWORK_ROOT .. 'ui/MY_PopupMenu.tpl.ini'
 local LAYER_LIST = {'Lowest', 'Lowest1', 'Lowest2', 'Normal', 'Normal1', 'Normal2', 'Topmost', 'Topmost1', 'Topmost2'}
+local ENABLE_FONT = 162
+local DISABLE_FONT = 161
 
 --[[
 	menu = {
@@ -219,7 +221,7 @@ function D.DrawScrollContainer(scroll, menu, bInlineContainer)
 				nHeaderWidth = max(nHeaderWidth, hHeader:GetAllItemSize())
 				-- ÕýÎÄ
 				local hContentInner = hContent:Lookup('Handle_ContentInner')
-				hContentInner:AppendItemFromString(GetFormatText(m.szOption))
+				hContentInner:AppendItemFromString(GetFormatText(m.szOption, m.bDisable and DISABLE_FONT or ENABLE_FONT))
 				hContentInner:SetW(99999)
 				hContentInner:FormatAllItemPos()
 				hContentInner:SetSizeByAllItemSize()
