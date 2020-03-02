@@ -136,7 +136,7 @@ function D.UpdateMouseOver(scroll, nCurX, nCurY)
 		local wnd = container:LookupContent(i)
 		if wnd:GetName() == 'Wnd_Item' then
 			local h = wnd:Lookup('', '')
-			h:Lookup('Image_Over'):SetVisible(h:PtInItem(nCurX, nCurY))
+			h:Lookup('Image_Over'):SetVisible(not wnd.bDisable and h:PtInItem(nCurX, nCurY))
 		elseif wnd:GetName() == 'WndScroll_Menu' then
 			D.UpdateMouseOver(wnd, nCurX, nCurY)
 		end
@@ -179,7 +179,7 @@ end
 -- 绘制选项列表
 function D.DrawScrollContainer(scroll, menu, bInlineContainer)
 	local nMinWidth = menu.nMinWidth or 0
-	local nHeaderWidth, nContentWidth, nFooterWidth = 0, 0, 0
+	local nHeaderWidth, nContentWidth, nFooterWidth = 10, 0, 10
 	local container = scroll:Lookup('WndContainer_Menu')
 	container:Clear()
 	for _, m in ipairs(menu) do
@@ -195,50 +195,70 @@ function D.DrawScrollContainer(scroll, menu, bInlineContainer)
 			local hHeader = h:Lookup('Handle_Item_L')
 			local hContent = h:Lookup('Handle_Content')
 			local hFooter = h:Lookup('Handle_Item_R')
-			h:Lookup('Image_Devide'):Hide()
-			h.OnItemLButtonClick = m.fnAction
-			-- 左侧图标
-			hHeader:Lookup('Image_Check'):SetVisible(m.bCheck and m.bChecked)
-			hHeader:Lookup('Image_MCheck'):SetVisible(m.bMCheck and m.bChecked)
-			hHeader:SetW(99999)
-			hHeader:FormatAllItemPos()
-			nHeaderWidth = max(nHeaderWidth, hHeader:GetAllItemSize())
-			-- 正文
-			hContent:AppendItemFromString(GetFormatText(m.szOption))
-			hContent:SetW(99999)
-			hContent:FormatAllItemPos()
-			nContentWidth = max(nContentWidth, hContent:GetAllItemSize())
-			-- 右侧图标
-			if m.nPushCount then
-				hFooter:Lookup('Handle_PushInfo/Text_PushInfo'):SetText(m.nPushCount)
-				hFooter:Lookup('Handle_PushInfo'):Show()
+			local imgDevide = h:Lookup('Image_Devide')
+			if m.bDevide or m.bDivide then
+				wnd.bDisable = true
+				imgDevide:Show()
+				wnd:SetH(imgDevide:GetH())
+				hHeader:Hide()
+				hContent:Hide()
+				hFooter:Hide()
+				h:ClearHoverElement()
 			else
-				hFooter:Lookup('Handle_PushInfo'):Hide()
-			end
-			hFooter:Lookup('Image_Color'):Hide()
-			if m.aCustomIcon then
-				for _, v in ipairs(m.aCustomIcon) do
-					local img = h:AppendItemFromIni(SZ_TPL_INI, 'Image_CustomIcon')
-					if v.szUITex and v.nFrame then
-						img:FromUITex(v.szUITex, v.nFrame)
-					elseif v.szUITex then
-						img:FromTextureFile(v.szUITex)
-					elseif v.nIconID then
-						img:FromIconID(v.nIconID)
-					end
-					if v.nWidth then
-						img:SetW(v.nWidth)
-					end
-					if v.nHeight then
-						img:SetW(v.nHeight)
-					end
-					img:ChangeRelation(hFooter:Lookup('Image_Color'), true, false)
+				if m.bDisable then
+					wnd.bDisable = true
+				else
+					h.OnItemLButtonClick = m.fnAction
 				end
+				imgDevide:Hide()
+				-- 左侧图标
+				hHeader:Lookup('Handle_Check/Image_Check'):SetVisible(m.bCheck and m.bChecked)
+				hHeader:Lookup('Handle_MCheck/Image_MCheck'):SetVisible(m.bMCheck and m.bChecked)
+				hHeader:SetW(99999)
+				hHeader:FormatAllItemPos()
+				nHeaderWidth = max(nHeaderWidth, hHeader:GetAllItemSize())
+				-- 正文
+				local hContentInner = hContent:Lookup('Handle_ContentInner')
+				hContentInner:AppendItemFromString(GetFormatText(m.szOption))
+				hContentInner:SetW(99999)
+				hContentInner:FormatAllItemPos()
+				hContentInner:SetSizeByAllItemSize()
+				hContentInner:SetRelY((hContent:GetH() - hContentInner:GetH()) / 2)
+				hContent:SetW(hContentInner:GetW())
+				hContent:FormatAllItemPos()
+				nContentWidth = max(nContentWidth, hContent:GetW())
+				-- 右侧图标
+				if m.nPushCount then
+					hFooter:Lookup('Handle_PushInfo/Text_PushInfo'):SetText(m.nPushCount)
+					hFooter:Lookup('Handle_PushInfo'):Show()
+				else
+					hFooter:Lookup('Handle_PushInfo'):Hide()
+				end
+				hFooter:Lookup('Image_Color'):Hide()
+				if m.aCustomIcon then
+					for _, v in ipairs(m.aCustomIcon) do
+						local img = h:AppendItemFromIni(SZ_TPL_INI, 'Image_CustomIcon')
+						if v.szUITex and v.nFrame then
+							img:FromUITex(v.szUITex, v.nFrame)
+						elseif v.szUITex then
+							img:FromTextureFile(v.szUITex)
+						elseif v.nIconID then
+							img:FromIconID(v.nIconID)
+						end
+						if v.nWidth then
+							img:SetW(v.nWidth)
+						end
+						if v.nHeight then
+							img:SetW(v.nHeight)
+						end
+						img:ChangeRelation(hFooter:Lookup('Image_Color'), true, false)
+					end
+				end
+				hFooter:Lookup('Image_Child'):Hide()
+				hFooter:SetW(99999)
+				hFooter:FormatAllItemPos()
+				nFooterWidth = max(nFooterWidth, hFooter:GetAllItemSize())
 			end
-			hFooter:Lookup('Image_Child'):Hide()
-			hFooter:SetW(99999)
-			hFooter:FormatAllItemPos()
-			nFooterWidth = max(nFooterWidth, hFooter:GetAllItemSize())
 		end
 	end
 	-- 滚动区域最大高度
