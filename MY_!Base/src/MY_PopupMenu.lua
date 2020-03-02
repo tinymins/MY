@@ -468,10 +468,9 @@ function D.OnItemLButtonClick()
 		if menu.bCheck then
 			menu.bChecked = not menu.bChecked
 		end
-		if not menu.fnAction then
-			return
+		if not menu.fnAction or menu.fnAction() ~= 0 then
+			Wnd.CloseWindow(frame)
 		end
-		menu.fnAction()
 	end
 end
 
