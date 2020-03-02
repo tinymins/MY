@@ -230,11 +230,11 @@ function D.DrawScrollContainer(scroll, menu, nLevel, bInlineContainer)
 			else
 				imgDevide:Hide()
 				-- 左侧图标
-				hHeader:Lookup('Handle_Check/Image_Check'):SetVisible(m.bCheck and m.bChecked)
-				hHeader:Lookup('Handle_MCheck/Image_MCheck'):SetVisible(m.bMCheck and m.bChecked)
+				hHeader:Lookup('Handle_Check'):SetVisible(m.bCheck and m.bChecked)
+				hHeader:Lookup('Handle_MCheck'):SetVisible(m.bMCheck and m.bChecked)
 				hHeader:SetW(99999)
 				hHeader:FormatAllItemPos()
-				nHeaderWidth = max(nHeaderWidth, hHeader:GetAllItemSize())
+				nHeaderWidth = max(nHeaderWidth, (hHeader:GetAllItemSize()))
 				-- 正文
 				local hContentInner = hContent:Lookup('Handle_ContentInner')
 				local nFont = m.bDisable and DISABLE_FONT or ENABLE_FONT
@@ -296,7 +296,7 @@ function D.DrawScrollContainer(scroll, menu, nLevel, bInlineContainer)
 	scroll:SetH(nHeight)
 	-- 非嵌套层则开始更新所有宽度
 	if not bInlineContainer then
-		nContentWidth = max(nMinWidth - nHeaderWidth - nFooterWidth, nContentWidth)
+		nContentWidth = max(nMinWidth - nHeaderWidth - nFooterWidth - 10, nContentWidth)
 		D.UpdateScrollContainerWidth(scroll, nHeaderWidth, nContentWidth, nFooterWidth, false)
 		D.UpdateMouseOver(scroll, Cursor.GetPos())
 	end
