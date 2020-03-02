@@ -91,6 +91,7 @@ end
 
 function D.SetDS(frame, menu)
 	frame.aMenu = {menu}
+	frame.aMenuY = {0}
 	D.UpdateUI(frame)
 end
 
@@ -179,7 +180,7 @@ function D.UpdateScrollContainerWidth(scroll, nHeaderWidth, nContentWidth, nFoot
 end
 
 -- 绘制选项列表
-function D.DrawScrollContainer(scroll, menu, bInlineContainer)
+function D.DrawScrollContainer(scroll, menu, nLevel, bInlineContainer)
 	local nMinWidth = menu.nMinWidth or 0
 	local nHeaderWidth, nContentWidth, nFooterWidth = 10, 0, 10
 	local container = scroll:Lookup('WndContainer_Menu')
@@ -187,7 +188,7 @@ function D.DrawScrollContainer(scroll, menu, bInlineContainer)
 	for _, m in ipairs(menu) do
 		if menu.bInline then
 			local scroll = container:AppendContentFromIni(SZ_TPL_INI, 'WndScroll_Menu')
-			local n1, n2, n3 = D.DrawScrollContainer(scroll, menu, true)
+			local n1, n2, n3 = D.DrawScrollContainer(scroll, menu, nLevel, true)
 			nHeaderWidth = max(nHeaderWidth, n1)
 			nContentWidth = max(nContentWidth, n2)
 			nFooterWidth = max(nFooterWidth, n3)
@@ -259,11 +260,13 @@ function D.DrawScrollContainer(scroll, menu, bInlineContainer)
 						img:ChangeRelation(hFooter:Lookup('Image_Color'), true, false)
 					end
 				end
-				hFooter:Lookup('Image_Child'):Hide()
+				hFooter:Lookup('Image_Child'):SetVisible(#m > 0)
 				hFooter:SetW(99999)
 				hFooter:FormatAllItemPos()
 				nFooterWidth = max(nFooterWidth, hFooter:GetAllItemSize())
 			end
+			wnd.menu = m
+			wnd.nLevel = nLevel + 1
 		end
 	end
 	-- 滚动区域最大高度
@@ -284,20 +287,23 @@ function D.DrawScrollContainer(scroll, menu, bInlineContainer)
 	return nHeaderWidth, nContentWidth, nFooterWidth
 end
 
-function D.UpdateWnd(wnd, menu)
+function D.UpdateWnd(wnd, menu, nLevel)
 	if D.IsEquals(wnd.menuSnapshot, menu) then
-		return
+		return false
 	end
 	-- 绘制列表
 	local scroll = wnd:Lookup('WndScroll_Menu')
 	local container = scroll:Lookup('WndContainer_Menu')
-	D.DrawScrollContainer(scroll, menu, false)
+	D.DrawScrollContainer(scroll, menu, nLevel, false)
 	-- 绘制背景
 	local nWidth, nHeight = container:GetSize()
 	wnd:SetSize(nWidth + 10, nHeight + 10)
 	wnd:Lookup('', ''):SetSize(nWidth + 10, nHeight + 10)
 	wnd:Lookup('', 'Image_Bg'):SetSize(nWidth + 10, nHeight + 10)
+	wnd.nLevel = nLevel
+	wnd.menu = menu
 	wnd.menuSnapshot = Clone(menu)
+	return true
 end
 
 -- 判断一个菜单配置项是不是另一个的子项
@@ -313,6 +319,24 @@ function D.IsSubMenu(menu, t)
 	return false
 end
 
+-- 根据主菜单位置计算刷新各子菜单位置
+function D.UpdateWndPos(frame)
+	local nW, nH = Station.GetClientSize()
+	local aMenu = frame.aMenu
+	local aMenuY = frame.aMenuY
+	for nLevel = 2, #aMenu do
+		local wnd = frame:Lookup('Wnd_Menu' .. nLevel)
+		local wndPrev = frame:Lookup('Wnd_Menu' .. (nLevel - 1))
+		local nX = wndPrev:GetAbsX() + wndPrev:GetW() + wnd:GetW() > nW
+			and wndPrev:GetRelX() - wnd:GetW()
+			or wndPrev:GetRelX() + wndPrev:GetW()
+		local nY = (frame:GetAbsY() + aMenuY[nLevel] + wnd:GetH() > nH)
+			and nH - wnd:GetH()
+			or aMenuY[nLevel]
+		wnd:SetRelPos(nX, nY)
+	end
+end
+
 -- 根据menu数据刷新显示
 function D.UpdateUI(frame)
 	-- 销毁模板
@@ -321,7 +345,7 @@ function D.UpdateUI(frame)
 		wnd:Destroy()
 	end
 	-- 逐个绘制菜单
-	local aMenu, bExist = frame.aMenu, true
+	local aMenu, bExist, bDrawed = frame.aMenu, true, false
 	for nLevel = 1, #aMenu do
 		local menu = aMenu[nLevel]
 		local wnd = frame:Lookup('Wnd_Menu' .. nLevel)
@@ -332,13 +356,18 @@ function D.UpdateUI(frame)
 			if not wnd then
 				wnd = D.AppendContentFromIni(frame, SZ_TPL_INI, 'Wnd_Menu', 'Wnd_Menu' .. nLevel)
 			end
-			D.UpdateWnd(wnd, menu)
+			if D.UpdateWnd(wnd, menu, nLevel) then
+				bDrawed = true
+			end
 		else -- 需要清理的菜单（已不存在）
 			if wnd then
 				wnd:Destroy()
 			end
 			aMenu[nLevel] = nil
 		end
+	end
+	if bDrawed then
+		D.UpdateWndPos(frame)
 	end
 end
 
@@ -348,6 +377,31 @@ end
 
 function D.OnFrameBreathe()
 	D.UpdateUI(this)
+end
+
+function D.OnItemMouseEnter()
+	local name = this:GetName()
+	if name == 'Handle_Item' then
+		local wnd = this:GetParent()
+		local frame = this:GetRoot()
+		local menu = wnd.menu
+		if #menu == 0 then
+			return
+		end
+		-- 插入子菜单
+		local nLevel = wnd.nLevel
+		for i = nLevel, #frame.aMenu do
+			frame.aMenu[i] = nil
+		end
+		frame.aMenu[nLevel] = menu
+		-- 记录触发位置
+		for i = nLevel, #frame.aMenuY do
+			frame.aMenuY[i] = nil
+		end
+		frame.aMenuY[nLevel] = this:GetAbsY() - frame:GetAbsY()
+		-- 更新UI
+		D.UpdateUI(frame)
+	end
 end
 
 -- Global exports
