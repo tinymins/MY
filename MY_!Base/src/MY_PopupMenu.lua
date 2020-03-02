@@ -239,7 +239,7 @@ function D.DrawScrollContainer(scroll, menu, nLevel, bInlineContainer)
 				local hContentInner = hContent:Lookup('Handle_ContentInner')
 				local nFont = m.bDisable and DISABLE_FONT or ENABLE_FONT
 				local rgb = m.rgb or CONSTANT.EMPTY_TABLE
-				local r, g, b = rgb.r or rgb[1] or m.r, rgb.b or rgb[2] or m.g, rgb.g or rgb[3] or m.b
+				local r, g, b = rgb.r or rgb[1] or m.r, rgb.g or rgb[2] or m.g, rgb.b or rgb[3] or m.b
 				hContentInner:AppendItemFromString(GetFormatText(m.szOption, nFont, r, g, b))
 				hContentInner:SetW(99999)
 				hContentInner:FormatAllItemPos()
@@ -255,7 +255,7 @@ function D.DrawScrollContainer(scroll, menu, nLevel, bInlineContainer)
 				else
 					hFooter:Lookup('Handle_PushInfo'):Hide()
 				end
-				hFooter:Lookup('Image_Color'):Hide()
+				hFooter:Lookup('Image_Color'):SetVisible(m.fnChangeColor and true or false)
 				if m.aCustomIcon then
 					for _, v in ipairs(m.aCustomIcon) do
 						local img = h:AppendItemFromIni(SZ_TPL_INI, 'Image_CustomIcon')
@@ -421,9 +421,15 @@ end
 function D.OnFrameBreathe()
 	if not this.aMenu[1].bShowKillFocus then
 		local wnd = Station.GetFocusWindow()
-		if wnd and wnd:GetRoot() ~= this then
+		local frame = wnd and wnd:GetRoot()
+		local name = frame and frame:GetName()
+		if frame and frame ~= this and name ~= 'MY_ColorTable' and name ~= 'MY_ColorPickerEx' then
 			if this.aMenu[1].fnCancel then
 				this.aMenu[1].fnCancel()
+			end
+			if this.bColorPicker then
+				Wnd.CloseWindow('MY_ColorTable')
+				Wnd.CloseWindow('MY_ColorPickerEx')
 			end
 			return Wnd.CloseWindow(this)
 		end
@@ -471,6 +477,19 @@ function D.OnItemLButtonClick()
 		if not menu.fnAction or menu.fnAction() ~= 0 then
 			Wnd.CloseWindow(frame)
 		end
+	elseif name == 'Image_Color' then
+		local wnd = this:GetParent():GetParent():GetParent() -- 'Wnd_Item'
+		local frame = this:GetRoot()
+		frame.bColorPicker = true
+		UI.OpenColorPicker(function(r, g, b)
+			if not wnd or not wnd:IsValid() then
+				return
+			end
+			if wnd.menu.fnChangeColor(r, g, b) ~= 0 then
+				wnd.menu.rgb = { r = r, g = g, b = b }
+			end
+			frame.bColorPicker = nil
+		end)
 	end
 end
 
