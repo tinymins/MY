@@ -221,7 +221,10 @@ function D.DrawScrollContainer(scroll, menu, bInlineContainer)
 				nHeaderWidth = max(nHeaderWidth, hHeader:GetAllItemSize())
 				-- ÕýÎÄ
 				local hContentInner = hContent:Lookup('Handle_ContentInner')
-				hContentInner:AppendItemFromString(GetFormatText(m.szOption, m.bDisable and DISABLE_FONT or ENABLE_FONT))
+				local nFont = m.bDisable and DISABLE_FONT or ENABLE_FONT
+				local rgb = m.rgb or CONSTANT.EMPTY_TABLE
+				local r, g, b = rgb.r or rgb[1] or m.r, rgb.b or rgb[2] or m.g, rgb.g or rgb[3] or m.b
+				hContentInner:AppendItemFromString(GetFormatText(m.szOption, nFont, r, g, b))
 				hContentInner:SetW(99999)
 				hContentInner:FormatAllItemPos()
 				hContentInner:SetSizeByAllItemSize()
