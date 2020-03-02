@@ -41,6 +41,7 @@ local _L = LIB.LoadLangPack()
 
 local D = {}
 local SZ_INI = PACKET_INFO.FRAMEWORK_ROOT .. 'ui/MY_PopupMenu.ini'
+local SZ_TPL_INI = PACKET_INFO.FRAMEWORK_ROOT .. 'ui/MY_PopupMenu.tpl.ini'
 local LAYER_LIST = {'Lowest', 'Lowest1', 'Lowest2', 'Normal', 'Normal1', 'Normal2', 'Topmost', 'Topmost1', 'Topmost2'}
 
 --[[
@@ -155,6 +156,7 @@ function D.UpdateScrollContainerWidth(scroll, nHeaderWidth, nContentWidth, nFoot
 			local hFooter = h:Lookup('Handle_Item_R')
 			hHeader:SetW(nHeaderWidth)
 			hContent:SetW(nContentWidth)
+			hContent:SetRelX(nHeaderWidth)
 			hFooter:SetW(nFooterWidth)
 			hFooter:SetRelX(nHeaderWidth + nContentWidth)
 			h:Lookup('Image_Over'):SetW(nWidth)
@@ -182,13 +184,13 @@ function D.DrawScrollContainer(scroll, menu, bInlineContainer)
 	container:Clear()
 	for _, m in ipairs(menu) do
 		if menu.bInline then
-			local scroll = container:AppendContentFromIni(SZ_INI, 'WndScroll_Menu')
+			local scroll = container:AppendContentFromIni(SZ_TPL_INI, 'WndScroll_Menu')
 			local n1, n2, n3 = D.DrawScrollContainer(scroll, menu, true)
 			nHeaderWidth = max(nHeaderWidth, n1)
 			nContentWidth = max(nContentWidth, n2)
 			nFooterWidth = max(nFooterWidth, n3)
 		else
-			local wnd = container:AppendContentFromIni(SZ_INI, 'Wnd_Item')
+			local wnd = container:AppendContentFromIni(SZ_TPL_INI, 'Wnd_Item')
 			local h = wnd:Lookup('', '')
 			local hHeader = h:Lookup('Handle_Item_L')
 			local hContent = h:Lookup('Handle_Content')
@@ -196,8 +198,8 @@ function D.DrawScrollContainer(scroll, menu, bInlineContainer)
 			h:Lookup('Image_Devide'):Hide()
 			h.OnItemLButtonClick = m.fnAction
 			-- 左侧图标
-			-- hHeader:Lookup('Image_Check'):SetVisible(m.bCheck and m.bChecked)
-			-- hHeader:Lookup('Image_MCheck'):SetVisible(m.bMCheck and m.bChecked)
+			hHeader:Lookup('Image_Check'):SetVisible(m.bCheck and m.bChecked)
+			hHeader:Lookup('Image_MCheck'):SetVisible(m.bMCheck and m.bChecked)
 			hHeader:SetW(99999)
 			hHeader:FormatAllItemPos()
 			nHeaderWidth = max(nHeaderWidth, hHeader:GetAllItemSize())
@@ -207,11 +209,16 @@ function D.DrawScrollContainer(scroll, menu, bInlineContainer)
 			hContent:FormatAllItemPos()
 			nContentWidth = max(nContentWidth, hContent:GetAllItemSize())
 			-- 右侧图标
-			-- hFooter:Lookup('Handle_PushInfo'):Hide()
-			-- hFooter:Lookup('Image_Color'):Hide()
+			if m.nPushCount then
+				hFooter:Lookup('Handle_PushInfo/Text_PushInfo'):SetText(m.nPushCount)
+				hFooter:Lookup('Handle_PushInfo'):Show()
+			else
+				hFooter:Lookup('Handle_PushInfo'):Hide()
+			end
+			hFooter:Lookup('Image_Color'):Hide()
 			if m.aCustomIcon then
 				for _, v in ipairs(m.aCustomIcon) do
-					local img = h:AppendItemFromIni(SZ_INI, 'Image_CustomIcon')
+					local img = h:AppendItemFromIni(SZ_TPL_INI, 'Image_CustomIcon')
 					if v.szUITex and v.nFrame then
 						img:FromUITex(v.szUITex, v.nFrame)
 					elseif v.szUITex then
@@ -297,7 +304,7 @@ function D.UpdateUI(frame)
 		end
 		if bExist then -- 确认绘制
 			if not wnd then
-				wnd = D.AppendContentFromIni(frame, SZ_INI, 'Wnd_Menu', 'Wnd_Menu' .. nLevel)
+				wnd = D.AppendContentFromIni(frame, SZ_TPL_INI, 'Wnd_Menu', 'Wnd_Menu' .. nLevel)
 			end
 			D.UpdateWnd(wnd, menu)
 		else -- 需要清理的菜单（已不存在）
