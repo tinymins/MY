@@ -4740,6 +4740,10 @@ function UI.ResizeIE(frame, w, h)
 	frame:SetDragArea(0, 0, w, 30)
 end
 
+function UI.PopupMenu(menu)
+	return MY_PopupMenu.Open(menu)
+end
+
 -- append an item to parent
 -- UI.Append(hParent, szType,[ szName,] tArg)
 -- hParent     -- an Window, Handle or UI object
