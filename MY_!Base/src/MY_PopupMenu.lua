@@ -167,7 +167,7 @@ function D.UpdateMouseOver(scroll, nCurX, nCurY)
 end
 
 -- 根据渲染的内容调整选项宽度（由于宽度受所有子元素影响 所以独立成函数在绘制结束后统一调用）
-function D.UpdateScrollContainerWidth(scroll, nHeaderWidth, nContentWidth, nFooterWidth)
+function D.UpdateScrollContainerWidth(scroll, nHeaderWidth, nContentWidth, nFooterWidth, bInlineContainer)
 	local nWidth = nHeaderWidth + nContentWidth + nFooterWidth
 	local container = scroll:Lookup('WndContainer_Menu')
 	for i = 0, container:GetAllContentCount() - 1 do
@@ -188,14 +188,14 @@ function D.UpdateScrollContainerWidth(scroll, nHeaderWidth, nContentWidth, nFoot
 			h:FormatAllItemPos()
 			wnd:SetW(nWidth)
 		elseif wnd:GetName() == 'WndScroll_Menu' then
-			D.UpdateScrollContainerWidth(wnd, nHeaderWidth, nContentWidth, nFooterWidth)
+			D.UpdateScrollContainerWidth(wnd, nHeaderWidth, nContentWidth, nFooterWidth, true)
 		end
 	end
 	container:SetW(nWidth)
 	-- 滚动条位置大小
 	local nWidth, nHeight = container:GetSize()
 	scroll:Lookup('Scroll_Menu'):SetH(nHeight)
-	scroll:Lookup('Scroll_Menu'):SetRelX(nWidth)
+	scroll:Lookup('Scroll_Menu'):SetRelX(bInlineContainer and nWidth - 5 or nWidth)
 	scroll:SetW(nWidth)
 end
 
@@ -296,7 +296,7 @@ function D.DrawScrollContainer(scroll, menu, nLevel, bInlineContainer)
 	-- 非嵌套层则开始更新所有宽度
 	if not bInlineContainer then
 		nContentWidth = max(nMinWidth - nHeaderWidth - nFooterWidth, nContentWidth)
-		D.UpdateScrollContainerWidth(scroll, nHeaderWidth, nContentWidth, nFooterWidth)
+		D.UpdateScrollContainerWidth(scroll, nHeaderWidth, nContentWidth, nFooterWidth, false)
 		D.UpdateMouseOver(scroll, Cursor.GetPos())
 	end
 	return nHeaderWidth, nContentWidth, nFooterWidth
