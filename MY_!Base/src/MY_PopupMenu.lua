@@ -59,6 +59,12 @@ local DIFF_KEYS = { -- 用于自动扫描菜单数据是否有更新的键
 	'bMCheck',
 	'bChecked',
 	'aCustomIcon',
+	'szIcon',
+	'nFrame',
+	'nMouseOverFrame',
+	'nIconWidth',
+	'nIconHeight',
+	'fnClickIcon',
 }
 
 --[[
@@ -256,24 +262,41 @@ function D.DrawScrollContainer(scroll, menu, nLevel, bInlineContainer)
 					hFooter:Lookup('Handle_PushInfo'):Hide()
 				end
 				hFooter:Lookup('Image_Color'):SetVisible(m.fnChangeColor and true or false)
+				local aCustomIcon = {}
 				if m.aCustomIcon then
 					for _, v in ipairs(m.aCustomIcon) do
-						local img = h:AppendItemFromIni(SZ_TPL_INI, 'Image_CustomIcon')
-						if v.szUITex and v.nFrame then
-							img:FromUITex(v.szUITex, v.nFrame)
-						elseif v.szUITex then
-							img:FromTextureFile(v.szUITex)
-						elseif v.nIconID then
-							img:FromIconID(v.nIconID)
-						end
-						if v.nWidth then
-							img:SetW(v.nWidth)
-						end
-						if v.nHeight then
-							img:SetW(v.nHeight)
-						end
-						img:ChangeRelation(hFooter:Lookup('Image_Color'), true, false)
+						insert(aCustomIcon, v)
 					end
+				end
+				if m.szIcon then
+					insert(aCustomIcon, {
+						szUITex = m.szIcon,
+						nFrame = m.nFrame,
+						nMouseOverFrame = m.nMouseOverFrame,
+						nWidth = m.nIconWidth,
+						nHeight = m.nIconHeight,
+						fnAction = m.fnClickIcon,
+					})
+				end
+				for _, v in ipairs(aCustomIcon) do
+					local img = hFooter:AppendItemFromIni(SZ_TPL_INI, 'Image_CustomIcon')
+					if v.szUITex and v.nFrame then
+						img:FromUITex(v.szUITex, v.nFrame)
+					elseif v.szUITex then
+						img:FromTextureFile(v.szUITex)
+					elseif v.nIconID then
+						img:FromIconID(v.nIconID)
+					end
+					if v.nWidth then
+						img:SetW(v.nWidth)
+					end
+					if v.nHeight then
+						img:SetW(v.nHeight)
+					end
+					while img:GetIndex() > 1 and hFooter:Lookup(img:GetIndex() - 1):GetName() ~= 'Image_Color' do
+						img:ExchangeIndex(img:GetIndex() - 1)
+					end
+					img.data = v
 				end
 				hFooter:Lookup('Image_Child'):SetVisible(#m > 0)
 				hFooter:SetW(99999)
@@ -490,6 +513,11 @@ function D.OnItemLButtonClick()
 			end
 			frame.bColorPicker = nil
 		end)
+	elseif name == 'Image_CustomIcon' then
+		local data = this.data
+		if not data.fnAction or data.fnAction() ~= 0 then
+			Wnd.CloseWindow(this:GetRoot())
+		end
 	end
 end
 
