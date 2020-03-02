@@ -268,11 +268,12 @@ function D.DrawScrollContainer(scroll, menu, bInlineContainer)
 	end
 	-- 滚动区域最大高度
 	container:FormatAllContentPos()
-	local _, nHeight = container:GetAllContentSize()
+	local nHeight = select(2, container:GetAllContentSize())
 	if menu.nMaxHeight then
 		nHeight = min(nHeight, menu.nMaxHeight)
 	end
 	container:SetH(nHeight)
+	container:FormatAllContentPos() -- 这里KGUI有BUG 如果调整高度后不重新Format一遍的话 一定会出滚动条
 	scroll:SetH(nHeight)
 	-- 非嵌套层则开始更新所有宽度
 	if not bInlineContainer then
