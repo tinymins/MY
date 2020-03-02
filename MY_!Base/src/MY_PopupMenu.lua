@@ -45,6 +45,21 @@ local SZ_TPL_INI = PACKET_INFO.FRAMEWORK_ROOT .. 'ui/MY_PopupMenu.tpl.ini'
 local LAYER_LIST = {'Lowest', 'Lowest1', 'Lowest2', 'Normal', 'Normal1', 'Normal2', 'Topmost', 'Topmost1', 'Topmost2'}
 local ENABLE_FONT = 162
 local DISABLE_FONT = 161
+local DIFF_KEYS = { -- 用于自动扫描菜单数据是否有更新的键
+	'szOption',
+	'fnAction',
+	'bInline',
+	'bDivide',
+	'bDevide',
+	'r',
+	'g',
+	'b',
+	'rgb',
+	'bCheck',
+	'bMCheck',
+	'bChecked',
+	'aCustomIcon',
+}
 
 --[[
 	menu = {
@@ -71,6 +86,7 @@ function D.Open(menu)
 		frame = Wnd.OpenWindow(SZ_INI, 'MY_PopupMenu')
 	end
 	frame:SetDS(menu)
+	Station.SetFocusWindow(frame)
 end
 
 function D.Close()
@@ -120,9 +136,12 @@ function D.IsEquals(m1, m2)
 	end
 	for i = 1, #m1 do
 		local ms1, ms2 = m1[i], m2[i]
-		if ms1.szOption ~= ms2.szOption
-		or ms1.bInline ~= ms2.bInline
-		or (#ms1 == 0) ~= (#ms2 == 0) then
+		for _, k in ipairs(DIFF_KEYS) do
+			if not IsEquals(ms1[k], ms2[k]) then
+				return false
+			end
+		end
+		if (#ms1 == 0) ~= (#ms2 == 0) then
 			return false
 		end
 		if ms1.bInline and not D.IsEquals(ms1, ms2) then
@@ -208,11 +227,6 @@ function D.DrawScrollContainer(scroll, menu, nLevel, bInlineContainer)
 				hFooter:Hide()
 				h:ClearHoverElement()
 			else
-				if m.bDisable then
-					wnd.bDisable = true
-				else
-					h.OnItemLButtonClick = m.fnAction
-				end
 				imgDevide:Hide()
 				-- 左侧图标
 				hHeader:Lookup('Handle_Check/Image_Check'):SetVisible(m.bCheck and m.bChecked)
@@ -308,7 +322,7 @@ end
 
 -- 判断一个菜单配置项是不是另一个的子项
 function D.IsSubMenu(menu, t)
-	for _, v in pairs(menu) do
+	for _, v in ipairs(menu) do
 		if v == t then
 			return true
 		end
@@ -376,13 +390,22 @@ function D.OnFrameCreate()
 end
 
 function D.OnFrameBreathe()
+	if not this.aMenu[1].bShowKillFocus then
+		local wnd = Station.GetFocusWindow()
+		if wnd and wnd:GetRoot() ~= this then
+			if this.aMenu[1].fnCancel then
+				this.aMenu[1].fnCancel()
+			end
+			return Wnd.CloseWindow(this)
+		end
+	end
 	D.UpdateUI(this)
 end
 
 function D.OnItemMouseEnter()
 	local name = this:GetName()
 	if name == 'Handle_Item' then
-		local wnd = this:GetParent()
+		local wnd = this:GetParent() -- 'Wnd_Item'
 		local frame = this:GetRoot()
 		local menu = wnd.menu
 		if #menu == 0 then
@@ -401,6 +424,25 @@ function D.OnItemMouseEnter()
 		frame.aMenuY[nLevel] = this:GetAbsY() - frame:GetAbsY()
 		-- 更新UI
 		D.UpdateUI(frame)
+	end
+end
+
+function D.OnItemLButtonClick()
+	local name = this:GetName()
+	if name == 'Handle_Item' then
+		local wnd = this:GetParent() -- 'Wnd_Item'
+		local frame = this:GetRoot()
+		local menu = wnd.menu
+		if menu.bDisable then
+			return
+		end
+		if menu.bCheck then
+			menu.bChecked = not menu.bChecked
+		end
+		if not menu.fnAction then
+			return
+		end
+		menu.fnAction()
 	end
 end
 
