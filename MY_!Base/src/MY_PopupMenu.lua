@@ -85,6 +85,7 @@ function D.Open(menu)
 	if not frame then
 		frame = Wnd.OpenWindow(SZ_INI, 'MY_PopupMenu')
 	end
+	frame.nCurX, frame.nCurY = Cursor.GetPos()
 	frame:SetDS(menu)
 	Station.SetFocusWindow(frame)
 end
@@ -338,6 +339,32 @@ function D.UpdateWndPos(frame)
 	local nW, nH = Station.GetClientSize()
 	local aMenu = frame.aMenu
 	local aMenuY = frame.aMenuY
+	-- 主菜单
+	local wnd = frame:Lookup('Wnd_Menu1')
+	local menu = aMenu[1]
+	if menu.x ~= 'keep' then
+		local nX0, nX = menu.x or frame.nCurX
+		if nX0 + wnd:GetW() <= nW then
+			nX = nX0
+		elseif nX0 - wnd:GetW() >= 0 then
+			nX = nX0 - wnd:GetW()
+		else
+			nX = nW - wnd:GetW()
+		end
+		wnd:SetRelX(nX)
+	end
+	if menu.y ~= 'keep' then
+		local nY0, nY = menu.y or frame.nCurY
+		if nY0 + wnd:GetH() <= nH then
+			nY = nY0
+		elseif nY0 - wnd:GetH() >= 0 then
+			nY = nY0 - wnd:GetH()
+		else
+			nY = nH - wnd:GetH()
+		end
+		wnd:SetRelY(nY)
+	end
+	-- 子菜单
 	for nLevel = 2, #aMenu do
 		local wnd = frame:Lookup('Wnd_Menu' .. nLevel)
 		local wndPrev = frame:Lookup('Wnd_Menu' .. (nLevel - 1))
@@ -386,6 +413,7 @@ function D.UpdateUI(frame)
 end
 
 function D.OnFrameCreate()
+	this:SetRelPos(0, 0)
 	this.SetDS = D.SetDS
 end
 
