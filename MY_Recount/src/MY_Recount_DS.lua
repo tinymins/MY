@@ -373,7 +373,7 @@ local Data          -- 当前战斗数据记录
 local History = {}  -- 历史战斗记录
 local SZ_REC_FILE = {'cache/fight_recount_log.jx3dat', PATH_TYPE.ROLE}
 local SKILL_EFFECT_CACHE = {} -- 最近的技能效果缓存 （进战时候将最近的数据压进来）
-local SKILL_EFFECT_REPLAY_FRAME = GLOBAL.GAME_FPS * 3 -- 进战时候将多久的数据压进来（逻辑帧）
+local SKILL_EFFECT_REPLAY_FRAME = GLOBAL.GAME_FPS * 1 -- 进战时候将多久的数据压进来（逻辑帧）
 
 -- 输出两个数里面小一点的那个 其中-1表示极大值
 local function Min(a, b)
