@@ -4741,6 +4741,10 @@ function UI.PopupMenu(menu)
 	return MY_PopupMenu.Open(menu)
 end
 
+function UI.ClosePopupMenu()
+	return MY_PopupMenu.Close()
+end
+
 -- append an item to parent
 -- UI.Append(hParent, szType,[ szName,] tArg)
 -- hParent     -- an Window, Handle or UI object
