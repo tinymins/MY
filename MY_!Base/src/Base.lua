@@ -390,6 +390,7 @@ local function IsBoolean (var) return type(var) == 'boolean'  end
 local function IsFunction(var) return type(var) == 'function' end
 local function IsUserdata(var) return type(var) == 'userdata' end
 local function IsHugeNumber(var) return IsNumber(var) and not (var < HUGE) end
+local function IsElement(element) return type(element) == 'table' and element.IsValid and element:IsValid() end
 -----------------------------------------------
 -- 创建数据补丁
 -----------------------------------------------
@@ -1061,6 +1062,7 @@ local LIB = {
 	IsNumber         = IsNumber        ,
 	IsUserdata       = IsUserdata      ,
 	IsHugeNumber     = IsHugeNumber    ,
+	IsElement        = IsElement       ,
 	IsEmpty          = IsEmpty         ,
 	IsString         = IsString        ,
 	IsTable          = IsTable         ,
