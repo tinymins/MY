@@ -385,6 +385,7 @@ function PS.OnPanelActive(wnd)
 						MY_RollMonitor.nSortType = nSortType
 						MY_RollMonitor.DrawBoard()
 						UI(raw):Text(SORT_TYPE_INFO[nSortType].szName)
+						return 0
 					end,
 				})
 			end
@@ -404,6 +405,7 @@ function PS.OnPanelActive(wnd)
 						UI(raw):Text(TIME_LIMIT_TITLE[nSec])
 						MY_RollMonitor.nTimeLimit = nSec
 						MY_RollMonitor.DrawBoard()
+						return 0
 					end,
 				})
 			end
