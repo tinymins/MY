@@ -63,7 +63,7 @@ function D.Popup()
 	for i, v in ipairs(addonmenu) do
 		insert(menu, v)
 	end
-	PopupMenu(menu)
+	UI.PopupMenu(menu)
 end
 
 function D.CheckEnable()
