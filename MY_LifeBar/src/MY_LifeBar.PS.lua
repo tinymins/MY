@@ -414,13 +414,9 @@ function PS.OnPanelActive(wnd)
 					cfg.DifferentiateForce = false
 				end,
 				rgb = cfg[tartype],
-				szIcon = 'ui/Image/button/CommonButton_1.UITex',
-				nFrame = 69, nMouseOverFrame = 70,
-				szLayer = 'ICON_RIGHT',
-				fnClickIcon = function()
-					UI.OpenColorPicker(function(r, g, b)
-						cfg[tartype] = { r, g, b }
-					end)
+				fnChangeColor = function(r, g, b)
+					cfg[tartype] = {r, g, b}
+					opt.rgb = cfg[tartype]
 				end,
 			})
 			table.insert(opt, {
@@ -436,13 +432,8 @@ function PS.OnPanelActive(wnd)
 				table.insert(opt, {
 					szOption = szForceTitle,
 					rgb = cfg[dwForceID],
-					szIcon = 'ui/Image/button/CommonButton_1.UITex',
-					nFrame = 69, nMouseOverFrame = 70,
-					szLayer = 'ICON_RIGHT',
-					fnClickIcon = function()
-						UI.OpenColorPicker(function(r, g, b)
-							cfg[dwForceID] = { r, g, b }
-						end)
+					fnChangeColor = function(r, g, b)
+						cfg[dwForceID] = { r, g, b }
 					end,
 					fnDisable = function()
 						return not cfg.DifferentiateForce
