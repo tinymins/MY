@@ -362,7 +362,7 @@ function D.DrawScrollContainer(scroll, menu, nLevel, bInlineContainer)
 	if menu.nMaxHeight then
 		nHeight = min(nHeight, menu.nMaxHeight)
 	end
-	nHeight = min(nHeight, (select(2, Station.GetClientSize())))
+	nHeight = min(nHeight, (select(2, Station.GetClientSize()) - 10))
 	container:SetH(nHeight)
 	container:FormatAllContentPos() -- 这里KGUI有BUG 如果调整高度后不重新Format一遍的话 一定会出滚动条
 	scroll:SetH(nHeight)
