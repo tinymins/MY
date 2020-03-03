@@ -65,6 +65,7 @@ local DIFF_KEYS = { -- 用于自动扫描菜单数据是否有更新的键
 	'nIconWidth',
 	'nIconHeight',
 	'fnClickIcon',
+	'szLayer',
 }
 
 --[[
@@ -188,6 +189,7 @@ function D.UpdateScrollContainerWidth(scroll, nHeaderWidth, nContentWidth, nFoot
 			hContent:SetRelX(nHeaderWidth)
 			hFooter:SetW(nFooterWidth)
 			hFooter:SetRelX(nHeaderWidth + nContentWidth)
+			h:Lookup('Image_Background'):SetW(nWidth)
 			h:Lookup('Image_Over'):SetW(nWidth)
 			h:Lookup('Image_Devide'):SetW(nWidth)
 			h:SetW(nWidth)
@@ -225,6 +227,7 @@ function D.DrawScrollContainer(scroll, menu, nLevel, bInlineContainer)
 			local hContent = h:Lookup('Handle_Content')
 			local hFooter = h:Lookup('Handle_Item_R')
 			local imgDevide = h:Lookup('Image_Devide')
+			local imgBg = h:Lookup('Image_Background')
 			if m.bDevide or m.bDivide then
 				wnd.bDisable = true
 				imgDevide:Show()
@@ -235,6 +238,22 @@ function D.DrawScrollContainer(scroll, menu, nLevel, bInlineContainer)
 				h:ClearHoverElement()
 			else
 				imgDevide:Hide()
+				-- 背景
+				local szBgUITex, nBgFrame = m.szBgUITex, m.nBgFrame
+				if m.szIcon and m.szLayer == 'ICON_FILL' then
+					szBgUITex = m.szIcon
+					nBgFrame = m.nFrame
+				end
+				if szBgUITex then
+					if szBgUITex and nBgFrame then
+						imgBg:FromUITex(szBgUITex, nBgFrame)
+					elseif szBgUITex then
+						imgBg:FromTextureFile(szBgUITex)
+					end
+					imgBg:Show()
+				else
+					imgBg:Hide()
+				end
 				-- 左侧图标
 				hHeader:Lookup('Handle_Check'):SetVisible(m.bCheck and m.bChecked)
 				hHeader:Lookup('Handle_MCheck'):SetVisible(m.bMCheck and m.bChecked)
@@ -268,7 +287,7 @@ function D.DrawScrollContainer(scroll, menu, nLevel, bInlineContainer)
 						insert(aCustomIcon, v)
 					end
 				end
-				if m.szIcon then
+				if m.szIcon and m.szLayer ~= 'ICON_FILL' then
 					insert(aCustomIcon, {
 						szUITex = m.szIcon,
 						nFrame = m.nFrame,
