@@ -171,6 +171,13 @@ function D.UpdateMouseOver(scroll, nCurX, nCurY)
 		local wnd = container:LookupContent(i)
 		if wnd:GetName() == 'Wnd_Item' then
 			local h = wnd:Lookup('', '')
+			local hFooter = h:Lookup('Handle_Item_R')
+			for i = 0, hFooter:GetItemCount() - 1 do
+				local hCustom = hFooter:Lookup(i)
+				if hCustom:GetName() == 'Handle_CustomIcon' then
+					hCustom:Lookup('Image_CustomIconHover'):SetVisible(hCustom:PtInItem(nCurX, nCurY))
+				end
+			end
 			h:Lookup('Image_Over'):SetVisible(not wnd.bDisable and h:PtInItem(nCurX, nCurY))
 		elseif wnd:GetName() == 'WndScroll_Menu' then
 			D.UpdateMouseOver(wnd, nCurX, nCurY)
