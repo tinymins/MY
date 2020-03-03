@@ -186,12 +186,14 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 				},
 				{ bDevide = true },
 			}
+			local m2 = { bInline = true, nMaxHeight = 550 }
 			for k, v in pairs(MY_AutoSell.tSellItem) do
-				insert(m1, {
+				insert(m2, {
 					szOption = k, bCheck = true, bChecked = v, fnAction = function(d, b) MY_AutoSell.tSellItem[k] = b end,
 					{ szOption = _L['Remove'], fnAction = function() MY_AutoSell.tSellItem[k] = nil end }
 				})
 			end
+			insert(m1, m2)
 			insert(m0, m1)
 			-- 自定义不卖物品
 			local m1 = {
@@ -210,12 +212,14 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 				},
 				{ bDevide = true },
 			}
+			local m2 = { bInline = true, nMaxHeight = 550 }
 			for k, v in pairs(MY_AutoSell.tProtectItem) do
-				insert(m1, {
+				insert(m2, {
 					szOption = k, bCheck = true, bChecked = v, fnAction = function(d, b) MY_AutoSell.tProtectItem[k] = b end,
 					{ szOption = _L['Remove'], fnAction = function() MY_AutoSell.tProtectItem[k] = nil end }
 				})
 			end
+			insert(m1, m2)
 			insert(m0, m1)
 			return m0
 		end,
