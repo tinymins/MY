@@ -164,6 +164,14 @@ function D.IsEquals(m1, m2)
 	return true
 end
 
+-- 判断一个菜单是否可交互
+function D.IsDisable(menu)
+	if menu.bDisable or menu.bDevide or menu.bDivide then
+		return true
+	end
+	return false
+end
+
 -- 更新鼠标进入状态防止闪烁 必须在刷新宽度后执行
 function D.UpdateMouseOver(scroll, nCurX, nCurY)
 	local container = scroll:Lookup('WndContainer_Menu')
@@ -181,7 +189,7 @@ function D.UpdateMouseOver(scroll, nCurX, nCurY)
 					hItem:Lookup('Image_ColorHover'):SetVisible(hItem:PtInItem(nCurX, nCurY))
 				end
 			end
-			h:Lookup('Image_Over'):SetVisible(not wnd.bDisable and h:PtInItem(nCurX, nCurY))
+			h:Lookup('Image_Over'):SetVisible(not D.IsDisable(wnd.menu) and h:PtInItem(nCurX, nCurY))
 		elseif wnd:GetName() == 'WndScroll_Menu' then
 			D.UpdateMouseOver(wnd, nCurX, nCurY)
 		end
@@ -244,7 +252,6 @@ function D.DrawScrollContainer(scroll, menu, nLevel, bInlineContainer)
 			local imgDevide = h:Lookup('Image_Devide')
 			local imgBg = h:Lookup('Image_Background')
 			if m.bDevide or m.bDivide then
-				wnd.bDisable = true
 				imgDevide:Show()
 				wnd:SetH(imgDevide:GetH())
 				hHeader:Hide()
@@ -277,7 +284,7 @@ function D.DrawScrollContainer(scroll, menu, nLevel, bInlineContainer)
 				nHeaderWidth = max(nHeaderWidth, (hHeader:GetAllItemSize()))
 				-- 正文
 				local hContentInner = hContent:Lookup('Handle_ContentInner')
-				local nFont = m.bDisable and DISABLE_FONT or ENABLE_FONT
+				local nFont = D.IsDisable(m) and DISABLE_FONT or ENABLE_FONT
 				local rgb = m.rgb or CONSTANT.EMPTY_TABLE
 				local r, g, b = rgb.r or rgb[1] or m.r, rgb.g or rgb[2] or m.g, rgb.b or rgb[3] or m.b
 				hContentInner:AppendItemFromString(GetFormatText(m.szOption, nFont, r, g, b))
@@ -559,7 +566,7 @@ function D.OnItemLButtonClick()
 		local wnd = this:GetParent() -- 'Wnd_Item'
 		local frame = this:GetRoot()
 		local menu = wnd.menu
-		if menu.bDisable then
+		if D.IsDisable(menu) then
 			return
 		end
 		if menu.bMCheck then
