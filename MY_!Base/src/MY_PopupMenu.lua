@@ -537,13 +537,13 @@ function D.OnItemLButtonClick()
 			end
 			menu.bChecked = not menu.bChecked
 			if menu.fnAction then
-				menu.fnAction()
+				menu.fnAction(menu.UserData, menu.bChecked)
 			end
 		else
 			if menu.bCheck then
 				menu.bChecked = not menu.bChecked
 			end
-			if not menu.fnAction or menu.fnAction() ~= 0 then
+			if not menu.fnAction or menu.fnAction(menu.UserData, menu.bChecked) ~= 0 then
 				Wnd.CloseWindow(frame)
 			end
 		end
@@ -562,7 +562,7 @@ function D.OnItemLButtonClick()
 		end)
 	elseif name == 'Image_CustomIcon' then
 		local data = this.data
-		if not data.fnAction or data.fnAction() ~= 0 then
+		if not data.fnAction or data.fnAction(data.UserData) ~= 0 then
 			Wnd.CloseWindow(this:GetRoot())
 		end
 	end
