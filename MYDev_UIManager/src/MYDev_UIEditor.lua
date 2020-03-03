@@ -167,7 +167,8 @@ function MYDev_UIEditor.OnLButtonClick()
 		menu.nMiniWidth = handle:GetW()
 		menu.x = nX
 		menu.y = nY + nH
-		PopupMenu(menu)
+		menu.szLayer = 'Topmost2'
+		UI.PopupMenu(menu)
 	elseif name == 'Btn_Close' then
 		Wnd.CloseWindow(this:GetRoot())
 	end
@@ -318,7 +319,7 @@ function D.GetMeun(frame)
 				fnAction = function()
 					D.UpdateTree(frame, el)
 					frame:Lookup('Btn_Select', 'Text_Select'):SetText(el:GetTreePath())
-					Wnd.CloseWindow(GetPopupMenu())
+					UI.ClosePopupMenu()
 				end,
 				fnMouseLeave = function()
 					return D.SetUIPos(frame)
