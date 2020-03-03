@@ -281,7 +281,7 @@ function D.DrawScrollContainer(scroll, menu, nLevel, bInlineContainer)
 				else
 					hFooter:Lookup('Handle_PushInfo'):Hide()
 				end
-				hFooter:Lookup('Image_Color'):SetVisible(m.fnChangeColor and true or false)
+				hFooter:Lookup('Handle_Color'):SetVisible(m.fnChangeColor and true or false)
 				local aCustomIcon = {}
 				if m.aCustomIcon then
 					for _, v in ipairs(m.aCustomIcon) do
@@ -313,13 +313,13 @@ function D.DrawScrollContainer(scroll, menu, nLevel, bInlineContainer)
 					if v.nHeight then
 						img:SetW(v.nHeight)
 					end
-					while img:GetIndex() > 1 and hFooter:Lookup(img:GetIndex() - 1):GetName() ~= 'Image_Color' do
+					while img:GetIndex() > 1 and hFooter:Lookup(img:GetIndex() - 1):GetName() ~= 'Handle_Color' do
 						img:ExchangeIndex(img:GetIndex() - 1)
 					end
 					img.data = v
 					img.menu = m
 				end
-				hFooter:Lookup('Image_Child'):SetVisible(#m > 0)
+				hFooter:Lookup('Handle_Child'):SetVisible(#m > 0)
 				hFooter:SetW(99999)
 				hFooter:FormatAllItemPos()
 				nFooterWidth = max(nFooterWidth, hFooter:GetAllItemSize())
@@ -553,7 +553,7 @@ function D.OnItemLButtonClick()
 			D.FireAction(frame, menu, menu.fnAction)
 		end
 	elseif name == 'Image_Color' then
-		local wnd = this:GetParent():GetParent():GetParent() -- 'Wnd_Item'
+		local wnd = this:GetParent():GetParent():GetParent():GetParent() -- 'Wnd_Item'
 		local frame = this:GetRoot()
 		frame.bColorPicker = true
 		UI.OpenColorPicker(function(r, g, b)
