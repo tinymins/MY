@@ -429,12 +429,12 @@ function D.UpdateUI(frame)
 		wnd:Destroy()
 	end
 	-- 逐个绘制菜单
-	local aMenu, bExist, bDrawed = frame.aMenu, true, false
-	for nLevel = 1, #aMenu do
+	local aMenu, nExistLevel, bExist, bDrawed = frame.aMenu, frame.nExistLevel or 0, true, false
+	for nLevel = 1, max(#aMenu, nExistLevel) do
 		local menu = aMenu[nLevel]
 		local wnd = frame:Lookup('Wnd_Menu' .. nLevel)
 		if nLevel > 1 then
-			bExist = D.IsSubMenu(aMenu[nLevel - 1], menu)
+			bExist = menu and D.IsSubMenu(aMenu[nLevel - 1], menu)
 		end
 		if bExist then -- 确认绘制
 			if not wnd then
@@ -451,6 +451,7 @@ function D.UpdateUI(frame)
 		end
 	end
 	if bDrawed then
+		frame.nExistLevel = #aMenu
 		D.UpdateWndPos(frame)
 	end
 end
