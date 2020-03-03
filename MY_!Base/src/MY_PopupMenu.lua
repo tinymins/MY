@@ -174,6 +174,18 @@ function D.IsDisable(menu)
 	return false
 end
 
+-- 克隆一个菜单配置项 用于建立快照
+function D.Clone(menu)
+	local m = {}
+	for _, k in ipairs(DIFF_KEYS) do
+		m[k] = Clone(menu[k])
+	end
+	for i, v in ipairs(menu) do
+		m[i] = D.Clone(v)
+	end
+	return m
+end
+
 -- 更新鼠标进入状态防止闪烁 必须在刷新宽度后执行
 function D.UpdateMouseOver(scroll, nCurX, nCurY)
 	local container = scroll:Lookup('WndContainer_Menu')
@@ -410,7 +422,7 @@ function D.UpdateWnd(wnd, menu, nLevel)
 	wnd:Lookup('', 'Image_Bg'):SetSize(nWidth + BORDER_SIZE * 2, nHeight + BORDER_SIZE * 2)
 	wnd.nLevel = nLevel
 	wnd.menu = menu
-	wnd.menuSnapshot = Clone(menu)
+	wnd.menuSnapshot = D.Clone(menu)
 	return true
 end
 
