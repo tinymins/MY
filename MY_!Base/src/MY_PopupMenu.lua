@@ -520,9 +520,8 @@ end
 
 function D.FireAction(frame, menu, fnAction, ...)
 	if fnAction and fnAction(menu.UserData, ...) == 0 then
-		return
+		Wnd.CloseWindow(frame)
 	end
-	Wnd.CloseWindow(frame)
 end
 
 function D.OnFrameCreate()
