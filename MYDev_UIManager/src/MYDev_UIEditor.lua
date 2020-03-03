@@ -171,6 +171,14 @@ function MYDev_UIEditor.OnLButtonClick()
 		UI.PopupMenu(menu)
 	elseif name == 'Btn_Close' then
 		Wnd.CloseWindow(this:GetRoot())
+	elseif name == 'Btn_Setting' then
+		local frame = this:GetRoot()
+		GetUserInput('', function(szTreePath)
+			local el = szTreePath and Station.Lookup(szTreePath)
+			if el then
+				D.SetElement(frame, el)
+			end
+		end, nil, nil, nil, frame.szTreePath)
 	end
 end
 
@@ -304,6 +312,12 @@ function D.CreateFrame()
 end
 end
 
+function D.SetElement(frame, el)
+	D.UpdateTree(frame, el)
+	frame.szTreePath = el:GetTreePath()
+	frame:Lookup('Btn_Select', 'Text_Select'):SetText(el:GetTreePath())
+end
+
 function D.GetMeun(frame)
 	local menu = {}
 	for k, v in ipairs({ 'Lowest', 'Lowest1', 'Lowest2', 'Normal', 'Normal1', 'Normal2', 'Topmost', 'Topmost1', 'Topmost2' })do
@@ -317,8 +331,7 @@ function D.GetMeun(frame)
 				bChecked = frmIter:IsVisible(),
 				rgb      = frmIter:IsAddOn() and { 255, 255, 255 } or { 255, 255, 0 },
 				fnAction = function()
-					D.UpdateTree(frame, el)
-					frame:Lookup('Btn_Select', 'Text_Select'):SetText(el:GetTreePath())
+					D.SetElement(frame, el)
 					UI.ClosePopupMenu()
 				end,
 				fnMouseLeave = function()
