@@ -191,7 +191,19 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 			for k, v in pairs(MY_AutoSell.tSellItem) do
 				insert(m2, {
 					szOption = k, bCheck = true, bChecked = v, fnAction = function(d, b) MY_AutoSell.tSellItem[k] = b end,
-					{ szOption = _L['Remove'], fnAction = function() MY_AutoSell.tSellItem[k] = nil end }
+					{
+						szOption = _L['Remove'],
+						fnAction = function()
+							MY_AutoSell.tSellItem[k] = nil
+							for i, v in ipairs(m2) do
+								if v.szOption == k then
+									remove(m2, i)
+									break
+								end
+							end
+							return 0
+						end,
+					},
 				})
 			end
 			insert(m1, m2)
@@ -217,7 +229,19 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 			for k, v in pairs(MY_AutoSell.tProtectItem) do
 				insert(m2, {
 					szOption = k, bCheck = true, bChecked = v, fnAction = function(d, b) MY_AutoSell.tProtectItem[k] = b end,
-					{ szOption = _L['Remove'], fnAction = function() MY_AutoSell.tProtectItem[k] = nil end }
+					{
+						szOption = _L['Remove'],
+						fnAction = function()
+							MY_AutoSell.tProtectItem[k] = nil
+							for i, v in ipairs(m2) do
+								if v.szOption == k then
+									remove(m2, i)
+									break
+								end
+							end
+							return 0
+						end,
+					},
 				})
 			end
 			insert(m1, m2)
