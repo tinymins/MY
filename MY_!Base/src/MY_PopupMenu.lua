@@ -567,26 +567,39 @@ function D.OnItemMouseEnter()
 		local wnd = this:GetParent() -- 'Wnd_Item'
 		local frame = this:GetRoot()
 		local menu = wnd.menu
-		if #menu == 0 then
-			return
+		if #menu ~= 0 then
+			-- 插入子菜单
+			local nLevel = wnd.nLevel
+			for i = nLevel, #frame.aMenu do
+				frame.aMenu[i] = nil
+			end
+			frame.aMenu[nLevel] = menu
+			-- 记录触发位置
+			for i = nLevel, #frame.aMenuY do
+				frame.aMenuY[i] = nil
+			end
+			frame.aMenuY[nLevel] = this:GetAbsY() - frame:GetAbsY()
+			-- 更新UI
+			D.UpdateUI(frame)
 		end
-		-- 插入子菜单
-		local nLevel = wnd.nLevel
-		for i = nLevel, #frame.aMenu do
-			frame.aMenu[i] = nil
+		if menu.fnMouseEnter then
+			menu.fnMouseEnter(menu.UserData)
 		end
-		frame.aMenu[nLevel] = menu
-		-- 记录触发位置
-		for i = nLevel, #frame.aMenuY do
-			frame.aMenuY[i] = nil
-		end
-		frame.aMenuY[nLevel] = this:GetAbsY() - frame:GetAbsY()
-		-- 更新UI
-		D.UpdateUI(frame)
 	elseif name == 'Handle_Color' then
 		LIB.ExecuteWithThis(this:GetParent():GetParent(), D.OnItemMouseEnter)
 	elseif name == 'Handle_CustomIcon' then
 		LIB.ExecuteWithThis(this:GetParent():GetParent(), D.OnItemMouseEnter)
+	end
+end
+
+function D.OnItemMouseLeave()
+	local name = this:GetName()
+	if name == 'Handle_Item' then
+		local wnd = this:GetParent() -- 'Wnd_Item'
+		local menu = wnd.menu
+		if menu.fnMouseLeave then
+			menu.fnMouseLeave(menu.UserData)
+		end
 	end
 end
 
