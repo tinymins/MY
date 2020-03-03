@@ -68,6 +68,7 @@ local DIFF_KEYS = { -- 用于自动扫描菜单数据是否有更新的键
 	'nIconHeight',
 	'fnClickIcon',
 	'szLayer',
+	'bDisable',
 }
 
 --[[
@@ -121,6 +122,7 @@ function D.SetDS(frame, menu)
 	if menu.szLayer then
 		frame:ChangeRelation(menu.szLayer)
 	end
+	D.CalcDisable(menu)
 	D.UpdateUI(frame)
 end
 
@@ -504,6 +506,18 @@ function D.UpdateUI(frame)
 	end
 end
 
+-- 根据自动禁用函数刷新禁用状态
+function D.CalcDisable(menu)
+	for _, v in ipairs(menu) do
+		if v.fnDisable then
+			v.bDisable = v.fnDisable(v.UserData)
+		end
+		if #v > 0 then
+			D.CalcDisable(v)
+		end
+	end
+end
+
 function D.FireAction(frame, menu, fnAction, ...)
 	if fnAction and fnAction(menu.UserData, ...) == 0 then
 		return
@@ -532,6 +546,7 @@ function D.OnFrameBreathe()
 			return Wnd.CloseWindow(this)
 		end
 	end
+	D.CalcDisable(this.aMenu[1])
 	D.UpdateUI(this)
 end
 
