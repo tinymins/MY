@@ -557,6 +557,10 @@ function D.OnItemMouseEnter()
 		frame.aMenuY[nLevel] = this:GetAbsY() - frame:GetAbsY()
 		-- ¸üÐÂUI
 		D.UpdateUI(frame)
+	elseif name == 'Handle_Color' then
+		LIB.ExecuteWithThis(this:GetParent():GetParent(), D.OnItemMouseEnter)
+	elseif name == 'Handle_CustomIcon' then
+		LIB.ExecuteWithThis(this:GetParent():GetParent(), D.OnItemMouseEnter)
 	end
 end
 
