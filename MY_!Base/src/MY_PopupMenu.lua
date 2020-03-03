@@ -292,14 +292,21 @@ function D.DrawScrollContainer(scroll, menu, nLevel, bInlineContainer)
 					insert(aCustomIcon, {
 						szUITex = m.szIcon,
 						nFrame = m.nFrame,
-						nMouseOverFrame = m.nMouseOverFrame,
+						szHoverUITex = m.szIcon,
+						nHoverFrame = m.nMouseOverFrame,
 						nWidth = m.nIconWidth,
 						nHeight = m.nIconHeight,
 						fnAction = m.fnClickIcon,
 					})
 				end
 				for _, v in ipairs(aCustomIcon) do
-					local img = hFooter:AppendItemFromIni(SZ_TPL_INI, 'Image_CustomIcon')
+					local hCustom = hFooter:AppendItemFromIni(SZ_TPL_INI, 'Handle_CustomIcon')
+					while hCustom:GetIndex() > 1 and hFooter:Lookup(hCustom:GetIndex() - 1):GetName() ~= 'Handle_Color' do
+						hCustom:ExchangeIndex(hCustom:GetIndex() - 1)
+					end
+					-- 图标
+					local img = hCustom:Lookup('Image_CustomIcon')
+					local imgHover = hCustom:Lookup('Image_CustomIconHover')
 					if v.szUITex and v.nFrame then
 						img:FromUITex(v.szUITex, v.nFrame)
 					elseif v.szUITex then
@@ -309,15 +316,33 @@ function D.DrawScrollContainer(scroll, menu, nLevel, bInlineContainer)
 					end
 					if v.nWidth then
 						img:SetW(v.nWidth)
+						imgHover:SetW(v.nWidth)
 					end
 					if v.nHeight then
 						img:SetW(v.nHeight)
+						imgHover:SetW(v.nHeight)
 					end
-					while img:GetIndex() > 1 and hFooter:Lookup(img:GetIndex() - 1):GetName() ~= 'Handle_Color' do
-						img:ExchangeIndex(img:GetIndex() - 1)
+					img:SetRelY((hCustom:GetH() - img:GetH()) / 2)
+					-- 鼠标滑过
+					if v.szHoverUITex and v.nHoverFrame then
+						imgHover:FromUITex(v.szHoverUITex, v.nHoverFrame)
+					elseif v.szHoverUITex then
+						imgHover:FromTextureFile(v.szHoverUITex)
+					elseif v.nIconID then
+						imgHover:FromIconID(v.nHoverIconID)
 					end
-					img.data = v
-					img.menu = m
+					if v.nHoverWidth then
+						imgHover:SetW(v.nHoverWidth)
+					end
+					if v.nHoverHeight then
+						imgHover:SetW(v.nHoverHeight)
+					end
+					imgHover:SetRelY((hCustom:GetH() - imgHover:GetH()) / 2)
+					-- 设置数据
+					hCustom:FormatAllItemPos()
+					hCustom:SetHoverElement('Image_CustomIconHover')
+					hCustom.data = v
+					hCustom.menu = m
 				end
 				hFooter:Lookup('Handle_Child'):SetVisible(#m > 0)
 				hFooter:SetW(99999)
@@ -565,7 +590,7 @@ function D.OnItemLButtonClick()
 			end
 			frame.bColorPicker = nil
 		end)
-	elseif name == 'Image_CustomIcon' then
+	elseif name == 'Handle_CustomIcon' then
 		local data = this.data
 		local menu = this.menu
 		local frame = this:GetRoot()
