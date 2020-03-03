@@ -173,9 +173,12 @@ function D.UpdateMouseOver(scroll, nCurX, nCurY)
 			local h = wnd:Lookup('', '')
 			local hFooter = h:Lookup('Handle_Item_R')
 			for i = 0, hFooter:GetItemCount() - 1 do
-				local hCustom = hFooter:Lookup(i)
-				if hCustom:GetName() == 'Handle_CustomIcon' then
-					hCustom:Lookup('Image_CustomIconHover'):SetVisible(hCustom:PtInItem(nCurX, nCurY))
+				local hItem = hFooter:Lookup(i)
+				local szName = hItem:GetName()
+				if szName == 'Handle_CustomIcon' then
+					hItem:Lookup('Image_CustomIconHover'):SetVisible(hItem:PtInItem(nCurX, nCurY))
+				elseif szName == 'Handle_Color' then
+					hItem:Lookup('Image_ColorHover'):SetVisible(hItem:PtInItem(nCurX, nCurY))
 				end
 			end
 			h:Lookup('Image_Over'):SetVisible(not wnd.bDisable and h:PtInItem(nCurX, nCurY))
@@ -588,8 +591,8 @@ function D.OnItemLButtonClick()
 		else
 			D.FireAction(frame, menu, menu.fnAction)
 		end
-	elseif name == 'Image_Color' then
-		local wnd = this:GetParent():GetParent():GetParent():GetParent() -- 'Wnd_Item'
+	elseif name == 'Handle_Color' then
+		local wnd = this:GetParent():GetParent():GetParent() -- 'Wnd_Item'
 		local frame = this:GetRoot()
 		frame.bColorPicker = true
 		UI.OpenColorPicker(function(r, g, b)
