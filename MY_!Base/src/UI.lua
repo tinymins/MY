@@ -3464,7 +3464,7 @@ function UI:Menu(lmenu, rmenu, bNoAutoBind)
 		menu.x = nX
 		menu.y = nY + nH
 		menu.bVisibleWhenHideUI = true
-		PopupMenu(menu)
+		UI.PopupMenu(menu)
 	end
 	-- bind left click
 	if lmenu then
