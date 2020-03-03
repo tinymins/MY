@@ -117,6 +117,9 @@ end
 function D.SetDS(frame, menu)
 	frame.aMenu = {menu}
 	frame.aMenuY = {0}
+	if menu.szLayer then
+		frame:ChangeRelation(menu.szLayer)
+	end
 	D.UpdateUI(frame)
 end
 
