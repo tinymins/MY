@@ -316,6 +316,7 @@ function D.DrawScrollContainer(scroll, menu, nLevel, bInlineContainer)
 						img:ExchangeIndex(img:GetIndex() - 1)
 					end
 					img.data = v
+					img.menu = m
 				end
 				hFooter:Lookup('Image_Child'):SetVisible(#m > 0)
 				hFooter:SetW(99999)
@@ -456,6 +457,13 @@ function D.UpdateUI(frame)
 	end
 end
 
+function D.FireAction(frame, menu, fnAction, ...)
+	if fnAction and fnAction(menu.UserData, ...) == 0 then
+		return
+	end
+	Wnd.CloseWindow(frame)
+end
+
 function D.OnFrameCreate()
 	this:SetRelPos(0, 0)
 	this.SetDS = D.SetDS
@@ -536,18 +544,12 @@ function D.OnItemLButtonClick()
 				p = p:GetNext()
 			end
 			menu.bChecked = not menu.bChecked
-			if menu.fnAction then
-				menu.fnAction(menu.UserData, menu.bChecked)
-			end
+			D.FireAction(frame, menu, menu.fnAction, menu.bChecked)
 		elseif menu.bCheck then
 			menu.bChecked = not menu.bChecked
-			if menu.fnAction then
-				menu.fnAction(menu.UserData, menu.bChecked)
-			end
+			D.FireAction(frame, menu, menu.fnAction, menu.bChecked)
 		else
-			if not menu.fnAction or menu.fnAction(menu.UserData, menu.bChecked) ~= 0 then
-				Wnd.CloseWindow(frame)
-			end
+			D.FireAction(frame, menu, menu.fnAction)
 		end
 	elseif name == 'Image_Color' then
 		local wnd = this:GetParent():GetParent():GetParent() -- 'Wnd_Item'
@@ -564,9 +566,9 @@ function D.OnItemLButtonClick()
 		end)
 	elseif name == 'Image_CustomIcon' then
 		local data = this.data
-		if not data.fnAction or data.fnAction(data.UserData) ~= 0 then
-			Wnd.CloseWindow(this:GetRoot())
-		end
+		local menu = this.menu
+		local frame = this:GetRoot()
+		D.FireAction(frame, menu, data.fnAction)
 	end
 end
 
