@@ -539,10 +539,12 @@ function D.OnItemLButtonClick()
 			if menu.fnAction then
 				menu.fnAction(menu.UserData, menu.bChecked)
 			end
-		else
-			if menu.bCheck then
-				menu.bChecked = not menu.bChecked
+		elseif menu.bCheck then
+			menu.bChecked = not menu.bChecked
+			if menu.fnAction then
+				menu.fnAction(menu.UserData, menu.bChecked)
 			end
+		else
 			if not menu.fnAction or menu.fnAction(menu.UserData, menu.bChecked) ~= 0 then
 				Wnd.CloseWindow(frame)
 			end
