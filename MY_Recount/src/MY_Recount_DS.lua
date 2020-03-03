@@ -212,7 +212,7 @@ SKILL_RESULT_TYPE.EFFECTIVE_THERAPY    = 14 -- 有效治疗
 SKILL_RESULT_TYPE.TRANSFER_LIFE        = 15 -- 吸取生命
 SKILL_RESULT_TYPE.TRANSFER_MANA        = 16 -- 吸取内力
 
--- Data DataDisplay History[] 数据结构
+-- Data、DataDisplay、HISTORY_CACHE[szFilePath].Data 数据结构
 Data = {
 	[DK.UUID] = 战斗统一标示符,
 	[DK.VERSION] = 数据版本号,
@@ -371,8 +371,11 @@ local O = {
 	bRecEverything    = true,
 }
 local Data          -- 当前战斗数据记录
-local History = {}  -- 历史战斗记录
-local SZ_REC_FILE = {'cache/fight_recount_log.jx3dat', PATH_TYPE.ROLE}
+local HISTORY_CACHE = setmetatable({}, { __mode = 'v' }) -- 历史战斗记录缓存 { [szFile] = Data }
+local UNSAVED_CACHE = {} -- 未保存的战斗记录缓存 { [szFile] = Data }
+local DS_DATA_CONFIG = { passphrase = false, crc = false }
+local DS_ROOT = {'userdata/fight_stat/', PATH_TYPE.ROLE}
+local SZ_CFG_FILE = {'userdata/fight_stat/config.jx3dat', PATH_TYPE.ROLE}
 local SKILL_EFFECT_CACHE = {} -- 最近的技能效果缓存 （进战时候将最近的数据压进来）
 local SKILL_EFFECT_REPLAY_FRAME = GLOBAL.GAME_FPS * 1 -- 进战时候将多久的数据压进来（逻辑帧）
 
@@ -401,17 +404,15 @@ end
 --             #               #           #           #       #             # #           #
 --           # #               #           #         #           # # # # #         # # # # # # # #
 -- ##################################################################################################
--- 登陆游戏加载保存的数据
+-- 登录游戏加载保存的数据
 function D.LoadData()
-	local data = LIB.LoadLUAData(SZ_REC_FILE, { passphrase = false })
+	local data = LIB.LoadLUAData(SZ_CFG_FILE, DS_DATA_CONFIG)
 	if data then
-		if data.bSaveHistory or data.History then
-			History = data.History or {}
-			for i = #History, 1, -1 do
-				if History[i][DK.VERSION] ~= VERSION then
-					remove(History, i)
-				end
+		if IsTable(data.History) then
+			for _, data in ipairs(data.History) do
+				UNSAVED_CACHE[LIB.FormatPath(DS_ROOT) .. D.GetDataFileName(data)] = data
 			end
+			D.SaveHistory()
 		end
 		O.bSaveHistory      = data.bSaveHistory or false
 		O.nMaxHistory       = data.nMaxHistory   or 10
@@ -424,13 +425,100 @@ end
 -- 退出游戏保存数据
 function D.SaveData()
 	local data = {
-		History = O.bSaveHistory and History or nil,
-		bSaveHistory      = O.bSaveHistory,
-		nMaxHistory       = O.nMaxHistory,
-		nMinFightTime     = O.nMinFightTime,
-		bRecEverything    = O.bRecEverything,
+		bSaveHistory   = O.bSaveHistory,
+		nMaxHistory    = O.nMaxHistory,
+		nMinFightTime  = O.nMinFightTime,
+		bRecEverything = O.bRecEverything,
 	}
-	LIB.SaveLUAData(SZ_REC_FILE, data, { passphrase = false })
+	LIB.SaveLUAData(SZ_CFG_FILE, data, DS_DATA_CONFIG)
+end
+
+-- 加载历史数据列表
+function D.GetHistoryFiles()
+	local aFiles = {}
+	local szPath = LIB.FormatPath(DS_ROOT):gsub('/', '\\')
+	local aFileName = {}
+	for _, v in ipairs(CPath.GetFileList(szPath)) do
+		insert(aFileName, v)
+	end
+	local szRoot = LIB.FormatPath(DS_ROOT)
+	for k, _ in pairs(HISTORY_CACHE) do
+		if wfind(k, szRoot) == 1 then
+			insert(aFileName, (k:sub(#szRoot + 1)))
+		end
+	end
+	for _, filename in ipairs(aFileName) do
+		local year, month, day, hour, minute, second, bossname, during = filename:match('^(%d+)%-(%d+)%-(%d+)%-(%d+)%-(%d+)%-(%d+)%_(.-)_(%d+)%.fstt%.jx3dat')
+		if year then
+			year = tonumber(year)
+			month = tonumber(month)
+			day = tonumber(day)
+			hour = tonumber(hour)
+			minute = tonumber(minute)
+			second = tonumber(second)
+			during = tonumber(during)
+			insert(aFiles, {
+				year, month, day, hour, minute, second,
+				bossname = bossname,
+				during = during,
+				time = DateToTime(
+					year,
+					month,
+					day,
+					hour,
+					minute,
+					second
+				),
+				filename = filename:sub(1, -13),
+				fullname = filename,
+				fullpath = szPath .. filename,
+			})
+		end
+	end
+	local function sortFile(a, b)
+		local n = max(#a, #b)
+		for i = 1, n do
+			if not a[i] then
+				return true
+			elseif not b[i] then
+				return false
+			elseif a[i] ~= b[i] then
+				return a[i] > b[i]
+			end
+		end
+		return true
+	end
+	sort(aFiles, sortFile)
+	return aFiles
+end
+
+-- 限制历史数据数量
+function D.LimitHistoryFile()
+	local aFiles = D.GetHistoryFiles()
+	for i = O.nMaxHistory + 1, #aFiles do
+		CPath.DelFile(aFiles[i].fullpath)
+		HISTORY_CACHE[aFiles[i].fullpath] = nil
+		UNSAVED_CACHE[aFiles[i].fullpath] = nil
+	end
+end
+
+-- 根据一个数据生成文件名
+function D.GetDataFileName(data)
+	return LIB.FormatTime(data[DK.TIME_BEGIN], '%yyyy-%MM-%dd-%hh-%mm-%ss')
+			.. '_' .. (data[DK.BOSSNAME] or g_tStrings.STR_NAME_UNKNOWN)
+			.. '_' .. data[DK.TIME_DURING]
+			.. '.fstt.jx3dat'
+end
+
+-- 保存缓存的历史数据
+function D.SaveHistory()
+	for szFilePath, data in pairs(UNSAVED_CACHE) do
+		LIB.SaveLUAData(szFilePath, data, DS_DATA_CONFIG)
+	end
+	if LIB.IsStreaming() then
+		D.LimitHistoryFile()
+	end
+	UNSAVED_CACHE = {}
 end
 
 -- 过图清除当前战斗数据
@@ -478,30 +566,37 @@ end)
 --     #           #         #     # #   #       #     # #   # # #     # #                            --
 -- ################################################################################################## --
 -- 获取统计数据
--- (table) D.Get(nIndex) -- 获取指定记录
---     (number)nIndex: 历史记录索引 为0返回当前统计
--- (table) D.Get()       -- 获取所有历史记录列表
-function D.Get(nIndex)
-	if not nIndex then
-		return History
-	elseif nIndex == 0 then
+-- (table) D.Get(szFilePath) -- 获取指定记录
+--     (string) szFilePath: 历史记录文件全路径 传'CURRENT'返回当前统计
+function D.Get(szFilePath)
+	if szFilePath == 'CURRENT' then
 		return Data
-	else
-		return History[nIndex]
 	end
+	if not HISTORY_CACHE[szFilePath] then
+		HISTORY_CACHE[szFilePath] = LIB.LoadLUAData(szFilePath, DS_DATA_CONFIG)
+	end
+	return HISTORY_CACHE[szFilePath]
 end
 
 -- 删除历史统计数据
--- (table) D.Del(nIndex) -- 删除指定序号的记录
---     (number)nIndex: 历史记录索引
--- (table) D.Del(data)   -- 删除指定记录
+-- (void) D.Del(szFilePath) -- 删除指定文件的记录
+--     (string)szFilePath: 历史记录文件全路径
+-- (void) D.Del(data)       -- 删除指定记录
 function D.Del(data)
-	if type(data) == 'number' then
-		remove(History, data)
+	if IsString(data) then
+		CPath.DelFile(data)
+		HISTORY_CACHE[data] = nil
+		UNSAVED_CACHE[data] = nil
 	else
-		for i = #History, 1, -1 do
-			if History[i] == data then
-				remove(History, i)
+		for szFilePath, v in pairs(HISTORY_CACHE) do
+			if v.data == data then
+				HISTORY_CACHE[szFilePath] = nil
+				CPath.DelFile(szFilePath)
+			end
+		end
+		for szFilePath, v in pairs(UNSAVED_CACHE) do
+			if v.data == data then
+				UNSAVED_CACHE[szFilePath] = nil
 			end
 		end
 	end
@@ -1158,13 +1253,13 @@ function D.Flush()
 			end
 		end
 	end
-	Data[DK.BOSSNAME] = szEnemyBossName or szBossName or ''
+	Data[DK.BOSSNAME] = szEnemyBossName or szBossName or g_tStrings.STR_NAME_UNKNOWN
 
 	if Data[DK.TIME_DURING] > O.nMinFightTime then
-		insert(History, 1, Data)
-		while #History > O.nMaxHistory do
-			remove(History)
-		end
+		local szFilePath = LIB.FormatPath(DS_ROOT) .. D.GetDataFileName(Data)
+		HISTORY_CACHE[szFilePath] = Data
+		UNSAVED_CACHE[szFilePath] = Data
+		D.SaveHistory()
 	end
 
 	D.Init(true)
@@ -1683,6 +1778,7 @@ local settings = {
 	exports = {
 		{
 			fields = {
+				GetHistoryFiles = D.GetHistoryFiles,
 				Get = D.Get,
 				Del = D.Del,
 				GeneAwayTime = D.GeneAwayTime,

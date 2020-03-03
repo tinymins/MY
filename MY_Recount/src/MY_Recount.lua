@@ -118,18 +118,18 @@ function D.GetTargetShowName(szName, bPlayer)
 end
 
 -- 设置当前显示记录
--- D.SetDisplayData(number nHistory): 显示第nHistory条历史记录 当nHistory等于0时显示当前记录
+-- D.SetDisplayData(string szFilePath): 显示指定文件的历史记录 传'CURRENT'时显示当前记录
 -- D.SetDisplayData(table  data): 显示数据为data的历史记录
-function D.SetDisplayData(data)
-	if IsNumber(data) then
-		data = MY_Recount_DS.Get(data)
+function D.SetDisplayData(szFilePath)
+	local data = IsTable(szFilePath)
+		and szFilePath
+		or MY_Recount_DS.Get(szFilePath)
+	if not IsTable(data) then
+		return
 	end
-	D.bHistoryMode = data ~= MY_Recount_DS.Get(0)
-
-	if IsTable(data) then
-		DataDisplay = data
-		FireUIEvent('MY_RECOUNT_DISP_DATA_UPDATE')
-	end
+	D.bHistoryMode = szFilePath ~= 'CURRENT'
+	DataDisplay = data
+	FireUIEvent('MY_RECOUNT_DISP_DATA_UPDATE')
 end
 
 -- 获取当前显示记录
@@ -406,12 +406,12 @@ end
 function D.GetHistoryMenu()
 	local t = {{
 		szOption = _L['current fight'],
-		rgb = (MY_Recount_DS.Get(0) == DataDisplay and {255, 255, 0}) or nil,
+		rgb = (MY_Recount_DS.Get('CURRENT') == DataDisplay and {255, 255, 0}) or nil,
 		fnAction = function()
 			if IsCtrlKeyDown() then
-				MY_Recount_FP_Open(MY_Recount_DS.Get(0))
+				MY_Recount_FP_Open(MY_Recount_DS.Get('CURRENT'))
 			else
-				D.SetDisplayData(0)
+				D.SetDisplayData('CURRENT')
 			end
 		end,
 		fnMouseEnter = function()
@@ -424,39 +424,41 @@ function D.GetHistoryMenu()
 		end,
 	}}
 
-	for _, data in ipairs(MY_Recount_DS.Get()) do
-		if data[DK.UUID] and data[DK.TIME_DURING] then
-			local t1 = {
-				szOption = (data[DK.BOSSNAME] or ''):gsub('#.*', '') .. ' (' .. LIB.FormatTimeCounter(data[DK.TIME_DURING], '%M:%ss') .. ')',
-				rgb = (data == DataDisplay and {255, 255, 0}) or nil,
-				fnAction = function()
-					if IsCtrlKeyDown() then
-						MY_Recount_FP_Open(data)
-					else
-						D.SetDisplayData(data)
-					end
-				end,
-				szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',
-				nFrame = 49,
-				nMouseOverFrame = 51,
-				nIconWidth = 17,
-				nIconHeight = 17,
-				szLayer = 'ICON_RIGHTMOST',
-				fnClickIcon = function()
-					MY_Recount_DS.Del(data)
-					Wnd.CloseWindow('PopupMenuPanel')
-				end,
-				fnMouseEnter = function()
-					if not MY_Recount_DS.bRecEverything then
-						return
-					end
-					local nX, nY = this:GetAbsX(), this:GetAbsY()
-					local nW, nH = this:GetW(), this:GetH()
-					OutputTip(GetFormatText(_L['Hold ctrl click to review whole fight'], nil, 255, 255, 0), 600, {nX, nY, nW, nH}, ALW.RIGHT_LEFT)
-				end,
-			}
-			insert(t, t1)
-		end
+	for _, file in ipairs(MY_Recount_DS.GetHistoryFiles()) do
+		local t1 = {
+			szOption = file.bossname .. ' (' .. LIB.FormatTimeCounter(file.during, '%M:%ss') .. ')',
+			rgb = (file.time == DataDisplay[DK.TIME_BEGIN] and {255, 255, 0}) or nil,
+			fnAction = function()
+				local data = MY_Recount_DS.Get(file.fullpath)
+				if IsCtrlKeyDown() then
+					MY_Recount_FP_Open(data)
+				else
+					D.SetDisplayData(data)
+				end
+			end,
+			szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',
+			nFrame = 49,
+			nMouseOverFrame = 51,
+			nIconWidth = 17,
+			nIconHeight = 17,
+			szLayer = 'ICON_RIGHTMOST',
+			fnClickIcon = function()
+				MY_Recount_DS.Del(file.fullpath)
+				Wnd.CloseWindow('PopupMenuPanel')
+			end,
+			fnMouseEnter = function()
+				local aXml = {}
+				insert(aXml, GetFormatText(file.bossname .. '(' .. LIB.FormatTimeCounter(file.during, '%M:%ss') .. ')\n', nil, 255, 255, 255))
+				insert(aXml, GetFormatText(LIB.FormatTime(file.time, '%yyyy/%MM/%dd %hh:%mm:%ss\n'), nil, 255, 255, 255))
+				if MY_Recount_DS.bRecEverything then
+					insert(aXml, GetFormatText('\n' .. _L['Hold ctrl click to review whole fight'], nil, 255, 255, 0))
+				end
+				local nX, nY = this:GetAbsX(), this:GetAbsY()
+				local nW, nH = this:GetW(), this:GetH()
+				OutputTip(concat(aXml), 600, {nX, nY, nW, nH}, ALW.RIGHT_LEFT)
+			end,
+		}
+		insert(t, t1)
 	end
 
 	insert(t, { bDevide = true })
@@ -590,7 +592,7 @@ LIB.RegisterAddonMenu('MY_RECOUNT_MENU', D.GetMenu)
 -- 新的战斗数据时
 LIB.RegisterEvent('MY_RECOUNT_NEW_FIGHT', function()
 	if not D.bHistoryMode then
-		D.SetDisplayData(0)
+		D.SetDisplayData('CURRENT')
 	end
 end)
 

@@ -668,7 +668,7 @@ function D.OnLButtonClick()
 		PopupMenu(MY_Recount.GetHistoryMenu())
 	elseif name == 'Btn_Empty' then
 		MY_Recount_DS.Flush()
-		MY_Recount.SetDisplayData(0)
+		MY_Recount.SetDisplayData('CURRENT')
 		D.DrawUI(this:GetRoot())
 	elseif name == 'Btn_Issuance' then
 		PopupMenu(MY_Recount.GetPublishMenu())
