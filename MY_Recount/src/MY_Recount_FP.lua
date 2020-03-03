@@ -307,15 +307,45 @@ function D.DrawHead(frame)
 	hCols:FormatAllItemPos()
 end
 
+-- 搜索匹配
+function D.MatchRecSearch(data, rec, szSearch, nSearch)
+	if not szSearch or szSearch == '' then
+		return true
+	end
+	if (
+		(szSearch == _L['Skill'] and rec[4] == EVERYTHING_TYPE.SKILL_EFFECT and rec[7] == SKILL_EFFECT_TYPE.SKILL)
+		or (szSearch == _L['Buff'] and rec[4] == EVERYTHING_TYPE.SKILL_EFFECT and rec[7] == SKILL_EFFECT_TYPE.BUFF)
+		or (szSearch == _L['Fight time'] and rec[4] == EVERYTHING_TYPE.FIGHT_TIME)
+		or (szSearch == _L['Death'] and rec[4] == EVERYTHING_TYPE.DEATH)
+		or (szSearch == _L['Online'] and rec[4] == EVERYTHING_TYPE.ONLINE and rec[6])
+		or (szSearch == _L['Offline'] and rec[4] == EVERYTHING_TYPE.ONLINE and not rec[6])
+		or (rec[4] == EVERYTHING_TYPE.SKILL_EFFECT and (
+			nSearch == rec[8] or nSearch == rec[5] or nSearch == rec[6]
+			or wfind(MY_Recount_DS.GetNameAusID(data, rec[5]) or '', szSearch)
+			or wfind(MY_Recount_DS.GetNameAusID(data, rec[6]) or '', szSearch)
+			or wfind(MY_Recount_DS.GetEffectInfoAusID(data, rec[10]) or '', szSearch)
+			or szSearch == MY_Recount.SKILL_RESULT_NAME[rec[11]]
+			or (szSearch == _L['Therapy'] and rec[12] > 0)
+			or (szSearch == _L['EffectTherapy'] and rec[13] > 0)
+			or (szSearch == _L['Damage'] and rec[14] > 0)
+			or (szSearch == _L['EffectDamage'] and rec[15] > 0)
+		))
+	) then
+		return true
+	end
+	return false
+end
+
 -- 根据搜索和配置过滤生成显示列表
 function D.UpdateData(frame)
-	local data = frame.data
-	local szSearch = frame:Lookup('Wnd_Total/Wnd_Search/Edit_Search'):GetText()
-	local nSearch = tonumber(szSearch)
-	local aRec = {}
-	if IsEmpty(szSearch) then
-		szSearch = nil
+	local aSearch = LIB.SplitString(frame:Lookup('Wnd_Total/Wnd_Search/Edit_Search'):GetText(), ' ', true)
+	for i, v in ipairs(aSearch) do
+		aSearch[i] = { v, tonumber(v) }
 	end
+	if IsEmpty(aSearch) then
+		aSearch = nil
+	end
+	local data, aRec = frame.data, {}
 	for _, rec in ipairs(data[DK.EVERYTHING]) do
 		local bMatch = true
 		-- 零数值记录
@@ -331,22 +361,13 @@ function D.UpdateData(frame)
 			bMatch = false
 		end
 		-- 搜索匹配
-		if bMatch and szSearch and not (
-			(szSearch == _L['Skill'] and rec[4] == EVERYTHING_TYPE.SKILL_EFFECT and rec[7] == SKILL_EFFECT_TYPE.SKILL)
-			or (szSearch == _L['Buff'] and rec[4] == EVERYTHING_TYPE.SKILL_EFFECT and rec[7] == SKILL_EFFECT_TYPE.BUFF)
-			or (szSearch == _L['Fight time'] and rec[4] == EVERYTHING_TYPE.FIGHT_TIME)
-			or (szSearch == _L['Death'] and rec[4] == EVERYTHING_TYPE.DEATH)
-			or (szSearch == _L['Online'] and rec[4] == EVERYTHING_TYPE.ONLINE and rec[6])
-			or (szSearch == _L['Offline'] and rec[4] == EVERYTHING_TYPE.ONLINE and not rec[6])
-			or (rec[4] == EVERYTHING_TYPE.SKILL_EFFECT and (
-				nSearch == rec[8] or nSearch == rec[5] or nSearch == rec[6]
-				or wfind(MY_Recount_DS.GetNameAusID(data, rec[5]) or '', szSearch)
-				or wfind(MY_Recount_DS.GetNameAusID(data, rec[6]) or '', szSearch)
-				or wfind(MY_Recount_DS.GetEffectInfoAusID(data, rec[10]) or '', szSearch)
-				or szSearch == MY_Recount.SKILL_RESULT_NAME[rec[11]]
-			))
-		) then
-			bMatch = false
+		if bMatch and aSearch then
+			for _, v in ipairs(aSearch) do
+				bMatch = D.MatchRecSearch(data, rec, v[1], v[2])
+				if not bMatch then
+					break
+				end
+			end
 		end
 		if bMatch then
 			insert(aRec, rec)
