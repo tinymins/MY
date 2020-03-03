@@ -513,11 +513,38 @@ function D.OnItemLButtonClick()
 		if menu.bDisable then
 			return
 		end
-		if menu.bCheck then
+		if menu.bMCheck then
+			local p = wnd:GetPrev()
+			while p do
+				if p.menu.bDevide or p.menu.bDivide then
+					break
+				end
+				if p.menu.bMCheck then
+					p.menu.bChecked = false
+				end
+				p = p:GetPrev()
+			end
+			local p = wnd:GetNext()
+			while p do
+				if p.menu.bDevide or p.menu.bDivide then
+					break
+				end
+				if p.menu.bMCheck then
+					p.menu.bChecked = false
+				end
+				p = p:GetNext()
+			end
 			menu.bChecked = not menu.bChecked
-		end
-		if not menu.fnAction or menu.fnAction() ~= 0 then
-			Wnd.CloseWindow(frame)
+			if menu.fnAction then
+				menu.fnAction()
+			end
+		else
+			if menu.bCheck then
+				menu.bChecked = not menu.bChecked
+			end
+			if not menu.fnAction or menu.fnAction() ~= 0 then
+				Wnd.CloseWindow(frame)
+			end
 		end
 	elseif name == 'Image_Color' then
 		local wnd = this:GetParent():GetParent():GetParent() -- 'Wnd_Item'
