@@ -354,8 +354,8 @@ function D.DrawScrollContainer(scroll, menu, nLevel, bInlineContainer)
 						imgHover:SetW(v.nWidth)
 					end
 					if v.nHeight then
-						img:SetW(v.nHeight)
-						imgHover:SetW(v.nHeight)
+						img:SetH(v.nHeight)
+						imgHover:SetH(v.nHeight)
 					end
 					img:SetRelY((hCustom:GetH() - img:GetH()) / 2)
 					-- Êó±ê»¬¹ý
