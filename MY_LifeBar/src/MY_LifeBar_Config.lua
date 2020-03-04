@@ -61,6 +61,12 @@ local function LoadDefaultTemplate(szStyle)
 			end
 		end
 	end
+	if LIB.IsStreaming() then -- 云端微调对立颜色防止压缩模糊
+		for _, szType in ipairs({ 'Player', 'Npc' }) do
+			template[1].Color.Enemy.__VALUE__[szType] = { 253, 86, 86 }
+		end
+		template[1].Color.Foe.__VALUE__.Player = { 202, 126, 255 }
+	end
 	return template
 end
 
