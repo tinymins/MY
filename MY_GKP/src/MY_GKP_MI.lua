@@ -155,8 +155,8 @@ LIB.RegisterBgMsg('MY_GKP_SYNC_START', function(_, aData, nChannel, dwID, szName
 				end)
 			end
 			LIB.RegisterBgMsg('MY_GKP_SYNC_CONTENT_' .. szKey, false)
-		end, function(szMsgID, nChannel, dwID, szName, bIsSelf, nSegCount, nSegIndex)
-			local fPercent = nSegIndex / nSegCount
+		end, function(szMsgID, nSegCount, nSegRecv, nSegIndex, nChannel, dwID, szName, bIsSelf)
+			local fPercent = nSegRecv / nSegCount
 			LIB.Topmsg(_L('Sychoronizing data please wait %d%% loaded.', fPercent * 100))
 		end)
 	end

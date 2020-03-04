@@ -138,7 +138,7 @@ local function CommonEventRegister(E, szID, fnAction)
 	elseif not szKey and E.tList and E.tList[szEvent] then
 		return true
 	end
-	return szKey
+	return szID
 end
 
 local function FireEventRec(E, p, ...)
@@ -572,7 +572,11 @@ local function OnBgMsg()
 	end
 	BG_MSG_PART[szMsgUUID][nSegIndex] = LIB.SimpleDecryptString(IsString(szPart) and szPart or '')
 	-- fire progress event
-	CommonEventFirer(BG_MSG_PROGRESS_EVENT, szMsgID, nChannel, dwID, szName, bSelf, nSegCount, #BG_MSG_PART[szMsgUUID], nSegIndex)
+	local nSegRecv = 0
+	for _, _ in pairs(BG_MSG_PART[szMsgUUID]) do
+		nSegRecv = nSegRecv + 1
+	end
+	CommonEventFirer(BG_MSG_PROGRESS_EVENT, szMsgID, nSegCount, nSegRecv, nSegIndex, nChannel, dwID, szName, bSelf)
 	-- concat and decode data
 	if #BG_MSG_PART[szMsgUUID] == nSegCount then
 		local szPlain = concat(BG_MSG_PART[szMsgUUID])
@@ -595,6 +599,9 @@ end
 -- LIB.RegisterBgMsg('MY_CHECK_INSTALL.RECEIVER_01', function(szMsgID, nChannel, dwTalkerID, szTalkerName, bSelf, oData) LIB.SendBgMsg(szTalkerName, 'MY_CHECK_INSTALL_REPLY', oData) end) -- ×¢²á
 -- LIB.RegisterBgMsg('MY_CHECK_INSTALL.RECEIVER_01') -- ×¢Ïú
 function LIB.RegisterBgMsg(szMsgID, fnAction, fnProgress)
+	if fnAction == false then
+		fnProgress = false
+	end
 	local szID = CommonEventRegister(BG_MSG_EVENT, szMsgID, fnAction)
 	return CommonEventRegister(BG_MSG_PROGRESS_EVENT, szID, fnProgress)
 end

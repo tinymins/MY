@@ -155,7 +155,7 @@ LIB.RegisterBgMsg('CHAR_INFO', function(szMsgID, aData, nChannel, dwID, szName, 
 		end
 		CharInfo.UpdateFrame(frame, szAction, oData)
 	end
-end, function(szMsgID, nChannel, dwID, szName, bIsSelf, nSegCount, nSegIndex)
+end, function(szMsgID, nSegCount, nSegRecv, nSegIndex, nChannel, dwID, szName, bIsSelf)
 	if bIsSelf then
 		return
 	end
@@ -163,7 +163,7 @@ end, function(szMsgID, nChannel, dwID, szName, bIsSelf, nSegCount, nSegIndex)
 	if not frame then
 		return
 	end
-	CharInfo.UpdateFrame(frame, 'PROGRESS', nSegIndex / nSegCount * 100)
+	CharInfo.UpdateFrame(frame, 'PROGRESS', nSegRecv / nSegCount * 100)
 end)
 
 -- public API
