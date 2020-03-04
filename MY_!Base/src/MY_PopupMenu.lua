@@ -69,6 +69,7 @@ local DIFF_KEYS = { -- 用于自动扫描菜单数据是否有更新的键
 	'fnClickIcon',
 	'szLayer',
 	'bDisable',
+	'fnAction',
 }
 
 --[[
