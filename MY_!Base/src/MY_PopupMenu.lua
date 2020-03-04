@@ -120,6 +120,7 @@ end
 function D.SetDS(frame, menu)
 	frame.aMenu = {menu}
 	frame.aMenuY = {0}
+	frame.aInvaild = {true}
 	if menu.szLayer then
 		frame:ChangeRelation(menu.szLayer)
 	end
@@ -409,10 +410,7 @@ function D.DrawScrollContainer(scroll, menu, nLevel, bInlineContainer)
 	return nHeaderWidth, nContentWidth, nFooterWidth
 end
 
-function D.UpdateWnd(wnd, menu, nLevel)
-	if D.IsEquals(wnd.menuSnapshot, menu) then
-		return false
-	end
+function D.DrawWnd(wnd, menu, nLevel)
 	-- 绘制列表
 	local scroll = wnd:Lookup('WndScroll_Menu')
 	local container = scroll:Lookup('WndContainer_Menu')
@@ -424,8 +422,6 @@ function D.UpdateWnd(wnd, menu, nLevel)
 	wnd:Lookup('', 'Image_Bg'):SetSize(nWidth + BORDER_SIZE * 2, nHeight + BORDER_SIZE * 2)
 	wnd.nLevel = nLevel
 	wnd.menu = menu
-	wnd.menuSnapshot = D.Clone(menu)
-	return true
 end
 
 -- 判断一个菜单配置项是不是另一个的子项
@@ -504,8 +500,11 @@ function D.UpdateUI(frame)
 			if not wnd then
 				wnd = D.AppendContentFromIni(frame, SZ_TPL_INI, 'Wnd_Menu', 'Wnd_Menu' .. nLevel)
 			end
-			if D.UpdateWnd(wnd, menu, nLevel) then
+			if frame.aInvaild[nLevel] or not D.IsEquals(wnd.menuSnapshot, menu) then
+				D.DrawWnd(wnd, menu, nLevel)
 				bDrawed = true
+				frame.aInvaild[nLevel] = false
+				wnd.menuSnapshot = D.Clone(menu)
 			end
 		else -- 需要清理的菜单（已不存在）
 			if wnd then
@@ -581,6 +580,8 @@ function D.OnItemMouseEnter()
 				frame.aMenuY[i] = nil
 			end
 			frame.aMenuY[nLevel] = this:GetAbsY() - frame:GetAbsY()
+			-- 标记无效绘制
+			frame.aInvaild[nLevel] = true
 			-- 更新UI
 			D.UpdateUI(frame)
 		end
