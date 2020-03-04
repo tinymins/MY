@@ -224,17 +224,14 @@ local EncodeLUAData = _G.var2str
 -----------------------------------------------
 -- Lua数据反序列化
 -----------------------------------------------
-local DecodeLUAData = _G.str2var
-if not DecodeLUAData then
-local szTempLog = 'interface/temp.log'
-local szTempJx3dat = 'interface/temp.jx3dat'
-function DecodeLUAData(szText)
-	Log(szTempLog, szText, 'clear close')
-	CPath.Move(szTempLog, szTempJx3dat)
-	local data = LoadLUAData(szTempJx3dat)
-	CPath.DelFile(szTempJx3dat)
+local DecodeLUAData = _G.str2var or function(szText)
+	local DECODE_ROOT = _DATA_ROOT_ .. '#cache/decode/'
+	local DECODE_PATH = DECODE_ROOT .. GetCurrentTime() .. GetTime() .. random(0, 999999) .. '.jx3dat'
+	CPath.MakeDir(DECODE_ROOT)
+	SaveDataToFile(szText, DECODE_PATH)
+	local data = LoadLUAData(DECODE_PATH)
+	CPath.DelFile(DECODE_PATH)
 	return data
-end
 end
 -----------------------------------------------
 -- 读取数据
