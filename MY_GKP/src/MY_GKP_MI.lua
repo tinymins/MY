@@ -145,14 +145,15 @@ LIB.RegisterBgMsg('MY_GKP_SYNC_START', function(_, aData, nChannel, dwID, szName
 			local dwID, tab = aData[1], aData[2]
 			if dwID == UI_GetClientPlayerID() or dwID == 0 then
 				LIB.Topmsg(_L['Sychoronization Complete'])
-				if not tab then
-					return D.Sysmsg(_L['Abnormal with Data Sharing, Please contact and make feed back with the writer.'])
+				if tab then
+					LIB.Confirm(_L('Data Sharing Finished, you have one last chance to confirm wheather cover the current data with [%s]\'s data or not? \n data of team bidding: %s\n transation data: %s', szName, #tab.GKP_Record, #tab.GKP_Account), function()
+						local ds = D.GetDS()
+						ds:SetAuctionList(tab.GKP_Record)
+						ds:SetPaymentList(tab.GKP_Account)
+					end)
+				else
+					D.Sysmsg(_L['Abnormal with Data Sharing, Please contact and make feed back with the writer.'])
 				end
-				LIB.Confirm(_L('Data Sharing Finished, you have one last chance to confirm wheather cover the current data with [%s]\'s data or not? \n data of team bidding: %s\n transation data: %s', szName, #tab.GKP_Record, #tab.GKP_Account), function()
-					local ds = D.GetDS()
-					ds:SetAuctionList(tab.GKP_Record)
-					ds:SetPaymentList(tab.GKP_Account)
-				end)
 			end
 			LIB.RegisterBgMsg('MY_GKP_SYNC_CONTENT_' .. szKey, false)
 		end, function(szMsgID, nSegCount, nSegRecv, nSegIndex, nChannel, dwID, szName, bIsSelf)
