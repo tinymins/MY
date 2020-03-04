@@ -573,24 +573,34 @@ function D.OnItemMouseEnter()
 		local wnd = this:GetParent() -- 'Wnd_Item'
 		local frame = this:GetRoot()
 		local menu = wnd.menu
-		if #menu ~= 0 then
-			if not D.IsDisable(menu) or menu.bAlwaysShowSub then
-				-- 插入子菜单
+		if #menu ~= 0 and (not D.IsDisable(menu) or menu.bAlwaysShowSub) then
+			LIB.DelayCall('MY_PopupMenu__HideSub', false)
+			-- 插入子菜单
+			local nLevel = wnd.nLevel
+			for i = nLevel, #frame.aMenu do
+				frame.aMenu[i] = nil
+			end
+			frame.aMenu[nLevel] = menu
+			-- 记录触发位置
+			for i = nLevel, #frame.aMenuY do
+				frame.aMenuY[i] = nil
+			end
+			frame.aMenuY[nLevel] = this:GetAbsY() - frame:GetAbsY()
+			-- 标记无效绘制
+			frame.aInvaild[nLevel] = true
+			-- 更新UI
+			D.UpdateUI(frame)
+		elseif not LIB.DelayCall('MY_PopupMenu__HideSub') then -- 3000ms后关闭之前展开的子菜单
+			LIB.DelayCall('MY_PopupMenu__HideSub', 1000, function()
+				if not IsElement(wnd) then
+					return
+				end
 				local nLevel = wnd.nLevel
 				for i = nLevel, #frame.aMenu do
 					frame.aMenu[i] = nil
 				end
-				frame.aMenu[nLevel] = menu
-				-- 记录触发位置
-				for i = nLevel, #frame.aMenuY do
-					frame.aMenuY[i] = nil
-				end
-				frame.aMenuY[nLevel] = this:GetAbsY() - frame:GetAbsY()
-				-- 标记无效绘制
-				frame.aInvaild[nLevel] = true
-				-- 更新UI
 				D.UpdateUI(frame)
-			end
+			end)
 		end
 		if menu.fnMouseEnter then
 			menu.fnMouseEnter(menu.UserData)
