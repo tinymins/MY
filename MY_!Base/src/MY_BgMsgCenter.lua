@@ -174,7 +174,7 @@ end
 -- 切换地图
 do
 local l_nSwitchMapID, l_nSwitchSubID
-local l_nEnteringMapID, l_nEnteringSubID, l_dwEnteringSwitchTime
+local l_nEnteringMapID, l_nEnteringSubID, l_dwEnteringTime, l_dwEnteringSwitchTime
 
 -- 点击进入某地图（进入前）
 local function OnSwitchMap(dwMapID, dwSubID, aMapCopy, dwTime)
@@ -272,15 +272,31 @@ LIB.RegisterEvent('MY_MESSAGE_BOX_ACTION.' .. PACKET_INFO.NAME_SPACE .. '#CD', f
 end)
 
 LIB.RegisterEvent('LOADING_ENDING.' .. PACKET_INFO.NAME_SPACE .. '#CD', function()
-	local dwTime = GetCurrentTime()
+	l_dwEnteringTime = GetCurrentTime()
 	local dwMapID = GetClientPlayer().GetMapID()
 	LIB.GetMapSaveCopy(dwMapID, function(aMapCopy)
 		local nSubID, dwSwitchTime
 		if dwMapID == l_nEnteringMapID then
 			nSubID, dwSwitchTime = l_nEnteringSubID, l_dwEnteringSwitchTime
 		end
-		OnEnterMap(dwMapID, nSubID, aMapCopy, dwTime, dwSwitchTime)
+		OnEnterMap(dwMapID, nSubID, aMapCopy, l_dwEnteringTime, dwSwitchTime)
 	end)
-	l_nEnteringSubID, l_dwEnteringSwitchTime = nil
+end)
+
+LIB.RegisterBgMsg('MY_ENTER_MAP_REQ', function(_, nChannel, dwTalkerID, szTalkerName, bSelf)
+	if not l_dwEnteringTime then
+		return
+	end
+	--[[#DEBUG BEGIN]]
+	LIB.Debug(PACKET_INFO.NAME_SPACE, 'Enter map request from ' .. szTalkerName, DEBUG_LEVEL.LOG)
+	--[[#DEBUG END]]
+	local dwMapID = GetClientPlayer().GetMapID()
+	LIB.GetMapSaveCopy(dwMapID, function(aMapCopy)
+		local nSubID, dwSwitchTime
+		if dwMapID == l_nEnteringMapID then
+			nSubID, dwSwitchTime = l_nEnteringSubID, l_dwEnteringSwitchTime
+		end
+		OnEnterMap(dwMapID, nSubID, aMapCopy, l_dwEnteringTime, dwSwitchTime)
+	end)
 end)
 end
