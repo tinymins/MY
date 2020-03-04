@@ -576,12 +576,12 @@ local function OnBgMsg()
 	-- concat and decode data
 	if #BG_MSG_PART[szMsgUUID] == nSegCount then
 		local szPlain = concat(BG_MSG_PART[szMsgUUID])
-		local aParam = szPlain and DecodeLUAData(szPlain)
-		if aParam then
-			CommonEventFirer(BG_MSG_EVENT, szMsgID, nChannel, dwID, szName, bSelf, unpack(aParam))
+		local aData = szPlain and DecodeLUAData(szPlain)
+		if aData then
+			CommonEventFirer(BG_MSG_EVENT, szMsgID, aData[1], nChannel, dwID, szName, bSelf)
 		--[[#DEBUG BEGIN]]
 		else
-			LIB.Debug('BG_EVENT#' .. szMsgID, GetTraceback('Cannot decode bgmsg'), DEBUG_LEVEL.ERROR)
+			LIB.Debug('BG_EVENT#' .. szMsgID, GetTraceback('Cannot decode BgMsg: ' .. szPlain), DEBUG_LEVEL.ERROR)
 		--[[#DEBUG END]]
 		end
 		BG_MSG_PART[szMsgUUID] = nil
@@ -590,9 +590,9 @@ end
 LIB.RegisterEvent('ON_BG_CHANNEL_MSG', OnBgMsg)
 end
 
--- LIB.RegisterBgMsg('MY_CHECK_INSTALL', function(szMsgID, nChannel, dwTalkerID, szTalkerName, bSelf, oDatas...) LIB.SendBgMsg(szTalkerName, 'MY_CHECK_INSTALL_REPLY', oData) end) -- 注册
+-- LIB.RegisterBgMsg('MY_CHECK_INSTALL', function(szMsgID, nChannel, dwTalkerID, szTalkerName, bSelf, oData) LIB.SendBgMsg(szTalkerName, 'MY_CHECK_INSTALL_REPLY', oData) end) -- 注册
 -- LIB.RegisterBgMsg('MY_CHECK_INSTALL') -- 注销
--- LIB.RegisterBgMsg('MY_CHECK_INSTALL.RECEIVER_01', function(szMsgID, nChannel, dwTalkerID, szTalkerName, bSelf, oDatas...) LIB.SendBgMsg(szTalkerName, 'MY_CHECK_INSTALL_REPLY', oData) end) -- 注册
+-- LIB.RegisterBgMsg('MY_CHECK_INSTALL.RECEIVER_01', function(szMsgID, nChannel, dwTalkerID, szTalkerName, bSelf, oData) LIB.SendBgMsg(szTalkerName, 'MY_CHECK_INSTALL_REPLY', oData) end) -- 注册
 -- LIB.RegisterBgMsg('MY_CHECK_INSTALL.RECEIVER_01') -- 注销
 function LIB.RegisterBgMsg(szMsgID, fnAction, fnProgress)
 	local szID = CommonEventRegister(BG_MSG_EVENT, szMsgID, fnAction)
@@ -627,9 +627,9 @@ local function ProcessQueue()
 	end
 	LIB.SendBgMsg(unpack(v))
 end
--- LIB.SendBgMsg(szName, szMsgID, ...)
--- LIB.SendBgMsg(nChannel, szMsgID, ...)
-function LIB.SendBgMsg(nChannel, szMsgID, ...)
+-- LIB.SendBgMsg(szName, szMsgID, oData)
+-- LIB.SendBgMsg(nChannel, szMsgID, oData)
+function LIB.SendBgMsg(nChannel, szMsgID, oData)
 	local szTarget, me = '', GetClientPlayer()
 	if not nChannel then
 		return
@@ -639,7 +639,7 @@ function LIB.SendBgMsg(nChannel, szMsgID, ...)
 		if szStatus == 'TALK_LOCK' then
 			LIB.Systopmsg(_L['BgMsg cannot be send due to talk lock, data will be sent as soon as talk unlocked.'])
 		end
-		insert(BG_MSG_QUEUE, { nChannel, szMsgID, ... })
+		insert(BG_MSG_QUEUE, { nChannel, szMsgID, oData })
 		LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '#BG_MSG_QUEUE', ProcessQueue)
 		return
 	end
@@ -656,7 +656,7 @@ function LIB.SendBgMsg(nChannel, szMsgID, ...)
 	-- encode and pagination
 	local szMsgSID = BG_MSG_ID_PREFIX .. szMsgID .. BG_MSG_ID_SUFFIX
 	local szMsgUUID = LIB.GetUUID():gsub('-', '')
-	local szArg = EncodeLUAData({...})
+	local szArg = EncodeLUAData({oData}) -- 如果发送nil，不包一层会被解析器误认为解码失败，所以必须用{}包裹
 	local nMsgLen = wlen(szArg)
 	local nSegLen = floor(MAX_CHANNEL_LEN[nChannel] / 4 * 3) -- Base64编码会导致长度增加
 	local nSegCount = ceil(nMsgLen / nSegLen)

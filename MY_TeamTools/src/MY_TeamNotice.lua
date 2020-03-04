@@ -130,7 +130,7 @@ function TI.CreateFrame(a, b)
 				end
 				if LIB.IsLeader() then
 					TI.szYY = szText
-					LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', 'Edit', szText, ui:Children('#Message'):Text())
+					LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', {'Edit', szText, ui:Children('#Message'):Text()})
 				else
 					ui:Children('#YY'):Text(TI.szYY, WNDEVENT_FIRETYPE.PREVENT)
 				end
@@ -201,7 +201,7 @@ function TI.CreateFrame(a, b)
 				end
 				if LIB.IsLeader() then
 					TI.szNote = szText
-					LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', 'Edit', ui:Children('#YY'):Text(), szText)
+					LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', {'Edit', ui:Children('#YY'):Text(), szText})
 				else
 					ui:Children('#Message'):Text(TI.szNote, WNDEVENT_FIRETYPE.PREVENT)
 				end
@@ -252,7 +252,7 @@ function TI.CreateFrame(a, b)
 				end
 			elseif szEvent == 'PARTY_ADD_MEMBER' then
 				if LIB.IsLeader() then
-					LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', 'reply', arg1, TI.szYY, TI.szNote)
+					LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', {'reply', arg1, TI.szYY, TI.szNote})
 				end
 			elseif szEvent == 'UI_SCALED' then
 				ui:Anchor(MY_TeamNotice.anchor)
@@ -280,7 +280,7 @@ function TI.OpenFrame()
 		if LIB.IsLeader() then
 			TI.CreateFrame()
 		else
-			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', 'ASK')
+			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', {'ASK'})
 			LIB.Sysmsg(_L['Asking..., If no response in longtime, team leader not enable plug-in.'])
 		end
 	end
@@ -304,7 +304,7 @@ LIB.RegisterEvent('FIRST_LOADING_END.TEAM_NOTICE', function()
 	-- 不存在队长不队长的问题了
 	local me = GetClientPlayer()
 	if me.IsInRaid() then
-		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', 'ASK')
+		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', {'ASK'})
 	end
 end)
 LIB.RegisterEvent('LOADING_END.TEAM_NOTICE', function()
@@ -344,18 +344,17 @@ LIB.RegisterEvent('ON_BG_CHANNEL_MSG.LR_TeamNotice', function()
 	end
 end)
 
-LIB.RegisterBgMsg('TI', function(_, nChannel, dwID, szName, bIsSelf, ...)
+LIB.RegisterBgMsg('TI', function(_, data, nChannel, dwID, szName, bIsSelf)
 	if not MY_TeamNotice.bEnable then
 		return
 	end
-	local data = {...}
 	if not bIsSelf then
 		local me = GetClientPlayer()
 		local team = GetClientTeam()
 		if team then
 			if data[1] == 'ASK' and LIB.IsLeader() then
 				if TI.GetFrame() then
-					LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', 'reply', szName, TI.szYY, TI.szNote)
+					LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', {'reply', szName, TI.szYY, TI.szNote})
 				end
 			else
 				if not LIB.IsLeader(dwID) then

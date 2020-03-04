@@ -87,7 +87,7 @@ function D.AddToList(tar, dwCaster, dwTime, szEvent)
 	-- bg notify
 	local me = GetClientPlayer()
 	if szEvent == 'DO_SKILL_CAST' and me.IsInParty() then
-		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GUDING_NOTIFY', tar.dwID, dwCaster)
+		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GUDING_NOTIFY', {tar.dwID, dwCaster})
 	end
 	if O.bAutoSay and me.dwID == dwCaster then
 		local nChannel = PLAYER_TALK_CHANNEL.RAID
@@ -150,9 +150,8 @@ function D.OnDoodadEnter()
 end
 
 -- notify
-function D.OnSkillNotify(_, nChannel, dwTalkerID, szTalkerName, bSelf, ...)
+function D.OnSkillNotify(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
 	if not bSelf then
-		local data = {...}
 		local dwID = tonumber(data[1])
 		if not O.tList[dwID] then
 			O.tList[dwID] = { dwCaster = tonumber(data[2]), dwTime = GetTime() }

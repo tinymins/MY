@@ -56,10 +56,11 @@ LIB.RegisterBgMsg('ASK_CURRENT_LOC', function(_, nChannel, dwTalkerID, szTalkerN
 end)
 
 -- 测试用（查看版本信息）
-LIB.RegisterBgMsg('MY_VERSION_CHECK', function(_, nChannel, dwTalkerID, szTalkerName, bSelf, bSilent)
+LIB.RegisterBgMsg('MY_VERSION_CHECK', function(_, oData, nChannel, dwTalkerID, szTalkerName, bSelf)
 	if bSelf then
 		return
 	end
+	local bSilent = oData[1]
 	if not bSilent and LIB.IsInParty() then
 		LIB.Talk(PLAYER_TALK_CHANNEL.RAID, _L('I\'ve installed MY plugins v%s', LIB.GetVersion()))
 	end
@@ -67,31 +68,29 @@ LIB.RegisterBgMsg('MY_VERSION_CHECK', function(_, nChannel, dwTalkerID, szTalker
 end)
 
 -- 测试用（调试工具）
-LIB.RegisterBgMsg('MY_GFN_CHECK', function(_, nChannel, dwTalkerID, szTalkerName, bSelf, szKey, szGFN, ...)
+LIB.RegisterBgMsg('MY_GFN_CHECK', function(_, oData, nChannel, dwTalkerID, szTalkerName, bSelf)
 	if bSelf or LIB.IsDebugClient(true) then
 		return
 	end
-	LIB.SendBgMsg(szTalkerName, 'MY_GFN_REPLY', szKey, XpCall(Get(_G, szGFN), ...))
+	LIB.SendBgMsg(szTalkerName, 'MY_GFN_REPLY', {oData[1], XpCall(Get(_G, oData[2]), select(3, unpack(oData)))})
 end)
 
 -- 进组查看属性
-LIB.RegisterBgMsg('RL', function(_, nChannel, dwID, szName, bIsSelf, ...)
-	local data = {...}
+LIB.RegisterBgMsg('RL', function(_, data, nChannel, dwID, szName, bIsSelf)
 	if not bIsSelf then
 		if data[1] == 'ASK' then
 			LIB.Confirm(_L('[%s] want to see your info, OK?', szName), function()
 				local me = GetClientPlayer()
 				local nGongZhan = LIB.GetBuff(me, 3219) and 1 or 0
 				local bEx = PACKET_INFO.AUTHOR_ROLES[me.dwID] == me.szName and 'Author' or 'Player'
-				LIB.SendBgMsg(szName, 'RL', 'Feedback', me.dwID, UI_GetPlayerMountKungfuID(), nGongZhan, bEx)
+				LIB.SendBgMsg(szName, 'RL', {'Feedback', me.dwID, UI_GetPlayerMountKungfuID(), nGongZhan, bEx})
 			end)
 		end
 	end
 end)
 
 -- 查看完整属性
-LIB.RegisterBgMsg('CHAR_INFO', function(_, nChannel, dwID, szName, bIsSelf, ...)
-	local data = {...}
+LIB.RegisterBgMsg('CHAR_INFO', function(_, data, nChannel, dwID, szName, bIsSelf)
 	if not bIsSelf and data[2] == UI_GetClientPlayerID() then
 		if data[1] == 'ASK'  then
 			if not MY_CharInfo or MY_CharInfo.bEnable or data[3] == 'DEBUG' then
@@ -101,24 +100,23 @@ LIB.RegisterBgMsg('CHAR_INFO', function(_, nChannel, dwID, szName, bIsSelf, ...)
 						v.tip = nil
 					end
 				end
-				LIB.SendBgMsg(LIB.IsParty(dwID) and PLAYER_TALK_CHANNEL.RAID or szName, 'CHAR_INFO', 'ACCEPT', dwID, aInfo)
+				LIB.SendBgMsg(LIB.IsParty(dwID) and PLAYER_TALK_CHANNEL.RAID or szName, 'CHAR_INFO', {'ACCEPT', dwID, aInfo})
 			else
-				LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'CHAR_INFO', 'REFUSE', dwID)
+				LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'CHAR_INFO', {'REFUSE', dwID})
 			end
 		end
 	end
 end)
 
 -- 搬运JH_ABOUT
-LIB.RegisterBgMsg('MY_ABOUT', function(_, nChannel, dwID, szName, bIsSelf, ...)
-	local data = {...}
+LIB.RegisterBgMsg('MY_ABOUT', function(_, data, nChannel, dwID, szName, bIsSelf)
 	if data[1] == 'Author' then -- 版本检查 自用 可以绘制详细表格
 		local me, szTong = GetClientPlayer(), ''
 		if me.dwTongID > 0 then
 			szTong = GetTongClient().ApplyGetTongName(me.dwTongID) or 'Failed'
 		end
 		local szServer = select(2, GetUserServer())
-		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_ABOUT', 'info',
+		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_ABOUT', {'info',
 			me.GetTotalEquipScore(),
 			me.GetMapID(),
 			szTong,
@@ -126,7 +124,7 @@ LIB.RegisterBgMsg('MY_ABOUT', function(_, nChannel, dwID, szName, bIsSelf, ...)
 			PACKET_INFO.VERSION,
 			szServer,
 			LIB.GetBuff(me, 3219)
-		)
+		})
 	elseif data[1] == 'TeamAuth' then -- 防止有人睡着 遇到了不止一次了
 		local team = GetClientTeam()
 		team.SetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER, dwID)
@@ -147,7 +145,8 @@ end)
 
 -- 团队副本CD
 do local LAST_TIME = {}
-LIB.RegisterBgMsg('MY_MAP_COPY_ID_REQUEST', function(_, nChannel, dwID, szName, bIsSelf, dwMapID, aPlayerID)
+LIB.RegisterBgMsg('MY_MAP_COPY_ID_REQUEST', function(_, aData, nChannel, dwID, szName, bIsSelf)
+	local dwMapID, aPlayerID = aData[1], aData[2]
 	if LAST_TIME[dwMapID] and GetCurrentTime() - LAST_TIME[dwMapID] < 5 then
 		return
 	end
@@ -164,7 +163,7 @@ LIB.RegisterBgMsg('MY_MAP_COPY_ID_REQUEST', function(_, nChannel, dwID, szName, 
 		end
 	end
 	local function fnAction(tMapID)
-		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_MAP_COPY_ID', dwMapID, tMapID[dwMapID] or -1)
+		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_MAP_COPY_ID', {dwMapID, tMapID[dwMapID] or -1})
 	end
 	LIB.GetMapSaveCopy(fnAction)
 	LAST_TIME[dwMapID] = GetCurrentTime()
@@ -197,7 +196,7 @@ local function OnSwitchMap(dwMapID, dwSubID, aMapCopy, dwTime)
 	end
 	LIB.Debug(PACKET_INFO.NAME_SPACE, szDebug, DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
-	LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_SWITCH_MAP', dwMapID, dwSubID, aMapCopy, dwTime)
+	LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_SWITCH_MAP', {dwMapID, dwSubID, aMapCopy, dwTime})
 end
 
 -- 成功进入某地图并加载完成（进入后）
@@ -221,7 +220,7 @@ local function OnEnterMap(dwMapID, dwSubID, aMapCopy, dwTime, dwSwitchTime)
 	end
 	LIB.Debug(PACKET_INFO.NAME_SPACE, szDebug, DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
-	LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_ENTER_MAP', dwMapID, dwSubID, aMapCopy, dwTime, dwSwitchTime)
+	LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_ENTER_MAP', {dwMapID, dwSubID, aMapCopy, dwTime, dwSwitchTime})
 end
 
 local function OnCrossMapGoFB()
@@ -283,7 +282,7 @@ LIB.RegisterEvent('LOADING_ENDING.' .. PACKET_INFO.NAME_SPACE .. '#CD', function
 	end)
 end)
 
-LIB.RegisterBgMsg('MY_ENTER_MAP_REQ', function(_, nChannel, dwTalkerID, szTalkerName, bSelf)
+LIB.RegisterBgMsg('MY_ENTER_MAP_REQ', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
 	if not l_dwEnteringTime then
 		return
 	end

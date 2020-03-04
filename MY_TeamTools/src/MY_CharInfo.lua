@@ -146,7 +146,8 @@ function CharInfo.UpdateFrame(frame, status, data)
 	end
 end
 
-LIB.RegisterBgMsg('CHAR_INFO', function(szMsgID, nChannel, dwID, szName, bIsSelf, szAction, dwTarID, oData)
+LIB.RegisterBgMsg('CHAR_INFO', function(szMsgID, aData, nChannel, dwID, szName, bIsSelf)
+	local szAction, dwTarID, oData = aData[1], aData[2], aData[3]
 	if not bIsSelf and dwTarID == UI_GetClientPlayerID() then
 		local frame = CharInfo.GetFrame(dwID)
 		if not frame then
@@ -194,7 +195,7 @@ function MY_CharInfo.ViewCharInfoToPlayer(dwID)
 		LIB.Alert(_L['Party limit'])
 	else
 		CharInfo.CreateFrame(dwID, szName)
-		LIB.SendBgMsg(nChannel, 'CHAR_INFO', 'ASK', dwID, LIB.IsShieldedVersion('MY_CharInfoDaddy', 2) and 'DEBUG')
+		LIB.SendBgMsg(nChannel, 'CHAR_INFO', {'ASK', dwID, LIB.IsShieldedVersion('MY_CharInfoDaddy', 2) and 'DEBUG'})
 	end
 end
 

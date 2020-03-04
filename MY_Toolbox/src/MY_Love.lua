@@ -433,7 +433,7 @@ function D.SetLover(dwID, nType)
 				D.UseDoubleLoveItem(aInfo, p.aUIID, function(bSuccess)
 					if bSuccess then
 						D.SaveLover(O.lover.nLoverTime, O.lover.dwID, O.lover.nLoverType, p.nItem, O.lover.nReceiveItem)
-						LIB.SendBgMsg(aInfo.name, 'MY_LOVE', 'LOVE_FIREWORK', p.nItem)
+						LIB.SendBgMsg(aInfo.name, 'MY_LOVE', {'LOVE_FIREWORK', p.nItem})
 						Wnd.CloseWindow('MY_Love_SetLover')
 					else
 						LIB.Systopmsg(_L['Failed to light firework.'])
@@ -456,7 +456,7 @@ function D.SetLover(dwID, nType)
 				return LIB.Alert(_L['Inadequate conditions, requiring Lv2 friend'])
 			end
 			D.SaveLover(GetCurrentTime(), dwID, nType, 0, 0)
-			LIB.SendBgMsg(aInfo.name, 'MY_LOVE', 'LOVE0')
+			LIB.SendBgMsg(aInfo.name, 'MY_LOVE', {'LOVE0'})
 		end)
 	else
 		-- 设置成为情缘（在线好友）
@@ -474,7 +474,7 @@ function D.SetLover(dwID, nType)
 					return LIB.Alert(_L('Inadequate conditions, requiring Lv6 friend/party/4-feet distance/%s', p.szName))
 				end
 				O.nPendingItem = p.nItem
-				LIB.SendBgMsg(aInfo.name, 'MY_LOVE', 'LOVE_ASK')
+				LIB.SendBgMsg(aInfo.name, 'MY_LOVE', {'LOVE_ASK'})
 				LIB.Systopmsg(_L('Love request has been sent to [%s], wait please', aInfo.name))
 			end)
 		end)
@@ -501,7 +501,7 @@ function D.RemoveLover()
 				-- 单向只通知在线的
 				local aInfo = LIB.GetFriend(lover.dwID)
 				if aInfo and aInfo.isonline then
-					LIB.SendBgMsg(lover.szName, 'MY_LOVE', 'REMOVE0')
+					LIB.SendBgMsg(lover.szName, 'MY_LOVE', {'REMOVE0'})
 				end
 				D.SaveLover(0, 0, 0, 0, 0)
 				LIB.Sysmsg(_L['Congratulations, cut blind love finish.'])
@@ -534,11 +534,11 @@ function D.FixLover()
 	if not LIB.IsParty(O.lover.dwID) then
 		return LIB.Alert(_L['Both sides must in a team to be repaired!'])
 	end
-	LIB.SendBgMsg(O.lover.szName, 'MY_LOVE', 'FIX1', {
+	LIB.SendBgMsg(O.lover.szName, 'MY_LOVE', {'FIX1', {
 		O.lover.nLoverTime,
 		O.lover.nSendItem,
 		O.lover.nReceiveItem,
-	})
+	}})
 	LIB.Systopmsg(_L['Repair request has been sent, wait please.'])
 end
 
@@ -573,7 +573,7 @@ function D.RequestOtherLover(dwID, nX, nY, fnAutoClose)
 			return LIB.Systopmsg(_L('[%s] is in fighting, no time for you.', tar.szName))
 		end
 		local me = GetClientPlayer()
-		LIB.SendBgMsg(tar.szName, 'MY_LOVE', 'VIEW', PACKET_INFO.AUTHOR_ROLES[me.dwID] == me.szName and 'Author' or 'Player')
+		LIB.SendBgMsg(tar.szName, 'MY_LOVE', {'VIEW', PACKET_INFO.AUTHOR_ROLES[me.dwID] == me.szName and 'Author' or 'Player'})
 	else
 		local tMsg = {
 			x = nX, y = nY,
@@ -628,7 +628,7 @@ function D.ReplyLove(bCancel)
 		szName = _L['<Not tell you>']
 	end
 	for k, v in pairs(O.tViewer) do
-		LIB.SendBgMsg(v, 'MY_LOVE', 'REPLY', {
+		LIB.SendBgMsg(v, 'MY_LOVE', {'REPLY', {
 			O.lover.dwID,
 			szName,
 			O.lover.dwAvatar or 0,
@@ -638,23 +638,23 @@ function D.ReplyLove(bCancel)
 			O.lover.nLoverType,
 			O.lover.nLoverTime,
 			O.lover.szLoverTitle,
-		})
+		}})
 	end
 	O.tViewer = {}
 end
 
 -- 后台同步
 do
-local function OnBgTalk(_, nChannel, dwTalkerID, szTalkerName, bSelf, ...)
+local function OnBgTalk(_, aData, nChannel, dwTalkerID, szTalkerName, bSelf)
 	if MY_Love.IsShielded() then
 		return
 	end
 	if not bSelf then
 		if not LIB.IsRemoteStorage() then
-			LIB.SendBgMsg(szTalkerName, 'MY_LOVE', 'DATA_NOT_SYNC')
+			LIB.SendBgMsg(szTalkerName, 'MY_LOVE', {'DATA_NOT_SYNC'})
 			return
 		end
-		local szKey, data = ...
+		local szKey, data = aData[1], aData[2]
 		if szKey == 'VIEW' then
 			if LIB.IsParty(dwTalkerID) or data == 'Author' then
 				O.tViewer[dwTalkerID] = szTalkerName
@@ -677,20 +677,20 @@ local function OnBgTalk(_, nChannel, dwTalkerID, szTalkerName, bSelf, ...)
 		elseif szKey == 'LOVE_ASK' then
 			if O.lover.dwID == dwTalkerID and O.lover.nLoverType == 1 then
 				-- 已是情缘发起修复
-				LIB.SendBgMsg(szTalkerName, 'MY_LOVE', 'FIX2', {
+				LIB.SendBgMsg(szTalkerName, 'MY_LOVE', {'FIX2', {
 					O.lover.nLoverTime,
 					O.lover.nSendItem,
 					O.lover.nReceiveItem,
-				})
+				}})
 			elseif O.lover.dwID ~= 0 and (O.lover.dwID ~= dwTalkerID or O.lover.nLoverType == 1) then
 				-- 已有情缘直接拒绝
-				LIB.SendBgMsg(szTalkerName, 'MY_LOVE', 'LOVE_ANS_EXISTS')
+				LIB.SendBgMsg(szTalkerName, 'MY_LOVE', {'LOVE_ANS_EXISTS'})
 			else
 				-- 询问意见
 				LIB.Confirm(_L('[%s] want to mutual love with you, OK?', szTalkerName), function()
-					LIB.SendBgMsg(szTalkerName, 'MY_LOVE', 'LOVE_ANS_YES')
+					LIB.SendBgMsg(szTalkerName, 'MY_LOVE', {'LOVE_ANS_YES'})
 				end, function()
-					LIB.SendBgMsg(szTalkerName, 'MY_LOVE', 'LOVE_ANS_NO')
+					LIB.SendBgMsg(szTalkerName, 'MY_LOVE', {'LOVE_ANS_NO'})
 				end)
 			end
 		elseif szKey == 'FIX1' or szKey == 'FIX2' then
@@ -713,9 +713,9 @@ local function OnBgTalk(_, nChannel, dwTalkerID, szTalkerName, bSelf, ...)
 				end
 			elseif szKey == 'FIX1' then
 				if O.lover.dwID == dwTalkerID then
-					LIB.SendBgMsg(szTalkerName, 'MY_LOVE', 'LOVE_ANS_ALREADY')
+					LIB.SendBgMsg(szTalkerName, 'MY_LOVE', {'LOVE_ANS_ALREADY'})
 				else
-					LIB.SendBgMsg(szTalkerName, 'MY_LOVE', 'LOVE_ANS_EXISTS')
+					LIB.SendBgMsg(szTalkerName, 'MY_LOVE', {'LOVE_ANS_EXISTS'})
 				end
 			end
 		elseif szKey == 'LOVE_ANS_EXISTS' then
@@ -741,7 +741,7 @@ local function OnBgTalk(_, nChannel, dwTalkerID, szTalkerName, bSelf, ...)
 				if bSuccess then
 					D.SaveLover(GetCurrentTime(), dwTalkerID, 1, nItem, 0)
 					LIB.Talk(PLAYER_TALK_CHANNEL.TONG, _L('From now on, my heart lover is [%s]', szTalkerName))
-					LIB.SendBgMsg(aInfo.name, 'MY_LOVE', 'LOVE_ANS_CONF', nItem)
+					LIB.SendBgMsg(aInfo.name, 'MY_LOVE', {'LOVE_ANS_CONF', nItem})
 					LIB.Systopmsg(_L('Congratulations, success to attach love with [%s]!', aInfo.name))
 					Wnd.CloseWindow('MY_Love_SetLover')
 				else

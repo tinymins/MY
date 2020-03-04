@@ -582,28 +582,28 @@ function MY_CataclysmParty_Base.OnItemRButtonClick()
 					szOption = _L['Take back all permissions'],
 					rgb = { 255, 255, 0 },
 					fnAction = function()
-						LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_ABOUT', 'TeamAuth')
+						LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_ABOUT', {'TeamAuth'})
 					end,
 				},
 				{
 					szOption = _L['Take back leader permission'],
 					rgb = { 255, 255, 0 },
 					fnAction = function()
-						LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_ABOUT', 'TeamLeader')
+						LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_ABOUT', {'TeamLeader'})
 					end,
 				},
 				{
 					szOption = _L['Take back mark permission'],
 					rgb = { 255, 255, 0 },
 					fnAction = function()
-						LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_ABOUT', 'TeamMark')
+						LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_ABOUT', {'TeamMark'})
 					end,
 				},
 				{
 					szOption = _L['Take back distribute permission'],
 					rgb = { 255, 255, 0 },
 					fnAction = function()
-						LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_ABOUT', 'TeamDistribute')
+						LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_ABOUT', {'TeamDistribute'})
 					end,
 				}
 			})

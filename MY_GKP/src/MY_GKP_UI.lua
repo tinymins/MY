@@ -226,7 +226,7 @@ function D.DrawAuctionPage(frame, szKey, szSort)
 					v.bDelete = not v.bDelete
 					frame.ds:SetAuctionRec(v)
 					if LIB.IsDistributer() then
-						LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'edit', v)
+						LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'edit', v})
 					end
 				end
 			else
@@ -393,7 +393,7 @@ function MY_GKP_UI.OnFrameCreate()
 			local nTime = tTime[#tTime].nTime - tTime[1].nTime -- 所花费的时间
 
 			LIB.Talk(PLAYER_TALK_CHANNEL.RAID, _L['--- Consumption ---'])
-			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_INFO', 'Start', '--- Consumption ---')
+			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'GKP_INFO', 'Start', '--- Consumption ---'})
 			local sort = {}
 			for k,v in pairs(tMember) do
 				table.insert(sort,{ szName = k, nGold = v })
@@ -404,10 +404,10 @@ function MY_GKP_UI.OnFrameCreate()
 				if v.nGold > 0 then
 					LIB.Talk(PLAYER_TALK_CHANNEL.RAID, { D.GetFormatLink(v.szName, true), D.GetFormatLink(g_tStrings.STR_TALK_HEAD_SAY1 .. v.nGold .. g_tStrings.STR_GOLD .. g_tStrings.STR_FULL_STOP) })
 				end
-				LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_INFO', 'Info', v.szName, v.nGold)
+				LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'GKP_INFO', 'Info', v.szName, v.nGold})
 			end
 			LIB.Talk(PLAYER_TALK_CHANNEL.RAID, _L('Total Auction: %d Gold.', ds:GetAuctionSum()))
-			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_INFO', 'End', _L('Total Auction: %d Gold.', ds:GetAuctionSum()), ds:GetAuctionSum(), nTime)
+			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'GKP_INFO', 'End', _L('Total Auction: %d Gold.', ds:GetAuctionSum()), ds:GetAuctionSum(), nTime})
 		end,
 	})
 	-- 欠费情况
@@ -470,14 +470,14 @@ function MY_GKP_UI.OnFrameCreate()
 
 			table.sort(tMember2, function(a, b) return a.nGold < b.nGold end)
 			LIB.Talk(PLAYER_TALK_CHANNEL.RAID, _L['Information on Debt'])
-			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_INFO', 'Start', 'Information on Debt')
+			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'GKP_INFO', 'Start', 'Information on Debt'})
 			for k, v in pairs(tMember2) do
 				if v.nGold < 0 then
 					LIB.Talk(PLAYER_TALK_CHANNEL.RAID, { D.GetFormatLink(v.szName, true), D.GetFormatLink(g_tStrings.STR_TALK_HEAD_SAY1 .. v.nGold .. g_tStrings.STR_GOLD .. g_tStrings.STR_FULL_STOP) })
-					LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_INFO', 'Info', v.szName, v.nGold, '-')
+					LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'GKP_INFO', 'Info', v.szName, v.nGold, '-'})
 				else
 					LIB.Talk(PLAYER_TALK_CHANNEL.RAID, { D.GetFormatLink(v.szName, true), D.GetFormatLink(g_tStrings.STR_TALK_HEAD_SAY1 .. '+' .. v.nGold .. g_tStrings.STR_GOLD .. g_tStrings.STR_FULL_STOP) })
-					LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_INFO', 'Info', v.szName, v.nGold, '+')
+					LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'GKP_INFO', 'Info', v.szName, v.nGold, '+'})
 				end
 			end
 			local nGold, nGold2 = 0, 0
@@ -498,7 +498,7 @@ function MY_GKP_UI.OnFrameCreate()
 			if nGold2 ~= 0 then
 				LIB.Talk(PLAYER_TALK_CHANNEL.RAID, _L('Spending: %d Gold.', nGold2 * -1))
 			end
-			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_INFO', 'End', _L('Received: %d Gold.', nGold))
+			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'GKP_INFO', 'End', _L('Received: %d Gold.', nGold)})
 		end,
 	})
 	-- 清空数据
@@ -576,7 +576,7 @@ function MY_GKP_UI.OnFrameCreate()
 				local menu = MY_GKP.GetTeamMemberMenu(function(v)
 					LIB.Confirm(_L('Wheater replace the current record with the synchronization [%s]\'s record?\n Please notice, this means you are going to lose the information of current record.', v.szName), function()
 						LIB.Alert(_L('Asking for the sychoronization information...\n If no response in longtime, it may because [%s] is not using MY_GKP plugin or not responding.', v.szName))
-						LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_Sync', v.szName) -- 请求同步信息
+						LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'GKP_Sync', v.szName}) -- 请求同步信息
 					end)
 				end, true)
 				table.insert(menu, 1, { bDevide = true })

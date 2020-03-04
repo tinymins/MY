@@ -124,7 +124,7 @@ function MY_PartyRequest.OnLButtonClick()
 	elseif name == 'Btn_Lookup' then
 		local info = this:GetParent().info
 		if not info.dwID or (not info.bDetail and IsCtrlKeyDown()) then
-			LIB.SendBgMsg(info.szName, 'RL', 'ASK')
+			LIB.SendBgMsg(info.szName, 'RL', {'ASK'})
 			this:Enable(false)
 			this:Lookup('', 'Text_Lookup'):SetText(_L['loading...'])
 			LIB.Sysmsg(_L['If it is always loading, the target may not install plugin or refuse.'])
@@ -457,8 +457,7 @@ LIB.RegisterEvent('PARTY_INVITE_REQUEST.MY_PartyRequest', D.OnApplyRequest)
 LIB.RegisterEvent('PARTY_APPLY_REQUEST.MY_PartyRequest' , D.OnApplyRequest)
 LIB.RegisterEvent('ON_MESSAGE_BOX_OPEN.MY_PartyRequest' , D.OnMessageBoxOpen)
 
-LIB.RegisterBgMsg('RL', function(_, nChannel, dwID, szName, bIsSelf, ...)
-	local data = {...}
+LIB.RegisterBgMsg('RL', function(_, data, nChannel, dwID, szName, bIsSelf)
 	if not bIsSelf then
 		if data[1] == 'Feedback' then
 			D.Feedback(szName, data, true)

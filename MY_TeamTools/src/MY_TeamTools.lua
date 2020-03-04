@@ -262,7 +262,7 @@ function RaidTools.OnFrameCreate()
 	this.tDataCache  = {} -- 临时数据
 	-- 请求数据
 	if LIB.IsDungeonMap(RT_MAPID) and not LIB.IsDungeonRoleProgressMap(RT_MAPID) then
-		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_MAP_COPY_ID_REQUEST', RT_MAPID) -- 打开界面刷新
+		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_MAP_COPY_ID_REQUEST', {RT_MAPID}) -- 打开界面刷新
 	end
 	-- 追加呼吸
 	this.hPageSet:ActivePage(RT_SELECT_PAGE)
@@ -310,7 +310,7 @@ function RaidTools.OnEvent(szEvent)
 		RT.UpdateDungeonInfo(hDungeon)
 	elseif szEvent == 'MY_RAIDTOOLS_MAPID_CHANGE' then
 		if LIB.IsDungeonMap(RT_MAPID) and not LIB.IsDungeonRoleProgressMap(RT_MAPID) then
-			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_MAP_COPY_ID_REQUEST', RT_MAPID) -- 地图变化刷新
+			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_MAP_COPY_ID_REQUEST', {RT_MAPID}) -- 地图变化刷新
 		end
 		local hDungeon = this.hPageSet:Lookup('Page_Info', 'Handle_Dungeon')
 		RT.UpdateDungeonInfo(hDungeon)
@@ -1139,7 +1139,7 @@ function RT.GetTeam()
 		if #aRequestMapCopyID == #aTeamMemberList then
 			aRequestMapCopyID = nil
 		end
-		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_MAP_COPY_ID_REQUEST', RT_MAPID, aRequestMapCopyID) -- 周期刷新
+		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_MAP_COPY_ID_REQUEST', {RT_MAPID, aRequestMapCopyID}) -- 周期刷新
 	end
 	return aList
 end
@@ -1406,7 +1406,8 @@ local function onLoadingEnd()
 end
 LIB.RegisterEvent('LOADING_END', onLoadingEnd)
 
-local function onBgMsgMapCopyID(_, nChannel, dwID, szName, bIsSelf, dwMapID, aCopyID)
+local function onBgMsgMapCopyID(_, data, nChannel, dwID, szName, bIsSelf)
+	local dwMapID, aCopyID = data[1], data[2]
 	if not RT_PLAYER_MAP_COPYID[dwID] then
 		RT_PLAYER_MAP_COPYID[dwID] = {}
 	end

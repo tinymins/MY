@@ -220,7 +220,8 @@ function MY_RaidTools.ClearDeathLog()
 	FireUIEvent('MY_RAIDTOOLS_DEATH')
 end
 
-LIB.RegisterBgMsg('MY_ENTER_MAP', function(_, nChannel, dwTalkerID, szTalkerName, bSelf, dwMapID, dwSubID, aMapCopy, dwTime, dwSwitchTime)
+LIB.RegisterBgMsg('MY_ENTER_MAP', function(_, aData, nChannel, dwTalkerID, szTalkerName, bSelf)
+	local dwMapID, dwSubID, aMapCopy, dwTime, dwSwitchTime = aData[1], aData[2], aData[3], aData[4], aData[5]
 	local key = dwTalkerID == PLAYER_ID
 		and 'self'
 		or dwTalkerID

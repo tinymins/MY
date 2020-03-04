@@ -239,7 +239,7 @@ function D.Open(ds, tab, szMode)
 					D.GetFormatLink(_L[' Distribute to ']),
 					D.GetFormatLink(tab.szPlayer, true)
 				})
-				LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'add', tab)
+				LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'add', tab})
 			end
 		elseif tab and szMode == 'EDIT' then
 			tab.szName = hName:Text()
@@ -252,7 +252,7 @@ function D.Open(ds, tab, szMode)
 					D.GetFormatLink(' '.. nMoney ..g_tStrings.STR_GOLD),
 					D.GetFormatLink(_L['Make changes to the record.']),
 				})
-				LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'edit', tab)
+				LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'edit', tab})
 			end
 		else
 			if LIB.IsDistributer() then
@@ -262,7 +262,7 @@ function D.Open(ds, tab, szMode)
 					D.GetFormatLink(_L['Manually make record to']),
 					D.GetFormatLink(tab.szPlayer, true)
 				})
-				LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'add', tab)
+				LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'add', tab})
 			end
 		end
 		if ui:Children('#WndCheckBox'):Check() then

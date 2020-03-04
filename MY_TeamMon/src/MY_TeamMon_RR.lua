@@ -318,7 +318,7 @@ function D.LoadConfigureFile(szFile, info)
 	MY_TeamMon_UI.OpenImportPanel(szFile, info.szTitle .. ' - ' .. info.szAuthor, function()
 		local me = GetClientPlayer()
 		if me.IsInParty() then
-			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TeamMon_RR', 'LOAD', info.szTitle)
+			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TeamMon_RR', {'LOAD', info.szTitle})
 		end
 		O.szLastKey = info.szKey
 		FireUIEvent('MY_TM_RR_META_LIST_UPDATE')
@@ -375,7 +375,7 @@ function D.ShareMetaToRaid(info, bSure)
 		end)
 		return
 	end
-	LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TeamMon_RR', 'SYNC', META_SEL_INFO)
+	LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TeamMon_RR', {'SYNC', META_SEL_INFO})
 end
 
 function D.UpdateList(frame)
@@ -548,7 +548,8 @@ function D.OnItemMouseLeave()
 	end
 end
 
-LIB.RegisterBgMsg('MY_TeamMon_RR', function(_, _, _, szTalker, _, action, info)
+LIB.RegisterBgMsg('MY_TeamMon_RR', function(_, data, _, _, szTalker, _)
+	local action, info = data[1], data[2]
 	if action == 'SYNC' then
 		info = LIB.FormatDataStructure(info, META_TEMPLATE)
 		if not IsEmpty(info.szURL) and not IsEmpty(info.szTitle) then

@@ -2107,8 +2107,7 @@ function D.ConfirmShare()
 	end
 end
 
-function D.OnShare(_, nChannel, dwID, szName, bIsSelf, ...)
-	local data = {...}
+function D.OnShare(_, data, nChannel, dwID, szName, bIsSelf)
 	if not bIsSelf then
 		insert(MY_TM_SHARE_QUEUE, {
 			szType  = data[1],

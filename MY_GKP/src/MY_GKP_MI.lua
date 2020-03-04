@@ -130,17 +130,19 @@ function D.SyncSend(dwID)
 	}
 	-- 密聊频道限制了字数 发起来太慢了
 	local szKey = LIB.GetUUID():sub(1, 8)
-	LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP_SYNC_START', dwID, szKey)
-	LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP_SYNC_CONTENT_' .. szKey, dwID, tab)
+	LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP_SYNC_START', {dwID, szKey})
+	LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP_SYNC_CONTENT_' .. szKey, {dwID, tab})
 end
 
 LIB.RegisterInit('MY_GKP_MI', function()
 	D.Init()
 end)
 
-LIB.RegisterBgMsg('MY_GKP_SYNC_START', function(_, nChannel, dwID, szName, bIsSelf, dwID, szKey)
+LIB.RegisterBgMsg('MY_GKP_SYNC_START', function(_, aData, nChannel, dwID, szName, bIsSelf)
+	local dwID, szKey = aData[1], aData[2]
 	if dwID == UI_GetClientPlayerID() or dwID == 0 then
-		LIB.RegisterBgMsg('MY_GKP_SYNC_CONTENT_' .. szKey, function(_, nChannel, dwID, szName, bIsSelf, dwID, tab)
+		LIB.RegisterBgMsg('MY_GKP_SYNC_CONTENT_' .. szKey, function(_, aData, nChannel, dwID, szName, bIsSelf)
+			local dwID, tab = aData[1], aData[2]
 			if dwID == UI_GetClientPlayerID() or dwID == 0 then
 				LIB.Topmsg(_L['Sychoronization Complete'])
 				if not tab then
@@ -161,8 +163,7 @@ LIB.RegisterBgMsg('MY_GKP_SYNC_START', function(_, nChannel, dwID, szName, bIsSe
 end)
 
 
-LIB.RegisterBgMsg('MY_GKP', function(_, nChannel, dwID, szName, bIsSelf, ...)
-	local data = {...}
+LIB.RegisterBgMsg('MY_GKP', function(_, data, nChannel, dwID, szName, bIsSelf)
 	local ds = D.GetDS()
 	local me = GetClientPlayer()
 	local team = GetClientTeam()
