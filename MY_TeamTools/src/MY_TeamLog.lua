@@ -224,14 +224,25 @@ LIB.RegisterBgMsg('MY_ENTER_MAP', function(_, nChannel, dwTalkerID, szTalkerName
 	local key = dwTalkerID == PLAYER_ID
 		and 'self'
 		or dwTalkerID
+	if not dwTime then
+		dwTime = GetCurrentTime()
+	end
+	if not dwSwitchTime then
+		dwSwitchTime = dwTime
+	end
+	for i, v in ipairs_r(ENTER_MAP_LOG) do -- 删除重复发送的过图
+		if v.dwID == key and v.dwMapID == dwMapID and v.dwSubID == dwSubID and v.dwTime == dwTime then
+			remove(ENTER_MAP_LOG, i)
+		end
+	end
 	insert(ENTER_MAP_LOG, {
 		dwID = key,
 		szName = szTalkerName,
 		dwMapID = dwMapID,
 		dwSubID = dwSubID,
 		aMapCopy = aMapCopy,
-		dwTime = dwTime or GetCurrentTime(),
-		dwSwitchTime = dwSwitchTime or GetCurrentTime(),
+		dwTime = dwTime,
+		dwSwitchTime = dwSwitchTime,
 	})
 	FireUIEvent('MY_RAIDTOOLS_ENTER_MAP', key)
 end)
