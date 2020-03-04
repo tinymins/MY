@@ -549,7 +549,7 @@ local function InitComponent(raw, szType)
 			end
 			local GetMenu = GetComponentProp(raw, 'GetListItemHandleMenu')
 			if GetMenu then
-				PopupMenu(GetMenu(this, data.text, data.id, data.data, data.selected))
+				UI.PopupMenu(GetMenu(this, data.text, data.id, data.data, data.selected))
 			end
 		end)
 		SetComponentProp(raw, 'listboxOptions', { multiSelect = false })
@@ -4564,7 +4564,7 @@ function UI.OpenListEditor(szFrameName, tTextList, OnAdd, OnDel)
 		end):Click(function(nButton)
 			if nButton == UI.MOUSE_EVENT.RBUTTON then
 				hHandle.Selected = true
-				PopupMenu({{
+				UI.PopupMenu({{
 					szOption = _L['delete'],
 					fnAction = function()
 						muDel:Click()

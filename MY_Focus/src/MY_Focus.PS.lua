@@ -113,6 +113,7 @@ function PS.OnPanelActive(wnd)
 			fnAction = function()
 				MY_Focus.RemoveFocusPattern(tData.szPattern)
 				list:ListBox('delete', 'id', oID)
+				UI.ClosePopupMenu()
 			end,
 		}}
 		-- ƥ�䷽ʽ

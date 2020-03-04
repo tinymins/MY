@@ -554,7 +554,7 @@ function D.OnInitPage()
 									O.aColumn[i], O.aColumn[i - 1] = O.aColumn[i - 1], O.aColumn[i]
 									D.UpdateUI(page)
 								end
-								Wnd.CloseWindow('PopupMenuPanel')
+								UI.ClosePopupMenu()
 							end,
 						},
 						{
@@ -564,7 +564,7 @@ function D.OnInitPage()
 									O.aColumn[i], O.aColumn[i + 1] = O.aColumn[i + 1], O.aColumn[i]
 									D.UpdateUI(page)
 								end
-								Wnd.CloseWindow('PopupMenuPanel')
+								UI.ClosePopupMenu()
 							end,
 						},
 						{
@@ -572,7 +572,7 @@ function D.OnInitPage()
 							fnAction = function()
 								remove(O.aColumn, i)
 								D.UpdateUI(page)
-								Wnd.CloseWindow('PopupMenuPanel')
+								UI.ClosePopupMenu()
 							end,
 						},
 					})
@@ -591,7 +591,7 @@ function D.OnInitPage()
 								insert(O.aColumn, col.id)
 							end
 							D.UpdateUI(page)
-							Wnd.CloseWindow('PopupMenuPanel')
+							UI.ClosePopupMenu()
 						end,
 					})
 				end

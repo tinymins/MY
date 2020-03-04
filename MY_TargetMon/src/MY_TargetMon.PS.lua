@@ -229,7 +229,7 @@ local function DrawDetail(ui)
 				fnAction = function()
 					D.DeleteMonitor(l_config, mon)
 					list:ListBox('delete', 'id', mon)
-					Wnd.CloseWindow('PopupMenuPanel')
+					UI.ClosePopupMenu()
 				end,
 			},
 			{
@@ -242,6 +242,7 @@ local function DrawDetail(ui)
 						end
 					end
 					InsertMonitor(index)
+					UI.ClosePopupMenu()
 				end,
 				bDisable = search,
 			},
@@ -293,6 +294,7 @@ local function DrawDetail(ui)
 							D.ModifyMonitor(mon, 'name', szVal)
 						end
 					end, function() end, function() end, nil, mon.name)
+					UI.ClosePopupMenu()
 				end,
 			},
 			{ bDevide = true },
@@ -476,6 +478,8 @@ local function DrawDetail(ui)
 		for _, p in ipairs(CUSTOM_BOX_EXTENT_ANIMATE) do
 			local t3 = {
 				szOption = p[2] or p[1],
+				bCheck = true, bMCheck = true,
+				bChecked = p[1] == mon.extentAnimate,
 				fnAction = function()
 					D.ModifyMonitor(mon, 'extentAnimate', p[1])
 				end,
@@ -485,9 +489,6 @@ local function DrawDetail(ui)
 			}
 			if p[1] then
 				t3.szIcon, t3.nFrame = unpack(p[1]:split('|'))
-			end
-			if p[1] == mon.extentAnimate then
-				t3.rgb = {255, 255, 0}
 			end
 			insert(t2, t3)
 		end
@@ -512,7 +513,7 @@ local function DrawDetail(ui)
 					UI.OpenIconPanel(function(dwIcon)
 						mon.iconid = dwIcon
 					end)
-					Wnd.CloseWindow('PopupMenuPanel')
+					UI.ClosePopupMenu()
 				end,
 			})
 			for dwID, info in pairs(mon.ids) do
@@ -538,7 +539,7 @@ local function DrawDetail(ui)
 						UI.OpenIconPanel(function(dwIcon)
 							D.ModifyMonitorId(info, 'iconid', dwIcon)
 						end)
-						Wnd.CloseWindow('PopupMenuPanel')
+						UI.ClosePopupMenu()
 					end,
 				}
 				if not IsEmpty(info.levels) then
@@ -563,7 +564,7 @@ local function DrawDetail(ui)
 							UI.OpenIconPanel(function(dwIcon)
 								info.iconid = dwIcon
 							end)
-							Wnd.CloseWindow('PopupMenuPanel')
+							UI.ClosePopupMenu()
 						end,
 					})
 					local tLevels = {}
@@ -588,7 +589,7 @@ local function DrawDetail(ui)
 									UI.OpenIconPanel(function(dwIcon)
 										D.ModifyMonitorLevel(infoLevel, 'iconid', dwIcon)
 									end)
-									Wnd.CloseWindow('PopupMenuPanel')
+									UI.ClosePopupMenu()
 								end,
 							}
 						})
@@ -624,6 +625,7 @@ local function DrawDetail(ui)
 					szOption = _L['Delete'],
 					fnAction = function()
 						D.DeleteMonitorId(mon, dwID)
+						UI.ClosePopupMenu()
 					end,
 				})
 				insert(t1, t2)

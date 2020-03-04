@@ -516,7 +516,7 @@ function D.OnInitPage()
 									aColumn[i], aColumn[i - 1] = aColumn[i - 1], aColumn[i]
 									D.UpdateUI(page)
 								end
-								Wnd.CloseWindow('PopupMenuPanel')
+								UI.ClosePopupMenu()
 							end,
 						},
 						{
@@ -526,7 +526,7 @@ function D.OnInitPage()
 									aColumn[i], aColumn[i + 1] = aColumn[i + 1], aColumn[i]
 									D.UpdateUI(page)
 								end
-								Wnd.CloseWindow('PopupMenuPanel')
+								UI.ClosePopupMenu()
 							end,
 						},
 						{
@@ -534,7 +534,7 @@ function D.OnInitPage()
 							fnAction = function()
 								remove(aColumn, i)
 								D.UpdateUI(page)
-								Wnd.CloseWindow('PopupMenuPanel')
+								UI.ClosePopupMenu()
 							end,
 						},
 					})
@@ -561,7 +561,7 @@ function D.OnInitPage()
 				end
 				D.FlushDB()
 				D.UpdateUI(page)
-				Wnd.CloseWindow('PopupMenuPanel')
+				UI.ClosePopupMenu()
 			end
 			-- ∆’Õ®—°œÓ
 			for _, col in ipairs(COLUMN_LIST) do

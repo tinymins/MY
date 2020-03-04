@@ -395,6 +395,7 @@ function PS.OnPanelActive(wnd)
 					end
 				end
 				SaveBlockWords()
+				UI.ClosePopupMenu()
 			end,
 		})
 		return menu

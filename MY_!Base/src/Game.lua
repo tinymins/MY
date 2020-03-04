@@ -159,7 +159,7 @@ function LIB.GetDistanceTypeMenu(bGlobal, eValue, fnAction)
 			t1.fnClickIcon = function()
 				LIB.ShowPanel()
 				LIB.SwitchTab('GlobalConfig')
-				Wnd.CloseWindow('PopupMenuPanel')
+				UI.ClosePopupMenu()
 			end
 		end
 		insert(t, t1)

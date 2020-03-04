@@ -742,7 +742,7 @@ function D.GetFilterMenu()
 			szLayer = 'ICON_RIGHTMOST',
 			fnClickIcon = function()
 				MY_GKP_Loot.tItemConfig.tNameFilter[szName] = nil
-				Wnd.CloseWindow('PopupMenuPanel')
+				UI.ClosePopupMenu()
 				D.ReloadFrame()
 			end,
 			fnDisable = function() return not MY_GKP_Loot.tItemConfig.bNameFilter end,
@@ -805,7 +805,7 @@ function D.GetAutoPickupMenu()
 			szLayer = 'ICON_RIGHTMOST',
 			fnClickIcon = function()
 				tItemConfig.tAutoPickupFilters[s] = nil
-				Wnd.CloseWindow('PopupMenuPanel')
+				UI.ClosePopupMenu()
 			end,
 		})
 	end
@@ -870,7 +870,7 @@ function D.GetAutoPickupMenu()
 			szLayer = 'ICON_RIGHTMOST',
 			fnClickIcon = function()
 				tItemConfig.tAutoPickupNames[s] = nil
-				Wnd.CloseWindow('PopupMenuPanel')
+				UI.ClosePopupMenu()
 			end,
 		})
 	end

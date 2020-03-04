@@ -128,7 +128,7 @@ function LIB.HidePanel(bMute, bNoAnimate)
 		PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
 	end
 	LIB.RegisterEsc('MY')
-	Wnd.CloseWindow('PopupMenuPanel')
+	UI.ClosePopupMenu()
 end
 
 function LIB.TogglePanel(bVisible, ...)

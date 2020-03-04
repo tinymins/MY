@@ -108,6 +108,7 @@ function D.Close()
 	if frame then
 		Wnd.CloseWindow(frame)
 	end
+	Wnd.CloseWindow('PopupMenuPanel')
 end
 
 function D.GetFrame()

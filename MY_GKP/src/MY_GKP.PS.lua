@@ -90,7 +90,7 @@ function D.GetSubsidiesMenu()
 					end
 				end
 				MY_GKP.aSubsidies = aSubsidies
-				Wnd.CloseWindow('PopupMenuPanel')
+				UI.ClosePopupMenu()
 			end,
 		})
 	end
@@ -147,7 +147,7 @@ function D.GetSchemeMenu()
 					end
 				end
 				MY_GKP.aScheme = aScheme
-				Wnd.CloseWindow('PopupMenuPanel')
+				UI.ClosePopupMenu()
 			end,
 		})
 	end

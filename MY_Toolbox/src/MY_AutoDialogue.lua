@@ -354,7 +354,7 @@ function D.GetDialogueMenu(aInfo, dwTargetType, dwTargetID, dwIndex)
 			menuSub.szLayer = 'ICON_RIGHT'
 			menuSub.fnClickIcon = function()
 				D.RemoveDialogueData(dialog.szMap, dialog.szName, dialog.szContext, option.szContext)
-				Wnd.CloseWindow('PopupMenuPanel')
+				UI.ClosePopupMenu()
 			end
 		end
 		if nRepeat and nRepeat > 0 then

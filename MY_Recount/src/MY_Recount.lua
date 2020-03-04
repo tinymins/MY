@@ -444,7 +444,7 @@ function D.GetHistoryMenu()
 			szLayer = 'ICON_RIGHTMOST',
 			fnClickIcon = function()
 				MY_Recount_DS.Del(file.fullpath)
-				Wnd.CloseWindow('PopupMenuPanel')
+				UI.ClosePopupMenu()
 			end,
 			fnMouseEnter = function()
 				local aXml = {}
@@ -571,7 +571,7 @@ function D.GetPublishMenu()
 			bCheck = true, -- 不设置成可选框不能点╭∩╮(︶︿︶）╭∩╮垃圾
 			fnAction = function()
 				Publish(nChannel, HUGE)
-				Wnd.CloseWindow('PopupMenuPanel')
+				UI.ClosePopupMenu()
 			end,
 			rgb = GetMsgFontColor(szChannel, true),
 		}

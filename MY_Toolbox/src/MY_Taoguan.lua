@@ -519,7 +519,7 @@ function PS.OnPanelActive(wnd)
 						szLayer = 'ICON_RIGHTMOST',
 						fnClickIcon = function()
 							MY_Taoguan.tFilterItem[k] = nil
-							Wnd.CloseWindow('PopupMenuPanel')
+							UI.ClosePopupMenu()
 						end,
 					})
 				end

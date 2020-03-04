@@ -182,7 +182,7 @@ local function OnWhisperCheck()
 				for i = #MY_ChatSwitch.aWhisper, 1, -1 do
 					if MY_ChatSwitch.aWhisper[i][1] == whisper[1] then
 						table.remove(MY_ChatSwitch.aWhisper, i)
-						Wnd.CloseWindow('PopupMenuPanel')
+						UI.ClosePopupMenu()
 					end
 				end
 			end,

@@ -536,7 +536,7 @@ function MY_GKP_UI.OnFrameCreate()
 					szLayer = 'ICON_RIGHTMOST',
 					fnClickIcon = function()
 						CPath.DelFile(info.fullpath)
-						Wnd.CloseWindow('PopupMenuPanel')
+						UI.ClosePopupMenu()
 					end,
 				})
 			end

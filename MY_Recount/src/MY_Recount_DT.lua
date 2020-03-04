@@ -149,7 +149,7 @@ function D.GetDetailMenu(frame)
 			bCheck = true, -- 不设置成可选框不能点╭∩╮(︶︿︶）╭∩╮垃圾
 			fnAction = function()
 				Publish(nChannel, HUGE)
-				Wnd.CloseWindow('PopupMenuPanel')
+				UI.ClosePopupMenu()
 			end,
 			rgb = GetMsgFontColor(szChannel, true),
 		}
