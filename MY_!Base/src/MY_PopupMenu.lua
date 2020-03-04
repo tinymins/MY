@@ -303,6 +303,9 @@ function D.DrawScrollContainer(scroll, menu, nLevel, bInlineContainer)
 				local nFont = D.IsDisable(m) and DISABLE_FONT or ENABLE_FONT
 				local rgb = m.rgb or CONSTANT.EMPTY_TABLE
 				local r, g, b = rgb.r or rgb[1] or m.r, rgb.g or rgb[2] or m.g, rgb.b or rgb[3] or m.b
+				if D.IsDisable(m) then
+					r, g, b = nil
+				end
 				hContentInner:AppendItemFromString(GetFormatText(m.szOption, nFont, r, g, b))
 				hContentInner:SetW(99999)
 				hContentInner:FormatAllItemPos()
