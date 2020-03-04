@@ -540,7 +540,7 @@ end
 ---------------------------------------------------------------------------------------------
 do
 local BG_MSG_ID_PREFIX = PACKET_INFO.NAME_SPACE .. ':'
-local BG_MSG_ID_SUFFIX = ':V1'
+local BG_MSG_ID_SUFFIX = ':V2'
 do
 local BG_MSG_EVENT = { szName = 'BgMsg' }
 local BG_MSG_PROGRESS_EVENT = { szName = 'BgMsgProgress' }
