@@ -325,8 +325,9 @@ function D.DrawScrollContainer(scroll, menu, nLevel, bInlineContainer)
 				end
 				if m.szIcon and m.szLayer ~= 'ICON_FILL' then
 					insert(aCustomIcon, {
-						szUITex = m.szIcon,
-						nFrame = m.nFrame,
+						szUITex = m.szIcon ~= 'fromiconid' and m.szIcon or nil,
+						nFrame = m.szIcon ~= 'fromiconid' and m.nFrame or nil,
+						nIconID = m.szIcon == 'fromiconid' and m.nFrame or nil,
 						szHoverUITex = m.szIcon,
 						nHoverFrame = m.nMouseOverFrame,
 						nWidth = m.nIconWidth,
