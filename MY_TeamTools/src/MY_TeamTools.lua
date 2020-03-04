@@ -372,7 +372,14 @@ function RaidTools.OnLButtonClick()
 		RT_SELECT_DEATH = nil
 		RT.UpdatetDeathMsg()
 	elseif szName == 'Btn_Clear' then
-		LIB.Confirm(_L['Clear Record'], RaidTools.ClearDeathLog)
+		if IsCtrlKeyDown() or (#RaidTools.GetDeathLog() == 0 and #RaidTools.GetEnterMapLog() == 0) then
+			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_ENTER_MAP_REQ')
+		else
+			LIB.Confirm(_L['Clear Record'], function()
+				RaidTools.ClearDeathLog()
+				RaidTools.ClearEnterMapLog()
+			end)
+		end
 	elseif szName == 'Btn_Style' then
 		RaidTools.nStyle = RaidTools.nStyle == 1 and 2 or 1
 		RT.SetStyle()
