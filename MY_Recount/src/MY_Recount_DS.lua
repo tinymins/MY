@@ -418,10 +418,11 @@ function D.LoadData()
 			D.SaveHistory()
 		end
 		O.bSaveHistoryOnExit = data.bSaveHistoryOnExit or data.bSaveHistory or false
+		O.bSaveHistoryOnExFi = data.bSaveHistoryOnExFi or false
 		O.nMaxHistory        = data.nMaxHistory or 10
 		O.nMinFightTime      = data.nMinFightTime or 30
 		O.bRecEverything     = data.bRecEverything or false
-		O.bSaveHistoryOnExFi = data.bSaveHistoryOnExFi or false
+		O.bSaveEverything    = data.bSaveEverything or false
 	end
 	D.Init()
 end
@@ -430,10 +431,11 @@ end
 function D.SaveData()
 	local data = {
 		bSaveHistoryOnExit = O.bSaveHistoryOnExit,
+		bSaveHistoryOnExFi = O.bSaveHistoryOnExFi,
 		nMaxHistory        = O.nMaxHistory       ,
 		nMinFightTime      = O.nMinFightTime     ,
 		bRecEverything     = O.bRecEverything    ,
-		bSaveHistoryOnExFi = O.bSaveHistoryOnExFi,
+		bSaveEverything    = O.bSaveEverything   ,
 	}
 	LIB.SaveLUAData(SZ_CFG_FILE, data, DS_DATA_CONFIG)
 end
