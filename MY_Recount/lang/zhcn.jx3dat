@@ -22,6 +22,7 @@ return {
 
     ['Save history on exit'] = '退出游戏时保存数据',
     ['Save history immediately'] = '脱离战斗时保存数据',
+    ['Do not save history everything'] = '不保存历史复盘数据',
 
     ['display as per second'            ] = '显示每秒平均数值',
     ['display effective value'          ] = '显示战斗有效数值',

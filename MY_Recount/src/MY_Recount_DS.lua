@@ -366,13 +366,15 @@ local VERSION = 2
 local D = {}
 local O = {
 	bSaveHistoryOnExit = false, -- 退出游戏时保存历史数据
+	bSaveHistoryOnExFi = false, -- 脱离战斗时保存历史数据
 	nMaxHistory        = 10   , -- 最大历史数据数量
 	nMinFightTime      = 30   , -- 最小战斗时间
-	bRecEverything     = false, -- 是否采集复盘数据
-	bSaveHistoryOnExFi = false, -- 脱离战斗时保存历史数据
+	bRecEverything     = true , -- 是否采集复盘数据
+	bSaveEverything    = false, -- 保存战斗记录时是否存储复盘数据
 }
 local Data          -- 当前战斗数据记录
 local HISTORY_CACHE = setmetatable({}, { __mode = 'v' }) -- 历史战斗记录缓存 { [szFile] = Data }
+local KEPT_CACHE = {} -- 保存了但是剔除了复盘记录的战斗记录缓存 { [szFile] = Data }
 local UNSAVED_CACHE = {} -- 未保存的战斗记录缓存 { [szFile] = Data }
 local DS_DATA_CONFIG = { passphrase = false, crc = false }
 local DS_ROOT = {'userdata/fight_stat/', PATH_TYPE.ROLE}
@@ -418,7 +420,7 @@ function D.LoadData()
 		O.bSaveHistoryOnExit = data.bSaveHistoryOnExit or data.bSaveHistory or false
 		O.nMaxHistory        = data.nMaxHistory or 10
 		O.nMinFightTime      = data.nMinFightTime or 30
-		O.bRecEverything     = data.bRecEverything2 or false
+		O.bRecEverything     = data.bRecEverything or false
 		O.bSaveHistoryOnExFi = data.bSaveHistoryOnExFi or false
 	end
 	D.Init()
@@ -430,7 +432,7 @@ function D.SaveData()
 		bSaveHistoryOnExit = O.bSaveHistoryOnExit,
 		nMaxHistory        = O.nMaxHistory       ,
 		nMinFightTime      = O.nMinFightTime     ,
-		bRecEverything2    = O.bRecEverything    ,
+		bRecEverything     = O.bRecEverything    ,
 		bSaveHistoryOnExFi = O.bSaveHistoryOnExFi,
 	}
 	LIB.SaveLUAData(SZ_CFG_FILE, data, DS_DATA_CONFIG)
@@ -439,7 +441,7 @@ end
 -- 加载历史数据列表
 function D.GetHistoryFiles()
 	local aFiles = {}
-	local szPath = LIB.FormatPath(DS_ROOT):gsub('/', '\\')
+	local szPath = LIB.FormatPath(DS_ROOT)
 	local aFileName = {}
 	for _, v in ipairs(CPath.GetFileList(szPath)) do
 		insert(aFileName, v)
@@ -489,7 +491,7 @@ function D.GetHistoryFiles()
 				return a[i] > b[i]
 			end
 		end
-		return true
+		return false
 	end
 	sort(aFiles, sortFile)
 	return aFiles
@@ -502,6 +504,7 @@ function D.LimitHistoryFile()
 		CPath.DelFile(aFiles[i].fullpath)
 		HISTORY_CACHE[aFiles[i].fullpath] = nil
 		UNSAVED_CACHE[aFiles[i].fullpath] = nil
+		KEPT_CACHE[aFiles[i].fullpath] = nil
 	end
 end
 
@@ -516,7 +519,23 @@ end
 -- 保存缓存的历史数据
 function D.SaveHistory()
 	for szFilePath, data in pairs(UNSAVED_CACHE) do
-		LIB.SaveLUAData(szFilePath, data, DS_DATA_CONFIG)
+		--[[#DEBUG BEGIN]]
+		LIB.Debug('MY_Recount_DS.SaveHistory: ' .. szFilePath, DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
+		local saveData = data
+		if not O.bSaveEverything then -- 保存数据时剔除复盘数据（防止卡）
+			--[[#DEBUG BEGIN]]
+			LIB.Debug('MY_Recount_DS.SaveHistoryWithoutEverything: ' .. szFilePath, DEBUG_LEVEL.LOG)
+			--[[#DEBUG END]]
+			saveData = {}
+			for k, v in pairs(data) do
+				saveData[k] = k == DK.EVERYTHING
+					and {}
+					or v
+			end
+			KEPT_CACHE[szFilePath] = data -- 加入复盘数据保护数组防止被GC
+		end
+		LIB.SaveLUAData(szFilePath, saveData, DS_DATA_CONFIG)
 	end
 	if LIB.IsStreaming() then
 		D.LimitHistoryFile()
@@ -576,6 +595,9 @@ function D.Get(szFilePath)
 		return Data
 	end
 	if not HISTORY_CACHE[szFilePath] then
+		--[[#DEBUG BEGIN]]
+		LIB.Debug('MY_Recount_DS.CacheMiss: ' .. szFilePath, DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
 		HISTORY_CACHE[szFilePath] = LIB.LoadLUAData(szFilePath, DS_DATA_CONFIG)
 	end
 	return HISTORY_CACHE[szFilePath]
@@ -590,6 +612,7 @@ function D.Del(data)
 		CPath.DelFile(data)
 		HISTORY_CACHE[data] = nil
 		UNSAVED_CACHE[data] = nil
+		KEPT_CACHE[data] = nil
 	else
 		for szFilePath, v in pairs(HISTORY_CACHE) do
 			if v.data == data then
@@ -600,6 +623,11 @@ function D.Del(data)
 		for szFilePath, v in pairs(UNSAVED_CACHE) do
 			if v.data == data then
 				UNSAVED_CACHE[szFilePath] = nil
+			end
+		end
+		for szFilePath, v in pairs(KEPT_CACHE) do
+			if v.data == data then
+				KEPT_CACHE[szFilePath] = nil
 			end
 		end
 	end
@@ -1817,10 +1845,11 @@ local settings = {
 		{
 			fields = {
 				bSaveHistoryOnExit = true,
+				bSaveHistoryOnExFi = true,
 				nMaxHistory        = true,
 				nMinFightTime      = true,
 				bRecEverything     = true,
-				bSaveHistoryOnExFi = true,
+				bSaveEverything    = true,
 			},
 			root = O,
 		},
@@ -1829,17 +1858,19 @@ local settings = {
 		{
 			fields = {
 				bSaveHistoryOnExit = true,
+				bSaveHistoryOnExFi = true,
 				nMaxHistory        = true,
 				nMinFightTime      = true,
 				bRecEverything     = true,
-				bSaveHistoryOnExFi = true,
+				bSaveEverything    = true,
 			},
 			triggers = {
 				bSaveHistoryOnExit = D.SaveData,
+				bSaveHistoryOnExFi = D.SaveData,
 				nMaxHistory        = D.SaveData,
 				nMinFightTime      = D.SaveData,
 				bRecEverything     = D.SaveData,
-				bSaveHistoryOnExFi = D.SaveData,
+				bSaveEverything    = D.SaveData,
 			},
 			root = O,
 		},
