@@ -647,7 +647,6 @@ function MY_GKP_UI.OnFrameCreate()
 	local hPageSet = ui:Children('#PageSet_Menu')
 	hPageSet:Children('#WndCheck_GKP_Record'):Children('#Text_GKP_Record'):Text(g_tStrings.GOLD_BID_RECORD_STATIC_TITLE)
 	hPageSet:Children('#WndCheck_GKP_Account'):Children('#Text_GKP_Account'):Text(g_tStrings.GOLD_BID_RPAY_STATIC_TITLE)
-	LIB.RegisterEsc('MY_GKP', D.IsOpened, D.ClosePanel)
 	-- ≈≈–Ú
 	local page = this:Lookup('PageSet_Menu/Page_GKP_Record')
 	local t = {
@@ -756,7 +755,7 @@ end
 
 function MY_GKP_UI.OnFrameKeyDown()
 	if GetKeyName(Station.GetMessageKey()) == 'Esc' then
-		D.ClosePanel()
+		Wnd.CloseWindow(this:GetRoot())
 		return 1
 	end
 end
