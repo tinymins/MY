@@ -365,10 +365,11 @@ local VERSION = 2
 
 local D = {}
 local O = {
-	bSaveHistory      = false,
-	nMaxHistory       = 10,
-	nMinFightTime     = 30,
-	bRecEverything    = false,
+	bSaveHistoryOnExit = false, -- 退出游戏时保存历史数据
+	nMaxHistory        = 10   , -- 最大历史数据数量
+	nMinFightTime      = 30   , -- 最小战斗时间
+	bRecEverything     = false, -- 是否采集复盘数据
+	bSaveHistoryOnExFi = false, -- 脱离战斗时保存历史数据
 }
 local Data          -- 当前战斗数据记录
 local HISTORY_CACHE = setmetatable({}, { __mode = 'v' }) -- 历史战斗记录缓存 { [szFile] = Data }
@@ -414,10 +415,11 @@ function D.LoadData()
 			end
 			D.SaveHistory()
 		end
-		O.bSaveHistory   = data.bSaveHistory or false
-		O.nMaxHistory    = data.nMaxHistory   or 10
-		O.nMinFightTime  = data.nMinFightTime or 30
-		O.bRecEverything = data.bRecEverything2 or false
+		O.bSaveHistoryOnExit = data.bSaveHistoryOnExit or data.bSaveHistory or false
+		O.nMaxHistory        = data.nMaxHistory or 10
+		O.nMinFightTime      = data.nMinFightTime or 30
+		O.bRecEverything     = data.bRecEverything2 or false
+		O.bSaveHistoryOnExFi = data.bSaveHistoryOnExFi or false
 	end
 	D.Init()
 end
@@ -425,10 +427,11 @@ end
 -- 退出游戏保存数据
 function D.SaveData()
 	local data = {
-		bSaveHistory    = O.bSaveHistory,
-		nMaxHistory     = O.nMaxHistory,
-		nMinFightTime   = O.nMinFightTime,
-		bRecEverything2 = O.bRecEverything,
+		bSaveHistoryOnExit = O.bSaveHistoryOnExit,
+		nMaxHistory        = O.nMaxHistory       ,
+		nMinFightTime      = O.nMinFightTime     ,
+		bRecEverything2    = O.bRecEverything    ,
+		bSaveHistoryOnExFi = O.bSaveHistoryOnExFi,
 	}
 	LIB.SaveLUAData(SZ_CFG_FILE, data, DS_DATA_CONFIG)
 end
@@ -1259,7 +1262,9 @@ function D.Flush()
 		local szFilePath = LIB.FormatPath(DS_ROOT) .. D.GetDataFileName(Data)
 		HISTORY_CACHE[szFilePath] = Data
 		UNSAVED_CACHE[szFilePath] = Data
-		D.SaveHistory()
+		if O.bSaveHistoryOnExFi then
+			D.SaveHistory()
+		end
 	end
 
 	D.Init(true)
@@ -1482,7 +1487,12 @@ LIB.RegisterInit('MY_Recount_DS', function()
 	D.LoadData()
 end)
 
-LIB.RegisterFlush('MY_Recount_DS', D.SaveData)
+LIB.RegisterFlush('MY_Recount_DS', function()
+	D.SaveData()
+	if O.bSaveHistoryOnExit then
+		D.SaveHistory()
+	end
+end)
 
 -- 同名目标数据合并
 function D.MergeTargetData(tDst, tSrc, data, szChannel, bMergeNpc, bMergeEffect, bHideAnonymous)
@@ -1806,10 +1816,11 @@ local settings = {
 		},
 		{
 			fields = {
-				bSaveHistory      = true,
-				nMaxHistory       = true,
-				nMinFightTime     = true,
-				bRecEverything    = true,
+				bSaveHistoryOnExit = true,
+				nMaxHistory        = true,
+				nMinFightTime      = true,
+				bRecEverything     = true,
+				bSaveHistoryOnExFi = true,
 			},
 			root = O,
 		},
@@ -1817,16 +1828,18 @@ local settings = {
 	imports = {
 		{
 			fields = {
-				bSaveHistory      = true,
-				nMaxHistory       = true,
-				nMinFightTime     = true,
-				bRecEverything    = true,
+				bSaveHistoryOnExit = true,
+				nMaxHistory        = true,
+				nMinFightTime      = true,
+				bRecEverything     = true,
+				bSaveHistoryOnExFi = true,
 			},
 			triggers = {
-				bSaveHistory      = D.SaveData,
-				nMaxHistory       = D.SaveData,
-				nMinFightTime     = D.SaveData,
-				bRecEverything    = D.SaveData,
+				bSaveHistoryOnExit = D.SaveData,
+				nMaxHistory        = D.SaveData,
+				nMinFightTime      = D.SaveData,
+				bRecEverything     = D.SaveData,
+				bSaveHistoryOnExFi = D.SaveData,
 			},
 			root = O,
 		},

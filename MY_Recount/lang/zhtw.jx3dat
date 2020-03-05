@@ -20,7 +20,8 @@ return {
     ['display only player record'] = '只顯示玩家記錄',
     ['display all record'] = '顯示所有記錄',
 
-    ['auto save data while exit game'] = '退出游戲時保存數據',
+    ['Save history on exit'] = '退出游戲時保存數據',
+    ['Save history immediately'] = '脫離戰鬥時保存數據',
 
     ['display as per second'            ] = '顯示每秒平均數值',
     ['display effective value'          ] = '顯示戰鬥有效數值',

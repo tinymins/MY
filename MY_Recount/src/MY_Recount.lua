@@ -463,10 +463,18 @@ function D.GetHistoryMenu()
 
 	insert(t, { bDevide = true })
 	insert(t, {
-		szOption = _L['auto save data while exit game'],
-		bCheck = true, bChecked = MY_Recount_DS.bSaveHistory,
+		szOption = _L['Save history on exit'],
+		bCheck = true, bChecked = MY_Recount_DS.bSaveHistoryOnExit,
 		fnAction = function()
-			MY_Recount_DS.bSaveHistory = not MY_Recount_DS.bSaveHistory
+			MY_Recount_DS.bSaveHistoryOnExit = not MY_Recount_DS.bSaveHistoryOnExit
+		end,
+	})
+	insert(t, {
+		szOption = _L['Save history immediately'],
+		bCheck = true,
+		bChecked = MY_Recount_DS.bSaveHistoryOnExFi,
+		fnAction = function()
+			MY_Recount_DS.bSaveHistoryOnExFi = not MY_Recount_DS.bSaveHistoryOnExFi
 		end,
 	})
 
