@@ -288,7 +288,7 @@ function D.GetHistoryFiles()
 				return a[i] > b[i]
 			end
 		end
-		return true
+		return false
 	end
 	sort(aFiles, sortFile)
 	return aFiles
