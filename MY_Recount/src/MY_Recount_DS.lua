@@ -441,15 +441,21 @@ end
 -- 加载历史数据列表
 function D.GetHistoryFiles()
 	local aFiles = {}
-	local szPath = LIB.FormatPath(DS_ROOT)
-	local aFileName = {}
-	for _, v in ipairs(CPath.GetFileList(szPath)) do
-		insert(aFileName, v)
-	end
+	local aFileName, tFileName = {}, {}
 	local szRoot = LIB.FormatPath(DS_ROOT)
 	for k, _ in pairs(HISTORY_CACHE) do
 		if wfind(k, szRoot) == 1 then
-			insert(aFileName, (k:sub(#szRoot + 1)))
+			k = k:sub(#szRoot + 1)
+			if not tFileName[k] then
+				insert(aFileName, k)
+				tFileName[k] = true
+			end
+		end
+	end
+	for _, v in ipairs(CPath.GetFileList(szRoot)) do
+		if not tFileName[v] then
+			insert(aFileName, v)
+			tFileName[v] = true
 		end
 	end
 	for _, filename in ipairs(aFileName) do
@@ -476,7 +482,7 @@ function D.GetHistoryFiles()
 				),
 				filename = filename:sub(1, -13),
 				fullname = filename,
-				fullpath = szPath .. filename,
+				fullpath = szRoot .. filename,
 			})
 		end
 	end
