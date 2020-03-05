@@ -575,10 +575,10 @@ function D.OnItemMouseEnter()
 		local wnd = this:GetParent() -- 'Wnd_Item'
 		local frame = this:GetRoot()
 		local menu = wnd.menu
+		local nLevel = wnd.nLevel
 		if #menu ~= 0 and (not D.IsDisable(menu) or menu.bAlwaysShowSub) then
 			LIB.DelayCall('MY_PopupMenu__HideSub', false)
 			-- 插入子菜单
-			local nLevel = wnd.nLevel
 			for i = nLevel, #frame.aMenu do
 				frame.aMenu[i] = nil
 			end
@@ -592,17 +592,18 @@ function D.OnItemMouseEnter()
 			frame.aInvaild[nLevel] = true
 			-- 更新UI
 			D.UpdateUI(frame)
-		elseif not LIB.DelayCall('MY_PopupMenu__HideSub') then -- 3000ms后关闭之前展开的子菜单
+		elseif frame.nAutoHideLevel ~= nLevel or not LIB.DelayCall('MY_PopupMenu__HideSub') then -- 3000ms后关闭之前展开的子菜单
 			LIB.DelayCall('MY_PopupMenu__HideSub', 1000, function()
 				if not IsElement(wnd) then
 					return
 				end
-				local nLevel = wnd.nLevel
 				for i = nLevel, #frame.aMenu do
 					frame.aMenu[i] = nil
 				end
+				frame.nAutoHideLevel = nil
 				D.UpdateUI(frame)
 			end)
+			frame.nAutoHideLevel = nLevel
 		end
 		if menu.fnMouseEnter then
 			menu.fnMouseEnter(menu.UserData)
