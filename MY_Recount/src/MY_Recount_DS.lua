@@ -368,7 +368,7 @@ local O = {
 	bSaveHistory      = false,
 	nMaxHistory       = 10,
 	nMinFightTime     = 30,
-	bRecEverything    = true,
+	bRecEverything    = false,
 }
 local Data          -- 当前战斗数据记录
 local HISTORY_CACHE = setmetatable({}, { __mode = 'v' }) -- 历史战斗记录缓存 { [szFile] = Data }
@@ -414,10 +414,10 @@ function D.LoadData()
 			end
 			D.SaveHistory()
 		end
-		O.bSaveHistory      = data.bSaveHistory or false
-		O.nMaxHistory       = data.nMaxHistory   or 10
-		O.nMinFightTime     = data.nMinFightTime or 30
-		O.bRecEverything    = LIB.FormatDataStructure(data.bRecEverything, false)
+		O.bSaveHistory   = data.bSaveHistory or false
+		O.nMaxHistory    = data.nMaxHistory   or 10
+		O.nMinFightTime  = data.nMinFightTime or 30
+		O.bRecEverything = data.bRecEverything2 or false
 	end
 	D.Init()
 end
@@ -425,10 +425,10 @@ end
 -- 退出游戏保存数据
 function D.SaveData()
 	local data = {
-		bSaveHistory   = O.bSaveHistory,
-		nMaxHistory    = O.nMaxHistory,
-		nMinFightTime  = O.nMinFightTime,
-		bRecEverything = O.bRecEverything,
+		bSaveHistory    = O.bSaveHistory,
+		nMaxHistory     = O.nMaxHistory,
+		nMinFightTime   = O.nMinFightTime,
+		bRecEverything2 = O.bRecEverything,
 	}
 	LIB.SaveLUAData(SZ_CFG_FILE, data, DS_DATA_CONFIG)
 end
