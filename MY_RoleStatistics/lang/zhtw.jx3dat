@@ -62,6 +62,13 @@ return {
     ['Just now'] = '剛剛',
 
     ['Columns'] = '顯示列',
+    ['Columns alert when esc'] = '打開ESC界面提醒數值變化的列',
+    ['Current online '] = '本次上線',
+    [' increased by '] = '增加了',
+    [' decreased by '] = '減少了',
+    ['pt'] = '點',
+    ['sc'] = '分',
+    ['.'] = '。',
     ['Move up'] = '上移',
     ['Move down'] = '下移',
     ['Delete'] = '刪除',

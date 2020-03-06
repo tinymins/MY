@@ -78,10 +78,27 @@ local O = {
 	},
 	szSort = 'time_days',
 	szSortOrder = 'desc',
+	aAlertColumn = {
+		'money',
+		'achievement_score',
+		'equip_score',
+		'pet_score',
+		'contribution',
+		'justice',
+		'prestige',
+		'camp_point',
+		'arena_award',
+		'exam_print',
+	},
 }
 RegisterCustomData('Global/MY_RoleStatistics_RoleStat.aColumn')
 RegisterCustomData('Global/MY_RoleStatistics_RoleStat.szSort')
 RegisterCustomData('Global/MY_RoleStatistics_RoleStat.szSortOrder')
+RegisterCustomData('Global/MY_RoleStatistics_RoleStat.aAlertColumn')
+
+local function GetFormatSysmsgText(szText)
+	return GetFormatText(szText, GetMsgFont('MSG_SYS'), GetMsgFontColor('MSG_SYS'))
+end
 
 local function GeneCommonFormatText(id)
 	return function(r)
@@ -384,6 +401,134 @@ for _, p in ipairs(COLUMN_LIST) do
 end
 local EXCEL_WIDTH = 960
 
+-- 小退提示
+local function GeneCommonCompareText(id, szTitle, szUnit)
+	return function(r1, r2)
+		if r1[id] == r2[id] then
+			return
+		end
+		local szOp = r1[id] < r2[id]
+			and _L[' increased by ']
+			or _L[' decreased by ']
+		return GetFormatSysmsgText(szTitle .. szOp .. abs(r2[id] - r1[id]) .. szUnit)
+	end
+end
+local ALERT_COLUMN = {
+	{ -- 装分
+		id = 'equip_score',
+		szTitle = _L['Equip score'],
+		GetValue = function(me)
+			return me.GetBaseEquipScore() + me.GetStrengthEquipScore() + me.GetMountsEquipScore()
+		end,
+		GetCompareText = GeneCommonCompareText('equip_score', _L['Equip score'], _L['sc']),
+	},
+	{ -- 宠物分
+		id = 'pet_score',
+		szTitle = _L['Pet score'],
+		GetValue = function(me)
+			return me.GetAcquiredFellowPetScore() + me.GetAcquiredFellowPetMedalScore()
+		end,
+		GetCompareText = GeneCommonCompareText('pet_score', _L['Pet score'], _L['sc']),
+	},
+	{ -- 金钱
+		id = 'money',
+		szTitle = _L['Money'],
+		nWidth = 200,
+		GetValue = function(me)
+			return me.GetMoney()
+		end,
+		GetCompareText = function(r1, r2)
+			local money = MoneyOptSub(r2.money, r1.money)
+			local nCompare = MoneyOptCmp(money, 0)
+			if nCompare == 0 then
+				return
+			end
+			local szOp = nCompare > 0
+				and _L[' increased by ']
+				or _L[' decreased by ']
+			local f = GetMsgFont('MSG_SYS')
+			local r, g, b = GetMsgFontColor('MSG_SYS')
+			local szExtra = 'font=' .. f .. ' r=' .. r .. ' g=' .. g .. ' b=' .. b
+			return GetFormatSysmsgText(_L['Money'] .. szOp)
+				.. GetMoneyText({ nGold = abs(money.nGold), nSilver = abs(money.nSilver), nCopper = abs(money.nCopper) }, szExtra)
+		end,
+	},
+	{ -- 江贡
+		id = 'contribution',
+		szTitle = _L['Contribution'],
+		GetValue = function(me)
+			return me.nContribution
+		end,
+		GetCompareText = GeneCommonCompareText('contribution', _L['Contribution'], _L['pt']),
+	},
+	{ -- 侠义
+		id = 'justice',
+		szTitle = _L['Justice'],
+		GetValue = function(me)
+			return me.nJustice
+		end,
+		GetCompareText = GeneCommonCompareText('justice', _L['Justice'], _L['pt']),
+	},
+	{
+		-- 威望
+		id = 'prestige',
+		szTitle = _L['Prestige'],
+		GetValue = function(me)
+			return me.nCurrentPrestige
+		end,
+		GetCompareText = GeneCommonCompareText('prestige', _L['Prestige'], _L['pt']),
+	},
+	{
+		-- 战阶积分
+		id = 'camp_point',
+		szTitle = _L['Camp point'],
+		GetValue = function(me)
+			return me.nTitlePoint
+		end,
+		GetCompareText = GeneCommonCompareText('camp_point', _L['Camp point'], _L['sc']),
+	},
+	{
+		-- 名剑币
+		id = 'arena_award',
+		szTitle = _L['Arena award'],
+		GetValue = function(me)
+			return me.nArenaAward
+		end,
+		GetCompareText = GeneCommonCompareText('arena_award', _L['Arena award'], _L['pt']),
+	},
+	{
+		-- 监本
+		id = 'exam_print',
+		szTitle = _L['Exam print'],
+		GetValue = function(me)
+			return me.nExamPrint
+		end,
+		GetCompareText = GeneCommonCompareText('exam_print', _L['Exam print'], _L['pt']),
+	},
+	{
+		-- 资历
+		id = 'achievement_score',
+		szTitle = _L['Achievement score'],
+		GetValue = function(me)
+			return me.GetAchievementRecord()
+		end,
+		GetCompareText = GeneCommonCompareText('achievement_score', _L['Achievement score'], _L['pt']),
+	},
+	{
+		-- 师徒分
+		id = 'mentor_score',
+		szTitle = _L['Mentor score'],
+		GetValue = function(me)
+			return me.dwTAEquipsScore
+		end,
+		GetCompareText = GeneCommonCompareText('mentor_score', _L['Mentor score'], _L['sc']),
+	},
+}
+local ALERT_COLUMN_DICT = {}
+for _, p in ipairs(ALERT_COLUMN) do
+	ALERT_COLUMN_DICT[p.id] = p
+end
+
 function D.FlushDB()
 	--[[#DEBUG BEGIN]]
 	LIB.Debug('MY_RoleStatistics_RoleStat', 'Flushing to database...', DEBUG_LEVEL.LOG)
@@ -537,6 +682,7 @@ function D.OnInitPage()
 	wnd:ChangeRelation(page, true, true)
 	Wnd.CloseWindow(frameTemp)
 
+	-- 显示列
 	UI(wnd):Append('WndComboBox', {
 		x = 800, y = 20, w = 180,
 		text = _L['Columns'],
@@ -591,6 +737,61 @@ function D.OnInitPage()
 								insert(O.aColumn, col.id)
 							end
 							D.UpdateUI(page)
+							UI.ClosePopupMenu()
+						end,
+					})
+				end
+			end
+			return t
+		end,
+	})
+
+	-- ESC提示列
+	UI(wnd):Append('WndComboBox', {
+		x = 600, y = 20, w = 180,
+		text = _L['Columns alert when esc'],
+		menu = function()
+			local t, c = {}, {}
+			for i, id in ipairs(O.aAlertColumn) do
+				local col = ALERT_COLUMN_DICT[id]
+				if col then
+					insert(t, {
+						szOption = col.szTitle,
+						{
+							szOption = _L['Move up'],
+							fnAction = function()
+								if i > 1 then
+									O.aAlertColumn[i], O.aAlertColumn[i - 1] = O.aAlertColumn[i - 1], O.aAlertColumn[i]
+								end
+								UI.ClosePopupMenu()
+							end,
+						},
+						{
+							szOption = _L['Move down'],
+							fnAction = function()
+								if i < #O.aAlertColumn then
+									O.aAlertColumn[i], O.aAlertColumn[i + 1] = O.aAlertColumn[i + 1], O.aAlertColumn[i]
+								end
+								UI.ClosePopupMenu()
+							end,
+						},
+						{
+							szOption = _L['Delete'],
+							fnAction = function()
+								remove(O.aAlertColumn, i)
+								UI.ClosePopupMenu()
+							end,
+						},
+					})
+					c[id] = true
+				end
+			end
+			for _, col in ipairs(ALERT_COLUMN_DICT) do
+				if not c[col.id] then
+					insert(t, {
+						szOption = col.szTitle,
+						fnAction = function()
+							insert(O.aAlertColumn, col.id)
 							UI.ClosePopupMenu()
 						end,
 					})
@@ -706,6 +907,32 @@ function D.OnItemMouseLeave()
 	HideTip()
 end
 
+local ALERT_INIT_VAL = {}
+LIB.RegisterInit('MY_RoleStatistics_RoleStat__AlertCol', function()
+	local me = GetClientPlayer()
+	for _, col in ipairs(ALERT_COLUMN) do
+		ALERT_INIT_VAL[col.id] = col.GetValue(me)
+	end
+end)
+LIB.RegisterFrameCreate('OptionPanel.MY_RoleStatistics_RoleStat__AlertCol', function()
+	local me = GetClientPlayer()
+	local tVal = {}
+	for _, col in ipairs(ALERT_COLUMN) do
+		tVal[col.id] = col.GetValue(me)
+	end
+
+	local szText = ''
+	for _, id in ipairs(O.aAlertColumn) do
+		local col = ALERT_COLUMN_DICT[id]
+		if col then
+			szText = szText .. (col.GetCompareText(ALERT_INIT_VAL, tVal) or '')
+		end
+	end
+	if not IsEmpty(szText) then
+		LIB.Sysmsg({ GetFormatSysmsgText(_L['Current online ']) .. szText .. GetFormatSysmsgText(_L['.']), rich = true })
+	end
+end)
+
 -- Module exports
 do
 local settings = {
@@ -733,6 +960,7 @@ local settings = {
 				aColumn = true,
 				szSort = true,
 				szSortOrder = true,
+				aAlertColumn = true,
 			},
 			root = O,
 		},
@@ -743,6 +971,7 @@ local settings = {
 				aColumn = true,
 				szSort = true,
 				szSortOrder = true,
+				aAlertColumn = true,
 			},
 			root = O,
 		},
