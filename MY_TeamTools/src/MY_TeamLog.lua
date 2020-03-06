@@ -179,7 +179,7 @@ local function OnDeath(dwID, dwKiller)
 		if not DEATH_LOG[key] then
 			DEATH_LOG[key] = {}
 		end
-		local szKiller = LIB.GetObjectName(IsPlayer(dwKiller) and TARGET.PLAYER or TARGET.NPC, dwKiller)
+		local szKiller = LIB.GetObjectName(IsPlayer(dwKiller) and TARGET.PLAYER or TARGET.NPC, dwKiller, 'never')
 		insert(DEATH_LOG[key], {
 			nCurrentTime = GetCurrentTime(),
 			data         = DAMAGE_LOG[key] or { szCaster = szKiller },
