@@ -143,7 +143,7 @@ local COLUMN_LIST = {
 	},
 	{ -- ×°·Ö
 		id = 'equip_score',
-		szTitle = _L['Equip score'],
+		szTitle = _L['EquSC'],
 		nWidth = 60,
 		GetFormatText = GeneCommonFormatText('equip_score'),
 		Compare = GeneCommonCompare('equip_score'),

@@ -167,14 +167,14 @@ local COLUMN_LIST = {
 	},
 	{ -- 装分
 		id = 'equip_score',
-		szTitle = _L['Equip score'],
+		szTitle = _L['EquSC'],
 		nWidth = 60,
 		GetFormatText = GeneCommonFormatText('equip_score'),
 		Compare = GeneCommonCompare('equip_score'),
 	},
 	{ -- 宠物分
 		id = 'pet_score',
-		szTitle = _L['Pet score'],
+		szTitle = _L['PetSC'],
 		nWidth = 55,
 		GetFormatText = GeneCommonFormatText('pet_score'),
 		Compare = GeneCommonCompare('pet_score'),
@@ -201,28 +201,28 @@ local COLUMN_LIST = {
 	},
 	{ -- 江贡
 		id = 'contribution',
-		szTitle = _L['Contribution'],
+		szTitle = _L['Contri'],
 		nWidth = 70,
 		GetFormatText = GeneCommonFormatText('contribution'),
 		Compare = GeneCommonCompare('contribution'),
 	},
 	{ -- 江贡周余
 		id = 'contribution_remain',
-		szTitle = _L['Contribution_remain'],
+		szTitle = _L['Contri_remain'],
 		nWidth = 70,
 		GetFormatText = GeneWeeklyFormatText('contribution_remain'),
 		Compare = GeneWeeklyCompare('contribution_remain'),
 	},
 	{ -- 侠义
 		id = 'justice',
-		szTitle = _L['Justice'],
+		szTitle = _L['Justi'],
 		nWidth = 60,
 		GetFormatText = GeneCommonFormatText('justice'),
 		Compare = GeneCommonCompare('justice'),
 	},
 	{ -- 侠义周余
 		id = 'justice_remain',
-		szTitle = _L['Justice remain'],
+		szTitle = _L['Justi_remain'],
 		nWidth = 60,
 		GetFormatText = GeneWeeklyFormatText('justice_remain'),
 		Compare = GeneWeeklyCompare('justice_remain'),
@@ -230,14 +230,14 @@ local COLUMN_LIST = {
 	{
 		-- 威望
 		id = 'prestige',
-		szTitle = _L['Prestige'],
+		szTitle = _L['Presti'],
 		nWidth = 70,
 		GetFormatText = GeneCommonFormatText('prestige'),
 		Compare = GeneCommonCompare('prestige'),
 	},
 	{ -- 威望周余
 		id = 'prestige_remain',
-		szTitle = _L['Prestige remain'],
+		szTitle = _L['Presti_remain'],
 		nWidth = 70,
 		GetFormatText = GeneWeeklyFormatText('prestige_remain'),
 		Compare = GeneWeeklyCompare('prestige_remain'),
@@ -287,7 +287,7 @@ local COLUMN_LIST = {
 	{
 		-- 监本
 		id = 'exam_print',
-		szTitle = _L['Exam print'],
+		szTitle = _L['ExamPt'],
 		nWidth = 55,
 		GetFormatText = GeneCommonFormatText('exam_print'),
 		Compare = GeneCommonCompare('exam_print'),
@@ -295,7 +295,7 @@ local COLUMN_LIST = {
 	{
 		-- 监本周余
 		id = 'exam_print_remain',
-		szTitle = _L['Exam print remain'],
+		szTitle = _L['ExamPt_remain'],
 		nWidth = 55,
 		GetFormatText = GeneWeeklyFormatText('exam_print_remain'),
 		Compare = GeneWeeklyCompare('exam_print_remain'),
@@ -303,7 +303,7 @@ local COLUMN_LIST = {
 	{
 		-- 资历
 		id = 'achievement_score',
-		szTitle = _L['Achievement score'],
+		szTitle = _L['AchiSC'],
 		nWidth = 70,
 		GetFormatText = GeneCommonFormatText('achievement_score'),
 		Compare = GeneCommonCompare('achievement_score'),
