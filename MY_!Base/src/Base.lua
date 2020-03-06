@@ -122,8 +122,8 @@ local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local function IsStreaming()
 	return SM_IsEnable and SM_IsEnable()
 end
-local _BUILD_                = '20200302'
-local _VERSION_              = 0x2015700
+local _BUILD_                = '20200306'
+local _VERSION_              = 0x2015800
 local _MENU_COLOR_           = {255, 165, 79}
 local _MAX_PLAYER_LEVEL_     = 100
 local _INTERFACE_ROOT_       = 'Interface/'
