@@ -73,6 +73,7 @@ local O = {
 	},
 	szSort = 'time_days',
 	szSortOrder = 'desc',
+	bFirstCopy = true, -- 第一次请求 CD
 	tMapSaveCopy = {}, -- 单副本 CD
 	tMapProgress = {}, -- 单BOSS CD
 }
@@ -317,8 +318,11 @@ local TIP_COLIMN = {
 	'time_days',
 }
 
-function D.FlushDB()
-	D.UpdateMapCopy()
+function D.FlushDB(bNoUpdate)
+	if not bNoUpdate or O.bFirstCopy then
+		D.UpdateMapCopy()
+		O.bFirstCopy = false
+	end
 	--[[#DEBUG BEGIN]]
 	LIB.Debug('MY_RoleStatistics_DungeonStat', 'Flushing to database...', DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
@@ -488,7 +492,7 @@ LIB.RegisterEvent('SYNC_LOOT_LIST.MY_RoleStatistics_DungeonStat__UpdateMapCopy',
 	if not LIB.IsInDungeon() then
 		return
 	end
-	D.UpdateMapCopy()
+	LIB.DelayCall('MY_RoleStatistics_DungeonStat__UpdateMapCopy', 300, D.UpdateMapCopy)
 end)
 
 function D.OnInitPage()
@@ -624,7 +628,7 @@ function D.OnEvent(event)
 	if event == 'ON_MY_MOSAICS_RESET' then
 		D.UpdateUI(this)
 	elseif event == 'UPDATE_DUNGEON_ROLE_PROGRESS' or event == 'ON_APPLY_PLAYER_SAVED_COPY_RESPOND' then
-		D.FlushDB()
+		D.FlushDB(true)
 		D.UpdateUI(this)
 	end
 end
