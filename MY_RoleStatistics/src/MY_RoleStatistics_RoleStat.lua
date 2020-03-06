@@ -90,6 +90,7 @@ local O = {
 		'arena_award',
 		'exam_print',
 	},
+	dwLastAlertTime = 0,
 }
 RegisterCustomData('Global/MY_RoleStatistics_RoleStat.aColumn')
 RegisterCustomData('Global/MY_RoleStatistics_RoleStat.szSort')
@@ -928,7 +929,9 @@ LIB.RegisterFrameCreate('OptionPanel.MY_RoleStatistics_RoleStat__AlertCol', func
 			szText = szText .. (col.GetCompareText(ALERT_INIT_VAL, tVal) or '')
 		end
 	end
-	if not IsEmpty(szText) then
+	if not IsEmpty(szText) and (GetTime() - O.dwLastAlertTime > 10000 or O.szLastAlert ~= szText) then
+		O.dwLastAlertTime = GetTime()
+		O.szLastAlert = szText
 		LIB.Sysmsg({ GetFormatSysmsgText(_L['Current online ']) .. szText .. GetFormatSysmsgText(_L['.']), rich = true })
 	end
 end)
