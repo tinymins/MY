@@ -220,7 +220,7 @@ function TI.CreateFrame(a, b)
 			text = _L['GKP Golden Team Record'],
 			onclick = function()
 				if MY_GKP then
-					MY_GKP.TogglePanel()
+					MY_GKP_MI.TogglePanel()
 				else
 					LIB.Alert(_L['You haven\'t had MY_GKP installed and loaded yet.'])
 				end
