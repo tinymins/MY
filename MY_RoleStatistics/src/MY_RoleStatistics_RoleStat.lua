@@ -922,13 +922,14 @@ LIB.RegisterFrameCreate('OptionPanel.MY_RoleStatistics_RoleStat__AlertCol', func
 		tVal[col.id] = col.GetValue(me)
 	end
 
-	local szText = ''
+	local aText = {}
 	for _, id in ipairs(O.aAlertColumn) do
 		local col = ALERT_COLUMN_DICT[id]
 		if col then
-			szText = szText .. (col.GetCompareText(ALERT_INIT_VAL, tVal) or '')
+			insert(aText, (col.GetCompareText(ALERT_INIT_VAL, tVal)))
 		end
 	end
+	local szText = concat(aText, _L[','])
 	if not IsEmpty(szText) and (GetTime() - O.dwLastAlertTime > 10000 or O.szLastAlert ~= szText) then
 		O.dwLastAlertTime = GetTime()
 		O.szLastAlert = szText
