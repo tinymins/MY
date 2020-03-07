@@ -663,15 +663,15 @@ function D.OnLButtonClick()
 		end
 		D.DrawUI(this:GetRoot())
 	elseif name == 'Btn_Option' then
-		PopupMenu(MY_Recount.GetMenu())
+		UI.PopupMenu(MY_Recount.GetMenu())
 	elseif name == 'Btn_History' then
-		PopupMenu(MY_Recount.GetHistoryMenu())
+		UI.PopupMenu(MY_Recount.GetHistoryMenu())
 	elseif name == 'Btn_Empty' then
 		MY_Recount_DS.Flush()
 		MY_Recount.SetDisplayData('CURRENT')
 		D.DrawUI(this:GetRoot())
 	elseif name == 'Btn_Issuance' then
-		PopupMenu(MY_Recount.GetPublishMenu())
+		UI.PopupMenu(MY_Recount.GetPublishMenu())
 	end
 end
 

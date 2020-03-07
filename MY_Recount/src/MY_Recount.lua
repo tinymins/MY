@@ -424,6 +424,7 @@ function D.GetHistoryMenu()
 		end,
 	}}
 
+	local tt = { bInline = true, nMaxHeight = 450 }
 	for _, file in ipairs(MY_Recount_DS.GetHistoryFiles()) do
 		local t1 = {
 			szOption = file.bossname .. ' (' .. LIB.FormatTimeCounter(file.during, '%M:%ss') .. ')',
@@ -458,8 +459,9 @@ function D.GetHistoryMenu()
 				OutputTip(concat(aXml), 600, {nX, nY, nW, nH}, ALW.RIGHT_LEFT)
 			end,
 		}
-		insert(t, t1)
+		insert(tt, t1)
 	end
+	insert(t, tt)
 
 	insert(t, { bDevide = true })
 	insert(t, {
