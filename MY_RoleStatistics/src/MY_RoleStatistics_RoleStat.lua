@@ -929,7 +929,7 @@ LIB.RegisterFrameCreate('OptionPanel.MY_RoleStatistics_RoleStat__AlertCol', func
 			insert(aText, (col.GetCompareText(ALERT_INIT_VAL, tVal)))
 		end
 	end
-	local szText = concat(aText, _L[','])
+	local szText = concat(aText, GetFormatSysmsgText(_L[',']))
 	if not IsEmpty(szText) and (GetTime() - O.dwLastAlertTime > 10000 or O.szLastAlert ~= szText) then
 		O.dwLastAlertTime = GetTime()
 		O.szLastAlert = szText
