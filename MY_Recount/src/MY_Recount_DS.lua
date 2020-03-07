@@ -424,7 +424,7 @@ function D.LoadData()
 		O.bRecEverything     = data.bRecEverything or false
 		O.bSaveEverything    = data.bSaveEverything or false
 	end
-	D.Init()
+	D.InitData()
 end
 
 -- 退出游戏保存数据
@@ -555,7 +555,6 @@ end
 do
 local function onLoadingEnding()
 	D.Flush()
-	D.Init(true)
 	FireUIEvent('MY_RECOUNT_NEW_FIGHT')
 end
 LIB.RegisterEvent('LOADING_ENDING', onLoadingEnding)
@@ -570,7 +569,7 @@ LIB.RegisterEvent('MY_FIGHT_HINT', function()
 		D.InsertEverything(Data, nLFC, nTime, nTick, EVERYTHING_TYPE.FIGHT_TIME, bFighting, szUUID, nDuring)
 	end
 	if bFighting and szUUID ~= Data[DK.UUID] then -- 进入新的战斗
-		D.Init()
+		D.InitData()
 		D.ReplayRecentSkillEffect()
 		FireUIEvent('MY_RECOUNT_NEW_FIGHT')
 	else
@@ -743,10 +742,9 @@ function D.ProcessSkillEffect(nLFC, nTime, nTick, dwCaster, dwTarget, nEffectTyp
 	end
 
 	-- 未进战则初始化统计数据（即默认当前帧所有的技能日志为进战技能）
-	if not LIB.GetFightUUID() and
-	D.nLastAutoInitFrame ~= GetLogicFrameCount() then
+	if not LIB.GetFightUUID() and D.nLastAutoInitFrame ~= GetLogicFrameCount() then
 		D.nLastAutoInitFrame = GetLogicFrameCount()
-		D.Init(true)
+		D.InitData()
 	end
 
 	-- 获取效果名称
@@ -1223,87 +1221,76 @@ local function GeneTypeNS()
 		[DK_REC.STAT        ] = {},
 	}
 end
-function D.Init(bForceInit)
-	if bForceInit or (not Data) or
-	(Data[DK.UUID] and LIB.GetFightUUID() ~= Data[DK.UUID]) then
-		Data = {
-			[DK.UUID       ] = LIB.GetFightUUID(),                -- 战斗唯一标识
-			[DK.VERSION    ] = VERSION,                           -- 数据版本号
-			[DK.TIME_BEGIN ] = GetCurrentTime(),                  -- 战斗开始时间
-			[DK.TICK_BEGIN ] = GetTime(),                         -- 战斗开始毫秒时间
-			[DK.TIME_DURING] =  0,                                -- 战斗持续时间
-			[DK.TICK_DURING] =  0,                                -- 战斗持续毫秒时间
-			[DK.AWAYTIME   ] = {},                                -- 死亡/掉线时间节点
-			[DK.NAME_LIST  ] = {},                                -- 名称缓存
-			[DK.FORCE_LIST ] = {},                                -- 势力缓存
-			[DK.EFFECT_LIST] = {},                                -- 效果信息缓存
-			[DK.DAMAGE     ] = GeneTypeNS(),                      -- 输出统计
-			[DK.HEAL       ] = GeneTypeNS(),                      -- 治疗统计
-			[DK.BE_HEAL    ] = GeneTypeNS(),                      -- 承疗统计
-			[DK.BE_DAMAGE  ] = GeneTypeNS(),                      -- 承伤统计
-			[DK.EVERYTHING ] = {},                                -- 战斗复盘
-		}
-	end
-
-	if not Data[DK.UUID] and LIB.GetFightUUID() then
-		Data[DK.UUID] = LIB.GetFightUUID()
-		Data[DK.TIME_BEGIN] = GetCurrentTime()
-	end
+function D.InitData()
+	Data = {
+		[DK.UUID       ] = LIB.GetFightUUID(),                -- 战斗唯一标识
+		[DK.VERSION    ] = VERSION,                           -- 数据版本号
+		[DK.TIME_BEGIN ] = GetCurrentTime(),                  -- 战斗开始时间
+		[DK.TICK_BEGIN ] = GetTime(),                         -- 战斗开始毫秒时间
+		[DK.TIME_DURING] =  0,                                -- 战斗持续时间
+		[DK.TICK_DURING] =  0,                                -- 战斗持续毫秒时间
+		[DK.AWAYTIME   ] = {},                                -- 死亡/掉线时间节点
+		[DK.NAME_LIST  ] = {},                                -- 名称缓存
+		[DK.FORCE_LIST ] = {},                                -- 势力缓存
+		[DK.EFFECT_LIST] = {},                                -- 效果信息缓存
+		[DK.DAMAGE     ] = GeneTypeNS(),                      -- 输出统计
+		[DK.HEAL       ] = GeneTypeNS(),                      -- 治疗统计
+		[DK.BE_HEAL    ] = GeneTypeNS(),                      -- 承疗统计
+		[DK.BE_DAMAGE  ] = GeneTypeNS(),                      -- 承伤统计
+		[DK.EVERYTHING ] = {},                                -- 战斗复盘
+	}
 end
 end
 
 -- Data数据压入历史记录 并重新初始化Data
 function D.Flush()
-	if not (Data and Data[DK.UUID]) then
-		return
-	end
-
-	-- 过滤空记录
-	if IsEmpty(Data[DK.BE_DAMAGE][DK_REC.STAT])
-	and IsEmpty(Data[DK.DAMAGE][DK_REC.STAT])
-	and IsEmpty(Data[DK.HEAL][DK_REC.STAT])
-	and IsEmpty(Data[DK.BE_HEAL][DK_REC.STAT]) then
-		return
-	end
-
-	-- 计算受伤最多的名字作为战斗名称
-	local nMaxValue, szBossName = 0, nil
-	local nEnemyMaxValue, szEnemyBossName = 0, nil
-	for id, p in pairs(Data[DK.BE_DAMAGE][DK_REC.STAT]) do
-		if nEnemyMaxValue < p[DK_REC_STAT.TOTAL_EFFECT] and not D.IsParty(id) then
-			nEnemyMaxValue  = p[DK_REC_STAT.TOTAL_EFFECT]
-			szEnemyBossName = D.GetNameAusID(Data, id)
+	if Data and Data[DK.UUID] then
+		-- 过滤空记录
+		if IsEmpty(Data[DK.BE_DAMAGE][DK_REC.STAT])
+		and IsEmpty(Data[DK.DAMAGE][DK_REC.STAT])
+		and IsEmpty(Data[DK.HEAL][DK_REC.STAT])
+		and IsEmpty(Data[DK.BE_HEAL][DK_REC.STAT]) then
+			return
 		end
-		if nMaxValue < p[DK_REC_STAT.TOTAL_EFFECT] and id ~= UI_GetClientPlayerID() then
-			nMaxValue  = p[DK_REC_STAT.TOTAL_EFFECT]
-			szBossName = D.GetNameAusID(Data, id)
-		end
-	end
-	-- 如果没有 则计算输出最多的NPC名字作为战斗名称
-	if not szBossName or not szEnemyBossName then
-		for id, p in pairs(Data[DK.DAMAGE][DK_REC.STAT]) do
+
+		-- 计算受伤最多的名字作为战斗名称
+		local nMaxValue, szBossName = 0, nil
+		local nEnemyMaxValue, szEnemyBossName = 0, nil
+		for id, p in pairs(Data[DK.BE_DAMAGE][DK_REC.STAT]) do
 			if nEnemyMaxValue < p[DK_REC_STAT.TOTAL_EFFECT] and not D.IsParty(id) then
 				nEnemyMaxValue  = p[DK_REC_STAT.TOTAL_EFFECT]
 				szEnemyBossName = D.GetNameAusID(Data, id)
 			end
-			if nMaxValue < p[DK_REC_STAT.TOTAL_EFFECT] and not tonumber(id) then
+			if nMaxValue < p[DK_REC_STAT.TOTAL_EFFECT] and id ~= UI_GetClientPlayerID() then
 				nMaxValue  = p[DK_REC_STAT.TOTAL_EFFECT]
 				szBossName = D.GetNameAusID(Data, id)
 			end
 		end
-	end
-	Data[DK.BOSSNAME] = szEnemyBossName or szBossName or g_tStrings.STR_NAME_UNKNOWN
+		-- 如果没有 则计算输出最多的NPC名字作为战斗名称
+		if not szBossName or not szEnemyBossName then
+			for id, p in pairs(Data[DK.DAMAGE][DK_REC.STAT]) do
+				if nEnemyMaxValue < p[DK_REC_STAT.TOTAL_EFFECT] and not D.IsParty(id) then
+					nEnemyMaxValue  = p[DK_REC_STAT.TOTAL_EFFECT]
+					szEnemyBossName = D.GetNameAusID(Data, id)
+				end
+				if nMaxValue < p[DK_REC_STAT.TOTAL_EFFECT] and not tonumber(id) then
+					nMaxValue  = p[DK_REC_STAT.TOTAL_EFFECT]
+					szBossName = D.GetNameAusID(Data, id)
+				end
+			end
+		end
+		Data[DK.BOSSNAME] = szEnemyBossName or szBossName or g_tStrings.STR_NAME_UNKNOWN
 
-	if Data[DK.TIME_DURING] > O.nMinFightTime then
-		local szFilePath = LIB.FormatPath(DS_ROOT) .. D.GetDataFileName(Data)
-		HISTORY_CACHE[szFilePath] = Data
-		UNSAVED_CACHE[szFilePath] = Data
-		if O.bSaveHistoryOnExFi then
-			D.SaveHistory()
+		if Data[DK.TIME_DURING] > O.nMinFightTime then
+			local szFilePath = LIB.FormatPath(DS_ROOT) .. D.GetDataFileName(Data)
+			HISTORY_CACHE[szFilePath] = Data
+			UNSAVED_CACHE[szFilePath] = Data
+			if O.bSaveHistoryOnExFi then
+				D.SaveHistory()
+			end
 		end
 	end
-
-	D.Init(true)
+	D.InitData()
 end
 
 -- 系统日志监控（数据源）
