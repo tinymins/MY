@@ -1034,6 +1034,26 @@ local CONSTANT = setmetatable({}, {
 			WARNING = 2,
 			SUCCESS = 3,
 		}),
+		BIG_WARS = {
+			-- 95级
+			-- 14765, -- 大战！英雄微山书院！
+			-- 14766, -- 大战！英雄天泣林！
+			-- 14767, -- 大战！英雄梵空禅院！
+			-- 14768, -- 大战！英雄阴山圣泉！
+			-- 14769, -- 大战！英雄引仙水榭！
+			-- 95级后
+			-- 17816, -- 大战！英雄稻香秘事！
+			-- 17817, -- 大战！英雄银雾湖！
+			-- 17818, -- 大战！英雄刀轮海厅！
+			-- 17819, -- 大战！英雄夕颜阁！
+			-- 17820, -- 大战！英雄白帝水宫！
+			-- 100级
+			19191, -- 大战！英雄九辩馆！
+			19192, -- 大战！英雄泥兰洞天！
+			19195, -- 大战！英雄镜泊糊！
+			19196, -- 大战！英雄大衍盘丝洞！
+			19197, -- 大战！英雄迷渊岛！
+		},
 		EQUIPMENT_SUIT_COUNT = _G.EQUIPMENT_SUIT_COUNT or 4,
 		INVENTORY_GUILD_BANK = INVENTORY_GUILD_BANK or INVENTORY_INDEX.TOTAL + 1, --帮会仓库界面虚拟一个背包位置
 		INVENTORY_GUILD_PAGE_SIZE = INVENTORY_GUILD_PAGE_SIZE or 100,

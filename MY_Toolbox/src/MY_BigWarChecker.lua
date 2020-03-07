@@ -54,11 +54,10 @@ local O = {
 RegisterCustomData('MY_BigWarChecker.bEnable')
 
 -- 大战没交
-local m_aBigWars = { 19191, 19192, 19195, 19196, 19197 }
 LIB.RegisterFrameCreate('ExitPanel.BIG_WAR_CHECK', function(name, frame)
 	local me = GetClientPlayer()
 	if me then
-		for _, dwQuestID in ipairs(m_aBigWars) do
+		for _, dwQuestID in ipairs(CONSTANT.BIG_WARS) do
 			local info = me.GetQuestTraceInfo(dwQuestID)
 			if info then
 				local finished = false
