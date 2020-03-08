@@ -118,12 +118,16 @@ local function GetTaskState(me, dwQuestID, dwNpcTemplateID)
 	if eCanAccept == QUEST_RESULT.SUCCESS then
 		return TASK_STATE.ACCEPTABLE
 	end
-	if eCanAccept == QUEST_RESULT.FAILED then
-		return TASK_STATE.UNACCEPTABLE
-	end
 	if eCanAccept == QUEST_RESULT.FINISHED_MAX_COUNT then
 		return TASK_STATE.FINISHED
 	end
+	-- local KQuestInfo = GetQuestInfo(dwQuestID)
+	-- if KQuestInfo.bRepeat then -- 可重复任务没到达上限一定可接（有时候地图不对会误判不可接受）
+	-- 	return TASK_STATE.ACCEPTABLE
+	-- end
+	-- if eCanAccept == QUEST_RESULT.FAILED then
+	-- 	return TASK_STATE.UNACCEPTABLE
+	-- end
 end
 
 local EXCEL_WIDTH = 960
