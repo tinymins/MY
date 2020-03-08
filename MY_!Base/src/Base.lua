@@ -1100,6 +1100,15 @@ local CONSTANT = setmetatable({}, {
 					{14730, 46969}, -- ¸ê±Ú¾§¿óÒý·éÑÌ
 				},
 			},
+			DRAGON_GATE_DESPAIR = {
+				{17895, 59149},
+			},
+			LEXUS_REALITY = {
+				{20220, 64489},
+			},
+			LIDU_GHOST_TOWN = {
+				{18317, 64489},
+			},
 			FORCE_ROUTINE = {
 				[FORCE_TYPE.TIAN_CE  ] = {{8206, 16747}, {11254, 16747}, {11255, 16747}}, -- Ìì²ß
 				[FORCE_TYPE.CHUN_YANG] = {{8347, 16747}, {8398, 16747}}, -- ´¿Ñô

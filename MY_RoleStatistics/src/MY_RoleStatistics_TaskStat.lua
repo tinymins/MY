@@ -133,7 +133,7 @@ local function GetTaskState(me, dwQuestID, dwNpcTemplateID)
 end
 
 local EXCEL_WIDTH = 960
-local TASK_WIDTH = 65
+local TASK_WIDTH = 50
 local function GeneCommonFormatText(id)
 	return function(r)
 		return GetFormatText(r[id])
@@ -295,9 +295,24 @@ local function InitTaskList(bReload)
 		szTitle = _L['Crystal scramble'],
 		tCampQuestInfo = CONSTANT.QUEST_INFO.CAMP_CRYSTAL_SCRAMBLE,
 	})
-	-- 'dragon_gate_despair', -- 龙门绝境
-	-- 'lexus_reality', -- 列星虚境
-	-- 'lidu_ghost_town', -- 李渡鬼城
+	-- 龙门绝境
+	insert(aTask, {
+		id = 'dragon_gate_despair',
+		szTitle = _L['Dragon gate despair'],
+		aQuestInfo = CONSTANT.QUEST_INFO.DRAGON_GATE_DESPAIR,
+	})
+	-- 列星虚境
+	insert(aTask, {
+		id = 'lexus_reality',
+		szTitle = _L['Lexus reality'],
+		aQuestInfo = CONSTANT.QUEST_INFO.LEXUS_REALITY,
+	})
+	-- 李渡鬼城
+	insert(aTask, {
+		id = 'lidu_ghost_town',
+		szTitle = _L['Lidu ghost town'],
+		aQuestInfo = CONSTANT.QUEST_INFO.LIDU_GHOST_TOWN,
+	})
 	-- 采仙草
 	insert(aTask, {
 		id = 'picking_fairy_grass',
