@@ -96,6 +96,7 @@ local TASK_STATE = {
 	FINISHABLE = 3,
 	FINISHED = 4,
 	UNACCEPTABLE = 5,
+	UNKNOWN = 6,
 }
 local function GetTaskState(me, dwQuestID, dwNpcTemplateID)
 	-- 获取身上任务状态 -1: 任务id非法 0: 任务不存在 1: 任务正在进行中 2: 任务完成但还没有交 3: 任务已完成
@@ -128,6 +129,7 @@ local function GetTaskState(me, dwQuestID, dwNpcTemplateID)
 	-- if eCanAccept == QUEST_RESULT.FAILED then
 	-- 	return TASK_STATE.UNACCEPTABLE
 	-- end
+	return TASK_STATE.UNKNOWN
 end
 
 local EXCEL_WIDTH = 960
@@ -399,10 +401,12 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 				szState = _L['Finished']
 			elseif tTaskState[TASK_STATE.UNACCEPTABLE] then
 				szState = _L['Unacceptable']
+			elseif tTaskState[TASK_STATE.UNKNOWN] then
+				szState = _L['Unknown']
 			else
 				szState = _L['None']
 			end
-			return GetFormatText(szState or _L['Unknown'], nil, r, g, b, 786, 'this.id="' .. id .. '"', 'Text_QuestState')
+			return GetFormatText(szState, nil, r, g, b, 786, 'this.id="' .. id .. '"', 'Text_QuestState')
 		end
 		col.GetFormatTip = function(rec)
 			local aXml = {}
