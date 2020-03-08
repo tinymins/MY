@@ -82,6 +82,7 @@ local O = {
 		'picking_fairy_grass', -- 采仙草
 		'find_dragon_veins', -- 寻龙脉
 		'illustration_routine', -- 美人图
+		'sneak_routine', -- 美人图潜行
 		'exam_sheng', -- 省试
 		'exam_hui', -- 会试
 		'time_days',
@@ -139,7 +140,7 @@ local function GetTaskState(me, dwQuestID, dwNpcTemplateID)
 end
 
 local EXCEL_WIDTH = 960
-local TASK_WIDTH = 43
+local TASK_WIDTH = 40
 local function GeneCommonFormatText(id)
 	return function(r)
 		return GetFormatText(r[id])
@@ -336,6 +337,12 @@ local function InitTaskList(bReload)
 		id = 'illustration_routine',
 		szTitle = _L['Illustration routine'],
 		aQuestInfo = CONSTANT.QUEST_INFO.ILLUSTRATION_ROUTINE,
+	})
+	-- 美人图潜行
+	insert(aTask, {
+		id = 'sneak_routine',
+		szTitle = _L['Sneak routine'],
+		aQuestInfo = CONSTANT.QUEST_INFO.SNEAK_ROUTINE,
 	})
 	-- 省试
 	insert(aTask, {
