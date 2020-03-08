@@ -993,7 +993,9 @@ function D.OnItemMouseEnter()
 			local x, y = this:GetAbsPos()
 			local w, h = this:GetSize()
 			local szXml = col.GetFormatTip(rec)
-			OutputTip(szXml, 450, {x, y, w, h}, UI.TIP_POSITION.TOP_BOTTOM)
+			if not IsEmpty(szXml) then
+				OutputTip(szXml, 450, {x, y, w, h}, UI.TIP_POSITION.TOP_BOTTOM)
+			end
 		end
 	elseif this.tip then
 		local x, y = this:GetAbsPos()
