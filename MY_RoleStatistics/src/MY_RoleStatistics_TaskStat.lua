@@ -59,8 +59,8 @@ DB:Execute('CREATE TABLE IF NOT EXISTS Task (guid NVARCHAR(20), name NVARCHAR(25
 local DB_TaskW = DB:Prepare('REPLACE INTO Task (guid, name, tasksid) VALUES (?, ?, ?)')
 local DB_TaskR = DB:Prepare('SELECT * FROM Task')
 local DB_TaskD = DB:Prepare('DELETE FROM TaskInfo WHERE guid = ?')
-DB:Execute('CREATE TABLE IF NOT EXISTS TaskInfo (guid NVARCHAR(20), account NVARCHAR(255), region NVARCHAR(20), server NVARCHAR(20), name NVARCHAR(20), force INTEGER, camp INTEGER, level INTEGER, task_info NVARCHAR(65535), time INTEGER, PRIMARY KEY(guid))')
-local DB_TaskInfoW = DB:Prepare('REPLACE INTO TaskInfo (guid, account, region, server, name, force, camp, level, task_info, time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+DB:Execute('CREATE TABLE IF NOT EXISTS TaskInfo (guid NVARCHAR(20), account NVARCHAR(255), region NVARCHAR(20), server NVARCHAR(20), name NVARCHAR(20), force INTEGER, camp INTEGER, level INTEGER, task_info NVARCHAR(65535), buff_info NVARCHAR(65535), time INTEGER, PRIMARY KEY(guid))')
+local DB_TaskInfoW = DB:Prepare('REPLACE INTO TaskInfo (guid, account, region, server, name, force, camp, level, task_info, buff_info, time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
 local DB_TaskInfoR = DB:Prepare('SELECT * FROM TaskInfo WHERE account LIKE ? OR name LIKE ? OR region LIKE ? OR server LIKE ? ORDER BY time DESC')
 local DB_TaskInfoD = DB:Prepare('DELETE FROM TaskInfo WHERE guid = ?')
 
@@ -119,6 +119,9 @@ local function GetTaskState(me, dwQuestID, dwNpcTemplateID)
 	local eCanAccept = me.CanAcceptQuest(dwQuestID, dwNpcTemplateID)
 	if eCanAccept == QUEST_RESULT.SUCCESS then
 		return TASK_STATE.ACCEPTABLE
+	end
+	if eCanAccept == QUEST_RESULT.ALREADY_ACCEPTED then
+		return TASK_STATE.ACCEPTED
 	end
 	if eCanAccept == QUEST_RESULT.FINISHED_MAX_COUNT then
 		return TASK_STATE.FINISHED
@@ -406,6 +409,14 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 			if task.tForceQuestInfo and task.tForceQuestInfo[rec.force] then
 				CountTaskState(task.tForceQuestInfo[rec.force])
 			end
+			if task.aBuffInfo then
+				for _, aInfo in ipairs(task.aBuffInfo) do
+					local szKey = aInfo[1] .. '_' .. (aInfo[2] or 0)
+					if rec.buff_info[szKey] then
+						tTaskState[rec.buff_info[szKey]] = (tTaskState[rec.buff_info[szKey]] or 0) + 1
+					end
+				end
+			end
 			local szState, r, g, b
 			if tTaskState[TASK_STATE.FINISHABLE] then
 				szState = _L['Finishable']
@@ -536,6 +547,7 @@ function D.FlushDB()
 	local level = me.nLevel
 	local time = GetCurrentTime()
 	local tTaskState = {}
+	local tBuffState = {}
 	for _, id in ipairs(O.aColumn) do
 		local task = TASK_HASH[id]
 		if task then
@@ -554,14 +566,26 @@ function D.FlushDB()
 					tTaskState[aInfo[1]] = GetTaskState(me, aInfo[1], aInfo[2])
 				end
 			end
+			if task.aBuffInfo then
+				for _, aInfo in ipairs(task.aBuffInfo) do
+					local nState = me.GetBuff(aInfo[1], aInfo[2] or 0)
+						and TASK_STATE.FINISHED
+						or TASK_STATE.UNKNOWN
+					if nState == TASK_STATE.FINISHED then
+						tBuffState[aInfo[1] .. '_0'] = TASK_STATE.FINISHED
+					end
+					tBuffState[aInfo[1] .. '_' .. (aInfo[2] or 0)] = nState
+				end
+			end
 		end
 	end
 	local task_info = EncodeLUAData(tTaskState)
+	local buff_info = EncodeLUAData(tBuffState)
 
 	DB:Execute('BEGIN TRANSACTION')
 
 	DB_TaskInfoW:ClearBindings()
-	DB_TaskInfoW:BindAll(guid, account, region, server, name, force, camp, level, task_info, time)
+	DB_TaskInfoW:BindAll(guid, account, region, server, name, force, camp, level, task_info, buff_info, time)
 	DB_TaskInfoW:Execute()
 
 	DB:Execute('END TRANSACTION')
@@ -627,6 +651,7 @@ function D.UpdateUI(page)
 
 	for _, p in ipairs(result) do
 		p.task_info = DecodeLUAData(p.task_info or '') or {}
+		p.buff_info = DecodeLUAData(p.buff_info or '') or {}
 	end
 
 	if Sorter then
