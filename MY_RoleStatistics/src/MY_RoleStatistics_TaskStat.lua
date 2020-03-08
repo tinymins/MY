@@ -82,6 +82,8 @@ local O = {
 		'picking_fairy_grass', -- 采仙草
 		'find_dragon_veins', -- 寻龙脉
 		'illustration_routine', -- 美人图
+		'exam_sheng', -- 省试
+		'exam_hui', -- 会试
 		'time_days',
 	},
 	szSort = 'time_days',
@@ -137,7 +139,7 @@ local function GetTaskState(me, dwQuestID, dwNpcTemplateID)
 end
 
 local EXCEL_WIDTH = 960
-local TASK_WIDTH = 50
+local TASK_WIDTH = 43
 local function GeneCommonFormatText(id)
 	return function(r)
 		return GetFormatText(r[id])
@@ -334,6 +336,18 @@ local function InitTaskList(bReload)
 		id = 'illustration_routine',
 		szTitle = _L['Illustration routine'],
 		aQuestInfo = CONSTANT.QUEST_INFO.ILLUSTRATION_ROUTINE,
+	})
+	-- 省试
+	insert(aTask, {
+		id = 'exam_sheng',
+		szTitle = _L['Exam sheng'],
+		aBuffInfo = CONSTANT.BUFF_INFO.EXAM_SHENG,
+	})
+	-- 会试
+	insert(aTask, {
+		id = 'exam_hui',
+		szTitle = _L['Exam hui'],
+		aBuffInfo = CONSTANT.BUFF_INFO.EXAM_HUI,
 	})
 	-- 用户自定义数据
 	DB_TaskR:ClearBindings()

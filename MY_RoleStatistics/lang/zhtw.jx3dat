@@ -109,4 +109,6 @@ return {
     ['Picking fairy grass'] = '採仙草',
     ['Find dragon veins'] = '尋龍脈',
     ['Illustration routine'] = '美人圖',
+    ['Exam sheng'] = '省試',
+    ['Exam hui'] = '會試',
 }
