@@ -169,6 +169,7 @@ local COLUMN_LIST = {
 			end
 			return GetFormatText(name)
 		end,
+		Compare = GeneCommonCompare('name'),
 	},
 	{ -- цееи
 		id = 'force',
@@ -439,18 +440,37 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 		end
 		col.Compare = function(r1, r2)
 			local k1, k2 = 0, 0
-			for _, aInfo in ipairs(task.aQuestInfo) do
-				if r1.task_info[aInfo[1]] == 1 then
-					k1 = k1 + 1
+			local tWeight = {
+				[TASK_STATE.FINISHABLE] = 10000,
+				[TASK_STATE.ACCEPTED] = 1000,
+				[TASK_STATE.ACCEPTABLE] = 100,
+				[TASK_STATE.UNACCEPTABLE] = 10,
+				[TASK_STATE.FINISHED] = 1,
+			}
+			if task.aQuestInfo then
+				for _, aInfo in ipairs(task.aQuestInfo) do
+					k1 = k1 + (r1.task_info[aInfo[1]] and tWeight[r1.task_info[aInfo[1]]] or 0)
+					k2 = k2 + (r2.task_info[aInfo[1]] and tWeight[r2.task_info[aInfo[1]]] or 0)
 				end
-				if r1.task_info[aInfo[1]] == 2 then
-					k1 = k1 + 10000
+			end
+			if task.tCampQuestInfo and task.tCampQuestInfo[r1.camp] then
+				for _, aInfo in ipairs(task.tCampQuestInfo[r1.camp]) do
+					k1 = k1 + (r1.task_info[aInfo[1]] and tWeight[r1.task_info[aInfo[1]]] or 0)
 				end
-				if r2.task_info[aInfo[1]] == 1 then
-					k2 = k2 + 1
+			end
+			if task.tCampQuestInfo and task.tCampQuestInfo[r2.camp] then
+				for _, aInfo in ipairs(task.tCampQuestInfo[r2.camp]) do
+					k2 = k2 + (r2.task_info[aInfo[1]] and tWeight[r2.task_info[aInfo[1]]] or 0)
 				end
-				if r2.task_info[aInfo[1]] == 2 then
-					k2 = k2 + 10000
+			end
+			if task.tForceQuestInfo and task.tForceQuestInfo[r1.force] then
+				for _, aInfo in ipairs(task.tForceQuestInfo[r1.force]) do
+					k1 = k1 + (r1.task_info[aInfo[1]] and tWeight[r1.task_info[aInfo[1]]] or 0)
+				end
+			end
+			if task.tForceQuestInfo and task.tForceQuestInfo[r2.force] then
+				for _, aInfo in ipairs(task.tForceQuestInfo[r2.force]) do
+					k2 = k2 + (r2.task_info[aInfo[1]] and tWeight[r2.task_info[aInfo[1]]] or 0)
 				end
 			end
 			if k1 == k2 then
