@@ -596,11 +596,11 @@ function LIB.GetDungeonRefreshTime(dwMapID)
 		if nMapType == MAP_TYPE.DUNGEON then
 			nMaxPlayerCount = nMaxPlayerCount1
 		end
-	elseif dwMapID == '5' then
+	elseif dwMapID == '5' or dwMapID == 'daily' then
 		nMaxPlayerCount = 5
-	elseif dwMapID == '10' then
+	elseif dwMapID == '10' or dwMapID == 'half_weekly' then
 		nMaxPlayerCount = 10
-	elseif dwMapID == '25' then
+	elseif dwMapID == '25' or dwMapID == 'weekly' then
 		nMaxPlayerCount = 25
 	end
 	if nMaxPlayerCount then
