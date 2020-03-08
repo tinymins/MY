@@ -118,6 +118,9 @@ local function GetTaskState(me, dwQuestID, dwNpcTemplateID)
 	if eCanAccept == QUEST_RESULT.SUCCESS then
 		return TASK_STATE.ACCEPTABLE
 	end
+	if eCanAccept == QUEST_RESULT.FAILED then
+		return TASK_STATE.UNACCEPTABLE
+	end
 	if eCanAccept == QUEST_RESULT.FINISHED_MAX_COUNT then
 		return TASK_STATE.FINISHED
 	end
