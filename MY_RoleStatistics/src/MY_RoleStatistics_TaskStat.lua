@@ -554,7 +554,6 @@ function D.UpdateUI(page)
 			hCol:Lookup('Image_TaskStat_Break'):Hide()
 		end
 		hCol.col = col
-		hCol.szSort = col.id
 		hCol:SetRelX(nX)
 		hCol:SetW(nWidth)
 		txt:SetW(nWidth)
@@ -767,12 +766,12 @@ end
 function D.OnItemLButtonClick()
 	local name = this:GetName()
 	if name == 'Handle_TaskStatColumn' then
-		if this.szSort then
+		if this.col.id then
 			local page = this:GetParent():GetParent():GetParent():GetParent():GetParent()
-			if O.szSort == this.szSort then
+			if O.szSort == this.col.id then
 				O.szSortOrder = O.szSortOrder == 'asc' and 'desc' or 'asc'
 			else
-				O.szSort = this.szSort
+				O.szSort = this.col.id
 			end
 			D.UpdateUI(page)
 		end
