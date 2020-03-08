@@ -74,6 +74,7 @@ local O = {
 		'public_routine', -- 公共日常
 		'stronghold_trade', -- 据点贸易
 		'camp_routine', -- 阵营日常
+		'crystal_scramble', -- 晶矿争夺
 		'dragon_gate_despair', -- 龙门绝境
 		'lexus_reality', -- 列星虚境
 		'lidu_ghost_town', -- 李渡鬼城
