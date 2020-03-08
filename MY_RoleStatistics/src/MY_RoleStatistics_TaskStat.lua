@@ -336,33 +336,35 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 			szTitle = task.szTitle,
 			nWidth = TASK_WIDTH,
 		}
-		local aTitleTipXml = {GetFormatText(task.szTitle .. '\n')}
-		local function InsertTitleTipXml(aInfo)
-			if IsCtrlKeyDown() then
-				insert(aTitleTipXml, GetFormatText('(' .. aInfo[1] .. ')', nil, 255, 128, 0))
+		col.GetTitleFormatTip = function()
+			local aTitleTipXml = {GetFormatText(task.szTitle .. '\n')}
+			local function InsertTitleTipXml(aInfo)
+				if IsCtrlKeyDown() then
+					insert(aTitleTipXml, GetFormatText('(' .. aInfo[1] .. ')', nil, 255, 128, 0))
+				end
+				insert(aTitleTipXml, GetFormatText('[' .. Table_GetQuestStringInfo(aInfo[1]).szName .. ']\n', nil, 255, 255, 0))
 			end
-			insert(aTitleTipXml, GetFormatText('[' .. Table_GetQuestStringInfo(aInfo[1]).szName .. ']\n', nil, 255, 255, 0))
-		end
-		if task.aQuestInfo then
-			for _, aInfo in ipairs(task.aQuestInfo) do
-				InsertTitleTipXml(aInfo)
-			end
-		end
-		if task.tCampQuestInfo then
-			for _, aCampQuestInfo in pairs(task.tCampQuestInfo) do
-				for _, aInfo in ipairs(aCampQuestInfo) do
+			if task.aQuestInfo then
+				for _, aInfo in ipairs(task.aQuestInfo) do
 					InsertTitleTipXml(aInfo)
 				end
 			end
-		end
-		if task.tForceQuestInfo then
-			for _, aForceQuestInfo in pairs(task.tForceQuestInfo) do
-				for _, aInfo in ipairs(aForceQuestInfo) do
-					InsertTitleTipXml(aInfo)
+			if task.tCampQuestInfo then
+				for _, aCampQuestInfo in pairs(task.tCampQuestInfo) do
+					for _, aInfo in ipairs(aCampQuestInfo) do
+						InsertTitleTipXml(aInfo)
+					end
 				end
 			end
+			if task.tForceQuestInfo then
+				for _, aForceQuestInfo in pairs(task.tForceQuestInfo) do
+					for _, aInfo in ipairs(aForceQuestInfo) do
+						InsertTitleTipXml(aInfo)
+					end
+				end
+			end
+			return concat(aTitleTipXml)
 		end
-		col.szTitleTipXml = concat(aTitleTipXml)
 		col.GetFormatText = function(rec)
 			local tTaskState = {}
 			local function CountTaskState(aQuestInfo)
@@ -551,9 +553,8 @@ function D.UpdateUI(page)
 		if i == 0 then
 			hCol:Lookup('Image_TaskStat_Break'):Hide()
 		end
+		hCol.col = col
 		hCol.szSort = col.id
-		hCol.szTip = col.szTitleTip
-		hCol.szTipXml = col.szTitleTipXml
 		hCol:SetRelX(nX)
 		hCol:SetW(nWidth)
 		txt:SetW(nWidth)
@@ -838,7 +839,9 @@ function D.OnItemMouseEnter()
 	elseif name == 'Handle_TaskStatColumn' then
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
-		local szXml = this.szTipXml or GetFormatText(this.szTip or this:Lookup('Text_TaskStat_Title'):GetText())
+		local szXml = this.col.GetTitleFormatTip
+			and this.col.GetTitleFormatTip()
+			or GetFormatText(this:Lookup('Text_TaskStat_Title'):GetText())
 		OutputTip(szXml, 450, {x, y, w, h}, UI.TIP_POSITION.TOP_BOTTOM)
 	elseif name == 'Text_QuestState' then
 		local id = this.id
