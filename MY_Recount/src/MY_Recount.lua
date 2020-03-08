@@ -380,11 +380,12 @@ function D.GetMenu()
 	-- 最大历史记录
 	local t1 = {
 		szOption = _L['max history'],
+		nMaxHeight = 500,
 		fnDisable = function()
 			return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
 		end,
 	}
-	for i = 1, 20 do
+	for i = 1, 50 do
 		insert(t1, {
 			szOption = i,
 			bCheck = true, bMCheck = true,

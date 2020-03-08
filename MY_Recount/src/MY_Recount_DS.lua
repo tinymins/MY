@@ -545,9 +545,7 @@ function D.SaveHistory()
 		end
 		LIB.SaveLUAData(szFilePath, saveData, DS_DATA_CONFIG)
 	end
-	if LIB.IsStreaming() then
-		D.LimitHistoryFile()
-	end
+	D.LimitHistoryFile()
 	UNSAVED_CACHE = {}
 end
 
