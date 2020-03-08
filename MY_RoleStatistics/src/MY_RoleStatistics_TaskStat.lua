@@ -335,27 +335,34 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 			id = id,
 			szTitle = task.szTitle,
 			nWidth = TASK_WIDTH,
-			szTitleTipXml = GetFormatText(task.szTitle .. '\n'),
 		}
+		local aTitleTipXml = {GetFormatText(task.szTitle .. '\n')}
+		local function InsertTitleTipXml(aInfo)
+			if IsCtrlKeyDown() then
+				insert(aTitleTipXml, GetFormatText('(' .. aInfo[1] .. ')', nil, 255, 128, 0))
+			end
+			insert(aTitleTipXml, GetFormatText('[' .. Table_GetQuestStringInfo(aInfo[1]).szName .. ']\n', nil, 255, 255, 0))
+		end
 		if task.aQuestInfo then
 			for _, aInfo in ipairs(task.aQuestInfo) do
-				col.szTitleTipXml = col.szTitleTipXml .. GetFormatText('[' .. Table_GetQuestStringInfo(aInfo[1]).szName .. ']\n', nil, 255, 255, 0)
+				InsertTitleTipXml(aInfo)
 			end
 		end
 		if task.tCampQuestInfo then
 			for _, aCampQuestInfo in pairs(task.tCampQuestInfo) do
 				for _, aInfo in ipairs(aCampQuestInfo) do
-					col.szTitleTipXml = col.szTitleTipXml .. GetFormatText('[' .. Table_GetQuestStringInfo(aInfo[1]).szName .. ']\n', nil, 255, 255, 0)
+					InsertTitleTipXml(aInfo)
 				end
 			end
 		end
 		if task.tForceQuestInfo then
 			for _, aForceQuestInfo in pairs(task.tForceQuestInfo) do
 				for _, aInfo in ipairs(aForceQuestInfo) do
-					col.szTitleTipXml = col.szTitleTipXml .. GetFormatText('[' .. Table_GetQuestStringInfo(aInfo[1]).szName .. ']\n', nil, 255, 255, 0)
+					InsertTitleTipXml(aInfo)
 				end
 			end
 		end
+		col.szTitleTipXml = concat(aTitleTipXml)
 		col.GetFormatText = function(rec)
 			local tTaskState = {}
 			local function CountTaskState(aQuestInfo)
@@ -385,12 +392,17 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 				szState = _L['Finished']
 			elseif tTaskState[TASK_STATE.UNACCEPTABLE] then
 				szState = _L['Unacceptable']
+			else
+				szState = _L['None']
 			end
 			return GetFormatText(szState or _L['Unknown'], nil, r, g, b, 786, 'this.id="' .. id .. '"', 'Text_QuestState')
 		end
 		col.GetFormatTip = function(rec)
 			local aXml = {}
 			local function InsertTaskState(aInfo)
+				if IsCtrlKeyDown() then
+					insert(aXml, GetFormatText('(' .. aInfo[1] .. ')', nil, 255, 128, 0))
+				end
 				insert(aXml, GetFormatText('[' .. Table_GetQuestStringInfo(aInfo[1]).szName .. ']: ', nil, 255, 255, 0))
 				if rec.task_info[aInfo[1]] == TASK_STATE.ACCEPTABLE then
 					insert(aXml, GetFormatText(_L['Acceptable'] .. '\n'))
