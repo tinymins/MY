@@ -88,7 +88,9 @@ return {
     ['Week routine: '] = '周常：',
 
     ['MY_RoleStatistics_TaskStat'] = '任务统计',
+    ['None'] = '无',
     ['Accepted'] = '已接',
+    ['Finishable'] = '可交',
     ['Finished'] = '完成',
     ['Unknown'] = '未知',
     ['Acceptable'] = '可接',
