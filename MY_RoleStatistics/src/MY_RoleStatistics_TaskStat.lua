@@ -55,8 +55,8 @@ if not DB then
 end
 local SZ_INI = PACKET_INFO.ROOT .. 'MY_RoleStatistics/ui/MY_RoleStatistics_TaskStat.ini'
 
-DB:Execute('CREATE TABLE IF NOT EXISTS Task (guid NVARCHAR(20), name NVARCHAR(255), tasksid NVARCHAR(2550), PRIMARY KEY(guid))')
-local DB_TaskW = DB:Prepare('REPLACE INTO Task (guid, name, tasksid) VALUES (?, ?, ?)')
+DB:Execute('CREATE TABLE IF NOT EXISTS Task (guid NVARCHAR(20), name NVARCHAR(255), task_info NVARCHAR(65535), PRIMARY KEY(guid))')
+local DB_TaskW = DB:Prepare('REPLACE INTO Task (guid, name, task_info) VALUES (?, ?, ?)')
 local DB_TaskR = DB:Prepare('SELECT * FROM Task')
 local DB_TaskD = DB:Prepare('DELETE FROM TaskInfo WHERE guid = ?')
 DB:Execute('CREATE TABLE IF NOT EXISTS TaskInfo (guid NVARCHAR(20), account NVARCHAR(255), region NVARCHAR(20), server NVARCHAR(20), name NVARCHAR(20), force INTEGER, camp INTEGER, level INTEGER, task_info NVARCHAR(65535), buff_info NVARCHAR(65535), time INTEGER, PRIMARY KEY(guid))')
@@ -353,10 +353,16 @@ local function InitTaskList(bReload)
 	DB_TaskR:ClearBindings()
 	DB_TaskR:BindAll()
 	for _, v in ipairs(DB_TaskR:GetAll()) do
+		local tTaskInfo = DecodeLUAData(v.task_info) or {}
 		insert(aTask, {
 			id = v.guid,
 			szTitle = v.name,
-			aQuestInfo = DecodeLUAData(v.tasksid) or {},
+			aQuestInfo = tTaskInfo.quests,
+			tCampQuestInfo = tTaskInfo.camp_quests,
+			tForceQuestInfo = tTaskInfo.force_quests,
+			aBuffInfo = tTaskInfo.buffs,
+			tCampBuffInfo = tTaskInfo.camp_buffs,
+			tForceBuffInfo = tTaskInfo.force_buffs,
 		})
 	end
 	TASK_LIST = aTask
