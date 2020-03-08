@@ -100,7 +100,6 @@ return {
     ['Teahouse'] = '茶館',
     ['Force routine'] = '勤修不輟',
     ['Public routine'] = '公共日常',
-    ['Camp routine'] = '陣營日常',
     ['Stronghold trade'] = '據點貿易',
     ['Crystal scramble'] = '晶礦爭奪',
     ['Dragon gate despair'] = '龍門絕境',

@@ -71,13 +71,12 @@ local O = {
 		'force',
 		'big_war', -- 大战
 		'teahouse', -- 茶馆
-		'public_routine', -- 公共日常
-		'stronghold_trade', -- 据点贸易
-		'camp_routine', -- 阵营日常
 		'crystal_scramble', -- 晶矿争夺
+		'stronghold_trade', -- 据点贸易
 		'dragon_gate_despair', -- 龙门绝境
 		'lexus_reality', -- 列星虚境
 		'lidu_ghost_town', -- 李渡鬼城
+		'public_routine', -- 公共日常
 		'force_routine', -- 勤修不辍
 		'picking_fairy_grass', -- 采仙草
 		'find_dragon_veins', -- 寻龙脉
@@ -140,7 +139,7 @@ local function GetTaskState(me, dwQuestID, dwNpcTemplateID)
 end
 
 local EXCEL_WIDTH = 960
-local TASK_WIDTH = 40
+local TASK_WIDTH = 45
 local function GeneCommonFormatText(id)
 	return function(r)
 		return GetFormatText(r[id])
@@ -174,7 +173,7 @@ local COLUMN_LIST = {
 	{ -- 名字
 		id = 'name',
 		szTitle = _L['Name'],
-		nWidth = 130,
+		nWidth = 110,
 		GetFormatText = function(rec)
 			local name = rec.name
 			if MY_ChatMosaics and MY_ChatMosaics.MosaicsString then
@@ -278,29 +277,17 @@ local function InitTaskList(bReload)
 		szTitle = _L['Force routine'],
 		tForceQuestInfo = CONSTANT.QUEST_INFO.FORCE_ROUTINE,
 	})
-	-- 公共日常
+	-- 晶矿争夺
 	insert(aTask, {
-		id = 'public_routine',
-		szTitle = _L['Public routine'],
-		aQuestInfo = CONSTANT.QUEST_INFO.PUBLIC_ROUTINE,
-	})
-	-- 阵营日常
-	insert(aTask, {
-		id = 'camp_routine',
-		szTitle = _L['Camp routine'],
-		tCampQuestInfo = CONSTANT.QUEST_INFO.CAMP_ROUTINE,
+		id = 'crystal_scramble',
+		szTitle = _L['Crystal scramble'],
+		tCampQuestInfo = CONSTANT.QUEST_INFO.CAMP_CRYSTAL_SCRAMBLE,
 	})
 	-- 据点贸易
 	insert(aTask, {
 		id = 'stronghold_trade',
 		szTitle = _L['Stronghold trade'],
 		tCampQuestInfo = CONSTANT.QUEST_INFO.CAMP_STRONGHOLD_TRADE,
-	})
-	-- 晶矿争夺
-	insert(aTask, {
-		id = 'crystal_scramble',
-		szTitle = _L['Crystal scramble'],
-		tCampQuestInfo = CONSTANT.QUEST_INFO.CAMP_CRYSTAL_SCRAMBLE,
 	})
 	-- 龙门绝境
 	insert(aTask, {
@@ -319,6 +306,12 @@ local function InitTaskList(bReload)
 		id = 'lidu_ghost_town',
 		szTitle = _L['Lidu ghost town'],
 		aQuestInfo = CONSTANT.QUEST_INFO.LIDU_GHOST_TOWN,
+	})
+	-- 公共日常
+	insert(aTask, {
+		id = 'public_routine',
+		szTitle = _L['Public routine'],
+		aQuestInfo = CONSTANT.QUEST_INFO.PUBLIC_ROUTINE,
 	})
 	-- 采仙草
 	insert(aTask, {
