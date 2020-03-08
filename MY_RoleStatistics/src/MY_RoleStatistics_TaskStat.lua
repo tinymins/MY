@@ -439,7 +439,7 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 			elseif tTaskState[TASK_STATE.ACCEPTABLE] then
 				szState = _L['Acceptable']
 			elseif tTaskState[TASK_STATE.FINISHED] then
-				szState = _L['Finished']
+				szState, r, g, b = _L['Finished'], 128, 255, 128
 			elseif tTaskState[TASK_STATE.UNACCEPTABLE] then
 				szState = _L['Unacceptable']
 			elseif tTaskState[TASK_STATE.UNKNOWN] then
