@@ -264,7 +264,7 @@ function D.OnAutoDoodad()
 				if bIntr then
 					D.dwOpenID = k
 				end
-			elseif v.craft or v.other or doodad.HaveQuest(me.dwID) then -- 任务和普通道具尝试 5 次
+			elseif v.craft or doodad.HaveQuest(me.dwID) then -- 任务和普通道具尝试 5 次
 				bIntr = (not me.bFightState or O.bInteractEvenFight) and not me.bOnHorse and IsAutoInteract()
 				-- 宴席只能吃队友的
 				if doodad.dwOwnerID ~= 0 and IsPlayer(doodad.dwOwnerID) and not LIB.IsParty(doodad.dwOwnerID) then
