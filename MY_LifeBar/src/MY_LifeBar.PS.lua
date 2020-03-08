@@ -414,7 +414,7 @@ function PS.OnPanelActive(wnd)
 					cfg.DifferentiateForce = false
 				end,
 				rgb = cfg[tartype],
-				fnChangeColor = function(r, g, b)
+				fnChangeColor = function(_, r, g, b)
 					cfg[tartype] = {r, g, b}
 					opt.rgb = cfg[tartype]
 				end,
@@ -432,7 +432,7 @@ function PS.OnPanelActive(wnd)
 				table.insert(opt, {
 					szOption = szForceTitle,
 					rgb = cfg[dwForceID],
-					fnChangeColor = function(r, g, b)
+					fnChangeColor = function(_, r, g, b)
 						cfg[dwForceID] = { r, g, b }
 					end,
 					fnDisable = function()

@@ -675,7 +675,7 @@ function D.OnItemLButtonClick()
 			if not wnd or not wnd:IsValid() then
 				return
 			end
-			if wnd.menu.fnChangeColor(r, g, b) ~= 0 then
+			if wnd.menu.fnChangeColor(wnd.menu.UserData, r, g, b) ~= 0 then
 				wnd.menu.rgb = { r = r, g = g, b = b }
 			end
 			frame.bColorPicker = nil
