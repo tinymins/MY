@@ -127,6 +127,9 @@ function D.SetDS(frame, menu)
 	if menu.szLayer then
 		frame:ChangeRelation(menu.szLayer)
 	end
+	if not Station.IsVisible() then
+		frame:ShowWhenUIHide()
+	end
 	D.CalcDisable(menu)
 	D.UpdateUI(frame)
 end
