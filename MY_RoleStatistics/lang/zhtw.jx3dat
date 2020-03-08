@@ -111,4 +111,10 @@ return {
     ['Sneak routine'] = '潛行美人圖',
     ['Exam sheng'] = '省試',
     ['Exam hui'] = '會試',
+
+    ['Refresh type:'] = '刷新：',
+    ['Daily'] = '日常',
+    ['Weekly'] = '周常',
+    ['Half-weekly'] = '半周常',
+    ['Onece'] = '一次性',
 }

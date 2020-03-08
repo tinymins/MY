@@ -93,6 +93,33 @@ RegisterCustomData('Global/MY_RoleStatistics_TaskStat.aColumn')
 RegisterCustomData('Global/MY_RoleStatistics_TaskStat.szSort')
 RegisterCustomData('Global/MY_RoleStatistics_TaskStat.szSortOrder')
 
+local TASK_TYPE = {
+	DAILY = 1,
+	WEEKLY = 2,
+	HALF_WEEKLY = 3,
+	ONECE = 4,
+}
+local TASK_TYPE_STRING = {
+	[TASK_TYPE.DAILY] = _L['Daily'],
+	[TASK_TYPE.WEEKLY] = _L['Weekly'],
+	[TASK_TYPE.HALF_WEEKLY] = _L['Half-weekly'],
+	[TASK_TYPE.ONECE] = _L['Onece'],
+}
+local function IsInSamePeriod(dwTime, eType)
+	if eType == TASK_TYPE.ONECE then
+		return true
+	end
+	local nNextTime, nCircle
+	if eType == TASK_TYPE.DAILY then
+		nNextTime, nCircle = LIB.GetDungeonRefreshTime('daily')
+	elseif eType == TASK_TYPE.WEEKLY then
+		nNextTime, nCircle = LIB.GetDungeonRefreshTime('weekly')
+	elseif eType == TASK_TYPE.HALF_WEEKLY then
+		nNextTime, nCircle = LIB.GetDungeonRefreshTime('half_weekly')
+	end
+	return dwTime >= nNextTime - nCircle
+end
+
 local TASK_STATE = {
 	ACCEPTABLE = 1,
 	ACCEPTED = 2,
@@ -263,90 +290,105 @@ local function InitTaskList(bReload)
 	insert(aTask, {
 		id = 'big_war',
 		szTitle = _L['Big war'],
+		eType = TASK_TYPE.DAILY,
 		aQuestInfo = CONSTANT.QUEST_INFO.BIG_WARS,
 	})
 	-- 茶馆
 	insert(aTask, {
 		id = 'teahouse',
 		szTitle = _L['Teahouse'],
+		eType = TASK_TYPE.DAILY,
 		aQuestInfo = CONSTANT.QUEST_INFO.TEAHOUSE_ROUTINE,
 	})
 	-- 勤修不辍
 	insert(aTask, {
 		id = 'force_routine',
 		szTitle = _L['Force routine'],
+		eType = TASK_TYPE.DAILY,
 		tForceQuestInfo = CONSTANT.QUEST_INFO.FORCE_ROUTINE,
 	})
 	-- 晶矿争夺
 	insert(aTask, {
 		id = 'crystal_scramble',
 		szTitle = _L['Crystal scramble'],
+		eType = TASK_TYPE.DAILY,
 		tCampQuestInfo = CONSTANT.QUEST_INFO.CAMP_CRYSTAL_SCRAMBLE,
 	})
 	-- 据点贸易
 	insert(aTask, {
 		id = 'stronghold_trade',
 		szTitle = _L['Stronghold trade'],
+		eType = TASK_TYPE.DAILY,
 		tCampQuestInfo = CONSTANT.QUEST_INFO.CAMP_STRONGHOLD_TRADE,
 	})
 	-- 龙门绝境
 	insert(aTask, {
 		id = 'dragon_gate_despair',
 		szTitle = _L['Dragon gate despair'],
+		eType = TASK_TYPE.DAILY,
 		aQuestInfo = CONSTANT.QUEST_INFO.DRAGON_GATE_DESPAIR,
 	})
 	-- 列星虚境
 	insert(aTask, {
 		id = 'lexus_reality',
 		szTitle = _L['Lexus reality'],
+		eType = TASK_TYPE.DAILY,
 		aQuestInfo = CONSTANT.QUEST_INFO.LEXUS_REALITY,
 	})
 	-- 李渡鬼城
 	insert(aTask, {
 		id = 'lidu_ghost_town',
 		szTitle = _L['Lidu ghost town'],
+		eType = TASK_TYPE.DAILY,
 		aQuestInfo = CONSTANT.QUEST_INFO.LIDU_GHOST_TOWN,
 	})
 	-- 公共日常
 	insert(aTask, {
 		id = 'public_routine',
 		szTitle = _L['Public routine'],
+		eType = TASK_TYPE.DAILY,
 		aQuestInfo = CONSTANT.QUEST_INFO.PUBLIC_ROUTINE,
 	})
 	-- 采仙草
 	insert(aTask, {
 		id = 'picking_fairy_grass',
 		szTitle = _L['Picking fairy grass'],
+		eType = TASK_TYPE.DAILY,
 		aQuestInfo = CONSTANT.QUEST_INFO.PICKING_FAIRY_GRASS,
 	})
 	-- 寻龙脉
 	insert(aTask, {
 		id = 'find_dragon_veins',
 		szTitle = _L['Find dragon veins'],
+		eType = TASK_TYPE.DAILY,
 		aQuestInfo = CONSTANT.QUEST_INFO.FIND_DRAGON_VEINS,
 	})
 	-- 美人图
 	insert(aTask, {
 		id = 'illustration_routine',
 		szTitle = _L['Illustration routine'],
+		eType = TASK_TYPE.DAILY,
 		aQuestInfo = CONSTANT.QUEST_INFO.ILLUSTRATION_ROUTINE,
 	})
 	-- 美人图潜行
 	insert(aTask, {
 		id = 'sneak_routine',
 		szTitle = _L['Sneak routine'],
+		eType = TASK_TYPE.DAILY,
 		aQuestInfo = CONSTANT.QUEST_INFO.SNEAK_ROUTINE,
 	})
 	-- 省试
 	insert(aTask, {
 		id = 'exam_sheng',
 		szTitle = _L['Exam sheng'],
+		eType = TASK_TYPE.WEEKLY,
 		aBuffInfo = CONSTANT.BUFF_INFO.EXAM_SHENG,
 	})
 	-- 会试
 	insert(aTask, {
 		id = 'exam_hui',
 		szTitle = _L['Exam hui'],
+		eType = TASK_TYPE.WEEKLY,
 		aBuffInfo = CONSTANT.BUFF_INFO.EXAM_HUI,
 	})
 	-- 用户自定义数据
@@ -357,6 +399,7 @@ local function InitTaskList(bReload)
 		insert(aTask, {
 			id = v.guid,
 			szTitle = v.name,
+			eType = tTaskInfo.type or TASK_TYPE.DAILY,
 			aQuestInfo = tTaskInfo.quests,
 			tCampQuestInfo = tTaskInfo.camp_quests,
 			tForceQuestInfo = tTaskInfo.force_quests,
@@ -383,7 +426,10 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 			nWidth = TASK_WIDTH,
 		}
 		col.GetTitleFormatTip = function()
-			local aTitleTipXml = {GetFormatText(task.szTitle .. '\n')}
+			local aTitleTipXml = {
+				GetFormatText(task.szTitle .. '\n'),
+				GetFormatText(_L['Refresh type:'] .. TASK_TYPE_STRING[task.eType] .. '\n', nil, 255, 128, 0)
+			}
 			local function InsertTitleTipXml(aInfo)
 				if IsCtrlKeyDown() then
 					insert(aTitleTipXml, GetFormatText('(' .. aInfo[1] .. ')', nil, 255, 128, 0))
@@ -438,7 +484,9 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 				end
 			end
 			local szState, r, g, b
-			if tTaskState[TASK_STATE.FINISHABLE] then
+			if not IsInSamePeriod(rec.time, task.eType) then
+				szState = _L['Unknown']
+			elseif tTaskState[TASK_STATE.FINISHABLE] then
 				szState = _L['Finishable']
 			elseif tTaskState[TASK_STATE.ACCEPTED] then
 				szState = _L['Accepted']
@@ -527,6 +575,12 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 				for _, aInfo in ipairs(task.tForceQuestInfo[r2.force]) do
 					k2 = k2 + (r2.task_info[aInfo[1]] and tWeight[r2.task_info[aInfo[1]]] or 0)
 				end
+			end
+			if not IsInSamePeriod(r1.time, task.eType) then
+				k1 = 0
+			end
+			if not IsInSamePeriod(r2.time, task.eType) then
+				k2 = 0
 			end
 			if k1 == k2 then
 				return 0
