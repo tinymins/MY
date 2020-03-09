@@ -95,7 +95,9 @@ local COMBAT_TEXT_STRING = { -- 需要变成特定字符串的伤害类型
 }
 local COMBAT_TEXT_COLOR = { --不需要修改的内定颜色
 	YELLOW = { 255, 255, 0   },
-	RED    = { 255, 0,   0   },
+	RED    = LIB.IsStreaming()
+		and { 253, 86, 86 }
+		or { 255, 0, 0 },
 	PURPLE = { 255, 0,   255 },
 	WHITE  = { 255, 255, 255 }
 }
@@ -218,7 +220,7 @@ MY_CombatText = {
 	bCritical    = false,
 	tCriticalC   = { 255, 255, 255 },
 	tCriticalH   = { 0,   255, 0   },
-	tCriticalB   = { 255, 0,   0   },
+	tCriticalB   = LIB.IsStreaming() and { 253, 86, 86 } or { 255, 0, 0 },
 	-- $name 名字 $sn   技能名 $crit 会心 $val  数值
 	szSkill      = '$sn' .. g_tStrings.STR_COLON .. '$crit $val',
 	szTherapy    = '$sn' .. g_tStrings.STR_COLON .. '$crit +$val',
@@ -227,7 +229,7 @@ MY_CombatText = {
 	bSnShorten2  = false,
 	bTherEffOnly = false,
 	col = { -- 颜色呗
-		['DAMAGE']                               = { 255, 0,   0   }, -- 自己受到的伤害
+		['DAMAGE']                               = LIB.IsStreaming() and { 253, 86, 86 } or { 255, 0, 0 }, -- 自己受到的伤害
 		[SKILL_RESULT_TYPE.THERAPY]              = { 0,   255, 0   }, -- 治疗
 		[SKILL_RESULT_TYPE.PHYSICS_DAMAGE]       = { 255, 255, 255 }, -- 外公
 		[SKILL_RESULT_TYPE.SOLAR_MAGIC_DAMAGE]   = { 255, 128, 128 }, -- 阳

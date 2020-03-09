@@ -994,11 +994,11 @@ local CONSTANT = setmetatable({}, {
 			[FORCE_TYPE.CANG_JIAN] = { 214, 249,  93 }, -- ≤ÿΩ£
 			[FORCE_TYPE.GAI_BANG ] = { 205, 133,  63 }, -- ÿ§∞Ô
 			[FORCE_TYPE.MING_JIAO] = { 240,  70,  96 }, -- √˜ΩÃ
-			[FORCE_TYPE.CANG_YUN ] = { 180,  60,   0 }, -- ≤‘‘∆
+			[FORCE_TYPE.CANG_YUN ] = IsStreaming() and { 255, 143, 80 } or { 180, 60, 0 }, -- ≤‘‘∆
 			[FORCE_TYPE.CHANG_GE ] = { 100, 250, 180 }, -- ≥§∏Ë
 			[FORCE_TYPE.BA_DAO   ] = { 106, 108, 189 }, -- ∞‘µ∂
 			[FORCE_TYPE.PENG_LAI ] = { 171, 227, 250 }, -- ≈Ó¿≥
-			[FORCE_TYPE.LING_XUE ] = { 161,   9,  34 }, -- ¡Ë—©
+			[FORCE_TYPE.LING_XUE ] = IsStreaming() and { 253, 86, 86 } or { 161,   9,  34 }, -- ¡Ë—©
 		}, {
 			__index = function(t, k)
 				return { 225, 225, 225 }
@@ -1031,7 +1031,7 @@ local CONSTANT = setmetatable({}, {
 		CAMP_COLOR_FG_DEFAULT = setmetatable({
 			[CAMP.NEUTRAL] = { 255, 255, 255 }, -- ÷–¡¢
 			[CAMP.GOOD   ] = {  60, 128, 220 }, -- ∫∆∆¯√À
-			[CAMP.EVIL   ] = { 160,  30,  30 }, -- ∂Ò»Àπ»
+			[CAMP.EVIL   ] = IsStreaming() and { 255, 63, 63 } or { 160, 30, 30 }, -- ∂Ò»Àπ»
 		}, {
 			__index = function(t, k)
 				return { 225, 225, 225 }
