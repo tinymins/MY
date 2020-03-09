@@ -78,6 +78,7 @@ local O = {
 		'lidu_ghost_town', -- 李渡鬼城
 		'public_routine', -- 公共日常
 		'force_routine', -- 勤修不辍
+		'rookie_routine', -- 浪客行
 		'picking_fairy_grass', -- 采仙草
 		'find_dragon_veins', -- 寻龙脉
 		'illustration_routine', -- 美人图
@@ -166,7 +167,7 @@ local function GetTaskState(me, dwQuestID, dwNpcTemplateID)
 end
 
 local EXCEL_WIDTH = 960
-local TASK_WIDTH = 45
+local TASK_WIDTH = 42
 local function GeneCommonFormatText(id)
 	return function(r)
 		return GetFormatText(r[id])
@@ -306,6 +307,13 @@ local function InitTaskList(bReload)
 		szTitle = _L['Force routine'],
 		eType = TASK_TYPE.DAILY,
 		tForceQuestInfo = CONSTANT.QUEST_INFO.FORCE_ROUTINE,
+	})
+	-- 浪客行
+	insert(aTask, {
+		id = 'rookie_routine',
+		szTitle = _L['Rookie routine'],
+		eType = TASK_TYPE.WEEKLY,
+		aQuestInfo = CONSTANT.QUEST_INFO.ROOKIE_ROUTINE,
 	})
 	-- 晶矿争夺
 	insert(aTask, {

@@ -1086,6 +1086,7 @@ local CONSTANT = setmetatable({}, {
 			PUBLIC_ROUTINE = {
 				{14831, 869}, -- 江湖道远侠义天下
 			},
+			ROOKIE_ROUTINE = {{21433, 67083}},
 			CAMP_CRYSTAL_SCRAMBLE = {
 				[CAMP.GOOD] = {
 					-- {14727, 46968}, -- 戈壁晶矿引烽烟

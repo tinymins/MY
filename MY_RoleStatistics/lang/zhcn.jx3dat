@@ -99,6 +99,7 @@ return {
     ['Big war'] = '大战',
     ['Teahouse'] = '茶馆',
     ['Force routine'] = '勤修不辍',
+    ['Rookie routine'] = '浪客行',
     ['Public routine'] = '公共日常',
     ['Stronghold trade'] = '据点贸易',
     ['Crystal scramble'] = '晶矿争夺',
