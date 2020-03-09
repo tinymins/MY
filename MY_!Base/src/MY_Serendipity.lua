@@ -127,6 +127,7 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTi
 	local szKey = szName .. '_' .. szSerendipity .. '_' .. dwTime
 	local szNameU = AnsiToUTF8(szName)
 	local szNameCRC = ('%x%x%x'):format(szNameU:byte(), GetStringCRC(szNameU), szNameU:byte(-1))
+	local bSelf = szName == LIB.GetClientInfo().szName
 	local function fnAction(szReporter)
 		if szReporter == '' and nMethod ~= 1 then
 			szName = ''
@@ -148,6 +149,7 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTi
 						n = szName, N = szNameCRC, R = szReporter,
 						S = LIB.GetRealServer(1), s = LIB.GetRealServer(2),
 						a = szSerendipity, f = nStatus, t = dwTime,
+						c = bSelf and 1 or 0,
 					})),
 					success = function()
 						--[[#DEBUG BEGIN]]
