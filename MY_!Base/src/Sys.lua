@@ -992,7 +992,7 @@ LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '#STORAGE_DATA', 200, function()
 	LIB.Ajax({
 		method = 'post',
 		payload = 'json',
-		url = 'http://storage.jx3.derzh.com/api/storage',
+		url = 'http://storage.j3cx.com/api/storage',
 		data = {
 			data = FormatStorageData(me),
 			lang = LIB.GetLang(),
@@ -1048,7 +1048,7 @@ function LIB.StorageData(szKey, oData)
 		LIB.Ajax({
 			method = 'post',
 			payload = 'json',
-			url = 'http://storage.jx3.derzh.com/api/storage',
+			url = 'http://storage.j3cx.com/api/storage',
 			data = {
 				data = FormatStorageData(me, { k = szKey, o = oData }),
 				lang = LIB.GetLang(),
