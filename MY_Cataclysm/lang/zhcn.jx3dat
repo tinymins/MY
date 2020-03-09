@@ -129,7 +129,7 @@ return {
 	['Right'] = '右',
 	['Show Decimal'] = '显示小数',
 	['Over mana bar'] = '遮挡内力',
-	['[%s] got buff [%s]x%d, remaining %ds.'] = '[%s]获得气劲[%s]x%d，剩余持续时间%d秒。',
+	['[%s] got buff [%s]x%d, remaining %ds.'] = '[%s]获得气劲【%s】x%d，剩余持续时间%d秒。',
 	['Edit buff'] = '团队BUFF监控',
 	['Name or id'] = 'ID/名称',
 	['Level'] = '等级',
