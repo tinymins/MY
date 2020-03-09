@@ -73,9 +73,9 @@ local O = {
 	},
 	szSort = 'time_days',
 	szSortOrder = 'desc',
-	bFirstCopy = true, -- 第一次请求 CD
 	tMapSaveCopy = {}, -- 单副本 CD
 	tMapProgress = {}, -- 单BOSS CD
+	bMapProgressApplied = false, -- 是否请求过副本进度
 }
 RegisterCustomData('Global/MY_RoleStatistics_DungeonStat.aColumn')
 RegisterCustomData('Global/MY_RoleStatistics_DungeonStat.szSort')
@@ -319,10 +319,7 @@ local TIP_COLIMN = {
 }
 
 function D.FlushDB(bForceUpdate)
-	if bForceUpdate or O.bFirstCopy then
-		D.UpdateMapCopy()
-		O.bFirstCopy = false
-	end
+	D.UpdateMapProgress(bForceUpdate)
 	--[[#DEBUG BEGIN]]
 	LIB.Debug('MY_RoleStatistics_DungeonStat', 'Flushing to database...', DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
@@ -470,7 +467,15 @@ function D.OnGetMapSaveCopyResopnse(tMapCopy)
 	O.tMapSaveCopy = tMapCopy
 end
 
-function D.UpdateMapCopy()
+function D.UpdateMapProgress(bForceUpdate)
+	-- 如果不是强制刷新副本进度并且已经请求过，则不再重复发起
+	if not bForceUpdate and O.bMapProgressApplied then
+		return
+	end
+	local me = GetClientPlayer()
+	if not me then -- 确保不可能在切换GS时请求
+		return
+	end
 	for _, col in ipairs(D.GetColumns()) do
 		local szID = wfind(col.id, 'dungeon_') and wgsub(col.id, 'dungeon_', '')
 		local dwID = szID and tonumber(szID)
@@ -484,6 +489,7 @@ function D.UpdateMapCopy()
 			O.tMapProgress[dwID] = aProgress
 		end
 	end
+	O.bMapProgressApplied = true
 	LIB.GetMapSaveCopy(D.OnGetMapSaveCopyResopnse)
 end
 
@@ -492,7 +498,7 @@ LIB.RegisterEvent('SYNC_LOOT_LIST.MY_RoleStatistics_DungeonStat__UpdateMapCopy',
 	if not LIB.IsInDungeon() then
 		return
 	end
-	LIB.DelayCall('MY_RoleStatistics_DungeonStat__UpdateMapCopy', 300, D.UpdateMapCopy)
+	LIB.DelayCall('MY_RoleStatistics_DungeonStat__UpdateMapCopy', 300, function() D.UpdateMapProgress() end)
 end)
 
 function D.OnInitPage()
