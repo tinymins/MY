@@ -72,6 +72,7 @@ local O = {
 	szSign = '', -- 情缘宣言（个性签名）
 	bAutoFocus = true, -- 自动焦点
 	bHookPlayerView = false, -- 在查看装备界面上显示情缘
+	bAutoReplyLover = true, -- 无需确认即可查看我的情缘
 	-- 导出常量
 	nLoveAttraction = 200,
 	nDoubleLoveAttraction = 800,
@@ -123,6 +124,7 @@ RegisterCustomData('MY_Love.szJabber')
 RegisterCustomData('MY_Love.szSign')
 RegisterCustomData('MY_Love.bAutoFocus')
 RegisterCustomData('MY_Love.bHookPlayerView')
+RegisterCustomData('MY_Love.bAutoReplyLover')
 
 --[[
 剑侠情缘
@@ -656,7 +658,7 @@ local function OnBgTalk(_, aData, nChannel, dwTalkerID, szTalkerName, bSelf)
 		end
 		local szKey, data = aData[1], aData[2]
 		if szKey == 'VIEW' then
-			if LIB.IsParty(dwTalkerID) or data == 'Author' then
+			if LIB.IsParty(dwTalkerID) or data == 'Author' or O.bAutoReplyLover then
 				O.tViewer[dwTalkerID] = szTalkerName
 				D.ReplyLove()
 			elseif not GetClientPlayer().bFightState and not O.bQuiet then
@@ -867,6 +869,7 @@ local settings = {
 				szSign = true,
 				bAutoFocus = true,
 				bHookPlayerView = true,
+				bAutoReplyLover = true,
 				nLoveAttraction = true,
 				nDoubleLoveAttraction = true,
 			},
@@ -882,6 +885,7 @@ local settings = {
 				szSign = true,
 				bAutoFocus = true,
 				bHookPlayerView = true,
+				bAutoReplyLover = true,
 			},
 			triggers = {
 				bAutoFocus = function(_, bAutoFocus)

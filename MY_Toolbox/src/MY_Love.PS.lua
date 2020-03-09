@@ -230,6 +230,13 @@ function PS.OnPanelActive(wnd)
 		checked = MY_Love.bHookPlayerView,
 		oncheck = function(bChecked) MY_Love.bHookPlayerView = bChecked end,
 	}):AutoWidth()
+	nY = nY + 25
+	ui:Append('WndCheckBox', {
+		x = nX + 5, y = nY, w = 200,
+		text = _L['Other view my lover without ask'],
+		checked = MY_Love.bAutoReplyLover,
+		oncheck = function(bChecked) MY_Love.bAutoReplyLover = bChecked end,
+	}):AutoWidth()
 	-- tips
 	nY = nY + 28
 	ui:Append('Text', { text = _L['Tips'], x = X, y = nY, font = 27 })

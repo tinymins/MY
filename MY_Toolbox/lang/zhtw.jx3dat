@@ -284,6 +284,7 @@ return {
 	['Quick to accost text: '] = '快捷勾搭用語：',
     ['Love signature: '] = '情緣個性宣言：',
     ['Enable player view panel hook'] = '在查看他人裝備界面顯示情緣選項卡',
+    ['Other view my lover without ask'] = '允許無需確認隨意查看我的情緣信息',
     ['Tips'] = '小提示',
 	['1. You can break love one-sided'] = '1. 情緣可以單方面刪除，相戀情緣會通過密聊告知對方',
     ['View love info'] = '查看情緣信息',
