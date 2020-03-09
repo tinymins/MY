@@ -237,7 +237,13 @@ function D.OnUpdateHeadName()
 				if tar.dwTemplateID == 3713 or tar.dwTemplateID == 3714 then
 					szName = Table_GetNpcTemplateName(1622)
 				end
-				sha:AppendDoodadID(tar.dwID, r, g, b, 255, 128, 40, szName, 0, 1)
+				local nR, nG, nB = r, g, b
+				if v.other then
+					nR = nR * 0.85
+					nG = nG * 0.85
+					nB = nB * 0.85
+				end
+				sha:AppendDoodadID(tar.dwID, nR, nG, nB, 255, 128, 40, szName, 0, 1)
 			end
 		end
 	end
