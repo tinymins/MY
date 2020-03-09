@@ -240,7 +240,8 @@ function MY_Recount_DT.OnFrameBreathe()
 				nCount = not MY_Recount_UI.bShowZeroVal and p[DK_REC_STAT_SKILL.NZ_COUNT] or p[DK_REC_STAT_SKILL.COUNT],
 				nTotal = MY_Recount_UI.bShowEffect and p[DK_REC_STAT_SKILL.TOTAL_EFFECT] or p[DK_REC_STAT_SKILL.TOTAL],
 			}
-			if MY_Recount_UI.bShowZeroVal or rec.nTotal > 0 then
+			if (MY_Recount_UI.bShowZeroVal or rec.nTotal > 0)
+			and (not MY_Recount_UI.bHideAnonymous or rec.szName:sub(1, 1) ~= '#') then
 				insert(aResult, rec)
 			end
 		end
@@ -422,7 +423,8 @@ function MY_Recount_DT.OnFrameBreathe()
 					nTotal         = MY_Recount_UI.bShowEffect and p[DK_REC_STAT_TARGET_SKILL.TOTAL_EFFECT] or p[DK_REC_STAT_TARGET_SKILL.TOTAL],
 					szName         = MY_Recount_DS.GetEffectNameAusID(DataDisplay, szChannel, szEffectID) or szEffectID,
 				}
-				if MY_Recount_UI.bShowZeroVal or rec.nTotal > 0 or rec.nMissCount > 0 then
+				if (MY_Recount_UI.bShowZeroVal or rec.nTotal > 0 or rec.nMissCount > 0)
+				and (not MY_Recount_UI.bHideAnonymous or rec.szName:sub(1, 1) ~= '#') then
 					insert(aResult, rec)
 				end
 			end
