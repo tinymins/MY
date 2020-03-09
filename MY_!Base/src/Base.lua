@@ -1028,6 +1028,26 @@ local CONSTANT = setmetatable({}, {
 			end,
 			__metatable = true,
 		}),
+		CAMP_COLOR_FG_DEFAULT = setmetatable({
+			[CAMP.NEUTRAL] = { 255, 255, 255 }, -- 中立
+			[CAMP.GOOD   ] = {  60, 128, 220 }, -- 浩气盟
+			[CAMP.EVIL   ] = { 160,  30,  30 }, -- 恶人谷
+		}, {
+			__index = function(t, k)
+				return { 225, 225, 225 }
+			end,
+			__metatable = true,
+		}),
+		CAMP_COLOR_BG_DEFAULT = setmetatable({
+			[CAMP.NEUTRAL] = { 255, 255, 255 }, -- 中立
+			[CAMP.GOOD   ] = {  60, 128, 220 }, -- 浩气盟
+			[CAMP.EVIL   ] = { 160,  30,  30 }, -- 恶人谷
+		}, {
+			__index = function(t, k)
+				return { 225, 225, 225 }
+			end,
+			__metatable = true,
+		}),
 		MSG_THEME = SetmetaReadonly({
 			NORMAL = 0,
 			ERROR = 1,

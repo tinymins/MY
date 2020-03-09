@@ -920,40 +920,20 @@ function LIB.SetForceColor(dwForce, szType, tCol)
 end
 
 local SZ_CAMP_COLOR_FG = 'config/player_camp_color.jx3dat'
-local MY_CAMP_COLOR_FG_DEFAULT = setmetatable({
-	[CAMP.NEUTRAL] = { 255, 255, 255 }, -- 中立
-	[CAMP.GOOD   ] = {  60, 128, 220 }, -- 浩气盟
-	[CAMP.EVIL   ] = { 160,  30,  30 }, -- 恶人谷
-}, {
-	__index = function(t, k)
-		return { 225, 225, 225 }
-	end,
-	__metatable = true,
-})
 local MY_CAMP_COLOR_FG_GLOBAL = LIB.LoadLUAData({SZ_CAMP_COLOR_FG, PATH_TYPE.GLOBAL}) or {}
 local MY_CAMP_COLOR_FG_CUSTOM = {}
 local MY_CAMP_COLOR_FG = setmetatable({}, {
 	__index = function(t, k)
-		return MY_CAMP_COLOR_FG_CUSTOM[k] or MY_CAMP_COLOR_FG_GLOBAL[k] or MY_CAMP_COLOR_FG_DEFAULT[k]
+		return MY_CAMP_COLOR_FG_CUSTOM[k] or MY_CAMP_COLOR_FG_GLOBAL[k] or CONSTANT.CAMP_COLOR_FG_DEFAULT[k]
 	end,
 })
 
 local SZ_CAMP_COLOR_BG = 'config/player_camp_color_bg.jx3dat'
-local MY_CAMP_COLOR_BG_DEFAULT = setmetatable({
-	[CAMP.NEUTRAL] = { 255, 255, 255 }, -- 中立
-	[CAMP.GOOD   ] = {  60, 128, 220 }, -- 浩气盟
-	[CAMP.EVIL   ] = { 160,  30,  30 }, -- 恶人谷
-}, {
-	__index = function(t, k)
-		return { 225, 225, 225 }
-	end,
-	__metatable = true,
-})
 local MY_CAMP_COLOR_BG_GLOBAL = LIB.LoadLUAData({SZ_CAMP_COLOR_BG, PATH_TYPE.GLOBAL}) or {}
 local MY_CAMP_COLOR_BG_CUSTOM = {}
 local MY_CAMP_COLOR_BG = setmetatable({}, {
 	__index = function(t, k)
-		return MY_CAMP_COLOR_BG_CUSTOM[k] or MY_CAMP_COLOR_BG_GLOBAL[k] or MY_CAMP_COLOR_BG_DEFAULT[k]
+		return MY_CAMP_COLOR_BG_CUSTOM[k] or MY_CAMP_COLOR_BG_GLOBAL[k] or CONSTANT.CAMP_COLOR_BG_DEFAULT[k]
 	end,
 })
 
