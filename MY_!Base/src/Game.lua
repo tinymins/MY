@@ -617,7 +617,7 @@ function LIB.GetRefreshTime(szType)
 			nCircle = 259200
 		end
 	else -- if szType == 'weekly' then -- 周一7点
-		if date.weekday == 0 or date.weekday == 1 then -- 周日0点 - 周一7点
+		if date.weekday == 0 or (date.weekday == 1 and date.hour < 7) then -- 周日0点 - 周一7点
 			nNextTime = nTime + (1 - date.weekday) * 86400 + (7 * 3600 - date.hour * 3600) + (0 - date.minute) * 60 + (0 - date.second)
 		else -- 周一7点 - 周六24点
 			nNextTime = nTime + (8 - date.weekday) * 86400 + (7 * 3600 - date.hour * 3600) + (0 - date.minute) * 60 + (0 - date.second)
