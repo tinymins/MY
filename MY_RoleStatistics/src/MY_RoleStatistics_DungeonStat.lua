@@ -318,8 +318,8 @@ local TIP_COLIMN = {
 	'time_days',
 }
 
-function D.FlushDB(bNoUpdate)
-	if not bNoUpdate or O.bFirstCopy then
+function D.FlushDB(bForceUpdate)
+	if bForceUpdate or O.bFirstCopy then
 		D.UpdateMapCopy()
 		O.bFirstCopy = false
 	end
@@ -350,7 +350,7 @@ function D.FlushDB(bNoUpdate)
 	LIB.Debug('MY_RoleStatistics_DungeonStat', 'Flushing to database finished...', DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 end
-LIB.RegisterFlush('MY_RoleStatistics_DungeonStat', D.FlushDB)
+LIB.RegisterFlush('MY_RoleStatistics_DungeonStat', function() D.FlushDB() end)
 
 function D.GetColumns()
 	local aCol = {}
@@ -563,7 +563,7 @@ function D.OnInitPage()
 						insert(aColumn, id)
 					end
 				end
-				D.FlushDB()
+				D.FlushDB(true)
 				D.UpdateUI(page)
 				UI.ClosePopupMenu()
 			end
@@ -620,7 +620,7 @@ function D.OnInitPage()
 end
 
 function D.OnActivePage()
-	D.FlushDB()
+	D.FlushDB(true)
 	D.UpdateUI(this)
 end
 
@@ -628,7 +628,7 @@ function D.OnEvent(event)
 	if event == 'ON_MY_MOSAICS_RESET' then
 		D.UpdateUI(this)
 	elseif event == 'UPDATE_DUNGEON_ROLE_PROGRESS' or event == 'ON_APPLY_PLAYER_SAVED_COPY_RESPOND' then
-		D.FlushDB(true)
+		D.FlushDB()
 		D.UpdateUI(this)
 	end
 end
