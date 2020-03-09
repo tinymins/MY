@@ -81,7 +81,6 @@ local O = {
 	aAlertColumn = {
 		'money',
 		'achievement_score',
-		'equip_score',
 		'pet_score',
 		'contribution',
 		'justice',
