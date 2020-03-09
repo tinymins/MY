@@ -111,11 +111,11 @@ local function IsInSamePeriod(dwTime, eType)
 	end
 	local nNextTime, nCircle
 	if eType == TASK_TYPE.DAILY then
-		nNextTime, nCircle = LIB.GetDungeonRefreshTime('daily')
+		nNextTime, nCircle = LIB.GetRefreshTime('daily')
 	elseif eType == TASK_TYPE.WEEKLY then
-		nNextTime, nCircle = LIB.GetDungeonRefreshTime('weekly')
+		nNextTime, nCircle = LIB.GetRefreshTime('weekly')
 	elseif eType == TASK_TYPE.HALF_WEEKLY then
-		nNextTime, nCircle = LIB.GetDungeonRefreshTime('half_weekly')
+		nNextTime, nCircle = LIB.GetRefreshTime('half-weekly')
 	end
 	return dwTime >= nNextTime - nCircle
 end

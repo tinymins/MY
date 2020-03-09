@@ -116,7 +116,7 @@ local function GeneCommonCompare(id)
 end
 local function GeneWeeklyFormatText(id)
 	return function(r)
-		local nNextTime, nCircle = LIB.GetDungeonRefreshTime('25')
+		local nNextTime, nCircle = LIB.GetRefreshTime('weekly')
 		local szText = nNextTime - nCircle < r.time
 			and r[id]
 			or _L['Unknown']
@@ -125,7 +125,7 @@ local function GeneWeeklyFormatText(id)
 end
 local function GeneWeeklyCompare(id)
 	return function(r1, r2)
-		local nNextTime, nCircle = LIB.GetDungeonRefreshTime('25')
+		local nNextTime, nCircle = LIB.GetRefreshTime('weekly')
 		local v1 = nNextTime - nCircle < r1.time
 			and r1[id]
 			or -1

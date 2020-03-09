@@ -587,55 +587,62 @@ LIB.RegisterEvent('ON_RESET_MAP_RESPOND', onCopyUpdated)
 LIB.RegisterEvent('ON_MAP_COPY_PROGRESS_UPDATE', onCopyUpdated)
 end
 
+-- 获取日常周常下次刷新时间和刷新周期
+-- (dwTime, dwCircle) LIB.GetRefreshTime(szType)
+-- @param szType {string} 刷新类型 daily weekly half-weekly
+-- @return dwTime {number} 下次刷新时间
+-- @return dwCircle {number} 刷新周期
+function LIB.GetRefreshTime(szType)
+	local nNextTime, nCircle = 0, 0
+	local nTime = GetCurrentTime()
+	local date = TimeToDate(nTime)
+	if szType == 'daily' then -- 每天7点
+		if date.hour < 7 then
+			nNextTime = nTime + (7 - date.hour) * 3600 + (0 - date.minute) * 60 + (0 - date.second)
+		else
+			nNextTime = nTime + (7 + 24 - date.hour) * 3600 + (0 - date.minute) * 60 + (0 - date.second)
+		end
+		nCircle = 86400
+	elseif szType == 'half-weekly' then -- 周一7点 周五7点
+		if ((date.weekday == 1 and date.hour >= 7) or date.weekday >= 2)
+		and ((date.weekday == 5 and date.hour < 7) or date.weekday <= 4) then -- 周一7点 - 周五7点
+			nNextTime = nTime + (5 - date.weekday) * 86400 + (7 * 3600 - date.hour * 3600) + (0 - date.minute) * 60 + (0 - date.second)
+			nCircle = 345600
+		else
+			if date.weekday == 0 or date.weekday == 1 then -- 周日0点 - 周一7点
+				nNextTime = nTime + (1 - date.weekday) * 86400 + (7 * 3600 - date.hour * 3600) + (0 - date.minute) * 60 + (0 - date.second)
+			else -- 周五7点 - 周六24点
+				nNextTime = nTime + (8 - date.weekday) * 86400 + (7 * 3600 - date.hour * 3600) + (0 - date.minute) * 60 + (0 - date.second)
+			end
+			nCircle = 259200
+		end
+	else -- if szType == 'weekly' then -- 周一7点
+		if date.weekday == 0 or date.weekday == 1 then -- 周日0点 - 周一7点
+			nNextTime = nTime + (1 - date.weekday) * 86400 + (7 * 3600 - date.hour * 3600) + (0 - date.minute) * 60 + (0 - date.second)
+		else -- 周一7点 - 周六24点
+			nNextTime = nTime + (8 - date.weekday) * 86400 + (7 * 3600 - date.hour * 3600) + (0 - date.minute) * 60 + (0 - date.second)
+		end
+		nCircle = 604800
+	end
+	return nNextTime, nCircle
+end
+
 -- 获取副本地图刷新时间
 -- (number nNextTime, number nCircle) LIB.GetDungeonRefreshTime(dwMapID)
 function LIB.GetDungeonRefreshTime(dwMapID)
-	local nNextTime, nCircle, nMaxPlayerCount = 0, 0, nil
-	if IsNumber(dwMapID) then
-		local _, nMapType, nMaxPlayerCount1 = GetMapParams(dwMapID)
-		if nMapType == MAP_TYPE.DUNGEON then
-			nMaxPlayerCount = nMaxPlayerCount1
+	local _, nMapType, nMaxPlayerCount = GetMapParams(dwMapID)
+	if nMapType == MAP_TYPE.DUNGEON then
+		if nMaxPlayerCount <= 5 then -- 5人本
+			return LIB.GetRefreshTime('daily')
 		end
-	elseif dwMapID == '5' or dwMapID == 'daily' then
-		nMaxPlayerCount = 5
-	elseif dwMapID == '10' or dwMapID == 'half_weekly' then
-		nMaxPlayerCount = 10
-	elseif dwMapID == '25' or dwMapID == 'weekly' then
-		nMaxPlayerCount = 25
-	end
-	if nMaxPlayerCount then
-		local nTime = GetCurrentTime()
-		local date = TimeToDate(nTime)
-		if nMaxPlayerCount <= 5 then -- 5人本 每天7点
-			if date.hour < 7 then
-				nNextTime = nTime + (7 - date.hour) * 3600 + (0 - date.minute) * 60 + (0 - date.second)
-			else
-				nNextTime = nTime + (7 + 24 - date.hour) * 3600 + (0 - date.minute) * 60 + (0 - date.second)
-			end
-			nCircle = 86400
-		elseif nMaxPlayerCount <= 10 then -- 10人本 周一7点 周五7点
-			if ((date.weekday == 1 and date.hour >= 7) or date.weekday >= 2)
-			and ((date.weekday == 5 and date.hour < 7) or date.weekday <= 4) then -- 周一7点 - 周五7点
-				nNextTime = nTime + (5 - date.weekday) * 86400 + (7 * 3600 - date.hour * 3600) + (0 - date.minute) * 60 + (0 - date.second)
-				nCircle = 345600
-			else
-				if date.weekday == 0 or date.weekday == 1 then -- 周日0点 - 周一7点
-					nNextTime = nTime + (1 - date.weekday) * 86400 + (7 * 3600 - date.hour * 3600) + (0 - date.minute) * 60 + (0 - date.second)
-				else -- 周五7点 - 周六24点
-					nNextTime = nTime + (8 - date.weekday) * 86400 + (7 * 3600 - date.hour * 3600) + (0 - date.minute) * 60 + (0 - date.second)
-				end
-				nCircle = 259200
-			end
-		else -- if nMaxPlayerCount <= 25 then -- 25人本 周一7点
-			if date.weekday == 0 or date.weekday == 1 then -- 周日0点 - 周一7点
-				nNextTime = nTime + (1 - date.weekday) * 86400 + (7 * 3600 - date.hour * 3600) + (0 - date.minute) * 60 + (0 - date.second)
-			else -- 周一7点 - 周六24点
-				nNextTime = nTime + (8 - date.weekday) * 86400 + (7 * 3600 - date.hour * 3600) + (0 - date.minute) * 60 + (0 - date.second)
-			end
-			nCircle = 604800
+		if nMaxPlayerCount <= 10 then -- 10人本
+			return LIB.GetRefreshTime('half-weekly')
+		end
+		if nMaxPlayerCount <= 25 then -- 25人本
+			return LIB.GetRefreshTime('weekly')
 		end
 	end
-	return nNextTime, nCircle
+	return 0, 0
 end
 
 -- 地图BOSS列表
