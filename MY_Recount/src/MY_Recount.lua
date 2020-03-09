@@ -414,6 +414,7 @@ function D.GetHistoryMenu()
 			else
 				D.SetDisplayData('CURRENT')
 			end
+			UI.ClosePopupMenu()
 		end,
 		fnMouseEnter = function()
 			if not MY_Recount_DS.bRecEverything then
@@ -437,6 +438,7 @@ function D.GetHistoryMenu()
 				else
 					D.SetDisplayData(data)
 				end
+				UI.ClosePopupMenu()
 			end,
 			szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',
 			nFrame = 49,
