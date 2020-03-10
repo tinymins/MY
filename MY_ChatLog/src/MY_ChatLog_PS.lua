@@ -85,7 +85,7 @@ span.emotion_44{width:21px; height: 21px; display: inline-block; background-imag
 ]]
 
 	for k, v in pairs(g_tStrings.tForceTitle) do
-		szHeader = szHeader .. ('.force-%s{color:#%02X%02X%02X}'):format(k, LIB.GetForceColor(k, 'forecolor'))
+		szHeader = szHeader .. ('.force-%s{color:#%02X%02X%02X}'):format(k, LIB.GetForceColor(k, 'foreground'))
 	end
 
 	szHeader = szHeader .. [[

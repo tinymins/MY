@@ -419,7 +419,7 @@ function MY_Farbnamen.Get(szKey)
 			szTitle   = info.title,
 			nCamp     = info.camp,
 			szTongID  = GetTongName(info.tong) or '',
-			rgb       = { LIB.GetForceColor(info.force, 'forecolor') },
+			rgb       = { LIB.GetForceColor(info.force, 'foreground') },
 		}
 	end
 end
