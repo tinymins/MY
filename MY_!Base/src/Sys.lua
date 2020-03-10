@@ -2374,18 +2374,13 @@ else
 			if szHour and szMinute and szSecond then
 				local dwTime = GetCurrentTime()
 				bInit = true
-				dwMonthEndTime = 0
 				dwPointEndTime = dwTime + tonumber(szHour) * 3600 + tonumber(szMinute) * 60 + tonumber(szSecond)
-				dwDayEndTime = 0
 			end
 			-- 包月时间截止至：xxxx/xx/xx xx:xx
 			local szYear, szMonth, szDay, szHour, szMinute = szMsg:match(_L['Month time to: (%d+)y(%d+)m(%d+)d (%d+)h(%d+)m'])
 			if szYear and szMonth and szDay and szHour and szMinute then
-				local dwTime = GetCurrentTime()
 				bInit = true
 				dwMonthEndTime = LIB.DateToTime(szYear, szMonth, szDay, szHour, szMinute, 0)
-				dwPointEndTime = 0
-				dwDayEndTime = 0
 			end
 			if bInit then
 				local frame = Station.Lookup('Lowest/Scene')
