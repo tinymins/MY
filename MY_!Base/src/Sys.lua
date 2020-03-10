@@ -2383,6 +2383,10 @@ else
 				dwMonthEndTime = LIB.DateToTime(szYear, szMonth, szDay, szHour, szMinute, 0)
 			end
 			if bInit then
+				local dwTime = GetCurrentTime()
+				if dwMonthEndTime > dwTime then -- 优先消耗月卡 即点卡结束时间需要加上月卡时间
+					dwPointEndTime = dwPointEndTime + dwMonthEndTime - dwTime
+				end
 				local frame = Station.Lookup('Lowest/Scene')
 				if frame then
 					frame[PACKET_INFO.NAME_SPACE .. '_TimeOfFee'] = {dwMonthEndTime, dwPointEndTime, dwDayEndTime}
