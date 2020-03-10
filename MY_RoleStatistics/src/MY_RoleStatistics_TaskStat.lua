@@ -980,16 +980,16 @@ function D.OnItemMouseEnter()
 			if id == 'TASK' then
 				for _, col in ipairs(D.GetColumns()) do
 					if TASK_HASH[col.id] then
-						insert(aXml, GetFormatText(col.szTitle))
-						insert(aXml, GetFormatText(':  '))
+						insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
+						insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
 						insert(aXml, col.GetFormatText(this.rec))
 						insert(aXml, GetFormatText('\n'))
 					end
 				end
 			else
 				local col = COLUMN_DICT[id]
-				insert(aXml, GetFormatText(col.szTitle))
-				insert(aXml, GetFormatText(':  '))
+				insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
+				insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
 				insert(aXml, col.GetFormatText(this.rec))
 				insert(aXml, GetFormatText('\n'))
 			end

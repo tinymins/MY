@@ -882,8 +882,8 @@ function D.OnItemMouseEnter()
 	if name == 'Handle_Row' then
 		local aXml = {}
 		for _, col in ipairs(COLUMN_LIST) do
-			insert(aXml, GetFormatText(col.szTitle))
-			insert(aXml, GetFormatText(':  '))
+			insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
+			insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
 			insert(aXml, col.GetFormatText(this.rec))
 			insert(aXml, GetFormatText('\n'))
 		end

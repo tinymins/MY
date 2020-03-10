@@ -709,8 +709,8 @@ function D.OnItemMouseEnter()
 				local tDungeon = {}
 				for _, col in ipairs(D.GetColumns()) do
 					if wfind(col.id, 'dungeon_') then
-						insert(aXml, GetFormatText(col.szTitle))
-						insert(aXml, GetFormatText(':  '))
+						insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
+						insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
 						insert(aXml, col.GetFormatText(this.rec))
 						insert(aXml, GetFormatText('\n'))
 						tDungeon[tonumber(col.id:sub(#'dungeon_' + 1))] = true
@@ -720,8 +720,8 @@ function D.OnItemMouseEnter()
 					if not tDungeon[dwMapID] then
 						local map = LIB.GetMapInfo(dwMapID)
 						if map then
-							insert(aXml, GetFormatText(map.szName))
-							insert(aXml, GetFormatText(':  '))
+							insert(aXml, GetFormatText(map.szName, 162, 255, 255, 0))
+							insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
 							insert(aXml, GetFormatText(concat(aCopyID, ',')))
 							insert(aXml, GetFormatText('\n'))
 						end
@@ -730,8 +730,8 @@ function D.OnItemMouseEnter()
 				end
 			else
 				local col = COLUMN_DICT[id]
-				insert(aXml, GetFormatText(col.szTitle))
-				insert(aXml, GetFormatText(':  '))
+				insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
+				insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
 				insert(aXml, col.GetFormatText(this.rec))
 				insert(aXml, GetFormatText('\n'))
 			end
