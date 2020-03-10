@@ -115,8 +115,13 @@ function D.Open(ds, tab, szMode)
 				end,
 			},
 			{
-				'option', 'afterComplete', function(raw, option, text)
+				'option', 'afterComplete', function(raw, option, search, text)
 					if text then
+						for k, v in ipairs(MY_GKP.aSubsidies) do
+							if v[1] == text then
+								ui:Children('#Money'):Text(v[2])
+							end
+						end
 						ui:Children('#Money'):Focus()
 					end
 				end,
