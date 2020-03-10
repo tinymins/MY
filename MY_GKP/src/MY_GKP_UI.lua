@@ -355,7 +355,7 @@ function MY_GKP_UI.OnFrameCreate()
 			end, nil, nil, nil, team.GetTeamSize())
 		end,
 	})
-	-- 消费情况按钮
+	-- 发布拍卖记录
 	nX = nW - 120 - 5
 	ui:Append('WndButton3', {
 		name = 'GOLD_TEAM_BID_LIST',
@@ -366,46 +366,31 @@ function MY_GKP_UI.OnFrameCreate()
 			if not me.IsInParty() and not LIB.IsDebugClient('MY_GKP') then
 				return LIB.Alert(_L['You are not in the team.'])
 			end
-			local tMember = {}
-			local aAuction = ds:GetAuctionList()
-			if IsEmpty(aAuction) then
+			local tAuction = ds:GetAuctionPlayerSum()
+			local aAuction = ds:GetAuctionList('nTime', 'desc')
+			if IsEmpty(tAuction) then
 				return LIB.Alert(_L['No Record'])
 			end
 			if not LIB.IsDistributer() and not LIB.IsDebugClient('MY_GKP') then
 				return LIB.Alert(_L['You are not the distrubutor.'])
 			end
 			FireUIEvent('MY_GKP_SEND_BEGIN')
-			local tTime = {}
-			for k, v in ipairs(aAuction) do
-				if not v.bDelete then
-					if not tMember[v.szPlayer] then
-						tMember[v.szPlayer] = 0
-					end
-					if tonumber(v.nMoney) > 0 then
-						tMember[v.szPlayer] = tMember[v.szPlayer] + v.nMoney
-					end
-					table.insert(tTime, { nTime = v.nTime })
-				end
-			end
-			table.sort(tTime, function(a, b)
-				return a.nTime < b.nTime
-			end)
-			local nTime = tTime[#tTime].nTime - tTime[1].nTime -- 所花费的时间
 
 			LIB.Talk(PLAYER_TALK_CHANNEL.RAID, _L['--- Consumption ---'])
 			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'GKP_INFO', 'Start', '--- Consumption ---'})
-			local sort = {}
-			for k,v in pairs(tMember) do
-				table.insert(sort,{ szName = k, nGold = v })
-			end
 
-			table.sort(sort,function(a,b) return a.nGold < b.nGold end)
-			for k, v in ipairs(sort) do
+			local aBill = {}
+			for k, v in pairs(tAuction) do
+				table.insert(aBill, { szName = k, nGold = v })
+			end
+			table.sort(aBill,function(a,b) return a.nGold < b.nGold end)
+			for k, v in ipairs(aBill) do
 				if v.nGold > 0 then
 					LIB.Talk(PLAYER_TALK_CHANNEL.RAID, { D.GetFormatLink(v.szName, true), D.GetFormatLink(g_tStrings.STR_TALK_HEAD_SAY1 .. v.nGold .. g_tStrings.STR_GOLD .. g_tStrings.STR_FULL_STOP) })
 				end
 				LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'GKP_INFO', 'Info', v.szName, v.nGold})
 			end
+			local nTime = aAuction[1].nTime - aAuction[#aAuction].nTime -- 所花费的时间
 			LIB.Talk(PLAYER_TALK_CHANNEL.RAID, _L('Total Auction: %d Gold.', ds:GetAuctionSum()))
 			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'GKP_INFO', 'End', _L('Total Auction: %d Gold.', ds:GetAuctionSum()), ds:GetAuctionSum(), nTime})
 		end,
@@ -421,57 +406,39 @@ function MY_GKP_UI.OnFrameCreate()
 			if not me.IsInParty() and not LIB.IsDebugClient('MY_GKP') then
 				return LIB.Alert(_L['You are not in the team.'])
 			end
-			local tMember = {}
-			local aAuction = ds:GetAuctionList()
-			local aPayment = ds:GetPaymentList()
-			if IsEmpty(aAuction) then
-				return LIB.Alert(_L['No Record'])
-			end
 			if not LIB.IsDistributer() and not LIB.IsDebugClient('MY_GKP') then
 				return LIB.Alert(_L['You are not the distrubutor.'])
 			end
-			FireUIEvent('MY_GKP_SEND_BEGIN')
-			for k, v in ipairs(aAuction) do
-				if not v.bDelete then
-					if tonumber(v.nMoney) > 0 then
-						if not tMember[v.szPlayer] then
-							tMember[v.szPlayer] = 0
-						end
-						tMember[v.szPlayer] = tMember[v.szPlayer] + v.nMoney
-					end
-				end
+			local tAuction = ds:GetAuctionPlayerSum()
+			local tPayment = ds:GetPaymentPlayerSum()
+			if IsEmpty(tAuction) and IsEmpty(tPayment) then
+				return LIB.Alert(_L['No Record'])
 			end
-			local _Account = {}
-			for k, v in ipairs(aPayment) do
-				if not v.bDelete and v.szPlayer and v.szPlayer ~= 'System' then
-					if tMember[v.szPlayer] then
-						tMember[v.szPlayer] = tMember[v.szPlayer] - v.nGold
-					else
-						if not _Account[v.szPlayer] then
-							_Account[v.szPlayer] = 0
-						end
-						_Account[v.szPlayer] = _Account[v.szPlayer] + v.nGold
-					end
+			FireUIEvent('MY_GKP_SEND_BEGIN')
+			for szPlayer, nMoney in pairs(tPayment) do
+				if not tAuction[szPlayer] then
+					tAuction[szPlayer] = 0
 				end
+				tAuction[szPlayer] = tAuction[szPlayer] - nMoney
 			end
 			-- 欠账
-			local tMember2 = {}
-			for k, v in pairs(tMember) do
-				if v ~= 0 then
-					table.insert(tMember2, { szName = k, nGold = v * -1 })
+			local aBill = {}
+			for k, v in pairs(tAuction) do
+				if v > 0 then
+					table.insert(aBill, { szName = k, nGold = -v })
 				end
 			end
 			-- 正账
-			for k, v in pairs(_Account) do
+			for k, v in pairs(tPayment) do
 				if v > 0 then
-					table.insert(tMember2, { szName = k, nGold = v })
+					table.insert(aBill, { szName = k, nGold = v })
 				end
 			end
 
-			table.sort(tMember2, function(a, b) return a.nGold < b.nGold end)
+			table.sort(aBill, function(a, b) return a.nGold < b.nGold end)
 			LIB.Talk(PLAYER_TALK_CHANNEL.RAID, _L['Information on Debt'])
 			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'GKP_INFO', 'Start', 'Information on Debt'})
-			for k, v in pairs(tMember2) do
+			for _, v in ipairs(aBill) do
 				if v.nGold < 0 then
 					LIB.Talk(PLAYER_TALK_CHANNEL.RAID, { D.GetFormatLink(v.szName, true), D.GetFormatLink(g_tStrings.STR_TALK_HEAD_SAY1 .. v.nGold .. g_tStrings.STR_GOLD .. g_tStrings.STR_FULL_STOP) })
 					LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'GKP_INFO', 'Info', v.szName, v.nGold, '-'})
@@ -481,14 +448,12 @@ function MY_GKP_UI.OnFrameCreate()
 				end
 			end
 			local nGold, nGold2 = 0, 0
-			for _, v in ipairs(aPayment) do
-				if not v.bDelete then
-					if v.szPlayer and v.szPlayer ~= 'System' then -- 必须要有交易对象
-						if tonumber(v.nGold) > 0 then
-							nGold = nGold + v.nGold
-						else
-							nGold2 = nGold2 + v.nGold
-						end
+			for szPlayer, nMoney in pairs(tPayment) do
+				if szPlayer ~= 'System' then -- 必须要有交易对象
+					if nMoney > 0 then
+						nGold = nGold + nMoney
+					else
+						nGold2 = nGold2 + nMoney
 					end
 				end
 			end
@@ -782,43 +747,37 @@ function MY_GKP_UI.OnItemMouseEnter()
 		local data = this.data
 		local szIcon, nFrame = GetForceImage(data.dwForceID)
 		local r, g, b = LIB.GetForceColor(data.dwForceID)
-		local szXml = GetFormatImage(szIcon,nFrame,20,20) .. GetFormatText('  ' .. data.szPlayer .. g_tStrings.STR_COLON .. '\n', 136, r, g, b)
+		local aXml = {
+			GetFormatImage(szIcon,nFrame,20,20),
+			GetFormatText('  ' .. data.szPlayer .. g_tStrings.STR_COLON .. '\n', 136, r, g, b),
+		}
 		if IsCtrlKeyDown() then
-			szXml = szXml .. GetFormatText(g_tStrings.DEBUG_INFO_ITEM_TIP .. '\n', 136, 255, 0, 0)
-			szXml = szXml .. GetFormatText(EncodeLUAData(data, ' '), 136, 255, 255, 255)
+			insert(aXml, GetFormatText(g_tStrings.DEBUG_INFO_ITEM_TIP .. '\n', 136, 255, 0, 0))
+			insert(aXml, GetFormatText(EncodeLUAData(data, ' '), 136, 255, 255, 255))
 		else
-			szXml = szXml .. GetFormatText(_L['System Information as Shown Below\n\n'],136,255,255,255)
-			local nNum,nNum1,nNum2 = 0,0,0
-			for kk,vv in ipairs(frame.ds:GetAuctionList()) do
-				if vv.szPlayer == data.szPlayer and not vv.bDelete then
-					if  vv.nMoney > 0 then
-						nNum = nNum + vv.nMoney
-					else
-						nNum1 = nNum1 + vv.nMoney
-					end
-				end
-			end
-			local r, g, b = D.GetMoneyCol(nNum)
-			szXml = szXml .. GetFormatText(_L['Total Cosumption:'],136,255,128,0) .. GetFormatText(nNum ..g_tStrings.STR_GOLD .. g_tStrings.STR_FULL_STOP .. '\n',136,r,g,b)
-			local r, g, b = D.GetMoneyCol(nNum1)
-			szXml = szXml .. GetFormatText(_L['Total Allowance:'],136,255,128,0) .. GetFormatText(nNum1 ..g_tStrings.STR_GOLD .. g_tStrings.STR_FULL_STOP .. '\n',136,r,g,b)
-			for kk, vv in ipairs(frame.ds:GetPaymentList()) do
-				if vv.szPlayer == data.szPlayer and not vv.bDelete and vv.nGold > 0 then
-					nNum2 = nNum2 + vv.nGold
-				end
-			end
-			local r, g, b = D.GetMoneyCol(nNum2)
-			szXml = szXml .. GetFormatText(_L['Total Payment:'],136,255,128,0) .. GetFormatText(nNum2 ..g_tStrings.STR_GOLD .. g_tStrings.STR_FULL_STOP .. '\n',136,r,g,b)
-			local nNum3 = nNum+nNum1-nNum2
-			if nNum3 < 0 then
-				nNum3 = 0
-			end
-			local r, g, b = D.GetMoneyCol(nNum3)
-			szXml = szXml .. GetFormatText(_L['Money on Debt:'],136,255,128,0) .. GetFormatText(nNum3 ..g_tStrings.STR_GOLD .. g_tStrings.STR_FULL_STOP .. '\n',136,r,g,b)
+			local tAuction, tSubsidy = frame.ds:GetAuctionPlayerSum()
+			local tPayment = frame.ds:GetPaymentPlayerSum()
+			local nAuction = tAuction[data.szPlayer] or 0
+			local nSubsidy = tSubsidy[data.szPlayer] or 0
+			local nPayment = tPayment[data.szPlayer] or 0
+			local nSummary = max(nAuction + nSubsidy - nPayment, 0)
+			insert(aXml, GetFormatText(_L['System Information as Shown Below\n\n'], 136, 255, 255, 255))
+			local r, g, b = D.GetMoneyCol(nAuction)
+			insert(aXml, GetFormatText(_L['Total Cosumption:'], 136, 255, 128, 0))
+			insert(aXml, GetFormatText(nAuction ..g_tStrings.STR_GOLD .. g_tStrings.STR_FULL_STOP .. '\n', 136, r, g, b))
+			local r, g, b = D.GetMoneyCol(nSubsidy)
+			insert(aXml, GetFormatText(_L['Total Allowance:'], 136, 255, 128, 0))
+			insert(aXml, GetFormatText(nSubsidy .. g_tStrings.STR_GOLD .. g_tStrings.STR_FULL_STOP .. '\n', 136, r, g, b))
+			local r, g, b = D.GetMoneyCol(nPayment)
+			insert(aXml, GetFormatText(_L['Total Payment:'], 136, 255, 128, 0))
+			insert(aXml, GetFormatText(nPayment .. g_tStrings.STR_GOLD .. g_tStrings.STR_FULL_STOP .. '\n', 136, r, g, b))
+			local r, g, b = D.GetMoneyCol(nSummary)
+			insert(aXml, GetFormatText(_L['Money on Debt:'], 136, 255, 128, 0))
+			insert(aXml, GetFormatText(nSummary .. g_tStrings.STR_GOLD .. g_tStrings.STR_FULL_STOP .. '\n', 136, r, g, b))
 		end
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
-		OutputTip(szXml, 400, { x, y, w, h })
+		OutputTip(concat(aXml), 400, { x, y, w, h })
 	end
 end
 

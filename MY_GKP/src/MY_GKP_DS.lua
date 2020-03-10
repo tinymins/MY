@@ -181,22 +181,80 @@ function DS:SetAuctionList(aList)
 	FireUIEvent('MY_GKP_DATA_UPDATE', self:GetFilePath(), 'AUCTION')
 end
 
--- 获取拍卖总额
-function DS:GetAuctionSum(bAccurate)
-	local a, b = 0, 0
-	for k, v in ipairs(self.DATA.GKP_Record) do
+-- 获取每个人拍卖总额
+function DS:GetAuctionPlayerSum(bAccurate)
+	-- 计算每个人的非系统金团欠款记录
+	local tArrears = {}
+	for _, v in ipairs(self.DATA.GKP_Record) do
+		if not v.bDelete and not v.bSystem and v.nMoney > 0 then
+			if not tArrears[v.szPlayer] then
+				tArrears[v.szPlayer] = 0
+			end
+			tArrears[v.szPlayer] = tArrears[v.szPlayer] + v.nMoney
+		end
+	end
+	-- 计算拍卖收入
+	local tIncome, tSubsidy = {}, {} -- 正数是拍装备罚款金额 负数是宴席补贴钱金额
+	for _, v in ipairs(self.DATA.GKP_Record) do
 		if not v.bDelete then
-			if tonumber(v.nMoney) > 0 then
-				a = a + v.nMoney
+			local nMoney = tonumber(v.nMoney)
+			if nMoney > 0 then
+				if v.bSystem and v.dwIndex == 0 and tArrears[v.szPlayer] then -- 系统金团同步来的追加 优先抵冲分配者记录欠款投币
+					local nOffset = min(tArrears[v.szPlayer], nMoney)
+					nMoney = nMoney - nOffset
+					tArrears[v.szPlayer] = tArrears[v.szPlayer] - nOffset
+				end
+				if not tIncome[v.szPlayer] then
+					tIncome[v.szPlayer] = 0
+				end
+				tIncome[v.szPlayer] = tIncome[v.szPlayer] + nMoney
 			else
-				b = b + v.nMoney
+				if not tSubsidy[v.szPlayer] then
+					tSubsidy[v.szPlayer] = 0
+				end
+				tSubsidy[v.szPlayer] = tSubsidy[v.szPlayer] + nMoney
 			end
 		end
 	end
 	if bAccurate then
-		return a + b
+		local tAccurate = {}
+		for szPlayer, nMoney in pairs(tIncome) do
+			if not tAccurate[szPlayer] then
+				tAccurate[szPlayer] = 0
+			end
+			tAccurate[szPlayer] = tAccurate[szPlayer] + nMoney
+		end
+		for szPlayer, nMoney in pairs(tSubsidy) do
+			if not tAccurate[szPlayer] then
+				tAccurate[szPlayer] = 0
+			end
+			tAccurate[szPlayer] = tAccurate[szPlayer] + nMoney
+		end
+		return tAccurate
 	else
-		return a, b
+		return tIncome, tSubsidy
+	end
+end
+
+-- 获取拍卖总额
+function DS:GetAuctionSum(bAccurate)
+	if bAccurate then
+		local nAccurate = 0
+		local tAccurate = self:GetAuctionPlayerSum(bAccurate)
+		for _, nMoney in pairs(tAccurate) do
+			nAccurate = nAccurate + nMoney
+		end
+		return nAccurate
+	else
+		local nIncome, nSubsidy = 0, 0
+		local tIncome, tSubsidy = self:GetAuctionPlayerSum(bAccurate)
+		for _, nMoney in pairs(tIncome) do
+			nIncome = nIncome + nMoney
+		end
+		for _, nMoney in pairs(tSubsidy) do
+			nSubsidy = nSubsidy + nMoney
+		end
+		return nIncome, nSubsidy
 	end
 end
 
@@ -317,22 +375,64 @@ function DS:GetPaymentList(szKey, szSort)
 	return aList
 end
 
--- 获取收钱总额
-function DS:GetPaymentSum(bAccurate)
-	local a, b = 0, 0
-	for k, v in ipairs(self.DATA.GKP_Account) do
+-- 获取每个角色收钱总额
+function DS:GetPaymentPlayerSum(bAccurate)
+	local tIncome, tOutcome = {}, {}
+	for _, v in ipairs(self.DATA.GKP_Account) do
 		if not v.bDelete then
-			if tonumber(v.nGold) > 0 then
-				a = a + v.nGold
+			local nMoney = tonumber(v.nGold)
+			if nMoney > 0 then
+				if not tIncome[v.szPlayer] then
+					tIncome[v.szPlayer] = 0
+				end
+				tIncome[v.szPlayer] = tIncome[v.szPlayer] + v.nGold
 			else
-				b = b + v.nGold
+				if not tOutcome[v.szPlayer] then
+					tOutcome[v.szPlayer] = 0
+				end
+				tOutcome[v.szPlayer] = tOutcome[v.szPlayer] + v.nGold
 			end
 		end
 	end
 	if bAccurate then
-		return a + b
+		local tAccurate = {}
+		for szPlayer, nMoney in pairs(tIncome) do
+			if not tAccurate[szPlayer] then
+				tAccurate[szPlayer] = 0
+			end
+			tAccurate[szPlayer] = tAccurate[szPlayer] + nMoney
+		end
+		for szPlayer, nMoney in pairs(tOutcome) do
+			if not tAccurate[szPlayer] then
+				tAccurate[szPlayer] = 0
+			end
+			tAccurate[szPlayer] = tAccurate[szPlayer] + nMoney
+		end
+		return tAccurate
 	else
-		return a, b
+		return tIncome, tOutcome
+	end
+end
+
+-- 获取收钱总额
+function DS:GetPaymentSum(bAccurate)
+	if bAccurate then
+		local nAccurate = 0
+		local tAccurate = self:GetPaymentPlayerSum(bAccurate)
+		for _, nMoney in pairs(tAccurate) do
+			nAccurate = nAccurate + nMoney
+		end
+		return nAccurate
+	else
+		local nIncome, nOutcome = 0, 0
+		local tIncome, tOutcome = self:GetPaymentPlayerSum(bAccurate)
+		for _, nMoney in pairs(tIncome) do
+			nIncome = nIncome + nMoney
+		end
+		for _, nMoney in pairs(tOutcome) do
+			nOutcome = nOutcome + nMoney
+		end
+		return nIncome, nOutcome
 	end
 end
 

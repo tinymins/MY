@@ -519,6 +519,7 @@ function D.SyncSystemGKP()
 			tab.dwForceID = dwForceID
 		end
 		tab.bDelete = v.nState == 0
+		tab.bSystem = true
 		ds:SetAuctionRec(tab)
 		-- ¸¶¿î¼ÇÂ¼
 		if not IsEmpty(v.dwPayerID) and not IsEmpty(v.nPrice) then
@@ -543,6 +544,7 @@ function D.SyncSystemGKP()
 			if IsEmpty(tab.dwForceID) and not IsEmpty(dwForceID) then
 				tab.dwForceID = dwForceID
 			end
+			tab.bSystem = true
 			ds:SetPaymentRec(tab)
 		end
 	end
