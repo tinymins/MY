@@ -706,12 +706,26 @@ function D.OnItemMouseEnter()
 		local aXml = {}
 		for _, id in ipairs(TIP_COLIMN) do
 			if id == 'DUNGEON' then
+				local tDungeon = {}
 				for _, col in ipairs(D.GetColumns()) do
 					if wfind(col.id, 'dungeon_') then
 						insert(aXml, GetFormatText(col.szTitle))
 						insert(aXml, GetFormatText(':  '))
 						insert(aXml, col.GetFormatText(this.rec))
 						insert(aXml, GetFormatText('\n'))
+						tDungeon[tonumber(col.id:sub(#'dungeon_' + 1))] = true
+					end
+				end
+				for dwMapID, aCopyID in pairs(this.rec.copy_info) do
+					if not tDungeon[dwMapID] then
+						local map = LIB.GetMapInfo(dwMapID)
+						if map then
+							insert(aXml, GetFormatText(map.szName))
+							insert(aXml, GetFormatText(':  '))
+							insert(aXml, GetFormatText(concat(aCopyID, ',')))
+							insert(aXml, GetFormatText('\n'))
+						end
+						tDungeon[dwMapID] = true
 					end
 				end
 			else
