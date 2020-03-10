@@ -402,15 +402,15 @@ end
 local EXCEL_WIDTH = 960
 
 -- 小退提示
-local function GeneCommonCompareText(id, szTitle, szUnit)
+local function GeneCommonCompareText(id, szTitle)
 	return function(r1, r2)
 		if r1[id] == r2[id] then
 			return
 		end
-		local szOp = r1[id] < r2[id]
-			and _L[' increased by ']
-			or _L[' decreased by ']
-		return GetFormatSysmsgText(szTitle .. szOp .. abs(r2[id] - r1[id]) .. szUnit)
+		local szOp = r1[id] <= r2[id]
+			and ' increased by %s'
+			or ' decreased by %s'
+		return GetFormatSysmsgText(_L(szTitle .. szOp, abs(r2[id] - r1[id])))
 	end
 end
 local ALERT_COLUMN = {
@@ -420,7 +420,7 @@ local ALERT_COLUMN = {
 		GetValue = function(me)
 			return me.GetBaseEquipScore() + me.GetStrengthEquipScore() + me.GetMountsEquipScore()
 		end,
-		GetCompareText = GeneCommonCompareText('equip_score', _L['Equip score'], _L['sc']),
+		GetCompareText = GeneCommonCompareText('equip_score', 'Equip score'),
 	},
 	{ -- 宠物分
 		id = 'pet_score',
@@ -428,7 +428,7 @@ local ALERT_COLUMN = {
 		GetValue = function(me)
 			return me.GetAcquiredFellowPetScore() + me.GetAcquiredFellowPetMedalScore()
 		end,
-		GetCompareText = GeneCommonCompareText('pet_score', _L['Pet score'], _L['sc']),
+		GetCompareText = GeneCommonCompareText('pet_score', 'Pet score'),
 	},
 	{ -- 金钱
 		id = 'money',
@@ -443,13 +443,10 @@ local ALERT_COLUMN = {
 			if nCompare == 0 then
 				return
 			end
-			local szOp = nCompare > 0
-				and _L[' increased by ']
-				or _L[' decreased by ']
 			local f = GetMsgFont('MSG_SYS')
 			local r, g, b = GetMsgFontColor('MSG_SYS')
 			local szExtra = 'font=' .. f .. ' r=' .. r .. ' g=' .. g .. ' b=' .. b
-			return GetFormatSysmsgText(_L['Money'] .. szOp)
+			return GetFormatSysmsgText(nCompare >= 0 and _L['Money increased by '] or _L['Money decreased by '])
 				.. GetMoneyText({ nGold = abs(money.nGold), nSilver = abs(money.nSilver), nCopper = abs(money.nCopper) }, szExtra)
 		end,
 	},
@@ -459,7 +456,7 @@ local ALERT_COLUMN = {
 		GetValue = function(me)
 			return me.nContribution
 		end,
-		GetCompareText = GeneCommonCompareText('contribution', _L['Contribution'], _L['pt']),
+		GetCompareText = GeneCommonCompareText('contribution', 'Contribution'),
 	},
 	{ -- 侠义
 		id = 'justice',
@@ -467,7 +464,7 @@ local ALERT_COLUMN = {
 		GetValue = function(me)
 			return me.nJustice
 		end,
-		GetCompareText = GeneCommonCompareText('justice', _L['Justice'], _L['pt']),
+		GetCompareText = GeneCommonCompareText('justice', 'Justice'),
 	},
 	{
 		-- 威望
@@ -476,7 +473,7 @@ local ALERT_COLUMN = {
 		GetValue = function(me)
 			return me.nCurrentPrestige
 		end,
-		GetCompareText = GeneCommonCompareText('prestige', _L['Prestige'], _L['pt']),
+		GetCompareText = GeneCommonCompareText('prestige', 'Prestige'),
 	},
 	{
 		-- 战阶积分
@@ -485,7 +482,7 @@ local ALERT_COLUMN = {
 		GetValue = function(me)
 			return me.nTitlePoint
 		end,
-		GetCompareText = GeneCommonCompareText('camp_point', _L['Camp point'], _L['sc']),
+		GetCompareText = GeneCommonCompareText('camp_point', 'Camp point'),
 	},
 	{
 		-- 名剑币
@@ -494,7 +491,7 @@ local ALERT_COLUMN = {
 		GetValue = function(me)
 			return me.nArenaAward
 		end,
-		GetCompareText = GeneCommonCompareText('arena_award', _L['Arena award'], _L['pt']),
+		GetCompareText = GeneCommonCompareText('arena_award', 'Arena award'),
 	},
 	{
 		-- 监本
@@ -503,7 +500,7 @@ local ALERT_COLUMN = {
 		GetValue = function(me)
 			return me.nExamPrint
 		end,
-		GetCompareText = GeneCommonCompareText('exam_print', _L['Exam print'], _L['pt']),
+		GetCompareText = GeneCommonCompareText('exam_print', 'Exam print'),
 	},
 	{
 		-- 资历
@@ -512,7 +509,7 @@ local ALERT_COLUMN = {
 		GetValue = function(me)
 			return me.GetAchievementRecord()
 		end,
-		GetCompareText = GeneCommonCompareText('achievement_score', _L['Achievement score'], _L['pt']),
+		GetCompareText = GeneCommonCompareText('achievement_score', 'Achievement score'),
 	},
 	{
 		-- 师徒分
@@ -521,7 +518,7 @@ local ALERT_COLUMN = {
 		GetValue = function(me)
 			return me.dwTAEquipsScore
 		end,
-		GetCompareText = GeneCommonCompareText('mentor_score', _L['Mentor score'], _L['sc']),
+		GetCompareText = GeneCommonCompareText('mentor_score', 'Mentor score'),
 	},
 }
 local ALERT_COLUMN_DICT = {}
