@@ -1049,10 +1049,10 @@ function MY_CataclysmMain.OnLButtonClick()
 		if nLootMode == PARTY_LOOT_MODE.BIDDING then
 			return OpenGoldTeam()
 		end
-		if not MY_GKP then
+		if not MY_GKP_MI then
 			return LIB.Alert(_L['Please install and load GKP addon first.'])
 		end
-		return MY_GKP.TogglePanel()
+		return MY_GKP_MI.TogglePanel()
 	elseif szName == 'Wnd_TeamTools' then
 		if not MY_RaidTools then
 			return LIB.Alert(_L['Please install and load MY_RaidTools addon first.'])
