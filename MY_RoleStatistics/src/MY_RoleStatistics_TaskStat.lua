@@ -167,7 +167,8 @@ local function GetTaskState(me, dwQuestID, dwNpcTemplateID)
 end
 
 local EXCEL_WIDTH = 960
-local TASK_WIDTH = 42
+local TASK_MIN_WIDTH = 42
+local TASK_MAX_WIDTH = 150
 local function GeneCommonFormatText(id)
 	return function(r)
 		return GetFormatText(r[id])
@@ -187,21 +188,21 @@ local COLUMN_LIST = {
 	{ -- 大区
 		id = 'region',
 		szTitle = _L['Region'],
-		nWidth = 100,
+		nMinWidth = 100, nMaxWidth = 100,
 		GetFormatText = GeneCommonFormatText('region'),
 		Compare = GeneCommonCompare('region'),
 	},
 	{ -- 服务器
 		id = 'server',
 		szTitle = _L['Server'],
-		nWidth = 100,
+		nMinWidth = 100, nMaxWidth = 100,
 		GetFormatText = GeneCommonFormatText('server'),
 		Compare = GeneCommonCompare('server'),
 	},
 	{ -- 名字
 		id = 'name',
 		szTitle = _L['Name'],
-		nWidth = 110,
+		nMinWidth = 110, nMaxWidth = 200,
 		GetFormatText = function(rec)
 			local name = rec.name
 			if MY_ChatMosaics and MY_ChatMosaics.MosaicsString then
@@ -214,7 +215,7 @@ local COLUMN_LIST = {
 	{ -- 门派
 		id = 'force',
 		szTitle = _L['Force'],
-		nWidth = 50,
+		nMinWidth = 50, nMaxWidth = 70,
 		GetFormatText = function(rec)
 			return GetFormatText(g_tStrings.tForceTitle[rec.force])
 		end,
@@ -223,7 +224,7 @@ local COLUMN_LIST = {
 	{ -- 阵营
 		id = 'camp',
 		szTitle = _L['Camp'],
-		nWidth = 50,
+		nMinWidth = 50, nMaxWidth = 50,
 		GetFormatText = function(rec)
 			return GetFormatText(g_tStrings.STR_CAMP_TITLE[rec.camp])
 		end,
@@ -232,14 +233,14 @@ local COLUMN_LIST = {
 	{ -- 等级
 		id = 'level',
 		szTitle = _L['Level'],
-		nWidth = 50,
+		nMinWidth = 50, nMaxWidth = 50,
 		GetFormatText = GeneCommonFormatText('level'),
 		Compare = GeneCommonCompare('level'),
 	},
 	{ -- 时间
 		id = 'time',
 		szTitle = _L['Cache time'],
-		nWidth = 165,
+		nMinWidth = 165, nMaxWidth = 165,
 		GetFormatText = function(rec)
 			return GetFormatText(LIB.FormatTime(rec.time, '%yyyy/%MM/%dd %hh:%mm:%ss'))
 		end,
@@ -248,7 +249,7 @@ local COLUMN_LIST = {
 	{ -- 时间计时
 		id = 'time_days',
 		szTitle = _L['Cache time days'],
-		nWidth = 120,
+		nMinWidth = 120, nMaxWidth = 120,
 		GetFormatText = function(rec)
 			local nTime = GetCurrentTime() - rec.time
 			local nSeconds = floor(nTime)
@@ -431,7 +432,8 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 		local col = { -- 副本CD
 			id = id,
 			szTitle = task.szTitle,
-			nWidth = TASK_WIDTH,
+			nMinWidth = TASK_MIN_WIDTH,
+			nMaxWidth = TASK_MAX_WIDTH,
 		}
 		col.GetTitleFormatTip = function()
 			local aTitleTipXml = {
@@ -693,12 +695,18 @@ function D.UpdateUI(page)
 	hCols:Clear()
 
 	local aCol, nX, Sorter = D.GetColumns(), 0, nil
+	local nExtraWidth = EXCEL_WIDTH
+	for i, col in ipairs(aCol) do
+		nExtraWidth = nExtraWidth - col.nMinWidth
+	end
 	for i, col in ipairs(aCol) do
 		local hCol = hCols:AppendItemFromIni(SZ_INI, 'Handle_TaskStatColumn')
 		local txt = hCol:Lookup('Text_TaskStat_Title')
 		local imgAsc = hCol:Lookup('Image_TaskStat_Asc')
 		local imgDesc = hCol:Lookup('Image_TaskStat_Desc')
-		local nWidth = i == #aCol and (EXCEL_WIDTH - nX) or col.nWidth
+		local nWidth = i == #aCol
+			and (EXCEL_WIDTH - nX)
+			or min(nExtraWidth * col.nMinWidth / (EXCEL_WIDTH - nExtraWidth) + col.nMinWidth, col.nMaxWidth or HUGE)
 		local nSortDelta = nWidth > 70 and 25 or 15
 		if i == 0 then
 			hCol:Lookup('Image_TaskStat_Break'):Hide()
@@ -741,6 +749,10 @@ function D.UpdateUI(page)
 	end
 
 	local aCol = D.GetColumns()
+	local nExtraWidth = EXCEL_WIDTH
+	for i, col in ipairs(aCol) do
+		nExtraWidth = nExtraWidth - col.nMinWidth
+	end
 	local hList = page:Lookup('Wnd_Total/WndScroll_TaskStat', 'Handle_List')
 	hList:Clear()
 	for i, rec in ipairs(result) do
@@ -759,10 +771,9 @@ function D.UpdateUI(page)
 			hItemContent:SetW(99999)
 			hItemContent:FormatAllItemPos()
 			hItemContent:SetSizeByAllItemSize()
-			local nWidth = col.nWidth
-			if j == #aCol then
-				nWidth = EXCEL_WIDTH - nX
-			end
+			local nWidth = j == #aCol
+				and (EXCEL_WIDTH - nX)
+				or min(nExtraWidth * col.nMinWidth / (EXCEL_WIDTH - nExtraWidth) + col.nMinWidth, col.nMaxWidth or HUGE)
 			hItem:SetRelX(nX)
 			hItem:SetW(nWidth)
 			hItemContent:SetRelPos((nWidth - hItemContent:GetW()) / 2, (hItem:GetH() - hItemContent:GetH()) / 2)
@@ -785,7 +796,7 @@ function D.OnInitPage()
 		x = 800, y = 20, w = 180,
 		text = _L['Columns'],
 		menu = function()
-			local t, aColumn, tChecked, nW = {}, O.aColumn, {}, 0
+			local t, aColumn, tChecked, nMinW = {}, O.aColumn, {}, 0
 			-- 已添加的
 			for i, id in ipairs(aColumn) do
 				local col = COLUMN_DICT[id]
@@ -821,7 +832,7 @@ function D.OnInitPage()
 							end,
 						},
 					})
-					nW = nW + col.nWidth
+					nMinW = nMinW + col.nMinWidth
 				end
 				tChecked[id] = true
 			end
@@ -836,7 +847,7 @@ function D.OnInitPage()
 					end
 				end
 				if not bExist then
-					if nW + nWidth > EXCEL_WIDTH then
+					if nMinW + nWidth > EXCEL_WIDTH then
 						LIB.Alert(_L['Too many column selected, width overflow, please delete some!'])
 					else
 						insert(aColumn, id)
@@ -852,7 +863,7 @@ function D.OnInitPage()
 					insert(t, {
 						szOption = col.szTitle,
 						fnAction = function()
-							fnAction(col.id, col.nWidth)
+							fnAction(col.id, col.nMinWidth)
 						end,
 					})
 				end
@@ -866,7 +877,7 @@ function D.OnInitPage()
 							szOption = col.szTitle,
 							bCheck = true, bChecked = tChecked[col.id],
 							fnAction = function()
-								fnAction(col.id, col.nWidth)
+								fnAction(col.id, col.nMinWidth)
 							end,
 						})
 					end
