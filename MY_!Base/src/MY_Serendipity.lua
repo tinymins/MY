@@ -142,9 +142,12 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTi
 			local function TryUploadWithNextDriver()
 				local config = configs[i]
 				if not config then
-					return
+					return 0
 				end
-				i = i + 1
+				--[[#DEBUG BEGIN]]
+				LIB.Debug('Try upload serendipity with mode ' .. config[1] .. '/' .. config[2], DEBUG_LEVEL.LOG)
+				--[[#DEBUG END]]
+				dc, i = LIB.DelayCall(6000, TryUploadWithNextDriver), i + 1 -- 必须先发起保护再请求，因为请求可能会立刻失败触发gc
 				LIB.Ajax({
 					driver = config[1],
 					method = config[2],
@@ -169,7 +172,6 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTi
 						TryUploadWithNextDriver()
 					end,
 				})
-				dc = LIB.DelayCall(6000, TryUploadWithNextDriver)
 			end
 			TryUploadWithNextDriver()
 		end
