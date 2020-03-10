@@ -240,7 +240,7 @@ local COLUMN_LIST = {
 	{ -- Ê±¼ä
 		id = 'time',
 		szTitle = _L['Cache time'],
-		nMinWidth = 165, nMaxWidth = 165,
+		nMinWidth = 165, nMaxWidth = 200,
 		GetFormatText = function(rec)
 			return GetFormatText(LIB.FormatTime(rec.time, '%yyyy/%MM/%dd %hh:%mm:%ss'))
 		end,
