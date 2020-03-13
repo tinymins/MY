@@ -74,6 +74,7 @@ return {
     ['Type'] = '事件',
     ['Caster'] = '释放者',
     ['Target'] = '目标',
+    ['Target not caster'] = '目标非释放者',
     ['EffectName'] = '名称',
     ['SkillResult'] = '效果',
     ['Therapy'] = '治疗',

@@ -308,7 +308,7 @@ function D.DrawHead(frame)
 end
 
 -- 搜索匹配
-function D.MatchRecSearch(data, rec, szSearch, nSearch)
+function D.MatchRecSearch(data, rec, szSearch, nSearch, bEffectName, bCaster, bTarget)
 	if not szSearch or szSearch == '' then
 		return true
 	end
@@ -320,11 +320,13 @@ function D.MatchRecSearch(data, rec, szSearch, nSearch)
 		or (szSearch == _L['Online'] and rec[4] == EVERYTHING_TYPE.ONLINE and rec[6])
 		or (szSearch == _L['Offline'] and rec[4] == EVERYTHING_TYPE.ONLINE and not rec[6])
 		or (rec[4] == EVERYTHING_TYPE.SKILL_EFFECT and (
-			nSearch == rec[8] or nSearch == rec[5] or nSearch == rec[6]
-			or wfind(MY_Recount_DS.GetNameAusID(data, rec[5]) or '', szSearch)
-			or wfind(MY_Recount_DS.GetNameAusID(data, rec[6]) or '', szSearch)
-			or wfind(MY_Recount_DS.GetEffectInfoAusID(data, rec[10]) or '', szSearch)
-			or szSearch == MY_Recount.SKILL_RESULT_NAME[rec[11]]
+			nSearch == rec[8]
+			or (bCaster and nSearch == rec[5])
+			or (bCaster and wfind(MY_Recount_DS.GetNameAusID(data, rec[5]) or '', szSearch))
+			or (bTarget and nSearch == rec[6])
+			or (bTarget and wfind(MY_Recount_DS.GetNameAusID(data, rec[6]) or '', szSearch))
+			or (bEffectName and wfind(MY_Recount_DS.GetEffectInfoAusID(data, rec[10]) or '', szSearch))
+			or (bEffectName and szSearch == MY_Recount.SKILL_RESULT_NAME[rec[11]])
 			or (szSearch == _L['Therapy'] and rec[12] > 0)
 			or (szSearch == _L['EffectTherapy'] and rec[13] > 0)
 			or (szSearch == _L['Damage'] and rec[14] > 0)
@@ -339,6 +341,10 @@ end
 -- 根据搜索和配置过滤生成显示列表
 function D.UpdateData(frame)
 	local aSearch = LIB.SplitString(frame:Lookup('Wnd_Total/Wnd_Search/Edit_Search'):GetText(), ' ', true)
+	local bEffectName = frame:Lookup('Wnd_Total/WndCheckBox_EffectName'):IsCheckBoxChecked()
+	local bCaster = frame:Lookup('Wnd_Total/WndCheckBox_Caster'):IsCheckBoxChecked()
+	local bTarget = frame:Lookup('Wnd_Total/WndCheckBox_Target'):IsCheckBoxChecked()
+	local bTargetNotCaster = frame:Lookup('Wnd_Total/WndCheckBox_TargetNotCaster'):IsCheckBoxChecked()
 	for i, v in ipairs(aSearch) do
 		aSearch[i] = { v, tonumber(v) }
 	end
@@ -360,10 +366,14 @@ function D.UpdateData(frame)
 		and select(2, MY_Recount_DS.GetEffectInfoAusID(data, rec[10])) then
 			bMatch = false
 		end
+		-- 释放者和目标是同一人
+		if bTargetNotCaster and rec[4] == EVERYTHING_TYPE.SKILL_EFFECT and rec[5] == rec[6] then
+			bMatch = false
+		end
 		-- 搜索匹配
 		if bMatch and aSearch then
 			for _, v in ipairs(aSearch) do
-				bMatch = D.MatchRecSearch(data, rec, v[1], v[2])
+				bMatch = D.MatchRecSearch(data, rec, v[1], v[2], bEffectName, bCaster, bTarget)
 				if not bMatch then
 					break
 				end
@@ -709,6 +719,10 @@ function MY_Recount_FP.OnFrameCreate()
 	this.szSortKey = 'time'
 	this.szSortOrder = 'asc'
 	this:Lookup('Wnd_Total/Wnd_Search/Edit_Search'):SetPlaceholderText(_L['Press enter to search ...'])
+	this:Lookup('Wnd_Total/WndCheckBox_EffectName', 'Text_CheckBox_EffectName'):SetText(_L['EffectName'])
+	this:Lookup('Wnd_Total/WndCheckBox_Caster', 'Text_CheckBox_Caster'):SetText(_L['Caster'])
+	this:Lookup('Wnd_Total/WndCheckBox_Target', 'Text_CheckBox_Target'):SetText(_L['Target'])
+	this:Lookup('Wnd_Total/WndCheckBox_TargetNotCaster', 'Text_CheckBox_TargetNotCaster'):SetText(_L['Target not caster'])
 
 	local handle = this:Lookup('Wnd_Total/Wnd_Index', 'Handle_IndexesOuter/Handle_Indexes')
 	handle:Clear()
@@ -754,6 +768,26 @@ function MY_Recount_FP.OnEditSpecialKeyDown()
 			end
 		end
 		return 1
+	end
+end
+
+function MY_Recount_FP.OnCheckBoxCheck()
+	local name = this:GetName()
+	if name == 'WndCheckBox_EffectName' or name == 'WndCheckBox_Caster'
+	or name == 'WndCheckBox_Target' or name == 'WndCheckBox_TargetNotCaster' then
+		local frame = this:GetRoot()
+		D.UpdateData(frame)
+		D.DrawData(frame)
+	end
+end
+
+function MY_Recount_FP.OnCheckBoxUncheck()
+	local name = this:GetName()
+	if name == 'WndCheckBox_EffectName' or name == 'WndCheckBox_Caster'
+	or name == 'WndCheckBox_Target' or name == 'WndCheckBox_TargetNotCaster' then
+		local frame = this:GetRoot()
+		D.UpdateData(frame)
+		D.DrawData(frame)
 	end
 end
 
