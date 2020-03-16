@@ -132,6 +132,23 @@ function LIB.SimpleDecryptString(szCipher)
 	return concat(a)
 end
 
+function LIB.SimpleDecodeString(szCipher, bTripSlashes)
+	local aPhrase = {'v', 'u', 'S', 'r', 'q', '9', 'O', 'b'}
+	local nPhrase = #aPhrase
+	for i, v in ipairs(aPhrase) do
+		aPhrase[i] = v:byte()
+	end
+
+	local aText, ch1, ch2 = {}
+	for i = 1, #szCipher, 2 do
+		ch1 = szCipher:byte(i) - 65;
+		ch2 = szCipher:byte(i + 1) - 65;
+		ch1 = LIB.NumberBitOr(LIB.NumberBitShl(ch1, 4, 64), ch2)
+		aText[(i + 1) / 2] = char(LIB.NumberBitXor(ch1, aPhrase[(((i + 1) / 2) - 1) % nPhrase + 1]))
+	end
+	return concat(aText)
+end
+
 local function EncodePostData(data, t, prefix)
 	if type(data) == 'table' then
 		local first = true
