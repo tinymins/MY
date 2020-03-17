@@ -101,7 +101,7 @@ local O = {
 		{ nItem = 12, szTitle = _L['FIREWORK_TITLE_157378'], aUIID = {157378, 160971} }, -- 素心竹月 知心人
 		{ nItem = 13, szTitle = _L['FIREWORK_TITLE_158339'], aUIID = {158339, 160972} }, -- 流光绮梦 衷情人
 		{ nItem = 14, szTitle = _L['FIREWORK_TITLE_159250'], aUIID = {159250, 160974} }, -- 莲心问情 倾心人
-		{ nItem = 15, szTitle = _L['FIREWORK_TITLE_160982'], aUIID = {160982 } }, -- 海誓山盟
+		{ nItem = 15, szTitle = _L['FIREWORK_TITLE_160982'], aUIID = {68338, 160982} }, -- 海誓山盟
 		{ nItem = 16, szTitle = _L['FIREWORK_TITLE_160993'], aUIID = {160993, 163339} }, -- 鹊桥引仙 相思人
 		{ nItem = 17, szTitle = _L['FIREWORK_TITLE_161367'], aUIID = {161367, 163340} }, -- 金缕诉情 深情人
 		{ nItem = 18, szTitle = _L['FIREWORK_TITLE_161887'], aUIID = {161887, 163341} }, -- 蝶梦剪窗 称心人
