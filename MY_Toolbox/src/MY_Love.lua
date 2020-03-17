@@ -87,28 +87,28 @@ local O = {
 	tOtherLover = {}, -- 查看的情缘数据
 	tViewer = {}, -- 等候查看您的玩家列表
 	aLoverItem = { -- 可用于结缘的烟花信息
-		{ nItem = 1, szName = LIB.GetItemNameByUIID(67291), szTitle = _L['FIREWORK_TITLE_67291'], aUIID = {67291} }, -- 真橙之心
-		{ nItem = 2, szName = LIB.GetItemNameByUIID(151303), szTitle = _L['FIREWORK_TITLE_151303'], aUIID = {151303} }, -- 无间长情 真心人
-		{ nItem = 3, szName = LIB.GetItemNameByUIID(151743), szTitle = _L['FIREWORK_TITLE_151743'], aUIID = {151743} }, -- 千衷不渝
-		{ nItem = 4, szName = LIB.GetItemNameByUIID(152844), szTitle = _L['FIREWORK_TITLE_152844'], aUIID = {152844} }, -- 心不释手
-		{ nItem = 5, szName = LIB.GetItemNameByUIID(154319), szTitle = _L['FIREWORK_TITLE_154319'], aUIID = {154319} }, -- 鸿福齐天 惜福人
-		{ nItem = 6, szName = LIB.GetItemNameByUIID(154320), szTitle = _L['FIREWORK_TITLE_154320'], aUIID = {154320} }, -- 情人心 一心人
-		{ nItem = 7, szName = LIB.GetItemNameByUIID(153641), szTitle = _L['FIREWORK_TITLE_153641'], aUIID = {153641} }, -- 素月流天
-		{ nItem = 8, szName = LIB.GetItemNameByUIID(153642), szTitle = _L['FIREWORK_TITLE_153642'], aUIID = {153642} }, -- 万家灯火
-		{ nItem = 9, szName = LIB.GetItemNameByUIID(156413), szTitle = _L['FIREWORK_TITLE_156413'], aUIID = {156413} }, -- 冰荷逢春 有福人
-		{ nItem = 10, szName = LIB.GetItemNameByUIID(156446), szTitle = _L['FIREWORK_TITLE_156446'], aUIID = {156446, 154313} }, -- 荷渡鸾桥 同心人
-		{ nItem = 11, szName = LIB.GetItemNameByUIID(157096), szTitle = _L['FIREWORK_TITLE_157096'], aUIID = {157096} }, -- 莲心并蒂 恒心人
-		{ nItem = 12, szName = LIB.GetItemNameByUIID(157378), szTitle = _L['FIREWORK_TITLE_157378'], aUIID = {157378} }, -- 素心竹月 知心人
-		{ nItem = 13, szName = LIB.GetItemNameByUIID(158339), szTitle = _L['FIREWORK_TITLE_158339'], aUIID = {158339} }, -- 流光绮梦 衷情人
-		{ nItem = 14, szName = LIB.GetItemNameByUIID(159250), szTitle = _L['FIREWORK_TITLE_159250'], aUIID = {159250} }, -- 莲心问情 倾心人
-		{ nItem = 15, szName = LIB.GetItemNameByUIID(160982), szTitle = _L['FIREWORK_TITLE_160982'], aUIID = {160982} }, -- 海誓山盟
-		{ nItem = 16, szName = LIB.GetItemNameByUIID(160993), szTitle = _L['FIREWORK_TITLE_160993'], aUIID = {160993} }, -- 鹊桥引仙 相思人
-		{ nItem = 17, szName = LIB.GetItemNameByUIID(161367), szTitle = _L['FIREWORK_TITLE_161367'], aUIID = {161367} }, -- 金缕诉情 深情人
-		{ nItem = 18, szName = LIB.GetItemNameByUIID(161887), szTitle = _L['FIREWORK_TITLE_161887'], aUIID = {161887} }, -- 蝶梦剪窗 称心人
-		{ nItem = 19, szName = LIB.GetItemNameByUIID(162307), szTitle = _L['FIREWORK_TITLE_162307'], aUIID = {162307} }, -- 花语相思 还愿人
-		{ nItem = 20, szName = LIB.GetItemNameByUIID(162308), szTitle = _L['FIREWORK_TITLE_162308'], aUIID = {162308} }, -- 在吗
-		{ nItem = 21, szName = LIB.GetItemNameByUIID(158577), szTitle = _L['FIREWORK_TITLE_158577'], aUIID = {158577} }, -- 金鸾喻情 玲珑心
-		-- { nItem = 63, szName = LIB.GetItemNameByUIID(65625), szTitle = LIB.GetItemNameByUIID(65625), aUIID = {65625} }, -- 测试用 焰火棒
+		{ nItem = 1, szTitle = _L['FIREWORK_TITLE_67291'], aUIID = {67291, 151179, 160465, 163486} }, -- 真橙之心
+		{ nItem = 2, szTitle = _L['FIREWORK_TITLE_151303'], aUIID = {151303, 160961, 161078} }, -- 无间长情 真心人
+		{ nItem = 3, szTitle = _L['FIREWORK_TITLE_151743'], aUIID = {151743, 160964, 161079} }, -- 千衷不渝
+		{ nItem = 4, szTitle = _L['FIREWORK_TITLE_152844'], aUIID = {152844, 160962} }, -- 心不释手
+		{ nItem = 5, szTitle = _L['FIREWORK_TITLE_154319'], aUIID = {154319, 160965} }, -- 鸿福齐天 惜福人
+		{ nItem = 6, szTitle = _L['FIREWORK_TITLE_154320'], aUIID = {154320, 160968} }, -- 情人心 一心人
+		{ nItem = 7, szTitle = _L['FIREWORK_TITLE_153641'], aUIID = {153641, 156447, 160963} }, -- 素月流天
+		{ nItem = 8, szTitle = _L['FIREWORK_TITLE_153642'], aUIID = {153642, 160966} }, -- 万家灯火
+		{ nItem = 9, szTitle = _L['FIREWORK_TITLE_156413'], aUIID = {156413, 160970} }, -- 冰荷逢春 有福人
+		{ nItem = 10, szTitle = _L['FIREWORK_TITLE_156446'], aUIID = {154313, 156446, 160967} }, -- 荷渡鸾桥 同心人
+		{ nItem = 11, szTitle = _L['FIREWORK_TITLE_157096'], aUIID = {157096, 160969} }, -- 莲心并蒂 恒心人
+		{ nItem = 12, szTitle = _L['FIREWORK_TITLE_157378'], aUIID = {157378, 160971} }, -- 素心竹月 知心人
+		{ nItem = 13, szTitle = _L['FIREWORK_TITLE_158339'], aUIID = {158339, 160972} }, -- 流光绮梦 衷情人
+		{ nItem = 14, szTitle = _L['FIREWORK_TITLE_159250'], aUIID = {159250, 160974} }, -- 莲心问情 倾心人
+		{ nItem = 15, szTitle = _L['FIREWORK_TITLE_160982'], aUIID = {160982 } }, -- 海誓山盟
+		{ nItem = 16, szTitle = _L['FIREWORK_TITLE_160993'], aUIID = {160993, 163339} }, -- 鹊桥引仙 相思人
+		{ nItem = 17, szTitle = _L['FIREWORK_TITLE_161367'], aUIID = {161367, 163340} }, -- 金缕诉情 深情人
+		{ nItem = 18, szTitle = _L['FIREWORK_TITLE_161887'], aUIID = {161887, 163341} }, -- 蝶梦剪窗 称心人
+		{ nItem = 19, szTitle = _L['FIREWORK_TITLE_162307'], aUIID = {162307, 163435} }, -- 花语相思 还愿人
+		{ nItem = 20, szTitle = _L['FIREWORK_TITLE_162308'], aUIID = {162308, 163427} }, -- 在吗
+		{ nItem = 21, szTitle = _L['FIREWORK_TITLE_158577'], aUIID = {158577, 160973} }, -- 金鸾喻情 玲珑心
+		-- { nItem = 63, szTitle = LIB.GetItemNameByUIID(65625), aUIID = {65625} }, -- 测试用 焰火棒
 	},
 	tLoverItem = {},
 	nPendingItem = 0, -- 请求结缘烟花nItem序号缓存
@@ -240,7 +240,7 @@ function D.CreateFireworkSelect(callback)
 	for i, p in ipairs(O.aLoverItem) do
 		ui:Append('WndButton', {
 			x = nX, y = nY + (nLineHeight - nItemHeight) / 2, w = nItemWidth, h = nItemHeight,
-			text = p.szName,
+			text = LIB.GetItemNameByUIID(p.aUIID[1]),
 			enable = not not D.GetBagItemPos(p.aUIID),
 			onclick = function() callback(p) end,
 			tip = p.szTitle,
