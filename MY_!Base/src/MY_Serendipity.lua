@@ -139,6 +139,18 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTi
 		local szReporterU = AnsiToUTF8(szReporter)
 		local function DoUpload()
 			local configs, i, dc = {{'curl', 'post'}, {'origin', 'post'}, {'origin', 'get'}, {'webcef', 'get'}}, 1
+			local url = 'http://data.j3cx.com/serendipity/?l=' .. LIB.GetLang()
+			.. '&data=' .. LIB.EncryptString(LIB.JsonEncode({
+				S = szRegionU, s = szServerU, a = szSerendipityU,
+				n = szNameU, N = szNameCRC, R = szReporterU,
+				f = nStatus, t = dwTime, c = bSelf and 0 or 1,
+				m = nMethod,
+			}))
+			--[[#DEBUG BEGIN]]
+			LIB.Debug('Prepare for uploading serendipity '
+				.. szSerendipity .. ' by ' .. szName .. '#' .. szNameCRC .. ' via ' .. szReporter
+				.. ' to ' .. url, DEBUG_LEVEL.LOG)
+			--[[#DEBUG END]]
 			local function TryUploadWithNextDriver()
 				local config = configs[i]
 				if not config then
@@ -151,13 +163,7 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTi
 				LIB.Ajax({
 					driver = config[1],
 					method = config[2],
-					url = 'http://data.j3cx.com/serendipity/?l=' .. LIB.GetLang()
-						.. '&data=' .. LIB.EncryptString(LIB.JsonEncode({
-							S = szRegionU, s = szServerU, a = szSerendipityU,
-							n = szNameU, N = szNameCRC, R = szReporterU,
-							f = nStatus, t = dwTime, c = bSelf and 0 or 1,
-							m = nMethod,
-						})),
+					url = url,
 					success = function()
 						--[[#DEBUG BEGIN]]
 						LIB.Debug('Upload serendipity succeed with mode ' .. config[1] .. '/' .. config[2], DEBUG_LEVEL.LOG)
