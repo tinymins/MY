@@ -122,7 +122,7 @@ local COLUMN_LIST = {
 			if MY_ChatMosaics and MY_ChatMosaics.MosaicsString then
 				name = MY_ChatMosaics.MosaicsString(name)
 			end
-			return GetFormatText(name)
+			return GetFormatText(name, nil, LIB.GetForceColor(rec.force, 'foreground'))
 		end,
 	},
 	{ -- цееи
