@@ -766,6 +766,13 @@ function D.OnItemMouseEnter()
 			end
 			hItem:Lookup('Text_Name'):SetText(szName)
 			hItem:Lookup('Text_Name'):SetFontColor(255, 255, 128)
+			hItem:Lookup('Text_Name').OnItemLButtonClick = function()
+				if serendipity.dwAchieve then
+					MY_Web.Open('https://j3cx.com/wiki/' .. serendipity.dwAchieve, { w = 850, h = 610 })
+					Wnd.CloseWindow(frame)
+				end
+			end
+			hItem:Lookup('Text_Name'):RegisterEvent(16)
 			local map = serendipity.dwMapID and LIB.GetMapInfo(serendipity.dwMapID)
 			hItem:Lookup('Text_Map'):SetText(map and map.szName or '')
 			hItem:Lookup('Text_Map'):SetFontColor(192, 192, 192)
