@@ -139,4 +139,7 @@ return {
     ['Weekly'] = '周常',
     ['Half-weekly'] = '半周常',
     ['Onece'] = '一次性',
+
+    ['MY_RoleStatistics_SerendipityStat'] = '奇遇統計',
+    ['Serendipity'] = '奇遇',
 }
