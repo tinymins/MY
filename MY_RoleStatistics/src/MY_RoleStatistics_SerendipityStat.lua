@@ -118,6 +118,17 @@ local function SerendipityStringTrigger(szText, aSearch, nID, nNum)
 end
 for _, serendipity in ipairs(SERENDIPITY_LIST) do
 	-- 今日失败的判断们
+	if serendipity.nBuffType == 1 then
+		LIB.RegisterEvent('BUFF_UPDATE.MY_RoleStatistics_SerendipityStat_AttemptBuff' .. serendipity.nID, function()
+			-- buff update：
+			-- arg0：dwPlayerID，arg1：bDelete，arg2：nIndex，arg3：bCanCancel
+			-- arg4：dwBuffID，arg5：nStackNum，arg6：nEndFrame，arg7：？update all?
+			-- arg8：nLevel，arg9：dwSkillSrcID
+			if arg0 == UI_GetClientPlayerID() and arg4 == serendipity.dwBuffID then
+				OnSerendipityTrigger()
+			end
+		end)
+	end
 	if serendipity.aRejectOpenWindow then
 		LIB.RegisterEvent('OPEN_WINDOW.MY_RoleStatistics_SerendipityStat_RejectOpenWindow' .. serendipity.nID, function()
 			SerendipityStringTrigger(arg1, serendipity.aRejectOpenWindow, serendipity.nID, serendipity.nMaxAttemptNum)
@@ -137,6 +148,11 @@ for _, serendipity in ipairs(SERENDIPITY_LIST) do
 		end, { "MSG_NPC_NEARBY" })
 	end
 	-- 尝试一次的判断们
+	if serendipity.aAttemptOpenWindow then
+		LIB.RegisterEvent('OPEN_WINDOW.MY_RoleStatistics_SerendipityStat_AttemptOpenWindow' .. serendipity.nID, function()
+			SerendipityStringTrigger(arg1, serendipity.aAttemptOpenWindow, serendipity.nID)
+		end)
+	end
 	if serendipity.aAttemptNpcSayTo then
 		LIB.RegisterMsgMonitor('MY_RoleStatistics_SerendipityStat_AttemptNpcSayTo' .. serendipity.nID, function(szMsg, nFont, bRich)
 			if bRich then
@@ -145,9 +161,19 @@ for _, serendipity in ipairs(SERENDIPITY_LIST) do
 			SerendipityStringTrigger(szMsg, serendipity.aAttemptNpcSayTo, serendipity.nID)
 		end, { "MSG_NPC_NEARBY" })
 	end
-	if serendipity.aAttemptOpenWindow then
-		LIB.RegisterEvent('OPEN_WINDOW.MY_RoleStatistics_SerendipityStat_AttemptOpenWindow' .. serendipity.nID, function()
-			SerendipityStringTrigger(arg1, serendipity.aAttemptOpenWindow, serendipity.nID)
+	if serendipity.aAttemptLootItem then
+		LIB.RegisterEvent('LOOT_ITEM.MY_RoleStatistics_SerendipityStat_AttemptLootItem' .. serendipity.nID, function()
+			if arg0 == UI_GetClientPlayerID() then
+				local item = GetItem(arg1)
+				if item then
+					for _, v in ipairs(serendipity.aAttemptLootItem) do
+						if v[1] == item.dwTabType and v[2] == item.dwIndex then
+							SERENDIPITY_COUNTER[serendipity.nID] = (SERENDIPITY_COUNTER[serendipity.nID] or 0) + 1
+							OnSerendipityTrigger()
+						end
+					end
+				end
+			end
 		end)
 	end
 	if serendipity.aFailureOpenWindow then
@@ -166,17 +192,6 @@ for _, serendipity in ipairs(SERENDIPITY_LIST) do
 	if serendipity.aFailureWarningMessage then
 		LIB.RegisterEvent('ON_WARNING_MESSAGE.MY_RoleStatistics_SerendipityStat_FailureWarningMessage' .. serendipity.nID, function()
 			SerendipityStringTrigger(arg1, serendipity.aFailureWarningMessage, serendipity.nID)
-		end)
-	end
-	if serendipity.nBuffType == 1 then
-		LIB.RegisterEvent('BUFF_UPDATE.MY_RoleStatistics_SerendipityStat_AttemptBuff' .. serendipity.nID, function()
-			-- buff update：
-			-- arg0：dwPlayerID，arg1：bDelete，arg2：nIndex，arg3：bCanCancel
-			-- arg4：dwBuffID，arg5：nStackNum，arg6：nEndFrame，arg7：？update all?
-			-- arg8：nLevel，arg9：dwSkillSrcID
-			if arg0 == UI_GetClientPlayerID() and arg4 == serendipity.dwBuffID then
-				OnSerendipityTrigger()
-			end
 		end)
 	end
 end

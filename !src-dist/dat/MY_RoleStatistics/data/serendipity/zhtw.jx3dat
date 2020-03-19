@@ -13,6 +13,7 @@ return {
 		nBuffType = 0,
 		dwBuffID = 10102,
 		aRejectOpenWindow = {"<G>都給你三張紙了，都沒畫好，還是明天再來吧。"},
+		aAttemptLootItem = {{ITEM_TABLE_TYPE.OTHER, 26026}},
 		aAttemptCostItemType = {"OTHER"},
 		dwAttemptCostItemIndex = 26026,
 	},
@@ -207,7 +208,7 @@ return {
 		nBuffType = 0,
 		dwBuffID = 11460,
 		aRejectOpenWindow = {"<G>你都問了三遍了，只是丟了個小物什。"},
-		aFailureNpcSayTo = {"丟了件不值錢的飾品，沒什麼的。"},
+		aFailureNpcSayTo = {"[苗淼爾]說：丟了件不值錢的飾品，沒什麼的。"},
 	},
 	{
 		nID = 14,
