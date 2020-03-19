@@ -277,7 +277,7 @@ return {
 		nBuffType = 0,
 		dwBuffID = 11895,
 		aRejectOpenWindow = {"<G>多謝你的草藥"},
-		aAttemptNpcSayTo = {"多謝你的草藥……滴水之恩，當涌泉相報。"},
+		aAttemptNpcSayTo = {"[康永浩]說：多謝你的草藥……滴水之恩，當涌泉相報。"},
 	},
 	{
 		nID = 18,

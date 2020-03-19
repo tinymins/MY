@@ -194,6 +194,21 @@ for _, serendipity in ipairs(SERENDIPITY_LIST) do
 			SerendipityStringTrigger(arg1, serendipity.aFailureWarningMessage, serendipity.nID)
 		end)
 	end
+	if serendipity.aFailureLootItem then
+		LIB.RegisterEvent('LOOT_ITEM.MY_RoleStatistics_SerendipityStat_FailureLootItem' .. serendipity.nID, function()
+			if arg0 == UI_GetClientPlayerID() then
+				local item = GetItem(arg1)
+				if item then
+					for _, v in ipairs(serendipity.aFailureLootItem) do
+						if v[1] == item.dwTabType and v[2] == item.dwIndex then
+							SERENDIPITY_COUNTER[serendipity.nID] = serendipity.nMaxAttemptNum
+							OnSerendipityTrigger()
+						end
+					end
+				end
+			end
+		end)
+	end
 end
 end
 
