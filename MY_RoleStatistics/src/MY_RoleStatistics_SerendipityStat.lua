@@ -826,6 +826,7 @@ function D.OnItemMouseEnter()
 		hList:AppendItemFromIni(SZ_TIP_INI, 'Handle_Title'):Lookup('Text_Title'):SetText(
 			rec.region .. ' ' .. rec.server .. ' - ' .. rec.name
 			.. ' (' .. g_tStrings.tForceTitle[rec.force] .. ' ' .. rec.level .. g_tStrings.STR_LEVEL .. ')')
+		local dwMapID = GetClientPlayer().GetMapID()
 		for _, serendipity in ipairs(SERENDIPITY_LIST) do
 			local col = COLUMN_DICT[serendipity.nID]
 			local hItem = hList:AppendItemFromIni(SZ_TIP_INI, 'Handle_Item')
@@ -844,7 +845,11 @@ function D.OnItemMouseEnter()
 			hItem:Lookup('Text_Name'):RegisterEvent(16)
 			local map = serendipity.dwMapID and LIB.GetMapInfo(serendipity.dwMapID)
 			hItem:Lookup('Text_Map'):SetText(map and map.szName or '')
-			hItem:Lookup('Text_Map'):SetFontColor(192, 192, 192)
+			if dwMapID == serendipity.dwMapID then
+				hItem:Lookup('Text_Map'):SetFontColor(168, 240, 240)
+			else
+				hItem:Lookup('Text_Map'):SetFontColor(192, 192, 192)
+			end
 			local szText, r, g, b = col.GetText(rec)
 			hItem:Lookup('Text_State'):SetText(szText)
 			hItem:Lookup('Text_State'):SetFontColor(r, g, b)
