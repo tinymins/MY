@@ -241,6 +241,30 @@ LIB.RegisterEvent('LOADING_ENDING.MY_RoleStatistics_SerendipityStat', function()
 end)
 
 -----------------------------------------------------------------------------------------------
+-- 获取是否是福源宠物
+-----------------------------------------------------------------------------------------------
+local FellowPetLucky = KG_Table.Load('settings\\Domesticate\\FellowPetLucky.tab', {
+	{f = 'i', t = 'Date'},
+	{f = 'i', t = 'PetIndex0'},
+	{f = 'i', t = 'PetIndex1'},
+	{f = 'i', t = 'PetIndex2'},
+}, FILE_OPEN_MODE.NORMAL)
+
+function D.GetLuckyFellowPet()
+	local tTime = TimeToDate(GetCurrentTime())
+	local nDate = tTime.month * 100 + tTime.day
+	local tLine = FellowPetLucky:Search(nDate)
+	if tLine then
+		return {
+			[tLine.PetIndex0] = true,
+			[tLine.PetIndex1] = true,
+			[tLine.PetIndex2] = true,
+		}
+	end
+	return CONSTANT.EMPTY_TABLE
+end
+
+-----------------------------------------------------------------------------------------------
 -- 可信的奇遇次数和周期计算
 -----------------------------------------------------------------------------------------------
 local function IsInSamePeriod(dwTime)
@@ -827,6 +851,7 @@ function D.OnItemMouseEnter()
 			rec.region .. ' ' .. rec.server .. ' - ' .. rec.name
 			.. ' (' .. g_tStrings.tForceTitle[rec.force] .. ' ' .. rec.level .. g_tStrings.STR_LEVEL .. ')')
 		local dwMapID = GetClientPlayer().GetMapID()
+		local tLuckPet = D.GetLuckyFellowPet()
 		for _, serendipity in ipairs(SERENDIPITY_LIST) do
 			local col = COLUMN_DICT[serendipity.nID]
 			local hItem = hList:AppendItemFromIni(SZ_TIP_INI, 'Handle_Item')
@@ -834,6 +859,7 @@ function D.OnItemMouseEnter()
 			if serendipity.szNick then
 				szName = szName .. '<' .. serendipity.szNick .. '>'
 			end
+			hItem:Lookup('Image_Lucky'):SetVisible(serendipity.dwPet and tLuckPet[serendipity.dwPet] or false)
 			hItem:Lookup('Text_Name'):SetText(szName)
 			hItem:Lookup('Text_Name'):SetFontColor(255, 255, 128)
 			hItem:Lookup('Text_Name').OnItemLButtonClick = function()
