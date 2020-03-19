@@ -99,12 +99,20 @@ RegisterCustomData('Global/MY_RoleStatistics_SerendipityStat.szSort')
 RegisterCustomData('Global/MY_RoleStatistics_SerendipityStat.szSortOrder')
 
 local SERENDIPITY_COUNTER = {}
+
+do
+local function DealyTrigger()
+	FireUIEvent('MY_ROLE_STAT_SERENDIPITY_UPDATE')
+end
+local function OnSerendipityTrigger()
+	LIB.DelayCall('MY_ROLE_STAT_SERENDIPITY_UPDATE', DealyTrigger)
+end
 local function SerendipityStringTrigger(szText, aSearch, nID, nNum)
 	for _, szSearch in ipairs(aSearch) do
 		if szText:sub(1, #szSearch) == szSearch then
 			SERENDIPITY_COUNTER[nID] = nNum
 				or ((SERENDIPITY_COUNTER[nID] or 0) + 1)
-			return FireUIEvent('MY_ROLE_STAT_SERENDIPITY_UPDATE')
+			return OnSerendipityTrigger()
 		end
 	end
 end
@@ -160,6 +168,18 @@ for _, serendipity in ipairs(SERENDIPITY_LIST) do
 			SerendipityStringTrigger(arg1, serendipity.aFailureWarningMessage, serendipity.nID)
 		end)
 	end
+	if serendipity.nBuffType == 1 then
+		LIB.RegisterEvent('BUFF_UPDATE.MY_RoleStatistics_SerendipityStat_AttemptBuff' .. serendipity.nID, function()
+			-- buff update£º
+			-- arg0£ºdwPlayerID£¬arg1£ºbDelete£¬arg2£ºnIndex£¬arg3£ºbCanCancel
+			-- arg4£ºdwBuffID£¬arg5£ºnStackNum£¬arg6£ºnEndFrame£¬arg7£º£¿update all?
+			-- arg8£ºnLevel£¬arg9£ºdwSkillSrcID
+			if arg0 == UI_GetClientPlayerID() and arg4 == serendipity.dwBuffID then
+				OnSerendipityTrigger()
+			end
+		end)
+	end
+end
 end
 
 local function IsInSamePeriod(dwTime)
