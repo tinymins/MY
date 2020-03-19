@@ -195,7 +195,7 @@ LIB.RegisterEvent('LOADING_ENDING.MY_RoleStatistics_SerendipityStat', function()
 						if item then
 							for _, v in ipairs(serendipity.aAttemptLootItem) do
 								if v[1] == item.dwTabType and v[2] == item.dwIndex then
-									SERENDIPITY_COUNTER[serendipity.nID] = (SERENDIPITY_COUNTER[serendipity.nID] or 0) + 1
+									SERENDIPITY_COUNTER[serendipity.nID] = (SERENDIPITY_COUNTER[serendipity.nID] or 0) + arg2
 									OnSerendipityTrigger()
 								end
 							end
