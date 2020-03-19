@@ -77,8 +77,8 @@ end
 local SZ_INI = PACKET_INFO.ROOT .. 'MY_RoleStatistics/ui/MY_RoleStatistics_SerendipityStat.ini'
 local SZ_TIP_INI = PACKET_INFO.ROOT .. 'MY_RoleStatistics/ui/MY_RoleStatistics_SerendipityTip.ini'
 
-DB:Execute('CREATE TABLE IF NOT EXISTS Info (guid NVARCHAR(20), account NVARCHAR(255), region NVARCHAR(20), server NVARCHAR(20), name NVARCHAR(20), force INTEGER, camp INTEGER, level INTEGER, serendipity_info NVARCHAR(65535), time INTEGER, PRIMARY KEY(guid))')
-local InfoW = DB:Prepare('REPLACE INTO Info (guid, account, region, server, name, force, camp, level, serendipity_info, time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+DB:Execute('CREATE TABLE IF NOT EXISTS Info (guid NVARCHAR(20), account NVARCHAR(255), region NVARCHAR(20), server NVARCHAR(20), name NVARCHAR(20), force INTEGER, camp INTEGER, level INTEGER, serendipity_info NVARCHAR(65535), item_count NVARCHAR(65535), time INTEGER, PRIMARY KEY(guid))')
+local InfoW = DB:Prepare('REPLACE INTO Info (guid, account, region, server, name, force, camp, level, serendipity_info, item_count, time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
 local InfoG = DB:Prepare('SELECT * FROM Info WHERE guid = ?')
 local InfoR = DB:Prepare('SELECT * FROM Info WHERE account LIKE ? OR name LIKE ? OR region LIKE ? OR server LIKE ? ORDER BY time DESC')
 local InfoD = DB:Prepare('DELETE FROM Info WHERE guid = ?')
@@ -200,6 +200,23 @@ LIB.RegisterEvent('LOADING_ENDING.MY_RoleStatistics_SerendipityStat', function()
 								end
 							end
 						end
+					end
+				end)
+			end
+			if serendipity.aAttemptItem then
+				RegisterEvent('BAG_ITEM_UPDATE.MY_RoleStatistics_SerendipityStat_AttemptItem' .. serendipity.nID, function()
+					local dwBox, dwX = arg0, arg1
+					local me = GetClientPlayer()
+					local item = GetPlayerItem(me, dwBox, dwX)
+					if item then
+						for _, v in ipairs(serendipity.aAttemptItem) do
+							if v[1] == item.dwTabType and v[2] == item.dwIndex then
+								OnSerendipityTrigger()
+								break
+							end
+						end
+					else
+						OnSerendipityTrigger()
 					end
 				end)
 			end
@@ -458,6 +475,11 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 			elseif not IsInSamePeriod(rec.time) then
 				szState = _L['Unknown']
 			elseif serendipity.nMaxAttemptNum > 0 then
+				if serendipity.aAttemptItem then -- 包里有可用触发奇遇道具进行数量补偿
+					for _, v in ipairs(serendipity.aAttemptItem) do
+						nCount = (nCount or 0) - Get(rec.item_count, v, 0)
+					end
+				end
 				if nCount and nCount >= serendipity.nMaxAttemptNum then
 					r, g, b = 255, 170, 170
 				end
@@ -506,6 +528,7 @@ function D.FlushDB()
 	local level = me.nLevel
 	local time = GetCurrentTime()
 	local tSerendipityInfo = {}
+	local tItemCount = {}
 
 	-- 如果在同一个CD周期 则保留数据库中的次数统计
 	InfoG:ClearBindings()
@@ -513,6 +536,7 @@ function D.FlushDB()
 	local result = InfoG:GetAll()
 	if result and result[1] and IsInSamePeriod(result[1].time) then
 		tSerendipityInfo = DecodeLUAData(result[1].serendipity_info) or tSerendipityInfo
+		tItemCount = DecodeLUAData(result[1].item_count) or tItemCount
 	end
 
 	-- 统计可信的次数
@@ -521,17 +545,32 @@ function D.FlushDB()
 		if nDailyCount then
 			tSerendipityInfo[serendipity.nID] = nDailyCount
 		end
+		if serendipity.aAttemptItem then
+			for _, v in ipairs(serendipity.aAttemptItem) do
+				if not tItemCount[v[1]] then
+					tItemCount[v[1]] = {}
+				end
+				tItemCount[v[1]][v[2]] = LIB.GetItemAmountInAllPackages(v[1], v[2])
+				if IsEmpty(tItemCount[v[1]][v[2]]) then
+					tItemCount[v[1]][v[2]] = nil
+				end
+				if IsEmpty(tItemCount[v[1]]) then
+					tItemCount[v[1]] = nil
+				end
+			end
+		end
 		if SERENDIPITY_COUNTER[serendipity.nID] then
 			tSerendipityInfo[serendipity.nID] = min((tSerendipityInfo[serendipity.nID] or 0) + SERENDIPITY_COUNTER[serendipity.nID], serendipity.nMaxAttemptNum)
 		end
 		SERENDIPITY_COUNTER[serendipity.nID] = nil
 	end
 	local serendipity_info = EncodeLUAData(tSerendipityInfo)
+	local item_count = EncodeLUAData(tItemCount)
 
 	DB:Execute('BEGIN TRANSACTION')
 
 	InfoW:ClearBindings()
-	InfoW:BindAll(guid, account, region, server, name, force, camp, level, serendipity_info, time)
+	InfoW:BindAll(guid, account, region, server, name, force, camp, level, serendipity_info, item_count, time)
 	InfoW:Execute()
 
 	DB:Execute('END TRANSACTION')
@@ -603,6 +642,7 @@ function D.UpdateUI(page)
 
 	for _, p in ipairs(result) do
 		p.serendipity_info = DecodeLUAData(p.serendipity_info or '') or {}
+		p.item_count = DecodeLUAData(p.item_count or '') or {}
 	end
 
 	if Sorter then

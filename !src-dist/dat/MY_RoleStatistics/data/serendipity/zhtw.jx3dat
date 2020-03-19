@@ -14,6 +14,7 @@ return {
 		dwBuffID = 10102,
 		aRejectOpenWindow = {"<G>都給你三張紙了，都沒畫好，還是明天再來吧。"},
 		aAttemptLootItem = {{ITEM_TABLE_TYPE.OTHER, 26026}},
+		aAttemptItem = {{ITEM_TABLE_TYPE.OTHER, 26026}},
 	},
 	{
 		nID = 2,
@@ -30,6 +31,7 @@ return {
 		dwBuffID = 10123,
 		aRejectOpenWindow = {"<G>都給你三回都沒燒好，老頭我和泥巴也費勁兒的。今天可不給了。"},
 		aAttemptLootItem = {{ITEM_TABLE_TYPE.OTHER, 25997}},
+		aAttemptItem = {{ITEM_TABLE_TYPE.OTHER, 25997}},
 	},
 	{
 		nID = 3,
@@ -46,6 +48,7 @@ return {
 		dwBuffID = 10094,
 		aRejectWarningMessage = {"三次已滿，請明日再來。"},
 		aAttemptLootItem = {{ITEM_TABLE_TYPE.OTHER, 26009}},
+		aAttemptItem = {{ITEM_TABLE_TYPE.OTHER, 26009}},
 	},
 	{
 		nID = 4,
@@ -76,6 +79,7 @@ return {
 		nBuffType = 1,
 		dwBuffID = 10126,
 		aRejectOpenWindow = {"<G>都給你三回都沒鑄好，工匠們鑄銅錫也是很辛苦的。今天可不給了。"},
+		aAttemptItem = {{ITEM_TABLE_TYPE.OTHER, 26027}},
 	},
 	{
 		nID = 6,
@@ -138,6 +142,7 @@ return {
 		nMaxAttemptNum = 3,
 		nBuffType = 1,
 		dwBuffID = 10593,
+		aAttemptItem = {{ITEM_TABLE_TYPE.OTHER, 26675}},
 	},
 	{
 		nID = 10,
@@ -282,6 +287,7 @@ return {
 		dwBuffID = 11905,
 		aRejectOpenWindow = {"<G>我們蒼雲軍定會剿滅叛軍，不讓兄弟們的鮮血白流。"},
 		aAttemptLootItem = {{ITEM_TABLE_TYPE.OTHER, 28443}},
+		aAttemptItem = {{ITEM_TABLE_TYPE.OTHER, 28443}},
 	},
 	{
 		nID = 19,
