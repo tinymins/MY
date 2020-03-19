@@ -352,11 +352,13 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 				szState, r, g, b = _L['Finished'], 128, 255, 128
 			elseif not IsInSamePeriod(rec.time) then
 				szState = _L['Unknown']
-			else
+			elseif serendipity.nMaxAttemptNum > 0 then
 				if nCount and nCount >= serendipity.nMaxAttemptNum then
 					r, g, b = 255, 170, 170
 				end
 				szState = (nCount or 0) .. '/' .. serendipity.nMaxAttemptNum
+			else
+				szState = (nCount or 0)
 			end
 			return szState, r, g, b
 		end

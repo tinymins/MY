@@ -615,7 +615,7 @@ return {
 		dwAchieve = 7447,
 		szAchieve = "½­ºþÂ¼",
 		dwSerendipity = 75,
-		nMaxAttemptNum = 3,
+		nMaxAttemptNum = -1,
 		nBuffType = 2,
 		dwBuffID = 16453,
 		aFailureWarningMessageType = {"MSG_NOTICE_YELLOW"},
