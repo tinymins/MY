@@ -14,8 +14,6 @@ return {
 		dwBuffID = 10102,
 		aRejectOpenWindow = {"<G>都给你三张纸了，都没画好，还是明天再来吧。"},
 		aAttemptLootItem = {{ITEM_TABLE_TYPE.OTHER, 26026}},
-		aAttemptCostItemType = {"OTHER"},
-		dwAttemptCostItemIndex = 26026,
 	},
 	{
 		nID = 2,
@@ -31,8 +29,7 @@ return {
 		nBuffType = 0,
 		dwBuffID = 10123,
 		aRejectOpenWindow = {"<G>都给你三回都没烧好，老头我和泥巴也费劲儿的。今天可不给了。"},
-		aAttemptCostItemType = {"OTHER"},
-		dwAttemptCostItemIndex = 25997,
+		aAttemptLootItem = {{ITEM_TABLE_TYPE.OTHER, 25997}},
 	},
 	{
 		nID = 3,
@@ -48,8 +45,7 @@ return {
 		nBuffType = 1,
 		dwBuffID = 10094,
 		aRejectWarningMessage = {"三次已满，请明日再来。"},
-		aAttemptCostItemType = {"OTHER"},
-		dwAttemptCostItemIndex = 26009,
+		aAttemptLootItem = {{ITEM_TABLE_TYPE.OTHER, 26009}},
 	},
 	{
 		nID = 4,
@@ -95,7 +91,7 @@ return {
 		nBuffType = 0,
 		dwBuffID = 10125,
 		aRejectOpenWindow = {"<G>你今天都赢我三回了。哼，今天不要再和你玩了。"},
-		aAttemptNpcSayTo = {"你还真厉害，不过我也不差。"},
+		aAttemptNpcSayTo = {"[航小婷]说：你还真厉害，不过我也不差。"},
 	},
 	{
 		nID = 7,
@@ -117,9 +113,7 @@ return {
 		szName = "石敢当",
 		dwMapID = 108,
 		dwNpc = 11969,
-		aDoodad = {
-			6064,
-		},
+		aDoodad = {6064},
 		dwPet = 147,
 		aItemAcquired = {{ITEM_TABLE_TYPE.CUST_TRINKET, 16878}},
 		dwAchieve = 5330,
@@ -160,7 +154,7 @@ return {
 		nBuffType = 0,
 		dwBuffID = 10974,
 		aRejectOpenWindow = {"<G>看了三株，也没发现这植物有什么神奇之处。"},
-		aFailureNpcSayTo = {"看起来没有传闻中的那么奇特。"},
+		aFailureNpcSayTo = {"[查飞天]说：看起来没有传闻中的那么奇特。"},
 	},
 	{
 		nID = 11,
@@ -177,7 +171,6 @@ return {
 		dwBuffID = 10959,
 		aRejectOpenWindow = {"<G>吃了三个都不是幼时吃过的味道,心情还是不好。", "<G>吃了三个都不如丁爷爷家的好吃,心情还是不好。"},
 		aFailureNpcSayTo = {"[沈笑颜]说：不是记忆里的味道。"},
-		aRejectNpcSayTo = {"[沈笑颜]说：吃了三个都不如丁爷爷家的好吃,心情还是不好。"},
 	},
 	{
 		nID = 12,
@@ -215,10 +208,7 @@ return {
 		szName = "甜豆",
 		dwMapID = 159,
 		dwNpc = 54677,
-		aDoodad = {
-			6341,
-			6342,
-		},
+		aDoodad = {6341, 6342},
 		dwPet = 213,
 		aItemAcquired = {{ITEM_TABLE_TYPE.CUST_TRINKET, 18285}},
 		dwAchieve = 5659,
@@ -265,9 +255,7 @@ return {
 		szName = "酒海小龟",
 		dwMapID = 22,
 		dwNpc = 56477,
-		aDoodad = {
-			6500,
-		},
+		aDoodad = {6500},
 		dwPet = 229,
 		aItemAcquired = {{ITEM_TABLE_TYPE.CUST_TRINKET, 18298}},
 		dwAchieve = 5813,
@@ -293,8 +281,7 @@ return {
 		nBuffType = 0,
 		dwBuffID = 11905,
 		aRejectOpenWindow = {"<G>我们苍云军定会剿灭叛军，不让兄弟们的鲜血白流。"},
-		aAttemptCostItemType = {"OTHER"},
-		dwAttemptCostItemIndex = 28443,
+		aAttemptLootItem = {{ITEM_TABLE_TYPE.OTHER, 28443}},
 	},
 	{
 		nID = 19,
@@ -343,9 +330,7 @@ return {
 		szName = "花月小龟",
 		dwMapID = 13,
 		dwNpc = 6985,
-		aDoodad = {
-			6985,
-		},
+		aDoodad = {6985},
 		dwPet = 242,
 		aItemAcquired = {{ITEM_TABLE_TYPE.CUST_TRINKET, 21060}},
 		dwAchieve = 6187,
@@ -361,9 +346,7 @@ return {
 		szNick = "七秀狗",
 		dwMapID = 16,
 		dwNpc = 59355,
-		aDoodad = {
-			6915,
-		},
+		aDoodad = {6915},
 		dwPet = 244,
 		aItemAcquired = {{ITEM_TABLE_TYPE.CUST_TRINKET, 22530}},
 		dwAchieve = 6028,
@@ -511,9 +494,7 @@ return {
 		szName = "阳阳",
 		dwMapID = 243,
 		dwNpc = 62005,
-		aDoodad = {
-			7274,
-		},
+		aDoodad = {7274},
 		dwPet = 260,
 		aItemAcquired = {{ITEM_TABLE_TYPE.CUST_TRINKET, 22538}},
 		dwAchieve = 6695,
@@ -528,9 +509,7 @@ return {
 		szName = "沉溪",
 		dwMapID = 330,
 		dwNpc = 62806,
-		aDoodad = {
-			7459,
-		},
+		aDoodad = {7459},
 		dwPet = 261,
 		aItemAcquired = {{ITEM_TABLE_TYPE.CUST_TRINKET, 22539}},
 		dwAchieve = 6697,
@@ -568,7 +547,7 @@ return {
 		nBuffType = 0,
 		dwBuffID = 15110,
 		aRejectOpenWindow = {"<G>没啦没啦，今天就这么多货，想要的话明天再来吧。"},
-		tFailureAddItem = "5, 32657",
+		aFailureLootItem = {{ITEM_TABLE_TYPE.OTHER, 32657}},
 	},
 	{
 		nID = 37,
@@ -584,7 +563,6 @@ return {
 		nBuffType = 0,
 		dwBuffID = 14918,
 		aRejectWarningMessage = {"鸭子甩了甩翅膀，表示自己不想再洗了"},
-		aFailureWarningMessageType = {"MSG_NOTICE_YELLOW"},
 		aFailureWarningMessage = {"绿头鸭的羽毛似乎还有些脏"},
 	},
 	{
@@ -592,9 +570,7 @@ return {
 		szName = "小苗苗",
 		dwMapID = 6,
 		dwNpc = 65896,
-		aDoodad = {
-			7763,
-		},
+		aDoodad = {7763},
 		dwPet = 285,
 		aItemAcquired = {{ITEM_TABLE_TYPE.CUST_TRINKET, 22563}},
 		dwAchieve = 7102,
@@ -619,7 +595,6 @@ return {
 		nMaxAttemptNum = -1,
 		nBuffType = 2,
 		dwBuffID = 16453,
-		aFailureWarningMessageType = {"MSG_NOTICE_YELLOW"},
 		aFailureWarningMessage = {"你吹奏了竹笛，却什么都没有发生。"},
 	},
 	{
@@ -636,7 +611,6 @@ return {
 		nBuffType = 0,
 		dwBuffID = 16451,
 		aRejectOpenWindow = {"<G>俺这儿做的是小本生意，你都已经试吃三牙瓜了，再吃下去俺这摊子就不要摆啦。"},
-		aFailureWarningMessageType = {"MSG_NOTICE_YELLOW"},
 		aFailureWarningMessage = {"你尝了一牙瓜，发现真的很甜。"},
 	},
 	{
@@ -660,9 +634,7 @@ return {
 		szName = "小果",
 		dwMapID = 5,
 		dwNpc = 0,
-		aDoodad = {
-			4582,
-		},
+		aDoodad = {4582},
 		dwPet = 58,
 		aItemAcquired = {{ITEM_TABLE_TYPE.OTHER, 20863}, {ITEM_TABLE_TYPE.CUST_TRINKET, 10913}},
 		dwQuest = 11790,
@@ -676,9 +648,7 @@ return {
 		szName = "小花",
 		dwMapID = 8,
 		dwNpc = 0,
-		aDoodad = {
-			4706,
-		},
+		aDoodad = {4706},
 		dwPet = 65,
 		aItemAcquired = {{ITEM_TABLE_TYPE.OTHER, 21304}, {ITEM_TABLE_TYPE.CUST_TRINKET, 11108}},
 		dwQuest = 11947,
@@ -692,9 +662,7 @@ return {
 		szName = "小诺",
 		dwMapID = 100,
 		dwNpc = 0,
-		aDoodad = {
-			4763,
-		},
+		aDoodad = {4763},
 		dwPet = 78,
 		aItemAcquired = {{ITEM_TABLE_TYPE.OTHER, 21574}, {ITEM_TABLE_TYPE.CUST_TRINKET, 11779}},
 		dwQuest = 12099,
@@ -708,9 +676,7 @@ return {
 		szName = "果果",
 		dwMapID = 194,
 		dwNpc = 0,
-		aDoodad = {
-			5055,
-		},
+		aDoodad = {5055},
 		dwPet = 82,
 		aItemAcquired = {{ITEM_TABLE_TYPE.OTHER, 22781}, {ITEM_TABLE_TYPE.CUST_TRINKET, 13051}},
 		dwQuest = 12897,
@@ -724,9 +690,7 @@ return {
 		szName = "冰蓝花客",
 		dwMapID = 30,
 		dwNpc = 0,
-		aDoodad = {
-			5053,
-		},
+		aDoodad = {5053},
 		dwPet = 83,
 		aItemAcquired = {{ITEM_TABLE_TYPE.OTHER, 22754}, {ITEM_TABLE_TYPE.CUST_TRINKET, 13052}},
 		dwQuest = 12875,
@@ -741,9 +705,7 @@ return {
 		szNick = "大公鸡",
 		dwMapID = 101,
 		dwNpc = 0,
-		aDoodad = {
-			5155,
-		},
+		aDoodad = {5155},
 		dwPet = 98,
 		aItemAcquired = {{ITEM_TABLE_TYPE.OTHER, 23381}, {ITEM_TABLE_TYPE.CUST_TRINKET, 13223}},
 		dwQuest = 13573,
@@ -757,9 +719,7 @@ return {
 		szName = "商周客",
 		dwMapID = 103,
 		dwNpc = 0,
-		aDoodad = {
-			5316,
-		},
+		aDoodad = {5316},
 		dwPet = 111,
 		aItemAcquired = {{ITEM_TABLE_TYPE.OTHER, 23842}, {ITEM_TABLE_TYPE.CUST_TRINKET, 13909}},
 		dwQuest = 14065,
