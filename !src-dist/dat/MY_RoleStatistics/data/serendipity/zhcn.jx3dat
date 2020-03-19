@@ -241,8 +241,8 @@ return {
 		nMaxAttemptNum = 3,
 		nBuffType = 0,
 		dwBuffID = 11464,
-		aRejectNpcSayTo = {"你已经赛了三圈，今天烈风已经不想和你比赛啦。"},
-		aAttemptNpcSayTo = {"若论骑术，如风如云如火，是最基础的三个条件。"},
+		aRejectNpcSayTo = {"[阿曼]说：{$name},你已经赛了三圈，今天烈风已经不想和你比赛啦。"},
+		aAttemptNpcSayTo = {"[阿曼]说：若论骑术，如风如云如火，是最基础的三个条件。"},
 	},
 	{
 		nID = 16,

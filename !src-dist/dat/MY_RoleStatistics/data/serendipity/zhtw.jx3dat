@@ -241,8 +241,8 @@ return {
 		nMaxAttemptNum = 3,
 		nBuffType = 0,
 		dwBuffID = 11464,
-		aRejectNpcSayTo = {"你已經賽了三圈，今天烈風已經不想和你比賽啦。"},
-		aAttemptNpcSayTo = {"若論騎術，如風如雲如火，是最基礎的三個條件。"},
+		aRejectNpcSayTo = {"[阿曼]說：{$name},你已經賽了三圈，今天烈風已經不想和你比賽啦。"},
+		aAttemptNpcSayTo = {"[阿曼]說：若論騎術，如風如雲如火，是最基礎的三個條件。"},
 	},
 	{
 		nID = 16,

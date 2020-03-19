@@ -98,120 +98,151 @@ RegisterCustomData('Global/MY_RoleStatistics_SerendipityStat.aColumn')
 RegisterCustomData('Global/MY_RoleStatistics_SerendipityStat.szSort')
 RegisterCustomData('Global/MY_RoleStatistics_SerendipityStat.szSortOrder')
 
+-----------------------------------------------------------------------------------------------
+-- 多个渠道奇遇次数监控
+-----------------------------------------------------------------------------------------------
 local SERENDIPITY_COUNTER = {}
+local REGISTER_EVENT, REGISTER_MSG = {}, {}
 
-do
-local function DealyTrigger()
-	FireUIEvent('MY_ROLE_STAT_SERENDIPITY_UPDATE')
+local function RegisterEvent(szID, ...)
+	REGISTER_EVENT[szID] = true
+	return LIB.RegisterEvent(szID, ...)
 end
-local function OnSerendipityTrigger()
-	LIB.DelayCall('MY_ROLE_STAT_SERENDIPITY_UPDATE', DealyTrigger)
+
+local function RegisterMsgMonitor(szID, ...)
+	REGISTER_MSG[szID] = true
+	return LIB.RegisterMsgMonitor(szID, ...)
 end
-local function SerendipityStringTrigger(szText, aSearch, nID, nNum)
-	for _, szSearch in ipairs(aSearch) do
-		if szText:sub(1, #szSearch) == szSearch then
-			SERENDIPITY_COUNTER[nID] = nNum
-				or ((SERENDIPITY_COUNTER[nID] or 0) + 1)
-			return OnSerendipityTrigger()
+
+LIB.RegisterEvent('LOADING_ENDING.MY_RoleStatistics_SerendipityStat', function()
+	for k, _ in pairs(REGISTER_EVENT) do
+		LIB.RegisterEvent(k, false)
+	end
+	for k, _ in pairs(REGISTER_MSG) do
+		LIB.RegisterMsgMonitor(k, false)
+	end
+	local function DelayTrigger()
+		FireUIEvent('MY_ROLE_STAT_SERENDIPITY_UPDATE')
+	end
+	local function OnSerendipityTrigger()
+		LIB.DelayCall('MY_ROLE_STAT_SERENDIPITY_UPDATE', DelayTrigger)
+	end
+	local PARSE_TEXT = setmetatable({}, {__index = function(t, k)
+		t[k] = wgsub(k, '{$name}', GetClientPlayer().szName)
+		return t[k]
+	end})
+	local function SerendipityStringTrigger(szText, aSearch, nID, nNum)
+		for _, szSearch in ipairs(aSearch) do
+			szSearch = PARSE_TEXT[szSearch]
+			if szText:sub(1, #szSearch) == szSearch then
+				SERENDIPITY_COUNTER[nID] = nNum
+					or ((SERENDIPITY_COUNTER[nID] or 0) + 1)
+				return OnSerendipityTrigger()
+			end
 		end
 	end
-end
-for _, serendipity in ipairs(SERENDIPITY_LIST) do
-	-- 今日失败的判断们
-	if serendipity.nBuffType == 1 then
-		LIB.RegisterEvent('BUFF_UPDATE.MY_RoleStatistics_SerendipityStat_AttemptBuff' .. serendipity.nID, function()
-			-- buff update：
-			-- arg0：dwPlayerID，arg1：bDelete，arg2：nIndex，arg3：bCanCancel
-			-- arg4：dwBuffID，arg5：nStackNum，arg6：nEndFrame，arg7：？update all?
-			-- arg8：nLevel，arg9：dwSkillSrcID
-			if arg0 == UI_GetClientPlayerID() and arg4 == serendipity.dwBuffID then
-				OnSerendipityTrigger()
+	local dwMapID = GetClientPlayer().GetMapID()
+	for _, serendipity in ipairs(SERENDIPITY_LIST) do
+		if serendipity.dwMapID == dwMapID then
+			-- 今日失败的判断们
+			if serendipity.nBuffType == 1 then
+				RegisterEvent('BUFF_UPDATE.MY_RoleStatistics_SerendipityStat_AttemptBuff' .. serendipity.nID, function()
+					-- buff update：
+					-- arg0：dwPlayerID，arg1：bDelete，arg2：nIndex，arg3：bCanCancel
+					-- arg4：dwBuffID，arg5：nStackNum，arg6：nEndFrame，arg7：？update all?
+					-- arg8：nLevel，arg9：dwSkillSrcID
+					if arg0 == UI_GetClientPlayerID() and arg4 == serendipity.dwBuffID then
+						OnSerendipityTrigger()
+					end
+				end)
 			end
-		end)
-	end
-	if serendipity.aRejectOpenWindow then
-		LIB.RegisterEvent('OPEN_WINDOW.MY_RoleStatistics_SerendipityStat_RejectOpenWindow' .. serendipity.nID, function()
-			SerendipityStringTrigger(arg1, serendipity.aRejectOpenWindow, serendipity.nID, serendipity.nMaxAttemptNum)
-		end)
-	end
-	if serendipity.aRejectWarningMessage then
-		LIB.RegisterEvent('ON_WARNING_MESSAGE.MY_RoleStatistics_SerendipityStat_RejectWarningMessage' .. serendipity.nID, function()
-			SerendipityStringTrigger(arg1, serendipity.aRejectWarningMessage, serendipity.nID, serendipity.nMaxAttemptNum)
-		end)
-	end
-	if serendipity.aRejectNpcSayTo then
-		LIB.RegisterMsgMonitor('MY_RoleStatistics_SerendipityStat_RejectNpcSayTo' .. serendipity.nID, function(szMsg, nFont, bRich)
-			if bRich then
-				szMsg = GetPureText(szMsg)
+			if serendipity.aRejectOpenWindow then
+				RegisterEvent('OPEN_WINDOW.MY_RoleStatistics_SerendipityStat_RejectOpenWindow' .. serendipity.nID, function()
+					SerendipityStringTrigger(arg1, serendipity.aRejectOpenWindow, serendipity.nID, serendipity.nMaxAttemptNum)
+				end)
 			end
-			SerendipityStringTrigger(szMsg, serendipity.aRejectNpcSayTo, serendipity.nID, serendipity.nMaxAttemptNum)
-		end, { "MSG_NPC_NEARBY" })
-	end
-	-- 尝试一次的判断们
-	if serendipity.aAttemptOpenWindow then
-		LIB.RegisterEvent('OPEN_WINDOW.MY_RoleStatistics_SerendipityStat_AttemptOpenWindow' .. serendipity.nID, function()
-			SerendipityStringTrigger(arg1, serendipity.aAttemptOpenWindow, serendipity.nID)
-		end)
-	end
-	if serendipity.aAttemptNpcSayTo then
-		LIB.RegisterMsgMonitor('MY_RoleStatistics_SerendipityStat_AttemptNpcSayTo' .. serendipity.nID, function(szMsg, nFont, bRich)
-			if bRich then
-				szMsg = GetPureText(szMsg)
+			if serendipity.aRejectWarningMessage then
+				RegisterEvent('ON_WARNING_MESSAGE.MY_RoleStatistics_SerendipityStat_RejectWarningMessage' .. serendipity.nID, function()
+					SerendipityStringTrigger(arg1, serendipity.aRejectWarningMessage, serendipity.nID, serendipity.nMaxAttemptNum)
+				end)
 			end
-			SerendipityStringTrigger(szMsg, serendipity.aAttemptNpcSayTo, serendipity.nID)
-		end, { "MSG_NPC_NEARBY" })
-	end
-	if serendipity.aAttemptLootItem then
-		LIB.RegisterEvent('LOOT_ITEM.MY_RoleStatistics_SerendipityStat_AttemptLootItem' .. serendipity.nID, function()
-			if arg0 == UI_GetClientPlayerID() then
-				local item = GetItem(arg1)
-				if item then
-					for _, v in ipairs(serendipity.aAttemptLootItem) do
-						if v[1] == item.dwTabType and v[2] == item.dwIndex then
-							SERENDIPITY_COUNTER[serendipity.nID] = (SERENDIPITY_COUNTER[serendipity.nID] or 0) + 1
-							OnSerendipityTrigger()
+			if serendipity.aRejectNpcSayTo then
+				RegisterMsgMonitor('MY_RoleStatistics_SerendipityStat_RejectNpcSayTo' .. serendipity.nID, function(szMsg, nFont, bRich)
+					if bRich then
+						szMsg = GetPureText(szMsg)
+					end
+					SerendipityStringTrigger(szMsg, serendipity.aRejectNpcSayTo, serendipity.nID, serendipity.nMaxAttemptNum)
+				end, { "MSG_NPC_NEARBY" })
+			end
+			-- 尝试一次的判断们
+			if serendipity.aAttemptOpenWindow then
+				RegisterEvent('OPEN_WINDOW.MY_RoleStatistics_SerendipityStat_AttemptOpenWindow' .. serendipity.nID, function()
+					SerendipityStringTrigger(arg1, serendipity.aAttemptOpenWindow, serendipity.nID)
+				end)
+			end
+			if serendipity.aAttemptNpcSayTo then
+				RegisterMsgMonitor('MY_RoleStatistics_SerendipityStat_AttemptNpcSayTo' .. serendipity.nID, function(szMsg, nFont, bRich)
+					if bRich then
+						szMsg = GetPureText(szMsg)
+					end
+					SerendipityStringTrigger(szMsg, serendipity.aAttemptNpcSayTo, serendipity.nID)
+				end, { "MSG_NPC_NEARBY" })
+			end
+			if serendipity.aAttemptLootItem then
+				RegisterEvent('LOOT_ITEM.MY_RoleStatistics_SerendipityStat_AttemptLootItem' .. serendipity.nID, function()
+					if arg0 == UI_GetClientPlayerID() then
+						local item = GetItem(arg1)
+						if item then
+							for _, v in ipairs(serendipity.aAttemptLootItem) do
+								if v[1] == item.dwTabType and v[2] == item.dwIndex then
+									SERENDIPITY_COUNTER[serendipity.nID] = (SERENDIPITY_COUNTER[serendipity.nID] or 0) + 1
+									OnSerendipityTrigger()
+								end
+							end
 						end
 					end
-				end
+				end)
 			end
-		end)
-	end
-	if serendipity.aFailureOpenWindow then
-		LIB.RegisterEvent('OPEN_WINDOW.MY_RoleStatistics_SerendipityStat_FailureOpenWindow' .. serendipity.nID, function()
-			SerendipityStringTrigger(arg1, serendipity.aFailureOpenWindow, serendipity.nID)
-		end)
-	end
-	if serendipity.aFailureNpcSayTo then
-		LIB.RegisterMsgMonitor('MY_RoleStatistics_SerendipityStat_FailureNpcSayTo' .. serendipity.nID, function(szMsg, nFont, bRich)
-			if bRich then
-				szMsg = GetPureText(szMsg)
+			if serendipity.aFailureOpenWindow then
+				RegisterEvent('OPEN_WINDOW.MY_RoleStatistics_SerendipityStat_FailureOpenWindow' .. serendipity.nID, function()
+					SerendipityStringTrigger(arg1, serendipity.aFailureOpenWindow, serendipity.nID)
+				end)
 			end
-			SerendipityStringTrigger(szMsg, serendipity.aFailureNpcSayTo, serendipity.nID)
-		end, { "MSG_NPC_NEARBY" })
-	end
-	if serendipity.aFailureWarningMessage then
-		LIB.RegisterEvent('ON_WARNING_MESSAGE.MY_RoleStatistics_SerendipityStat_FailureWarningMessage' .. serendipity.nID, function()
-			SerendipityStringTrigger(arg1, serendipity.aFailureWarningMessage, serendipity.nID)
-		end)
-	end
-	if serendipity.aFailureLootItem then
-		LIB.RegisterEvent('LOOT_ITEM.MY_RoleStatistics_SerendipityStat_FailureLootItem' .. serendipity.nID, function()
-			if arg0 == UI_GetClientPlayerID() then
-				local item = GetItem(arg1)
-				if item then
-					for _, v in ipairs(serendipity.aFailureLootItem) do
-						if v[1] == item.dwTabType and v[2] == item.dwIndex then
-							SERENDIPITY_COUNTER[serendipity.nID] = serendipity.nMaxAttemptNum
-							OnSerendipityTrigger()
+			if serendipity.aFailureNpcSayTo then
+				RegisterMsgMonitor('MY_RoleStatistics_SerendipityStat_FailureNpcSayTo' .. serendipity.nID, function(szMsg, nFont, bRich)
+					if bRich then
+						szMsg = GetPureText(szMsg)
+					end
+					SerendipityStringTrigger(szMsg, serendipity.aFailureNpcSayTo, serendipity.nID)
+				end, { "MSG_NPC_NEARBY" })
+			end
+			if serendipity.aFailureWarningMessage then
+				RegisterEvent('ON_WARNING_MESSAGE.MY_RoleStatistics_SerendipityStat_FailureWarningMessage' .. serendipity.nID, function()
+					SerendipityStringTrigger(arg1, serendipity.aFailureWarningMessage, serendipity.nID)
+				end)
+			end
+			if serendipity.aFailureLootItem then
+				RegisterEvent('LOOT_ITEM.MY_RoleStatistics_SerendipityStat_FailureLootItem' .. serendipity.nID, function()
+					if arg0 == UI_GetClientPlayerID() then
+						local item = GetItem(arg1)
+						if item then
+							for _, v in ipairs(serendipity.aFailureLootItem) do
+								if v[1] == item.dwTabType and v[2] == item.dwIndex then
+									SERENDIPITY_COUNTER[serendipity.nID] = serendipity.nMaxAttemptNum
+									OnSerendipityTrigger()
+								end
+							end
 						end
 					end
-				end
+				end)
 			end
-		end)
+		end
 	end
-end
-end
+end)
 
+-----------------------------------------------------------------------------------------------
+-- 可信的奇遇次数和周期计算
+-----------------------------------------------------------------------------------------------
 local function IsInSamePeriod(dwTime)
 	local nNextTime, nCircle = LIB.GetRefreshTime('daily')
 	return dwTime >= nNextTime - nCircle
