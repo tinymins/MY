@@ -99,80 +99,65 @@ RegisterCustomData('Global/MY_RoleStatistics_SerendipityStat.szSort')
 RegisterCustomData('Global/MY_RoleStatistics_SerendipityStat.szSortOrder')
 
 local SERENDIPITY_COUNTER = {}
+local function SerendipityStringTrigger(szText, aSearch, nID, nNum)
+	for _, szSearch in ipairs(aSearch) do
+		if szText:sub(1, #szSearch) == szSearch then
+			SERENDIPITY_COUNTER[nID] = nNum
+				or ((SERENDIPITY_COUNTER[nID] or 0) + 1)
+			return FireUIEvent('MY_ROLE_STAT_SERENDIPITY_UPDATE')
+		end
+	end
+end
 for _, serendipity in ipairs(SERENDIPITY_LIST) do
 	-- 今日失败的判断们
-	if serendipity.szRejectOpenWindow then
+	if serendipity.aRejectOpenWindow then
 		LIB.RegisterEvent('OPEN_WINDOW.MY_RoleStatistics_SerendipityStat_RejectOpenWindow' .. serendipity.nID, function()
-			if arg1:sub(1, #serendipity.szRejectOpenWindow) == serendipity.szRejectOpenWindow then
-				SERENDIPITY_COUNTER[serendipity.nID] = serendipity.nMaxAttemptNum
-				FireUIEvent('MY_ROLE_STAT_SERENDIPITY_UPDATE')
-			end
+			SerendipityStringTrigger(arg1, serendipity.aRejectOpenWindow, serendipity.nID, serendipity.nMaxAttemptNum)
 		end)
 	end
-	if serendipity.szRejectWarningMessage then
+	if serendipity.aRejectWarningMessage then
 		LIB.RegisterEvent('ON_WARNING_MESSAGE.MY_RoleStatistics_SerendipityStat_RejectWarningMessage' .. serendipity.nID, function()
-			if arg0 == serendipity.szRejectWarningMessageType and arg1:sub(1, #serendipity.szRejectWarningMessage) == serendipity.szRejectWarningMessage then
-				SERENDIPITY_COUNTER[serendipity.nID] = serendipity.nMaxAttemptNum
-				FireUIEvent('MY_ROLE_STAT_SERENDIPITY_UPDATE')
-			end
+			SerendipityStringTrigger(arg1, serendipity.aRejectWarningMessage, serendipity.nID, serendipity.nMaxAttemptNum)
 		end)
 	end
-	if serendipity.szRejectNpcSayTo then
+	if serendipity.aRejectNpcSayTo then
 		LIB.RegisterMsgMonitor('MY_RoleStatistics_SerendipityStat_RejectNpcSayTo' .. serendipity.nID, function(szMsg, nFont, bRich)
 			if bRich then
 				szMsg = GetPureText(szMsg)
 			end
-			if szMsg:sub(1, #serendipity.szRejectNpcSayTo) == serendipity.szRejectNpcSayTo then
-				SERENDIPITY_COUNTER[serendipity.nID] = serendipity.nMaxAttemptNum
-				FireUIEvent('MY_ROLE_STAT_SERENDIPITY_UPDATE')
-			end
+			SerendipityStringTrigger(szMsg, serendipity.aRejectNpcSayTo, serendipity.nID, serendipity.nMaxAttemptNum)
 		end, { "MSG_NPC_NEARBY" })
 	end
 	-- 尝试一次的判断们
-	if serendipity.szAttemptNpcSayTo then
+	if serendipity.aAttemptNpcSayTo then
 		LIB.RegisterMsgMonitor('MY_RoleStatistics_SerendipityStat_AttemptNpcSayTo' .. serendipity.nID, function(szMsg, nFont, bRich)
 			if bRich then
 				szMsg = GetPureText(szMsg)
 			end
-			if szMsg:sub(1, #serendipity.szAttemptNpcSayTo) == serendipity.szAttemptNpcSayTo then
-				SERENDIPITY_COUNTER[serendipity.nID] = (SERENDIPITY_COUNTER[serendipity.nID] or 0) + 1
-				FireUIEvent('MY_ROLE_STAT_SERENDIPITY_UPDATE')
-			end
+			SerendipityStringTrigger(szMsg, serendipity.aAttemptNpcSayTo, serendipity.nID)
 		end, { "MSG_NPC_NEARBY" })
 	end
-	if serendipity.szAttemptOpenWindow then
+	if serendipity.aAttemptOpenWindow then
 		LIB.RegisterEvent('OPEN_WINDOW.MY_RoleStatistics_SerendipityStat_AttemptOpenWindow' .. serendipity.nID, function()
-			if arg1:sub(1, #serendipity.szAttemptOpenWindow) == serendipity.szAttemptOpenWindow then
-				SERENDIPITY_COUNTER[serendipity.nID] = (SERENDIPITY_COUNTER[serendipity.nID] or 0) + 1
-				FireUIEvent('MY_ROLE_STAT_SERENDIPITY_UPDATE')
-			end
+			SerendipityStringTrigger(arg1, serendipity.aAttemptOpenWindow, serendipity.nID)
 		end)
 	end
-	if serendipity.szFailureOpenWindow then
+	if serendipity.aFailureOpenWindow then
 		LIB.RegisterEvent('OPEN_WINDOW.MY_RoleStatistics_SerendipityStat_FailureOpenWindow' .. serendipity.nID, function()
-			if arg1:sub(1, #serendipity.szFailureOpenWindow) == serendipity.szFailureOpenWindow then
-				SERENDIPITY_COUNTER[serendipity.nID] = (SERENDIPITY_COUNTER[serendipity.nID] or 0) + 1
-				FireUIEvent('MY_ROLE_STAT_SERENDIPITY_UPDATE')
-			end
+			SerendipityStringTrigger(arg1, serendipity.aFailureOpenWindow, serendipity.nID)
 		end)
 	end
-	if serendipity.szFailureNpcSayTo then
+	if serendipity.aFailureNpcSayTo then
 		LIB.RegisterMsgMonitor('MY_RoleStatistics_SerendipityStat_FailureNpcSayTo' .. serendipity.nID, function(szMsg, nFont, bRich)
 			if bRich then
 				szMsg = GetPureText(szMsg)
 			end
-			if szMsg:sub(1, #serendipity.szFailureNpcSayTo) == serendipity.szFailureNpcSayTo then
-				SERENDIPITY_COUNTER[serendipity.nID] = (SERENDIPITY_COUNTER[serendipity.nID] or 0) + 1
-				FireUIEvent('MY_ROLE_STAT_SERENDIPITY_UPDATE')
-			end
+			SerendipityStringTrigger(szMsg, serendipity.aFailureNpcSayTo, serendipity.nID)
 		end, { "MSG_NPC_NEARBY" })
 	end
-	if serendipity.szFailureWarningMessage then
+	if serendipity.aFailureWarningMessage then
 		LIB.RegisterEvent('ON_WARNING_MESSAGE.MY_RoleStatistics_SerendipityStat_FailureWarningMessage' .. serendipity.nID, function()
-			if arg0 == serendipity.szFailureWarningMessageType and arg1:sub(1, #serendipity.szFailureWarningMessage) == serendipity.szFailureWarningMessage then
-				SERENDIPITY_COUNTER[serendipity.nID] = (SERENDIPITY_COUNTER[serendipity.nID] or 0) + 1
-				FireUIEvent('MY_ROLE_STAT_SERENDIPITY_UPDATE')
-			end
+			SerendipityStringTrigger(arg1, serendipity.aFailureWarningMessage, serendipity.nID)
 		end)
 	end
 end
@@ -190,11 +175,12 @@ local function GetSerendipityDailyCount(me, tab)
 	if tab.dwQuest and me.GetQuestState(tab.dwQuest) == QUEST_STATE.FINISHED then
 		return -1
 	end
-	if tab.szPetTabType and tab.dwPetIndex and LIB.GetItemAmountInAllPackages(ITEM_TABLE_TYPE[tab.szPetTabType], tab.dwPetIndex) > 0 then
-		return -1
-	end
-	if tab.szCubTabType and tab.dwCubIndex and LIB.GetItemAmountInAllPackages(ITEM_TABLE_TYPE[tab.szCubTabType], tab.dwCubIndex) > 0 then
-		return -1
+	if tab.aItemAcquired then
+		for _, v in ipairs(tab.aItemAcquired) do
+			if LIB.GetItemAmountInAllPackages(v[1], v[2]) > 0 then
+				return -1
+			end
+		end
 	end
 	if tab.dwAchieve and me.IsAchievementAcquired(tab.dwAchieve) then
 		return -1
