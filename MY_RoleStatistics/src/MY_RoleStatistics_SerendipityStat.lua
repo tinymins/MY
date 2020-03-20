@@ -245,7 +245,7 @@ LIB.RegisterEvent('LOADING_ENDING.MY_RoleStatistics_SerendipityStat', function()
 						if item then
 							for _, v in ipairs(serendipity.aFailureLootItem) do
 								if v[1] == item.dwTabType and v[2] == item.dwIndex then
-									SERENDIPITY_COUNTER[serendipity.nID] = serendipity.nMaxAttemptNum
+									SERENDIPITY_COUNTER[serendipity.nID] = (SERENDIPITY_COUNTER[serendipity.nID] or 0) + arg2
 									OnSerendipityTrigger()
 								end
 							end
