@@ -495,7 +495,7 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 			end
 			local szState, r, g, b
 			if not IsInSamePeriod(rec.time, task.eType) then
-				szState = _L['Unknown']
+				szState = _L['--']
 			elseif tTaskState[TASK_STATE.FINISHABLE] then
 				szState = _L['Finishable']
 			elseif tTaskState[TASK_STATE.ACCEPTED] then
@@ -507,7 +507,7 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 			elseif tTaskState[TASK_STATE.UNACCEPTABLE] then
 				szState = _L['Unacceptable']
 			elseif tTaskState[TASK_STATE.UNKNOWN] then
-				szState = _L['Unknown']
+				szState = _L['--']
 			else
 				szState = _L['None']
 			end
