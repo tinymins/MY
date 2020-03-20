@@ -359,10 +359,16 @@ function D.GetDialogueMenu(aInfo, dwTargetType, dwTargetID, dwIndex)
 		end
 		if nRepeat and nRepeat > 0 then
 			menuSub.r, menuSub.g, menuSub.b = 255, 0, 255
-			menuSub.fnAction = function() D.DisableDialogueData(dialog.szMap, dialog.szName, dialog.szContext, option.szContext) end
+			menuSub.fnAction = function()
+				D.DisableDialogueData(dialog.szMap, dialog.szName, dialog.szContext, option.szContext)
+				UI.ClosePopupMenu()
+			end
 		else
 			menuSub.r, menuSub.g, menuSub.b = 255, 255, 255
-			menuSub.fnAction = function() D.EnableDialogueData(dialog.szMap, dialog.szName, dialog.szContext, option.szContext) end
+			menuSub.fnAction = function()
+				D.EnableDialogueData(dialog.szMap, dialog.szName, dialog.szContext, option.szContext)
+				UI.ClosePopupMenu()
+			end
 		end
 		if option.szImage then
 			menuSub.szIcon = option.szImage
