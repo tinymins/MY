@@ -678,7 +678,12 @@ function PS.OnPanelActive(frame)
 		onchange = function(szText)
 			MY_GKPDoodad.szCustom = szText
 		end,
-		tip = _L['Tip: Enter the name of dead animals can be automatically Paoding!'],
+		tip = function()
+			if LIB.IsShieldedVersion('MY_GKPDoodad') then
+				return
+			end
+			return _L['Tip: Enter the name of dead animals can be automatically Paoding!']
+		end,
 		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 		autoenable = function() return (MY_GKPDoodad.bShowName or MY_GKPDoodad.bInteract) and MY_GKPDoodad.bCustom end,
 	})
