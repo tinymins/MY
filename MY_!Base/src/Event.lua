@@ -133,8 +133,8 @@ local function CommonEventRegister(E, szID, fnAction)
 				E.tList = nil
 			end
 		end
-	elseif szKey and E.tList and E.tList[szEvent] then
-		return E.tList[szEvent].tKey[szKey] or false
+	elseif szKey and E.tList then
+		return E.tList[szEvent] and E.tList[szEvent].tKey[szKey] or false
 	elseif not szKey and E.tList and E.tList[szEvent] then
 		return true
 	end
