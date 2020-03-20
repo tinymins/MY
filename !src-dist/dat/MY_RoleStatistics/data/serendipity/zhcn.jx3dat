@@ -554,6 +554,7 @@ return {
 		dwBuffID = 15110,
 		aRejectOpenWindow = {"<G>没啦没啦，今天就这么多货，想要的话明天再来吧。"},
 		aFailureLootItem = {{ITEM_TABLE_TYPE.OTHER, 32657}},
+		aAttemptItem = {{ITEM_TABLE_TYPE.OTHER, 32655}},
 	},
 	{
 		nID = 37,
