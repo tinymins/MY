@@ -97,6 +97,7 @@ return {
     ['Delete'] = '刪除',
     ['Too many column selected, width overflow, please delete some!'] = '選擇列過多已超出寬度限制，請先刪除一些列！',
 
+    ['Float panel'] = '頭像浮動圖標',
     ['%s before'] = '%s前',
     ['Refresh: %s'] = '刷新：%s',
 

@@ -61,6 +61,7 @@ local DB_TaskR = DB:Prepare('SELECT * FROM Task')
 local DB_TaskD = DB:Prepare('DELETE FROM TaskInfo WHERE guid = ?')
 DB:Execute('CREATE TABLE IF NOT EXISTS TaskInfo (guid NVARCHAR(20), account NVARCHAR(255), region NVARCHAR(20), server NVARCHAR(20), name NVARCHAR(20), force INTEGER, camp INTEGER, level INTEGER, task_info NVARCHAR(65535), buff_info NVARCHAR(65535), time INTEGER, PRIMARY KEY(guid))')
 local DB_TaskInfoW = DB:Prepare('REPLACE INTO TaskInfo (guid, account, region, server, name, force, camp, level, task_info, buff_info, time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+local DB_TaskInfoG = DB:Prepare('SELECT * FROM TaskInfo WHERE guid = ?')
 local DB_TaskInfoR = DB:Prepare('SELECT * FROM TaskInfo WHERE account LIKE ? OR name LIKE ? OR region LIKE ? OR server LIKE ? ORDER BY time DESC')
 local DB_TaskInfoD = DB:Prepare('DELETE FROM TaskInfo WHERE guid = ?')
 
@@ -89,10 +90,13 @@ local O = {
 	},
 	szSort = 'time_days',
 	szSortOrder = 'desc',
+	bFloat = false,
+	tFloatAnchor = {},
 }
 RegisterCustomData('Global/MY_RoleStatistics_TaskStat.aColumn')
 RegisterCustomData('Global/MY_RoleStatistics_TaskStat.szSort')
 RegisterCustomData('Global/MY_RoleStatistics_TaskStat.szSortOrder')
+RegisterCustomData('MY_RoleStatistics_TaskStat.bFloat')
 
 local TASK_TYPE = {
 	DAILY = 1,
@@ -739,9 +743,8 @@ function D.UpdateUI(page)
 	DB_TaskInfoR:BindAll(szUSearch, szUSearch, szUSearch, szUSearch)
 	local result = DB_TaskInfoR:GetAll()
 
-	for _, p in ipairs(result) do
-		p.task_info = DecodeLUAData(p.task_info or '') or {}
-		p.buff_info = DecodeLUAData(p.buff_info or '') or {}
+	for _, rec in ipairs(result) do
+		D.DecodeRow(rec)
 	end
 
 	if Sorter then
@@ -757,10 +760,6 @@ function D.UpdateUI(page)
 	hList:Clear()
 	for i, rec in ipairs(result) do
 		local hRow = hList:AppendItemFromIni(SZ_INI, 'Handle_Row')
-		rec.guid   = UTF8ToAnsi(rec.guid)
-		rec.name   = UTF8ToAnsi(rec.name)
-		rec.region = UTF8ToAnsi(rec.region)
-		rec.server = UTF8ToAnsi(rec.server)
 		hRow.rec = rec
 		hRow:Lookup('Image_RowBg'):SetVisible(i % 2 == 1)
 		local nX = 0
@@ -785,12 +784,62 @@ function D.UpdateUI(page)
 	hList:FormatAllItemPos()
 end
 
+function D.DecodeRow(rec)
+	rec.guid   = UTF8ToAnsi(rec.guid)
+	rec.name   = UTF8ToAnsi(rec.name)
+	rec.region = UTF8ToAnsi(rec.region)
+	rec.server = UTF8ToAnsi(rec.server)
+	rec.task_info = DecodeLUAData(rec.task_info or '') or {}
+	rec.buff_info = DecodeLUAData(rec.buff_info or '') or {}
+end
+
+function D.OutputRowTip(this, rec)
+	local aXml = {}
+	for _, id in ipairs(TIP_COLIMN) do
+		if id == 'TASK' then
+			for _, col in ipairs(D.GetColumns()) do
+				if TASK_HASH[col.id] then
+					insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
+					insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
+					insert(aXml, col.GetFormatText(rec))
+					insert(aXml, GetFormatText('\n'))
+				end
+			end
+		else
+			local col = COLUMN_DICT[id]
+			insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
+			insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
+			insert(aXml, col.GetFormatText(rec))
+			insert(aXml, GetFormatText('\n'))
+		end
+	end
+	local x, y = this:GetAbsPos()
+	local w, h = this:GetSize()
+	local nPosType = this:GetRoot():GetName() == 'MY_RoleStatistics_TaskFloat'
+		and UI.TIP_POSITION.TOP_BOTTOM
+		or UI.TIP_POSITION.RIGHT_LEFT
+	OutputTip(concat(aXml), 450, {x, y, w, h}, nPosType)
+end
+
+function D.CloseRowTip()
+	HideTip()
+end
+
 function D.OnInitPage()
 	local page = this
 	local frameTemp = Wnd.OpenWindow(SZ_INI, 'MY_RoleStatistics_TaskStat')
 	local wnd = frameTemp:Lookup('Wnd_Total')
 	wnd:ChangeRelation(page, true, true)
 	Wnd.CloseWindow(frameTemp)
+
+	UI(wnd):Append('WndCheckBox', {
+		x = 670, y = 21, w = 180,
+		text = _L['Float panel'],
+		checked = MY_RoleStatistics_TaskStat.bFloat,
+		oncheck = function()
+			MY_RoleStatistics_TaskStat.bFloat = not MY_RoleStatistics_TaskStat.bFloat
+		end,
+	})
 
 	UI(wnd):Append('WndComboBox', {
 		x = 800, y = 20, w = 180,
@@ -975,28 +1024,7 @@ end
 function D.OnItemMouseEnter()
 	local name = this:GetName()
 	if name == 'Handle_Row' then
-		local aXml = {}
-		for _, id in ipairs(TIP_COLIMN) do
-			if id == 'TASK' then
-				for _, col in ipairs(D.GetColumns()) do
-					if TASK_HASH[col.id] then
-						insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
-						insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
-						insert(aXml, col.GetFormatText(this.rec))
-						insert(aXml, GetFormatText('\n'))
-					end
-				end
-			else
-				local col = COLUMN_DICT[id]
-				insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
-				insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
-				insert(aXml, col.GetFormatText(this.rec))
-				insert(aXml, GetFormatText('\n'))
-			end
-		end
-		local x, y = this:GetAbsPos()
-		local w, h = this:GetSize()
-		OutputTip(concat(aXml), 450, {x, y, w, h}, UI.TIP_POSITION.RIGHT_LEFT)
+		D.OutputRowTip(this, this.rec)
 	elseif name == 'Handle_TaskStatColumn' then
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
@@ -1028,6 +1056,52 @@ function D.OnItemMouseLeave()
 	HideTip()
 end
 
+-- ¸¡¶¯¿ò
+function D.CheckFloatPanel()
+	if O.bFloat then
+		local frame = Wnd.OpenWindow(PLUGIN_ROOT .. '/ui/MY_RoleStatistics_TaskFloat.ini', 'MY_RoleStatistics_TaskFloat')
+		local function UpdateAnchor()
+			local an = O.tFloatAnchor
+			if IsEmpty(an) then
+				local nX, nY = Station.Lookup('Normal/SprintPower'):GetAbsPos()
+				frame:SetRelPos(nX + 70, nY + 37)
+			else
+				frame:SetPoint(an.s, 0, 0, an.r, an.x, an.y)
+			end
+			frame:BringToTop()
+		end
+		frame.OnMouseEnter = function()
+			local me = GetClientPlayer()
+			if not me then
+				return
+			end
+			D.FlushDB()
+			DB_TaskInfoG:ClearBindings()
+			DB_TaskInfoG:BindAll(me.GetGlobalID() or me.szName)
+			local result = DB_TaskInfoG:GetAll()
+			local rec = result[1]
+			if not rec then
+				return
+			end
+			D.DecodeRow(rec)
+			D.OutputRowTip(this, rec)
+		end
+		frame.OnMouseLeave = function()
+			D.CloseRowTip()
+		end
+		frame.OnEvent = function(event)
+			if event == 'ON_LEAVE_CUSTOM_UI_MODE' then
+				UpdateAnchor()
+			end
+		end
+		frame:RegisterEvent('ON_LEAVE_CUSTOM_UI_MODE')
+		UpdateAnchor()
+	else
+		Wnd.CloseWindow('MY_RoleStatistics_TaskFloat')
+	end
+end
+LIB.RegisterInit('MY_RoleStatistics_TaskFloat', D.CheckFloatPanel)
+
 -- Module exports
 do
 local settings = {
@@ -1055,6 +1129,8 @@ local settings = {
 				aColumn = true,
 				szSort = true,
 				szSortOrder = true,
+				bFloat = true,
+				tFloatAnchor = true,
 			},
 			root = O,
 		},
@@ -1065,6 +1141,11 @@ local settings = {
 				aColumn = true,
 				szSort = true,
 				szSortOrder = true,
+				bFloat = true,
+				tFloatAnchor = true,
+			},
+			triggers = {
+				bFloat = D.CheckFloatPanel,
 			},
 			root = O,
 		},

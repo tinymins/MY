@@ -93,10 +93,13 @@ local O = {
 	},
 	szSort = 'time_days',
 	szSortOrder = 'desc',
+	bFloat = false,
+	tFloatAnchor = {},
 }
 RegisterCustomData('Global/MY_RoleStatistics_SerendipityStat.aColumn')
 RegisterCustomData('Global/MY_RoleStatistics_SerendipityStat.szSort')
 RegisterCustomData('Global/MY_RoleStatistics_SerendipityStat.szSortOrder')
+RegisterCustomData('MY_RoleStatistics_SerendipityStat.bFloat')
 
 -----------------------------------------------------------------------------------------------
 -- 多个渠道奇遇次数监控
@@ -640,9 +643,8 @@ function D.UpdateUI(page)
 	InfoR:BindAll(szUSearch, szUSearch, szUSearch, szUSearch)
 	local result = InfoR:GetAll()
 
-	for _, p in ipairs(result) do
-		p.serendipity_info = DecodeLUAData(p.serendipity_info or '') or {}
-		p.item_count = DecodeLUAData(p.item_count or '') or {}
+	for _, rec in ipairs(result) do
+		D.DecodeRow(rec)
 	end
 
 	if Sorter then
@@ -658,10 +660,6 @@ function D.UpdateUI(page)
 	hList:Clear()
 	for i, rec in ipairs(result) do
 		local hRow = hList:AppendItemFromIni(SZ_INI, 'Handle_Row')
-		rec.guid   = UTF8ToAnsi(rec.guid)
-		rec.name   = UTF8ToAnsi(rec.name)
-		rec.region = UTF8ToAnsi(rec.region)
-		rec.server = UTF8ToAnsi(rec.server)
 		hRow.rec = rec
 		hRow:Lookup('Image_RowBg'):SetVisible(i % 2 == 1)
 		local nX = 0
@@ -686,12 +684,108 @@ function D.UpdateUI(page)
 	hList:FormatAllItemPos()
 end
 
+function D.DecodeRow(rec)
+	rec.guid   = UTF8ToAnsi(rec.guid)
+	rec.name   = UTF8ToAnsi(rec.name)
+	rec.region = UTF8ToAnsi(rec.region)
+	rec.server = UTF8ToAnsi(rec.server)
+	rec.serendipity_info = DecodeLUAData(rec.serendipity_info or '') or {}
+	rec.item_count = DecodeLUAData(rec.item_count or '') or {}
+end
+
+function D.OutputRowTip(this, rec)
+	local frame = Wnd.OpenWindow(SZ_TIP_INI, 'MY_RoleStatistics_SerendipityTip')
+	local hList = frame:Lookup('', 'Handle_List')
+	hList:Clear()
+	hList:AppendItemFromIni(SZ_TIP_INI, 'Handle_Title'):Lookup('Text_Title'):SetText(
+		rec.region .. ' ' .. rec.server .. ' - ' .. rec.name
+		.. ' (' .. g_tStrings.tForceTitle[rec.force] .. ' ' .. rec.level .. g_tStrings.STR_LEVEL .. ')')
+	local dwMapID = GetClientPlayer().GetMapID()
+	local tLuckPet = D.GetLuckyFellowPet()
+	for _, serendipity in ipairs(SERENDIPITY_LIST) do
+		local col = COLUMN_DICT[serendipity.nID]
+		local hItem = hList:AppendItemFromIni(SZ_TIP_INI, 'Handle_Item')
+		local szName = serendipity.szName
+		if serendipity.szNick then
+			szName = szName .. '<' .. serendipity.szNick .. '>'
+		end
+		hItem:Lookup('Image_Lucky'):SetVisible(serendipity.dwPet and tLuckPet[serendipity.dwPet] or false)
+		hItem:Lookup('Text_Name'):SetText(szName)
+		hItem:Lookup('Text_Name'):SetFontColor(255, 255, 128)
+		hItem:Lookup('Text_Name').OnItemLButtonClick = function()
+			if serendipity.dwAchieve then
+				MY_Web.Open('https://j3cx.com/wiki/' .. serendipity.dwAchieve, { w = 850, h = 610 })
+				Wnd.CloseWindow(frame)
+			end
+		end
+		hItem:Lookup('Text_Name'):RegisterEvent(16)
+		local map = serendipity.dwMapID and LIB.GetMapInfo(serendipity.dwMapID)
+		hItem:Lookup('Text_Map'):SetText(map and map.szName or '')
+		if dwMapID == serendipity.dwMapID then
+			hItem:Lookup('Text_Map'):SetFontColor(168, 240, 240)
+		else
+			hItem:Lookup('Text_Map'):SetFontColor(192, 192, 192)
+		end
+		local szText, r, g, b = col.GetText(rec)
+		hItem:Lookup('Text_State'):SetText(szText)
+		hItem:Lookup('Text_State'):SetFontColor(r, g, b)
+	end
+	hList:FormatAllItemPos()
+	frame.OnFrameBreathe = function()
+		local wnd, item = Station.GetMouseOverWindow()
+		if wnd then
+			local frame = wnd:GetRoot()
+			local name = frame:GetName()
+			if name == 'MY_RoleStatistics_SerendipityTip' then
+				return
+			end
+			if name == 'MY_RoleStatistics_SerendipityFloat' then
+				return
+			end
+			if name == 'MY_RoleStatistics' then
+				while item do
+					if item:GetName() == 'Handle_Row' then
+						return
+					end
+					item = item:GetParent()
+				end
+			end
+		end
+		Wnd.CloseWindow(frame)
+	end
+	if this:GetRoot():GetName() == 'MY_RoleStatistics_SerendipityFloat' then
+		local nX, nY = this:GetRoot():GetAbsPos()
+		local nW, nH = this:GetRoot():GetSize()
+		local nCW, nCH = Station.GetClientSize()
+		nX = nX + nW / 2 - frame:GetW() / 2
+		nY = (nY + nH + frame:GetH() < nCH)
+			and (nY + nH - 2)
+			or (nY - frame:GetH() + 2)
+		frame:SetRelPos(nX, nY)
+	else
+		frame:SetPoint('CENTER', 0, 0, this:GetRoot():GetTreePath(), 'CENTER', 0, 0)
+	end
+end
+
+function D.CloseRowTip()
+	-- Wnd.CloseWindow('MY_RoleStatistics_SerendipityTip')
+end
+
 function D.OnInitPage()
 	local page = this
 	local frameTemp = Wnd.OpenWindow(SZ_INI, 'MY_RoleStatistics_SerendipityStat')
 	local wnd = frameTemp:Lookup('Wnd_Total')
 	wnd:ChangeRelation(page, true, true)
 	Wnd.CloseWindow(frameTemp)
+
+	UI(wnd):Append('WndCheckBox', {
+		x = 670, y = 21, w = 180,
+		text = _L['Float panel'],
+		checked = MY_RoleStatistics_SerendipityStat.bFloat,
+		oncheck = function()
+			MY_RoleStatistics_SerendipityStat.bFloat = not MY_RoleStatistics_SerendipityStat.bFloat
+		end,
+	})
 
 	UI(wnd):Append('WndComboBox', {
 		x = 800, y = 20, w = 180,
@@ -883,64 +977,7 @@ end
 function D.OnItemMouseEnter()
 	local name = this:GetName()
 	if name == 'Handle_Row' then
-		local rec = this.rec
-		local frame = Wnd.OpenWindow(SZ_TIP_INI, 'MY_RoleStatistics_SerendipityTip')
-		local hList = frame:Lookup('', 'Handle_List')
-		hList:Clear()
-		hList:AppendItemFromIni(SZ_TIP_INI, 'Handle_Title'):Lookup('Text_Title'):SetText(
-			rec.region .. ' ' .. rec.server .. ' - ' .. rec.name
-			.. ' (' .. g_tStrings.tForceTitle[rec.force] .. ' ' .. rec.level .. g_tStrings.STR_LEVEL .. ')')
-		local dwMapID = GetClientPlayer().GetMapID()
-		local tLuckPet = D.GetLuckyFellowPet()
-		for _, serendipity in ipairs(SERENDIPITY_LIST) do
-			local col = COLUMN_DICT[serendipity.nID]
-			local hItem = hList:AppendItemFromIni(SZ_TIP_INI, 'Handle_Item')
-			local szName = serendipity.szName
-			if serendipity.szNick then
-				szName = szName .. '<' .. serendipity.szNick .. '>'
-			end
-			hItem:Lookup('Image_Lucky'):SetVisible(serendipity.dwPet and tLuckPet[serendipity.dwPet] or false)
-			hItem:Lookup('Text_Name'):SetText(szName)
-			hItem:Lookup('Text_Name'):SetFontColor(255, 255, 128)
-			hItem:Lookup('Text_Name').OnItemLButtonClick = function()
-				if serendipity.dwAchieve then
-					MY_Web.Open('https://j3cx.com/wiki/' .. serendipity.dwAchieve, { w = 850, h = 610 })
-					Wnd.CloseWindow(frame)
-				end
-			end
-			hItem:Lookup('Text_Name'):RegisterEvent(16)
-			local map = serendipity.dwMapID and LIB.GetMapInfo(serendipity.dwMapID)
-			hItem:Lookup('Text_Map'):SetText(map and map.szName or '')
-			if dwMapID == serendipity.dwMapID then
-				hItem:Lookup('Text_Map'):SetFontColor(168, 240, 240)
-			else
-				hItem:Lookup('Text_Map'):SetFontColor(192, 192, 192)
-			end
-			local szText, r, g, b = col.GetText(rec)
-			hItem:Lookup('Text_State'):SetText(szText)
-			hItem:Lookup('Text_State'):SetFontColor(r, g, b)
-		end
-		hList:FormatAllItemPos()
-		frame.OnFrameBreathe = function()
-			local wnd, item = Station.GetMouseOverWindow()
-			if wnd then
-				local frame = wnd:GetRoot()
-				local name = frame:GetName()
-				if name == 'MY_RoleStatistics_SerendipityTip' then
-					return
-				end
-				if name == 'MY_RoleStatistics' then
-					while item do
-						if item:GetName() == 'Handle_Row' then
-							return
-						end
-						item = item:GetParent()
-					end
-				end
-			end
-			Wnd.CloseWindow(frame)
-		end
-		frame:SetPoint('CENTER', 0, 0, this:GetRoot():GetTreePath(), 'CENTER', 0, 0)
+		D.OutputRowTip(this, this.rec)
 	elseif name == 'Handle_SerendipityStatColumn' then
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
@@ -959,6 +996,52 @@ D.OnItemRefreshTip = D.OnItemMouseEnter
 function D.OnItemMouseLeave()
 	HideTip()
 end
+
+-- 浮动框
+function D.CheckFloatPanel()
+	if O.bFloat then
+		local frame = Wnd.OpenWindow(PLUGIN_ROOT .. '/ui/MY_RoleStatistics_SerendipityFloat.ini', 'MY_RoleStatistics_SerendipityFloat')
+		local function UpdateAnchor()
+			local an = O.tFloatAnchor
+			if IsEmpty(an) then
+				local nX, nY = Station.Lookup('Normal/SprintPower'):GetAbsPos()
+				frame:SetRelPos(nX + 60, nY + 60)
+			else
+				frame:SetPoint(an.s, 0, 0, an.r, an.x, an.y)
+			end
+			frame:BringToTop()
+		end
+		frame.OnMouseEnter = function()
+			local me = GetClientPlayer()
+			if not me then
+				return
+			end
+			D.FlushDB()
+			InfoG:ClearBindings()
+			InfoG:BindAll(me.GetGlobalID() or me.szName)
+			local result = InfoG:GetAll()
+			local rec = result[1]
+			if not rec then
+				return
+			end
+			D.DecodeRow(rec)
+			D.OutputRowTip(this, rec)
+		end
+		frame.OnMouseLeave = function()
+			D.CloseRowTip()
+		end
+		frame.OnEvent = function(event)
+			if event == 'ON_LEAVE_CUSTOM_UI_MODE' then
+				UpdateAnchor()
+			end
+		end
+		frame:RegisterEvent('ON_LEAVE_CUSTOM_UI_MODE')
+		UpdateAnchor()
+	else
+		Wnd.CloseWindow('MY_RoleStatistics_SerendipityFloat')
+	end
+end
+LIB.RegisterInit('MY_RoleStatistics_SerendipityFloat', D.CheckFloatPanel)
 
 -- Module exports
 do
@@ -987,6 +1070,8 @@ local settings = {
 				aColumn = true,
 				szSort = true,
 				szSortOrder = true,
+				bFloat = true,
+				tFloatAnchor = true,
 			},
 			root = O,
 		},
@@ -997,6 +1082,10 @@ local settings = {
 				aColumn = true,
 				szSort = true,
 				szSortOrder = true,
+				bFloat = true,
+			},
+			triggers = {
+				bFloat = D.CheckFloatPanel,
 			},
 			root = O,
 		},

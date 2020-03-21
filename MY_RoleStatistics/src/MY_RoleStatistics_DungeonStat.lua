@@ -57,6 +57,7 @@ local SZ_INI = PACKET_INFO.ROOT .. 'MY_RoleStatistics/ui/MY_RoleStatistics_Dunge
 
 DB:Execute('CREATE TABLE IF NOT EXISTS DungeonInfo (guid NVARCHAR(20), account NVARCHAR(255), region NVARCHAR(20), server NVARCHAR(20), name NVARCHAR(20), force INTEGER, level INTEGER, equip_score INTEGER, copy_info NVARCHAR(65535), progress_info NVARCHAR(65535), time INTEGER, PRIMARY KEY(guid))')
 local DB_DungeonInfoW = DB:Prepare('REPLACE INTO DungeonInfo (guid, account, region, server, name, force, level, equip_score, copy_info, progress_info, time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+local DB_DungeonInfoG = DB:Prepare('SELECT * FROM DungeonInfo WHERE guid = ?')
 local DB_DungeonInfoR = DB:Prepare('SELECT * FROM DungeonInfo WHERE account LIKE ? OR name LIKE ? OR region LIKE ? OR server LIKE ? ORDER BY time DESC')
 local DB_DungeonInfoD = DB:Prepare('DELETE FROM DungeonInfo WHERE guid = ?')
 
@@ -76,10 +77,13 @@ local O = {
 	tMapSaveCopy = {}, -- 单副本 CD
 	tMapProgress = {}, -- 单BOSS CD
 	bMapProgressApplied = false, -- 是否请求过副本进度
+	bFloat = false,
+	tFloatAnchor = {},
 }
 RegisterCustomData('Global/MY_RoleStatistics_DungeonStat.aColumn')
 RegisterCustomData('Global/MY_RoleStatistics_DungeonStat.szSort')
 RegisterCustomData('Global/MY_RoleStatistics_DungeonStat.szSortOrder')
+RegisterCustomData('MY_RoleStatistics_DungeonStat.bFloat')
 
 local EXCEL_WIDTH = 960
 local DUNGEON_WIDTH = 80
@@ -420,9 +424,8 @@ function D.UpdateUI(page)
 	DB_DungeonInfoR:BindAll(szUSearch, szUSearch, szUSearch, szUSearch)
 	local result = DB_DungeonInfoR:GetAll()
 
-	for _, p in ipairs(result) do
-		p.copy_info = DecodeLUAData(p.copy_info or '') or {}
-		p.progress_info = DecodeLUAData(p.progress_info or '') or {}
+	for _, rec in ipairs(result) do
+		D.DecodeRow(rec)
 	end
 
 	if Sorter then
@@ -434,10 +437,6 @@ function D.UpdateUI(page)
 	hList:Clear()
 	for i, rec in ipairs(result) do
 		local hRow = hList:AppendItemFromIni(SZ_INI, 'Handle_Row')
-		rec.guid   = UTF8ToAnsi(rec.guid)
-		rec.name   = UTF8ToAnsi(rec.name)
-		rec.region = UTF8ToAnsi(rec.region)
-		rec.server = UTF8ToAnsi(rec.server)
 		hRow.rec = rec
 		hRow:Lookup('Image_RowBg'):SetVisible(i % 2 == 1)
 		local nX = 0
@@ -501,12 +500,76 @@ LIB.RegisterEvent('SYNC_LOOT_LIST.MY_RoleStatistics_DungeonStat__UpdateMapCopy',
 	LIB.DelayCall('MY_RoleStatistics_DungeonStat__UpdateMapCopy', 300, function() D.UpdateMapProgress() end)
 end)
 
+function D.DecodeRow(rec)
+	rec.guid   = UTF8ToAnsi(rec.guid)
+	rec.name   = UTF8ToAnsi(rec.name)
+	rec.region = UTF8ToAnsi(rec.region)
+	rec.server = UTF8ToAnsi(rec.server)
+	rec.copy_info = DecodeLUAData(rec.copy_info or '') or {}
+	rec.progress_info = DecodeLUAData(rec.progress_info or '') or {}
+end
+
+function D.OutputRowTip(this, rec)
+	local aXml = {}
+	for _, id in ipairs(TIP_COLIMN) do
+		if id == 'DUNGEON' then
+			local tDungeon = {}
+			for _, col in ipairs(D.GetColumns()) do
+				if wfind(col.id, 'dungeon_') then
+					insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
+					insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
+					insert(aXml, col.GetFormatText(rec))
+					insert(aXml, GetFormatText('\n'))
+					tDungeon[tonumber(col.id:sub(#'dungeon_' + 1))] = true
+				end
+			end
+			for dwMapID, aCopyID in pairs(rec.copy_info) do
+				if not tDungeon[dwMapID] then
+					local map = LIB.GetMapInfo(dwMapID)
+					if map then
+						insert(aXml, GetFormatText(map.szName, 162, 255, 255, 0))
+						insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
+						insert(aXml, GetFormatText(concat(aCopyID, ',')))
+						insert(aXml, GetFormatText('\n'))
+					end
+					tDungeon[dwMapID] = true
+				end
+			end
+		else
+			local col = COLUMN_DICT[id]
+			insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
+			insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
+			insert(aXml, col.GetFormatText(rec))
+			insert(aXml, GetFormatText('\n'))
+		end
+	end
+	local x, y = this:GetAbsPos()
+	local w, h = this:GetSize()
+	local nPosType = this:GetRoot():GetName() == 'MY_RoleStatistics_DungeonFloat'
+		and UI.TIP_POSITION.TOP_BOTTOM
+		or UI.TIP_POSITION.RIGHT_LEFT
+	OutputTip(concat(aXml), 450, {x, y, w, h}, nPosType)
+end
+
+function D.CloseRowTip()
+	HideTip()
+end
+
 function D.OnInitPage()
 	local page = this
 	local frameTemp = Wnd.OpenWindow(SZ_INI, 'MY_RoleStatistics_DungeonStat')
 	local wnd = frameTemp:Lookup('Wnd_Total')
 	wnd:ChangeRelation(page, true, true)
 	Wnd.CloseWindow(frameTemp)
+
+	UI(wnd):Append('WndCheckBox', {
+		x = 670, y = 21, w = 180,
+		text = _L['Float panel'],
+		checked = MY_RoleStatistics_DungeonStat.bFloat,
+		oncheck = function()
+			MY_RoleStatistics_DungeonStat.bFloat = not MY_RoleStatistics_DungeonStat.bFloat
+		end,
+	})
 
 	UI(wnd):Append('WndComboBox', {
 		x = 800, y = 20, w = 180,
@@ -703,42 +766,7 @@ end
 function D.OnItemMouseEnter()
 	local name = this:GetName()
 	if name == 'Handle_Row' then
-		local aXml = {}
-		for _, id in ipairs(TIP_COLIMN) do
-			if id == 'DUNGEON' then
-				local tDungeon = {}
-				for _, col in ipairs(D.GetColumns()) do
-					if wfind(col.id, 'dungeon_') then
-						insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
-						insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
-						insert(aXml, col.GetFormatText(this.rec))
-						insert(aXml, GetFormatText('\n'))
-						tDungeon[tonumber(col.id:sub(#'dungeon_' + 1))] = true
-					end
-				end
-				for dwMapID, aCopyID in pairs(this.rec.copy_info) do
-					if not tDungeon[dwMapID] then
-						local map = LIB.GetMapInfo(dwMapID)
-						if map then
-							insert(aXml, GetFormatText(map.szName, 162, 255, 255, 0))
-							insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
-							insert(aXml, GetFormatText(concat(aCopyID, ',')))
-							insert(aXml, GetFormatText('\n'))
-						end
-						tDungeon[dwMapID] = true
-					end
-				end
-			else
-				local col = COLUMN_DICT[id]
-				insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
-				insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
-				insert(aXml, col.GetFormatText(this.rec))
-				insert(aXml, GetFormatText('\n'))
-			end
-		end
-		local x, y = this:GetAbsPos()
-		local w, h = this:GetSize()
-		OutputTip(concat(aXml), 450, {x, y, w, h}, UI.TIP_POSITION.RIGHT_LEFT)
+		D.OutputRowTip(this, this.rec)
 	elseif name == 'Image_ProgressBoss' or name == 'Text_CD' then
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
@@ -775,6 +803,52 @@ function D.OnItemMouseLeave()
 	HideTip()
 end
 
+-- 浮动框
+function D.CheckFloatPanel()
+	if O.bFloat then
+		local frame = Wnd.OpenWindow(PLUGIN_ROOT .. '/ui/MY_RoleStatistics_DungeonFloat.ini', 'MY_RoleStatistics_DungeonFloat')
+		local function UpdateAnchor()
+			local an = O.tFloatAnchor
+			if IsEmpty(an) then
+				local nX, nY = Station.Lookup('Normal/SprintPower'):GetAbsPos()
+				frame:SetRelPos(nX + 70, nY + 13)
+			else
+				frame:SetPoint(an.s, 0, 0, an.r, an.x, an.y)
+			end
+			frame:BringToTop()
+		end
+		frame.OnMouseEnter = function()
+			local me = GetClientPlayer()
+			if not me then
+				return
+			end
+			D.FlushDB(true)
+			DB_DungeonInfoG:ClearBindings()
+			DB_DungeonInfoG:BindAll(me.GetGlobalID() or me.szName)
+			local result = DB_DungeonInfoG:GetAll()
+			local rec = result[1]
+			if not rec then
+				return
+			end
+			D.DecodeRow(rec)
+			D.OutputRowTip(this, rec)
+		end
+		frame.OnMouseLeave = function()
+			D.CloseRowTip()
+		end
+		frame.OnEvent = function(event)
+			if event == 'ON_LEAVE_CUSTOM_UI_MODE' then
+				UpdateAnchor()
+			end
+		end
+		frame:RegisterEvent('ON_LEAVE_CUSTOM_UI_MODE')
+		UpdateAnchor()
+	else
+		Wnd.CloseWindow('MY_RoleStatistics_DungeonFloat')
+	end
+end
+LIB.RegisterInit('MY_RoleStatistics_DungeonFloat', D.CheckFloatPanel)
+
 -- Module exports
 do
 local settings = {
@@ -802,6 +876,8 @@ local settings = {
 				aColumn = true,
 				szSort = true,
 				szSortOrder = true,
+				bFloat = true,
+				tFloatAnchor = true,
 			},
 			root = O,
 		},
@@ -812,6 +888,11 @@ local settings = {
 				aColumn = true,
 				szSort = true,
 				szSortOrder = true,
+				bFloat = true,
+				tFloatAnchor = true,
+			},
+			triggers = {
+				bFloat = D.CheckFloatPanel,
 			},
 			root = O,
 		},

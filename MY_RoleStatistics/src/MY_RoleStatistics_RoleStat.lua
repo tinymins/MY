@@ -58,6 +58,7 @@ local SZ_INI = PACKET_INFO.ROOT .. 'MY_RoleStatistics/ui/MY_RoleStatistics_RoleS
 DB:Execute('CREATE TABLE IF NOT EXISTS RoleInfo (guid NVARCHAR(20), account NVARCHAR(255), region NVARCHAR(20), server NVARCHAR(20), name NVARCHAR(20), force INTEGER, level INTEGER, equip_score INTEGER, pet_score INTEGER, gold INTEGER, silver INTEGER, copper INTEGER, contribution INTEGER, contribution_remain INTEGER, justice INTEGER, justice_remain INTEGER, prestige INTEGER, prestige_remain INTEGER, camp_point INTEGER, camp_point_percentage INTEGER, camp_level INTEGER, arena_award INTEGER, arena_award_remain INTEGER, exam_print INTEGER, exam_print_remain INTEGER, achievement_score INTEGER, coin INTEGER, mentor_score INTEGER, time INTEGER, PRIMARY KEY(guid))')
 local DB_RoleInfoW = DB:Prepare('REPLACE INTO RoleInfo (guid, account, region, server, name, force, level, equip_score, pet_score, gold, silver, copper, contribution, contribution_remain, justice, justice_remain, prestige, prestige_remain, camp_point, camp_point_percentage, camp_level, arena_award, arena_award_remain, exam_print, exam_print_remain, achievement_score, coin, mentor_score, time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
 local DB_RoleInfoCoinW = DB:Prepare('UPDATE RoleInfo SET coin = ? WHERE account = ? AND region = ?')
+local DB_RoleInfoG = DB:Prepare('SELECT * FROM RoleInfo WHERE guid = ?')
 local DB_RoleInfoR = DB:Prepare('SELECT * FROM RoleInfo WHERE account LIKE ? OR name LIKE ? OR region LIKE ? OR server LIKE ? ORDER BY time DESC')
 local DB_RoleInfoD = DB:Prepare('DELETE FROM RoleInfo WHERE guid = ?')
 
@@ -90,11 +91,14 @@ local O = {
 		'exam_print',
 	},
 	dwLastAlertTime = 0,
+	bFloat = false,
+	tFloatAnchor = {},
 }
 RegisterCustomData('Global/MY_RoleStatistics_RoleStat.aColumn')
 RegisterCustomData('Global/MY_RoleStatistics_RoleStat.szSort')
 RegisterCustomData('Global/MY_RoleStatistics_RoleStat.szSortOrder')
 RegisterCustomData('Global/MY_RoleStatistics_RoleStat.aAlertColumn')
+RegisterCustomData('MY_RoleStatistics_RoleStat.bFloat')
 
 local function GetFormatSysmsgText(szText)
 	return GetFormatText(szText, GetMsgFont('MSG_SYS'), GetMsgFontColor('MSG_SYS'))
@@ -634,6 +638,10 @@ function D.UpdateUI(page)
 	DB_RoleInfoR:BindAll(szUSearch, szUSearch, szUSearch, szUSearch)
 	local result = DB_RoleInfoR:GetAll()
 
+	for _, rec in ipairs(result) do
+		D.DecodeRow(rec)
+	end
+
 	if Sorter then
 		sort(result, Sorter)
 	end
@@ -643,10 +651,6 @@ function D.UpdateUI(page)
 	hList:Clear()
 	for i, rec in ipairs(result) do
 		local hRow = hList:AppendItemFromIni(SZ_INI, 'Handle_Row')
-		rec.guid   = UTF8ToAnsi(rec.guid)
-		rec.name   = UTF8ToAnsi(rec.name)
-		rec.region = UTF8ToAnsi(rec.region)
-		rec.server = UTF8ToAnsi(rec.server)
 		hRow.rec = rec
 		hRow:Lookup('Image_RowBg'):SetVisible(i % 2 == 1)
 		local nX = 0
@@ -672,12 +676,48 @@ function D.UpdateUI(page)
 	hList:FormatAllItemPos()
 end
 
+function D.DecodeRow(rec)
+	rec.guid   = UTF8ToAnsi(rec.guid)
+	rec.name   = UTF8ToAnsi(rec.name)
+	rec.region = UTF8ToAnsi(rec.region)
+	rec.server = UTF8ToAnsi(rec.server)
+end
+
+function D.OutputRowTip(this, rec)
+	local aXml = {}
+	for _, col in ipairs(COLUMN_LIST) do
+		insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
+		insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
+		insert(aXml, col.GetFormatText(rec))
+		insert(aXml, GetFormatText('\n'))
+	end
+	local x, y = this:GetAbsPos()
+	local w, h = this:GetSize()
+	local nPosType = this:GetRoot():GetName() == 'MY_RoleStatistics_RoleFloat'
+		and UI.TIP_POSITION.TOP_BOTTOM
+		or UI.TIP_POSITION.RIGHT_LEFT
+	OutputTip(concat(aXml), 450, {x, y, w, h}, nPosType)
+end
+
+function D.CloseRowTip()
+	HideTip()
+end
+
 function D.OnInitPage()
 	local page = this
 	local frameTemp = Wnd.OpenWindow(SZ_INI, 'MY_RoleStatistics_RoleStat')
 	local wnd = frameTemp:Lookup('Wnd_Total')
 	wnd:ChangeRelation(page, true, true)
 	Wnd.CloseWindow(frameTemp)
+
+	UI(wnd):Append('WndCheckBox', {
+		x = 470, y = 21, w = 180,
+		text = _L['Float panel'],
+		checked = MY_RoleStatistics_RoleStat.bFloat,
+		oncheck = function()
+			MY_RoleStatistics_RoleStat.bFloat = not MY_RoleStatistics_RoleStat.bFloat
+		end,
+	})
 
 	-- ÏÔÊ¾ÁÐ
 	UI(wnd):Append('WndComboBox', {
@@ -877,16 +917,7 @@ end
 function D.OnItemMouseEnter()
 	local name = this:GetName()
 	if name == 'Handle_Row' then
-		local aXml = {}
-		for _, col in ipairs(COLUMN_LIST) do
-			insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
-			insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
-			insert(aXml, col.GetFormatText(this.rec))
-			insert(aXml, GetFormatText('\n'))
-		end
-		local x, y = this:GetAbsPos()
-		local w, h = this:GetSize()
-		OutputTip(concat(aXml), 450, {x, y, w, h}, UI.TIP_POSITION.RIGHT_LEFT)
+		D.OutputRowTip(this, this.rec)
 	elseif name == 'Handle_RoleStatColumn' then
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
@@ -933,6 +964,52 @@ LIB.RegisterFrameCreate('OptionPanel.MY_RoleStatistics_RoleStat__AlertCol', func
 	end
 end)
 
+-- ¸¡¶¯¿ò
+function D.CheckFloatPanel()
+	if O.bFloat then
+		local frame = Wnd.OpenWindow(PLUGIN_ROOT .. '/ui/MY_RoleStatistics_RoleFloat.ini', 'MY_RoleStatistics_RoleFloat')
+		local function UpdateAnchor()
+			local an = O.tFloatAnchor
+			if IsEmpty(an) then
+				local nX, nY = Station.Lookup('Normal/SprintPower'):GetAbsPos()
+				frame:SetRelPos(nX + 55, nY - 8)
+			else
+				frame:SetPoint(an.s, 0, 0, an.r, an.x, an.y)
+			end
+			frame:BringToTop()
+		end
+		frame.OnMouseEnter = function()
+			local me = GetClientPlayer()
+			if not me then
+				return
+			end
+			D.FlushDB()
+			DB_RoleInfoG:ClearBindings()
+			DB_RoleInfoG:BindAll(me.GetGlobalID() or me.szName)
+			local result = DB_RoleInfoG:GetAll()
+			local rec = result[1]
+			if not rec then
+				return
+			end
+			D.DecodeRow(rec)
+			D.OutputRowTip(this, rec)
+		end
+		frame.OnMouseLeave = function()
+			D.CloseRowTip()
+		end
+		frame.OnEvent = function(event)
+			if event == 'ON_LEAVE_CUSTOM_UI_MODE' then
+				UpdateAnchor()
+			end
+		end
+		frame:RegisterEvent('ON_LEAVE_CUSTOM_UI_MODE')
+		UpdateAnchor()
+	else
+		Wnd.CloseWindow('MY_RoleStatistics_RoleFloat')
+	end
+end
+LIB.RegisterInit('MY_RoleStatistics_RoleFloat', D.CheckFloatPanel)
+
 -- Module exports
 do
 local settings = {
@@ -961,6 +1038,8 @@ local settings = {
 				szSort = true,
 				szSortOrder = true,
 				aAlertColumn = true,
+				bFloat = true,
+				tFloatAnchor = true,
 			},
 			root = O,
 		},
@@ -972,6 +1051,11 @@ local settings = {
 				szSort = true,
 				szSortOrder = true,
 				aAlertColumn = true,
+				bFloat = true,
+				tFloatAnchor = true,
+			},
+			triggers = {
+				bFloat = D.CheckFloatPanel,
 			},
 			root = O,
 		},
