@@ -555,7 +555,7 @@ function D.OnItemLButtonClick()
 		if not data.bDist and not data.bBidding then
 			-- if doodad.CanDialog(me) then -- ª·µº÷¬‚“∂°
 			if doodad.CanLoot(me.dwID) then
-				OpenDoodad(me, doodad)
+				LIB.OpenDoodad(me, doodad)
 			else
 				LIB.Topmsg(g_tStrings.TIP_TOO_FAR)
 			end
