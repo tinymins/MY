@@ -2846,14 +2846,12 @@ function LIB.Logout(bCompletely)
 end
 
 -- 根据技能 ID 获取引导帧数，非引导技能返回 nil
--- (number) LIB.GetChannelSkillFrame(number dwSkillID)
-do local SKILL_EX = LIB.LoadLUAData(PACKET_INFO.FRAMEWORK_ROOT .. 'data/skill_ex.jx3dat') or {}
-function LIB.GetChannelSkillFrame(dwSkillID)
-	local t = SKILL_EX[dwSkillID]
-	if t then
-		return t.nChannelFrame
+-- (number) LIB.GetChannelSkillFrame(number dwSkillID, number nLevel)
+function LIB.GetChannelSkillFrame(dwSkillID, nLevel)
+	local skill = GetSkill(dwSkillID, nLevel)
+	if skill then
+		return skill.nChannelFrame
 	end
-end
 end
 
 function LIB.IsMarker(...)
