@@ -1528,6 +1528,26 @@ LIB.RegisterEvent('DOODAD_ENTER_SCENE', function() NEARBY_DOODAD[arg0] = GetDood
 LIB.RegisterEvent('DOODAD_LEAVE_SCENE', function() NEARBY_DOODAD[arg0] = nil end)
 end
 
+-- 打开一个拾取交互物件（当前帧重复调用仅打开一次防止庖丁）
+function LIB.OpenDoodad(me, doodad)
+	LIB.Throttle(PACKET_INFO.NAME_SPACE .. '#OpenDoodad' .. doodad.dwID, 375, function()
+		--[[#DEBUG BEGIN]]
+		LIB.Debug('Open Doodad ' .. doodad.dwID .. ' [' .. doodad.szName .. '] at ' .. GetLogicFrameCount() .. '.', DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
+		OpenDoodad(me, doodad)
+	end)
+end
+
+-- 交互一个拾取交互物件（当前帧重复调用仅交互一次防止庖丁）
+function LIB.InteractDoodad(dwID)
+	LIB.Throttle(PACKET_INFO.NAME_SPACE .. '#InteractDoodad' .. dwID, 375, function()
+		--[[#DEBUG BEGIN]]
+		LIB.Debug('Open Doodad ' .. dwID .. ' at ' .. GetLogicFrameCount() .. '.', DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
+		InteractDoodad(dwID)
+	end)
+end
+
 -- 获取玩家自身信息（缓存）
 do local m_ClientInfo
 function LIB.GetClientInfo(arg0)
