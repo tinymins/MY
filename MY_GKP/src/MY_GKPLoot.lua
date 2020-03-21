@@ -245,6 +245,10 @@ function D.OnFrameCreate()
 end
 
 function D.OnFrameBreathe()
+	local nLFC = GetLogicFrameCount()
+	if this.nLastBreathe and nLFC - this.nLastBreathe < GLOBAL.GAME_FPS / 2 then
+		return
+	end
 	local me = GetClientPlayer()
 	local wnd = this:Lookup('WndContainer_DoodadList'):LookupContent(0)
 	while wnd do
@@ -297,6 +301,7 @@ function D.OnFrameBreathe()
 		wnd:Lookup('', 'Handle_Compass'):FormatAllItemPos()
 		wnd = wnd:GetNext()
 	end
+	this.nLastBreathe = nLFC
 end
 
 function D.OnEvent(szEvent)
