@@ -1481,6 +1481,10 @@ function D.DrawLootList(dwID, bRemove)
 		-- 修改UI大小
 		D.AdjustWnd(wnd)
 		D.AdjustFrame(frame)
+
+		-- 立即自动拾取一次
+		frame.nLastBreathe = nil
+		LIB.ExecuteWithThis(frame, D.OnFrameBreathe)
 	end
 end
 
