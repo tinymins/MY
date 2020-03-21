@@ -274,7 +274,7 @@ function D.OnUseManaChange(_, bUseMana)
 				local doo = GetDoodad(k)
 				if doo and LIB.GetDistance(doo) < 6 then
 					O.nManaFrame = GetLogicFrameCount()
-					InteractDoodad(doo.dwID)
+					LIB.InteractDoodad(doo.dwID)
 					LIB.Sysmsg(_L['Auto eat GUDING'])
 					break
 				end

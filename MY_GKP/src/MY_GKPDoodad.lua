@@ -261,13 +261,13 @@ function D.OnAutoDoodad()
 		return
 	end
 	for k, v in pairs(D.tDoodad) do
-		local doodad, bIntr = GetDoodad(k), false
+		local doodad, bIntr, bOpen = GetDoodad(k), false, false
 		if not doodad then
 			D.Remove(k)
 		elseif doodad.CanDialog(me) then -- 若存在却不能对话只简单保留
 			if v.loot then -- 尸体只摸一次
-				bIntr = (not me.bFightState or O.bOpenLootEvenFight) and doodad.CanLoot(me.dwID)
-				if bIntr then
+				bOpen = (not me.bFightState or O.bOpenLootEvenFight) and doodad.CanLoot(me.dwID)
+				if bOpen then
 					D.dwOpenID = k
 				end
 			elseif v.craft or doodad.HaveQuest(me.dwID) then -- 任务和普通道具尝试 5 次
@@ -278,10 +278,19 @@ function D.OnAutoDoodad()
 				end
 			end
 		end
-		if bIntr then
-			LIB.Debug(_L['MY_GKPDoodad'], 'Auto interact [' .. doodad.szName .. ']', DEBUG_LEVEL.LOG)
+		if bOpen then
+			--[[#DEBUG BEGIN]]
+			LIB.Debug(_L['MY_GKPDoodad'], 'Auto open [' .. doodad.szName .. '].', DEBUG_LEVEL.LOG)
+			--[[#DEBUG END]]
 			LIB.BreatheCall('AutoDoodad', 500)
-			return InteractDoodad(k)
+			return LIB.OpenDoodad(me, doodad)
+		end
+		if bIntr then
+			--[[#DEBUG BEGIN]]
+			LIB.Debug(_L['MY_GKPDoodad'], 'Auto interact [' .. doodad.szName .. '].', DEBUG_LEVEL.LOG)
+			--[[#DEBUG END]]
+			LIB.BreatheCall('AutoDoodad', 500)
+			return LIB.InteractDoodad(k)
 		end
 	end
 end

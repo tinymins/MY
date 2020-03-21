@@ -317,7 +317,7 @@ function D.OnDoodadEnter()
 		then
 			D.dwDoodadID = arg0
 			LIB.DelayCall(520, function()
-				InteractDoodad(D.dwDoodadID)
+				LIB.InteractDoodad(D.dwDoodadID)
 			end)
 		end
 	end
