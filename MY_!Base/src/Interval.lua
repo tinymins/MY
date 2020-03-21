@@ -45,6 +45,9 @@ local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAD
 -- BreatheCall 呼吸调用   每帧调用       毫秒       1 / GLOBAL.GAME_FPS
 -- FrameCall   按帧调用   每帧调用       呼吸帧     1 / GLOBAL.GAME_FPS
 -- RenderCall  渲染调用   每次渲染调用   毫秒       1 / 每秒渲染次数
+-- Debounce    调用防抖   延迟调用一次   毫秒       1 / GLOBAL.GAME_FPS
+-- Throttle    调用节流   分段频率限制   毫秒       1 / GLOBAL.GAME_FPS
+-- FinallyThrottle 确保延迟调用的节流    毫秒       1 / GLOBAL.GAME_FPS
 ---------------------------------------------------------------------
 if DelayCall and BreatheCall and FrameCall and RenderCall then
 	LIB.DelayCall   = DelayCall
@@ -496,4 +499,139 @@ frame:Hide()
 
 LuaActive_Enable(false)
 
+end
+
+--=================================== debounce ================================================
+-- Debounce(szKey, nTime, fnAction, oArg)
+-- Debounce('CASTING') -- 获取名称为CASTING的Debounce的信息
+-- Debounce('CASTING', false) -- 注销名称为CASTING的Debounce
+-- Debounce('CASTING', 100, function() end, oArg) -- 注册名称为CASTING防抖时间为100的Debounce
+-- Debounce('CASTING', 200) -- 把名称为CASTING的Debounce防抖时间改为200毫秒
+--=============================================================================================
+do
+local _tDebounce = {}
+function LIB.Debounce(szKey, nTime, fnAction, oArg)
+	local bUnreg
+	if type(szKey) == 'number' then
+		-- Debounce(nTime, fnAction[, oArg])
+		szKey, nTime, fnAction, oArg = nil, szKey, nTime, fnAction
+	elseif type(nTime) == 'boolean' then
+		-- Debounce(szKey, false)
+		nTime, bUnreg = nil, true
+	end
+	if fnAction then -- reg
+		if not szKey then -- 匿名rc调用
+			szKey = GetTickCount()
+			while _tDebounce[tostring(szKey)] do
+				szKey = szKey + 0.1
+			end
+			szKey = tostring(szKey)
+		end
+		_tDebounce[szKey] = {
+			nTime = nTime,
+			nNext = GetTime() + nTime,
+			fnAction = fnAction,
+			oArg = oArg,
+		}
+	elseif nTime then -- modify
+		if _tDebounce[szKey] then
+			_tDebounce[szKey].nTime = nTime
+			_tDebounce[szKey].nNext = GetTime() + nTime
+		end
+	elseif szKey and bUnreg then -- unreg
+		_tDebounce[szKey] = nil
+	elseif szKey then -- get registered rendercall info
+		local d = _tDebounce[szKey]
+		if d then
+			return szKey, d.nTime, d.nNext - GetTime()
+		end
+		return
+	end
+	return szKey
+end
+LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '#Debounce', function()
+	local nTime = GetTime()
+	for szKey, d in pairs(_tDebounce) do
+		if nTime >= d.nNext then
+			local res, err, trace = XpCall(d.fnAction, d.oArg)
+			if not res then
+				FireUIEvent('CALL_LUA_ERROR', err .. '\nonDebounce: ' .. szKey .. '\n' .. trace .. '\n')
+			end
+			_tDebounce[szKey] = nil
+		end
+	end
+end)
+end
+
+--=================================== throttle ================================================
+-- Throttle(szKey, nTime, fnAction, oArg)
+-- Throttle('CASTING') -- 获取名称为CASTING的Throttle的信息
+-- Throttle('CASTING', false) -- 注销名称为CASTING的Throttle
+-- Throttle('CASTING', 100, function() end, oArg) -- 注册名称为CASTING防抖时间为100的Throttle
+-- Throttle('CASTING', 200) -- 把名称为CASTING的Throttle防抖时间改为200毫秒
+--=============================================================================================
+do
+local _tThrottle = {}
+function LIB.Throttle(szKey, nTime, fnAction, oArg)
+	local bUnreg, bThrottle
+	if type(szKey) == 'number' then
+		-- Throttle(nTime, fnAction[, oArg])
+		szKey, nTime, fnAction, oArg = nil, szKey, nTime, fnAction
+	elseif type(nTime) == 'boolean' then
+		-- Throttle(szKey, false)
+		nTime, bUnreg = nil, true
+	end
+	if fnAction then -- reg
+		if not szKey then -- 匿名rc调用
+			szKey = GetTickCount()
+			while _tThrottle[tostring(szKey)] do
+				szKey = szKey + 0.1
+			end
+			szKey = tostring(szKey)
+		end
+		if _tThrottle[szKey] and _tThrottle[szKey].nNext > GetTime() then
+			bThrottle = true
+		else
+			_tThrottle[szKey] = {
+				nTime = nTime,
+				nNext = GetTime() + nTime,
+				fnAction = fnAction,
+				oArg = oArg,
+			}
+			local res, err, trace = XpCall(fnAction, oArg)
+			if not res then
+				FireUIEvent('CALL_LUA_ERROR', err .. '\nonThrottle: ' .. szKey .. '\n' .. trace .. '\n')
+			end
+		end
+	elseif nTime then -- modify
+		if _tThrottle[szKey] then
+			_tThrottle[szKey].nTime = nTime
+			_tThrottle[szKey].nNext = GetTime() + nTime
+		end
+	elseif szKey and bUnreg then -- unreg
+		_tThrottle[szKey] = nil
+	elseif szKey then -- get registered rendercall info
+		local d = _tThrottle[szKey]
+		if d then
+			return szKey, d.nTime, d.nNext - GetTime()
+		end
+		return
+	end
+	return szKey, bThrottle
+end
+LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '#Throttle', function()
+	local nTime = GetTime()
+	for szKey, d in pairs(_tThrottle) do
+		if nTime >= d.nNext then
+			_tThrottle[szKey] = nil
+		end
+	end
+end)
+end
+
+function LIB.FinallyThrottle(...)
+	local _, bThrottle = LIB.Throttle(...)
+	if bThrottle then
+		LIB.Debounce(...)
+	end
 end
