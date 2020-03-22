@@ -93,13 +93,12 @@ local O = {
 	},
 	szSort = 'time_days',
 	szSortOrder = 'desc',
-	bFloat = false,
-	tFloatAnchor = {},
+	bFloatEntry = false,
 }
 RegisterCustomData('Global/MY_RoleStatistics_SerendipityStat.aColumn')
 RegisterCustomData('Global/MY_RoleStatistics_SerendipityStat.szSort')
 RegisterCustomData('Global/MY_RoleStatistics_SerendipityStat.szSortOrder')
-RegisterCustomData('MY_RoleStatistics_SerendipityStat.bFloat')
+RegisterCustomData('MY_RoleStatistics_SerendipityStat.bFloatEntry')
 
 -----------------------------------------------------------------------------------------------
 -- 多个渠道奇遇次数监控
@@ -734,12 +733,12 @@ function D.OutputRowTip(this, rec)
 	frame.OnFrameBreathe = function()
 		local wnd, item = Station.GetMouseOverWindow()
 		if wnd then
+			if wnd:GetName() == 'Btn_MY_RoleStatistics_SerendipityEntry' then
+				return
+			end
 			local frame = wnd:GetRoot()
 			local name = frame:GetName()
 			if name == 'MY_RoleStatistics_SerendipityTip' then
-				return
-			end
-			if name == 'MY_RoleStatistics_SerendipityFloat' then
 				return
 			end
 			if name == 'MY_RoleStatistics' then
@@ -753,17 +752,17 @@ function D.OutputRowTip(this, rec)
 		end
 		Wnd.CloseWindow(frame)
 	end
-	if this:GetRoot():GetName() == 'MY_RoleStatistics_SerendipityFloat' then
-		local nX, nY = this:GetRoot():GetAbsPos()
-		local nW, nH = this:GetRoot():GetSize()
+	if this:GetRoot():GetName() == 'MY_RoleStatistics' then
+		frame:SetPoint('CENTER', 0, 0, this:GetRoot():GetTreePath(), 'CENTER', 0, 0)
+	else
+		local nX, nY = this:GetAbsPos()
+		local nW, nH = this:GetSize()
 		local nCW, nCH = Station.GetClientSize()
 		nX = nX + nW / 2 - frame:GetW() / 2
 		nY = (nY + nH + frame:GetH() < nCH)
 			and (nY + nH - 2)
 			or (nY - frame:GetH() + 2)
 		frame:SetRelPos(nX, nY)
-	else
-		frame:SetPoint('CENTER', 0, 0, this:GetRoot():GetTreePath(), 'CENTER', 0, 0)
 	end
 end
 
@@ -781,9 +780,9 @@ function D.OnInitPage()
 	UI(wnd):Append('WndCheckBox', {
 		x = 670, y = 21, w = 180,
 		text = _L['Float panel'],
-		checked = MY_RoleStatistics_SerendipityStat.bFloat,
+		checked = MY_RoleStatistics_SerendipityStat.bFloatEntry,
 		oncheck = function()
-			MY_RoleStatistics_SerendipityStat.bFloat = not MY_RoleStatistics_SerendipityStat.bFloat
+			MY_RoleStatistics_SerendipityStat.bFloatEntry = not MY_RoleStatistics_SerendipityStat.bFloatEntry
 		end,
 	})
 
@@ -998,20 +997,25 @@ function D.OnItemMouseLeave()
 end
 
 -- 浮动框
-function D.CheckFloatPanel()
-	if O.bFloat then
-		local frame = Wnd.OpenWindow(PLUGIN_ROOT .. '/ui/MY_RoleStatistics_SerendipityFloat.ini', 'MY_RoleStatistics_SerendipityFloat')
-		local function UpdateAnchor()
-			local an = O.tFloatAnchor
-			if IsEmpty(an) then
-				local nX, nY = Station.Lookup('Normal/SprintPower'):GetAbsPos()
-				frame:SetRelPos(nX + 60, nY + 60)
-			else
-				frame:SetPoint(an.s, 0, 0, an.r, an.x, an.y)
-			end
-			frame:BringToTop()
+function D.UpdateFloatEntry(bFloatEntry)
+	local frame = Station.Lookup('Normal/SprintPower')
+	if not frame then
+		return
+	end
+	local btn = frame:Lookup('Btn_MY_RoleStatistics_SerendipityEntry')
+	if IsNil(bFloatEntry) then
+		bFloatEntry = O.bFloatEntry
+	end
+	if bFloatEntry then
+		if btn then
+			return
 		end
-		frame.OnMouseEnter = function()
+		local frameTemp = Wnd.OpenWindow(PLUGIN_ROOT .. '/ui/MY_RoleStatistics_SerendipityEntry.ini', 'MY_RoleStatistics_SerendipityEntry')
+		btn = frameTemp:Lookup('Btn_MY_RoleStatistics_SerendipityEntry')
+		btn:ChangeRelation(frame, true, true)
+		btn:SetRelPos(61, 60)
+		Wnd.CloseWindow(frameTemp)
+		btn.OnMouseEnter = function()
 			local me = GetClientPlayer()
 			if not me then
 				return
@@ -1027,21 +1031,19 @@ function D.CheckFloatPanel()
 			D.DecodeRow(rec)
 			D.OutputRowTip(this, rec)
 		end
-		frame.OnMouseLeave = function()
+		btn.OnMouseLeave = function()
 			D.CloseRowTip()
 		end
-		frame.OnEvent = function(event)
-			if event == 'ON_LEAVE_CUSTOM_UI_MODE' then
-				UpdateAnchor()
-			end
-		end
-		frame:RegisterEvent('ON_LEAVE_CUSTOM_UI_MODE')
-		UpdateAnchor()
 	else
-		Wnd.CloseWindow('MY_RoleStatistics_SerendipityFloat')
+		if not btn then
+			return
+		end
+		btn:Destroy()
 	end
 end
-LIB.RegisterInit('MY_RoleStatistics_SerendipityFloat', D.CheckFloatPanel)
+LIB.RegisterInit('MY_RoleStatistics_SerendipityEntry', D.UpdateFloatEntry)
+LIB.RegisterReload('MY_RoleStatistics_SerendipityEntry', D.UpdateFloatEntry, false)
+LIB.RegisterFrameCreate('SprintPower.MY_RoleStatistics_SerendipityEntry', D.UpdateFloatEntry)
 
 -- Module exports
 do
@@ -1070,8 +1072,7 @@ local settings = {
 				aColumn = true,
 				szSort = true,
 				szSortOrder = true,
-				bFloat = true,
-				tFloatAnchor = true,
+				bFloatEntry = true,
 			},
 			root = O,
 		},
@@ -1082,10 +1083,10 @@ local settings = {
 				aColumn = true,
 				szSort = true,
 				szSortOrder = true,
-				bFloat = true,
+				bFloatEntry = true,
 			},
 			triggers = {
-				bFloat = D.CheckFloatPanel,
+				bFloatEntry = D.UpdateFloatEntry,
 			},
 			root = O,
 		},

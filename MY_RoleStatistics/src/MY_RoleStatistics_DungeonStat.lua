@@ -77,13 +77,12 @@ local O = {
 	tMapSaveCopy = {}, -- 单副本 CD
 	tMapProgress = {}, -- 单BOSS CD
 	bMapProgressApplied = false, -- 是否请求过副本进度
-	bFloat = false,
-	tFloatAnchor = {},
+	bFloatEntry = false,
 }
 RegisterCustomData('Global/MY_RoleStatistics_DungeonStat.aColumn')
 RegisterCustomData('Global/MY_RoleStatistics_DungeonStat.szSort')
 RegisterCustomData('Global/MY_RoleStatistics_DungeonStat.szSortOrder')
-RegisterCustomData('MY_RoleStatistics_DungeonStat.bFloat')
+RegisterCustomData('MY_RoleStatistics_DungeonStat.bFloatEntry')
 
 local EXCEL_WIDTH = 960
 local DUNGEON_WIDTH = 80
@@ -545,9 +544,9 @@ function D.OutputRowTip(this, rec)
 	end
 	local x, y = this:GetAbsPos()
 	local w, h = this:GetSize()
-	local nPosType = this:GetRoot():GetName() == 'MY_RoleStatistics_DungeonFloat'
-		and UI.TIP_POSITION.TOP_BOTTOM
-		or UI.TIP_POSITION.RIGHT_LEFT
+	local nPosType = this:GetRoot():GetName() == 'MY_RoleStatistics'
+		and UI.TIP_POSITION.RIGHT_LEFT
+		or UI.TIP_POSITION.TOP_BOTTOM
 	OutputTip(concat(aXml), 450, {x, y, w, h}, nPosType)
 end
 
@@ -565,9 +564,9 @@ function D.OnInitPage()
 	UI(wnd):Append('WndCheckBox', {
 		x = 670, y = 21, w = 180,
 		text = _L['Float panel'],
-		checked = MY_RoleStatistics_DungeonStat.bFloat,
+		checked = MY_RoleStatistics_DungeonStat.bFloatEntry,
 		oncheck = function()
-			MY_RoleStatistics_DungeonStat.bFloat = not MY_RoleStatistics_DungeonStat.bFloat
+			MY_RoleStatistics_DungeonStat.bFloatEntry = not MY_RoleStatistics_DungeonStat.bFloatEntry
 		end,
 	})
 
@@ -804,20 +803,25 @@ function D.OnItemMouseLeave()
 end
 
 -- 浮动框
-function D.CheckFloatPanel()
-	if O.bFloat then
-		local frame = Wnd.OpenWindow(PLUGIN_ROOT .. '/ui/MY_RoleStatistics_DungeonFloat.ini', 'MY_RoleStatistics_DungeonFloat')
-		local function UpdateAnchor()
-			local an = O.tFloatAnchor
-			if IsEmpty(an) then
-				local nX, nY = Station.Lookup('Normal/SprintPower'):GetAbsPos()
-				frame:SetRelPos(nX + 70, nY + 13)
-			else
-				frame:SetPoint(an.s, 0, 0, an.r, an.x, an.y)
-			end
-			frame:BringToTop()
+function D.UpdateFloatEntry(bFloatEntry)
+	local frame = Station.Lookup('Normal/SprintPower')
+	if not frame then
+		return
+	end
+	local btn = frame:Lookup('Btn_MY_RoleStatistics_DungeonEntry')
+	if IsNil(bFloatEntry) then
+		bFloatEntry = O.bFloatEntry
+	end
+	if bFloatEntry then
+		if btn then
+			return
 		end
-		frame.OnMouseEnter = function()
+		local frameTemp = Wnd.OpenWindow(PLUGIN_ROOT .. '/ui/MY_RoleStatistics_DungeonEntry.ini', 'MY_RoleStatistics_DungeonEntry')
+		btn = frameTemp:Lookup('Btn_MY_RoleStatistics_DungeonEntry')
+		btn:ChangeRelation(frame, true, true)
+		btn:SetRelPos(72, 13)
+		Wnd.CloseWindow(frameTemp)
+		btn.OnMouseEnter = function()
 			local me = GetClientPlayer()
 			if not me then
 				return
@@ -833,21 +837,19 @@ function D.CheckFloatPanel()
 			D.DecodeRow(rec)
 			D.OutputRowTip(this, rec)
 		end
-		frame.OnMouseLeave = function()
+		btn.OnMouseLeave = function()
 			D.CloseRowTip()
 		end
-		frame.OnEvent = function(event)
-			if event == 'ON_LEAVE_CUSTOM_UI_MODE' then
-				UpdateAnchor()
-			end
-		end
-		frame:RegisterEvent('ON_LEAVE_CUSTOM_UI_MODE')
-		UpdateAnchor()
 	else
-		Wnd.CloseWindow('MY_RoleStatistics_DungeonFloat')
+		if not btn then
+			return
+		end
+		btn:Destroy()
 	end
 end
-LIB.RegisterInit('MY_RoleStatistics_DungeonFloat', D.CheckFloatPanel)
+LIB.RegisterInit('MY_RoleStatistics_DungeonEntry', D.UpdateFloatEntry)
+LIB.RegisterReload('MY_RoleStatistics_DungeonEntry', D.UpdateFloatEntry, false)
+LIB.RegisterFrameCreate('SprintPower.MY_RoleStatistics_DungeonEntry', D.UpdateFloatEntry)
 
 -- Module exports
 do
@@ -876,8 +878,7 @@ local settings = {
 				aColumn = true,
 				szSort = true,
 				szSortOrder = true,
-				bFloat = true,
-				tFloatAnchor = true,
+				bFloatEntry = true,
 			},
 			root = O,
 		},
@@ -888,11 +889,10 @@ local settings = {
 				aColumn = true,
 				szSort = true,
 				szSortOrder = true,
-				bFloat = true,
-				tFloatAnchor = true,
+				bFloatEntry = true,
 			},
 			triggers = {
-				bFloat = D.CheckFloatPanel,
+				bFloatEntry = D.UpdateFloatEntry,
 			},
 			root = O,
 		},
