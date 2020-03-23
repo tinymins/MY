@@ -40,9 +40,13 @@ local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAD
 local _L = LIB.LoadLangPack()
 -----------------------------------------------------------------------------------------------------------
 
+local PLUGIN_NAME = 'MY_PopupMenu'
+local COLOR_TABLE_NAME = 'MY_ColorTable'
+local COLOR_PICKER_NAME = 'MY_ColorPickerEx'
+
 local D = {}
-local SZ_INI = PACKET_INFO.FRAMEWORK_ROOT .. 'ui/MY_PopupMenu.ini'
-local SZ_TPL_INI = PACKET_INFO.FRAMEWORK_ROOT .. 'ui/MY_PopupMenu.tpl.ini'
+local SZ_INI = PACKET_INFO.FRAMEWORK_ROOT .. 'ui/PopupMenu.ini'
+local SZ_TPL_INI = PACKET_INFO.FRAMEWORK_ROOT .. 'ui/PopupMenu.tpl.ini'
 local LAYER_LIST = {'Lowest', 'Lowest1', 'Lowest2', 'Normal', 'Normal1', 'Normal2', 'Topmost', 'Topmost1', 'Topmost2'}
 local ENABLE_FONT = 162
 local DISABLE_FONT = 161
@@ -96,7 +100,7 @@ local DIFF_KEYS = { -- 用于自动扫描菜单数据是否有更新的键
 function D.Open(menu)
 	local frame = D.GetFrame()
 	if not frame then
-		frame = Wnd.OpenWindow(SZ_INI, 'MY_PopupMenu')
+		frame = Wnd.OpenWindow(SZ_INI, PLUGIN_NAME)
 	end
 	frame.nCurX, frame.nCurY = Cursor.GetPos()
 	frame:SetDS(menu)
@@ -113,7 +117,7 @@ end
 
 function D.GetFrame()
 	for _, v in ipairs(LAYER_LIST) do
-		local frame = Station.Lookup(v .. '/MY_PopupMenu')
+		local frame = Station.Lookup(v .. '/' .. PLUGIN_NAME)
 		if frame then
 			return frame
 		end
@@ -135,7 +139,7 @@ function D.SetDS(frame, menu)
 end
 
 function D.AppendContentFromIni(parentWnd, szIni, szPath, szName)
-	local frameTemp = Wnd.OpenWindow(szIni, 'MY_PopupMenu__TempWnd')
+	local frameTemp = Wnd.OpenWindow(szIni, PLUGIN_NAME .. '__TempWnd')
 	local wnd = frameTemp:Lookup(szPath)
 	if wnd then
 		if szName then
@@ -562,13 +566,13 @@ function D.OnFrameBreathe()
 		local wnd = Station.GetFocusWindow()
 		local frame = wnd and wnd:GetRoot()
 		local name = frame and frame:GetName()
-		if frame and frame ~= this and name ~= 'MY_ColorTable' and name ~= 'MY_ColorPickerEx' then
+		if frame and frame ~= this and name ~= COLOR_TABLE_NAME and name ~= COLOR_PICKER_NAME then
 			if this.aMenu[1].fnCancel then
 				this.aMenu[1].fnCancel()
 			end
 			if this.bColorPicker then
-				Wnd.CloseWindow('MY_ColorTable')
-				Wnd.CloseWindow('MY_ColorPickerEx')
+				Wnd.CloseWindow(COLOR_TABLE_NAME)
+				Wnd.CloseWindow(COLOR_PICKER_NAME)
 			end
 			return Wnd.CloseWindow(this)
 		end
@@ -585,7 +589,7 @@ function D.OnItemMouseEnter()
 		local menu = wnd.menu
 		local nLevel = wnd.nLevel
 		if #menu ~= 0 and (not D.IsDisable(menu) or menu.bAlwaysShowSub) then
-			LIB.DelayCall('MY_PopupMenu__HideSub', false)
+			LIB.DelayCall(PLUGIN_NAME .. '__HideSub', false)
 			-- 插入子菜单
 			for i = nLevel, #frame.aMenu do
 				frame.aMenu[i] = nil
@@ -600,8 +604,8 @@ function D.OnItemMouseEnter()
 			frame.aInvaild[nLevel] = true
 			-- 更新UI
 			D.UpdateUI(frame)
-		elseif frame.nAutoHideLevel ~= nLevel or not LIB.DelayCall('MY_PopupMenu__HideSub') then -- 3000ms后关闭之前展开的子菜单
-			LIB.DelayCall('MY_PopupMenu__HideSub', 1000, function()
+		elseif frame.nAutoHideLevel ~= nLevel or not LIB.DelayCall(PLUGIN_NAME .. '__HideSub') then -- 3000ms后关闭之前展开的子菜单
+			LIB.DelayCall(PLUGIN_NAME .. '__HideSub', 1000, function()
 				if not IsElement(wnd) then
 					return
 				end
@@ -709,5 +713,5 @@ local settings = {
 		},
 	},
 }
-MY_PopupMenu = LIB.GeneGlobalNS(settings)
+_G[PLUGIN_NAME] = LIB.GeneGlobalNS(settings)
 end
