@@ -299,36 +299,7 @@ function D.DrawScrollContainer(scroll, menu, nLevel, bInlineContainer)
 				else
 					imgBg:Hide()
 				end
-				-- 左侧图标
-				hHeader:Lookup('Handle_Check'):SetVisible(m.bCheck and m.bChecked)
-				hHeader:Lookup('Handle_MCheck'):SetVisible(m.bMCheck and m.bChecked)
-				hHeader:SetW(99999)
-				hHeader:FormatAllItemPos()
-				nHeaderWidth = max(nHeaderWidth, (hHeader:GetAllItemSize()))
-				-- 正文
-				local hContentInner = hContent:Lookup('Handle_ContentInner')
-				local nFont = D.IsDisable(m) and DISABLE_FONT or ENABLE_FONT
-				local rgb = m.rgb or CONSTANT.EMPTY_TABLE
-				local r, g, b = rgb.r or rgb[1] or m.r, rgb.g or rgb[2] or m.g, rgb.b or rgb[3] or m.b
-				if D.IsDisable(m) then
-					r, g, b = nil
-				end
-				hContentInner:AppendItemFromString(GetFormatText(m.szOption, nFont, r, g, b))
-				hContentInner:SetW(99999)
-				hContentInner:FormatAllItemPos()
-				hContentInner:SetSizeByAllItemSize()
-				hContentInner:SetRelY((hContent:GetH() - hContentInner:GetH()) / 2)
-				hContent:SetW(hContentInner:GetW())
-				hContent:FormatAllItemPos()
-				nContentWidth = max(nContentWidth, hContent:GetW())
-				-- 右侧图标
-				if m.nPushCount then
-					hFooter:Lookup('Handle_PushInfo/Text_PushInfo'):SetText(m.nPushCount)
-					hFooter:Lookup('Handle_PushInfo'):Show()
-				else
-					hFooter:Lookup('Handle_PushInfo'):Hide()
-				end
-				hFooter:Lookup('Handle_Color'):SetVisible(m.fnChangeColor and true or false)
+				-- 自定义图标
 				local aCustomIcon = {}
 				if m.aCustomIcon then
 					for _, v in ipairs(m.aCustomIcon) do
@@ -337,6 +308,7 @@ function D.DrawScrollContainer(scroll, menu, nLevel, bInlineContainer)
 				end
 				if m.szIcon and m.szLayer ~= 'ICON_FILL' then
 					insert(aCustomIcon, {
+						szPosType = m.szLayer == 'ICON_LEFT' and 'LEFT' or 'RIGHT',
 						szUITex = m.szIcon ~= 'fromiconid' and m.szIcon or nil,
 						nFrame = m.szIcon ~= 'fromiconid' and m.nFrame or nil,
 						nIconID = m.szIcon == 'fromiconid' and m.nFrame or nil,
@@ -348,9 +320,12 @@ function D.DrawScrollContainer(scroll, menu, nLevel, bInlineContainer)
 					})
 				end
 				for _, v in ipairs(aCustomIcon) do
-					local hCustom = hFooter:AppendItemFromIni(SZ_TPL_INI, 'Handle_CustomIcon')
-					while hCustom:GetIndex() > 1 and hFooter:Lookup(hCustom:GetIndex() - 1):GetName() ~= 'Handle_Color' do
-						hCustom:ExchangeIndex(hCustom:GetIndex() - 1)
+					local hDest = v.szPosType == 'LEFT' and hHeader or hFooter
+					local hCustom = hDest:AppendItemFromIni(SZ_TPL_INI, 'Handle_CustomIcon')
+					if hDest == hFooter then
+						while hCustom:GetIndex() > 1 and hFooter:Lookup(hCustom:GetIndex() - 1):GetName() ~= 'Handle_Color' do
+							hCustom:ExchangeIndex(hCustom:GetIndex() - 1)
+						end
 					end
 					-- 图标
 					local img = hCustom:Lookup('Image_CustomIcon')
@@ -392,6 +367,36 @@ function D.DrawScrollContainer(scroll, menu, nLevel, bInlineContainer)
 					hCustom.data = v
 					hCustom.menu = m
 				end
+				-- 左侧图标
+				hHeader:Lookup('Handle_Check'):SetVisible(m.bCheck and m.bChecked)
+				hHeader:Lookup('Handle_MCheck'):SetVisible(m.bMCheck and m.bChecked)
+				hHeader:SetW(99999)
+				hHeader:FormatAllItemPos()
+				nHeaderWidth = max(nHeaderWidth, (hHeader:GetAllItemSize()))
+				-- 正文
+				local hContentInner = hContent:Lookup('Handle_ContentInner')
+				local nFont = D.IsDisable(m) and DISABLE_FONT or ENABLE_FONT
+				local rgb = m.rgb or CONSTANT.EMPTY_TABLE
+				local r, g, b = rgb.r or rgb[1] or m.r, rgb.g or rgb[2] or m.g, rgb.b or rgb[3] or m.b
+				if D.IsDisable(m) then
+					r, g, b = nil
+				end
+				hContentInner:AppendItemFromString(GetFormatText(m.szOption, nFont, r, g, b))
+				hContentInner:SetW(99999)
+				hContentInner:FormatAllItemPos()
+				hContentInner:SetSizeByAllItemSize()
+				hContentInner:SetRelY((hContent:GetH() - hContentInner:GetH()) / 2)
+				hContent:SetW(hContentInner:GetW())
+				hContent:FormatAllItemPos()
+				nContentWidth = max(nContentWidth, hContent:GetW())
+				-- 右侧图标
+				if m.nPushCount then
+					hFooter:Lookup('Handle_PushInfo/Text_PushInfo'):SetText(m.nPushCount)
+					hFooter:Lookup('Handle_PushInfo'):Show()
+				else
+					hFooter:Lookup('Handle_PushInfo'):Hide()
+				end
+				hFooter:Lookup('Handle_Color'):SetVisible(m.fnChangeColor and true or false)
 				hFooter:Lookup('Handle_Child'):SetVisible(#m > 0)
 				hFooter:SetW(99999)
 				hFooter:FormatAllItemPos()
