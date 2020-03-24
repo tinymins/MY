@@ -372,7 +372,7 @@ function D.DrawScrollContainer(scroll, menu, nLevel, bInlineContainer)
 					hCustom.menu = m
 				end
 				-- ×ó²àÍ¼±ê
-				hHeader:Lookup('Handle_Check'):SetVisible(m.bCheck and m.bChecked)
+				hHeader:Lookup('Handle_Check'):SetVisible(m.bCheck and not m.bMCheck and m.bChecked)
 				hHeader:Lookup('Handle_MCheck'):SetVisible(m.bMCheck and m.bChecked)
 				hHeader:SetW(99999)
 				hHeader:FormatAllItemPos()
