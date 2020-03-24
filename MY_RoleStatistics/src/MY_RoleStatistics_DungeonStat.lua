@@ -236,7 +236,7 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 					local aBossKill = rec.progress_info[map.dwID]
 					local nNextTime, nCircle = LIB.GetDungeonRefreshTime(map.dwID)
 					if not aBossKill or nNextTime - nCircle > rec.time then
-						return GetFormatText(_L['Unknown'])
+						return GetFormatText(_L['--'])
 					end
 					local aXml = {}
 					for _, bKill in ipairs(aBossKill) do
@@ -276,7 +276,7 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 					local nNextTime, nCircle = LIB.GetDungeonRefreshTime(map.dwID)
 					local szText = nNextTime - nCircle < rec.time
 						and (aCopyID and aCopyID[1] or _L['None'])
-						or (_L['Unknown'])
+						or (_L['--'])
 					return GetFormatText(szText, nil, nil, nil, nil, 786, 'this.mapid=' .. map.dwID, 'Text_CD')
 				end
 				col.Compare = function(r1, r2)
