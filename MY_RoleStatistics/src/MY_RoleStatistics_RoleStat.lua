@@ -108,7 +108,7 @@ end
 
 local function GeneCommonFormatText(id)
 	return function(r)
-		return GetFormatText(r[id])
+		return GetFormatText(r[id], 162, 255, 255, 255)
 	end
 end
 local function GeneCommonCompare(id)
@@ -125,7 +125,7 @@ local function GeneWeeklyFormatText(id)
 		local szText = (nNextTime - nCircle < r.time and r[id] and r[id] >= 0)
 			and r[id]
 			or _L['--']
-		return GetFormatText(szText)
+		return GetFormatText(szText, 162, 255, 255, 255)
 	end
 end
 local function GeneWeeklyCompare(id)
@@ -181,7 +181,7 @@ local COLUMN_LIST = {
 		szTitle = _L['Force'],
 		nWidth = 50,
 		GetFormatText = function(rec)
-			return GetFormatText(g_tStrings.tForceTitle[rec.force])
+			return GetFormatText(g_tStrings.tForceTitle[rec.force], 162, 255, 255, 255)
 		end,
 		Compare = GeneCommonCompare('force'),
 	},
@@ -308,7 +308,7 @@ local COLUMN_LIST = {
 		szTitle = _L['Camp level'],
 		nWidth = 70,
 		GetFormatText = function(rec)
-			return GetFormatText(rec.camp_level .. ' + ' .. rec.camp_point_percentage .. '%')
+			return GetFormatText(rec.camp_level .. ' + ' .. rec.camp_point_percentage .. '%', 162, 255, 255, 255)
 		end,
 		Compare = function(r1, r2)
 			if r1.camp_level == r2.camp_level then
@@ -390,7 +390,7 @@ local COLUMN_LIST = {
 		szTitle = _L['Cache time'],
 		nWidth = 165,
 		GetFormatText = function(rec)
-			return GetFormatText(LIB.FormatTime(rec.time, '%yyyy/%MM/%dd %hh:%mm:%ss'))
+			return GetFormatText(LIB.FormatTime(rec.time, '%yyyy/%MM/%dd %hh:%mm:%ss'), 162, 255, 255, 255)
 		end,
 		Compare = GeneCommonCompare('time'),
 	},
@@ -412,21 +412,21 @@ local COLUMN_LIST = {
 			local nMinute  = nMinutes % 60
 			local nSecond  = nSeconds % 60
 			if nYears > 0 then
-				return GetFormatText(_L('%d years %d days before', nYears, nDay))
+				return GetFormatText(_L('%d years %d days before', nYears, nDay), 162, 255, 255, 255)
 			end
 			if nDays > 0 then
-				return GetFormatText(_L('%d days %d hours before', nDays, nHour))
+				return GetFormatText(_L('%d days %d hours before', nDays, nHour), 162, 255, 255, 255)
 			end
 			if nHours > 0 then
-				return GetFormatText(_L('%d hours %d mins before', nHours, nMinute))
+				return GetFormatText(_L('%d hours %d mins before', nHours, nMinute), 162, 255, 255, 255)
 			end
 			if nMinutes > 0 then
-				return GetFormatText(_L('%d mins %d secs before', nMinutes, nSecond))
+				return GetFormatText(_L('%d mins %d secs before', nMinutes, nSecond), 162, 255, 255, 255)
 			end
 			if nSecond > 10 then
-				return GetFormatText(_L('%d secs before', nSecond))
+				return GetFormatText(_L('%d secs before', nSecond), 162, 255, 255, 255)
 			end
-			return GetFormatText(_L['Just now'])
+			return GetFormatText(_L['Just now'], 162, 255, 255, 255)
 		end,
 		Compare = GeneCommonCompare('time'),
 	},
@@ -774,7 +774,7 @@ function D.OutputRowTip(this, rec)
 			insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
 			insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
 			insert(aXml, col.GetFormatText(rec))
-			insert(aXml, GetFormatText('\n'))
+			insert(aXml, GetFormatText('\n', 162, 255, 255, 255))
 		end
 	end
 	local x, y = this:GetAbsPos()
@@ -1005,7 +1005,7 @@ function D.OnItemMouseEnter()
 	elseif name == 'Handle_RoleStatColumn' then
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
-		local szXml = GetFormatText(this:Lookup('Text_RoleStat_Title'):GetText())
+		local szXml = GetFormatText(this:Lookup('Text_RoleStat_Title'):GetText(), 162, 255, 255, 255)
 		OutputTip(szXml, 450, {x, y, w, h}, UI.TIP_POSITION.TOP_BOTTOM)
 	elseif this.tip then
 		local x, y = this:GetAbsPos()

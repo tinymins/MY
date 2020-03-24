@@ -88,7 +88,7 @@ local EXCEL_WIDTH = 960
 local DUNGEON_WIDTH = 80
 local function GeneCommonFormatText(id)
 	return function(r)
-		return GetFormatText(r[id])
+		return GetFormatText(r[id], 162, 255, 255, 255)
 	end
 end
 local function GeneCommonCompare(id)
@@ -104,6 +104,7 @@ local COLUMN_LIST = {
 	-- account,
 	{ -- 大区
 		id = 'region',
+		bHideInFloat = true,
 		szTitle = _L['Region'],
 		nWidth = 100,
 		GetFormatText = GeneCommonFormatText('region'),
@@ -111,6 +112,7 @@ local COLUMN_LIST = {
 	},
 	{ -- 服务器
 		id = 'server',
+		bHideInFloat = true,
 		szTitle = _L['Server'],
 		nWidth = 100,
 		GetFormatText = GeneCommonFormatText('server'),
@@ -118,6 +120,7 @@ local COLUMN_LIST = {
 	},
 	{ -- 名字
 		id = 'name',
+		bHideInFloat = true,
 		szTitle = _L['Name'],
 		nWidth = 130,
 		GetFormatText = function(rec)
@@ -125,20 +128,22 @@ local COLUMN_LIST = {
 			if MY_ChatMosaics and MY_ChatMosaics.MosaicsString then
 				name = MY_ChatMosaics.MosaicsString(name)
 			end
-			return GetFormatText(name, nil, LIB.GetForceColor(rec.force, 'foreground'))
+			return GetFormatText(name, 162, LIB.GetForceColor(rec.force, 'foreground'))
 		end,
 	},
 	{ -- 门派
 		id = 'force',
+		bHideInFloat = true,
 		szTitle = _L['Force'],
 		nWidth = 50,
 		GetFormatText = function(rec)
-			return GetFormatText(g_tStrings.tForceTitle[rec.force])
+			return GetFormatText(g_tStrings.tForceTitle[rec.force], 162, 255, 255, 255)
 		end,
 		Compare = GeneCommonCompare('force'),
 	},
 	{ -- 等级
 		id = 'level',
+		bHideInFloat = true,
 		szTitle = _L['Level'],
 		nWidth = 50,
 		GetFormatText = GeneCommonFormatText('level'),
@@ -146,6 +151,7 @@ local COLUMN_LIST = {
 	},
 	{ -- 装分
 		id = 'equip_score',
+		bHideInFloat = true,
 		szTitle = _L['EquSC'],
 		nWidth = 60,
 		GetFormatText = GeneCommonFormatText('equip_score'),
@@ -154,16 +160,18 @@ local COLUMN_LIST = {
 	{
 		-- 时间
 		id = 'time',
+		bHideInFloat = true,
 		szTitle = _L['Cache time'],
 		nWidth = 165,
 		GetFormatText = function(rec)
-			return GetFormatText(LIB.FormatTime(rec.time, '%yyyy/%MM/%dd %hh:%mm:%ss'))
+			return GetFormatText(LIB.FormatTime(rec.time, '%yyyy/%MM/%dd %hh:%mm:%ss'), 162, 255, 255, 255)
 		end,
 		Compare = GeneCommonCompare('time'),
 	},
 	{
 		-- 时间计时
 		id = 'time_days',
+		bHideInFloat = true,
 		szTitle = _L['Cache time days'],
 		nWidth = 120,
 		GetFormatText = function(rec)
@@ -178,21 +186,21 @@ local COLUMN_LIST = {
 			local nMinute  = nMinutes % 60
 			local nSecond  = nSeconds % 60
 			if nYears > 0 then
-				return GetFormatText(_L('%d years %d days before', nYears, nDay))
+				return GetFormatText(_L('%d years %d days before', nYears, nDay), 162, 255, 255, 255)
 			end
 			if nDays > 0 then
-				return GetFormatText(_L('%d days %d hours before', nDays, nHour))
+				return GetFormatText(_L('%d days %d hours before', nDays, nHour), 162, 255, 255, 255)
 			end
 			if nHours > 0 then
-				return GetFormatText(_L('%d hours %d mins before', nHours, nMinute))
+				return GetFormatText(_L('%d hours %d mins before', nHours, nMinute), 162, 255, 255, 255)
 			end
 			if nMinutes > 0 then
-				return GetFormatText(_L('%d mins %d secs before', nMinutes, nSecond))
+				return GetFormatText(_L('%d mins %d secs before', nMinutes, nSecond), 162, 255, 255, 255)
 			end
 			if nSecond > 10 then
-				return GetFormatText(_L('%d secs before', nSecond))
+				return GetFormatText(_L('%d secs before', nSecond), 162, 255, 255, 255)
 			end
-			return GetFormatText(_L['Just now'])
+			return GetFormatText(_L['Just now'], 162, 255, 255, 255)
 		end,
 		Compare = GeneCommonCompare('time'),
 	},
@@ -236,7 +244,7 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 					local aBossKill = rec.progress_info[map.dwID]
 					local nNextTime, nCircle = LIB.GetDungeonRefreshTime(map.dwID)
 					if not aBossKill or nNextTime - nCircle > rec.time then
-						return GetFormatText(_L['--'])
+						return GetFormatText(_L['--'], 162, 255, 255, 255)
 					end
 					local aXml = {}
 					for _, bKill in ipairs(aBossKill) do
@@ -277,7 +285,7 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 					local szText = nNextTime - nCircle < rec.time
 						and (aCopyID and aCopyID[1] or _L['None'])
 						or (_L['--'])
-					return GetFormatText(szText, nil, nil, nil, nil, 786, 'this.mapid=' .. map.dwID, 'Text_CD')
+					return GetFormatText(szText, 162, 255, 255, 255, 786, 'this.mapid=' .. map.dwID, 'Text_CD')
 				end
 				col.Compare = function(r1, r2)
 					local k1 = r1.copy_info[map.dwID] and r1.copy_info[map.dwID][1]
@@ -309,7 +317,7 @@ for _, p in ipairs(COLUMN_LIST) do
 	end
 	COLUMN_DICT[p.id] = p
 end
-local TIP_COLIMN = {
+local TIP_COLUMN = {
 	'region',
 	'server',
 	'name',
@@ -510,7 +518,8 @@ end
 
 function D.OutputRowTip(this, rec)
 	local aXml = {}
-	for _, id in ipairs(TIP_COLIMN) do
+	local bFloat = this:GetRoot():GetName() ~= 'MY_RoleStatistics'
+	for _, id in ipairs(TIP_COLUMN) do
 		if id == 'DUNGEON' then
 			local tDungeon = {}
 			for _, col in ipairs(D.GetColumns()) do
@@ -518,7 +527,7 @@ function D.OutputRowTip(this, rec)
 					insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
 					insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
 					insert(aXml, col.GetFormatText(rec))
-					insert(aXml, GetFormatText('\n'))
+					insert(aXml, GetFormatText('\n', 162, 255, 255, 255))
 					tDungeon[tonumber(col.id:sub(#'dungeon_' + 1))] = true
 				end
 			end
@@ -529,24 +538,24 @@ function D.OutputRowTip(this, rec)
 						insert(aXml, GetFormatText(map.szName, 162, 255, 255, 0))
 						insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
 						insert(aXml, GetFormatText(concat(aCopyID, ',')))
-						insert(aXml, GetFormatText('\n'))
+						insert(aXml, GetFormatText('\n', 162, 255, 255, 255))
 					end
 					tDungeon[dwMapID] = true
 				end
 			end
 		else
 			local col = COLUMN_DICT[id]
-			insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
-			insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
-			insert(aXml, col.GetFormatText(rec))
-			insert(aXml, GetFormatText('\n'))
+			if col and (not bFloat or not col.bHideInFloat) then
+				insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
+				insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
+				insert(aXml, col.GetFormatText(rec))
+				insert(aXml, GetFormatText('\n', 162, 255, 255, 255))
+			end
 		end
 	end
 	local x, y = this:GetAbsPos()
 	local w, h = this:GetSize()
-	local nPosType = this:GetRoot():GetName() == 'MY_RoleStatistics'
-		and UI.TIP_POSITION.RIGHT_LEFT
-		or UI.TIP_POSITION.TOP_BOTTOM
+	local nPosType = bFloat and UI.TIP_POSITION.TOP_BOTTOM or UI.TIP_POSITION.RIGHT_LEFT
 	OutputTip(concat(aXml), 450, {x, y, w, h}, nPosType)
 end
 
@@ -784,11 +793,11 @@ function D.OnItemMouseEnter()
 		insert(aText, '')
 		local nTime = LIB.GetDungeonRefreshTime(this.mapid) - GetCurrentTime()
 		insert(aText, _L('Refresh: %s', LIB.FormatTimeCounter(nTime, 2, 2)))
-		OutputTip(GetFormatText(concat(aText, '\n')), 400, { x, y, w, h })
+		OutputTip(GetFormatText(concat(aText, '\n'), 162, 255, 255, 255), 400, { x, y, w, h })
 	elseif name == 'Handle_DungeonStatColumn' then
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
-		local szXml = GetFormatText(this.szTip or this:Lookup('Text_DungeonStat_Title'):GetText())
+		local szXml = GetFormatText(this.szTip or this:Lookup('Text_DungeonStat_Title'):GetText(), 162, 255, 255, 255)
 		OutputTip(szXml, 450, {x, y, w, h}, UI.TIP_POSITION.TOP_BOTTOM)
 	elseif this.tip then
 		local x, y = this:GetAbsPos()

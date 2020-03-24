@@ -174,7 +174,7 @@ local TASK_MIN_WIDTH = 42
 local TASK_MAX_WIDTH = 150
 local function GeneCommonFormatText(id)
 	return function(r)
-		return GetFormatText(r[id])
+		return GetFormatText(r[id], 162, 255, 255, 255)
 	end
 end
 local function GeneCommonCompare(id)
@@ -190,6 +190,7 @@ local COLUMN_LIST = {
 	-- account,
 	{ -- 大区
 		id = 'region',
+		bHideInFloat = true,
 		szTitle = _L['Region'],
 		nMinWidth = 100, nMaxWidth = 100,
 		GetFormatText = GeneCommonFormatText('region'),
@@ -197,6 +198,7 @@ local COLUMN_LIST = {
 	},
 	{ -- 服务器
 		id = 'server',
+		bHideInFloat = true,
 		szTitle = _L['Server'],
 		nMinWidth = 100, nMaxWidth = 100,
 		GetFormatText = GeneCommonFormatText('server'),
@@ -204,6 +206,7 @@ local COLUMN_LIST = {
 	},
 	{ -- 名字
 		id = 'name',
+		bHideInFloat = true,
 		szTitle = _L['Name'],
 		nMinWidth = 110, nMaxWidth = 200,
 		GetFormatText = function(rec)
@@ -211,30 +214,33 @@ local COLUMN_LIST = {
 			if MY_ChatMosaics and MY_ChatMosaics.MosaicsString then
 				name = MY_ChatMosaics.MosaicsString(name)
 			end
-			return GetFormatText(name, nil, LIB.GetForceColor(rec.force, 'foreground'))
+			return GetFormatText(name, 162, LIB.GetForceColor(rec.force, 'foreground'))
 		end,
 		Compare = GeneCommonCompare('name'),
 	},
 	{ -- 门派
 		id = 'force',
+		bHideInFloat = true,
 		szTitle = _L['Force'],
 		nMinWidth = 50, nMaxWidth = 70,
 		GetFormatText = function(rec)
-			return GetFormatText(g_tStrings.tForceTitle[rec.force])
+			return GetFormatText(g_tStrings.tForceTitle[rec.force], 162, 255, 255, 255)
 		end,
 		Compare = GeneCommonCompare('force'),
 	},
 	{ -- 阵营
 		id = 'camp',
+		bHideInFloat = true,
 		szTitle = _L['Camp'],
 		nMinWidth = 50, nMaxWidth = 50,
 		GetFormatText = function(rec)
-			return GetFormatText(g_tStrings.STR_CAMP_TITLE[rec.camp])
+			return GetFormatText(g_tStrings.STR_CAMP_TITLE[rec.camp], 162, 255, 255, 255)
 		end,
 		Compare = GeneCommonCompare('camp'),
 	},
 	{ -- 等级
 		id = 'level',
+		bHideInFloat = true,
 		szTitle = _L['Level'],
 		nMinWidth = 50, nMaxWidth = 50,
 		GetFormatText = GeneCommonFormatText('level'),
@@ -242,15 +248,17 @@ local COLUMN_LIST = {
 	},
 	{ -- 时间
 		id = 'time',
+		bHideInFloat = true,
 		szTitle = _L['Cache time'],
 		nMinWidth = 165, nMaxWidth = 200,
 		GetFormatText = function(rec)
-			return GetFormatText(LIB.FormatTime(rec.time, '%yyyy/%MM/%dd %hh:%mm:%ss'))
+			return GetFormatText(LIB.FormatTime(rec.time, '%yyyy/%MM/%dd %hh:%mm:%ss'), 162, 255, 255, 255)
 		end,
 		Compare = GeneCommonCompare('time'),
 	},
 	{ -- 时间计时
 		id = 'time_days',
+		bHideInFloat = true,
 		szTitle = _L['Cache time days'],
 		nMinWidth = 120, nMaxWidth = 120,
 		GetFormatText = function(rec)
@@ -265,21 +273,21 @@ local COLUMN_LIST = {
 			local nMinute  = nMinutes % 60
 			local nSecond  = nSeconds % 60
 			if nYears > 0 then
-				return GetFormatText(_L('%d years %d days before', nYears, nDay))
+				return GetFormatText(_L('%d years %d days before', nYears, nDay), 162, 255, 255, 255)
 			end
 			if nDays > 0 then
-				return GetFormatText(_L('%d days %d hours before', nDays, nHour))
+				return GetFormatText(_L('%d days %d hours before', nDays, nHour), 162, 255, 255, 255)
 			end
 			if nHours > 0 then
-				return GetFormatText(_L('%d hours %d mins before', nHours, nMinute))
+				return GetFormatText(_L('%d hours %d mins before', nHours, nMinute), 162, 255, 255, 255)
 			end
 			if nMinutes > 0 then
-				return GetFormatText(_L('%d mins %d secs before', nMinutes, nSecond))
+				return GetFormatText(_L('%d mins %d secs before', nMinutes, nSecond), 162, 255, 255, 255)
 			end
 			if nSecond > 10 then
-				return GetFormatText(_L('%d secs before', nSecond))
+				return GetFormatText(_L('%d secs before', nSecond), 162, 255, 255, 255)
 			end
-			return GetFormatText(_L['Just now'])
+			return GetFormatText(_L['Just now'], 162, 255, 255, 255)
 		end,
 		Compare = GeneCommonCompare('time'),
 	},
@@ -440,14 +448,14 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 		}
 		col.GetTitleFormatTip = function()
 			local aTitleTipXml = {
-				GetFormatText(task.szTitle .. '\n'),
-				GetFormatText(_L['Refresh type:'] .. TASK_TYPE_STRING[task.eType] .. '\n', nil, 255, 128, 0)
+				GetFormatText(task.szTitle .. '\n', 162, 255, 255, 255),
+				GetFormatText(_L['Refresh type:'] .. TASK_TYPE_STRING[task.eType] .. '\n', 162, 255, 128, 0)
 			}
 			local function InsertTitleTipXml(aInfo)
 				if IsCtrlKeyDown() then
-					insert(aTitleTipXml, GetFormatText('(' .. aInfo[1] .. ')', nil, 255, 128, 0))
+					insert(aTitleTipXml, GetFormatText('(' .. aInfo[1] .. ')', 162, 255, 128, 0))
 				end
-				insert(aTitleTipXml, GetFormatText('[' .. Table_GetQuestStringInfo(aInfo[1]).szName .. ']\n', nil, 255, 255, 0))
+				insert(aTitleTipXml, GetFormatText('[' .. Table_GetQuestStringInfo(aInfo[1]).szName .. ']\n', 162, 255, 255, 0))
 			end
 			if task.aQuestInfo then
 				for _, aInfo in ipairs(task.aQuestInfo) do
@@ -514,27 +522,27 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 			else
 				szState = _L['None']
 			end
-			return GetFormatText(szState, nil, r, g, b, 786, 'this.id="' .. id .. '"', 'Text_QuestState')
+			return GetFormatText(szState, 162, r, g, b, 786, 'this.id="' .. id .. '"', 'Text_QuestState')
 		end
 		col.GetFormatTip = function(rec)
 			local aXml = {}
 			local function InsertTaskState(aInfo)
 				if IsCtrlKeyDown() then
-					insert(aXml, GetFormatText('(' .. aInfo[1] .. ')', nil, 255, 128, 0))
+					insert(aXml, GetFormatText('(' .. aInfo[1] .. ')', 162, 255, 128, 0))
 				end
-				insert(aXml, GetFormatText('[' .. Table_GetQuestStringInfo(aInfo[1]).szName .. ']: ', nil, 255, 255, 0))
+				insert(aXml, GetFormatText('[' .. Table_GetQuestStringInfo(aInfo[1]).szName .. ']: ', 162, 255, 255, 0))
 				if rec.task_info[aInfo[1]] == TASK_STATE.ACCEPTABLE then
-					insert(aXml, GetFormatText(_L['Acceptable'] .. '\n'))
+					insert(aXml, GetFormatText(_L['Acceptable'] .. '\n', 162, 255, 255, 255))
 				elseif rec.task_info[aInfo[1]] == TASK_STATE.UNACCEPTABLE then
-					insert(aXml, GetFormatText(_L['Unacceptable'] .. '\n'))
+					insert(aXml, GetFormatText(_L['Unacceptable'] .. '\n', 162, 255, 255, 255))
 				elseif rec.task_info[aInfo[1]] == TASK_STATE.ACCEPTED then
-					insert(aXml, GetFormatText(_L['Accepted'] .. '\n'))
+					insert(aXml, GetFormatText(_L['Accepted'] .. '\n', 162, 255, 255, 255))
 				elseif rec.task_info[aInfo[1]] == TASK_STATE.FINISHED then
-					insert(aXml, GetFormatText(_L['Finished'] .. '\n'))
+					insert(aXml, GetFormatText(_L['Finished'] .. '\n', 162, 255, 255, 255))
 				elseif rec.task_info[aInfo[1]] == TASK_STATE.FINISHABLE then
-					insert(aXml, GetFormatText(_L['Finishable'] .. '\n'))
+					insert(aXml, GetFormatText(_L['Finishable'] .. '\n', 162, 255, 255, 255))
 				else
-					insert(aXml, GetFormatText(_L['Unknown'] .. '\n'))
+					insert(aXml, GetFormatText(_L['Unknown'] .. '\n', 162, 255, 255, 255))
 				end
 			end
 			if task.aQuestInfo then
@@ -606,7 +614,7 @@ end })
 for _, p in ipairs(COLUMN_LIST) do
 	COLUMN_DICT[p.id] = p
 end
-local TIP_COLIMN = {
+local TIP_COLUMN = {
 	'region',
 	'server',
 	'name',
@@ -794,29 +802,30 @@ end
 
 function D.OutputRowTip(this, rec)
 	local aXml = {}
-	for _, id in ipairs(TIP_COLIMN) do
+	local bFloat = this:GetRoot():GetName() ~= 'MY_RoleStatistics'
+	for _, id in ipairs(TIP_COLUMN) do
 		if id == 'TASK' then
 			for _, col in ipairs(D.GetColumns()) do
 				if TASK_HASH[col.id] then
 					insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
 					insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
 					insert(aXml, col.GetFormatText(rec))
-					insert(aXml, GetFormatText('\n'))
+					insert(aXml, GetFormatText('\n', 162, 255, 255, 255))
 				end
 			end
 		else
 			local col = COLUMN_DICT[id]
-			insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
-			insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
-			insert(aXml, col.GetFormatText(rec))
-			insert(aXml, GetFormatText('\n'))
+			if col and (not bFloat or not col.bHideInFloat) then
+				insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
+				insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
+				insert(aXml, col.GetFormatText(rec))
+				insert(aXml, GetFormatText('\n', 162, 255, 255, 255))
+			end
 		end
 	end
 	local x, y = this:GetAbsPos()
 	local w, h = this:GetSize()
-	local nPosType = this:GetRoot():GetName() == 'MY_RoleStatistics'
-		and UI.TIP_POSITION.RIGHT_LEFT
-		or UI.TIP_POSITION.TOP_BOTTOM
+	local nPosType = bFloat and UI.TIP_POSITION.TOP_BOTTOM or UI.TIP_POSITION.RIGHT_LEFT
 	OutputTip(concat(aXml), 450, {x, y, w, h}, nPosType)
 end
 
@@ -1029,7 +1038,7 @@ function D.OnItemMouseEnter()
 		local w, h = this:GetSize()
 		local szXml = this.col.GetTitleFormatTip
 			and this.col.GetTitleFormatTip()
-			or GetFormatText(this:Lookup('Text_TaskStat_Title'):GetText())
+			or GetFormatText(this:Lookup('Text_TaskStat_Title'):GetText(), 162, 255, 255, 255)
 		OutputTip(szXml, 450, {x, y, w, h}, UI.TIP_POSITION.TOP_BOTTOM)
 	elseif name == 'Text_QuestState' then
 		local id = this.id
