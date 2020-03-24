@@ -803,15 +803,12 @@ function D.OnItemMouseLeave()
 end
 
 -- ¸¡¶¯¿ò
-function D.UpdateFloatEntry(bFloatEntry)
+function D.ApplyFloatEntry(bFloatEntry)
 	local frame = Station.Lookup('Normal/SprintPower')
 	if not frame then
 		return
 	end
 	local btn = frame:Lookup('Btn_MY_RoleStatistics_DungeonEntry')
-	if IsNil(bFloatEntry) then
-		bFloatEntry = O.bFloatEntry
-	end
 	if bFloatEntry then
 		if btn then
 			return
@@ -847,8 +844,11 @@ function D.UpdateFloatEntry(bFloatEntry)
 		btn:Destroy()
 	end
 end
+function D.UpdateFloatEntry()
+	D.ApplyFloatEntry(O.bFloatEntry)
+end
 LIB.RegisterInit('MY_RoleStatistics_DungeonEntry', D.UpdateFloatEntry)
-LIB.RegisterReload('MY_RoleStatistics_DungeonEntry', D.UpdateFloatEntry, false)
+LIB.RegisterReload('MY_RoleStatistics_DungeonEntry', function() D.ApplyFloatEntry(false) end)
 LIB.RegisterFrameCreate('SprintPower.MY_RoleStatistics_DungeonEntry', D.UpdateFloatEntry)
 
 -- Module exports

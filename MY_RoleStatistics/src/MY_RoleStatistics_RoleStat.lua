@@ -964,7 +964,7 @@ LIB.RegisterFrameCreate('OptionPanel.MY_RoleStatistics_RoleStat__AlertCol', func
 end)
 
 -- ¸¡¶¯¿ò
-function D.UpdateFloatEntry(bFloatEntry)
+function D.ApplyFloatEntry(bFloatEntry)
 	local frame = Station.Lookup('Normal/SprintPower')
 	if not frame then
 		return
@@ -1008,8 +1008,11 @@ function D.UpdateFloatEntry(bFloatEntry)
 		btn:Destroy()
 	end
 end
+function D.UpdateFloatEntry()
+	D.ApplyFloatEntry(O.bFloatEntry)
+end
 LIB.RegisterInit('MY_RoleStatistics_RoleEntry', D.UpdateFloatEntry)
-LIB.RegisterReload('MY_RoleStatistics_RoleEntry', D.UpdateFloatEntry, false)
+LIB.RegisterReload('MY_RoleStatistics_RoleEntry', function() D.ApplyFloatEntry(false) end)
 LIB.RegisterFrameCreate('SprintPower.MY_RoleStatistics_RoleEntry', D.UpdateFloatEntry)
 
 -- Module exports

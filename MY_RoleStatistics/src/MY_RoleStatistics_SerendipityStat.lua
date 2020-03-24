@@ -997,7 +997,7 @@ function D.OnItemMouseLeave()
 end
 
 -- ¸¡¶¯¿ò
-function D.UpdateFloatEntry(bFloatEntry)
+function D.ApplyFloatEntry(bFloatEntry)
 	local frame = Station.Lookup('Normal/SprintPower')
 	if not frame then
 		return
@@ -1041,8 +1041,11 @@ function D.UpdateFloatEntry(bFloatEntry)
 		btn:Destroy()
 	end
 end
+function D.UpdateFloatEntry()
+	D.ApplyFloatEntry(O.bFloatEntry)
+end
 LIB.RegisterInit('MY_RoleStatistics_SerendipityEntry', D.UpdateFloatEntry)
-LIB.RegisterReload('MY_RoleStatistics_SerendipityEntry', D.UpdateFloatEntry, false)
+LIB.RegisterReload('MY_RoleStatistics_SerendipityEntry', function() D.ApplyFloatEntry(false) end)
 LIB.RegisterFrameCreate('SprintPower.MY_RoleStatistics_SerendipityEntry', D.UpdateFloatEntry)
 
 -- Module exports
