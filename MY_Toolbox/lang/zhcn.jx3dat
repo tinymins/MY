@@ -349,4 +349,13 @@ return {
     ['read green book'] = '已读绿色书籍',
     ['read blue book'] = '已读蓝色书籍',
     ['Auto sell %s item: %s.'] = '自动出售%s物品：%s。',
+
+    ['MY_DynamicItem'] = '动态物品栏',
+    ['Dynamic item bar for different map'] = '在不同地图显示不同的物品列表',
+    ['Enable'] = '启用',
+    ['Show background'] = '显示背景',
+    ['Box number'] = '总格子数',
+    ['Col number'] = '列数',
+    ['Dynamic item %d'] = '动态物品栏 %s',
+    ['Only item can be draged in'] = '动态物品栏只能放入物品',
 }
