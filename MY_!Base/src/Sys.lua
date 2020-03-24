@@ -56,9 +56,9 @@ local _L = LIB.LoadLangPack()
 -- #######################################################################################################
 do local HOTKEY_CACHE = {}
 -- 增加系统快捷键
--- (void) LIB.RegisterHotKey(string szName, string szTitle, func fnAction)   -- 增加系统快捷键
-function LIB.RegisterHotKey(szName, szTitle, fnAction)
-	insert(HOTKEY_CACHE, { szName = szName, szTitle = szTitle, fnAction = fnAction })
+-- (void) LIB.RegisterHotKey(string szName, string szTitle, func fnDown, func fnUp)   -- 增加系统快捷键
+function LIB.RegisterHotKey(szName, szTitle, fnDown, fnUp)
+	insert(HOTKEY_CACHE, { szName = szName, szTitle = szTitle, fnDown = fnDown, fnUp = fnUp })
 end
 
 -- 获取快捷键名称
@@ -227,7 +227,7 @@ LIB.RegisterInit(PACKET_INFO.NAME_SPACE .. '#BIND_HOTKEY', function()
 	-- hotkey
 	Hotkey.AddBinding(PACKET_INFO.NAME_SPACE .. '_Total', _L['Open/Close main panel'], PACKET_INFO.NAME, LIB.TogglePanel, nil)
 	for _, v in ipairs(HOTKEY_CACHE) do
-		Hotkey.AddBinding(v.szName, v.szTitle, '', v.fnAction, nil)
+		Hotkey.AddBinding(v.szName, v.szTitle, '', v.fnDown, v.fnUp)
 	end
 	for i = 1, 5 do
 		Hotkey.AddBinding(PACKET_INFO.NAME_SPACE .. '_HotKey_Null_'..i, _L['none-function hotkey'], '', function() end, nil)
