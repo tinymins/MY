@@ -2278,7 +2278,7 @@ function LIB.GetItemAmount(dwTabType, dwIndex, nBookID)
 end
 
 -- 获取一样东西在背包、装备、仓库的数量
-do local CACHE
+do local CACHE, FULL_CACHE
 local function InsertItem(cache, it)
 	if it then
 		if it.nGenre == ITEM_GENRE.BOOK then
@@ -2290,15 +2290,23 @@ local function InsertItem(cache, it)
 		end
 	end
 end
-function LIB.GetItemAmountInAllPackages(dwTabType, dwIndex, nBookID)
-	if not CACHE then
-		local cache = {}
+function LIB.GetItemAmountInAllPackages(dwTabType, dwIndex, nBookID, bFull)
+	if IsBoolean(nBookID) then
+		nBookID, bFull = nil, nBookID
+	end
+	local cache = CACHE
+	if bFull then
+		cache = FULL_CACHE
+	end
+	if not cache then
+		cache = {}
 		local me = GetClientPlayer()
 		if not me then
 			return
 		end
-		local nIndex = LIB.GetBagPackageIndex()
-		for dwBox = nIndex, nIndex + LIB.GetBagPackageCount() do
+		local nIndex = bFull and 1 or LIB.GetBagPackageIndex()
+		local nCount = bFull and 7 or LIB.GetBagPackageCount()
+		for dwBox = nIndex, nCount do
 			for dwX = 0, me.GetBoxSize(dwBox) - 1 do
 				InsertItem(cache, me.GetItem(dwBox, dwX))
 			end
@@ -2317,16 +2325,23 @@ function LIB.GetItemAmountInAllPackages(dwTabType, dwIndex, nBookID)
 				InsertItem(cache, GetPlayerItem(me, dwBox, dwX))
 			end
 		end
-		CACHE = cache
+		if bFull then
+			FULL_CACHE = cache
+		else
+			CACHE = cache
+		end
 	end
 	local szKey = dwTabType .. ',' .. dwIndex
 	if nBookID then
 		szKey = szKey .. ',' .. nBookID
 	end
-	return CACHE[szKey] or 0
+	return cache[szKey] or 0
 end
-LIB.RegisterEvent('BAG_ITEM_UPDATE.' .. PACKET_INFO.NAME_SPACE .. '#LIB#GetItemAmountInAllPackages', function()
-	CACHE = nil
+LIB.RegisterEvent({
+	'BAG_ITEM_UPDATE.' .. PACKET_INFO.NAME_SPACE .. '#LIB#GetItemAmountInAllPackages',
+	'LOADING_ENDING.' .. PACKET_INFO.NAME_SPACE .. '#LIB#GetItemAmountInAllPackages'
+}, function()
+	CACHE, FULL_CACHE = nil
 end)
 end
 
