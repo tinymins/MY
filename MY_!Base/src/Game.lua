@@ -3035,6 +3035,45 @@ function LIB.IsInZombieMap()
 	return me and LIB.IsZombieMap(me.GetMapID())
 end
 
+-- 判断地图是不是MOBA地图
+-- (bool) LIB.IsMobaMap(dwMapID)
+function LIB.IsMobaMap(dwMapID)
+	return CONSTANT.MOBA_MAP[dwMapID] or false
+end
+
+-- 判断当前地图是不是MOBA地图
+-- (bool) LIB.IsInMobaMap()
+function LIB.IsInMobaMap()
+	local me = GetClientPlayer()
+	return me and LIB.IsMobaMap(me.GetMapID())
+end
+
+-- 判断地图是不是浪客行地图
+-- (bool) LIB.IsStarveMap(dwMapID)
+function LIB.IsStarveMap(dwMapID)
+	return CONSTANT.STARVE_MAP[dwMapID] or false
+end
+
+-- 判断当前地图是不是浪客行地图
+-- (bool) LIB.IsInStarveMap()
+function LIB.IsInStarveMap()
+	local me = GetClientPlayer()
+	return me and LIB.IsStarveMap(me.GetMapID())
+end
+
+-- 判断地图是不是新背包地图
+-- (bool) LIB.IsExtraBagMap(dwMapID)
+function LIB.IsExtraBagMap(dwMapID)
+	return LIB.IsPubgMap(dwMapID) or LIB.IsMobaMap(dwMapID) or LIB.IsStarveMap(dwMapID)
+end
+
+-- 判断当前地图是不是新背包地图
+-- (bool) LIB.IsInExtraBagMap()
+function LIB.IsInExtraBagMap()
+	local me = GetClientPlayer()
+	return me and LIB.IsExtraBagMap(me.GetMapID())
+end
+
 -- 判断地图是不是功能屏蔽地图
 -- (bool) LIB.IsShieldedMap(dwMapID)
 function LIB.IsShieldedMap(dwMapID)
