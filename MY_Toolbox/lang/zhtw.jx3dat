@@ -351,6 +351,7 @@ return {
     ['Auto sell %s item: %s.'] = '自動出售%s物品：%s。',
 
     ['MY_DynamicItem'] = '動態物品欄',
+    ['MY Dynamic Item'] = '茗伊動態物品欄',
     ['Dynamic item bar for different map'] = '在不同地圖顯示不同的物品列表',
     ['Enable'] = '啟用',
     ['Show background'] = '顯示背景',

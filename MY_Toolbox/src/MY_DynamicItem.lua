@@ -172,7 +172,6 @@ function D.UpdateList(frame)
 	local hList = frame:Lookup('', 'Handle_List')
 	for i = 1, O.nNum do
 		local hItem = hList:Lookup(i - 1)
-		hItem:Lookup('Image_ItemBg'):SetVisible(O.bShowBg)
 		local box = hItem:Lookup('Box_Item')
 		local data = O.aList[i]
 		if data then
@@ -262,6 +261,7 @@ function D.OnFrameCreate()
 	D.UpdateHotKey(this)
 	D.UpdateAnchor(this)
 	D.UpdateBgVisible(this)
+	D.UpdateItemVisible(this)
 
 	this:RegisterEvent('UI_SCALED')
 	this:RegisterEvent('LOADING_ENDING')
@@ -284,8 +284,10 @@ function D.OnEvent(event)
 		D.UpdateAnchor(this)
 	elseif event == 'HAND_PICK_OBJECT' then
 		D.UpdateBgVisible(this)
+		D.UpdateItemVisible(this)
 	elseif event == 'HAND_CLEAR_OBJECT' then
 		D.UpdateBgVisible(this)
+		D.UpdateItemVisible(this)
 	elseif event == 'HOT_KEY_RELOADED' then
 		D.UpdateHotKey(this)
 	elseif event == 'ON_ENTER_CUSTOM_UI_MODE' then
@@ -373,23 +375,28 @@ function D.OnItemLButtonDragEnd()
 	end
 end
 
-for i = 1, 16 do
-	LIB.RegisterHotKey(MODULE_NAME .. '_' .. i, _L('Dynamic item %d', i), function()
-		local frame = D.GetFrame()
-		local hItem = frame and frame:Lookup('', 'Handle_List'):Lookup(i - 1)
-		if not hItem then
-			return
-		end
-		hItem:Lookup('Box_Item'):SetObjectPressed(1)
-	end, function()
-		local frame = D.GetFrame()
-		local hItem = frame and frame:Lookup('', 'Handle_List'):Lookup(i - 1)
-		if not hItem then
-			return
-		end
-		hItem:Lookup('Box_Item'):SetObjectPressed(0)
-		LIB.ExecuteWithThis(hItem:Lookup('Box_Item'), D.OnItemLButtonClick)
-	end)
+for i = 1, 32 do
+	Hotkey.AddBinding(
+		MODULE_NAME .. '_' .. i,
+		_L('Dynamic item %d', i),
+		i == 1 and _L['MY Dynamic Item'] or '',
+		function()
+			local frame = D.GetFrame()
+			local hItem = frame and frame:Lookup('', 'Handle_List'):Lookup(i - 1)
+			if not hItem then
+				return
+			end
+			hItem:Lookup('Box_Item'):SetObjectPressed(1)
+		end,
+		function()
+			local frame = D.GetFrame()
+			local hItem = frame and frame:Lookup('', 'Handle_List'):Lookup(i - 1)
+			if not hItem then
+				return
+			end
+			hItem:Lookup('Box_Item'):SetObjectPressed(0)
+			LIB.ExecuteWithThis(hItem:Lookup('Box_Item'), D.OnItemLButtonClick)
+		end)
 end
 
 LIB.RegisterInit(MODULE_NAME, D.CheckEnable)
@@ -421,7 +428,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 			local t2 = {
 				szOption = _L['Col number'],
 			}
-			for i = 1, 16 do
+			for i = 1, 32 do
 				insert(t1, {
 					szOption = i,
 					fnAction = function()
