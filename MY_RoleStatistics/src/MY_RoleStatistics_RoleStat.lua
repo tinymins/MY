@@ -146,6 +146,7 @@ local COLUMN_LIST = {
 	-- account,
 	{ -- 大区
 		id = 'region',
+		bHideInFloat = true,
 		szTitle = _L['Region'],
 		nWidth = 100,
 		GetFormatText = GeneCommonFormatText('region'),
@@ -153,6 +154,7 @@ local COLUMN_LIST = {
 	},
 	{ -- 服务器
 		id = 'server',
+		bHideInFloat = true,
 		szTitle = _L['Server'],
 		nWidth = 100,
 		GetFormatText = GeneCommonFormatText('server'),
@@ -160,6 +162,7 @@ local COLUMN_LIST = {
 	},
 	{ -- 名字
 		id = 'name',
+		bHideInFloat = true,
 		szTitle = _L['Name'],
 		nWidth = 130,
 		GetFormatText = function(rec)
@@ -172,6 +175,7 @@ local COLUMN_LIST = {
 	},
 	{ -- 门派
 		id = 'force',
+		bHideInFloat = true,
 		szTitle = _L['Force'],
 		nWidth = 50,
 		GetFormatText = function(rec)
@@ -181,6 +185,7 @@ local COLUMN_LIST = {
 	},
 	{ -- 等级
 		id = 'level',
+		bHideInFloat = true,
 		szTitle = _L['Level'],
 		nWidth = 50,
 		GetFormatText = GeneCommonFormatText('level'),
@@ -188,6 +193,7 @@ local COLUMN_LIST = {
 	},
 	{ -- 装分
 		id = 'equip_score',
+		bHideInFloat = true,
 		szTitle = _L['Equip score'],
 		szShortTitle = _L['EquSC'],
 		nWidth = 60,
@@ -196,6 +202,7 @@ local COLUMN_LIST = {
 	},
 	{ -- 宠物分
 		id = 'pet_score',
+		bHideInFloat = true,
 		szTitle = _L['PetSC'],
 		nWidth = 55,
 		GetFormatText = GeneCommonFormatText('pet_score'),
@@ -316,6 +323,7 @@ local COLUMN_LIST = {
 		-- 名剑币周余
 		id = 'arena_award_remain',
 		szTitle = _L['Arena award remain'],
+		szShortTitle = _L['Aren awa remain'],
 		nWidth = 60,
 		GetFormatText = GeneWeeklyFormatText('arena_award_remain'),
 		Compare = GeneWeeklyCompare('arena_award_remain'),
@@ -366,6 +374,7 @@ local COLUMN_LIST = {
 	{
 		-- 时间
 		id = 'time',
+		bHideInFloat = true,
 		szTitle = _L['Cache time'],
 		nWidth = 165,
 		GetFormatText = function(rec)
@@ -376,6 +385,7 @@ local COLUMN_LIST = {
 	{
 		-- 时间计时
 		id = 'time_days',
+		bHideInFloat = true,
 		szTitle = _L['Cache time days'],
 		nWidth = 120,
 		GetFormatText = function(rec)
@@ -737,17 +747,18 @@ end
 
 function D.OutputRowTip(this, rec)
 	local aXml = {}
+	local bFloat = this:GetRoot():GetName() ~= 'MY_RoleStatistics'
 	for _, col in ipairs(COLUMN_LIST) do
-		insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
-		insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
-		insert(aXml, col.GetFormatText(rec))
-		insert(aXml, GetFormatText('\n'))
+		if not bFloat or not col.bHideInFloat then
+			insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
+			insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
+			insert(aXml, col.GetFormatText(rec))
+			insert(aXml, GetFormatText('\n'))
+		end
 	end
 	local x, y = this:GetAbsPos()
 	local w, h = this:GetSize()
-	local nPosType = this:GetRoot():GetName() == 'MY_RoleStatistics'
-		and UI.TIP_POSITION.RIGHT_LEFT
-		or UI.TIP_POSITION.TOP_BOTTOM
+	local nPosType = bFloat and UI.TIP_POSITION.TOP_BOTTOM or UI.TIP_POSITION.RIGHT_LEFT
 	OutputTip(concat(aXml), 450, {x, y, w, h}, nPosType)
 end
 
