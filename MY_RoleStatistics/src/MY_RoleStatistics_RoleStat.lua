@@ -56,7 +56,8 @@ end
 local SZ_INI = PACKET_INFO.ROOT .. 'MY_RoleStatistics/ui/MY_RoleStatistics_RoleStat.ini'
 
 DB:Execute('CREATE TABLE IF NOT EXISTS RoleInfo (guid NVARCHAR(20), account NVARCHAR(255), region NVARCHAR(20), server NVARCHAR(20), name NVARCHAR(20), force INTEGER, level INTEGER, equip_score INTEGER, pet_score INTEGER, gold INTEGER, silver INTEGER, copper INTEGER, contribution INTEGER, contribution_remain INTEGER, justice INTEGER, justice_remain INTEGER, prestige INTEGER, prestige_remain INTEGER, camp_point INTEGER, camp_point_percentage INTEGER, camp_level INTEGER, arena_award INTEGER, arena_award_remain INTEGER, exam_print INTEGER, exam_print_remain INTEGER, achievement_score INTEGER, coin INTEGER, mentor_score INTEGER, time INTEGER, PRIMARY KEY(guid))')
-local DB_RoleInfoW = DB:Prepare('REPLACE INTO RoleInfo (guid, account, region, server, name, force, level, equip_score, pet_score, gold, silver, copper, contribution, contribution_remain, justice, justice_remain, prestige, prestige_remain, camp_point, camp_point_percentage, camp_level, arena_award, arena_award_remain, exam_print, exam_print_remain, achievement_score, coin, mentor_score, time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+DB:Execute('ALTER TABLE RoleInfo ADD COLUMN starve_remain INTEGER')
+local DB_RoleInfoW = DB:Prepare('REPLACE INTO RoleInfo (guid, account, region, server, name, force, level, equip_score, pet_score, gold, silver, copper, contribution, contribution_remain, justice, justice_remain, prestige, prestige_remain, camp_point, camp_point_percentage, camp_level, arena_award, arena_award_remain, exam_print, exam_print_remain, achievement_score, coin, mentor_score, starve_remain, time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
 local DB_RoleInfoCoinW = DB:Prepare('UPDATE RoleInfo SET coin = ? WHERE account = ? AND region = ?')
 local DB_RoleInfoG = DB:Prepare('SELECT * FROM RoleInfo WHERE guid = ?')
 local DB_RoleInfoR = DB:Prepare('SELECT * FROM RoleInfo WHERE account LIKE ? OR name LIKE ? OR region LIKE ? OR server LIKE ? ORDER BY time DESC')
@@ -119,9 +120,9 @@ end
 local function GeneWeeklyFormatText(id)
 	return function(r)
 		local nNextTime, nCircle = LIB.GetRefreshTime('weekly')
-		local szText = nNextTime - nCircle < r.time
+		local szText = (nNextTime - nCircle < r.time and r[id] and r[id] >= 0)
 			and r[id]
-			or _L['Unknown']
+			or _L['--']
 		return GetFormatText(szText)
 	end
 end
@@ -246,6 +247,13 @@ local COLUMN_LIST = {
 		nWidth = 60,
 		GetFormatText = GeneWeeklyFormatText('justice_remain'),
 		Compare = GeneWeeklyCompare('justice_remain'),
+	},
+	{ -- ¿ÀøÕº„÷‹”‡
+		id = 'starve_remain',
+		szTitle = _L['Starv_remain'],
+		nWidth = 60,
+		GetFormatText = GeneWeeklyFormatText('starve_remain'),
+		Compare = GeneWeeklyCompare('starve_remain'),
 	},
 	{
 		-- Õ˛Õ˚
@@ -529,6 +537,25 @@ for _, p in ipairs(ALERT_COLUMN) do
 	ALERT_COLUMN_DICT[p.id] = p
 end
 
+local INFO_CACHE = {}
+LIB.RegisterFrameCreate('regionPQreward.MY_RoleStatistics_RoleStat', function()
+	local frame = arg0
+	if not frame then
+		return
+	end
+	local txt = frame:Lookup('', 'Text_discrible')
+	txt.__SetText = txt.SetText
+	txt.SetText = function(txt, szText)
+		Output(szText)
+		local szNum = szText:match(_L['Current week can acquire (%d+) Langke Jian.'])
+		Output(szNum)
+		if szNum then
+			INFO_CACHE['starve_remain'] = tonumber(szNum)
+		end
+		txt:__SetText(szText)
+	end
+end)
+
 function D.FlushDB()
 	--[[#DEBUG BEGIN]]
 	LIB.Debug('MY_RoleStatistics_RoleStat', 'Flushing to database...', DEBUG_LEVEL.LOG)
@@ -563,12 +590,29 @@ function D.FlushDB()
 	local achievement_score = me.GetAchievementRecord()
 	local coin = me.nCoin
 	local mentor_score = me.dwTAEquipsScore
+	local starve_remain = INFO_CACHE['starve_remain']
 	local time = GetCurrentTime()
+
+	if not starve_remain then
+		DB_RoleInfoG:ClearBindings()
+		DB_RoleInfoG:BindAll(guid)
+		local result = DB_RoleInfoG:GetAll()
+		if result and result[1] then
+			local dwTime, dwCircle = LIB.GetRefreshTime('weekly')
+			if dwTime - dwCircle < result[1].time then
+				starve_remain = result[1].starve_remain
+			end
+		end
+		if not starve_remain then
+			starve_remain = -1
+		end
+		INFO_CACHE['starve_remain'] = starve_remain
+	end
 
 	DB:Execute('BEGIN TRANSACTION')
 
 	DB_RoleInfoW:ClearBindings()
-	DB_RoleInfoW:BindAll(guid, account, region, server, name, force, level, equip_score, pet_score, gold, silver, copper, contribution, contribution_remain, justice, justice_remain, prestige, prestige_remain, camp_point, camp_point_percentage, camp_level, arena_award, arena_award_remain, exam_print, exam_print_remain, achievement_score, coin, mentor_score, time)
+	DB_RoleInfoW:BindAll(guid, account, region, server, name, force, level, equip_score, pet_score, gold, silver, copper, contribution, contribution_remain, justice, justice_remain, prestige, prestige_remain, camp_point, camp_point_percentage, camp_level, arena_award, arena_award_remain, exam_print, exam_print_remain, achievement_score, coin, mentor_score, starve_remain, time)
 	DB_RoleInfoW:Execute()
 
 	DB_RoleInfoCoinW:ClearBindings()

@@ -36,6 +36,8 @@ return {
     ['Justice'              ] = '俠義值',
     ['Justi_remain'         ] = '俠義周',
     ['Justice remain'       ] = '俠義值周上限',
+    ['Starv_remain'         ] = '浪客周',
+    ['Starve remain'        ] = '浪客箋周上限',
     ['Presti'               ] = '威望',
     ['Prestige'             ] = '威望值',
     ['Presti_remain'        ] = '威望周',
@@ -65,6 +67,7 @@ return {
     ['Columns'] = '顯示列',
     ['Columns alert when esc'] = '打開ESC界面提醒數值變化的列',
     ['Current online '] = '本次登錄',
+    ['Current week can acquire (%d+) Langke Jian.'] = '本周還可獲得(%d+)份浪客箋。',
 
     ['Equip score increased by %s'] = '裝備分數提升了%s分',
     ['Equip score decreased by %s'] = '裝備分數降低了%s分',
