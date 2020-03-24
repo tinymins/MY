@@ -36,6 +36,7 @@ return {
     ['Justice'              ] = '侠义值',
     ['Justi_remain'         ] = '侠义周',
     ['Justice remain'       ] = '侠义值周上限',
+    ['Starve'               ] = '浪客笺',
     ['Starv_remain'         ] = '浪客周',
     ['Starve remain'        ] = '浪客笺周上限',
     ['Presti'               ] = '威望',
