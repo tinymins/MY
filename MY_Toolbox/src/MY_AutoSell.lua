@@ -83,7 +83,8 @@ RegisterCustomData('MY_AutoSell.tProtectItem')
 -- 自动售出物品
 function D.AutoSellItem(nNpcID, nShopID)
 	local me = GetClientPlayer()
-	for dwBox = 1, LIB.GetBagPackageCount() do
+	local nIndex = LIB.GetBagPackageIndex()
+	for dwBox = nIndex, nIndex + LIB.GetBagPackageCount() do
 		local dwSize = me.GetBoxSize(dwBox) - 1
 		for dwX = 0, dwSize do
 			local item = me.GetItem(dwBox, dwX)

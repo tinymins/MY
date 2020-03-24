@@ -2204,11 +2204,17 @@ function LIB.GetFaceAngel(nX, nY, nFace, nTX, nTY, bAbs)
 	end
 end
 
+function LIB.GetBagPackageIndex()
+	return LIB.IsInExtraBagMap()
+		and INVENTORY_INDEX.LIMITED_PACKAGE
+		or INVENTORY_INDEX.PACKAGE
+end
+
 function LIB.GetBagPackageCount()
 	if _G.Bag_GetPacketCount then
 		return _G.Bag_GetPacketCount()
 	end
-	return 6
+	return LIB.IsInExtraBagMap() and 1 or 6
 end
 
 function LIB.GetBankPackageCount()
@@ -2220,7 +2226,8 @@ end
 -- (number) LIB.GetFreeBagBoxNum()
 function LIB.GetFreeBagBoxNum()
 	local me, nFree = GetClientPlayer(), 0
-	for i = 1, LIB.GetBagPackageCount() do
+	local nIndex = LIB.GetBagPackageIndex()
+	for i = nIndex, nIndex + LIB.GetBagPackageCount() do
 		nFree = nFree + me.GetBoxFreeRoomSize(i)
 	end
 	return nFree
@@ -2230,7 +2237,8 @@ end
 -- (number, number) LIB.GetFreeBagBox()
 function LIB.GetFreeBagBox()
 	local me = GetClientPlayer()
-	for i = 1, LIB.GetBagPackageCount() do
+	local nIndex = LIB.GetBagPackageIndex()
+	for i = nIndex, nIndex + LIB.GetBagPackageCount() do
 		if me.GetBoxFreeRoomSize(i) > 0 then
 			for j = 0, me.GetBoxSize(i) - 1 do
 				if not me.GetItem(i, j) then
@@ -2245,7 +2253,8 @@ end
 -- (number dwBox, number dwX) LIB.WalkBagItem(fnWalker)
 function LIB.WalkBagItem(fnWalker)
 	local me = GetClientPlayer()
-	for dwBox = 1, LIB.GetBagPackageCount() do
+	local nIndex = LIB.GetBagPackageIndex()
+	for dwBox = nIndex, nIndex + LIB.GetBagPackageCount() do
 		for dwX = 0, me.GetBoxSize(dwBox) - 1 do
 			local it = me.GetItem(dwBox, dwX)
 			if it and fnWalker(it, dwBox, dwX) == 0 then
@@ -2288,7 +2297,8 @@ function LIB.GetItemAmountInAllPackages(dwTabType, dwIndex, nBookID)
 		if not me then
 			return
 		end
-		for dwBox = 1, LIB.GetBagPackageCount() do
+		local nIndex = LIB.GetBagPackageIndex()
+		for dwBox = nIndex, nIndex + LIB.GetBagPackageCount() do
 			for dwX = 0, me.GetBoxSize(dwBox) - 1 do
 				InsertItem(cache, me.GetItem(dwBox, dwX))
 			end

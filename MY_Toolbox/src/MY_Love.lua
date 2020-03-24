@@ -166,7 +166,8 @@ end
 -- 获取背包指定ID物品列表
 function D.GetBagItemPos(aUIID)
 	local me = GetClientPlayer()
-	for dwBox = 1, LIB.GetBagPackageCount() do
+	local nIndex = LIB.GetBagPackageIndex()
+	for dwBox = nIndex, nIndex + LIB.GetBagPackageCount() do
 		for dwX = 0, me.GetBoxSize(dwBox) - 1 do
 			local it = me.GetItem(dwBox, dwX)
 			if it then
