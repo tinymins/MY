@@ -87,6 +87,7 @@ local O = {
 		'pet_score',
 		'contribution',
 		'justice',
+		'starve',
 		'prestige',
 		'camp_point',
 		'arena_award',
@@ -357,6 +358,7 @@ local COLUMN_LIST = {
 	{
 		-- 资历
 		id = 'achievement_score',
+		bHideInFloat = true,
 		szTitle = _L['Achievement score'],
 		szShortTitle = _L['AchiSC'],
 		nWidth = 70,
@@ -366,6 +368,7 @@ local COLUMN_LIST = {
 	{
 		-- 通宝
 		id = 'coin',
+		bHideInFloat = true,
 		szTitle = _L['Coin'],
 		nWidth = 70,
 		GetFormatText = GeneCommonFormatText('coin'),
@@ -374,6 +377,7 @@ local COLUMN_LIST = {
 	{
 		-- 师徒分
 		id = 'mentor_score',
+		bHideInFloat = true,
 		szTitle = _L['Mentor score'],
 		nWidth = 70,
 		GetFormatText = GeneCommonFormatText('mentor_score'),
@@ -505,6 +509,14 @@ local ALERT_COLUMN = {
 			return me.nJustice
 		end,
 		GetCompareText = GeneCommonCompareText('justice', 'Justice'),
+	},
+	{ -- 浪客笺
+		id = 'starve',
+		szTitle = _L['Starve'],
+		GetValue = function(me)
+			return LIB.GetItemAmountInAllPackages(5, 34797, true)
+		end,
+		GetCompareText = GeneCommonCompareText('starve', 'Starve'),
 	},
 	{
 		-- 威望
@@ -895,7 +907,7 @@ function D.OnInitPage()
 					c[id] = true
 				end
 			end
-			for _, col in ipairs(ALERT_COLUMN_DICT) do
+			for _, col in ipairs(ALERT_COLUMN) do
 				if not c[col.id] then
 					insert(t, {
 						szOption = col.szTitle,

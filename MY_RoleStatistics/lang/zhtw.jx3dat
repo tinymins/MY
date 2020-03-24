@@ -79,6 +79,8 @@ return {
     ['Contribution decreased by %s'] = '消耗江湖貢獻值%s點',
     ['Justice increased by %s'] = '獲得俠義值%s點',
     ['Justice decreased by %s'] = '消耗俠義值%s點',
+    ['Starve increased by %s'] = '獲得浪客箋%s份',
+    ['Starve decreased by %s'] = '消耗浪客箋%s份',
     ['Prestige increased by %s'] = '獲得威望值%s點',
     ['Prestige decreased by %s'] = '消耗威望值%s點',
     ['Camp point increased by %s'] = '獲得戰階積分%s點',
