@@ -188,7 +188,8 @@ local COLUMN_LIST = {
 	},
 	{ -- 装分
 		id = 'equip_score',
-		szTitle = _L['EquSC'],
+		szTitle = _L['Equip score'],
+		szShortTitle = _L['EquSC'],
 		nWidth = 60,
 		GetFormatText = GeneCommonFormatText('equip_score'),
 		Compare = GeneCommonCompare('equip_score'),
@@ -222,35 +223,40 @@ local COLUMN_LIST = {
 	},
 	{ -- 江贡
 		id = 'contribution',
-		szTitle = _L['Contri'],
+		szTitle = _L['Contribution'],
+		szShortTitle = _L['Contri'],
 		nWidth = 70,
 		GetFormatText = GeneCommonFormatText('contribution'),
 		Compare = GeneCommonCompare('contribution'),
 	},
 	{ -- 江贡周余
 		id = 'contribution_remain',
-		szTitle = _L['Contri_remain'],
+		szTitle = _L['Contribution remain'],
+		szShortTitle = _L['Contri_remain'],
 		nWidth = 70,
 		GetFormatText = GeneWeeklyFormatText('contribution_remain'),
 		Compare = GeneWeeklyCompare('contribution_remain'),
 	},
 	{ -- 侠义
 		id = 'justice',
-		szTitle = _L['Justi'],
+		szTitle = _L['Justice'],
+		szShortTitle = _L['Justi'],
 		nWidth = 60,
 		GetFormatText = GeneCommonFormatText('justice'),
 		Compare = GeneCommonCompare('justice'),
 	},
 	{ -- 侠义周余
 		id = 'justice_remain',
-		szTitle = _L['Justi_remain'],
+		szTitle = _L['Justice remain'],
+		szShortTitle = _L['Justi_remain'],
 		nWidth = 60,
 		GetFormatText = GeneWeeklyFormatText('justice_remain'),
 		Compare = GeneWeeklyCompare('justice_remain'),
 	},
 	{ -- 浪客笺周余
 		id = 'starve_remain',
-		szTitle = _L['Starv_remain'],
+		szTitle = _L['Starve remain'],
+		szShortTitle = _L['Starv_remain'],
 		nWidth = 60,
 		GetFormatText = GeneWeeklyFormatText('starve_remain'),
 		Compare = GeneWeeklyCompare('starve_remain'),
@@ -258,14 +264,16 @@ local COLUMN_LIST = {
 	{
 		-- 威望
 		id = 'prestige',
-		szTitle = _L['Presti'],
+		szTitle = _L['Prestige'],
+		szShortTitle = _L['Presti'],
 		nWidth = 70,
 		GetFormatText = GeneCommonFormatText('prestige'),
 		Compare = GeneCommonCompare('prestige'),
 	},
 	{ -- 威望周余
 		id = 'prestige_remain',
-		szTitle = _L['Presti_remain'],
+		szTitle = _L['Prestige remain'],
+		szShortTitle = _L['Presti_remain'],
 		nWidth = 70,
 		GetFormatText = GeneWeeklyFormatText('prestige_remain'),
 		Compare = GeneWeeklyCompare('prestige_remain'),
@@ -315,7 +323,8 @@ local COLUMN_LIST = {
 	{
 		-- 监本
 		id = 'exam_print',
-		szTitle = _L['ExamPt'],
+		szTitle = _L['Exam print'],
+		szShortTitle = _L['ExamPt'],
 		nWidth = 55,
 		GetFormatText = GeneCommonFormatText('exam_print'),
 		Compare = GeneCommonCompare('exam_print'),
@@ -323,7 +332,8 @@ local COLUMN_LIST = {
 	{
 		-- 监本周余
 		id = 'exam_print_remain',
-		szTitle = _L['ExamPt_remain'],
+		szTitle = _L['Exam print remain'],
+		szShortTitle = _L['ExamPt_remain'],
 		nWidth = 55,
 		GetFormatText = GeneWeeklyFormatText('exam_print_remain'),
 		Compare = GeneWeeklyCompare('exam_print_remain'),
@@ -331,7 +341,8 @@ local COLUMN_LIST = {
 	{
 		-- 资历
 		id = 'achievement_score',
-		szTitle = _L['AchiSC'],
+		szTitle = _L['Achievement score'],
+		szShortTitle = _L['AchiSC'],
 		nWidth = 70,
 		GetFormatText = GeneCommonFormatText('achievement_score'),
 		Compare = GeneCommonCompare('achievement_score'),
@@ -546,9 +557,7 @@ LIB.RegisterFrameCreate('regionPQreward.MY_RoleStatistics_RoleStat', function()
 	local txt = frame:Lookup('', 'Text_discrible')
 	txt.__SetText = txt.SetText
 	txt.SetText = function(txt, szText)
-		Output(szText)
 		local szNum = szText:match(_L['Current week can acquire (%d+) Langke Jian.'])
-		Output(szNum)
 		if szNum then
 			INFO_CACHE['starve_remain'] = tonumber(szNum)
 		end
@@ -656,7 +665,7 @@ function D.UpdateUI(page)
 		hCol:SetRelX(nX)
 		hCol:SetW(nWidth)
 		txt:SetW(nWidth)
-		txt:SetText(col.szTitle)
+		txt:SetText(col.szShortTitle or col.szTitle)
 		imgAsc:SetRelX(nWidth - nSortDelta)
 		imgDesc:SetRelX(nWidth - nSortDelta)
 		if O.szSort == col.id then
