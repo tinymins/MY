@@ -356,8 +356,6 @@ end
 function D.OnItemLButtonDragEnd()
 	local name = this:GetName()
 	if name == 'Box_Item' then
-		this.bIgnoreClick = nil
-		this.bDisableClick = nil
 		local wnd = Station.GetMouseOverWindow()
 		if not wnd or wnd:GetRoot() ~= this:GetRoot() then
 			return
@@ -370,6 +368,8 @@ function D.OnItemLButtonDragEnd()
 			D.SaveMapConfig()
 			D.UpdateList(this:GetRoot())
 		end
+		this.bIgnoreClick = nil
+		this.bDisableClick = nil
 	end
 end
 
@@ -388,7 +388,7 @@ for i = 1, 16 do
 			return
 		end
 		hItem:Lookup('Box_Item'):SetObjectPressed(0)
-		LIB.ExecuteWithThis(hItem:Lookup('Box_Item'), 'OnItemLButtonClick')
+		LIB.ExecuteWithThis(hItem:Lookup('Box_Item'), D.OnItemLButtonClick)
 	end)
 end
 
