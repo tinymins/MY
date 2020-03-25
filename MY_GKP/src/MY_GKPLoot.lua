@@ -259,7 +259,7 @@ function D.OnFrameBreathe()
 		for i = 0, hList:GetItemCount() - 1 do
 			hItem = hList:Lookup(i)
 			if D.IsItemAutoPickup(hItem.itemData, O.tItemConfig, doodad, bCanDialog)
-			and not hItem.itemData.bDist and not hItem.itemData.bBidding then
+			and not hItem.itemData.bDist and not hItem.itemData.bNeedRoll and not hItem.itemData.bBidding then
 				LIB.ExecuteWithThis(hItem, D.OnItemLButtonClick)
 			end
 		end
@@ -552,7 +552,7 @@ function D.OnItemLButtonClick()
 		local me, team   = GetClientPlayer(), GetClientTeam()
 		local dwDoodadID = data.dwDoodadID
 		local doodad     = GetDoodad(dwDoodadID)
-		if not data.bDist and not data.bBidding then
+		if not data.bDist and not data.bNeedRoll and not data.bBidding then
 			-- if doodad.CanDialog(me) then -- ª·µº÷¬‚“∂°
 			if doodad.CanLoot(me.dwID) then
 				LIB.OpenDoodad(me, doodad)
@@ -1672,9 +1672,7 @@ function D.GetDoodadLootInfo(dwID)
 				end
 				data.szType = GetItemDataType(data)
 				data.nWeight = ITEM_DATA_WEIGHT[data.szType]
-				if (not data.bNeedRoll and not data.bBidding) or LIB.IsDebugClient('MY_GKP') then
-					table.insert(aItemData, data)
-				end
+				insert(aItemData, data)
 			end
 		end
 		nMoney = d.GetLootMoney() or 0
