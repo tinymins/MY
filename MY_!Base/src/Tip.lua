@@ -458,9 +458,9 @@ function LIB.OutputDoodadTip(Rect, dwDoodadID, szExtraXml)
 	end
 	-- µ÷ÊÔÐÅÏ¢
 	if IsCtrlKeyDown() then
-		insert(t, GetFormatText(FormatString(g_tStrings.TIP_DOODAD_ID, doodad.dwID)), 102)
-		insert(t, GetFormatText(FormatString(g_tStrings.TIP_TEMPLATE_ID, doodad.dwTemplateID)), 102)
-		insert(t, GetFormatText(FormatString(g_tStrings.TIP_REPRESENTID_ID, doodad.dwRepresentID)), 102)
+		insert(t, GetFormatText(FormatString(g_tStrings.TIP_DOODAD_ID, doodad.dwID), 102))
+		insert(t, GetFormatText(FormatString(g_tStrings.TIP_TEMPLATE_ID, doodad.dwTemplateID), 102))
+		insert(t, GetFormatText(FormatString(g_tStrings.TIP_REPRESENTID_ID, doodad.dwRepresentID), 102))
 	end
 
 	if doodad.nKind == DOODAD_KIND.GUIDE and not Rect then
