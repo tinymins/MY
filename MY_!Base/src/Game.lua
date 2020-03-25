@@ -1925,7 +1925,7 @@ LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '#ListenFightStateChange', ListenFight
 -- 获取当前战斗时间
 function LIB.GetFightTime(szFormat)
 	local nTick = 0
-	if LIB.IsFighting() then -- 战斗状态
+	if FIGHTING then -- 战斗状态
 		nTick = GetTickCount() - FIGHT_BEGIN_TICK
 	else  -- 脱战状态
 		nTick = FIGHT_END_TICK - FIGHT_BEGIN_TICK
