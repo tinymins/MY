@@ -168,45 +168,48 @@ function D.InitList(frame)
 	frame:SetSize(nSplitsW, nSplitsH)
 end
 
-function D.UpdateItemCD(hItem, i)
+function D.UpdateListCD(frame)
 	local me = GetClientPlayer()
-	local box = hItem:Lookup('Box_Item')
-	local data = O.aList[i]
-	if data then
-		if data[1] == UI_OBJECT.ITEM then
-			UpdataItemCDProgress(me, box, data[2], data[3])
+	local hList = frame:Lookup('', 'Handle_List')
+	for i = 1, O.nNum do
+		local hItem = hList:Lookup(i - 1)
+		local box = hItem:Lookup('Box_Item')
+		local data = O.aList[i]
+		if data then
+			if data[1] == UI_OBJECT.ITEM_INFO then
+				UpdataItemCDProgress(me, box, 0, data[2], data[3])
+			elseif data[1] == UI_OBJECT.ITEM then
+				UpdataItemCDProgress(me, box, data[2], data[3])
+			end
 		end
 	end
-end
-
-function D.UpdateItem(hItem, i)
-	local box = hItem:Lookup('Box_Item')
-	local data = O.aList[i]
-	if data then
-		if data[1] == UI_OBJECT.ITEM_INFO then
-			local nAmount = LIB.GetItemAmount(data[2], data[3], data[4])
-			UpdateBoxObject(box, UI_OBJECT.ITEM_INFO, nil, data[2], data[3], data[4] or nAmount)
-			box:EnableObject(nAmount > 0)
-		elseif data[1] == UI_OBJECT.ITEM then
-			UpdateBoxObject(box, UI_OBJECT.ITEM, data[2], data[3])
-			D.UpdateItemCD(hItem, i)
-		else
-			UpdateBoxObject(box, UI_OBJECT.NONE)
-		end
-	else
-		UpdateBoxObject(box, UI_OBJECT.NONE)
-	end
-	box.OnItemLButtonClick = nil
-	box.OnItemRButtonClick = nil
-	box.OnItemLButtonDrag = nil
-	box.OnItemLButtonDragEnd = nil
 end
 
 function D.UpdateList(frame)
 	local hList = frame:Lookup('', 'Handle_List')
 	for i = 1, O.nNum do
-		D.UpdateItem(hList:Lookup(i - 1), i)
+		local hItem = hList:Lookup(i - 1)
+		local box = hItem:Lookup('Box_Item')
+		local data = O.aList[i]
+		if data then
+			if data[1] == UI_OBJECT.ITEM_INFO then
+				local nAmount = LIB.GetItemAmount(data[2], data[3], data[4])
+				UpdateBoxObject(box, UI_OBJECT.ITEM_INFO, nil, data[2], data[3], data[4] or nAmount)
+				box:EnableObject(nAmount > 0)
+			elseif data[1] == UI_OBJECT.ITEM then
+				UpdateBoxObject(box, UI_OBJECT.ITEM, data[2], data[3])
+			else
+				UpdateBoxObject(box, UI_OBJECT.NONE)
+			end
+		else
+			UpdateBoxObject(box, UI_OBJECT.NONE)
+		end
+		box.OnItemLButtonClick = nil
+		box.OnItemRButtonClick = nil
+		box.OnItemLButtonDrag = nil
+		box.OnItemLButtonDragEnd = nil
 	end
+	D.UpdateListCD(frame)
 	D.UpdateItemVisible(frame)
 end
 
@@ -290,12 +293,7 @@ function D.OnFrameCreate()
 end
 
 function D.OnFrameBreathe()
-	local hList = this:Lookup('', 'Handle_List')
-	for i = 1, O.nNum do
-		if O.aList[i] and O.aList[i][1] == UI_OBJECT.ITEM then
-			D.UpdateItemCD(hList:Lookup(i - 1), i)
-		end
-	end
+	D.UpdateListCD(this)
 end
 
 function D.OnEvent(event)
