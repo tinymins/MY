@@ -1,7 +1,8 @@
 -- language data (zhcn) updated at 2014-12-27 22:15:14
 return {
     ['MY_Recount'] = '战斗统计',
-    ['enable'] = '启用',
+    ['Enable recording'] = '记录战斗统计数据',
+    ['Enable UI'] = '显示战斗统计界面',
     ['current fight'] = '当前统计',
     ['fight recount'] = '战斗统计',
 

@@ -52,6 +52,11 @@ local ENABLE_FONT = 162
 local DISABLE_FONT = 161
 local BORDER_SIZE = 5 -- 背景图四周边框宽度
 local DIFF_KEYS = { -- 用于自动扫描菜单数据是否有更新的键
+	'szImagePath',
+	'nBgFrame',
+	'nBgAlpha',
+	'szOverImgPath',
+	'nOverFrame',
 	'szOption',
 	'fnAction',
 	'bInline',

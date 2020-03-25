@@ -1078,7 +1078,7 @@ do
 local l_tBoolValues = {
 	['MY_ChatSwitch_DisplayPanel'] = 0,
 	['MY_ChatSwitch_LockPostion'] = 1,
-	['MY_Recount_Enable'] = 2,
+	['MY_Recount_EnableUI'] = 2,
 	['MY_ChatSwitch_CH1'] = 3,
 	['MY_ChatSwitch_CH2'] = 4,
 	['MY_ChatSwitch_CH3'] = 5,

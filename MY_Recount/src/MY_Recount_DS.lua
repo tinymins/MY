@@ -365,6 +365,7 @@ local VERSION = 2
 
 local D = {}
 local O = {
+	bEnable            = false, -- Êý¾Ý¼ÇÂ¼×Ü¿ª¹Ø ·ÀÖ¹¹Ù·½SB¼¼ÄÜBUFF½Å±¾Ï¹¼¸°ÑÐ´³¬¸ßÆµÌ«¿¨Ë¦¹ø¸ø½çÃæÂß¼­
 	bSaveHistoryOnExit = false, -- ÍË³öÓÎÏ·Ê±±£´æÀúÊ·Êý¾Ý
 	bSaveHistoryOnExFi = false, -- ÍÑÀëÕ½¶·Ê±±£´æÀúÊ·Êý¾Ý
 	nMaxHistory        = 10   , -- ×î´óÀúÊ·Êý¾ÝÊýÁ¿
@@ -417,6 +418,7 @@ function D.LoadData()
 			end
 			D.SaveHistory()
 		end
+		O.bEnable            = data.bEnable or false
 		O.bSaveHistoryOnExit = data.bSaveHistoryOnExit or data.bSaveHistory or false
 		O.bSaveHistoryOnExFi = data.bSaveHistoryOnExFi or false
 		O.nMaxHistory        = data.nMaxHistory or 10
@@ -430,6 +432,7 @@ end
 -- ÍË³öÓÎÏ·±£´æÊý¾Ý
 function D.SaveData()
 	local data = {
+		bEnable            = O.bEnable           ,
 		bSaveHistoryOnExit = O.bSaveHistoryOnExit,
 		bSaveHistoryOnExFi = O.bSaveHistoryOnExFi,
 		nMaxHistory        = O.nMaxHistory       ,
@@ -561,6 +564,9 @@ end
 
 -- ÍË³öÕ½¶· ±£´æÊý¾Ý
 LIB.RegisterEvent('MY_FIGHT_HINT', function()
+	if not O.bEnable then
+		return
+	end
 	local nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
 	local bFighting, szUUID, nDuring = arg0, arg1, arg2
 	if not bFighting then
@@ -1293,6 +1299,9 @@ end
 
 -- ÏµÍ³ÈÕÖ¾¼à¿Ø£¨Êý¾ÝÔ´£©
 LIB.RegisterEvent('SYS_MSG', function()
+	if not O.bEnable then
+		return
+	end
 	if arg0 == 'UI_OME_SKILL_CAST_LOG' then
 		-- ¼¼ÄÜÊ©·ÅÈÕÖ¾£»
 		-- (arg1)dwCaster£º¼¼ÄÜÊ©·ÅÕß (arg2)dwSkillID£º¼¼ÄÜID (arg3)dwLevel£º¼¼ÄÜµÈ¼¶
@@ -1435,6 +1444,9 @@ function D.OnTeammateStateChange(dwID, bLeave, nAwayType, bAddWhenRecEmpty)
 	end
 end
 LIB.RegisterEvent('PARTY_UPDATE_MEMBER_INFO', function()
+	if not O.bEnable then
+		return
+	end
 	local team = GetClientTeam()
 	local info = team.GetMemberInfo(arg1)
 	if info then
@@ -1442,6 +1454,9 @@ LIB.RegisterEvent('PARTY_UPDATE_MEMBER_INFO', function()
 	end
 end)
 LIB.RegisterEvent('SYS_MSG', function()
+	if not O.bEnable then
+		return
+	end
 	if arg0 ~= 'UI_OME_DEATH_NOTIFY' then
 		return
 	end
@@ -1458,6 +1473,9 @@ LIB.RegisterEvent('SYS_MSG', function()
 	end
 end)
 LIB.RegisterEvent('PARTY_SET_MEMBER_ONLINE_FLAG', function()
+	if not O.bEnable then
+		return
+	end
 	if LIB.IsParty(arg1) then
 		local nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
 		D.InsertEverything(
@@ -1478,6 +1496,9 @@ LIB.RegisterEvent('PARTY_SET_MEMBER_ONLINE_FLAG', function()
 	end
 end)
 LIB.RegisterEvent('MY_RECOUNT_NEW_FIGHT', function() -- ¿ªÕ½É¨Ãè¶ÓÓÑ ¼ÇÂ¼¿ªÕ½¾ÍËÀµô/µôÏßµÄÈË
+	if not O.bEnable then
+		return
+	end
 	local team = GetClientTeam()
 	local me = GetClientPlayer()
 	if team and me and (me.IsInParty() or me.IsInRaid()) then
@@ -1494,6 +1515,9 @@ LIB.RegisterEvent('MY_RECOUNT_NEW_FIGHT', function() -- ¿ªÕ½É¨Ãè¶ÓÓÑ ¼ÇÂ¼¿ªÕ½¾ÍË
 	end
 end)
 LIB.RegisterEvent('PARTY_ADD_MEMBER', function() -- ÖÐÍ¾ÓÐÈË½ø¶Ó ²¹ÉÏÔÝÀë¼ÇÂ¼
+	if not O.bEnable then
+		return
+	end
 	local team = GetClientTeam()
 	local info = team.GetMemberInfo(arg1)
 	if info then
@@ -1837,6 +1861,7 @@ local settings = {
 		},
 		{
 			fields = {
+				bEnable            = true,
 				bSaveHistoryOnExit = true,
 				bSaveHistoryOnExFi = true,
 				nMaxHistory        = true,
@@ -1850,6 +1875,7 @@ local settings = {
 	imports = {
 		{
 			fields = {
+				bEnable            = true,
 				bSaveHistoryOnExit = true,
 				bSaveHistoryOnExFi = true,
 				nMaxHistory        = true,
@@ -1858,6 +1884,10 @@ local settings = {
 				bSaveEverything    = true,
 			},
 			triggers = {
+				bEnable = function()
+					D.SaveData()
+					MY_Recount_UI.CheckOpen()
+				end,
 				bSaveHistoryOnExit = D.SaveData,
 				bSaveHistoryOnExFi = D.SaveData,
 				nMaxHistory        = D.SaveData,

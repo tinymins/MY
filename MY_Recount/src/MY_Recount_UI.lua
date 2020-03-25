@@ -209,6 +209,14 @@ function D.Close()
 	Wnd.CloseWindow('MY_Recount_UI')
 end
 
+function D.CheckOpen()
+	if MY_Recount_DS.bEnable and LIB.GetStorage('BoolValues.MY_Recount_EnableUI') then
+		D.Open()
+	else
+		D.Close()
+	end
+end
+
 function D.UpdateAnchor(frame)
 	local an = LIB.GetStorage('FrameAnchor.MY_Recount')
 		or { x = 0, y = -70, s = 'BOTTOMRIGHT', r = 'BOTTOMRIGHT' }
@@ -693,13 +701,7 @@ function D.OnCheckBoxUncheck()
 	end
 end
 
-LIB.RegisterStorageInit('MY_Recount_UI', function()
-	if LIB.GetStorage('BoolValues.MY_Recount_Enable') then
-		D.Open()
-	else
-		D.Close()
-	end
-end)
+LIB.RegisterStorageInit('MY_Recount_UI', D.CheckOpen)
 
 -- Global exports
 do
@@ -713,6 +715,7 @@ local settings = {
 			fields = {
 				Open = D.Open,
 				Close = D.Close,
+				CheckOpen = D.CheckOpen,
 				FORCE_BAR_CSS = FORCE_BAR_CSS,
 				DISPLAY_MODE = DISPLAY_MODE,
 			},

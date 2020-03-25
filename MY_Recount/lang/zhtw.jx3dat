@@ -1,7 +1,8 @@
 -- language data (zhtw) updated at 2014-12-27 22:15:14
 return {
     ['MY_Recount'] = '戰鬥統計',
-    ['enable'] = '啟用',
+    ['Enable recording'] = '記錄戰鬥統計數據',
+    ['Enable UI'] = '顯示戰鬥統計界面',
     ['current fight'] = '當前統計',
     ['fight recount'] = '戰鬥統計',
 

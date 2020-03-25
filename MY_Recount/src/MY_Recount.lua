@@ -139,124 +139,122 @@ end
 
 -- 获取设置菜单
 function D.GetMenu()
+	local function IsUIDisabled()
+		return not MY_Recount_DS.bEnable or not LIB.GetStorage('BoolValues.MY_Recount_EnableUI')
+	end
 	local t = {
 		szOption = _L['fight recount'],
 		{
-			szOption = _L['enable'],
+			szOption = _L['Enable recording'],
 			bCheck = true,
-			bChecked = LIB.GetStorage('BoolValues.MY_Recount_Enable'),
+			bChecked = MY_Recount_DS.bEnable,
 			fnAction = function()
-				local bEnable = not LIB.GetStorage('BoolValues.MY_Recount_Enable')
-				if bEnable then
-					MY_Recount_UI.Open()
-				else
-					MY_Recount_UI.Close()
-				end
-				LIB.SetStorage('BoolValues.MY_Recount_Enable', bEnable)
+				MY_Recount_DS.bEnable = not MY_Recount_DS.bEnable
 			end,
-		}, {
+		},
+		{
+			szOption = _L['Enable UI'],
+			bCheck = true,
+			bChecked = LIB.GetStorage('BoolValues.MY_Recount_EnableUI'),
+			fnAction = function()
+				LIB.SetStorage('BoolValues.MY_Recount_EnableUI', not LIB.GetStorage('BoolValues.MY_Recount_EnableUI'))
+				MY_Recount_UI.CheckOpen()
+			end,
+			fnDisable = function() return not MY_Recount_DS.bEnable end,
+		},
+		{
 			szOption = _L['display as per second'],
 			bCheck = true,
 			bChecked = MY_Recount_UI.bShowPerSec,
 			fnAction = function()
 				MY_Recount_UI.bShowPerSec = not MY_Recount_UI.bShowPerSec
 			end,
-			fnDisable = function()
-				return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
-			end,
-		}, {
+			fnDisable = IsUIDisabled,
+		},
+		{
 			szOption = _L['display effective value'],
 			bCheck = true,
 			bChecked = MY_Recount_UI.bShowEffect,
 			fnAction = function()
 				MY_Recount_UI.bShowEffect = not MY_Recount_UI.bShowEffect
 			end,
-			fnDisable = function()
-				return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
-			end,
-		}, {
+			fnDisable = IsUIDisabled,
+		},
+		{
 			szOption = _L['uncount awaytime'],
 			bCheck = true,
 			bChecked = MY_Recount_UI.bAwayMode,
 			fnAction = function()
 				MY_Recount_UI.bAwayMode = not MY_Recount_UI.bAwayMode
 			end,
-			fnDisable = function()
-				return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
-			end,
-		}, {
+			fnDisable = IsUIDisabled,
+		},
+		{
 			szOption = _L['show nodata teammate'],
 			bCheck = true,
 			bChecked = MY_Recount_UI.bShowNodataTeammate,
 			fnAction = function()
 				MY_Recount_UI.bShowNodataTeammate = not MY_Recount_UI.bShowNodataTeammate
 			end,
-			fnDisable = function()
-				return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
-			end,
-		}, {
+			fnDisable = IsUIDisabled,
+		},
+		{
 			szOption = _L['use system time count'],
 			bCheck = true,
 			bChecked = MY_Recount_UI.bSysTimeMode,
 			fnAction = function()
 				MY_Recount_UI.bSysTimeMode = not MY_Recount_UI.bSysTimeMode
 			end,
-			fnDisable = function()
-				return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
-			end,
-		}, {
+			fnDisable = IsUIDisabled,
+		},
+		{
 			szOption = _L['Group npc with same name'],
 			bCheck = true,
 			bChecked = MY_Recount_UI.bGroupSameNpc,
 			fnAction = function()
 				MY_Recount_UI.bGroupSameNpc = not MY_Recount_UI.bGroupSameNpc
 			end,
-			fnDisable = function()
-				return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
-			end,
-		}, {
+			fnDisable = IsUIDisabled,
+		},
+		{
 			szOption = _L['Group effect with same name'],
 			bCheck = true,
 			bChecked = MY_Recount_UI.bGroupSameEffect,
 			fnAction = function()
 				MY_Recount_UI.bGroupSameEffect = not MY_Recount_UI.bGroupSameEffect
 			end,
-			fnDisable = function()
-				return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
-			end,
-		}, {
+			fnDisable = IsUIDisabled,
+		},
+		{
 			szOption = _L['Hide anonymous effect'],
 			bCheck = true,
 			bChecked = MY_Recount_UI.bHideAnonymous,
 			fnAction = function()
 				MY_Recount_UI.bHideAnonymous = not MY_Recount_UI.bHideAnonymous
 			end,
-			fnDisable = function()
-				return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
-			end,
-		}, {
+			fnDisable = IsUIDisabled,
+		},
+		{
 			szOption = _L['show zero value effect'],
 			bCheck = true,
 			bChecked = MY_Recount_UI.bShowZeroVal,
 			fnAction = function()
 				MY_Recount_UI.bShowZeroVal = not MY_Recount_UI.bShowZeroVal
 			end,
-			fnDisable = function()
-				return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
-			end,
-		}, {
+			fnDisable = IsUIDisabled,
+		},
+		{
 			szOption = _L['Record everything'],
 			bCheck = true,
 			bChecked = MY_Recount_DS.bRecEverything,
 			fnAction = function()
 				MY_Recount_DS.bRecEverything = not MY_Recount_DS.bRecEverything
 			end,
-			fnDisable = function()
-				return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
-			end,
+			fnDisable = IsUIDisabled,
 		},
 		{   -- 切换统计类型
 			szOption = _L['switch recount mode'],
+			fnDisable = IsUIDisabled,
 			{
 				szOption = _L['display only npc record'],
 				bCheck = true, bMCheck = true,
@@ -264,14 +262,16 @@ function D.GetMenu()
 				fnAction = function()
 					MY_Recount_UI.nDisplayMode = MY_Recount_UI.DISPLAY_MODE.NPC
 				end,
-			}, {
+			},
+			{
 				szOption = _L['display only player record'],
 				bCheck = true, bMCheck = true,
 				bChecked = MY_Recount_UI.nDisplayMode == MY_Recount_UI.DISPLAY_MODE.PLAYER,
 				fnAction = function()
 					MY_Recount_UI.nDisplayMode = MY_Recount_UI.DISPLAY_MODE.PLAYER
 				end,
-			}, {
+			},
+			{
 				szOption = _L['display all record'],
 				bCheck = true, bMCheck = true,
 				bChecked = MY_Recount_UI.nDisplayMode == MY_Recount_UI.DISPLAY_MODE.BOTH,
@@ -285,9 +285,7 @@ function D.GetMenu()
 	-- 过滤短时间记录
 	local t1 = {
 		szOption = _L['filter short fight'],
-		fnDisable = function()
-			return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
-		end,
+		fnDisable = function() return not MY_Recount_DS.bEnable end,
 	}
 	for _, i in pairs({ -1, 10, 30, 60, 90, 120, 180 }) do
 		local szOption
@@ -307,9 +305,7 @@ function D.GetMenu()
 			fnAction = function()
 				MY_Recount_DS.nMinFightTime = i
 			end,
-			fnDisable = function()
-				return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
-			end,
+			fnDisable = function() return not MY_Recount_DS.bEnable end,
 		})
 	end
 	insert(t, t1)
@@ -317,9 +313,7 @@ function D.GetMenu()
 	-- 风格选择
 	local t1 = {
 		szOption = _L['theme'],
-		fnDisable = function()
-			return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
-		end,
+		fnDisable = IsUIDisabled,
 	}
 	for i, _ in ipairs(MY_Recount_UI.FORCE_BAR_CSS) do
 		local t2 = {
@@ -329,9 +323,7 @@ function D.GetMenu()
 			fnAction = function()
 				MY_Recount_UI.nCss = i
 			end,
-			fnDisable = function()
-				return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
-			end,
+			fnDisable = IsUIDisabled,
 		}
 		if i == 1 then
 			t2.szOption = _L['Global Color']
@@ -352,9 +344,7 @@ function D.GetMenu()
 	-- 数值刷新周期
 	local t1 = {
 		szOption = _L['redraw interval'],
-		fnDisable = function()
-			return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
-		end,
+		fnDisable = IsUIDisabled,
 	}
 	for _, i in ipairs({1, GLOBAL.GAME_FPS / 2, GLOBAL.GAME_FPS, GLOBAL.GAME_FPS * 2}) do
 		local szOption
@@ -370,9 +360,7 @@ function D.GetMenu()
 			fnAction = function()
 				MY_Recount_UI.nDrawInterval = i
 			end,
-			fnDisable = function()
-				return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
-			end,
+			fnDisable = IsUIDisabled,
 		})
 	end
 	insert(t, t1)
@@ -381,9 +369,7 @@ function D.GetMenu()
 	local t1 = {
 		szOption = _L['max history'],
 		nMaxHeight = 500,
-		fnDisable = function()
-			return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
-		end,
+		fnDisable = function() return not MY_Recount_DS.bEnable end,
 	}
 	for i = 1, 50 do
 		insert(t1, {
@@ -393,9 +379,7 @@ function D.GetMenu()
 			fnAction = function()
 				MY_Recount_DS.nMaxHistory = i
 			end,
-			fnDisable = function()
-				return not LIB.GetStorage('BoolValues.MY_Recount_Enable')
-			end,
+			fnDisable = function() return not MY_Recount_DS.bEnable end,
 		})
 	end
 	insert(t, t1)
