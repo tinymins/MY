@@ -817,6 +817,7 @@ function CombatText.GetFreeShadow()
 		return sha
 	end
 	Log('[MY] CombatText Get Free Item Failed!!!')
+	Log('[MY] 同屏战斗文字已抵达上限' .. COMBAT_TEXT_MAX_COUNT .. '个，建议检查服务端脚本是不是给外包乱写了，卡成PPT不要甩锅给界面组。')
 end
 
 function CombatText.LoadConfig()
