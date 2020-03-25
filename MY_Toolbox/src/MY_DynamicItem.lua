@@ -168,20 +168,71 @@ function D.InitList(frame)
 	frame:SetSize(nSplitsW, nSplitsH)
 end
 
+function D.UpdateCDText(txt, nTime)
+	if txt.nTime == nTime then
+		return
+	end
+	local nSec, szTime, nR, nG, nB = floor(nTime / GLOBAL.GAME_FPS)
+	if nSec == 0 then
+		szTime, nR, nG, nB = '', 255, 255, 255
+	else
+		local nH = floor(nSec / 3600)
+		local nM = floor(nSec / 60) % 60
+		local nS = nSec % 60
+		if nH > 0 then
+			if nM > 0 or nS > 0 then
+				nH = nH + 1
+			end
+			szTime = nH ..'h'
+			nR, nG, nB = 255, 255, 255
+		elseif nM  > 0 then
+			if nS > 0 then
+				nM = nM + 1
+			end
+			szTime = nM ..'m'
+			nR, nG, nB = 255, 255, 0
+		elseif nS >= 0 then
+			if nS < 5 then
+				if not txt.nSpark or txt.nSpark >= 7 then
+					txt.nSpark = 0
+					txt.bSpark = not txt.bSpark
+				end
+				if txt.bSpark then
+					nR, nG, nB = 255, 255, 255
+				else
+					nR, nG, nB = 255, 0, 0
+				end
+				txt.nSpark = txt.nSpark + 1
+			else
+				nR, nG, nB = 255, 255, 0
+			end
+			szTime = nS
+		end
+	end
+	txt:SetText(szTime)
+	txt:SetFontColor(nR, nG, nB)
+	txt.nTime = nTime
+end
+
 function D.UpdateListCD(frame)
 	local me = GetClientPlayer()
+	if not me then
+		return
+	end
+	local bShowCD = LIB.GetNumberBit(GetUserPreferences(4380, 'c'), 2) == 1
 	local hList = frame:Lookup('', 'Handle_List')
 	for i = 1, O.nNum do
 		local hItem = hList:Lookup(i - 1)
 		local box = hItem:Lookup('Box_Item')
-		local data = O.aList[i]
+		local data, nTime = O.aList[i], 0
 		if data then
 			if data[1] == UI_OBJECT.ITEM_INFO then
-				UpdataItemCDProgress(me, box, 0, data[2], data[3])
+				nTime = UpdataItemCDProgress(me, box, 0, data[2], data[3]) or 0
 			elseif data[1] == UI_OBJECT.ITEM then
-				UpdataItemCDProgress(me, box, data[2], data[3])
+				nTime = UpdataItemCDProgress(me, box, data[2], data[3]) or 0
 			end
 		end
+		D.UpdateCDText(hItem:Lookup('Text_CD'), bShowCD and nTime or 0)
 	end
 end
 
