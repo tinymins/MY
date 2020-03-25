@@ -425,6 +425,7 @@ function D.LoadData()
 		O.nMinFightTime      = data.nMinFightTime or 30
 		O.bRecEverything     = data.bRecEverything or false
 		O.bSaveEverything    = data.bSaveEverything or false
+		MY_Recount_UI.CheckOpen()
 	end
 	D.InitData()
 end
@@ -671,6 +672,9 @@ end
 function D.GeneFightTime(data, szRecordType, dwID)
 	local nTimeDuring = data[DK.TIME_DURING]
 	local nTimeBegin  = data[DK.TIME_BEGIN]
+	if nTimeDuring < 0 then
+		nTimeDuring = floor(LIB.GetFightTime() / 1000) + nTimeDuring + 1
+	end
 	if szRecordType and data[szRecordType] and data[szRecordType][DK_REC.TIME_DURING] then
 		nTimeDuring = data[szRecordType][DK_REC.TIME_DURING]
 	end
@@ -790,9 +794,6 @@ function D.ProcessSkillEffect(nLFC, nTime, nTick, dwCaster, dwTarget, nEffectTyp
 	then
 		D.AddDamageRecord(Data, dwCaster, dwTarget, szEffectID, 0, 0, nSkillResult)
 	end
-
-	Data[DK.TIME_DURING] = GetCurrentTime() - Data[DK.TIME_BEGIN]
-	Data[DK.TICK_DURING] = GetTime() - Data[DK.TICK_BEGIN]
 end
 
 function D.OnSkillEffect(dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nResultCount, tResult)
@@ -1226,13 +1227,15 @@ local function GeneTypeNS()
 	}
 end
 function D.InitData()
+	local bFighting = LIB.IsFighting()
+	local nFightTick = bFighting and LIB.GetFightTime() or 0
 	Data = {
 		[DK.UUID       ] = LIB.GetFightUUID(),                -- 战斗唯一标识
 		[DK.VERSION    ] = VERSION,                           -- 数据版本号
 		[DK.TIME_BEGIN ] = GetCurrentTime(),                  -- 战斗开始时间
 		[DK.TICK_BEGIN ] = GetTime(),                         -- 战斗开始毫秒时间
-		[DK.TIME_DURING] =  0,                                -- 战斗持续时间
-		[DK.TICK_DURING] =  0,                                -- 战斗持续毫秒时间
+		[DK.TIME_DURING] = - (nFightTick / 1000) - 1,         -- 战斗持续时间 负数表示本次战斗尚未结束 其数值为记录开始时负的战斗秒数减一
+		[DK.TICK_DURING] = - nFightTick - 1,                  -- 战斗持续毫秒时间 负数表示本次战斗尚未结束 其数值为记录开始时负的战斗毫秒数减一
 		[DK.AWAYTIME   ] = {},                                -- 死亡/掉线时间节点
 		[DK.NAME_LIST  ] = {},                                -- 名称缓存
 		[DK.FORCE_LIST ] = {},                                -- 势力缓存
@@ -1284,6 +1287,10 @@ function D.Flush()
 			end
 		end
 		Data[DK.BOSSNAME] = szEnemyBossName or szBossName or g_tStrings.STR_NAME_UNKNOWN
+
+		local nFightTick = LIB.GetFightTime() or 0
+		Data[DK.TIME_DURING] = floor(nFightTick / 1000) + Data[DK.TIME_DURING] + 1
+		Data[DK.TICK_DURING] = nFightTick + Data[DK.TICK_DURING] + 1
 
 		if Data[DK.TIME_DURING] > O.nMinFightTime then
 			local szFilePath = LIB.FormatPath(DS_ROOT) .. D.GetDataFileName(Data)
