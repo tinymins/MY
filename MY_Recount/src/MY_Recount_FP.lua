@@ -219,7 +219,7 @@ local COLUMN_LIST = {
 				return GetFormatText(MY_Recount.SKILL_RESULT_NAME[rec[11]] or '')
 			end
 			if rec[4] == EVERYTHING_TYPE.BUFF_UPDATE then
-				return GetFormatText(rec[10] and _L['Disappear'] or _L['Appear'])
+				return GetFormatText(rec[10] and _L['Disappear'] or _L['Acquired'])
 			end
 			return GetFormatText('-')
 		end,
