@@ -101,7 +101,9 @@ end
 function D.LoadMapConfig()
 	O.aList = LIB.LoadLUAData(
 		{'userdata/dynamic_item/' .. D.GetMapID() .. '.jx3dat', PATH_TYPE.GLOBAL},
-		{ passphrase = false }) or {}
+		{ passphrase = false })
+		or LIB.LoadLUAData(PLUGIN_ROOT .. '/data/dynamic_item/' .. D.GetMapID() .. '.jx3dat')
+		or {}
 end
 
 function D.GetFrame()
