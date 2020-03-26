@@ -175,6 +175,9 @@ local COLUMN_LIST = {
 			if rec[4] == EVERYTHING_TYPE.SKILL_EFFECT then
 				return GetFormatText(MY_Recount_DS.GetNameAusID(data, rec[5]) or rec[5])
 			end
+			if rec[4] == EVERYTHING_TYPE.BUFF_UPDATE then
+				return GetFormatText(MY_Recount_DS.GetNameAusID(data, rec[5]) or rec[5])
+			end
 			if rec[4] == EVERYTHING_TYPE.DEATH then
 				return GetFormatText(rec[8] or rec[6])
 			end
@@ -281,7 +284,7 @@ local COLUMN_LIST = {
 					if rec[13] then
 						return GetFormatText(_L('Stacknum %d, remain time %dms, cancellable.', rec[11], (rec[12] - rec[1]) / GLOBAL.GAME_FPS))
 					end
-					return GetFormatText(_L('Stacknum %d, remain time %dms.', rec[11], (rec[12] - rec[1]) / GLOBAL.GAME_FPS))
+					return GetFormatText(_L('Stacknum %d, remain time %dms, uncancellable.', rec[11], (rec[12] - rec[1]) / GLOBAL.GAME_FPS))
 				end
 			end
 			return GetFormatText('-')
@@ -470,10 +473,10 @@ function D.DrawData(frame)
 				if j == #COLUMN_LIST then
 					nWidth = EXCEL_WIDTH - nX
 				end
-				hItem:SetRelX(nX)
-				hItem:SetW(nWidth)
+				hItem:SetRelX(nX + 4)
+				hItem:SetW(nWidth - 8)
 				hItemContent:SetRelPos(
-					nWidth < hItemContent:GetW()
+					hItem:GetW() < hItemContent:GetW()
 						and 0
 						or (nWidth - hItemContent:GetW()) / 2,
 					(hItem:GetH() - hItemContent:GetH()) / 2)

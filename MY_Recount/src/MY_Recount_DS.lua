@@ -722,13 +722,11 @@ end
 function D.ProcessSkillEffect(nLFC, nTime, nTick, dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nResultCount, tResult)
 	-- 获取释放对象和承受对象
 	local KCaster = LIB.GetObject(dwCaster)
-	if KCaster and not IsPlayer(dwCaster)
-	and KCaster.dwEmployer and KCaster.dwEmployer ~= 0 then -- 宠物的数据算在主人统计中
+	if KCaster and not IsPlayer(dwCaster) and KCaster.dwEmployer and KCaster.dwEmployer ~= 0 then -- 宠物的数据算在主人统计中
 		KCaster = LIB.GetObject(KCaster.dwEmployer)
 	end
 	local KTarget, dwTargetEmployer = LIB.GetObject(dwTarget), nil
-	if KTarget and not IsPlayer(dwTarget)
-	and KTarget.dwEmployer and KTarget.dwEmployer ~= 0 then
+	if KTarget and not IsPlayer(dwTarget) and KTarget.dwEmployer and KTarget.dwEmployer ~= 0 then
 		dwTargetEmployer = KTarget.dwEmployer
 	end
 	if not (KCaster and KTarget) then
@@ -808,6 +806,10 @@ function D.OnSkillEffect(dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLe
 end
 
 function D.ProcessBuffUpdate(nLFC, nTime, nTick, dwCaster, dwTarget, dwBuffID, dwBuffLevel, nStackNum, bDelete, nEndFrame, bCanCancel)
+	local KCaster = LIB.GetObject(dwCaster)
+	if KCaster and not IsPlayer(dwCaster) and KCaster.dwEmployer and KCaster.dwEmployer ~= 0 then -- 宠物的数据算在主人统计中
+		dwCaster = KCaster.dwEmployer
+	end
 	local szEffectID = D.InitEffectData(Data, SKILL_EFFECT_TYPE.BUFF, dwBuffID, dwBuffLevel)
 	D.InitObjectData(Data, dwCaster)
 	D.InitObjectData(Data, dwTarget)
