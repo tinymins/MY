@@ -286,10 +286,18 @@ local COLUMN_LIST = {
 			end
 			if rec[4] == EVERYTHING_TYPE.BUFF_UPDATE then
 				if not rec[10] then
-					if rec[13] then
-						return GetFormatText(_L('Stacknum %d, remain time %dms, cancellable.', rec[11], (rec[12] - rec[1]) / GLOBAL.GAME_FPS))
+					if rec[11] == 1 then
+						return GetFormatText(_L(
+							rec[13]
+								and 'Remain time %s, cancellable.'
+								or 'Remain time %s, uncancellable.',
+							LIB.FormatTimeCounter((rec[12] - rec[1]) / GLOBAL.GAME_FPS, 2, 2)))
 					end
-					return GetFormatText(_L('Stacknum %d, remain time %dms, uncancellable.', rec[11], (rec[12] - rec[1]) / GLOBAL.GAME_FPS))
+					return GetFormatText(_L(
+						rec[13]
+							and 'Stacknum %d, remain time %s, cancellable.'
+							or 'Stacknum %d, remain time %s, uncancellable.',
+						rec[11], LIB.FormatTimeCounter((rec[12] - rec[1]) / GLOBAL.GAME_FPS, 2, 2)))
 				end
 			end
 			return GetFormatText('-')
