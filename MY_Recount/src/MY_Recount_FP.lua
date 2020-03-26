@@ -472,7 +472,11 @@ function D.DrawData(frame)
 				end
 				hItem:SetRelX(nX)
 				hItem:SetW(nWidth)
-				hItemContent:SetRelPos((nWidth - hItemContent:GetW()) / 2, (hItem:GetH() - hItemContent:GetH()) / 2)
+				hItemContent:SetRelPos(
+					nWidth < hItemContent:GetW()
+						and 0
+						or (nWidth - hItemContent:GetW()) / 2,
+					(hItem:GetH() - hItemContent:GetH()) / 2)
 				hItem:FormatAllItemPos()
 				nX = nX + nWidth
 			end
