@@ -50,8 +50,8 @@ local SZ_TPL_INI = PACKET_INFO.FRAMEWORK_ROOT .. 'ui/PopupMenu.tpl.ini'
 local LAYER_LIST = {'Lowest', 'Lowest1', 'Lowest2', 'Normal', 'Normal1', 'Normal2', 'Topmost', 'Topmost1', 'Topmost2'}
 local ENABLE_FONT = 162
 local DISABLE_FONT = 161
-local BORDER_H_SIZE = 8 -- 背景图左右边框宽度
-local BORDER_V_SIZE = 8 -- 背景图上下边框宽度
+local PADDING_H = 8 -- 背景图左右边框宽度
+local PADDING_V = 8 -- 背景图上下边框宽度
 local DIFF_KEYS = { -- 用于自动扫描菜单数据是否有更新的键
 	'szImagePath',
 	'nBgFrame',
@@ -228,8 +228,15 @@ function D.UpdateMouseOver(scroll, nCurX, nCurY)
 	end
 end
 
+function D.GetPadding(top)
+	return top.nPaddingTop or top.nPaddingVertical or top.nPadding or PADDING_V,
+		top.nPaddingBottom or top.nPaddingVertical or top.nPadding or PADDING_V,
+		top.nPaddingLeft or top.nPaddingHorizontal or top.nPadding or PADDING_H,
+		top.nPaddingRight or top.nPaddingHorizontal or top.nPadding or PADDING_H
+end
+
 -- 根据渲染的内容调整选项宽度（由于宽度受所有子元素影响 所以独立成函数在绘制结束后统一调用）
-function D.UpdateScrollContainerWidth(scroll, nHeaderWidth, nContentWidth, nFooterWidth, bInlineContainer)
+function D.UpdateScrollContainerWidth(scroll, nHeaderWidth, nContentWidth, nFooterWidth, nPaddingRight, bInlineContainer)
 	local nWidth = nHeaderWidth + nContentWidth + nFooterWidth
 	local container = scroll:Lookup('WndContainer_Menu')
 	for i = 0, container:GetAllContentCount() - 1 do
@@ -252,14 +259,14 @@ function D.UpdateScrollContainerWidth(scroll, nHeaderWidth, nContentWidth, nFoot
 			h:FormatAllItemPos()
 			wnd:SetW(nWidth)
 		elseif wnd:GetName() == 'WndScroll_Menu' then
-			D.UpdateScrollContainerWidth(wnd, nHeaderWidth, nContentWidth, nFooterWidth, true)
+			D.UpdateScrollContainerWidth(wnd, nHeaderWidth, nContentWidth, nFooterWidth, nPaddingRight, true)
 		end
 	end
 	container:SetW(nWidth)
 	-- 滚动条位置大小
 	local nWidth, nHeight = container:GetSize()
 	scroll:Lookup('Scroll_Menu'):SetH(nHeight)
-	scroll:Lookup('Scroll_Menu'):SetRelX(bInlineContainer and (nWidth - BORDER_H_SIZE) or nWidth)
+	scroll:Lookup('Scroll_Menu'):SetRelX(bInlineContainer and (nWidth - nPaddingRight) or nWidth)
 	scroll:SetW(nWidth)
 end
 
@@ -267,6 +274,7 @@ end
 function D.DrawScrollContainer(scroll, top, menu, nLevel, bInlineContainer)
 	local nMinWidth = menu.nMinWidth or menu.nMiniWidth or 0
 	local nHeaderWidth, nContentWidth, nFooterWidth = 10, 0, 10
+	local nPaddingTop, nPaddingBottom, nPaddingLeft, nPaddingRight = D.GetPadding(top)
 	local container = scroll:Lookup('WndContainer_Menu')
 	container:Clear()
 	for _, m in ipairs(menu) do
@@ -425,14 +433,14 @@ function D.DrawScrollContainer(scroll, top, menu, nLevel, bInlineContainer)
 	if menu.nMaxHeight then
 		nHeight = min(nHeight, menu.nMaxHeight)
 	end
-	nHeight = min(nHeight, (select(2, Station.GetClientSize()) - BORDER_V_SIZE * 2))
+	nHeight = min(nHeight, select(2, Station.GetClientSize()) - nPaddingTop - nPaddingBottom)
 	container:SetH(nHeight)
 	container:FormatAllContentPos() -- 这里KGUI有BUG 如果调整高度后不重新Format一遍的话 一定会出滚动条
 	scroll:SetH(nHeight)
 	-- 非嵌套层则开始更新所有宽度
 	if not bInlineContainer then
-		nContentWidth = max(nMinWidth - nHeaderWidth - nFooterWidth - BORDER_H_SIZE * 2, nContentWidth)
-		D.UpdateScrollContainerWidth(scroll, nHeaderWidth, nContentWidth, nFooterWidth, false)
+		nContentWidth = max(nMinWidth - nHeaderWidth - nFooterWidth - nPaddingLeft - nPaddingRight, nContentWidth)
+		D.UpdateScrollContainerWidth(scroll, nHeaderWidth, nContentWidth, nFooterWidth, nPaddingRight, false)
 		D.UpdateMouseOver(scroll, Cursor.GetPos())
 	end
 	return nHeaderWidth, nContentWidth, nFooterWidth
@@ -445,10 +453,12 @@ function D.DrawWnd(wnd, top, menu, nLevel)
 	D.DrawScrollContainer(scroll, top, menu, nLevel, false)
 	-- 绘制背景
 	local nWidth, nHeight = container:GetSize()
-	scroll:SetRelY(BORDER_V_SIZE)
-	wnd:SetSize(nWidth + BORDER_H_SIZE * 2, nHeight + BORDER_V_SIZE * 2)
-	wnd:Lookup('', ''):SetSize(nWidth + BORDER_H_SIZE * 2, nHeight + BORDER_V_SIZE * 2)
-	wnd:Lookup('', 'Image_Bg'):SetSize(nWidth + BORDER_H_SIZE * 2, nHeight + BORDER_V_SIZE * 2)
+	local nPaddingTop, nPaddingBottom, nPaddingLeft, nPaddingRight = D.GetPadding(top)
+	local nWWidth, nWHeight = nWidth + nPaddingLeft + nPaddingRight, nHeight + nPaddingTop + nPaddingBottom
+	scroll:SetRelY(nPaddingTop)
+	wnd:SetSize(nWWidth, nWHeight)
+	wnd:Lookup('', ''):SetSize(nWWidth, nWHeight)
+	wnd:Lookup('', 'Image_Bg'):SetSize(nWWidth, nWHeight)
 	if top.szImagePath and top.nBgFrame then
 		wnd:Lookup('', 'Image_Bg'):FromUITex(top.szImagePath, top.nBgFrame)
 	end
