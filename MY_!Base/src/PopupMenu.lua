@@ -588,13 +588,14 @@ function D.OnFrameCreate()
 end
 
 function D.OnFrameBreathe()
-	if not this.aMenu[1].bShowKillFocus then
+	local top = this.aMenu[1]
+	if not top.bShowKillFocus then
 		local wnd = Station.GetFocusWindow()
 		local frame = wnd and wnd:GetRoot()
 		local name = frame and frame:GetName()
 		if frame and frame ~= this and name ~= COLOR_TABLE_NAME and name ~= COLOR_PICKER_NAME then
-			if this.aMenu[1].fnCancel then
-				this.aMenu[1].fnCancel()
+			if top.fnCancel then
+				top.fnCancel()
 			end
 			if this.bColorPicker then
 				Wnd.CloseWindow(COLOR_TABLE_NAME)
@@ -603,7 +604,10 @@ function D.OnFrameBreathe()
 			return Wnd.CloseWindow(this)
 		end
 	end
-	D.CalcDisable(this.aMenu[1])
+	if top.fnAutoClose and top.fnAutoClose() then
+		return Wnd.CloseWindow(this)
+	end
+	D.CalcDisable(top)
 	D.UpdateUI(this)
 end
 
