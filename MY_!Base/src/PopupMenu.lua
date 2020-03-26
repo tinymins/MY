@@ -50,7 +50,7 @@ local SZ_TPL_INI = PACKET_INFO.FRAMEWORK_ROOT .. 'ui/PopupMenu.tpl.ini'
 local LAYER_LIST = {'Lowest', 'Lowest1', 'Lowest2', 'Normal', 'Normal1', 'Normal2', 'Topmost', 'Topmost1', 'Topmost2'}
 local ENABLE_FONT = 162
 local DISABLE_FONT = 161
-local BORDER_SIZE = 5 -- 背景图四周边框宽度
+local BORDER_SIZE = 8 -- 背景图四周边框宽度
 local DIFF_KEYS = { -- 用于自动扫描菜单数据是否有更新的键
 	'szImagePath',
 	'nBgFrame',
@@ -263,7 +263,7 @@ function D.UpdateScrollContainerWidth(scroll, nHeaderWidth, nContentWidth, nFoot
 end
 
 -- 绘制选项列表
-function D.DrawScrollContainer(scroll, menu, nLevel, bInlineContainer)
+function D.DrawScrollContainer(scroll, top, menu, nLevel, bInlineContainer)
 	local nMinWidth = menu.nMinWidth or menu.nMiniWidth or 0
 	local nHeaderWidth, nContentWidth, nFooterWidth = 10, 0, 10
 	local container = scroll:Lookup('WndContainer_Menu')
@@ -271,7 +271,7 @@ function D.DrawScrollContainer(scroll, menu, nLevel, bInlineContainer)
 	for _, m in ipairs(menu) do
 		if m.bInline then
 			local scroll = container:AppendContentFromIni(SZ_TPL_INI, 'WndScroll_Menu')
-			local n1, n2, n3 = D.DrawScrollContainer(scroll, m, nLevel, true)
+			local n1, n2, n3 = D.DrawScrollContainer(scroll, top, m, nLevel, true)
 			nHeaderWidth = max(nHeaderWidth, n1)
 			nContentWidth = max(nContentWidth, n2)
 			nFooterWidth = max(nFooterWidth, n3)
@@ -283,6 +283,9 @@ function D.DrawScrollContainer(scroll, menu, nLevel, bInlineContainer)
 			local hFooter = h:Lookup('Handle_Item_R')
 			local imgDevide = h:Lookup('Image_Devide')
 			local imgBg = h:Lookup('Image_Background')
+			if top.szOverImgPath and top.nOverFrame then
+				h:Lookup('Image_Over'):FromUITex(top.szOverImgPath, top.nOverFrame)
+			end
 			if m.bDevide or m.bDivide then
 				imgDevide:Show()
 				wnd:SetH(imgDevide:GetH())
@@ -434,16 +437,22 @@ function D.DrawScrollContainer(scroll, menu, nLevel, bInlineContainer)
 	return nHeaderWidth, nContentWidth, nFooterWidth
 end
 
-function D.DrawWnd(wnd, menu, nLevel)
+function D.DrawWnd(wnd, top, menu, nLevel)
 	-- 绘制列表
 	local scroll = wnd:Lookup('WndScroll_Menu')
 	local container = scroll:Lookup('WndContainer_Menu')
-	D.DrawScrollContainer(scroll, menu, nLevel, false)
+	D.DrawScrollContainer(scroll, top, menu, nLevel, false)
 	-- 绘制背景
 	local nWidth, nHeight = container:GetSize()
 	wnd:SetSize(nWidth + BORDER_SIZE * 2, nHeight + BORDER_SIZE * 2)
 	wnd:Lookup('', ''):SetSize(nWidth + BORDER_SIZE * 2, nHeight + BORDER_SIZE * 2)
 	wnd:Lookup('', 'Image_Bg'):SetSize(nWidth + BORDER_SIZE * 2, nHeight + BORDER_SIZE * 2)
+	if top.szImagePath and top.nBgFrame then
+		wnd:Lookup('', 'Image_Bg'):FromUITex(top.szImagePath, top.nBgFrame)
+	end
+	if top.nBgAlpha then
+		wnd:Lookup('', 'Image_Bg'):SetAlpha(top.nBgAlpha)
+	end
 	wnd.nLevel = nLevel
 	wnd.menu = menu
 end
@@ -525,7 +534,7 @@ function D.UpdateUI(frame)
 				wnd = D.AppendContentFromIni(frame, SZ_TPL_INI, 'Wnd_Menu', 'Wnd_Menu' .. nLevel)
 			end
 			if frame.aInvaild[nLevel] or not D.IsEquals(wnd.menuSnapshot, menu) then
-				D.DrawWnd(wnd, menu, nLevel)
+				D.DrawWnd(wnd, aMenu[1], menu, nLevel)
 				bDrawed = true
 				frame.aInvaild[nLevel] = false
 				wnd.menuSnapshot = D.Clone(menu)
