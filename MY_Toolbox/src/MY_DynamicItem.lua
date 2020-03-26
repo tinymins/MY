@@ -289,8 +289,6 @@ function D.ParseBoxItem(box)
 				tItem = {UI_OBJECT.ITEM_INFO, data[4], data[5]}
 			end
 		end
-	elseif not data[1] == -1 then
-		Output(data)
 	end
 	O.aList[box.nIndex] = tItem or {}
 end
