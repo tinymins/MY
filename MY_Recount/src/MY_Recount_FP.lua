@@ -123,6 +123,9 @@ local COLUMN_LIST = {
 			if rec[4] == EVERYTHING_TYPE.DEATH then
 				return GetFormatText(_L['Death'])
 			end
+			if rec[4] == EVERYTHING_TYPE.BUFF_UPDATE then
+				return GetFormatText(_L['Buff'])
+			end
 			if rec[4] == EVERYTHING_TYPE.ONLINE then
 				if rec[6] then
 					return GetFormatText(_L['Online'])
@@ -149,6 +152,13 @@ local COLUMN_LIST = {
 				local szName, bAnonymous = MY_Recount_DS.GetEffectInfoAusID(data, rec[10])
 				if IsEmpty(szName) or bAnonymous then
 					szName = rec[8] .. ',' .. rec[9]
+				end
+				return GetFormatText(szName)
+			end
+			if rec[4] == EVERYTHING_TYPE.BUFF_UPDATE then
+				local szName, bAnonymous = MY_Recount_DS.GetEffectInfoAusID(data, rec[9])
+				if IsEmpty(szName) or bAnonymous then
+					szName = rec[7] .. ',' .. rec[8]
 				end
 				return GetFormatText(szName)
 			end
@@ -181,6 +191,9 @@ local COLUMN_LIST = {
 			if rec[4] == EVERYTHING_TYPE.SKILL_EFFECT then
 				return GetFormatText(MY_Recount_DS.GetNameAusID(data, rec[6]) or rec[6])
 			end
+			if rec[4] == EVERYTHING_TYPE.BUFF_UPDATE then
+				return GetFormatText(MY_Recount_DS.GetNameAusID(data, rec[6]) or rec[6])
+			end
 			if rec[4] == EVERYTHING_TYPE.DEATH then
 				return GetFormatText(rec[7] or rec[5])
 			end
@@ -196,6 +209,9 @@ local COLUMN_LIST = {
 		GetFormatText = function(rec)
 			if rec[4] == EVERYTHING_TYPE.SKILL_EFFECT then
 				return GetFormatText(MY_Recount.SKILL_RESULT_NAME[rec[11]] or '')
+			end
+			if rec[4] == EVERYTHING_TYPE.BUFF_UPDATE then
+				return GetFormatText(rec[10] and _L['Disappear'] or _L['Appear'])
 			end
 			return GetFormatText('-')
 		end,
@@ -259,6 +275,14 @@ local COLUMN_LIST = {
 					return GetFormatText(_L('[%s] killed %s.', rec[8], rec[7]))
 				end
 				return GetFormatText(_L('%s killed %s.', rec[8], rec[7]))
+			end
+			if rec[4] == EVERYTHING_TYPE.BUFF_UPDATE then
+				if not rec[10] then
+					if rec[13] then
+						return GetFormatText(_L('Stacknum %d, remain time %dms, cancellable.', rec[11], (rec[12] - rec[1]) / GLOBAL.GAME_FPS))
+					end
+					return GetFormatText(_L('Stacknum %d, remain time %dms.', rec[11], (rec[12] - rec[1]) / GLOBAL.GAME_FPS))
+				end
 			end
 			return GetFormatText('-')
 		end,
@@ -332,6 +356,14 @@ function D.MatchRecSearch(data, rec, szSearch, nSearch, bEffectName, bCaster, bT
 			or (szSearch == _L['Damage'] and rec[14] > 0)
 			or (szSearch == _L['EffectDamage'] and rec[15] > 0)
 		))
+		or (rec[4] == EVERYTHING_TYPE.BUFF_UPDATE and (
+			nSearch == rec[7]
+			or (bCaster and nSearch == rec[5])
+			or (bCaster and wfind(MY_Recount_DS.GetNameAusID(data, rec[5]) or '', szSearch))
+			or (bTarget and nSearch == rec[6])
+			or (bTarget and wfind(MY_Recount_DS.GetNameAusID(data, rec[6]) or '', szSearch))
+			or (bEffectName and wfind(MY_Recount_DS.GetEffectInfoAusID(data, rec[9]) or '', szSearch))
+		))
 	) then
 		return true
 	end
@@ -355,20 +387,31 @@ function D.UpdateData(frame)
 	for _, rec in ipairs(data[DK.EVERYTHING]) do
 		local bMatch = true
 		-- 零数值记录
-		if bMatch and not MY_Recount_UI.bShowZeroVal
-		and rec[4] == EVERYTHING_TYPE.SKILL_EFFECT
-		and rec[14] == 0 and rec[12] == 0 then
-			bMatch = false
+		if bMatch and not MY_Recount_UI.bShowZeroVal then
+			if rec[4] == EVERYTHING_TYPE.SKILL_EFFECT and rec[14] == 0 and rec[12] == 0 then
+				bMatch = false
+			end
+			if rec[4] == EVERYTHING_TYPE.BUFF_UPDATE then
+				bMatch = false
+			end
 		end
 		-- 没名字记录
-		if bMatch and MY_Recount_UI.bHideAnonymous
-		and rec[4] == EVERYTHING_TYPE.SKILL_EFFECT
-		and select(2, MY_Recount_DS.GetEffectInfoAusID(data, rec[10])) then
-			bMatch = false
+		if bMatch and MY_Recount_UI.bHideAnonymous then
+			if rec[4] == EVERYTHING_TYPE.SKILL_EFFECT and select(2, MY_Recount_DS.GetEffectInfoAusID(data, rec[10])) then
+				bMatch = false
+			end
+			if rec[4] == EVERYTHING_TYPE.BUFF_UPDATE and select(2, MY_Recount_DS.GetEffectInfoAusID(data, rec[9])) then
+				bMatch = false
+			end
 		end
 		-- 释放者和目标是同一人
-		if bTargetNotCaster and rec[4] == EVERYTHING_TYPE.SKILL_EFFECT and rec[5] == rec[6] then
-			bMatch = false
+		if bTargetNotCaster then
+			if rec[4] == EVERYTHING_TYPE.SKILL_EFFECT and rec[5] == rec[6] then
+				bMatch = false
+			end
+			if rec[4] == EVERYTHING_TYPE.BUFF_UPDATE then
+				bMatch = false
+			end
 		end
 		-- 搜索匹配
 		if bMatch and aSearch then
@@ -561,12 +604,46 @@ function D.OutputTip(this, rec)
 			insert(aXml, GetFormatText('\n'))
 		end
 	end
+	if rec[4] == EVERYTHING_TYPE.BUFF_UPDATE then
+		-- 名称
+		local col = COLUMN_DICT['effectname']
+		local szName, bAnonymous = MY_Recount_DS.GetEffectInfoAusID(data, rec[9])
+		if IsEmpty(szName) or bAnonymous then
+			szName = rec[7] .. ',' .. rec[8]
+		else
+			szName = szName .. ' (' .. rec[7] .. ',' .. rec[8] .. ')'
+		end
+		insert(aXml, GetFormatText(col.szTitle))
+		insert(aXml, GetFormatText(':  '))
+		insert(aXml, GetFormatText(szName))
+		insert(aXml, GetFormatText('\n'))
+		-- 释放者
+		local col = COLUMN_DICT['caster']
+		local dwID = rec[5]
+		local szName = MY_Recount_DS.GetNameAusID(data, rec[5])
+		insert(aXml, GetFormatText(col.szTitle))
+		insert(aXml, GetFormatText(':  '))
+		insert(aXml, GetFormatText(szName and (szName .. ' (' .. dwID .. ')') or dwID))
+		insert(aXml, GetFormatText('\n'))
+		-- 目标
+		local col = COLUMN_DICT['target']
+		local dwID = rec[6]
+		local szName = MY_Recount_DS.GetNameAusID(data, rec[6])
+		insert(aXml, GetFormatText(col.szTitle))
+		insert(aXml, GetFormatText(':  '))
+		insert(aXml, GetFormatText(szName and (szName .. ' (' .. dwID .. ')') or dwID))
+		insert(aXml, GetFormatText('\n'))
+	end
 	-- 描述
 	local col = COLUMN_DICT['description']
 	insert(aXml, GetFormatText(col.szTitle))
 	insert(aXml, GetFormatText(':  '))
 	insert(aXml, col.GetFormatText(rec))
 	insert(aXml, GetFormatText('\n'))
+
+	if IsCtrlKeyDown() then
+		insert(aXml, GetFormatText(EncodeLUAData(rec, '  ')))
+	end
 
 	local x, y = this:GetAbsPos()
 	local w, h = this:GetSize()

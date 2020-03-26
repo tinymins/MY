@@ -360,6 +360,7 @@ local EVERYTHING_TYPE = {
 	FIGHT_TIME = 2,
 	DEATH = 3,
 	ONLINE = 4,
+	BUFF_UPDATE = 5,
 }
 local VERSION = 2
 
@@ -381,7 +382,8 @@ local DS_DATA_CONFIG = { passphrase = false, crc = false }
 local DS_ROOT = {'userdata/fight_stat/', PATH_TYPE.ROLE}
 local SZ_CFG_FILE = {'userdata/fight_stat/config.jx3dat', PATH_TYPE.ROLE}
 local SKILL_EFFECT_CACHE = {} -- 最近的技能效果缓存 （进战时候将最近的数据压进来）
-local SKILL_EFFECT_REPLAY_FRAME = GLOBAL.GAME_FPS * 1 -- 进战时候将多久的数据压进来（逻辑帧）
+local BUFF_UPDATE_CACHE = {} -- 最近的BUFF效果缓存 （进战时候将最近的数据压进来）
+local LOG_REPLAY_FRAME = GLOBAL.GAME_FPS * 1 -- 进战时候将多久的数据压进来（逻辑帧）
 
 -- 输出两个数里面小一点的那个 其中-1表示极大值
 local function Min(a, b)
@@ -575,7 +577,7 @@ LIB.RegisterEvent('MY_FIGHT_HINT', function()
 	end
 	if bFighting and szUUID ~= Data[DK.UUID] then -- 进入新的战斗
 		D.InitData()
-		D.ReplayRecentSkillEffect()
+		D.ReplayRecentLog()
 		FireUIEvent('MY_RECOUNT_NEW_FIGHT')
 	else
 		D.Flush()
@@ -798,19 +800,48 @@ end
 
 function D.OnSkillEffect(dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nResultCount, tResult)
 	local nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
-	while SKILL_EFFECT_CACHE[1] and nLFC - SKILL_EFFECT_CACHE[1][1] > SKILL_EFFECT_REPLAY_FRAME do
+	while SKILL_EFFECT_CACHE[1] and nLFC - SKILL_EFFECT_CACHE[1][1] > LOG_REPLAY_FRAME do
 		remove(SKILL_EFFECT_CACHE, 1)
 	end
 	insert(SKILL_EFFECT_CACHE, {nLFC, nTime, nTick, dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nResultCount, tResult})
 	D.ProcessSkillEffect(nLFC, nTime, nTick, dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nResultCount, tResult)
 end
 
-function D.ReplayRecentSkillEffect()
+function D.ProcessBuffUpdate(nLFC, nTime, nTick, dwCaster, dwTarget, dwBuffID, dwBuffLevel, nStackNum, bDelete, nEndFrame, bCanCancel)
+	local szEffectID = D.InitEffectData(Data, SKILL_EFFECT_TYPE.BUFF, dwBuffID, dwBuffLevel)
+	D.InitObjectData(Data, dwCaster)
+	D.InitObjectData(Data, dwTarget)
+	D.InsertEverything(
+		Data,
+		nLFC, nTime, nTick,
+		EVERYTHING_TYPE.BUFF_UPDATE,
+		dwCaster, dwTarget, dwBuffID, dwBuffLevel, szEffectID, bDelete, nStackNum, nEndFrame, bCanCancel)
+end
+
+function D.OnBuffUpdate(dwCaster, dwTarget, dwBuffID, dwBuffLevel, nStackNum, bDelete, nEndFrame, bCanCancel)
+	if dwBuffID == 0 then
+		return
+	end
+	local nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
+	while BUFF_UPDATE_CACHE[1] and nLFC - BUFF_UPDATE_CACHE[1][1] > LOG_REPLAY_FRAME do
+		remove(BUFF_UPDATE_CACHE, 1)
+	end
+	insert(BUFF_UPDATE_CACHE, {nLFC, nTime, nTick, dwCaster, dwTarget, dwBuffID, dwBuffLevel, nStackNum, bDelete, nEndFrame, bCanCancel})
+	D.ProcessBuffUpdate(nLFC, nTime, nTick, dwCaster, dwTarget, dwBuffID, dwBuffLevel, nStackNum, bDelete, nEndFrame, bCanCancel)
+end
+
+function D.ReplayRecentLog()
 	local nCurLFC = GetLogicFrameCount()
 	for _, v in ipairs(SKILL_EFFECT_CACHE) do
 		local nLFC, nTime, nTick, dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nResultCount, tResult = unpack(v)
-		if nCurLFC - nLFC <= SKILL_EFFECT_REPLAY_FRAME then
+		if nCurLFC - nLFC <= LOG_REPLAY_FRAME then
 			D.ProcessSkillEffect(nLFC, nTime, nTick, dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nResultCount, tResult)
+		end
+	end
+	for _, v in ipairs(BUFF_UPDATE_CACHE) do
+		local nLFC, nTime, nTick, dwCaster, dwTarget, dwBuffID, dwBuffLevel, nStackNum, bDelete, nEndFrame, bCanCancel = unpack(v)
+		if nCurLFC - nLFC <= LOG_REPLAY_FRAME then
+			D.ProcessBuffUpdate(nLFC, nTime, nTick, dwCaster, dwTarget, dwBuffID, dwBuffLevel, nStackNum, bDelete, nEndFrame, bCanCancel)
 		end
 	end
 end
@@ -1187,7 +1218,7 @@ function D.InitObjectData(data, dwID, szChannel)
 		end
 	end
 	-- 统计结构体
-	if not data[szChannel][DK_REC.STAT][dwID] then
+	if szChannel and not data[szChannel][DK_REC.STAT][dwID] then
 		data[szChannel][DK_REC.STAT][dwID] = {
 			[DK_REC_STAT.TOTAL       ] = 0 , -- 总输出
 			[DK_REC_STAT.TOTAL_EFFECT] = 0 , -- 有效输出
@@ -1414,6 +1445,19 @@ end)
 --         end
 --     end
 -- end)
+
+
+-- 系统BUFF监控（数据源）
+LIB.RegisterEvent('BUFF_UPDATE', function()
+	if not O.bEnable then
+		return
+	end
+	-- buff update：
+	-- arg0：dwPlayerID，arg1：bDelete，arg2：nIndex，arg3：bCanCancel
+	-- arg4：dwBuffID，arg5：nStackNum，arg6：nEndFrame，arg7：？update all?
+	-- arg8：nLevel，arg9：dwSkillSrcID
+	D.OnBuffUpdate(arg9, arg0, arg4, arg8, arg5, arg1, arg6, arg3)
+end)
 
 -- 有人死了活了做一下时间轴记录
 function D.OnTeammateStateChange(dwID, bLeave, nAwayType, bAddWhenRecEmpty)
