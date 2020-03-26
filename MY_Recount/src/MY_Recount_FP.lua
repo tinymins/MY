@@ -67,21 +67,26 @@ local PAGE_SIZE = 300
 local PAGE_DISPLAY = 19
 
 local function GeneCommonFormatText(szType, nIndex)
+	local tIndex = IsTable(szType)
+		and szType
+		or {[szType] = nIndex}
 	return function(r)
-		if szType == '*' or r[4] == szType then
-			return GetFormatText(r[nIndex])
+		local i = tIndex[r[4]] or tIndex['*']
+		if i then
+			return GetFormatText(r[i])
 		end
 		return GetFormatText('-')
 	end
 end
 local function GeneCommonCompare(szType, nIndex)
+	local tIndex = IsTable(szType)
+		and szType
+		or {[szType] = nIndex}
 	return function(r1, r2)
-		local v1 = (szType == '*' or r1[4] == szType)
-			and r1[nIndex]
-			or 0
-		local v2 = (szType == '*' or r2[4] == szType)
-			and r2[nIndex]
-			or 0
+		local i1 = tIndex[r1[4]] or tIndex['*']
+		local i2 = tIndex[r2[4]] or tIndex['*']
+		local v1 = i1 and r1[i1] or 0
+		local v2 = i2 and r2[i2] or 0
 		if v1 == v2 then
 			if r1[3] == r2[3] then
 				return 0
@@ -164,7 +169,7 @@ local COLUMN_LIST = {
 			end
 			return GetFormatText('-')
 		end,
-		Compare = GeneCommonCompare(EVERYTHING_TYPE.SKILL_EFFECT, 10)
+		Compare = GeneCommonCompare({[EVERYTHING_TYPE.SKILL_EFFECT] = 10, [EVERYTHING_TYPE.BUFF_UPDATE] = 9})
 	},
 	{
 		id = 'caster',
@@ -183,7 +188,7 @@ local COLUMN_LIST = {
 			end
 			return GetFormatText('-')
 		end,
-		Compare = GeneCommonCompare(EVERYTHING_TYPE.SKILL_EFFECT, 5)
+		Compare = GeneCommonCompare({[EVERYTHING_TYPE.SKILL_EFFECT] = 5, [EVERYTHING_TYPE.BUFF_UPDATE] = 5})
 	},
 	{
 		id = 'target',
@@ -202,7 +207,7 @@ local COLUMN_LIST = {
 			end
 			return GetFormatText('-')
 		end,
-		Compare = GeneCommonCompare(EVERYTHING_TYPE.SKILL_EFFECT, 6)
+		Compare = GeneCommonCompare({[EVERYTHING_TYPE.SKILL_EFFECT] = 6, [EVERYTHING_TYPE.BUFF_UPDATE] = 6})
 	},
 	{
 		id = 'skillresult',
@@ -319,7 +324,9 @@ function D.DrawHead(frame)
 		if i == 0 then
 			hCol:Lookup('Image_DungeonStat_Break'):Hide()
 		end
-		hCol.szKey = col.id
+		if col.Compare then
+			hCol.szKey = col.id
+		end
 		hCol:SetRelX(nX)
 		hCol:SetW(nWidth)
 		txt:SetW(nWidth)
