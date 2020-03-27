@@ -876,6 +876,7 @@ return {
 			szType = "LOOT",
 			dwType = TARGET.NPC,
 			dwID = 55065,
+			aPosition = {{99595,105495,1109056}},
 		},
 		{
 			nSerendipityID = 14,
@@ -916,10 +917,16 @@ return {
 		{
 			nSerendipityID = 18,
 			dwMapID = 193,
-			szType = "TRIGGER",
+			szType = "LOOT",
 			dwType = TARGET.NPC,
 			dwID = 56476,
 			aPosition = {{90747, 11840, 1152128}},
+		},
+		{
+			nSerendipityID = 18,
+			dwMapID = 193,
+			szType = "TRIGGER",
+			aPosition = {{90172,9341,1157632}},
 		},
 		{
 			nSerendipityID = 19,
@@ -1024,6 +1031,14 @@ return {
 			aPosition = {{39208, 70614, 1144832}},
 		},
 		{
+			nSerendipityID = 29,
+			dwMapID = 150,
+			szType = "LOOT",
+			dwType = TARGET.NPC,
+			dwID = 59336,
+			aPosition = {{39008,69908,1148800}},
+		},
+		{
 			nSerendipityID = 30,
 			dwMapID = 193,
 			szType = "TRIGGER",
@@ -1101,13 +1116,15 @@ return {
 			szType = "TRIGGER",
 			dwType = TARGET.NPC,
 			dwID = 65578,
+			aPosition = {{74246,58833,1075072}},
 		},
 		{
 			nSerendipityID = 37,
 			dwMapID = 411,
 			szType = "LOOT",
 			dwType = TARGET.DOODAD,
-			dwID = 2180,
+			dwID = 7707,
+			aPosition = {{74556,57757,1075136}},
 		},
 		{
 			nSerendipityID = 38,
@@ -1118,11 +1135,28 @@ return {
 			aPosition = {{40550, 27393, 1049984}},
 		},
 		{
+			nSerendipityID = 38,
+			dwMapID = 6,
+			szType = "LOOT",
+			dwType = TARGET.DOODAD,
+			dwID = 7763,
+			aPosition = {{41015,23468,1049728}},
+		},
+		{
+			nSerendipityID = 39,
+			dwMapID = 6,
+			szType = "LOOT",
+			dwType = TARGET.NPC,
+			dwID = 69040,
+			aPosition = {{62780,37639,1049152}},
+		},
+		{
 			nSerendipityID = 39,
 			dwMapID = 6,
 			szType = "TRIGGER",
-			dwType = TARGET.NPC,
-			dwID = 69040,
+			dwType = TARGET.DOODAD,
+			dwID = 6914,
+			aPosition = {{62713,38189,1048896}},
 		},
 		{
 			nSerendipityID = 40,
