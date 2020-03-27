@@ -400,6 +400,10 @@ end
 LIB.RegisterInit('MY_MiddleMapMark', D.Hook)
 
 function D.Unhook()
+	local h = Station.Lookup('Topmost1/MiddleMap', 'Handle_Inner/Handle_MY_MMM')
+	if h then
+		h:GetParent():RemoveItem(h)
+	end
 	UnhookTableFunc(MiddleMap, 'ShowMap', D.ShowMap)
 	UnhookTableFunc(MiddleMap, 'UpdateCurrentMap', D.UpdateCurrentMap)
 	UnhookTableFunc(MiddleMap, 'OnEditChanged', D.OnEditChanged)
