@@ -1059,7 +1059,7 @@ LIB.RegisterFrameCreate('SprintPower.MY_RoleStatistics_SerendipityEntry', D.Upda
 function D.OnMMMItemMouseEnter()
 	local mark = this.data
 	local aXml = {}
-	if mark.dwType == TARGET.NPC then
+	if mark.dwType and mark.dwID then
 		insert(aXml, GetFormatText(LIB.GetTemplateName(mark.dwType, mark.dwID) .. '\n', 162, 255, 255, 0))
 	end
 	if mark.nSerendipityID then
@@ -1107,12 +1107,13 @@ function D.DrawMapMark()
 				if nX > 0 and nY > 0 and nX < nW and nY < nH then
 					nCount = nCount + 1
 					if nCount > nItemCount then
-						hMMM:AppendItemFromString('<image>w=13 h=13 path="ui/Image/UICommon/CommonPanel4.UITex" frame=69 eventid=784</image>')
+						hMMM:AppendItemFromString('<image>w=10 h=10 alpha=210 path="ui/Image/UICommon/CommonPanel4.UITex" frame=69 eventid=784</image>')
 						nItemCount = nItemCount + 1
 					end
 					local item = hMMM:Lookup(nCount - 1)
 					item:Show()
 					item:SetRelPos(nX, nY)
+					item:SetFrame(mark.szType == 'TRIGGER' and 69 or 90)
 					item.data = mark
 					item.OnItemMouseEnter = D.OnMMMItemMouseEnter
 					item.OnItemMouseLeave = D.OnMMMItemMouseLeave
@@ -1128,8 +1129,8 @@ function D.DrawMapMark()
 end
 
 function D.HookMapMark()
-	HookTableFunc(MiddleMap, 'ShowMap', D.DrawMapMark)
-	HookTableFunc(MiddleMap, 'UpdateCurrentMap', D.DrawMapMark)
+	HookTableFunc(MiddleMap, 'ShowMap', D.DrawMapMark, { bAfterOrigin = true })
+	HookTableFunc(MiddleMap, 'UpdateCurrentMap', D.DrawMapMark, { bAfterOrigin = true })
 end
 LIB.RegisterInit('MY_RoleStatistics_SerendipityMapMark', D.HookMapMark)
 
