@@ -59,8 +59,8 @@ if LIB.IsDebugClient('MY_RoleStatistics_SerendipityStat', true) then
 		SaveDataToFile(data, PACKET_INFO.ROOT .. DAT_ROOT .. szFile, PASSPHRASE)
 	end
 end
-local SERENDIPITY_LIST = LIB.LoadLUAData(PLUGIN_ROOT .. '/data/serendipity/{$lang}.jx3dat', { passphrase = PASSPHRASE })
-if not SERENDIPITY_LIST then
+local SERENDIPITY_LIST, MAP_POINT_LIST = unpack(LIB.LoadLUAData(PLUGIN_ROOT .. '/data/serendipity/{$lang}.jx3dat', { passphrase = PASSPHRASE }) or {})
+if not SERENDIPITY_LIST or not MAP_POINT_LIST then
 	return LIB.Sysmsg(_L['MY_RoleStatistics_SerendipityStat'], _L['Cannot load serendipity data!!!'], CONSTANT.MSG_THEME.ERROR)
 end
 local SERENDIPITY_HASH = {}
@@ -996,7 +996,9 @@ function D.OnItemMouseLeave()
 	HideTip()
 end
 
+-------------------------------------------------------------------------------------------------------
 -- 浮动框
+-------------------------------------------------------------------------------------------------------
 function D.ApplyFloatEntry(bFloatEntry)
 	local frame = Station.Lookup('Normal/SprintPower')
 	if not frame then
@@ -1047,6 +1049,96 @@ end
 LIB.RegisterInit('MY_RoleStatistics_SerendipityEntry', D.UpdateFloatEntry)
 LIB.RegisterReload('MY_RoleStatistics_SerendipityEntry', function() D.ApplyFloatEntry(false) end)
 LIB.RegisterFrameCreate('SprintPower.MY_RoleStatistics_SerendipityEntry', D.UpdateFloatEntry)
+
+-------------------------------------------------------------------------------------------------------
+-- 地图标记
+-------------------------------------------------------------------------------------------------------
+function D.OnMMMItemMouseEnter()
+	local mark = this.data
+	local aXml = {}
+	if mark.dwType == TARGET.NPC then
+		insert(aXml, GetFormatText(LIB.GetTemplateName(mark.dwType, mark.dwID) .. '\n', 162, 255, 255, 0))
+	end
+	if mark.nSerendipityID then
+		local serendipity = SERENDIPITY_HASH[mark.nSerendipityID]
+		if serendipity then
+			insert(aXml, GetFormatText(serendipity.szName .. _L[' - '], 162, 255, 255, 255))
+		end
+	end
+	if mark.szType == 'TRIGGER' then
+		insert(aXml, GetFormatText(_L['Trigger'], 162, 255, 255, 255))
+	elseif mark.szType == 'LOOT' then
+		insert(aXml, GetFormatText(_L['Loot item'], 162, 255, 255, 255))
+	end
+	local x, y = this:GetAbsPos()
+	local w, h = this:GetSize()
+	OutputTip(concat(aXml), 450, {x, y, w, h}, UI.TIP_POSITION.TOP_BOTTOM)
+end
+
+function D.OnMMMItemMouseLeave()
+	HideTip()
+end
+
+function D.DrawMapMark()
+	local frame = Station.Lookup('Topmost1/MiddleMap')
+	local player = GetClientPlayer()
+	if not player or not frame or not frame:IsVisible() then
+		return
+	end
+	local dwMapID = MiddleMap.dwMapID or player.GetMapID()
+	local hInner = frame:Lookup('', 'Handle_Inner')
+	local nW, nH = hInner:GetSize()
+	local hMMM = hInner:Lookup('Handle_MY_SerendipityMMM')
+	if not hMMM then
+		hInner:AppendItemFromString('<handle>firstpostype=0 name="Handle_MY_SerendipityMMM" w=' .. nW .. ' h=' .. nH .. '</handle>')
+		hMMM = hInner:Lookup('Handle_MY_SerendipityMMM')
+		hInner:FormatAllItemPos()
+	end
+	local nCount = 0
+	local nItemCount = hMMM:GetItemCount()
+
+	for _, mark in ipairs(MAP_POINT_LIST) do
+		if mark.dwMapID == dwMapID and mark.aPosition then
+			for _, pos in ipairs(mark.aPosition) do
+				local nX, nY = MiddleMap.LPosToHPos(pos[1], pos[2], 13, 13)
+				if nX > 0 and nY > 0 and nX < nW and nY < nH then
+					nCount = nCount + 1
+					if nCount > nItemCount then
+						hMMM:AppendItemFromString('<image>w=13 h=13 path="ui/Image/UICommon/CommonPanel4.UITex" frame=69 eventid=784</image>')
+						nItemCount = nItemCount + 1
+					end
+					local item = hMMM:Lookup(nCount - 1)
+					item:Show()
+					item:SetRelPos(nX, nY)
+					item.data = mark
+					item.OnItemMouseEnter = D.OnMMMItemMouseEnter
+					item.OnItemMouseLeave = D.OnMMMItemMouseLeave
+				end
+			end
+		end
+	end
+
+	for i = nCount, nItemCount - 1 do
+		hMMM:Lookup(i):Hide()
+	end
+	hMMM:FormatAllItemPos()
+end
+
+function D.HookMapMark()
+	HookTableFunc(MiddleMap, 'ShowMap', D.DrawMapMark)
+	HookTableFunc(MiddleMap, 'UpdateCurrentMap', D.DrawMapMark)
+end
+LIB.RegisterInit('MY_RoleStatistics_SerendipityMapMark', D.HookMapMark)
+
+function D.UnhookMapMark()
+	local h = Station.Lookup('Topmost1/MiddleMap', 'Handle_Inner/Handle_MY_SerendipityMMM')
+	if h then
+		h:GetParent():RemoveItem(h)
+	end
+	UnhookTableFunc(MiddleMap, 'ShowMap', D.DrawMapMark)
+	UnhookTableFunc(MiddleMap, 'UpdateCurrentMap', D.DrawMapMark)
+end
+LIB.RegisterReload('MY_RoleStatistics_SerendipityMapMark', D.UnhookMapMark)
 
 -- Module exports
 do
