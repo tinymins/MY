@@ -69,8 +69,8 @@ local DBD_RI = DB:Prepare('SELECT templateid, poskey, mapid, x, y, name FROM Doo
 local DBD_RN = DB:Prepare('SELECT templateid, poskey, mapid, x, y, name FROM DoodadInfo WHERE name LIKE ?')
 local DBD_RNM = DB:Prepare('SELECT templateid, poskey, mapid, x, y, name FROM DoodadInfo WHERE name LIKE ? AND mapid = ?')
 
-MY_MiddleMapMark = {}
-do
+local D = {}
+
 ---------------------------------------------------------------
 -- 数据存储
 ---------------------------------------------------------------
@@ -178,7 +178,7 @@ end
 LIB.RegisterExit('MY_MiddleMapMark_Save', OnExit)
 
 local function Rerender()
-	MY_MiddleMapMark.Search(l_szKeyword)
+	D.Search(true)
 end
 
 local function AutomaticRerender()
@@ -294,7 +294,7 @@ local function OnDoodadEnterScene()
 end
 LIB.RegisterEvent('DOODAD_ENTER_SCENE.MY_MIDDLEMAPMARK', OnDoodadEnterScene)
 
-function MY_MiddleMapMark.SearchNpc(szText, dwMapID)
+function D.SearchNpc(szText, dwMapID)
 	local aInfos
 	local szSearch = AnsiToUTF8('%' .. szText .. '%')
 	if dwMapID then
@@ -322,7 +322,7 @@ function MY_MiddleMapMark.SearchNpc(szText, dwMapID)
 	return aInfos
 end
 
-function MY_MiddleMapMark.SearchDoodad(szText, dwMapID)
+function D.SearchDoodad(szText, dwMapID)
 	local aInfos
 	local szSearch = AnsiToUTF8('%' .. szText .. '%')
 	if dwMapID then
@@ -349,50 +349,28 @@ function MY_MiddleMapMark.SearchDoodad(szText, dwMapID)
 	end
 	return aInfos
 end
-end
 
 ---------------------------------------------------------------
 -- 中地图HOOK
 ---------------------------------------------------------------
 -- HOOK MAP SWITCH
-if MiddleMap._MY_MMM_ShowMap == nil then
-	MiddleMap._MY_MMM_ShowMap = MiddleMap.ShowMap or false
-end
-MiddleMap.ShowMap = function(...)
-	if MiddleMap._MY_MMM_ShowMap then
-		MiddleMap._MY_MMM_ShowMap(...)
-	end
-	MY_MiddleMapMark.Search(l_szKeyword)
+function D.ShowMap()
+	D.Search(true)
 end
 
-if MiddleMap._MY_MMM_UpdateCurrentMap == nil then
-	MiddleMap._MY_MMM_UpdateCurrentMap = MiddleMap.UpdateCurrentMap or false
-end
-MiddleMap.UpdateCurrentMap = function(...)
-	if MiddleMap._MY_MMM_UpdateCurrentMap then
-		MiddleMap._MY_MMM_UpdateCurrentMap(...)
-	end
-	MY_MiddleMapMark.Search(l_szKeyword)
+function D.UpdateCurrentMap()
+	D.Search(true)
 end
 
 -- HOOK OnEditChanged
-if MiddleMap._MY_MMM_OnEditChanged == nil then
-	MiddleMap._MY_MMM_OnEditChanged = MiddleMap.OnEditChanged or false
-end
-MiddleMap.OnEditChanged = function()
+function D.OnEditChanged()
 	if this:GetName() == 'Edit_Search' then
-		MY_MiddleMapMark.Search(this:GetText())
-	end
-	if MiddleMap._MY_MMM_OnEditChanged then
-		MiddleMap._MY_MMM_OnEditChanged()
+		LIB.DelayCall('MY_MiddleMapMark__EditChanged', 500, D.Search)
 	end
 end
 
 -- HOOK OnMouseEnter
-if MiddleMap._MY_MMM_OnMouseEnter == nil then
-	MiddleMap._MY_MMM_OnMouseEnter = MiddleMap.OnMouseEnter or false
-end
-MiddleMap.OnMouseEnter = function()
+function D.OnMouseEnter()
 	if this:GetName() == 'Edit_Search' then
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
@@ -403,38 +381,32 @@ MiddleMap.OnMouseEnter = function()
 			UI.TIP_POSITION.TOP_BOTTOM
 		)
 	end
-	if MiddleMap._MY_MMM_OnMouseEnter then
-		MiddleMap._MY_MMM_OnMouseEnter()
-	end
 end
 
 -- HOOK OnMouseLeave
-if MiddleMap._MY_MMM_OnMouseLeave == nil then
-	MiddleMap._MY_MMM_OnMouseLeave = MiddleMap.OnMouseLeave or false
-end
-MiddleMap.OnMouseLeave = function()
+function D.OnMouseLeave()
 	if this:GetName() == 'Edit_Search' then
 		HideTip()
 	end
-	if MiddleMap._MY_MMM_OnMouseLeave then
-		MiddleMap._MY_MMM_OnMouseLeave()
-	end
 end
 
-local function onReload()
-	for _, szKey in ipairs({
-		'OnEditChanged',
-		'OnMouseEnter',
-		'OnMouseLeave',
-		'UpdateCurrentMap',
-	}) do
-		if MiddleMap['_MY_MMM_' .. szKey] then
-			MiddleMap[szKey] = MiddleMap['_MY_MMM_' .. szKey]
-			MiddleMap['_MY_MMM_' .. szKey] = nil
-		end
-	end
+function D.Hook()
+	HookTableFunc(MiddleMap, 'ShowMap', D.ShowMap)
+	HookTableFunc(MiddleMap, 'UpdateCurrentMap', D.UpdateCurrentMap)
+	HookTableFunc(MiddleMap, 'OnEditChanged', D.OnEditChanged)
+	HookTableFunc(MiddleMap, 'OnMouseEnter', D.OnMouseEnter)
+	HookTableFunc(MiddleMap, 'OnMouseLeave', D.OnMouseLeave)
 end
-LIB.RegisterReload('MY_MiddleMapMark', onReload)
+LIB.RegisterInit('MY_MiddleMapMark', D.Hook)
+
+function D.Unhook()
+	UnhookTableFunc(MiddleMap, 'ShowMap', D.ShowMap)
+	UnhookTableFunc(MiddleMap, 'UpdateCurrentMap', D.UpdateCurrentMap)
+	UnhookTableFunc(MiddleMap, 'OnEditChanged', D.OnEditChanged)
+	UnhookTableFunc(MiddleMap, 'OnMouseEnter', D.OnMouseEnter)
+	UnhookTableFunc(MiddleMap, 'OnMouseLeave', D.OnMouseLeave)
+end
+LIB.RegisterReload('MY_MiddleMapMark', D.Unhook)
 
 -- start search
 local MAX_DISPLAY_COUNT = 1000
@@ -453,16 +425,16 @@ end
 local function OnMMMItemMouseLeave()
 	HideTip()
 end
-function MY_MiddleMapMark.Search(szKeyword)
+function D.Search(bForce)
 	local frame = Station.Lookup('Topmost1/MiddleMap')
 	local player = GetClientPlayer()
 	if not player or not frame or not frame:IsVisible() then
 		return
 	end
-
+	local szKeyword = frame:Lookup('Wnd_NormalMap/Wnd_Tool/Edit_Search'):GetText()
 	local dwMapID = MiddleMap.dwMapID or player.GetMapID()
 	local nMapIndex = MiddleMap.nIndex
-	if l_dwMapID == dwMapID and l_nMapIndex == nMapIndex and l_szKeyword == szKeyword then
+	if not bForce and l_dwMapID == dwMapID and l_nMapIndex == nMapIndex and l_szKeyword == szKeyword then
 		return
 	end
 	l_renderTime = GetTime()
@@ -494,7 +466,7 @@ function MY_MiddleMapMark.Search(szKeyword)
 	local nX, nY, item
 
 	for i, szSearch in ipairs(aKeywords) do
-		infos = MY_MiddleMapMark.SearchNpc(szSearch, dwMapID)
+		infos = D.SearchNpc(szSearch, dwMapID)
 		for _, info in ipairs(infos) do
 			if nCount < MAX_DISPLAY_COUNT then
 				nX, nY = MiddleMap.LPosToHPos(info.x, info.y, 13, 13)
@@ -523,7 +495,7 @@ function MY_MiddleMapMark.Search(szKeyword)
 	end
 
 	for i, szSearch in ipairs(aKeywords) do
-		infos = MY_MiddleMapMark.SearchDoodad(szSearch, dwMapID)
+		infos = D.SearchDoodad(szSearch, dwMapID)
 		for _, info in ipairs(infos) do
 			if nCount < MAX_DISPLAY_COUNT then
 				nX, nY = MiddleMap.LPosToHPos(info.x, info.y, 13, 13)
@@ -596,7 +568,7 @@ function PS.OnPanelActive(wnd)
 			local infos, szName, szTitle
 			list:ListBox('clear')
 
-			infos = MY_MiddleMapMark.SearchNpc(szText)
+			infos = D.SearchNpc(szText)
 			nCount = nCount + #infos
 			for _, info in ipairs(infos) do
 				szName  = info.decoded and info.name  or UTF8ToAnsi(info.name)
@@ -615,7 +587,7 @@ function PS.OnPanelActive(wnd)
 				end
 			end
 
-			infos = MY_MiddleMapMark.SearchDoodad(szText)
+			infos = D.SearchDoodad(szText)
 			nCount = nCount + #infos
 			for _, info in ipairs(infos) do
 				szName = info.decoded and info.name or UTF8ToAnsi(info.name)
