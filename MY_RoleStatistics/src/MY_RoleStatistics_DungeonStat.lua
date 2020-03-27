@@ -846,6 +846,9 @@ function D.ApplyFloatEntry(bFloatEntry)
 		btn.OnMouseLeave = function()
 			D.CloseRowTip()
 		end
+		btn.OnLButtonClick = function()
+			MY_RoleStatistics.Open('DungeonStat')
+		end
 	else
 		if not btn then
 			return
