@@ -391,11 +391,11 @@ function D.OnMouseLeave()
 end
 
 function D.Hook()
-	HookTableFunc(MiddleMap, 'ShowMap', D.ShowMap)
-	HookTableFunc(MiddleMap, 'UpdateCurrentMap', D.UpdateCurrentMap)
-	HookTableFunc(MiddleMap, 'OnEditChanged', D.OnEditChanged)
-	HookTableFunc(MiddleMap, 'OnMouseEnter', D.OnMouseEnter)
-	HookTableFunc(MiddleMap, 'OnMouseLeave', D.OnMouseLeave)
+	HookTableFunc(MiddleMap, 'ShowMap', D.ShowMap, { bAfterOrigin = true })
+	HookTableFunc(MiddleMap, 'UpdateCurrentMap', D.UpdateCurrentMap, { bAfterOrigin = true })
+	HookTableFunc(MiddleMap, 'OnEditChanged', D.OnEditChanged, { bAfterOrigin = true })
+	HookTableFunc(MiddleMap, 'OnMouseEnter', D.OnMouseEnter, { bAfterOrigin = true })
+	HookTableFunc(MiddleMap, 'OnMouseLeave', D.OnMouseLeave, { bAfterOrigin = true })
 end
 LIB.RegisterInit('MY_MiddleMapMark', D.Hook)
 
