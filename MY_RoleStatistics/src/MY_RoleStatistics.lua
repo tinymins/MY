@@ -55,8 +55,9 @@ local Framework = {}
 local SZ_INI = PLUGIN_ROOT .. '/ui/MY_RoleStatistics.ini'
 local SZ_MOD_INI = PLUGIN_ROOT .. '/ui/MY_RoleStatistics.Mod.ini'
 
-function D.Open()
-	Wnd.OpenWindow(SZ_INI, 'MY_RoleStatistics')
+function D.Open(szModule)
+	local frame = Wnd.OpenWindow(SZ_INI, 'MY_RoleStatistics')
+	D.ActivePage(frame, szModule or 1, true)
 end
 
 function D.Close()
@@ -97,7 +98,6 @@ end
 
 -- 初始化主界面 绘制分页按钮
 function D.InitPageSet(frame)
-	local pageAct
 	local pageset = frame:Lookup('PageSet_All')
 	for i, m in ipairs(O.aModule) do
 		local frameMod = Wnd.OpenWindow(SZ_MOD_INI, 'MY_RoleStatisticsMod')
@@ -112,15 +112,30 @@ function D.InitPageSet(frame)
 		checkbox:SetRelX(checkbox:GetRelX() + checkbox:GetW() * (i - 1))
 		checkbox.nIndex = i
 		page.nIndex = i
-		if not pageAct then
-			pageAct = page
+	end
+end
+
+function D.ActivePage(frame, szModule, bFirst)
+	local pageset = frame:Lookup('PageSet_All')
+	local pageActive = pageset:GetActivePage()
+	local nActiveIndex, nToIndex = pageActive.nIndex, nil
+	for i, m in ipairs(O.aModule) do
+		if m.szID == szModule or i == szModule then
+			nToIndex = i
 		end
 	end
-	if pageAct then
-		local _this = this
-		this = pageset
-		Framework.OnActivePage()
-		this = _this
+	if bFirst and not nToIndex then
+		nToIndex = 1
+	end
+	if nToIndex then
+		if nToIndex == nActiveIndex then
+			local _this = this
+			this = pageset
+			Framework.OnActivePage()
+			this = _this
+		else
+			pageset:ActivePage(nToIndex - 1)
+		end
 	end
 end
 
