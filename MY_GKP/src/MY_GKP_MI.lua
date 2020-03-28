@@ -447,6 +447,9 @@ end)
 -- 系统金团
 ----------------------------------------------------------------------<
 function D.SyncSystemGKP()
+	if not MY_GKP.bSyncSystem then
+		return
+	end
 	local GetInfo = _G.GoldTeamBase_GetAllBiddingInfos
 	if not GetInfo then
 		local env = GetInsideEnv()
@@ -550,6 +553,9 @@ function D.SyncSystemGKP()
 	end
 end
 LIB.RegisterEvent('BIDDING_OPERATION', function()
+	if not MY_GKP.bSyncSystem then
+		return
+	end
 	LIB.DelayCall('MY_GKP_MI__SyncSystemGKP', 150, D.SyncSystemGKP)
 end)
 LIB.RegisterInit('MY_GKP_MI__SyncSystemGKP', D.SyncSystemGKP)
