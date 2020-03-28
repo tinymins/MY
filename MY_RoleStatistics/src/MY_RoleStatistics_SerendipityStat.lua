@@ -584,6 +584,22 @@ function D.FlushDB()
 end
 LIB.RegisterFlush('MY_RoleStatistics_SerendipityStat', D.FlushDB)
 
+function D.GetClientPlayerRec()
+	local me = GetClientPlayer()
+	if not me then
+		return
+	end
+	D.FlushDB()
+	InfoG:ClearBindings()
+	InfoG:BindAll(me.GetGlobalID() or me.szName)
+	local result = InfoG:GetAll()
+	local rec = result[1]
+	if rec then
+		D.DecodeRow(rec)
+	end
+	return rec
+end
+
 function D.GetColumns()
 	local aCol = {}
 	for _, id in ipairs(O.aColumn) do
@@ -1029,19 +1045,10 @@ function D.ApplyFloatEntry(bFloatEntry)
 		btn:SetRelPos(61, 60)
 		Wnd.CloseWindow(frameTemp)
 		btn.OnMouseEnter = function()
-			local me = GetClientPlayer()
-			if not me then
-				return
-			end
-			D.FlushDB()
-			InfoG:ClearBindings()
-			InfoG:BindAll(me.GetGlobalID() or me.szName)
-			local result = InfoG:GetAll()
-			local rec = result[1]
+			local rec = D.GetClientPlayerRec()
 			if not rec then
 				return
 			end
-			D.DecodeRow(rec)
 			D.OutputRowTip(this, rec)
 		end
 		btn.OnMouseLeave = function()
@@ -1068,22 +1075,39 @@ LIB.RegisterFrameCreate('SprintPower.MY_RoleStatistics_SerendipityEntry', D.Upda
 -- 地图标记
 -------------------------------------------------------------------------------------------------------
 function D.OnMMMItemMouseEnter()
+	local me = GetClientPlayer()
+	if not me then
+		return
+	end
 	local mark = this.data
 	local aXml = {}
+	-- 名字
 	if mark.dwType and mark.dwID then
-		insert(aXml, GetFormatText(LIB.GetTemplateName(mark.dwType, mark.dwID) .. '\n', 162, 255, 255, 0))
+		insert(aXml, GetFormatText(LIB.GetTemplateName(mark.dwType, mark.dwID), 162, 255, 255, 0))
 	end
+	-- 当前统计
+	local col = mark.nSerendipityID and mark.szType == 'TRIGGER' and COLUMN_DICT[mark.nSerendipityID]
+	local rec = col and D.GetClientPlayerRec()
+	local szState, r, g, b = rec and col.GetText(rec)
+	if szState then
+		insert(aXml, GetFormatText('        ' .. szState .. '\n', 162, r, g, b))
+	else
+		insert(aXml, GetFormatText('\n', 162))
+	end
+	-- 奇遇名称
 	if mark.nSerendipityID then
 		local serendipity = SERENDIPITY_HASH[mark.nSerendipityID]
 		if serendipity then
 			insert(aXml, GetFormatText(serendipity.szName .. _L[' - '], 162, 255, 255, 255))
 		end
 	end
+	-- 奇遇类型
 	if mark.szType == 'TRIGGER' then
 		insert(aXml, GetFormatText(_L['Trigger'], 162, 255, 255, 255))
 	elseif mark.szType == 'LOOT' then
 		insert(aXml, GetFormatText(_L['Loot item'], 162, 255, 255, 255))
 	end
+	-- 调用显示
 	local x, y = this:GetAbsPos()
 	local w, h = this:GetSize()
 	OutputTip(concat(aXml), 450, {x, y, w, h}, UI.TIP_POSITION.TOP_BOTTOM)
