@@ -1083,16 +1083,7 @@ function D.OnMMMItemMouseEnter()
 	local aXml = {}
 	-- 名字
 	if mark.dwType and mark.dwID then
-		insert(aXml, GetFormatText(LIB.GetTemplateName(mark.dwType, mark.dwID), 162, 255, 255, 0))
-	end
-	-- 当前统计
-	local col = mark.nSerendipityID and mark.szType == 'TRIGGER' and COLUMN_DICT[mark.nSerendipityID]
-	local rec = col and D.GetClientPlayerRec()
-	local szState, r, g, b = rec and col.GetText(rec)
-	if szState then
-		insert(aXml, GetFormatText('        ' .. szState .. '\n', 162, r, g, b))
-	else
-		insert(aXml, GetFormatText('\n', 162))
+		insert(aXml, GetFormatText(LIB.GetTemplateName(mark.dwType, mark.dwID) .. '\n', 162, 255, 255, 0))
 	end
 	-- 奇遇名称
 	if mark.nSerendipityID then
@@ -1103,9 +1094,23 @@ function D.OnMMMItemMouseEnter()
 	end
 	-- 奇遇类型
 	if mark.szType == 'TRIGGER' then
-		insert(aXml, GetFormatText(_L['Trigger'], 162, 255, 255, 255))
+		insert(aXml, GetFormatText(_L['Trigger'] .. '\n', 162, 255, 255, 255))
 	elseif mark.szType == 'LOOT' then
-		insert(aXml, GetFormatText(_L['Loot item'], 162, 255, 255, 255))
+		insert(aXml, GetFormatText(_L['Loot item'] .. '\n', 162, 255, 255, 255))
+	end
+	-- 当前统计
+	local szState, r, g, b
+	if mark.nSerendipityID then
+		local col = COLUMN_DICT[mark.nSerendipityID]
+		if col then
+			local rec = D.GetClientPlayerRec()
+			if rec then
+				szState, r, g, b = col.GetText(rec)
+			end
+		end
+	end
+	if szState then
+		insert(aXml, GetFormatText(szState .. '\n', 162, r, g, b))
 	end
 	-- 调用显示
 	local x, y = this:GetAbsPos()
