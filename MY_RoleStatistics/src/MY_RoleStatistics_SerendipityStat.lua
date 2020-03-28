@@ -94,11 +94,13 @@ local O = {
 	szSort = 'time_days',
 	szSortOrder = 'desc',
 	bFloatEntry = false,
+	bMapMark = false,
 }
 RegisterCustomData('Global/MY_RoleStatistics_SerendipityStat.aColumn')
 RegisterCustomData('Global/MY_RoleStatistics_SerendipityStat.szSort')
 RegisterCustomData('Global/MY_RoleStatistics_SerendipityStat.szSortOrder')
 RegisterCustomData('MY_RoleStatistics_SerendipityStat.bFloatEntry')
+RegisterCustomData('MY_RoleStatistics_SerendipityStat.bMapMark')
 
 -----------------------------------------------------------------------------------------------
 -- 多个渠道奇遇次数监控
@@ -778,7 +780,16 @@ function D.OnInitPage()
 	Wnd.CloseWindow(frameTemp)
 
 	UI(wnd):Append('WndCheckBox', {
-		x = 670, y = 21, w = 180,
+		x = 540, y = 21, w = 130,
+		text = _L['Map mark'],
+		checked = MY_RoleStatistics_SerendipityStat.bMapMark,
+		oncheck = function()
+			MY_RoleStatistics_SerendipityStat.bMapMark = not MY_RoleStatistics_SerendipityStat.bMapMark
+		end,
+	})
+
+	UI(wnd):Append('WndCheckBox', {
+		x = 670, y = 21, w = 130,
 		text = _L['Float panel'],
 		checked = MY_RoleStatistics_SerendipityStat.bFloatEntry,
 		oncheck = function()
@@ -1132,7 +1143,6 @@ function D.HookMapMark()
 	HookTableFunc(MiddleMap, 'ShowMap', D.DrawMapMark, { bAfterOrigin = true })
 	HookTableFunc(MiddleMap, 'UpdateCurrentMap', D.DrawMapMark, { bAfterOrigin = true })
 end
-LIB.RegisterInit('MY_RoleStatistics_SerendipityMapMark', D.HookMapMark)
 
 function D.UnhookMapMark()
 	local h = Station.Lookup('Topmost1/MiddleMap', 'Handle_Inner/Handle_MY_SerendipityMMM')
@@ -1143,6 +1153,16 @@ function D.UnhookMapMark()
 	UnhookTableFunc(MiddleMap, 'UpdateCurrentMap', D.DrawMapMark)
 end
 LIB.RegisterReload('MY_RoleStatistics_SerendipityMapMark', D.UnhookMapMark)
+
+function D.CheckMapMark()
+	if O.bMapMark then
+		D.HookMapMark()
+		D.DrawMapMark()
+	else
+		D.UnhookMapMark()
+	end
+end
+LIB.RegisterInit('MY_RoleStatistics_SerendipityMapMark', D.CheckMapMark)
 
 -- Module exports
 do
@@ -1172,6 +1192,7 @@ local settings = {
 				szSort = true,
 				szSortOrder = true,
 				bFloatEntry = true,
+				bMapMark = true,
 			},
 			root = O,
 		},
@@ -1183,9 +1204,11 @@ local settings = {
 				szSort = true,
 				szSortOrder = true,
 				bFloatEntry = true,
+				bMapMark = true,
 			},
 			triggers = {
 				bFloatEntry = D.UpdateFloatEntry,
+				bMapMark = D.CheckMapMark,
 			},
 			root = O,
 		},
