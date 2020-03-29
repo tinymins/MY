@@ -235,6 +235,9 @@ function D.UpdateSaveDB()
 		return
 	end
 	if not O.bSaveDB then
+		--[[#DEBUG BEGIN]]
+		LIB.Debug('MY_RoleStatistics_BagStat', 'Remove from database...', DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
 		local guid = me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName
 		DB_ItemsDA:ClearBindings()
 		DB_ItemsDA:BindAll(guid)
@@ -242,6 +245,9 @@ function D.UpdateSaveDB()
 		DB_OwnerInfoD:ClearBindings()
 		DB_OwnerInfoD:BindAll(guid)
 		DB_OwnerInfoD:Execute()
+		--[[#DEBUG BEGIN]]
+		LIB.Debug('MY_RoleStatistics_BagStat', 'Remove from database finished...', DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
 	end
 	FireUIEvent('MY_ROLE_STAT_BAG_UPDATE')
 end

@@ -705,9 +705,15 @@ function D.UpdateSaveDB()
 		return
 	end
 	if not O.bSaveDB then
+		--[[#DEBUG BEGIN]]
+		LIB.Debug('MY_RoleStatistics_RoleStat', 'Remove from database...', DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
 		DB_RoleInfoD:ClearBindings()
 		DB_RoleInfoD:BindAll(me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName)
 		DB_RoleInfoD:Execute()
+		--[[#DEBUG BEGIN]]
+		LIB.Debug('MY_RoleStatistics_RoleStat', 'Remove from database finished...', DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
 	end
 	FireUIEvent('MY_ROLE_STAT_ROLE_UPDATE')
 end

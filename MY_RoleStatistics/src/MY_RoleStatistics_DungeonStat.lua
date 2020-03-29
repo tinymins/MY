@@ -398,9 +398,15 @@ function D.UpdateSaveDB()
 		return
 	end
 	if not O.bSaveDB then
+		--[[#DEBUG BEGIN]]
+		LIB.Debug('MY_RoleStatistics_DungeonStat', 'Remove from database...', DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
 		DB_DungeonInfoD:ClearBindings()
 		DB_DungeonInfoD:BindAll(me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName)
 		DB_DungeonInfoD:Execute()
+		--[[#DEBUG BEGIN]]
+		LIB.Debug('MY_RoleStatistics_DungeonStat', 'Remove from database finished...', DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
 	end
 	FireUIEvent('MY_ROLE_STAT_DUNGEON_UPDATE')
 end

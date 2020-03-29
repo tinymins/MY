@@ -621,9 +621,15 @@ function D.UpdateSaveDB()
 		return
 	end
 	if not O.bSaveDB then
+		--[[#DEBUG BEGIN]]
+		LIB.Debug('MY_RoleStatistics_SerendipityStat', 'Remove from database...', DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
 		InfoD:ClearBindings()
 		InfoD:BindAll(me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName)
 		InfoD:Execute()
+		--[[#DEBUG BEGIN]]
+		LIB.Debug('MY_RoleStatistics_SerendipityStat', 'Remove from database finished...', DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
 	end
 	FireUIEvent('MY_ROLE_STAT_SERENDIPITY_UPDATE')
 end
