@@ -60,6 +60,7 @@ local O = {
 	bAllDoodad = false, -- 其它全部
 	bCustom = true, -- 启用自定义
 	szCustom = '', -- 自定义列表
+	bRecent = true, -- 启用自动最近5分钟采集
 }
 RegisterCustomData('MY_GKPDoodad.bOpenLoot')
 RegisterCustomData('MY_GKPDoodad.bOpenLootEvenFight')
@@ -73,6 +74,7 @@ RegisterCustomData('MY_GKPDoodad.bQuestDoodad')
 RegisterCustomData('MY_GKPDoodad.bAllDoodad')
 RegisterCustomData('MY_GKPDoodad.bCustom')
 RegisterCustomData('MY_GKPDoodad.szCustom')
+RegisterCustomData('MY_GKPDoodad.bRecent')
 
 ---------------------------------------------------------------------
 -- 本地函数和变量
@@ -103,30 +105,53 @@ local D = {
 		4229, 4230, 5661, 5662,
 	},
 	tCustom = {}, -- 自定义列表
+	tRecent = {}, -- 最近采集的东西、自动继续采集
 	tDoodad = {}, -- 待处理的 doodad 列表
 	nToLoot = 0,  -- 待拾取处理数量（用于修复判断）
 }
 
+function D.IsCustomDoodad(doodad)
+	if O.bCustom and D.tCustom[doodad.szName] then
+		if doodad.nKind == DOODAD_KIND.CORPSE or doodad.nKind == DOODAD_KIND.NPCDROP then
+			return GetDoodadTemplate(doodad.dwTemplateID).dwCraftID == CONSTANT.CRAFT_TYPE.SKINNING
+		end
+		return true
+	end
+	return false
+end
+
+function D.IsRecentDoodad(doodad)
+	if O.bRecent and D.tRecent[doodad.dwTemplateID] then
+		if doodad.nKind == DOODAD_KIND.CORPSE or doodad.nKind == DOODAD_KIND.NPCDROP then
+			return GetDoodadTemplate(doodad.dwTemplateID).dwCraftID == CONSTANT.CRAFT_TYPE.SKINNING
+		end
+		return true
+	end
+	return false
+end
+
 -- try to add
 function D.TryAdd(dwID, bDelay)
+	if bDelay then
+		return LIB.DelayCall('MY_GKPDoodad__DelayTryAdd' .. dwID, 500, function() D.TryAdd(dwID) end)
+	end
 	local doodad = GetDoodad(dwID)
 	if doodad then
 		local data, me = nil, GetClientPlayer()
 		if doodad.nKind == DOODAD_KIND.CORPSE or doodad.nKind == DOODAD_KIND.NPCDROP then
-			if bDelay then
-				return LIB.DelayCall(500, function() D.TryAdd(dwID) end)
-			end
 			if O.bOpenLoot and doodad.CanLoot(me.dwID) then
 				data = { loot = true }
-			elseif O.bCustom and D.tCustom[doodad.szName]
-				and GetDoodadTemplate(doodad.dwTemplateID).dwCraftID == CONSTANT.CRAFT_TYPE.SKINNING
-			then
+			elseif D.IsCustomDoodad(doodad) then
 				data = { craft = true }
+			elseif D.IsRecentDoodad(doodad) then
+				data = { recent = true }
 			end
 		elseif O.bQuestDoodad and (doodad.dwTemplateID == 3713 or doodad.dwTemplateID == 3714) then
 			data = { craft = true }
-		elseif O.tCraft[doodad.szName] or (O.bCustom and D.tCustom[doodad.szName]) then
+		elseif D.IsCustomDoodad(doodad) then
 			data = { craft = true }
+		elseif D.IsRecentDoodad(doodad) then
+			data = { recent = true }
 		elseif doodad.HaveQuest(me.dwID) then
 			if O.bQuestDoodad then
 				data = { quest = true }
@@ -171,6 +196,7 @@ function D.ReloadCustom()
 		end
 	end
 	D.tCustom = t
+	D.tRecent = {}
 	D.RescanNearby()
 end
 
@@ -276,6 +302,18 @@ function D.OnAutoDoodad()
 				if doodad.dwOwnerID ~= 0 and IsPlayer(doodad.dwOwnerID) and not LIB.IsParty(doodad.dwOwnerID) then
 					bIntr = false
 				end
+			elseif v.recent then -- 最近采集的
+				bIntr = true
+				-- 从最近采集移除、意味着如果玩家打断这次采集就不会自动继续采集
+				D.tRecent[doodad.dwTemplateID] = nil
+				for dwID, _ in pairs(D.tDoodad) do
+					local d = GetDoodad(dwID)
+					if d and d.dwTemplateID == doodad.dwTemplateID then
+						D.TryAdd(dwID, true)
+						D.tDoodad[dwID] = nil
+					end
+				end
+				D.bUpdateLabel = true
 			end
 		end
 		if bOpen then
@@ -311,10 +349,11 @@ function D.OnOpenDoodad(dwID)
 	D.Remove(dwID) -- 从列表删除
 	local doodad = GetDoodad(dwID)
 	if doodad then
-		if IsAutoInteract() and O.bCustom
-			and D.tCustom[doodad.szName] and GetDoodadTemplate(doodad.dwTemplateID).dwCraftID == 3 --庖丁
-		then
+		if D.IsCustomDoodad(doodad) then --庖丁
 			D.tDoodad[dwID] = { craft = true }
+			D.bUpdateLabel = true
+		elseif D.IsRecentDoodad(doodad) then
+			D.tDoodad[dwID] = { recent = true }
 			D.bUpdateLabel = true
 		end
 	end
@@ -323,25 +362,24 @@ end
 
 -- save manual doodad
 function D.OnLootDoodad()
-	if not O.bCustom then
+	if not O.bRecent then
 		return
 	end
 	local doodad = GetDoodad(arg0)
-	if not doodad or doodad.CanLoot(GetClientPlayer().dwID) then
+	if not doodad then
 		return
 	end
 	local t = GetDoodadTemplate(doodad.dwTemplateID)
-	if (t.dwCraftID == CONSTANT.CRAFT_TYPE.MINING
-		or t.dwCraftID == CONSTANT.CRAFT_TYPE.HERBALISM
-		or t.dwCraftID == CONSTANT.CRAFT_TYPE.SKINNING)
-	and not O.tCraft[doodad.szName] then
-		for _, v in ipairs(D.tCraft) do
-			if v == doodad.dwTemplateID then
-				O.tCraft[doodad.szName] = true
-				return
+	if t.dwCraftID == CONSTANT.CRAFT_TYPE.MINING
+	or t.dwCraftID == CONSTANT.CRAFT_TYPE.HERBALISM
+	or t.dwCraftID == CONSTANT.CRAFT_TYPE.SKINNING then
+		D.tRecent[doodad.dwTemplateID] = true -- 加入最近采集列表
+		for _, d in ipairs(LIB.GetNearDoodad()) do
+			if d.dwTemplateID == doodad.dwTemplateID then
+				D.TryAdd(d.dwID)
 			end
 		end
-		D.tCustom[doodad.szName] = true
+		D.bUpdateLabel = true
 	end
 end
 
@@ -658,6 +696,16 @@ function PS.OnPanelActive(frame)
 
 	nX = ui:Append('WndCheckBox', {
 		x = nX, y = nY,
+		text = _L['Recent items'],
+		checked = MY_GKPDoodad.bRecent,
+		oncheck = function(bChecked)
+			MY_GKPDoodad.bRecent = bChecked
+		end,
+		autoenable = function() return MY_GKPDoodad.bShowName or MY_GKPDoodad.bInteract end,
+	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
+
+	nX = ui:Append('WndCheckBox', {
+		x = nX, y = nY,
 		text = _L['All other'],
 		checked = MY_GKPDoodad.bAllDoodad,
 		oncheck = function(bChecked)
@@ -721,6 +769,7 @@ local settings = {
 				bAllDoodad = true,
 				bCustom = true,
 				szCustom = true,
+				bRecent = true,
 			},
 			root = O,
 		},
@@ -740,6 +789,7 @@ local settings = {
 				bAllDoodad = true,
 				bCustom = true,
 				szCustom = true,
+				bRecent = true,
 			},
 			triggers = {
 				bOpenLoot = D.RescanNearby,
@@ -754,6 +804,7 @@ local settings = {
 				bAllDoodad = D.RescanNearby,
 				bCustom = D.RescanNearby,
 				szCustom = D.ReloadCustom,
+				bRecent = D.RescanNearby,
 			},
 			root = O,
 		},

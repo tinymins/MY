@@ -209,6 +209,7 @@ return {
 	['Show the head name'] = '显示头顶名字',
 	['Display minimap flag'] = '小地图中显示',
 	['Quest items'] = '任务物品',
+	['Recent items'] = '最近采集物品',
 	['All other'] = '其它全部',
 	['Customs (split by | )'] = '自定义（用|分隔）：',
 	['|'] = '｜',
