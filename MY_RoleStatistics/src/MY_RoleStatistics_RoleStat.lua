@@ -595,68 +595,92 @@ LIB.RegisterFrameCreate('regionPQreward.MY_RoleStatistics_RoleStat', function()
 	end
 end)
 
+do
+local REC_CACHE
+function D.GetClientPlayerRec()
+	local me = GetClientPlayer()
+	if not me then
+		return
+	end
+	local rec = REC_CACHE
+	local guid = me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName
+	if not rec then
+		rec = {
+			starve_remain = -1,
+		}
+		-- 如果在同一个CD周期 则保留数据库中的次数统计
+		DB_RoleInfoG:ClearBindings()
+		DB_RoleInfoG:BindAll(guid)
+		local result = DB_RoleInfoG:GetAll()
+		if result and result[1] and result[1].time then
+			local dwTime, dwCircle = LIB.GetRefreshTime('weekly')
+			if dwTime - dwCircle < result[1].time then
+				rec.starve_remain = result[1].starve_remain
+			end
+		end
+		REC_CACHE = rec
+	end
+
+	-- 基础信息
+	rec.guid = guid
+	rec.account = LIB.GetAccount() or ''
+	rec.region = LIB.GetRealServer(1)
+	rec.server = LIB.GetRealServer(2)
+	rec.name = me.szName
+	rec.force = me.dwForceID
+	rec.level = me.nLevel
+	rec.equip_score = me.GetBaseEquipScore() + me.GetStrengthEquipScore() + me.GetMountsEquipScore()
+	rec.pet_score = me.GetAcquiredFellowPetScore() + me.GetAcquiredFellowPetMedalScore()
+	local money = me.GetMoney()
+	rec.gold = money.nGold
+	rec.silver = money.nSilver
+	rec.copper = money.nCopper
+	rec.contribution = me.nContribution
+	rec.contribution_remain = me.GetContributionRemainSpace()
+	rec.justice = me.nJustice
+	rec.justice_remain = me.GetJusticeRemainSpace()
+	rec.prestige = me.nCurrentPrestige
+	rec.prestige_remain = me.GetPrestigeRemainSpace()
+	rec.camp_point = me.nTitlePoint
+	rec.camp_point_percentage = me.GetRankPointPercentage()
+	rec.camp_level = me.nTitle
+	rec.arena_award = me.nArenaAward
+	rec.arena_award_remain = me.GetArenaAwardRemainSpace()
+	rec.exam_print = me.nExamPrint
+	rec.exam_print_remain = me.GetExamPrintRemainSpace()
+	rec.achievement_score = me.GetAchievementRecord()
+	rec.coin = me.nCoin
+	rec.mentor_score = me.dwTAEquipsScore
+	rec.starve = LIB.GetItemAmountInAllPackages(5, 34797, true)
+	rec.time = GetCurrentTime()
+	return rec
+end
+end
+
 function D.FlushDB()
 	--[[#DEBUG BEGIN]]
 	LIB.Debug('MY_RoleStatistics_RoleStat', 'Flushing to database...', DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
-	local me = GetClientPlayer()
-	local guid = AnsiToUTF8(me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName)
-	local account = LIB.GetAccount() or ''
-	local region = AnsiToUTF8(LIB.GetRealServer(1))
-	local server = AnsiToUTF8(LIB.GetRealServer(2))
-	local name = AnsiToUTF8(me.szName)
-	local force = me.dwForceID
-	local level = me.nLevel
-	local equip_score = me.GetBaseEquipScore() + me.GetStrengthEquipScore() + me.GetMountsEquipScore()
-	local pet_score = me.GetAcquiredFellowPetScore() + me.GetAcquiredFellowPetMedalScore()
-	local money = me.GetMoney()
-	local gold = money.nGold
-	local silver = money.nSilver
-	local copper = money.nCopper
-	local contribution = me.nContribution
-	local contribution_remain = me.GetContributionRemainSpace()
-	local justice = me.nJustice
-	local justice_remain = me.GetJusticeRemainSpace()
-	local prestige = me.nCurrentPrestige
-	local prestige_remain = me.GetPrestigeRemainSpace()
-	local camp_point = me.nTitlePoint
-	local camp_point_percentage = me.GetRankPointPercentage()
-	local camp_level = me.nTitle
-	local arena_award = me.nArenaAward
-	local arena_award_remain = me.GetArenaAwardRemainSpace()
-	local exam_print = me.nExamPrint
-	local exam_print_remain = me.GetExamPrintRemainSpace()
-	local achievement_score = me.GetAchievementRecord()
-	local coin = me.nCoin
-	local mentor_score = me.dwTAEquipsScore
-	local starve = LIB.GetItemAmountInAllPackages(5, 34797, true)
-	local starve_remain = INFO_CACHE['starve_remain']
-	local time = GetCurrentTime()
 
-	if not starve_remain then
-		DB_RoleInfoG:ClearBindings()
-		DB_RoleInfoG:BindAll(guid)
-		local result = DB_RoleInfoG:GetAll()
-		if result and result[1] then
-			local dwTime, dwCircle = LIB.GetRefreshTime('weekly')
-			if dwTime - dwCircle < result[1].time then
-				starve_remain = result[1].starve_remain
-			end
-		end
-		if not starve_remain then
-			starve_remain = -1
-		end
-		INFO_CACHE['starve_remain'] = starve_remain
-	end
+	local rec = Clone(D.GetClientPlayerRec())
+	D.EncodeRow(rec)
 
 	DB:Execute('BEGIN TRANSACTION')
 
 	DB_RoleInfoW:ClearBindings()
-	DB_RoleInfoW:BindAll(guid, account, region, server, name, force, level, equip_score, pet_score, gold, silver, copper, contribution, contribution_remain, justice, justice_remain, prestige, prestige_remain, camp_point, camp_point_percentage, camp_level, arena_award, arena_award_remain, exam_print, exam_print_remain, achievement_score, coin, mentor_score, starve, starve_remain, time)
+	DB_RoleInfoW:BindAll(
+		rec.guid, rec.account, rec.region, rec.server,
+		rec.name, rec.force, rec.level, rec.equip_score,
+		rec.pet_score, rec.gold, rec.silver, rec.copper,
+		rec.contribution, rec.contribution_remain, rec.justice, rec.justice_remain,
+		rec.prestige, rec.prestige_remain, rec.camp_point, rec.camp_point_percentage,
+		rec.camp_level, rec.arena_award, rec.arena_award_remain, rec.exam_print,
+		rec.exam_print_remain, rec.achievement_score, rec.coin, rec.mentor_score,
+		rec.starve, rec.starve_remain, rec.time)
 	DB_RoleInfoW:Execute()
 
 	DB_RoleInfoCoinW:ClearBindings()
-	DB_RoleInfoCoinW:BindAll(coin, account, region)
+	DB_RoleInfoCoinW:BindAll(rec.coin, rec.account, rec.region)
 	DB_RoleInfoCoinW:Execute()
 
 	DB:Execute('END TRANSACTION')
@@ -757,6 +781,13 @@ function D.UpdateUI(page)
 		hRow:FormatAllItemPos()
 	end
 	hList:FormatAllItemPos()
+end
+
+function D.EncodeRow(rec)
+	rec.guid   = AnsiToUTF8(rec.guid)
+	rec.name   = AnsiToUTF8(rec.name)
+	rec.region = AnsiToUTF8(rec.region)
+	rec.server = AnsiToUTF8(rec.server)
 end
 
 function D.DecodeRow(rec)
@@ -1068,19 +1099,10 @@ function D.ApplyFloatEntry(bFloatEntry)
 		btn:SetRelPos(55, -8)
 		Wnd.CloseWindow(frameTemp)
 		btn.OnMouseEnter = function()
-			local me = GetClientPlayer()
-			if not me then
-				return
-			end
-			D.FlushDB()
-			DB_RoleInfoG:ClearBindings()
-			DB_RoleInfoG:BindAll(me.GetGlobalID() or me.szName)
-			local result = DB_RoleInfoG:GetAll()
-			local rec = result[1]
+			local rec = D.GetClientPlayerRec()
 			if not rec then
 				return
 			end
-			D.DecodeRow(rec)
 			D.OutputRowTip(this, rec)
 		end
 		btn.OnMouseLeave = function()

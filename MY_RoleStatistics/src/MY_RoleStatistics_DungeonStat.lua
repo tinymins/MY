@@ -329,31 +329,54 @@ local TIP_COLUMN = {
 	'time_days',
 }
 
-function D.FlushDB(bForceUpdate)
+do
+local REC_CACHE
+function D.GetClientPlayerRec(bForceUpdate)
+	local me = GetClientPlayer()
+	if not me then
+		return
+	end
+	local rec = REC_CACHE
+	local guid = me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName
+	if not rec then
+		rec = {}
+		REC_CACHE = rec
+	end
 	D.UpdateMapProgress(bForceUpdate)
+
+	-- »ù´¡ÐÅÏ¢
+	rec.guid = guid
+	rec.account = LIB.GetAccount() or ''
+	rec.region = LIB.GetRealServer(1)
+	rec.server = LIB.GetRealServer(2)
+	rec.name = me.szName
+	rec.force = me.dwForceID
+	rec.level = me.nLevel
+	rec.equip_score = me.GetBaseEquipScore() + me.GetStrengthEquipScore() + me.GetMountsEquipScore()
+	rec.time = GetCurrentTime()
+	rec.copy_info = O.tMapSaveCopy
+	rec.progress_info = O.tMapProgress
+	return rec
+end
+end
+
+function D.FlushDB(bForceUpdate)
 	--[[#DEBUG BEGIN]]
 	LIB.Debug('MY_RoleStatistics_DungeonStat', 'Flushing to database...', DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
-	local me = GetClientPlayer()
-	local guid = AnsiToUTF8(me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName)
-	local account = LIB.GetAccount() or ''
-	local region = AnsiToUTF8(LIB.GetRealServer(1))
-	local server = AnsiToUTF8(LIB.GetRealServer(2))
-	local name = AnsiToUTF8(me.szName)
-	local force = me.dwForceID
-	local level = me.nLevel
-	local equip_score = me.GetBaseEquipScore() + me.GetStrengthEquipScore() + me.GetMountsEquipScore()
-	local time = GetCurrentTime()
-	local copy_info = EncodeLUAData(O.tMapSaveCopy)
-	local progress_info = EncodeLUAData(O.tMapProgress)
+
+	local rec = Clone(D.GetClientPlayerRec(bForceUpdate))
+	D.EncodeRow(rec)
 
 	DB:Execute('BEGIN TRANSACTION')
-
 	DB_DungeonInfoW:ClearBindings()
-	DB_DungeonInfoW:BindAll(guid, account, region, server, name, force, level, equip_score, copy_info, progress_info, time)
+	DB_DungeonInfoW:BindAll(
+		rec.guid, rec.account, rec.region, rec.server,
+		rec.name, rec.force, rec.level, rec.equip_score,
+		rec.copy_info, rec.progress_info, rec.time)
 	DB_DungeonInfoW:Execute()
-
 	DB:Execute('END TRANSACTION')
+
 	--[[#DEBUG BEGIN]]
 	LIB.Debug('MY_RoleStatistics_DungeonStat', 'Flushing to database finished...', DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
@@ -506,6 +529,15 @@ LIB.RegisterEvent('SYNC_LOOT_LIST.MY_RoleStatistics_DungeonStat__UpdateMapCopy',
 	end
 	LIB.DelayCall('MY_RoleStatistics_DungeonStat__UpdateMapCopy', 300, function() D.UpdateMapProgress() end)
 end)
+
+function D.EncodeRow(rec)
+	rec.guid   = AnsiToUTF8(rec.guid)
+	rec.name   = AnsiToUTF8(rec.name)
+	rec.region = AnsiToUTF8(rec.region)
+	rec.server = AnsiToUTF8(rec.server)
+	rec.copy_info = EncodeLUAData(rec.copy_info)
+	rec.progress_info = EncodeLUAData(rec.progress_info)
+end
 
 function D.DecodeRow(rec)
 	rec.guid   = UTF8ToAnsi(rec.guid)
@@ -828,19 +860,10 @@ function D.ApplyFloatEntry(bFloatEntry)
 		btn:SetRelPos(72, 13)
 		Wnd.CloseWindow(frameTemp)
 		btn.OnMouseEnter = function()
-			local me = GetClientPlayer()
-			if not me then
-				return
-			end
-			D.FlushDB(true)
-			DB_DungeonInfoG:ClearBindings()
-			DB_DungeonInfoG:BindAll(me.GetGlobalID() or me.szName)
-			local result = DB_DungeonInfoG:GetAll()
-			local rec = result[1]
+			local rec = D.GetClientPlayerRec(true)
 			if not rec then
 				return
 			end
-			D.DecodeRow(rec)
 			D.OutputRowTip(this, rec)
 		end
 		btn.OnMouseLeave = function()

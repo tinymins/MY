@@ -517,88 +517,94 @@ for _, p in ipairs(COLUMN_LIST) do
 	COLUMN_DICT[p.id] = p
 end
 
-function D.FlushDB()
-	--[[#DEBUG BEGIN]]
-	LIB.Debug('MY_RoleStatistics_SerendipityStat', 'Flushing to database...', DEBUG_LEVEL.LOG)
-	--[[#DEBUG END]]
+do
+local REC_CACHE
+function D.GetClientPlayerRec()
 	local me = GetClientPlayer()
-	local guid = AnsiToUTF8(me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName)
-	local account = LIB.GetAccount() or ''
-	local region = AnsiToUTF8(LIB.GetRealServer(1))
-	local server = AnsiToUTF8(LIB.GetRealServer(2))
-	local name = AnsiToUTF8(me.szName)
-	local force = me.dwForceID
-	local camp = me.nCamp
-	local level = me.nLevel
-	local time = GetCurrentTime()
-	local tSerendipityInfo = {}
-	local tItemCount = {}
-
-	-- 如果在同一个CD周期 则保留数据库中的次数统计
-	InfoG:ClearBindings()
-	InfoG:BindAll(guid)
-	local result = InfoG:GetAll()
-	if result and result[1] and IsInSamePeriod(result[1].time) then
-		tSerendipityInfo = DecodeLUAData(result[1].serendipity_info) or tSerendipityInfo
-		tItemCount = DecodeLUAData(result[1].item_count) or tItemCount
+	if not me then
+		return
 	end
+	local rec = REC_CACHE
+	local guid = me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName
+	if not rec then
+		rec = {
+			serendipity_info = {},
+			item_count = {},
+		}
+		-- 如果在同一个CD周期 则保留数据库中的次数统计
+		InfoG:ClearBindings()
+		InfoG:BindAll(guid)
+		local result = InfoG:GetAll()
+		if result and result[1] and result[1].time and IsInSamePeriod(result[1].time) then
+			rec.serendipity_info = DecodeLUAData(result[1].serendipity_info) or rec.serendipity_info
+			rec.item_count = DecodeLUAData(result[1].item_count) or rec.item_count
+		end
+		rec.serendipity_info = rec.serendipity_info
+		rec.item_count = rec.item_count
+		REC_CACHE = rec
+	end
+
+	-- 基础信息
+	rec.guid = guid
+	rec.account = LIB.GetAccount() or ''
+	rec.region = LIB.GetRealServer(1)
+	rec.server = LIB.GetRealServer(2)
+	rec.name = me.szName
+	rec.force = me.dwForceID
+	rec.camp = me.nCamp
+	rec.level = me.nLevel
+	rec.time = GetCurrentTime()
 
 	-- 统计可信的次数
 	for _, serendipity in ipairs(SERENDIPITY_LIST) do
 		local nDailyCount = GetSerendipityDailyCount(me, serendipity)
 		if nDailyCount then
-			tSerendipityInfo[serendipity.nID] = nDailyCount
+			rec.serendipity_info[serendipity.nID] = nDailyCount
 		end
 		if serendipity.aAttemptItem then
 			for _, v in ipairs(serendipity.aAttemptItem) do
-				if not tItemCount[v[1]] then
-					tItemCount[v[1]] = {}
+				if not rec.item_count[v[1]] then
+					rec.item_count[v[1]] = {}
 				end
-				tItemCount[v[1]][v[2]] = LIB.GetItemAmountInAllPackages(v[1], v[2])
-				if IsEmpty(tItemCount[v[1]][v[2]]) then
-					tItemCount[v[1]][v[2]] = nil
+				rec.item_count[v[1]][v[2]] = LIB.GetItemAmountInAllPackages(v[1], v[2])
+				if IsEmpty(rec.item_count[v[1]][v[2]]) then
+					rec.item_count[v[1]][v[2]] = nil
 				end
-				if IsEmpty(tItemCount[v[1]]) then
-					tItemCount[v[1]] = nil
+				if IsEmpty(rec.item_count[v[1]]) then
+					rec.item_count[v[1]] = nil
 				end
 			end
 		end
 		if SERENDIPITY_COUNTER[serendipity.nID] then
-			tSerendipityInfo[serendipity.nID] = min((tSerendipityInfo[serendipity.nID] or 0) + SERENDIPITY_COUNTER[serendipity.nID], serendipity.nMaxAttemptNum)
+			rec.serendipity_info[serendipity.nID] = min((rec.serendipity_info[serendipity.nID] or 0) + SERENDIPITY_COUNTER[serendipity.nID], serendipity.nMaxAttemptNum)
 		end
 		SERENDIPITY_COUNTER[serendipity.nID] = nil
 	end
-	local serendipity_info = EncodeLUAData(tSerendipityInfo)
-	local item_count = EncodeLUAData(tItemCount)
+	return rec
+end
+end
+
+function D.FlushDB()
+	--[[#DEBUG BEGIN]]
+	LIB.Debug('MY_RoleStatistics_SerendipityStat', 'Flushing to database...', DEBUG_LEVEL.LOG)
+	--[[#DEBUG END]]
+
+	local rec = Clone(D.GetClientPlayerRec())
+	D.EncodeRow(rec)
 
 	DB:Execute('BEGIN TRANSACTION')
-
 	InfoW:ClearBindings()
-	InfoW:BindAll(guid, account, region, server, name, force, camp, level, serendipity_info, item_count, time)
+	InfoW:BindAll(
+		rec.guid, rec.account, rec.region, rec.server,
+		rec.name, rec.force, rec.camp, rec.level,
+		rec.serendipity_info, rec.item_count, rec.time)
 	InfoW:Execute()
-
 	DB:Execute('END TRANSACTION')
 	--[[#DEBUG BEGIN]]
 	LIB.Debug('MY_RoleStatistics_SerendipityStat', 'Flushing to database finished...', DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 end
 LIB.RegisterFlush('MY_RoleStatistics_SerendipityStat', D.FlushDB)
-
-function D.GetClientPlayerRec()
-	local me = GetClientPlayer()
-	if not me then
-		return
-	end
-	D.FlushDB()
-	InfoG:ClearBindings()
-	InfoG:BindAll(me.GetGlobalID() or me.szName)
-	local result = InfoG:GetAll()
-	local rec = result[1]
-	if rec then
-		D.DecodeRow(rec)
-	end
-	return rec
-end
 
 function D.GetColumns()
 	local aCol = {}
@@ -699,6 +705,15 @@ function D.UpdateUI(page)
 		hRow:FormatAllItemPos()
 	end
 	hList:FormatAllItemPos()
+end
+
+function D.EncodeRow(rec)
+	rec.guid = AnsiToUTF8(rec.guid)
+	rec.region = AnsiToUTF8(rec.region)
+	rec.server = AnsiToUTF8(rec.server)
+	rec.name = AnsiToUTF8(rec.name)
+	rec.serendipity_info = EncodeLUAData(rec.serendipity_info)
+	rec.item_count = EncodeLUAData(rec.item_count)
 end
 
 function D.DecodeRow(rec)

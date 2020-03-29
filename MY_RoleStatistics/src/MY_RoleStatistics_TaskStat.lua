@@ -626,39 +626,50 @@ local TIP_COLUMN = {
 	'time_days',
 }
 
-function D.FlushDB()
-	InitTaskList()
-	--[[#DEBUG BEGIN]]
-	LIB.Debug('MY_RoleStatistics_TaskStat', 'Flushing to database...', DEBUG_LEVEL.LOG)
-	--[[#DEBUG END]]
+do
+local REC_CACHE
+function D.GetClientPlayerRec()
 	local me = GetClientPlayer()
-	local guid = AnsiToUTF8(me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName)
-	local account = LIB.GetAccount() or ''
-	local region = AnsiToUTF8(LIB.GetRealServer(1))
-	local server = AnsiToUTF8(LIB.GetRealServer(2))
-	local name = AnsiToUTF8(me.szName)
-	local force = me.dwForceID
-	local camp = me.nCamp
-	local level = me.nLevel
-	local time = GetCurrentTime()
-	local tTaskState = {}
-	local tBuffState = {}
+	if not me then
+		return
+	end
+	local rec = REC_CACHE
+	local guid = me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName
+	if not rec then
+		rec = {}
+		REC_CACHE = rec
+	end
+	InitTaskList()
+
+	-- »ù´¡ÐÅÏ¢
+	rec.guid = guid
+	rec.account = LIB.GetAccount() or ''
+	rec.region = LIB.GetRealServer(1)
+	rec.server = LIB.GetRealServer(2)
+	rec.name = me.szName
+	rec.force = me.dwForceID
+	rec.camp = me.nCamp
+	rec.level = me.nLevel
+	rec.time = GetCurrentTime()
+	rec.task_info = {}
+	rec.buff_info = {}
+
 	for _, id in ipairs(O.aColumn) do
 		local task = TASK_HASH[id]
 		if task then
 			if task.aQuestInfo then
 				for _, aInfo in ipairs(task.aQuestInfo) do
-					tTaskState[aInfo[1]] = GetTaskState(me, aInfo[1], aInfo[2])
+					rec.task_info[aInfo[1]] = GetTaskState(me, aInfo[1], aInfo[2])
 				end
 			end
 			if task.tCampQuestInfo and task.tCampQuestInfo[me.nCamp] then
 				for _, aInfo in ipairs(task.tCampQuestInfo[me.nCamp]) do
-					tTaskState[aInfo[1]] = GetTaskState(me, aInfo[1], aInfo[2])
+					rec.task_info[aInfo[1]] = GetTaskState(me, aInfo[1], aInfo[2])
 				end
 			end
 			if task.tForceQuestInfo and task.tForceQuestInfo[me.dwForceID] then
 				for _, aInfo in ipairs(task.tForceQuestInfo[me.dwForceID]) do
-					tTaskState[aInfo[1]] = GetTaskState(me, aInfo[1], aInfo[2])
+					rec.task_info[aInfo[1]] = GetTaskState(me, aInfo[1], aInfo[2])
 				end
 			end
 			if task.aBuffInfo then
@@ -667,23 +678,33 @@ function D.FlushDB()
 						and TASK_STATE.FINISHED
 						or TASK_STATE.UNKNOWN
 					if nState == TASK_STATE.FINISHED then
-						tBuffState[aInfo[1] .. '_0'] = TASK_STATE.FINISHED
+						rec.buff_info[aInfo[1] .. '_0'] = TASK_STATE.FINISHED
 					end
-					tBuffState[aInfo[1] .. '_' .. (aInfo[2] or 0)] = nState
+					rec.buff_info[aInfo[1] .. '_' .. (aInfo[2] or 0)] = nState
 				end
 			end
 		end
 	end
-	local task_info = EncodeLUAData(tTaskState)
-	local buff_info = EncodeLUAData(tBuffState)
+	return rec
+end
+end
+
+function D.FlushDB()
+	--[[#DEBUG BEGIN]]
+	LIB.Debug('MY_RoleStatistics_TaskStat', 'Flushing to database...', DEBUG_LEVEL.LOG)
+	--[[#DEBUG END]]
+	local rec = Clone(D.GetClientPlayerRec())
+	D.EncodeRow(rec)
 
 	DB:Execute('BEGIN TRANSACTION')
-
 	DB_TaskInfoW:ClearBindings()
-	DB_TaskInfoW:BindAll(guid, account, region, server, name, force, camp, level, task_info, buff_info, time)
+	DB_TaskInfoW:BindAll(
+		rec.guid, rec.account, rec.region, rec.server,
+		rec.name, rec.force, rec.camp, rec.level,
+		rec.task_info, rec.buff_info, rec.time)
 	DB_TaskInfoW:Execute()
-
 	DB:Execute('END TRANSACTION')
+
 	--[[#DEBUG BEGIN]]
 	LIB.Debug('MY_RoleStatistics_TaskStat', 'Flushing to database finished...', DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
@@ -789,6 +810,15 @@ function D.UpdateUI(page)
 		hRow:FormatAllItemPos()
 	end
 	hList:FormatAllItemPos()
+end
+
+function D.EncodeRow(rec)
+	rec.guid   = AnsiToUTF8(rec.guid)
+	rec.name   = AnsiToUTF8(rec.name)
+	rec.region = AnsiToUTF8(rec.region)
+	rec.server = AnsiToUTF8(rec.server)
+	rec.task_info = EncodeLUAData(rec.task_info)
+	rec.buff_info = EncodeLUAData(rec.buff_info)
 end
 
 function D.DecodeRow(rec)
@@ -1081,19 +1111,10 @@ function D.ApplyFloatEntry(bFloatEntry)
 		btn:SetRelPos(72, 37)
 		Wnd.CloseWindow(frameTemp)
 		btn.OnMouseEnter = function()
-			local me = GetClientPlayer()
-			if not me then
-				return
-			end
-			D.FlushDB()
-			DB_TaskInfoG:ClearBindings()
-			DB_TaskInfoG:BindAll(me.GetGlobalID() or me.szName)
-			local result = DB_TaskInfoG:GetAll()
-			local rec = result[1]
+			local rec = D.GetClientPlayerRec()
 			if not rec then
 				return
 			end
-			D.DecodeRow(rec)
 			D.OutputRowTip(this, rec)
 		end
 		btn.OnMouseLeave = function()
