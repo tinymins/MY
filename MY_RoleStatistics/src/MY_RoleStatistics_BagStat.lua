@@ -81,9 +81,11 @@ local D = {}
 local O = {
 	bCompactMode = false,
 	tUncheckedNames = {},
+	bSaveDB = true,
 }
 RegisterCustomData('Global/MY_RoleStatistics_BagStat.bCompactMode')
 RegisterCustomData('Global/MY_RoleStatistics_BagStat.tUncheckedNames')
+RegisterCustomData('MY_RoleStatistics_BagStat.bSaveDB')
 
 do
 local GetItemText
@@ -140,6 +142,9 @@ end
 LIB.RegisterEvent('UPDATE_TONG_REPERTORY_PAGE.MY_RoleStatistics_BagStat', UpdateTongRepertoryPage)
 
 function D.FlushDB()
+	if not O.bSaveDB then
+		return
+	end
 	--[[#DEBUG BEGIN]]
 	LIB.Debug('MY_RoleStatistics_BagStat', 'Flushing to database...', DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
@@ -218,6 +223,29 @@ function D.FlushDB()
 	--[[#DEBUG END]]
 end
 LIB.RegisterFlush('MY_RoleStatistics_BagStat', D.FlushDB)
+end
+
+do local INIT = false
+function D.UpdateSaveDB()
+	if not INIT then
+		return
+	end
+	local me = GetClientPlayer()
+	if not me then
+		return
+	end
+	if not O.bSaveDB then
+		local guid = me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName
+		DB_ItemsDA:ClearBindings()
+		DB_ItemsDA:BindAll(guid)
+		DB_ItemsDA:Execute()
+		DB_OwnerInfoD:ClearBindings()
+		DB_OwnerInfoD:BindAll(guid)
+		DB_OwnerInfoD:Execute()
+	end
+	FireUIEvent('MY_ROLE_STAT_BAG_UPDATE')
+end
+LIB.RegisterInit('MY_RoleStatistics_BagUpdateSaveDB', function() INIT = true end)
 end
 
 function D.UpdateNames(page)
@@ -412,6 +440,7 @@ function D.OnInitPage()
 	local frame = this:GetRoot()
 	frame:RegisterEvent('MY_BAGSTATISTICS_MODE_CHANGE')
 	frame:RegisterEvent('ON_MY_MOSAICS_RESET')
+	frame:RegisterEvent('MY_ROLE_STAT_BAG_UPDATE')
 end
 
 function D.OnActivePage()
@@ -423,6 +452,9 @@ function D.OnEvent(event)
 	if event == 'MY_BAGSTATISTICS_MODE_CHANGE' then
 		D.UpdateItems(this)
 	elseif event == 'ON_MY_MOSAICS_RESET' then
+		D.UpdateNames(this)
+	elseif event == 'MY_ROLE_STAT_BAG_UPDATE' then
+		D.FlushDB()
 		D.UpdateNames(this)
 	end
 end
@@ -550,6 +582,7 @@ local settings = {
 		{
 			fields = {
 				OnInitPage = D.OnInitPage,
+				szSaveDB = 'MY_RoleStatistics_BagStat.bSaveDB',
 			},
 		},
 		{
@@ -569,6 +602,7 @@ local settings = {
 			fields = {
 				bCompactMode = true,
 				tUncheckedNames = true,
+				bSaveDB = true,
 			},
 			root = O,
 		},
@@ -578,11 +612,13 @@ local settings = {
 			fields = {
 				bCompactMode = true,
 				tUncheckedNames = true,
+				bSaveDB = true,
 			},
 			triggers = {
 				bCompactMode = function()
 					FireUIEvent('MY_BAGSTATISTICS_MODE_CHANGE')
 				end,
+				bSaveDB = D.UpdateSaveDB,
 			},
 			root = O,
 		},
