@@ -98,6 +98,7 @@ end
 
 -- 初始化主界面 绘制分页按钮
 function D.InitPageSet(frame)
+	frame.bInitPageset = true
 	local pageset = frame:Lookup('PageSet_All')
 	for i, m in ipairs(O.aModule) do
 		local frameMod = Wnd.OpenWindow(SZ_MOD_INI, 'MY_RoleStatisticsMod')
@@ -113,6 +114,7 @@ function D.InitPageSet(frame)
 		checkbox.nIndex = i
 		page.nIndex = i
 	end
+	frame.bInitPageset = nil
 end
 
 function D.ActivePage(frame, szModule, bFirst)
@@ -147,6 +149,9 @@ function Framework.OnLButtonClick()
 end
 
 function Framework.OnActivePage()
+	if this:GetRoot().bInitPageset then
+		return
+	end
 	local name = this:GetName()
 	if name == 'PageSet_All' then
 		local page = this:GetActivePage()
