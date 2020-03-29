@@ -204,6 +204,17 @@ function LIB.CopyChatLine(hTime, bTextEditor)
 				if emo then
 					edit:InsertObj(emo.szCmd, { type = 'emotion', text = emo.szCmd, id = emo.dwID })
 				end
+			else
+				local szImg, nFrame = p:GetImagePath()
+				if szImg == 'ui\\image\\common\\money.uitex' and nFrame == 0 then
+					edit:InsertText(_L['Gold'])
+				elseif szImg == 'ui\\image\\common\\money.uitex' and nFrame == 2 then
+					edit:InsertText(_L['Silver'])
+				elseif szImg == 'ui\\image\\common\\money.uitex' and nFrame == 1 then
+					edit:InsertText(_L['Copper'])
+				elseif szImg == 'ui\\image\\common\\money.uitex' and (nFrame == 31 or nFrame == 32 or nFrame == 33 or nFrame == 34) then
+					edit:InsertText(_L['Brics'])
+				end
 			end
 		end
 	end
