@@ -835,7 +835,7 @@ function D.OnInitPage()
 	Wnd.CloseWindow(frameTemp)
 
 	UI(wnd):Append('WndCheckBox', {
-		x = 540, y = 21, w = 130,
+		x = 670, y = 21, w = 130,
 		text = _L['Map mark'],
 		checked = MY_RoleStatistics_SerendipityStat.bMapMark,
 		oncheck = function()
