@@ -145,6 +145,31 @@ function Framework.OnLButtonClick()
 	local name = this:GetName()
 	if name == 'Btn_Close' then
 		D.Close()
+	elseif name == 'Btn_Option' then
+		local menu = {}
+		local tFloatEntryMenu = { szOption = _L['Float panel'] }
+		for _, m in ipairs(O.aModule) do
+			if m and m.env.szFloatEntry then
+				insert(tFloatEntryMenu, {
+					szOption = m.szName,
+					bCheck = true, bChecked = Get(_G, m.env.szFloatEntry),
+					fnAction = function()
+						Set(_G, m.env.szFloatEntry, not Get(_G, m.env.szFloatEntry))
+					end,
+				})
+			end
+		end
+		if #tFloatEntryMenu > 0 then
+			insert(menu, tFloatEntryMenu)
+		end
+		if #menu > 0 then
+			local nX, nY = this:GetAbsPos()
+			local nW, nH = this:GetSize()
+			menu.nMiniWidth = nW
+			menu.x = nX
+			menu.y = nY + nH
+			UI.PopupMenu(menu)
+		end
 	end
 end
 

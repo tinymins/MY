@@ -819,15 +819,6 @@ function D.OnInitPage()
 		end,
 	})
 
-	UI(wnd):Append('WndCheckBox', {
-		x = 670, y = 21, w = 130,
-		text = _L['Float panel'],
-		checked = MY_RoleStatistics_SerendipityStat.bFloatEntry,
-		oncheck = function()
-			MY_RoleStatistics_SerendipityStat.bFloatEntry = not MY_RoleStatistics_SerendipityStat.bFloatEntry
-		end,
-	})
-
 	UI(wnd):Append('WndComboBox', {
 		x = 800, y = 20, w = 180,
 		text = _L['Columns'],
@@ -1215,6 +1206,7 @@ local settings = {
 		{
 			fields = {
 				OnInitPage = D.OnInitPage,
+				szFloatEntry = 'MY_RoleStatistics_SerendipityStat.bFloatEntry',
 			},
 		},
 		{

@@ -825,15 +825,6 @@ function D.OnInitPage()
 	wnd:ChangeRelation(page, true, true)
 	Wnd.CloseWindow(frameTemp)
 
-	UI(wnd):Append('WndCheckBox', {
-		x = 470, y = 21, w = 180,
-		text = _L['Float panel'],
-		checked = MY_RoleStatistics_RoleStat.bFloatEntry,
-		oncheck = function()
-			MY_RoleStatistics_RoleStat.bFloatEntry = not MY_RoleStatistics_RoleStat.bFloatEntry
-		end,
-	})
-
 	-- œ‘ æ¡–
 	UI(wnd):Append('WndComboBox', {
 		x = 800, y = 20, w = 180,
@@ -1132,6 +1123,7 @@ local settings = {
 		{
 			fields = {
 				OnInitPage = D.OnInitPage,
+				szFloatEntry = 'MY_RoleStatistics_RoleStat.bFloatEntry',
 			},
 		},
 		{
