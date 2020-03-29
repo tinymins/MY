@@ -94,12 +94,14 @@ local O = {
 	szSort = 'time_days',
 	szSortOrder = 'desc',
 	bFloatEntry = false,
+	bSaveDB = true,
 	bMapMark = false,
 }
 RegisterCustomData('Global/MY_RoleStatistics_SerendipityStat.aColumn')
 RegisterCustomData('Global/MY_RoleStatistics_SerendipityStat.szSort')
 RegisterCustomData('Global/MY_RoleStatistics_SerendipityStat.szSortOrder')
 RegisterCustomData('MY_RoleStatistics_SerendipityStat.bFloatEntry')
+RegisterCustomData('MY_RoleStatistics_SerendipityStat.bSaveDB')
 RegisterCustomData('MY_RoleStatistics_SerendipityStat.bMapMark')
 
 -----------------------------------------------------------------------------------------------
@@ -585,6 +587,9 @@ end
 end
 
 function D.FlushDB()
+	if not O.bSaveDB then
+		return
+	end
 	--[[#DEBUG BEGIN]]
 	LIB.Debug('MY_RoleStatistics_SerendipityStat', 'Flushing to database...', DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
@@ -605,6 +610,25 @@ function D.FlushDB()
 	--[[#DEBUG END]]
 end
 LIB.RegisterFlush('MY_RoleStatistics_SerendipityStat', D.FlushDB)
+
+do local INIT = false
+function D.UpdateSaveDB()
+	if not INIT then
+		return
+	end
+	local me = GetClientPlayer()
+	if not me then
+		return
+	end
+	if not O.bSaveDB then
+		InfoD:ClearBindings()
+		InfoD:BindAll(me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName)
+		InfoD:Execute()
+	end
+	FireUIEvent('MY_ROLE_STAT_SERENDIPITY_UPDATE')
+end
+LIB.RegisterInit('MY_RoleStatistics_SerendipityUpdateSaveDB', function() INIT = true end)
+end
 
 function D.GetColumns()
 	local aCol = {}
@@ -1207,6 +1231,7 @@ local settings = {
 			fields = {
 				OnInitPage = D.OnInitPage,
 				szFloatEntry = 'MY_RoleStatistics_SerendipityStat.bFloatEntry',
+				szSaveDB = 'MY_RoleStatistics_SerendipityStat.bSaveDB',
 			},
 		},
 		{
@@ -1228,6 +1253,7 @@ local settings = {
 				szSort = true,
 				szSortOrder = true,
 				bFloatEntry = true,
+				bSaveDB = true,
 				bMapMark = true,
 			},
 			root = O,
@@ -1240,10 +1266,12 @@ local settings = {
 				szSort = true,
 				szSortOrder = true,
 				bFloatEntry = true,
+				bSaveDB = true,
 				bMapMark = true,
 			},
 			triggers = {
 				bFloatEntry = D.UpdateFloatEntry,
+				bSaveDB = D.UpdateSaveDB,
 				bMapMark = D.CheckMapMark,
 			},
 			root = O,

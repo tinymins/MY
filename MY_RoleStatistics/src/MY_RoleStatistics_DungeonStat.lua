@@ -78,11 +78,13 @@ local O = {
 	tMapProgress = {}, -- 单BOSS CD
 	bMapProgressApplied = false, -- 是否请求过副本进度
 	bFloatEntry = false,
+	bSaveDB = true,
 }
 RegisterCustomData('Global/MY_RoleStatistics_DungeonStat.aColumn')
 RegisterCustomData('Global/MY_RoleStatistics_DungeonStat.szSort')
 RegisterCustomData('Global/MY_RoleStatistics_DungeonStat.szSortOrder')
 RegisterCustomData('MY_RoleStatistics_DungeonStat.bFloatEntry')
+RegisterCustomData('MY_RoleStatistics_DungeonStat.bSaveDB')
 
 local EXCEL_WIDTH = 960
 local DUNGEON_WIDTH = 80
@@ -361,6 +363,9 @@ end
 end
 
 function D.FlushDB(bForceUpdate)
+	if not O.bSaveDB then
+		return
+	end
 	--[[#DEBUG BEGIN]]
 	LIB.Debug('MY_RoleStatistics_DungeonStat', 'Flushing to database...', DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
@@ -382,6 +387,25 @@ function D.FlushDB(bForceUpdate)
 	--[[#DEBUG END]]
 end
 LIB.RegisterFlush('MY_RoleStatistics_DungeonStat', function() D.FlushDB() end)
+
+do local INIT = false
+function D.UpdateSaveDB()
+	if not INIT then
+		return
+	end
+	local me = GetClientPlayer()
+	if not me then
+		return
+	end
+	if not O.bSaveDB then
+		DB_DungeonInfoD:ClearBindings()
+		DB_DungeonInfoD:BindAll(me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName)
+		DB_DungeonInfoD:Execute()
+	end
+	FireUIEvent('MY_ROLE_STAT_DUNGEON_UPDATE')
+end
+LIB.RegisterInit('MY_RoleStatistics_DungeonUpdateSaveDB', function() INIT = true end)
+end
 
 function D.GetColumns()
 	local aCol = {}
@@ -717,6 +741,7 @@ function D.OnInitPage()
 	frame:RegisterEvent('ON_MY_MOSAICS_RESET')
 	frame:RegisterEvent('UPDATE_DUNGEON_ROLE_PROGRESS')
 	frame:RegisterEvent('ON_APPLY_PLAYER_SAVED_COPY_RESPOND')
+	frame:RegisterEvent('MY_ROLE_STAT_DUNGEON_UPDATE')
 end
 
 function D.OnActivePage()
@@ -728,6 +753,9 @@ function D.OnEvent(event)
 	if event == 'ON_MY_MOSAICS_RESET' then
 		D.UpdateUI(this)
 	elseif event == 'UPDATE_DUNGEON_ROLE_PROGRESS' or event == 'ON_APPLY_PLAYER_SAVED_COPY_RESPOND' then
+		D.FlushDB()
+		D.UpdateUI(this)
+	elseif event == 'MY_ROLE_STAT_DUNGEON_UPDATE' then
 		D.FlushDB()
 		D.UpdateUI(this)
 	end
@@ -885,6 +913,7 @@ local settings = {
 			fields = {
 				OnInitPage = D.OnInitPage,
 				szFloatEntry = 'MY_RoleStatistics_DungeonStat.bFloatEntry',
+				szSaveDB = 'MY_RoleStatistics_DungeonStat.bSaveDB',
 			},
 		},
 		{
@@ -906,6 +935,7 @@ local settings = {
 				szSort = true,
 				szSortOrder = true,
 				bFloatEntry = true,
+				bSaveDB = true,
 			},
 			root = O,
 		},
@@ -917,9 +947,11 @@ local settings = {
 				szSort = true,
 				szSortOrder = true,
 				bFloatEntry = true,
+				bSaveDB = true,
 			},
 			triggers = {
 				bFloatEntry = D.UpdateFloatEntry,
+				bSaveDB = D.UpdateSaveDB,
 			},
 			root = O,
 		},

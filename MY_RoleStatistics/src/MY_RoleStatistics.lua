@@ -162,6 +162,21 @@ function Framework.OnLButtonClick()
 		if #tFloatEntryMenu > 0 then
 			insert(menu, tFloatEntryMenu)
 		end
+		local tSaveDBMenu = { szOption = _L['Save DB'] }
+		for _, m in ipairs(O.aModule) do
+			if m and m.env.szSaveDB then
+				insert(tSaveDBMenu, {
+					szOption = m.szName,
+					bCheck = true, bChecked = Get(_G, m.env.szSaveDB),
+					fnAction = function()
+						Set(_G, m.env.szSaveDB, not Get(_G, m.env.szSaveDB))
+					end,
+				})
+			end
+		end
+		if #tSaveDBMenu > 0 then
+			insert(menu, tSaveDBMenu)
+		end
 		if #menu > 0 then
 			local nX, nY = this:GetAbsPos()
 			local nW, nH = this:GetSize()

@@ -91,11 +91,13 @@ local O = {
 	szSort = 'time_days',
 	szSortOrder = 'desc',
 	bFloatEntry = false,
+	bSaveDB = true,
 }
 RegisterCustomData('Global/MY_RoleStatistics_TaskStat.aColumn')
 RegisterCustomData('Global/MY_RoleStatistics_TaskStat.szSort')
 RegisterCustomData('Global/MY_RoleStatistics_TaskStat.szSortOrder')
 RegisterCustomData('MY_RoleStatistics_TaskStat.bFloatEntry')
+RegisterCustomData('MY_RoleStatistics_TaskStat.bSaveDB')
 
 local TASK_TYPE = {
 	DAILY = 1,
@@ -438,6 +440,9 @@ local function InitTaskList(bReload)
 end
 
 local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
+	if not TASK_HASH then
+		InitTaskList()
+	end
 	local task = TASK_HASH[id]
 	if task then
 		local col = { -- ¸±±¾CD
@@ -690,6 +695,9 @@ end
 end
 
 function D.FlushDB()
+	if not O.bSaveDB then
+		return
+	end
 	--[[#DEBUG BEGIN]]
 	LIB.Debug('MY_RoleStatistics_TaskStat', 'Flushing to database...', DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
@@ -710,6 +718,25 @@ function D.FlushDB()
 	--[[#DEBUG END]]
 end
 LIB.RegisterFlush('MY_RoleStatistics_TaskStat', D.FlushDB)
+
+do local INIT = false
+function D.UpdateSaveDB()
+	if not INIT then
+		return
+	end
+	local me = GetClientPlayer()
+	if not me then
+		return
+	end
+	if not O.bSaveDB then
+		DB_TaskInfoD:ClearBindings()
+		DB_TaskInfoD:BindAll(me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName)
+		DB_TaskInfoD:Execute()
+	end
+	FireUIEvent('MY_ROLE_STAT_TASK_UPDATE')
+end
+LIB.RegisterInit('MY_RoleStatistics_TaskUpdateSaveDB', function() INIT = true end)
+end
 
 function D.GetColumns()
 	local aCol = {}
@@ -972,6 +999,7 @@ function D.OnInitPage()
 	frame:RegisterEvent('QUEST_CANCELED')
 	frame:RegisterEvent('QUEST_FINISHED')
 	frame:RegisterEvent('DAILY_QUEST_UPDATE')
+	frame:RegisterEvent('MY_ROLE_STAT_TASK_UPDATE')
 end
 
 function D.OnActivePage()
@@ -984,6 +1012,9 @@ function D.OnEvent(event)
 		D.UpdateUI(this)
 	elseif event == 'QUEST_ACCEPTED' or event == 'QUEST_CANCELED'
 	or event == 'QUEST_FINISHED' or event == 'DAILY_QUEST_UPDATE' then
+		D.FlushDB()
+		D.UpdateUI(this)
+	elseif event == 'MY_ROLE_STAT_TASK_UPDATE' then
 		D.FlushDB()
 		D.UpdateUI(this)
 	end
@@ -1136,6 +1167,7 @@ local settings = {
 			fields = {
 				OnInitPage = D.OnInitPage,
 				szFloatEntry = 'MY_RoleStatistics_TaskStat.bFloatEntry',
+				szSaveDB = 'MY_RoleStatistics_TaskStat.bSaveDB',
 			},
 		},
 		{
@@ -1157,6 +1189,7 @@ local settings = {
 				szSort = true,
 				szSortOrder = true,
 				bFloatEntry = true,
+				bSaveDB = true,
 			},
 			root = O,
 		},
@@ -1168,9 +1201,11 @@ local settings = {
 				szSort = true,
 				szSortOrder = true,
 				bFloatEntry = true,
+				bSaveDB = true,
 			},
 			triggers = {
 				bFloatEntry = D.UpdateFloatEntry,
+				bSaveDB = D.UpdateSaveDB,
 			},
 			root = O,
 		},

@@ -106,6 +106,7 @@ return {
 
     ['Map mark'] = '地图显示位置',
     ['Float panel'] = '头像浮动图标',
+    ['Save DB'] = '统计当前角色',
     ['%s before'] = '%s前',
     ['Refresh: %s'] = '刷新：%s',
 
