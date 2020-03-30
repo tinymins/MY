@@ -101,11 +101,9 @@ function D.CheckEnable()
 end
 
 LIB.RegisterInit('MY_AutoMemorizeBook', D.CheckEnable)
-LIB.RegisterReload('MY_AutoMemorizeBook', function()
-	UI('Normal/CraftReaderPanel/MY_AutoMemorizeBook'):Remove()
-end)
+LIB.RegisterReload('MY_AutoMemorizeBook', D.Unhook)
 LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_AutoMemorizeBook', function()
-	if arg0 and arg0 ~= 'MY_LifeBar' then
+	if arg0 and arg0 ~= 'MY_AutoMemorizeBook' then
 		return
 	end
 	D.CheckEnable()
