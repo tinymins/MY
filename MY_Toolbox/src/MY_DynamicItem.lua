@@ -95,7 +95,7 @@ function D.SaveMapConfig()
 	LIB.SaveLUAData(
 		{'userdata/dynamic_item/' .. D.GetMapID() .. '.jx3dat', PATH_TYPE.GLOBAL},
 		O.aList,
-		{ passphrase = false })
+		{ passphrase = false, crc = false })
 end
 
 function D.LoadMapConfig()
