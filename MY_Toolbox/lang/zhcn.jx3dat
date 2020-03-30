@@ -363,4 +363,8 @@ return {
     ['MY_AutoMemorizeBook'] = '自动阅读',
     ['Press SHIFT for temporary disable'] = '打开界面时按住SHIFT键可临时禁用',
     ['Auto memorize book has been disabled due to SHIFT key pressed.'] = '你按住了Shift键，自动阅读被禁用。',
+
+    ['MY_FriendTipLocation'] = '好友位置',
+    ['Show all friend tip location'] = '社交界面显示全部所在地',
+    ['(Different camp)'] = '（对立阵营）',
 }

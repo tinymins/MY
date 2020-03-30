@@ -1,7 +1,7 @@
 --------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
--- @desc     : 常用工具
+-- @desc     : 好友界面显示所有好友位置
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
@@ -39,7 +39,7 @@ local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAD
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Toolbox'
 local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
-local MODULE_NAME = 'MY_Toolbox'
+local MODULE_NAME = 'MY_FriendTipLocation'
 local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
 if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
@@ -47,47 +47,109 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
 end
 --------------------------------------------------------------------------
 
-do
-local TARGET_TYPE, TARGET_ID
-local function onHotKey()
-	if TARGET_TYPE then
-		LIB.SetTarget(TARGET_TYPE, TARGET_ID)
-		TARGET_TYPE, TARGET_ID = nil
-	else
-		TARGET_TYPE, TARGET_ID = LIB.GetTarget()
-		LIB.SetTarget(TARGET.PLAYER, UI_GetClientPlayerID())
+local D = {}
+local O = {
+	bEnable = false,
+}
+RegisterCustomData('MY_FriendTipLocation.bEnable')
+
+function D.Hook()
+	local frame = Station.Lookup('Normal/FriendTip')
+	if not frame then
+		return
 	end
-end
-LIB.RegisterHotKey('MY_AutoLoopMeAndTarget', _L['Loop target between me and target'], onHotKey)
+	local me = GetClientPlayer()
+	if not me then
+		return
+	end
+	local txtName = frame:Lookup('', 'Text_Name')
+	local txtTitle = frame:Lookup('Wnd_Friend', 'Text_WhereT')
+	local txtLocation = frame:Lookup('Wnd_Friend', 'Text_Where')
+	if not (txtName and txtTitle and txtLocation) then
+		return
+	end
+	if not txtLocation.__MY_SetText then
+		txtLocation.__MY_SetText = txtLocation.SetText
+		txtLocation.SetText = function(_, szText)
+			local info = txtName and LIB.GetFriend(txtName:GetText())
+			local card = info and info.isonline and GetFellowshipCardClient().GetFellowshipCardInfo(info.id)
+			if card then
+				szText = Table_GetMapName(card.dwMapID)
+				if (me.nCamp == CAMP.EVIL and card.nCamp == CAMP.GOOD)
+				or (me.nCamp == CAMP.GOOD and card.nCamp == CAMP.EVIL) then
+					szText = szText .. _L['(Different camp)']
+				end
+			end
+			txtLocation:__MY_SetText(szText)
+		end
+	end
 end
 
-local PS = {}
-function PS.OnPanelActive(wnd)
-	local ui = UI(wnd)
-	local X, Y = 20, 20
-	local W, H = ui:Size()
-	local x, y = X, Y
-	x, y = MY_GongzhanCheck.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_FooterTip.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	if MY_BagEx then
-		x, y = MY_BagEx.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	end
-	if MY_BagSort then
-		x, y = MY_BagSort.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	end
-	x, y = MY_VisualSkill.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_ShenxingHelper.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_AutoHideChat.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_WhisperMetion.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_ArenaHelper.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_ChangGeShadow.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_Memo.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_EnergyBar.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_AchievementWiki.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_LockFrame.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_AutoSell.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_DynamicItem.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_HideAnnounceBg.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_FriendTipLocation.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+function D.Unhook()
+	Wnd.CloseWindow('FriendTip')
 end
-LIB.RegisterPanel('MY_ToolBox', _L['toolbox'], _L['General'], 'UI/Image/Common/Money.UITex|243', PS)
+
+function D.CheckEnable()
+	if LIB.IsShieldedVersion('MY_FriendTipLocation') or not O.bEnable then
+		D.Unhook()
+		LIB.RegisterFrameCreate('FriendTip.MY_FriendTipLocation', false)
+	else
+		D.Hook()
+		LIB.RegisterFrameCreate('FriendTip.MY_FriendTipLocation', D.Hook)
+	end
+end
+
+LIB.RegisterInit('MY_FriendTipLocation', D.CheckEnable)
+LIB.RegisterReload('MY_FriendTipLocation', D.Unhook)
+LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_FriendTipLocation', function()
+	if arg0 and arg0 ~= 'MY_FriendTipLocation' then
+		return
+	end
+	D.CheckEnable()
+end)
+
+function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+	if not LIB.IsShieldedVersion('MY_FriendTipLocation') then
+		x = x + ui:Append('WndCheckBox', {
+			x = x, y = y,
+			text = _L['Show all friend tip location'],
+			checked = MY_FriendTipLocation.bEnable,
+			oncheck = function(bChecked)
+				MY_FriendTipLocation.bEnable = bChecked
+			end,
+		}):AutoWidth():Width() + 5
+		x, y = X, y + 25
+	end
+	return x, y
+end
+
+-- Global exports
+do
+local settings = {
+	exports = {
+		{
+			fields = {
+				OnPanelActivePartial = D.OnPanelActivePartial,
+			},
+		},
+		{
+			fields = {
+				bEnable = true,
+			},
+			root = O,
+		},
+	},
+	imports = {
+		{
+			fields = {
+				bEnable = true,
+			},
+			triggers = {
+				bEnable = D.CheckEnable,
+			},
+			root = O,
+		},
+	},
+}
+MY_FriendTipLocation = LIB.GeneGlobalNS(settings)
+end
