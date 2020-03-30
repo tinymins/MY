@@ -79,7 +79,7 @@ function D.GetLoverMenu(nType)
 	for _, v in ipairs(aGroup) do
 		local aFriend = me.GetFellowshipInfo(v.id) or {}
 		for _, vv in ipairs(aFriend) do
-			if vv.attraction >= MY_Love.nLoveAttraction and (nType ~= 1 or vv.attraction >= MY_Love.nDoubleLoveAttraction) then
+			if vv.istwoway and vv.attraction >= MY_Love.nLoveAttraction and (nType ~= 1 or vv.attraction >= MY_Love.nDoubleLoveAttraction) then
 				table.insert(m0, {
 					szOption = vv.name,
 					fnDisable = function() return not vv.isonline end,

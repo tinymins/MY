@@ -318,7 +318,7 @@ function D.GetLover()
 				end
 			end
 			-- 遍历到情缘，获取基础信息并返回
-			if info.id == dwLoverID then
+			if info.id == dwLoverID and info.istwoway then
 				local fellowClient = GetFellowshipCardClient()
 				if fellowClient then
 					local card = fellowClient.GetFellowshipCardInfo(info.id)
