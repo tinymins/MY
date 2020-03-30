@@ -238,13 +238,17 @@ function D.UpdateSaveDB()
 		--[[#DEBUG BEGIN]]
 		LIB.Debug('MY_RoleStatistics_BagStat', 'Remove from database...', DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
-		local guid = me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName
-		DB_ItemsDA:ClearBindings()
-		DB_ItemsDA:BindAll(guid)
-		DB_ItemsDA:Execute()
-		DB_OwnerInfoD:ClearBindings()
-		DB_OwnerInfoD:BindAll(guid)
-		DB_OwnerInfoD:Execute()
+		for _, guid in ipairs({
+			me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName,
+			'tong' .. me.dwTongID,
+		}) do
+			DB_ItemsDA:ClearBindings()
+			DB_ItemsDA:BindAll(guid)
+			DB_ItemsDA:Execute()
+			DB_OwnerInfoD:ClearBindings()
+			DB_OwnerInfoD:BindAll(guid)
+			DB_OwnerInfoD:Execute()
+		end
 		--[[#DEBUG BEGIN]]
 		LIB.Debug('MY_RoleStatistics_BagStat', 'Remove from database finished...', DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
