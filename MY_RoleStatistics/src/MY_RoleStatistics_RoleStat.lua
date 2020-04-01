@@ -580,6 +580,7 @@ for _, p in ipairs(ALERT_COLUMN) do
 	ALERT_COLUMN_DICT[p.id] = p
 end
 
+do
 local INFO_CACHE = {}
 LIB.RegisterFrameCreate('regionPQreward.MY_RoleStatistics_RoleStat', function()
 	local frame = arg0
@@ -597,7 +598,6 @@ LIB.RegisterFrameCreate('regionPQreward.MY_RoleStatistics_RoleStat', function()
 	end
 end)
 
-do
 local REC_CACHE
 function D.GetClientPlayerRec()
 	local me = GetClientPlayer()
@@ -655,6 +655,10 @@ function D.GetClientPlayerRec()
 	rec.mentor_score = me.dwTAEquipsScore
 	rec.starve = LIB.GetItemAmountInAllPackages(5, 34797, true)
 	rec.time = GetCurrentTime()
+
+	for k, v in pairs(INFO_CACHE) do
+		rec[k] = v
+	end
 	return rec
 end
 end
