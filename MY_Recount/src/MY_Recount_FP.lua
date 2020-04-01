@@ -361,6 +361,10 @@ function D.MatchRecSearch(data, rec, szSearch, nSearch, bEffectName, bCaster, bT
 		or (szSearch == _L['Death'] and rec[4] == EVERYTHING_TYPE.DEATH)
 		or (szSearch == _L['Online'] and rec[4] == EVERYTHING_TYPE.ONLINE and rec[6])
 		or (szSearch == _L['Offline'] and rec[4] == EVERYTHING_TYPE.ONLINE and not rec[6])
+		or (rec[4] == EVERYTHING_TYPE.DEATH and (
+			wfind(rec[7] or '', szSearch)
+			or wfind(rec[8] or '', szSearch)
+		))
 		or (rec[4] == EVERYTHING_TYPE.SKILL_EFFECT and (
 			nSearch == rec[8]
 			or (bCaster and nSearch == rec[5])
