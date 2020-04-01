@@ -1,7 +1,7 @@
 --------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
--- @desc     : 常用工具
+-- @desc     : 记住动态技能栏上次位置
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
@@ -39,7 +39,7 @@ local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAD
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Toolbox'
 local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
-local MODULE_NAME = 'MY_Toolbox'
+local MODULE_NAME = 'MY_DynamicActionBarPos'
 local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
 if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
@@ -47,48 +47,85 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
 end
 --------------------------------------------------------------------------
 
-do
-local TARGET_TYPE, TARGET_ID
-local function onHotKey()
-	if TARGET_TYPE then
-		LIB.SetTarget(TARGET_TYPE, TARGET_ID)
-		TARGET_TYPE, TARGET_ID = nil
-	else
-		TARGET_TYPE, TARGET_ID = LIB.GetTarget()
-		LIB.SetTarget(TARGET.PLAYER, UI_GetClientPlayerID())
-	end
-end
-LIB.RegisterHotKey('MY_AutoLoopMeAndTarget', _L['Loop target between me and target'], onHotKey)
+local D = {}
+local O = {
+	-- 设置项
+	bEnable = true,
+	tAnchor = nil,
+}
+RegisterCustomData('MY_DynamicActionBarPos.bEnable')
+
+function D.GetFrame()
+	return Station.Lookup('Lowest1/DynamicActionBar')
 end
 
-local PS = {}
-function PS.OnPanelActive(wnd)
-	local ui = UI(wnd)
-	local X, Y = 20, 20
-	local W, H = ui:Size()
-	local x, y = X, Y
-	x, y = MY_GongzhanCheck.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_FooterTip.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	if MY_BagEx then
-		x, y = MY_BagEx.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+function D.UpdateAnchor()
+	local an = O.bEnable and O.tAnchor
+	if not an then
+		return
 	end
-	if MY_BagSort then
-		x, y = MY_BagSort.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+	local frame = D.GetFrame()
+	if not frame then
+		return
 	end
-	x, y = MY_VisualSkill.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_ShenxingHelper.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_AutoHideChat.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_DynamicActionBarPos.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_WhisperMetion.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_ArenaHelper.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_ChangGeShadow.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_Memo.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_EnergyBar.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_AchievementWiki.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_LockFrame.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_AutoSell.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_DynamicItem.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_HideAnnounceBg.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_FriendTipLocation.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+	frame:SetPoint(an.s, 0, 0, an.r, an.x, an.y)
+	frame:CorrectPos()
 end
-LIB.RegisterPanel('MY_ToolBox', _L['toolbox'], _L['General'], 'UI/Image/Common/Money.UITex|243', PS)
+
+function D.SaveAnchor()
+	local frame = D.GetFrame()
+	if not frame then
+		return
+	end
+	O.tAnchor = GetFrameAnchor(frame, 'TOP_LEFT')
+end
+
+LIB.RegisterFrameCreate('DynamicActionBar.MY_DynamicActionBarPos', D.UpdateAnchor)
+LIB.RegisterFrameCreate('UI_SCALED.MY_DynamicActionBarPos', D.UpdateAnchor)
+LIB.RegisterEvent('ON_LEAVE_CUSTOM_UI_MODE.MY_DynamicActionBarPos', D.SaveAnchor)
+
+function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+	ui:Append('WndCheckBox', {
+		x = x, y = y, w = 130,
+		text = _L['Restore dynamic action bar pos'],
+		checked = MY_DynamicActionBarPos.bEnable,
+		oncheck = function()
+			MY_DynamicActionBarPos.bEnable = not MY_DynamicActionBarPos.bEnable
+		end,
+	}):AutoWidth()
+	y = y + 25
+	return x, y
+end
+
+-- Global exports
+do
+local settings = {
+	exports = {
+		{
+			fields = {
+				OnPanelActivePartial = D.OnPanelActivePartial,
+			},
+		},
+		{
+			fields = {
+				bEnable = true,
+				tAnchor = true,
+			},
+			root = O,
+		},
+	},
+	imports = {
+		{
+			fields = {
+				bEnable = true,
+				tAnchor = true,
+			},
+			triggers = {
+				bEnable = D.UpdateAnchor,
+			},
+			root = O,
+		},
+	},
+}
+MY_DynamicActionBarPos = LIB.GeneGlobalNS(settings)
+end
