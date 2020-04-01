@@ -13,6 +13,6 @@ return {
 
     ['Search'] = '搜索',
     ['Time Limited'] = '限时',
-    ['package searcher'] = '仓库背包搜索',
+    ['package searcher'] = '背包仓库搜索',
     ['compare with bag'] = '对比背包',
 }

@@ -367,14 +367,15 @@ function D.CheckInjection()
 end
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	ui:Append('WndCheckBox', {
-		x = x, y = y,
+	x = x + ui:Append('WndCheckBox', {
+		x = x, y = y, w = 200,
 		text = _L['Guild package sort and stack'],
 		checked = MY_BagSort.bGuildBank,
 		oncheck = function(bChecked)
 			MY_BagSort.bGuildBank = bChecked
 		end,
-	})
+	}):AutoWidth():Width() + 5
+	x = X
 	y = y + 25
 	return x, y
 end
