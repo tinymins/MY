@@ -3,7 +3,6 @@ return {
     -- MY_Toolbox.lua
     ['toolbox'] = '常用工具',
     ['infotip'] = '信息显示',
-    ['package searcher'] = '背包搜索',
     ['friend headtop tips'] = '附近好友高亮',
     ['friend headtop tips nav'] = '启用场景追踪点',
     ['tong member headtop tips'] = '附近帮会成员高亮',
@@ -367,4 +366,7 @@ return {
     ['MY_FriendTipLocation'] = '好友位置',
     ['Show all friend tip location'] = '社交界面显示全部所在地',
     ['(Different camp)'] = '（对立阵营）',
+
+    ['MY_DynamicActionBarPos'] = '动态技能栏位置',
+    ['Restore dynamic action bar pos'] = '记住上次动态技能栏所在位置',
 }

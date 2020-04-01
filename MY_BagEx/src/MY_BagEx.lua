@@ -272,7 +272,7 @@ local function Hook()
 		UI(frame):Append('WndCheckBox', {
 			name = 'WndCheckBox_Compare',
 			w = 100, x = 340, y = 56,
-			text = _L['compare with bag'],
+			text = _L['Compare with bag'],
 			checked = l_bCompareBank,
 			oncheck = function(bChecked)
 				if bChecked then
@@ -321,7 +321,7 @@ local function Hook()
 		UI('Normal/GuildBankPanel'):Append('WndCheckBox', {
 			name = 'WndCheckBox_Compare',
 			w = 100, x = 20, y = 475,
-			text = _L['compare with bag'],
+			text = _L['Compare with bag'],
 			checked = l_bCompareGuild,
 			oncheck = function(bChecked)
 				l_bCompareGuild = bChecked
@@ -425,7 +425,7 @@ LIB.RegisterReload('MY_BAGEX', function() Apply(false) end)
 function MY_BagEx.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, w = 200,
-		text = _L['package searcher'],
+		text = _L['Package searcher'],
 		checked = MY_BagEx.bEnable,
 		oncheck = function(bChecked)
 			MY_BagEx.Enable(bChecked)
