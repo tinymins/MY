@@ -131,7 +131,7 @@ function LIB.CopyChatLine(hTime, bTextEditor)
 	if not edit then
 		return
 	end
-	Station.Lookup('Lowest2/EditBox'):Show()
+	edit:GetRoot():Show()
 	edit:ClearText()
 	local h, i, bBegin, bContent = hTime:GetParent(), hTime:GetIndex(), nil, false
 	-- loop
@@ -1243,6 +1243,7 @@ end
 local HOOKED_UI = setmetatable({}, { __mode = 'k' })
 local function Hook(i)
 	local h = Station.Lookup('Lowest2/ChatPanel' .. i .. '/Wnd_Message', 'Handle_Message')
+		or Station.Lookup('Normal1/ChatPanel' .. i .. '/Wnd_Message', 'Handle_Message')
 	if h and not HOOKED_UI[h] then
 		HOOKED_UI[h] = true
 		HookTableFunc(h, 'AppendItemFromString', BeforeChatAppendItemFromString, { bHookParams = true })
@@ -1253,6 +1254,7 @@ LIB.RegisterEvent('CHAT_PANEL_OPEN.ChatPanelHook', function(event) Hook(arg0) en
 
 local function Unhook(i)
 	local h = Station.Lookup('Lowest2/ChatPanel' .. i .. '/Wnd_Message', 'Handle_Message')
+		or Station.Lookup('Normal1/ChatPanel' .. i .. '/Wnd_Message', 'Handle_Message')
 	if h and HOOKED_UI[h] then
 		HOOKED_UI[h] = nil
 		UnhookTableFunc(h, 'AppendItemFromString', BeforeChatAppendItemFromString)
