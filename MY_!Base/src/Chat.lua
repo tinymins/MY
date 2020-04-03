@@ -125,6 +125,7 @@ end
 -- ∏¥÷∆¡ƒÃÏ––
 function LIB.CopyChatLine(hTime, bTextEditor)
 	local edit = Station.Lookup('Lowest2/EditBox/Edit_Input')
+		or Station.Lookup('Normal1/EditBox/Edit_Input')
 	if bTextEditor then
 		edit = UI.OpenTextEditor():Find('.WndEdit')[1]
 	end
