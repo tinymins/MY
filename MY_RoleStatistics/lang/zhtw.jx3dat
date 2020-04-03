@@ -68,6 +68,7 @@ return {
 
     ['Columns'] = '顯示列',
     ['Columns alert when esc'] = '打開ESC界面提醒數值變化的列',
+    ['Today online '] = '今日在線',
     ['Current online '] = '本次登錄',
     ['Current week can acquire (%d+) Langke Jian.'] = '本周還可獲得(%d+)份浪客箋。',
 

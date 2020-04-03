@@ -93,6 +93,7 @@ local O = {
 		'arena_award',
 		'exam_print',
 	},
+	tAlertTodayVal = nil,
 	dwLastAlertTime = 0,
 	bFloatEntry = false,
 	bSaveDB = true,
@@ -101,6 +102,7 @@ RegisterCustomData('Global/MY_RoleStatistics_RoleStat.aColumn')
 RegisterCustomData('Global/MY_RoleStatistics_RoleStat.szSort')
 RegisterCustomData('Global/MY_RoleStatistics_RoleStat.szSortOrder')
 RegisterCustomData('Global/MY_RoleStatistics_RoleStat.aAlertColumn')
+RegisterCustomData('Global/MY_RoleStatistics_RoleStat.tAlertTodayVal')
 RegisterCustomData('MY_RoleStatistics_RoleStat.bFloatEntry')
 RegisterCustomData('MY_RoleStatistics_RoleStat.bSaveDB')
 
@@ -1085,6 +1087,14 @@ LIB.RegisterInit('MY_RoleStatistics_RoleStat__AlertCol', function()
 	for _, col in ipairs(ALERT_COLUMN) do
 		ALERT_INIT_VAL[col.id] = col.GetValue(me)
 	end
+	if not IsTable(O.tAlertTodayVal) or not IsNumber(O.tAlertTodayVal.nTime)
+	or not LIB.IsInSameRefreshTime('daily', O.tAlertTodayVal.nTime) then
+		O.tAlertTodayVal = {}
+		for _, col in ipairs(ALERT_COLUMN) do
+			O.tAlertTodayVal[col.id] = col.GetValue(me)
+		end
+		O.tAlertTodayVal.nTime = GetCurrentTime()
+	end
 end)
 LIB.RegisterFrameCreate('OptionPanel.MY_RoleStatistics_RoleStat__AlertCol', function()
 	local me = GetClientPlayer()
@@ -1093,18 +1103,25 @@ LIB.RegisterFrameCreate('OptionPanel.MY_RoleStatistics_RoleStat__AlertCol', func
 		tVal[col.id] = col.GetValue(me)
 	end
 
-	local aText = {}
+	local aText, aDailyText = {}, {}
 	for _, id in ipairs(O.aAlertColumn) do
 		local col = ALERT_COLUMN_DICT[id]
 		if col then
 			insert(aText, (col.GetCompareText(ALERT_INIT_VAL, tVal)))
+			insert(aDailyText, (col.GetCompareText(O.tAlertTodayVal, tVal)))
 		end
 	end
-	local szText = concat(aText, GetFormatSysmsgText(_L[',']))
-	if not IsEmpty(szText) and (GetTime() - O.dwLastAlertTime > 10000 or O.szLastAlert ~= szText) then
+	local szText, szDailyText = concat(aText, GetFormatSysmsgText(_L[','])), concat(aDailyText, GetFormatSysmsgText(_L[',']))
+	if GetTime() - O.dwLastAlertTime > 10000 or O.szLastAlert ~= szText or O.szLastDailyAlert ~= szDailyText then
+		if not IsEmpty(szText) then
+			LIB.Sysmsg({ GetFormatSysmsgText(_L['Current online ']) .. szText .. GetFormatSysmsgText(_L['.']), rich = true })
+		end
+		if not IsEmpty(szDailyText) then
+			LIB.Sysmsg({ GetFormatSysmsgText(_L['Today online ']) .. szDailyText .. GetFormatSysmsgText(_L['.']), rich = true })
+		end
 		O.dwLastAlertTime = GetTime()
 		O.szLastAlert = szText
-		LIB.Sysmsg({ GetFormatSysmsgText(_L['Current online ']) .. szText .. GetFormatSysmsgText(_L['.']), rich = true })
+		O.szLastDailyAlert = szDailyText
 	end
 end)
 
@@ -1184,6 +1201,7 @@ local settings = {
 				szSort = true,
 				szSortOrder = true,
 				aAlertColumn = true,
+				tAlertTodayVal = true,
 				bFloatEntry = true,
 				bSaveDB = true,
 			},
@@ -1197,6 +1215,7 @@ local settings = {
 				szSort = true,
 				szSortOrder = true,
 				aAlertColumn = true,
+				tAlertTodayVal = true,
 				bFloatEntry = true,
 				bSaveDB = true,
 			},
