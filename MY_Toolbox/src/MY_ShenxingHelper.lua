@@ -182,7 +182,9 @@ LIB.RegisterInit('MY_ShenxingHelper', D.Apply)
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 'auto',
-		text = _L['avoid blacking shenxing cd'],
+		text = _L['Avoid blacking shenxing cd'],
+		tip = _L['Got zhenyan wen shenxing, your shengxing will be blacked.'],
+		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 		checked = MY_ShenxingHelper.bAvoidBlackCD,
 		oncheck = function(bChecked)
 			MY_ShenxingHelper.bAvoidBlackCD = bChecked

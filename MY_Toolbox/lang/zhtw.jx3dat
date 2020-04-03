@@ -9,7 +9,7 @@ return {
     ['tong member headtop tips nav'] = '啟用場景追蹤點',
 
     ['check nearby gongzhan'] = '檢測附近共戰',
-    ['Detected [%s] has Gongzhan BUFF for %d second(s).'] = '檢測到[%s]共戰BUFF剩餘%d秒。',
+    ['Detected [%s] has Gongzhan BUFF for %d second(s).'] = '檢測到[%s]共戰氣勁剩餘%d秒。',
 
     ['* infomation tips'] = '※ 信息條（SHIFT+U移動位置）',
 
@@ -46,7 +46,7 @@ return {
 
     ['GongZhan'] = '共戰',
     ['Scanning gongzhan: %d/%d'] = '正在掃描共戰：%d/%d',
-    ['Detected [%s] has GongZhan buff for %s.'] = '檢測到[%s]共戰BUFF剩餘%s。',
+    ['Detected [%s] has GongZhan buff for %s.'] = '檢測到[%s]共戰江湖氣勁剩餘%s。',
     ['Nearby GongZhan Total Count: %d.'] = '附近共戰數量：%d。',
     ['------------------------------------'] = '————————————————————————',
     ['auto hide chat panel'] = '自動隱藏聊天欄',
@@ -55,10 +55,11 @@ return {
     ['visual skill'] = '顯示歷史招式列表',
     ['display %d skills.'] = '顯示%d格。',
 
-    ['avoid blacking shenxing cd'] = '防止神行CD被吃',
+    ['Avoid blacking shenxing cd'] = '防止開陣導致神行千里失敗',
+    ['Got zhenyan wen shenxing, your shengxing will be blacked.'] = '在神行千里施法過程中獲得陣眼，神行會進入調息狀態但角色仍然會停留在原地（邏輯組調息判定寫挫了）。',
     ['Shenxing has been cancelled, cause you got the zhenyan.'] = '您獲取到陣眼，為防止神行千里CD被黑，讀條已自動打斷。',
 
-    ['auto switch talk channel when into battle field'] = '進出戰場JJC時自動切換團隊/戰場頻道',
+    ['auto switch talk channel when into battle field'] = '進出戰場、競技場時自動切換團隊/戰場頻道',
 
     ['The kill sequence is: '] = '正確擊殺順序：',
     ['failed to calc.'] = '計算失敗。',
