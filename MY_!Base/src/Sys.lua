@@ -245,6 +245,16 @@ if PACKET_INFO.DEBUG_LEVEL <= DEBUG_LEVEL.DEBUG then
 		'Lowest2/ChatPanel8',
 		'Lowest2/ChatPanel9',
 		'Lowest2/EditBox',
+		'Normal1/ChatPanel1',
+		'Normal1/ChatPanel2',
+		'Normal1/ChatPanel3',
+		'Normal1/ChatPanel4',
+		'Normal1/ChatPanel5',
+		'Normal1/ChatPanel6',
+		'Normal1/ChatPanel7',
+		'Normal1/ChatPanel8',
+		'Normal1/ChatPanel9',
+		'Normal1/EditBox',
 		'Normal/' .. PACKET_INFO.NAME_SPACE,
 	}
 	LIB.RegisterHotKey(PACKET_INFO.NAME_SPACE .. '_STAGE_CHAT', _L['Display only chat panel'], function()
@@ -2253,7 +2263,7 @@ end
 end
 
 function LIB.EditBox_AppendLinkPlayer(szName)
-	local edit = Station.Lookup('Lowest2/EditBox/Edit_Input')
+	local edit = LIB.GetChatInputEdit()
 	edit:InsertObj('['.. szName ..']', { type = 'name', text = '['.. szName ..']', name = szName })
 	Station.SetFocusWindow(edit)
 	return true
@@ -2265,7 +2275,7 @@ function LIB.EditBox_AppendLinkItem(dwID)
 		return false
 	end
 	local szName = '[' .. LIB.GetItemNameByItem(item) ..']'
-	local edit = Station.Lookup('Lowest2/EditBox/Edit_Input')
+	local edit = LIB.GetChatInputEdit()
 	edit:InsertObj(szName, { type = 'item', text = szName, item = item.dwID })
 	Station.SetFocusWindow(edit)
 	return true

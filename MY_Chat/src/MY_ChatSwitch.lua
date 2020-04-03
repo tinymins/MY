@@ -123,12 +123,15 @@ end
 
 local function OnAwayCheck()
 	LIB.SwitchChat('/afk')
-	Station.Lookup('Lowest2/EditBox'):Show()
-	if Station.Lookup('Lowest2/EditBox/Edit_Input'):GetText() == '' then
-		Station.Lookup('Lowest2/EditBox/Edit_Input'):InsertText(MY_ChatSwitch.szAway or g_tStrings.STR_AUTO_REPLAY_LEAVE)
-		Station.Lookup('Lowest2/EditBox/Edit_Input'):SelectAll()
+	local edit = LIB.GetChatInputEdit()
+	if edit then
+		edit:GetRoot():Show()
+		if edit:GetText() == '' then
+			edit:InsertText(MY_ChatSwitch.szAway or g_tStrings.STR_AUTO_REPLAY_LEAVE)
+			edit:SelectAll()
+		end
+		Station.SetFocusWindow(edit)
 	end
-	Station.SetFocusWindow('Lowest2/EditBox/Edit_Input')
 end
 
 local function OnAwayUncheck()
@@ -139,12 +142,15 @@ local function OnAwayTip() return MY_ChatSwitch.szAway or g_tStrings.STR_AUTO_RE
 
 local function OnBusyCheck()
 	LIB.SwitchChat('/atr')
-	Station.Lookup('Lowest2/EditBox'):Show()
-	if Station.Lookup('Lowest2/EditBox/Edit_Input'):GetText() == '' then
-		Station.Lookup('Lowest2/EditBox/Edit_Input'):InsertText(MY_ChatSwitch.szBusy or g_tStrings.STR_AUTO_REPLAY_LEAVE)
-		Station.Lookup('Lowest2/EditBox/Edit_Input'):SelectAll()
+	local edit = LIB.GetChatInputEdit()
+	if edit then
+		edit:GetRoot():Show()
+		if edit:GetText() == '' then
+			edit:InsertText(MY_ChatSwitch.szBusy or g_tStrings.STR_AUTO_REPLAY_LEAVE)
+			edit:SelectAll()
+		end
+		Station.SetFocusWindow(edit)
 	end
-	Station.SetFocusWindow('Lowest2/EditBox/Edit_Input')
 end
 
 local function OnBusyUncheck()
@@ -267,8 +273,11 @@ RegisterCustomData('MY_ChatSwitch.bAlertBeforeClear')
 
 local function OnChannelCheck()
 	LIB.SwitchChat(this.info.channel)
-	Station.Lookup('Lowest2/EditBox'):Show()
-	Station.SetFocusWindow('Lowest2/EditBox/Edit_Input')
+	local edit = LIB.GetChatInputEdit()
+	if edit then
+		edit:GetRoot():Show()
+		Station.SetFocusWindow(edit)
+	end
 	this:Check(false)
 end
 

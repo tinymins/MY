@@ -42,10 +42,15 @@ local _L = LIB.LoadLangPack()
 local RENDERED_FLAG_KEY = 'b' .. PACKET_INFO.NAME_SPACE .. 'ChatRendered'
 local ITEM_LBUTTONDOWN_KEY = '__' .. PACKET_INFO.NAME_SPACE .. '_OnItemLButtonDown'
 
+function LIB.GetChatInputEdit()
+	return Station.Lookup('Lowest2/EditBox/Edit_Input')
+		or Station.Lookup('Normal1/EditBox/Edit_Input')
+end
+
 -- 海鳗里面抠出来的
 -- 聊天复制并发布
 function LIB.RepeatChatLine(hTime)
-	local edit = Station.Lookup('Lowest2/EditBox/Edit_Input')
+	local edit = LIB.GetChatInputEdit()
 	if not edit then
 		return
 	end
@@ -124,7 +129,7 @@ end
 
 -- 复制聊天行
 function LIB.CopyChatLine(hTime, bTextEditor)
-	local edit = Station.Lookup('Lowest2/EditBox/Edit_Input')
+	local edit = LIB.GetChatInputEdit()
 		or Station.Lookup('Normal1/EditBox/Edit_Input')
 	if bTextEditor then
 		edit = UI.OpenTextEditor():Find('.WndEdit')[1]
@@ -262,7 +267,7 @@ function ChatLinkEvents.OnNameLClick(element, link)
 		end
 	else
 		LIB.SwitchChat(UI(link):Text())
-		local edit = Station.Lookup('Lowest2/EditBox/Edit_Input')
+		local edit = LIB.GetChatInputEdit()
 		if edit then
 			Station.SetFocusWindow(edit)
 		end
@@ -420,7 +425,7 @@ end
 
 -- 复制Item到输入框
 function LIB.CopyChatItem(p)
-	local edit = Station.Lookup('Lowest2/EditBox/Edit_Input')
+	local edit = LIB.GetChatInputEdit()
 	if not edit then
 		return
 	end
@@ -606,15 +611,21 @@ function LIB.SwitchChat(nChannel)
 	if szHeader then
 		SwitchChatChannel(szHeader)
 	elseif nChannel == PLAYER_TALK_CHANNEL.WHISPER then
-		Station.Lookup('Lowest2/EditBox'):Show()
-		Station.Lookup('Lowest2/EditBox/Edit_Input'):SetText('/w ')
-		Station.SetFocusWindow('Lowest2/EditBox/Edit_Input')
+		local edit = LIB.GetChatInputEdit()
+		if edit then
+			edit:GetRoot():Show()
+			edit:SetText('/w ')
+			Station.SetFocusWindow(edit)
+		end
 	elseif type(nChannel) == 'string' then
 		if string.sub(nChannel, 1, 1) == '/' then
 			if nChannel == '/cafk' or nChannel == '/catr' then
 				SwitchChatChannel(nChannel)
 				LIB.Talk(nil, nChannel, nil, nil, nil, true)
-				Station.Lookup('Lowest2/EditBox'):Show()
+				local edit = LIB.GetChatInputEdit()
+				if edit then
+					edit:GetRoot():Show()
+				end
 			else
 				SwitchChatChannel(nChannel..' ')
 			end
@@ -627,7 +638,10 @@ end
 
 -- 将焦点设置到聊天栏
 function LIB.FocusChatBox()
-	Station.SetFocusWindow('Lowest2/EditBox/Edit_Input')
+	local edit = LIB.GetChatInputEdit()
+	if edit then
+		Station.SetFocusWindow(edit)
+	end
 end
 
 do
@@ -875,7 +889,7 @@ function LIB.Talk(nChannel, szText, szUUID, bNoEscape, bSaveDeny, bPushToChatBox
 		end
 	end
 	if bPushToChatBox or (bSaveDeny and not LIB.CanTalk(nChannel)) then
-		local edit = Station.Lookup('Lowest2/EditBox/Edit_Input')
+		local edit = LIB.GetChatInputEdit()
 		edit:ClearText()
 		for _, v in ipairs(tSay) do
 			edit:InsertObj(v.text, v)
@@ -909,7 +923,7 @@ function LIB.EditBoxInsertItemInfo(dwTabType, dwIndex, nBookInfo, nVersion)
 	if not nVersion then
 		nVersion = GLOBAL.CURRENT_ITEM_VERSION
 	end
-	local edit = Station.Lookup('Lowest2/EditBox/Edit_Input')
+	local edit = LIB.GetChatInputEdit()
 	if itemInfo.nGenre == ITEM_GENRE.BOOK then
 		if not nBookInfo then
 			return false

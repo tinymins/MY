@@ -1265,7 +1265,7 @@ end
 
 function RaidTools.OnAppendEdit()
 	local handle = this:GetParent()
-	local edit = Station.Lookup('Lowest2/EditBox/Edit_Input')
+	local edit = LIB.GetChatInputEdit()
 	edit:ClearText()
 	for i = this:GetIndex(), handle:GetItemCount() do
 		local h = handle:Lookup(i)

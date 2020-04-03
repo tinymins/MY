@@ -517,7 +517,7 @@ function D.OnItemLButtonDown()
 				data   = { type = 'text', text = szName }
 			end
 			if szName then
-				local edit = Station.Lookup('Lowest2/EditBox/Edit_Input')
+				local edit = LIB.GetChatInputEdit()
 				edit:InsertObj(szName, data)
 				Station.SetFocusWindow(edit)
 			end

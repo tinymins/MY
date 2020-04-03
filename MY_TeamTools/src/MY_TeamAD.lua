@@ -99,7 +99,7 @@ function PS.OnPanelActive(wnd)
 
 	nX = X + 10
 	nX = ui:Append('WndButton2', { x = nX, y = nY + 10, text = _L['Save Advertising'] }):Click(function(bChecked)
-		local edit = Station.Lookup('Lowest2/EditBox/Edit_Input')
+		local edit = LIB.GetChatInputEdit()
 		local txt, data = edit:GetText(), edit:GetTextStruct()
 		if LIB.TrimString(txt) == '' then
 			LIB.Alert(_L['Chat box is empty'])
@@ -133,7 +133,7 @@ function PS.OnPanelActive(wnd)
 		nX = ui:Append('WndButton2', {
 			x = nX, y = nY, w = 80, text = v.key,
 			onlclick = function()
-				local edit = Station.Lookup('Lowest2/EditBox/Edit_Input')
+				local edit = LIB.GetChatInputEdit()
 				D.SetEdit(edit, v.ad)
 				Station.SetFocusWindow(edit)
 			end,
