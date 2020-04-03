@@ -627,6 +627,11 @@ function LIB.GetRefreshTime(szType)
 	return nNextTime, nCircle
 end
 
+function LIB.IsInSameRefreshTime(szType, dwTime)
+	local nNextTime, nCircle = LIB.GetRefreshTime(szType)
+	return nNextTime > dwTime and nNextTime - dwTime <= nCircle
+end
+
 -- 获取副本地图刷新时间
 -- (number nNextTime, number nCircle) LIB.GetDungeonRefreshTime(dwMapID)
 function LIB.GetDungeonRefreshTime(dwMapID)
