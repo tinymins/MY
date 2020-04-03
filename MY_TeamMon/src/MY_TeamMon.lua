@@ -220,6 +220,12 @@ local function PatternNameReplacer(szContent, szSender, szReceiver)
 	if szType == 'B' then
 		return LIB.GetBuffName(dwID, nLevel)
 	end
+	if szType == 'M' then
+		local map = LIB.GetMapInfo(dwID)
+		if map then
+			return map.szName
+		end
+	end
 	-- return '$' .. szType .. szContent
 end
 local PARSE_TEXT_CACHE = {}
