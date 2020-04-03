@@ -96,6 +96,7 @@ local O = {
 	bFloatEntry = false,
 	bSaveDB = true,
 	bMapMark = false,
+	bMapMarkHideAcquired = true,
 }
 RegisterCustomData('Global/MY_RoleStatistics_SerendipityStat.aColumn')
 RegisterCustomData('Global/MY_RoleStatistics_SerendipityStat.szSort')
@@ -103,6 +104,7 @@ RegisterCustomData('Global/MY_RoleStatistics_SerendipityStat.szSortOrder')
 RegisterCustomData('MY_RoleStatistics_SerendipityStat.bFloatEntry')
 RegisterCustomData('MY_RoleStatistics_SerendipityStat.bSaveDB')
 RegisterCustomData('MY_RoleStatistics_SerendipityStat.bMapMark')
+RegisterCustomData('MY_RoleStatistics_SerendipityStat.bMapMarkHideAcquired')
 
 -----------------------------------------------------------------------------------------------
 -- 多个渠道奇遇次数监控
@@ -841,12 +843,22 @@ function D.OnInitPage()
 	Wnd.CloseWindow(frameTemp)
 
 	UI(wnd):Append('WndCheckBox', {
-		x = 670, y = 21, w = 130,
+		x = 540, y = 21, w = 130,
 		text = _L['Map mark'],
 		checked = MY_RoleStatistics_SerendipityStat.bMapMark,
 		oncheck = function()
 			MY_RoleStatistics_SerendipityStat.bMapMark = not MY_RoleStatistics_SerendipityStat.bMapMark
 		end,
+	})
+
+	UI(wnd):Append('WndCheckBox', {
+		x = 670, y = 21, w = 130,
+		text = _L['Map mark hide acquired'],
+		checked = MY_RoleStatistics_SerendipityStat.bMapMarkHideAcquired,
+		oncheck = function()
+			MY_RoleStatistics_SerendipityStat.bMapMarkHideAcquired = not MY_RoleStatistics_SerendipityStat.bMapMarkHideAcquired
+		end,
+		autoenable = function() return MY_RoleStatistics_SerendipityStat.bMapMark end,
 	})
 
 	UI(wnd):Append('WndComboBox', {
@@ -1177,7 +1189,13 @@ function D.DrawMapMark()
 	local nItemCount = hMMM:GetItemCount()
 
 	for _, mark in ipairs(MAP_POINT_LIST) do
-		if mark.dwMapID == dwMapID and mark.aPosition then
+		local bShow = mark.dwMapID == dwMapID and mark.aPosition and true or false
+		if bShow and O.bMapMarkHideAcquired then
+			if mark.dwPet and player.IsFellowPetAcquired(mark.dwPet) then
+				bShow = false
+			end
+		end
+		if bShow then
 			for _, pos in ipairs(mark.aPosition) do
 				local nX, nY = MiddleMap.LPosToHPos(pos[1], pos[2], 13, 13)
 				if nX > 0 and nY > 0 and nX < nW and nY < nH then
@@ -1205,6 +1223,7 @@ function D.DrawMapMark()
 end
 
 function D.HookMapMark()
+	D.UnhookMapMark()
 	HookTableFunc(MiddleMap, 'ShowMap', D.DrawMapMark, { bAfterOrigin = true })
 	HookTableFunc(MiddleMap, 'UpdateCurrentMap', D.DrawMapMark, { bAfterOrigin = true })
 end
@@ -1261,6 +1280,7 @@ local settings = {
 				bFloatEntry = true,
 				bSaveDB = true,
 				bMapMark = true,
+				bMapMarkHideAcquired = true,
 			},
 			root = O,
 		},
@@ -1274,11 +1294,13 @@ local settings = {
 				bFloatEntry = true,
 				bSaveDB = true,
 				bMapMark = true,
+				bMapMarkHideAcquired = true,
 			},
 			triggers = {
 				bFloatEntry = D.UpdateFloatEntry,
 				bSaveDB = D.UpdateSaveDB,
 				bMapMark = D.CheckMapMark,
+				bMapMarkHideAcquired = D.CheckMapMark,
 			},
 			root = O,
 		},
