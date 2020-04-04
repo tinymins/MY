@@ -1194,6 +1194,12 @@ function D.DrawMapMark()
 			if mark.dwPet and player.IsFellowPetAcquired(mark.dwPet) then
 				bShow = false
 			end
+			if bShow and mark.nSerendipityID then
+				local serendipity = SERENDIPITY_HASH[mark.nSerendipityID]
+				if serendipity and GetSerendipityDailyCount(player, serendipity) == -1 then
+					bShow = false
+				end
+			end
 		end
 		if bShow then
 			for _, pos in ipairs(mark.aPosition) do
