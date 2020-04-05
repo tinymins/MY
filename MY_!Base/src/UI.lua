@@ -97,6 +97,7 @@ UI = setmetatable({}, {
 			ASCII = 1, -- Ó¢ÎÄ
 			WIDE_CHAR = 2, -- ÖÐÓ¢ÎÄ
 		}),
+		LAYER_LIST = {'Lowest', 'Lowest1', 'Lowest2', 'Normal', 'Normal1', 'Normal2', 'Topmost', 'Topmost1', 'Topmost2'},
 	},
 	__tostring = function(t) return PACKET_INFO.NAME_SPACE .. '_UI (class prototype)' end,
 	__call = function (...)
@@ -4915,6 +4916,15 @@ function UI.ScrollIntoView(el, scrollY, nOffsetY, scrollX, nOffsetX)
 	end
 	if scrollX then
 		scrollX:SetScrollPos(nX / nParentW * scrollX:GetStepCount())
+	end
+end
+
+function UI.LookupFrame(szName)
+	for _, v in ipairs(UI.LAYER_LIST) do
+		local frame = Station.Lookup(v .. '/' .. szName)
+		if frame then
+			return frame
+		end
 	end
 end
 
