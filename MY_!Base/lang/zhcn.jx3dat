@@ -467,6 +467,7 @@ return {
 	ACTIVITY_MAP_TYPE = {
 		['WEEK_TEAM_DUNGEON'] = '武林通鉴·秘境',
 		['WEEK_RAID_DUNGEON'] = '武林通鉴·团队秘境',
+		['WEEK_PUBLIC_QUEST'] = '武林通鉴·公共任务',
 	},
 
 	['Point left time: (%d+)h(%d+)m(%d+)s'] = '点卡剩余时间为：(%d+)小时(%d+)分(%d+)秒',

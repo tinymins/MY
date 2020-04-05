@@ -489,30 +489,47 @@ function LIB.GetTypeGroupMap()
 	return aGroup
 end
 
--- 获取指定活动地图列表
--- WEEK_TEAM_DUNGEON 周常小队本
--- WEEK_RAID_DUNGEON 周常团队本
-function LIB.GetActivityMap(szType)
-	local aMap = {}
+-- {{武林通鉴 szType 枚举}}
+-- WEEK_TEAM_DUNGEON 武林通鉴·秘境
+-- WEEK_RAID_DUNGEON 武林通鉴·团队秘境
+-- WEEK_PUBLIC_QUEST 武林通鉴·公共任务
+
+-- 获取指定活动任务列表
+-- szType枚举值见 @{{武林通鉴 szType 枚举}}
+function LIB.GetActivityQuest(szType)
+	local aQuestID = {}
 	local me = GetClientPlayer()
 	local date = TimeToDate(GetCurrentTime())
 	local aActive = Table_GetActivityOfDay(date.year, date.month, date.day, ACTIVITY_UI.CALENDER)
 	for _, p in ipairs(aActive) do
 		if (szType == 'WEEK_TEAM_DUNGEON' and p.szName == _L.ACTIVITY_MAP_TYPE.WEEK_TEAM_DUNGEON)
-		or (szType == 'WEEK_RAID_DUNGEON' and p.szName == _L.ACTIVITY_MAP_TYPE.WEEK_RAID_DUNGEON) then
-			local aQuestID = LIB.SplitString(p.szQuestID, ';')
-			for _, szQuestID in ipairs(aQuestID) do
+		or (szType == 'WEEK_RAID_DUNGEON' and p.szName == _L.ACTIVITY_MAP_TYPE.WEEK_RAID_DUNGEON)
+		or (szType == 'WEEK_PUBLIC_QUEST' and p.szName == _L.ACTIVITY_MAP_TYPE.WEEK_PUBLIC_QUEST) then
+			for _, szQuestID in ipairs(LIB.SplitString(p.szQuestID, ';')) do
 				local tLine = Table_GetCalenderActivityQuest(szQuestID)
 				if tLine and tLine.nNpcTemplateID ~= -1 then
 					local nQuestID = select(2, me.RandomByDailyQuest(szQuestID, tLine.nNpcTemplateID))
-					local tInfo = nQuestID and Table_GetQuestStringInfo(nQuestID)
-					local dwMapID = tInfo and tInfo.dwDungeonID
-					local map = dwMapID and LIB.GetMapInfo(dwMapID)
-					if map then
-						insert(aMap, map)
+					if nQuestID then
+						insert(aQuestID, {nQuestID, tLine.nNpcTemplateID})
 					end
 				end
 			end
+		end
+	end
+	return aQuestID
+end
+
+-- 获取指定活动地图列表
+-- szType枚举值见 @{{武林通鉴 szType 枚举}}
+function LIB.GetActivityMap(szType)
+	local aMap = {}
+	local aQuestInfo = LIB.GetActivityQuest(szType)
+	for _, p in ipairs(aQuestInfo) do
+		local tInfo = p[1] and Table_GetQuestStringInfo(p[1])
+		local dwMapID = tInfo and tInfo.dwDungeonID
+		local map = dwMapID and LIB.GetMapInfo(dwMapID)
+		if map then
+			insert(aMap, map)
 		end
 	end
 	return aMap
