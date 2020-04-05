@@ -172,7 +172,7 @@ local function GetTaskState(me, dwQuestID, dwNpcTemplateID)
 end
 
 local EXCEL_WIDTH = 960
-local TASK_MIN_WIDTH = 42
+local TASK_MIN_WIDTH = 35
 local TASK_MAX_WIDTH = 150
 local function GeneCommonFormatText(id)
 	return function(r)
@@ -432,7 +432,32 @@ local function InitTaskList(bReload)
 	end
 	TASK_LIST = aTask
 	-- 高速id键索引
-	local tTask = {}
+	local tTask = setmetatable({}, {
+		__index = function(_, id)
+			if id == 'week_team_dungeon' then
+				return {
+					id = id,
+					szTitle = _L.ACTIVITY_MAP_TYPE.WEEK_TEAM_DUNGEON,
+					eType = TASK_TYPE.WEEKLY,
+					aQuestInfo = LIB.GetActivityQuest('WEEK_TEAM_DUNGEON'),
+				}
+			elseif id == 'week_raid_dungeon' then
+				return {
+					id = id,
+					szTitle = _L.ACTIVITY_MAP_TYPE.WEEK_RAID_DUNGEON,
+					eType = TASK_TYPE.WEEKLY,
+					aQuestInfo = LIB.GetActivityQuest('WEEK_RAID_DUNGEON'),
+				}
+			elseif id == 'week_public_quest' then
+				return {
+					id = id,
+					szTitle = _L.ACTIVITY_MAP_TYPE.WEEK_PUBLIC_QUEST,
+					eType = TASK_TYPE.WEEKLY,
+					aQuestInfo = LIB.GetActivityQuest('WEEK_PUBLIC_QUEST'),
+				}
+			end
+		end,
+	})
 	for _, v in ipairs(aTask) do
 		tTask[v.id] = v
 	end
@@ -619,6 +644,13 @@ end })
 for _, p in ipairs(COLUMN_LIST) do
 	COLUMN_DICT[p.id] = p
 end
+
+local ACTIVITY_LIST = {
+	'week_team_dungeon',
+	'week_raid_dungeon',
+	'week_public_quest',
+}
+
 local TIP_COLUMN = {
 	'region',
 	'server',
@@ -627,6 +659,7 @@ local TIP_COLUMN = {
 	'camp',
 	'level',
 	'TASK',
+	'ACTIVITY',
 	'time',
 	'time_days',
 }
@@ -659,34 +692,41 @@ function D.GetClientPlayerRec()
 	rec.task_info = {}
 	rec.buff_info = {}
 
-	for _, id in ipairs(O.aColumn) do
-		local task = TASK_HASH[id]
-		if task then
-			if task.aQuestInfo then
-				for _, aInfo in ipairs(task.aQuestInfo) do
-					rec.task_info[aInfo[1]] = GetTaskState(me, aInfo[1], aInfo[2])
-				end
+	local aTask = {}
+	-- 任务选项
+	for _, task in ipairs(TASK_LIST) do
+		insert(aTask, task)
+	end
+	-- 动态活动副本选项
+	for _, szType in ipairs(ACTIVITY_LIST) do
+		insert(aTask, TASK_HASH[szType])
+	end
+
+	for _, task in ipairs(aTask) do
+		if task.aQuestInfo then
+			for _, aInfo in ipairs(task.aQuestInfo) do
+				rec.task_info[aInfo[1]] = GetTaskState(me, aInfo[1], aInfo[2])
 			end
-			if task.tCampQuestInfo and task.tCampQuestInfo[me.nCamp] then
-				for _, aInfo in ipairs(task.tCampQuestInfo[me.nCamp]) do
-					rec.task_info[aInfo[1]] = GetTaskState(me, aInfo[1], aInfo[2])
-				end
+		end
+		if task.tCampQuestInfo and task.tCampQuestInfo[me.nCamp] then
+			for _, aInfo in ipairs(task.tCampQuestInfo[me.nCamp]) do
+				rec.task_info[aInfo[1]] = GetTaskState(me, aInfo[1], aInfo[2])
 			end
-			if task.tForceQuestInfo and task.tForceQuestInfo[me.dwForceID] then
-				for _, aInfo in ipairs(task.tForceQuestInfo[me.dwForceID]) do
-					rec.task_info[aInfo[1]] = GetTaskState(me, aInfo[1], aInfo[2])
-				end
+		end
+		if task.tForceQuestInfo and task.tForceQuestInfo[me.dwForceID] then
+			for _, aInfo in ipairs(task.tForceQuestInfo[me.dwForceID]) do
+				rec.task_info[aInfo[1]] = GetTaskState(me, aInfo[1], aInfo[2])
 			end
-			if task.aBuffInfo then
-				for _, aInfo in ipairs(task.aBuffInfo) do
-					local nState = me.GetBuff(aInfo[1], aInfo[2] or 0)
-						and TASK_STATE.FINISHED
-						or TASK_STATE.UNKNOWN
-					if nState == TASK_STATE.FINISHED then
-						rec.buff_info[aInfo[1] .. '_0'] = TASK_STATE.FINISHED
-					end
-					rec.buff_info[aInfo[1] .. '_' .. (aInfo[2] or 0)] = nState
+		end
+		if task.aBuffInfo then
+			for _, aInfo in ipairs(task.aBuffInfo) do
+				local nState = me.GetBuff(aInfo[1], aInfo[2] or 0)
+					and TASK_STATE.FINISHED
+					or TASK_STATE.UNKNOWN
+				if nState == TASK_STATE.FINISHED then
+					rec.buff_info[aInfo[1] .. '_0'] = TASK_STATE.FINISHED
 				end
+				rec.buff_info[aInfo[1] .. '_' .. (aInfo[2] or 0)] = nState
 			end
 		end
 	end
@@ -866,10 +906,21 @@ end
 function D.OutputRowTip(this, rec)
 	local aXml = {}
 	local bFloat = this:GetRoot():GetName() ~= 'MY_RoleStatistics'
+	local tActivity = LIB.FlipObjectKV(ACTIVITY_LIST)
 	for _, id in ipairs(TIP_COLUMN) do
 		if id == 'TASK' then
 			for _, col in ipairs(D.GetColumns()) do
-				if TASK_HASH[col.id] then
+				if TASK_HASH[col.id] and not tActivity[col.id] then
+					insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
+					insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
+					insert(aXml, col.GetFormatText(rec))
+					insert(aXml, GetFormatText('\n', 162, 255, 255, 255))
+				end
+			end
+		elseif id == 'ACTIVITY' then
+			for _, szType in ipairs(ACTIVITY_LIST) do
+				local col = COLUMN_DICT[szType]
+				if col and (not bFloat or not col.bHideInFloat) then
 					insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
 					insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
 					insert(aXml, col.GetFormatText(rec))
@@ -993,6 +1044,22 @@ function D.OnInitPage()
 						})
 					end
 					tChecked[task.id] = true
+				end
+			end
+			-- 动态活动副本选项
+			for _, szType in ipairs(ACTIVITY_LIST) do
+				if not tChecked[szType] then
+					local col = COLUMN_DICT[szType]
+					if col then
+						insert(t, {
+							szOption = col.szTitle,
+							bCheck = true, bChecked = tChecked[col.id],
+							fnAction = function()
+								fnAction(col.id, col.nMinWidth)
+							end,
+						})
+						tChecked[szType] = true
+					end
 				end
 			end
 			return t
