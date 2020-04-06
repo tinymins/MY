@@ -208,7 +208,9 @@ local function ApplyUIArguments(ui, arg)
 		if arg.autovisible        ~= nil then ui:Visible        (arg.autovisible) end
 		if arg.enable             ~= nil then ui:Enable         (arg.enable     ) end
 		if arg.autoenable         ~= nil then ui:Enable         (arg.autoenable ) end
-		if arg.image              ~= nil then ui:Image(arg.image, arg.imageframe) end
+		if arg.image              ~= nil then
+			ui:Image(arg.image, arg.imageframe, arg.imageoverframe, arg.imagedownframe, arg.imagedisableframe)
+		end
 		if arg.icon               ~= nil then ui:Icon           (arg.icon       ) end
 		if arg.name               ~= nil then ui:Name           (arg.name       ) end
 		if arg.penetrable         ~= nil then ui:Penetrable     (arg.penetrable ) end
@@ -338,6 +340,10 @@ local function GetComponentElement(raw, elementType)
 			element = raw
 		elseif componentType == 'WndEditBox' or componentType == 'WndEditComboBox' or componentType == 'WndAutocomplete' then
 			element = raw:Lookup('WndEdit_Default')
+		end
+	elseif elementType == 'BUTTON' then
+		if componentType == 'WndButton' then
+			element = raw
 		end
 	elseif elementType == 'WEB' then
 		if componentType == 'WndWebPage'
@@ -3021,14 +3027,26 @@ end
 
 -- (self) Instance:Image(szImageAndFrame)
 -- (self) Instance:Image(szImage, nFrame)
-function UI:Image(szImage, nFrame)
+function UI:Image(szImage, nFrame, nOverFrame, nDownFrame, nDisableFrame)
 	self:_checksum()
-	if szImage then
-		if IsString(szImage) and IsNil(nFrame) then
-			nFrame = tonumber((gsub(szImage, '.*%|(%d+)', '%1')))
-			szImage = gsub(szImage, '%|.*', '')
-		end
-		if IsString(szImage) and IsNumber(nFrame) then
+	if IsString(szImage) and IsNil(nFrame) then
+		nFrame = tonumber((gsub(szImage, '.*%|(%d+)', '%1')))
+		szImage = gsub(szImage, '%|.*', '')
+	end
+	if IsString(szImage) then
+		szImage = wgsub(szImage, '/', '\\')
+		if IsNumber(nFrame) and IsNumber(nOverFrame) and IsNumber(nDownFrame) and IsNumber(nDisableFrame) then
+			for _, raw in ipairs(self.raws) do
+				raw = GetComponentElement(raw, 'BUTTON')
+				if raw then
+					raw:SetAnimatePath(szImage)
+					raw:SetAnimateGroupNormal(nFrame)
+					raw:SetAnimateGroupMouseOver(nOverFrame)
+					raw:SetAnimateGroupMouseDown(nDownFrame)
+					raw:SetAnimateGroupDisable(nDisableFrame)
+				end
+			end
+		elseif IsString(szImage) and IsNumber(nFrame) then
 			for _, raw in ipairs(self.raws) do
 				local el = GetComponentElement(raw, 'IMAGE')
 				if el then
@@ -3040,7 +3058,7 @@ function UI:Image(szImage, nFrame)
 					el:SetExtentImage(szImage, nFrame)
 				end
 			end
-		elseif IsString(szImage) then
+		else
 			for _, raw in ipairs(self.raws) do
 				raw = GetComponentElement(raw, 'IMAGE')
 				if raw then
@@ -3049,8 +3067,8 @@ function UI:Image(szImage, nFrame)
 				end
 			end
 		end
-		return self
 	end
+	return self
 end
 
 -- (self) Instance:Frame(nFrame)
