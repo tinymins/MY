@@ -77,12 +77,20 @@ function D.RequireRerender()
 end
 
 do
-local function DrawShadowLine(sha, dwSrcID, dwDstID, aCol, nAlpha, nWidth)
+local function DrawShadowLine(sha, dwSrcType, dwSrcID, dwDstType, dwDstID, aCol, nAlpha, nWidth)
 	local r, g, b = unpack(aCol)
 	sha:SetTriangleFan(GEOMETRY_TYPE.LINE, nWidth)
 	sha:ClearTriangleFanPoint()
-	sha:AppendCharacterID(dwSrcID, MY_TargetLine.bAtHead, r, g, b, nAlpha)
-	sha:AppendCharacterID(dwDstID, MY_TargetLine.bAtHead, r, g, b, nAlpha)
+	if dwSrcType == TARGET.DOODAD then
+		sha:AppendDoodadID(dwSrcID, r, g, b, nAlpha)
+	else
+		sha:AppendCharacterID(dwSrcID, MY_TargetLine.bAtHead, r, g, b, nAlpha)
+	end
+	if dwDstType == TARGET.DOODAD then
+		sha:AppendDoodadID(dwDstID, r, g, b, nAlpha)
+	else
+		sha:AppendCharacterID(dwDstID, MY_TargetLine.bAtHead, r, g, b, nAlpha)
+	end
 	sha:Show()
 end
 local function GetShadow(szName)
@@ -98,17 +106,24 @@ local bCurTargetRL, dwCurTarLineSrcID, dwCurTarLineDstID, shaTLine
 local bCurTTargetRL, dwCurTTarLineSrcID, dwCurTTarLineDstID, shaTTLine
 function D.UpdateLine()
 	local me = GetClientPlayer()
-	local tar = LIB.GetObject(LIB.GetTarget(me))
-	local ttar = LIB.GetObject(LIB.GetTarget(tar))
-	local dwTarLineSrcID, dwTarLineDstID, dwTTarLineSrcID, dwTTarLineDstID
+	local dwTarType, dwTarID = LIB.GetTarget(me)
+	local tar = LIB.GetObject(dwTarType, dwTarID)
+	local dwTTarType, dwTTarID = LIB.GetTarget(tar)
+	local ttar = LIB.GetObject(dwTTarType, dwTTarID)
+	local dwTarLineSrcType, dwTarLineSrcID, dwTarLineDstType, dwTarLineDstID
+	local dwTTarLineSrcType, dwTTarLineSrcID, dwTTarLineDstType, dwTTarLineDstID
 	if not C.bShielded then
 		if me and tar and (not ttar or ttar.dwID ~= me.dwID) then
+			dwTarLineSrcType = TARGET.PLAYER
 			dwTarLineSrcID = me.dwID
-			dwTarLineDstID = tar.dwID
+			dwTarLineDstType = dwTarType
+			dwTarLineDstID = dwTarID
 		end
 		if me and tar and ttar then
-			dwTTarLineSrcID = tar.dwID
-			dwTTarLineDstID = ttar.dwID
+			dwTTarLineSrcType = dwTarType
+			dwTTarLineSrcID = dwTarID
+			dwTTarLineDstType = dwTTarType
+			dwTTarLineDstID = dwTTarID
 		end
 	end
 
@@ -135,7 +150,11 @@ function D.UpdateLine()
 				if not shaTLine then
 					shaTLine = GetShadow('TLine')
 				end
-				DrawShadowLine(shaTLine, dwTarLineSrcID, dwTarLineDstID, O.tTargetColor, O.nLineAlpha, O.nLineWidth)
+				DrawShadowLine(
+					shaTLine,
+					dwTarLineSrcType, dwTarLineSrcID,
+					dwTarLineDstType, dwTarLineDstID,
+					O.tTargetColor, O.nLineAlpha, O.nLineWidth)
 			end
 		else
 			if dwCurTarLineSrcID then
@@ -170,7 +189,11 @@ function D.UpdateLine()
 				if not shaTTLine then
 					shaTTLine = GetShadow('TTLine')
 				end
-				DrawShadowLine(shaTTLine, dwTTarLineSrcID, dwTTarLineDstID, O.tTTargetColor, O.nLineAlpha, O.nLineWidth)
+				DrawShadowLine(
+					shaTTLine,
+					dwTTarLineSrcType, dwTTarLineSrcID,
+					dwTTarLineDstType, dwTTarLineDstID,
+					O.tTTargetColor, O.nLineAlpha, O.nLineWidth)
 			end
 		else
 			if dwCurTTarLineSrcID then
