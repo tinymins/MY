@@ -59,8 +59,45 @@ MY_PartyRequest = {
 	bAcceptTong   = false,
 	bAcceptFriend = false,
 	bAcceptAll    = false,
+	bAcceptCustom = false,
+	tAcceptCustom = {},
 }
 LIB.RegisterCustomData('MY_PartyRequest')
+
+function MY_PartyRequest.GetCustomNameMenu()
+	local t = {
+		szOption = _L['Auto accept specific names'],
+		bCheck = true, bChecked = MY_PartyRequest.bAcceptCustom,
+		fnAction = function()
+			MY_PartyRequest.bAcceptCustom = not MY_PartyRequest.bAcceptCustom
+		end,
+		fnDisable = function() return not MY_PartyRequest.bEnable end,
+	}
+	for szName, bEnable in pairs(MY_PartyRequest.tAcceptCustom) do
+		insert(t, {
+			szOption = szName,
+			bCheck = true, bChecked = bEnable,
+			fnAction = function()
+				MY_PartyRequest.tAcceptCustom[szName] = not MY_PartyRequest.tAcceptCustom[szName]
+			end,
+			fnDisable = function() return not MY_PartyRequest.bEnable or not MY_PartyRequest.bAcceptCustom end,
+		})
+	end
+	if #t ~= 0 then
+		insert(t, CONSTANT.MENU_DIVIDER)
+	end
+	insert(t, {
+		szOption = _L['Add'],
+		fnAction = function()
+			GetUserInput(_L['Please input custom name, multiple split with ",[]":'], function(val)
+				for _, v in ipairs(LIB.SplitString(val, {',', '[', ']'}, true)) do
+					MY_PartyRequest.tAcceptCustom[v] = true
+				end
+			end)
+		end,
+	})
+	return t
+end
 
 function MY_PartyRequest.OnFrameCreate()
 	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
@@ -112,6 +149,7 @@ function MY_PartyRequest.OnLButtonClick()
 				end,
 			},
 		}
+		insert(menu, MY_PartyRequest.GetCustomNameMenu())
 		PopupMenu(menu)
 	elseif name == 'Btn_Close' then
 		D.ClosePanel()
@@ -246,6 +284,10 @@ function D.GetRequestStatus(info)
 	if MY_PartyRequest.bAcceptAll then
 		szStatus = 'accept'
 		szMsg = _L('Auto accept %s(%s %d%s) party request, go to MY/raid/teamtools panel if you want to turn off this feature.',
+			info.szName, g_tStrings.tForceTitle[info.dwForce], info.nLevel, g_tStrings.STR_LEVEL)
+	elseif MY_PartyRequest.bAcceptCustom and MY_PartyRequest.tAcceptCustom[info.szName] then
+		szStatus = 'accept'
+		szMsg = _L('Auto accept %s(%s %d%s) custom request, go to MY/raid/teamtools panel if you want to turn off this feature.',
 			info.szName, g_tStrings.tForceTitle[info.dwForce], info.nLevel, g_tStrings.STR_LEVEL)
 	elseif info.bFriend and MY_PartyRequest.bAcceptFriend then
 		szStatus = 'accept'

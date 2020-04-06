@@ -64,6 +64,8 @@ return {
 	['Auto accept friend'] = '自动通过好友',
 	['Auto accept tong member'] = '自动通过帮会成员',
 	['Auto accept all'] = '自动通过所有人',
+	['Auto accept custom'] = '自动通过指定角色',
+	['Please input custom name, multiple split with ",[]":'] = '请输入自定义角色名称，多个角色名请使用半角逗号或方括号分隔：',
 	['Auto refuse %s(%s %d%s) party request, equip score: %d, go to MY/raid/teamtools panel if you want to turn off this feature.']
 		= '自动拒绝了 %s(%s %d%s) 的组队请求，装备分数：%d，如需关闭该功能请前往茗伊插件/团队/团队工具取消勾选对应项。',
 	['Auto refuse %s(%s %d%s) party request, go to MY/raid/teamtools panel if you want to turn off this feature.']
@@ -74,6 +76,8 @@ return {
 		'自动通过了好友 %s(%s %d%s) 的组队请求，如需关闭该功能请前往茗伊插件/团队/团队工具取消勾选对应项。',
 	['Auto tong member friend %s(%s %d%s) party request, go to MY/raid/teamtools panel if you want to turn off this feature.'] =
 		'自动通过了帮会成员 %s(%s %d%s) 的组队请求，如需关闭该功能请前往茗伊插件/团队/团队工具取消勾选对应项。',
+	['Auto accept %s(%s %d%s) custom request, go to MY/raid/teamtools panel if you want to turn off this feature.'] =
+		'自动通过了指定角色 %s(%s %d%s) 的组队请求，如需关闭该功能请前往茗伊插件/团队/团队工具取消勾选对应项。',
 	['Asking...'] = '正在征询对方意见\n如果长时间未响应可能是对方没有安装插件。',
 	['Syncing: %.2f%%.'] = '正在同步数据(%.2f%%)...',
 	['Refuse request'] = '对方拒绝了您的请求！',

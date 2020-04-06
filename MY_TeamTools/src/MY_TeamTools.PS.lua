@@ -152,6 +152,22 @@ function PS.OnPanelActive(wnd)
 		autoenable = function() return MY_PartyRequest.bEnable end,
 	}):AutoWidth()
 	y = y + 25
+	x = x + ui:Append('WndCheckBox', {
+		x = x, y = y,
+		checked = MY_PartyRequest.bAcceptCustom,
+		text = _L['Auto accept custom'],
+		oncheck = function(bChecked)
+			MY_PartyRequest.bAcceptCustom = bChecked
+		end,
+		autoenable = function() return MY_PartyRequest.bEnable end,
+	}):AutoWidth():Width()
+	ui:Append('WndButton', {
+		x = x, y = y + 1, w = 24, h = 22,
+		buttonstyle = 'OPTION',
+		menu = MY_PartyRequest.GetCustomNameMenu,
+		autoenable = function() return MY_PartyRequest.bEnable and MY_PartyRequest.bAcceptCustom end,
+	})
+	y = y + 25
 
 	x, y = MY_TeamRestore.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 end
