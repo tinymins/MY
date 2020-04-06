@@ -51,20 +51,22 @@ local D = {}
 local O = {
 	-- …Ë÷√œÓ
 	bEnable = true,
-	tAnchor = nil,
+	tAnchors = {},
 }
 RegisterCustomData('MY_DynamicActionBarPos.bEnable')
+RegisterCustomData('MY_DynamicActionBarPos.tAnchors')
 
-function D.GetFrame()
-	return Station.Lookup('Lowest1/DynamicActionBar')
-end
+local FRAME_LIST = {
+	'DynamicActionBar',
+	'IdentityDynActBar',
+}
 
-function D.UpdateAnchor()
-	local an = O.bEnable and O.tAnchor
+function D.UpdateAnchor(szName)
+	local an = O.tAnchors[szName]
 	if not an then
 		return
 	end
-	local frame = D.GetFrame()
+	local frame = UI.LookupFrame(szName)
 	if not frame then
 		return
 	end
@@ -72,17 +74,64 @@ function D.UpdateAnchor()
 	frame:CorrectPos()
 end
 
-function D.SaveAnchor()
-	local frame = D.GetFrame()
+function D.SaveAnchor(szName)
+	local frame = UI.LookupFrame(szName)
 	if not frame then
 		return
 	end
-	O.tAnchor = GetFrameAnchor(frame, 'TOP_LEFT')
+	O.tAnchors[szName] = GetFrameAnchor(frame, 'TOP_LEFT')
 end
 
-LIB.RegisterFrameCreate('DynamicActionBar.MY_DynamicActionBarPos', D.UpdateAnchor)
-LIB.RegisterFrameCreate('UI_SCALED.MY_DynamicActionBarPos', D.UpdateAnchor)
-LIB.RegisterEvent('ON_LEAVE_CUSTOM_UI_MODE.MY_DynamicActionBarPos', D.SaveAnchor)
+function D.Hook(szName)
+	local function OnFrameCreate(frame)
+		if not frame or frame.__MY_OnFrameDragEnd then
+			return
+		end
+		frame.__MY_OnFrameDragEnd = frame.OnFrameDragEnd
+		frame.OnFrameDragEnd = function()
+			D.SaveAnchor(szName)
+		end
+	end
+	LIB.RegisterFrameCreate(szName .. '.MY_DynamicActionBarPos', function()
+		OnFrameCreate(arg0)
+		D.UpdateAnchor(szName)
+	end)
+	LIB.RegisterFrameCreate('UI_SCALED.MY_DynamicActionBarPos__' .. szName, function()
+		D.UpdateAnchor(szName)
+	end)
+	LIB.RegisterEvent('ON_LEAVE_CUSTOM_UI_MODE.MY_DynamicActionBarPos__' .. szName, function()
+		D.SaveAnchor(szName)
+	end)
+	OnFrameCreate(UI.LookupFrame(szName))
+end
+
+function D.Unhook(szName)
+	local frame = UI.LookupFrame(szName)
+	if frame and frame.__MY_OnFrameDragEnd then
+		frame.OnFrameDragEnd = frame.__MY_OnFrameDragEnd
+		frame.__MY_OnFrameDragEnd = nil
+	end
+	LIB.RegisterFrameCreate(szName .. '.MY_DynamicActionBarPos', false)
+	LIB.RegisterFrameCreate('UI_SCALED.MY_DynamicActionBarPos__' .. szName, false)
+	LIB.RegisterEvent('ON_LEAVE_CUSTOM_UI_MODE.MY_DynamicActionBarPos__' .. szName, false)
+end
+
+function D.CheckEnable()
+	for _, szName in ipairs(FRAME_LIST) do
+		if O.bEnable then
+			D.Hook(szName)
+		else
+			D.Unhook(szName)
+		end
+	end
+end
+
+LIB.RegisterReload('MY_DynamicActionBarPos', function()
+	for _, szName in ipairs(FRAME_LIST) do
+		D.Unhook(szName)
+	end
+end)
+LIB.RegisterInit('MY_DynamicActionBarPos', D.CheckEnable)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	ui:Append('WndCheckBox', {
@@ -109,7 +158,7 @@ local settings = {
 		{
 			fields = {
 				bEnable = true,
-				tAnchor = true,
+				tAnchors = true,
 			},
 			root = O,
 		},
@@ -118,10 +167,10 @@ local settings = {
 		{
 			fields = {
 				bEnable = true,
-				tAnchor = true,
+				tAnchors = true,
 			},
 			triggers = {
-				bEnable = D.UpdateAnchor,
+				bEnable = D.CheckEnable,
 			},
 			root = O,
 		},
