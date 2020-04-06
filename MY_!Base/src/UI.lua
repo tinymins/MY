@@ -135,6 +135,15 @@ UI = setmetatable({}, {
 				nMouseDownGroup = 3,
 				nDisableGroup = 4,
 			},
+			OPTION = {
+				nWidth = 22,
+				nHeight = 24,
+				szImage = 'ui/Image/UICommon/CommonPanel2.UITex',
+				nNormalGroup = 57,
+				nMouseOverGroup = 58,
+				nMouseDownGroup = 59,
+				nDisableGroup = 56,
+			},
 		},
 	},
 	__tostring = function(t) return PACKET_INFO.NAME_SPACE .. '_UI (class prototype)' end,
@@ -193,7 +202,7 @@ local function ApplyUIArguments(ui, arg)
 		if arg.limit              ~= nil then ui:Limit          (arg.limit      ) end
 		if arg.scroll             ~= nil then ui:Scroll         (arg.scroll     ) end
 		if arg.handlestyle        ~= nil then ui:HandleStyle    (arg.handlestyle) end
-		if arg.buttonstyle        ~= nil then ui:ButtonStyle    (arg.buttonstyle) end
+		if arg.buttonstyle        ~= nil then ui:ButtonStyle    (arg.buttonstyle) end -- must before :Size()
 		if arg.edittype           ~= nil then ui:EditType       (arg.edittype   ) end
 		if arg.visible            ~= nil then ui:Visible        (arg.visible    ) end
 		if arg.autovisible        ~= nil then ui:Visible        (arg.autovisible) end
