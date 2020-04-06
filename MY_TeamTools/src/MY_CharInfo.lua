@@ -42,7 +42,7 @@ local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamTools'
 local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
+if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2016100) then
 	return
 end
 --------------------------------------------------------------------------
@@ -71,9 +71,10 @@ function CharInfo.CreateFrame(dwID, szName)
 		x = x, y = y + 2, w = 240 - 2 * x,
 		text = wstring.sub(szName, 1, 6), halign = 1,
 	}) -- UI≥¨¡À
-	ui:Append('WndButton2', {
+	ui:Append('WndButton', {
 		name = 'LOOKUP', x = 70, y = 360,
 		text = g_tStrings.STR_LOOKUP,
+		buttonstyle = 2,
 		onclick = function()
 			ViewInviteToPlayer(dwID)
 		end,

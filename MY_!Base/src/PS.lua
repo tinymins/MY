@@ -978,8 +978,9 @@ function PS.OnPanelActive(wnd)
 			y = y + 35
 		end
 	end
-	ui:Append('WndButton2', {
+	ui:Append('WndButton', {
 		x = x, y = y, w = 160,
+		buttonstyle = 2,
 		text = _L['Restore default'],
 		onclick = function()
 			LIB.SetForceColor('reset')
@@ -1039,9 +1040,10 @@ function PS.OnPanelActive(wnd)
 			y = y + 35
 		end
 	end
-	ui:Append('WndButton2', {
+	ui:Append('WndButton', {
 		x = x, y = y, w = 160,
 		text = _L['Restore default'],
+		buttonstyle = 2,
 		onclick = function()
 			LIB.SetCampColor('reset')
 			LIB.SwitchTab('GlobalColor', true)

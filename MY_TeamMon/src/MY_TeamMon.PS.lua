@@ -43,7 +43,7 @@ local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamMon'
 local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
+if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2016100) then
 	return
 end
 --------------------------------------------------------------------------
@@ -58,8 +58,9 @@ function PS.OnPanelActive(wnd)
 	local nX, nY = X, Y
 	local nLineH = 22
 
-	-- ui:Append('WndButton2', {
+	-- ui:Append('WndButton', {
 	-- 	x = 400, y = 20, text = g_tStrings.HELP_PANEL,
+	-- 	buttonstyle = 2,
 	-- 	onclick = function()
 	-- 		OpenInternetExplorer('https://github.com/luckyyyyy/JH/blob/dev/JH_DBM/README.md')
 	-- 	end,
@@ -199,16 +200,19 @@ function PS.OnPanelActive(wnd)
 			MY_TeamMon.bCommon = bCheck
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
-	nX = ui:Append('WndButton2', {
+	nX = ui:Append('WndButton', {
 		x = X + 5, y = nY + 15, text = _L['Data panel'],
+		buttonstyle = 2,
 		onclick = MY_TeamMon_UI.TogglePanel,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
-	nX = ui:Append('WndButton2', {
+	nX = ui:Append('WndButton', {
 		x = nX + 5, y = nY + 15, text = _L['Export data'],
+		buttonstyle = 2,
 		onclick = MY_TeamMon_UI.OpenExportPanel,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
-	nX = ui:Append('WndButton2', {
+	nX = ui:Append('WndButton', {
 		x = nX + 5, y = nY + 15, text = _L['Import data'],
+		buttonstyle = 2,
 		menu = function()
 			local szLang = select(3, GetVersion())
 			local menu = {}
@@ -220,8 +224,9 @@ function PS.OnPanelActive(wnd)
 			return menu
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
-	nX = ui:Append('WndButton2', {
+	nX = ui:Append('WndButton', {
 		x = nX + 5, y = nY + 15, text = _L['Open data folder'],
+		buttonstyle = 2,
 		onclick = function()
 			local szRoot = LIB.GetAbsolutePath(MY_TM_DATA_ROOT):gsub('/', '\\')
 			LIB.OpenFolder(szRoot)

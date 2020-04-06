@@ -42,7 +42,7 @@ local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamTools'
 local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
+if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2016100) then
 	return
 end
 --------------------------------------------------------------------------
@@ -160,11 +160,12 @@ function TI.CreateFrame(a, b)
 				},
 			},
 		}):Width() + 5
-		y = y + ui:Append('WndButton2', {
+		y = y + ui:Append('WndButton', {
 			name = 'Btn_YY',
 			x = x, y = y, text = LIB.IsLeader()
 				and (LIB.GetLang() == 'zhcn' and _L['Paste YY'] or _L['Paste DC'])
 				or (LIB.GetLang() == 'zhcn' and _L['Copy YY'] or _L['Copy DC']),
+			buttonstyle = 2,
 			onclick = function()
 				local yy = ui:Children('#YY'):Text()
 				if LIB.IsLeader() then
@@ -208,16 +209,18 @@ function TI.CreateFrame(a, b)
 			end,
 		})
 		x, y = 11, 130
-		x = x + ui:Append('WndButton2', {
+		x = x + ui:Append('WndButton', {
 			name = 'WndBtn_RaidTools',
 			x = x, y = y, w = 96,
 			text = _L['Raid Tools'],
+			buttonstyle = 2,
 			onclick = MY_RaidTools.TogglePanel,
 		}):AutoWidth():Width() + 5
-		x = x + ui:Append('WndButton2', {
+		x = x + ui:Append('WndButton', {
 			name = 'WndBtn_GKP',
 			x = x, y = y, w = 96,
 			text = _L['GKP Golden Team Record'],
+			buttonstyle = 2,
 			onclick = function()
 				if MY_GKP then
 					MY_GKP_MI.TogglePanel()
@@ -227,10 +230,11 @@ function TI.CreateFrame(a, b)
 			end,
 		}):AutoWidth():Width() + 5
 		if MY_TeamMon_RR then
-			x = x + ui:Append('WndButton2', {
+			x = x + ui:Append('WndButton', {
 				name = 'WndBtn_TeamMon',
 				x = x, y = y, w = 96,
 				text = _L['Import Data'],
+				buttonstyle = 2,
 				onclick = MY_TeamMon_RR.OpenPanel,
 			}):AutoWidth():Width() + 5
 		end

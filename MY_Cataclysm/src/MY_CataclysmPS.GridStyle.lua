@@ -42,7 +42,7 @@ local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Cataclysm'
 local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
+if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2016100) then
 	return
 end
 --------------------------------------------------------------------------
@@ -139,8 +139,10 @@ function PS.OnPanelActive(frame)
 		}):AutoWidth():Width() + 5
 	end
 	-- Ãû×Ö×ÖÌåÐÞ¸Ä
-	x = x + ui:Append('WndButton2', {
-		x = x, y = y - 3, text = _L['Name font'],
+	x = x + ui:Append('WndButton', {
+		x = x, y = y - 3,
+		text = _L['Name font'],
+		buttonstyle = 2,
 		onclick = function()
 			UI.OpenFontPicker(function(nFont)
 				CFG.nNameFont = nFont
@@ -252,8 +254,10 @@ function PS.OnPanelActive(frame)
 			end,
 		}):AutoWidth():Width() + 5
 	end
-	ui:Append('WndButton2', {
-		x = x, y = y - 1, text = _L['Life font'],
+	ui:Append('WndButton', {
+		x = x, y = y - 1,
+		text = _L['Life font'],
+		buttonstyle = 2,
 		onclick = function()
 			UI.OpenFontPicker(function(nFont)
 				CFG.nLifeFont = nFont
@@ -302,8 +306,10 @@ function PS.OnPanelActive(frame)
 		end,
 	}):AutoWidth():Width() + 5
 
-	x = x + ui:Append('WndButton2', {
-		x = x, y = y, text = g_tStrings.STR_SKILL_MANA .. g_tStrings.FONT,
+	x = x + ui:Append('WndButton', {
+		x = x, y = y,
+		text = g_tStrings.STR_SKILL_MANA .. g_tStrings.FONT,
+		buttonstyle = 2,
 		onclick = function()
 			UI.OpenFontPicker(function(nFont)
 				CFG.nManaFont = nFont

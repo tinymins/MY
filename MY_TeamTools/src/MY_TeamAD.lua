@@ -42,7 +42,7 @@ local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamAD'
 local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
+if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2016100) then
 	return
 end
 --------------------------------------------------------------------------
@@ -98,7 +98,7 @@ function PS.OnPanelActive(wnd)
 	nX, nY = ui:Append('Text', { x = nX, y = nY, text = _L['Save Talk'], font = 27 }):Pos('BOTTOMRIGHT')
 
 	nX = X + 10
-	nX = ui:Append('WndButton2', { x = nX, y = nY + 10, text = _L['Save Advertising'] }):Click(function(bChecked)
+	nX = ui:Append('WndButton', { x = nX, y = nY + 10, text = _L['Save Advertising'], buttonstyle = 2 }):Click(function(bChecked)
 		local edit = LIB.GetChatInputEdit()
 		local txt, data = edit:GetText(), edit:GetTextStruct()
 		if LIB.TrimString(txt) == '' then
@@ -130,8 +130,9 @@ function PS.OnPanelActive(wnd)
 			nX = X + 10
 			nY = nY + 28
 		end
-		nX = ui:Append('WndButton2', {
+		nX = ui:Append('WndButton', {
 			x = nX, y = nY, w = 80, text = v.key,
+			buttonstyle = 2,
 			onlclick = function()
 				local edit = LIB.GetChatInputEdit()
 				D.SetEdit(edit, v.ad)

@@ -43,7 +43,7 @@ local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamMon'
 local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
+if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2016100) then
 	return
 end
 --------------------------------------------------------------------------
@@ -166,9 +166,10 @@ function D.OnFrameCreate()
 	for k, v in ipairs(MY_TMUI_TYPE) do
 		this.hPageSet:Lookup('CheckBox_' .. v, 'Text_Page_' .. v):SetText(_L[v])
 	end
-	ui:Append('WndButton3', {
+	ui:Append('WndButton', {
 		x = 900, y = 52, w = 140, h = 27,
 		text = g_tStrings.SYS_MENU,
+		buttonstyle = 3,
 		menu = function()
 			local menu = {}
 			insert(menu, { szOption = _L['Import data (local)'], fnAction = function() D.OpenImportPanel() end }) -- 有传参 不要改
@@ -216,8 +217,10 @@ function D.OnFrameCreate()
 			FireUIEvent('MY_TMUI_DATA_RELOAD')
 		end,
 	})
-	uiPageSetMain:Append('WndButton2', {
-		x = 920, y = 40, text = _L['Clear record'],
+	uiPageSetMain:Append('WndButton', {
+		x = 920, y = 40,
+		text = _L['Clear record'],
+		buttonstyle = 2,
 		onclick = function()
 			LIB.Confirm(_L['Confirm?'], function()
 				MY_TeamMon.ClearTemp(MY_TMUI_SELECT_TYPE)
@@ -870,7 +873,11 @@ function D.OpenImportPanel(szDefault, szTitle, fnAction)
 	nY = 110
 	nX, nY = ui:Append('Text', { x = 20, y = nY, text = _L['File name'], font = 27 }):Pos('BOTTOMRIGHT')
 	nX = ui:Append('WndEditBox', { name = 'FilePtah', x = 25, y = nY, w = 450, h = 25, text = szTitle, enable = not szDefault }):Pos('BOTTOMRIGHT')
-	nX, nY = ui:Append('WndButton2', { x = nX + 5, y = nY, text = _L['Browse'], enable = not szDefault,
+	nX, nY = ui:Append('WndButton', {
+		x = nX + 5, y = nY,
+		text = _L['Browse'],
+		buttonstyle = 2,
+		enable = not szDefault,
 		onclick = function()
 			local szFile = GetOpenFileName(
 				_L['please select data file.'],
@@ -907,8 +914,9 @@ function D.OpenImportPanel(szDefault, szTitle, fnAction)
 			nType = 2
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
-	ui:Append('WndButton3', {
+	ui:Append('WndButton', {
 		x = 285, y = nY + 30, text = g_tStrings.STR_HOTKEY_SURE,
+		buttonstyle = 3,
 		onclick = function()
 			local config = {
 				bFullPath  = not szDefault,
@@ -972,8 +980,9 @@ function D.OpenExportPanel()
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
 	ui:Append('WndCheckBox', { name = 'Format', x = 20, y = nY + 50, text = _L['Format content'] })
-	ui:Append('WndButton3', {
+	ui:Append('WndButton', {
 		x = 285, y = nY + 30, text = g_tStrings.STR_HOTKEY_SURE,
+		buttonstyle = 3,
 		onclick = function()
 			local config = {
 				bFormat = ui:Children('#Format'):Check(),
@@ -1342,8 +1351,9 @@ function D.OpenAddPanel(szType, data)
 			end
 		end,
 	}):Pos('BOTTOMRIGHT')
-	ui:Append('WndButton3', {
+	ui:Append('WndButton', {
 		x = 120, y = nY + 40, text = _L['Add'],
+		buttonstyle = 3,
 		onclick = function()
 			local txt = ui:Children('#map'):Text()
 			local map = LIB.GetMapInfo(txt)
@@ -1391,9 +1401,10 @@ function D.OpenJsonPanel(data, fnAction)
 			end
 		end,
 	})
-	ui:Append('WndButton3',{
+	ui:Append('WndButton',{
 		x = 30, y = 440,
 		text = g_tStrings.STR_HOTKEY_SURE,
+		buttonstyle = 3,
 		onclick = function()
 			LIB.Confirm(_L['Confirm?'], function()
 				local dat = DecodeLUAData(ui:Children('#CODE'):Text())
@@ -2537,8 +2548,10 @@ function D.OpenSettingPanel(data, szType)
 		}):Pos('BOTTOMRIGHT')
 		FormatElPosByCountdownType(v, ui, k)
 	end
-	nX = ui:Append('WndButton2', {
-		x = 30, y = nY + 10, text = _L['Add countdown'],
+	nX = ui:Append('WndButton', {
+		x = 30, y = nY + 10,
+		text = _L['Add countdown'],
+		buttonstyle = 2,
 		enable = not (data.tCountdown and #data.tCountdown > 10),
 		onclick = function()
 			if not data.tCountdown then
@@ -2672,8 +2685,10 @@ function D.OpenSettingPanel(data, szType)
 				nY = nY + CHECKBOX_HEIGHT
 			end
 		end
-		nX = ui:Append('WndButton2', {
-			x = 30, y = nY + 10, text = _L['Add circle'],
+		nX = ui:Append('WndButton', {
+			x = 30, y = nY + 10,
+			text = _L['Add circle'],
+			buttonstyle = 2,
 			enable = not (data.aCircle and #data.aCircle > 10),
 			onclick = function()
 				if not data.aCircle then
@@ -2697,9 +2712,10 @@ function D.OpenSettingPanel(data, szType)
 			nX, nY = ui:Append('Text', { x = 20, y = nY + 10, text = _L['Focuslist'], font = 27 }):Pos('BOTTOMRIGHT')
 			nX, nY = 30, nY + 10
 			for _, p in ipairs(data.aFocus or CONSTANT.EMPTY_TABLE) do
-				nX = nX + ui:Append('WndButton2', {
+				nX = nX + ui:Append('WndButton', {
 					x = nX, y = nY, w = 100,
 					text = MY_Focus.FormatRuleText(p, true),
+					buttonstyle = 2,
 					onclick = function()
 						local ui = UI(this)
 						MY_Focus.OpenRuleEditor(p, function(dat)
@@ -2728,9 +2744,10 @@ function D.OpenSettingPanel(data, szType)
 					nY = nY + BUTTON2_HEIGHT
 				end
 			end
-			nX = ui:Append('WndButton2', {
+			nX = ui:Append('WndButton', {
 				x = nX, y = nY, w = 100,
 				text = _L['Add focus'],
+				buttonstyle = 2,
 				onclick = function()
 					if not data.aFocus then
 						data.aFocus = {}
@@ -2749,9 +2766,10 @@ function D.OpenSettingPanel(data, szType)
 			nX, nY = ui:Append('Text', { x = 20, y = nY + 10, text = _L['Team panel buff rule list'], font = 27 }):Pos('BOTTOMRIGHT')
 			nX, nY = 30, nY + 10
 			for _, p in ipairs(data.aCataclysmBuff or CONSTANT.EMPTY_TABLE) do
-				nX = nX + ui:Append('WndButton2', {
+				nX = nX + ui:Append('WndButton', {
 					x = nX, y = nY, w = 100,
 					text = MY_Cataclysm.EncodeBuffRule(p, true),
+					buttonstyle = 2,
 					onclick = function()
 						local ui = UI(this)
 						MY_Cataclysm.OpenBuffRuleEditor(p, function(dat)
@@ -2780,9 +2798,10 @@ function D.OpenSettingPanel(data, szType)
 					nY = nY + BUTTON2_HEIGHT
 				end
 			end
-			nX = ui:Append('WndButton2', {
+			nX = ui:Append('WndButton', {
 				x = nX, y = nY, w = 100,
 				text = _L['Add buff rule'],
+				buttonstyle = 2,
 				onclick = function()
 					if not data.aCataclysmBuff then
 						data.aCataclysmBuff = {}
@@ -2795,14 +2814,17 @@ function D.OpenSettingPanel(data, szType)
 			nY = nY + BUTTON2_HEIGHT
 		end
 	end
-	-- nX = ui:Append('WndButton2', {
+	-- nX = ui:Append('WndButton', {
 	-- 	x = 640, y = nY + 10, text = g_tStrings.HELP_PANEL,
+	-- 	buttonstyle = 2,
 	-- 	onclick = function()
 	-- 		OpenInternetExplorer('https://github.com/luckyyyyy/JH/blob/master/JH_DBM/README.md')
 	-- 	end,
 	-- }):Pos('BOTTOMRIGHT')
-	ui:Append('WndButton2', {
-		x = 335, y = nY + 10, text = g_tStrings.STR_FRIEND_DEL, color = { 255, 0, 0 },
+	ui:Append('WndButton', {
+		x = 335, y = nY + 10,
+		text = g_tStrings.STR_FRIEND_DEL, color = { 255, 0, 0 },
+		buttonstyle = 2,
 		onclick = function()
 			LIB.Confirm(_L['Sure to delete?'], function()
 				D.RemoveData(data.dwMapID, data.nIndex, szName or _L['This data'])

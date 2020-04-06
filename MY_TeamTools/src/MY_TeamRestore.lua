@@ -42,7 +42,7 @@ local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamRestore'
 local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
+if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2016100) then
 	return
 end
 --------------------------------------------------------------------------
@@ -326,8 +326,9 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
 	nX = X + 10
 	nY = nY + 5
 	for i, v in ipairs(O.SaveList) do
-		nX = ui:Append('WndButton2', {
+		nX = ui:Append('WndButton', {
 			x = nX + 5, y = nY, w = 80, text = v.name,
+			buttonstyle = 2,
 			tip = v.name .. '\n' .. _L['Left click to recovery, right click for more.'],
 			tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 			onlclick = function()
@@ -399,8 +400,9 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
 		end
 	end
 
-	nX = ui:Append('WndButton2', {
+	nX = ui:Append('WndButton', {
 		x = nX + 5, y = nY, text = _L['Save Team'],
+		buttonstyle = 2,
 		onclick = function()
 			GetUserInput(_L['Save team name'], function(text)
 				D.Save(nil, text)

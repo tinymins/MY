@@ -42,7 +42,7 @@ local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Cataclysm'
 local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
+if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2016100) then
 	return
 end
 --------------------------------------------------------------------------
@@ -455,9 +455,10 @@ function MY_Cataclysm.OpenBuffRuleEditor(rec, onChangeNotify, bHideBase)
 	}):AutoWidth():Width() + 5
 
 	y = y + 50
-	ui:Append('WndButton2', {
+	ui:Append('WndButton', {
 		x = (w - 120) / 2, y = y, w = 120,
 		text = _L['Delete'], color = {223, 63, 95},
+		buttonstyle = 2,
 		onclick = function()
 			local function fnAction()
 				onChangeNotify()

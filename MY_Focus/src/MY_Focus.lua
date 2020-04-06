@@ -42,7 +42,7 @@ local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Focus'
 local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
+if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2016100) then
 	return
 end
 --------------------------------------------------------------------------
@@ -938,9 +938,10 @@ function D.OpenRuleEditor(tData, onChangeNotify, bHideBase)
 	nX, nY = X, nY + dY
 
 	nY = nY + 20
-	ui:Append('WndButton2', {
+	ui:Append('WndButton', {
 		x = (W - 100) / 2, y = nY, w = 100,
 		text = g_tStrings.STR_FRIEND_DEL, color = { 255, 0, 0 },
+		buttonstyle = 2,
 		onclick = function()
 			LIB.Confirm(_L['Sure to delete?'], function()
 				onChangeNotify()

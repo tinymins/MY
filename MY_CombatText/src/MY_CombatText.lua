@@ -42,7 +42,7 @@ local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_CombatText'
 local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
+if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2016100) then
 	return
 end
 --------------------------------------------------------------------------
@@ -1222,7 +1222,7 @@ function PS.OnPanelActive(frame)
 	end
 
 	if IsFileExist(COMBAT_TEXT_CONFIG) then
-		ui:Append('WndButton3', { x = 350, y = 0, text = _L['Load CombatText Config'] }):Click(CombatText.CheckEnable)
+		ui:Append('WndButton', { x = 350, y = 0, text = _L['Load CombatText Config'], buttonstyle = 3 }):Click(CombatText.CheckEnable)
 	end
 end
 LIB.RegisterPanel('MY_CombatText', _L['CombatText'], _L['System'], 2041, PS)

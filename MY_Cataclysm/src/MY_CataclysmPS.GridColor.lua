@@ -42,7 +42,7 @@ local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Cataclysm'
 local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
+if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2016100) then
 	return
 end
 --------------------------------------------------------------------------
@@ -133,8 +133,9 @@ function PS.OnPanelActive(frame)
 	-- 设置分段距离等级
 	x = X + 10
 	if CFG.bEnableDistance then
-		y = y + ui:Append('WndButton3', {
+		y = y + ui:Append('WndButton', {
 			x = x, y = y, text = _L['Edit Distance Level'],
+			buttonstyle = 3,
 			onclick = function()
 				GetUserInput(_L['distance, distance, ...'], function(szText)
 					local t = LIB.SplitString(LIB.TrimString(szText), ',')

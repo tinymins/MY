@@ -43,7 +43,7 @@ local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TargetMon'
 local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2014200) then
+if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2016100) then
 	return
 end
 --------------------------------------------------------------------------
@@ -206,9 +206,11 @@ local function DrawDetail(ui)
 			Search()
 		end,
 	})
-	uiWrapper:Append('WndButton2', {
+	uiWrapper:Append('WndButton', {
 		x = x1 + w1 - 60, y = y0 - 1, w = 60, h = 28,
-		text = _L['Add'], onclick = function() InsertMonitor() end,
+		text = _L['Add'],
+		buttonstyle = 2,
+		onclick = function() InsertMonitor() end,
 	})
 
 	-- ³õÊ¼»¯list¿Ø¼þ
@@ -672,9 +674,11 @@ local function DrawDetail(ui)
 		uiWrapper:BringToTop()
 	end
 
-	uiWrapper:Append('WndButton2', {
+	uiWrapper:Append('WndButton', {
 		x = x0 + w0 / 2 - 50, y = y0 + h0 - 30,
-		w = 100, h = 30, text = _L['Close'],
+		w = 100, h = 30,
+		text = _L['Close'],
+		buttonstyle = 2,
 		onclick = function()
 			l_config = nil
 			uiWrapper:Hide()
@@ -711,28 +715,31 @@ local function DrawPreview(ui, config, OpenDetail)
 			onchange = function(val) D.ModifyConfig(config, 'caption', val) end,
 		})
 	end
-	uiWnd:Append('WndButton2', {
+	uiWnd:Append('WndButton', {
 		x = w - 180, y = y,
 		w = 50, h = 25,
 		text = _L['Move Up'],
+		buttonstyle = 2,
 		onclick = function()
 			D.MoveConfig(config, -1)
 			LIB.SwitchTab('MY_TargetMon', true)
 		end,
 	})
-	uiWnd:Append('WndButton2', {
+	uiWnd:Append('WndButton', {
 		x = w - 125, y = y,
 		w = 50, h = 25,
 		text = _L['Move Down'],
+		buttonstyle = 2,
 		onclick = function()
 			D.MoveConfig(config, 1)
 			LIB.SwitchTab('MY_TargetMon', true)
 		end,
 	})
-	uiWnd:Append('WndButton2', {
+	uiWnd:Append('WndButton', {
 		x = w - 70, y = y,
 		w = 60, h = 25,
 		text = _L['Delete'],
+		buttonstyle = 2,
 		onclick = function()
 			D.DeleteConfig(config, IsCtrlKeyDown())
 			LIB.SwitchTab('MY_TargetMon', true)
@@ -983,9 +990,10 @@ local function DrawPreview(ui, config, OpenDetail)
 		end,
 		autoenable = function() return config.enable end,
 	})
-	uiWnd:Append('WndButton2', {
+	uiWnd:Append('WndButton', {
 		x = w - 110, y = y, w = 102,
 		text = _L['Set monitor'],
+		buttonstyle = 2,
 		onclick = function() OpenDetail(config) end,
 		autoenable = function() return config.enable end,
 	})
@@ -1085,10 +1093,11 @@ local function DrawControls(ui, OpenDetail)
 	local w, h = ui:Size()
 	local uiWnd = ui:Append('WndWindow', { name = 'Wnd_Controls', w = w, h = 80 })
 	local x, y = (w - 380) / 2, 10
-	uiWnd:Append('WndButton2', {
+	uiWnd:Append('WndButton', {
 		x = x, y = y,
 		w = 60, h = 30,
 		text = _L['Create'],
+		buttonstyle = 2,
 		onclick = function()
 			local config = D.CreateConfig()
 			DrawPreview(ui, config, OpenDetail)
@@ -1097,10 +1106,11 @@ local function DrawControls(ui, OpenDetail)
 		end,
 	})
 	x = x + 70
-	uiWnd:Append('WndButton2', {
+	uiWnd:Append('WndButton', {
 		x = x, y = y,
 		w = 60, h = 30,
 		text = _L['Import'],
+		buttonstyle = 2,
 		onclick = function()
 			local file = GetOpenFileName(
 				_L['Please select import target monitor data file.'],
@@ -1125,10 +1135,11 @@ local function DrawControls(ui, OpenDetail)
 		end,
 	})
 	x = x + 70
-	uiWnd:Append('WndButton2', {
+	uiWnd:Append('WndButton', {
 		x = x, y = y,
 		w = 60, h = 30,
 		text = _L['Export'],
+		buttonstyle = 2,
 		tip = _L['Press ALT to export as default data.\n Press CTRL to export as plain.'],
 		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 		menu = function()
@@ -1183,10 +1194,11 @@ local function DrawControls(ui, OpenDetail)
 		end,
 	})
 	x = x + 70
-	uiWnd:Append('WndButton2', {
+	uiWnd:Append('WndButton', {
 		x = x, y = y,
 		w = 80, h = 30,
 		text = _L['Save As Default'],
+		buttonstyle = 2,
 		onclick = function()
 			LIB.Confirm(_L['Sure to save as default?'], function()
 				D.SaveConfig(true)
@@ -1194,10 +1206,11 @@ local function DrawControls(ui, OpenDetail)
 		end,
 	})
 	x = x + 90
-	uiWnd:Append('WndButton2', {
+	uiWnd:Append('WndButton', {
 		x = x, y = y,
 		w = 80, h = 30,
 		text = _L['Reset Default'],
+		buttonstyle = 2,
 		onclick = function()
 			LIB.Dialog(_L['Sure to reset default?'], {
 				{

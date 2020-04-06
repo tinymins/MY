@@ -98,6 +98,44 @@ UI = setmetatable({}, {
 			WIDE_CHAR = 2, -- ÖÐÓ¢ÎÄ
 		}),
 		LAYER_LIST = {'Lowest', 'Lowest1', 'Lowest2', 'Normal', 'Normal1', 'Normal2', 'Topmost', 'Topmost1', 'Topmost2'},
+		BUTTON_STYLE = {
+			{
+				nWidth = 100,
+				nHeight = 26,
+				szImage = 'ui/Image/UICommon/CommonPanel.UITex',
+				nNormalGroup = 25,
+				nMouseOverGroup = 26,
+				nMouseDownGroup = 27,
+				nDisableGroup = 28,
+			},
+			{
+				nWidth = 100,
+				nHeight = 25,
+				szImage = 'ui/image/uicommon/logincommon.uitex',
+				nNormalGroup = 54,
+				nMouseOverGroup = 55,
+				nMouseDownGroup = 56,
+				nDisableGroup = 60,
+			},
+			{
+				nWidth = 148,
+				nHeight = 33,
+				szImage = PACKET_INFO.UITEX_COMMON,
+				nNormalGroup = 5,
+				nMouseOverGroup = 6,
+				nMouseDownGroup = 7,
+				nDisableGroup = 8,
+			},
+			{
+				nWidth = 148,
+				nHeight = 33,
+				szImage = PACKET_INFO.UITEX_COMMON,
+				nNormalGroup = 1,
+				nMouseOverGroup = 2,
+				nMouseDownGroup = 3,
+				nDisableGroup = 4,
+			},
+		},
 	},
 	__tostring = function(t) return PACKET_INFO.NAME_SPACE .. '_UI (class prototype)' end,
 	__call = function (...)
@@ -155,6 +193,7 @@ local function ApplyUIArguments(ui, arg)
 		if arg.limit              ~= nil then ui:Limit          (arg.limit      ) end
 		if arg.scroll             ~= nil then ui:Scroll         (arg.scroll     ) end
 		if arg.handlestyle        ~= nil then ui:HandleStyle    (arg.handlestyle) end
+		if arg.buttonstyle        ~= nil then ui:ButtonStyle    (arg.buttonstyle) end
 		if arg.edittype           ~= nil then ui:EditType       (arg.edittype   ) end
 		if arg.visible            ~= nil then ui:Visible        (arg.visible    ) end
 		if arg.autovisible        ~= nil then ui:Visible        (arg.autovisible) end
@@ -3206,6 +3245,25 @@ function UI:TrackbarStyle(nTrackbarStyle)
 	return self
 end
 
+-- (self) UI:ButtonStyle(nButtonStyle)
+function UI:ButtonStyle(nButtonStyle)
+	self:_checksum()
+	local tStyle = UI.BUTTON_STYLE[nButtonStyle]
+	if tStyle then
+		for _, raw in ipairs(self.raws) do
+			if GetComponentType(raw) == 'WndButton' then
+				raw:SetAnimatePath((wgsub(tStyle.szImage, '/', '\\')))
+				raw:SetAnimateGroupNormal(tStyle.nNormalGroup)
+				raw:SetAnimateGroupMouseOver(tStyle.nMouseOverGroup)
+				raw:SetAnimateGroupMouseDown(tStyle.nMouseDownGroup)
+				raw:SetAnimateGroupDisable(tStyle.nDisableGroup)
+				raw:SetSize(tStyle.nWidth, tStyle.nHeight)
+			end
+		end
+	end
+	return self
+end
+
 -- (self) UI:FormatChildrenPos()
 function UI:FormatChildrenPos()
 	self:_checksum()
@@ -4502,8 +4560,10 @@ function UI.OpenIconPanel(fnAction)
 		end
 	end
 	ui:Append('WndEditBox', { name = 'Icon', x = 730, y = 580, w = 50, h = 25, edittype = 0 })
-	ui:Append('WndButton2', {
-		text = g_tStrings.STR_HOTKEY_SURE, x = 800, y = 580,
+	ui:Append('WndButton', {
+		x = 800, y = 580,
+		text = g_tStrings.STR_HOTKEY_SURE,
+		buttonstyle = 2,
 		onclick = function()
 			local nIcon = tonumber(ui:Children('#Icon'):Text())
 			if nIcon then

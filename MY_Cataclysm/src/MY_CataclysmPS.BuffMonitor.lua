@@ -42,7 +42,7 @@ local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Cataclysm'
 local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
+if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2016100) then
 	return
 end
 --------------------------------------------------------------------------
@@ -102,8 +102,9 @@ function PS.OnPanelActive(frame)
 	local w, h = ui:Size()
 
 	x = X
-	x = x + ui:Append('WndButton2', {
+	x = x + ui:Append('WndButton', {
 		x = x, y = y, w = 100,
+		buttonstyle = 2,
 		text = _L['Add'],
 		onclick = function()
 			local rec = {}
@@ -112,8 +113,9 @@ function PS.OnPanelActive(frame)
 			OpenBuffRuleEditor(rec)
 		end,
 	}):AutoHeight():Width() + 5
-	x = x + ui:Append('WndButton2', {
+	x = x + ui:Append('WndButton', {
 		x = x, y = y, w = 100,
+		buttonstyle = 2,
 		text = _L['Edit'],
 		onclick = function()
 			local ui = UI.CreateFrame('MY_Cataclysm_BuffConfig', {
@@ -130,9 +132,10 @@ function PS.OnPanelActive(frame)
 			})
 			y = y + edit:Height() + 5
 
-			ui:Append('WndButton2', {
+			ui:Append('WndButton', {
 				x = x, y = y, w = 310,
 				text = _L['Sure'],
+				buttonstyle = 2,
 				onclick = function()
 					CFG.aBuffList = DecodeBuffRuleList(edit:Text())
 					MY_Cataclysm.UpdateBuffListCache()

@@ -43,7 +43,7 @@ local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamMon'
 local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
+if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2016100) then
 	return
 end
 --------------------------------------------------------------------------
@@ -177,7 +177,10 @@ function PS.OnPanelActive(frame)
 	}):Pos('BOTTOMRIGHT')
 
 	nY = nY + 10
-	nX = ui:Append('WndButton2', { x = X + 10, y = nY + 5, text = g_tStrings.FONT,
+	nX = ui:Append('WndButton', {
+		x = X + 10, y = nY + 5,
+		text = g_tStrings.FONT,
+		buttonstyle = 2,
 		onclick = function()
 			UI.OpenFontPicker(function(nFont)
 				O.dwFontScheme = nFont
@@ -185,8 +188,10 @@ function PS.OnPanelActive(frame)
 			end)
 		end,
 	}):Pos('BOTTOMRIGHT')
-	ui:Append('WndButton2', {
-		text = _L['Preview'], x = nX + 10, y = nY + 5,
+	ui:Append('WndButton', {
+		x = nX + 10, y = nY + 5,
+		text = _L['Preview'],
+		buttonstyle = 2,
 		onclick = function()
 			D.UpdateText(_L['PVE everyday, Xuanjing everyday!'])
 		end,

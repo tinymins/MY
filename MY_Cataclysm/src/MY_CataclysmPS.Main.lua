@@ -42,7 +42,7 @@ local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Cataclysm'
 local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
+if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2016100) then
 	return
 end
 --------------------------------------------------------------------------
@@ -78,8 +78,10 @@ function PS.OnPanelActive(frame)
 	end
 
 	-- »Ö¸´Ä¬ÈÏ
-	y = y + ui:Append('WndButton2', {
-		x = x, y = y + 3, text = _L['Restore default'],
+	y = y + ui:Append('WndButton', {
+		x = x, y = y + 3,
+		text = _L['Restore default'],
+		buttonstyle = 2,
 		onclick = function()
 			MY_Cataclysm.ConfirmRestoreConfig()
 		end,

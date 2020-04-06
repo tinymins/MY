@@ -42,7 +42,7 @@ local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_GKP'
 local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
+if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2016100) then
 	return
 end
 --------------------------------------------------------------------------
@@ -119,8 +119,10 @@ function Chat.OpenFrame(item, menu, data)
 	if not frame then
 		frame = Wnd.OpenWindow(PACKET_INFO.ROOT .. 'MY_GKP/ui/MY_GKP_Chat.ini', 'MY_GKP_Chat')
 		local ui = UI(frame):Anchor('CENTER')
-		ui:Append('WndButton2', {
-			x = 380, y = 38, text = _L['Stop Bidding'],
+		ui:Append('WndButton', {
+			x = 380, y = 38,
+			text = _L['Stop Bidding'],
+			buttonstyle = 2,
 			onclick = function()
 				LIB.Talk(PLAYER_TALK_CHANNEL.RAID, _L['--- Stop Bidding ---'])
 				LIB.DelayCall(1000, function() UnRegisterMsgMonitor(Chat.OnMsgArrive) end)

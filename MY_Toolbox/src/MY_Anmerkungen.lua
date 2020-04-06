@@ -42,7 +42,7 @@ local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Anmerkungen'
 local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2014200) then
+if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2016100) then
 	return
 end
 --------------------------------------------------------------------------
@@ -415,18 +415,20 @@ function PS.OnPanelActive(wnd)
 	local w, h = ui:Size()
 	local x, y = 0, 0
 
-	ui:Append('WndButton2', {
+	ui:Append('WndButton', {
 		x = x, y = y, w = 110,
 		text = _L['Create'],
+		buttonstyle = 2,
 		onclick = function()
 			MY_Anmerkungen.OpenPlayerNoteEditPanel()
 		end,
 	})
 
 	if not MY.IsShieldedVersion('MY_Anmerkungen') then
-		ui:Append('WndButton2', {
+		ui:Append('WndButton', {
 			x = w - 230, y = y, w = 110,
 			text = _L['Import'],
+			buttonstyle = 2,
 			onclick = function()
 				GetUserInput(_L['please input import data:'], function(szVal)
 					local config = DecodeLUAData(szVal)
@@ -491,9 +493,10 @@ function PS.OnPanelActive(wnd)
 			end,
 		})
 
-		ui:Append('WndButton2', {
+		ui:Append('WndButton', {
 			x = w - 110, y = y, w = 110,
 			text = _L['Export'],
+			buttonstyle = 2,
 			onclick = function()
 				UI.OpenTextEditor(EncodeLUAData({
 					server   = LIB.GetRealServer(),
