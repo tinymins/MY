@@ -101,8 +101,8 @@ local O = {
 RegisterCustomData('Global/MY_RoleStatistics_RoleStat.aColumn')
 RegisterCustomData('Global/MY_RoleStatistics_RoleStat.szSort')
 RegisterCustomData('Global/MY_RoleStatistics_RoleStat.szSortOrder')
-RegisterCustomData('Global/MY_RoleStatistics_RoleStat.aAlertColumn')
-RegisterCustomData('Global/MY_RoleStatistics_RoleStat.tAlertTodayVal')
+RegisterCustomData('MY_RoleStatistics_RoleStat.aAlertColumn')
+RegisterCustomData('MY_RoleStatistics_RoleStat.tAlertTodayVal')
 RegisterCustomData('MY_RoleStatistics_RoleStat.bFloatEntry')
 RegisterCustomData('MY_RoleStatistics_RoleStat.bSaveDB')
 
