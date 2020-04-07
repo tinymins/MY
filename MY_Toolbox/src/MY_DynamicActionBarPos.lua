@@ -70,7 +70,11 @@ function D.UpdateAnchor(szName)
 	if not frame then
 		return
 	end
-	frame:SetPoint(an.s, 0, 0, an.r, an.x, an.y)
+	if frame.__MY_SetPoint then
+		frame:__MY_SetPoint(an.s, 0, 0, an.r, an.x, an.y)
+	else
+		frame:SetPoint(an.s, 0, 0, an.r, an.x, an.y)
+	end
 	frame:CorrectPos()
 end
 
@@ -91,6 +95,8 @@ function D.Hook(szName)
 		frame.OnFrameDragEnd = function()
 			D.SaveAnchor(szName)
 		end
+		frame.__MY_SetPoint = frame.SetPoint
+		frame.SetPoint = function() end
 	end
 	LIB.RegisterFrameCreate(szName .. '.MY_DynamicActionBarPos', function()
 		OnFrameCreate(arg0)
@@ -107,9 +113,15 @@ end
 
 function D.Unhook(szName)
 	local frame = UI.LookupFrame(szName)
-	if frame and frame.__MY_OnFrameDragEnd then
-		frame.OnFrameDragEnd = frame.__MY_OnFrameDragEnd
-		frame.__MY_OnFrameDragEnd = nil
+	if frame then
+		if frame.__MY_OnFrameDragEnd then
+			frame.OnFrameDragEnd = frame.__MY_OnFrameDragEnd
+			frame.__MY_OnFrameDragEnd = nil
+		end
+		if frame.__MY_SetPoint then
+			frame.SetPoint = frame.__MY_SetPoint
+			frame.__MY_SetPoint = nil
+		end
 	end
 	LIB.RegisterFrameCreate(szName .. '.MY_DynamicActionBarPos', false)
 	LIB.RegisterFrameCreate('UI_SCALED.MY_DynamicActionBarPos__' .. szName, false)
