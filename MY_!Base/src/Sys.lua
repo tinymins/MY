@@ -1668,9 +1668,15 @@ end
 
 do
 local nIndex = 0
-function LIB.Alert(szMsg, fnAction, szSure, fnCancelAction)
+function LIB.Alert(szName, szMsg, fnAction, szSure, fnCancelAction)
+	if IsFunction(szMsg) or IsNil(szMsg) then
+		szMsg, fnAction, szSure, fnCancelAction = szName, szMsg, fnAction, szSure
+		szName = PACKET_INFO.NAME_SPACE .. '_Alert' .. nIndex
+		nIndex = nIndex + 1
+	else
+		szName = PACKET_INFO.NAME_SPACE .. '_AlertCRC' .. GetStringCRC(szName)
+	end
 	local nW, nH = Station.GetClientSize()
-	local szName = PACKET_INFO.NAME_SPACE .. '_Alert' .. nIndex
 	local tMsg = {
 		x = nW / 2, y = nH / 3,
 		szName = szName,
@@ -1682,7 +1688,6 @@ function LIB.Alert(szMsg, fnAction, szSure, fnCancelAction)
 			fnAction = fnAction,
 		},
 	}
-	nIndex = nIndex + 1
 	MessageBox(tMsg)
 	return szName
 end
