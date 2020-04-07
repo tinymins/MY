@@ -66,7 +66,7 @@ function D.SetDS(frame, szFilePath)
 		D.DrawPaymentPage(frame)
 	else
 		Wnd.CloseWindow(frame)
-		LIB.Alert(_L['Load data source failed!'])
+		LIB.Alert('MY_GKP_UI', _L['Load data source failed!'])
 	end
 end
 
@@ -167,7 +167,7 @@ function D.DrawAuctionPage(frame, szKey, szSort)
 			if bMainInstance then
 				item.OnItemRButtonClick = function()
 					if not LIB.IsDistributer() and not LIB.IsDebugClient('MY_GKP') then
-						return LIB.Alert(_L['You are not the distrubutor.'])
+						return LIB.Alert('MY_GKP_UI', _L['You are not the distrubutor.'])
 					end
 					MY_GKP_AuctionUI.Open(this:GetRoot().ds, v, 'EDIT')
 				end
@@ -221,7 +221,7 @@ function D.DrawAuctionPage(frame, szKey, szSort)
 			if bMainInstance then
 				wnd:Lookup('WndButton_Delete').OnLButtonClick = function()
 					if not LIB.IsDistributer() and not LIB.IsDebugClient('MY_GKP') then
-						return LIB.Alert(_L['You are not the distrubutor.'])
+						return LIB.Alert('MY_GKP_UI', _L['You are not the distrubutor.'])
 					end
 					v.bDelete = not v.bDelete
 					frame.ds:SetAuctionRec(v)
@@ -316,7 +316,7 @@ function MY_GKP_UI.OnFrameCreate()
 		buttonstyle = 3,
 		onclick = function()
 			if not LIB.IsDistributer() and not LIB.IsDebugClient('MY_GKP') then -- debug
-				return LIB.Alert(_L['You are not the distrubutor.'])
+				return LIB.Alert('MY_GKP_UI', _L['You are not the distrubutor.'])
 			end
 			MY_GKP_AuctionUI.Open(this:GetRoot().ds)
 		end,
@@ -332,14 +332,14 @@ function MY_GKP_UI.OnFrameCreate()
 			local ds = this:GetRoot().ds
 			local me = GetClientPlayer()
 			if not me.IsInParty() and not LIB.IsDebugClient('MY_GKP') then
-				return LIB.Alert(_L['You are not in the team.'])
+				return LIB.Alert('MY_GKP_UI', _L['You are not in the team.'])
 			end
 			local team = GetClientTeam()
 			if IsEmpty(ds:GetAuctionList()) then
-				return LIB.Alert(_L['No Record'])
+				return LIB.Alert('MY_GKP_UI', _L['No Record'])
 			end
 			if not LIB.IsDistributer() and not LIB.IsDebugClient('MY_GKP') then
-				return LIB.Alert(_L['You are not the distrubutor.'])
+				return LIB.Alert('MY_GKP_UI', _L['You are not the distrubutor.'])
 			end
 			GetUserInput(_L['Total Amount of People with Output Settle Account'],function(num)
 				if not tonumber(num) then return end
@@ -367,15 +367,15 @@ function MY_GKP_UI.OnFrameCreate()
 			local ds = this:GetRoot().ds
 			local me = GetClientPlayer()
 			if not me.IsInParty() and not LIB.IsDebugClient('MY_GKP') then
-				return LIB.Alert(_L['You are not in the team.'])
+				return LIB.Alert('MY_GKP_UI', _L['You are not in the team.'])
 			end
 			local tAuction = ds:GetAuctionPlayerSum()
 			local aAuction = ds:GetAuctionList('nTime', 'desc')
 			if IsEmpty(tAuction) then
-				return LIB.Alert(_L['No Record'])
+				return LIB.Alert('MY_GKP_UI', _L['No Record'])
 			end
 			if not LIB.IsDistributer() and not LIB.IsDebugClient('MY_GKP') then
-				return LIB.Alert(_L['You are not the distrubutor.'])
+				return LIB.Alert('MY_GKP_UI', _L['You are not the distrubutor.'])
 			end
 			FireUIEvent('MY_GKP_SEND_BEGIN')
 
@@ -408,15 +408,15 @@ function MY_GKP_UI.OnFrameCreate()
 			local ds = this:GetRoot().ds
 			local me = GetClientPlayer()
 			if not me.IsInParty() and not LIB.IsDebugClient('MY_GKP') then
-				return LIB.Alert(_L['You are not in the team.'])
+				return LIB.Alert('MY_GKP_UI', _L['You are not in the team.'])
 			end
 			if not LIB.IsDistributer() and not LIB.IsDebugClient('MY_GKP') then
-				return LIB.Alert(_L['You are not the distrubutor.'])
+				return LIB.Alert('MY_GKP_UI', _L['You are not the distrubutor.'])
 			end
 			local tAuction = ds:GetAuctionPlayerSum()
 			local tPayment = ds:GetPaymentPlayerSum()
 			if IsEmpty(tAuction) and IsEmpty(tPayment) then
-				return LIB.Alert(_L['No Record'])
+				return LIB.Alert('MY_GKP_UI', _L['No Record'])
 			end
 			FireUIEvent('MY_GKP_SEND_BEGIN')
 			for szPlayer, nMoney in pairs(tPayment) do
@@ -526,7 +526,7 @@ function MY_GKP_UI.OnFrameCreate()
 					if not IsEmpty(file) then
 						LIB.Confirm(_L['Are you sure to cover the current information with the last record data?'], function()
 							D.LoadData(file, true)
-							LIB.Alert(_L['Reocrd Recovered.'])
+							LIB.Alert('MY_GKP_UI', _L['Reocrd Recovered.'])
 						end)
 					end
 				end,
@@ -547,7 +547,7 @@ function MY_GKP_UI.OnFrameCreate()
 			if me.IsInParty() then
 				local menu = MY_GKP.GetTeamMemberMenu(function(v)
 					LIB.Confirm(_L('Wheater replace the current record with the synchronization [%s]\'s record?\n Please notice, this means you are going to lose the information of current record.', v.szName), function()
-						LIB.Alert(_L('Asking for the sychoronization information...\n If no response in longtime, it may because [%s] is not using MY_GKP plugin or not responding.', v.szName))
+						LIB.Alert('MY_GKP_UI', _L('Asking for the sychoronization information...\n If no response in longtime, it may because [%s] is not using MY_GKP plugin or not responding.', v.szName))
 						LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'GKP_Sync', v.szName}) -- 请求同步信息
 					end)
 				end, true)
@@ -555,15 +555,15 @@ function MY_GKP_UI.OnFrameCreate()
 				table.insert(menu, 1, { szOption = _L['Please select which will be the one you are going to ask record for.'], bDisable = true })
 				return menu
 			else
-				LIB.Alert(_L['You are not in the team.'])
+				LIB.Alert('MY_GKP_UI', _L['You are not in the team.'])
 			end
 		end,
 		rmenu = function()
 			local me = GetClientPlayer()
 			if not me.IsInParty() then
-				LIB.Alert(_L['You are not in the team.'])
+				LIB.Alert('MY_GKP_UI', _L['You are not in the team.'])
 			elseif not LIB.IsDistributer() and not LIB.IsDebugClient('MY_GKP') then
-				LIB.Alert(_L['You are not the distrubutor.'])
+				LIB.Alert('MY_GKP_UI', _L['You are not the distrubutor.'])
 			else
 				local menu = MY_GKP.GetTeamMemberMenu(function(v)
 					LIB.Confirm(_L('Wheater synchronize your record to [%s]?\n Please notice, this means the opposite sites are going to lose their information of current record.', v.szName), function()
@@ -613,7 +613,7 @@ function MY_GKP_UI.OnFrameCreate()
 				MY_GKP_MI.LoadHistory(frame.ds:GetFilePath())
 				MY_GKP_MI.OpenPanel()
 				Wnd.CloseWindow(frame)
-				LIB.Alert(_L['Reocrd Recovered.'])
+				LIB.Alert('MY_GKP_UI', _L['Reocrd Recovered.'])
 			end)
 		end,
 	})
