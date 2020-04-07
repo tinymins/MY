@@ -9,6 +9,7 @@ return {
 	['OT Alert'] = '即将OT报警',
 	['OT Alert Sound'] = '播放声音',
 	['Style Setting'] = '风格设置',
+	['Show percent'] = '显示百分比',
 	['Top Target'] = '置顶目标',
 	['Special Self'] = '自己的颜色特殊化显示',
 	['Style Select'] = '风格选择',

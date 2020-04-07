@@ -58,6 +58,7 @@ MY_ThreatRank = {
 	bOTAlertSound = true,  -- OT 播放声音
 	bSpecialSelf  = true,  -- 特殊颜色显示自己
 	bTopTarget    = true,  -- 置顶当前目标
+	bShowPercent  = true,  -- 是否为显示百分比模式
 	tAnchor       = {},
 	nStyle        = 2,
 }
@@ -376,12 +377,16 @@ function _TS.UpdateThreatBars(tList, dwTargetID, dwApplyID)
 
 			local item = this.handle:AppendItemFromData(this.hItemData, k)
 			local nThreatPercentage, fDiff = 0, 0
-			if v.val ~= 0 then
-				fDiff = v.val / nTopRank
-				nThreatPercentage = fDiff * (100 / 120)
-				item:Lookup('Text_ThreatValue'):SetText(math.floor(100 * fDiff) .. '%')
+			if MY_ThreatRank.bShowPercent then
+				if v.val ~= 0 then
+					fDiff = v.val / nTopRank
+					nThreatPercentage = fDiff * (100 / 120)
+					item:Lookup('Text_ThreatValue'):SetText(math.floor(100 * fDiff) .. '%')
+				else
+					item:Lookup('Text_ThreatValue'):SetText('0%')
+				end
 			else
-				item:Lookup('Text_ThreatValue'):SetText('0%')
+				item:Lookup('Text_ThreatValue'):SetText(v.val)
 			end
 			item:Lookup('Text_ThreatValue'):SetFontScheme(dat[6][2])
 
@@ -519,6 +524,15 @@ function PS.OnPanelActive(frame)
 	y = y + 28
 
 	x = x + 10
+	ui:Append('WndCheckBox', {
+		x = x , y = y, checked = TS.bShowPercent, text = _L['Show percent'],
+		oncheck = function(bChecked)
+			TS.bShowPercent = bChecked
+		end,
+		autoenable = IsEnabled,
+	})
+
+	y = y + 28
 	ui:Append('WndCheckBox', {
 		x = x , y = y, checked = TS.bTopTarget, text = _L['Top Target'],
 		oncheck = function(bChecked)

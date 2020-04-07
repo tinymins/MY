@@ -9,6 +9,7 @@ return {
 	['OT Alert'] = '即將OT報警',
 	['OT Alert Sound'] = '播放聲音',
 	['Style Setting'] = '風格設置',
+	['Show percent'] = '顯示百分比',
 	['Top Target'] = '置頂目標',
 	['Special Self'] = '自己的顏色特殊化顯示',
 	['Style Select'] = '風格選擇',
