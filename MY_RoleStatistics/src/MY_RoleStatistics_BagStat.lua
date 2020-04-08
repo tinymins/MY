@@ -298,7 +298,7 @@ end
 function D.UpdateItems(page)
 	D.FlushDB()
 
-	local searchitem = page:Lookup('Wnd_Total/Wnd_SearchItem/Edit_SearchItem'):GetText():gsub('%s+', '%%')
+	local searchitem = AnsiToUTF8('%' .. page:Lookup('Wnd_Total/Wnd_SearchItem/Edit_SearchItem'):GetText():gsub('%s+', '%%') .. '%')
 	local sqlfrom = '(SELECT B.ownerkey, B.boxtype, B.boxindex, B.tabtype, B.tabindex, B.tabsubindex, B.bagcount, B.bankcount, B.time FROM BagItems AS B LEFT JOIN ItemInfo AS I ON B.tabtype = I.tabtype AND B.tabindex = I.tabindex WHERE B.tabtype != -1 AND B.tabindex != -1 AND (I.name LIKE ? OR I.desc LIKE ?)) AS C LEFT JOIN OwnerInfo AS O ON C.ownerkey = O.ownerkey WHERE '
 	local sql  = 'SELECT C.ownerkey AS ownerkey, C.boxtype AS boxtype, C.boxindex AS boxindex, C.tabtype AS tabtype, C.tabindex AS tabindex, C.tabsubindex AS tabsubindex, SUM(C.bagcount) AS bagcount, SUM(C.bankcount) AS bankcount, C.time AS time, O.ownername AS ownername, O.servername AS servername FROM' .. sqlfrom
 	local sqlc = 'SELECT COUNT(*) AS count FROM' .. sqlfrom
@@ -310,7 +310,7 @@ function D.UpdateItems(page)
 		local wnd = container:LookupContent(i)
 		if wnd:Lookup('CheckBox_Name'):IsCheckBoxChecked() then
 			insert(wheres, 'O.ownerkey = ?')
-			insert(ownerkeys, wnd.ownerkey)
+			insert(ownerkeys, AnsiToUTF8(wnd.ownerkey))
 		end
 	end
 	local sqlwhere = ((#wheres == 0 and ' 1 = 0 ') or ('(' .. concat(wheres, ' OR ') .. ')'))
@@ -321,7 +321,7 @@ function D.UpdateItems(page)
 	-- 绘制页码
 	local DB_CountR = DB:Prepare(sqlc)
 	DB_CountR:ClearBindings()
-	DB_CountR:BindAll(AnsiToUTF8('%' .. searchitem .. '%'), AnsiToUTF8('%' .. searchitem .. '%'), unpack(ownerkeys))
+	DB_CountR:BindAll(searchitem, searchitem, unpack(ownerkeys))
 	local nCount = #DB_CountR:GetAll()
 	local nPageCount = floor(nCount / nPageSize) + 1
 	page:Lookup('Wnd_Total/Wnd_Index/Wnd_IndexEdit/WndEdit_Index'):SetText(page.nCurrentPage)
@@ -372,7 +372,7 @@ function D.UpdateItems(page)
 	-- 绘制列表
 	local DB_ItemInfoR = DB:Prepare(sql)
 	DB_ItemInfoR:ClearBindings()
-	DB_ItemInfoR:BindAll(AnsiToUTF8('%' .. searchitem .. '%'), AnsiToUTF8('%' .. searchitem .. '%'), unpack(ownerkeys))
+	DB_ItemInfoR:BindAll(searchitem, searchitem, unpack(ownerkeys))
 	local result = DB_ItemInfoR:GetAll()
 
 	local sqlbelongs = 'SELECT * FROM (SELECT ownerkey, SUM(bagcount) AS bagcount, SUM(bankcount) AS bankcount FROM BagItems WHERE tabtype = ? AND tabindex = ? AND tabsubindex = ? GROUP BY ownerkey) AS B LEFT JOIN OwnerInfo AS O ON B.ownerkey = O.ownerkey WHERE '
