@@ -62,7 +62,7 @@ function D.GetList()
 		end
 	end
 	for _, p in ipairs(FONT_LIST) do
-		if p.szLang == szLang then
+		if p.tLang[szLang] then
 			local szFile = p.szFile:gsub('^%./', FONT_DIR):gsub('/', '\\')
 			local szKey = szFile:lower()
 			if not tExist[szKey] then
