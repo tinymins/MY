@@ -956,6 +956,11 @@ function LIB.GetFontList()
 			tExist[szKey] = true
 		end
 	end
+	for i, p in ipairs_r(aList) do
+		if not IsFileExist(p.szFile) then
+			remove(aList, i)
+		end
+	end
 	return aList
 end
 
