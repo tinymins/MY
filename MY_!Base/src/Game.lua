@@ -2361,6 +2361,7 @@ function LIB.GetItemAmountInAllPackages(dwTabType, dwIndex, nBookID, bFull)
 end
 LIB.RegisterEvent({
 	'BAG_ITEM_UPDATE.' .. PACKET_INFO.NAME_SPACE .. '#LIB#GetItemAmountInAllPackages',
+	'BANK_ITEM_UPDATE.' .. PACKET_INFO.NAME_SPACE .. '#LIB#GetItemAmountInAllPackages',
 	'LOADING_ENDING.' .. PACKET_INFO.NAME_SPACE .. '#LIB#GetItemAmountInAllPackages'
 }, function()
 	CACHE, FULL_CACHE = nil
