@@ -2241,7 +2241,7 @@ end
 
 function LIB.GetBankPackageCount()
 	local me = GetClientPlayer()
-	return me.GetBankPackageCount()
+	return me.GetBankPackageCount() + 1 -- 逻辑写挫了 返回的比真实的少一个
 end
 
 -- 获取背包空位总数
@@ -2333,7 +2333,7 @@ function LIB.GetItemAmountInAllPackages(dwTabType, dwIndex, nBookID, bFull)
 				InsertItem(cache, me.GetItem(dwBox, dwX))
 			end
 		end
-		for dwBox = INVENTORY_INDEX.BANK, INVENTORY_INDEX.BANK + me.GetBankPackageCount() - 1 do
+		for dwBox = INVENTORY_INDEX.BANK, INVENTORY_INDEX.BANK + LIB.GetBankPackageCount() - 1 do
 			for dwX = 0,  me.GetBoxSize(dwBox) - 1 do
 				InsertItem(cache, GetPlayerItem(me, dwBox, dwX))
 			end

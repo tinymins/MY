@@ -180,7 +180,7 @@ function D.FlushDB()
 	DB_OwnerInfoW:Execute()
 
 	-- ²Ö¿â
-	for boxtype = INVENTORY_INDEX.BANK, INVENTORY_INDEX.BANK + me.GetBankPackageCount() - 1 do
+	for boxtype = INVENTORY_INDEX.BANK, INVENTORY_INDEX.BANK + LIB.GetBankPackageCount() - 1 do
 		local count = me.GetBoxSize(boxtype)
 		for boxindex = 0, count - 1 do
 			local KItem = GetPlayerItem(me, boxtype, boxindex)
