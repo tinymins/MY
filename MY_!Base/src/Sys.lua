@@ -947,7 +947,7 @@ function LIB.GetFontList()
 		end
 	end
 	local CUSTOM_FONT_DIR = LIB.FormatPath({'font/', PATH_TYPE.GLOBAL}):gsub('%./', '/')
-	local CUSTOM_FONT_LIST = LIB.LoadLUAData(CUSTOM_FONT_DIR .. 'list.jx3dat') or {}
+	local CUSTOM_FONT_LIST = LIB.LoadLUAData(CUSTOM_FONT_DIR .. 'list.jx3dat', { passphrase = false }) or {}
 	for _, p in ipairs(CUSTOM_FONT_LIST) do
 		local szFile = p.szFile:gsub('^%./', CUSTOM_FONT_DIR):gsub('/', '\\')
 		local szKey = szFile:lower()
