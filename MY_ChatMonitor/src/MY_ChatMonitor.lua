@@ -394,128 +394,125 @@ _C.OnPanelActive = function(wnd)
         end,
     })
 
-    ui:Append('Image', {
-        x = w - 26, y = 13,
-        image = 'UI/Image/UICommon/Commonpanel.UITex', imageframe = 18,
-        w = 30, h = 30, alpha = 200,
-        onhover = function(bIn) this:SetAlpha((bIn and 255) or 200) end,
-        onclick = function()
-            PopupMenu((function()
-                local t = LIB.GetChatChannelMenu(function(szChannel)
-                    MY_ChatMonitor.tChannels[szChannel] = not MY_ChatMonitor.tChannels[szChannel]
-                    _C.RegisterMsgMonitor()
-                end, MY_ChatMonitor.tChannels)
-                table.insert(t, { bDevide = true })
-                table.insert(t,{
-                    szOption = _L['timestrap format'], {
-                        szOption = '[%hh:%mm:%ss]',
-                        fnAction = function()
-                            MY_ChatMonitor.szTimestrap = '[%hh:%mm:%ss]'
-                        end,
-                        bCheck = true, bMCheck = true,
-                        bChecked = MY_ChatMonitor.szTimestrap == '[%hh:%mm:%ss]'
-                    }, {
-                        szOption = '[%MM/%dd %hh:%mm:%ss]',
-                        fnAction = function()
-                            MY_ChatMonitor.szTimestrap = '[%MM/%dd %hh:%mm:%ss]'
-                        end,
-                        bCheck = true, bMCheck = true,
-                        bChecked = MY_ChatMonitor.szTimestrap == '[%MM/%dd %hh:%mm:%ss]'
-                    }, {
-                        szOption = _L['custom'],
-                        fnAction = function()
-                            GetUserInput(_L['custom timestrap (eg:[%yyyy/%MM/%dd_%hh:%mm:%ss])'], function(szText)
-                                MY_ChatMonitor.szTimestrap = szText
-                            end, nil, nil, nil, MY_ChatMonitor.szTimestrap)
-                        end,
-                    },
-                })
-                table.insert(t,{
-                    szOption = _L['max record count'],
+    ui:Append('WndButton', {
+        x = w - 26, y = 15, w = 25, h = 25,
+        buttonstyle = 'OPTION',
+        -- onhover = function(bIn) this:SetAlpha((bIn and 255) or 200) end,
+        menu = function()
+            local t = LIB.GetChatChannelMenu(function(szChannel)
+                MY_ChatMonitor.tChannels[szChannel] = not MY_ChatMonitor.tChannels[szChannel]
+                _C.RegisterMsgMonitor()
+            end, MY_ChatMonitor.tChannels)
+            table.insert(t, { bDevide = true })
+            table.insert(t,{
+                szOption = _L['timestrap format'], {
+                    szOption = '[%hh:%mm:%ss]',
                     fnAction = function()
-                        GetUserInputNumber(MY_ChatMonitor.nMaxRecord, 1000, nil, function(val)
-                            MY_ChatMonitor.nMaxRecord = val or MY_ChatMonitor.nMaxRecord
-                        end, nil, function() return not LIB.IsPanelVisible() end)
+                        MY_ChatMonitor.szTimestrap = '[%hh:%mm:%ss]'
                     end,
-                })
-                table.insert(t,{
-                    szOption = _L['show message preview box'],
+                    bCheck = true, bMCheck = true,
+                    bChecked = MY_ChatMonitor.szTimestrap == '[%hh:%mm:%ss]'
+                }, {
+                    szOption = '[%MM/%dd %hh:%mm:%ss]',
                     fnAction = function()
-                        MY_ChatMonitor.bShowPreview = not MY_ChatMonitor.bShowPreview
+                        MY_ChatMonitor.szTimestrap = '[%MM/%dd %hh:%mm:%ss]'
                     end,
-                    bCheck = true,
-                    bChecked = MY_ChatMonitor.bShowPreview
-                })
-                table.insert(t,{
-                    szOption = _L['play new message alert sound'],
+                    bCheck = true, bMCheck = true,
+                    bChecked = MY_ChatMonitor.szTimestrap == '[%MM/%dd %hh:%mm:%ss]'
+                }, {
+                    szOption = _L['custom'],
                     fnAction = function()
-                        MY_ChatMonitor.bPlaySound = not MY_ChatMonitor.bPlaySound
+                        GetUserInput(_L['custom timestrap (eg:[%yyyy/%MM/%dd_%hh:%mm:%ss])'], function(szText)
+                            MY_ChatMonitor.szTimestrap = szText
+                        end, nil, nil, nil, MY_ChatMonitor.szTimestrap)
                     end,
-                    bCheck = true,
-                    bChecked = MY_ChatMonitor.bPlaySound
-                })
-                table.insert(t,{
-                    szOption = _L['output to system channel'],
+                },
+            })
+            table.insert(t,{
+                szOption = _L['max record count'],
+                fnAction = function()
+                    GetUserInputNumber(MY_ChatMonitor.nMaxRecord, 1000, nil, function(val)
+                        MY_ChatMonitor.nMaxRecord = val or MY_ChatMonitor.nMaxRecord
+                    end, nil, function() return not LIB.IsPanelVisible() end)
+                end,
+            })
+            table.insert(t,{
+                szOption = _L['show message preview box'],
+                fnAction = function()
+                    MY_ChatMonitor.bShowPreview = not MY_ChatMonitor.bShowPreview
+                end,
+                bCheck = true,
+                bChecked = MY_ChatMonitor.bShowPreview
+            })
+            table.insert(t,{
+                szOption = _L['play new message alert sound'],
+                fnAction = function()
+                    MY_ChatMonitor.bPlaySound = not MY_ChatMonitor.bPlaySound
+                end,
+                bCheck = true,
+                bChecked = MY_ChatMonitor.bPlaySound
+            })
+            table.insert(t,{
+                szOption = _L['output to system channel'],
+                fnAction = function()
+                    MY_ChatMonitor.bRedirectSysChannel = not MY_ChatMonitor.bRedirectSysChannel
+                end,
+                bCheck = true,
+                bChecked = MY_ChatMonitor.bRedirectSysChannel
+            })
+            table.insert(t,{
+                szOption = _L['ignore same message'],
+                fnAction = function()
+                    MY_ChatMonitor.bIgnoreSame = not MY_ChatMonitor.bIgnoreSame
+                end,
+                bCheck = true,
+                bChecked = MY_ChatMonitor.bIgnoreSame
+            })
+            if IsCtrlKeyDown() then
+                -- table.insert(t, {
+                --     szOption = _L['Realtime save'],
+                --     fnAction = function()
+                --         MY_ChatMonitor.bRealtimeSave = not MY_ChatMonitor.bRealtimeSave
+                --     end,
+                --     bCheck = true,
+                --     bChecked = MY_ChatMonitor.bRealtimeSave
+                -- })
+                table.insert(t, {
+                    szOption = _L['Distinct server'],
                     fnAction = function()
-                        MY_ChatMonitor.bRedirectSysChannel = not MY_ChatMonitor.bRedirectSysChannel
-                    end,
-                    bCheck = true,
-                    bChecked = MY_ChatMonitor.bRedirectSysChannel
-                })
-                table.insert(t,{
-                    szOption = _L['ignore same message'],
-                    fnAction = function()
-                        MY_ChatMonitor.bIgnoreSame = not MY_ChatMonitor.bIgnoreSame
-                    end,
-                    bCheck = true,
-                    bChecked = MY_ChatMonitor.bIgnoreSame
-                })
-                if IsCtrlKeyDown() then
-                    -- table.insert(t, {
-                    --     szOption = _L['Realtime save'],
-                    --     fnAction = function()
-                    --         MY_ChatMonitor.bRealtimeSave = not MY_ChatMonitor.bRealtimeSave
-                    --     end,
-                    --     bCheck = true,
-                    --     bChecked = MY_ChatMonitor.bRealtimeSave
-                    -- })
-                    table.insert(t, {
-                        szOption = _L['Distinct server'],
-                        fnAction = function()
-                            MY_ChatMonitor.bDistinctServer = not MY_ChatMonitor.bDistinctServer
-                            D.LoadData()
-                            LIB.SwitchTab('MY_ChatMonitor', true)
-                        end,
-                        bCheck = true,
-                        bChecked = MY_ChatMonitor.bDistinctServer
-                    })
-                end
-                table.insert(t, { bDevide = true })
-                table.insert(t,{
-                    szOption = _L['regular expression'],
-                    fnAction = function()
-                        if MY_ChatMonitor.bIsRegexp then
-                            MY_ChatMonitor.bIsRegexp = not MY_ChatMonitor.bIsRegexp
-                        else
-                            MessageBox({
-                                szName = 'MY_ChatMonitor_Regexp',
-                                szMessage = _L['Are you sure you want to turn on regex mode?\nRegex is something advanced, make sure you know what you are doing.'],
-                                {szOption = g_tStrings.STR_HOTKEY_SURE, fnAction = function() MY_ChatMonitor.bIsRegexp = not MY_ChatMonitor.bIsRegexp end},
-                                {szOption = g_tStrings.STR_HOTKEY_CANCEL, fnAction = function() end},
-                            })
-                        end
+                        MY_ChatMonitor.bDistinctServer = not MY_ChatMonitor.bDistinctServer
+                        D.LoadData()
+                        LIB.SwitchTab('MY_ChatMonitor', true)
                     end,
                     bCheck = true,
-                    bChecked = MY_ChatMonitor.bIsRegexp
+                    bChecked = MY_ChatMonitor.bDistinctServer
                 })
-                return t
-            end)())
+            end
+            table.insert(t, { bDevide = true })
+            table.insert(t,{
+                szOption = _L['regular expression'],
+                fnAction = function()
+                    if MY_ChatMonitor.bIsRegexp then
+                        MY_ChatMonitor.bIsRegexp = not MY_ChatMonitor.bIsRegexp
+                    else
+                        MessageBox({
+                            szName = 'MY_ChatMonitor_Regexp',
+                            szMessage = _L['Are you sure you want to turn on regex mode?\nRegex is something advanced, make sure you know what you are doing.'],
+                            {szOption = g_tStrings.STR_HOTKEY_SURE, fnAction = function() MY_ChatMonitor.bIsRegexp = not MY_ChatMonitor.bIsRegexp end},
+                            {szOption = g_tStrings.STR_HOTKEY_CANCEL, fnAction = function() end},
+                        })
+                    end
+                end,
+                bCheck = true,
+                bChecked = MY_ChatMonitor.bIsRegexp
+            })
+            return t
         end,
     })
 
     ui:Append('WndButton', {
         name = 'Button_ChatMonitor_Switcher',
-        x = w - 136, y = 15, w = 50,
+        x = w - 134, y = 15, w = 50,
         text = (MY_ChatMonitor.bCapture and _L['stop']) or _L['start'],
         onclick = function()
             if MY_ChatMonitor.bCapture then
@@ -529,7 +526,7 @@ _C.OnPanelActive = function(wnd)
     })
 
     ui:Append('WndButton', {
-        x = w - 81, y = 15, w = 50,
+        x = w - 79, y = 15, w = 50,
         text = _L['clear'],
         onclick = function()
             RECORD_LIST = {}
