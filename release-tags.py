@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+# pip install pypiwin32
 
-import time, os, re, codecs
+import time, os, re, codecs, win32api, datetime, argparse
 
 def __is_interface(path):
     name = os.path.basename(path).lower()
@@ -27,11 +28,12 @@ def __is_git_clean():
 
 def __get_release_commit_list():
     commit_list = []
-    for commit in os.popen('git log --grep Release --pretty=format:"%s|%h"').read().split('\n'):
+    for commit in os.popen('git log --grep Release --pretty=format:"%s|%h|%at"').read().split('\n'):
         try:
             info = commit.split('|')
             version = int(info[0][9:])
-            commit_list.append({ 'version': version, 'hash': info[1] })
+            timestamp = int(info[2])
+            commit_list.append({ 'version': version, 'hash': info[1], 'timestamp': timestamp })
         except:
             pass
     return commit_list
@@ -64,6 +66,11 @@ def __get_changelog_list():
     return changelog_list
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Automatic release branch tags.')
+    parser.add_argument('--adjust-time', action='store_true', help='Create tag on commit time.')
+    parser.add_argument('--overwrite', action='store_true', help='Overwrite exist tag.')
+    args = parser.parse_args()
+
     __assert(__is_git_clean(), 'Error: branch has uncommited file change(s)!')
 
     os.system('git checkout master')
@@ -78,13 +85,14 @@ if __name__ == '__main__':
     release_list = __get_release_commit_list()
 
     for changlog in changelog_list:
-        tag = None
-        for p in tag_list:
-            if p.get('version') == changlog.get('version'):
-                tag = p
-                break
-        if tag != None:
-            continue
+        if not args.overwrite:
+            tag = None
+            for p in tag_list:
+                if p.get('version') == changlog.get('version'):
+                    tag = p
+                    break
+            if tag != None:
+                continue
 
         release = None
         for p in release_list:
@@ -93,6 +101,12 @@ if __name__ == '__main__':
                 break
         if release == None:
             continue
+
+        if args.adjust_time:
+            t = datetime.datetime.fromtimestamp(release.get('timestamp'))
+            print('Changing time to %d-%d-%d %d:%d:%d' % (t.year, t.month, t.day, t.hour, t.minute, t.second))
+            tt = datetime.datetime.utcfromtimestamp(release.get('timestamp'))
+            win32api.SetSystemTime(tt.year, tt.month, 0, tt.day, tt.hour, tt.minute, tt.second, 0)
 
         print('Creating tag V%d on %s...' % (changlog.get('version'), release.get('hash')))
         message = 'Release V%d\n%s' % (changlog.get('version'), changlog.get('message'))
