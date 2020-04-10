@@ -13,6 +13,6 @@ return {
 	{ tLang = { zhcn = true }, szName = "浪漫雅圆·繁体", szFile = "./LangManYaYuan.ttf" },
 	{ tLang = { zhtw = true }, szName = "王汉宗特黑", szFile = "./HanWangHeiHeavy.ttf" },
 	{ tLang = { zhcn = true }, szName = "王汉宗特黑·繁体", szFile = "./HanWangHeiHeavy.ttf" },
-	{ tLang = { zhcn = true, zhtw = true }, szName = "蒙纳盈富体", szFile = "./MengNaYingFuTi.ttf" },
+	{ tLang = { zhcn = true, zhtw = true }, szName = "蒙纳盈富体", szFile = "./MengNaYingFuTiFull.ttf" },
 	{ tLang = { zhcn = true }, szName = "蒙纳盈富体·繁体", szFile = "./MengNaYingFuTiFan.ttf" },
 }
