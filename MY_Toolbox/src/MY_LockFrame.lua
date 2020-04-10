@@ -62,6 +62,7 @@ local O = {
 		['LR_AS_FP'] = true,
 		['QuestTraceList'] = true,
 		['ChatPanel'] = true,
+		['DynamicActionBar'] = true,
 		['ExteriorAction'] = true,
 		['MentorMessage'] = true,
 		['JX_TeamCD'] = true,
@@ -75,6 +76,7 @@ local O = {
 		'FightingStatistic',
 		'QuestTraceList',
 		'ChatPanel',
+		'DynamicActionBar',
 		'ExteriorAction',
 		'MentorMessage',
 		'JX_TeamCD',
@@ -105,6 +107,7 @@ local O = {
 		['ChatPanel8'] = 'ChatPanel', -- 聊天面板 [Lowest2/ChatPanel8]
 		['ChatPanel9'] = 'ChatPanel', -- 聊天面板 [Lowest2/ChatPanel9]
 		['ChatPanel10'] = 'ChatPanel', -- 聊天面板 [Lowest2/ChatPanel10]
+		['DynamicActionBar'] = 'DynamicActionBar', -- 动态技能栏 [Lowest1/DynamicActionBar]
 		['ExteriorAction'] = 'ExteriorAction', -- 外装动作 [Normal/ExteriorAction]
 		['MentorMessage'] = 'MentorMessage', -- 师徒提示 [Normal/MentorMessage]
 		['JX_TeamCD'] = 'JX_TeamCD', -- 剑心·团队技能监控 [Normal/JX_TeamCD]
