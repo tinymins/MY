@@ -56,18 +56,31 @@ local O = {
 RegisterCustomData('MY_DynamicActionBarPos.bEnable')
 RegisterCustomData('MY_DynamicActionBarPos.tAnchors')
 
-local FRAME_LIST = {
-	'DynamicActionBar',
-	'IdentityDynActBar',
+local HOOK_FRAME_NAME = {
+	'DynamicActionBar', -- 各种动态技能栏
+	'IdentityDynActBar', -- 身份开启栏
 }
 
+local REMPOS_FRAME_TYPE = LIB.FlipObjectKV({
+	'DynamicMutualBar',
+	'DynamicActionBar2', -- 右下角特殊技能栏
+	-- 'DynamicPetBar', -- 御兽技能栏
+	-- 'DynamicCarrierBar', -- 射箭塔技能栏
+	-- 'DashBoard',
+	'IdentityDynActBar',
+})
+
 function D.UpdateAnchor(szName)
-	local an = O.tAnchors[szName]
-	if not an then
-		return
-	end
 	local frame = UI.LookupFrame(szName)
 	if not frame then
+		return
+	end
+	local szType = D.GetFrameType(frame)
+	if not szType or not REMPOS_FRAME_TYPE[szType] then
+		return
+	end
+	local an = O.tAnchors[szType]
+	if not an then
 		return
 	end
 	if frame.__MY_SetPoint then
@@ -83,20 +96,52 @@ function D.SaveAnchor(szName)
 	if not frame then
 		return
 	end
-	O.tAnchors[szName] = GetFrameAnchor(frame, 'TOP_LEFT')
+	local szType = D.GetFrameType(frame)
+	if not szType or not REMPOS_FRAME_TYPE[szType] then
+		return
+	end
+	O.tAnchors[szType] = GetFrameAnchor(frame, 'TOP_LEFT')
+end
+
+function D.GetFrameType(frame)
+	if frame:GetName() == 'DynamicActionBar' then
+		local el = frame:Lookup('Wnd_Left', 'Image_Leftbg')
+		if el then
+			local szImage, nFrame = el:GetImagePath()
+			if szImage:lower() == 'ui\\image\\jianghu\\jianghu06.uitex' and nFrame == 1 then
+				return 'DynamicActionBar2'
+			end
+		end
+		if frame:Lookup('Wnd_Left', 'Handle_Pet/Box_Pet') then
+			return 'DynamicPetBar'
+		end
+	end
+	return frame:GetName()
 end
 
 function D.Hook(szName)
 	local function OnFrameCreate(frame)
-		if not frame or frame.__MY_OnFrameDragEnd then
+		if not frame then
 			return
 		end
-		frame.__MY_OnFrameDragEnd = frame.OnFrameDragEnd
-		frame.OnFrameDragEnd = function()
-			D.SaveAnchor(szName)
+		local szType = D.GetFrameType(frame)
+		if not REMPOS_FRAME_TYPE[szType] then
+			return
 		end
-		frame.__MY_SetPoint = frame.SetPoint
-		frame.SetPoint = function() end
+		if not frame.__MY_OnFrameDragEnd then
+			frame.__MY_OnFrameDragEnd = frame.OnFrameDragEnd
+			frame.OnFrameDragEnd = function()
+				D.SaveAnchor(szName)
+			end
+		end
+		if not frame.__MY_SetPoint then
+			frame.__MY_SetPoint = frame.SetPoint
+			frame.SetPoint = function(...)
+				if IsEmpty(O.tAnchors[szType]) then
+					frame.__MY_SetPoint(...)
+				end
+			end
+		end
 	end
 	LIB.RegisterFrameCreate(szName .. '.MY_DynamicActionBarPos', function()
 		OnFrameCreate(arg0)
@@ -129,7 +174,7 @@ function D.Unhook(szName)
 end
 
 function D.CheckEnable()
-	for _, szName in ipairs(FRAME_LIST) do
+	for _, szName in ipairs(HOOK_FRAME_NAME) do
 		if O.bEnable then
 			D.Hook(szName)
 		else
@@ -139,7 +184,7 @@ function D.CheckEnable()
 end
 
 LIB.RegisterReload('MY_DynamicActionBarPos', function()
-	for _, szName in ipairs(FRAME_LIST) do
+	for _, szName in ipairs(HOOK_FRAME_NAME) do
 		D.Unhook(szName)
 	end
 end)
