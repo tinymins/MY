@@ -96,7 +96,7 @@ local O = {
 	tAlertTodayVal = nil,
 	dwLastAlertTime = 0,
 	bFloatEntry = false,
-	bSaveDB = true,
+	bSaveDB = false,
 }
 RegisterCustomData('Global/MY_RoleStatistics_RoleStat.aColumn')
 RegisterCustomData('Global/MY_RoleStatistics_RoleStat.szSort')

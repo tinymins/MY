@@ -78,7 +78,7 @@ local O = {
 	tMapProgress = {}, -- 单BOSS CD
 	bMapProgressApplied = false, -- 是否请求过副本进度
 	bFloatEntry = false,
-	bSaveDB = true,
+	bSaveDB = false,
 }
 RegisterCustomData('Global/MY_RoleStatistics_DungeonStat.aColumn')
 RegisterCustomData('Global/MY_RoleStatistics_DungeonStat.szSort')

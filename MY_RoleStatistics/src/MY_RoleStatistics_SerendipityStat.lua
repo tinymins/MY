@@ -94,7 +94,7 @@ local O = {
 	szSort = 'time_days',
 	szSortOrder = 'desc',
 	bFloatEntry = false,
-	bSaveDB = true,
+	bSaveDB = false,
 	bMapMark = false,
 	bMapMarkHideAcquired = true,
 }

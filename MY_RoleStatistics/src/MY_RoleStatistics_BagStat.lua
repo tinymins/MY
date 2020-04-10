@@ -81,7 +81,7 @@ local D = {}
 local O = {
 	bCompactMode = false,
 	tUncheckedNames = {},
-	bSaveDB = true,
+	bSaveDB = false,
 }
 RegisterCustomData('Global/MY_RoleStatistics_BagStat.bCompactMode')
 RegisterCustomData('Global/MY_RoleStatistics_BagStat.tUncheckedNames')

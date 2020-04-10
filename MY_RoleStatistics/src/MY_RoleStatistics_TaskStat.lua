@@ -91,7 +91,7 @@ local O = {
 	szSort = 'time_days',
 	szSortOrder = 'desc',
 	bFloatEntry = false,
-	bSaveDB = true,
+	bSaveDB = false,
 }
 RegisterCustomData('Global/MY_RoleStatistics_TaskStat.aColumn')
 RegisterCustomData('Global/MY_RoleStatistics_TaskStat.szSort')
