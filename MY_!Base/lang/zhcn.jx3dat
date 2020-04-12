@@ -139,9 +139,9 @@ return {
 	['download immediately'] = '立即下载',
 	['see new feature'] = '更新日志',
 
-	['Boss list updated to v%s.'] = 'BOSS列表已成功更新至v%s。',
-	['Add to Boss list'] = '加为茗伊BOSS',
-	['Remove from Boss list'] = '从茗伊BOSS中删除',
+	['Boss list updated to v%s.'] = '首领列表已成功更新至v%s。',
+	['Add to Boss list'] = '加为茗伊首领列表',
+	['Remove from Boss list'] = '从茗伊首领列表中删除',
 	['Important Npc list updated to v%s.'] = '重要NPC列表已成功更新至v%s。',
 	['Add to important npc list'] = '加为重要NPC',
 	['Remove from important npc list'] = '从重要NPC中删除',

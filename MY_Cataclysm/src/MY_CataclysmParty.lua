@@ -74,14 +74,14 @@ local CTM_TTARGET -- 注意这个是UI逻辑目标选中的目标 不一定是真实的当前目标
 local CTM_CACHE              = setmetatable({}, { __mode = 'v' })
 local CTM_LIFE_CACHE         = {} -- 当前帧队友血量缓存
 local CTM_BUFF_CACHE         = {} -- 附近记录到的需要显示的BUFF缓存
-local CTM_BOSS_CACHE         = {} -- 附近的BOSS缓存
-local CTM_BOSS_FOCUS_BUFF    = {} -- 附近记录到的BOSS点名BUFF缓存
+local CTM_BOSS_CACHE         = {} -- 附近的首领缓存
+local CTM_BOSS_FOCUS_BUFF    = {} -- 附近记录到的首领点名BUFF缓存
 local CTM_ATTENTION_BUFF     = {} -- 附近记录到的需要显示蒙版的BUFF缓存
 local CTM_ATTENTION_STACK    = {} -- 蒙版BUFF栈（取第一个也就是最新入栈的作为显示颜色）
 local CTM_CAUTION_BUFF       = {} -- 附近记录到的警告BUFF缓存
 local CTM_SCREEN_HEAD        = {} -- 头顶倒计时缓存
-local CTM_BOSS_TARGET        = {} -- BOSS目标缓存
-local CTM_BOSS_FOCUSED_STATE = {} -- 被BOSS点名的状态缓存
+local CTM_BOSS_TARGET        = {} -- 首领目标缓存
+local CTM_BOSS_FOCUSED_STATE = {} -- 被首领点名的状态缓存
 local CTM_THREAT_NPC_ID, CTM_THREAT_TARGET_ID
 local CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID
 local CHANGGE_REAL_SHADOW_TPLID = 46140 -- 清绝歌影 的主体影子

@@ -667,7 +667,7 @@ function LIB.GetDungeonRefreshTime(dwMapID)
 	return 0, 0
 end
 
--- 地图BOSS列表
+-- 地图首领列表
 do local BOSS_LIST, BOSS_LIST_CUSTOM
 local CACHE_PATH = {'temporary/bosslist.jx3dat', PATH_TYPE.GLOBAL}
 local CUSTOM_PATH = {'config/bosslist.jx3dat', PATH_TYPE.GLOBAL}
@@ -720,7 +720,7 @@ local function GenerateList(bForceRefresh)
 	end
 end
 
--- 获取指定地图指定模板ID的NPC是不是BOSS
+-- 获取指定地图指定模板ID的NPC是不是首领
 -- (boolean) LIB.IsBoss(dwMapID, dwTem)
 function LIB.IsBoss(dwMapID, dwTemplateID)
 	GenerateList()

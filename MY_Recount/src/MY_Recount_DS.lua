@@ -735,7 +735,7 @@ function D.ProcessSkillEffect(nLFC, nTime, nTick, dwCaster, dwTarget, nEffectTyp
 	dwCaster = KCaster.dwID
 	dwTarget = KTarget.dwID
 
-	-- 过滤掉不是队友的以及不是BOSS的
+	-- 过滤掉不是队友的以及不是首领的
 	local me = GetClientPlayer()
 	if dwCaster ~= me.dwID                 -- 释放者不是自己
 	and dwTarget ~= me.dwID                -- 承受者不是自己

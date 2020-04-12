@@ -75,7 +75,7 @@ local O = {
 	szSort = 'time_days',
 	szSortOrder = 'desc',
 	tMapSaveCopy = {}, -- 单副本 CD
-	tMapProgress = {}, -- 单BOSS CD
+	tMapProgress = {}, -- 单首领 CD
 	bMapProgressApplied = false, -- 是否请求过副本进度
 	bFloatEntry = false,
 	bSaveDB = false,
@@ -552,7 +552,7 @@ function D.UpdateMapProgress(bForceUpdate)
 	LIB.GetMapSaveCopy(D.OnGetMapSaveCopyResopnse)
 end
 
--- BOSS倒了刷新CD
+-- 首领死亡刷新副本进度
 LIB.RegisterEvent('SYNC_LOOT_LIST.MY_RoleStatistics_DungeonStat__UpdateMapCopy', function()
 	if not LIB.IsInDungeon() then
 		return
