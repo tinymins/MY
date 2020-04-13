@@ -2452,49 +2452,234 @@ function UI:Height(nHeight, nRawHeight)
 	end
 end
 
-do
-local function ResizeBgImages(hnd, nWidth, nHeight) -- 处理窗口背景自适应缩放
-	local imgBgTLConner = hnd:Lookup('Image_BgTL_Conner')
-	local imgBgTRConner = hnd:Lookup('Image_BgTR_Conner')
-	local imgBgTLFlex = hnd:Lookup('Image_BgTL_Flex')
-	local imgBgTRFlex = hnd:Lookup('Image_BgTR_Flex')
-	local imgBgTLCenter = hnd:Lookup('Image_BgTL_Center')
-	local imgBgTRCenter = hnd:Lookup('Image_BgTR_Center')
-	local imgBgBL = hnd:Lookup('Image_BgBL')
-	local imgBgBC = hnd:Lookup('Image_BgBC')
-	local imgBgBR = hnd:Lookup('Image_BgBR')
-	local imgBgCL = hnd:Lookup('Image_BgCL')
-	local imgBgCC = hnd:Lookup('Image_BgCC')
-	local imgBgCR = hnd:Lookup('Image_BgCR')
-	if not imgBgTLConner or not imgBgTLFlex or not imgBgTLCenter
-	or not imgBgTRConner or not imgBgTRFlex or not imgBgTRCenter
-	or not imgBgBL or not imgBgBC or not imgBgBR or not imgBgCL or not imgBgCC or not imgBgCR then
-		return
+local function SetComponentSize(raw, nOuterWidth, nOuterHeight, nInnerWidth, nInnerHeight)
+	local nWidth, nHeight = nOuterWidth, nOuterHeight
+	local nMinWidth = GetComponentProp(raw, 'minWidth')
+	local nMinHeight = GetComponentProp(raw, 'minHeight')
+	if nMinWidth and nWidth < nMinWidth then
+		nWidth = nMinWidth
 	end
-	local fScale = nWidth < 426 and (nWidth / 426) or 1
-	local nTH = 70 * fScale
-	local nTConnerW = 213 * fScale
-	imgBgTLConner:SetSize(nTConnerW, nTH)
-	imgBgTRConner:SetSize(nTConnerW, nTH)
-	local nTFlexW = max(0, (nWidth - (nWidth >= 674 and 674 or 426)) / 2)
-	imgBgTLFlex:SetSize(nTFlexW, nTH)
-	imgBgTRFlex:SetSize(nTFlexW, nTH)
-	local nTCenterW = nWidth >= 674 and (124 * fScale) or 0
-	imgBgTLCenter:SetSize(nTCenterW, nTH)
-	imgBgTRCenter:SetSize(nTCenterW, nTH)
-	local nBLW, nBRW = ceil(124 * fScale), ceil(8 * fScale)
-	local nBCW, nBH = nWidth - nBLW - nBRW + 1, 85 * fScale -- 不知道为什么差一像素 但是加上就好了
-	imgBgBL:SetSize(nBLW, nBH)
-	imgBgBC:SetSize(nBCW, nBH)
-	imgBgBR:SetSize(nBRW, nBH)
-	local nCEdgeW = ceil(8 * fScale)
-	local nCCW, nCH = nWidth - 2 * nCEdgeW + 1, nHeight - nTH - nBH -- 不知道为什么差一像素 但是加上就好了
-	imgBgCL:SetSize(nCEdgeW, nCH)
-	imgBgCC:SetSize(nCCW, nCH)
-	imgBgCR:SetSize(nCEdgeW, nCH)
-	imgBgCL:SetRelY(nTH)
-	imgBgBL:SetRelY(nTH + nCH)
-	hnd:FormatAllItemPos()
+	if nMinHeight and nHeight < nMinHeight then
+		nHeight = nMinHeight
+	end
+	local componentType = GetComponentType(raw)
+	if componentType == 'WndFrame' then
+		local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
+		local hnd = raw:Lookup('', '')
+		-- 处理窗口背景自适应缩放
+		local imgBgTLConner = hnd:Lookup('Image_BgTL_Conner')
+		local imgBgTRConner = hnd:Lookup('Image_BgTR_Conner')
+		local imgBgTLFlex = hnd:Lookup('Image_BgTL_Flex')
+		local imgBgTRFlex = hnd:Lookup('Image_BgTR_Flex')
+		local imgBgTLCenter = hnd:Lookup('Image_BgTL_Center')
+		local imgBgTRCenter = hnd:Lookup('Image_BgTR_Center')
+		local imgBgBL = hnd:Lookup('Image_BgBL')
+		local imgBgBC = hnd:Lookup('Image_BgBC')
+		local imgBgBR = hnd:Lookup('Image_BgBR')
+		local imgBgCL = hnd:Lookup('Image_BgCL')
+		local imgBgCC = hnd:Lookup('Image_BgCC')
+		local imgBgCR = hnd:Lookup('Image_BgCR')
+		if imgBgTLConner and imgBgTLFlex and imgBgTLCenter
+		and imgBgTRConner and imgBgTRFlex and imgBgTRCenter
+		and imgBgBL and imgBgBC and imgBgBR and imgBgCL and imgBgCC and imgBgCR then
+			local fScale = nWidth < 426 and (nWidth / 426) or 1
+			local nTH = 70 * fScale
+			local nTConnerW = 213 * fScale
+			imgBgTLConner:SetSize(nTConnerW, nTH)
+			imgBgTRConner:SetSize(nTConnerW, nTH)
+			local nTFlexW = max(0, (nWidth - (nWidth >= 674 and 674 or 426)) / 2)
+			imgBgTLFlex:SetSize(nTFlexW, nTH)
+			imgBgTRFlex:SetSize(nTFlexW, nTH)
+			local nTCenterW = nWidth >= 674 and (124 * fScale) or 0
+			imgBgTLCenter:SetSize(nTCenterW, nTH)
+			imgBgTRCenter:SetSize(nTCenterW, nTH)
+			local nBLW, nBRW = ceil(124 * fScale), ceil(8 * fScale)
+			local nBCW, nBH = nWidth - nBLW - nBRW + 1, 85 * fScale -- 不知道为什么差一像素 但是加上就好了
+			imgBgBL:SetSize(nBLW, nBH)
+			imgBgBC:SetSize(nBCW, nBH)
+			imgBgBR:SetSize(nBRW, nBH)
+			local nCEdgeW = ceil(8 * fScale)
+			local nCCW, nCH = nWidth - 2 * nCEdgeW + 1, nHeight - nTH - nBH -- 不知道为什么差一像素 但是加上就好了
+			imgBgCL:SetSize(nCEdgeW, nCH)
+			imgBgCC:SetSize(nCCW, nCH)
+			imgBgCR:SetSize(nCEdgeW, nCH)
+			imgBgCL:SetRelY(nTH)
+			imgBgBL:SetRelY(nTH + nCH)
+			hnd:FormatAllItemPos()
+		end
+		-- 按分类处理其他
+		if GetComponentProp(raw, 'simple') then
+			local nWidthTitleBtnR = 0
+			local p = raw:Lookup('WndContainer_TitleBtnR'):GetFirstChild()
+			while p do
+				nWidthTitleBtnR = nWidthTitleBtnR + (p:GetSize())
+				p = p:GetNext()
+			end
+			raw:Lookup('', 'Text_Title'):SetSize(nWidth - nWidthTitleBtnR, 30)
+			raw:Lookup('', 'Image_Title'):SetSize(nWidth, 30)
+			raw:Lookup('', 'Shadow_Bg'):SetSize(nWidth, nHeight)
+			raw:Lookup('WndContainer_TitleBtnR'):SetSize(nWidth, 30)
+			raw:Lookup('WndContainer_TitleBtnR'):FormatAllContentPos()
+			raw:Lookup('Btn_Drag'):SetRelPos(nWidth - 16, nHeight - 16)
+			raw:SetSize(nWidth, nHeight)
+			raw:SetDragArea(0, 0, nWidth, 30)
+			hnd:SetSize(nWidth, nHeight)
+			wnd:SetSize(nWidth, nHeight - 30)
+		elseif GetComponentProp(raw, 'intact') or raw == LIB.GetFrame() then
+			hnd:SetSize(nWidth, nHeight)
+			hnd:Lookup('Text_Title'):SetW(nWidth - 90)
+			hnd:Lookup('Text_Author'):SetW(nWidth - 31)
+			hnd:Lookup('Text_Author'):SetRelY(nHeight - 41)
+			-- 处理窗口其它组件
+			local btnClose = raw:Lookup('Btn_Close')
+			if btnClose then
+				btnClose:SetRelPos(nWidth - 35, 15)
+			end
+			local btnDrag = raw:Lookup('Btn_Drag')
+			if btnDrag then
+				btnDrag:SetRelPos(nWidth - 18, nHeight - 20)
+			end
+			local btnMax = raw:Lookup('CheckBox_Maximize')
+			if btnMax then
+				btnMax:SetRelPos(nWidth - 63, 15)
+			end
+			if wnd then
+				wnd:SetSize(nWidth, nHeight)
+				wnd:Lookup('', ''):SetSize(nWidth, nHeight)
+			end
+			raw:SetSize(nWidth, nHeight)
+			raw:SetDragArea(0, 0, nWidth, 55)
+			-- reset position
+			local an = GetFrameAnchor(raw)
+			raw:SetPoint(an.s, 0, 0, an.r, an.x, an.y)
+		else
+			raw:SetSize(nWidth, nHeight)
+			hnd:SetSize(nWidth, nHeight)
+		end
+	elseif componentType == 'WndCheckBox' then
+		local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
+		local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
+		local txt = GetComponentElement(raw, 'TEXT')
+		wnd:SetSize(nHeight, nHeight)
+		txt:SetSize(nWidth - nHeight - 1, nHeight)
+		txt:SetRelPos(nHeight + 1, 0)
+		hdl:SetSize(nWidth, nHeight)
+		hdl:FormatAllItemPos()
+	elseif componentType == 'WndComboBox' then
+		local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
+		local cmb = GetComponentElement(raw, 'COMBOBOX')
+		local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
+		local txt = GetComponentElement(raw, 'TEXT')
+		local img = GetComponentElement(raw, 'IMAGE')
+		local w, h = cmb:GetSize()
+		cmb:SetRelPos(nWidth-w-5, math.ceil((nHeight - h)/2))
+		cmb:Lookup('', ''):SetAbsPos(hdl:GetAbsPos())
+		cmb:Lookup('', ''):SetSize(nWidth, nHeight)
+		wnd:SetSize(nWidth, nHeight)
+		hdl:SetSize(nWidth, nHeight)
+		img:SetSize(nWidth, nHeight)
+		txt:SetSize(nWidth - w - 5 - 10, nHeight)
+		hdl:FormatAllItemPos()
+	elseif componentType == 'WndEditComboBox' or componentType == 'WndAutocomplete' then
+		local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
+		local cmb = GetComponentElement(raw, 'COMBOBOX')
+		local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
+		local img = GetComponentElement(raw, 'IMAGE')
+		local edt = GetComponentElement(raw, 'EDIT')
+		wnd:SetSize(nWidth, nHeight)
+		hdl:SetSize(nWidth, nHeight)
+		img:SetSize(nWidth, nHeight)
+		hdl:FormatAllItemPos()
+		local w, h = cmb:GetSize()
+		edt:SetSize(nWidth - 10 - w, nHeight - 4)
+		cmb:SetRelPos(nWidth - w - 5, (nHeight - h - 1) / 2 + 1)
+	elseif componentType == 'WndRadioBox' then
+		local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
+		local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
+		local txt = GetComponentElement(raw, 'TEXT')
+		wnd:SetSize(nHeight, nHeight)
+		txt:SetSize(nWidth - nHeight - 1, nHeight)
+		txt:SetRelPos(nHeight + 1, 0)
+		hdl:SetSize(nWidth, nHeight)
+		hdl:FormatAllItemPos()
+	elseif componentType == 'WndEditBox' then
+		local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
+		local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
+		local img = GetComponentElement(raw, 'IMAGE')
+		local edt = GetComponentElement(raw, 'EDIT')
+		wnd:SetSize(nWidth, nHeight)
+		hdl:SetSize(nWidth, nHeight)
+		img:SetSize(nWidth, nHeight)
+		edt:SetSize(nWidth-8, nHeight-4)
+		hdl:FormatAllItemPos()
+	elseif componentType == 'Text' then
+		local txt = GetComponentElement(raw, 'TEXT')
+		txt:SetSize(nWidth, nHeight)
+		txt:GetParent():FormatAllItemPos()
+		SetComponentProp(raw, 'bAutoSize', false)
+	elseif componentType == 'WndListBox' then
+		raw:SetSize(nWidth, nHeight)
+		raw:Lookup('Scroll_Default'):SetRelPos(nWidth - 15, 10)
+		raw:Lookup('Scroll_Default'):SetSize(15, nHeight - 20)
+		raw:Lookup('', ''):SetSize(nWidth, nHeight)
+		raw:Lookup('', 'Image_Default'):SetSize(nWidth, nHeight)
+		local hList = raw:Lookup('', 'Handle_Scroll')
+		hList:SetSize(nWidth - 20, nHeight - 20)
+		for i = hList:GetItemCount() - 1, 0, -1 do
+			local hItem = hList:Lookup(i)
+			hItem:Lookup('Image_Bg'):SetSize(nWidth - 20, 25)
+			hItem:Lookup('Image_Sel'):SetSize(nWidth - 20, 25)
+			hItem:Lookup('Text_Default'):SetSize(nWidth - 20, 25)
+			hItem:FormatAllItemPos()
+		end
+		hList:FormatAllItemPos()
+	elseif componentType == 'WndScrollBox' then
+		raw:SetSize(nWidth, nHeight)
+		raw:Lookup('', ''):SetSize(nWidth, nHeight)
+		raw:Lookup('', 'Image_Default'):SetSize(nWidth, nHeight)
+		raw:Lookup('', 'Handle_Padding'):SetSize(nWidth - 30, nHeight - 20)
+		raw:Lookup('', 'Handle_Padding/Handle_Scroll'):SetSize(nWidth - 30, nHeight - 20)
+		raw:Lookup('', 'Handle_Padding/Handle_Scroll'):FormatAllItemPos()
+		raw:Lookup('WndScrollBar'):SetRelX(nWidth - 20)
+		raw:Lookup('WndScrollBar'):SetH(nHeight - 20)
+	elseif componentType == 'WndTrackbar' then
+		local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
+		local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
+		local sld = GetComponentElement(raw, 'TRACKBAR')
+		local txt = GetComponentElement(raw, 'TEXT')
+		local nWidth = nOuterWidth or max(nWidth, (nInnerWidth or 0) + 5)
+		local nHeight = nOuterHeight or max(nHeight, (nInnerHeight or 0) + 5)
+		local nRawWidth = min(nWidth, nInnerWidth or sld:GetW())
+		local nRawHeight = min(nHeight, nInnerHeight or sld:GetH())
+		wnd:SetSize(nWidth, nHeight)
+		sld:SetSize(nRawWidth, nRawHeight)
+		sld:Lookup('Btn_Track'):SetSize(min(34, nRawWidth * 0.6), nRawHeight)
+		hdl:SetSize(nWidth, nHeight)
+		hdl:Lookup('Image_BG'):SetSize(nRawWidth, nRawHeight - 2)
+		txt:SetRelX(nRawWidth + 5)
+		txt:SetSize(nWidth - nRawWidth - 5, nHeight)
+		hdl:FormatAllItemPos()
+	elseif raw:GetBaseType() == 'Wnd' then
+		local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
+		local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
+		local txt = GetComponentElement(raw, 'TEXT')
+		local img = GetComponentElement(raw, 'IMAGE')
+		local edt = GetComponentElement(raw, 'EDIT')
+		if wnd then wnd:SetSize(nWidth, nHeight) end
+		if hdl then hdl:SetSize(nWidth, nHeight) end
+		if txt then txt:SetSize(nWidth, nHeight) end
+		if img then img:SetSize(nWidth, nHeight) end
+		if edt then edt:SetSize(nWidth - 8, nHeight - 4) end
+		if hdl then hdl:FormatAllItemPos() end
+	else
+		local itm = GetComponentElement(raw, 'ITEM') or raw
+		itm:SetSize(nWidth, nHeight)
+		local h = itm:GetParent()
+		if h and h:GetType() == 'Handle' then
+			h:FormatAllItemPos()
+		end
+	end
+	LIB.ExecuteWithThis(raw, raw.OnSizeChanged)
 end
 
 -- (number, number) Instance:Size(bInnerSize)
@@ -2517,195 +2702,8 @@ function UI:Size(arg0, arg1, arg2, arg3)
 		end
 		return self
 	elseif IsNumber(arg0) or IsNumber(arg1) or IsNumber(arg2) or IsNumber(arg3) then
-		local componentType, element
 		for _, raw in ipairs(self.raws) do
-			local nWidth, nHeight = arg0 or raw:GetW(), arg1 or raw:GetH()
-			local nMinWidth = GetComponentProp(raw, 'minWidth')
-			local nMinHeight = GetComponentProp(raw, 'minHeight')
-			if nMinWidth and nWidth < nMinWidth then
-				nWidth = nMinWidth
-			end
-			if nMinHeight and nHeight < nMinHeight then
-				nHeight = nMinHeight
-			end
-			componentType = GetComponentType(raw)
-			if componentType == 'WndFrame' then
-				local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
-				local hnd = raw:Lookup('', '')
-				if GetComponentProp(raw, 'simple') then
-					local nWidthTitleBtnR = 0
-					local p = raw:Lookup('WndContainer_TitleBtnR'):GetFirstChild()
-					while p do
-						nWidthTitleBtnR = nWidthTitleBtnR + (p:GetSize())
-						p = p:GetNext()
-					end
-					raw:Lookup('', 'Text_Title'):SetSize(nWidth - nWidthTitleBtnR, 30)
-					raw:Lookup('', 'Image_Title'):SetSize(nWidth, 30)
-					raw:Lookup('', 'Shadow_Bg'):SetSize(nWidth, nHeight)
-					raw:Lookup('WndContainer_TitleBtnR'):SetSize(nWidth, 30)
-					raw:Lookup('WndContainer_TitleBtnR'):FormatAllContentPos()
-					raw:Lookup('Btn_Drag'):SetRelPos(nWidth - 16, nHeight - 16)
-					raw:SetSize(nWidth, nHeight)
-					raw:SetDragArea(0, 0, nWidth, 30)
-					hnd:SetSize(nWidth, nHeight)
-					wnd:SetSize(nWidth, nHeight - 30)
-				elseif GetComponentProp(raw, 'intact') or raw == LIB.GetFrame() then
-					hnd:SetSize(nWidth, nHeight)
-					hnd:Lookup('Text_Title'):SetW(nWidth - 90)
-					hnd:Lookup('Text_Author'):SetW(nWidth - 31)
-					hnd:Lookup('Text_Author'):SetRelY(nHeight - 41)
-					ResizeBgImages(hnd, nWidth, nHeight)
-					-- 处理窗口其它组件
-					local btnClose = raw:Lookup('Btn_Close')
-					if btnClose then
-						btnClose:SetRelPos(nWidth - 35, 15)
-					end
-					local btnDrag = raw:Lookup('Btn_Drag')
-					if btnDrag then
-						btnDrag:SetRelPos(nWidth - 18, nHeight - 20)
-					end
-					local btnMax = raw:Lookup('CheckBox_Maximize')
-					if btnMax then
-						btnMax:SetRelPos(nWidth - 63, 15)
-					end
-					if wnd then
-						wnd:SetSize(nWidth, nHeight)
-						wnd:Lookup('', ''):SetSize(nWidth, nHeight)
-					end
-					raw:SetSize(nWidth, nHeight)
-					raw:SetDragArea(0, 0, nWidth, 55)
-					-- reset position
-					local an = GetFrameAnchor(raw)
-					raw:SetPoint(an.s, 0, 0, an.r, an.x, an.y)
-				else
-					raw:SetSize(nWidth, nHeight)
-					hnd:SetSize(nWidth, nHeight)
-					ResizeBgImages(hnd, nWidth, nHeight)
-				end
-			elseif componentType == 'WndCheckBox' then
-				local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
-				local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
-				local txt = GetComponentElement(raw, 'TEXT')
-				wnd:SetSize(nHeight, nHeight)
-				txt:SetSize(nWidth - nHeight - 1, nHeight)
-				txt:SetRelPos(nHeight + 1, 0)
-				hdl:SetSize(nWidth, nHeight)
-				hdl:FormatAllItemPos()
-			elseif componentType == 'WndComboBox' then
-				local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
-				local cmb = GetComponentElement(raw, 'COMBOBOX')
-				local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
-				local txt = GetComponentElement(raw, 'TEXT')
-				local img = GetComponentElement(raw, 'IMAGE')
-				local w, h = cmb:GetSize()
-				cmb:SetRelPos(nWidth-w-5, math.ceil((nHeight - h)/2))
-				cmb:Lookup('', ''):SetAbsPos(hdl:GetAbsPos())
-				cmb:Lookup('', ''):SetSize(nWidth, nHeight)
-				wnd:SetSize(nWidth, nHeight)
-				hdl:SetSize(nWidth, nHeight)
-				img:SetSize(nWidth, nHeight)
-				txt:SetSize(nWidth - w - 5 - 10, nHeight)
-				hdl:FormatAllItemPos()
-			elseif componentType == 'WndEditComboBox' or componentType == 'WndAutocomplete' then
-				local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
-				local cmb = GetComponentElement(raw, 'COMBOBOX')
-				local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
-				local img = GetComponentElement(raw, 'IMAGE')
-				local edt = GetComponentElement(raw, 'EDIT')
-				wnd:SetSize(nWidth, nHeight)
-				hdl:SetSize(nWidth, nHeight)
-				img:SetSize(nWidth, nHeight)
-				hdl:FormatAllItemPos()
-				local w, h = cmb:GetSize()
-				edt:SetSize(nWidth - 10 - w, nHeight - 4)
-				cmb:SetRelPos(nWidth - w - 5, (nHeight - h - 1) / 2 + 1)
-			elseif componentType == 'WndRadioBox' then
-				local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
-				local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
-				local txt = GetComponentElement(raw, 'TEXT')
-				wnd:SetSize(nHeight, nHeight)
-				txt:SetSize(nWidth - nHeight - 1, nHeight)
-				txt:SetRelPos(nHeight + 1, 0)
-				hdl:SetSize(nWidth, nHeight)
-				hdl:FormatAllItemPos()
-			elseif componentType == 'WndEditBox' then
-				local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
-				local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
-				local img = GetComponentElement(raw, 'IMAGE')
-				local edt = GetComponentElement(raw, 'EDIT')
-				wnd:SetSize(nWidth, nHeight)
-				hdl:SetSize(nWidth, nHeight)
-				img:SetSize(nWidth, nHeight)
-				edt:SetSize(nWidth-8, nHeight-4)
-				hdl:FormatAllItemPos()
-			elseif componentType == 'Text' then
-				local txt = GetComponentElement(raw, 'TEXT')
-				txt:SetSize(nWidth, nHeight)
-				txt:GetParent():FormatAllItemPos()
-				SetComponentProp(raw, 'bAutoSize', false)
-			elseif componentType == 'WndListBox' then
-				raw:SetSize(nWidth, nHeight)
-				raw:Lookup('Scroll_Default'):SetRelPos(nWidth - 15, 10)
-				raw:Lookup('Scroll_Default'):SetSize(15, nHeight - 20)
-				raw:Lookup('', ''):SetSize(nWidth, nHeight)
-				raw:Lookup('', 'Image_Default'):SetSize(nWidth, nHeight)
-				local hList = raw:Lookup('', 'Handle_Scroll')
-				hList:SetSize(nWidth - 20, nHeight - 20)
-				for i = hList:GetItemCount() - 1, 0, -1 do
-					local hItem = hList:Lookup(i)
-					hItem:Lookup('Image_Bg'):SetSize(nWidth - 20, 25)
-					hItem:Lookup('Image_Sel'):SetSize(nWidth - 20, 25)
-					hItem:Lookup('Text_Default'):SetSize(nWidth - 20, 25)
-					hItem:FormatAllItemPos()
-				end
-				hList:FormatAllItemPos()
-			elseif componentType == 'WndScrollBox' then
-				raw:SetSize(nWidth, nHeight)
-				raw:Lookup('', ''):SetSize(nWidth, nHeight)
-				raw:Lookup('', 'Image_Default'):SetSize(nWidth, nHeight)
-				raw:Lookup('', 'Handle_Padding'):SetSize(nWidth - 30, nHeight - 20)
-				raw:Lookup('', 'Handle_Padding/Handle_Scroll'):SetSize(nWidth - 30, nHeight - 20)
-				raw:Lookup('', 'Handle_Padding/Handle_Scroll'):FormatAllItemPos()
-				raw:Lookup('WndScrollBar'):SetRelX(nWidth - 20)
-				raw:Lookup('WndScrollBar'):SetH(nHeight - 20)
-			elseif componentType == 'WndTrackbar' then
-				local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
-				local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
-				local sld = GetComponentElement(raw, 'TRACKBAR')
-				local txt = GetComponentElement(raw, 'TEXT')
-				local nWidth = arg0 or max(nWidth, (arg2 or 0) + 5)
-				local nHeight = arg1 or max(nHeight, (arg3 or 0) + 5)
-				local nRawWidth = min(nWidth, arg2 or sld:GetW())
-				local nRawHeight = min(nHeight, arg3 or sld:GetH())
-				wnd:SetSize(nWidth, nHeight)
-				sld:SetSize(nRawWidth, nRawHeight)
-				sld:Lookup('Btn_Track'):SetSize(min(34, nRawWidth * 0.6), nRawHeight)
-				hdl:SetSize(nWidth, nHeight)
-				hdl:Lookup('Image_BG'):SetSize(nRawWidth, nRawHeight - 2)
-				txt:SetRelX(nRawWidth + 5)
-				txt:SetSize(nWidth - nRawWidth - 5, nHeight)
-				hdl:FormatAllItemPos()
-			elseif raw:GetBaseType() == 'Wnd' then
-				local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
-				local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
-				local txt = GetComponentElement(raw, 'TEXT')
-				local img = GetComponentElement(raw, 'IMAGE')
-				local edt = GetComponentElement(raw, 'EDIT')
-				if wnd then wnd:SetSize(nWidth, nHeight) end
-				if hdl then hdl:SetSize(nWidth, nHeight) end
-				if txt then txt:SetSize(nWidth, nHeight) end
-				if img then img:SetSize(nWidth, nHeight) end
-				if edt then edt:SetSize(nWidth - 8, nHeight - 4) end
-				if hdl then hdl:FormatAllItemPos() end
-			else
-				local itm = GetComponentElement(raw, 'ITEM') or raw
-				itm:SetSize(nWidth, nHeight)
-				local h = itm:GetParent()
-				if h and h:GetType() == 'Handle' then
-					h:FormatAllItemPos()
-				end
-			end
-			LIB.ExecuteWithThis(raw, raw.OnSizeChanged)
+			SetComponentSize(raw, arg0 or raw:GetW(), arg1 or raw:GetH(), arg2, arg3)
 		end
 		return self
 	else
@@ -2727,7 +2725,6 @@ function UI:Size(arg0, arg1, arg2, arg3)
 		end
 		return w, h, rw, rh
 	end
-end
 end
 
 -- (self) Instance:MinSize() -- Get element min size
@@ -3284,7 +3281,7 @@ function UI:ButtonStyle(nButtonStyle)
 				raw:SetAnimateGroupMouseOver(tStyle.nMouseOverGroup)
 				raw:SetAnimateGroupMouseDown(tStyle.nMouseDownGroup)
 				raw:SetAnimateGroupDisable(tStyle.nDisableGroup)
-				raw:SetSize(tStyle.nWidth, tStyle.nHeight)
+				SetComponentSize(raw, tStyle.nWidth, tStyle.nHeight)
 			end
 		end
 	end
