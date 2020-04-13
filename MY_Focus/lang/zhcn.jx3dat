@@ -25,6 +25,7 @@ return {
     ['Enable scene navi'] = '启用场景目标追踪',
     ['Heal healper'] = '治疗辅助',
     ['Select target when mouse enter'] = '鼠标移入时即选中目标',
+    ['Show tip at right bottom'] = '目标信息显示在屏幕右下角',
     ['Right click list to delete'] = '右键点击列表可删除',
 
     ['Auto focus'              ] = '启用默认焦点',

@@ -472,6 +472,16 @@ function PS.OnPanelActive(wnd)
 	y = y + deltaY
 
 	ui:Append('WndCheckBox', {
+		x = x, y = y, w = wr, text = _L['Show tip at right bottom'],
+		checked = MY_Focus.bShowTipRB,
+		oncheck = function(bChecked)
+			MY_Focus.bShowTipRB = bChecked
+		end,
+		autoenable = function() return MY_Focus.IsEnabled() end,
+	})
+	y = y + deltaY
+
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, w = wr, text = _L['Heal healper'],
 		tip = _L['Select target when mouse enter'],
 		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
@@ -480,8 +490,7 @@ function PS.OnPanelActive(wnd)
 			MY_Focus.bHealHelper = bChecked
 		end,
 		autoenable = function() return MY_Focus.IsEnabled() end,
-	})
-	y = y + deltaY
+	}):AutoWidth():Width() + 5
 
 	ui:Append('WndComboBox', {
 		x = x, y = y, w = wr, text = _L['Distance type'],
@@ -492,6 +501,8 @@ function PS.OnPanelActive(wnd)
 		end,
 		autoenable = function() return MY_Focus.IsEnabled() end,
 	}):AutoWidth()
+
+	x = xr
 	y = y + deltaY
 
 	ui:Append('WndTrackbar', {
