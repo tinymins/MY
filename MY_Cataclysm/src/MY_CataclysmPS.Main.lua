@@ -221,13 +221,23 @@ function PS.OnPanelActive(frame)
 
 	x = X + 10
 	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, text = _L['Don\'t show Tip in fight'],
+		x = x, y = y, text = _L['Show tip at right bottom'],
+		checked = CFG.bShowTipAtRightBottom,
+		oncheck = function(bCheck)
+			CFG.bShowTipAtRightBottom = bCheck
+		end,
+	}):AutoWidth():Width() + 5
+
+	x = x + ui:Append('WndCheckBox', {
+		x = x, y = y, text = _L['Don\'t show tip in fight'],
 		checked = CFG.bHideTipInFight,
 		oncheck = function(bCheck)
 			CFG.bHideTipInFight = bCheck
 		end,
 	}):AutoWidth():Width() + 5
 
+	x = X + 10
+	y = y + 25
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, text = g_tStrings.STR_RAID_TARGET_ASSIST,
 		checked = CFG.bTempTargetEnable,
@@ -249,6 +259,7 @@ function PS.OnPanelActive(frame)
 				and _L['Target assist no delay.']
 				or _L('Target assist delay %dms.', val * 75)
 		end,
+		autoenable = function() return CFG.bTempTargetEnable end,
 	}):AutoWidth():Width()
 
 	x = X + 10
@@ -266,6 +277,7 @@ function PS.OnPanelActive(frame)
 		oncheck = function(bCheck)
 			CFG.bAltViewInFight = not bCheck
 		end,
+		autoenable = function() return CFG.bAltView end,
 	}):AutoWidth():Width() + 5
 	-- y = y + ui:Append('WndCheckBox', { x = 10, y = nY, text = _L['Faster Refresh HP(Greater performance loss)'], checked = CFG.bFasterHP, enable = false })
 	-- :Click(function(bCheck)

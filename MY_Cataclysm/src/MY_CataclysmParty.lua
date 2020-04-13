@@ -412,17 +412,20 @@ end
 do
 
 local function OnItemRefreshTip()
-	local me = GetClientPlayer()
-	local bTip = not CFG.bHideTipInFight or not me.bFightState
+	local bTip = not CFG.bHideTipInFight or not LIB.IsFighting()
 	if not bTip then
 		return
 	end
-	local nX, nY = this:GetRoot():GetAbsPos()
-	local nW, nH = this:GetRoot():GetSize()
+	local Rect
+	if not CFG.bShowTipAtRightBottom then
+		local nX, nY = this:GetRoot():GetAbsPos()
+		local nW, nH = this:GetRoot():GetSize()
+		Rect = { nX, nY + 5, nW, nH }
+	end
 	if this.bBuff then
-		LIB.OutputBuffTip({ nX, nY + 5, nW, nH }, this.dwID, this.nLevel, MY_GetEndTime(this.nEndFrame), GetFormatText(this.szVia, 82))
+		LIB.OutputBuffTip(Rect, this.dwID, this.nLevel, MY_GetEndTime(this.nEndFrame), GetFormatText(this.szVia, 82))
 	elseif this.bRole then
-		LIB.OutputTeamMemberTip({ nX, nY + 5, nW, nH }, this.dwID)
+		LIB.OutputTeamMemberTip(Rect, this.dwID)
 	end
 end
 MY_CataclysmParty_Base.OnItemRefreshTip = OnItemRefreshTip

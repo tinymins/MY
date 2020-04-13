@@ -40,6 +40,7 @@ return {
 	bAltView               = false,
 	bAltViewInFight        = false,
 	bHideTipInFight        = false,
+	bShowTipAtRightBottom  = false,
 	bTempTargetEnable      = false,
 	nTempTargetDelay       = 0,
 	fScaleX                = 1.1,
