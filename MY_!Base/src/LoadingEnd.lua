@@ -54,3 +54,14 @@ setmetatable(LIB, {
 	__newindex = function() assert(false, 'DO NOT modify ' .. PACKET_INFO.NAME_SPACE .. ' after initialized!!!') end
 })
 FireUIEvent(PACKET_INFO.NAME_SPACE .. '_BASE_LOADING_END')
+
+LIB.RegisterInit(PACKET_INFO.NAME_SPACE .. '#AUTHOR_TIP', function()
+	if MY_Farbnamen and MY_Farbnamen.RegisterHeader then
+		for dwID, szName in pairs_c(PACKET_INFO.AUTHOR_ROLES) do
+			MY_Farbnamen.RegisterHeader(szName, dwID, PACKET_INFO.AUTHOR_HEADER)
+		end
+		for szName, _ in pairs_c(PACKET_INFO.AUTHOR_PROTECT_NAMES) do
+			MY_Farbnamen.RegisterHeader(szName, '*', PACKET_INFO.AUTHOR_FAKE_HEADER)
+		end
+	end
+end)

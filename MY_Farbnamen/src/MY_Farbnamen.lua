@@ -67,8 +67,18 @@ local _MY_Farbnamen = {
 	tCampString  = Clone(g_tStrings.STR_GUILD_CAMP_NAME),
 	aPlayerQueu = {},
 }
+local HEADER_XML = {}
 local DB_ERR_COUNT, DB_MAX_ERR_COUNT = 0, 5
 local DB, DBI_W, DBI_RI, DBI_RN, DBT_W, DBT_RI
+
+local function GetRealName(szName)
+	local szRealName = szName
+	local nPos = StringFindW(szName, '@')
+	if nPos then
+		szRealName = szName:sub(1, nPos - 1)
+	end
+	return szRealName
+end
 
 local function InitDB()
 	if DB then
@@ -244,25 +254,34 @@ function MY_Farbnamen.Render(szMsg)
 	return szMsg
 end
 
+function MY_Farbnamen.RegisterHeader(szName, dwID, szHeaderXml)
+	if not HEADER_XML[szName] then
+		HEADER_XML[szName] = {}
+	end
+	if HEADER_XML[szName][dwID] then
+		return LIB.Debug('ERROR', 'MY_Farbnamen Conflicted Name-ID: ' .. szName .. '(' .. dwID .. ')', DEBUG_LEVEL.ERROR)
+	end
+	if dwID == '*' then
+		szName = GetRealName(szName)
+	end
+	HEADER_XML[szName][dwID] = szHeaderXml
+end
+
 function MY_Farbnamen.GetTip(szName)
 	local tInfo = MY_Farbnamen.GetAusName(szName)
 	if tInfo then
 		local tTip = {}
 		-- author info
 		if tInfo.dwID and tInfo.szName then
-			if tInfo.szName == PACKET_INFO.AUTHOR_ROLES[tInfo.dwID] then
-				insert(tTip, GetFormatText(PACKET_INFO.NAME, 8, 89, 224, 232))
-				insert(tTip, GetFormatText(' ', 136, 89, 224, 232))
-				insert(tTip, GetFormatText(_L['[Author]'], 8, 89, 224, 232))
+			local szHeaderXml = HEADER_XML[tInfo.szName] and HEADER_XML[tInfo.szName][tInfo.dwID]
+			if szHeaderXml then
+				insert(tTip, szHeaderXml)
 				insert(tTip, CONSTANT.XML_LINE_BREAKER)
 			elseif tInfo.dwID ~= UI_GetClientPlayerID() then
-				local szRealName = tInfo.szName
-				local nPos = StringFindW(tInfo.szName, '@')
-				if nPos then
-					szRealName = tInfo.szName:sub(1, nPos - 1)
-				end
-				if PACKET_INFO.AUTHOR_PROTECT_NAMES[szRealName] then
-					insert(tTip, GetFormatText(_L['[Fake author]'], 8, 255, 95, 159))
+				local szName = GetRealName(tInfo.szName)
+				local szHeaderXml = HEADER_XML[szName] and HEADER_XML[szName]['*']
+				if szHeaderXml then
+					insert(tTip, szHeaderXml)
 					insert(tTip, CONSTANT.XML_LINE_BREAKER)
 				end
 			end

@@ -188,10 +188,12 @@ local _AUTHOR_ROLES_     = {
 	-- [4662931] = char(0xBE, 0xCD, 0xCA, 0xC7, 0xB8, 0xF6, 0xD5, 0xF3, 0xD1, 0xDB), -- 日月明尊
 	-- [3438030] = char(0xB4, 0xE5, 0xBF, 0xDA, 0xB5, 0xC4, 0xCD, 0xF5, 0xCA, 0xA6, 0xB8, 0xB5), -- 枫泾古镇
 }
+local _AUTHOR_HEADER_ = GetFormatText(_NAME_ .. ' ' .. _L['[Author]'], 8, 89, 224, 232)
 local _AUTHOR_PROTECT_NAMES_ = {
 	[char(0xDC, 0xF8, 0xD2, 0xC1)] = true, -- 简体
 	[char(0xE8, 0x8C, 0x97, 0xE4, 0xBC, 0x8A, 0xE4, 0xBC, 0x8A)] = true, -- 繁体
 }
+local _AUTHOR_FAKE_HEADER_ = GetFormatText(_L['[Fake author]'], 8, 255, 95, 159)
 Log('[' .. _NAME_SPACE_ .. '] Debug level ' .. _DEBUG_LEVEL_ .. ' / delog level ' .. _DELOG_LEVEL_)
 ---------------------------------------------------------------------------------------------
 -- 通用函数
@@ -717,7 +719,9 @@ local tInfo = {
 	AUTHOR_WEIBO_URL     = _AUTHOR_WEIBO_URL_    ,
 	AUTHOR_SIGNATURE     = _AUTHOR_SIGNATURE_    ,
 	AUTHOR_ROLES         = _AUTHOR_ROLES_        ,
+	AUTHOR_HEADER        = _AUTHOR_HEADER_       ,
 	AUTHOR_PROTECT_NAMES = _AUTHOR_PROTECT_NAMES_,
+	AUTHOR_FAKE_HEADER   = _AUTHOR_FAKE_HEADER_  ,
 	MENU_COLOR           = _MENU_COLOR_          ,
 	MAX_PLAYER_LEVEL     = _MAX_PLAYER_LEVEL_    ,
 }

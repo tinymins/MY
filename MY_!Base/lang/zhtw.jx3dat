@@ -133,6 +133,9 @@ return {
 	['text editor'                              ] = '文本編輯器',
 	['Font %d'                                  ] = '字體 %d',
 
+	['[Author]'] = '〔插件君〕',
+	['[Fake author]'] = '〔該玩家非插件君，注意謹防上當受騙〕',
+
 	-- MY_CheckUpdate.lua
 	['new version found.'] = '發現新版本！',
 	['new version found, would you want to download immediately?'] = '發現新版本！是否立即前往下載？',
