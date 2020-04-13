@@ -246,9 +246,6 @@ end
 
 function D.OnFrameBreathe()
 	local nLFC = GetLogicFrameCount()
-	if this.nLastBreathe and nLFC - this.nLastBreathe < GLOBAL.GAME_FPS / 2 then
-		return
-	end
 	local me = GetClientPlayer()
 	local wnd = this:Lookup('WndContainer_DoodadList'):LookupContent(0)
 	while wnd do
@@ -258,9 +255,11 @@ function D.OnFrameBreathe()
 		local hList, hItem = wnd:Lookup('', 'Handle_ItemList')
 		for i = 0, hList:GetItemCount() - 1 do
 			hItem = hList:Lookup(i)
-			if D.IsItemAutoPickup(hItem.itemData, O.tItemConfig, doodad, bCanDialog)
+			if (not hItem.nAutoLootLFC or nLFC - hItem.nAutoLootLFC >= GLOBAL.GAME_FPS / 2)
+			and D.IsItemAutoPickup(hItem.itemData, O.tItemConfig, doodad, bCanDialog)
 			and not hItem.itemData.bDist and not hItem.itemData.bNeedRoll and not hItem.itemData.bBidding then
 				LIB.ExecuteWithThis(hItem, D.OnItemLButtonClick)
+				hItem.nAutoLootLFC = nLFC
 			end
 		end
 		wnd:Lookup('', 'Image_DoodadTitleBg'):SetFrame(bCanDialog and 0 or 3)
@@ -301,7 +300,6 @@ function D.OnFrameBreathe()
 		wnd:Lookup('', 'Handle_Compass'):FormatAllItemPos()
 		wnd = wnd:GetNext()
 	end
-	this.nLastBreathe = nLFC
 end
 
 function D.OnEvent(szEvent)
@@ -1467,6 +1465,7 @@ function D.DrawLootList(dwID, bRemove)
 					bDist = true
 				end
 				h.itemData = itemData
+				h.nAutoLootLFC = nil
 			end
 		end
 		if bSpecial then
@@ -1483,7 +1482,6 @@ function D.DrawLootList(dwID, bRemove)
 		D.AdjustFrame(frame)
 
 		-- 立即自动拾取一次
-		frame.nLastBreathe = nil
 		LIB.ExecuteWithThis(frame, D.OnFrameBreathe)
 	end
 end
