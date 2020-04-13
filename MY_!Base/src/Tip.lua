@@ -59,7 +59,7 @@ end
 
 -- nFont 为 true 表示传入的是Xml字符串 否则表示格式化的字体
 function LIB.OutputTip(Rect, szText, nFont, ePos, nMaxWidth)
-	if not IsTable(Rect) then
+	if not IsTable(Rect) and not IsNil(Rect) then
 		Rect, szText, nFont, ePos, nMaxWidth = nil, Rect, szText, nFont, ePos
 	end
 	if nFont ~= true then
@@ -70,7 +70,7 @@ function LIB.OutputTip(Rect, szText, nFont, ePos, nMaxWidth)
 end
 
 function LIB.OutputBuffTip(Rect, dwID, nLevel, nTime, szExtraXml)
-	if not IsTable(Rect) then
+	if not IsTable(Rect) and not IsNil(Rect) then
 		Rect, dwID, nLevel, nTime, szExtraXml = nil, Rect, dwID, nLevel, nTime
 	end
 	local t = {}
@@ -131,7 +131,7 @@ function LIB.OutputBuffTip(Rect, dwID, nLevel, nTime, szExtraXml)
 end
 
 function LIB.OutputTeamMemberTip(Rect, dwID, szExtraXml)
-	if not IsTable(Rect) then
+	if not IsTable(Rect) and not IsNil(Rect) then
 		Rect, dwID, szExtraXml = nil, Rect, dwID
 	end
 	local team = GetClientTeam()
@@ -172,7 +172,7 @@ function LIB.OutputTeamMemberTip(Rect, dwID, szExtraXml)
 end
 
 function LIB.OutputPlayerTip(Rect, dwID, szExtraXml)
-	if not IsTable(Rect) then
+	if not IsTable(Rect) and not IsNil(Rect) then
 		Rect, dwID, szExtraXml = nil, Rect, dwID
 	end
 	local player = GetPlayer(dwID)
@@ -246,7 +246,7 @@ function LIB.OutputPlayerTip(Rect, dwID, szExtraXml)
 end
 
 function LIB.OutputNpcTemplateTip(Rect, dwNpcTemplateID, szExtraXml)
-	if not IsTable(Rect) then
+	if not IsTable(Rect) and not IsNil(Rect) then
 		Rect, dwNpcTemplateID, szExtraXml = nil, Rect, dwNpcTemplateID
 	end
 	local npc = GetNpcTemplate(dwNpcTemplateID)
@@ -276,7 +276,7 @@ function LIB.OutputNpcTemplateTip(Rect, dwNpcTemplateID, szExtraXml)
 end
 
 function LIB.OutputNpcTip(Rect, dwID, szExtraXml)
-	if not IsTable(Rect) then
+	if not IsTable(Rect) and not IsNil(Rect) then
 		Rect, dwID, szExtraXml = nil, Rect, dwID
 	end
 	local npc = GetNpc(dwID)
@@ -332,7 +332,7 @@ function LIB.OutputNpcTip(Rect, dwID, szExtraXml)
 end
 
 function LIB.OutputDoodadTemplateTip(Rect, dwTemplateID, szExtraXml)
-	if not IsTable(Rect) then
+	if not IsTable(Rect) and not IsNil(Rect) then
 		Rect, dwTemplateID, szExtraXml = nil, Rect, dwTemplateID
 	end
 	local doodad = GetDoodadTemplate(dwTemplateID)
@@ -362,7 +362,7 @@ function LIB.OutputDoodadTemplateTip(Rect, dwTemplateID, szExtraXml)
 end
 
 function LIB.OutputDoodadTip(Rect, dwDoodadID, szExtraXml)
-	if not IsTable(Rect) then
+	if not IsTable(Rect) and not IsNil(Rect) then
 		Rect, dwDoodadID, szExtraXml = nil, Rect, dwDoodadID
 	end
 	local doodad = GetDoodad(dwDoodadID)
@@ -473,7 +473,7 @@ function LIB.OutputDoodadTip(Rect, dwDoodadID, szExtraXml)
 end
 
 function LIB.OutputObjectTip(Rect, dwType, dwID, szExtraXml)
-	if not IsTable(Rect) then
+	if not IsTable(Rect) and not IsNil(Rect) then
 		Rect, dwType, dwID, szExtraXml = nil, Rect, dwType, dwID
 	end
 	Rect = ConvRectEl(Rect)
@@ -487,7 +487,7 @@ function LIB.OutputObjectTip(Rect, dwType, dwID, szExtraXml)
 end
 
 function LIB.OutputItemInfoTip(Rect, dwTabType, dwIndex, nBookInfo)
-	if not IsTable(Rect) then
+	if not IsTable(Rect) and not IsNil(Rect) then
 		Rect, dwTabType, dwIndex, nBookInfo = nil, Rect, dwTabType, dwIndex
 	end
 	local szXml = GetItemInfoTip(0, dwTabType, dwIndex, nil, nil, nBookInfo)
