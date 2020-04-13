@@ -273,12 +273,23 @@ function D.OnTableInsert(dwID, dwBuffID, nLevel, nIcon)
 		return
 	end
 	local dwTargetType, dwTargetID = Target_GetTargetData()
+	-- 判断是否有8帧之内的气劲 如果有则排序时候应当拥有相同的权重（解决不同客户端同步团队BUFF顺序不一致的问题）
+	local nLFC = GetLogicFrameCount()
+	local nSortLFC = nLFC
+	for i = O.handle:GetItemCount() - 1, 0, -1 do
+		local hItem = O.handle:Lookup(i)
+		if nLFC - hItem.nLFC <= GLOBAL.GAME_FPS / 2 and nLFC - hItem.nSortLFC <= GLOBAL.GAME_FPS / 2 then
+			nSortLFC = hItem.nSortLFC
+			break
+		end
+	end
 	local data = { dwID = dwID, dwBuffID = dwBuffID, nLevel = nLevel }
 	local h = O.handle:AppendItemFromData(O.hItem)
 	local nCount = O.handle:GetItemCount()
 	if dwTargetID == dwID then
 		h:Lookup('Image_Select'):Show()
 	end
+	h:SetUserData(nSortLFC * 1000 + dwID % 1000)
 	h:Lookup('Image_KungFu'):FromIconID(Table_GetSkillIconID(info.dwMountKungfuID) or 1435)
 	h:Lookup('Text_Name'):SetText(nCount .. ' ' .. info.szName)
 	h:Lookup('Image_life'):SetPercentage(info.nCurrentLife / math.max(info.nMaxLife, 1))
@@ -302,7 +313,10 @@ function D.OnTableInsert(dwID, dwBuffID, nLevel, nIcon)
 		box:SetOverText(0, buff.nStackNum)
 	end
 	h.data = data
+	h.nLFC = nLFC
+	h.nSortLFC = nSortLFC
 	h:Show()
+	O.handle:Sort()
 	O.handle:FormatAllItemPos()
 	D.SwitchPanel(nCount)
 	CACHE_LIST[key] = h
