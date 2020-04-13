@@ -417,7 +417,7 @@ end)
 local function fxTarget(r, g, b, a) return 255 - (255 - r) * 0.3, 255 - (255 - g) * 0.3, 255 - (255 - b) * 0.3, a end
 local function fxDeath(r, g, b, a) return ceil(r * 0.4), ceil(g * 0.4), ceil(b * 0.4), a end
 local function fxDeathTarget(r, g, b, a) return ceil(r * 0.45), ceil(g * 0.45), ceil(b * 0.45), a end
-local lb, info, bVisible, nDisX, nDisY, nDisZ, fTextScale, dwTarType, dwTarID, relation, force, nPriority, szName, r, g, b
+local lb, info, bFight, bVisible, nDisX, nDisY, nDisZ, fTextScale, dwTarType, dwTarID, relation, force, nPriority, szName, r, g, b
 local aCountDown, szCountDown, bShowName, bShowKungfu, kunfu, bShowTong, bShowTitle, bShowLife, bShowLifePercent, tEffect
 function CheckInvalidRect(dwType, dwID, me, object)
 	lb = LB_CACHE[dwID]
@@ -463,6 +463,7 @@ function CheckInvalidRect(dwType, dwID, me, object)
 			lb:SetDistance(0)
 			LB_CACHE[dwID] = lb
 		end
+		bFight = LIB.IsFighting()
 		fTextScale = Config.fTextScale
 		dwTarType, dwTarID = me.GetTarget()
 		relation = D.GetRelation(me.dwID, dwID, me, object)
@@ -537,7 +538,7 @@ function CheckInvalidRect(dwType, dwID, me, object)
 		end
 		lb:SetCD(szCountDown)
 		-- 名字
-		bShowName = GetConfigComputeValue('ShowName', relation, force, me.bFightState)
+		bShowName = GetConfigComputeValue('ShowName', relation, force, bFight)
 		if bShowName then
 			lb:SetName(szName)
 		end
@@ -559,13 +560,13 @@ function CheckInvalidRect(dwType, dwID, me, object)
 		end
 		lb:SetDistanceVisible(Config.bShowDistance)
 		-- 帮会
-		bShowTong = GetConfigComputeValue('ShowTong', relation, force, me.bFightState)
+		bShowTong = GetConfigComputeValue('ShowTong', relation, force, bFight)
 		if bShowTong then
 			lb:SetTong(D.GetTongName(object.dwTongID) or '')
 		end
 		lb:SetTongVisible(bShowTong)
 		-- 称号
-		bShowTitle = GetConfigComputeValue('ShowTitle', relation, force, me.bFightState)
+		bShowTitle = GetConfigComputeValue('ShowTitle', relation, force, bFight)
 		if bShowTitle then
 			lb:SetTitle(object.szTitle or '')
 		end
@@ -576,14 +577,14 @@ function CheckInvalidRect(dwType, dwID, me, object)
 		else
 			lb:SetLife(object.nCurrentLife, object.nMaxLife)
 		end
-		bShowLife = szName ~= '' and GetConfigComputeValue('ShowLife', relation, force, me.bFightState)
+		bShowLife = szName ~= '' and GetConfigComputeValue('ShowLife', relation, force, bFight)
 		if bShowLife then
 			lb:SetLifeBar(Config.nLifeOffsetX, Config.nLifeOffsetY, Config.nLifeWidth, Config.nLifeHeight, Config.nLifePadding)
 			lb:SetLifeBarBorder(Config.nLifeBorder, Config.nLifeBorderR, Config.nLifeBorderG, Config.nLifeBorderB)
 		end
 		lb:SetLifeBarVisible(bShowLife)
 		-- 血量数值部分
-		bShowLifePercent = GetConfigComputeValue('ShowLifePer', relation, force, me.bFightState)
+		bShowLifePercent = GetConfigComputeValue('ShowLifePer', relation, force, bFight)
 		if bShowLifePercent then
 			lb:SetLifeText(Config.nLifePerOffsetX, Config.nLifePerOffsetY, Config.bHideLifePercentageDecimal and '%.0f' or '%.1f')
 		end
