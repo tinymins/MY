@@ -193,30 +193,30 @@ local __TEMPLATE__ = {
 	},
 	ShowName = {
 		Self = {
-			Npc = { bEnable = true, bOnlyFighting = false },
+			Npc = { bEnable = true, bOnlyFighting = false, bHidePets = false },
 			Player = { bEnable = true, bOnlyFighting = false },
 		},
 		Party = {
-			Npc = { bEnable = true, bOnlyFighting = false },
+			Npc = { bEnable = true, bOnlyFighting = false, bHidePets = false },
 			Player = { bEnable = true, bOnlyFighting = false },
 		},
 		Enemy = {
-			Npc = { bEnable = true, bOnlyFighting = false },
+			Npc = { bEnable = true, bOnlyFighting = false, bHidePets = false },
 			Player = { bEnable = true, bOnlyFighting = false },
 		},
 		Neutrality = {
-			Npc = { bEnable = true, bOnlyFighting = false },
+			Npc = { bEnable = true, bOnlyFighting = false, bHidePets = false },
 			Player = { bEnable = true, bOnlyFighting = false },
 		},
 		Ally = {
-			Npc = { bEnable = true, bOnlyFighting = false },
+			Npc = { bEnable = true, bOnlyFighting = false, bHidePets = false },
 			Player = { bEnable = true, bOnlyFighting = false },
 		},
 		Foe = { Player = { bEnable = true, bOnlyFighting = false } },
 	},
 	ShowTong = {
 		Self = {
-			Npc = { bEnable = true, bOnlyFighting = false },
+			Npc = { bEnable = true, bOnlyFighting = false, bHidePets = false },
 			Player = { bEnable = true, bOnlyFighting = false },
 		},
 		Party = { Player = { bEnable = true, bOnlyFighting = false } },
@@ -227,69 +227,69 @@ local __TEMPLATE__ = {
 	},
 	ShowTitle = {
 		Self = {
-			Npc = { bEnable = true, bOnlyFighting = false },
+			Npc = { bEnable = true, bOnlyFighting = false, bHidePets = false },
 			Player = { bEnable = true, bOnlyFighting = false },
 		},
 		Party = {
-			Npc = { bEnable = true, bOnlyFighting = false },
+			Npc = { bEnable = true, bOnlyFighting = false, bHidePets = false },
 			Player = { bEnable = true, bOnlyFighting = false },
 		},
 		Enemy = {
-			Npc = { bEnable = true, bOnlyFighting = false },
+			Npc = { bEnable = true, bOnlyFighting = false, bHidePets = false },
 			Player = { bEnable = true, bOnlyFighting = false },
 		},
 		Neutrality = {
-			Npc = { bEnable = true, bOnlyFighting = false },
+			Npc = { bEnable = true, bOnlyFighting = false, bHidePets = false },
 			Player = { bEnable = true, bOnlyFighting = false },
 		},
 		Ally = {
-			Npc = { bEnable = true, bOnlyFighting = false },
+			Npc = { bEnable = true, bOnlyFighting = false, bHidePets = false },
 			Player = { bEnable = true, bOnlyFighting = false },
 		},
 		Foe = { Player = { bEnable = true, bOnlyFighting = false } },
 	},
 	ShowLife = {
 		Self = {
-			Npc = { bEnable = true, bOnlyFighting = false },
+			Npc = { bEnable = true, bOnlyFighting = false, bHidePets = false },
 			Player = { bEnable = true, bOnlyFighting = false },
 		},
 		Party = {
-			Npc = { bEnable = false, bOnlyFighting = false },
+			Npc = { bEnable = false, bOnlyFighting = false, bHidePets = false },
 			Player = { bEnable = true, bOnlyFighting = false },
 		},
 		Enemy = {
-			Npc = { bEnable = true, bOnlyFighting = false },
+			Npc = { bEnable = true, bOnlyFighting = false, bHidePets = false },
 			Player = { bEnable = true, bOnlyFighting = false },
 		},
 		Neutrality = {
-			Npc = { bEnable = true, bOnlyFighting = false },
+			Npc = { bEnable = true, bOnlyFighting = false, bHidePets = false },
 			Player = { bEnable = true, bOnlyFighting = false },
 		},
 		Ally = {
-			Npc = { bEnable = true, bOnlyFighting = false },
+			Npc = { bEnable = true, bOnlyFighting = false, bHidePets = false },
 			Player = { bEnable = true, bOnlyFighting = false },
 		},
 		Foe = { Player = { bEnable = true, bOnlyFighting = false } },
 	},
 	ShowLifePer = {
 		Self = {
-			Npc = { bEnable = false, bOnlyFighting = false },
+			Npc = { bEnable = false, bOnlyFighting = false, bHidePets = false },
 			Player = { bEnable = false, bOnlyFighting = false },
 		},
 		Party = {
-			Npc = { bEnable = false, bOnlyFighting = false },
+			Npc = { bEnable = false, bOnlyFighting = false, bHidePets = false },
 			Player = { bEnable = false, bOnlyFighting = false },
 		},
 		Enemy = {
-			Npc = { bEnable = false, bOnlyFighting = false },
+			Npc = { bEnable = false, bOnlyFighting = false, bHidePets = false },
 			Player = { bEnable = false, bOnlyFighting = false },
 		},
 		Neutrality = {
-			Npc = { bEnable = false, bOnlyFighting = false },
+			Npc = { bEnable = false, bOnlyFighting = false, bHidePets = false },
 			Player = { bEnable = false, bOnlyFighting = false },
 		},
 		Ally = {
-			Npc = { bEnable = false, bOnlyFighting = false },
+			Npc = { bEnable = false, bOnlyFighting = false, bHidePets = false },
 			Player = { bEnable = false, bOnlyFighting = false },
 		},
 		Foe = { Player = { bEnable = false, bOnlyFighting = false } },

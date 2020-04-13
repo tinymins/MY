@@ -464,7 +464,7 @@ function PS.OnPanelActive(wnd)
 							fnAction = function()
 								cfg.Player.bOnlyFighting = not cfg.Player.bOnlyFighting
 							end,
-						}
+						},
 					}, relation, 'Player'))
 				end
 			end
@@ -491,7 +491,15 @@ function PS.OnPanelActive(wnd)
 							fnAction = function()
 								cfg.Npc.bOnlyFighting = not cfg.Npc.bOnlyFighting
 							end,
-						}
+						},
+						{
+							szOption = _L['Hide pets'],
+							bCheck = true,
+							bChecked = cfg.Player.bHidePets,
+							fnAction = function()
+								cfg.Npc.bHidePets = not cfg.Npc.bHidePets
+							end,
+						},
 					}, relation, 'Npc'))
 				end
 			end

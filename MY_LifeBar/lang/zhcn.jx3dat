@@ -81,6 +81,7 @@ return {
     ['Foe'] = '仇人关系',
 
     ['hide when unfight'] = '脱战时隐藏',
+    ['Hide pets'] = '不显示跟宠',
     ['hide decimal'] = '不显示小数',
 
     ['Default config cannot be loaded, please reinstall!!!'] = '默认配置加载失败，请重新安装！',
