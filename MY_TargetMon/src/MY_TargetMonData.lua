@@ -537,7 +537,12 @@ function UpdateView()
 		if config.enable then
 			local dwTarType, dwTarID = D.GetTarget(config.target, config.type)
 			local KObject = LIB.GetObject(dwTarType, dwTarID)
-			local dwTarKungfuID = KObject and dwTarType == TARGET.PLAYER and KObject.GetKungfuMountID() or 0
+			local dwTarKungfuID = KObject
+				and (dwTarType == TARGET.PLAYER
+					and (KObject.GetKungfuMountID() or 0)
+					or 'npc'
+				)
+				or 0
 			local view = VIEW_LIST[nViewIndex]
 			if not view then
 				view = {}
