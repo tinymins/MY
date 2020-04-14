@@ -60,6 +60,8 @@ local DK_REC_STAT_TARGET = MY_Recount_DS.DK_REC_STAT_TARGET
 local DK_REC_STAT_TARGET_DETAIL = MY_Recount_DS.DK_REC_STAT_TARGET_DETAIL
 local DK_REC_STAT_TARGET_SKILL = MY_Recount_DS.DK_REC_STAT_TARGET_SKILL
 
+local MAX_HISTORY_DISP = 50
+
 local STAT_TYPE = { -- 统计类型
 	DPS  = 1, -- 输出统计
 	HPS  = 2, -- 治疗统计
@@ -410,8 +412,11 @@ function D.GetHistoryMenu()
 		end,
 	}}
 
-	local tt = { bInline = true, nMaxHeight = 450 }
+	local tt, nCount = { bInline = true, nMaxHeight = 450 }, 0
 	for _, file in ipairs(MY_Recount_DS.GetHistoryFiles()) do
+		if nCount >= MAX_HISTORY_DISP then
+			break
+		end
 		local t1 = {
 			szOption = file.bossname .. ' (' .. LIB.FormatTimeCounter(file.during, '%M:%ss') .. ')',
 			rgb = (file.time == DataDisplay[DK.TIME_BEGIN] and {255, 255, 0}) or nil,
@@ -447,6 +452,7 @@ function D.GetHistoryMenu()
 			end,
 		}
 		insert(tt, t1)
+		nCount = nCount + 1
 	end
 	insert(t, tt)
 
