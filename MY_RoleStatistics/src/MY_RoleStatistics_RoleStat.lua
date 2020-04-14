@@ -95,6 +95,7 @@ local O = {
 	},
 	tAlertTodayVal = nil,
 	dwLastAlertTime = 0,
+	tSummaryIgnoreGUID = {},
 	bFloatEntry = false,
 	bSaveDB = false,
 }
@@ -103,6 +104,7 @@ RegisterCustomData('Global/MY_RoleStatistics_RoleStat.szSort')
 RegisterCustomData('Global/MY_RoleStatistics_RoleStat.szSortOrder')
 RegisterCustomData('MY_RoleStatistics_RoleStat.aAlertColumn')
 RegisterCustomData('MY_RoleStatistics_RoleStat.tAlertTodayVal')
+RegisterCustomData('MY_RoleStatistics_RoleStat.tSummaryIgnoreGUID')
 RegisterCustomData('MY_RoleStatistics_RoleStat.bFloatEntry')
 RegisterCustomData('MY_RoleStatistics_RoleStat.bSaveDB')
 
@@ -852,6 +854,7 @@ function D.UpdateUI(page)
 		local hRow = hList:AppendItemFromIni(SZ_INI, 'Handle_Row')
 		hRow.rec = rec
 		hRow:Lookup('Image_RowBg'):SetVisible(i % 2 == 1)
+		-- 绘制列
 		local nX = 0
 		for j, col in ipairs(aCol) do
 			local hItem = hRow:AppendItemFromIni(SZ_INI, 'Handle_Item') -- 外部居中层
@@ -870,10 +873,28 @@ function D.UpdateUI(page)
 			hItem:FormatAllItemPos()
 			nX = nX + nWidth
 		end
+		-- 绘制复选框
+		UI(hRow):Append('CheckBox', {
+			x = 5, y = 2, w = EXCEL_WIDTH - 10,
+			checked = IsEmpty(O.tSummaryIgnoreGUID) or not O.tSummaryIgnoreGUID[rec.guid] or false,
+			oncheck = function(bCheck)
+				O.tSummaryIgnoreGUID[rec.guid] = not bCheck or nil
+				D.UpdateUI(page)
+			end,
+			visible = O.bConfigSummary or false,
+		})
+		-- 格式化位置
 		hRow:FormatAllItemPos()
 	end
 	hList:FormatAllItemPos()
+
 	-- 汇总
+	local aSum = {}
+	for _, rec in ipairs(result) do
+		if IsEmpty(O.tSummaryIgnoreGUID) or not O.tSummaryIgnoreGUID[rec.guid] then
+			insert(aSum, rec)
+		end
+	end
 	local hSum = page:Lookup('Wnd_Total/WndScroll_RoleStat', 'Handle_Sum')
 	hSum:Clear()
 	local hRow = hSum:AppendItemFromIni(SZ_INI, 'Handle_Row', 'Handle_SumRow')
@@ -882,7 +903,7 @@ function D.UpdateUI(page)
 	for j, col in ipairs(aCol) do
 		local hItem = hRow:AppendItemFromIni(SZ_INI, 'Handle_Item') -- 外部居中层
 		local hItemContent = hItem:Lookup('Handle_ItemContent') -- 内部文本布局层
-		hItemContent:AppendItemFromString(col.GetSummaryFormatText and col.GetSummaryFormatText(result) or GetFormatText('--'))
+		hItemContent:AppendItemFromString(col.GetSummaryFormatText and col.GetSummaryFormatText(aSum) or GetFormatText('--'))
 		hItemContent:SetW(99999)
 		hItemContent:FormatAllItemPos()
 		hItemContent:SetSizeByAllItemSize()
@@ -1058,6 +1079,15 @@ function D.OnInitPage()
 				end
 			end
 			return t
+		end,
+	})
+
+	UI(wnd):Append('WndButton', {
+		x = 25, y = 552, w = 25, h = 25,
+		buttonstyle = 'OPTION',
+		onclick = function()
+			O.bConfigSummary = not O.bConfigSummary
+			D.UpdateUI(page)
 		end,
 	})
 
@@ -1283,6 +1313,7 @@ local settings = {
 				szSortOrder = true,
 				aAlertColumn = true,
 				tAlertTodayVal = true,
+				tSummaryIgnoreGUID = true,
 				bFloatEntry = true,
 				bSaveDB = true,
 			},
@@ -1297,6 +1328,7 @@ local settings = {
 				szSortOrder = true,
 				aAlertColumn = true,
 				tAlertTodayVal = true,
+				tSummaryIgnoreGUID = true,
 				bFloatEntry = true,
 				bSaveDB = true,
 			},
