@@ -322,13 +322,13 @@ local function GetComponentElement(raw, elementType)
 			element = raw:Lookup('', 'Handle_Padding/Handle_Scroll')
 		elseif componentType == 'WndFrame' then
 			element = GetComponentElement(raw, 'MAIN_WINDOW'):Lookup('', '')
-		elseif componentType == 'Handle' then
+		elseif componentType == 'Handle' or componentType == 'CheckBox' then
 			element = raw
 		elseif componentBaseType == 'Wnd' then
 			element = raw:Lookup('', '')
 		end
 	elseif elementType == 'CHECKBOX' then
-		if componentType == 'WndCheckBox' or componentType == 'WndRadioBox' then
+		if componentType == 'WndCheckBox' or componentType == 'WndRadioBox' or componentType == 'CheckBox' then
 			element = raw
 		end
 	elseif elementType == 'COMBOBOX' then
@@ -369,7 +369,7 @@ local function GetComponentElement(raw, elementType)
 			element = raw:Lookup('', 'Text_Title') or raw:Lookup('', 'Text_Default')
 		elseif componentBaseType == 'Wnd' then
 			element = raw:Lookup('', 'Text_Default')
-		elseif componentType == 'Handle' then
+		elseif componentType == 'Handle' or componentType == 'CheckBox' then
 			element = raw:Lookup('Text_Default')
 		elseif componentType == 'Text' then
 			element = raw
@@ -378,7 +378,7 @@ local function GetComponentElement(raw, elementType)
 		if componentType == 'WndEditBox' or componentType == 'WndComboBox' or componentType == 'WndEditComboBox'
 		or componentType == 'WndAutocomplete' or componentType == 'WndScrollBox' then
 			element = raw:Lookup('', 'Image_Default')
-		elseif componentType == 'Handle' then
+		elseif componentType == 'Handle' or componentType == 'CheckBox' then
 			element = raw:Lookup('Image_Default')
 		elseif componentType == 'Image' then
 			element = raw
@@ -608,6 +608,75 @@ local function InitComponent(raw, szType)
 			end
 		end)
 		SetComponentProp(raw, 'listboxOptions', { multiSelect = false })
+	elseif szType == 'CheckBox' then
+		raw:RegisterEvent(831)
+		local function UpdateCheckState(raw)
+			if not IsElement(raw) then
+				return
+			end
+			local img = raw:Lookup('Image_Default')
+			if not IsElement(img) then
+				return
+			end
+			if GetComponentProp(raw, 'bDisabled') then
+				img:SetFrame(GetComponentProp(raw, 'bChecked') and 91 or 90)
+				raw:SetAlpha(255)
+			elseif GetComponentProp(raw, 'bDown') then
+				img:SetFrame(GetComponentProp(raw, 'bChecked') and 6 or 5)
+				raw:SetAlpha(190)
+			elseif GetComponentProp(raw, 'bIn') then
+				img:SetFrame(GetComponentProp(raw, 'bChecked') and 7 or 98)
+				raw:SetAlpha(255)
+			else
+				img:SetFrame(GetComponentProp(raw, 'bChecked') and 6 or 5)
+				raw:SetAlpha(255)
+			end
+		end
+		raw.OnItemMouseIn = function()
+			SetComponentProp(raw, 'bIn', true)
+			UpdateCheckState(raw)
+		end
+		raw.OnItemMouseOut = function()
+			SetComponentProp(raw, 'bIn', false)
+			UpdateCheckState(raw)
+		end
+		raw.OnItemLButtonDown = function()
+			SetComponentProp(raw, 'bDown', true)
+			UpdateCheckState(raw)
+		end
+		raw.OnItemLButtonUp = function()
+			SetComponentProp(raw, 'bDown', false)
+			UpdateCheckState(raw)
+		end
+		raw.OnItemLButtonClick = function()
+			raw:Check(not GetComponentProp(raw, 'bChecked'))
+		end
+		raw.Check = function(_, bChecked, eFireType)
+			SetComponentProp(raw, 'bChecked', bChecked)
+			UpdateCheckState(raw)
+			if eFireType == WNDEVENT_FIRETYPE.PREVENT then
+				return
+			end
+			if bChecked then
+				if raw.OnCheckBoxCheck then
+					raw.OnCheckBoxCheck()
+				end
+			else
+				if raw.OnCheckBoxUncheck then
+					raw.OnCheckBoxUncheck()
+				end
+			end
+		end
+		raw.IsCheckBoxChecked = function()
+			return GetComponentProp(raw, 'bChecked') or false
+		end
+		raw.Enable = function(_, bEnabled)
+			SetComponentProp(raw, 'bDisabled', not bEnabled)
+			UpdateCheckState(raw)
+		end
+		raw.IsEnabled = function()
+			return not GetComponentProp(raw, 'bDisabled')
+		end
 	end
 end
 
@@ -1107,8 +1176,8 @@ local _tItemXML = {
 	['Box'] = '<box>w=48 h=48 eventid=525311 </box>',
 	['Shadow'] = '<shadow>w=15 h=15 eventid=277 </shadow>',
 	['Handle'] = '<handle>firstpostype=0 w=10 h=10</handle>',
+	['CheckBox'] = '<handle>name="CheckBox" w=100 h=28 <image>name="Image_Default" w=28 h=28 path="ui\\Image\\button\\CommonButton_1.UITex" frame=5</image><text>name="Text_Default" valign=1 x=29 w=71 h=28</text></handle>',
 }
-local _szItemINI = PACKET_INFO.FRAMEWORK_ROOT .. 'ui\\HandleItems.ini'
 local _nTempWndCount = 0
 -- append
 -- similar as jQuery.append()
@@ -1125,57 +1194,16 @@ function UI:Append(arg0, arg1)
 	if arg0:find('%<') then
 		szXml = arg0
 	else
-		szXml = _tItemXML[arg0]
-		if not szXml then
-			szType = arg0
-		end
+		szType = arg0
+		szXml = _tItemXML[szType]
 		if IsTable(arg1) then
 			tArg = arg1
 		elseif IsString(arg1) then
 			tArg = { name = arg1 }
 		end
 	end
-
-	if szType then -- append from ini file
-		for _, raw in ipairs(self.raws) do
-			local parentWnd = GetComponentElement(raw, 'MAIN_WINDOW')
-			local parentHandle = GetComponentElement(raw, 'MAIN_HANDLE')
-			if parentWnd and (sub(szType, 1, 3) == 'Wnd' or find(szType, '^[^<>?:]*%.ini:%w+$')) then
-				local szFile, szComponet = szType, szType
-				if find(szFile, '^[^<>?:]*%.ini:%w+$') then
-					szType = gsub(szFile, '^[^<>?]*%.ini:', '')
-					szFile = sub(szFile, 0, -#szType - 2)
-					szComponet = szFile:gsub('$.*[/\\]', ''):gsub('^[^<>?]*[/\\]', ''):sub(0, -5)
-				else
-					szFile = PACKET_INFO.UICOMPONENT_ROOT .. szFile .. '.ini'
-				end
-				local frame = Wnd.OpenWindow(szFile, PACKET_INFO.NAME_SPACE .. '_TempWnd#' .. _nTempWndCount)
-				if not frame then
-					return LIB.Debug(PACKET_INFO.NAME_SPACE .. '#UI#append', _L('unable to open ini file [%s]', szFile), DEBUG_LEVEL.ERROR)
-				end
-				_nTempWndCount = _nTempWndCount + 1
-				local raw = frame:Lookup(szComponet)
-				if not raw then
-					LIB.Debug(PACKET_INFO.NAME_SPACE .. '#UI#append', _L('can not find wnd component [%s:%s]', szFile, szComponet), DEBUG_LEVEL.ERROR)
-				else
-					InitComponent(raw, szType)
-					raw:ChangeRelation(parentWnd, true, true)
-					ui = ui:Add(raw)
-					UI(raw):Hover(OnCommonComponentMouseEnter, OnCommonComponentMouseLeave):Change(OnCommonComponentMouseEnter)
-				end
-				Wnd.CloseWindow(frame)
-			elseif sub(szType, 1, 3) ~= 'Wnd' and parentHandle then
-				raw = parentHandle:AppendItemFromIni(_szItemINI, szType)
-				if not raw then
-					return LIB.Debug(PACKET_INFO.NAME_SPACE .. '#UI:Append', _L('unable to append handle item [%s]', szType), DEBUG_LEVEL.ERROR)
-				else
-					ui = ui:Add(raw)
-				end
-				parentHandle:FormatAllItemPos()
-			end
-		end
-	elseif szXml then -- append from xml
-		local startIndex
+	if szXml then -- append from xml
+		local startIndex, el
 		for _, raw in ipairs(self.raws) do
 			local h = GetComponentElement(raw, 'MAIN_HANDLE')
 			if h then
@@ -1183,9 +1211,49 @@ function UI:Append(arg0, arg1)
 				h:AppendItemFromString(szXml)
 				h:FormatAllItemPos()
 				for i = startIndex, h:GetItemCount() - 1 do
-					ui = ui:Add(h:Lookup(i))
+					el = h:Lookup(i)
+					if szType then
+						InitComponent(el, szType)
+					end
+					ui = ui:Add(el)
 				end
 			end
+		end
+	elseif szType then -- append from ini file
+		for _, raw in ipairs(self.raws) do
+			local parentWnd = GetComponentElement(raw, 'MAIN_WINDOW')
+			local parentHandle = GetComponentElement(raw, 'MAIN_HANDLE')
+			local szFile, szComponent = szType, szType
+			if find(szFile, '^[^<>?:]*%.ini:%w+$') then
+				szType = gsub(szFile, '^[^<>?]*%.ini:', '')
+				szFile = sub(szFile, 0, -#szType - 2)
+				szComponent = szFile:gsub('$.*[/\\]', ''):gsub('^[^<>?]*[/\\]', ''):sub(0, -5)
+			else
+				szFile = PACKET_INFO.UICOMPONENT_ROOT .. szFile .. '.ini'
+			end
+			local frame = Wnd.OpenWindow(szFile, PACKET_INFO.NAME_SPACE .. '_TempWnd#' .. _nTempWndCount)
+			if not frame then
+				return LIB.Debug(PACKET_INFO.NAME_SPACE .. '#UI#Append', _L('Unable to open ini file [%s]', szFile), DEBUG_LEVEL.ERROR)
+			end
+			_nTempWndCount = _nTempWndCount + 1
+			local raw = frame:Lookup(szComponent)
+			if parentWnd and raw then -- KWndWindow
+				InitComponent(raw, szType)
+				raw:ChangeRelation(parentWnd, true, true)
+			elseif parentHandle then
+				raw = parentHandle:AppendItemFromIni(szFile, szComponent)
+				if raw then -- KItemNull
+					InitComponent(raw, szType)
+					parentHandle:FormatAllItemPos()
+				else
+					LIB.Debug(PACKET_INFO.NAME_SPACE .. '#UI#Append', _L('Can not find wnd or item component [%s:%s]', szFile, szComponent), DEBUG_LEVEL.ERROR)
+				end
+			end
+			if raw then
+				ui = ui:Add(raw)
+				UI(raw):Hover(OnCommonComponentMouseEnter, OnCommonComponentMouseLeave):Change(OnCommonComponentMouseEnter)
+			end
+			Wnd.CloseWindow(frame)
 		end
 	end
 	return ApplyUIArguments(ui, tArg)
@@ -2561,6 +2629,15 @@ local function SetComponentSize(raw, nOuterWidth, nOuterHeight, nInnerWidth, nIn
 		local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
 		local txt = GetComponentElement(raw, 'TEXT')
 		wnd:SetSize(nHeight, nHeight)
+		txt:SetSize(nWidth - nHeight - 1, nHeight)
+		txt:SetRelPos(nHeight + 1, 0)
+		hdl:SetSize(nWidth, nHeight)
+		hdl:FormatAllItemPos()
+	elseif componentType == 'CheckBox' then
+		local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
+		local img = GetComponentElement(raw, 'IMAGE')
+		local txt = GetComponentElement(raw, 'TEXT')
+		img:SetSize(nHeight, nHeight)
 		txt:SetSize(nWidth - nHeight - 1, nHeight)
 		txt:SetRelPos(nHeight + 1, 0)
 		hdl:SetSize(nWidth, nHeight)
