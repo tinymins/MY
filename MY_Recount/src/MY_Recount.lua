@@ -371,7 +371,7 @@ function D.GetMenu()
 		nMaxHeight = 500,
 		fnDisable = function() return not MY_Recount_DS.bEnable end,
 	}
-	for i = 1, 50 do
+	for _, i in ipairs({ 5, 10, 20, 30, 50, 100, 200, 500, 1000 }) do
 		insert(t1, {
 			szOption = i,
 			bCheck = true, bMCheck = true,
