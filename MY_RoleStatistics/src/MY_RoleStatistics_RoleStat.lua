@@ -115,6 +115,17 @@ local function GeneCommonFormatText(id)
 		return GetFormatText(r[id], 162, 255, 255, 255)
 	end
 end
+local function GeneCommonSummaryFormatText(id)
+	return function(rs)
+		local v = 0
+		for _, r in ipairs(rs) do
+			if IsNumber(r[id]) then
+				v = v + r[id]
+			end
+		end
+		return GetFormatText(v, 162, 255, 255, 255)
+	end
+end
 local function GeneCommonCompare(id)
 	return function(r1, r2)
 		if r1[id] == r2[id] then
@@ -130,6 +141,21 @@ local function GeneWeeklyFormatText(id)
 			and r[id]
 			or _L['--']
 		return GetFormatText(szText, 162, 255, 255, 255)
+	end
+end
+local function GeneWeeklySummaryFormatText(id)
+	return function(rs)
+		local nNextTime, nCircle = LIB.GetRefreshTime('weekly')
+		local v = nil
+		for _, r in ipairs(rs) do
+			if nNextTime - nCircle < r.time and IsNumber(r[id]) and r[id] >= 0 then
+				if not v then
+					v = 0
+				end
+				v = v + r[id]
+			end
+		end
+		return GetFormatText(v or '--', 162, 255, 255, 255)
 	end
 end
 local function GeneWeeklyCompare(id)
@@ -177,6 +203,9 @@ local COLUMN_LIST = {
 				name = MY_ChatMosaics.MosaicsString(name)
 			end
 			return GetFormatText(name, nil, LIB.GetForceColor(rec.force, 'foreground'))
+		end,
+		GetSummaryFormatText = function()
+			return GetFormatText(_L['Summary'], nil, 255, 255, 0)
 		end,
 	},
 	{ -- 门派
@@ -233,6 +262,13 @@ local COLUMN_LIST = {
 			end
 			return r1.gold > r2.gold and 1 or -1
 		end,
+		GetSummaryFormatText = function(recs)
+			local tMoney = { nGold = 0, nSilver = 0, nCopper = 0 }
+			for _, rec in ipairs(recs) do
+				tMoney = MoneyOptAdd(tMoney, { nGold = rec.gold, nSilver = rec.silver, nCopper = rec.copper })
+			end
+			return GetMoneyText(tMoney, 105)
+		end,
 	},
 	{ -- 江贡
 		id = 'contribution',
@@ -249,6 +285,7 @@ local COLUMN_LIST = {
 		nWidth = 70,
 		GetFormatText = GeneWeeklyFormatText('contribution_remain'),
 		Compare = GeneWeeklyCompare('contribution_remain'),
+		GetSummaryFormatText = GeneWeeklySummaryFormatText('contribution_remain'),
 	},
 	{ -- 侠义
 		id = 'justice',
@@ -265,6 +302,7 @@ local COLUMN_LIST = {
 		nWidth = 60,
 		GetFormatText = GeneWeeklyFormatText('justice_remain'),
 		Compare = GeneWeeklyCompare('justice_remain'),
+		GetSummaryFormatText = GeneWeeklySummaryFormatText('justice_remain'),
 	},
 	{ -- 浪客笺
 		id = 'starve',
@@ -272,6 +310,7 @@ local COLUMN_LIST = {
 		nWidth = 60,
 		GetFormatText = GeneWeeklyFormatText('starve'),
 		Compare = GeneWeeklyCompare('starve'),
+		GetSummaryFormatText = GeneWeeklySummaryFormatText('starve'),
 	},
 	{ -- 浪客笺周余
 		id = 'starve_remain',
@@ -280,6 +319,7 @@ local COLUMN_LIST = {
 		nWidth = 60,
 		GetFormatText = GeneWeeklyFormatText('starve_remain'),
 		Compare = GeneWeeklyCompare('starve_remain'),
+		GetSummaryFormatText = GeneWeeklySummaryFormatText('starve_remain'),
 	},
 	{
 		-- 威望
@@ -297,6 +337,7 @@ local COLUMN_LIST = {
 		nWidth = 70,
 		GetFormatText = GeneWeeklyFormatText('prestige_remain'),
 		Compare = GeneWeeklyCompare('prestige_remain'),
+		GetSummaryFormatText = GeneWeeklySummaryFormatText('prestige_remain'),
 	},
 	{
 		-- 战阶积分
@@ -305,6 +346,7 @@ local COLUMN_LIST = {
 		nWidth = 70,
 		GetFormatText = GeneWeeklyFormatText('camp_point'),
 		Compare = GeneWeeklyCompare('camp_point'),
+		GetSummaryFormatText = GeneWeeklySummaryFormatText('camp_point'),
 	},
 	{
 		-- 战阶等级
@@ -340,6 +382,7 @@ local COLUMN_LIST = {
 		nWidth = 60,
 		GetFormatText = GeneWeeklyFormatText('arena_award_remain'),
 		Compare = GeneWeeklyCompare('arena_award_remain'),
+		GetSummaryFormatText = GeneWeeklySummaryFormatText('arena_award_remain'),
 	},
 	{
 		-- 监本
@@ -349,6 +392,7 @@ local COLUMN_LIST = {
 		nWidth = 55,
 		GetFormatText = GeneCommonFormatText('exam_print'),
 		Compare = GeneCommonCompare('exam_print'),
+		GetSummaryFormatText = GeneCommonSummaryFormatText('exam_print'),
 	},
 	{
 		-- 监本周余
@@ -358,6 +402,7 @@ local COLUMN_LIST = {
 		nWidth = 55,
 		GetFormatText = GeneWeeklyFormatText('exam_print_remain'),
 		Compare = GeneWeeklyCompare('exam_print_remain'),
+		GetSummaryFormatText = GeneWeeklySummaryFormatText('exam_print_remain'),
 	},
 	{
 		-- 资历
@@ -377,6 +422,16 @@ local COLUMN_LIST = {
 		nWidth = 70,
 		GetFormatText = GeneCommonFormatText('coin'),
 		Compare = GeneCommonCompare('coin'),
+		GetSummaryFormatText = function(recs)
+			local tAccount, nCoin = {}, 0
+			for _, rec in ipairs(recs) do
+				if not tAccount[rec.account] and IsNumber(rec.coin) then
+					nCoin = nCoin + rec.coin
+					tAccount[rec.account] = true
+				end
+			end
+			return GetFormatText(nCoin)
+		end,
 	},
 	{
 		-- 师徒分
@@ -790,6 +845,7 @@ function D.UpdateUI(page)
 	end
 
 	local aCol = D.GetColumns()
+	-- 列表
 	local hList = page:Lookup('Wnd_Total/WndScroll_RoleStat', 'Handle_List')
 	hList:Clear()
 	for i, rec in ipairs(result) do
@@ -817,6 +873,31 @@ function D.UpdateUI(page)
 		hRow:FormatAllItemPos()
 	end
 	hList:FormatAllItemPos()
+	-- 汇总
+	local hSum = page:Lookup('Wnd_Total/WndScroll_RoleStat', 'Handle_Sum')
+	hSum:Clear()
+	local hRow = hSum:AppendItemFromIni(SZ_INI, 'Handle_Row', 'Handle_SumRow')
+	hRow:Lookup('Image_RowBg'):SetVisible(false)
+	local nX = 0
+	for j, col in ipairs(aCol) do
+		local hItem = hRow:AppendItemFromIni(SZ_INI, 'Handle_Item') -- 外部居中层
+		local hItemContent = hItem:Lookup('Handle_ItemContent') -- 内部文本布局层
+		hItemContent:AppendItemFromString(col.GetSummaryFormatText and col.GetSummaryFormatText(result) or GetFormatText('--'))
+		hItemContent:SetW(99999)
+		hItemContent:FormatAllItemPos()
+		hItemContent:SetSizeByAllItemSize()
+		local nWidth = col.nWidth
+		if j == #aCol then
+			nWidth = EXCEL_WIDTH - nX
+		end
+		hItem:SetRelX(nX)
+		hItem:SetW(nWidth)
+		hItemContent:SetRelPos((nWidth - hItemContent:GetW()) / 2, (hItem:GetH() - hItemContent:GetH()) / 2)
+		hItem:FormatAllItemPos()
+		nX = nX + nWidth
+	end
+	hRow:FormatAllItemPos()
+	hSum:FormatAllItemPos()
 end
 
 function D.EncodeRow(rec)
