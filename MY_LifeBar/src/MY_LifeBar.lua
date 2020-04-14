@@ -419,7 +419,7 @@ end)
 local function fxTarget(r, g, b, a) return 255 - (255 - r) * 0.3, 255 - (255 - g) * 0.3, 255 - (255 - b) * 0.3, a end
 local function fxDeath(r, g, b, a) return ceil(r * 0.4), ceil(g * 0.4), ceil(b * 0.4), a end
 local function fxDeathTarget(r, g, b, a) return ceil(r * 0.45), ceil(g * 0.45), ceil(b * 0.45), a end
-local lb, info, bVisible, bFight, nDisX, nDisY, nDisZ, fTextScale, dwTarType, dwTarID, relation, force, nPriority, szName, r, g, b
+local lb, info, bVisible, bFight, nDisX, nDisY, nDisZ, fTextScale, dwTarType, dwTarID, relation, force, nPriority, szName, szTongName, r, g, b
 local aCountDown, szCountDown, bPet, bShowName, bShowKungfu, kunfu, bShowTong, bShowTitle, bShowLife, bShowLifePercent, tEffect
 function CheckInvalidRect(dwType, dwID, me, object)
 	lb = LB_CACHE[dwID]
@@ -564,7 +564,11 @@ function CheckInvalidRect(dwType, dwID, me, object)
 		-- °ï»á
 		bShowTong = GetConfigComputeValue('ShowTong', relation, force, bFight, bPet)
 		if bShowTong then
-			lb:SetTong(D.GetTongName(object.dwTongID) or '')
+			szTongName = D.GetTongName(object.dwTongID) or ''
+			if MY_ChatMosaics and MY_ChatMosaics.MosaicsString and szTongName and (dwType == TARGET.PLAYER or bPet) then
+				szTongName = MY_ChatMosaics.MosaicsString(szTongName)
+			end
+			lb:SetTong(szTongName)
 		end
 		lb:SetTongVisible(bShowTong)
 		-- ³ÆºÅ
