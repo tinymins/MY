@@ -537,7 +537,7 @@ function D.GetClientPlayerRec()
 		}
 		-- 如果在同一个CD周期 则保留数据库中的次数统计
 		InfoG:ClearBindings()
-		InfoG:BindAll(guid)
+		InfoG:BindAll(AnsiToUTF8(guid))
 		local result = InfoG:GetAll()
 		if result and result[1] and result[1].time and IsInSamePeriod(result[1].time) then
 			rec.serendipity_info = DecodeLUAData(result[1].serendipity_info) or rec.serendipity_info
@@ -627,7 +627,7 @@ function D.UpdateSaveDB()
 		LIB.Debug('MY_RoleStatistics_SerendipityStat', 'Remove from database...', DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		InfoD:ClearBindings()
-		InfoD:BindAll(me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName)
+		InfoD:BindAll(AnsiToUTF8(me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName))
 		InfoD:Execute()
 		--[[#DEBUG BEGIN]]
 		LIB.Debug('MY_RoleStatistics_SerendipityStat', 'Remove from database finished...', DEBUG_LEVEL.LOG)
@@ -994,7 +994,7 @@ function D.OnLButtonClick()
 		local page = this:GetParent():GetParent():GetParent():GetParent():GetParent()
 		LIB.Confirm(_L('Are you sure to delete item record of %s?', wnd.name), function()
 			InfoD:ClearBindings()
-			InfoD:BindAll(wnd.guid)
+			InfoD:BindAll(AnsiToUTF8(wnd.guid))
 			InfoD:Execute()
 			D.UpdateUI(page)
 		end)
@@ -1026,7 +1026,7 @@ function D.OnItemRButtonClick()
 				szOption = _L['Delete'],
 				fnAction = function()
 					InfoD:ClearBindings()
-					InfoD:BindAll(rec.guid)
+					InfoD:BindAll(AnsiToUTF8(rec.guid))
 					InfoD:Execute()
 					D.UpdateUI(page)
 				end,

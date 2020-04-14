@@ -671,7 +671,7 @@ function D.GetClientPlayerRec()
 		}
 		-- 如果在同一个CD周期 则保留数据库中的次数统计
 		DB_RoleInfoG:ClearBindings()
-		DB_RoleInfoG:BindAll(guid)
+		DB_RoleInfoG:BindAll(AnsiToUTF8(guid))
 		local result = DB_RoleInfoG:GetAll()
 		if result and result[1] and result[1].time then
 			local dwTime, dwCircle = LIB.GetRefreshTime('weekly')
@@ -772,7 +772,7 @@ function D.UpdateSaveDB()
 		LIB.Debug('MY_RoleStatistics_RoleStat', 'Remove from database...', DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		DB_RoleInfoD:ClearBindings()
-		DB_RoleInfoD:BindAll(me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName)
+		DB_RoleInfoD:BindAll(AnsiToUTF8(me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName))
 		DB_RoleInfoD:Execute()
 		--[[#DEBUG BEGIN]]
 		LIB.Debug('MY_RoleStatistics_RoleStat', 'Remove from database finished...', DEBUG_LEVEL.LOG)
@@ -1117,7 +1117,7 @@ function D.OnLButtonClick()
 		local page = this:GetParent():GetParent():GetParent():GetParent():GetParent()
 		LIB.Confirm(_L('Are you sure to delete item record of %s?', wnd.name), function()
 			DB_RoleInfoD:ClearBindings()
-			DB_RoleInfoD:BindAll(wnd.guid)
+			DB_RoleInfoD:BindAll(AnsiToUTF8(wnd.guid))
 			DB_RoleInfoD:Execute()
 			D.UpdateUI(page)
 		end)
@@ -1149,7 +1149,7 @@ function D.OnItemRButtonClick()
 				szOption = _L['Delete'],
 				fnAction = function()
 					DB_RoleInfoD:ClearBindings()
-					DB_RoleInfoD:BindAll(rec.guid)
+					DB_RoleInfoD:BindAll(AnsiToUTF8(rec.guid))
 					DB_RoleInfoD:Execute()
 					D.UpdateUI(page)
 				end,
