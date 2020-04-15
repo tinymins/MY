@@ -2399,6 +2399,34 @@ function LIB.Equip(szName)
 	end
 end
 
+-- 使用物品
+-- (bool) LIB.UseItem(szName)
+-- (bool) LIB.UseItem(dwTabType, dwIndex, nBookID)
+function LIB.UseItem(dwTabType, dwIndex, nBookID)
+	local bUse = false
+	if IsString(dwTabType) then
+		LIB.WalkBagItem(function(item, dwBox, dwX)
+			if LIB.GetObjectName('ITEM', item) == dwTabType then
+				bUse = true
+				OnUseItem(dwBox, dwX)
+				return 0
+			end
+		end)
+	else
+		LIB.WalkBagItem(function(item, dwBox, dwX)
+			if item.dwTabType == dwTabType and item.dwIndex == dwIndex then
+				if item.nGenre == ITEM_GENRE.BOOK and item.nBookID ~= nBookID then
+					return
+				end
+				bUse = true
+				OnUseItem(dwBox, dwX)
+				return 0
+			end
+		end)
+	end
+	return bUse
+end
+
 do
 -- 下标为 nIndex 的 BUFF 缓存
 local BUFF_CACHE = setmetatable({}, { __mode = 'v' })
