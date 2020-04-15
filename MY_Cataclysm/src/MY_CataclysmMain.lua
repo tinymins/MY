@@ -436,7 +436,9 @@ function D.CreateControlBar()
 	end
 	-- ∑÷≈‰ƒ£ Ω
 	local hLootMode = container:AppendContentFromIni(szIniFile, 'WndButton_LootMode')
-	hLootMode:Lookup('', 'Image_LootMode'):FromUITex(unpack(CTM_LOOT_MODE[nLootMode]))
+	if CTM_LOOT_MODE[nLootMode] then
+		hLootMode:Lookup('', 'Image_LootMode'):FromUITex(unpack(CTM_LOOT_MODE[nLootMode]))
+	end
 	if nLootMode == PARTY_LOOT_MODE.DISTRIBUTE
 	or (nLootMode == PARTY_LOOT_MODE.BIDDING and OpenGoldTeam) then
 		container:AppendContentFromIni(szIniFile, 'WndButton_LootQuality')
