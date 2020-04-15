@@ -4984,10 +4984,18 @@ end
 
 function UI.GetShadowHandle(szName)
 	local frame = Station.Lookup('Lowest/MY_Shadows')
+	if frame and not IsElement(frame) then -- 关闭无效的 frame 句柄
+		Wnd.CloseWindow('MY_Shadows')
+		frame = nil
+	end
 	if not frame then
 		frame = Wnd.OpenWindow(PACKET_INFO.FRAMEWORK_ROOT .. 'ui/MY_Shadows.ini', 'MY_Shadows')
 	end
 	local sh = frame:Lookup('', szName)
+	if sh and not IsElement(sh) then -- 关闭无效的 sh 句柄
+		frame:Lookup('', ''):Remove(sh)
+		sh = nil
+	end
 	if not sh then
 		frame:Lookup('', ''):AppendItemFromString(format('<handle> name="%s" </handle>', szName))
 		--[[#DEBUG BEGIN]]
