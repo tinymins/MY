@@ -148,6 +148,8 @@ function D.TryAdd(dwID, bDelay)
 			end
 		elseif O.bQuestDoodad and (doodad.dwTemplateID == 3713 or doodad.dwTemplateID == 3714) then
 			data = { craft = true }
+		elseif O.tCraft[doodad.dwTemplateID] then
+			data = { craft = true }
 		elseif D.IsCustomDoodad(doodad) then
 			data = { craft = true }
 		elseif D.IsRecentDoodad(doodad) then
@@ -655,16 +657,15 @@ function PS.OnPanelActive(frame)
 				nX = X + 10
 			end
 		else
-			local k = GetDoodadTemplateName(v)
 			ui:Append('WndCheckBox', {
 				x = nX, y = nY,
-				text = k,
-				checked = MY_GKPDoodad.tCraft[k] ~= nil,
+				text = GetDoodadTemplateName(v),
+				checked = MY_GKPDoodad.tCraft[v],
 				oncheck = function(bChecked)
 					if bChecked then
-						MY_GKPDoodad.tCraft[k] = true
+						MY_GKPDoodad.tCraft[v] = true
 					else
-						MY_GKPDoodad.tCraft[k] = nil
+						MY_GKPDoodad.tCraft[v] = nil
 					end
 					D.RescanNearby()
 				end,
