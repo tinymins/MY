@@ -344,6 +344,6 @@ local menu = {
 	szOption = _L['MY_RoleStatistics'],
 	fnAction = function() D.Toggle() end,
 }
-LIB.RegisterAddonMenu('MY_BAGSTATISTICS_MENU', menu)
+LIB.RegisterAddonMenu('MY_RoleStatistics', menu)
 end
 LIB.RegisterHotKey('MY_RoleStatistics', _L['Open/Close MY_RoleStatistics'], D.Toggle, nil)
