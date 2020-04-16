@@ -212,7 +212,7 @@ function TI.CreateFrame(a, b)
 		x = x + ui:Append('WndButton', {
 			name = 'WndBtn_RaidTools',
 			x = x, y = y, w = 96,
-			text = _L['Raid Tools'],
+			text = _L['MY_TeamTools'],
 			buttonstyle = 2,
 			onclick = MY_RaidTools.TogglePanel,
 		}):AutoWidth():Width() + 5
