@@ -485,12 +485,14 @@ local function InitComponent(raw, szType)
 		end
 		edt.OnKillFocus = function()
 			LIB.DelayCall(function()
-				if not Station.GetFocusWindow() or Station.GetFocusWindow():GetName() ~= 'PopupMenuPanel' then
-					Wnd.CloseWindow('PopupMenuPanel')
+				local wnd = Station.GetFocusWindow()
+				local frame = wnd and wnd:GetRoot()
+				if not frame or frame:GetName() ~= 'MY_PopupMenu' then
+					UI.ClosePopupMenu()
 				end
 			end)
 		end
-		edt.OnEditSpecialKeyDown = function()
+		edt.OnEditSpecialKeyDown = function() -- TODO: MY_PopupMenu ÊÊÅä
 			local szKey = GetKeyName(Station.GetMessageKey())
 			if IsPopupMenuOpened() and PopupMenu_ProcessHotkey then
 				if szKey == 'Enter'
@@ -1637,7 +1639,7 @@ function UI:Autocomplete(method, arg1, arg2)
 				end
 			end
 		elseif method == 'close' then
-			Wnd.CloseWindow('PopupMenuPanel')
+			UI.ClosePopupMenu()
 		elseif method == 'destroy' then
 			for _, raw in ipairs(self.raws) do
 				raw:Lookup('WndEdit_Default').OnSetFocus = nil
@@ -1704,7 +1706,7 @@ function UI:Autocomplete(method, arg1, arg2)
 									if IsFunction(opt.afterComplete) then
 										opt.afterComplete(raw, opt, text, src)
 									end
-									Wnd.CloseWindow('PopupMenuPanel')
+									UI.ClosePopupMenu()
 									opt.disabledTmp = nil
 								end,
 							}
@@ -1743,10 +1745,12 @@ function UI:Autocomplete(method, arg1, arg2)
 					end
 					local nX, nY = raw:GetAbsPos()
 					local nW, nH = raw:GetSize()
+					menu.szLayer = 'Topmost2'
 					menu.nMiniWidth = nW
 					menu.x, menu.y = nX, nY + nH
 					menu.bDisableSound = true
 					menu.bShowKillFocus = true
+					menu.nMaxHeight = min(select(2, Station.GetClientSize()) - raw:GetAbsY() - raw:GetH(), 600)
 
 					if IsFunction(opt.beforePopup) then
 						opt.beforePopup(raw, opt, text, menu)
@@ -1754,11 +1758,11 @@ function UI:Autocomplete(method, arg1, arg2)
 					-- popup menu
 					if #menu > 0 then
 						opt.disabledTmp = true
-						PopupMenu(menu)
+						UI.PopupMenu(menu)
 						Station.SetFocusWindow(raw:Lookup('WndEdit_Default'))
 						opt.disabledTmp = nil
 					else
-						Wnd.CloseWindow('PopupMenuPanel')
+						UI.ClosePopupMenu()
 					end
 				end
 			end
