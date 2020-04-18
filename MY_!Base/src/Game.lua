@@ -3844,3 +3844,37 @@ function LIB.GetPlayerAvatar(dwForceID, nRoleType, dwAvatarID)
 	end
 	return szFile, nFrame, bAnimate
 end
+
+-- 获取一个地图的成就列表（区分是否包含五甲）
+local MAP_ACHI_NORMAL, MAP_ACHI_ALL
+function LIB.GetMapAchievements(dwMapID, bWujia)
+	if not MAP_ACHI_NORMAL then
+		local tMapAchiNormal, tMapAchiAll = {}, {}
+		local nCount = g_tTable.Achievement:GetRowCount()
+		for i = 2, nCount do
+			local tLine = g_tTable.Achievement:GetRow(i)
+			if tLine and tLine.nVisible == 1 then
+				for _, szID in ipairs(LIB.SplitString(tLine.szSceneID, '|', true)) do
+					local dwID = tonumber(szID)
+					if dwID then
+						if tLine.dwGeneral == 1 then
+							if not tMapAchiNormal[dwID] then
+								tMapAchiNormal[dwID] = {}
+							end
+							insert(tMapAchiNormal[dwID], tLine.dwID)
+						end
+						if not tMapAchiAll[dwID] then
+							tMapAchiAll[dwID] = {}
+						end
+						insert(tMapAchiAll[dwID], tLine.dwID)
+					end
+				end
+			end
+		end
+		MAP_ACHI_NORMAL, MAP_ACHI_ALL = tMapAchiNormal, tMapAchiAll
+	end
+	if bWujia then
+		return Clone(MAP_ACHI_ALL[dwMapID])
+	end
+	return Clone(MAP_ACHI_NORMAL[dwMapID])
+end
