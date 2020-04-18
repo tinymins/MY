@@ -105,7 +105,7 @@ return {
 	['Take back mark permission'] = '收回标记权限',
 	['Take back distribute permission'] = '收回分配权限',
 	['Please install and load GKP addon first.'] = '未检测到金团记录插件，请先返回角色选择界面进入插件管理界面，安装并加载茗伊金团记录子插件。',
-	['Please install and load MY_RaidTools addon first.'] = '未检测到团队工具插件，请先返回角色选择界面进入插件管理界面，安装并加载茗伊团队工具子插件。',
+	['Please install and load MY_TeamTools addon first.'] = '未检测到团队工具插件，请先返回角色选择界面进入插件管理界面，安装并加载茗伊团队工具子插件。',
 	['Please install and load MY_TeamNotice addon first.'] = '未检测到团队告示插件，请先返回角色选择界面进入插件管理界面，安装并加载茗伊团队工具子插件。',
 	['You are not the distrubutor.'] = '你不是分配者。',
 	['Official team frame style'] = '官方样式',

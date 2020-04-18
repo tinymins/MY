@@ -1056,10 +1056,10 @@ function MY_CataclysmMain.OnLButtonClick()
 		end
 		return MY_GKP_MI.TogglePanel()
 	elseif szName == 'Wnd_TeamTools' then
-		if not MY_RaidTools then
-			return LIB.Alert(_L['Please install and load MY_RaidTools addon first.'])
+		if not MY_TeamTools then
+			return LIB.Alert(_L['Please install and load MY_TeamTools addon first.'])
 		end
-		MY_RaidTools.TogglePanel()
+		MY_TeamTools.TogglePanel()
 	elseif szName == 'Wnd_TeamNotice' then
 		if not MY_TeamNotice then
 			return LIB.Alert(_L['Please install and load MY_TeamNotice addon first.'])
