@@ -59,6 +59,7 @@ local DIFF_KEYS = { -- 用于自动扫描菜单数据是否有更新的键
 	'szOverImgPath',
 	'nOverFrame',
 	'szOption',
+	'bRichText',
 	'fnAction',
 	'bInline',
 	'bDivide',
@@ -404,7 +405,7 @@ function D.DrawScrollContainer(scroll, top, menu, nLevel, bInlineContainer)
 				if D.IsDisable(m) then
 					r, g, b = nil
 				end
-				hContentInner:AppendItemFromString(GetFormatText(m.szOption, nFont, r, g, b))
+				hContentInner:AppendItemFromString(m.bRichText and m.szOption or GetFormatText(m.szOption, nFont, r, g, b))
 				hContentInner:SetW(99999)
 				hContentInner:FormatAllItemPos()
 				hContentInner:SetSizeByAllItemSize()
