@@ -434,7 +434,7 @@ function LIB.GetTypeGroupMap()
 			end
 			insert(tDungeon[szGroup], {
 				dwID = tLine.dwMapID,
-				szName = tLine.szOtherName .. '_' .. tLine.szLayer3Name,
+				szName = tLine.szLayer3Name .. tLine.szOtherName,
 			})
 			tMapExist[tLine.dwMapID] = szGroup
 		end
@@ -487,6 +487,55 @@ function LIB.GetTypeGroupMap()
 		end
 	end)
 	return aGroup
+end
+
+function LIB.GetRegionGroupMap()
+	local tMapRegion = {}
+	local nCount = g_tTable.MapList:GetRowCount()
+	for i = 2, nCount do
+		local tLine = g_tTable.MapList:GetRow(i)
+		if tLine.dwRegionID > 0 then
+			local dwRegionID = tLine.dwRegionID
+			if not tMapRegion[dwRegionID] then
+				tMapRegion[dwRegionID] = {}
+			end
+			local tRegion = tMapRegion[dwRegionID]
+			if tLine.nGroup == 4 then -- GROUP_TYPE_COPY
+				if tLine.szType == 'RAID' then
+					if not tRegion.aRaid then
+						tRegion.aRaid = {}
+					end
+					insert(tRegion.aRaid, { dwID = tLine.nID, szName = tLine.szMiddleMap })
+				else
+					if not tRegion.aDungeon then
+						tRegion.aDungeon = {}
+					end
+					insert(tRegion.aDungeon, { dwID = tLine.nID, szName = tLine.szMiddleMap })
+				end
+			else
+				if not tRegion.aMap then
+					tRegion.aMap = {}
+				end
+				insert(tRegion.aMap, { dwID = tLine.nID, szName = tLine.szMiddleMap })
+			end
+		end
+	end
+	local aRegion = {}
+	local nCount = g_tTable.RegionMap:GetRowCount()
+	for i = 2, nCount do
+		local tLine = g_tTable.RegionMap:GetRow(i)
+		local info = tMapRegion[tLine.dwRegionID]
+		if info then
+			insert(aRegion, {
+				dwID = tLine.dwRegionID,
+				szName = tLine.szRegionName,
+				aMapInfo = info.aMap,
+				aRaidInfo = info.aRaid,
+				aDungeonInfo = info.aDungeon,
+			})
+		end
+	end
+	return aRegion
 end
 
 -- {{Œ‰¡÷Õ®º¯ szType √∂æŸ}}
