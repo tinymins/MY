@@ -299,3 +299,66 @@ LIB.RegisterBgMsg('MY_ENTER_MAP_REQ', function(_, data, nChannel, dwTalkerID, sz
 	end)
 end)
 end
+
+do local LAST_ACHI_TIME, LAST_COUNTER_TIME = {}, {}
+LIB.RegisterBgMsg('MY_TEAMTOOLS_ACHI_REQ', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
+	local aAchieveID, aCounterID, aRequestID, aRefreshID = data[1], data[2], data[3], data[4]
+	local dwID, bResponse = UI_GetClientPlayerID()
+	for _, v in ipairs(aRequestID) do
+		if bResponse then
+			break
+		end
+		if v == dwID then
+			bResponse = true
+		end
+	end
+	for _, v in ipairs(aRefreshID) do
+		if bResponse then
+			break
+		end
+		if v == dwID then
+			for _, vv in ipairs(aAchieveID) do
+				if bResponse then
+					break
+				end
+				if not LAST_ACHI_TIME[vv] or GetCurrentTime() - LAST_ACHI_TIME[vv] > 5 then
+					bResponse = true
+				end
+			end
+			for _, vv in ipairs(aCounterID) do
+				if bResponse then
+					break
+				end
+				if not LAST_COUNTER_TIME[vv] or GetCurrentTime() - LAST_COUNTER_TIME[vv] > 5 then
+					bResponse = true
+				end
+			end
+		end
+	end
+	--[[#DEBUG BEGIN]]
+	LIB.Debug(PACKET_INFO.NAME_SPACE, 'Achievement request from ' .. szTalkerName
+		.. ', will ' .. (bResponse and '' or 'not ') .. 'response.', DEBUG_LEVEL.LOG)
+	--[[#DEBUG END]]
+	if bResponse then
+		local me = GetClientPlayer()
+		local aAchieveRes, aCounterRes = {}, {}
+		for _, dwAchieveID in ipairs(aAchieveID) do
+			LAST_ACHI_TIME[dwAchieveID] = GetCurrentTime()
+			insert(aAchieveRes, {dwAchieveID, me.IsAchievementAcquired(dwAchieveID)})
+		end
+		for _, dwCounterID in ipairs(aCounterID) do
+			LAST_COUNTER_TIME[dwCounterID] = GetCurrentTime()
+			insert(aCounterRes, {dwCounterID, me.GetAchievementCount(dwCounterID)})
+		end
+		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TEAMTOOLS_ACHI_RES', {aAchieveRes, aCounterRes})
+	end
+end)
+LIB.RegisterEvent({
+	'NEW_ACHIEVEMENT',
+	'SYNC_ACHIEVEMENT_DATA',
+	'UPDATE_ACHIEVEMENT_POINT',
+	'UPDATE_ACHIEVEMENT_COUNT',
+}, function()
+	LAST_ACHI_TIME, LAST_COUNTER_TIME = {}, {}
+end)
+end

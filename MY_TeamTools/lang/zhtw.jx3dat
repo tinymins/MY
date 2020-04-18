@@ -50,6 +50,12 @@ return {
 	['Use:'] = '使用:', -- 匹配特效腰椎 缺少item.dwSkillID
 	['use'] = '使用',
 	['Team strength(%d/%d)'] = '團隊實力(%d/%d)',
+	-- MY_TeamTools_Achievement
+	['MY_TeamTools_Achievement'] = '成就狀態',
+	['Name'] = '名字',
+	['(Finished)'] = '(已完成)',
+	['(Progress)'] = '(未完成)',
+	['(Unknown)'] = '(未知)',
 
 	-- MY_PartyRequest
 	['Party Request'] = '優化入隊申請列表',
