@@ -302,26 +302,51 @@ end
 
 do local LAST_ACHI_TIME, LAST_COUNTER_TIME = {}, {}
 LIB.RegisterBgMsg('MY_TEAMTOOLS_ACHI_REQ', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
+	if bSelf then
+		--[[#DEBUG BEGIN]]
+		LIB.Debug(PACKET_INFO.NAME_SPACE, 'Team achievement request sent.', DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
+		return
+	end
 	local aAchieveID, aCounterID, aRequestID, aRefreshID = data[1], data[2], data[3], data[4]
-	local dwID, bResponse = UI_GetClientPlayerID()
-	for _, v in ipairs(aRequestID) do
-		if bResponse then
-			break
+	local dwID = UI_GetClientPlayerID()
+	local bRequest, bRefresh, bResponse = false, false, false
+	if not bResponse then
+		if aRequestID then
+			for _, v in ipairs(aRequestID) do
+				if bRequest then
+					break
+				end
+				if v == dwID then
+					bRequest = true
+				end
+			end
+		else
+			bRequest = true
 		end
-		if v == dwID then
+		if bRequest then
 			bResponse = true
 		end
 	end
-	for _, v in ipairs(aRefreshID) do
-		if bResponse then
-			break
+	if not bResponse then
+		if aRefreshID then
+			for _, v in ipairs(aRefreshID) do
+				if bRefresh then
+					break
+				end
+				if v == dwID then
+					bRefresh = true
+				end
+			end
+		else
+			bRefresh = true
 		end
-		if v == dwID then
+		if bRefresh then
 			for _, vv in ipairs(aAchieveID) do
 				if bResponse then
 					break
 				end
-				if not LAST_ACHI_TIME[vv] or GetCurrentTime() - LAST_ACHI_TIME[vv] > 5 then
+				if not LAST_ACHI_TIME[vv] then
 					bResponse = true
 				end
 			end
@@ -329,7 +354,7 @@ LIB.RegisterBgMsg('MY_TEAMTOOLS_ACHI_REQ', function(_, data, nChannel, dwTalkerI
 				if bResponse then
 					break
 				end
-				if not LAST_COUNTER_TIME[vv] or GetCurrentTime() - LAST_COUNTER_TIME[vv] > 5 then
+				if not LAST_COUNTER_TIME[vv] then
 					bResponse = true
 				end
 			end

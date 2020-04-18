@@ -333,7 +333,10 @@ function D.RequestTeamData()
 		end
 	end
 	if (not IsEmpty(aAchieveID) or not IsEmpty(aCounterID)) and (not IsEmpty(aRequestID) or not IsEmpty(aRefreshID)) then
-		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TEAMTOOLS_ACHI_REQ', {aAchieveID, aCounterID, aRequestID, aRefreshID})
+		if #aRequestID == #aTeamMemberList - 1 then
+			aRequestID = nil
+		end
+		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TEAMTOOLS_ACHI_REQ', {aAchieveID, aCounterID, aRequestID, nil})
 	end
 	-- 刷新自己的
 	D.UpdateSelfData()
