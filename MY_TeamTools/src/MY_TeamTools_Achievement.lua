@@ -55,10 +55,11 @@ local O = {
 	szSortOrder = 'asc',
 	aAchievement = {},
 }
+local MAX_ALL_MAP_ACHI = 40
 local ACHIEVE_CACHE = {}
 local COUNTER_CACHE = {}
 local EXCEL_WIDTH = 1056
-local ACHI_MIN_WIDTH = 25
+local ACHI_MIN_WIDTH = 15
 local ACHI_MAX_WIDTH = HUGE
 local STAT_SORT = setmetatable({
 	['FINISH'] = 3,
@@ -176,7 +177,7 @@ function D.UpdateAchievementID()
 			if achi and achi.nVisible == 1 and achi.dwGeneral == 1
 			and (IsEmpty(O.szSearch) or wfind(achi.szName, O.szSearch) or wfind(achi.szDesc, O.szSearch)) then
 				insert(aAchievement, achi.dwID)
-				if #aAchievement >= 20 then
+				if #aAchievement >= MAX_ALL_MAP_ACHI then
 					break
 				end
 			end
@@ -383,7 +384,9 @@ function D.OutputAchieveTip(dwAchieveID, dwID)
 		return
 	end
 	local aXml = {}
+	-- 成就名称
 	insert(aXml, GetFormatText('[' .. achi.szName .. ']', 162, 255, 255, 0))
+	-- 完成状态
 	if dwID then
 		insert(aXml, GetFormatText(' ', 162, 255, 255, 255))
 		local szStat, aProgressCounter = D.GetPlayerAchievementStat(dwID, dwAchieveID)
@@ -409,7 +412,30 @@ function D.OutputAchieveTip(dwAchieveID, dwID)
 	else
 		insert(aXml, GetFormatText('\n', 162, 255, 255, 255))
 	end
-	insert(aXml, GetFormatText(achi.szDesc, 162, 255, 255, 255))
+	insert(aXml, GetFormatText(achi.szDesc .. '\n', 162, 255, 255, 255))
+	-- 子成就
+	for _, s in ipairs(LIB.SplitString(achi.szSubAchievements, '|', true)) do
+		local dwSubAchieveID = tonumber(s)
+		if dwSubAchieveID then
+			local achi = Table_GetAchievement(dwSubAchieveID)
+			if dwID then
+				local szStat = D.GetPlayerAchievementStat(dwID, dwSubAchieveID)
+				if achi then
+					if szStat == 'FINISH' then
+						insert(aXml, GetFormatText(_L['r'], 162, 128, 255, 128))
+					elseif szStat == 'PROGRESS' then
+						insert(aXml, GetFormatText(_L['x'], 162, 173, 173, 173))
+					else --if szStat == 'UNKNOWN' then
+						insert(aXml, GetFormatText(_L['?'], 162, 173, 173, 173))
+					end
+					insert(aXml, GetFormatText(' ', 162, 255, 255, 255))
+				end
+			else
+				insert(aXml, GetFormatText(_L[' '], 162, 255, 255, 255))
+			end
+			insert(aXml, GetFormatText(achi.szName .. '\n', 162, 255, 255, 255))
+		end
+	end
 	local x, y = this:GetAbsPos()
 	local w, h = this:GetSize()
 	OutputTip(concat(aXml), 450, {x, y, w, h}, UI.TIP_POSITION.TOP_BOTTOM)
@@ -516,8 +542,6 @@ end
 function D.SetSearch(szSearch)
 	O.szSearch = szSearch
 	D.UpdateAchievementID()
-	D.RequestTeamData()
-	UI.ClosePopupMenu()
 end
 
 function D.OnInitPage()
@@ -578,11 +602,12 @@ function D.OnInitPage()
 	local ui = UI(wnd):Fetch('Wnd_Search/Edit_Search')
 	ui:Change(function()
 		LIB.Debounce(
-			'MY_TeamTools_Achievement_MapName',
+			'MY_TeamTools_Achievement_Search',
 			1000,
 			D.SetSearch,
 			this:GetText())
 	end)
+	ui:Blur(function() D.RequestTeamData() end)
 	ui:Text(O.szSearch, WNDEVENT_FIRETYPE.PREVENT)
 
 	local frame = this:GetRoot()
