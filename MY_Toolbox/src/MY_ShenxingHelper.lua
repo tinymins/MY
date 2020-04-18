@@ -207,6 +207,7 @@ function D.CheckOpenAllMapEnable()
 		D.UnhookOpenAllMap()
 	end
 end
+LIB.RegisterFrameCreate('WorldMap.MY_ShenxingHelper__OpenAllMap', D.CheckOpenAllMapEnable)
 
 --------------------------------------------------------------------------
 -- ·ÀÖ¹ÉñÐÐCD±»ºÚ
