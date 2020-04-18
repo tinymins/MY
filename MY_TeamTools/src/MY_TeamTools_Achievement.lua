@@ -427,7 +427,7 @@ function D.OutputAchieveTip(dwAchieveID, dwID)
 		if dwSubAchieveID then
 			local achi = Table_GetAchievement(dwSubAchieveID)
 			if dwID then
-				local szStat = D.GetPlayerAchievementStat(dwID, dwSubAchieveID)
+				local szStat, aProgressCounter = D.GetPlayerAchievementStat(dwID, dwSubAchieveID)
 				if achi then
 					if szStat == 'FINISH' then
 						insert(aXml, GetFormatText(_L['r'], 162, 128, 255, 128))
@@ -438,10 +438,22 @@ function D.OutputAchieveTip(dwAchieveID, dwID)
 					end
 					insert(aXml, GetFormatText(' ', 162, 255, 255, 255))
 				end
+				insert(aXml, GetFormatText(achi.szName, 162, 255, 255, 255))
+				if not IsEmpty(aProgressCounter) then
+					insert(aXml, GetFormatText(' (', 162, 255, 255, 255))
+					for i, progress in ipairs(aProgressCounter) do
+						local nTriggerVal, nPoint, nExp, nPrefix, nPostfix, nShiftID = Table_GetAchievementInfo(progress.dwCounter)
+						if i ~= 1 then
+							insert(aXml, GetFormatText(', ', 162, 255, 255, 255))
+						end
+						insert(aXml, GetFormatText(progress.nNumber .. '/' .. nTriggerVal, 162, 255, 255, 255))
+					end
+					insert(aXml, GetFormatText(')', 162, 255, 255, 255))
+				end
+				insert(aXml, GetFormatText('\n', 162, 255, 255, 255))
 			else
-				insert(aXml, GetFormatText(_L[' '], 162, 255, 255, 255))
+				insert(aXml, GetFormatText(_L[' '] .. achi.szName .. '\n', 162, 255, 255, 255))
 			end
-			insert(aXml, GetFormatText(achi.szName .. '\n', 162, 255, 255, 255))
 		end
 	end
 	local x, y = this:GetAbsPos()
