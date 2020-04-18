@@ -1732,8 +1732,9 @@ LIB.RegisterEvent('SYNC_LOOT_LIST', function()
 	if not wnd and LIB.IsShieldedVersion('MY_GKPLoot', 2) then
 		local bDungeonTreasure = false
 		local aItemData = D.GetDoodadLootInfo(arg0)
-		for k, v in ipairs(aItemData) do
-			if wstring.find(v.szName, _L['Dungeon treasure']) == 1 then
+		for _, v in ipairs(aItemData) do
+			if wfind(v.szName, _L['Dungeon treasure']) == 1 -- √ÿæ≥±¶œ‰
+			or v.szName == LIB.GetObjectName('ITEM_INFO', 5, 33011) then -- Ì∆Ì¬Õ¨–ƒ¿Ò∫–
 				bDungeonTreasure = true
 				break
 			end
