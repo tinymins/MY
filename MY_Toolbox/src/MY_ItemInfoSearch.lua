@@ -118,19 +118,12 @@ local function DrawList()
 	end
 end
 
-local function Search(szSearch)
-	SEARCH = szSearch
-	for _, v in ipairs(CACHE) do
-		if v.szSearch == szSearch then
-			RESULT = v.aResult
-			return
-		end
-	end
-	RESULT = {}
-	local dwID = tonumber(szSearch)
+local function SearchWithoutCache(szSearch)
+	local aResult = {}
 	if szSearch == '' then
-		return
+		return aResult
 	end
+	local dwID = tonumber(szSearch)
 	for dwTabType, nMaxIndex in pairs(ITEM_TYPE_MAX) do
 		for dwIndex = 1, nMaxIndex do
 			local itemInfo = GetItemInfo(dwTabType, dwIndex)
@@ -139,43 +132,58 @@ local function Search(szSearch)
 				or (itemInfo.nGenre ~= ITEM_GENRE.BOOK and wfind(LIB.GetItemNameByItemInfo(itemInfo), szSearch))
 				or wfind(itemInfo.szName, szSearch)
 			) then
-				insert(RESULT, {
+				insert(aResult, {
 					dwTabType = dwTabType,
 					dwIndex = dwIndex,
 					itemInfo = itemInfo,
 				})
-				if #RESULT >= MAX_DISP then
-					return
+				if #aResult >= MAX_DISP then
+					return aResult
 				end
 			end
 		end
 	end
 	for i = 1, g_tTable.BookSegment:GetRowCount() do
 		local row = g_tTable.BookSegment:GetRow(i)
-		if row then
-			local dwRecipeID = BookID2GlobelRecipeID(row.dwBookID, row.dwSegmentID)
+		local dwRecipeID = row and BookID2GlobelRecipeID(row.dwBookID, row.dwSegmentID)
+		if dwRecipeID and GlobelRecipeID2BookID(dwRecipeID) then
 			local itemInfo = GetItemInfo(5, row.dwBookItemIndex)
 			if itemInfo and (
 				dwID == itemInfo.dwID or dwID == dwRecipeID
 				or dwID == row.dwBookID or dwID == row.dwSegmentID
 				or wfind(LIB.GetItemNameByItemInfo(itemInfo, dwRecipeID), szSearch)
 			) then
-				insert(RESULT, {
+				insert(aResult, {
 					dwTabType = 5,
 					dwIndex = row.dwBookItemIndex,
 					itemInfo = itemInfo,
 					dwRecipeID = dwRecipeID,
 				})
-				if #RESULT >= MAX_DISP then
-					return
+				if #aResult >= MAX_DISP then
+					return aResult
 				end
 			end
 		end
 	end
-	if #CACHE > 20 then
-		remove(CACHE, 1)
+	return aResult
+end
+
+local function SearchWithCache(szSearch)
+	-- ËÑË÷»º´æ
+	for _, v in ipairs(CACHE) do
+		if v.szSearch == szSearch then
+			return v.aResult
+		end
 	end
-	insert(CACHE, { szSearch = szSearch, aResult = RESULT })
+	-- ¼ÆËã½á¹û
+	local aResult = SearchWithoutCache(szSearch)
+	if szSearch ~= '' then
+		if #CACHE > 20 then
+			remove(CACHE, 1)
+		end
+		insert(CACHE, { szSearch = szSearch, aResult = aResult })
+	end
+	return aResult
 end
 
 local PS = {}
@@ -192,7 +200,8 @@ function PS.OnPanelActive(wnd)
 		placeholder = _L['Please input item name or item index number'],
 		onchange = function(szSearch)
 			LIB.DelayCall('MY_ItemInfoSearch', 200, function()
-				Search(szSearch)
+				SEARCH = szSearch
+				RESULT = SearchWithCache(szSearch)
 				DrawList()
 			end)
 		end,
