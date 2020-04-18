@@ -147,6 +147,14 @@ function Framework.OnLButtonClick()
 		D.Close()
 	elseif name == 'Btn_Option' then
 		local menu = {}
+		insert(menu, {
+			szOption = _L['Option'],
+			fnAction = function()
+				LIB.ShowPanel()
+				LIB.FocusPanel()
+				LIB.SwitchTab('MY_TeamTools')
+			end,
+		})
 		local tFloatEntryMenu = { szOption = _L['Float panel'] }
 		for _, m in ipairs(O.aModule) do
 			if m and m.env.szFloatEntry then
