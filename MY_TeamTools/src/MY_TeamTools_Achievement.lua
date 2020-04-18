@@ -367,7 +367,11 @@ end)
 function D.OutputRowTip(this, rec)
 	local aXml = {}
 	for _, col in ipairs(D.GetColumns()) do
-		insert(aXml, GetFormatText('[' .. col.szTitle .. ']', 162, 255, 255, 0))
+		if col.dwAchieveID then
+			insert(aXml, GetFormatText('[' .. col.szTitle .. ']', 162, 255, 255, 0))
+		else
+			insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
+		end
 		insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
 		insert(aXml, col.GetFormatText(rec))
 		if IsCtrlKeyDown() then
