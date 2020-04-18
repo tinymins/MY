@@ -697,6 +697,61 @@ function D.GetTotalEquipScore(page, dwID)
 	end
 end
 
+function D.UpdateSelfData()
+	local dwMapID = RT_MAPID
+	local dwID = UI_GetClientPlayerID()
+	local function fnAction(tMapID)
+		local aCopyID = tMapID[dwMapID]
+		if not RT_PLAYER_MAP_COPYID[dwID] then
+			RT_PLAYER_MAP_COPYID[dwID] = {}
+		end
+		RT_PLAYER_MAP_COPYID[dwID][dwMapID] = IsTable(aCopyID) and aCopyID[1] or -1
+		FireUIEvent('MY_TEAMTOOLS_SUMMARY')
+	end
+	LIB.GetMapSaveCopy(fnAction)
+end
+
+function D.RequestTeamData()
+	local me = GetClientPlayer()
+	if not me then
+		return
+	end
+	local aRequestID, aRefreshID = {}, {}
+	local bDungeonMap = LIB.IsDungeonMap(RT_MAPID)
+	local bIsDungeonRoleProgressMap = LIB.IsDungeonRoleProgressMap(RT_MAPID)
+	--[[#DEBUG BEGIN]]
+	if bIsDungeonRoleProgressMap then
+		LIB.Debug(PACKET_INFO.NAME_SPACE, 'Update team map progress.', DEBUG_LEVEL.LOG)
+	end
+	--[[#DEBUG END]]
+	local aTeamMemberList = D.GetTeamMemberList(true)
+	for _, dwID in ipairs(aTeamMemberList) do
+		if bIsDungeonRoleProgressMap then -- 副本进度
+			ApplyDungeonRoleProgress(RT_MAPID, dwID) -- 成功回调 UPDATE_DUNGEON_ROLE_PROGRESS(dwMapID, dwPlayerID)
+		elseif bDungeonMap then -- 副本CDID
+			if not RT_PLAYER_MAP_COPYID[dwID] then
+				RT_PLAYER_MAP_COPYID[dwID] = {}
+			end
+			if RT_PLAYER_MAP_COPYID[dwID][RT_MAPID] then
+				insert(aRefreshID, dwID)
+			else
+				insert(aRequestID, dwID)
+			end
+		end
+	end
+	if not IsEmpty(aRequestID) or not IsEmpty(aRefreshID) then
+		--[[#DEBUG BEGIN]]
+		LIB.Debug(PACKET_INFO.NAME_SPACE, 'Request team map copy id.', DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
+		if #aRequestID == #aTeamMemberList then
+			aRequestID = nil
+		end
+		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_MAP_COPY_ID_REQUEST', {RT_MAPID, aRequestID, nil})
+	end
+	-- 刷新自己的
+	D.UpdateSelfData()
+end
+
 -- 获取团队大部分情况 非缓存
 function D.GetTeam(page)
 	local me    = GetClientPlayer()
@@ -722,7 +777,7 @@ function D.GetTeam(page)
 			tBuff             = {}, -- 增益BUFF
 			tFood             = {}, -- 小吃和附魔
 			-- nEquipScore       = -1,  -- 装备分
-			nCopyID           = RT_PLAYER_MAP_COPYID[dwID] and RT_PLAYER_MAP_COPYID[dwID][RT_MAPID] and RT_PLAYER_MAP_COPYID[dwID][RT_MAPID].nID, -- 副本ID
+			nCopyID           = RT_PLAYER_MAP_COPYID[dwID] and RT_PLAYER_MAP_COPYID[dwID][RT_MAPID], -- 副本ID
 			tBossKill         = {}, -- 副本进度
 			nFightState       = KPlayer and KPlayer.bFightState and 1 or 0, -- 战斗状态
 			bIsOnLine         = true,
@@ -751,36 +806,14 @@ function D.GetTeam(page)
 				D.GetEquipCache(page, me)
 			end
 		end
-		-- 副本CDID
-		if aInfo.bIsOnLine and not bIsDungeonRoleProgressMap and LIB.IsDungeonMap(RT_MAPID) then
-			if not RT_PLAYER_MAP_COPYID[dwID] then
-				RT_PLAYER_MAP_COPYID[dwID] = {}
-			end
-			if not RT_PLAYER_MAP_COPYID[dwID][RT_MAPID] then
-				RT_PLAYER_MAP_COPYID[dwID][RT_MAPID] = {}
-			end
-			local tCopyID = RT_PLAYER_MAP_COPYID[dwID][RT_MAPID]
-			if (not tCopyID.nRequestTime or GetCurrentTime() - tCopyID.nRequestTime > 10)
-			and (not tCopyID.nReceiveTime or GetCurrentTime() - tCopyID.nReceiveTime > 60) then
-				insert(aRequestMapCopyID, dwID)
-				tCopyID.nRequestTime = GetCurrentTime()
-			end
-		end
 		-- 副本进度
 		if aInfo.bIsOnLine and bIsDungeonRoleProgressMap then
-			ApplyDungeonRoleProgress(RT_MAPID, dwID) -- 成功回调 UPDATE_DUNGEON_ROLE_PROGRESS(dwMapID, dwPlayerID)
 			for i, boss in ipairs(aProgressMapBoss) do
 				aInfo.tBossKill[i] = GetDungeonRoleProgress(RT_MAPID, dwID, boss.dwProgressID)
 			end
 		end
 		setmetatable(aInfo, { __index = page.tDataCache[dwID] })
 		insert(aList, aInfo)
-	end
-	if #aRequestMapCopyID > 0 then
-		if #aRequestMapCopyID == #aTeamMemberList then
-			aRequestMapCopyID = nil
-		end
-		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_MAP_COPY_ID_REQUEST', {RT_MAPID, aRequestMapCopyID}) -- 周期刷新
 	end
 	return aList
 end
@@ -844,11 +877,8 @@ LIB.RegisterBgMsg('MY_MAP_COPY_ID', function(_, data, nChannel, dwID, szName, bI
 	if not RT_PLAYER_MAP_COPYID[dwID] then
 		RT_PLAYER_MAP_COPYID[dwID] = {}
 	end
-	if not RT_PLAYER_MAP_COPYID[dwID][dwMapID] then
-		RT_PLAYER_MAP_COPYID[dwID][dwMapID] = {}
-	end
-	RT_PLAYER_MAP_COPYID[dwID][dwMapID].nID = IsTable(aCopyID) and aCopyID[1] or -1
-	RT_PLAYER_MAP_COPYID[dwID][dwMapID].nReceiveTime = GetCurrentTime()
+	RT_PLAYER_MAP_COPYID[dwID][dwMapID] = IsTable(aCopyID) and aCopyID[1] or -1
+	FireUIEvent('MY_TEAMTOOLS_SUMMARY')
 end)
 
 function D.OnInitPage()
@@ -866,10 +896,12 @@ function D.OnInitPage()
 	frame:RegisterEvent('PARTY_DELETE_MEMBER')
 	frame:RegisterEvent('PARTY_SET_MEMBER_ONLINE_FLAG')
 	frame:RegisterEvent('ON_APPLY_PLAYER_SAVED_COPY_RESPOND')
+	frame:RegisterEvent('UPDATE_DUNGEON_ROLE_PROGRESS')
 	frame:RegisterEvent('LOADING_END')
 	-- 团长变更 重新请求标签
 	frame:RegisterEvent('TEAM_AUTHORITY_CHANGED')
 	-- 自定义事件
+	frame:RegisterEvent('MY_TEAMTOOLS_SUMMARY')
 	frame:RegisterEvent('MY_RAIDTOOLS_SUCCESS')
 	frame:RegisterEvent('MY_RAIDTOOLS_DEATH')
 	frame:RegisterEvent('MY_RAIDTOOLS_ENTER_MAP')
@@ -950,10 +982,6 @@ function D.OnInitPage()
 	-- ui 临时变量
 	this.tViewInvite = {} -- 请求装备队列
 	this.tDataCache  = {} -- 临时数据
-	-- 请求数据
-	if LIB.IsDungeonMap(RT_MAPID) and not LIB.IsDungeonRoleProgressMap(RT_MAPID) then
-		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_MAP_COPY_ID_REQUEST', {RT_MAPID}) -- 打开界面刷新
-	end
 	-- lang
 	page:Lookup('Wnd_Summary', 'Handle_Player_BG/Text_Title_3'):SetText(_L['BUFF'])
 	page:Lookup('Wnd_Summary', 'Handle_Player_BG/Text_Title_4'):SetText(_L['Equip'])
@@ -962,21 +990,27 @@ function D.OnInitPage()
 end
 
 function D.OnActivePage()
-	LIB.BreatheCall('MY_RaidTools', 1000, D.UpdateList, this)
-	LIB.BreatheCall('MY_RaidTools_Clear', 3000, D.GetEquip, this)
 	local hView = D.GetPlayerView()
 	if hView and hView:IsVisible() then
 		hView:Hide()
 	end
+	LIB.BreatheCall('MY_RaidTools_Draw', 1000, D.UpdateList, this)
+	LIB.BreatheCall('MY_RaidTools_GetEquip', 3000, D.GetEquip, this)
+	LIB.BreatheCall('MY_RaidTools_RequestTeamData', 30000, D.RequestTeamData, this)
 end
 
 function D.OnDeactivePage()
-	LIB.BreatheCall('MY_RaidTools', false)
-	LIB.BreatheCall('MY_RaidTools_Clear', false)
+	LIB.BreatheCall('MY_RaidTools_Draw', false)
+	LIB.BreatheCall('MY_RaidTools_GetEquip', false)
+	LIB.BreatheCall('MY_RaidTools_RequestTeamData', false)
 end
 
 function D.OnEvent(szEvent)
-	if szEvent == 'PEEK_OTHER_PLAYER' then
+	if szEvent == 'MY_TEAMTOOLS_SUMMARY' then
+		D.UpdateList(this)
+	elseif szEvent == 'UPDATE_DUNGEON_ROLE_PROGRESS' then
+		D.UpdateList(this)
+	elseif szEvent == 'PEEK_OTHER_PLAYER' then
 		if arg0 == CONSTANT.PEEK_OTHER_PLAYER_RESPOND.SUCCESS then
 			if this.tViewInvite[arg1] then
 				D.GetEquipCache(this, GetPlayer(arg1)) -- 抓取所有数据
@@ -1004,9 +1038,7 @@ function D.OnEvent(szEvent)
 		local hDungeon = this:Lookup('Wnd_Summary', 'Handle_Dungeon')
 		D.UpdateDungeonInfo(hDungeon)
 	elseif szEvent == 'MY_RAIDTOOLS_MAPID_CHANGE' then
-		if LIB.IsDungeonMap(RT_MAPID) and not LIB.IsDungeonRoleProgressMap(RT_MAPID) then
-			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_MAP_COPY_ID_REQUEST', {RT_MAPID}) -- 地图变化刷新
-		end
+		D.RequestTeamData() -- 地图变化刷新
 		local hDungeon = this:Lookup('Wnd_Summary', 'Handle_Dungeon')
 		D.UpdateDungeonInfo(hDungeon)
 	elseif szEvent == 'ON_APPLY_PLAYER_SAVED_COPY_RESPOND' then

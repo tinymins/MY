@@ -145,28 +145,69 @@ end)
 
 -- 团队副本CD
 do local LAST_TIME = {}
-LIB.RegisterBgMsg('MY_MAP_COPY_ID_REQUEST', function(_, aData, nChannel, dwID, szName, bIsSelf)
-	local dwMapID, aPlayerID = aData[1], aData[2]
-	if LAST_TIME[dwMapID] and GetCurrentTime() - LAST_TIME[dwMapID] < 5 then
+LIB.RegisterBgMsg('MY_MAP_COPY_ID_REQUEST', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
+	if bSelf then
+		--[[#DEBUG BEGIN]]
+		LIB.Debug(PACKET_INFO.NAME_SPACE, 'Team map copy id request sent.', DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
 		return
 	end
-	if aPlayerID then
-		local bResponse = false
-		for _, dwID in ipairs(aPlayerID) do
-			if dwID == UI_GetClientPlayerID() then
+	local dwMapID, aRequestID, aRefreshID = data[1], data[2], data[3]
+	local dwID = UI_GetClientPlayerID()
+	local bRequest, bRefresh, bResponse = false, false, false
+	if not bResponse then
+		if aRequestID then
+			for _, v in ipairs(aRequestID) do
+				if bRequest then
+					break
+				end
+				if v == dwID then
+					bRequest = true
+				end
+			end
+		else
+			bRequest = true
+		end
+		if bRequest then
+			bResponse = true
+		end
+	end
+	if not bResponse then
+		if aRefreshID then
+			for _, v in ipairs(aRefreshID) do
+				if bRefresh then
+					break
+				end
+				if v == dwID then
+					bRefresh = true
+				end
+			end
+		else
+			bRefresh = true
+		end
+		if bRefresh then
+			if not LAST_TIME[dwMapID] then
 				bResponse = true
-				break
 			end
 		end
-		if not bResponse then
-			return
+	end
+	--[[#DEBUG BEGIN]]
+	LIB.Debug(PACKET_INFO.NAME_SPACE, 'Team map copy id request from ' .. szTalkerName
+		.. ', will ' .. (bResponse and '' or 'not ') .. 'response.', DEBUG_LEVEL.LOG)
+	--[[#DEBUG END]]
+	if bResponse then
+		local function fnAction(tMapID)
+			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_MAP_COPY_ID', {dwMapID, tMapID[dwMapID] or -1})
 		end
+		LIB.GetMapSaveCopy(fnAction)
+		LAST_TIME[dwMapID] = GetCurrentTime()
 	end
-	local function fnAction(tMapID)
-		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_MAP_COPY_ID', {dwMapID, tMapID[dwMapID] or -1})
-	end
-	LIB.GetMapSaveCopy(fnAction)
-	LAST_TIME[dwMapID] = GetCurrentTime()
+end)
+LIB.RegisterEvent({
+	'ON_RESET_MAP_RESPOND',
+	'ON_APPLY_PLAYER_SAVED_COPY_RESPOND',
+}, function()
+	LAST_TIME = {}
 end)
 end
 
