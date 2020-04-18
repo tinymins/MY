@@ -46,7 +46,10 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2016100) then
 	return
 end
 --------------------------------------------------------------------------
-local TI = {}
+local TI = {
+	szYY = '',
+	szNote = '',
+}
 
 MY_TeamNotice = {
 	bEnable = true,
@@ -136,7 +139,7 @@ function TI.CreateFrame(a, b)
 					end
 					LIB.Systopmsg(_L['Please unlock talk lock first.'])
 				end
-				ui:Children('#YY'):Text(TI.szYY, WNDEVENT_FIRETYPE.PREVENT)
+				ui:Fetch('YY'):Text(TI.szYY, WNDEVENT_FIRETYPE.PREVENT)
 			end,
 			autocomplete = {
 				{
@@ -172,6 +175,9 @@ function TI.CreateFrame(a, b)
 			onclick = function()
 				local yy = ui:Children('#YY'):Text()
 				if LIB.IsLeader() then
+					if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
+						return LIB.Alert('TALK_LOCK', _L['Please unlock talk lock first.'])
+					end
 					if tonumber(yy) then
 						TI.tList = TI.GetList()
 						if not TI.tList[tonumber(yy)] then
@@ -211,7 +217,7 @@ function TI.CreateFrame(a, b)
 					end
 					LIB.Systopmsg(_L['Please unlock talk lock first.'])
 				end
-				ui:Children('#Message'):Text(TI.szNote, WNDEVENT_FIRETYPE.PREVENT)
+				ui:Fetch('Message'):Text(TI.szNote, WNDEVENT_FIRETYPE.PREVENT)
 			end,
 		})
 		x, y = 11, 130
