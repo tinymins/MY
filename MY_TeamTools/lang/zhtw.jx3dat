@@ -3,6 +3,7 @@ return {
 	-- MY_TeamTools
 	['MY_TeamTools'] = '團隊工具',
 	['Open/Close MY_TeamTools'] = '打開/關閉團隊工具',
+	['Fetch teammate\'s data failed, please unlock talk and reopen.'] = '獲取隊友數據失敗，請解除聊天鎖後重新打開界面。',
 	-- MY_TeamTools_DeathLog
 	['MY_TeamTools_DeathLog'] = '重傷記錄',
 	['OUTER GUEST'] = '天外來客',

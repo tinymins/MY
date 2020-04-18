@@ -122,7 +122,13 @@ function D.NewAuction(tab, bSkipPanel)
 	end
 end
 
-function D.SyncSend(dwID)
+function D.SyncSend(dwID, bSilent)
+	if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
+		if not bSilent then
+			LIB.Systopmsg(_L['Please unlock talk lock, otherwise gkp will not able to sync to teammate.'])
+		end
+		return
+	end
 	local ds = D.GetDS()
 	local tab = {
 		GKP_Record  = ds:GetAuctionList(),
@@ -171,7 +177,7 @@ LIB.RegisterBgMsg('MY_GKP', function(_, data, nChannel, dwID, szName, bIsSelf)
 	if team then
 		if not bIsSelf then
 			if data[1] == 'GKP_Sync' and data[2] == me.szName then
-				D.SyncSend(dwID)
+				D.SyncSend(dwID, true)
 			elseif (data[1] == 'del' or data[1] == 'edit' or data[1] == 'add') and MY_GKP.bAutoSync then
 				local tab = data[2]
 				tab.bSync = true

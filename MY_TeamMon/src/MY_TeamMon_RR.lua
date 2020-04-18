@@ -318,7 +318,7 @@ function D.LoadConfigureFile(szFile, info)
 	MY_TeamMon_UI.OpenImportPanel(szFile, info.szTitle .. ' - ' .. info.szAuthor, function()
 		local me = GetClientPlayer()
 		if me.IsInParty() then
-			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TeamMon_RR', {'LOAD', info.szTitle})
+			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TeamMon_RR', {'LOAD', info.szTitle}, true)
 		end
 		O.szLastKey = info.szKey
 		FireUIEvent('MY_TM_RR_META_LIST_UPDATE')
@@ -363,6 +363,9 @@ function D.DownloadData(info)
 end
 
 function D.ShareMetaToRaid(info, bSure)
+	if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
+		return LIB.Alert('TALK_LOCK', _L['Please unlock talk lock first.'])
+	end
 	if not LIB.IsInParty() then
 		return LIB.Alert(_L['You are not in the team.'])
 	end

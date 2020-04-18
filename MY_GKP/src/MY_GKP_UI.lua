@@ -226,7 +226,10 @@ function D.DrawAuctionPage(frame, szKey, szSort)
 					v.bDelete = not v.bDelete
 					frame.ds:SetAuctionRec(v)
 					if LIB.IsDistributer() then
-						LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'edit', v})
+						if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
+							LIB.Systopmsg(_L['Please unlock talk lock, otherwise gkp will not able to sync to teammate.'])
+						end
+						LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'edit', v}, true)
 					end
 				end
 			else
@@ -364,6 +367,9 @@ function MY_GKP_UI.OnFrameCreate()
 		x = nX, y = 660, w = 120, text = g_tStrings.GOLD_TEAM_BID_LIST,
 		buttonstyle = 3,
 		onclick = function()
+			if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
+				return LIB.Alert('TALK_LOCK', _L['Please unlock talk lock first.'])
+			end
 			local ds = this:GetRoot().ds
 			local me = GetClientPlayer()
 			if not me.IsInParty() and not LIB.IsDebugClient('MY_GKP') then
@@ -405,6 +411,9 @@ function MY_GKP_UI.OnFrameCreate()
 		x = nX, y = 660, w = 120, text = _L['Debt Issued'],
 		buttonstyle = 3,
 		onclick = function()
+			if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
+				return LIB.Alert('TALK_LOCK', _L['Please unlock talk lock first.'])
+			end
 			local ds = this:GetRoot().ds
 			local me = GetClientPlayer()
 			if not me.IsInParty() and not LIB.IsDebugClient('MY_GKP') then
@@ -543,6 +552,9 @@ function MY_GKP_UI.OnFrameCreate()
 		tip = _L['Left click to sync from others, right click to sync to others'],
 		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
 		lmenu = function()
+			if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
+				return LIB.Alert('TALK_LOCK', _L['Please unlock talk lock first.'])
+			end
 			local me = GetClientPlayer()
 			if me.IsInParty() then
 				local menu = MY_GKP.GetTeamMemberMenu(function(v)
@@ -559,6 +571,9 @@ function MY_GKP_UI.OnFrameCreate()
 			end
 		end,
 		rmenu = function()
+			if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
+				return LIB.Alert('TALK_LOCK', _L['Please unlock talk lock first.'])
+			end
 			local me = GetClientPlayer()
 			if not me.IsInParty() then
 				LIB.Alert('MY_GKP_UI', _L['You are not in the team.'])

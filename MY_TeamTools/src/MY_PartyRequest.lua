@@ -162,6 +162,9 @@ function MY_PartyRequest.OnLButtonClick()
 	elseif name == 'Btn_Lookup' then
 		local info = this:GetParent().info
 		if not info.dwID or (not info.bDetail and IsCtrlKeyDown()) then
+			if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
+				return LIB.Alert('TALK_LOCK', _L['Please unlock talk lock first.'])
+			end
 			LIB.SendBgMsg(info.szName, 'RL', {'ASK'})
 			this:Enable(false)
 			this:Lookup('', 'Text_Lookup'):SetText(_L['loading...'])

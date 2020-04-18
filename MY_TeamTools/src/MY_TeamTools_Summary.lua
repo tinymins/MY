@@ -746,7 +746,11 @@ function D.RequestTeamData()
 		if #aRequestID == #aTeamMemberList then
 			aRequestID = nil
 		end
-		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_MAP_COPY_ID_REQUEST', {RT_MAPID, aRequestID, nil})
+		if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
+			LIB.Systopmsg(_L['Fetch teammate\'s data failed, please unlock talk and reopen.'])
+		else
+			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_MAP_COPY_ID_REQUEST', {RT_MAPID, aRequestID, nil})
+		end
 	end
 	-- 刷新自己的
 	D.UpdateSelfData()

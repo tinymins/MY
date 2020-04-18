@@ -19,6 +19,7 @@ return {
 	['Pick up time limit exceeded, please try again.'] = '拾取时间超出限制，请再试一次。',
 	['No Pick up Object, may due to Network off - line'] = '没有拾取对象，可能是掉线了。',
 	['Cannot distrubute items to Equipment Boss, may due to Equipment Boss is too far away or got dropline when looting.'] = '无法将物品分配给当前散件老板，可能因为散件老板不在线、距离太远或者物品拾取时散件老板掉线了。',
+	['Please unlock talk lock, otherwise gkp will not able to sync to teammate.'] = '金团记录同步失败，请先解除聊天锁。',
 
 	['LClick to distrubute all equipment to '] = '鼠标左键点击分配所有装备给',
 	['Ctrl + LClick to distrubute all lootable items to '] = '按住Ctrl点击鼠标左键分配所有物品给',

@@ -136,6 +136,8 @@ return {
 	['[Author]'] = '〔插件君〕',
 	['[Fake author]'] = '〔该玩家非插件君，注意谨防上当受骗〕',
 
+	['Please unlock talk lock first.'] = '请先解除聊天锁。',
+
 	-- MY_CheckUpdate.lua
 	['new version found.'] = '发现新版本！',
 	['new version found, would you want to download immediately?'] = '发现新版本！是否立即前往下载？',

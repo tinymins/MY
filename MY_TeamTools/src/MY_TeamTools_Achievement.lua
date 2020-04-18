@@ -337,7 +337,11 @@ function D.RequestTeamData()
 		if #aRequestID == #aTeamMemberList - 1 then
 			aRequestID = nil
 		end
-		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TEAMTOOLS_ACHI_REQ', {aAchieveID, aCounterID, aRequestID, nil})
+		if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
+			LIB.Systopmsg(_L['Fetch teammate\'s data failed, please unlock talk and reopen.'])
+		else
+			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TEAMTOOLS_ACHI_REQ', {aAchieveID, aCounterID, aRequestID, nil})
+		end
 	end
 	-- 刷新自己的
 	D.UpdateSelfData()

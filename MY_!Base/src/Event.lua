@@ -636,14 +636,14 @@ local function ProcessQueue()
 end
 -- LIB.SendBgMsg(szName, szMsgID, oData)
 -- LIB.SendBgMsg(nChannel, szMsgID, oData)
-function LIB.SendBgMsg(nChannel, szMsgID, oData)
+function LIB.SendBgMsg(nChannel, szMsgID, oData, bSilent)
 	local szTarget, me = '', GetClientPlayer()
 	if not nChannel then
 		return
 	end
 	local szStatus = GetSenderStatus(me)
 	if szStatus ~= 'READY' then
-		if szStatus == 'TALK_LOCK' then
+		if szStatus == 'TALK_LOCK' and not bSilent then
 			LIB.Systopmsg(_L['BgMsg cannot be send due to talk lock, data will be sent as soon as talk unlocked.'])
 		end
 		insert(BG_MSG_QUEUE, { nChannel, szMsgID, oData })

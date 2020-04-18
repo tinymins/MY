@@ -49,7 +49,7 @@ LIB.RegisterBgMsg('ASK_CURRENT_LOC', function(_, nChannel, dwTalkerID, szTalkerN
 		szMessage = _L('[%s] wants to get your location, would you like to share?', szTalkerName), {
 			szOption = g_tStrings.STR_HOTKEY_SURE, fnAction = function()
 				local me = GetClientPlayer()
-				LIB.SendBgMsg(szTalkerName, 'REPLY_CURRENT_LOC', { me.GetMapID(), me.nX, me.nY, me.nZ })
+				LIB.SendBgMsg(szTalkerName, 'REPLY_CURRENT_LOC', { me.GetMapID(), me.nX, me.nY, me.nZ }, true)
 			end
 		}, { szOption = g_tStrings.STR_HOTKEY_CANCEL },
 	})
@@ -64,7 +64,7 @@ LIB.RegisterBgMsg('MY_VERSION_CHECK', function(_, oData, nChannel, dwTalkerID, s
 	if not bSilent and LIB.IsInParty() then
 		LIB.Talk(PLAYER_TALK_CHANNEL.RAID, _L('I\'ve installed MY plugins v%s', LIB.GetVersion()))
 	end
-	LIB.SendBgMsg(szTalkerName, 'MY_VERSION_REPLY', LIB.GetVersion())
+	LIB.SendBgMsg(szTalkerName, 'MY_VERSION_REPLY', LIB.GetVersion(), true)
 end)
 
 -- 测试用（调试工具）
@@ -72,7 +72,7 @@ LIB.RegisterBgMsg('MY_GFN_CHECK', function(_, oData, nChannel, dwTalkerID, szTal
 	if bSelf or LIB.IsDebugClient(true) then
 		return
 	end
-	LIB.SendBgMsg(szTalkerName, 'MY_GFN_REPLY', {oData[1], XpCall(Get(_G, oData[2]), select(3, unpack(oData)))})
+	LIB.SendBgMsg(szTalkerName, 'MY_GFN_REPLY', {oData[1], XpCall(Get(_G, oData[2]), select(3, unpack(oData)))}, true)
 end)
 
 -- 进组查看属性
@@ -83,7 +83,7 @@ LIB.RegisterBgMsg('RL', function(_, data, nChannel, dwID, szName, bIsSelf)
 				local me = GetClientPlayer()
 				local nGongZhan = LIB.GetBuff(me, 3219) and 1 or 0
 				local bEx = PACKET_INFO.AUTHOR_ROLES[me.dwID] == me.szName and 'Author' or 'Player'
-				LIB.SendBgMsg(szName, 'RL', {'Feedback', me.dwID, UI_GetPlayerMountKungfuID(), nGongZhan, bEx})
+				LIB.SendBgMsg(szName, 'RL', {'Feedback', me.dwID, UI_GetPlayerMountKungfuID(), nGongZhan, bEx}, true)
 			end)
 		end
 	end
@@ -100,9 +100,9 @@ LIB.RegisterBgMsg('CHAR_INFO', function(_, data, nChannel, dwID, szName, bIsSelf
 						v.tip = nil
 					end
 				end
-				LIB.SendBgMsg(LIB.IsParty(dwID) and PLAYER_TALK_CHANNEL.RAID or szName, 'CHAR_INFO', {'ACCEPT', dwID, aInfo})
+				LIB.SendBgMsg(LIB.IsParty(dwID) and PLAYER_TALK_CHANNEL.RAID or szName, 'CHAR_INFO', {'ACCEPT', dwID, aInfo}, true)
 			else
-				LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'CHAR_INFO', {'REFUSE', dwID})
+				LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'CHAR_INFO', {'REFUSE', dwID}, true)
 			end
 		end
 	end
@@ -124,7 +124,7 @@ LIB.RegisterBgMsg('MY_ABOUT', function(_, data, nChannel, dwID, szName, bIsSelf)
 			PACKET_INFO.VERSION,
 			szServer,
 			LIB.GetBuff(me, 3219)
-		})
+		}, true)
 	elseif data[1] == 'TeamAuth' then -- 防止有人睡着 遇到了不止一次了
 		local team = GetClientTeam()
 		team.SetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER, dwID)
@@ -197,7 +197,7 @@ LIB.RegisterBgMsg('MY_MAP_COPY_ID_REQUEST', function(_, data, nChannel, dwTalker
 	--[[#DEBUG END]]
 	if bResponse then
 		local function fnAction(tMapID)
-			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_MAP_COPY_ID', {dwMapID, tMapID[dwMapID] or -1})
+			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_MAP_COPY_ID', {dwMapID, tMapID[dwMapID] or -1}, true)
 		end
 		LIB.GetMapSaveCopy(fnAction)
 		LAST_TIME[dwMapID] = GetCurrentTime()
@@ -237,7 +237,7 @@ local function OnSwitchMap(dwMapID, dwSubID, aMapCopy, dwTime)
 	end
 	LIB.Debug(PACKET_INFO.NAME_SPACE, szDebug, DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
-	LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_SWITCH_MAP', {dwMapID, dwSubID, aMapCopy, dwTime})
+	LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_SWITCH_MAP', {dwMapID, dwSubID, aMapCopy, dwTime}, true)
 end
 
 -- 成功进入某地图并加载完成（进入后）
@@ -261,7 +261,7 @@ local function OnEnterMap(dwMapID, dwSubID, aMapCopy, dwTime, dwSwitchTime)
 	end
 	LIB.Debug(PACKET_INFO.NAME_SPACE, szDebug, DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
-	LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_ENTER_MAP', {dwMapID, dwSubID, aMapCopy, dwTime, dwSwitchTime})
+	LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_ENTER_MAP', {dwMapID, dwSubID, aMapCopy, dwTime, dwSwitchTime}, true)
 end
 
 local function OnCrossMapGoFB()
@@ -416,7 +416,7 @@ LIB.RegisterBgMsg('MY_TEAMTOOLS_ACHI_REQ', function(_, data, nChannel, dwTalkerI
 			LAST_COUNTER_TIME[dwCounterID] = GetCurrentTime()
 			insert(aCounterRes, {dwCounterID, me.GetAchievementCount(dwCounterID)})
 		end
-		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TEAMTOOLS_ACHI_RES', {aAchieveRes, aCounterRes})
+		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TEAMTOOLS_ACHI_RES', {aAchieveRes, aCounterRes}, true)
 	end
 end)
 LIB.RegisterEvent({

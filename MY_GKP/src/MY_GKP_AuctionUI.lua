@@ -238,36 +238,48 @@ function D.Open(ds, tab, szMode)
 		tab.dwForceID = dwForceID or tab.dwForceID or 0
 		if tab and type(item) == 'userdata' and szMode ~= 'EDIT' then
 			if LIB.IsDistributer() then
-				LIB.Talk(PLAYER_TALK_CHANNEL.RAID, {
-					D.GetFormatLink(tab),
-					D.GetFormatLink(' '.. nMoney .. g_tStrings.STR_GOLD),
-					D.GetFormatLink(_L[' Distribute to ']),
-					D.GetFormatLink(tab.szPlayer, true)
-				})
-				LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'add', tab})
+				if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
+					LIB.Systopmsg(_L['Please unlock talk lock, otherwise gkp will not able to sync to teammate.'])
+				else
+					LIB.Talk(PLAYER_TALK_CHANNEL.RAID, {
+						D.GetFormatLink(tab),
+						D.GetFormatLink(' '.. nMoney .. g_tStrings.STR_GOLD),
+						D.GetFormatLink(_L[' Distribute to ']),
+						D.GetFormatLink(tab.szPlayer, true)
+					})
+				end
+				LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'add', tab}, true)
 			end
 		elseif tab and szMode == 'EDIT' then
 			tab.szName = hName:Text()
 			tab.dwForceID = dwForceID or tab.dwForceID or 0
 			tab.bEdit = true
 			if LIB.IsDistributer() then
-				LIB.Talk(PLAYER_TALK_CHANNEL.RAID, {
-					D.GetFormatLink(tab.szPlayer, true),
-					D.GetFormatLink(' '.. tab.szName),
-					D.GetFormatLink(' '.. nMoney ..g_tStrings.STR_GOLD),
-					D.GetFormatLink(_L['Make changes to the record.']),
-				})
-				LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'edit', tab})
+				if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
+					LIB.Systopmsg(_L['Please unlock talk lock, otherwise gkp will not able to sync to teammate.'])
+				else
+					LIB.Talk(PLAYER_TALK_CHANNEL.RAID, {
+						D.GetFormatLink(tab.szPlayer, true),
+						D.GetFormatLink(' '.. tab.szName),
+						D.GetFormatLink(' '.. nMoney ..g_tStrings.STR_GOLD),
+						D.GetFormatLink(_L['Make changes to the record.']),
+					})
+				end
+				LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'edit', tab}, true)
 			end
 		else
 			if LIB.IsDistributer() then
-				LIB.Talk(PLAYER_TALK_CHANNEL.RAID, {
-					D.GetFormatLink(tab.szName),
-					D.GetFormatLink(' '.. nMoney ..g_tStrings.STR_GOLD),
-					D.GetFormatLink(_L['Manually make record to']),
-					D.GetFormatLink(tab.szPlayer, true)
-				})
-				LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'add', tab})
+				if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
+					LIB.Systopmsg(_L['Please unlock talk lock, otherwise gkp will not able to sync to teammate.'])
+				else
+					LIB.Talk(PLAYER_TALK_CHANNEL.RAID, {
+						D.GetFormatLink(tab.szName),
+						D.GetFormatLink(' '.. nMoney ..g_tStrings.STR_GOLD),
+						D.GetFormatLink(_L['Manually make record to']),
+						D.GetFormatLink(tab.szPlayer, true)
+					})
+				end
+				LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'add', tab}, true)
 			end
 		end
 		if ui:Children('#WndCheckBox'):Check() then

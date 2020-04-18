@@ -169,6 +169,9 @@ end)
 
 -- public API
 function MY_CharInfo.ViewCharInfoToPlayer(dwID)
+	if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
+		return LIB.Alert('TALK_LOCK', _L['Please unlock talk lock first.'])
+	end
 	local nChannel, szName
 	if LIB.IsParty(dwID) then
 		local team = GetClientTeam()

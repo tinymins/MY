@@ -585,6 +585,9 @@ function MY_CataclysmParty_Base.OnItemRButtonClick()
 					szOption = _L['Take back all permissions'],
 					rgb = { 255, 255, 0 },
 					fnAction = function()
+						if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
+							return LIB.Alert('TALK_LOCK', _L['Please unlock talk lock first.'])
+						end
 						LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_ABOUT', {'TeamAuth'})
 					end,
 				},
@@ -592,6 +595,9 @@ function MY_CataclysmParty_Base.OnItemRButtonClick()
 					szOption = _L['Take back leader permission'],
 					rgb = { 255, 255, 0 },
 					fnAction = function()
+						if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
+							return LIB.Alert('TALK_LOCK', _L['Please unlock talk lock first.'])
+						end
 						LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_ABOUT', {'TeamLeader'})
 					end,
 				},
@@ -599,6 +605,9 @@ function MY_CataclysmParty_Base.OnItemRButtonClick()
 					szOption = _L['Take back mark permission'],
 					rgb = { 255, 255, 0 },
 					fnAction = function()
+						if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
+							return LIB.Alert('TALK_LOCK', _L['Please unlock talk lock first.'])
+						end
 						LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_ABOUT', {'TeamMark'})
 					end,
 				},
@@ -606,6 +615,9 @@ function MY_CataclysmParty_Base.OnItemRButtonClick()
 					szOption = _L['Take back distribute permission'],
 					rgb = { 255, 255, 0 },
 					fnAction = function()
+						if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
+							return LIB.Alert('TALK_LOCK', _L['Please unlock talk lock first.'])
+						end
 						LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_ABOUT', {'TeamDistribute'})
 					end,
 				}
