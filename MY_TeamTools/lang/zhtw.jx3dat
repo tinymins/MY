@@ -61,6 +61,7 @@ return {
 	['(Progress)'] = '(未完成)',
 	['(Unknown)'] = '(未知)',
 	['All map'] = '全部地圖',
+	['Current map'] = '當前地圖',
 
 	-- MY_PartyRequest
 	['Party Request'] = '優化入隊申請列表',

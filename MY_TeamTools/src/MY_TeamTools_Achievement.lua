@@ -578,6 +578,15 @@ function D.OnInitPage()
 		})
 		tMapName[0] = _L['All map']
 		insert(aMapName, _L['All map'])
+		insert(tMapMenu, {
+			szOption = _L['Current map'],
+			fnAction = function()
+				O.dwMapID = GetClientPlayer().GetMapID()
+				D.UpdateAchievementID()
+				D.RequestTeamData()
+				UI.ClosePopupMenu()
+			end,
+		})
 		for _, group in ipairs(LIB.GetTypeGroupMap()) do
 			local tSub = { szOption = group.szGroup }
 			for _, info in ipairs(group.aMapInfo) do
