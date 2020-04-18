@@ -108,9 +108,11 @@ function D.Open(menu)
 	if not frame then
 		frame = Wnd.OpenWindow(SZ_INI, PLUGIN_NAME)
 	end
+	if not menu.bShowKillFocus then
+		Station.SetFocusWindow(frame)
+	end
 	frame.nCurX, frame.nCurY = Cursor.GetPos()
 	frame:SetDS(menu)
-	Station.SetFocusWindow(frame)
 end
 
 function D.Close()
