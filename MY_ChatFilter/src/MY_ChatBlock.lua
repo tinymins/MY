@@ -50,262 +50,200 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2014200) then
 	return
 end
 --------------------------------------------------------------------------
-local TYPE_LIST = {
-	'NEARBY', 'SENCE', 'WORLD', 'TEAM', 'RAID', 'BATTLE_FIELD', 'TONG',
-	'FORCE', 'CAMP', 'WHISPER', 'FRIENDS', 'TONG_ALLIANCE', 'SYSTEM',
+local TALK_CHANNEL_MSG_TYPE = {
+	[PLAYER_TALK_CHANNEL.NEARBY       ] = 'MSG_NORMAL'        ,
+	[PLAYER_TALK_CHANNEL.SENCE        ] = 'MSG_MAP'           ,
+	[PLAYER_TALK_CHANNEL.WORLD        ] = 'MSG_WORLD'         ,
+	[PLAYER_TALK_CHANNEL.TEAM         ] = 'MSG_PARTY'         ,
+	[PLAYER_TALK_CHANNEL.RAID         ] = 'MSG_TEAM'          ,
+	[PLAYER_TALK_CHANNEL.BATTLE_FIELD ] = 'MSG_BATTLE_FILED'  ,
+	[PLAYER_TALK_CHANNEL.TONG         ] = 'MSG_GUILD'         ,
+	[PLAYER_TALK_CHANNEL.FORCE        ] = 'MSG_SCHOOL'        ,
+	[PLAYER_TALK_CHANNEL.CAMP         ] = 'MSG_CAMP'          ,
+	[PLAYER_TALK_CHANNEL.WHISPER      ] = 'MSG_WHISPER'       ,
+	[PLAYER_TALK_CHANNEL.FRIENDS      ] = 'MSG_FRIEND'        ,
+	[PLAYER_TALK_CHANNEL.TONG_ALLIANCE] = 'MSG_GUILD_ALLIANCE',
+	[PLAYER_TALK_CHANNEL.LOCAL_SYS    ] = 'MSG_SYS'           ,
 }
-
-local TYPE_CHANNELS = setmetatable({
-	['NEARBY'       ] = {PLAYER_TALK_CHANNEL.NEARBY       },
-	['SENCE'        ] = {PLAYER_TALK_CHANNEL.SENCE        },
-	['WORLD'        ] = {PLAYER_TALK_CHANNEL.WORLD        },
-	['TEAM'         ] = {PLAYER_TALK_CHANNEL.TEAM         },
-	['RAID'         ] = {PLAYER_TALK_CHANNEL.RAID         },
-	['BATTLE_FIELD' ] = {PLAYER_TALK_CHANNEL.BATTLE_FIELD },
-	['TONG'         ] = {PLAYER_TALK_CHANNEL.TONG         },
-	['FORCE'        ] = {PLAYER_TALK_CHANNEL.FORCE        },
-	['CAMP'         ] = {PLAYER_TALK_CHANNEL.CAMP         },
-	['WHISPER'      ] = {PLAYER_TALK_CHANNEL.WHISPER      },
-	['FRIENDS'      ] = {PLAYER_TALK_CHANNEL.FRIENDS      },
-	['TONG_ALLIANCE'] = {PLAYER_TALK_CHANNEL.TONG_ALLIANCE},
-}, {__index = function(t, k) return CONSTANT.EMPTY_TABLE end})
-local TYPE_MSGS = setmetatable({
-	['NEARBY'       ] = {'MSG_NORMAL'        },
-	['SENCE'        ] = {'MSG_MAP'           },
-	['WORLD'        ] = {'MSG_WORLD'         },
-	['TEAM'         ] = {'MSG_PARTY'         },
-	['RAID'         ] = {'MSG_TEAM'          },
-	['BATTLE_FIELD' ] = {'MSG_BATTLE_FILED'  },
-	['TONG'         ] = {'MSG_GUILD'         },
-	['FORCE'        ] = {'MSG_SCHOOL'        },
-	['CAMP'         ] = {'MSG_CAMP'          },
-	['WHISPER'      ] = {'MSG_WHISPER'       },
-	['FRIENDS'      ] = {'MSG_FRIEND'        },
-	['TONG_ALLIANCE'] = {'MSG_GUILD_ALLIANCE'},
-	['SYSTEM'       ] = {'MSG_SYS'           },
-}, {__index = function(t, k) return CONSTANT.EMPTY_TABLE end})
-
-local TYPE_COLOR = setmetatable({
-	['NEARBY'       ] = {255, 255, 255},
-	['SENCE'        ] = {255, 126, 126},
-	['WORLD'        ] = {252, 204, 204},
-	['TEAM'         ] = {140, 178, 253},
-	['RAID'         ] = { 73, 168, 241},
-	['BATTLE_FIELD' ] = {255, 126, 126},
-	['TONG'         ] = {  0, 200,  72},
-	['FORCE'        ] = {  0, 255, 255},
-	['CAMP'         ] = {155, 230,  58},
-	['WHISPER'      ] = {202, 126, 255},
-	['FRIENDS'      ] = {241, 114, 183},
-	['TONG_ALLIANCE'] = {178, 240, 164},
-	['SYSTEM'       ] = {255, 255, 0  },
-}, {__index = function(t, k) return {255, 255, 255} end})
-local TYPE_TITLE = setmetatable({
-	['NEARBY'       ] = _L['nearby'     ],
-	['SENCE'        ] = _L['map'        ],
-	['WORLD'        ] = _L['world'      ],
-	['TEAM'         ] = _L['team'       ],
-	['RAID'         ] = _L['raid'       ],
-	['BATTLE_FIELD' ] = _L['battlefield'],
-	['TONG'         ] = _L['tong'       ],
-	['FORCE'        ] = _L['force'      ],
-	['CAMP'         ] = _L['camp'       ],
-	['WHISPER'      ] = _L['whisper'    ],
-	['FRIENDS'      ] = _L['firends'    ],
-	['TONG_ALLIANCE'] = _L['alliance'   ],
-	['SYSTEM'       ] = _L['system'     ],
-}, {__index = function(t, k) return k end})
+local MSG_TYPE_TALK_CHANNEL = LIB.FlipObjectKV(TALK_CHANNEL_MSG_TYPE)
 
 local DEFAULT_KW_CONFIG = {
-	keyword = '',
-	channel = {
-		['NEARBY'       ] = true ,
-		['SENCE'        ] = true ,
-		['WORLD'        ] = true ,
-		['TEAM'         ] = false,
-		['RAID'         ] = false,
-		['BATTLE_FIELD' ] = false,
-		['TONG'         ] = false,
-		['FORCE'        ] = true ,
-		['CAMP'         ] = true ,
-		['WHISPER'      ] = true ,
-		['FRIENDS'      ] = false,
-		['TONG_ALLIANCE'] = false,
-		['SYSTEM'       ] = false,
+	szKeyword = '',
+	tMsgType = {
+		['MSG_NORMAL'        ] = true ,
+		['MSG_MAP'           ] = true ,
+		['MSG_WORLD'         ] = true ,
+		['MSG_PARTY'         ] = false,
+		['MSG_TEAM'          ] = false,
+		['MSG_BATTLE_FILED'  ] = false,
+		['MSG_GUILD'         ] = false,
+		['MSG_SCHOOL'        ] = true ,
+		['MSG_CAMP'          ] = true ,
+		['MSG_WHISPER'       ] = true ,
+		['MSG_FRIEND'        ] = false,
+		['MSG_GUILD_ALLIANCE'] = false,
+		['MSG_SYS'           ] = false,
 	},
-	ignoreAcquaintance = true,
-	ignoreCase = true, ignoreEnEm = true, ignoreSpace = true,
+	bIgnoreAcquaintance = true,
+	bIgnoreCase = true, bIgnoreEnEm = true, bIgnoreSpace = true,
 }
-MY_ChatBlock = {}
-MY_ChatBlock.bBlockWords = true
-MY_ChatBlock.tBlockWords = {}
+
+local D = {}
+local O = {
+	bBlockWords = true,
+	aBlockWords = {},
+}
 RegisterCustomData('MY_ChatBlock.bBlockWords')
 
-local TYPE_CHANNELMSGS_R = (function()
-	local t = {}
-	for eType, aChannel in pairs(TYPE_CHANNELS) do
-		for _, nChannel in ipairs(aChannel) do
-			if not t[nChannel] then
-				t[nChannel] = {}
-			end
-			insert(t[nChannel], eType)
-		end
-	end
-	for eType, aMsgType in pairs(TYPE_MSGS) do
-		for _, szMsgType in ipairs(aMsgType) do
-			if not t[szMsgType] then
-				t[szMsgType] = {}
-			end
-			insert(t[szMsgType], eType)
-		end
-	end
-	return t
-end)()
-
-local function SaveBlockWords()
-	LIB.SaveLUAData({'config/chatblockwords.jx3dat', PATH_TYPE.GLOBAL}, {blockwords = MY_ChatBlock.tBlockWords})
-	LIB.StorageData('MY_CHAT_BLOCKWORD', MY_ChatBlock.tBlockWords)
+function D.SaveBlockWords()
+	LIB.SaveLUAData(
+		{'config/chatblockwords.jx3dat', PATH_TYPE.GLOBAL},
+		{ aBlockWords = O.aBlockWords },
+		{ passphrase = false })
+	LIB.StorageData('MY_CHAT_BLOCKWORD', O.aBlockWords)
 end
 
-local function LoadBlockWords()
-	local szOrgPath, tOrgData = LIB.GetLUADataPath({'config/MY_CHAT/blockwords.{$lang}.jx3dat', PATH_TYPE.DATA}), nil
-	if IsLocalFileExist(szOrgPath) then
-		tOrgData = LIB.LoadLUAData(szOrgPath)
-		CPath.DelFile(szOrgPath)
-	end
-
-	local tKeys = {}
-	for i, bw in ipairs(MY_ChatBlock.tBlockWords) do
-		tKeys[bw.keyword] = true
-	end
-	if tOrgData then
-		for i, rec in ipairs(tOrgData) do
-			local bw = Clone(DEFAULT_KW_CONFIG)
-			if type(rec) == 'string' then
-				bw.keyword = rec
-			elseif type(rec) == 'table' and type(rec[1]) == 'string' then
-				bw.keyword = rec[1]
-			end
-			if bw.keyword ~= '' and not tKeys[bw.keyword] then
-				insert(MY_ChatBlock.tBlockWords, bw)
-				tKeys[bw.keyword] = true
+function D.LoadBlockWords()
+	local aBlockWords = {}
+	local data = LIB.LoadLUAData(
+		{'config/chatblockwords.jx3dat', PATH_TYPE.GLOBAL},
+		{ passphrase = false })
+	or LIB.LoadLUAData({'config/chatblockwords.jx3dat', PATH_TYPE.GLOBAL})
+	if data then
+		if IsTable(data.aBlockWords) then
+			aBlockWords = data.aBlockWords
+		end
+		-- 兼容旧版数据
+		if data.blockwords then
+			for i, bw in ipairs(data.blockwords) do
+				if IsTable(bw) and IsTable(bw.channel) then
+					if bw.keyword then
+						local bwNew = {
+							szKeyword = bw.keyword,
+							tMsgType = {},
+							bIgnoreAcquaintance = bw.ignoreAcquaintance,
+							bIgnoreCase = bw.ignoreCase,
+							bIgnoreEnEm = bw.ignoreEnEm,
+							bIgnoreSpace = bw.ignoreSpace,
+						}
+						for k, v in pairs(bw.channel) do
+							if k == 'SYSTEM' then
+								k = 'LOCAL_SYS'
+							end
+							local k = PLAYER_TALK_CHANNEL[k] and TALK_CHANNEL_MSG_TYPE[PLAYER_TALK_CHANNEL[k]]
+							if k then
+								bwNew.tMsgType[k] = v
+							end
+						end
+						insert(aBlockWords, bwNew)
+					end
+				end
 			end
 		end
 	end
-	local data = LIB.LoadLUAData({'config/chatblockwords.jx3dat', PATH_TYPE.GLOBAL})
-	if data and data.blockwords then
-		for i, bw in ipairs(data.blockwords) do
-			bw = LIB.FormatDataStructure(bw, DEFAULT_KW_CONFIG)
-			if bw.keyword ~= '' and not tKeys[bw.keyword] then
-				insert(MY_ChatBlock.tBlockWords, bw)
-				tKeys[bw.keyword] = true
+	O.aBlockWords = aBlockWords
+	D.CheckEnable()
+end
+
+function D.IsBlockMsg(szText, szMsgType, dwTalkerID)
+	local bAcquaintance = dwTalkerID
+		and (LIB.GetFriend(dwTalkerID) or LIB.GetFoe(dwTalkerID) or LIB.GetTongMember(dwTalkerID))
+		or false
+	for _, bw in ipairs(O.aBlockWords) do
+		if bw.tMsgType[szMsgType] and (not bAcquaintance or not bw.bIgnoreAcquaintance)
+		and LIB.StringSimpleMatch(szText, bw.szKeyword, not bw.bIgnoreCase, not bw.bIgnoreEnEm, bw.bIgnoreSpace) then
+			return true
+		end
+	end
+	return false
+end
+
+function D.OnTalkFilter(nChannel, t, dwTalkerID, szName, bEcho, bOnlyShowBallon, bSecurity, bGMAccount, bCheater, dwTitleID, dwIdePetTemplateID)
+	local szType = TALK_CHANNEL_MSG_TYPE[nChannel]
+	if not szType then
+		return
+	end
+	local szText = ''
+	for _, v in ipairs(t) do
+		if v.text then
+			szText = szText .. v.text
+		end
+	end
+	if D.IsBlockMsg(szText, szType, dwTalkerID) then
+		return true
+	end
+end
+
+function D.OnMsgFilter(szMsg, nFont, bRich, r, g, b, szType, dwTalkerID, szName)
+	if D.IsBlockMsg(bRich and GetPureText(szMsg) or szMsg, szType, dwTalkerID) then
+		return true
+	end
+end
+
+function D.CheckEnable()
+	UnRegisterTalkFilter(D.OnTalkFilter)
+	UnRegisterMsgFilter(D.OnMsgFilter)
+	if not O.bBlockWords then
+		return
+	end
+	local tChannel, tMsgType = {}, {}
+	for _, bw in ipairs(O.aBlockWords) do
+		for szType, bEnable in pairs(bw.tMsgType) do
+			if bEnable then
+				if MSG_TYPE_TALK_CHANNEL[szType] then
+					tChannel[MSG_TYPE_TALK_CHANNEL[szType]] = true
+				end
+				tMsgType[szType] = true
 			end
 		end
 	end
-
-	if tOrgData then
-		SaveBlockWords()
+	local aChannel, aMsgType = {}, {}
+	for k, _ in pairs(tChannel) do
+		insert(aChannel, k)
+	end
+	for k, _ in pairs(tMsgType) do
+		insert(aMsgType, k)
+	end
+	if not IsEmpty(aChannel) then
+		RegisterTalkFilter(D.OnTalkFilter, aChannel)
+	end
+	if not IsEmpty(aMsgType) then
+		RegisterMsgFilter(D.OnMsgFilter, aMsgType)
 	end
 end
 
 LIB.RegisterEvent('MY_PRIVATE_STORAGE_UPDATE', function()
 	if arg0 == 'MY_CHAT_BLOCKWORD' then
-		MY_ChatBlock.tBlockWords = arg1
+		O.aBlockWords = arg1
+		D.CheckEnable()
 	end
 end)
-LIB.RegisterInit('MY_CHAT_BW', LoadBlockWords)
+LIB.RegisterInit('MY_ChatBlock', D.LoadBlockWords)
 
-local tNoneSpaceBlockWords = {}
-function MY_ChatBlock.MatchBlockWord(talkData, talkType, dwTalkerID)
-	local szText = ''
-	if type(talkData) == 'table' then
-		for _, v in ipairs(talkData) do
-			if v.text then
-				szText = szText .. v.text
-			end
-		end
-	elseif type(talkData) == 'string' then
-		szText = talkData
-	end
-	local bAcquaintance = dwTalkerID and (LIB.GetFriend(dwTalkerID) or LIB.GetFoe(dwTalkerID) or LIB.GetTongMember(dwTalkerID))
-
-
-	for _, bw in ipairs(MY_ChatBlock.tBlockWords) do
-		local hasfilter = false
-		for _, eType in ipairs(TYPE_CHANNELMSGS_R[talkType] or CONSTANT.EMPTY_TABLE) do
-			if bw.channel[eType] then
-				hasfilter = true
-				break
-			end
-		end
-		if hasfilter and not (bw.ignoreAcquaintance and bAcquaintance)
-		and LIB.StringSimpleMatch(szText, bw.keyword, not bw.ignoreCase, not bw.ignoreEnEm, bw.ignoreSpace) then
-			return true
-		end
-	end
-end
-
+-- Global exports
 do
-local aChannel, aMsgType = {}, {}
-for _, eType in ipairs(TYPE_LIST) do
-	for _, nChannel in ipairs(TYPE_CHANNELS[eType]) do
-		local exist = false
-		for _, ch in ipairs(aChannel) do
-			if ch == nChannel then
-				exist = true
-				break
-			end
-		end
-		if not exist then
-			insert(aChannel, nChannel)
-		end
-	end
-	for _, szMsgType in ipairs(TYPE_MSGS[eType]) do
-		local exist = false
-		for _, ch in ipairs(aMsgType) do
-			if ch == szMsgType then
-				exist = true
-				break
-			end
-		end
-		if not exist then
-			insert(aMsgType, szMsgType)
-		end
-	end
-end
-RegisterTalkFilter(function(nChannel, t, dwTalkerID, szName, bEcho, bOnlyShowBallon, bSecurity, bGMAccount, bCheater, dwTitleID, dwIdePetTemplateID)
-	if MY_ChatBlock.bBlockWords and MY_ChatBlock.MatchBlockWord(t, nChannel, dwTalkerID) then
-		return true
-	end
-end, aChannel)
-
-RegisterMsgFilter(function(szMsg, nFont, bRich, r, g, b, szType, dwTalkerID, szName)
-	if MY_ChatBlock.bBlockWords and MY_ChatBlock.MatchBlockWord(bRich and GetPureText(szMsg) or szMsg, szType, dwTalkerID) then
-		return true
-	end
-end, aMsgType)
-end
-
-local function Chn2Str(ch)
-	local aText = {}
-	for _, eType in ipairs(TYPE_LIST) do
-		if ch[eType] then
-			insert(aText, TYPE_TITLE[eType])
-		end
-	end
-	local szText
-	if #aText == 0 then
-		szText = _L['Disabled']
-	elseif #aText == #TYPE_LIST then
-		szText = _L['All channels']
-	else
-		szText = concat(aText, ',')
-	end
-	return szText
-end
-
-local function ChatBlock2Text(szText, tChannel)
-	return szText .. ' (' .. Chn2Str(tChannel) .. ')'
+local settings = {
+	exports = {
+		{
+			fields = {
+				bBlockWords = true,
+			},
+			root = O,
+		},
+	},
+	imports = {
+		{
+			fields = {
+				bBlockWords = true,
+			},
+			triggers = {
+				bBlockWords = D.CheckEnable,
+			},
+			root = O,
+		},
+	},
+}
+MY_ChatBlock = LIB.GeneGlobalNS(settings)
 end
 
 local PS = {}
@@ -313,11 +251,11 @@ function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
 	local w, h = ui:Size()
 	local x, y = 0, 0
-	LoadBlockWords()
+	D.LoadBlockWords()
 
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 70,
-		text = _L['enable'],
+		text = _L['Enable'],
 		checked = MY_ChatBlock.bBlockWords,
 		oncheck = function(bCheck)
 			MY_ChatBlock.bBlockWords = bCheck
@@ -334,74 +272,67 @@ function PS.OnPanelActive(wnd)
 
 	local list = ui:Append('WndListBox', { x = x, y = y, w = w, h = h - 30 })
 	-- 初始化list控件
-	for _, bw in ipairs(MY_ChatBlock.tBlockWords) do
-		list:ListBox('insert', ChatBlock2Text(bw.keyword, bw.channel), bw.keyword, bw)
+	for _, bw in ipairs(O.aBlockWords) do
+		list:ListBox('insert', bw.szKeyword, bw.szKeyword, bw)
 	end
 	list:ListBox('onmenu', function(hItem, text, id, data)
-		local chns = data.channel
-		local menu = {
-			szOption = _L['Channels'],
-		}
-		for _, eType in ipairs(TYPE_LIST) do
-			insert(menu, {
-				szOption = _L('%s channel', TYPE_TITLE[eType]),
-				rgb = TYPE_COLOR[eType],
-				bCheck = true, bChecked = chns[eType],
-				fnAction = function()
-					chns[eType] = not chns[eType]
-					UI(hItem):Text(ChatBlock2Text(id, chns))
-					SaveBlockWords()
-				end,
-			})
-		end
+		local menu = LIB.GetMsgTypeMenu(function(szType)
+			if data.tMsgType[szType] then
+				data.tMsgType[szType] = nil
+			else
+				data.tMsgType[szType] = true
+			end
+			D.CheckEnable()
+		end, data.tMsgType)
 		insert(menu, CONSTANT.MENU_DIVIDER)
 		insert(menu, {
-			szOption = _L['ignore spaces'],
-			bCheck = true, bChecked = data.ignoreSpace,
+			szOption = _L['Ignore spaces'],
+			bCheck = true, bChecked = data.bIgnoreSpace,
 			fnAction = function()
-				data.ignoreSpace = not data.ignoreSpace
-				SaveBlockWords()
+				data.bIgnoreSpace = not data.bIgnoreSpace
+				D.SaveBlockWords()
 			end,
 		})
 		insert(menu, {
-			szOption = _L['ignore enem'],
-			bCheck = true, bChecked = data.ignoreEnEm,
+			szOption = _L['Ignore enem'],
+			bCheck = true, bChecked = data.bIgnoreEnEm,
 			fnAction = function()
-				data.ignoreEnEm = not data.ignoreEnEm
-				SaveBlockWords()
+				data.bIgnoreEnEm = not data.bIgnoreEnEm
+				D.SaveBlockWords()
 			end,
 		})
 		insert(menu, {
-			szOption = _L['ignore case'],
-			bCheck = true, bChecked = data.ignoreCase,
+			szOption = _L['Ignore case'],
+			bCheck = true, bChecked = data.bIgnoreCase,
 			fnAction = function()
-				data.ignoreCase = not data.ignoreCase
-				SaveBlockWords()
+				data.bIgnoreCase = not data.bIgnoreCase
+				D.SaveBlockWords()
 			end,
 		})
 		insert(menu, {
-			szOption = _L['ignore acquaintance'],
-			bCheck = true, bChecked = data.ignoreAcquaintance,
+			szOption = _L['Ignore acquaintance'],
+			bCheck = true, bChecked = data.bIgnoreAcquaintance,
 			fnAction = function()
-				data.ignoreAcquaintance = not data.ignoreAcquaintance
-				SaveBlockWords()
+				data.bIgnoreAcquaintance = not data.bIgnoreAcquaintance
+				D.SaveBlockWords()
 			end,
 		})
 		insert(menu, CONSTANT.MENU_DIVIDER)
 		insert(menu, {
-			szOption = _L['delete'],
+			szOption = _L['Delete'],
 			fnAction = function()
 				list:ListBox('delete', 'id', id)
-				LoadBlockWords()
-				for i = #MY_ChatBlock.tBlockWords, 1, -1 do
-					if MY_ChatBlock.tBlockWords[i].keyword == id then
-						remove(MY_ChatBlock.tBlockWords, i)
+				D.LoadBlockWords()
+				for i = #O.aBlockWords, 1, -1 do
+					if O.aBlockWords[i].szKeyword == id then
+						remove(O.aBlockWords, i)
 					end
 				end
-				SaveBlockWords()
+				D.SaveBlockWords()
 				UI.ClosePopupMenu()
 			end,
 		})
+		menu.szOption = _L['Channels']
 		return menu
 	end):ListBox('onlclick', function(hItem, text, id, data, selected)
 		edit:Text(id)
@@ -409,47 +340,44 @@ function PS.OnPanelActive(wnd)
 	-- add
 	ui:Append('WndButton', {
 		x = w - 160, y=  0, w = 80,
-		text = _L['add'],
+		text = _L['Add'],
 		onclick = function()
-			local szText = edit:Text()
-			-- 去掉前后空格
-			szText = (gsub(szText, '^%s*(.-)%s*$', '%1'))
-			-- 验证是否为空
-			if szText == '' then
+			local szText = LIB.TrimString(edit:Text())
+			if IsEmpty(szText) then
 				return
 			end
-			LoadBlockWords()
+			D.LoadBlockWords()
 			-- 验证是否重复
-			for i, bw in ipairs(MY_ChatBlock.tBlockWords) do
-				if bw.keyword == szText then
+			for i, bw in ipairs(O.aBlockWords) do
+				if bw.szKeyword == szText then
 					return
 				end
 			end
 			-- 加入表
 			local bw = Clone(DEFAULT_KW_CONFIG)
-			bw.keyword = szText
-			insert(MY_ChatBlock.tBlockWords, 1, bw)
-			SaveBlockWords()
+			bw.szKeyword = szText
+			insert(O.aBlockWords, 1, bw)
+			D.SaveBlockWords()
 			-- 更新UI
-			list:ListBox('insert', ChatBlock2Text(bw.keyword, bw.channel), bw.keyword, bw, 1)
+			list:ListBox('insert', bw.szKeyword, bw.szKeyword, bw, 1)
 		end,
 	})
 	-- del
 	ui:Append('WndButton', {
 		x = w - 80, y =  0, w = 80,
-		text = _L['delete'],
+		text = _L['Delete'],
 		onclick = function()
 			for _, v in ipairs(list:ListBox('select', 'selected')) do
 				list:ListBox('delete', 'id', v.id)
-				LoadBlockWords()
-				for i = #MY_ChatBlock.tBlockWords, 1, -1 do
-					if MY_ChatBlock.tBlockWords[i].keyword == v.id then
-						remove(MY_ChatBlock.tBlockWords, i)
+				D.LoadBlockWords()
+				for i = #O.aBlockWords, 1, -1 do
+					if O.aBlockWords[i].szKeyword == v.id then
+						remove(O.aBlockWords, i)
 					end
 				end
-				SaveBlockWords()
+				D.SaveBlockWords()
 			end
 		end,
 	})
 end
-LIB.RegisterPanel( 'MY_ChatBlock', _L['chat filter'], _L['Chat'], 'UI/Image/Common/Money.UITex|243', PS)
+LIB.RegisterPanel('MY_ChatBlock', _L['MY_ChatBlock'], _L['Chat'], 'UI/Image/Common/Money.UITex|243', PS)
