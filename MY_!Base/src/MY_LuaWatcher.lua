@@ -27,8 +27,8 @@ local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.rando
 local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
 local mod, modf, pow, sqrt = math.mod or math.fmod, math.modf, math.pow, math.sqrt
 local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
-local pack, unpack = table.pack or function(...) return {...} end, table.unpack or unpack
+local insert, remove, concat, unpack = table.insert, table.remove, table.concat, table.unpack or unpack
+local pack, sort, getn = table.pack or function(...) return {...} end, table.sort, table.getn
 -- jx3 apis caching
 local wsub, wlen, wfind, wgsub = wstring.sub, wstring.len, StringFindW, StringReplaceW
 local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
