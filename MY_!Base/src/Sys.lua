@@ -199,7 +199,7 @@ function LIB.SetHotKey(szCommand, nIndex, nKey, bShift, bCtrl, bAlt)
 		local wAll, hAll = hK:GetAllItemSize()
 		local w, h = hK:GetSize()
 		local scroll = frame:Lookup('Scroll_Key')
-		local nCountStep = math.ceil((hAll - h) / 10)
+		local nCountStep = ceil((hAll - h) / 10)
 		scroll:SetStepCount(nCountStep)
 		scroll:SetScrollPos(0)
 		if nCountStep > 0 then
@@ -215,7 +215,7 @@ function LIB.SetHotKey(szCommand, nIndex, nKey, bShift, bCtrl, bAlt)
 		local scroll = frame:Lookup('Scroll_List')
 		if scroll:GetStepCount() > 0 then
 			local _, nH = hI:GetSize()
-			local nStep = math.ceil((nI * nH) / 10)
+			local nStep = ceil((nI * nH) / 10)
 			if nStep > scroll:GetStepCount() then
 				nStep = scroll:GetStepCount()
 			end
@@ -1169,14 +1169,14 @@ function LIB.SetStorage(szKey, ...)
 			return
 		end
 		local oVal = ...
-		local nPos = math.floor(nBitPos / BIT_NUMBER)
+		local nPos = floor(nBitPos / BIT_NUMBER)
 		local nOffset = BIT_NUMBER - nBitPos % BIT_NUMBER - 1
 		local nByte = GetAddonCustomData('MY', nPos, 1)
-		local nBit = math.floor(nByte / math.pow(2, nOffset)) % 2
+		local nBit = floor(nByte / pow(2, nOffset)) % 2
 		if (nBit == 1) == (not not oVal) then
 			return
 		end
-		nByte = nByte + (nBit == 1 and -1 or 1) * math.pow(2, nOffset)
+		nByte = nByte + (nBit == 1 and -1 or 1) * pow(2, nOffset)
 		SetAddonCustomData('MY', nPos, 1, nByte)
 	elseif szPriKey == 'FrameAnchor' then
 		local anchor = ...
@@ -1226,10 +1226,10 @@ function LIB.GetStorage(szKey)
 		if not nBitPos then
 			return
 		end
-		local nPos = math.floor(nBitPos / BIT_NUMBER)
+		local nPos = floor(nBitPos / BIT_NUMBER)
 		local nOffset = BIT_NUMBER - nBitPos % BIT_NUMBER - 1
 		local nByte = GetAddonCustomData('MY', nPos, 1)
-		local nBit = math.floor(nByte / math.pow(2, nOffset)) % 2
+		local nBit = floor(nByte / pow(2, nOffset)) % 2
 		return nBit == 1
 	elseif szPriKey == 'FrameAnchor' then
 		return GetOnlineFrameAnchor(szSubKey)

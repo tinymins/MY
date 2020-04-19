@@ -154,7 +154,7 @@ MY_InfoTip.Cache = {
         formatString = '', title = _L['lotus clock'], prefix = _L['Lotus Clock: '], content = _L['%d:%d:%d'],
         GetContent = function()
             local nTotal = 6*60*60 - GetLogicFrameCount()/16%(6*60*60)
-            return format(MY_InfoTip.Cache.LotusTime.formatString, math.floor(nTotal/(60*60)), math.floor(nTotal/60%60), math.floor(nTotal%60))
+            return format(MY_InfoTip.Cache.LotusTime.formatString, floor(nTotal/(60*60)), floor(nTotal/60%60), floor(nTotal%60))
         end
     },
     GPS = { -- ½ÇÉ«×ø±ê
@@ -184,7 +184,7 @@ MY_InfoTip.Cache = {
             end
             local sm = _C.tSm[GLOBAL.GAME_FPS]
             if sm and me then
-                s = math.sqrt(math.pow(me.nX - sm.x, 2) + math.pow(me.nY - sm.y, 2) + math.pow((me.nZ - sm.z) / 8, 2)) / 64
+                s = sqrt(pow(me.nX - sm.x, 2) + pow(me.nY - sm.y, 2) + pow((me.nZ - sm.z) / 8, 2)) / 64
                     / (GetLogicFrameCount() - sm.framecount) * GLOBAL.GAME_FPS
             end
             return format(MY_InfoTip.Cache.Speedometer.formatString, s)

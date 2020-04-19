@@ -354,7 +354,7 @@ function MY_GKP_UI.OnFrameCreate()
 				LIB.Talk(PLAYER_TALK_CHANNEL.RAID, _L('Reall Salary: %d Gold.',a + b, a, b))
 				if a + b >= 0 then
 					LIB.Talk(PLAYER_TALK_CHANNEL.RAID, _L('Amount of People with Settle Account: %d',num))
-					LIB.Talk(PLAYER_TALK_CHANNEL.RAID, _L('Actual per person: %d Gold.',math.floor((a + b) / num)))
+					LIB.Talk(PLAYER_TALK_CHANNEL.RAID, _L('Actual per person: %d Gold.',floor((a + b) / num)))
 				else
 					LIB.Talk(PLAYER_TALK_CHANNEL.RAID, _L['The Account is Negative, no money is coming out!'])
 				end

@@ -407,7 +407,7 @@ function D.SetFrameSize(bEnter)
 			nGroupEx = 1
 		end
 		local container = frame:Lookup('Container_Main')
-		local fScaleX = math.max(nGroupEx == 1 and 1 or 0, CFG.fScaleX)
+		local fScaleX = max(nGroupEx == 1 and 1 or 0, CFG.fScaleX)
 		local minW = container:GetRelX() + container:GetW()
 		local w = max(128 * nGroupEx * fScaleX, minW + 30)
 		local h = select(2, frame:GetSize())

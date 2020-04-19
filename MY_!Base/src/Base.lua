@@ -97,28 +97,29 @@
 -- : ............ ... ,,,.,..         .:;i:rir7rr;rii::..          k@BF :O@J. . ........................................................................  --
 -- ###################################################################################################################################################### --
 
----------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
----------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------
 local setmetatable = setmetatable
-local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
-local sub, len, format, rep = string.sub, string.len, string.format, string.rep
-local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
+local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
+local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
+local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
+local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
 local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random = math.huge, math.pi, math.random
+local HUGE, PI, random, abs = math.huge, math.pi, math.random, math.abs
 local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
-local pow, sqrt, sin, cos, tan = math.pow, math.sqrt, math.sin, math.cos, math.tan
+local pow, sqrt, sin, cos, tan, atan = math.pow, math.sqrt, math.sin, math.cos, math.tan, math.atan
 local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
 local pack, unpack = table.pack or function(...) return {...} end, table.unpack or unpack
 -- jx3 apis caching
-local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
-local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
-local GetClientPlayer, GetPlayer, GetNpc = GetClientPlayer, GetPlayer, GetNpc
+local wsub, wlen, wfind, wgsub = wstring.sub, wstring.len, StringFindW, StringReplaceW
+local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
----------------------------------------------------------------------------------------------
+local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+-------------------------------------------------------------------------------------------------------
 -- 本地函数变量
----------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------
 local function IsStreaming()
 	return SM_IsEnable and SM_IsEnable()
 end
@@ -1245,7 +1246,7 @@ _G[_NAME_SPACE_] = LIB
 function LIB.GetVersion(dwVersion)
 	local dwVersion = dwVersion or _VERSION_
 	local szVersion = format('%X.%X.%02X', dwVersion / 0x1000000,
-		math.floor(dwVersion / 0x10000) % 0x100, math.floor(dwVersion / 0x100) % 0x100)
+		floor(dwVersion / 0x10000) % 0x100, floor(dwVersion / 0x100) % 0x100)
 	if  dwVersion % 0x100 ~= 0 then
 		szVersion = szVersion .. 'b' .. tostring(dwVersion % 0x100)
 	end

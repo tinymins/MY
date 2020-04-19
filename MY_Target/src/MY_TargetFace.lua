@@ -87,16 +87,16 @@ end
 do
 local function DrawShape(tar, sha, nDegree, nRadius, nAlpha, col)
 	nRadius = nRadius * 64
-	local nFace = math.ceil(128 * nDegree / 360)
-	local dwRad1 = math.pi * (tar.nFaceDirection - nFace) / 128
+	local nFace = ceil(128 * nDegree / 360)
+	local dwRad1 = PI * (tar.nFaceDirection - nFace) / 128
 	if tar.nFaceDirection > (256 - nFace) then
-		dwRad1 = dwRad1 - math.pi - math.pi
+		dwRad1 = dwRad1 - PI - PI
 	end
-	local dwRad2 = dwRad1 + (nDegree / 180 * math.pi)
+	local dwRad2 = dwRad1 + (nDegree / 180 * PI)
 	local nAlpha2 = 0
 	if nDegree == 360 then
 		nAlpha, nAlpha2 = nAlpha2, nAlpha
-		dwRad2 = dwRad2 + math.pi / 16
+		dwRad2 = dwRad2 + PI / 16
 	end
 	-- orgina point
 	sha:SetTriangleFan(GEOMETRY_TYPE.TRIANGLE)
@@ -107,9 +107,9 @@ local function DrawShape(tar, sha, nDegree, nRadius, nAlpha, col)
 	-- relative points
 	local sX, sZ = Scene_PlaneGameWorldPosToScene(tar.nX, tar.nY)
 	repeat
-		local sX_, sZ_ = Scene_PlaneGameWorldPosToScene(tar.nX + math.cos(dwRad1) * nRadius, tar.nY + math.sin(dwRad1) * nRadius)
+		local sX_, sZ_ = Scene_PlaneGameWorldPosToScene(tar.nX + cos(dwRad1) * nRadius, tar.nY + sin(dwRad1) * nRadius)
 		sha:AppendCharacterID(tar.dwID, false, col[1], col[2], col[3], nAlpha2, { sX_ - sX, 0, sZ_ - sZ })
-		dwRad1 = dwRad1 + math.pi / 16
+		dwRad1 = dwRad1 + PI / 16
 	until dwRad1 >= dwRad2
 end
 

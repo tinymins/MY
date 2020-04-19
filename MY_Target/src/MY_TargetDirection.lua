@@ -168,9 +168,9 @@ function D.OnFrameBreathe()
 		-- 头像
 		SetObjectAvatar(this:Lookup('', 'Handle_Main/Image_Force'), tar, info, bInfo)
 		-- 方位
-		local dwRad1 = math.atan2(tar.nY - me.nY, tar.nX - me.nX)
-		local dwRad2 = me.nFaceDirection / 128 * math.pi
-		this:Lookup('', 'Handle_Main/Image_Arrow'):SetRotate(1.5 * math.pi + dwRad2 - dwRad1)
+		local dwRad1 = atan2(tar.nY - me.nY, tar.nX - me.nX)
+		local dwRad2 = me.nFaceDirection / 128 * PI
+		this:Lookup('', 'Handle_Main/Image_Arrow'):SetRotate(1.5 * PI + dwRad2 - dwRad1)
 		-- 颜色
 		local nFrame = 4
 		if me.IsInParty() and LIB.IsParty(tar.dwID) then

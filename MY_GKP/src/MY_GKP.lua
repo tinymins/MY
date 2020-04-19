@@ -168,10 +168,10 @@ function D.GetMoneyTipText(nGold)
 	local r, g, b = D.GetMoneyCol(nGold)
 	if MY_GKP.bShowGoldBrick then
 		if nGold >= 0 then
-			return GetFormatText(math.floor(nGold / 10000), 41, r, g, b) .. GetFormatImage(szUitex, 27) .. GetFormatText(math.floor(nGold % 10000), 41, r, g, b) .. GetFormatImage(szUitex, 0)
+			return GetFormatText(floor(nGold / 10000), 41, r, g, b) .. GetFormatImage(szUitex, 27) .. GetFormatText(floor(nGold % 10000), 41, r, g, b) .. GetFormatImage(szUitex, 0)
 		else
 			nGold = nGold * -1
-			return GetFormatText('-' .. math.floor(nGold / 10000), 41, r, g, b) .. GetFormatImage(szUitex, 27) .. GetFormatText(math.floor(nGold % 10000), 41, r, g, b) .. GetFormatImage(szUitex, 0)
+			return GetFormatText('-' .. floor(nGold / 10000), 41, r, g, b) .. GetFormatImage(szUitex, 27) .. GetFormatText(floor(nGold % 10000), 41, r, g, b) .. GetFormatImage(szUitex, 0)
 		end
 	else
 		return GetFormatText(nGold, 41, r, g, b) .. GetFormatImage(szUitex, 0)
@@ -201,7 +201,7 @@ function D.Bidding(nMoney)
 	local fx, fy = Station.GetClientSize()
 	local w2, h2 = LeaderAddMoney:GetSize()
 	LeaderAddMoney:SetAbsPos((fx - w2) / 2, (fy - h2) / 2)
-	LeaderAddMoney:Lookup('Edit_PriceB'):SetText(math.floor(nGold / 10000))
+	LeaderAddMoney:Lookup('Edit_PriceB'):SetText(floor(nGold / 10000))
 	LeaderAddMoney:Lookup('Edit_Price'):SetText(nGold % 10000)
 	LeaderAddMoney:Lookup('Edit_Reason'):SetText(_L['Auto append'])
 	LeaderAddMoney:Lookup('Btn_Ok').OnLButtonUp = function()

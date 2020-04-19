@@ -79,7 +79,7 @@ local function LoadUI(ui)
 	ui:Children('#WndTrackbar_TitleEffectOffsetY'):Value(Config.nTitleEffectOffsetY)
 	ui:Children('#WndTrackbar_LifePerOffsetX'):Value(Config.nLifePerOffsetX)
 	ui:Children('#WndTrackbar_LifePerOffsetY'):Value(Config.nLifePerOffsetY)
-	ui:Children('#WndTrackbar_Distance'):Value(math.sqrt(Config.nDistance) / 64)
+	ui:Children('#WndTrackbar_Distance'):Value(sqrt(Config.nDistance) / 64)
 	ui:Children('#WndTrackbar_VerticalDistance'):Value(Config.nVerticalDistance / 8 / 64)
 	ui:Children('#WndTrackbar_Alpha'):Value(Config.nAlpha)
 	ui:Children('#WndCheckBox_IgnoreUIScale'):Check(not Config.bSystemUIScale)
@@ -346,7 +346,7 @@ function PS.OnPanelActive(wnd)
 		name = 'WndTrackbar_Distance',
 		x = x, y = y, trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 0, 300 },
 		text = function(value) return value == 0 and _L['Max Distance: Unlimited.'] or _L('Max Distance: %s foot.', value) end,
-		value = math.sqrt(Config.nDistance) / 64,
+		value = sqrt(Config.nDistance) / 64,
 		onchange = function(value)
 			Config.nDistance = value * value * 64 * 64
 		end,

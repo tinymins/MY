@@ -2004,12 +2004,12 @@ function LIB.GetFightTime(szFormat)
 	end
 
 	if szFormat then
-		local nSeconds = math.floor(nTick / 1000)
-		local nMinutes = math.floor(nSeconds / 60)
-		local nHours   = math.floor(nMinutes / 60)
+		local nSeconds = floor(nTick / 1000)
+		local nMinutes = floor(nSeconds / 60)
+		local nHours   = floor(nMinutes / 60)
 		local nMinute  = nMinutes % 60
 		local nSecond  = nSeconds % 60
-		szFormat = szFormat:gsub('f', math.floor(nTick / 1000 * GLOBAL.GAME_FPS))
+		szFormat = szFormat:gsub('f', floor(nTick / 1000 * GLOBAL.GAME_FPS))
 		szFormat = szFormat:gsub('H', nHours)
 		szFormat = szFormat:gsub('M', nMinutes)
 		szFormat = szFormat:gsub('S', nSeconds)
@@ -2266,11 +2266,11 @@ function LIB.GetFaceAngel(nX, nY, nFace, nTX, nTY, bAbs)
 	end
 	if type(nX) == 'number' and type(nY) == 'number' and type(nFace) == 'number'
 	and type(nTX) == 'number' and type(nTY) == 'number' then
-		local nFace = (nFace * 2 * math.pi / 255) - math.pi
-		local nSight = (nX == nTX and ((nY > nTY and math.pi / 2) or - math.pi / 2)) or math.atan((nTY - nY) / (nTX - nX))
-		local nAngel = ((nSight - nFace) % (math.pi * 2) - math.pi) / math.pi * 180
+		local nFace = (nFace * 2 * PI / 255) - PI
+		local nSight = (nX == nTX and ((nY > nTY and PI / 2) or - PI / 2)) or atan((nTY - nY) / (nTX - nX))
+		local nAngel = ((nSight - nFace) % (PI * 2) - PI) / PI * 180
 		if bAbs then
-			nAngel = math.abs(nAngel)
+			nAngel = abs(nAngel)
 		end
 		return nAngel
 	end

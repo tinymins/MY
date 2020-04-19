@@ -235,11 +235,11 @@ function D.UpdateMingJiao(frame)
 	hImageMoonEnergy:SetPercentage(moonPer)
 
 	hMingJiao:Lookup('Text_Sun'):Show(me.nSunPowerValue == 0 and me.nCurrentSunEnergy ~= me.nMaxSunEnergy and me.nCurrentSunEnergy ~= 0)
-	local nInteger = math.modf(sunPer * 100)
+	local nInteger = modf(sunPer * 100)
 	if nInteger > 100 then nInteger = 100 end
 	hMingJiao:Lookup('Text_Sun'):SetText(tostring(nInteger))
 	hMingJiao:Lookup('Text_Moon'):Show(me.nMoonPowerValue == 0 and me.nCurrentMoonEnergy ~= me.nMaxMoonEnergy and me.nCurrentMoonEnergy ~= 0)
-	nInteger = math.modf(moonPer * 100)
+	nInteger = modf(moonPer * 100)
 	if nInteger > 100 then nInteger = 100 end
 	hMingJiao:Lookup('Text_Moon'):SetText(tostring(nInteger))
 

@@ -249,7 +249,7 @@ function D.UpdateItem(hItem, p)
 	-- 自身面向
 	if player then
 		hItem:Lookup('Handle_L/Handle_Compass/Image_Player'):Show()
-		hItem:Lookup('Handle_L/Handle_Compass/Image_Player'):SetRotate( - player.nFaceDirection / 128 * math.pi)
+		hItem:Lookup('Handle_L/Handle_Compass/Image_Player'):SetRotate( - player.nFaceDirection / 128 * PI)
 	end
 	-- 左侧主要部分
 	if MY_Focus.bDisplayKungfuIcon and dwType == TARGET.PLAYER then
@@ -284,21 +284,21 @@ function D.UpdateItem(hItem, p)
 			-- 特判角度
 			if player.nX == KObject.nX then
 				if player.nY > KObject.nY then
-					nRotate = math.pi / 2
+					nRotate = PI / 2
 				else
-					nRotate = - math.pi / 2
+					nRotate = - PI / 2
 				end
 			else
-				nRotate = math.atan((player.nY - KObject.nY) / (player.nX - KObject.nX))
+				nRotate = atan((player.nY - KObject.nY) / (player.nX - KObject.nX))
 			end
 			if nRotate < 0 then
-				nRotate = nRotate + math.pi
+				nRotate = nRotate + PI
 			end
 			if KObject.nY < player.nY then
-				nRotate = math.pi + nRotate
+				nRotate = PI + nRotate
 			end
 			local nRadius = 13.5
-			h:SetRelPos((nRadius + nRadius * math.cos(nRotate) + 2) * MY_Focus.fScaleY, (nRadius - 3 - 13.5 * math.sin(nRotate)) * MY_Focus.fScaleY)
+			h:SetRelPos((nRadius + nRadius * cos(nRotate) + 2) * MY_Focus.fScaleY, (nRadius - 3 - 13.5 * sin(nRotate)) * MY_Focus.fScaleY)
 			h:GetParent():FormatAllItemPos()
 		end
 	end

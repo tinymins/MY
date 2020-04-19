@@ -74,7 +74,7 @@ local function GetRealIndex(nIndex, nIndexBase, nCount)
 end
 
 local function UpdateUI(frame, during)
-	local percentage = math.min(math.max(during / ANI_TIME, 0), 1)
+	local percentage = min(max(during / ANI_TIME, 0), 1)
 	local hList = frame:Lookup('', 'Handle_Boxes')
 	local nCount = hList:GetItemCount()
 

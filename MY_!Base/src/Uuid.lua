@@ -57,8 +57,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 local M = {}
 -----
-math.randomseed(GetCurrentTime())
-math.random()
+randomseed(GetCurrentTime())
+random()
 -----
 local function num2bs(num)
 	local _mod = math.fmod or math.mod

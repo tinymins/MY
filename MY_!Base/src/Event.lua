@@ -321,7 +321,7 @@ LIB.RegisterEvent('BUFF_UPDATE', function()
 		return
 	end
 	if arg0 == UI_GetClientPlayerID() and arg4 == 103 then
-		DelayCall(PACKET_INFO.NAME_SPACE .. '#ON_IDLE', math.random(0, 10000), function()
+		DelayCall(PACKET_INFO.NAME_SPACE .. '#ON_IDLE', random(0, 10000), function()
 			local me = GetClientPlayer()
 			if me and me.GetBuff(103, 0) then
 				OnIdle()

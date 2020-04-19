@@ -61,7 +61,7 @@ local xmlDecode = function(xml)
 		if count > 100 then
 			local t, i = {}, 1
 			while i <= count do
-				insert(t, char(unpack(bytes, i, math.min(i + 99, count))))
+				insert(t, char(unpack(bytes, i, min(i + 99, count))))
 				i = i + 100
 			end
 			return concat(t)
@@ -250,7 +250,7 @@ local bytes2string = function(bytes)
 	if count > 100 then
 		local t, i = {}, 1
 		while i <= count do
-			insert(t, char(unpack(bytes, i, math.min(i + 99, count))))
+			insert(t, char(unpack(bytes, i, min(i + 99, count))))
 			i = i + 100
 		end
 		return concat(t)

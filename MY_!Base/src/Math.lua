@@ -49,9 +49,9 @@ function LIB.Number2Bitmap(n)
 		insert(t, 0)
 	else
 		while n > 0 do
-			local nValue = math.fmod(n, 2)
+			local nValue = fmod(n, 2)
 			insert(t, nValue)
-			n = math.floor(n / 2)
+			n = floor(n / 2)
 		end
 	end
 	return setmetatable(t, metatable)
@@ -95,7 +95,7 @@ function LIB.NumberBitAnd(n1, n2)
 	local t1 = LIB.Number2Bitmap(n1)
 	local t2 = LIB.Number2Bitmap(n2)
 	local t3 = {}
-	for i = 1, math.max(#t1, #t2) do
+	for i = 1, max(#t1, #t2) do
 		t3[i] = t1[i] == 1 and t2[i] == 1 and 1 or 0
 	end
 	return LIB.Bitmap2Number(t3)
@@ -107,7 +107,7 @@ function LIB.NumberBitOr(n1, n2)
 	local t1 = LIB.Number2Bitmap(n1)
 	local t2 = LIB.Number2Bitmap(n2)
 	local t3 = {}
-	for i = 1, math.max(#t1, #t2) do
+	for i = 1, max(#t1, #t2) do
 		t3[i] = t1[i] == 0 and t2[i] == 0 and 0 or 1
 	end
 	return LIB.Bitmap2Number(t3)
@@ -119,7 +119,7 @@ function LIB.NumberBitXor(n1, n2)
 	local t1 = LIB.Number2Bitmap(n1)
 	local t2 = LIB.Number2Bitmap(n2)
 	local t3 = {}
-	for i = 1, math.max(#t1, #t2) do
+	for i = 1, max(#t1, #t2) do
 		t3[i] = t1[i] == t2[i] and 0 or 1
 	end
 	return LIB.Bitmap2Number(t3)

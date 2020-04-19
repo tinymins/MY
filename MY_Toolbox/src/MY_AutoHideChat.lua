@@ -110,7 +110,7 @@ function D.ShowChatPanel(nShowFrame, nDelayFrame, callback)
 			return
 		end
 		-- calc new alpha
-		local nAlpha = math.min(math.ceil((nFrame - nDelayFrame - nStartFrame) / nShowFrame * (255 - nStartAlpha) + nStartAlpha), 255)
+		local nAlpha = min(ceil((nFrame - nDelayFrame - nStartFrame) / nShowFrame * (255 - nStartAlpha) + nStartAlpha), 255)
 		-- alpha each panel
 		for i = 1, 10 do
 			local hFrame = Station.Lookup('Lowest2/ChatPanel' .. i)
@@ -170,7 +170,7 @@ function D.HideChatPanel(nHideFrame, nDelayFrame, callback)
 			return
 		end
 		-- calc new alpha
-		local nAlpha = math.max(math.ceil((1 - (nFrame - nDelayFrame - nStartFrame) / nHideFrame) * nStartAlpha), 0)
+		local nAlpha = max(ceil((1 - (nFrame - nDelayFrame - nStartFrame) / nHideFrame) * nStartAlpha), 0)
 		-- if panel setting panel is opened then delay again
 		local hPanelSettingFrame = Station.Lookup('Normal/ChatSettingPanel')
 		if hPanelSettingFrame and hPanelSettingFrame:IsVisible() then

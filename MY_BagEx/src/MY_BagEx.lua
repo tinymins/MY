@@ -241,8 +241,8 @@ local function Hook()
 			placeholder = _L['Search'],
 			onchange = function(txt)
 				local nLen = txt:len()
-				nLen = math.max(nLen, 10)
-				nLen = math.min(nLen, 20)
+				nLen = max(nLen, 10)
+				nLen = min(nLen, 20)
 				UI(this):Width(nLen * 10)
 				l_szBagFilter = txt
 				DoFilterBag()
@@ -262,8 +262,8 @@ local function Hook()
 			placeholder = _L['Search'],
 			onchange = function(txt)
 				local nLen = txt:len()
-				nLen = math.max(nLen, 15)
-				nLen = math.min(nLen, 25)
+				nLen = max(nLen, 15)
+				nLen = min(nLen, 25)
 				UI(this):Width(nLen * 10)
 				l_szBankFilter = txt
 				DoFilterBank(true)
@@ -311,8 +311,8 @@ local function Hook()
 			placeholder = _L['Search'],
 			onchange = function(txt)
 				local nLen = txt:len()
-				nLen = math.max(nLen, 10)
-				nLen = math.min(nLen, 25)
+				nLen = max(nLen, 10)
+				nLen = min(nLen, 25)
 				UI(this):Width(nLen * 10)
 				l_szGuildBankFilter = txt
 				DoFilterGuildBank(true)

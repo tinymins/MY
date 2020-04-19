@@ -84,7 +84,7 @@ local function UpdateChannelDailyLimit(hRadio, bPlus)
 			end
 		end
 	end
-	UI(shaCount):DrawCircle(nil, nil, nil, info.color[1], info.color[2], info.color[3], 100, math.pi / 2, math.pi * 2 * dwPercent)
+	UI(shaCount):DrawCircle(nil, nil, nil, info.color[1], info.color[2], info.color[3], 100, PI / 2, PI * 2 * dwPercent)
 end
 
 local function OnClsCheck()
@@ -317,8 +317,8 @@ function MY_ChatSwitch.OnFrameCreate()
 				chk.OnCheckBoxUncheck = v.onuncheck
 			end
 			wnd:SetRelX(nWidth)
-			nWidth = nWidth + math.ceil(wnd:GetW())
-			nHeight = math.max(nHeight, math.ceil(wnd:GetH()))
+			nWidth = nWidth + ceil(wnd:GetW())
+			nHeight = max(nHeight, ceil(wnd:GetH()))
 			chk.txtTitle = txtTitle
 			chk.txtCooldown = txtCooldown
 			chk.shaCount = shaCount

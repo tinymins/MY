@@ -239,7 +239,7 @@ function D.IsMapEnabled()
 end
 
 function D.GetNz(nZ,nZ2)
-	return math.floor(((nZ/8 - nZ2/8) ^ 2) ^ 0.5)/64
+	return floor(((nZ/8 - nZ2/8) ^ 2) ^ 0.5)/64
 end
 
 function D.GetRelation(dwSrcID, dwTarID, KSrc, KTar)

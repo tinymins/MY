@@ -415,13 +415,13 @@ function D.UpdateUI(frame)
 		-- 数值显示
 		if MY_Recount_UI.bShowEffect then
 			if MY_Recount_UI.bShowPerSec then
-				hItem:Lookup('Text_R'):SetText(math.floor(p.nEffectValue / p.nTimeCount) .. ' ' .. szUnit)
+				hItem:Lookup('Text_R'):SetText(floor(p.nEffectValue / p.nTimeCount) .. ' ' .. szUnit)
 			else
 				hItem:Lookup('Text_R'):SetText(p.nEffectValue)
 			end
 		else
 			if MY_Recount_UI.bShowPerSec then
-				hItem:Lookup('Text_R'):SetText(math.floor(p.nValue / p.nTimeCount) .. ' ' .. szUnit)
+				hItem:Lookup('Text_R'):SetText(floor(p.nValue / p.nTimeCount) .. ' ' .. szUnit)
 			else
 				hItem:Lookup('Text_R'):SetText(p.nValue)
 			end
@@ -487,13 +487,13 @@ function D.UpdateUI(frame)
 		-- 右侧文字
 		if MY_Recount_UI.bShowEffect then
 			if MY_Recount_UI.bShowPerSec then
-				hItem:Lookup('Text_Me_R'):SetText(math.floor(tMyRec.nEffectValue / tMyRec.nTimeCount) .. ' ' .. szUnit)
+				hItem:Lookup('Text_Me_R'):SetText(floor(tMyRec.nEffectValue / tMyRec.nTimeCount) .. ' ' .. szUnit)
 			else
 				hItem:Lookup('Text_Me_R'):SetText(tMyRec.nEffectValue)
 			end
 		else
 			if MY_Recount_UI.bShowPerSec then
-				hItem:Lookup('Text_Me_R'):SetText(math.floor(tMyRec.nValue / tMyRec.nTimeCount) .. ' ' .. szUnit)
+				hItem:Lookup('Text_Me_R'):SetText(floor(tMyRec.nValue / tMyRec.nTimeCount) .. ' ' .. szUnit)
 			else
 				hItem:Lookup('Text_Me_R'):SetText(tMyRec.nValue)
 			end

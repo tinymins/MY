@@ -86,10 +86,10 @@ local DOODAD_MAX_DISTINCT_DISTANCE = 2 * 64
 -- 31 - 16 λ x
 -- 15 -  0 λ y
 local function GeneNpcInfoPosKey(mapid, x, y)
-	return mapid * L32 + math.floor(x / NPC_MAX_DISTINCT_DISTANCE) * L16 + math.floor(y / NPC_MAX_DISTINCT_DISTANCE)
+	return mapid * L32 + floor(x / NPC_MAX_DISTINCT_DISTANCE) * L16 + floor(y / NPC_MAX_DISTINCT_DISTANCE)
 end
 local function GeneDoodadInfoPosKey(mapid, x, y)
-	return mapid * L32 + math.floor(x / DOODAD_MAX_DISTINCT_DISTANCE) * L16 + math.floor(y / DOODAD_MAX_DISTINCT_DISTANCE)
+	return mapid * L32 + floor(x / DOODAD_MAX_DISTINCT_DISTANCE) * L16 + floor(y / DOODAD_MAX_DISTINCT_DISTANCE)
 end
 
 local SZ_CACHE_PATH = 'cache/NPC_DOODAD_REC/'

@@ -2259,9 +2259,9 @@ end
 
 function UI:DrawEclipse(nX, nY, nMajorAxis, nMinorAxis, nR, nG, nB, nA, dwRotate, dwPitch, dwRad, nAccuracy)
 	nR, nG, nB, nA = nR or 255, nG or 255, nB or 255, nA or 255
-	dwRotate, dwPitch, dwRad = dwRotate or 0, dwPitch or 0, dwRad or (2 * math.pi)
+	dwRotate, dwPitch, dwRad = dwRotate or 0, dwPitch or 0, dwRad or (2 * PI)
 	nAccuracy = nAccuracy or 32
-	local deltaRad = (2 * math.pi) / nAccuracy
+	local deltaRad = (2 * PI) / nAccuracy
 	local sha, nX1, nY1, nMajorAxis1, nMinorAxis1, dwRad1, dwRad2, nDis
 	for _, raw in ipairs(self.raws) do
 		sha = GetComponentElement(raw, 'SHADOW')
@@ -2278,15 +2278,15 @@ function UI:DrawEclipse(nX, nY, nMajorAxis, nMinorAxis, nR, nG, nB, nA, dwRotate
 			sha:AppendTriangleFanPoint(nX ,nY, nR, nG, nB, nA)
 			sha:Show()
 			repeat
-				nDis = nMajorAxis * nMinorAxis / math.sqrt(math.pow(nMinorAxis * math.cos(dwRad1 - dwRotate), 2) + math.pow(nMajorAxis * math.sin(dwRad1 - dwRotate), 2))
+				nDis = nMajorAxis * nMinorAxis / sqrt(pow(nMinorAxis * cos(dwRad1 - dwRotate), 2) + pow(nMajorAxis * sin(dwRad1 - dwRotate), 2))
 				sha:AppendTriangleFanPoint(
-					nX + nDis * math.cos(dwRad1),
-					nY - nDis * math.sin(dwRad1),
+					nX + nDis * cos(dwRad1),
+					nY - nDis * sin(dwRad1),
 					nR, nG, nB, nA
 				)
 				-- sha:AppendTriangleFanPoint(
-				-- 	nX + (nMajorAxis * math.cos(dwRotate) * math.cos(dwRad1 - dwRotate) - nMinorAxis * math.sin(dwRotate) * math.sin(dwRad1 - dwRotate)),
-				-- 	nY - (nMinorAxis * math.cos(dwRotate) * math.sin(dwRad1 - dwRotate) + nMajorAxis * math.sin(dwRotate) * math.cos(dwRad1 - dwRotate)),
+				-- 	nX + (nMajorAxis * cos(dwRotate) * cos(dwRad1 - dwRotate) - nMinorAxis * sin(dwRotate) * sin(dwRad1 - dwRotate)),
+				-- 	nY - (nMinorAxis * cos(dwRotate) * sin(dwRad1 - dwRotate) + nMajorAxis * sin(dwRotate) * cos(dwRad1 - dwRotate)),
 				-- 	nR, nG, nB, nA
 				-- )
 				dwRad1 = (dwRad1 < dwRad2 and dwRad1 + deltaRad > dwRad2) and dwRad2 or (dwRad1 + deltaRad)
@@ -2298,9 +2298,9 @@ end
 
 function UI:DrawCircle(nX, nY, nRadius, nR, nG, nB, nA, dwPitch, dwRad, nAccuracy)
 	nR, nG, nB, nA = nR or 255, nG or 255, nB or 255, nA or 255
-	dwPitch, dwRad = dwPitch or 0, dwRad or (2 * math.pi)
+	dwPitch, dwRad = dwPitch or 0, dwRad or (2 * PI)
 	nAccuracy = nAccuracy or 32
-	local deltaRad = (2 * math.pi) / nAccuracy
+	local deltaRad = (2 * PI) / nAccuracy
 	local sha, nX1, nY1, nRadius1, dwRad1, dwRad2
 	for _, raw in ipairs(self.raws) do
 		sha = GetComponentElement(raw, 'SHADOW')
@@ -2309,14 +2309,14 @@ function UI:DrawCircle(nX, nY, nRadius, nR, nG, nB, nA, dwPitch, dwRad, nAccurac
 			dwRad2 = dwPitch + dwRad
 			nX1 = nX or (sha:GetW() / 2)
 			nY1 = nY or (sha:GetH() / 2)
-			nRadius1 = nRadius or math.min(nX1, nY1)
+			nRadius1 = nRadius or min(nX1, nY1)
 			sha:SetTriangleFan(GEOMETRY_TYPE.TRIANGLE)
 			sha:SetD3DPT(D3DPT.TRIANGLEFAN)
 			sha:ClearTriangleFanPoint()
 			sha:AppendTriangleFanPoint(nX1, nY1, nR, nG, nB, nA)
 			sha:Show()
 			repeat
-				sha:AppendTriangleFanPoint(nX1 + math.cos(dwRad1) * nRadius1, nY1 - math.sin(dwRad1) * nRadius1, nR, nG, nB, nA)
+				sha:AppendTriangleFanPoint(nX1 + cos(dwRad1) * nRadius1, nY1 - sin(dwRad1) * nRadius1, nR, nG, nB, nA)
 				dwRad1 = (dwRad1 < dwRad2 and dwRad1 + deltaRad > dwRad2) and dwRad2 or (dwRad1 + deltaRad)
 			until dwRad1 > dwRad2
 		end
@@ -2444,21 +2444,21 @@ function UI:Shake(xrange, yrange, maxspeed, time)
 					local x, y = ui:Pos()
 					x, y = x - xoffset, y - yoffset
 
-					xoffset = xoffset + math.random(xspeed > 0 and 0 or xspeed, xspeed > 0 and xspeed or 0)
+					xoffset = xoffset + random(xspeed > 0 and 0 or xspeed, xspeed > 0 and xspeed or 0)
 					if xoffset < - xhalfrange then
-						xoffset = math.min(- xrange - xoffset, xhalfrange)
+						xoffset = min(- xrange - xoffset, xhalfrange)
 						xspeed = - xspeed
 					elseif xoffset > xhalfrange then
-						xoffset = math.max(xrange - xoffset, - xhalfrange)
+						xoffset = max(xrange - xoffset, - xhalfrange)
 						xspeed = - xspeed
 					end
 
-					yoffset = yoffset + math.random(yspeed > 0 and 0 or yspeed, yspeed > 0 and yspeed or 0)
+					yoffset = yoffset + random(yspeed > 0 and 0 or yspeed, yspeed > 0 and yspeed or 0)
 					if yoffset < - yhalfrange then
-						yoffset =  math.min(- yrange - yoffset, yhalfrange)
+						yoffset =  min(- yrange - yoffset, yhalfrange)
 						yspeed = - yspeed
 					elseif yoffset > yhalfrange then
-						yoffset = math.max(yrange - yoffset, - yhalfrange)
+						yoffset = max(yrange - yoffset, - yhalfrange)
 						yspeed = - yspeed
 					end
 
@@ -2654,7 +2654,7 @@ local function SetComponentSize(raw, nOuterWidth, nOuterHeight, nInnerWidth, nIn
 		local txt = GetComponentElement(raw, 'TEXT')
 		local img = GetComponentElement(raw, 'IMAGE')
 		local w, h = cmb:GetSize()
-		cmb:SetRelPos(nWidth-w-5, math.ceil((nHeight - h)/2))
+		cmb:SetRelPos(nWidth-w-5, ceil((nHeight - h)/2))
 		cmb:Lookup('', ''):SetAbsPos(hdl:GetAbsPos())
 		cmb:Lookup('', ''):SetSize(nWidth, nHeight)
 		wnd:SetSize(nWidth, nHeight)
@@ -4283,10 +4283,10 @@ function  UI.CreateFrame(szName, opt)
 				local W, H = Station.GetClientSize()
 				local X, Y = frm:GetRelPos()
 				local w, h = x - X, y - Y
-				w = math.min(w, W - X) -- frame size should not larger than client size
-				h = math.min(h, H - Y)
-				w = math.max(w, opt.minwidth) -- frame size must larger than setted min size
-				h = math.max(h, opt.minheight)
+				w = min(w, W - X) -- frame size should not larger than client size
+				h = min(h, H - Y)
+				w = max(w, opt.minwidth) -- frame size must larger than setted min size
+				h = max(h, opt.minheight)
 				frm:Lookup('Btn_Drag'):SetRelPos(w - 16, h - 16)
 				frm:Lookup('', 'Shadow_Bg'):SetSize(w, h)
 			end
@@ -4304,8 +4304,8 @@ function  UI.CreateFrame(szName, opt)
 				frm:Lookup('WndContainer_TitleBtnL'):Show()
 				frm:Lookup('WndContainer_TitleBtnR'):Show()
 				local w, h = this:GetRelPos()
-				w = math.max(w + 16, opt.minwidth)
-				h = math.max(h + 16, opt.minheight)
+				w = max(w + 16, opt.minwidth)
+				h = max(h + 16, opt.minheight)
 				UI(frm):Size(w, h)
 				if frm.OnDragResize then
 					local res, err, trace = XpCall(frm.OnDragResize, frm:Lookup('Wnd_Total'))
@@ -4363,7 +4363,7 @@ function UI.OpenColorPicker(callback, t)
 		for nGreen = 1, 8 do
 			for nBlue = 1, 8 do
 				local x = 20 + ((nRed - 1) % 4) * 220 + (nGreen - 1) * 25
-				local y = 10 + math.modf((nRed - 1) / 4) * 220 + (nBlue - 1) * 25
+				local y = 10 + modf((nRed - 1) / 4) * 220 + (nBlue - 1) * 25
 				local r, g, b  = nRed * 32 - 1, nGreen * 32 - 1, nBlue * 32 - 1
 				ui:Append('Shadow', {
 					w = 23, h = 23, x = x, y = y, color = { r, g, b }, alpha = 200,
@@ -4682,7 +4682,7 @@ function UI.OpenIconPanel(fnAction)
 	})
 	ui:Append('WndTrackbar', {
 		x = 10, y = 580, h = 25, w = 500, textfmt = ' Page: %d',
-		range = {1, math.ceil(nMaxIcon / 144)}, value = ICON_PAGE or 21,
+		range = {1, ceil(nMaxIcon / 144)}, value = ICON_PAGE or 21,
 		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		onchange = function(nVal)
 			LIB.DelayCall(function() GetPage(nVal) end)

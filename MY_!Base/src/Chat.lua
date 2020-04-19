@@ -663,7 +663,7 @@ local function InitEmotion()
 			t[t1.dwID] = t1
 			t[t1.szCmd] = t1
 			t[t1.szImageFile..','..t1.nFrame..','..t1.szType] = t1
-			MAX_EMOTION_LEN = math.max(MAX_EMOTION_LEN, wlen(t1.szCmd))
+			MAX_EMOTION_LEN = max(MAX_EMOTION_LEN, wlen(t1.szCmd))
 		end
 		EMOTION_CACHE = t
 	end
@@ -710,7 +710,7 @@ local function ParseFaceIcon(t)
 				else
 					szLeft = szLeft .. sub(szText, 1, nPos - 1)
 					szText = sub(szText, nPos)
-					for i = math.min(MAX_EMOTION_LEN, wlen(szText)), 2, -1 do
+					for i = min(MAX_EMOTION_LEN, wlen(szText)), 2, -1 do
 						local szTest = wsub(szText, 1, i)
 						local emo = LIB.GetChatEmotion(szTest)
 						if emo then

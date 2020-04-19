@@ -129,7 +129,7 @@ end
 local function CreateWebPageFrame()
 	local szRequestID, hFrame
 	repeat
-		szRequestID = ('%X%X'):format(GetTickCount(), math.floor(math.random() * 0xEFFF) + 0x1000)
+		szRequestID = ('%X%X'):format(GetTickCount(), floor(random() * 0xEFFF) + 0x1000)
 	until not Station.Lookup('Lowest/MYRRWP_' .. szRequestID)
 	--[[#DEBUG BEGIN]]
 	LIB.Debug('CreateWebPageFrame: ' .. szRequestID, DEBUG_LEVEL.LOG)
@@ -272,7 +272,7 @@ function LIB.Ajax(settings)
 		end
 		-- create page
 		if not hFrame then
-			RequestID = ('%X_%X'):format(GetTickCount(), math.floor(math.random() * 65536))
+			RequestID = ('%X_%X'):format(GetTickCount(), floor(random() * 65536))
 			hFrame = Wnd.OpenWindow(PACKET_INFO.UICOMPONENT_ROOT .. 'WndWebCef.ini', 'MYRRWC_' .. RequestID)
 			hFrame:Hide()
 		end

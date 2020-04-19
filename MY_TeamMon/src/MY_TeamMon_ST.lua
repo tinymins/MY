@@ -213,7 +213,7 @@ local function SetSTAction(ui, nLeft, nPer)
 		end
 	else
 		if ui.nAlpha < ST_UI_ALPHA then
-			ui.nAlpha = math.min(ST_UI_ALPHA, ui.nAlpha + 15)
+			ui.nAlpha = min(ST_UI_ALPHA, ui.nAlpha + 15)
 			obj:SetInfo({ nTime = nLeft }):SetPercentage(nPer):SetAlpha(ui.nAlpha)
 		else
 			obj:SetInfo({ nTime = nLeft }):SetPercentage(nPer)
@@ -322,7 +322,7 @@ function ST:SetInfo(tTime, nIcon)
 		self.ui.txt:SetText(tTime.szName)
 	end
 	if tTime.nTime then
-		self.ui:SetUserData(math.floor(tTime.nTime))
+		self.ui:SetUserData(floor(tTime.nTime))
 		self.ui.time:SetText(FormatTimeCounter(tTime.nTime))
 	end
 	if nIcon then

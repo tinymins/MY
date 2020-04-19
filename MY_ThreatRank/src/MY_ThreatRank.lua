@@ -176,7 +176,7 @@ function TS.OnFrameBreathe()
 		local szText = hText.szText or ''
 		if buff then
 			local szName = MY_GetBuffName(buff.dwID, buff.nLevel)
-			hText:SetText(format('%s (%ds)', szName, math.floor(MY_GetEndTime(buff.nEndFrame))) .. szText)
+			hText:SetText(format('%s (%ds)', szName, floor(MY_GetEndTime(buff.nEndFrame))) .. szText)
 			hText:SetFontColor(0, 255, 0)
 		else
 			hText:SetText(HATRED_COLLECT .. szText)
@@ -335,7 +335,7 @@ function _TS.UpdateThreatBars(tList, dwTargetID, dwApplyID)
 			tMyRank = v
 		end
 	end
-	this.bg:SetH(55 + 24 * math.min(#tThreat, TS.nMaxBarCount))
+	this.bg:SetH(55 + 24 * min(#tThreat, TS.nMaxBarCount))
 	this.handle:Clear()
 	local KGnpc = GetNpc(dwApplyID)
 	if #tThreat > 0 and KGnpc then
@@ -382,7 +382,7 @@ function _TS.UpdateThreatBars(tList, dwTargetID, dwApplyID)
 				if v.val ~= 0 then
 					fDiff = v.val / nTopRank
 					nThreatPercentage = fDiff * (100 / 120)
-					item:Lookup('Text_ThreatValue'):SetText(math.floor(100 * fDiff) .. '%')
+					item:Lookup('Text_ThreatValue'):SetText(floor(100 * fDiff) .. '%')
 				else
 					item:Lookup('Text_ThreatValue'):SetText('0%')
 				end

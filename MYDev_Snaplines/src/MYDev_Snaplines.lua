@@ -330,7 +330,7 @@ function MYDev_Snaplines.OnFrameBreathe()
 			hText:SetFontScale(1)
 			hText:AutoSize()
 			local nTextW, nTextH = hText:GetSize()
-			local fScale = math.min( nClientW / nTextW, nClientH / nTextH )
+			local fScale = min( nClientW / nTextW, nClientH / nTextH )
 			if fScale < 1 then
 				hText:SetFontScale(fScale)
 				hText:AutoSize()

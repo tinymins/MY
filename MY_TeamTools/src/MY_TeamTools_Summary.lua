@@ -555,11 +555,11 @@ function D.UpdateList(page)
 	for k, v in pairs(tScore) do
 		nScore = nScore + v
 	end
-	page.hTotalScore:SetText(math.floor(nScore))
+	page.hTotalScore:SetText(floor(nScore))
 	local nNum      = #D.GetTeamMemberList(true)
 	local nAvgScore = nScore / nNum
 	page.hProgress:Lookup('Image_Progress'):SetPercentage(nAvgScore / RT_SCORE_FULL)
-	page.hProgress:Lookup('Text_Progress'):SetText(_L('Team strength(%d/%d)', math.floor(nAvgScore), RT_SCORE_FULL))
+	page.hProgress:Lookup('Text_Progress'):SetText(_L('Team strength(%d/%d)', floor(nAvgScore), RT_SCORE_FULL))
 	-- 心法统计
 	for k, dwKungfuID in pairs(LIB.GetKungfuList()) do
 		local h = page.hKungfuList:Lookup(k - 1)

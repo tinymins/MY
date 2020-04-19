@@ -167,7 +167,7 @@ function D.OnFrameBreathe()
 					O.handle:RemoveItem(h)
 					O.handle:FormatAllItemPos()
 				else
-					h:SetAlpha(math.max(0, nAlpha - 30))
+					h:SetAlpha(max(0, nAlpha - 30))
 					h:Lookup('Animate_Update'):SetAlpha(0)
 				end
 			else
@@ -181,7 +181,7 @@ function D.OnFrameBreathe()
 					end
 					local nAlpha = h:Lookup('Animate_Update'):GetAlpha()
 					if nAlpha > 0 then
-						h:Lookup('Animate_Update'):SetAlpha(math.max(0, nAlpha - 8))
+						h:Lookup('Animate_Update'):SetAlpha(max(0, nAlpha - 8))
 					end
 					if buff.nStackNum > 1 then
 						h:Lookup('Box'):SetOverText(0, buff.nStackNum)

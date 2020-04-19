@@ -544,7 +544,7 @@ function D.GetPublishMenu()
 		for i = 0, min(hList:GetItemCount(), nLimit) - 1 do
 			local hItem = hList:Lookup(i)
 			insert(aResult, hItem.data)
-			nMaxNameLen = math.max(nMaxNameLen, wlen(hItem.data.szName))
+			nMaxNameLen = max(nMaxNameLen, wlen(hItem.data.szName))
 		end
 		if not MY_Recount_UI.bShowPerSec then
 			nTimeCount = 1

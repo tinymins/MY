@@ -77,7 +77,7 @@ local SORT_TYPE_INFO = {
 		fnCalc = function(aRecord, nIndex1, nIndex2)
 			local nRoll = 0
 			for i = nIndex1, nIndex2 do
-				nRoll = math.max(nRoll, aRecord[i].nRoll)
+				nRoll = max(nRoll, aRecord[i].nRoll)
 			end
 			return nRoll
 		end
@@ -87,7 +87,7 @@ local SORT_TYPE_INFO = {
 		fnCalc = function(aRecord, nIndex1, nIndex2)
 			local nRoll = 0
 			for i = nIndex1, nIndex2 do
-				nRoll = math.min(nRoll, aRecord[i].nRoll)
+				nRoll = min(nRoll, aRecord[i].nRoll)
 			end
 			return nRoll
 		end
@@ -109,8 +109,8 @@ local SORT_TYPE_INFO = {
 			local nCount = nIndex2 - nIndex1 + 1
 			for i = nIndex1, nIndex2 do
 				local nRoll = aRecord[i].nRoll
-				nMin = math.min(nMin, nRoll)
-				nMax = math.max(nMax, nRoll)
+				nMin = min(nMin, nRoll)
+				nMax = max(nMax, nRoll)
 				nTotal = nTotal + nRoll
 			end
 			if nCount > 2 then

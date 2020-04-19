@@ -380,7 +380,7 @@ function MY_Recount_DT.OnFrameBreathe()
 		if hSelectedItem and not this:Lookup('WndScroll_Target'):IsVisible() then
 			-- 说明是刚从未选择状态切换过来 滚动条滚动到选中项
 			local hScroll = this:Lookup('WndScroll_Skill/Scroll_Skill_List')
-			hScroll:SetScrollPos(math.ceil(hScroll:GetStepCount() * hSelectedItem:GetIndex() / hSelectedItem:GetParent():GetItemCount()))
+			hScroll:SetScrollPos(ceil(hScroll:GetStepCount() * hSelectedItem:GetIndex() / hSelectedItem:GetParent():GetItemCount()))
 		end
 
 		--------------- 三、技能释放结果列表更新 -----------------

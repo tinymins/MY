@@ -712,7 +712,7 @@ function CTM:AutoLinkAllPanel()
 			if nShownCount < CFG.nAutoLinkMode then
 				tPosnSize[nShownCount] = { nX = nX + (128 * CFG.fScaleX * nShownCount), nY = nY, nW = nW, nH = nH }
 			else
-				local nUpperIndex = math.min(nShownCount - CFG.nAutoLinkMode, CFG.nAutoLinkMode - 1)
+				local nUpperIndex = min(nShownCount - CFG.nAutoLinkMode, CFG.nAutoLinkMode - 1)
 				local tPS = tPosnSize[nUpperIndex] or {nH = 235 * CFG.fScaleY}
 				tPosnSize[nShownCount] = {
 					nX = nX + (128 * CFG.fScaleX * (nShownCount - CFG.nAutoLinkMode)),
@@ -1046,7 +1046,7 @@ function CTM:KungFuSwitch(dwID)
 				if player and img and img:IsValid() then
 					local nType, dwSkillID, dwSkillLevel, fCastPercent = player.GetSkillOTActionState()
 					if nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE then
-						local alpha = 255 * (math.abs(math.mod(fCastPercent * 300, 32) - 7) + 4) / 12
+						local alpha = 255 * (abs(mod(fCastPercent * 300, 32) - 7) + 4) / 12
 						if alpha <= 255 then
 							img:SetAlpha(alpha)
 						end
@@ -1716,7 +1716,7 @@ function CTM:RefreshDistance()
 				end
 				if CFG.bShowDistance then
 					v:Lookup('Text_Distance'):SetText(format('%.1f', nDistance))
-					v:Lookup('Text_Distance'):SetFontColor(255, math.max(0, 255 - nDistance * 8), math.max(0, 255 - nDistance * 8))
+					v:Lookup('Text_Distance'):SetFontColor(255, max(0, 255 - nDistance * 8), max(0, 255 - nDistance * 8))
 				else
 					v:Lookup('Text_Distance'):SetText('')
 				end
@@ -1879,7 +1879,7 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 			LIB.BreatheCall(key, false)
 			LIB.BreatheCall(key, function()
 				if lifeFade:IsValid() then
-					local nFadeAlpha = math.max(lifeFade:GetAlpha() - CTM_ALPHA_STEP, 0)
+					local nFadeAlpha = max(lifeFade:GetAlpha() - CTM_ALPHA_STEP, 0)
 					lifeFade:SetAlpha(nFadeAlpha)
 					if nFadeAlpha <= 0 then
 						LIB.BreatheCall(key, false)
@@ -2072,7 +2072,7 @@ function CTM:ChangeTeamVoteState(eType, dwID, status)
 			h:Lookup(opt.resolvePath):SetAlpha(240)
 			LIB.BreatheCall(key, function()
 				if h:Lookup(opt.resolvePath):IsValid() then
-					local nAlpha = math.max(h:Lookup(opt.resolvePath):GetAlpha() - 15, 0)
+					local nAlpha = max(h:Lookup(opt.resolvePath):GetAlpha() - 15, 0)
 					h:Lookup(opt.resolvePath):SetAlpha(nAlpha)
 					if nAlpha <= 0 then
 						LIB.BreatheCall(key, false)

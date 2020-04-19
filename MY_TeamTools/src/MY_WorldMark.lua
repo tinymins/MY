@@ -124,8 +124,8 @@ end
 function D.Draw(Point, sha, col)
 	local nRadius    = 64
 	local nFace      = 128
-	local dwRad1     = math.pi
-	local dwRad2     = 3 * math.pi + math.pi / 20
+	local dwRad1     = PI
+	local dwRad2     = 3 * PI + PI / 20
 	local r, g, b    = unpack(col)
 	local nX, nY, nZ = unpack(Point)
 	sha:SetTriangleFan(GEOMETRY_TYPE.TRIANGLE)
@@ -135,9 +135,9 @@ function D.Draw(Point, sha, col)
 	sha:Show()
 	local sX, sZ = Scene_PlaneGameWorldPosToScene(nX, nY)
 	repeat
-		local sX_, sZ_ = Scene_PlaneGameWorldPosToScene(nX + math.cos(dwRad1) * nRadius, nY + math.sin(dwRad1) * nRadius)
+		local sX_, sZ_ = Scene_PlaneGameWorldPosToScene(nX + cos(dwRad1) * nRadius, nY + sin(dwRad1) * nRadius)
 		sha:AppendTriangleFan3DPoint(nX ,nY, nZ, r, g, b, 80, { sX_ - sX, 0, sZ_ - sZ })
-		dwRad1 = dwRad1 + math.pi / 16
+		dwRad1 = dwRad1 + PI / 16
 	until dwRad1 > dwRad2
 end
 

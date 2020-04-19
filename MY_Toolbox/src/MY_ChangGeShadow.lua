@@ -106,7 +106,7 @@ function D.Apply()
 					szText = szText .. g_tStrings.STR_CONNECT .. KeepOneByteFloat(nDis) .. g_tStrings.STR_METER
 				end
 				if O.bShowCD then
-					szText = szText .. g_tStrings.STR_CONNECT .. math.floor(fPer * MAX_LIMIT_TIME) .. '"'
+					szText = szText .. g_tStrings.STR_CONNECT .. floor(fPer * MAX_LIMIT_TIME) .. '"'
 				end
 				sha:Show()
 				sha:ClearTriangleFanPoint()

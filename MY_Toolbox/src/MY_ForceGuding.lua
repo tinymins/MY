@@ -214,7 +214,7 @@ function D.OnEnableChange(_, bEnable)
 					local tar = GetDoodad(k)
 					if tar then
 						--  show name
-						local szText = _L['-'] .. math.floor(nLeft / 1000)
+						local szText = _L['-'] .. floor(nLeft / 1000)
 						local player = GetPlayer(v.dwCaster)
 						if player then
 							szText = player.szName .. szText

@@ -794,9 +794,9 @@ function D.OnScrollBarPosChanged()
 	local dir = szName:match('WndScroll_' .. MY_TMUI_SELECT_TYPE .. '_(.*)')
 	if dir then
 		local handle = hWndScroll:Lookup('', format('Handle_%s_List_%s', MY_TMUI_SELECT_TYPE, dir))
-		local nPer = this:GetScrollPos() / math.max(1, this:GetStepCount())
-		local nCount = math.ceil(handle:GetItemCount() * nPer)
-		for i = math.max(0, nCount - MY_TMUI_ITEM_PER_PAGE), nCount + MY_TMUI_ITEM_PER_PAGE, 1 do -- 每次渲染两页
+		local nPer = this:GetScrollPos() / max(1, this:GetStepCount())
+		local nCount = ceil(handle:GetItemCount() * nPer)
+		for i = max(0, nCount - MY_TMUI_ITEM_PER_PAGE), nCount + MY_TMUI_ITEM_PER_PAGE, 1 do -- 每次渲染两页
 			local h = handle:Lookup(i)
 			if h then
 				if not h.bDraw then

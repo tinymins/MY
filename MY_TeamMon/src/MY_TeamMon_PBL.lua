@@ -120,7 +120,7 @@ function D.OnFrameBreathe()
 			end
 			if p and info and buff then
 				local nDistance = LIB.GetDistance(p)
-				h:Lookup('Image_life'):SetPercentage(info.nCurrentLife / math.max(info.nMaxLife, 1))
+				h:Lookup('Image_life'):SetPercentage(info.nCurrentLife / max(info.nMaxLife, 1))
 				h:Lookup('Text_Name'):SetText(i + 1 .. ' ' .. info.szName)
 				if nDistance > DISTANCE then
 					h:Lookup('Image_life'):SetAlpha(150)
@@ -293,7 +293,7 @@ function D.OnTableInsert(dwID, dwBuffID, nLevel, nIcon)
 	h:SetUserData(nSortLFC * 1000 + dwID % 1000)
 	h:Lookup('Image_KungFu'):FromIconID(Table_GetSkillIconID(info.dwMountKungfuID) or 1435)
 	h:Lookup('Text_Name'):SetText(nCount .. ' ' .. info.szName)
-	h:Lookup('Image_life'):SetPercentage(info.nCurrentLife / math.max(info.nMaxLife, 1))
+	h:Lookup('Image_life'):SetPercentage(info.nCurrentLife / max(info.nMaxLife, 1))
 	local box = h:Lookup('Box_Icon')
 	local _, icon = LIB.GetBuffName(dwBuffID, nLevel)
 	if nIcon then
@@ -308,7 +308,7 @@ function D.OnTableInsert(dwID, dwBuffID, nLevel, nIcon)
 	box:SetOverTextFontScheme(0, 7)
 	local nSec = LIB.GetEndTime(buff.nEndFrame)
 	if nSec < 60 then
-		box:SetOverText(1, math.floor(nSec) .. '\'')
+		box:SetOverText(1, floor(nSec) .. '\'')
 	end
 	if buff.nStackNum > 1 then
 		box:SetOverText(0, buff.nStackNum)
