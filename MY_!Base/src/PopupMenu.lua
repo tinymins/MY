@@ -274,7 +274,7 @@ function D.UpdateScrollContainerWidth(scroll, nHeaderWidth, nContentWidth, nFoot
 	local nWidth, nHeight = container:GetSize()
 	scroll:Lookup('Scroll_Menu'):SetH(nHeight)
 	scroll:Lookup('Scroll_Menu'):SetRelX(bInlineContainer and (nWidth - nPaddingRight) or nWidth)
-	scroll:SetW(nWidth)
+	scroll:SetW(max(nWidth, scroll:Lookup('Scroll_Menu'):GetRelX() + scroll:Lookup('Scroll_Menu'):GetW()))
 end
 
 -- 绘制选项列表
