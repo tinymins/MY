@@ -260,21 +260,21 @@ end
 -- 加入校验和确保数据不被篡改（0-255）
 function D.EncodeString(szData)
 	local nCrc = 0
-	for i = 1, string.len(szData) do
-		nCrc = (nCrc + string.byte(szData, i)) % 255
+	for i = 1, len(szData) do
+		nCrc = (nCrc + byte(szData, i)) % 255
 	end
-	return string.format('%02x', nCrc) .. szData
+	return format('%02x', nCrc) .. szData
 end
 
 -- 剔除校验和提取原始数据
 function D.DecodeHMString(szData)
 	if not IsEmpty(szData) and IsString(szData) and len(szData) > 2 then
 		local nCrc = 0
-		for i = 3, string.len(szData) do
-			nCrc = (nCrc + string.byte(szData, i)) % 255
+		for i = 3, len(szData) do
+			nCrc = (nCrc + byte(szData, i)) % 255
 		end
-		if nCrc == tonumber(string.sub(szData, 1, 2), 16) then
-			return string.sub(szData, 3)
+		if nCrc == tonumber(sub(szData, 1, 2), 16) then
+			return sub(szData, 3)
 		end
 	end
 end

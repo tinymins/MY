@@ -320,7 +320,7 @@ function D.OnShowDeathInfo()
 				insert(xml, GetFormatText(g_tStrings.STR_UNKOWN_SKILL, 41, 255, 128, 0))
 			end
 			local t = TimeToDate(v.nCurrentTime)
-			insert(xml, GetFormatText('\t' .. string.format('%02d:%02d:%02d', t.hour, t.minute, t.second), 41))
+			insert(xml, GetFormatText('\t' .. format('%02d:%02d:%02d', t.hour, t.minute, t.second), 41))
 			if v.tResult then
 				for kk, vv in pairs(v.tResult) do
 					if vv > 0 then
@@ -350,7 +350,7 @@ function D.OnAppendEdit()
 			break
 		end
 		if h:GetName() == 'namelink' then
-			edit:InsertObj(szText, { type = 'name', text = szText, name = string.sub(szText, 2, -2) })
+			edit:InsertObj(szText, { type = 'name', text = szText, name = sub(szText, 2, -2) })
 		else
 			edit:InsertObj(szText, { type = 'text', text = szText })
 		end

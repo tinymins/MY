@@ -410,7 +410,7 @@ function PS.OnPanelActive(wnd)
 		onclick = function()
 			local szText = edit:Text()
 			-- 去掉前后空格
-			szText = (string.gsub(szText, '^%s*(.-)%s*$', '%1'))
+			szText = (gsub(szText, '^%s*(.-)%s*$', '%1'))
 			-- 验证是否为空
 			if szText == '' then
 				return

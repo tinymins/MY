@@ -88,9 +88,9 @@ local function var2str(var, indent, level)
 		elseif szType == 'number' then
 			insert(t, tostring(var))
 		elseif szType == 'string' then
-			insert(t, string.format('%q', var))
+			insert(t, format('%q', var))
 		-- elseif szType == 'function' then
-			-- local s = string.dump(var)
+			-- local s = dump(var)
 			-- insert(t, 'loadstring('')
 			-- -- 'string slice too long'
 			-- for i = 1, #s, 2000 do

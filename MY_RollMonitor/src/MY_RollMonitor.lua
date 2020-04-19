@@ -271,7 +271,7 @@ function MY_RollMonitor.Echo(nSortType, nLimit, nChannel, bShowUnroll)
 	local tNames = {}
 	for i, aRecord in ipairs(MY_RollMonitor.GetResult(nSortType)) do
 		if nLimit <= 0 or i <= nLimit then
-			LIB.Talk(nChannel, _L('[%s] rolls for %d times, valid score is %s.', aRecord.szName, aRecord.nCount, string.gsub(aRecord.nRoll, '(%d+%.%d%d)%d+','%1')) .. '\n')
+			LIB.Talk(nChannel, _L('[%s] rolls for %d times, valid score is %s.', aRecord.szName, aRecord.nCount, gsub(aRecord.nRoll, '(%d+%.%d%d)%d+','%1')) .. '\n')
 		end
 		tNames[aRecord.szName] = true
 	end
@@ -305,7 +305,7 @@ function MY_RollMonitor.DrawBoard(ui)
 			szHTML = szHTML ..
 				LIB.GetCopyLinkText() ..
 				GetFormatText('['..aRecord.szName..']', nil, nil, nil, nil, 515, nil, 'namelink_0') ..
-				GetFormatText(_L( ' rolls for %d times, valid score is %s.', aRecord.nCount, (string.gsub(aRecord.nRoll,'(%d+%.%d%d)%d+','%1')) ) .. '\n')
+				GetFormatText(_L( ' rolls for %d times, valid score is %s.', aRecord.nCount, (gsub(aRecord.nRoll,'(%d+%.%d%d)%d+','%1')) ) .. '\n')
 			for _, nTime in ipairs(aRecord.aTime) do
 				table.insert(m_aRecTime, nTime)
 			end
@@ -346,7 +346,7 @@ end
 -- 系统频道监控处理函数
 local function OnMsgArrive(szMsg, nFont, bRich, r, g, b)
 	local isRoll = false
-	for szName, nRoll in string.gmatch(szMsg, _L['ROLL_MONITOR_EXP'] ) do
+	for szName, nRoll in gmatch(szMsg, _L['ROLL_MONITOR_EXP'] ) do
 		-- 格式化数值
 		nRoll = tonumber(nRoll)
 		if not nRoll then

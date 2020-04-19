@@ -131,7 +131,7 @@ function D.DecodeDialogInfo(aInfo, dwTarType, dwTarID)
 		or v.name == 'W' then  -- 需要确认的选项
 			local szImage, nImageFrame
 			if v.name == 'T' then
-				for iconid in string.gmatch(v.context, '%$ (%d+)') do
+				for iconid in gmatch(v.context, '%$ (%d+)') do
 					szImage = 'fromiconid'
 					nImageFrame = iconid
 				end
@@ -139,7 +139,7 @@ function D.DecodeDialogInfo(aInfo, dwTarType, dwTarID)
 			insert(dialog.aOptions, { dwID = tonumber(v.attribute.id) or 0, szContext = v.context })
 		elseif v.name == 'T' then -- 图片
 			local szImage, nImageFrame
-			for iconid in string.gmatch(v.context, '%$ (%d+)') do
+			for iconid in gmatch(v.context, '%$ (%d+)') do
 				szImage = 'fromiconid'
 				nImageFrame = iconid
 			end

@@ -544,7 +544,7 @@ function D.GetPublishMenu()
 		for i = 0, min(hList:GetItemCount(), nLimit) - 1 do
 			local hItem = hList:Lookup(i)
 			insert(aResult, hItem.data)
-			nMaxNameLen = math.max(nMaxNameLen, wstring.len(hItem.data.szName))
+			nMaxNameLen = math.max(nMaxNameLen, wlen(hItem.data.szName))
 		end
 		if not MY_Recount_UI.bShowPerSec then
 			nTimeCount = 1
@@ -552,8 +552,8 @@ function D.GetPublishMenu()
 		end
 		-- 发布数据
 		for i, p in ipairs(aResult) do
-			local szText = string.format('%02d', i) .. '.[' .. p.szName .. ']'
-			for i = wstring.len(p.szName), nMaxNameLen - 1 do
+			local szText = format('%02d', i) .. '.[' .. p.szName .. ']'
+			for i = wlen(p.szName), nMaxNameLen - 1 do
 				szText = szText .. g_tStrings.STR_ONE_CHINESE_SPACE
 			end
 			if MY_Recount.nPublishMode == PUBLISH_MODE.BOTH then

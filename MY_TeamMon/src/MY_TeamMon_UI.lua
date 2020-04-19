@@ -647,7 +647,7 @@ function D.OnItemRButtonClick()
 				local nTime = tInterval[#tInterval]
 				for k, v in ipairs_r(tInterval) do
 					if #cmenu == 16 then break end
-					insert(cmenu, { szOption = string.format('%.1f', (nTime - v) / 1000) .. g_tStrings.STR_TIME_SECOND })
+					insert(cmenu, { szOption = format('%.1f', (nTime - v) / 1000) .. g_tStrings.STR_TIME_SECOND })
 					nTime = v
 				end
 				remove(cmenu, 1)
@@ -793,7 +793,7 @@ function D.OnScrollBarPosChanged()
 	local szName = hWndScroll:GetName()
 	local dir = szName:match('WndScroll_' .. MY_TMUI_SELECT_TYPE .. '_(.*)')
 	if dir then
-		local handle = hWndScroll:Lookup('', string.format('Handle_%s_List_%s', MY_TMUI_SELECT_TYPE, dir))
+		local handle = hWndScroll:Lookup('', format('Handle_%s_List_%s', MY_TMUI_SELECT_TYPE, dir))
 		local nPer = this:GetScrollPos() / math.max(1, this:GetStepCount())
 		local nCount = math.ceil(handle:GetItemCount() * nPer)
 		for i = math.max(0, nCount - MY_TMUI_ITEM_PER_PAGE), nCount + MY_TMUI_ITEM_PER_PAGE, 1 do -- √ø¥Œ‰÷»æ¡Ω“≥

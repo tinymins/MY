@@ -142,7 +142,7 @@ function LIB.Table_GetSkillSchoolKungfu(dwSchoolID)
 	local tLine = g_tTable.SkillSchoolKungfu:Search(dwSchoolID)
 	if tLine then
 		local szKungfu = tLine.szKungfu
-		for s in string.gmatch(szKungfu, "%d+") do
+		for s in gmatch(szKungfu, "%d+") do
 			local dwID = tonumber(s)
 			if dwID then
 				table.insert(tKungFungList, dwID)
@@ -160,7 +160,7 @@ function LIB.Table_GetMKungfuList(dwKungfuID)
 	local tKungfu = {}
 	if tLine and tLine.szKungfu then
 		local szKungfu = tLine.szKungfu
-		for s in string.gmatch(szKungfu, "%d+") do
+		for s in gmatch(szKungfu, "%d+") do
 			local dwID = tonumber(s)
 			if dwID then
 				table.insert(tKungfu, dwID)
@@ -184,7 +184,7 @@ function LIB.Table_GetNewKungfuSkill(dwMountKungfu, dwKungfuID)
 	end
 	local tSkill = {}
 	local szSkill = tLine.szNewSkillID
-	for s in string.gmatch(szSkill, "%d+") do
+	for s in gmatch(szSkill, "%d+") do
 		local dwID = tonumber(s)
 		if dwID then
 			table.insert(tSkill, dwID)
@@ -204,7 +204,7 @@ function LIB.Table_GetKungfuSkillList(dwKungfuID)
 	local tLine = g_tTable.KungfuSkill:Search(dwKungfuID)
 	if tLine then
 		local szSkill = tLine.szSkill
-		for s in string.gmatch(szSkill, "%d+") do
+		for s in gmatch(szSkill, "%d+") do
 			local dwID = tonumber(s)
 			if dwID then
 				table.insert(tSkill, dwID)

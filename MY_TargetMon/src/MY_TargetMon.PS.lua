@@ -174,7 +174,7 @@ local function DrawDetail(ui)
 
 	local function InsertMonitor(index)
 		GetUserInput(_L['Please input name/id:'], function(szVal)
-			szVal = (string.gsub(szVal, '^%s*(.-)%s*$', '%1'))
+			szVal = (gsub(szVal, '^%s*(.-)%s*$', '%1'))
 			if szVal ~= '' then
 				local mon = D.CreateMonitor(l_config, szVal)
 				local id = tonumber(szVal)
@@ -287,7 +287,7 @@ local function DrawDetail(ui)
 				szOption = _L['Rename'],
 				fnAction = function()
 					GetUserInput(_L['Please input name/id:'], function(szVal)
-						szVal = (string.gsub(szVal, '^%s*(.-)%s*$', '%1'))
+						szVal = (gsub(szVal, '^%s*(.-)%s*$', '%1'))
 						if szVal ~= '' then
 							list:ListBox(
 								'update',
@@ -312,7 +312,7 @@ local function DrawDetail(ui)
 				szOption = _L('Long alias: %s', mon.longAlias or _L['Not set']),
 				fnAction = function()
 					GetUserInput(_L['Please input long alias:'], function(szVal)
-						szVal = (string.gsub(szVal, '^%s*(.-)%s*$', '%1'))
+						szVal = (gsub(szVal, '^%s*(.-)%s*$', '%1'))
 						if szVal == '' then
 							szVal = nil
 						end
@@ -329,7 +329,7 @@ local function DrawDetail(ui)
 				szOption = _L('Short alias: %s', mon.shortAlias or _L['Not set']),
 				fnAction = function()
 					GetUserInput(_L['Please input short alias:'], function(szVal)
-						szVal = (string.gsub(szVal, '^%s*(.-)%s*$', '%1'))
+						szVal = (gsub(szVal, '^%s*(.-)%s*$', '%1'))
 						if szVal == '' then
 							szVal = nil
 						end
@@ -607,7 +607,7 @@ local function DrawDetail(ui)
 					szOption = _L['Manual add level'],
 					fnAction = function()
 						GetUserInput(_L['Please input level:'], function(szVal)
-							local nLevel = tonumber(string.gsub(szVal, '^%s*(.-)%s*$', '%1'), 10)
+							local nLevel = tonumber(gsub(szVal, '^%s*(.-)%s*$', '%1'), 10)
 							if nLevel then
 								if info.levels[nLevel] then
 									return
@@ -646,7 +646,7 @@ local function DrawDetail(ui)
 			szOption = _L['Manual add id'],
 			fnAction = function()
 				GetUserInput(_L['Please input id:'], function(szVal)
-					local dwID = tonumber(string.gsub(szVal, '^%s*(.-)%s*$', '%1'), 10)
+					local dwID = tonumber(gsub(szVal, '^%s*(.-)%s*$', '%1'), 10)
 					if dwID then
 						if mon.ids[dwID] then
 							return

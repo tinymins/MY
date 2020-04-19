@@ -1715,7 +1715,7 @@ function CTM:RefreshDistance()
 					v.nDistanceLevel = 1
 				end
 				if CFG.bShowDistance then
-					v:Lookup('Text_Distance'):SetText(string.format('%.1f', nDistance))
+					v:Lookup('Text_Distance'):SetText(format('%.1f', nDistance))
 					v:Lookup('Text_Distance'):SetFontColor(255, math.max(0, 255 - nDistance * 8), math.max(0, 255 - nDistance * 8))
 				else
 					v:Lookup('Text_Distance'):SetText('')

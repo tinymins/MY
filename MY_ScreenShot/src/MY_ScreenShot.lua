@@ -95,7 +95,7 @@ end
 MY_ScreenShot.ShotScreen = function(nShowUI)
     -- 生成可使用的完整截图目录
     local szFolderPath = MY_ScreenShot.GetConfig('szFilePath')
-    if szFolderPath~='' and not (string.sub(szFolderPath,2,2)==':' and IsFileExist(szFolderPath)) then
+    if szFolderPath~='' and not (sub(szFolderPath,2,2)==':' and IsFileExist(szFolderPath)) then
         LIB.Sysmsg(_L('Shotscreen destination folder error: %s not exist. File has been save to default folder.', szFolderPath))
         szFolderPath = ''
     end
@@ -105,7 +105,7 @@ MY_ScreenShot.ShotScreen = function(nShowUI)
         local tDateTime = TimeToDate(GetCurrentTime())
         local i = 0
         repeat
-            szFilePath = szFolderPath .. (string.format('%04d-%02d-%02d_%02d-%02d-%02d-%03d', tDateTime.year, tDateTime.month, tDateTime.day, tDateTime.hour, tDateTime.minute, tDateTime.second, i)) ..'.' .. MY_ScreenShot.GetConfig('szFileExName')
+            szFilePath = szFolderPath .. (format('%04d-%02d-%02d_%02d-%02d-%02d-%03d', tDateTime.year, tDateTime.month, tDateTime.day, tDateTime.hour, tDateTime.minute, tDateTime.second, i)) ..'.' .. MY_ScreenShot.GetConfig('szFileExName')
             i=i+1
         until not IsFileExist(szFilePath)
     else
@@ -180,9 +180,9 @@ _MY_ScreenShot.OnPanelActive = function(wnd)
     ui:Append('WndEditBox', 'WndEditBox_SsRoot'):Pos(30,220):Size(620,100)
       :Text(MY_ScreenShot.GetConfig('szFilePath'))
       :Change(function(szValue)
-        szValue = string.gsub(szValue, '^%s*(.-)%s*$', '%1')
-        szValue = string.gsub(szValue, '\\', '/')
-        szValue = string.gsub(szValue, '^(.-)/*$', '%1')
+        szValue = gsub(szValue, '^%s*(.-)%s*$', '%1')
+        szValue = gsub(szValue, '\\', '/')
+        szValue = gsub(szValue, '^(.-)/*$', '%1')
         szValue = szValue..((#szValue>0 and '/') or '')
         MY_ScreenShot.SetConfig('szFilePath', szValue)
       end)

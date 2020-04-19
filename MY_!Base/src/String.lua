@@ -95,10 +95,6 @@ function LIB.TrimString(szText)
 	return (gsub(szText, '^%s*(.-)%s*$', '%1'))
 end
 
-function LIB.StringLenW(str)
-	return wlen(str)
-end
-
 function LIB.StringSubW(str,s,e)
 	if s < 0 then
 		s = wlen(str) + s

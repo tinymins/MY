@@ -100,7 +100,7 @@ _C.nSmFrameCount = GetLogicFrameCount()
 MY_InfoTip.Cache = {
     Ping         = { -- Ping
         formatString = '', title = _L['ping monitor'], prefix = _L['Ping: '], content = _L['%d'],
-        GetContent = function() return string.format(MY_InfoTip.Cache.Ping.formatString, GetPingValue() / 2) end
+        GetContent = function() return format(MY_InfoTip.Cache.Ping.formatString, GetPingValue() / 2) end
     },
     TimeMachine  = { -- 倍速显示
         formatString = '', title = _L['time machine'], prefix = _L['Rate: '], content = 'x%.2f',
@@ -120,7 +120,7 @@ MY_InfoTip.Cache = {
             if tm then
                 s = 1000 * (GetLogicFrameCount() - tm.frame) / GLOBAL.GAME_FPS / (GetTickCount() - tm.tick)
             end
-            return string.format(MY_InfoTip.Cache.TimeMachine.formatString, s)
+            return format(MY_InfoTip.Cache.TimeMachine.formatString, s)
         end
     },
     Distance  = { -- 目标距离
@@ -128,7 +128,7 @@ MY_InfoTip.Cache = {
         GetContent = function()
             local p, s = LIB.GetObject(LIB.GetTarget()), _L['No Target']
             if p then
-                s = string.format(MY_InfoTip.Cache.Distance.formatString, LIB.GetDistance(p))
+                s = format(MY_InfoTip.Cache.Distance.formatString, LIB.GetDistance(p))
             end
             return s
         end
@@ -137,7 +137,7 @@ MY_InfoTip.Cache = {
         formatString = '', title = _L['system time'], prefix = _L['Time: '], content = _L['%02d:%02d:%02d'],
         GetContent = function()
             local tDateTime = TimeToDate(GetCurrentTime())
-            return string.format(MY_InfoTip.Cache.SysTime.formatString, tDateTime.hour, tDateTime.minute, tDateTime.second)
+            return format(MY_InfoTip.Cache.SysTime.formatString, tDateTime.hour, tDateTime.minute, tDateTime.second)
         end
     },
     FightTime = { -- 战斗计时
@@ -154,7 +154,7 @@ MY_InfoTip.Cache = {
         formatString = '', title = _L['lotus clock'], prefix = _L['Lotus Clock: '], content = _L['%d:%d:%d'],
         GetContent = function()
             local nTotal = 6*60*60 - GetLogicFrameCount()/16%(6*60*60)
-            return string.format(MY_InfoTip.Cache.LotusTime.formatString, math.floor(nTotal/(60*60)), math.floor(nTotal/60%60), math.floor(nTotal%60))
+            return format(MY_InfoTip.Cache.LotusTime.formatString, math.floor(nTotal/(60*60)), math.floor(nTotal/60%60), math.floor(nTotal%60))
         end
     },
     GPS = { -- 角色坐标
@@ -162,7 +162,7 @@ MY_InfoTip.Cache = {
         GetContent = function()
             local player, text = GetClientPlayer(), ''
             if player then
-                text = string.format(MY_InfoTip.Cache.GPS.formatString, player.GetMapID(), player.nX, player.nY, player.nZ)
+                text = format(MY_InfoTip.Cache.GPS.formatString, player.GetMapID(), player.nX, player.nY, player.nZ)
             end
             return text
         end
@@ -187,7 +187,7 @@ MY_InfoTip.Cache = {
                 s = math.sqrt(math.pow(me.nX - sm.x, 2) + math.pow(me.nY - sm.y, 2) + math.pow((me.nZ - sm.z) / 8, 2)) / 64
                     / (GetLogicFrameCount() - sm.framecount) * GLOBAL.GAME_FPS
             end
-            return string.format(MY_InfoTip.Cache.Speedometer.formatString, s)
+            return format(MY_InfoTip.Cache.Speedometer.formatString, s)
         end
     },
 }

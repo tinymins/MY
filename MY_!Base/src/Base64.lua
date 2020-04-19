@@ -75,27 +75,27 @@ local function to_base64(to_encode)
 	local encoded = ''
 	local trailing = ''
 
-	for i = 1, string.len(to_encode) do
-		bit_pattern = bit_pattern .. to_binary(string.byte(string.sub(to_encode, i, i)))
+	for i = 1, len(to_encode) do
+		bit_pattern = bit_pattern .. to_binary(byte(sub(to_encode, i, i)))
 	end
 
 	-- Check the number of bytes. If it's not evenly divisible by three,
 	-- zero-pad the ending & append on the correct number of ``=``s.
-	if math.mod(string.len(bit_pattern), 3) == 2 then
+	if math.mod(len(bit_pattern), 3) == 2 then
 		trailing = '=='
 		bit_pattern = bit_pattern .. '0000000000000000'
-	elseif math.mod(string.len(bit_pattern), 3) == 1 then
+	elseif math.mod(len(bit_pattern), 3) == 1 then
 		trailing = '='
 		bit_pattern = bit_pattern .. '00000000'
 	end
 
-	for i = 1, string.len(bit_pattern), 6 do
-		local byte = string.sub(bit_pattern, i, i+5)
+	for i = 1, len(bit_pattern), 6 do
+		local byte = sub(bit_pattern, i, i+5)
 		local offset = tonumber(from_binary(byte))
-		encoded = encoded .. string.sub(index_table, offset+1, offset+1)
+		encoded = encoded .. sub(index_table, offset+1, offset+1)
 	end
 
-	return string.sub(encoded, 1, -1 - string.len(trailing)) .. trailing
+	return sub(encoded, 1, -1 - len(trailing)) .. trailing
 end
 
 
@@ -105,19 +105,19 @@ local function from_base64(to_decode)
 	local bit_pattern = ''
 	local decoded = ''
 
-	for i = 1, string.len(unpadded) do
-		local char = string.sub(to_decode, i, i)
-		local offset, _ = string.find(index_table, char)
+	for i = 1, len(unpadded) do
+		local char = sub(to_decode, i, i)
+		local offset, _ = find(index_table, char)
 		if offset == nil then
 			error('Invalid character \'' .. char .. '\' found.')
 		end
 
-		bit_pattern = bit_pattern .. string.sub(to_binary(offset-1), 3)
+		bit_pattern = bit_pattern .. sub(to_binary(offset-1), 3)
 	end
 
-	for i = 1, string.len(bit_pattern), 8 do
-		local byte = string.sub(bit_pattern, i, i+7)
-		decoded = decoded .. string.char(from_binary(byte))
+	for i = 1, len(bit_pattern), 8 do
+		local byte = sub(bit_pattern, i, i+7)
+		decoded = decoded .. char(from_binary(byte))
 	end
 
 	local padding_length = padded:len()-unpadded:len()

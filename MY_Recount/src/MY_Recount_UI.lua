@@ -626,7 +626,7 @@ function D.OnItemRefreshTip()
 								or p.rec[DK_REC_STAT_SKILL.DETAIL][nSkillResult][DK_REC_STAT_SKILL_DETAIL.COUNT]
 						end
 						szXml = szXml .. GetFormatText(SKILL_RESULT_NAME[nSkillResult] .. szColon, nil, 255, 202, 126)
-						szXml = szXml .. GetFormatText(string.format('%2d', nCount) .. ' ')
+						szXml = szXml .. GetFormatText(format('%2d', nCount) .. ' ')
 					end
 					szXml = szXml .. GetFormatText('\n')
 				end

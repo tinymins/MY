@@ -294,7 +294,7 @@ xmlEncode = function(xml)
 		-- attributes
 		local attr = ''
 		for k, v in pairs(xml) do
-			if type(k) == 'string' and string.find(k, '^[a-zA-Z0-9_]+$') then
+			if type(k) == 'string' and find(k, '^[a-zA-Z0-9_]+$') then
 				insert(t, ' ')
 				insert(t, k)
 				insert(t, '=')

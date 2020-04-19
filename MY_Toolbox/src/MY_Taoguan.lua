@@ -291,7 +291,7 @@ end
 -- 事件处理
 -------------------------------------
 function D.MonitorZP(szMsg)
-	local _, _, nP = string.find(szMsg, _L['Current total score:(%d+)'])
+	local _, _, nP = find(szMsg, _L['Current total score:(%d+)'])
 	if nP then
 		D.nPoint = tonumber(nP)
 		if D.nPoint >= O.nPausePoint then

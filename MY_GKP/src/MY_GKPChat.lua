@@ -72,10 +72,10 @@ function Chat.OnMsgArrive(szMsg)
 	if frame then
 		local hScroll = frame:Lookup('WndScroll_Chat')
 		local h = hScroll:Lookup('', '')
-		szMsg = string.gsub(szMsg, _L['[Team]'], '')
+		szMsg = gsub(szMsg, _L['[Team]'], '')
 		local AppendText = function()
 			local t = TimeToDate(GetCurrentTime())
-			return GetFormatText(string.format(' %02d:%02d:%02d ', t.hour, t.minute, t.second), 10, 255, 255, 255)
+			return GetFormatText(format(' %02d:%02d:%02d ', t.hour, t.minute, t.second), 10, 255, 255, 255)
 		end
 		szMsg = AppendText() .. szMsg
 		if MY and LIB.Chat and LIB.RenderChatLink then
@@ -102,7 +102,7 @@ function MY_GKP.DistributionItem()
 	if not h or not i then
 		error('GKP_ERROR -> UI_ERROR')
 	end
-	local szName = string.match(h:Lookup(i + 3):GetText(), '%[(.*)%]')
+	local szName = match(h:Lookup(i + 3):GetText(), '%[(.*)%]')
 	local me     = Station.Lookup('Normal/MY_GKP_Chat')
 	local box    = me:Lookup('', 'Box')
 	local data   = box.data

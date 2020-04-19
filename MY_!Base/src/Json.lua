@@ -105,9 +105,9 @@ end
 local function decode_error(message, text, location)
 	if text then
 		if location then
-			message = string.format('%s at char %d of: %s', message, location, text)
+			message = format('%s at char %d of: %s', message, location, text)
 		else
-			message = string.format('%s: %s', message, text)
+			message = format('%s: %s', message, text)
 		end
 	end
 	assert(false, message)
@@ -288,7 +288,7 @@ end
 -- @return result[, error]
 local function decode_value(text)
 	if type(text) ~= 'string' then
-		return nil, string.format('expected string argument to Json_Decode(), got %s', type(text))
+		return nil, format('expected string argument to Json_Decode(), got %s', type(text))
 	end
 	if text:match('^%s*$') then
 		return nil, 'empty string passed to Json_Decode()'
@@ -327,7 +327,7 @@ local function backslash_replacement_function(c)
 	elseif c == '\\' then
 		return '\\\\'
 	else
-		return string.format('\\u%04x', c:byte())
+		return format('\\u%04x', c:byte())
 	end
 end
 
@@ -461,12 +461,12 @@ local function encode_value(value, parents, indent)
 				end
 				local key_indent = indent .. '    '
 				local subtable_indent = indent .. rep(' ', max_key_length + 2 + 4)
-				local FORMAT = '%s%' .. string.format('%d', max_key_length) .. 's: %s'
+				local FORMAT = '%s%' .. format('%d', max_key_length) .. 's: %s'
 				local COMBINED_PARTS = {}
 				for i, key in ipairs(object_keys) do
 					local encoded_val = encode_value(TT[key], parents, subtable_indent)
 					if encoded_val then
-						insert(COMBINED_PARTS, string.format(FORMAT, key_indent, KEYS[i], encoded_val))
+						insert(COMBINED_PARTS, format(FORMAT, key_indent, KEYS[i], encoded_val))
 					end
 				end
 				result_value = '{\n' .. concat(COMBINED_PARTS, ',\n') .. '\n' .. indent .. '}'
@@ -476,7 +476,7 @@ local function encode_value(value, parents, indent)
 					local encoded_val = encode_value(TT[key], parents, indent)
 					if encoded_val then
 						local encoded_key = encode_value(tostring(key), parents, indent)
-						insert(PARTS, string.format('%s:%s', encoded_key, encoded_val))
+						insert(PARTS, format('%s:%s', encoded_key, encoded_val))
 					end
 				end
 				result_value = '{' .. concat(PARTS, ',') .. '}'

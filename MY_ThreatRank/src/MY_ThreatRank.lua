@@ -159,7 +159,7 @@ function TS.OnFrameBreathe()
 		else
 			local lifeper = p.nCurrentLife / p.nMaxLife
 			this.CastBar:Hide()
-			this.txt:SetText(MY_GetObjName(p) .. string.format(' (%0.1f%%)', lifeper * 100))
+			this.txt:SetText(MY_GetObjName(p) .. format(' (%0.1f%%)', lifeper * 100))
 			this.Life:SetPercentage(lifeper)
 		end
 
@@ -176,7 +176,7 @@ function TS.OnFrameBreathe()
 		local szText = hText.szText or ''
 		if buff then
 			local szName = MY_GetBuffName(buff.dwID, buff.nLevel)
-			hText:SetText(string.format('%s (%ds)', szName, math.floor(MY_GetEndTime(buff.nEndFrame))) .. szText)
+			hText:SetText(format('%s (%ds)', szName, math.floor(MY_GetEndTime(buff.nEndFrame))) .. szText)
 			hText:SetFontColor(0, 255, 0)
 		else
 			hText:SetText(HATRED_COLLECT .. szText)

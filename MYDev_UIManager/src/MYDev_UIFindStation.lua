@@ -69,7 +69,7 @@ local function fnApply(wnd)
 					local nX, nY = wnd:GetAbsPos()
 					local nW, nH = wnd:GetSize()
 					local szTip = GetFormatText(_L['<Component Path>'] .. '\n', 101)
-					szTip = szTip .. GetFormatText(string.sub(wnd:GetTreePath(), 1, -2), 106)
+					szTip = szTip .. GetFormatText(sub(wnd:GetTreePath(), 1, -2), 106)
 					OutputTip(szTip, 400, { nX, nY, nW, nH })
 				end
 			else
@@ -104,7 +104,7 @@ local function fnApply(wnd)
 					local nX, nY = wnd:GetAbsPos()
 					local nW, nH = wnd:GetSize()
 					local szTip = GetFormatText(_L['<Component Path>'] .. '\n', 101)
-					szTip = szTip .. GetFormatText(string.sub(wnd:GetTreePath(), 1, -2), 106)
+					szTip = szTip .. GetFormatText(sub(wnd:GetTreePath(), 1, -2), 106)
 					OutputTip(szTip, 400, { nX, nY, nW, nH })
 				end
 			else
@@ -150,9 +150,9 @@ local function fnSearch(wnd, szText, tResult)
 			local hT = hnd:Lookup(i)
 			if hT:GetType() == 'Handle' or hT:GetType() == 'TreeLeaf' then
 				fnSearch(hT, szText, tResult)
-			elseif hT:GetType() == 'Text' and hT:IsVisible() and string.find(hT:GetText(), szText) then
+			elseif hT:GetType() == 'Text' and hT:IsVisible() and find(hT:GetText(), szText) then
 				local p1, p2 = hT:GetTreePath()
-				table.insert(tResult, { p1 = string.sub(p1, 1, -2), p2 = p2, txt = hT:GetText() })
+				table.insert(tResult, { p1 = sub(p1, 1, -2), p2 = p2, txt = hT:GetText() })
 			end
 		end
 	end

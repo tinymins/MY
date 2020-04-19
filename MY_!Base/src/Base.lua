@@ -153,7 +153,7 @@ local function LoadLangPack(szLangFolder)
 		t0[k] = v
 	end
 	if type(szLangFolder)=='string' then
-		szLangFolder = string.gsub(szLangFolder,'[/\\]+$','')
+		szLangFolder = gsub(szLangFolder,'[/\\]+$','')
 		local t2 = LoadLUAData(szLangFolder..'/default') or {}
 		for k, v in pairs(t2) do
 			t0[k] = v
@@ -165,7 +165,7 @@ local function LoadLangPack(szLangFolder)
 	end
 	setmetatable(t0, {
 		__index = function(t, k) return k end,
-		__call = function(t, k, ...) return string.format(t[k], ...) end,
+		__call = function(t, k, ...) return format(t[k], ...) end,
 	})
 	return t0
 end
@@ -242,7 +242,7 @@ local function Get(var, keys, dft)
 	local res = false
 	if type(keys) == 'string' then
 		local ks = {}
-		for k in string.gmatch(keys, '[^%.]+') do
+		for k in gmatch(keys, '[^%.]+') do
 			insert(ks, k)
 		end
 		keys = ks
@@ -269,7 +269,7 @@ local function Set(var, keys, val)
 	local res = false
 	if type(keys) == 'string' then
 		local ks = {}
-		for k in string.gmatch(keys, '[^%.]+') do
+		for k in gmatch(keys, '[^%.]+') do
 			insert(ks, k)
 		end
 		keys = ks
@@ -636,7 +636,7 @@ local TRACEBACK_DEL = ('\n[^\n]*' .. _NAME_SPACE_ .. '%.lua:%d+:%sin%sfunction%s
 		return percent .. letter
     else
 		-- else, return a case-insensitive character class of the matched letter
-		return string.format("[%s%s]", letter:lower(), letter:upper())
+		return format("[%s%s]", letter:lower(), letter:upper())
     end
 end)
 local function GetTraceback(str)
@@ -1244,7 +1244,7 @@ _G[_NAME_SPACE_] = LIB
 -- (string, number) LIB.GetVersion()
 function LIB.GetVersion(dwVersion)
 	local dwVersion = dwVersion or _VERSION_
-	local szVersion = string.format('%X.%X.%02X', dwVersion / 0x1000000,
+	local szVersion = format('%X.%X.%02X', dwVersion / 0x1000000,
 		math.floor(dwVersion / 0x10000) % 0x100, math.floor(dwVersion / 0x100) % 0x100)
 	if  dwVersion % 0x100 ~= 0 then
 		szVersion = szVersion .. 'b' .. tostring(dwVersion % 0x100)

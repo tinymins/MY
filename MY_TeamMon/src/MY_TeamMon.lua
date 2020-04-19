@@ -1417,7 +1417,7 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 			if bInParty and content:find('$team') then
 				local c = content
 				for kk, vv in ipairs(team.GetTeamMemberList()) do
-					if string.find(szContent, c:gsub('$team', team.GetClientTeamMemberName(vv)), nil, true) and (v.szTarget == szNpcName or v.szTarget == '%') then -- hit
+					if find(szContent, c:gsub('$team', team.GetClientTeamMemberName(vv)), nil, true) and (v.szTarget == szNpcName or v.szTarget == '%') then -- hit
 						data = v
 						dwReceiverID = vv
 						szReceiver = team.GetClientTeamMemberName(vv)
@@ -1426,8 +1426,8 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 				end
 			else
 				if v.szTarget == szNpcName or v.szTarget == '%' then
-					if (v.bReg and string.find(szContent, content)) or
-						(not v.bReg and string.find(szContent, content, nil, true))
+					if (v.bReg and find(szContent, content)) or
+						(not v.bReg and find(szContent, content, nil, true))
 					then
 						data = v
 						break

@@ -743,7 +743,7 @@ local function GenerateList(bForceRefresh)
 			local tLine = g_tTable.DungeonBoss:GetRow(i)
 			local dwMapID = tLine.dwMapID
 			local szNpcList = tLine.szNpcList
-			for szNpcIndex in string.gmatch(szNpcList, '(%d+)') do
+			for szNpcIndex in gmatch(szNpcList, '(%d+)') do
 				local p = g_tTable.DungeonNpc:Search(tonumber(szNpcIndex))
 				if p then
 					if not BOSS_LIST[dwMapID] then
@@ -1090,7 +1090,7 @@ local KUNGFU_SHORT_NAME_CACHE = {}
 function LIB.GetKungfuName(dwKungfuID, szType)
 	if not KUNGFU_NAME_CACHE[dwKungfuID] then
 		KUNGFU_NAME_CACHE[dwKungfuID] = Table_GetSkillName(dwKungfuID, 1) or ''
-		KUNGFU_SHORT_NAME_CACHE[dwKungfuID] = wstring.sub(KUNGFU_NAME_CACHE[dwKungfuID], 1, 2)
+		KUNGFU_SHORT_NAME_CACHE[dwKungfuID] = wsub(KUNGFU_NAME_CACHE[dwKungfuID], 1, 2)
 	end
 	if szType == 'short' then
 		return KUNGFU_SHORT_NAME_CACHE[dwKungfuID]
@@ -2013,9 +2013,9 @@ function LIB.GetFightTime(szFormat)
 		szFormat = szFormat:gsub('H', nHours)
 		szFormat = szFormat:gsub('M', nMinutes)
 		szFormat = szFormat:gsub('S', nSeconds)
-		szFormat = szFormat:gsub('hh', string.format('%02d', nHours ))
-		szFormat = szFormat:gsub('mm', string.format('%02d', nMinute))
-		szFormat = szFormat:gsub('ss', string.format('%02d', nSecond))
+		szFormat = szFormat:gsub('hh', format('%02d', nHours ))
+		szFormat = szFormat:gsub('mm', format('%02d', nMinute))
+		szFormat = szFormat:gsub('ss', format('%02d', nSecond))
 		szFormat = szFormat:gsub('h', nHours)
 		szFormat = szFormat:gsub('m', nMinute)
 		szFormat = szFormat:gsub('s', nSecond)
@@ -3324,7 +3324,7 @@ function LIB.SetTeamInfo(tTeamInfo)
 				LIB.Sysmsg(_L('unable get player of %d group: #%d', nGroup + 1, dwID))
 			else
 				if not tSaved[szName] then
-					szName = string.gsub(szName, '@.*', '')
+					szName = gsub(szName, '@.*', '')
 				end
 				local state = tSaved[szName]
 				if not state then

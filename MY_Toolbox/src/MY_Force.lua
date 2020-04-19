@@ -211,7 +211,7 @@ end
 -- check on wanted msg
 do
 local function OnMsgAnnounce(szMsg)
-	local _, _, sM, sN = string.find(szMsg, _L['Now somebody pay (%d+) gold to buy life of (.-)'])
+	local _, _, sM, sN = find(szMsg, _L['Now somebody pay (%d+) gold to buy life of (.-)'])
 	if sM and sN == GetClientPlayer().szName then
 		local fW = function()
 			OutputWarningMessage('MSG_WARNING_RED', _L('Congratulations, you offered a reward [%s] gold!', sM))

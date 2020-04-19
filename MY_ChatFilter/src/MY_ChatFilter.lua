@@ -136,7 +136,7 @@ LIB.HookChatPanel('FILTER.MY_ChatFilter', function(h, szMsg, szChannel, dwTime)
 		-- ¼ÆËã¹ýÂË¼ÇÂ¼
 		local szText, szName = GetPureText(szMsg), ''
 		if l_tChannelHeader[szChannel] then
-			local nS, nE = wstring.find(szText, l_tChannelHeader[szChannel])
+			local nS, nE = wfind(szText, l_tChannelHeader[szChannel])
 			if nS and nE then
 				szName = ''
 				szText:sub(1, nE):gsub('(%[[^%[%]]-%])', function(s)

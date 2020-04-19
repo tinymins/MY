@@ -70,7 +70,7 @@ end
 function HP:Create()
 	if not self:IsHandleValid() then
 		local hList = UI.GetShadowHandle('MY_LifeBar')
-		hList:AppendItemFromString(FormatHandle(string.format('name="%s"', self.szName)))
+		hList:AppendItemFromString(FormatHandle(format('name="%s"', self.szName)))
 		local hItem = hList:Lookup(self.szName)
 		hItem:AppendItemFromString('<shadow>name="hp_bg"</shadow>')
 		hItem:AppendItemFromString('<shadow>name="hp_bg2"</shadow>')

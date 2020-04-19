@@ -155,7 +155,7 @@ function D.OnAppendEdit()
 			break
 		end
 		if h:GetName() == 'namelink' then
-			edit:InsertObj(szText, { type = 'name', text = szText, name = string.sub(szText, 2, -2) })
+			edit:InsertObj(szText, { type = 'name', text = szText, name = sub(szText, 2, -2) })
 		else
 			edit:InsertObj(szText, { type = 'text', text = szText })
 		end

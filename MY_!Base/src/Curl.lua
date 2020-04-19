@@ -283,7 +283,7 @@ function LIB.Ajax(settings)
 			-- local szUrl, szTitle, szContent = this:GetLocationURL(), this:GetLocationName(), this:GetDocument()
 			local szContent = ''
 			--[[#DEBUG BEGIN]]
-			-- LIB.Debug('MYRRWC::OnDocumentComplete', string.format('%s - %s', szTitle, szUrl), DEBUG_LEVEL.LOG)
+			-- LIB.Debug('MYRRWC::OnDocumentComplete', format('%s - %s', szTitle, szUrl), DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
 			-- 注销超时处理时钟
 			LIB.DelayCall('MYRRWC_TO_' .. RequestID, false)
@@ -347,7 +347,7 @@ function LIB.Ajax(settings)
 			local szUrl, szTitle, szContent = this:GetLocationURL(), this:GetLocationName(), this:GetDocument()
 			if szUrl ~= szTitle or szContent ~= '' then
 				--[[#DEBUG BEGIN]]
-				LIB.Debug('MYRRWP::OnDocumentComplete', string.format('%s - %s', szTitle, szUrl), DEBUG_LEVEL.LOG)
+				LIB.Debug('MYRRWP::OnDocumentComplete', format('%s - %s', szTitle, szUrl), DEBUG_LEVEL.LOG)
 				--[[#DEBUG END]]
 				-- 注销超时处理时钟
 				LIB.DelayCall('MYRRWP_TO_' .. RequestID, false)

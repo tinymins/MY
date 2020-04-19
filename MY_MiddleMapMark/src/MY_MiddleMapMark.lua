@@ -316,7 +316,7 @@ function D.SearchNpc(szText, dwMapID)
 	end
 	for _, info in pairs(l_npc) do
 		if (not dwMapID or info.mapid == dwMapID)
-		and (wstring.find(info.name, szText) or wstring.find(info.title, szText)) then
+		and (wfind(info.name, szText) or wfind(info.title, szText)) then
 			table.insert(aInfos, 1, info)
 		end
 	end
@@ -344,7 +344,7 @@ function D.SearchDoodad(szText, dwMapID)
 	end
 	for _, info in pairs(l_doodad) do
 		if (not dwMapID or info.mapid == dwMapID)
-		and (wstring.find(info.name, szText)) then
+		and (wfind(info.name, szText)) then
 			table.insert(aInfos, 1, info)
 		end
 	end

@@ -70,7 +70,7 @@ function CharInfo.CreateFrame(dwID, szName)
 	ui:Append('Text', {
 		name = 'Text_Name',
 		x = x, y = y + 2, w = 240 - 2 * x,
-		text = wstring.sub(szName, 1, 6), halign = 1,
+		text = wsub(szName, 1, 6), halign = 1,
 	}) -- UI≥¨¡À
 	ui:Append('WndButton', {
 		name = 'LOOKUP', x = 70, y = 360,

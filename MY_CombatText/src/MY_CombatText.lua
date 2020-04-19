@@ -703,7 +703,7 @@ function CombatText.OnSkillText(dwCasterID, dwTargetID, bCriticalStrike, nType, 
 			szCasterName = ''
 		end
 		if MY_CombatText.bSnShorten2 then
-			szName = wstring.sub(szName, 1, 2) -- wstring是兼容台服的 台服utf-8
+			szName = wsub(szName, 1, 2) -- wstring是兼容台服的 台服utf-8
 		end
 		szText = szReplaceText
 		szText = szText:gsub('(%s?)$crit(%s?)', (bCriticalStrike and '%1'.. g_tStrings.STR_CS_NAME .. '%2' or ''))

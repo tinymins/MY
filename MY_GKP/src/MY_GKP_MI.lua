@@ -203,7 +203,7 @@ LIB.RegisterBgMsg('MY_GKP', function(_, data, nChannel, dwID, szName, bIsSelf)
 					local width, height = ui:Size()
 					local right, bottom = left + width, top + height
 					local btn           = this
-					local path          = GetRootPath() .. string.format('\\ScreenShot\\GKP_Ticket_%s.png', FormatTime('%Y-%m-%d_%H.%M.%S', GetCurrentTime()))
+					local path          = GetRootPath() .. format('\\ScreenShot\\GKP_Ticket_%s.png', FormatTime('%Y-%m-%d_%H.%M.%S', GetCurrentTime()))
 					btn:Hide()
 					LIB.DelayCall(function()
 						ScreenShot(path, 100, scale * left, scale * top, scale * right, scale * bottom)

@@ -145,7 +145,7 @@ function D.Open(ds, tab, szMode)
 					if tonumber(text) then
 						if tonumber(text) < 100 and tonumber(text) > -100 and tonumber(text) ~= 0 then
 							for k, v in ipairs({2, 3, 4}) do
-								local szMoney = string.format('%0.'.. v ..'f', text):gsub('%.', '')
+								local szMoney = format('%0.'.. v ..'f', text):gsub('%.', '')
 								table.insert(option.source, {
 									text     = szMoney,
 									keyword  = text,

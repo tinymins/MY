@@ -216,7 +216,7 @@ function MY_Farbnamen.Render(szMsg)
 		if xml then
 			for _, ele in ipairs(xml) do
 				if ele[''].name and ele[''].name:sub(1, 9) == 'namelink_' then
-					local szName = string.gsub(ele[''].text, '[%[%]]', '')
+					local szName = gsub(ele[''].text, '[%[%]]', '')
 					local tInfo = MY_Farbnamen.GetAusName(szName)
 					if tInfo then
 						ele[''].r = tInfo.rgb[1]
@@ -229,15 +229,15 @@ function MY_Farbnamen.Render(szMsg)
 			end
 			szMsg = LIB.Xml.Encode(xml)
 		end
-		-- szMsg = string.gsub( szMsg, '<text>([^<]-)text='([^<]-)'([^<]-name='namelink_%d-'[^<]-)</text>', function (szExtra1, szName, szExtra2)
-		--     szName = string.gsub(szName, '[%[%]]', '')
+		-- szMsg = gsub( szMsg, '<text>([^<]-)text='([^<]-)'([^<]-name='namelink_%d-'[^<]-)</text>', function (szExtra1, szName, szExtra2)
+		--     szName = gsub(szName, '[%[%]]', '')
 		--     local tInfo = MY_Farbnamen.GetAusName(szName)
 		--     if tInfo then
-		--         szExtra1 = string.gsub(szExtra1, '[rgb]=%d+', '')
-		--         szExtra2 = string.gsub(szExtra2, '[rgb]=%d+', '')
-		--         szExtra1 = string.gsub(szExtra1, 'eventid=%d+', '')
-		--         szExtra2 = string.gsub(szExtra2, 'eventid=%d+', '')
-		--         return string.format(
+		--         szExtra1 = gsub(szExtra1, '[rgb]=%d+', '')
+		--         szExtra2 = gsub(szExtra2, '[rgb]=%d+', '')
+		--         szExtra1 = gsub(szExtra1, 'eventid=%d+', '')
+		--         szExtra2 = gsub(szExtra2, 'eventid=%d+', '')
+		--         return format(
 		--             '<text>%stext='[%s]'%s eventid=883 script='this.OnItemMouseEnter=function() MY_Farbnamen.ShowTip(this) end\nthis.OnItemMouseLeave=function() HideTip() end' r=%d g=%d b=%d</text>',
 		--             szExtra1, szName, szExtra2, tInfo.rgb[1], tInfo.rgb[2], tInfo.rgb[3]
 		--         )
@@ -246,7 +246,7 @@ function MY_Farbnamen.Render(szMsg)
 	elseif type(szMsg) == 'table' and type(szMsg.GetName) == 'function' and szMsg:GetName():sub(1, 8) == 'namelink' then
 		local namelink = szMsg
 		local ui = UI(namelink):Hover(MY_Farbnamen.ShowTip, HideTip, true)
-		local szName = string.gsub(namelink:GetText(), '[%[%]]', '')
+		local szName = gsub(namelink:GetText(), '[%[%]]', '')
 		local tInfo = MY_Farbnamen.GetAusName(szName)
 		if tInfo then
 			ui:Color(tInfo.rgb)
@@ -336,7 +336,7 @@ function MY_Farbnamen.ShowTip(namelink)
 	if not namelink then
 		return
 	end
-	local szName = string.gsub(namelink:GetText(), '[%[%]]', '')
+	local szName = gsub(namelink:GetText(), '[%[%]]', '')
 	local x, y = namelink:GetAbsPos()
 	local w, h = namelink:GetSize()
 

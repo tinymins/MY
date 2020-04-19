@@ -316,7 +316,7 @@ function LIB.FormatPath(oFilePath, tParams)
 		szFilePath, ePathType = oFilePath, PATH_TYPE.NORMAL
 	end
 	-- Unified the directory separator
-	szFilePath = string.gsub(szFilePath, '\\', '/')
+	szFilePath = gsub(szFilePath, '\\', '/')
 	-- if it's relative path then complete path with '/{NS}#DATA/'
 	if szFilePath:sub(2, 3) ~= ':/' then
 		if ePathType == PATH_TYPE.DATA then
@@ -339,7 +339,7 @@ function LIB.FormatPath(oFilePath, tParams)
 	end
 	-- if exist {$lang} then add language identity
 	if find(szFilePath, '{$lang}', nil, true) then
-		szFilePath = szFilePath:gsub('{%$lang}', tParams['lang'] or string.lower(LIB.GetLang()))
+		szFilePath = szFilePath:gsub('{%$lang}', tParams['lang'] or lower(LIB.GetLang()))
 	end
 	-- if exist {$version} then add version identity
 	if find(szFilePath, '{$version}', nil, true) then
@@ -392,11 +392,11 @@ end
 function LIB.GetLUADataPath(oFilePath)
 	local szFilePath = LIB.FormatPath(oFilePath)
 	-- ensure has file name
-	if string.sub(szFilePath, -1) == '/' then
+	if sub(szFilePath, -1) == '/' then
 		szFilePath = szFilePath .. 'data'
 	end
 	-- ensure file ext name
-	if string.sub(szFilePath, -7):lower() ~= '.jx3dat' then
+	if sub(szFilePath, -7):lower() ~= '.jx3dat' then
 		szFilePath = szFilePath .. '.jx3dat'
 	end
 	return szFilePath
@@ -734,7 +734,7 @@ end
 
 function LIB.GetGlobalValue(szVarPath)
 	local tVariable = _G
-	for szIndex in string.gmatch(szVarPath, '[^%.]+') do
+	for szIndex in gmatch(szVarPath, '[^%.]+') do
 		if tVariable and type(tVariable) == 'table' then
 			tVariable = tVariable[szIndex]
 		else
@@ -1160,8 +1160,8 @@ function LIB.SetStorage(szKey, ...)
 	local szPriKey, szSubKey = szKey
 	local nPos = StringFindW(szKey, '.')
 	if nPos then
-		szSubKey = string.sub(szKey, nPos + 1)
-		szPriKey = string.sub(szKey, 1, nPos - 1)
+		szSubKey = sub(szKey, nPos + 1)
+		szPriKey = sub(szKey, 1, nPos - 1)
 	end
 	if szPriKey == 'BoolValues' then
 		local nBitPos = l_tBoolValues[szSubKey]
@@ -1218,8 +1218,8 @@ function LIB.GetStorage(szKey)
 	local szPriKey, szSubKey = szKey
 	local nPos = StringFindW(szKey, '.')
 	if nPos then
-		szSubKey = string.sub(szKey, nPos + 1)
-		szPriKey = string.sub(szKey, 1, nPos - 1)
+		szSubKey = sub(szKey, nPos + 1)
+		szPriKey = sub(szKey, 1, nPos - 1)
 	end
 	if szPriKey == 'BoolValues' then
 		local nBitPos = l_tBoolValues[szSubKey]

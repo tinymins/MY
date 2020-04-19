@@ -169,7 +169,7 @@ function D.Restore(n)
 				LIB.Sysmsg(_L('Unable get player of %d group: #%d', nGroup + 1, dwID), CONSTANT.MSG_THEME.ERROR)
 			else
 				if not tSaved[szName] then
-					szName = string.gsub(szName, '@.*', '')
+					szName = gsub(szName, '@.*', '')
 				end
 				local state = tSaved[szName]
 				if not state then

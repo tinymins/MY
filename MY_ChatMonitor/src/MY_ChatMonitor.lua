@@ -241,11 +241,11 @@ _C.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID, s
         end
         rec.text = StringLowerW(rec.text)
     end
-    rec.hash = string.gsub(rec.hash, '[\n%s]+', '')
+    rec.hash = gsub(rec.hash, '[\n%s]+', '')
     --------------------------------------------------------------------------------------
     -- 开始计算是否符合过滤器要求
     if MY_ChatMonitor.bIsRegexp then -- regexp
-        if not string.find(rec.text, MY_ChatMonitor.szKeyWords) then
+        if not find(rec.text, MY_ChatMonitor.szKeyWords) then
             return
         end
     else -- normal
@@ -356,7 +356,7 @@ _C.OnPanelActive = function(wnd)
                     end
                     table.insert(menu, { szOption = _L['add'], fnAction = function()
                         GetUserInput('', function(szVal)
-                            szVal = (string.gsub(szVal, '^%s*(.-)%s*$', '%1'))
+                            szVal = (gsub(szVal, '^%s*(.-)%s*$', '%1'))
                             if szVal~='' then
                                 local t = LIB.LoadLUAData({_C.szLuaData, PATH_TYPE.GLOBAL}) or {}
                                 for i = #t, 1, -1 do

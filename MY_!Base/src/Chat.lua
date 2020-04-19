@@ -157,11 +157,11 @@ function LIB.CopyChatLine(hTime, bTextEditor)
 					edit:InsertObj(szText, { type = 'item', text = szText, item = p:GetUserData() })
 				elseif szName == 'iteminfolink' then
 					edit:InsertObj(szText, { type = 'iteminfo', text = szText, version = p.nVersion, tabtype = p.dwTabType, index = p.dwIndex })
-				elseif string.sub(szName, 1, 8) == 'namelink' then
+				elseif sub(szName, 1, 8) == 'namelink' then
 					if bBegin == nil then
 						bBegin = false
 					end
-					edit:InsertObj(szText, { type = 'name', text = szText, name = string.match(szText, '%[(.*)%]') })
+					edit:InsertObj(szText, { type = 'name', text = szText, name = match(szText, '%[(.*)%]') })
 				elseif szName == 'questlink' then
 					edit:InsertObj(szText, { type = 'quest', text = szText, questid = p:GetUserData() })
 				elseif szName == 'recipelink' then
@@ -189,7 +189,7 @@ function LIB.CopyChatLine(hTime, bTextEditor)
 						for _, v in ipairs({g_tStrings.STR_TALK_HEAD_WHISPER, g_tStrings.STR_TALK_HEAD_SAY, g_tStrings.STR_TALK_HEAD_SAY1, g_tStrings.STR_TALK_HEAD_SAY2 }) do
 							local nB, nE = StringFindW(szText, v)
 							if nB then
-								szText, bBegin = string.sub(szText, nB + nE), true
+								szText, bBegin = sub(szText, nB + nE), true
 								edit:ClearText()
 							end
 						end
@@ -436,8 +436,8 @@ function LIB.CopyChatItem(p)
 			edit:InsertObj(szText, { type = 'item', text = szText, item = p:GetUserData() })
 		elseif szName == 'iteminfolink' then
 			edit:InsertObj(szText, { type = 'iteminfo', text = szText, version = p.nVersion, tabtype = p.dwTabType, index = p.dwIndex })
-		elseif string.sub(szName, 1, 8) == 'namelink' then
-			edit:InsertObj(szText, { type = 'name', text = szText, name = string.match(szText, '%[(.*)%]') })
+		elseif sub(szName, 1, 8) == 'namelink' then
+			edit:InsertObj(szText, { type = 'name', text = szText, name = match(szText, '%[(.*)%]') })
 		elseif szName == 'questlink' then
 			edit:InsertObj(szText, { type = 'quest', text = szText, questid = p:GetUserData() })
 		elseif szName == 'recipelink' then
@@ -494,7 +494,7 @@ function LIB.FormatChatContent(szMsg)
 				table.insert(t2, {type = 'item', text = ndata.text, innerText = ndata.text:sub(2, -2), item = ndata.userdata})
 			-- 物品信息
 			elseif ndata.name == 'iteminfolink' then
-				local version, tab, index = string.match(ndata.script, 'this.nVersion=(%d+)%s*this.dwTabType=(%d+)%s*this.dwIndex=(%d+)')
+				local version, tab, index = match(ndata.script, 'this.nVersion=(%d+)%s*this.dwTabType=(%d+)%s*this.dwIndex=(%d+)')
 				table.insert(t2, {type = 'iteminfo', text = ndata.text, innerText = ndata.text:sub(2, -2), version = version, tabtype = tab, index = index})
 			-- 姓名
 			elseif ndata.name:sub(1, 9) == 'namelink_' then
@@ -504,14 +504,14 @@ function LIB.FormatChatContent(szMsg)
 				table.insert(t2, {type = 'quest', text = ndata.text, innerText = ndata.text:sub(2, -2), questid = ndata.userdata})
 			-- 生活技艺
 			elseif ndata.name == 'recipelink' then
-				local craft, recipe = string.match(ndata.script, 'this.dwCraftID=(%d+)%s*this.dwRecipeID=(%d+)')
+				local craft, recipe = match(ndata.script, 'this.dwCraftID=(%d+)%s*this.dwRecipeID=(%d+)')
 				table.insert(t2, {type = 'recipe', text = ndata.text, innerText = ndata.text:sub(2, -2), craftid = craft, recipeid = recipe})
 			-- 技能
 			elseif ndata.name == 'skilllink' then
-				local skillinfo = string.match(ndata.script, 'this.skillKey=%{(.-)%}')
+				local skillinfo = match(ndata.script, 'this.skillKey=%{(.-)%}')
 				local skillKey = {}
-				for w in string.gfind(skillinfo, '(.-)%,') do
-					local k, v  = string.match(w, '(.-)=(%w+)')
+				for w in gmatch(skillinfo, '(.-)%,') do
+					local k, v  = match(w, '(.-)=(%w+)')
 					skillKey[k] = v
 				end
 				skillKey.text = ndata.text
@@ -519,29 +519,29 @@ function LIB.FormatChatContent(szMsg)
 				table.insert(t2, skillKey)
 			-- 称号
 			elseif ndata.name == 'designationlink' then
-				local id, fix = string.match(ndata.script, 'this.dwID=(%d+)%s*this.bPrefix=(.-)')
+				local id, fix = match(ndata.script, 'this.dwID=(%d+)%s*this.bPrefix=(.-)')
 				table.insert(t2, {type = 'designation', text = ndata.text, innerText = ndata.text:sub(2, -2), id = id, prefix = fix})
 			-- 技能秘籍
 			elseif ndata.name == 'skillrecipelink' then
-				local id, level = string.match(ndata.script, 'this.dwID=(%d+)%s*this.dwLevel=(%d+)')
+				local id, level = match(ndata.script, 'this.dwID=(%d+)%s*this.dwLevel=(%d+)')
 				table.insert(t2, {type = 'skillrecipe', text = ndata.text, innerText = ndata.text:sub(2, -2), id = id, level = level})
 			-- 书籍
 			elseif ndata.name == 'booklink' then
-				local version, tab, index, id = string.match(ndata.script, 'this.nVersion=(%d+)%s*this.dwTabType=(%d+)%s*this.dwIndex=(%d+)%s*this.nBookRecipeID=(%d+)')
+				local version, tab, index, id = match(ndata.script, 'this.nVersion=(%d+)%s*this.dwTabType=(%d+)%s*this.dwIndex=(%d+)%s*this.nBookRecipeID=(%d+)')
 				table.insert(t2, {type = 'book', text = ndata.text, innerText = ndata.text:sub(2, -2), version = version, tabtype = tab, index = index, bookinfo = id})
 			-- 成就
 			elseif ndata.name == 'achievementlink' then
-				local id = string.match(ndata.script, 'this.dwID=(%d+)')
+				local id = match(ndata.script, 'this.dwID=(%d+)')
 				table.insert(t2, {type = 'achievement', text = ndata.text, innerText = ndata.text:sub(2, -2), id = id})
 			-- 强化
 			elseif ndata.name == 'enchantlink' then
-				local pro, craft, recipe = string.match(ndata.script, 'this.dwProID=(%d+)%s*this.dwCraftID=(%d+)%s*this.dwRecipeID=(%d+)')
+				local pro, craft, recipe = match(ndata.script, 'this.dwProID=(%d+)%s*this.dwCraftID=(%d+)%s*this.dwRecipeID=(%d+)')
 				table.insert(t2, {type = 'enchant', text = ndata.text, innerText = ndata.text:sub(2, -2), proid = pro, craftid = craft, recipeid = recipe})
 			-- 事件
 			elseif ndata.name == 'eventlink' then
-				local eventname, linkinfo = string.match(ndata.script, 'this.szName="(.-)"%s*this.szLinkInfo="(.-)"$')
+				local eventname, linkinfo = match(ndata.script, 'this.szName="(.-)"%s*this.szLinkInfo="(.-)"$')
 				if not eventname then
-					eventname, linkinfo = string.match(ndata.script, 'this.szName="(.-)"%s*this.szLinkInfo="(.-)"')
+					eventname, linkinfo = match(ndata.script, 'this.szName="(.-)"%s*this.szLinkInfo="(.-)"')
 				end
 				table.insert(t2, {type = 'eventlink', text = ndata.text, innerText = ndata.text:sub(2, -2), name = eventname, linkinfo = linkinfo:gsub('\\(.)', '%1')})
 			-- 未知类型的字符串
@@ -619,7 +619,7 @@ function LIB.SwitchChat(nChannel)
 			Station.SetFocusWindow(edit)
 		end
 	elseif type(nChannel) == 'string' then
-		if string.sub(nChannel, 1, 1) == '/' then
+		if sub(nChannel, 1, 1) == '/' then
 			if nChannel == '/cafk' or nChannel == '/catr' then
 				SwitchChatChannel(nChannel)
 				LIB.Talk(nil, nChannel, nil, nil, nil, true)
@@ -631,7 +631,7 @@ function LIB.SwitchChat(nChannel)
 				SwitchChatChannel(nChannel..' ')
 			end
 		else
-			SwitchChatChannel('/w ' .. string.gsub(nChannel,'[%[%]]','') .. ' ')
+			SwitchChatChannel('/w ' .. gsub(nChannel,'[%[%]]','') .. ' ')
 		end
 	end
 end
@@ -663,7 +663,7 @@ local function InitEmotion()
 			t[t1.dwID] = t1
 			t[t1.szCmd] = t1
 			t[t1.szImageFile..','..t1.nFrame..','..t1.szType] = t1
-			MAX_EMOTION_LEN = math.max(MAX_EMOTION_LEN, wstring.len(t1.szCmd))
+			MAX_EMOTION_LEN = math.max(MAX_EMOTION_LEN, wlen(t1.szCmd))
 		end
 		EMOTION_CACHE = t
 	end
@@ -682,7 +682,7 @@ function LIB.GetChatEmotion(arg0, arg1, arg2)
 	elseif not arg1 then
 		t = EMOTION_CACHE[arg0]
 	elseif arg2 then
-		arg0 = string.gsub(arg0, '\\\\', '\\')
+		arg0 = gsub(arg0, '\\\\', '\\')
 		t = EMOTION_CACHE[arg0..','..arg1..','..arg2]
 	end
 	return Clone(t)
@@ -708,10 +708,10 @@ local function ParseFaceIcon(t)
 					szLeft = szLeft .. szText
 					szText = ''
 				else
-					szLeft = szLeft .. string.sub(szText, 1, nPos - 1)
-					szText = string.sub(szText, nPos)
-					for i = math.min(MAX_EMOTION_LEN, wstring.len(szText)), 2, -1 do
-						local szTest = wstring.sub(szText, 1, i)
+					szLeft = szLeft .. sub(szText, 1, nPos - 1)
+					szText = sub(szText, nPos)
+					for i = math.min(MAX_EMOTION_LEN, wlen(szText)), 2, -1 do
+						local szTest = wsub(szText, 1, i)
 						local emo = LIB.GetChatEmotion(szTest)
 						if emo then
 							szFace, dwFaceID = szTest, emo.dwID
@@ -745,9 +745,9 @@ local function ParseName(t)
 	local tar = LIB.GetObject(me.GetTarget())
 	for i, v in ipairs(t) do
 		if v.type == 'text' then
-			v.text = string.gsub(v.text, '%$zj', '[' .. me.szName .. ']')
+			v.text = gsub(v.text, '%$zj', '[' .. me.szName .. ']')
 			if tar then
-				v.text = string.gsub(v.text, '%$mb', '[' .. tar.szName .. ']')
+				v.text = gsub(v.text, '%$mb', '[' .. tar.szName .. ']')
 			end
 		end
 	end
@@ -759,18 +759,18 @@ local function ParseName(t)
 			-- end
 			table.insert(t2, v)
 		else
-			local nOff, nLen = 1, string.len(v.text)
+			local nOff, nLen = 1, len(v.text)
 			while nOff <= nLen do
 				local szName = nil
-				local nPos1, nPos2 = string.find(v.text, '%[[^%[%]]+%]', nOff)
+				local nPos1, nPos2 = find(v.text, '%[[^%[%]]+%]', nOff)
 				if not nPos1 then
 					nPos1 = nLen
 				else
-					szName = string.sub(v.text, nPos1 + 1, nPos2 - 1)
+					szName = sub(v.text, nPos1 + 1, nPos2 - 1)
 					nPos1 = nPos1 - 1
 				end
 				if nPos1 >= nOff then
-					table.insert(t2, { type = 'text', text = string.sub(v.text, nOff, nPos1) })
+					table.insert(t2, { type = 'text', text = sub(v.text, nOff, nPos1) })
 					nOff = nPos1 + 1
 				end
 				if szName then
@@ -802,19 +802,19 @@ local function ParseAntiSWS(t)
 				local nSensitiveWordEndLen = 1 -- 最后一个字符（要裁剪掉的字符）大小
 				local nSensitiveWordEndPos = #szText + 1
 				for _, szSensitiveWord in ipairs(SENSITIVE_WORD) do
-					local _, nEndPos = wstring.find(szText, szSensitiveWord)
+					local _, nEndPos = wfind(szText, szSensitiveWord)
 					if nEndPos and nEndPos < nSensitiveWordEndPos then
-						local nSensitiveWordLenW = wstring.len(szSensitiveWord)
-						nSensitiveWordEndLen = string.len(wstring.sub(szSensitiveWord, nSensitiveWordLenW, nSensitiveWordLenW))
+						local nSensitiveWordLenW = wlen(szSensitiveWord)
+						nSensitiveWordEndLen = len(wsub(szSensitiveWord, nSensitiveWordLenW, nSensitiveWordLenW))
 						nSensitiveWordEndPos = nEndPos
 					end
 				end
 
 				table.insert(t2, {
 					type = 'text',
-					text = string.sub(szText, 1, nSensitiveWordEndPos - nSensitiveWordEndLen)
+					text = sub(szText, 1, nSensitiveWordEndPos - nSensitiveWordEndLen)
 				})
-				szText = string.sub(szText, nSensitiveWordEndPos + 1 - nSensitiveWordEndLen)
+				szText = sub(szText, nSensitiveWordEndPos + 1 - nSensitiveWordEndLen)
 			end
 		else
 			table.insert(t2, v)
@@ -838,11 +838,11 @@ function LIB.Talk(nChannel, szText, szUUID, bNoEscape, bSaveDeny, bPushToChatBox
 	-- channel
 	if not nChannel then
 		nChannel = PLAYER_TALK_CHANNEL.NEARBY
-	elseif type(nChannel) == 'string' then
+	elseif IsString(nChannel) then
 		if not szText then
 			szText = nChannel
 			nChannel = PLAYER_TALK_CHANNEL.NEARBY
-		elseif type(szText) == 'number' then
+		elseif IsNumber(szText) then
 			szText, nChannel = nChannel, szText
 		else
 			szTarget = nChannel
@@ -853,7 +853,7 @@ function LIB.Talk(nChannel, szText, szUUID, bNoEscape, bSaveDeny, bPushToChatBox
 	end
 	-- say body
 	local tSay = nil
-	if type(szText) == 'table' then
+	if IsTable(szText) then
 		tSay = szText
 	else
 		tSay = {{ type = 'text', text = szText}}
@@ -878,12 +878,12 @@ function LIB.Talk(nChannel, szText, szUUID, bNoEscape, bSaveDeny, bPushToChatBox
 		local nLen = 0
 		for i, v in ipairs(tSay) do
 			if nLen <= 64 then
-				nLen = nLen + LIB.StringLenW(v.text or v.name or '')
+				nLen = nLen + wlen(v.text or v.name or '')
 				if nLen > 64 then
 					if v.text then v.text = LIB.StringSubW(v.text, 1, 64 - nLen ) end
 					if v.name then v.name = LIB.StringSubW(v.name, 1, 64 - nLen ) end
-					for j=#tSay, i+1, -1 do
-						table.remove(tSay, j)
+					for j = #tSay, i + 1, -1 do
+						remove(tSay, j)
 					end
 				end
 			end

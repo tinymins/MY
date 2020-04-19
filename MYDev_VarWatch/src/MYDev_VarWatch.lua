@@ -60,7 +60,7 @@ local function var2str_x(var, indent, level) -- 只解析一层table且不解析方法
 		elseif szType == 'number' then
 			insert(t, tostring(var))
 		elseif szType == 'string' then
-			insert(t, string.format('%q', var))
+			insert(t, format('%q', var))
 		elseif szType == 'boolean' then
 			insert(t, tostring(var))
 		elseif szType == 'table' then
