@@ -64,8 +64,8 @@ randomseed(GetCurrentTime())
 random()
 -----
 local function num2bs(num)
-	local _mod = math.fmod or math.mod
-	local _floor = math.floor
+	local _mod = mod
+	local _floor = floor
 	--
 	local result = ""
 	if(num == 0) then return "0" end
@@ -101,7 +101,7 @@ local function padbits(num,bits)
 end
 --
 local function getUUID()
-	local _rnd = math.random
+	local _rnd = random
 	local _fmt = string.format
 	--
 	_rnd()
