@@ -126,7 +126,7 @@ function LIB.SetHotKey(szCommand, nIndex, nKey, bShift, bCtrl, bAlt)
 				if not v.Hotkey2 then
 					v.Hotkey2 = {nKey = 0, bShift = false, bCtrl = false, bAlt = false}
 				end
-				table.insert(aKey, v)
+				insert(aKey, v)
 			end
 		end
 		if not aKey then return end
@@ -1274,7 +1274,7 @@ function LIB.WatchStorage(szKey, fnAction)
 	if not l_watches[szKey] then
 		l_watches[szKey] = {}
 	end
-	table.insert(l_watches[szKey], fnAction)
+	insert(l_watches[szKey], fnAction)
 end
 
 local INIT_FUNC_LIST = {}

@@ -391,9 +391,9 @@ function MY_GKP_UI.OnFrameCreate()
 
 			local aBill = {}
 			for k, v in pairs(tAuction) do
-				table.insert(aBill, { szName = k, nGold = v })
+				insert(aBill, { szName = k, nGold = v })
 			end
-			table.sort(aBill,function(a,b) return a.nGold < b.nGold end)
+			sort(aBill,function(a,b) return a.nGold < b.nGold end)
 			for k, v in ipairs(aBill) do
 				if v.nGold > 0 then
 					LIB.Talk(PLAYER_TALK_CHANNEL.RAID, { D.GetFormatLink(v.szName, true), D.GetFormatLink(g_tStrings.STR_TALK_HEAD_SAY1 .. v.nGold .. g_tStrings.STR_GOLD .. g_tStrings.STR_FULL_STOP) })
@@ -439,17 +439,17 @@ function MY_GKP_UI.OnFrameCreate()
 			local aBill = {}
 			for k, v in pairs(tAuction) do
 				if v > 0 then
-					table.insert(aBill, { szName = k, nGold = -v })
+					insert(aBill, { szName = k, nGold = -v })
 				end
 			end
 			-- 正账
 			for k, v in pairs(tPayment) do
 				if v > 0 then
-					table.insert(aBill, { szName = k, nGold = v })
+					insert(aBill, { szName = k, nGold = v })
 				end
 			end
 
-			table.sort(aBill, function(a, b) return a.nGold < b.nGold end)
+			sort(aBill, function(a, b) return a.nGold < b.nGold end)
 			LIB.Talk(PLAYER_TALK_CHANNEL.RAID, _L['Information on Debt'])
 			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'GKP_INFO', 'Start', 'Information on Debt'})
 			for _, v in ipairs(aBill) do
@@ -564,8 +564,8 @@ function MY_GKP_UI.OnFrameCreate()
 						LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'GKP_Sync', v.szName}) -- 请求同步信息
 					end)
 				end, true)
-				table.insert(menu, 1, { bDevide = true })
-				table.insert(menu, 1, { szOption = _L['Please select which will be the one you are going to ask record for.'], bDisable = true })
+				insert(menu, 1, { bDevide = true })
+				insert(menu, 1, { szOption = _L['Please select which will be the one you are going to ask record for.'], bDisable = true })
 				return menu
 			else
 				LIB.Alert('MY_GKP_UI', _L['You are not in the team.'])
@@ -586,8 +586,8 @@ function MY_GKP_UI.OnFrameCreate()
 						MY_GKP_MI.SyncSend(v.dwID)
 					end)
 				end, true)
-				table.insert(menu, { bDevide = true })
-				table.insert(menu, {
+				insert(menu, { bDevide = true })
+				insert(menu, {
 					szOption = _L['Full raid.'],
 					fnAction = function()
 						LIB.Confirm(_L['Wheater synchronize your record to full raid?\n Please notice, this means the opposite sites are going to lose their information of current record.'], function()
@@ -595,8 +595,8 @@ function MY_GKP_UI.OnFrameCreate()
 						end)
 					end,
 				})
-				table.insert(menu, 1, { bDevide = true })
-				table.insert(menu, 1, { szOption = _L['Please select which will be the one you are going to send record to.'], bDisable = true })
+				insert(menu, 1, { bDevide = true })
+				insert(menu, 1, { szOption = _L['Please select which will be the one you are going to send record to.'], bDisable = true })
 				return menu
 			end
 		end,

@@ -106,7 +106,7 @@ function PS.OnPanelActive(wnd)
 			LIB.Alert(_L['Chat box is empty'])
 		else
 			GetUserInput(_L['Save Advertising Name'],function(text)
-				table.insert(O.tADList, { key = text, text = txt, ad = data })
+				insert(O.tADList, { key = text, text = txt, ad = data })
 				D.SaveLUAData()
 				LIB.SwitchTab('MY_TeamAD', true)
 			end, nil, nil, nil, nil, 5)
@@ -143,7 +143,7 @@ function PS.OnPanelActive(wnd)
 				local menu = {{
 					szOption = _L['Delete'],
 					fnAction = function()
-						table.remove(O.tADList, k)
+						remove(O.tADList, k)
 						D.SaveLUAData()
 						LIB.SwitchTab('MY_TeamAD', true)
 					end,

@@ -126,21 +126,21 @@ _C.Trick = function()
 			for _, dwID in ipairs(team.GetTeamMemberList()) do
 				local info = team.GetMemberInfo(dwID)
 				if info and (MY_TalkEx.nTrickForce == -1 or MY_TalkEx.nTrickForce == info.dwForceID) then
-					table.insert(t, info.szName)
+					insert(t, info.szName)
 				end
 			end
 		end
 	elseif MY_TalkEx.szTrickFilter == 'NEARBY' then
 		for _, p in ipairs(LIB.GetNearPlayer()) do
 			if MY_TalkEx.nTrickForce == -1 or MY_TalkEx.nTrickForce == p.dwForceID then
-				table.insert(t, p.szName)
+				insert(t, p.szName)
 			end
 		end
 	end
 	-- 去掉自己 _(:з」∠)_调侃自己是闹哪样
 	for i = #t, 1, -1 do
 		if t[i] == GetClientPlayer().szName then
-			table.remove(t, i)
+			remove(t, i)
 		end
 	end
 	-- none target
@@ -216,7 +216,7 @@ LIB.RegisterPanel('TalkEx', _L['talk ex'], _L['Chat'], 'UI/Image/UICommon/Scienc
 	  :Pos(95, 241):Size(80,25):Menu(function()
 	  	local t = {}
 	  	for szFilterId,szTitle in pairs(_C.tTrickFilter) do
-	  		table.insert(t,{
+	  		insert(t,{
 	  			szOption = szTitle,
 	  			fnAction = function()
 	  				ui:Find('#WndComboBox_Trick_Filter'):Text(szTitle)
@@ -234,7 +234,7 @@ LIB.RegisterPanel('TalkEx', _L['talk ex'], _L['Chat'], 'UI/Image/UICommon/Scienc
 	  :Menu(function()
 	  	local t = {}
 	  	for szFilterId,szTitle in pairs(_C.tForceTitle) do
-	  		table.insert(t,{
+	  		insert(t,{
 	  			szOption = szTitle,
 	  			fnAction = function()
 	  				ui:Find('#WndComboBox_Trick_Force'):Text(szTitle)
@@ -267,7 +267,7 @@ LIB.RegisterPanel('TalkEx', _L['talk ex'], _L['Chat'], 'UI/Image/UICommon/Scienc
 	  :Menu(function()
 	  	local t = {}
 	  	for nTrickChannel, tChannel in pairs(_C.tTrickChannels) do
-	  		table.insert(t,{
+	  		insert(t,{
 	  			rgb = tChannel.tCol,
 	  			szOption = tChannel.szName,
 	  			fnAction = function()

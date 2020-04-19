@@ -290,7 +290,7 @@ _C.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID, s
     --------------------------------------------------------------------------------------
     -- 开始处理记录的数据保存
     -- 更新缓存数组 哈希表
-    table.insert(RECORD_LIST, rec)
+    insert(RECORD_LIST, rec)
     RECORD_HASH[rec.hash] = (RECORD_HASH[rec.hash] or 0) + 1
     -- 验证记录是否超过限制条数
     local nOverflowed = #RECORD_LIST - MY_ChatMonitor.nMaxRecord
@@ -307,7 +307,7 @@ _C.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID, s
             if _C.uiBoard then
                 _C.uiBoard:RemoveItemUntilNewLine()
             end
-            table.remove(RECORD_LIST, 1)
+            remove(RECORD_LIST, 1)
         end
     end
     -- if MY_ChatMonitor.bRealtimeSave then
@@ -328,7 +328,7 @@ _C.OnPanelActive = function(wnd)
             local source = {}
             for _, szOpt in ipairs(LIB.LoadLUAData({_C.szLuaData, PATH_TYPE.GLOBAL}) or {}) do
                 if type(szOpt) == 'string' then
-                    table.insert(source, szOpt)
+                    insert(source, szOpt)
                 end
             end
             self:Autocomplete('option', 'source', source)
@@ -340,7 +340,7 @@ _C.OnPanelActive = function(wnd)
                 local source = {}
                 for _, szOpt in ipairs(LIB.LoadLUAData({_C.szLuaData, PATH_TYPE.GLOBAL}) or {}) do
                     if type(szOpt) == 'string' then
-                        table.insert(source, szOpt)
+                        insert(source, szOpt)
                     end
                 end
                 UI(this):Autocomplete('option', 'source', source)
@@ -352,9 +352,9 @@ _C.OnPanelActive = function(wnd)
             {
                 'option', 'beforePopup', function(wnd, option, text, menu)
                     if #menu > 0 then
-                        table.insert(menu, { bDevide = true })
+                        insert(menu, { bDevide = true })
                     end
-                    table.insert(menu, { szOption = _L['add'], fnAction = function()
+                    insert(menu, { szOption = _L['add'], fnAction = function()
                         GetUserInput('', function(szVal)
                             szVal = (gsub(szVal, '^%s*(.-)%s*$', '%1'))
                             if szVal~='' then
@@ -362,7 +362,7 @@ _C.OnPanelActive = function(wnd)
                                 for i = #t, 1, -1 do
                                     if t[i] == szVal then return end
                                 end
-                                table.insert(t, szVal)
+                                insert(t, szVal)
                                 LIB.SaveLUAData({_C.szLuaData, PATH_TYPE.GLOBAL}, t)
                             end
                         end, function() end, function() end, nil, UI(wnd):Text() )
@@ -374,7 +374,7 @@ _C.OnPanelActive = function(wnd)
                     local t = LIB.LoadLUAData({_C.szLuaData, PATH_TYPE.GLOBAL}) or {}
                     for i = #t, 1, -1 do
                         if t[i] == szOption then
-                            table.remove(t, i)
+                            remove(t, i)
                         end
                     end
                     LIB.SaveLUAData({_C.szLuaData, PATH_TYPE.GLOBAL}, t)
@@ -404,8 +404,8 @@ _C.OnPanelActive = function(wnd)
                 MY_ChatMonitor.tChannels[szChannel] = not MY_ChatMonitor.tChannels[szChannel]
                 _C.RegisterMsgMonitor()
             end, MY_ChatMonitor.tChannels)
-            table.insert(t, { bDevide = true })
-            table.insert(t,{
+            insert(t, { bDevide = true })
+            insert(t,{
                 szOption = _L['timestrap format'], {
                     szOption = '[%hh:%mm:%ss]',
                     fnAction = function()
@@ -429,7 +429,7 @@ _C.OnPanelActive = function(wnd)
                     end,
                 },
             })
-            table.insert(t,{
+            insert(t,{
                 szOption = _L['max record count'],
                 fnAction = function()
                     GetUserInputNumber(MY_ChatMonitor.nMaxRecord, 1000, nil, function(val)
@@ -437,7 +437,7 @@ _C.OnPanelActive = function(wnd)
                     end, nil, function() return not LIB.IsPanelVisible() end)
                 end,
             })
-            table.insert(t,{
+            insert(t,{
                 szOption = _L['show message preview box'],
                 fnAction = function()
                     MY_ChatMonitor.bShowPreview = not MY_ChatMonitor.bShowPreview
@@ -445,7 +445,7 @@ _C.OnPanelActive = function(wnd)
                 bCheck = true,
                 bChecked = MY_ChatMonitor.bShowPreview
             })
-            table.insert(t,{
+            insert(t,{
                 szOption = _L['play new message alert sound'],
                 fnAction = function()
                     MY_ChatMonitor.bPlaySound = not MY_ChatMonitor.bPlaySound
@@ -453,7 +453,7 @@ _C.OnPanelActive = function(wnd)
                 bCheck = true,
                 bChecked = MY_ChatMonitor.bPlaySound
             })
-            table.insert(t,{
+            insert(t,{
                 szOption = _L['output to system channel'],
                 fnAction = function()
                     MY_ChatMonitor.bRedirectSysChannel = not MY_ChatMonitor.bRedirectSysChannel
@@ -461,7 +461,7 @@ _C.OnPanelActive = function(wnd)
                 bCheck = true,
                 bChecked = MY_ChatMonitor.bRedirectSysChannel
             })
-            table.insert(t,{
+            insert(t,{
                 szOption = _L['ignore same message'],
                 fnAction = function()
                     MY_ChatMonitor.bIgnoreSame = not MY_ChatMonitor.bIgnoreSame
@@ -470,7 +470,7 @@ _C.OnPanelActive = function(wnd)
                 bChecked = MY_ChatMonitor.bIgnoreSame
             })
             if IsCtrlKeyDown() then
-                -- table.insert(t, {
+                -- insert(t, {
                 --     szOption = _L['Realtime save'],
                 --     fnAction = function()
                 --         MY_ChatMonitor.bRealtimeSave = not MY_ChatMonitor.bRealtimeSave
@@ -478,7 +478,7 @@ _C.OnPanelActive = function(wnd)
                 --     bCheck = true,
                 --     bChecked = MY_ChatMonitor.bRealtimeSave
                 -- })
-                table.insert(t, {
+                insert(t, {
                     szOption = _L['Distinct server'],
                     fnAction = function()
                         MY_ChatMonitor.bDistinctServer = not MY_ChatMonitor.bDistinctServer
@@ -489,8 +489,8 @@ _C.OnPanelActive = function(wnd)
                     bChecked = MY_ChatMonitor.bDistinctServer
                 })
             end
-            table.insert(t, { bDevide = true })
-            table.insert(t,{
+            insert(t, { bDevide = true })
+            insert(t,{
                 szOption = _L['regular expression'],
                 fnAction = function()
                     if MY_ChatMonitor.bIsRegexp then
@@ -561,7 +561,7 @@ LIB.RegisterInit('MY_CHATMONITOR', _C.Init)
 _C.RegisterMsgMonitor = function()
     local t = {}
     for szChannel, bCapture in pairs(MY_ChatMonitor.tChannels) do
-        if bCapture then table.insert(t, szChannel) end
+        if bCapture then insert(t, szChannel) end
     end
     UnRegisterMsgMonitor(_C.OnMsgArrive)
     RegisterMsgMonitor(_C.OnMsgArrive, t)

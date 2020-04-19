@@ -322,7 +322,7 @@ function MYDev_Snaplines.OnFrameBreathe()
 		else
 			this:Lookup('', 'Handle_Snaplines_Item'):Hide()
 		end
-		hText:SetText(table.concat(tTip, '\n'))
+		hText:SetText(concat(tTip, '\n'))
 
 		-- Ëõ·Å
 		if MYDev_Snaplines.bAutoScale then

@@ -244,7 +244,7 @@ local function grok_array(text, start)
 	local nIndex = 1
 	while i <= text_len do
 		local val, new_i = grok_one(text, i)
-		-- table.insert(VALUE, val) -- this will cause a bug: table.insert(VALUE, nil) -- [null,null,1] -> {1}
+		-- insert(VALUE, val) -- this will cause a bug: insert(VALUE, nil) -- [null,null,1] -> {1}
 		VALUE[nIndex] = val
 		i = skip_whitespace(text, new_i)
 		-- Expect now either ']' to end things, or a ',' to allow us to continue.
@@ -378,13 +378,13 @@ local function object_or_array(T)
 	end
 	-- An object with number map
 	local map = nil
-	table.sort(string_keys)
+	sort(string_keys)
 	if #number_keys > 0 then
 		map = {}
 		for key, val in pairs(T) do
 			map[key] = val
 		end
-		table.sort(number_keys)
+		sort(number_keys)
 		for _, number_key in ipairs(number_keys) do
 			local string_key = tostring(number_key)
 			if map[string_key] == nil then

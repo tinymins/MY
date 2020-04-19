@@ -172,7 +172,7 @@ local function OnWhisperCheck()
 	local t = {}
 	for i, whisper in ipairs(MY_ChatSwitch.aWhisper) do
 		local info = MY_Farbnamen and MY_Farbnamen.Get(whisper[1])
-		table.insert(t, {
+		insert(t, {
 			szOption = whisper[1],
 			rgb = info and info.rgb or {202, 126, 255},
 			fnAction = function()
@@ -188,7 +188,7 @@ local function OnWhisperCheck()
 			fnClickIcon = function()
 				for i = #MY_ChatSwitch.aWhisper, 1, -1 do
 					if MY_ChatSwitch.aWhisper[i][1] == whisper[1] then
-						table.remove(MY_ChatSwitch.aWhisper, i)
+						remove(MY_ChatSwitch.aWhisper, i)
 						UI.ClosePopupMenu()
 					end
 				end
@@ -199,16 +199,16 @@ local function OnWhisperCheck()
 				local r, g, b = GetMsgFontColor('MSG_WHISPER')
 				for _, v in ipairs(whisper[2]) do
 					if IsString(v) then
-						table.insert(t, v)
+						insert(t, v)
 					elseif IsTable(v) and IsString(v[1]) then
 						if today == LIB.FormatTime(v[2], '%yyyy%MM%dd') then
-							table.insert(t, LIB.GetTimeLinkText(v[2], {r = r, g = g, b = b, s = '[%hh:%mm:%ss]'}) .. v[1])
+							insert(t, LIB.GetTimeLinkText(v[2], {r = r, g = g, b = b, s = '[%hh:%mm:%ss]'}) .. v[1])
 						else
-							table.insert(t, LIB.GetTimeLinkText(v[2], {r = r, g = g, b = b, s = '[%M.%dd.%hh:%mm:%ss]'}) .. v[1])
+							insert(t, LIB.GetTimeLinkText(v[2], {r = r, g = g, b = b, s = '[%M.%dd.%hh:%mm:%ss]'}) .. v[1])
 						end
 					end
 				end
-				local szMsg = table.concat(t, '')
+				local szMsg = concat(t, '')
 				if MY_Farbnamen then
 					szMsg = MY_Farbnamen.Render(szMsg)
 				end
@@ -220,8 +220,8 @@ local function OnWhisperCheck()
 	t.x = x
 	t.y = y - #MY_ChatSwitch.aWhisper * 24 - 24 - 20 - 8
 	if #t > 0 then
-		table.insert(t, 1, CONSTANT.MENU_DIVIDER)
-		table.insert(t, 1, {
+		insert(t, 1, CONSTANT.MENU_DIVIDER)
+		insert(t, 1, {
 			szOption = g_tStrings.CHANNEL_WHISPER_SIGN,
 			rgb = {202, 126, 255},
 			fnAction = function()
@@ -364,20 +364,20 @@ function MY_ChatSwitch.OnEvent(event)
 			local t
 			for i = #MY_ChatSwitch.aWhisper, 1, -1 do
 				if MY_ChatSwitch.aWhisper[i][1] == szName then
-					t = table.remove(MY_ChatSwitch.aWhisper, i)
+					t = remove(MY_ChatSwitch.aWhisper, i)
 				end
 			end
 			while #MY_ChatSwitch.aWhisper > 20 do
-				table.remove(MY_ChatSwitch.aWhisper, 1)
+				remove(MY_ChatSwitch.aWhisper, 1)
 			end
 			if not t then
 				t = {szName, {}}
 			end
 			while #t[2] > 20 do
-				table.remove(t[2], 1)
+				remove(t[2], 1)
 			end
-			table.insert(t[2], {szMsg, GetCurrentTime()})
-			table.insert(MY_ChatSwitch.aWhisper, t)
+			insert(t[2], {szMsg, GetCurrentTime()})
+			insert(MY_ChatSwitch.aWhisper, t)
 		end
 		if dwTalkerID ~= UI_GetClientPlayerID() then
 			return
@@ -523,7 +523,7 @@ function PS.OnPanelActive(wnd)
 				end,
 			}
 			for i, v in ipairs(CHANNEL_LIST) do
-				table.insert(t, {
+				insert(t, {
 					szOption = v.title, rgb = v.color,
 					bCheck = true, bChecked = not LIB.GetStorage('BoolValues.MY_ChatSwitch_CH' .. i),
 					fnAction = function()

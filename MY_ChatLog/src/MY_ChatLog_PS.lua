@@ -267,7 +267,7 @@ function D.ExportConfirm()
 				for nGroup, info in ipairs(LOG_TYPE) do
 					if tChannels[nGroup] then
 						for _, szChannel in ipairs(info.aChannel) do
-							table.insert(aChannels, szChannel)
+							insert(aChannels, szChannel)
 						end
 					end
 				end

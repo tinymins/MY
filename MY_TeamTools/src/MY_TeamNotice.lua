@@ -149,7 +149,7 @@ function TI.CreateFrame(a, b)
 							TI.tList = TI.GetList()
 							option.source = {}
 							for k, v in pairs(TI.tList) do
-								table.insert(option.source, k)
+								insert(option.source, k)
 							end
 							if #option.source == 1 and tostring(option.source[1]) == text then
 								option.source = {}

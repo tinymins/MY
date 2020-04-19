@@ -653,7 +653,7 @@ function D.OnRemoveFocus(dwType, dwID)
 	for i = #FOCUS_LIST, 1, -1 do
 		local p = FOCUS_LIST[i]
 		if p.dwType == dwType and p.dwID == dwID then
-			table.remove(FOCUS_LIST, i)
+			remove(FOCUS_LIST, i)
 			break
 		end
 	end
@@ -671,14 +671,14 @@ function D.SortFocus(fn)
 		end
 		return true
 	end
-	table.sort(FOCUS_LIST, fn)
+	sort(FOCUS_LIST, fn)
 end
 
 -- 获取焦点列表
 function D.GetFocusList()
 	local t = {}
 	for _, v in ipairs(FOCUS_LIST) do
-		table.insert(t, v)
+		insert(t, v)
 	end
 	return t
 end

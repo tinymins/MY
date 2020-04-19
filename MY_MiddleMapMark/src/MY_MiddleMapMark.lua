@@ -311,13 +311,13 @@ function D.SearchNpc(szText, dwMapID)
 		local p = aInfos[i]
 		if (not dwMapID or p.mapid == dwMapID)
 		and l_npc[p.templateid .. ',' .. p.poskey] then
-			table.remove(aInfos, i)
+			remove(aInfos, i)
 		end
 	end
 	for _, info in pairs(l_npc) do
 		if (not dwMapID or info.mapid == dwMapID)
 		and (wfind(info.name, szText) or wfind(info.title, szText)) then
-			table.insert(aInfos, 1, info)
+			insert(aInfos, 1, info)
 		end
 	end
 	return aInfos
@@ -339,13 +339,13 @@ function D.SearchDoodad(szText, dwMapID)
 		local p = aInfos[i]
 		if (not dwMapID or p.mapid == dwMapID)
 		and l_doodad[p.templateid .. ',' .. p.poskey] then
-			table.remove(aInfos, i)
+			remove(aInfos, i)
 		end
 	end
 	for _, info in pairs(l_doodad) do
 		if (not dwMapID or info.mapid == dwMapID)
 		and (wfind(info.name, szText)) then
-			table.insert(aInfos, 1, info)
+			insert(aInfos, 1, info)
 		end
 	end
 	return aInfos

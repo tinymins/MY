@@ -147,7 +147,7 @@ local function SubmitData()
 	local data = {}
 	for szQues, szAnsw in pairs(l_tCached) do
 		if not l_tAccept[szQues] then
-			table.insert(data, { ques = szQues, ans = szAnsw })
+			insert(data, { ques = szQues, ans = szAnsw })
 		end
 	end
 	if #data == 0 then

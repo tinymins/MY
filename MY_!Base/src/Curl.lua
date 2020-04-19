@@ -268,7 +268,7 @@ function LIB.Ajax(settings)
 		if nFreeWebPages > 0 then
 			RequestID = MY_RRWC_FREE[nFreeWebPages]
 			hFrame = Station.Lookup('Lowest/MYRRWC_' .. RequestID)
-			table.remove(MY_RRWC_FREE)
+			remove(MY_RRWC_FREE)
 		end
 		-- create page
 		if not hFrame then
@@ -296,7 +296,7 @@ function LIB.Ajax(settings)
 			-- 	end
 			--[[#DEBUG END]]
 			-- end
-			table.insert(MY_RRWC_FREE, RequestID)
+			insert(MY_RRWC_FREE, RequestID)
 		end
 
 		-- do with this remote request
@@ -318,7 +318,7 @@ function LIB.Ajax(settings)
 					end
 					--[[#DEBUG END]]
 				end
-				table.insert(MY_RRWC_FREE, RequestID)
+				insert(MY_RRWC_FREE, RequestID)
 			end)
 		end
 
@@ -331,7 +331,7 @@ function LIB.Ajax(settings)
 		if nFreeWebPages > 0 then
 			RequestID = MY_RRWP_FREE[nFreeWebPages]
 			hFrame = Station.Lookup('Lowest/MYRRWP_' .. RequestID)
-			table.remove(MY_RRWP_FREE)
+			remove(MY_RRWP_FREE)
 		end
 		-- create page
 		if not hFrame then
@@ -368,7 +368,7 @@ function LIB.Ajax(settings)
 					end
 					--[[#DEBUG END]]
 				end
-				table.insert(MY_RRWP_FREE, RequestID)
+				insert(MY_RRWP_FREE, RequestID)
 			end
 		end
 
@@ -399,7 +399,7 @@ function LIB.Ajax(settings)
 					end
 					--[[#DEBUG END]]
 				end
-				table.insert(MY_RRWP_FREE, RequestID)
+				insert(MY_RRWP_FREE, RequestID)
 			end)
 		end
 

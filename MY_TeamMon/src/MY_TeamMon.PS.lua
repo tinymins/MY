@@ -174,7 +174,7 @@ function PS.OnPanelActive(wnd)
 		menu = function()
 			local menu = {}
 			for k, v in ipairs({ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 }) do
-				table.insert(menu, { szOption = v, bMCheck = true, bChecked = MY_TeamMon_BL.nCount == v, fnAction = function()
+				insert(menu, { szOption = v, bMCheck = true, bChecked = MY_TeamMon_BL.nCount == v, fnAction = function()
 					FireUIEvent('MY_TM_BL_RESIZE', nil, v)
 				end })
 			end
@@ -186,7 +186,7 @@ function PS.OnPanelActive(wnd)
 		menu = function()
 			local menu = {}
 			for k, v in ipairs({ 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 100 }) do
-				table.insert(menu, { szOption = v, bMCheck = true, bChecked = MY_TeamMon_BL.fScale == v / 55, fnAction = function()
+				insert(menu, { szOption = v, bMCheck = true, bChecked = MY_TeamMon_BL.fScale == v / 55, fnAction = function()
 					FireUIEvent('MY_TM_BL_RESIZE', v / 55)
 				end })
 			end
@@ -217,10 +217,10 @@ function PS.OnPanelActive(wnd)
 		menu = function()
 			local szLang = select(3, GetVersion())
 			local menu = {}
-			table.insert(menu, { szOption = _L['Import data (local)'], fnAction = function() MY_TeamMon_UI.OpenImportPanel() end }) -- 有传参 不要改
+			insert(menu, { szOption = _L['Import data (local)'], fnAction = function() MY_TeamMon_UI.OpenImportPanel() end }) -- 有传参 不要改
 			local szLang = select(3, GetVersion())
 			if szLang == 'zhcn' or szLang == 'zhtw' then
-				table.insert(menu, { szOption = _L['Import data (web)'], fnAction = MY_TeamMon_RR.OpenPanel })
+				insert(menu, { szOption = _L['Import data (web)'], fnAction = MY_TeamMon_RR.OpenPanel })
 			end
 			return menu
 		end,

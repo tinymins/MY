@@ -335,7 +335,7 @@ function D.OnShowDeathInfo()
 		end
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
-		OutputTip(table.concat(xml), 400, { x, y, w, h })
+		OutputTip(concat(xml), 400, { x, y, w, h })
 	end
 end
 
@@ -397,7 +397,7 @@ function D.UpdateList(page, dwID)
 			end
 			insert(xml, GetFormatText(g_tStrings.STR_KILL .. g_tStrings.STR_FULL_STOP, 10, 255, 255, 255))
 			insert(xml, GetFormatText('\n'))
-			hDeathMsg:AppendItemFromString(table.concat(xml))
+			hDeathMsg:AppendItemFromString(concat(xml))
 		end
 	end
 	hDeathMsg:FormatAllItemPos()

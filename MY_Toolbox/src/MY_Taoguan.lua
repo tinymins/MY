@@ -424,7 +424,7 @@ function PS.OnPanelActive(wnd)
 			local m0 = {}
 			for i = 2, MAX_POINT_POW do
 				local v = 10 * 2 ^ i
-				table.insert(m0, { szOption = tostring(v), fnAction = function()
+				insert(m0, { szOption = tostring(v), fnAction = function()
 					MY_Taoguan.nPausePoint = v
 					ui:Text(tostring(v))
 				end })
@@ -469,7 +469,7 @@ function PS.OnPanelActive(wnd)
 				local m0 = {}
 				for i = 2, MAX_POINT_POW - 1 do
 					local v = 10 * 2 ^ i
-					table.insert(m0, { szOption = tostring(v), fnAction = function()
+					insert(m0, { szOption = tostring(v), fnAction = function()
 						MY_Taoguan['nUse' .. p.szID] = v
 						ui:Text(tostring(v))
 					end })

@@ -248,7 +248,7 @@ LIB.RegisterBgMsg('MY_GKP', function(_, data, nChannel, dwID, szName, bIsSelf)
 							if dwForceID == -1 then
 								dwForceID = v.dwForceID
 							end
-							table.insert(tBox, v)
+							insert(tBox, v)
 						end
 					end
 					if dwForceID ~= -1 then

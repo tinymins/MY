@@ -239,7 +239,7 @@ function D.UpdateList(page)
 		Enchant = 0,
 		Special = 0,
 	}
-	table.sort(aTeam, D.Sorter)
+	sort(aTeam, D.Sorter)
 
 	for k, v in ipairs(aTeam) do
 		-- 心法统计
@@ -352,7 +352,7 @@ function D.UpdateList(page)
 							local nAlpha = nTime < 600 and 80 or 255
 							insert(xml, '<image> path="fromiconid" frame=' .. nIcon ..' alpha=' .. nAlpha ..  ' w=30 h=30 </image>')
 						end
-						OutputTip(table.concat(xml), 250, { x, y, w, h })
+						OutputTip(concat(xml), 250, { x, y, w, h })
 					end
 				else
 					hBuff:SetOverText(1, '')
@@ -580,7 +580,7 @@ function D.UpdateList(page)
 				this:Lookup('Text_Num'):SetFontScheme(101)
 				local xml = {}
 				insert(xml, GetFormatText(szName .. g_tStrings.STR_COLON .. nCount .. g_tStrings.STR_PERSON ..'\n', 157))
-				table.sort(tKungfu[dwKungfuID], function(a, b)
+				sort(tKungfu[dwKungfuID], function(a, b)
 					local nCountA = a.nEquipScore or -1
 					local nCountB = b.nEquipScore or -1
 					return nCountA > nCountB
@@ -594,7 +594,7 @@ function D.UpdateList(page)
 				end
 				local x, y = img:GetAbsPos()
 				local w, h = img:GetSize()
-				OutputTip(table.concat(xml), 400, { x, y, w, h })
+				OutputTip(concat(xml), 400, { x, y, w, h })
 			end
 		end
 	end
@@ -1079,7 +1079,7 @@ function D.OnItemMouseEnter()
 		end
 		local x, y = img:GetAbsPos()
 		local w, h = img:GetSize()
-		OutputTip(table.concat(xml), 400, { x, y, w, h })
+		OutputTip(concat(xml), 400, { x, y, w, h })
 	end
 end
 
@@ -1131,7 +1131,7 @@ function D.OnItemRButtonClick()
 			if v.szOption == g_tStrings.LOOKUP_INFO then
 				for _, vv in ipairs(v) do
 					if vv.szOption == g_tStrings.LOOKUP_NEW_TANLENT then
-						table.insert(menu, vv)
+						insert(menu, vv)
 						break
 					end
 				end

@@ -152,7 +152,7 @@ local function fnSearch(wnd, szText, tResult)
 				fnSearch(hT, szText, tResult)
 			elseif hT:GetType() == 'Text' and hT:IsVisible() and find(hT:GetText(), szText) then
 				local p1, p2 = hT:GetTreePath()
-				table.insert(tResult, { p1 = sub(p1, 1, -2), p2 = p2, txt = hT:GetText() })
+				insert(tResult, { p1 = sub(p1, 1, -2), p2 = p2, txt = hT:GetText() })
 			end
 		end
 	end

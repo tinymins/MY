@@ -141,7 +141,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 		rmenu = function()
 			local t = { { szOption = _L['send to ...'], bDisable = true }, { bDevide = true } }
 			for _, tChannel in ipairs(tChannels) do
-				table.insert( t, {
+				insert( t, {
 					szOption = tChannel.szName,
 					rgb = tChannel.rgb,
 					bCheck = true, bMCheck = true, bChecked = O.nGongzhanPublishChannel == tChannel.nChannel,

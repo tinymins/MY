@@ -145,7 +145,7 @@ local TYPE_CHANNELMSGS_R = (function()
 			if not t[nChannel] then
 				t[nChannel] = {}
 			end
-			table.insert(t[nChannel], eType)
+			insert(t[nChannel], eType)
 		end
 	end
 	for eType, aMsgType in pairs(TYPE_MSGS) do
@@ -153,7 +153,7 @@ local TYPE_CHANNELMSGS_R = (function()
 			if not t[szMsgType] then
 				t[szMsgType] = {}
 			end
-			table.insert(t[szMsgType], eType)
+			insert(t[szMsgType], eType)
 		end
 	end
 	return t
@@ -184,7 +184,7 @@ local function LoadBlockWords()
 				bw.keyword = rec[1]
 			end
 			if bw.keyword ~= '' and not tKeys[bw.keyword] then
-				table.insert(MY_ChatBlock.tBlockWords, bw)
+				insert(MY_ChatBlock.tBlockWords, bw)
 				tKeys[bw.keyword] = true
 			end
 		end
@@ -194,7 +194,7 @@ local function LoadBlockWords()
 		for i, bw in ipairs(data.blockwords) do
 			bw = LIB.FormatDataStructure(bw, DEFAULT_KW_CONFIG)
 			if bw.keyword ~= '' and not tKeys[bw.keyword] then
-				table.insert(MY_ChatBlock.tBlockWords, bw)
+				insert(MY_ChatBlock.tBlockWords, bw)
 				tKeys[bw.keyword] = true
 			end
 		end
@@ -254,7 +254,7 @@ for _, eType in ipairs(TYPE_LIST) do
 			end
 		end
 		if not exist then
-			table.insert(aChannel, nChannel)
+			insert(aChannel, nChannel)
 		end
 	end
 	for _, szMsgType in ipairs(TYPE_MSGS[eType]) do
@@ -266,7 +266,7 @@ for _, eType in ipairs(TYPE_LIST) do
 			end
 		end
 		if not exist then
-			table.insert(aMsgType, szMsgType)
+			insert(aMsgType, szMsgType)
 		end
 	end
 end
@@ -287,7 +287,7 @@ local function Chn2Str(ch)
 	local aText = {}
 	for _, eType in ipairs(TYPE_LIST) do
 		if ch[eType] then
-			table.insert(aText, TYPE_TITLE[eType])
+			insert(aText, TYPE_TITLE[eType])
 		end
 	end
 	local szText
@@ -296,7 +296,7 @@ local function Chn2Str(ch)
 	elseif #aText == #TYPE_LIST then
 		szText = _L['All channels']
 	else
-		szText = table.concat(aText, ',')
+		szText = concat(aText, ',')
 	end
 	return szText
 end
@@ -340,7 +340,7 @@ function PS.OnPanelActive(wnd)
 			szOption = _L['Channels'],
 		}
 		for _, eType in ipairs(TYPE_LIST) do
-			table.insert(menu, {
+			insert(menu, {
 				szOption = _L('%s channel', TYPE_TITLE[eType]),
 				rgb = TYPE_COLOR[eType],
 				bCheck = true, bChecked = chns[eType],
@@ -351,8 +351,8 @@ function PS.OnPanelActive(wnd)
 				end,
 			})
 		end
-		table.insert(menu, CONSTANT.MENU_DIVIDER)
-		table.insert(menu, {
+		insert(menu, CONSTANT.MENU_DIVIDER)
+		insert(menu, {
 			szOption = _L['ignore spaces'],
 			bCheck = true, bChecked = data.ignoreSpace,
 			fnAction = function()
@@ -360,7 +360,7 @@ function PS.OnPanelActive(wnd)
 				SaveBlockWords()
 			end,
 		})
-		table.insert(menu, {
+		insert(menu, {
 			szOption = _L['ignore enem'],
 			bCheck = true, bChecked = data.ignoreEnEm,
 			fnAction = function()
@@ -368,7 +368,7 @@ function PS.OnPanelActive(wnd)
 				SaveBlockWords()
 			end,
 		})
-		table.insert(menu, {
+		insert(menu, {
 			szOption = _L['ignore case'],
 			bCheck = true, bChecked = data.ignoreCase,
 			fnAction = function()
@@ -376,7 +376,7 @@ function PS.OnPanelActive(wnd)
 				SaveBlockWords()
 			end,
 		})
-		table.insert(menu, {
+		insert(menu, {
 			szOption = _L['ignore acquaintance'],
 			bCheck = true, bChecked = data.ignoreAcquaintance,
 			fnAction = function()
@@ -384,15 +384,15 @@ function PS.OnPanelActive(wnd)
 				SaveBlockWords()
 			end,
 		})
-		table.insert(menu, CONSTANT.MENU_DIVIDER)
-		table.insert(menu, {
+		insert(menu, CONSTANT.MENU_DIVIDER)
+		insert(menu, {
 			szOption = _L['delete'],
 			fnAction = function()
 				list:ListBox('delete', 'id', id)
 				LoadBlockWords()
 				for i = #MY_ChatBlock.tBlockWords, 1, -1 do
 					if MY_ChatBlock.tBlockWords[i].keyword == id then
-						table.remove(MY_ChatBlock.tBlockWords, i)
+						remove(MY_ChatBlock.tBlockWords, i)
 					end
 				end
 				SaveBlockWords()
@@ -425,7 +425,7 @@ function PS.OnPanelActive(wnd)
 			-- 加入表
 			local bw = Clone(DEFAULT_KW_CONFIG)
 			bw.keyword = szText
-			table.insert(MY_ChatBlock.tBlockWords, 1, bw)
+			insert(MY_ChatBlock.tBlockWords, 1, bw)
 			SaveBlockWords()
 			-- 更新UI
 			list:ListBox('insert', ChatBlock2Text(bw.keyword, bw.channel), bw.keyword, bw, 1)
@@ -441,7 +441,7 @@ function PS.OnPanelActive(wnd)
 				LoadBlockWords()
 				for i = #MY_ChatBlock.tBlockWords, 1, -1 do
 					if MY_ChatBlock.tBlockWords[i].keyword == v.id then
-						table.remove(MY_ChatBlock.tBlockWords, i)
+						remove(MY_ChatBlock.tBlockWords, i)
 					end
 				end
 				SaveBlockWords()

@@ -118,11 +118,11 @@ LIB.HookChatPanel('FILTER.MY_ChatFilter', function(h, szMsg, szChannel, dwTime)
 								return false
 							end
 						end
-						table.insert(h.MY_tDuplicateUUID, 1, szUUID)
+						insert(h.MY_tDuplicateUUID, 1, szUUID)
 						local nCount = #h.MY_tDuplicateUUID - MAX_UUID_RECORD
 						if nCount > 0 then
 							for i = nCount, 1, -1 do
-								table.remove(h.MY_tDuplicateUUID)
+								remove(h.MY_tDuplicateUUID)
 							end
 						end
 					end
@@ -166,11 +166,11 @@ LIB.HookChatPanel('FILTER.MY_ChatFilter', function(h, szMsg, szChannel, dwTime)
 					return false
 				end
 			end
-			table.insert(h.MY_tDuplicateLog, 1, szText)
+			insert(h.MY_tDuplicateLog, 1, szText)
 			local nCount = #h.MY_tDuplicateLog - MAX_CHAT_RECORD
 			if nCount > 0 then
 				for i = nCount, 1, -1 do
-					table.remove(h.MY_tDuplicateLog)
+					remove(h.MY_tDuplicateLog)
 				end
 			end
 		end
@@ -219,7 +219,7 @@ LIB.RegisterPanel('MY_DuplicateChatFilter', _L['duplicate chat filter'], _L['Cha
 		menu = function()
 			local t = {}
 			for szChannelID, bFilter in pairs(MY_ChatFilter.tApplyDuplicateChannels) do
-				table.insert(t, {
+				insert(t, {
 					szOption = g_tStrings.tChannelName[szChannelID],
 					bCheck = true, bChecked = bFilter,
 					rgb = GetMsgFontColor(szChannelID, true),

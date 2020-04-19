@@ -110,7 +110,7 @@ function D.Open(ds, tab, szMode)
 					option.source = {}
 					for k, v in ipairs(MY_GKP.aSubsidies) do
 						if v[3] then
-							table.insert(option.source, v[1])
+							insert(option.source, v[1])
 						end
 					end
 				end,
@@ -146,16 +146,16 @@ function D.Open(ds, tab, szMode)
 						if tonumber(text) < 100 and tonumber(text) > -100 and tonumber(text) ~= 0 then
 							for k, v in ipairs({2, 3, 4}) do
 								local szMoney = format('%0.'.. v ..'f', text):gsub('%.', '')
-								table.insert(option.source, {
+								insert(option.source, {
 									text     = szMoney,
 									keyword  = text,
 									display  = D.GetMoneyTipText(tonumber(szMoney)),
 									richtext = true,
 								})
 							end
-							table.insert(option.source, { divide = true, keyword = text })
+							insert(option.source, { divide = true, keyword = text })
 						end
-						table.insert(option.source, {
+						insert(option.source, {
 							text     = text,
 							keyword  = text,
 							display  = D.GetMoneyTipText(tonumber(text)),

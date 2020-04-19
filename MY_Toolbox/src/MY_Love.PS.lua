@@ -76,12 +76,12 @@ local PS = { IsShielded = MY_Love.IsShielded }
 function D.GetLoverMenu(nType)
 	local me, m0 = GetClientPlayer(), {}
 	local aGroup = me.GetFellowshipGroupInfo() or {}
-	table.insert(aGroup, 1, {id = 0, name = g_tStrings.STR_FRIEND_GOOF_FRIEND})
+	insert(aGroup, 1, {id = 0, name = g_tStrings.STR_FRIEND_GOOF_FRIEND})
 	for _, v in ipairs(aGroup) do
 		local aFriend = me.GetFellowshipInfo(v.id) or {}
 		for _, vv in ipairs(aFriend) do
 			if vv.istwoway and vv.attraction >= MY_Love.nLoveAttraction and (nType ~= 1 or vv.attraction >= MY_Love.nDoubleLoveAttraction) then
-				table.insert(m0, {
+				insert(m0, {
 					szOption = vv.name,
 					fnDisable = function() return not vv.isonline end,
 					fnAction = function()
@@ -92,7 +92,7 @@ function D.GetLoverMenu(nType)
 		end
 	end
 	if #m0 == 0 then
-		table.insert(m0, { szOption = _L['<Non-avaiable>'] })
+		insert(m0, { szOption = _L['<Non-avaiable>'] })
 	end
 	return m0
 end

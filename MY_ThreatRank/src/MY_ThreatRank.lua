@@ -326,9 +326,9 @@ function _TS.UpdateThreatBars(tList, dwTargetID, dwApplyID)
 	end
 	-- 重构用于排序
 	for k, v in pairs(tList) do
-		table.insert(tThreat, { id = k, val = v })
+		insert(tThreat, { id = k, val = v })
 	end
-	table.sort(tThreat, function(a, b) return a.val > b.val end) -- 进行排序
+	sort(tThreat, function(a, b) return a.val > b.val end) -- 进行排序
 	for k, v in ipairs(tThreat) do
 		v.sort = k
 		if v.id == UI_GetClientPlayerID() then
@@ -344,7 +344,7 @@ function _TS.UpdateThreatBars(tList, dwTargetID, dwApplyID)
 			if TS.bTopTarget and tList[dwTargetID] then
 				for k, v in ipairs(tThreat) do
 					if v.id == dwTargetID then
-						table.insert(tThreat, 1, table.remove(tThreat, k))
+						insert(tThreat, 1, remove(tThreat, k))
 						break
 					end
 				end
@@ -575,7 +575,7 @@ function PS.OnPanelActive(frame)
 		menu = function()
 			local t = {}
 			for k, v in ipairs(_TS.tStyle) do
-				table.insert(t, {
+				insert(t, {
 					szOption = _L('Style %d', k),
 					bMCheck = true,
 					bChecked = TS.nStyle == k,
@@ -595,7 +595,7 @@ function PS.OnPanelActive(frame)
 		menu = function()
 			local t = {}
 			for k, v in ipairs({2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30, 50}) do -- 其实服务器最大反馈不到50个
-				table.insert(t, {
+				insert(t, {
 					szOption = v,
 					bMCheck = true,
 					bChecked = TS.nMaxBarCount == v,

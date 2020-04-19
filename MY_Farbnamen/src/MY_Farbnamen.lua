@@ -492,7 +492,7 @@ end
 --------------------------------------------------------------
 function MY_Farbnamen.GetMenu()
 	local t = {szOption = _L['MY_Farbnamen']}
-	table.insert(t, {
+	insert(t, {
 		szOption = _L['enable'],
 		fnAction = function()
 			MY_Farbnamen.bEnabled = not MY_Farbnamen.bEnabled
@@ -500,7 +500,7 @@ function MY_Farbnamen.GetMenu()
 		bCheck = true,
 		bChecked = MY_Farbnamen.bEnabled
 	})
-	table.insert(t, {
+	insert(t, {
 		szOption = _L['customize color'],
 		fnAction = function()
 			LIB.ShowPanel()
@@ -511,7 +511,7 @@ function MY_Farbnamen.GetMenu()
 			return not MY_Farbnamen.bEnabled
 		end,
 	})
-	table.insert(t, {
+	insert(t, {
 		szOption = _L['reset data'],
 		fnAction = function()
 			if not InitDB() then

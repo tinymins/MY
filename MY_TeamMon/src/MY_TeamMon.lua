@@ -1913,7 +1913,7 @@ function D.LoadConfigureFile(config)
 							for kk, vv in ipairs(v) do
 								if not D.CheckSameData(szType, k, vv.dwID or vv.szContent, vv.nLevel or vv.szTarget) then
 									D.FILE[szType][k] = D.FILE[szType][k] or {}
-									table.insert(D.FILE[szType][k], vv)
+									insert(D.FILE[szType][k], vv)
 								end
 							end
 						end
@@ -1983,7 +1983,7 @@ function D.RemoveData(szType, dwMapID, nIndex)
 	if nIndex then
 		if D.FILE[szType][dwMapID] and D.FILE[szType][dwMapID][nIndex] then
 			if dwMapID == -9 then
-				table.remove(D.FILE[szType][dwMapID], nIndex)
+				remove(D.FILE[szType][dwMapID], nIndex)
 				if #D.FILE[szType][dwMapID] == 0 then
 					D.FILE[szType][dwMapID] = nil
 				end
@@ -2042,7 +2042,7 @@ function D.MoveData(szType, dwMapID, nIndex, dwTargetMapID, bCopy)
 		D.FILE[szType][dwTargetMapID] = D.FILE[szType][dwTargetMapID] or {}
 		insert(D.FILE[szType][dwTargetMapID], clone(D.FILE[szType][dwMapID][nIndex]))
 		if not bCopy then
-			table.remove(D.FILE[szType][dwMapID], nIndex)
+			remove(D.FILE[szType][dwMapID], nIndex)
 			if #D.FILE[szType][dwMapID] == 0 then
 				D.FILE[szType][dwMapID] = nil
 			end
@@ -2061,8 +2061,8 @@ function D.Exchange(szType, dwMapID, nIndex1, nIndex2)
 		local data1 = D.FILE[szType][dwMapID][nIndex1]
 		local data2 = D.FILE[szType][dwMapID][nIndex2]
 		if data1 and data2 then
-			-- local data = table.remove(D.FILE[szType][dwMapID], nIndex1)
-			-- table.insert(D.FILE[szType][dwMapID], nIndex2 + 1, data)
+			-- local data = remove(D.FILE[szType][dwMapID], nIndex1)
+			-- insert(D.FILE[szType][dwMapID], nIndex2 + 1, data)
 			D.FILE[szType][dwMapID][nIndex1] = data2
 			D.FILE[szType][dwMapID][nIndex2] = data1
 			FireUIEvent('MY_TM_CREATE_CACHE')
@@ -2105,10 +2105,10 @@ function D.ConfirmShare()
 				D.RemoveData(t.szType, t.dwMapID, nIndex)
 			end
 			D.AddData(t.szType, t.dwMapID, data)
-			table.remove(MY_TM_SHARE_QUEUE, 1)
+			remove(MY_TM_SHARE_QUEUE, 1)
 			LIB.DelayCall(100, D.ConfirmShare)
 		end, function()
-			table.remove(MY_TM_SHARE_QUEUE, 1)
+			remove(MY_TM_SHARE_QUEUE, 1)
 			LIB.DelayCall(100, D.ConfirmShare)
 		end)
 	end

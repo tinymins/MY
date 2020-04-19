@@ -253,12 +253,12 @@ local function InsertChangeGroupMenu(tMenu, dwMemberID)
 					fnAction = function() GetClientTeam().ChangeMemberGroup(dwMemberID, i, 0) end,
 					fnAutoClose = function() return true end,
 				}
-				table.insert(tSubMenu, tSubSubMenu)
+				insert(tSubMenu, tSubSubMenu)
 			end
 		end
 	end
 	if #tSubMenu > 0 then
-		table.insert(tMenu, tSubMenu)
+		insert(tMenu, tSubMenu)
 	end
 end
 
@@ -509,7 +509,7 @@ function MY_CataclysmParty_Base.OnItemRButtonClick()
 	local me = GetClientPlayer()
 	local info = CTM:GetMemberInfo(dwID)
 	local szPath, nFrame = GetForceImage(info.dwForceID)
-	table.insert(menu, {
+	insert(menu, {
 		szOption = info.szName,
 		szLayer = 'ICON_RIGHT',
 		rgb = { LIB.GetForceColor(info.dwForceID, 'foreground') },
@@ -517,13 +517,13 @@ function MY_CataclysmParty_Base.OnItemRButtonClick()
 		nFrame = nFrame
 	})
 	if LIB.IsLeader() and me.IsInRaid() then
-		table.insert(menu, { bDevide = true })
+		insert(menu, { bDevide = true })
 		InsertChangeGroupMenu(menu, dwID)
 	end
 	local info = CTM:GetMemberInfo(dwID)
 	if dwID ~= me.dwID then
 		if LIB.IsLeader() then
-			table.insert(menu, { bDevide = true })
+			insert(menu, { bDevide = true })
 		end
 		InsertTeammateMenu(menu, dwID)
 		local t = {}
@@ -532,20 +532,20 @@ function MY_CataclysmParty_Base.OnItemRButtonClick()
 			if v.szOption == g_tStrings.LOOKUP_INFO then
 				for _, vv in ipairs(v) do
 					if vv.szOption == g_tStrings.LOOKUP_NEW_TANLENT then -- ÆæÑ¨
-						table.insert(menu, vv)
+						insert(menu, vv)
 						break
 					end
 				end
 			end
 			if v.szOption == g_tStrings.STR_MAKE_TRADDING then -- ½»Ò×
-				table.insert(menu, v)
+				insert(menu, v)
 			end
 		end
-		table.insert(menu, { szOption = g_tStrings.STR_LOOKUP, bDisable = not info.bIsOnLine, fnAction = function()
+		insert(menu, { szOption = g_tStrings.STR_LOOKUP, bDisable = not info.bIsOnLine, fnAction = function()
 			ViewInviteToPlayer(dwID)
 		end })
 		if MY_CharInfo and MY_CharInfo.ViewCharInfoToPlayer then
-			table.insert(menu, {
+			insert(menu, {
 				szOption = g_tStrings.STR_LOOK .. g_tStrings.STR_EQUIP_ATTR, bDisable = not info.bIsOnLine, fnAction = function()
 					MY_CharInfo.ViewCharInfoToPlayer(dwID)
 				end
@@ -564,11 +564,11 @@ function MY_CataclysmParty_Base.OnItemRButtonClick()
 			end
 		end
 	else
-		table.insert(menu, { bDevide = true })
+		insert(menu, { bDevide = true })
 		InsertPlayerMenu(menu, dwID)
 		if LIB.IsLeader() then
-			table.insert(menu, { bDevide = true })
-			table.insert(menu, {
+			insert(menu, { bDevide = true })
+			insert(menu, {
 				szOption = _L['Take back all permissions'],
 				rgb = { 255, 255, 0 },
 				fnAction = function()
@@ -578,8 +578,8 @@ function MY_CataclysmParty_Base.OnItemRButtonClick()
 				end,
 			})
 		elseif not LIB.IsShieldedVersion('MY_CataclysmSeize', 2) then
-			table.insert(menu, { bDevide = true })
-			table.insert(menu, {
+			insert(menu, { bDevide = true })
+			insert(menu, {
 				szOption = _L['Take back permissions'],
 				rgb = { 255, 255, 0 },
 				{

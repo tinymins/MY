@@ -212,7 +212,7 @@ function MY_RollMonitor.GetPersonResult(szName, nSortType, nTimeLimit)
 		if rec.nTime < nStartTime then
 			nIndex1 = i
 		else
-			table.insert(aTime, rec.nTime)
+			insert(aTime, rec.nTime)
 		end
 	end
 	nIndex1 = nIndex1 + 1
@@ -241,10 +241,10 @@ function MY_RollMonitor.GetResult(nSortType, nTimeLimit)
 	for _, aRecord in pairs(m_tRecords) do
 		aRecord = MY_RollMonitor.GetPersonResult(aRecord, nSortType, nTimeLimit)
 		if aRecord then
-			table.insert(t, aRecord)
+			insert(t, aRecord)
 		end
 	end
-	table.sort(t, function(v1, v2) return v1.nRoll > v2.nRoll end)
+	sort(t, function(v1, v2) return v1.nRoll > v2.nRoll end)
 	return t
 end
 
@@ -307,11 +307,11 @@ function MY_RollMonitor.DrawBoard(ui)
 				GetFormatText('['..aRecord.szName..']', nil, nil, nil, nil, 515, nil, 'namelink_0') ..
 				GetFormatText(_L( ' rolls for %d times, valid score is %s.', aRecord.nCount, (gsub(aRecord.nRoll,'(%d+%.%d%d)%d+','%1')) ) .. '\n')
 			for _, nTime in ipairs(aRecord.aTime) do
-				table.insert(m_aRecTime, nTime)
+				insert(m_aRecTime, nTime)
 			end
 			tNames[aRecord.szName] = true
 		end
-		table.sort(m_aRecTime)
+		sort(m_aRecTime)
 		local team = GetClientTeam()
 		if team then
 			local szUnrolledNames = ''
@@ -359,8 +359,8 @@ local function OnMsgArrive(szMsg, nFont, bRich, r, g, b)
 		end
 		local aRecord = m_tRecords[szName]
 		-- 格式化数组 更新各数值
-		table.insert(m_aRecTime, GetCurrentTime())
-		table.insert(aRecord, {nTime = GetCurrentTime(), nRoll = nRoll})
+		insert(m_aRecTime, GetCurrentTime())
+		insert(aRecord, {nTime = GetCurrentTime(), nRoll = nRoll})
 	end
 	if not isRoll then
 		return
@@ -380,7 +380,7 @@ function PS.OnPanelActive(wnd)
 		menu = function(raw)
 			local t = {}
 			for _, nSortType in ipairs(SORT_TYPE_LIST) do
-				table.insert(t, {
+				insert(t, {
 					szOption = SORT_TYPE_INFO[nSortType].szName,
 					fnAction = function()
 						MY_RollMonitor.nSortType = nSortType
@@ -400,7 +400,7 @@ function PS.OnPanelActive(wnd)
 		menu = function(raw)
 			local t = {}
 			for _, nSec in ipairs(TIME_LIMIT) do
-				table.insert(t, {
+				insert(t, {
 					szOption = TIME_LIMIT_TITLE[nSec],
 					fnAction = function()
 						UI(raw):Text(TIME_LIMIT_TITLE[nSec])
@@ -424,7 +424,7 @@ function PS.OnPanelActive(wnd)
 				fnAction = function() MY_RollMonitor.bPublishRestart = not MY_RollMonitor.bPublishRestart end,
 			}, { bDevide = true }}
 			for _, tChannel in ipairs(PUBLISH_CHANNELS) do
-				table.insert(t, {
+				insert(t, {
 					szOption = tChannel.szName,
 					rgb = tChannel.rgb,
 					bCheck = true, bMCheck = true, bChecked = MY_RollMonitor.nPublishChannel == tChannel.nChannel,
@@ -467,7 +467,7 @@ function PS.OnPanelActive(wnd)
 				}
 			}, { bDevide = true } }
 			for _, tChannel in ipairs(PUBLISH_CHANNELS) do
-				table.insert( t, {
+				insert( t, {
 					szOption = tChannel.szName,
 					rgb = tChannel.rgb,
 					bCheck = true, bMCheck = true, bChecked = MY_RollMonitor.nPublishChannel == tChannel.nChannel,

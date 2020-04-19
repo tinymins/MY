@@ -55,7 +55,7 @@ local D = {}
 ----------------------------------------------------------------------<
 function D.GetSubsidiesMenu()
 	local menu = { szOption = _L['Edit Allowance Protocols'], rgb = { 255, 0, 0 } }
-	table.insert(menu, {
+	insert(menu, {
 		szOption = _L['Add New Protocols'],
 		rgb = { 255, 255, 0 },
 		fnAction = function()
@@ -67,9 +67,9 @@ function D.GetSubsidiesMenu()
 			end)
 		end,
 	})
-	table.insert(menu, { bDevide = true})
+	insert(menu, { bDevide = true})
 	for k, v in ipairs(MY_GKP.aSubsidies) do
-		table.insert(menu, {
+		insert(menu, {
 			szOption = v[1],
 			bCheck = true,
 			bChecked = v[3],
@@ -102,7 +102,7 @@ end
 ----------------------------------------------------------------------<
 function D.GetSchemeMenu()
 	local menu = { szOption = _L['Edit Auction Protocols'], rgb = { 255, 0, 0 } }
-	table.insert(menu,{
+	insert(menu,{
 		szOption = _L['Edit All Protocols'],
 		rgb = { 255, 255, 0 },
 		fnAction = function()
@@ -110,7 +110,7 @@ function D.GetSchemeMenu()
 			if IsTable(MY_GKP.aScheme) then
 				for k, v in ipairs(MY_GKP.aScheme) do
 					if IsTable(v) and IsNumber(v[1]) then
-						table.insert(a, tostring(v[1]))
+						insert(a, tostring(v[1]))
 					end
 				end
 			end
@@ -118,15 +118,15 @@ function D.GetSchemeMenu()
 				local t = LIB.SplitString(txt, ',')
 				local aScheme = {}
 				for k, v in ipairs(t) do
-					table.insert(aScheme, { tonumber(v) or 0, true })
+					insert(aScheme, { tonumber(v) or 0, true })
 				end
 				MY_GKP.aScheme = aScheme
 			end, nil, nil, nil, concat(a, ','))
 		end
 	})
-	table.insert(menu, { bDevide = true })
+	insert(menu, { bDevide = true })
 	for k, v in ipairs(MY_GKP.aScheme) do
-		table.insert(menu,{
+		insert(menu,{
 			szOption = v[1],
 			bCheck = true,
 			bChecked = v[2],

@@ -99,9 +99,9 @@ function LIB.Table_GetTeamRecruit()
 			if dwSubType > 0 then
 				res[dwType][dwSubType] = res[dwType][dwSubType] or {SubType=dwSubType, SubTypeName=szSubTypeName}
 				res[dwType][dwSubType].bParent = true
-				table.insert(res[dwType][dwSubType], tLine)
+				insert(res[dwType][dwSubType], tLine)
 			else
-				table.insert(res[dwType], tLine)
+				insert(res[dwType], tLine)
 			end
 		end
 	end
@@ -145,7 +145,7 @@ function LIB.Table_GetSkillSchoolKungfu(dwSchoolID)
 		for s in gmatch(szKungfu, "%d+") do
 			local dwID = tonumber(s)
 			if dwID then
-				table.insert(tKungFungList, dwID)
+				insert(tKungFungList, dwID)
 			end
 		end
 	end
@@ -163,7 +163,7 @@ function LIB.Table_GetMKungfuList(dwKungfuID)
 		for s in gmatch(szKungfu, "%d+") do
 			local dwID = tonumber(s)
 			if dwID then
-				table.insert(tKungfu, dwID)
+				insert(tKungfu, dwID)
 			end
 		end
 	end
@@ -187,7 +187,7 @@ function LIB.Table_GetNewKungfuSkill(dwMountKungfu, dwKungfuID)
 	for s in gmatch(szSkill, "%d+") do
 		local dwID = tonumber(s)
 		if dwID then
-			table.insert(tSkill, dwID)
+			insert(tSkill, dwID)
 		end
 	end
 	if tSkill and not IsEmpty(tSkill) then
@@ -207,7 +207,7 @@ function LIB.Table_GetKungfuSkillList(dwKungfuID)
 		for s in gmatch(szSkill, "%d+") do
 			local dwID = tonumber(s)
 			if dwID then
-				table.insert(tSkill, dwID)
+				insert(tSkill, dwID)
 			end
 		end
 	end

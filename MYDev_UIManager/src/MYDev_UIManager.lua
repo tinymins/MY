@@ -54,10 +54,10 @@ local function GetMeun(ui)
 	local menu, frames = { szOption = ui }, {}
 	local frame = Station.Lookup(ui):GetFirstChild()
 	while frame do
-		table.insert(frames, { szName = frame:GetName() })
+		insert(frames, { szName = frame:GetName() })
 		frame = frame:GetNext()
 	end
-	table.sort(frames, function(a, b) return a.szName < b.szName end)
+	sort(frames, function(a, b) return a.szName < b.szName end)
 	for k, v in ipairs(frames) do
 		local szPath = ui .. '/' .. v.szName
 		local frame = Station.Lookup(szPath)
@@ -65,7 +65,7 @@ local function GetMeun(ui)
 		if UI_DESC[szPath] then
 			szOption = szOption .. ' (' .. UI_DESC[szPath]  .. ')'
 		end
-		table.insert(menu, {
+		insert(menu, {
 			szOption = szOption,
 			bCheck = true,
 			bChecked = frame:IsVisible(),
@@ -88,7 +88,7 @@ end
 TraceButton_AppendAddonMenu({function()
 	local menu = { szOption = _L['MYDev_UIManager'] }
 	for k, v in ipairs({ 'Lowest', 'Lowest1', 'Lowest2', 'Normal', 'Normal1', 'Normal2', 'Topmost', 'Topmost1', 'Topmost2' })do
-		table.insert(menu, GetMeun(v))
+		insert(menu, GetMeun(v))
 	end
 	return {menu}
 end})

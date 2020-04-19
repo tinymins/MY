@@ -108,7 +108,7 @@ function D.Apply()
 				local sha = hShaList:Lookup(tostring(dwID))
 				if sha then
 					sha:Hide()
-					table.insert(hShaList.freeShadows, sha)
+					insert(hShaList.freeShadows, sha)
 				end
 			end
 		end
@@ -188,7 +188,7 @@ function D.Apply()
 				local sha = hShaList:Lookup(tostring(dwID))
 				if sha then
 					sha:Hide()
-					table.insert(hShaList.freeShadows, sha)
+					insert(hShaList.freeShadows, sha)
 				end
 			end
 		end

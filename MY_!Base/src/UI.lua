@@ -3184,7 +3184,7 @@ function UI:ItemInfo(...)
 			else
 				local KItemInfo = GetItemInfo(data[2], data[3])
 				if KItemInfo.nGenre == ITEM_GENRE.BOOK and #data == 4 then -- 西山居BUG
-					table.insert(data, 4, 99999)
+					insert(data, 4, 99999)
 				end
 				local res, err, trace = XpCall(UpdataItemInfoBoxObject, raw, unpack(data)) -- 防止itemtab不一样
 				if not res then
@@ -4106,7 +4106,7 @@ function HandlePool:GetAllItem(bShow)
 	for i = self.handle:GetItemCount() - 1, 0, -1 do
 		local item = self.handle:Lookup(i)
 		if bShow and item:IsVisible() or not bShow then
-			table.insert(t, item)
+			insert(t, item)
 		end
 	end
 	return t

@@ -275,14 +275,14 @@ function LIB.GetTargetContextMenu(dwType, szName, dwID)
 	local t = {}
 	if dwType == TARGET.PLAYER then
 		-- 复制
-		table.insert(t, {
+		insert(t, {
 			szOption = _L['copy'],
 			fnAction = function()
 				LIB.Talk(GetClientPlayer().szName, '[' .. szName .. ']')
 			end,
 		})
 		-- 密聊
-		-- table.insert(t, {
+		-- insert(t, {
 		--     szOption = _L['whisper'],
 		--     fnAction = function()
 		--         LIB.SwitchChat(szName)
@@ -303,7 +303,7 @@ function LIB.GetTargetContextMenu(dwType, szName, dwID)
 		end
 		-- insert view equip
 		if dwID and UI_GetClientPlayerID() ~= dwID then
-			table.insert(t, {
+			insert(t, {
 				szOption = _L['show equipment'],
 				fnAction = function()
 					ViewInviteToPlayer(dwID)
@@ -311,7 +311,7 @@ function LIB.GetTargetContextMenu(dwType, szName, dwID)
 			})
 		end
 		-- insert view arena
-		table.insert(t, {
+		insert(t, {
 			szOption = g_tStrings.LOOKUP_CORPS,
 			-- fnDisable = function() return not GetPlayer(dwID) end,
 			fnAction = function()
@@ -328,7 +328,7 @@ function LIB.GetTargetContextMenu(dwType, szName, dwID)
 			if v.szOption == g_tStrings.LOOKUP_INFO then
 				for _, vv in ipairs(v) do
 					if vv.szOption == g_tStrings.LOOKUP_NEW_TANLENT then -- 查看奇穴
-						table.insert(t, vv)
+						insert(t, vv)
 						break
 					end
 				end
@@ -344,7 +344,7 @@ function LIB.GetTargetContextMenu(dwType, szName, dwID)
 			or v.szOption == g_tStrings.STR_MAKE_TRADDING       -- 交易
 			or v.szOption == g_tStrings.REPORT_RABOT            -- 举报外挂
 			then
-				table.insert(t, v)
+				insert(t, v)
 			end
 		end
 	end
@@ -1735,11 +1735,11 @@ local function GeneFriendListCache()
 				FRIEND_LIST_BY_NAME = {}
 				FRIEND_LIST_BY_GROUP = {{ id = 0, name = g_tStrings.STR_FRIEND_GOOF_FRIEND or '' }} -- 默认分组
 				for _, group in ipairs(infos) do
-					table.insert(FRIEND_LIST_BY_GROUP, group)
+					insert(FRIEND_LIST_BY_GROUP, group)
 				end
 				for _, group in ipairs(FRIEND_LIST_BY_GROUP) do
 					for _, p in ipairs(me.GetFellowshipInfo(group.id) or {}) do
-						table.insert(group, p)
+						insert(group, p)
 						FRIEND_LIST_BY_ID[p.id] = p
 						FRIEND_LIST_BY_NAME[p.name] = p
 					end
@@ -1773,11 +1773,11 @@ function LIB.GetFriendList(arg0)
 	local tGroup = {}
 	if GeneFriendListCache() then
 		if type(arg0) == 'number' then
-			table.insert(tGroup, FRIEND_LIST_BY_GROUP[arg0])
+			insert(tGroup, FRIEND_LIST_BY_GROUP[arg0])
 		elseif type(arg0) == 'string' then
 			for _, group in ipairs(FRIEND_LIST_BY_GROUP) do
 				if group.name == arg0 then
-					table.insert(tGroup, Clone(group))
+					insert(tGroup, Clone(group))
 				end
 			end
 		else
@@ -1823,7 +1823,7 @@ local function GeneFoeListCache()
 					for i, p in ipairs(infos) do
 						FOE_LIST_BY_ID[p.id] = p
 						FOE_LIST_BY_NAME[p.name] = p
-						table.insert(FOE_LIST, p)
+						insert(FOE_LIST, p)
 					end
 					return true
 				end
@@ -2224,7 +2224,7 @@ local function WithTargetHandle()
 	end
 
 	LOCK_WITH_TARGET = true
-	local r = table.remove(WITH_TARGET_LIST, 1)
+	local r = remove(WITH_TARGET_LIST, 1)
 
 	LIB.SetTempTarget(r.dwType, r.dwID)
 	local res, err, trace = XpCall(r.callback)
@@ -2238,7 +2238,7 @@ local function WithTargetHandle()
 end
 function LIB.WithTarget(dwType, dwID, callback)
 	-- 因为客户端多线程 所以加上资源锁 防止设置临时目标冲突
-	table.insert(WITH_TARGET_LIST, {
+	insert(WITH_TARGET_LIST, {
 		dwType   = dwType  ,
 		dwID     = dwID    ,
 		callback = callback,
@@ -2668,7 +2668,7 @@ end
 -- (table) LIB.GetSkillByName(szName)
 do local PLAYER_SKILL_CACHE = {} -- 玩家技能列表[缓存] 技能名反查ID
 function LIB.GetSkillByName(szName)
-	if table.getn(PLAYER_SKILL_CACHE)==0 then
+	if getn(PLAYER_SKILL_CACHE)==0 then
 		for i = 1, g_tTable.Skill:GetRowCount() do
 			local tLine = g_tTable.Skill:GetRow(i)
 			if tLine~=nil and tLine.dwIconID~=nil and tLine.fSortOrder~=nil and tLine.szName~=nil and tLine.dwIconID~=13 and ( (not PLAYER_SKILL_CACHE[tLine.szName]) or tLine.fSortOrder>PLAYER_SKILL_CACHE[tLine.szName].fSortOrder) then
@@ -3328,13 +3328,13 @@ function LIB.SetTeamInfo(tTeamInfo)
 				end
 				local state = tSaved[szName]
 				if not state then
-					table.insert(tWrong[nGroup], { dwID = dwID, szName = szName, state = nil })
+					insert(tWrong[nGroup], { dwID = dwID, szName = szName, state = nil })
 					LIB.Sysmsg(_L('unknown status: %s', szName))
 				elseif state.nGroup == nGroup then
 					SyncMember(team, dwID, szName, state)
 					LIB.Sysmsg(_L('need not adjust: %s', szName))
 				else
-					table.insert(tWrong[nGroup], { dwID = dwID, szName = szName, state = state })
+					insert(tWrong[nGroup], { dwID = dwID, szName = szName, state = state })
 				end
 				if szName == tTeamInfo.szLeader then
 					dwLeader = dwID
@@ -3356,16 +3356,16 @@ function LIB.SetTeamInfo(tTeamInfo)
 			-- wrong user to be adjusted
 			local src = tWrong[nGroup][nIndex]
 			local dIndex = GetWrongIndex(tWrong[src.state.nGroup], false)
-			table.remove(tWrong[nGroup], nIndex)
+			remove(tWrong[nGroup], nIndex)
 			-- do adjust
 			if not dIndex then
 				team.ChangeMemberGroup(src.dwID, src.state.nGroup, 0) -- 直接丢过去
 			else
 				local dst = tWrong[src.state.nGroup][dIndex]
-				table.remove(tWrong[src.state.nGroup], dIndex)
+				remove(tWrong[src.state.nGroup], dIndex)
 				team.ChangeMemberGroup(src.dwID, src.state.nGroup, dst.dwID)
 				if not dst.state or dst.state.nGroup ~= nGroup then
-					table.insert(tWrong[nGroup], dst)
+					insert(tWrong[nGroup], dst)
 				else -- bingo
 					LIB.Sysmsg(_L('change group of [%s] to %d', dst.szName, nGroup + 1))
 					SyncMember(team, dst.dwID, dst.szName, dst.state)
@@ -3490,7 +3490,7 @@ function LIB.GetCharInfo()
 		local handle = hCharInfo:Lookup('WndScroll_Property', '')
 		for i = 0, handle:GetVisibleItemCount() -1 do
 			local h = handle:Lookup(i)
-			table.insert(data, {
+			insert(data, {
 				szTip = h.szTip,
 				label = h:Lookup(0):GetText(),
 				value = h:Lookup(1):GetText(),

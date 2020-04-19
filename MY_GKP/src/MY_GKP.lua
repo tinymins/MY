@@ -216,14 +216,14 @@ function D.GetTeamMemberMenu(fnAction, bDisable, bSelf)
 	local tTeam, menu = {}, {}
 	for _, v in ipairs(GetClientTeam().GetTeamMemberList()) do
 		local info = GetClientTeam().GetMemberInfo(v)
-		table.insert(tTeam, { szName = info.szName, dwID = v, dwForce = info.dwForceID, bIsOnLine = info.bIsOnLine})
+		insert(tTeam, { szName = info.szName, dwID = v, dwForce = info.dwForceID, bIsOnLine = info.bIsOnLine})
 	end
 	local dwID = UI_GetClientPlayerID()
-	table.sort(tTeam, function(a, b) return a.dwForce < b.dwForce end)
+	sort(tTeam, function(a, b) return a.dwForce < b.dwForce end)
 	for _, v in ipairs(tTeam) do
 		if v.dwID ~= dwID or bSelf then
 			local szIcon, nFrame = GetForceImage(v.dwForce)
-			table.insert(menu, {
+			insert(menu, {
 				szOption = v.szName,
 				szLayer  = 'ICON_RIGHTMOST',
 				bDisable = bDisable and not v.bIsOnLine,

@@ -407,7 +407,7 @@ function PS.OnPanelActive(wnd)
 			end)
 		end
 		if tartype == 'Player' then
-			table.insert(opt, {
+			insert(opt, {
 				szOption = _L['Unified force color'],
 				bCheck = true, bMCheck = true,
 				bChecked = not cfg.DifferentiateForce,
@@ -420,7 +420,7 @@ function PS.OnPanelActive(wnd)
 					opt.rgb = cfg[tartype]
 				end,
 			})
-			table.insert(opt, {
+			insert(opt, {
 				szOption = _L['Differentiate force color'],
 				bCheck = true, bMCheck = true,
 				bChecked = cfg.DifferentiateForce,
@@ -428,9 +428,9 @@ function PS.OnPanelActive(wnd)
 					cfg.DifferentiateForce = true
 				end,
 			})
-			table.insert(opt,{ bDevide = true } )
+			insert(opt,{ bDevide = true } )
 			for dwForceID, szForceTitle in pairs(g_tStrings.tForceTitle) do
-				table.insert(opt, {
+				insert(opt, {
 					szOption = szForceTitle,
 					rgb = cfg[dwForceID],
 					fnChangeColor = function(_, r, g, b)
@@ -447,10 +447,10 @@ function PS.OnPanelActive(wnd)
 	local function GeneBooleanPopupMenu(cfgs, szPlayerTip, szNpcTip)
 		local t = {}
 		if szPlayerTip then
-			table.insert(t, { szOption = szPlayerTip, bDisable = true } )
+			insert(t, { szOption = szPlayerTip, bDisable = true } )
 			for relation, cfg in pairs(cfgs) do
 				if cfg.Player then
-					table.insert(t, FillColorTable({
+					insert(t, FillColorTable({
 						szOption = _L[relation],
 						bCheck = true,
 						bChecked = cfg.Player.bEnable,
@@ -471,13 +471,13 @@ function PS.OnPanelActive(wnd)
 			end
 		end
 		if szPlayerTip and szNpcTip then
-			table.insert(t,{ bDevide = true } )
+			insert(t,{ bDevide = true } )
 		end
 		if szNpcTip then
-			table.insert(t,{ szOption = szNpcTip, bDisable = true } )
+			insert(t,{ szOption = szNpcTip, bDisable = true } )
 			for relation, cfg in pairs(cfgs) do
 				if cfg.Npc then
-					table.insert(t, FillColorTable({
+					insert(t, FillColorTable({
 						szOption = _L[relation],
 						bCheck = true,
 						bChecked = cfg.Npc.bEnable,
@@ -542,12 +542,12 @@ function PS.OnPanelActive(wnd)
 		x = x, y = y, text = _L['lifebar display config'],
 		menu = function()
 			local t = GeneBooleanPopupMenu(Config.ShowLife, _L['player lifebar display'], _L['npc lifebar display'])
-			table.insert(t, { bDevide = true })
+			insert(t, { bDevide = true })
 			local t1 = {
 				szOption = _L['Draw direction'],
 			}
 			for _, szDirection in ipairs({ 'LEFT_RIGHT', 'RIGHT_LEFT', 'TOP_BOTTOM', 'BOTTOM_TOP' }) do
-				table.insert(t1, {
+				insert(t1, {
 					szOption = _L.DIRECTION[szDirection],
 					bCheck = true, bMCheck = true,
 					bChecked = Config.szLifeDirection == szDirection,
@@ -556,7 +556,7 @@ function PS.OnPanelActive(wnd)
 					end,
 				})
 			end
-			table.insert(t, t1)
+			insert(t, t1)
 			return t
 		end,
 		autoenable = function() return D.IsEnabled() end,
@@ -568,8 +568,8 @@ function PS.OnPanelActive(wnd)
 		x = x, y = y, text = _L['lifepercentage display config'],
 		menu = function()
 			local t = GeneBooleanPopupMenu(Config.ShowLifePer, _L['player lifepercentage display'], _L['npc lifepercentage display'])
-			table.insert(t, { bDevide = true })
-			table.insert(t, {
+			insert(t, { bDevide = true })
+			insert(t, {
 				szOption = _L['hide decimal'],
 				bCheck = true,
 				bChecked = Config.bHideLifePercentageDecimal,

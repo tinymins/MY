@@ -143,9 +143,9 @@ function PS.OnPanelActive(frame)
 					local tt = {}
 					for k, v in ipairs(t) do
 						if not tonumber(v) then
-							table.remove(t, k)
+							remove(t, k)
 						else
-							table.insert(tt, tonumber(v))
+							insert(tt, tonumber(v))
 						end
 					end
 					if #t > 0 then
@@ -155,8 +155,8 @@ function PS.OnPanelActive(frame)
 						CFG.tDistanceCol = {}
 						CFG.tDistanceAlpha = {}
 						for i = 1, #t do
-							table.insert(CFG.tDistanceCol, tDistanceCol[i] or { 255, 255, 255 })
-							table.insert(CFG.tDistanceAlpha, tDistanceAlpha[i] or 255)
+							insert(CFG.tDistanceCol, tDistanceCol[i] or { 255, 255, 255 })
+							insert(CFG.tDistanceAlpha, tDistanceAlpha[i] or 255)
 						end
 						LIB.SwitchTab('MY_Cataclysm_GridColor', true)
 					end

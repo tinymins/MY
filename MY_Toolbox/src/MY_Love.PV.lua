@@ -240,7 +240,7 @@ function D.HookPlayerViewPanel()
 						InsertTeammateLeaderMenu(m0, tar.dwID)
 					end
 					if #m0 > 0 then
-						table.insert(m0, { bDevide = true })
+						insert(m0, { bDevide = true })
 					end
 					InsertPlayerCommonMenu(m0, tar.dwID, tar.szName)
 					PopupMenu(m0)

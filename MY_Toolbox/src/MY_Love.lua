@@ -672,7 +672,7 @@ local function OnBgTalk(_, aData, nChannel, dwTalkerID, szTalkerName, bSelf)
 				)
 			end
 		elseif szKey == 'LOVE0' or szKey == 'REMOVE0' then
-			local i = math.random(1, math.floor(table.getn(O.aAutoSay)/2)) * 2
+			local i = math.random(1, math.floor(getn(O.aAutoSay)/2)) * 2
 			if szKey == 'LOVE0' then
 				i = i - 1
 			end

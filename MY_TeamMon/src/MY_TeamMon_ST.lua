@@ -246,7 +246,7 @@ function MY_TeamMon_ST.OnFrameBreathe()
 						else
 							local nATime = (nNow - vv.nCreate) / 1000
 							vv.nLeft = nNow
-							table.remove(vv.countdown, 1)
+							remove(vv.countdown, 1)
 							local time = vv.countdown[1]
 							time.nTime = time.nTime - nATime
 							vv.obj:SetInfo(time):Switch(false)

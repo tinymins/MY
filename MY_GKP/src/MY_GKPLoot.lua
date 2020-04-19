@@ -407,7 +407,7 @@ function D.OnLButtonClick()
 					local aItemData = D.GetDoodadLootInfo(dwDoodadID)
 					local t = {}
 					for k, v in ipairs(aItemData) do
-						table.insert(t, MY_GKP.GetFormatLink(v.item))
+						insert(t, MY_GKP.GetFormatLink(v.item))
 					end
 					LIB.Talk(PLAYER_TALK_CHANNEL.RAID, t)
 				end,
@@ -624,9 +624,9 @@ function D.OnItemRButtonClick()
 			return
 		end
 		local menu = {}
-		table.insert(menu, { szOption = data.szName , bDisable = true })
-		table.insert(menu, { bDevide = true })
-		table.insert(menu, {
+		insert(menu, { szOption = data.szName , bDisable = true })
+		insert(menu, { bDevide = true })
+		insert(menu, {
 			szOption = 'Roll',
 			fnAction = function()
 				if MY_RollMonitor then
@@ -638,10 +638,10 @@ function D.OnItemRButtonClick()
 				LIB.Talk(PLAYER_TALK_CHANNEL.RAID, { MY_GKP.GetFormatLink(data.item), MY_GKP.GetFormatLink(_L['Roll the dice if you wang']) })
 			end
 		})
-		table.insert(menu, { bDevide = true })
+		insert(menu, { bDevide = true })
 		for k, v in ipairs(MY_GKP.aScheme) do
 			if v[2] then
-				table.insert(menu, {
+				insert(menu, {
 					szOption = v[1],
 					fnAction = function()
 						MY_GKP_Chat.OpenFrame(data.item, D.GetDistributeMenu(data, data.nUiId), {
@@ -701,7 +701,7 @@ function D.GetFilterMenu()
 		CONSTANT.MENU_DIVIDER,
 	}
 	for i, p in ipairs(GKP_ITEM_QUALITIES) do
-		table.insert(t1, {
+		insert(t1, {
 			szOption = p.szTitle,
 			rgb = { GetItemFontColorByQuality(p.nQuality) },
 			bCheck = true,
@@ -731,7 +731,7 @@ function D.GetFilterMenu()
 		CONSTANT.MENU_DIVIDER,
 	}
 	for szName, bEnable in pairs(MY_GKP_Loot.tItemConfig.tNameFilter) do
-		table.insert(t1, {
+		insert(t1, {
 			szOption = szName,
 			bCheck = true,
 			bChecked = bEnable,
@@ -847,7 +847,7 @@ function D.GetAutoPickupMenu()
 	-- 自动拾取品级
 	local t1 = { szOption = _L['Auto pickup by item quality'] }
 	for i, p in ipairs(GKP_ITEM_QUALITIES) do
-		table.insert(t1, {
+		insert(t1, {
 			szOption = p.szTitle,
 			rgb = { GetItemFontColorByQuality(p.nQuality) },
 			bCheck = true,
@@ -919,7 +919,7 @@ function D.GetBossAction(dwDoodadID, bMenu)
 				))
 				or IsCtrlKeyDown()
 			) and v.bDist then -- 按住Ctrl的情况下 无视分类 否则只给装备
-				table.insert(aEquipmentItemData, v)
+				insert(aEquipmentItemData, v)
 			end
 		end
 		if #aEquipmentItemData == 0 then
@@ -961,8 +961,8 @@ function D.GetBossAction(dwDoodadID, bMenu)
 			MY_GKP_LOOT_BOSS = v.dwID
 			fnAction()
 		end, false, true)
-		table.insert(menu, 1, { bDevide = true })
-		table.insert(menu, 1, { szOption = _L['select equip boss'], bDisable = true })
+		insert(menu, 1, { bDevide = true })
+		insert(menu, 1, { szOption = _L['select equip boss'], bDisable = true })
 		PopupMenu(menu)
 	else
 		fnAction()
@@ -1230,7 +1230,7 @@ function D.GetDistributeMenu(aItemData, szAutoDistType)
 	local me, team     = GetClientPlayer(), GetClientTeam()
 	local dwMapID      = me.GetMapID()
 	local aPartyMember = D.GetaPartyMember(aDoodadID)
-	table.sort(aPartyMember, function(a, b)
+	sort(aPartyMember, function(a, b)
 		return a.dwForceID < b.dwForceID
 	end)
 	local aItemName = {}
@@ -1247,13 +1247,13 @@ function D.GetDistributeMenu(aItemData, szAutoDistType)
 		if dwAutoDistID then
 			local member = aPartyMember(dwAutoDistID)
 			if member then
-				table.insert(menu, GetMemberMenu(member, aItemData, szAutoDistType, aDoodadID))
-				table.insert(menu, { bDevide = true })
+				insert(menu, GetMemberMenu(member, aItemData, szAutoDistType, aDoodadID))
+				insert(menu, { bDevide = true })
 			end
 		end
 	end
 	for _, member in ipairs(aPartyMember) do
-		table.insert(menu, GetMemberMenu(member, aItemData, szAutoDistType, aDoodadID))
+		insert(menu, GetMemberMenu(member, aItemData, szAutoDistType, aDoodadID))
 	end
 	return menu
 end

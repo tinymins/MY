@@ -299,9 +299,9 @@ function PS.OnPanelActive(wnd)
 		text = (function()
 			local t = {}
 			for szName, _ in pairs(MY_ChatMosaics.tIgnoreNames) do
-				table.insert(t, szName)
+				insert(t, szName)
 			end
-			table.concat(t, ',')
+			concat(t, ',')
 		end)(),
 		onchange = function(szText)
 			MY_ChatMosaics.tIgnoreNames = {}

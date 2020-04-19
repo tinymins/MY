@@ -572,7 +572,7 @@ function D.OnItemRButtonClick()
 		local dwType, dwID = this.dwType, this.dwID
 		local t = LIB.GetTargetContextMenu(dwType, this:Lookup('Handle_R/Handle_LMN/Text_Name'):GetText(), dwID)
 		if this.bDeletable then
-			table.insert(t, 1, {
+			insert(t, 1, {
 				szOption = _L['Delete focus'],
 				fnAction = function()
 					if l_dwLockType == dwType and l_dwLockID == dwID then
@@ -583,7 +583,7 @@ function D.OnItemRButtonClick()
 				end,
 			})
 		else
-			table.insert(t, 1, {
+			insert(t, 1, {
 				szOption = _L['Option'],
 				fnAction = function()
 					LIB.ShowPanel()
@@ -593,7 +593,7 @@ function D.OnItemRButtonClick()
 			})
 		end
 		local bLock = dwType == l_dwLockType and dwID == l_dwLockID
-		table.insert(t, {
+		insert(t, {
 			szOption = bLock and _L['Unlock focus'] or _L['Lock focus'],
 			fnAction = function()
 				if bLock then

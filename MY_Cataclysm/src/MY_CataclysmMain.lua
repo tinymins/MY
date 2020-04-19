@@ -288,7 +288,7 @@ function D.InsertForceCountMenu(tMenu)
 	}
 	for dwForceID, nCount in pairs(tForceList) do
 		local szPath, nFrame = GetForceImage(dwForceID)
-		table.insert(tSubMenu, {
+		insert(tSubMenu, {
 			szOption = g_tStrings.tForceTitle[dwForceID] .. '   ' .. nCount,
 			rgb = { LIB.GetForceColor(dwForceID) },
 			szIcon = szPath,
@@ -296,7 +296,7 @@ function D.InsertForceCountMenu(tMenu)
 			szLayer = 'ICON_LEFT'
 		})
 	end
-	table.insert(tMenu, tSubMenu)
+	insert(tMenu, tSubMenu)
 end
 
 function D.InsertDistributeMenu(tMenu)
@@ -992,7 +992,7 @@ function MY_CataclysmMain.OnLButtonClick()
 		local menu = {}
 		if me.IsInRaid() then
 			-- 团队就位
-			table.insert(menu, {
+			insert(menu, {
 				szOption = g_tStrings.STR_RAID_MENU_READY_CONFIRM,
 				{
 					szOption = g_tStrings.STR_RAID_READY_CONFIRM_START,
@@ -1007,30 +1007,30 @@ function MY_CataclysmMain.OnLButtonClick()
 					fnAction = function() MY_CataclysmParty:ClearTeamVote('raid_ready') end,
 				}
 			})
-			table.insert(menu, { bDevide = true })
+			insert(menu, { bDevide = true })
 		end
 		-- 分配
 		D.InsertDistributeMenu(menu, not LIB.IsDistributer())
-		table.insert(menu, { bDevide = true })
+		insert(menu, { bDevide = true })
 		if me.IsInRaid() then
 			-- 编辑模式
-			table.insert(menu, { szOption = gsub(g_tStrings.STR_RAID_MENU_RAID_EDIT, 'Ctrl', 'Alt'), bDisable = not LIB.IsLeader() or not me.IsInRaid(), bCheck = true, bChecked = CFG.bEditMode, fnAction = function()
+			insert(menu, { szOption = gsub(g_tStrings.STR_RAID_MENU_RAID_EDIT, 'Ctrl', 'Alt'), bDisable = not LIB.IsLeader() or not me.IsInRaid(), bCheck = true, bChecked = CFG.bEditMode, fnAction = function()
 				CFG.bEditMode = not CFG.bEditMode
 				GetPopupMenu():Hide()
 			end })
 			-- 人数统计
-			table.insert(menu, { bDevide = true })
+			insert(menu, { bDevide = true })
 			D.InsertForceCountMenu(menu)
-			table.insert(menu, { bDevide = true })
+			insert(menu, { bDevide = true })
 		end
-		table.insert(menu, { szOption = _L['Interface settings'], rgb = { 255, 255, 0 }, fnAction = function()
+		insert(menu, { szOption = _L['Interface settings'], rgb = { 255, 255, 0 }, fnAction = function()
 			LIB.ShowPanel()
 			LIB.FocusPanel()
 			LIB.SwitchTab('MY_Cataclysm')
 		end })
 		if LIB.IsDebugClient(true) then
-			table.insert(menu, { bDevide = true })
-			table.insert(menu, { szOption = 'DEBUG', bCheck = true, bChecked = DEBUG, fnAction = function()
+			insert(menu, { bDevide = true })
+			insert(menu, { szOption = 'DEBUG', bCheck = true, bChecked = DEBUG, fnAction = function()
 				DEBUG = not DEBUG
 			end	})
 		end
