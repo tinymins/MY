@@ -154,6 +154,7 @@ def convert_progress(argv):
                         with codecs.open(filepath,'w',encoding='gbk') as f:
                             f.write(ret_text)
                             print('File saved...')
+                        crc_text = __get_file_crc(filepath)
                     else:
                         print('Already up to date.')
                     crcs[relpath] = crc_text
