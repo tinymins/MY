@@ -1844,6 +1844,22 @@ function LIB.HumanColor2RGB(name)
 end
 end
 
+-- 获取某个字体的颜色
+-- (bool) LIB.GetFontColor(number nFont)
+do
+local CACHE, el = {}
+function LIB.GetFontColor(nFont)
+	if not CACHE[nFont] then
+		if not el or not IsElement(el) then
+			el = UI.GetTempElement('Text.MYLib_GetFontColor')
+		end
+		el:SetFontScheme(nFont)
+		CACHE[nFont] = {el:GetFontColor()}
+	end
+	return unpack(CACHE[nFont])
+end
+end
+
 function LIB.ExecuteWithThis(element, fnAction, ...)
 	if not (element and element:IsValid()) then
 		-- Log('[UI ERROR]Invalid element on executing ui event!')
