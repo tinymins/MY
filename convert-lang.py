@@ -111,6 +111,7 @@ def convert_progress(argv):
         if crc_header != crcs.get(relpath):
             header_changed = True
             crcs[relpath] = crc_header
+    header_sys = re.sub(r'(?s)-- lib apis caching.*?([-]+)', r'\1', header)
 
     cpkg = ''
     cpkg_path = '?'
@@ -133,7 +134,7 @@ def convert_progress(argv):
             relpath = filepath.replace(root_path, '')
             crc_changed = False
 
-            if extname == '.lua' and header != '' and basename != pkg_name and filename != 'Compatible.lua' and filename != 'Base.lua' and filename != 'src.lua':
+            if extname == '.lua' and header != '' and basename != pkg_name and filename != 'src.lua':
                 print('--------------------------------')
                 print('Update header: ' + filepath)
                 crc_text = __get_file_crc(filepath)
@@ -143,7 +144,10 @@ def convert_progress(argv):
                     all_the_text = ''
                     for count, line in enumerate(codecs.open(filepath,'r',encoding='gbk')):
                         all_the_text = all_the_text + line
-                    ret_text = re.sub(r'(?s)([-]+)\n-- these global functions are accessed all the time by the event handler\n-- so caching them is worth the effort\n\1.*?\n\1\n', header, all_the_text)
+                    if all_the_text.find('-- lib apis caching') != -1:
+                        ret_text = re.sub(r'(?s)([-]+)\n-- these global functions are accessed all the time by the event handler\n-- so caching them is worth the effort\n\1.*?\n\1\n', header, all_the_text)
+                    else:
+                        ret_text = re.sub(r'(?s)([-]+)\n-- these global functions are accessed all the time by the event handler\n-- so caching them is worth the effort\n\1.*?\n\1\n', header_sys, all_the_text)
 
                     if all_the_text != ret_text:
                         print('File saving...')
