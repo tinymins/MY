@@ -17,8 +17,9 @@
 -------------------------------------------------------------------------------------------------------
 local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local sub, len, format, rep = string.sub, string.len, string.format, string.rep
-local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
+local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
+local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
+local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
 local type, tonumber, tostring = type, tonumber, tostring
 local HUGE, PI, random, abs = math.huge, math.pi, math.random, math.abs
 local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
