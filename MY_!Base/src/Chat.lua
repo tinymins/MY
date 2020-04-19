@@ -1101,7 +1101,7 @@ end
 end
 
 do
-local CHANNEL_GROUP = {
+local MSG_GROUP = {
     {
         szCaption = g_tStrings.CHANNEL_CHANNEL,
         tChannels = {
@@ -1137,9 +1137,9 @@ local CHANNEL_GROUP = {
         },
     }
 }
-function LIB.GetChatChannelMenu(fnAction, tChecked)
+function LIB.GetMsgTypeMenu(fnAction, tChecked)
 	local t = {}
-	for _, cg in ipairs(CHANNEL_GROUP) do
+	for _, cg in ipairs(MSG_GROUP) do
 		local t1 = { szOption = cg.szCaption }
 		if cg.tChannels[1] then
 			for _, szChannel in ipairs(cg.tChannels) do
@@ -1149,7 +1149,7 @@ function LIB.GetChatChannelMenu(fnAction, tChecked)
 					UserData = szChannel,
 					fnAction = fnAction,
 					bCheck = true,
-					bChecked = tChecked[szChannel]
+					bChecked = tChecked[szChannel],
 				})
 			end
 		else
@@ -1165,7 +1165,7 @@ function LIB.GetChatChannelMenu(fnAction, tChecked)
 						UserData = szChannel,
 						fnAction = fnAction,
 						bCheck = true,
-						bChecked = tChecked[szChannel]
+						bChecked = tChecked[szChannel],
 					})
 				end
 			end

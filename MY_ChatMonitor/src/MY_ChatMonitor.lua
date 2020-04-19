@@ -367,7 +367,7 @@ _C.OnPanelActive = function(wnd)
         buttonstyle = 'OPTION',
         -- onhover = function(bIn) this:SetAlpha((bIn and 255) or 200) end,
         menu = function()
-            local t = LIB.GetChatChannelMenu(function(szChannel)
+            local t = LIB.GetMsgTypeMenu(function(szChannel)
                 MY_ChatMonitor.tChannels[szChannel] = not MY_ChatMonitor.tChannels[szChannel]
                 _C.RegisterMsgMonitor()
             end, MY_ChatMonitor.tChannels)
