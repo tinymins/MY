@@ -16,9 +16,10 @@ local byte, char, len, find, format = string.byte, string.char, string.len, stri
 local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
 local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
 local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, abs = math.huge, math.pi, math.random, math.abs
-local min, max, floor, ceil, modf = math.min, math.max, math.floor, math.ceil, math.modf
-local pow, sqrt, sin, cos, tan, atan = math.pow, math.sqrt, math.sin, math.cos, math.tan, math.atan
+local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
+local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
+local mod, modf, pow, sqrt = math.mod or math.fmod, math.modf, math.pow, math.sqrt
+local sin, cos, tan, atan = math.sin, math.cos, math.tan, math.atan
 local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
 local pack, unpack = table.pack or function(...) return {...} end, table.unpack or unpack
 -- jx3 apis caching
@@ -51,7 +52,7 @@ function LIB.Number2Bitmap(n)
 		insert(t, 0)
 	else
 		while n > 0 do
-			local nValue = fmod(n, 2)
+			local nValue = mod(n, 2)
 			insert(t, nValue)
 			n = floor(n / 2)
 		end
