@@ -448,6 +448,7 @@ function D.OnLButtonClick()
 					if #aErrmsg > 0 then
 						LIB.Alert(concat(aErrmsg, '\n'))
 					end
+					return
 				end
 				D.DownloadMeta({ szURL = szURL }, function(info)
 					D.AddMeta(info)
