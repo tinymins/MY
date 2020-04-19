@@ -28,8 +28,9 @@ local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
 local LIB = MY
 local UI, DEBUG_LEVEL, PATH_TYPE, PACKET_INFO = LIB.UI, LIB.DEBUG_LEVEL, LIB.PATH_TYPE, LIB.PACKET_INFO
+local wsub, count_c = LIB.wsub, LIB.count_c
+local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
 local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local ipairs_r, count_c, pairs_c, ipairs_c = LIB.ipairs_r, LIB.count_c, LIB.pairs_c, LIB.ipairs_c
 local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
 local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
 local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
@@ -880,8 +881,12 @@ function LIB.Talk(nChannel, szText, szUUID, bNoEscape, bSaveDeny, bPushToChatBox
 			if nLen <= 64 then
 				nLen = nLen + wlen(v.text or v.name or '')
 				if nLen > 64 then
-					if v.text then v.text = LIB.StringSubW(v.text, 1, 64 - nLen ) end
-					if v.name then v.name = LIB.StringSubW(v.name, 1, 64 - nLen ) end
+					if v.text then
+						v.text = wsub(v.text, 1, 64 - nLen)
+					end
+					if v.name then
+						v.name = wsub(v.name, 1, 64 - nLen)
+					end
 					for j = #tSay, i + 1, -1 do
 						remove(tSay, j)
 					end

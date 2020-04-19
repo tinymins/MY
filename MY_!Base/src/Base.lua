@@ -118,6 +118,21 @@ local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount,
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
 -------------------------------------------------------------------------------------------------------
+-- wstring 修正
+local _wsub = wsub
+local function wsub(str, s, e)
+	local nLen = wlen(str)
+	if s < 0 then
+		s = nLen + s + 1
+	end
+	if not e then
+		e = nLen
+	elseif e < 0 then
+		e = nLen + e + 1
+	end
+	return _wsub(str, s, e)
+end
+-------------------------------------------------------------------------------------------------------
 -- 本地函数变量
 -------------------------------------------------------------------------------------------------------
 local function IsStreaming()
@@ -1194,6 +1209,7 @@ local CONSTANT = setmetatable({}, {
 })
 ---------------------------------------------------------------------------------------------
 local LIB = {
+	wsub             = wsub            ,
 	count_c          = count_c         ,
 	pairs_c          = pairs_c         ,
 	ipairs_c         = ipairs_c        ,
