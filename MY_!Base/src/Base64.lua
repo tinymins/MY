@@ -21,7 +21,7 @@ local type, tonumber, tostring = type, tonumber, tostring
 local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
 local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
 local mod, modf, pow, sqrt = math.mod or math.fmod, math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan = math.sin, math.cos, math.tan, math.atan
+local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
 local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
 local pack, unpack = table.pack or function(...) return {...} end, table.unpack or unpack
 -- jx3 apis caching
