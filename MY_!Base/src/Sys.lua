@@ -1155,7 +1155,7 @@ local function OnStorageChange(szKey)
 	end
 end
 
-local SetOnlineAddonCustomData = SetOnlineAddonCustomData or SetAddonCustomData
+local SetOnlineAddonCustomData = _G.SetOnlineAddonCustomData or SetAddonCustomData
 function LIB.SetStorage(szKey, ...)
 	local szPriKey, szSubKey = szKey
 	local nPos = StringFindW(szKey, '.')
@@ -1213,7 +1213,7 @@ function LIB.SetStorage(szKey, ...)
 	OnStorageChange(szKey)
 end
 
-local GetOnlineAddonCustomData = GetOnlineAddonCustomData or GetAddonCustomData
+local GetOnlineAddonCustomData = _G.GetOnlineAddonCustomData or GetAddonCustomData
 function LIB.GetStorage(szKey)
 	local szPriKey, szSubKey = szKey
 	local nPos = StringFindW(szKey, '.')
