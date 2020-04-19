@@ -180,7 +180,7 @@ function D.UpdateList(page, dwMapID)
 			insert(aRec, v)
 		end
 	end
-	sort(aRec, function(a, b) return a.dwSwitchTime > b.dwSwitchTime end)
+	sort(aRec, function(a, b) return a.dwSwitchTime < b.dwSwitchTime end)
 	hDeathMsg:Clear()
 	for _, data in ipairs(aRec) do
 		local info = INFO_CACHE[data.dwID]
