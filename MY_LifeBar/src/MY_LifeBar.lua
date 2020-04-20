@@ -452,12 +452,10 @@ function CheckInvalidRect(dwType, dwID, me, object)
 	if bVisible
 	and dwType == TARGET.NPC
 	and not object.CanSeeName()
+	and (object.dwTemplateID ~= CHANGGE_REAL_SHADOW_TPLID or (bShieldedVersion and IsEnemy(me.dwID, dwID)))
 	and (
-		object.dwTemplateID ~= CHANGGE_REAL_SHADOW_TPLID
-		or (IsEnemy(me.dwID, dwID) and bShieldedVersion)
-	) and not (
-		Config.bShowSpecialNpc and (not bShieldedVersion or LIB.IsInDungeon())
-		and (not (Config.bShowSpecialNpcOnlyEnemy or bShieldedVersion) or IsEnemy(me.dwID, dwID))
+		not Config.bShowSpecialNpc or (bShieldedVersion and not LIB.IsInDungeon())
+		or (Config.bShowSpecialNpcOnlyEnemy and not IsEnemy(me.dwID, dwID))
 	) then
 		bVisible = false
 	end
