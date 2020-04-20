@@ -225,6 +225,11 @@ function Framework.OnFrameCreate()
 	this:BringToTop()
 	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
 	this:Lookup('', 'Text_Title'):SetText(PACKET_INFO.NAME .. ' - ' .. _L['MY_RoleStatistics'])
+	PlaySound(SOUND.UI_SOUND,g_sound.OpenFrame)
+end
+
+function Framework.OnFrameDestroy()
+	PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
 end
 
 -- 全局广播模块事件
