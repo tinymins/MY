@@ -701,7 +701,7 @@ function PS.OnPanelActive(wnd)
 			Config.bShowSpecialNpc = bChecked
 			D.Reset()
 		end,
-		tip = _L['This function has been shielded by official'],
+		tip = _L['This function has been shielded by official except in dungeon'],
 		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
 		autoenable = function() return D.IsEnabled() end,
 	}):AutoWidth():Width() + 5
@@ -714,7 +714,7 @@ function PS.OnPanelActive(wnd)
 			Config.bShowSpecialNpcOnlyEnemy = bChecked
 			D.Reset()
 		end,
-		tip = _L['This function has been shielded by official'],
+		tip = _L['This function has been shielded by official except in dungeon'],
 		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
 		autoenable = function() return D.IsEnabled() and Config.bShowSpecialNpc end,
 	})

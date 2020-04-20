@@ -103,6 +103,6 @@ return {
     ['XLifeBar style'] = '扁平風格',
     ['Keep current'] = '保持現狀',
 
-    ['This function has been shielded by official'] = '應官方要求，該功能已停止使用',
+    ['This function has been shielded by official except in dungeon'] = '應官方要求，該功能已停止在副本外使用',
     ['Compressing: '] = '壓縮數據：',
 }
