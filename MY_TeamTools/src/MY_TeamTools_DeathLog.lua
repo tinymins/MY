@@ -384,8 +384,8 @@ function D.UpdateList(page, dwID)
 	sort(aRec, function(a, b) return a.nCurrentTime > b.nCurrentTime end)
 	hDeathMsg:Clear()
 	for _, data in ipairs(aRec) do
-		if MY_IsParty(data.dwID) or data.dwID == me.dwID then
-			local info = INFO_CACHE[data.dwID]
+		local info = INFO_CACHE[data.dwID]
+		if info then
 			local key = data.dwID == me.dwID and 'self' or data.dwID
 			local t = TimeToDate(data.nCurrentTime)
 			local xml = {}
