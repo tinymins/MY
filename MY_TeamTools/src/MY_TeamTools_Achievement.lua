@@ -372,6 +372,10 @@ function D.RequestTeamData()
 	D.UpdateSelfData()
 end
 
+function D.DelayRequestTeamData()
+	LIB.DelayCall('MY_TeamTools_Achievement_DelayReq', 1000, D.RequestTeamData)
+end
+
 LIB.RegisterBgMsg('MY_TEAMTOOLS_ACHI_RES', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
 	local aAchieveRes, aCounterRes = data[1], data[2]
 	if not ACHIEVE_CACHE[dwTalkerID] then
@@ -679,6 +683,10 @@ function D.OnInitPage()
 	local frame = this:GetRoot()
 	frame:RegisterEvent('MY_TEAMTOOLS_ACHI')
 	frame:RegisterEvent('ON_MY_MOSAICS_RESET')
+	frame:RegisterEvent('NEW_ACHIEVEMENT')
+	frame:RegisterEvent('SYNC_ACHIEVEMENT_DATA')
+	frame:RegisterEvent('UPDATE_ACHIEVEMENT_POINT')
+	frame:RegisterEvent('UPDATE_ACHIEVEMENT_COUNT')
 	this.hAchievement = frame:CreateItemData(SZ_INI, 'Handle_Item_Achievement')
 end
 
@@ -692,6 +700,14 @@ function D.OnEvent(event)
 		D.UpdatePage(this)
 	elseif event == 'ON_MY_MOSAICS_RESET' then
 		D.UpdatePage(this)
+	elseif event == 'NEW_ACHIEVEMENT' or event == 'SYNC_ACHIEVEMENT_DATA'
+	or event == 'UPDATE_ACHIEVEMENT_POINT' or event == 'UPDATE_ACHIEVEMENT_COUNT'
+	or event == 'PARTY_DELETE_MEMBER' or event == 'PARTY_DISBAND' then
+		D.UpdateSelfData()
+		D.UpdatePage(this)
+		D.DelayRequestTeamData()
+	elseif event == 'PARTY_ADD_MEMBER' or event == 'PARTY_UPDATE_BASE_INFO' then
+		D.DelayRequestTeamData()
 	end
 end
 
