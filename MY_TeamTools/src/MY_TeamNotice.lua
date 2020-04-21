@@ -147,23 +147,22 @@ function TI.CreateFrame(a, b)
 			end,
 			autocomplete = {
 				{
-					'option', 'beforeSearch', function(raw, option, text)
+					'option', 'beforeSearch', function(text)
+						local source = {}
 						if LIB.IsLeader() then
 							TI.tList = TI.GetList()
-							option.source = {}
 							for k, v in pairs(TI.tList) do
-								insert(option.source, k)
+								insert(source, k)
 							end
-							if #option.source == 1 and tostring(option.source[1]) == text then
-								option.source = {}
+							if #source == 1 and tostring(source[1]) == text then
+								source = {}
 							end
-						else
-							option.source = {}
 						end
+						UI(this):Autocomplete('option', 'source', source)
 					end,
 				},
 				{
-					'option', 'beforeDelete', function(szOption, fnDoDelete, option)
+					'option', 'beforeDelete', function(szOption)
 						TI.tList[tonumber(szOption)] = nil
 						TI.SaveList()
 					end,

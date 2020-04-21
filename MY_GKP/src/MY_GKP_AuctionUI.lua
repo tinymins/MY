@@ -109,13 +109,14 @@ function D.Open(ds, tab, szMode)
 		name = 'Name', x = x + 140, y = y + 91, w = 185, h = 25,
 		autocomplete = {
 			{
-				'option', 'beforeSearch', function(raw, option, text)
-					option.source = {}
+				'option', 'beforeSearch', function(text)
+					local source = {}
 					for k, v in ipairs(MY_GKP.aSubsidies) do
 						if v[3] then
-							insert(option.source, v[1])
+							insert(source, v[1])
 						end
 					end
+					UI(this):Autocomplete('option', 'source', source)
 				end,
 			},
 			{
@@ -143,28 +144,29 @@ function D.Open(ds, tab, szMode)
 		name = 'Money', x = x + 140, y = y + 151, w = 185, h = 25, limit = 8, edittype = UI.EDIT_TYPE.ASCII,
 		autocomplete = {
 			{
-				'option', 'beforeSearch', function(raw, option, text)
-					option.source = {}
+				'option', 'beforeSearch', function(text)
+					local source = {}
 					if tonumber(text) then
 						if tonumber(text) < 100 and tonumber(text) > -100 and tonumber(text) ~= 0 then
 							for k, v in ipairs({2, 3, 4}) do
 								local szMoney = format('%0.'.. v ..'f', text):gsub('%.', '')
-								insert(option.source, {
+								insert(source, {
 									text     = szMoney,
 									keyword  = text,
 									display  = D.GetMoneyTipText(tonumber(szMoney)),
 									richtext = true,
 								})
 							end
-							insert(option.source, { divide = true, keyword = text })
+							insert(source, { divide = true, keyword = text })
 						end
-						insert(option.source, {
+						insert(source, {
 							text     = text,
 							keyword  = text,
 							display  = D.GetMoneyTipText(tonumber(text)),
 							richtext = true,
 						})
 					end
+					UI(this):Autocomplete('option', 'source', source)
 				end,
 			},
 		},

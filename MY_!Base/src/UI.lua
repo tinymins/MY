@@ -514,10 +514,10 @@ local function InitComponent(raw, szType)
 			end
 		end
 		SetComponentProp(raw, 'autocompleteOptions', {
-			beforeSearch = nil  , -- @param: raw, option
-			beforePopup  = nil  , -- @param: menu, raw, option
-			beforeDelete = nil  , -- @param: szOption, fnDoDelete, option
-			afterDelete  = nil  , -- @param: szOption, option
+			beforeSearch = nil  , -- @param: text
+			beforePopup  = nil  , -- @param: menu
+			beforeDelete = nil  , -- @param: szOption
+			afterDelete  = nil  , -- @param: szOption
 
 			ignoreCase   = true ,  -- ignore case while matching
 			anyMatch     = true ,  -- match any part of option list
@@ -1659,7 +1659,7 @@ function UI:Autocomplete(method, arg1, arg2)
 				if opt then
 					local text = arg1 or raw:Lookup('WndEdit_Default'):GetText()
 					if IsFunction(opt.beforeSearch) then
-						opt.beforeSearch(raw, opt, text)
+						LIB.ExecuteWithThis(raw, opt.beforeSearch, text)
 					end
 					local needle = opt.ignoreCase and StringLowerW(text) or text
 					local aSrc = {}
@@ -1732,13 +1732,13 @@ function UI:Autocomplete(method, arg1, arg2)
 										UI(raw):Autocomplete('search')
 									end
 									if opt.beforeDelete then
-										bSure = opt.beforeDelete(src, fnDoDelete, opt)
+										bSure = LIB.ExecuteWithThis(raw, opt.beforeDelete, src)
 									end
 									if bSure ~= false then
 										fnDoDelete()
 									end
 									if opt.afterDelete then
-										opt.afterDelete(src, opt)
+										LIB.ExecuteWithThis(raw, opt.afterDelete, src)
 									end
 								end
 							end
@@ -1757,7 +1757,7 @@ function UI:Autocomplete(method, arg1, arg2)
 					menu.nMaxHeight = min(select(2, Station.GetClientSize()) - raw:GetAbsY() - raw:GetH(), 600)
 
 					if IsFunction(opt.beforePopup) then
-						opt.beforePopup(raw, opt, text, menu)
+						LIB.ExecuteWithThis(raw, opt.beforePopup, menu)
 					end
 					-- popup menu
 					if #menu > 0 then

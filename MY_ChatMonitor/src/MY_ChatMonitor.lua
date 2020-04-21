@@ -315,9 +315,10 @@ _C.OnPanelActive = function(wnd)
             end
         end,
         autocomplete = {
-            -- { 'option', 'beforeSearch', function(raw, option, text) end },
+            -- { 'option', 'beforeSearch', function(text) end },
             {
-                'option', 'beforePopup', function(wnd, option, text, menu)
+                'option', 'beforePopup', function(menu)
+                    local ac = this
                     if #menu > 0 then
                         insert(menu, { bDevide = true })
                     end
@@ -332,12 +333,12 @@ _C.OnPanelActive = function(wnd)
                                 insert(t, szVal)
                                 LIB.SaveLUAData({_C.szLuaData, PATH_TYPE.GLOBAL}, t)
                             end
-                        end, function() end, function() end, nil, UI(wnd):Text() )
+                        end, function() end, function() end, nil, UI(ac):Text() )
                     end })
                 end,
             },
             {
-                'option', 'beforeDelete', function(szOption, fnDoDelete, option)
+                'option', 'beforeDelete', function(szOption)
                     local t = LIB.LoadLUAData({_C.szLuaData, PATH_TYPE.GLOBAL}) or {}
                     for i = #t, 1, -1 do
                         if t[i] == szOption then
