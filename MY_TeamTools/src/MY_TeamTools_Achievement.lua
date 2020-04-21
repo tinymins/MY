@@ -173,6 +173,19 @@ function D.GetDispColumns()
 	return aCol
 end
 
+function D.AchievementSorter(a, b)
+	local v1 = a.dwSub == 10
+		and 0
+		or 1
+	local v2 = b.dwSub == 10
+		and 0
+		or 1
+	if v1 == v2 then
+		return a.dwID > b.dwID
+	end
+	return v1 > v2
+end
+
 function D.UpdateAchievementID()
 	local aAchievement = {}
 	if O.dwMapID == 0 then
@@ -182,7 +195,7 @@ function D.UpdateAchievementID()
 			if achi and achi.nVisible == 1 and achi.dwGeneral == 1
 			and (not O.bIntelligentHide or achi.dwSub ~= 10) -- 隐藏声望成就
 			and (IsEmpty(O.szSearch) or wfind(achi.szName, O.szSearch) or wfind(achi.szDesc, O.szSearch)) then
-				insert(aAchievement, achi.dwID)
+				insert(aAchievement, achi)
 				if #aAchievement >= MAX_ALL_MAP_ACHI then
 					break
 				end
@@ -194,9 +207,13 @@ function D.UpdateAchievementID()
 			if achi
 			and (not O.bIntelligentHide or achi.dwSub ~= 10) -- 隐藏声望成就
 			and (IsEmpty(O.szSearch) or wfind(achi.szName, O.szSearch) or wfind(achi.szDesc, O.szSearch)) then
-				insert(aAchievement, achi.dwID)
+				insert(aAchievement, achi)
 			end
 		end
+	end
+	sort(aAchievement, D.AchievementSorter)
+	for i, achi in ipairs(aAchievement) do
+		aAchievement[i] = achi.dwID
 	end
 	O.aAchievement = aAchievement
 	FireUIEvent('MY_TEAMTOOLS_ACHI')
@@ -656,7 +673,7 @@ function D.OnInitPage()
 			D.UpdateAchievementID()
 		end,
 		tip = _L['Hide unimportant achievements'],
-		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
 	})
 
 	local frame = this:GetRoot()
