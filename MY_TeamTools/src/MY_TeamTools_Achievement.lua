@@ -59,6 +59,7 @@ local O = {
 	szSort = 'name',
 	szSortOrder = 'asc',
 	aAchievement = {},
+	aSearchAC = {},
 }
 local MAX_ALL_MAP_ACHI = 40
 local ACHIEVE_CACHE = {}
@@ -173,6 +174,14 @@ function D.GetDispColumns()
 	return aCol
 end
 
+function D.UpdateSearchAC()
+	local info = g_tTable.DungeonInfo:Search(O.dwMapID)
+	if info then
+		O.aSearchAC = LIB.SplitString(info.szBossInfo, ' ', true)
+	end
+	FireUIEvent('MY_TEAMTOOLS_ACHI_SEARCH_AC')
+end
+
 function D.AchievementSorter(a, b)
 	local v1 = a.dwSub == 10
 		and 0
@@ -222,6 +231,8 @@ end
 LIB.RegisterEvent('LOADING_ENDING', function()
 	O.dwMapID = GetClientPlayer().GetMapID()
 	O.szSearch = ''
+	O.aSearchAC = {}
+	D.UpdateSearchAC()
 	D.UpdateAchievementID()
 end)
 
@@ -643,8 +654,9 @@ function D.OnInitPage()
 	wnd:ChangeRelation(this, true, true)
 	Wnd.CloseWindow(frameTemp)
 
-	UI(wnd):Append('WndAutocomplete', {
-		x = 20, y = 20, w = 200,
+	local nX = 20
+	nX = nX + UI(wnd):Append('WndAutocomplete', {
+		x = nX, y = 20, w = 200,
 		name = 'WndAutocomplete_Map',
 		onchange = function(szText)
 			if D.tMapID[szText] then
@@ -655,21 +667,27 @@ function D.OnInitPage()
 		end,
 		autocomplete = {{'option', 'source', D.aMapName}},
 		menu = function() return D.tMapMenu end,
-	})
+	}):Width() + 5
 
-	local ui = UI(wnd):Fetch('Wnd_Search/Edit_Search')
-	ui:Change(function()
-		LIB.Debounce(
-			'MY_TeamTools_Achievement_Search',
-			1000,
-			D.SetSearch,
-			this:GetText())
-	end)
-	ui:Blur(function() D.RequestTeamData() end)
-	ui:Text(O.szSearch, WNDEVENT_FIRETYPE.PREVENT)
+	nX = nX + UI(wnd):Append('WndAutocomplete', {
+		x = nX, y = 20, w = 200,
+		name = 'WndAutocomplete_Search',
+		text = O.szSearch,
+		placeholder = _L['Search'],
+		onchange = function(szText)
+			LIB.Debounce(
+				'MY_TeamTools_Achievement_Search',
+				500,
+				D.SetSearch,
+				szText)
+		end,
+		autocomplete = {{'option', 'source', O.aSearchAC}},
+		onclick = function() UI(this):Autocomplete('search') end,
+		onblur = function() D.RequestTeamData() end,
+	}):Width() + 5
 
-	UI(wnd):Append('WndCheckBox', {
-		x = 450, y = 20, w = 200,
+	nX = nX + UI(wnd):Append('WndCheckBox', {
+		x = nX, y = 20, w = 200,
 		text = _L['Intelligent hide'],
 		checked = O.bIntelligentHide,
 		oncheck = function(bChecked)
@@ -678,10 +696,11 @@ function D.OnInitPage()
 		end,
 		tip = _L['Hide unimportant achievements'],
 		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
-	})
+	}):Width() + 5
 
 	local frame = this:GetRoot()
 	frame:RegisterEvent('MY_TEAMTOOLS_ACHI')
+	frame:RegisterEvent('MY_TEAMTOOLS_ACHI_SEARCH_AC')
 	frame:RegisterEvent('ON_MY_MOSAICS_RESET')
 	frame:RegisterEvent('NEW_ACHIEVEMENT')
 	frame:RegisterEvent('SYNC_ACHIEVEMENT_DATA')
@@ -698,6 +717,8 @@ end
 function D.OnEvent(event)
 	if event == 'MY_TEAMTOOLS_ACHI' then
 		D.UpdatePage(this)
+	elseif event == 'MY_TEAMTOOLS_ACHI_SEARCH_AC' then
+		UI(this):Fetch('WndAutocomplete_Search'):Autocomplete('option', 'source', O.aSearchAC)
 	elseif event == 'ON_MY_MOSAICS_RESET' then
 		D.UpdatePage(this)
 	elseif event == 'NEW_ACHIEVEMENT' or event == 'SYNC_ACHIEVEMENT_DATA'
