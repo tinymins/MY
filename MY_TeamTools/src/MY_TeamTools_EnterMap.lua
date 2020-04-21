@@ -69,7 +69,7 @@ LIB.RegisterEvent('LOADING_END', function()
 end)
 
 LIB.RegisterBgMsg('MY_ENTER_MAP', function(_, aData, nChannel, dwTalkerID, szTalkerName, bSelf)
-	local dwMapID, dwSubID, aMapCopy, dwTime, dwSwitchTime = aData[1], aData[2], aData[3], aData[4], aData[5]
+	local dwMapID, dwSubID, aMapCopy, dwTime, dwSwitchTime, nCopyIndex = aData[1], aData[2], aData[3], aData[4], aData[5], aData[6]
 	local key = dwTalkerID == PLAYER_ID
 		and 'self'
 		or dwTalkerID
@@ -99,6 +99,9 @@ LIB.RegisterBgMsg('MY_ENTER_MAP', function(_, aData, nChannel, dwTalkerID, szTal
 	if not dwSwitchTime then
 		dwSwitchTime = dwTime
 	end
+	if not nCopyIndex then
+		nCopyIndex = 0
+	end
 	for i, v in ipairs_r(ENTER_MAP_LOG) do -- 删除重复发送的过图
 		if v.dwID == key and v.dwMapID == dwMapID and v.dwSubID == dwSubID and v.dwTime == dwTime then
 			remove(ENTER_MAP_LOG, i)
@@ -112,6 +115,7 @@ LIB.RegisterBgMsg('MY_ENTER_MAP', function(_, aData, nChannel, dwTalkerID, szTal
 		aMapCopy = aMapCopy,
 		dwTime = dwTime,
 		dwSwitchTime = dwSwitchTime,
+		nCopyIndex = nCopyIndex,
 	})
 	FireUIEvent('MY_TEAMTOOLS_ENTERMAP', key)
 end)
@@ -191,11 +195,16 @@ function D.UpdateList(page, dwMapID)
 			insert(aXml, GetFormatText(_L[' * '] .. format('[%02d:%02d:%02d]', t.hour, t.minute, t.second), 10, 255, 255, 255, 16, 'this.OnItemLButtonClick = MY_TeamTools_EnterMap.OnAppendEdit'))
 			local r, g, b = LIB.GetForceColor(info.dwForceID)
 			insert(aXml, GetFormatText('[' .. data.szName ..']', 10, r, g, b, 16, 'this.OnItemLButtonClick = function() OnItemLinkDown(this) end', 'namelink'))
-			if data.aMapCopy then
-				insert(aXml, GetFormatText(_L(' enter map %s, copy id %s.', map.szName, concat(data.aMapCopy, ','))))
-			else
-				insert(aXml, GetFormatText(_L(' enter map %s.', map.szName)))
+			insert(aXml, GetFormatText(_L(' enter map %s', map.szName)))
+			if LIB.IsDungeonMap(data.dwMapID) then
+				if not IsEmpty(data.nCopyIndex) then
+					insert(aXml, GetFormatText(_L(', copy id is %s', data.nCopyIndex)))
+				end
+				if not IsEmpty(data.aMapCopy) then
+					insert(aXml, GetFormatText(_L(', copy cd is %s', concat(data.aMapCopy, ','))))
+				end
 			end
+			insert(aXml, GetFormatText(_L['.']))
 			insert(aXml, GetFormatText('\n'))
 			hDeathMsg:AppendItemFromString(concat(aXml))
 		end

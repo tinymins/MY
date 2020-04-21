@@ -245,7 +245,7 @@ local function OnSwitchMap(dwMapID, dwSubID, aMapCopy, dwTime)
 end
 
 -- 成功进入某地图并加载完成（进入后）
-local function OnEnterMap(dwMapID, dwSubID, aMapCopy, dwTime, dwSwitchTime)
+local function OnEnterMap(dwMapID, dwSubID, aMapCopy, dwTime, dwSwitchTime, nCopyIndex)
 	if not LIB.IsInParty() then
 		return
 	end
@@ -265,7 +265,7 @@ local function OnEnterMap(dwMapID, dwSubID, aMapCopy, dwTime, dwSwitchTime)
 	end
 	LIB.Debug(PACKET_INFO.NAME_SPACE, szDebug, DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
-	LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_ENTER_MAP', {dwMapID, dwSubID, aMapCopy, dwTime, dwSwitchTime}, true)
+	LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_ENTER_MAP', {dwMapID, dwSubID, aMapCopy, dwTime, dwSwitchTime, nCopyIndex}, true)
 end
 
 local function OnCrossMapGoFB()
@@ -317,13 +317,15 @@ end)
 
 LIB.RegisterEvent('LOADING_ENDING.' .. PACKET_INFO.NAME_SPACE .. '#CD', function()
 	l_dwEnteringTime = GetCurrentTime()
-	local dwMapID = GetClientPlayer().GetMapID()
+	local me = GetClientPlayer()
+	local dwMapID = me.GetMapID()
+	local nCopyIndex = me.GetScene().nCopyIndex
 	LIB.GetMapSaveCopy(dwMapID, function(aMapCopy)
 		local nSubID, dwSwitchTime
 		if dwMapID == l_nEnteringMapID then
 			nSubID, dwSwitchTime = l_nEnteringSubID, l_dwEnteringSwitchTime
 		end
-		OnEnterMap(dwMapID, nSubID, aMapCopy, l_dwEnteringTime, dwSwitchTime)
+		OnEnterMap(dwMapID, nSubID, aMapCopy, l_dwEnteringTime, dwSwitchTime, nCopyIndex)
 	end)
 end)
 
@@ -334,13 +336,15 @@ LIB.RegisterBgMsg('MY_ENTER_MAP_REQ', function(_, data, nChannel, dwTalkerID, sz
 	--[[#DEBUG BEGIN]]
 	LIB.Debug(PACKET_INFO.NAME_SPACE, 'Enter map request from ' .. szTalkerName, DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
-	local dwMapID = GetClientPlayer().GetMapID()
+	local me = GetClientPlayer()
+	local dwMapID = me.GetMapID()
+	local nCopyIndex = me.GetScene().nCopyIndex
 	LIB.GetMapSaveCopy(dwMapID, function(aMapCopy)
 		local nSubID, dwSwitchTime
 		if dwMapID == l_nEnteringMapID then
 			nSubID, dwSwitchTime = l_nEnteringSubID, l_dwEnteringSwitchTime
 		end
-		OnEnterMap(dwMapID, nSubID, aMapCopy, l_dwEnteringTime, dwSwitchTime)
+		OnEnterMap(dwMapID, nSubID, aMapCopy, l_dwEnteringTime, dwSwitchTime, nCopyIndex)
 	end)
 end)
 end

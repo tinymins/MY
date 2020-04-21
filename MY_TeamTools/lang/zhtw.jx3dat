@@ -31,8 +31,10 @@ return {
 	['Clear record'] = '清除記錄',
 	-- MY_TeamTools_EnterMap
 	['MY_TeamTools_EnterMap'] = '過圖記錄',
-	[' enter map %s.'] = '進入地圖 %s。',
-	[' enter map %s, copy id %s.'] = '進入地圖 %s，副本ID為%s。',
+	[' enter map %s'] = '進入地圖 %s',
+	[', copy id is %s'] = '，副本ID為 %s',
+	[', copy cd is %s'] = '，已有進度 %s',
+	['.'] = '。',
 	-- MY_TeamTools_Summary
 	['MY_TeamTools_Summary'] = '團隊概況',
 	['Equip score'] = '裝備得分',
