@@ -62,6 +62,8 @@ return {
 	['(Unknown)'] = '(未知)',
 	['All map'] = '全部地圖',
 	['Current map'] = '當前地圖',
+	['Intelligent hide'] = '智能隱藏',
+	['Hide unimportant achievements'] = '隱藏聲望等不需要優先關注的成就',
 
 	-- MY_PartyRequest
 	['Party Request'] = '優化入隊申請列表',

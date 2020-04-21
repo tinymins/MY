@@ -55,6 +55,7 @@ local D = {}
 local O = {
 	dwMapID = 0,
 	szSearch = '',
+	bIntelligentHide = false,
 	szSort = 'name',
 	szSortOrder = 'asc',
 	aAchievement = {},
@@ -179,6 +180,7 @@ function D.UpdateAchievementID()
 		for i = 2, nCount do
 			local achi = g_tTable.Achievement:GetRow(i)
 			if achi and achi.nVisible == 1 and achi.dwGeneral == 1
+			and (not O.bIntelligentHide or achi.dwSub ~= 10) -- 隐藏声望成就
 			and (IsEmpty(O.szSearch) or wfind(achi.szName, O.szSearch) or wfind(achi.szDesc, O.szSearch)) then
 				insert(aAchievement, achi.dwID)
 				if #aAchievement >= MAX_ALL_MAP_ACHI then
@@ -189,7 +191,9 @@ function D.UpdateAchievementID()
 	else
 		for _, dwAchieveID in ipairs(LIB.GetMapAchievements(O.dwMapID)) do
 			local achi = Table_GetAchievement(dwAchieveID)
-			if achi and (IsEmpty(O.szSearch) or wfind(achi.szName, O.szSearch) or wfind(achi.szDesc, O.szSearch)) then
+			if achi
+			and (not O.bIntelligentHide or achi.dwSub ~= 10) -- 隐藏声望成就
+			and (IsEmpty(O.szSearch) or wfind(achi.szName, O.szSearch) or wfind(achi.szDesc, O.szSearch)) then
 				insert(aAchievement, achi.dwID)
 			end
 		end
@@ -642,6 +646,18 @@ function D.OnInitPage()
 	end)
 	ui:Blur(function() D.RequestTeamData() end)
 	ui:Text(O.szSearch, WNDEVENT_FIRETYPE.PREVENT)
+
+	UI(wnd):Append('WndCheckBox', {
+		x = 450, y = 20, w = 200,
+		text = _L['Intelligent hide'],
+		checked = O.bIntelligentHide,
+		oncheck = function(bChecked)
+			O.bIntelligentHide = bChecked
+			D.UpdateAchievementID()
+		end,
+		tip = _L['Hide unimportant achievements'],
+		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+	})
 
 	local frame = this:GetRoot()
 	frame:RegisterEvent('MY_TEAMTOOLS_ACHI')
