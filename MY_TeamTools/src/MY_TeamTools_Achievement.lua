@@ -229,6 +229,9 @@ function D.UpdateAchievementID()
 end
 
 LIB.RegisterEvent('LOADING_ENDING', function()
+	if MY_TeamTools.IsOpened() then
+		return
+	end
 	O.dwMapID = GetClientPlayer().GetMapID()
 	O.szSearch = ''
 	O.aSearchAC = {}
