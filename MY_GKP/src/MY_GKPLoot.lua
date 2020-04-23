@@ -244,14 +244,14 @@ function D.OnFrameCreate()
 	this:RegisterEvent('MY_GKP_LOOT_BOSS')
 	local a = GKP_LOOT_ANCHOR
 	this:SetPoint(a.s, 0, 0, a.r, a.x, a.y)
-	this:Lookup('WndContainer_DoodadList'):Clear()
+	this:Lookup('Scroll_DoodadList/WndContainer_DoodadList'):Clear()
 	D.AdjustFrame(this)
 end
 
 function D.OnFrameBreathe()
 	local nLFC = GetLogicFrameCount()
 	local me = GetClientPlayer()
-	local wnd = this:Lookup('WndContainer_DoodadList'):LookupContent(0)
+	local wnd = this:Lookup('Scroll_DoodadList/WndContainer_DoodadList'):LookupContent(0)
 	while wnd do
 		local doodad = GetDoodad(wnd.dwDoodadID)
 		-- Ê°È¡ÅÐ¶¨
@@ -1263,7 +1263,9 @@ end
 end
 
 function D.AdjustFrame(frame)
-	local container = frame:Lookup('WndContainer_DoodadList')
+	local scroll = frame:Lookup('Scroll_DoodadList')
+	local scrollbar = scroll:Lookup('ScrolBar_DoodadList')
+	local container = scroll:Lookup('WndContainer_DoodadList')
 	local nW, nH = frame:GetW(), 0
 	local wnd = container:LookupContent(0)
 	while wnd do
@@ -1271,8 +1273,12 @@ function D.AdjustFrame(frame)
 		nH = nH + wnd:GetH()
 		wnd = wnd:GetNext()
 	end
-	container:FormatAllContentPos()
+	nH = min(nH, 750)
+	scroll:SetSize(nW, nH)
+	scrollbar:SetH(nH)
+	scrollbar:SetRelX(nW - 8)
 	container:SetSize(nW, nH)
+	container:FormatAllContentPos()
 	frame:SetSize(nW, nH)
 end
 
@@ -1302,7 +1308,7 @@ function D.GetDoodadWnd(frame, dwID, bCreate)
 	if not frame then
 		return
 	end
-	local container = frame:Lookup('WndContainer_DoodadList')
+	local container = frame:Lookup('Scroll_DoodadList/WndContainer_DoodadList')
 	local wnd = container:LookupContent(0)
 	while wnd and wnd.dwDoodadID ~= dwID do
 		wnd = wnd:GetNext()
@@ -1371,7 +1377,7 @@ function D.DrawLootList(dwID, bRemove)
 	if bRemove then
 		if wnd then
 			wnd:Destroy()
-			local container = frame:Lookup('WndContainer_DoodadList')
+			local container = frame:Lookup('Scroll_DoodadList/WndContainer_DoodadList')
 			if container:GetAllContentCount() == 0 then
 				D.CloseFrame()
 			else
