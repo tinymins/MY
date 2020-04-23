@@ -131,10 +131,44 @@ function LIB.GetTimeLinkText(dwTime, opt)
 	return GetFormatText(szText, opt.f, opt.r, opt.g, opt.b, 82691, GetCopyLinkScript(opt), 'timelink')
 end
 
+function LIB.ClearTalkInput()
+	local edit = LIB.GetChatInputEdit()
+	if not edit then
+		return
+	end
+	edit:ClearText()
+end
+
+-- LIB.InsertTalkInput(szType, ...data)
+function LIB.InsertTalkInput(szType, ...)
+	local edit = LIB.GetChatInputEdit()
+	if not edit then
+		return
+	end
+	local szText, data
+	if szType == 'achievement' then
+		local dwAchieve = ...
+		local achi = Table_GetAchievement(dwAchieve)
+		if not achi then
+			return
+		end
+		szText = '[' .. achi.szName .. ']'
+		data = {
+			type = 'achievement',
+			text = szText,
+			id = achi.dwID,
+		}
+	end
+	if not szText or not data then
+		return
+	end
+	edit:GetRoot():Show()
+	edit:InsertObj(szText, data)
+end
+
 -- ∏¥÷∆¡ƒÃÏ––
 function LIB.CopyChatLine(hTime, bTextEditor)
 	local edit = LIB.GetChatInputEdit()
-		or Station.Lookup('Normal1/EditBox/Edit_Input')
 	if bTextEditor then
 		edit = UI.OpenTextEditor():Find('.WndEdit')[1]
 	end
