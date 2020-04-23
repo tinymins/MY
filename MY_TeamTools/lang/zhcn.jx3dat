@@ -70,7 +70,9 @@ return {
 
 	-- MY_PartyRequest
 	['Party Request'] = '优化入队申请列表',
-	['Clear list and close?'] = '清空列表并关闭？',
+	['MY_PartyRequest'] = '组队助手',
+	['Party invite request.'] = '对方邀请你组队。',
+	['Party apply request.'] = '对方申请加入你的队伍。',
 	['Ask details'] = '询问详情',
 	['Press ctrl and click to ask detail.'] = '按住CTRL点击左键可询问详情',
 	['loading...'] = '读取中..',
@@ -83,7 +85,8 @@ return {
 	['Auto accept friend'] = '自动通过好友',
 	['Auto accept tong member'] = '自动通过帮会成员',
 	['Auto accept all'] = '自动通过所有人',
-	['Auto accept custom'] = '自动通过指定角色',
+	['Auto accept specific names'] = '自动通过指定角色',
+	['Add'] = '添加',
 	['Please input custom name, multiple split with ",[]":'] = '请输入自定义角色名称，多个角色名请使用半角逗号或方括号分隔：',
 	['Auto refuse %s(%s %d%s) party request, equip score: %d, go to MY/raid/teamtools panel if you want to turn off this feature.']
 		= '自动拒绝了 %s(%s %d%s) 的组队请求，装备分数：%d，如需关闭该功能请前往茗伊插件/团队/团队工具取消勾选对应项。',

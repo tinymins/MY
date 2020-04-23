@@ -159,7 +159,7 @@ function PS.OnPanelActive(wnd)
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y,
 		checked = MY_PartyRequest.bAcceptCustom,
-		text = _L['Auto accept custom'],
+		text = _L['Auto accept specific names'],
 		oncheck = function(bChecked)
 			MY_PartyRequest.bAcceptCustom = bChecked
 		end,

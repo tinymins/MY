@@ -53,7 +53,6 @@ end
 local D = {}
 local PR_INI_PATH = PACKET_INFO.ROOT .. 'MY_TeamTools/ui/MY_PartyRequest.ini'
 local PR_EQUIP_REQUEST = {}
-local PR_PARTY_REACT = {}
 local PR_PARTY_REQUEST = {}
 
 MY_PartyRequest = {
@@ -84,6 +83,16 @@ function MY_PartyRequest.GetCustomNameMenu()
 			fnAction = function()
 				MY_PartyRequest.tAcceptCustom[szName] = not MY_PartyRequest.tAcceptCustom[szName]
 			end,
+			szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',
+			nFrame = 49,
+			nMouseOverFrame = 51,
+			nIconWidth = 17,
+			nIconHeight = 17,
+			szLayer = 'ICON_RIGHTMOST',
+			fnClickIcon = function()
+				MY_PartyRequest.tAcceptCustom[szName] = nil
+				UI.ClosePopupMenu()
+			end,
 			fnDisable = function() return not MY_PartyRequest.bEnable or not MY_PartyRequest.bAcceptCustom end,
 		})
 	end
@@ -103,66 +112,12 @@ function MY_PartyRequest.GetCustomNameMenu()
 	return t
 end
 
-function MY_PartyRequest.OnFrameCreate()
-	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
-	this:Lookup('', 'Text_Title'):SetText(g_tStrings.STR_ARENA_INVITE)
-	LIB.RegisterEsc('MY_PartyRequest', D.GetFrame, D.ClosePanel)
-end
-
-function MY_PartyRequest.OnLButtonClick()
+function D.OnLButtonClick()
 	local name = this:GetName()
-	if name == 'Btn_Setting' then
-		local menu = {
-			{
-				szOption = _L['Auto refuse low level player'],
-				bCheck = true, bChecked = MY_PartyRequest.bRefuseLowLv,
-				fnAction = function()
-					MY_PartyRequest.bRefuseLowLv = not MY_PartyRequest.bRefuseLowLv
-				end,
-			},
-			{
-				szOption = _L['Auto refuse robot player'],
-				bCheck = true, bChecked = MY_PartyRequest.bRefuseRobot,
-				fnAction = function()
-					MY_PartyRequest.bRefuseRobot = not MY_PartyRequest.bRefuseRobot
-				end,
-				fnMouseEnter = function()
-					local szXml = GetFormatText(_L['Full level and equip score less than 2/3 of yours'], nil, 255, 255, 0)
-					OutputTip(szXml, 600, {this:GetAbsX(), this:GetAbsY(), this:GetW(), this:GetH()}, ALW.RIGHT_LEFT)
-				end,
-			},
-			{
-				szOption = _L['Auto accept friend'],
-				bCheck = true, bChecked = MY_PartyRequest.bAcceptFriend,
-				fnAction = function()
-					MY_PartyRequest.bAcceptFriend = not MY_PartyRequest.bAcceptFriend
-				end,
-			},
-			{
-				szOption = _L['Auto accept tong member'],
-				bCheck = true, bChecked = MY_PartyRequest.bAcceptTong,
-				fnAction = function()
-					MY_PartyRequest.bAcceptTong = not MY_PartyRequest.bAcceptTong
-				end,
-			},
-			{
-				szOption = _L['Auto accept all'],
-				bCheck = true, bChecked = MY_PartyRequest.bAcceptAll,
-				fnAction = function()
-					MY_PartyRequest.bAcceptAll = not MY_PartyRequest.bAcceptAll
-				end,
-			},
-		}
-		insert(menu, MY_PartyRequest.GetCustomNameMenu())
-		PopupMenu(menu)
-	elseif name == 'Btn_Close' then
-		D.ClosePanel()
-	elseif name == 'Btn_Accept' then
+	if name == 'Btn_Accept' then
 		D.AcceptRequest(this:GetParent().info)
-		D.UpdateFrame()
 	elseif name == 'Btn_Refuse' then
 		D.RefuseRequest(this:GetParent().info)
-		D.UpdateFrame()
 	elseif name == 'Btn_Lookup' then
 		local info = this:GetParent().info
 		if not info.dwID or (not info.bDetail and IsCtrlKeyDown()) then
@@ -185,13 +140,13 @@ function MY_PartyRequest.OnLButtonClick()
 	end
 end
 
-function MY_PartyRequest.OnRButtonClick()
+function D.OnRButtonClick()
 	if this.info then
 		PopupMenu(LIB.GetTargetContextMenu(TARGET.PLAYER, this.info.szName, this.info.dwID))
 	end
 end
 
-function MY_PartyRequest.OnMouseEnter()
+function D.OnMouseEnter()
 	local name = this:GetName()
 	if name == 'Btn_Lookup' then
 		local info = this:GetParent().info
@@ -211,7 +166,7 @@ function MY_PartyRequest.OnMouseEnter()
 	end
 end
 
-function MY_PartyRequest.OnMouseLeave()
+function D.OnMouseLeave()
 	if this.info then
 		HideTip()
 	end
@@ -228,16 +183,12 @@ function D.OpenPanel()
 	Wnd.OpenWindow(PR_INI_PATH, 'MY_PartyRequest')
 end
 
-function D.ClosePanel(bCompulsory)
-	local fnAction = function()
-		Wnd.CloseWindow(D.GetFrame())
-		PR_PARTY_REACT = {}
-		PR_PARTY_REQUEST = {}
-	end
-	if bCompulsory then
-		fnAction()
+-- 判断是否需要更新界面
+function D.CheckRequestUpdate(info)
+	if info.dwDelayTime and info.dwDelayTime > GetTime() then
+		MY_Request.Remove('MY_PartyRequest', info.szName)
 	else
-		LIB.Confirm(_L['Clear list and close?'], fnAction)
+		MY_Request.Replace('MY_PartyRequest', info.szName, info)
 	end
 end
 
@@ -253,10 +204,10 @@ function D.OnPeekPlayer()
 				local mnt = p.GetKungfuMount()
 				local data = { nil, arg1, mnt and mnt.dwSkillID or nil, false }
 				D.Feedback(p.szName, data, false)
-			end
-			local info = D.GetRequestInfo(arg1)
-			if info and D.DoAutoAction(info) then
-				D.UpdateFrame()
+				local info = PR_PARTY_REQUEST[p.szName]
+				if info then
+					D.DoAutoAction(info)
+				end
 			end
 		end
 		PR_EQUIP_REQUEST[arg1] = nil
@@ -269,20 +220,14 @@ function D.PeekPlayer(dwID)
 end
 
 function D.AcceptRequest(info)
-	for i, v in ipairs_r(PR_PARTY_REQUEST) do
-		if v == info then
-			remove(PR_PARTY_REQUEST, i)
-		end
-	end
+	PR_PARTY_REQUEST[info.szName] = nil
+	MY_Request.Remove('MY_PartyRequest', info.szName)
 	info.fnAccept()
 end
 
 function D.RefuseRequest(info)
-	for i, v in ipairs_r(PR_PARTY_REQUEST) do
-		if v == info then
-			remove(PR_PARTY_REQUEST, i)
-		end
-	end
+	PR_PARTY_REQUEST[info.szName] = nil
+	MY_Request.Remove('MY_PartyRequest', info.szName)
 	info.fnRefuse()
 end
 
@@ -306,7 +251,7 @@ function D.GetRequestStatus(info)
 			info.szName, g_tStrings.tForceTitle[info.dwForce], info.nLevel, g_tStrings.STR_LEVEL)
 	end
 	if szStatus == 'normal' and not info.bFriend and not info.bTongMember then
-		if MY_PartyRequest.bRefuseRobot and info.dwID then
+		if MY_PartyRequest.bRefuseRobot and info.dwID and info.nLevel == PACKET_INFO.MAX_PLAYER_LEVEL then
 			local me = GetClientPlayer()
 			local tar = GetPlayer(info.dwID)
 			if tar then
@@ -345,35 +290,29 @@ function D.DoAutoAction(info)
 	return bAction, szStatus, szMsg
 end
 
-function D.GetRequestInfo(key)
-	for k, v in ipairs(PR_PARTY_REQUEST) do
-		if v.szName == key or v.dwID == key then
-			return v
-		end
-	end
-end
-
 function D.OnMessageBoxOpen()
 	local szMsgName, frame = arg0, arg1
 	local szPrefix, szName = unpack(LIB.SplitString(szMsgName, '_', true, 2))
-	if not MY_PartyRequest.bEnable or not frame or not frame:IsValid()
-	or (szMsgName:sub(1, 5) ~= 'ATMP_' and szMsgName:sub(1, 5) ~= 'IMTP_') then
+	if not MY_PartyRequest.bEnable or not frame or not frame:IsValid() or (szPrefix ~= 'ATMP' and szPrefix ~= 'IMTP') then
 		return
 	end
 	local fnAccept = Get(frame:Lookup('Wnd_All/Btn_Option1'), 'fnAction')
 	local fnRefuse = Get(frame:Lookup('Wnd_All/Btn_Option2'), 'fnAction')
 	if fnAccept and fnRefuse then
 		-- 获取组队方法
-		PR_PARTY_REACT[szName] = {
-			fnAccept = function()
-				Call(fnAccept)
-				PR_PARTY_REACT[szName] = nil
-			end,
-			fnRefuse = function()
-				Call(fnRefuse)
-				PR_PARTY_REACT[szName] = nil
-			end,
-		}
+		local info = PR_PARTY_REQUEST[szName]
+		if not info then
+			info = {}
+			PR_PARTY_REQUEST[szName] = info
+		end
+		info.fnAccept = function()
+			PR_PARTY_REQUEST[szName] = nil
+			Call(fnAccept)
+		end
+		info.fnRefuse = function()
+			PR_PARTY_REQUEST[szName] = nil
+			Call(fnRefuse)
+		end
 		-- 关闭对话框
 		frame.fnAutoClose = nil
 		frame.fnCancelAction = nil
@@ -382,123 +321,74 @@ function D.OnMessageBoxOpen()
 	end
 end
 
-function D.OnApplyRequest()
+function D.OnApplyRequest(event)
 	if not MY_PartyRequest.bEnable then
 		return
 	end
 	local szName, nCamp, dwForce, nLevel, nType = arg0, arg1, arg2, arg3, arg4
-	local tReact = PR_PARTY_REACT[szName]
-	if tReact then
-		-- 判断对方是否已在进组列表中
-		local info = D.GetRequestInfo(szName)
-		if not info then
-			info = {
-				szName      = szName,
-				nCamp       = nCamp,
-				dwForce     = dwForce,
-				nLevel      = nLevel,
-				bFriend     = LIB.IsFriend(szName),
-				bTongMember = LIB.IsTongMember(szName),
-				fnAccept    = tReact.fnAccept,
-				fnRefuse    = tReact.fnRefuse,
-			}
-			insert(PR_PARTY_REQUEST, info)
+	local info = PR_PARTY_REQUEST[szName]
+	if not info then
+		info = {}
+		PR_PARTY_REQUEST[szName] = info
+	end
+	-- 判断对方是否已在进组列表中
+	info.szType      = event == 'PARTY_INVITE_REQUEST' and 'invite' or 'request'
+	info.szName      = szName
+	info.nCamp       = nCamp
+	info.dwForce     = dwForce
+	info.nLevel      = nLevel
+	info.bFriend     = LIB.IsFriend(szName)
+	info.bTongMember = LIB.IsTongMember(szName)
+	info.fnAccept    = info.fnAccept
+	info.fnRefuse    = info.fnRefuse
+	info.dwDelayTime = nil
+	-- 获取dwID
+	local tar = LIB.GetObject(TARGET.PLAYER, szName)
+	if not info.dwID and tar then
+		info.dwID = tar.dwID
+	end
+	if not info.dwID and MY_Farbnamen and MY_Farbnamen.Get then
+		local data = MY_Farbnamen.Get(szName)
+		if data then
+			info.dwID = data.dwID
 		end
-		-- 获取dwID
-		local me = GetClientPlayer()
-		local tar = LIB.GetObject(TARGET.PLAYER, szName)
-		if not info.dwID and tar then
-			info.dwID = tar.dwID
-		end
-		if not info.dwID and MY_Farbnamen and MY_Farbnamen.Get then
-			local data = MY_Farbnamen.Get(szName)
-			if data then
-				info.dwID = data.dwID
-			end
-		end
-		-- 自动拒绝 没拒绝的自动申请装备
-		local bAction, szStatus = D.DoAutoAction(info)
-		if szStatus == 'suspicious' then
-			info.dwDelayTime = GetTime() + 2000
-		end
-		if not bAction and info.dwID then
+	end
+	-- 自动拒绝 没拒绝的自动申请装备
+	local bAction, szStatus = D.DoAutoAction(info)
+	if szStatus == 'suspicious' then
+		info.dwDelayTime = GetTime() + 2000
+		D.DelayInterval()
+	end
+	if not bAction then
+		if info.dwID then
 			D.PeekPlayer(info.dwID)
 		end
-		-- 更新界面
-		D.UpdateFrame()
+		D.CheckRequestUpdate(info)
 	end
 end
 
-function D.UpdateFrame()
-	if not D.GetFrame() then
-		D.OpenPanel()
-	end
-	local frame = D.GetFrame()
-	-- update
-	if #PR_PARTY_REQUEST == 0 then
-		return D.ClosePanel(true)
-	end
+function D.DelayInterval()
 	local dwTime, dwDelayTime = GetTime(), nil
-	local container, nH, bEmpty = frame:Lookup('WndContainer_Request'), 0, true
-	container:Clear()
-	for _, info in ipairs(PR_PARTY_REQUEST) do
+	for _, info in pairs(PR_PARTY_REQUEST) do
 		if info.dwDelayTime and info.dwDelayTime > dwTime then
 			dwDelayTime = min(dwDelayTime or HUGE, info.dwDelayTime)
-		else
-			local wnd = container:AppendContentFromIni(PR_INI_PATH, 'WndWindow_Item')
-			local hItem = wnd:Lookup('', '')
-			hItem:Lookup('Image_Hover'):SetFrame(2)
-
-			if info.dwKungfuID then
-				hItem:Lookup('Image_Icon'):FromIconID(Table_GetSkillIconID(info.dwKungfuID, 1))
-			else
-				hItem:Lookup('Image_Icon'):FromUITex(GetForceImage(info.dwForce))
-			end
-			hItem:Lookup('Handle_Status/Handle_Gongzhan'):SetVisible(info.nGongZhan == 1)
-
-			local szCampImg, nCampFrame = LIB.GetCampImage(info.nCamp)
-			if szCampImg then
-				hItem:Lookup('Handle_Status/Handle_Camp/Image_Camp'):FromUITex(szCampImg, nCampFrame)
-			end
-			hItem:Lookup('Handle_Status/Handle_Camp'):SetVisible(not not szCampImg)
-
-			if info.bDetail and info.bEx == 'Author' then
-				hItem:Lookup('Text_Name'):SetFontColor(255, 255, 0)
-			end
-			hItem:Lookup('Text_Name'):SetText(info.szName)
-			hItem:Lookup('Text_Level'):SetText(info.nLevel)
-
-			wnd:Lookup('Btn_Accept', 'Text_Accept'):SetText(g_tStrings.STR_ACCEPT)
-			wnd:Lookup('Btn_Refuse', 'Text_Refuse'):SetText(g_tStrings.STR_REFUSE)
-			wnd:Lookup('Btn_Lookup', 'Text_Lookup'):SetText(info.dwID and g_tStrings.STR_LOOKUP or _L['Ask details'])
-			wnd.info = info
-			nH = nH + wnd:GetH()
-			bEmpty = false
 		end
 	end
 	if dwDelayTime then
-		LIB.DelayCall('MY_PartyRequest', dwDelayTime - dwTime, D.UpdateFrame)
+		LIB.DelayCall('MY_PartyRequest', dwDelayTime - dwTime, D.DelayInterval)
 	end
-	container:SetH(nH)
-	container:FormatAllContentPos()
-	frame:Lookup('', 'Image_Bg'):SetH(nH)
-	frame:SetH(nH + 30)
-	frame:SetDragArea(0, 0, frame:GetW(), frame:GetH())
-	frame:SetVisible(not bEmpty)
 end
 
 function D.Feedback(szName, data, bDetail)
-	for k, v in ipairs(PR_PARTY_REQUEST) do
-		if v.szName == szName then
-			v.bDetail    = bDetail
-			v.dwID       = data[2]
-			v.dwKungfuID = data[3]
-			v.nGongZhan  = data[4]
-			v.bEx        = data[5]
-			break
-		end
+	local v = PR_PARTY_REQUEST[szName]
+	if v then
+		v.bDetail    = bDetail
+		v.dwID       = data[2]
+		v.dwKungfuID = data[3]
+		v.nGongZhan  = data[4]
+		v.bEx        = data[5]
 	end
-	D.UpdateFrame()
+	D.DelayInterval()
 end
 
 LIB.RegisterEvent('PEEK_OTHER_PLAYER.MY_PartyRequest'   , D.OnPeekPlayer  )
@@ -513,3 +403,111 @@ LIB.RegisterBgMsg('RL', function(_, data, nChannel, dwID, szName, bIsSelf)
 		end
 	end
 end)
+
+--------------------------------------------------------------------------------
+-- 注册邀请
+--------------------------------------------------------------------------------
+local R = {
+	szIconUITex = 'ui\\Image\\button\\SystemButton.UITex',
+	nIconFrame = 8,
+}
+
+function R.Drawer(container, info)
+	local wnd = container:AppendContentFromIni(PR_INI_PATH, 'Wnd_PartyRequest')
+	wnd.info = info
+	wnd.OnMouseEnter = D.OnMouseEnter
+	wnd.OnMouseLeave = D.OnMouseLeave
+	wnd.OnLButtonClick = D.OnLButtonClick
+	wnd.OnRButtonClick = D.OnRButtonClick
+
+	local hItem = wnd:Lookup('', '')
+	if info.dwKungfuID then
+		hItem:Lookup('Image_Icon'):FromIconID(Table_GetSkillIconID(info.dwKungfuID, 1))
+	else
+		hItem:Lookup('Image_Icon'):FromUITex(GetForceImage(info.dwForce))
+	end
+	hItem:Lookup('Handle_Status/Handle_Gongzhan'):SetVisible(info.nGongZhan == 1)
+
+	local szCampImg, nCampFrame = LIB.GetCampImage(info.nCamp)
+	if szCampImg then
+		hItem:Lookup('Handle_Status/Handle_Camp/Image_Camp'):FromUITex(szCampImg, nCampFrame)
+	end
+	hItem:Lookup('Handle_Status/Handle_Camp'):SetVisible(not not szCampImg)
+
+	if info.bDetail and info.bEx == 'Author' then
+		hItem:Lookup('Text_Name'):SetFontColor(255, 255, 0)
+	end
+	hItem:Lookup('Text_Name'):SetText(info.szName)
+	hItem:Lookup('Text_Level'):SetText(info.nLevel)
+
+	wnd:Lookup('Btn_Accept').OnLButtonClick = D.OnLButtonClick
+	wnd:Lookup('Btn_Accept', 'Text_Accept'):SetText(g_tStrings.STR_ACCEPT)
+	wnd:Lookup('Btn_Refuse').OnLButtonClick = D.OnLButtonClick
+	wnd:Lookup('Btn_Refuse', 'Text_Refuse'):SetText(g_tStrings.STR_REFUSE)
+	wnd:Lookup('Btn_Lookup').OnMouseEnter = D.OnMouseEnter
+	wnd:Lookup('Btn_Lookup').OnMouseLeave = D.OnMouseLeave
+	wnd:Lookup('Btn_Lookup').OnLButtonClick = D.OnLButtonClick
+	wnd:Lookup('Btn_Lookup', 'Text_Lookup'):SetText(info.dwID and g_tStrings.STR_LOOKUP or _L['Ask details'])
+
+	return wnd
+end
+
+function R.GetTip(info)
+	if info.szType == 'invite' then
+		return GetFormatText(_L['Party invite request.'])
+	end
+	return GetFormatText(_L['Party apply request.'])
+end
+
+function R.GetMenu()
+	local menu = {
+		szOption = _L['MY_PartyRequest'],
+		{
+			szOption = _L['Auto refuse low level player'],
+			bCheck = true, bChecked = MY_PartyRequest.bRefuseLowLv,
+			fnAction = function()
+				MY_PartyRequest.bRefuseLowLv = not MY_PartyRequest.bRefuseLowLv
+			end,
+		},
+		{
+			szOption = _L['Auto refuse robot player'],
+			bCheck = true, bChecked = MY_PartyRequest.bRefuseRobot,
+			fnAction = function()
+				MY_PartyRequest.bRefuseRobot = not MY_PartyRequest.bRefuseRobot
+			end,
+			fnMouseEnter = function()
+				local szXml = GetFormatText(_L['Full level and equip score less than 2/3 of yours'], nil, 255, 255, 0)
+				OutputTip(szXml, 600, {this:GetAbsX(), this:GetAbsY(), this:GetW(), this:GetH()}, ALW.RIGHT_LEFT)
+			end,
+		},
+		{
+			szOption = _L['Auto accept friend'],
+			bCheck = true, bChecked = MY_PartyRequest.bAcceptFriend,
+			fnAction = function()
+				MY_PartyRequest.bAcceptFriend = not MY_PartyRequest.bAcceptFriend
+			end,
+		},
+		{
+			szOption = _L['Auto accept tong member'],
+			bCheck = true, bChecked = MY_PartyRequest.bAcceptTong,
+			fnAction = function()
+				MY_PartyRequest.bAcceptTong = not MY_PartyRequest.bAcceptTong
+			end,
+		},
+		{
+			szOption = _L['Auto accept all'],
+			bCheck = true, bChecked = MY_PartyRequest.bAcceptAll,
+			fnAction = function()
+				MY_PartyRequest.bAcceptAll = not MY_PartyRequest.bAcceptAll
+			end,
+		},
+	}
+	insert(menu, MY_PartyRequest.GetCustomNameMenu())
+	return menu
+end
+
+function R.OnClear()
+	PR_PARTY_REQUEST = {}
+end
+
+MY_Request.Register('MY_PartyRequest', R)

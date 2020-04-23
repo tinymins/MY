@@ -425,6 +425,10 @@ return {
 
 	['Encrypt and compressing: '] = '更新加密压缩：',
 
+	-- MY_Request
+	['Invite'] = '邀请',
+	['Clear list and close?'] = '清空列表并关闭？',
+
 	-- LuaWatcher
 	['MY_LuaWatcher'] = '调用统计',
 	['Start'] = '开始',
