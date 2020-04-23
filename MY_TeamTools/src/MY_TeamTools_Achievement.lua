@@ -211,7 +211,7 @@ function D.UpdateAchievementID()
 			end
 		end
 	else
-		for _, dwAchieveID in ipairs(LIB.GetMapAchievements(O.dwMapID)) do
+		for _, dwAchieveID in ipairs(LIB.GetMapAchievements(O.dwMapID) or CONSTANT.EMPTY_TABLE) do
 			local achi = Table_GetAchievement(dwAchieveID)
 			if achi
 			and (not O.bIntelligentHide or achi.dwSub ~= 10) -- Òþ²ØÉùÍû³É¾Í
@@ -747,7 +747,11 @@ function D.OnItemLButtonClick()
 			AchievementPanel.Compare(this.rec.id)
 		end
 	elseif name == 'Handle_StatColumn' then
-		if this.col.id then
+		if IsCtrlKeyDown() then
+			if this.achieveid then
+				LIB.InsertTalkInput('achievement', this.achieveid)
+			end
+		elseif this.col.id then
 			local page = this:GetParent():GetParent():GetParent():GetParent():GetParent()
 			if O.szSort == this.col.id then
 				O.szSortOrder = O.szSortOrder == 'asc' and 'desc' or 'asc'
@@ -760,9 +764,15 @@ function D.OnItemLButtonClick()
 		if not this.achieveid then
 			return
 		end
-		local AchievementPanel = _G.AchievementPanel or GetInsideEnv().AchievementPanel
-		if AchievementPanel then
-			AchievementPanel.Open(nil, this.achieveid)
+		if IsCtrlKeyDown() then
+			if this.achieveid then
+				LIB.InsertTalkInput('achievement', this.achieveid)
+			end
+		else
+			local AchievementPanel = _G.AchievementPanel or GetInsideEnv().AchievementPanel
+			if AchievementPanel then
+				AchievementPanel.Open(nil, this.achieveid)
+			end
 		end
 	end
 end
