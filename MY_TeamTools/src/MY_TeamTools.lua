@@ -54,6 +54,7 @@ end
 local D = {}
 local O = {
 	aModule = {},
+	nActivePageIndex = nil,
 }
 local Framework = {}
 local SZ_INI = PLUGIN_ROOT .. '/ui/MY_TeamTools.ini'
@@ -126,7 +127,7 @@ function D.ActivePage(frame, szModule, bFirst)
 	local pageActive = pageset:GetActivePage()
 	local nActiveIndex, nToIndex = pageActive.nIndex, nil
 	for i, m in ipairs(O.aModule) do
-		if m.szID == szModule or i == szModule then
+		if m.szID == szModule or i == szModule or i == O.nActivePageIndex then
 			nToIndex = i
 		end
 	end
@@ -142,6 +143,7 @@ function D.ActivePage(frame, szModule, bFirst)
 		else
 			pageset:ActivePage(nToIndex - 1)
 		end
+		O.nActivePageIndex = nToIndex
 	end
 end
 
@@ -235,6 +237,7 @@ function Framework.OnActivePage()
 				this = _this
 			end
 			frame.pActivePage = page
+			O.nActivePageIndex = page.nIndex
 		end
 	end
 end
