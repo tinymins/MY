@@ -123,9 +123,12 @@ function D.RedrawList()
 	if not frame then
 		return
 	end
-	local container, nSumH = frame:Lookup('WndContainer_Request'), 0
+	local scroll = frame:Lookup('Scroll_Request')
+	local scrollbar = scroll:Lookup('ScrolBar_Request')
+	local container = scroll:Lookup('WndContainer_Request')
+	local nSumH = 0
 	container:Clear()
-	for _, info in ipairs(REQUEST_LIST) do
+	for i, info in ipairs(REQUEST_LIST) do
 		local wnd = container:AppendContentFromIni(INI_PATH, 'WndWindow_Item')
 		local handler = REQUEST_HANDLER[info.szType]
 		local inner, nH = handler.Drawer(wnd, info.data)
@@ -141,17 +144,21 @@ function D.RedrawList()
 			LIB.Debug('MY_Request', info.szType .. '#' .. info.szKey .. ' drawer does not return a wnd!', DEBUG_LEVEL.ERROR)
 		end
 		wnd:Lookup('', 'Image_TypeIcon'):FromUITex(handler.szIconUITex, handler.nIconFrame)
+		wnd:Lookup('', 'Image_Spliter'):SetVisible(i ~= #REQUEST_LIST)
 		wnd.info = info
 		nSumH = nSumH + nH
 	end
+	nSumH = min(nSumH, 475)
+	scroll:SetH(nSumH)
+	scrollbar:SetH(nSumH - 2)
 	container:SetH(nSumH)
 	container:FormatAllContentPos()
-	frame:Lookup('', 'Image_Bg'):SetH(nSumH)
-	frame:SetH(nSumH + 30)
+	frame:Lookup('', 'Image_Bg'):SetH(nSumH + 4)
+	frame:SetH(nSumH + 30 + 4)
 end
 
 function D.OnFrameCreate()
-	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
+	this:SetPoint('CENTER', 0, -200, 'CENTER', 0, 0)
 	this:Lookup('', 'Text_Title'):SetText(_L['Invite'])
 	LIB.RegisterEsc('MY_PartyRequest', D.GetFrame, D.Close)
 end
