@@ -1670,7 +1670,35 @@ function UI:Autocomplete(method, arg1, arg2)
 							haystack = StringLowerW(haystack)
 						end
 						local pos = wfind(haystack, needle)
-						if pos and (opt.anyMatch or pos == 0) then
+						if pos and pos > 0 and not opt.anyMatch then
+							pos = nil
+						end
+						if not pos then
+							local aPinyin, aPinyinConsonant = LIB.Han2Pinyin(haystack)
+							if not pos then
+								for _, s in ipairs(aPinyin) do
+									pos = wfind(s, needle)
+									if pos and pos > 0 and not opt.anyMatch then
+										pos = nil
+									end
+									if pos then
+										break
+									end
+								end
+							end
+							if not pos then
+								for _, s in ipairs(aPinyinConsonant) do
+									pos = wfind(s, needle)
+									if pos and pos > 0 and not opt.anyMatch then
+										pos = nil
+									end
+									if pos then
+										break
+									end
+								end
+							end
+						end
+						if pos then
 							insert(aSrc, src)
 						end
 					end
