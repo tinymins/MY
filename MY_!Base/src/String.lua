@@ -59,12 +59,21 @@ function LIB.SplitString(szText, aSpliter, bIgnoreEmptyPart, nMaxPart)
 	if IsString(aSpliter) then
 		aSpliter = {aSpliter}
 	end
-	local nOff, aResult, szPart = 1, {}
+	local nOff, nLen, aResult, nResult, szPart, nEnd, szEnd, nPos = 1, #szText, {}, 0
 	while true do
-		local nEnd, szEnd
-		if not nMaxPart or nMaxPart > #aResult + 1 then
+		nEnd, szEnd = nil
+		if not nMaxPart or nMaxPart > nResult + 1 then
 			for _, szSpliter in ipairs(aSpliter) do
-				local nPos = StringFindW(szText, szSpliter, nOff)
+				if szSpliter == '' then
+					nPos = #wsub(sub(szText, nOff), 1, 1)
+					if nPos == 0 then
+						nPos = nil
+					else
+						nPos = nOff + nPos
+					end
+				else
+					nPos = StringFindW(szText, szSpliter, nOff)
+				end
 				if nPos and (not nEnd or nPos < nEnd) then
 					nEnd, szEnd = nPos, szSpliter
 				end
@@ -73,15 +82,19 @@ function LIB.SplitString(szText, aSpliter, bIgnoreEmptyPart, nMaxPart)
 		if not nEnd then
 			szPart = sub(szText, nOff, len(szText))
 			if not bIgnoreEmptyPart or szPart ~= '' then
+				nResult = nResult + 1
 				insert(aResult, szPart)
 			end
 			break
-		else
-			szPart = sub(szText, nOff, nEnd - 1)
-			if not bIgnoreEmptyPart or szPart ~= '' then
-				insert(aResult, szPart)
-			end
-			nOff = nEnd + len(szEnd)
+		end
+		szPart = sub(szText, nOff, nEnd - 1)
+		if not bIgnoreEmptyPart or szPart ~= '' then
+			nResult = nResult + 1
+			insert(aResult, szPart)
+		end
+		nOff = nEnd + len(szEnd)
+		if nOff > nLen then
+			break
 		end
 	end
 	return aResult
