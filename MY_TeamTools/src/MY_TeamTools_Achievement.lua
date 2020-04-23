@@ -682,7 +682,7 @@ function D.OnInitPage()
 				szText)
 		end,
 		autocomplete = {{'option', 'source', O.aSearchAC}},
-		onclick = function() UI(this):Autocomplete('search') end,
+		onclick = function() UI(this):Autocomplete('search', '') end,
 		onblur = function() D.RequestTeamData() end,
 	}):Width() + 5
 
