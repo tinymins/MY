@@ -55,12 +55,14 @@ local D = {}
 local O = {
 	dwMapID = 0,
 	szSearch = '',
-	bIntelligentHide = false,
+	bIntelligentHide = true,
 	szSort = 'name',
 	szSortOrder = 'asc',
 	aAchievement = {},
 	aSearchAC = {},
 }
+RegisterCustomData('MY_TeamTools_Achievement.bIntelligentHide')
+
 local MAX_ALL_MAP_ACHI = 40
 local ACHIEVE_CACHE = {}
 local COUNTER_CACHE = {}
@@ -826,7 +828,17 @@ local settings = {
 	exports = {
 		{
 			fields = {
+				bIntelligentHide = true,
 			},
+			root = O,
+		},
+	},
+	imports = {
+		{
+			fields = {
+				bIntelligentHide = true,
+			},
+			root = O,
 		},
 	},
 }
