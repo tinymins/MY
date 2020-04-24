@@ -90,7 +90,22 @@ LIB.RegisterFrameCreate('ExitPanel.BIG_WAR_CHECK', function(name, frame)
 			if ui:Children('#Text_MY_Tip'):Count() == 0 then
 				ui:Append('Text', { name = 'Text_MY_Tip', y = ui:Height(), w = ui:Width(), color = {255, 255, 0}, font = 199, halign = 1})
 			end
-			ui:Children('#Text_MY_Tip'):Text(_L['Warning: Bigwar has been finished but not handed yet!']):Shake(10, 10, 10, 1000)
+			ui:Children('#Text_MY_Tip'):Text(_L['Warning: Bigwar has been finished but not handed yet!'])
+			local nTick = GetTime()
+			local el = ui:Children('#Text_MY_Tip')[1]
+			local SCALE_ANIMATE_TIME, SHAKE_ANIMATE_TIME = 200, 200
+			LIB.RenderCall(function()
+				if not IsElement(el) then
+					return 0
+				end
+				local nTime = GetTime() - nTick
+				if nTime >= SCALE_ANIMATE_TIME then
+					el:SetFontScale(1)
+					ui:Children('#Text_MY_Tip'):Shake(10, 10, 10, SHAKE_ANIMATE_TIME)
+					return 0
+				end
+				el:SetFontScale((1 - nTime / SCALE_ANIMATE_TIME) * 6 + 1)
+			end)
 		else
 			ui:Children('#Text_MY_Tip'):Remove()
 		end
