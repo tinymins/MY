@@ -76,6 +76,8 @@ LIB.RegisterFrameCreate('ExitPanel.BIG_WAR_CHECK', function(name, frame)
 					end
 				end
 				if finished then
+					OutputWarningMessage('MSG_WARNING_RED', _L['Warning: Bigwar has been finished but not handed yet!'])
+					PlaySound(SOUND.UI_SOUND, g_sound.CloseAuction)
 					local ui = UI(frame)
 					if ui:Children('#Text_MY_Tip'):Count() == 0 then
 						ui:Append('Text', { name = 'Text_MY_Tip',y = ui:Height(), w = ui:Width(), color = {255, 255, 0}, font = 199, halign = 1})
@@ -164,7 +166,7 @@ LIB.RegisterEvent('LOADING_END.MY_BigWarChecker', function()
 	for _, v in ipairs(aQuestInfo) do
 		if v.dwMapID == dwMapID and v.eState ~= TASK_STATE.ACCEPTED and v.eState ~= TASK_STATE.FINISHED then
 			local function fnAction()
-				OutputWarningMessage('MSG_WARNING_YELLOW', _L['This map is big war map and you did not accepted the quest, is that correct?'])
+				OutputWarningMessage('MSG_WARNING_RED', _L['This map is big war map and you did not accepted the quest, is that correct?'])
 				PlaySound(SOUND.UI_SOUND, g_sound.CloseAuction)
 			end
 			LIB.DelayCall(10000, fnAction)
