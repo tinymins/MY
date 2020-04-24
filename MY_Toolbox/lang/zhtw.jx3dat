@@ -126,6 +126,7 @@ return {
     LOCK_TIP = {},
 
     ['Warning: Bigwar has been finished but not handed yet!'] = '茗伊提示：大戰還沒交！',
+    ['This map is big war map and you did not accepted the quest, is that correct?'] = '提示：檢測到角色沒有接受當前地圖秘境大戰系列任務！',
 
     ['show changge shadow index'] = '顯示長歌影子次序',
     ['show distance'] = '顯示距離',

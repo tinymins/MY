@@ -88,9 +88,91 @@ LIB.RegisterFrameCreate('ExitPanel.BIG_WAR_CHECK', function(name, frame)
 	end
 end)
 
-function D.Apply()
+local TASK_STATE = {
+	ACCEPTABLE = 1,
+	ACCEPTED = 2,
+	FINISHABLE = 3,
+	FINISHED = 4,
+	UNACCEPTABLE = 5,
+	UNKNOWN = 6,
+}
+local function GetTaskState(me, dwQuestID, dwNpcTemplateID)
+	-- 获取身上任务状态 -1: 任务id非法 0: 任务不存在 1: 任务正在进行中 2: 任务完成但还没有交 3: 任务已完成
+	local nState = me.GetQuestPhase(dwQuestID)
+	if nState == 1 then
+		return TASK_STATE.ACCEPTED
+	end
+	if nState == 2 then
+		return TASK_STATE.FINISHABLE
+	end
+	if nState == 3 then
+		return TASK_STATE.FINISHED
+	end
+	-- 获取任务状态
+	if me.GetQuestState(dwQuestID) == QUEST_STATE.FINISHED then
+		return TASK_STATE.FINISHED
+	end
+	-- 获取是否可接
+	local eCanAccept = me.CanAcceptQuest(dwQuestID, dwNpcTemplateID)
+	if eCanAccept == QUEST_RESULT.SUCCESS then
+		return TASK_STATE.ACCEPTABLE
+	end
+	if eCanAccept == QUEST_RESULT.ALREADY_ACCEPTED then
+		return TASK_STATE.ACCEPTED
+	end
+	if eCanAccept == QUEST_RESULT.FINISHED_MAX_COUNT then
+		return TASK_STATE.FINISHED
+	end
+	-- local KQuestInfo = GetQuestInfo(dwQuestID)
+	-- if KQuestInfo.bRepeat then -- 可重复任务没到达上限一定可接（有时候地图不对会误判不可接受）
+	-- 	return TASK_STATE.ACCEPTABLE
+	-- end
+	-- if eCanAccept == QUEST_RESULT.FAILED then
+	-- 	return TASK_STATE.UNACCEPTABLE
+	-- end
+	return TASK_STATE.UNKNOWN
 end
-LIB.RegisterInit('MY_BigWarChecker', D.Apply)
+
+LIB.RegisterEvent('LOADING_END.MY_BigWarChecker', function()
+	local me = GetClientPlayer()
+	local dwMapID = me.GetMapID()
+	-- 分析大战本状态数据
+	local aQuestInfo = {}
+	for _, v in ipairs(CONSTANT.QUEST_INFO.BIG_WARS) do
+		local szPos = Table_GetQuestPosInfo(v[1], 'quest_state', 1)
+		local szMap = szPos and szPos:match('N (%d+),')
+		local dwMap = szMap and tonumber(szMap)
+		insert(aQuestInfo, {
+			dwQuestID = v[1],
+			dwNpcTemplateID = v[2],
+			dwMapID = dwMap,
+			eState = GetTaskState(me, v[1], v[2]),
+		})
+	end
+	-- 分析一些不需要提示的情况
+	for _, v in ipairs(aQuestInfo) do
+		-- 如果完成了大战直接返回
+		if v.eState == TASK_STATE.FINISHED or v.eState == TASK_STATE.FINISHABLE then
+			return
+		end
+		-- 如果有可接的大战但是不在这个地图则返回
+		if v.eState == TASK_STATE.ACCEPTABLE and v.dwMapID ~= dwMapID then
+			return
+		end
+	end
+	-- 否则如果没接当前地图大战就报警
+	for _, v in ipairs(aQuestInfo) do
+		if v.dwMapID == dwMapID and v.eState ~= TASK_STATE.ACCEPTED and v.eState ~= TASK_STATE.FINISHED then
+			local function fnAction()
+				OutputWarningMessage('MSG_WARNING_YELLOW', _L['This map is big war map and you did not accepted the quest, is that correct?'])
+				PlaySound(SOUND.UI_SOUND, g_sound.CloseAuction)
+			end
+			LIB.DelayCall(10000, fnAction)
+			fnAction()
+			return
+		end
+	end
+end)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	return x, y
@@ -116,9 +198,6 @@ local settings = {
 		{
 			fields = {
 				bEnable = true,
-			},
-			triggers = {
-				bEnable = D.Apply,
 			},
 			root = O,
 		},
