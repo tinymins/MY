@@ -374,4 +374,14 @@ return {
 
     ['MY_DynamicActionBarPos'] = '動態技能欄位置',
     ['Restore dynamic action bar pos'] = '記住上次動態技能欄所在位置',
+
+    -- MY_Domesticate.lua
+    ['measure (%d+) point'] = '飽食度(%d+)點',
+    ['No enough %s to feed %s!'] = '沒有足夠的[%s]用於馴養[%s]！',
+    ['Auto feed'] = '自動喂食',
+    ['Auto feed domesticate cancelled.'] = '自動喂食已取消。',
+    ['Set domesticate auto feed %s to %s succeed.'] = '設置自動使用[%s]喂食[%s]成功。',
+    ['Your domesticate %s available measure is %d point!'] = '你馴養的%s待喂養飽食度已達到%d點！',
+    ['Domesticate feed alert'] = '馴養提醒',
+    ['Alert when measure larger than %d'] = '當馴養可喂養飽食度高於%d點時提醒',
 }
