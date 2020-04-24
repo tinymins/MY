@@ -57,35 +57,56 @@ local O = {
 }
 RegisterCustomData('MY_BigWarChecker.bEnable')
 
+local function IsBigWarFinishable(me)
+	for _, aQuestInfo in ipairs(CONSTANT.QUEST_INFO.BIG_WARS) do
+		local info = me.GetQuestTraceInfo(aQuestInfo[1])
+		if info then
+			local finished = false
+			if info.finish then
+				finished = true
+			elseif info.quest_state then
+				finished = true
+				for _, state in ipairs(info.quest_state) do
+					if state.need ~= state.have then
+						finished = false
+					end
+				end
+			end
+			if finished then
+				return true
+			end
+		end
+	end
+end
+
 -- 大战没交
 LIB.RegisterFrameCreate('ExitPanel.BIG_WAR_CHECK', function(name, frame)
 	local me = GetClientPlayer()
 	if me then
-		for _, aQuestInfo in ipairs(CONSTANT.QUEST_INFO.BIG_WARS) do
-			local info = me.GetQuestTraceInfo(aQuestInfo[1])
-			if info then
-				local finished = false
-				if info.finish then
-					finished = true
-				elseif info.quest_state then
-					finished = true
-					for _, state in ipairs(info.quest_state) do
-						if state.need ~= state.have then
-							finished = false
-						end
-					end
-				end
-				if finished then
-					OutputWarningMessage('MSG_WARNING_RED', _L['Warning: Bigwar has been finished but not handed yet!'])
-					PlaySound(SOUND.UI_SOUND, g_sound.CloseAuction)
-					local ui = UI(frame)
-					if ui:Children('#Text_MY_Tip'):Count() == 0 then
-						ui:Append('Text', { name = 'Text_MY_Tip',y = ui:Height(), w = ui:Width(), color = {255, 255, 0}, font = 199, halign = 1})
-					end
-					ui = ui:Children('#Text_MY_Tip'):Text(_L['Warning: Bigwar has been finished but not handed yet!']):Shake(10, 10, 10, 1000)
-					break
-				end
+		local ui = UI(frame)
+		if IsBigWarFinishable(me) then
+			OutputWarningMessage('MSG_WARNING_RED', _L['Warning: Bigwar has been finished but not handed yet!'])
+			PlaySound(SOUND.UI_SOUND, g_sound.CloseAuction)
+			if ui:Children('#Text_MY_Tip'):Count() == 0 then
+				ui:Append('Text', { name = 'Text_MY_Tip', y = ui:Height(), w = ui:Width(), color = {255, 255, 0}, font = 199, halign = 1})
 			end
+			ui:Children('#Text_MY_Tip'):Text(_L['Warning: Bigwar has been finished but not handed yet!']):Shake(10, 10, 10, 1000)
+		else
+			ui:Children('#Text_MY_Tip'):Remove()
+		end
+	end
+end)
+LIB.RegisterFrameCreate('OptionPanel.BIG_WAR_CHECK', function(name, frame)
+	local me = GetClientPlayer()
+	if me then
+		local ui = UI(frame)
+		if IsBigWarFinishable(me) then
+			if ui:Children('#Text_MY_Tip'):Count() == 0 then
+				ui:Append('Text', { name = 'Text_MY_Tip', y = -20, w = ui:Width(), color = {255, 255, 0}, font = 199, halign = 1})
+			end
+			ui:Children('#Text_MY_Tip'):Text(_L['Warning: Bigwar has been finished but not handed yet!']):Shake(10, 10, 10, 1000)
+		else
+			ui:Children('#Text_MY_Tip'):Remove()
 		end
 	end
 end)
