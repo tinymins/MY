@@ -150,6 +150,7 @@ function D.OnMessageBoxOpen()
 					info = {}
 					EVOKE_LIST[szName] = info
 				end
+				info.szType = szType
 				info.szName = szName
 				info.szDesc = szMsg
 				info.fnAccept = function()
@@ -247,6 +248,28 @@ end
 
 function R.GetTip(info)
 	return GetFormatText(info.szDesc)
+end
+
+function R.GetIcon(info, szImage, nFrame)
+	if info.szType == 'A2M' or info.szType == 'M2A' then
+		local info = LIB.GetFriend(info.szName)
+		local card = info and GetFellowshipCardClient().GetFellowshipCardInfo(info.id)
+		if card then
+			local szAvatarFile, nAvatarFrame, bAnimate = LIB.GetPlayerAvatar(card.dwForceID, card.nRoleType, card.dwMiniAvatarID)
+			if szAvatarFile and not bAnimate then
+				szImage, nFrame = szAvatarFile, nAvatarFrame
+			end
+		end
+	elseif info.szType == 'FRIEND' then
+		szImage, nFrame = 'FromIconID', 307
+	elseif info.szType == 'TONG' then
+		szImage, nFrame = 'FromIconID', 305
+	elseif info.szType == 'TONGALL' then
+		szImage, nFrame = 'FromIconID', 592
+	elseif info.szType == 'TONGALLS' then
+		szImage, nFrame = 'FromIconID', 591
+	end
+	return szImage, nFrame
 end
 
 function R.GetMenu()
