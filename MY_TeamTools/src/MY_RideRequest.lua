@@ -340,9 +340,6 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 		tip = _L['Optimize ride and emotion request'],
 		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
 	}):Width() + 5
-
-	x = X
-	y = y + 20
 	return x, y
 end
 

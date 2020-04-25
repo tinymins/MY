@@ -96,6 +96,7 @@ function PS.OnPanelActive(wnd)
 	x = X + 10
 	x, y = MY_PartyRequest.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	x, y = MY_RideRequest.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+	x, y = MY_EvokeRequest.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 
 	x, y = MY_TeamRestore.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 end

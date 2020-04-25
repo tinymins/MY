@@ -50,9 +50,14 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
 	return
 end
 --------------------------------------------------------------------------
+local INI_PATH = PACKET_INFO.ROOT .. 'MY_TeamTools/ui/MY_EvokeRequest.ini'
 local D = {}
-local PR_INI_PATH = PACKET_INFO.ROOT .. 'MY_TeamTools/ui/MY_EvokeRequest.ini'
-local PR_EVOKE_MSG = {
+local O = {
+	bEnable = false,
+}
+RegisterCustomData('MY_EvokeRequest.bEnable')
+
+local EVOKE_MSG = {
 	['A2M'] = g_tStrings.MENTOR_APPRENTICE_EVOKE_MSG,
 	['M2A'] = g_tStrings.MENTOR_MENTOR_EVOKE_MSG,
 	['FRIEND'] = g_tStrings.MENTOR_FRIEND_EVOKE_MSG,
@@ -63,6 +68,20 @@ local PR_EVOKE_MSG = {
 	['PARTY'] = g_tStrings.MENTOR_PARTY_EVOKE_MSG,
 }
 local EVOKE_LIST = {}
+
+function D.GetMenu()
+	local menu = {
+		szOption = _L['MY_EvokeRequest'],
+		{
+			szOption = _L['Enable'],
+			bCheck = true, bChecked = MY_EvokeRequest.bEnable,
+			fnAction = function()
+				MY_EvokeRequest.bEnable = not MY_EvokeRequest.bEnable
+			end,
+		},
+	}
+	return menu
+end
 
 function D.OnLButtonClick()
 	local name = this:GetName()
@@ -116,7 +135,7 @@ function D.OnMessageBoxOpen()
 		local hContent = frame:Lookup('Wnd_All', 'Handle_Message')
 		local txt = hContent and hContent:Lookup(0)
 		local szMsg, szType = txt and txt:GetType() == 'Text' and txt:GetText()
-		for k, szMsgTpl in pairs(PR_EVOKE_MSG) do
+		for k, szMsgTpl in pairs(EVOKE_MSG) do
 			if FormatString(szMsgTpl, szName) == szMsg then
 				szType = k
 				break
@@ -165,6 +184,46 @@ end
 
 LIB.RegisterEvent('ON_MESSAGE_BOX_OPEN.MY_EvokeRequest' , D.OnMessageBoxOpen)
 
+function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+	x = x + ui:Append('WndComboBox', {
+		x = x, y = y, w = 120,
+		text = _L['MY_EvokeRequest'],
+		menu = D.GetMenu,
+	}):Width() + 5
+
+	x = X
+	y = y + 20
+	return x, y
+end
+
+-- Global exports
+do
+local settings = {
+	exports = {
+		{
+			fields = {
+				OnPanelActivePartial = D.OnPanelActivePartial,
+			},
+		},
+		{
+			fields = {
+				bEnable = true,
+			},
+			root = O,
+		},
+	},
+	imports = {
+		{
+			fields = {
+				bEnable = true,
+			},
+			root = O,
+		},
+	},
+}
+MY_EvokeRequest = LIB.GeneGlobalNS(settings)
+end
+
 --------------------------------------------------------------------------------
 -- ×¢²áÑûÇë
 --------------------------------------------------------------------------------
@@ -174,7 +233,7 @@ local R = {
 }
 
 function R.Drawer(container, info)
-	local wnd = container:AppendContentFromIni(PR_INI_PATH, 'Wnd_EvokeRequest')
+	local wnd = container:AppendContentFromIni(INI_PATH, 'Wnd_EvokeRequest')
 	wnd.info = info
 	wnd.OnMouseEnter = D.OnMouseEnter
 	wnd.OnMouseLeave = D.OnMouseLeave
@@ -188,6 +247,10 @@ end
 
 function R.GetTip(info)
 	return GetFormatText(info.szDesc)
+end
+
+function R.GetMenu()
+	return D.GetMenu()
 end
 
 function R.OnClear()
