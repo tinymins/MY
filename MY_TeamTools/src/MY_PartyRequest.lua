@@ -67,7 +67,57 @@ MY_PartyRequest = {
 }
 LIB.RegisterCustomData('MY_PartyRequest')
 
-function MY_PartyRequest.GetCustomNameMenu()
+function MY_PartyRequest.GetMenu()
+	local menu = {
+		szOption = _L['MY_PartyRequest'],
+		{
+			szOption = _L['Enable'],
+			bCheck = true, bChecked = MY_PartyRequest.bEnable,
+			fnAction = function()
+				MY_PartyRequest.bEnable = not MY_PartyRequest.bEnable
+			end,
+		},
+		CONSTANT.MENU_DIVIDER,
+		{
+			szOption = _L['Auto refuse low level player'],
+			bCheck = true, bChecked = MY_PartyRequest.bRefuseLowLv,
+			fnAction = function()
+				MY_PartyRequest.bRefuseLowLv = not MY_PartyRequest.bRefuseLowLv
+			end,
+		},
+		{
+			szOption = _L['Auto refuse robot player'],
+			bCheck = true, bChecked = MY_PartyRequest.bRefuseRobot,
+			fnAction = function()
+				MY_PartyRequest.bRefuseRobot = not MY_PartyRequest.bRefuseRobot
+			end,
+			fnMouseEnter = function()
+				local szXml = GetFormatText(_L['Full level and equip score less than 2/3 of yours'], nil, 255, 255, 0)
+				OutputTip(szXml, 600, {this:GetAbsX(), this:GetAbsY(), this:GetW(), this:GetH()}, ALW.RIGHT_LEFT)
+			end,
+		},
+		{
+			szOption = _L['Auto accept friend'],
+			bCheck = true, bChecked = MY_PartyRequest.bAcceptFriend,
+			fnAction = function()
+				MY_PartyRequest.bAcceptFriend = not MY_PartyRequest.bAcceptFriend
+			end,
+		},
+		{
+			szOption = _L['Auto accept tong member'],
+			bCheck = true, bChecked = MY_PartyRequest.bAcceptTong,
+			fnAction = function()
+				MY_PartyRequest.bAcceptTong = not MY_PartyRequest.bAcceptTong
+			end,
+		},
+		{
+			szOption = _L['Auto accept all'],
+			bCheck = true, bChecked = MY_PartyRequest.bAcceptAll,
+			fnAction = function()
+				MY_PartyRequest.bAcceptAll = not MY_PartyRequest.bAcceptAll
+			end,
+		},
+	}
 	local t = {
 		szOption = _L['Auto accept specific names'],
 		bCheck = true, bChecked = MY_PartyRequest.bAcceptCustom,
@@ -109,7 +159,8 @@ function MY_PartyRequest.GetCustomNameMenu()
 			end)
 		end,
 	})
-	return t
+	insert(menu, t)
+	return menu
 end
 
 function D.OnLButtonClick()
@@ -460,50 +511,7 @@ function R.GetTip(info)
 end
 
 function R.GetMenu()
-	local menu = {
-		szOption = _L['MY_PartyRequest'],
-		{
-			szOption = _L['Auto refuse low level player'],
-			bCheck = true, bChecked = MY_PartyRequest.bRefuseLowLv,
-			fnAction = function()
-				MY_PartyRequest.bRefuseLowLv = not MY_PartyRequest.bRefuseLowLv
-			end,
-		},
-		{
-			szOption = _L['Auto refuse robot player'],
-			bCheck = true, bChecked = MY_PartyRequest.bRefuseRobot,
-			fnAction = function()
-				MY_PartyRequest.bRefuseRobot = not MY_PartyRequest.bRefuseRobot
-			end,
-			fnMouseEnter = function()
-				local szXml = GetFormatText(_L['Full level and equip score less than 2/3 of yours'], nil, 255, 255, 0)
-				OutputTip(szXml, 600, {this:GetAbsX(), this:GetAbsY(), this:GetW(), this:GetH()}, ALW.RIGHT_LEFT)
-			end,
-		},
-		{
-			szOption = _L['Auto accept friend'],
-			bCheck = true, bChecked = MY_PartyRequest.bAcceptFriend,
-			fnAction = function()
-				MY_PartyRequest.bAcceptFriend = not MY_PartyRequest.bAcceptFriend
-			end,
-		},
-		{
-			szOption = _L['Auto accept tong member'],
-			bCheck = true, bChecked = MY_PartyRequest.bAcceptTong,
-			fnAction = function()
-				MY_PartyRequest.bAcceptTong = not MY_PartyRequest.bAcceptTong
-			end,
-		},
-		{
-			szOption = _L['Auto accept all'],
-			bCheck = true, bChecked = MY_PartyRequest.bAcceptAll,
-			fnAction = function()
-				MY_PartyRequest.bAcceptAll = not MY_PartyRequest.bAcceptAll
-			end,
-		},
-	}
-	insert(menu, MY_PartyRequest.GetCustomNameMenu())
-	return menu
+	return MY_PartyRequest.GetMenu()
 end
 
 function R.OnClear()

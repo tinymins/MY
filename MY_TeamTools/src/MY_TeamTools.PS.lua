@@ -94,83 +94,13 @@ function PS.OnPanelActive(wnd)
 	y = y + 20
 	y = y + ui:Append('Text', { x = x, y = y, text = _L['Party Request'], font = 27 }):Height() + 5
 	x = X + 10
-	ui:Append('WndCheckBox', {
-		x = x, y = y,
-		checked = MY_PartyRequest.bEnable,
-		text = _L['Party Request'],
-		oncheck = function(bChecked)
-			MY_PartyRequest.bEnable = bChecked
-		end,
-	}):AutoWidth()
-	x = x + 10
-	y = y + 25
-	ui:Append('WndCheckBox', {
-		x = x, y = y,
-		checked = MY_PartyRequest.bRefuseLowLv,
-		text = _L['Auto refuse low level player'],
-		oncheck = function(bChecked)
-			MY_PartyRequest.bRefuseLowLv = bChecked
-		end,
-		autoenable = function() return MY_PartyRequest.bEnable end,
-	}):AutoWidth()
-	y = y + 25
-	ui:Append('WndCheckBox', {
-		x = x, y = y,
-		checked = MY_PartyRequest.bRefuseRobot,
-		text = _L['Auto refuse robot player'],
-		tip = _L['Full level and equip score less than 2/3 of yours'],
-		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
-		oncheck = function(bChecked)
-			MY_PartyRequest.bRefuseRobot = bChecked
-		end,
-		autoenable = function() return MY_PartyRequest.bEnable end,
-	}):AutoWidth()
-	y = y + 25
-	ui:Append('WndCheckBox', {
-		x = x, y = y,
-		checked = MY_PartyRequest.bAcceptFriend,
-		text = _L['Auto accept friend'],
-		oncheck = function(bChecked)
-			MY_PartyRequest.bAcceptFriend = bChecked
-		end,
-		autoenable = function() return MY_PartyRequest.bEnable end,
-	}):AutoWidth()
-	y = y + 25
-	ui:Append('WndCheckBox', {
-		x = x, y = y,
-		checked = MY_PartyRequest.bAcceptTong,
-		text = _L['Auto accept tong member'],
-		oncheck = function(bChecked)
-			MY_PartyRequest.bAcceptTong = bChecked
-		end,
-		autoenable = function() return MY_PartyRequest.bEnable end,
-	}):AutoWidth()
-	y = y + 25
-	ui:Append('WndCheckBox', {
-		x = x, y = y,
-		checked = MY_PartyRequest.bAcceptAll,
-		text = _L['Auto accept all'],
-		oncheck = function(bChecked)
-			MY_PartyRequest.bAcceptAll = bChecked
-		end,
-		autoenable = function() return MY_PartyRequest.bEnable end,
-	}):AutoWidth()
-	y = y + 25
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y,
-		checked = MY_PartyRequest.bAcceptCustom,
-		text = _L['Auto accept specific names'],
-		oncheck = function(bChecked)
-			MY_PartyRequest.bAcceptCustom = bChecked
-		end,
-		autoenable = function() return MY_PartyRequest.bEnable end,
-	}):AutoWidth():Width()
-	ui:Append('WndButton', {
-		x = x, y = y + 1, w = 24, h = 22,
-		buttonstyle = 'OPTION',
-		menu = MY_PartyRequest.GetCustomNameMenu,
-		autoenable = function() return MY_PartyRequest.bEnable and MY_PartyRequest.bAcceptCustom end,
-	})
+	x = x + ui:Append('WndComboBox', {
+		x = x, y = y, w = 120,
+		text = _L['MY_PartyRequest'],
+		menu = MY_PartyRequest.GetMenu,
+	}):Width() + 5
+
+	x = X + 10
 	y = y + 25
 
 	x, y = MY_TeamRestore.OnPanelActivePartial(ui, X, Y, W, H, x, y)
