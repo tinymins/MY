@@ -1,7 +1,7 @@
 --------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
--- @desc     : 召请助手
+-- @desc     : 好友助手
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
@@ -50,33 +50,31 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
 	return
 end
 --------------------------------------------------------------------------
-local INI_PATH = PACKET_INFO.ROOT .. 'MY_TeamTools/ui/MY_EvokeRequest.ini'
+local INI_PATH = PACKET_INFO.ROOT .. 'MY_TeamTools/ui/MY_SocialRequest.ini'
 local D = {}
 local O = {
 	bEnable = false,
 }
-RegisterCustomData('MY_EvokeRequest.bEnable')
+RegisterCustomData('MY_SocialRequest.bEnable')
 
-local EVOKE_MSG = {
-	['A2M'] = g_tStrings.MENTOR_APPRENTICE_EVOKE_MSG,
-	['M2A'] = g_tStrings.MENTOR_MENTOR_EVOKE_MSG,
-	['FRIEND'] = g_tStrings.MENTOR_FRIEND_EVOKE_MSG,
-	['TONG'] = g_tStrings.MENTOR_TONG_EVOKE_MSG,
-	['TONGALL'] = g_tStrings.MENTOR_TONGALL_EVOKE_MSG,
-	['TONGALLS'] = g_tStrings.MENTOR_TONGALLS_EVOKE_MSG,
-	['ZUIYUAN'] = g_tStrings.MENTOR_QINGMINGJIE_ZUIYUAN_EVOKE_MSG_MSG,
-	['PARTY'] = g_tStrings.MENTOR_PARTY_EVOKE_MSG,
-}
-local EVOKE_LIST = {}
+local REQUEST_MSG = {}
+local REQUEST_LIST = {}
+
+for k, v in pairs({
+	['ADD_FRIEND_FELLOWSHIP'] = g_tStrings.STR_FRIEND_NEED_ADD_FRIEND_FELLOWSHIP,
+	['ADD_FRIEND'           ] = g_tStrings.STR_FRIEND_NEED_ADD_FRIEND,
+}) do
+	REQUEST_MSG[k] = v:gsub('<D0>', '^(.-)')
+end
 
 function D.GetMenu()
 	local menu = {
-		szOption = _L['MY_EvokeRequest'],
+		szOption = _L['MY_SocialRequest'],
 		{
 			szOption = _L['Enable'],
-			bCheck = true, bChecked = MY_EvokeRequest.bEnable,
+			bCheck = true, bChecked = MY_SocialRequest.bEnable,
 			fnAction = function()
-				MY_EvokeRequest.bEnable = not MY_EvokeRequest.bEnable
+				MY_SocialRequest.bEnable = not MY_SocialRequest.bEnable
 			end,
 		},
 	}
@@ -114,14 +112,14 @@ function D.OnMouseLeave()
 end
 
 function D.AcceptRequest(info)
-	EVOKE_LIST[info.szName] = nil
-	MY_Request.Remove('MY_EvokeRequest', info.szName)
+	REQUEST_LIST[info.szName] = nil
+	MY_Request.Remove('MY_SocialRequest', info.szName)
 	info.fnAccept()
 end
 
 function D.RefuseRequest(info)
-	EVOKE_LIST[info.szName] = nil
-	MY_Request.Remove('MY_EvokeRequest', info.szName)
+	REQUEST_LIST[info.szName] = nil
+	MY_Request.Remove('MY_SocialRequest', info.szName)
 	info.fnRefuse()
 end
 
@@ -130,13 +128,13 @@ function D.OnMessageBoxOpen()
 	if not O.bEnable or not frame or not frame:IsValid() then
 		return
 	end
-	if szMsgName:find('^A_E_M_') then
-		local szName = szMsgName:sub(7)
+	if szMsgName == 'NeedAddFriend' then
 		local hContent = frame:Lookup('Wnd_All', 'Handle_Message')
 		local txt = hContent and hContent:Lookup(0)
-		local szMsg, szType = txt and txt:GetType() == 'Text' and txt:GetText()
-		for k, szMsgTpl in pairs(EVOKE_MSG) do
-			if FormatString(szMsgTpl, szName) == szMsg then
+		local szMsg, szType, szName = txt and txt:GetType() == 'Text' and txt:GetText()
+		for k, szMsgTpl in pairs(REQUEST_MSG) do
+			szName = szMsg:match(szMsgTpl)
+			if szName then
 				szType = k
 				break
 			end
@@ -145,20 +143,20 @@ function D.OnMessageBoxOpen()
 			local fnAccept = Get(frame:Lookup('Wnd_All/Btn_Option1'), 'fnAction')
 			local fnRefuse = Get(frame:Lookup('Wnd_All/Btn_Option2'), 'fnAction')
 			if fnAccept and fnRefuse then
-				local info = EVOKE_LIST[szName]
+				local info = REQUEST_LIST[szName]
 				if not info then
 					info = {}
-					EVOKE_LIST[szName] = info
+					REQUEST_LIST[szName] = info
 				end
 				info.szType = szType
 				info.szName = szName
 				info.szDesc = szMsg
 				info.fnAccept = function()
-					EVOKE_LIST[szName] = nil
+					REQUEST_LIST[szName] = nil
 					Call(fnAccept)
 				end
 				info.fnRefuse = function()
-					EVOKE_LIST[szName] = nil
+					REQUEST_LIST[szName] = nil
 					Call(fnRefuse)
 				end
 				-- 获取dwID
@@ -172,7 +170,7 @@ function D.OnMessageBoxOpen()
 						info.dwID = data.dwID
 					end
 				end
-				MY_Request.Replace('MY_EvokeRequest', info.szName, info)
+				MY_Request.Replace('MY_SocialRequest', info.szName, info)
 				-- 关闭对话框
 				frame.fnAutoClose = nil
 				frame.fnCancelAction = nil
@@ -183,14 +181,19 @@ function D.OnMessageBoxOpen()
 	end
 end
 
-LIB.RegisterEvent('ON_MESSAGE_BOX_OPEN.MY_EvokeRequest' , D.OnMessageBoxOpen)
+LIB.RegisterEvent('ON_MESSAGE_BOX_OPEN.MY_SocialRequest' , D.OnMessageBoxOpen)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	x = x + ui:Append('WndComboBox', {
 		x = x, y = y, w = 120,
-		text = _L['MY_EvokeRequest'],
+		text = _L['MY_SocialRequest'],
 		menu = D.GetMenu,
+		tip = _L['Optimize social friend request'],
+		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
 	}):Width() + 5
+
+	x = X
+	y = y + 20
 	return x, y
 end
 
@@ -219,19 +222,19 @@ local settings = {
 		},
 	},
 }
-MY_EvokeRequest = LIB.GeneGlobalNS(settings)
+MY_SocialRequest = LIB.GeneGlobalNS(settings)
 end
 
 --------------------------------------------------------------------------------
 -- 注册邀请
 --------------------------------------------------------------------------------
 local R = {
-	szIconUITex = 'ui\\Image\\button\\SystemButton.UITex',
-	nIconFrame = 55,
+	szIconUITex = 'FromIconID',
+	nIconFrame = 2118,
 }
 
 function R.Drawer(container, info)
-	local wnd = container:AppendContentFromIni(INI_PATH, 'Wnd_EvokeRequest')
+	local wnd = container:AppendContentFromIni(INI_PATH, 'Wnd_Request')
 	wnd.info = info
 	wnd.OnMouseEnter = D.OnMouseEnter
 	wnd.OnMouseLeave = D.OnMouseLeave
@@ -247,34 +250,12 @@ function R.GetTip(info)
 	return GetFormatText(info.szDesc)
 end
 
-function R.GetIcon(info, szImage, nFrame)
-	if info.szType == 'A2M' or info.szType == 'M2A' then
-		local info = LIB.GetFriend(info.szName)
-		local card = info and GetFellowshipCardClient().GetFellowshipCardInfo(info.id)
-		if card then
-			local szAvatarFile, nAvatarFrame, bAnimate = LIB.GetPlayerAvatar(card.dwForceID, card.nRoleType, card.dwMiniAvatarID)
-			if szAvatarFile and not bAnimate then
-				szImage, nFrame = szAvatarFile, nAvatarFrame
-			end
-		end
-	elseif info.szType == 'FRIEND' then
-		szImage, nFrame = 'FromIconID', 307
-	elseif info.szType == 'TONG' then
-		szImage, nFrame = 'FromIconID', 305
-	elseif info.szType == 'TONGALL' then
-		szImage, nFrame = 'FromIconID', 592
-	elseif info.szType == 'TONGALLS' then
-		szImage, nFrame = 'FromIconID', 591
-	end
-	return szImage, nFrame
-end
-
 function R.GetMenu()
 	return D.GetMenu()
 end
 
 function R.OnClear()
-	EVOKE_LIST = {}
+	REQUEST_LIST = {}
 end
 
-MY_Request.Register('MY_EvokeRequest', R)
+MY_Request.Register('MY_SocialRequest', R)

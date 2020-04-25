@@ -128,6 +128,11 @@ return {
 	-- MY_EvokeRequest
 	['MY_EvokeRequest'] = '召請助手',
 
+	-- MY_SocialRequest
+	['MY_SocialRequest'] = '社交助手',
+	['Optimize social friend request'] = '優化好友添加請求列表。',
+	['Enable'] = '啟用',
+
 	['Edit team info?'] = '是否填寫團隊小告示（團員進組可看到）',
 	['Team Message'] = '團隊告示',
 	['Team Small Message'] = '團隊小告示',
