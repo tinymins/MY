@@ -143,7 +143,11 @@ function D.RedrawList()
 		else
 			LIB.Debug('MY_Request', info.szType .. '#' .. info.szKey .. ' drawer does not return a wnd!', DEBUG_LEVEL.ERROR)
 		end
-		wnd:Lookup('', 'Image_TypeIcon'):FromUITex(handler.szIconUITex, handler.nIconFrame)
+		if handler.szIconUITex == 'FromIconID' then
+			wnd:Lookup('', 'Image_TypeIcon'):FromIconID(handler.nIconFrame)
+		else
+			wnd:Lookup('', 'Image_TypeIcon'):FromUITex(handler.szIconUITex, handler.nIconFrame)
+		end
 		wnd:Lookup('', 'Image_Spliter'):SetVisible(i ~= #REQUEST_LIST)
 		wnd.info = info
 		nSumH = nSumH + nH

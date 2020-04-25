@@ -303,7 +303,7 @@ function D.GetRequestStatus(info)
 			info.szName, g_tStrings.tForceTitle[info.dwForce], info.nLevel, g_tStrings.STR_LEVEL)
 	elseif O.bAcceptCustom and O.tAcceptCustom[info.szName] then
 		szStatus = 'accept'
-		szMsg = _L('Auto accept %s(%s %d%s) custom request, go to MY/raid/teamtools panel if you want to turn off this feature.',
+		szMsg = _L('Auto accept %s(%s %d%s) custom party request, go to MY/raid/teamtools panel if you want to turn off this feature.',
 			info.szName, g_tStrings.tForceTitle[info.dwForce], info.nLevel, g_tStrings.STR_LEVEL)
 	elseif info.bFriend and O.bAcceptFriend then
 		szStatus = 'accept'

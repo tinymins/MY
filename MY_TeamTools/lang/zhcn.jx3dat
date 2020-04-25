@@ -69,7 +69,7 @@ return {
 	['Hide unimportant achievements'] = '隐藏声望等不需要优先关注的成就',
 
 	-- MY_PartyRequest
-	['Party Request'] = '优化入队申请列表',
+	['Party Request'] = '优化申请列表',
 	['MY_PartyRequest'] = '组队助手',
 	['Party invite request.'] = '对方邀请你组队。',
 	['Party apply request.'] = '对方申请加入你的队伍。',
@@ -98,12 +98,32 @@ return {
 		'自动通过了好友 %s(%s %d%s) 的组队请求，如需关闭该功能请前往茗伊插件/团队/团队工具取消勾选对应项。',
 	['Auto tong member friend %s(%s %d%s) party request, go to MY/raid/teamtools panel if you want to turn off this feature.'] =
 		'自动通过了帮会成员 %s(%s %d%s) 的组队请求，如需关闭该功能请前往茗伊插件/团队/团队工具取消勾选对应项。',
-	['Auto accept %s(%s %d%s) custom request, go to MY/raid/teamtools panel if you want to turn off this feature.'] =
+	['Auto accept %s(%s %d%s) custom party request, go to MY/raid/teamtools panel if you want to turn off this feature.'] =
 		'自动通过了指定角色 %s(%s %d%s) 的组队请求，如需关闭该功能请前往茗伊插件/团队/团队工具取消勾选对应项。',
 	['Asking...'] = '正在征询对方意见\n如果长时间未响应可能是对方没有安装插件。',
 	['Syncing: %.2f%%.'] = '正在同步数据(%.2f%%)...',
 	['Refuse request'] = '对方拒绝了您的请求！',
 	['Party limit'] = '必须和对方组队',
+
+	-- MY_RideRequest
+	['MY_RideRequest'] = '同乘助手',
+	['Optimize ride and emotion request'] = '优化双人同骑、双人动作请求列表。',
+	['Auto accept friend'] = '自动通过好友',
+	['Auto accept tong member'] = '自动通过帮会成员',
+	['Auto accept all'] = '自动通过所有人',
+	['Auto accept specific names'] = '自动通过指定角色',
+	['Auto refuse others'] = '自动拒绝不符合以上要求的',
+	['Auto refuse unknown'] = '自动拒绝非好友、非帮会成员',
+	['Add'] = '添加',
+	['Please input custom name, multiple split with ",[]":'] = '请输入自定义角色名称，多个角色名请使用半角逗号或方括号分隔：',
+	['Auto refuse %s ride request, go to MY/raid/teamtools panel if you want to turn off this feature.']
+		= '自动拒绝了 %s 的同乘请求，如需关闭该功能请前往茗伊插件/团队/团队工具取消勾选对应项。',
+	['Auto accept friend %s ride request, go to MY/raid/teamtools panel if you want to turn off this feature.'] =
+		'自动通过了好友 %s 的同乘请求，如需关闭该功能请前往茗伊插件/团队/团队工具取消勾选对应项。',
+	['Auto tong member friend %s ride request, go to MY/raid/teamtools panel if you want to turn off this feature.'] =
+		'自动通过了帮会成员 %s 的同乘请求，如需关闭该功能请前往茗伊插件/团队/团队工具取消勾选对应项。',
+	['Auto accept %s custom ride request, go to MY/raid/teamtools panel if you want to turn off this feature.'] =
+		'自动通过了指定角色 %s 的同乘请求，如需关闭该功能请前往茗伊插件/团队/团队工具取消勾选对应项。',
 
 	['Edit team info?'] = '是否填写团队小告示（团员进组可看到）',
 	['Team Message'] = '团队告示',

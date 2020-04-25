@@ -95,6 +95,7 @@ function PS.OnPanelActive(wnd)
 	y = y + ui:Append('Text', { x = x, y = y, text = _L['Party Request'], font = 27 }):Height() + 5
 	x = X + 10
 	x, y = MY_PartyRequest.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+	x, y = MY_RideRequest.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 
 	x, y = MY_TeamRestore.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 end
