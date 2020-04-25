@@ -1273,7 +1273,7 @@ function D.AdjustFrame(frame)
 		nH = nH + wnd:GetH()
 		wnd = wnd:GetNext()
 	end
-	nH = min(nH, 750)
+	nH = min(nH, select(2, Station.GetClientSize()) * 4 / 5)
 	scroll:SetSize(nW, nH)
 	scrollbar:SetH(nH)
 	scrollbar:SetRelX(nW - 8)
