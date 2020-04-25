@@ -92,7 +92,7 @@ function D.Replace(szType, szKey, data)
 	end
 	local bExist
 	for i, v in ipairs_r(REQUEST_LIST) do
-		if v.szKey == szKey then
+		if v.szType == szType and v.szKey == szKey then
 			bExist = true
 			v.data = data
 		end
@@ -135,6 +135,7 @@ function D.RedrawList()
 		local inner, nH = handler.Drawer(wnd, info.data)
 		if inner then
 			inner:SetName('Wnd_Content')
+			inner:SetRelPos(56, 0)
 			nH = inner:GetH()
 			wnd:Lookup('', 'Image_Hover'):SetH(nH)
 			wnd:Lookup('', 'Image_TypeIcon'):SetRelY((nH - wnd:Lookup('', 'Image_TypeIcon'):GetH()) / 2)
