@@ -150,8 +150,10 @@ function D.RedrawList()
 		end
 		if szIconUITex == 'FromIconID' then
 			wnd:Lookup('', 'Image_TypeIcon'):FromIconID(nIconFrame)
-		elseif szIconUITex and nIconFrame then
+		elseif szIconUITex and nIconFrame and nIconFrame >= 0 then
 			wnd:Lookup('', 'Image_TypeIcon'):FromUITex(szIconUITex, nIconFrame)
+		elseif szIconUITex then
+			wnd:Lookup('', 'Image_TypeIcon'):FromTextureFile(szIconUITex)
 		end
 		wnd:Lookup('', 'Image_Spliter'):SetVisible(i ~= #REQUEST_LIST)
 		wnd.info = info
