@@ -55,7 +55,7 @@ local PR_INI_PATH = PACKET_INFO.ROOT .. 'MY_TeamTools/ui/MY_PartyRequest.ini'
 local PR_EQUIP_REQUEST = {}
 local PR_PARTY_REQUEST = {}
 
-MY_PartyRequest = {
+local O = {
 	bEnable       = true,
 	bRefuseLowLv  = false,
 	bRefuseRobot  = false,
@@ -65,9 +65,16 @@ MY_PartyRequest = {
 	bAcceptCustom = false,
 	tAcceptCustom = {},
 }
-LIB.RegisterCustomData('MY_PartyRequest')
+RegisterCustomData('MY_PartyRequest.bEnable')
+RegisterCustomData('MY_PartyRequest.bRefuseLowLv')
+RegisterCustomData('MY_PartyRequest.bRefuseRobot')
+RegisterCustomData('MY_PartyRequest.bAcceptTong')
+RegisterCustomData('MY_PartyRequest.bAcceptFriend')
+RegisterCustomData('MY_PartyRequest.bAcceptAll')
+RegisterCustomData('MY_PartyRequest.bAcceptCustom')
+RegisterCustomData('MY_PartyRequest.tAcceptCustom')
 
-function MY_PartyRequest.GetMenu()
+function D.GetMenu()
 	local menu = {
 		szOption = _L['MY_PartyRequest'],
 		{
@@ -84,6 +91,7 @@ function MY_PartyRequest.GetMenu()
 			fnAction = function()
 				MY_PartyRequest.bRefuseLowLv = not MY_PartyRequest.bRefuseLowLv
 			end,
+			fnDisable = function() return not MY_PartyRequest.bEnable end,
 		},
 		{
 			szOption = _L['Auto refuse robot player'],
@@ -95,6 +103,7 @@ function MY_PartyRequest.GetMenu()
 				local szXml = GetFormatText(_L['Full level and equip score less than 2/3 of yours'], nil, 255, 255, 0)
 				OutputTip(szXml, 600, {this:GetAbsX(), this:GetAbsY(), this:GetW(), this:GetH()}, ALW.RIGHT_LEFT)
 			end,
+			fnDisable = function() return not MY_PartyRequest.bEnable end,
 		},
 		{
 			szOption = _L['Auto accept friend'],
@@ -102,6 +111,7 @@ function MY_PartyRequest.GetMenu()
 			fnAction = function()
 				MY_PartyRequest.bAcceptFriend = not MY_PartyRequest.bAcceptFriend
 			end,
+			fnDisable = function() return not MY_PartyRequest.bEnable end,
 		},
 		{
 			szOption = _L['Auto accept tong member'],
@@ -109,6 +119,7 @@ function MY_PartyRequest.GetMenu()
 			fnAction = function()
 				MY_PartyRequest.bAcceptTong = not MY_PartyRequest.bAcceptTong
 			end,
+			fnDisable = function() return not MY_PartyRequest.bEnable end,
 		},
 		{
 			szOption = _L['Auto accept all'],
@@ -116,6 +127,7 @@ function MY_PartyRequest.GetMenu()
 			fnAction = function()
 				MY_PartyRequest.bAcceptAll = not MY_PartyRequest.bAcceptAll
 			end,
+			fnDisable = function() return not MY_PartyRequest.bEnable end,
 		},
 	}
 	local t = {
@@ -158,6 +170,7 @@ function MY_PartyRequest.GetMenu()
 				end
 			end)
 		end,
+		fnDisable = function() return not MY_PartyRequest.bEnable or not MY_PartyRequest.bAcceptCustom end,
 	})
 	insert(menu, t)
 	return menu
@@ -284,25 +297,25 @@ end
 
 function D.GetRequestStatus(info)
 	local szStatus, szMsg = 'normal'
-	if MY_PartyRequest.bAcceptAll then
+	if O.bAcceptAll then
 		szStatus = 'accept'
 		szMsg = _L('Auto accept %s(%s %d%s) party request, go to MY/raid/teamtools panel if you want to turn off this feature.',
 			info.szName, g_tStrings.tForceTitle[info.dwForce], info.nLevel, g_tStrings.STR_LEVEL)
-	elseif MY_PartyRequest.bAcceptCustom and MY_PartyRequest.tAcceptCustom[info.szName] then
+	elseif O.bAcceptCustom and O.tAcceptCustom[info.szName] then
 		szStatus = 'accept'
 		szMsg = _L('Auto accept %s(%s %d%s) custom request, go to MY/raid/teamtools panel if you want to turn off this feature.',
 			info.szName, g_tStrings.tForceTitle[info.dwForce], info.nLevel, g_tStrings.STR_LEVEL)
-	elseif info.bFriend and MY_PartyRequest.bAcceptFriend then
+	elseif info.bFriend and O.bAcceptFriend then
 		szStatus = 'accept'
 		szMsg = _L('Auto accept friend %s(%s %d%s) party request, go to MY/raid/teamtools panel if you want to turn off this feature.',
 			info.szName, g_tStrings.tForceTitle[info.dwForce], info.nLevel, g_tStrings.STR_LEVEL)
-	elseif info.bTongMember and MY_PartyRequest.bAcceptTong then
+	elseif info.bTongMember and O.bAcceptTong then
 		szStatus = 'accept'
 		szMsg = _L('Auto tong member friend %s(%s %d%s) party request, go to MY/raid/teamtools panel if you want to turn off this feature.',
 			info.szName, g_tStrings.tForceTitle[info.dwForce], info.nLevel, g_tStrings.STR_LEVEL)
 	end
 	if szStatus == 'normal' and not info.bFriend and not info.bTongMember then
-		if MY_PartyRequest.bRefuseRobot and info.dwID and info.nLevel == PACKET_INFO.MAX_PLAYER_LEVEL then
+		if O.bRefuseRobot and info.dwID and info.nLevel == PACKET_INFO.MAX_PLAYER_LEVEL then
 			local me = GetClientPlayer()
 			local tar = GetPlayer(info.dwID)
 			if tar then
@@ -316,7 +329,7 @@ function D.GetRequestStatus(info)
 				end
 			end
 		end
-		if MY_PartyRequest.bRefuseLowLv and info.nLevel < PACKET_INFO.MAX_PLAYER_LEVEL then
+		if O.bRefuseLowLv and info.nLevel < PACKET_INFO.MAX_PLAYER_LEVEL then
 			szStatus = 'refuse'
 			szMsg = _L('Auto refuse %s(%s %d%s) party request, go to MY/raid/teamtools panel if you want to turn off this feature.',
 				info.szName, g_tStrings.tForceTitle[info.dwForce], info.nLevel, g_tStrings.STR_LEVEL)
@@ -344,7 +357,7 @@ end
 function D.OnMessageBoxOpen()
 	local szMsgName, frame = arg0, arg1
 	local szPrefix, szName = unpack(LIB.SplitString(szMsgName, '_', true, 2))
-	if not MY_PartyRequest.bEnable or not frame or not frame:IsValid() or (szPrefix ~= 'ATMP' and szPrefix ~= 'IMTP') then
+	if not O.bEnable or not frame or not frame:IsValid() or (szPrefix ~= 'ATMP' and szPrefix ~= 'IMTP') then
 		return
 	end
 	local fnAccept = Get(frame:Lookup('Wnd_All/Btn_Option1'), 'fnAction')
@@ -373,7 +386,7 @@ function D.OnMessageBoxOpen()
 end
 
 function D.OnApplyRequest(event)
-	if not MY_PartyRequest.bEnable then
+	if not O.bEnable then
 		return
 	end
 	local szName, nCamp, dwForce, nLevel, nType = arg0, arg1, arg2, arg3, arg4
@@ -455,6 +468,57 @@ LIB.RegisterBgMsg('RL', function(_, data, nChannel, dwID, szName, bIsSelf)
 	end
 end)
 
+function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+	x = x + ui:Append('WndComboBox', {
+		x = x, y = y, w = 120,
+		text = _L['MY_PartyRequest'],
+		menu = D.GetMenu,
+	}):Width() + 5
+	return x, y
+end
+
+-- Global exports
+do
+local settings = {
+	exports = {
+		{
+			fields = {
+				OnPanelActivePartial = D.OnPanelActivePartial,
+			},
+		},
+		{
+			fields = {
+				bEnable       = true,
+				bRefuseLowLv  = true,
+				bRefuseRobot  = true,
+				bAcceptTong   = true,
+				bAcceptFriend = true,
+				bAcceptAll    = true,
+				bAcceptCustom = true,
+				tAcceptCustom = true,
+			},
+			root = O,
+		},
+	},
+	imports = {
+		{
+			fields = {
+				bEnable       = true,
+				bRefuseLowLv  = true,
+				bRefuseRobot  = true,
+				bAcceptTong   = true,
+				bAcceptFriend = true,
+				bAcceptAll    = true,
+				bAcceptCustom = true,
+				tAcceptCustom = true,
+			},
+			root = O,
+		},
+	},
+}
+MY_PartyRequest = LIB.GeneGlobalNS(settings)
+end
+
 --------------------------------------------------------------------------------
 -- ×¢²áÑûÇë
 --------------------------------------------------------------------------------
@@ -511,7 +575,7 @@ function R.GetTip(info)
 end
 
 function R.GetMenu()
-	return MY_PartyRequest.GetMenu()
+	return D.GetMenu()
 end
 
 function R.OnClear()

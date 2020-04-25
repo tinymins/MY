@@ -94,14 +94,7 @@ function PS.OnPanelActive(wnd)
 	y = y + 20
 	y = y + ui:Append('Text', { x = x, y = y, text = _L['Party Request'], font = 27 }):Height() + 5
 	x = X + 10
-	x = x + ui:Append('WndComboBox', {
-		x = x, y = y, w = 120,
-		text = _L['MY_PartyRequest'],
-		menu = MY_PartyRequest.GetMenu,
-	}):Width() + 5
-
-	x = X + 10
-	y = y + 25
+	x, y = MY_PartyRequest.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 
 	x, y = MY_TeamRestore.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 end
