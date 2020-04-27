@@ -46,6 +46,7 @@ return {
 	['Name of the Item:'] = '物品名称：',
 	['Route of Acquiring:'] = '获得途径：',
 	['Auction Price:'] = '拍卖价格：',
+	['Please enter numbers'] = '请输入数字',
 	['Equiptment Boss'] = '散件老板',
 	['Gainer'] = '获得者',
 	['Name of the Items'] = '物品名称',
