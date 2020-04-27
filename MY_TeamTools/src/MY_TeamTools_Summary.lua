@@ -897,7 +897,6 @@ function D.OnInitPage()
 
 	local page = this
 	local frame = page:GetRoot()
-	frame:RegisterEvent('UI_SCALED')
 	frame:RegisterEvent('PEEK_OTHER_PLAYER')
 	frame:RegisterEvent('PARTY_ADD_MEMBER')
 	frame:RegisterEvent('PARTY_DISBAND')
@@ -1041,7 +1040,6 @@ function D.OnEvent(szEvent)
 	elseif szEvent == 'LOADING_END' or szEvent == 'PARTY_DISBAND' then
 		this.tDataCache = {}
 		this.hList:Clear()
-		D.UpdatetDeathPage()
 		-- 副本信息
 		local hDungeon = this:Lookup('Wnd_Summary', 'Handle_Dungeon')
 		D.UpdateDungeonInfo(hDungeon)
@@ -1052,8 +1050,6 @@ function D.OnEvent(szEvent)
 	elseif szEvent == 'ON_APPLY_PLAYER_SAVED_COPY_RESPOND' then
 		local hDungeon = this:Lookup('Wnd_Summary', 'Handle_Dungeon')
 		D.UpdateDungeonInfo(hDungeon)
-	elseif szEvent == 'UI_SCALED' then
-		D.UpdateAnchor(this)
 	elseif szEvent == 'MY_RAIDTOOLS_SUCCESS' then
 		if RT_SORT_FIELD == 'nEquipScore' then
 			D.UpdateList(this)
