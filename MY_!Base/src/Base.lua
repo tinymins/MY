@@ -1203,6 +1203,11 @@ local CONSTANT = setmetatable({}, {
 			EXAM_SHENG = {{10936, 0}},
 			EXAM_HUI = {{4125, 0}},
 		},
+		SKILL_TYPE = {
+			[15054] = {
+				[25] = 'HEAL', -- 梅花三弄
+			},
+		},
 		EQUIPMENT_SUIT_COUNT = _G.EQUIPMENT_SUIT_COUNT or 4,
 		INVENTORY_GUILD_BANK = INVENTORY_GUILD_BANK or INVENTORY_INDEX.TOTAL + 1, --帮会仓库界面虚拟一个背包位置
 		INVENTORY_GUILD_PAGE_SIZE = INVENTORY_GUILD_PAGE_SIZE or 100,

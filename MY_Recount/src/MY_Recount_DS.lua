@@ -388,6 +388,7 @@ local SZ_CFG_FILE = {'userdata/fight_stat/config.jx3dat', PATH_TYPE.ROLE}
 local SKILL_EFFECT_CACHE = {} -- 最近的技能效果缓存 （进战时候将最近的数据压进来）
 local BUFF_UPDATE_CACHE = {} -- 最近的BUFF效果缓存 （进战时候将最近的数据压进来）
 local LOG_REPLAY_FRAME = GLOBAL.GAME_FPS * 1 -- 进战时候将多久的数据压进来（逻辑帧）
+local SKILL_TYPE = CONSTANT.SKILL_TYPE
 
 -- 输出两个数里面小一点的那个 其中-1表示极大值
 local function Min(a, b)
@@ -785,11 +786,17 @@ function D.ProcessSkillEffect(nLFC, nTime, nTick, dwCaster, dwTarget, nEffectTyp
 	elseif nSkillResult == SKILL_RESULT.HIT -- 击中
 		or nSkillResult == SKILL_RESULT.CRITICAL -- 会心
 	then
-		if nTherapy > 0 then -- 有治疗
+		if nTherapy > 0 then -- 有治疗数据
 			D.AddHealRecord(Data, dwCaster, dwTarget, szEffectID, nTherapy, nEffectTherapy, nSkillResult)
-		end
-		if nDamage > 0 or nTherapy == 0 then -- 有伤害 或者 无伤害无治疗的效果
+		elseif nDamage > 0 then -- 有伤害数据
 			D.AddDamageRecord(Data, dwCaster, dwTarget, szEffectID, nDamage, nEffectDamage, nSkillResult)
+		else -- 无伤害无治疗的效果
+			local szType = SKILL_TYPE[dwEffectID] and SKILL_TYPE[dwEffectID][dwEffectLevel]
+			if szType == 'HEAL' then -- 特判治疗技能
+				D.AddHealRecord(Data, dwCaster, dwTarget, szEffectID, nTherapy, nEffectTherapy, nSkillResult)
+			else -- if szType == 'DAMAGE' then -- 特判输出技能
+				D.AddDamageRecord(Data, dwCaster, dwTarget, szEffectID, nDamage, nEffectDamage, nSkillResult)
+			end
 		end
 	elseif nSkillResult == SKILL_RESULT.BLOCK  -- 格挡
 		or nSkillResult == SKILL_RESULT.SHIELD -- 无效
