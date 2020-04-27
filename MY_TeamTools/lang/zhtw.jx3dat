@@ -132,6 +132,8 @@ return {
 	['MY_SocialRequest'] = '社交助手',
 	['Optimize social friend request'] = '優化好友添加請求列表。',
 	['Enable'] = '啟用',
+	['Add'] = '添加',
+	['Ignore'] = '忽略',
 
 	['Edit team info?'] = '是否填寫團隊小告示（團員進組可看到）',
 	['Team Message'] = '團隊告示',

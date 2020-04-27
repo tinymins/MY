@@ -240,9 +240,9 @@ function R.Drawer(container, info)
 	wnd.OnMouseLeave = D.OnMouseLeave
 	wnd:Lookup('', 'Text_Name'):SetText(info.szName)
 	wnd:Lookup('Btn_Accept').OnLButtonClick = D.OnLButtonClick
-	wnd:Lookup('Btn_Accept', 'Text_Accept'):SetText(g_tStrings.STR_ACCEPT)
+	wnd:Lookup('Btn_Accept', 'Text_Accept'):SetText(_L['Add'])
 	wnd:Lookup('Btn_Refuse').OnLButtonClick = D.OnLButtonClick
-	wnd:Lookup('Btn_Refuse', 'Text_Refuse'):SetText(g_tStrings.STR_REFUSE)
+	wnd:Lookup('Btn_Refuse', 'Text_Refuse'):SetText(_L['Ignore'])
 	return wnd
 end
 
