@@ -178,9 +178,9 @@ end
 
 function D.UpdateSearchAC()
 	local info = g_tTable.DungeonInfo:Search(O.dwMapID)
-	if info then
-		O.aSearchAC = LIB.SplitString(info.szBossInfo, ' ', true)
-	end
+	O.aSearchAC = info
+		and LIB.SplitString(info.szBossInfo, ' ', true)
+		or {}
 	FireUIEvent('MY_TEAMTOOLS_ACHI_SEARCH_AC')
 end
 
@@ -236,7 +236,6 @@ LIB.RegisterEvent('LOADING_ENDING', function()
 	end
 	O.dwMapID = GetClientPlayer().GetMapID()
 	O.szSearch = ''
-	O.aSearchAC = {}
 	D.UpdateSearchAC()
 	D.UpdateAchievementID()
 end)
@@ -652,6 +651,7 @@ function D.OnInitPage()
 			szOption = _L['All map'],
 			fnAction = function()
 				O.dwMapID = 0
+				D.UpdateSearchAC()
 				D.UpdateAchievementID()
 				D.RequestTeamData()
 				UI.ClosePopupMenu()
@@ -663,6 +663,7 @@ function D.OnInitPage()
 			szOption = _L['Current map'],
 			fnAction = function()
 				O.dwMapID = GetClientPlayer().GetMapID()
+				D.UpdateSearchAC()
 				D.UpdateAchievementID()
 				D.RequestTeamData()
 				UI.ClosePopupMenu()
@@ -675,6 +676,7 @@ function D.OnInitPage()
 					szOption = info.szName,
 					fnAction = function()
 						O.dwMapID = info.dwID
+						D.UpdateSearchAC()
 						D.UpdateAchievementID()
 						D.RequestTeamData()
 						UI.ClosePopupMenu()
@@ -702,6 +704,7 @@ function D.OnInitPage()
 		onchange = function(szText)
 			if D.tMapID[szText] then
 				O.dwMapID = D.tMapID[szText]
+				D.UpdateSearchAC()
 				D.UpdateAchievementID()
 				D.RequestTeamData()
 			end
@@ -759,7 +762,7 @@ function D.OnEvent(event)
 	if event == 'MY_TEAMTOOLS_ACHI' then
 		D.UpdatePage(this)
 	elseif event == 'MY_TEAMTOOLS_ACHI_SEARCH_AC' then
-		UI(this):Fetch('WndAutocomplete_Search'):Autocomplete('option', 'source', O.aSearchAC)
+		UI(this):Fetch('Wnd_Total/WndAutocomplete_Search'):Autocomplete('option', 'source', O.aSearchAC)
 	elseif event == 'ON_MY_MOSAICS_RESET' then
 		D.UpdatePage(this)
 	elseif event == 'NEW_ACHIEVEMENT' or event == 'SYNC_ACHIEVEMENT_DATA'
