@@ -228,7 +228,7 @@ return {
 	['%s request download:'] = '[%s]建议下载该数据：',
 	['Title: %s'] = '标题：%s',
 	['Author: %s'] = '作者：%s',
-	['%s loaded %s'] = '[%s]加载了[%s]。',
+	['%s loaded %s'] = '[%s]加载了团队监控数据：%s。',
 	['Sync team'] = '同步团队',
 	['Add url'] = '添加订阅',
 	['Remove url'] = '删除订阅',
