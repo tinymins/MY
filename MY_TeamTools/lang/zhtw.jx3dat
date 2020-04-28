@@ -67,6 +67,7 @@ return {
 	['Search'] = '搜索',
 	['Intelligent hide'] = '智能隱藏',
 	['Hide unimportant achievements'] = '隱藏聲望等不需要優先關注的成就',
+	['Achievement point: %d'] = '成就點數：%d',
 
 	-- MY_PartyRequest
 	['Party Request'] = '優化申請列表',

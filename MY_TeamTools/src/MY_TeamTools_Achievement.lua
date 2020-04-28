@@ -288,6 +288,25 @@ function D.GetPlayerAchievementStat(dwID, dwAchieveID)
 	return 'UNKNOWN'
 end
 
+do local ACHIEVE_POINT_CACHE = {}
+function D.GetAchievementPoint(dwAchieveID)
+	if not ACHIEVE_POINT_CACHE[dwAchieveID] then
+		local nAchievePoint = select(2, Table_GetAchievementInfo(dwAchieveID))
+		local achi = Table_GetAchievement(dwAchieveID)
+		if achi then
+			for _, s in ipairs(LIB.SplitString(achi.szCounters, '|', true)) do
+				local dwCounter = tonumber(s)
+				if dwCounter then
+					nAchievePoint = nAchievePoint + select(2, Table_GetAchievementInfo(dwCounter))
+				end
+			end
+		end
+		ACHIEVE_POINT_CACHE[dwAchieveID] = nAchievePoint
+	end
+	return ACHIEVE_POINT_CACHE[dwAchieveID]
+end
+end
+
 do
 local function AnalysisAchievementRequest(dwAchieveID, tAchieveID, tCounterID)
 	local info = Table_GetAchievement(dwAchieveID)
@@ -465,6 +484,7 @@ function D.OutputAchieveTip(dwAchieveID, dwID)
 	else
 		insert(aXml, GetFormatText('\n', 162, 255, 255, 255))
 	end
+	insert(aXml, GetFormatText(_L('Achievement point: %d', D.GetAchievementPoint(dwAchieveID)) .. '\n', 162, 255, 128, 0))
 	insert(aXml, GetFormatText(achi.szDesc .. '\n', 162, 255, 255, 255))
 	-- всЁи╬м
 	for _, s in ipairs(LIB.SplitString(achi.szSubAchievements, '|', true)) do
