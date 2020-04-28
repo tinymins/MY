@@ -779,11 +779,7 @@ function D.ProcessSkillEffect(nLFC, nTime, nTick, dwCaster, dwTarget, nEffectTyp
 		nSkillResult, nTherapy, nEffectTherapy, nDamage, nEffectDamage,
 		tResult)
 
-	-- 识破
-	local nValue = tResult[SKILL_RESULT_TYPE.INSIGHT_DAMAGE]
-	if nValue and nValue > 0 then
-		D.AddDamageRecord(Data, dwCaster, dwTarget, szEffectID, nDamage, nEffectDamage, SKILL_RESULT.INSIGHT)
-	elseif nSkillResult == SKILL_RESULT.HIT -- 击中
+	if nSkillResult == SKILL_RESULT.HIT -- 击中
 		or nSkillResult == SKILL_RESULT.CRITICAL -- 会心
 	then
 		if nTherapy > 0 then -- 有治疗数据
@@ -798,6 +794,8 @@ function D.ProcessSkillEffect(nLFC, nTime, nTick, dwCaster, dwTarget, nEffectTyp
 				D.AddDamageRecord(Data, dwCaster, dwTarget, szEffectID, nDamage, nEffectDamage, nSkillResult)
 			end
 		end
+	elseif nSkillResult == SKILL_RESULT.INSIGHT then -- 识破
+		D.AddDamageRecord(Data, dwCaster, dwTarget, szEffectID, nDamage, nEffectDamage, SKILL_RESULT.INSIGHT)
 	elseif nSkillResult == SKILL_RESULT.BLOCK  -- 格挡
 		or nSkillResult == SKILL_RESULT.SHIELD -- 无效
 		or nSkillResult == SKILL_RESULT.MISS   -- 偏离
@@ -1370,6 +1368,8 @@ LIB.RegisterEvent('SYS_MSG', function()
 		-- D.OnSkillEffect(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
 		if arg7 and arg7 ~= 0 then -- bCriticalStrike
 			D.OnSkillEffect(arg1, arg2, arg4, arg5, arg6, SKILL_RESULT.CRITICAL, arg8, arg9)
+		elseif arg9[SKILL_RESULT_TYPE.INSIGHT_DAMAGE] then -- 识破
+			D.OnSkillEffect(arg1, arg2, arg4, arg5, arg6, SKILL_RESULT.INSIGHT, arg8, arg9)
 		else
 			D.OnSkillEffect(arg1, arg2, arg4, arg5, arg6, SKILL_RESULT.HIT, arg8, arg9)
 		end
@@ -1453,6 +1453,8 @@ end)
 --         end
 --         if bCriticalStrike then -- bCriticalStrike
 --             D.OnSkillEffect(dwCasterID, dwTargetID, nEffectType, dwSkillID, dwSkillLevel, SKILL_RESULT.CRITICAL, nResultCount, tResult)
+--         elseif tResult[SKILL_RESULT_TYPE.INSIGHT_DAMAGE] then -- 识破
+--             D.OnSkillEffect(dwCasterID, dwTargetID, nEffectType, dwSkillID, dwSkillLevel, SKILL_RESULT.INSIGHT, nResultCount, tResult)
 --         else
 --             D.OnSkillEffect(dwCasterID, dwTargetID, nEffectType, dwSkillID, dwSkillLevel, SKILL_RESULT.HIT, nResultCount, tResult)
 --         end
