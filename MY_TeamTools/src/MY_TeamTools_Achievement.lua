@@ -724,10 +724,14 @@ function D.OnInitPage()
 				500,
 				D.SetSearch,
 				szText)
+			LIB.Debounce('MY_TeamTools_Achievement_RequestTeamData', 2000, D.RequestTeamData)
 		end,
 		autocomplete = {{'option', 'source', O.aSearchAC}},
 		onclick = function() UI(this):Autocomplete('search', '') end,
-		onblur = function() D.RequestTeamData() end,
+		onblur = function()
+			D.RequestTeamData()
+			LIB.Debounce('MY_TeamTools_Achievement_RequestTeamData', false)
+		end,
 	}):Width() + 5
 
 	nX = nX + UI(wnd):Append('WndCheckBox', {
