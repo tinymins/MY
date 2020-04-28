@@ -429,10 +429,16 @@ LIB.RegisterBgMsg('MY_TEAMTOOLS_ACHI_RES', function(_, data, nChannel, dwTalkerI
 end)
 
 function D.OutputRowTip(this, rec)
-	local aXml = {}
+	local aXml, nAchievePoint, nAciquiePoint = {}, 0, 0
 	for _, col in ipairs(D.GetColumns()) do
 		if col.dwAchieveID then
+			local nPoint = D.GetAchievementPoint(col.dwAchieveID)
+			if D.GetPlayerAchievementStat(rec.id, col.dwAchieveID) == 'FINISH' then
+				nAciquiePoint = nAciquiePoint + nPoint
+			end
+			nAchievePoint = nAchievePoint + nPoint
 			insert(aXml, GetFormatText('[' .. col.szTitle .. ']', 162, 255, 255, 0))
+			insert(aXml, GetFormatText(' (+' .. nPoint .. ')', 162, 255, 255, 0))
 		else
 			insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
 		end
@@ -444,6 +450,7 @@ function D.OutputRowTip(this, rec)
 			insert(aXml, GetFormatText('\n', 162, 255, 255, 255))
 		end
 	end
+	insert(aXml, GetFormatText(_L('Achievement point: %d / %d', nAciquiePoint, nAchievePoint) .. '\n', 162, 255, 128, 0))
 	local x, y = this:GetAbsPos()
 	local w, h = this:GetSize()
 	local nPosType = UI.TIP_POSITION.RIGHT_LEFT
