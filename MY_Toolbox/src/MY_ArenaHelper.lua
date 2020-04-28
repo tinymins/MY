@@ -55,7 +55,7 @@ local D = {}
 local O = {
 	bAutoSwitchTalkChannel = true,
 	bRestoreAuthorityInfo = true,
-	bAutoShowModel = true,
+	bAutoShowModel = false,
 }
 RegisterCustomData('MY_ArenaHelper.bAutoSwitchTalkChannel')
 RegisterCustomData('MY_ArenaHelper.bRestoreAuthorityInfo')
