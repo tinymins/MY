@@ -430,27 +430,36 @@ end)
 
 function D.OutputRowTip(this, rec)
 	local aXml, nAchievePoint, nAciquiePoint = {}, 0, 0
-	for _, col in ipairs(D.GetColumns()) do
+	local aCol = D.GetColumns()
+	local nLen = 0
+	for _, col in ipairs(aCol) do
+		if col.dwAchieveID then
+			nLen = max(nLen, wlen(col.szTitle))
+		end
+	end
+	for _, col in ipairs(aCol) do
 		if col.dwAchieveID then
 			local nPoint = D.GetAchievementPoint(col.dwAchieveID)
+			local szSpace = g_tStrings.STR_ONE_CHINESE_SPACE:rep(nLen - wlen(col.szTitle))
 			if D.GetPlayerAchievementStat(rec.id, col.dwAchieveID) == 'FINISH' then
 				nAciquiePoint = nAciquiePoint + nPoint
 			end
 			nAchievePoint = nAchievePoint + nPoint
-			insert(aXml, GetFormatText('[' .. col.szTitle .. ']', 162, 255, 255, 0))
-			insert(aXml, GetFormatText(' (+' .. nPoint .. ')', 162, 255, 255, 0))
+			insert(aXml, GetFormatText('[' .. col.szTitle .. ']' .. szSpace .. '  ', 162, 255, 255, 0))
+			insert(aXml, col.GetFormatText(rec))
+			insert(aXml, GetFormatText(' (+' .. nPoint .. ')', 162, 255, 128, 0))
 		else
 			insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
+			insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
+			insert(aXml, col.GetFormatText(rec))
 		end
-		insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
-		insert(aXml, col.GetFormatText(rec))
 		if IsCtrlKeyDown() then
 			insert(aXml, GetFormatText('\t' .. col.id, 162, 255, 0, 0))
 		else
 			insert(aXml, GetFormatText('\n', 162, 255, 255, 255))
 		end
 	end
-	insert(aXml, GetFormatText(_L('Achievement point: %d / %d', nAciquiePoint, nAchievePoint) .. '\n', 162, 255, 128, 0))
+	insert(aXml, 5, GetFormatText(_L('Achievement point: %d / %d', nAciquiePoint, nAchievePoint) .. '\n', 162, 255, 128, 0))
 	local x, y = this:GetAbsPos()
 	local w, h = this:GetSize()
 	local nPosType = UI.TIP_POSITION.RIGHT_LEFT
