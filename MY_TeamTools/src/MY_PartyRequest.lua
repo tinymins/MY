@@ -268,10 +268,6 @@ function D.OnPeekPlayer()
 				local mnt = p.GetKungfuMount()
 				local data = { nil, arg1, mnt and mnt.dwSkillID or nil, false }
 				D.Feedback(p.szName, data, false)
-				local info = PR_PARTY_REQUEST[p.szName]
-				if info then
-					D.DoAutoAction(info)
-				end
 			end
 		end
 		PR_EQUIP_REQUEST[arg1] = nil
@@ -339,17 +335,19 @@ function D.GetRequestStatus(info)
 end
 
 function D.DoAutoAction(info)
-	local bAction = false
-	local szStatus, szMsg = D.GetRequestStatus(info)
-	if szStatus == 'refuse' then
-		bAction = true
-		D.RefuseRequest(info)
-	elseif szStatus == 'accept' then
-		bAction = true
-		D.AcceptRequest(info)
-	end
-	if szMsg then
-		LIB.Sysmsg(szMsg)
+	local bAction, szStatus, szMsg = false
+	if info.fnAccept then
+		szStatus, szMsg = D.GetRequestStatus(info)
+		if szStatus == 'refuse' then
+			bAction = true
+			D.RefuseRequest(info)
+		elseif szStatus == 'accept' then
+			bAction = true
+			D.AcceptRequest(info)
+		end
+		if szMsg then
+			LIB.Sysmsg(szMsg)
+		end
 	end
 	return bAction, szStatus, szMsg
 end
@@ -377,6 +375,7 @@ function D.OnMessageBoxOpen()
 			PR_PARTY_REQUEST[szName] = nil
 			Call(fnRefuse)
 		end
+		D.DoAutoAction(info)
 		-- 关闭对话框
 		frame.fnAutoClose = nil
 		frame.fnCancelAction = nil
@@ -403,8 +402,6 @@ function D.OnApplyRequest(event)
 	info.nLevel      = nLevel
 	info.bFriend     = LIB.IsFriend(szName)
 	info.bTongMember = LIB.IsTongMember(szName)
-	info.fnAccept    = info.fnAccept
-	info.fnRefuse    = info.fnRefuse
 	info.dwDelayTime = nil
 	-- 获取dwID
 	local tar = LIB.GetObject(TARGET.PLAYER, szName)
@@ -444,13 +441,14 @@ function D.DelayInterval()
 end
 
 function D.Feedback(szName, data, bDetail)
-	local v = PR_PARTY_REQUEST[szName]
-	if v then
-		v.bDetail    = bDetail
-		v.dwID       = data[2]
-		v.dwKungfuID = data[3]
-		v.nGongZhan  = data[4]
-		v.bEx        = data[5]
+	local info = PR_PARTY_REQUEST[szName]
+	if info then
+		info.bDetail    = bDetail
+		info.dwID       = data[2]
+		info.dwKungfuID = data[3]
+		info.nGongZhan  = data[4]
+		info.bEx        = data[5]
+		D.DoAutoAction(info)
 	end
 	D.DelayInterval()
 end
