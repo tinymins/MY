@@ -699,7 +699,7 @@ function D.OnInitPage()
 
 	local nX = 20
 	nX = nX + UI(wnd):Append('WndAutocomplete', {
-		x = nX, y = 20, w = 200,
+		x = nX, y = 20, w = 250,
 		name = 'WndAutocomplete_Map',
 		onchange = function(szText)
 			if D.tMapID[szText] then
