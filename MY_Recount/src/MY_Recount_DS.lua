@@ -1521,7 +1521,7 @@ LIB.RegisterEvent('BUFF_UPDATE', function()
 	if not O.bEnable then
 		return
 	end
-	if arg4 == 9334 and arg8 == 1 then -- 长歌盾·梅花三弄
+	if arg4 == 9334 then -- 长歌盾·梅花三弄
 		tAbsorbInfo = ABSORB_CACHE[arg0]
 		if not tAbsorbInfo then
 			tAbsorbInfo = {}
