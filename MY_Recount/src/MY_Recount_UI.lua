@@ -617,11 +617,19 @@ function D.OnItemRefreshTip()
 					szXml = szXml .. GetFormatText(_L['total: '] .. p.rec[DK_REC_STAT_SKILL.TOTAL]
 						.. ' ' .. _L['effect: '] .. p.rec[DK_REC_STAT_SKILL.TOTAL_EFFECT] .. '\n')
 					for _, nSkillResult in ipairs({
-						SKILL_RESULT.HIT     ,
+						{ SKILL_RESULT.ABSORB, SKILL_RESULT.HIT },
 						SKILL_RESULT.INSIGHT ,
 						SKILL_RESULT.CRITICAL,
 						SKILL_RESULT.MISS    ,
 					}) do
+						if IsTable(nSkillResult) then
+							for i, v in ipairs(nSkillResult) do
+								if p.rec[DK_REC_STAT_SKILL.DETAIL][v] or i == #nSkillResult then
+									nSkillResult = v
+									break
+								end
+							end
+						end
 						local nCount = 0
 						if p.rec[DK_REC_STAT_SKILL.DETAIL][nSkillResult] then
 							nCount = not MY_Recount_UI.bShowZeroVal

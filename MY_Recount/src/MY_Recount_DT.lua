@@ -394,8 +394,14 @@ function MY_Recount_DT.OnFrameBreathe()
 				local rec = {
 					szKey          = id,
 					nHitCount      = MY_Recount_UI.bShowZeroVal
-						and (p[DK_REC_STAT_SKILL_TARGET.COUNT][SKILL_RESULT.HIT] or 0)
-						or p[DK_REC_STAT_SKILL_TARGET.NZ_COUNT][SKILL_RESULT.HIT] or 0,
+						and (
+							(p[DK_REC_STAT_SKILL_TARGET.COUNT][SKILL_RESULT.HIT] or 0)
+							+ (p[DK_REC_STAT_SKILL_TARGET.COUNT][SKILL_RESULT.ABSORB] or 0)
+						)
+						or (
+							(p[DK_REC_STAT_SKILL_TARGET.NZ_COUNT][SKILL_RESULT.HIT] or 0)
+							+ (p[DK_REC_STAT_SKILL_TARGET.NZ_COUNT][SKILL_RESULT.ABSORB] or 0)
+						),
 					nMissCount     = MY_Recount_UI.bShowZeroVal
 						and (p[DK_REC_STAT_SKILL_TARGET.COUNT][SKILL_RESULT.MISS] or 0)
 						or p[DK_REC_STAT_SKILL_TARGET.NZ_COUNT][SKILL_RESULT.MISS] or 0,
