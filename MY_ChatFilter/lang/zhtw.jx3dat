@@ -18,15 +18,4 @@ return {
     ['only filter continuous duplicate chat'] = '刷屏屏蔽只屏蔽連續發送的刷屏聊天記錄',
     ['select duplicate channels'            ] = '選擇啟用刷屏屏蔽的頻道',
     ['filter duplicate addon message'       ] = '屏蔽相同內容的插件喊話（如海鰻首領倒計時）',
-
-    ['MOSAICS_CHAR'] = '…',
-    ['chat mosaics'] = '聊天打碼',
-    ['chat mosaics (mosaics names in chat panel)'] = '聊天打碼（聊天欄中名字打上馬賽克）',
-    ['no mosaics on my own name'] = '自己的名字不打碼',
-    ['part mosaics A (mosaics except 1st and last character)'] = '打碼模式A（第一個字和最後一個字不打碼）',
-    ['part mosaics B (mosaics except 1st character)'         ] = '打碼模式B（第一個字不打碼）',
-    ['part mosaics C (mosaics except last character)'        ] = '打碼模式C（最後一個字不打碼）',
-    ['part mosaics D (mosaics all character)'                ] = '打碼模式D（所有字打碼）',
-    ['mosaics character'] = '輸入馬賽克字元',
-    ['unmosaics names (split by comma)'] = '不打碼的名字（英文半形逗號','分隔多個名字）',
 }

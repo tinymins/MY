@@ -1,6 +1,6 @@
 [MY_Chat]
 name=聊天輔助
-desc=快速切換頻道和聊天打碼複製以及顯示隊伍泡泡
+desc=快速切換頻道、聊天複製、打馬賽克、以及顯示隊伍泡泡
 default=1
 version=1.0
 dependence=MY_!Base

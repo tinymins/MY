@@ -94,11 +94,11 @@ function D.MosaicsString(szText)
 	end
 	if (not O.bIgnoreOwnName or szText ~= GetClientPlayer().szName) and not O.tIgnoreNames[szText] then
 		local nLen = wlen(szText)
-		if O.nMosaicsMode == 1 and nLen > 2 then
+		if O.nMosaicsMode == 3 and nLen > 2 then
 			szText = wsub(szText, 1, 1) .. rep(O.szMosaics, nLen - 2) .. wsub(szText, nLen, nLen)
-		elseif O.nMosaicsMode == 2 and nLen > 1 then
+		elseif O.nMosaicsMode == 1 and nLen > 1 then
 			szText = wsub(szText, 1, 1) .. rep(O.szMosaics, nLen - 1)
-		elseif O.nMosaicsMode == 3 and nLen > 1 then
+		elseif O.nMosaicsMode == 2 and nLen > 1 then
 			szText = rep(O.szMosaics, nLen - 1) .. wsub(szText, nLen, nLen)
 		elseif O.nMosaicsMode == 4 or nLen <= 1 then
 			szText = rep(O.szMosaics, nLen)
