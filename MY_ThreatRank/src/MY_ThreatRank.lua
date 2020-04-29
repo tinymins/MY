@@ -417,7 +417,7 @@ function _TS.UpdateThreatBars(tList, dwTargetID, dwApplyID)
 						end
 					end
 				end
-				if TS.bForceColor then
+				if TS.bForceColor and p then
 					r, g, b = MY_GetForceColor(p.dwForceID)
 				else
 					r, g, b = 255, 255, 255
