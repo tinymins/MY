@@ -340,19 +340,30 @@ Data = {
 }
 ]]
 local SKILL_RESULT = {
-	HIT     = 0, -- 命中
-	BLOCK   = 1, -- 格挡
-	SHIELD  = 2, -- 无效
-	MISS    = 3, -- 偏离
-	DODGE   = 4, -- 闪避
-	CRITICAL= 5, -- 会心
-	INSIGHT = 6, -- 识破
+	HIT      = 0, -- 命中
+	BLOCK    = 1, -- 格挡
+	SHIELD   = 2, -- 无效
+	MISS     = 3, -- 偏离
+	DODGE    = 4, -- 闪避
+	CRITICAL = 5, -- 会心
+	INSIGHT  = 6, -- 识破
+	ABSORB   = 7, -- 化解
 }
 local NZ_SKILL_RESULT = {
 	[SKILL_RESULT.BLOCK ] = true,
 	[SKILL_RESULT.SHIELD] = true,
 	[SKILL_RESULT.MISS  ] = true,
 	[SKILL_RESULT.DODGE ] = true,
+}
+local SKILL_RESULT_NAME = {
+	[SKILL_RESULT.HIT     ] = g_tStrings.STR_HIT_NAME     ,
+	[SKILL_RESULT.BLOCK   ] = g_tStrings.STR_IMMUNITY_NAME,
+	[SKILL_RESULT.SHIELD  ] = g_tStrings.STR_SHIELD_NAME  ,
+	[SKILL_RESULT.MISS    ] = g_tStrings.STR_MSG_MISS     ,
+	[SKILL_RESULT.DODGE   ] = g_tStrings.STR_MSG_DODGE    ,
+	[SKILL_RESULT.CRITICAL] = g_tStrings.STR_CS_NAME      ,
+	[SKILL_RESULT.INSIGHT ] = g_tStrings.STR_MSG_INSIGHT  ,
+	[SKILL_RESULT.ABSORB  ] = g_tStrings.STR_MSG_ABSORB   ,
 }
 local AWAYTIME_TYPE = {
 	DEATH          = 0,
@@ -387,6 +398,7 @@ local DS_ROOT = {'userdata/fight_stat/', PATH_TYPE.ROLE}
 local SZ_CFG_FILE = {'userdata/fight_stat/config.jx3dat', PATH_TYPE.ROLE}
 local SKILL_EFFECT_CACHE = {} -- 最近的技能效果缓存 （进战时候将最近的数据压进来）
 local BUFF_UPDATE_CACHE = {} -- 最近的BUFF效果缓存 （进战时候将最近的数据压进来）
+local ABSORB_CACHE = {} -- 目标盾来源缓存表 如长歌梅花三弄
 local LOG_REPLAY_FRAME = GLOBAL.GAME_FPS * 1 -- 进战时候将多久的数据压进来（逻辑帧）
 local SKILL_TYPE = CONSTANT.SKILL_TYPE
 
@@ -785,6 +797,7 @@ function D.ProcessSkillEffect(nLFC, nTime, nTick, dwCaster, dwTarget, nEffectTyp
 
 	if nSkillResult == SKILL_RESULT.HIT -- 击中
 		or nSkillResult == SKILL_RESULT.CRITICAL -- 会心
+		or nSkillResult == SKILL_RESULT.ABSORB -- 盾治疗
 	then
 		if nTherapy > 0 then -- 有治疗数据
 			D.AddHealRecord(Data, dwCaster, dwTarget, szEffectID, nTherapy, nEffectTherapy, nSkillResult)
@@ -1371,6 +1384,7 @@ function D.Flush()
 end
 
 -- 系统日志监控（数据源）
+do local tAbsorbInfo
 LIB.RegisterEvent('SYS_MSG', function()
 	if not O.bEnable then
 		return
@@ -1390,12 +1404,37 @@ LIB.RegisterEvent('SYS_MSG', function()
 		-- (arg1)dwCaster：施放者 (arg2)dwTarget：目标 (arg3)bReact：是否为反击 (arg4)nType：Effect类型 (arg5)dwID:Effect的ID
 		-- (arg6)dwLevel：Effect的等级 (arg7)bCriticalStrike：是否会心 (arg8)nCount：tResultCount数据表中元素个数 (arg9)tResultCount：数值集合
 		-- D.OnSkillEffect(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
+		if arg9[SKILL_RESULT_TYPE.ABSORB_DAMAGE] then
+			tAbsorbInfo = ABSORB_CACHE[arg2]
+			if tAbsorbInfo then
+				D.OnSkillEffect(
+					tAbsorbInfo.dwSrcID, arg2,
+					tAbsorbInfo.nType, tAbsorbInfo.dwEffectID, tAbsorbInfo.dwEffectLevel,
+					SKILL_RESULT.ABSORB, 1, {
+						[SKILL_RESULT_TYPE.THERAPY] = arg9[SKILL_RESULT_TYPE.ABSORB_DAMAGE],
+						[SKILL_RESULT_TYPE.EFFECTIVE_THERAPY] = arg9[SKILL_RESULT_TYPE.ABSORB_DAMAGE],
+					})
+			end
+		end
 		if arg7 and arg7 ~= 0 then -- bCriticalStrike
 			D.OnSkillEffect(arg1, arg2, arg4, arg5, arg6, SKILL_RESULT.CRITICAL, arg8, arg9)
 		elseif arg9[SKILL_RESULT_TYPE.INSIGHT_DAMAGE] then -- 识破
 			D.OnSkillEffect(arg1, arg2, arg4, arg5, arg6, SKILL_RESULT.INSIGHT, arg8, arg9)
 		else
 			D.OnSkillEffect(arg1, arg2, arg4, arg5, arg6, SKILL_RESULT.HIT, arg8, arg9)
+		end
+		-- 盾化解伤害补偿至盾提供者的治疗量
+		if arg9[SKILL_RESULT_TYPE.ABSORB_DAMAGE] then
+			tAbsorbInfo = ABSORB_CACHE[arg2]
+			if tAbsorbInfo then
+				D.OnSkillEffect(
+					tAbsorbInfo.dwSrcID, arg2,
+					tAbsorbInfo.nType, tAbsorbInfo.dwEffectID, tAbsorbInfo.dwEffectLevel,
+					SKILL_RESULT.ABSORB, 1, {
+						[SKILL_RESULT_TYPE.THERAPY] = arg9[SKILL_RESULT_TYPE.ABSORB_DAMAGE],
+						[SKILL_RESULT_TYPE.EFFECTIVE_THERAPY] = arg9[SKILL_RESULT_TYPE.ABSORB_DAMAGE],
+					})
+			end
 		end
 		-- end
 	elseif arg0 == 'UI_OME_SKILL_BLOCK_LOG' then
@@ -1429,6 +1468,7 @@ LIB.RegisterEvent('SYS_MSG', function()
 		-- D.OnCommonHealth(arg1, arg2)
 	end
 end)
+end
 
 -- JJC中使用的数据源（不能记录溢出数据）
 -- LIB.RegisterEvent('SKILL_EFFECT_TEXT', function(event)
@@ -1490,6 +1530,11 @@ end)
 LIB.RegisterEvent('BUFF_UPDATE', function()
 	if not O.bEnable then
 		return
+	end
+	if arg4 == 9334 and arg8 == 1 then -- 长歌盾·梅花三弄
+		ABSORB_CACHE[arg0] = not arg1
+			and { dwSrcID = arg9, nType = SKILL_EFFECT_TYPE.BUFF, dwEffectID = arg4, dwEffectLevel = 1 }
+			or nil
 	end
 	-- buff update：
 	-- arg0：dwPlayerID，arg1：bDelete，arg2：nIndex，arg3：bCanCancel
@@ -1938,6 +1983,8 @@ local settings = {
 				GetEffectNameAusID = D.GetEffectNameAusID,
 				Flush = D.Flush,
 				GetMergeTargetData = D.GetMergeTargetData,
+				SKILL_RESULT = SKILL_RESULT,
+				SKILL_RESULT_NAME = SKILL_RESULT_NAME,
 				EVERYTHING_TYPE = EVERYTHING_TYPE,
 				DK = DK,
 				DK_REC = DK_REC,

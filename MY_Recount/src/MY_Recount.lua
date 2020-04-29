@@ -63,6 +63,8 @@ local DK_REC_STAT_SKILL_TARGET = MY_Recount_DS.DK_REC_STAT_SKILL_TARGET
 local DK_REC_STAT_TARGET = MY_Recount_DS.DK_REC_STAT_TARGET
 local DK_REC_STAT_TARGET_DETAIL = MY_Recount_DS.DK_REC_STAT_TARGET_DETAIL
 local DK_REC_STAT_TARGET_SKILL = MY_Recount_DS.DK_REC_STAT_TARGET_SKILL
+local SKILL_RESULT = MY_Recount_DS.SKILL_RESULT
+local SKILL_RESULT_NAME = MY_Recount_DS.SKILL_RESULT_NAME
 
 local MAX_HISTORY_DISP = 50
 
@@ -88,24 +90,6 @@ local PUBLISH_MODE = {
 	EFFECT = 1, -- 只显示有效值
 	TOTAL  = 2, -- 只显示总数值
 	BOTH   = 3, -- 同时显示有效和总数
-}
-local SKILL_RESULT = {
-	HIT     = 0, -- 命中
-	BLOCK   = 1, -- 格挡
-	SHIELD  = 2, -- 无效
-	MISS    = 3, -- 偏离
-	DODGE   = 4, -- 闪避
-	CRITICAL= 5, -- 会心
-	INSIGHT = 6, -- 识破
-}
-local SKILL_RESULT_NAME = {
-	[SKILL_RESULT.HIT     ] = g_tStrings.STR_HIT_NAME     ,
-	[SKILL_RESULT.BLOCK   ] = g_tStrings.STR_IMMUNITY_NAME,
-	[SKILL_RESULT.SHIELD  ] = g_tStrings.STR_SHIELD_NAME  ,
-	[SKILL_RESULT.MISS    ] = g_tStrings.STR_MSG_MISS     ,
-	[SKILL_RESULT.DODGE   ] = g_tStrings.STR_MSG_DODGE    ,
-	[SKILL_RESULT.CRITICAL] = g_tStrings.STR_CS_NAME      ,
-	[SKILL_RESULT.INSIGHT ] = g_tStrings.STR_MSG_INSIGHT  ,
 }
 
 local D = {}
