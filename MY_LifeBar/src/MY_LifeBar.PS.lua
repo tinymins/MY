@@ -499,7 +499,7 @@ function PS.OnPanelActive(wnd)
 						{
 							szOption = _L['Hide pets'],
 							bCheck = true,
-							bChecked = cfg.Player.bHidePets,
+							bChecked = cfg.Npc.bHidePets,
 							fnAction = function()
 								cfg.Npc.bHidePets = not cfg.Npc.bHidePets
 							end,
