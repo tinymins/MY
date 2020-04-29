@@ -550,7 +550,7 @@ function D.UpdatePage(page)
 
 	local aCol, nX, Sorter = D.GetDispColumns(), 0, nil
 	for i, col in ipairs(aCol) do
-		local hCol = hCols:AppendItemFromIni(SZ_INI, 'Handle_StatColumn')
+		local hCol = hCols:AppendItemFromData(page.hStatColumnData, 'Handle_StatColumn')
 		local hTitle = hCol:Lookup('Handle_Stat_Title')
 		local txt = hTitle:Lookup('Text_Stat_Title')
 		local imgAsc = hCol:Lookup('Image_Stat_Asc')
@@ -616,12 +616,12 @@ function D.UpdatePage(page)
 	local hList = page:Lookup('Wnd_Total/WndScroll_Stat', 'Handle_List')
 	hList:Clear()
 	for i, rec in ipairs(aRec) do
-		local hRow = hList:AppendItemFromIni(SZ_INI, 'Handle_Row')
+		local hRow = hList:AppendItemFromData(page.hRowData, 'Handle_Row')
 		hRow.rec = rec
 		hRow:Lookup('Image_RowBg'):SetVisible(i % 2 == 1)
 		local nX = 0
 		for j, col in ipairs(aCol) do
-			local hItem = hRow:AppendItemFromIni(SZ_INI, 'Handle_Item') -- 外部居中层
+			local hItem = hRow:AppendItemFromData(page.hItemData, 'Handle_Item') -- 外部居中层
 			local hItemContent = hItem:Lookup('Handle_ItemContent') -- 内部文本布局层
 			hItemContent:AppendItemFromString(col.GetFormatText(rec))
 			hItemContent:SetW(99999)
@@ -754,7 +754,9 @@ function D.OnInitPage()
 	frame:RegisterEvent('SYNC_ACHIEVEMENT_DATA')
 	frame:RegisterEvent('UPDATE_ACHIEVEMENT_POINT')
 	frame:RegisterEvent('UPDATE_ACHIEVEMENT_COUNT')
-	this.hAchievement = frame:CreateItemData(SZ_INI, 'Handle_Item_Achievement')
+	this.hRowData = frame:CreateItemData(SZ_INI, 'Handle_Row')
+	this.hItemData = frame:CreateItemData(SZ_INI, 'Handle_Item')
+	this.hStatColumnData = frame:CreateItemData(SZ_INI, 'Handle_StatColumn')
 end
 
 function D.OnActivePage()
