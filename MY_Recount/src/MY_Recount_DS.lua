@@ -576,6 +576,7 @@ end
 do
 local function onLoadingEnding()
 	D.Flush()
+	ABSORB_CACHE = {}
 	FireUIEvent('MY_RECOUNT_NEW_FIGHT')
 end
 LIB.RegisterEvent('LOADING_ENDING', onLoadingEnding)
@@ -1404,18 +1405,6 @@ LIB.RegisterEvent('SYS_MSG', function()
 		-- (arg1)dwCaster：施放者 (arg2)dwTarget：目标 (arg3)bReact：是否为反击 (arg4)nType：Effect类型 (arg5)dwID:Effect的ID
 		-- (arg6)dwLevel：Effect的等级 (arg7)bCriticalStrike：是否会心 (arg8)nCount：tResultCount数据表中元素个数 (arg9)tResultCount：数值集合
 		-- D.OnSkillEffect(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
-		if arg9[SKILL_RESULT_TYPE.ABSORB_DAMAGE] then
-			tAbsorbInfo = ABSORB_CACHE[arg2]
-			if tAbsorbInfo then
-				D.OnSkillEffect(
-					tAbsorbInfo.dwSrcID, arg2,
-					tAbsorbInfo.nType, tAbsorbInfo.dwEffectID, tAbsorbInfo.dwEffectLevel,
-					SKILL_RESULT.ABSORB, 1, {
-						[SKILL_RESULT_TYPE.THERAPY] = arg9[SKILL_RESULT_TYPE.ABSORB_DAMAGE],
-						[SKILL_RESULT_TYPE.EFFECTIVE_THERAPY] = arg9[SKILL_RESULT_TYPE.ABSORB_DAMAGE],
-					})
-			end
-		end
 		if arg7 and arg7 ~= 0 then -- bCriticalStrike
 			D.OnSkillEffect(arg1, arg2, arg4, arg5, arg6, SKILL_RESULT.CRITICAL, arg8, arg9)
 		elseif arg9[SKILL_RESULT_TYPE.INSIGHT_DAMAGE] then -- 识破
@@ -1429,7 +1418,7 @@ LIB.RegisterEvent('SYS_MSG', function()
 			if tAbsorbInfo then
 				D.OnSkillEffect(
 					tAbsorbInfo.dwSrcID, arg2,
-					tAbsorbInfo.nType, tAbsorbInfo.dwEffectID, tAbsorbInfo.dwEffectLevel,
+					tAbsorbInfo.nEffectType, tAbsorbInfo.dwEffectID, tAbsorbInfo.dwEffectLevel,
 					SKILL_RESULT.ABSORB, 1, {
 						[SKILL_RESULT_TYPE.THERAPY] = arg9[SKILL_RESULT_TYPE.ABSORB_DAMAGE],
 						[SKILL_RESULT_TYPE.EFFECTIVE_THERAPY] = arg9[SKILL_RESULT_TYPE.ABSORB_DAMAGE],
@@ -1527,14 +1516,26 @@ end
 
 
 -- 系统BUFF监控（数据源）
+do local tAbsorbInfo
 LIB.RegisterEvent('BUFF_UPDATE', function()
 	if not O.bEnable then
 		return
 	end
 	if arg4 == 9334 and arg8 == 1 then -- 长歌盾·梅花三弄
-		ABSORB_CACHE[arg0] = not arg1
-			and { dwSrcID = arg9, nType = SKILL_EFFECT_TYPE.BUFF, dwEffectID = arg4, dwEffectLevel = 1 }
-			or nil
+		tAbsorbInfo = ABSORB_CACHE[arg0]
+		if not tAbsorbInfo then
+			tAbsorbInfo = {}
+			ABSORB_CACHE[arg0] = tAbsorbInfo
+		end
+		if arg1 then
+			tAbsorbInfo.nEndFrame = GetLogicFrameCount()
+		else
+			tAbsorbInfo.dwSrcID = arg9
+			tAbsorbInfo.nEffectType = SKILL_EFFECT_TYPE.BUFF
+			tAbsorbInfo.dwEffectID = arg4
+			tAbsorbInfo.dwEffectLevel = 1
+			tAbsorbInfo.nEndFrame = nil
+		end
 	end
 	-- buff update：
 	-- arg0：dwPlayerID，arg1：bDelete，arg2：nIndex，arg3：bCanCancel
@@ -1542,6 +1543,7 @@ LIB.RegisterEvent('BUFF_UPDATE', function()
 	-- arg8：nLevel，arg9：dwSkillSrcID
 	D.OnBuffUpdate(arg9, arg0, arg4, arg8, arg5, arg1, arg6, arg3)
 end)
+end
 
 -- 有人死了活了做一下时间轴记录
 function D.OnTeammateStateChange(dwID, bLeave, nAwayType, bAddWhenRecEmpty)
