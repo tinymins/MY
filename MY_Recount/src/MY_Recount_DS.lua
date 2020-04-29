@@ -443,7 +443,7 @@ function D.LoadData()
 		O.nMaxHistory        = data.nMaxHistory or 10
 		O.nMinFightTime      = data.nMinFightTime or 30
 		O.bRecEverything     = data.bRecEverything or false
-		O.bSaveEverything    = data.bSaveEverything or false
+		O.bSaveEverything    = data.bSaveEverything1 or false
 		MY_Recount_UI.CheckOpen()
 	end
 	D.InitData()
@@ -458,7 +458,7 @@ function D.SaveData()
 		nMaxHistory        = O.nMaxHistory       ,
 		nMinFightTime      = O.nMinFightTime     ,
 		bRecEverything     = O.bRecEverything    ,
-		bSaveEverything    = O.bSaveEverything   ,
+		bSaveEverything1   = O.bSaveEverything   ,
 	}
 	LIB.SaveLUAData(SZ_CFG_FILE, data, DS_DATA_CONFIG)
 end

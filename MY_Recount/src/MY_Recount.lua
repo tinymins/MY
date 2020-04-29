@@ -460,17 +460,19 @@ function D.GetHistoryMenu()
 			MY_Recount_DS.bSaveHistoryOnExFi = not MY_Recount_DS.bSaveHistoryOnExFi
 		end,
 	})
-	insert(t, {
-		szOption = _L['Do not save history everything'],
-		bCheck = true,
-		bChecked = not MY_Recount_DS.bSaveEverything,
-		fnAction = function()
-			MY_Recount_DS.bSaveEverything = not MY_Recount_DS.bSaveEverything
-		end,
-		fnDisable = function()
-			return not MY_Recount_DS.bSaveHistoryOnExit and not MY_Recount_DS.bSaveHistoryOnExFi
-		end,
-	})
+	if MY_Recount_DS.bSaveEverything or IsShiftKeyDown() then
+		insert(t, {
+			szOption = _L['Do not save history everything'],
+			bCheck = true,
+			bChecked = not MY_Recount_DS.bSaveEverything,
+			fnAction = function()
+				MY_Recount_DS.bSaveEverything = not MY_Recount_DS.bSaveEverything
+			end,
+			fnDisable = function()
+				return not MY_Recount_DS.bSaveHistoryOnExit and not MY_Recount_DS.bSaveHistoryOnExFi
+			end,
+		})
+	end
 
 	return t
 end
