@@ -171,7 +171,7 @@ end
 
 function D.OnFrameCreate()
 	this:SetPoint('CENTER', 0, -200, 'CENTER', 0, 0)
-	this:Lookup('', 'Text_Title'):SetText(_L['Invite'])
+	this:Lookup('', 'Text_Title'):SetText(_L['Request list'])
 	LIB.RegisterEsc('MY_PartyRequest', D.GetFrame, D.Close)
 end
 
