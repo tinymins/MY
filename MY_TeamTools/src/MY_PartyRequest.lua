@@ -249,7 +249,7 @@ end
 
 -- 判断是否需要更新界面
 function D.CheckRequestUpdate(info)
-	if info.dwDelayTime and info.dwDelayTime > GetTime() then
+	if not info.fnAccept or (info.dwDelayTime and info.dwDelayTime > GetTime()) then
 		MY_Request.Remove('MY_PartyRequest', info.szName)
 	else
 		MY_Request.Replace('MY_PartyRequest', info.szName, info)
