@@ -90,6 +90,7 @@ end
 function D.GetDetailMenu(frame)
 	local t = {}
 	local DataDisplay = MY_Recount.GetDisplayData()
+	local eTimeChannel = MY_Recount_UI.bSysTimeMode and STAT_TYPE_KEY[MY_Recount_UI.nChannel]
 	local function Publish(nChannel, nLimit)
 		local bDetail = frame:Lookup('', 'Handle_Spliter'):IsVisible()
 		LIB.Talk(
@@ -98,7 +99,7 @@ function D.GetDetailMenu(frame)
 			.. _L['fight recount'] .. ' - '
 			.. frame:Lookup('', 'Text_Default'):GetText()
 			.. ' ' .. ((DataDisplay[DK.BOSSNAME] and ' - ' .. DataDisplay[DK.BOSSNAME]) or '')
-			.. '(' .. LIB.FormatTimeCounter(DataDisplay[DK.TIME_DURING], '%M:%ss') .. ')',
+			.. '(' .. LIB.FormatTimeCounter(MY_Recount_DS.GeneFightTime(DataDisplay, eTimeChannel), '%M:%ss') .. ')',
 			nil,
 			true
 		)

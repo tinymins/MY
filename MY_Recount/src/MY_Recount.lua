@@ -514,13 +514,14 @@ function D.GetPublishMenu()
 			return
 		end
 		local DataDisplay = MY_Recount.GetDisplayData()
+		local eTimeChannel = MY_Recount_UI.bSysTimeMode and STAT_TYPE_KEY[MY_Recount_UI.nChannel]
 		LIB.Talk(
 			nChannel,
 			'[' .. PACKET_INFO.SHORT_NAME .. ']'
 			.. _L['fight recount'] .. ' - '
 			.. frame:Lookup('Wnd_Title', 'Text_Title'):GetText()
 			.. ' ' .. ((DataDisplay[DK.BOSSNAME] and ' - ' .. DataDisplay[DK.BOSSNAME]) or '')
-			.. '(' .. LIB.FormatTimeCounter(DataDisplay[DK.TIME_DURING], '%M:%ss') .. ')',
+			.. '(' .. LIB.FormatTimeCounter(MY_Recount_DS.GeneFightTime(DataDisplay, eTimeChannel), '%M:%ss') .. ')',
 			nil,
 			true
 		)

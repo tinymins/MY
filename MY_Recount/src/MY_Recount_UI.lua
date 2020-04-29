@@ -256,8 +256,8 @@ function D.UpdateUI(frame)
 	local tRecord = tInfo[DK_REC.STAT]
 
 	-- 计算战斗时间
-	local szTimeChannel = MY_Recount_UI.bSysTimeMode and STAT_TYPE_KEY[MY_Recount_UI.nChannel]
-	local nTimeCount = MY_Recount_DS.GeneFightTime(data, szTimeChannel)
+	local eTimeChannel = MY_Recount_UI.bSysTimeMode and STAT_TYPE_KEY[MY_Recount_UI.nChannel]
+	local nTimeCount = MY_Recount_DS.GeneFightTime(data, eTimeChannel)
 	local szTimeCount = LIB.FormatTimeCounter(nTimeCount, '%M:%ss')
 	if LIB.IsInArena() then
 		szTimeCount = LIB.GetFightTime('M:ss')
@@ -291,7 +291,7 @@ function D.UpdateUI(frame)
 					nEffectValue = rec[DK_REC_STAT.TOTAL_EFFECT] or 0      ,
 					nTimeCount   = max( -- 计算战斗时间 防止计算DPS时除以0
 						MY_Recount_UI.bAwayMode
-							and MY_Recount_DS.GeneFightTime(data, szTimeChannel, dwID) -- 删去死亡时间
+							and MY_Recount_DS.GeneFightTime(data, eTimeChannel, dwID) -- 删去死亡时间
 							or nTimeCount,
 						1), -- 不删去暂离时间
 				}
