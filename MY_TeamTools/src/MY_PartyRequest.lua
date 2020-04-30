@@ -249,7 +249,7 @@ end
 
 -- 判断是否需要更新界面
 function D.CheckRequestUpdate(info)
-	if not info.fnAccept or (info.dwDelayTime and info.dwDelayTime > GetTime()) then
+	if not info.szName or not info.fnAccept or (info.dwDelayTime and info.dwDelayTime > GetTime()) then
 		MY_Request.Remove('MY_PartyRequest', info.szName)
 	else
 		MY_Request.Replace('MY_PartyRequest', info.szName, info)
@@ -336,7 +336,7 @@ end
 
 function D.DoAutoAction(info)
 	local bAction, szStatus, szMsg = false
-	if info.fnAccept then
+	if info.szName and info.fnAccept then
 		szStatus, szMsg = D.GetRequestStatus(info)
 		if szStatus == 'refuse' then
 			bAction = true
