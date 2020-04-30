@@ -955,10 +955,10 @@ end
 
 -- 将一条记录插入数组
 do local tInfo, tRecord, tResult, tSkillRecord, tSkillTargetData, tTargetRecord, tTargetSkillData
-function D.InsertRecord(data, szRecordType, idRecord, idTarget, szEffectName, nValue, nEffectValue, nSkillResult)
+function D.InsertRecord(data, szRecordType, dwOwnerID, dwTargetID, szEffectID, nValue, nEffectValue, nSkillResult)
 	tInfo   = data[szRecordType]
-	tRecord = tInfo[DK_REC.STAT][idRecord]
-	if not szEffectName or szEffectName == '' then
+	tRecord = tInfo[DK_REC.STAT][dwOwnerID]
+	if not szEffectID or szEffectID == '' then
 		return
 	end
 	------------------------
@@ -1016,8 +1016,8 @@ function D.InsertRecord(data, szRecordType, idRecord, idTarget, szEffectName, nV
 	-- # 节： tRecord.Skill
 	------------------------
 	-- 添加具体技能记录
-	if not tRecord[DK_REC_STAT.SKILL][szEffectName] then
-		tRecord[DK_REC_STAT.SKILL][szEffectName] = {
+	if not tRecord[DK_REC_STAT.SKILL][szEffectID] then
+		tRecord[DK_REC_STAT.SKILL][szEffectID] = {
 			[DK_REC_STAT_SKILL.COUNT        ] =  0, -- 该玩家四象轮回释放次数（假设szEffectName是四象轮回）
 			[DK_REC_STAT_SKILL.NZ_COUNT     ] =  0, -- 该玩家非零值四象轮回释放次数
 			[DK_REC_STAT_SKILL.MAX          ] =  0, -- 该玩家四象轮回最大输出量
@@ -1032,7 +1032,7 @@ function D.InsertRecord(data, szRecordType, idRecord, idTarget, szEffectName, nV
 			[DK_REC_STAT_SKILL.TARGET       ] = {}, -- 该玩家四象轮回承受者统计
 		}
 	end
-	tSkillRecord = tRecord[DK_REC_STAT.SKILL][szEffectName]
+	tSkillRecord = tRecord[DK_REC_STAT.SKILL][szEffectID]
 	tSkillRecord[DK_REC_STAT_SKILL.COUNT       ] = tSkillRecord[DK_REC_STAT_SKILL.COUNT] + 1
 	tSkillRecord[DK_REC_STAT_SKILL.MAX         ] = max(tSkillRecord[DK_REC_STAT_SKILL.MAX], nValue)
 	tSkillRecord[DK_REC_STAT_SKILL.MAX_EFFECT  ] = max(tSkillRecord[DK_REC_STAT_SKILL.MAX_EFFECT], nEffectValue)
@@ -1090,8 +1090,8 @@ function D.InsertRecord(data, szRecordType, idRecord, idTarget, szEffectName, nV
 	-- # 节： tRecord.Skill.Target
 	------------------------------
 	-- 添加具体技能承受者记录
-	if not tSkillRecord[DK_REC_STAT_SKILL.TARGET][idTarget] then
-		tSkillRecord[DK_REC_STAT_SKILL.TARGET][idTarget] = {
+	if not tSkillRecord[DK_REC_STAT_SKILL.TARGET][dwTargetID] then
+		tSkillRecord[DK_REC_STAT_SKILL.TARGET][dwTargetID] = {
 			[DK_REC_STAT_SKILL_TARGET.MAX         ] = 0, -- 该玩家四象轮回击中的这个玩家最大伤害
 			[DK_REC_STAT_SKILL_TARGET.MAX_EFFECT  ] = 0, -- 该玩家四象轮回击中的这个玩家最大有效伤害
 			[DK_REC_STAT_SKILL_TARGET.TOTAL       ] = 0, -- 该玩家四象轮回击中的这个玩家伤害总和
@@ -1108,7 +1108,7 @@ function D.InsertRecord(data, szRecordType, idRecord, idTarget, szEffectName, nV
 			},
 		}
 	end
-	tSkillTargetData = tSkillRecord[DK_REC_STAT_SKILL.TARGET][idTarget]
+	tSkillTargetData = tSkillRecord[DK_REC_STAT_SKILL.TARGET][dwTargetID]
 	tSkillTargetData[DK_REC_STAT_SKILL_TARGET.MAX         ] = max(tSkillTargetData[DK_REC_STAT_SKILL_TARGET.MAX], nValue)
 	tSkillTargetData[DK_REC_STAT_SKILL_TARGET.MAX_EFFECT  ] = max(tSkillTargetData[DK_REC_STAT_SKILL_TARGET.MAX_EFFECT], nEffectValue)
 	tSkillTargetData[DK_REC_STAT_SKILL_TARGET.TOTAL       ] = tSkillTargetData[DK_REC_STAT_SKILL_TARGET.TOTAL] + nValue
@@ -1122,8 +1122,8 @@ function D.InsertRecord(data, szRecordType, idRecord, idTarget, szEffectName, nV
 	-- # 节： tRecord.Target
 	------------------------
 	-- 添加具体承受/释放者记录
-	if not tRecord[DK_REC_STAT.TARGET][idTarget] then
-		tRecord[DK_REC_STAT.TARGET][idTarget] = {
+	if not tRecord[DK_REC_STAT.TARGET][dwTargetID] then
+		tRecord[DK_REC_STAT.TARGET][dwTargetID] = {
 			[DK_REC_STAT_TARGET.COUNT        ] =  0, -- 该玩家对idTarget的技能释放次数
 			[DK_REC_STAT_TARGET.NZ_COUNT     ] =  0, -- 该玩家对idTarget的非零值技能释放次数
 			[DK_REC_STAT_TARGET.MAX          ] =  0, -- 该玩家对idTarget的技能最大输出量
@@ -1138,7 +1138,7 @@ function D.InsertRecord(data, szRecordType, idRecord, idTarget, szEffectName, nV
 			[DK_REC_STAT_TARGET.SKILL        ] = {}, -- 该玩家对idTarget的技能具体分别统计
 		}
 	end
-	tTargetRecord = tRecord[DK_REC_STAT.TARGET][idTarget]
+	tTargetRecord = tRecord[DK_REC_STAT.TARGET][dwTargetID]
 	tTargetRecord[DK_REC_STAT_TARGET.COUNT       ] = tTargetRecord[DK_REC_STAT_TARGET.COUNT] + 1
 	tTargetRecord[DK_REC_STAT_TARGET.MAX         ] = max(tTargetRecord[DK_REC_STAT_TARGET.MAX], nValue)
 	tTargetRecord[DK_REC_STAT_TARGET.MAX_EFFECT  ] = max(tTargetRecord[DK_REC_STAT_TARGET.MAX_EFFECT], nEffectValue)
@@ -1196,8 +1196,8 @@ function D.InsertRecord(data, szRecordType, idRecord, idTarget, szEffectName, nV
 	-- # 节： tRecord.Target[x].Skill
 	---------------------------------
 	-- 添加承受者具体技能记录
-	if not tTargetRecord[DK_REC_STAT_TARGET.SKILL][szEffectName] then
-		tTargetRecord[DK_REC_STAT_TARGET.SKILL][szEffectName] = {
+	if not tTargetRecord[DK_REC_STAT_TARGET.SKILL][szEffectID] then
+		tTargetRecord[DK_REC_STAT_TARGET.SKILL][szEffectID] = {
 			[DK_REC_STAT_TARGET_SKILL.MAX         ] = 0, -- 该玩家击中这个玩家的四象轮回最大伤害
 			[DK_REC_STAT_TARGET_SKILL.MAX_EFFECT  ] = 0, -- 该玩家击中这个玩家的四象轮回最大有效伤害
 			[DK_REC_STAT_TARGET_SKILL.TOTAL       ] = 0, -- 该玩家击中这个玩家的四象轮回伤害总和
@@ -1214,7 +1214,7 @@ function D.InsertRecord(data, szRecordType, idRecord, idTarget, szEffectName, nV
 			},
 		}
 	end
-	tTargetSkillData = tTargetRecord[DK_REC_STAT_TARGET.SKILL][szEffectName]
+	tTargetSkillData = tTargetRecord[DK_REC_STAT_TARGET.SKILL][szEffectID]
 	tTargetSkillData[DK_REC_STAT_TARGET_SKILL.MAX         ] = max(tTargetSkillData[DK_REC_STAT_TARGET_SKILL.MAX], nValue)
 	tTargetSkillData[DK_REC_STAT_TARGET_SKILL.MAX_EFFECT  ] = max(tTargetSkillData[DK_REC_STAT_TARGET_SKILL.MAX_EFFECT], nEffectValue)
 	tTargetSkillData[DK_REC_STAT_TARGET_SKILL.TOTAL       ] = tTargetSkillData[DK_REC_STAT_TARGET_SKILL.TOTAL] + nValue
