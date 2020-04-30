@@ -94,9 +94,11 @@ local MY_TM_MAX_CACHE     = 3000 -- 最大的cache数量 主要是UI的问题
 local MY_TM_DEL_CACHE     = 1000 -- 每次清理的数量 然后会做一次gc
 local MY_TM_INIFILE       = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon.ini'
 
-local MY_TM_SHARE_QUEUE = {}
-local MY_TM_MARK_QUEUE  = {}
-local MY_TM_MARK_IDLE   = true -- 标记空闲
+local MY_TM_SHARE_QUEUE  = {}
+local MY_TM_MARK_QUEUE   = {}
+local MY_TM_MARK_IDLE    = true -- 标记空闲
+local MY_TM_SHIELDED_MAP = false -- 标记当前在功能限制地图 限制所有功能监听
+local MY_TM_PVP_MAP      = false -- 标记当前在可能发生PVP战斗的地图 限制战斗功能监听
 ----
 local MY_TM_LEFT_BRACKET      = _L['[']
 local MY_TM_RIGHT_BRACKET     = _L[']']
@@ -554,6 +556,20 @@ function D.Talk(szType, szMsg, szTarget)
 	end
 end
 
+-- 更新当前地图使用条件
+function D.UpdateShieldStatus()
+	local bShielded = LIB.IsShieldedVersion('MY_TargetMon', 2)
+	local bShieldedMap = bShielded and (
+		LIB.IsInArena() or LIB.IsInBattleField()
+		or LIB.IsInPubg() or LIB.IsInZombieMap()
+		or LIB.IsInMobaMap())
+	local bPvpMap = bShielded and not LIB.IsInDungeon()
+	if bShieldedMap then
+		LIB.Sysmsg(_L['MY_TeamMon is blocked in this map, temporary disabled.'])
+	end
+	MY_TM_SHIELDED_MAP, MY_TM_PVP_MAP = bShieldedMap, bPvpMap
+end
+
 local function CreateCache(szType, tab)
 	local data  = D.DATA[szType]
 	local cache = CACHE.MAP[szType]
@@ -571,13 +587,14 @@ end
 -- 核心函数 缓存创建 UI缓存创建
 function D.CreateData(szEvent)
 	local nTime   = GetTime()
-	local szLang  = select(3, GetVersion())
 	local dwMapID = LIB.GetMapID(true)
 	local me = GetClientPlayer()
 	-- 用于更新 BUFF / CAST / NPC 缓存处理 不需要再获取本地对象
 	MY_TM_CORE_NAME     = me.szName
 	MY_TM_CORE_PLAYERID = me.dwID
 	D.Log('get player info cache success!')
+	-- 更新功能屏蔽状态
+	D.UpdateShieldStatus()
 	-- 重建metatable 获取ALL数据的方法 主要用于UI 逻辑中毫无作用
 	for kType, vTable in pairs(D.FILE)  do
 		setmetatable(D.FILE[kType], { __index = function(me, index)
@@ -619,71 +636,65 @@ function D.CreateData(szEvent)
 		end
 	end
 	pcall(Raid_MonitorBuffs) -- clear
-	-- 判断战场使用条件
-	if LIB.IsInArena() and LIB.IsShieldedVersion('MY_TargetMon', 2) then
-		LIB.Sysmsg(_L['MY_TeamMon is blocked in arena, temporary disabled.'])
-		D.Log('MAPID: ' .. dwMapID ..  ' create data Failed:' .. GetTime() - nTime  .. 'ms')
-	else
-		-- 重建MAP
-		for _, v in ipairs({ 'BUFF', 'DEBUFF', 'CASTING', 'NPC', 'DOODAD' }) do
-			if D.FILE[v][dwMapID] then -- 本地图数据
-				CreateCache(v, D.FILE[v][dwMapID])
-			end
-			if D.FILE[v][-1] then -- 通用数据
-				CreateCache(v, D.FILE[v][-1])
-			end
+	-- 重建MAP
+	for _, v in ipairs({ 'BUFF', 'DEBUFF', 'CASTING', 'NPC', 'DOODAD' }) do
+		if D.FILE[v][dwMapID] then -- 本地图数据
+			CreateCache(v, D.FILE[v][dwMapID])
 		end
-		-- 单独重建TALK数据
-		do
-			for _, vType in ipairs({ 'TALK', 'CHAT' }) do
-				local data  = D.FILE[vType]
-				local talk  = D.DATA[vType]
-				CACHE.MAP[vType] = {
-					HIT   = {},
-					OTHER = {},
-				}
-				local cache = CACHE.MAP[vType]
-				if data[-1] then -- 通用数据
-					for k, v in ipairs(data[-1]) do
-						talk[#talk + 1] = v
-					end
-				end
-				if data[dwMapID] then -- 本地图数据
-					for k, v in ipairs(data[dwMapID]) do
-						talk[#talk + 1] = v
-					end
-				end
-				for k, v in ipairs(talk) do
-					if v.szContent then
-						if v.szContent:find('$me') or v.szContent:find('$team') or v.bSearch or v.bReg then
-							insert(cache.OTHER, v)
-						else
-							cache.HIT[v.szContent] = cache.HIT[v.szContent] or {}
-							cache.HIT[v.szContent][v.szTarget or 'sys'] = v
-						end
-					else
-						LIB.Debug('MY_TeamMon', '[Warning] ' .. vType .. ' data is not szContent #' .. k .. ', please do check it!', DEBUG_LEVEL.WARNING)
-					end
-				end
-				D.Log('create ' .. vType .. ' data success!')
-			end
+		if D.FILE[v][-1] then -- 通用数据
+			CreateCache(v, D.FILE[v][-1])
 		end
-		if O.bPushTeamPanel then
-			local tBuff = {}
-			for k, v in ipairs(D.DATA.BUFF) do
-				if v[MY_TM_TYPE.BUFF_GET] and v[MY_TM_TYPE.BUFF_GET].bTeamPanel then
-					insert(tBuff, v.dwID)
-				end
-			end
-			for k, v in ipairs(D.DATA.DEBUFF) do
-				if v[MY_TM_TYPE.BUFF_GET] and v[MY_TM_TYPE.BUFF_GET].bTeamPanel then
-					insert(tBuff, v.dwID)
-				end
-			end
-			pcall(Raid_MonitorBuffs, tBuff)
-		end
-		D.Log('MAPID: ' .. dwMapID ..  ' create data success:' .. GetTime() - nTime  .. 'ms')
 	end
+	-- 单独重建TALK数据
+	do
+		for _, vType in ipairs({ 'TALK', 'CHAT' }) do
+			local data  = D.FILE[vType]
+			local talk  = D.DATA[vType]
+			CACHE.MAP[vType] = {
+				HIT   = {},
+				OTHER = {},
+			}
+			local cache = CACHE.MAP[vType]
+			if data[-1] then -- 通用数据
+				for k, v in ipairs(data[-1]) do
+					talk[#talk + 1] = v
+				end
+			end
+			if data[dwMapID] then -- 本地图数据
+				for k, v in ipairs(data[dwMapID]) do
+					talk[#talk + 1] = v
+				end
+			end
+			for k, v in ipairs(talk) do
+				if v.szContent then
+					if v.szContent:find('$me') or v.szContent:find('$team') or v.bSearch or v.bReg then
+						insert(cache.OTHER, v)
+					else
+						cache.HIT[v.szContent] = cache.HIT[v.szContent] or {}
+						cache.HIT[v.szContent][v.szTarget or 'sys'] = v
+					end
+				else
+					LIB.Debug('MY_TeamMon', '[Warning] ' .. vType .. ' data is not szContent #' .. k .. ', please do check it!', DEBUG_LEVEL.WARNING)
+				end
+			end
+			D.Log('create ' .. vType .. ' data success!')
+		end
+	end
+	if O.bPushTeamPanel then
+		local tBuff = {}
+		for k, v in ipairs(D.DATA.BUFF) do
+			if v[MY_TM_TYPE.BUFF_GET] and v[MY_TM_TYPE.BUFF_GET].bTeamPanel then
+				insert(tBuff, v.dwID)
+			end
+		end
+		for k, v in ipairs(D.DATA.DEBUFF) do
+			if v[MY_TM_TYPE.BUFF_GET] and v[MY_TM_TYPE.BUFF_GET].bTeamPanel then
+				insert(tBuff, v.dwID)
+			end
+		end
+		pcall(Raid_MonitorBuffs, tBuff)
+	end
+	D.Log('MAPID: ' .. dwMapID ..  ' create data success:' .. GetTime() - nTime  .. 'ms')
 	-- gc
 	if szEvent ~= 'MY_TM_CREATE_CACHE' then
 		CACHE.NPC_LIST   = {}
@@ -819,6 +830,9 @@ end
 -- local a=GetTime();for i=1, 10000 do FireUIEvent('BUFF_UPDATE',UI_GetClientPlayerID(),false,1,true,i,1,1,1,1,0) end;Output(GetTime()-a)
 -- 事件操作
 function D.OnBuff(dwOwner, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, dwSkillSrcID)
+	if MY_TM_SHIELDED_MAP or (MY_TM_PVP_MAP and dwOwner ~= MY_TM_CORE_PLAYERID) then
+		return
+	end
 	local szType = bCanCancel and 'BUFF' or 'DEBUFF'
 	local key = dwBuffID .. '_' .. nBuffLevel
 	local data = D.GetData(szType, dwBuffID, nBuffLevel)
@@ -967,6 +981,9 @@ end
 
 -- 技能事件
 function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
+	if MY_TM_SHIELDED_MAP or (MY_TM_PVP_MAP and dwCaster ~= MY_TM_CORE_PLAYERID) then
+		return
+	end
 	local key = dwCastID .. '_' .. dwLevel
 	local nTime = GetTime()
 	CACHE.SKILL_LIST[dwCaster] = CACHE.SKILL_LIST[dwCaster] or {}
@@ -1089,6 +1106,9 @@ end
 
 -- NPC事件
 function D.OnNpcEvent(npc, bEnter)
+	if MY_TM_SHIELDED_MAP then
+		return
+	end
 	local data = D.GetData('NPC', npc.dwTemplateID)
 	local nTime = GetTime()
 	if bEnter then
@@ -1237,6 +1257,9 @@ end
 
 -- DOODAD事件
 function D.OnDoodadEvent(doodad, bEnter)
+	if MY_TM_SHIELDED_MAP then
+		return
+	end
 	local data = D.GetData('DOODAD', doodad.dwTemplateID)
 	local nTime = GetTime()
 	if bEnter then
@@ -1373,6 +1396,9 @@ function D.OnDoodadEvent(doodad, bEnter)
 end
 
 function D.OnDoodadAllLeave(dwTemplateID)
+	if MY_TM_SHIELDED_MAP then
+		return
+	end
 	local data = D.GetData('DOODAD', dwTemplateID)
 	if data then
 		local szSender = nil
@@ -1380,9 +1406,13 @@ function D.OnDoodadAllLeave(dwTemplateID)
 		D.CountdownEvent(data, MY_TM_TYPE.DOODAD_ALLLEAVE, szSender, szReceiver)
 	end
 end
+
 -- 系统和NPC喊话处理
 -- OutputMessage('MSG_SYS', 1..'\n')
 function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
+	if MY_TM_SHIELDED_MAP then
+		return
+	end
 	-- 近期记录
 	szContent = tostring(szContent)
 	local me = GetClientPlayer()
@@ -1527,6 +1557,9 @@ end
 
 -- NPC死亡事件 触发倒计时
 function D.OnDeath(dwCharacterID, dwKiller)
+	if MY_TM_SHIELDED_MAP then
+		return
+	end
 	local npc = GetNpc(dwCharacterID)
 	if npc then
 		local data = D.GetData('NPC', npc.dwTemplateID)
@@ -1554,6 +1587,9 @@ end
 
 -- NPC进出战斗事件 触发倒计时
 function D.OnNpcFight(dwTemplateID, bFight)
+	if MY_TM_SHIELDED_MAP then
+		return
+	end
 	local data = D.GetData('NPC', dwTemplateID)
 	if data then
 		local szSender = nil
@@ -1604,6 +1640,9 @@ end
 
 -- 不该放在倒计时中 需要重构
 function D.OnNpcInfoChange(szEvent, dwTemplateID, nPer, bIncrease)
+	if MY_TM_SHIELDED_MAP then
+		return
+	end
 	local data = D.GetData('NPC', dwTemplateID)
 	if data and data.tCountdown then
 		local dwType = szEvent == 'MY_TM_NPC_LIFE_CHANGE' and MY_TM_TYPE.NPC_LIFE or MY_TM_TYPE.NPC_MANA
@@ -1653,8 +1692,12 @@ function D.OnNpcInfoChange(szEvent, dwTemplateID, nPer, bIncrease)
 		end
 	end
 end
+
 -- NPC 全部消失的倒计时处理
 function D.OnNpcAllLeave(dwTemplateID)
+	if MY_TM_SHIELDED_MAP then
+		return
+	end
 	local data = D.GetData('NPC', dwTemplateID)
 	local szSender = nil
 	local szReceiver = LIB.GetTemplateName(TARGET.NPC, dwTemplateID)
@@ -1667,6 +1710,9 @@ end
 function D.RegisterMessage(bEnable)
 	if bEnable then
 		LIB.RegisterMsgMonitor('MY_TeamMon_MON', function(szMsg, nFont, bRich)
+			if MY_TM_SHIELDED_MAP then
+				return
+			end
 			if not GetClientPlayer() then
 				return
 			end

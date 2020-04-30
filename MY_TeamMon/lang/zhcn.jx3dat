@@ -140,7 +140,7 @@ return {
 	['Edit color'] = '修改颜色（报警通用颜色）',
 	['Clear color'] = '清空颜色',
 	['Edit name'] = '修改名称',
-	['MY_TeamMon is blocked in arena, temporary disabled.'] = '竞技场中无法使用团队监控，插件暂时关闭。',
+	['MY_TeamMon is blocked in this map, temporary disabled.'] = '当前地图禁止使用团队监控，相关功能已暂时关闭。',
 	['Add to monitor list'] = '添加到监控列表',
 	['(player)'] = '（玩家）',
 	['Export data'] = '导出数据',
