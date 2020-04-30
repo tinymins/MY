@@ -229,7 +229,7 @@ function TI.CreateFrame(a, b)
 			x = x, y = y, w = 96,
 			text = _L['MY_TeamTools'],
 			buttonstyle = 2,
-			onclick = MY_TeamTools.TogglePanel,
+			onclick = MY_TeamTools.Toggle,
 		}):AutoWidth():Width() + 5
 		x = x + ui:Append('WndButton', {
 			name = 'WndBtn_GKP',

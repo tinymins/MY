@@ -1063,7 +1063,7 @@ function MY_CataclysmMain.OnLButtonClick()
 		if not MY_TeamTools then
 			return LIB.Alert(_L['Please install and load MY_TeamTools addon first.'])
 		end
-		MY_TeamTools.TogglePanel()
+		MY_TeamTools.Toggle()
 	elseif szName == 'Wnd_TeamNotice' then
 		if not MY_TeamNotice then
 			return LIB.Alert(_L['Please install and load MY_TeamNotice addon first.'])
