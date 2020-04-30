@@ -1413,18 +1413,18 @@ LIB.RegisterEvent('SYS_MSG', function()
 			D.OnSkillEffect(arg1, arg2, arg4, arg5, arg6, SKILL_RESULT.HIT, arg8, arg9)
 		end
 		-- 盾化解伤害补偿至盾提供者的治疗量
-		if arg9[SKILL_RESULT_TYPE.ABSORB_DAMAGE] then
-			tAbsorbInfo = ABSORB_CACHE[arg2]
-			if tAbsorbInfo then
-				D.OnSkillEffect(
-					tAbsorbInfo.dwSrcID, arg2,
-					tAbsorbInfo.nEffectType, tAbsorbInfo.dwEffectID, tAbsorbInfo.dwEffectLevel,
-					SKILL_RESULT.ABSORB, 1, {
-						[SKILL_RESULT_TYPE.THERAPY] = arg9[SKILL_RESULT_TYPE.ABSORB_DAMAGE],
-						[SKILL_RESULT_TYPE.EFFECTIVE_THERAPY] = arg9[SKILL_RESULT_TYPE.ABSORB_DAMAGE],
-					})
-			end
-		end
+		-- if arg9[SKILL_RESULT_TYPE.ABSORB_DAMAGE] then
+		-- 	tAbsorbInfo = ABSORB_CACHE[arg2]
+		-- 	if tAbsorbInfo then
+		-- 		D.OnSkillEffect(
+		-- 			tAbsorbInfo.dwSrcID, arg2,
+		-- 			tAbsorbInfo.nEffectType, tAbsorbInfo.dwEffectID, tAbsorbInfo.dwEffectLevel,
+		-- 			SKILL_RESULT.ABSORB, 1, {
+		-- 				[SKILL_RESULT_TYPE.THERAPY] = arg9[SKILL_RESULT_TYPE.ABSORB_DAMAGE],
+		-- 				[SKILL_RESULT_TYPE.EFFECTIVE_THERAPY] = arg9[SKILL_RESULT_TYPE.ABSORB_DAMAGE],
+		-- 			})
+		-- 	end
+		-- end
 		-- end
 	elseif arg0 == 'UI_OME_SKILL_BLOCK_LOG' then
 		-- 格挡日志；
@@ -1521,22 +1521,22 @@ LIB.RegisterEvent('BUFF_UPDATE', function()
 	if not O.bEnable then
 		return
 	end
-	if arg4 == 9334 then -- 长歌盾·梅花三弄
-		tAbsorbInfo = ABSORB_CACHE[arg0]
-		if not tAbsorbInfo then
-			tAbsorbInfo = {}
-			ABSORB_CACHE[arg0] = tAbsorbInfo
-		end
-		if arg1 then
-			tAbsorbInfo.nEndFrame = GetLogicFrameCount()
-		else
-			tAbsorbInfo.dwSrcID = arg9
-			tAbsorbInfo.nEffectType = SKILL_EFFECT_TYPE.BUFF
-			tAbsorbInfo.dwEffectID = arg4
-			tAbsorbInfo.dwEffectLevel = 1
-			tAbsorbInfo.nEndFrame = nil
-		end
-	end
+	-- if arg4 == 9334 then -- 长歌盾·梅花三弄
+	-- 	tAbsorbInfo = ABSORB_CACHE[arg0]
+	-- 	if not tAbsorbInfo then
+	-- 		tAbsorbInfo = {}
+	-- 		ABSORB_CACHE[arg0] = tAbsorbInfo
+	-- 	end
+	-- 	if arg1 then
+	-- 		tAbsorbInfo.nEndFrame = GetLogicFrameCount()
+	-- 	else
+	-- 		tAbsorbInfo.dwSrcID = arg9
+	-- 		tAbsorbInfo.nEffectType = SKILL_EFFECT_TYPE.BUFF
+	-- 		tAbsorbInfo.dwEffectID = arg4
+	-- 		tAbsorbInfo.dwEffectLevel = 1
+	-- 		tAbsorbInfo.nEndFrame = nil
+	-- 	end
+	-- end
 	-- buff update：
 	-- arg0：dwPlayerID，arg1：bDelete，arg2：nIndex，arg3：bCanCancel
 	-- arg4：dwBuffID，arg5：nStackNum，arg6：nEndFrame，arg7：？update all?
