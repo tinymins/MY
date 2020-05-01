@@ -268,7 +268,9 @@ function D.UpdateUI(frame)
 	-- 整理数据 生成要显示的列表
 	local nMaxValue, aResult, tResult = 0, {}, {}
 	for dwID, rec in pairs(tRecord) do
-		if (MY_Recount_UI.bShowZeroVal or rec[MY_Recount_UI.bShowEffect and DK_REC_STAT.TOTAL_EFFECT or DK_REC_STAT.TOTAL] > 0)
+		local bShowZeroVal = MY_Recount_UI.bShowZeroVal
+			or MY_Recount.StatContainsImportantEffect(rec)
+		if (bShowZeroVal or rec[MY_Recount_UI.bShowEffect and DK_REC_STAT.TOTAL_EFFECT or DK_REC_STAT.TOTAL] > 0)
 		and (
 			MY_Recount_UI.nDisplayMode == DISPLAY_MODE.BOTH or  -- 确定显示模式（显示NPC/显示玩家/全部显示）
 			(MY_Recount_UI.nDisplayMode == DISPLAY_MODE.NPC and not IsPlayer(dwID)) or
@@ -602,6 +604,7 @@ function D.OnItemRefreshTip()
 			for szEffectID, p in pairs(tRec[DK_REC_STAT.SKILL]) do
 				local szName = MY_Recount_DS.GetEffectNameAusID(DataDisplay, szChannel, szEffectID) or szEffectID
 				insert(t, {
+					szEffectID = szEffectID,
 					szName = szName,
 					rec = p,
 					bAnonymous = IsEmpty(szName) or szName:sub(1, 1) == '#',
@@ -611,9 +614,17 @@ function D.OnItemRefreshTip()
 				return p1.rec[DK_REC_STAT_SKILL.TOTAL] > p2.rec[DK_REC_STAT_SKILL.TOTAL]
 			end)
 			for _, p in ipairs(t) do
-				if (MY_Recount_UI.bShowZeroVal or p.rec[DK_REC_STAT_SKILL.TOTAL] > 0)
+				local bShowZeroVal = MY_Recount_UI.bShowZeroVal
+					or MY_Recount.IsImportantEffect(p.szEffectID)
+					or MY_Recount.IsImportantEffect(p.rec.tEffectID)
+				if (bShowZeroVal or p.rec[DK_REC_STAT_SKILL.TOTAL] > 0)
 				and (not MY_Recount_UI.bHideAnonymous or not p.bAnonymous) then
-					szXml = szXml .. GetFormatText(p.szName .. '\n', nil, 255, 150, 0)
+					szXml = szXml .. GetFormatText(p.szName, nil, 255, 150, 0)
+					if IsCtrlKeyDown() then
+						szXml = szXml .. GetFormatText('\t' .. p.szEffectID, nil, 255, 255, 0)
+					else
+						szXml = szXml .. GetFormatText('\n', nil, 255, 150, 0)
+					end
 					szXml = szXml .. GetFormatText(_L['total: '] .. p.rec[DK_REC_STAT_SKILL.TOTAL]
 						.. ' ' .. _L['effect: '] .. p.rec[DK_REC_STAT_SKILL.TOTAL_EFFECT] .. '\n')
 					for _, nSkillResult in ipairs({
@@ -632,7 +643,7 @@ function D.OnItemRefreshTip()
 						end
 						local nCount = 0
 						if p.rec[DK_REC_STAT_SKILL.DETAIL][nSkillResult] then
-							nCount = not MY_Recount_UI.bShowZeroVal
+							nCount = not bShowZeroVal
 								and p.rec[DK_REC_STAT_SKILL.DETAIL][nSkillResult][DK_REC_STAT_SKILL_DETAIL.NZ_COUNT]
 								or p.rec[DK_REC_STAT_SKILL.DETAIL][nSkillResult][DK_REC_STAT_SKILL_DETAIL.COUNT]
 						end

@@ -239,26 +239,30 @@ function MY_Recount_DT.OnFrameBreathe()
 	local aResult, nTotal = {}, MY_Recount_UI.bShowEffect and tData[DK_REC_STAT.TOTAL_EFFECT] or tData[DK_REC_STAT.TOTAL]
 	if szPrimarySort == DK_REC_STAT.SKILL then
 		for szEffectID, p in pairs(tData[DK_REC_STAT.SKILL]) do
+			local bShowZeroVal = MY_Recount_UI.bShowZeroVal
+				or MY_Recount.StatSkillContainsImportantEffect(szEffectID, p)
 			local rec = {
 				szKey  = szEffectID,
 				szName = MY_Recount_DS.GetEffectNameAusID(DataDisplay, szChannel, szEffectID) or szEffectID,
-				nCount = not MY_Recount_UI.bShowZeroVal and p[DK_REC_STAT_SKILL.NZ_COUNT] or p[DK_REC_STAT_SKILL.COUNT],
+				nCount = not bShowZeroVal and p[DK_REC_STAT_SKILL.NZ_COUNT] or p[DK_REC_STAT_SKILL.COUNT],
 				nTotal = MY_Recount_UI.bShowEffect and p[DK_REC_STAT_SKILL.TOTAL_EFFECT] or p[DK_REC_STAT_SKILL.TOTAL],
 			}
-			if (MY_Recount_UI.bShowZeroVal or rec.nTotal > 0)
+			if (bShowZeroVal or rec.nTotal > 0)
 			and (not MY_Recount_UI.bHideAnonymous or rec.szName:sub(1, 1) ~= '#') then
 				insert(aResult, rec)
 			end
 		end
 	else
 		for id, p in pairs(tData[DK_REC_STAT.TARGET]) do
+			local bShowZeroVal = MY_Recount_UI.bShowZeroVal
+				or MY_Recount.StatTargetContainsImportantEffect(p)
 			local rec = {
 				szKey  = id                              ,
 				szName = IsString(id) and id or MY_Recount_DS.GetNameAusID(DataDisplay, id),
-				nCount = not MY_Recount_UI.bShowZeroVal and p[DK_REC_STAT_TARGET.NZ_COUNT] or p[DK_REC_STAT_TARGET.COUNT],
+				nCount = not bShowZeroVal and p[DK_REC_STAT_TARGET.NZ_COUNT] or p[DK_REC_STAT_TARGET.COUNT],
 				nTotal = MY_Recount_UI.bShowEffect and p[DK_REC_STAT_TARGET.TOTAL_EFFECT] or p[DK_REC_STAT_TARGET.TOTAL],
 			}
-			if MY_Recount_UI.bShowZeroVal or rec.nTotal > 0 then
+			if bShowZeroVal or rec.nTotal > 0 then
 				insert(aResult, rec)
 			end
 		end
@@ -316,20 +320,22 @@ function MY_Recount_DT.OnFrameBreathe()
 		this:Lookup('', 'Handle_Spliter'):Show()
 		--------------- 二、技能释放结果列表更新 -----------------
 		-- 数据收集
-		local aResult, nCountSum = {}, 0
+		local aResult, nCountSum, bShowZeroVal = {}, 0
 		if szPrimarySort == DK_REC_STAT.SKILL then
-			nCountSum = not MY_Recount_UI.bShowZeroVal
+			bShowZeroVal = MY_Recount_UI.bShowZeroVal
+				or MY_Recount.StatSkillContainsImportantEffect(szSelected, tData[DK_REC_STAT.SKILL][szSelected])
+			nCountSum = not bShowZeroVal
 				and tData[DK_REC_STAT.SKILL][szSelected][DK_REC_STAT_SKILL.NZ_COUNT]
 				or tData[DK_REC_STAT.SKILL][szSelected][DK_REC_STAT_SKILL.COUNT]
 			for nSkillResult, p in pairs(tData[DK_REC_STAT.SKILL][szSelected][DK_REC_STAT_SKILL.DETAIL]) do
 				local res = {
-					nCount = not MY_Recount_UI.bShowZeroVal and p[DK_REC_STAT_SKILL_DETAIL.NZ_COUNT] or p[DK_REC_STAT_SKILL_DETAIL.COUNT],
+					nCount = not bShowZeroVal and p[DK_REC_STAT_SKILL_DETAIL.NZ_COUNT] or p[DK_REC_STAT_SKILL_DETAIL.COUNT],
 					nMin   = not MY_Recount_UI.bShowEffect
-						and (not MY_Recount_UI.bShowZeroVal and p[DK_REC_STAT_SKILL_DETAIL.NZ_MIN] or p[DK_REC_STAT_SKILL_DETAIL.MIN])
-						or (not MY_Recount_UI.bShowZeroVal and p[DK_REC_STAT_SKILL_DETAIL.NZ_MIN_EFFECT] or p[DK_REC_STAT_SKILL_DETAIL.MIN_EFFECT]),
+						and (not bShowZeroVal and p[DK_REC_STAT_SKILL_DETAIL.NZ_MIN] or p[DK_REC_STAT_SKILL_DETAIL.MIN])
+						or (not bShowZeroVal and p[DK_REC_STAT_SKILL_DETAIL.NZ_MIN_EFFECT] or p[DK_REC_STAT_SKILL_DETAIL.MIN_EFFECT]),
 					nAvg   = not MY_Recount_UI.bShowEffect
-						and (not MY_Recount_UI.bShowZeroVal and p[DK_REC_STAT_SKILL_DETAIL.NZ_AVG] or p[DK_REC_STAT_SKILL_DETAIL.AVG])
-						or (not MY_Recount_UI.bShowZeroVal and p[DK_REC_STAT_SKILL_DETAIL.NZ_AVG_EFFECT] or p[DK_REC_STAT_SKILL_DETAIL.AVG_EFFECT]),
+						and (not bShowZeroVal and p[DK_REC_STAT_SKILL_DETAIL.NZ_AVG] or p[DK_REC_STAT_SKILL_DETAIL.AVG])
+						or (not bShowZeroVal and p[DK_REC_STAT_SKILL_DETAIL.NZ_AVG_EFFECT] or p[DK_REC_STAT_SKILL_DETAIL.AVG_EFFECT]),
 					nMax   = MY_Recount_UI.bShowEffect and p[DK_REC_STAT_SKILL_DETAIL.MAX_EFFECT] or p[DK_REC_STAT_SKILL_DETAIL.MAX],
 					nTotal = MY_Recount_UI.bShowEffect and p[DK_REC_STAT_SKILL_DETAIL.TOTAL_EFFECT] or p[DK_REC_STAT_SKILL_DETAIL.TOTAL],
 					szSkillResult = SKILL_RESULT_NAME[nSkillResult],
@@ -339,18 +345,20 @@ function MY_Recount_DT.OnFrameBreathe()
 				end
 			end
 		else
-			nCountSum = not MY_Recount_UI.bShowZeroVal
+			bShowZeroVal = MY_Recount_UI.bShowZeroVal
+				or MY_Recount.StatTargetContainsImportantEffect(tData[DK_REC_STAT.TARGET][szSelected])
+			nCountSum = not bShowZeroVal
 				and tData[DK_REC_STAT.TARGET][szSelected][DK_REC_STAT_TARGET.NZ_COUNT]
 				or tData[DK_REC_STAT.TARGET][szSelected][DK_REC_STAT_TARGET.COUNT]
 			for nSkillResult, p in pairs(tData[DK_REC_STAT.TARGET][szSelected][DK_REC_STAT_TARGET.DETAIL]) do
 				local res = {
-					nCount = not MY_Recount_UI.bShowZeroVal and p[DK_REC_STAT_TARGET_DETAIL.NZ_COUNT] or p[DK_REC_STAT_TARGET_DETAIL.COUNT],
+					nCount = not bShowZeroVal and p[DK_REC_STAT_TARGET_DETAIL.NZ_COUNT] or p[DK_REC_STAT_TARGET_DETAIL.COUNT],
 					nMin   = not MY_Recount_UI.bShowEffect
-						and (not MY_Recount_UI.bShowZeroVal and p[DK_REC_STAT_TARGET_DETAIL.NZ_MIN] or p[DK_REC_STAT_TARGET_DETAIL.MIN])
-						or (not MY_Recount_UI.bShowZeroVal and p[DK_REC_STAT_TARGET_DETAIL.NZ_MIN_EFFECT] or p[DK_REC_STAT_TARGET_DETAIL.MIN_EFFECT]),
+						and (not bShowZeroVal and p[DK_REC_STAT_TARGET_DETAIL.NZ_MIN] or p[DK_REC_STAT_TARGET_DETAIL.MIN])
+						or (not bShowZeroVal and p[DK_REC_STAT_TARGET_DETAIL.NZ_MIN_EFFECT] or p[DK_REC_STAT_TARGET_DETAIL.MIN_EFFECT]),
 					nAvg   = not MY_Recount_UI.bShowEffect
-						and (not MY_Recount_UI.bShowZeroVal and p[DK_REC_STAT_TARGET_DETAIL.NZ_AVG] or p[DK_REC_STAT_TARGET_DETAIL.AVG])
-						or (not MY_Recount_UI.bShowZeroVal and p[DK_REC_STAT_TARGET_DETAIL.NZ_AVG_EFFECT] or p[DK_REC_STAT_TARGET_DETAIL.AVG_EFFECT]),
+						and (not bShowZeroVal and p[DK_REC_STAT_TARGET_DETAIL.NZ_AVG] or p[DK_REC_STAT_TARGET_DETAIL.AVG])
+						or (not bShowZeroVal and p[DK_REC_STAT_TARGET_DETAIL.NZ_AVG_EFFECT] or p[DK_REC_STAT_TARGET_DETAIL.AVG_EFFECT]),
 					nMax   = MY_Recount_UI.bShowEffect and p[DK_REC_STAT_TARGET_DETAIL.MAX_EFFECT] or p[DK_REC_STAT_TARGET_DETAIL.MAX],
 					nTotal = MY_Recount_UI.bShowEffect and p[DK_REC_STAT_TARGET_DETAIL.TOTAL_EFFECT] or p[DK_REC_STAT_TARGET_DETAIL.TOTAL],
 					szSkillResult = SKILL_RESULT_NAME[nSkillResult],
@@ -366,14 +374,15 @@ function MY_Recount_DT.OnFrameBreathe()
 		local hList = this:Lookup('WndScroll_Detail', 'Handle_DetailList')
 		for i, p in ipairs(aResult) do
 			local hItem = hList:Lookup(i - 1) or hList:AppendItemFromIni(SZ_INI, 'Handle_DetailItem')
-			local nCount = not MY_Recount_UI.bShowZeroVal and p.nNzCount or p.nCount
 			hItem:Lookup('Text_DetailNo'):SetText(i)
 			hItem:Lookup('Text_DetailType'):SetText(p.szSkillResult)
 			hItem:Lookup('Text_DetailMin'):SetText(p.nMin)
 			hItem:Lookup('Text_DetailAverage'):SetText(p.nAvg)
 			hItem:Lookup('Text_DetailMax'):SetText(p.nMax)
-			hItem:Lookup('Text_DetailCount'):SetText(nCount)
-			hItem:Lookup('Text_DetailPercent'):SetText(nCountSum > 0 and _L('%.1f%%', (i == 1 and ceil or floor)(nCount / nCountSum * 1000) / 10) or ' - ')
+			hItem:Lookup('Text_DetailCount'):SetText(p.nCount)
+			hItem:Lookup('Text_DetailPercent'):SetText(nCountSum > 0
+				and _L('%.1f%%', (i == 1 and ceil or floor)(p.nCount / nCountSum * 1000) / 10)
+				or ' - ')
 		end
 		for i = hList:GetItemCount() - 1, #aResult, -1 do
 			hList:RemoveItem(i)
@@ -391,10 +400,12 @@ function MY_Recount_DT.OnFrameBreathe()
 		-- 数据收集
 		local aResult, nTotal = {}, 0
 		if szPrimarySort == DK_REC_STAT.SKILL then
+			local bShowZeroVal = MY_Recount_UI.bShowZeroVal
+				or MY_Recount.StatSkillContainsImportantEffect(szSelectedSkill, tData[DK_REC_STAT.SKILL][szSelectedSkill])
 			for id, p in pairs(tData[DK_REC_STAT.SKILL][szSelectedSkill][DK_REC_STAT_SKILL.TARGET]) do
 				local rec = {
 					szKey          = id,
-					nHitCount      = MY_Recount_UI.bShowZeroVal
+					nHitCount      = bShowZeroVal
 						and (
 							(p[DK_REC_STAT_SKILL_TARGET.COUNT][SKILL_RESULT.HIT] or 0)
 							+ (p[DK_REC_STAT_SKILL_TARGET.COUNT][SKILL_RESULT.ABSORB] or 0)
@@ -403,38 +414,40 @@ function MY_Recount_DT.OnFrameBreathe()
 							(p[DK_REC_STAT_SKILL_TARGET.NZ_COUNT][SKILL_RESULT.HIT] or 0)
 							+ (p[DK_REC_STAT_SKILL_TARGET.NZ_COUNT][SKILL_RESULT.ABSORB] or 0)
 						),
-					nMissCount     = MY_Recount_UI.bShowZeroVal
+					nMissCount     = bShowZeroVal
 						and (p[DK_REC_STAT_SKILL_TARGET.COUNT][SKILL_RESULT.MISS] or 0)
 						or p[DK_REC_STAT_SKILL_TARGET.NZ_COUNT][SKILL_RESULT.MISS] or 0,
-					nCriticalCount = MY_Recount_UI.bShowZeroVal
+					nCriticalCount = bShowZeroVal
 						and (p[DK_REC_STAT_SKILL_TARGET.COUNT][SKILL_RESULT.CRITICAL] or 0)
 						or p[DK_REC_STAT_SKILL_TARGET.NZ_COUNT][SKILL_RESULT.CRITICAL] or 0,
 					nMax           = MY_Recount_UI.bShowEffect and p[DK_REC_STAT_SKILL_TARGET.MAX_EFFECT] or p[DK_REC_STAT_SKILL_TARGET.MAX],
 					nTotal         = MY_Recount_UI.bShowEffect and p[DK_REC_STAT_SKILL_TARGET.TOTAL_EFFECT] or p[DK_REC_STAT_SKILL_TARGET.TOTAL],
 					szName         = IsString(id) and id or MY_Recount_DS.GetNameAusID(DataDisplay, id),
 				}
-				if MY_Recount_UI.bShowZeroVal or rec.nTotal > 0 or rec.nMissCount > 0 then
+				if bShowZeroVal or rec.nTotal > 0 or rec.nMissCount > 0 then
 					insert(aResult, rec)
 				end
 			end
 			nTotal = tData[DK_REC_STAT.SKILL][szSelected][MY_Recount_UI.bShowEffect and DK_REC_STAT_SKILL.TOTAL_EFFECT or DK_REC_STAT_SKILL.TOTAL]
 		else
+			local bShowZeroVal = MY_Recount_UI.bShowZeroVal
+				or MY_Recount.StatTargetContainsImportantEffect(tData[DK_REC_STAT.TARGET][szSelectedTarget])
 			for szEffectID, p in pairs(tData[DK_REC_STAT.TARGET][szSelectedTarget][DK_REC_STAT_TARGET.SKILL]) do
 				local rec = {
-					nHitCount      = MY_Recount_UI.bShowZeroVal
+					nHitCount      = bShowZeroVal
 						and (p[DK_REC_STAT_TARGET_SKILL.COUNT][SKILL_RESULT.HIT] or 0)
 						or p[DK_REC_STAT_TARGET_SKILL.NZ_COUNT][SKILL_RESULT.HIT] or 0,
-					nMissCount     = MY_Recount_UI.bShowZeroVal
+					nMissCount     = bShowZeroVal
 						and (p[DK_REC_STAT_TARGET_SKILL.COUNT][SKILL_RESULT.MISS] or 0)
 						or p[DK_REC_STAT_TARGET_SKILL.NZ_COUNT][SKILL_RESULT.MISS] or 0,
-					nCriticalCount = MY_Recount_UI.bShowZeroVal
+					nCriticalCount = bShowZeroVal
 						and (p[DK_REC_STAT_TARGET_SKILL.COUNT][SKILL_RESULT.CRITICAL] or 0)
 						or p[DK_REC_STAT_TARGET_SKILL.NZ_COUNT][SKILL_RESULT.CRITICAL] or 0,
 					nMax           = MY_Recount_UI.bShowEffect and p[DK_REC_STAT_TARGET_SKILL.MAX_EFFECT] or p[DK_REC_STAT_TARGET_SKILL.MAX],
 					nTotal         = MY_Recount_UI.bShowEffect and p[DK_REC_STAT_TARGET_SKILL.TOTAL_EFFECT] or p[DK_REC_STAT_TARGET_SKILL.TOTAL],
 					szName         = MY_Recount_DS.GetEffectNameAusID(DataDisplay, szChannel, szEffectID) or szEffectID,
 				}
-				if (MY_Recount_UI.bShowZeroVal or rec.nTotal > 0 or rec.nMissCount > 0)
+				if (bShowZeroVal or rec.nTotal > 0 or rec.nMissCount > 0)
 				and (not MY_Recount_UI.bHideAnonymous or rec.szName:sub(1, 1) ~= '#') then
 					insert(aResult, rec)
 				end

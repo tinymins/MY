@@ -86,6 +86,10 @@ local STAT_TYPE_NAME = {
 	[STAT_TYPE.BDPS] = g_tStrings.STR_BE_DAMAGE_STATISTIC , -- 承伤统计
 	[STAT_TYPE.BHPS] = g_tStrings.STR_BE_THERAPY_STATISTIC, -- 承疗统计
 }
+local IMPORTANT_EFFECT = {
+	[SKILL_EFFECT_TYPE.SKILL .. ',371,1'] = true, -- 镇山河
+	[SKILL_EFFECT_TYPE.SKILL .. ',15054,1'] = true, -- 梅花三弄
+}
 local PUBLISH_MODE = {
 	EFFECT = 1, -- 只显示有效值
 	TOTAL  = 2, -- 只显示总数值
@@ -105,6 +109,47 @@ function D.GetTargetShowName(szName, bPlayer)
 		szName = MY_ChatMosaics.MosaicsString(szName)
 	end
 	return szName
+end
+
+function D.IsImportantEffect(v)
+	if not v then
+		return false
+	end
+	if IsTable(v) then
+		for k, v in pairs(v) do
+			if IMPORTANT_EFFECT[k] or IMPORTANT_EFFECT[v] then
+				return true
+			end
+		end
+		return false
+	end
+	if IMPORTANT_EFFECT[v] then
+		return true
+	end
+end
+
+function D.StatContainsImportantEffect(rec)
+	for szEffectID, p in ipairs(rec[DK_REC_STAT.SKILL]) do
+		if IMPORTANT_EFFECT[szEffectID] and p[DK_REC_STAT_SKILL.NZ_COUNT] > 0 then
+			return true
+		end
+	end
+	return false
+end
+
+function D.StatSkillContainsImportantEffect(szEffectID, p)
+	return D.IsImportantEffect(szEffectID)
+		or D.IsImportantEffect(p.tEffectID)
+end
+
+function D.StatTargetContainsImportantEffect(rec)
+	for szEffectID, p in pairs(rec[DK_REC_STAT_TARGET.SKILL]) do
+		if MY_Recount.IsImportantEffect(szEffectID)
+		or MY_Recount.IsImportantEffect(p.tEffectID) then
+			return true
+		end
+	end
+	return false
 end
 
 -- 设置当前显示记录
@@ -613,6 +658,10 @@ local settings = {
 				GetHistoryMenu = D.GetHistoryMenu,
 				GetPublishMenu = D.GetPublishMenu,
 				GetTargetShowName = D.GetTargetShowName,
+				IsImportantEffect = D.IsImportantEffect,
+				StatContainsImportantEffect = D.StatContainsImportantEffect,
+				StatSkillContainsImportantEffect = D.StatSkillContainsImportantEffect,
+				StatTargetContainsImportantEffect = D.StatTargetContainsImportantEffect,
 				STAT_TYPE = STAT_TYPE,
 				STAT_TYPE_KEY = STAT_TYPE_KEY,
 				STAT_TYPE_NAME = STAT_TYPE_NAME,

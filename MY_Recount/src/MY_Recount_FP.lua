@@ -414,7 +414,8 @@ function D.UpdateData(frame)
 		local bMatch = true
 		-- ÁãÊýÖµ¼ÇÂ¼
 		if bMatch and not MY_Recount_UI.bShowZeroVal then
-			if rec[4] == EVERYTHING_TYPE.SKILL_EFFECT and rec[14] == 0 and rec[12] == 0 then
+			if rec[4] == EVERYTHING_TYPE.SKILL_EFFECT and rec[14] == 0 and rec[12] == 0
+			and not MY_Recount.IsImportantEffect(rec[7] .. ',' .. rec[8] .. ',' .. rec[9]) then
 				bMatch = false
 			end
 			if rec[4] == EVERYTHING_TYPE.BUFF_UPDATE then

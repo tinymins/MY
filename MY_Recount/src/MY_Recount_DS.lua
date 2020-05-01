@@ -1737,6 +1737,7 @@ function D.MergeTargetData(tDst, tSrc, data, szChannel, bMergeNpc, bMergeEffect,
 			tDstSkill = tDst[DK_REC_STAT.SKILL][id]
 			if not tDstSkill then
 				tDstSkill = {
+					tEffectID = {},
 					[DK_REC_STAT_SKILL.COUNT        ] =  0, -- 该玩家四象轮回释放次数（假设szEffectName是四象轮回）
 					[DK_REC_STAT_SKILL.NZ_COUNT     ] =  0, -- 该玩家非零值四象轮回释放次数
 					[DK_REC_STAT_SKILL.MAX          ] =  0, -- 该玩家四象轮回最大输出量
@@ -1752,6 +1753,7 @@ function D.MergeTargetData(tDst, tSrc, data, szChannel, bMergeNpc, bMergeEffect,
 				}
 				tDst[DK_REC_STAT.SKILL][id] = tDstSkill
 			end
+			tDstSkill.tEffectID[szEffectID] = true
 			tDstSkill[DK_REC_STAT_SKILL.COUNT        ] = tDstSkill[DK_REC_STAT_SKILL.COUNT] + tSrcSkill[DK_REC_STAT_SKILL.COUNT]
 			tDstSkill[DK_REC_STAT_SKILL.NZ_COUNT     ] = tDstSkill[DK_REC_STAT_SKILL.NZ_COUNT] + tSrcSkill[DK_REC_STAT_SKILL.NZ_COUNT]
 			tDstSkill[DK_REC_STAT_SKILL.MAX          ] = max(tDstSkill[DK_REC_STAT_SKILL.MAX], tSrcSkill[DK_REC_STAT_SKILL.MAX])
@@ -1919,6 +1921,7 @@ function D.MergeTargetData(tDst, tSrc, data, szChannel, bMergeNpc, bMergeEffect,
 				tDstTargetSkill = tDstTarget[DK_REC_STAT_TARGET.SKILL][id]
 				if not tDstTargetSkill then
 					tDstTargetSkill = {
+						tEffectID = {},
 						[DK_REC_STAT_TARGET_SKILL.MAX         ] = 0, -- 该玩家击中这个玩家的四象轮回最大伤害
 						[DK_REC_STAT_TARGET_SKILL.MAX_EFFECT  ] = 0, -- 该玩家击中这个玩家的四象轮回最大有效伤害
 						[DK_REC_STAT_TARGET_SKILL.TOTAL       ] = 0, -- 该玩家击中这个玩家的四象轮回伤害总和
@@ -1928,6 +1931,7 @@ function D.MergeTargetData(tDst, tSrc, data, szChannel, bMergeNpc, bMergeEffect,
 					}
 					tDstTarget[DK_REC_STAT_TARGET.SKILL][id] = tDstTargetSkill
 				end
+				tDstTargetSkill.tEffectID[szEffectID] = true
 				tDstTargetSkill[DK_REC_STAT_TARGET_SKILL.MAX         ] = max(tDstTargetSkill[DK_REC_STAT_TARGET_SKILL.MAX], tSrcTargetSkill[DK_REC_STAT_TARGET_SKILL.MAX])
 				tDstTargetSkill[DK_REC_STAT_TARGET_SKILL.MAX_EFFECT  ] = max(tDstTargetSkill[DK_REC_STAT_TARGET_SKILL.MAX_EFFECT], tSrcTargetSkill[DK_REC_STAT_TARGET_SKILL.MAX_EFFECT])
 				tDstTargetSkill[DK_REC_STAT_TARGET_SKILL.TOTAL       ] = tDstTargetSkill[DK_REC_STAT_TARGET_SKILL.TOTAL] + tSrcTargetSkill[DK_REC_STAT_TARGET_SKILL.TOTAL]
