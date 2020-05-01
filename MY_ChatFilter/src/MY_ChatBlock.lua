@@ -70,19 +70,12 @@ local MSG_TYPE_TALK_CHANNEL = LIB.FlipObjectKV(TALK_CHANNEL_MSG_TYPE)
 local DEFAULT_KW_CONFIG = {
 	szKeyword = '',
 	tMsgType = {
-		['MSG_NORMAL'        ] = true ,
-		['MSG_MAP'           ] = true ,
-		['MSG_WORLD'         ] = true ,
-		['MSG_PARTY'         ] = false,
-		['MSG_TEAM'          ] = false,
-		['MSG_BATTLE_FILED'  ] = false,
-		['MSG_GUILD'         ] = false,
-		['MSG_SCHOOL'        ] = true ,
-		['MSG_CAMP'          ] = true ,
-		['MSG_WHISPER'       ] = true ,
-		['MSG_FRIEND'        ] = false,
-		['MSG_GUILD_ALLIANCE'] = false,
-		['MSG_SYS'           ] = false,
+		['MSG_NORMAL'        ] = true,
+		['MSG_MAP'           ] = true,
+		['MSG_WORLD'         ] = true,
+		['MSG_SCHOOL'        ] = true,
+		['MSG_CAMP'          ] = true,
+		['MSG_WHISPER'       ] = true,
 	},
 	bIgnoreAcquaintance = true,
 	bIgnoreCase = true, bIgnoreEnEm = true, bIgnoreSpace = true,
@@ -283,6 +276,7 @@ function PS.OnPanelActive(wnd)
 				data.tMsgType[szType] = true
 			end
 			D.CheckEnable()
+			D.SaveBlockWords()
 		end, data.tMsgType)
 		insert(menu, CONSTANT.MENU_DIVIDER)
 		insert(menu, {
