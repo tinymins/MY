@@ -746,6 +746,15 @@ function D.OnInitPage()
 		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
 	}):Width() + 5
 
+	UI(wnd):Append('WndButton', {
+		x = 960, y = 20, w = 120,
+		text = _L['Refresh'],
+		onclick = function()
+			D.RequestTeamData()
+			LIB.Systopmsg(_L['Team achievement request sent.'])
+		end,
+	})
+
 	local frame = this:GetRoot()
 	frame:RegisterEvent('MY_TEAMTOOLS_ACHI')
 	frame:RegisterEvent('MY_TEAMTOOLS_ACHI_SEARCH_AC')

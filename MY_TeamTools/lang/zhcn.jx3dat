@@ -69,6 +69,8 @@ return {
 	['Hide unimportant achievements'] = '隐藏声望等不需要优先关注的成就',
 	['Achievement point: %d'] = '获得资历：%d',
 	['Achievement point: %d / %d'] = '获得资历：%d / %d',
+	['Refresh'] = '刷新',
+	['Team achievement request sent.'] = '刷新团队成就请求已发送。',
 
 	-- MY_PartyRequest
 	['Party Request'] = '优化申请列表',
