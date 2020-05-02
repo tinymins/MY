@@ -639,6 +639,14 @@ function D.UpdatePage(page)
 	hList:FormatAllItemPos()
 end
 
+function D.DelayUpdatePage(page)
+	LIB.DelayCall('MY_TeamTools_Achievement__DelayUpdatePage', 200, function()
+		if IsElement(page) then
+			D.UpdatePage(page)
+		end
+	end)
+end
+
 function D.SetSearch(szSearch)
 	O.szSearch = szSearch
 	D.UpdateAchievementID()
@@ -775,7 +783,7 @@ end
 
 function D.OnEvent(event)
 	if event == 'MY_TEAMTOOLS_ACHI' then
-		D.UpdatePage(this)
+		D.DelayUpdatePage(this)
 	elseif event == 'MY_TEAMTOOLS_ACHI_SEARCH_AC' then
 		UI(this):Fetch('Wnd_Total/WndAutocomplete_Search'):Autocomplete('option', 'source', O.aSearchAC)
 	elseif event == 'ON_MY_MOSAICS_RESET' then
@@ -784,7 +792,7 @@ function D.OnEvent(event)
 	or event == 'UPDATE_ACHIEVEMENT_POINT' or event == 'UPDATE_ACHIEVEMENT_COUNT'
 	or event == 'PARTY_DELETE_MEMBER' or event == 'PARTY_DISBAND' then
 		D.UpdateSelfData()
-		D.UpdatePage(this)
+		D.DelayUpdatePage(this)
 		D.DelayRequestTeamData()
 	elseif event == 'PARTY_ADD_MEMBER' or event == 'PARTY_UPDATE_BASE_INFO' then
 		D.DelayRequestTeamData()
