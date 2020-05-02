@@ -322,7 +322,7 @@ function D.GetMenu()
 		szOption = _L['filter short fight'],
 		fnDisable = function() return not MY_Recount_DS.bEnable end,
 	}
-	for _, i in pairs({ -1, 10, 30, 60, 90, 120, 180 }) do
+	for _, i in pairs({ -1, 10, 15, 20, 25, 30, 45, 60, 90, 120, 180 }) do
 		local szOption
 		if i < 0 then
 			szOption = _L['no time limit']
