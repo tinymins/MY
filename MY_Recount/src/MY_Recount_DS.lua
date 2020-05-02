@@ -69,6 +69,7 @@ local DK = {
 	BE_HEAL     = DEBUG and 'BeHeal'      or 14, -- 承疗统计
 	BE_DAMAGE   = DEBUG and 'BeDamage'    or 15, -- 承伤统计
 	EVERYTHING  = DEBUG and 'Everything'  or 16, -- 战斗复盘
+	ABSORB      = DEBUG and 'Absorb'      or 17, -- 化解统计
 }
 
 local DK_REC = {
@@ -670,7 +671,7 @@ end
 -- data: 数据
 -- dwID: 计算暂离的角色ID 为空则计算团队的暂离时间（目前永远为0）
 -- szRecordType: 不同类型的数据在官方时间算法下计算结果可能不一样
---               枚举暂时有 DK.HEAL DK.DAMAGE DK.BE_DAMAGE DK.BE_HEAL 四种
+--               枚举暂时有 DK.HEAL DK.DAMAGE DK.BE_DAMAGE DK.BE_HEAL DK.ABSORB 五种
 do local nFightTime, nAwayTime
 function D.GeneAwayTime(data, dwID, szRecordType)
 	nFightTime = D.GeneFightTime(data, dwID, szRecordType)
@@ -687,7 +688,7 @@ end
 -- D.GeneFightTime(data, dwID, szRecordType)
 -- data: 数据
 -- szRecordType: 不同类型的数据在官方时间算法下计算结果可能不一样
---               枚举暂时有 DK.HEAL DK.DAMAGE DK.BE_DAMAGE DK.BE_HEAL 四种
+--               枚举暂时有 DK.HEAL DK.DAMAGE DK.BE_DAMAGE DK.BE_HEAL DK.ABSORB 五种
 --               为空则计算普通时间算法
 -- dwID: 计算战斗时间的角色ID 为空则计算团队的战斗时间
 do local nTimeDuring, nTimeBegin, nAwayBegin, nAwayEnd
@@ -798,7 +799,6 @@ function D.ProcessSkillEffect(nLFC, nTime, nTick, dwCaster, dwTarget, nEffectTyp
 
 	if nSkillResult == SKILL_RESULT.HIT -- 击中
 		or nSkillResult == SKILL_RESULT.CRITICAL -- 会心
-		or nSkillResult == SKILL_RESULT.ABSORB -- 盾治疗
 	then
 		if nTherapy > 0 then -- 有治疗数据
 			D.AddHealRecord(Data, dwCaster, dwTarget, szEffectID, nTherapy, nEffectTherapy, nSkillResult)
@@ -812,6 +812,8 @@ function D.ProcessSkillEffect(nLFC, nTime, nTick, dwCaster, dwTarget, nEffectTyp
 				D.AddDamageRecord(Data, dwCaster, dwTarget, szEffectID, nDamage, nEffectDamage, nSkillResult)
 			end
 		end
+	elseif nSkillResult == SKILL_RESULT.ABSORB then -- 盾治疗
+		D.AddAbsorbRecord(Data, dwCaster, dwTarget, szEffectID, nTherapy, nSkillResult)
 	elseif nSkillResult == SKILL_RESULT.INSIGHT then -- 识破
 		D.AddDamageRecord(Data, dwCaster, dwTarget, szEffectID, nDamage, nEffectDamage, SKILL_RESULT.INSIGHT)
 	elseif nSkillResult == SKILL_RESULT.BLOCK  -- 格挡
@@ -1247,6 +1249,13 @@ function D.AddHealRecord(data, dwCaster, dwTarget, szEffectID, nHeal, nEffectHea
 	D.InsertRecord(data, DK.BE_HEAL, dwTarget, dwCaster, szEffectID, nHeal, nEffectHeal, nSkillResult)
 end
 
+-- 插入一条化解记录
+function D.AddAbsorbRecord(data, dwCaster, dwTarget, szEffectID, nAbsorb, nSkillResult)
+	-- 添加化解记录
+	D.InitObjectData(data, dwCaster, DK.ABSORB)
+	D.InsertRecord(data, DK.ABSORB, dwCaster, dwTarget, szEffectID, nAbsorb, nAbsorb, nSkillResult)
+end
+
 -- 确认对象数据已创建（未创建则创建）
 function D.InitObjectData(data, dwID, szChannel)
 	-- 名称缓存
@@ -1324,6 +1333,7 @@ function D.InitData()
 		[DK.HEAL       ] = GeneTypeNS(),                      -- 治疗统计
 		[DK.BE_HEAL    ] = GeneTypeNS(),                      -- 承疗统计
 		[DK.BE_DAMAGE  ] = GeneTypeNS(),                      -- 承伤统计
+		[DK.ABSORB     ] = GeneTypeNS(),                      -- 化解统计
 		[DK.EVERYTHING ] = {},                                -- 战斗复盘
 	}
 end
@@ -1413,18 +1423,18 @@ LIB.RegisterEvent('SYS_MSG', function()
 			D.OnSkillEffect(arg1, arg2, arg4, arg5, arg6, SKILL_RESULT.HIT, arg8, arg9)
 		end
 		-- 盾化解伤害补偿至盾提供者的治疗量
-		-- if arg9[SKILL_RESULT_TYPE.ABSORB_DAMAGE] then
-		-- 	tAbsorbInfo = ABSORB_CACHE[arg2]
-		-- 	if tAbsorbInfo then
-		-- 		D.OnSkillEffect(
-		-- 			tAbsorbInfo.dwSrcID, arg2,
-		-- 			tAbsorbInfo.nEffectType, tAbsorbInfo.dwEffectID, tAbsorbInfo.dwEffectLevel,
-		-- 			SKILL_RESULT.ABSORB, 1, {
-		-- 				[SKILL_RESULT_TYPE.THERAPY] = arg9[SKILL_RESULT_TYPE.ABSORB_DAMAGE],
-		-- 				[SKILL_RESULT_TYPE.EFFECTIVE_THERAPY] = arg9[SKILL_RESULT_TYPE.ABSORB_DAMAGE],
-		-- 			})
-		-- 	end
-		-- end
+		if arg9[SKILL_RESULT_TYPE.ABSORB_DAMAGE] then
+			tAbsorbInfo = ABSORB_CACHE[arg2]
+			if tAbsorbInfo then
+				D.OnSkillEffect(
+					tAbsorbInfo.dwSrcID, arg2,
+					tAbsorbInfo.nEffectType, tAbsorbInfo.dwEffectID, tAbsorbInfo.dwEffectLevel,
+					SKILL_RESULT.ABSORB, 1, {
+						[SKILL_RESULT_TYPE.THERAPY] = arg9[SKILL_RESULT_TYPE.ABSORB_DAMAGE],
+						[SKILL_RESULT_TYPE.EFFECTIVE_THERAPY] = arg9[SKILL_RESULT_TYPE.ABSORB_DAMAGE],
+					})
+			end
+		end
 		-- end
 	elseif arg0 == 'UI_OME_SKILL_BLOCK_LOG' then
 		-- 格挡日志；
@@ -1521,22 +1531,22 @@ LIB.RegisterEvent('BUFF_UPDATE', function()
 	if not O.bEnable then
 		return
 	end
-	-- if arg4 == 9334 then -- 长歌盾·梅花三弄
-	-- 	tAbsorbInfo = ABSORB_CACHE[arg0]
-	-- 	if not tAbsorbInfo then
-	-- 		tAbsorbInfo = {}
-	-- 		ABSORB_CACHE[arg0] = tAbsorbInfo
-	-- 	end
-	-- 	if arg1 then
-	-- 		tAbsorbInfo.nEndFrame = GetLogicFrameCount()
-	-- 	else
-	-- 		tAbsorbInfo.dwSrcID = arg9
-	-- 		tAbsorbInfo.nEffectType = SKILL_EFFECT_TYPE.BUFF
-	-- 		tAbsorbInfo.dwEffectID = arg4
-	-- 		tAbsorbInfo.dwEffectLevel = 1
-	-- 		tAbsorbInfo.nEndFrame = nil
-	-- 	end
-	-- end
+	if arg4 == 9334 then -- 长歌盾·梅花三弄
+		tAbsorbInfo = ABSORB_CACHE[arg0]
+		if not tAbsorbInfo then
+			tAbsorbInfo = {}
+			ABSORB_CACHE[arg0] = tAbsorbInfo
+		end
+		if arg1 then
+			tAbsorbInfo.nEndFrame = GetLogicFrameCount()
+		else
+			tAbsorbInfo.dwSrcID = arg9
+			tAbsorbInfo.nEffectType = SKILL_EFFECT_TYPE.BUFF
+			tAbsorbInfo.dwEffectID = arg4
+			tAbsorbInfo.dwEffectLevel = 1
+			tAbsorbInfo.nEndFrame = nil
+		end
+	end
 	-- buff update：
 	-- arg0：dwPlayerID，arg1：bDelete，arg2：nIndex，arg3：bCanCancel
 	-- arg4：dwBuffID，arg5：nStackNum，arg6：nEndFrame，arg7：？update all?

@@ -69,6 +69,7 @@ local D = {}
 local O = {}
 local SZ_INI = PLUGIN_ROOT .. '/ui/MY_Recount_DT.ini'
 local STAT_TYPE = MY_Recount.STAT_TYPE
+local STAT_TYPE_LIST = MY_Recount.STAT_TYPE_LIST
 local STAT_TYPE_KEY = MY_Recount.STAT_TYPE_KEY
 local STAT_TYPE_NAME = MY_Recount.STAT_TYPE_NAME
 local SKILL_RESULT = MY_Recount.SKILL_RESULT
@@ -533,11 +534,11 @@ function MY_Recount_DT.OnItemRButtonClick()
 		local szKey = this.szKey
 		local menu = {}
 		menu.x, menu.y = Cursor.GetPos(true)
-		for _, nChannel in ipairs({ STAT_TYPE.DPS, STAT_TYPE.HPS, STAT_TYPE.BDPS, STAT_TYPE.BHPS }) do
+		for _, k in ipairs(STAT_TYPE_LIST) do
 			insert(menu, {
-				szOption = STAT_TYPE_NAME[nChannel],
+				szOption = STAT_TYPE_NAME[STAT_TYPE[k]],
 				fnAction = function()
-					Wnd.OpenWindow(SZ_INI, 'MY_Recount_DT#' .. szKey .. '_' .. nChannel)
+					Wnd.OpenWindow(SZ_INI, 'MY_Recount_DT#' .. szKey .. '_' .. STAT_TYPE[k])
 				end,
 			})
 		end

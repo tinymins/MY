@@ -6,6 +6,8 @@ return {
     ['current fight'] = '当前统计',
     ['fight recount'] = '战斗统计',
 
+    ['Absorb statistics'] = '化解统计',
+
     ['switch recount mode'] = '切换统计类型',
     ['filter short fight'] = '过滤短时战斗',
     ['no time limit'] = '无时间限制',

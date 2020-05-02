@@ -73,18 +73,35 @@ local STAT_TYPE = { -- 统计类型
 	HPS  = 2, -- 治疗统计
 	BDPS = 3, -- 承伤统计
 	BHPS = 4, -- 承疗统计
+	APS  = 5, -- 化解统计
+}
+local STAT_TYPE_LIST = {
+	'DPS' , -- 输出统计
+	'HPS' , -- 治疗统计
+	'BDPS', -- 承伤统计
+	'BHPS', -- 承疗统计
+	'APS' , -- 化解统计
 }
 local STAT_TYPE_KEY = { -- 统计类型数组名
 	[STAT_TYPE.DPS ] = DK.DAMAGE,
 	[STAT_TYPE.HPS ] = DK.HEAL,
 	[STAT_TYPE.BDPS] = DK.BE_DAMAGE,
 	[STAT_TYPE.BHPS] = DK.BE_HEAL,
+	[STAT_TYPE.APS ] = DK.ABSORB,
 }
 local STAT_TYPE_NAME = {
 	[STAT_TYPE.DPS ] = g_tStrings.STR_DAMAGE_STATISTIC    , -- 伤害统计
 	[STAT_TYPE.HPS ] = g_tStrings.STR_THERAPY_STATISTIC   , -- 治疗统计
 	[STAT_TYPE.BDPS] = g_tStrings.STR_BE_DAMAGE_STATISTIC , -- 承伤统计
 	[STAT_TYPE.BHPS] = g_tStrings.STR_BE_THERAPY_STATISTIC, -- 承疗统计
+	[STAT_TYPE.APS ] = _L['Absorb statistics']            , -- 化解统计
+}
+local STAT_TYPE_UNIT = {
+	[STAT_TYPE.DPS ] = 'DPS',
+	[STAT_TYPE.HPS ] = 'HPS',
+	[STAT_TYPE.BDPS] = 'DPS',
+	[STAT_TYPE.BHPS] = 'HPS',
+	[STAT_TYPE.APS ] = 'APS',
 }
 local IMPORTANT_EFFECT = {
 	[SKILL_EFFECT_TYPE.SKILL .. ',371,1'] = true, -- 镇山河
@@ -663,8 +680,10 @@ local settings = {
 				StatSkillContainsImportantEffect = D.StatSkillContainsImportantEffect,
 				StatTargetContainsImportantEffect = D.StatTargetContainsImportantEffect,
 				STAT_TYPE = STAT_TYPE,
+				STAT_TYPE_LIST = STAT_TYPE_LIST,
 				STAT_TYPE_KEY = STAT_TYPE_KEY,
 				STAT_TYPE_NAME = STAT_TYPE_NAME,
+				STAT_TYPE_UNIT = STAT_TYPE_UNIT,
 				PUBLISH_MODE = PUBLISH_MODE,
 				SKILL_RESULT = SKILL_RESULT,
 				SKILL_RESULT_NAME = SKILL_RESULT_NAME,

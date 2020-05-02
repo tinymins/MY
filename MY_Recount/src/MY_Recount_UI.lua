@@ -71,7 +71,9 @@ local DISPLAY_MODE = { -- 统计显示
 }
 local SZ_INI = PLUGIN_ROOT .. '/ui/MY_Recount_UI.ini'
 local STAT_TYPE = MY_Recount.STAT_TYPE
+local STAT_TYPE_LIST = MY_Recount.STAT_TYPE_LIST
 local STAT_TYPE_KEY = MY_Recount.STAT_TYPE_KEY
+local STAT_TYPE_UNIT = MY_Recount.STAT_TYPE_UNIT
 local STAT_TYPE_NAME = MY_Recount.STAT_TYPE_NAME
 local SKILL_RESULT = MY_Recount.SKILL_RESULT
 local SKILL_RESULT_NAME = MY_Recount.SKILL_RESULT_NAME
@@ -243,17 +245,15 @@ function D.UpdateUI(frame)
 	end
 
 	-- 获取统计数据
-	local tInfo, szUnit
-	if MY_Recount_UI.nChannel == STAT_TYPE.DPS then       -- 伤害统计
-		tInfo, szUnit = data[DK.DAMAGE], 'DPS'
-	elseif MY_Recount_UI.nChannel == STAT_TYPE.HPS then   -- 治疗统计
-		tInfo, szUnit = data[DK.HEAL], 'HPS'
-	elseif MY_Recount_UI.nChannel == STAT_TYPE.BDPS then  -- 承伤统计
-		tInfo, szUnit = data[DK.BE_DAMAGE], 'DPS'
-	elseif MY_Recount_UI.nChannel == STAT_TYPE.BHPS then  -- 承疗统计
-		tInfo, szUnit = data[DK.BE_HEAL], 'HPS'
+	local eDKKey = STAT_TYPE_KEY[MY_Recount_UI.nChannel]
+	if not eDKKey then
+		return
 	end
-	local tRecord = tInfo[DK_REC.STAT]
+	local tData = data[eDKKey]
+	if not tData then
+		return
+	end
+	local tRecord, szUnit = tData[DK_REC.STAT], STAT_TYPE_UNIT[MY_Recount_UI.nChannel]
 
 	-- 计算战斗时间
 	local eTimeChannel = MY_Recount_UI.bSysTimeMode and STAT_TYPE_KEY[MY_Recount_UI.nChannel]
@@ -672,25 +672,19 @@ end
 function D.OnLButtonClick()
 	local name = this:GetName()
 	if name == 'Btn_Right' then
-		if MY_Recount_UI.nChannel == STAT_TYPE.DPS then
-			MY_Recount_UI.nChannel = STAT_TYPE.HPS
-		elseif MY_Recount_UI.nChannel == STAT_TYPE.HPS then
-			MY_Recount_UI.nChannel = STAT_TYPE.BDPS
-		elseif MY_Recount_UI.nChannel == STAT_TYPE.BDPS then
-			MY_Recount_UI.nChannel = STAT_TYPE.BHPS
-		elseif MY_Recount_UI.nChannel == STAT_TYPE.BHPS then
-			MY_Recount_UI.nChannel = STAT_TYPE.DPS
+		for i, v in ipairs(STAT_TYPE_LIST) do
+			if STAT_TYPE[v] == MY_Recount_UI.nChannel then
+				MY_Recount_UI.nChannel = STAT_TYPE[STAT_TYPE_LIST[((i + 1) - 1) % #STAT_TYPE_LIST + 1]]
+				break
+			end
 		end
 		D.DrawUI(this:GetRoot())
 	elseif name == 'Btn_Left' then
-		if MY_Recount_UI.nChannel == STAT_TYPE.HPS then
-			MY_Recount_UI.nChannel = STAT_TYPE.DPS
-		elseif MY_Recount_UI.nChannel == STAT_TYPE.BDPS then
-			MY_Recount_UI.nChannel = STAT_TYPE.HPS
-		elseif MY_Recount_UI.nChannel == STAT_TYPE.BHPS then
-			MY_Recount_UI.nChannel = STAT_TYPE.BDPS
-		elseif MY_Recount_UI.nChannel == STAT_TYPE.DPS then
-			MY_Recount_UI.nChannel = STAT_TYPE.BHPS
+		for i, v in ipairs(STAT_TYPE_LIST) do
+			if STAT_TYPE[v] == MY_Recount_UI.nChannel then
+				MY_Recount_UI.nChannel = STAT_TYPE[STAT_TYPE_LIST[((i - 1) + #STAT_TYPE_LIST - 1) % #STAT_TYPE_LIST + 1]]
+				break
+			end
 		end
 		D.DrawUI(this:GetRoot())
 	elseif name == 'Btn_Option' then
