@@ -2852,6 +2852,9 @@ local SKILL_CACHE = setmetatable({}, { __mode = 'v' })
 local SKILL_PROXY = setmetatable({}, { __mode = 'v' })
 local function reject() assert(false, 'Modify skill info from LIB.GetSkill is forbidden!') end
 function LIB.GetSkill(dwID, nLevel)
+	if nLevel == 0 then
+		return
+	end
 	local KSkill = GetSkill(dwID, nLevel)
 	if not KSkill then
 		return
