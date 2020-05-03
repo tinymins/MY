@@ -208,7 +208,7 @@ local menu = {
 	fnAction = function()
 		LIB.ShowPanel()
 		LIB.FocusPanel()
-		LIB.SwitchTab('MY_Anmerkungen')
+		LIB.SwitchTab('MY_Anmerkungen_Player_Note')
 	end,
 }
 LIB.RegisterAddonMenu('MY_Anmerkungen_PlayerNotes', menu)
@@ -535,4 +535,4 @@ end
 function PS.OnPanelDeactive()
 	_C.list = nil
 end
-LIB.RegisterPanel( 'MY_Anmerkungen_Player_Note', _L['player note'], _L['Target'], 'ui/Image/button/ShopButton.UITex|12', PS)
+LIB.RegisterPanel('MY_Anmerkungen_Player_Note', _L['player note'], _L['Target'], 'ui/Image/button/ShopButton.UITex|12', PS)
