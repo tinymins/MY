@@ -454,6 +454,9 @@ function D.DrawScrollContainer(scroll, top, menu, nLevel, bInlineContainer)
 end
 
 function D.DrawWnd(wnd, top, menu, nLevel)
+	--[[#DEBUG BEGIN]]
+	LIB.Debug(PLUGIN_NAME, 'Draw wnd at level ' .. nLevel, DEBUG_LEVEL.LOG)
+	--[[#DEBUG END]]
 	-- ªÊ÷∆¡–±Ì
 	local scroll = wnd:Lookup('WndScroll_Menu')
 	local container = scroll:Lookup('WndContainer_Menu')
