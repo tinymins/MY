@@ -366,42 +366,42 @@ local SKILL_RESULT_NAME = {
 	[SKILL_RESULT.INSIGHT ] = g_tStrings.STR_MSG_INSIGHT  ,
 	[SKILL_RESULT.ABSORB  ] = g_tStrings.STR_MSG_ABSORB   ,
 }
-local ABSORB_BUFF = LIB.FlipObjectKV({
-	134, -- 坐忘无我_紫霞
-	1754, -- 藏剑_西子情_泉凝月_月凝
-	4244, -- 明教_渡厄力_吸收盾
-	4400, -- 明教_圣明佑_生命转吸收盾
-	4719, -- 明教_渡厄力_体质转伤害吸收
-	5135, -- 气纯特殊武器_群体蛋壳
-	5735, -- 藏剑_泉凝月
-	6223, -- 五毒_奇穴_治疗吸收盾
-	6224, -- 五毒_奇穴_格挡伤害
-	8253, -- 盾压_雄峦伤害吸收盾
-	8279, -- 盾壁
-	8291, -- 盾护伤害吸收盾
-	8292, -- 盾壁加强版
-	8515, -- 蝶息_20%伤害吸收盾
-	9584, -- 梅花三弄被动一次性5%伤害吸收盾
-	10266, -- 长歌_梅花三弄
-	11187, -- 苍云特殊武器_斗气加护
-	11530, -- 峰值_变身加盾
-	15415, -- 新附魔T衣服伤害吸收盾
-	15415, -- 新附魔T衣服伤害吸收盾凌雪藏锋
-	15948, -- 孤影伤害吸收盾
-	16441, -- 少林特殊武器_佛化金身
-	16568, -- 五毒新版特殊武器_无支祁护盾
-	16721, -- 元旦活动_武器技能_护盾
-	16877, -- 少林特殊武器_金刚护生
-	16882, -- 少林特殊武器_心印加身中性吸收盾
-	16883, -- 少林特殊武器_心印加身阴性吸收盾
-	16884, -- 少林特殊武器_心印加身阳性吸收盾
-	16911, -- 长歌特殊武器_梅花大盾
-	17015, -- 月斜星楼护盾
-	17028, -- 金戈秘籍护盾
-	17047, -- 蟾蜍韧性盾
-	17094, -- 物化天行吸收盾
-	9334, -- 梅花三弄
-})
+local ABSORB_BUFF = {
+	[134  ] = 9999, -- 坐忘无我_紫霞
+	[1754 ] = 9999, -- 藏剑_西子情_泉凝月_月凝
+	[4244 ] = 9999, -- 明教_渡厄力_吸收盾
+	[4400 ] = 9999, -- 明教_圣明佑_生命转吸收盾
+	[4719 ] = 9999, -- 明教_渡厄力_体质转伤害吸收
+	[5135 ] = 9999, -- 气纯特殊武器_群体蛋壳
+	[5735 ] = 9999, -- 藏剑_泉凝月
+	[6223 ] = 9999, -- 五毒_奇穴_治疗吸收盾
+	[6224 ] = 9999, -- 五毒_奇穴_格挡伤害
+	[8253 ] = 9999, -- 盾压_雄峦伤害吸收盾
+	[8279 ] = 9999, -- 盾壁
+	[8291 ] = 9999, -- 盾护伤害吸收盾
+	[8292 ] = 9999, -- 盾壁加强版
+	[8515 ] = 9999, -- 蝶息_20%伤害吸收盾
+	[9584 ] = 9999, -- 梅花三弄被动一次性5%伤害吸收盾
+	[10266] = 9999, -- 长歌_梅花三弄
+	[11187] = 9999, -- 苍云特殊武器_斗气加护
+	[11530] = 9999, -- 峰值_变身加盾
+	[15415] = 9999, -- 新附魔T衣服伤害吸收盾
+	[15415] = 9999, -- 新附魔T衣服伤害吸收盾凌雪藏锋
+	[15948] = 9999, -- 孤影伤害吸收盾
+	[16441] = 9999, -- 少林特殊武器_佛化金身
+	[16568] = 9999, -- 五毒新版特殊武器_无支祁护盾
+	[16721] = 9999, -- 元旦活动_武器技能_护盾
+	[16877] = 9999, -- 少林特殊武器_金刚护生
+	[16882] = 9999, -- 少林特殊武器_心印加身中性吸收盾
+	[16883] = 9999, -- 少林特殊武器_心印加身阴性吸收盾
+	[16884] = 9999, -- 少林特殊武器_心印加身阳性吸收盾
+	[16911] = 9999, -- 长歌特殊武器_梅花大盾
+	[17015] = 9999, -- 月斜星楼护盾
+	[17028] = 9999, -- 金戈秘籍护盾
+	[17047] = 9999, -- 蟾蜍韧性盾
+	[17094] = 9999, -- 物化天行吸收盾
+	[9334 ] = 9998, -- 梅花三弄
+}
 local AWAYTIME_TYPE = {
 	DEATH          = 0,
 	OFFLINE        = 1,
@@ -1571,9 +1571,12 @@ end
 
 
 -- 系统BUFF监控（数据源）
-do local nAbsorb, aAbsorbInfo, tAbsorbInfo
+do local nAbsorbPriority, nLFC, aAbsorbInfo, tAbsorbInfo
 local function AbsorbSorter(p1, p2)
-	return ABSORB_BUFF[p1.dwViaID] > ABSORB_BUFF[p2.dwViaID]
+	if p1.nPriority == p2.nPriority then
+		return p1.dwInitTime < p2.dwInitTime
+	end
+	return p1.nPriority > p2.nPriority
 end
 LIB.RegisterEvent('BUFF_UPDATE', function()
 	-- local owner, bdelete, index, cancancel, id  , stacknum, endframe, binit, level, srcid, isvalid, leftframe
@@ -1581,8 +1584,8 @@ LIB.RegisterEvent('BUFF_UPDATE', function()
 	if not O.bEnable then
 		return
 	end
-	nAbsorb = ABSORB_BUFF[arg4]
-	if nAbsorb then -- BUFF盾
+	nAbsorbPriority = ABSORB_BUFF[arg4]
+	if nAbsorbPriority then -- BUFF盾
 		aAbsorbInfo = ABSORB_CACHE[arg0]
 		if not aAbsorbInfo then
 			aAbsorbInfo = {}
@@ -1595,22 +1598,29 @@ LIB.RegisterEvent('BUFF_UPDATE', function()
 				break
 			end
 		end
+		nLFC = GetLogicFrameCount()
 		if arg1 then
 			if tAbsorbInfo then
-				tAbsorbInfo.nEndFrame = GetLogicFrameCount()
+				tAbsorbInfo.nEndFrame = nLFC
 			end
 		else
 			if not tAbsorbInfo then
 				tAbsorbInfo = {
-					dwViaID = arg4
+					nPriority = nAbsorbPriority,
+					dwViaID = arg4,
+					dwInitTime = nLFC,
 				}
 				insert(aAbsorbInfo, tAbsorbInfo)
+				sort(aAbsorbInfo, AbsorbSorter)
+			end
+			if arg7 then
+				tAbsorbInfo.dwInitTime = nLFC
 				sort(aAbsorbInfo, AbsorbSorter)
 			end
 			tAbsorbInfo.dwSrcID = arg9
 			tAbsorbInfo.nEffectType = SKILL_EFFECT_TYPE.BUFF
 			tAbsorbInfo.dwEffectID = arg4
-			tAbsorbInfo.dwEffectLevel = 1
+			tAbsorbInfo.dwEffectLevel = arg8
 			tAbsorbInfo.nEndFrame = arg6
 		end
 	end
