@@ -636,7 +636,9 @@ LIB.RegisterPanel('MY_ThreatRank', g_tStrings.HATRED_COLLECT, _L['Target'], 632,
 do
 local function GetMenu()
 	return {
-		szOption = g_tStrings.HATRED_COLLECT, bCheck = true, bChecked = _TS.GetFrame(), fnAction = function()
+		szOption = g_tStrings.HATRED_COLLECT,
+		bCheck = true, bChecked = not not _TS.GetFrame(),
+		fnAction = function()
 			TS.bInDungeon = false
 			if not _TS.GetFrame() then -- 这样才对嘛  按按钮应该强制开启和关闭
 				TS.bEnable = true
