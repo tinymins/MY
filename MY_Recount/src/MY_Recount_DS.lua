@@ -366,6 +366,42 @@ local SKILL_RESULT_NAME = {
 	[SKILL_RESULT.INSIGHT ] = g_tStrings.STR_MSG_INSIGHT  ,
 	[SKILL_RESULT.ABSORB  ] = g_tStrings.STR_MSG_ABSORB   ,
 }
+local ABSORB_BUFF = LIB.FlipObjectKV({
+	134, -- 坐忘无我_紫霞
+	1754, -- 藏剑_西子情_泉凝月_月凝
+	4244, -- 明教_渡厄力_吸收盾
+	4400, -- 明教_圣明佑_生命转吸收盾
+	4719, -- 明教_渡厄力_体质转伤害吸收
+	5135, -- 气纯特殊武器_群体蛋壳
+	5735, -- 藏剑_泉凝月
+	6223, -- 五毒_奇穴_治疗吸收盾
+	6224, -- 五毒_奇穴_格挡伤害
+	8253, -- 盾压_雄峦伤害吸收盾
+	8279, -- 盾壁
+	8291, -- 盾护伤害吸收盾
+	8292, -- 盾壁加强版
+	8515, -- 蝶息_20%伤害吸收盾
+	9584, -- 梅花三弄被动一次性5%伤害吸收盾
+	10266, -- 长歌_梅花三弄
+	11187, -- 苍云特殊武器_斗气加护
+	11530, -- 峰值_变身加盾
+	15415, -- 新附魔T衣服伤害吸收盾
+	15415, -- 新附魔T衣服伤害吸收盾凌雪藏锋
+	15948, -- 孤影伤害吸收盾
+	16441, -- 少林特殊武器_佛化金身
+	16568, -- 五毒新版特殊武器_无支祁护盾
+	16721, -- 元旦活动_武器技能_护盾
+	16877, -- 少林特殊武器_金刚护生
+	16882, -- 少林特殊武器_心印加身中性吸收盾
+	16883, -- 少林特殊武器_心印加身阴性吸收盾
+	16884, -- 少林特殊武器_心印加身阳性吸收盾
+	16911, -- 长歌特殊武器_梅花大盾
+	17015, -- 月斜星楼护盾
+	17028, -- 金戈秘籍护盾
+	17047, -- 蟾蜍韧性盾
+	17094, -- 物化天行吸收盾
+	9334, -- 梅花三弄
+})
 local AWAYTIME_TYPE = {
 	DEATH          = 0,
 	OFFLINE        = 1,
@@ -399,7 +435,7 @@ local DS_ROOT = {'userdata/fight_stat/', PATH_TYPE.ROLE}
 local SZ_CFG_FILE = {'userdata/fight_stat/config.jx3dat', PATH_TYPE.ROLE}
 local SKILL_EFFECT_CACHE = {} -- 最近的技能效果缓存 （进战时候将最近的数据压进来）
 local BUFF_UPDATE_CACHE = {} -- 最近的BUFF效果缓存 （进战时候将最近的数据压进来）
-local ABSORB_CACHE = {} -- 目标盾来源缓存表 如长歌梅花三弄
+local ABSORB_CACHE = {} -- 目标盾来源与状态缓存表
 local LOG_REPLAY_FRAME = GLOBAL.GAME_FPS * 1 -- 进战时候将多久的数据压进来（逻辑帧）
 local SKILL_TYPE = CONSTANT.SKILL_TYPE
 
@@ -924,6 +960,9 @@ function D.GetEffectNameAusID(data, szChannel, szEffectID)
 			if szChannel == DK.HEAL or szChannel == DK.BE_HEAL then
 				return info[1] .. '(HOT)'
 			end
+			if szChannel == DK.ABSORB then
+				return info[1]
+			end
 			return info[1] .. '(DOT)'
 		end
 		return info[1]
@@ -1395,7 +1434,7 @@ function D.Flush()
 end
 
 -- 系统日志监控（数据源）
-do local tAbsorbInfo
+do local aAbsorbInfo, nLFC
 LIB.RegisterEvent('SYS_MSG', function()
 	if not O.bEnable then
 		return
@@ -1424,15 +1463,21 @@ LIB.RegisterEvent('SYS_MSG', function()
 		end
 		-- 盾化解伤害补偿至盾提供者的治疗量
 		if arg9[SKILL_RESULT_TYPE.ABSORB_DAMAGE] then
-			tAbsorbInfo = ABSORB_CACHE[arg2]
-			if tAbsorbInfo then
-				D.OnSkillEffect(
-					tAbsorbInfo.dwSrcID, arg2,
-					tAbsorbInfo.nEffectType, tAbsorbInfo.dwEffectID, tAbsorbInfo.dwEffectLevel,
-					SKILL_RESULT.ABSORB, 1, {
-						[SKILL_RESULT_TYPE.THERAPY] = arg9[SKILL_RESULT_TYPE.ABSORB_DAMAGE],
-						[SKILL_RESULT_TYPE.EFFECTIVE_THERAPY] = arg9[SKILL_RESULT_TYPE.ABSORB_DAMAGE],
-					})
+			aAbsorbInfo = ABSORB_CACHE[arg2]
+			nLFC = GetLogicFrameCount()
+			if aAbsorbInfo then
+				for _, tAbsorbInfo in ipairs(aAbsorbInfo) do
+					if tAbsorbInfo.nEndFrame >= nLFC then
+						D.OnSkillEffect(
+							tAbsorbInfo.dwSrcID, arg2,
+							tAbsorbInfo.nEffectType, tAbsorbInfo.dwEffectID, tAbsorbInfo.dwEffectLevel,
+							SKILL_RESULT.ABSORB, 1, {
+								[SKILL_RESULT_TYPE.THERAPY] = arg9[SKILL_RESULT_TYPE.ABSORB_DAMAGE],
+								[SKILL_RESULT_TYPE.EFFECTIVE_THERAPY] = arg9[SKILL_RESULT_TYPE.ABSORB_DAMAGE],
+							})
+						break
+					end
+				end
 			end
 		end
 		-- end
@@ -1526,25 +1571,47 @@ end
 
 
 -- 系统BUFF监控（数据源）
-do local tAbsorbInfo
+do local nAbsorb, aAbsorbInfo, tAbsorbInfo
+local function AbsorbSorter(p1, p2)
+	return ABSORB_BUFF[p1.dwViaID] > ABSORB_BUFF[p2.dwViaID]
+end
 LIB.RegisterEvent('BUFF_UPDATE', function()
+	-- local owner, bdelete, index, cancancel, id  , stacknum, endframe, binit, level, srcid, isvalid, leftframe
+	--     = arg0 , arg1   , arg2 , arg3     , arg4, arg5    , arg6    , arg7 , arg8 , arg9 , arg10  , arg11
 	if not O.bEnable then
 		return
 	end
-	if arg4 == 9334 then -- 长歌盾·梅花三弄
-		tAbsorbInfo = ABSORB_CACHE[arg0]
-		if not tAbsorbInfo then
-			tAbsorbInfo = {}
-			ABSORB_CACHE[arg0] = tAbsorbInfo
+	nAbsorb = ABSORB_BUFF[arg4]
+	if nAbsorb then -- BUFF盾
+		aAbsorbInfo = ABSORB_CACHE[arg0]
+		if not aAbsorbInfo then
+			aAbsorbInfo = {}
+			ABSORB_CACHE[arg0] = aAbsorbInfo
+		end
+		tAbsorbInfo = nil
+		for _, v in ipairs(aAbsorbInfo) do
+			if v.dwViaID == arg4 then
+				tAbsorbInfo = v
+				break
+			end
 		end
 		if arg1 then
-			tAbsorbInfo.nEndFrame = GetLogicFrameCount()
+			if tAbsorbInfo then
+				tAbsorbInfo.nEndFrame = GetLogicFrameCount()
+			end
 		else
+			if not tAbsorbInfo then
+				tAbsorbInfo = {
+					dwViaID = arg4
+				}
+				insert(aAbsorbInfo, tAbsorbInfo)
+				sort(aAbsorbInfo, AbsorbSorter)
+			end
 			tAbsorbInfo.dwSrcID = arg9
 			tAbsorbInfo.nEffectType = SKILL_EFFECT_TYPE.BUFF
 			tAbsorbInfo.dwEffectID = arg4
 			tAbsorbInfo.dwEffectLevel = 1
-			tAbsorbInfo.nEndFrame = nil
+			tAbsorbInfo.nEndFrame = arg6
 		end
 	end
 	-- buff update：
