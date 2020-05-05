@@ -967,6 +967,9 @@ local CONSTANT = setmetatable({}, {
 		NPC_NAME_FIX = {
 			[58294] = 62347, -- 剑出鸿蒙
 		},
+		NPC_HIDDEN = {
+			[60045] = true, -- 辉天堑铁库牢房的不知道什么东西
+		},
 		DOODAD_NAME = {},
 		DOODAD_NAME_FIX = {},
 		-- skillid, uitex, frame

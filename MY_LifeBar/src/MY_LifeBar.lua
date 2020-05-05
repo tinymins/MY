@@ -86,7 +86,8 @@ end
 end
 -----------------------------------------------------------------------------------------
 
-local _L, D = LIB.LoadLangPack(PACKET_INFO.ROOT .. 'MY_LifeBar/lang/'), {}
+local D = {}
+local NPC_HIDDEN = CONSTANT.NPC_HIDDEN
 local LB_CACHE = {}
 local TONG_NAME_CACHE = {}
 local NPC_CACHE = {}
@@ -456,6 +457,7 @@ function CheckInvalidRect(dwType, dwID, me, object)
 	and (
 		not Config.bShowSpecialNpc or (bShieldedVersion and not LIB.IsInDungeon())
 		or (Config.bShowSpecialNpcOnlyEnemy and not IsEnemy(me.dwID, dwID))
+		or NPC_HIDDEN[object.dwTemplateID]
 	) then
 		bVisible = false
 	end
