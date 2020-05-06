@@ -44,7 +44,7 @@ local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAD
 local _L = LIB.LoadLangPack()
 -----------------------------------------------------------------------------------------------------------
 -- 测试用（请求共享位置）
-LIB.RegisterBgMsg('ASK_CURRENT_LOC', function(_, nChannel, dwTalkerID, szTalkerName, bSelf)
+LIB.RegisterBgMsg('ASK_CURRENT_LOC', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
 	if bSelf then
 		return
 	end
