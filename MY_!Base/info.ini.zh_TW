@@ -32,4 +32,5 @@ lua_25=src\MY_Serendipity.lua
 lua_26=src\MY_BgMsgCenter.lua
 lua_27=src\MY_HoverEntry.lua
 lua_28=src\MY_Web.lua
+lua_29=src\MY_Bidding.lua
 package=MY

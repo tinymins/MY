@@ -489,4 +489,14 @@ return {
 	['Size: %d'] = '大小：%d',
 
 	['Streaming client does not support export!'] = '云端客户端不支持导出功能！',
+
+	-- MY_Bidding
+	['You are not distributer!'] = '你不是分配者！',
+	['Please unlock safety talk lock first!'] = '请先解除聊天锁。',
+	['Bidding item:'] = '拍卖物品：',
+	['Min price:'] = '最低出价：',
+	['Min price step:'] = '最小加价：',
+	['Target bidding number:'] = '目标人数：',
+	['Sure'] = '确定',
+	['Cancel'] = '取消',
 }
