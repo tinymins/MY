@@ -3,6 +3,9 @@ return {
     -- MY_ChatMonitor.lua
     ['MY_ChatMonitor'] = '聊天监控',
     ['Enable'] = '启用',
+    ['Delete'] = '删除',
+    ['Add'] = '添加',
+    ['Please input keyword:'] = '请输入监控关键字：',
     ['Click to config monitors'] = '点击配置监控项',
     ['waiting...'] = '等待中…',
     ['load preset'] = '加载预设',

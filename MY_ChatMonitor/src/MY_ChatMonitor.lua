@@ -445,7 +445,7 @@ function PS.OnPanelActive(wnd)
         text = _L['Click to config monitors'],
         menu = function()
             local menu = {}
-            for _, p in ipairs(KEYWORD_LIST) do
+            for i, p in ipairs(KEYWORD_LIST) do
                 local m = LIB.GetMsgTypeMenu(function(szChannel)
                     p.tChannel[szChannel] = not p.tChannel[szChannel]
                     D.SaveConfig()
@@ -491,10 +491,40 @@ function PS.OnPanelActive(wnd)
                     end,
                     fnDisable = function() return not p.bEnable end,
                 })
+                insert(m, {
+                    szOption = _L['Delete'],
+                    fnAction = function()
+                        remove(KEYWORD_LIST, i)
+                        D.SaveConfig()
+                        D.RegisterMsgMonitor()
+                    end,
+                })
                 m.szOption = p.szKeyword
                 insert(menu, m)
-                return menu
             end
+            if #menu > 0 then
+                insert(menu, CONSTANT.MENU_DIVIDER)
+            end
+            insert(menu, {
+                szOption = _L['Add'],
+                fnAction = function()
+                    GetUserInput(_L['Please input keyword:'], function(szText)
+                        szText = LIB.TrimString(szText)
+                        if IsEmpty(szText) then
+                            return
+                        end
+                        insert(KEYWORD_LIST, {
+                            szKeyword = szText,
+                            tChannel = Clone(DEFAULE_CHANNEL),
+                            bEnable = true,
+                            bIsRegexp = false,
+                        })
+                        D.SaveConfig()
+                        D.RegisterMsgMonitor()
+                    end)
+                end,
+            })
+            return menu
         end,
     })
 
