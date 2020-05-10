@@ -109,32 +109,59 @@ function D.EditToConfig(edit, tConfig)
 	end
 end
 
-function D.ConfigToEdit(edit, tConfig)
-	edit:ClearText()
+function D.ConfigToEditStruct(tConfig)
+	local aStruct = {}
 	if tConfig.nBookID then
-		local text = '[' .. LIB.GetObjectName('ITEM_INFO', tConfig.dwTabType, tConfig.dwTabIndex, tConfig.nBookID) .. ']'
-		edit:InsertObj(text, {
+		insert(aStruct, {
 			type = 'book',
 			version = 0,
-			text = text,
+			text = '[' .. LIB.GetObjectName('ITEM_INFO', tConfig.dwTabType, tConfig.dwTabIndex, tConfig.nBookID) .. ']',
 			tabtype = tConfig.dwTabType,
 			index = tConfig.dwTabIndex,
 			bookinfo = tConfig.nBookID,
 		})
-		edit:InsertText('x' .. (tConfig.nCount or 1))
+		if tConfig.nCount and tConfig.nCount > 1 then
+			insert(aStruct, {
+				type = 'text',
+				text = ' x' .. tConfig.nCount,
+			})
+		end
 	elseif tConfig.dwTabType then
-		local text = '[' .. LIB.GetObjectName('ITEM_INFO', tConfig.dwTabType, tConfig.dwTabIndex) .. ']'
-		edit:InsertObj(text, {
+		insert(aStruct, {
 			type = 'iteminfo',
 			version = 0,
-			text = text,
+			text = '[' .. LIB.GetObjectName('ITEM_INFO', tConfig.dwTabType, tConfig.dwTabIndex) .. ']',
 			tabtype = tConfig.dwTabType,
 			index = tConfig.dwTabIndex,
 		})
-		edit:InsertText('x' .. (tConfig.nCount or 1))
+		if tConfig.nCount and tConfig.nCount > 1 then
+			insert(aStruct, {
+				type = 'text',
+				text = ' x' .. tConfig.nCount,
+			})
+		end
 	elseif tConfig.szItem then
-		edit:InsertText(tConfig.szItem)
+		insert(aStruct, {
+			type = 'text',
+			text = tConfig.szItem,
+		})
 	end
+	return aStruct
+end
+
+function D.SetTextStruct(edit, aStruct)
+	edit:ClearText()
+	for _, p in ipairs(aStruct) do
+		if p.type == 'book' or p.type == 'iteminfo' then
+			edit:InsertObj(p.text, p)
+		elseif p.type == 'text' then
+			edit:InsertText(p.text)
+		end
+	end
+end
+
+function D.ConfigToEdit(edit, tConfig)
+	D.SetTextStruct(edit, D.ConfigToEditStruct(tConfig))
 end
 
 function D.GetQuickBiddingPrice(szKey)
@@ -380,7 +407,30 @@ function MY_BiddingBase.OnLButtonClick()
 	elseif name == 'WndButton_Bidding' then
 		local szKey = D.GetKey(frame)
 		local nPrice = D.GetQuickBiddingPrice(szKey)
+		local aSay = D.ConfigToEditStruct(BIDDING_CACHE[szKey].tConfig)
+		insert(aSay, { type = 'text', text = _L(' bidding for %d gold.', nPrice) })
 		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_BIDDING_ACTION', { szKey = szKey, nPrice = nPrice })
+		LIB.Talk(PLAYER_TALK_CHANNEL.RAID, aSay, nil, true)
+	elseif name == 'WndButton_Publish' then
+		local szKey = D.GetKey(frame)
+		local cache = BIDDING_CACHE[szKey]
+		local tConfig = cache.tConfig
+		local aRecord = D.GetRankRecord(cache.aRecord)
+		local aSay = D.ConfigToEditStruct(tConfig)
+		if #aRecord == 0 then
+			insert(aSay, { type = 'text', text = _L[' do not has vaild bidding price'] })
+		else
+			insert(aSay, { type = 'text', text = _L[' bidding valid prices: '] })
+			for i = 1, min(#aRecord, tConfig.nNumber) do
+				if i > 1 then
+					insert(aSay, { type = 'text', text = _L[','] })
+				end
+				insert(aSay, { type = 'name', name = aRecord[i].szTalkerName })
+				insert(aSay, { type = 'text', text = aRecord[i].nPrice .. _L[' gold'] })
+			end
+		end
+		insert(aSay, { type = 'text', text = _L['.'] })
+		LIB.Talk(PLAYER_TALK_CHANNEL.RAID, aSay, nil, true)
 	end
 end
 

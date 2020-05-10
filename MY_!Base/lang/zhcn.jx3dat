@@ -500,4 +500,10 @@ return {
 	['Sure'] = '确定',
 	['Cancel'] = '取消',
 	['Click to quick bidding at price '] = '点击快速出价：',
+	[' bidding for %d gold.'] = '出价%d金。',
+	[' do not has vaild bidding price'] = '当前尚无有效出价',
+	[' bidding valid prices: '] = '当前拍卖有效出价：',
+	[','] = '，',
+	[' gold'] = '金',
+	['.'] = '。',
 }
