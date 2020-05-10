@@ -535,7 +535,7 @@ function PS.OnPanelActive(wnd)
         x = 8, y = 10, w = 25, h = 25, alpha = 180,
         onhover = function(bIn) this:SetAlpha( (bIn and 255 ) or 180) end,
         onclick = function()
-            local szText = '<image>path="ui/Image/UICommon/Talk_Face.UITex" frame=25 w=24 h=24</image> <text>text=' .. EncodeComponentsString(_L['CHAT_MONITOR_TIP']) ..' font=207 </text>'
+            local szText = GetFormatText(_L['CHAT_MONITOR_TIP'], 162)
             local x, y = Cursor.GetPos()
             local w, h = this:GetSize()
             OutputTip(szText, 450, {x, y, w, h})
