@@ -385,8 +385,9 @@ function D.UpdatePrepareBarPos()
 	if MY_Cataclysm.bFold or D.GetGroupTotal() < 3 then
 		hPrepare:SetRelPos(0, -18)
 	else
-		local container = frame:Lookup('Container_Main')
-		hPrepare:SetRelPos(container:GetRelX() + container:GetW(), 3)
+		local wrapper = frame:Lookup('WndContainer_Wrapper')
+		local container = wrapper:Lookup('WndContainer_Main')
+		hPrepare:SetRelPos(wrapper:GetRelX() + container:GetW(), 3)
 	end
 	hTotal:FormatAllItemPos()
 end
@@ -409,17 +410,21 @@ function D.SetFrameSize(bEnter)
 		if CFG.nAutoLinkMode ~= 5 then
 			nGroupEx = 1
 		end
-		local container = frame:Lookup('Container_Main')
-		local fScaleX = max(nGroupEx == 1 and 1 or 0, CFG.fScaleX)
-		local minW = container:GetRelX() + container:GetW()
-		local w = max(128 * nGroupEx * fScaleX, minW + 30)
-		local h = select(2, frame:GetSize())
-		frame:SetW(w)
+		local wrapper = frame:Lookup('WndContainer_Wrapper')
+		local container = wrapper:Lookup('WndContainer_Main')
+		local nItemW = frame:Lookup('', 'Handle_ListW'):GetW() * CFG.fScaleX
+		local nMinW = wrapper:GetRelX() + container:GetW()
+		local nDragW = max(nItemW * nGroupEx, nMinW + 30)
+		local nDragH = select(2, frame:GetSize())
+		frame:SetW(nDragW)
+		frame:SetDragArea(0, 0, nDragW, nDragH)
+		local nBgW, nWrapperW = nDragW, container:GetW()
 		if not bEnter then
-			w = max(128 * fScaleX, minW)
+			nBgW = nItemW * nGroupEx -- max(nItemW, minW)
+			nWrapperW = nBgW - wrapper:GetRelX()
 		end
-		frame:SetDragArea(0, 0, w, h)
-		frame:Lookup('', 'Handle_BG/Image_Title_BG'):SetW(w)
+		wrapper:SetW(nWrapperW)
+		frame:Lookup('', 'Handle_BG/Image_Title_BG'):SetW(nBgW)
 		D.UpdatePrepareBarPos()
 	end
 end
@@ -430,7 +435,7 @@ function D.CreateControlBar()
 	local nLootMode    = team.nLootMode
 	local nRollQuality = team.nRollQuality
 	local frame        = D.GetFrame()
-	local container    = frame:Lookup('Container_Main')
+	local container    = frame:Lookup('WndContainer_Wrapper/WndContainer_Main')
 	local szIniFile    = INI_ROOT .. 'MY_CataclysmMain_Button.ini'
 	container:Clear()
 	-- 团队工具 团队告示
