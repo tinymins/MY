@@ -411,6 +411,9 @@ function MY_BiddingBase.OnLButtonClick()
 	local name = this:GetName()
 	local frame = this:GetRoot()
 	if name == 'Btn_Close' then
+		if LIB.IsDistributer() then
+			return LIB.Systopmsg(_L['You are distributer, Please finish this bidding!'])
+		end
 		Wnd.CloseWindow(frame)
 	elseif name == 'Btn_Option' then
 		if not LIB.IsDistributer() then

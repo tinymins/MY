@@ -512,4 +512,5 @@ return {
 	[' finally bidding valid prices: '] = '最終出價：',
 	[', bidding finished.'] = '，拍賣結束。',
 	['Create bidding'] = '發起拍賣',
+	['You are distributer, Please finish this bidding!'] = '你是分配者，請完成此次拍賣！',
 }
