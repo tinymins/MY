@@ -2,7 +2,8 @@
 return {
     -- MY_ChatMonitor.lua
     ['MY_ChatMonitor'] = '聊天监控',
-    ['chat monitor'] = '聊天监控',
+    ['Enable'] = '启用',
+    ['Click to config monitors'] = '点击配置监控项',
     ['waiting...'] = '等待中…',
     ['load preset'] = '加载预设',
     ['regexp'] = '正则',
@@ -18,7 +19,7 @@ return {
     ['Realtime save'] = '实时存记录',
     ['Distinct server'] = '服务器共享',
     ['key words:'] = '关键字：',
-    ['Are you sure you want to turn on regex mode?\nRegex is something advanced, make sure you know what you are doing.'] = '你确定要开启正则表达式模式吗？\n正则表达式是一种高级匹配规则，如果您不知道这是什么，请点击取消。\n更多关于正则表达式请上网搜索『Lua正则表达式』。',
+    ['Are you sure you want to turn on regex mode?\nRegex is something advanced, make sure you know what you are doing.\nHold shift key next time to skip this alert.'] = '你确定要开启正则表达式模式吗？\n正则表达式是一种高级匹配规则，如果您不知道这是什么，请点击取消。\n更多关于正则表达式请上网搜索『Lua正则表达式』。\n下次按住SHIFT键点击监控配置可以跳过该警告。',
     ['CHAT_MONITOR_KEYWORDS_SAMPLE'] = '10|十人,血战天策|XZTC,!小铁被吃了,!开宴黑铁;大战',
     ['CHAT_MONITOR_TIP'] = '关键字过滤器\n说明：\n半角分号;分隔多个条件\n每个条件中用半角逗号,表示且\n每个条件中用半角分隔符|表示或\n每个条件中用半角感叹号!表示非\n\n例1：大明宫;DMG;血战天策;XZTC\n-----------------\n如上例子代表匹配含有DMG或大明宫或XZTC或血战天策的聊天记录。\n\n例2：25,大明宫;10,血战天策\n-----------------\n如上例子代表匹配同时含有“25”和“大明宫”或者同时含有“10”和“血战天策”的聊天记录。\n\n例3：\n10|十人,血战天策|XZTC,!小铁被吃了,!开宴黑铁;大战\n-----------------\n如上例子代表匹配同时含有“10”或“十人”，“XZTC”或“血战天策”，并且不含有“小铁被吃了”，也不含有“开宴黑铁”的句子；或者含有“大战”的聊天记录。\n\n关于正则，不会正则表达式的小伙伴不要随便打钩哦~~会正则表达式的小伙伴(┘￣︶￣)┘└(￣︶￣└)[GiveMeFive!] \n-----------------\nPs：作者语言表达能力不佳，有什么看不懂的，你拓麻来打我啊hhhhhhhhhhhhhhhhhhhhhhh…',
 }
