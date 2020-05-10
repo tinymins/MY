@@ -418,19 +418,43 @@ function D.SetFrameSize(bEnter)
 		local nDragH = select(2, frame:GetSize())
 		frame:SetW(nDragW)
 		frame:SetDragArea(0, 0, nDragW, nDragH)
-		local nBgW, nWrapperW = nDragW, container:GetW()
+		local nBgW, nWrapperW = max(nItemW * nGroupEx, nMinW + 5), container:GetW()
 		if not bEnter then
-			nBgW = nItemW * nGroupEx -- max(nItemW, minW)
-			nWrapperW = nBgW - wrapper:GetRelX()
+			nBgW = min(nItemW * nGroupEx, nMinW + 5)
+			nWrapperW = nBgW - wrapper:GetRelX() - 5
 		end
-		wrapper:SetW(nWrapperW)
-		frame:Lookup('', 'Handle_BG/Image_Title_BG'):SetW(nBgW)
-		D.UpdatePrepareBarPos()
+		local nBgSW = frame:Lookup('', 'Handle_BG/Image_Title_BG'):GetW()
+		local nWrapperSW = wrapper:GetW()
+		local nSTick = bEnter
+			and GetTime()
+			or GetTime() + 1500
+		local nDuring = bEnter
+			and 100
+			or 200
+		local bContinue, nTick, fPer
+		LIB.RenderCall('MY_CataclysmMain_WAni', function()
+			bContinue = false
+			if IsElement(wrapper) then
+				nTick = GetTime()
+				if nTick < nSTick then
+					return
+				end
+				bContinue = nTick - nSTick < nDuring
+				fPer = bContinue
+					and ((nTick - nSTick) / nDuring)
+					or 1
+				wrapper:SetW((nWrapperW - nWrapperSW) * fPer + nWrapperSW)
+				frame:Lookup('', 'Handle_BG/Image_Title_BG'):SetW((nBgW - nBgSW) * fPer + nBgSW)
+			end
+			if not bContinue then
+				D.UpdatePrepareBarPos()
+				return 0
+			end
+		end)
 	end
 end
 
 function D.CreateControlBar()
-	local me           = GetClientPlayer()
 	local team         = GetClientTeam()
 	local nLootMode    = team.nLootMode
 	local nRollQuality = team.nRollQuality
