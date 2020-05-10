@@ -49,6 +49,9 @@ local O = {}
 local BIDDING_CACHE = {}
 
 function D.Open(tConfig)
+	if not tConfig then
+		tConfig = {}
+	end
 	if not tConfig.szKey then
 		tConfig.szKey = LIB.GetUUID()
 	end
@@ -58,7 +61,23 @@ function D.Open(tConfig)
 	if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 		return LIB.Systopmsg(_L['Please unlock safety talk lock first!'])
 	end
-	LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_BIDDING_START', tConfig)
+	if not tConfig.szItem and not tConfig.dwTabType then
+		BIDDING_CACHE[tConfig.szKey] = {
+			tConfig = tConfig,
+			aRecord = {},
+		}
+		local frame = Wnd.OpenWindow(INI_PATH, 'MY_Bidding#' .. tConfig.szKey)
+		if not frame then
+			return
+		end
+		frame.bWaitInit = true
+		frame.tUnsavedConfig = Clone(tConfig)
+		D.UpdateConfig(frame)
+		D.SwitchConfig(frame, true)
+		D.UpdateAuthourize(frame)
+	else
+		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_BIDDING_START', tConfig)
+	end
 end
 
 function D.Close(szKey)
@@ -98,6 +117,12 @@ function D.EditToConfig(edit, tConfig)
 			tConfig.dwTabIndex = tStruct.index
 			tConfig.nCount = 1
 			tConfig.nBookID = tStruct.bookinfo
+		elseif tStruct.type == 'text' then
+			tConfig.szItem = tStruct.text
+			tConfig.dwTabType = nil
+			tConfig.dwTabIndex = nil
+			tConfig.nCount = 1
+			tConfig.nBookID = nil
 		end
 	end
 	local tCount = aStruct and aStruct[2]
@@ -203,15 +228,16 @@ function D.UpdateConfig(frame)
 		-- szItem
 		h:Lookup('Handle_ConfigName/Handle_ConfigName_Value/Handle_ConfigBiddingItem'):Hide()
 		h:Lookup('Handle_ConfigName/Handle_ConfigName_Value/Text_ConfigBiddingName'):Show()
-		h:Lookup('Handle_ConfigName/Handle_ConfigName_Value/Text_ConfigBiddingName'):SetText(tConfig.szItem)
-		wnd:Lookup('WndEditBox_Name/WndEdit_Name'):SetText(tConfig.szItem)
+		h:Lookup('Handle_ConfigName/Handle_ConfigName_Value/Text_ConfigBiddingName'):SetText(tConfig.szItem or '')
+		wnd:Lookup('WndEditBox_Name/WndEdit_Name'):SetText(tConfig.szItem or '')
 	end
-	wnd:Lookup('WndEditBox_PriceMin/WndEdit_PriceMin'):SetText(tConfig.nPriceMin)
-	D.DrawPrice(h:Lookup('Handle_ConfigPriceMin/Handle_ConfigPriceMin_Value'), tConfig.nPriceMin)
-	wnd:Lookup('WndEditBox_PriceStep/WndEdit_PriceStep'):SetText(tConfig.nPriceStep)
-	D.DrawPrice(h:Lookup('Handle_ConfigPriceStep/Handle_ConfigPriceStep_Value'), tConfig.nPriceStep)
-	wnd:Lookup('WndCombo_Number', 'Text_Number'):SetText(tConfig.nNumber)
-	h:Lookup('Handle_ConfigNumber/Text_ConfigNumber_Value'):SetText(tConfig.nNumber)
+	wnd:Lookup('WndEditBox_PriceMin/WndEdit_PriceMin'):SetText(tConfig.nPriceMin or '')
+	D.DrawPrice(h:Lookup('Handle_ConfigPriceMin/Handle_ConfigPriceMin_Value'), tConfig.nPriceMin or 0)
+	wnd:Lookup('WndEditBox_PriceStep/WndEdit_PriceStep'):SetText(tConfig.nPriceStep or '')
+	D.DrawPrice(h:Lookup('Handle_ConfigPriceStep/Handle_ConfigPriceStep_Value'), tConfig.nPriceStep or 0)
+	wnd:Lookup('WndCombo_Number', 'Text_Number'):SetText(tConfig.nNumber or 1)
+	h:Lookup('Handle_ConfigNumber/Text_ConfigNumber_Value'):SetText(tConfig.nNumber or 1)
+	frame:Lookup('Wnd_Bidding/WndButton_Bidding'):SetVisible(not frame.bWaitInit)
 end
 
 function D.SwitchConfig(frame, bConfig)
@@ -224,7 +250,7 @@ function D.SwitchConfig(frame, bConfig)
 	frame:Lookup('Wnd_Config/WndCombo_Number'):SetVisible(bConfig)
 	frame:Lookup('Wnd_Config', 'Handle_ConfigNumber/Text_ConfigNumber_Value'):SetVisible(not bConfig)
 	frame:Lookup('Wnd_Config/WndButton_ConfigSubmit'):SetVisible(bConfig)
-	frame:Lookup('Wnd_Config/WndButton_ConfigCancel'):SetVisible(bConfig)
+	frame:Lookup('Wnd_Config/WndButton_ConfigCancel'):SetVisible(not frame.bWaitInit and bConfig)
 	frame:Lookup('Wnd_Config/Btn_Option'):SetVisible(not bConfig)
 end
 
@@ -233,9 +259,9 @@ function D.UpdateAuthourize(frame)
 	if not bDistributer then
 		D.SwitchConfig(frame, false)
 	end
-	frame:Lookup('Wnd_Config/Btn_Option'):SetVisible(bDistributer)
-	frame:Lookup('Wnd_Bidding/WndButton_Publish'):SetVisible(bDistributer)
-	frame:Lookup('Wnd_Bidding/WndButton_Finish'):SetVisible(bDistributer)
+	frame:Lookup('Wnd_Config/Btn_Option'):SetVisible(not frame.bWaitInit and bDistributer)
+	frame:Lookup('Wnd_Bidding/WndButton_Publish'):SetVisible(not frame.bWaitInit and bDistributer)
+	frame:Lookup('Wnd_Bidding/WndButton_Finish'):SetVisible(not frame.bWaitInit and bDistributer)
 end
 
 function D.RecordSorter(r1, r2)
@@ -422,8 +448,11 @@ function MY_BiddingBase.OnLButtonClick()
 		D.EditToConfig(wnd:Lookup('WndEditBox_Name/WndEdit_Name'), tConfig)
 		tConfig.nPriceMin = tonumber(wnd:Lookup('WndEditBox_PriceMin/WndEdit_PriceMin'):GetText()) or 2000
 		tConfig.nPriceStep = tonumber(wnd:Lookup('WndEditBox_PriceStep/WndEdit_PriceStep'):GetText()) or 1000
-		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_BIDDING_CONFIG', tConfig)
+		tConfig.nNumber = tConfig.nNumber or 1
+		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, frame.bWaitInit and 'MY_BIDDING_START' or 'MY_BIDDING_CONFIG', tConfig)
+		frame.bWaitInit = nil
 		D.SwitchConfig(frame, false)
+		D.UpdateAuthourize(frame)
 	elseif name == 'WndButton_ConfigCancel' then
 		D.SwitchConfig(frame, false)
 	elseif name == 'WndButton_Bidding' then
@@ -515,3 +544,5 @@ function MY_BiddingBase.OnItemLButtonClick()
 		LIB.Talk(PLAYER_TALK_CHANNEL.RAID, aSay, nil, true)
 	end
 end
+
+LIB.RegisterAddonMenu('MY_Bidding', { szOption = _L['Create bidding'], fnAction = D.Open })

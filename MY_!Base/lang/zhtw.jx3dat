@@ -511,4 +511,5 @@ return {
 	[' nobody would buy it'] = '無人出價',
 	[' finally bidding valid prices: '] = '最終出價：',
 	[', bidding finished.'] = '，拍賣結束。',
+	['Create bidding'] = '發起拍賣',
 }
