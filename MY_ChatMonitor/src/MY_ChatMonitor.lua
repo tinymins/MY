@@ -342,7 +342,7 @@ function D.RegisterMsgMonitor()
     local tChannel = {}
     for _, p in ipairs(KEYWORD_LIST) do
         if p.bEnable then
-            for szChannel, bCapture in pairs(p.tChannels) do
+            for szChannel, bCapture in pairs(p.tChannel) do
                 if bCapture then
                     tChannel[szChannel] = true
                 end
