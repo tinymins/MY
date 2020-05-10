@@ -434,7 +434,7 @@ function D.CreateControlBar()
 	local szIniFile    = INI_ROOT .. 'MY_CataclysmMain_Button.ini'
 	container:Clear()
 	-- 团队工具 团队告示
-	if me.IsInRaid() then
+	if LIB.IsInParty() then
 		container:AppendContentFromIni(szIniFile, 'Wnd_TeamTools')
 		container:AppendContentFromIni(szIniFile, 'Wnd_TeamNotice')
 	end
