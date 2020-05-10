@@ -499,4 +499,5 @@ return {
 	['Target bidding number:'] = '目標人數：',
 	['Sure'] = '確定',
 	['Cancel'] = '取消',
+	['Click to quick bidding at price '] = '點擊快速出價：',
 }

@@ -73,6 +73,81 @@ function D.GetKey(frame)
 	return frame:GetName():sub(#'MY_Bidding#' + 1)
 end
 
+function D.EditToConfig(edit, tConfig)
+	local aStruct = edit:GetTextStruct()
+	local tStruct = aStruct and aStruct[1]
+	if tStruct then
+		if tStruct.type == 'item' then
+			local item = GetItem(tStruct.item)
+			if item then
+				tConfig.szItem = nil
+				tConfig.dwTabType = item.dwTabType
+				tConfig.dwTabIndex = item.dwIndex
+				tConfig.nCount = item.bCanStack and item.nStackNum or 1
+				tConfig.nBookID = item.nGenre == ITEM_GENRE.BOOK and item.nBookID or nil
+			end
+		elseif tStruct.type == 'iteminfo' then
+			tConfig.szItem = nil
+			tConfig.dwTabType = tStruct.tabtype
+			tConfig.dwTabIndex = tStruct.index
+			tConfig.nCount = 1
+			tConfig.nBookID = nil
+		elseif tStruct.type == 'book' then
+			tConfig.szItem = nil
+			tConfig.dwTabType = tStruct.tabtype
+			tConfig.dwTabIndex = tStruct.index
+			tConfig.nCount = 1
+			tConfig.nBookID = tStruct.bookinfo
+		end
+	end
+	local tCount = aStruct and aStruct[2]
+	if tCount and tCount.type == 'text' then
+		local nCount = tonumber(tCount.text:gsub('.*x', ''), 10)
+		if nCount then
+			tConfig.nCount = max(floor(nCount), 1)
+		end
+	end
+end
+
+function D.ConfigToEdit(edit, tConfig)
+	edit:ClearText()
+	if tConfig.nBookID then
+		local text = '[' .. LIB.GetObjectName('ITEM_INFO', tConfig.dwTabType, tConfig.dwTabIndex, tConfig.nBookID) .. ']'
+		edit:InsertObj(text, {
+			type = 'book',
+			version = 0,
+			text = text,
+			tabtype = tConfig.dwTabType,
+			index = tConfig.dwTabIndex,
+			bookinfo = tConfig.nBookID,
+		})
+		edit:InsertText('x' .. (tConfig.nCount or 1))
+	elseif tConfig.dwTabType then
+		local text = '[' .. LIB.GetObjectName('ITEM_INFO', tConfig.dwTabType, tConfig.dwTabIndex) .. ']'
+		edit:InsertObj(text, {
+			type = 'iteminfo',
+			version = 0,
+			text = text,
+			tabtype = tConfig.dwTabType,
+			index = tConfig.dwTabIndex,
+		})
+		edit:InsertText('x' .. (tConfig.nCount or 1))
+	elseif tConfig.szItem then
+		edit:InsertText(tConfig.szItem)
+	end
+end
+
+function D.GetQuickBiddingPrice(szKey)
+	local cache = BIDDING_CACHE[szKey]
+	local tConfig = cache.tConfig
+	local aRecord = D.GetRankRecord(cache.aRecord)
+	local nPrice = tConfig.nPriceMin
+	if #aRecord >= tConfig.nNumber then
+		nPrice = aRecord[#aRecord].nPrice + tConfig.nPriceStep
+	end
+	return nPrice
+end
+
 function D.DrawPrice(h, nGold)
 	h:Clear()
 	h:AppendItemFromString(GetMoneyText({ nGold = nGold }, 'font=162', 'cut_zero4'))
@@ -87,13 +162,16 @@ function D.UpdateConfig(frame)
 	if tConfig.dwTabType and tConfig.dwTabIndex then
 		-- dwTabType, dwTabIndex, nBookID
 		local szItem = LIB.GetObjectName('ITEM_INFO', tConfig.dwTabType, tConfig.dwTabIndex, tConfig.nBookID)
+		if tConfig.nCount and tConfig.nCount > 1 then
+			szItem = szItem .. ' x' .. (tConfig.nCount or 1)
+		end
 		UpdateBoxObject(
 			h:Lookup('Handle_ConfigName/Handle_ConfigName_Value/Handle_ConfigBiddingItem/Box_ConfigBiddingItem'),
 			UI_OBJECT.ITEM_INFO, nil, tConfig.dwTabType, tConfig.dwTabIndex, tConfig.nBookID or tConfig.nCount)
 		h:Lookup('Handle_ConfigName/Handle_ConfigName_Value/Handle_ConfigBiddingItem'):Show()
 		h:Lookup('Handle_ConfigName/Handle_ConfigName_Value/Text_ConfigBiddingName'):Hide()
 		h:Lookup('Handle_ConfigName/Handle_ConfigName_Value/Handle_ConfigBiddingItem/Text_ConfigBiddingItem'):SetText(szItem)
-		wnd:Lookup('WndEditBox_Name/WndEdit_Name'):SetText(szItem)
+		D.ConfigToEdit(wnd:Lookup('WndEditBox_Name/WndEdit_Name'), tConfig)
 	else -- if tConfig.szItem then
 		-- szItem
 		h:Lookup('Handle_ConfigName/Handle_ConfigName_Value/Handle_ConfigBiddingItem'):Hide()
@@ -256,29 +334,71 @@ end
 
 function MY_BiddingBase.OnLButtonClick()
 	local name = this:GetName()
+	local frame = this:GetRoot()
 	if name == 'Btn_Close' then
-		Wnd.CloseWindow(this:GetRoot())
+		Wnd.CloseWindow(frame)
 	elseif name == 'Btn_Option' then
 		if not LIB.IsDistributer() then
 			return LIB.Systopmsg(_L['You are not distributer!'])
 		end
-		D.SwitchConfig(this:GetRoot(), true)
+		local szKey = D.GetKey(frame)
+		frame.tUnsavedConfig = Clone(BIDDING_CACHE[szKey].tConfig)
+		D.UpdateConfig(frame)
+		D.SwitchConfig(frame, true)
+	elseif name == 'Btn_Number' then
+		local frame = frame
+		local txt = this:GetParent():Lookup('', 'Text_Number')
+		local menu = {}
+		for i = 1, 24 do
+			insert(menu, {
+				szOption = i,
+				fnAction = function()
+					frame.tUnsavedConfig.nNumber = i
+					txt:SetText(i)
+					UI.ClosePopupMenu()
+				end,
+			})
+		end
+		local wnd = this:GetParent()
+		menu.x = wnd:GetAbsX()
+		menu.y = wnd:GetAbsY() + wnd:GetH()
+		menu.nMinWidth = wnd:GetW()
+		UI.PopupMenu(menu)
 	elseif name == 'WndButton_ConfigSubmit' then
 		if not LIB.IsDistributer() then
 			return LIB.Systopmsg(_L['You are not distributer!'])
 		end
-		D.SwitchConfig(this:GetRoot(), false)
+		local tConfig = frame.tUnsavedConfig
+		local wnd = this:GetParent()
+		D.EditToConfig(wnd:Lookup('WndEditBox_Name/WndEdit_Name'), tConfig)
+		tConfig.nPriceMin = tonumber(wnd:Lookup('WndEditBox_PriceMin/WndEdit_PriceMin'):GetText()) or 2000
+		tConfig.nPriceStep = tonumber(wnd:Lookup('WndEditBox_PriceStep/WndEdit_PriceStep'):GetText()) or 1000
+		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_BIDDING_CONFIG', tConfig)
+		D.SwitchConfig(frame, false)
 	elseif name == 'WndButton_ConfigCancel' then
-		D.SwitchConfig(this:GetRoot(), false)
+		D.SwitchConfig(frame, false)
 	elseif name == 'WndButton_Bidding' then
-		local szKey = D.GetKey(this:GetRoot())
-		local cache = BIDDING_CACHE[szKey]
-		local tConfig = cache.tConfig
-		local aRecord = D.GetRankRecord(cache.aRecord)
-		local nPrice = tConfig.nPriceMin
-		if #aRecord >= tConfig.nNumber then
-			nPrice = aRecord[#aRecord].nPrice + tConfig.nPriceStep
-		end
+		local szKey = D.GetKey(frame)
+		local nPrice = D.GetQuickBiddingPrice(szKey)
 		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_BIDDING_ACTION', { szKey = szKey, nPrice = nPrice })
+	end
+end
+
+function MY_BiddingBase.OnItemRefreshTip()
+	local name = this:GetName()
+	if name == 'Handle_ButtonBidding' then
+		local frame = this:GetRoot()
+		local szKey = D.GetKey(frame)
+		local nPrice = D.GetQuickBiddingPrice(szKey)
+		local szXml = GetFormatText(_L['Click to quick bidding at price '])
+			.. GetMoneyText({ nGold = nPrice }, 'font=162', 'cut_zero4')
+		LIB.OutputTip(this, szXml, true, ALW.TOP_BOTTOM)
+	end
+end
+
+function MY_BiddingBase.OnItemMouseLeave()
+	local name = this:GetName()
+	if name == 'Handle_ButtonBidding' then
+		HideTip()
 	end
 end
