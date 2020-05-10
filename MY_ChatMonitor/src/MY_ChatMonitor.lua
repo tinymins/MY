@@ -491,12 +491,14 @@ function PS.OnPanelActive(wnd)
                     end,
                     fnDisable = function() return not p.bEnable end,
                 })
+                insert(m, CONSTANT.MENU_DIVIDER)
                 insert(m, {
                     szOption = _L['Delete'],
                     fnAction = function()
                         remove(KEYWORD_LIST, i)
                         D.SaveConfig()
                         D.RegisterMsgMonitor()
+                        UI.ClosePopupMenu()
                     end,
                 })
                 m.szOption = p.szKeyword
