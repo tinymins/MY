@@ -296,9 +296,8 @@ function TI.OpenFrame()
 	if LIB.IsInZombieMap() then
 		return LIB.Topmsg(_L['TeamNotice is disabled in this map.'])
 	end
-	local me = GetClientPlayer()
 	MY_TeamNotice.bEnable = true
-	if me.IsInRaid() then
+	if LIB.IsInParty() then
 		if LIB.IsLeader() then
 			TI.CreateFrame()
 		else
@@ -327,8 +326,7 @@ LIB.RegisterEvent('FIRST_LOADING_END.TEAM_NOTICE', function()
 		return
 	end
 	-- 不存在队长不队长的问题了
-	local me = GetClientPlayer()
-	if me.IsInRaid() then
+	if LIB.IsInParty() then
 		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', {'ASK'}, true)
 	end
 end)
@@ -400,8 +398,7 @@ local function GetMenu()
 	return {{
 		szOption = _L['Team Message'],
 		fnDisable = function()
-			local me = GetClientPlayer()
-			return not me.IsInRaid()
+			return not LIB.IsInParty()
 		end,
 		fnAction = TI.OpenFrame,
 	}}
