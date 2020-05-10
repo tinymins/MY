@@ -441,7 +441,7 @@ function PS.OnPanelActive(wnd)
     ui:Append('Text', { x = 22, y = 15, w = 100, h = 25, text = _L['key words:'] })
 
     ui:Append('WndComboBox', {
-        x = 80, y = 15, w = w - 226, h = 25,
+        x = 80, y = 15, w = w - 246, h = 25,
         text = _L['Click to config monitors'],
         menu = function()
             local menu = {}
@@ -532,8 +532,8 @@ function PS.OnPanelActive(wnd)
 
     ui:Append('Image', {
         image = 'UI/Image/UICommon/Commonpanel2.UITex', imageframe = 48,
-        x = 8, y = 10, w = 25, h = 25, alpha = 180,
-        onhover = function(bIn) this:SetAlpha( (bIn and 255 ) or 180) end,
+        x = w - 160, y = 18, w = 20, h = 20, alpha = 180,
+        onhover = function(bIn) this:SetAlpha(bIn and 255 or 180) end,
         onclick = function()
             local szText = GetFormatText(_L['CHAT_MONITOR_TIP'], 162)
             local x, y = Cursor.GetPos()
