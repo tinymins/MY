@@ -69,20 +69,20 @@ local O = {
 		{ _L['Other'], '', true},
 	},
 	aScheme = { -- ÅÄÂô·½°¸
-		{ 100, true },
-		{ 1000, true },
-		{ 2000, true },
-		{ 3000, true },
-		{ 4000, true },
-		{ 5000, true },
-		{ 6000, true },
-		{ 7000, true },
-		{ 8000, true },
-		{ 9000, true },
-		{ 10000, true },
-		{ 20000, true },
-		{ 50000, true },
-		{ 100000, true },
+		{ 100, 100, true },
+		{ 1000, 1000, true },
+		{ 2000, 1000, true },
+		{ 3000, 1000, true },
+		{ 4000, 1000, true },
+		{ 5000, 1000, true },
+		{ 6000, 1000, true },
+		{ 7000, 1000, true },
+		{ 8000, 1000, true },
+		{ 9000, 1000, true },
+		{ 10000, 2000, true },
+		{ 20000, 2000, true },
+		{ 50000, 2000, true },
+		{ 100000, 5000, true },
 	},
 	bSyncSystem = true,
 }
@@ -102,7 +102,7 @@ RegisterCustomData('MY_GKP.bSyncSystem')
 function D.SaveConfig()
 	local Config = {
 		Subsidies = O.aSubsidies,
-		Scheme = O.aScheme,
+		Scheme2 = O.aScheme,
 	}
 	LIB.SaveLUAData({'config/gkp.cfg', PATH_TYPE.GLOBAL}, Config)
 end
@@ -111,7 +111,7 @@ function D.LoadConfig()
 	local Config = LIB.LoadLUAData({'config/gkp.cfg', PATH_TYPE.GLOBAL})
 	if Config then
 		O.aSubsidies = Config.Subsidies
-		O.aScheme = Config.Scheme
+		O.aScheme = Config.Scheme2 or O.aScheme
 	end
 end
 

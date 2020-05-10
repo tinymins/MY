@@ -112,29 +112,34 @@ function D.GetSchemeMenu()
 			local a = {}
 			if IsTable(MY_GKP.aScheme) then
 				for k, v in ipairs(MY_GKP.aScheme) do
-					if IsTable(v) and IsNumber(v[1]) then
-						insert(a, tostring(v[1]))
-					end
+					insert(a, tostring(v[1]) .. ',' .. tostring(v[2]))
 				end
 			end
-			GetUserInput(_L['New Protocol Format: Money, Money, Money'], function(txt)
-				local t = LIB.SplitString(txt, ',')
+			GetUserInput(_L['New Protocol Format: Money, Step; Money, Step'], function(txt)
+				local t = LIB.SplitString(txt, ';')
 				local aScheme = {}
 				for k, v in ipairs(t) do
-					insert(aScheme, { tonumber(v) or 0, true })
+					local a = LIB.SplitString(txt, ',')
+					if a[1] and a[2] then
+						a[1] = tonumber(a[1])
+						a[2] = tonumber(a[2])
+					end
+					if not IsEmpty(a[1]) and not IsEmpty(a[2]) then
+						insert(aScheme, { a[1], a[2], true })
+					end
 				end
 				MY_GKP.aScheme = aScheme
-			end, nil, nil, nil, concat(a, ','))
+			end, nil, nil, nil, concat(a, ';'))
 		end
 	})
 	insert(menu, { bDevide = true })
 	for k, v in ipairs(MY_GKP.aScheme) do
 		insert(menu,{
-			szOption = v[1],
+			szOption = v[1] .. ',' .. v[2],
 			bCheck = true,
-			bChecked = v[2],
+			bChecked = v[3],
 			fnAction = function()
-				v[2] = not v[2]
+				v[3] = not v[3]
 				MY_GKP.aScheme = MY_GKP.aScheme
 			end,
 			szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',

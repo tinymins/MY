@@ -643,10 +643,21 @@ function D.OnItemRButtonClick()
 		})
 		insert(menu, { bDevide = true })
 		for k, v in ipairs(MY_GKP.aScheme) do
-			if v[2] then
+			if v[3] then
 				insert(menu, {
-					szOption = v[1],
+					szOption = v[1] .. ',' .. v[2],
 					fnAction = function()
+						if IsShiftKeyDown() then
+							MY_Bidding.Open({
+								nPriceMin = v[1],
+								nPriceStep = v[2],
+								nNumber = data.item.bCanStack and data.item.nStackNum or 1,
+								dwTabType = data.item.dwTabType,
+								dwTabIndex = data.item.dwIndex,
+								nBookID = data.item.nGenre == ITEM_GENRE.BOOK and data.item.nBookID or nil,
+							})
+							return
+						end
 						MY_GKP_Chat.OpenFrame(data.item, D.GetDistributeMenu(data, data.nUiId), {
 							dwDoodadID = dwDoodadID,
 							data = data,

@@ -75,7 +75,7 @@ return {
 	['Add New Protocols'] = '添加新方案',
 	['New Protocol  Format: Protocol\'s Name, Money'] = '新方案 格式：方案名,金錢',
 	['Edit All Protocols'] = '編輯所有方案',
-	['New Protocol Format: Money, Money, Money'] = '新方案 格式：金錢,金錢,金錢,...',
+	['New Protocol Format: Money, Step; Money, Step'] = '新方案 格式：底價,加價;底價,加價...',
 	['No Record'] = '沒有記錄',
 	['System Information as Shown Below\n\n'] = '----------  統計信息如下  ----------\n\n',
 	['Total Cosumption:'] = '總計消費：',
