@@ -1211,6 +1211,20 @@ local CONSTANT = setmetatable({}, {
 				[25] = 'HEAL', -- 梅花三弄
 			},
 		},
+		MINI_MAP_POINT = {
+			QUEST_REGION    = 1,
+			TEAMMATE        = 2,
+			SPARKING        = 3,
+			DEATH           = 4,
+			QUEST_NPC       = 5,
+			DOODAD          = 6,
+			MAP_MARK        = 7,
+			FUNCTION_NPC    = 8,
+			RED_NAME        = 9,
+			NEW_PQ	        = 10,
+			SPRINT_POINT    = 11,
+			FAKE_FELLOW_PET = 12,
+		},
 		EQUIPMENT_SUIT_COUNT = _G.EQUIPMENT_SUIT_COUNT or 4,
 		INVENTORY_GUILD_BANK = INVENTORY_GUILD_BANK or INVENTORY_INDEX.TOTAL + 1, --帮会仓库界面虚拟一个背包位置
 		INVENTORY_GUILD_PAGE_SIZE = INVENTORY_GUILD_PAGE_SIZE or 100,
