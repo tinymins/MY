@@ -3008,6 +3008,13 @@ function LIB.IsInParty()
 	return me and me.IsInParty()
 end
 
+-- 判断自己在不在团队里
+-- (bool) LIB.IsInRaid()
+function LIB.IsInRaid()
+	local me = GetClientPlayer()
+	return me and me.IsInRaid()
+end
+
 -- 判断当前地图是不是竞技场
 -- (bool) LIB.IsInArena()
 function LIB.IsInArena()
