@@ -1175,11 +1175,10 @@ function D.OnMMMItemMouseLeave()
 	HideTip()
 end
 
-function D.GetVisibleMapPoint()
+function D.GetVisibleMapPoint(dwMapID)
 	local aMapPoint = {}
 	local player = GetClientPlayer()
 	if player then
-		local dwMapID = MiddleMap.dwMapID or player.GetMapID()
 		for _, mark in ipairs(MAP_POINT_LIST) do
 			local bShow = mark.dwMapID == dwMapID and mark.aPosition and true or false
 			if bShow and O.bMapMarkHideAcquired then
@@ -1203,7 +1202,8 @@ end
 
 function D.DrawMapMark()
 	local frame = Station.Lookup('Topmost1/MiddleMap')
-	if not frame or not frame:IsVisible() then
+	local player = GetClientPlayer()
+	if not player or not frame or not frame:IsVisible() then
 		return
 	end
 	local hInner = frame:Lookup('', 'Handle_Inner')
@@ -1217,7 +1217,7 @@ function D.DrawMapMark()
 	local nCount = 0
 	local nItemCount = hMMM:GetItemCount()
 
-	for _, mark in ipairs(D.GetVisibleMapPoint()) do
+	for _, mark in ipairs(D.GetVisibleMapPoint(MiddleMap.dwMapID or player.GetMapID())) do
 		if mark.aPosition then
 			for _, pos in ipairs(mark.aPosition) do
 				local nX, nY = MiddleMap.LPosToHPos(pos[1], pos[2], 13, 13)
@@ -1250,7 +1250,7 @@ function D.DrawMiniMapPoint()
 	if not me then
 		return
 	end
-	for _, mark in ipairs(D.GetVisibleMapPoint()) do
+	for _, mark in ipairs(D.GetVisibleMapPoint(me.GetMapID())) do
 		if mark.aPosition then
 			for _, pos in ipairs(mark.aPosition) do
 				if pow((me.nX - pos[1]) / 64, 2) + pow((me.nY - pos[2]) / 64, 2) <= MINI_MAP_POINT_MAX_DISTANCE then
@@ -1262,9 +1262,17 @@ function D.DrawMiniMapPoint()
 	end
 end
 
+function D.HookMiniMapMark()
+	LIB.BreatheCall('MY_RoleStatistics_SerendipityMiniMapMark', 1000, D.DrawMiniMapPoint)
+end
+
+function D.UnhookMiniMapMark()
+	LIB.BreatheCall('MY_RoleStatistics_SerendipityMiniMapMark', false)
+end
+LIB.RegisterReload('MY_RoleStatistics_SerendipityMiniMapMark', D.UnhookMiniMapMark)
+
 function D.HookMapMark()
 	D.UnhookMapMark()
-	LIB.BreatheCall('MY_RoleStatistics_SerendipityMiniMapMark', 1000, D.DrawMiniMapPoint)
 	HookTableFunc(MiddleMap, 'ShowMap', D.DrawMapMark, { bAfterOrigin = true })
 	HookTableFunc(MiddleMap, 'UpdateCurrentMap', D.DrawMapMark, { bAfterOrigin = true })
 end
@@ -1274,7 +1282,6 @@ function D.UnhookMapMark()
 	if h then
 		h:GetParent():RemoveItem(h)
 	end
-	LIB.BreatheCall('MY_RoleStatistics_SerendipityMiniMapMark', false)
 	UnhookTableFunc(MiddleMap, 'ShowMap', D.DrawMapMark)
 	UnhookTableFunc(MiddleMap, 'UpdateCurrentMap', D.DrawMapMark)
 end
@@ -1284,8 +1291,10 @@ function D.CheckMapMark()
 	if O.bMapMark then
 		D.HookMapMark()
 		D.DrawMapMark()
+		D.HookMiniMapMark()
 	else
 		D.UnhookMapMark()
+		D.UnhookMiniMapMark()
 	end
 end
 LIB.RegisterInit('MY_RoleStatistics_SerendipityMapMark', D.CheckMapMark)
