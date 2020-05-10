@@ -86,6 +86,7 @@ local InfoW = DB:Prepare('REPLACE INTO Info (guid, account, region, server, name
 local InfoG = DB:Prepare('SELECT * FROM Info WHERE guid = ?')
 local InfoR = DB:Prepare('SELECT * FROM Info WHERE account LIKE ? OR name LIKE ? OR region LIKE ? OR server LIKE ? ORDER BY time DESC')
 local InfoD = DB:Prepare('DELETE FROM Info WHERE guid = ?')
+local MINI_MAP_POINT_MAX_DISTANCE = pow(300, 2)
 
 local D = {}
 local O = {
@@ -1174,13 +1175,37 @@ function D.OnMMMItemMouseLeave()
 	HideTip()
 end
 
+function D.GetVisibleMapPoint()
+	local aMapPoint = {}
+	local player = GetClientPlayer()
+	if player then
+		local dwMapID = MiddleMap.dwMapID or player.GetMapID()
+		for _, mark in ipairs(MAP_POINT_LIST) do
+			local bShow = mark.dwMapID == dwMapID and mark.aPosition and true or false
+			if bShow and O.bMapMarkHideAcquired then
+				if mark.dwPet and player.IsFellowPetAcquired(mark.dwPet) then
+					bShow = false
+				end
+				if bShow and mark.nSerendipityID then
+					local serendipity = SERENDIPITY_HASH[mark.nSerendipityID]
+					if serendipity and GetSerendipityDailyCount(player, serendipity) == -1 then
+						bShow = false
+					end
+				end
+			end
+			if bShow then
+				insert(aMapPoint, mark)
+			end
+		end
+	end
+	return aMapPoint
+end
+
 function D.DrawMapMark()
 	local frame = Station.Lookup('Topmost1/MiddleMap')
-	local player = GetClientPlayer()
-	if not player or not frame or not frame:IsVisible() then
+	if not frame or not frame:IsVisible() then
 		return
 	end
-	local dwMapID = MiddleMap.dwMapID or player.GetMapID()
 	local hInner = frame:Lookup('', 'Handle_Inner')
 	local nW, nH = hInner:GetSize()
 	local hMMM = hInner:Lookup('Handle_MY_SerendipityMMM')
@@ -1192,20 +1217,8 @@ function D.DrawMapMark()
 	local nCount = 0
 	local nItemCount = hMMM:GetItemCount()
 
-	for _, mark in ipairs(MAP_POINT_LIST) do
-		local bShow = mark.dwMapID == dwMapID and mark.aPosition and true or false
-		if bShow and O.bMapMarkHideAcquired then
-			if mark.dwPet and player.IsFellowPetAcquired(mark.dwPet) then
-				bShow = false
-			end
-			if bShow and mark.nSerendipityID then
-				local serendipity = SERENDIPITY_HASH[mark.nSerendipityID]
-				if serendipity and GetSerendipityDailyCount(player, serendipity) == -1 then
-					bShow = false
-				end
-			end
-		end
-		if bShow then
+	for _, mark in ipairs(D.GetVisibleMapPoint()) do
+		if mark.aPosition then
 			for _, pos in ipairs(mark.aPosition) do
 				local nX, nY = MiddleMap.LPosToHPos(pos[1], pos[2], 13, 13)
 				if nX > 0 and nY > 0 and nX < nW and nY < nH then
@@ -1232,8 +1245,26 @@ function D.DrawMapMark()
 	hMMM:FormatAllItemPos()
 end
 
+function D.DrawMiniMapPoint()
+	local me = GetClientPlayer()
+	if not me then
+		return
+	end
+	for _, mark in ipairs(D.GetVisibleMapPoint()) do
+		if mark.aPosition then
+			for _, pos in ipairs(mark.aPosition) do
+				if pow((me.nX - pos[1]) / 64, 2) + pow((me.nY - pos[2]) / 64, 2) <= MINI_MAP_POINT_MAX_DISTANCE then
+					LIB.UpdateMiniFlag(CONSTANT.MINI_MAP_POINT.FUNCTION_NPC,
+						pos[1], pos[2], 21, 47, GLOBAL.GAME_FPS)
+				end
+			end
+		end
+	end
+end
+
 function D.HookMapMark()
 	D.UnhookMapMark()
+	LIB.BreatheCall('MY_RoleStatistics_SerendipityMiniMapMark', 1000, D.DrawMiniMapPoint)
 	HookTableFunc(MiddleMap, 'ShowMap', D.DrawMapMark, { bAfterOrigin = true })
 	HookTableFunc(MiddleMap, 'UpdateCurrentMap', D.DrawMapMark, { bAfterOrigin = true })
 end
@@ -1243,6 +1274,7 @@ function D.UnhookMapMark()
 	if h then
 		h:GetParent():RemoveItem(h)
 	end
+	LIB.BreatheCall('MY_RoleStatistics_SerendipityMiniMapMark', false)
 	UnhookTableFunc(MiddleMap, 'ShowMap', D.DrawMapMark)
 	UnhookTableFunc(MiddleMap, 'UpdateCurrentMap', D.DrawMapMark)
 end
