@@ -491,6 +491,13 @@ return {
 	['Streaming client does not support export!'] = '雲端客戶端不支持導出功能！',
 
 	-- MY_Bidding
+	['Bidding'] = '拍賣',
+	['Show price'] = '出價',
+	['Name'] = '名字',
+	['Price'] = '出價',
+	['Time'] = '時間',
+	['Publish'] = '發佈',
+	['Finish'] = '結束',
 	['You are not distributer!'] = '你不是分配者！',
 	['Please unlock safety talk lock first!'] = '請先解除聊天鎖。',
 	['Bidding item:'] = '拍賣物品：',

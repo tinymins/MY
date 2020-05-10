@@ -491,6 +491,13 @@ return {
 	['Streaming client does not support export!'] = '云端客户端不支持导出功能！',
 
 	-- MY_Bidding
+	['Bidding'] = '拍卖',
+	['Show price'] = '出价',
+	['Name'] = '名字',
+	['Price'] = '出价',
+	['Time'] = '时间',
+	['Publish'] = '发布',
+	['Finish'] = '结束',
 	['You are not distributer!'] = '你不是分配者！',
 	['Please unlock safety talk lock first!'] = '请先解除聊天锁。',
 	['Bidding item:'] = '拍卖物品：',
