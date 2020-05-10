@@ -506,4 +506,9 @@ return {
 	[','] = '，',
 	[' gold'] = '金',
 	['.'] = '。',
+	[' delete '] = '已作废',
+	[' \'s invalid price .'] = '的出价记录。',
+	[' nobody would buy it'] = '无人出价',
+	[' finally bidding valid prices: '] = '最终出价：',
+	[', bidding finished.'] = '，拍卖结束。',
 }

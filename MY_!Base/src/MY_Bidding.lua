@@ -234,7 +234,8 @@ function D.UpdateAuthourize(frame)
 		D.SwitchConfig(frame, false)
 	end
 	frame:Lookup('Wnd_Config/Btn_Option'):SetVisible(bDistributer)
-	frame:Lookup('Wnd_Config/WndButton_Publish'):SetVisible(bDistributer)
+	frame:Lookup('Wnd_Bidding/WndButton_Publish'):SetVisible(bDistributer)
+	frame:Lookup('Wnd_Bidding/WndButton_Finish'):SetVisible(bDistributer)
 end
 
 function D.RecordSorter(r1, r2)
@@ -268,6 +269,7 @@ function D.UpdateList(frame)
 	h:Clear()
 	for _, rec in ipairs(aRecord) do
 		local hItem = h:AppendItemFromIni(INI_PATH, 'Handle_Row')
+		hItem.rec = rec
 		hItem:Lookup('Handle_RowItem/Image_RowItemKungfu'):FromIconID(Table_GetSkillIconID(rec.dwKungfu, 1))
 		hItem:Lookup('Handle_RowItem/Text_RowItemName'):SetText(rec.szTalkerName)
 		D.DrawPrice(hItem:Lookup('Handle_RowItem/Handle_RowItemPrice'), rec.nPrice)
@@ -336,9 +338,29 @@ LIB.RegisterBgMsg('MY_BIDDING_ACTION', function(_, data, nChannel, dwTalkerID, s
 	D.UpdateList(frame)
 end)
 
+LIB.RegisterBgMsg('MY_BIDDING_DELETE', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
+	if not BIDDING_CACHE[data.szKey] then
+		return
+	end
+	local aRecord = BIDDING_CACHE[data.szKey].aRecord
+	for i, p in ipairs_r(aRecord) do
+		if p.dwTalkerID == data.dwTalkerID then
+			remove(aRecord, i)
+		end
+	end
+	local frame = D.GetFrame(data.szKey)
+	if not frame then
+		return
+	end
+	D.UpdateList(frame)
+end)
+
 LIB.RegisterBgMsg('MY_BIDDING_FINISH', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
-	BIDDING_CACHE[data] = nil
-	D.Close(data)
+	if not BIDDING_CACHE[data.szKey] then
+		return
+	end
+	BIDDING_CACHE[data.szKey] = nil
+	D.Close(data.szKey)
 end)
 
 -------------------------------------------------------------------------------------------------------
@@ -431,6 +453,27 @@ function MY_BiddingBase.OnLButtonClick()
 		end
 		insert(aSay, { type = 'text', text = _L['.'] })
 		LIB.Talk(PLAYER_TALK_CHANNEL.RAID, aSay, nil, true)
+	elseif name == 'WndButton_Finish' then
+		local szKey = D.GetKey(frame)
+		local cache = BIDDING_CACHE[szKey]
+		local tConfig = cache.tConfig
+		local aRecord = D.GetRankRecord(cache.aRecord)
+		local aSay = D.ConfigToEditStruct(tConfig)
+		if #aRecord == 0 then
+			insert(aSay, { type = 'text', text = _L[' nobody would buy it'] })
+		else
+			insert(aSay, { type = 'text', text = _L[' finally bidding valid prices: '] })
+			for i = 1, min(#aRecord, tConfig.nNumber) do
+				if i > 1 then
+					insert(aSay, { type = 'text', text = _L[','] })
+				end
+				insert(aSay, { type = 'name', name = aRecord[i].szTalkerName })
+				insert(aSay, { type = 'text', text = aRecord[i].nPrice .. _L[' gold'] })
+			end
+		end
+		insert(aSay, { type = 'text', text = _L[', bidding finished.'] })
+		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_BIDDING_FINISH', { szKey = szKey })
+		LIB.Talk(PLAYER_TALK_CHANNEL.RAID, aSay, nil, true)
 	end
 end
 
@@ -450,5 +493,25 @@ function MY_BiddingBase.OnItemMouseLeave()
 	local name = this:GetName()
 	if name == 'Handle_ButtonBidding' then
 		HideTip()
+	end
+end
+
+function MY_BiddingBase.OnItemLButtonClick()
+	local name = this:GetName()
+	if name == 'Handle_RowItemDelete' then
+		if not LIB.IsDistributer() then
+			return LIB.Systopmsg(_L['You are not distributer!'])
+		end
+		local frame = this:GetRoot()
+		local szKey = D.GetKey(frame)
+		local cache = BIDDING_CACHE[szKey]
+		local tConfig = cache.tConfig
+		local aSay = D.ConfigToEditStruct(tConfig)
+		local rec = this:GetParent().rec
+		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_BIDDING_DELETE', { szKey = szKey, dwTalkerID = rec.dwTalkerID })
+		insert(aSay, { type = 'text', text = _L[' delete '] })
+		insert(aSay, { type = 'name', name = rec.szTalkerName })
+		insert(aSay, { type = 'text', text = _L[' \'s invalid price .'] })
+		LIB.Talk(PLAYER_TALK_CHANNEL.RAID, aSay, nil, true)
 	end
 end
