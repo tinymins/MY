@@ -85,6 +85,7 @@ function D.Open(tConfig)
 		D.UpdateAuthourize(frame)
 	else
 		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_BIDDING_START', tConfig)
+		D.PublishConfig(tConfig, true)
 	end
 end
 
@@ -316,6 +317,17 @@ function D.UpdateList(frame)
 	h:FormatAllItemPos()
 end
 
+function D.PublishConfig(tConfig, bInit)
+	local aSay = D.ConfigToEditStruct(tConfig)
+	if bInit then
+		insert(aSay, 1, { type = 'text', text = _L['Raise bidding for '] })
+	else
+		insert(aSay, 1, { type = 'text', text = _L['Modify bidding for '] })
+	end
+	insert(aSay, { type = 'text', text = _L(', min price is %d, bidding step is %d.', tConfig.nPriceMin, tConfig.nPriceStep) })
+	LIB.Talk(PLAYER_TALK_CHANNEL.RAID, aSay, nil, true)
+end
+
 -- Global exports
 do
 local settings = {
@@ -478,6 +490,7 @@ function MY_BiddingBase.OnLButtonClick()
 		tConfig.nPriceStep = tonumber(wnd:Lookup('WndEditBox_PriceStep/WndEdit_PriceStep'):GetText()) or 1000
 		tConfig.nNumber = tConfig.nNumber or 1
 		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, frame.bWaitInit and 'MY_BIDDING_START' or 'MY_BIDDING_CONFIG', tConfig)
+		D.PublishConfig(tConfig, frame.bWaitInit)
 		frame.bWaitInit = nil
 		D.SwitchConfig(frame, false)
 		D.UpdateAuthourize(frame)
@@ -506,24 +519,27 @@ function MY_BiddingBase.OnLButtonClick()
 		local cache = BIDDING_CACHE[szKey]
 		local tConfig = cache.tConfig
 		local edit = this:GetParent():Lookup('WndEditBox_CustomBidding/WndEdit_CustomBidding')
+		local nPriceMin = D.GetQuickBiddingPrice(szKey)
 		local nPrice = tonumber(edit:GetText()) or 0
-		nPrice = (max(0, floor((nPrice - tConfig.nPriceMin) / tConfig.nPriceStep) - 1)) * tConfig.nPriceStep + tConfig.nPriceMin
+		nPrice = max(nPriceMin, floor(((nPrice - tConfig.nPriceMin) / tConfig.nPriceStep) - 1) * tConfig.nPriceStep + tConfig.nPriceMin)
 		edit:SetText(nPrice)
 	elseif name == 'WndButton_CustomBiddingUp' then
 		local szKey = D.GetKey(frame)
 		local cache = BIDDING_CACHE[szKey]
 		local tConfig = cache.tConfig
 		local edit = this:GetParent():Lookup('WndEditBox_CustomBidding/WndEdit_CustomBidding')
+		local nPriceMin = D.GetQuickBiddingPrice(szKey)
 		local nPrice = tonumber(edit:GetText()) or 0
-		nPrice = (max(0, floor((nPrice - tConfig.nPriceMin) / tConfig.nPriceStep) + 1)) * tConfig.nPriceStep + tConfig.nPriceMin
+		nPrice = max(nPriceMin, floor(((nPrice - tConfig.nPriceMin) / tConfig.nPriceStep) + 1) * tConfig.nPriceStep + tConfig.nPriceMin)
 		edit:SetText(nPrice)
 	elseif name == 'WndButton_CustomBiddingSure' then
 		local szKey = D.GetKey(frame)
 		local cache = BIDDING_CACHE[szKey]
 		local tConfig = cache.tConfig
 		local edit = this:GetParent():Lookup('WndEditBox_CustomBidding/WndEdit_CustomBidding')
+		local nPriceMin = D.GetQuickBiddingPrice(szKey)
 		local nPrice = tonumber(edit:GetText()) or 0
-		local nPriceNear = (max(0, floor((nPrice - tConfig.nPriceMin) / tConfig.nPriceStep))) * tConfig.nPriceStep + tConfig.nPriceMin
+		local nPriceNear = max(nPriceMin, floor(((nPrice - tConfig.nPriceMin) / tConfig.nPriceStep)) * tConfig.nPriceStep + tConfig.nPriceMin)
 		if nPrice ~= nPriceNear then
 			LIB.Systopmsg(_L['Not a valid price'])
 			LIB.Systopmsg(_L('Nearest price is %d and %d', nPriceNear, nPriceNear + tConfig.nPriceMin))

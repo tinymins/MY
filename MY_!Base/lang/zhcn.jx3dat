@@ -525,4 +525,7 @@ return {
 	['Not a valid price'] = '你输入的出价不在拍卖允许范围内！',
 	['Nearest price is %d and %d'] = '最接近的有效出价为%d金、%d金。',
 	['Sure cancel this bidding? You will not able to bidding this item.'] = '拍卖尚未结束，退出后不可再次出价，确定要提前退出？',
+	['Raise bidding for '] = '发起拍卖',
+	['Modify bidding for '] = '修改拍卖',
+	[', min price is %d, bidding step is %d.'] = '，最低出价%d金，最小加价%d金。',
 }
