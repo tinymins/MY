@@ -500,11 +500,6 @@ function MY_BiddingBase.OnLButtonClick()
 		local szKey = D.GetKey(frame)
 		local nPrice = D.GetQuickBiddingPrice(szKey)
 		if IsShiftKeyDown() then
-			this:GetParent():GetParent()
-				:Lookup('Wnd_CustomBidding/WndEditBox_CustomBidding/WndEdit_CustomBidding')
-				:SetText(nPrice)
-			D.SwitchCustomBidding(frame, true)
-		else
 			if not D.CheckTalkLock() then
 				return
 			end
@@ -513,6 +508,11 @@ function MY_BiddingBase.OnLButtonClick()
 			insert(aSay, { type = 'text', text = _L(', bidding for %d gold.', nPrice) })
 			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_BIDDING_ACTION', { szKey = szKey, nPrice = nPrice })
 			LIB.Talk(PLAYER_TALK_CHANNEL.RAID, aSay, nil, true)
+		else
+			this:GetParent():GetParent()
+				:Lookup('Wnd_CustomBidding/WndEditBox_CustomBidding/WndEdit_CustomBidding')
+				:SetText(nPrice)
+			D.SwitchCustomBidding(frame, true)
 		end
 	elseif name == 'WndButton_CustomBiddingDown' then
 		local szKey = D.GetKey(frame)
@@ -613,9 +613,10 @@ function MY_BiddingBase.OnItemRefreshTip()
 		local frame = this:GetRoot()
 		local szKey = D.GetKey(frame)
 		local nPrice = D.GetQuickBiddingPrice(szKey)
-		local szXml = GetFormatText(_L['Click to quick bidding at price '])
+		local szXml = GetFormatText(_L['Click to input price.'])
+		.. GetFormatText('\n' .. _L['Hold SHIFT when click to quick bidding at price '])
 			.. GetMoneyText({ nGold = nPrice }, 'font=162', 'cut_zero4')
-			.. GetFormatText('\n' .. _L['Hold SHIFT when click to input price.'])
+			.. GetFormatText(_L['.'])
 		LIB.OutputTip(this, szXml, true, ALW.TOP_BOTTOM)
 	end
 end
