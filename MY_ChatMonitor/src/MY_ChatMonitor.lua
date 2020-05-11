@@ -109,7 +109,7 @@ function D.LoadConfig()
     if not aKeyword then
         aKeyword = {{
             szKeyword = _L.CHAT_MONITOR_KEYWORDS_SAMPLE,
-            aChannel = Clone(DEFAULE_CHANNEL),
+            tChannel = Clone(DEFAULE_CHANNEL),
             bEnable = true,
             bIsRegexp = false,
         }}
