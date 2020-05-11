@@ -325,8 +325,10 @@ function ST:SetInfo(tTime, nIcon)
 		self.ui.txt:SetText(tTime.szName)
 	end
 	if tTime.nTime then
+		self.ui.time:SetText((tTime.nTime >= 1 or tTime.nTime < 0.1)
+			and FormatTimeCounter(tTime.nTime)
+			or ('%.1f'):format(tTime.nTime) .. 's')
 		self.ui:SetUserData(floor(tTime.nTime))
-		self.ui.time:SetText(FormatTimeCounter(tTime.nTime))
 	end
 	if nIcon then
 		local box = self.ui:Lookup('Box')
