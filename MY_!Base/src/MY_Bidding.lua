@@ -211,7 +211,7 @@ end
 
 function D.DrawPrice(h, nGold)
 	h:Clear()
-	h:AppendItemFromString(GetMoneyText({ nGold = nGold }, 'font=162', 'cut_zero4'))
+	h:AppendItemFromString(GetMoneyText({ nGold = nGold }, 'font=162', 'all2'))
 	h:FormatAllItemPos()
 end
 
@@ -615,7 +615,7 @@ function MY_BiddingBase.OnItemRefreshTip()
 		local nPrice = D.GetQuickBiddingPrice(szKey)
 		local szXml = GetFormatText(_L['Click to input price.'])
 		.. GetFormatText('\n' .. _L['Hold SHIFT when click to quick bidding at price '])
-			.. GetMoneyText({ nGold = nPrice }, 'font=162', 'cut_zero4')
+			.. GetMoneyText({ nGold = nPrice }, 'font=162', 'all2')
 			.. GetFormatText(_L['.'])
 		LIB.OutputTip(this, szXml, true, ALW.TOP_BOTTOM)
 	end
