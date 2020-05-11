@@ -434,7 +434,9 @@ function MY_BiddingBase.OnLButtonClick()
 		if LIB.IsDistributer() then
 			return LIB.Systopmsg(_L['You are distributer, Please finish this bidding!'])
 		end
-		Wnd.CloseWindow(frame)
+		LIB.Confirm(_L['Sure cancel this bidding? You will not able to bidding this item.'], function()
+			Wnd.CloseWindow(frame)
+		end)
 	elseif name == 'Btn_Option' then
 		if not LIB.IsDistributer() then
 			return LIB.Systopmsg(_L['You are not distributer!'])
@@ -570,10 +572,11 @@ function MY_BiddingBase.OnLButtonClick()
 		local tConfig = cache.tConfig
 		local aRecord = D.GetRankRecord(cache.aRecord)
 		local aSay = D.ConfigToEditStruct(tConfig)
+		insert(aSay, 1, { type = 'text', text = _L['Bidding'] })
 		if #aRecord == 0 then
-			insert(aSay, { type = 'text', text = _L[' nobody would buy it'] })
+			insert(aSay, { type = 'text', text = _L[', nobody would buy it'] })
 		else
-			insert(aSay, { type = 'text', text = _L[' finally bidding valid prices: '] })
+			insert(aSay, { type = 'text', text = _L[', finally bidding valid prices: '] })
 			for i = 1, min(#aRecord, tConfig.nNumber) do
 				if i > 1 then
 					insert(aSay, { type = 'text', text = _L[','] })
