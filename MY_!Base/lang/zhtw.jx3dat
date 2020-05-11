@@ -507,7 +507,9 @@ return {
 	['Sure'] = '確定',
 	['Cancel'] = '取消',
 	['Click to quick bidding at price '] = '點擊快速出價：',
-	[' bidding for %d gold.'] = '出價%d金。',
+	['Hold SHIFT when click to input price.'] = '按住SHIFT鍵點擊可手動出價。',
+	['Want to buy '] = '參與拍賣',
+	[', bidding for %d gold.'] = '，出價%d金。',
 	[' do not has vaild bidding price'] = '當前尚無有效出價',
 	[' bidding valid prices: '] = '當前拍賣有效出價：',
 	[','] = '，',
@@ -520,4 +522,6 @@ return {
 	[', bidding finished.'] = '，拍賣結束。',
 	['Create bidding'] = '發起拍賣',
 	['You are distributer, Please finish this bidding!'] = '你是分配者，請完成此次拍賣！',
+	['Not a valid price'] = '你輸入的出價不在拍賣允許範圍內！',
+	['Nearest price is %d and %d'] = '最接近的有效出價為%d金、%d金。',
 }

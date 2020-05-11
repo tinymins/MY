@@ -254,6 +254,10 @@ function D.SwitchConfig(frame, bConfig)
 	frame:Lookup('Wnd_Config/Btn_Option'):SetVisible(not bConfig)
 end
 
+function D.SwitchCustomBidding(frame, bCustom)
+	frame:Lookup('Wnd_CustomBidding'):SetVisible(bCustom)
+end
+
 function D.UpdateAuthourize(frame)
 	local bDistributer = LIB.IsDistributer()
 	if not bDistributer then
@@ -410,6 +414,7 @@ function MY_BiddingBase.OnFrameCreate()
 	this:Lookup('WndScroll_Bidding', 'Handle_BiddingColumns/Handle_BiddingColumnTime/Text_BiddingColumnTime_Title'):SetText(_L['Time'])
 	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, -100)
 	D.SwitchConfig(this, false)
+	D.SwitchCustomBidding(this, false)
 	D.UpdateAuthourize(this)
 	D.UpdateList(this)
 end
@@ -468,10 +473,54 @@ function MY_BiddingBase.OnLButtonClick()
 	elseif name == 'WndButton_Bidding' then
 		local szKey = D.GetKey(frame)
 		local nPrice = D.GetQuickBiddingPrice(szKey)
+		if IsShiftKeyDown() then
+			this:GetParent():GetParent()
+				:Lookup('Wnd_CustomBidding/WndEditBox_CustomBidding/WndEdit_CustomBidding')
+				:SetText(nPrice)
+			D.SwitchCustomBidding(frame, true)
+		else
+			local aSay = D.ConfigToEditStruct(BIDDING_CACHE[szKey].tConfig)
+			insert(aSay, 1, { type = 'text', text = _L['Want to buy '] })
+			insert(aSay, { type = 'text', text = _L(', bidding for %d gold.', nPrice) })
+			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_BIDDING_ACTION', { szKey = szKey, nPrice = nPrice })
+			LIB.Talk(PLAYER_TALK_CHANNEL.RAID, aSay, nil, true)
+		end
+	elseif name == 'WndButton_CustomBiddingDown' then
+		local szKey = D.GetKey(frame)
+		local cache = BIDDING_CACHE[szKey]
+		local tConfig = cache.tConfig
+		local edit = this:GetParent():Lookup('WndEditBox_CustomBidding/WndEdit_CustomBidding')
+		local nPrice = tonumber(edit:GetText()) or 0
+		nPrice = (max(0, floor((nPrice - tConfig.nPriceMin) / tConfig.nPriceStep) - 1)) * tConfig.nPriceStep + tConfig.nPriceMin
+		edit:SetText(nPrice)
+	elseif name == 'WndButton_CustomBiddingUp' then
+		local szKey = D.GetKey(frame)
+		local cache = BIDDING_CACHE[szKey]
+		local tConfig = cache.tConfig
+		local edit = this:GetParent():Lookup('WndEditBox_CustomBidding/WndEdit_CustomBidding')
+		local nPrice = tonumber(edit:GetText()) or 0
+		nPrice = (max(0, floor((nPrice - tConfig.nPriceMin) / tConfig.nPriceStep) + 1)) * tConfig.nPriceStep + tConfig.nPriceMin
+		edit:SetText(nPrice)
+	elseif name == 'WndButton_CustomBiddingSure' then
+		local szKey = D.GetKey(frame)
+		local cache = BIDDING_CACHE[szKey]
+		local tConfig = cache.tConfig
+		local edit = this:GetParent():Lookup('WndEditBox_CustomBidding/WndEdit_CustomBidding')
+		local nPrice = tonumber(edit:GetText()) or 0
+		local nPriceNear = (max(0, floor((nPrice - tConfig.nPriceMin) / tConfig.nPriceStep))) * tConfig.nPriceStep + tConfig.nPriceMin
+		if nPrice ~= nPriceNear then
+			LIB.Systopmsg(_L['Not a valid price'])
+			LIB.Systopmsg(_L('Nearest price is %d and %d', nPriceNear, nPriceNear + tConfig.nPriceMin))
+			return
+		end
 		local aSay = D.ConfigToEditStruct(BIDDING_CACHE[szKey].tConfig)
-		insert(aSay, { type = 'text', text = _L(' bidding for %d gold.', nPrice) })
+		insert(aSay, 1, { type = 'text', text = _L['Want to buy '] })
+		insert(aSay, { type = 'text', text = _L(', bidding for %d gold.', nPrice) })
 		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_BIDDING_ACTION', { szKey = szKey, nPrice = nPrice })
 		LIB.Talk(PLAYER_TALK_CHANNEL.RAID, aSay, nil, true)
+		D.SwitchCustomBidding(frame, false)
+	elseif name == 'WndButton_CustomBiddingCancel' then
+		D.SwitchCustomBidding(frame, false)
 	elseif name == 'WndButton_Publish' then
 		local szKey = D.GetKey(frame)
 		local cache = BIDDING_CACHE[szKey]
@@ -524,6 +573,7 @@ function MY_BiddingBase.OnItemRefreshTip()
 		local nPrice = D.GetQuickBiddingPrice(szKey)
 		local szXml = GetFormatText(_L['Click to quick bidding at price '])
 			.. GetMoneyText({ nGold = nPrice }, 'font=162', 'cut_zero4')
+			.. GetFormatText('\n' .. _L['Hold SHIFT when click to input price.'])
 		LIB.OutputTip(this, szXml, true, ALW.TOP_BOTTOM)
 	end
 end
