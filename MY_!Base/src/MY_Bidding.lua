@@ -48,6 +48,14 @@ local D = {}
 local O = {}
 local BIDDING_CACHE = {}
 
+function D.CheckTalkLock()
+	if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
+		LIB.Systopmsg(_L['Please unlock safety talk lock first!'])
+		return false
+	end
+	return true
+end
+
 function D.Open(tConfig)
 	if not tConfig then
 		tConfig = {}
@@ -58,8 +66,8 @@ function D.Open(tConfig)
 	if not LIB.IsDistributer() then
 		return LIB.Systopmsg(_L['You are not distributer!'])
 	end
-	if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
-		return LIB.Systopmsg(_L['Please unlock safety talk lock first!'])
+	if not D.CheckTalkLock() then
+		return
 	end
 	if not tConfig.szItem and not tConfig.dwTabType then
 		BIDDING_CACHE[tConfig.szKey] = {
@@ -458,6 +466,9 @@ function MY_BiddingBase.OnLButtonClick()
 		if not LIB.IsDistributer() then
 			return LIB.Systopmsg(_L['You are not distributer!'])
 		end
+		if not D.CheckTalkLock() then
+			return
+		end
 		local tConfig = frame.tUnsavedConfig
 		local wnd = this:GetParent()
 		D.EditToConfig(wnd:Lookup('WndEditBox_Name/WndEdit_Name'), tConfig)
@@ -479,6 +490,9 @@ function MY_BiddingBase.OnLButtonClick()
 				:SetText(nPrice)
 			D.SwitchCustomBidding(frame, true)
 		else
+			if not D.CheckTalkLock() then
+				return
+			end
 			local aSay = D.ConfigToEditStruct(BIDDING_CACHE[szKey].tConfig)
 			insert(aSay, 1, { type = 'text', text = _L['Want to buy '] })
 			insert(aSay, { type = 'text', text = _L(', bidding for %d gold.', nPrice) })
@@ -513,6 +527,9 @@ function MY_BiddingBase.OnLButtonClick()
 			LIB.Systopmsg(_L('Nearest price is %d and %d', nPriceNear, nPriceNear + tConfig.nPriceMin))
 			return
 		end
+		if not D.CheckTalkLock() then
+			return
+		end
 		local aSay = D.ConfigToEditStruct(BIDDING_CACHE[szKey].tConfig)
 		insert(aSay, 1, { type = 'text', text = _L['Want to buy '] })
 		insert(aSay, { type = 'text', text = _L(', bidding for %d gold.', nPrice) })
@@ -522,6 +539,9 @@ function MY_BiddingBase.OnLButtonClick()
 	elseif name == 'WndButton_CustomBiddingCancel' then
 		D.SwitchCustomBidding(frame, false)
 	elseif name == 'WndButton_Publish' then
+		if not D.CheckTalkLock() then
+			return
+		end
 		local szKey = D.GetKey(frame)
 		local cache = BIDDING_CACHE[szKey]
 		local tConfig = cache.tConfig
@@ -542,6 +562,9 @@ function MY_BiddingBase.OnLButtonClick()
 		insert(aSay, { type = 'text', text = _L['.'] })
 		LIB.Talk(PLAYER_TALK_CHANNEL.RAID, aSay, nil, true)
 	elseif name == 'WndButton_Finish' then
+		if not D.CheckTalkLock() then
+			return
+		end
 		local szKey = D.GetKey(frame)
 		local cache = BIDDING_CACHE[szKey]
 		local tConfig = cache.tConfig
@@ -590,6 +613,9 @@ function MY_BiddingBase.OnItemLButtonClick()
 	if name == 'Handle_RowItemDelete' then
 		if not LIB.IsDistributer() then
 			return LIB.Systopmsg(_L['You are not distributer!'])
+		end
+		if not D.CheckTalkLock() then
+			return
 		end
 		local frame = this:GetRoot()
 		local szKey = D.GetKey(frame)
