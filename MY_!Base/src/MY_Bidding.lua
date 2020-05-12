@@ -208,16 +208,18 @@ function D.GetQuickBiddingPrice(szKey)
 		nPriceNext = aRecord[tConfig.nNumber].nPrice + tConfig.nPriceStep
 	end
 	-- 计算自己的当前有效出价
-	local nPriceSelf
+	local nPriceSelf, bP
 	for i, p in ipairs(aRecord) do
-		if i > tConfig.nNumber then
-			break
-		end
 		if p.dwTalkerID == UI_GetClientPlayerID() then
-			nPriceSelf = p.nPrice
+			if i <= tConfig.nNumber then
+				nPriceSelf = p.nPrice
+			end
+			if p.bP then
+				bP = true
+			end
 		end
 	end
-	return nPriceNext, nPriceSelf
+	return nPriceNext, nPriceSelf, bP
 end
 
 function D.DrawPrice(h, nGold)
@@ -326,6 +328,7 @@ function D.UpdateList(frame)
 		hItem:Lookup('Handle_RowItem/Text_RowItemName'):SetText(rec.szTalkerName)
 		D.DrawPrice(hItem:Lookup('Handle_RowItem/Handle_RowItemPrice'), rec.nPrice)
 		hItem:Lookup('Handle_RowItem/Text_RowItemTime'):SetText(LIB.FormatTime(rec.dwTime, '%hh:%mm:%ss'))
+		hItem:Lookup('Handle_RowItem/Text_RowItemP'):SetVisible(rec.bP)
 		hItem:SetAlpha(tConfig.nNumber < i and 100 or 255)
 	end
 	h:FormatAllItemPos()
@@ -419,6 +422,22 @@ LIB.RegisterBgMsg('MY_BIDDING_ACTION', function(_, data, nChannel, dwTalkerID, s
 	D.UpdateList(frame)
 end)
 
+LIB.RegisterBgMsg('MY_BIDDING_P', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
+	if not BIDDING_CACHE[data.szKey] then
+		return
+	end
+	for _, p in ipairs(BIDDING_CACHE[data.szKey].aRecord) do
+		if p.dwTalkerID == dwTalkerID then
+			p.bP = true
+		end
+	end
+	local frame = D.GetFrame(data.szKey)
+	if not frame then
+		return
+	end
+	D.UpdateList(frame)
+end)
+
 LIB.RegisterBgMsg('MY_BIDDING_DELETE', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
 	if not BIDDING_CACHE[data.szKey] then
 		return
@@ -458,6 +477,7 @@ function MY_BiddingBase.OnFrameCreate()
 	this:Lookup('Wnd_Config/WndButton_ConfigSubmit', 'Text_ConfigSubmit'):SetText(_L['Sure'])
 	this:Lookup('Wnd_Config/WndButton_ConfigCancel', 'Text_ConfigCancel'):SetText(_L['Cancel'])
 	this:Lookup('Wnd_Bidding/WndButton_Bidding', 'Text_ButtonBidding'):SetText(_L['Show price'])
+	this:Lookup('Wnd_Bidding/WndButton_BiddingP', 'Text_ButtonBiddingP'):SetText(_L['P'])
 	this:Lookup('Wnd_Bidding/WndButton_Publish', 'Text_Publish'):SetText(_L['Publish'])
 	this:Lookup('Wnd_Bidding/WndButton_Finish', 'Text_Finish'):SetText(_L['Finish'])
 	this:Lookup('WndScroll_Bidding', 'Handle_BiddingColumns/Handle_BiddingColumnName/Text_BiddingColumnName_Title'):SetText(_L['Name'])
@@ -527,9 +547,45 @@ function MY_BiddingBase.OnLButtonClick()
 		D.UpdateAuthourize(frame)
 	elseif name == 'WndButton_ConfigCancel' then
 		D.SwitchConfig(frame, false)
+	elseif name == 'WndButton_BiddingP' then
+		if not D.CheckTalkLock() then
+			return
+		end
+		local szKey = D.GetKey(frame)
+		local cache = BIDDING_CACHE[szKey]
+		local aRecord = D.GetRankRecord(cache.aRecord)
+		local bExist, bP, bValid = false, false, false
+		for i, p in ipairs(aRecord) do
+			if p.dwTalkerID == UI_GetClientPlayerID() then
+				bExist = true
+				if p.bP then
+					bP = true
+				elseif i <= cache.tConfig.nNumber then
+					bValid = true
+				end
+				break
+			end
+		end
+		if not bExist then
+			return LIB.Systopmsg(_L['You have not bidding a price yet.'])
+		end
+		if bP then
+			return LIB.Systopmsg(_L['You have already p.'])
+		end
+		if bValid then
+			return LIB.Systopmsg(_L['You cannot p cause you have a vaild price.'])
+		end
+		local aSay = D.ConfigToEditStruct(BIDDING_CACHE[szKey].tConfig)
+		insert(aSay, 1, { type = 'text', text = _L['Exit from bidding '] })
+		insert(aSay, { type = 'text', text = _L[', P.'] })
+		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_BIDDING_P', { szKey = szKey })
+		LIB.Talk(PLAYER_TALK_CHANNEL.RAID, aSay, nil, true)
 	elseif name == 'WndButton_Bidding' then
 		local szKey = D.GetKey(frame)
-		local nPrice, nPriceSelf = D.GetQuickBiddingPrice(szKey)
+		local nPrice, nPriceSelf, bP = D.GetQuickBiddingPrice(szKey)
+		if bP then
+			return LIB.Systopmsg(_L['You have already p.'])
+		end
 		if IsShiftKeyDown() then
 			if not D.CheckTalkLock() then
 				return
@@ -571,7 +627,10 @@ function MY_BiddingBase.OnLButtonClick()
 		local cache = BIDDING_CACHE[szKey]
 		local tConfig = cache.tConfig
 		local edit = this:GetParent():Lookup('WndEditBox_CustomBidding/WndEdit_CustomBidding')
-		local nPriceMin = D.GetQuickBiddingPrice(szKey)
+		local nPriceMin, _, bP = D.GetQuickBiddingPrice(szKey)
+		if bP then
+			return LIB.Systopmsg(_L['You have already p.'])
+		end
 		local nPrice = tonumber(edit:GetText()) or 0
 		local nPriceNear = max(nPriceMin, floor(((nPrice - tConfig.nPriceMin) / tConfig.nPriceStep)) * tConfig.nPriceStep + tConfig.nPriceMin)
 		if nPrice ~= nPriceNear then
@@ -646,14 +705,16 @@ function MY_BiddingBase.OnItemRefreshTip()
 	if name == 'Handle_ButtonBidding' then
 		local frame = this:GetRoot()
 		local szKey = D.GetKey(frame)
-		local nPrice, nPriceSelf = D.GetQuickBiddingPrice(szKey)
-		local szXml = GetFormatText(_L['Click to input price.'])
-			.. (nPriceSelf
-				and GetFormatText('\n' .. _L['Your valid price is '])
-					.. GetMoneyText({ nGold = nPriceSelf }, 'font=162', 'all2')
-				or GetFormatText('\n' .. _L['Hold SHIFT when click to quick bidding at price '])
-					.. GetMoneyText({ nGold = nPrice }, 'font=162', 'all2'))
-			.. GetFormatText(_L['.'])
+		local nPrice, nPriceSelf, bP = D.GetQuickBiddingPrice(szKey)
+		local szXml = bP
+			and GetFormatText(_L['You have already p.'])
+			or (GetFormatText(_L['Click to input price.'])
+				.. (nPriceSelf
+					and GetFormatText('\n' .. _L['Your valid price is '])
+						.. GetMoneyText({ nGold = nPriceSelf }, 'font=162', 'all2')
+					or GetFormatText('\n' .. _L['Hold SHIFT when click to quick bidding at price '])
+						.. GetMoneyText({ nGold = nPrice }, 'font=162', 'all2'))
+				.. GetFormatText(_L['.']))
 		LIB.OutputTip(this, szXml, true, ALW.TOP_BOTTOM)
 	end
 end
