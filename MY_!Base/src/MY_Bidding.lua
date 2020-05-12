@@ -314,16 +314,19 @@ end
 
 function D.UpdateList(frame)
 	local szKey = D.GetKey(frame)
+	local cache = BIDDING_CACHE[szKey]
+	local tConfig = cache.tConfig
 	local aRecord = D.GetRankRecord(BIDDING_CACHE[szKey].aRecord)
 	local h = frame:Lookup('WndScroll_Bidding', 'Handle_List')
 	h:Clear()
-	for _, rec in ipairs(aRecord) do
+	for i, rec in ipairs(aRecord) do
 		local hItem = h:AppendItemFromIni(INI_PATH, 'Handle_Row')
 		hItem.rec = rec
 		hItem:Lookup('Handle_RowItem/Image_RowItemKungfu'):FromIconID(Table_GetSkillIconID(rec.dwKungfu, 1))
 		hItem:Lookup('Handle_RowItem/Text_RowItemName'):SetText(rec.szTalkerName)
 		D.DrawPrice(hItem:Lookup('Handle_RowItem/Handle_RowItemPrice'), rec.nPrice)
 		hItem:Lookup('Handle_RowItem/Text_RowItemTime'):SetText(LIB.FormatTime(rec.dwTime, '%hh:%mm:%ss'))
+		hItem:SetAlpha(tConfig.nNumber < i and 100 or 255)
 	end
 	h:FormatAllItemPos()
 end
