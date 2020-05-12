@@ -324,8 +324,25 @@ function D.PublishConfig(tConfig, bInit)
 	else
 		insert(aSay, 1, { type = 'text', text = _L['Modify bidding for '] })
 	end
-	insert(aSay, { type = 'text', text = _L(', min price is %d, bidding step is %d.', tConfig.nPriceMin, tConfig.nPriceStep) })
+	insert(aSay, {
+		type = 'text',
+		text = _L(', min price is %s, bidding step is %s.',
+			D.GetMoneyTalkText(tConfig.nPriceMin),
+			D.GetMoneyTalkText(tConfig.nPriceStep)),
+		})
 	LIB.Talk(PLAYER_TALK_CHANNEL.RAID, aSay, nil, true)
+end
+
+function D.GetMoneyTalkText(nGold)
+	if nGold >= 10000 then
+		local nBrick = floor(nGold / 10000)
+		local nGold = nGold % 10000
+		if nGold == 0 then
+			return _L('%d brick', nBrick)
+		end
+		return _L('%d brick %d gold', nBrick, nGold)
+	end
+	return _L('%d gold', nGold)
 end
 
 -- Global exports
@@ -505,7 +522,7 @@ function MY_BiddingBase.OnLButtonClick()
 			end
 			local aSay = D.ConfigToEditStruct(BIDDING_CACHE[szKey].tConfig)
 			insert(aSay, 1, { type = 'text', text = _L['Want to buy '] })
-			insert(aSay, { type = 'text', text = _L(', bidding for %d gold.', nPrice) })
+			insert(aSay, { type = 'text', text = _L(', bidding for %s.', D.GetMoneyTalkText(nPrice)) })
 			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_BIDDING_ACTION', { szKey = szKey, nPrice = nPrice })
 			LIB.Talk(PLAYER_TALK_CHANNEL.RAID, aSay, nil, true)
 		else
@@ -550,7 +567,7 @@ function MY_BiddingBase.OnLButtonClick()
 		end
 		local aSay = D.ConfigToEditStruct(BIDDING_CACHE[szKey].tConfig)
 		insert(aSay, 1, { type = 'text', text = _L['Want to buy '] })
-		insert(aSay, { type = 'text', text = _L(', bidding for %d gold.', nPrice) })
+		insert(aSay, { type = 'text', text = _L(', bidding for %s.', D.GetMoneyTalkText(nPrice)) })
 		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_BIDDING_ACTION', { szKey = szKey, nPrice = nPrice })
 		LIB.Talk(PLAYER_TALK_CHANNEL.RAID, aSay, nil, true)
 		D.SwitchCustomBidding(frame, false)

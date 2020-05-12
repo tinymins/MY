@@ -509,7 +509,10 @@ return {
 	['Click to input price.'] = '点击进入手动出价。',
 	['Hold SHIFT when click to quick bidding at price '] = '按住SHIFT键点击可快速出价：',
 	['Want to buy '] = '参与拍卖',
-	[', bidding for %d gold.'] = '，出价%d金。',
+	['%d gold'] = '%d金',
+	['%d brick'] = '%d金砖',
+	['%d brick %d gold'] = '%d金砖%d金',
+	[', bidding for %s.'] = '，出价%s。',
 	[' do not has vaild bidding price'] = '当前尚无有效出价',
 	[' bidding valid prices: '] = '当前拍卖有效出价：',
 	[','] = '，',
@@ -527,5 +530,5 @@ return {
 	['Sure cancel this bidding? You will not able to bidding this item.'] = '拍卖尚未结束，退出后不可再次出价，确定要提前退出？',
 	['Raise bidding for '] = '发起拍卖',
 	['Modify bidding for '] = '修改拍卖',
-	[', min price is %d, bidding step is %d.'] = '，最低出价%d金，最小加价%d金。',
+	[', min price is %s, bidding step is %s.'] = '，最低出价%s，最小加价%s。',
 }
