@@ -1701,10 +1701,12 @@ function D.GetDoodadLootInfo(dwID)
 		local nLootItemCount = d.GetItemListCount()
 		for i = 0, nLootItemCount - 1 do
 			local data = D.GetItemData(me, d, i)
-			if data.bSpecial then
-				bSpecial = true
+			if data then
+				if data.bSpecial then
+					bSpecial = true
+				end
+				insert(aItemData, data)
 			end
-			insert(aItemData, data)
 		end
 		nMoney = d.GetLootMoney() or 0
 	end
