@@ -540,4 +540,5 @@ return {
 	[', min price is %s, bidding step is %s.'] = '，最低出价%s，最小加价%s。',
 	['Your valid price is '] = '你当前有效出价为：',
 	['You already have a vaild price at %s.'] = '你已有有效出价%s，无需重复出价。',
+	['Sure to delete %s\'s bidding record?'] = '确定要作废[%s]的出价记录？',
 }

@@ -741,12 +741,17 @@ function MY_BiddingBase.OnItemLButtonClick()
 		local tConfig = cache.tConfig
 		local aSay = D.ConfigToEditStruct(tConfig)
 		local rec = this:GetParent().rec
-		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_BIDDING_DELETE', { szKey = szKey, dwTalkerID = rec.dwTalkerID })
 		insert(aSay, 1, { type = 'text', text = _L['Modify bidding for '] })
 		insert(aSay, { type = 'text', text = _L['\'s record, delete '] })
 		insert(aSay, { type = 'name', name = rec.szTalkerName })
 		insert(aSay, { type = 'text', text = _L[' \'s invalid price .'] })
-		LIB.Talk(PLAYER_TALK_CHANNEL.RAID, aSay, nil, true)
+		LIB.Confirm(_L('Sure to delete %s\'s bidding record?', rec.szTalkerName), function()
+			if not LIB.IsDistributer() then
+				return LIB.Systopmsg(_L['You are not distributer!'])
+			end
+			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_BIDDING_DELETE', { szKey = szKey, dwTalkerID = rec.dwTalkerID })
+			LIB.Talk(PLAYER_TALK_CHANNEL.RAID, aSay, nil, true)
+		end)
 	end
 end
 
