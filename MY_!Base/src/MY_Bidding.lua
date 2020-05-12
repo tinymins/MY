@@ -202,9 +202,19 @@ function D.GetQuickBiddingPrice(szKey)
 	local cache = BIDDING_CACHE[szKey]
 	local tConfig = cache.tConfig
 	local aRecord = D.GetRankRecord(cache.aRecord)
+	-- 计算最低加价金额
 	local nPrice = tConfig.nPriceMin
 	if #aRecord >= tConfig.nNumber then
-		nPrice = aRecord[#aRecord].nPrice + tConfig.nPriceStep
+		nPrice = aRecord[tConfig.nNumber].nPrice + tConfig.nPriceStep
+	end
+	-- 如果自己出过价且有效则不加价
+	for i, p in ipairs(aRecord) do
+		if i > tConfig.nPriceMin then
+			break
+		end
+		if p.dwTalkerID == UI_GetClientPlayerID() then
+			nPrice = p.nPrice
+		end
 	end
 	return nPrice
 end
