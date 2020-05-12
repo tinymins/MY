@@ -531,4 +531,6 @@ return {
 	['Raise bidding for '] = '发起拍卖',
 	['Modify bidding for '] = '修改拍卖',
 	[', min price is %s, bidding step is %s.'] = '，最低出价%s，最小加价%s。',
+	['Your valid price is '] = '你当前有效出价为：',
+	['You already have a vaild price at %s.'] = '你已有有效出价%s，无需重复出价。',
 }

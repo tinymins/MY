@@ -203,20 +203,21 @@ function D.GetQuickBiddingPrice(szKey)
 	local tConfig = cache.tConfig
 	local aRecord = D.GetRankRecord(cache.aRecord)
 	-- 计算最低加价金额
-	local nPrice = tConfig.nPriceMin
+	local nPriceNext = tConfig.nPriceMin
 	if #aRecord >= tConfig.nNumber then
-		nPrice = aRecord[tConfig.nNumber].nPrice + tConfig.nPriceStep
+		nPriceNext = aRecord[tConfig.nNumber].nPrice + tConfig.nPriceStep
 	end
-	-- 如果自己出过价且有效则不加价
+	-- 计算自己的当前有效出价
+	local nPriceSelf
 	for i, p in ipairs(aRecord) do
-		if i > tConfig.nPriceMin then
+		if i > tConfig.nNumber then
 			break
 		end
 		if p.dwTalkerID == UI_GetClientPlayerID() then
-			nPrice = p.nPrice
+			nPriceSelf = p.nPrice
 		end
 	end
-	return nPrice
+	return nPriceNext, nPriceSelf
 end
 
 function D.DrawPrice(h, nGold)
@@ -525,10 +526,13 @@ function MY_BiddingBase.OnLButtonClick()
 		D.SwitchConfig(frame, false)
 	elseif name == 'WndButton_Bidding' then
 		local szKey = D.GetKey(frame)
-		local nPrice = D.GetQuickBiddingPrice(szKey)
+		local nPrice, nPriceSelf = D.GetQuickBiddingPrice(szKey)
 		if IsShiftKeyDown() then
 			if not D.CheckTalkLock() then
 				return
+			end
+			if nPriceSelf then
+				return LIB.Systopmsg(_L('You already have a vaild price at %s.', D.GetMoneyTalkText(nPriceSelf)))
 			end
 			local aSay = D.ConfigToEditStruct(BIDDING_CACHE[szKey].tConfig)
 			insert(aSay, 1, { type = 'text', text = _L['Want to buy '] })
@@ -639,10 +643,13 @@ function MY_BiddingBase.OnItemRefreshTip()
 	if name == 'Handle_ButtonBidding' then
 		local frame = this:GetRoot()
 		local szKey = D.GetKey(frame)
-		local nPrice = D.GetQuickBiddingPrice(szKey)
+		local nPrice, nPriceSelf = D.GetQuickBiddingPrice(szKey)
 		local szXml = GetFormatText(_L['Click to input price.'])
-		.. GetFormatText('\n' .. _L['Hold SHIFT when click to quick bidding at price '])
-			.. GetMoneyText({ nGold = nPrice }, 'font=162', 'all2')
+			.. (nPriceSelf
+				and GetFormatText('\n' .. _L['Your valid price is '])
+					.. GetMoneyText({ nGold = nPriceSelf }, 'font=162', 'all2')
+				or GetFormatText('\n' .. _L['Hold SHIFT when click to quick bidding at price '])
+					.. GetMoneyText({ nGold = nPrice }, 'font=162', 'all2'))
 			.. GetFormatText(_L['.'])
 		LIB.OutputTip(this, szXml, true, ALW.TOP_BOTTOM)
 	end
