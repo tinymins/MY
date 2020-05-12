@@ -443,7 +443,7 @@ function D.OnLButtonClick()
 		insert(menu, CONSTANT.MENU_DIVIDER)
 		insert(menu, D.GetFilterMenu())
 		insert(menu, D.GetAutoPickupMenu())
-		PopupMenu(menu)
+		UI.PopupMenu(menu)
 	elseif szName == 'Btn_Boss' then
 		if not D.AuthCheck(this:GetParent().dwDoodadID) then
 			return LIB.Topmsg(_L['You are not the distrubutor.'])
@@ -572,7 +572,7 @@ function D.OnItemLButtonClick()
 			if not D.AuthCheck(dwDoodadID) then
 				return
 			end
-			return PopupMenu(D.GetDistributeMenu(data, data.item.nUiId))
+			return UI.PopupMenu(D.GetDistributeMenu(data, data.item.nUiId))
 		elseif data.bBidding then
 			if team.nLootMode ~= PARTY_LOOT_MODE.BIDDING then
 				return OutputMessage('MSG_ANNOUNCE_RED', g_tStrings.GOLD_CHANGE_BID_LOOT)
@@ -607,7 +607,7 @@ function D.OnItemLButtonClick()
 				return LIB.Topmsg(_L['You are not the distrubutor.'])
 			end
 		end
-		return PopupMenu(D.GetDistributeMenu(aItemData, hItem.itemData.szType))
+		return UI.PopupMenu(D.GetDistributeMenu(aItemData, hItem.itemData.szType))
 	end
 end
 
@@ -626,48 +626,7 @@ function D.OnItemRButtonClick()
 		if not D.AuthCheck(dwDoodadID) then
 			return
 		end
-		local menu = {}
-		insert(menu, { szOption = data.szName , bDisable = true })
-		insert(menu, { bDevide = true })
-		insert(menu, {
-			szOption = 'Roll',
-			fnAction = function()
-				if MY_RollMonitor then
-					if MY_RollMonitor.OpenPanel and MY_RollMonitor.Clear then
-						MY_RollMonitor.OpenPanel()
-						MY_RollMonitor.Clear({echo=false})
-					end
-				end
-				LIB.Talk(PLAYER_TALK_CHANNEL.RAID, { MY_GKP.GetFormatLink(data.item), MY_GKP.GetFormatLink(_L['Roll the dice if you wang']) })
-			end
-		})
-		insert(menu, { bDevide = true })
-		for k, v in ipairs(MY_GKP.aScheme) do
-			if v[3] then
-				insert(menu, {
-					szOption = v[1] .. ',' .. v[2],
-					fnAction = function()
-						if IsShiftKeyDown() then
-							MY_Bidding.Open({
-								nPriceMin = v[1],
-								nPriceStep = v[2],
-								nNumber = data.item.bCanStack and data.item.nStackNum or 1,
-								dwTabType = data.item.dwTabType,
-								dwTabIndex = data.item.dwIndex,
-								nBookID = data.item.nGenre == ITEM_GENRE.BOOK and data.item.nBookID or nil,
-							})
-							return
-						end
-						MY_GKP_Chat.OpenFrame(data.item, D.GetDistributeMenu(data, data.nUiId), {
-							dwDoodadID = dwDoodadID,
-							data = data,
-						})
-						LIB.Talk(PLAYER_TALK_CHANNEL.RAID, { MY_GKP.GetFormatLink(data.item), MY_GKP.GetFormatLink(_L(' %d Gold Start Bidding, off a price if you want.', v[1])) })
-					end
-				})
-			end
-		end
-		PopupMenu(menu)
+		UI.PopupMenu(D.GetItemBiddingMenu(dwDoodadID, data))
 	end
 end
 
@@ -977,7 +936,7 @@ function D.GetBossAction(dwDoodadID, bMenu)
 		end, false, true)
 		insert(menu, 1, { bDevide = true })
 		insert(menu, 1, { szOption = _L['select equip boss'], bDisable = true })
-		PopupMenu(menu)
+		UI.PopupMenu(menu)
 	else
 		fnAction()
 	end
@@ -1271,6 +1230,56 @@ function D.GetDistributeMenu(aItemData, szAutoDistType)
 	end
 	return menu
 end
+end
+
+function D.GetItemBiddingMenu(dwDoodadID, data)
+	local menu = {}
+	insert(menu, { szOption = data.szName , bDisable = true })
+	insert(menu, { bDevide = true })
+	insert(menu, {
+		szOption = 'Roll',
+		fnAction = function()
+			if MY_RollMonitor then
+				if MY_RollMonitor.OpenPanel and MY_RollMonitor.Clear then
+					MY_RollMonitor.OpenPanel()
+					MY_RollMonitor.Clear({echo=false})
+				end
+			end
+			LIB.Talk(PLAYER_TALK_CHANNEL.RAID, { MY_GKP.GetFormatLink(data.item), MY_GKP.GetFormatLink(_L['Roll the dice if you wang']) })
+			return 0
+		end
+	})
+	insert(menu, { bDevide = true })
+	for k, v in ipairs(MY_GKP.aScheme) do
+		if v[3] then
+			insert(menu, {
+				szOption = v[1] .. ',' .. v[2],
+				fnAction = function()
+					if IsShiftKeyDown() then
+						MY_Bidding.Open({
+							nPriceMin = v[1],
+							nPriceStep = v[2],
+							nNumber = data.item.bCanStack and data.item.nStackNum or 1,
+							dwTabType = data.item.dwTabType,
+							dwTabIndex = data.item.dwIndex,
+							nBookID = data.item.nGenre == ITEM_GENRE.BOOK and data.item.nBookID or nil,
+						})
+						return 0
+					end
+					MY_GKP_Chat.OpenFrame(data.item, D.GetDistributeMenu(data, data.nUiId), {
+						dwDoodadID = dwDoodadID,
+						data = data,
+					})
+					LIB.Talk(PLAYER_TALK_CHANNEL.RAID, {
+						MY_GKP.GetFormatLink(data.item),
+						MY_GKP.GetFormatLink(_L(' %d Gold Start Bidding, off a price if you want.', v[1])),
+					})
+					return 0
+				end
+			})
+		end
+	end
+	return menu
 end
 
 function D.AdjustFrame(frame)
@@ -1642,6 +1651,41 @@ local function GetItemDataType(data)
 	return 'OTHER'
 end
 
+function D.GetItemData(me, d, i)
+	local item, bNeedRoll, bDist, bBidding = d.GetLootItem(i, me)
+	if item then
+		-- itemData
+		local data = {
+			dwDoodadID   = d.dwID        ,
+			szDoodadName = d.szName      ,
+			item         = item          ,
+			szName       = LIB.GetItemNameByItem(item),
+			dwID         = item.dwID     ,
+			dwTabType    = item.dwTabType,
+			dwIndex      = item.dwIndex  ,
+			nUiId        = item.nUiId    ,
+			nGenre       = item.nGenre   ,
+			nSub         = item.nSub     ,
+			nQuality     = item.nQuality ,
+			bNeedRoll    = bNeedRoll     ,
+			bDist        = bDist         ,
+			bBidding     = bBidding      ,
+			nStackNum    = item.bCanStack and item.nStackNum or 1,
+			bSpecial     = item.nQuality == GKP_LOOT_HUANGBABA_QUALITY
+				and LIB.GetItemIconByUIID(item.nUiId) == GKP_LOOT_HUANGBABA_ICON,
+		}
+		if DEBUG_LOOT then
+			data.bDist = true -- !!! Debug
+		end
+		if item.nGenre == ITEM_GENRE.BOOK then
+			data.nBookID = item.nBookID
+		end
+		data.szType = GetItemDataType(data)
+		data.nWeight = ITEM_DATA_WEIGHT[data.szType]
+		return data
+	end
+end
+
 local function LootItemSorter(data1, data2)
 	return data1.nWeight < data2.nWeight
 end
@@ -1651,53 +1695,21 @@ function D.GetDoodadLootInfo(dwID)
 	local me = GetClientPlayer()
 	local d  = GetDoodad(dwID)
 	local aItemData = {}
-	local szName
 	local bSpecial = false
 	local nMoney = 0
 	if me and d then
-		szName = d.szName
 		local nLootItemCount = d.GetItemListCount()
 		for i = 0, nLootItemCount - 1 do
-			local item, bNeedRoll, bDist, bBidding = d.GetLootItem(i, me)
-			if item then
-				local szItemName = LIB.GetItemNameByItem(item)
-				if item.nQuality == GKP_LOOT_HUANGBABA_QUALITY and LIB.GetItemIconByUIID(item.nUiId) == GKP_LOOT_HUANGBABA_ICON then
-					bSpecial = true
-				end
-				-- bSpecial = true -- debug
-				-- itemData
-				local data = {
-					dwDoodadID   = dwID          ,
-					szDoodadName = szName        ,
-					item         = item          ,
-					szName       = szItemName    ,
-					dwID         = item.dwID     ,
-					dwTabType    = item.dwTabType,
-					dwIndex      = item.dwIndex  ,
-					nUiId        = item.nUiId    ,
-					nGenre       = item.nGenre   ,
-					nSub         = item.nSub     ,
-					nQuality     = item.nQuality ,
-					bNeedRoll    = bNeedRoll     ,
-					bDist        = bDist         ,
-					bBidding     = bBidding      ,
-					nStackNum    = item.bCanStack and item.nStackNum or 1,
-				}
-				if DEBUG_LOOT then
-					data.bDist = true -- !!! Debug
-				end
-				if item.nGenre == ITEM_GENRE.BOOK then
-					data.nBookID = item.nBookID
-				end
-				data.szType = GetItemDataType(data)
-				data.nWeight = ITEM_DATA_WEIGHT[data.szType]
-				insert(aItemData, data)
+			local data = D.GetItemData(me, d, i)
+			if data.bSpecial then
+				bSpecial = true
 			end
+			insert(aItemData, data)
 		end
 		nMoney = d.GetLootMoney() or 0
 	end
 	sort(aItemData, LootItemSorter)
-	return aItemData, nMoney, szName, bSpecial
+	return aItemData, nMoney, d.szName, bSpecial
 end
 
 function D.HideSystemLoot()
@@ -1795,14 +1807,16 @@ local settings = {
 		},
 		{
 			fields = {
-				IsEnabled = D.IsEnabled,
-				CanDialog = D.CanDialog,
-				IsItemDisplay = D.IsItemDisplay,
-				IsItemAutoPickup = D.IsItemAutoPickup,
-				GetMessageBox     = D.GetMessageBox    ,
-				GetaPartyMember   = D.GetaPartyMember  ,
-				GetFilterMenu     = D.GetFilterMenu    ,
-				GetAutoPickupMenu = D.GetAutoPickupMenu,
+				IsEnabled          = D.IsEnabled         ,
+				CanDialog          = D.CanDialog         ,
+				IsItemDisplay      = D.IsItemDisplay     ,
+				IsItemAutoPickup   = D.IsItemAutoPickup  ,
+				GetMessageBox      = D.GetMessageBox     ,
+				GetaPartyMember    = D.GetaPartyMember   ,
+				GetFilterMenu      = D.GetFilterMenu     ,
+				GetAutoPickupMenu  = D.GetAutoPickupMenu ,
+				GetItemData        = D.GetItemData       ,
+				GetItemBiddingMenu = D.GetItemBiddingMenu,
 			},
 		},
 		{
