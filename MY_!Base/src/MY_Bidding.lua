@@ -483,11 +483,26 @@ function MY_BiddingBase.OnFrameCreate()
 	this:Lookup('WndScroll_Bidding', 'Handle_BiddingColumns/Handle_BiddingColumnName/Text_BiddingColumnName_Title'):SetText(_L['Name'])
 	this:Lookup('WndScroll_Bidding', 'Handle_BiddingColumns/Handle_BiddingColumnPrice/Text_BiddingColumnPrice_Title'):SetText(_L['Price'])
 	this:Lookup('WndScroll_Bidding', 'Handle_BiddingColumns/Handle_BiddingColumnTime/Text_BiddingColumnTime_Title'):SetText(_L['Time'])
+	this:RegisterEvent('PARTY_DISBAND')
+	this:RegisterEvent('PARTY_DELETE_MEMBER')
+	this:RegisterEvent('TEAM_AUTHORITY_CHANGED')
 	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, -100)
 	D.SwitchConfig(this, false)
 	D.SwitchCustomBidding(this, false)
 	D.UpdateAuthourize(this)
 	D.UpdateList(this)
+end
+
+function MY_BiddingBase.OnEvent(event)
+	if event == 'PARTY_DISBAND' then
+		Wnd.CloseWindow(this)
+	elseif event == 'PARTY_DELETE_MEMBER' then
+		if UI_GetClientPlayerID() == arg1 then
+			Wnd.CloseWindow(this)
+		end
+	elseif event == 'TEAM_AUTHORITY_CHANGED' then
+		D.UpdateAuthourize(this)
+	end
 end
 
 function MY_BiddingBase.OnLButtonClick()
