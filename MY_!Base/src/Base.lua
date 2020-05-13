@@ -968,6 +968,7 @@ local CONSTANT = setmetatable({}, {
 			[58294] = 62347, -- 剑出鸿蒙
 		},
 		NPC_HIDDEN = {
+			[19153] = true, -- 皇宫范围总控
 			[60045] = true, -- 辉天堑铁库牢房的不知道什么东西
 		},
 		DOODAD_NAME = {},
