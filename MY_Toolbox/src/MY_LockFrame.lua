@@ -156,7 +156,7 @@ function D.IsFrameLock(frame)
 		return false
 	end
 	local szLock = O.tLockID[frame:GetName()]
-	return szLock and O.tEnable[szLock]
+	return szLock and O.tEnable[szLock] ~= false
 end
 
 function D.CheckFrame(frame)
@@ -226,7 +226,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 			for _, k in ipairs(O.tLockList) do
 				insert(t, {
 					szOption = _L['LOCK_FRAME_' .. k],
-					bCheck = true, bChecked = MY_LockFrame.tEnable[k],
+					bCheck = true, bChecked = MY_LockFrame.tEnable[k] ~= false,
 					fnAction = function(_, b)
 						MY_LockFrame.tEnable[k] = b
 						D.CheckAllFrame()
