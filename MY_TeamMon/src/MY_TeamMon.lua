@@ -1413,6 +1413,12 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 	if MY_TM_SHIELDED_MAP then
 		return
 	end
+	if dwNpcID and not IsPlayer(dwNpcID) then
+		local npc = GetNpc(dwNpcID)
+		if npc and LIB.IsShieldedNpc(npc.dwTemplateID, 'TALK') then
+			return
+		end
+	end
 	-- ½üÆÚ¼ÇÂ¼
 	szContent = tostring(szContent)
 	local me = GetClientPlayer()

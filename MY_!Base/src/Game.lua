@@ -886,9 +886,9 @@ function LIB.IsImportantNpc(dwMapID, dwTemplateID, bNoBoss)
 end
 
 -- 获取指定模板ID的NPC是不是被屏蔽的NPC
--- (boolean) LIB.IsShieldedNpc(dwTemplateID)
-function LIB.IsShieldedNpc(dwTemplateID)
-	return Table_IsShieldedNpc and Table_IsShieldedNpc(dwTemplateID)
+-- (boolean) LIB.IsShieldedNpc(dwTemplateID, szType)
+function LIB.IsShieldedNpc(dwTemplateID, szType)
+	return Table_IsShieldedNpc and Table_IsShieldedNpc(dwTemplateID, szType)
 end
 
 LIB.RegisterTargetAddonMenu(PACKET_INFO.NAME_SPACE .. '#Game#ImportantNpclist', function()

@@ -603,7 +603,7 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		end
 
 		-- ÅÐ¶ÏÆÁ±ÎµÄNPC
-		if bFocus and dwType == TARGET.NPC and LIB.IsShieldedNpc(dwTemplateID) and LIB.IsShieldedVersion('TARGET') then
+		if bFocus and dwType == TARGET.NPC and LIB.IsShieldedNpc(dwTemplateID, 'FOCUS') and LIB.IsShieldedVersion('TARGET') then
 			bFocus = false
 		end
 
