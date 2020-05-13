@@ -1,4 +1,5 @@
 > 这是在国产大型3D网游《剑网3》中使用的辅助插件，遵循简单实用原则，侧重于 PVE 并且全部开源免费。
+[![Build Status](https://travis-ci.com/tinymins/JX3MY.svg?token=yQdYwdSeW1cRn46LTYo4&branch=master)](https://travis-ci.com/tinymins/JX3MY)
 
 # 捐助
 
