@@ -329,6 +329,7 @@ return {
     ['LOCK_FRAME_MY_Recount_UI'] = '茗伊·伤害统计',
     ['LOCK_FRAME_LR_AS_FP'] = '懒人·账本悬浮窗',
     ['LOCK_FRAME_QuestTraceList'] = '任务追踪',
+    ['LOCK_FRAME_Matrix'] = '阵法界面',
     ['LOCK_FRAME_ChatPanel'] = '聊天面板',
     ['LOCK_FRAME_DynamicActionBar'] = '动态技能栏',
     ['LOCK_FRAME_ExteriorAction'] = '外装动作',

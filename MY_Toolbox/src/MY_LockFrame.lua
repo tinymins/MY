@@ -71,6 +71,7 @@ local O = {
 		['MentorMessage'] = true,
 		['JX_TeamCD'] = true,
 		['JX_HeightMeter'] = true,
+		['Matrix'] = true,
 	},
 	-- 本地变量
 	bTempDisable = false,
@@ -80,9 +81,10 @@ local O = {
 		'FightingStatistic',
 		'QuestTraceList',
 		'ChatPanel',
-		'DynamicActionBar',
+		'Matrix',
 		'ExteriorAction',
 		'MentorMessage',
+		'DynamicActionBar',
 		'JX_TeamCD',
 		'JX_HeightMeter',
 		'JX_TargetList',
@@ -101,6 +103,7 @@ local O = {
 		['MY_Recount_UI'] = 'MY_Recount_UI', -- 茗伊·伤害统计 [Normal/MY_Recount_UI]
 		['LR_AS_FP'] = 'LR_AS_FP', -- 懒人·账本悬浮窗 [Normal/LR_AS_FP]
 		['QuestTraceList'] = 'QuestTraceList', -- 任务追踪 [Normal/QuestTraceList]
+		['Matrix'] = 'Matrix', -- 阵法界面 [Normal/Matrix]
 		['ChatPanel1'] = 'ChatPanel', -- 聊天面板 [Lowest2/ChatPanel1]
 		['ChatPanel2'] = 'ChatPanel', -- 聊天面板 [Lowest2/ChatPanel2]
 		['ChatPanel3'] = 'ChatPanel', -- 聊天面板 [Lowest2/ChatPanel3]
