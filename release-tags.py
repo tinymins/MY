@@ -67,7 +67,7 @@ def __get_changelog_list():
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Automatic release branch tags.')
-    parser.add_argument('--adjust-time', action='store_true', help='Create tag on commit time.')
+    parser.add_argument('--mock-time', action='store_true', help='Tagger at commit time.')
     parser.add_argument('--overwrite', action='store_true', help='Overwrite exist tag.')
     args = parser.parse_args()
 
@@ -102,7 +102,7 @@ if __name__ == '__main__':
         if release == None:
             continue
 
-        if args.adjust_time:
+        if args.mock_time:
             t = datetime.datetime.fromtimestamp(release.get('timestamp'))
             print('Changing time to %d-%d-%d %d:%d:%d' % (t.year, t.month, t.day, t.hour, t.minute, t.second))
             tt = datetime.datetime.utcfromtimestamp(release.get('timestamp'))
