@@ -100,6 +100,12 @@ local PROVIDER_PARAMS = {
 		szBlobURL = 'https://gitee.com/%s/%s/blob/%s/%s',
 		szBlobURL_T = '^https://gitee%.com/([^/]+)/([^/]+)/blob/([^/]+)/(.+)$',
 	},
+	jx3box = {
+		szRawURL = 'https://git.jx3box.com/%s/%s/raw/%s/%s',
+		szRawURL_T = '^https://git%.jx3box%.com/([^/]+)/([^/]+)/raw/([^/]+)/(.+)$',
+		szBlobURL = 'https://git.jx3box.com/%s/%s/blob/%s/%s',
+		szBlobURL_T = '^https://git%.jx3box%.com/([^/]+)/([^/]+)/blob/([^/]+)/(.+)$',
+	},
 }
 local DEFAULT_PROVIDER = 'github'
 local DEFAULT_PROJECT = 'JX3_MY_DATA'
