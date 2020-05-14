@@ -888,7 +888,14 @@ end
 -- 获取指定模板ID的NPC是不是被屏蔽的NPC
 -- (boolean) LIB.IsShieldedNpc(dwTemplateID, szType)
 function LIB.IsShieldedNpc(dwTemplateID, szType)
-	return Table_IsShieldedNpc and Table_IsShieldedNpc(dwTemplateID, szType)
+	if not Table_IsShieldedNpc then
+		return false
+	end
+	local bShieldFocus, bShieldSpeak = Table_IsShieldedNpc(dwTemplateID)
+	if szType == 'TALK' then
+		return bShieldSpeak
+	end
+	return bShieldFocus
 end
 
 LIB.RegisterTargetAddonMenu(PACKET_INFO.NAME_SPACE .. '#Game#ImportantNpclist', function()
