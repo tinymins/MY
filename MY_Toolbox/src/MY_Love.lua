@@ -807,7 +807,10 @@ local function OnPlayerFellowshipLogin()
 		else
 			D.OutputLoverMsg(D.FormatLoverString(_L('Warm tip: Your {$type} lover [{$name}] offline, hurry doing like doing.'), O.lover))
 		end
-		GetClientPlayer().UpdateFellowshipInfo()
+		if not Station.Lookup('Normal/SocialPanel') then
+			Wnd.OpenWindow('SocialPanel')
+			Wnd.CloseWindow('SocialPanel')
+		end
 	end
 end
 LIB.RegisterEvent('PLAYER_FELLOWSHIP_LOGIN.MY_Love', OnPlayerFellowshipLogin)
