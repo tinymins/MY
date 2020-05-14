@@ -92,7 +92,7 @@ local function OnItemLButtonClick()
 		local hItem = this:GetParent()
 		local txtName = hItem:Lookup('Text_AchiName')
 		local txtDescribe = hItem:Lookup('Text_AchiDescribe')
-		local szURL = 'https://j3cx.com/wiki/' .. hItem.dwAchievement
+		local szURL = 'https://wiki.j3cx.com/' .. hItem.dwAchievement
 		local szKey = 'AchievementWiki_' .. hItem.dwAchievement
 		local szTitle = txtName:GetText() .. ' - ' .. txtDescribe:GetText()
 		MY_Web.Open(szURL, { key = szKey, title = szTitle, w = 850, h = 610 })

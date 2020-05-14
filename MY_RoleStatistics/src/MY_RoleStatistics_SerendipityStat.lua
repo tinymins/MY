@@ -783,7 +783,7 @@ function D.OutputRowTip(this, rec)
 		hItem:Lookup('Text_Name'):SetFontColor(255, 255, 128)
 		hItem:Lookup('Text_Name').OnItemLButtonClick = function()
 			if serendipity.dwAchieve then
-				MY_Web.Open('https://j3cx.com/wiki/' .. serendipity.dwAchieve, { w = 850, h = 610 })
+				MY_Web.Open('https://wiki.j3cx.com/' .. serendipity.dwAchieve, { w = 850, h = 610 })
 				Wnd.CloseWindow(frame)
 			end
 		end
