@@ -232,7 +232,7 @@ return {
 	['Sync team'] = '同步團隊',
 	['Add url'] = '添加訂閱',
 	['Remove url'] = '刪除訂閱',
-	['Default dataset cannot be removed!'] = '默認數據不可刪除！',
+	['Embedded dataset cannot be removed!'] = '內置數據不可刪除！',
 	['Meta URL: %s'] = '訂閱地址：%s',
 	['(Short URL: %s)'] = '（短鏈：%s）',
 	['Copy meta url'] = '複製訂閱地址',

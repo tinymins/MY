@@ -63,6 +63,7 @@ local INI_PATH = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_RR.ini'
 local MY_TM_META_ROOT = MY_TeamMon.MY_TM_META_ROOT
 local MY_TM_DATA_ROOT = MY_TeamMon.MY_TM_DATA_ROOT
 local MY_TM_DATA_PASSPHRASE = '89g45ynbtldnsryu98rbny9ps7468hb6npyusiryuxoldg7lbn894bn678b496746'
+local EMBEDDED_SUBSCRIBE_URL = 'https://dbm.j3cx.com/subscribe'
 
 -- 陆服环境下，以下缩写均对等
 -- tinymins
@@ -219,7 +220,7 @@ function GetAttachBlobURL(szAttach, szURL)
 end
 end
 
-local META_DEFAULT = {{
+local META_EMBEDDED_LIST = {{
 	szKey = 'DEFAULT',
 	szAuthor = _L['Default'],
 	szTitle = _L['Default monitor data'],
@@ -258,7 +259,7 @@ end
 
 function D.AddMeta(info)
 	local aMeta = D.LoadMetaList()
-	for _, p in spairs(META_DEFAULT, aMeta) do
+	for _, p in spairs(aMeta, META_EMBEDDED_LIST) do
 		if p.szURL == info.szURL then
 			return
 		end
@@ -313,6 +314,28 @@ function D.DownloadMeta(info, onSuccess, onError)
 			if info.szKey then
 				META_DOWNLOADING_KEY[info.szKey] = nil
 			end
+			FireUIEvent('MY_TM_RR_META_LIST_UPDATE')
+		end,
+	})
+end
+
+function D.RequestMetaEmbedded()
+	LIB.Ajax({
+		method = 'auto',
+		url = EMBEDDED_SUBSCRIBE_URL,
+		charset = 'utf8',
+		success = function(szHTML)
+			local res = LIB.JsonDecode(szHTML)
+			if not IsTable(res) then
+				return
+			end
+			local aMeta = {}
+			for _, info in ipairs(res) do
+				info = LIB.FormatDataStructure(info, META_TEMPLATE)
+				info.bEmbedded = true
+				insert(aMeta, info)
+			end
+			META_EMBEDDED_LIST = aMeta
 			FireUIEvent('MY_TM_RR_META_LIST_UPDATE')
 		end,
 	})
@@ -389,23 +412,26 @@ function D.UpdateList(frame)
 	if not frame and frame:IsValid() then
 		return
 	end
-	local aMeta = D.LoadMetaList()
+	local aMeta, tMetaID = D.LoadMetaList(), {}
 	local container = frame:Lookup('PageSet_Menu/Page_FileDownload/WndScroll_FileDownload/WndContainer_FileDownload_List')
 	container:Clear()
-	for _, p in spairs(META_DEFAULT, aMeta) do
-		local wnd = container:AppendContentFromIni(INI_PATH, 'Wnd_Item')
-		wnd:Lookup('', 'Text_Item_Author'):SetText(LIB.ReplaceSensitiveWord(p.szAuthor))
-		wnd:Lookup('', 'Text_Item_Title'):SetText(LIB.ReplaceSensitiveWord(p.szTitle))
-		wnd:Lookup('Btn_Info'):SetVisible(not IsEmpty(p.szAboutURL))
-		wnd:Lookup('Btn_Info', 'Text_Info'):SetText(_L['See details'])
-		wnd:Lookup('Btn_Download', 'Text_Download'):SetText(
-			(META_DOWNLOADING_KEY[p.szKey] and _L['Fetching...'])
-			or (DATA_DOWNLOADER and DATA_DOWNLOADER.szDownloadingKey == p.szKey and _L['Downloading...'])
-			or (p.szKey == O.szLastKey and _L['Last select'])
-			or _L['Download']
-		)
-		wnd:Lookup('Btn_Download'):Enable(not META_DOWNLOADING_KEY[p.szKey] and (not DATA_DOWNLOADER or DATA_DOWNLOADER.szDownloadingKey ~= p.szKey))
-		wnd.info = p
+	for _, p in spairs(aMeta, META_EMBEDDED_LIST) do
+		if not tMetaID[p.szKey] then
+			local wnd = container:AppendContentFromIni(INI_PATH, 'Wnd_Item')
+			wnd:Lookup('', 'Text_Item_Author'):SetText(LIB.ReplaceSensitiveWord(p.szAuthor))
+			wnd:Lookup('', 'Text_Item_Title'):SetText(LIB.ReplaceSensitiveWord(p.szTitle))
+			wnd:Lookup('Btn_Info'):SetVisible(not IsEmpty(p.szAboutURL))
+			wnd:Lookup('Btn_Info', 'Text_Info'):SetText(_L['See details'])
+			wnd:Lookup('Btn_Download', 'Text_Download'):SetText(
+				(META_DOWNLOADING_KEY[p.szKey] and _L['Fetching...'])
+				or (DATA_DOWNLOADER and DATA_DOWNLOADER.szDownloadingKey == p.szKey and _L['Downloading...'])
+				or (p.szKey == O.szLastKey and _L['Last select'])
+				or _L['Download']
+			)
+			wnd:Lookup('Btn_Download'):Enable(not META_DOWNLOADING_KEY[p.szKey] and (not DATA_DOWNLOADER or DATA_DOWNLOADER.szDownloadingKey ~= p.szKey))
+			wnd.info = p
+			tMetaID[p.szKey] = true
+		end
 	end
 	container:FormatAllContentPos()
 end
@@ -421,6 +447,7 @@ function D.OnFrameCreate()
 	D.UpdateList(this)
 	this:RegisterEvent('MY_TM_RR_META_LIST_UPDATE')
 	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
+	D.RequestMetaEmbedded()
 end
 
 function D.OnEvent(event)
@@ -467,8 +494,8 @@ function D.OnLButtonClick()
 		if not META_SEL_INFO then
 			return MY.Topmsg(_L['Please select one dataset first!'])
 		end
-		if META_SEL_INFO.szKey == 'DEFAULT' then
-			return MY.Topmsg(_L['Default dataset cannot be removed!'])
+		if META_SEL_INFO.bEmbedded then
+			return MY.Topmsg(_L['Embedded dataset cannot be removed!'])
 		end
 		LIB.Confirm(_L['Confirm?'], function()
 			local aMeta = D.LoadMetaList()
