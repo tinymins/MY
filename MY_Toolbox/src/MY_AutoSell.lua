@@ -98,18 +98,18 @@ function D.AutoSellItem(nNpcID, nShopID)
 				if not O.tProtectItem[szName] then
 					if not bSell and O.tSellItem[szName] then
 						bSell = true
-						szReason = _L['specified']
+						szReason = _L['Specified']
 					end
 					if not bSell and item.nGenre == ITEM_GENRE.BOOK and me.IsBookMemorized(GlobelRecipeID2BookID(item.nBookID)) then
 						if O.bSellWhiteBook and item.nQuality == 1 then
 							bSell = true
-							szReason = _L['read white book']
+							szReason = _L['Read white book']
 						elseif O.bSellGreenBook and item.nQuality == 2 then
 							bSell = true
-							szReason = _L['read green book']
+							szReason = _L['Read green book']
 						elseif O.bSellBlueBook and item.nQuality == 3 then
 							bSell = true
-							szReason = _L['read blue book']
+							szReason = _L['Read blue book']
 						end
 					end
 				end

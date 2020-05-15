@@ -111,7 +111,7 @@ function D.Apply()
 					end
 				end
 			else
-				szText = szText .. _L['failed to calc.']
+				szText = szText .. _L['Failed to calc.']
 			end
 			LIB.Sysmsg(szText)
 			OutputWarningMessage('MSG_WARNING_RED', szText, 10)

@@ -156,7 +156,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	-- 竞技场频道切换
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 'auto',
-		text = _L['auto switch talk channel when into battle field'],
+		text = _L['Auto switch talk channel when into battle field'],
 		checked = MY_ArenaHelper.bAutoSwitchTalkChannel,
 		oncheck = function(bChecked)
 			MY_ArenaHelper.bAutoSwitchTalkChannel = bChecked
@@ -167,7 +167,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	-- 竞技场自动恢复队伍信息
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 'auto',
-		text = _L['auto restore team info in arena'],
+		text = _L['Auto restore team info in arena'],
 		checked = MY_ArenaHelper.bRestoreAuthorityInfo,
 		oncheck = function(bChecked)
 			MY_ArenaHelper.bRestoreAuthorityInfo = bChecked
@@ -178,7 +178,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	-- 竞技场战场自动取消屏蔽
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 'auto',
-		text = _L['auto cancel hide player in arena and battlefield'],
+		text = _L['Auto cancel hide player in arena and battlefield'],
 		checked = MY_ArenaHelper.bAutoShowModel,
 		oncheck = function(bChecked)
 			MY_ArenaHelper.bAutoShowModel = bChecked

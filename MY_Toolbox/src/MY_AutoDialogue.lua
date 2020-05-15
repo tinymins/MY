@@ -422,7 +422,7 @@ function D.CreateEntry()
 			end
 			p.el = UI(wnd):Append('WndButton', {
 				name = 'WndButton_AutoChat',
-				text = _L['autochat'],
+				text = _L['Autochat'],
 				tip = _L['Left click to config autochat.\nRight click to edit global config.'],
 				tippostype = UI.TIP_POSITION.TOP_BOTTOM,
 				lmenu = function()
@@ -504,20 +504,20 @@ end
 ---------------------------------------------------------------------------
 function D.GetConfigMenu()
 	return {
-		szOption = _L['autochat'], {
+		szOption = _L['Autochat'], {
 			szOption = _L['enable'],
 			bCheck = true, bChecked = MY_AutoDialogue.bEnable,
 			fnAction = function()
 				MY_AutoDialogue.bEnable = not MY_AutoDialogue.bEnable
 			end
 		}, {
-			szOption = _L['echo when autochat'],
+			szOption = _L['Echo when autochat'],
 			bCheck = true, bChecked = MY_AutoDialogue.bEchoOn,
 			fnAction = function()
 				MY_AutoDialogue.bEchoOn = not MY_AutoDialogue.bEchoOn
 			end
 		}, {
-			szOption = _L['auto chat when only one selection'],
+			szOption = _L['Auto chat when only one selection'],
 			bCheck = true, bChecked = MY_AutoDialogue.bAutoSelectSg,
 			fnAction = function()
 				MY_AutoDialogue.bAutoSelectSg = not MY_AutoDialogue.bAutoSelectSg
@@ -529,13 +529,13 @@ function D.GetConfigMenu()
 				MY_AutoDialogue.bAutoSelectSp = not MY_AutoDialogue.bAutoSelectSp
 			end
 		}, {
-			szOption = _L['disable when shift key pressed'],
+			szOption = _L['Disable when shift key pressed'],
 			bCheck = true, bChecked = MY_AutoDialogue.bEnableShift,
 			fnAction = function()
 				MY_AutoDialogue.bEnableShift = not MY_AutoDialogue.bEnableShift
 			end
 		}, {
-			szOption = _L['close after auto chat'],
+			szOption = _L['Close after auto chat'],
 			bCheck = true, bChecked = MY_AutoDialogue.bAutoClose,
 			fnAction = function()
 				MY_AutoDialogue.bAutoClose = not MY_AutoDialogue.bAutoClose

@@ -69,7 +69,7 @@ function MY_Anmerkungen.OpenPlayerNoteEditPanel(dwID, szName)
 	local w, h = 340, 300
 	local ui = UI.CreateFrame('MY_Anmerkungen_PlayerNoteEdit_' .. (dwID or 0), {
 		w = w, h = h, anchor = 'CENTER',
-		text = _L['my anmerkungen - player note edit'],
+		text = _L['MY Anmerkungen - Player Note Edit'],
 	})
 
 	local function IsValid()
@@ -135,7 +135,7 @@ function MY_Anmerkungen.OpenPlayerNoteEditPanel(dwID, szName)
 	ui:Append('WndCheckBox', {
 		name = 'WndCheckBox_AlertWhenGroup',
 		x = x + 58, y = y, w = 200,
-		text = _L['alert when group'],
+		text = _L['Alert when group'],
 		checked = note.bAlertWhenGroup,
 	})
 	y = y + 20
@@ -143,7 +143,7 @@ function MY_Anmerkungen.OpenPlayerNoteEditPanel(dwID, szName)
 	ui:Append('WndCheckBox', {
 		name = 'WndCheckBox_TipWhenGroup',
 		x = x + 58, y = y, w = 200,
-		text = _L['tip when group'],
+		text = _L['Tip when group'],
 		checked = note.bTipWhenGroup,
 	})
 	y = y + 30
@@ -190,7 +190,7 @@ local function onMenu()
 	if dwType == TARGET.PLAYER then
 		local p = LIB.GetObject(dwType, dwID)
 		return {
-			szOption = _L['edit player note'],
+			szOption = _L['Edit player note'],
 			fnAction = function()
 				LIB.DelayCall(1, function()
 					MY_Anmerkungen.OpenPlayerNoteEditPanel(p.dwID, p.szName)
@@ -434,7 +434,7 @@ function PS.OnPanelActive(wnd)
 			text = _L['Import'],
 			buttonstyle = 2,
 			onclick = function()
-				GetUserInput(_L['please input import data:'], function(szVal)
+				GetUserInput(_L['Please input import data:'], function(szVal)
 					local config = DecodeLUAData(szVal)
 					if config and config.server and config.public and config.private then
 						if config.server ~= LIB.GetRealServer() then
@@ -535,4 +535,4 @@ end
 function PS.OnPanelDeactive()
 	_C.list = nil
 end
-LIB.RegisterPanel('MY_Anmerkungen_Player_Note', _L['player note'], _L['Target'], 'ui/Image/button/ShopButton.UITex|12', PS)
+LIB.RegisterPanel('MY_Anmerkungen_Player_Note', _L['Player note'], _L['Target'], 'ui/Image/button/ShopButton.UITex|12', PS)

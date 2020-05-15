@@ -102,11 +102,11 @@ _C.tSm = {}
 _C.nSmFrameCount = GetLogicFrameCount()
 MY_InfoTip.Cache = {
     Ping         = { -- Ping
-        formatString = '', title = _L['ping monitor'], prefix = _L['Ping: '], content = _L['%d'],
+        formatString = '', title = _L['Ping monitor'], prefix = _L['Ping: '], content = _L['%d'],
         GetContent = function() return format(MY_InfoTip.Cache.Ping.formatString, GetPingValue() / 2) end
     },
     TimeMachine  = { -- 倍速显示
-        formatString = '', title = _L['time machine'], prefix = _L['Rate: '], content = 'x%.2f',
+        formatString = '', title = _L['Time machine'], prefix = _L['Rate: '], content = 'x%.2f',
         GetContent = function()
             local s = 1
             if _C.nTmFrameCount ~= GetLogicFrameCount() then
@@ -127,7 +127,7 @@ MY_InfoTip.Cache = {
         end
     },
     Distance  = { -- 目标距离
-        formatString = '', title = _L['target distance'], prefix = _L['Distance: '], content = _L['%.1f Foot'],
+        formatString = '', title = _L['Target distance'], prefix = _L['Distance: '], content = _L['%.1f Foot'],
         GetContent = function()
             local p, s = LIB.GetObject(LIB.GetTarget()), _L['No Target']
             if p then
@@ -137,14 +137,14 @@ MY_InfoTip.Cache = {
         end
     },
     SysTime   = { -- 系统时间
-        formatString = '', title = _L['system time'], prefix = _L['Time: '], content = _L['%02d:%02d:%02d'],
+        formatString = '', title = _L['System time'], prefix = _L['Time: '], content = _L['%02d:%02d:%02d'],
         GetContent = function()
             local tDateTime = TimeToDate(GetCurrentTime())
             return format(MY_InfoTip.Cache.SysTime.formatString, tDateTime.hour, tDateTime.minute, tDateTime.second)
         end
     },
     FightTime = { -- 战斗计时
-        formatString = '', title = _L['fight clock'], prefix = _L['Fight Clock: '], content = '',
+        formatString = '', title = _L['Fight clock'], prefix = _L['Fight Clock: '], content = '',
         GetContent = function()
             if LIB.GetFightUUID() or LIB.GetLastFightUUID() then
                 return MY_InfoTip.Cache.FightTime.formatString .. LIB.GetFightTime('H:mm:ss')
@@ -154,7 +154,7 @@ MY_InfoTip.Cache = {
         end
     },
     LotusTime = { -- 莲花和藕倒计时
-        formatString = '', title = _L['lotus clock'], prefix = _L['Lotus Clock: '], content = _L['%d:%d:%d'],
+        formatString = '', title = _L['Lotus clock'], prefix = _L['Lotus Clock: '], content = _L['%d:%d:%d'],
         GetContent = function()
             local nTotal = 6*60*60 - GetLogicFrameCount()/16%(6*60*60)
             return format(MY_InfoTip.Cache.LotusTime.formatString, floor(nTotal/(60*60)), floor(nTotal/60%60), floor(nTotal%60))
@@ -171,7 +171,7 @@ MY_InfoTip.Cache = {
         end
     },
     Speedometer = { -- 角色速度
-        formatString = '', title = _L['speedometer'], prefix = _L['Speed: '], content = _L['%.2f f/s'],
+        formatString = '', title = _L['Speedometer'], prefix = _L['Speed: '], content = _L['%.2f f/s'],
         GetContent = function()
             local s = 0
             local me = GetClientPlayer()
@@ -266,14 +266,14 @@ LIB.RegisterInit('MY_INFOTIP', function()
 end)
 
 
-LIB.RegisterPanel( 'MY_InfoTip', _L['infotip'], _L['System'], 'ui/Image/UICommon/ActivePopularize2.UITex|22', { OnPanelActive = function(wnd)
+LIB.RegisterPanel( 'MY_InfoTip', _L['MY_InfoTip'], _L['System'], 'ui/Image/UICommon/ActivePopularize2.UITex|22', { OnPanelActive = function(wnd)
     local ui = UI(wnd)
     local w, h = ui:Size()
     local x, y = 50, 20
 
     ui:Append('Text', 'Text_InfoTip')
       :Pos(x, y):Width(350)
-      :Text(_L['* infomation tips']):Color(255,255,0)
+      :Text(_L['Infomation tips']):Color(255,255,0)
     y = y + 5
 
     for id, cache in pairs(MY_InfoTip.Cache) do
@@ -288,21 +288,21 @@ LIB.RegisterPanel( 'MY_InfoTip', _L['infotip'], _L['System'], 'ui/Image/UICommon
           end)
         x = x + 220
         ui:Append('WndCheckBox', 'WndCheckBox_InfoTipTitle_'..id):Pos(x, y):Width(60)
-          :Text(_L['title']):Check(cfg.bShowTitle or false)
+          :Text(_L['Title']):Check(cfg.bShowTitle or false)
           :Check(function(bChecked)
             cfg.bShowTitle = bChecked
             MY_InfoTip.Reload()
           end)
         x = x + 70
         ui:Append('WndCheckBox', 'WndCheckBox_InfoTipBg_'..id):Pos(x, y):Width(60)
-          :Text(_L['background']):Check(cfg.bShowBg or false)
+          :Text(_L['Background']):Check(cfg.bShowBg or false)
           :Check(function(bChecked)
             cfg.bShowBg = bChecked
             MY_InfoTip.Reload()
           end)
         x = x + 70
         ui:Append('WndButton', 'WndButton_InfoTipFont_'..id):Pos(x, y)
-          :Width(50):Text(_L['font'])
+          :Width(50):Text(_L['Font'])
           :Click(function()
             UI.OpenFontPicker(function(f)
                 cfg.nFont = f

@@ -244,9 +244,9 @@ function MY_VisualSkill.OnEvent(event)
 			OnSkillCast(this, dwSkillID, dwSkillLevel)
 		end
 	elseif event == 'ON_ENTER_CUSTOM_UI_MODE' then
-		UpdateCustomModeWindow(this, _L['visual skill'], MY_VisualSkill.bPenetrable)
+		UpdateCustomModeWindow(this, _L['Visual skill'], MY_VisualSkill.bPenetrable)
 	elseif event == 'ON_LEAVE_CUSTOM_UI_MODE' then
-		UpdateCustomModeWindow(this, _L['visual skill'], MY_VisualSkill.bPenetrable)
+		UpdateCustomModeWindow(this, _L['Visual skill'], MY_VisualSkill.bPenetrable)
 		MY_VisualSkill.anchor = GetFrameAnchor(this)
 	elseif event == 'CUSTOM_UI_MODE_SET_DEFAULT' then
 		MY_VisualSkill.anchor = defaultAnchor
@@ -283,7 +283,7 @@ LIB.RegisterInit('MY_VISUALSKILL', MY_VisualSkill.Reload)
 function MY_VisualSkill.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, w = 'auto',
-		text = _L['visual skill'],
+		text = _L['Visual skill'],
 		checked = MY_VisualSkill.bEnable,
 		oncheck = function(bChecked)
 			MY_VisualSkill.bEnable = bChecked
@@ -295,8 +295,8 @@ function MY_VisualSkill.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 		x = x, y = y,
 		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE, range = {1, 32},
 		value = MY_VisualSkill.nVisualSkillBoxCount,
-		text = _L('display %d skills.', MY_VisualSkill.nVisualSkillBoxCount),
-		textfmt = function(val) return _L('display %d skills.', val) end,
+		text = _L('Display %d skills.', MY_VisualSkill.nVisualSkillBoxCount),
+		textfmt = function(val) return _L('Display %d skills.', val) end,
 		onchange = function(val)
 			MY_VisualSkill.nVisualSkillBoxCount = val
 			MY_VisualSkill.Reload()

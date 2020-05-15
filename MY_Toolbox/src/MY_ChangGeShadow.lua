@@ -134,14 +134,14 @@ LIB.RegisterInit('MY_ChangGeShadow', D.Apply)
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, w = 'auto',
-		text = _L['show changge shadow index'],
+		text = _L['Show changge shadow index'],
 		checked = MY_ChangGeShadow.bEnable,
 		oncheck = function(bChecked)
 			MY_ChangGeShadow.bEnable = bChecked
 		end,
 		tip = function(self)
 			if not self:Enable() then
-				return _L['changge force only']
+				return _L['Changge force only']
 			end
 		end,
 		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
@@ -152,14 +152,14 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	}):Width() + 5
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, w = 'auto',
-		text = _L['show distance'],
+		text = _L['Show distance'],
 		checked = MY_ChangGeShadow.bShowDistance,
 		oncheck = function(bChecked)
 			MY_ChangGeShadow.bShowDistance = bChecked
 		end,
 		tip = function(self)
 			if not self:Enable() then
-				return _L['changge force only']
+				return _L['Changge force only']
 			end
 		end,
 		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
@@ -170,14 +170,14 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	}):Width() + 5
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, w = 'auto',
-		text = _L['show countdown'],
+		text = _L['Show countdown'],
 		checked = MY_ChangGeShadow.bShowCD,
 		oncheck = function(bChecked)
 			MY_ChangGeShadow.bShowCD = bChecked
 		end,
 		tip = function(self)
 			if not self:Enable() then
-				return _L['changge force only']
+				return _L['Changge force only']
 			end
 		end,
 		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
@@ -188,7 +188,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	}):Width() + 5
 	ui:Append('WndTrackbar', {
 		x = x, y = y, w = 150,
-		textfmt = function(val) return _L('scale: %d%%.', val) end,
+		textfmt = function(val) return _L('Scale: %d%%.', val) end,
 		range = {10, 800},
 		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		value = MY_ChangGeShadow.fScale * 100,
