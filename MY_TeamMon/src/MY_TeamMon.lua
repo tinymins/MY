@@ -2010,29 +2010,31 @@ function D.SaveConfigureFile(config)
 		szServer = select(4, GetUserServer()),
 		nTimeStamp = GetCurrentTime()
 	}
-	local root = GetRootPath():gsub('\\', '/')
-	local path = MY_TM_DATA_ROOT .. config.szFileName
-	if config.bJson then
-		path = path .. '.json'
-		SaveDataToFile(LIB.JsonEncode(data, config.bFormat), path)
-		-- Log(path, LIB.JsonEncode(data, config.bFormat), 'close')
-		-- SaveLUAData(path, LIB.JsonEncode(data, config.bFormat), nil, false)
-	else
-		local option = {
-			passphrase = MY_TM_DATA_PASSPHRASE,
-			crc = true,
-			compress = true,
-		}
-		if config.bFormat then
-			option.indent = '\t'
-			option.crc = false
-			option.compress = false
-			option.passphrase = false
+	local szRoot = GetRootPath():gsub('\\', '/')
+	local szPath = MY_TM_DATA_ROOT .. config.szFileName
+	if config.eType == 'JSON' or config.eType == 'JSON_FORMATED' then
+		if config.eType ~= 'JSON' then
+			szPath = szPath .. '.' .. config.eType:lower():sub(6)
 		end
-		LIB.SaveLUAData(path, data, option)
+		szPath = szPath .. '.json'
+		SaveDataToFile(LIB.JsonEncode(data, config.eType == 'JSON_FORMATED' and '\t' or nil), szPath)
+	else
+		if config.eType ~= 'LUA' then
+			szPath = szPath .. '.' .. config.eType:lower():sub(5)
+		end
+		szPath = szPath .. '.jx3dat'
+		local option = {
+			passphrase = config.eType == 'LUA_ENCRYPTED'
+				and MY_TM_DATA_PASSPHRASE
+				or false,
+			crc = config.eType == 'LUA_ENCRYPTED',
+			compress = config.eType == 'LUA_ENCRYPTED',
+			indent = config.eType == 'LUA_FORMATED' and '\t' or nil,
+		}
+		LIB.SaveLUAData(szPath, data, option)
 	end
-	LIB.GetAbsolutePath(path):gsub('/', '\\')
-	return root .. path
+	LIB.GetAbsolutePath(szPath):gsub('/', '\\')
+	return szRoot .. szPath
 end
 
 -- É¾³ý ÒÆ¶¯ Ìí¼Ó Çå¿Õ

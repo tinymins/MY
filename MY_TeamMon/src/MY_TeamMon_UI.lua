@@ -975,7 +975,7 @@ function D.OpenExportPanel()
 		end,
 	}):Pos('BOTTOMRIGHT')
 	nY = nY + 10
-	local szFileName = 'TM-' .. select(3, GetVersion()) .. FormatTime('-%Y%m%d_%H.%M', GetCurrentTime()) .. '.jx3dat'
+	local szFileName = 'TM-' .. select(3, GetVersion()) .. FormatTime('-%Y%m%d_%H.%M', GetCurrentTime())
 	nX, nY = ui:Append('Text', { x = 20, y = nY, text = _L['File name'], font = 27 }):Pos('BOTTOMRIGHT')
 	nX, nY = ui:Append('WndEditBox', {
 		x = 25, y = nY, w = 500, h = 25,
@@ -986,41 +986,66 @@ function D.OpenExportPanel()
 	}):Pos('BOTTOMRIGHT')
 	nY = nY + 10
 	nX, nY = ui:Append('Text', { x = 20, y = nY, text = _L['File format'], font = 27 }):Pos('BOTTOMRIGHT')
-	local nType = 1
+	local eType = 'LUA_ENCRYPTED'
 	nX = ui:Append('WndRadioBox', {
 		x = 25, y = nY,
-		text = _L['LUA TABLE'], group = 'type',
+		text = _L['Lua encrypted'], group = 'type',
 		checked = true,
 		oncheck = function()
-			nType = 1
+			eType = 'LUA_ENCRYPTED'
+		end,
+	}):AutoWidth():Pos('BOTTOMRIGHT')
+	nX = ui:Append('WndRadioBox', {
+		x = nX + 5, y = nY,
+		text = _L['Lua plain'], group = 'type',
+		checked = false,
+		oncheck = function()
+			eType = 'LUA'
+		end,
+	}):AutoWidth():Pos('BOTTOMRIGHT')
+	nX = ui:Append('WndRadioBox', {
+		x = nX + 5, y = nY,
+		text = _L['Lua formated'], group = 'type',
+		checked = false,
+		oncheck = function()
+			eType = 'LUA_FORMATED'
+		end,
+	}):AutoWidth():Pos('BOTTOMRIGHT')
+	nX = ui:Append('WndRadioBox', {
+		x = nX + 5, y = nY,
+		text = _L['JSON'], group = 'type',
+		checked = false,
+		oncheck = function()
+			eType = 'JSON'
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
 	nX, nY = ui:Append('WndRadioBox', {
 		x = nX + 5, y = nY,
-		text = _L['JSON'], group = 'type', enable = false,
-		onclick = function()
-			nType = 2
+		text = _L['JSON formated'], group = 'type',
+		checked = false,
+		oncheck = function()
+			eType = 'JSON_FORMATED'
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
-	ui:Append('WndCheckBox', { name = 'Format', x = 20, y = nY + 50, text = _L['Format content'] })
 	ui:Append('WndButton', {
 		x = 285, y = nY + 30, text = g_tStrings.STR_HOTKEY_SURE,
 		buttonstyle = 3,
 		onclick = function()
 			local config = {
-				bFormat = ui:Children('#Format'):Check(),
 				szFileName = szFileName,
 				szAuthor = szAuthor,
-				bJson = nType == 2,
 				tList = {},
+				eType = eType,
 			}
 			for k, v in ipairs(MY_TMUI_TYPE) do
 				if ui:Children('#' .. v):Check() then
 					config.tList[v] = true
 				end
 			end
-			local path = MY_TeamMon.SaveConfigureFile(config)
-			LIB.Alert(_L('Export success: %s', path))
+			local szPath = MY_TeamMon.SaveConfigureFile(config)
+			local szMsg = _L('Export success: %s', szPath)
+			LIB.Alert(szMsg)
+			LIB.Sysmsg(szMsg)
 			ui:Remove()
 		end,
 	})
