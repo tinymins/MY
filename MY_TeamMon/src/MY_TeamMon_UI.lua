@@ -936,15 +936,20 @@ function D.OpenImportPanel(szDefault, szTitle, fnAction)
 					config.tList[v] = true
 				end
 			end
-			local bStatus, szMsg = MY_TeamMon.LoadConfigureFile(config)
-			LIB.Sysmsg(_L['MY_TeamMon'], _L('Load config: %s', tostring(szMsg)), CONSTANT.MSG_THEME.ERROR)
+			local bStatus, szMsg, tMeta = MY_TeamMon.LoadConfigureFile(config)
 			if bStatus then
-				LIB.Alert(_L('Import success: %s', szTitle or szMsg))
+				LIB.Sysmsg(_L['MY_TeamMon'], _L('Load config success: %s', tostring(szMsg)), CONSTANT.MSG_THEME.SUCCESS)
+				local function fnAlert2()
+					local szAuthor = tMeta and LIB.ReplaceSensitiveWord(tostring(tMeta.szAuthor)) or _L['Unknown author']
+					LIB.Alert(_L('Plugin is plugin, data is data, plugin author is plugin author, data author is data author..\nYou just loaded data\'s author is %s, it works on mingyi plugin team monitor addon.\n%s is data author, do not response for plugin problems. MingYi is plugin author, do not response for data problems.', szAuthor, szAuthor))
+				end
+				LIB.Alert(_L('Import success: %s', szTitle or szMsg), fnAlert2, nil, fnAlert2)
 				ui:Remove()
 				if fnAction then
 					fnAction()
 				end
 			else
+				LIB.Sysmsg(_L['MY_TeamMon'], _L('Load config failed: %s', tostring(szMsg)), CONSTANT.MSG_THEME.ERROR)
 				LIB.Alert(_L('Import failed: %s', szTitle or _L[szMsg]))
 			end
 		end,

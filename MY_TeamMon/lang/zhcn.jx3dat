@@ -148,7 +148,8 @@ return {
 	['Browse'] = '浏览',
 	['Import data (web)'] = '导入数据（联网获取文件）',
 	['Import data (local)'] = '导入数据（本地文件）',
-	['Load config: %s'] = '加载数据：%s',
+	['Load config success: %s'] = '数据加载成功：%s',
+	['Load config failed: %s'] = '数据加载失败：%s',
 	['Open data folder'] = '打开数据文件夹',
 	['Includes'] = '包括',
 	['File name'] = '文件名',
@@ -238,4 +239,7 @@ return {
 	['Copy meta url'] = '复制订阅地址',
 	['Copy short meta url'] = '复制短地址',
 	['%s focus rules converted, if you are data author please notice that focus auto convert will not last long, you should export your data again.'] = '%s条焦点数据升级成功。注意：如果您是数据作者，请注意该数据升级逻辑将在未来几个版本后移除，您需要在此之前重新导出数据，否则旧版数据中的焦点列表未来可能无法成功导入。',
+
+	['Unknown author'] = '佚名',
+	['Plugin is plugin, data is data, plugin author is plugin author, data author is data author..\nYou just loaded data\'s author is %s, it works on mingyi plugin team monitor addon.\n%s is data author, do not response for plugin problems. MingYi is plugin author, do not response for data problems.'] = '插件是插件，数据是数据；插件作者是插件作者，数据作者是数据作者。\n\n您刚刚加载的是数据作者【%s】的团队监控数据，\n它配置在插件作者【茗伊】编写的团队监控插件中。\n\n【%s】是数据作者不负责插件功能问题，【茗伊】是插件作者不负责具体数据问题，需要反馈问题时请注意分别。',
 }

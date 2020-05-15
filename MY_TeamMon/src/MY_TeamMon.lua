@@ -1992,7 +1992,7 @@ function D.LoadConfigureFile(config)
 		FireUIEvent('MY_TM_CREATE_CACHE')
 		FireUIEvent('MY_TM_DATA_RELOAD')
 		FireUIEvent('MY_TMUI_DATA_RELOAD')
-		return true, szFullPath:gsub('\\', '/')
+		return true, szFullPath:gsub('\\', '/'), Clone(data.__meta)
 	end
 end
 
