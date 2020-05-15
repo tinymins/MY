@@ -15,4 +15,4 @@ lua_6=src/MY_GKPLoot.lua
 lua_7=src/MY_GKPChat.lua
 lua_8=src/MY_GKPVote.lua
 lua_9=src/MY_GKPDoodad.lua
-lua_9=src/MY_GKPGoldTeamLootHook.lua
+lua_10=src/MY_GKPGoldTeamLootHook.lua
