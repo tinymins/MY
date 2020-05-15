@@ -137,11 +137,11 @@ function PS.OnPanelActive(wnd)
 	x = x + 235
 	ui:Append('Text', {
 		x = x + 3, y = y - 16,
-		text = _L['only enable in those maps below'],
+		text = _L['Only enable in those maps below'],
 		autoenable = function() return D.IsEnabled() end,
 	})
 	ui:Append('WndCheckBox', {
-		x = x, y = y + 9, w = 80, text = _L['arena'],
+		x = x, y = y + 9, w = 80, text = _L['Arena'],
 		checked = Config.bOnlyInArena,
 		oncheck = function(bChecked)
 			Config.bOnlyInArena = bChecked
@@ -151,7 +151,7 @@ function PS.OnPanelActive(wnd)
 	})
 	x = x + 80
 	ui:Append('WndCheckBox', {
-		x = x, y = y + 9, w = 70, text = _L['battlefield'],
+		x = x, y = y + 9, w = 70, text = _L['Battlefield'],
 		checked = Config.bOnlyInBattleField,
 		oncheck = function(bChecked)
 			Config.bOnlyInBattleField = bChecked
@@ -161,7 +161,7 @@ function PS.OnPanelActive(wnd)
 	})
 	x = x + 70
 	ui:Append('WndCheckBox', {
-		x = x, y = y + 9, w = 70, text = _L['dungeon'],
+		x = x, y = y + 9, w = 70, text = _L['Dungeon'],
 		checked = Config.bOnlyInDungeon,
 		oncheck = function(bChecked)
 			Config.bOnlyInDungeon = bChecked
@@ -180,7 +180,7 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndTrackbar', {
 		name = 'WndTrackbar_LifeBarWidth',
 		x = x, y = y, trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 5, 150 },
-		text = function(value) return _L('lifebar width: %s px.', value) end, -- 血条宽度
+		text = function(value) return _L('Lifebar width: %s px.', value) end, -- 血条宽度
 		value = Config.nLifeWidth,
 		onchange = function(value)
 			Config.nLifeWidth = value
@@ -192,7 +192,7 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndTrackbar', {
 		name = 'WndTrackbar_LifeBarHeight',
 		x = x, y = y, trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 1, 150 },
-		text = function(value) return _L('lifebar height: %s px.', value) end, -- 血条高度
+		text = function(value) return _L('Lifebar height: %s px.', value) end, -- 血条高度
 		value = Config.nLifeHeight,
 		onchange = function(value)
 			Config.nLifeHeight = value
@@ -204,7 +204,7 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndTrackbar', {
 		name = 'WndTrackbar_LifeBarOffsetX',
 		x = x, y = y, trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE, range = { -150, 150 },
-		text = function(value) return _L('lifebar offset-x: %d px.', value) end, -- 血条水平偏移
+		text = function(value) return _L('Lifebar offset-x: %d px.', value) end, -- 血条水平偏移
 		value = Config.nLifeOffsetX,
 		onchange = function(value)
 			Config.nLifeOffsetX = value
@@ -216,7 +216,7 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndTrackbar', {
 		name = 'WndTrackbar_LifeBarOffsetY',
 		x = x, y = y, trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 0, 150 },
-		text = function(value) return _L('lifebar offset-y: %d px.', value) end, -- 血条竖直偏移
+		text = function(value) return _L('Lifebar offset-y: %d px.', value) end, -- 血条竖直偏移
 		value = Config.nLifeOffsetY,
 		onchange = function(value)
 			Config.nLifeOffsetY = value
@@ -228,7 +228,7 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndTrackbar', {
 		name = 'WndTrackbar_LifeBarPadding',
 		x = x, y = y, trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 0, 10 },
-		text = function(value) return _L('lifebar padding: %d px.', value) end, -- 血条边框宽度
+		text = function(value) return _L('Lifebar padding: %d px.', value) end, -- 血条边框宽度
 		value = Config.nLifePadding,
 		onchange = function(value)
 			Config.nLifePadding = value
@@ -240,7 +240,7 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndTrackbar', {
 		name = 'WndTrackbar_LifeBarBorder',
 		x = x, y = y, trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 0, 10 },
-		text = function(value) return _L('lifebar border: %d px.', value) end, -- 血条边框宽度
+		text = function(value) return _L('Lifebar border: %d px.', value) end, -- 血条边框宽度
 		value = Config.nLifeBorder,
 		onchange = function(value)
 			Config.nLifeBorder = value
@@ -252,7 +252,7 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndTrackbar', {
 		name = 'WndTrackbar_LifePerOffsetX',
 		x = x, y = y, trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE, range = { -150, 150 },
-		text = function(value) return _L('life percentage offset-x: %d px.', value) end, -- 血量百分比水平偏移
+		text = function(value) return _L('Life percentage offset-x: %d px.', value) end, -- 血量百分比水平偏移
 		value = Config.nLifePerOffsetX,
 		onchange = function(value)
 			Config.nLifePerOffsetX = value
@@ -264,7 +264,7 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndTrackbar', {
 		name = 'WndTrackbar_LifePerOffsetY',
 		x = x, y = y, trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 0, 150 },
-		text = function(value) return _L('life percentage offset-y: %d px.', value) end, -- 血量百分比竖直偏移
+		text = function(value) return _L('Life percentage offset-y: %d px.', value) end, -- 血量百分比竖直偏移
 		value = Config.nLifePerOffsetY,
 		onchange = function(value)
 			Config.nLifePerOffsetY = value
@@ -276,7 +276,7 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndTrackbar', {
 		name = 'WndTrackbar_TextOffsetY',
 		x = x, y = y, trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 0, 150 },
-		text = function(value) return _L('text offset-y: %d px.', value) end, -- 第一行字高度
+		text = function(value) return _L('Text offset-y: %d px.', value) end, -- 第一行字高度
 		value = Config.nTextOffsetY,
 		onchange = function(value)
 			Config.nTextOffsetY = value
@@ -288,7 +288,7 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndTrackbar', {
 		name = 'WndTrackbar_TextLineHeight',
 		x = x, y = y, trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 0, 150 },
-		text = function(value) return _L('text line height: %d px.', value) end, -- 字行高度
+		text = function(value) return _L('Text line height: %d px.', value) end, -- 字行高度
 		value = Config.nTextLineHeight,
 		onchange = function(value)
 			Config.nTextLineHeight = value
@@ -300,7 +300,7 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndTrackbar', {
 		name = 'WndTrackbar_TextScale',
 		x = x, y = y, trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 0, 200 },
-		text = function(value) return _L('text scale: %.1f%%.', value / 40 * 100) end, -- 字缩放
+		text = function(value) return _L('Text scale: %.1f%%.', value / 40 * 100) end, -- 字缩放
 		value = Config.fTextScale * 40,
 		onchange = function(value)
 			Config.fTextScale = value / 40
@@ -312,7 +312,7 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndTrackbar', {
 		name = 'WndTrackbar_TextSpacing',
 		x = x, y = y, trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 0, 300 },
-		text = function(value) return _L('text spacing: %.1f.', value / 10) end, -- 字间距
+		text = function(value) return _L('Text spacing: %.1f.', value / 10) end, -- 字间距
 		value = Config.fTextSpacing * 10,
 		onchange = function(value)
 			Config.fTextSpacing = value / 10
@@ -372,7 +372,7 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndTrackbar', {
 		name = 'WndTrackbar_Alpha',
 		x = x, y = y, trackbarstyle = UI.TRACKBAR_STYLE.SHOW_PERCENT, range = { 0, 255 },
-		text = function(value) return _L('alpha: %.0f%%.', value) end, -- 透明度
+		text = function(value) return _L('Alpha: %.0f%%.', value) end, -- 透明度
 		value = Config.nAlpha,
 		onchange = function(value)
 			Config.nAlpha = value * 255 / 100
@@ -462,7 +462,7 @@ function PS.OnPanelActive(wnd)
 							D.Reset()
 						end,
 						{
-							szOption = _L['hide when unfight'],
+							szOption = _L['Hide when unfight'],
 							bCheck = true,
 							bChecked = cfg.Player.bOnlyFighting,
 							fnAction = function()
@@ -489,7 +489,7 @@ function PS.OnPanelActive(wnd)
 							D.Reset()
 						end,
 						{
-							szOption = _L['hide when unfight'],
+							szOption = _L['Hide when unfight'],
 							bCheck = true,
 							bChecked = cfg.Npc.bOnlyFighting,
 							fnAction = function()
@@ -512,9 +512,9 @@ function PS.OnPanelActive(wnd)
 	end
 	-- 显示名字
 	ui:Append('WndComboBox', {
-		x = x, y = y, text = _L['name display config'],
+		x = x, y = y, text = _L['Name display config'],
 		menu = function()
-			return GeneBooleanPopupMenu(Config.ShowName, _L['player name display'], _L['npc name display'])
+			return GeneBooleanPopupMenu(Config.ShowName, _L['Player name display'], _L['Npc name display'])
 		end,
 		autoenable = function() return D.IsEnabled() end,
 	})
@@ -522,9 +522,9 @@ function PS.OnPanelActive(wnd)
 
 	-- 称号
 	ui:Append('WndComboBox', {
-		x = x, y = y, text = _L['title display config'],
+		x = x, y = y, text = _L['Title display config'],
 		menu = function()
-			return GeneBooleanPopupMenu(Config.ShowTitle, _L['player title display'], _L['npc title display'])
+			return GeneBooleanPopupMenu(Config.ShowTitle, _L['Player title display'], _L['Npc title display'])
 		end,
 		autoenable = function() return D.IsEnabled() end,
 	})
@@ -532,9 +532,9 @@ function PS.OnPanelActive(wnd)
 
 	-- 帮会
 	ui:Append('WndComboBox', {
-		x = x, y = y, text = _L['tong display config'],
+		x = x, y = y, text = _L['Tong display config'],
 		menu = function()
-			return GeneBooleanPopupMenu(Config.ShowTong, _L['player tong display'])
+			return GeneBooleanPopupMenu(Config.ShowTong, _L['Player tong display'])
 		end,
 		autoenable = function() return D.IsEnabled() end,
 	})
@@ -542,9 +542,9 @@ function PS.OnPanelActive(wnd)
 
 	-- 血条设置
 	ui:Append('WndComboBox', {
-		x = x, y = y, text = _L['lifebar display config'],
+		x = x, y = y, text = _L['Lifebar display config'],
 		menu = function()
-			local t = GeneBooleanPopupMenu(Config.ShowLife, _L['player lifebar display'], _L['npc lifebar display'])
+			local t = GeneBooleanPopupMenu(Config.ShowLife, _L['Player lifebar display'], _L['Npc lifebar display'])
 			insert(t, { bDevide = true })
 			local t1 = {
 				szOption = _L['Draw direction'],
@@ -568,12 +568,12 @@ function PS.OnPanelActive(wnd)
 
 	-- 显示血量%
 	ui:Append('WndComboBox', {
-		x = x, y = y, text = _L['lifepercentage display config'],
+		x = x, y = y, text = _L['Lifepercentage display config'],
 		menu = function()
-			local t = GeneBooleanPopupMenu(Config.ShowLifePer, _L['player lifepercentage display'], _L['npc lifepercentage display'])
+			local t = GeneBooleanPopupMenu(Config.ShowLifePer, _L['Player lifepercentage display'], _L['Npc lifepercentage display'])
 			insert(t, { bDevide = true })
 			insert(t, {
-				szOption = _L['hide decimal'],
+				szOption = _L['Hide decimal'],
 				bCheck = true,
 				bChecked = Config.bHideLifePercentageDecimal,
 				fnAction = function()
@@ -588,10 +588,10 @@ function PS.OnPanelActive(wnd)
 
 	-- 当前阵营
 	ui:Append('WndComboBox', {
-		x = x, y = y, text = _L['set current camp'],
+		x = x, y = y, text = _L['Set current camp'],
 		menu = function()
 			return {{
-				szOption = _L['auto detect'],
+				szOption = _L['Auto detect'],
 				bCheck = true, bMCheck = true,
 				bChecked = Config.nCamp == -1,
 				fnAction = function()
@@ -642,7 +642,7 @@ function PS.OnPanelActive(wnd)
 		end,
 		autoenable = function() return D.IsEnabled() end,
 	})
-	ui:Append('Text', { text = _L['lifebar border color'], x = x + 27, y = y - 2 })
+	ui:Append('Text', { text = _L['Lifebar border color'], x = x + 27, y = y - 2 })
 
 	x = X
 	y = y + offsety - 10
@@ -695,7 +695,7 @@ function PS.OnPanelActive(wnd)
 	y = y + offsety - 10
 	x = x + ui:Append('WndCheckBox', {
 		name = 'WndCheckBox_ShowSpecialNpc',
-		x = x, y = y, text = _L['show special npc'],
+		x = x, y = y, text = _L['Show special npc'],
 		checked = Config.bShowSpecialNpc,
 		oncheck = function(bChecked)
 			Config.bShowSpecialNpc = bChecked
@@ -708,7 +708,7 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndCheckBox', {
 		name = 'WndCheckBox_ShowSpecialNpcOnlyEnemy',
 		x = x, y = y, w = 'auto',
-		text = _L['only enemy'],
+		text = _L['Only enemy'],
 		checked = Config.bShowSpecialNpcOnlyEnemy,
 		oncheck = function(bChecked)
 			Config.bShowSpecialNpcOnlyEnemy = bChecked
@@ -724,7 +724,7 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndCheckBox', {
 		name = 'WndCheckBox_ShowKungfu',
 		x = x, y = y, w = 'auto',
-		text = _L['show kungfu'],
+		text = _L['Show kungfu'],
 		checked = Config.bShowKungfu,
 		oncheck = function(bChecked)
 			Config.bShowKungfu = bChecked
@@ -735,7 +735,7 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndCheckBox', {
 		name = 'WndCheckBox_ShowDistance',
 		x = x + 90, y = y, w = 'auto',
-		text = _L['show distance'],
+		text = _L['Show distance'],
 		checked = Config.bShowDistance,
 		oncheck = function(bChecked)
 			Config.bShowDistance = bChecked
