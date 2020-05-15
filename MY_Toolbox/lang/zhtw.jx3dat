@@ -113,6 +113,7 @@ return {
     ['Conversation with [%s] auto chose: %s'           ] = '對話[%s]自動選擇了：%s',
     ['echo when autochat'                              ] = '輸出選擇的選項',
     ['auto chat when only one selection'               ] = '只有一個選項時自動選擇',
+    ['Auto chat when only one space selection'         ] = '只有一個空白選項時自動選擇',
     ['disable when shift key pressed'                  ] = '按住SHIFT時禁用自動對話',
     ['close after auto chat'                           ] = '自動對話後關閉窗口',
     ['Skip quest talk'                                 ] = '精簡接受任務劇情對話',

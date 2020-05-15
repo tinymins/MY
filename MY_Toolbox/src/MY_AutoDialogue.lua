@@ -61,12 +61,14 @@ MY_AutoDialogue.bEchoOn = true
 MY_AutoDialogue.bAutoClose = true
 MY_AutoDialogue.bEnableShift = true
 MY_AutoDialogue.bAutoSelectSg = false
+MY_AutoDialogue.bAutoSelectSp = false
 MY_AutoDialogue.bSkipQuestTalk = false
 RegisterCustomData('MY_AutoDialogue.bEnable')
 RegisterCustomData('MY_AutoDialogue.bEchoOn', 1)
 RegisterCustomData('MY_AutoDialogue.bAutoClose', 1)
 RegisterCustomData('MY_AutoDialogue.bEnableShift')
 RegisterCustomData('MY_AutoDialogue.bAutoSelectSg')
+RegisterCustomData('MY_AutoDialogue.bAutoSelectSp')
 RegisterCustomData('MY_AutoDialogue.bSkipQuestTalk')
 
 ---------------------------------------------------------------------------
@@ -193,9 +195,15 @@ function D.ProcessDialogInfo(frame, aInfo, dwTarType, dwTarID, dwIndex)
 			end
 		end
 	end
-	if not option and MY_AutoDialogue.bAutoSelectSg and #dialog.aOptions == 1 and not LIB.IsInDungeon() then
-		option = dialog.aOptions[1]
-		nRepeat = 1
+	if not LIB.IsInDungeon() then
+		if not option and MY_AutoDialogue.bAutoSelectSp and #dialog.aOptions == 1 and dialog.aOptions[1].szContext == '' then
+			option = dialog.aOptions[1]
+			nRepeat = 1
+		end
+		if not option and MY_AutoDialogue.bAutoSelectSg and #dialog.aOptions == 1 then
+			option = dialog.aOptions[1]
+			nRepeat = 1
+		end
 	end
 	if option and option.dwID then
 		if MY_AutoDialogue.bAutoClose then
@@ -513,6 +521,12 @@ function D.GetConfigMenu()
 			bCheck = true, bChecked = MY_AutoDialogue.bAutoSelectSg,
 			fnAction = function()
 				MY_AutoDialogue.bAutoSelectSg = not MY_AutoDialogue.bAutoSelectSg
+			end
+		}, {
+			szOption = _L['Auto chat when only one space selection'],
+			bCheck = true, bChecked = MY_AutoDialogue.bAutoSelectSp,
+			fnAction = function()
+				MY_AutoDialogue.bAutoSelectSp = not MY_AutoDialogue.bAutoSelectSp
 			end
 		}, {
 			szOption = _L['disable when shift key pressed'],
