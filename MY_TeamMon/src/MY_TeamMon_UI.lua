@@ -957,13 +957,24 @@ function D.OpenImportPanel(szDefault, szTitle, fnAction)
 end
 
 function D.OpenExportPanel()
-	local ui = UI.CreateFrame('MY_TeamMon_DataPanel', { w = 720, h = 330, text = _L['Export data'], close = true })
+	local ui = UI.CreateFrame('MY_TeamMon_DataPanel', { w = 720, h = 410, text = _L['Export data'], close = true })
 	local nX, nY = ui:Append('Text', { x = 20, y = 50, text = _L['Includes'], font = 27 }):Pos('BOTTOMRIGHT')
 	nX = 20
 	for k, v in ipairs(MY_TMUI_TYPE) do
 		nX = ui:Append('WndCheckBox', { name = v, x = nX + 5, y = nY, checked = true, text = _L[v] }):AutoWidth():Pos('BOTTOMRIGHT')
 	end
 	nY = 110
+	local szAuthor = GetUserRoleName()
+	nX, nY = ui:Append('Text', { x = 20, y = nY, text = _L['Author name'], font = 27 }):Pos('BOTTOMRIGHT')
+	nX, nY = ui:Append('WndEditBox', {
+		x = 25, y = nY, w = 500, h = 25,
+		text = szAuthor,
+		limit = 6,
+		onchange = function(szText)
+			szAuthor = LIB.TrimString(szText)
+		end,
+	}):Pos('BOTTOMRIGHT')
+	nY = nY + 10
 	local szFileName = 'TM-' .. select(3, GetVersion()) .. FormatTime('-%Y%m%d_%H.%M', GetCurrentTime()) .. '.jx3dat'
 	nX, nY = ui:Append('Text', { x = 20, y = nY, text = _L['File name'], font = 27 }):Pos('BOTTOMRIGHT')
 	nX, nY = ui:Append('WndEditBox', {
@@ -999,8 +1010,9 @@ function D.OpenExportPanel()
 			local config = {
 				bFormat = ui:Children('#Format'):Check(),
 				szFileName = szFileName,
+				szAuthor = szAuthor,
 				bJson = nType == 2,
-				tList = {}
+				tList = {},
 			}
 			for k, v in ipairs(MY_TMUI_TYPE) do
 				if ui:Children('#' .. v):Check() then

@@ -2004,7 +2004,9 @@ function D.SaveConfigureFile(config)
 	-- HM.20170504: add meta data
 	data['__meta'] = {
 		szLang = select(3, GetVersion()),
-		szAuthor = GetUserRoleName(),
+		szAuthor = not IsEmpty(config.szAuthor)
+			and config.szAuthor
+			or GetUserRoleName(),
 		szServer = select(4, GetUserServer()),
 		nTimeStamp = GetCurrentTime()
 	}
