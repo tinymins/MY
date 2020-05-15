@@ -625,7 +625,7 @@ function D.OnItemRefreshTip()
 					else
 						szXml = szXml .. GetFormatText('\n', nil, 255, 150, 0)
 					end
-					szXml = szXml .. GetFormatText(_L['total: '] .. p.rec[DK_REC_STAT_SKILL.TOTAL]
+					szXml = szXml .. GetFormatText(_L['Total: '] .. p.rec[DK_REC_STAT_SKILL.TOTAL]
 						.. ' ' .. _L['effect: '] .. p.rec[DK_REC_STAT_SKILL.TOTAL_EFFECT] .. '\n')
 					for _, nSkillResult in ipairs({
 						{ SKILL_RESULT.ABSORB, SKILL_RESULT.HIT },
@@ -655,7 +655,7 @@ function D.OnItemRefreshTip()
 			end
 			if DataDisplay[DK.AWAYTIME][id] then
 				szXml = szXml .. GetFormatText(_L(
-					'away count: %d, away time: %ds',
+					'Away count: %d, away time: %ds',
 					#DataDisplay[DK.AWAYTIME][id],
 					MY_Recount_DS.GeneAwayTime(DataDisplay, id, MY_Recount_UI.bSysTimeMode)
 				), nil, 255, 191, 255)

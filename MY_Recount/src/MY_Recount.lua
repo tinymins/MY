@@ -195,7 +195,7 @@ function D.GetMenu()
 		return not MY_Recount_DS.bEnable or not LIB.GetStorage('BoolValues.MY_Recount_EnableUI')
 	end
 	local t = {
-		szOption = _L['fight recount'],
+		szOption = _L['Fight recount'],
 		{
 			szOption = _L['Enable recording'],
 			bCheck = true,
@@ -215,7 +215,7 @@ function D.GetMenu()
 			fnDisable = function() return not MY_Recount_DS.bEnable end,
 		},
 		{
-			szOption = _L['display as per second'],
+			szOption = _L['Display as per second'],
 			bCheck = true,
 			bChecked = MY_Recount_UI.bShowPerSec,
 			fnAction = function()
@@ -224,7 +224,7 @@ function D.GetMenu()
 			fnDisable = IsUIDisabled,
 		},
 		{
-			szOption = _L['display effective value'],
+			szOption = _L['Display effective value'],
 			bCheck = true,
 			bChecked = MY_Recount_UI.bShowEffect,
 			fnAction = function()
@@ -233,7 +233,7 @@ function D.GetMenu()
 			fnDisable = IsUIDisabled,
 		},
 		{
-			szOption = _L['uncount awaytime'],
+			szOption = _L['Uncount awaytime'],
 			bCheck = true,
 			bChecked = MY_Recount_UI.bAwayMode,
 			fnAction = function()
@@ -242,7 +242,7 @@ function D.GetMenu()
 			fnDisable = IsUIDisabled,
 		},
 		{
-			szOption = _L['show nodata teammate'],
+			szOption = _L['Show nodata teammate'],
 			bCheck = true,
 			bChecked = MY_Recount_UI.bShowNodataTeammate,
 			fnAction = function()
@@ -251,7 +251,7 @@ function D.GetMenu()
 			fnDisable = IsUIDisabled,
 		},
 		{
-			szOption = _L['use system time count'],
+			szOption = _L['Use system time count'],
 			bCheck = true,
 			bChecked = MY_Recount_UI.bSysTimeMode,
 			fnAction = function()
@@ -287,7 +287,7 @@ function D.GetMenu()
 			fnDisable = IsUIDisabled,
 		},
 		{
-			szOption = _L['show zero value effect'],
+			szOption = _L['Show zero value effect'],
 			bCheck = true,
 			bChecked = MY_Recount_UI.bShowZeroVal,
 			fnAction = function()
@@ -305,10 +305,10 @@ function D.GetMenu()
 			fnDisable = IsUIDisabled,
 		},
 		{   -- 切换统计类型
-			szOption = _L['switch recount mode'],
+			szOption = _L['Switch recount mode'],
 			fnDisable = IsUIDisabled,
 			{
-				szOption = _L['display only npc record'],
+				szOption = _L['Display only npc record'],
 				bCheck = true, bMCheck = true,
 				bChecked = MY_Recount_UI.nDisplayMode == MY_Recount_UI.DISPLAY_MODE.NPC,
 				fnAction = function()
@@ -316,7 +316,7 @@ function D.GetMenu()
 				end,
 			},
 			{
-				szOption = _L['display only player record'],
+				szOption = _L['Display only player record'],
 				bCheck = true, bMCheck = true,
 				bChecked = MY_Recount_UI.nDisplayMode == MY_Recount_UI.DISPLAY_MODE.PLAYER,
 				fnAction = function()
@@ -324,7 +324,7 @@ function D.GetMenu()
 				end,
 			},
 			{
-				szOption = _L['display all record'],
+				szOption = _L['Display all record'],
 				bCheck = true, bMCheck = true,
 				bChecked = MY_Recount_UI.nDisplayMode == MY_Recount_UI.DISPLAY_MODE.BOTH,
 				fnAction = function()
@@ -336,19 +336,19 @@ function D.GetMenu()
 
 	-- 过滤短时间记录
 	local t1 = {
-		szOption = _L['filter short fight'],
+		szOption = _L['Filter short fight'],
 		fnDisable = function() return not MY_Recount_DS.bEnable end,
 	}
 	for _, i in pairs({ -1, 10, 15, 20, 25, 30, 45, 60, 90, 120, 180 }) do
 		local szOption
 		if i < 0 then
-			szOption = _L['no time limit']
+			szOption = _L['No time limit']
 		elseif i < 60 then
-			szOption = _L('less than %d second', i)
+			szOption = _L('Less than %d second', i)
 		elseif i == 90 then
-			szOption = _L('less than %d minute and a half', i / 60)
+			szOption = _L('Less than %d minute and a half', i / 60)
 		else
-			szOption = _L('less than %d minute', i / 60)
+			szOption = _L('Less than %d minute', i / 60)
 		end
 		insert(t1, {
 			szOption = szOption,
@@ -364,7 +364,7 @@ function D.GetMenu()
 
 	-- 风格选择
 	local t1 = {
-		szOption = _L['theme'],
+		szOption = _L['Theme'],
 		fnDisable = IsUIDisabled,
 	}
 	for i, _ in ipairs(MY_Recount_UI.FORCE_BAR_CSS) do
@@ -395,15 +395,15 @@ function D.GetMenu()
 
 	-- 数值刷新周期
 	local t1 = {
-		szOption = _L['redraw interval'],
+		szOption = _L['Redraw interval'],
 		fnDisable = IsUIDisabled,
 	}
 	for _, i in ipairs({1, GLOBAL.GAME_FPS / 2, GLOBAL.GAME_FPS, GLOBAL.GAME_FPS * 2}) do
 		local szOption
 		if i == 1 then
-			szOption = _L['realtime refresh']
+			szOption = _L['Realtime refresh']
 		else
-			szOption = _L('every %.1f second', i / GLOBAL.GAME_FPS)
+			szOption = _L('Every %.1f second', i / GLOBAL.GAME_FPS)
 		end
 		insert(t1, {
 			szOption = szOption,
@@ -419,7 +419,7 @@ function D.GetMenu()
 
 	-- 最大历史记录
 	local t1 = {
-		szOption = _L['max history'],
+		szOption = _L['Max history'],
 		nMaxHeight = 500,
 		fnDisable = function() return not MY_Recount_DS.bEnable end,
 	}
@@ -442,7 +442,7 @@ end
 -- 获取历史记录菜单
 function D.GetHistoryMenu()
 	local t = {{
-		szOption = _L['current fight'],
+		szOption = _L['Current fight'],
 		rgb = (MY_Recount_DS.Get('CURRENT') == DataDisplay and {255, 255, 0}) or nil,
 		fnAction = function()
 			if IsCtrlKeyDown() then
@@ -545,23 +545,23 @@ function D.GetPublishMenu()
 
 	-- 发布类型
 	insert(t, {
-		szOption = _L['publish mode'],
+		szOption = _L['Publish mode'],
 		{
-			szOption = _L['only effect value'],
+			szOption = _L['Only effect value'],
 			bCheck = true, bMCheck = true,
 			bChecked = MY_Recount.nPublishMode == PUBLISH_MODE.EFFECT,
 			fnAction = function()
 				MY_Recount.nPublishMode = PUBLISH_MODE.EFFECT
 			end,
 		}, {
-			szOption = _L['only total value'],
+			szOption = _L['Only total value'],
 			bCheck = true, bMCheck = true,
 			bChecked = MY_Recount.nPublishMode == PUBLISH_MODE.TOTAL,
 			fnAction = function()
 				MY_Recount.nPublishMode = PUBLISH_MODE.TOTAL
 			end,
 		}, {
-			szOption = _L['effect and total value'],
+			szOption = _L['Effect and total value'],
 			bCheck = true, bMCheck = true,
 			bChecked = MY_Recount.nPublishMode == PUBLISH_MODE.BOTH,
 			fnAction = function()
@@ -580,7 +580,7 @@ function D.GetPublishMenu()
 		LIB.Talk(
 			nChannel,
 			'[' .. PACKET_INFO.SHORT_NAME .. ']'
-			.. _L['fight recount'] .. ' - '
+			.. _L['Fight recount'] .. ' - '
 			.. frame:Lookup('Wnd_Title', 'Text_Title'):GetText()
 			.. ' ' .. ((DataDisplay[DK.BOSSNAME] and ' - ' .. DataDisplay[DK.BOSSNAME]) or '')
 			.. '(' .. LIB.FormatTimeCounter(MY_Recount_DS.GeneFightTime(DataDisplay, eTimeChannel), '%M:%ss') .. ')',
@@ -644,7 +644,7 @@ function D.GetPublishMenu()
 		}
 		for _, nLimit in ipairs({1, 2, 3, 4, 5, 8, 10, 15, 20, 30, 50, 100}) do
 			insert(t1, {
-				szOption = _L('top %d', nLimit),
+				szOption = _L('Top %d', nLimit),
 				fnAction = function() Publish(nChannel, nLimit) end,
 			})
 		end

@@ -97,7 +97,7 @@ function D.GetDetailMenu(frame)
 		LIB.Talk(
 			nChannel,
 			'[' .. PACKET_INFO.SHORT_NAME .. ']'
-			.. _L['fight recount'] .. ' - '
+			.. _L['Fight recount'] .. ' - '
 			.. frame:Lookup('', 'Text_Default'):GetText()
 			.. ' ' .. ((DataDisplay[DK.BOSSNAME] and ' - ' .. DataDisplay[DK.BOSSNAME]) or '')
 			.. '(' .. LIB.FormatTimeCounter(MY_Recount_DS.GeneFightTime(DataDisplay, eTimeChannel), '%M:%ss') .. ')',
@@ -161,7 +161,7 @@ function D.GetDetailMenu(frame)
 		}
 		for _, nLimit in ipairs({1, 2, 3, 4, 5, 8, 10, 15, 20, 30, 50, 100}) do
 			insert(t1, {
-				szOption = _L('top %d', nLimit),
+				szOption = _L('Top %d', nLimit),
 				fnAction = function() Publish(nChannel, nLimit) end,
 			})
 		end
