@@ -495,9 +495,12 @@ end
 -- 编码 JSON 数据，成功返回 JSON 字符串，失败返回 nil
 -- (string) LIB.JsonEncode(vData[, bPretty])
 -- vData 变量数据，支持字符串、数字、Table/Userdata
--- bPretty 是否增加缩进美化，默认为 false
-function LIB.JsonEncode(vData, bPretty)
-	return encode_value(vData, {}, bPretty and '')
+-- szIndent 加缩进美化，默认无
+function LIB.JsonEncode(vData, szIndent)
+	if not IsString(szIndent) then
+		szIndent = szIndent and '' or nil
+	end
+	return encode_value(vData, {}, szIndent and '')
 end
 
 -- 解析 JSON 数据，成功返回数据，失败返回 nil 加错误信息
