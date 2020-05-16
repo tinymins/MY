@@ -521,7 +521,7 @@ function D.GetHistoryFiles()
 		end
 	end
 	for _, filename in ipairs(aFileName) do
-		local year, month, day, hour, minute, second, bossname, during = filename:match('^(%d+)%-(%d+)%-(%d+)%-(%d+)%-(%d+)%-(%d+)%_(.-)_(%d+)%.fstt%.jx3dat')
+		local year, month, day, hour, minute, second, bossname, during = filename:match('^(%d+)%-(%d+)%-(%d+)%-(%d+)%-(%d+)%-(%d+)%_(.-)_(%d+%.?%d*)%.fstt%.jx3dat')
 		if year then
 			year = tonumber(year)
 			month = tonumber(month)
@@ -580,7 +580,7 @@ end
 function D.GetDataFileName(data)
 	return LIB.FormatTime(data[DK.TIME_BEGIN], '%yyyy-%MM-%dd-%hh-%mm-%ss')
 			.. '_' .. (data[DK.BOSSNAME] or g_tStrings.STR_NAME_UNKNOWN)
-			.. '_' .. data[DK.TIME_DURING]
+			.. '_' .. ceil(data[DK.TIME_DURING])
 			.. '.fstt.jx3dat'
 end
 
