@@ -201,9 +201,12 @@ function D.CheckAlertEnable()
 				return
 			end
 			local domesticate = me.GetDomesticate()
+			if not domesticate then
+				return
+			end
 			local nMeasure = domesticate.nMaxFullMeasure - domesticate.nFullMeasure
 			if nMeasure >= O.nAlertNum and domesticate.nGrowthLevel < domesticate.nMaxGrowthLevel then
-				local szDomesticate = LIB.GetObjectName('ITEM_INFO', O.dwAutoFeedCubTabType, O.dwAutoFeedCubTabIndex)
+				local szDomesticate = LIB.GetObjectName('ITEM_INFO', domesticate.dwCubTabType, domesticate.dwCubTabIndex)
 				OutputWarningMessage('MSG_WARNING_YELLOW', _L('Your domesticate %s available measure is %d point!', szDomesticate, nMeasure))
 				PlaySound(SOUND.UI_SOUND, g_sound.CloseAuction)
 			end
