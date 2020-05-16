@@ -206,8 +206,26 @@ end
 
 function D.CheckOpenAllMapEnable()
 	if O.bOpenAllMap and not LIB.IsShieldedVersion('MY_ShenxingHelper') then
+		LIB.RegisterEvent({
+			'LOADING_END.MY_ShenxingHelper__OpenAllMap',
+			'UPDATE_ROAD_TRACK_FORCE.MY_ShenxingHelper__OpenAllMap',
+			'UPDATE_ROUTE_NODE_OPEN_LIST.MY_ShenxingHelper__OpenAllMap',
+			'ON_MAP_VISIT_FLAG_CHANGED.MY_ShenxingHelper__OpenAllMap',
+			'SYNC_ROLE_DATA_END.MY_ShenxingHelper__OpenAllMap',
+			'PLAYER_LEVEL_UPDATE.MY_ShenxingHelper__OpenAllMap',
+		}, D.HookOpenAllMap)
+		LIB.DelayCall('MY_ShenxingHelper__HookOpenAllMap', 200, D.HookOpenAllMap)
 		D.HookOpenAllMap()
 	else
+		LIB.RegisterEvent({
+			'LOADING_END.MY_ShenxingHelper__OpenAllMap',
+			'UPDATE_ROAD_TRACK_FORCE.MY_ShenxingHelper__OpenAllMap',
+			'UPDATE_ROUTE_NODE_OPEN_LIST.MY_ShenxingHelper__OpenAllMap',
+			'ON_MAP_VISIT_FLAG_CHANGED.MY_ShenxingHelper__OpenAllMap',
+			'SYNC_ROLE_DATA_END.MY_ShenxingHelper__OpenAllMap',
+			'PLAYER_LEVEL_UPDATE.MY_ShenxingHelper__OpenAllMap',
+		}, false)
+		LIB.DelayCall('MY_ShenxingHelper__HookOpenAllMap', false)
 		D.UnhookOpenAllMap()
 	end
 end
