@@ -673,10 +673,11 @@ function MY_BiddingBase.OnLButtonClick()
 		local tConfig = cache.tConfig
 		local aRecord = D.GetRankRecord(cache.aRecord)
 		local aSay = D.ConfigToEditStruct(tConfig)
+		insert(aSay, 1, { type = 'text', text = _L['Bidding'] })
 		if #aRecord == 0 then
-			insert(aSay, { type = 'text', text = _L[' do not has vaild bidding price'] })
+			insert(aSay, { type = 'text', text = _L[', no vaild price'] })
 		else
-			insert(aSay, { type = 'text', text = _L[' bidding valid prices: '] })
+			insert(aSay, { type = 'text', text = _L[', current valid prices: '] })
 			for i = 1, min(#aRecord, tConfig.nNumber) do
 				if i > 1 then
 					insert(aSay, { type = 'text', text = _L[','] })
