@@ -182,7 +182,7 @@ function D.CheckAutoFeedEnable()
 					end
 				end)
 			end
-			if not bFeed then
+			if nRound > 0 and not bFeed then
 				local szFood = LIB.GetObjectName('ITEM_INFO', O.dwAutoFeedFoodTabType, O.dwAutoFeedFoodTabIndex)
 				local szDomesticate = LIB.GetObjectName('ITEM_INFO', O.dwAutoFeedCubTabType, O.dwAutoFeedCubTabIndex)
 				LIB.Systopmsg(_L('No enough %s to feed %s!', szFood, szDomesticate))
