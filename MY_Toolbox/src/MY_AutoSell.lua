@@ -86,6 +86,9 @@ RegisterCustomData('MY_AutoSell.tProtectItem')
 
 -- 自动售出物品
 function D.AutoSellItem(nNpcID, nShopID)
+	if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) then
+		return
+	end
 	local me = GetClientPlayer()
 	local nIndex = LIB.GetBagPackageIndex()
 	for dwBox = nIndex, nIndex + LIB.GetBagPackageCount() do
