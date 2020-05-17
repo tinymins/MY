@@ -88,7 +88,8 @@ function PS.OnPanelActive(wnd)
 			end,
 		}):AutoWidth():Width() + 5
 	end
-	y = y + 20
+
+	x, y = MY_FirstBossKill.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 
 	x = X
 	y = y + 20

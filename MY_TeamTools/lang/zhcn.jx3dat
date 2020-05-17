@@ -196,4 +196,11 @@ return {
 	['Save Advertising'] = '保存喊话',
 	['Save Advertising Name'] = '保存名(如：烛龙殿2/HG) 5字内',
 	['Advertising List'] = '喊话列表 （左键导入聊天框，右键更多选项）',
+
+	-- MY_FirstBossKill.lua --
+	['Share boss kill'] = '首次击败分享',
+	['Share boss kill record for kill rank.'] = '分享首次击败副本首领信息，用于数据统计。',
+	['Try share boss kill: %s - %ds (%s).'] = '正在分享：%s 战斗%d秒（%s）。',
+	['Share boss kill success: %s - %ds (%s).'] = '成功分享：%s 战斗%d秒（%s）。',
+	['Full win'] = '全胜',
 }
