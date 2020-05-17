@@ -70,7 +70,7 @@ local Table_GetBuffName, Table_GetSkillName, Table_BuffIsVisible = Table_GetBuff
 ]]
 
 local COMBAT_TEXT_INIFILE        = PACKET_INFO.ROOT .. 'MY_CombatText/ui/MY_CombatText_Render.ini'
-local COMBAT_TEXT_CONFIG         = PACKET_INFO.ROOT .. 'MY_CombatText/config.jx3dat'
+local COMBAT_TEXT_CONFIG         = LIB.FormatPath({'config/CombatText.jx3dat', PATH_TYPE.GLOBAL})
 local COMBAT_TEXT_PLAYERID       = 0
 local COMBAT_TEXT_TOTAL          = 32
 local COMBAT_TEXT_UI_SCALE       = 1
@@ -1226,7 +1226,12 @@ function PS.OnPanelActive(frame)
 	end
 
 	if IsFileExist(COMBAT_TEXT_CONFIG) then
-		ui:Append('WndButton', { x = 350, y = 0, text = _L['Load CombatText Config'], buttonstyle = 3 }):Click(CombatText.CheckEnable)
+		ui:Append('WndButton', {
+			x = 460, y = 15, w = 120,
+			text = _L['Load CombatText Config'],
+			buttonstyle = 3,
+			onclick = CombatText.CheckEnable,
+		})
 	end
 end
 LIB.RegisterPanel('MY_CombatText', _L['CombatText'], _L['System'], 2041, PS)
