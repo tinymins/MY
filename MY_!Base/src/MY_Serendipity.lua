@@ -42,70 +42,29 @@ local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.G
 local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
 -------------------------------------------------------------------------------------------------------
 local _L, D = LIB.LoadLangPack(), {}
-local SERENDIPITY_STATUS = {
-	START = 0,
-	FINISH = 1,
-	START_AND_FINISH = 2,
-}
-
-local SERENDIPITY_LIST = {}
-do
-local Xtra = {
+local O = {
 	bEnable     = LIB.FormatDataStructure(LIB.LoadLUAData({'config/show_notify.jx3dat'           , PATH_TYPE.GLOBAL}), false),
 	bSound      = LIB.FormatDataStructure(LIB.LoadLUAData({'config/serendipity_sound.jx3dat'     , PATH_TYPE.GLOBAL}), true ),
 	bPreview    = LIB.FormatDataStructure(LIB.LoadLUAData({'config/serendipity_preview.jx3dat'   , PATH_TYPE.GLOBAL}), true ),
 	bAutoShare  = LIB.FormatDataStructure(LIB.LoadLUAData({'config/serendipity_autoshare.jx3dat' , PATH_TYPE.GLOBAL}), false),
 	bSilentMode = LIB.FormatDataStructure(LIB.LoadLUAData({'config/serendipity_silentmode.jx3dat', PATH_TYPE.GLOBAL}), true ),
 }
-MY_Serendipity = setmetatable({}, {
-	__index = function(t, k)
-		return Xtra[k]
-	end,
-	__newindex = function(t, k, v)
-		if Xtra[k] == v then
-			return
-		end
-		if k == 'bEnable' then
-			if v then
-				for i, p in ipairs_r(SERENDIPITY_LIST) do
-					LIB.CreateNotify({
-						szKey = p.szKey,
-						szMsg = p.szXml,
-						fnAction = p.fnAction,
-						bPlaySound = false,
-						bPopupPreview = false,
-					})
-				end
-			else
-				for i, p in ipairs_r(SERENDIPITY_LIST) do
-					LIB.DismissNotify(p.szKey)
-				end
-			end
-			LIB.SaveLUAData({'config/show_notify.jx3dat', PATH_TYPE.GLOBAL}, v)
-		elseif k == 'bSound' then
-			LIB.SaveLUAData({'config/serendipity_sound.jx3dat', PATH_TYPE.GLOBAL}, v)
-		elseif k == 'bPreview' then
-			LIB.SaveLUAData({'config/serendipity_preview.jx3dat', PATH_TYPE.GLOBAL}, v)
-		elseif k == 'bAutoShare' then
-			LIB.SaveLUAData({'config/serendipity_autoshare.jx3dat', PATH_TYPE.GLOBAL}, v)
-		elseif k == 'bSilentMode' then
-			LIB.SaveLUAData({'config/serendipity_silentmode.jx3dat', PATH_TYPE.GLOBAL}, v)
-		end
-		Xtra[k] = v
-	end,
-})
-end
 
-do
-local function OnMyNotifyDismiss()
+local SERENDIPITY_INFO
+local SERENDIPITY_STATUS = {
+	START = 0,
+	FINISH = 1,
+	START_AND_FINISH = 2,
+}
+local SERENDIPITY_LIST = {}
+
+LIB.RegisterEvent('MY_NOTIFY_DISMISS', function()
 	for i, p in ipairs_r(SERENDIPITY_LIST) do
 		if p.szKey == arg0 then
 			remove(SERENDIPITY_LIST, i)
 		end
 	end
-end
-LIB.RegisterEvent('MY_NOTIFY_DISMISS', OnMyNotifyDismiss)
-end
+end)
 
 function D.GetSerendipityShareName(fnAction, bNoConfirm)
 	local szReporter = LIB.LoadLUAData({'config/realname.jx3dat', PATH_TYPE.ROLE}) or GetClientPlayer().szName:gsub('@.-$', '')
@@ -125,7 +84,6 @@ function D.GetSerendipityShareName(fnAction, bNoConfirm)
 		GetUserInput(_L['Please input your realname, left blank for anonymous report:'], fnConfirm, nil, nil, nil, szReporter, 6)
 	end
 end
-MY_Serendipity.GetSerendipityShareName = D.GetSerendipityShareName
 
 function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTime, szMode)
 	local szKey = szName .. '_' .. szSerendipity .. '_' .. dwTime
@@ -269,8 +227,7 @@ function D.OnSerendipity(szName, szSerendipity, nMethod, nStatus, dwTime)
 	end
 end
 
-do
-local function GetSerendipityName(nID)
+function D.GetSerendipityName(nID)
 	for i = 2, g_tTable.Adventure:GetRowCount() do
 		local tLine = g_tTable.Adventure:GetRow(i)
 		if tLine.dwID == nID then
@@ -284,34 +241,31 @@ LIB.RegisterEvent('ON_SERENDIPITY_TRIGGER.QIYU', function()
 	if not me then
 		return
 	end
-	D.OnSerendipity(me.szName, GetSerendipityName(arg0), 2, arg1, GetCurrentTime())
+	D.OnSerendipity(me.szName, D.GetSerendipityName(arg0), 2, arg1, GetCurrentTime())
 end)
-end
 
-do
-local l_serendipities
-local function GetSerendipityInfo(dwTabType, dwIndex)
-	if not l_serendipities then
-		l_serendipities = LIB.LoadLUAData(PACKET_INFO.FRAMEWORK_ROOT .. 'data/serendipities/{$lang}.jx3dat')
-		l_serendipities.name = {}
-		for dwTabType, tList in pairs(l_serendipities) do
+function D.GetSerendipityInfo(dwTabType, dwIndex)
+	if not SERENDIPITY_INFO then
+		SERENDIPITY_INFO = LIB.LoadLUAData(PACKET_INFO.FRAMEWORK_ROOT .. 'data/serendipities/{$lang}.jx3dat')
+		SERENDIPITY_INFO.name = {}
+		for dwTabType, tList in pairs(SERENDIPITY_INFO) do
 			if dwTabType ~= 'name' then
 				for dwID, p in pairs(tList) do
 					if IsNumber(dwTabType) then
 						local KItemInfo = GetItemInfo(dwTabType, dwID)
 						if KItemInfo then
-							l_serendipities.name[KItemInfo.szName] = p
+							SERENDIPITY_INFO.name[KItemInfo.szName] = p
 						end
 					end
 					local KItemInfo = GetItemInfo(p[1], p[2])
 					if KItemInfo then
-						l_serendipities.name[KItemInfo.szName] = p
+						SERENDIPITY_INFO.name[KItemInfo.szName] = p
 					end
 				end
 			end
 		end
 	end
-	local serendipity = l_serendipities[dwTabType] and l_serendipities[dwTabType][dwIndex]
+	local serendipity = SERENDIPITY_INFO[dwTabType] and SERENDIPITY_INFO[dwTabType][dwIndex]
 	if serendipity then
 		local iteminfo = GetItemInfo(serendipity[1], serendipity[2])
 		if iteminfo then
@@ -350,7 +304,7 @@ LIB.RegisterMsgMonitor('QIYU', function(szMsg, nFont, bRich, r, g, b, szChannel)
 		if not IsDebugClient() and LIB.IsParty(szName) and not LIB.IsFriend(szName) then
 			return
 		end
-		if not GetSerendipityInfo('name', szSerendipity) then -- 太多了筛选下…
+		if not D.GetSerendipityInfo('name', szSerendipity) then -- 太多了筛选下…
 			return
 		end
 		D.OnSerendipity(szName, szSerendipity, 1, 0, GetCurrentTime())
@@ -363,7 +317,7 @@ LIB.RegisterEvent('LOOT_ITEM', function()
 	if not player or not item then
 		return
 	end
-	local szSerendipity, nStatus = GetSerendipityInfo(item.dwTabType, item.dwIndex)
+	local szSerendipity, nStatus = D.GetSerendipityInfo(item.dwTabType, item.dwIndex)
 	if szSerendipity then
 		D.OnSerendipity(player.szName, szSerendipity, 3, nStatus, GetCurrentTime())
 	end
@@ -374,12 +328,11 @@ LIB.RegisterEvent('QUEST_FINISHED', function()
 	if not me then
 		return
 	end
-	local szSerendipity, nStatus = GetSerendipityInfo('quest', arg0)
+	local szSerendipity, nStatus = D.GetSerendipityInfo('quest', arg0)
 	if szSerendipity then
 		D.OnSerendipity(me.szName, szSerendipity, 4, nStatus, GetCurrentTime())
 	end
 end)
-end
 
 LIB.RegisterInit(function()
 	LIB.RegisterTutorial({
@@ -456,3 +409,67 @@ LIB.RegisterInit(function()
 		},
 	})
 end)
+
+
+-- Global exports
+do
+local settings = {
+	exports = {
+		{
+			fields = {
+				bEnable     = true,
+				bSound      = true,
+				bPreview    = true,
+				bAutoShare  = true,
+				bSilentMode = true,
+			},
+			root = O,
+		},
+	},
+	imports = {
+		{
+			fields = {
+				bEnable     = true,
+				bSound      = true,
+				bPreview    = true,
+				bAutoShare  = true,
+				bSilentMode = true,
+			},
+			triggers = {
+				bEnable = function(_, v)
+					if v then
+						for i, p in ipairs_r(SERENDIPITY_LIST) do
+							LIB.CreateNotify({
+								szKey = p.szKey,
+								szMsg = p.szXml,
+								fnAction = p.fnAction,
+								bPlaySound = false,
+								bPopupPreview = false,
+							})
+						end
+					else
+						for i, p in ipairs_r(SERENDIPITY_LIST) do
+							LIB.DismissNotify(p.szKey)
+						end
+					end
+					LIB.SaveLUAData({'config/show_notify.jx3dat', PATH_TYPE.GLOBAL}, v)
+				end,
+				bSound = function(_, v)
+					LIB.SaveLUAData({'config/serendipity_sound.jx3dat', PATH_TYPE.GLOBAL}, v)
+				end,
+				bPreview = function(_, v)
+					LIB.SaveLUAData({'config/serendipity_preview.jx3dat', PATH_TYPE.GLOBAL}, v)
+				end,
+				bAutoShare = function(_, v)
+					LIB.SaveLUAData({'config/serendipity_autoshare.jx3dat', PATH_TYPE.GLOBAL}, v)
+				end,
+				bSilentMode = function(_, v)
+					LIB.SaveLUAData({'config/serendipity_silentmode.jx3dat', PATH_TYPE.GLOBAL}, v)
+				end,
+			},
+			root = O,
+		},
+	},
+}
+MY_Serendipity = LIB.GeneGlobalNS(settings)
+end
