@@ -253,7 +253,7 @@ function D.OnMsgArrive(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID, szNa
     -- 开始计算是否符合过滤器要求
     local bMatch = false
     for _, p in ipairs(KEYWORD_LIST) do
-        if p.bEnable then
+        if p.bEnable and p.tChannel[szChannel] then
             if p.bIsRegexp then -- regexp
                 if find(rec.text, p.szKeyword) then
                     bMatch = true
