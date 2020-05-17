@@ -172,7 +172,7 @@ local function EncodePostData(data, t, prefix)
 			insert(t, prefix)
 			insert(t, '=')
 		end
-		insert(t, data)
+		insert(t, tostring(data))
 	end
 end
 
