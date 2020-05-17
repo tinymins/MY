@@ -78,7 +78,9 @@ function D.CheckUpdateAcquire()
 		local szServerU = AnsiToUTF8(p.szServer)
 		local szNameU = AnsiToUTF8(p.szName)
 		local szAchieve = Table_GetAchievement(p.dwAchieveID).szName
-		local nCRC = GetStringCRC(szServerU .. ','
+		local szTime = LIB.FormatTime(p.dwTime, '%yyyy-%MM-%dd %hh:%mm:%ss')
+		local nCRC = GetStringCRC('MY_BKR_AhfB6aBL9o$8R9t3ka6Uk6@#^^KHLoMtZCdS@5e2@T_'
+			.. szServerU .. ','
 			.. szNameU .. ','
 			.. p.dwAchieveID .. ','
 			.. p.dwTime .. ',' .. p.nFightTime)
@@ -90,7 +92,7 @@ function D.CheckUpdateAcquire()
 			d = p.nFightTime,
 			c = nCRC, _ = GetCurrentTime(),
 		})
-		LIB.Sysmsg(_L('Try share boss kill: %s - %ds (%s).', szAchieve, p.nFightTime, LIB.FormatTime(p.dwTime)))
+		LIB.Sysmsg(_L('Try share boss kill: %s - %ds (%s).', szAchieve, p.nFightTime, szTime))
 		--[[#DEBUG BEGIN]]
 		LIB.Debug(szURL, DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
@@ -102,7 +104,7 @@ function D.CheckUpdateAcquire()
 						remove(BOSS_ACHIEVE_ACQUIRE, i)
 					end
 				end
-				LIB.Sysmsg(_L('Share boss kill success: %s - %ds (%s).', szAchieve, p.nFightTime, LIB.FormatTime(p.dwTime)))
+				LIB.Sysmsg(_L('Share boss kill success: %s - %ds (%s).', szAchieve, p.nFightTime, szTime))
 			end,
 		})
 	end
