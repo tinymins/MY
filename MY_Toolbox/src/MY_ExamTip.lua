@@ -50,8 +50,8 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
 	return
 end
 --------------------------------------------------------------------------
-local QUERY_URL = 'https://j3cx.com/api/exam?l=%s&q=%s'
-local SUBMIT_URL = 'https://j3cx.com/api/exam'
+local QUERY_URL = 'https://exam.j3cx.com/api/exam?q=%s'
+local SUBMIT_URL = 'https://exam.uploads.j3cx.com/api/exam/uploads'
 local l_tLocal -- 本地题库
 local l_tCached = {} -- 玩家答题缓存
 local l_tAccept = {} -- 从服务器获取到的数据缓存
@@ -105,10 +105,9 @@ local function QueryData(szQues)
 		end
 	end
 
-	local _, _, szLang, _ = GetVersion()
 	LIB.Ajax({
 		method = 'get',
-		url = QUERY_URL:format(szLang, LIB.UrlEncode(szQues)),
+		url = QUERY_URL:format(LIB.UrlEncode(AnsiToUTF8(szQues))),
 		success = function(html, status)
 			local res = LIB.JsonDecode(html)
 			if not res or not IsCurrentQuestion(res.ques) then
@@ -123,15 +122,17 @@ local function QueryData(szQues)
 				end
 			else
 				for _, rec in ipairs(res.data) do
-					if IsCurrentQuestion(rec.ques) and ResolveAnswer(rec.ques, rec.ans) then
-						l_tAccept[rec.ques] = rec.ans
+					local ques, ans = UTF8ToAnsi(rec.ques), UTF8ToAnsi(rec.ans)
+					if IsCurrentQuestion(ques) and ResolveAnswer(ans) then
+						l_tAccept[ques] = ans
 						return
 					end
 				end
 
 				local szText = _L['No result matched, here\'s similar answers:']
 				for _, rec in ipairs(res.data) do
-					szText = szText .. '\n' .. _L('Question: %s\nAnswer: %s', rec.ques, rec.ans)
+					local ques, ans = UTF8ToAnsi(rec.ques), UTF8ToAnsi(rec.ans)
+					szText = szText .. '\n' .. _L('Question: %s\nAnswer: %s', ques, ans)
 				end
 				DisplayMessage(szText)
 			end
@@ -150,7 +151,7 @@ local function SubmitData()
 	local data = {}
 	for szQues, szAnsw in pairs(l_tCached) do
 		if not l_tAccept[szQues] then
-			insert(data, { ques = szQues, ans = szAnsw })
+			insert(data, { ques = AnsiToUTF8(szQues), ans = AnsiToUTF8(szAnsw) })
 		end
 	end
 	if #data == 0 then

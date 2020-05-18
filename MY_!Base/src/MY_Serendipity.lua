@@ -101,7 +101,7 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTi
 		local szReporterU = AnsiToUTF8(szReporter)
 		local function DoUpload()
 			local configs, i, dc = {{'curl', 'post'}, {'origin', 'post'}, {'origin', 'get'}, {'webcef', 'get'}}, 1
-			local url = 'http://data.j3cx.com/serendipity/?l=' .. LIB.GetLang()
+			local url = 'http://serendipity.uploads.j3cx.com/api/serendipity/uploads?l=' .. LIB.GetLang()
 			.. '&data=' .. LIB.EncryptString(LIB.JsonEncode({
 				S = szRegionU, s = szServerU, a = szSerendipityU,
 				n = szNameU, N = szNameCRC, R = szReporterU,

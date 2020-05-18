@@ -1097,7 +1097,7 @@ function LIB.StorageData(szKey, oData)
 		LIB.Ajax({
 			method = 'post',
 			payload = 'json',
-			url = 'http://storage.j3cx.com/api/storage',
+			url = 'http://storage.uploads.j3cx.com/api/storage/uploads',
 			data = {
 				data = FormatStorageData(me, { k = szKey, o = oData }),
 				lang = LIB.GetLang(),
