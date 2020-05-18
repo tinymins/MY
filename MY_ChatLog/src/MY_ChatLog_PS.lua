@@ -144,7 +144,7 @@ span.emotion_44{width:21px; height: 21px; display: inline-block; background-imag
 		// if (Sys.safari) document.write('Safari: ' + Sys.safari);
 
 		if (!Sys.chrome && !Sys.firefox) {
-			document.getElementById('browserWarning').innerHTML = '<a>WARNING: Please use </a><a href=\'http://www.google.cn/chrome/browser/desktop/index.html\' style=\'color: yellow;\'>Chrome</a></a> to browse this page!!!</a>';
+			document.getElementById('browserWarning').innerHTML = '<a>WARNING: Please use </a><a href=\'https://www.google.cn/chrome/browser/desktop/index.html\' style=\'color: yellow;\'>Chrome</a></a> to browse this page!!!</a>';
 		} else {
 			document.getElementById('controls').style['display'] = null;
 			document.getElementById('browserWarning').style['display'] = 'none';

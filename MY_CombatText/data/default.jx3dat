@@ -5,7 +5,7 @@
 -- 在游戏内重新打开伤害样式设置界面，点击右上角载入配置可直接刷新本文件。
 -- 以下local定义不要去修改，只是作为注解和枚举。
 -- 不要改本文件，本文件只是做参考，而且每次插件更新会覆盖。
--- 修改教程 详见 http://www.bilibili.com/video/av3409345
+-- 修改教程 详见 https://www.bilibili.com/video/av3409345
 -- 修改后 会心样式将失效 可以选择删除 COMBAT_TEXT_SCALE 重新使样式生效
 
 local SKILL_RESULT_TYPE = {
