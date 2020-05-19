@@ -128,8 +128,17 @@ function MY_WebBase.OnEditSpecialKeyDown()
 	end
 end
 
+function MY_WebBase.OnKillFocus()
+	local name = this:GetName()
+	if name == 'Edit_Input' then
+		this:SetCaretPos(0)
+	end
+end
+
 function MY_WebBase.OnWebLoadEnd()
-	this:GetRoot():Lookup('Wnd_Controls/Edit_Input'):SetText(this:GetLocationURL())
+	local edit = this:GetRoot():Lookup('Wnd_Controls/Edit_Input')
+	edit:SetText(this:GetLocationURL())
+	edit:SetCaretPos(0)
 end
 
 function MY_WebBase.OnTitleChanged()
