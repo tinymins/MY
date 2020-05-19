@@ -71,6 +71,7 @@ function D.Open(dwAchievement)
 		return
 	end
 	local szURL = 'https://wiki.j3cx.com/' .. dwAchievement
+		.. '?' .. LIB.EncodePostData({ player = AnsiToUTF8(GetUserRoleName()) })
 	local szKey = 'AchievementWiki_' .. dwAchievement
 	local szTitle = achi.szName .. ' - ' .. achi.szDesc
 	szKey = MY_Web.Open(szURL, {
@@ -81,7 +82,7 @@ function D.Open(dwAchievement)
 	UI(MY_Web.GetFrame(szKey)):Size(D.OnWebSizeChange)
 end
 
-local function OnItemMouseEnter()
+function D.OnAchieveItemMouseEnter()
 	if O.bEnable then
 		this:SetObjectMouseOver(true)
 		local x, y = this:GetAbsPos()
@@ -103,21 +104,21 @@ local function OnItemMouseEnter()
 	end
 end
 
-local function OnItemMouseLeave()
+function D.OnAchieveItemMouseLeave()
 	if O.bEnable then
 		this:SetObjectMouseOver(false)
 		HideTip()
 	end
 end
 
-local function OnItemLButtonClick()
+function D.OnAchieveItemLButtonClick()
 	local name = this:GetName()
 	if name == 'Box_AchiBox' and O.bEnable then
 		D.Open(this:GetParent().dwAchievement)
 	end
 end
 
-local function OnAppendItem(res, hList)
+function D.OnAchieveAppendItem(res, hList)
 	local hItem = res[1]
 	if not hItem then
 		return
@@ -130,48 +131,42 @@ local function OnAppendItem(res, hList)
 	end
 	boxAchi:RegisterEvent(ITEM_EVENT.LBUTTONCLICK)
 	boxAchi:RegisterEvent(ITEM_EVENT.MOUSEENTERLEAVE)
-	UnhookTableFunc(boxAchi, 'OnItemMouseEnter', OnItemMouseEnter)
-	UnhookTableFunc(boxAchi, 'OnItemMouseLeave', OnItemMouseLeave)
-	UnhookTableFunc(boxAchi, 'OnItemLButtonClick', OnItemLButtonClick)
-	HookTableFunc(boxAchi, 'OnItemMouseEnter', OnItemMouseEnter)
-	HookTableFunc(boxAchi, 'OnItemMouseLeave', OnItemMouseLeave)
-	HookTableFunc(boxAchi, 'OnItemLButtonClick', OnItemLButtonClick)
+	UnhookTableFunc(boxAchi, 'OnItemMouseEnter', D.OnAchieveItemMouseEnter)
+	UnhookTableFunc(boxAchi, 'OnItemMouseLeave', D.OnAchieveItemMouseLeave)
+	UnhookTableFunc(boxAchi, 'OnItemLButtonClick', D.OnAchieveItemLButtonClick)
+	HookTableFunc(boxAchi, 'OnItemMouseEnter', D.OnAchieveItemMouseEnter)
+	HookTableFunc(boxAchi, 'OnItemMouseLeave', D.OnAchieveItemMouseLeave)
+	HookTableFunc(boxAchi, 'OnItemLButtonClick', D.OnAchieveItemLButtonClick)
 end
 
-local function HookHandle(h)
+function D.HookAchieveHandle(h)
 	if not h then
 		return
 	end
 	for i = 0, h:GetItemCount() - 1 do
-		OnAppendItem({h:Lookup(i)}, h)
+		D.OnAchieveAppendItem({h:Lookup(i)}, h)
 	end
-	HookTableFunc(h, 'AppendItemFromData', OnAppendItem, { bAfterOrigin = true, bPassReturn = true })
+	HookTableFunc(h, 'AppendItemFromData', D.OnAchieveAppendItem, { bAfterOrigin = true, bPassReturn = true })
 end
 
-local function HookFrame(frame)
-	HookHandle(frame:Lookup('PageSet_Achievement/Page_Achievement/WndScroll_AShow', ''))
-	HookHandle(frame:Lookup('PageSet_Achievement/Page_TopRecord/WndScroll_TRShow', ''))
-	HookHandle(frame:Lookup('PageSet_Achievement/Page_Summary/WndContainer_AchiPanel/PageSet_Achi/Page_Chi/PageSet_RecentAchi/Page_Scene', ''))
-	HookHandle(frame:Lookup('PageSet_Achievement/Page_Summary/WndContainer_AchiPanel/PageSet_Achi/Page_Chi/PageSet_RecentAchi/Page_AlmostFinish', ''))
+function D.HookAchieveFrame(frame)
+	D.HookAchieveHandle(frame:Lookup('PageSet_Achievement/Page_Achievement/WndScroll_AShow', ''))
+	D.HookAchieveHandle(frame:Lookup('PageSet_Achievement/Page_TopRecord/WndScroll_TRShow', ''))
+	D.HookAchieveHandle(frame:Lookup('PageSet_Achievement/Page_Summary/WndContainer_AchiPanel/PageSet_Achi/Page_Chi/PageSet_RecentAchi/Page_Scene', ''))
+	D.HookAchieveHandle(frame:Lookup('PageSet_Achievement/Page_Summary/WndContainer_AchiPanel/PageSet_Achi/Page_Chi/PageSet_RecentAchi/Page_AlmostFinish', ''))
 end
 
-do
-local function OnInit()
+LIB.RegisterInit('MY_AchievementWiki', function()
 	local frame = Station.Lookup('Normal/AchievementPanel')
 	if not frame then
 		return
 	end
-	HookFrame(frame)
-end
-LIB.RegisterInit('MY_AchievementWiki', OnInit)
-end
+	D.HookAchieveFrame(frame)
+end)
 
-do
-local function OnFrameCreate(name, frame)
-	HookFrame(frame)
-end
-LIB.RegisterFrameCreate('AchievementPanel.MY_AchievementWiki', OnFrameCreate)
-end
+LIB.RegisterFrameCreate('AchievementPanel.MY_AchievementWiki', function(name, frame)
+	D.HookAchieveFrame(frame)
+end)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	ui:Append('WndCheckBox', {
