@@ -84,14 +84,14 @@ function D.CheckUpdateAcquire()
 			.. szNameU .. ','
 			.. p.dwAchieveID .. ','
 			.. p.dwTime .. ',' .. p.nFightTime)
-		local szURL = 'https://bkr.uploads.j3cx.com/api/bkr/uploads?' .. LIB.EncodePostData({
+		local szURL = 'https://bkr.uploads.j3cx.com/api/bkr/uploads?' .. LIB.EncodePostData(LIB.UrlEncode({
 			s = szServerU,
 			n = szNameU,
 			a = p.dwAchieveID,
 			t = p.dwTime,
 			d = p.nFightTime,
 			c = nCRC, _ = GetCurrentTime(),
-		})
+		}))
 		LIB.Sysmsg(_L('Try share boss kill: %s - %ds (%s).', szAchieve, p.nFightTime, szTime))
 		--[[#DEBUG BEGIN]]
 		LIB.Debug(szURL, DEBUG_LEVEL.LOG)
