@@ -54,8 +54,32 @@ end
 local D = {}
 local O = {
 	bEnable = false,
+	nW = 850,
+	nH = 610,
 }
 RegisterCustomData('MY_AchievementWiki.bEnable')
+RegisterCustomData('MY_AchievementWiki.nW')
+RegisterCustomData('MY_AchievementWiki.nH')
+
+function D.OnWebSizeChange()
+	O.nW, O.nH = this:GetSize()
+end
+
+function D.Open(dwAchievement)
+	local achi = Table_GetAchievement(dwAchievement)
+	if not achi then
+		return
+	end
+	local szURL = 'https://wiki.j3cx.com/' .. dwAchievement
+	local szKey = 'AchievementWiki_' .. dwAchievement
+	local szTitle = achi.szName .. ' - ' .. achi.szDesc
+	szKey = MY_Web.Open(szURL, {
+		key = szKey,
+		title = szTitle,
+		w = O.nW, h = O.nH,
+	})
+	UI(MY_Web.GetFrame(szKey)):Size(D.OnWebSizeChange)
+end
 
 local function OnItemMouseEnter()
 	if O.bEnable then
@@ -89,13 +113,7 @@ end
 local function OnItemLButtonClick()
 	local name = this:GetName()
 	if name == 'Box_AchiBox' and O.bEnable then
-		local hItem = this:GetParent()
-		local txtName = hItem:Lookup('Text_AchiName')
-		local txtDescribe = hItem:Lookup('Text_AchiDescribe')
-		local szURL = 'https://wiki.j3cx.com/' .. hItem.dwAchievement
-		local szKey = 'AchievementWiki_' .. hItem.dwAchievement
-		local szTitle = txtName:GetText() .. ' - ' .. txtDescribe:GetText()
-		MY_Web.Open(szURL, { key = szKey, title = szTitle, w = 850, h = 610 })
+		D.Open(this:GetParent().dwAchievement)
 	end
 end
 
@@ -174,12 +192,15 @@ local settings = {
 	exports = {
 		{
 			fields = {
+				Open = D.Open,
 				OnPanelActivePartial = D.OnPanelActivePartial,
 			},
 		},
 		{
 			fields = {
 				bEnable = true,
+				nW = true,
+				nH = true,
 			},
 			root = O,
 		},
@@ -188,6 +209,8 @@ local settings = {
 		{
 			fields = {
 				bEnable = true,
+				nW = true,
+				nH = true,
 			},
 			root = O,
 		},
