@@ -170,6 +170,10 @@ local function OnResizePanel()
 	this:SetPoint(an.s, 0, 0, an.r, an.x, an.y)
 end
 
+function MY_Web.GetFrame(szKey)
+	return Station.SearchFrame('MY_Web#' .. szKey)
+end
+
 function MY_Web.Open(url, options)
 	if not options then
 		options = {}
