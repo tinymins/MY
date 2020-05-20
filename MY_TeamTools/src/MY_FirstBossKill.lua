@@ -77,6 +77,8 @@ function D.CheckUpdateAcquire()
 	for _, p in ipairs(BOSS_ACHIEVE_ACQUIRE) do
 		local szServerU = AnsiToUTF8(p.szServer)
 		local szNameU = AnsiToUTF8(p.szName)
+		local szLeaderU = AnsiToUTF8(p.szLeader)
+		local szTeammateU = AnsiToUTF8(p.szTeammate)
 		local szAchieve = Table_GetAchievement(p.dwAchieveID).szName
 		local szTime = LIB.FormatTime(p.dwTime, '%yyyy-%MM-%dd %hh:%mm:%ss')
 		local nCRC = GetStringCRC('MY_BKR_AhfB6aBL9o$8R9t3ka6Uk6@#^^KHLoMtZCdS@5e2@T_'
@@ -87,6 +89,8 @@ function D.CheckUpdateAcquire()
 		local szURL = 'https://bkr.uploads.j3cx.com/api/bkr/uploads?' .. LIB.EncodePostData(LIB.UrlEncode({
 			s = szServerU,
 			n = szNameU,
+			l = szLeaderU,
+			m = szTeammateU,
 			a = p.dwAchieveID,
 			t = p.dwTime,
 			d = p.nFightTime,
@@ -144,13 +148,33 @@ LIB.RegisterEvent({
 	local me = GetClientPlayer()
 	for dwAchieveID, bAcquired in pairs(CURRENT_MAP_BOSS_ACHIEVE) do
 		if not bAcquired and me.IsAchievementAcquired(dwAchieveID) then
+			local aTeammate, szLeader = {}, ''
+			local team = GetClientTeam()
+			if team then
+				-- 队长
+				local dwLeader = team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER)
+				local leader = dwLeader and team.GetMemberInfo(dwLeader)
+				if leader then
+					szLeader = leader.szName
+				end
+				-- 团员
+				for _, dwTarID in ipairs(team.GetTeamMemberList()) do
+					local info = team.GetMemberInfo(dwTarID)
+					if info then
+						insert(aTeammate, info.szName)
+					end
+				end
+			end
 			insert(BOSS_ACHIEVE_ACQUIRE, {
 				szServer = LIB.GetRealServer(2),
 				szName = me.szName,
+				szLeader = szLeader,
+				szTeammate = concat(aTeammate),
 				dwAchieveID = dwAchieveID,
 				dwTime = GetCurrentTime(),
 				nFightTime = LIB.GetFightTime(),
 			})
+			CURRENT_MAP_BOSS_ACHIEVE[dwAchieveID] = true
 		end
 	end
 	D.CheckUpdateAcquire()
