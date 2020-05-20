@@ -87,7 +87,7 @@ end
 
 function DS:ClearData()
 	self.DATA = GetClearData()
-	FireUIEvent('MY_GKP_DATA_UPDATE', self:GetFilePath(), 'ALL')
+	self:DelayFireUpdate('ALL')
 end
 
 function DS:IsEmpty()
@@ -106,8 +106,15 @@ end
 
 -- 下一帧存盘
 function DS:DelaySaveData()
-	LIB.DelayCall('MY_GKP_DS#' .. self:GetFilePath(), function()
+	LIB.DelayCall('MY_GKP_DS__DelaySaveData#' .. self:GetFilePath(), function()
 		self:SaveData()
+	end)
+end
+
+-- 下一帧发送更新事件
+function DS:DelayFireUpdate(szType)
+	LIB.DelayCall('MY_GKP_DS__DelayFireUpdate#' .. self:GetFilePath() .. '#' .. szType, function()
+		FireUIEvent('MY_GKP_DATA_UPDATE', self:GetFilePath(), szType)
 	end)
 end
 
@@ -121,7 +128,7 @@ function DS:SetTime(nTime)
 	if IsNumber(nTime) and nTime ~= self.DATA.GKP_Time then
 		self.DATA.GKP_Time = nTime
 		self:DelaySaveData()
-		FireUIEvent('MY_GKP_DATA_UPDATE', self:GetFilePath(), 'TIME')
+		self:DelayFireUpdate('TIME')
 	end
 end
 
@@ -135,7 +142,7 @@ function DS:SetMap(szMap)
 	if IsString(szMap) and szMap ~= self.DATA.GKP_Map then
 		self.DATA.GKP_Map = szMap
 		self:DelaySaveData()
-		FireUIEvent('MY_GKP_DATA_UPDATE', self:GetFilePath(), 'MAP')
+		self:DelayFireUpdate('MAP')
 	end
 end
 
@@ -160,7 +167,7 @@ function DS:SetAuctionRec(rec)
 	end
 	self.DATA.GKP_Record[nIndex] = rec
 	self:DelaySaveData()
-	FireUIEvent('MY_GKP_DATA_UPDATE', self:GetFilePath(), 'AUCTION')
+	self:DelayFireUpdate('AUCTION')
 end
 
 -- 获取指定key的拍卖记录
@@ -182,7 +189,7 @@ function DS:SetAuctionList(aList)
 	end
 	self.DATA.GKP_Record = aList
 	self:DelaySaveData()
-	FireUIEvent('MY_GKP_DATA_UPDATE', self:GetFilePath(), 'AUCTION')
+	self:DelayFireUpdate('AUCTION')
 end
 
 -- 获取每个人拍卖总额
@@ -316,7 +323,7 @@ function DS:SetPaymentRec(rec)
 	end
 	self.DATA.GKP_Account[nIndex] = rec
 	self:DelaySaveData()
-	FireUIEvent('MY_GKP_DATA_UPDATE', self:GetFilePath(), 'PAYMENT')
+	self:DelayFireUpdate('PAYMENT')
 end
 
 -- 获取指定key的收钱记录
@@ -338,7 +345,7 @@ function DS:SetPaymentList(aList)
 	end
 	self.DATA.GKP_Account = aList
 	self:DelaySaveData()
-	FireUIEvent('MY_GKP_DATA_UPDATE', self:GetFilePath(), 'PAYMENT')
+	self:DelayFireUpdate('PAYMENT')
 end
 
 -- 获取收钱记录列表（排序）
