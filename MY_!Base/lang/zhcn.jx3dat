@@ -116,9 +116,9 @@ return {
 	-- MY.lua
 	PLUGIN_NAME                                   = '茗伊插件集',
 	PLUGIN_SHORT_NAME                             = '茗伊插件',
-	PLUGIN_AUTHOR                                 = '茗伊 @ 双梦镇',
+	PLUGIN_AUTHOR                                 = '茗伊 @ 梦江南',
 	PLUGIN_AUTHOR_WEIBO                           = '茗伊',
-	PLUGIN_AUTHOR_SIGNATURE                       = '茗伊 @双梦镇 @唯满侠 @追风蹑景',
+	PLUGIN_AUTHOR_SIGNATURE                       = '茗伊 @梦江南',
 	['%s, welcome to use %s!'                   ] = '欢迎%s使用%s！',
 	['Author @%s'                               ] = '作者 @%s',
 	['Open/Close main panel'                    ] = '打开/关闭主界面',
