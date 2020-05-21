@@ -126,7 +126,7 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTi
 					driver = config[1],
 					method = config[2],
 					url = url,
-					success = function()
+					fulfilled = function()
 						--[[#DEBUG BEGIN]]
 						LIB.Debug('Upload serendipity succeed with mode ' .. config[1] .. '/' .. config[2], DEBUG_LEVEL.LOG)
 						--[[#DEBUG END]]

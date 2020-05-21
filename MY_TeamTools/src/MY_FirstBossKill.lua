@@ -102,7 +102,8 @@ function D.CheckUpdateAcquire()
 		--[[#DEBUG END]]
 		LIB.Ajax({
 			url = szURL,
-			success = function()
+			driver = 'auto', method = 'auto',
+			fulfilled = function()
 				for i, v in ipairs_r(BOSS_ACHIEVE_ACQUIRE_LOG) do
 					if v.dwAchieveID == p.dwAchieveID then
 						remove(BOSS_ACHIEVE_ACQUIRE_LOG, i)
@@ -163,7 +164,7 @@ LIB.RegisterEvent({
 				for _, dwTarID in ipairs(team.GetTeamMemberList()) do
 					local info = team.GetMemberInfo(dwTarID)
 					if info then
-						insert(aTeammate, info.szName)
+						insert(aTeammate, info.szName .. ',' .. info.dwMountKungfuID)
 					end
 				end
 			end
@@ -171,7 +172,7 @@ LIB.RegisterEvent({
 				szServer = LIB.GetRealServer(2),
 				szName = me.szName,
 				szLeader = szLeader,
-				szTeammate = concat(aTeammate),
+				szTeammate = concat(aTeammate, ';'),
 				dwAchieveID = dwAchieveID,
 				dwTime = GetCurrentTime(),
 				nFightTime = LIB.GetFightTime(),
