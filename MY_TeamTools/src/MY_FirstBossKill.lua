@@ -56,17 +56,17 @@ local O = {
 }
 RegisterCustomData('MY_FirstBossKill.bEnable')
 
-local BOSS_ACHIEVE_ACQUIRE = {}
-local CURRENT_MAP_BOSS_ACHIEVE = {}
+local BOSS_ACHIEVE_ACQUIRE_LOG = {} -- 等待上传的首领击杀信息
+local BOSS_ACHIEVE_ACQUIRE_STATE = {} -- 当前地图首领击杀状态
 local DATA_FILE = {'data/boss_achieve_acquire.jx3dat', PATH_TYPE.ROLE}
 
 function D.LoadData()
-	BOSS_ACHIEVE_ACQUIRE = LIB.LoadLUAData(DATA_FILE) or {}
+	BOSS_ACHIEVE_ACQUIRE_LOG = LIB.LoadLUAData(DATA_FILE) or {}
 end
 LIB.RegisterInit('MY_FirstBossKill', D.LoadData)
 
 function D.SaveData()
-	LIB.SaveLUAData(DATA_FILE, BOSS_ACHIEVE_ACQUIRE)
+	LIB.SaveLUAData(DATA_FILE, BOSS_ACHIEVE_ACQUIRE_LOG)
 end
 LIB.RegisterFlush('MY_FirstBossKill', D.SaveData)
 
@@ -74,7 +74,7 @@ function D.CheckUpdateAcquire()
 	if not O.bEnable then
 		return
 	end
-	for _, p in ipairs(BOSS_ACHIEVE_ACQUIRE) do
+	for _, p in ipairs(BOSS_ACHIEVE_ACQUIRE_LOG) do
 		local szServerU = AnsiToUTF8(p.szServer)
 		local szNameU = AnsiToUTF8(p.szName)
 		local szLeaderU = AnsiToUTF8(p.szLeader)
@@ -103,9 +103,9 @@ function D.CheckUpdateAcquire()
 		LIB.Ajax({
 			url = szURL,
 			success = function()
-				for i, v in ipairs_r(BOSS_ACHIEVE_ACQUIRE) do
+				for i, v in ipairs_r(BOSS_ACHIEVE_ACQUIRE_LOG) do
 					if v.dwAchieveID == p.dwAchieveID then
-						remove(BOSS_ACHIEVE_ACQUIRE, i)
+						remove(BOSS_ACHIEVE_ACQUIRE_LOG, i)
 					end
 				end
 				LIB.Sysmsg(_L('Share boss kill success: %s - %ds (%s).', szAchieve, p.nFightTime, szTime))
@@ -120,22 +120,24 @@ LIB.RegisterEvent('LOADING_ENDING.MY_FirstBossKill', function()
 	end
 	local me = GetClientPlayer()
 	local dwMapID = me.GetMapID()
+	local tBossAchieveAcquireState = {}
 	for _, dwAchieveID in ipairs(LIB.GetMapAchievements(dwMapID) or CONSTANT.EMPTY_TABLE) do
 		local achi = Table_GetAchievement(dwAchieveID)
 		if achi and wfind(achi.szName, _L['Full win']) then
 			for _, s in ipairs(LIB.SplitString(achi.szSubAchievements, '|', true)) do
 				local dwSubAchieve = tonumber(s)
 				if dwSubAchieve then
-					CURRENT_MAP_BOSS_ACHIEVE[dwSubAchieve] = me.IsAchievementAcquired(dwSubAchieve)
+					tBossAchieveAcquireState[dwSubAchieve] = me.IsAchievementAcquired(dwSubAchieve)
 				end
 			end
-			-- CURRENT_MAP_BOSS_ACHIEVE[dwAchieveID] = me.IsAchievementAcquired(dwAchieveID)
+			-- aBossAchieve[dwAchieveID] = me.IsAchievementAcquired(dwAchieveID)
 		end
 	end
 	--[[#DEBUG BEGIN]]
-	if not IsEmpty(CURRENT_MAP_BOSS_ACHIEVE) then
-		LIB.Debug('Current map boss achieve: ' .. LIB.EncodePostData(CURRENT_MAP_BOSS_ACHIEVE) .. '.', DEBUG_LEVEL.LOG)
+	if not IsEmpty(tBossAchieveAcquireState) then
+		LIB.Debug('Current map boss achieve: ' .. LIB.EncodePostData(tBossAchieveAcquireState) .. '.', DEBUG_LEVEL.LOG)
 	end
+	BOSS_ACHIEVE_ACQUIRE_STATE = tBossAchieveAcquireState
 	--[[#DEBUG END]]
 end)
 
@@ -146,7 +148,7 @@ LIB.RegisterEvent({
 	'UPDATE_ACHIEVEMENT_COUNT.MY_FirstBossKill',
 }, function()
 	local me = GetClientPlayer()
-	for dwAchieveID, bAcquired in pairs(CURRENT_MAP_BOSS_ACHIEVE) do
+	for dwAchieveID, bAcquired in pairs(BOSS_ACHIEVE_ACQUIRE_STATE) do
 		if not bAcquired and me.IsAchievementAcquired(dwAchieveID) then
 			local aTeammate, szLeader = {}, ''
 			local team = GetClientTeam()
@@ -165,7 +167,7 @@ LIB.RegisterEvent({
 					end
 				end
 			end
-			insert(BOSS_ACHIEVE_ACQUIRE, {
+			insert(BOSS_ACHIEVE_ACQUIRE_LOG, {
 				szServer = LIB.GetRealServer(2),
 				szName = me.szName,
 				szLeader = szLeader,
@@ -174,7 +176,7 @@ LIB.RegisterEvent({
 				dwTime = GetCurrentTime(),
 				nFightTime = LIB.GetFightTime(),
 			})
-			CURRENT_MAP_BOSS_ACHIEVE[dwAchieveID] = true
+			BOSS_ACHIEVE_ACQUIRE_STATE[dwAchieveID] = true
 		end
 	end
 	D.CheckUpdateAcquire()
