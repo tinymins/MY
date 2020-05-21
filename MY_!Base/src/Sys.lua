@@ -1864,27 +1864,28 @@ function LIB.GetFontColor(nFont)
 end
 end
 
-function LIB.ExecuteWithThis(element, fnAction, ...)
-	if not (element and element:IsValid()) then
-		-- Log('[UI ERROR]Invalid element on executing ui event!')
-		return false
-	end
-	if type(fnAction) == 'string' then
-		if element[fnAction] then
-			fnAction = element[fnAction]
+function LIB.ExecuteWithThis(context, fnAction, ...)
+	-- 界面组件支持字符串调用方法
+	if IsString(fnAction) then
+		if not IsElement(context) then
+			-- Log('[UI ERROR]Invalid element on executing ui event!')
+			return false
+		end
+		if context[fnAction] then
+			fnAction = context[fnAction]
 		else
-			local szFrame = element:GetRoot():GetName()
+			local szFrame = context:GetRoot():GetName()
 			if type(_G[szFrame]) == 'table' then
 				fnAction = _G[szFrame][fnAction]
 			end
 		end
 	end
-	if type(fnAction) ~= 'function' then
+	if not IsFunction(fnAction) then
 		-- Log('[UI ERROR]Invalid function on executing ui event! # ' .. element:GetTreePath())
 		return false
 	end
 	local _this = this
-	this = element
+	this = context
 	local rets = {fnAction(...)}
 	this = _this
 	return true, unpack(rets)
