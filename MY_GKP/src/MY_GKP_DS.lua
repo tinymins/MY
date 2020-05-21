@@ -62,6 +62,20 @@ local function GetClearData()
 	}
 end
 
+local function GetCache(DATA)
+	local CACHE = {
+		GKP_Record_Index = {},
+		GKP_Account_Index = {},
+	}
+	for i, rec in ipairs(DATA.GKP_Record) do
+		CACHE.GKP_Record_Index[rec.key] = i
+	end
+	for i, rec in ipairs(DATA.GKP_Account) do
+		CACHE.GKP_Account_Index[rec.key] = i
+	end
+	return CACHE
+end
+
 function DS:ctor(szFilePath)
 	local t = LIB.LoadLUAData(szFilePath)
 	if t then
@@ -71,6 +85,7 @@ function DS:ctor(szFilePath)
 			GKP_Record = t.GKP_Record or {},
 			GKP_Account = t.GKP_Account or {},
 		}
+		self.CACHE = GetCache(self.DATA)
 	end
 	self.szFilePath = szFilePath
 end
@@ -82,11 +97,13 @@ end
 function DS:InitData()
 	if not self.DATA then
 		self.DATA = GetClearData()
+		self.CACHE = GetCache(self.DATA)
 	end
 end
 
 function DS:ClearData()
 	self.DATA = GetClearData()
+	self.CACHE = GetCache(self.DATA)
 	self:DelayFireUpdate('ALL')
 end
 
@@ -157,25 +174,19 @@ function DS:SetAuctionRec(rec)
 	if not rec.key then
 		rec.key = LIB.GetUUID()
 	end
-	local nIndex = #self.DATA.GKP_Record + 1
-	if rec.key then
-		for i, v in ipairs(self.DATA.GKP_Record) do
-			if v.key == rec.key then
-				nIndex = i
-			end
-		end
-	end
+	local nIndex = self.CACHE.GKP_Record_Index[rec.key]
+		or (#self.DATA.GKP_Record + 1)
 	self.DATA.GKP_Record[nIndex] = rec
+	self.CACHE.GKP_Record_Index[rec.key] = nIndex
 	self:DelaySaveData()
 	self:DelayFireUpdate('AUCTION')
 end
 
 -- 获取指定key的拍卖记录
 function DS:GetAuctionRec(szKey)
-	for _, v in ipairs(self.DATA.GKP_Record) do
-		if v.key == szKey then
-			return v
-		end
+	local nIndex = self.CACHE.GKP_Record_Index[szKey]
+	if nIndex then
+		return self.DATA.GKP_Record[nIndex]
 	end
 end
 
@@ -188,6 +199,7 @@ function DS:SetAuctionList(aList)
 		end
 	end
 	self.DATA.GKP_Record = aList
+	self.CACHE = GetCache(self.DATA)
 	self:DelaySaveData()
 	self:DelayFireUpdate('AUCTION')
 end
@@ -313,25 +325,19 @@ function DS:SetPaymentRec(rec)
 	if not rec.key then
 		rec.key = LIB.GetUUID()
 	end
-	local nIndex = #self.DATA.GKP_Account + 1
-	if rec.key then
-		for i, v in ipairs(self.DATA.GKP_Account) do
-			if v.key == rec.key then
-				nIndex = i
-			end
-		end
-	end
+	local nIndex = self.CACHE.GKP_Account_Index[rec.key]
+		or (#self.DATA.GKP_Account + 1)
 	self.DATA.GKP_Account[nIndex] = rec
+	self.CACHE.GKP_Account_Index[rec.key] = nIndex
 	self:DelaySaveData()
 	self:DelayFireUpdate('PAYMENT')
 end
 
 -- 获取指定key的收钱记录
 function DS:GetPaymentRec(szKey)
-	for _, v in ipairs(self.DATA.GKP_Account) do
-		if v.key == szKey then
-			return v
-		end
+	local nIndex = self.CACHE.GKP_Account_Index[szKey]
+	if nIndex then
+		return self.DATA.GKP_Account[nIndex]
 	end
 end
 
@@ -344,6 +350,7 @@ function DS:SetPaymentList(aList)
 		end
 	end
 	self.DATA.GKP_Account = aList
+	self.CACHE = GetCache(self.DATA)
 	self:DelaySaveData()
 	self:DelayFireUpdate('PAYMENT')
 end
