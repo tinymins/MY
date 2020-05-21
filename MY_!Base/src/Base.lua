@@ -1053,25 +1053,25 @@ local CONSTANT = setmetatable({}, {
 			__metatable = true,
 		}),
 		FORCE_COLOR_BG_DEFAULT = setmetatable({
-			[FORCE_TYPE.JIANG_HU ] = { 255, 255, 255 }, -- 江湖
-			[FORCE_TYPE.SHAO_LIN ] = { 125, 112,  10 }, -- 少林
-			[FORCE_TYPE.WAN_HUA  ] = {  47,  14,  70 }, -- 万花
-			[FORCE_TYPE.TIAN_CE  ] = { 105,  14,  14 }, -- 天策
-			[FORCE_TYPE.CHUN_YANG] = {   8,  90, 113 }, -- 纯阳 56,175,255,232
-			[FORCE_TYPE.QI_XIU   ] = { 162,  74, 129 }, -- 七秀
-			[FORCE_TYPE.WU_DU    ] = {   7,  82, 154 }, -- 五毒
-			[FORCE_TYPE.TANG_MEN ] = {  75, 113,  40 }, -- 唐门
-			[FORCE_TYPE.CANG_JIAN] = { 148, 152,  27 }, -- 藏剑
-			[FORCE_TYPE.GAI_BANG ] = { 159, 102,  37 }, -- 丐帮
-			[FORCE_TYPE.MING_JIAO] = { 145,  80,  17 }, -- 明教
-			[FORCE_TYPE.CANG_YUN ] = { 157,  47,   2 }, -- 苍云
-			[FORCE_TYPE.CHANG_GE ] = {   8, 107, 113 }, -- 长歌
-			[FORCE_TYPE.BA_DAO   ] = {  49,  39, 110 }, -- 霸刀
-			[FORCE_TYPE.PENG_LAI ] = {  93,  97, 126 }, -- 蓬莱
-			[FORCE_TYPE.LING_XUE ] = { 161,   9,  34 }, -- 凌雪
+			[FORCE_TYPE.JIANG_HU ] = { 255, 255, 255, 200 }, -- 江湖
+			[FORCE_TYPE.SHAO_LIN ] = { 125, 112,  10, 255 }, -- 少林
+			[FORCE_TYPE.WAN_HUA  ] = {  47,  14,  70, 255 }, -- 万花
+			[FORCE_TYPE.TIAN_CE  ] = { 105,  14,  14, 255 }, -- 天策
+			[FORCE_TYPE.CHUN_YANG] = {   8,  90, 113, 255 }, -- 纯阳 56,175,255,232
+			[FORCE_TYPE.QI_XIU   ] = { 162,  74, 129, 255 }, -- 七秀
+			[FORCE_TYPE.WU_DU    ] = {   7,  82, 154, 255 }, -- 五毒
+			[FORCE_TYPE.TANG_MEN ] = {  75, 113,  40, 255 }, -- 唐门
+			[FORCE_TYPE.CANG_JIAN] = { 148, 152,  27, 255 }, -- 藏剑
+			[FORCE_TYPE.GAI_BANG ] = { 159, 102,  37, 255 }, -- 丐帮
+			[FORCE_TYPE.MING_JIAO] = { 145,  80,  17, 255 }, -- 明教
+			[FORCE_TYPE.CANG_YUN ] = { 157,  47,   2, 255 }, -- 苍云
+			[FORCE_TYPE.CHANG_GE ] = {   8, 107, 113, 255 }, -- 长歌
+			[FORCE_TYPE.BA_DAO   ] = {  49,  39, 110, 255 }, -- 霸刀
+			[FORCE_TYPE.PENG_LAI ] = {  93,  97, 126, 255 }, -- 蓬莱
+			[FORCE_TYPE.LING_XUE ] = { 161,   9,  34, 255 }, -- 凌雪
 		}, {
 			__index = function(t, k)
-				return { 225, 225, 225 }
+				return { 225, 225, 225, 150 } -- NPC 以及未知门派
 			end,
 			__metatable = true,
 		}),

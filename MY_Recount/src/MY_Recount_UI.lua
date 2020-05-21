@@ -192,11 +192,11 @@ do
 local function CalcGlobalCss()
 	local tCss = FORCE_BAR_CSS[1]
 	for _, dwForceID in pairs_c(CONSTANT.FORCE_TYPE) do
-		local r, g, b = LIB.GetForceColor(dwForceID, 'background')
-		tCss[dwForceID] = { r = r, g = g, b = b, a = 150 }
+		local r, g, b, a = LIB.GetForceColor(dwForceID, 'background')
+		tCss[dwForceID] = { r = r, g = g, b = b, a = a }
 	end
-	local r, g, b = LIB.GetForceColor(-1, 'background')
-	tCss[-1] = { r = r, g = g, b = b, a = 150 }
+	local r, g, b, a = LIB.GetForceColor(-1, 'background')
+	tCss[-1] = { r = r, g = g, b = b, a = a }
 end
 CalcGlobalCss()
 
