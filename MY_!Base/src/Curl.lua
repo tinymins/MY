@@ -71,15 +71,11 @@ function LIB.RemoteRequest(szUrl, fnSuccess, fnError, nTimeout)
 	return LIB.Ajax(settings)
 end
 
-local function pcall_this(context, fn, ...)
-	local _this
-	if context then
-		_this, this = this, context
-	end
-	local rtc = {pcall(fn, ...)}
-	if context then
-		this = _this
-	end
+local function CallWithThis(context, fn, ...)
+	local _this = this
+	this = context
+	local rtc = {Call(fn, ...)}
+	this = _this
 	return unpack(rtc)
 end
 
@@ -193,8 +189,8 @@ function LIB.Ajax(settings)
 		end
 	end
 
-	if not settings.success then
-		settings.success = function(html, status)
+	if not settings.success and not settings.fulfilled then
+		settings.fulfilled = function()
 			--[[#DEBUG BEGIN]]
 			LIB.Debug(
 				'AJAX',
@@ -207,13 +203,13 @@ function LIB.Ajax(settings)
 		end
 	end
 	if not settings.error then
-		settings.error = function(html, status, success)
+		settings.error = function(html, status, connected)
 			--[[#DEBUG BEGIN]]
 			LIB.Debug(
 				'AJAX',
 				settings.url .. ' - ' .. settings.driver .. '/' .. settings.method
 					.. ' (' .. driver .. '/' .. method .. ')'
-					.. ': ' .. (success and status or 'FAILED'),
+					.. ': ' .. (connected and status or 'FAILED'),
 				DEBUG_LEVEL.WARNING
 			)
 			--[[#DEBUG END]]
@@ -222,7 +218,7 @@ function LIB.Ajax(settings)
 
 	if driver == 'curl' then
 		if not Curl_Create then
-			return settings.error()
+			return CallWithThis(settings, settings.error, '', 0, false)
 		end
 		local curl = Curl_Create(url)
 		if method == 'post' then
@@ -243,23 +239,26 @@ function LIB.Ajax(settings)
 				if settings.charset == 'utf8' then
 					html = UTF8ToAnsi(html)
 				end
-				settings.complete(html, code, success)
+				CallWithThis(settings, settings.complete, html, code, success)
 			end
 		end)
 		curl:OnSuccess(function(html, code)
+			if settings.fulfilled then
+				CallWithThis(settings, settings.fulfilled)
+			end
 			if settings.success then
 				if settings.charset == 'utf8' then
 					html = UTF8ToAnsi(html)
 				end
-				settings.success(html, code, settings)
+				CallWithThis(settings, settings.success, html, code)
 			end
 		end)
-		curl:OnError(function(html, code, success)
+		curl:OnError(function(html, code, connected)
 			if settings.error then
 				if settings.charset == 'utf8' then
 					html = UTF8ToAnsi(html)
 				end
-				settings.error(html, code, settings)
+				CallWithThis(settings, settings.error, html, code, connected)
 			end
 		end)
 		curl:SetConnTimeout(settings.timeout)
@@ -291,14 +290,12 @@ function LIB.Ajax(settings)
 			-- 注销超时处理时钟
 			LIB.DelayCall('MYRRWC_TO_' .. RequestID, false)
 			-- 成功回调函数
-			-- if settings.success then
-			--[[#DEBUG BEGIN]]local status, err = --[[#DEBUG END]]pcall_this(settings.context, settings.success, szContent, 200, settings)
-			--[[#DEBUG BEGIN]]
-			-- 	if not status then
-			-- 		LIB.Debug('MYRRWC::OnDocumentComplete::Callback', err, DEBUG_LEVEL.ERROR)
-			-- 	end
-			--[[#DEBUG END]]
-			-- end
+			if settings.fulfilled then
+				CallWithThis(settings, settings.fulfilled)
+			end
+			if settings.success then
+				CallWithThis(settings, settings.success, szContent, 200)
+			end
 			insert(MY_RRWC_FREE, RequestID)
 		end
 
@@ -314,12 +311,7 @@ function LIB.Ajax(settings)
 				--[[#DEBUG END]]
 				-- request timeout, call timeout function.
 				if settings.error then
-					--[[#DEBUG BEGIN]]local status, err = --[[#DEBUG END]]pcall_this(settings.context, settings.error, 'timeout', settings)
-					--[[#DEBUG BEGIN]]
-					if not status then
-						LIB.Debug('MYRRWC::TIMEOUT', err, DEBUG_LEVEL.ERROR)
-					end
-					--[[#DEBUG END]]
+					CallWithThis(settings, settings.error, '', 0, false)
 				end
 				insert(MY_RRWC_FREE, RequestID)
 			end)
@@ -355,21 +347,14 @@ function LIB.Ajax(settings)
 				-- 注销超时处理时钟
 				LIB.DelayCall('MYRRWP_TO_' .. RequestID, false)
 				-- 成功回调函数
+				if settings.fulfilled then
+					CallWithThis(settings, settings.fulfilled)
+				end
 				if settings.success then
-					--[[#DEBUG BEGIN]]local status, err = --[[#DEBUG END]]pcall_this(settings.context, settings.success, szContent, 200, settings)
-					--[[#DEBUG BEGIN]]
-					if not status then
-						LIB.Debug('MYRRWP::OnDocumentComplete::Callback', err, DEBUG_LEVEL.ERROR)
-					end
-					--[[#DEBUG END]]
+					CallWithThis(settings, settings.success, szContent, 200)
 				end
 				if settings.complete then
-					--[[#DEBUG BEGIN]]local status, err = --[[#DEBUG END]]pcall_this(settings.context, settings.complete, szContent, 200, true)
-					--[[#DEBUG BEGIN]]
-					if not status then
-						LIB.Debug('MYRRWP::OnDocumentComplete::Callback::Complete', err, DEBUG_LEVEL.ERROR)
-					end
-					--[[#DEBUG END]]
+					CallWithThis(settings, settings.complete, szContent, 200, true)
 				end
 				insert(MY_RRWP_FREE, RequestID)
 			end
@@ -387,20 +372,10 @@ function LIB.Ajax(settings)
 				--[[#DEBUG END]]
 				-- request timeout, call timeout function.
 				if settings.error then
-					--[[#DEBUG BEGIN]]local status, err = --[[#DEBUG END]]pcall_this(settings.context, settings.error, 'timeout', settings)
-					--[[#DEBUG BEGIN]]
-					if not status then
-						LIB.Debug('MYRRWP::TIMEOUT', err, DEBUG_LEVEL.ERROR)
-					end
-					--[[#DEBUG END]]
+					CallWithThis(settings, settings.error, '', 0, false)
 				end
 				if settings.complete then
-					--[[#DEBUG BEGIN]]local status, err = --[[#DEBUG END]]pcall_this(settings.context, settings.complete, '', 500, false)
-					--[[#DEBUG BEGIN]]
-					if not status then
-						LIB.Debug('MYRRWP::TIMEOUT::Callback::Complete', err, DEBUG_LEVEL.ERROR)
-					end
-					--[[#DEBUG END]]
+					CallWithThis(settings, settings.complete, '', 500, false)
 				end
 				insert(MY_RRWP_FREE, RequestID)
 			end)
@@ -416,12 +391,12 @@ function LIB.Ajax(settings)
 		szKey = MY_AJAX_TAG .. szKey
 		if method == 'post' then
 			if not CURL_HttpPost then
-				return settings.error()
+				return CallWithThis(settings, settings.error, '', 0, false)
 			end
 			CURL_HttpPost(szKey, url, data, ssl, settings.timeout)
 		else
 			if not CURL_HttpRqst then
-				return settings.error()
+				return CallWithThis(settings, settings.error, '', 0, false)
 			end
 			CURL_HttpRqst(szKey, url, ssl, settings.timeout)
 		end
@@ -441,30 +416,20 @@ local function OnCurlRequestResult()
 			html = UTF8ToAnsi(html)
 		end
 		if settings.complete then
-			--[[#DEBUG BEGIN]]local status, err = --[[#DEBUG END]]pcall(settings.complete, html, status, bSuccess or dwBufferSize > 0)
-			--[[#DEBUG BEGIN]]
-			if not status then
-				LIB.Debug(GetTraceback('CURL # ' .. settings.url .. ' - complete - PCALL ERROR - ' .. err), DEBUG_LEVEL.ERROR)
-			end
-			--[[#DEBUG END]]
+			CallWithThis(settings, settings.complete, html, status, bSuccess or dwBufferSize > 0)
 		end
 		if bSuccess then
 			-- if settings.payload == 'json' then
 			-- 	html = LIB.JsonDecode(html)
 			-- end
-			--[[#DEBUG BEGIN]]local status, err = --[[#DEBUG END]]pcall(settings.success, html, status)
-			--[[#DEBUG BEGIN]]
-			if not status then
-				LIB.Debug(GetTraceback('CURL # ' .. settings.url .. ' - success - PCALL ERROR - ' .. err), DEBUG_LEVEL.ERROR)
+			if settings.fulfilled then
+				CallWithThis(settings, settings.fulfilled)
 			end
-			--[[#DEBUG END]]
+			if settings.success then
+				CallWithThis(settings, settings.success, html, status)
+			end
 		else
-			--[[#DEBUG BEGIN]]local status, err = --[[#DEBUG END]]pcall(settings.error, html, status, dwBufferSize ~= 0)
-			--[[#DEBUG BEGIN]]
-			if not status then
-				LIB.Debug(GetTraceback('CURL # ' .. settings.url .. ' - error - PCALL ERROR - ' .. err), DEBUG_LEVEL.ERROR)
-			end
-			--[[#DEBUG END]]
+			CallWithThis(settings, settings.error, html, status, dwBufferSize ~= 0)
 		end
 		MY_CALL_AJAX[szKey] = nil
 	end
