@@ -203,7 +203,8 @@ LIB.RegisterPanel('TalkEx', _L['talk ex'], _L['Chat'], 'UI/Image/UICommon/Scienc
 			end)
 	  	end
 	  end, function()
-	  	LIB.Talk(nil, MY_TalkEx.szTalk, nil, nil, nil, true)
+		LIB.SetChatInput(MY_TalkEx.szTalk)
+		LIB.FocusChatInput()
 	  end)
 	-------------------------------------
 	-- µ÷Ù©²¿·Ö

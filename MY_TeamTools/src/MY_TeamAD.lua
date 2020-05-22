@@ -125,7 +125,7 @@ function PS.OnPanelActive(wnd)
 			x = nX, y = nY, w = 80, text = v.key,
 			buttonstyle = 2,
 			onlclick = function()
-				LIB.Talk(nil, v.ad, nil, nil, nil, true)
+				LIB.SetChatInput(v.ad)
 				LIB.FocusChatInput()
 			end,
 			rmenu = function()

@@ -861,41 +861,19 @@ local function ParseAntiSWS(t)
 	return t2
 end
 
--- 发布聊天内容
--- (void) LIB.Talk(string szTarget, string szText[, boolean bNoEscape, [boolean bSaveDeny, [boolean bPushToChatBox] ] ])
--- (void) LIB.Talk([number nChannel, ] string szText[, boolean bNoEscape[boolean bSaveDeny, [boolean bPushToChatBox] ] ])
--- szTarget       -- 密聊的目标角色名
--- szText         -- 聊天内容，（亦可为兼容 KPlayer.Talk 的 table）
--- nChannel       -- *可选* 聊天频道，PLAYER_TALK_CHANNLE.*，默认为近聊
--- bNoEscape      -- *可选* 不解析聊天内容中的表情图片和名字，默认为 false
--- bSaveDeny      -- *可选* 在聊天输入栏保留不可发言的频道内容，默认为 false
--- bPushToChatBox -- *可选* 仅推送到聊天框，默认为 false
--- 特别注意：nChannel, szText 两者的参数顺序可以调换，战场/团队聊天频道智能切换
-function LIB.Talk(nChannel, szText, szUUID, bNoEscape, bSaveDeny, bPushToChatBox)
-	local szTarget, me = '', GetClientPlayer()
-	-- channel
-	if not nChannel then
-		nChannel = PLAYER_TALK_CHANNEL.NEARBY
-	elseif IsString(nChannel) then
-		if not szText then
-			szText = nChannel
-			nChannel = PLAYER_TALK_CHANNEL.NEARBY
-		elseif IsNumber(szText) then
-			szText, nChannel = nChannel, szText
-		else
-			szTarget = nChannel
-			nChannel = PLAYER_TALK_CHANNEL.WHISPER
-		end
-	elseif nChannel == PLAYER_TALK_CHANNEL.RAID and me.GetScene().nType == MAP_TYPE.BATTLE_FIELD then
-		nChannel = PLAYER_TALK_CHANNEL.BATTLE_FIELD
-	end
-	-- say body
+-- 格式化聊天内容
+-- szText      -- 聊天内容，（亦可为兼容 KPlayer.Talk 的 table）
+-- bNoEscape   -- 不解析聊天内容中的表情图片和名字
+-- bCheckLegal -- 安全性和长度校验
+local function FormatTalkData(szText, bNoEscape, bCheckLegal)
+	-- 聊天内容格式标准化
 	local tSay = nil
 	if IsTable(szText) then
 		tSay = Clone(szText)
 	else
 		tSay = {{ type = 'text', text = szText }}
 	end
+	-- 过滤换行符
 	if LIB.IsShieldedVersion('TALK', 2) then
 		for _, v in ipairs(tSay) do
 			if v.text then
@@ -906,58 +884,94 @@ function LIB.Talk(nChannel, szText, szUUID, bNoEscape, bSaveDeny, bPushToChatBox
 			end
 		end
 	end
+	-- 名字表情转义
 	if not bNoEscape then
 		tSay = ParseFaceIcon(tSay)
 		tSay = ParseName(tSay)
 	end
-	if nChannel == PLAYER_TALK_CHANNEL.LOCAL_SYS then
-		local szXml = LIB.StringifyChatContent(tSay, GetMsgFontColor('MSG_SYS'))
-		return LIB.Sysmsg({ szXml, rich = true })
-	end
-	tSay = ParseAntiSWS(tSay)
-	if LIB.IsShieldedVersion('TALK') then
-		local nLen = 0
-		for i, v in ipairs(tSay) do
-			if nLen <= 64 then
-				nLen = nLen + wlen(v.text or v.name or '')
-				if nLen > 64 then
-					if v.text then
-						v.text = wsub(v.text, 1, 64 - nLen)
-					end
-					if v.name then
-						v.name = wsub(v.name, 1, 64 - nLen)
-					end
-					for j = #tSay, i + 1, -1 do
-						remove(tSay, j)
+	-- 安全性和长度校验
+	if bCheckLegal then
+		tSay = ParseAntiSWS(tSay)
+		if LIB.IsShieldedVersion('TALK') then
+			local nLen = 0
+			for i, v in ipairs(tSay) do
+				if nLen <= 64 then
+					nLen = nLen + wlen(v.text or v.name or '')
+					if nLen > 64 then
+						if v.text then
+							v.text = wsub(v.text, 1, 64 - nLen)
+						end
+						if v.name then
+							v.name = wsub(v.name, 1, 64 - nLen)
+						end
+						for j = #tSay, i + 1, -1 do
+							remove(tSay, j)
+						end
 					end
 				end
 			end
 		end
 	end
-	if bPushToChatBox or (bSaveDeny and not LIB.CanTalk(nChannel)) then
-		local edit = LIB.GetChatInputEdit()
+	return tSay
+end
+
+-- 设置聊天内容
+-- (void) LIB.SetChatInput(string szText[, boolean bNoEscape])
+-- szText         -- 聊天内容，（亦可为兼容 KPlayer.Talk 的 table）
+-- bNoEscape      -- *可选* 不解析聊天内容中的表情图片和名字，默认为 false
+function LIB.SetChatInput(szText, bNoEscape)
+	local tSay = FormatTalkData(szText, bNoEscape, true)
+	local edit = LIB.GetChatInputEdit()
+	if edit then
 		edit:ClearText()
 		for _, v in ipairs(tSay) do
 			edit:InsertObj(v.text, v)
 		end
-		-- change to this channel
-		LIB.SwitchChat(nChannel)
-		-- set focus
-		Station.SetFocusWindow(edit)
-	else
-		if not tSay[1]
-		or tSay[1].name ~= ''
-		or tSay[1].type ~= 'eventlink' then
-			insert(tSay, 1, {
-				type = 'eventlink', name = '',
-				linkinfo = LIB.JsonEncode({
-					via = PACKET_INFO.NAME_SPACE,
-					uuid = szUUID and tostring(szUUID),
-				})
-			})
-		end
-		me.Talk(nChannel, szTarget, tSay)
 	end
+end
+
+-- 发布聊天内容
+-- (void) LIB.Talk(number nChannel, string szText[, boolean bNoEscape, [boolean bSaveDeny] ])
+-- (void) LIB.Talk(string szTarget, string szText[, boolean bNoEscape, [boolean bSaveDeny] ])
+-- nChannel       -- 聊天频道，PLAYER_TALK_CHANNLE.* 战场/团队聊天频道可智能切换
+-- szTarget       -- 密聊的目标角色名
+-- szText         -- 聊天内容，（亦可为兼容 KPlayer.Talk 的 table）
+-- bNoEscape      -- *可选* 不解析聊天内容中的表情图片和名字，默认为 false
+-- bSaveDeny      -- *可选* 在聊天输入栏保留不可发言的频道内容，默认为 false
+function LIB.Talk(nChannel, szText, szUUID, bNoEscape, bSaveDeny)
+	-- 检查是否转向设置输入框
+	if bSaveDeny and not LIB.CanTalk(nChannel) then
+		LIB.SetChatInput(szText, bNoEscape)
+		LIB.SwitchChat(nChannel)
+		LIB.FocusChatInput()
+		return
+	end
+	-- 初始化参数
+	local szTarget, me = '', GetClientPlayer()
+	if IsString(nChannel) then
+		szTarget = nChannel
+		nChannel = PLAYER_TALK_CHANNEL.WHISPER
+	elseif nChannel == PLAYER_TALK_CHANNEL.RAID and me.GetScene().nType == MAP_TYPE.BATTLE_FIELD then
+		nChannel = PLAYER_TALK_CHANNEL.BATTLE_FIELD
+	end
+	-- 格式化并判断是否是系统输出
+	local bSystem = nChannel == PLAYER_TALK_CHANNEL.LOCAL_SYS
+	local tSay = FormatTalkData(szText, bNoEscape, not bSystem)
+	if bSystem then
+		local szXml = LIB.StringifyChatContent(tSay, GetMsgFontColor('MSG_SYS'))
+		return LIB.Sysmsg({ szXml, rich = true })
+	end
+	-- 检查标签并发送
+	if not tSay[1] or tSay[1].name ~= '' or tSay[1].type ~= 'eventlink' then
+		insert(tSay, 1, {
+			type = 'eventlink', name = '',
+			linkinfo = LIB.JsonEncode({
+				via = PACKET_INFO.NAME_SPACE,
+				uuid = szUUID and tostring(szUUID),
+			})
+		})
+	end
+	me.Talk(nChannel, szTarget, tSay)
 end
 end
 
