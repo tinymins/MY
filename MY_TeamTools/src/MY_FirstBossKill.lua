@@ -96,7 +96,7 @@ function D.CheckUpdateAcquire()
 			d = p.nFightTime,
 			c = nCRC, _ = GetCurrentTime(),
 		}))
-		LIB.Sysmsg(_L('Try share boss kill: %s - %ds (%s).', szAchieve, p.nFightTime, szTime))
+		LIB.Sysmsg(_L('Try share boss kill: %s - %ds (%s).', szAchieve, p.nFightTime / 1000, szTime))
 		--[[#DEBUG BEGIN]]
 		LIB.Debug(szURL, DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
@@ -109,7 +109,7 @@ function D.CheckUpdateAcquire()
 						remove(BOSS_ACHIEVE_ACQUIRE_LOG, i)
 					end
 				end
-				LIB.Sysmsg(_L('Share boss kill success: %s - %ds (%s).', szAchieve, p.nFightTime, szTime))
+				LIB.Sysmsg(_L('Share boss kill success: %s - %ds (%s).', szAchieve, p.nFightTime / 1000, szTime))
 			end,
 		})
 	end
