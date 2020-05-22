@@ -3,6 +3,8 @@ return {
     ['MY_ChatBlock'] = '聊天過濾',
     ['Channels'] = '頻道設置',
     ['Enable'] = '啟用',
+    ['Edit'] = '編輯',
+    ['Please input keyword:'] = '請輸入關鍵字：',
     ['Add'] = '添加',
     ['Delete'] = '刪除',
 

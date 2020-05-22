@@ -278,6 +278,20 @@ function PS.OnPanelActive(wnd)
 			D.CheckEnable()
 			D.SaveBlockWords()
 		end, data.tMsgType)
+		insert(menu, 1, CONSTANT.MENU_DIVIDER)
+		insert(menu, 1, {
+			szOption = _L['Edit'],
+			fnAction = function()
+				GetUserInput(_L['Please input keyword:'], function(szText)
+					szText = LIB.TrimString(szText)
+					if IsEmpty(szText) then
+						return
+					end
+					data.szKeyword = szText
+					D.SaveBlockWords()
+				end, nil, nil, nil, data.szKeyword)
+			end,
+		})
 		insert(menu, CONSTANT.MENU_DIVIDER)
 		insert(menu, {
 			szOption = _L['Ignore spaces'],
