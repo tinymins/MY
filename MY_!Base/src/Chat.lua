@@ -900,6 +900,9 @@ function LIB.Talk(nChannel, szText, szUUID, bNoEscape, bSaveDeny, bPushToChatBox
 			if v.text then
 				v.text = wgsub(v.text, '\n', ' ')
 			end
+			if v.name then
+				v.name = wgsub(v.name, '\n', ' ')
+			end
 		end
 	end
 	if not bNoEscape then
