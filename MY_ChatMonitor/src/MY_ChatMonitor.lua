@@ -458,6 +458,21 @@ function PS.OnPanelActive(wnd)
                 end
                 insert(m, 1, CONSTANT.MENU_DIVIDER)
                 insert(m, 1, {
+                    szOption = _L['Edit'],
+                    fnAction = function()
+                        GetUserInput(_L['Please input keyword:'], function(szText)
+                            szText = LIB.TrimString(szText)
+                            if IsEmpty(szText) then
+                                return
+                            end
+                            p.szKeyword = szText
+                            D.SaveConfig()
+                            D.RegisterMsgMonitor()
+                        end, nil, nil, nil, p.szKeyword)
+                    end,
+                })
+                insert(m, 1, CONSTANT.MENU_DIVIDER)
+                insert(m, 1, {
                     szOption = _L['Enable'],
                     bCheck = true, bChecked = p.bEnable,
                     fnAction = function()

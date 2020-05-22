@@ -3,6 +3,7 @@ return {
     -- MY_ChatMonitor.lua
     ['MY_ChatMonitor'] = '聊天監控',
     ['Enable'] = '啟用',
+    ['Edit'] = '編輯',
     ['Delete'] = '刪除',
     ['Add'] = '添加',
     ['Please input keyword:'] = '請輸入監控關鍵字：',

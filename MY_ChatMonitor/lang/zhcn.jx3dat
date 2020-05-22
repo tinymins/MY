@@ -3,6 +3,7 @@ return {
     -- MY_ChatMonitor.lua
     ['MY_ChatMonitor'] = 'ÁÄÌì¼à¿Ø',
     ['Enable'] = 'ÆôÓÃ',
+    ['Edit'] = '±à¼­',
     ['Delete'] = 'É¾³ı',
     ['Add'] = 'Ìí¼Ó',
     ['Please input keyword:'] = 'ÇëÊäÈë¼à¿Ø¹Ø¼ü×Ö£º',
