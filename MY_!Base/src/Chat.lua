@@ -891,9 +891,9 @@ function LIB.Talk(nChannel, szText, szUUID, bNoEscape, bSaveDeny, bPushToChatBox
 	-- say body
 	local tSay = nil
 	if IsTable(szText) then
-		tSay = szText
+		tSay = Clone(szText)
 	else
-		tSay = {{ type = 'text', text = szText}}
+		tSay = {{ type = 'text', text = szText }}
 	end
 	if LIB.IsShieldedVersion('TALK', 2) then
 		for _, v in ipairs(tSay) do
