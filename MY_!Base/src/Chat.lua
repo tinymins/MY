@@ -658,11 +658,12 @@ function LIB.SwitchChat(nChannel)
 	elseif type(nChannel) == 'string' then
 		if sub(nChannel, 1, 1) == '/' then
 			if nChannel == '/cafk' or nChannel == '/catr' then
-				SwitchChatChannel(nChannel)
-				LIB.Talk(nil, nChannel, nil, nil, nil, true)
 				local edit = LIB.GetChatInputEdit()
 				if edit then
-					edit:GetRoot():Show()
+					edit:ClearText()
+					for _, v in ipairs({{ type = 'text', text = nChannel }}) do
+						edit:InsertObj(v.text, v)
+					end
 				end
 			else
 				SwitchChatChannel(nChannel..' ')
