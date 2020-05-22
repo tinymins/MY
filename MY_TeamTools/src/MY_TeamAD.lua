@@ -69,19 +69,6 @@ local O = {
 	}
 }
 
-function D.SetEdit(edit, tab)
-	edit:ClearText()
-	for k, v in ipairs(tab) do
-		if v.text then
-			if v.type == 'text' then
-				edit:InsertText(v.text)
-			else
-				edit:InsertObj(v.text, v)
-			end
-		end
-	end
-end
-
 function D.LoadLUAData()
 	O.tADList = LIB.LoadLUAData(O.szDataFile, { passphrase = false, crc = false }) or {}
 end
@@ -138,9 +125,8 @@ function PS.OnPanelActive(wnd)
 			x = nX, y = nY, w = 80, text = v.key,
 			buttonstyle = 2,
 			onlclick = function()
-				local edit = LIB.GetChatInputEdit()
-				D.SetEdit(edit, v.ad)
-				Station.SetFocusWindow(edit)
+				LIB.Talk(nil, v.ad, nil, nil, nil, true)
+				LIB.FocusChatBox()
 			end,
 			rmenu = function()
 				local menu = {{
