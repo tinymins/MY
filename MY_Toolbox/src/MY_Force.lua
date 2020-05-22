@@ -141,26 +141,17 @@ function D.OnFeedHorseChange(_, bFeedHorse)
 		LIB.RegisterEvent('SYS_MSG.MY_Force__FeedHorse', function()
 			local me = GetClientPlayer()
 			-- ¶ÁÌõ¼¼ÄÜ
-			if arg0 == 'UI_OME_SKILL_CAST_LOG' then
-				-- on prepare Æï³Ë
-				if O.bFeedHorse and arg1 == me.dwID and (arg2 == 433 or arg2 == 53 or Table_GetSkillName(arg2, 1) == Table_GetSkillName(53, 1)) then
-					local it = me.GetItem(INVENTORY_INDEX.EQUIP, EQUIPMENT_INVENTORY.HORSE)
-					if it then
-						OutputItemTip(UI_OBJECT_ITEM, INVENTORY_INDEX.EQUIP, EQUIPMENT_INVENTORY.HORSE)
-						local hM = Station.Lookup('Topmost1/TipPanel_Normal', 'Handle_Message')
-						for i = 0, hM:GetItemCount() - 1, 1 do
-							local hT = hM:Lookup(i)
-							if hT:GetType() == 'Text' and hT:GetFontScheme() == 164 then
-								local szFullMeasure = LIB.TrimString(hT:GetText())
-								local tDisplay = g_tTable.RideSubDisplay:Search(it.nDetail)
-								if tDisplay and szFullMeasure ~= tDisplay.szFullMeasure3 then
-									OutputWarningMessage('MSG_WARNING_YELLOW', Table_GetItemName(it.nUiId) .. ': ' .. szFullMeasure)
-									PlaySound(SOUND.UI_SOUND, g_sound.CloseAuction)
-								end
-								break
-							end
-						end
-						HideTip(false)
+			if arg0 == 'UI_OME_SKILL_CAST_LOG' and O.bFeedHorse and arg1 == me.dwID
+			and (arg2 == 433 or arg2 == 53 or Table_GetSkillName(arg2, 1) == Table_GetSkillName(53, 1)) then -- on prepare Æï³Ë
+				local it = me.GetEquippedHorse()
+				if it then
+					local nFullLevel = it.GetHorseFullLevel()
+					if nFullLevel ~= FULL_LEVEL.FULL then
+						local itemInfo = GetItemInfo(it.dwTabType, it.dwIndex)
+						local tDisplay = Table_GetRideSubDisplay(itemInfo.nDetail)
+						local szFullMeasure = tDisplay['szFullMeasure' .. (nFullLevel + 1)]
+						OutputWarningMessage('MSG_WARNING_YELLOW', Table_GetItemName(it.nUiId) .. ': ' .. szFullMeasure)
+						PlaySound(SOUND.UI_SOUND, g_sound.CloseAuction)
 					end
 				end
 			end
