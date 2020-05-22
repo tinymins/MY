@@ -126,7 +126,7 @@ function PS.OnPanelActive(wnd)
 			buttonstyle = 2,
 			onlclick = function()
 				LIB.Talk(nil, v.ad, nil, nil, nil, true)
-				LIB.FocusChatBox()
+				LIB.FocusChatInput()
 			end,
 			rmenu = function()
 				local menu = {{

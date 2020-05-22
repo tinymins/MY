@@ -675,7 +675,7 @@ end
 end
 
 -- 将焦点设置到聊天栏
-function LIB.FocusChatBox()
+function LIB.FocusChatInput()
 	local edit = LIB.GetChatInputEdit()
 	if edit then
 		Station.SetFocusWindow(edit)
