@@ -153,8 +153,8 @@ LIB.RegisterEvent('LOADING_ENDING.MY_FirstBossKill', function()
 	if not IsEmpty(tBossAchieveAcquireState) then
 		LIB.Debug('Current map boss achieve: ' .. LIB.EncodePostData(tBossAchieveAcquireState) .. '.', DEBUG_LEVEL.LOG)
 	end
-	BOSS_ACHIEVE_ACQUIRE_STATE = tBossAchieveAcquireState
 	--[[#DEBUG END]]
+	BOSS_ACHIEVE_ACQUIRE_STATE = tBossAchieveAcquireState
 end)
 
 LIB.RegisterEvent({
