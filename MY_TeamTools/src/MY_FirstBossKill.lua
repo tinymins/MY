@@ -66,7 +66,11 @@ end
 LIB.RegisterInit('MY_FirstBossKill', D.LoadData)
 
 function D.SaveData()
-	LIB.SaveLUAData(DATA_FILE, BOSS_ACHIEVE_ACQUIRE_LOG)
+	local aAchieveAcquireLog = Clone(BOSS_ACHIEVE_ACQUIRE_LOG)
+	for _, rec in ipairs(aAchieveAcquireLog) do
+		rec.bPending = nil
+	end
+	LIB.SaveLUAData(DATA_FILE, aAchieveAcquireLog)
 end
 LIB.RegisterFlush('MY_FirstBossKill', D.SaveData)
 
@@ -75,48 +79,59 @@ function D.CheckUpdateAcquire()
 		return
 	end
 	for _, p in ipairs(BOSS_ACHIEVE_ACQUIRE_LOG) do
-		local szServerU = AnsiToUTF8(p.szServer)
-		local szNameU = AnsiToUTF8(p.szName)
-		local szLeaderU = AnsiToUTF8(p.szLeader)
-		local szTeammateU = AnsiToUTF8(p.szTeammate)
-		local szAchieve = Table_GetAchievement(p.dwAchieveID).szName
-		local szTime = LIB.FormatTime(p.dwTime, '%yyyy-%MM-%dd %hh:%mm:%ss')
-		local nCRC = GetStringCRC('MY_BKR_AhfB6aBL9o$8R9t3ka6Uk6@#^^KHLoMtZCdS@5e2@T_'
-			.. szServerU .. ','
-			.. szNameU .. ','
-			.. p.dwAchieveID .. ','
-			.. p.dwTime .. ',' .. p.nFightTime)
-		local szURL = 'https://bkr.uploads.j3cx.com/api/bkr/uploads?' .. LIB.EncodePostData(LIB.UrlEncode({
-			s = szServerU,
-			n = szNameU,
-			l = szLeaderU,
-			m = szTeammateU,
-			a = p.dwAchieveID,
-			t = p.dwTime,
-			d = p.nFightTime,
-			c = nCRC, _ = GetCurrentTime(),
-		}))
-		LIB.Sysmsg(_L('Try share boss kill: %s - %ds (%s).', szAchieve, p.nFightTime / 1000, szTime))
-		--[[#DEBUG BEGIN]]
-		LIB.Debug(szURL, DEBUG_LEVEL.LOG)
-		--[[#DEBUG END]]
-		LIB.Ajax({
-			url = szURL,
-			driver = 'auto', method = 'auto',
-			fulfilled = function()
-				for i, v in ipairs_r(BOSS_ACHIEVE_ACQUIRE_LOG) do
-					if v.dwAchieveID == p.dwAchieveID then
-						remove(BOSS_ACHIEVE_ACQUIRE_LOG, i)
+		if not p.bPending then
+			local szServerU = AnsiToUTF8(p.szServer)
+			local szNameU = AnsiToUTF8(p.szName)
+			local szLeaderU = AnsiToUTF8(p.szLeader)
+			local szTeammateU = AnsiToUTF8(p.szTeammate)
+			local szAchieve = Table_GetAchievement(p.dwAchieveID).szName
+			local szTime = LIB.FormatTime(p.dwTime, '%yyyy-%MM-%dd %hh:%mm:%ss')
+			local nCRC = GetStringCRC('MY_BKR_AhfB6aBL9o$8R9t3ka6Uk6@#^^KHLoMtZCdS@5e2@T_'
+				.. szServerU .. ','
+				.. szNameU .. ','
+				.. p.dwAchieveID .. ','
+				.. p.dwTime .. ',' .. p.nFightTime)
+			local szURL = 'https://bkr.uploads.j3cx.com/api/bkr/uploads?' .. LIB.EncodePostData(LIB.UrlEncode({
+				s = szServerU,
+				n = szNameU,
+				l = szLeaderU,
+				m = szTeammateU,
+				a = p.dwAchieveID,
+				t = p.dwTime,
+				d = p.nFightTime,
+				c = nCRC, _ = GetCurrentTime(),
+			}))
+			LIB.Sysmsg(_L('Try share boss kill: %s - %ds (%s).', szAchieve, p.nFightTime / 1000, szTime))
+			--[[#DEBUG BEGIN]]
+			LIB.Debug(szURL, DEBUG_LEVEL.LOG)
+			--[[#DEBUG END]]
+			local tConfig = {
+				url = szURL,
+				driver = 'auto', method = 'auto',
+				fulfilled = function()
+					for i, v in ipairs_r(BOSS_ACHIEVE_ACQUIRE_LOG) do
+						if v.dwAchieveID == p.dwAchieveID then
+							remove(BOSS_ACHIEVE_ACQUIRE_LOG, i)
+						end
 					end
-				end
-				LIB.Sysmsg(_L('Share boss kill success: %s - %ds (%s).', szAchieve, p.nFightTime / 1000, szTime))
-			end,
-		})
+					LIB.Sysmsg(_L('Share boss kill success: %s - %ds (%s).', szAchieve, p.nFightTime / 1000, szTime))
+				end,
+				complete = function()
+					for _, v in ipairs_r(BOSS_ACHIEVE_ACQUIRE_LOG) do
+						if v.dwAchieveID == p.dwAchieveID then
+							v.bPending = nil
+						end
+					end
+				end,
+			}
+			p.bPending = true
+			LIB.Ajax(tConfig)
+		end
 	end
 end
 
 LIB.RegisterEvent('LOADING_ENDING.MY_FirstBossKill', function()
-	if not LIB.IsInDungeon(true) then
+	if not LIB.IsInDungeon() then
 		return
 	end
 	local me = GetClientPlayer()
