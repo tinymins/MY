@@ -2774,12 +2774,12 @@ RegisterEvent("ON_SKILL_REPLACE", OnSkillReplace)
 RegisterEvent("CHANGE_SKILL_ICON", OnSkillReplace)
 function LIB.GetKungfuSkillIDs(dwKungfuID)
 	if not CACHE[dwKungfuID] then
-		local aSubKungfuID, aList = LIB.Table_GetMKungfuList(dwKungfuID), {}
-		for _, dwSubKungfuID in ipairs(aSubKungfuID) do
-			local aSub = { dwSubKungfuID = dwSubKungfuID }
-			local aSkillID = LIB.Table_GetNewKungfuSkill(dwKungfuID, dwSubKungfuID)
+		local aMKungfuID, aList = LIB.Table_GetMKungfuList(dwKungfuID), {}
+		for _, dwMKungfuID in ipairs(aMKungfuID) do
+			local aSub = { dwSubKungfuID = dwMKungfuID }
+			local aSkillID = LIB.Table_GetKungfuSkillList(dwKungfuID, dwMKungfuID)
 			if not aSkillID then
-				aSkillID = LIB.Table_GetKungfuSkillList(dwSubKungfuID)
+				aSkillID = LIB.Table_GetKungfuSkillList(dwMKungfuID)
 			end
 			for _, dwSkillID in ipairs(aSkillID) do
 				insert(aSub, REPLACE[dwSkillID] or dwSkillID)

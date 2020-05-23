@@ -173,48 +173,31 @@ function LIB.Table_GetMKungfuList(dwKungfuID)
 	return tKungfu
 end
 
-
-function LIB.Table_GetNewKungfuSkill(dwMountKungfu, dwKungfuID)
-	if IsFunction(_G.Table_GetNewKungfuSkill) then
-		return _G.Table_GetNewKungfuSkill(dwMountKungfu, dwKungfuID)
-	end
-	local tLine = g_tTable.SkillKungFuShow:Search(dwMountKungfu) or {}
-	if IsEmpty(tLine) then
-		return nil
-	end
-	if tLine.dwKungfu ~= dwKungfuID then
-		return nil
-	end
-	local tSkill = {}
-	local szSkill = tLine.szNewSkillID
-	for s in gmatch(szSkill, "%d+") do
-		local dwID = tonumber(s)
-		if dwID then
-			insert(tSkill, dwID)
+-- 获取一个心法的技能列表
+-- LIB.Table_GetKungfuSkillList(dwKungfuID)
+-- 获取一个套路的技能列表
+-- LIB.Table_GetKungfuSkillList(dwKungfuID, dwMountKungfu)
+function LIB.Table_GetKungfuSkillList(dwKungfuID, dwMountKungfu)
+	-- 获取一个套路的技能列表
+	if dwMountKungfu then
+		if IsFunction(_G.Table_GetNewKungfuSkill) then -- 兼容旧版
+			return _G.Table_GetNewKungfuSkill(dwKungfuID, dwMountKungfu)
+				or _G.Table_GetKungfuSkillList(dwMountKungfu)
 		end
+		return Table_GetKungfuSkillList(dwMountKungfu, dwKungfuID)
 	end
-	if tSkill and not IsEmpty(tSkill) then
-		return tSkill
-	end
-	return nil
-end
-
-function LIB.Table_GetKungfuSkillList(dwKungfuID)
-	if IsFunction(_G.Table_GetKungfuSkillList) then
+	-- 获取一个心法的技能列表
+	if IsFunction(_G.Table_GetNewKungfuSkill)
+	and IsFunction(_G.Table_GetKungfuSkillList) then -- 兼容旧版
 		return _G.Table_GetKungfuSkillList(dwKungfuID)
 	end
-	local tSkill = {}
-	local tLine = g_tTable.KungfuSkill:Search(dwKungfuID)
-	if tLine then
-		local szSkill = tLine.szSkill
-		for s in gmatch(szSkill, "%d+") do
-			local dwID = tonumber(s)
-			if dwID then
-				insert(tSkill, dwID)
-			end
+	local aSkillID = {}
+	for _, dwSubKungfuID in ipairs(Table_GetMKungfuList(dwKungfuID) or CONSTANT.EMPTY_TABLE) do
+		for _, dwSkillID in ipairs(LIB.Table_GetKungfuSkillList(dwKungfuID, dwSubKungfuID) or CONSTANT.EMPTY_TABLE) do
+			insert(aSkillID, dwSkillID)
 		end
 	end
-	return tSkill
+	return aSkillID
 end
 
 do
