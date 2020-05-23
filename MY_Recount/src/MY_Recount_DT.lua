@@ -101,8 +101,7 @@ function D.GetDetailMenu(frame)
 			.. frame:Lookup('', 'Text_Default'):GetText()
 			.. ' ' .. ((DataDisplay[DK.BOSSNAME] and ' - ' .. DataDisplay[DK.BOSSNAME]) or '')
 			.. '(' .. LIB.FormatTimeCounter(MY_Recount_DS.GeneFightTime(DataDisplay, eTimeChannel), '%M:%ss') .. ')',
-			nil,
-			true
+			{ parsers = { name = false } }
 		)
 		LIB.Talk(nChannel, '------------------------------')
 

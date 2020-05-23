@@ -584,8 +584,7 @@ function D.GetPublishMenu()
 			.. frame:Lookup('Wnd_Title', 'Text_Title'):GetText()
 			.. ' ' .. ((DataDisplay[DK.BOSSNAME] and ' - ' .. DataDisplay[DK.BOSSNAME]) or '')
 			.. '(' .. LIB.FormatTimeCounter(MY_Recount_DS.GeneFightTime(DataDisplay, eTimeChannel), '%M:%ss') .. ')',
-			nil,
-			true
+			{ parsers = { name = false } }
 		)
 		LIB.Talk(nChannel, '------------------------')
 		local hList      = frame:Lookup('Wnd_Main', 'Handle_List')
@@ -623,7 +622,7 @@ function D.GetPublishMenu()
 				)
 			end
 
-			LIB.Talk(nChannel, szText, nil, p.id == p.szName)
+			LIB.Talk(nChannel, szText)
 		end
 
 		LIB.Talk(nChannel, '------------------------')

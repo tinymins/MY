@@ -269,7 +269,7 @@ function MY_RollMonitor.Echo(nSortType, nLimit, nChannel, bShowUnroll)
 		PACKET_INFO.SHORT_NAME, _L['roll monitor'],
 		TIME_LIMIT_TITLE[MY_RollMonitor.nTimeLimit],
 		SORT_TYPE_INFO[nSortType].szName
-	), nil, true)
+	), { parsers = { name = false } })
 	LIB.Talk(nChannel, _L['-------------------------------'] .. '\n')
 	local tNames = {}
 	for i, aRecord in ipairs(MY_RollMonitor.GetResult(nSortType)) do

@@ -861,11 +861,57 @@ local function ParseAntiSWS(t)
 	return t2
 end
 
+-- parserOptions 解析规则类型定义
+-- parserOptions         (object|boolean) 解析器开关 true 表示全部解析， false 表示全不解析
+-- parserOptions.name    (boolean)        解析聊天内容中的名字，默认解析
+-- parserOptions.emotion (boolean)        解析聊天内容中的表情图片和名字，默认解析
+-- parserOptions.sws     (boolean)        安全性关键词校验，默认不校验
+-- parserOptions.len     (boolean)        聊天最大长度限制校验，默认不校验
+local StandardizeParserOptions
+do
+local DEFAULT_PARSER_OPTIONS = LIB.SetmetaReadonly({
+	name = true,
+	emotion = true,
+	sws = false,
+	len = true,
+})
+local FULL_PARSER_OPTIONS = LIB.SetmetaReadonly({
+	name = true,
+	emotion = true,
+	sws = true,
+	len = true,
+})
+local NULL_PARSER_OPTIONS = LIB.SetmetaReadonly({
+	name = false,
+	emotion = false,
+	sws = false,
+	len = false,
+})
+function StandardizeParserOptions(parsers)
+	if parsers == true then
+		parsers = FULL_PARSER_OPTIONS
+	elseif parsers == false then
+		parsers = NULL_PARSER_OPTIONS
+	elseif not IsTable(parsers) then
+		parsers = DEFAULT_PARSER_OPTIONS
+	end
+	local mt = {
+		__index = function(_, k)
+			local v = parsers[k]
+			if IsNil(v) then
+				v = DEFAULT_PARSER_OPTIONS[k]
+			end
+			return v
+		end,
+	}
+	return setmetatable({}, mt)
+end
+end
+
 -- 格式化聊天内容
--- szText      -- 聊天内容，（亦可为兼容 KPlayer.Talk 的 table）
--- bNoEscape   -- 不解析聊天内容中的表情图片和名字
--- bCheckLegal -- 安全性和长度校验
-local function FormatTalkData(szText, bNoEscape, bCheckLegal)
+-- szText        -- 聊天内容，（亦可为兼容 KPlayer.Talk 的 table）
+-- parserOptions -- 解析规则，参见 @parserOptions 定义
+local function StandardizeTalkData(szText, parserOptions)
 	-- 聊天内容格式标准化
 	local tSay = nil
 	if IsTable(szText) then
@@ -884,29 +930,32 @@ local function FormatTalkData(szText, bNoEscape, bCheckLegal)
 			end
 		end
 	end
-	-- 名字表情转义
-	if not bNoEscape then
+	-- 表情转义
+	if parserOptions.emotion then
 		tSay = ParseFaceIcon(tSay)
+	end
+	-- 名字转义
+	if parserOptions.name then
 		tSay = ParseName(tSay)
 	end
 	-- 安全性和长度校验
-	if bCheckLegal then
+	if parserOptions.sws then
 		tSay = ParseAntiSWS(tSay)
-		if LIB.IsShieldedVersion('TALK') then
-			local nLen = 0
-			for i, v in ipairs(tSay) do
-				if nLen <= 64 then
-					nLen = nLen + wlen(v.text or v.name or '')
-					if nLen > 64 then
-						if v.text then
-							v.text = wsub(v.text, 1, 64 - nLen)
-						end
-						if v.name then
-							v.name = wsub(v.name, 1, 64 - nLen)
-						end
-						for j = #tSay, i + 1, -1 do
-							remove(tSay, j)
-						end
+	end
+	if parserOptions.len and LIB.IsShieldedVersion('TALK') then
+		local nLen = 0
+		for i, v in ipairs(tSay) do
+			if nLen <= 64 then
+				nLen = nLen + wlen(v.text or v.name or '')
+				if nLen > 64 then
+					if v.text then
+						v.text = wsub(v.text, 1, 64 - nLen)
+					end
+					if v.name then
+						v.name = wsub(v.name, 1, 64 - nLen)
+					end
+					for j = #tSay, i + 1, -1 do
+						remove(tSay, j)
 					end
 				end
 			end
@@ -919,8 +968,9 @@ end
 -- (void) LIB.SetChatInput(string szText[, boolean bNoEscape])
 -- szText         -- 聊天内容，（亦可为兼容 KPlayer.Talk 的 table）
 -- bNoEscape      -- *可选* 不解析聊天内容中的表情图片和名字，默认为 false
-function LIB.SetChatInput(szText, bNoEscape)
-	local tSay = FormatTalkData(szText, bNoEscape, true)
+function LIB.SetChatInput(szText, parsers)
+	local parserOptions = StandardizeParserOptions(parsers)
+	local tSay = StandardizeTalkData(szText, parserOptions)
 	local edit = LIB.GetChatInputEdit()
 	if edit then
 		edit:ClearText()
@@ -931,17 +981,24 @@ function LIB.SetChatInput(szText, bNoEscape)
 end
 
 -- 发布聊天内容
--- (void) LIB.Talk(number nChannel, string szText[, boolean bNoEscape, [boolean bSaveDeny] ])
--- (void) LIB.Talk(string szTarget, string szText[, boolean bNoEscape, [boolean bSaveDeny] ])
--- nChannel       -- 聊天频道，PLAYER_TALK_CHANNLE.* 战场/团队聊天频道可智能切换
--- szTarget       -- 密聊的目标角色名
--- szText         -- 聊天内容，（亦可为兼容 KPlayer.Talk 的 table）
--- bNoEscape      -- *可选* 不解析聊天内容中的表情图片和名字，默认为 false
--- bSaveDeny      -- *可选* 在聊天输入栏保留不可发言的频道内容，默认为 false
-function LIB.Talk(nChannel, szText, szUUID, bNoEscape, bSaveDeny)
+-- (void) LIB.Talk(mixed uTarget, string szText[, boolean bNoEscape, [boolean bSaveDeny] ])
+-- uTarget   -- 聊天目标：
+--              1、(number) PLAYER_TALK_CHANNLE.* 战场/团队聊天频道可智能切换
+--              2、(string) 密聊的目标角色名
+-- szText    -- 聊天内容，（亦可为兼容 KPlayer.Talk 的 table）
+-- tOptions  -- 高级参数
+--              tOptions.uuid            (string)         消息唯一标识符，用于刷屏过滤
+--              tOptions.parsers         (object|boolean) 解析器开关 true 表示全部解析， false 表示全不解析
+--              tOptions.parsers.name    (boolean)        解析聊天内容中的名字，默认解析
+--              tOptions.parsers.emotion (boolean)        解析聊天内容中的表情图片和名字，默认解析
+--              tOptions.save            (boolean)        在聊天输入栏保留不可发言的频道内容，默认为 false
+function LIB.Talk(nChannel, szText, tOptions)
+	if not tOptions then
+		tOptions = {}
+	end
 	-- 检查是否转向设置输入框
-	if bSaveDeny and not LIB.CanTalk(nChannel) then
-		LIB.SetChatInput(szText, bNoEscape)
+	if tOptions.save and not LIB.CanTalk(nChannel) then
+		LIB.SetChatInput(szText, tOptions.parsers)
 		LIB.SwitchChat(nChannel)
 		LIB.FocusChatInput()
 		return
@@ -956,7 +1013,12 @@ function LIB.Talk(nChannel, szText, szUUID, bNoEscape, bSaveDeny)
 	end
 	-- 格式化并判断是否是系统输出
 	local bSystem = nChannel == PLAYER_TALK_CHANNEL.LOCAL_SYS
-	local tSay = FormatTalkData(szText, bNoEscape, not bSystem)
+	local parserOptions = StandardizeParserOptions(tOptions.parsers)
+	if bSystem then
+		parserOptions.sws = false
+		parserOptions.len = false
+	end
+	local tSay = StandardizeTalkData(szText, parserOptions)
 	if bSystem then
 		local szXml = LIB.StringifyChatContent(tSay, GetMsgFontColor('MSG_SYS'))
 		return LIB.Sysmsg({ szXml, rich = true })
@@ -967,7 +1029,7 @@ function LIB.Talk(nChannel, szText, szUUID, bNoEscape, bSaveDeny)
 			type = 'eventlink', name = '',
 			linkinfo = LIB.JsonEncode({
 				via = PACKET_INFO.NAME_SPACE,
-				uuid = szUUID and tostring(szUUID),
+				uuid = tOptions.uuid and tostring(tOptions.uuid),
 			})
 		})
 	end

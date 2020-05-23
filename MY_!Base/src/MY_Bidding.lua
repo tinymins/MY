@@ -347,7 +347,7 @@ function D.PublishConfig(tConfig, bInit)
 			D.GetMoneyTalkText(tConfig.nPriceMin),
 			D.GetMoneyTalkText(tConfig.nPriceStep)),
 		})
-	LIB.Talk(PLAYER_TALK_CHANNEL.RAID, aSay, nil, true)
+	LIB.Talk(PLAYER_TALK_CHANNEL.RAID, aSay, { parsers = { name = false } })
 end
 
 function D.GetMoneyTalkText(nGold)
@@ -594,7 +594,7 @@ function MY_BiddingBase.OnLButtonClick()
 		insert(aSay, 1, { type = 'text', text = _L['Exit from bidding '] })
 		insert(aSay, { type = 'text', text = _L[', P.'] })
 		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_BIDDING_P', { szKey = szKey })
-		LIB.Talk(PLAYER_TALK_CHANNEL.RAID, aSay, nil, true)
+		LIB.Talk(PLAYER_TALK_CHANNEL.RAID, aSay, { parsers = { name = false } })
 	elseif name == 'WndButton_Bidding' then
 		local szKey = D.GetKey(frame)
 		local nPrice, nPriceSelf, bP = D.GetQuickBiddingPrice(szKey)
@@ -612,7 +612,7 @@ function MY_BiddingBase.OnLButtonClick()
 			insert(aSay, 1, { type = 'text', text = _L['Want to buy '] })
 			insert(aSay, { type = 'text', text = _L(', bidding for %s.', D.GetMoneyTalkText(nPrice)) })
 			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_BIDDING_ACTION', { szKey = szKey, nPrice = nPrice })
-			LIB.Talk(PLAYER_TALK_CHANNEL.RAID, aSay, nil, true)
+			LIB.Talk(PLAYER_TALK_CHANNEL.RAID, aSay, { parsers = { name = false } })
 		else
 			this:GetParent():GetParent()
 				:Lookup('Wnd_CustomBidding/WndEditBox_CustomBidding/WndEdit_CustomBidding')
@@ -660,7 +660,7 @@ function MY_BiddingBase.OnLButtonClick()
 		insert(aSay, 1, { type = 'text', text = _L['Want to buy '] })
 		insert(aSay, { type = 'text', text = _L(', bidding for %s.', D.GetMoneyTalkText(nPrice)) })
 		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_BIDDING_ACTION', { szKey = szKey, nPrice = nPrice })
-		LIB.Talk(PLAYER_TALK_CHANNEL.RAID, aSay, nil, true)
+		LIB.Talk(PLAYER_TALK_CHANNEL.RAID, aSay, { parsers = { name = false } })
 		D.SwitchCustomBidding(frame, false)
 	elseif name == 'WndButton_CustomBiddingCancel' then
 		D.SwitchCustomBidding(frame, false)
@@ -687,7 +687,7 @@ function MY_BiddingBase.OnLButtonClick()
 			end
 		end
 		insert(aSay, { type = 'text', text = _L['.'] })
-		LIB.Talk(PLAYER_TALK_CHANNEL.RAID, aSay, nil, true)
+		LIB.Talk(PLAYER_TALK_CHANNEL.RAID, aSay, { parsers = { name = false } })
 	elseif name == 'WndButton_Finish' then
 		if not D.CheckTalkLock() then
 			return
@@ -712,7 +712,7 @@ function MY_BiddingBase.OnLButtonClick()
 		end
 		insert(aSay, { type = 'text', text = _L[', bidding finished.'] })
 		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_BIDDING_FINISH', { szKey = szKey })
-		LIB.Talk(PLAYER_TALK_CHANNEL.RAID, aSay, nil, true)
+		LIB.Talk(PLAYER_TALK_CHANNEL.RAID, aSay, { parsers = { name = false } })
 	end
 end
 
@@ -766,7 +766,7 @@ function MY_BiddingBase.OnItemLButtonClick()
 				return LIB.Systopmsg(_L['You are not distributer!'])
 			end
 			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_BIDDING_DELETE', { szKey = szKey, dwTalkerID = rec.dwTalkerID })
-			LIB.Talk(PLAYER_TALK_CHANNEL.RAID, aSay, nil, true)
+			LIB.Talk(PLAYER_TALK_CHANNEL.RAID, aSay, { parsers = { name = false } })
 		end)
 	end
 end
