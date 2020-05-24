@@ -564,7 +564,7 @@ function D.UpdateList(page)
 	page.hProgress:Lookup('Image_Progress'):SetPercentage(nAvgScore / RT_SCORE_FULL)
 	page.hProgress:Lookup('Text_Progress'):SetText(_L('Team strength(%d/%d)', floor(nAvgScore), RT_SCORE_FULL))
 	-- 心法统计
-	for k, dwKungfuID in pairs(LIB.GetKungfuList()) do
+	for k, dwKungfuID in pairs(LIB.GetKungfuIDS()) do
 		local h = page.hKungfuList:Lookup(k - 1)
 		local img = h:Lookup('Image_Force')
 		local nCount = 0
@@ -951,7 +951,7 @@ function D.OnInitPage()
 	this.hKungfuList = page:Lookup('Wnd_Summary', 'Handle_Kungfu/Handle_Kungfu_List')
 	this.hKungfu     = frame:CreateItemData(SZ_INI, 'Handle_Kungfu_Item')
 	this.hKungfuList:Clear()
-	for k, dwKungfuID in pairs(LIB.GetKungfuList()) do
+	for k, dwKungfuID in pairs(LIB.GetKungfuIDS()) do
 		local h = this.hKungfuList:AppendItemFromData(this.hKungfu, dwKungfuID)
 		local img = h:Lookup('Image_Force')
 		img:FromIconID(select(2, MY_GetSkillName(dwKungfuID)))

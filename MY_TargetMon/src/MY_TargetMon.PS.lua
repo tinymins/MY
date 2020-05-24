@@ -359,8 +359,8 @@ local function DrawDetail(ui)
 				end,
 			},
 		}
-		for _, dwForceID in ipairs(LIB.GetForceList()) do
-			for i, dwKungfuID in ipairs(LIB.GetForceKungfuList(dwForceID) or {}) do
+		for _, dwForceID in ipairs(LIB.GetForceIDS()) do
+			for i, dwKungfuID in ipairs(LIB.GetForceKungfuIDS(dwForceID) or {}) do
 				insert(t2, {
 					szOption = LIB.GetSkillName(dwKungfuID, 1),
 					rgb = {LIB.GetForceColor(dwForceID, 'foreground')},
@@ -397,8 +397,8 @@ local function DrawDetail(ui)
 				fnDisable = function() return mon.tarkungfus.all or IsEmpty(mon.tarkungfus) end,
 			},
 		}
-		for _, dwForceID in ipairs(LIB.GetForceList()) do
-			for i, dwKungfuID in ipairs(LIB.GetForceKungfuList(dwForceID) or {}) do
+		for _, dwForceID in ipairs(LIB.GetForceIDS()) do
+			for i, dwKungfuID in ipairs(LIB.GetForceKungfuIDS(dwForceID) or {}) do
 				insert(t2, {
 					szOption = LIB.GetSkillName(dwKungfuID, 1),
 					rgb = {LIB.GetForceColor(dwForceID, 'foreground')},

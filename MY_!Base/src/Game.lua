@@ -1055,7 +1055,7 @@ end
 
 do
 local FORCE_LIST
-function LIB.GetForceList()
+function LIB.GetForceIDS()
 	FORCE_LIST = {}
 	for _, dwForceID in pairs_c(CONSTANT.FORCE_TYPE) do
 		if dwForceID ~= CONSTANT.FORCE_TYPE.JIANG_HU then
@@ -1072,11 +1072,11 @@ for i, p in ipairs(CONSTANT.KUNGFU_LIST) do
 	ORDER[p.dwID] = i
 end
 local KUNGFU_LIST
-function LIB.GetKungfuList()
+function LIB.GetKungfuIDS()
 	if not KUNGFU_LIST then
 		KUNGFU_LIST = {}
-		for _, dwForceID in pairs_c(LIB.GetForceList()) do
-			for _, dwKungfuID in ipairs(LIB.GetForceKungfuList(dwForceID)) do
+		for _, dwForceID in ipairs(LIB.GetForceIDS()) do
+			for _, dwKungfuID in ipairs(LIB.GetForceKungfuIDS(dwForceID)) do
 				insert(KUNGFU_LIST, dwKungfuID)
 			end
 		end
@@ -2767,35 +2767,86 @@ local function OnSkillReplace()
 			end
 		end
 	end
+	CACHE = {}
 	REPLACE[arg0] = arg1
 	REPLACE[arg1] = nil
 end
 RegisterEvent("ON_SKILL_REPLACE", OnSkillReplace)
 RegisterEvent("CHANGE_SKILL_ICON", OnSkillReplace)
-function LIB.GetKungfuSkillIDs(dwKungfuID)
-	if not CACHE[dwKungfuID] then
-		local aMKungfuID, aList = LIB.Table_GetMKungfuList(dwKungfuID), {}
-		for _, dwMKungfuID in ipairs(aMKungfuID) do
-			local aSub = { dwSubKungfuID = dwMKungfuID }
-			local aSkillID = LIB.Table_GetKungfuSkillList(dwKungfuID, dwMKungfuID)
-			if not aSkillID then
-				aSkillID = LIB.Table_GetKungfuSkillList(dwMKungfuID)
+
+-- 获取一个心法的技能列表
+-- LIB.GetKungfuSkillIDS(dwKungfuID)
+-- 获取一个套路的技能列表
+-- LIB.GetKungfuSkillIDS(dwKungfuID, dwMountKungfu)
+function LIB.GetKungfuSkillIDS(dwKungfuID, dwMountKungfu)
+	if not dwMountKungfu then
+		dwMountKungfu = 0
+	end
+	if not (CACHE[dwKungfuID] and CACHE[dwKungfuID][dwMountKungfu]) then
+		local aSkillID
+		if not IsEmpty(dwMountKungfu) then -- 获取一个套路的技能列表
+			if IsFunction(_G.Table_GetNewKungfuSkill) then -- 兼容旧版
+				aSkillID = _G.Table_GetNewKungfuSkill(dwKungfuID, dwMountKungfu)
+					or _G.Table_GetKungfuSkillList(dwMountKungfu)
+			else
+				aSkillID = Table_GetKungfuSkillList(dwMountKungfu, dwKungfuID)
 			end
-			for _, dwSkillID in ipairs(aSkillID) do
-				insert(aSub, REPLACE[dwSkillID] or dwSkillID)
+		else -- 获取一个心法的技能列表 遍历该心法的所有套路
+			if IsFunction(_G.Table_GetNewKungfuSkill) and IsFunction(_G.Table_GetKungfuSkillList) then -- 兼容旧版
+				aSkillID = _G.Table_GetKungfuSkillList(dwKungfuID)
+			else
+				aSkillID = {}
+				for _, dwMKungfuID in ipairs(LIB.GetMKungfuIDS(dwKungfuID)) do
+					for _, dwSkillID in ipairs(LIB.GetKungfuSkillIDS(dwKungfuID, dwMKungfuID)) do
+						insert(aSkillID, dwSkillID)
+					end
+				end
 			end
-			insert(aList, aSub)
 		end
-		CACHE[dwKungfuID] = aList
+		for i, dwSkillID in ipairs(aSkillID) do
+			if REPLACE[dwSkillID] then
+				aSkillID[i] = REPLACE[dwSkillID]
+			end
+		end
+		if not CACHE[dwKungfuID] then
+			CACHE[dwKungfuID] = {}
+		end
+		CACHE[dwKungfuID][dwMountKungfu] = aSkillID or {}
+	end
+	return CACHE[dwKungfuID]
+end
+end
+
+-- 获取内功心法子套路列表（P面板左侧每列标题即为套路名）
+do local CACHE = {}
+function LIB.GetMKungfuIDS(dwKungfuID)
+	if not CACHE[dwKungfuID] then
+		CACHE[dwKungfuID] = Table_GetMKungfuList(dwKungfuID) or CONSTANT.EMPTY_TABLE
 	end
 	return CACHE[dwKungfuID]
 end
 end
 
 do local CACHE = {}
-function LIB.GetForceKungfuList(dwForceID)
+function LIB.GetForceKungfuIDS(dwForceID)
 	if not CACHE[dwForceID] then
-		CACHE[dwForceID] = LIB.Table_GetSkillSchoolKungfu(dwForceID)
+		if IsFunction(_G.Table_GetSkillSchoolKungfu) then
+			-- 这个API真是莫名其妙，明明是Force-Kungfu对应表，标题非写成School-Kungfu对应表
+			CACHE[dwForceID] = _G.Table_GetSkillSchoolKungfu(dwForceID) or {}
+		else
+			local aKungfuList = {}
+			local tLine = g_tTable.SkillSchoolKungfu:Search(dwForceID)
+			if tLine then
+				local szKungfu = tLine.szKungfu
+				for s in gmatch(szKungfu, '%d+') do
+					local dwID = tonumber(s)
+					if dwID then
+						insert(aKungfuList, dwID)
+					end
+				end
+			end
+			CACHE[dwForceID] = aKungfuList
+		end
 	end
 	return CACHE[dwForceID]
 end
@@ -2804,22 +2855,32 @@ end
 do local CACHE = {}
 function LIB.GetSchoolForceID(dwSchoolID)
 	if not CACHE[dwSchoolID] then
-		CACHE[dwSchoolID] = LIB.Table_SchoolToForce(dwSchoolID)
+		if IsFunction(_G.Table_SchoolToForce) then
+			CACHE[dwSchoolID] = _G.Table_SchoolToForce(dwSchoolID) or 0
+		else
+			local nCount = g_tTable.ForceToSchool:GetRowCount()
+			local dwForceID = 0
+			for i = 1, nCount do
+				local tLine = g_tTable.ForceToSchool:GetRow(i)
+				if dwSchoolID == tLine.dwSchoolID then
+					dwForceID = tLine.dwForceID
+				end
+			end
+			CACHE[dwSchoolID] = dwForceID or 0
+		end
 	end
 	return CACHE[dwSchoolID]
 end
 end
 
-function LIB.GetTargetSkillIDs(tar)
+function LIB.GetTargetSkillIDS(tar)
 	local aSchoolID, aSkillID = tar.GetSchoolList(), {}
 	for _, dwSchoolID in ipairs(aSchoolID) do
 		local dwForceID = LIB.GetSchoolForceID(dwSchoolID)
-		local aKungfuID = LIB.GetForceKungfuList(dwForceID)
+		local aKungfuID = LIB.GetForceKungfuIDS(dwForceID)
 		for _, dwKungfuID in ipairs(aKungfuID) do
-			for _, aGroup in ipairs(LIB.GetKungfuSkillIDs(dwKungfuID)) do
-				for _, dwSkillID in ipairs(aGroup) do
-					insert(aSkillID, dwSkillID)
-				end
+			for _, dwSkillID in ipairs(LIB.GetKungfuSkillIDS(dwKungfuID)) do
+				insert(aSkillID, dwSkillID)
 			end
 		end
 	end
@@ -2832,7 +2893,7 @@ function LIB.GetSkillMountList(bIncludePassive)
 	if not LIST then
 		LIST, LIST_ALL = {}, {}
 		local me = GetClientPlayer()
-		local aList = LIB.GetTargetSkillIDs(me)
+		local aList = LIB.GetTargetSkillIDS(me)
 		for _, dwID in ipairs(aList) do
 			local nLevel = me.GetSkillLevel(dwID)
 			if nLevel > 0 then
