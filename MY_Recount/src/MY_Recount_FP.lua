@@ -141,6 +141,9 @@ local COLUMN_LIST = {
 				end
 				return GetFormatText(_L['Offline'])
 			end
+			if rec[4] == EVERYTHING_TYPE.ENTER_LEAVE_SCENE then
+				return GetFormatText(_L['Target'])
+			end
 			return GetFormatText('-')
 		end,
 		Compare = GeneCommonCompare('*', 4)
@@ -170,6 +173,9 @@ local COLUMN_LIST = {
 					szName = rec[7] .. ',' .. rec[8]
 				end
 				return GetFormatText(szName)
+			end
+			if rec[4] == EVERYTHING_TYPE.ENTER_LEAVE_SCENE then
+				return GetFormatText(rec[8])
 			end
 			return GetFormatText('-')
 		end,
@@ -223,7 +229,10 @@ local COLUMN_LIST = {
 				return GetFormatText(MY_Recount.SKILL_RESULT_NAME[rec[11]] or '')
 			end
 			if rec[4] == EVERYTHING_TYPE.BUFF_UPDATE then
-				return GetFormatText(rec[10] and _L['Disappear'] or _L['Acquired'])
+				return GetFormatText(rec[10] and _L['Wither'] or _L['Acquired'])
+			end
+			if rec[4] == EVERYTHING_TYPE.ENTER_LEAVE_SCENE then
+				return GetFormatText(rec[5] == 1 and _L['Appear'] or _L['Disappear'])
 			end
 			return GetFormatText('-')
 		end,
@@ -303,6 +312,13 @@ local COLUMN_LIST = {
 							or 'Stacknum %d, remain time %s, uncancellable.',
 						rec[11], LIB.FormatTimeCounter((rec[12] - rec[1]) / GLOBAL.GAME_FPS, 2, 2)))
 				end
+			end
+			if rec[4] == EVERYTHING_TYPE.ENTER_LEAVE_SCENE then
+				return GetFormatText(
+					'[' .. (rec[8] or LIB.GetObjectName(rec[6], rec[7])) .. ']'
+					.. _L.TARGET[rec[6]]
+					.. (rec[5] == 1 and _L['Appear'] or _L['Disappear'])
+					.. _L['.'])
 			end
 			return GetFormatText('-')
 		end,
@@ -428,6 +444,9 @@ function D.UpdateData(frame)
 				bMatch = false
 			end
 			if rec[4] == EVERYTHING_TYPE.BUFF_UPDATE and select(2, MY_Recount_DS.GetEffectInfoAusID(data, rec[9])) then
+				bMatch = false
+			end
+			if rec[4] == EVERYTHING_TYPE.ENTER_LEAVE_SCENE and IsEmpty(rec[8]) then
 				bMatch = false
 			end
 		end

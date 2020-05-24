@@ -413,6 +413,7 @@ local EVERYTHING_TYPE = {
 	DEATH = 3,
 	ONLINE = 4,
 	BUFF_UPDATE = 5,
+	ENTER_LEAVE_SCENE = 6,
 }
 local VERSION = 2
 
@@ -1677,6 +1678,40 @@ LIB.RegisterEvent('PARTY_UPDATE_MEMBER_INFO', function()
 		D.OnTeammateStateChange(arg1, info.bDeathFlag, AWAYTIME_TYPE.DEATH, false)
 	end
 end)
+for _, v in ipairs({
+	{'NPC_ENTER_SCENE', TARGET.NPC, 1},
+	{'NPC_LEAVE_SCENE', TARGET.NPC, 0},
+	{'DOODAD_ENTER_SCENE', TARGET.DOODAD, 1},
+	{'DOODAD_LEAVE_SCENE', TARGET.DOODAD, 0},
+	{'PLAYER_ENTER_SCENE', TARGET.PLAYER, 1},
+	{'PLAYER_LEAVE_SCENE', TARGET.PLAYER, 0},
+}) do
+	local szEvent, dwType, nEnter = unpack(v)
+	LIB.RegisterEvent(szEvent, function()
+		if not O.bEnable then
+			return
+		end
+		-- 插入数据到日志
+		local nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
+		local dwID, dwTemplateID = arg0, 0
+		if dwType == TARGET.NPC or dwType == TARGET.DOODAD then
+			local KObject = LIB.GetObject(dwType, dwID)
+			if KObject then
+				dwTemplateID = KObject.dwTemplateID
+			end
+		elseif dwType == TARGET.PLAYER then
+			if not LIB.IsParty(dwID) then
+				return
+			end
+		end
+		D.InsertEverything(
+			Data, nLFC, nTime, nTick,
+			EVERYTHING_TYPE.ENTER_LEAVE_SCENE, nEnter,
+			TARGET.NPC, dwID,
+			LIB.GetObjectName(TARGET.NPC, dwID, 'never'), dwTemplateID
+		)
+	end)
+end
 LIB.RegisterEvent('SYS_MSG', function()
 	if not O.bEnable then
 		return
