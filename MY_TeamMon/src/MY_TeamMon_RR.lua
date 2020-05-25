@@ -464,6 +464,7 @@ function D.OnFrameCreate()
 	this:Lookup('Btn_CheckUpdate', 'Text_CheckUpdate'):SetText(_L['Check update'])
 	this:Lookup('Btn_AddUrl', 'Text_AddUrl'):SetText(_L['Add url'])
 	this:Lookup('Btn_RemoveUrl', 'Text_RemoveUrl'):SetText(_L['Remove url'])
+	this:Lookup('Btn_ExportUrl', 'Text_ExportUrl'):SetText(_L['Export meta url'])
 	this:Lookup('PageSet_Menu/Page_FileDownload', 'Text_Record_Break1'):SetText(_L['Author'])
 	this:Lookup('PageSet_Menu/Page_FileDownload', 'Text_Record_Break2'):SetText(_L['Title'])
 	this:Lookup('PageSet_Menu/WndCheck_FileDownload', 'Text_FileDownload'):SetText(_L['Data download'])
@@ -534,6 +535,12 @@ function D.OnLButtonClick()
 			D.SaveMetaList(aMeta)
 			D.UpdateList(frame)
 		end)
+	elseif name == 'Btn_ExportUrl' then
+		local aMetaURL = {}
+		for _, info in ipairs(D.LoadMetaList()) do
+			insert(aMetaURL, GetShortURL(info.szURL) or GetRawURL(info.szURL))
+		end
+		UI.OpenTextEditor(concat(aMetaURL, ';'))
 	elseif name == 'Btn_Info' then
 		LIB.OpenBrowser(this:GetParent().info.szAboutURL)
 	elseif name == 'Btn_SyncTeam' then
