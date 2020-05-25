@@ -189,6 +189,13 @@ end
 function MYDev_UIEditor.OnItemLButtonClick()
 	local name = this:GetName()
 	if name == 'TreeLeaf_Node' or name == 'TreeLeaf_Content' then
+		local el = this.dat.___id
+		if IsShiftKeyDown() then
+			if el and el:IsValid() then
+				el:SetVisible(not el:IsVisible())
+			end
+			return
+		end
 		if name == 'TreeLeaf_Node' then
 			if this:IsExpand() then
 				this:Collapse()
@@ -197,7 +204,6 @@ function MYDev_UIEditor.OnItemLButtonClick()
 			end
 			this:GetParent():FormatAllItemPos()
 		end
-		local el = this.dat.___id
 		if el and el:IsValid() then
 			local frame = this:GetRoot()
 			local edit = frame:Lookup('Edit_Log/Edit_Default')
