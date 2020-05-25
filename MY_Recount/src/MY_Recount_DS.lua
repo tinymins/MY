@@ -70,6 +70,7 @@ local DK = {
 	BE_DAMAGE   = DEBUG and 'BeDamage'    or 15, -- 承伤统计
 	EVERYTHING  = DEBUG and 'Everything'  or 16, -- 战斗复盘
 	ABSORB      = DEBUG and 'Absorb'      or 17, -- 化解统计
+	PLAYER_LIST = DEBUG and 'Playerlist'  or 19, -- 玩家信息缓存
 }
 
 local DK_REC = {
@@ -642,6 +643,25 @@ LIB.RegisterEvent('MY_FIGHT_HINT', function()
 		D.InsertEverything(Data, nLFC, nTime, nTick, EVERYTHING_TYPE.FIGHT_TIME, bFighting, szUUID, nDuring)
 	end
 end)
+
+function D.GetPlayer(dwID)
+	local me = GetClientPlayer()
+	local team = GetClientTeam()
+	local p, info
+	if dwID == UI_GetClientPlayerID() then
+		p = me
+		info = {
+			dwMountKungfuID = UI_GetPlayerMountKungfuID(),
+			szName = me.szName,
+			nMaxLife = me.nMaxLife,
+			nCurrentLife = me.nCurrentLife,
+		}
+	else
+		p = GetPlayer(dwID)
+		info = team.GetMemberInfo(dwID)
+	end
+	return p, info
+end
 
 -- ################################################################################################## --
 --                             #           #             #       #                                    --
@@ -1313,6 +1333,31 @@ function D.InitObjectData(data, dwID, szChannel)
 			data[DK.FORCE_LIST][dwID] = 0
 		end
 	end
+	-- 玩家信息缓存
+	if not data[DK.PLAYER_LIST][dwID] and IsPlayer(dwID) then
+		local player, info = D.GetPlayer(dwID)
+		if player and info and not IsEmpty(info.dwMountKungfuID) then
+			local aEquip = {}
+			for nEquipIndex, tEquipInfo in pairs(LIB.GetPlayerEquipInfo(player)) do
+				insert(aEquip, {
+					nEquipIndex,
+					tEquipInfo.dwTabType,
+					tEquipInfo.dwTabIndex,
+					tEquipInfo.nStrengthLevel,
+					tEquipInfo.aSlotItem,
+					tEquipInfo.dwPermanentEnchantID,
+					tEquipInfo.dwTemporaryEnchantID,
+					tEquipInfo.dwTemporaryEnchantLeftSeconds,
+				})
+			end
+			local aInfo = {
+				info.dwMountKungfuID,
+				player.GetTotalEquipScore(),
+				aEquip,
+			}
+			data[DK.PLAYER_LIST][dwID] = aInfo
+		end
+	end
 	-- 统计结构体
 	if szChannel and not data[szChannel][DK_REC.STAT][dwID] then
 		data[szChannel][DK_REC.STAT][dwID] = {
@@ -1368,6 +1413,7 @@ function D.InitData()
 		[DK.AWAYTIME   ] = {},                                -- 死亡/掉线时间节点
 		[DK.NAME_LIST  ] = {},                                -- 名称缓存
 		[DK.FORCE_LIST ] = {},                                -- 势力缓存
+		[DK.PLAYER_LIST] = {},                                -- 玩家信息缓存
 		[DK.EFFECT_LIST] = {},                                -- 效果信息缓存
 		[DK.DAMAGE     ] = GeneTypeNS(),                      -- 输出统计
 		[DK.HEAL       ] = GeneTypeNS(),                      -- 治疗统计
