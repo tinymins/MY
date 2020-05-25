@@ -55,8 +55,10 @@ end
 local D = {}
 local O = {
 	szLastKey = '',
+	szLastVersion = '',
 }
 RegisterCustomData('Global/MY_TeamMon_RR.szLastKey')
+RegisterCustomData('Global/MY_TeamMon_RR.szLastVersion')
 
 local LANG = LIB.GetLang()
 local INI_PATH = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_RR.ini'
@@ -246,6 +248,13 @@ local META_TEMPLATE = {
 local META_SEL_INFO, DATA_DOWNLOADER
 local META_DOWNLOADING_KEY = {}
 
+local function SafeCall(f, ...)
+	if not f then
+		return
+	end
+	return Call(f, ...)
+end
+
 function D.OpenPanel()
 	Wnd.OpenWindow(INI_PATH, 'MY_TeamMon_RR')
 end
@@ -305,7 +314,7 @@ function D.DownloadMeta(info, onSuccess, onError)
 				end
 			end
 			D.SaveMetaList(aMeta)
-			onSuccess(info)
+			SafeCall(onSuccess, info)
 		end,
 		error = function(html, status)
 			if status == 404 then
@@ -314,7 +323,7 @@ function D.DownloadMeta(info, onSuccess, onError)
 			--[[#DEBUG BEGIN]]
 			LIB.Debug(_L['MY_TeamMon_RR'], 'ERROR Get Meta: ' .. status .. '\n' .. UTF8ToAnsi(html), DEBUG_LEVEL.WARNING)
 			--[[#DEBUG END]]
-			onError()
+			SafeCall(onError)
 		end,
 		complete = function()
 			if info.szKey then
@@ -325,9 +334,15 @@ function D.DownloadMeta(info, onSuccess, onError)
 	})
 end
 
+function D.DownloadAllMeta()
+	for _, info in ipairs(D.LoadMetaList()) do
+		D.DownloadMeta(info)
+	end
+end
+
 function D.RequestMetaEmbedded()
 	LIB.Ajax({
-		method = 'auto',
+		driver = 'auto', method = 'auto',
 		url = EMBEDDED_SUBSCRIBE_URL,
 		charset = 'utf8',
 		success = function(szHTML)
@@ -354,6 +369,7 @@ function D.LoadConfigureFile(szFile, info)
 			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TeamMon_RR', {'LOAD', info.szTitle}, true)
 		end
 		O.szLastKey = info.szKey
+		O.szLastVersion = info.szVersion
 		FireUIEvent('MY_TM_RR_META_LIST_UPDATE')
 	end)
 end
@@ -431,7 +447,7 @@ function D.UpdateList(frame)
 			wnd:Lookup('Btn_Download', 'Text_Download'):SetText(
 				(META_DOWNLOADING_KEY[p.szKey] and _L['Fetching...'])
 				or (DATA_DOWNLOADER and DATA_DOWNLOADER.szDownloadingKey == p.szKey and _L['Downloading...'])
-				or (p.szKey == O.szLastKey and _L['Last select'])
+				or (p.szKey == O.szLastKey and (p.szVersion == O.szLastVersion and _L['Last select'] or _L['Can update']))
 				or _L['Download']
 			)
 			wnd:Lookup('Btn_Download'):Enable(not META_DOWNLOADING_KEY[p.szKey] and (not DATA_DOWNLOADER or DATA_DOWNLOADER.szDownloadingKey ~= p.szKey))
@@ -445,6 +461,7 @@ end
 function D.OnFrameCreate()
 	DATA_DOWNLOADER = this:Lookup('', 'Image_Downloader')
 	this:Lookup('Btn_SyncTeam', 'Text_SyncTeam'):SetText(_L['Sync team'])
+	this:Lookup('Btn_CheckUpdate', 'Text_CheckUpdate'):SetText(_L['Check update'])
 	this:Lookup('Btn_AddUrl', 'Text_AddUrl'):SetText(_L['Add url'])
 	this:Lookup('Btn_RemoveUrl', 'Text_RemoveUrl'):SetText(_L['Remove url'])
 	this:Lookup('PageSet_Menu/Page_FileDownload', 'Text_Record_Break1'):SetText(_L['Author'])
@@ -453,6 +470,10 @@ function D.OnFrameCreate()
 	D.UpdateList(this)
 	this:RegisterEvent('MY_TM_RR_META_LIST_UPDATE')
 	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
+	if not O.bAutoDownloadAll then
+		D.DownloadAllMeta()
+		O.bAutoDownloadAll = true
+	end
 	D.RequestMetaEmbedded()
 end
 
@@ -520,6 +541,9 @@ function D.OnLButtonClick()
 			return MY.Topmsg(_L['Please select one dataset first!'])
 		end
 		D.ShareMetaToRaid(META_SEL_INFO)
+	elseif name == 'Btn_CheckUpdate' then
+		D.DownloadAllMeta()
+		D.RequestMetaEmbedded()
 	end
 end
 
@@ -627,6 +651,7 @@ local settings = {
 		{
 			fields = {
 				szLastKey = true,
+				szLastVersion = true,
 			},
 			root = O,
 		},
@@ -635,6 +660,7 @@ local settings = {
 		{
 			fields = {
 				szLastKey = true,
+				szLastVersion = true,
 			},
 			root = O,
 		},

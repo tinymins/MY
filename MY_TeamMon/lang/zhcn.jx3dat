@@ -237,6 +237,7 @@ return {
 	['Author: %s'] = '作者：%s',
 	['%s loaded %s'] = '[%s]加载了团队监控数据：%s。',
 	['Sync team'] = '同步团队',
+	['Check update'] = '检查更新',
 	['Add url'] = '添加订阅',
 	['Remove url'] = '删除订阅',
 	['Embedded dataset cannot be removed!'] = '内置数据不可删除！',
