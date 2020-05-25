@@ -1,0 +1,4 @@
+Farme	Left	Top	Width	High	File
+0	96	0	15	52	C:\Users\root\Desktop\ÖÐ.tga
+1	113	0	75	52	C:\Users\root\Desktop\ÓÒ.tga
+2	0	0	94	52	C:\Users\root\Desktop\×ó.tga

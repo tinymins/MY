@@ -135,10 +135,10 @@ local function DrawUI(frame)
 		end
 	end
 	local nBoxesW = BOX_W * MY_VisualSkill.nVisualSkillBoxCount
-	frame:Lookup('', 'Handle_Bg/Image_Bg_11'):SetW(nBoxesW - 34)
+	frame:Lookup('', 'Handle_Bg/Image_Bg_11'):SetW(nBoxesW)
 	frame:Lookup('', 'Handle_Bg'):FormatAllItemPos()
 	frame:Lookup('', ''):FormatAllItemPos()
-	frame:SetW(nBoxesW + 176)
+	frame:SetW(nBoxesW + 169)
 	hList:SetW(nBoxesW)
 	UpdateUI(frame, ANI_TIME)
 end
