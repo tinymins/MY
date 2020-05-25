@@ -1913,7 +1913,11 @@ end
 
 -- 判断是不是队友
 function LIB.IsParty(dwID)
-	return GetClientPlayer().IsPlayerInMyParty(dwID) or dwID == UI_GetClientPlayerID()
+	if dwID == UI_GetClientPlayerID() then
+		return true
+	end
+	local me = GetClientPlayer()
+	return me and me.IsPlayerInMyParty(dwID)
 end
 
 -- 判断关系
