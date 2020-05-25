@@ -1741,9 +1741,10 @@ for _, v in ipairs({
 		local nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
 		local dwID, dwTemplateID = arg0, 0
 		local KObject = LIB.GetObject(dwType, dwID)
-		local nMaxLife, nCurrentLife = 0, 0
+		local nCurrentLife, nMaxLife, nCurrentMana, nMaxMana = 0, 0
 		if KObject then
-			nMaxLife, nCurrentLife = KObject.nMaxLife, KObject.nCurrentLife
+			nCurrentLife, nMaxLife = KObject.nCurrentLife, KObject.nMaxLife
+			nCurrentMana, nMaxMana = KObject.nCurrentMana, KObject.nMaxMana
 		end
 		if dwType == TARGET.NPC or dwType == TARGET.DOODAD then
 			if KObject then
@@ -1759,7 +1760,7 @@ for _, v in ipairs({
 			EVERYTHING_TYPE.ENTER_LEAVE_SCENE, nEnter,
 			TARGET.NPC, dwID,
 			LIB.GetObjectName(TARGET.NPC, dwID, 'never'), dwTemplateID,
-			nMaxLife, nCurrentLife
+			nCurrentLife, nMaxLife, nCurrentMana, nMaxMana
 		)
 	end)
 end

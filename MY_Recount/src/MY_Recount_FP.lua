@@ -684,6 +684,25 @@ function D.OutputTip(this, rec)
 		insert(aXml, GetFormatText(szName and (szName .. ' (' .. dwID .. ')') or dwID))
 		insert(aXml, GetFormatText('\n'))
 	end
+	if rec[4] == EVERYTHING_TYPE.ENTER_LEAVE_SCENE then
+		-- 模板ID
+		if rec[6] == TARGET.NPC or rec[6] == TARGET.DOODAD then
+			insert(aXml, GetFormatText(_L['TemplateID']))
+			insert(aXml, GetFormatText(':  '))
+			insert(aXml, GetFormatText(rec[9]))
+			insert(aXml, GetFormatText('\n'))
+		end
+		-- 血量
+		insert(aXml, GetFormatText(_L['Life']))
+		insert(aXml, GetFormatText(':  '))
+		insert(aXml, GetFormatText(rec[10] .. '/' .. rec[11]))
+		insert(aXml, GetFormatText('\n'))
+		-- 内力
+		insert(aXml, GetFormatText(_L['Mana']))
+		insert(aXml, GetFormatText(':  '))
+		insert(aXml, GetFormatText(rec[12] .. '/' .. rec[13]))
+		insert(aXml, GetFormatText('\n'))
+	end
 	-- 描述
 	local col = COLUMN_DICT['description']
 	insert(aXml, GetFormatText(col.szTitle))
