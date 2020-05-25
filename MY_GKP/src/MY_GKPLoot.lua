@@ -1255,7 +1255,7 @@ function D.GetItemBiddingMenu(dwDoodadID, data)
 			insert(menu, {
 				szOption = v[1] .. ',' .. v[2],
 				fnAction = function()
-					if IsShiftKeyDown() then
+					if not IsShiftKeyDown() then
 						MY_Bidding.Open({
 							nPriceMin = v[1],
 							nPriceStep = v[2],
@@ -1275,7 +1275,11 @@ function D.GetItemBiddingMenu(dwDoodadID, data)
 						MY_GKP.GetFormatLink(_L(' %d Gold Start Bidding, off a price if you want.', v[1])),
 					})
 					return 0
-				end
+				end,
+				fnMouseEnter = function()
+					local szMsg = GetFormatText(_L['Hold SHIFT click to raise ancient bidding panel.'], nil, 255, 255, 0)
+					OutputTip(szMsg, 600, {this:GetAbsX(), this:GetAbsY(), this:GetW(), this:GetH()}, ALW.RIGHT_LEFT)
+				end,
 			})
 		end
 	end

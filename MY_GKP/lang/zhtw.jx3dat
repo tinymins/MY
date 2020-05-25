@@ -131,6 +131,7 @@ return {
 	['The Account is Negative, no money is coming out!'] = '記賬的人肯定是豬，賬是負的發不出錢了！',
 	['GKP_TIPS'] = '《金團記錄 - 拾取列表》操作指南。\n1、本拾取列表為金團記錄插件提供，插件安裝後關閉了官方自帶的拾取列表，如想恢復請不要載入金團記錄。\n2、拾取列表對特定的道具擁有分配記憶功能，例如小鐵和裂石等，只需要按住Shift點擊閃爍邊框的道具即可分配給上一個人。\n3、拾取列表左上角有更換樣式的按鈕，可以自由選擇喜歡的樣式。\n4、分配時按住Shift會阻止彈出記錄界面，達到快速分配的目的。\n5、如果分配時勾選了散件老闆，那麼會出現一鍵分配所有物品給這個成員的選項，在關閉按鈕旁邊。\n6、按住Alt可以預覽外觀。',
 	['Roll the dice if you wang'] = ' 要的請Roll點，命令 /roll。',
+	['Hold SHIFT click to raise ancient bidding panel.'] = '按住SHIFT點擊，可打開舊版拍賣界面。',
 	[' %d Gold Start Bidding, off a price if you want.'] = ' %d 金起拍，要的出價。',
 	['You already distrubute [%s] with [%s], you can press Shift and select the object to make a fast distrubution, you can also make distribution to he or her by clicking this menu. \n'] = '上次你已經把 [%s] 分配給了 [%s] ，下次可以直接在物品圖標上按住Shift快速分配給 [%s] ，也可以點擊這個菜單分配給TA。\n',
 	['No Equiptment left for Equiptment Boss'] = '沒有剩餘的裝備可以分配給散件老闆。',
