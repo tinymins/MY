@@ -216,6 +216,15 @@ function LIB.Ajax(settings)
 		end
 	end
 
+	--[[#DEBUG BEGIN]]
+	LIB.Debug(
+		'AJAX',
+		settings.url .. ' - ' .. settings.driver .. '/' .. settings.method
+			.. ' (' .. driver .. '/' .. method .. ')'
+			.. ': PREPARE READY',
+		DEBUG_LEVEL.LOG
+	)
+	--[[#DEBUG END]]
 	if driver == 'curl' then
 		if not Curl_Create then
 			return CallWithThis(settings, settings.error, '', 0, false)
