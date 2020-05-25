@@ -70,7 +70,9 @@ local DK = {
 	BE_DAMAGE   = DEBUG and 'BeDamage'    or 15, -- 承伤统计
 	EVERYTHING  = DEBUG and 'Everything'  or 16, -- 战斗复盘
 	ABSORB      = DEBUG and 'Absorb'      or 17, -- 化解统计
-	PLAYER_LIST = DEBUG and 'Playerlist'  or 19, -- 玩家信息缓存
+	PLAYER_LIST = DEBUG and 'Playerlist'  or 18, -- 玩家信息缓存
+	SERVER      = DEBUG and 'Server'      or 19, -- 所在服务器
+	MAP         = DEBUG and 'Map'         or 20, -- 所在地图
 }
 
 local DK_REC = {
@@ -1406,6 +1408,8 @@ function D.InitData()
 	Data = {
 		[DK.UUID       ] = LIB.GetFightUUID(),                -- 战斗唯一标识
 		[DK.VERSION    ] = VERSION,                           -- 数据版本号
+		[DK.SERVER     ] = LIB.GetRealServer(2),              -- 所在服务器
+		[DK.MAP        ] = LIB.GetMapID(),                    -- 所在地图
 		[DK.TIME_BEGIN ] = GetCurrentTime(),                  -- 战斗开始时间
 		[DK.TICK_BEGIN ] = GetTime(),                         -- 战斗开始毫秒时间
 		[DK.TIME_DURING] = - (nFightTick / 1000) - 1,         -- 战斗持续时间 负数表示本次战斗尚未结束 其数值为记录开始时负的战斗秒数减一
