@@ -1740,8 +1740,12 @@ for _, v in ipairs({
 		-- 插入数据到日志
 		local nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
 		local dwID, dwTemplateID = arg0, 0
+		local KObject = LIB.GetObject(dwType, dwID)
+		local nMaxLife, nCurrentLife = 0, 0
+		if KObject then
+			nMaxLife, nCurrentLife = KObject.nMaxLife, KObject.nCurrentLife
+		end
 		if dwType == TARGET.NPC or dwType == TARGET.DOODAD then
-			local KObject = LIB.GetObject(dwType, dwID)
 			if KObject then
 				dwTemplateID = KObject.dwTemplateID
 			end
@@ -1754,7 +1758,8 @@ for _, v in ipairs({
 			Data, nLFC, nTime, nTick,
 			EVERYTHING_TYPE.ENTER_LEAVE_SCENE, nEnter,
 			TARGET.NPC, dwID,
-			LIB.GetObjectName(TARGET.NPC, dwID, 'never'), dwTemplateID
+			LIB.GetObjectName(TARGET.NPC, dwID, 'never'), dwTemplateID,
+			nMaxLife, nCurrentLife
 		)
 	end)
 end
