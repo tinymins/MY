@@ -255,44 +255,197 @@ function D.SetUIPos(frame, el)
 	end
 end
 
+local function table_r(var, level, indent)
+	local t = {}
+	local szType = type(var)
+	if szType == 'nil' then
+		insert(t, 'nil')
+	elseif szType == 'number' then
+		insert(t, tostring(var))
+	elseif szType == 'string' then
+		insert(t, string.format('%q', var))
+	elseif szType == 'function' then
+		-- local s = string.dump(var)
+		-- insert(t, 'loadstring('')
+		-- -- 'string slice too long'
+		-- for i = 1, #s, 2000 do
+		-- 	insert(t, concat({'', byte(s, i, i + 2000 - 1)}, '\\'))
+		-- end
+		-- insert(t, '')')
+		insert(t, tostring(var))
+	elseif szType == 'boolean' then
+		insert(t, tostring(var))
+	elseif szType == 'table' then
+		insert(t, '{')
+		local s_tab_equ = '='
+		if indent then
+			s_tab_equ = ' = '
+			if not IsEmpty(var) then
+				insert(t, '\n')
+			end
+		end
+		local nohash = true
+		local key, val, lastkey, lastval, hasval
+		local tlist, thash = {}, {}
+		repeat
+			key, val = next(var, lastkey)
+			if key then
+				-- judge if this is a pure list table
+				if nohash and (
+					type(key) ~= 'number'
+					or (lastval == nil and key ~= 1) -- first loop and index is not 1 : hash table
+					or (lastkey and lastkey + 1 ~= key)
+				) then
+					nohash = false
+				end
+				-- process to insert to table
+				-- insert indent
+				if indent then
+					insert(t, rep(indent, level + 1))
+				end
+				-- insert key
+				if nohash then -- pure list: do not need a key
+				elseif type(key) == 'string' and key:find('^[a-zA-Z_][a-zA-Z0-9_]*$') then -- a = val
+					insert(t, key)
+					insert(t, s_tab_equ)
+				else -- [10010] = val -- ['.start with or contains special char'] = val
+					insert(t, '[')
+					insert(t, table_r(key, level + 1, indent))
+					insert(t, ']')
+					insert(t, s_tab_equ)
+				end
+				-- insert value
+				insert(t, table_r(val, level + 1, indent))
+				insert(t, ',')
+				if indent then
+					insert(t, '\n')
+				end
+				lastkey, lastval, hasval = key, val, true
+			end
+		until not key
+		-- remove last `,` if no indent
+		if not indent and hasval then
+			remove(t)
+		end
+		-- insert `}` with indent
+		if indent and not IsEmpty(var) then
+			insert(t, rep(indent, level))
+		end
+		insert(t, '}')
+	else --if (szType == 'userdata') then
+		insert(t, '"')
+		insert(t, tostring(var))
+		insert(t, '"')
+	end
+	return concat(t)
+end
+
+local function var2str(var, indent, level)
+	return table_r(var, level or 0, indent)
+end
+
+function D.InsertTip(aXml, szTitle, szValue)
+	insert(aXml, GetFormatText(szTitle, 67))
+	insert(aXml, GetFormatText(szValue .. '\n', 44))
+end
+
 function D.GetTipInfo(el)
-	local xml = {
-		GetFormatText('[' .. el:GetName() .. ']\n', 65)
-	}
-	insert(xml, GetFormatText('Type: ', 67))
-	insert(xml, GetFormatText(el:GetType() .. '\n', 44))
-	insert(xml, GetFormatText('Visible: ', 67))
-	insert(xml, GetFormatText(tostring(el:IsVisible()) .. '\n', 44))
-	insert(xml, GetFormatText('Size: ', 67))
-	insert(xml, GetFormatText(concat({ el:GetSize() }, ', ') .. '\n', 44))
-	insert(xml, GetFormatText('RelPos: ', 67))
-	insert(xml, GetFormatText(concat({ el:GetRelPos() }, ', ') .. '\n', 44))
-	insert(xml, GetFormatText('AbsPos: ', 67))
-	insert(xml, GetFormatText(concat({ el:GetAbsPos() }, ', ') .. '\n', 44))
+	-- 通用组件信息
+	local szType = el:GetType()
+	local aXml = {}
+	insert(aXml, GetFormatText('[' .. el:GetName() .. ']\n', 65))
+	D.InsertTip(aXml, 'Type: ', szType)
+	D.InsertTip(aXml, 'Visible: ', tostring(el:IsVisible()))
+	D.InsertTip(aXml, 'Size: ', concat({ el:GetSize() }, ', '))
+	D.InsertTip(aXml, 'RelPos: ', concat({ el:GetRelPos() }, ', '))
+	D.InsertTip(aXml, 'AbsPos: ', concat({ el:GetAbsPos() }, ', '))
 	local szPath1, szPath2 = el:GetTreePath()
-	insert(xml, GetFormatText('Path1: ', 67))
-	insert(xml, GetFormatText(szPath1 .. '\n', 44))
+	D.InsertTip(aXml, 'Path1: ', szPath1)
 	if szPath2 then
-		insert(xml, GetFormatText('Path2: ', 67))
-		insert(xml, GetFormatText(szPath2 .. '\n', 44))
+		D.InsertTip(aXml, 'Path2: ', szPath2)
 	end
-	insert(xml, GetFormatText('\n ---------- D Table --------- \n\n', 67))
+	-- 分类组件信息
+	if szType == 'Text' then
+		D.InsertTip(aXml, 'FontScheme: ', el:GetFontScheme())
+		D.InsertTip(aXml, 'Text: ', el:GetText())
+		D.InsertTip(aXml, 'TextLen: ', el:GetTextLen())
+		D.InsertTip(aXml, 'VAlign: ', el:GetVAlign())
+		D.InsertTip(aXml, 'HAlign: ', el:GetHAlign())
+		D.InsertTip(aXml, 'RowSpacing: ', el:GetRowSpacing())
+		D.InsertTip(aXml, 'IsMultiLine: ', tostring(el:IsMultiLine()))
+		D.InsertTip(aXml, 'IsCenterEachLine: ', tostring(el:IsCenterEachLine()))
+		D.InsertTip(aXml, 'FontSpacing: ', el:GetFontSpacing())
+		D.InsertTip(aXml, 'IsRichText: ', tostring(el:IsRichText()))
+		D.InsertTip(aXml, 'FontScale: ', el:GetFontScale())
+		D.InsertTip(aXml, 'FontID: ', el:GetFontID())
+		D.InsertTip(aXml, 'FontColor: ', el:GetFontColor())
+		D.InsertTip(aXml, 'FontBoder: ', el:GetFontBoder())
+		D.InsertTip(aXml, 'FontProjection: ', el:GetFontProjection())
+		D.InsertTip(aXml, 'TextExtent: ', el:GetTextExtent())
+		D.InsertTip(aXml, 'TextPosExtent: ', el:GetTextPosExtent())
+		D.InsertTip(aXml, 'Index: ', el:GetIndex())
+	elseif szType == 'Image' then
+		local szPath, nFrame = el:GetImagePath()
+		D.InsertTip(aXml, 'Image: ', szPath or '')
+		if nFrame then
+			D.InsertTip(aXml, 'Frame: ', nFrame)
+		end
+		D.InsertTip(aXml, 'ImageType: ', el:GetImageType())
+		D.InsertTip(aXml, 'ImageID: ', el:GetImageID())
+		D.InsertTip(aXml, 'Index: ', el:GetIndex())
+	elseif szType == 'Shadow' then
+		D.InsertTip(aXml, 'ShadowColor: ', el:GetShadowColor())
+		D.InsertTip(aXml, 'ColorRGB: ', concat({el:GetColorRGB(), ', '}))
+		D.InsertTip(aXml, 'IsTriangleFan: ', tostring(el:IsTriangleFan()))
+		D.InsertTip(aXml, 'Index: ', el:GetIndex())
+	elseif szType == 'Animate' then
+		D.InsertTip(aXml, 'IsFinished: ', tostring(el:IsFinished()))
+		D.InsertTip(aXml, 'Index: ', el:GetIndex())
+	elseif szType == 'Box' then
+		D.InsertTip(aXml, 'BoxIndex: ', el:GetBoxIndex())
+		-- D.InsertTip(aXml, 'Object: ', hElem:GetObject())
+		D.InsertTip(aXml, 'ObjectType: ', el:GetObjectType())
+		D.InsertTip(aXml, 'ObjectData: ', concat({el:GetObjectData()}, ', '))
+		D.InsertTip(aXml, 'IsEmpty: ', tostring(el:IsEmpty()))
+		if not el:IsEmpty() then
+			D.InsertTip(aXml, 'IsObjectEnable: ', tostring(el:IsObjectEnable()))
+			D.InsertTip(aXml, 'IsObjectCoolDown: ', tostring(el:IsObjectCoolDown()))
+			D.InsertTip(aXml, 'IsObjectSelected: ', tostring(el:IsObjectSelected()))
+			D.InsertTip(aXml, 'IsObjectMouseOver: ', tostring(el:IsObjectMouseOver()))
+			D.InsertTip(aXml, 'IsObjectPressed: ', tostring(el:IsObjectPressed()))
+			D.InsertTip(aXml, 'CoolDownPercentage: ', el:GetCoolDownPercentage())
+			D.InsertTip(aXml, 'ObjectIcon: ', el:GetObjectIcon())
+			D.InsertTip(aXml, 'OverText0: ', ('[Font]%s [Pos]%s [Text]%s'):format(el:GetOverTextFontScheme(0), el:GetOverTextPosition(0), el:GetOverText(0)))
+			D.InsertTip(aXml, 'OverText1: ', ('[Font]%s [Pos]%s [Text]%s'):format(el:GetOverTextFontScheme(1), el:GetOverTextPosition(1), el:GetOverText(1)))
+			D.InsertTip(aXml, 'OverText2: ', ('[Font]%s [Pos]%s [Text]%s'):format(el:GetOverTextFontScheme(2), el:GetOverTextPosition(2), el:GetOverText(2)))
+			D.InsertTip(aXml, 'OverText3: ', ('[Font]%s [Pos]%s [Text]%s'):format(el:GetOverTextFontScheme(3), el:GetOverTextPosition(3), el:GetOverText(3)))
+			D.InsertTip(aXml, 'OverText4: ', ('[Font]%s [Pos]%s [Text]%s'):format(el:GetOverTextFontScheme(4), el:GetOverTextPosition(4), el:GetOverText(4)))
+		end
+		D.InsertTip(aXml, 'Index: ', el:GetIndex())
+	elseif szType == 'WndButton' then
+		D.InsertTip(aXml, 'ImagePath: ', el:GetAnimatePath())
+		D.InsertTip(aXml, 'Normal: ', el:GetAnimateGroupNormal())
+		D.InsertTip(aXml, 'Over: ', el:GetAnimateGroupMouseOver())
+		D.InsertTip(aXml, 'Down: ', el:GetAnimateGroupMouseDown())
+		D.InsertTip(aXml, 'Disable: ', el:GetAnimateGroupDisable())
+	end
+	-- 数据绑定信息
+	insert(aXml, GetFormatText('\n ---------- D Table --------- \n\n', 67))
 	for k, v in pairs(el) do
-		insert(xml, GetFormatText(k .. ': ', 67))
-		insert(xml, GetFormatText(tostring(v) .. '\n', 44))
+		D.InsertTip(aXml, k .. ': ', tostring(v))
 	end
-	if el:GetType() == 'WndFrame' then
+	-- 全局绑定信息
+	if szType == 'WndFrame' then
 		local G
 		if el:IsAddOn() then
 			G = _G.GetAddonEnv and _G.GetAddonEnv() or _G
 		else
-			G = _G
+			G = _G.GetInsideEnv and _G.GetInsideEnv() or _G
 		end
 		if G and G[el:GetName()] then
-			insert(xml, GetFormatText('\n ---------- D Global --------- \n\n', 67))
+			insert(aXml, GetFormatText('\n ---------- D Global --------- \n\n', 67))
 			for k, v in pairs(G[el:GetName()]) do
-				insert(xml, GetFormatText(k .. ': ', 67))
-				insert(xml, GetFormatText(tostring(v) .. '\n', 44))
+				D.InsertTip(aXml, k .. ': ', tostring(v))
 				if debug and type(v) == 'function' then
 					local d = debug.getinfo(v)
 					local t = {}
@@ -300,12 +453,12 @@ function D.GetTipInfo(el)
 						t[g] = v;
 					end
 					t.func = nil
-					insert(xml, GetFormatText(EncodeLUAData(t, '\t') .. '\n', 44))
+					insert(aXml, GetFormatText(EncodeLUAData(t, '\t') .. '\n', 44))
 				end
 			end
 		end
 	end
-	return xml
+	return aXml
 end
 
 do
