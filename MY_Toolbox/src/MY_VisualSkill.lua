@@ -65,7 +65,7 @@ RegisterCustomData('MY_VisualSkill.nVisualSkillBoxCount')
 RegisterCustomData('MY_VisualSkill.anchor')
 
 local BOX_WIDTH = 55
-local BOX_ANIMATION_TIME = 450
+local BOX_ANIMATION_TIME = 300
 local BOX_SLIDEOUT_DISTANCE = 200
 
 -- local FORMATION_SKILL = {
@@ -133,7 +133,11 @@ function D.UpdateAnimation(frame, fPercentage)
 			or ((fPercentage == 1 or hItem.nStartX > hList:GetW() - BOX_WIDTH)
 				and (nSlideRRelX + BOX_WIDTH * (nCount - i + 1))
 				or (nSlideLRelX - BOX_WIDTH * (i - O.nVisualSkillBoxCount)))
-		local nRelX = (nDstRelX - hItem.nStartX) * fPercentage + hItem.nStartX
+		local nRelX = hItem.nStartX + (nDstRelX - hItem.nStartX) * (
+			hItem.nStartX > hList:GetW() - BOX_WIDTH
+				and min(fPercentage / 0.4, 1)
+				or max((fPercentage - 0.4) / 0.6, 0)
+		)
 		local nAlpha = (nRelX >= 0 and nRelX <= hList:GetW() - BOX_WIDTH)
 			and 255
 			or (1 - min(abs(nRelX < 0 and nRelX or (hList:GetW() - BOX_WIDTH - nRelX)) / BOX_SLIDEOUT_DISTANCE, 1)) * 255
