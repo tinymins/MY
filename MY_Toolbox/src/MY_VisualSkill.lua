@@ -129,15 +129,21 @@ function D.UpdateAnimation(frame, fPercentage)
 			hItem.nStartX = hItem:GetRelX()
 		end
 		local nDstRelX = i < O.nVisualSkillBoxCount
-			and hList:GetW() - BOX_WIDTH * (i + 1)
+			and hList:GetW() - BOX_WIDTH * (i + 1) -- 列表BOX计算排列位置
 			or ((fPercentage == 1 or hItem.nStartX > hList:GetW() - BOX_WIDTH)
-				and (nSlideRRelX + BOX_WIDTH * (nCount - i + 1))
-				or (nSlideLRelX - BOX_WIDTH * (i - O.nVisualSkillBoxCount)))
+				and (nSlideRRelX + BOX_WIDTH * (nCount - i + 1)) -- 未参与动画或动画结束的BOX终点为右侧
+				or (nSlideLRelX - BOX_WIDTH * (i - O.nVisualSkillBoxCount))) -- 参与动画的BOX终点为左侧
 		local nRelX = hItem.nStartX + (nDstRelX - hItem.nStartX) * (
 			hItem.nStartX > hList:GetW() - BOX_WIDTH
-				and min(fPercentage / 0.4, 1)
-				or max((fPercentage - 0.4) / 0.6, 0)
+				and min(fPercentage / 0.4, 1) -- 动画BOX先行运动发起碰撞
+				or max((fPercentage - 0.4) / 0.6, 0) -- 列表BOX延迟碰撞
 		)
+		if hItem.nStartX > hList:GetW() - BOX_WIDTH then -- 右侧进场BOX播放碰撞动画
+			if fPercentage < 0.7 and (not hItem.nHitTime or GetTime() - hItem.nHitTime > BOX_ANIMATION_TIME) then
+				hItem:Lookup('Animate_Hit'):Replay()
+				hItem.nHitTime = GetTime()
+			end
+		end
 		local nAlpha = (nRelX >= 0 and nRelX <= hList:GetW() - BOX_WIDTH)
 			and 255
 			or (1 - min(abs(nRelX < 0 and nRelX or (hList:GetW() - BOX_WIDTH - nRelX)) / BOX_SLIDEOUT_DISTANCE, 1)) * 255
