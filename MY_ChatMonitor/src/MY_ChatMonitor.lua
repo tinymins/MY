@@ -157,7 +157,6 @@ function D.SaveData()
         and PATH_TYPE.SERVER or PATH_TYPE.ROLE
     LIB.SaveLUAData({DATA_FILE, TYPE}, {list = RECORD_LIST, hash = RECORD_HASH})
 end
-LIB.RegisterFlush(D.SaveData)
 
 function D.LoadData()
     local data = O.bDistinctServer
@@ -166,7 +165,6 @@ function D.LoadData()
     RECORD_LIST = data.list or {}
     RECORD_HASH = data.hash or {}
 end
-LIB.RegisterInit(D.LoadData)
 
 function D.GetHTML(rec)
     -- render link event
@@ -334,9 +332,15 @@ end
 
 function D.Init()
     D.LoadConfig()
+    D.LoadData()
     D.RegisterMsgMonitor()
 end
 LIB.RegisterInit('MY_CHATMONITOR', D.Init)
+
+function D.Exit()
+    D.SaveData()
+end
+LIB.RegisterExit('MY_ChatMonitor', D.Exit)
 
 function D.RegisterMsgMonitor()
     local tChannel = {}

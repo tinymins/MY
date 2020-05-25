@@ -75,7 +75,6 @@ local TONG_MEMBER_LOGOUT_MSG = '^' .. LIB.EscapeString(g_tStrings.STR_GUILD_MEMB
 ------------------------------------------------------------------------------------------------------
 -- 数据库控制器
 ------------------------------------------------------------------------------------------------------
-local EXPORT_SLICE = 100
 local LOG_TYPE = {
 	{ szKey = 'whisper', szTitle = g_tStrings.tChannelName['MSG_WHISPER'       ], aChannel = {'MSG_WHISPER'       }},
 	{ szKey = 'party'  , szTitle = g_tStrings.tChannelName['MSG_PARTY'         ], aChannel = {'MSG_PARTY'         }},
@@ -103,6 +102,7 @@ local LOG_LIMIT = (LIB.IsStreaming() and not LIB.IsDebugClient())
 local MSGTYPE_COLOR = setmetatable({
 	['MSG_MY_MONITOR'] = {255, 255, 0},
 }, {__index = function(t, k) return GetMsgFontColor(k, true) end})
+local UNSAVED_MSG_LIST, MAIN_DS = {}
 
 function D.GetRoot()
 	local szRoot = LIB.FormatPath({'userdata/chat_log/', PATH_TYPE.ROLE})
@@ -116,10 +116,8 @@ function D.Open()
 	MY_ChatLog_Open(D.GetRoot())
 end
 
-do
-local l_aMsg, l_ds = {}
 function D.InitDB(szMode)
-	if l_ds then
+	if MAIN_DS then
 		return true
 	end
 	if not szMode then
@@ -147,10 +145,10 @@ function D.InitDB(szMode)
 		end
 	end
 	if bSuccess then
-		for _, a in ipairs(l_aMsg) do
+		for _, a in ipairs(UNSAVED_MSG_LIST) do
 			ds:InsertMsg(unpack(a))
 		end
-		l_ds, l_aMsg = ds, {}
+		MAIN_DS, UNSAVED_MSG_LIST = ds, {}
 	end
 	return bSuccess
 end
@@ -240,10 +238,10 @@ function D.OptimizeDB()
 	if not D.InitDB('sure') then
 		return
 	end
-	l_ds:OptimizeDB()
+	MAIN_DS:OptimizeDB()
 end
 
-local function OnMsg(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID, szTalker)
+LIB.RegisterMsgMonitor('MY_ChatLog', function(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID, szTalker)
 	local szText = szMsg
 	if bRich then
 		szText = GetPureText(szMsg)
@@ -261,39 +259,38 @@ local function OnMsg(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID, szTalk
 			return
 		end
 	end
-	if l_ds then
-		l_ds:InsertMsg(szChannel, szText, szMsg, szTalker, GetCurrentTime())
+	if MAIN_DS then
+		MAIN_DS:InsertMsg(szChannel, szText, szMsg, szTalker, GetCurrentTime())
 		if O.bRealtimeCommit and not LIB.IsShieldedVersion('MY_ChatLog') then
-			l_ds:FlushDB()
+			MAIN_DS:FlushDB()
 		end
 	else
-		insert(l_aMsg, {szChannel, szText, szMsg, szTalker, GetCurrentTime()})
+		insert(UNSAVED_MSG_LIST, {szChannel, szText, szMsg, szTalker, GetCurrentTime()})
 	end
-end
-local tChannels, aChannels = {}, {}
-for _, info in ipairs(LOG_TYPE) do
-	for _, szChannel in ipairs(info.aChannel) do
-		tChannels[szChannel] = true
+end, (function()
+	local tChannels, aChannels = {}, {}
+	for _, info in ipairs(LOG_TYPE) do
+		for _, szChannel in ipairs(info.aChannel) do
+			tChannels[szChannel] = true
+		end
 	end
-end
-for szChannel, _ in pairs(tChannels) do
-	insert(aChannels, szChannel)
-end
-LIB.RegisterMsgMonitor('MY_ChatLog', OnMsg, aChannels)
+	for szChannel, _ in pairs(tChannels) do
+		insert(aChannels, szChannel)
+	end
+	return aChannels
+end)())
 
-local function onLoadingEnding()
-	if l_ds then
-		l_ds:FlushDB()
+LIB.RegisterEvent('LOADING_ENDING.MY_ChatLog_Save', function()
+	if MAIN_DS then
+		MAIN_DS:FlushDB()
 	end
-end
-LIB.RegisterEvent('LOADING_ENDING.MY_ChatLog_Save', onLoadingEnding)
+end)
 
-local function onIdle()
-	if l_ds and not LIB.IsShieldedVersion('DEVELOP') then
-		l_ds:FlushDB()
+LIB.RegisterIdle('MY_ChatLog_Save', function()
+	if MAIN_DS and not LIB.IsShieldedVersion('DEVELOP') then
+		MAIN_DS:FlushDB()
 	end
-end
-LIB.RegisterIdle('MY_ChatLog_Save', onIdle)
+end)
 
 function D.OnInit()
 	if not GetClientPlayer() then
@@ -305,13 +302,15 @@ function D.OnInit()
 end
 LIB.RegisterInit('MY_ChatLog_InitDB', D.OnInit)
 
-do
-local function Flush()
+function D.FlushDB(bCheckExceed)
 	if not D.InitDB('silent') then
 		return
 	end
-	l_ds:FlushDB()
-	-- 数据超限处理
+	MAIN_DS:FlushDB()
+	-- 数据超限检查处理
+	if not bCheckExceed then
+		return
+	end
 	local bExceed = false
 	for _, p in ipairs(LOG_LIMIT) do
 		local aChannel = {}
@@ -324,12 +323,12 @@ local function Flush()
 				end
 			end
 		end
-		local nCount = l_ds:CountMsg(aChannel)
+		local nCount = MAIN_DS:CountMsg(aChannel)
 		if nCount > p.nLimit then
-			local aMsg = l_ds:SelectMsg(aChannel, nil, nil, nil, nCount - p.nLimit, 1)
+			local aMsg = MAIN_DS:SelectMsg(aChannel, nil, nil, nil, nCount - p.nLimit, 1)
 			if aMsg and aMsg[1] then
 				bExceed = true
-				l_ds:DeleteMsgInterval(aChannel, '', 0, aMsg[1].nTime)
+				MAIN_DS:DeleteMsgInterval(aChannel, '', 0, aMsg[1].nTime)
 			end
 		end
 	end
@@ -337,33 +336,27 @@ local function Flush()
 		D.OptimizeDB()
 	end
 end
-LIB.RegisterFlush('MY_Chat_Release', Flush)
-end
 
-local function onExit()
-	if not l_ds then
+function D.ReleaseDB()
+	D.FlushDB(true)
+	if not MAIN_DS then
 		return
 	end
-	l_ds:ReleaseDB()
+	MAIN_DS:ReleaseDB()
 end
-LIB.RegisterExit('MY_Chat_Release', onExit)
+LIB.RegisterExit('MY_Chat_Release', D.ReleaseDB)
 
-local function onDisconnect()
+LIB.RegisterEvent('DISCONNECT.MY_Chat_Release', function()
 	if LIB.IsShieldedVersion('DEVELOP') then
 		return
 	end
-	onExit()
-end
-LIB.RegisterEvent('DISCONNECT.MY_Chat_Release', onDisconnect)
-end
+	D.ReleaseDB()
+end)
 
-do
-local menu = {
+LIB.RegisterAddonMenu('MY_CHATLOG_MENU', {
 	szOption = _L['MY_ChatLog'],
 	fnAction = D.Open,
-}
-LIB.RegisterAddonMenu('MY_CHATLOG_MENU', menu)
-end
+})
 LIB.RegisterHotKey('MY_ChatLog', _L['MY_ChatLog'], D.Open, nil)
 
 -- Global exports
