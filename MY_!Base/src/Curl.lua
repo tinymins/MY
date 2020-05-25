@@ -394,7 +394,7 @@ function LIB.Ajax(settings)
 		wWebPage:Navigate(url)
 	else -- if driver == 'origin' then
 		local szKey = GetTickCount() * 100
-		while MY_CALL_AJAX[MY_AJAX_TAG .. szKey] do
+		while MY_CALL_AJAX['__addon_' .. MY_AJAX_TAG .. szKey] do
 			szKey = szKey + 1
 		end
 		szKey = MY_AJAX_TAG .. szKey
