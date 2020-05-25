@@ -119,36 +119,34 @@ end
 function D.UpdateAnimation(frame, fPercentage)
 	local hList = frame:Lookup('', 'Handle_Boxes')
 	local nCount = hList:GetItemCount()
-
-	local hItem = hList:LogicLookup(0)
-	if not hItem.nStartX then
-		hItem.nStartX = hItem:GetRelX()
-	end
-	hItem:SetAlpha((1 - fPercentage) * 255)
-	hItem:SetRelX(hItem.nStartX - (hItem.nStartX + BOX_SLIDEOUT_DISTANCE) * fPercentage)
-
-	local nRelX = 0
-	for i = 1, nCount - 2 do
+	local nSlideLRelX = 0 - BOX_SLIDEOUT_DISTANCE
+	local nSlideRRelX = hList:GetW() + BOX_SLIDEOUT_DISTANCE
+	-- [0, O.nVisualSkillBoxCount] 最终显示的BOX
+	-- [O.nVisualSkillBoxCount - 1, nCount - 1] 用作动画的渐隐BOX
+	for i = 0, nCount - 1 do
 		local hItem = hList:LogicLookup(i)
 		if not hItem.nStartX then
 			hItem.nStartX = hItem:GetRelX()
 		end
-		hItem:SetAlpha(255)
-		hItem:SetRelX(nRelX + (hItem.nStartX - nRelX) * (1 - fPercentage))
-		nRelX = nRelX + hItem:GetW()
+		local nDstRelX = i < O.nVisualSkillBoxCount
+			and hList:GetW() - BOX_WIDTH * (i + 1)
+			or ((fPercentage == 1 or hItem.nStartX > hList:GetW() - BOX_WIDTH)
+				and (nSlideRRelX + BOX_WIDTH * (nCount - i + 1))
+				or (nSlideLRelX - BOX_WIDTH * (i - O.nVisualSkillBoxCount)))
+		local nRelX = (nDstRelX - hItem.nStartX) * fPercentage + hItem.nStartX
+		local nAlpha = (nRelX >= 0 and nRelX <= hList:GetW() - BOX_WIDTH)
+			and 255
+			or (1 - min(abs(nRelX < 0 and nRelX or (hList:GetW() - BOX_WIDTH - nRelX)) / BOX_SLIDEOUT_DISTANCE, 1)) * 255
+		hItem:SetRelX(nRelX)
+		hItem:SetAlpha(nAlpha)
 	end
-
-	local hItem = hList:LogicLookup(nCount - 1)
-	hItem:SetAlpha(fPercentage * 255)
-	hItem:SetRelX(nRelX + BOX_SLIDEOUT_DISTANCE * (1 - fPercentage))
-
 	hList:FormatAllItemPos()
 end
 
 function D.StartAnimation(frame, nStep)
 	local hList = frame:Lookup('', 'Handle_Boxes')
 	if nStep then
-		hList.nIndexBase = (hList.nIndexBase + nStep) % hList:GetItemCount()
+		hList.nIndexBase = (hList.nIndexBase - nStep) % hList:GetItemCount()
 	end
 	local nCount = hList:GetItemCount()
 	for i = 0, nCount - 1 do
@@ -161,7 +159,7 @@ end
 -- 绘制正确数量的列表
 function D.CorrectBoxCount(frame)
 	local hList = frame:Lookup('', 'Handle_Boxes')
-	local nBoxCount = O.nVisualSkillBoxCount + 1
+	local nBoxCount = O.nVisualSkillBoxCount * 2
 	local nBoxCountOffset = nBoxCount - hList:GetItemCount()
 	if nBoxCountOffset == 0 then
 		return
@@ -213,7 +211,7 @@ function D.OnSkillCast(frame, dwSkillID, dwSkillLevel)
 	end
 	-- 渲染界面触发动画
 	local box = frame:Lookup('', 'Handle_Boxes')
-		:LogicLookup(0):Lookup('Box_Skill')
+		:LogicLookup(-1):Lookup('Box_Skill')
 	box:SetObject(UI_OBJECT_SKILL, dwSkillID, dwSkillLevel)
 	box:SetObjectIcon(dwIconID)
 	box:Show()
