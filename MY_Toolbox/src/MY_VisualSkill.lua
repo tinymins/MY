@@ -50,64 +50,106 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
 	return
 end
 --------------------------------------------------------------------------
-local _C = {}
 local INI_PATH = PACKET_INFO.ROOT .. 'MY_ToolBox/ui/MY_VisualSkill.ini'
-local BOX_W = 55
-local ANI_TIME = 450
-local OUT_DISTANCE = 200
-local defaultAnchor = {x = 0, y = -220, s = 'BOTTOMCENTER', r = 'BOTTOMCENTER'}
-MY_VisualSkill = {}
-MY_VisualSkill.bEnable = false
-MY_VisualSkill.bPenetrable = true
-MY_VisualSkill.anchor = defaultAnchor
-MY_VisualSkill.nVisualSkillBoxCount = 5
+local DEFAULT_ANCHOR = { x = 0, y = -220, s = 'BOTTOMCENTER', r = 'BOTTOMCENTER' }
+local D = {}
+local O = {
+	bEnable = false,
+	bPenetrable = true,
+	nVisualSkillBoxCount = 5,
+	anchor = Clone(DEFAULT_ANCHOR),
+}
 RegisterCustomData('MY_VisualSkill.bEnable')
 RegisterCustomData('MY_VisualSkill.bPenetrable')
-RegisterCustomData('MY_VisualSkill.anchor')
 RegisterCustomData('MY_VisualSkill.nVisualSkillBoxCount')
+RegisterCustomData('MY_VisualSkill.anchor')
 
-local function ApplyAnchor(frame)
-	local anchor = MY_VisualSkill.anchor
+local BOX_WIDTH = 55
+local BOX_ANIMATION_TIME = 450
+local BOX_SLIDEOUT_DISTANCE = 200
+
+-- local FORMATION_SKILL = {
+-- 	[230  ] = true, -- (230)  Íò»¨ÉËº¦Õó·¨Ê©·Å  Æß¾øåÐÒ£Õó
+-- 	[347  ] = true, -- (347)  ´¿ÑôÆø×ÚÕó·¨Ê©·Å  ¾Å¹¬°ËØÔÕó
+-- 	[526  ] = true, -- (526)  ÆßÐãÖÎÁÆÕó·¨Ê©·Å  »¨ÔÂÁè·çÕó
+-- 	[662  ] = true, -- (662)  Ìì²ß·ÀÓùÕó·¨ÊÍ·Å  ¾ÅÏåµØÐþÕó
+-- 	[740  ] = true, -- (740)  ÉÙÁÖ·ÀÓùÕó·¨Ê©·Å  ½ð¸Õ·üÄ§Õó
+-- 	[745  ] = true, -- (745)  ÉÙÁÖ¹¥»÷Õó·¨Ê©·Å  Ìì¹ÄÀ×ÒôÕó
+-- 	[754  ] = true, -- (754)  Ìì²ß¹¥»÷Õó·¨ÊÍ·Å  ÎÀ¹«ÕÛ³åÕó
+-- 	[778  ] = true, -- (778)  ´¿Ñô½£×ÚÕó·¨Ê©·Å  ±±¶·ÆßÐÇÕó
+-- 	[781  ] = true, -- (781)  ÆßÐãÉËº¦Õó·¨Ê©·Å  ¾ÅÒô¾ªÏÒÕó
+-- 	[1020 ] = true, -- (1020) Íò»¨ÖÎÁÆÕó·¨Ê©·Å  ÂäÐÇ¾ªºèÕó
+-- 	[1866 ] = true, -- (1866) ²Ø½£Õó·¨ÊÍ·Å      ÒÀÉ½¹ÛÀ½Õó
+-- 	[2481 ] = true, -- (2481) Îå¶¾ÖÎÁÆÕó·¨Ê©·Å  ÃîÊÖÖ¯ÌìÕó
+-- 	[2487 ] = true, -- (2487) Îå¶¾¹¥»÷Õó·¨Ê©·Å  Íò¹ÆÊÉÐÄÕó
+-- 	[3216 ] = true, -- (3216) ÌÆÃÅÍâ¹¦Õó·¨Ê©·Å  Á÷ÐÇ¸ÏÔÂÕó
+-- 	[3217 ] = true, -- (3217) ÌÆÃÅÄÚ¹¦Õó·¨Ê©·Å  Ç§»ú°Ù±äÕó
+-- 	[4674 ] = true, -- (4674) Ã÷½Ì¹¥»÷Õó·¨Ê©·Å  Ñ×ÍþÆÆÄ§Õó
+-- 	[4687 ] = true, -- (4687) Ã÷½Ì·ÀÓùÕó·¨Ê©·Å  ÎÞÁ¿¹âÃ÷Õó
+-- 	[5311 ] = true, -- (5311) Ø¤°ï¹¥»÷Õó·¨ÊÍ·Å  ½µÁú·ü»¢Õó
+-- 	[13228] = true, -- (13228)  ÁÙ´¨ÁÐÉ½ÕóÊÍ·Å  ÁÙ´¨ÁÐÉ½Õó
+-- 	[13275] = true, -- (13275)  ·æÁèºá¾øÕóÊ©·Å  ·æÁèºá¾øÕó
+-- }
+local COMMON_SKILL = {
+	[10   ] = true, -- (10)    ºáÉ¨Ç§¾ü           ºáÉ¨Ç§¾ü
+	[11   ] = true, -- (11)    ÆÕÍ¨¹¥»÷-¹÷¹¥»÷     ÁùºÏ¹÷
+	[12   ] = true, -- (12)    ÆÕÍ¨¹¥»÷-Ç¹¹¥»÷     Ã·»¨Ç¹·¨
+	[13   ] = true, -- (13)    ÆÕÍ¨¹¥»÷-½£¹¥»÷     Èý²ñ½£·¨
+	[14   ] = true, -- (14)    ÆÕÍ¨¹¥»÷-È­Ì×¹¥»÷   ³¤È­
+	[15   ] = true, -- (15)    ÆÕÍ¨¹¥»÷-Ë«±ø¹¥»÷   Á¬»·Ë«µ¶
+	[16   ] = true, -- (16)    ÆÕÍ¨¹¥»÷-±Ê¹¥»÷     ÅÐ¹Ù±Ê·¨
+	[1795 ] = true, -- (1795)  ÆÕÍ¨¹¥»÷-ÖØ½£¹¥»÷   ËÄ¼¾½£·¨
+	[2183 ] = true, -- (2183)  ÆÕÍ¨¹¥»÷-³æµÑ¹¥»÷   ´ó»ÄµÑ·¨
+	[3121 ] = true, -- (3121)  ÆÕÍ¨¹¥»÷-¹­¹¥»÷     î¸·çïÚ·¨
+	[4326 ] = true, -- (4326)  ÆÕÍ¨¹¥»÷-Ë«µ¶¹¥»÷   ´óÄ®µ¶·¨
+	[13039] = true, -- (13039) ÆÕÍ¨¹¥»÷_¶Üµ¶¹¥»÷   ¾íÑ©µ¶
+	[14063] = true, -- (14063) ÆÕÍ¨¹¥»÷_ÇÙ¹¥»÷     ÎåÒôÁùÂÉ
+	[16010] = true, -- (16010) ÆÕÍ¨¹¥»÷_°ÁËªµ¶¹¥»÷  Ëª·çµ¶·¨
+	[19712] = true, -- (19712) ÆÕÍ¨¹¥»÷_ÅîÀ³É¡¹¥»÷  Æ®Ò£É¡»÷
+	[17   ] = true, -- (17)    ½­ºþ-·ÀÉíÎäÒÕ-´ò×ø  ´ò×ø
+	[18   ] = true, -- (18)    Ì¤ÔÆ               Ì¤ÔÆ
+}
+
+function D.UpdateAnchor(frame)
+	local anchor = O.anchor
 	frame:SetPoint(anchor.s, 0, 0, anchor.r, anchor.x, anchor.y)
 	frame:CorrectPos()
 end
 
-local function GetRealIndex(nIndex, nIndexBase, nCount)
-	return (nIndex + nIndexBase) % nCount
-end
-
-local function UpdateUI(frame, during)
-	local percentage = min(max(during / ANI_TIME, 0), 1)
+function D.UpdateAnimation(frame, fPercentage)
 	local hList = frame:Lookup('', 'Handle_Boxes')
 	local nCount = hList:GetItemCount()
 
-	local hItem = hList:Lookup(GetRealIndex(0, frame.nIndexBase, nCount))
+	local hItem = hList:LogicLookup(0)
 	if not hItem.nStartX then
 		hItem.nStartX = hItem:GetRelX()
 	end
-	hItem:SetAlpha((1 - percentage) * 255)
-	hItem:SetRelX(hItem.nStartX - (hItem.nStartX + OUT_DISTANCE) * percentage)
+	hItem:SetAlpha((1 - fPercentage) * 255)
+	hItem:SetRelX(hItem.nStartX - (hItem.nStartX + BOX_SLIDEOUT_DISTANCE) * fPercentage)
 
 	local nRelX = 0
 	for i = 1, nCount - 2 do
-		local hItem = hList:Lookup(GetRealIndex(i, frame.nIndexBase, nCount))
+		local hItem = hList:LogicLookup(i)
 		if not hItem.nStartX then
 			hItem.nStartX = hItem:GetRelX()
 		end
 		hItem:SetAlpha(255)
-		hItem:SetRelX(nRelX + (hItem.nStartX - nRelX) * (1 - percentage))
+		hItem:SetRelX(nRelX + (hItem.nStartX - nRelX) * (1 - fPercentage))
 		nRelX = nRelX + hItem:GetW()
 	end
 
-	local hItem = hList:Lookup(GetRealIndex(nCount - 1, frame.nIndexBase, nCount))
-	hItem:SetAlpha(percentage * 255)
-	hItem:SetRelX(nRelX + OUT_DISTANCE * (1 - percentage))
+	local hItem = hList:LogicLookup(nCount - 1)
+	hItem:SetAlpha(fPercentage * 255)
+	hItem:SetRelX(nRelX + BOX_SLIDEOUT_DISTANCE * (1 - fPercentage))
 
 	hList:FormatAllItemPos()
 end
 
-local function StartAnimation(frame)
+function D.StartAnimation(frame, nStep)
 	local hList = frame:Lookup('', 'Handle_Boxes')
+	if nStep then
+		hList.nIndexBase = (hList.nIndexBase + nStep) % hList:GetItemCount()
+	end
 	local nCount = hList:GetItemCount()
 	for i = 0, nCount - 1 do
 		local hItem = hList:Lookup(i)
@@ -116,101 +158,79 @@ local function StartAnimation(frame)
 	frame.nTickStart = GetTickCount()
 end
 
-local function DrawUI(frame)
+-- »æÖÆÕýÈ·ÊýÁ¿µÄÁÐ±í
+function D.CorrectBoxCount(frame)
 	local hList = frame:Lookup('', 'Handle_Boxes')
-	local nOffset = MY_VisualSkill.nVisualSkillBoxCount - hList:GetItemCount() + 1
-	if nOffset == 0 then
+	local nBoxCount = O.nVisualSkillBoxCount + 1
+	local nBoxCountOffset = nBoxCount - hList:GetItemCount()
+	if nBoxCountOffset == 0 then
 		return
-	elseif nOffset > 0 then
-		for i = 1, nOffset do
+	end
+	if nBoxCountOffset > 0 then
+		for i = 1, nBoxCountOffset do
 			hList:AppendItemFromIni(INI_PATH, 'Handle_Box'):Lookup('Box_Skill'):Hide()
-			for i = hList:GetItemCount() - 1, frame.nIndexBase + 1 do
+			for i = hList:GetItemCount() - 1, hList.nIndexBase + 1 do
 				hList:ExchangeItemIndex(i, i - 1)
 			end
 		end
-	elseif nOffset < 0 then
-		for i = nOffset, -1 do
-			hList:RemoveItem(GetRealIndex(0, frame.nIndexBase, hList:GetItemCount()))
-			frame.nIndexBase = frame.nIndexBase % hList:GetItemCount()
+	elseif nBoxCountOffset < 0 then
+		for i = nBoxCountOffset, -1 do
+			hList:LogicRemoveItem(0)
+			hList.nIndexBase = hList.nIndexBase % hList:GetItemCount()
 		end
 	end
-	local nBoxesW = BOX_W * MY_VisualSkill.nVisualSkillBoxCount
+	local nBoxesW = BOX_WIDTH * O.nVisualSkillBoxCount
 	frame:Lookup('', 'Handle_Bg/Image_Bg_11'):SetW(nBoxesW)
 	frame:Lookup('', 'Handle_Bg'):FormatAllItemPos()
 	frame:Lookup('', ''):FormatAllItemPos()
 	frame:SetW(nBoxesW + 169)
 	hList:SetW(nBoxesW)
-	UpdateUI(frame, ANI_TIME)
+	hList.nCount = nBoxCount
+	D.UpdateAnimation(frame, 1)
 end
 
-local function OnSkillCast(frame, dwSkillID, dwSkillLevel)
-	-- get name
+function D.OnSkillCast(frame, dwSkillID, dwSkillLevel)
+	-- »ñÈ¡¼¼ÄÜÐÅÏ¢
 	local szSkillName, dwIconID = LIB.GetSkillName(dwSkillID, dwSkillLevel)
 	if dwSkillID == 4097 then -- Æï³Ë
 		dwIconID = 1899
-	elseif Table_IsSkillFormation(dwSkillID, dwSkillLevel)        -- Õó·¨¼¼ÄÜ
-		or Table_IsSkillFormationCaster(dwSkillID, dwSkillLevel)  -- Õó·¨ÊÍ·Å¼¼ÄÜ
-		-- or dwSkillID == 230     -- (230)  Íò»¨ÉËº¦Õó·¨Ê©·Å  Æß¾øåÐÒ£Õó
-		-- or dwSkillID == 347     -- (347)  ´¿ÑôÆø×ÚÕó·¨Ê©·Å  ¾Å¹¬°ËØÔÕó
-		-- or dwSkillID == 526     -- (526)  ÆßÐãÖÎÁÆÕó·¨Ê©·Å  »¨ÔÂÁè·çÕó
-		-- or dwSkillID == 662     -- (662)  Ìì²ß·ÀÓùÕó·¨ÊÍ·Å  ¾ÅÏåµØÐþÕó
-		-- or dwSkillID == 740     -- (740)  ÉÙÁÖ·ÀÓùÕó·¨Ê©·Å  ½ð¸Õ·üÄ§Õó
-		-- or dwSkillID == 745     -- (745)  ÉÙÁÖ¹¥»÷Õó·¨Ê©·Å  Ìì¹ÄÀ×ÒôÕó
-		-- or dwSkillID == 754     -- (754)  Ìì²ß¹¥»÷Õó·¨ÊÍ·Å  ÎÀ¹«ÕÛ³åÕó
-		-- or dwSkillID == 778     -- (778)  ´¿Ñô½£×ÚÕó·¨Ê©·Å  ±±¶·ÆßÐÇÕó
-		-- or dwSkillID == 781     -- (781)  ÆßÐãÉËº¦Õó·¨Ê©·Å  ¾ÅÒô¾ªÏÒÕó
-		-- or dwSkillID == 1020    -- (1020) Íò»¨ÖÎÁÆÕó·¨Ê©·Å  ÂäÐÇ¾ªºèÕó
-		-- or dwSkillID == 1866    -- (1866) ²Ø½£Õó·¨ÊÍ·Å      ÒÀÉ½¹ÛÀ½Õó
-		-- or dwSkillID == 2481    -- (2481) Îå¶¾ÖÎÁÆÕó·¨Ê©·Å  ÃîÊÖÖ¯ÌìÕó
-		-- or dwSkillID == 2487    -- (2487) Îå¶¾¹¥»÷Õó·¨Ê©·Å  Íò¹ÆÊÉÐÄÕó
-		-- or dwSkillID == 3216    -- (3216) ÌÆÃÅÍâ¹¦Õó·¨Ê©·Å  Á÷ÐÇ¸ÏÔÂÕó
-		-- or dwSkillID == 3217    -- (3217) ÌÆÃÅÄÚ¹¦Õó·¨Ê©·Å  Ç§»ú°Ù±äÕó
-		-- or dwSkillID == 4674    -- (4674) Ã÷½Ì¹¥»÷Õó·¨Ê©·Å  Ñ×ÍþÆÆÄ§Õó
-		-- or dwSkillID == 4687    -- (4687) Ã÷½Ì·ÀÓùÕó·¨Ê©·Å  ÎÞÁ¿¹âÃ÷Õó
-		-- or dwSkillID == 5311    -- (5311) Ø¤°ï¹¥»÷Õó·¨ÊÍ·Å  ½µÁú·ü»¢Õó
-		-- or dwSkillID == 13228   -- (13228)  ÁÙ´¨ÁÐÉ½ÕóÊÍ·Å  ÁÙ´¨ÁÐÉ½Õó
-		-- or dwSkillID == 13275   -- (13275)  ·æÁèºá¾øÕóÊ©·Å  ·æÁèºá¾øÕó
-		or dwSkillID == 10         -- (10)    ºáÉ¨Ç§¾ü           ºáÉ¨Ç§¾ü
-		or dwSkillID == 11         -- (11)    ÆÕÍ¨¹¥»÷-¹÷¹¥»÷    ÁùºÏ¹÷
-		or dwSkillID == 12         -- (12)    ÆÕÍ¨¹¥»÷-Ç¹¹¥»÷    Ã·»¨Ç¹·¨
-		or dwSkillID == 13         -- (13)    ÆÕÍ¨¹¥»÷-½£¹¥»÷    Èý²ñ½£·¨
-		or dwSkillID == 14         -- (14)    ÆÕÍ¨¹¥»÷-È­Ì×¹¥»÷  ³¤È­
-		or dwSkillID == 15         -- (15)    ÆÕÍ¨¹¥»÷-Ë«±ø¹¥»÷  Á¬»·Ë«µ¶
-		or dwSkillID == 16         -- (16)    ÆÕÍ¨¹¥»÷-±Ê¹¥»÷    ÅÐ¹Ù±Ê·¨
-		or dwSkillID == 1795       -- (1795)  ÆÕÍ¨¹¥»÷-ÖØ½£¹¥»÷  ËÄ¼¾½£·¨
-		or dwSkillID == 2183       -- (2183)  ÆÕÍ¨¹¥»÷-³æµÑ¹¥»÷  ´ó»ÄµÑ·¨
-		or dwSkillID == 3121       -- (3121)  ÆÕÍ¨¹¥»÷-¹­¹¥»÷    î¸·çïÚ·¨
-		or dwSkillID == 4326       -- (4326)  ÆÕÍ¨¹¥»÷-Ë«µ¶¹¥»÷  ´óÄ®µ¶·¨
-		or dwSkillID == 13039      -- (13039) ÆÕÍ¨¹¥»÷_¶Üµ¶¹¥»÷  ¾íÑ©µ¶
-		or dwSkillID == 14063      -- (14063) ÆÕÍ¨¹¥»÷_ÇÙ¹¥»÷  ÎåÒôÁùÂÉ
-		or dwSkillID == 16010      -- (16010) ÆÕÍ¨¹¥»÷_°ÁËªµ¶¹¥»÷  Ëª·çµ¶·¨
-		or dwSkillID == 19712      -- (19712) ÆÕÍ¨¹¥»÷_ÅîÀ³É¡¹¥»÷  Æ®Ò£É¡»÷
-		or dwSkillID == 17         -- (17)    ½­ºþ-·ÀÉíÎäÒÕ-´ò×ø ´ò×ø
-		or dwSkillID == 18         -- (18)    Ì¤ÔÆ Ì¤ÔÆ
-		or dwIconID  == 1817       -- ±ÕÕó
-		or dwIconID  == 533        -- ´ò×ø
-		or dwIconID  == 13         -- ×Ó¼¼ÄÜ
-		or not szSkillName
-		or szSkillName == ''
-	then
+	end
+	-- ÎÞÃû¼¼ÄÜÆÁ±Î
+	if not szSkillName or szSkillName == '' then
 		return
 	end
-
-	local hList = frame:Lookup('', 'Handle_Boxes')
-	local hItem = hList:Lookup(frame.nIndexBase)
-	frame.nIndexBase = (frame.nIndexBase + 1) % hList:GetItemCount()
-
-	local box = hItem:Lookup('Box_Skill')
+	-- ÆÕ¹¥ÆÁ±Î
+	if COMMON_SKILL[dwSkillID] then
+		return
+	end
+	-- ÌØÊâÍ¼±ê¼¼ÄÜÆÁ±Î
+	if dwIconID == 1817 --[[±ÕÕó]] or dwIconID == 533 --[[´ò×ø]] or dwIconID == 13 --[[×Ó¼¼ÄÜ]] then
+		return
+	end
+	-- Õó·¨ÊÍ·Å¼¼ÄÜÆÁ±Î
+	if Table_IsSkillFormation(dwSkillID, dwSkillLevel) or Table_IsSkillFormationCaster(dwSkillID, dwSkillLevel) then
+		return
+	end
+	-- äÖÈ¾½çÃæ´¥·¢¶¯»­
+	local box = frame:Lookup('', 'Handle_Boxes')
+		:LogicLookup(0):Lookup('Box_Skill')
 	box:SetObject(UI_OBJECT_SKILL, dwSkillID, dwSkillLevel)
 	box:SetObjectIcon(dwIconID)
 	box:Show()
-
-	StartAnimation(frame)
+	D.StartAnimation(frame, 1)
 end
 
-function MY_VisualSkill.OnFrameCreate()
-	this.nIndexBase = 0
-	DrawUI(this)
+function D.OnFrameCreate()
+	local hList = this:Lookup('', 'Handle_Boxes')
+	hList.LogicLookup = function(el, i)
+		return el:Lookup((i + el.nIndexBase) % el.nCount)
+	end
+	hList.LogicRemoveItem = function(el, i)
+		return el:RemoveItem((i + el.nIndexBase) % el.nCount)
+	end
+	hList.nIndexBase = 0
+	hList.nCount = 0
+	D.CorrectBoxCount(this)
 	this:RegisterEvent('RENDER_FRAME_UPDATE')
 	this:RegisterEvent('UI_SCALED')
 	this:RegisterEvent('DO_SKILL_CAST')
@@ -218,10 +238,10 @@ function MY_VisualSkill.OnFrameCreate()
 	this:RegisterEvent('ON_ENTER_CUSTOM_UI_MODE')
 	this:RegisterEvent('ON_LEAVE_CUSTOM_UI_MODE')
 	this:RegisterEvent('CUSTOM_UI_MODE_SET_DEFAULT')
-	MY_VisualSkill.OnEvent('UI_SCALED')
+	D.OnEvent('UI_SCALED')
 end
 
-function MY_VisualSkill.OnEvent(event)
+function D.OnEvent(event)
 	if event == 'RENDER_FRAME_UPDATE' then
 		if not this.nTickStart then
 			return
@@ -230,64 +250,63 @@ function MY_VisualSkill.OnEvent(event)
 		if nTickDuring > 600 then
 			this.nTickStart = nil
 		end
-		UpdateUI(this, nTickDuring)
+		D.UpdateAnimation(this, min(max(nTickDuring / BOX_ANIMATION_TIME, 0), 1))
 	elseif event == 'UI_SCALED' then
-		ApplyAnchor(this)
+		D.UpdateAnchor(this)
 	elseif event == 'DO_SKILL_CAST' then
 		local dwID, dwSkillID, dwSkillLevel = arg0, arg1, arg2
 		if dwID == GetControlPlayer().dwID then
-			OnSkillCast(this, dwSkillID, dwSkillLevel)
+			D.OnSkillCast(this, dwSkillID, dwSkillLevel)
 		end
 	elseif event == 'DO_SKILL_CHANNEL_PROGRESS' then
 		local dwID, dwSkillID, dwSkillLevel = arg3, arg1, arg2
 		if dwID == GetControlPlayer().dwID then
-			OnSkillCast(this, dwSkillID, dwSkillLevel)
+			D.OnSkillCast(this, dwSkillID, dwSkillLevel)
 		end
 	elseif event == 'ON_ENTER_CUSTOM_UI_MODE' then
-		UpdateCustomModeWindow(this, _L['Visual skill'], MY_VisualSkill.bPenetrable)
+		UpdateCustomModeWindow(this, _L['Visual skill'], O.bPenetrable)
 	elseif event == 'ON_LEAVE_CUSTOM_UI_MODE' then
-		UpdateCustomModeWindow(this, _L['Visual skill'], MY_VisualSkill.bPenetrable)
+		UpdateCustomModeWindow(this, _L['Visual skill'], O.bPenetrable)
 		MY_VisualSkill.anchor = GetFrameAnchor(this)
 	elseif event == 'CUSTOM_UI_MODE_SET_DEFAULT' then
-		MY_VisualSkill.anchor = defaultAnchor
-		ApplyAnchor(this)
+		MY_VisualSkill.anchor = Clone(DEFAULT_ANCHOR)
+		D.UpdateAnchor(this)
 	end
 end
 
-function MY_VisualSkill.Open()
+function D.Open()
 	Wnd.OpenWindow(INI_PATH, 'MY_VisualSkill')
 end
 
-function MY_VisualSkill.GetFrame()
+function D.GetFrame()
 	return Station.Lookup('Normal/MY_VisualSkill')
 end
 
-function MY_VisualSkill.Close()
+function D.Close()
 	Wnd.CloseWindow('MY_VisualSkill')
 end
 
-function MY_VisualSkill.Reload()
-	if MY_VisualSkill.bEnable then
-		local frame = MY_VisualSkill.GetFrame()
+function D.Reload()
+	if O.bEnable then
+		local frame = D.GetFrame()
 		if frame then
-			DrawUI(frame)
+			D.CorrectBoxCount(frame)
 		else
-			MY_VisualSkill.Open()
+			D.Open()
 		end
 	else
-		MY_VisualSkill.Close()
+		D.Close()
 	end
 end
-LIB.RegisterInit('MY_VISUALSKILL', MY_VisualSkill.Reload)
+LIB.RegisterInit('MY_VISUALSKILL', D.Reload)
 
-function MY_VisualSkill.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, w = 'auto',
 		text = _L['Visual skill'],
 		checked = MY_VisualSkill.bEnable,
 		oncheck = function(bChecked)
 			MY_VisualSkill.bEnable = bChecked
-			MY_VisualSkill.Reload()
 		end,
 	}):Width() + 5
 
@@ -299,10 +318,53 @@ function MY_VisualSkill.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 		textfmt = function(val) return _L('Display %d skills.', val) end,
 		onchange = function(val)
 			MY_VisualSkill.nVisualSkillBoxCount = val
-			MY_VisualSkill.Reload()
 		end,
 	})
 	x = X
 	y = y + 25
 	return x, y
+end
+
+---------------------------------------------------------------------
+-- Global exports
+---------------------------------------------------------------------
+do
+local settings = {
+	exports = {
+		{
+			fields = {
+				OnPanelActivePartial = D.OnPanelActivePartial,
+			},
+		},
+		{
+			preset = 'UIEvent',
+			root = D,
+		},
+		{
+			fields = {
+				bEnable              = true,
+				bPenetrable          = true,
+				nVisualSkillBoxCount = true,
+				anchor               = true,
+			},
+			root = O,
+		},
+	},
+	imports = {
+		{
+			fields = {
+				bEnable              = true,
+				bPenetrable          = true,
+				nVisualSkillBoxCount = true,
+				anchor               = true,
+			},
+			triggers = {
+				bEnable              = D.Reload,
+				nVisualSkillBoxCount = D.Reload,
+			},
+			root = O,
+		},
+	},
+}
+MY_VisualSkill = LIB.GeneGlobalNS(settings)
 end
