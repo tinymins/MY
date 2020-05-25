@@ -64,7 +64,7 @@ RegisterCustomData('MY_VisualSkill.bPenetrable')
 RegisterCustomData('MY_VisualSkill.nVisualSkillBoxCount')
 RegisterCustomData('MY_VisualSkill.anchor')
 
-local BOX_WIDTH = 55
+local BOX_WIDTH = 48
 local BOX_ANIMATION_TIME = 300
 local BOX_SLIDEOUT_DISTANCE = 200
 
