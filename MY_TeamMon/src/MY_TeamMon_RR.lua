@@ -290,7 +290,7 @@ function D.DownloadMeta(info, onSuccess, onError)
 		FireUIEvent('MY_TM_RR_META_LIST_UPDATE')
 	end
 	LIB.Ajax({
-		method = 'auto',
+		driver = 'auto', method = 'auto',
 		url = szURL,
 		charset = 'utf8',
 		success = function(szHTML)
