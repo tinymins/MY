@@ -4019,3 +4019,42 @@ function LIB.GetMapAchievements(dwMapID, bWujia)
 	end
 	return Clone(MAP_ACHI_NORMAL[dwMapID])
 end
+
+function LIB.GetPlayerEquipInfo(player)
+	local tEquipInfo = {}
+	for nItemIndex = 0, EQUIPMENT_INVENTORY.TOTAL do
+		local item = GetPlayerItem(player, INVENTORY_INDEX.EQUIP, nItemIndex)
+		if item then
+			-- 五行石
+			local aSlotItem = {}
+			for i = 1, item.GetSlotCount() do
+				local nEnchantID = item.GetMountDiamondEnchantID(i - 1)
+				if nEnchantID > 0 then
+					local dwTabType, dwTabIndex = GetDiamondInfoFromEnchantID(nEnchantID)
+					if dwTabType and dwTabIndex then
+						aSlotItem[i] = {dwTabType, dwTabIndex}
+					end
+				end
+			end
+			-- 五彩石
+			local nEnchantID = item.GetMountFEAEnchantID()
+			if nEnchantID ~= 0 then
+				local dwTabType, dwTabIndex = GetColorDiamondInfoFromEnchantID(nEnchantID)
+				if dwTabType and dwTabIndex then
+					aSlotItem[0] = {dwTabType, dwTabIndex}
+				end
+			end
+			-- 插入结果集
+			tEquipInfo[nItemIndex] = {
+				dwTabType = item.dwTabType,
+				dwTabIndex = item.dwIndex,
+				nStrengthLevel = item.nStrengthLevel,
+				aSlotItem = aSlotItem,
+				dwPermanentEnchantID = item.dwPermanentEnchantID,
+				dwTemporaryEnchantID = item.dwTemporaryEnchantID,
+				dwTemporaryEnchantLeftSeconds = item.GetTemporaryEnchantLeftSeconds(),
+			}
+		end
+	end
+	return tEquipInfo
+end
