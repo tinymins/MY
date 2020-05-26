@@ -289,6 +289,7 @@ function PS.OnPanelActive(wnd)
 					end
 					data.szKeyword = szText
 					D.SaveBlockWords()
+					list:ListBox('update', 'id', id, {'text'}, {szText})
 				end, nil, nil, nil, data.szKeyword)
 			end,
 		})
