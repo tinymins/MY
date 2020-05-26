@@ -89,6 +89,8 @@ function D.CheckUpdateAcquire()
 			local nCRC = GetStringCRC('MY_BKR_AhfB6aBL9o$8R9t3ka6Uk6@#^^KHLoMtZCdS@5e2@T_'
 				.. szServerU .. ','
 				.. szNameU .. ','
+				.. szLeaderU .. ','
+				.. szTeammateU .. ','
 				.. p.dwAchieveID .. ','
 				.. p.dwTime .. ',' .. p.nFightTime)
 			local szURL = 'https://bkr.uploads.j3cx.com/api/bkr/uploads?' .. LIB.EncodePostData(LIB.UrlEncode({
