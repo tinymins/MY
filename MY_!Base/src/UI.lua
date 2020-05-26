@@ -43,6 +43,14 @@ local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAD
 -------------------------------------------------------------------------------------------------------
 local _L = LIB.LoadLangPack()
 
+local function CallWithThis(context, fn, ...)
+	local _this = this
+	this = context
+	local rtc = {Call(fn, ...)}
+	this = _this
+	return unpack(rtc)
+end
+
 -------------------------------------
 -- UI object class
 -------------------------------------
@@ -610,7 +618,10 @@ local function InitComponent(raw, szType)
 			end
 			local GetMenu = GetComponentProp(raw, 'GetListItemHandleMenu')
 			if GetMenu then
-				UI.PopupMenu(GetMenu(this, data.text, data.id, data.data, data.selected))
+				local status, menu = CallWithThis(raw, GetMenu, this, data.text, data.id, data.data, data.selected)
+				if status and menu then
+					UI.PopupMenu(menu)
+				end
 			end
 		end)
 		SetComponentProp(raw, 'listboxOptions', { multiSelect = false })
@@ -1996,8 +2007,6 @@ function UI:ListBox(method, arg1, arg2, arg3, arg4)
 					raw:Lookup('', 'Handle_Scroll'):Clear()
 				end
 			end
-		elseif method == 'multiSelect' then
-			self:ListBox('option', 'multiSelect', arg1)
 		elseif method == 'onmenu' then
 			if IsFunction(arg1) then
 				for _, raw in ipairs(self.raws) do
@@ -2126,7 +2135,7 @@ function UI:FadeTo(nTime, nOpacity, callback)
 				if (nStartAlpha - nCurrentAlpha)*(nCurrentAlpha - nOpacity) <= 0 then
 					ui:Alpha(nOpacity)
 					if callback then
-						Call(callback, ui)
+						CallWithThis(raw, callback, ui)
 					end
 					return 0
 				end
@@ -2156,10 +2165,11 @@ function UI:FadeOut(nTime, callback)
 			SetComponentProp(ui, 'nOpacity', ui:Alpha())
 		end
 	end
-	self:FadeTo(nTime, 0, function(ui)
+	self:FadeTo(nTime, 0, function()
+		local ui = UI(this)
 		ui:Toggle(false)
 		if callback then
-			Call(callback, ui)
+			CallWithThis(this, callback)
 		end
 	end)
 	return self
@@ -2189,7 +2199,7 @@ function UI:SlideTo(nTime, nHeight, callback)
 				if (nStartValue - nCurrentValue)*(nCurrentValue - nHeight) <= 0 then
 					ui:Height(nHeight):Toggle( nHeight ~= 0 )
 					if callback then
-						Call(callback)
+						CallWithThis(raw, callback)
 					end
 					return 0
 				end
@@ -3769,16 +3779,10 @@ function UI:Click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 				local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
 				local itm = GetComponentElement(raw, 'ITEM')
 				if wnd and wnd.OnLButtonClick then
-					local _this = this
-					this = wnd
-					Call(wnd.OnLButtonClick)
-					this = _this
+					CallWithThis(wnd, wnd.OnLButtonClick)
 				end
 				if itm and itm.OnItemLButtonClick then
-					local _this = this
-					this = itm
-					Call(itm.OnItemLButtonClick)
-					this = _this
+					CallWithThis(itm, itm.OnItemLButtonClick)
 				end
 			end
 		elseif nFlag==UI.MOUSE_EVENT.MBUTTON then
@@ -3788,16 +3792,10 @@ function UI:Click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 				local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
 				local itm = GetComponentElement(raw, 'ITEM')
 				if wnd and wnd.OnRButtonClick then
-					local _this = this
-					this = wnd
-					Call(wnd.OnRButtonClick)
-					this = _this
+					CallWithThis(wnd, wnd.OnRButtonClick)
 				end
 				if itm and itm.OnItemRButtonClick then
-					local _this = this
-					this = itm
-					Call(itm.OnItemRButtonClick)
-					this = _this
+					CallWithThis(itm, itm.OnItemRButtonClick)
 				end
 			end
 		end
@@ -3990,18 +3988,12 @@ function UI:Change(fnOnChange)
 		for _, raw in ipairs(self.raws) do
 			local edt = GetComponentElement(raw, 'EDIT')
 			if edt and edt.OnEditChanged then
-				local _this = this
-				this = edt
-				Call(edt.OnEditChanged, raw)
-				this = _this
+				CallWithThis(edt, edt.OnEditChanged, raw)
 			end
 			if GetComponentType(raw) == 'WndTrackbar' then
 				local sld = GetComponentElement(raw, 'TRACKBAR')
 				if sld and sld.OnScrollBarPosChanged then
-					local _this = this
-					this = sld
-					Call(sld.OnScrollBarPosChanged, raw)
-					this = _this
+					CallWithThis(sld, sld.OnScrollBarPosChanged, raw)
 				end
 			end
 		end
@@ -4030,7 +4022,7 @@ function UI:Focus(fnOnSetFocus)
 			raw = GetComponentElement(raw, 'EDIT')
 			if raw then
 				UI(raw):UIEvent('OnSetFocus', function()
-					Call(fnOnSetFocus, self)
+					CallWithThis(raw, fnOnSetFocus)
 				end)
 			end
 		end
@@ -4186,7 +4178,7 @@ function  UI.CreateFrame(szName, opt)
 			return true
 		end, function()
 			if frm.OnCloseButtonClick then
-				local status, res = Call(frm.OnCloseButtonClick)
+				local status, res = CallWithThis(frm, frm.OnCloseButtonClick)
 				if status and res then
 					return
 				end
