@@ -111,7 +111,7 @@ function PS.OnPanelActive(wnd)
 	for _, v in ipairs(MY_Focus.GetAllFocusPattern()) do
 		list:ListBox('insert', MY_Focus.FormatRuleText(v), v, v)
 	end
-	list:ListBox('onmenu', function(hItem, szText, oID, tData)
+	list:ListBox('onmenu', function(oID, szText, tData)
 		local t = {{
 			szOption = _L['delete'],
 			fnAction = function()

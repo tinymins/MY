@@ -218,7 +218,7 @@ local function DrawDetail(ui)
 	})
 
 	-- ³õÊ¼»¯list¿Ø¼þ
-	local function onMenu(hItem, szText, szID, data)
+	local function onMenu(szID, szText, data)
 		local mon = data.mon
 		local search = l_search and l_search ~= ''
 		local t1 = {

@@ -557,25 +557,34 @@ local function InitComponent(raw, szType)
 		local scroll = raw:Lookup('', 'Handle_Scroll')
 		SetComponentProp(raw, 'OnListItemHandleMouseEnter', function()
 			local data = GetComponentProp(this, 'listboxItemData')
-			local onHover = GetComponentProp(raw, 'OnListItemHandleCustomHover')
-			if onHover and onHover(this, true, data.text, data.id, data.data, not data.selected) == false then
-				return
+			local onHoverIn = GetComponentProp(raw, 'OnListItemHandleCustomHoverIn')
+			if onHoverIn then
+				local bStatus, bRet = CallWithThis(raw, onHoverIn, data.id, data.text, data.data, not data.selected)
+				if bStatus and bRet == false then
+					return
+				end
 			end
 			UI(this:Lookup('Image_Bg')):FadeIn(100)
 		end)
 		SetComponentProp(raw, 'OnListItemHandleMouseLeave', function()
 			local data = GetComponentProp(this, 'listboxItemData')
-			local onHover = GetComponentProp(raw, 'OnListItemHandleCustomHover')
-			if onHover and onHover(this, false, data.text, data.id, data.data, not data.selected) == false then
-				return
+			local onHoverOut = GetComponentProp(raw, 'OnListItemHandleCustomHoverOut')
+			if onHoverOut then
+				local bStatus, bRet = CallWithThis(raw, onHoverOut, data.id, data.text, data.data, not data.selected)
+				if bStatus and bRet == false then
+					return
+				end
 			end
 			UI(this:Lookup('Image_Bg')):FadeTo(500,0)
 		end)
 		SetComponentProp(raw, 'OnListItemHandleLButtonClick', function()
 			local data = GetComponentProp(this, 'listboxItemData')
-			local onItemClick = GetComponentProp(raw, 'OnListItemHandleCustomLButtonClick')
-			if onItemClick and onItemClick(this, data.text, data.id, data.data, not data.selected) == false then
-				return
+			local onItemLClick = GetComponentProp(raw, 'OnListItemHandleCustomLButtonClick')
+			if onItemLClick then
+				local bStatus, bRet = CallWithThis(raw, onItemLClick, data.id, data.text, data.data, not data.selected)
+				if bStatus and bRet == false then
+					return
+				end
 			end
 			local opt = GetComponentProp(raw, 'listboxOptions')
 			if not data.selected then
@@ -597,9 +606,12 @@ local function InitComponent(raw, szType)
 		end)
 		SetComponentProp(raw, 'OnListItemHandleRButtonClick', function()
 			local data = GetComponentProp(this, 'listboxItemData')
-			local onItemClick = GetComponentProp(raw, 'OnListItemHandleCustomRButtonClick')
-			if onItemClick and onItemClick(this, data.text, data.id, data.data, not data.selected) == false then
-				return
+			local onItemRClick = GetComponentProp(raw, 'OnListItemHandleCustomRButtonClick')
+			if onItemRClick then
+				local bStatus, bRet = CallWithThis(raw, onItemRClick, data.id, data.text, data.data, not data.selected)
+				if bStatus and bRet == false then
+					return
+				end
 			end
 			if not data.selected then
 				local opt = GetComponentProp(raw, 'listboxOptions')
@@ -618,7 +630,7 @@ local function InitComponent(raw, szType)
 			end
 			local GetMenu = GetComponentProp(raw, 'GetListItemHandleMenu')
 			if GetMenu then
-				local status, menu = CallWithThis(raw, GetMenu, this, data.text, data.id, data.data, data.selected)
+				local status, menu = CallWithThis(raw, GetMenu, data.id, data.text, data.data, data.selected)
 				if status and menu then
 					UI.PopupMenu(menu)
 				end
@@ -1852,6 +1864,20 @@ function UI:Autocomplete(method, arg1, arg2)
 end
 
 -- ui listbox interface
+-- (get) list:ListBox('option')
+-- (set) list:ListBox('option', k, v)
+-- (set) list:ListBox('option', {k1=v1, k2=v2})
+-- (set) list:ListBox('select', 'all'|'unselected'|'selected')
+-- (set) list:ListBox('insert', text, id, data, pos)
+-- (set) list:ListBox('insert', text, id, data, {pos=pos, r=r, g=g, b=b})
+-- (set) list:ListBox('exchange', 'id'|'index', k1, k2)
+-- (set) list:ListBox('update', 'id'|'text', k, {'text', 'data'}, {szText, oData})
+-- (set) list:ListBox('delete', 'id'|'text', k)
+-- (set) list:ListBox('clear')
+-- (set) list:ListBox('onmenu', function(id, text, data, selected) end)
+-- (set) list:ListBox('onlclick', function(id, text, data, selected) end)
+-- (set) list:ListBox('onrclick', function(id, text, data, selected) end)
+-- (set) list:ListBox('onhover', function(id, text, data, selected) end, function(id, text, data, selected) end)
 function UI:ListBox(method, arg1, arg2, arg3, arg4)
 	self:_checksum()
 	if method == 'option' and (IsNil(arg1) or (IsString(arg1) and IsNil(arg2))) then -- get
@@ -2035,7 +2061,14 @@ function UI:ListBox(method, arg1, arg2, arg3, arg4)
 			if IsFunction(arg1) then
 				for _, raw in ipairs(self.raws) do
 					if GetComponentType(raw) == 'WndListBox' then
-						SetComponentProp(raw, 'OnListItemHandleCustomHover', arg1)
+						SetComponentProp(raw, 'OnListItemHandleCustomHoverIn', arg1)
+					end
+				end
+			end
+			if IsFunction(arg2) then
+				for _, raw in ipairs(self.raws) do
+					if GetComponentType(raw) == 'WndListBox' then
+						SetComponentProp(raw, 'OnListItemHandleCustomHoverOut', arg2)
 					end
 				end
 			end

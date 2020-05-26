@@ -268,7 +268,7 @@ function PS.OnPanelActive(wnd)
 	for _, bw in ipairs(O.aBlockWords) do
 		list:ListBox('insert', bw.szKeyword, bw.szKeyword, bw)
 	end
-	list:ListBox('onmenu', function(hItem, text, id, data)
+	list:ListBox('onmenu', function(id, text, data)
 		local menu = LIB.GetMsgTypeMenu(function(szType)
 			if data.tMsgType[szType] then
 				data.tMsgType[szType] = nil
@@ -342,7 +342,7 @@ function PS.OnPanelActive(wnd)
 		})
 		menu.szOption = _L['Channels']
 		return menu
-	end):ListBox('onlclick', function(hItem, text, id, data, selected)
+	end):ListBox('onlclick', function(id, text, data, selected)
 		edit:Text(id)
 	end)
 	-- add

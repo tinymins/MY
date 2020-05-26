@@ -214,25 +214,30 @@ function PS.OnPanelActive(wnd)
 	UI_LIST = ui:Append('WndListBox', {
 		x = x, y = y, w = w - x, h = h - y,
 	})
-	UI_LIST:ListBox('onhover', function(list, bIn, text, id, data)
+	UI_LIST:ListBox('onhover', function(id, text, data)
 		if id == 'count' then
 			return false
 		end
-		if bIn and IsCtrlKeyDown() and IsShiftKeyDown() then
+		if IsCtrlKeyDown() and IsShiftKeyDown() then
 			LIB.OutputTip(this, EncodeLUAData(data, '  '))
-		elseif data and bIn and (data.itemInfo.nGenre ~= ITEM_GENRE.BOOK or data.dwRecipeID) then
+		elseif data and (data.itemInfo.nGenre ~= ITEM_GENRE.BOOK or data.dwRecipeID) then
 			LIB.OutputItemInfoTip(data.dwTabType, data.dwIndex, data.dwRecipeID)
 		else
 			HideTip()
 		end
+	end, function(id, text, data)
+		if id == 'count' then
+			return false
+		end
+		HideTip()
 	end)
-	UI_LIST:ListBox('onlclick', function(list, text, id, data)
+	UI_LIST:ListBox('onlclick', function(id, text, data)
 		if data and IsCtrlKeyDown() then
 			LIB.EditBoxInsertItemInfo(data.dwTabType, data.dwIndex, data.dwRecipeID)
 		end
 		return false
 	end)
-	UI_LIST:ListBox('onrclick', function(list, text, id, data)
+	UI_LIST:ListBox('onrclick', function(id, text, data)
 		return false
 	end)
 	Init()
