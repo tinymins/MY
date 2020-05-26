@@ -334,6 +334,47 @@ LIB.RegisterEvent('QUEST_FINISHED', function()
 	end
 end)
 
+LIB.RegisterEvent('OPEN_WINDOW.MY_Serendipity_HouseFlowerPrice', function()
+	if not O.bEnable then
+		return
+	end
+	local tar = GetTargetHandle(GetClientPlayer().GetTarget())
+	if not tar or tar.dwTemplateID ~= 99172 then
+		return
+	end
+	local szUnit, szPrice, szItem = arg1:match(_L['Today I want every (%d-%s-) number sold at (%d-%s-) for (%s+)'])
+	local szMapLine = Station.Lookup('Normal/Minimap/Wnd_Minimap/Wnd_Over', 'Text_Fresher'):GetText()
+	if szUnit then
+		local szServerU = AnsiToUTF8(LIB.GetRealServer(2))
+		local szMapLineU = AnsiToUTF8(szMapLine)
+		local szUnitU = AnsiToUTF8(szUnit)
+		local szPriceU = AnsiToUTF8(szPrice)
+		local szItemU = AnsiToUTF8(szItem)
+		local dwTime = GetCurrentTime()
+		local nCRC = GetStringCRC('MY_r8395yrtsiolty79osd_'
+			.. szServerU .. ','
+			.. szMapLineU .. ','
+			.. szUnitU .. ','
+			.. szPriceU .. ','
+			.. szItemU .. ','
+			.. dwTime)
+		local szURL = 'https://house.uploads.j3cx.com/api/flower/uploads?' .. LIB.EncodePostData(LIB.UrlEncode({
+			s = szServerU,
+			m = szMapLineU,
+			u = szUnitU,
+			p = szPriceU,
+			i = szItemU,
+			t = dwTime,
+			c = nCRC, _ = GetCurrentTime(),
+		}))
+		local tConfig = {
+			url = szURL,
+			driver = 'auto', method = 'auto',
+		}
+		LIB.Ajax(tConfig)
+	end
+end)
+
 LIB.RegisterInit(function()
 	LIB.RegisterTutorial({
 		szKey = 'MY_Serendipity',
