@@ -417,6 +417,9 @@ local EVERYTHING_TYPE = {
 	ONLINE = 4,
 	BUFF_UPDATE = 5,
 	ENTER_LEAVE_SCENE = 6,
+	SYS_MSG = 7,
+	PLAYER_SAY = 8,
+	WARNING_MESSAGE = 9,
 }
 local VERSION = 2
 
@@ -1768,6 +1771,53 @@ for _, v in ipairs({
 		)
 	end)
 end
+-- ÏµÍ³ÏûÏ¢ÈÕÖ¾
+LIB.RegisterMsgMonitor('MY_Recount_DS_Everything', function(szMsg, nFont, bRich)
+	if not O.bEnable then
+		return
+	end
+	if bRich then
+		szMsg = LIB.GetPureText(szMsg)
+	end
+	local nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
+	D.InsertEverything(
+		Data, nLFC, nTime, nTick,
+		EVERYTHING_TYPE.SYS_MSG, szMsg:gsub('\r', '')
+	)
+end, { 'MSG_SYS' })
+-- ½ÇÉ«º°»°ÈÕÖ¾
+LIB.RegisterEvent('PLAYER_SAY', function()
+	if not O.bEnable then
+		return
+	end
+	if not IsPlayer(arg1) then
+		local szText = LIB.GetPureText(arg0)
+		if szText and szText ~= '' then
+			local npc = GetNpc(arg1)
+			local nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
+			D.InsertEverything(
+				Data, nLFC, nTime, nTick,
+				EVERYTHING_TYPE.PLAYER_SAY,
+				-- szContent, dwNpcID, szNpcName, dwNpcTemplateID
+				szText, arg1, arg3 == '' and '%' or arg3, npc and npc.dwTemplateID or 0
+			)
+		end
+	end
+end)
+-- ÏµÍ³¾¯¸æ¿òÈÕÖ¾
+LIB.RegisterEvent('ON_WARNING_MESSAGE', function()
+	if not O.bEnable then
+		return
+	end
+	local nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
+	D.InsertEverything(
+		Data, nLFC, nTime, nTick,
+		EVERYTHING_TYPE.WARNING_MESSAGE,
+		-- szContent
+		arg1
+	)
+end)
+-- ËÀÍöÈÕÖ¾
 LIB.RegisterEvent('SYS_MSG', function()
 	if not O.bEnable then
 		return
@@ -1787,6 +1837,7 @@ LIB.RegisterEvent('SYS_MSG', function()
 		)
 	end
 end)
+-- ÉÏÏßÏÂÏßÈÕÖ¾
 LIB.RegisterEvent('PARTY_SET_MEMBER_ONLINE_FLAG', function()
 	if not O.bEnable then
 		return
@@ -1810,6 +1861,7 @@ LIB.RegisterEvent('PARTY_SET_MEMBER_ONLINE_FLAG', function()
 		end
 	end
 end)
+-- ½ø³öÕ½¶·ÔÝÀë¼ÇÂ¼
 LIB.RegisterEvent('MY_RECOUNT_NEW_FIGHT', function() -- ¿ªÕ½É¨Ãè¶ÓÓÑ ¼ÇÂ¼¿ªÕ½¾ÍËÀµô/µôÏßµÄÈË
 	if not O.bEnable then
 		return
@@ -1829,7 +1881,8 @@ LIB.RegisterEvent('MY_RECOUNT_NEW_FIGHT', function() -- ¿ªÕ½É¨Ãè¶ÓÓÑ ¼ÇÂ¼¿ªÕ½¾ÍË
 		end
 	end
 end)
-LIB.RegisterEvent('PARTY_ADD_MEMBER', function() -- ÖÐÍ¾ÓÐÈË½ø¶Ó ²¹ÉÏÔÝÀë¼ÇÂ¼
+-- ÖÐÍ¾ÓÐÈË½ø¶Ó ²¹ÉÏÔÝÀë¼ÇÂ¼
+LIB.RegisterEvent('PARTY_ADD_MEMBER', function()
 	if not O.bEnable then
 		return
 	end

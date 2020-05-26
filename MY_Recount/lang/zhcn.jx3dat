@@ -119,6 +119,9 @@ return {
     ['effect healed %d'] = '其中有效治疗%d点',
     ['Online'] = '上线',
     ['Offline'] = '离线',
+    ['System'] = '系统',
+    ['Talk'] = '喊话',
+    ['Warning'] = '警告',
     ['[%s] get online.'] = '[%s]上线了。',
     ['[%s] get offline.'] = '[%s]离线了。',
 

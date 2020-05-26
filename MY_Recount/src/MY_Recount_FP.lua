@@ -144,6 +144,15 @@ local COLUMN_LIST = {
 			if rec[4] == EVERYTHING_TYPE.ENTER_LEAVE_SCENE then
 				return GetFormatText(_L['Target'])
 			end
+			if rec[4] == EVERYTHING_TYPE.SYS_MSG then
+				return GetFormatText(_L['System'])
+			end
+			if rec[4] == EVERYTHING_TYPE.PLAYER_SAY then
+				return GetFormatText(_L['Talk'])
+			end
+			if rec[4] == EVERYTHING_TYPE.WARNING_MESSAGE then
+				return GetFormatText(_L['Warning'])
+			end
 			return GetFormatText('-')
 		end,
 		Compare = GeneCommonCompare('*', 4)
@@ -176,6 +185,15 @@ local COLUMN_LIST = {
 			end
 			if rec[4] == EVERYTHING_TYPE.ENTER_LEAVE_SCENE then
 				return GetFormatText(rec[8])
+			end
+			if rec[4] == EVERYTHING_TYPE.SYS_MSG then
+				return GetFormatText(_L['System'])
+			end
+			if rec[4] == EVERYTHING_TYPE.PLAYER_SAY then
+				return GetFormatText(rec[7])
+			end
+			if rec[4] == EVERYTHING_TYPE.WARNING_MESSAGE then
+				return GetFormatText(_L['System'])
 			end
 			return GetFormatText('-')
 		end,
@@ -320,6 +338,15 @@ local COLUMN_LIST = {
 					.. (rec[5] == 1 and _L['Appear'] or _L['Disappear'])
 					.. _L['.'])
 			end
+			if rec[4] == EVERYTHING_TYPE.SYS_MSG then
+				return GetFormatText(rec[5])
+			end
+			if rec[4] == EVERYTHING_TYPE.PLAYER_SAY then
+				return GetFormatText(rec[5])
+			end
+			if rec[4] == EVERYTHING_TYPE.WARNING_MESSAGE then
+				return GetFormatText(rec[5])
+			end
 			return GetFormatText('-')
 		end,
 	},
@@ -384,6 +411,9 @@ function D.MatchRecSearch(data, rec, szSearch, nSearch, bEffectName, bCaster, bT
 		or (szSearch == _L['Target'] and rec[4] == EVERYTHING_TYPE.ENTER_LEAVE_SCENE)
 		or (szSearch == _L['Appear'] and rec[4] == EVERYTHING_TYPE.ENTER_LEAVE_SCENE and rec[5] == 1)
 		or (szSearch == _L['Disappear'] and rec[4] == EVERYTHING_TYPE.ENTER_LEAVE_SCENE and rec[5] == 0)
+		or (szSearch == _L['System'] and rec[4] == EVERYTHING_TYPE.SYS_MSG)
+		or (szSearch == _L['Talk'] and rec[4] == EVERYTHING_TYPE.PLAYER_SAY)
+		or (szSearch == _L['Warning'] and rec[4] == EVERYTHING_TYPE.WARNING_MESSAGE)
 		or (rec[4] == EVERYTHING_TYPE.DEATH and (
 			wfind(rec[7] or '', szSearch)
 			or wfind(rec[8] or '', szSearch)
@@ -413,6 +443,11 @@ function D.MatchRecSearch(data, rec, szSearch, nSearch, bEffectName, bCaster, bT
 			nSearch == rec[7]
 			or wfind(rec[8] or '', szSearch))
 		)
+		or (rec[4] == EVERYTHING_TYPE.PLAYER_SAY and wfind(rec[6] or '', szSearch))
+		or ((rec[4] == EVERYTHING_TYPE.SYS_MSG
+				or rec[4] == EVERYTHING_TYPE.PLAYER_SAY
+				or rec[4] == EVERYTHING_TYPE.WARNING_MESSAGE)
+			and wfind(rec[5], szSearch))
 	) then
 		return true
 	end
