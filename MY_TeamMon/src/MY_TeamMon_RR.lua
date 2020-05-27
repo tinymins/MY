@@ -296,7 +296,7 @@ function D.DownloadMeta(info, onSuccess, onError)
 		success = function(szHTML)
 			local res = LIB.JsonDecode(szHTML)
 			if not res then
-				return onError(_L['ERR: Info content is illegal!'])
+				return SafeCall(onError, _L['ERR: Info content is illegal!'])
 			end
 			local info = {
 				szURL = szURL,
@@ -318,7 +318,7 @@ function D.DownloadMeta(info, onSuccess, onError)
 		end,
 		error = function(html, status)
 			if status == 404 then
-				return onError(_L['ERR404: Meta address not found!'])
+				return SafeCall(onError, _L['ERR404: Meta address not found!'])
 			end
 			--[[#DEBUG BEGIN]]
 			LIB.Debug(_L['MY_TeamMon_RR'], 'ERROR Get Meta: ' .. status .. '\n' .. UTF8ToAnsi(html), DEBUG_LEVEL.WARNING)
