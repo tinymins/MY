@@ -1811,6 +1811,9 @@ function LIB.JsonDecode(value)
 	if res then
 		return err
 	end
+	if IsString(err) then
+		err = err:gsub('^[^\n]-%.lua%:%d+%:', '')
+	end
 	return nil, err, trace
 end
 
