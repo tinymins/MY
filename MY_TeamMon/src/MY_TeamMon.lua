@@ -2017,7 +2017,7 @@ function D.SaveConfigureFile(config)
 			szPath = szPath .. '.' .. config.eType:lower():sub(6)
 		end
 		szPath = szPath .. '.json'
-		SaveDataToFile(LIB.JsonEncode(data, config.eType == 'JSON_FORMATED' and '\t' or nil), szPath)
+		SaveDataToFile(LIB.JsonEncode(data, config.eType == 'JSON_FORMATED'), szPath)
 	else
 		if config.eType ~= 'LUA' then
 			szPath = szPath .. '.' .. config.eType:lower():sub(5)
