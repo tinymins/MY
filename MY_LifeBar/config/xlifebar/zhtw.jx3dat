@@ -294,5 +294,28 @@ local __TEMPLATE__ = {
 		},
 		Foe = { Player = { bEnable = false, bOnlyFighting = false } },
 	},
+	ShowBalloon = {
+		Self = {
+			Npc = { bEnable = true },
+			Player = { bEnable = true },
+		},
+		Party = {
+			Npc = { bEnable = true },
+			Player = { bEnable = true },
+		},
+		Enemy = {
+			Npc = { bEnable = true },
+			Player = { bEnable = true },
+		},
+		Neutrality = {
+			Npc = { bEnable = true },
+			Player = { bEnable = true },
+		},
+		Ally = {
+			Npc = { bEnable = true },
+			Player = { bEnable = true },
+		},
+		Foe = { Player = { bEnable = true } },
+	},
 }
 return { __TEMPLATE__, __META__ }

@@ -281,6 +281,60 @@ function HP:ClearSFX()
 	return self:SetSFX()
 end
 
+function HP:SetBalloon(szMsg, nStartTick, nDuring, nOffsetY)
+	if self:IsHandleValid() then
+		local balloon = self.handle:Lookup('balloon')
+		local szKey = 'MY_LIFEBAR_HP_BALLOON_' .. self.dwType .. '_' .. self.dwID
+		local dwCtcType = self.dwType == TARGET.DOODAD and CTCT.DOODAD_POS_2_SCREEN_POS or CTCT.CHARACTER_TOP_2_SCREEN_POS
+		if szMsg then
+			if not balloon then
+				self.handle:AppendItemFromString('<handle>name="balloon" <image>name="Image_Bg1" path="ui\\Image\\UICommon\\CommonPanel.UITex" frame=21 postype=0 imagetype=10</image><image>name="Image_Bg2" path="ui\\Image\\Common\\CommonPanel.UITex" frame=71 postype=0 disablescale=1</image><handle>name="content" x=20 y=10 </handle></handle>')
+				balloon = self.handle:Lookup('balloon')
+			end
+			local hContent = balloon:Lookup('content')
+			hContent:Clear()
+			hContent:AppendItemFromString(szMsg)
+			hContent:SetW(350)
+			hContent:FormatAllItemPos()
+			hContent:SetSizeByAllItemSize()
+			balloon:SetSize(max(hContent:GetW() + 40, 50), hContent:GetH() + 20)
+			balloon:Lookup('Image_Bg1'):SetSize(balloon:GetSize())
+			balloon:Lookup('Image_Bg2'):SetRelPos(balloon:GetW() * 3 / 4, balloon:GetH() - 3)
+			balloon:FormatAllItemPos()
+			local nEndTick = nStartTick + nDuring
+			local nAnimationTime = min(nDuring / 5, 1000)
+			balloon:Show()
+			balloon:SetAlpha(0)
+			local nTick, nX, nY, bFront, nAni
+			LIB.RenderCall(szKey, function()
+				nTick = GetTime()
+				if balloon and balloon:IsValid() and nTick <= nEndTick then
+					nX, nY, bFront = LIB.CThreadCoor(dwCtcType, self.dwID)
+					nX, nY = Station.AdjustToOriginalPos(nX, nY)
+					balloon:SetAbsPos(nX - balloon:GetW() / 2, nY - nOffsetY - balloon:GetH())
+					nAni = min((nTick - nStartTick) * 2, nEndTick - nTick) -- 出现比消失快一倍比较舒服
+					balloon:SetAlpha(nAni > nAnimationTime and 255 or nAni / nAnimationTime * 255)
+				else
+					LIB.CThreadCoor(dwCtcType, self.dwID, szKey, false)
+					LIB.RenderCall(szKey, false)
+				end
+			end)
+			LIB.CThreadCoor(dwCtcType, self.dwID, szKey, true)
+		else
+			if balloon and balloon:IsValid() then
+				balloon:Hide()
+			end
+			LIB.RenderCall(szKey, false)
+			LIB.CThreadCoor(dwCtcType, self.dwID, szKey, false)
+		end
+	end
+	return self
+end
+
+function HP:ClearBalloon()
+	return self:SetBalloon()
+end
+
 function MY_LifeBar_HP(dwType, dwID)
 	if dwType == 'clear' then
 		CACHE = {}

@@ -401,7 +401,7 @@ function PS.OnPanelActive(wnd)
 	-- 右半边
 	X = 350
 	x, y = X, Y
-	offsety = 27
+	offsety = 24
 
 	-- 颜色设置
 	ui:Append('WndComboBox', {
@@ -462,9 +462,9 @@ function PS.OnPanelActive(wnd)
 					insert(t, opt)
 				end
 			end
-			insert(t,{ bDevide = true } )
+			insert(t, { bDevide = true } )
 			-- NCP颜色设置
-			insert(t,{ szOption = _L['Npc color config'], bDisable = true } )
+			insert(t, { szOption = _L['Npc color config'], bDisable = true } )
 			for relation, cfg in pairs(Config.Color) do
 				if cfg.Npc then
 					local opt = {}
@@ -520,7 +520,7 @@ function PS.OnPanelActive(wnd)
 			insert(t, { bDevide = true })
 		end
 		if szNpcTip then
-			insert(t,{ szOption = szNpcTip, bDisable = true } )
+			insert(t, { szOption = szNpcTip, bDisable = true } )
 			for relation, cfg in pairs(cfgs) do
 				if cfg.Npc then
 					insert(t, {
@@ -625,6 +625,48 @@ function PS.OnPanelActive(wnd)
 					Config.bHideLifePercentageDecimal = not Config.bHideLifePercentageDecimal
 				end,
 			})
+			return t
+		end,
+		autoenable = function() return D.IsEnabled() end,
+	})
+	y = y + offsety
+
+	-- 显示对话泡泡
+	ui:Append('WndComboBox', {
+		x = x, y = y, text = _L['Balloon display config'],
+		menu = function()
+			local t = {}
+			insert(t, { szOption = _L['Player balloon display'], bDisable = true } )
+			for relation, cfg in pairs(Config.ShowBalloon) do
+				if cfg.Player then
+					insert(t, {
+						szOption = _L[relation],
+						rgb = Config.Color[relation].Player,
+						bCheck = true,
+						bChecked = cfg.Player.bEnable,
+						fnAction = function()
+							cfg.Player.bEnable = not cfg.Player.bEnable
+							D.Reset()
+						end,
+					})
+				end
+			end
+			insert(t, { bDevide = true })
+			insert(t, { szOption = _L['Npc balloon display'], bDisable = true } )
+			for relation, cfg in pairs(Config.ShowBalloon) do
+				if cfg.Npc then
+					insert(t, {
+						szOption = _L[relation],
+						rgb = Config.Color[relation].Npc,
+						bCheck = true,
+						bChecked = cfg.Npc.bEnable,
+						fnAction = function()
+							cfg.Npc.bEnable = not cfg.Npc.bEnable
+							D.Reset()
+						end,
+					})
+				end
+			end
 			return t
 		end,
 		autoenable = function() return D.IsEnabled() end,
@@ -812,7 +854,7 @@ function PS.OnPanelActive(wnd)
 		autoenable = function() return D.IsEnabled() end,
 	})
 
-	y = y + offsety
+	y = y + offsety - 5
 	ui:Append('WndButton', {
 		x = x, y = y, w = 65,
 		text = _L['Font'],
@@ -825,7 +867,7 @@ function PS.OnPanelActive(wnd)
 	})
 
 	ui:Append('WndButton', {
-		x = x + 65, y = y, w = 120, text = _L['reset config'],
+		x = x + 65, y = y, w = 125, text = _L['reset config'],
 		onclick = function()
 			Config('reset')
 		end,

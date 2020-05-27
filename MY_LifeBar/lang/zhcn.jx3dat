@@ -33,6 +33,10 @@ return {
     ['Player lifepercentage display'] = '玩家百分比显示',
     ['Npc lifepercentage display'] = 'NPC百分比显示',
 
+    ['Balloon display config'] = '聊天泡泡显示设置',
+    ['Player balloon display'] = '玩家聊天泡泡显示',
+    ['Npc balloon display'] = 'NPC聊天泡泡显示',
+
     ['Show special npc'] = '显示特殊NPC',
     ['Only enemy'] = '仅敌对',
     ['Show object id'] = '显示ID',

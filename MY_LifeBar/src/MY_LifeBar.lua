@@ -767,6 +767,64 @@ LIB.RegisterEvent('MY_LIFEBAR_COUNTDOWN', function()
 	end
 end)
 
+-----------------------------------------------------------------------------------------
+-- ¶Ô»°ÅÝÅÝ
+-----------------------------------------------------------------------------------------
+local BALLOON_CHANNEL = {
+	[PLAYER_TALK_CHANNEL.NEARBY] = true,
+	[PLAYER_TALK_CHANNEL.RAID] = true,
+	[PLAYER_TALK_CHANNEL.TEAM] = true,
+	[PLAYER_TALK_CHANNEL.TONG] = true,
+	[PLAYER_TALK_CHANNEL.SENCE] = true,
+	[PLAYER_TALK_CHANNEL.BATTLE_FIELD] = true,
+	[PLAYER_TALK_CHANNEL.NPC_NEARBY] = true,
+	[PLAYER_TALK_CHANNEL.NPC_PARTY] = true,
+	[PLAYER_TALK_CHANNEL.NPC_SENCE] = true,
+	[PLAYER_TALK_CHANNEL.NPC_SAY_TO] = true,
+	[PLAYER_TALK_CHANNEL.NPC_YELL_TO] = true,
+	[PLAYER_TALK_CHANNEL.BATTLE_FIELD_SIDE] = true,
+}
+
+local function OnCharacterSay(dwID, nChannel, szText)
+	if not BALLOON_CHANNEL[nChannel] then
+		return
+	end
+	if dwID == 0 then
+		return
+	end
+	local dwType = IsPlayer(dwID) and TARGET.PLAYER or TARGET.NPC
+	local object = LIB.GetObject(dwType, dwID)
+	if not object then
+		return
+	end
+	local lb = LB_CACHE[dwID]
+	if not lb then
+		return
+	end
+	local me = GetClientPlayer()
+	local scene = me.GetScene()
+	if dwType == TARGET.PLAYER and IsEnemy(me.dwID, dwID) and (scene.bIsArenaMap or LIB.IsShieldedMap(scene.dwMapID)) then
+		return
+	end
+	local relation = D.GetRelation(me.dwID, dwID, me, object)
+	local force = D.GetForce(dwType, dwID, object)
+	local cfg = GetConfigValue('ShowBalloon', relation, force)
+	if not cfg.bEnable then
+		return
+	end
+	lb:SetBalloon(szText, GetTime())
+end
+
+LIB.RegisterEvent('CHARACTER_SAY', function()
+	local szText = Table_GetSmartDialog(arg3, arg0)
+	szText = GetFormatText(szText)
+	OnCharacterSay(arg1, arg2, szText)
+end)
+
+LIB.RegisterEvent('PLAYER_SAY', function()
+	OnCharacterSay(arg1, arg2, arg0)
+end)
+
 local function onSwitch()
 	MY_LifeBar.bEnabled = not MY_LifeBar.bEnabled
 	D.Reset(true)

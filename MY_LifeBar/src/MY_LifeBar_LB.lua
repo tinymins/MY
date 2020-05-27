@@ -115,6 +115,11 @@ local function InitConfigData(self)
 	self.sfx_w = 0
 	self.sfx_h = 0
 	self.sfx_invalid = true
+	-- ÅÝÅÝ
+	self.balloon_msg = ''
+	self.balloon_start = 0
+	self.balloon_during = 0
+	self.balloon_invalid = true
 end
 
 -- ¹¹Ôìº¯Êý
@@ -131,6 +136,7 @@ function LB:Create()
 	if not self.hp.handle then
 		self.hp:Create()
 		self:SetInvalid('sfx', true)
+		self:SetInvalid('balloon', true)
 		self:SetInvalid('texts', true)
 		self:SetInvalid('priority', true)
 		self:SetInvalid('life_text', true)
@@ -160,6 +166,7 @@ function LB:Paint(force)
 		self:DrawLife(force)
 		self:DrawTexts(force)
 		self:ApplySFX(force)
+		self:ApplyBalloon(force)
 		self:ApplyPriority(force)
 	end
 	return self
@@ -193,6 +200,7 @@ function LB:SetScale(scale)
 	if self.scale ~= scale then
 		self.scale = scale
 		self:SetInvalid('sfx', true)
+		self:SetInvalid('balloon', true)
 		self:SetInvalid('texts', true)
 		self:SetInvalid('life_text', true)
 		self:SetInvalid('life_bar', true)
@@ -231,6 +239,7 @@ function LB:SetTextsPos(y, height)
 		self.texts_y = y
 		self.texts_height = height
 		self:SetInvalid('sfx', true)
+		self:SetInvalid('balloon', true)
 		self:SetInvalid('texts', true)
 	end
 	return self
@@ -394,6 +403,7 @@ function LB:DrawTexts(force)
 		if self.texts_lines ~= texts_lines then
 			self.texts_lines = texts_lines
 			self:SetInvalid('sfx', true)
+			self:SetInvalid('balloon', true)
 		end
 		self.texts_invalid = false
 	end
@@ -520,10 +530,10 @@ function LB:SetSFX(file, scale, y, w, h)
 	if self.sfx_file ~= file or self.sfx_y ~= y
 	or self.sfx_scale ~= scale or self.sfx_w ~= w or self.sfx_h ~= h then
 		self.sfx_file = file
-		self.sfx_scale = scale
-		self.sfx_y = y
-		self.sfx_w = w
-		self.sfx_h = h
+		self.sfx_scale = scale or 0
+		self.sfx_y = y or 0
+		self.sfx_w = w or 0
+		self.sfx_h = h or 0
 		self:SetInvalid('sfx', true)
 	end
 	return self
@@ -547,6 +557,38 @@ function LB:ApplySFX(force)
 			self.hp:ClearSFX()
 		end
 		self.sfx_invalid = false
+	end
+	return self
+end
+
+function LB:SetBalloon(msg, tick)
+	if self.balloon_msg ~= msg or self.balloon_start ~= tick then
+		self.balloon_msg = msg
+		self.balloon_start = tick
+		self.balloon_during = 9000
+		self:SetInvalid('balloon', true)
+	end
+	return self
+end
+
+function LB:ClearBalloon()
+	return self:SetBalloon()
+end
+
+function LB:ApplyBalloon(force)
+	if self.balloon_invalid or force then
+		if self.balloon_msg then
+			self.hp:SetBalloon(
+				self.balloon_msg,
+				self.balloon_start,
+				self.balloon_during,
+				self.sfx_h * self.sfx_scale / Station.GetUIScale() * self.scale
+				+ (self.texts_y + self.texts_height * self.texts_scale * self.texts_lines + self.sfx_y) / Station.GetUIScale() * self.scale
+			)
+		else
+			self.hp:ClearBalloon()
+		end
+		self.balloon_invalid = false
 	end
 	return self
 end
