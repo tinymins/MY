@@ -1129,6 +1129,7 @@ local NEARBY_NPC = {}      -- 附近的NPC
 local NEARBY_PET = {}      -- 附近的PET
 local NEARBY_PLAYER = {}   -- 附近的物品
 local NEARBY_DOODAD = {}   -- 附近的玩家
+local NEARBY_FIGHT = {}    -- 附近玩家和NPC战斗状态缓存
 
 -- 获取指定对象
 -- (KObject, info, bIsInfo) LIB.GetObject([number dwType, ]number dwID)
@@ -1593,19 +1594,42 @@ function LIB.GetNearDoodadTable()
 end
 end
 
+LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '#FIGHT_HINT_TRIGGER', function()
+	for dwID, tar in pairs(NEARBY_NPC) do
+		if tar.bFightState ~= NEARBY_FIGHT[dwID] then
+			NEARBY_FIGHT[dwID] = tar.bFightState
+			FireUIEvent('MY_NPC_FIGHT_HINT', dwID, tar.bFightState)
+		end
+	end
+	for dwID, tar in pairs(NEARBY_PLAYER) do
+		if tar.bFightState ~= NEARBY_FIGHT[dwID] then
+			NEARBY_FIGHT[dwID] = tar.bFightState
+			FireUIEvent('MY_PLAYER_FIGHT_HINT', dwID, tar.bFightState)
+		end
+	end
+end)
 LIB.RegisterEvent('NPC_ENTER_SCENE', function()
 	local npc = GetNpc(arg0)
 	if npc and npc.dwEmployer ~= 0 then
 		NEARBY_PET[arg0] = npc
 	end
 	NEARBY_NPC[arg0] = npc
+	NEARBY_FIGHT[arg0] = npc and npc.bFightState or false
 end)
 LIB.RegisterEvent('NPC_LEAVE_SCENE', function()
 	NEARBY_PET[arg0] = nil
 	NEARBY_NPC[arg0] = nil
+	NEARBY_FIGHT[arg0] = nil
 end)
-LIB.RegisterEvent('PLAYER_ENTER_SCENE', function() NEARBY_PLAYER[arg0] = GetPlayer(arg0) end)
-LIB.RegisterEvent('PLAYER_LEAVE_SCENE', function() NEARBY_PLAYER[arg0] = nil end)
+LIB.RegisterEvent('PLAYER_ENTER_SCENE', function()
+	local player = GetPlayer(arg0)
+	NEARBY_PLAYER[arg0] = player
+	NEARBY_FIGHT[arg0] = player and player.bFightState or false
+end)
+LIB.RegisterEvent('PLAYER_LEAVE_SCENE', function()
+	NEARBY_PLAYER[arg0] = nil
+	NEARBY_FIGHT[arg0] = nil
+end)
 LIB.RegisterEvent('DOODAD_ENTER_SCENE', function() NEARBY_DOODAD[arg0] = GetDoodad(arg0) end)
 LIB.RegisterEvent('DOODAD_LEAVE_SCENE', function() NEARBY_DOODAD[arg0] = nil end)
 end
