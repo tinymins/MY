@@ -519,7 +519,7 @@ function PS.OnPanelActive(wnd)
 		w = w, h = h - 30,
 		listbox = {{
 			'onlclick',
-			function(hItem, szText, szID, data, bSelected)
+			function(szID, szText, data, bSelected)
 				MY_Anmerkungen.OpenPlayerNoteEditPanel(data.dwID, data.szName)
 				return false
 			end,
