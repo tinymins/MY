@@ -153,6 +153,9 @@ local COLUMN_LIST = {
 			if rec[4] == EVERYTHING_TYPE.WARNING_MESSAGE then
 				return GetFormatText(_L['Warning'])
 			end
+			if rec[4] == EVERYTHING_TYPE.FIGHT_HINT then
+				return GetFormatText(_L['Fight hint'])
+			end
 			return GetFormatText('-')
 		end,
 		Compare = GeneCommonCompare('*', 4)
@@ -195,6 +198,9 @@ local COLUMN_LIST = {
 			if rec[4] == EVERYTHING_TYPE.WARNING_MESSAGE then
 				return GetFormatText(_L['System'])
 			end
+			if rec[4] == EVERYTHING_TYPE.FIGHT_HINT then
+				return GetFormatText(rec[7] and _L['Start fight'] or _L['Finish fight'])
+			end
 			return GetFormatText('-')
 		end,
 		Compare = GeneCommonCompare({[EVERYTHING_TYPE.SKILL_EFFECT] = 10, [EVERYTHING_TYPE.BUFF_UPDATE] = 9})
@@ -213,6 +219,9 @@ local COLUMN_LIST = {
 			end
 			if rec[4] == EVERYTHING_TYPE.DEATH then
 				return GetFormatText(rec[8] or rec[6])
+			end
+			if rec[4] == EVERYTHING_TYPE.FIGHT_HINT then
+				return GetFormatText(rec[8])
 			end
 			return GetFormatText('-')
 		end,
@@ -347,6 +356,9 @@ local COLUMN_LIST = {
 			if rec[4] == EVERYTHING_TYPE.WARNING_MESSAGE then
 				return GetFormatText(rec[5])
 			end
+			if rec[4] == EVERYTHING_TYPE.FIGHT_HINT then
+				return GetFormatText(_L(rec[7] and '[%s] start fight.' or '[%s] finish fight.', rec[8]))
+			end
 			return GetFormatText('-')
 		end,
 	},
@@ -414,6 +426,7 @@ function D.MatchRecSearch(data, rec, szSearch, nSearch, bEffectName, bCaster, bT
 		or (szSearch == _L['System'] and rec[4] == EVERYTHING_TYPE.SYS_MSG)
 		or (szSearch == _L['Talk'] and rec[4] == EVERYTHING_TYPE.PLAYER_SAY)
 		or (szSearch == _L['Warning'] and rec[4] == EVERYTHING_TYPE.WARNING_MESSAGE)
+		or (szSearch == _L['Fight hint'] and rec[4] == EVERYTHING_TYPE.FIGHT_HINT)
 		or (rec[4] == EVERYTHING_TYPE.DEATH and (
 			wfind(rec[7] or '', szSearch)
 			or wfind(rec[8] or '', szSearch)
@@ -448,6 +461,10 @@ function D.MatchRecSearch(data, rec, szSearch, nSearch, bEffectName, bCaster, bT
 				or rec[4] == EVERYTHING_TYPE.PLAYER_SAY
 				or rec[4] == EVERYTHING_TYPE.WARNING_MESSAGE)
 			and wfind(rec[5], szSearch))
+		or (rec[4] == EVERYTHING_TYPE.FIGHT_HINT and (
+			nSearch == rec[6]
+			or wfind(rec[8], szSearch)
+		))
 	) then
 		return true
 	end
@@ -729,6 +746,25 @@ function D.OutputTip(this, rec)
 	if rec[4] == EVERYTHING_TYPE.ENTER_LEAVE_SCENE then
 		-- 模板ID
 		if rec[6] == TARGET.NPC or rec[6] == TARGET.DOODAD then
+			insert(aXml, GetFormatText(_L['TemplateID']))
+			insert(aXml, GetFormatText(':  '))
+			insert(aXml, GetFormatText(rec[9]))
+			insert(aXml, GetFormatText('\n'))
+		end
+		-- 血量
+		insert(aXml, GetFormatText(_L['Life']))
+		insert(aXml, GetFormatText(':  '))
+		insert(aXml, GetFormatText(rec[10] .. '/' .. rec[11]))
+		insert(aXml, GetFormatText('\n'))
+		-- 内力
+		insert(aXml, GetFormatText(_L['Mana']))
+		insert(aXml, GetFormatText(':  '))
+		insert(aXml, GetFormatText(rec[12] .. '/' .. rec[13]))
+		insert(aXml, GetFormatText('\n'))
+	end
+	if rec[4] == EVERYTHING_TYPE.FIGHT_HINT then
+		-- 模板ID
+		if rec[5] == TARGET.NPC then
 			insert(aXml, GetFormatText(_L['TemplateID']))
 			insert(aXml, GetFormatText(':  '))
 			insert(aXml, GetFormatText(rec[9]))

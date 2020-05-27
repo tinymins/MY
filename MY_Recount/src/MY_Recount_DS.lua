@@ -420,6 +420,7 @@ local EVERYTHING_TYPE = {
 	SYS_MSG = 7,
 	PLAYER_SAY = 8,
 	WARNING_MESSAGE = 9,
+	FIGHT_HINT = 10,
 }
 local VERSION = 2
 
@@ -1815,6 +1816,38 @@ LIB.RegisterEvent('ON_WARNING_MESSAGE', function()
 		EVERYTHING_TYPE.WARNING_MESSAGE,
 		-- szContent
 		arg1
+	)
+end)
+-- 进入退出战斗日志
+LIB.RegisterEvent({'MY_NPC_FIGHT_HINT', 'MY_PLAYER_FIGHT_HINT'}, function(e)
+	if not O.bEnable then
+		return
+	end
+	local nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
+	local dwType = e == 'MY_NPC_FIGHT_HINT' and TARGET.NPC or TARGET.PLAYER
+	local dwID, bFight, dwTemplateID = arg0, arg1, 0
+	local KObject = LIB.GetObject(dwType, dwID)
+	local szName = LIB.GetObjectName(KObject, 'never') or ''
+	local nCurrentLife, nMaxLife, nCurrentMana, nMaxMana = 0, 0
+	if KObject then
+		nCurrentLife, nMaxLife = KObject.nCurrentLife, KObject.nMaxLife
+		nCurrentMana, nMaxMana = KObject.nCurrentMana, KObject.nMaxMana
+	end
+	if dwType == TARGET.NPC or dwType == TARGET.DOODAD then
+		if KObject then
+			dwTemplateID = KObject.dwTemplateID
+		end
+	elseif dwType == TARGET.PLAYER then
+		if not LIB.IsParty(dwID) then
+			return
+		end
+	end
+	D.InsertEverything(
+		Data, nLFC, nTime, nTick,
+		EVERYTHING_TYPE.FIGHT_HINT,
+		dwType, dwID, bFight,
+		szName, dwTemplateID,
+		nCurrentLife, nMaxLife, nCurrentMana, nMaxMana
 	)
 end)
 -- 死亡日志

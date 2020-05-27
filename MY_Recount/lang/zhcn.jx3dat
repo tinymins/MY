@@ -122,6 +122,11 @@ return {
     ['System'] = '系统',
     ['Talk'] = '喊话',
     ['Warning'] = '警告',
+    ['Fight hint'] = '战斗',
+    ['Start fight'] = '进入战斗',
+    ['Finish fight'] = '结束战斗',
+    ['[%s] start fight.'] = '[%s]进入战斗。',
+    ['[%s] finish fight.'] = '[%s]结束战斗。',
     ['[%s] get online.'] = '[%s]上线了。',
     ['[%s] get offline.'] = '[%s]离线了。',
 
