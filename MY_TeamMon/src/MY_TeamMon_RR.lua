@@ -189,6 +189,10 @@ local function GetURL(szURL, szType)
 			szProvider = DEFAULT_PROVIDER
 		end
 		szSimple = szUser .. szSimple
+		szSimple = LIB.UrlEncode(AnsiToUTF8(szSimple))
+		szUser = LIB.UrlEncode(AnsiToUTF8(szUser))
+		szProject = LIB.UrlEncode(AnsiToUTF8(szProject))
+		szBranch = LIB.UrlEncode(AnsiToUTF8(szBranch))
 	end
 	local provider = szProvider and PROVIDER_PARAMS[szProvider]
 	if not provider then
@@ -207,6 +211,10 @@ local function GetURL(szURL, szType)
 		return provider.szBlobURL:format(szUser, szProject, szBranch, szPath)
 	end
 	if szType == 'SHORT' then
+		szSimple = UTF8ToAnsi(LIB.UrlDecode(szSimple))
+		szUser = UTF8ToAnsi(LIB.UrlDecode(szUser))
+		szProject = UTF8ToAnsi(LIB.UrlDecode(szProject))
+		szBranch = UTF8ToAnsi(LIB.UrlDecode(szBranch))
 		if provider.bSimple then
 			if szProvider ~= DEFAULT_PROVIDER then
 				szSimple = szSimple .. '@' .. szProvider
