@@ -158,7 +158,7 @@ function PS.OnPanelActive(frame)
 		w = w - 240 - 20, h = h - y - 5,
 		listbox = {{
 			'onlclick',
-			function(hItem, szText, id, data, bSelected)
+			function(id, szText, data, bSelected)
 				OpenBuffRuleEditor(data)
 				return false
 			end,
