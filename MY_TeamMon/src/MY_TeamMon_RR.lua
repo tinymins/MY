@@ -103,43 +103,61 @@ local PROVIDER_PARAMS = {
 		szBlobURL_T = '^https://gitee%.com/([^/]+)/([^/]+)/blob/([^/]+)/(.+)$',
 	},
 	jx3box = {
-		szRawURL = 'https://git.jx3box.com/%s/%s/raw/%s/%s',
-		szRawURL_T = '^https://git%.jx3box%.com/([^/]+)/([^/]+)/raw/([^/]+)/(.+)$',
-		szBlobURL = 'https://git.jx3box.com/%s/%s/blob/%s/%s',
-		szBlobURL_T = '^https://git%.jx3box%.com/([^/]+)/([^/]+)/blob/([^/]+)/(.+)$',
+		bSimple = true,
+		szRawURL = 'https://git.jx3box.com/feed?key=%s',
+		szRawURL_T = '^https://git%.jx3box%.com/feed%?key%=(.+)$',
 	},
 }
-local DEFAULT_PROVIDER = 'github'
+local DEFAULT_PROVIDER = 'jx3box'
 local DEFAULT_PROJECT = 'JX3_MY_DATA'
 local DEFAULT_BRANCH = 'master'
 local DEFAULT_PATH = 'MY_TeamMon/' .. LANG .. '/meta.json'
 local function GetURL(szURL, szType)
-	local szUser, szProvider, szProject, szBranch, szPath, nPos = szURL
+	local szSimple, szUser, szProvider, szProject, szBranch, szPath, nPos
 	if wfind(szURL, '://') then
 		for k, p in pairs(PROVIDER_PARAMS) do
-			if IsTable(p.szRawURL_T) then
-				for _, s in ipairs(p.szRawURL_T) do
-					szUser, szProject, szBranch, szPath = szURL:match(s)
-					if szUser then
-						break
+			if p.bSimple then
+				if IsTable(p.szRawURL_T) then
+					for _, s in ipairs(p.szRawURL_T) do
+						szSimple = szURL:match(s)
+						if szSimple then
+							break
+						end
 					end
+				elseif IsString(p.szRawURL_T) then
+					szSimple = szURL:match(p.szRawURL_T)
 				end
-			elseif IsString(p.szRawURL_T) then
-				szUser, szProject, szBranch, szPath = szURL:match(p.szRawURL_T)
-			end
-			if not szUser then
-				szUser, szProject, szBranch, szPath = szURL:match(p.szBlobURL_T)
-			end
-			if szUser then
-				szProvider = k
-				break
+				if szSimple then
+					szProvider = k
+					break
+				end
+			else
+				if IsTable(p.szRawURL_T) then
+					for _, s in ipairs(p.szRawURL_T) do
+						szUser, szProject, szBranch, szPath = szURL:match(s)
+						if szUser then
+							break
+						end
+					end
+				elseif IsString(p.szRawURL_T) then
+					szUser, szProject, szBranch, szPath = szURL:match(p.szRawURL_T)
+				end
+				if not szUser and p.szBlobURL_T then
+					szUser, szProject, szBranch, szPath = szURL:match(p.szBlobURL_T)
+				end
+				if szUser then
+					szProvider = k
+					break
+				end
 			end
 		end
 	else
+		szUser, szSimple = szURL, ''
 		nPos = wfind(szUser, ':')
 		if nPos then
 			szPath = szUser:sub(nPos + 1):gsub('^/+', '')
 			szUser = szUser:sub(1, nPos - 1)
+			szSimple = ':' .. szPath .. szSimple
 		else
 			szPath = DEFAULT_PATH
 		end
@@ -147,6 +165,7 @@ local function GetURL(szURL, szType)
 		if nPos then
 			szBranch = szUser:sub(nPos + 1)
 			szUser = szUser:sub(1, nPos - 1)
+			szSimple = '?' .. szBranch .. szSimple
 		else
 			szBranch = DEFAULT_BRANCH
 		end
@@ -154,28 +173,46 @@ local function GetURL(szURL, szType)
 		if nPos then
 			szProject = szUser:sub(nPos + 1)
 			szUser = szUser:sub(1, nPos - 1)
+			szSimple = '/' .. szProject .. szSimple
 		else
 			szProject = DEFAULT_PROJECT
 		end
 		nPos = wfind(szUser, '@')
 		if nPos then
 			szProvider = szUser:sub(nPos + 1)
-			szUser = szUser:sub(1, nPos - 1)
+			if PROVIDER_PARAMS[szProvider] then
+				szUser = szUser:sub(1, nPos - 1)
+			else
+				szProvider = DEFAULT_PROVIDER
+			end
 		else
 			szProvider = DEFAULT_PROVIDER
 		end
+		szSimple = szUser .. szSimple
 	end
 	local provider = szProvider and PROVIDER_PARAMS[szProvider]
 	if not provider then
 		return
 	end
 	if szType == 'RAW' then
+		if provider.bSimple then
+			return provider.szRawURL:format(szSimple)
+		end
 		return provider.szRawURL:format(szUser, szProject, szBranch, szPath)
 	end
 	if szType == 'BLOB' then
+		if not provider.szBlobURL then
+			return
+		end
 		return provider.szBlobURL:format(szUser, szProject, szBranch, szPath)
 	end
 	if szType == 'SHORT' then
+		if provider.bSimple then
+			if szProvider ~= DEFAULT_PROVIDER then
+				szSimple = szSimple .. '@' .. szProvider
+			end
+			return szSimple
+		end
 		if szProvider ~= DEFAULT_PROVIDER then
 			szUser = szUser .. '@' .. szProvider
 		end
@@ -233,8 +270,8 @@ local META_EMBEDDED_LIST = {{
 	szAuthor = _L['Default'],
 	szTitle = _L['Default monitor data'],
 	szDataUrl = './data.jx3dat',
-	szURL = GetRawURL('tinymins'),
-	szAboutURL = GetBlobURL('tinymins:MY_TeamMon/README.md'),
+	szURL = GetRawURL('tinymins@github'),
+	szAboutURL = GetBlobURL('tinymins@github:MY_TeamMon/README.md'),
 }}
 local META_TEMPLATE = {
 	szURL = '',
