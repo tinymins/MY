@@ -221,3 +221,7 @@ local function OnLoot()
 end
 LIB.RegisterEvent('LOOT_ITEM.MY_EXAMTIP', OnLoot)
 end
+
+LIB.RegisterReload('MY_ExamTip', function()
+	Wnd.CloseWindow('ExaminationPanel')
+end)
