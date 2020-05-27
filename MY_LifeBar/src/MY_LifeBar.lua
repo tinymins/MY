@@ -683,10 +683,10 @@ local function onBreathe()
 			end
 		end
 		if DRAW_TARGET_ID then
+			CheckInvalidRect(DRAW_TARGET_TYPE, DRAW_TARGET_ID, me, KTar)
 			if DRAW_TARGET_TYPE == dwLastType and DRAW_TARGET_ID == dwLastID then
 				return
 			end
-			CheckInvalidRect(DRAW_TARGET_TYPE, DRAW_TARGET_ID, me, KTar)
 		end
 		nRoundLeft = nRoundLeft - 1
 	end
