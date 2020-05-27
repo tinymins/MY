@@ -100,9 +100,9 @@ function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
 	local w, h = ui:Size()
 
-	local X, Y = 10, 15
+	local X, Y = 10, 10
 	local x, y = X, Y
-	local offsety = 45
+	local offsety = 30
 	-- 开启
 	ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['Enable'],
@@ -135,47 +135,52 @@ function PS.OnPanelActive(wnd)
 		autoenable = function() return D.IsEnabled() end,
 	})
 	x = x + 235
-	ui:Append('Text', {
-		x = x + 3, y = y - 16,
-		text = _L['Only enable in those maps below'],
-		autoenable = function() return D.IsEnabled() end,
-	})
 	ui:Append('WndCheckBox', {
-		x = x, y = y + 9, w = 80, text = _L['Arena'],
+		x = x, y = y, w = 80, text = _L['Arena'],
 		checked = Config.bOnlyInArena,
 		oncheck = function(bChecked)
 			Config.bOnlyInArena = bChecked
 			D.Reset(true)
 		end,
+		tip = _L['Only enable in checked map types'],
+		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
 		autoenable = function() return D.IsEnabled() end,
 	})
 	x = x + 80
 	ui:Append('WndCheckBox', {
-		x = x, y = y + 9, w = 70, text = _L['Battlefield'],
+		x = x, y = y, w = 70, text = _L['Battlefield'],
 		checked = Config.bOnlyInBattleField,
 		oncheck = function(bChecked)
 			Config.bOnlyInBattleField = bChecked
 			D.Reset(true)
 		end,
+		tip = _L['Only enable in checked map types'],
+		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
 		autoenable = function() return D.IsEnabled() end,
 	})
 	x = x + 70
 	ui:Append('WndCheckBox', {
-		x = x, y = y + 9, w = 70, text = _L['Dungeon'],
+		x = x, y = y, w = 70, text = _L['Dungeon'],
 		checked = Config.bOnlyInDungeon,
 		oncheck = function(bChecked)
 			Config.bOnlyInDungeon = bChecked
 			D.Reset(true)
 		end,
+		tip = _L['Only enable in checked map types'],
+		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
 		autoenable = function() return D.IsEnabled() end,
 	})
 	y = y + offsety
 	-- <hr />
-	ui:Append('Image', 'Image_Spliter'):Pos(10, y-7):Size(w - 20, 1):Image('UI/Image/UICommon/ScienceTreeNode.UITex',62)
+	ui:Append('Image', {
+		name = 'Image_Spliter',
+		x = 10, y = y, w = w - 20, h = 1,
+		image = 'UI/Image/UICommon/ScienceTreeNode.UITex|62',
+	})
 
-	X, Y = 15, 60
+	X, Y = 15, y + 5
 	x, y = X, Y
-	offsety = 20
+	offsety = 21.5
 
 	ui:Append('WndTrackbar', {
 		name = 'WndTrackbar_LifeBarWidth',
@@ -394,67 +399,105 @@ function PS.OnPanelActive(wnd)
 	y = y + offsety
 
 	-- 右半边
-	X, Y = 350, 65
+	X = 350
 	x, y = X, Y
 	offsety = 27
-	local function FillColorTable(opt, relation, tartype)
-		local cfg = Config.Color[relation]
-		opt.rgb = cfg[tartype]
-		opt.szIcon = 'ui/Image/button/CommonButton_1.UITex'
-		opt.nFrame = 69
-		opt.nMouseOverFrame = 70
-		opt.szLayer = 'ICON_RIGHT'
-		opt.fnClickIcon = function()
-			UI.OpenColorPicker(function(r, g, b)
-				cfg[tartype] = { r, g, b }
-			end)
-		end
-		if tartype == 'Player' then
-			insert(opt, {
-				szOption = _L['Unified force color'],
-				bCheck = true, bMCheck = true,
-				bChecked = not cfg.DifferentiateForce,
-				fnAction = function(_, r, g, b)
-					cfg.DifferentiateForce = false
-				end,
-				rgb = cfg[tartype],
-				fnChangeColor = function(_, r, g, b)
-					cfg[tartype] = {r, g, b}
-					opt.rgb = cfg[tartype]
-				end,
-			})
-			insert(opt, {
-				szOption = _L['Differentiate force color'],
-				bCheck = true, bMCheck = true,
-				bChecked = cfg.DifferentiateForce,
-				fnAction = function(_, r, g, b)
-					cfg.DifferentiateForce = true
-				end,
-			})
-			insert(opt,{ bDevide = true } )
-			for dwForceID, szForceTitle in pairs(g_tStrings.tForceTitle) do
-				insert(opt, {
-					szOption = szForceTitle,
-					rgb = cfg[dwForceID],
-					fnChangeColor = function(_, r, g, b)
-						cfg[dwForceID] = { r, g, b }
-					end,
-					fnDisable = function()
-						return not cfg.DifferentiateForce
-					end,
-				})
+
+	-- 颜色设置
+	ui:Append('WndComboBox', {
+		x = x, y = y, text = _L['Color config'],
+		menu = function()
+			local t = {}
+			-- 玩家颜色设置
+			insert(t, { szOption = _L['Player color config'], bDisable = true } )
+			for relation, cfg in pairs(Config.Color) do
+				if cfg.Player then
+					local opt = {}
+					opt.szOption = _L[relation]
+					opt.rgb = cfg.Player
+					opt.szIcon = 'ui/Image/button/CommonButton_1.UITex'
+					opt.nFrame = 69
+					opt.nMouseOverFrame = 70
+					opt.szLayer = 'ICON_RIGHT'
+					opt.fnClickIcon = function()
+						UI.OpenColorPicker(function(r, g, b)
+							cfg.Player = { r, g, b }
+							opt.rgb = cfg.Player
+						end)
+					end
+					insert(opt, {
+						szOption = _L['Unified force color'],
+						bCheck = true, bMCheck = true,
+						bChecked = not cfg.DifferentiateForce,
+						fnAction = function(_, r, g, b)
+							cfg.DifferentiateForce = false
+						end,
+						rgb = cfg.Player,
+						fnChangeColor = function(_, r, g, b)
+							cfg.Player = {r, g, b}
+							opt.rgb = cfg.Player
+						end,
+					})
+					insert(opt, {
+						szOption = _L['Differentiate force color'],
+						bCheck = true, bMCheck = true,
+						bChecked = cfg.DifferentiateForce,
+						fnAction = function(_, r, g, b)
+							cfg.DifferentiateForce = true
+						end,
+					})
+					insert(opt, { bDevide = true })
+					for dwForceID, szForceTitle in pairs(g_tStrings.tForceTitle) do
+						insert(opt, {
+							szOption = szForceTitle,
+							rgb = cfg[dwForceID],
+							fnChangeColor = function(_, r, g, b)
+								cfg[dwForceID] = { r, g, b }
+							end,
+							fnDisable = function()
+								return not cfg.DifferentiateForce
+							end,
+						})
+					end
+					insert(t, opt)
+				end
 			end
-		end
-		return opt
-	end
+			insert(t,{ bDevide = true } )
+			-- NCP颜色设置
+			insert(t,{ szOption = _L['Npc color config'], bDisable = true } )
+			for relation, cfg in pairs(Config.Color) do
+				if cfg.Npc then
+					local opt = {}
+					opt.szOption = _L[relation]
+					opt.rgb = cfg.Npc
+					opt.szIcon = 'ui/Image/button/CommonButton_1.UITex'
+					opt.nFrame = 69
+					opt.nMouseOverFrame = 70
+					opt.szLayer = 'ICON_RIGHT'
+					opt.fnClickIcon = function()
+						UI.OpenColorPicker(function(r, g, b)
+							cfg.Npc = { r, g, b }
+							opt.rgb = cfg.Npc
+						end)
+					end
+					insert(t, opt)
+				end
+			end
+			return t
+		end,
+		autoenable = function() return D.IsEnabled() end,
+	})
+	y = y + offsety
+
 	local function GeneBooleanPopupMenu(cfgs, szPlayerTip, szNpcTip)
 		local t = {}
 		if szPlayerTip then
 			insert(t, { szOption = szPlayerTip, bDisable = true } )
 			for relation, cfg in pairs(cfgs) do
 				if cfg.Player then
-					insert(t, FillColorTable({
+					insert(t, {
 						szOption = _L[relation],
+						rgb = Config.Color[relation].Player,
 						bCheck = true,
 						bChecked = cfg.Player.bEnable,
 						fnAction = function()
@@ -469,19 +512,20 @@ function PS.OnPanelActive(wnd)
 								cfg.Player.bOnlyFighting = not cfg.Player.bOnlyFighting
 							end,
 						},
-					}, relation, 'Player'))
+					})
 				end
 			end
 		end
 		if szPlayerTip and szNpcTip then
-			insert(t,{ bDevide = true } )
+			insert(t, { bDevide = true })
 		end
 		if szNpcTip then
 			insert(t,{ szOption = szNpcTip, bDisable = true } )
 			for relation, cfg in pairs(cfgs) do
 				if cfg.Npc then
-					insert(t, FillColorTable({
+					insert(t, {
 						szOption = _L[relation],
+						rgb = Config.Color[relation].Npc,
 						bCheck = true,
 						bChecked = cfg.Npc.bEnable,
 						fnAction = function()
@@ -504,12 +548,13 @@ function PS.OnPanelActive(wnd)
 								cfg.Npc.bHidePets = not cfg.Npc.bHidePets
 							end,
 						},
-					}, relation, 'Npc'))
+					})
 				end
 			end
 		end
 		return t
 	end
+
 	-- 显示名字
 	ui:Append('WndComboBox', {
 		x = x, y = y, text = _L['Name display config'],

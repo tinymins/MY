@@ -5,10 +5,14 @@ return {
     ['Enable'] = '启用',
     ['Configure name'] = '配置文件名称',
 
-    ['Only enable in those maps below'] = '√ 仅在以下地图启用扁平血条',
+    ['Only enable in checked map types'] = '勾选后仅在勾选类型的地图中启用扁平血条，全部取消勾选表示所有地图启用。',
     ['Arena'] = '竞技场',
     ['Battlefield'] = '战场',
     ['Dungeon'] = '副本',
+
+    ['Color config'] = '颜色设置',
+    ['Player color config'] = '玩家颜色设置',
+    ['Npc color config'] = 'NPC颜色设置',
 
     ['Name display config'] = '名字显示设置',
     ['Player name display'] = '玩家名字显示',
