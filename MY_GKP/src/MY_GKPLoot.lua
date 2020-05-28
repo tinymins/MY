@@ -55,6 +55,7 @@ local DEBUG_LOOT = false -- 测试拾取分配 强制进入分配模式并最终不调用分配接口
 local GKP_LOOT_ANCHOR  = { s = 'CENTER', r = 'CENTER', x = 0, y = 0 }
 local GKP_LOOT_INIFILE = PLUGIN_ROOT .. '/ui/MY_GKP_Loot.ini'
 local MY_GKP_LOOT_BOSS -- 散件老板
+local GKP_AUTO_LOOT_DEBOUNCE_TIME = GLOBAL.GAME_FPS / 2 -- 自动拾取时延
 
 local GKP_LOOT_HUANGBABA_ICON = 2589 -- 玄晶图标
 local GKP_LOOT_HUANGBABA_QUALITY = CONSTANT.ITEM_QUALITY.NACARAT -- 玄晶品级
@@ -117,14 +118,25 @@ RegisterCustomData('MY_GKP_Loot.nConfirmQuality')
 RegisterCustomData('MY_GKP_Loot.tConfirm')
 RegisterCustomData('MY_GKP_Loot.tItemConfig')
 
-do
-local function onLoadingEnd()
+function D.UpdateShielded()
+	GKP_AUTO_LOOT_DEBOUNCE_TIME = LIB.IsShieldedVersion('MY_GKPLoot', 2)
+		and GLOBAL.GAME_FPS / 2
+		or 0
+end
+
+LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_GKP_Loot', function()
+	if arg0 and arg0 ~= 'MY_GKPLoot' then
+		return
+	end
+	D.UpdateShielded()
+end)
+
+LIB.RegisterEvent('LOADING_END.MY_GKP_Loot', function()
+	D.UpdateShielded()
 	D.aDoodadID = {}
 	MY_GKP_Loot.tItemConfig.tFilterQuality = {}
 	MY_GKP_Loot.tItemConfig.bNameFilter = false
-end
-LIB.RegisterEvent('LOADING_END.MY_GKP_Loot', onLoadingEnd)
-end
+end)
 
 function D.IsEnabled()
 	if not O.bOn then
@@ -259,7 +271,7 @@ function D.OnFrameBreathe()
 		local hList, hItem = wnd:Lookup('', 'Handle_ItemList')
 		for i = 0, hList:GetItemCount() - 1 do
 			hItem = hList:Lookup(i)
-			if (not hItem.nAutoLootLFC or nLFC - hItem.nAutoLootLFC >= GLOBAL.GAME_FPS / 2)
+			if (not hItem.nAutoLootLFC or nLFC - hItem.nAutoLootLFC >= GKP_AUTO_LOOT_DEBOUNCE_TIME)
 			and D.IsItemAutoPickup(hItem.itemData, O.tItemConfig, doodad, bCanDialog)
 			and not hItem.itemData.bDist and not hItem.itemData.bNeedRoll and not hItem.itemData.bBidding then
 				LIB.ExecuteWithThis(hItem, D.OnItemLButtonClick)
