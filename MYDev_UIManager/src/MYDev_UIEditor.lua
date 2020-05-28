@@ -196,6 +196,17 @@ function MYDev_UIEditor.OnItemLButtonClick()
 			end
 			return
 		end
+		if IsAltKeyDown() then
+			if not MY_El then
+				MY_El = setmetatable({}, {
+					__call = function(t, k)
+						return t[1]
+					end,
+				})
+			end
+			MY_El[1] = el
+			return
+		end
 		if name == 'TreeLeaf_Node' then
 			if this:IsExpand() then
 				this:Collapse()
