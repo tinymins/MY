@@ -288,14 +288,13 @@ function HP:SetBalloon(szMsg, nStartTick, nDuring, nOffsetY)
 		local dwCtcType = self.dwType == TARGET.DOODAD and CTCT.DOODAD_POS_2_SCREEN_POS or CTCT.CHARACTER_TOP_2_SCREEN_POS
 		if not IsEmpty(szMsg) then
 			if not balloon then
-				self.handle:AppendItemFromString('<handle>name="balloon" <image>name="Image_Bg1" path="ui\\Image\\UICommon\\CommonPanel.UITex" frame=21 postype=0 imagetype=10</image><image>name="Image_Bg2" path="ui\\Image\\Common\\CommonPanel.UITex" frame=71 postype=0 disablescale=1</image><handle>name="content" x=15 y=8 handletype=3 valign=2 </handle></handle>')
+				self.handle:AppendItemFromString('<handle>name="balloon" handletype=0 <image>name="Image_Bg1" path="ui\\Image\\UICommon\\CommonPanel.UITex" frame=21 postype=0 imagetype=10</image><image>name="Image_Bg2" path="ui\\Image\\Common\\CommonPanel.UITex" frame=71 postype=0 disablescale=1</image><handle>name="content" x=15 y=10 handletype=4 valign=2 </handle></handle>')
 				balloon = self.handle:Lookup('balloon')
 			end
 			local hContent = balloon:Lookup('content')
 			hContent:Clear()
-			hContent:AppendItemFromString(szMsg)
 			hContent:SetW(350)
-			hContent:FormatAllItemPos()
+			hContent:AppendItemFromString(szMsg)
 			hContent:SetSizeByAllItemSize()
 			balloon:SetSize(max(hContent:GetW() + 30, 50), hContent:GetH() + 20)
 			balloon:Lookup('Image_Bg1'):SetSize(balloon:GetSize())
