@@ -214,7 +214,7 @@ return {
 	['Default'] = '默认',
 	['Default monitor data'] = '默认数据',
 	['Data download'] = '数据下载',
-	['ERR: Info content is illegal!'] = '错误：无法获得有效的描述文件！',
+	['ERR: Info content is illegal!'] = '错误：描述文件解析失败！',
 	['ERR404: Meta address not found!'] = '错误404：订阅地址不存在！',
 	['Downloader is not ready!'] = '数据下载器未就绪！',
 	['Dowloading in progress, please wait...'] = '数据下载正在进行中，请稍后...',

@@ -339,9 +339,9 @@ function D.DownloadMeta(info, onSuccess, onError)
 		url = szURL,
 		charset = 'utf8',
 		success = function(szHTML)
-			local res = LIB.JsonDecode(szHTML)
+			local res, err = LIB.JsonDecode(szHTML)
 			if not res then
-				return SafeCall(onError, _L['ERR: Info content is illegal!'])
+				return SafeCall(onError, _L['ERR: Info content is illegal!'] .. '\n\n' .. err)
 			end
 			local info = {
 				szURL = szURL,
