@@ -1700,7 +1700,7 @@ function D.GetDoodadLootInfo(dwID)
 	local d  = GetDoodad(dwID)
 	local aItemData = {}
 	local bSpecial = false
-	local nMoney = 0
+	local nMoney, szName = 0, ''
 	if me and d then
 		local nLootItemCount = d.GetItemListCount()
 		for i = 0, nLootItemCount - 1 do
@@ -1713,9 +1713,10 @@ function D.GetDoodadLootInfo(dwID)
 			end
 		end
 		nMoney = d.GetLootMoney() or 0
+		szName = d.szName
 	end
 	sort(aItemData, LootItemSorter)
-	return aItemData, nMoney, d.szName, bSpecial
+	return aItemData, nMoney, szName, bSpecial
 end
 
 function D.HideSystemLoot()
