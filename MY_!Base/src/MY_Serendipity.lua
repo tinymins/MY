@@ -301,9 +301,6 @@ LIB.RegisterMsgMonitor('QIYU', function(szMsg, nFont, bRich, r, g, b, szChannel)
 	end)
 	-- 恭喜侠士江阙阙在25人英雄会战唐门中获得稀有掉落[夜话·白鹭]！
 	szMsg:gsub(_L.ADVENTURE_PATT2, function(szName, szSerendipity)
-		if not IsDebugClient() and LIB.IsParty(szName) and not LIB.IsFriend(szName) then
-			return
-		end
 		if not D.GetSerendipityInfo('name', szSerendipity) then -- 太多了筛选下…
 			return
 		end
