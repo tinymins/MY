@@ -169,7 +169,7 @@ LIB.RegisterEvent({
 	for dwAchieveID, bAcquired in pairs(BOSS_ACHIEVE_ACQUIRE_STATE) do
 		if not bAcquired and me.IsAchievementAcquired(dwAchieveID) then
 			local aTeammate, szLeader = {}, ''
-			local team = GetClientTeam()
+			local team = LIB.IsInParty() and GetClientTeam()
 			if team then
 				-- ¶Ó³¤
 				local dwLeader = team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER)
@@ -184,6 +184,9 @@ LIB.RegisterEvent({
 						insert(aTeammate, info.szName .. ',' .. info.dwMountKungfuID)
 					end
 				end
+			else
+				szLeader = me.szName
+				insert(aTeammate, me.szName .. ',' .. UI_GetPlayerMountKungfuID())
 			end
 			insert(BOSS_ACHIEVE_ACQUIRE_LOG, {
 				szServer = LIB.GetRealServer(2),
