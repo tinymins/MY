@@ -286,7 +286,7 @@ function HP:SetBalloon(szMsg, nStartTick, nDuring, nOffsetY)
 		local balloon = self.handle:Lookup('balloon')
 		local szKey = 'MY_LIFEBAR_HP_BALLOON_' .. self.dwType .. '_' .. self.dwID
 		local dwCtcType = self.dwType == TARGET.DOODAD and CTCT.DOODAD_POS_2_SCREEN_POS or CTCT.CHARACTER_TOP_2_SCREEN_POS
-		if szMsg then
+		if not IsEmpty(szMsg) then
 			if not balloon then
 				self.handle:AppendItemFromString('<handle>name="balloon" <image>name="Image_Bg1" path="ui\\Image\\UICommon\\CommonPanel.UITex" frame=21 postype=0 imagetype=10</image><image>name="Image_Bg2" path="ui\\Image\\Common\\CommonPanel.UITex" frame=71 postype=0 disablescale=1</image><handle>name="content" x=15 y=8 handletype=3 valign=2 </handle></handle>')
 				balloon = self.handle:Lookup('balloon')
