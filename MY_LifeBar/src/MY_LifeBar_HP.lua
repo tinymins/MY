@@ -314,6 +314,9 @@ function HP:SetBalloon(szMsg, nStartTick, nDuring, nOffsetY)
 					nAni = min((nTick - nStartTick) * 2, nEndTick - nTick) -- 出现比消失快一倍比较舒服
 					balloon:SetAlpha(nAni > nAnimationTime and 255 or nAni / nAnimationTime * 255)
 				else
+					if balloon and balloon:IsValid() then
+						balloon:Hide()
+					end
 					LIB.CThreadCoor(dwCtcType, self.dwID, szKey, false)
 					LIB.RenderCall(szKey, false)
 				end
