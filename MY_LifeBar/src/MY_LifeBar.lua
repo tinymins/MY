@@ -771,25 +771,25 @@ end)
 -- ¶Ô»°ÅÝÅÝ
 -----------------------------------------------------------------------------------------
 local BALLOON_CHANNEL = {
-	[PLAYER_TALK_CHANNEL.NEARBY] = true,
-	[PLAYER_TALK_CHANNEL.RAID] = true,
-	[PLAYER_TALK_CHANNEL.TEAM] = true,
-	[PLAYER_TALK_CHANNEL.TONG] = true,
-	[PLAYER_TALK_CHANNEL.SENCE] = true,
-	[PLAYER_TALK_CHANNEL.BATTLE_FIELD] = true,
-	[PLAYER_TALK_CHANNEL.NPC_NEARBY] = true,
-	[PLAYER_TALK_CHANNEL.NPC_PARTY] = true,
-	[PLAYER_TALK_CHANNEL.NPC_SENCE] = true,
-	[PLAYER_TALK_CHANNEL.NPC_SAY_TO] = true,
-	[PLAYER_TALK_CHANNEL.NPC_YELL_TO] = true,
-	[PLAYER_TALK_CHANNEL.BATTLE_FIELD_SIDE] = true,
+	['MSG_NORMAL'           ] = true, -- PLAYER_TALK_CHANNEL.NEARBY, PLAYER_TALK_CHANNEL.NPC_NEARBY
+	['MSG_TEAM'             ] = true, -- PLAYER_TALK_CHANNEL.RAID
+	['MSG_PARTY'            ] = true, -- PLAYER_TALK_CHANNEL.TEAM
+	['MSG_GUILD'            ] = true, -- PLAYER_TALK_CHANNEL.TONG
+	['MSG_MAP'              ] = true, -- PLAYER_TALK_CHANNEL.SENCE
+	['MSG_BATTLE_FILED'     ] = true, -- PLAYER_TALK_CHANNEL.BATTLE_FIELD
+	['MSG_NPC_PARTY'        ] = true, -- PLAYER_TALK_CHANNEL.NPC_PARTY
+	['MSG_NPC_YELL'         ] = true, -- PLAYER_TALK_CHANNEL.NPC_SENCE
+	['MSG_NPC_WHISPER'      ] = true, -- PLAYER_TALK_CHANNEL.NPC_SAY_TO, PLAYER_TALK_CHANNEL.NPC_YELL_TO
+	['MSG_BATTLE_FIELD_SIDE'] = true, -- PLAYER_TALK_CHANNEL.BATTLE_FIELD_SIDE
 }
 
 local function OnCharacterSay(dwID, nChannel, szText)
-	if not BALLOON_CHANNEL[nChannel] then
+	if dwID == 0 then
 		return
 	end
-	if dwID == 0 then
+	local szMsgType = LIB.TalkChannel2MsgType(nChannel)
+	local bc = szMsgType and Config.BalloonChannel[szMsgType]
+	if not bc or not bc.bEnable then
 		return
 	end
 	local dwType = IsPlayer(dwID) and TARGET.PLAYER or TARGET.NPC
@@ -812,7 +812,7 @@ local function OnCharacterSay(dwID, nChannel, szText)
 	if not cfg.bEnable then
 		return
 	end
-	lb:SetBalloon(szText, GetTime())
+	lb:SetBalloon(szText, GetTime(), bc.nDuring)
 end
 
 LIB.RegisterEvent('CHARACTER_SAY', function()

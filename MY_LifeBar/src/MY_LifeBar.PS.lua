@@ -667,6 +667,35 @@ function PS.OnPanelActive(wnd)
 					})
 				end
 			end
+			insert(t, { bDevide = true })
+			insert(t, { szOption = _L['Balloon channel config'], bDisable = true } )
+			for szMsgType, cfg in pairs(Config.BalloonChannel) do
+				local t1 = { szOption = _L['Balloon display time'] }
+				for _, nDuring in ipairs({ 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 15000, 20000 }) do
+					insert(t1, {
+						szOption = nDuring .. 'ms',
+						bCheck = true, bMCheck = true,
+						bChecked = cfg.nDuring == nDuring,
+						fnAction = function()
+							cfg.nDuring = nDuring
+							D.Reset()
+						end,
+					})
+				end
+				insert(t, {
+					szOption = g_tStrings.tChannelName[szMsgType],
+					rgb = GetMsgFontColor(szMsgType, true),
+					{
+						szOption = _L['Enable'],
+						bCheck = true, bChecked = cfg.bEnable,
+						fnAction = function()
+							cfg.bEnable = not cfg.bEnable
+							D.Reset()
+						end,
+					},
+					t1,
+				})
+			end
 			return t
 		end,
 		autoenable = function() return D.IsEnabled() end,

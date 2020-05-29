@@ -561,11 +561,11 @@ function LB:ApplySFX(force)
 	return self
 end
 
-function LB:SetBalloon(msg, tick)
+function LB:SetBalloon(msg, tick, during)
 	if self.balloon_msg ~= msg or self.balloon_start ~= tick then
 		self.balloon_msg = msg
 		self.balloon_start = tick
-		self.balloon_during = 9000
+		self.balloon_during = during
 		self:SetInvalid('balloon', true)
 	end
 	return self

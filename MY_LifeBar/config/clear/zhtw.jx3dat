@@ -317,5 +317,17 @@ local __TEMPLATE__ = {
 		},
 		Foe = { Player = { bEnable = true } },
 	},
+	BalloonChannel = {
+		['MSG_NORMAL'           ] = { bEnable = true, nDuring = 5000 },
+		['MSG_TEAM'             ] = { bEnable = true, nDuring = 5000 },
+		['MSG_PARTY'            ] = { bEnable = true, nDuring = 5000 },
+		['MSG_GUILD'            ] = { bEnable = true, nDuring = 9000 },
+		['MSG_MAP'              ] = { bEnable = true, nDuring = 9000 },
+		['MSG_BATTLE_FILED'     ] = { bEnable = true, nDuring = 9000 },
+		['MSG_NPC_PARTY'        ] = { bEnable = true, nDuring = 9000 },
+		['MSG_NPC_YELL'         ] = { bEnable = true, nDuring = 9000 },
+		['MSG_NPC_WHISPER'      ] = { bEnable = true, nDuring = 9000 },
+		['MSG_BATTLE_FIELD_SIDE'] = { bEnable = true, nDuring = 5000 },
+	},
 }
 return { __TEMPLATE__, __META__ }

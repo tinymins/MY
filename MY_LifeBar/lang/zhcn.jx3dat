@@ -36,6 +36,8 @@ return {
     ['Balloon display config'] = '聊天泡泡显示设置',
     ['Player balloon display'] = '玩家聊天泡泡显示',
     ['Npc balloon display'] = 'NPC聊天泡泡显示',
+    ['Balloon channel config'] = '聊天泡泡频道设置',
+    ['Balloon display time'] = '泡泡显示时长',
 
     ['Show special npc'] = '显示特殊NPC',
     ['Only enemy'] = '仅敌对',
