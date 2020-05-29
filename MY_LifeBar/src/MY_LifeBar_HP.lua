@@ -298,7 +298,7 @@ function HP:SetBalloon(szMsg, nStartTick, nDuring, nOffsetY)
 			hContent:SetSizeByAllItemSize()
 			balloon:SetSize(max(hContent:GetW() + 30, 50), hContent:GetH() + 20)
 			balloon:Lookup('Image_Bg1'):SetSize(balloon:GetSize())
-			balloon:Lookup('Image_Bg2'):SetRelPos(balloon:GetW() * 3 / 4, balloon:GetH() - 3)
+			balloon:Lookup('Image_Bg2'):SetRelPos(min(balloon:GetW() * 3 / 4, balloon:GetW() - balloon:Lookup('Image_Bg2'):GetW() - 10), balloon:GetH() - 3)
 			balloon:FormatAllItemPos()
 			local nEndTick = nStartTick + nDuring
 			local nAnimationTime = min(nDuring / 5, 1000)
