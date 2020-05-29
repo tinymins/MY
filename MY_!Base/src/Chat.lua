@@ -1214,6 +1214,37 @@ function LIB.GetChannelDailyLimit(nLevel, nChannel)
 end
 end
 
+local PLAYER_TALK_CHANNEL_MSG_TYPE = {
+	[PLAYER_TALK_CHANNEL.WHISPER          ] = 'MSG_WHISPER'          ,
+	[PLAYER_TALK_CHANNEL.NEARBY           ] = 'MSG_NORMAL'           ,
+	[PLAYER_TALK_CHANNEL.TEAM             ] = 'MSG_PARTY'            ,
+	[PLAYER_TALK_CHANNEL.TONG             ] = 'MSG_GUILD'            ,
+	[PLAYER_TALK_CHANNEL.TONG_ALLIANCE    ] = 'MSG_GUILD_ALLIANCE'   ,
+	[PLAYER_TALK_CHANNEL.TONG_SYS         ] = 'MSG_GUILD'            ,
+	[PLAYER_TALK_CHANNEL.WORLD            ] = 'MSG_WORLD'            ,
+	[PLAYER_TALK_CHANNEL.FORCE            ] = 'MSG_SCHOOL'           ,
+	[PLAYER_TALK_CHANNEL.CAMP             ] = 'MSG_CAMP'             ,
+	[PLAYER_TALK_CHANNEL.FRIENDS          ] = 'MSG_FRIEND'           ,
+	[PLAYER_TALK_CHANNEL.RAID             ] = 'MSG_TEAM'             ,
+	[PLAYER_TALK_CHANNEL.SENCE            ] = 'MSG_MAP'              ,
+	[PLAYER_TALK_CHANNEL.BATTLE_FIELD     ] = 'MSG_BATTLE_FILED'     ,
+	[PLAYER_TALK_CHANNEL.LOCAL_SYS        ] = 'MSG_SYS'              ,
+	[PLAYER_TALK_CHANNEL.GM_MESSAGE       ] = 'MSG_SYS'              ,
+	[PLAYER_TALK_CHANNEL.NPC_WHISPER      ] = 'MSG_NPC_WHISPER'      ,
+	[PLAYER_TALK_CHANNEL.NPC_NEARBY       ] = 'MSG_NPC_NEARBY'       ,
+	[PLAYER_TALK_CHANNEL.NPC_PARTY        ] = 'MSG_NPC_PARTY'        ,
+	[PLAYER_TALK_CHANNEL.NPC_SENCE        ] = 'MSG_NPC_YELL'         ,
+	[PLAYER_TALK_CHANNEL.FACE             ] = 'MSG_FACE'             ,
+	[PLAYER_TALK_CHANNEL.NPC_FACE         ] = 'MSG_NPC_FACE'         ,
+	[PLAYER_TALK_CHANNEL.NPC_SAY_TO_CAMP  ] = 'MSG_CAMP'             ,
+	[PLAYER_TALK_CHANNEL.IDENTITY         ] = 'MSG_IDENTITY'         ,
+	[PLAYER_TALK_CHANNEL.BULLET_SCREEN    ] = 'MSG_JJC_BULLET_SCREEN',
+	[PLAYER_TALK_CHANNEL.BATTLE_FIELD_SIDE] = 'MSG_BATTLE_FIELD_SIDE',
+}
+function LIB.TalkChannel2MsgType(nChannel)
+	return PLAYER_TALK_CHANNEL_MSG_TYPE[nChannel]
+end
+
 do
 local MSG_GROUP = {
     {
