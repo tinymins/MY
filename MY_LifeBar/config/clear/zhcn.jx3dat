@@ -324,6 +324,7 @@ local __TEMPLATE__ = {
 		['MSG_GUILD'            ] = { bEnable = true, nDuring = 9000 },
 		['MSG_MAP'              ] = { bEnable = true, nDuring = 9000 },
 		['MSG_BATTLE_FILED'     ] = { bEnable = true, nDuring = 9000 },
+		['MSG_NPC_NEARBY'       ] = { bEnable = true, nDuring = 9000 },
 		['MSG_NPC_PARTY'        ] = { bEnable = true, nDuring = 9000 },
 		['MSG_NPC_YELL'         ] = { bEnable = true, nDuring = 9000 },
 		['MSG_NPC_WHISPER'      ] = { bEnable = true, nDuring = 9000 },
