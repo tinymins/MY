@@ -670,7 +670,10 @@ function PS.OnPanelActive(wnd)
 			insert(t, { bDevide = true })
 			insert(t, { szOption = _L['Balloon channel config'], bDisable = true } )
 			for szMsgType, cfg in pairs(Config.BalloonChannel) do
-				local t1 = { szOption = _L['Balloon display time'] }
+				local t1 = {
+					szOption = _L['Balloon display time'],
+					fnDisable = function() return not cfg.bEnable end,
+				}
 				for _, nDuring in ipairs({ 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 15000, 20000 }) do
 					insert(t1, {
 						szOption = nDuring .. 'ms',
@@ -680,19 +683,17 @@ function PS.OnPanelActive(wnd)
 							cfg.nDuring = nDuring
 							D.Reset()
 						end,
+						fnDisable = function() return not cfg.bEnable end,
 					})
 				end
 				insert(t, {
 					szOption = g_tStrings.tChannelName[szMsgType],
 					rgb = GetMsgFontColor(szMsgType, true),
-					{
-						szOption = _L['Enable'],
-						bCheck = true, bChecked = cfg.bEnable,
-						fnAction = function()
-							cfg.bEnable = not cfg.bEnable
-							D.Reset()
-						end,
-					},
+					bCheck = true, bChecked = cfg.bEnable,
+					fnAction = function()
+						cfg.bEnable = not cfg.bEnable
+						D.Reset()
+					end,
 					t1,
 				})
 			end
