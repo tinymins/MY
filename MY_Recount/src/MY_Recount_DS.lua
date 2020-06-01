@@ -82,18 +82,6 @@ local DK_REC = {
 	STAT         = DEBUG and 'Statistics'   or 4,
 }
 
-local DK_REC_SNAPSHOT = {
-	TIME_DURING  = DEBUG and 'nTimeDuring'  or 1,
-	TOTAL        = DEBUG and 'nTotal'       or 2,
-	TOTAL_EFFECT = DEBUG and 'nTotalEffect' or 3,
-	STATISTICS   = DEBUG and 'Statistics'   or 4,
-}
-
-local DK_REC_SNAPSHOT_STAT = {
-	TOTAL        = DEBUG and 'nTotal'       or 1,
-	TOTAL_EFFECT = DEBUG and 'nTotalEffect' or 2,
-}
-
 local DK_REC_STAT = {
 	TOTAL        = DEBUG and 'nTotal'       or 1,
 	TOTAL_EFFECT = DEBUG and 'nTotalEffect' or 2,
@@ -2258,8 +2246,6 @@ local settings = {
 				EVERYTHING_TYPE = EVERYTHING_TYPE,
 				DK = DK,
 				DK_REC = DK_REC,
-				DK_REC_SNAPSHOT = DK_REC_SNAPSHOT,
-				DK_REC_SNAPSHOT_STAT = DK_REC_SNAPSHOT_STAT,
 				DK_REC_STAT = DK_REC_STAT,
 				DK_REC_STAT_DETAIL = DK_REC_STAT_DETAIL,
 				DK_REC_STAT_SKILL = DK_REC_STAT_SKILL,
