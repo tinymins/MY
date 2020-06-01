@@ -62,7 +62,9 @@ local SZ_INI = PACKET_INFO.ROOT .. 'MY_RoleStatistics/ui/MY_RoleStatistics_RoleS
 DB:Execute('CREATE TABLE IF NOT EXISTS RoleInfo (guid NVARCHAR(20), account NVARCHAR(255), region NVARCHAR(20), server NVARCHAR(20), name NVARCHAR(20), force INTEGER, level INTEGER, equip_score INTEGER, pet_score INTEGER, gold INTEGER, silver INTEGER, copper INTEGER, contribution INTEGER, contribution_remain INTEGER, justice INTEGER, justice_remain INTEGER, prestige INTEGER, prestige_remain INTEGER, camp_point INTEGER, camp_point_percentage INTEGER, camp_level INTEGER, arena_award INTEGER, arena_award_remain INTEGER, exam_print INTEGER, exam_print_remain INTEGER, achievement_score INTEGER, coin INTEGER, mentor_score INTEGER, time INTEGER, PRIMARY KEY(guid))')
 DB:Execute('ALTER TABLE RoleInfo ADD COLUMN starve INTEGER')
 DB:Execute('ALTER TABLE RoleInfo ADD COLUMN starve_remain INTEGER')
-local DB_RoleInfoW = DB:Prepare('REPLACE INTO RoleInfo (guid, account, region, server, name, force, level, equip_score, pet_score, gold, silver, copper, contribution, contribution_remain, justice, justice_remain, prestige, prestige_remain, camp_point, camp_point_percentage, camp_level, arena_award, arena_award_remain, exam_print, exam_print_remain, achievement_score, coin, mentor_score, starve, starve_remain, time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+DB:Execute('ALTER TABLE RoleInfo ADD COLUMN architecture INTEGER')
+DB:Execute('ALTER TABLE RoleInfo ADD COLUMN architecture_remain INTEGER')
+local DB_RoleInfoW = DB:Prepare('REPLACE INTO RoleInfo (guid, account, region, server, name, force, level, equip_score, pet_score, gold, silver, copper, contribution, contribution_remain, justice, justice_remain, prestige, prestige_remain, camp_point, camp_point_percentage, camp_level, arena_award, arena_award_remain, exam_print, exam_print_remain, achievement_score, coin, mentor_score, starve, starve_remain, architecture, architecture_remain, time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
 local DB_RoleInfoCoinW = DB:Prepare('UPDATE RoleInfo SET coin = ? WHERE account = ? AND region = ?')
 local DB_RoleInfoG = DB:Prepare('SELECT * FROM RoleInfo WHERE guid = ?')
 local DB_RoleInfoR = DB:Prepare('SELECT * FROM RoleInfo WHERE account LIKE ? OR name LIKE ? OR region LIKE ? OR server LIKE ? ORDER BY time DESC')
@@ -326,6 +328,23 @@ local COLUMN_LIST = {
 		GetFormatText = GeneWeeklyFormatText('starve_remain'),
 		Compare = GeneWeeklyCompare('starve_remain'),
 		GetSummaryFormatText = GeneWeeklySummaryFormatText('starve_remain'),
+	},
+	{ -- ‘∞’¨±“
+		id = 'architecture',
+		szTitle = _L['Architecture'],
+		nWidth = 60,
+		GetFormatText = GeneWeeklyFormatText('architecture'),
+		Compare = GeneWeeklyCompare('architecture'),
+		GetSummaryFormatText = GeneWeeklySummaryFormatText('architecture'),
+	},
+	{ -- ‘∞’¨±“÷‹”‡
+		id = 'architecture_remain',
+		szTitle = _L['Architecture remain'],
+		szShortTitle = _L['Arch_remain'],
+		nWidth = 60,
+		GetFormatText = GeneWeeklyFormatText('architecture_remain'),
+		Compare = GeneWeeklyCompare('architecture_remain'),
+		GetSummaryFormatText = GeneWeeklySummaryFormatText('architecture_remain'),
 	},
 	{
 		-- Õ˛Õ˚
@@ -714,6 +733,8 @@ function D.GetClientPlayerRec()
 	rec.exam_print = me.nExamPrint
 	rec.exam_print_remain = me.GetExamPrintRemainSpace()
 	rec.achievement_score = me.GetAchievementRecord()
+	rec.architecture = me.nArchitecture
+	rec.architecture_remain = me.GetArchitectureRemainSpace()
 	rec.coin = me.nCoin
 	rec.mentor_score = me.dwTAEquipsScore
 	rec.starve = LIB.GetItemAmountInAllPackages(5, 34797, true)
@@ -748,7 +769,8 @@ function D.FlushDB()
 		rec.prestige, rec.prestige_remain, rec.camp_point, rec.camp_point_percentage,
 		rec.camp_level, rec.arena_award, rec.arena_award_remain, rec.exam_print,
 		rec.exam_print_remain, rec.achievement_score, rec.coin, rec.mentor_score,
-		rec.starve, rec.starve_remain, rec.time)
+		rec.starve, rec.starve_remain, rec.architecture, rec.architecture_remain,
+		rec.time)
 	DB_RoleInfoW:Execute()
 
 	DB_RoleInfoCoinW:ClearBindings()
