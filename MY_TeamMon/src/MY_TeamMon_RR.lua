@@ -480,7 +480,7 @@ function D.UpdateList(frame)
 		return
 	end
 	local aMeta, tMetaID = D.LoadMetaList(), {}
-	local container = frame:Lookup('PageSet_Menu/Page_FileDownload/WndScroll_FileDownload/WndContainer_FileDownload_List')
+	local container = frame:Lookup('PageSet_Menu/Page_Fav/WndScroll_Fav/WndContainer_Fav_List')
 	container:Clear()
 	for _, p in spairs(aMeta, META_EMBEDDED_LIST) do
 		if not tMetaID[p.szKey] then
@@ -510,9 +510,9 @@ function D.OnFrameCreate()
 	this:Lookup('Btn_AddUrl', 'Text_AddUrl'):SetText(_L['Add url'])
 	this:Lookup('Btn_RemoveUrl', 'Text_RemoveUrl'):SetText(_L['Remove url'])
 	this:Lookup('Btn_ExportUrl', 'Text_ExportUrl'):SetText(_L['Export meta url'])
-	this:Lookup('PageSet_Menu/Page_FileDownload', 'Text_Record_Break1'):SetText(_L['Author'])
-	this:Lookup('PageSet_Menu/Page_FileDownload', 'Text_Record_Break2'):SetText(_L['Title'])
-	this:Lookup('PageSet_Menu/WndCheck_FileDownload', 'Text_FileDownload'):SetText(_L['Data download'])
+	this:Lookup('PageSet_Menu/Page_Fav', 'Text_Fav_Break1'):SetText(_L['Author'])
+	this:Lookup('PageSet_Menu/Page_Fav', 'Text_Fav_Break2'):SetText(_L['Title'])
+	this:Lookup('PageSet_Menu/WndCheck_Fav', 'Text_FavCheck'):SetText(_L['Data download'])
 	D.UpdateList(this)
 	this:RegisterEvent('MY_TM_RR_META_LIST_UPDATE')
 	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
