@@ -81,13 +81,13 @@ local O = {
 	tMapSaveCopy = {}, -- 单副本 CD
 	tMapProgress = {}, -- 单首领 CD
 	bMapProgressApplied = false, -- 是否请求过副本进度
-	bFloatEntry = false,
+	bFloatEntry = true,
 	bSaveDB = false,
 }
 RegisterCustomData('Global/MY_RoleStatistics_DungeonStat.aColumn')
 RegisterCustomData('Global/MY_RoleStatistics_DungeonStat.szSort')
 RegisterCustomData('Global/MY_RoleStatistics_DungeonStat.szSortOrder')
-RegisterCustomData('MY_RoleStatistics_DungeonStat.bFloatEntry')
+RegisterCustomData('MY_RoleStatistics_DungeonStat.bFloatEntry', 2)
 RegisterCustomData('MY_RoleStatistics_DungeonStat.bSaveDB')
 
 local EXCEL_WIDTH = 960

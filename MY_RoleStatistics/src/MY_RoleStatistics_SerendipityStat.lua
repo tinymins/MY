@@ -98,7 +98,7 @@ local O = {
 	},
 	szSort = 'time_days',
 	szSortOrder = 'desc',
-	bFloatEntry = false,
+	bFloatEntry = true,
 	bSaveDB = false,
 	bMapMark = false,
 	bMapMarkHideAcquired = true,
@@ -106,7 +106,7 @@ local O = {
 RegisterCustomData('Global/MY_RoleStatistics_SerendipityStat.aColumn')
 RegisterCustomData('Global/MY_RoleStatistics_SerendipityStat.szSort')
 RegisterCustomData('Global/MY_RoleStatistics_SerendipityStat.szSortOrder')
-RegisterCustomData('MY_RoleStatistics_SerendipityStat.bFloatEntry')
+RegisterCustomData('MY_RoleStatistics_SerendipityStat.bFloatEntry', 2)
 RegisterCustomData('MY_RoleStatistics_SerendipityStat.bSaveDB')
 RegisterCustomData('MY_RoleStatistics_SerendipityStat.bMapMark')
 RegisterCustomData('MY_RoleStatistics_SerendipityStat.bMapMarkHideAcquired')

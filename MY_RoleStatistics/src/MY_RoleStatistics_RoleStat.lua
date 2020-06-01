@@ -100,7 +100,7 @@ local O = {
 	tAlertTodayVal = nil,
 	dwLastAlertTime = 0,
 	tSummaryIgnoreGUID = {},
-	bFloatEntry = false,
+	bFloatEntry = true,
 	bSaveDB = false,
 }
 RegisterCustomData('Global/MY_RoleStatistics_RoleStat.aColumn')
@@ -109,7 +109,7 @@ RegisterCustomData('Global/MY_RoleStatistics_RoleStat.szSortOrder')
 RegisterCustomData('MY_RoleStatistics_RoleStat.aAlertColumn')
 RegisterCustomData('MY_RoleStatistics_RoleStat.tAlertTodayVal')
 RegisterCustomData('MY_RoleStatistics_RoleStat.tSummaryIgnoreGUID')
-RegisterCustomData('MY_RoleStatistics_RoleStat.bFloatEntry')
+RegisterCustomData('MY_RoleStatistics_RoleStat.bFloatEntry', 2)
 RegisterCustomData('MY_RoleStatistics_RoleStat.bSaveDB')
 
 local function GetFormatSysmsgText(szText)

@@ -94,13 +94,13 @@ local O = {
 	},
 	szSort = 'time_days',
 	szSortOrder = 'desc',
-	bFloatEntry = false,
+	bFloatEntry = true,
 	bSaveDB = false,
 }
 RegisterCustomData('Global/MY_RoleStatistics_TaskStat.aColumn')
 RegisterCustomData('Global/MY_RoleStatistics_TaskStat.szSort')
 RegisterCustomData('Global/MY_RoleStatistics_TaskStat.szSortOrder')
-RegisterCustomData('MY_RoleStatistics_TaskStat.bFloatEntry')
+RegisterCustomData('MY_RoleStatistics_TaskStat.bFloatEntry', 2)
 RegisterCustomData('MY_RoleStatistics_TaskStat.bSaveDB')
 
 local TASK_TYPE = {
