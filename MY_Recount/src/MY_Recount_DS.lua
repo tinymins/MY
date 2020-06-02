@@ -1331,7 +1331,7 @@ function D.InitObjectData(data, dwID, szChannel)
 	if not data[DK.PLAYER_LIST][dwID] and IsPlayer(dwID) then
 		local player, info = D.GetPlayer(dwID)
 		if player and info and not IsEmpty(info.dwMountKungfuID) then
-			local aEquip = {}
+			local aEquip, nEquipScore = {}, player.GetTotalEquipScore()
 			for nEquipIndex, tEquipInfo in pairs(LIB.GetPlayerEquipInfo(player)) do
 				insert(aEquip, {
 					nEquipIndex,
@@ -1344,12 +1344,14 @@ function D.InitObjectData(data, dwID, szChannel)
 					tEquipInfo.dwTemporaryEnchantLeftSeconds,
 				})
 			end
-			local aInfo = {
-				info.dwMountKungfuID,
-				player.GetTotalEquipScore(),
-				aEquip,
-			}
-			data[DK.PLAYER_LIST][dwID] = aInfo
+			if not IsEmpty(aEquip) and not IsEmpty(nEquipScore) then
+				local aInfo = {
+					info.dwMountKungfuID,
+					player.GetTotalEquipScore(),
+					aEquip,
+				}
+				data[DK.PLAYER_LIST][dwID] = aInfo
+			end
 		end
 	end
 	-- 统计结构体
