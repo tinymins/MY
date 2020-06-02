@@ -298,12 +298,23 @@ local function SafeCall(f, ...)
 	return Call(f, ...)
 end
 
+function D.GetFrame()
+	return Station.SearchFrame('MY_TeamMon_RR')
+end
+
 function D.OpenPanel()
-	return Wnd.OpenWindow(INI_PATH, 'MY_TeamMon_RR')
+	local frame = D.GetFrame() or Wnd.OpenWindow(INI_PATH, 'MY_TeamMon_RR')
+	frame:Show()
+	frame:BringToTop()
+	return frame
 end
 
 function D.ClosePanel()
-	Wnd.CloseWindow('MY_TeamMon_RR')
+	local frame = D.GetFrame()
+	if not frame then
+		return
+	end
+	frame:Hide()
 end
 
 function D.LoadFavMetaList()
