@@ -747,7 +747,11 @@ LIB.RegisterBgMsg('MY_TeamMon_RR', function(_, data, _, _, szTalker, _)
 				.. _L('Title: %s', info.szTitle) .. '\n'
 				.. _L('Author: %s', info.szAuthor) .. '\n'
 				.. _L('Meta URL: %s', info.szURL), function()
+					local bHide = not D.GetFrame()
 					local frame = D.OpenPanel()
+					if bHide then
+						D.ClosePanel()
+					end
 					D.AddFavMeta(info)
 					D.DownloadData(frame.downloader, info)
 				end)
