@@ -432,8 +432,9 @@ function D.DelayInterval()
 	local dwTime, dwDelayTime = GetTime(), nil
 	for _, info in pairs(PR_PARTY_REQUEST) do
 		if info.dwDelayTime and info.dwDelayTime > dwTime then
-			dwDelayTime = min(dwDelayTime or HUGE, info.dwDelayTime)
+			dwDelayTime = min(dwDelayTime or HUGE, info.dwDelayTime + 75)
 		end
+		D.CheckRequestUpdate(info)
 	end
 	if dwDelayTime then
 		LIB.DelayCall('MY_PartyRequest', dwDelayTime - dwTime, D.DelayInterval)
