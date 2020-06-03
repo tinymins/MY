@@ -228,7 +228,7 @@ function D.UpdateItem(hItem, p)
 	-- ±ê¼Ç
 	hInfoList:Lookup('Handle_Mark'):Hide()
 	local KTeam = GetClientTeam()
-	if KTeam and LIB.IsInParty() then
+	if KTeam and LIB.IsInParty() and (dwType == TARGET.NPC or dwType == TARGET.PLAYER) then
 		local tMark = KTeam.GetTeamMark()
 		if tMark then
 			local nMarkID = tMark[dwID]
@@ -277,7 +277,7 @@ function D.UpdateItem(hItem, p)
 		hItem:Lookup('Handle_L/Handle_Compass/Image_PointGreen'):Hide()
 		if player and nDistance > 0 then
 			local h
-			if LIB.IsEnemy(UI_GetClientPlayerID(), dwID) then
+			if (dwType == TARGET.NPC or dwType == TARGET.PLAYER) and LIB.IsEnemy(UI_GetClientPlayerID(), dwID) then
 				h = hItem:Lookup('Handle_L/Handle_Compass/Image_PointRed')
 			else
 				h = hItem:Lookup('Handle_L/Handle_Compass/Image_PointGreen')
