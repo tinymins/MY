@@ -445,3 +445,20 @@ local function OnCurlRequestResult()
 end
 LIB.RegisterEvent('CURL_REQUEST_RESULT.AJAX', OnCurlRequestResult)
 end
+
+function LIB.DownloadFile(szPath, resolve)
+	local downloader = LIB.UI.GetTempElement('Image.' .. PACKET_INFO.NAME_SPACE .. '#DownloadFile-' .. GetStringCRC(szPath))
+	if downloader.bPending then
+		insert(downloader.aResolve, resolve)
+	else
+		downloader.bPending = true
+		downloader.aResolve = {resolve}
+		downloader.FromTextureFile = function(_, szPath)
+			downloader:GetParent():RemoveItem(downloader)
+			for _, cb in ipairs(downloader.aResolve) do
+				Call(cb, szPath)
+			end
+		end
+		downloader:FromRemoteFile(szPath)
+	end
+end

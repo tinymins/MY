@@ -66,6 +66,7 @@ local MY_TM_META_ROOT = MY_TeamMon.MY_TM_META_ROOT
 local MY_TM_DATA_ROOT = MY_TeamMon.MY_TM_DATA_ROOT
 local MY_TM_DATA_PASSPHRASE = '89g45ynbtldnsryu98rbny9ps7468hb6npyusiryuxoldg7lbn894bn678b496746'
 local EMBEDDED_SUBSCRIBE_URL = 'https://dbm.j3cx.com/subscribe'
+local META_DOWNLOADING, DATA_DOWNLOADING = {}, {}
 
 -- 陆服环境下，以下缩写均对等
 -- tinymins
@@ -349,10 +350,10 @@ function D.MetaJsonToLua(res, szURL, szKey)
 	}
 end
 
-function D.DownloadMeta(downloader, info, onSuccess, onError)
+function D.DownloadMeta(info, onSuccess, onError)
 	local szURL = GetRawURL(info.szURL) or info.szURL
 	if info.szKey then
-		downloader.tDownloading[info.szKey] = true
+		META_DOWNLOADING[info.szKey] = true
 		FireUIEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
 	end
 	LIB.Ajax({
@@ -385,16 +386,16 @@ function D.DownloadMeta(downloader, info, onSuccess, onError)
 		end,
 		complete = function()
 			if info.szKey then
-				downloader.tDownloading[info.szKey] = nil
+				META_DOWNLOADING[info.szKey] = nil
 			end
 			FireUIEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
 		end,
 	})
 end
 
-function D.DownloadFavMetaList(downloader)
+function D.DownloadFavMetaList()
 	for _, info in ipairs(D.LoadFavMetaList()) do
-		D.DownloadMeta(downloader, info)
+		D.DownloadMeta(info)
 	end
 end
 
@@ -432,21 +433,19 @@ function D.LoadConfigureFile(szFile, info)
 	end)
 end
 
-function D.DownloadData(downloader, info, callback)
+function D.DownloadData(info, callback)
 	local szUUID = 'Remote-' .. info.szDataURL:gsub('[^a-zA-Z0-9%%]', '_') .. '-' .. GetStringCRC(info.szURL) .. '-' .. GetStringCRC(info.szVersion)
 	local LUA_CONFIG = { passphrase = MY_TM_DATA_PASSPHRASE, crc = true, compress = true }
 	local p = LIB.LoadLUAData(MY_TM_META_ROOT .. szUUID .. '.jx3dat', LUA_CONFIG)
 	if p and p.szVersion == info.szVersion and IsLocalFileExist(MY_TM_DATA_ROOT .. szUUID .. '.jx3dat') then
 		return D.LoadConfigureFile(szUUID .. '.jx3dat', info)
 	end
-	if not (downloader and downloader:IsValid()) then
-		return LIB.Topmsg(_L['Downloader is not ready!'])
-	end
-	if downloader.szDownloadingKey then
+	if DATA_DOWNLOADING[info.szKey] then
 		return LIB.Topmsg(_L['Dowloading in progress, please wait...'])
 	end
-	downloader.szDownloadingKey = info.szKey
-	downloader.FromTextureFile = function(_, szPath)
+	DATA_DOWNLOADING[info.szKey] = true
+	LIB.DownloadFile(info.szDataURL, function(szPath)
+		DATA_DOWNLOADING[info.szKey] = nil
 		local data = LIB.LoadLUAData(szPath, LUA_CONFIG)
 		if data then
 			local szFile = szUUID .. '.jx3dat'
@@ -456,10 +455,8 @@ function D.DownloadData(downloader, info, callback)
 		else
 			LIB.Topmsg(_L('Decode %s failed!', info.szTitle))
 		end
-		downloader.szDownloadingKey = nil
 		SafeCall(callback)
-	end
-	downloader:FromRemoteFile(info.szDataURL)
+	end)
 end
 
 function D.ShareMetaToRaid(info, bSure)
@@ -481,7 +478,7 @@ function D.ShareMetaToRaid(info, bSure)
 	LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TeamMon_RR', {'SYNC', info})
 end
 
-function D.AppendMetaInfoItem(downloader, container, p, pSel)
+function D.AppendMetaInfoItem(container, p, pSel)
 	local wnd = container:AppendContentFromIni(INI_PATH, 'Wnd_Item')
 	local bSel = pSel and p.szKey == pSel.szKey
 	wnd:Lookup('', 'Text_Item_Author'):SetText(LIB.ReplaceSensitiveWord(p.szAuthor))
@@ -490,12 +487,12 @@ function D.AppendMetaInfoItem(downloader, container, p, pSel)
 	wnd:Lookup('Btn_Info'):SetVisible(not IsEmpty(p.szAboutURL))
 	wnd:Lookup('Btn_Info', 'Text_Info'):SetText(_L['See details'])
 	wnd:Lookup('Btn_Download', 'Text_Download'):SetText(
-		(downloader.tDownloading[p.szKey] and _L['Fetching...'])
-		or (downloader and downloader.szDownloadingKey == p.szKey and _L['Downloading...'])
+		(META_DOWNLOADING[p.szKey] and _L['Fetching...'])
+		or (DATA_DOWNLOADING[p.szKey] and _L['Downloading...'])
 		or (p.szKey == O.szLastKey and (p.szVersion == O.szLastVersion and _L['Last select'] or _L['Can update']))
 		or _L['Download']
 	)
-	wnd:Lookup('Btn_Download'):Enable(not downloader.tDownloading[p.szKey] and (not downloader or downloader.szDownloadingKey ~= p.szKey))
+	wnd:Lookup('Btn_Download'):Enable(not META_DOWNLOADING[p.szKey] and not DATA_DOWNLOADING[p.szKey])
 	wnd.info = p
 	return bSel
 end
@@ -510,7 +507,7 @@ function D.UpdateRepoList(frame)
 	local container = page:Lookup('WndScroll_Repo/WndContainer_Repo_List')
 	container:Clear()
 	for _, p in ipairs(REPO_META_LIST) do
-		if D.AppendMetaInfoItem(frame.downloader, container, p, pSel) then
+		if D.AppendMetaInfoItem(container, p, pSel) then
 			bSel = true
 		end
 	end
@@ -530,7 +527,7 @@ function D.UpdateFavList(frame)
 	local container = page:Lookup('WndScroll_Fav/WndContainer_Fav_List')
 	container:Clear()
 	for _, p in ipairs(D.LoadFavMetaList()) do
-		if D.AppendMetaInfoItem(frame.downloader, container, p, pSel) then
+		if D.AppendMetaInfoItem(container, p, pSel) then
 			bSel = true
 		end
 	end
@@ -550,7 +547,7 @@ function D.CheckPageInit(page)
 		D.RequestRepoMetaList()
 	elseif p:GetName() == 'Page_Fav' then
 		D.UpdateFavList(this:GetRoot())
-		D.DownloadFavMetaList(page:GetRoot().downloader)
+		D.DownloadFavMetaList()
 	end
 	p.bInit = true
 end
@@ -574,8 +571,6 @@ function D.OnFrameCreate()
 	this:RegisterEvent('MY_TM_RR_REPO_META_LIST_UPDATE')
 	this:RegisterEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
 	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
-	this.downloader = this:Lookup('', 'Image_Downloader')
-	this.downloader.tDownloading = {}
 	D.CheckPageInit(this:Lookup('PageSet_Menu'))
 end
 
@@ -597,15 +592,14 @@ function D.OnLButtonClick()
 	if name == 'Btn_Close' then
 		D.ClosePanel()
 	elseif name == 'Btn_Download' then
-		local downloader = this:GetRoot().downloader
 		if this:GetParent():GetParent():GetParent():GetParent():GetName() == 'Page_Repo' then
-			D.DownloadData(downloader, this:GetParent().info, function()
+			D.DownloadData(this:GetParent().info, function()
 				FireUIEvent('MY_TM_RR_REPO_META_LIST_UPDATE')
 			end)
 			FireUIEvent('MY_TM_RR_REPO_META_LIST_UPDATE')
 		else
-			D.DownloadMeta(downloader, this:GetParent().info, function(info)
-				D.DownloadData(downloader, info, function()
+			D.DownloadMeta(this:GetParent().info, function(info)
+				D.DownloadData(info, function()
 					FireUIEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
 				end)
 				FireUIEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
@@ -616,7 +610,6 @@ function D.OnLButtonClick()
 			end)
 		end
 	elseif name == 'Btn_FavAddUrl' then
-		local downloader = this:GetRoot().downloader
 		GetUserInput(_L['Please input meta address:'], function(szText)
 			local aURL = LIB.SplitString(szText, ';')
 			local nPending = 0
@@ -630,7 +623,7 @@ function D.OnLButtonClick()
 					end
 					return
 				end
-				D.DownloadMeta(downloader, { szURL = szURL }, function(info)
+				D.DownloadMeta({ szURL = szURL }, function(info)
 					D.AddFavMeta(info)
 					D.UpdateFavList(frame)
 					ProcessQueue()
@@ -680,7 +673,7 @@ function D.OnLButtonClick()
 		end
 		D.ShareMetaToRaid(info)
 	elseif name == 'Btn_FavCheckUpdate' then
-		D.DownloadFavMetaList(this:GetRoot().downloader)
+		D.DownloadFavMetaList()
 	elseif name == 'Btn_RepoCheckUpdate' then
 		D.RequestRepoMetaList()
 	end
@@ -767,13 +760,8 @@ LIB.RegisterBgMsg('MY_TeamMon_RR', function(_, data, _, _, szTalker, _)
 				.. _L('Title: %s', info.szTitle) .. '\n'
 				.. _L('Author: %s', info.szAuthor) .. '\n'
 				.. _L('Meta URL: %s', info.szURL), function()
-					local bHide = not D.GetFrame()
-					local frame = D.OpenPanel()
-					if bHide then
-						D.ClosePanel()
-					end
 					D.AddFavMeta(info)
-					D.DownloadData(frame.downloader, info)
+					D.DownloadData(info)
 				end)
 		end
 	elseif action == 'LOAD' then
