@@ -337,6 +337,18 @@ function D.AddFavMeta(info)
 	D.SaveFavMetaList(aMeta)
 end
 
+function D.MetaJsonToLua(res, szURL, szKey)
+	return {
+		szURL = szURL,
+		szDataURL = GetAttachRawURL(res.data_url or './data.jx3dat', szURL),
+		szKey = szKey or LIB.GetUUID(),
+		szAuthor = res.author or '',
+		szTitle = res.name or '',
+		szAboutURL = GetAttachBlobURL(res.about or '', szURL),
+		szVersion = res.version or '',
+	}
+end
+
 function D.DownloadMeta(downloader, info, onSuccess, onError)
 	local szURL = GetRawURL(info.szURL) or info.szURL
 	if info.szKey then
@@ -352,15 +364,7 @@ function D.DownloadMeta(downloader, info, onSuccess, onError)
 			if not res then
 				return SafeCall(onError, _L['ERR: Info content is illegal!'] .. '\n\n' .. err)
 			end
-			local info = {
-				szURL = szURL,
-				szDataURL = GetAttachRawURL(res.data_url or './data.jx3dat', szURL),
-				szKey = info.szKey or LIB.GetUUID(),
-				szAuthor = res.author or '',
-				szTitle = res.name or '',
-				szAboutURL = GetAttachBlobURL(res.about or '', szURL),
-				szVersion = res.version or '',
-			}
+			local info = D.MetaJsonToLua(res, szURL, info.szKey)
 			local aMeta = D.LoadFavMetaList()
 			for i, p in ipairs(aMeta) do
 				if p.szKey == info.szKey then
@@ -406,7 +410,7 @@ function D.RequestRepoMetaList()
 			end
 			local aMeta = {}
 			for _, info in ipairs(res) do
-				info = LIB.FormatDataStructure(info, META_TEMPLATE)
+				info = D.MetaJsonToLua(info, '', info.key)
 				info.bEmbedded = true
 				insert(aMeta, info)
 			end
@@ -719,13 +723,19 @@ function D.OnItemMouseEnter()
 	local name = this:GetName()
 	if name == 'Handle_Item' then
 		local wnd = this:GetParent()
-		local szTip = _L('Meta URL: %s', wnd.info.szURL)
+		local szTip = ''
+		if not IsEmpty(wnd.info.szURL) then
+			szTip = szTip .. _L('Meta URL: %s', wnd.info.szURL)
+		end
 		local szShortURL = GetShortURL(wnd.info.szURL)
-		if szShortURL then
+		if not IsEmpty(szShortURL) then
 			szTip = szTip .. _L('(Short URL: %s)', szShortURL)
 		end
 		if IsCtrlKeyDown() then
 			szTip = szTip .. '\n' .. EncodeLUAData(wnd.info, '  ')
+		end
+		if IsEmpty(szTip) then
+			return
 		end
 		LIB.OutputTip(this, szTip)
 	end
