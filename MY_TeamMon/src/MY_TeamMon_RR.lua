@@ -278,6 +278,7 @@ local REPO_META_LIST = {{
 	szKey = 'DEFAULT',
 	szAuthor = _L['Default'],
 	szTitle = _L['Default monitor data'],
+	szUpdateTime = '',
 	szDataUrl = './data.jx3dat',
 	szURL = GetRawURL('tinymins@github'),
 	szAboutURL = GetBlobURL('tinymins@github:MY_TeamMon/README.md'),
@@ -289,6 +290,7 @@ local META_TEMPLATE = {
 	szVersion = '',
 	szAuthor = '',
 	szTitle = '',
+	szUpdateTime = '',
 	szAboutURL = '',
 }
 
@@ -345,6 +347,7 @@ function D.MetaJsonToLua(res, szURL, szKey)
 		szKey = szKey or LIB.GetUUID(),
 		szAuthor = res.author or '',
 		szTitle = res.name or '',
+		szUpdateTime = res.update or '',
 		szAboutURL = GetAttachBlobURL(res.about or '', szURL),
 		szVersion = res.version or '',
 	}
@@ -483,6 +486,7 @@ function D.AppendMetaInfoItem(container, p, pSel)
 	local bSel = pSel and p.szKey == pSel.szKey
 	wnd:Lookup('', 'Text_Item_Author'):SetText(LIB.ReplaceSensitiveWord(p.szAuthor))
 	wnd:Lookup('', 'Text_Item_Title'):SetText(LIB.ReplaceSensitiveWord(p.szTitle))
+	wnd:Lookup('', 'Text_Item_Download'):SetText(LIB.ReplaceSensitiveWord(p.szUpdateTime))
 	wnd:Lookup('', 'Image_Item_Sel'):SetVisible(bSel)
 	wnd:Lookup('Btn_Info'):SetVisible(not IsEmpty(p.szAboutURL))
 	wnd:Lookup('Btn_Info', 'Text_Info'):SetText(_L['See details'])
