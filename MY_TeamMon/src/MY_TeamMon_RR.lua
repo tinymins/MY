@@ -432,41 +432,34 @@ function D.LoadConfigureFile(szFile, info)
 	end)
 end
 
-function D.DownloadData(downloader, info)
-	D.DownloadMeta(downloader, info, function(info)
-		local szUUID = 'Remote-' .. info.szDataURL:gsub('[^a-zA-Z0-9%%]', '_') .. '-' .. GetStringCRC(info.szURL) .. '-' .. GetStringCRC(info.szVersion)
-		local LUA_CONFIG = { passphrase = MY_TM_DATA_PASSPHRASE, crc = true, compress = true }
-		local p = LIB.LoadLUAData(MY_TM_META_ROOT .. szUUID .. '.jx3dat', LUA_CONFIG)
-		if p and p.szVersion == info.szVersion and IsLocalFileExist(MY_TM_DATA_ROOT .. szUUID .. '.jx3dat') then
-			return D.LoadConfigureFile(szUUID .. '.jx3dat', info)
+function D.DownloadData(downloader, info, callback)
+	local szUUID = 'Remote-' .. info.szDataURL:gsub('[^a-zA-Z0-9%%]', '_') .. '-' .. GetStringCRC(info.szURL) .. '-' .. GetStringCRC(info.szVersion)
+	local LUA_CONFIG = { passphrase = MY_TM_DATA_PASSPHRASE, crc = true, compress = true }
+	local p = LIB.LoadLUAData(MY_TM_META_ROOT .. szUUID .. '.jx3dat', LUA_CONFIG)
+	if p and p.szVersion == info.szVersion and IsLocalFileExist(MY_TM_DATA_ROOT .. szUUID .. '.jx3dat') then
+		return D.LoadConfigureFile(szUUID .. '.jx3dat', info)
+	end
+	if not (downloader and downloader:IsValid()) then
+		return LIB.Topmsg(_L['Downloader is not ready!'])
+	end
+	if downloader.szDownloadingKey then
+		return LIB.Topmsg(_L['Dowloading in progress, please wait...'])
+	end
+	downloader.szDownloadingKey = info.szKey
+	downloader.FromTextureFile = function(_, szPath)
+		local data = LIB.LoadLUAData(szPath, LUA_CONFIG)
+		if data then
+			local szFile = szUUID .. '.jx3dat'
+			LIB.SaveLUAData(MY_TM_META_ROOT .. szUUID .. '.jx3dat', info, LUA_CONFIG)
+			LIB.SaveLUAData(MY_TM_DATA_ROOT .. szFile, data, LUA_CONFIG)
+			D.LoadConfigureFile(szFile, info)
+		else
+			LIB.Topmsg(_L('Decode %s failed!', info.szTitle))
 		end
-		if not (downloader and downloader:IsValid()) then
-			return LIB.Topmsg(_L['Downloader is not ready!'])
-		end
-		if downloader.szDownloadingKey then
-			return LIB.Topmsg(_L['Dowloading in progress, please wait...'])
-		end
-		downloader.szDownloadingKey = info.szKey
-		downloader.FromTextureFile = function(_, szPath)
-			local data = LIB.LoadLUAData(szPath, LUA_CONFIG)
-			if data then
-				local szFile = szUUID .. '.jx3dat'
-				LIB.SaveLUAData(MY_TM_META_ROOT .. szUUID .. '.jx3dat', info, LUA_CONFIG)
-				LIB.SaveLUAData(MY_TM_DATA_ROOT .. szFile, data, LUA_CONFIG)
-				D.LoadConfigureFile(szFile, info)
-			else
-				LIB.Topmsg(_L('Decode %s failed!', info.szTitle))
-			end
-			downloader.szDownloadingKey = nil
-			FireUIEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
-		end
-		downloader:FromRemoteFile(info.szDataURL)
-		FireUIEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
-	end, function(szErrmsg)
-		if szErrmsg then
-			LIB.Alert(szErrmsg)
-		end
-	end)
+		downloader.szDownloadingKey = nil
+		SafeCall(callback)
+	end
+	downloader:FromRemoteFile(info.szDataURL)
 end
 
 function D.ShareMetaToRaid(info, bSure)
@@ -604,7 +597,24 @@ function D.OnLButtonClick()
 	if name == 'Btn_Close' then
 		D.ClosePanel()
 	elseif name == 'Btn_Download' then
-		D.DownloadData(this:GetRoot().downloader, this:GetParent().info)
+		local downloader = this:GetRoot().downloader
+		if this:GetParent():GetParent():GetParent():GetParent():GetName() == 'Page_Repo' then
+			D.DownloadData(downloader, this:GetParent().info, function()
+				FireUIEvent('MY_TM_RR_REPO_META_LIST_UPDATE')
+			end)
+			FireUIEvent('MY_TM_RR_REPO_META_LIST_UPDATE')
+		else
+			D.DownloadMeta(downloader, this:GetParent().info, function(info)
+				D.DownloadData(downloader, info, function()
+					FireUIEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
+				end)
+				FireUIEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
+			end, function(szErrmsg)
+				if szErrmsg then
+					LIB.Alert(szErrmsg)
+				end
+			end)
+		end
 	elseif name == 'Btn_FavAddUrl' then
 		local downloader = this:GetRoot().downloader
 		GetUserInput(_L['Please input meta address:'], function(szText)
