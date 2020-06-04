@@ -51,11 +51,12 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
 end
 --------------------------------------------------------------------------
 local QUERY_URL = 'https://pull.j3cx.com/api/exam?q=%s'
-local SUBMIT_URL = 'https://push.j3cx.com/api/exam/uploads'
+local SUBMIT_URL = 'https://push.j3cx.com/api/exam/uploads?'
 local l_tLocal -- 本地题库
-local l_tCached = {} -- 玩家答题缓存
+local l_tExamDataCached = {} -- 玩家答题缓存
 local l_tAccept = {} -- 从服务器获取到的数据缓存
 local l_szLastQueryQues -- 最后一次网络查询的题目（防止重查）
+local D = {}
 
 local function DisplayMessage(szText)
 	LIB.Sysmsg(_L['Exam tip'], szText)
@@ -77,11 +78,13 @@ local function ResolveAnswer(szAnsw)
 	for i = 1, 4 do
 		frame:Lookup('Wnd_Type1/CheckBox_T1No' .. i, 'Text_T1No' .. i):SetFontColor(0, 0, 0)
 	end
-	for i = 1, 4 do
-		if frame:Lookup('Wnd_Type1/CheckBox_T1No' .. i, 'Text_T1No' .. i):GetText() == szAnsw then
-			frame:Lookup('Wnd_Type1/CheckBox_T1No' .. i, 'Text_T1No' .. i):SetFontColor(255, 255, 0)
-			frame:Lookup('Wnd_Type1/CheckBox_T1No' .. i):Check(true)
-			return true
+	if szAnsw then
+		for i = 1, 4 do
+			if frame:Lookup('Wnd_Type1/CheckBox_T1No' .. i, 'Text_T1No' .. i):GetText() == szAnsw then
+				frame:Lookup('Wnd_Type1/CheckBox_T1No' .. i, 'Text_T1No' .. i):SetFontColor(255, 255, 0)
+				frame:Lookup('Wnd_Type1/CheckBox_T1No' .. i):Check(true)
+				return true
+			end
 		end
 	end
 	return false
@@ -92,6 +95,7 @@ local function QueryData(szQues)
 		return
 	end
 	l_szLastQueryQues = szQues
+	ResolveAnswer()
 	DisplayMessage(_L['Querying, please wait...'])
 
 	if not l_tLocal then
@@ -144,27 +148,30 @@ local function QueryData(szQues)
 	})
 end
 
-local function SubmitData()
+function D.SubmitData(tExamData, bAllRight)
 	if LIB.IsDebugServer() then
 		return
 	end
 	local data = {}
-	for szQues, szAnsw in pairs(l_tCached) do
+	for szQues, res in pairs(tExamData) do
+		local aChoise = {}
+		for i, szChoise in pairs(res.aChoise) do
+			aChoise[i] = AnsiToUTF8(szChoise)
+		end
 		if not l_tAccept[szQues] then
-			insert(data, { ques = AnsiToUTF8(szQues), ans = AnsiToUTF8(szAnsw) })
+			insert(data, { AnsiToUTF8(szQues), aChoise, res.nChoise })
 		end
 	end
 	if #data == 0 then
 		return
 	end
 	LIB.Ajax({
-		method = 'post',
-		payload = 'json',
-		url = SUBMIT_URL,
-		data = {
+		driver = 'auto', method = 'auto',
+		url = SUBMIT_URL .. LIB.EncodePostData(LIB.UrlEncode({
 			lang = select(3, GetVersion()),
 			data = data,
-		},
+			perfect = bAllRight and 1 or 0,
+		})),
 		success = function(html, status)
 			local res = LIB.JsonDecode(html)
 			if LIB.IsShieldedVersion('MY_ExamTip') or not res then
@@ -190,36 +197,34 @@ local function OnFrameBreathe()
 	if not LIB.IsShieldedVersion('MY_ExamTip') then
 		QueryData(szQues)
 	end
-	local szAnsw
+	local aChoise, nChoise
 	for i = 1, 4 do
 		if frame:Lookup('Wnd_Type1/CheckBox_T1No' .. i):IsCheckBoxChecked() then
-			szAnsw = frame:Lookup('Wnd_Type1/CheckBox_T1No' .. i, 'Text_T1No' .. i):GetText()
-			break
+			nChoise = i
 		end
+		insert(aChoise, frame:Lookup('Wnd_Type1/CheckBox_T1No' .. i, 'Text_T1No' .. i):GetText())
 	end
-	if szQues and szAnsw then
-		l_tCached[szQues] = szAnsw
+	if szQues and not IsEmpty(aChoise) then
+		l_tExamDataCached[szQues] = { aChoise = aChoise, nChoise = nChoise }
 	end
 	l_nExamPrintRemainSpace = GetClientPlayer().GetExamPrintRemainSpace()
 end
 
-local function OnFrameCreate(name, frame)
+LIB.RegisterFrameCreate('ExaminationPanel.EXAM_TIP', function(name, frame)
 	frame.OnFrameBreathe = OnFrameBreathe
-end
-LIB.RegisterFrameCreate('ExaminationPanel.EXAM_TIP', OnFrameCreate)
+end)
 
-local function OnLoot()
+LIB.RegisterEvent('LOOT_ITEM.MY_EXAMTIP', function()
 	local item = GetItem(arg1)
 	if item and item.nUiId == 65814 then
 		local nBeforeExamPrintRemainSpace = l_nExamPrintRemainSpace
+		local tExamData = Clone(l_tExamDataCached)
 		LIB.DelayCall(function()
-			if nBeforeExamPrintRemainSpace - GetClientPlayer().GetExamPrintRemainSpace() == 100 then
-				SubmitData()
-			end
+			local bAllRight = nBeforeExamPrintRemainSpace - GetClientPlayer().GetExamPrintRemainSpace() == 100
+			D.SubmitData(tExamData, bAllRight)
 		end, 2000)
 	end
-end
-LIB.RegisterEvent('LOOT_ITEM.MY_EXAMTIP', OnLoot)
+end)
 end
 
 LIB.RegisterReload('MY_ExamTip', function()
