@@ -192,9 +192,9 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTi
 			LIB.DismissNotify(szKey)
 		end
 	end
-	D.GetSerendipityShareName(function()
-		fnAction('https://serendipity.uploads.j3cx.com')
-		fnAction('https://push.j3cx.com')
+	D.GetSerendipityShareName(function(szName)
+		fnAction(szName, 'https://serendipity.uploads.j3cx.com')
+		fnAction(szName, 'https://push.j3cx.com')
 	end, szMode ~= 'manual')
 end
 
