@@ -93,7 +93,7 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTi
 	local bSelf = szName == LIB.GetClientInfo().szName
 	local szNameU = AnsiToUTF8(szName)
 	local szNameCRC = ('%x%x%x'):format(szNameU:byte(), GetStringCRC(szNameU), szNameU:byte(-1))
-	local function fnAction(szReporter)
+	local function fnAction(szReporter, szDomain)
 		if szReporter == '' and nMethod ~= 1 then
 			szName = ''
 			szNameU = ''
@@ -101,7 +101,7 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTi
 		local szReporterU = AnsiToUTF8(szReporter)
 		local function DoUpload()
 			local configs, i, dc = {{'curl', 'post'}, {'origin', 'post'}, {'origin', 'get'}, {'webcef', 'get'}}, 1
-			local url = 'https://serendipity.uploads.j3cx.com/api/serendipity/uploads?l=' .. LIB.GetLang()
+			local url = szDomain .. '/api/serendipity/uploads?l=' .. LIB.GetLang()
 			.. '&data=' .. LIB.EncryptString(LIB.JsonEncode({
 				S = szRegionU, s = szServerU, a = szSerendipityU,
 				n = szNameU, N = szNameCRC, R = szReporterU,
@@ -192,7 +192,10 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTi
 			LIB.DismissNotify(szKey)
 		end
 	end
-	D.GetSerendipityShareName(fnAction, szMode ~= 'manual')
+	D.GetSerendipityShareName(function()
+		fnAction('https://serendipity.uploads.j3cx.com')
+		fnAction('https://push.j3cx.com')
+	end, szMode ~= 'manual')
 end
 
 function D.OnSerendipity(szName, szSerendipity, nMethod, nStatus, dwTime)
