@@ -1310,25 +1310,9 @@ function D.AddAbsorbRecord(data, dwCaster, dwTarget, szEffectID, nAbsorb, nSkill
 	D.InsertRecord(data, DK.ABSORB, dwCaster, dwTarget, szEffectID, nAbsorb, nAbsorb, nSkillResult)
 end
 
--- 确认对象数据已创建（未创建则创建）
-function D.InitObjectData(data, dwID, szChannel)
-	-- 名称缓存
-	if not data[DK.NAME_LIST][dwID] then
-		data[DK.NAME_LIST][dwID] = LIB.GetObjectName(IsPlayer(dwID) and TARGET.PLAYER or TARGET.NPC, dwID, 'never') -- 名称缓存
-	end
-	-- 势力缓存
-	if not data[DK.FORCE_LIST][dwID] then
-		if IsPlayer(dwID) then
-			local player = GetPlayer(dwID)
-			if player then
-				data[DK.FORCE_LIST][dwID] = player.dwForceID or 0
-			end
-		else
-			data[DK.FORCE_LIST][dwID] = 0
-		end
-	end
-	-- 玩家信息缓存
-	if not data[DK.PLAYER_LIST][dwID] and IsPlayer(dwID) then
+-- 保存玩家信息
+function D.SavePlayerInfo(data, dwID, bRefresh)
+	if (bRefresh or not data[DK.PLAYER_LIST][dwID]) and IsPlayer(dwID) then
 		local player, info = D.GetPlayer(dwID)
 		if player and info and not IsEmpty(info.dwMountKungfuID) then
 			local aEquip, nEquipScore = {}, player.GetTotalEquipScore()
@@ -1354,6 +1338,25 @@ function D.InitObjectData(data, dwID, szChannel)
 			end
 		end
 	end
+end
+
+-- 确认对象数据已创建（未创建则创建）
+function D.InitObjectData(data, dwID, szChannel)
+	-- 名称缓存
+	if not data[DK.NAME_LIST][dwID] then
+		data[DK.NAME_LIST][dwID] = LIB.GetObjectName(IsPlayer(dwID) and TARGET.PLAYER or TARGET.NPC, dwID, 'never') -- 名称缓存
+	end
+	-- 势力缓存
+	if not data[DK.FORCE_LIST][dwID] then
+		if IsPlayer(dwID) then
+			local player = GetPlayer(dwID)
+			if player then
+				data[DK.FORCE_LIST][dwID] = player.dwForceID or 0
+			end
+		else
+			data[DK.FORCE_LIST][dwID] = 0
+		end
+	end
 	-- 统计结构体
 	if szChannel and not data[szChannel][DK_REC.STAT][dwID] then
 		data[szChannel][DK_REC.STAT][dwID] = {
@@ -1364,6 +1367,8 @@ function D.InitObjectData(data, dwID, szChannel)
 			[DK_REC_STAT.TARGET      ] = {}, -- 该玩家具体对谁造成输出的统计
 		}
 	end
+	-- 玩家信息缓存
+	D.SavePlayerInfo(data, dwID)
 end
 
 do local szKey
@@ -1752,6 +1757,7 @@ for _, v in ipairs({
 			if not LIB.IsParty(dwID) then
 				return
 			end
+			D.SavePlayerInfo(Data, dwID, true)
 		end
 		D.InsertEverything(
 			Data, nLFC, nTime, nTick,
@@ -1831,6 +1837,7 @@ LIB.RegisterEvent({'MY_NPC_FIGHT_HINT', 'MY_PLAYER_FIGHT_HINT'}, function(e)
 		if not LIB.IsParty(dwID) then
 			return
 		end
+		D.SavePlayerInfo(Data, dwID, true)
 	end
 	D.InsertEverything(
 		Data, nLFC, nTime, nTick,
