@@ -93,7 +93,7 @@ function D.CheckUpdateAcquire()
 				.. szTeammateU .. ','
 				.. p.dwAchieveID .. ','
 				.. p.dwTime .. ',' .. p.nFightTime)
-			local szURL = 'https://bkr.uploads.j3cx.com/api/bkr/uploads?' .. LIB.EncodePostData(LIB.UrlEncode({
+			local szURL = 'https://push.j3cx.com/api/bkr/uploads?' .. LIB.EncodePostData(LIB.UrlEncode({
 				s = szServerU,
 				n = szNameU,
 				l = szLeaderU,

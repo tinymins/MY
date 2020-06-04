@@ -355,7 +355,7 @@ LIB.RegisterEvent('OPEN_WINDOW.MY_Serendipity_HouseFlowerPrice', function()
 			.. szPriceU .. ','
 			.. szItemU .. ','
 			.. dwTime)
-		local szURL = 'https://house.uploads.j3cx.com/api/flower/uploads?' .. LIB.EncodePostData(LIB.UrlEncode({
+		local szURL = 'https://push.j3cx.com/api/flower/uploads?' .. LIB.EncodePostData(LIB.UrlEncode({
 			s = szServerU,
 			m = szMapLineU,
 			u = szUnitU,

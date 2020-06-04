@@ -50,8 +50,8 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
 	return
 end
 --------------------------------------------------------------------------
-local QUERY_URL = 'https://exam.j3cx.com/api/exam?q=%s'
-local SUBMIT_URL = 'https://exam.uploads.j3cx.com/api/exam/uploads'
+local QUERY_URL = 'https://pull.j3cx.com/api/exam?q=%s'
+local SUBMIT_URL = 'https://push.j3cx.com/api/exam/uploads'
 local l_tLocal -- 本地题库
 local l_tCached = {} -- 玩家答题缓存
 local l_tAccept = {} -- 从服务器获取到的数据缓存

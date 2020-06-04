@@ -65,7 +65,7 @@ local INI_PATH = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_RR.ini'
 local MY_TM_META_ROOT = MY_TeamMon.MY_TM_META_ROOT
 local MY_TM_DATA_ROOT = MY_TeamMon.MY_TM_DATA_ROOT
 local MY_TM_DATA_PASSPHRASE = '89g45ynbtldnsryu98rbny9ps7468hb6npyusiryuxoldg7lbn894bn678b496746'
-local REPO_META_SUBSCRIBE_URL = 'https://api.j3cx.com/api/dbm/subscribe'
+local REPO_META_SUBSCRIBE_URL = 'https://pull.j3cx.com/api/dbm/subscribe'
 local META_DOWNLOADING, DATA_DOWNLOADING = {}, {}
 
 -- 陆服环境下，以下缩写均对等
