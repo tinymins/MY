@@ -528,3 +528,10 @@ function LIB.GetPostDataCRC(tData, szPassphrase)
 	end
 	return GetStringCRC(concat(r, ';'))
 end
+
+function LIB.SignPostData(tData, szPassphrase)
+	local szCRC = LIB.GetPostDataCRC(tData, szPassphrase)
+	tData.crc = szCRC
+	tData._ = GetCurrentTime()
+	return tData
+end
