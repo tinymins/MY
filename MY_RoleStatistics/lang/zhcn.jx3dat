@@ -124,6 +124,7 @@ return {
 	['r'] = '√',
     ['x'] = '×',
     ['Week routine: '] = '周常：',
+    ['---- %d players dungeon ----'] = '———— %d人副本 ————',
 
     ['MY_RoleStatistics_TaskStat'] = '任务统计',
     ['None'] = '无',

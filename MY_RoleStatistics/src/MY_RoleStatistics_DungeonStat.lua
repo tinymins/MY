@@ -587,27 +587,47 @@ function D.OutputRowTip(this, rec)
 	local bFloat = this:GetRoot():GetName() ~= 'MY_RoleStatistics'
 	for _, id in ipairs(TIP_COLUMN) do
 		if id == 'DUNGEON' then
-			local tDungeon = {}
+			local tDungeon, aDungeon = {}, {}
 			for _, col in ipairs(D.GetColumns()) do
 				if wfind(col.id, 'dungeon_') then
-					insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
-					insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
-					insert(aXml, col.GetFormatText(rec))
-					insert(aXml, GetFormatText('\n', 162, 255, 255, 255))
-					tDungeon[tonumber(col.id:sub(#'dungeon_' + 1))] = true
+					local a, dwMapID = {}, tonumber(col.id:sub(#'dungeon_' + 1))
+					local nMaxPlayerCount = select(3, GetMapParams(dwMapID))
+					insert(a, GetFormatText(col.szTitle, 162, 255, 255, 0))
+					insert(a, GetFormatText(':  ', 162, 255, 255, 0))
+					insert(a, col.GetFormatText(rec))
+					insert(a, GetFormatText('\n', 162, 255, 255, 255))
+					insert(aDungeon, { dwMapID = dwMapID, nMaxPlayerCount = nMaxPlayerCount, szXml = concat(a) })
+					tDungeon[dwMapID] = true
 				end
 			end
 			for dwMapID, aCopyID in pairs(rec.copy_info) do
 				if not tDungeon[dwMapID] then
 					local map = LIB.GetMapInfo(dwMapID)
 					if map then
-						insert(aXml, GetFormatText(map.szName, 162, 255, 255, 0))
-						insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
-						insert(aXml, GetFormatText(concat(aCopyID, ',')))
-						insert(aXml, GetFormatText('\n', 162, 255, 255, 255))
+						local a = {}
+						local nMaxPlayerCount = select(3, GetMapParams(dwMapID))
+						insert(a, GetFormatText(map.szName, 162, 255, 255, 0))
+						insert(a, GetFormatText(':  ', 162, 255, 255, 0))
+						insert(a, GetFormatText(concat(aCopyID, ',')))
+						insert(a, GetFormatText('\n', 162, 255, 255, 255))
+						insert(aDungeon, { dwMapID = dwMapID, nMaxPlayerCount = nMaxPlayerCount, szXml = concat(a) })
 					end
 					tDungeon[dwMapID] = true
 				end
+			end
+			sort(aDungeon, function(p1, p2)
+				if p1.nMaxPlayerCount == p2.nMaxPlayerCount then
+					return p1.dwMapID < p2.dwMapID
+				end
+				return p1.nMaxPlayerCount < p2.nMaxPlayerCount
+			end)
+			local nMaxPlayerCount = 0
+			for _, p in ipairs(aDungeon) do
+				if nMaxPlayerCount ~= p.nMaxPlayerCount then
+					nMaxPlayerCount = p.nMaxPlayerCount
+					insert(aXml, GetFormatText(_L('---- %d players dungeon ----', nMaxPlayerCount) .. '\n', 162, 255, 255, 0))
+				end
+				insert(aXml, p.szXml)
 			end
 		else
 			local col = COLUMN_DICT[id]
