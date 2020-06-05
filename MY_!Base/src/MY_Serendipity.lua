@@ -93,36 +93,45 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTi
 	local bSelf = szName == LIB.GetClientInfo().szName
 	local szNameU = AnsiToUTF8(szName)
 	local szNameCRC = ('%x%x%x'):format(szNameU:byte(), GetStringCRC(szNameU), szNameU:byte(-1))
-	local function fnAction(szReporter, szDomain)
+	local szLang = LIB.GetLang()
+	local nCount = bSelf and 0 or 1
+	local function fnAction(szReporter)
 		if szReporter == '' and nMethod ~= 1 then
 			szName = ''
 			szNameU = ''
 		end
 		local szReporterU = AnsiToUTF8(szReporter)
+		local szCrc = GetStringCRC(concat({
+			szLang,
+			szRegionU,
+			szServerU,
+			szSerendipityU,
+			szNameU,
+			szNameCRC,
+			szReporterU,
+			nStatus,
+			dwTime,
+			nCount,
+			nMethod,
+		}, ','))
 		local function DoUpload()
-			local url = szDomain .. '/api/serendipity/uploads?l=' .. LIB.GetLang()
-			.. '&data=' .. LIB.EncryptString(LIB.JsonEncode({
-				S = szRegionU, s = szServerU, a = szSerendipityU,
-				n = szNameU, N = szNameCRC, R = szReporterU,
-				f = nStatus, t = dwTime, c = bSelf and 0 or 1,
-				m = nMethod,
-			}))
 			--[[#DEBUG BEGIN]]
-			local szDebugInfo = szSerendipity .. ' by ' .. szName .. '#' .. szNameCRC
-				.. ' via ' .. szReporter .. ' to ' .. url
-			LIB.Debug('Prepare for uploading serendipity ' .. szDebugInfo, DEBUG_LEVEL.LOG)
+			LIB.Debug('Prepare for uploading serendipity ' .. szSerendipity .. ' by '
+				.. szName .. '#' .. szNameCRC .. ' via ' .. szReporter, DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
-			LIB.EnsureAjax({
-				url = url,
-				--[[#DEBUG BEGIN]]
-				fulfilled = function()
-					LIB.Debug('Upload serendipity ' .. szDebugInfo .. ' succeed.', DEBUG_LEVEL.LOG)
-				end,
-				error = function()
-					LIB.Debug('Upload serendipity ' .. szDebugInfo .. ' failed.', DEBUG_LEVEL.LOG)
-				end,
-				--[[#DEBUG END]]
-			})
+			LIB.EnsureAjax({ url = 'https://serendipity.uploads.j3cx.com/api/serendipity/uploads?l=' .. szLang
+				.. '&data=' .. LIB.EncryptString(LIB.JsonEncode({
+					S = szRegionU, s = szServerU, a = szSerendipityU,
+					n = szNameU, N = szNameCRC, R = szReporterU,
+					f = nStatus, t = dwTime, c = nCount, m = nMethod,
+				})) })
+			LIB.EnsureAjax({ url = 'https://push.j3cx.com/api/serendipity/uploads?l=' ..
+				.. '&' .. LIB.EncodePostData(LIB.UrlEncode({
+					S = szRegionU, s = szServerU, a = szSerendipityU,
+					n = szNameU, N = szNameCRC, R = szReporterU,
+					f = nStatus, t = dwTime, c = nCount,
+					l = szLang, m = nMethod, crc = szCrc,
+				})) })
 		end
 		if szMode == 'manual' or nMethod ~= 1 then
 			DoUpload()
@@ -173,10 +182,7 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTi
 			LIB.DismissNotify(szKey)
 		end
 	end
-	D.GetSerendipityShareName(function(szName)
-		fnAction(szName, 'https://serendipity.uploads.j3cx.com')
-		fnAction(szName, 'https://push.j3cx.com')
-	end, szMode ~= 'manual')
+	D.GetSerendipityShareName(fnAction, szMode ~= 'manual')
 end
 
 function D.OnSerendipity(szName, szSerendipity, nMethod, nStatus, dwTime)
