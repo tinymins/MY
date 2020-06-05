@@ -101,19 +101,6 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTi
 			szNameU = ''
 		end
 		local szReporterU = AnsiToUTF8(szReporter)
-		local szCrc = GetStringCRC(concat({
-			szLang,
-			szRegionU,
-			szServerU,
-			szSerendipityU,
-			szNameU,
-			szNameCRC,
-			szReporterU,
-			nStatus,
-			dwTime,
-			nCount,
-			nMethod,
-		}, ','))
 		local function DoUpload()
 			--[[#DEBUG BEGIN]]
 			LIB.Debug('Prepare for uploading serendipity ' .. szSerendipity .. ' by '
@@ -125,13 +112,13 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTi
 					n = szNameU, N = szNameCRC, R = szReporterU,
 					f = nStatus, t = dwTime, c = nCount, m = nMethod,
 				})) })
-			LIB.EnsureAjax({ url = 'https://push.j3cx.com/api/serendipity/uploads?l=' ..
-				.. '&' .. LIB.EncodePostData(LIB.UrlEncode({
+			LIB.EnsureAjax({ url = 'https://push.j3cx.com/api/serendipity/uploads?'
+				.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
+					l = szLang,
 					S = szRegionU, s = szServerU, a = szSerendipityU,
 					n = szNameU, N = szNameCRC, R = szReporterU,
-					f = nStatus, t = dwTime, c = nCount,
-					l = szLang, m = nMethod, crc = szCrc,
-				})) })
+					f = nStatus, t = dwTime, c = nCount, m = nMethod,
+				}, 'IYUgd789ao6r8waDY*(W&8923'))) })
 		end
 		if szMode == 'manual' or nMethod ~= 1 then
 			DoUpload()
@@ -332,33 +319,17 @@ LIB.RegisterEvent('OPEN_WINDOW.MY_Serendipity_HouseFlowerPrice', function()
 	local szUnit, szPrice, szItem = arg1:match(_L['Today I want every (%d-%s-) number sold at (%d-%s-) for (%s+)'])
 	local szMapLine = Station.Lookup('Normal/Minimap/Wnd_Minimap/Wnd_Over', 'Text_Fresher'):GetText()
 	if szUnit then
-		local szServerU = AnsiToUTF8(LIB.GetRealServer(2))
-		local szMapLineU = AnsiToUTF8(szMapLine)
-		local szUnitU = AnsiToUTF8(szUnit)
-		local szPriceU = AnsiToUTF8(szPrice)
-		local szItemU = AnsiToUTF8(szItem)
-		local dwTime = GetCurrentTime()
-		local nCRC = GetStringCRC('MY_r8395yrtsiolty79osd_'
-			.. szServerU .. ','
-			.. szMapLineU .. ','
-			.. szUnitU .. ','
-			.. szPriceU .. ','
-			.. szItemU .. ','
-			.. dwTime)
-		local szURL = 'https://push.j3cx.com/api/flower/uploads?' .. LIB.EncodePostData(LIB.UrlEncode({
-			s = szServerU,
-			m = szMapLineU,
-			u = szUnitU,
-			p = szPriceU,
-			i = szItemU,
-			t = dwTime,
-			c = nCRC, _ = GetCurrentTime(),
-		}))
-		local tConfig = {
-			url = szURL,
-			driver = 'auto', method = 'auto',
-		}
-		LIB.Ajax(tConfig)
+		LIB.EnsureAjax({
+			url = 'https://push.j3cx.com/api/flower/uploads?'
+				.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
+					s = AnsiToUTF8(LIB.GetRealServer(2)),
+					m = AnsiToUTF8(szMapLine),
+					u = AnsiToUTF8(szUnit),
+					p = AnsiToUTF8(szPrice),
+					i = AnsiToUTF8(szItem),
+					t = GetCurrentTime(),
+				}, 'MY_r8395yrtsiolty79osd')))
+			})
 	end
 end)
 
