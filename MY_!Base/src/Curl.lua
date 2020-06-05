@@ -511,3 +511,18 @@ function LIB.EnsureAjax(options)
 	end
 	TryUploadWithNextDriver()
 end
+
+function LIB.GetPostDataCRC(tData, szPassphrase)
+	local a = {}
+	for k, v in pairs(tData) do
+		insert(a, { k = k, v = v })
+	end
+	sort(a, function(p1, p2) return tostring(p1.k) < tostring(p2.k) end)
+	for i, v in ipairs(a) do
+		a[i] = v.k .. ':' .. v.v
+	end
+	if szPassphrase then
+		insert(a, 1, szPassphrase)
+	end
+	return GetStringCRC(concat(a, ';'))
+end
