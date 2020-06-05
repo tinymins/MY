@@ -100,7 +100,6 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTi
 		end
 		local szReporterU = AnsiToUTF8(szReporter)
 		local function DoUpload()
-			local configs, i, dc = {{'curl', 'post'}, {'origin', 'post'}, {'origin', 'get'}, {'webcef', 'get'}}, 1
 			local url = szDomain .. '/api/serendipity/uploads?l=' .. LIB.GetLang()
 			.. '&data=' .. LIB.EncryptString(LIB.JsonEncode({
 				S = szRegionU, s = szServerU, a = szSerendipityU,
@@ -109,39 +108,21 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTi
 				m = nMethod,
 			}))
 			--[[#DEBUG BEGIN]]
-			LIB.Debug('Prepare for uploading serendipity '
-				.. szSerendipity .. ' by ' .. szName .. '#' .. szNameCRC .. ' via ' .. szReporter
-				.. ' to ' .. url, DEBUG_LEVEL.LOG)
+			local szDebugInfo = szSerendipity .. ' by ' .. szName .. '#' .. szNameCRC
+				.. ' via ' .. szReporter .. ' to ' .. url
+			LIB.Debug('Prepare for uploading serendipity ' .. szDebugInfo, DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
-			local function TryUploadWithNextDriver()
-				local config = configs[i]
-				if not config then
-					return 0
-				end
+			LIB.EnsureAjax({
+				url = url,
 				--[[#DEBUG BEGIN]]
-				LIB.Debug('Try upload serendipity with mode ' .. config[1] .. '/' .. config[2], DEBUG_LEVEL.LOG)
+				fulfilled = function()
+					LIB.Debug('Upload serendipity ' .. szDebugInfo .. ' succeed.', DEBUG_LEVEL.LOG)
+				end,
+				error = function()
+					LIB.Debug('Upload serendipity ' .. szDebugInfo .. ' failed.', DEBUG_LEVEL.LOG)
+				end,
 				--[[#DEBUG END]]
-				dc, i = LIB.DelayCall(30000, TryUploadWithNextDriver), i + 1 -- 必须先发起保护再请求，因为请求可能会立刻失败触发gc
-				LIB.Ajax({
-					driver = config[1],
-					method = config[2],
-					url = url,
-					fulfilled = function()
-						--[[#DEBUG BEGIN]]
-						LIB.Debug('Upload serendipity succeed with mode ' .. config[1] .. '/' .. config[2], DEBUG_LEVEL.LOG)
-						--[[#DEBUG END]]
-						LIB.DelayCall(dc, false)
-					end,
-					error = function()
-						--[[#DEBUG BEGIN]]
-						LIB.Debug('Upload serendipity failed with mode ' .. config[1] .. '/' .. config[2], DEBUG_LEVEL.LOG)
-						--[[#DEBUG END]]
-						LIB.DelayCall(dc, false)
-						TryUploadWithNextDriver()
-					end,
-				})
-			end
-			TryUploadWithNextDriver()
+			})
 		end
 		if szMode == 'manual' or nMethod ~= 1 then
 			DoUpload()

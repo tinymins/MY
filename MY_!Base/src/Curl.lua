@@ -44,6 +44,13 @@ local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAD
 local _L = LIB.LoadLangPack()
 -------------------------------------------------------------------------------------------------------------
 
+local function SafeCall(f, ...)
+	if not f then
+		return
+	end
+	return Call(f, ...)
+end
+
 -- ##################################################################################################
 --   # # # # # # # # # # #       #       #           #           #                     #     #
 --   #                   #       #       # # # #       #   # # # # # # # #             #       #
@@ -461,4 +468,46 @@ function LIB.DownloadFile(szPath, resolve)
 		end
 		downloader:FromRemoteFile(szPath)
 	end
+end
+
+-- 发起数据接口安全稳定的多次重试 Ajax 调用
+-- 注意该接口暂只可用于上传 因为不支持返回结果内容
+function LIB.EnsureAjax(options)
+	local key = GetStringCRC(options.url)
+	local configs, i, dc = {{'curl', 'post'}, {'origin', 'post'}, {'origin', 'get'}, {'webcef', 'get'}}, 1
+	--[[#DEBUG BEGIN]]
+	LIB.Debug('Ensure ajax ' .. key .. ' preparing: ' .. options.url, DEBUG_LEVEL.LOG)
+	--[[#DEBUG END]]
+	local function TryUploadWithNextDriver()
+		local config = configs[i]
+		if not config then
+			SafeCall(options.error)
+			return 0
+		end
+		--[[#DEBUG BEGIN]]
+		LIB.Debug('Ensure ajax ' .. key .. ' try mode ' .. config[1] .. '/' .. config[2], DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
+		dc, i = LIB.DelayCall(30000, TryUploadWithNextDriver), i + 1 -- 必须先发起保护再请求，因为请求可能会立刻失败触发gc
+		local opt = {
+			driver = config[1],
+			method = config[2],
+			url = options.url,
+			fulfilled = function(...)
+				--[[#DEBUG BEGIN]]
+				LIB.Debug('Ensure ajax ' .. key .. ' succeed with mode ' .. config[1] .. '/' .. config[2], DEBUG_LEVEL.LOG)
+				--[[#DEBUG END]]
+				LIB.DelayCall(dc, false)
+				SafeCall(options.fulfilled, ...)
+			end,
+			error = function()
+				--[[#DEBUG BEGIN]]
+				LIB.Debug('Ensure ajax ' .. key .. ' failed with mode ' .. config[1] .. '/' .. config[2], DEBUG_LEVEL.LOG)
+				--[[#DEBUG END]]
+				LIB.DelayCall(dc, false)
+				TryUploadWithNextDriver()
+			end,
+		}
+		LIB.Ajax(opt)
+	end
+	TryUploadWithNextDriver()
 end
