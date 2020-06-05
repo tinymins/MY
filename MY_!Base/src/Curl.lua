@@ -513,16 +513,18 @@ function LIB.EnsureAjax(options)
 end
 
 function LIB.GetPostDataCRC(tData, szPassphrase)
-	local a = {}
+	local a, r = {}, {}
 	for k, v in pairs(tData) do
 		insert(a, { k = k, v = v })
 	end
 	sort(a, function(p1, p2) return tostring(p1.k) < tostring(p2.k) end)
-	for i, v in ipairs(a) do
-		a[i] = v.k .. ':' .. v.v
-	end
 	if szPassphrase then
-		insert(a, 1, szPassphrase)
+		insert(r, szPassphrase)
 	end
-	return GetStringCRC(concat(a, ';'))
+	for _, v in ipairs(a) do
+		if v.k ~= '_' and v.k ~= 'crc' then
+			insert(r, v.k .. ':' .. v.v)
+		end
+	end
+	return GetStringCRC(concat(r, ';'))
 end
