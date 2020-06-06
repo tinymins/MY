@@ -355,7 +355,7 @@ function LIB.GetTargetContextMenu(dwType, szName, dwID)
 	return t
 end
 
--- 获取副本选择菜单
+-- 获取秘境选择菜单
 -- (table) LIB.GetDungeonMenu(fnAction, bOnlyRaid)
 do
 local function RecruitItemToDungeonMenu(p, fnAction, tChecked)
@@ -368,7 +368,7 @@ local function RecruitItemToDungeonMenu(p, fnAction, tChecked)
 			return t
 		end
 	else
-		-- 不限阵营 有地图ID 7点开始 持续24小时 基本就是副本了
+		-- 不限阵营 有地图ID 7点开始 持续24小时 基本就是秘境了
 		if p.nCamp == 7
 		and p.nStartTime == 7 and p.nLastTime == 24
 		and p.dwMapID and LIB.IsDungeonMap(p.dwMapID) then
@@ -415,7 +415,7 @@ function LIB.GetTypeGroupMap()
 	tWeight[_L.MAP_GROUP['Battle field / Arena']] = 97
 	tWeight[_L.MAP_GROUP['Other dungeon']] = 96
 	tWeight[_L.MAP_GROUP['Other']] = 95
-	-- 获取副本类型
+	-- 获取秘境类型
 	local tDungeon = {}
 	local nCount, tLine, szVersionName, szGroup, dwMapID = g_tTable.DungeonInfo:GetRowCount()
 	for i = 2, nCount do
@@ -446,7 +446,7 @@ function LIB.GetTypeGroupMap()
 	for szGroup, aMapInfo in pairs(tDungeon) do
 		insert(aGroup, { szGroup = szGroup, aMapInfo = aMapInfo })
 	end
-	-- 非副本
+	-- 非秘境
 	local tMap = {}
 	local nCount, tLine, szGroup = g_tTable.MapList:GetRowCount()
 	for i = 2, nCount do
@@ -588,7 +588,7 @@ function LIB.GetActivityMap(szType)
 	return aMap
 end
 
--- 获取副本CD列表（异步）
+-- 获取秘境CD列表（异步）
 -- (table) LIB.GetMapSaveCopy(fnAction)
 -- (number|nil) LIB.GetMapSaveCopy(dwMapID, fnAction)
 do
@@ -702,7 +702,7 @@ function LIB.IsInSameRefreshTime(szType, dwTime)
 	return nNextTime > dwTime and nNextTime - dwTime <= nCircle
 end
 
--- 获取副本地图刷新时间
+-- 获取秘境地图刷新时间
 -- (number nNextTime, number nCircle) LIB.GetDungeonRefreshTime(dwMapID)
 function LIB.GetDungeonRefreshTime(dwMapID)
 	local _, nMapType, nMaxPlayerCount = GetMapParams(dwMapID)
@@ -2090,7 +2090,7 @@ function LIB.IsFighting()
 	if not bFightState and LIB.IsInArena() and ARENA_START then
 		bFightState = true
 	elseif not bFightState and LIB.IsInDungeon() then
-		-- 在副本且附近队友进战且附近敌对NPC进战则判断处于战斗状态
+		-- 在秘境且附近队友进战且附近敌对NPC进战则判断处于战斗状态
 		local bPlayerFighting, bNpcFighting
 		for _, p in ipairs(LIB.GetNearPlayer()) do
 			if me.IsPlayerInMyParty(p.dwID) and p.bFightState then
@@ -3172,7 +3172,7 @@ local function GenerateMapInfo()
 	return MAP_LIST
 end
 
--- 判断一个地图是不是副本
+-- 判断一个地图是不是秘境
 -- (bool) LIB.IsDungeonMap(szMapName, bRaid)
 -- (bool) LIB.IsDungeonMap(dwMapID, bRaid)
 function LIB.IsDungeonMap(dwMapID, bRaid)
@@ -3218,13 +3218,13 @@ function LIB.GetMapNameList()
 	return aList
 end
 
--- 判断一个地图是不是个人CD副本
+-- 判断一个地图是不是个人CD秘境
 -- (bool) LIB.IsDungeonRoleProgressMap(dwMapID)
 function LIB.IsDungeonRoleProgressMap(dwMapID)
 	return (select(8, GetMapParams(dwMapID)))
 end
 
--- 判断当前地图是不是副本
+-- 判断当前地图是不是秘境
 -- (bool) LIB.IsInDungeon(bool bRaid)
 function LIB.IsInDungeon(bRaid)
 	local me = GetClientPlayer()

@@ -117,14 +117,14 @@ return {
     ['%s before'] = '%s前',
     ['Refresh: %s'] = '刷新：%s',
 
-    ['MY_RoleStatistics_DungeonStat'] = '副本统计',
+    ['MY_RoleStatistics_DungeonStat'] = '秘境统计',
     ['None'] = '无',
     ['Unknown'] = '未知',
-    ['Dungeon copy'] = '副本进度',
+    ['Dungeon copy'] = '秘境进度',
 	['r'] = '√',
     ['x'] = '×',
     ['Week routine: '] = '周常：',
-    ['---- %d players dungeon ----'] = '———— %d人副本 ————',
+    ['---- %d players dungeon ----'] = '———— %d人秘境 ————',
 
     ['MY_RoleStatistics_TaskStat'] = '任务统计',
     ['None'] = '无',

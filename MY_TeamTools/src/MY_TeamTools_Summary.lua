@@ -92,7 +92,7 @@ local RT_SKILL_TYPE = {
 	[15] = 'TRANSFER_LIFE',
 	[16] = 'TRANSFER_MANA',
 }
--- 副本评分 晚点在做吧
+-- 秘境评分 晚点在做吧
 -- local RT_DUNGEON_TOTAL = {}
 local RT_SCORE = {
 	Equip   = _L['Equip score'],
@@ -488,7 +488,7 @@ function D.UpdateList(page)
 					hScore:SetText(g_tStrings.STR_GUILD_OFFLINE)
 				end
 			end
-			-- 副本CD
+			-- 秘境CD
 			if not h.hHandle_BossKills then
 				h.hHandle_BossKills = {
 					self = h:Lookup('Handle_BossKills'),
@@ -730,9 +730,9 @@ function D.RequestTeamData()
 	--[[#DEBUG END]]
 	local aTeamMemberList = D.GetTeamMemberList(true)
 	for _, dwID in ipairs(aTeamMemberList) do
-		if bIsDungeonRoleProgressMap then -- 副本进度
+		if bIsDungeonRoleProgressMap then -- 秘境进度
 			ApplyDungeonRoleProgress(RT_MAPID, dwID) -- 成功回调 UPDATE_DUNGEON_ROLE_PROGRESS(dwMapID, dwPlayerID)
-		elseif bDungeonMap then -- 副本CDID
+		elseif bDungeonMap then -- 秘境CDID
 			if not RT_PLAYER_MAP_COPYID[dwID] then
 				RT_PLAYER_MAP_COPYID[dwID] = {}
 			end
@@ -785,8 +785,8 @@ function D.GetTeam(page)
 			tBuff             = {}, -- 增益BUFF
 			tFood             = {}, -- 小吃和附魔
 			-- nEquipScore       = -1,  -- 装备分
-			nCopyID           = RT_PLAYER_MAP_COPYID[dwID] and RT_PLAYER_MAP_COPYID[dwID][RT_MAPID], -- 副本ID
-			tBossKill         = {}, -- 副本进度
+			nCopyID           = RT_PLAYER_MAP_COPYID[dwID] and RT_PLAYER_MAP_COPYID[dwID][RT_MAPID], -- 秘境ID
+			tBossKill         = {}, -- 秘境进度
 			nFightState       = KPlayer and KPlayer.bFightState and 1 or 0, -- 战斗状态
 			bIsOnLine         = true,
 			bGrandpa          = false, -- 大爷
@@ -814,7 +814,7 @@ function D.GetTeam(page)
 				D.GetEquipCache(page, me)
 			end
 		end
-		-- 副本进度
+		-- 秘境进度
 		if aInfo.bIsOnLine and bIsDungeonRoleProgressMap then
 			for i, boss in ipairs(aProgressMapBoss) do
 				aInfo.tBossKill[i] = GetDungeonRoleProgress(RT_MAPID, dwID, boss.dwProgressID)
@@ -945,7 +945,7 @@ function D.OnInitPage()
 	-- 装备分
 	this.hTotalScore = page:Lookup('Wnd_Summary', 'Handle_Score/Text_TotalScore')
 	this.hProgress   = page:Lookup('Wnd_Summary', 'Handle_Progress')
-	-- 副本信息
+	-- 秘境信息
 	local hDungeon = page:Lookup('Wnd_Summary', 'Handle_Dungeon')
 	D.UpdateDungeonInfo(hDungeon)
 	this.hKungfuList = page:Lookup('Wnd_Summary', 'Handle_Kungfu/Handle_Kungfu_List')
@@ -1040,7 +1040,7 @@ function D.OnEvent(szEvent)
 	elseif szEvent == 'LOADING_END' or szEvent == 'PARTY_DISBAND' then
 		this.tDataCache = {}
 		this.hList:Clear()
-		-- 副本信息
+		-- 秘境信息
 		local hDungeon = this:Lookup('Wnd_Summary', 'Handle_Dungeon')
 		D.UpdateDungeonInfo(hDungeon)
 	elseif szEvent == 'MY_RAIDTOOLS_MAPID_CHANGE' then

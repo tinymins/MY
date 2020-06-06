@@ -53,7 +53,7 @@ end
 
 MY_ThreatRank = {
 	bEnable       = true,  -- 开启
-	bInDungeon    = true, -- 只有副本内才开启
+	bInDungeon    = true, -- 只有秘境内才开启
 	nBGAlpha      = 30,    -- 背景透明度
 	nMaxBarCount  = 7,     -- 最大列表
 	bForceColor   = false, -- 根据门派着色

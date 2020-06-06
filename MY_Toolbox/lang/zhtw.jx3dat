@@ -60,7 +60,7 @@ return {
     ['Shenxing has been cancelled, cause you got the zhenyan.'] = '您獲取到陣眼，為防止神行千里CD被黑，讀條已自動打斷。',
     ['Shenxing to ancient maps'] = '盛唐故地神行千里',
     ['Force open all map shenxing'] = '未知地圖神行千里',
-    ['Shenxing can fly to undiscovered maps'] = '允許神行千里前往尚未探索過的地圖、副本',
+    ['Shenxing can fly to undiscovered maps'] = '允許神行千里前往尚未探索過的地圖、秘境',
 
     ['Auto switch talk channel when into battle field'] = '進出戰場、競技場時自動切換團隊/戰場頻道',
 

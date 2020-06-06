@@ -4,7 +4,7 @@ return {
 	['Well done! %s in %d group first to attack %s!!'] = '%d小隊的 %s 率先攻擊了 %s！獲取不一定准確，僅供參考！',
 	['** You Threat more than %d, 120% is Out of Taunt! **'] = '** 你的仇恨超過了 %d％ 達到 120％ 則ＯＴ！**',
 	['Enable ThreatScrutiny'] = '開啟仇恨統計',
-	['Only in the map type is Dungeon Enable plug-in'] = '只有地圖類型是副本時才啟用',
+	['Only in the map type is Dungeon Enable plug-in'] = '只有地圖類型是秘境時才啟用',
 	['Alert Setting'] = '報警設置',
 	['OT Alert'] = '即將OT報警',
 	['OT Alert Sound'] = '播放聲音',

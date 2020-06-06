@@ -32,7 +32,7 @@ return {
 	-- MY_TeamTools_EnterMap
 	['MY_TeamTools_EnterMap'] = '过图记录',
 	[' enter map %s'] = '进入地图 %s',
-	[', copy id is %s'] = '，副本ID为 %s',
+	[', copy id is %s'] = '，秘境ID为 %s',
 	[', copy cd is %s'] = '，已有进度 %s',
 	['.'] = '。',
 	-- MY_TeamTools_Summary
@@ -44,7 +44,7 @@ return {
 	['Special equip score'] = '特效得分',
 	['Too far'] = '距离太远',
 	['Equip'] = '装备',
-	['Dungeon CD'] = '副本CD',
+	['Dungeon CD'] = '秘境CD',
 	['Fight'] = '战斗',
 	['None'] = '无',
 	['Unknown'] = '未知',
@@ -199,7 +199,7 @@ return {
 
 	-- MY_FirstBossKill.lua --
 	['Share boss kill'] = '首次击败分享',
-	['Share boss kill record for kill rank.'] = '分享首次击败副本首领相关团队与战斗信息，用于数据统计。',
+	['Share boss kill record for kill rank.'] = '分享首次击败秘境首领相关团队与战斗信息，用于数据统计。',
 	['Try share boss kill: %s - %ds (%s).'] = '正在分享：%s，战斗%d秒，%s。',
 	['Share boss kill success: %s - %ds (%s).'] = '成功分享：%s，战斗%d秒，%s。',
 	['Full win'] = '全胜',

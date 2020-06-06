@@ -1,7 +1,7 @@
 --------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
--- @desc     : 副本CD统计
+-- @desc     : 秘境CD统计
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
@@ -78,9 +78,9 @@ local O = {
 	},
 	szSort = 'time_days',
 	szSortOrder = 'desc',
-	tMapSaveCopy = {}, -- 单副本 CD
+	tMapSaveCopy = {}, -- 单秘境 CD
 	tMapProgress = {}, -- 单首领 CD
-	bMapProgressApplied = false, -- 是否请求过副本进度
+	bMapProgressApplied = false, -- 是否请求过秘境进度
 	bFloatEntry = true,
 	bSaveDB = false,
 }
@@ -234,7 +234,7 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 		end
 		local map = id and LIB.GetMapInfo(id)
 		if map then
-			local col = { -- 副本CD
+			local col = { -- 秘境CD
 				id = 'dungeon_' .. id,
 				szTitle = map.szName,
 				nWidth = DUNGEON_WIDTH,
@@ -531,7 +531,7 @@ function D.OnGetMapSaveCopyResopnse(tMapCopy)
 end
 
 function D.UpdateMapProgress(bForceUpdate)
-	-- 如果不是强制刷新副本进度并且已经请求过，则不再重复发起
+	-- 如果不是强制刷新秘境进度并且已经请求过，则不再重复发起
 	if not bForceUpdate and O.bMapProgressApplied then
 		return
 	end
@@ -556,7 +556,7 @@ function D.UpdateMapProgress(bForceUpdate)
 	LIB.GetMapSaveCopy(D.OnGetMapSaveCopyResopnse)
 end
 
--- 首领死亡刷新副本进度
+-- 首领死亡刷新秘境进度
 LIB.RegisterEvent('SYNC_LOOT_LIST.MY_RoleStatistics_DungeonStat__UpdateMapCopy', function()
 	if not LIB.IsInDungeon() then
 		return
@@ -732,7 +732,7 @@ function D.OnInitPage()
 					})
 				end
 			end
-			-- 副本选项
+			-- 秘境选项
 			local tDungeonChecked = {}
 			for _, id in ipairs(aColumn) do
 				local szID = wfind(id, 'dungeon_') and wgsub(id, 'dungeon_', '')
@@ -744,7 +744,7 @@ function D.OnInitPage()
 			local tDungeonMenu = LIB.GetDungeonMenu(function(info)
 				fnAction('dungeon_' .. info.dwID, DUNGEON_WIDTH)
 			end, nil, tDungeonChecked)
-			-- 动态活动副本选项
+			-- 动态活动秘境选项
 			for _, szType in ipairs({
 				'week_team_dungeon',
 				'week_raid_dungeon',

@@ -96,7 +96,7 @@ return {
     ['Cancel buff %d - %d'] = '卸除气劲 %d - %d',
     ['Move Up'] = '上移',
     ['Move Down'] = '下移',
-    ['Cancel buff is disabled outside dungeon.'] = '快捷键卸除气劲仅在副本内可用',
+    ['Cancel buff is disabled outside dungeon.'] = '快捷键卸除气劲仅在秘境内可用',
     ['Hotkey cancel is only allowed for buff.'] = '快捷键只能取消气劲不能释放技能',
     ['Cannot find target to cancel buff.'] = '找不到需要卸除气劲的目标',
     ['Cannot find buff to cancel.'] = '需要卸除的气劲不存在',

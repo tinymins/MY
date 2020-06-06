@@ -147,7 +147,7 @@ LIB.RegisterBgMsg('MY_ABOUT', function(_, data, nChannel, dwID, szName, bIsSelf)
 	end
 end)
 
--- 团队副本CD
+-- 团队秘境CD
 do local LAST_TIME = {}
 LIB.RegisterBgMsg('MY_MAP_COPY_ID_REQUEST', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
 	if bSelf then
@@ -271,7 +271,7 @@ end
 local function OnCrossMapGoFB()
 	local dwTime = GetCurrentTime()
 	local dwMapID, dwID = this.tInfo.MapID, this.tInfo.ID
-	-- 副本可重置且是队长则会弹出重置提示框 走 crossmap_dungeon_reset 流程
+	-- 秘境可重置且是队长则会弹出重置提示框 走 crossmap_dungeon_reset 流程
 	if LIB.IsDungeonResetable(dwMapID) and LIB.IsLeader() then
 		l_nSwitchMapID, l_nSwitchSubID = dwMapID, dwID
 	else

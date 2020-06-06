@@ -474,7 +474,7 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 	end
 	local task = TASK_HASH[id]
 	if task then
-		local col = { -- 副本CD
+		local col = { -- 秘境CD
 			id = id,
 			szTitle = task.szTitle,
 			nMinWidth = TASK_MIN_WIDTH,
@@ -701,7 +701,7 @@ function D.GetClientPlayerRec()
 	for _, task in ipairs(TASK_LIST) do
 		insert(aTask, task)
 	end
-	-- 动态活动副本选项
+	-- 动态活动秘境选项
 	for _, szType in ipairs(ACTIVITY_LIST) do
 		insert(aTask, TASK_HASH[szType])
 	end
@@ -1050,7 +1050,7 @@ function D.OnInitPage()
 					tChecked[task.id] = true
 				end
 			end
-			-- 动态活动副本选项
+			-- 动态活动秘境选项
 			for _, szType in ipairs(ACTIVITY_LIST) do
 				if not tChecked[szType] then
 					local col = COLUMN_DICT[szType]

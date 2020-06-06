@@ -459,7 +459,7 @@ local COLUMN_LIST = {
 local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 	local serendipity = SERENDIPITY_HASH[id]
 	if serendipity then
-		local col = { -- ¸±±¾CD
+		local col = { -- ÃØ¾³CD
 			id = id,
 			szTitle = serendipity.szName,
 			nMinWidth = TASK_MIN_WIDTH,

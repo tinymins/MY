@@ -8,7 +8,7 @@ return {
     ['Only enable in checked map types'] = '勾选后仅在勾选类型的地图中启用扁平血条，全部取消勾选表示所有地图启用。',
     ['Arena'] = '竞技场',
     ['Battlefield'] = '战场',
-    ['Dungeon'] = '副本',
+    ['Dungeon'] = '秘境',
 
     ['Color config'] = '颜色设置',
     ['Player color config'] = '玩家颜色设置',
@@ -109,6 +109,6 @@ return {
     ['XLifeBar style'] = '扁平风格',
     ['Keep current'] = '保持现状',
 
-    ['This function has been shielded by official except in dungeon'] = '应官方要求，该功能已停止在副本外使用',
+    ['This function has been shielded by official except in dungeon'] = '应官方要求，该功能已停止在秘境外使用',
     ['Compressing: '] = '压缩数据：',
 }

@@ -382,7 +382,7 @@ function D.RedrawMapList(frame)
 		},
 	}
 	insert(aGroupMap, tCommon)
-	-- ¸±±¾
+	-- ÃØ¾³
 	for _, v in ipairs(LIB.GetTypeGroupMap()) do
 		insert(aGroupMap, v)
 	end

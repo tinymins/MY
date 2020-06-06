@@ -17,7 +17,7 @@ return {
     ['Auto focus enemy in arena'] = '焦点竞技场敌方队员',
     ['Anmerkungen auto focus'] = '焦点记在小本本里的玩家',
     ['Traversal object'] = '获取信息时设置临时目标',
-    ['May cause some problem in dungeon map'] = '获取信息更加精准但是可能造成性能和其他问题（建议副本中不要开启）',
+    ['May cause some problem in dungeon map'] = '获取信息更加精准但是可能造成性能和其他问题（建议秘境中不要开启）',
     ['Show focus\'s target'] = '显示目标的目标',
     ['Show 3d distance'] = '显示三维坐标距离',
     ['Hide dead object'] = '隐藏重伤的目标',
