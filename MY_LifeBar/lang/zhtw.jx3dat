@@ -44,7 +44,8 @@ return {
     ['Show object id'] = '顯示ID',
     ['Only unnamed'] = '僅無名目標',
     ['Sort by screen pos'] = '根據位置調整遮擋順序',
-    ['Self always on top'] = '總是置頂顯示我的頭頂',
+    ['Self always on top'] = '置頂自身',
+    ['Target always on top'] = '置頂目標',
 
     ['Global UI scale: %.2f.'] = '整體縮放：%.2f。',
     ['Max Distance: %s foot.'] = '最大顯示距離：%s尺。',

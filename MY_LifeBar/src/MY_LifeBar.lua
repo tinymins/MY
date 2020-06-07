@@ -476,6 +476,9 @@ function CheckInvalidRect(dwType, dwID, me, object)
 		force = D.GetForce(dwType, dwID, object)
 		nPriority = OBJECT_SCREEN_POS_Y_CACHE[dwID] or 0 -- 默认根据屏幕坐标排序
 		if Config.bMineOnTop and dwType == TARGET.PLAYER and dwID == me.dwID then -- 自身永远最前
+			nPriority = nPriority + 20000
+		end
+		if Config.bTargetOnTop and dwID == dwTarID then -- 目标永远最前
 			nPriority = nPriority + 10000
 		end
 		szName = LIB.GetObjectName(object, (Config.bShowObjectID and (Config.bShowObjectIDOnlyUnnamed and 'auto' or 'always') or 'never'))

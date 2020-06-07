@@ -50,6 +50,7 @@ local __TEMPLATE__ = {
 	bSystemUIScale = true,
 	bShowWhenUIHide = true,
 	bMineOnTop = true,
+	bTargetOnTop = true,
 	bScreenPosSort = true,
 
 	Color = {

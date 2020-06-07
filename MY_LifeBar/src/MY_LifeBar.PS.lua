@@ -95,6 +95,7 @@ local function LoadUI(ui)
 	ui:Children('#WndCheckBox_ShowDistance'):Check(Config.bShowDistance)
 	ui:Children('#WndCheckBox_ScreenPosSort'):Check(Config.bScreenPosSort)
 	ui:Children('#WndCheckBox_MineOnTop'):Check(Config.bMineOnTop)
+	ui:Children('#WndCheckBox_TargetOnTop'):Check(Config.bTargetOnTop)
 end
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
@@ -873,7 +874,7 @@ function PS.OnPanelActive(wnd)
 	})
 
 	y = y + offsety - 10
-	ui:Append('WndCheckBox', {
+	x = x + ui:Append('WndCheckBox', {
 		name = 'WndCheckBox_MineOnTop',
 		x = x, y = y, w = 'auto',
 		text = _L['Self always on top'],
@@ -882,7 +883,20 @@ function PS.OnPanelActive(wnd)
 			Config.bMineOnTop = bChecked
 		end,
 		autoenable = function() return D.IsEnabled() end,
-	})
+	}):Width() + 5
+
+	x = x + ui:Append('WndCheckBox', {
+		name = 'WndCheckBox_TargetOnTop',
+		x = x, y = y, w = 'auto',
+		text = _L['Target always on top'],
+		checked = Config.bTargetOnTop,
+		oncheck = function(bChecked)
+			Config.bTargetOnTop = bChecked
+		end,
+		autoenable = function() return D.IsEnabled() end,
+	}):Width() + 5
+
+	x = X
 
 	y = y + offsety - 5
 	ui:Append('WndButton', {
