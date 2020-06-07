@@ -225,6 +225,7 @@ function D.UpdateAnchor(frame)
 	local an = LIB.GetStorage('FrameAnchor.MY_Recount')
 		or { x = 0, y = -70, s = 'BOTTOMRIGHT', r = 'BOTTOMRIGHT' }
 	frame:SetPoint(an.s, 0, 0, an.r, an.x, an.y)
+	frame:CorrectPos()
 end
 
 -- 重绘整个界面
