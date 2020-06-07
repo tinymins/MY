@@ -86,10 +86,12 @@ local O = {
 	bCompactMode = false,
 	tUncheckedNames = {},
 	bSaveDB = false,
+	bAdviceSaveDB = false,
 }
 RegisterCustomData('Global/MY_RoleStatistics_BagStat.bCompactMode')
 RegisterCustomData('Global/MY_RoleStatistics_BagStat.tUncheckedNames')
 RegisterCustomData('MY_RoleStatistics_BagStat.bSaveDB')
+RegisterCustomData('MY_RoleStatistics_BagStat.bAdviceSaveDB')
 
 do
 local GetItemText
@@ -458,6 +460,14 @@ function D.OnInitPage()
 end
 
 function D.OnActivePage()
+	if not O.bAdviceSaveDB and not O.bSaveDB then
+		LIB.Confirm(_L('%s stat has not been enabled, this character\'s data will not be saved, are you willing to save this character?\nYou can change this config by click option button on the top-right conner.', _L[MODULE_NAME]), function()
+			MY_RoleStatistics_BagStat.bSaveDB = true
+			MY_RoleStatistics_BagStat.bAdviceSaveDB = true
+		end, function()
+			MY_RoleStatistics_BagStat.bAdviceSaveDB = true
+		end)
+	end
 	D.FlushDB()
 	D.UpdateNames(this)
 end
@@ -617,6 +627,7 @@ local settings = {
 				bCompactMode = true,
 				tUncheckedNames = true,
 				bSaveDB = true,
+				bAdviceSaveDB = true,
 			},
 			root = O,
 		},
@@ -627,6 +638,7 @@ local settings = {
 				bCompactMode = true,
 				tUncheckedNames = true,
 				bSaveDB = true,
+				bAdviceSaveDB = true,
 			},
 			triggers = {
 				bCompactMode = function()

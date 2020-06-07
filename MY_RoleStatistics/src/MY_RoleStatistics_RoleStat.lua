@@ -104,6 +104,7 @@ local O = {
 	tSummaryIgnoreGUID = {},
 	bFloatEntry = true,
 	bSaveDB = false,
+	bAdviceSaveDB = false,
 }
 RegisterCustomData('Global/MY_RoleStatistics_RoleStat.aColumn')
 RegisterCustomData('Global/MY_RoleStatistics_RoleStat.szSort')
@@ -113,6 +114,7 @@ RegisterCustomData('MY_RoleStatistics_RoleStat.tAlertTodayVal')
 RegisterCustomData('MY_RoleStatistics_RoleStat.tSummaryIgnoreGUID')
 RegisterCustomData('MY_RoleStatistics_RoleStat.bFloatEntry', 2)
 RegisterCustomData('MY_RoleStatistics_RoleStat.bSaveDB')
+RegisterCustomData('MY_RoleStatistics_RoleStat.bAdviceSaveDB')
 
 local function GetFormatSysmsgText(szText)
 	return GetFormatText(szText, GetMsgFont('MSG_SYS'), GetMsgFontColor('MSG_SYS'))
@@ -1123,6 +1125,14 @@ function D.OnInitPage()
 end
 
 function D.OnActivePage()
+	if not O.bAdviceSaveDB and not O.bSaveDB then
+		LIB.Confirm(_L('%s stat has not been enabled, this character\'s data will not be saved, are you willing to save this character?\nYou can change this config by click option button on the top-right conner.', _L[MODULE_NAME]), function()
+			MY_RoleStatistics_RoleStat.bSaveDB = true
+			MY_RoleStatistics_RoleStat.bAdviceSaveDB = true
+		end, function()
+			MY_RoleStatistics_RoleStat.bAdviceSaveDB = true
+		end)
+	end
 	D.FlushDB()
 	D.UpdateUI(this)
 end
@@ -1342,6 +1352,7 @@ local settings = {
 				tSummaryIgnoreGUID = true,
 				bFloatEntry = true,
 				bSaveDB = true,
+				bAdviceSaveDB = true,
 			},
 			root = O,
 		},
@@ -1357,6 +1368,7 @@ local settings = {
 				tSummaryIgnoreGUID = true,
 				bFloatEntry = true,
 				bSaveDB = true,
+				bAdviceSaveDB = true,
 			},
 			triggers = {
 				bFloatEntry = D.UpdateFloatEntry,

@@ -83,12 +83,14 @@ local O = {
 	bMapProgressApplied = false, -- 是否请求过秘境进度
 	bFloatEntry = true,
 	bSaveDB = false,
+	bAdviceSaveDB = false,
 }
 RegisterCustomData('Global/MY_RoleStatistics_DungeonStat.aColumn')
 RegisterCustomData('Global/MY_RoleStatistics_DungeonStat.szSort')
 RegisterCustomData('Global/MY_RoleStatistics_DungeonStat.szSortOrder')
 RegisterCustomData('MY_RoleStatistics_DungeonStat.bFloatEntry', 2)
 RegisterCustomData('MY_RoleStatistics_DungeonStat.bSaveDB')
+RegisterCustomData('MY_RoleStatistics_DungeonStat.bAdviceSaveDB')
 
 local EXCEL_WIDTH = 960
 local DUNGEON_WIDTH = 80
@@ -775,6 +777,14 @@ function D.OnInitPage()
 end
 
 function D.OnActivePage()
+	if not O.bAdviceSaveDB and not O.bSaveDB then
+		LIB.Confirm(_L('%s stat has not been enabled, this character\'s data will not be saved, are you willing to save this character?\nYou can change this config by click option button on the top-right conner.', _L[MODULE_NAME]), function()
+			MY_RoleStatistics_DungeonStat.bSaveDB = true
+			MY_RoleStatistics_DungeonStat.bAdviceSaveDB = true
+		end, function()
+			MY_RoleStatistics_DungeonStat.bAdviceSaveDB = true
+		end)
+	end
 	D.FlushDB(true)
 	D.UpdateUI(this)
 end
@@ -966,6 +976,7 @@ local settings = {
 				szSortOrder = true,
 				bFloatEntry = true,
 				bSaveDB = true,
+				bAdviceSaveDB = true,
 			},
 			root = O,
 		},
@@ -978,6 +989,7 @@ local settings = {
 				szSortOrder = true,
 				bFloatEntry = true,
 				bSaveDB = true,
+				bAdviceSaveDB = true,
 			},
 			triggers = {
 				bFloatEntry = D.UpdateFloatEntry,
