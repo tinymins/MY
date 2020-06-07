@@ -203,4 +203,5 @@ return {
 	['Try share boss kill: %s - %ds (%s).'] = '正在分享：%s，战斗%d秒，%s。',
 	['Share boss kill success: %s - %ds (%s).'] = '成功分享：%s，战斗%d秒，%s。',
 	['Full win'] = '全胜',
+	['Would you like to share first boss kill log?'] = '你想要分享首次击败秘境首领日志，用于争夺跨区服秘境通关百强榜吗？',
 }

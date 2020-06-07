@@ -245,3 +245,24 @@ local settings = {
 }
 MY_FirstBossKill = LIB.GeneGlobalNS(settings)
 end
+
+LIB.RegisterTutorial({
+	szKey = 'MY_FirstBossKill',
+	szMessage = _L['Would you like to share first boss kill log?'],
+	fnRequire = function()
+		return not LIB.IsDebugServer() and not MY_FirstBossKill.bEnable
+	end,
+	{
+		szOption = _L['Yes'],
+		bDefault = true,
+		fnAction = function()
+			MY_FirstBossKill.bEnable = true
+		end,
+	},
+	{
+		szOption = _L['No'],
+		fnAction = function()
+			MY_FirstBossKill.bEnable = false
+		end,
+	},
+})
