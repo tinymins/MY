@@ -125,12 +125,6 @@ return {
     ['Warning: Bigwar has been finished but not handed yet!'] = '茗伊提示：大战还没交！',
     ['This map is big war map and you did not accepted the quest, is that correct?'] = '提示：检测到角色没有接受当前地图秘境大战系列任务！',
 
-    ['Show changge shadow index'] = '显示长歌影子次序',
-    ['Show distance'] = '显示距离',
-    ['Show countdown'] = '显示时间',
-    ['Scale: %d%%.'] = '缩放: %d%%',
-    ['Changge force only'] = '仅长歌可用',
-
     ['Auto restore team info in arena'] = '竞技场中自动恢复上次组队信息',
     ['Auto cancel hide player in arena and battlefield'] = '竞技场与战场中自动取消屏蔽玩家与NPC',
 
@@ -147,8 +141,6 @@ return {
     ['Max display count %d, current %d.'] = '最大显示%d条，当前结果%d条。',
 
     ['Hide announce bg'] = '隐藏官方公告区背景',
-    ['MY_EnergyBar'] = '门派能量条',
-    ['Enable MY_EnergyBar'] = '显示门派能量条',
 
     -- MY_Taoguan
     ['MY_Taoguan'] = '年兽陶罐',
@@ -171,29 +163,6 @@ return {
     ['Please input custom name'] = '请输入自定义名称',
     ['Start/stop break can'] = '开始/停止砸罐',
     ['Restore default config'] = '恢复默认设置',
-
-    -- MY_Force
-    ['MY_Force'] = '门派特色',
-    ['Your pet [%s] disappeared!'] = '您的宠物 [%s] 消失了！',
-    ['Alert when pet disappear unexpectedly (for 5D)'] = '五毒宠物意外消失提醒（献祭、召唤除外）',
-    ['Alert when horse is hungry'] = '坐骑饥饿上马时发出提醒',
-    ['Mark pet'] = '标记自己的宠物',
-    ['School feature'] = '职业特色辅助',
-    ['Your debuff of type [%s] reached [%d]'] = '您身上的 [%s] debuff 达到 [%d] 个',
-    ['Alert when my same type of debuff reached a certain number '] = '提醒自身同类型 debuff 达到一定数量',
-    ['Alert when I am wanted publishing online'] = '在线被悬赏时提醒自己',
-    ['Now somebody pay (%d+) gold to buy life of (.-)'] = '现有人愿付(%d+)金，对(.-)进行悬赏',
-    ['Congratulations, you offered a reward [%s] gold!'] = '恭喜你被悬赏 [%s]，肥水不流外人田啊！！',
-
-    -- MY_ForceGuding
-    ['I have put the GUDING, hurry to eat if you lack of mana. *la la la*'] = '法宝 [仙王蛊鼎] 已祭出，内力不足抓紧享用，用茗伊插件看得见~#玫瑰#玫瑰~~',
-    ['Auto eat GUDING'] = '自动吃仙王蛊鼎',
-    ['MY_ForceGuding'] = '茗伊蛊鼎',
-    ['Display GUDING of teammate, change color'] = '突出显示团队里的仙王蛊鼎，设置颜色',
-    ['Auto talk in team channel after puting GUDING'] = '喊话提醒队友来吃',
-    ['Talk message'] = '喊话内容',
-    ['Automatic eat GUDING when mana below '] = '自动吃蛊鼎，当蓝低于',
-    [', or life below '] = '，或血低于',
 
 	-- MY_Love.lua --
 	['MY_Love'] = '剑侠情缘',

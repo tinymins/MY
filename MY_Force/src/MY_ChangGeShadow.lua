@@ -41,7 +41,7 @@ local Call, XpCall, GetTraceback, RandomChild = LIB.Call, LIB.XpCall, LIB.GetTra
 local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
 local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
 -------------------------------------------------------------------------------------------------------
-local PLUGIN_NAME = 'MY_Toolbox'
+local PLUGIN_NAME = 'MY_Force'
 local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Toolbox'
 local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
@@ -200,8 +200,6 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 			return me and me.dwForceID == CONSTANT.FORCE_TYPE.CHANG_GE
 		end,
 	})
-	x = X
-	y = y + 25
 	return x, y
 end
 

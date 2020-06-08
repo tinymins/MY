@@ -41,7 +41,7 @@ local Call, XpCall, GetTraceback, RandomChild = LIB.Call, LIB.XpCall, LIB.GetTra
 local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
 local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
 -------------------------------------------------------------------------------------------------------
-local PLUGIN_NAME = 'MY_Toolbox'
+local PLUGIN_NAME = 'MY_Force'
 local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Force'
 local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
@@ -303,7 +303,7 @@ function PS.OnPanelActive(frame)
 	local ui = UI(frame)
 	local X, Y = 10, 10
 	local x, y = X, Y
-	local w, h = ui:Size()
+	local W, H = ui:Size()
 	-- wu du
 	---------------
 	ui:Append('Text', { text = g_tStrings.tForceTitle[CONSTANT.FORCE_TYPE.WU_DU], x = x, y = y, font = 27 })
@@ -363,7 +363,7 @@ function PS.OnPanelActive(frame)
 	x = X + 10
 	y = y + 28
 	ui:Append('WndEditBox', {
-		x = x, y = y, w = w - x * 2, h = 50,
+		x = x, y = y, w = W - x * 2, h = 50,
 		multiline = true, limit = 512,
 		text = MY_ForceGuding.szSay,
 		autoenable = function() return MY_ForceGuding.bAutoSay end,
@@ -408,6 +408,10 @@ function PS.OnPanelActive(frame)
 	---------------
 	x = X
 	ui:Append('Text', { text = _L['Others'], x = x, y = y, font = 27 })
+	-- crlf
+	x = X + 10
+	y = y + 28
+	MY_EnergyBar.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	-- crlf
 	x = X + 10
 	y = y + 28
@@ -462,5 +466,9 @@ function PS.OnPanelActive(frame)
 			return m0
 		end,
 	})
+	-- crlf
+	x = X + 10
+	y = y + 28
+	x, y = MY_ChangGeShadow.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 end
 LIB.RegisterPanel('MY_Force', _L['MY_Force'], _L['Target'], 327, PS)
