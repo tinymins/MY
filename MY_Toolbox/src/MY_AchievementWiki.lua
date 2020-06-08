@@ -171,15 +171,14 @@ LIB.RegisterFrameCreate('AchievementPanel.MY_AchievementWiki', function(name, fr
 end)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	ui:Append('WndCheckBox', {
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, w = 'auto',
 		text = _L['Achievement wiki'],
 		checked = MY_AchievementWiki.bEnable,
 		oncheck = function(bChecked)
 			MY_AchievementWiki.bEnable = bChecked
 		end,
-	})
-	y = y + 25
+	}):Width() + 5
 	return x, y
 end
 

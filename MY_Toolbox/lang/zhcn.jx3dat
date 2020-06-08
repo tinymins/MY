@@ -387,4 +387,14 @@ return {
     ['Your domesticate %s available measure is %d point!'] = '你驯养的%s待喂养饱食度已达到%d点！',
     ['Domesticate feed alert'] = '驯养提醒',
     ['Alert when measure larger than %d'] = '当驯养可喂养饱食度高于%d点时提醒',
+
+    -- MY_YunMacro.lua
+    ['Sync yun macro'] = '同步云端宏',
+    ['Macro update failed...'] = '同步云端宏失败...',
+    ['ERR: Info content is illegal!'] = '错误：内容解析失败！',
+    ['Macro update started, please keep panel opened and wait.'] = '开始更新宏，请保持当前界面开启、不要切换宏并等待结果。',
+    ['Macro update succeed, please click save button.'] = '宏数据更新成功，清点击宏界面的“确定”或“应用”按钮使该宏生效。',
+    ['Top yun macro'] = '云端宏排名',
+    ['Show yun macro buttons on macro panel.'] = '在宏界面显示云端宏按钮',
+    ['Got it'] = '好的',
 }

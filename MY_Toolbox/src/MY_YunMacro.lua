@@ -1,7 +1,7 @@
 --------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
--- @desc     : 常用工具
+-- @desc     : 云端宏
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
@@ -51,54 +51,139 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
 end
 --------------------------------------------------------------------------
 
-do
-local TARGET_TYPE, TARGET_ID
-local function onHotKey()
-	if TARGET_TYPE then
-		LIB.SetTarget(TARGET_TYPE, TARGET_ID)
-		TARGET_TYPE, TARGET_ID = nil
+local D = {}
+local O = {
+	bEnable = false,
+}
+RegisterCustomData('MY_YunMacro.bEnable')
+
+function D.Hook()
+	local frame = Station.SearchFrame('MacroSettingPanel')
+	if not frame then
+		return
+	end
+	local edtName = frame:Lookup('Edit_Name')
+	local edtDesc = frame:Lookup('Edit_Desc')
+	local edtMacro = frame:Lookup('Edit_Content')
+	local btnSure = frame:Lookup('Btn_Sure')
+	local hIconList = frame:Lookup('', 'Handle_Icon')
+	UI(frame):Append('WndButton', {
+		name = 'Btn_YunMacro_Update',
+		x = edtName:GetRelX() + edtName:GetW() + 10, y = edtName:GetRelY() - 4,
+		w = 'auto', h = edtName:GetH(),
+		text = _L['Sync yun macro'],
+		onclick = function()
+			LIB.Alert('MY_YunMacro', _L['Macro update started, please keep panel opened and wait.'], nil, _L['Got it'])
+			LIB.Ajax({
+				driver = 'auto', mode = 'auto',
+				url = 'https://pull.j3cx.com/api/plugins/macro/query?name='
+					.. LIB.UrlEncode(AnsiToUTF8(edtName:GetText())),
+				success = function(szHTML)
+					local res, err = LIB.JsonDecode(szHTML)
+					if not res then
+						return LIB.Alert('MY_YunMacro', _L['ERR: Info content is illegal!'] .. '\n\n' .. err, nil, _L['Got it'])
+					end
+					if res.icon then
+						for i = 0, hIconList:GetItemCount() - 1 do
+							hIconList:Lookup(i):SetObjectInUse(false)
+						end
+						local box = hIconList:Lookup(0)
+						box:SetObjectInUse(true)
+						box:SetObjectIcon(res.icon)
+						box.nIconID = res.icon
+						hIconList.nIconID = res.icon
+					end
+					edtDesc:SetText(res.desc)
+					edtDesc:SetCaretPos(0)
+					edtMacro:SetText(res.data)
+					edtMacro:SetCaretPos(0)
+					LIB.Alert('MY_YunMacro', _L['Macro update succeed, please click save button.'], nil, _L['Got it'])
+				end,
+				error = function()
+					LIB.Alert('MY_YunMacro', _L['Macro update failed...'], nil, _L['Got it'])
+				end,
+			})
+		end,
+	})
+	UI(frame):Append('WndButton', {
+		name = 'Btn_YunMacro_Tops',
+		x = edtMacro:GetRelX(), y = btnSure:GetRelY(),
+		w = btnSure:GetW(), h = btnSure:GetH(),
+		text = _L['Top yun macro'],
+		onclick = function()
+			LIB.OpenBrowser('https://page.j3cx.com/macro/tops?kungfu=' .. UI_GetPlayerMountKungfuID())
+		end,
+	})
+end
+
+function D.Unhook()
+	local frame = Station.SearchFrame('MacroSettingPanel')
+	if not frame then
+		return
+	end
+	for _, s in ipairs({
+		'Btn_YunMacro_Update',
+		'Btn_YunMacro_Tops',
+	}) do
+		local el = frame:Lookup(s)
+		if el then
+			el:Destroy()
+		end
+	end
+end
+
+function D.Apply()
+	if O.bEnable then
+		D.Hook()
+		LIB.RegisterFrameCreate('MacroSettingPanel.MY_YunMacro', D.Hook)
+		LIB.RegisterReload('MY_YunMacro', D.Unhook)
 	else
-		TARGET_TYPE, TARGET_ID = LIB.GetTarget()
-		LIB.SetTarget(TARGET.PLAYER, UI_GetClientPlayerID())
+		D.Unhook()
+		LIB.RegisterFrameCreate('MacroSettingPanel.MY_YunMacro', false)
+		LIB.RegisterReload('MY_YunMacro', false)
 	end
 end
-LIB.RegisterHotKey('MY_AutoLoopMeAndTarget', _L['Loop target between me and target'], onHotKey)
+LIB.RegisterInit('MY_YunMacro', D.Apply)
+
+function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+	x = x + ui:Append('WndCheckBox', {
+		x = x, y = y, w = 'auto',
+		text = _L['Show yun macro buttons on macro panel.'],
+		checked = MY_YunMacro.bEnable,
+		oncheck = function(bChecked)
+			MY_YunMacro.bEnable = bChecked
+		end,
+	}):Width() + 5
+	return x, y
 end
 
-local PS = {}
-function PS.OnPanelActive(wnd)
-	local ui = UI(wnd)
-	local X, Y = 20, 20
-	local W, H = ui:Size()
-	local x, y = X, Y
-	x, y = MY_GongzhanCheck.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_FooterTip.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	if MY_BagEx then
-		x, y = MY_BagEx.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	end
-	if MY_BagSort then
-		x, y = MY_BagSort.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	end
-	x, y = MY_VisualSkill.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_AutoHideChat.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_DynamicActionBarPos.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_WhisperMetion.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_ArenaHelper.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_EnergyBar.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_ShenxingHelper.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-
-	x, y = MY_AchievementWiki.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_YunMacro.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = X, y + 25
-
-	x, y = MY_Domesticate.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_HideAnnounceBg.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_FriendTipLocation.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_Memo.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_ChangGeShadow.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-
-	x, y = MY_LockFrame.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_AutoSell.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_DynamicItem.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+-- Global exports
+do
+local settings = {
+	exports = {
+		{
+			fields = {
+				OnPanelActivePartial = D.OnPanelActivePartial,
+			},
+		},
+		{
+			fields = {
+				bEnable = true,
+			},
+			root = O,
+		},
+	},
+	imports = {
+		{
+			fields = {
+				bEnable = true,
+			},
+			triggers = {
+				bEnable = D.Apply,
+			},
+			root = O,
+		},
+	},
+}
+MY_YunMacro = LIB.GeneGlobalNS(settings)
 end
-LIB.RegisterPanel('MY_ToolBox', _L['MY_ToolBox'], _L['General'], 'UI/Image/Common/Money.UITex|243', PS)
