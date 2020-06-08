@@ -512,12 +512,30 @@ function LIB.EnsureAjax(options)
 	TryUploadWithNextDriver()
 end
 
+do local function StringSorter(p1, p2)
+	local k1, k2, c1, c2 = tostring(p1.k), tostring(p2.k)
+	for i = 1, max(#k1, #k2) do
+		c1, c2 = byte(k1, i, 1), byte(k2, i, 1)
+		if not c1 then
+			if not c2 then
+				return false
+			end
+			return true
+		end
+		if not c2 then
+			return false
+		end
+		if c1 ~= c2 then
+			return c1 < c2
+		end
+	end
+end
 function LIB.GetPostDataCRC(tData, szPassphrase)
 	local a, r = {}, {}
 	for k, v in pairs(tData) do
 		insert(a, { k = k, v = v })
 	end
-	sort(a, function(p1, p2) return tostring(p1.k) < tostring(p2.k) end)
+	sort(a, StringSorter)
 	if szPassphrase then
 		insert(r, szPassphrase)
 	end
@@ -527,6 +545,7 @@ function LIB.GetPostDataCRC(tData, szPassphrase)
 		end
 	end
 	return GetStringCRC(concat(r, ';'))
+end
 end
 
 function LIB.SignPostData(tData, szPassphrase)
