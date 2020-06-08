@@ -71,30 +71,32 @@ function PS.OnPanelActive(wnd)
 	local X, Y = 20, 20
 	local W, H = ui:Size()
 	local x, y = X, Y
-	x, y = MY_GongzhanCheck.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_FooterTip.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+	local deltaY = 34
+
+	x, y = MY_FooterTip.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 	if MY_BagEx then
-		x, y = MY_BagEx.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+		x, y = MY_BagEx.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 	end
 	if MY_BagSort then
-		x, y = MY_BagSort.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+		x, y = MY_BagSort.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 	end
-	x, y = MY_VisualSkill.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_DynamicActionBarPos.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_ArenaHelper.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_ShenxingHelper.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+	x, y = MY_VisualSkill.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
+	x, y = MY_DynamicActionBarPos.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
+	x, y = MY_ArenaHelper.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
+	x, y = MY_ShenxingHelper.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 
-	x, y = MY_AchievementWiki.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_YunMacro.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = X, y + 25
+	x, y = MY_AchievementWiki.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
+	x, y = MY_YunMacro.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
+	x, y = X, y + deltaY
 
-	x, y = MY_Domesticate.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_HideAnnounceBg.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_FriendTipLocation.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_Memo.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+	x, y = MY_Domesticate.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
+	x, y = MY_HideAnnounceBg.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
+	x, y = MY_FriendTipLocation.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
+	x, y = MY_Memo.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 
-	x, y = MY_LockFrame.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_AutoSell.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = MY_DynamicItem.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+	MY_GongzhanCheck.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
+	MY_LockFrame.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
+	MY_AutoSell.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
+	MY_DynamicItem.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 end
 LIB.RegisterPanel('MY_ToolBox', _L['MY_ToolBox'], _L['General'], 'UI/Image/Common/Money.UITex|243', PS)

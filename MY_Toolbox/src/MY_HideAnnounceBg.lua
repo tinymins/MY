@@ -66,7 +66,7 @@ end
 LIB.RegisterInit('MY_HideAnnounceBg', D.Apply)
 LIB.RegisterFrameCreate('GMAnnouncePanel.MY_HideAnnounceBg', D.Apply)
 
-function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 	if not LIB.IsShieldedVersion('MY_HideAnnounceBg') then
 		x = x + ui:Append('WndCheckBox', {
 			x = x, y = y,

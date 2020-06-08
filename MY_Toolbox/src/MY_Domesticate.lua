@@ -221,7 +221,7 @@ LIB.RegisterInit('MY_Domesticate__Alert', D.CheckAlertEnable)
 LIB.RegisterFrameCreate('DomesticatePanel.MY_Domesticate', D.HookDomesticatePanel)
 LIB.RegisterReload('MY_Domesticate', D.UnHookDomesticatePanel)
 
-function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, w = 'auto',
 		text = _L['Domesticate feed alert'],
@@ -242,7 +242,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 		autoenable = function() return MY_Domesticate.bAlert end,
 	})
 	x = X
-	y = y + 25
+	y = y + deltaY
 	return x, y
 end
 

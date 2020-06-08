@@ -211,7 +211,7 @@ function D.Apply()
 end
 LIB.RegisterInit('MY_FooterTip', D.Apply)
 
-function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 	-- 好友高亮
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 180,
@@ -228,8 +228,9 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 		oncheck = function(bCheck)
 			MY_FooterTip.bFriendNav = not MY_FooterTip.bFriendNav
 		end,
+		autoenable = function() return MY_FooterTip.bFriend end,
 	})
-	y = y + 25
+	y = y + deltaY
 
 	-- 帮会高亮
 	ui:Append('WndCheckBox', {
@@ -247,8 +248,9 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 		oncheck = function(bCheck)
 			MY_FooterTip.bTongMemberNav = not MY_FooterTip.bTongMemberNav
 		end,
+		autoenable = function() return MY_FooterTip.bTongMember end,
 	})
-	y = y + 25
+	y = y + deltaY
 	return x, y
 end
 

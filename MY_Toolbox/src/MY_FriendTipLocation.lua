@@ -112,7 +112,7 @@ LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_FriendTipLocation', function()
 	D.CheckEnable()
 end)
 
-function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 	if not LIB.IsShieldedVersion('MY_FriendTipLocation') then
 		x = x + ui:Append('WndCheckBox', {
 			x = x, y = y,
@@ -122,7 +122,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 				MY_FriendTipLocation.bEnable = bChecked
 			end,
 		}):AutoWidth():Width() + 5
-		x, y = X, y + 25
+		x, y = X, y + deltaY
 	end
 	return x, y
 end

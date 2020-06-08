@@ -194,7 +194,7 @@ LIB.RegisterReload('MY_DynamicActionBarPos', function()
 end)
 LIB.RegisterInit('MY_DynamicActionBarPos', D.CheckEnable)
 
-function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 130,
 		text = _L['Restore dynamic action bar pos'],
@@ -203,7 +203,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 			MY_DynamicActionBarPos.bEnable = not MY_DynamicActionBarPos.bEnable
 		end,
 	}):AutoWidth()
-	y = y + 25
+	y = y + deltaY
 	return x, y
 end
 

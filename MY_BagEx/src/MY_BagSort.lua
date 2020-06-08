@@ -370,7 +370,7 @@ function D.CheckInjection()
 	end
 end
 
-function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, w = 200,
 		text = _L['Guild package sort and stack'],
@@ -380,7 +380,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 		end,
 	}):AutoWidth():Width() + 5
 	x = X
-	y = y + 25
+	y = y + deltaY
 	return x, y
 end
 

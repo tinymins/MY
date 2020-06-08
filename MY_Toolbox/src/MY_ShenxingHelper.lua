@@ -288,7 +288,7 @@ LIB.RegisterReload('MY_ShenxingHelper', D.RemoveHook)
 --------------------------------------------------------------------------
 -- …Ë÷√ΩÁ√Ê
 --------------------------------------------------------------------------
-function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, w = 'auto',
 		text = _L['Avoid blacking shenxing cd'],
@@ -323,7 +323,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	end
 
 	x = X
-	y = y + 25
+	y = y + deltaY
 	return x, y
 end
 

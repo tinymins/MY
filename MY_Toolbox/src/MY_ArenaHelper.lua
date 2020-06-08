@@ -131,7 +131,7 @@ LIB.RegisterEvent('LOADING_END', function()
 end)
 end
 
-function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 	-- 竞技场自动恢复队伍信息
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 'auto',
@@ -141,7 +141,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 			MY_ArenaHelper.bRestoreAuthorityInfo = bChecked
 		end,
 	})
-	y = y + 25
+	y = y + deltaY
 
 	-- 竞技场战场自动取消屏蔽
 	ui:Append('WndCheckBox', {
@@ -152,7 +152,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 			MY_ArenaHelper.bAutoShowModel = bChecked
 		end,
 	})
-	y = y + 25
+	y = y + deltaY
 	return x, y
 end
 

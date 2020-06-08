@@ -185,7 +185,7 @@ end
 LIB.RegisterInit('MY_ANMERKUNGEN_PLAYERNOTE', onInit)
 end
 
-function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y,
 		text = _L['Memo (Role)'],
@@ -223,7 +223,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 			end)
 		end,
 	}):AutoWidth():Width() + 5
-	y = y + 25
+	y = y + deltaY
 	x = X
 	return x, y
 end
