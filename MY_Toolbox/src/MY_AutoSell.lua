@@ -144,7 +144,7 @@ LIB.RegisterInit('MY_AutoSell', D.CheckEnable)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	ui:Append('WndComboBox', {
-		x = W - 150, y = 50, w = 130,
+		x = W - 140, y = 50, w = 130,
 		text = _L['Auto sell items'],
 		menu = function()
 			local m0 = {

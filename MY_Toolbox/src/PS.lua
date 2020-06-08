@@ -68,32 +68,48 @@ end
 local PS = {}
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
-	local X, Y = 20, 20
+	local X, Y = 10, 10
 	local W, H = ui:Size()
 	local x, y = X, Y
-	local deltaY = 34
+	local deltaY = 28
 
-	x, y = MY_FooterTip.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
+	-- 目标
+	x = X
+	y = y + ui:Append('Text', { x = x, y = y, h = 'auto', text = _L['Target'], color = {255, 255, 0} }):Height() + 5
+	x = x + 10
+	x, y = MY_FooterTip.OnPanelActivePartial(ui, X + 10, Y, W, H, x, y, deltaY)
+
+	-- 战斗
+	x = X
+	y = y + ui:Append('Text', { x = x, y = y, h = 'auto', text = _L['Battle'], color = {255, 255, 0} }):Height() + 5
+	x = x + 10
+	x, y = MY_VisualSkill.OnPanelActivePartial(ui, X + 10, Y, W, H, x, y, deltaY)
+	x, y = MY_DynamicActionBarPos.OnPanelActivePartial(ui, X + 10, Y, W, H, x, y, deltaY)
+	x, y = MY_ArenaHelper.OnPanelActivePartial(ui, X + 10, Y, W, H, x, y, deltaY)
+	x, y = MY_ShenxingHelper.OnPanelActivePartial(ui, X + 10, Y, W, H, x, y, deltaY)
+
+	-- 其他
+	x = X
+	y = y + ui:Append('Text', { x = x, y = y, h = 'auto', text = _L['Others'], color = {255, 255, 0} }):Height() + 5
+	x = x + 10
+	x, y = MY_AchievementWiki.OnPanelActivePartial(ui, X + 10, Y, W, H, x, y, deltaY)
+	x, y = MY_YunMacro.OnPanelActivePartial(ui, X + 10, Y, W, H, x, y, deltaY)
+
+	x, y = X + 10, y + deltaY
 	if MY_BagEx then
-		x, y = MY_BagEx.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
+		x, y = MY_BagEx.OnPanelActivePartial(ui, X + 10, Y, W, H, x, y, deltaY)
 	end
 	if MY_BagSort then
-		x, y = MY_BagSort.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
+		x, y = MY_BagSort.OnPanelActivePartial(ui, X + 10, Y, W, H, x, y, deltaY)
 	end
-	x, y = MY_VisualSkill.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
-	x, y = MY_DynamicActionBarPos.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
-	x, y = MY_ArenaHelper.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
-	x, y = MY_ShenxingHelper.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
+	x, y = MY_HideAnnounceBg.OnPanelActivePartial(ui, X + 10, Y, W, H, x, y, deltaY)
+	x, y = MY_FriendTipLocation.OnPanelActivePartial(ui, X + 10, Y, W, H, x, y, deltaY)
 
-	x, y = MY_AchievementWiki.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
-	x, y = MY_YunMacro.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
-	x, y = X, y + deltaY
+	x, y = X + 10, y + deltaY
+	x, y = MY_Domesticate.OnPanelActivePartial(ui, X + 10, Y, W, H, x, y, deltaY)
+	x, y = MY_Memo.OnPanelActivePartial(ui, X + 10, Y, W, H, x, y, deltaY)
 
-	x, y = MY_Domesticate.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
-	x, y = MY_HideAnnounceBg.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
-	x, y = MY_FriendTipLocation.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
-	x, y = MY_Memo.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
-
+	-- 右侧浮动
 	MY_GongzhanCheck.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 	MY_LockFrame.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 	MY_AutoSell.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)

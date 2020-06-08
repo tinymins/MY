@@ -480,7 +480,7 @@ LIB.RegisterInit(MODULE_NAME, D.CheckEnable)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	ui:Append('WndComboBox', {
-		x = W - 150, y = 106, w = 130,
+		x = W - 140, y = 106, w = 130,
 		text = _L[MODULE_NAME],
 		menu = function()
 			local t = {

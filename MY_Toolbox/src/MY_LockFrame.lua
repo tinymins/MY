@@ -210,7 +210,7 @@ LIB.RegisterInit('MY_LockFrame', D.CheckAllFrame)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	ui:Append('WndComboBox', {
-		x = W - 150, y = 78, w = 130,
+		x = W - 140, y = 78, w = 130,
 		text = _L['Lock frame position'],
 		menu = function()
 			local t = {

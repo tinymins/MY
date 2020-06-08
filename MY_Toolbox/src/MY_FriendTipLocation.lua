@@ -122,7 +122,6 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 				MY_FriendTipLocation.bEnable = bChecked
 			end,
 		}):AutoWidth():Width() + 5
-		x, y = X, y + deltaY
 	end
 	return x, y
 end
