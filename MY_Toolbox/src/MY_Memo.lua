@@ -67,8 +67,6 @@ local GLOBAL_MEMO = {
 	anchor = { s = 'TOPRIGHT', r = 'TOPRIGHT', x = -310, y = 335 },
 }
 local D = {}
-MY_Memo = {}
-RegisterCustomData('MY_Anmerkungen.szNotePanelContent')
 
 function D.Reload(bGlobal)
 	local CFG_O = bGlobal and GLOBAL_MEMO or ROLE_MEMO
@@ -83,12 +81,6 @@ function D.Reload(bGlobal)
 	local TITLE = bGlobal and _L['MY Memo (Global)'] or _L['MY Memo (Role)']
 	UI('Normal/' .. NAME):Remove()
 	if CFG.bEnable then
-		if not bGlobal and CFG.szContent == ''
-		and MY_Anmerkungen and MY_Anmerkungen.szNotePanelContent then
-			CFG.szContent = MY_Anmerkungen.szNotePanelContent
-			D.SaveConfig()
-			MY_Anmerkungen.szNotePanelContent = nil
-		end
 		UI.CreateFrame(NAME, {
 			simple = true, alpha = 140,
 			maximize = true, minimize = true, dragresize = true,
@@ -158,27 +150,27 @@ function D.SaveConfig()
 	LIB.SaveLUAData({'config/memo.jx3dat', PATH_TYPE.GLOBAL}, CFG)
 end
 
-function MY_Memo.IsEnable(bGlobal)
+function D.IsEnable(bGlobal)
 	if bGlobal then
 		return GLOBAL_MEMO.bEnable
 	end
 	return ROLE_MEMO.bEnable
 end
 
-function MY_Memo.Toggle(bGlobal, bEnable)
+function D.Toggle(bGlobal, bEnable)
 	(bGlobal and GLOBAL_MEMO or ROLE_MEMO).bEnable = bEnable
 	D.SaveConfig()
 	D.Reload(bGlobal)
 end
 
-function MY_Memo.GetFont(bGlobal)
+function D.GetFont(bGlobal)
 	if bGlobal then
 		return GLOBAL_MEMO.nFont
 	end
 	return ROLE_MEMO.nFont
 end
 
-function MY_Memo.SetFont(bGlobal, nFont)
+function D.SetFont(bGlobal, nFont)
 	(bGlobal and GLOBAL_MEMO or ROLE_MEMO).nFont = nFont
 	D.SaveConfig()
 	D.Reload(bGlobal)
@@ -193,13 +185,13 @@ end
 LIB.RegisterInit('MY_ANMERKUNGEN_PLAYERNOTE', onInit)
 end
 
-function MY_Memo.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y,
 		text = _L['Memo (Role)'],
-		checked = MY_Memo.IsEnable(false),
+		checked = D.IsEnable(false),
 		oncheck = function(bChecked)
-			MY_Memo.Toggle(false, bChecked)
+			D.Toggle(false, bChecked)
 		end,
 	}):AutoWidth():Width() + 5
 
@@ -208,7 +200,7 @@ function MY_Memo.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 		text = _L['Font'],
 		onclick = function()
 			UI.OpenFontPicker(function(nFont)
-				MY_Memo.SetFont(false, nFont)
+				D.SetFont(false, nFont)
 			end)
 		end,
 	}):AutoWidth():Width() + 5
@@ -216,9 +208,9 @@ function MY_Memo.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y,
 		text = _L['Memo (Global)'],
-		checked = MY_Memo.IsEnable(true),
+		checked = D.IsEnable(true),
 		oncheck = function(bChecked)
-			MY_Memo.Toggle(true, bChecked)
+			D.Toggle(true, bChecked)
 		end,
 	}):AutoWidth():Width() + 5
 
@@ -227,11 +219,27 @@ function MY_Memo.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 		text = _L['Font'],
 		onclick = function()
 			UI.OpenFontPicker(function(nFont)
-				MY_Memo.SetFont(true, nFont)
+				D.SetFont(true, nFont)
 			end)
 		end,
 	}):AutoWidth():Width() + 5
 	y = y + 25
 	x = X
 	return x, y
+end
+
+---------------------------------------------------------------------
+-- Global exports
+---------------------------------------------------------------------
+do
+local settings = {
+	exports = {
+		{
+			fields = {
+				OnPanelActivePartial = D.OnPanelActivePartial,
+			},
+		},
+	},
+}
+MY_Memo = LIB.GeneGlobalNS(settings)
 end
