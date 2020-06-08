@@ -41,9 +41,9 @@ local Call, XpCall, GetTraceback, RandomChild = LIB.Call, LIB.XpCall, LIB.GetTra
 local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
 local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
 -------------------------------------------------------------------------------------------------------
-local PLUGIN_NAME = 'MY_Toolbox'
+local PLUGIN_NAME = 'MY_Chat'
 local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
-local MODULE_NAME = 'MY_Toolbox'
+local MODULE_NAME = 'MY_Chat'
 local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
 if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
@@ -282,15 +282,14 @@ end
 LIB.RegisterInit('MY_AutoHideChat', D.Apply)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	ui:Append('WndCheckBox', {
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, w = 'auto',
-		text = _L['auto hide chat panel'],
+		text = _L['Auto hide chat panel'],
 		checked = MY_AutoHideChat.bEnable,
 		oncheck = function(bChecked)
 			MY_AutoHideChat.bEnable = bChecked
 		end,
-	})
-	y = y + 25
+	}):Width()
 	return x, y
 end
 

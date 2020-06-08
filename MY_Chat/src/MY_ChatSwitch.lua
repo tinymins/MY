@@ -59,12 +59,14 @@ local O = {
 	szBusy = nil,
 	tChannelCount = {},
 	bAlertBeforeClear = true,
+	bAutoSwitchBfChannel = true,
 }
 RegisterCustomData('MY_ChatSwitch.szAway')
 RegisterCustomData('MY_ChatSwitch.szBusy')
 RegisterCustomData('MY_ChatSwitch.aWhisper', 1)
 RegisterCustomData('MY_ChatSwitch.tChannelCount')
 RegisterCustomData('MY_ChatSwitch.bAlertBeforeClear')
+RegisterCustomData('MY_ChatSwitch.bAutoSwitchBfChannel')
 
 local function UpdateChannelDailyLimit(hRadio, bPlus)
 	local me = GetClientPlayer()
@@ -286,6 +288,25 @@ local function OnChannelCheck()
 	this:Check(false)
 end
 
+function D.ApplyBattlefieldChannelSwitch()
+	-- 竞技场自动切换团队频道
+	if O.bAutoSwitchBfChannel then
+		LIB.RegisterEvent('LOADING_ENDING.MY_ChatSwitch__AutoSwitchBattlefieldChannel', function()
+			local bIsBattleField = (GetClientPlayer().GetScene().nType == MAP_TYPE.BATTLE_FIELD)
+			local nChannel, szName = EditBox_GetChannel()
+			if bIsBattleField and (nChannel == PLAYER_TALK_CHANNEL.RAID or nChannel == PLAYER_TALK_CHANNEL.TEAM) then
+				O.JJCAutoSwitchTalkChannel_OrgChannel = nChannel
+				LIB.SwitchChat(PLAYER_TALK_CHANNEL.BATTLE_FIELD)
+			elseif not bIsBattleField and nChannel == PLAYER_TALK_CHANNEL.BATTLE_FIELD then
+				LIB.SwitchChat(O.JJCAutoSwitchTalkChannel_OrgChannel or PLAYER_TALK_CHANNEL.RAID)
+			end
+		end)
+	else
+		LIB.RegisterEvent('LOADING_ENDING.MY_ChatSwitch__AutoSwitchBattlefieldChannel')
+	end
+end
+LIB.RegisterInit('MY_ChatSwitch__AutoSwitchBattlefieldChannel', D.Apply)
+
 function D.OnFrameCreate()
 	this.tRadios = {}
 	this:RegisterEvent('UI_SCALED')
@@ -492,6 +513,7 @@ local settings = {
 				szBusy = true,
 				tChannelCount = true,
 				bAlertBeforeClear = true,
+				bAutoSwitchBfChannel = true,
 			},
 			root = O,
 		},
@@ -504,6 +526,10 @@ local settings = {
 				szBusy = true,
 				tChannelCount = true,
 				bAlertBeforeClear = true,
+				bAutoSwitchBfChannel = true,
+			},
+			triggers = {
+				bAutoSwitchBfChannel = D.Apply,
 			},
 			root = O,
 		},
@@ -518,18 +544,19 @@ end
 local PS = {}
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
-	local w , h  = ui:Size()
-	local x0, y0 = 30, 30
-	local x , y  = x0, y0
+	local W, H = ui:Size()
+	local X, Y = 20, 20
+	local x, y = X, Y
 	local deltaX = 25
-	local deltaY = 33
+	local deltaY = 31
 
-	ui:Append('WndButton', {
-		x = w - x - 80, y = y,
-		w = 80, h = 30,
-		text = _L['about...'],
-		onclick = function() LIB.Alert(_L['Mingyi Plugins - Chatpanel\nThis plugin is developed by tinymins @ derzh.com.']) end,
-	})
+	if (MY_Farbnamen and MY_Farbnamen.GetMenu) then
+		ui:Append('WndComboBox', {
+			x = W - X - 150, y = y, w = 150,
+			text = _L['farbnamen'],
+			menu = MY_Farbnamen.GetMenu,
+		})
+	end
 
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 250,
@@ -688,13 +715,20 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + deltaY
 
-	if (MY_Farbnamen and MY_Farbnamen.GetMenu) then
-		ui:Append('WndComboBox', {
-			x = x, y = y, w = 150,
-			text = _L['farbnamen'],
-			menu = MY_Farbnamen.GetMenu,
-		})
-		y = y + deltaY
-	end
+	x, y = MY_AutoHideChat.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+	x, y = X, y + deltaY
+
+	-- 竞技场频道切换
+	ui:Append('WndCheckBox', {
+		x = x, y = y, w = 'auto',
+		text = _L['Auto switch talk channel when into battle field'],
+		checked = MY_ChatSwitch.bAutoSwitchBfChannel,
+		oncheck = function(bChecked)
+			MY_ChatSwitch.bAutoSwitchBfChannel = bChecked
+		end,
+	})
+	y = y + deltaY
+
+	x, y = MY_WhisperMetion.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 end
 LIB.RegisterPanel('MY_ChatSwitch', _L['chat helper'], _L['Chat'], 'UI/Image/UICommon/ActivePopularize2.UITex|20', PS)

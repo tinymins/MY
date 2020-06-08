@@ -29,7 +29,6 @@ return {
     ['Are you sure you want to clear current message panel?\nPress CTRL when click can clear without alert.\nPress ALT when click can clear all window.'] = '你确定要清空当前聊天栏消息吗？\n按住CTRL点击可以跳过该警告。\n按住ALT点击可以清空所有聊天栏。',
     ['Are you sure you want to clear all message panel?'] = '你确定要清空所有聊天栏消息吗？',
 
-    ['about...'] = '关于',
     ['display panel'] = '显示聊天频道快速切换面板',
     ['lock postion'] = '锁定聊天频道快速切换面板位置',
     ['team balloon'] = '显示队伍聊天泡泡',
@@ -45,8 +44,6 @@ return {
     ['farbnamen'] = '职业染色',
     ['chat time format'] = '聊天时间格式',
 
-    ['Mingyi Plugins - Chatpanel\nThis plugin is developed by tinymins @ derzh.com.'] = '[茗伊插件集] - 聊天辅助\n------------\n√该插件由茗伊小朋宇独立开发完成。\n√有问题请联系：茗伊@双梦镇@光明顶@荻花宫@体服',
-
     ['MOSAICS_CHAR'] = '…',
     ['chat mosaics'] = '聊天打马',
     ['chat mosaics (mosaics names in chat panel)'] = '聊天打马（聊天栏中名字打上马赛克）',
@@ -57,4 +54,8 @@ return {
     ['part mosaics D (mosaics all character)'                ] = '打马模式肆（所有字打马）',
     ['mosaics character'] = '输入马赛克字符',
     ['unmosaics names (split by comma)'] = '不打马的名字（英文半角逗号','分隔多个名字）',
+
+    ['Auto hide chat panel'] = '自动隐藏聊天栏',
+    ['Auto switch talk channel when into battle field'] = '进出战场、竞技场时自动切换团队/战场频道',
+    ['Redirect metion to whisper'] = '记录其他频道提及我的点名内容到密聊频道',
 }

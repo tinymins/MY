@@ -49,8 +49,6 @@ return {
     ['Detected [%s] has GongZhan buff for %s.'] = '检测到[%s]共战江湖气劲剩余%s。',
     ['Nearby GongZhan Total Count: %d.'] = '附近共战数量：%d。',
     ['------------------------------------'] = '————————————————————————',
-    ['auto hide chat panel'] = '自动隐藏聊天栏',
-    ['Redirect metion to whisper'] = '记录其他频道提及我的点名内容到密聊频道',
 
     ['Visual skill'] = '显示历史招式列表',
     ['Display %d skills.'] = '显示%d格。',
@@ -61,8 +59,6 @@ return {
     ['Shenxing to ancient maps'] = '盛唐故地神行千里',
     ['Force open all map shenxing'] = '未知地图神行千里',
     ['Shenxing can fly to undiscovered maps'] = '允许神行千里前往尚未探索过的地图、秘境',
-
-    ['Auto switch talk channel when into battle field'] = '进出战场、竞技场时自动切换团队/战场频道',
 
     ['The kill sequence is: '] = '正确击杀顺序：',
     ['Failed to calc.'] = '计算失败。',

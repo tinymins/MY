@@ -53,32 +53,11 @@ end
 
 local D = {}
 local O = {
-	bAutoSwitchTalkChannel = true,
 	bRestoreAuthorityInfo = true,
 	bAutoShowModel = false,
 }
-RegisterCustomData('MY_ArenaHelper.bAutoSwitchTalkChannel')
 RegisterCustomData('MY_ArenaHelper.bRestoreAuthorityInfo')
 RegisterCustomData('MY_ArenaHelper.bAutoShowModel')
-
-function D.Apply()
-	-- 竞技场自动切换团队频道
-	if MY_ArenaHelper.bAutoSwitchTalkChannel then
-		LIB.RegisterEvent('LOADING_ENDING.MY_ArenaHelper', function()
-			local bIsBattleField = (GetClientPlayer().GetScene().nType == MAP_TYPE.BATTLE_FIELD)
-			local nChannel, szName = EditBox_GetChannel()
-			if bIsBattleField and (nChannel == PLAYER_TALK_CHANNEL.RAID or nChannel == PLAYER_TALK_CHANNEL.TEAM) then
-				O.JJCAutoSwitchTalkChannel_OrgChannel = nChannel
-				LIB.SwitchChat(PLAYER_TALK_CHANNEL.BATTLE_FIELD)
-			elseif not bIsBattleField and nChannel == PLAYER_TALK_CHANNEL.BATTLE_FIELD then
-				LIB.SwitchChat(O.JJCAutoSwitchTalkChannel_OrgChannel or PLAYER_TALK_CHANNEL.RAID)
-			end
-		end)
-	else
-		LIB.RegisterEvent('LOADING_ENDING.MY_ArenaHelper')
-	end
-end
-LIB.RegisterInit('MY_ArenaHelper', D.Apply)
 
 -- auto restore team authourity info in arena
 do local l_tTeamInfo, l_bConfigEnd
@@ -153,17 +132,6 @@ end)
 end
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	-- 竞技场频道切换
-	ui:Append('WndCheckBox', {
-		x = x, y = y, w = 'auto',
-		text = _L['Auto switch talk channel when into battle field'],
-		checked = MY_ArenaHelper.bAutoSwitchTalkChannel,
-		oncheck = function(bChecked)
-			MY_ArenaHelper.bAutoSwitchTalkChannel = bChecked
-		end,
-	})
-	y = y + 25
-
 	-- 竞技场自动恢复队伍信息
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 'auto',
@@ -199,7 +167,6 @@ local settings = {
 		},
 		{
 			fields = {
-				bAutoSwitchTalkChannel = true,
 				bRestoreAuthorityInfo = true,
 				bAutoShowModel = true,
 			},
@@ -209,12 +176,8 @@ local settings = {
 	imports = {
 		{
 			fields = {
-				bAutoSwitchTalkChannel = true,
 				bRestoreAuthorityInfo = true,
 				bAutoShowModel = true,
-			},
-			triggers = {
-				bAutoSwitchTalkChannel = D.Apply,
 			},
 			root = O,
 		},
