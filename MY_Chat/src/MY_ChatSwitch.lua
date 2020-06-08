@@ -52,12 +52,19 @@ end
 --------------------------------------------------------------------------
 local INI_PATH = PACKET_INFO.ROOT .. 'MY_Chat/ui/MY_ChatSwitch.ini'
 local CD_REFRESH_OFFSET = 7 * 60 * 60 -- 7µã¸üÐÂCD
-MY_ChatSwitch = {}
-MY_ChatSwitch.aWhisper = {}
-MY_ChatSwitch.szAway = nil
-MY_ChatSwitch.szBusy = nil
+local D = {}
+local O = {
+	aWhisper = {},
+	szAway = nil,
+	szBusy = nil,
+	tChannelCount = {},
+	bAlertBeforeClear = true,
+}
 RegisterCustomData('MY_ChatSwitch.szAway')
 RegisterCustomData('MY_ChatSwitch.szBusy')
+RegisterCustomData('MY_ChatSwitch.aWhisper', 1)
+RegisterCustomData('MY_ChatSwitch.tChannelCount')
+RegisterCustomData('MY_ChatSwitch.bAlertBeforeClear')
 
 local function UpdateChannelDailyLimit(hRadio, bPlus)
 	local me = GetClientPlayer()
@@ -71,12 +78,12 @@ local function UpdateChannelDailyLimit(hRadio, bPlus)
 	local nChannel = info.channel
 	if nChannel then
 		local szDate = LIB.FormatTime(GetCurrentTime() - CD_REFRESH_OFFSET, '%yyyy%MM%dd')
-		if MY_ChatSwitch.tChannelCount.szDate ~= szDate then
-			MY_ChatSwitch.tChannelCount = {szDate = szDate}
+		if O.tChannelCount.szDate ~= szDate then
+			O.tChannelCount = {szDate = szDate}
 		end
-		MY_ChatSwitch.tChannelCount[nChannel] = (MY_ChatSwitch.tChannelCount[nChannel] or 0) + (bPlus and 1 or 0)
+		O.tChannelCount[nChannel] = (O.tChannelCount[nChannel] or 0) + (bPlus and 1 or 0)
 
-		local nDailyCount = MY_ChatSwitch.tChannelCount[nChannel]
+		local nDailyCount = O.tChannelCount[nChannel]
 		local nDailyLimit = LIB.GetChannelDailyLimit(me.nLevel, nChannel)
 		if nDailyLimit then
 			if nDailyLimit > 0 then
@@ -131,7 +138,7 @@ local function OnAwayCheck()
 	if edit then
 		edit:GetRoot():Show()
 		if edit:GetText() == '' then
-			edit:InsertText(MY_ChatSwitch.szAway or g_tStrings.STR_AUTO_REPLAY_LEAVE)
+			edit:InsertText(O.szAway or g_tStrings.STR_AUTO_REPLAY_LEAVE)
 			edit:SelectAll()
 		end
 		Station.SetFocusWindow(edit)
@@ -142,7 +149,7 @@ local function OnAwayUncheck()
 	LIB.SwitchChat('/cafk')
 end
 
-local function OnAwayTip() return MY_ChatSwitch.szAway or g_tStrings.STR_AUTO_REPLAY_LEAVE end
+local function OnAwayTip() return O.szAway or g_tStrings.STR_AUTO_REPLAY_LEAVE end
 
 local function OnBusyCheck()
 	LIB.SwitchChat('/atr')
@@ -150,7 +157,7 @@ local function OnBusyCheck()
 	if edit then
 		edit:GetRoot():Show()
 		if edit:GetText() == '' then
-			edit:InsertText(MY_ChatSwitch.szBusy or g_tStrings.STR_AUTO_REPLAY_LEAVE)
+			edit:InsertText(O.szBusy or g_tStrings.STR_AUTO_REPLAY_LEAVE)
 			edit:SelectAll()
 		end
 		Station.SetFocusWindow(edit)
@@ -161,7 +168,7 @@ local function OnBusyUncheck()
 	LIB.SwitchChat('/catr')
 end
 
-local function OnBusyTip() return MY_ChatSwitch.szBusy end
+local function OnBusyTip() return O.szBusy end
 
 local function OnMosaicsCheck()
 	MY_ChatMosaics.bEnabled = true
@@ -173,7 +180,7 @@ end
 
 local function OnWhisperCheck()
 	local t = {}
-	for i, whisper in ipairs(MY_ChatSwitch.aWhisper) do
+	for i, whisper in ipairs(O.aWhisper) do
 		local info = MY_Farbnamen and MY_Farbnamen.Get(whisper[1])
 		insert(t, {
 			szOption = whisper[1],
@@ -189,9 +196,9 @@ local function OnWhisperCheck()
 			nIconHeight = 17,
 			szLayer = 'ICON_RIGHTMOST',
 			fnClickIcon = function()
-				for i = #MY_ChatSwitch.aWhisper, 1, -1 do
-					if MY_ChatSwitch.aWhisper[i][1] == whisper[1] then
-						remove(MY_ChatSwitch.aWhisper, i)
+				for i = #O.aWhisper, 1, -1 do
+					if O.aWhisper[i][1] == whisper[1] then
+						remove(O.aWhisper, i)
 						UI.ClosePopupMenu()
 					end
 				end
@@ -221,7 +228,7 @@ local function OnWhisperCheck()
 	end
 	local x, y = this:GetAbsPos()
 	t.x = x
-	t.y = y - #MY_ChatSwitch.aWhisper * 24 - 24 - 20 - 8
+	t.y = y - #O.aWhisper * 24 - 24 - 20 - 8
 	if #t > 0 then
 		insert(t, 1, CONSTANT.MENU_DIVIDER)
 		insert(t, 1, {
@@ -269,12 +276,6 @@ for i, v in ipairs(CHANNEL_LIST) do
 end
 local m_tChannelTime = {}
 
-MY_ChatSwitch.tChannelCount = {}
-MY_ChatSwitch.bAlertBeforeClear = true
-RegisterCustomData('MY_ChatSwitch.aWhisper', 1)
-RegisterCustomData('MY_ChatSwitch.tChannelCount')
-RegisterCustomData('MY_ChatSwitch.bAlertBeforeClear')
-
 local function OnChannelCheck()
 	LIB.SwitchChat(this.info.channel)
 	local edit = LIB.GetChatInputEdit()
@@ -285,7 +286,7 @@ local function OnChannelCheck()
 	this:Check(false)
 end
 
-function MY_ChatSwitch.OnFrameCreate()
+function D.OnFrameCreate()
 	this.tRadios = {}
 	this:RegisterEvent('UI_SCALED')
 	this:RegisterEvent('PLAYER_SAY')
@@ -352,10 +353,10 @@ function MY_ChatSwitch.OnFrameCreate()
 
 	this:Lookup('', 'Image_Bar'):SetW(nWidth + 35)
 	this:SetW(nWidth + 60)
-	MY_ChatSwitch.UpdateAnchor(this)
+	D.UpdateAnchor(this)
 end
 
-function MY_ChatSwitch.OnEvent(event)
+function D.OnEvent(event)
 	if event == 'PLAYER_SAY' then
 		local szContent, dwTalkerID, nChannel, szName, szMsg = arg0, arg1, arg2, arg3, arg9
 		if not IsString(arg9) then
@@ -365,13 +366,13 @@ function MY_ChatSwitch.OnEvent(event)
 		end
 		if nChannel == PLAYER_TALK_CHANNEL.WHISPER then
 			local t
-			for i = #MY_ChatSwitch.aWhisper, 1, -1 do
-				if MY_ChatSwitch.aWhisper[i][1] == szName then
-					t = remove(MY_ChatSwitch.aWhisper, i)
+			for i = #O.aWhisper, 1, -1 do
+				if O.aWhisper[i][1] == szName then
+					t = remove(O.aWhisper, i)
 				end
 			end
-			while #MY_ChatSwitch.aWhisper > 20 do
-				remove(MY_ChatSwitch.aWhisper, 1)
+			while #O.aWhisper > 20 do
+				remove(O.aWhisper, 1)
 			end
 			if not t then
 				t = {szName, {}}
@@ -380,7 +381,7 @@ function MY_ChatSwitch.OnEvent(event)
 				remove(t[2], 1)
 			end
 			insert(t[2], {szMsg, GetCurrentTime()})
-			insert(MY_ChatSwitch.aWhisper, t)
+			insert(O.aWhisper, t)
 		end
 		if dwTalkerID ~= UI_GetClientPlayerID() then
 			return
@@ -391,7 +392,7 @@ function MY_ChatSwitch.OnEvent(event)
 			m_tChannelTime[nChannel] = GetCurrentTime()
 		end
 	elseif event == 'UI_SCALED' then
-		MY_ChatSwitch.UpdateAnchor(this)
+		D.UpdateAnchor(this)
 	elseif event == 'LOADING_ENDING' then
 		for nChannel, hRadio in pairs(this.tRadios) do
 			UpdateChannelDailyLimit(hRadio)
@@ -399,7 +400,7 @@ function MY_ChatSwitch.OnEvent(event)
 	end
 end
 
-function MY_ChatSwitch.OnFrameBreathe()
+function D.OnFrameBreathe()
 	for nChannel, nTime in pairs(m_tChannelTime) do
 		local nCooldown = (CHANNEL_CD_TIME[nChannel] or 0) - (GetCurrentTime() - nTime)
 		if nCooldown <= 0 then
@@ -414,7 +415,7 @@ function MY_ChatSwitch.OnFrameBreathe()
 	end
 end
 
-function MY_ChatSwitch.OnMouseEnter()
+function D.OnMouseEnter()
 	if this.szTip then
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
@@ -422,11 +423,11 @@ function MY_ChatSwitch.OnMouseEnter()
 	end
 end
 
-function MY_ChatSwitch.OnMouseLeave()
+function D.OnMouseLeave()
 	HideTip()
 end
 
-function MY_ChatSwitch.OnLButtonClick()
+function D.OnLButtonClick()
 	local name = this:GetName()
 	if name == 'Btn_Option' then
 		LIB.ShowPanel()
@@ -435,12 +436,12 @@ function MY_ChatSwitch.OnLButtonClick()
 	end
 end
 
-function MY_ChatSwitch.OnFrameDragEnd()
+function D.OnFrameDragEnd()
 	this:CorrectPos()
 	LIB.SetStorage('FrameAnchor.MY_ChatSwitch', GetFrameAnchor(this))
 end
 
-function MY_ChatSwitch.UpdateAnchor(this)
+function D.UpdateAnchor(this)
 	local anchor = LIB.GetStorage('FrameAnchor.MY_ChatSwitch')
 		or { x = 10, y = -60, s = 'BOTTOMLEFT', r = 'BOTTOMLEFT' }
 	this:SetPoint(anchor.s, 0, 0, anchor.r, anchor.x, anchor.y)
@@ -449,31 +450,71 @@ end
 
 local function OnChatSetAFK()
 	if type(arg0) == 'table' then
-		MY_ChatSwitch.szAway = LIB.StringfyChatContent(arg0)
+		O.szAway = LIB.StringfyChatContent(arg0)
 	else
-		MY_ChatSwitch.szAway = arg0 and tostring(arg0)
+		O.szAway = arg0 and tostring(arg0)
 	end
 end
 LIB.RegisterEvent('ON_CHAT_SET_AFK', OnChatSetAFK)
 
 local function OnChatSetATR()
 	if type(arg0) == 'table' then
-		MY_ChatSwitch.szBusy = LIB.StringfyChatContent(arg0):sub(4)
+		O.szBusy = LIB.StringfyChatContent(arg0):sub(4)
 	else
-		MY_ChatSwitch.szBusy = arg0 and tostring(arg0)
+		O.szBusy = arg0 and tostring(arg0)
 	end
 end
 LIB.RegisterEvent('ON_CHAT_SET_ATR', OnChatSetATR)
 
-function MY_ChatSwitch.ReInitUI()
+function D.ReInitUI()
 	Wnd.CloseWindow('MY_ChatSwitch')
 	if not LIB.GetStorage('BoolValues.MY_ChatSwitch_DisplayPanel') then
 		return
 	end
 	Wnd.OpenWindow(INI_PATH, 'MY_ChatSwitch')
 end
-LIB.RegisterStorageInit('MY_CHAT', MY_ChatSwitch.ReInitUI)
+LIB.RegisterStorageInit('MY_CHAT', D.ReInitUI)
 
+--------------------------------------------------------------------------
+-- Global exports
+--------------------------------------------------------------------------
+do
+local settings = {
+	exports = {
+		{
+			root = D,
+			preset = 'UIEvent',
+		},
+		{
+			fields = {
+				aWhisper = true,
+				szAway = true,
+				szBusy = true,
+				tChannelCount = true,
+				bAlertBeforeClear = true,
+			},
+			root = O,
+		},
+	},
+	imports = {
+		{
+			fields = {
+				aWhisper = true,
+				szAway = true,
+				szBusy = true,
+				tChannelCount = true,
+				bAlertBeforeClear = true,
+			},
+			root = O,
+		},
+	},
+}
+MY_ChatSwitch = LIB.GeneGlobalNS(settings)
+end
+
+--------------------------------------------------------------------------
+-- PS
+--------------------------------------------------------------------------
 local PS = {}
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
@@ -496,7 +537,7 @@ function PS.OnPanelActive(wnd)
 		checked = LIB.GetStorage('BoolValues.MY_ChatSwitch_DisplayPanel'),
 		oncheck = function(bChecked)
 			LIB.SetStorage('BoolValues.MY_ChatSwitch_DisplayPanel', bChecked)
-			MY_ChatSwitch.ReInitUI()
+			D.ReInitUI()
 		end,
 	})
 	y = y + deltaY
@@ -507,7 +548,7 @@ function PS.OnPanelActive(wnd)
 		checked = LIB.GetStorage('BoolValues.MY_ChatSwitch_LockPostion'),
 		oncheck = function(bChecked)
 			LIB.SetStorage('BoolValues.MY_ChatSwitch_LockPostion', bChecked)
-			MY_ChatSwitch.ReInitUI()
+			D.ReInitUI()
 		end,
 		isdisable = function()
 			return not LIB.GetStorage('BoolValues.MY_ChatSwitch_DisplayPanel')
@@ -534,7 +575,7 @@ function PS.OnPanelActive(wnd)
 							'BoolValues.MY_ChatSwitch_CH' .. i,
 							not LIB.GetStorage('BoolValues.MY_ChatSwitch_CH' .. i)
 						)
-						MY_ChatSwitch.ReInitUI()
+						D.ReInitUI()
 					end,
 				})
 			end
