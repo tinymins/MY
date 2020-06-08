@@ -137,15 +137,20 @@ do
 local nUpdateTime = 0
 function MYDev_UIEditor.OnFrameBreathe()
 	if GetTime() - nUpdateTime > 500 then
-		local handle, el = this.hList
-		for i = 0, handle:GetItemCount() - 1 do
-			el = handle:Lookup(i)
-			if el.dat and el.dat.___id and not el.dat.___id:IsValid() then
-				D.UpdateTree(this)
-				break
+		local elRoot = Station.Lookup(this.szTreePath)
+		if elRoot and elRoot ~= this.elRoot then
+			D.SetElement(this, elRoot)
+		else
+			local handle, el = this.hList
+			for i = 0, handle:GetItemCount() - 1 do
+				el = handle:Lookup(i)
+				if el.dat and el.dat.___id and not el.dat.___id:IsValid() then
+					D.UpdateTree(this)
+					break
+				end
 			end
+			nUpdateTime = GetTime()
 		end
-		nUpdateTime = GetTime()
 	end
 	-- this:BringToTop()
 end
