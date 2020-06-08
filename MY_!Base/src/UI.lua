@@ -51,6 +51,10 @@ local function CallWithThis(context, fn, ...)
 	return unpack(rtc)
 end
 
+local function IsSamePath(p1, p2)
+	return p1:gsub('/', '\\'):lower() == p2:gsub('/', '\\'):lower()
+end
+
 -------------------------------------
 -- UI object class
 -------------------------------------
@@ -2703,6 +2707,14 @@ local function SetComponentSize(raw, nOuterWidth, nOuterHeight, nInnerWidth, nIn
 			raw:SetSize(nWidth, nHeight)
 			hnd:SetSize(nWidth, nHeight)
 		end
+	elseif componentType == 'WndButton' and IsSamePath(raw:GetAnimatePath(), UI.BUTTON_STYLE[1].szImage) then
+		local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
+		local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
+		local txt = GetComponentElement(raw, 'TEXT')
+		wnd:SetSize(nWidth, nHeight)
+		txt:SetSize(nWidth, nHeight - 3)
+		hdl:SetSize(nWidth, nHeight - 3)
+		hdl:FormatAllItemPos()
 	elseif componentType == 'WndCheckBox' then
 		local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
 		local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
