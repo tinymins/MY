@@ -41,7 +41,7 @@ local Call, XpCall, GetTraceback, RandomChild = LIB.Call, LIB.XpCall, LIB.GetTra
 local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
 local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
 -------------------------------------------------------------------------------------------------------
-local PLUGIN_NAME = 'MYDev_UIManager'
+local PLUGIN_NAME = 'MY_!Base'
 local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MYDev_UIManager'
 local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
@@ -89,6 +89,9 @@ local function GetMeun(ui)
 end
 
 TraceButton_AppendAddonMenu({function()
+	if not LIB.IsDebugClient('MYDev_UIManager') then
+		return
+	end
 	local menu = { szOption = _L['MYDev_UIManager'] }
 	for k, v in ipairs({ 'Lowest', 'Lowest1', 'Lowest2', 'Normal', 'Normal1', 'Normal2', 'Topmost', 'Topmost1', 'Topmost2' })do
 		insert(menu, GetMeun(v))

@@ -42,7 +42,7 @@ local Call, XpCall, GetTraceback, RandomChild = LIB.Call, LIB.XpCall, LIB.GetTra
 local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
 local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
 -------------------------------------------------------------------------------------------------------
-local PLUGIN_NAME = 'MYDev_UIManager'
+local PLUGIN_NAME = 'MY_!Base'
 local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MYDev_UIFindStation'
 local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
@@ -191,6 +191,10 @@ end
 -- …Ë÷√ΩÁ√Ê
 ---------------------------------------------------------------------
 local PS = {}
+
+function PS.IsShielded()
+	return not LIB.IsDebugClient('MYDev_UIFindStation')
+end
 
 function PS.OnPanelActive(frame)
 	local ui = UI(frame)

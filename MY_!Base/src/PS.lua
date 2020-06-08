@@ -877,6 +877,14 @@ function PS.OnPanelActive(wnd)
 		tip = _L['Show error message'],
 		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 		onclick = function()
+			if IsCtrlKeyDown() and IsAltKeyDown() and IsShiftKeyDown() then
+				LIB.IsDebugClient('MYDev_UIEditor', true, true)
+				LIB.IsDebugClient('MYDev_UIManager', true, true)
+				LIB.IsDebugClient('MYDev_UIFindStation', true, true)
+				LIB.Systopmsg(_L['Debug tools has been enabled...'])
+				LIB.ReopenPanel()
+				return
+			end
 			UI.OpenTextEditor(LIB.GetAddonErrorMessage())
 		end,
 	}):AutoWidth():Width() + 5
