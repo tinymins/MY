@@ -196,12 +196,4 @@ return {
 	['Save Advertising'] = '保存喊話',
 	['Save Advertising Name'] = '保存名(如：燭龍殿2/HG) 5字內',
 	['Advertising List'] = '喊話列表 （左鍵導入聊天框，右鍵更多選項）',
-
-	-- MY_FirstBossKill.lua --
-	['Share boss kill'] = '首次擊敗分享',
-	['Share boss kill record for kill rank.'] = '分享首次擊敗秘境首領相關團隊與戰鬥信息，用於數據統計。',
-	['Try share boss kill: %s - %ds (%s).'] = '正在分享：%s，戰鬥%d秒，%s。',
-	['Share boss kill success: %s - %ds (%s).'] = '成功分享：%s，戰鬥%d秒，%s。',
-	['Full win'] = '全勝',
-	['Would you like to share first boss kill log?'] = '你想要分享首次擊敗秘境首領日誌，用於爭奪跨區服秘境通關百強榜嗎？',
 }

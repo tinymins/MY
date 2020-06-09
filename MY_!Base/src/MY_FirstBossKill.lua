@@ -41,9 +41,9 @@ local Call, XpCall, GetTraceback, RandomChild = LIB.Call, LIB.XpCall, LIB.GetTra
 local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
 local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
 -------------------------------------------------------------------------------------------------------
-local PLUGIN_NAME = 'MY_TeamTools'
+local PLUGIN_NAME = 'MY_!Base'
 local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
-local MODULE_NAME = 'MY_TeamTools'
+local MODULE_NAME = 'MY_!Base'
 local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
 if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
@@ -74,36 +74,46 @@ function D.SaveData()
 end
 LIB.RegisterFlush('MY_FirstBossKill', D.SaveData)
 
+function D.ShareBKR(p, bOnymous, onfulfilled, oncomplete)
+	local szServerU = AnsiToUTF8(p.szServer)
+	local szNameU = AnsiToUTF8(p.szName)
+	local szLeaderU = AnsiToUTF8(p.szLeader)
+	local szTeammateU = AnsiToUTF8(p.szTeammate)
+	local szURL = 'https://push.j3cx.com/api/bkr/uploads?'
+		.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
+			s = szServerU,
+			n = szNameU,
+			l = szLeaderU,
+			m = szTeammateU,
+			a = p.dwAchieveID,
+			t = p.dwTime,
+			d = p.nFightTime,
+			o = bOnymous and 1 or 0,
+		}, 'MY_BKR_AhfB6aBL9o$8R9t3ka6Uk6@#^^KHLoMtZCdS@5e2@T')))
+	--[[#DEBUG BEGIN]]
+	LIB.Debug(szURL, DEBUG_LEVEL.LOG)
+	--[[#DEBUG END]]
+	local tConfig = {
+		url = szURL,
+		driver = 'auto', method = 'auto',
+		fulfilled = onfulfilled,
+		complete = oncomplete,
+	}
+	LIB.Ajax(tConfig)
+end
+
 function D.CheckUpdateAcquire()
 	if not O.bEnable then
 		return
 	end
 	for _, p in ipairs(BOSS_ACHIEVE_ACQUIRE_LOG) do
 		if not p.bPending then
-			local szServerU = AnsiToUTF8(p.szServer)
-			local szNameU = AnsiToUTF8(p.szName)
-			local szLeaderU = AnsiToUTF8(p.szLeader)
-			local szTeammateU = AnsiToUTF8(p.szTeammate)
 			local szAchieve = Table_GetAchievement(p.dwAchieveID).szName
 			local szTime = LIB.FormatTime(p.dwTime, '%yyyy-%MM-%dd %hh:%mm:%ss')
-			local szURL = 'https://push.j3cx.com/api/bkr/uploads?'
-				.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
-					s = szServerU,
-					n = szNameU,
-					l = szLeaderU,
-					m = szTeammateU,
-					a = p.dwAchieveID,
-					t = p.dwTime,
-					d = p.nFightTime,
-				}, 'MY_BKR_AhfB6aBL9o$8R9t3ka6Uk6@#^^KHLoMtZCdS@5e2@T')))
+			p.bPending = true
 			LIB.Sysmsg(_L('Try share boss kill: %s - %ds (%s).', szAchieve, p.nFightTime / 1000, szTime))
-			--[[#DEBUG BEGIN]]
-			LIB.Debug(szURL, DEBUG_LEVEL.LOG)
-			--[[#DEBUG END]]
-			local tConfig = {
-				url = szURL,
-				driver = 'auto', method = 'auto',
-				fulfilled = function()
+			D.ShareBKR(p, true,
+				function()
 					for i, v in ipairs_r(BOSS_ACHIEVE_ACQUIRE_LOG) do
 						if v.dwAchieveID == p.dwAchieveID then
 							remove(BOSS_ACHIEVE_ACQUIRE_LOG, i)
@@ -111,16 +121,13 @@ function D.CheckUpdateAcquire()
 					end
 					LIB.Sysmsg(_L('Share boss kill success: %s - %ds (%s).', szAchieve, p.nFightTime / 1000, szTime))
 				end,
-				complete = function()
+				function()
 					for _, v in ipairs_r(BOSS_ACHIEVE_ACQUIRE_LOG) do
 						if v.dwAchieveID == p.dwAchieveID then
 							v.bPending = nil
 						end
 					end
-				end,
-			}
-			p.bPending = true
-			LIB.Ajax(tConfig)
+				end)
 		end
 	end
 end
@@ -181,7 +188,7 @@ LIB.RegisterEvent({
 				szLeader = me.szName
 				insert(aTeammate, me.szName .. ',' .. UI_GetPlayerMountKungfuID())
 			end
-			insert(BOSS_ACHIEVE_ACQUIRE_LOG, {
+			local rec = {
 				szServer = LIB.GetRealServer(2),
 				szName = me.szName,
 				szLeader = szLeader,
@@ -189,8 +196,10 @@ LIB.RegisterEvent({
 				dwAchieveID = dwAchieveID,
 				dwTime = GetCurrentTime(),
 				nFightTime = LIB.GetFightTime(),
-			})
+			}
+			insert(BOSS_ACHIEVE_ACQUIRE_LOG, rec)
 			BOSS_ACHIEVE_ACQUIRE_STATE[dwAchieveID] = true
+			D.ShareBKR(rec, false)
 		end
 	end
 	D.CheckUpdateAcquire()

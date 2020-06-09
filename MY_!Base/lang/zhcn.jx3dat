@@ -627,4 +627,12 @@ return {
 	['Search'] = '搜 索',
 	['Searching, please wait...'] = '正在检索，请稍候……',
 	['(Supports Lua regex)'] = '（支持 Lua 正则）',
+
+	-- MY_FirstBossKill.lua --
+	['Share boss kill'] = '首次击败分享',
+	['Share boss kill record for kill rank.'] = '公开分享首次击败秘境首领相关团队与战斗信息，用于数据统计。',
+	['Try share boss kill: %s - %ds (%s).'] = '正在分享：%s，战斗%d秒，%s。',
+	['Share boss kill success: %s - %ds (%s).'] = '成功分享：%s，战斗%d秒，%s。',
+	['Full win'] = '全胜',
+	['Would you like to share first boss kill log?'] = '你想要分享首次击败秘境首领日志，用于争夺跨区服秘境通关百强榜吗？',
 }
