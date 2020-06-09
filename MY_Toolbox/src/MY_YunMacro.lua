@@ -76,7 +76,7 @@ function D.Hook()
 			LIB.Alert('MY_YunMacro', _L['Macro update started, please keep panel opened and wait.'], nil, _L['Got it'])
 			LIB.Ajax({
 				driver = 'auto', mode = 'auto',
-				url = 'https://pull.j3cx.com/api/plugins/macro/query?name='
+				url = 'https://pull.j3cx.com/api/macro/query?name='
 					.. LIB.UrlEncode(AnsiToUTF8(edtName:GetText())),
 				success = function(szHTML)
 					local res, err = LIB.JsonDecode(szHTML)
