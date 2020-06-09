@@ -105,8 +105,8 @@ local PROVIDER_PARAMS = {
 	},
 	jx3box = {
 		bSimple = true,
-		szRawURL = 'https://git.jx3box.com/feed?key=%s',
-		szRawURL_T = '^https://git%.jx3box%.com/feed%?key%=(.+)$',
+		szRawURL = 'https://pull.j3cx.com/api/dbm/feed?key=%s',
+		szRawURL_T = '^https://pull%.j3cx%.com/api/dbm/feed%?key%=(.+)$',
 	},
 }
 local DEFAULT_PROVIDER = 'jx3box'
