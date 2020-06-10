@@ -65,7 +65,7 @@ function D.Hook()
 	local edtName = frame:Lookup('Edit_Name')
 	local edtDesc = frame:Lookup('Edit_Desc')
 	local edtMacro = frame:Lookup('Edit_Content')
-	local btnSure = frame:Lookup('Btn_Sure')
+	local btnNew = frame:Lookup('Btn_New')
 	local hIconList = frame:Lookup('', 'Handle_Icon')
 	UI(frame):Append('WndButton', {
 		name = 'Btn_YunMacro_Update',
@@ -107,8 +107,8 @@ function D.Hook()
 	})
 	UI(frame):Append('WndButton', {
 		name = 'Btn_YunMacro_Tops',
-		x = edtMacro:GetRelX(), y = btnSure:GetRelY(),
-		w = btnSure:GetW(), h = btnSure:GetH(),
+		x = edtMacro:GetRelX(), y = btnNew:GetRelY(),
+		w = btnNew:GetW(), h = btnNew:GetH(),
 		text = _L['Top yun macro'],
 		onclick = function()
 			LIB.OpenBrowser('https://page.j3cx.com/macro/tops?kungfu=' .. UI_GetPlayerMountKungfuID())
