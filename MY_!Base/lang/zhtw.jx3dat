@@ -630,7 +630,7 @@ return {
 
 	-- MY_FirstBossKill.lua --
 	['Share boss kill'] = '首次擊敗分享',
-	['Share boss kill record for kill rank.'] = '分享首次擊敗秘境首領相關團隊與戰鬥信息，用於數據統計。',
+	['Share boss kill record for kill rank.'] = '公開分享首次擊敗秘境首領相關團隊與戰鬥信息，用於數據統計。',
 	['Try share boss kill: %s - %ds (%s).'] = '正在分享：%s，戰鬥%d秒，%s。',
 	['Share boss kill success: %s - %ds (%s).'] = '成功分享：%s，戰鬥%d秒，%s。',
 	['Full win'] = '全勝',

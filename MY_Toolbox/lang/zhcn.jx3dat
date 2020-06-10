@@ -362,4 +362,5 @@ return {
     ['Top yun macro'] = '云端宏排名',
     ['Show yun macro buttons on macro panel.'] = '在宏界面显示云端宏按钮',
     ['Got it'] = '好的',
+    ['Please input macro name first.'] = '请先输入宏名称。',
 }

@@ -73,11 +73,15 @@ function D.Hook()
 		w = 'auto', h = edtName:GetH(),
 		text = _L['Sync yun macro'],
 		onclick = function()
+			local szName = LIB.TrimString(edtName:GetText())
+			if IsEmpty(szName) then
+				return LIB.Alert(_L['Please input macro name first.'])
+			end
 			LIB.Alert('MY_YunMacro', _L['Macro update started, please keep panel opened and wait.'], nil, _L['Got it'])
 			LIB.Ajax({
 				driver = 'auto', mode = 'auto',
 				url = 'https://pull.j3cx.com/api/macro/query?name='
-					.. LIB.UrlEncode(AnsiToUTF8(edtName:GetText())),
+					.. LIB.UrlEncode(AnsiToUTF8(szName)),
 				success = function(szHTML)
 					local res, err = LIB.JsonDecode(szHTML)
 					if not res then
