@@ -977,35 +977,35 @@ local CONSTANT = setmetatable({}, {
 		-- skillid, uitex, frame
 		KUNGFU_LIST = {
 			-- MT
-			{ dwID = 10062, szUITex = 'ui/Image/icon/skill_tiance01.UITex'    , nFrame = 0  }, -- 铁牢
-			{ dwID = 10243, szUITex = 'ui/Image/icon/mingjiao_taolu_7.UITex'  , nFrame = 0  }, -- 明尊
-			{ dwID = 10389, szUITex = 'ui/Image/icon/Skill_CangY_33.UITex'    , nFrame = 0  }, -- 铁骨
-			{ dwID = 10002, szUITex = 'ui/Image/icon/skill_shaolin14.UITex'   , nFrame = 0  }, -- 少林
+			{ dwID = 10062, nIcon = 632  , szUITex = 'ui/Image/icon/skill_tiance01.UITex'    , nFrame = 0  }, -- 铁牢
+			{ dwID = 10243, nIcon = 3864 , szUITex = 'ui/Image/icon/mingjiao_taolu_7.UITex'  , nFrame = 0  }, -- 明尊
+			{ dwID = 10389, nIcon = 6315 , szUITex = 'ui/Image/icon/Skill_CangY_33.UITex'    , nFrame = 0  }, -- 铁骨
+			{ dwID = 10002, nIcon = 429  , szUITex = 'ui/Image/icon/skill_shaolin14.UITex'   , nFrame = 0  }, -- 少林
 			-- 治疗
-			{ dwID = 10080, szUITex = 'ui/Image/icon/skill_qixiu02.UITex'     , nFrame = 0  }, -- 云裳
-			{ dwID = 10176, szUITex = 'ui/Image/icon/wudu_neigong_2.UITex'    , nFrame = 0  }, -- 补天
-			{ dwID = 10028, szUITex = 'ui/Image/icon/skill_wanhua23.UITex'    , nFrame = 0  }, -- 离经
-			{ dwID = 10448, szUITex = 'ui/Image/icon/skill_0514_23.UITex'     , nFrame = 0  }, -- 相知
+			{ dwID = 10080, nIcon = 887  , szUITex = 'ui/Image/icon/skill_qixiu02.UITex'     , nFrame = 0  }, -- 云裳
+			{ dwID = 10176, nIcon = 2767 , szUITex = 'ui/Image/icon/wudu_neigong_2.UITex'    , nFrame = 0  }, -- 补天
+			{ dwID = 10028, nIcon = 412  , szUITex = 'ui/Image/icon/skill_wanhua23.UITex'    , nFrame = 0  }, -- 离经
+			{ dwID = 10448, nIcon = 7067 , szUITex = 'ui/Image/icon/skill_0514_23.UITex'     , nFrame = 0  }, -- 相知
 			-- 内功
-			{ dwID = 10225, szUITex = 'ui/Image/icon/skill_tangm_20.UITex'    , nFrame = 0  }, -- 天罗
-			{ dwID = 10081, szUITex = 'ui/Image/icon/skill_qixiu03.UITex'     , nFrame = 0  }, -- 冰心
-			{ dwID = 10175, szUITex = 'ui/Image/icon/wudu_neigong_1.UITex'    , nFrame = 0  }, -- 毒经
-			{ dwID = 10242, szUITex = 'ui/Image/icon/mingjiao_taolu_8.UITex'  , nFrame = 0  }, -- 焚影
-			{ dwID = 10014, szUITex = 'ui/Image/icon/skill_chunyang21.UITex'  , nFrame = 0  }, -- 紫霞
-			{ dwID = 10021, szUITex = 'ui/Image/icon/skill_wanhua17.UITex'    , nFrame = 0  }, -- 花间
-			{ dwID = 10003, szUITex = 'ui/Image/icon/skill_shaolin10.UITex'   , nFrame = 0  }, -- 易经
-			{ dwID = 10447, szUITex = 'ui/Image/icon/skill_0514_27.UITex'     , nFrame = 0  }, -- 莫问
+			{ dwID = 10225, nIcon = 3184 , szUITex = 'ui/Image/icon/skill_tangm_20.UITex'    , nFrame = 0  }, -- 天罗
+			{ dwID = 10081, nIcon = 888  , szUITex = 'ui/Image/icon/skill_qixiu03.UITex'     , nFrame = 0  }, -- 冰心
+			{ dwID = 10175, nIcon = 2766 , szUITex = 'ui/Image/icon/wudu_neigong_1.UITex'    , nFrame = 0  }, -- 毒经
+			{ dwID = 10242, nIcon = 3865 , szUITex = 'ui/Image/icon/mingjiao_taolu_8.UITex'  , nFrame = 0  }, -- 焚影
+			{ dwID = 10014, nIcon = 627  , szUITex = 'ui/Image/icon/skill_chunyang21.UITex'  , nFrame = 0  }, -- 紫霞
+			{ dwID = 10021, nIcon = 406  , szUITex = 'ui/Image/icon/skill_wanhua17.UITex'    , nFrame = 0  }, -- 花间
+			{ dwID = 10003, nIcon = 425  , szUITex = 'ui/Image/icon/skill_shaolin10.UITex'   , nFrame = 0  }, -- 易经
+			{ dwID = 10447, nIcon = 7071 , szUITex = 'ui/Image/icon/skill_0514_27.UITex'     , nFrame = 0  }, -- 莫问
 			-- 外功
-			{ dwID = 10390, szUITex = 'ui/Image/icon/Skill_CangY_32.UITex'    , nFrame = 0  }, -- 分山
-			{ dwID = 10224, szUITex = 'ui/Image/icon/skill_tangm_01.UITex'    , nFrame = 0  }, -- 鲸鱼
-			{ dwID = 10144, szUITex = 'ui/Image/icon/cangjian_neigong_1.UITex', nFrame = 0  }, -- 问水
-			{ dwID = 10145, szUITex = 'ui/Image/icon/cangjian_neigong_2.UITex', nFrame = 0  }, -- 山居
-			{ dwID = 10015, szUITex = 'ui/Image/icon/skill_chunyang13.UITex'  , nFrame = 0  }, -- 剑纯
-			{ dwID = 10026, szUITex = 'ui/Image/icon/skill_tiance02.UITex'    , nFrame = 0  }, -- 傲雪
-			{ dwID = 10268, szUITex = 'ui/Image/icon/skill_GB_30.UITex'       , nFrame = 0  }, -- 笑尘
-			{ dwID = 10464, szUITex = 'ui/Image/icon/daoj_16_8_25_16.UITex'   , nFrame = 0  }, -- 霸刀
-			{ dwID = 10533, szUITex = 'ui/image/icon/jnpl_18_10_30_27.uitex'  , nFrame = 45 }, -- 蓬莱
-			{ dwID = 10585, szUITex = 'ui/image/icon/jnlxg_19_10_21_9.uitex'  , nFrame = 74 }, -- 凌雪
+			{ dwID = 10390, nIcon = 6314 , szUITex = 'ui/Image/icon/Skill_CangY_32.UITex'    , nFrame = 0  }, -- 分山
+			{ dwID = 10224, nIcon = 3165 , szUITex = 'ui/Image/icon/skill_tangm_01.UITex'    , nFrame = 0  }, -- 鲸鱼
+			{ dwID = 10144, nIcon = 2376 , szUITex = 'ui/Image/icon/cangjian_neigong_1.UITex', nFrame = 0  }, -- 问水
+			{ dwID = 10145, nIcon = 2377 , szUITex = 'ui/Image/icon/cangjian_neigong_2.UITex', nFrame = 0  }, -- 山居
+			{ dwID = 10015, nIcon = 619  , szUITex = 'ui/Image/icon/skill_chunyang13.UITex'  , nFrame = 0  }, -- 剑纯
+			{ dwID = 10026, nIcon = 633  , szUITex = 'ui/Image/icon/skill_tiance02.UITex'    , nFrame = 0  }, -- 傲雪
+			{ dwID = 10268, nIcon = 4610 , szUITex = 'ui/Image/icon/skill_GB_30.UITex'       , nFrame = 0  }, -- 笑尘
+			{ dwID = 10464, nIcon = 8424 , szUITex = 'ui/Image/icon/daoj_16_8_25_16.UITex'   , nFrame = 0  }, -- 霸刀
+			{ dwID = 10533, nIcon = 10709, szUITex = 'ui/image/icon/JNPL_18_10_30_27.uitex'  , nFrame = 45 }, -- 蓬莱
+			{ dwID = 10585, nIcon = 12128, szUITex = 'ui/image/icon/JNLXG_19_10_21_9.uitex'  , nFrame = 74 }, -- 凌雪
 		},
 		FORCE_AVATAR = setmetatable({
 			[FORCE_TYPE.JIANG_HU ] = { 'ui\\Image\\PlayerAvatar\\jianghu.tga'  , -2, false }, -- 江湖
