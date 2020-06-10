@@ -511,7 +511,7 @@ local function DrawDetail(ui)
 					D.ModifyMonitor(mon, 'ignoreId', not mon.ignoreId)
 				end,
 				szIcon = 'fromiconid',
-				nFrame = mon.iconid,
+				nFrame = mon.iconid or 13,
 				nIconWidth = 22,
 				nIconHeight = 22,
 				szLayer = 'ICON_RIGHTMOST',
@@ -534,7 +534,7 @@ local function DrawDetail(ui)
 						return mon.ignoreId
 					end,
 					szIcon = 'fromiconid',
-					nFrame = info.iconid,
+					nFrame = info.iconid or 13,
 					nIconWidth = 22,
 					nIconHeight = 22,
 					szLayer = 'ICON_RIGHTMOST',
@@ -559,7 +559,7 @@ local function DrawDetail(ui)
 							D.ModifyMonitorId(info, 'ignoreLevel', not info.ignoreLevel)
 						end,
 						szIcon = 'fromiconid',
-						nFrame = info.iconid,
+						nFrame = info.iconid or 13,
 						nIconWidth = 22,
 						nIconHeight = 22,
 						szLayer = 'ICON_RIGHTMOST',
@@ -587,7 +587,7 @@ local function DrawDetail(ui)
 									return mon.ignoreId or info.ignoreLevel
 								end,
 								szIcon = 'fromiconid',
-								nFrame = infoLevel.iconid,
+								nFrame = infoLevel.iconid or 13,
 								nIconWidth = 22,
 								nIconHeight = 22,
 								szLayer = 'ICON_RIGHTMOST',
