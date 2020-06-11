@@ -119,7 +119,7 @@ function D.GetSchemeMenu()
 				local t = LIB.SplitString(txt, ';')
 				local aScheme = {}
 				for k, v in ipairs(t) do
-					local a = LIB.SplitString(txt, ',')
+					local a = LIB.SplitString(v, ',')
 					if a[1] and a[2] then
 						a[1] = tonumber(a[1])
 						a[2] = tonumber(a[2])
