@@ -85,6 +85,7 @@ local O = {
 		{ 100000, 5000, true },
 	},
 	bSyncSystem = true,
+	bNewBidding = true,
 }
 RegisterCustomData('MY_GKP.bOn')
 RegisterCustomData('MY_GKP.bMoneyTalk')
@@ -95,6 +96,7 @@ RegisterCustomData('MY_GKP.bAutoSync')
 RegisterCustomData('MY_GKP.bShowGoldBrick')
 RegisterCustomData('MY_GKP.bShow2ndKungfuLoot')
 RegisterCustomData('MY_GKP.bSyncSystem')
+RegisterCustomData('MY_GKP.bNewBidding')
 
 ---------------------------------------------------------------------->
 -- 数据处理
@@ -345,6 +347,7 @@ local settings = {
 				aSubsidies = true,
 				aScheme = true,
 				bSyncSystem = true,
+				bNewBidding = true,
 			},
 			root = O,
 		},
@@ -363,6 +366,7 @@ local settings = {
 				aSubsidies = true,
 				aScheme = true,
 				bSyncSystem = true,
+				bNewBidding = true,
 			},
 			triggers = {
 				bDisplayEmptyRecords = function()

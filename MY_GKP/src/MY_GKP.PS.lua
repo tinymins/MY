@@ -235,6 +235,15 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + 28
 
+	ui:Append('WndCheckBox', {
+		x = x, y = y, w = 250,
+		text = _L['Prefer use new bidding panel'], checked = MY_GKP.bNewBidding,
+		oncheck = function(bChecked)
+			MY_GKP.bSyncSystem = bChecked
+		end,
+	})
+	y = y + 28
+
 	y = y + 5
 	ui:Append('WndComboBox', { x = x, y = y, w = 150, text = _L['Edit Allowance Protocols'], menu = D.GetSubsidiesMenu })
 	ui:Append('WndComboBox', { x = x + 160, y = y, text = _L['Edit Auction Protocols'], menu = D.GetSchemeMenu })
