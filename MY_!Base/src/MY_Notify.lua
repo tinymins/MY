@@ -44,9 +44,11 @@ local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAD
 
 MY_Notify = {}
 MY_Notify.anchor = { x = -100, y = -150, s = 'BOTTOMRIGHT', r = 'BOTTOMRIGHT' }
+MY_Notify.bEntry = false
 MY_Notify.bDesc = false
 MY_Notify.bDisableDismiss = false
 RegisterCustomData('MY_Notify.anchor')
+RegisterCustomData('MY_Notify.bEntry')
 RegisterCustomData('MY_Notify.bDesc')
 RegisterCustomData('MY_Notify.bDisableDismiss')
 
@@ -107,22 +109,17 @@ function D.UpdateEntry()
 	if not container then
 		return
 	end
-	local nUnread = 0
-	for _, v in ipairs(NOTIFY_LIST) do
-		if v.bUnread then
-			nUnread = nUnread + 1
+	local bShow, nUnread = false, 0
+	if MY_Notify.bEntry then
+		for _, v in ipairs(NOTIFY_LIST) do
+			if v.bUnread then
+				nUnread = nUnread + 1
+			end
 		end
+		bShow = #NOTIFY_LIST > 0
 	end
 	local wItem = container:Lookup('Wnd_News_XJ')
-	if #NOTIFY_LIST == 0 then
-		-- if wItem then
-		-- 	-- container:SetW(container:GetW() - wItem:GetW())
-		-- 	wItem:Destroy()
-		-- 	container:FormatAllContentPos()
-		-- end
-		wItem:Hide()
-		container:FormatAllContentPos()
-	else
+	if bShow then
 		-- if not wItem then
 		-- 	wItem = container:AppendContentFromIni(ENTRY_INI_PATH, 'Wnd_MY_NotifyIcon')
 		-- 	-- container:SetW(container:GetW() + wItem:GetW())
@@ -141,8 +138,17 @@ function D.UpdateEntry()
 		wItem:Lookup('Btn_News_XJ', 'Image_Red_Pot'):SetVisible(nUnread > 0)
 		wItem:Lookup('Btn_News_XJ').OnLButtonClick = function() MY_Notify.OpenPanel() end
 		container:FormatAllContentPos()
+	else
+		-- if wItem then
+		-- 	-- container:SetW(container:GetW() - wItem:GetW())
+		-- 	wItem:Destroy()
+		-- 	container:FormatAllContentPos()
+		-- end
+		wItem:Hide()
+		container:FormatAllContentPos()
 	end
 end
+MY_Notify.UpdateEntry = D.UpdateEntry
 LIB.RegisterInit('MY_Notify', D.UpdateEntry)
 
 function D.RemoveEntry()

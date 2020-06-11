@@ -1103,6 +1103,15 @@ function PS.OnPanelActive(wnd)
 	}):AutoWidth()
 	y = y + 30
 	x = x + ui:Append('WndCheckBox', {
+		x = x, y = y, w = 200, h = 25,
+		text = _L['Show in minimap'],
+		checked = MY_Notify.bEntry,
+		oncheck = function(bChecked)
+			MY_Notify.bEntry = bChecked
+			MY_Notify.UpdateEntry()
+		end,
+	}):AutoWidth():Width() + 5
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, w = 100, h = 25,
 		text = _L['Order desc'],
 		checked = MY_Notify.bDesc,
