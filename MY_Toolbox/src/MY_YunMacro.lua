@@ -86,6 +86,14 @@ function D.Hook()
 					.. LIB.UrlEncode(AnsiToUTF8(szName)),
 				success = function(szHTML)
 					local res, err = LIB.JsonDecode(szHTML)
+					if res then
+						local bVaild, szErrID, nLine, szErrMsg = LIB.IsMacroValid(res.data)
+						if bVaild then
+							res.desc = LIB.ReplaceSensitiveWord(res.desc)
+						else
+							res, err = false, szErrMsg
+						end
+					end
 					if not res then
 						return LIB.Alert('MY_YunMacro', _L['ERR: Info content is illegal!'] .. '\n\n' .. err, nil, _L['Got it'])
 					end
