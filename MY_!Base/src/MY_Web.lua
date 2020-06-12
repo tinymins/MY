@@ -201,6 +201,9 @@ function MY_Web.Open(url, options)
 	WINDOWS[szKey] = Wnd.OpenWindow(PACKET_INFO.FRAMEWORK_ROOT .. 'ui/MY_Web.ini', 'MY_Web#' .. szKey)
 
 	local frame = WINDOWS[szKey]
+	if options.layer then
+		frame:ChangeRelation(options.layer)
+	end
 	local ui = UI(frame)
 	if options.driver == 'ie' then
 		ui:Children('#Wnd_Web'):Append('WndWebPage', { name = 'WndWeb' })
