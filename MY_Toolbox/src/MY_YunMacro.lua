@@ -67,9 +67,11 @@ function D.Hook()
 	local edtMacro = frame:Lookup('Edit_Content')
 	local btnNew = frame:Lookup('Btn_New')
 	local hIconList = frame:Lookup('', 'Handle_Icon')
-	UI(frame):Append('WndButton', {
+	local nX = edtName:GetRelX() + edtName:GetW() + 10
+	local nY = edtName:GetRelY() - 4
+	nX = nX + UI(frame):Append('WndButton', {
 		name = 'Btn_YunMacro_Update',
-		x = edtName:GetRelX() + edtName:GetW() + 10, y = edtName:GetRelY() - 4,
+		x = nX, y = nY,
 		w = 'auto', h = edtName:GetH(),
 		text = _L['Sync yun macro'],
 		onclick = function()
@@ -108,6 +110,21 @@ function D.Hook()
 				end,
 			})
 		end,
+	}):Width()
+	UI(frame):Append('WndButton', {
+		name = 'Btn_YunMacro_Details',
+		x = nX, y = nY,
+		w = 'auto', h = edtName:GetH(),
+		text = _L['Show yun macro details'],
+		onclick = function()
+			local szName = LIB.TrimString(edtName:GetText())
+			if IsEmpty(szName) then
+				return LIB.Alert(_L['Please input macro name first.'])
+			end
+			local szURL = 'https://page.j3cx.com/macro/details?name='
+				.. LIB.UrlEncode(AnsiToUTF8(szName))
+			MY_Web.Open(szURL, { key = 'MY_YunMacro_' .. GetStringCRC(szName), layer = 'Topmost' })
+		end,
 	})
 	UI(frame):Append('WndButton', {
 		name = 'Btn_YunMacro_Tops',
@@ -127,6 +144,7 @@ function D.Unhook()
 	end
 	for _, s in ipairs({
 		'Btn_YunMacro_Update',
+		'Btn_YunMacro_Details',
 		'Btn_YunMacro_Tops',
 	}) do
 		local el = frame:Lookup(s)

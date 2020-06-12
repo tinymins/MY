@@ -355,6 +355,7 @@ return {
 
     -- MY_YunMacro.lua
     ['Sync yun macro'] = '同步雲端宏',
+    ['Show yun macro details'] = '顯示詳情',
     ['Macro update failed...'] = '同步雲端宏失敗...',
     ['ERR: Info content is illegal!'] = '錯誤：內容解析失敗！',
     ['Macro update started, please keep panel opened and wait.'] = '開始更新宏，請保持當前界面開啟、不要切換宏並等待結果。',
