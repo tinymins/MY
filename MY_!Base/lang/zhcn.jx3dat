@@ -358,6 +358,14 @@ return {
 		['<='] = '不大于',
 	},
 
+	['Syntax error at line %d'] = '语法解析错误发生在第%d行',
+	['Unknown action at line %d'] = '未知的指令发生在第%d行',
+	['Unknown action skill at line %d'] = '未知的指令技能名称发生在第%d行',
+	['Unknown action buff at line %d'] = '未知的指令气劲名称发生在第%d行',
+	['Unknown condition at line %d'] = '未知的条件指令发生在第%d行',
+	['Unknown condition skill at line %d'] = '未知的条件技能名称发生在第%d行',
+	['Unknown condition buff at line %d'] = '未知的条件气劲名称发生在第%d行',
+
 	['MY_Notify'] = '茗伊消息中心',
 	['Show share notify.'] = '启用奇遇等数据分享提示',
 	['Show notify tip.'] = '显示提示框',
