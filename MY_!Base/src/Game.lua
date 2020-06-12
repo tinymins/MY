@@ -266,6 +266,27 @@ function LIB.GetBuffName(dwBuffID, dwLevel)
 end
 end
 
+-- 通过BUFF名称获取BUFF信息
+-- (table) LIB.GetBuffByName(szName)
+do local CACHE
+function LIB.GetBuffByName(szName)
+	if not CACHE then
+		local aCache, tLine, tExist = {}
+		for i = 1, g_tTable.Buff:GetRowCount() do
+			tLine = g_tTable.Buff:GetRow(i)
+			if tLine and tLine.szName then
+				tExist = aCache[tLine.szName]
+				if not tExist or (tLine.bShow == 1 and tExist.bShow == 0) then
+					aCache[tLine.szName] = tLine
+				end
+			end
+		end
+		CACHE = aCache
+	end
+	return CACHE[szName]
+end
+end
+
 function LIB.GetEndTime(nEndFrame, bAllowNegative)
 	if bAllowNegative then
 		return (nEndFrame - GetLogicFrameCount()) / GLOBAL.GAME_FPS
@@ -2702,19 +2723,24 @@ function LIB.CanOTAction(KObject)
 	return KObject.nMoveState == MOVE_STATE.ON_STAND or KObject.nMoveState == MOVE_STATE.ON_FLOAT
 end
 
--- 通过技能名称获取技能对象
+-- 通过技能名称获取技能信息
 -- (table) LIB.GetSkillByName(szName)
-do local PLAYER_SKILL_CACHE = {} -- 玩家技能列表[缓存] 技能名反查ID
+do local CACHE
 function LIB.GetSkillByName(szName)
-	if getn(PLAYER_SKILL_CACHE)==0 then
+	if not CACHE then
+		local aCache, tLine, tExist = {}
 		for i = 1, g_tTable.Skill:GetRowCount() do
-			local tLine = g_tTable.Skill:GetRow(i)
-			if tLine~=nil and tLine.dwIconID~=nil and tLine.fSortOrder~=nil and tLine.szName~=nil and tLine.dwIconID~=13 and ( (not PLAYER_SKILL_CACHE[tLine.szName]) or tLine.fSortOrder>PLAYER_SKILL_CACHE[tLine.szName].fSortOrder) then
-				PLAYER_SKILL_CACHE[tLine.szName] = tLine
+			tLine = g_tTable.Skill:GetRow(i)
+			if tLine and tLine.dwIconID and tLine.fSortOrder and tLine.szName then
+				tExist = aCache[tLine.szName]
+				if not tExist or tLine.fSortOrder > tExist.fSortOrder then
+					aCache[tLine.szName] = tLine
+				end
 			end
 		end
+		CACHE = aCache
 	end
-	return PLAYER_SKILL_CACHE[szName]
+	return CACHE[szName]
 end
 end
 
