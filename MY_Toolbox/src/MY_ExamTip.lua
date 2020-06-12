@@ -167,11 +167,11 @@ function D.SubmitData(tExamData, bAllRight)
 	end
 	LIB.Ajax({
 		driver = 'auto', method = 'auto',
-		url = SUBMIT_URL .. LIB.EncodePostData(LIB.UrlEncode({
+		url = SUBMIT_URL .. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
 			lang = select(3, GetVersion()),
-			data = data,
+			data = LIB.JsonEncode(data),
 			perfect = bAllRight and 1 or 0,
-		})),
+		}, 'idiadoHUiogyui()&*hHUO'))),
 		success = function(html, status)
 			local res = LIB.JsonDecode(html)
 			if LIB.IsShieldedVersion('MY_ExamTip') or not res then
@@ -197,7 +197,7 @@ local function OnFrameBreathe()
 	if not LIB.IsShieldedVersion('MY_ExamTip') then
 		QueryData(szQues)
 	end
-	local aChoise, nChoise
+	local aChoise, nChoise = {}, -1
 	for i = 1, 4 do
 		if frame:Lookup('Wnd_Type1/CheckBox_T1No' .. i):IsCheckBoxChecked() then
 			nChoise = i
