@@ -415,7 +415,7 @@ local function OnBagItemUpdate()
 		DoFilterGuildBank()
 	end
 end
-LIB.RegisterEvent({'BAG_ITEM_UPDATE', 'GUILD_BANK_PANEL_UPDATE'}, function()
+LIB.RegisterEvent({'BAG_ITEM_UPDATE', 'GUILD_BANK_PANEL_UPDATE', 'LOADING_END'}, function()
 	if not MY_BagEx.bEnable then
 		return
 	end
