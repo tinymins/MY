@@ -196,19 +196,17 @@ function D.OnFrameCreate()
 		ui:Append('WndButton', {
 			name = 'On', text = 'Enable', x = 110, y = 10, enable = not MY_TeamMon.bEnable,
 			onclick = function()
-				MY_TeamMon.Enable(true, true)
+				MY_TeamMon.bEnable = true
 				this:Enable(false)
 				ui:Children('#Off'):Enable(true)
-				MY_TeamMon.bEnable = true
 			end,
 		})
 		ui:Append('WndButton', {
 			name = 'Off', text = 'Disable', x = 210, y = 10, enable = MY_TeamMon.bEnable,
 			onclick = function()
-				MY_TeamMon.Enable(false)
+				MY_TeamMon.bEnable = false
 				this:Enable(false)
 				ui:Children('#On'):Enable(true)
-				MY_TeamMon.bEnable = false
 			end,
 		})
 	end
@@ -945,6 +943,15 @@ function D.OpenImportPanel(szDefault, szTitle, fnAction)
 				end
 				LIB.Alert(_L('Import success: %s', szTitle or szMsg), fnAlert2, nil, fnAlert2)
 				ui:Remove()
+				if MY_LifeBar and not MY_LifeBar.bEnabled then
+					MY_LifeBar.bEnabled = true
+				end
+				if MY_TeamMon and not MY_TeamMon.bEnabled then
+					MY_TeamMon.bEnabled = true
+				end
+				if MY_Focus and not MY_Focus.bEnabled then
+					MY_Focus.bEnabled = true
+				end
 				if fnAction then
 					fnAction()
 				end

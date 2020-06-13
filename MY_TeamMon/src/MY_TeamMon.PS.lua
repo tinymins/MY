@@ -75,7 +75,6 @@ function PS.OnPanelActive(wnd)
 		x = X + 10, y = nY, text = _L['Enable MY_TeamMon'],
 		checked = MY_TeamMon.bEnable,
 		oncheck = function(bCheck)
-			MY_TeamMon.Enable(bCheck, true)
 			MY_TeamMon.bEnable = bCheck
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')

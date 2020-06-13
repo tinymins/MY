@@ -2251,6 +2251,11 @@ local settings = {
 				bPushBuffList       = true,
 				bPushPartyBuffList  = true,
 			},
+			triggers = {
+				bEnable = function()
+					D.Enable(O.bEnable, true)
+				end,
+			},
 			root = O,
 		},
 	},
