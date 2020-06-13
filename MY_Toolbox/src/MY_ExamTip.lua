@@ -50,8 +50,6 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
 	return
 end
 --------------------------------------------------------------------------
-local QUERY_URL = 'https://pull.j3cx.com/api/exam?q=%s'
-local SUBMIT_URL = 'https://push.j3cx.com/api/exam/uploads?'
 local l_tLocal -- 本地题库
 local l_tExamDataCached = {} -- 玩家答题缓存
 local l_tAccept = {} -- 从服务器获取到的数据缓存
@@ -111,7 +109,11 @@ local function QueryData(szQues)
 
 	LIB.Ajax({
 		method = 'get',
-		url = QUERY_URL:format(LIB.UrlEncode(AnsiToUTF8(szQues))),
+		url = 'https://pull.j3cx.com/api/exam?'
+			.. LIB.EncodePostData(LIB.UrlEncode({
+				lang = AnsiToUTF8(LIB.GetLang()),
+				q = AnsiToUTF8(szQues),
+			})),
 		success = function(html, status)
 			local res = LIB.JsonDecode(html)
 			if not res or not IsCurrentQuestion(res.ques) then
@@ -167,11 +169,12 @@ function D.SubmitData(tExamData, bAllRight)
 	end
 	LIB.Ajax({
 		driver = 'auto', method = 'auto',
-		url = SUBMIT_URL .. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
-			lang = select(3, GetVersion()),
-			data = LIB.JsonEncode(data),
-			perfect = bAllRight and 1 or 0,
-		}, 'idiadoHUiogyui()&*hHUO'))),
+		url = 'https://push.j3cx.com/api/exam/uploads?'
+			.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
+				lang = AnsiToUTF8(LIB.GetLang()),
+				data = LIB.JsonEncode(data),
+				perfect = bAllRight and 1 or 0,
+			}, 'idiadoHUiogyui()&*hHUO'))),
 		success = function(html, status)
 			local res = LIB.JsonDecode(html)
 			if LIB.IsShieldedVersion('MY_ExamTip') or not res then

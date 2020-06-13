@@ -81,6 +81,7 @@ function D.ShareBKR(p, bOnymous, onfulfilled, oncomplete)
 	local szTeammateU = AnsiToUTF8(p.szTeammate)
 	local szURL = 'https://push.j3cx.com/api/bkr/uploads?'
 		.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
+			g = AnsiToUTF8(LIB.GetLang()),
 			s = szServerU,
 			n = szNameU,
 			l = szLeaderU,

@@ -70,8 +70,9 @@ function D.Open(dwAchievement)
 	if not achi then
 		return
 	end
-	local szURL = 'https://page.j3cx.com/wiki/' .. dwAchievement
-		.. '?' .. LIB.EncodePostData(LIB.UrlEncode({
+	local szURL = 'https://page.j3cx.com/wiki/' .. dwAchievement .. '?'
+		.. LIB.EncodePostData(LIB.UrlEncode({
+			lang = AnsiToUTF8(LIB.GetLang()),
 			player = AnsiToUTF8(GetUserRoleName()),
 		}))
 	local szKey = 'AchievementWiki_' .. dwAchievement

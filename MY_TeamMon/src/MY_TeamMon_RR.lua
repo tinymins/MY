@@ -65,7 +65,6 @@ local INI_PATH = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_RR.ini'
 local MY_TM_META_ROOT = MY_TeamMon.MY_TM_META_ROOT
 local MY_TM_DATA_ROOT = MY_TeamMon.MY_TM_DATA_ROOT
 local MY_TM_DATA_PASSPHRASE = '89g45ynbtldnsryu98rbny9ps7468hb6npyusiryuxoldg7lbn894bn678b496746'
-local REPO_META_SUBSCRIBE_URL = 'https://pull.j3cx.com/api/dbm/subscribe'
 local META_DOWNLOADING, DATA_DOWNLOADING = {}, {}
 
 -- 陆服环境下，以下缩写均对等
@@ -405,7 +404,10 @@ end
 function D.RequestRepoMetaList()
 	LIB.Ajax({
 		driver = 'auto', method = 'auto',
-		url = REPO_META_SUBSCRIBE_URL,
+		url = 'https://pull.j3cx.com/api/dbm/subscribe?'
+			.. LIB.EncodePostData(LIB.UrlEncode({
+				lang = AnsiToUTF8(LIB.GetLang()),
+			})),
 		charset = 'utf8',
 		success = function(szHTML)
 			local res = LIB.JsonDecode(szHTML)

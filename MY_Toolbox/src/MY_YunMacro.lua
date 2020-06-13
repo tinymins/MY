@@ -82,8 +82,11 @@ function D.Hook()
 			LIB.Alert('MY_YunMacro', _L['Macro update started, please keep panel opened and wait.'], nil, _L['Got it'])
 			LIB.Ajax({
 				driver = 'auto', mode = 'auto',
-				url = 'https://pull.j3cx.com/api/macro/query?name='
-					.. LIB.UrlEncode(AnsiToUTF8(szName)),
+				url = 'https://pull.j3cx.com/api/macro/query?'
+					.. LIB.EncodePostData(LIB.UrlEncode({
+						lang = AnsiToUTF8(LIB.GetLang()),
+						name = AnsiToUTF8(szName),
+					})),
 				success = function(szHTML)
 					local res, err = LIB.JsonDecode(szHTML)
 					if res then
@@ -129,8 +132,11 @@ function D.Hook()
 			if IsEmpty(szName) then
 				return LIB.Alert(_L['Please input macro name first.'])
 			end
-			local szURL = 'https://page.j3cx.com/macro/details?name='
-				.. LIB.UrlEncode(AnsiToUTF8(szName))
+			local szURL = 'https://page.j3cx.com/macro/details?'
+				.. LIB.EncodePostData(LIB.UrlEncode({
+					lang = AnsiToUTF8(LIB.GetLang()),
+					name = AnsiToUTF8(szName),
+				}))
 			MY_Web.Open(szURL, { key = 'MY_YunMacro_' .. GetStringCRC(szName), layer = 'Topmost' })
 		end,
 	})
@@ -140,7 +146,12 @@ function D.Hook()
 		w = btnNew:GetW(), h = btnNew:GetH(),
 		text = _L['Top yun macro'],
 		onclick = function()
-			LIB.OpenBrowser('https://page.j3cx.com/macro/tops?kungfu=' .. UI_GetPlayerMountKungfuID())
+			local szURL = 'https://page.j3cx.com/macro/tops?'
+				.. LIB.EncodePostData(LIB.UrlEncode({
+					lang = AnsiToUTF8(LIB.GetLang()),
+					kungfu = tostring(UI_GetPlayerMountKungfuID()),
+				}))
+			LIB.OpenBrowser(szURL)
 		end,
 	})
 end
