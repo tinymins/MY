@@ -360,10 +360,10 @@ return {
 
 	['Syntax error at line %d'] = '語法解析錯誤發生在第%d行',
 	['Unknown action at line %d'] = '未知的指令發生在第%d行',
-	['Unknown action skill at line %d'] = '未知的指令技能名稱發生在第%d行',
+	['Unknown action skill at line %d'] = '未知的指令招式名稱發生在第%d行',
 	['Unknown action buff at line %d'] = '未知的指令氣勁名稱發生在第%d行',
 	['Unknown condition at line %d'] = '未知的條件指令發生在第%d行',
-	['Unknown condition skill at line %d'] = '未知的條件技能名稱發生在第%d行',
+	['Unknown condition skill at line %d'] = '未知的條件招式名稱發生在第%d行',
 	['Unknown condition buff at line %d'] = '未知的條件氣勁名稱發生在第%d行',
 
 	['MY_Notify'] = '茗伊消息中心',
