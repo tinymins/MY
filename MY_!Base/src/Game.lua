@@ -4196,7 +4196,7 @@ function LIB.IsMacroValid(szMacro)
 				if not szJudge then
 					szJudge, szJudgeData = szSubCondition:match('^([a-zA-Z_]+)[<>=0-9.]*$'), ''
 				end
-				if szJudge then
+				if szJudge and szJudge ~= 'last_skill' then
 					local szJudgeType = MACRO_CONDITION_DATATYPE[szJudge]
 					if not szJudgeType then
 						local szErrMsg = _L('Unknown condition at line %d', nLine)
