@@ -4146,7 +4146,7 @@ function LIB.IsMacroValid(szMacro)
 	local bDebug = LIB.IsDebugClient('MY_Macro')
 	for nLine, szLine in ipairs(LIB.SplitString(szMacro, '\n')) do
 		szLine = LIB.TrimString(szLine)
-		if not IsEmpty(szLine) then
+		if not IsEmpty(szLine) and szLine:sub(1, 2) ~= '--' then
 			-- 拆分 /动作指令 [条件] 动作指令参数
 			local szAction, szCondition, szActionData = szLine:match('^/([a-zA-Z_]+)%s+%[([^%]]+)%]%s*(.-)%s*$')
 			if not szAction then
