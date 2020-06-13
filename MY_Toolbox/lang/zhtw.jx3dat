@@ -101,6 +101,7 @@ return {
     ['Question: %s\nAnswer: %s'] = '問：%s\n答：%s',
     ['Loading failed.'] = '載入失敗。',
     ['%s record(s) commited, %s record(s) accepted!'] = '已為您自動提交了%s條題庫數據，其中%s條已被系統通過採納！',
+    ['<G>Congratulations you finished the exam, please visit Yangzhou next monday for result.'] = '<G>恭喜你完成了會試，請於下周一前往揚州城幫會區前方的皇榜查閱成績。',
 
     ['Autochat'                                        ] = '自動對話',
     ['Common'                                          ] = '通用',

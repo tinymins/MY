@@ -218,17 +218,32 @@ LIB.RegisterFrameCreate('ExaminationPanel.EXAM_TIP', function(name, frame)
 end)
 
 LIB.RegisterEvent('LOOT_ITEM.MY_EXAMTIP', function()
+	if IsEmpty(l_tExamDataCached) then
+		return
+	end
 	local item = GetItem(arg1)
 	if item and item.nUiId == 65814 then
 		local nBeforeExamPrintRemainSpace = l_nExamPrintRemainSpace
 		local tExamData = Clone(l_tExamDataCached)
-		LIB.DelayCall(function()
+		l_tExamDataCached = {}
+		LIB.DelayCall(2000, function()
 			local bAllRight = nBeforeExamPrintRemainSpace - GetClientPlayer().GetExamPrintRemainSpace() == 100
 			D.SubmitData(tExamData, bAllRight)
-		end, 2000)
+		end)
 	end
 end)
 end
+
+LIB.RegisterEvent('OPEN_WINDOW.MY_EXAMTIP', function()
+	if IsEmpty(l_tExamDataCached) then
+		return
+	end
+	if wfind(arg1, _L['<G>Congratulations you finished the exam, please visit Yangzhou next monday for result.']) then
+		local tExamData = Clone(l_tExamDataCached)
+		l_tExamDataCached = {}
+		D.SubmitData(tExamData, false)
+	end
+end)
 
 LIB.RegisterReload('MY_ExamTip', function()
 	Wnd.CloseWindow('ExaminationPanel')
