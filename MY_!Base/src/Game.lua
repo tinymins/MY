@@ -4192,9 +4192,9 @@ function LIB.IsMacroValid(szMacro)
 				-- bufftime:太极<4.1
 				-- tbuff:流血
 				-- 校验【条件指令:条件指令参数(可选数值比较)】类型
-				local szJudge, szJudgeData = szSubCondition:match('^([a-zA-Z_]+)%:([^<>~=]+)[<>~=0-9.]*$')
+				local szJudge, szJudgeData = szSubCondition:match('^([a-zA-Z_]+)%s*%:%s*([^<>~=]+)%s*[<>~=]*%s*[0-9.]*$')
 				if not szJudge then
-					szJudge, szJudgeData = szSubCondition:match('^([a-zA-Z_]+)[<>~=0-9.]*$'), ''
+					szJudge, szJudgeData = szSubCondition:match('^([a-zA-Z_]+)%s*[<>~=]*%s*[0-9.%s]*$'), ''
 				end
 				if szJudge and szJudge ~= 'last_skill' then
 					local szJudgeType = MACRO_CONDITION_DATATYPE[szJudge]
