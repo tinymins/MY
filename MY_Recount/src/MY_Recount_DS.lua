@@ -1745,7 +1745,7 @@ for _, v in ipairs({
 		local dwID, dwTemplateID = arg0, 0
 		local KObject = LIB.GetObject(dwType, dwID)
 		local nCurrentLife, nMaxLife, nCurrentMana, nMaxMana = 0, 0
-		if KObject then
+		if KObject and (dwType == TARGET.NPC or dwType == TARGET.PLAYER) then
 			nCurrentLife, nMaxLife = KObject.nCurrentLife, KObject.nMaxLife
 			nCurrentMana, nMaxMana = KObject.nCurrentMana, KObject.nMaxMana
 		end
