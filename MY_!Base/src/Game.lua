@@ -4143,6 +4143,7 @@ local MACRO_CONDITION_DATATYPE = {
 }
 function LIB.IsMacroValid(szMacro)
 	-- /cast [nobuff:太极] 太极无极
+	local bDebug = LIB.IsDebugClient('MY_Macro')
 	for nLine, szLine in ipairs(LIB.SplitString(szMacro, '\n')) do
 		szLine = LIB.TrimString(szLine)
 		if not IsEmpty(szLine) then
@@ -4154,17 +4155,33 @@ function LIB.IsMacroValid(szMacro)
 			end
 			-- 校验动作指令
 			if not szAction then
-				return false, 'SYNTAX_ERROR', nLine, _L('Syntax error at line %d', nLine)
+				local szErrMsg = _L('Syntax error at line %d', nLine)
+				if bDebug then
+					szErrMsg = szErrMsg .. '{' .. szLine .. '}'
+				end
+				return false, 'SYNTAX_ERROR', nLine, szErrMsg
 			end
 			local szActionType = MACRO_ACTION_DATATYPE[szAction]
 			if not szActionType then
-				return false, 'UNKNOWN_ACTION', nLine, _L('Unknown action at line %d', nLine)
+				local szErrMsg = _L('Unknown action at line %d', nLine)
+				if bDebug then
+					szErrMsg = szErrMsg .. '{' .. szAction .. '}'
+				end
+				return false, 'UNKNOWN_ACTION', nLine, szErrMsg
 			end
 			-- 校验动作指令参数
 			if szActionType == 'SKILL' and not tonumber(szActionData) and not LIB.GetSkillByName(szActionData) then
-				return false, 'UNKNOWN_ACTION_SKILL', nLine, _L('Unknown action skill at line %d', nLine)
+				local szErrMsg = _L('Unknown action skill at line %d', nLine)
+				if bDebug then
+					szErrMsg = szErrMsg .. '{' .. szActionData .. '}'
+				end
+				return false, 'UNKNOWN_ACTION_SKILL', nLine, szErrMsg
 			elseif szActionType == 'BUFF' and not tonumber(szActionData) and not LIB.GetBuffByName(szActionData) then
-				return false, 'UNKNOWN_ACTION_BUFF', nLine, _L('Unknown action buff at line %d', nLine)
+				local szErrMsg = _L('Unknown action buff at line %d', nLine)
+				if bDebug then
+					szErrMsg = szErrMsg .. '{' .. szActionData .. '}'
+				end
+				return false, 'UNKNOWN_ACTION_BUFF', nLine, szErrMsg
 			end
 			-- 校验条件
 			for _, szSubCondition in ipairs(LIB.SplitString(szCondition, {'|', '&'}, true)) do
@@ -4182,20 +4199,40 @@ function LIB.IsMacroValid(szMacro)
 				if szJudge then
 					local szJudgeType = MACRO_CONDITION_DATATYPE[szJudge]
 					if not szJudgeType then
-						return false, 'UNKNOWN_CONDITION', nLine, _L('Unknown condition at line %d', nLine)
+						local szErrMsg = _L('Unknown condition at line %d', nLine)
+						if bDebug then
+							szErrMsg = szErrMsg .. '{' .. szJudge .. '}'
+						end
+						return false, 'UNKNOWN_CONDITION', nLine, szErrMsg
 					end
 					if szJudgeType == 'SKILL' and not tonumber(szJudgeData) and not LIB.GetSkillByName(szJudgeData) then
-						return false, 'UNKNOWN_CONDITION_SKILL', nLine, _L('Unknown condition skill at line %d', nLine)
+						local szErrMsg = _L('Unknown condition skill at line %d', nLine)
+						if bDebug then
+							szErrMsg = szErrMsg .. '{' .. szJudgeData .. '}'
+						end
+						return false, 'UNKNOWN_CONDITION_SKILL', nLine, szErrMsg
 					elseif szJudgeType == 'BUFF' and not tonumber(szJudgeData) and not LIB.GetBuffByName(szJudgeData) then
-						return false, 'UNKNOWN_CONDITION_BUFF', nLine, _L('Unknown condition buff at line %d', nLine)
+						local szErrMsg = _L('Unknown condition buff at line %d', nLine)
+						if bDebug then
+							szErrMsg = szErrMsg .. '{' .. szJudgeData .. '}'
+						end
+						return false, 'UNKNOWN_CONDITION_BUFF', nLine, szErrMsg
 					end
 				elseif not szSubCondition:match('moon[<>=%s]+sun') and not szSubCondition:match('sun[<>=%s]+moon') then
 					szJudge, szJudgeData = szSubCondition:match('^(last_skill)[=~%s]+([^<>=~]+)$')
 					if not szJudge then
-						return false, 'UNKNOWN_CONDITION', nLine, _L('Unknown condition at line %d', nLine)
+						local szErrMsg = _L('Unknown condition at line %d', nLine)
+						if bDebug then
+							szErrMsg = szErrMsg .. '{' .. szSubCondition .. '}'
+						end
+						return false, 'UNKNOWN_CONDITION', nLine, szErrMsg
 					end
 					if szJudge and not tonumber(szJudgeData) and not LIB.GetSkillByName(szJudgeData) then
-						return false, 'UNKNOWN_ACTION_SKILL', nLine, _L('Unknown condition skill at line %d', nLine)
+						local szErrMsg = _L('Unknown condition skill at line %d', nLine)
+						if bDebug then
+							szErrMsg = szErrMsg .. '{' .. szJudgeData .. '}'
+						end
+						return false, 'UNKNOWN_ACTION_SKILL', nLine, szErrMsg
 					end
 				end
 			end
