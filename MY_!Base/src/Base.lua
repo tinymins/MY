@@ -970,6 +970,7 @@ local CONSTANT = setmetatable({}, {
 		NPC_HIDDEN = {
 			[19153] = true, -- 皇宫范围总控
 			[27634] = true, -- 秦皇陵安禄山总控
+			[56383] = true, -- 通关进度完成表现控制
 			[60045] = true, -- 辉天堑铁库牢房的不知道什么东西
 		},
 		DOODAD_NAME = {},
