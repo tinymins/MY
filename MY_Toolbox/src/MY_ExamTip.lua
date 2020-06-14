@@ -50,10 +50,10 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
 	return
 end
 --------------------------------------------------------------------------
-local l_tLocal -- 本地题库
-local l_tExamDataCached = {} -- 玩家答题缓存
-local l_tAccept = {} -- 从服务器获取到的数据缓存
-local l_szLastQueryQues -- 最后一次网络查询的题目（防止重查）
+local LOCAL_DATA_CACHE -- 本地题库
+local INPUT_DATA_CACHE = {} -- 玩家答题缓存
+local REMOTE_DATA_CACHE = {} -- 从服务器获取到的数据缓存
+local LAST_REMOTE_QUERY -- 最后一次网络查询的题目（防止重查）
 local D = {}
 
 local function DisplayMessage(szText)
@@ -89,18 +89,18 @@ local function ResolveAnswer(szAnsw)
 end
 
 local function QueryData(szQues)
-	if l_szLastQueryQues == szQues then
+	if LAST_REMOTE_QUERY == szQues then
 		return
 	end
-	l_szLastQueryQues = szQues
+	LAST_REMOTE_QUERY = szQues
 	ResolveAnswer()
 	DisplayMessage(_L['Querying, please wait...'])
 
-	if not l_tLocal then
-		l_tLocal = LIB.LoadLUAData({'config/examtip.jx3dat', PATH_TYPE.GLOBAL}) or {}
+	if not LOCAL_DATA_CACHE then
+		LOCAL_DATA_CACHE = LIB.LoadLUAData({'config/examtip.jx3dat', PATH_TYPE.GLOBAL}, { passphrase = false }) or {}
 	end
-	if l_tLocal[szQues] then
-		for _, szAnsw in ipairs(l_tLocal[szQues]) do
+	if LOCAL_DATA_CACHE[szQues] then
+		for _, szAnsw in ipairs(LOCAL_DATA_CACHE[szQues]) do
 			if ResolveAnswer(szAnsw) then
 				return DisplayMessage(_L['Local exam data matched.'])
 			end
@@ -130,7 +130,7 @@ local function QueryData(szQues)
 				for _, rec in ipairs(res.data) do
 					local ques, ans = UTF8ToAnsi(rec.ques), UTF8ToAnsi(rec.ans)
 					if IsCurrentQuestion(ques) and ResolveAnswer(ans) then
-						l_tAccept[ques] = ans
+						REMOTE_DATA_CACHE[ques] = ans
 						return
 					end
 				end
@@ -155,13 +155,10 @@ function D.SubmitData(tExamData, bAllRight)
 		return
 	end
 	local data = {}
-	for szQues, res in pairs(tExamData) do
-		local aChoise = {}
-		for i, szChoise in pairs(res.aChoise) do
-			aChoise[i] = AnsiToUTF8(szChoise)
-		end
-		if not l_tAccept[szQues] then
-			insert(data, { AnsiToUTF8(szQues), aChoise, res.nChoise })
+	for szQues, aBody in pairs(tExamData) do
+		if not REMOTE_DATA_CACHE[szQues] then
+			insert(aBody, 1, szQues)
+			insert(data, LIB.ConvertToUTF8(aBody))
 		end
 	end
 	if #data == 0 then
@@ -185,9 +182,7 @@ function D.SubmitData(tExamData, bAllRight)
 	})
 end
 
-do
-local l_nExamPrintRemainSpace = 0
-local function OnFrameBreathe()
+function D.GatherDataFromPanel()
 	local frame = Station.Lookup('Normal/ExaminationPanel')
 	if not (frame and frame:IsVisible()) then
 		return
@@ -196,19 +191,78 @@ local function OnFrameBreathe()
 	if not txtQues then
 		return
 	end
-	local szQues = txtQues:GetText()
+	local szQues, aBody = txtQues:GetText()
+	-- 单选
+	if not aBody then
+		local wnd = frame:Lookup('Wnd_Type1')
+		if wnd and wnd:IsVisible() then
+			local aChoise, aChoosed = {}, {}
+			for i = 1, 4 do
+				local chk = wnd:Lookup('CheckBox_T1No' .. i)
+				if chk and chk:IsVisible() then
+					if chk:IsCheckBoxChecked() then
+						insert(aChoosed, #aChoise)
+					end
+					insert(aChoise, chk:Lookup('Text_T1No' .. i):GetText())
+				end
+			end
+			aBody = { 1, aChoise, aChoosed }
+		end
+	end
+	-- 多选
+	if not aBody then
+		local wnd = frame:Lookup('Wnd_Type2')
+		if wnd and wnd:IsVisible() then
+			local aChoise, aChoosed = {}, {}
+			for i = 1, 4 do
+				local chk = wnd:Lookup('CheckBox_T2No' .. i)
+				if chk and chk:IsVisible() then
+					if chk:IsCheckBoxChecked() then
+						insert(aChoosed, #aChoise)
+					end
+					insert(aChoise, chk:Lookup('Text_T2No' .. i):GetText())
+				end
+			end
+			aBody = { 2, aChoise, aChoosed }
+		end
+	end
+	-- 问答题
+	if not aBody then
+		local wnd = frame:Lookup('Wnd_Type3')
+		if wnd and wnd:IsVisible() then
+			local edt = wnd:Lookup('Edit_Anwer')
+			aBody = { 3, edt and edt:GetText() or '' }
+		end
+	end
+	-- 看图单选
+	if not aBody then
+		local wnd = frame:Lookup('Wnd_Type4')
+		if wnd and wnd:IsVisible() then
+			local aChoise, aChoosed = {}, {}
+			for i = 1, 4 do
+				local chk = wnd:Lookup('CheckBox_T4No' .. i)
+				if chk and chk:IsVisible() then
+					if chk:IsCheckBoxChecked() then
+						insert(aChoosed, #aChoise)
+					end
+					insert(aChoise, chk:Lookup('Text_T4No' .. i):GetText())
+				end
+			end
+			aBody = { 4, aChoise, aChoosed }
+		end
+	end
+	return szQues, aBody
+end
+
+do
+local l_nExamPrintRemainSpace = 0
+local function OnFrameBreathe()
+	local szQues, aBody = D.GatherDataFromPanel()
 	if not LIB.IsShieldedVersion('MY_ExamTip') then
 		QueryData(szQues)
 	end
-	local aChoise, nChoise = {}, -1
-	for i = 1, 4 do
-		if frame:Lookup('Wnd_Type1/CheckBox_T1No' .. i):IsCheckBoxChecked() then
-			nChoise = i
-		end
-		insert(aChoise, frame:Lookup('Wnd_Type1/CheckBox_T1No' .. i, 'Text_T1No' .. i):GetText())
-	end
-	if szQues and not IsEmpty(aChoise) then
-		l_tExamDataCached[szQues] = { aChoise = aChoise, nChoise = nChoise }
+	if szQues and aBody then
+		INPUT_DATA_CACHE[szQues] = aBody
 	end
 	l_nExamPrintRemainSpace = GetClientPlayer().GetExamPrintRemainSpace()
 end
@@ -218,14 +272,14 @@ LIB.RegisterFrameCreate('ExaminationPanel.EXAM_TIP', function(name, frame)
 end)
 
 LIB.RegisterEvent('LOOT_ITEM.MY_EXAMTIP', function()
-	if IsEmpty(l_tExamDataCached) then
+	if IsEmpty(INPUT_DATA_CACHE) then
 		return
 	end
 	local item = GetItem(arg1)
 	if item and item.nUiId == 65814 then
 		local nBeforeExamPrintRemainSpace = l_nExamPrintRemainSpace
-		local tExamData = Clone(l_tExamDataCached)
-		l_tExamDataCached = {}
+		local tExamData = Clone(INPUT_DATA_CACHE)
+		INPUT_DATA_CACHE = {}
 		LIB.DelayCall(2000, function()
 			local bAllRight = nBeforeExamPrintRemainSpace - GetClientPlayer().GetExamPrintRemainSpace() == 100
 			D.SubmitData(tExamData, bAllRight)
@@ -235,12 +289,12 @@ end)
 end
 
 LIB.RegisterEvent('OPEN_WINDOW.MY_EXAMTIP', function()
-	if IsEmpty(l_tExamDataCached) then
+	if IsEmpty(INPUT_DATA_CACHE) then
 		return
 	end
 	if wfind(arg1, _L['<G>Congratulations you finished the exam, please visit Yangzhou next monday for result.']) then
-		local tExamData = Clone(l_tExamDataCached)
-		l_tExamDataCached = {}
+		local tExamData = Clone(INPUT_DATA_CACHE)
+		INPUT_DATA_CACHE = {}
 		D.SubmitData(tExamData, false)
 	end
 end)
