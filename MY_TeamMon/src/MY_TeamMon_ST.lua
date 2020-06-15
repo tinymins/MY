@@ -138,6 +138,13 @@ local function CreateCountdown(nType, szKey, tParam, szSender, szReceiver)
 			ui.obj:RemoveItem()
 		end
 		ST_TIME_EXPIRE[nType][szKey] = nil
+	elseif tTime.nTime == -1 then
+		local ui = ST_CACHE[nType][szKey]
+		if ui and ui:IsValid() then
+			ui.obj:RemoveItem()
+		end
+	elseif tTime.nTime == -2 then
+		ST_TIME_EXPIRE[nType][szKey] = nil
 	else
 		local nExpire = ST_TIME_EXPIRE[nType][szKey]
 		if nExpire and nExpire > nTime then
