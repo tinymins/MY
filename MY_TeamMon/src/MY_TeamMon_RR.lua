@@ -38,8 +38,9 @@ local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals,
 local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
 local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
 local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local Call, XpCall, GetTraceback, RandomChild = LIB.Call, LIB.XpCall, LIB.GetTraceback, LIB.RandomChild
 local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
+local Call, XpCall, SafeCall = LIB.Call, LIB.XpCall, LIB.SafeCall
+local GetTraceback, RandomChild = LIB.GetTraceback, LIB.RandomChild
 local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TeamMon'
@@ -293,13 +294,6 @@ local META_TEMPLATE = {
 	szAboutURL = '',
 }
 
-local function SafeCall(f, ...)
-	if not f then
-		return
-	end
-	return Call(f, ...)
-end
-
 function D.GetFrame()
 	return Station.SearchFrame('MY_TeamMon_RR')
 end
@@ -365,7 +359,8 @@ function D.DownloadMeta(info, onSuccess, onError)
 		success = function(szHTML)
 			local res, err = LIB.JsonDecode(szHTML)
 			if not res then
-				return SafeCall(onError, _L['ERR: Info content is illegal!'] .. '\n\n' .. err)
+				SafeCall(onError, _L['ERR: Info content is illegal!'] .. '\n\n' .. err)
+				return
 			end
 			local info = D.MetaJsonToLua(res, szURL, info.szKey)
 			local aMeta = D.LoadFavMetaList()
@@ -379,7 +374,8 @@ function D.DownloadMeta(info, onSuccess, onError)
 		end,
 		error = function(html, status)
 			if status == 404 then
-				return SafeCall(onError, _L['ERR404: Meta address not found!'])
+				SafeCall(onError, _L['ERR404: Meta address not found!'])
+				return
 			end
 			--[[#DEBUG BEGIN]]
 			LIB.Debug(_L['MY_TeamMon_RR'], 'ERROR Get Meta: ' .. status .. '\n' .. UTF8ToAnsi(html), DEBUG_LEVEL.WARNING)

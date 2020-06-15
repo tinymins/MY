@@ -706,6 +706,12 @@ function XpCall(arg0, ...)
 	return unpack(res)
 end
 end
+local function SafeCall(f, ...)
+	if not IsFunction(f) then
+		return false
+	end
+	return Call(f, ...)
+end
 -----------------------------------------------
 -- 插件集信息
 -----------------------------------------------
@@ -1262,6 +1268,7 @@ local LIB = {
 	Clone            = Clone           ,
 	Call             = Call            ,
 	XpCall           = XpCall          ,
+	SafeCall         = SafeCall        ,
 	SetmetaReadonly  = SetmetaReadonly ,
 	Set              = Set             ,
 	Get              = Get             ,
