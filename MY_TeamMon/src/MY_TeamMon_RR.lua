@@ -458,7 +458,10 @@ function D.DownloadData(info, callback)
 		else
 			LIB.Topmsg(_L('Decode %s failed!', info.szTitle))
 		end
-		SafeCall(callback)
+		SafeCall(callback, true)
+	end, function()
+		DATA_DOWNLOADING[info.szKey] = nil
+		SafeCall(callback, false)
 	end)
 end
 
