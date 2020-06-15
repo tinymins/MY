@@ -447,21 +447,17 @@ end
 LIB.RegisterEvent('CURL_REQUEST_RESULT.AJAX', OnCurlRequestResult)
 end
 
-function LIB.DownloadFile(szPath, resolve)
-	local downloader = LIB.UI.GetTempElement('Image.' .. PACKET_INFO.NAME_SPACE .. '#DownloadFile-' .. GetStringCRC(szPath))
-	if downloader.bPending then
-		insert(downloader.aResolve, resolve)
-	else
-		downloader.bPending = true
-		downloader.aResolve = {resolve}
-		downloader.FromTextureFile = function(_, szPath)
-			downloader:GetParent():RemoveItem(downloader)
-			for _, cb in ipairs(downloader.aResolve) do
-				Call(cb, szPath)
-			end
-		end
-		downloader:FromRemoteFile(szPath)
+function LIB.DownloadFile(szPath, resolve, reject)
+	local downloader = LIB.UI.GetTempElement('Image.' .. PACKET_INFO.NAME_SPACE .. '#DownloadFile-' .. GetStringCRC(szPath) .. '#' .. GetTime())
+	downloader.FromTextureFile = function(_, szPath)
+		Call(resolve, szPath)
 	end
+	downloader:FromRemoteFile(szPath, false, function(image, szURL, szAbsPath, bSuccess)
+		if not bSuccess then
+			Call(reject)
+		end
+		downloader:GetParent():RemoveItem(downloader)
+	end)
 end
 
 -- 发起数据接口安全稳定的多次重试 Ajax 调用
