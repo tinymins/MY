@@ -365,4 +365,6 @@ return {
     ['Show yun macro buttons on macro panel.'] = '在宏界面顯示雲端宏按鈕',
     ['Got it'] = '好的',
     ['Please input macro name first.'] = '請先輸入宏名稱。',
+
+    ['MY_RoleStatistics'] = '角色統計',
 }
