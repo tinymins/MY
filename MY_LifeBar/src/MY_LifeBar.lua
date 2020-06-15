@@ -339,8 +339,8 @@ function D.SaveSysHeadTop()
 		['CLIENTPLAYER_LIFE' ] = GetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, CONSTANT.GLOBAL_HEAD.LIFE ),
 		['CLIENTPLAYER_GUILD'] = GetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, CONSTANT.GLOBAL_HEAD.GUILD),
 		['INTELLIGENCE_LIFE' ] = GetGlobalTopIntelligenceLife(),
-		['NPC_BALLOON'       ] = select(2, SafeCall(_G.Addon_IsNpcBalloon())),
-		['PLAYER_BALLOON'    ] = select(2, SafeCall(_G.Addon_IsPlayerBalloon())),
+		['NPC_BALLOON'       ] = select(2, SafeCall(_G.Addon_IsNpcBalloon)),
+		['PLAYER_BALLOON'    ] = select(2, SafeCall(_G.Addon_IsPlayerBalloon)),
 	}
 end
 function D.ResumeSysHeadTop()
