@@ -319,6 +319,8 @@ function D.HideSysHeadTop()
 	SetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, CONSTANT.GLOBAL_HEAD.LIFE , false)
 	SetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, CONSTANT.GLOBAL_HEAD.GUILD, false)
 	SetGlobalTopIntelligenceLife(false)
+	SafeCall(_G.Addon_ShowNpcBalloon, false)
+	SafeCall(_G.Addon_ShowPlayerBalloon, false)
 end
 function D.SaveSysHeadTop()
 	if SYS_HEAD_TOP_STATE then
@@ -337,6 +339,8 @@ function D.SaveSysHeadTop()
 		['CLIENTPLAYER_LIFE' ] = GetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, CONSTANT.GLOBAL_HEAD.LIFE ),
 		['CLIENTPLAYER_GUILD'] = GetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, CONSTANT.GLOBAL_HEAD.GUILD),
 		['INTELLIGENCE_LIFE' ] = GetGlobalTopIntelligenceLife(),
+		['NPC_BALLOON'       ] = select(2, SafeCall(_G.Addon_IsNpcBalloon())),
+		['PLAYER_BALLOON'    ] = select(2, SafeCall(_G.Addon_IsPlayerBalloon())),
 	}
 end
 function D.ResumeSysHeadTop()
@@ -355,6 +359,8 @@ function D.ResumeSysHeadTop()
 	SetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, CONSTANT.GLOBAL_HEAD.LIFE , SYS_HEAD_TOP_STATE['CLIENTPLAYER_LIFE'])
 	SetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, CONSTANT.GLOBAL_HEAD.GUILD, SYS_HEAD_TOP_STATE['CLIENTPLAYER_GUILD'])
 	SetGlobalTopIntelligenceLife(SYS_HEAD_TOP_STATE['INTELLIGENCE_LIFE'])
+	SafeCall(_G.Addon_ShowNpcBalloon, SYS_HEAD_TOP_STATE['NPC_BALLOON'])
+	SafeCall(_G.Addon_ShowPlayerBalloon, SYS_HEAD_TOP_STATE['PLAYER_BALLOON'])
 	SYS_HEAD_TOP_STATE = nil
 end
 LIB.RegisterExit(D.ResumeSysHeadTop)
