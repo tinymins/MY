@@ -359,7 +359,7 @@ function D.DownloadMeta(info, onSuccess, onError)
 		FireUIEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
 	end
 	LIB.Ajax({
-		driver = 'auto', method = 'auto',
+		driver = 'auto', mode = 'auto', method = 'auto',
 		url = szURL,
 		charset = 'utf8',
 		success = function(szHTML)
@@ -403,7 +403,7 @@ end
 
 function D.RequestRepoMetaList()
 	LIB.Ajax({
-		driver = 'auto', method = 'auto',
+		driver = 'auto', mode = 'auto', method = 'auto',
 		url = 'https://pull.j3cx.com/api/dbm/subscribe?'
 			.. LIB.EncodePostData(LIB.UrlEncode({
 				lang = AnsiToUTF8(LIB.GetLang()),

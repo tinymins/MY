@@ -108,7 +108,7 @@ local function QueryData(szQues)
 	end
 
 	LIB.Ajax({
-		method = 'get',
+		driver = 'auto', mode = 'auto', method = 'auto',
 		url = 'https://pull.j3cx.com/api/exam?'
 			.. LIB.EncodePostData(LIB.UrlEncode({
 				lang = AnsiToUTF8(LIB.GetLang()),
@@ -165,7 +165,7 @@ function D.SubmitData(tExamData, bAllRight)
 		return
 	end
 	LIB.Ajax({
-		driver = 'auto', method = 'auto',
+		driver = 'auto', mode = 'auto', method = 'auto',
 		url = 'https://push.j3cx.com/api/exam/uploads?'
 			.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
 				lang = AnsiToUTF8(LIB.GetLang()),

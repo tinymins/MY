@@ -96,7 +96,7 @@ function D.ShareBKR(p, bOnymous, onfulfilled, oncomplete)
 	--[[#DEBUG END]]
 	local tConfig = {
 		url = szURL,
-		driver = 'auto', method = 'auto',
+		driver = 'auto', mode = 'auto', method = 'auto',
 		fulfilled = onfulfilled,
 		complete = oncomplete,
 	}
