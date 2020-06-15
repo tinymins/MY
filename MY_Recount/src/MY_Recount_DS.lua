@@ -447,6 +447,8 @@ local function Min(a, b)
 	return min(a, b)
 end
 
+local AsyncSaveLuaData = _G.AsyncSaveLuaData or SaveLUAData
+
 -- ##################################################################################################
 --             #                 #         #             #         #                 # # # # # # #
 --   # # # # # # # # # # #       #   #     #             #         #         # # #   #     #     #
@@ -600,7 +602,7 @@ function D.SaveHistory()
 			end
 			KEPT_CACHE[szFilePath] = data -- 加入复盘数据保护数组防止被GC
 		end
-		LIB.SaveLUAData(szFilePath, saveData, DS_DATA_CONFIG)
+		AsyncSaveLuaData(szFilePath, saveData, { crc = false })
 	end
 	D.LimitHistoryFile()
 	UNSAVED_CACHE = {}
