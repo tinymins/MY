@@ -2588,11 +2588,13 @@ function D.OpenSettingPanel(data, szType)
 			end,
 			onclick = function()
 				if v.nClass ~= -1 then
-					local class = v.key and MY_TM_TYPE.COMMON or v.nClass
+					local nClass = v.key and MY_TM_TYPE.COMMON or v.nClass
 					if data.dwID then
-						FireUIEvent('MY_TM_ST_DEL', class, v.key or (k .. '.'  .. data.dwID .. '.' .. (data.nLevel or 0)), true) -- try kill
+						local szKey = v.key or (k .. '.'  .. data.dwID .. '.' .. (data.nLevel or 0))
+						FireUIEvent('MY_TM_ST_DEL', nClass, szKey) -- try kill
 					else
-						FireUIEvent('MY_TM_ST_DEL', class, v.key or (data.nIndex .. '.' .. k), true) -- try kill
+						local szKey = v.key or (data.nIndex .. '.' .. k)
+						FireUIEvent('MY_TM_ST_DEL', nClass, szKey) -- try kill
 					end
 				end
 				if #data.tCountdown == 1 then

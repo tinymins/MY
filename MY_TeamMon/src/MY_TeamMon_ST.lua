@@ -175,11 +175,9 @@ function MY_TeamMon_ST.OnEvent(szEvent)
 	elseif szEvent == 'MY_TM_ST_DEL' then
 		local ui = ST_CACHE[arg0][arg1]
 		if ui and ui:IsValid() then
-			if arg2 then -- 强制无条件删除
-				ui.obj:RemoveItem()
-				ST_TIME_EXPIRE[arg0][arg1] = nil
-			end
+			ui.obj:RemoveItem()
 		end
+		ST_TIME_EXPIRE[arg0][arg1] = nil
 	elseif szEvent == 'MY_TM_ST_CLEAR' then
 		D.handle:Clear()
 		for k, v in pairs(ST_TIME_EXPIRE) do

@@ -1608,7 +1608,7 @@ function D.OnNpcFight(dwTemplateID, bFight)
 				if v.nClass == MY_TM_TYPE.NPC_FIGHT and not v.bFightHold then
 					local nClass = v.key and MY_TM_TYPE.COMMON or v.nClass
 					local szKey = v.key or (k .. '.' .. (data.dwID or 0) .. '.' .. (data.nLevel or 0) .. '.' .. (data.nIndex or 0))
-					FireUIEvent('MY_TM_ST_DEL', nClass, szKey, true) -- try kill
+					FireUIEvent('MY_TM_ST_DEL', nClass, szKey) -- try kill
 				end
 			end
 		end
