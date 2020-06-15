@@ -1505,7 +1505,7 @@ function D.OpenSettingPanel(data, szType)
 		if data.tKungFu then
 			insert(menu, { szOption = _L['No request'], bCheck = true, bChecked = type(data.tKungFu) == 'nil', fnAction = function()
 				data.tKungFu = nil
-				GetPopupMenu():Hide()
+				UI.ClosePopupMenu()
 			end })
 		end
 		for k, v in ipairs(CONSTANT.KUNGFU_LIST) do
@@ -1589,9 +1589,9 @@ function D.OpenSettingPanel(data, szType)
 
 	local function SetCountdownType(dat, val, ui, i)
 		dat.nClass = val
-		GetPopupMenu():Hide()
 		FormatElPosByCountdownType(dat, ui, i)
 		ui:Children('#Countdown' .. i):Text(_L['Countdown TYPE ' ..  dat.nClass])
+		UI.ClosePopupMenu()
 	end
 
 	local function CheckCountdown(tTime)

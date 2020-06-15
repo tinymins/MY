@@ -1048,7 +1048,7 @@ function MY_CataclysmMain.OnLButtonClick()
 			-- 编辑模式
 			insert(menu, { szOption = gsub(g_tStrings.STR_RAID_MENU_RAID_EDIT, 'Ctrl', 'Alt'), bDisable = not LIB.IsLeader() or not me.IsInRaid(), bCheck = true, bChecked = CFG.bEditMode, fnAction = function()
 				CFG.bEditMode = not CFG.bEditMode
-				GetPopupMenu():Hide()
+				UI.ClosePopupMenu()
 			end })
 			-- 人数统计
 			insert(menu, { bDevide = true })
