@@ -99,7 +99,8 @@ local O = {
 	},
 	szSort = 'time_days',
 	szSortOrder = 'desc',
-	bFloatEntry = true,
+	bFloatEntry = false,
+	bAdviceFloatEntry = false,
 	bSaveDB = false,
 	bAdviceSaveDB = false,
 	bMapMark = false,
@@ -108,9 +109,10 @@ local O = {
 RegisterCustomData('Global/MY_RoleStatistics_SerendipityStat.aColumn')
 RegisterCustomData('Global/MY_RoleStatistics_SerendipityStat.szSort')
 RegisterCustomData('Global/MY_RoleStatistics_SerendipityStat.szSortOrder')
-RegisterCustomData('MY_RoleStatistics_SerendipityStat.bFloatEntry', 2)
+RegisterCustomData('MY_RoleStatistics_SerendipityStat.bFloatEntry')
 RegisterCustomData('MY_RoleStatistics_SerendipityStat.bSaveDB')
 RegisterCustomData('MY_RoleStatistics_SerendipityStat.bAdviceSaveDB')
+RegisterCustomData('MY_RoleStatistics_SerendipityStat.bAdviceFloatEntry')
 RegisterCustomData('MY_RoleStatistics_SerendipityStat.bMapMark')
 RegisterCustomData('MY_RoleStatistics_SerendipityStat.bMapMarkHideAcquired')
 
@@ -981,15 +983,35 @@ function D.OnInitPage()
 	frame:RegisterEvent('MY_ROLE_STAT_SERENDIPITY_UPDATE')
 end
 
-function D.OnActivePage()
-	if not O.bAdviceSaveDB and not O.bSaveDB then
-		LIB.Confirm(_L('%s stat has not been enabled, this character\'s data will not be saved, are you willing to save this character?\nYou can change this config by click option button on the top-right conner.', _L[MODULE_NAME]), function()
-			MY_RoleStatistics_SerendipityStat.bSaveDB = true
-			MY_RoleStatistics_SerendipityStat.bAdviceSaveDB = true
-		end, function()
-			MY_RoleStatistics_SerendipityStat.bAdviceSaveDB = true
-		end)
+function D.CheckAdvice()
+	for _, p in ipairs({
+		{
+			szMsg = _L('%s stat has not been enabled, this character\'s data will not be saved, are you willing to save this character?\nYou can change this config by click option button on the top-right conner.', _L[MODULE_NAME]),
+			szAdviceKey = 'bAdviceSaveDB',
+			szSetKey = 'bSaveDB',
+		},
+		{
+			szMsg = _L('%s stat float entry has not been enabled, are you willing to enable it?\nYou can change this config by click option button on the top-right conner.', _L[MODULE_NAME]),
+			szAdviceKey = 'bAdviceFloatEntry',
+			szSetKey = 'bFloatEntry',
+		},
+	}) do
+		if not O[p.szAdviceKey] and not O[p.szSetKey] then
+			LIB.Confirm(p.szMsg, function()
+				MY_RoleStatistics_SerendipityStat[p.szSetKey] = true
+				MY_RoleStatistics_SerendipityStat[p.szAdviceKey] = true
+				D.CheckAdvice()
+			end, function()
+				MY_RoleStatistics_SerendipityStat[p.szAdviceKey] = true
+				D.CheckAdvice()
+			end)
+			return
+		end
 	end
+end
+
+function D.OnActivePage()
+	D.CheckAdvice()
 	D.FlushDB()
 	D.UpdateUI(this)
 end
