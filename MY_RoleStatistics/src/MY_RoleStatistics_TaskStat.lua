@@ -54,7 +54,7 @@ end
 
 CPath.MakeDir(LIB.FormatPath({'userdata/role_statistics', PATH_TYPE.GLOBAL}))
 
-local DB = LIB.ConnectDatabase(_L['MY_RoleStatistics_TaskStat'], {'userdata/role_statistics/task_stat.db', PATH_TYPE.GLOBAL})
+local DB = LIB.ConnectDatabase(_L['MY_RoleStatistics_TaskStat'], {'userdata/role_statistics/task_stat.v2.db', PATH_TYPE.GLOBAL})
 if not DB then
 	return LIB.Sysmsg(_L['MY_RoleStatistics_TaskStat'], _L['Cannot connect to database!!!'], CONSTANT.MSG_THEME.ERROR)
 end
