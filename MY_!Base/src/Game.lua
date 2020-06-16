@@ -2699,6 +2699,16 @@ function LIB.IsBossFocusBuff(dwID, nLevel, nStackNum)
 end
 end
 
+function LIB.IsVisibleBuff(dwID, nLevel)
+	if not Table_BuffIsVisible(dwID, nLevel) then
+		return true
+	end
+	if LIB.IsBossFocusBuff(dwID, nLevel, 0xffff) then
+		return true
+	end
+	return false
+end
+
 -- 获取对象是否无敌
 -- (mixed) LIB.IsInvincible([object KObject])
 -- @return <nil >: invalid KObject
