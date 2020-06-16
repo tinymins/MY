@@ -1354,6 +1354,9 @@ local function RegisterMenu(aList, tKey, arg0, arg1)
 end
 
 local function GenerateMenu(aList, bMainMenu, dwTarType, dwTarID)
+	if not LIB.AssertVersion('', '', 0x2000100) then
+		return
+	end
 	local menu = {}
 	if bMainMenu then
 		menu = {

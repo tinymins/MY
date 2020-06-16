@@ -52,6 +52,9 @@ function LIB.GetFrame()
 end
 
 function LIB.OpenPanel()
+	if not LIB.AssertVersion('', '', 0x2000100) then
+		return
+	end
 	if not LIB.IsInitialized() then
 		return
 	end
@@ -87,6 +90,9 @@ end
 
 function LIB.ShowPanel(bMute, bNoAnimate)
 	local frame = LIB.OpenPanel()
+	if not frame then
+		return
+	end
 	if not frame:IsVisible() then
 		frame:Show()
 		frame.bVisible = true

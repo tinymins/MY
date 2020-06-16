@@ -208,6 +208,9 @@ local function OnInit()
 	if not INIT_EVENT then
 		return
 	end
+	if not LIB.AssertVersion('', '', 0x2000100) then
+		return
+	end
 	LIB.CreateDataRoot(PATH_TYPE.ROLE)
 	LIB.CreateDataRoot(PATH_TYPE.GLOBAL)
 	LIB.CreateDataRoot(PATH_TYPE.SERVER)
