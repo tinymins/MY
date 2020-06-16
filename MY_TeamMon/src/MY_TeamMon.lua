@@ -55,7 +55,7 @@ end
 
 local MY_SplitString, MY_TrimString = LIB.SplitString, LIB.TrimString
 local MY_GetFormatText, MY_GetPureText = LIB.GetFormatText, LIB.GetPureText
-local FireUIEvent, Table_BuffIsVisible, Table_IsSkillShow = FireUIEvent, Table_BuffIsVisible, Table_IsSkillShow
+local FireUIEvent, MY_IsVisibleBuff, Table_IsSkillShow = FireUIEvent, LIB.IsVisibleBuff, Table_IsSkillShow
 local GetHeadTextForceFontColor, TargetPanel_SetOpenState = GetHeadTextForceFontColor, TargetPanel_SetOpenState
 
 local MY_TM_META_ROOT = LIB.FormatPath({'userdata/TeamMon/Meta/', PATH_TYPE.GLOBAL})
@@ -840,7 +840,7 @@ function D.OnBuff(dwOwner, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, dw
 	local nTime = GetTime()
 	if not bDelete then
 		-- ½üÆÚ¼ÇÂ¼
-		if Table_BuffIsVisible(dwBuffID, nBuffLevel) or not LIB.IsShieldedVersion('MY_TargetMon', 2) then
+		if MY_IsVisibleBuff(dwBuffID, nBuffLevel) or not LIB.IsShieldedVersion('MY_TargetMon', 2) then
 			local tWeak, tTemp = CACHE.TEMP[szType], D.TEMP[szType]
 			if not tWeak[key] then
 				local t = {

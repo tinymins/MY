@@ -42,7 +42,7 @@ local Call, XpCall, SafeCall = LIB.Call, LIB.XpCall, LIB.SafeCall
 local GetTraceback, RandomChild = LIB.GetTraceback, LIB.RandomChild
 local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
 -------------------------------------------------------------------------------------------------------
-local Station, Table_BuffIsVisible, MY_GetBuffName = Station, Table_BuffIsVisible,  LIB.GetBuffName
+local Station, MY_IsVisibleBuff, MY_GetBuffName = Station, LIB.IsVisibleBuff,  LIB.GetBuffName
 ---------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Cataclysm'
 local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -715,7 +715,7 @@ local function OnBuffUpdate(dwOwnerID, dwID, nLevel, nStackNum, dwSrcID)
 			nStackNum = nStackNum,
 		})
 	end
-	if Table_BuffIsVisible(dwID, nLevel) then
+	if MY_IsVisibleBuff(dwID, nLevel) then
 		local szName = MY_GetBuffName(dwID, nLevel)
 		RecBuffWithTabs(BUFF_LIST[dwID], dwOwnerID, dwID, dwSrcID)
 		RecBuffWithTabs(BUFF_LIST[szName], dwOwnerID, dwID, dwSrcID)

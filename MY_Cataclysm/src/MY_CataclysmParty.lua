@@ -56,7 +56,7 @@ local D = {}
 -- 重构 @ 2015 赶时间 很多东西写的很粗略
 -----------------------------------------------
 local Station, SetTarget = Station, SetTarget
-local Target_GetTargetData, Table_BuffIsVisible = Target_GetTargetData, Table_BuffIsVisible
+local Target_GetTargetData = Target_GetTargetData
 local MY_GetDistance, MY_GetBuff, MY_GetEndTime, MY_GetObject = LIB.GetDistance, LIB.GetBuff, LIB.GetEndTime, LIB.GetObject
 local CFG                    = MY_Cataclysm.CFG
 local CTM_BG_COLOR_MODE      = MY_Cataclysm.BG_COLOR_MODE
