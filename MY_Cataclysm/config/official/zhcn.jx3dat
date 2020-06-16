@@ -22,7 +22,7 @@ return {
 	nShowIcon              = 2,
 	bShowDistance          = false,
 	bShowBossTarget        = true,
-	bShowBossFocus         = true,
+	bShowBossFocus         = false,
 	bEnableDistance        = true,
 	bShowTargetTargetAni   = false,
 	nNameFont              = 234,
