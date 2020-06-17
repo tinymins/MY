@@ -91,7 +91,7 @@ local O = {
 }
 RegisterCustomData('Global/MY_RoleStatistics_BagStat.bCompactMode')
 RegisterCustomData('Global/MY_RoleStatistics_BagStat.tUncheckedNames')
-RegisterCustomData('MY_RoleStatistics_BagStat.bSaveDB')
+RegisterCustomData('MY_RoleStatistics_BagStat.bSaveDB', 20200618)
 RegisterCustomData('MY_RoleStatistics_BagStat.bAdviceSaveDB')
 
 do

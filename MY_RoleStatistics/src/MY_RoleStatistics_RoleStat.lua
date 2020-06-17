@@ -116,7 +116,7 @@ RegisterCustomData('MY_RoleStatistics_RoleStat.tAlertTodayVal')
 RegisterCustomData('MY_RoleStatistics_RoleStat.tSummaryIgnoreGUID')
 RegisterCustomData('MY_RoleStatistics_RoleStat.bFloatEntry')
 RegisterCustomData('MY_RoleStatistics_RoleStat.bAdviceFloatEntry')
-RegisterCustomData('MY_RoleStatistics_RoleStat.bSaveDB')
+RegisterCustomData('MY_RoleStatistics_RoleStat.bSaveDB', 20200618)
 RegisterCustomData('MY_RoleStatistics_RoleStat.bAdviceSaveDB')
 
 local function GetFormatSysmsgText(szText)

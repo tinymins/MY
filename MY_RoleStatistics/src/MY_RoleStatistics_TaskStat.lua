@@ -105,7 +105,7 @@ RegisterCustomData('Global/MY_RoleStatistics_TaskStat.szSort')
 RegisterCustomData('Global/MY_RoleStatistics_TaskStat.szSortOrder')
 RegisterCustomData('MY_RoleStatistics_TaskStat.bFloatEntry')
 RegisterCustomData('MY_RoleStatistics_TaskStat.bAdviceFloatEntry')
-RegisterCustomData('MY_RoleStatistics_TaskStat.bSaveDB')
+RegisterCustomData('MY_RoleStatistics_TaskStat.bSaveDB', 20200618)
 RegisterCustomData('MY_RoleStatistics_TaskStat.bAdviceSaveDB')
 
 local TASK_TYPE = {
