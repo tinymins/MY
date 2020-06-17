@@ -201,7 +201,7 @@ LIB.RegisterEvent({
 			}
 			insert(BOSS_ACHIEVE_ACQUIRE_LOG, rec)
 			BOSS_ACHIEVE_ACQUIRE_STATE[dwAchieveID] = true
-			D.ShareBKR(rec, false)
+			-- D.ShareBKR(rec, false)
 		end
 	end
 	D.CheckUpdateAcquire()
@@ -257,23 +257,23 @@ local settings = {
 MY_FirstBossKill = LIB.GeneGlobalNS(settings)
 end
 
-LIB.RegisterTutorial({
-	szKey = 'MY_FirstBossKill',
-	szMessage = _L['Would you like to share first boss kill log?'],
-	fnRequire = function()
-		return not LIB.IsDebugServer() and not MY_FirstBossKill.bEnable
-	end,
-	{
-		szOption = _L['Yes'],
-		bDefault = true,
-		fnAction = function()
-			MY_FirstBossKill.bEnable = true
-		end,
-	},
-	{
-		szOption = _L['No'],
-		fnAction = function()
-			MY_FirstBossKill.bEnable = false
-		end,
-	},
-})
+-- LIB.RegisterTutorial({
+-- 	szKey = 'MY_FirstBossKill',
+-- 	szMessage = _L['Would you like to share first boss kill log?'],
+-- 	fnRequire = function()
+-- 		return not LIB.IsDebugServer() and not MY_FirstBossKill.bEnable
+-- 	end,
+-- 	{
+-- 		szOption = _L['Yes'],
+-- 		bDefault = true,
+-- 		fnAction = function()
+-- 			MY_FirstBossKill.bEnable = true
+-- 		end,
+-- 	},
+-- 	{
+-- 		szOption = _L['No'],
+-- 		fnAction = function()
+-- 			MY_FirstBossKill.bEnable = false
+-- 		end,
+-- 	},
+-- })
