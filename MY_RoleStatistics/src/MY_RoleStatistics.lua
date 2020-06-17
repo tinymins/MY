@@ -62,6 +62,7 @@ local SZ_MOD_INI = PLUGIN_ROOT .. '/ui/MY_RoleStatistics.Mod.ini'
 
 function D.Open(szModule)
 	local frame = Wnd.OpenWindow(SZ_INI, 'MY_RoleStatistics')
+	frame:BringToTop()
 	D.ActivePage(frame, szModule or 1, true)
 end
 
@@ -357,3 +358,72 @@ local menu = {
 LIB.RegisterAddonMenu('MY_RoleStatistics', menu)
 end
 LIB.RegisterHotKey('MY_RoleStatistics', _L['Open/Close MY_RoleStatistics'], D.Toggle, nil)
+
+--------------------------------------------------------------------------
+-- ÉèÖÃ½çÃæ
+--------------------------------------------------------------------------
+local PS = {}
+function PS.OnPanelActive(wnd)
+	local ui = UI(wnd)
+	local X, Y = 25, 25
+	local x, y = X, Y
+	local w, h = ui:Size()
+
+	ui:Append('WndButton', {
+		x = w - 165, y = y, w = 150, h = 38,
+		text = _L['Open panel'],
+		buttonstyle = 3,
+		onclick = D.Open,
+	})
+
+	local aFloatEntry, aSaveDB = {}, {}
+	for _, m in ipairs(O.aModule) do
+		if m and m.env.szFloatEntry then
+			insert(aFloatEntry, { szName = m.szName, szKey = m.env.szFloatEntry })
+		end
+		if m and m.env.szSaveDB then
+			insert(aSaveDB, { szName = m.szName, szKey = m.env.szSaveDB })
+		end
+	end
+	if #aFloatEntry > 0 then
+		x = X
+		ui:Append('Text', { x = x, y = y, text = _L['Float panel'], font = 27 })
+		x = x + 10
+		y = y + 35
+
+		for _, p in ipairs(aFloatEntry) do
+			x = x + ui:Append('WndCheckBox', {
+				x = x, y = y, w = 200,
+				text = p.szName, checked = Get(_G, p.szKey),
+				oncheck = function(bChecked)
+					Set(_G, p.szKey, bChecked)
+				end,
+			}):AutoWidth():Width() + 5
+		end
+		y = y + 40
+	end
+	if #aSaveDB > 0 then
+		x = X
+		ui:Append('Text', { x = x, y = y, text = _L['Save DB'], font = 27 })
+		x = x + 10
+		y = y + 35
+
+		for _, p in ipairs(aSaveDB) do
+			x = x + ui:Append('WndCheckBox', {
+				x = x, y = y, w = 200,
+				text = p.szName, checked = Get(_G, p.szKey),
+				oncheck = function(bChecked)
+					Set(_G, p.szKey, bChecked)
+				end,
+			}):AutoWidth():Width() + 5
+		end
+		y = y + 40
+	end
+
+	x = X
+	ui:Append('Text', { x = x, y = y, w = w, text = _L['Tips'], font = 27, multiline = true, valign = 0 })
+	y = y + 30
+	x = X + 10
+	ui:Append('Text', { x = x, y = y, w = w, text = _L['MY_RoleStatistics TIPS'], font = 27, multiline = true, valign = 0 })
+end
+LIB.RegisterPanel('MY_RoleStatistics', _L['MY_RoleStatistics'], _L['General'], 13491, PS)
