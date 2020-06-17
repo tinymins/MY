@@ -786,11 +786,11 @@ function D.CheckAdvice()
 			szAdviceKey = 'bAdviceSaveDB',
 			szSetKey = 'bSaveDB',
 		},
-		{
-			szMsg = _L('%s stat float entry has not been enabled, are you willing to enable it?\nYou can change this config by click option button on the top-right conner.', _L[MODULE_NAME]),
-			szAdviceKey = 'bAdviceFloatEntry',
-			szSetKey = 'bFloatEntry',
-		},
+		-- {
+		-- 	szMsg = _L('%s stat float entry has not been enabled, are you willing to enable it?\nYou can change this config by click option button on the top-right conner.', _L[MODULE_NAME]),
+		-- 	szAdviceKey = 'bAdviceFloatEntry',
+		-- 	szSetKey = 'bFloatEntry',
+		-- },
 	}) do
 		if not O[p.szAdviceKey] and not O[p.szSetKey] then
 			LIB.Confirm(p.szMsg, function()
