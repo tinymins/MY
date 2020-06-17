@@ -540,6 +540,9 @@ local function OnSizeChanged()
 	end
 	-- fix size
 	local nWidth, nHeight = frame:GetSize()
+	local hTotal = frame:Lookup('', '')
+	hTotal:Lookup('Text_Author'):SetRelY(nHeight - 25 - 30)
+	hTotal:FormatAllItemPos()
 	local wnd = frame:Lookup('Wnd_Total')
 	wnd:Lookup('WndContainer_Category'):SetSize(nWidth - 22, 32)
 	wnd:Lookup('WndContainer_Category'):FormatAllContentPos()
@@ -829,58 +832,70 @@ function PS.OnPanelActive(wnd)
 		onclick = function()
 			LIB.OpenBrowser('https://j3cx.com/serendipity')
 		end,
-	}):AutoWidth():Width()
-	-- 用户设置
-	x = 7
-	x = x + ui:Append('WndButton', {
-		x = x, y = 405, w = 111,
-		name = 'WndButton_UserPreferenceFolder',
-		text = _L['User preference'],
-		tip = _L['User preference'] .. _L['Storage location'],
-		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
-		onclick = function()
-			local szRoot = LIB.GetAbsolutePath({'', PATH_TYPE.ROLE}):gsub('/', '\\')
-			LIB.OpenFolder(szRoot)
-			UI.OpenTextEditor(szRoot)
-		end,
 	}):AutoWidth():Width() + 5
+	-- 数据位置
 	x = x + ui:Append('WndButton', {
-		x = x, y = 405, w = 111,
-		name = 'WndButton_ServerPreferenceFolder',
-		text = _L['Server preference'],
-		tip = _L['Server preference'] .. _L['Storage location'],
-		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
-		onclick = function()
-			local szRoot = LIB.GetAbsolutePath({'', PATH_TYPE.SERVER}):gsub('/', '\\')
-			LIB.OpenFolder(szRoot)
-			UI.OpenTextEditor(szRoot)
-		end,
-	}):AutoWidth():Width() + 5
-	x = x + ui:Append('WndButton', {
-		x = x, y = 405, w = 111,
-		name = 'WndButton_GlobalPreferenceFolder',
-		text = _L['Global preference'],
-		tip = _L['Global preference'] .. _L['Storage location'],
-		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
-		onclick = function()
-			local szRoot = LIB.GetAbsolutePath({'', PATH_TYPE.GLOBAL}):gsub('/', '\\')
-			LIB.OpenFolder(szRoot)
-			UI.OpenTextEditor(szRoot)
-		end,
-	}):AutoWidth():Width() + 5
-	x = x + ui:Append('WndButton', {
-		name = 'WndButton_Flush',
-		x = x, y = 405, w = 111,
-		text = _L['Flush data'],
-		tip = _L['Config and data will be saved when exit game, click to save immediately'],
-		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
-		onclick = function()
-			LIB.FireFlush()
+		x = x, y = 405,
+		name = 'WndButton_UserPreference',
+		text = _L['User preference storage'],
+		menu = function()
+			return {
+				{
+					szOption = _L['User preference'],
+					fnMouseEnter = function()
+						local nX, nY = this:GetAbsX(), this:GetAbsY()
+						local nW, nH = this:GetW(), this:GetH()
+						OutputTip(GetFormatText(_L['User preference'] .. _L['Storage location'], nil, 255, 255, 0), 600, {nX, nY, nW, nH}, ALW.BOTTOM_TOP)
+					end,
+					fnAction = function()
+						local szRoot = LIB.GetAbsolutePath({'', PATH_TYPE.ROLE}):gsub('/', '\\')
+						LIB.OpenFolder(szRoot)
+						UI.OpenTextEditor(szRoot)
+					end,
+				},
+				{
+					szOption = _L['Server preference'],
+					fnMouseEnter = function()
+						local nX, nY = this:GetAbsX(), this:GetAbsY()
+						local nW, nH = this:GetW(), this:GetH()
+						OutputTip(GetFormatText(_L['Server preference'] .. _L['Storage location'], nil, 255, 255, 0), 600, {nX, nY, nW, nH}, ALW.BOTTOM_TOP)
+					end,
+					fnAction = function()
+						local szRoot = LIB.GetAbsolutePath({'', PATH_TYPE.SERVER}):gsub('/', '\\')
+						LIB.OpenFolder(szRoot)
+						UI.OpenTextEditor(szRoot)
+					end,
+				},
+				{
+					szOption = _L['Global preference'],
+					fnMouseEnter = function()
+						local nX, nY = this:GetAbsX(), this:GetAbsY()
+						local nW, nH = this:GetW(), this:GetH()
+						OutputTip(GetFormatText(_L['Global preference'] .. _L['Storage location'], nil, 255, 255, 0), 600, {nX, nY, nW, nH}, ALW.BOTTOM_TOP)
+					end,
+					fnAction = function()
+						local szRoot = LIB.GetAbsolutePath({'', PATH_TYPE.GLOBAL}):gsub('/', '\\')
+						LIB.OpenFolder(szRoot)
+						UI.OpenTextEditor(szRoot)
+					end,
+				},
+				{
+					szOption = _L['Flush data'],
+					fnMouseEnter = function()
+						local nX, nY = this:GetAbsX(), this:GetAbsY()
+						local nW, nH = this:GetW(), this:GetH()
+						OutputTip(GetFormatText(_L['Config and data will be saved when exit game, click to save immediately'], nil, 255, 255, 0), 600, {nX, nY, nW, nH}, ALW.BOTTOM_TOP)
+					end,
+					fnAction = function()
+						LIB.FireFlush()
+					end,
+				},
+			}
 		end,
 	}):AutoWidth():Width() + 5
 	x = x + ui:Append('WndButton', {
 		name = 'WndButton_AddonErrorMessage',
-		x = x, y = 405, w = 111,
+		x = x, y = 405,
 		text = _L['Error message'],
 		tip = _L['Show error message'],
 		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
@@ -923,11 +938,8 @@ function PS.OnPanelResize(wnd)
 	ui:Children('#WndCheckBox_SerendipityNotifyTip'):Top(scaleH + 65)
 	ui:Children('#WndCheckBox_SerendipityNotifySound'):Top(scaleH + 65)
 	ui:Children('#WndButton_SerendipitySearch'):Top(scaleH + 65)
-	ui:Children('#WndButton_UserPreferenceFolder'):Top(scaleH + 95)
-	ui:Children('#WndButton_ServerPreferenceFolder'):Top(scaleH + 95)
-	ui:Children('#WndButton_GlobalPreferenceFolder'):Top(scaleH + 95)
-	ui:Children('#WndButton_Flush'):Top(scaleH + 95)
-	ui:Children('#WndButton_AddonErrorMessage'):Top(scaleH + 95)
+	ui:Children('#WndButton_UserPreference'):Top(scaleH + 65)
+	ui:Children('#WndButton_AddonErrorMessage'):Top(scaleH + 65)
 end
 function PS.OnPanelBreathe(wnd)
 	local ui = LIB.UI(wnd)
