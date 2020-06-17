@@ -451,7 +451,7 @@ local PS = {}
 
 function PS.OnPanelActive(frame)
 	local ui = UI(frame)
-	local X, Y = 10, 10
+	local X, Y = 25, 25
 	local nX, nY = X, Y
 	local nLineHeightS, nLineHeightM, nLineHeightL = 22, 28, 32
 

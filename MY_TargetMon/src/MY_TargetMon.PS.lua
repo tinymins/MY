@@ -898,7 +898,7 @@ local function DrawPreview(ui, config, OpenDetail)
 	})
 
 	uiWnd:Append('WndComboBox', {
-		x = x + 90, y = y, w = (w - 250 - 30 - 30 - 80) / 2,
+		x = x + 90, y = y, w = 100,
 		text = _L['Icon style'],
 		menu = function()
 			local t, subt, szIcon, nFrame = {}
@@ -925,7 +925,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		autoenable = function() return config.enable end,
 	})
 	uiWnd:Append('WndComboBox', {
-		x = x + 90 + (w - 250 - 30 - 30 - 80) / 2, y = y, w = (w - 250 - 30 - 30 - 80) / 2,
+		x = x + 90 + 100, y = y, w = 100,
 		text = _L['Countdown style'],
 		menu = function()
 			local t, subt, szIcon, nFrame = {}
@@ -953,8 +953,9 @@ local function DrawPreview(ui, config, OpenDetail)
 
 	y = Y + 30
 	local deltaY = 21
+	local xr = w - 280
 	uiWnd:Append('WndComboBox', {
-		x = w - 250, y = y, w = 135,
+		x = xr, y = y, w = 135,
 		text = _L['Set target'],
 		menu = function()
 			local t = {}
@@ -996,7 +997,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		autoenable = function() return config.enable end,
 	})
 	uiWnd:Append('WndButton', {
-		x = w - 110, y = y, w = 102,
+		x = xr + 140, y = y, w = 102,
 		text = _L['Set monitor'],
 		buttonstyle = 2,
 		onclick = function() OpenDetail(config) end,
@@ -1005,7 +1006,7 @@ local function DrawPreview(ui, config, OpenDetail)
 	y = y + 24
 
 	uiWnd:Append('WndTrackbar', {
-		x = w - 250, y = y,
+		x = xr, y = y,
 		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		range = {1, 32},
 		value = config.maxLineCount,
@@ -1018,7 +1019,7 @@ local function DrawPreview(ui, config, OpenDetail)
 	y = y + deltaY
 
 	uiWnd:Append('WndTrackbar', {
-		x = w - 250, y = y,
+		x = xr, y = y,
 		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		range = {1, 300},
 		value = config.scale * 100,
@@ -1031,7 +1032,7 @@ local function DrawPreview(ui, config, OpenDetail)
 	y = y + deltaY
 
 	uiWnd:Append('WndTrackbar', {
-		x = w - 250, y = y,
+		x = xr, y = y,
 		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		range = {1, 300},
 		value = config.iconFontScale * 100,
@@ -1044,7 +1045,7 @@ local function DrawPreview(ui, config, OpenDetail)
 	y = y + deltaY
 
 	uiWnd:Append('WndTrackbar', {
-		x = w - 250, y = y,
+		x = xr, y = y,
 		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		range = {1, 300},
 		value = config.otherFontScale * 100,
@@ -1057,7 +1058,7 @@ local function DrawPreview(ui, config, OpenDetail)
 	y = y + deltaY
 
 	uiWnd:Append('WndTrackbar', {
-		x = w - 250, y = y,
+		x = xr, y = y,
 		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		range = {50, 1000},
 		value = config.cdBarWidth,
@@ -1070,7 +1071,7 @@ local function DrawPreview(ui, config, OpenDetail)
 	y = y + deltaY
 
 	uiWnd:Append('WndTrackbar', {
-		x = w - 250, y = y,
+		x = xr, y = y,
 		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		range = {-1, 30},
 		value = config.decimalTime,

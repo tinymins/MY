@@ -168,13 +168,13 @@ end
 local PS = {}
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
-	local X, Y = 10, 10
+	local X, Y = 25, 25
 	local x, y = X, Y
 	local w, h = ui:Size()
 
 	ui:Append('Text', { x = x, y = y, text = _L['Preference Setting'], font = 27 })
 	ui:Append('WndButton', {
-		x = w - 150, y = y, w = 150, h = 38,
+		x = w - 165, y = y, w = 150, h = 38,
 		text = _L['Open Panel'],
 		buttonstyle = 3,
 		onclick = MY_GKP_MI.OpenPanel,

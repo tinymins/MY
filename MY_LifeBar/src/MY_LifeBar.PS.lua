@@ -104,7 +104,7 @@ function PS.OnPanelActive(wnd)
 
 	local X, Y = 10, 10
 	local x, y = X, Y
-	local offsety = 30
+	local offsety = 40
 	-- ¿ªÆô
 	ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['Enable'],
@@ -136,7 +136,7 @@ function PS.OnPanelActive(wnd)
 		end,
 		autoenable = function() return D.IsEnabled() end,
 	})
-	x = x + 235
+	x = x + 365
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 80, text = _L['Arena'],
 		checked = Config.bOnlyInArena,
@@ -180,9 +180,9 @@ function PS.OnPanelActive(wnd)
 		image = 'UI/Image/UICommon/ScienceTreeNode.UITex|62',
 	})
 
-	X, Y = 15, y + 5
-	x, y = X, Y
-	offsety = 21.5
+	X, Y = 15, y + 10
+	x, y = X + 15, Y
+	offsety = 25.2
 
 	ui:Append('WndTrackbar', {
 		name = 'WndTrackbar_LifeBarWidth',
@@ -401,9 +401,9 @@ function PS.OnPanelActive(wnd)
 	y = y + offsety
 
 	-- ÓÒ°ë±ß
-	X = 350
+	X = 470
 	x, y = X, Y
-	offsety = 24
+	offsety = 27
 
 	-- ÑÕÉ«ÉèÖÃ
 	ui:Append('WndComboBox', {
@@ -742,7 +742,7 @@ function PS.OnPanelActive(wnd)
 		autoenable = function() return D.IsEnabled() end,
 	})
 	y = y + offsety
-	offsety = 31
+	offsety = 36
 
 	ui:Append('Shadow', {
 		name = 'Shadow_LifeBarBorderRGB', -- ÑªÌõ±ß¿òÑÕÉ«

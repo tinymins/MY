@@ -69,7 +69,7 @@ end
 local PS = {}
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
-	local X, Y = 10, 10
+	local X, Y = 25, 25
 	local W, H = ui:Size()
 	local x, y = X, Y
 	local deltaY = 28
@@ -118,7 +118,7 @@ function PS.OnPanelActive(wnd)
 
 	if MY_RoleStatistics then
 		ui:Append('WndButton', {
-			x = W - 140, y = 140, w = 130,
+			x = W - 140, y = 155, w = 130,
 			text = _L['MY_RoleStatistics'],
 			buttonstyle = 2,
 			onclick = function()

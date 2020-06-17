@@ -63,7 +63,7 @@ local tChannels = {
 }
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	ui:Append('WndButton', {
-		x = W - 130, y = 15, w = 120,
+		x = W - 130, y = 30, w = 120,
 		text = _L['Check nearby gongzhan'],
 		onlclick = function()
 			if LIB.BreatheCall('MY_GongzhanCheck') then

@@ -197,6 +197,7 @@ local TABS_LIST, TAB_WELCOME = {
 	{ id = _L['Battle'] },
 	{ id = _L['Raid'] },
 	{ id = _L['System'] },
+	{ id = _L['Search'] },
 	{ id = _L['Others'] },
 }
 --[[ tTabs:
@@ -684,7 +685,7 @@ function LIB.OnFrameCreate()
 	this:Lookup('Wnd_Total/Btn_Weibo', 'Image_Icon'):FromUITex(PACKET_INFO.UITEX_ICON, PACKET_INFO.MAINICON_FRAME)
 	this:Lookup('Btn_Drag'):RegisterLButtonDrag()
 	LIB.RedrawCategory()
-	LIB.ResizePanel(780 * fScale, 540 * fScale)
+	LIB.ResizePanel(960 * fScale, 630 * fScale)
 	LIB.ExecuteWithThis(this, OnSizeChanged)
 	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
 	this:CorrectPos()

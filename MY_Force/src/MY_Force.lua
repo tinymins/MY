@@ -302,7 +302,7 @@ end
 local PS = {}
 function PS.OnPanelActive(frame)
 	local ui = UI(frame)
-	local X, Y = 10, 10
+	local X, Y = 25, 25
 	local x, y = X, Y
 	local W, H = ui:Size()
 	-- wu du
