@@ -383,9 +383,16 @@ local PS = {}
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
 	local w, h = ui:Size()
-	local x, y = 50, 50
-	local dy = 40
+	local X, Y = 25, 25
+	local x, y = X, Y
+	local dy = 35
 	local wr = 200
+
+	-- ×ó²à
+	x = X
+	ui:Append('Text', { x = x, y = y, text = _L['Settings'], font = 27 })
+	y = y + dy
+	x = X + 10
 
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = wr,
@@ -429,6 +436,16 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + dy
 
+	x = X
+	ui:Append('Text', { x = x, y = y, w = w, text = _L['Tips'], font = 27, multiline = true, valign = 0 })
+	y = y + 30
+	x = X + 10
+	ui:Append('Text', { x = x, y = y, w = w, text = _L['MY_ChatLog TIPS'], font = 27, multiline = true, valign = 0 })
+
+	-- ÓÒ²à
+	x = w - 150
+	y = Y
+	dy = 40
 	ui:Append('WndButton', {
 		x = x, y = y, w = 125, h = 35,
 		text = _L['Open chatlog'],

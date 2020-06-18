@@ -43,4 +43,8 @@ return {
     ['You need to upgrade chatlog database before using, that may take a while and cannot be break, do you want to do it now?'] = '聊天记录需要优化更新数据库后方可使用，更新可能导致客户端无响应一段时间，希望现在开始更新吗？',
     ['Problem(s) detected on your chatlog database and must be fixed before use, would you like to do this now?'] = '检测到您的聊天记录数据受损，需要修复后方可使用，修复可能导致客户端无响应一段时间，是否立即开始修复？',
     ['Your client may get no responding, please wait until it finished, otherwise your chatlog data may got lost, press yes to start.'] = '请点击确定开始操作，客户端可能失去响应，请耐心等待。请勿随意结束客户端，否则您的聊天记录可能会永久丢失。',
+
+    ['Settings'] = '设置',
+    ['Tips'] = '说明',
+    ['MY_ChatLog TIPS'] = '1、该功能用于统计角色数据到本地，不涉及任何数据上传。\n2、聊天记录在角色退出游戏时存盘，直接关机或闪退将会丢失部分记录。\n3、登录其他角色时无法查看当前角色的聊天记录。\n4、只有登录过的角色信息才有可能存在记录，未登录过的角色不会有记录。\n5、由于玩法和官方接口随时可能更改，不保证聊天记录随时有效可用。\n6、由于聊天记录存储在本地，拥有丰富计算机经验的侠士或许可以篡改记录，所以不可作为截图证据使用。',
 }
