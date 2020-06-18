@@ -1305,10 +1305,6 @@ function LIB.GetVersion(dwVersion)
 end
 
 function LIB.AssertVersion(szKey, szCaption, dwMinVersion)
-	local me = GetClientPlayer()
-	if me and me.dwForceID == FORCE_TYPE.BA_DAO and GetUserRoleName() == '安于此生' then
-		return false
-	end
 	if _VERSION_ < dwMinVersion then
 		if not IsEmpty(szCaption) then
 			LIB.Sysmsg(_L(
