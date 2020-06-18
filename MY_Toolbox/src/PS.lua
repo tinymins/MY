@@ -115,16 +115,5 @@ function PS.OnPanelActive(wnd)
 	MY_LockFrame.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 	MY_AutoSell.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 	MY_DynamicItem.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
-
-	if MY_RoleStatistics then
-		ui:Append('WndButton', {
-			x = W - 140, y = 155, w = 130,
-			text = _L['MY_RoleStatistics'],
-			buttonstyle = 2,
-			onclick = function()
-				MY_RoleStatistics.Open()
-			end,
-		})
-	end
 end
 LIB.RegisterPanel('MY_ToolBox', _L['MY_ToolBox'], _L['General'], 'UI/Image/Common/Money.UITex|243', PS)
