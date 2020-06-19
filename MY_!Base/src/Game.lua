@@ -2700,7 +2700,7 @@ end
 end
 
 function LIB.IsVisibleBuff(dwID, nLevel)
-	if not Table_BuffIsVisible(dwID, nLevel) then
+	if Table_BuffIsVisible(dwID, nLevel) then
 		return true
 	end
 	if LIB.IsBossFocusBuff(dwID, nLevel, 0xffff) then
