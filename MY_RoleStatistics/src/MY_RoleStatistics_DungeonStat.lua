@@ -93,7 +93,7 @@ RegisterCustomData('Global/MY_RoleStatistics_DungeonStat.szSortOrder')
 RegisterCustomData('MY_RoleStatistics_DungeonStat.bFloatEntry')
 RegisterCustomData('MY_RoleStatistics_DungeonStat.bAdviceFloatEntry')
 RegisterCustomData('MY_RoleStatistics_DungeonStat.bSaveDB', 20200618)
-RegisterCustomData('MY_RoleStatistics_DungeonStat.bAdviceSaveDB')
+RegisterCustomData('MY_RoleStatistics_DungeonStat.bAdviceSaveDB', 20200618)
 
 local EXCEL_WIDTH = 960
 local DUNGEON_WIDTH = 80
