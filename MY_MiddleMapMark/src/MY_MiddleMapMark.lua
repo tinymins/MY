@@ -542,26 +542,10 @@ end
 local PS = {}
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
-	local x, y = ui:Pos()
+	local x, y = 0, 0
 	local w, h = ui:Size()
 
-	local list = ui:Append('WndListBox', 'WndListBox_1')
-	  :Pos(20, 35)
-	  :Size(w - 32, h - 50)
-	  :ListBox('onlclick', function(id, text, data, selected)
-	  	OpenMiddleMap(data.dwMapID, 0)
-	  	UI('Topmost1/MiddleMap/Wnd_NormalMap/Wnd_Tool/Edit_Search'):Text(LIB.EscapeString(data.szName))
-	  	Station.SetFocusWindow('Topmost1/MiddleMap')
-	  	if not selected then -- avoid unselect
-	  		return false
-	  	end
-	  end)
-
-	local muProgress = ui:Append('Image', 'Image_Progress')
-	  :Pos(20, 31)
-	  :Size(w - 30, 4)
-	  :Image('ui/Image/UICommon/RaidTotal.UITex|45')
-
+	local list, muProgress
 	local function UpdateList(szText)
 		if IsEmpty(szText) then
 			list:ListBox('clear')
@@ -613,14 +597,42 @@ function PS.OnPanelActive(wnd)
 			end
 		end
 	end
+
 	ui:Append('WndEditBox', {
 		name = 'WndEdit_Search',
-		x = 18, y = 10,
-		w = w - 26, h = 25,
+		x = x, y = y,
+		w = w, h = 25,
 		onchange = function(szText)
 			UpdateList(szText)
 		end,
 	})
+	y = y + 25
+
+	muProgress = ui:Append('Image', {
+		name = 'Image_Progress',
+		x = x, y = y,
+		w = w, h = 4,
+		image = 'ui/Image/UICommon/RaidTotal.UITex|45',
+	})
+	y = y + 4
+
+	list = ui:Append('WndListBox', {
+		name = 'WndListBox_1',
+		x = x, y = y,
+		w = w, h = h - y,
+		listbox = {{
+			'onlclick',
+			function(id, text, data, selected)
+				OpenMiddleMap(data.dwMapID, 0)
+				UI('Topmost1/MiddleMap/Wnd_NormalMap/Wnd_Tool/Edit_Search'):Text(LIB.EscapeString(data.szName))
+				Station.SetFocusWindow('Topmost1/MiddleMap')
+				if not selected then -- avoid unselect
+					return false
+				end
+			end,
+		}},
+	})
+
 	UpdateList('')
 end
 
