@@ -45,10 +45,11 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
 end
 --------------------------------------------------------------------------
 local CACHE = {}
-local ITEM_TYPE_MAX, UI_LIST
+local ITEM_TYPE_MAX, BOOK_SEGMENT_COUNT, SEARCH_STEP_COUNT
 local SEARCH, RESULT, MAX_DISP = '', {}, 500
+local D = {}
 
-local function Init()
+function D.Init()
 	if not ITEM_TYPE_MAX then
 		ITEM_TYPE_MAX = {}
 		local dwTabType = 1
@@ -108,33 +109,32 @@ local function Init()
 			end
 			dwTabType = dwTabType + 1
 		end
+		-- 总查找步数 用于进度条
+		BOOK_SEGMENT_COUNT = g_tTable.BookSegment:GetRowCount()
+		SEARCH_STEP_COUNT = 0
+		for _, nMaxIndex in pairs(ITEM_TYPE_MAX) do
+			SEARCH_STEP_COUNT = SEARCH_STEP_COUNT + nMaxIndex
+		end
+		SEARCH_STEP_COUNT = SEARCH_STEP_COUNT + BOOK_SEGMENT_COUNT
 	end
 end
 
-local function DrawList()
-	UI_LIST:ListBox('clear')
-	if IsEmpty(SEARCH) then
-		for i, s in ipairs(_L['MY_ItemInfoSearch TIPS']) do
-			UI_LIST:ListBox('insert', s, 'TIP' .. i, nil, { r = 255, g = 255, b = 0 })
-		end
-	else
-		for _, item in ipairs(RESULT) do
-			local opt = {}
-			opt.r, opt.g, opt.b = GetItemFontColorByQuality(item.itemInfo.nQuality, false)
-			UI_LIST:ListBox('insert', ' [' .. LIB.GetItemNameByItemInfo(item.itemInfo, item.dwRecipeID) .. '] - ' .. item.itemInfo.szName, item, item, opt)
-		end
-		UI_LIST:ListBox('insert', _L('Max display count %d, current %d.', MAX_DISP, #RESULT), 'count', nil, { r = 100, g = 100, b = 100 })
-	end
+function D.StopSearch()
+	LIB.BreatheCall('MY_ItemInfoSearch', false)
 end
 
-local function SearchWithoutCache(szSearch)
+function D.DoRawSearch(szSearch, fnProgress, fnCallback)
 	local aResult = {}
 	if szSearch == '' then
-		return aResult
+		fnCallback(aResult)
+		return
 	end
 	local dwID = tonumber(szSearch)
-	for dwTabType, nMaxIndex in pairs(ITEM_TYPE_MAX) do
-		for dwIndex = 1, nMaxIndex do
+	-- 构建分段搜索步骤
+	local dwTabType, dwIndex, nRound = next(ITEM_TYPE_MAX), 1, 0
+	local function SearchStep()
+		nRound = nRound + 1
+		if dwTabType then
 			local itemInfo = GetItemInfo(dwTabType, dwIndex)
 			if itemInfo and (
 				dwIndex == dwID
@@ -147,52 +147,75 @@ local function SearchWithoutCache(szSearch)
 					itemInfo = itemInfo,
 				})
 				if #aResult >= MAX_DISP then
-					return aResult
+					return true
 				end
+			end
+			if dwIndex < ITEM_TYPE_MAX[dwTabType] then
+				dwIndex = dwIndex + 1
+			else
+				dwTabType = next(ITEM_TYPE_MAX, dwTabType)
+				dwIndex = 1
+			end
+		else
+			local row = g_tTable.BookSegment:GetRow(dwIndex)
+			local dwRecipeID = row and BookID2GlobelRecipeID(row.dwBookID, row.dwSegmentID)
+			if dwRecipeID and GlobelRecipeID2BookID(dwRecipeID) then
+				local itemInfo = GetItemInfo(5, row.dwBookItemIndex)
+				if itemInfo and (
+					dwID == itemInfo.dwID or dwID == dwRecipeID
+					or dwID == row.dwBookID or dwID == row.dwSegmentID
+					or wfind(LIB.GetItemNameByItemInfo(itemInfo, dwRecipeID), szSearch)
+				) then
+					insert(aResult, {
+						dwTabType = 5,
+						dwIndex = row.dwBookItemIndex,
+						itemInfo = itemInfo,
+						dwRecipeID = dwRecipeID,
+					})
+					if #aResult >= MAX_DISP then
+						return true
+					end
+				end
+			end
+			if dwIndex < BOOK_SEGMENT_COUNT then
+				dwIndex = dwIndex + 1
+			else
+				return true
 			end
 		end
 	end
-	for i = 1, g_tTable.BookSegment:GetRowCount() do
-		local row = g_tTable.BookSegment:GetRow(i)
-		local dwRecipeID = row and BookID2GlobelRecipeID(row.dwBookID, row.dwSegmentID)
-		if dwRecipeID and GlobelRecipeID2BookID(dwRecipeID) then
-			local itemInfo = GetItemInfo(5, row.dwBookItemIndex)
-			if itemInfo and (
-				dwID == itemInfo.dwID or dwID == dwRecipeID
-				or dwID == row.dwBookID or dwID == row.dwSegmentID
-				or wfind(LIB.GetItemNameByItemInfo(itemInfo, dwRecipeID), szSearch)
-			) then
-				insert(aResult, {
-					dwTabType = 5,
-					dwIndex = row.dwBookItemIndex,
-					itemInfo = itemInfo,
-					dwRecipeID = dwRecipeID,
-				})
-				if #aResult >= MAX_DISP then
-					return aResult
+	local function SearchBreathe()
+		local nTime = GetTime()
+		while GetTime() - nTime < 50 do
+			for _ = 1, 100 do
+				if SearchStep() then
+					fnCallback(aResult)
+					D.StopSearch()
+					return
 				end
 			end
+			fnProgress(nRound / SEARCH_STEP_COUNT)
 		end
 	end
-	return aResult
+	LIB.BreatheCall('MY_ItemInfoSearch', SearchBreathe)
 end
 
-local function SearchWithCache(szSearch)
+function D.Search(szSearch, fnProgress, fnCallback)
 	-- 搜索缓存
 	for _, v in ipairs(CACHE) do
 		if v.szSearch == szSearch then
-			return v.aResult
+			fnCallback(v.aResult)
+			return
 		end
 	end
 	-- 计算结果
-	local aResult = SearchWithoutCache(szSearch)
-	if szSearch ~= '' then
+	D.DoRawSearch(szSearch, fnProgress, function(aResult)
 		if #CACHE > 20 then
 			remove(CACHE, 1)
 		end
 		insert(CACHE, { szSearch = szSearch, aResult = aResult })
-	end
-	return aResult
+		fnCallback(aResult)
+	end)
 end
 
 local PS = {}
@@ -203,54 +226,99 @@ function PS.OnPanelActive(wnd)
 	local x, y = X, Y
 	local w, h = ui:Size()
 
+	local list, muProgress
+	local function UpdateList()
+		list:ListBox('clear')
+		if IsEmpty(SEARCH) then
+			for i, s in ipairs(_L['MY_ItemInfoSearch TIPS']) do
+				list:ListBox('insert', s, 'TIP' .. i, nil, { r = 255, g = 255, b = 0 })
+			end
+		else
+			for _, item in ipairs(RESULT) do
+				local opt = {}
+				opt.r, opt.g, opt.b = GetItemFontColorByQuality(item.itemInfo.nQuality, false)
+				list:ListBox('insert', ' [' .. LIB.GetItemNameByItemInfo(item.itemInfo, item.dwRecipeID) .. '] - ' .. item.itemInfo.szName, item, item, opt)
+			end
+			list:ListBox('insert', _L('Max display count %d, current %d.', MAX_DISP, #RESULT), 'count', nil, { r = 100, g = 100, b = 100 })
+		end
+	end
+
 	y = y + ui:Append('WndEditBox', {
 		x = x, y = y, w = w - x, h = 25,
 		text = SEARCH,
 		placeholder = _L['Please input item name or item index number'],
 		onchange = function(szSearch)
 			LIB.DelayCall('MY_ItemInfoSearch', 200, function()
-				SEARCH = szSearch
-				RESULT = SearchWithCache(szSearch)
-				DrawList()
+				D.Search(szSearch,
+					function(fPer)
+						muProgress:Width(w * fPer)
+					end,
+					function(aResult)
+						muProgress:Width(w)
+						SEARCH = szSearch
+						RESULT = aResult
+						UpdateList()
+					end)
 			end)
 		end,
 	}):Height()
 
-	UI_LIST = ui:Append('WndListBox', {
-		x = x, y = y, w = w - x, h = h - y,
+	muProgress = ui:Append('Image', {
+		name = 'Image_Progress',
+		x = x, y = y,
+		w = w, h = 4,
+		image = 'ui/Image/UICommon/RaidTotal.UITex|45',
 	})
-	UI_LIST:ListBox('onhover', function(id, text, data)
-		if id == 'count' then
-			return false
-		end
-		if IsCtrlKeyDown() and IsShiftKeyDown() then
-			LIB.OutputTip(this, EncodeLUAData(data, '  '))
-		elseif data and (data.itemInfo.nGenre ~= ITEM_GENRE.BOOK or data.dwRecipeID) then
-			LIB.OutputItemInfoTip(data.dwTabType, data.dwIndex, data.dwRecipeID)
-		else
-			HideTip()
-		end
-	end, function(id, text, data)
-		if id == 'count' then
-			return false
-		end
-		HideTip()
-	end)
-	UI_LIST:ListBox('onlclick', function(id, text, data)
-		if data and IsCtrlKeyDown() then
-			LIB.EditBoxInsertItemInfo(data.dwTabType, data.dwIndex, data.dwRecipeID)
-		end
-		return false
-	end)
-	UI_LIST:ListBox('onrclick', function(id, text, data)
-		return false
-	end)
-	Init()
-	DrawList()
+	y = y + 4
+
+	list = ui:Append('WndListBox', {
+		x = x, y = y, w = w - x, h = h - y,
+		listbox = {
+			{
+				'onhover',
+				function(id, text, data)
+					if id == 'count' then
+						return false
+					end
+					if IsCtrlKeyDown() and IsShiftKeyDown() then
+						LIB.OutputTip(this, EncodeLUAData(data, '  '))
+					elseif data and (data.itemInfo.nGenre ~= ITEM_GENRE.BOOK or data.dwRecipeID) then
+						LIB.OutputItemInfoTip(data.dwTabType, data.dwIndex, data.dwRecipeID)
+					else
+						HideTip()
+					end
+				end,
+				function(id, text, data)
+					if id == 'count' then
+						return false
+					end
+					HideTip()
+				end
+			},
+			{
+				'onlclick',
+				function(id, text, data)
+					if data and IsCtrlKeyDown() then
+						LIB.EditBoxInsertItemInfo(data.dwTabType, data.dwIndex, data.dwRecipeID)
+					end
+					return false
+				end
+			},
+			{
+				'onrclick',
+				function(id, text, data)
+					return false
+				end
+			},
+		},
+	})
+
+	D.Init()
+	UpdateList()
 end
 
 function PS.OnPanelDeactive()
-	UI_LIST = nil
+	D.StopSearch()
 end
 
 LIB.RegisterPanel('MY_ItemInfoSearch', _L['MY_ItemInfoSearch'], _L['General'], 'ui/Image/UICommon/ActivePopularize2.UITex|30', PS)
