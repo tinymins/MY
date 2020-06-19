@@ -436,6 +436,7 @@ function D.DrawScrollContainer(scroll, top, menu, nLevel, bInlineContainer)
 		end
 	end
 	-- 滚动区域最大高度
+	container:SetW(1) -- 防止菜单同行排列
 	container:FormatAllContentPos()
 	local nHeight = select(2, container:GetAllContentSize())
 	if menu.nMaxHeight then
