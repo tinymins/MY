@@ -152,7 +152,7 @@ local function QueryData(szQues)
 end
 
 function D.SubmitData(tExamData, bAllRight)
-	if LIB.IsDebugServer() then
+	if LIB.IsDebugServer() or not MY_Serendipity.bEnable then
 		return
 	end
 	local data = {}
