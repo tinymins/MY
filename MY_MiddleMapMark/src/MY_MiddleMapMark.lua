@@ -620,17 +620,30 @@ function PS.OnPanelActive(wnd)
 		name = 'WndListBox_1',
 		x = x, y = y,
 		w = w, h = h - y,
-		listbox = {{
-			'onlclick',
-			function(id, text, data, selected)
-				OpenMiddleMap(data.dwMapID, 0)
-				UI('Topmost1/MiddleMap/Wnd_NormalMap/Wnd_Tool/Edit_Search'):Text(LIB.EscapeString(data.szName))
-				Station.SetFocusWindow('Topmost1/MiddleMap')
-				if not selected then -- avoid unselect
-					return false
-				end
-			end,
-		}},
+		listbox = {
+			{
+				'onhover',
+				function(id, text, data)
+					if IsString(id) and id:sub(1, 3) == 'TIP' then
+						return false
+					end
+				end,
+			},
+			{
+				'onlclick',
+				function(id, text, data, selected)
+					if IsString(id) and id:sub(1, 3) == 'TIP' then
+						return false
+					end
+					OpenMiddleMap(data.dwMapID, 0)
+					UI('Topmost1/MiddleMap/Wnd_NormalMap/Wnd_Tool/Edit_Search'):Text(LIB.EscapeString(data.szName))
+					Station.SetFocusWindow('Topmost1/MiddleMap')
+					if not selected then -- avoid unselect
+						return false
+					end
+				end,
+			},
+		},
 	})
 
 	UpdateList('')

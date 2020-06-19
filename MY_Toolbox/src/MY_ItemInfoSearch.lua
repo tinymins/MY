@@ -277,7 +277,7 @@ function PS.OnPanelActive(wnd)
 			{
 				'onhover',
 				function(id, text, data)
-					if id == 'count' then
+					if id == 'count' or (IsString(id) and id:sub(1, 3) == 'TIP') then
 						return false
 					end
 					if IsCtrlKeyDown() and IsShiftKeyDown() then
