@@ -132,30 +132,27 @@ LIB.RegisterInit('MY_LOGOFF', onInit)
 local PS = {}
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
-	local x, y = 20, 20
+	local X, Y = 20, 20
+	local x, y = X, Y
 	local w, h = ui:Size()
 
 	-- 暂离登出
-	ui:Append('Text', { x = x + 10, y = y, text = _L['# idle logoff'] })
-	y = y + 23
+	x = X
+	ui:Append('Text', { x = x, y = y, text = _L['Idle logoff'], font = 27 })
+	y = y + 35
 
-	ui:Append('Image', {
-		x = x - 15, y = y, w = w - (x - 15) * 2, h = 1,
-		image = 'UI/Image/UICommon/ScienceTreeNode.UITex', imageframe = 62,
-	})
-	y = y + 17
-
-	ui:Append('WndCheckBox', {
-		x = x, y = y, text = _L['enable'],
+	x = X + 10
+	x = x + ui:Append('WndCheckBox', {
+		x = x, y = y, text = _L['Enable'],
 		checked = MY_Logoff.bIdleOff,
 		oncheck = function(bChecked)
 			MY_Logoff.bIdleOff = bChecked
 			IdleOff()
 		end,
-	})
+	}):AutoWidth():Width() + 5
 
 	ui:Append('WndTrackbar', {
-		x = x + 70, y = y, w = 150,
+		x = x, y = y, w = 150,
 		textfmt = function(val) return _L('Auto logoff when keep idle for %dmin.', val) end,
 		range = {1, 1440},
 		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
@@ -164,67 +161,77 @@ function PS.OnPanelActive(wnd)
 			MY_Logoff.nIdleOffTime = val
 			LIB.DelayCall('MY_LOGOFF_IDLE_TIME_CHANGE', 500, IdleOff)
 		end,
+		autoenable = function() return MY_Logoff.bIdleOff end,
 	})
 	y = y + 40
 
 	-- 快速登出
-	ui:Append('Text', { x = x + 10, y = y, text = _L['# express logoff'] })
-	y = y + 23
+	x = X
+	ui:Append('Text', { x = x, y = y, text = _L['Express logoff'], font = 27 })
+	y = y + 35
 
-	ui:Append('Image', {
-		x = x - 15, y = y, w = w - (x - 15) * 2, h = 1,
-		image = 'UI/Image/UICommon/ScienceTreeNode.UITex', imageframe = 62,
-	})
-	y = y + 17
-
-	ui:Append('WndButton', {
-		x = x, y = y, w = 120, text = _L['return to role list'],
+	x = X + 10
+	x = x + ui:Append('WndButton', {
+		x = x, y = y, w = 120,
+		text = _L['Return to role list'], buttonstyle = 2,
 		onclick = function() Logoff(false) end,
-	})
+	}):Width() + 5
+
+	x = x + ui:Append('WndButton', {
+		x = x, y = y, w = 170,
+		text = _L['Return to role list while not fight'], buttonstyle = 2,
+		onclick = function() Logoff(false,true) end,
+	}):Width() + 5
 
 	ui:Append('WndButton', {
-		x = 145, y = y, w = 170, text = _L['return to role list while not fight'],
-		onclick = function() Logoff(false,true) end,
-	})
-
-	ui:Append('Text', {
-		x = 330, y = y, r = 255, g = 255, b = 0, text = _L['* hotkey setting'],
+		x = x, y = y, w = 100,
+		text = _L['Hotkey setting'], buttonstyle = 2,
 		onclick = function() LIB.SetHotKey() end,
 	})
 	y = y + 30
 
-	ui:Append('WndButton', {
-		x = 20, y = y, w = 120, text = _L['return to game login'],
+	x = X + 10
+	x = x + ui:Append('WndButton', {
+		x = x, y = y, w = 120,
+		text = _L['Return to game login'], buttonstyle = 2,
 		onclick = function() Logoff(true) end,
-	})
-	ui:Append('WndButton', {
-		x = 145, y = y, w = 170, text = _L['return to game login while not fight'],
+	}):Width() + 5
+	x = x + ui:Append('WndButton', {
+		x = x, y = y, w = 170,
+		text = _L['Return to game login while not fight'], buttonstyle = 2,
 		onclick = function() Logoff(true,true) end,
-	})
+	}):Width() + 5
 	y = y + 30
+
+	x = X
+	y = y + 20
+	ui:Append('Text', { x = x, y = y, w = w - x * 2, text = _L['Tips'], font = 27, multiline = true, valign = 0 })
+	y = y + 30
+	x = X + 10
+	ui:Append('Text', { x = x, y = y, w = w - x * 2, text = _L['MY_Logoff TIPS'], font = 27, multiline = true, valign = 0 })
 end
-LIB.RegisterPanel('Logoff', _L['express logoff'], _L['System'], 'UI/Image/UICommon/LoginSchool.UITex|24', PS)
+LIB.RegisterPanel('Logoff', _L['Express logoff'], _L['System'], 'UI/Image/UICommon/LoginSchool.UITex|24', PS)
 
 do
 local menu = {
-	szOption = _L['express logoff'],
+	szOption = _L['Express logoff'],
 	{
-		szOption = _L['return to role list'],
+		szOption = _L['Return to role list'],
 		fnAction = function()
 			Logoff(false)
 		end,
 	}, {
-		szOption = _L['return to game login'],
+		szOption = _L['Return to game login'],
 		fnAction = function()
 			Logoff(true)
 		end,
 	}, {
-		szOption = _L['return to role list while not fight'],
+		szOption = _L['Return to role list while not fight'],
 		fnAction = function()
 			Logoff(false, true)
 		end,
 	}, {
-		szOption = _L['return to game login while not fight'],
+		szOption = _L['Return to game login while not fight'],
 		fnAction = function()
 			Logoff(true, true)
 		end,
@@ -240,9 +247,9 @@ local menu = {
 LIB.RegisterAddonMenu('MY_LOGOFF_MENU', menu)
 end
 
-LIB.RegisterHotKey('MY_LogOff_RUI', _L['return to role list'], function() Logoff(false) end, nil)
-LIB.RegisterHotKey('MY_LogOff_RRL', _L['return to game login'], function() Logoff(true) end, nil)
-LIB.RegisterHotKey('MY_LogOff_RUI_UNFIGHT', _L['return to role list while not fight'], function() Logoff(false, true) end, nil)
-LIB.RegisterHotKey('MY_LogOff_RRL_UNFIGHT', _L['return to game login while not fight'], function() Logoff(true, true) end, nil)
-LIB.RegisterHotKey('MY_LogOff_RUI_UNFIGHT_ALIVE', _L['return to role list while not fight and not dead'], function() Logoff(false, true, true) end, nil)
-LIB.RegisterHotKey('MY_LogOff_RRL_UNFIGHT_ALIVE', _L['return to game login while not fight and not dead'], function() Logoff(true, true, true) end, nil)
+LIB.RegisterHotKey('MY_LogOff_RUI', _L['Return to role list'], function() Logoff(false) end, nil)
+LIB.RegisterHotKey('MY_LogOff_RRL', _L['Return to game login'], function() Logoff(true) end, nil)
+LIB.RegisterHotKey('MY_LogOff_RUI_UNFIGHT', _L['Return to role list while not fight'], function() Logoff(false, true) end, nil)
+LIB.RegisterHotKey('MY_LogOff_RRL_UNFIGHT', _L['Return to game login while not fight'], function() Logoff(true, true) end, nil)
+LIB.RegisterHotKey('MY_LogOff_RUI_UNFIGHT_ALIVE', _L['Return to role list while not fight and not dead'], function() Logoff(false, true, true) end, nil)
+LIB.RegisterHotKey('MY_LogOff_RRL_UNFIGHT_ALIVE', _L['Return to game login while not fight and not dead'], function() Logoff(true, true, true) end, nil)

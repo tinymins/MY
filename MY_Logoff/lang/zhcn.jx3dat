@@ -1,19 +1,16 @@
 -- language data (zhcn) updated at 2014-4-10 03:38:11
 return {
     -- MY_Logoff.lua
-    ['express logoff'] = '快速登出',
-    ['# express logoff'] = '● 快速登出',
-    ['* hotkey setting'] = '☆ 快捷键设置',
-    ['return to role list'] = '返回角色选择',
-    ['return to game login'] = '返回账号登录',
-    ['return to role list while not fight'] = '脱战后返回角色选择',
-    ['return to game login while not fight'] = '脱战后返回账号登录',
-    ['return to role list while not fight and not dead'] = '脱战未重伤返回角色页',
-    ['return to game login while not fight and not dead'] = '脱战未重伤返回登录页',
-    ['force return to role list.'] = '强制返回角色选择页面。',
-    ['force return to game login.'] = '强制返回账户登录页面。',
-    ['return to role list while leaving fighting.'] = '在下一次脱离战斗的一瞬间返回角色选择页面。',
-    ['return to game login while leaving fighting.'] = '在下一次脱离战斗的一瞬间返回账户登录页面。',
+    ['Express logoff'] = '快速登出',
+    ['Hotkey setting'] = '快捷键设置',
+    ['Return to role list'] = '返回角色选择',
+    ['Return to game login'] = '返回账号登录',
+    ['Return to role list while not fight'] = '脱战后返回角色选择',
+    ['Return to game login while not fight'] = '脱战后返回账号登录',
+    ['Return to role list while not fight and not dead'] = '脱战未重伤返回角色页',
+    ['Return to game login while not fight and not dead'] = '脱战未重伤返回登录页',
+    ['Return to role list while leaving fighting.'] = '在下一次脱离战斗的一瞬间返回角色选择页面。',
+    ['Return to game login while leaving fighting.'] = '在下一次脱离战斗的一瞬间返回账户登录页面。',
 
     ['Logoff has been cancelled.'] = '自动登出已取消。',
     ['Logoff is ready for your casting unfight skill.'] = '脱战登出已启动，请释放脱战招式，游戏将在脱战瞬间下线。',
@@ -22,7 +19,10 @@ return {
     ['Idle off notice: you\'ll auto logoff if you keep idle for %dm %ds.'] = '暂离登出提醒：如果您继续保持离开状态%d分%d秒后，您将会自动登出游戏。',
     ['Idle off has been started, you\'ll auto logoff if you keep idle for %dm.'] = '暂离登出已启动，当您进入离开状态%d分钟后，您将会自动登出游戏。',
 
-    ['# idle logoff'] = '● 暂离登出',
-    ['enable'] = '启用',
+    ['Idle logoff'] = '暂离登出',
+    ['Enable'] = '启用',
     ['Auto logoff when keep idle for %dmin.'] = '暂离%s分钟后将自动返回登录界面。',
+
+    ['Tips'] = '说明',
+    ['MY_Logoff TIPS'] = '1、点击上方按钮，即可快速登出到角色选择、账号登录页。\n2、登出原理为调用官方提供的接口，不会涉及任何第三方数据传输。\n3、由于官方的战斗保护机制，如果您在战斗中强行登出游戏，官方服务器会将您的角色强行保持在线30秒左右，这段时间内您仍然可能被首领或其他玩家重伤。',
 }
