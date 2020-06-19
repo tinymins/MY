@@ -562,14 +562,13 @@ function PS.OnPanelActive(wnd)
 	  :Size(w - 30, 4)
 	  :Image('ui/Image/UICommon/RaidTotal.UITex|45')
 
-	ui:Append('WndEditBox', {
-		name = 'WndEdit_Search',
-		x = 18, y = 10,
-		w = w - 26, h = 25,
-		onchange = function(szText)
-			if not (szText and #szText > 0) then
-				return
+	local function UpdateList(szText)
+		if IsEmpty(szText) then
+			list:ListBox('clear')
+			for i, s in ipairs(_L['MY_MiddleMapMark TIPS']) do
+				list:ListBox('insert', s, 'TIP' .. i, nil, { r = 255, g = 255, b = 0 })
 			end
+		else
 			local nMaxDisp = 500
 			local nDisp = 0
 			local nCount = 0
@@ -612,8 +611,17 @@ function PS.OnPanelActive(wnd)
 					tNames[info.mapid .. szName] = true
 				end
 			end
+		end
+	end
+	ui:Append('WndEditBox', {
+		name = 'WndEdit_Search',
+		x = 18, y = 10,
+		w = w - 26, h = 25,
+		onchange = function(szText)
+			UpdateList(szText)
 		end,
 	})
+	UpdateList('')
 end
 
 function PS.OnPanelResize(wnd)
