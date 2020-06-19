@@ -113,12 +113,16 @@ end
 
 local function DrawList()
 	UI_LIST:ListBox('clear')
-	for _, item in ipairs(RESULT) do
-		local opt = {}
-		opt.r, opt.g, opt.b = GetItemFontColorByQuality(item.itemInfo.nQuality, false)
-		UI_LIST:ListBox('insert', ' [' .. LIB.GetItemNameByItemInfo(item.itemInfo, item.dwRecipeID) .. '] - ' .. item.itemInfo.szName, item, item, opt)
-	end
-	if SEARCH ~= '' then
+	if IsEmpty(SEARCH) then
+		for i, s in ipairs(_L['MY_ItemInfoSearch TIPS']) do
+			UI_LIST:ListBox('insert', s, 'TIP' .. i, nil, { r = 255, g = 255, b = 0 })
+		end
+	else
+		for _, item in ipairs(RESULT) do
+			local opt = {}
+			opt.r, opt.g, opt.b = GetItemFontColorByQuality(item.itemInfo.nQuality, false)
+			UI_LIST:ListBox('insert', ' [' .. LIB.GetItemNameByItemInfo(item.itemInfo, item.dwRecipeID) .. '] - ' .. item.itemInfo.szName, item, item, opt)
+		end
 		UI_LIST:ListBox('insert', _L('Max display count %d, current %d.', MAX_DISP, #RESULT), 'count', nil, { r = 100, g = 100, b = 100 })
 	end
 end

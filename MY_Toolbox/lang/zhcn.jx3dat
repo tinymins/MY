@@ -140,6 +140,12 @@ return {
     ['MY_ItemInfoSearch'] = '物品搜索',
     ['Please input item name or item index number'] = '请输入物品名称或物品ID',
     ['Max display count %d, current %d.'] = '最大显示%d条，当前结果%d条。',
+    ['MY_ItemInfoSearch TIPS'] = {
+        '说明：',
+        '　　1、在上方输入框输入您想要查询的物品名称，即可进行游戏内物品查询。',
+        '　　2、该功能调用官方接口查询物品表，不涉及任何网络通信与数据存储。',
+        '　　3、物品表每次更新都可能被修改，查询结果只代表查询时刻的即时状态。',
+    },
 
     ['Hide announce bg'] = '隐藏官方公告区背景',
 
@@ -257,7 +263,10 @@ return {
     ['Enable player view panel hook'] = '在查看他人装备界面显示情缘选项卡',
     ['Other view my lover without ask'] = '允许无需确认随意查看我的情缘信息',
     ['Tips'] = '小提示',
-	['1. You can break love one-sided'] = '1. 情缘可以单方面删除，相恋情缘会通过密聊告知对方',
+	['1. You can break love one-sided.'] = '1. 情缘可以单方面删除，相恋情缘会通过密聊告知对方。',
+	['2. Data was stored in official data segment.'] = '2. 情缘数据保存在官方提供的界面设置数据存储位上，任何第三方都无法知晓您的数据。',
+	['3. Please do not enable config async, that may cause data lose.'] = '3. 由于官方界面设置一些原因，不停开关界面设置同步选项可能会导致情缘数据丢失。',
+	['4. To recove lover data, please ask you lover click fix button.'] = '4. 如果您的情缘信息不慎丢失，您可邀请您的情缘点击该界面的修复按钮，修复关系。',
     ['View love info'] = '查看情缘信息',
     ['FIREWORK_TITLE_67291'] = '真橙之心',
     ['FIREWORK_TITLE_156446'] = '同心人',
