@@ -777,7 +777,7 @@ local function onBreathe()
 					break
 				end
 				if coroutine.status(p.coAction) == 'suspended' then
-					local res = coroutine.resume(p.coAction)
+					local res = {coroutine.resume(p.coAction)}
 					if res[1] == true then
 						remove(res, 1)
 						p.bSuccess = true
