@@ -777,14 +777,18 @@ local function onBreathe()
 					break
 				end
 				if coroutine.status(p.coAction) == 'suspended' then
-					local status, err = coroutine.resume(p.coAction)
-					if not status then
-						FireUIEvent('CALL_LUA_ERROR',  'OnCoroutine: ' .. p.szID .. ', Error: ' .. err .. '\n')
+					local res = coroutine.resume(p.coAction)
+					if res[1] == true then
+						remove(res, 1)
+						p.bSuccess = true
+						p.aReturn = res
+					elseif not res[1] then
+						FireUIEvent('CALL_LUA_ERROR',  'OnCoroutine: ' .. p.szID .. ', Error: ' .. res[2] .. '\n')
 					end
 				end
 				if coroutine.status(p.coAction) == 'dead' then
 					if p.fnCallback then
-						Call(p.fnCallback)
+						Call(p.fnCallback, p.bSuccess or false, unpack(p.aReturn or CONSTANT.EMPTY_TABLE))
 					end
 					COROUTINE_LIST[k] = nil
 				end
