@@ -1004,7 +1004,9 @@ function PS.OnPanelActive(frame)
 
 	x = X
 	ui:Append('Text', { x = x, y = y, text = _L['Circle Style'], font = 27, autoenable = IsEnabled })
-	x = x + 70
+	y = y + deltaY
+
+	x = X + 10
 	ui:Append('WndRadioBox', {
 		x = x, y = y + 5, text = _L['hit feel'],
 		group = 'style',
