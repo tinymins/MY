@@ -63,6 +63,7 @@ local SZ_MOD_INI = PLUGIN_ROOT .. '/ui/MY_TeamTools.Mod.ini'
 
 function D.Open(szModule)
 	local frame = Wnd.OpenWindow(SZ_INI, 'MY_TeamTools')
+	frame:BringToTop()
 	D.ActivePage(frame, szModule or 1, true)
 end
 

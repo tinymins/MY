@@ -58,6 +58,13 @@ function PS.OnPanelActive(wnd)
 	local x, y = X, Y
 	local W, H = ui:Size()
 
+	ui:Append('WndButton', {
+		x = W - 165, y = y, w = 150, h = 38,
+		text = _L['Open Panel'],
+		buttonstyle = 3,
+		onclick = MY_TeamTools.Open,
+	})
+
 	y = y + ui:Append('Text', { x = x, y = y, text = _L['MY_TeamTools'], font = 27 }):Height() + 5
 	x = X + 10
 	x = x + ui:Append('WndCheckBox', {
