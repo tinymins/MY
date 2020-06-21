@@ -64,7 +64,9 @@ if LIB.IsDebugClient('MY_RoleStatistics_SerendipityStat', true) then
 		SaveDataToFile(data, PACKET_INFO.ROOT .. DAT_ROOT .. szFile, PASSPHRASE)
 	end
 end
-local SERENDIPITY_LIST, MAP_POINT_LIST = unpack(LIB.LoadLUAData(PLUGIN_ROOT .. '/data/serendipity/{$lang}.jx3dat', { passphrase = PASSPHRASE }) or {})
+local SERENDIPITY_LIST, MAP_POINT_LIST = unpack(LIB.LoadLUAData(PLUGIN_ROOT .. '/data/serendipity/{$lang}.jx3dat', { passphrase = PASSPHRASE })
+	or LIB.LoadLUAData(PLUGIN_ROOT .. '/data/serendipity/{$lang}.jx3dat', { passphrase = false })
+	or {})
 if not SERENDIPITY_LIST or not MAP_POINT_LIST then
 	return LIB.Sysmsg(_L['MY_RoleStatistics_SerendipityStat'], _L['Cannot load serendipity data!!!'], CONSTANT.MSG_THEME.ERROR)
 end
