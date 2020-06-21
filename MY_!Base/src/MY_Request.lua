@@ -65,6 +65,9 @@ function D.Close(bCompulsory)
 	local function fnAction()
 		REQUEST_LIST = {}
 		Wnd.CloseWindow(D.GetFrame())
+		for _, v in pairs(REQUEST_HANDLER) do
+			SafeCall(v.OnClear)
+		end
 	end
 	if bCompulsory or IsEmpty(REQUEST_LIST) then
 		fnAction()
@@ -84,6 +87,7 @@ function D.RegisterRequest(szType, tHandler)
 		GetTip = tHandler.GetTip,
 		GetIcon = tHandler.GetIcon,
 		GetMenu = tHandler.GetMenu,
+		OnClear = tHandler.OnClear,
 	}
 end
 
