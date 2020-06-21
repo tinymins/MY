@@ -4,6 +4,7 @@ return {
 
     ['Enable'] = '啟用',
     ['Configure name'] = '配置文件名稱',
+    ['Auto hide system headtop'] = '自動隱藏官方頭頂',
 
     ['Only enable in checked map types'] = '勾選後僅在勾選類型的地圖中啟用扁平血條，全部取消勾選表示所有地圖啟用。',
     ['Arena'] = '競技場',

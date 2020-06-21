@@ -224,8 +224,10 @@ end
 MY_LifeBar = {}
 MY_LifeBar.bEnabled = false
 MY_LifeBar.szConfig = 'common'
+MY_LifeBar.bAutoHideSysHeadtop = true
 RegisterCustomData('MY_LifeBar.bEnabled')
 RegisterCustomData('MY_LifeBar.szConfig')
+RegisterCustomData('MY_LifeBar.bAutoHideSysHeadtop')
 
 function D.IsShielded() return LIB.IsShieldedVersion('TARGET') and LIB.IsInShieldedMap() end
 function D.IsEnabled() return MY_LifeBar.bEnabled and not D.IsShielded() end
@@ -296,10 +298,10 @@ function D.AutoSwitchSysHeadTop()
 	if not Config('loaded') then
 		return
 	end
-	if D.IsMapEnabled() then
-		if Config.eCss == '' then
-			Config('reset')
-		end
+	if Config.eCss == '' and D.IsMapEnabled() then
+		Config('reset')
+	end
+	if MY_LifeBar.bAutoHideSysHeadtop and D.IsMapEnabled() then
 		D.SaveSysHeadTop()
 		D.HideSysHeadTop()
 	else

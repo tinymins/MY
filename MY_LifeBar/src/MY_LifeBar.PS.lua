@@ -106,7 +106,7 @@ function PS.OnPanelActive(wnd)
 	local x, y = X, Y
 	local offsety = 40
 	-- 开启
-	ui:Append('WndCheckBox', {
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['Enable'],
 		checked = MY_LifeBar.bEnabled,
 		oncheck = function(bChecked)
@@ -119,10 +119,9 @@ function PS.OnPanelActive(wnd)
 			end
 		end,
 		autoenable = function() return not D.IsShielded() end,
-	})
-	x = x + 80
+	}):AutoWidth():Width() + 5
 	-- 配置文件名称
-	ui:Append('WndEditBox', {
+	x = x + ui:Append('WndEditBox', {
 		x = x, y = y, w = 200, h = 25,
 		placeholder = _L['Configure name'],
 		text = MY_LifeBar.szConfig,
@@ -135,9 +134,17 @@ function PS.OnPanelActive(wnd)
 			LoadUI(ui)
 		end,
 		autoenable = function() return D.IsEnabled() end,
-	})
-	x = x + 365
-	ui:Append('WndCheckBox', {
+	}):AutoWidth():Width() + 5
+	x = 310
+	x = x + ui:Append('WndCheckBox', {
+		x = x, y = y, w = 155, text = _L['Auto hide system headtop'],
+		checked = MY_LifeBar.bAutoHideSysHeadtop,
+		oncheck = function(bChecked)
+			MY_LifeBar.bAutoHideSysHeadtop = bChecked
+			D.Reset(true)
+		end,
+	}):AutoWidth():Width() + 5
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, w = 80, text = _L['Arena'],
 		checked = Config.bOnlyInArena,
 		oncheck = function(bChecked)
@@ -147,9 +154,8 @@ function PS.OnPanelActive(wnd)
 		tip = _L['Only enable in checked map types'],
 		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
 		autoenable = function() return D.IsEnabled() end,
-	})
-	x = x + 80
-	ui:Append('WndCheckBox', {
+	}):AutoWidth():Width() + 5
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, w = 70, text = _L['Battlefield'],
 		checked = Config.bOnlyInBattleField,
 		oncheck = function(bChecked)
@@ -159,9 +165,8 @@ function PS.OnPanelActive(wnd)
 		tip = _L['Only enable in checked map types'],
 		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
 		autoenable = function() return D.IsEnabled() end,
-	})
-	x = x + 70
-	ui:Append('WndCheckBox', {
+	}):AutoWidth():Width() + 5
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, w = 70, text = _L['Dungeon'],
 		checked = Config.bOnlyInDungeon,
 		oncheck = function(bChecked)
@@ -171,7 +176,7 @@ function PS.OnPanelActive(wnd)
 		tip = _L['Only enable in checked map types'],
 		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
 		autoenable = function() return D.IsEnabled() end,
-	})
+	}):AutoWidth():Width() + 5
 	y = y + offsety
 	-- <hr />
 	ui:Append('Image', {
