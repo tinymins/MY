@@ -142,7 +142,6 @@ return {
 
 	['Edit team info?'] = '是否填寫團隊小告示（團員進組可看到）',
 	['Team Message'] = '團隊告示',
-	['Team Small Message'] = '團隊小告示',
 	['Asking..., If no response in longtime, team leader not enable plug-in.'] = '請求已發出，如果沒有響應可能是團長沒有開啟小告示',
 	['YY:'] = 'YY:',
 	['DC:'] = 'DC:',

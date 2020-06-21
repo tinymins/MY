@@ -394,8 +394,7 @@ LIB.RegisterBgMsg('TI', function(_, data, nChannel, dwID, szName, bIsSelf)
 	end
 end)
 
-do
-local function GetMenu()
+LIB.RegisterAddonMenu(function()
 	return {{
 		szOption = _L['Team Message'],
 		fnDisable = function()
@@ -403,16 +402,7 @@ local function GetMenu()
 		end,
 		fnAction = TI.OpenFrame,
 	}}
-end
-LIB.RegisterAddonMenu(GetMenu)
-
-local function GetMenuTB()
-	local menu = GetMenu()
-	menu[1].szOption = _L['Team Small Message']
-	return menu
-end
-TraceButton_AppendAddonMenu({ GetMenuTB })
-end
+end)
 
 local ui = {
 	OpenFrame = TI.OpenFrame
