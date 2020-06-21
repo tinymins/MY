@@ -772,6 +772,7 @@ end
 function D.OutputRowTip(this, rec)
 	local frame = Wnd.OpenWindow(SZ_TIP_INI, 'MY_RoleStatistics_SerendipityTip')
 	local hList = frame:Lookup('', 'Handle_List')
+	local imgBg = frame:Lookup('', 'Image_Bg')
 	hList:Clear()
 	hList:AppendItemFromIni(SZ_TIP_INI, 'Handle_Title'):Lookup('Text_Title'):SetText(
 		rec.region .. ' ' .. rec.server .. ' - ' .. rec.name
@@ -807,6 +808,10 @@ function D.OutputRowTip(this, rec)
 		hItem:Lookup('Text_State'):SetFontColor(r, g, b)
 	end
 	hList:FormatAllItemPos()
+	local nDeltaY = select(2, hList:GetAllItemSize()) + hList:GetRelY() - hList:GetH()
+	hList:SetH(hList:GetH() + nDeltaY)
+	imgBg:SetH(imgBg:GetH() + nDeltaY)
+	frame:SetH(frame:GetH() + nDeltaY)
 	frame.OnFrameBreathe = function()
 		local wnd, item = Station.GetMouseOverWindow()
 		if wnd then
