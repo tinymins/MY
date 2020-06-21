@@ -204,7 +204,7 @@ function D.GatherDataFromPanel()
 					if chk:IsCheckBoxChecked() then
 						insert(aChoosed, #aChoise)
 					end
-					insert(aChoise, chk:Lookup('Text_T1No' .. i):GetText())
+					insert(aChoise, chk:Lookup('', 'Text_T1No' .. i):GetText())
 				end
 			end
 			aBody = { 1, aChoise, aChoosed }
