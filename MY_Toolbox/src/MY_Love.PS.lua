@@ -242,22 +242,37 @@ function PS.OnPanelActive(wnd)
 		checked = MY_Love.bAutoReplyLover,
 		oncheck = function(bChecked) MY_Love.bAutoReplyLover = bChecked end,
 	}):AutoWidth()
+
 	-- tips
 	nY = nY + 28
 	ui:Append('Text', { text = _L['Tips'], x = X, y = nY, font = 27 })
 	nX = X + 10
-	nY = nY + 25
-	ui:Append('Text', { text = _L['1. You can break love one-sided.'], x = nX, y = nY, w = W - nX * 2 })
-	nY = nY + 25
-	ui:Append('Text', { text = _L['2. Data was stored in official data segment.'], x = nX, y = nY, w = W - nX * 2 })
-	nY = nY + 25
-	ui:Append('Text', { text = _L['3. Please do not enable config async, that may cause data lose.'], x = nX, y = nY, w = W - nX * 2 })
-	nY = nY + 25
-	ui:Append('Text', { text = _L['4. To recove lover data, please ask you lover click fix button.'], x = nX, y = nY, w = W - nX * 2 })
-	nY = nY + 25
-	ui:Append('Text', { text = _L['5. Lover must be toway friend, so delete friend will cause both side none-lover.'], x = nX, y = nY, w = W - nX * 2 })
-	nY = nY + 25
-	ui:Append('Text', { text = _L['6. Lover can see each other\'s location, delete friend can prevent this.'], x = nX, y = nY, w = W - nX * 2 })
+	nY = nY + 35
+
+	nY = nY + ui:Append('Text', {
+		x = nX, y = nY, w = W - nX * 2, multiline = true, valign = 0,
+		text = _L['1. You can break love one-sided.'],
+	}):AutoHeight():Height() + 3
+	nY = nY + ui:Append('Text', {
+		x = nX, y = nY, w = W - nX * 2, multiline = true, valign = 0,
+		text = _L['2. Data was stored in official data segment.'],
+	}):AutoHeight():Height() + 3
+	nY = nY + ui:Append('Text', {
+		x = nX, y = nY, w = W - nX * 2, multiline = true, valign = 0,
+		text = _L['3. Please do not enable config async, that may cause data lose.'],
+		}):AutoHeight():Height() + 3
+	nY = nY + ui:Append('Text', {
+		x = nX, y = nY, w = W - nX * 2, multiline = true, valign = 0,
+		text = _L['4. To recove lover data, please ask you lover click fix button.'],
+	}):AutoHeight():Height() + 3
+	nY = nY + ui:Append('Text', {
+		x = nX, y = nY, w = W - nX * 2, multiline = true, valign = 0,
+		text = _L['5. Lover must be toway friend, so delete friend will cause both side none-lover.'],
+	}):AutoHeight():Height() + 3
+	nY = nY + ui:Append('Text', {
+		x = nX, y = nY, w = W - nX * 2, multiline = true, valign = 0,
+		text = _L['6. Lover can see each other\'s location, delete friend can prevent this.'],
+	}):AutoHeight():Height() + 3
 	O.bPanelActive = true
 end
 
