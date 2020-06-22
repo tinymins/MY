@@ -37,6 +37,7 @@ local __TEMPLATE__ = {
 
 	fTitleEffectScale = 0.5,
 	nTitleEffectOffsetY = 0,
+	nBalloonOffsetY = -20,
 
 	nAlpha = 200,
 	nFont = 16,

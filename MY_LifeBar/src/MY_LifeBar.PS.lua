@@ -81,6 +81,7 @@ local function LoadUI(ui)
 	ui:Children('#WndTrackbar_TextSpacing'):Value(Config.fTextSpacing * 10)
 	ui:Children('#WndTrackbar_TitleEffectScale'):Value(Config.fTitleEffectScale * 100)
 	ui:Children('#WndTrackbar_TitleEffectOffsetY'):Value(Config.nTitleEffectOffsetY)
+	ui:Children('#WndTrackbar_BalloonOffsetY'):Value(Config.nBalloonOffsetY)
 	ui:Children('#WndTrackbar_LifePerOffsetX'):Value(Config.nLifePerOffsetX)
 	ui:Children('#WndTrackbar_LifePerOffsetY'):Value(Config.nLifePerOffsetY)
 	ui:Children('#WndTrackbar_Distance'):Value(sqrt(Config.nDistance) / 64)
@@ -187,7 +188,7 @@ function PS.OnPanelActive(wnd)
 
 	X, Y = 15, y + 10
 	x, y = X + 15, Y
-	offsety = 25.2
+	offsety = 23.6
 
 	ui:Append('WndTrackbar', {
 		name = 'WndTrackbar_LifeBarWidth',
@@ -352,6 +353,18 @@ function PS.OnPanelActive(wnd)
 		value = Config.nTitleEffectOffsetY,
 		onchange = function(value)
 			Config.nTitleEffectOffsetY = value
+		end,
+		autoenable = function() return D.IsEnabled() end,
+	})
+	y = y + offsety
+
+	ui:Append('WndTrackbar', {
+		name = 'WndTrackbar_BalloonOffsetY',
+		x = x, y = y, trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE, range = { -150, 150 },
+		text = function(value) return _L('Balloon offset y: %d px.', value) end, -- 头顶特效间距
+		value = Config.nBalloonOffsetY,
+		onchange = function(value)
+			Config.nBalloonOffsetY = value
 		end,
 		autoenable = function() return D.IsEnabled() end,
 	})

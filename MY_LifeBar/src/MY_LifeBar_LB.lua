@@ -120,6 +120,7 @@ local function InitConfigData(self)
 	self.balloon_msg = ''
 	self.balloon_start = 0
 	self.balloon_during = 0
+	self.balloon_offset_y = 0
 	self.balloon_invalid = true
 end
 
@@ -562,11 +563,12 @@ function LB:ApplySFX(force)
 	return self
 end
 
-function LB:SetBalloon(msg, tick, during)
-	if self.balloon_msg ~= msg or self.balloon_start ~= tick then
+function LB:SetBalloon(msg, tick, during, offset_y)
+	if self.balloon_msg ~= msg or self.balloon_start ~= tick or self.balloon_offset_y ~= offset_y then
 		self.balloon_msg = msg
 		self.balloon_start = tick
 		self.balloon_during = during
+		self.balloon_offset_y = offset_y
 		self:SetInvalid('balloon', true)
 	end
 	return self
@@ -584,7 +586,10 @@ function LB:ApplyBalloon(force)
 				self.balloon_start,
 				self.balloon_during,
 				self.sfx_h * self.sfx_scale / Station.GetUIScale() * self.scale
-				+ (self.texts_y + self.texts_height * self.texts_scale * self.texts_lines + self.sfx_y) / Station.GetUIScale() * self.scale
+				+ (self.texts_y
+					+ self.texts_height * self.texts_scale * self.texts_lines
+					+ self.sfx_y
+					+ self.balloon_offset_y) / Station.GetUIScale() * self.scale
 			)
 		else
 			self.hp:ClearBalloon()

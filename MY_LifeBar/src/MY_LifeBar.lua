@@ -824,7 +824,7 @@ local function OnCharacterSay(dwID, nChannel, szText)
 	if not cfg.bEnable then
 		return
 	end
-	lb:SetBalloon(szText, GetTime(), bc.nDuring)
+	lb:SetBalloon(szText, GetTime(), bc.nDuring, Config.nBalloonOffsetY)
 end
 
 LIB.RegisterEvent('CHARACTER_SAY', function()

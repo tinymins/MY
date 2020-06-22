@@ -70,6 +70,7 @@ return {
     ['Text spacing: %.1f.'] = '文字間距：%.1f。',
     ['Title effect scale: %.2f%%.'] = '標記與任務卷軸縮放：%.2f。',
     ['Title effect offset y: %d px.'] = '標記與任務卷軸豎直偏移%dpx。',
+    ['Balloon offset y: %d px.'] = '頭頂泡泡豎直偏移%dpx。',
 
     ['Alpha: %.0f%%.'] = '透明度%.0f%%。',
 
