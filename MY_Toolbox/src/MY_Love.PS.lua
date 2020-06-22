@@ -247,13 +247,17 @@ function PS.OnPanelActive(wnd)
 	ui:Append('Text', { text = _L['Tips'], x = X, y = nY, font = 27 })
 	nX = X + 10
 	nY = nY + 25
-	ui:Append('Text', { text = _L['1. You can break love one-sided.'], x = nX, y = nY })
+	ui:Append('Text', { text = _L['1. You can break love one-sided.'], x = nX, y = nY, w = W - nX * 2 })
 	nY = nY + 25
-	ui:Append('Text', { text = _L['2. Data was stored in official data segment.'], x = nX, y = nY })
+	ui:Append('Text', { text = _L['2. Data was stored in official data segment.'], x = nX, y = nY, w = W - nX * 2 })
 	nY = nY + 25
-	ui:Append('Text', { text = _L['3. Please do not enable config async, that may cause data lose.'], x = nX, y = nY })
+	ui:Append('Text', { text = _L['3. Please do not enable config async, that may cause data lose.'], x = nX, y = nY, w = W - nX * 2 })
 	nY = nY + 25
-	ui:Append('Text', { text = _L['4. To recove lover data, please ask you lover click fix button.'], x = nX, y = nY })
+	ui:Append('Text', { text = _L['4. To recove lover data, please ask you lover click fix button.'], x = nX, y = nY, w = W - nX * 2 })
+	nY = nY + 25
+	ui:Append('Text', { text = _L['5. Lover must be toway friend, so delete friend will cause both side none-lover.'], x = nX, y = nY, w = W - nX * 2 })
+	nY = nY + 25
+	ui:Append('Text', { text = _L['6. Lover can see each other\'s location, delete friend can prevent this.'], x = nX, y = nY, w = W - nX * 2 })
 	O.bPanelActive = true
 end
 

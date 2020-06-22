@@ -267,6 +267,8 @@ return {
 	['2. Data was stored in official data segment.'] = '2. 情緣數據保存在官方提供的界面設置數據存儲位上，任何第三方都無法知曉您的數據。',
 	['3. Please do not enable config async, that may cause data lose.'] = '3. 由於官方界面設置一些原因，不停開關界面設置同步選項可能會導致情緣數據丟失。',
 	['4. To recove lover data, please ask you lover click fix button.'] = '4. 如果您的情緣信息不慎丟失，您可邀請您的情緣點擊該界面的修複按鈕，修複關係。',
+	['5. Lover must be toway friend, so delete friend will cause both side none-lover.'] = '5. 情緣要求必須是雙向好友，任何一方刪除對方好友後，雙方都將轉換為無情緣狀態。',
+	['6. Lover can see each other\'s location, delete friend can prevent this.'] = '6. 情緣可以互相看到對方角色所在地圖，刪除好友即可使對方恢復無情緣從而無法通過任何方式繼續查看您的位置。',
     ['View love info'] = '查看情緣信息',
     ['FIREWORK_TITLE_67291'] = '真橙之心',
     ['FIREWORK_TITLE_156446'] = '同心人',
