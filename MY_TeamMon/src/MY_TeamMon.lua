@@ -643,11 +643,8 @@ function D.CreateData(szEvent)
 	pcall(Raid_MonitorBuffs) -- clear
 	-- 重建MAP
 	for _, v in ipairs({ 'BUFF', 'DEBUFF', 'CASTING', 'NPC', 'DOODAD' }) do
-		if D.FILE[v][dwMapID] then -- 本地图数据
-			CreateCache(v, D.FILE[v][dwMapID])
-		end
-		if D.FILE[v][MY_TM_SPECIAL_MAP.COMMON] then -- 通用数据
-			CreateCache(v, D.FILE[v][MY_TM_SPECIAL_MAP.COMMON])
+		for _, d in D.IterTable(MY_TeamMon.GetTable(v), dwMapID) do
+			CreateCache(v, d)
 		end
 	end
 	-- 单独重建TALK数据
@@ -660,13 +657,8 @@ function D.CreateData(szEvent)
 				OTHER = {},
 			}
 			local cache = CACHE.MAP[vType]
-			if data[MY_TM_SPECIAL_MAP.COMMON] then -- 通用数据
-				for k, v in ipairs(data[MY_TM_SPECIAL_MAP.COMMON]) do
-					talk[#talk + 1] = v
-				end
-			end
-			if data[dwMapID] then -- 本地图数据
-				for k, v in ipairs(data[dwMapID]) do
+			for _, d in D.IterTable(data, LIB.GetMapID()) do
+				for k, v in ipairs(d) do
 					talk[#talk + 1] = v
 				end
 			end
@@ -1826,6 +1818,20 @@ function D.GetTable(szType, bTemp)
 	end
 end
 
+-- 迭代数据表子序列
+function D.IterTable(data, dwMapID)
+	local res = {}
+	if data then
+		if data[MY_TM_SPECIAL_MAP.COMMON] then
+			insert(res, data[MY_TM_SPECIAL_MAP.COMMON])
+		end
+		if data[dwMapID] then
+			insert(res, data[dwMapID])
+		end
+	end
+	return sipairs(unpack(res))
+end
+
 local function GetData(tab, szType, dwID, nLevel)
 	-- D.Log('LOOKUP TYPE:' .. szType .. ' ID:' .. dwID .. ' LEVEL:' .. nLevel)
 	if nLevel then
@@ -2208,6 +2214,7 @@ local settings = {
 				ParseCustomText     = ParseCustomText    ,
 				Enable              = D.Enable           ,
 				GetTable            = D.GetTable         ,
+				IterTable           = D.IterTable        ,
 				GetData             = D.GetData          ,
 				GetIntervalData     = D.GetIntervalData  ,
 				RemoveData          = D.RemoveData       ,

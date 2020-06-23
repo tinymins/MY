@@ -53,7 +53,6 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
 end
 --------------------------------------------------------------------------
 local TARGET = TARGET
-local MY_TM_SPECIAL_MAP   = MY_TeamMon.MY_TM_SPECIAL_MAP
 local INI_SHADOW          = PACKET_INFO.UICOMPONENT_ROOT .. 'Shadow.ini'
 local CIRCLE_MAX_RADIUS   = 30    -- 最大的半径
 local CIRCLE_LINE_ALPHA   = 165   -- 线和边框最大透明度
@@ -83,18 +82,14 @@ RegisterCustomData('MY_TeamMon_CC.bBorder')
 
 function D.UpdateRule()
 	CIRCLE_RULE[TARGET.NPC] = {}
-	local aData = MY_TeamMon and MY_TeamMon.GetTable and MY_TeamMon.GetTable('NPC')
-	if aData then
-		for _, data in spairs(aData[MY_TM_SPECIAL_MAP.COMMON], aData[LIB.GetMapID()]) do
+	CIRCLE_RULE[TARGET.DOODAD] = {}
+	if MY_TeamMon.GetTable and MY_TeamMon.IterTable then
+		for _, data in MY_TeamMon.IterTable(MY_TeamMon.GetTable('NPC'), LIB.GetMapID()) do
 			if not IsEmpty(data.aCircle) or data.bDrawLine then
 				CIRCLE_RULE[TARGET.NPC][data.dwID] = data
 			end
 		end
-	end
-	CIRCLE_RULE[TARGET.DOODAD] = {}
-	local aData = MY_TeamMon and MY_TeamMon.GetTable and MY_TeamMon.GetTable('DOODAD')
-	if aData then
-		for _, data in spairs(aData[MY_TM_SPECIAL_MAP.COMMON], aData[LIB.GetMapID()]) do
+		for _, data in MY_TeamMon.IterTable(MY_TeamMon.GetTable('DOODAD'), LIB.GetMapID()) do
 			if not IsEmpty(data.aCircle) or data.bDrawLine then
 				CIRCLE_RULE[TARGET.DOODAD][data.dwID] = data
 			end
