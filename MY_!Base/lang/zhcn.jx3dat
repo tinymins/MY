@@ -446,7 +446,6 @@ return {
 	['Stop'] = '结束',
 	['Refresh'] = '刷新',
 	['Reset'] = '重置',
-	['Recycle bin'] = '回收站',
 	['Team dungeon'] = '小队秘境',
 	['Raid dungeon'] = '团队秘境',
 	['Duo dungeon'] = '双人秘境',

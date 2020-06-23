@@ -68,8 +68,7 @@ local MY_TMUI_TALK_R        = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI_T
 local MY_TMUI_TYPE          = { 'BUFF', 'DEBUFF', 'CASTING', 'NPC', 'DOODAD', 'TALK', 'CHAT' }
 local MY_TMUI_SELECT_TYPE   = MY_TMUI_TYPE[1]
 local MY_TMUI_SELECT_MAP    = _L['All data']
-local MY_TMUI_CATEGORY_ALL  = g_tStrings.STR_GUILD_ALL .. '/' .. g_tStrings.OTHER
-local MY_TMUI_TREE_EXPAND   = { [MY_TMUI_CATEGORY_ALL] = true } -- 默认第一项展开
+local MY_TMUI_TREE_EXPAND   = { [_L['Common / uncategorized']] = true } -- 默认第一项展开
 local MY_TMUI_ITEM_PER_PAGE = 27
 local MY_TMUI_SEARCH
 local MY_TMUI_MAP_SEARCH
@@ -300,7 +299,7 @@ function D.ConflictCheck()
 								LIB.Sysmsg(
 									_L['MY_TeamMon'],
 									_L['Data conflict'] .. ' ' .. _L[MY_TMUI_SELECT_TYPE] .. ' '
-										.. D.GetMapName(k) .. ' :: ' .. vvv.dwID .. ' :: '
+										.. MY_TeamMon.GetMapName(k) .. ' :: ' .. vvv.dwID .. ' :: '
 										.. (vvv.szName or D.GetDataName(MY_TMUI_SELECT_TYPE, vvv)),
 									CONSTANT.MSG_THEME.ERROR)
 								break
@@ -375,10 +374,15 @@ function D.RedrawMapList(frame)
 	local data, aGroupMap = MY_TeamMon.GetTable(MY_TMUI_SELECT_TYPE), {}
 	-- 全部/其他
 	local tCommon = {
-		szGroup = MY_TMUI_CATEGORY_ALL,
+		szGroup = _L['Common / uncategorized'],
 		aMapInfo = {
 			_L['All data'], -- 全部
 			MY_TM_SPECIAL_MAP.COMMON, -- 通用
+			MY_TM_SPECIAL_MAP.CITY, -- 主城
+			MY_TM_SPECIAL_MAP.DUNGEON, -- 秘境
+			MY_TM_SPECIAL_MAP.TEAM_DUNGEON, -- 小队秘境
+			MY_TM_SPECIAL_MAP.RAID_DUNGEON, -- 团队秘境
+			MY_TM_SPECIAL_MAP.RECYCLE_BIN, -- 回收站
 		},
 	}
 	insert(aGroupMap, tCommon)
@@ -412,7 +416,7 @@ function D.RedrawMapList(frame)
 			if not IsTable(vv) then
 				v.aMapInfo[i] = {
 					dwID = vv,
-					szName = D.GetMapName(vv) or tostring(vv),
+					szName = MY_TeamMon.GetMapName(vv) or tostring(vv),
 				}
 			end
 		end
@@ -580,7 +584,9 @@ function D.OnItemRButtonClick()
 		insert(menu, { szOption = this:Lookup('Text_TreeItem'):GetText(), bDisable = true })
 		insert(menu, { bDevide = true })
 		insert(menu, { szOption = _L['Clear this map data'], rgb = { 255, 0, 0 }, fnAction = function()
-			D.RemoveData(dwMapID, nil, dwMapID and Get(LIB.GetMapInfo(dwMapID), 'szName', _L['This data']) or _L['All data'])
+			D.RemoveData(dwMapID, nil, dwMapID
+				and Get(MY_TeamMon.GetMapInfo(dwMapID), 'szName', _L['This data'])
+				or _L['All data'])
 		end })
 		PopupMenu(menu)
 	elseif szName == 'Handle_L' then
@@ -590,12 +596,12 @@ function D.OnItemRButtonClick()
 		if MY_TMUI_SELECT_TYPE ~= 'TALK' and MY_TMUI_SELECT_TYPE ~= 'CHAT' then -- 太长
 			insert(menu, { szOption = g_tStrings.CHAT_NAME .. g_tStrings.STR_COLON .. name, bDisable = true })
 		end
-		insert(menu, { szOption = _L['Class'] .. g_tStrings.STR_COLON .. (D.GetMapName(t.dwMapID) or t.dwMapID), bDisable = true })
+		insert(menu, { szOption = _L['Class'] .. g_tStrings.STR_COLON .. MY_TeamMon.GetMapName(t.dwMapID), bDisable = true })
 		insert(menu, { bDevide = true })
 		insert(menu, { szOption = g_tStrings.STR_FRIEND_MOVE_TO })
 		insert(menu[#menu], { szOption = _L['Manual input'], fnAction = function()
 			GetUserInput(g_tStrings.MSG_INPUT_MAP_NAME, function(szText)
-				local map = LIB.GetMapInfo(szText)
+				local map = MY_TeamMon.GetMapInfo(szText)
 				if map then
 					return D.MoveData(t.dwMapID, t.nIndex, map, IsCtrlKeyDown())
 				end
@@ -671,7 +677,7 @@ function D.OnItemMouseEnter()
 		D.UpdateMapNodeMouseState(this)
 	elseif szName == 'Handle_TreeItem' then
 		local info = IsNumber(this.dwMapID) and g_tTable.DungeonInfo:Search(this.dwMapID)
-		local szXml = GetFormatText((D.GetMapName(this.dwMapID) or this.dwMapID) ..' (' .. this.nCount ..  ')\n', 47, 255, 255, 0)
+		local szXml = GetFormatText(MY_TeamMon.GetMapName(this.dwMapID) ..' (' .. this.nCount ..  ')\n', 47, 255, 255, 0)
 		if info and LIB.TrimString(info.szBossInfo) ~= '' then
 			local tBoss = LIB.SplitString(info.szBossInfo, ' ')
 			for k, v in ipairs(tBoss or {}) do
@@ -834,9 +840,9 @@ function D.OutputTip(szType, data, rect)
 	elseif szType == 'DOODAD' then
 		LIB.OutputDoodadTemplateTip(rect, data.dwID)
 	elseif szType == 'TALK' then
-		OutputTip(GetFormatText((data.szTarget or _L['Warning box']) .. '\t', 41, 255, 255, 0) .. GetFormatText((D.GetMapName(data.dwMapID) or data.dwMapID) .. '\n', 41, 255, 255, 255) .. GetFormatText(data.szContent, 41, 255, 255, 255), 300, rect)
+		OutputTip(GetFormatText((data.szTarget or _L['Warning box']) .. '\t', 41, 255, 255, 0) .. GetFormatText(MY_TeamMon.GetMapName(data.dwMapID) .. '\n', 41, 255, 255, 255) .. GetFormatText(data.szContent, 41, 255, 255, 255), 300, rect)
 	elseif szType == 'CHAT' then
-		OutputTip(GetFormatText(_L['CHAT'] .. '\t', 41, 255, 255, 0) .. GetFormatText((D.GetMapName(data.dwMapID) or data.dwMapID) .. '\n', 41, 255, 255, 255) .. GetFormatText(data.szContent, 41, 255, 255, 255), 300, rect)
+		OutputTip(GetFormatText(_L['CHAT'] .. '\t', 41, 255, 255, 0) .. GetFormatText(MY_TeamMon.GetMapName(data.dwMapID) .. '\n', 41, 255, 255, 255) .. GetFormatText(data.szContent, 41, 255, 255, 255), 300, rect)
 	end
 end
 
@@ -1117,7 +1123,7 @@ function D.CheckSearch(szType, data)
 			or (data.szNote   and tostring(data.szNote):find(MY_TMUI_SEARCH, nil, true))
 			or (data.key      and tostring(data.key):find(MY_TMUI_SEARCH, nil, true)) -- 画圈圈
 			or (data.dwID     and tostring(data.dwID):find(MY_TMUI_SEARCH, nil, true))
-			or (data.dwMapID  and D.GetMapName(data.dwMapID):find(MY_TMUI_SEARCH, nil, true))
+			or (data.dwMapID  and MY_TeamMon.GetMapName(data.dwMapID):find(MY_TMUI_SEARCH, nil, true))
 			or (data.szTarget and tostring(data.szTarget):find(MY_TMUI_SEARCH, nil, true))
 		then
 			return true
@@ -1246,17 +1252,6 @@ function D.SetChatItemAction(h)
 		h:Lookup('Text_Content'):SetFontColor(unpack(dat.col))
 	end
 	h.bDraw = true
-end
-
-function D.GetMapName(dwMapID)
-	if dwMapID == _L['All data'] then
-		return dwMapID
-	end
-	if dwMapID == MY_TM_SPECIAL_MAP.RECYCLE_BIN then
-		return _L['Recycle bin']
-	end
-	local map = LIB.GetMapInfo(dwMapID)
-	return map and map.szName
 end
 
 -- 更新监控数据
@@ -1391,7 +1386,9 @@ function D.OpenAddPanel(szType, data)
 	end)
 	nX, nY = ui:Append('WndEditBox', {
 		name = 'map', x = 100, y = nY + 15, w = 200, h = 30,
-		text = MY_TMUI_SELECT_MAP ~= _L['All data'] and D.GetMapName(MY_TMUI_SELECT_MAP) or D.GetMapName(data.dwMapID),
+		text = MY_TMUI_SELECT_MAP ~= _L['All data']
+			and MY_TeamMon.GetMapName(MY_TMUI_SELECT_MAP)
+			or MY_TeamMon.GetMapName(data.dwMapID),
 		autocomplete = {{'option', 'source', LIB.GetMapNameList()}},
 		onchange = function()
 			local el = this
@@ -1399,7 +1396,7 @@ function D.OpenAddPanel(szType, data)
 			if ui:Text() == '' then
 				local menu = {}
 				D.InsertDungeonMenu(menu, function(dwMapID)
-					ui:Text(D.GetMapName(dwMapID))
+					ui:Text(MY_TeamMon.GetMapName(dwMapID))
 				end)
 				local nX, nY = this:GetAbsPos()
 				local nW, nH = this:GetSize()
@@ -1418,7 +1415,7 @@ function D.OpenAddPanel(szType, data)
 		buttonstyle = 3,
 		onclick = function()
 			local txt = ui:Children('#map'):Text()
-			local map = LIB.GetMapInfo(txt)
+			local map = MY_TeamMon.GetMapInfo(txt)
 			if not map then
 				return LIB.Alert(_L['The map does not exist'])
 			end

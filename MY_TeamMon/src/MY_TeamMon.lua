@@ -88,8 +88,30 @@ local MY_TM_TYPE = {
 local MY_TM_SCRUTINY_TYPE = { SELF = 1, TEAM = 2, ENEMY = 3, TARGET = 4 }
 local MY_TM_SPECIAL_MAP = {
 	COMMON = -1, -- 通用
+	CITY = -2, -- 主城
+	DUNGEON = -3, -- 秘境
+	TEAM_DUNGEON = -4, -- 小队秘境
+	RAID_DUNGEON = -5, -- 团队秘境
 	RECYCLE_BIN = -9, -- 回收站
 }
+local MY_TM_SPECIAL_MAP_NAME = {
+	[MY_TM_SPECIAL_MAP.COMMON] = _L['Common data'],
+	[MY_TM_SPECIAL_MAP.CITY] = _L['City data'],
+	[MY_TM_SPECIAL_MAP.DUNGEON] = _L['Dungeon data'],
+	[MY_TM_SPECIAL_MAP.TEAM_DUNGEON] = _L['Team dungeon data'],
+	[MY_TM_SPECIAL_MAP.RAID_DUNGEON] = _L['Raid dungeon data'],
+	[MY_TM_SPECIAL_MAP.RECYCLE_BIN] = _L['Recycle bin data'],
+}
+local MY_TM_SPECIAL_MAP_INFO = {}
+for _, dwMapID in pairs(MY_TM_SPECIAL_MAP) do
+	local map = LIB.SetmetaReadonly({
+		dwID = dwMapID,
+		dwMapID = dwMapID,
+		szName = MY_TM_SPECIAL_MAP_NAME[dwMapID],
+	})
+	MY_TM_SPECIAL_MAP_INFO[map.szName] = map
+	MY_TM_SPECIAL_MAP_INFO[map.dwMapID] = map
+end
 -- 核心优化变量
 local MY_TM_CORE_PLAYERID = 0
 local MY_TM_CORE_NAME     = 0
@@ -1825,11 +1847,38 @@ function D.IterTable(data, dwMapID)
 		if data[MY_TM_SPECIAL_MAP.COMMON] then
 			insert(res, data[MY_TM_SPECIAL_MAP.COMMON])
 		end
+		if LIB.IsDungeonMap(dwMapID) then
+			insert(res, data[MY_TM_SPECIAL_MAP.DUNGEON])
+		end
+		if LIB.IsDungeonMap(dwMapID, true) then
+			insert(res, data[MY_TM_SPECIAL_MAP.RAID_DUNGEON])
+		end
+		if LIB.IsDungeonMap(dwMapID, false) then
+			insert(res, data[MY_TM_SPECIAL_MAP.TEAM_DUNGEON])
+		end
+		if LIB.IsCityMap(dwMapID) then
+			insert(res, data[MY_TM_SPECIAL_MAP.TEAM_DUNGEON])
+		end
 		if data[dwMapID] then
 			insert(res, data[dwMapID])
 		end
 	end
 	return sipairs(unpack(res))
+end
+
+function D.GetMapName(dwMapID)
+	if dwMapID == _L['All data'] then
+		return dwMapID
+	end
+	local map = D.GetMapInfo(dwMapID)
+	if map then
+		return map.szName
+	end
+	return '#' .. dwMapID
+end
+
+function D.GetMapInfo(id)
+	return MY_TM_SPECIAL_MAP_INFO[id] or LIB.GetMapInfo(id)
 end
 
 local function GetData(tab, szType, dwID, nLevel)
@@ -2215,6 +2264,8 @@ local settings = {
 				Enable              = D.Enable           ,
 				GetTable            = D.GetTable         ,
 				IterTable           = D.IterTable        ,
+				GetMapName          = D.GetMapName       ,
+				GetMapInfo          = D.GetMapInfo       ,
 				GetData             = D.GetData          ,
 				GetIntervalData     = D.GetIntervalData  ,
 				RemoveData          = D.RemoveData       ,
