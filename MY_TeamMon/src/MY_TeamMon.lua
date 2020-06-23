@@ -92,6 +92,7 @@ local MY_TM_SPECIAL_MAP = {
 	DUNGEON = -3, -- 秘境
 	TEAM_DUNGEON = -4, -- 小队秘境
 	RAID_DUNGEON = -5, -- 团队秘境
+	STARVE = -6, -- 浪客行
 	RECYCLE_BIN = -9, -- 回收站
 }
 local MY_TM_SPECIAL_MAP_NAME = {
@@ -100,6 +101,7 @@ local MY_TM_SPECIAL_MAP_NAME = {
 	[MY_TM_SPECIAL_MAP.DUNGEON] = _L['Dungeon data'],
 	[MY_TM_SPECIAL_MAP.TEAM_DUNGEON] = _L['Team dungeon data'],
 	[MY_TM_SPECIAL_MAP.RAID_DUNGEON] = _L['Raid dungeon data'],
+	[MY_TM_SPECIAL_MAP.STARVE] = _L['Starve data'],
 	[MY_TM_SPECIAL_MAP.RECYCLE_BIN] = _L['Recycle bin data'],
 }
 local MY_TM_SPECIAL_MAP_INFO = {}
@@ -1858,6 +1860,9 @@ function D.IterTable(data, dwMapID)
 		end
 		if LIB.IsCityMap(dwMapID) then
 			insert(res, data[MY_TM_SPECIAL_MAP.TEAM_DUNGEON])
+		end
+		if LIB.IsStarveMap(dwMapID) then
+			insert(res, data[MY_TM_SPECIAL_MAP.STARVE])
 		end
 		if data[dwMapID] then
 			insert(res, data[dwMapID])

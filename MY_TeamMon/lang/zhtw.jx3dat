@@ -30,6 +30,7 @@ return {
 	['Dungeon data'] = '秘境的數據',
 	['Team dungeon data'] = '小隊秘境的數據',
 	['Raid dungeon data'] = '團隊秘境的數據',
+	['Starve data'] = '浪客行的數據',
 	['Recycle bin'] = '回收站',
 	['Recycle bin data'] = '回收站的數據',
 	['['] = '【',
