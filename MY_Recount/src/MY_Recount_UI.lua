@@ -80,8 +80,7 @@ local RANK_FRAME  = {
 	169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182,
 	183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193
 }
-local FORCE_BAR_CSS = {
-	{}, -- GLOBAL
+local FORCE_BAR_CSS = LIB.LoadLUAData({'config/recount/barcss.jx3dat', PATH_TYPE.GLOBAL}, { passphrase = false }) or {
 	{
 		[-1                  ] = { r = 255, g = 255, b = 255, a = 150 }, -- NPC
 		[CONSTANT.FORCE_TYPE.JIANG_HU ] = { r = 255, g = 255, b = 255, a = 255 }, -- ½­ºþ
@@ -155,6 +154,7 @@ local FORCE_BAR_CSS = {
 		[CONSTANT.FORCE_TYPE.PENG_LAI ] = { image = 'ui/Image/Common/Money.UITex', frame = 42  }, -- ÅîÀ³
 	},
 }
+insert(FORCE_BAR_CSS, {}) -- GLOBAL
 
 local D = {}
 local O = {
