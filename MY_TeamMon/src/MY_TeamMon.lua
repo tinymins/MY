@@ -2283,6 +2283,7 @@ local settings = {
 				Exchange            = D.Exchange         ,
 				MY_TM_META_ROOT     = MY_TM_META_ROOT    ,
 				MY_TM_DATA_ROOT     = MY_TM_DATA_ROOT    ,
+				MY_TM_SPECIAL_MAP   = MY_TM_SPECIAL_MAP  ,
 				MY_TM_TYPE          = MY_TM_TYPE         ,
 				MY_TM_SCRUTINY_TYPE = MY_TM_SCRUTINY_TYPE,
 			},
