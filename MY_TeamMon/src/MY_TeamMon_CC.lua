@@ -84,12 +84,12 @@ function D.UpdateRule()
 	CIRCLE_RULE[TARGET.NPC] = {}
 	CIRCLE_RULE[TARGET.DOODAD] = {}
 	if MY_TeamMon.GetTable and MY_TeamMon.IterTable then
-		for _, data in MY_TeamMon.IterTable(MY_TeamMon.GetTable('NPC'), LIB.GetMapID()) do
+		for _, data in MY_TeamMon.IterTable(MY_TeamMon.GetTable('NPC'), LIB.GetMapID(), true) do
 			if not IsEmpty(data.aCircle) or data.bDrawLine then
 				CIRCLE_RULE[TARGET.NPC][data.dwID] = data
 			end
 		end
-		for _, data in MY_TeamMon.IterTable(MY_TeamMon.GetTable('DOODAD'), LIB.GetMapID()) do
+		for _, data in MY_TeamMon.IterTable(MY_TeamMon.GetTable('DOODAD'), LIB.GetMapID(), true) do
 			if not IsEmpty(data.aCircle) or data.bDrawLine then
 				CIRCLE_RULE[TARGET.DOODAD][data.dwID] = data
 			end

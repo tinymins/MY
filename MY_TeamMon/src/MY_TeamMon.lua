@@ -667,7 +667,7 @@ function D.CreateData(szEvent)
 	pcall(Raid_MonitorBuffs) -- clear
 	-- 重建MAP
 	for _, v in ipairs({ 'BUFF', 'DEBUFF', 'CASTING', 'NPC', 'DOODAD' }) do
-		for _, d in D.IterTable(MY_TeamMon.GetTable(v), dwMapID) do
+		for _, d in D.IterTable(MY_TeamMon.GetTable(v), dwMapID, false) do
 			CreateCache(v, d)
 		end
 	end
@@ -1843,7 +1843,7 @@ function D.GetTable(szType, bTemp)
 end
 
 -- 迭代数据表子序列
-function D.IterTable(data, dwMapID)
+function D.IterTable(data, dwMapID, bIterItem)
 	local res = {}
 	if data then
 		if data[MY_TM_SPECIAL_MAP.COMMON] then
@@ -1859,7 +1859,7 @@ function D.IterTable(data, dwMapID)
 			insert(res, data[MY_TM_SPECIAL_MAP.TEAM_DUNGEON])
 		end
 		if LIB.IsCityMap(dwMapID) then
-			insert(res, data[MY_TM_SPECIAL_MAP.TEAM_DUNGEON])
+			insert(res, data[MY_TM_SPECIAL_MAP.CITY])
 		end
 		if LIB.IsStarveMap(dwMapID) then
 			insert(res, data[MY_TM_SPECIAL_MAP.STARVE])
@@ -1868,7 +1868,10 @@ function D.IterTable(data, dwMapID)
 			insert(res, data[dwMapID])
 		end
 	end
-	return sipairs(unpack(res))
+	if bIterItem then
+		return sipairs_r(unpack(res))
+	end
+	return ipairs_r(res)
 end
 
 function D.GetMapName(dwMapID)
