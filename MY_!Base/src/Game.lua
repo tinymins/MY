@@ -3268,6 +3268,19 @@ function LIB.IsInDungeon(bRaid)
 	return me and LIB.IsDungeonMap(me.GetMapID(), bRaid)
 end
 
+-- 判断一个地图是不是主城
+-- (bool) LIB.IsCityMap(dwMapID)
+function LIB.IsCityMap(dwMapID)
+	return select(2, GetMapParams(dwMapID)) == MAP_TYPE.CITY
+end
+
+-- 判断当前地图是不是主城
+-- (bool) LIB.IsInCity()
+function LIB.IsInCity()
+	local me = GetClientPlayer()
+	return me and LIB.IsCityMap(me.GetMapID())
+end
+
 -- 判断地图是不是PUBG
 -- (bool) LIB.IsPubgMap(dwMapID)
 do
