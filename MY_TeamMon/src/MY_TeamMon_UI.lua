@@ -382,6 +382,7 @@ function D.RedrawMapList(frame)
 			MY_TM_SPECIAL_MAP.DUNGEON, -- 秘境
 			MY_TM_SPECIAL_MAP.TEAM_DUNGEON, -- 小队秘境
 			MY_TM_SPECIAL_MAP.RAID_DUNGEON, -- 团队秘境
+			MY_TM_SPECIAL_MAP.STARVE, -- 浪客行
 		},
 	}
 	insert(aGroupMap, tCommon)
