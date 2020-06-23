@@ -371,7 +371,7 @@ return {
     ['Macro update failed...'] = '同步云端宏失败...',
     ['ERR: Info content is illegal!'] = '错误：内容解析失败！',
     ['Macro update started, please keep panel opened and wait.'] = '开始更新宏，请保持当前界面开启、不要切换宏并等待结果。',
-    ['Macro update succeed, please click save button.'] = '宏数据更新成功，清点击宏界面的“确定”或“应用”按钮使该宏生效。',
+    ['Macro update succeed, please click save button.'] = '宏数据更新成功，请点击宏界面的“确定”或“应用”按钮使该宏生效。',
     ['Top yun macro'] = '云端宏排名',
     ['Show yun macro buttons on macro panel.'] = '在宏界面显示云端宏按钮',
     ['Got it'] = '好的',
