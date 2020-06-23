@@ -210,25 +210,39 @@ LIB.HookChatPanel('AFTER.MY_FARBNAMEN', function(h, nIndex)
 		end
 	end
 end)
+local OPT_DEFAULT = {
+	bTip = true,
+	bColor = true,
+}
 -- 开放的名称染色接口
 -- (userdata) MY_Farbnamen.Render(userdata namelink)    处理namelink染色 namelink是一个姓名Text元素
 -- (string) MY_Farbnamen.Render(string szMsg)           格式化szMsg 处理里面的名字
-function MY_Farbnamen.Render(szMsg)
+function MY_Farbnamen.Render(szMsg, tOption)
+	local bOption = IsTable(tOption)
+	if bOption then
+		setmetatable(tOption, { __index = OPT_DEFAULT })
+	else
+		tOption = OPT_DEFAULT
+	end
 	if type(szMsg) == 'string' then
 		-- <text>text='[就是个阵眼]' font=10 r=255 g=255 b=255  name='namelink_4662931' eventid=515</text><text>text='说：' font=10 r=255 g=255 b=255 </text><text>text='[茗伊]' font=10 r=255 g=255 b=255  name='namelink_4662931' eventid=771</text><text>text='\n' font=10 r=255 g=255 b=255 </text>
 		local xml = LIB.Xml.Decode(szMsg)
 		if xml then
 			for _, ele in ipairs(xml) do
 				if ele[''].name and ele[''].name:sub(1, 9) == 'namelink_' then
-					local szName = gsub(ele[''].text, '[%[%]]', '')
-					local tInfo = MY_Farbnamen.GetAusName(szName)
-					if tInfo then
-						ele[''].r = tInfo.rgb[1]
-						ele[''].g = tInfo.rgb[2]
-						ele[''].b = tInfo.rgb[3]
+					if tOption.color then
+						local szName = gsub(ele[''].text, '[%[%]]', '')
+						local tInfo = MY_Farbnamen.GetAusName(szName)
+						if tInfo then
+							ele[''].r = tInfo.rgb[1]
+							ele[''].g = tInfo.rgb[2]
+							ele[''].b = tInfo.rgb[3]
+						end
 					end
-					ele[''].eventid = 82803
-					ele[''].script = (ele[''].script or '') .. '\nthis.OnItemMouseEnter=function() MY_Farbnamen.ShowTip(this) end\nthis.OnItemMouseLeave=function() HideTip() end'
+					if tOption.hover then
+						ele[''].eventid = 82803
+						ele[''].script = (ele[''].script or '') .. '\nthis.OnItemMouseEnter=function() MY_Farbnamen.ShowTip(this) end\nthis.OnItemMouseLeave=function() HideTip() end'
+					end
 				end
 			end
 			szMsg = LIB.Xml.Encode(xml)
@@ -249,12 +263,20 @@ function MY_Farbnamen.Render(szMsg)
 		-- end)
 	elseif type(szMsg) == 'table' and type(szMsg.GetName) == 'function' and szMsg:GetName():sub(1, 8) == 'namelink' then
 		local namelink = szMsg
-		local ui = UI(namelink):Hover(MY_Farbnamen.ShowTip, HideTip, true)
-		local szName = gsub(namelink:GetText(), '[%[%]]', '')
-		local tInfo = MY_Farbnamen.GetAusName(szName)
-		if tInfo then
-			ui:Color(tInfo.rgb)
+		local ui = UI(namelink)
+		if tOption.color then
+			local szName = gsub(namelink:GetText(), '[%[%]]', '')
+			local tInfo = MY_Farbnamen.GetAusName(szName)
+			if tInfo then
+				ui:Color(tInfo.rgb)
+			end
 		end
+		if tOption.hover then
+			ui:Hover(MY_Farbnamen.ShowTip, HideTip, true)
+		end
+	end
+	if bOption then
+		setmetatable(tOption, nil)
 	end
 	return szMsg
 end
