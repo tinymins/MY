@@ -3253,7 +3253,8 @@ end
 -- 判断一个地图是不是主城
 -- (bool) LIB.IsCityMap(dwMapID)
 function LIB.IsCityMap(dwMapID)
-	return select(2, GetMapParams(dwMapID)) == MAP_TYPE.CITY
+	local tType = Table_GetMapType(dwMapID)
+	return tType and tType.CITY and true or false
 end
 
 -- 判断当前地图是不是主城
