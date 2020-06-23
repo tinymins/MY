@@ -86,9 +86,10 @@ function D.Apply()
 						local nPos1, nPos2 = szText:find(szName)
 						h:InsertItemFromString(i, true, GetFormatText(szText:sub(nPos2 + 1), hItem:GetFontScheme()))
 						h:InsertItemFromString(i, true, GetFormatText('[' .. szText:sub(nPos1, nPos2) .. ']', nil, nil, nil, nil, nil, nil, 'namelink'))
-						LIB.RenderChatLink(h:Lookup(i + 1))
+						local txtName = h:Lookup(i + 1)
+						LIB.RenderChatLink(txtName)
 						if MY_Farbnamen and MY_Farbnamen.Render then
-							MY_Farbnamen.Render(h:Lookup(i + 1))
+							MY_Farbnamen.Render(txtName, { bColor = false })
 						end
 						hItem:SetText(szText:sub(1, nPos1 - 1))
 						hItem:SetFontColor(0, 0, 0)
