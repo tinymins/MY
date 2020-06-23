@@ -59,6 +59,7 @@ local FilterCustomText      = MY_TeamMon.FilterCustomText
 local MY_TM_TYPE            = MY_TeamMon.MY_TM_TYPE
 local MY_TM_SCRUTINY_TYPE   = MY_TeamMon.MY_TM_SCRUTINY_TYPE
 local MY_TM_DATA_ROOT       = MY_TeamMon.MY_TM_DATA_ROOT
+local MY_TM_SPECIAL_MAP     = MY_TeamMon.MY_TM_SPECIAL_MAP
 local MY_TMUI_INIFILE       = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI.ini'
 local MY_TMUI_ITEM_L        = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI_ITEM_L.ini'
 local MY_TMUI_TALK_L        = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI_TALK_L.ini'
@@ -285,7 +286,7 @@ function D.ConflictCheck()
 		local data = MY_TeamMon.GetTable(MY_TMUI_SELECT_TYPE)
 		local bMsg = false
 		for k, v in pairs(data) do
-			if k ~= -9 then
+			if k ~= MY_TM_SPECIAL_MAP.RECYCLE_BIN then
 				local tTemp = {}
 				for kk, vv in ipairs(v) do
 					tTemp[vv.dwID] = tTemp[vv.dwID] or {}
@@ -377,7 +378,7 @@ function D.RedrawMapList(frame)
 		szGroup = MY_TMUI_CATEGORY_ALL,
 		aMapInfo = {
 			_L['All data'], -- 全部
-			-1, -- 通用
+			MY_TM_SPECIAL_MAP.COMMON, -- 通用
 		},
 	}
 	insert(aGroupMap, tCommon)
@@ -388,7 +389,7 @@ function D.RedrawMapList(frame)
 	-- 回收站
 	insert(aGroupMap, {
 		szGroup = _L['Recycle bin'],
-		aMapInfo = { -9 },
+		aMapInfo = { MY_TM_SPECIAL_MAP.RECYCLE_BIN },
 	})
 	-- 未知的
 	local tMapExist = {}
@@ -843,11 +844,15 @@ function D.InsertDungeonMenu(menu, fnAction)
 	local dwMapID = LIB.GetMapID()
 	local aDungeon =  LIB.GetTypeGroupMap()
 	local data = MY_TeamMon.GetTable(MY_TMUI_SELECT_TYPE)
-	insert(menu, { szOption = g_tStrings.CHANNEL_COMMON .. ' (' .. (data[-1] and #data[-1] or 0) .. ')', fnAction = function()
-		if fnAction then
-			fnAction(-1)
-		end
-	end })
+	insert(menu, {
+		szOption = g_tStrings.CHANNEL_COMMON
+			.. ' (' .. (data[MY_TM_SPECIAL_MAP.COMMON] and #data[MY_TM_SPECIAL_MAP.COMMON] or 0) .. ')',
+		fnAction = function()
+			if fnAction then
+				fnAction(MY_TM_SPECIAL_MAP.COMMON)
+			end
+		end,
+	})
 	insert(menu, { bDevide = true })
 	for k, v in ipairs(aDungeon) do
 		local tMenu = { szOption = v.szGroup }
@@ -1247,7 +1252,7 @@ function D.GetMapName(dwMapID)
 	if dwMapID == _L['All data'] then
 		return dwMapID
 	end
-	if dwMapID == -9 then
+	if dwMapID == MY_TM_SPECIAL_MAP.RECYCLE_BIN then
 		return _L['Recycle bin']
 	end
 	local map = LIB.GetMapInfo(dwMapID)

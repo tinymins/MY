@@ -86,6 +86,10 @@ local MY_TM_TYPE = {
 	CHAT_MONITOR    = 20,
 }
 local MY_TM_SCRUTINY_TYPE = { SELF = 1, TEAM = 2, ENEMY = 3, TARGET = 4 }
+local MY_TM_SPECIAL_MAP = {
+	COMMON = -1, -- 通用
+	RECYCLE_BIN = -9, -- 回收站
+}
 -- 核心优化变量
 local MY_TM_CORE_PLAYERID = 0
 local MY_TM_CORE_NAME     = 0
@@ -602,7 +606,7 @@ function D.CreateData(szEvent)
 			if index == _L['All data'] then
 				local t = {}
 				for k, v in pairs(vTable) do
-					if k ~= -9 then
+					if k ~= MY_TM_SPECIAL_MAP.RECYCLE_BIN then
 						for kk, vv in ipairs(v) do
 							t[#t +1] = vv
 						end
@@ -642,8 +646,8 @@ function D.CreateData(szEvent)
 		if D.FILE[v][dwMapID] then -- 本地图数据
 			CreateCache(v, D.FILE[v][dwMapID])
 		end
-		if D.FILE[v][-1] then -- 通用数据
-			CreateCache(v, D.FILE[v][-1])
+		if D.FILE[v][MY_TM_SPECIAL_MAP.COMMON] then -- 通用数据
+			CreateCache(v, D.FILE[v][MY_TM_SPECIAL_MAP.COMMON])
 		end
 	end
 	-- 单独重建TALK数据
@@ -656,8 +660,8 @@ function D.CreateData(szEvent)
 				OTHER = {},
 			}
 			local cache = CACHE.MAP[vType]
-			if data[-1] then -- 通用数据
-				for k, v in ipairs(data[-1]) do
+			if data[MY_TM_SPECIAL_MAP.COMMON] then -- 通用数据
+				for k, v in ipairs(data[MY_TM_SPECIAL_MAP.COMMON]) do
 					talk[#talk + 1] = v
 				end
 			end
@@ -2042,7 +2046,7 @@ end
 function D.RemoveData(szType, dwMapID, nIndex)
 	if nIndex then
 		if D.FILE[szType][dwMapID] and D.FILE[szType][dwMapID][nIndex] then
-			if dwMapID == -9 then
+			if dwMapID == MY_TM_SPECIAL_MAP.RECYCLE_BIN then
 				remove(D.FILE[szType][dwMapID], nIndex)
 				if #D.FILE[szType][dwMapID] == 0 then
 					D.FILE[szType][dwMapID] = nil
@@ -2051,7 +2055,7 @@ function D.RemoveData(szType, dwMapID, nIndex)
 				FireUIEvent('MY_TM_DATA_RELOAD', { [szType] = true })
 				FireUIEvent('MY_TMUI_DATA_RELOAD')
 			else
-				D.MoveData(szType, dwMapID, nIndex, -9)
+				D.MoveData(szType, dwMapID, nIndex, MY_TM_SPECIAL_MAP.RECYCLE_BIN)
 			end
 		end
 	elseif dwMapID then
@@ -2074,7 +2078,7 @@ end
 
 function D.CheckSameData(szType, dwMapID, dwID, nLevel)
 	if D.FILE[szType][dwMapID] then
-		if dwMapID ~= -9 then
+		if dwMapID ~= MY_TM_SPECIAL_MAP.RECYCLE_BIN then
 			for k, v in ipairs(D.FILE[szType][dwMapID]) do
 				if type(dwID) == 'string' then
 					if dwID == v.szContent and nLevel == v.szTarget then
