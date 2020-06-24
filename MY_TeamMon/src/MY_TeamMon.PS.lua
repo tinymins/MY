@@ -218,13 +218,24 @@ function PS.OnPanelActive(wnd)
 		x = nX + 5, y = nY + 15, text = _L['Import data'],
 		buttonstyle = 2,
 		menu = function()
-			local szLang = select(3, GetVersion())
 			local menu = {}
-			insert(menu, { szOption = _L['Import data (local)'], fnAction = function() MY_TeamMon_UI.OpenImportPanel() end }) -- 有传参 不要改
+			insert(menu, {
+				szOption = _L['Import data (local)'],
+				fnAction = function() MY_TeamMon_UI.OpenImportPanel() end,
+			})
 			local szLang = select(3, GetVersion())
 			if szLang == 'zhcn' or szLang == 'zhtw' then
-				insert(menu, { szOption = _L['Import data (web)'], fnAction = MY_TeamMon_RR.OpenPanel })
+				insert(menu, {
+					szOption = _L['Import data (web)'],
+					fnAction = function() MY_TeamMon_RR.OpenPanel() end,
+				})
 			end
+			insert(menu, {
+				szOption = _L['Clear data'],
+				fnAction = function()
+					MY_TeamMon.RemoveData(nil, nil, _L['All data'])
+				end,
+			})
 			return menu
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')

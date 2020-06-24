@@ -182,6 +182,12 @@ function D.OnFrameCreate()
 			if szLang == 'zhcn' or szLang == 'zhtw' then
 				insert(menu, { szOption = _L['Import data (web)'], fnAction = MY_TeamMon_RR.OpenPanel })
 			end
+			insert(menu, {
+				szOption = _L['Clear data'],
+				fnAction = function()
+					MY_TeamMon.RemoveData(nil, nil, _L['All data'])
+				end,
+			})
 			insert(menu, { szOption = _L['Export data'], fnAction = D.OpenExportPanel })
 			insert(menu, { szOption = _L['Open data folder'], fnAction = function()
 				local szRoot = LIB.GetAbsolutePath(MY_TM_DATA_ROOT):gsub('/', '\\')
