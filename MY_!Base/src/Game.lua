@@ -1656,6 +1656,47 @@ LIB.RegisterEvent('DOODAD_ENTER_SCENE', function() NEARBY_DOODAD[arg0] = GetDood
 LIB.RegisterEvent('DOODAD_LEAVE_SCENE', function() NEARBY_DOODAD[arg0] = nil end)
 end
 
+do local CACHE = {}
+function LIB.GetFurnitureInfo(szKey, oVal)
+	if szKey == 'nRepresentID' then
+		szKey = 'dwModelID'
+	end
+	if not CACHE[szKey] then
+		CACHE[szKey] = {}
+		for i = 2, g_tTable.HomelandFurnitureInfo:GetRowCount() do
+			local tLine = g_tTable.HomelandFurnitureInfo:GetRow(i)
+			if tLine and tLine[szKey] then
+				CACHE[szKey][tLine[szKey]] = tLine
+			end
+		end
+	end
+	return Clone(CACHE[szKey][oVal])
+end
+end
+
+local Homeland_GetNearbyObjectsInfo = _G.Homeland_GetNearbyObjectsInfo or GetInsideEnv().Homeland_GetNearbyObjectsInfo
+function LIB.GetNearFurniture(nDis)
+	if not Homeland_GetNearbyObjectsInfo then
+		return CONSTANT.EMPTY_TABLE
+	end
+	if not nDis then
+		nDis = 6
+	end
+	local aFurniture, tID = {}, {}
+	for _, p in ipairs(Homeland_GetNearbyObjectsInfo(nDis)) do
+		local dwID = LIB.NumberBitShl(p.BaseId, 32, 64) + p.InstID
+		local info = not tID[dwID] and LIB.GetFurnitureInfo('nRepresentID', p.RepresentID)
+		if info then
+			info.dwID = dwID
+			info.nInstID = p.InstID
+			info.nBaseID = p.BaseId
+			insert(aFurniture, info)
+			tID[dwID] = true
+		end
+	end
+	return aFurniture
+end
+
 -- 打开一个拾取交互物件（当前帧重复调用仅打开一次防止庖丁）
 function LIB.OpenDoodad(me, doodad)
 	LIB.Throttle(PACKET_INFO.NAME_SPACE .. '#OpenDoodad' .. doodad.dwID, 375, function()
