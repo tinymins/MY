@@ -81,10 +81,10 @@ local function CallWithThis(context, fn, ...)
 end
 
 do
-local MY_RRWP_FREE = {}
-local MY_RRWC_FREE = {}
-local MY_CALL_AJAX = {}
-local MY_AJAX_TAG = 'MY_AJAX#'
+local RRWP_FREE = {}
+local RRWC_FREE = {}
+local CALL_AJAX = {}
+local AJAX_TAG = PACKET_INFO.NAME_SPACE .. '_AJAX#'
 local l_ajaxsettingsmeta = {
 	__index = {
 		method = 'get',
@@ -130,11 +130,11 @@ local function CreateWebPageFrame()
 	local szRequestID, hFrame
 	repeat
 		szRequestID = ('%X%X'):format(GetTickCount(), floor(random() * 0xEFFF) + 0x1000)
-	until not Station.Lookup('Lowest/MYRRWP_' .. szRequestID)
+	until not Station.Lookup('Lowest/' .. PACKET_INFO.NAME_SPACE .. 'RRWP_' .. szRequestID)
 	--[[#DEBUG BEGIN]]
 	LIB.Debug('CreateWebPageFrame: ' .. szRequestID, DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
-	hFrame = Wnd.OpenWindow(PACKET_INFO.UICOMPONENT_ROOT .. 'WndWebPage.ini', 'MYRRWP_' .. szRequestID)
+	hFrame = Wnd.OpenWindow(PACKET_INFO.UICOMPONENT_ROOT .. 'WndWebPage.ini', PACKET_INFO.NAME_SPACE .. 'RRWP_' .. szRequestID)
 	hFrame:Hide()
 	return szRequestID, hFrame
 end
@@ -173,7 +173,7 @@ function LIB.Ajax(settings)
 		end
 		url, data = url .. serialize(data), nil
 	end
-	assert(method == 'post' or method == 'get' or method == 'put' or method == 'delete', '[MY_AJAX] Unknown http request type: ' .. method)
+	assert(method == 'post' or method == 'get' or method == 'put' or method == 'delete', '[' .. PACKET_INFO.NAME_SPACE .. '_AJAX] Unknown http request type: ' .. method)
 
 	local driver = settings.driver
 	if driver == 'auto' then
@@ -274,18 +274,18 @@ function LIB.Ajax(settings)
 		curl:SetConnTimeout(settings.timeout)
 		curl:Perform()
 	elseif driver == 'webcef' then
-		assert(method == 'get', '[MY_AJAX] Webcef only support get method, got ' .. method)
+		assert(method == 'get', '[' .. PACKET_INFO.NAME_SPACE .. '_AJAX] Webcef only support get method, got ' .. method)
 		local RequestID, hFrame
-		local nFreeWebPages = #MY_RRWC_FREE
+		local nFreeWebPages = #RRWC_FREE
 		if nFreeWebPages > 0 then
-			RequestID = MY_RRWC_FREE[nFreeWebPages]
-			hFrame = Station.Lookup('Lowest/MYRRWC_' .. RequestID)
-			remove(MY_RRWC_FREE)
+			RequestID = RRWC_FREE[nFreeWebPages]
+			hFrame = Station.Lookup('Lowest/' .. PACKET_INFO.NAME_SPACE .. 'RRWC_' .. RequestID)
+			remove(RRWC_FREE)
 		end
 		-- create page
 		if not hFrame then
 			RequestID = ('%X_%X'):format(GetTickCount(), floor(random() * 65536))
-			hFrame = Wnd.OpenWindow(PACKET_INFO.UICOMPONENT_ROOT .. 'WndWebCef.ini', 'MYRRWC_' .. RequestID)
+			hFrame = Wnd.OpenWindow(PACKET_INFO.UICOMPONENT_ROOT .. 'WndWebCef.ini', PACKET_INFO.NAME_SPACE .. 'RRWC_' .. RequestID)
 			hFrame:Hide()
 		end
 		local wWebCef = hFrame:Lookup('WndWebCef')
@@ -295,10 +295,10 @@ function LIB.Ajax(settings)
 			-- local szUrl, szTitle, szContent = this:GetLocationURL(), this:GetLocationName(), this:GetDocument()
 			local szContent = ''
 			--[[#DEBUG BEGIN]]
-			-- LIB.Debug('MYRRWC::OnDocumentComplete', format('%s - %s', szTitle, szUrl), DEBUG_LEVEL.LOG)
+			-- LIB.Debug(PACKET_INFO.NAME_SPACE .. 'RRWC::OnDocumentComplete', format('%s - %s', szTitle, szUrl), DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
 			-- 注销超时处理时钟
-			LIB.DelayCall('MYRRWC_TO_' .. RequestID, false)
+			LIB.DelayCall(PACKET_INFO.NAME_SPACE .. 'RRWC_TO_' .. RequestID, false)
 			-- 成功回调函数
 			if settings.fulfilled then
 				CallWithThis(settings, settings.fulfilled)
@@ -306,37 +306,37 @@ function LIB.Ajax(settings)
 			if settings.success then
 				CallWithThis(settings, settings.success, szContent, 200)
 			end
-			insert(MY_RRWC_FREE, RequestID)
+			insert(RRWC_FREE, RequestID)
 		end
 
 		-- do with this remote request
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('MYRRWC', settings.url, DEBUG_LEVEL.LOG)
+		LIB.Debug(PACKET_INFO.NAME_SPACE .. 'RRWC', settings.url, DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		-- register request timeout clock
 		if settings.timeout > 0 then
-			LIB.DelayCall('MYRRWC_TO_' .. RequestID, settings.timeout, function()
+			LIB.DelayCall(PACKET_INFO.NAME_SPACE .. 'RRWC_TO_' .. RequestID, settings.timeout, function()
 				--[[#DEBUG BEGIN]]
-				LIB.Debug('MYRRWC::Timeout', settings.url, DEBUG_LEVEL.WARNING) -- log
+				LIB.Debug(PACKET_INFO.NAME_SPACE .. 'RRWC::Timeout', settings.url, DEBUG_LEVEL.WARNING) -- log
 				--[[#DEBUG END]]
 				-- request timeout, call timeout function.
 				if settings.error then
 					CallWithThis(settings, settings.error, '', 0, false)
 				end
-				insert(MY_RRWC_FREE, RequestID)
+				insert(RRWC_FREE, RequestID)
 			end)
 		end
 
 		-- start chrome navigate
 		wWebCef:Navigate(url)
 	elseif driver == 'webbrowser' then
-		assert(method == 'get', '[MY_AJAX] Webbrowser only support get method, got ' .. method)
+		assert(method == 'get', '[' .. PACKET_INFO.NAME_SPACE .. '_AJAX] Webbrowser only support get method, got ' .. method)
 		local RequestID, hFrame
-		local nFreeWebPages = #MY_RRWP_FREE
+		local nFreeWebPages = #RRWP_FREE
 		if nFreeWebPages > 0 then
-			RequestID = MY_RRWP_FREE[nFreeWebPages]
-			hFrame = Station.Lookup('Lowest/MYRRWP_' .. RequestID)
-			remove(MY_RRWP_FREE)
+			RequestID = RRWP_FREE[nFreeWebPages]
+			hFrame = Station.Lookup('Lowest/' .. PACKET_INFO.NAME_SPACE .. 'RRWP_' .. RequestID)
+			remove(RRWP_FREE)
 		end
 		-- create page
 		if not hFrame then
@@ -352,10 +352,10 @@ function LIB.Ajax(settings)
 			local szUrl, szTitle, szContent = this:GetLocationURL(), this:GetLocationName(), this:GetDocument()
 			if szUrl ~= szTitle or szContent ~= '' then
 				--[[#DEBUG BEGIN]]
-				LIB.Debug('MYRRWP::OnDocumentComplete', format('%s - %s', szTitle, szUrl), DEBUG_LEVEL.LOG)
+				LIB.Debug(PACKET_INFO.NAME_SPACE .. 'RRWP::OnDocumentComplete', format('%s - %s', szTitle, szUrl), DEBUG_LEVEL.LOG)
 				--[[#DEBUG END]]
 				-- 注销超时处理时钟
-				LIB.DelayCall('MYRRWP_TO_' .. RequestID, false)
+				LIB.DelayCall(PACKET_INFO.NAME_SPACE .. 'RRWP_TO_' .. RequestID, false)
 				-- 成功回调函数
 				if settings.fulfilled then
 					CallWithThis(settings, settings.fulfilled)
@@ -366,19 +366,19 @@ function LIB.Ajax(settings)
 				if settings.complete then
 					CallWithThis(settings, settings.complete, szContent, 200, true)
 				end
-				insert(MY_RRWP_FREE, RequestID)
+				insert(RRWP_FREE, RequestID)
 			end
 		end
 
 		-- do with this remote request
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('MYRRWP', settings.url, DEBUG_LEVEL.LOG)
+		LIB.Debug(PACKET_INFO.NAME_SPACE .. 'RRWP', settings.url, DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		-- register request timeout clock
 		if settings.timeout > 0 then
-			LIB.DelayCall('MYRRWP_TO_' .. RequestID, settings.timeout, function()
+			LIB.DelayCall(PACKET_INFO.NAME_SPACE .. 'RRWP_TO_' .. RequestID, settings.timeout, function()
 				--[[#DEBUG BEGIN]]
-				LIB.Debug('MYRRWP::Timeout', settings.url, DEBUG_LEVEL.WARNING) -- log
+				LIB.Debug(PACKET_INFO.NAME_SPACE .. 'RRWP::Timeout', settings.url, DEBUG_LEVEL.WARNING) -- log
 				--[[#DEBUG END]]
 				-- request timeout, call timeout function.
 				if settings.error then
@@ -387,7 +387,7 @@ function LIB.Ajax(settings)
 				if settings.complete then
 					CallWithThis(settings, settings.complete, '', 500, false)
 				end
-				insert(MY_RRWP_FREE, RequestID)
+				insert(RRWP_FREE, RequestID)
 			end)
 		end
 
@@ -395,10 +395,10 @@ function LIB.Ajax(settings)
 		wWebPage:Navigate(url)
 	else -- if driver == 'origin' then
 		local szKey = GetTickCount() * 100
-		while MY_CALL_AJAX['__addon_' .. MY_AJAX_TAG .. szKey] do
+		while CALL_AJAX['__addon_' .. AJAX_TAG .. szKey] do
 			szKey = szKey + 1
 		end
-		szKey = MY_AJAX_TAG .. szKey
+		szKey = AJAX_TAG .. szKey
 		if method == 'post' then
 			if not CURL_HttpPost then
 				return CallWithThis(settings, settings.error, '', 0, false)
@@ -410,7 +410,7 @@ function LIB.Ajax(settings)
 			end
 			CURL_HttpRqst(szKey, url, ssl, settings.timeout)
 		end
-		MY_CALL_AJAX['__addon_' .. szKey] = settings
+		CALL_AJAX['__addon_' .. szKey] = settings
 	end
 end
 
@@ -419,8 +419,8 @@ local function OnCurlRequestResult()
 	local bSuccess     = arg1
 	local html         = arg2
 	local dwBufferSize = arg3
-	if MY_CALL_AJAX[szKey] then
-		local settings = MY_CALL_AJAX[szKey]
+	if CALL_AJAX[szKey] then
+		local settings = CALL_AJAX[szKey]
 		local status = bSuccess and 200 or 500
 		if settings.charset == 'utf8' and IsString(html) then
 			html = UTF8ToAnsi(html)
@@ -441,7 +441,7 @@ local function OnCurlRequestResult()
 		else
 			CallWithThis(settings, settings.error, html, status, dwBufferSize ~= 0)
 		end
-		MY_CALL_AJAX[szKey] = nil
+		CALL_AJAX[szKey] = nil
 	end
 end
 LIB.RegisterEvent('CURL_REQUEST_RESULT.AJAX', OnCurlRequestResult)
