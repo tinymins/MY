@@ -467,7 +467,7 @@ end
 --   options.OnPanelDeactive(wnd)    选项卡取消激活
 --   options.bShielded               国服和谐的选项卡
 -- }
--- Ex： LIB.RegisterPanel( 'Test', '测试标签', '测试', 'UI/Image/UICommon/ScienceTreeNode.UITex|123', {255,255,0,200}, { OnPanelActive = function(wnd) end } )
+-- Ex： LIB.RegisterPanel( 'Test', '测试标签', '测试', 'UI/Image/UICommon/ScienceTreeNode.UITex|123', { OnPanelActive = function(wnd) end } )
 function LIB.RegisterPanel(szID, szTitle, szCategory, szIconTex, options)
 	-- 格式化图标信息
 	if IsNumber(szIconTex) then
@@ -919,33 +919,33 @@ function PS.OnPanelResize(wnd)
 	local scaleH = w / 557 * 278
 	local bottomH = 90
 	if scaleH > h - bottomH then
-		ui:Children('#Shadow_Adv'):Size((h - bottomH) / 278 * 557, (h - bottomH))
-		ui:Children('#Image_Adv'):Size((h - bottomH) / 278 * 557, (h - bottomH))
-		ui:Children('#Text_Memory'):Pos(w - 150, h - bottomH + 10)
-		ui:Children('#Text_Adv'):Pos(10, h - bottomH + 10)
-		ui:Children('#Text_Svr'):Pos(10, h - bottomH + 35)
+		ui:Fetch('Shadow_Adv'):Size((h - bottomH) / 278 * 557, (h - bottomH))
+		ui:Fetch('Image_Adv'):Size((h - bottomH) / 278 * 557, (h - bottomH))
+		ui:Fetch('Text_Memory'):Pos(w - 150, h - bottomH + 10)
+		ui:Fetch('Text_Adv'):Pos(10, h - bottomH + 10)
+		ui:Fetch('Text_Svr'):Pos(10, h - bottomH + 35)
 	else
-		ui:Children('#Shadow_Adv'):Size(w, scaleH)
-		ui:Children('#Image_Adv'):Size(w, scaleH)
-		ui:Children('#Text_Memory'):Pos(w - 150, scaleH + 10)
-		ui:Children('#Text_Adv'):Pos(10, scaleH + 10)
-		ui:Children('#Text_Svr'):Pos(10, scaleH + 35)
+		ui:Fetch('Shadow_Adv'):Size(w, scaleH)
+		ui:Fetch('Image_Adv'):Size(w, scaleH)
+		ui:Fetch('Text_Memory'):Pos(w - 150, scaleH + 10)
+		ui:Fetch('Text_Adv'):Pos(10, scaleH + 10)
+		ui:Fetch('Text_Svr'):Pos(10, scaleH + 35)
 	end
-	ui:Children('#WndCheckBox_SerendipityNotify'):Top(scaleH + 65)
-	ui:Children('#WndCheckBox_SerendipityAutoShare'):Top(scaleH + 65)
-	ui:Children('#WndCheckBox_SerendipitySilentMode'):Top(scaleH + 65)
-	ui:Children('#WndEditBox_SerendipitySilentMode'):Top(scaleH + 65)
-	ui:Children('#WndCheckBox_SerendipityNotifyTip'):Top(scaleH + 65)
-	ui:Children('#WndCheckBox_SerendipityNotifySound'):Top(scaleH + 65)
-	ui:Children('#WndButton_SerendipitySearch'):Top(scaleH + 65)
-	ui:Children('#WndButton_UserPreference'):Top(scaleH + 65)
-	ui:Children('#WndButton_AddonErrorMessage'):Top(scaleH + 65)
+	ui:Fetch('WndCheckBox_SerendipityNotify'):Top(scaleH + 65)
+	ui:Fetch('WndCheckBox_SerendipityAutoShare'):Top(scaleH + 65)
+	ui:Fetch('WndCheckBox_SerendipitySilentMode'):Top(scaleH + 65)
+	ui:Fetch('WndEditBox_SerendipitySilentMode'):Top(scaleH + 65)
+	ui:Fetch('WndCheckBox_SerendipityNotifyTip'):Top(scaleH + 65)
+	ui:Fetch('WndCheckBox_SerendipityNotifySound'):Top(scaleH + 65)
+	ui:Fetch('WndButton_SerendipitySearch'):Top(scaleH + 65)
+	ui:Fetch('WndButton_UserPreference'):Top(scaleH + 65)
+	ui:Fetch('WndButton_AddonErrorMessage'):Top(scaleH + 65)
 end
 function PS.OnPanelBreathe(wnd)
 	local ui = LIB.UI(wnd)
-	ui:Children('#Text_Adv'):Text(GetAdvText())
-	ui:Children('#Text_Svr'):Text(GetSvrText())
-	ui:Children('#Text_Memory'):Text(GetMemoryText())
+	ui:Fetch('Text_Adv'):Text(GetAdvText())
+	ui:Fetch('Text_Svr'):Text(GetSvrText())
+	ui:Fetch('Text_Memory'):Text(GetMemoryText())
 end
 LIB.RegisterPanel('Welcome', _L['Welcome'], _L['System'], '', PS)
 end
