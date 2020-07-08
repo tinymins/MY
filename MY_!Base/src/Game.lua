@@ -833,8 +833,8 @@ LIB.RegisterTargetAddonMenu(NSFormatString('{$NS}#Game#Bosslist'), function()
 					end
 					BOSS_LIST_CUSTOM[dwMapID].ADD[dwTemplateID] = nil
 					SaveCustomList()
-					FireUIEvent('MY_SET_BOSS', dwMapID, dwTemplateID, false)
-					FireUIEvent('MY_SET_IMPORTANT_NPC', dwMapID, dwTemplateID, LIB.IsImportantNpc(dwMapID, dwTemplateID))
+					FireUIEvent(NSFormatString('{$NS}_SET_BOSS'), dwMapID, dwTemplateID, false)
+					FireUIEvent(NSFormatString('{$NS}_SET_IMPORTANT_NPC'), dwMapID, dwTemplateID, LIB.IsImportantNpc(dwMapID, dwTemplateID))
 				end,
 			}
 		else
@@ -851,8 +851,8 @@ LIB.RegisterTargetAddonMenu(NSFormatString('{$NS}#Game#Bosslist'), function()
 					end
 					BOSS_LIST_CUSTOM[dwMapID].ADD[dwTemplateID] = szName
 					SaveCustomList()
-					FireUIEvent('MY_SET_BOSS', dwMapID, dwTemplateID, true)
-					FireUIEvent('MY_SET_IMPORTANT_NPC', dwMapID, dwTemplateID, LIB.IsImportantNpc(dwMapID, dwTemplateID))
+					FireUIEvent(NSFormatString('{$NS}_SET_BOSS'), dwMapID, dwTemplateID, true)
+					FireUIEvent(NSFormatString('{$NS}_SET_IMPORTANT_NPC'), dwMapID, dwTemplateID, LIB.IsImportantNpc(dwMapID, dwTemplateID))
 				end,
 			}
 		end
@@ -946,7 +946,7 @@ LIB.RegisterTargetAddonMenu(NSFormatString('{$NS}#Game#ImportantNpclist'), funct
 					end
 					INPC_LIST_CUSTOM[dwMapID].ADD[dwTemplateID] = nil
 					SaveCustomList()
-					FireUIEvent('MY_SET_IMPORTANT_NPC', dwMapID, dwTemplateID, false)
+					FireUIEvent(NSFormatString('{$NS}_SET_IMPORTANT_NPC'), dwMapID, dwTemplateID, false)
 				end,
 			}
 		else
@@ -963,7 +963,7 @@ LIB.RegisterTargetAddonMenu(NSFormatString('{$NS}#Game#ImportantNpclist'), funct
 					end
 					INPC_LIST_CUSTOM[dwMapID].ADD[dwTemplateID] = szName
 					SaveCustomList()
-					FireUIEvent('MY_SET_IMPORTANT_NPC', dwMapID, dwTemplateID, true)
+					FireUIEvent(NSFormatString('{$NS}_SET_IMPORTANT_NPC'), dwMapID, dwTemplateID, true)
 				end,
 			}
 		end
@@ -2173,8 +2173,8 @@ function LIB.IsFighting()
 	end
 	return bFightState
 end
-LIB.RegisterEvent('LOADING_ENDING.MY-PLAYER', function() ARENA_START = nil end)
-LIB.RegisterEvent('ARENA_START.MY-PLAYER', function() ARENA_START = true end)
+LIB.RegisterEvent(NSFormatString('LOADING_ENDING.{$NS}#PLAYER'), function() ARENA_START = nil end)
+LIB.RegisterEvent(NSFormatString('ARENA_START.{$NS}#PLAYER'), function() ARENA_START = true end)
 end
 
 -------------------------------------------------------------------------------------------------------------------
@@ -2815,7 +2815,7 @@ function LIB.CanUseSkill(dwSkillID, dwLevel)
 		dwSkillID = LIB.GetSkillByName(dwSkillID).dwSkillID
 	end
 	if not box or not box:IsValid() then
-		box = UI.GetTempElement('Box.MYLib_Skill')
+		box = UI.GetTempElement(NSFormatString('Box.{$NS}Lib_Skill'))
 	end
 	local me = GetClientPlayer()
 	if me and box then
