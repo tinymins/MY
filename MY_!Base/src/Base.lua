@@ -712,6 +712,16 @@ local function SafeCall(f, ...)
 	end
 	return Call(f, ...)
 end
+
+local NSFormatString
+do local CACHE = {}
+function NSFormatString(s)
+	if not CACHE[s] then
+		CACHE[s] = wgsub(s, '{$ns}', _NAME_SPACE_)
+	end
+	return CACHE[s]
+end
+end
 -----------------------------------------------
 -- 插件集信息
 -----------------------------------------------
@@ -1280,6 +1290,7 @@ local LIB = {
 	RandomChild      = RandomChild     ,
 	GetTraceback     = GetTraceback    ,
 	IsStreaming      = IsStreaming     ,
+	NSFormatString   = NSFormatString  ,
 	LoadLangPack     = LoadLangPack    ,
 	CONSTANT         = CONSTANT        ,
 	PATH_TYPE        = PATH_TYPE       ,
