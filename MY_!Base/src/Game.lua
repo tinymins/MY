@@ -1620,13 +1620,13 @@ LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '#FIGHT_HINT_TRIGGER', function()
 	for dwID, tar in pairs(NEARBY_NPC) do
 		if tar.bFightState ~= NEARBY_FIGHT[dwID] then
 			NEARBY_FIGHT[dwID] = tar.bFightState
-			FireUIEvent('MY_NPC_FIGHT_HINT', dwID, tar.bFightState)
+			FireUIEvent(PACKET_INFO.NAME_SPACE .. '_NPC_FIGHT_HINT', dwID, tar.bFightState)
 		end
 	end
 	for dwID, tar in pairs(NEARBY_PLAYER) do
 		if tar.bFightState ~= NEARBY_FIGHT[dwID] then
 			NEARBY_FIGHT[dwID] = tar.bFightState
-			FireUIEvent('MY_PLAYER_FIGHT_HINT', dwID, tar.bFightState)
+			FireUIEvent(PACKET_INFO.NAME_SPACE .. '_PLAYER_FIGHT_HINT', dwID, tar.bFightState)
 		end
 	end
 end)
@@ -2080,7 +2080,7 @@ local function ListenFightStateChange()
 				-- 新的一轮战斗开始
 				FIGHT_BEGIN_TICK = GetTickCount()
 				FIGHT_UUID = FIGHT_BEGIN_TICK
-				FireUIEvent('MY_FIGHT_HINT', true, FIGHT_UUID, 0)
+				FireUIEvent(PACKET_INFO.NAME_SPACE .. '_FIGHT_HINT', true, FIGHT_UUID, 0)
 			end
 		end
 	else
@@ -2089,7 +2089,7 @@ local function ListenFightStateChange()
 			FIGHT_END_TICK, FIGHTING = GetTickCount(), false
 		elseif FIGHT_UUID and GetTickCount() - FIGHT_END_TICK > 5000 then
 			LAST_FIGHT_UUID, FIGHT_UUID = FIGHT_UUID, nil
-			FireUIEvent('MY_FIGHT_HINT', false, LAST_FIGHT_UUID, FIGHT_END_TICK - FIGHT_BEGIN_TICK)
+			FireUIEvent(PACKET_INFO.NAME_SPACE .. '_FIGHT_HINT', false, LAST_FIGHT_UUID, FIGHT_END_TICK - FIGHT_BEGIN_TICK)
 		end
 	end
 end
