@@ -328,7 +328,7 @@ LIB.RegisterEvent('BUFF_UPDATE', function()
 		return
 	end
 	if arg0 == UI_GetClientPlayerID() and arg4 == 103 then
-		DelayCall(PACKET_INFO.NAME_SPACE .. '#ON_IDLE', random(0, 10000), function()
+		DelayCall(NSFormatString('{$NS}#ON_IDLE'), random(0, 10000), function()
 			local me = GetClientPlayer()
 			if me and me.GetBuff(103, 0) then
 				OnIdle()
@@ -336,7 +336,7 @@ LIB.RegisterEvent('BUFF_UPDATE', function()
 		end)
 	end
 end)
-LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '#ON_IDLE', function()
+LIB.BreatheCall(NSFormatString('{$NS}#ON_IDLE'), function()
 	if Station.GetIdleTime() > 300000 then
 		OnIdle()
 	end
@@ -354,7 +354,7 @@ end
 do
 local SPECIAL_KEY_EVENT = { szName = 'SpecialKey' }
 local ALT, SHIFT, CTRL = false, false, false
-LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '#ON_SPECIAL_KEY', function()
+LIB.BreatheCall(NSFormatString('{$NS}#ON_SPECIAL_KEY'), function()
 	if IsShiftKeyDown() then
 		if not SHIFT then
 			SHIFT = true
@@ -499,7 +499,7 @@ local function StepNext(bQuick)
 	local nW, nH = Station.GetClientSize()
 	local tMsg = {
 		x = nW / 2, y = nH / 3,
-		szName = PACKET_INFO.NAME_SPACE .. '_Tutorial',
+		szName = NSFormatString('{$NS}_Tutorial'),
 		szMessage = tutorial.szMessage,
 		szAlignment = 'CENTER',
 	}
@@ -547,7 +547,7 @@ end
 -- 背景通讯
 ---------------------------------------------------------------------------------------------
 do
-local BG_MSG_ID_PREFIX = PACKET_INFO.NAME_SPACE .. ':'
+local BG_MSG_ID_PREFIX = NSFormatString('{$NS}:')
 local BG_MSG_ID_SUFFIX = ':V2'
 do
 local BG_MSG_EVENT = { szName = 'BgMsg' }
@@ -655,7 +655,7 @@ function LIB.SendBgMsg(nChannel, szMsgID, oData, bSilent)
 			LIB.Systopmsg(_L['BgMsg cannot be send due to talk lock, data will be sent as soon as talk unlocked.'])
 		end
 		insert(BG_MSG_QUEUE, { nChannel, szMsgID, oData })
-		LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '#BG_MSG_QUEUE', ProcessQueue)
+		LIB.BreatheCall(NSFormatString('{$NS}#BG_MSG_QUEUE'), ProcessQueue)
 		return
 	end
 	-- channel
@@ -804,7 +804,7 @@ local function onBreathe()
 	--[[#DEBUG END]]
 	l_nLastBreatheTime = nBeginTime
 end
-LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '#COROUTINE', onBreathe)
+LIB.BreatheCall(NSFormatString('{$NS}#COROUTINE'), onBreathe)
 
 -- 执行协程直到它完成
 -- 不传参表示执行所有协程并清空协程队列

@@ -208,7 +208,7 @@ function LIB.Debug(...)
 		oTitle, oContent, nLevel = ...
 	end
 	if not oTitle then
-		oTitle = PACKET_INFO.NAME_SPACE .. '_DEBUG'
+		oTitle = NSFormatString('{$NS}_DEBUG')
 	end
 	if not IsNumber(nLevel) then
 		nLevel = DEBUG_LEVEL.WARNING

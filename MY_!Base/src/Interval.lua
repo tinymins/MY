@@ -498,7 +498,7 @@ local function __OnActive()
 	onBreatheCall()
 end
 
-local frame = Wnd.OpenWindow(PACKET_INFO.UICOMPONENT_ROOT .. 'WndFrameEmpty.ini', PACKET_INFO.NAME_SPACE .. '#Interval')
+local frame = Wnd.OpenWindow(PACKET_INFO.UICOMPONENT_ROOT .. 'WndFrameEmpty.ini', NSFormatString('{$NS}#Interval'))
 frame.OnFrameBreathe = __OnActive
 frame:Hide()
 
@@ -554,7 +554,7 @@ function LIB.Debounce(szKey, nTime, fnAction, oArg)
 	end
 	return szKey
 end
-LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '#Debounce', function()
+LIB.BreatheCall(NSFormatString('{$NS}#Debounce'), function()
 	local nTime = GetTime()
 	for szKey, d in pairs(_tDebounce) do
 		if nTime >= d.nNext then
@@ -624,7 +624,7 @@ function LIB.Throttle(szKey, nTime, fnAction, oArg)
 	end
 	return szKey, bThrottle
 end
-LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '#Throttle', function()
+LIB.BreatheCall(NSFormatString('{$NS}#Throttle'), function()
 	local nTime = GetTime()
 	for szKey, d in pairs(_tThrottle) do
 		if nTime >= d.nNext then

@@ -717,7 +717,7 @@ local NSFormatString
 do local CACHE = {}
 function NSFormatString(s)
 	if not CACHE[s] then
-		CACHE[s] = wgsub(s, '{$ns}', _NAME_SPACE_)
+		CACHE[s] = wgsub(s, '{$NS}', _NAME_SPACE_)
 	end
 	return CACHE[s]
 end

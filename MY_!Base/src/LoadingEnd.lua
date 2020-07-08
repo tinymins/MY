@@ -56,11 +56,11 @@ end
 setmetatable(LIB, {
 	__metatable = true,
 	__index = PROXY,
-	__newindex = function() assert(false, 'DO NOT modify ' .. PACKET_INFO.NAME_SPACE .. ' after initialized!!!') end
+	__newindex = function() assert(false, NSFormatString('DO NOT modify {$NS} after initialized!!!')) end
 })
-FireUIEvent(PACKET_INFO.NAME_SPACE .. '_BASE_LOADING_END')
+FireUIEvent(NSFormatString('{$NS}_BASE_LOADING_END'))
 
-LIB.RegisterInit(PACKET_INFO.NAME_SPACE .. '#AUTHOR_TIP', function()
+LIB.RegisterInit(NSFormatString('{$NS}#AUTHOR_TIP'), function()
 	if MY_Farbnamen and MY_Farbnamen.RegisterHeader then
 		for dwID, szName in pairs_c(PACKET_INFO.AUTHOR_ROLES) do
 			MY_Farbnamen.RegisterHeader(szName, dwID, PACKET_INFO.AUTHOR_HEADER)

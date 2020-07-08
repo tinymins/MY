@@ -44,8 +44,8 @@ local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAD
 -------------------------------------------------------------------------------------------------------
 local _L = LIB.LoadLangPack()
 
-local RENDERED_FLAG_KEY = 'b' .. PACKET_INFO.NAME_SPACE .. 'ChatRendered'
-local ITEM_LBUTTONDOWN_KEY = '__' .. PACKET_INFO.NAME_SPACE .. '_OnItemLButtonDown'
+local RENDERED_FLAG_KEY = NSFormatString('b{$NS}ChatRendered')
+local ITEM_LBUTTONDOWN_KEY = NSFormatString('__{$NS}_OnItemLButtonDown')
 
 function LIB.GetChatInputEdit()
 	return Station.Lookup('Lowest2/EditBox/Edit_Input')
@@ -97,8 +97,8 @@ function LIB.RemoveChatLine(hTime)
 end
 
 local function GetCopyLinkScript(opt)
-	local handlerEntry = PACKET_INFO.NAME_SPACE .. '.ChatLinkEventHandlers'
-	local szScript = 'this[\'b' .. PACKET_INFO.NAME_SPACE .. 'ChatRendered\']=true;this.OnItemMouseEnter='
+	local handlerEntry = NSFormatString('{$NS}.ChatLinkEventHandlers')
+	local szScript = NSFormatString('this[\'b{$NS}ChatRendered\']=true;this.OnItemMouseEnter=')
 		.. handlerEntry .. '.OnCopyMouseEnter;this.OnItemMouseLeave=' .. handlerEntry .. '.OnCopyMouseLeave;'
 	if opt.lclick ~= false then
 		szScript = szScript .. 'this.bLButton=true;this.OnItemLButtonDown='.. handlerEntry .. '.OnCopyLClick;'
@@ -410,7 +410,7 @@ function LIB.RenderChatLink(arg1, arg2)
 						script = ''
 					end
 
-					local handlerEntry = PACKET_INFO.NAME_SPACE .. '.ChatLinkEventHandlers'
+					local handlerEntry = NSFormatString('{$NS}.ChatLinkEventHandlers')
 					if name:sub(1, 8) == 'namelink' then
 						script = script .. 'this.' .. RENDERED_FLAG_KEY .. '=true;this.OnItemLButtonDown='
 							.. handlerEntry .. '.OnNameLClick;this.OnItemRButtonDown='
@@ -1457,7 +1457,7 @@ local function OnChatPanelNamelinkLButtonDown(...)
 	LIB.ChatLinkEventHandlers.OnNameLClick(...)
 end
 
-LIB.HookChatPanel('AFTER.' .. PACKET_INFO.NAME_SPACE .. '#HOOKNAME', function(h, nIndex)
+LIB.HookChatPanel(NSFormatString('AFTER.{$NS}#HOOKNAME'), function(h, nIndex)
 	for i = nIndex, h:GetItemCount() - 1 do
 		local hItem = h:Lookup(i)
 		if hItem:GetName():find('^namelink_%d+$') and not hItem[RENDERED_FLAG_KEY] then

@@ -70,7 +70,7 @@ function LIB.IsShieldedVersion(szKey, nLevel, bSet)
 		end
 		SHIELDED_LEVEL[szKey] = nLevel
 		-- 发起事件通知
-		local szEvent = PACKET_INFO.NAME_SPACE .. '#SHIELDED_VERSION'
+		local szEvent = NSFormatString('{$NS}#SHIELDED_VERSION')
 		if szKey == '*' or szKey == '!' then
 			for k, _ in pairs(DELAY_EVENT) do
 				LIB.DelayCall(k, false)
@@ -84,7 +84,7 @@ function LIB.IsShieldedVersion(szKey, nLevel, bSet)
 				LIB.ReopenPanel()
 			end
 			DELAY_EVENT[szEvent] = nil
-			FireUIEvent(PACKET_INFO.NAME_SPACE .. '_SHIELDED_VERSION', szKey)
+			FireUIEvent(NSFormatString('{$NS}_SHIELDED_VERSION'), szKey)
 		end)
 		DELAY_EVENT[szEvent] = true
 	else
@@ -124,7 +124,7 @@ function LIB.IsDebugClient(szKey, bDebug, bSet)
 		end
 		DEBUG[szKey] = bDebug
 		-- 发起事件通知
-		local szEvent = PACKET_INFO.NAME_SPACE .. '#DEBUG'
+		local szEvent = NSFormatString('{$NS}#DEBUG')
 		if szKey == '*' or szKey == '!' then
 			for k, _ in pairs(DELAY_EVENT) do
 				LIB.DelayCall(k, false)
@@ -138,7 +138,7 @@ function LIB.IsDebugClient(szKey, bDebug, bSet)
 				LIB.ReopenPanel()
 			end
 			DELAY_EVENT[szEvent] = nil
-			FireUIEvent(PACKET_INFO.NAME_SPACE .. '_DEBUG', szKey)
+			FireUIEvent(NSFormatString('{$NS}_DEBUG'), szKey)
 		end)
 		DELAY_EVENT[szEvent] = true
 	else

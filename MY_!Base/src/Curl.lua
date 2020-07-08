@@ -84,7 +84,7 @@ do
 local RRWP_FREE = {}
 local RRWC_FREE = {}
 local CALL_AJAX = {}
-local AJAX_TAG = PACKET_INFO.NAME_SPACE .. '_AJAX#'
+local AJAX_TAG = NSFormatString('{$NS}_AJAX#')
 local l_ajaxsettingsmeta = {
 	__index = {
 		method = 'get',
@@ -130,11 +130,11 @@ local function CreateWebPageFrame()
 	local szRequestID, hFrame
 	repeat
 		szRequestID = ('%X%X'):format(GetTickCount(), floor(random() * 0xEFFF) + 0x1000)
-	until not Station.Lookup('Lowest/' .. PACKET_INFO.NAME_SPACE .. 'RRWP_' .. szRequestID)
+	until not Station.Lookup(NSFormatString('Lowest/{$NS}RRWP_') .. szRequestID)
 	--[[#DEBUG BEGIN]]
 	LIB.Debug('CreateWebPageFrame: ' .. szRequestID, DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
-	hFrame = Wnd.OpenWindow(PACKET_INFO.UICOMPONENT_ROOT .. 'WndWebPage.ini', PACKET_INFO.NAME_SPACE .. 'RRWP_' .. szRequestID)
+	hFrame = Wnd.OpenWindow(PACKET_INFO.UICOMPONENT_ROOT .. 'WndWebPage.ini', NSFormatString('{$NS}RRWP_') .. szRequestID)
 	hFrame:Hide()
 	return szRequestID, hFrame
 end
@@ -173,7 +173,7 @@ function LIB.Ajax(settings)
 		end
 		url, data = url .. serialize(data), nil
 	end
-	assert(method == 'post' or method == 'get' or method == 'put' or method == 'delete', '[' .. PACKET_INFO.NAME_SPACE .. '_AJAX] Unknown http request type: ' .. method)
+	assert(method == 'post' or method == 'get' or method == 'put' or method == 'delete', NSFormatString('[{$NS}_AJAX] Unknown http request type: ') .. method)
 
 	local driver = settings.driver
 	if driver == 'auto' then
@@ -274,18 +274,18 @@ function LIB.Ajax(settings)
 		curl:SetConnTimeout(settings.timeout)
 		curl:Perform()
 	elseif driver == 'webcef' then
-		assert(method == 'get', '[' .. PACKET_INFO.NAME_SPACE .. '_AJAX] Webcef only support get method, got ' .. method)
+		assert(method == 'get', NSFormatString('[{$NS}_AJAX] Webcef only support get method, got ') .. method)
 		local RequestID, hFrame
 		local nFreeWebPages = #RRWC_FREE
 		if nFreeWebPages > 0 then
 			RequestID = RRWC_FREE[nFreeWebPages]
-			hFrame = Station.Lookup('Lowest/' .. PACKET_INFO.NAME_SPACE .. 'RRWC_' .. RequestID)
+			hFrame = Station.Lookup(NSFormatString('Lowest/{$NS}RRWC_') .. RequestID)
 			remove(RRWC_FREE)
 		end
 		-- create page
 		if not hFrame then
 			RequestID = ('%X_%X'):format(GetTickCount(), floor(random() * 65536))
-			hFrame = Wnd.OpenWindow(PACKET_INFO.UICOMPONENT_ROOT .. 'WndWebCef.ini', PACKET_INFO.NAME_SPACE .. 'RRWC_' .. RequestID)
+			hFrame = Wnd.OpenWindow(PACKET_INFO.UICOMPONENT_ROOT .. 'WndWebCef.ini', NSFormatString('{$NS}RRWC_') .. RequestID)
 			hFrame:Hide()
 		end
 		local wWebCef = hFrame:Lookup('WndWebCef')
@@ -295,10 +295,10 @@ function LIB.Ajax(settings)
 			-- local szUrl, szTitle, szContent = this:GetLocationURL(), this:GetLocationName(), this:GetDocument()
 			local szContent = ''
 			--[[#DEBUG BEGIN]]
-			-- LIB.Debug(PACKET_INFO.NAME_SPACE .. 'RRWC::OnDocumentComplete', format('%s - %s', szTitle, szUrl), DEBUG_LEVEL.LOG)
+			-- LIB.Debug(NSFormatString('{$NS}RRWC::OnDocumentComplete'), format('%s - %s', szTitle, szUrl), DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
 			-- 注销超时处理时钟
-			LIB.DelayCall(PACKET_INFO.NAME_SPACE .. 'RRWC_TO_' .. RequestID, false)
+			LIB.DelayCall(NSFormatString('{$NS}RRWC_TO_') .. RequestID, false)
 			-- 成功回调函数
 			if settings.fulfilled then
 				CallWithThis(settings, settings.fulfilled)
@@ -311,13 +311,13 @@ function LIB.Ajax(settings)
 
 		-- do with this remote request
 		--[[#DEBUG BEGIN]]
-		LIB.Debug(PACKET_INFO.NAME_SPACE .. 'RRWC', settings.url, DEBUG_LEVEL.LOG)
+		LIB.Debug(NSFormatString('{$NS}RRWC'), settings.url, DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		-- register request timeout clock
 		if settings.timeout > 0 then
-			LIB.DelayCall(PACKET_INFO.NAME_SPACE .. 'RRWC_TO_' .. RequestID, settings.timeout, function()
+			LIB.DelayCall(NSFormatString('{$NS}RRWC_TO_') .. RequestID, settings.timeout, function()
 				--[[#DEBUG BEGIN]]
-				LIB.Debug(PACKET_INFO.NAME_SPACE .. 'RRWC::Timeout', settings.url, DEBUG_LEVEL.WARNING) -- log
+				LIB.Debug(NSFormatString('{$NS}RRWC::Timeout'), settings.url, DEBUG_LEVEL.WARNING) -- log
 				--[[#DEBUG END]]
 				-- request timeout, call timeout function.
 				if settings.error then
@@ -330,12 +330,12 @@ function LIB.Ajax(settings)
 		-- start chrome navigate
 		wWebCef:Navigate(url)
 	elseif driver == 'webbrowser' then
-		assert(method == 'get', '[' .. PACKET_INFO.NAME_SPACE .. '_AJAX] Webbrowser only support get method, got ' .. method)
+		assert(method == 'get', NSFormatString('[{$NS}_AJAX] Webbrowser only support get method, got ') .. method)
 		local RequestID, hFrame
 		local nFreeWebPages = #RRWP_FREE
 		if nFreeWebPages > 0 then
 			RequestID = RRWP_FREE[nFreeWebPages]
-			hFrame = Station.Lookup('Lowest/' .. PACKET_INFO.NAME_SPACE .. 'RRWP_' .. RequestID)
+			hFrame = Station.Lookup(NSFormatString('Lowest/{$NS}RRWP_') .. RequestID)
 			remove(RRWP_FREE)
 		end
 		-- create page
@@ -352,10 +352,10 @@ function LIB.Ajax(settings)
 			local szUrl, szTitle, szContent = this:GetLocationURL(), this:GetLocationName(), this:GetDocument()
 			if szUrl ~= szTitle or szContent ~= '' then
 				--[[#DEBUG BEGIN]]
-				LIB.Debug(PACKET_INFO.NAME_SPACE .. 'RRWP::OnDocumentComplete', format('%s - %s', szTitle, szUrl), DEBUG_LEVEL.LOG)
+				LIB.Debug(NSFormatString('{$NS}RRWP::OnDocumentComplete'), format('%s - %s', szTitle, szUrl), DEBUG_LEVEL.LOG)
 				--[[#DEBUG END]]
 				-- 注销超时处理时钟
-				LIB.DelayCall(PACKET_INFO.NAME_SPACE .. 'RRWP_TO_' .. RequestID, false)
+				LIB.DelayCall(NSFormatString('{$NS}RRWP_TO_') .. RequestID, false)
 				-- 成功回调函数
 				if settings.fulfilled then
 					CallWithThis(settings, settings.fulfilled)
@@ -372,13 +372,13 @@ function LIB.Ajax(settings)
 
 		-- do with this remote request
 		--[[#DEBUG BEGIN]]
-		LIB.Debug(PACKET_INFO.NAME_SPACE .. 'RRWP', settings.url, DEBUG_LEVEL.LOG)
+		LIB.Debug(NSFormatString('{$NS}RRWP'), settings.url, DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		-- register request timeout clock
 		if settings.timeout > 0 then
-			LIB.DelayCall(PACKET_INFO.NAME_SPACE .. 'RRWP_TO_' .. RequestID, settings.timeout, function()
+			LIB.DelayCall(NSFormatString('{$NS}RRWP_TO_') .. RequestID, settings.timeout, function()
 				--[[#DEBUG BEGIN]]
-				LIB.Debug(PACKET_INFO.NAME_SPACE .. 'RRWP::Timeout', settings.url, DEBUG_LEVEL.WARNING) -- log
+				LIB.Debug(NSFormatString('{$NS}RRWP::Timeout'), settings.url, DEBUG_LEVEL.WARNING) -- log
 				--[[#DEBUG END]]
 				-- request timeout, call timeout function.
 				if settings.error then
@@ -448,7 +448,7 @@ LIB.RegisterEvent('CURL_REQUEST_RESULT.AJAX', OnCurlRequestResult)
 end
 
 function LIB.DownloadFile(szPath, resolve, reject)
-	local downloader = LIB.UI.GetTempElement('Image.' .. PACKET_INFO.NAME_SPACE .. '#DownloadFile-' .. GetStringCRC(szPath) .. '#' .. GetTime())
+	local downloader = LIB.UI.GetTempElement(NSFormatString('Image.{$NS}#DownloadFile-') .. GetStringCRC(szPath) .. '#' .. GetTime())
 	downloader.FromTextureFile = function(_, szPath)
 		Call(resolve, szPath)
 	end

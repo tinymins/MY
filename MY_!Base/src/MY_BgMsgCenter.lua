@@ -291,7 +291,7 @@ local function OnFBAppendItemFromIni(hList)
 	end
 end
 
-LIB.RegisterFrameCreate('CrossMap.' .. PACKET_INFO.NAME_SPACE .. '#CD', function(name, frame)
+LIB.RegisterFrameCreate(NSFormatString('CrossMap.{$NS}#CD'), function(name, frame)
 	local hList = frame:Lookup('Wnd_CrossFB', 'Handle_DifficultyList')
 	if hList then
 		OnFBAppendItemFromIni(hList)
@@ -306,7 +306,7 @@ LIB.RegisterFrameCreate('CrossMap.' .. PACKET_INFO.NAME_SPACE .. '#CD', function
 	--[[#DEBUG END]]
 end)
 
-LIB.RegisterEvent('MY_MESSAGE_BOX_ACTION.' .. PACKET_INFO.NAME_SPACE .. '#CD', function()
+LIB.RegisterEvent(NSFormatString('MY_MESSAGE_BOX_ACTION.{$NS}#CD'), function()
 	if arg0 ~= 'crossmap_dungeon_reset' then
 		return
 	end
@@ -316,7 +316,7 @@ LIB.RegisterEvent('MY_MESSAGE_BOX_ACTION.' .. PACKET_INFO.NAME_SPACE .. '#CD', f
 	l_nSwitchMapID, l_nSwitchSubID = nil
 end)
 
-LIB.RegisterEvent('LOADING_ENDING.' .. PACKET_INFO.NAME_SPACE .. '#CD', function()
+LIB.RegisterEvent(NSFormatString('LOADING_ENDING.{$NS}#CD'), function()
 	l_dwEnteringTime = GetCurrentTime()
 	local me = GetClientPlayer()
 	local dwMapID = me.GetMapID()

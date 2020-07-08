@@ -163,7 +163,7 @@ UI = setmetatable({}, {
 			},
 		},
 	},
-	__tostring = function(t) return PACKET_INFO.NAME_SPACE .. '_UI (class prototype)' end,
+	__tostring = function(t) return NSFormatString('{$NS}_UI (class prototype)') end,
 	__call = function (...)
 		local store = {}
 		return createInstance(setmetatable({}, {
@@ -184,7 +184,7 @@ UI = setmetatable({}, {
 					store[k] = v
 				end
 			end,
-			__tostring = function(t) return PACKET_INFO.NAME_SPACE .. '_UI (class instance)' end,
+			__tostring = function(t) return NSFormatString('{$NS}_UI (class instance)') end,
 		}), nil, ...)
 	end,
 })
@@ -772,7 +772,7 @@ function UI:Add(mixed)
 	if IsElement(mixed) then
 		insert(raws, mixed)
 	end
-	if IsTable(mixed) and tostring(mixed) == PACKET_INFO.NAME_SPACE .. '_UI (class instance)' then
+	if IsTable(mixed) and tostring(mixed) == NSFormatString('{$NS}_UI (class instance)') then
 		for i = 1, mixed:Count() do
 			insert(raws, mixed[i])
 		end
@@ -1265,9 +1265,9 @@ function UI:Append(arg0, arg1)
 			else
 				szFile = PACKET_INFO.UICOMPONENT_ROOT .. szFile .. '.ini'
 			end
-			local frame = Wnd.OpenWindow(szFile, PACKET_INFO.NAME_SPACE .. '_TempWnd#' .. _nTempWndCount)
+			local frame = Wnd.OpenWindow(szFile, NSFormatString('{$NS}_TempWnd#') .. _nTempWndCount)
 			if not frame then
-				return LIB.Debug(PACKET_INFO.NAME_SPACE .. '#UI#Append', _L('Unable to open ini file [%s]', szFile), DEBUG_LEVEL.ERROR)
+				return LIB.Debug(NSFormatString('{$NS}#UI#Append'), _L('Unable to open ini file [%s]', szFile), DEBUG_LEVEL.ERROR)
 			end
 			_nTempWndCount = _nTempWndCount + 1
 			local raw = frame:Lookup(szComponent)
@@ -1280,7 +1280,7 @@ function UI:Append(arg0, arg1)
 					InitComponent(raw, szType)
 					parentHandle:FormatAllItemPos()
 				else
-					LIB.Debug(PACKET_INFO.NAME_SPACE .. '#UI#Append', _L('Can not find wnd or item component [%s:%s]', szFile, szComponent), DEBUG_LEVEL.ERROR)
+					LIB.Debug(NSFormatString('{$NS}#UI#Append'), _L('Can not find wnd or item component [%s:%s]', szFile, szComponent), DEBUG_LEVEL.ERROR)
 				end
 			end
 			if raw then
@@ -1379,7 +1379,7 @@ function UI:Visible(bVisible)
 	elseif IsFunction(bVisible) then
 		for _, raw in ipairs(self.raws) do
 			raw = GetComponentElement(raw, 'CHECKBOX') or GetComponentElement(raw, 'MAIN_WINDOW') or raw
-			LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '_UI_VISIBLE_CHECK#' .. tostring(raw), function()
+			LIB.BreatheCall(NSFormatString('{$NS}_UI_VISIBLE_CHECK#') .. tostring(raw), function()
 				if IsElement(raw) then
 					raw:SetVisible(bVisible())
 				else
@@ -1460,7 +1460,7 @@ function UI:Enable(...)
 		for _, raw in ipairs(self.raws) do
 			raw = GetComponentElement(raw, 'CHECKBOX') or GetComponentElement(raw, 'MAIN_WINDOW') or raw
 			if IsFunction(bEnable) then
-				LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '_UI_ENABLE_CHECK#' .. tostring(raw), function()
+				LIB.BreatheCall(NSFormatString('{$NS}_UI_ENABLE_CHECK#') .. tostring(raw), function()
 					if IsElement(raw) then
 						SetComponentEnable(raw, bEnable())
 					else
@@ -2163,7 +2163,7 @@ function UI:FadeTo(nTime, nOpacity, callback)
 			if not ui:Visible() then
 				ui:Alpha(0):Toggle(true)
 			end
-			LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '_FADE_' .. tostring(ui[1]), function()
+			LIB.BreatheCall(NSFormatString('{$NS}_FADE_') .. tostring(ui[1]), function()
 				ui:Show()
 				local nCurrentAlpha = fnCurrent(nStartAlpha, nOpacity, nTime, GetTime() - nStartTime)
 				ui:Alpha(nCurrentAlpha)
@@ -3277,7 +3277,7 @@ function UI:ItemInfo(...)
 				end
 				local res, err, trace = XpCall(UpdataItemInfoBoxObject, raw, unpack(data)) -- 防止itemtab不一样
 				if not res then
-					FireUIEvent('CALL_LUA_ERROR', err .. '\n' .. PACKET_INFO.NAME_SPACE .. '#UI:ItemInfo\n' .. trace .. '\n')
+					FireUIEvent('CALL_LUA_ERROR', err .. NSFormatString('\n{$NS}#UI:ItemInfo\n') .. trace .. '\n')
 				end
 			end
 		end
@@ -3296,7 +3296,7 @@ function UI:BoxInfo(nType, ...)
 			else
 				local res, err, trace = XpCall(UpdateBoxObject, raw, nType, ...) -- 防止itemtab内外网不一样
 				if not res then
-					FireUIEvent('CALL_LUA_ERROR', err .. '\n' .. PACKET_INFO.NAME_SPACE .. '#UI:BoxInfo\n' .. trace .. '\n')
+					FireUIEvent('CALL_LUA_ERROR', err .. NSFormatString('\n{$NS}#UI:BoxInfo\n') .. trace .. '\n')
 				end
 			end
 		end
@@ -4381,7 +4381,7 @@ function  UI.CreateFrame(szName, opt)
 				if frm.OnDragResize then
 					local res, err, trace = XpCall(frm.OnDragResize, frm:Lookup('Wnd_Total'))
 					if not res then
-						FireUIEvent('CALL_LUA_ERROR', err .. '\n' .. PACKET_INFO.NAME_SPACE .. '#OnDragResize\n' .. trace .. '\n')
+						FireUIEvent('CALL_LUA_ERROR', err .. NSFormatString('\n{$NS}#OnDragResize\n') .. trace .. '\n')
 					end
 				end
 			end
@@ -4411,7 +4411,7 @@ function UI.OpenColorPicker(callback, t)
 	if t then
 		return OpenColorTablePanel(callback,nil,nil,t)
 	end
-	local ui = UI.CreateFrame(PACKET_INFO.NAME_SPACE .. '_ColorTable', { simple = true, close = true, esc = true })
+	local ui = UI.CreateFrame(NSFormatString('{$NS}_ColorTable'), { simple = true, close = true, esc = true })
 	  :Size(900, 500):Text(_L['color picker']):Anchor({s='CENTER', r='CENTER', x=0, y=0})
 	local fnHover = function(bHover, r, g, b)
 		if bHover then
@@ -4544,7 +4544,7 @@ function UI.OpenColorPickerEx(fnAction)
 		return floor(r * 255), floor(g * 255), floor(b * 255)
 	end
 
-	local wnd = UI.CreateFrame(PACKET_INFO.NAME_SPACE .. '_ColorPickerEx', { w = 346, h = 430, text = _L['color picker ex'], simple = true, close = true, esc = true, x = fX + 15, y = fY + 15 })
+	local wnd = UI.CreateFrame(NSFormatString('{$NS}_ColorPickerEx'), { w = 346, h = 430, text = _L['color picker ex'], simple = true, close = true, esc = true, x = fX + 15, y = fY + 15 })
 	local fnHover = function(bHover, r, g, b)
 		if bHover then
 			wnd:Children('#Select'):Color(r, g, b)
@@ -4606,7 +4606,7 @@ end
 
 -- 打开字体选择
 function UI.OpenFontPicker(callback, t)
-	local ui, i = UI.CreateFrame(PACKET_INFO.NAME_SPACE .. '_Font_Picker', { simple = true, close = true, esc = true, text = _L['Font picker'] }), 0
+	local ui, i = UI.CreateFrame(NSFormatString('{$NS}_Font_Picker'), { simple = true, close = true, esc = true, text = _L['Font picker'] }), 0
 	while 1 do
 		local font = i
 		local txt = ui:Append('Text', {
@@ -4695,7 +4695,7 @@ function UI.OpenIconPanel(fnAction)
 		MAX_ICON = MAX_ICON or 10000
 	end
 	local nMaxIcon, boxs, txts = MAX_ICON, {}, {}
-	local ui = UI.CreateFrame(PACKET_INFO.NAME_SPACE .. '_IconPanel', { w = 920, h = 650, text = _L['Icon Picker'], simple = true, close = true, esc = true })
+	local ui = UI.CreateFrame(NSFormatString('{$NS}_IconPanel'), { w = 920, h = 650, text = _L['Icon Picker'], simple = true, close = true, esc = true })
 	local function GetPage(nPage, bInit)
 		if nPage == ICON_PAGE and not bInit then
 			return
@@ -4766,7 +4766,7 @@ end
 -- 打开文本编辑器
 function UI.OpenTextEditor(szText, szFrameName)
 	if not szFrameName then
-		szFrameName = PACKET_INFO.NAME_SPACE .. '_DefaultTextEditor'
+		szFrameName = NSFormatString('{$NS}_DefaultTextEditor')
 	end
 	local w, h, ui = 400, 300
 	local function OnResize()
@@ -5128,7 +5128,7 @@ function UI.GetTempElement(szType)
 	end
 	if not cache or not ui or ui:Count() == 0 then
 		cache = {}
-		ui = UI.CreateFrame(PACKET_INFO.NAME_SPACE .. '#TempElement', { empty = true }):Hide()
+		ui = UI.CreateFrame(NSFormatString('{$NS}#TempElement'), { empty = true }):Hide()
 	end
 	local szName = szType .. '_' .. szKey
 	local raw = cache[szName]

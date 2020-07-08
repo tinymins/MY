@@ -807,7 +807,7 @@ function LIB.IsBoss(dwMapID, dwTemplateID)
 	) and true or false
 end
 
-LIB.RegisterTargetAddonMenu(PACKET_INFO.NAME_SPACE .. '#Game#Bosslist', function()
+LIB.RegisterTargetAddonMenu(NSFormatString('{$NS}#Game#Bosslist'), function()
 	local dwType, dwID = LIB.GetTarget()
 	if dwType == TARGET.NPC and (IsCtrlKeyDown() or IsAltKeyDown() or IsShiftKeyDown()) then
 		GenerateList()
@@ -920,7 +920,7 @@ function LIB.IsShieldedNpc(dwTemplateID, szType)
 	return bShieldFocus
 end
 
-LIB.RegisterTargetAddonMenu(PACKET_INFO.NAME_SPACE .. '#Game#ImportantNpclist', function()
+LIB.RegisterTargetAddonMenu(NSFormatString('{$NS}#Game#ImportantNpclist'), function()
 	local dwType, dwID = LIB.GetTarget()
 	if dwType == TARGET.NPC and (IsCtrlKeyDown() or IsAltKeyDown() or IsShiftKeyDown()) then
 		GenerateList()
@@ -1616,17 +1616,17 @@ function LIB.GetNearDoodadTable()
 end
 end
 
-LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '#FIGHT_HINT_TRIGGER', function()
+LIB.BreatheCall(NSFormatString('{$NS}#FIGHT_HINT_TRIGGER'), function()
 	for dwID, tar in pairs(NEARBY_NPC) do
 		if tar.bFightState ~= NEARBY_FIGHT[dwID] then
 			NEARBY_FIGHT[dwID] = tar.bFightState
-			FireUIEvent(PACKET_INFO.NAME_SPACE .. '_NPC_FIGHT_HINT', dwID, tar.bFightState)
+			FireUIEvent(NSFormatString('{$NS}_NPC_FIGHT_HINT'), dwID, tar.bFightState)
 		end
 	end
 	for dwID, tar in pairs(NEARBY_PLAYER) do
 		if tar.bFightState ~= NEARBY_FIGHT[dwID] then
 			NEARBY_FIGHT[dwID] = tar.bFightState
-			FireUIEvent(PACKET_INFO.NAME_SPACE .. '_PLAYER_FIGHT_HINT', dwID, tar.bFightState)
+			FireUIEvent(NSFormatString('{$NS}_PLAYER_FIGHT_HINT'), dwID, tar.bFightState)
 		end
 	end
 end)
@@ -1699,7 +1699,7 @@ end
 
 -- 打开一个拾取交互物件（当前帧重复调用仅打开一次防止庖丁）
 function LIB.OpenDoodad(me, doodad)
-	LIB.Throttle(PACKET_INFO.NAME_SPACE .. '#OpenDoodad' .. doodad.dwID, 375, function()
+	LIB.Throttle(NSFormatString('{$NS}#OpenDoodad') .. doodad.dwID, 375, function()
 		--[[#DEBUG BEGIN]]
 		LIB.Debug('Open Doodad ' .. doodad.dwID .. ' [' .. doodad.szName .. '] at ' .. GetLogicFrameCount() .. '.', DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
@@ -1709,7 +1709,7 @@ end
 
 -- 交互一个拾取交互物件（当前帧重复调用仅交互一次防止庖丁）
 function LIB.InteractDoodad(dwID)
-	LIB.Throttle(PACKET_INFO.NAME_SPACE .. '#InteractDoodad' .. dwID, 375, function()
+	LIB.Throttle(NSFormatString('{$NS}#InteractDoodad') .. dwID, 375, function()
 		--[[#DEBUG BEGIN]]
 		LIB.Debug('Open Doodad ' .. dwID .. ' at ' .. GetLogicFrameCount() .. '.', DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
@@ -2080,7 +2080,7 @@ local function ListenFightStateChange()
 				-- 新的一轮战斗开始
 				FIGHT_BEGIN_TICK = GetTickCount()
 				FIGHT_UUID = FIGHT_BEGIN_TICK
-				FireUIEvent(PACKET_INFO.NAME_SPACE .. '_FIGHT_HINT', true, FIGHT_UUID, 0)
+				FireUIEvent(NSFormatString('{$NS}_FIGHT_HINT'), true, FIGHT_UUID, 0)
 			end
 		end
 	else
@@ -2089,11 +2089,11 @@ local function ListenFightStateChange()
 			FIGHT_END_TICK, FIGHTING = GetTickCount(), false
 		elseif FIGHT_UUID and GetTickCount() - FIGHT_END_TICK > 5000 then
 			LAST_FIGHT_UUID, FIGHT_UUID = FIGHT_UUID, nil
-			FireUIEvent(PACKET_INFO.NAME_SPACE .. '_FIGHT_HINT', false, LAST_FIGHT_UUID, FIGHT_END_TICK - FIGHT_BEGIN_TICK)
+			FireUIEvent(NSFormatString('{$NS}_FIGHT_HINT'), false, LAST_FIGHT_UUID, FIGHT_END_TICK - FIGHT_BEGIN_TICK)
 		end
 	end
 end
-LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '#ListenFightStateChange', ListenFightStateChange)
+LIB.BreatheCall(NSFormatString('{$NS}#ListenFightStateChange'), ListenFightStateChange)
 
 -- 获取当前战斗时间
 function LIB.GetFightTime(szFormat)
@@ -2330,7 +2330,7 @@ local function WithTargetHandle()
 	LIB.SetTempTarget(r.dwType, r.dwID)
 	local res, err, trace = XpCall(r.callback)
 	if not res then
-		FireUIEvent('CALL_LUA_ERROR', err .. '\n' .. PACKET_INFO.NAME_SPACE .. '#WithTarget\n' .. trace .. '\n')
+		FireUIEvent('CALL_LUA_ERROR', err .. NSFormatString('\n{$NS}#WithTarget\n') .. trace .. '\n')
 	end
 	LIB.ResumeTarget()
 
@@ -2511,9 +2511,9 @@ function LIB.GetItemAmountInAllPackages(dwTabType, dwIndex, nBookID, bFull)
 	return cache[szKey] or 0
 end
 LIB.RegisterEvent({
-	'BAG_ITEM_UPDATE.' .. PACKET_INFO.NAME_SPACE .. '#LIB#GetItemAmountInAllPackages',
-	'BANK_ITEM_UPDATE.' .. PACKET_INFO.NAME_SPACE .. '#LIB#GetItemAmountInAllPackages',
-	'LOADING_ENDING.' .. PACKET_INFO.NAME_SPACE .. '#LIB#GetItemAmountInAllPackages'
+	NSFormatString('BAG_ITEM_UPDATE.{$NS}#LIB#GetItemAmountInAllPackages'),
+	NSFormatString('BANK_ITEM_UPDATE.{$NS}#LIB#GetItemAmountInAllPackages'),
+	NSFormatString('LOADING_ENDING.{$NS}#LIB#GetItemAmountInAllPackages')
 }, function()
 	CACHE, FULL_CACHE = nil
 end)
@@ -2591,7 +2591,7 @@ local function GetBuffKey(dwID, nLevel, dwSkillSrcID)
 end
 -- 缓存保护
 local function Reject()
-	assert(false, 'Modify buff list from ' .. PACKET_INFO.NAME_SPACE .. '.GetBuffList is forbidden!')
+	assert(false, NSFormatString('Modify buff list from {$NS}.GetBuffList is forbidden!'))
 end
 -- 缓存检查
 local function GeneObjectBuffCache(KObject, nIndex)

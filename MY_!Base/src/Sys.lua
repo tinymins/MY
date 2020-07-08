@@ -228,14 +228,14 @@ function LIB.SetHotKey(szCommand, nIndex, nKey, bShift, bCtrl, bAlt)
 	end
 end
 
-LIB.RegisterInit(PACKET_INFO.NAME_SPACE .. '#BIND_HOTKEY', function()
+LIB.RegisterInit(NSFormatString('{$NS}#BIND_HOTKEY'), function()
 	-- hotkey
-	Hotkey.AddBinding(PACKET_INFO.NAME_SPACE .. '_Total', _L['Open/Close main panel'], PACKET_INFO.NAME, LIB.TogglePanel, nil)
+	Hotkey.AddBinding(NSFormatString('{$NS}_Total'), _L['Open/Close main panel'], PACKET_INFO.NAME, LIB.TogglePanel, nil)
 	for _, v in ipairs(HOTKEY_CACHE) do
 		Hotkey.AddBinding(v.szName, v.szTitle, '', v.fnDown, v.fnUp)
 	end
 	for i = 1, 5 do
-		Hotkey.AddBinding(PACKET_INFO.NAME_SPACE .. '_HotKey_Null_'..i, _L['none-function hotkey'], '', function() end, nil)
+		Hotkey.AddBinding(NSFormatString('{$NS}_HotKey_Null_')..i, _L['none-function hotkey'], '', function() end, nil)
 	end
 end)
 if PACKET_INFO.DEBUG_LEVEL <= DEBUG_LEVEL.DEBUG then
@@ -262,7 +262,7 @@ if PACKET_INFO.DEBUG_LEVEL <= DEBUG_LEVEL.DEBUG then
 		'Normal1/EditBox',
 		'Normal/' .. PACKET_INFO.NAME_SPACE,
 	}
-	LIB.RegisterHotKey(PACKET_INFO.NAME_SPACE .. '_STAGE_CHAT', _L['Display only chat panel'], function()
+	LIB.RegisterHotKey(NSFormatString('{$NS}_STAGE_CHAT'), _L['Display only chat panel'], function()
 		if Station.IsVisible() then
 			for _, v in ipairs(aFrame) do
 				local frame = Station.Lookup(v)
@@ -282,7 +282,7 @@ if PACKET_INFO.DEBUG_LEVEL <= DEBUG_LEVEL.DEBUG then
 		end
 	end)
 end
-LIB.RegisterHotKey(PACKET_INFO.NAME_SPACE .. '_STOP_CASTING', _L['Stop cast skill'], function() GetClientPlayer().StopCurrentAction() end)
+LIB.RegisterHotKey(NSFormatString('{$NS}_STOP_CASTING'), _L['Stop cast skill'], function() GetClientPlayer().StopCurrentAction() end)
 end
 
 -- Save & Load Lua Data
@@ -1000,7 +1000,7 @@ function LIB.GetFontList()
 end
 
 -- 加载注册数据
-LIB.RegisterInit(PACKET_INFO.NAME_SPACE .. '#INITDATA', function()
+LIB.RegisterInit(NSFormatString('{$NS}#INITDATA'), function()
 	local t = LoadLUAData(LIB.GetLUADataPath({'config/initial.jx3dat', PATH_TYPE.GLOBAL}))
 	if t then
 		for v_name, v_data in pairs(t) do
@@ -1027,7 +1027,7 @@ local function FormatStorageData(me, d)
 end
 -- 个人数据版本号
 local m_nStorageVer = {}
-LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '#STORAGE_DATA', 200, function()
+LIB.BreatheCall(NSFormatString('{$NS}#STORAGE_DATA'), 200, function()
 	if not LIB.IsInitialized() then
 		return
 	end
@@ -1082,7 +1082,7 @@ LIB.BreatheCall(PACKET_INFO.NAME_SPACE .. '#STORAGE_DATA', 200, function()
 	})
 	return 0
 end)
-LIB.RegisterFlush(PACKET_INFO.NAME_SPACE .. '#STORAGE_DATA', function()
+LIB.RegisterFlush(NSFormatString('{$NS}#STORAGE_DATA'), function()
 	LIB.SaveLUAData({'config/storageversion.jx3dat', PATH_TYPE.ROLE}, m_nStorageVer)
 end)
 -- 保存个人数据 方便网吧党和公司家里多电脑切换
@@ -1674,12 +1674,12 @@ local function OnMessageBoxOpen()
 			local nIndex, szOption = btn.nIndex, btn.szOption
 			if btn.fnAction then
 				HookTableFunc(btn, 'fnAction', function()
-					FireUIEvent(PACKET_INFO.NAME_SPACE .. '_MESSAGE_BOX_ACTION', szName, 'ACTION', szOption, nIndex)
+					FireUIEvent(NSFormatString('{$NS}_MESSAGE_BOX_ACTION'), szName, 'ACTION', szOption, nIndex)
 				end, { bAfterOrigin = true })
 			end
 			if btn.fnCountDownEnd then
 				HookTableFunc(btn, 'fnCountDownEnd', function()
-					FireUIEvent(PACKET_INFO.NAME_SPACE .. '_MESSAGE_BOX_ACTION', szName, 'TIME_OUT', szOption, nIndex)
+					FireUIEvent(NSFormatString('{$NS}_MESSAGE_BOX_ACTION'), szName, 'TIME_OUT', szOption, nIndex)
 				end, { bAfterOrigin = true })
 			end
 			aMsg[i] = { nIndex = nIndex, szOption = szOption }
@@ -1691,20 +1691,20 @@ local function OnMessageBoxOpen()
 		if not msg then
 			return
 		end
-		FireUIEvent(PACKET_INFO.NAME_SPACE .. '_MESSAGE_BOX_ACTION', szName, 'ACTION', msg.szOption, msg.nIndex)
+		FireUIEvent(NSFormatString('{$NS}_MESSAGE_BOX_ACTION'), szName, 'ACTION', msg.szOption, msg.nIndex)
 	end, { bAfterOrigin = true })
 
 	HookTableFunc(frame, 'fnCancelAction', function()
-		FireUIEvent(PACKET_INFO.NAME_SPACE .. '_MESSAGE_BOX_ACTION', szName, 'CANCEL')
+		FireUIEvent(NSFormatString('{$NS}_MESSAGE_BOX_ACTION'), szName, 'CANCEL')
 	end, { bAfterOrigin = true })
 
 	if frame.fnAutoClose then
 		HookTableFunc(frame, 'fnAutoClose', function()
-			FireUIEvent(PACKET_INFO.NAME_SPACE .. '_MESSAGE_BOX_ACTION', szName, 'AUTO_CLOSE')
+			FireUIEvent(NSFormatString('{$NS}_MESSAGE_BOX_ACTION'), szName, 'AUTO_CLOSE')
 		end, { bAfterOrigin = true })
 	end
 
-	FireUIEvent(PACKET_INFO.NAME_SPACE .. '_MESSAGE_BOX_OPEN', arg0, arg1)
+	FireUIEvent(NSFormatString('{$NS}_MESSAGE_BOX_OPEN'), arg0, arg1)
 end
 LIB.RegisterEvent('ON_MESSAGE_BOX_OPEN', OnMessageBoxOpen)
 end
@@ -1714,10 +1714,10 @@ local nIndex = 0
 function LIB.Alert(szName, szMsg, fnAction, szSure, fnCancelAction)
 	if IsFunction(szMsg) or IsNil(szMsg) then
 		szMsg, fnAction, szSure, fnCancelAction = szName, szMsg, fnAction, szSure
-		szName = PACKET_INFO.NAME_SPACE .. '_Alert' .. nIndex
+		szName = NSFormatString('{$NS}_Alert') .. nIndex
 		nIndex = nIndex + 1
 	else
-		szName = PACKET_INFO.NAME_SPACE .. '_AlertCRC' .. GetStringCRC(szName)
+		szName = NSFormatString('{$NS}_AlertCRC') .. GetStringCRC(szName)
 	end
 	local nW, nH = Station.GetClientSize()
 	local tMsg = {
@@ -1740,7 +1740,7 @@ function LIB.Confirm(szMsg, fnAction, fnCancel, szSure, szCancel, fnCancelAction
 	local nW, nH = Station.GetClientSize()
 	local tMsg = {
 		x = nW / 2, y = nH / 3,
-		szName = PACKET_INFO.NAME_SPACE .. '_Confirm',
+		szName = NSFormatString('{$NS}_Confirm'),
 		szMessage = szMsg,
 		szAlignment = 'CENTER',
 		fnCancelAction = fnCancelAction,
@@ -1759,7 +1759,7 @@ function LIB.Dialog(szMsg, aOptions, fnCancelAction)
 	local nW, nH = Station.GetClientSize()
 	local tMsg = {
 		x = nW / 2, y = nH / 3,
-		szName = PACKET_INFO.NAME_SPACE .. '_Dialog',
+		szName = NSFormatString('{$NS}_Dialog'),
 		szMessage = szMsg,
 		szAlignment = 'CENTER',
 		fnCancelAction = fnCancelAction,
@@ -2439,7 +2439,7 @@ if _G.Login_GetTimeOfFee then
 else
 	local bInit, dwMonthEndTime, dwPointEndTime, dwDayEndTime = false, 0, 0, 0
 	local frame = Station.Lookup('Lowest/Scene')
-	local data = frame and frame[PACKET_INFO.NAME_SPACE .. '_TimeOfFee']
+	local data = frame and frame[NSFormatString('{$NS}_TimeOfFee')]
 	if data then
 		bInit, dwMonthEndTime, dwPointEndTime, dwDayEndTime = true, unpack(data)
 	else
@@ -2464,7 +2464,7 @@ else
 				end
 				local frame = Station.Lookup('Lowest/Scene')
 				if frame then
-					frame[PACKET_INFO.NAME_SPACE .. '_TimeOfFee'] = {dwMonthEndTime, dwPointEndTime, dwDayEndTime}
+					frame[NSFormatString('{$NS}_TimeOfFee')] = {dwMonthEndTime, dwPointEndTime, dwDayEndTime}
 				end
 				LIB.RegisterMsgMonitor('LIB#GetTimeOfFee')
 			end
