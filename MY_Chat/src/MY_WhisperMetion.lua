@@ -60,7 +60,27 @@ RegisterCustomData('MY_WhisperMetion.bEnable')
 
 function D.Apply()
 	if O.bEnable then
-		LIB.RegisterMsgMonitor('MY_RedirectMetionToWhisper', function(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID, szName)
+		LIB.RegisterMsgMonitor({
+			'MSG_NORMAL.MY_RedirectMetionToWhisper',
+			'MSG_PARTY.MY_RedirectMetionToWhisper',
+			'MSG_MAP.MY_RedirectMetionToWhisper',
+			'MSG_BATTLE_FILED.MY_RedirectMetionToWhisper',
+			'MSG_GUILD.MY_RedirectMetionToWhisper',
+			'MSG_GUILD_ALLIANCE.MY_RedirectMetionToWhisper',
+			'MSG_SCHOOL.MY_RedirectMetionToWhisper',
+			'MSG_WORLD.MY_RedirectMetionToWhisper',
+			'MSG_TEAM.MY_RedirectMetionToWhisper',
+			'MSG_CAMP.MY_RedirectMetionToWhisper',
+			'MSG_GROUP.MY_RedirectMetionToWhisper',
+			'MSG_SEEK_MENTOR.MY_RedirectMetionToWhisper',
+			'MSG_FRIEND.MY_RedirectMetionToWhisper',
+			'MSG_IDENTITY.MY_RedirectMetionToWhisper',
+			'MSG_SYS.MY_RedirectMetionToWhisper',
+			'MSG_NPC_NEARBY.MY_RedirectMetionToWhisper',
+			'MSG_NPC_YELL.MY_RedirectMetionToWhisper',
+			'MSG_NPC_PARTY.MY_RedirectMetionToWhisper',
+			'MSG_NPC_WHISPER.MY_RedirectMetionToWhisper',
+		}, function(szChannel, szMsg, nFont, bRich, r, g, b, dwTalkerID, szName)
 			local me = GetClientPlayer()
 			if not me or me.dwID == dwTalkerID then
 				return
@@ -70,11 +90,7 @@ function D.Apply()
 			if nPos and StringFindW(szMsg, szText, nPos) then
 				OutputMessage('MSG_WHISPER', szMsg, bRich, nFont, {r, g, b}, dwTalkerID, szName)
 			end
-		end, {
-			'MSG_NORMAL', 'MSG_PARTY', 'MSG_MAP', 'MSG_BATTLE_FILED', 'MSG_GUILD', 'MSG_GUILD_ALLIANCE', 'MSG_SCHOOL', 'MSG_WORLD',
-			'MSG_TEAM', 'MSG_CAMP', 'MSG_GROUP', 'MSG_SEEK_MENTOR', 'MSG_FRIEND', 'MSG_IDENTITY', 'MSG_SYS',
-			'MSG_NPC_NEARBY', 'MSG_NPC_YELL', 'MSG_NPC_PARTY', 'MSG_NPC_WHISPER',
-		})
+		end)
 		LIB.HookChatPanel('FILTER.MY_RedirectMetionToWhisper', function(h, szMsg, szChannel, dwTime)
 			if h.__MY_LastMsg == szMsg and h.__MY_LastMsgChannel ~= szChannel and szChannel == 'MSG_WHISPER' then
 				return false
@@ -85,7 +101,25 @@ function D.Apply()
 		end)
 	else
 		LIB.HookChatPanel('FILTER.MY_RedirectMetionToWhisper', false)
-		LIB.RegisterMsgMonitor('MY_RedirectMetionToWhisper')
+		LIB.RegisterMsgMonitor('MSG_NORMAL.MY_RedirectMetionToWhisper', false)
+		LIB.RegisterMsgMonitor('MSG_PARTY.MY_RedirectMetionToWhisper', false)
+		LIB.RegisterMsgMonitor('MSG_MAP.MY_RedirectMetionToWhisper', false)
+		LIB.RegisterMsgMonitor('MSG_BATTLE_FILED.MY_RedirectMetionToWhisper', false)
+		LIB.RegisterMsgMonitor('MSG_GUILD.MY_RedirectMetionToWhisper', false)
+		LIB.RegisterMsgMonitor('MSG_GUILD_ALLIANCE.MY_RedirectMetionToWhisper', false)
+		LIB.RegisterMsgMonitor('MSG_SCHOOL.MY_RedirectMetionToWhisper', false)
+		LIB.RegisterMsgMonitor('MSG_WORLD.MY_RedirectMetionToWhisper',false)
+		LIB.RegisterMsgMonitor('MSG_TEAM.MY_RedirectMetionToWhisper', false)
+		LIB.RegisterMsgMonitor('MSG_CAMP.MY_RedirectMetionToWhisper', false)
+		LIB.RegisterMsgMonitor('MSG_GROUP.MY_RedirectMetionToWhisper', false)
+		LIB.RegisterMsgMonitor('MSG_SEEK_MENTOR.MY_RedirectMetionToWhisper', false)
+		LIB.RegisterMsgMonitor('MSG_FRIEND.MY_RedirectMetionToWhisper', false)
+		LIB.RegisterMsgMonitor('MSG_IDENTITY.MY_RedirectMetionToWhisper', false)
+		LIB.RegisterMsgMonitor('MSG_SYS.MY_RedirectMetionToWhisper',false)
+		LIB.RegisterMsgMonitor('MSG_NPC_NEARBY.MY_RedirectMetionToWhisper', false)
+		LIB.RegisterMsgMonitor('MSG_NPC_YELL.MY_RedirectMetionToWhisper', false)
+		LIB.RegisterMsgMonitor('MSG_NPC_PARTY.MY_RedirectMetionToWhisper', false)
+		LIB.RegisterMsgMonitor('MSG_NPC_WHISPER.MY_RedirectMetionToWhisper',false)
 	end
 end
 LIB.RegisterInit('MY_WhisperMetion', D.Apply)

@@ -187,12 +187,12 @@ LIB.RegisterEvent('LOADING_ENDING.MY_RoleStatistics_SerendipityStat', function()
 				end)
 			end
 			if serendipity.aRejectNpcSayTo then
-				RegisterMsgMonitor('MY_RoleStatistics_SerendipityStat_RejectNpcSayTo' .. serendipity.nID, function(szMsg, nFont, bRich)
+				RegisterMsgMonitor('MSG_NPC_NEARBY.MY_RoleStatistics_SerendipityStat_RejectNpcSayTo' .. serendipity.nID, function(szChannel, szMsg, nFont, bRich)
 					if bRich then
 						szMsg = GetPureText(szMsg)
 					end
 					SerendipityStringTrigger(szMsg, serendipity.aRejectNpcSayTo, serendipity.nID, serendipity.nMaxAttemptNum)
-				end, { "MSG_NPC_NEARBY" })
+				end)
 			end
 			-- 尝试一次的判断们
 			if serendipity.aAttemptOpenWindow then
@@ -201,12 +201,12 @@ LIB.RegisterEvent('LOADING_ENDING.MY_RoleStatistics_SerendipityStat', function()
 				end)
 			end
 			if serendipity.aAttemptNpcSayTo then
-				RegisterMsgMonitor('MY_RoleStatistics_SerendipityStat_AttemptNpcSayTo' .. serendipity.nID, function(szMsg, nFont, bRich)
+				RegisterMsgMonitor('MSG_NPC_NEARBY.MY_RoleStatistics_SerendipityStat_AttemptNpcSayTo' .. serendipity.nID, function(szChannel, szMsg, nFont, bRich)
 					if bRich then
 						szMsg = GetPureText(szMsg)
 					end
 					SerendipityStringTrigger(szMsg, serendipity.aAttemptNpcSayTo, serendipity.nID)
-				end, { "MSG_NPC_NEARBY" })
+				end)
 			end
 			if serendipity.aAttemptLootItem then
 				RegisterEvent('LOOT_ITEM.MY_RoleStatistics_SerendipityStat_AttemptLootItem' .. serendipity.nID, function()
@@ -246,12 +246,12 @@ LIB.RegisterEvent('LOADING_ENDING.MY_RoleStatistics_SerendipityStat', function()
 				end)
 			end
 			if serendipity.aFailureNpcSayTo then
-				RegisterMsgMonitor('MY_RoleStatistics_SerendipityStat_FailureNpcSayTo' .. serendipity.nID, function(szMsg, nFont, bRich)
+				RegisterMsgMonitor('MSG_NPC_NEARBY.MY_RoleStatistics_SerendipityStat_FailureNpcSayTo' .. serendipity.nID, function(szChannel, szMsg, nFont, bRich)
 					if bRich then
 						szMsg = GetPureText(szMsg)
 					end
 					SerendipityStringTrigger(szMsg, serendipity.aFailureNpcSayTo, serendipity.nID)
-				end, { "MSG_NPC_NEARBY" })
+				end)
 			end
 			if serendipity.aFailureWarningMessage then
 				RegisterEvent('ON_WARNING_MESSAGE.MY_RoleStatistics_SerendipityStat_FailureWarningMessage' .. serendipity.nID, function()

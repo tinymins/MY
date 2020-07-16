@@ -294,7 +294,7 @@ end
 -------------------------------------
 -- 事件处理
 -------------------------------------
-function D.MonitorZP(szMsg)
+function D.MonitorZP(szChannel, szMsg)
 	local _, _, nP = find(szMsg, _L['Current total score:(%d+)'])
 	if nP then
 		D.nPoint = tonumber(nP)
@@ -365,7 +365,7 @@ function D.Start()
 		return
 	end
 	D.bEnable = true
-	LIB.RegisterMsgMonitor('MY_Taoguan', D.MonitorZP, {'MSG_SYS'})
+	LIB.RegisterMsgMonitor('MSG_SYS.MY_Taoguan', D.MonitorZP)
 	LIB.BreatheCall('MY_Taoguan', D.BreakCanStateTransfer)
 	LIB.RegisterEvent('LOOT_ITEM.MY_Taoguan', D.OnLootItem)
 	LIB.RegisterEvent('DOODAD_ENTER_SCENE.MY_Taoguan', D.OnDoodadEnter)
@@ -386,7 +386,7 @@ function D.Stop()
 		return
 	end
 	D.bEnable = false
-	LIB.RegisterMsgMonitor('MY_Taoguan', false)
+	LIB.RegisterMsgMonitor('MSG_SYS.MY_Taoguan', false)
 	LIB.BreatheCall('MY_Taoguan', false)
 	LIB.RegisterEvent('NPC_ENTER_SCENE.MY_Taoguan', false)
 	LIB.RegisterEvent('LOOT_ITEM.MY_Taoguan', false)

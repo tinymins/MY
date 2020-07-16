@@ -1772,7 +1772,7 @@ for _, v in ipairs({
 	end)
 end
 -- 系统消息日志
-LIB.RegisterMsgMonitor('MY_Recount_DS_Everything', function(szMsg, nFont, bRich)
+LIB.RegisterMsgMonitor('MSG_SYS.MY_Recount_DS_Everything', function(szChannel, szMsg, nFont, bRich)
 	if not O.bEnable then
 		return
 	end
@@ -1784,7 +1784,7 @@ LIB.RegisterMsgMonitor('MY_Recount_DS_Everything', function(szMsg, nFont, bRich)
 		Data, nLFC, nTime, nTick,
 		EVERYTHING_TYPE.SYS_MSG, szMsg:gsub('\r', '')
 	)
-end, { 'MSG_SYS' })
+end)
 -- 角色喊话日志
 LIB.RegisterEvent('PLAYER_SAY', function()
 	if not O.bEnable then

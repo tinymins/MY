@@ -189,7 +189,7 @@ function D.OnNotifyCB()
 end
 
 -- 插入聊天内容时监控聊天信息
-function D.OnMsgArrive(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID, szName)
+function D.OnMsgArrive(szChannel, szMsg, nFont, bRich, r, g, b, dwTalkerID, szName)
     -- is enabled
     if not O.bCapture then
         return
@@ -344,6 +344,9 @@ end
 LIB.RegisterExit('MY_ChatMonitor', D.Exit)
 
 function D.RegisterMsgMonitor()
+    for _, szChannel in ipairs(O.aCurrentChannel or CONSTANT.EMPTY_TABLE) do
+        LIB.RegisterMsgMonitor(szChannel .. '.MY_ChatMonitor', false)
+    end
     local tChannel = {}
     for _, p in ipairs(KEYWORD_LIST) do
         if p.bEnable then
@@ -358,11 +361,10 @@ function D.RegisterMsgMonitor()
     for szChannel, _ in pairs(tChannel) do
         insert(aChannel, szChannel)
     end
-    UnRegisterMsgMonitor(D.OnMsgArrive)
-    if #aChannel == 0 then
-        return
+    for _, szChannel in ipairs(aChannel) do
+        LIB.RegisterMsgMonitor(szChannel .. '.MY_ChatMonitor', D.OnMsgArrive)
     end
-    RegisterMsgMonitor(D.OnMsgArrive, aChannel)
+    O.aCurrentChannel = aChannel
 end
 
 -------------------------------------------------------------------------------------------------------

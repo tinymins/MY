@@ -252,7 +252,7 @@ function D.GetSerendipityInfo(dwTabType, dwIndex)
 	end
 end
 
-LIB.RegisterMsgMonitor('QIYU', function(szMsg, nFont, bRich, r, g, b, szChannel)
+LIB.RegisterMsgMonitor('MSG_SYS.QIYU', function(szChannel, szMsg, nFont, bRich, r, g, b)
 	local me = GetClientPlayer()
 	if not me then
 		return
@@ -284,7 +284,7 @@ LIB.RegisterMsgMonitor('QIYU', function(szMsg, nFont, bRich, r, g, b, szChannel)
 		end
 		D.OnSerendipity(szName, szSerendipity, 1, 0, GetCurrentTime())
 	end)
-end, {'MSG_SYS'})
+end)
 
 LIB.RegisterEvent('LOOT_ITEM', function()
 	local player = GetPlayer(arg0)

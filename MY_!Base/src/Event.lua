@@ -692,42 +692,37 @@ end
 ---------------------------------------------------------------------------------------------
 -- ×¢²áÁÄÌì¼àÌý
 ---------------------------------------------------------------------------------------------
--- Register:   LIB.RegisterMsgMonitor(string szKey, function fnAction, table tChannels)
---             LIB.RegisterMsgMonitor(function fnAction, table tChannels)
--- Unregister: LIB.RegisterMsgMonitor(string szKey)
+-- Register:   LIB.RegisterMsgMonitor(string szKey, function fnAction)
+-- Unregister: LIB.RegisterMsgMonitor(string szKey, false)
 do
-local MSG_MONITOR_FUNC = {}
-function LIB.RegisterMsgMonitor(arg0, arg1, arg2)
-	local szKey, fnAction, tChannels
-	local tp0, tp1, tp2 = type(arg0), type(arg1), type(arg2)
-	if tp0 == 'string' and tp1 == 'function' and tp2 == 'table' then
-		szKey, fnAction, tChannels = arg0, arg1, arg2
-	elseif tp0 == 'function' and tp1 == 'table' then
-		fnAction, tChannels = arg0, arg1
-	elseif tp0 == 'string' and not arg1 then
-		szKey = arg0
+local MSGMON_EVENT = { szName = 'MsgMonitor' }
+local function MsgMonHandler(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID, szName)
+	if bRich then
+		-- filter addon comm.
+		if StringFindW(szMsg, 'eventlink') and StringFindW(szMsg, _L['Addon comm.']) then
+			return
+		end
+		-- filter addon echo message.
+		if szChannel == 'MSG_SYS' and StringFindW(szMsg, '<text>text=""') == 1 then
+			return
+		end
 	end
-
-	if szKey and MSG_MONITOR_FUNC[szKey] then
-		UnRegisterMsgMonitor(MSG_MONITOR_FUNC[szKey].fn)
-		MSG_MONITOR_FUNC[szKey] = nil
+	CommonEventFirer(MSGMON_EVENT, szChannel, szMsg, nFont, bRich, r, g, b, dwTalkerID, szName)
+end
+function MSGMON_EVENT.OnCreateEvent(szEvent)
+	if not szEvent then
+		return
 	end
-	if fnAction and tChannels then
-		MSG_MONITOR_FUNC[szKey] = { fn = function(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID, szName)
-			if bRich then
-				-- filter addon comm.
-				if StringFindW(szMsg, 'eventlink') and StringFindW(szMsg, _L['Addon comm.']) then
-					return
-				end
-				-- filter addon echo message.
-				if StringFindW(szMsg, '<text>text=""') == 1 then
-					return
-				end
-			end
-			fnAction(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID, szName)
-		end, ch = tChannels }
-		RegisterMsgMonitor(MSG_MONITOR_FUNC[szKey].fn, MSG_MONITOR_FUNC[szKey].ch)
+	RegisterMsgMonitor(MsgMonHandler, { szEvent })
+end
+function MSGMON_EVENT.OnRemoveEvent(szEvent)
+	if not szEvent then
+		return
 	end
+	UnRegisterMsgMonitor(MsgMonHandler, { szEvent })
+end
+function LIB.RegisterMsgMonitor(szEvent, fnAction)
+	return CommonEventRegister(MSGMON_EVENT, szEvent, fnAction)
 end
 end
 

@@ -2443,7 +2443,7 @@ else
 	if data then
 		bInit, dwMonthEndTime, dwPointEndTime, dwDayEndTime = true, unpack(data)
 	else
-		LIB.RegisterMsgMonitor('LIB#GetTimeOfFee', function(szMsg)
+		LIB.RegisterMsgMonitor('MSG_SYS.LIB#GetTimeOfFee', function(szChannel, szMsg)
 			-- 点卡剩余时间为：558小时41分33秒
 			local szHour, szMinute, szSecond = szMsg:match(_L['Point left time: (%d+)h(%d+)m(%d+)s'])
 			if szHour and szMinute and szSecond then
@@ -2466,9 +2466,9 @@ else
 				if frame then
 					frame[NSFormatString('{$NS}_TimeOfFee')] = {dwMonthEndTime, dwPointEndTime, dwDayEndTime}
 				end
-				LIB.RegisterMsgMonitor('LIB#GetTimeOfFee')
+				LIB.RegisterMsgMonitor('MSG_SYS.LIB#GetTimeOfFee', false)
 			end
-		end, {'MSG_SYS'})
+		end)
 	end
 	function LIB.GetTimeOfFee()
 		local dwTime = GetCurrentTime()

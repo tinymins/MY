@@ -1736,7 +1736,7 @@ end
 -- RegisterMsgMonitor
 function D.RegisterMessage(bEnable)
 	if bEnable then
-		LIB.RegisterMsgMonitor('MY_TeamMon_MON', function(szMsg, nFont, bRich)
+		LIB.RegisterMsgMonitor('MSG_SYS.MY_TeamMon_MON', function(szChannel, szMsg, nFont, bRich)
 			if MY_TM_SHIELDED_MAP then
 				return
 			end
@@ -1752,9 +1752,9 @@ function D.RegisterMessage(bEnable)
 			-- end
 			szMsg = szMsg:gsub('\r', '')
 			D.OnCallMessage('CHAT', szMsg)
-		end, { 'MSG_SYS' })
+		end)
 	else
-		LIB.RegisterMsgMonitor('MY_TeamMon_MON')
+		LIB.RegisterMsgMonitor('MSG_SYS.MY_TeamMon_MON', false)
 	end
 end
 

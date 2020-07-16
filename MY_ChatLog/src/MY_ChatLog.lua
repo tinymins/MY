@@ -242,33 +242,7 @@ function D.OptimizeDB()
 	MAIN_DS:OptimizeDB()
 end
 
-LIB.RegisterMsgMonitor('MY_ChatLog', function(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID, szTalker)
-	local szText = szMsg
-	if bRich then
-		szText = GetPureText(szMsg)
-	else
-		szMsg = GetFormatText(szMsg, nFont, r, g, b)
-	end
-	-- filters
-	if szChannel == 'MSG_GUILD' then
-		if O.bIgnoreTongOnlineMsg and szText:find(TONG_ONLINE_MSG) then
-			return
-		end
-		if O.bIgnoreTongMemberLogMsg and (
-			szText:find(TONG_MEMBER_LOGIN_MSG) or szText:find(TONG_MEMBER_LOGOUT_MSG)
-		) then
-			return
-		end
-	end
-	if MAIN_DS then
-		MAIN_DS:InsertMsg(szChannel, szText, szMsg, szTalker, GetCurrentTime())
-		if O.bRealtimeCommit and not LIB.IsShieldedVersion('MY_ChatLog') then
-			MAIN_DS:FlushDB()
-		end
-	else
-		insert(UNSAVED_MSG_LIST, {szChannel, szText, szMsg, szTalker, GetCurrentTime()})
-	end
-end, (function()
+(function()
 	local tChannels, aChannels = {}, {}
 	for _, info in ipairs(LOG_TYPE) do
 		for _, szChannel in ipairs(info.aChannel) do
@@ -276,10 +250,36 @@ end, (function()
 		end
 	end
 	for szChannel, _ in pairs(tChannels) do
-		insert(aChannels, szChannel)
+		LIB.RegisterMsgMonitor(szChannel .. '.MY_ChatLog', function(szChannel, szMsg, nFont, bRich, r, g, b, dwTalkerID, szTalker)
+			local szText = szMsg
+			if bRich then
+				szText = GetPureText(szMsg)
+			else
+				szMsg = GetFormatText(szMsg, nFont, r, g, b)
+			end
+			-- filters
+			if szChannel == 'MSG_GUILD' then
+				if O.bIgnoreTongOnlineMsg and szText:find(TONG_ONLINE_MSG) then
+					return
+				end
+				if O.bIgnoreTongMemberLogMsg and (
+					szText:find(TONG_MEMBER_LOGIN_MSG) or szText:find(TONG_MEMBER_LOGOUT_MSG)
+				) then
+					return
+				end
+			end
+			if MAIN_DS then
+				MAIN_DS:InsertMsg(szChannel, szText, szMsg, szTalker, GetCurrentTime())
+				if O.bRealtimeCommit and not LIB.IsShieldedVersion('MY_ChatLog') then
+					MAIN_DS:FlushDB()
+				end
+			else
+				insert(UNSAVED_MSG_LIST, {szChannel, szText, szMsg, szTalker, GetCurrentTime()})
+			end
+		end)
 	end
 	return aChannels
-end)())
+end)()
 
 LIB.RegisterEvent('LOADING_ENDING.MY_ChatLog_Save', function()
 	if MAIN_DS then
