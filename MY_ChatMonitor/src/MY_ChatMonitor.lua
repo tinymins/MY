@@ -202,10 +202,6 @@ function D.OnMsgArrive(szChannel, szMsg, nFont, bRich, r, g, b, dwTalkerID, szNa
         rec.html = szMsg
         -- 格式化消息
         local tMsgContent = LIB.FormatChatContent(szMsg)
-        -- 检测消息是否是插件自己产生的
-        if tMsgContent[1] and tMsgContent[1].type == 'text' and tMsgContent[1].innerText == '' then
-            return
-        end
         -- 拼接消息
         if szChannel == 'MSG_SYS' then -- 系统消息
             for i, v in ipairs(tMsgContent) do
