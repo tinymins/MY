@@ -441,7 +441,7 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 			szName = LIB.GetObjectName(KObject, 'auto')
 		end
 		local bFocus, aVia = false, {}
-		local dwMapID = me.GetMapID()
+		local dwMapID = LIB.GetMapID(true)
 		local dwTemplateID, szTong = -1, ''
 		if dwType == TARGET.PLAYER then
 			if KObject.dwTongID ~= 0 then
@@ -584,7 +584,7 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		-- ≈–∂œ÷ÿ“™NPC
 		if not bFocus and O.bFocusINpc
 		and dwType == TARGET.NPC
-		and LIB.IsImportantNpc(me.GetMapID(), KObject.dwTemplateID) then
+		and LIB.IsImportantNpc(dwMapID, KObject.dwTemplateID) then
 			insert(aVia, {
 				bDeletable = false,
 				szVia = _L['Important npc focus'],
@@ -996,6 +996,7 @@ do
 local function UpdateTeamMonData()
 	D.TEAMMON_FOCUS = {}
 	local aDS = {}
+	local dwMapID = LIB.GetMapID(true)
 	if MY_TeamMon and MY_TeamMon.GetTable then
 		for _, p in ipairs({
 			{'NPC', TARGET.NPC},
@@ -1008,7 +1009,7 @@ local function UpdateTeamMonData()
 		end
 	end
 	for _, ds in ipairs(aDS) do
-		for _, data in spairs(ds.aData[-1], ds.aData[LIB.GetMapID()]) do
+		for _, data in spairs(ds.aData[-1], ds.aData[dwMapID]) do
 			if data.aFocus then
 				for _, p in ipairs(data.aFocus) do
 					local rule = Clone(p)
