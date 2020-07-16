@@ -714,9 +714,15 @@ function LIB.RegisterMsgMonitor(arg0, arg1, arg2)
 	end
 	if fnAction and tChannels then
 		MSG_MONITOR_FUNC[szKey] = { fn = function(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID, szName)
-			-- filter addon comm.
-			if StringFindW(szMsg, 'eventlink') and StringFindW(szMsg, _L['Addon comm.']) then
-				return
+			if bRich then
+				-- filter addon comm.
+				if StringFindW(szMsg, 'eventlink') and StringFindW(szMsg, _L['Addon comm.']) then
+					return
+				end
+				-- filter addon echo message.
+				if StringFindW(szMsg, '<text>text=""') == 1 then
+					return
+				end
 			end
 			fnAction(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID, szName)
 		end, ch = tChannels }
