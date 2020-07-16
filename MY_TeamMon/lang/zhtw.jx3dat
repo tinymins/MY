@@ -255,6 +255,7 @@ return {
 	['Remove url'] = '刪除訂閱',
 	['Embedded dataset cannot be removed!'] = '內置數據不可刪除！',
 	['Meta URL: %s'] = '訂閱地址：%s',
+	['Update time: %s'] = '更新時間：%s',
 	['(Short URL: %s)'] = '（短鏈：%s）',
 	['Copy meta url'] = '複製訂閱地址',
 	['Copy short meta url'] = '複製短地址',

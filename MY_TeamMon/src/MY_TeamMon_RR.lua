@@ -762,12 +762,21 @@ LIB.RegisterBgMsg('MY_TeamMon_RR', function(_, data, _, _, szTalker, _)
 	local action, info = data[1], data[2]
 	if action == 'SYNC' then
 		info = LIB.FormatDataStructure(info, META_TEMPLATE)
-		if not IsEmpty(info.szURL) and not IsEmpty(info.szTitle) then
-			LIB.Confirm(_L('%s request download:', szTalker) .. '\n'
-				.. _L('Title: %s', info.szTitle) .. '\n'
-				.. _L('Author: %s', info.szAuthor) .. '\n'
-				.. _L('Meta URL: %s', info.szURL), function()
-					D.AddFavMeta(info)
+		if not IsEmpty(info.szTitle) then
+			LIB.Confirm(
+				_L('%s request download:', szTalker)
+					.. '\n' .. _L('Title: %s', info.szTitle)
+					.. '\n' .. _L('Author: %s', info.szAuthor)
+					.. (IsEmpty(info.szURL)
+						and ''
+						or '\n' .. _L('Meta URL: %s', info.szURL))
+					.. (IsEmpty(info.szUpdateTime)
+						and ''
+						or '\n' .. _L('Update time: %s', info.szUpdateTime)),
+				function()
+					if not IsEmpty(info.szURL) then
+						D.AddFavMeta(info)
+					end
 					D.DownloadData(info)
 				end)
 		end
