@@ -538,10 +538,7 @@ function MY_GKP_UI.OnFrameCreate()
 						LIB.FormatPath({'userdata/gkp', PATH_TYPE.ROLE})
 					)
 					if not IsEmpty(file) then
-						LIB.Confirm(_L['Are you sure to cover the current information with the last record data?'], function()
-							D.LoadData(file, true)
-							LIB.Alert('MY_GKP_UI', _L['Reocrd Recovered.'])
-						end)
+						MY_GKP_Open(file)
 					end
 				end,
 			})
