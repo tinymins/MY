@@ -185,7 +185,7 @@ function D.OnFrameCreate()
 			insert(menu, {
 				szOption = _L['Clear data'],
 				fnAction = function()
-					MY_TeamMon.RemoveData(nil, nil, _L['All data'])
+					D.RemoveData(nil, nil, _L['All data'])
 				end,
 			})
 			insert(menu, { szOption = _L['Export data'], fnAction = D.OpenExportPanel })
