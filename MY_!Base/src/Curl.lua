@@ -531,7 +531,7 @@ function LIB.GetPostDataCRC(tData, szPassphrase)
 	end
 	for _, v in ipairs(a) do
 		if v.k ~= '_' and v.k ~= 'crc' then
-			insert(r, v.k .. ':' .. v.v)
+			insert(r, tostring(v.k) .. ':' .. tostring(v.v))
 		end
 	end
 	return GetStringCRC(concat(r, ';'))
