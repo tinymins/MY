@@ -419,13 +419,28 @@ end
 end
 
 function LIB.GetTypeGroupMap()
-	local aGroup, tMapExist = {}, {}
+	-- 计算地图分组
+	local tGroupMap, tMapExist = {}, {}
+	local function GroupMapIterator(dwMapID, szGroup, szMapName)
+		if szGroup then
+			if CONSTANT.MAP_NAME_FIX[dwMapID] then
+				dwMapID = CONSTANT.MAP_NAME_FIX[dwMapID]
+			end
+			if tMapExist[dwMapID] then
+				return
+			end
+			if not tGroupMap[szGroup] then
+				tGroupMap[szGroup] = {}
+			end
+			insert(tGroupMap[szGroup], { dwID = dwMapID, szName = IsEmpty(szMapName) and ('#' .. dwMapID) or szMapName })
+		end
+		tMapExist[dwMapID] = szGroup or 'IGNORE'
+	end
 	-- 类型排序权重
 	local tWeight = {} -- { ['风起稻香'] = 20, ['风起稻香 - 小队秘境'] = 21 }
-	local nCount, tLine, szVersionName = g_tTable.DLCInfo:GetRowCount()
-	for i = 2, nCount do
-		tLine = g_tTable.DLCInfo:GetRow(i)
-		szVersionName = LIB.TrimString(tLine.szDLCName)
+	for i = 2, g_tTable.DLCInfo:GetRowCount() do
+		local tLine = g_tTable.DLCInfo:GetRow(i)
+		local szVersionName = LIB.TrimString(tLine.szDLCName)
 		tWeight[szVersionName] = 2000 + i * 10
 	end
 	for i, szVersionName in ipairs(_L.GAME_VERSION_NAME) do
@@ -438,12 +453,10 @@ function LIB.GetTypeGroupMap()
 	tWeight[_L.MAP_GROUP['Other dungeon']] = 96
 	tWeight[_L.MAP_GROUP['Other']] = 95
 	-- 获取秘境类型
-	local tDungeon = {}
-	local nCount, tLine, szVersionName, szGroup, dwMapID = g_tTable.DungeonInfo:GetRowCount()
-	for i = 2, nCount do
-		tLine = g_tTable.DungeonInfo:GetRow(i)
-		szVersionName = LIB.TrimString(tLine.szVersionName)
-		szGroup = szVersionName
+	for i = 2, g_tTable.DungeonInfo:GetRowCount() do
+		local tLine = g_tTable.DungeonInfo:GetRow(i)
+		local szVersionName = LIB.TrimString(tLine.szVersionName)
+		local szGroup = szVersionName
 		if tLine.dwClassID == 1 or tLine.dwClassID == 2 then
 			szGroup = szGroup .. ' - ' .. _L['Team dungeon']
 			tWeight[szGroup] = (tWeight[szVersionName] or 0) + 2
@@ -454,25 +467,11 @@ function LIB.GetTypeGroupMap()
 			szGroup = szGroup .. ' - ' .. _L['Duo dungeon']
 			tWeight[szGroup] = (tWeight[szVersionName] or 0) + 1
 		end
-		if not CONSTANT.MAP_NAME_FIX[tLine.dwMapID] and not tMapExist[tLine.dwMapID] then
-			if not tDungeon[szGroup] then
-				tDungeon[szGroup] = {}
-			end
-			insert(tDungeon[szGroup], {
-				dwID = tLine.dwMapID,
-				szName = tLine.szLayer3Name .. tLine.szOtherName,
-			})
-			tMapExist[tLine.dwMapID] = szGroup
-		end
-	end
-	for szGroup, aMapInfo in pairs(tDungeon) do
-		insert(aGroup, { szGroup = szGroup, aMapInfo = aMapInfo })
+		GroupMapIterator(tLine.dwMapID, szGroup, tLine.szLayer3Name .. tLine.szOtherName)
 	end
 	-- 非秘境
-	local tMap = {}
-	local nCount, tLine, szGroup = g_tTable.MapList:GetRowCount()
-	for i = 2, nCount do
-		tLine = g_tTable.MapList:GetRow(i)
+	for i = 2, g_tTable.MapList:GetRowCount() do
+		local tLine, szGroup = g_tTable.MapList:GetRow(i), nil
 		if tLine.szType == 'BIRTH' or tLine.szType == 'SCHOOL' then
 			szGroup = _L.MAP_GROUP['Birth / School']
 		elseif tLine.szType == 'CITY' or tLine.szType == 'OLD_CITY' then
@@ -486,18 +485,20 @@ function LIB.GetTypeGroupMap()
 		elseif tLine.szType ~= 'TEST' then -- tLine.szType == 'OTHER'
 			szGroup = _L.MAP_GROUP['Other']
 		end
-		if szGroup and not CONSTANT.MAP_NAME_FIX[tLine.nID] and not tMapExist[tLine.nID] then
-			if not tMap[szGroup] then
-				tMap[szGroup] = {}
-			end
-			insert(tMap[szGroup], {
-				dwID = tLine.nID,
-				szName = tLine.szName,
-			})
-			tMapExist[tLine.nID] = szGroup
-		end
+		GroupMapIterator(tLine.nID, szGroup, tLine.szName)
 	end
-	for szGroup, aMapInfo in pairs(tMap) do
+	-- 逻辑导出表
+	for _, dwMapID in ipairs(GetMapList()) do
+		GroupMapIterator(
+			dwMapID,
+			select(2, GetMapParams(dwMapID)) == MAP_TYPE.DUNGEON
+				and _L.MAP_GROUP['Other dungeon']
+				or _L.MAP_GROUP['Other'],
+			Table_GetMapName(dwMapID))
+	end
+	-- 哈希转数组
+	local aGroup = {}
+	for szGroup, aMapInfo in pairs(tGroupMap) do
 		insert(aGroup, { szGroup = szGroup, aMapInfo = aMapInfo })
 	end
 	-- 排序
