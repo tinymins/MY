@@ -481,12 +481,10 @@ function LIB.GetTypeGroupMap()
 			szGroup = _L.MAP_GROUP['Village / Camp']
 		elseif tLine.szType == 'BATTLE_FIELD' or tLine.szType == 'ARENA' then
 			szGroup = _L.MAP_GROUP['Battle field / Arena']
-		elseif tLine.szType == 'OTHER' or tLine.szType == '' then
-			szGroup = _L.MAP_GROUP['Other']
 		elseif tLine.szType == 'DUNGEON' or tLine.szType == 'RAID' then
 			szGroup = _L.MAP_GROUP['Other dungeon']
-		else
-			szGroup = nil
+		elseif tLine.szType ~= 'TEST' then -- tLine.szType == 'OTHER'
+			szGroup = _L.MAP_GROUP['Other']
 		end
 		if szGroup and not CONSTANT.MAP_NAME_FIX[tLine.nID] and not tMapExist[tLine.nID] then
 			if not tMap[szGroup] then
