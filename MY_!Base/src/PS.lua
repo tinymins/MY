@@ -48,7 +48,7 @@ local INI_PATH = PACKET_INFO.FRAMEWORK_ROOT ..'ui/MY.ini'
 -- 界面开关
 ---------------------------------------------------------------------------------------------
 function LIB.GetFrame()
-	return Station.Lookup('Normal/MY')
+	return Station.Lookup(NSFormatString('Normal/{$NS}'))
 end
 
 function LIB.OpenPanel()
@@ -60,7 +60,7 @@ function LIB.OpenPanel()
 	end
 	local frame = LIB.GetFrame()
 	if not frame then
-		frame = Wnd.OpenWindow(INI_PATH, 'MY')
+		frame = Wnd.OpenWindow(INI_PATH, PACKET_INFO.NAME_SPACE)
 		frame:Hide()
 		frame.bVisible = false
 		LIB.CheckTutorial()
@@ -111,7 +111,7 @@ function LIB.ShowPanel(bMute, bNoAnimate)
 		end
 	end
 	frame:BringToTop()
-	LIB.RegisterEsc('MY', LIB.IsPanelVisible, function() LIB.HidePanel() end)
+	LIB.RegisterEsc(PACKET_INFO.NAME_SPACE, LIB.IsPanelVisible, function() LIB.HidePanel() end)
 end
 
 function LIB.HidePanel(bMute, bNoAnimate)
@@ -138,7 +138,7 @@ function LIB.HidePanel(bMute, bNoAnimate)
 	if not bMute then
 		PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
 	end
-	LIB.RegisterEsc('MY')
+	LIB.RegisterEsc(PACKET_INFO.NAME_SPACE)
 	UI.ClosePopupMenu()
 end
 
@@ -183,7 +183,7 @@ end
 
 -- if panel visible
 function LIB.IsPanelOpened()
-	return Station.Lookup('Normal/MY')
+	return Station.Lookup(NSFormatString('Normal/{$NS}'))
 end
 
 ---------------------------------------------------------------------------------------------
@@ -406,7 +406,7 @@ function LIB.SwitchTab(szID, bForceUpdate)
 	if wnd.OnPanelDeactive then
 		local res, err, trace = XpCall(wnd.OnPanelDeactive, wnd)
 		if not res then
-			FireUIEvent('CALL_LUA_ERROR', err .. '\nMY#OnPanelDeactive\n' .. trace .. '\n')
+			FireUIEvent('CALL_LUA_ERROR', err .. NSFormatString('\n{$NS}#OnPanelDeactive\n') .. trace .. '\n')
 		end
 	end
 	-- clear all events
@@ -429,7 +429,7 @@ function LIB.SwitchTab(szID, bForceUpdate)
 		if tab.OnPanelActive then
 			local res, err, trace = XpCall(tab.OnPanelActive, wnd)
 			if not res then
-				FireUIEvent('CALL_LUA_ERROR', err .. '\nMY#OnPanelActive\n' .. trace .. '\n')
+				FireUIEvent('CALL_LUA_ERROR', err .. NSFormatString('\n{$NS}#OnPanelActive\n') .. trace .. '\n')
 			end
 			wnd:FormatAllContentPos()
 		end
@@ -578,21 +578,21 @@ local function OnSizeChanged()
 	if hWndMainPanel.OnPanelResize then
 		local res, err, trace = XpCall(hWndMainPanel.OnPanelResize, hWndMainPanel)
 		if not res then
-			FireUIEvent('CALL_LUA_ERROR', err .. '\nMY#OnPanelResize\n' .. trace .. '\n')
+			FireUIEvent('CALL_LUA_ERROR', err .. NSFormatString('\n{$NS}#OnPanelResize\n') .. trace .. '\n')
 		end
 		hWndMainPanel:FormatAllContentPos()
 	elseif hWndMainPanel.OnPanelActive then
 		if hWndMainPanel.OnPanelDeactive then
 			local res, err, trace = XpCall(hWndMainPanel.OnPanelDeactive, hWndMainPanel)
 			if not res then
-				FireUIEvent('CALL_LUA_ERROR', err .. '\nMY#OnPanelResize->OnPanelDeactive\n' .. trace .. '\n')
+				FireUIEvent('CALL_LUA_ERROR', err .. NSFormatString('\n{$NS}#OnPanelResize->OnPanelDeactive\n') .. trace .. '\n')
 			end
 		end
 		hWndMainPanel:Clear()
 		hWndMainPanel:Lookup('', ''):Clear()
 		local res, err, trace = XpCall(hWndMainPanel.OnPanelActive, hWndMainPanel)
 		if not res then
-			FireUIEvent('CALL_LUA_ERROR', err .. '\nMY#OnPanelResize->OnPanelActive\n' .. trace .. '\n')
+			FireUIEvent('CALL_LUA_ERROR', err .. NSFormatString('\n{$NS}#OnPanelResize->OnPanelActive\n') .. trace .. '\n')
 		end
 		hWndMainPanel:FormatAllContentPos()
 	end
