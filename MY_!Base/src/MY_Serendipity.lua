@@ -219,7 +219,8 @@ LIB.RegisterEvent('ON_SERENDIPITY_TRIGGER.QIYU', function()
 	if not me then
 		return
 	end
-	D.OnSerendipity(me.szName, D.GetSerendipityName(arg0), 2, arg1, GetCurrentTime())
+	local nStatus = arg1 and SERENDIPITY_STATUS.START or SERENDIPITY_STATUS.FINISH
+	D.OnSerendipity(me.szName, D.GetSerendipityName(arg0), 2, nStatus, GetCurrentTime())
 end)
 
 function D.GetSerendipityInfo(dwTabType, dwIndex)
