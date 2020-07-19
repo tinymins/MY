@@ -68,7 +68,7 @@ local MY_TMUI_TALK_R        = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI_T
 local MY_TMUI_TYPE          = { 'BUFF', 'DEBUFF', 'CASTING', 'NPC', 'DOODAD', 'TALK', 'CHAT' }
 local MY_TMUI_SELECT_TYPE   = MY_TMUI_TYPE[1]
 local MY_TMUI_SELECT_MAP    = _L['All data']
-local MY_TMUI_TREE_EXPAND   = { [_L['Common / uncategorized']] = true } -- 默认第一项展开
+local MY_TMUI_TREE_EXPAND   = { [_L['All']] = true } -- 默认第一项展开
 local MY_TMUI_ITEM_PER_PAGE = 27
 local MY_TMUI_SEARCH
 local MY_TMUI_MAP_SEARCH
@@ -379,10 +379,17 @@ end
 function D.RedrawMapList(frame)
 	local data, aGroupMap = MY_TeamMon.GetTable(MY_TMUI_SELECT_TYPE), {}
 	-- 全部/其他
+	local tAll = {
+		szGroup = _L['All'],
+		aMapInfo = {
+			_L['All data'], -- 全部
+		},
+	}
+	insert(aGroupMap, tAll)
+	-- 全部/其他
 	local tCommon = {
 		szGroup = _L['Common / uncategorized'],
 		aMapInfo = {
-			_L['All data'], -- 全部
 			MY_TM_SPECIAL_MAP.COMMON, -- 通用
 			MY_TM_SPECIAL_MAP.CITY, -- 主城
 			MY_TM_SPECIAL_MAP.DUNGEON, -- 秘境

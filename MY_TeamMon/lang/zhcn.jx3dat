@@ -24,6 +24,7 @@ return {
 	['Clear record'] = '清空记录',
 	['The map does not exist'] = '这个地图不存在',
 	['Common / uncategorized'] = '通用/其他',
+	['All'] = '全部',
 	['All data'] = '全部的数据',
 	['Common data'] = '通用的数据',
 	['City data'] = '主城的数据',
