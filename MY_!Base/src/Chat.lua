@@ -1372,12 +1372,16 @@ local function BeforeChatAppendItemFromString(h, szMsg, ...) -- h, szMsg, szChan
 		end
 	end
 	for szKey, fnAction in pairs(CHAT_HOOK.BEFORE) do
-		--[[#DEBUG BEGIN]]local status = --[[#DEBUG END]]XpCall(fnAction, h, szMsg, ...)
+		local res = {XpCall(fnAction, h, szMsg, ...)}
+		if res[1] then
+			if IsString(res[2]) then
+				szMsg = res[2]
+			end
 		--[[#DEBUG BEGIN]]
-		if not status then
+		else
 			LIB.Debug('ERROR', 'HookChatPanel.BEFORE#' .. szKey, DEBUG_LEVEL.ERROR)
-		end
 		--[[#DEBUG END]]
+		end
 	end
 	local nCount = h:GetItemCount()
 	if nCount == 0 then
