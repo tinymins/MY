@@ -1673,7 +1673,7 @@ function LIB.GetFurnitureInfo(szKey, oVal)
 end
 end
 
-local Homeland_GetNearbyObjectsInfo = _G.Homeland_GetNearbyObjectsInfo or GetInsideEnv().Homeland_GetNearbyObjectsInfo
+local Homeland_GetNearbyObjectsInfo = GetGameAPI('Homeland_GetNearbyObjectsInfo')
 function LIB.GetNearFurniture(nDis)
 	if not Homeland_GetNearbyObjectsInfo then
 		return CONSTANT.EMPTY_TABLE
