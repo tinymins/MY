@@ -722,6 +722,17 @@ function NSFormatString(s)
 	return CACHE[s]
 end
 end
+
+local function GetGameAPI(szAddon, szInside)
+	local api = _G[szAddon]
+	if not api then
+		local env = GetInsideEnv()
+		if env then
+			api = env[szInside or szAddon]
+		end
+	end
+	return api
+end
 -----------------------------------------------
 -- 插件集信息
 -----------------------------------------------
@@ -1290,6 +1301,7 @@ local LIB = {
 	GetTraceback     = GetTraceback    ,
 	IsStreaming      = IsStreaming     ,
 	NSFormatString   = NSFormatString  ,
+	GetGameAPI       = GetGameAPI      ,
 	LoadLangPack     = LoadLangPack    ,
 	CONSTANT         = CONSTANT        ,
 	PATH_TYPE        = PATH_TYPE       ,
