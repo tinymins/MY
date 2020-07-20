@@ -230,7 +230,7 @@ function MY_Farbnamen.Render(szMsg, tOption)
 		if xml then
 			for _, ele in ipairs(xml) do
 				if ele[''].name and ele[''].name:sub(1, 9) == 'namelink_' then
-					if tOption.color then
+					if tOption.bColor then
 						local szName = gsub(ele[''].text, '[%[%]]', '')
 						local tInfo = MY_Farbnamen.GetAusName(szName)
 						if tInfo then
@@ -239,7 +239,7 @@ function MY_Farbnamen.Render(szMsg, tOption)
 							ele[''].b = tInfo.rgb[3]
 						end
 					end
-					if tOption.hover then
+					if tOption.bTip then
 						ele[''].eventid = 82803
 						ele[''].script = (ele[''].script or '') .. '\nthis.OnItemMouseEnter=function() MY_Farbnamen.ShowTip(this) end\nthis.OnItemMouseLeave=function() HideTip() end'
 					end
@@ -264,14 +264,14 @@ function MY_Farbnamen.Render(szMsg, tOption)
 	elseif type(szMsg) == 'table' and type(szMsg.GetName) == 'function' and szMsg:GetName():sub(1, 8) == 'namelink' then
 		local namelink = szMsg
 		local ui = UI(namelink)
-		if tOption.color then
+		if tOption.bColor then
 			local szName = gsub(namelink:GetText(), '[%[%]]', '')
 			local tInfo = MY_Farbnamen.GetAusName(szName)
 			if tInfo then
 				ui:Color(tInfo.rgb)
 			end
 		end
-		if tOption.hover then
+		if tOption.bTip then
 			ui:Hover(MY_Farbnamen.ShowTip, HideTip, true)
 		end
 	end
