@@ -213,6 +213,7 @@ end)
 local OPT_DEFAULT = {
 	bTip = true,
 	bColor = true,
+	bIcon = false,
 }
 -- 开放的名称染色接口
 -- (userdata) MY_Farbnamen.Render(userdata namelink)    处理namelink染色 namelink是一个姓名Text元素
@@ -317,7 +318,7 @@ function MY_Farbnamen.GetTip(szName)
 		insert(tTip, GetFormatText(('%s(%d)'):format(tInfo.szName, tInfo.nLevel), 136))
 		-- 是否同队伍
 		if UI_GetClientPlayerID() ~= tInfo.dwID and LIB.IsParty(tInfo.dwID) then
-			insert(tTip, GetFormatText(_L['[teammate]'], nil, 0, 255, 0))
+			insert(tTip, GetFormatText(_L['[Teammate]'], nil, 0, 255, 0))
 		end
 		insert(tTip, CONSTANT.XML_LINE_BREAKER)
 		-- 称号
@@ -516,41 +517,54 @@ end
 --------------------------------------------------------------
 -- 菜单
 --------------------------------------------------------------
-function MY_Farbnamen.GetMenu()
-	local t = {szOption = _L['MY_Farbnamen']}
-	insert(t, {
-		szOption = _L['enable'],
-		fnAction = function()
+function MY_Farbnamen.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
+	x = x + ui:Append('WndCheckBox', {
+		x = x, y = y, w = 'auto',
+		text = _L['Enable MY_Farbnamen'],
+		checked = MY_Farbnamen.bEnabled,
+		oncheck = function()
 			MY_Farbnamen.bEnabled = not MY_Farbnamen.bEnabled
 		end,
-		bCheck = true,
-		bChecked = MY_Farbnamen.bEnabled
-	})
-	insert(t, {
-		szOption = _L['customize color'],
-		fnAction = function()
+	}):Width() + 5
+
+	x = X + 25
+	y = y + lineHeight
+
+	x = x + ui:Append('WndButton', {
+		x = x, y = y, w = 'auto',
+		buttonstyle = 2,
+		text = _L['Customize color'],
+		onclick = function()
 			LIB.ShowPanel()
 			LIB.FocusPanel()
 			LIB.SwitchTab('GlobalColor')
 		end,
-		fnDisable = function()
-			return not MY_Farbnamen.bEnabled
+		autoenable = function()
+			return MY_Farbnamen.bEnabled
 		end,
-	})
-	insert(t, {
-		szOption = _L['reset data'],
-		fnAction = function()
-			if not InitDB() then
-				return
-			end
-			DB:Execute('DELETE FROM InfoCache')
-			LIB.Sysmsg(_L['MY_Farbnamen'], _L['cache data deleted.'])
+	}):Width() + 5
+
+	x = x + ui:Append('WndButton', {
+		x = x, y = y, w = 'auto',
+		buttonstyle = 2,
+		text = _L['Reset data'],
+		onclick = function()
+			LIB.Confirm(_L['Are you sure to reset farbnamen data? All character\'s data cache will be removed.'], function()
+				if not InitDB() then
+					return
+				end
+				DB:Execute('DELETE FROM InfoCache')
+				LIB.Sysmsg(_L['MY_Farbnamen'], _L['Cache data deleted.'])
+			end)
 		end,
-		fnDisable = function()
-			return not MY_Farbnamen.bEnabled
+		autoenable = function()
+			return MY_Farbnamen.bEnabled
 		end,
-	})
-	return t
+	}):Width() + 5
+
+	y = y + lineHeight
+
+	return x, y
 end
 LIB.RegisterAddonMenu('MY_Farbenamen', MY_Farbnamen.GetMenu)
 --------------------------------------------------------------

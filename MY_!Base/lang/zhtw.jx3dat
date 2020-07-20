@@ -93,9 +93,6 @@ return {
 	['enable'] = '啟用',
 	['Enable'] = '啟用',
 
-	['reset data'] = '重置數據',
-	['analyse data'] = '分析數據',
-
 	['add'] = '添加',
 	['delete'] = '刪除',
 	['add group'] = '添加分組',

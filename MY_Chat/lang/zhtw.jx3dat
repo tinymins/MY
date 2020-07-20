@@ -41,7 +41,6 @@ return {
     ['always show *'] = '總是顯示※號',
     ['always be white'] = '永遠顯示為白色',
     ['hide system msg copy'] = '不複製系統消息',
-    ['farbnamen'] = '職業染色',
     ['chat time format'] = '聊天時間格式',
 
     ['MOSAICS_CHAR'] = '…',

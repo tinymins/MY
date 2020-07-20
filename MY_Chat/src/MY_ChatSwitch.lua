@@ -551,14 +551,11 @@ function PS.OnPanelActive(wnd)
 	local deltaX = 25
 	local deltaY = 31
 
-	if (MY_Farbnamen and MY_Farbnamen.GetMenu) then
-		ui:Append('WndComboBox', {
-			x = W - X - 150, y = y, w = 150,
-			text = _L['farbnamen'],
-			menu = MY_Farbnamen.GetMenu,
-		})
+	if (MY_Farbnamen and MY_Farbnamen.OnPanelActivePartial) then
+		x, y = MY_Farbnamen.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 	end
 
+	x = X
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 250,
 		text = _L['display panel'],
