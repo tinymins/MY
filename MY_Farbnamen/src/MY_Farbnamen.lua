@@ -607,6 +607,9 @@ function MY_Farbnamen.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
 		oncheck = function()
 			MY_Farbnamen.bInsertIcon = not MY_Farbnamen.bInsertIcon
 		end,
+		autoenable = function()
+			return MY_Farbnamen.bEnabled
+		end,
 	}):Width() + 5
 
 	x = X + 25
