@@ -56,10 +56,13 @@ end
 ---------------------------------------------------------------
 LIB.CreateDataRoot(PATH_TYPE.SERVER)
 
+local D = {}
 MY_Farbnamen = MY_Farbnamen or {
 	bEnabled = true,
+	bInsertIcon = false,
 }
 RegisterCustomData('MY_Farbnamen.bEnabled')
+RegisterCustomData('MY_Farbnamen.bInsertIcon')
 
 local _MY_Farbnamen = {
 	tForceString = Clone(g_tStrings.tForceTitle),
@@ -202,85 +205,155 @@ InitDB()
 ---------------------------------------------------------------
 -- 聊天复制和时间显示相关
 ---------------------------------------------------------------
--- 插入聊天内容的 HOOK （过滤、加入时间 ）
-LIB.HookChatPanel('AFTER.MY_FARBNAMEN', function(h, nIndex)
-	if MY_Farbnamen.bEnabled then
-		for i = nIndex, h:GetItemCount() - 1 do
-			MY_Farbnamen.Render(h:Lookup(i))
-		end
-	end
-end)
-local OPT_DEFAULT = {
-	bTip = true,
-	bColor = true,
-	bIcon = false,
-}
--- 开放的名称染色接口
--- (userdata) MY_Farbnamen.Render(userdata namelink)    处理namelink染色 namelink是一个姓名Text元素
--- (string) MY_Farbnamen.Render(string szMsg)           格式化szMsg 处理里面的名字
-function MY_Farbnamen.Render(szMsg, tOption)
-	local bOption = IsTable(tOption)
-	if bOption then
-		setmetatable(tOption, { __index = OPT_DEFAULT })
-	else
-		tOption = OPT_DEFAULT
-	end
-	if type(szMsg) == 'string' then
-		-- <text>text='[就是个阵眼]' font=10 r=255 g=255 b=255  name='namelink_4662931' eventid=515</text><text>text='说：' font=10 r=255 g=255 b=255 </text><text>text='[茗伊]' font=10 r=255 g=255 b=255  name='namelink_4662931' eventid=771</text><text>text='\n' font=10 r=255 g=255 b=255 </text>
-		local xml = LIB.Xml.Decode(szMsg)
-		if xml then
-			for _, ele in ipairs(xml) do
-				if ele[''].name and ele[''].name:sub(1, 9) == 'namelink_' then
-					if tOption.bColor then
-						local szName = gsub(ele[''].text, '[%[%]]', '')
-						local tInfo = MY_Farbnamen.GetAusName(szName)
-						if tInfo then
+function D.RenderXml(szMsg, tOption)
+	-- <text>text='[就是个阵眼]' font=10 r=255 g=255 b=255  name='namelink_4662931' eventid=515</text><text>text='说：' font=10 r=255 g=255 b=255 </text><text>text='[茗伊]' font=10 r=255 g=255 b=255  name='namelink_4662931' eventid=771</text><text>text='\n' font=10 r=255 g=255 b=255 </text>
+	local xml = LIB.Xml.Decode(szMsg)
+	if xml then
+		GetInsideEnv().SetWindowTitle('decode')
+		local i, ele = 1, nil
+		while i <= #xml do
+			ele = xml[i]
+			if ele[''].name and ele[''].name:sub(1, 9) == 'namelink_' then
+				if tOption.bColor or tOption.bInsertIcon then
+					local szName = gsub(ele[''].text, '[%[%]]', '')
+					local tInfo = MY_Farbnamen.GetAusName(szName)
+					if tInfo then
+						GetInsideEnv().SetWindowTitle(szName)
+						if tOption.bColor then
 							ele[''].r = tInfo.rgb[1]
 							ele[''].g = tInfo.rgb[2]
 							ele[''].b = tInfo.rgb[3]
 						end
-					end
-					if tOption.bTip then
-						ele[''].eventid = 82803
-						ele[''].script = (ele[''].script or '') .. '\nthis.OnItemMouseEnter=function() MY_Farbnamen.ShowTip(this) end\nthis.OnItemMouseLeave=function() HideTip() end'
+						if tOption.bInsertIcon then
+							local szIcon, nFrame = GetForceImage(tInfo.dwForceID)
+							if szIcon and nFrame then
+								insert(xml, i, {
+									{
+										[''] = {
+											w = 23,
+											h = 23,
+											path = szIcon,
+											frame = nFrame,
+										},
+										['.'] = 'image',
+									},
+									[''] = {},
+								})
+								i = i + 1
+							end
+						end
 					end
 				end
+				if tOption.bTip then
+					ele[''].eventid = 82803
+					ele[''].script = (ele[''].script or '') .. '\nthis.OnItemMouseEnter=function() MY_Farbnamen.ShowTip(this) end\nthis.OnItemMouseLeave=function() HideTip() end'
+				end
 			end
-			szMsg = LIB.Xml.Encode(xml)
+			i = i + 1
 		end
-		-- szMsg = gsub( szMsg, '<text>([^<]-)text='([^<]-)'([^<]-name='namelink_%d-'[^<]-)</text>', function (szExtra1, szName, szExtra2)
-		--     szName = gsub(szName, '[%[%]]', '')
-		--     local tInfo = MY_Farbnamen.GetAusName(szName)
-		--     if tInfo then
-		--         szExtra1 = gsub(szExtra1, '[rgb]=%d+', '')
-		--         szExtra2 = gsub(szExtra2, '[rgb]=%d+', '')
-		--         szExtra1 = gsub(szExtra1, 'eventid=%d+', '')
-		--         szExtra2 = gsub(szExtra2, 'eventid=%d+', '')
-		--         return format(
-		--             '<text>%stext='[%s]'%s eventid=883 script='this.OnItemMouseEnter=function() MY_Farbnamen.ShowTip(this) end\nthis.OnItemMouseLeave=function() HideTip() end' r=%d g=%d b=%d</text>',
-		--             szExtra1, szName, szExtra2, tInfo.rgb[1], tInfo.rgb[2], tInfo.rgb[3]
-		--         )
-		--     end
-		-- end)
-	elseif type(szMsg) == 'table' and type(szMsg.GetName) == 'function' and szMsg:GetName():sub(1, 8) == 'namelink' then
-		local namelink = szMsg
-		local ui = UI(namelink)
-		if tOption.bColor then
-			local szName = gsub(namelink:GetText(), '[%[%]]', '')
-			local tInfo = MY_Farbnamen.GetAusName(szName)
-			if tInfo then
+		szMsg = LIB.Xml.Encode(xml)
+	end
+	-- szMsg = gsub( szMsg, '<text>([^<]-)text='([^<]-)'([^<]-name='namelink_%d-'[^<]-)</text>', function (szExtra1, szName, szExtra2)
+	--     szName = gsub(szName, '[%[%]]', '')
+	--     local tInfo = MY_Farbnamen.GetAusName(szName)
+	--     if tInfo then
+	--         szExtra1 = gsub(szExtra1, '[rgb]=%d+', '')
+	--         szExtra2 = gsub(szExtra2, '[rgb]=%d+', '')
+	--         szExtra1 = gsub(szExtra1, 'eventid=%d+', '')
+	--         szExtra2 = gsub(szExtra2, 'eventid=%d+', '')
+	--         return format(
+	--             '<text>%stext='[%s]'%s eventid=883 script='this.OnItemMouseEnter=function() MY_Farbnamen.ShowTip(this) end\nthis.OnItemMouseLeave=function() HideTip() end' r=%d g=%d b=%d</text>',
+	--             szExtra1, szName, szExtra2, tInfo.rgb[1], tInfo.rgb[2], tInfo.rgb[3]
+	--         )
+	--     end
+	-- end)
+	return szMsg
+end
+
+function D.RenderNamelink(namelink, tOption)
+	local ui, nNumOffset = UI(namelink), 0
+	if tOption.bColor or tOption.bInsertIcon then
+		local szName = gsub(namelink:GetText(), '[%[%]]', '')
+		local tInfo = MY_Farbnamen.GetAusName(szName)
+		if tInfo then
+			if tOption.bColor then
 				ui:Color(tInfo.rgb)
 			end
-		end
-		if tOption.bTip then
-			ui:Hover(MY_Farbnamen.ShowTip, HideTip, true)
+			if tOption.bInsertIcon then
+				local szIcon, nFrame = GetForceImage(tInfo.dwForceID)
+				if szIcon and nFrame then
+					local hParent = namelink:GetParent()
+					hParent:AppendItemFromString('<image>w=23 h=23 path="' .. szIcon .. '" frame=' .. nFrame .. '</image>')
+					for i = hParent:GetItemCount() - 1, namelink:GetIndex() + 1, -1 do
+						hParent:ExchangeItemIndex(i, i - 1)
+					end
+					nNumOffset = nNumOffset + 1
+				end
+			end
 		end
 	end
-	if bOption then
-		setmetatable(tOption, nil)
+	if tOption.bTip then
+		ui:Hover(MY_Farbnamen.ShowTip, HideTip, true)
+	end
+	return namelink, nNumOffset
+end
+
+function D.RenderHandle(h, tOption, bIgnoreRange)
+	local nIndex = not bIgnoreRange and tOption.nStartIndex or 0
+	local nEndIndex = not bIgnoreRange and tOption.nEndIndex or (h:GetItemCount() - 1)
+	while nIndex <= nEndIndex do
+		local _, nNumOffset = D.RenderEl(h:Lookup(nIndex), tOption, true)
+		nIndex = nIndex + 1 + nNumOffset
+		nEndIndex = nEndIndex + nNumOffset
+	end
+	return h, 0
+end
+
+function D.RenderEl(el, tOption, bIgnoreRange)
+	if el:GetType() == 'Text' and el:GetName():sub(1, 8) == 'namelink' then
+		return D.RenderNamelink(el, tOption)
+	end
+	if el:GetType() == 'Handle' then
+		return D.RenderHandle(el, tOption, bIgnoreRange)
+	end
+	return el, 0
+end
+
+-- 开放的名称染色接口
+-- (userdata) MY_Farbnamen.Render(userdata namelink)    处理namelink染色 namelink是一个姓名Text元素
+-- (string) MY_Farbnamen.Render(string szMsg)           格式化szMsg 处理里面的名字
+function MY_Farbnamen.Render(szMsg, tOriOption)
+	local tOption = {
+		bColor = true,
+		bTip = true,
+		bInsertIcon = false,
+	}
+	if IsTable(tOriOption) then
+		if not IsNil(tOriOption.bTip) then
+			tOption.bTip = tOriOption.bTip
+		end
+		if not IsNil(tOriOption.bColor) then
+			tOption.bColor = tOriOption.bColor
+		end
+		if not IsNil(tOriOption.bInsertIcon) then
+			tOption.bInsertIcon = tOriOption.bInsertIcon
+		end
+	end
+	if IsString(szMsg) then
+		szMsg = D.RenderXml(szMsg, tOption)
+	elseif IsElement(szMsg) then
+		szMsg = D.RenderEl(szMsg, tOption)
 	end
 	return szMsg
 end
+
+-- 插入聊天内容的 HOOK （过滤、加入时间 ）
+LIB.HookChatPanel('BEFORE.MY_FARBNAMEN', function(h, szMsg, ...)
+	if MY_Farbnamen.bEnabled then
+		szMsg = MY_Farbnamen.Render(szMsg, MY_Farbnamen)
+	end
+	return szMsg
+end)
 
 function MY_Farbnamen.RegisterHeader(szName, dwID, szHeaderXml)
 	if not HEADER_XML[szName] then
@@ -524,6 +597,15 @@ function MY_Farbnamen.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
 		checked = MY_Farbnamen.bEnabled,
 		oncheck = function()
 			MY_Farbnamen.bEnabled = not MY_Farbnamen.bEnabled
+		end,
+	}):Width() + 5
+
+	x = x + ui:Append('WndCheckBox', {
+		x = x, y = y, w = 'auto',
+		text = _L['Insert force icon'],
+		checked = MY_Farbnamen.bInsertIcon,
+		oncheck = function()
+			MY_Farbnamen.bInsertIcon = not MY_Farbnamen.bInsertIcon
 		end,
 	}):Width() + 5
 

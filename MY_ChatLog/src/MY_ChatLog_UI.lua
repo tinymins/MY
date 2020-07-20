@@ -342,9 +342,7 @@ function D.UpdatePage(frame, bKeepScroll)
 				LIB.RenderChatLink(h:Lookup(i))
 			end
 			if MY_Farbnamen and MY_Farbnamen.Render then
-				for i = nCount, h:GetItemCount() - 1 do
-					MY_Farbnamen.Render(h:Lookup(i))
-				end
+				MY_Farbnamen.Render(h, { nStartIndex = nCount })
 			end
 			if MY_ChatMosaics and MY_ChatMosaics.Mosaics then
 				MY_ChatMosaics.Mosaics(h)
