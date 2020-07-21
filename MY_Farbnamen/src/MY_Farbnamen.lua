@@ -317,30 +317,29 @@ function D.RenderEl(el, tOption, bIgnoreRange)
 	return el, 0
 end
 
+function D.MergeOption(dst, src)
+	if IsTable(src) then
+		for k, _ in pairs(dst) do
+			if not IsNil(src[k]) then
+				dst[k] = src[k]
+			end
+		end
+	end
+	return dst
+end
+
 -- 开放的名称染色接口
 -- (userdata) MY_Farbnamen.Render(userdata namelink)    处理namelink染色 namelink是一个姓名Text元素
 -- (string) MY_Farbnamen.Render(string szMsg)           格式化szMsg 处理里面的名字
-function MY_Farbnamen.Render(szMsg, tOriOption)
-	local tOption = {
-		bColor = true,
-		bTip = true,
-		bInsertIcon = false,
-		nInsertIconSize = 23,
-	}
-	if IsTable(tOriOption) then
-		if not IsNil(tOriOption.bTip) then
-			tOption.bTip = tOriOption.bTip
-		end
-		if not IsNil(tOriOption.bColor) then
-			tOption.bColor = tOriOption.bColor
-		end
-		if not IsNil(tOriOption.bInsertIcon) then
-			tOption.bInsertIcon = tOriOption.bInsertIcon
-		end
-		if not IsNil(tOriOption.nInsertIconSize) then
-			tOption.nInsertIconSize = tOriOption.nInsertIconSize
-		end
-	end
+function MY_Farbnamen.Render(szMsg, tOption)
+	tOption = D.MergeOption(
+		{
+			bColor = true,
+			bTip = true,
+			bInsertIcon = MY_Farbnamen.bInsertIcon or false,
+			nInsertIconSize = MY_Farbnamen.nInsertIconSize or 23,
+		},
+		tOption)
 	if IsString(szMsg) then
 		szMsg = D.RenderXml(szMsg, tOption)
 	elseif IsElement(szMsg) then
@@ -352,7 +351,7 @@ end
 -- 插入聊天内容的 HOOK （过滤、加入时间 ）
 LIB.HookChatPanel('BEFORE.MY_FARBNAMEN', function(h, szMsg, ...)
 	if MY_Farbnamen.bEnabled then
-		szMsg = MY_Farbnamen.Render(szMsg, MY_Farbnamen)
+		szMsg = MY_Farbnamen.Render(szMsg, true)
 	end
 	return szMsg
 end)
