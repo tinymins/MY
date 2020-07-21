@@ -586,7 +586,7 @@ function sipairs_r(...)
 			end
 		end
 	end
-	return SafeIterR, iters, 0
+	return SafeIterR, iters, #iters + 1
 end
 function spairs_r(...)
 	local argc = select('#', ...)
@@ -599,7 +599,7 @@ function spairs_r(...)
 			end
 		end
 	end
-	return SafeIterR, iters, 0
+	return SafeIterR, iters, #iters + 1
 end
 end
 -----------------------------------------------
