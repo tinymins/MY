@@ -1361,26 +1361,26 @@ end
 local l_hPrevItem
 local function BeforeChatAppendItemFromString(h, szMsg, ...) -- h, szMsg, szChannel, dwTime, nR, nG, nB, ...
 	for szKey, fnAction in pairs(CHAT_HOOK.FILTER) do
-		local status, invalid = XpCall(fnAction, h, szMsg, ...)
-		if status then
-			if not invalid then
+		local res, err, trace = XpCall(fnAction, h, szMsg, ...)
+		if res then
+			if not err then
 				return h, '', ...
 			end
 		--[[#DEBUG BEGIN]]
 		else
-			LIB.Debug('ERROR', 'HookChatPanel.FILTER#' .. szKey, DEBUG_LEVEL.ERROR)
+			FireUIEvent('CALL_LUA_ERROR', err .. '\nHookChatPanel.FILTER:' .. szKey .. '\n' .. trace .. '\n')
 		--[[#DEBUG END]]
 		end
 	end
 	for szKey, fnAction in pairs(CHAT_HOOK.BEFORE) do
-		local res = {XpCall(fnAction, h, szMsg, ...)}
-		if res[1] then
-			if IsString(res[2]) then
-				szMsg = res[2]
+		local res, err, trace = XpCall(fnAction, h, szMsg, ...)
+		if res then
+			if IsString(err) then
+				szMsg = err
 			end
 		--[[#DEBUG BEGIN]]
 		else
-			LIB.Debug('ERROR', 'HookChatPanel.BEFORE#' .. szKey, DEBUG_LEVEL.ERROR)
+			FireUIEvent('CALL_LUA_ERROR', err .. '\nHookChatPanel.BEFORE:' .. szKey .. '\n' .. trace .. '\n')
 		--[[#DEBUG END]]
 		end
 	end
