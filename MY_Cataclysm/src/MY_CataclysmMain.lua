@@ -131,49 +131,28 @@ end
 end
 
 do
-local function ScanTeamMonRule(data)
-	if not data.aCataclysmBuff then
-		return
-	end
-	for _, v in ipairs(data.aCataclysmBuff) do
-		v = Clone(v)
-		v.dwID = data.dwID
-		if data.bCheckLevel then
-			v.nLevel = data.nLevel
-		end
-		v.nIcon = data.nIcon
-		insert(CTM_BUFF_TEAMMON, v)
-	end
-end
 local function UpdateTeamMonData()
-	CTM_BUFF_TEAMMON = {}
-	local aData = MY_TeamMon and MY_TeamMon.GetTable and MY_TeamMon.GetTable('BUFF')
-	if aData then
-		if aData[-1] then
-			for _, v in ipairs(aData[-1]) do
-				ScanTeamMonRule(v)
+	if MY_TeamMon and MY_TeamMon.IterTable and MY_TeamMon.GetTable then
+		local aBuff = {}
+		local dwMapID = LIB.GetMapID(true)
+		for _, szType in ipairs({'BUFF', 'DEBUFF'}) do
+			for _, data in MY_TeamMon.IterTable(MY_TeamMon.GetTable(szType), dwMapID, true) do
+				if data.aCataclysmBuff then
+					for _, v in ipairs(data.aCataclysmBuff) do
+						v = Clone(v)
+						v.dwID = data.dwID
+						if data.bCheckLevel then
+							v.nLevel = data.nLevel
+						end
+						v.nIcon = data.nIcon
+						insert(CTM_BUFF_TEAMMON, v)
+					end
+				end
 			end
 		end
-		if aData[LIB.GetMapID()] then
-			for _, v in ipairs(aData[LIB.GetMapID()]) do
-				ScanTeamMonRule(v)
-			end
-		end
+		CTM_BUFF_TEAMMON = aBuff
+		D.UpdateBuffListCache()
 	end
-	local aData = MY_TeamMon and MY_TeamMon.GetTable and MY_TeamMon.GetTable('DEBUFF')
-	if aData then
-		if aData[-1] then
-			for _, v in ipairs(aData[-1]) do
-				ScanTeamMonRule(v)
-			end
-		end
-		if aData[LIB.GetMapID()] then
-			for _, v in ipairs(aData[LIB.GetMapID()]) do
-				ScanTeamMonRule(v)
-			end
-		end
-	end
-	D.UpdateBuffListCache()
 end
 LIB.RegisterEvent('LOADING_ENDING.MY_CataclysmMain', UpdateTeamMonData)
 local function onTeamMonUpdate()

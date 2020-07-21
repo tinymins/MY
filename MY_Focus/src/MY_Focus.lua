@@ -53,8 +53,8 @@ end
 --------------------------------------------------------------------------
 
 local CHANGGE_REAL_SHADOW_TPLID = 46140 -- 清绝歌影 的主体影子
-local INI_PATH = PACKET_INFO.ROOT .. 'MY_Focus/ui/MY_Focus.ini'
 local FOCUS_LIST = {}
+local TEAMMON_FOCUS = {}
 local l_tTempFocusList = {
 	[TARGET.PLAYER] = {},   -- dwID
 	[TARGET.NPC]    = {},   -- dwTemplateID
@@ -64,7 +64,6 @@ local PRIVATE_CONFIG_LOADED = false
 local PRIVATE_CONFIG_CHANGED = false
 local PUBLIC_CONFIG_LOADED = false
 local PUBLIC_CONFIG_CHANGED = false
-local l_dwLockType, l_dwLockID, l_lockInDisplay
 local O, D = {}, {}
 local PRIVATE_DEFAULT = {
 	bEnable     = false   , -- 是否启用
@@ -493,8 +492,8 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 			end
 		end
 		-- 判断团队监控焦点
-		if not bFocus and D.TEAMMON_FOCUS and O.bTeamMonFocus then
-			local aRule = D.GetEligibleRules(D.TEAMMON_FOCUS, dwMapID, dwType, dwID, dwTemplateID, szName, szTong)
+		if not bFocus and O.bTeamMonFocus then
+			local aRule = D.GetEligibleRules(TEAMMON_FOCUS, dwMapID, dwType, dwID, dwTemplateID, szName, szTong)
 			for _, tRule in ipairs(aRule) do
 				insert(aVia, {
 					tRule = tRule,
@@ -994,40 +993,34 @@ end
 
 do
 local function UpdateTeamMonData()
-	D.TEAMMON_FOCUS = {}
-	local aDS = {}
-	local dwMapID = LIB.GetMapID(true)
-	if MY_TeamMon and MY_TeamMon.GetTable then
-		for _, p in ipairs({
-			{'NPC', TARGET.NPC},
-			{'DOODAD', TARGET.DOODAD},
+	if MY_TeamMon and MY_TeamMon.IterTable and MY_TeamMon.GetTable then
+		local aFocus = {}
+		local dwMapID = LIB.GetMapID(true)
+		for _, ds in ipairs({
+			{ szType = 'NPC', dwType = TARGET.NPC},
+			{ szType = 'DOODAD', dwType = TARGET.DOODAD},
 		}) do
-			local aData = MY_TeamMon.GetTable(p[1])
-			if aData then
-				insert(aDS, { dwType = p[2], aData = aData })
-			end
-		end
-	end
-	for _, ds in ipairs(aDS) do
-		for _, data in spairs(ds.aData[-1], ds.aData[dwMapID]) do
-			if data.aFocus then
-				for _, p in ipairs(data.aFocus) do
-					local rule = Clone(p)
-					rule.szMethod = 'TEMPLATE_ID'
-					rule.szPattern = tostring(data.dwID)
-					rule.tType = {
-						bAll = false,
-						[TARGET.NPC] = false,
-						[TARGET.PLAYER] = false,
-						[TARGET.DOODAD] = false,
-					}
-					rule.tType[ds.dwType] = true
-					insert(D.TEAMMON_FOCUS, D.FormatAutoFocusData(rule))
+			for _, data in MY_TeamMon.IterTable(MY_TeamMon.GetTable(ds.szType), dwMapID, true) do
+				if data.aFocus then
+					for _, p in ipairs(data.aFocus) do
+						local rule = Clone(p)
+						rule.szMethod = 'TEMPLATE_ID'
+						rule.szPattern = tostring(data.dwID)
+						rule.tType = {
+							bAll = false,
+							[TARGET.NPC] = false,
+							[TARGET.PLAYER] = false,
+							[TARGET.DOODAD] = false,
+						}
+						rule.tType[ds.dwType] = true
+						insert(aFocus, D.FormatAutoFocusData(rule))
+					end
 				end
 			end
 		end
+		TEAMMON_FOCUS = aFocus
+		D.RescanNearby()
 	end
-	D.RescanNearby()
 end
 LIB.RegisterEvent('LOADING_ENDING.MY_Focus', UpdateTeamMonData)
 local function onTeamMonUpdate()

@@ -81,21 +81,22 @@ RegisterCustomData('MY_TeamMon_CC.bEnable')
 RegisterCustomData('MY_TeamMon_CC.bBorder')
 
 function D.UpdateRule()
-	CIRCLE_RULE[TARGET.NPC] = {}
-	CIRCLE_RULE[TARGET.DOODAD] = {}
-	if MY_TeamMon.GetTable and MY_TeamMon.IterTable then
-		for _, data in MY_TeamMon.IterTable(MY_TeamMon.GetTable('NPC'), LIB.GetMapID(), true) do
-			if not IsEmpty(data.aCircle) or data.bDrawLine then
-				CIRCLE_RULE[TARGET.NPC][data.dwID] = data
+	if MY_TeamMon and MY_TeamMon.IterTable and MY_TeamMon.GetTable then
+		CIRCLE_RULE[TARGET.NPC] = {}
+		CIRCLE_RULE[TARGET.DOODAD] = {}
+		local dwMapID = LIB.GetMapID(true)
+		for _, ds in ipairs({
+			{ szType = 'NPC', dwType = TARGET.NPC},
+			{ szType = 'DOODAD', dwType = TARGET.DOODAD},
+		}) do
+			for _, data in MY_TeamMon.IterTable(MY_TeamMon.GetTable(ds.szType), dwMapID, true) do
+				if not IsEmpty(data.aCircle) or data.bDrawLine then
+					CIRCLE_RULE[ds.dwType][data.dwID] = data
+				end
 			end
 		end
-		for _, data in MY_TeamMon.IterTable(MY_TeamMon.GetTable('DOODAD'), LIB.GetMapID(), true) do
-			if not IsEmpty(data.aCircle) or data.bDrawLine then
-				CIRCLE_RULE[TARGET.DOODAD][data.dwID] = data
-			end
-		end
+		D.RescanNearby()
 	end
-	D.RescanNearby()
 end
 
 function D.DrawLine(dwType, tar, ttar, sha, col)
