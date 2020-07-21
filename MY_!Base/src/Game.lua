@@ -3304,6 +3304,20 @@ function LIB.IsInCity()
 	return me and LIB.IsCityMap(me.GetMapID())
 end
 
+-- 判断一个地图是不是野外
+-- (bool) LIB.IsVillageMap(dwMapID)
+function LIB.IsVillageMap(dwMapID)
+	local tType = Table_GetMapType(dwMapID)
+	return tType and tType.VILLAGE and true or false
+end
+
+-- 判断当前地图是不是野外
+-- (bool) LIB.IsInVillage()
+function LIB.IsInCity()
+	local me = GetClientPlayer()
+	return me and LIB.IsVillageMap(me.GetMapID())
+end
+
 -- 判断地图是不是PUBG
 -- (bool) LIB.IsPubgMap(dwMapID)
 do
