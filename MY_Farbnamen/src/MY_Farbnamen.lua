@@ -602,6 +602,8 @@ function MY_Farbnamen.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
 		end,
 	}):Width() + 5
 
+	x = X + 25
+	y = y + lineHeight
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, w = 'auto',
 		text = _L['Insert force icon'],
