@@ -138,7 +138,7 @@ LIB.HookChatPanel('FILTER.MY_ChatFilter', function(h, szMsg, szChannel, dwTime)
 	if MY_ChatFilter.bFilterDuplicate
 	and MY_ChatFilter.tApplyDuplicateChannels[szChannel] then
 		-- ¼ÆËã¹ýÂË¼ÇÂ¼
-		local szText, szName = GetPureText(szMsg), ''
+		local szText, szName = LIB.GetPureText(szMsg), ''
 		if l_tChannelHeader[szChannel] then
 			local nS, nE = wfind(szText, l_tChannelHeader[szChannel])
 			if nS and nE then
