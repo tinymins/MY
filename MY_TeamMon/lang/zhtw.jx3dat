@@ -28,6 +28,7 @@ return {
 	['All data'] = '全部的數據',
 	['Common data'] = '通用的數據',
 	['City data'] = '主城的數據',
+	['Village data'] = '野外的數據',
 	['Dungeon data'] = '秘境的數據',
 	['Team dungeon data'] = '小隊秘境的數據',
 	['Raid dungeon data'] = '團隊秘境的數據',
