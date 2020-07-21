@@ -73,7 +73,7 @@ local function GetItemText(item)
 			local szKey = item.dwTabType .. ',' .. item.dwIndex
 			if not l_tItemText[szKey] then
 				l_tItemText[szKey] = ''
-				l_tItemText[szKey] = LIB.Xml.GetPureText(GetItemTip(item))
+				l_tItemText[szKey] = LIB.XMLGetPureText(GetItemTip(item))
 			end
 			return l_tItemText[szKey]
 		else

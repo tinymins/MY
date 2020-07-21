@@ -175,7 +175,7 @@ local function getDateTitle(szDate)
 end
 
 local function convertXml2Html(szXml)
-	local aXml = LIB.Xml.Decode(szXml)
+	local aXml = LIB.XMLDecode(szXml)
 	local t = {}
 	if aXml then
 		local text, name

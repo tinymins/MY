@@ -386,7 +386,7 @@ do
 local CACHE = setmetatable({}, { __mode = 'v' })
 function LIB.GetPureText(szXml)
 	if not CACHE[szXml] then
-		CACHE[szXml] = {GetPureText and GetPureText(szXml) or LIB.Xml.GetPureText(szXml)}
+		CACHE[szXml] = {GetPureText and GetPureText(szXml) or LIB.XMLGetPureText(szXml)}
 	end
 	return CACHE[szXml][1]
 end

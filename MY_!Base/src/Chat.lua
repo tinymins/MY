@@ -399,7 +399,7 @@ LIB.ChatLinkEventHandlers = ChatLinkEventHandlers
 function LIB.RenderChatLink(arg1, arg2)
 	if type(arg1) == 'string' then -- szMsg
 		local szMsg = arg1
-		local xmls = LIB.Xml.Decode(szMsg)
+		local xmls = LIB.XMLDecode(szMsg)
 		if xmls then
 			for i, xml in ipairs(xmls) do
 				if xml and xml['.'] == 'text' and xml[''] and xml[''].name then
@@ -434,7 +434,7 @@ function LIB.RenderChatLink(arg1, arg2)
 					end
 				end
 			end
-			szMsg = LIB.Xml.Encode(xmls)
+			szMsg = LIB.XMLEncode(xmls)
 		end
 		return szMsg
 	elseif type(arg1) == 'table' and type(arg1.GetName) == 'function' then
@@ -503,12 +503,12 @@ end
 
 --解析消息
 function LIB.FormatChatContent(szMsg)
-	local t = LIB.Xml.Decode(szMsg)
+	local t = LIB.XMLDecode(szMsg)
 	-- Output(t)
 	local t2 = {}
 	for _, node in ipairs(t) do
-		local ntype = LIB.Xml.GetNodeType(node)
-		local ndata = LIB.Xml.GetNodeData(node)
+		local ntype = LIB.XMLGetNodeType(node)
+		local ndata = LIB.XMLGetNodeData(node)
 		-- 静态表情
 		if ntype == 'image' then
 			local emo = LIB.GetChatEmotion(ndata.path, ndata.frame, 'image')

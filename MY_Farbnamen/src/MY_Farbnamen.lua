@@ -207,7 +207,7 @@ InitDB()
 ---------------------------------------------------------------
 function D.RenderXml(szMsg, tOption)
 	-- <text>text='[就是个阵眼]' font=10 r=255 g=255 b=255  name='namelink_4662931' eventid=515</text><text>text='说：' font=10 r=255 g=255 b=255 </text><text>text='[茗伊]' font=10 r=255 g=255 b=255  name='namelink_4662931' eventid=771</text><text>text='\n' font=10 r=255 g=255 b=255 </text>
-	local xml = LIB.Xml.Decode(szMsg)
+	local xml = LIB.XMLDecode(szMsg)
 	if xml then
 		GetInsideEnv().SetWindowTitle('decode')
 		local i, ele = 1, nil
@@ -251,7 +251,7 @@ function D.RenderXml(szMsg, tOption)
 			end
 			i = i + 1
 		end
-		szMsg = LIB.Xml.Encode(xml)
+		szMsg = LIB.XMLEncode(xml)
 	end
 	-- szMsg = gsub( szMsg, '<text>([^<]-)text='([^<]-)'([^<]-name='namelink_%d-'[^<]-)</text>', function (szExtra1, szName, szExtra2)
 	--     szName = gsub(szName, '[%[%]]', '')

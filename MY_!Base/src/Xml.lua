@@ -8,8 +8,8 @@
 ---------------------------------------------------------
 -- Simple JX3 XML decoding and encoding in pure Lua.
 ---------------------------------------------------------
--- local lua_value = LIB.Xml.Decode(raw_xml_text)
--- local raw_xml_text = LIB.Xml.Encode(lua_table_or_value)
+-- local lua_value = LIB.XMLDecode(raw_xml_text)
+-- local raw_xml_text = LIB.XMLEncode(lua_table_or_value)
 ---------------------------------------------------------
 -------------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -374,34 +374,27 @@ end
 LIB.Xml = LIB.Xml or {}
 
 -- 解析 XML 数据，成功返回数据，失败返回 nil 加错误信息
--- (mixed) LIB.Xml.Decode(string szData)
-LIB.Xml.Decode = xmlDecode
+-- (mixed) LIB.XMLDecode(string szData)
 LIB.XMLDecode = xmlDecode
 
 -- 编码 XML 数据，成功返回 XML 字符串，失败返回 nil
--- (string) LIB.Xml.Encode(tData)
+-- (string) LIB.XMLEncode(tData)
 -- tData 变量数据，Table保存的XML数据
-LIB.Xml.Encode = xmlEncode
 LIB.XMLEncode = xmlEncode
 
 -- 转义 XML 字符串
--- (string) LIB.Xml.Escape(raw_str)
-LIB.Xml.Escape = xmlEscape
+-- (string) LIB.XMLEscape(raw_str)
 LIB.XMLEscape = xmlEscape
 
 -- 反转义 XML 字符串
--- (string) LIB.Xml.Unescape(escaped_str)
-LIB.Xml.Unescape = xmlUnescape
+-- (string) LIB.XMLUnescape(escaped_str)
 LIB.XMLUnescape = xmlUnescape
 
 -- xml转纯文字
-LIB.Xml.GetPureText = xml2Text
 LIB.XMLGetPureText = xml2Text
 
 -- xml节点类型
-LIB.Xml.GetNodeType = GetNodeType
 LIB.XMLGetNodeType = GetNodeType
 
 -- xml节点属性
-LIB.Xml.GetNodeData = GetNodeData
 LIB.XMLGetNodeData = GetNodeData
