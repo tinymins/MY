@@ -60,6 +60,7 @@ local D = {}
 MY_Farbnamen = MY_Farbnamen or {
 	bEnabled = true,
 	bInsertIcon = false,
+	nInsertIconSize = 23,
 }
 RegisterCustomData('MY_Farbnamen.bEnabled')
 RegisterCustomData('MY_Farbnamen.bInsertIcon')
@@ -227,8 +228,8 @@ function D.RenderXml(szMsg, tOption)
 							local szIcon, nFrame = GetForceImage(tInfo.dwForceID)
 							if szIcon and nFrame then
 								local nodeImage = LIB.XMLCreateNode('image')
-								LIB.XMLSetNodeData(nodeImage, 'w', 23)
-								LIB.XMLSetNodeData(nodeImage, 'h', 23)
+								LIB.XMLSetNodeData(nodeImage, 'w', tOption.nInsertIconSize)
+								LIB.XMLSetNodeData(nodeImage, 'h', tOption.nInsertIconSize)
 								LIB.XMLSetNodeData(nodeImage, 'path', szIcon)
 								LIB.XMLSetNodeData(nodeImage, 'frame', nFrame)
 								insert(aXMLNode, i, nodeImage)
@@ -278,7 +279,9 @@ function D.RenderNamelink(namelink, tOption)
 				local szIcon, nFrame = GetForceImage(tInfo.dwForceID)
 				if szIcon and nFrame then
 					local hParent = namelink:GetParent()
-					hParent:AppendItemFromString('<image>w=23 h=23 path="' .. szIcon .. '" frame=' .. nFrame .. '</image>')
+					hParent:AppendItemFromString('<image>w=' .. tOption.nInsertIconSize
+						.. ' h=' .. tOption.nInsertIconSize
+						.. ' path="' .. szIcon .. '" frame=' .. nFrame .. '</image>')
 					for i = hParent:GetItemCount() - 1, namelink:GetIndex() + 1, -1 do
 						hParent:ExchangeItemIndex(i, i - 1)
 					end
@@ -322,6 +325,7 @@ function MY_Farbnamen.Render(szMsg, tOriOption)
 		bColor = true,
 		bTip = true,
 		bInsertIcon = false,
+		nInsertIconSize = 23,
 	}
 	if IsTable(tOriOption) then
 		if not IsNil(tOriOption.bTip) then
@@ -332,6 +336,9 @@ function MY_Farbnamen.Render(szMsg, tOriOption)
 		end
 		if not IsNil(tOriOption.bInsertIcon) then
 			tOption.bInsertIcon = tOriOption.bInsertIcon
+		end
+		if not IsNil(tOriOption.nInsertIconSize) then
+			tOption.nInsertIconSize = tOriOption.nInsertIconSize
 		end
 	end
 	if IsString(szMsg) then
@@ -606,6 +613,18 @@ function MY_Farbnamen.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
 			return MY_Farbnamen.bEnabled
 		end,
 	}):Width() + 5
+
+	x = x + ui:Append('WndTrackbar', {
+		x = x, y = y, w = 100, h = 25,
+		value = MY_Farbnamen.nInsertIconSize,
+		range = {1, 300},
+		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		textfmt = function(v) return _L('Icon size: %dpx', v) end,
+		onchange = function(val)
+			MY_Farbnamen.nInsertIconSize = val
+		end,
+		autoenable = function() return MY_Farbnamen.bInsertIcon end,
+	}):AutoWidth():Width() + 5
 
 	x = X + 25
 	y = y + lineHeight
