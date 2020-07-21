@@ -175,16 +175,16 @@ local function getDateTitle(szDate)
 end
 
 local function convertXml2Html(szXml)
-	local aXml = LIB.XMLDecode(szXml)
+	local aXMLNode = LIB.XMLDecode(szXml)
 	local t = {}
-	if aXml then
-		local text, name
-		for _, xml in ipairs(aXml) do
-			text = xml[''].text
-			name = xml[''].name
+	if aXMLNode then
+		local text, name, force, r, g, b
+		for _, node in ipairs(aXMLNode) do
+			text = LIB.XMLGetNodeData(node, 'text')
+			name = LIB.XMLGetNodeData(node, 'name')
 			if text then
-				local force
 				text = htmlEncode(text)
+				force = nil
 				insert(t, '<a')
 				if name and name:sub(1, 9) == 'namelink_' then
 					insert(t, ' class="namelink')
@@ -198,8 +198,11 @@ local function convertXml2Html(szXml)
 					end
 					insert(t, '"')
 				end
-				if not force and xml[''].r and xml[''].g and xml[''].b then
-					insert(t, (' style="color:#%02X%02X%02X"'):format(xml[''].r, xml[''].g, xml[''].b))
+				r = LIB.XMLGetNodeData(node, 'r')
+				g = LIB.XMLGetNodeData(node, 'g')
+				b = LIB.XMLGetNodeData(node, 'b')
+				if not force and r and g and b then
+					insert(t, (' style="color:#%02X%02X%02X"'):format(r, g, b))
 				end
 				insert(t, '>')
 				insert(t, text)

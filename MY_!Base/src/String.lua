@@ -384,10 +384,30 @@ end
 
 do
 local CACHE = setmetatable({}, { __mode = 'v' })
-function LIB.GetPureText(szXml)
-	if not CACHE[szXml] then
-		CACHE[szXml] = {GetPureText and GetPureText(szXml) or LIB.XMLGetPureText(szXml)}
+function LIB.GetPureText(szXml, szDriver)
+	if not szDriver then
+		szDriver = 'AUTO'
 	end
-	return CACHE[szXml][1]
+	local cache = CACHE[szXml]
+	if not cache then
+		cache = {}
+		CACHE[szXml] = cache
+	end
+	if IsNil(cache.c) and (szDriver == 'CPP' or szDriver == 'AUTO') then
+		cache.c = GetPureText
+			and GetPureText(szXml)
+			or false
+	end
+	if IsNil(cache.l) and (szDriver == 'LUA' or (szDriver == 'AUTO' and not cache.c)) then
+		local aXMLNode = LIB.XMLDecode(szXml)
+		cache.l = LIB.XMLGetPureText(aXMLNode) or false
+	end
+	if szDriver == 'CPP' then
+		return cache.c
+	end
+	if szDriver == 'LUA' then
+		return cache.l
+	end
+	return cache.c or cache.l
 end
 end

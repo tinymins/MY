@@ -8,8 +8,8 @@
 ---------------------------------------------------------
 -- Simple JX3 XML decoding and encoding in pure Lua.
 ---------------------------------------------------------
--- local lua_value = LIB.XMLDecode(raw_xml_text)
--- local raw_xml_text = LIB.XMLEncode(lua_table_or_value)
+-- local aXMLNode = LIB.XMLDecode(szXML: string)
+-- local szXML = LIB.XMLEncode(xml: aXMLNode | XMLNode)
 ---------------------------------------------------------
 -------------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -48,7 +48,85 @@ local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild,
 local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
 -------------------------------------------------------------------------------------------------------
 
-local xmlDecode = function(xml)
+local function bytes2string(bytes)
+	local char, insert, concat, unpack = string.char, insert, concat, unpack
+	local count = #bytes
+	if count > 100 then
+		local t, i = {}, 1
+		while i <= count do
+			insert(t, char(unpack(bytes, i, min(i + 99, count))))
+			i = i + 100
+		end
+		return concat(t)
+	else
+		return char(unpack(bytes))
+	end
+end
+
+local function XMLEscape(str)
+	return (str:gsub('\\', '\\\\'):gsub('"', '\\"'))
+end
+
+local function XMLUnescape(str)
+	local bytes2string, insert, byte = bytes2string, insert, string.byte
+	local bytes_string, b_escaping, len, byte_current = {}, false, #str
+	local byte_char_n, byte_char_t, byte_lf, byte_tab, byte_escape = (byte('n')), (byte('t')), (byte('\n')), (byte('\t')), (byte('\\'))
+	for i = 1, len do
+		byte_current = byte(str, i)
+		if b_escaping then
+			b_escaping = false
+			if byte_current == byte_char_n then
+				byte_current = byte_lf
+			elseif byte_current == byte_char_t then
+				byte_current = byte_tab
+			end
+			insert(bytes_string, byte_current)
+		elseif byte_current == byte_escape then
+			b_escaping = true
+		else
+			insert(bytes_string, byte_current)
+		end
+	end
+	return bytes2string(bytes_string)
+end
+
+local function XMLCreateNode(type)
+	return { type = type, attrs = {}, data = {}, children = {} }
+end
+
+local function XMLIsNode(node)
+	return IsTable(node)
+		and IsString(node.type)
+		and IsTable(node.attrs)
+		and IsTable(node.data)
+		and IsTable(node.children)
+end
+
+local function XMLGetNodeType(node)
+	return node.type
+end
+
+local function XMLGetNodeAttr(node, key)
+	return node.attrs[key]
+end
+
+local function XMLSetNodeAttr(node, key, val)
+	node.attrs[key] = val
+end
+
+local function XMLGetNodeData(node, key)
+	return node.data[key]
+end
+
+local function XMLSetNodeData(node, key, val)
+	node.data[key] = val
+end
+
+local function XMLGetNodeChildren(node)
+	return node.children
+end
+
+local function XMLDecode(xml)
 	local function str2var(str)
 		if str == 'true' then
 			return true
@@ -58,7 +136,7 @@ local xmlDecode = function(xml)
 			return tonumber(str)
 		end
 	end
-	local insert, remove, concat = table.insert, table.remove, table.concat
+	local insert, remove, concat, unpack = table.insert, table.remove, table.concat, table.unpack or unpack
 	local find, sub, gsub, char, byte = string.find, string.sub, string.gsub, string.char, string.byte
 	local function bytes2string(bytes)
 		local count = #bytes
@@ -73,13 +151,12 @@ local xmlDecode = function(xml)
 			return char(unpack(bytes))
 		end
 	end
-	local t = {[''] = {}}
+	local t = XMLCreateNode('')
 	local p = t
 	local p1
 	local stack = {}
 	local state = 'text'
-	local unpack = unpack or table.unpack
-	local pos, len = 1, #xml
+	local pos, xlen = 1, #xml
 	local byte_current
 	local byte_apos, byte_quot, byte_escape, byte_slash = (byte('"')) , (byte('"')), (byte('\\')), (byte('/'))
 	local byte_lt, byte_gt, byte_amp, byte_eq, byte_space = (byte('<')), (byte('>')), (byte('&')), (byte('=')), (byte(' '))
@@ -87,7 +164,7 @@ local xmlDecode = function(xml)
 	local pos1, pos2, byte_quote, key, b_escaping, bytes_string
 	-- <        label         attribute_key=attribute_value>        text_key=text_value<        /     label         >
 	-- label_lt label_opening attribute                    label_gt text               label_lt slash label_closing label_gt
-	while pos <= len do
+	while pos <= xlen do
 		byte_current = byte(xml, pos)
 		if state == 'text' then
 			if byte_current == byte_lt then
@@ -107,15 +184,15 @@ local xmlDecode = function(xml)
 		elseif state == 'label_opening' then
 			if byte_current == byte_gt then
 				state = 'text'
-				p1 = { ['.'] = xml:sub(pos1, pos - 1), [''] = {} }
+				p1 = XMLCreateNode(xml:sub(pos1, pos - 1))
 				insert(stack, p1)
-				insert(p, p1)
+				insert(p.children, p1)
 				p = p1
 			elseif byte_current == byte_space then
 				state = 'attribute'
-				p1 = { ['.'] = xml:sub(pos1, pos - 1), [''] = {} }
+				p1 = XMLCreateNode(xml:sub(pos1, pos - 1))
 				insert(stack, p1)
-				insert(p, p1)
+				insert(p.children, p1)
 				p = p1
 			end
 		elseif state == 'label_closing' then
@@ -144,7 +221,7 @@ local xmlDecode = function(xml)
 				state = 'attribute_eq'
 			elseif byte_current ~= byte_space then
 				state = 'attribute'
-				p[key] = key
+				p.attrs[key] = key
 				pos = pos - 1
 			end
 		elseif state == 'attribute_eq' then
@@ -170,17 +247,17 @@ local xmlDecode = function(xml)
 			elseif byte_current == byte_escape then
 				b_escaping = true
 			elseif byte_current == byte_quote then
-				p[key] = bytes2string(bytes_string)
+				p.attrs[key] = bytes2string(bytes_string)
 				state = 'attribute'
 			else
 				insert(bytes_string, byte_current)
 			end
 		elseif state == 'attribute_value' then
 			if byte_current == byte_space then
-				p[key] = str2var(xml:sub(pos1, pos))
+				p.attrs[key] = str2var(xml:sub(pos1, pos))
 				state = 'attribute'
 			elseif byte_current == byte_gt then
-				p[key] = str2var(xml:sub(pos1, pos - 1))
+				p.attrs[key] = str2var(xml:sub(pos1, pos - 1))
 				state = 'text'
 			end
 		elseif state == 'text_key' then
@@ -196,7 +273,7 @@ local xmlDecode = function(xml)
 				state = 'text_eq'
 			elseif byte_current ~= byte_space then
 				state = 'text'
-				p[''][key] = key
+				p.data[key] = key
 				pos = pos - 1
 			end
 		elseif state == 'text_eq' then
@@ -222,17 +299,17 @@ local xmlDecode = function(xml)
 			elseif byte_current == byte_escape then
 				b_escaping = true
 			elseif byte_current == byte_quote then
-				p[''][key] = bytes2string(bytes_string)
+				p.data[key] = bytes2string(bytes_string)
 				state = 'text'
 			else
 				insert(bytes_string, byte_current)
 			end
 		elseif state == 'text_value' then
 			if byte_current == byte_space then
-				p[''][key] = str2var(xml:sub(pos1, pos))
+				p.data[key] = str2var(xml:sub(pos1, pos))
 				state = 'text'
 			elseif byte_current == byte_lt then
-				p[''][key] = str2var(xml:sub(pos1, pos - 1))
+				p.data[key] = str2var(xml:sub(pos1, pos - 1))
 				state = 'label_lt'
 			end
 		end
@@ -241,91 +318,23 @@ local xmlDecode = function(xml)
 	if #stack ~= 0 then
 		return Log('XML decode error: unclosed elements detected.' .. #stack .. ' stacks on `' .. xml .. '`')
 	end
-	return t
+	return t.children
 end
 
-local xmlEscape = function(str)
-	return (str:gsub('\\', '\\\\'):gsub('"', '\\"'))
-end
-
-local bytes2string = function(bytes)
-	local char, insert, concat, unpack = string.char, insert, concat, unpack
-	local count = #bytes
-	if count > 100 then
-		local t, i = {}, 1
-		while i <= count do
-			insert(t, char(unpack(bytes, i, min(i + 99, count))))
-			i = i + 100
-		end
-		return concat(t)
-	else
-		return char(unpack(bytes))
-	end
-end
-
-local xmlUnescape = function(str)
-	local bytes2string, insert, byte = bytes2string, insert, string.byte
-	local bytes_string, b_escaping, len, byte_current = {}, false, #str
-	local byte_char_n, byte_char_t, byte_lf, byte_tab, byte_escape = (byte('n')), (byte('t')), (byte('\n')), (byte('\t')), (byte('\\'))
-	for i = 1, len do
-		byte_current = byte(str, i)
-		if b_escaping then
-			b_escaping = false
-			if byte_current == byte_char_n then
-				byte_current = byte_lf
-			elseif byte_current == byte_char_t then
-				byte_current = byte_tab
-			end
-			insert(bytes_string, byte_current)
-		elseif byte_current == byte_escape then
-			b_escaping = true
-		else
-			insert(bytes_string, byte_current)
-		end
-	end
-	return bytes2string(bytes_string)
-end
-
-local xmlEncode
-xmlEncode = function(xml)
+local function XMLEncode(xml)
 	local t = {}
-
-	-- head
-	if xml['.'] then
+	if XMLIsNode(xml) then
+		-- head open
 		insert(t, '<')
-		insert(t, xml['.'])
-
+		insert(t, xml.type)
 		-- attributes
-		local attr = ''
-		for k, v in pairs(xml) do
-			if type(k) == 'string' and find(k, '^[a-zA-Z0-9_]+$') then
-				insert(t, ' ')
-				insert(t, k)
-				insert(t, '=')
-				if type(v) == 'string' then
-					insert(t, '"')
-					insert(t, xmlEscape(v))
-					insert(t, '"')
-				elseif type(v) == 'boolean' then
-					insert(t, (( v and 'true' ) or 'false'))
-				else
-					insert(t, tostring(v))
-				end
-			end
-		end
-
-		insert(t, '>')
-	end
-	-- inner attritubes
-	local text = ''
-	if xml[''] then
-		for k, v in pairs(xml['']) do
+		for k, v in pairs(xml.attrs) do
 			insert(t, ' ')
 			insert(t, k)
 			insert(t, '=')
 			if type(v) == 'string' then
 				insert(t, '"')
-				insert(t, xmlEscape(v))
+				insert(t, XMLEscape(v))
 				insert(t, '"')
 			elseif type(v) == 'boolean' then
 				insert(t, (( v and 'true' ) or 'false'))
@@ -333,68 +342,102 @@ xmlEncode = function(xml)
 				insert(t, tostring(v))
 			end
 		end
-	end
-
-	-- children
-	for _, v in ipairs(xml) do
-		insert(t, xmlEncode(v))
-	end
-
-	if xml['.'] then
-		insert(t, '</')
-		insert(t, xml['.'])
+		-- head close
 		insert(t, '>')
+		-- data
+		for k, v in pairs(xml.data) do
+			insert(t, ' ')
+			insert(t, k)
+			insert(t, '=')
+			if type(v) == 'string' then
+				insert(t, '"')
+				insert(t, XMLEscape(v))
+				insert(t, '"')
+			elseif type(v) == 'boolean' then
+				insert(t, (( v and 'true' ) or 'false'))
+			else
+				insert(t, tostring(v))
+			end
+		end
+		-- children
+		for _, v in ipairs(XMLGetNodeChildren(xml)) do
+			insert(t, XMLEncode(v))
+		end
+		-- node close
+		insert(t, '</')
+		insert(t, XMLGetNodeType(xml))
+		insert(t, '>')
+	elseif IsTable(xml) then
+		for _, v in ipairs(xml) do
+			insert(t, XMLEncode(v))
+		end
 	end
-
 	return (concat(t))
 end
 
-local xml2Text = function(xml)
-	local t = {}
-	local xmls = xmlDecode(xml)
-	if xmls then
-		for _, xml in ipairs(xmls) do
-			if xml[''] then
-				insert(t, xml[''].text)
-			end
+local function XMLGetPureText(xml)
+	local a = {}
+	if XMLIsNode(xml) then
+		insert(a, XMLGetNodeData(xml, 'text') or '')
+		for _, v in ipairs(XMLGetNodeChildren(xml)) do
+			insert(a, XMLGetPureText(v))
+		end
+	elseif IsTable(xml) then
+		for _, v in ipairs(xml) do
+			insert(a, XMLGetPureText(v))
 		end
 	end
-	return concat(t)
+	return concat(a)
 end
-
-local function GetNodeType(node)
-	return node['.']
-end
-
-local function GetNodeData(node)
-	return node['']
-end
-
--- public API
-LIB.Xml = LIB.Xml or {}
 
 -- 解析 XML 数据，成功返回数据，失败返回 nil 加错误信息
--- (mixed) LIB.XMLDecode(string szData)
-LIB.XMLDecode = xmlDecode
+-- (XMLNode[] | nil) LIB.XMLDecode(szData: string)
+LIB.XMLDecode = XMLDecode
 
 -- 编码 XML 数据，成功返回 XML 字符串，失败返回 nil
--- (string) LIB.XMLEncode(tData)
--- tData 变量数据，Table保存的XML数据
-LIB.XMLEncode = xmlEncode
+-- (string) LIB.XMLEncode(xml: XMLNode[] | XMLNode)
+LIB.XMLEncode = XMLEncode
 
 -- 转义 XML 字符串
--- (string) LIB.XMLEscape(raw_str)
-LIB.XMLEscape = xmlEscape
+-- (string) LIB.XMLEscape(raw_str: string)
+LIB.XMLEscape = XMLEscape
 
 -- 反转义 XML 字符串
--- (string) LIB.XMLUnescape(escaped_str)
-LIB.XMLUnescape = xmlUnescape
+-- (string) LIB.XMLUnescape(escaped_str: string)
+LIB.XMLUnescape = XMLUnescape
 
--- xml转纯文字
-LIB.XMLGetPureText = xml2Text
+-- XML 转纯文字
+-- (string) LIB.XMLGetPureText(xml: XMLNode[] | XMLNode)
+LIB.XMLGetPureText = XMLGetPureText
 
--- xml节点类型
-LIB.XMLGetNodeType = GetNodeType
+-- 创建 XML 节点
+-- (XMLNode) LIB.XMLCreateNode(type: string)
+LIB.XMLCreateNode = XMLCreateNode
 
--- xml节点属性
-LIB.XMLGetNodeData = GetNodeData
+-- 判断是否是 XML 节点
+-- (boolean) LIB.XMLIsNode(xml: XMLNode | any)
+LIB.XMLIsNode = XMLIsNode
+
+-- 获取 XML 节点类型
+-- (string) LIB.XMLGetNodeType(xml: XMLNode)
+LIB.XMLGetNodeType = XMLGetNodeType
+
+-- 获取 XML 节点属性
+-- (string | number | boolean) LIB.XMLGetNodeAttr(xml: XMLNode, key: string)
+LIB.XMLGetNodeAttr = XMLGetNodeAttr
+
+-- 设置 XML 节点属性
+-- (void) LIB.XMLSetNodeAttr(xml: XMLNode, key: string, val: string | number | boolean)
+LIB.XMLSetNodeAttr = XMLSetNodeAttr
+
+-- 获取 XML 节点数据
+-- (string | number | boolean) LIB.XMLGetNodeData(xml: XMLNode, key: string)
+LIB.XMLGetNodeData = XMLGetNodeData
+
+-- 设置 XML 节点数据
+-- (void) LIB.XMLSetNodeData(xml: XMLNode, key: string, val: string | number | boolean)
+LIB.XMLSetNodeData = XMLSetNodeData
+
+-- 获取 XML 子节点列表
+-- (XMLNode[]) LIB.XMLGetNodeChildren(xml: XMLNode)
+LIB.XMLGetNodeChildren = XMLGetNodeChildren

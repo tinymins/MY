@@ -207,51 +207,46 @@ InitDB()
 ---------------------------------------------------------------
 function D.RenderXml(szMsg, tOption)
 	-- <text>text='[就是个阵眼]' font=10 r=255 g=255 b=255  name='namelink_4662931' eventid=515</text><text>text='说：' font=10 r=255 g=255 b=255 </text><text>text='[茗伊]' font=10 r=255 g=255 b=255  name='namelink_4662931' eventid=771</text><text>text='\n' font=10 r=255 g=255 b=255 </text>
-	local xml = LIB.XMLDecode(szMsg)
-	if xml then
-		GetInsideEnv().SetWindowTitle('decode')
-		local i, ele = 1, nil
-		while i <= #xml do
-			ele = xml[i]
-			if ele[''].name and ele[''].name:sub(1, 9) == 'namelink_' then
+	local aXMLNode = LIB.XMLDecode(szMsg)
+	if aXMLNode then
+		local i, node, name = 1, nil, nil
+		while i <= #aXMLNode do
+			node = aXMLNode[i]
+			name = LIB.XMLIsNode(node) and LIB.XMLGetNodeData(node, 'name')
+			if name and name:sub(1, 9) == 'namelink_' then
 				if tOption.bColor or tOption.bInsertIcon then
-					local szName = gsub(ele[''].text, '[%[%]]', '')
+					local szName = gsub(LIB.XMLGetNodeData(node, 'text'), '[%[%]]', '')
 					local tInfo = MY_Farbnamen.GetAusName(szName)
 					if tInfo then
-						GetInsideEnv().SetWindowTitle(szName)
 						if tOption.bColor then
-							ele[''].r = tInfo.rgb[1]
-							ele[''].g = tInfo.rgb[2]
-							ele[''].b = tInfo.rgb[3]
+							LIB.XMLSetNodeData(node, 'r', tInfo.rgb[1])
+							LIB.XMLSetNodeData(node, 'g', tInfo.rgb[2])
+							LIB.XMLSetNodeData(node, 'b', tInfo.rgb[3])
 						end
 						if tOption.bInsertIcon then
 							local szIcon, nFrame = GetForceImage(tInfo.dwForceID)
 							if szIcon and nFrame then
-								insert(xml, i, {
-									{
-										[''] = {
-											w = 23,
-											h = 23,
-											path = szIcon,
-											frame = nFrame,
-										},
-										['.'] = 'image',
-									},
-									[''] = {},
-								})
+								local nodeImage = LIB.XMLCreateNode('image')
+								LIB.XMLSetNodeData(nodeImage, 'w', 23)
+								LIB.XMLSetNodeData(nodeImage, 'h', 23)
+								LIB.XMLSetNodeData(nodeImage, 'path', szIcon)
+								LIB.XMLSetNodeData(nodeImage, 'frame', nFrame)
+								insert(aXMLNode, i, nodeImage)
 								i = i + 1
 							end
 						end
 					end
 				end
 				if tOption.bTip then
-					ele[''].eventid = 82803
-					ele[''].script = (ele[''].script or '') .. '\nthis.OnItemMouseEnter=function() MY_Farbnamen.ShowTip(this) end\nthis.OnItemMouseLeave=function() HideTip() end'
+					LIB.XMLSetNodeData(node, 'eventid', 82803)
+					LIB.XMLSetNodeData(node, 'script', (LIB.XMLGetNodeData(node, 'script') or '')
+						.. '\nthis.OnItemMouseEnter=function() MY_Farbnamen.ShowTip(this) end'
+						.. '\nthis.OnItemMouseLeave=function() HideTip() end')
 				end
 			end
 			i = i + 1
 		end
-		szMsg = LIB.XMLEncode(xml)
+		szMsg = LIB.XMLEncode(aXMLNode)
 	end
 	-- szMsg = gsub( szMsg, '<text>([^<]-)text='([^<]-)'([^<]-name='namelink_%d-'[^<]-)</text>', function (szExtra1, szName, szExtra2)
 	--     szName = gsub(szName, '[%[%]]', '')

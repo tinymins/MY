@@ -105,7 +105,7 @@ function GetItemText(KItem)
 			local szKey = KItem.dwTabType .. ',' .. KItem.dwIndex .. ',' .. nBookID
 			if not l_tItemText[szKey] then
 				l_tItemText[szKey] = ''
-				l_tItemText[szKey] = LIB.XMLGetPureText(GetItemTip(KItem))
+				l_tItemText[szKey] = LIB.GetPureText(GetItemTip(KItem), 'LUA')
 			end
 			return l_tItemText[szKey]
 		else
