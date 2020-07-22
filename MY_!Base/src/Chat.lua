@@ -102,6 +102,7 @@ local function GetCopyLinkScript(opt)
 		.. handlerEntry .. '.OnCopyMouseEnter;this.OnItemMouseLeave=' .. handlerEntry .. '.OnCopyMouseLeave;'
 	if opt.lclick ~= false then
 		szScript = szScript .. 'this.bLButton=true;this.OnItemLButtonDown='.. handlerEntry .. '.OnCopyLClick;'
+			.. 'this.szRichText="' .. EncodeLUAData(opt.richtext or '') .. '"'
 	end
 	if opt.mclick ~= false then
 		szScript = szScript .. 'this.bMButton=true;this.OnItemMButtonDown='.. handlerEntry .. '.OnCopyMClick;'
@@ -168,7 +169,7 @@ function LIB.InsertTalkInput(szType, ...)
 end
 
 -- 复制聊天行
-function LIB.CopyChatLine(hTime, bTextEditor)
+function LIB.CopyChatLine(hTime, bTextEditor, bRichText)
 	local edit = LIB.GetChatInputEdit()
 	if bTextEditor then
 		edit = UI.OpenTextEditor():Find('.WndEdit')[1]
@@ -178,87 +179,91 @@ function LIB.CopyChatLine(hTime, bTextEditor)
 	end
 	edit:GetRoot():Show()
 	edit:ClearText()
-	local h, i, bBegin, bContent = hTime:GetParent(), hTime:GetIndex(), nil, false
-	-- loop
-	for i = i + 1, h:GetItemCount() - 1 do
-		local p = h:Lookup(i)
-		if p:GetType() == 'Text' then
-			local szName = p:GetName()
-			if szName ~= 'timelink' and szName ~= 'copylink' and szName ~= 'msglink' and szName ~= 'time' then
-				local szText, bEnd = p:GetText(), false
-				if not bTextEditor and StringFindW(szText, '\n') then
-					szText = wgsub(szText, '\n', '')
-					bEnd = true
-				end
-				bContent = true
-				if szName == 'itemlink' then
-					edit:InsertObj(szText, { type = 'item', text = szText, item = p:GetUserData() })
-				elseif szName == 'iteminfolink' then
-					edit:InsertObj(szText, { type = 'iteminfo', text = szText, version = p.nVersion, tabtype = p.dwTabType, index = p.dwIndex })
-				elseif sub(szName, 1, 8) == 'namelink' then
-					if bBegin == nil then
-						bBegin = false
+	if bRichText then
+		edit:InsertText(hTime.szRichText)
+	else
+		local h, i, bBegin, bContent = hTime:GetParent(), hTime:GetIndex(), nil, false
+		-- loop
+		for i = i + 1, h:GetItemCount() - 1 do
+			local p = h:Lookup(i)
+			if p:GetType() == 'Text' then
+				local szName = p:GetName()
+				if szName ~= 'timelink' and szName ~= 'copylink' and szName ~= 'msglink' and szName ~= 'time' then
+					local szText, bEnd = p:GetText(), false
+					if not bTextEditor and StringFindW(szText, '\n') then
+						szText = wgsub(szText, '\n', '')
+						bEnd = true
 					end
-					edit:InsertObj(szText, { type = 'name', text = szText, name = match(szText, '%[(.*)%]') })
-				elseif szName == 'questlink' then
-					edit:InsertObj(szText, { type = 'quest', text = szText, questid = p:GetUserData() })
-				elseif szName == 'recipelink' then
-					edit:InsertObj(szText, { type = 'recipe', text = szText, craftid = p.dwCraftID, recipeid = p.dwRecipeID })
-				elseif szName == 'enchantlink' then
-					edit:InsertObj(szText, { type = 'enchant', text = szText, proid = p.dwProID, craftid = p.dwCraftID, recipeid = p.dwRecipeID })
-				elseif szName == 'skilllink' then
-					local o = Clone(p.skillKey)
-					o.type, o.text = 'skill', szText
-					edit:InsertObj(szText, o)
-				elseif szName =='skillrecipelink' then
-					edit:InsertObj(szText, { type = 'skillrecipe', text = szText, id = p.dwID, level = p.dwLevelD })
-				elseif szName =='booklink' then
-					edit:InsertObj(szText, { type = 'book', text = szText, tabtype = p.dwTabType, index = p.dwIndex, bookinfo = p.nBookRecipeID, version = p.nVersion })
-				elseif szName =='achievementlink' then
-					edit:InsertObj(szText, { type = 'achievement', text = szText, id = p.dwID })
-				elseif szName =='designationlink' then
-					edit:InsertObj(szText, { type = 'designation', text = szText, id = p.dwID, prefix = p.bPrefix })
-				elseif szName =='eventlink' then
-					if szText and #szText > 0 then -- 过滤插件消息
-						edit:InsertObj(szText, { type = 'eventlink', text = szText, name = p.szName, linkinfo = p.szLinkInfo })
-					end
-				else
-					if bBegin == false then
-						for _, v in ipairs({g_tStrings.STR_TALK_HEAD_WHISPER, g_tStrings.STR_TALK_HEAD_SAY, g_tStrings.STR_TALK_HEAD_SAY1, g_tStrings.STR_TALK_HEAD_SAY2 }) do
-							local nB, nE = StringFindW(szText, v)
-							if nB then
-								szText, bBegin = sub(szText, nB + nE), true
-								edit:ClearText()
+					bContent = true
+					if szName == 'itemlink' then
+						edit:InsertObj(szText, { type = 'item', text = szText, item = p:GetUserData() })
+					elseif szName == 'iteminfolink' then
+						edit:InsertObj(szText, { type = 'iteminfo', text = szText, version = p.nVersion, tabtype = p.dwTabType, index = p.dwIndex })
+					elseif sub(szName, 1, 8) == 'namelink' then
+						if bBegin == nil then
+							bBegin = false
+						end
+						edit:InsertObj(szText, { type = 'name', text = szText, name = match(szText, '%[(.*)%]') })
+					elseif szName == 'questlink' then
+						edit:InsertObj(szText, { type = 'quest', text = szText, questid = p:GetUserData() })
+					elseif szName == 'recipelink' then
+						edit:InsertObj(szText, { type = 'recipe', text = szText, craftid = p.dwCraftID, recipeid = p.dwRecipeID })
+					elseif szName == 'enchantlink' then
+						edit:InsertObj(szText, { type = 'enchant', text = szText, proid = p.dwProID, craftid = p.dwCraftID, recipeid = p.dwRecipeID })
+					elseif szName == 'skilllink' then
+						local o = Clone(p.skillKey)
+						o.type, o.text = 'skill', szText
+						edit:InsertObj(szText, o)
+					elseif szName =='skillrecipelink' then
+						edit:InsertObj(szText, { type = 'skillrecipe', text = szText, id = p.dwID, level = p.dwLevelD })
+					elseif szName =='booklink' then
+						edit:InsertObj(szText, { type = 'book', text = szText, tabtype = p.dwTabType, index = p.dwIndex, bookinfo = p.nBookRecipeID, version = p.nVersion })
+					elseif szName =='achievementlink' then
+						edit:InsertObj(szText, { type = 'achievement', text = szText, id = p.dwID })
+					elseif szName =='designationlink' then
+						edit:InsertObj(szText, { type = 'designation', text = szText, id = p.dwID, prefix = p.bPrefix })
+					elseif szName =='eventlink' then
+						if szText and #szText > 0 then -- 过滤插件消息
+							edit:InsertObj(szText, { type = 'eventlink', text = szText, name = p.szName, linkinfo = p.szLinkInfo })
+						end
+					else
+						if bBegin == false then
+							for _, v in ipairs({g_tStrings.STR_TALK_HEAD_WHISPER, g_tStrings.STR_TALK_HEAD_SAY, g_tStrings.STR_TALK_HEAD_SAY1, g_tStrings.STR_TALK_HEAD_SAY2 }) do
+								local nB, nE = StringFindW(szText, v)
+								if nB then
+									szText, bBegin = sub(szText, nB + nE), true
+									edit:ClearText()
+								end
 							end
 						end
+						if szText ~= '' and (getn(edit:GetTextStruct()) > 0 or szText ~= g_tStrings.STR_FACE) then
+							edit:InsertText(szText)
+						end
 					end
-					if szText ~= '' and (getn(edit:GetTextStruct()) > 0 or szText ~= g_tStrings.STR_FACE) then
-						edit:InsertText(szText)
+					if bEnd then
+						break
 					end
-				end
-				if bEnd then
+				elseif bTextEditor and bContent and (szName == 'timelink' or szName == 'copylink' or szName == 'msglink' or szName == 'time') then
 					break
 				end
-			elseif bTextEditor and bContent and (szName == 'timelink' or szName == 'copylink' or szName == 'msglink' or szName == 'time') then
-				break
-			end
-		elseif p:GetType() == 'Image' or p:GetType() == 'Animate' then
-			local dwID = tonumber((p:GetName():gsub('^emotion_', '')))
-			if dwID then
-				local emo = LIB.GetChatEmotion(dwID)
-				if emo then
-					edit:InsertObj(emo.szCmd, { type = 'emotion', text = emo.szCmd, id = emo.dwID })
-				end
-			else
-				local szImg, nFrame = p:GetImagePath()
-				if szImg == 'ui\\image\\common\\money.uitex' and nFrame == 0 then
-					edit:InsertText(_L['Gold'])
-				elseif szImg == 'ui\\image\\common\\money.uitex' and nFrame == 2 then
-					edit:InsertText(_L['Silver'])
-				elseif szImg == 'ui\\image\\common\\money.uitex' and nFrame == 1 then
-					edit:InsertText(_L['Copper'])
-				elseif szImg == 'ui\\image\\common\\money.uitex' and (nFrame == 31 or nFrame == 32 or nFrame == 33 or nFrame == 34) then
-					edit:InsertText(_L['Brics'])
+			elseif p:GetType() == 'Image' or p:GetType() == 'Animate' then
+				local dwID = tonumber((p:GetName():gsub('^emotion_', '')))
+				if dwID then
+					local emo = LIB.GetChatEmotion(dwID)
+					if emo then
+						edit:InsertObj(emo.szCmd, { type = 'emotion', text = emo.szCmd, id = emo.dwID })
+					end
+				else
+					local szImg, nFrame = p:GetImagePath()
+					if szImg == 'ui\\image\\common\\money.uitex' and nFrame == 0 then
+						edit:InsertText(_L['Gold'])
+					elseif szImg == 'ui\\image\\common\\money.uitex' and nFrame == 2 then
+						edit:InsertText(_L['Silver'])
+					elseif szImg == 'ui\\image\\common\\money.uitex' and nFrame == 1 then
+						edit:InsertText(_L['Copper'])
+					elseif szImg == 'ui\\image\\common\\money.uitex' and (nFrame == 31 or nFrame == 32 or nFrame == 33 or nFrame == 34) then
+						edit:InsertText(_L['Brics'])
+					end
 				end
 			end
 		end
@@ -322,7 +327,7 @@ function ChatLinkEvents.OnCopyLClick(element, link)
 	if not link then
 		link = element
 	end
-	LIB.CopyChatLine(link, IsCtrlKeyDown())
+	LIB.CopyChatLine(link, IsCtrlKeyDown(), IsCtrlKeyDown() and IsShiftKeyDown())
 end
 function ChatLinkEvents.OnCopyMClick(element, link)
 	if not link then
