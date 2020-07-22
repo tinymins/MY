@@ -506,7 +506,7 @@ function LIB.CopyChatItem(p)
 	end
 end
 
--- 从界面聊天元素解析原始聊天消息
+-- 从界面聊天元素解析原始聊天消息数据
 -- (aSay: table) LIB.ParseChatContent(oData: Element, tOption: table)
 -- (aSay: table) LIB.ParseChatContent(oData: XMLString, tOption: table)
 -- (aSay: table) LIB.ParseChatContent(oData: XMLNode, tOption: table)
@@ -792,16 +792,18 @@ function LIB.ParseChatContent(oData, tOption)
 end
 end
 
-function LIB.StringifyChatContent(t, r, g, b)
-	local aContent = {}
+-- 从原始聊天消息数据构建界面元素富文本字符串
+-- (aSay: table) LIB.StringifyChatContent(aSay: table, r?: number, g?: number, b?: number, font?: number)
+function LIB.StringifyChatContent(t, r, g, b, f)
+	local aXML = {}
 	for _, v in ipairs(t) do
 		if v.type == 'text' then
-			insert(aContent, GetFormatText(v.text, nil, r, g, b))
+			insert(aXML, GetFormatText(v.text, f, r, g, b))
 		elseif v.type == 'name' then
-			insert(aContent, GetFormatText(v.text, nil, r, g, b, 515, nil, 'namelink_' .. (v.id or 0)))
+			insert(aXML, GetFormatText(v.text, f, r, g, b, 515, nil, 'namelink_' .. (v.id or 0)))
 		end
 	end
-	return concat(aContent)
+	return concat(aXML)
 end
 
 -- 字符串化一个聊天table结构体
