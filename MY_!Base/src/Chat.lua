@@ -507,16 +507,16 @@ function LIB.CopyChatItem(p)
 end
 
 -- 从界面聊天元素解析原始聊天消息
--- (aSay: table) LIB.FormatChatContent(oData: Element, tOption: table)
--- (aSay: table) LIB.FormatChatContent(oData: XMLString, tOption: table)
--- (aSay: table) LIB.FormatChatContent(oData: XMLNode, tOption: table)
+-- (aSay: table) LIB.ParseChatContent(oData: Element, tOption: table)
+-- (aSay: table) LIB.ParseChatContent(oData: XMLString, tOption: table)
+-- (aSay: table) LIB.ParseChatContent(oData: XMLNode, tOption: table)
 do
-local function FormatChatContent(oData, tOption, aContent, bIgnoreRange)
+local function ParseChatContent(oData, tOption, aContent, bIgnoreRange)
 	if IsString(oData) then
 		local aXMLNode = LIB.XMLDecode(oData)
 		if aXMLNode then
 			for _, node in ipairs(aXMLNode) do
-				FormatChatContent(node, tOption, aContent, true)
+				ParseChatContent(node, tOption, aContent, true)
 			end
 		end
 	elseif LIB.XMLIsNode(oData) then
@@ -531,7 +531,7 @@ local function FormatChatContent(oData, tOption, aContent, bIgnoreRange)
 			local nStartIndex = not bIgnoreRange and tOption.nStartIndex or 0
 			local nEndIndex = not bIgnoreRange and tOption.nEndIndex or (#children - 1)
 			for nIndex = nStartIndex, nEndIndex do
-				FormatChatContent(children[nIndex + 1], tOption, aContent, true)
+				ParseChatContent(children[nIndex + 1], tOption, aContent, true)
 			end
 		elseif nodeType == 'text' then -- 文字内容
 			if nodeName == 'itemlink' then -- 物品链接
@@ -669,7 +669,7 @@ local function FormatChatContent(oData, tOption, aContent, bIgnoreRange)
 			local nStartIndex = not bIgnoreRange and tOption.nStartIndex or 0
 			local nEndIndex = not bIgnoreRange and tOption.nEndIndex or (h:GetItemCount() - 1)
 			for nIndex = nStartIndex, nEndIndex do
-				FormatChatContent(elem:Lookup(nIndex), tOption, aContent, true)
+				ParseChatContent(elem:Lookup(nIndex), tOption, aContent, true)
 			end
 		elseif elemType == 'Text' then -- 文字内容
 			local elemText = elem:GetText()
@@ -787,8 +787,8 @@ local function FormatChatContent(oData, tOption, aContent, bIgnoreRange)
 	end
 	return aContent
 end
-function LIB.FormatChatContent(oData, tOption)
-	return FormatChatContent(oData, tOption, {}, false)
+function LIB.ParseChatContent(oData, tOption)
+	return ParseChatContent(oData, tOption, {}, false)
 end
 end
 

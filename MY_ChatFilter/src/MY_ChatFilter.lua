@@ -107,7 +107,7 @@ LIB.HookChatPanel('FILTER.MY_ChatFilter', function(h, szMsg, szChannel, dwTime)
 	-- 插件消息UUID过滤
 	if MY_ChatFilter.bFilterDuplicateAddonTalk then
 		local me = GetClientPlayer()
-		local tSay = LIB.FormatChatContent(szMsg)
+		local tSay = LIB.ParseChatContent(szMsg)
 		if not h.MY_tDuplicateUUID then
 			h.MY_tDuplicateUUID = {}
 		end
