@@ -278,13 +278,11 @@ function D.RenderNamelink(namelink, tOption)
 			if tOption.bInsertIcon then
 				local szIcon, nFrame = GetForceImage(tInfo.dwForceID)
 				if szIcon and nFrame then
-					local hParent = namelink:GetParent()
-					hParent:AppendItemFromString('<image>w=' .. tOption.nInsertIconSize
-						.. ' h=' .. tOption.nInsertIconSize
-						.. ' path="' .. szIcon .. '" frame=' .. nFrame .. '</image>')
-					for i = hParent:GetItemCount() - 1, namelink:GetIndex() + 1, -1 do
-						hParent:ExchangeItemIndex(i, i - 1)
-					end
+					namelink:GetParent():InsertItemFromString(
+						namelink:GetIndex(),
+						false,
+						'<image>w=' .. tOption.nInsertIconSize .. ' h=' .. tOption.nInsertIconSize
+							.. ' path="' .. szIcon .. '" frame=' .. nFrame .. '</image>')
 					nNumOffset = nNumOffset + 1
 				end
 			end
