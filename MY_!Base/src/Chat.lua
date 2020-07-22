@@ -320,7 +320,8 @@ function LIB.CopyChatLine(hTime, bTextEditor, bRichText)
 	Station.SetFocusWindow(edit)
 end
 
-do local ChatLinkEvents, PEEK_PLAYER = {}, {}
+-- 聊天界面元素通用事件查看角色装备标记位
+local PEEK_PLAYER = {}
 LIB.RegisterEvent('PEEK_OTHER_PLAYER', function()
 	if not PEEK_PLAYER[arg1] then
 		return
@@ -336,112 +337,113 @@ LIB.RegisterEvent('PEEK_OTHER_PLAYER', function()
 	end
 	PEEK_PLAYER[arg1] = nil
 end)
-function ChatLinkEvents.OnNameLClick(element, link)
-	if not link then
-		link = element
-	end
-	if IsCtrlKeyDown() and IsAltKeyDown() then
-		local menu = {}
-		InsertInviteTeamMenu(menu, (UI(link):Text():gsub('[%[%]]', '')))
-		menu[1].fnAction()
-	elseif IsCtrlKeyDown() then
-		LIB.CopyChatItem(link)
-	elseif IsShiftKeyDown() then
-		if not LIB.IsInShieldedMap() or not LIB.IsShieldedVersion('TARGET') then
-			LIB.SetTarget(TARGET.PLAYER, UI(link):Text())
+
+-- 聊天界面元素通用事件绑定函数
+local ChatLinkEvents = {
+	OnNameLClick = function(element, link)
+		if not link then
+			link = element
 		end
-	elseif IsAltKeyDown() then
-		if MY_Farbnamen and MY_Farbnamen.Get then
-			local info = MY_Farbnamen.Get((UI(link):Text():gsub('[%[%]]', '')))
-			if info then
-				PEEK_PLAYER[info.dwID] = true
-				ViewInviteToPlayer(info.dwID)
+		if IsCtrlKeyDown() and IsAltKeyDown() then
+			local menu = {}
+			InsertInviteTeamMenu(menu, (UI(link):Text():gsub('[%[%]]', '')))
+			menu[1].fnAction()
+		elseif IsCtrlKeyDown() then
+			LIB.CopyChatItem(link)
+		elseif IsShiftKeyDown() then
+			if not LIB.IsInShieldedMap() or not LIB.IsShieldedVersion('TARGET') then
+				LIB.SetTarget(TARGET.PLAYER, UI(link):Text())
+			end
+		elseif IsAltKeyDown() then
+			if MY_Farbnamen and MY_Farbnamen.Get then
+				local info = MY_Farbnamen.Get((UI(link):Text():gsub('[%[%]]', '')))
+				if info then
+					PEEK_PLAYER[info.dwID] = true
+					ViewInviteToPlayer(info.dwID)
+				end
+			end
+		else
+			LIB.SwitchChatChannel(UI(link):Text())
+			local edit = LIB.GetChatInput()
+			if edit then
+				Station.SetFocusWindow(edit)
 			end
 		end
-	else
-		LIB.SwitchChatChannel(UI(link):Text())
-		local edit = LIB.GetChatInput()
-		if edit then
-			Station.SetFocusWindow(edit)
+	end,
+	OnNameRClick = function(element, link)
+		if not link then
+			link = element
 		end
-	end
-end
-function ChatLinkEvents.OnNameRClick(element, link)
-	if not link then
-		link = element
-	end
-	PopupMenu(LIB.GetTargetContextMenu(TARGET.PLAYER, (UI(link):Text():gsub('[%[%]]', ''))))
-end
-function ChatLinkEvents.OnCopyLClick(element, link)
-	if not link then
-		link = element
-	end
-	LIB.CopyChatLine(link, IsCtrlKeyDown(), IsCtrlKeyDown() and IsShiftKeyDown())
-end
-function ChatLinkEvents.OnCopyMClick(element, link)
-	if not link then
-		link = element
-	end
-	LIB.RemoveChatLine(link)
-end
-function ChatLinkEvents.OnCopyRClick(element, link)
-	if not link then
-		link = element
-	end
-	LIB.RepeatChatLine(link)
-end
-function ChatLinkEvents.OnCopyMouseEnter(el, link)
-	if not link then
-		link = el
-	end
-	local x, y = el:GetAbsPos()
-	local w, h = el:GetSize()
-	local s = ''
-	if el.bLButton then
-		s = s .. _L['LClick to copy to editbox.\n']
-	end
-	if el.bMButton then
-		s = s .. _L['MClick to remove this line.\n']
-	end
-	if el.bRButton then
-		s = s .. _L['RClick to repeat this line.\n']
-	end
-	local szText = GetFormatText(s:sub(1, -2), 136)
-	OutputTip(szText, 450, {x, y, w, h}, UI.TIP_POSITION.TOP_BOTTOM)
-end
-function ChatLinkEvents.OnCopyMouseLeave(element, link)
-	if not link then
-		link = element
-	end
-	HideTip()
-end
-function ChatLinkEvents.OnItemLClick(element, link)
-	if not link then
-		link = element
-	end
-	OnItemLinkDown(link)
-end
-function ChatLinkEvents.OnItemRClick(element, link)
-	if not link then
-		link = element
-	end
-	if IsCtrlKeyDown() then
-		LIB.CopyChatItem(link)
-	end
-end
-LIB.ChatLinkEvents = ChatLinkEvents
+		PopupMenu(LIB.GetTargetContextMenu(TARGET.PLAYER, (UI(link):Text():gsub('[%[%]]', ''))))
+	end,
+	OnCopyLClick = function(element, link)
+		if not link then
+			link = element
+		end
+		LIB.CopyChatLine(link, IsCtrlKeyDown(), IsCtrlKeyDown() and IsShiftKeyDown())
+	end,
+	OnCopyMClick = function(element, link)
+		if not link then
+			link = element
+		end
+		LIB.RemoveChatLine(link)
+	end,
+	OnCopyRClick = function(element, link)
+		if not link then
+			link = element
+		end
+		LIB.RepeatChatLine(link)
+	end,
+	OnCopyMouseEnter = function(el, link)
+		if not link then
+			link = el
+		end
+		local x, y = el:GetAbsPos()
+		local w, h = el:GetSize()
+		local s = ''
+		if el.bLButton then
+			s = s .. _L['LClick to copy to editbox.\n']
+		end
+		if el.bMButton then
+			s = s .. _L['MClick to remove this line.\n']
+		end
+		if el.bRButton then
+			s = s .. _L['RClick to repeat this line.\n']
+		end
+		local szText = GetFormatText(s:sub(1, -2), 136)
+		OutputTip(szText, 450, {x, y, w, h}, UI.TIP_POSITION.TOP_BOTTOM)
+	end,
+	OnCopyMouseLeave = function(element, link)
+		if not link then
+			link = element
+		end
+		HideTip()
+	end,
+	OnItemLClick = function(element, link)
+		if not link then
+			link = element
+		end
+		OnItemLinkDown(link)
+	end,
+	OnItemRClick = function(element, link)
+		if not link then
+			link = element
+		end
+		if IsCtrlKeyDown() then
+			LIB.CopyChatItem(link)
+		end
+	end,
+}
+LIB.ChatLinkEvents = SetmetaReadonly(ChatLinkEvents)
 
+-- 聊天界面元素通用事件绑定函数（this）
 local ChatLinkEventHandlers = {}
-function ChatLinkEventHandlers.OnNameLClick() ChatLinkEvents.OnNameLClick(this) end
-function ChatLinkEventHandlers.OnNameRClick() ChatLinkEvents.OnNameRClick(this) end
-function ChatLinkEventHandlers.OnCopyLClick() ChatLinkEvents.OnCopyLClick(this) end
-function ChatLinkEventHandlers.OnCopyMClick() ChatLinkEvents.OnCopyMClick(this) end
-function ChatLinkEventHandlers.OnCopyRClick() ChatLinkEvents.OnCopyRClick(this) end
-function ChatLinkEventHandlers.OnCopyMouseEnter() ChatLinkEvents.OnCopyMouseEnter(this) end
-function ChatLinkEventHandlers.OnCopyMouseLeave() ChatLinkEvents.OnCopyMouseLeave(this) end
-function ChatLinkEventHandlers.OnItemLClick() ChatLinkEvents.OnItemLClick(this) end
-function ChatLinkEventHandlers.OnItemRClick() ChatLinkEvents.OnItemRClick(this) end
-LIB.ChatLinkEventHandlers = ChatLinkEventHandlers
+for k, f in pairs(LIB.ChatLinkEvents) do
+	LIB.ChatLinkEventHandlers[k] = function()
+		f(this)
+	end
+end
+LIB.ChatLinkEventHandlers = SetmetaReadonly(ChatLinkEventHandlers)
 
 -- 绑定link事件响应
 -- (userdata) LIB.RenderChatLink(userdata link)                   处理link的各种事件绑定 namelink是一个超链接Text元素
@@ -513,7 +515,6 @@ function LIB.RenderChatLink(arg1, arg2)
 		element[RENDERED_FLAG_KEY] = true
 		return element
 	end
-end
 end
 
 -- 复制Item到输入框
