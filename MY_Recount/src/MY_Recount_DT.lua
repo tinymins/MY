@@ -93,7 +93,7 @@ function D.GetDetailMenu(frame)
 	local eTimeChannel = MY_Recount_UI.bSysTimeMode and STAT_TYPE_KEY[MY_Recount_UI.nChannel]
 	local function Publish(nChannel, nLimit)
 		local bDetail = frame:Lookup('', 'Handle_Spliter'):IsVisible()
-		LIB.Talk(
+		LIB.SendChat(
 			nChannel,
 			'[' .. PACKET_INFO.SHORT_NAME .. ']'
 			.. _L['Fight recount'] .. ' - '
@@ -102,7 +102,7 @@ function D.GetDetailMenu(frame)
 			.. '(' .. LIB.FormatTimeCounter(MY_Recount_DS.GeneFightTime(DataDisplay, eTimeChannel), '%M:%ss') .. ')',
 			{ parsers = { name = false } }
 		)
-		LIB.Talk(nChannel, '------------------------------')
+		LIB.SendChat(nChannel, '------------------------------')
 
 		local aTabTalk = {}
 		D.InsertFromText(aTabTalk, frame:Lookup('WndScroll_Skill', 'Handle_SkillTitle'))
@@ -120,8 +120,8 @@ function D.GetDetailMenu(frame)
 				D.InsertFromText(aTabTalk, hList:Lookup(i))
 			end
 		end
-		LIB.TabTalk(nChannel, aTabTalk, {'L', 'L', 'R', 'R', 'R'})
-		LIB.Talk(nChannel, '------------------------------')
+		LIB.SendTabChat(nChannel, aTabTalk, {'L', 'L', 'R', 'R', 'R'})
+		LIB.SendChat(nChannel, '------------------------------')
 
 		if bDetail then
 			local aTabTalk = {}
@@ -130,8 +130,8 @@ function D.GetDetailMenu(frame)
 			for i = 0, hList:GetItemCount() - 1 do
 				D.InsertFromText(aTabTalk, hList:Lookup(i))
 			end
-			LIB.TabTalk(nChannel, aTabTalk, {'L', 'L', 'R', 'R', 'R', 'R', 'R'})
-			LIB.Talk(nChannel, '------------------------------')
+			LIB.SendTabChat(nChannel, aTabTalk, {'L', 'L', 'R', 'R', 'R', 'R', 'R'})
+			LIB.SendChat(nChannel, '------------------------------')
 
 			local aTabTalk = {}
 			D.InsertFromText(aTabTalk, frame:Lookup('WndScroll_Target', 'Handle_TargetTitle'))
@@ -139,8 +139,8 @@ function D.GetDetailMenu(frame)
 			for i = 0, min(hList:GetItemCount(), nLimit) - 1 do
 				D.InsertFromText(aTabTalk, hList:Lookup(i))
 			end
-			LIB.TabTalk(nChannel, aTabTalk, {'L', 'L', 'R', 'R', 'R', 'R', 'R', 'R'})
-			LIB.Talk(nChannel, '------------------------------')
+			LIB.SendTabChat(nChannel, aTabTalk, {'L', 'L', 'R', 'R', 'R', 'R', 'R', 'R'})
+			LIB.SendChat(nChannel, '------------------------------')
 		end
 	end
 	for nChannel, szChannel in pairs({

@@ -2328,7 +2328,7 @@ end
 end
 
 function LIB.EditBox_AppendLinkPlayer(szName)
-	local edit = LIB.GetChatInputEdit()
+	local edit = LIB.GetChatInput()
 	edit:InsertObj('['.. szName ..']', { type = 'name', text = '['.. szName ..']', name = szName })
 	Station.SetFocusWindow(edit)
 	return true
@@ -2340,7 +2340,7 @@ function LIB.EditBox_AppendLinkItem(dwID)
 		return false
 	end
 	local szName = '[' .. LIB.GetItemNameByItem(item) ..']'
-	local edit = LIB.GetChatInputEdit()
+	local edit = LIB.GetChatInput()
 	edit:InsertObj(szName, { type = 'item', text = szName, item = item.dwID })
 	Station.SetFocusWindow(edit)
 	return true

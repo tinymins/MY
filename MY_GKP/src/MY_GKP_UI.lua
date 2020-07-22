@@ -352,15 +352,15 @@ function MY_GKP_UI.OnFrameCreate()
 			GetUserInput(_L['Total Amount of People with Output Settle Account'],function(num)
 				if not tonumber(num) then return end
 				local a, b = ds:GetAuctionSum()
-				LIB.Talk(PLAYER_TALK_CHANNEL.RAID, _L['Salary Settle Account'])
-				LIB.Talk(PLAYER_TALK_CHANNEL.RAID, _L('Salary Statistic: income  %d Gold.', a))
-				LIB.Talk(PLAYER_TALK_CHANNEL.RAID, _L('Salary Allowance: %d Gold.', b))
-				LIB.Talk(PLAYER_TALK_CHANNEL.RAID, _L('Reall Salary: %d Gold.',a + b, a, b))
+				LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, _L['Salary Settle Account'])
+				LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, _L('Salary Statistic: income  %d Gold.', a))
+				LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, _L('Salary Allowance: %d Gold.', b))
+				LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, _L('Reall Salary: %d Gold.',a + b, a, b))
 				if a + b >= 0 then
-					LIB.Talk(PLAYER_TALK_CHANNEL.RAID, _L('Amount of People with Settle Account: %d',num))
-					LIB.Talk(PLAYER_TALK_CHANNEL.RAID, _L('Actual per person: %d Gold.',floor((a + b) / num)))
+					LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, _L('Amount of People with Settle Account: %d',num))
+					LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, _L('Actual per person: %d Gold.',floor((a + b) / num)))
 				else
-					LIB.Talk(PLAYER_TALK_CHANNEL.RAID, _L['The Account is Negative, no money is coming out!'])
+					LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, _L['The Account is Negative, no money is coming out!'])
 				end
 			end, nil, nil, nil, team.GetTeamSize())
 		end,
@@ -390,7 +390,7 @@ function MY_GKP_UI.OnFrameCreate()
 			end
 			FireUIEvent('MY_GKP_SEND_BEGIN')
 
-			LIB.Talk(PLAYER_TALK_CHANNEL.RAID, _L['--- Consumption ---'])
+			LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, _L['--- Consumption ---'])
 			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'GKP_INFO', 'Start', '--- Consumption ---'})
 
 			local aBill = {}
@@ -400,12 +400,12 @@ function MY_GKP_UI.OnFrameCreate()
 			sort(aBill,function(a,b) return a.nGold < b.nGold end)
 			for k, v in ipairs(aBill) do
 				if v.nGold > 0 then
-					LIB.Talk(PLAYER_TALK_CHANNEL.RAID, { D.GetFormatLink(v.szName, true), D.GetFormatLink(g_tStrings.STR_TALK_HEAD_SAY1 .. v.nGold .. g_tStrings.STR_GOLD .. g_tStrings.STR_FULL_STOP) })
+					LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, { D.GetFormatLink(v.szName, true), D.GetFormatLink(g_tStrings.STR_TALK_HEAD_SAY1 .. v.nGold .. g_tStrings.STR_GOLD .. g_tStrings.STR_FULL_STOP) })
 				end
 				LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'GKP_INFO', 'Info', v.szName, v.nGold})
 			end
 			local nTime = aAuction[1].nTime - aAuction[#aAuction].nTime -- 所花费的时间
-			LIB.Talk(PLAYER_TALK_CHANNEL.RAID, _L('Total Auction: %d Gold.', ds:GetAuctionSum()))
+			LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, _L('Total Auction: %d Gold.', ds:GetAuctionSum()))
 			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'GKP_INFO', 'End', _L('Total Auction: %d Gold.', ds:GetAuctionSum()), ds:GetAuctionSum(), nTime})
 		end,
 	})
@@ -454,14 +454,14 @@ function MY_GKP_UI.OnFrameCreate()
 			end
 
 			sort(aBill, function(a, b) return a.nGold < b.nGold end)
-			LIB.Talk(PLAYER_TALK_CHANNEL.RAID, _L['Information on Debt'])
+			LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, _L['Information on Debt'])
 			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'GKP_INFO', 'Start', 'Information on Debt'})
 			for _, v in ipairs(aBill) do
 				if v.nGold < 0 then
-					LIB.Talk(PLAYER_TALK_CHANNEL.RAID, { D.GetFormatLink(v.szName, true), D.GetFormatLink(g_tStrings.STR_TALK_HEAD_SAY1 .. v.nGold .. g_tStrings.STR_GOLD .. g_tStrings.STR_FULL_STOP) })
+					LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, { D.GetFormatLink(v.szName, true), D.GetFormatLink(g_tStrings.STR_TALK_HEAD_SAY1 .. v.nGold .. g_tStrings.STR_GOLD .. g_tStrings.STR_FULL_STOP) })
 					LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'GKP_INFO', 'Info', v.szName, v.nGold, '-'})
 				else
-					LIB.Talk(PLAYER_TALK_CHANNEL.RAID, { D.GetFormatLink(v.szName, true), D.GetFormatLink(g_tStrings.STR_TALK_HEAD_SAY1 .. '+' .. v.nGold .. g_tStrings.STR_GOLD .. g_tStrings.STR_FULL_STOP) })
+					LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, { D.GetFormatLink(v.szName, true), D.GetFormatLink(g_tStrings.STR_TALK_HEAD_SAY1 .. '+' .. v.nGold .. g_tStrings.STR_GOLD .. g_tStrings.STR_FULL_STOP) })
 					LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'GKP_INFO', 'Info', v.szName, v.nGold, '+'})
 				end
 			end
@@ -476,10 +476,10 @@ function MY_GKP_UI.OnFrameCreate()
 				end
 			end
 			if nGold ~= 0 then
-				LIB.Talk(PLAYER_TALK_CHANNEL.RAID, _L('Received: %d Gold.', nGold))
+				LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, _L('Received: %d Gold.', nGold))
 			end
 			if nGold2 ~= 0 then
-				LIB.Talk(PLAYER_TALK_CHANNEL.RAID, _L('Spending: %d Gold.', nGold2 * -1))
+				LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, _L('Spending: %d Gold.', nGold2 * -1))
 			end
 			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'GKP_INFO', 'End', _L('Received: %d Gold.', nGold)})
 		end,

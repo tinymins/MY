@@ -106,12 +106,12 @@ _C.Talk = function()
 		_dwTalkTick = GetTime()
 		-- 近聊不放在第一个会导致发不出去
 		if MY_TalkEx.tTalkChannels[PLAYER_TALK_CHANNEL.NEARBY] then
-			LIB.Talk(PLAYER_TALK_CHANNEL.NEARBY, MY_TalkEx.szTalk)
+			LIB.SendChat(PLAYER_TALK_CHANNEL.NEARBY, MY_TalkEx.szTalk)
 		end
 		-- 遍历发送队列
 		for nChannel, _ in pairs(MY_TalkEx.tTalkChannels) do
 			if nChannel ~= PLAYER_TALK_CHANNEL.NEARBY then
-				LIB.Talk(nChannel, MY_TalkEx.szTalk)
+				LIB.SendChat(nChannel, MY_TalkEx.szTalk)
 			end
 		end
 	end
@@ -153,13 +153,13 @@ _C.Trick = function()
 	end
 	-- start tricking
 	if #MY_TalkEx.szTrickTextBegin > 0 then
-		LIB.Talk(MY_TalkEx.nTrickChannel, MY_TalkEx.szTrickTextBegin)
+		LIB.SendChat(MY_TalkEx.nTrickChannel, MY_TalkEx.szTrickTextBegin)
 	end
 	for _, szName in ipairs(t) do
-		LIB.Talk(MY_TalkEx.nTrickChannel, (MY_TalkEx.szTrickText:gsub('%$mb', '[' .. szName .. ']')))
+		LIB.SendChat(MY_TalkEx.nTrickChannel, (MY_TalkEx.szTrickText:gsub('%$mb', '[' .. szName .. ']')))
 	end
 	if #MY_TalkEx.szTrickTextEnd > 0 then
-		LIB.Talk(MY_TalkEx.nTrickChannel, MY_TalkEx.szTrickTextEnd)
+		LIB.SendChat(MY_TalkEx.nTrickChannel, MY_TalkEx.szTrickTextEnd)
 	end
 end
 

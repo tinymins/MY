@@ -303,14 +303,14 @@ function LIB.GetTargetContextMenu(dwType, szName, dwID)
 		insert(t, {
 			szOption = _L['copy'],
 			fnAction = function()
-				LIB.Talk(GetClientPlayer().szName, '[' .. szName .. ']')
+				LIB.SendChat(GetClientPlayer().szName, '[' .. szName .. ']')
 			end,
 		})
 		-- √‹¡ƒ
 		-- insert(t, {
 		--     szOption = _L['whisper'],
 		--     fnAction = function()
-		--         LIB.SwitchChat(szName)
+		--         LIB.SwitchChatChannel(szName)
 		--     end,
 		-- })
 		-- √‹¡ƒ ∫√”— —˚«Î»Î∞Ô ∏˙ÀÊ

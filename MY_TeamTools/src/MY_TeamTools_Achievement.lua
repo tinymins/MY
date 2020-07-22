@@ -817,7 +817,7 @@ function D.OnItemLButtonClick()
 	elseif name == 'Handle_StatColumn' then
 		if IsCtrlKeyDown() then
 			if this.achieveid then
-				LIB.InsertTalkInput('achievement', this.achieveid)
+				LIB.InsertChatInput('achievement', this.achieveid)
 			end
 		elseif this.col.id then
 			local page = this:GetParent():GetParent():GetParent():GetParent():GetParent()
@@ -834,7 +834,7 @@ function D.OnItemLButtonClick()
 		end
 		if IsCtrlKeyDown() then
 			if this.achieveid then
-				LIB.InsertTalkInput('achievement', this.achieveid)
+				LIB.InsertChatInput('achievement', this.achieveid)
 			end
 		else
 			local AchievementPanel = _G.AchievementPanel or GetInsideEnv().AchievementPanel

@@ -521,9 +521,9 @@ function D.RemoveLover()
 						LIB.DelayCall(50, function()
 							LIB.Confirm(_L['You do not really want to cut off love it, really sure?'], function()
 								-- 双向则密聊提醒
-								LIB.Talk(lover.szName, _L['Sorry, I decided to just a swordman, bye my plugin lover'])
+								LIB.SendChat(lover.szName, _L['Sorry, I decided to just a swordman, bye my plugin lover'])
 								D.SaveLover(0, 0, 0, 0, 0)
-								LIB.Talk(PLAYER_TALK_CHANNEL.TONG, _L('A blade and cut, no longer meet with [%s].', lover.szName))
+								LIB.SendChat(PLAYER_TALK_CHANNEL.TONG, _L('A blade and cut, no longer meet with [%s].', lover.szName))
 								LIB.Sysmsg(_L['Congratulations, do not repeat the same mistakes ah.'])
 							end)
 						end)
@@ -715,7 +715,7 @@ local function OnBgTalk(_, aData, nChannel, dwTalkerID, szTalkerName, bSelf)
 						end
 						Wnd.CloseWindow('MY_Love_SetLover')
 						D.SaveLover(tonumber(data[1]), dwTalkerID, 1, data[3], data[2])
-						LIB.Talk(PLAYER_TALK_CHANNEL.TONG, _L('From now on, my heart lover is [%s]', szTalkerName))
+						LIB.SendChat(PLAYER_TALK_CHANNEL.TONG, _L('From now on, my heart lover is [%s]', szTalkerName))
 						LIB.Systopmsg(_L('Congratulations, love relation with [%s] has been fixed!', szTalkerName))
 					end)
 				end
@@ -748,7 +748,7 @@ local function OnBgTalk(_, aData, nChannel, dwTalkerID, szTalkerName, bSelf)
 			D.UseDoubleLoveItem(aInfo, aUIID, function(bSuccess)
 				if bSuccess then
 					D.SaveLover(GetCurrentTime(), dwTalkerID, 1, nItem, 0)
-					LIB.Talk(PLAYER_TALK_CHANNEL.TONG, _L('From now on, my heart lover is [%s]', szTalkerName))
+					LIB.SendChat(PLAYER_TALK_CHANNEL.TONG, _L('From now on, my heart lover is [%s]', szTalkerName))
 					LIB.SendBgMsg(aInfo.name, 'MY_LOVE', {'LOVE_ANS_CONF', nItem})
 					LIB.Systopmsg(_L('Congratulations, success to attach love with [%s]!', aInfo.name))
 					Wnd.CloseWindow('MY_Love_SetLover')
@@ -760,7 +760,7 @@ local function OnBgTalk(_, aData, nChannel, dwTalkerID, szTalkerName, bSelf)
 			local aInfo = LIB.GetFriend(dwTalkerID)
 			if aInfo then
 				D.SaveLover(GetCurrentTime(), dwTalkerID, 1, 0, data)
-				LIB.Talk(PLAYER_TALK_CHANNEL.TONG, _L('From now on, my heart lover is [%s]', szTalkerName))
+				LIB.SendChat(PLAYER_TALK_CHANNEL.TONG, _L('From now on, my heart lover is [%s]', szTalkerName))
 				LIB.Systopmsg(_L('Congratulations, success to attach love with [%s]!', aInfo.name))
 			end
 		elseif szKey == 'LOVE_FIREWORK' then
@@ -791,7 +791,7 @@ end
 
 -- 情缘名字链接通知
 function D.OutputLoverMsg(szMsg)
-	LIB.Talk(PLAYER_TALK_CHANNEL.LOCAL_SYS, szMsg)
+	LIB.SendChat(PLAYER_TALK_CHANNEL.LOCAL_SYS, szMsg)
 end
 
 -- 上线，下线通知：bOnLine, szName, bFoe

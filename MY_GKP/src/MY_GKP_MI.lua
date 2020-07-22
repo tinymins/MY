@@ -430,13 +430,13 @@ function D.MoneyUpdate(nGold, nSilver, nCopper)
 	})
 	if D.TradingTarget.szName and MY_GKP.bMoneyTalk then
 		if nGold > 0 then
-			LIB.Talk(PLAYER_TALK_CHANNEL.RAID, {
+			LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, {
 				D.GetFormatLink(_L['Received']),
 				D.GetFormatLink(D.TradingTarget.szName, true),
 				D.GetFormatLink(_L['The'] .. nGold ..g_tStrings.STR_GOLD .. g_tStrings.STR_FULL_STOP),
 			})
 		else
-			LIB.Talk(PLAYER_TALK_CHANNEL.RAID, {
+			LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, {
 				D.GetFormatLink(_L['Pay to']),
 				D.GetFormatLink(D.TradingTarget.szName, true),
 				D.GetFormatLink(' ' .. nGold * -1 ..g_tStrings.STR_GOLD .. g_tStrings.STR_FULL_STOP),

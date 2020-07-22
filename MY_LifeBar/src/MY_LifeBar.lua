@@ -782,24 +782,11 @@ end)
 -----------------------------------------------------------------------------------------
 -- ¶Ô»°ÅÝÅÝ
 -----------------------------------------------------------------------------------------
-local BALLOON_CHANNEL = {
-	['MSG_NORMAL'           ] = true, -- PLAYER_TALK_CHANNEL.NEARBY, PLAYER_TALK_CHANNEL.NPC_NEARBY
-	['MSG_TEAM'             ] = true, -- PLAYER_TALK_CHANNEL.RAID
-	['MSG_PARTY'            ] = true, -- PLAYER_TALK_CHANNEL.TEAM
-	['MSG_GUILD'            ] = true, -- PLAYER_TALK_CHANNEL.TONG
-	['MSG_MAP'              ] = true, -- PLAYER_TALK_CHANNEL.SENCE
-	['MSG_BATTLE_FILED'     ] = true, -- PLAYER_TALK_CHANNEL.BATTLE_FIELD
-	['MSG_NPC_PARTY'        ] = true, -- PLAYER_TALK_CHANNEL.NPC_PARTY
-	['MSG_NPC_YELL'         ] = true, -- PLAYER_TALK_CHANNEL.NPC_SENCE
-	['MSG_NPC_WHISPER'      ] = true, -- PLAYER_TALK_CHANNEL.NPC_SAY_TO, PLAYER_TALK_CHANNEL.NPC_YELL_TO
-	['MSG_BATTLE_FIELD_SIDE'] = true, -- PLAYER_TALK_CHANNEL.BATTLE_FIELD_SIDE
-}
-
 local function OnCharacterSay(dwID, nChannel, szText)
 	if dwID == 0 then
 		return
 	end
-	local szMsgType = LIB.TalkChannel2MsgType(nChannel)
+	local szMsgType = CONSTANT.PLAYER_TALK_CHANNEL_TO_MSG_TYPE[nChannel]
 	local bc = szMsgType and Config.BalloonChannel[szMsgType]
 	if not bc or not bc.bEnable then
 		return

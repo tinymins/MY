@@ -130,12 +130,12 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 						end
 					else
 						Echo(nIndex, nCount * 2 + 1)
-						LIB.Talk(nChannel, _L['------------------------------------'])
+						LIB.SendChat(nChannel, _L['------------------------------------'])
 						for _, r in ipairs(aGongZhan) do
-							LIB.Talk(nChannel, _L('Detected [%s] has GongZhan buff for %s.', r.szName, LIB.FormatTimeCounter(r.nTime, nil, 2)))
+							LIB.SendChat(nChannel, _L('Detected [%s] has GongZhan buff for %s.', r.szName, LIB.FormatTimeCounter(r.nTime, nil, 2)))
 						end
-						LIB.Talk(nChannel, _L('Nearby GongZhan Total Count: %d.', #aGongZhan))
-						LIB.Talk(nChannel, _L['------------------------------------'])
+						LIB.SendChat(nChannel, _L('Nearby GongZhan Total Count: %d.', #aGongZhan))
+						LIB.SendChat(nChannel, _L['------------------------------------'])
 						LIB.SetTarget(dwTarType, dwTarID)
 						return 0
 					end

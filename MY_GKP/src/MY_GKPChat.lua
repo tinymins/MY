@@ -82,7 +82,7 @@ function Chat.OnMsgArrive(szMsg)
 			return GetFormatText(format(' %02d:%02d:%02d ', t.hour, t.minute, t.second), 10, 255, 255, 255)
 		end
 		szMsg = AppendText() .. szMsg
-		if MY and LIB.Chat and LIB.RenderChatLink then
+		if MY and LIB.SendChat and LIB.RenderChatLink then
 			szMsg =  LIB.RenderChatLink(szMsg)
 		end
 		if MY_Farbnamen and MY_Farbnamen.Render then
@@ -129,7 +129,7 @@ function Chat.OpenFrame(item, menu, data)
 			text = _L['Stop Bidding'],
 			buttonstyle = 2,
 			onclick = function()
-				LIB.Talk(PLAYER_TALK_CHANNEL.RAID, _L['--- Stop Bidding ---'])
+				LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, _L['--- Stop Bidding ---'])
 				LIB.DelayCall(1000, function() UnRegisterMsgMonitor(Chat.OnMsgArrive) end)
 			end,
 		})

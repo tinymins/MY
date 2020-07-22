@@ -86,18 +86,18 @@ local function onNewChatLine(h, i, szMsg, szChannel, dwTime, nR, nG, nB)
 			if MY_ChatCopy.bChatCopyAlwaysWhite then
 				_r, _g, _b = 255, 255, 255
 			end
-			szTime = LIB.GetCopyLinkText(_L[' * '], { r = _r, g = _g, b = _b, richtext = szMsg })
+			szTime = LIB.GetChatCopyXML(_L[' * '], { r = _r, g = _g, b = _b, richtext = szMsg })
 		elseif MY_ChatCopy.bChatCopyAlwaysWhite then
 			nR, nG, nB = 255, 255, 255
 		end
 		if MY_ChatCopy.bChatTime then
 			if MY_ChatCopy.eChatTime == 'HOUR_MIN_SEC' then
-				szTime = szTime .. LIB.GetTimeLinkText(dwTime, {
+				szTime = szTime .. LIB.GetChatTimeXML(dwTime, {
 					r = nR, g = nG, b = nB, f = 10,
 					s = '[%hh:%mm:%ss]', richtext = szMsg,
 				})
 			else
-				szTime = szTime .. LIB.GetTimeLinkText(dwTime, {
+				szTime = szTime .. LIB.GetChatTimeXML(dwTime, {
 					r = nR, g = nG, b = nB, f = 10,
 					s = '[%hh:%mm]', richtext = szMsg,
 				})

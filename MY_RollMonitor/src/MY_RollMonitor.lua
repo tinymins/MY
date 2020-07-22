@@ -182,7 +182,7 @@ function MY_RollMonitor.Clear(bEcho, nChannel)
 	end
 	if bEcho then
 		nChannel = nChannel or MY_RollMonitor.nPublishChannel
-		LIB.Talk(nChannel, _L['----------- roll restart -----------'] .. '\n')
+		LIB.SendChat(nChannel, _L['----------- roll restart -----------'] .. '\n')
 	end
 	m_tRecords = {}
 	MY_RollMonitor.DrawBoard()
@@ -266,16 +266,16 @@ function MY_RollMonitor.Echo(nSortType, nLimit, nChannel, bShowUnroll)
 	nLimit    = nLimit    or MY_RollMonitor.nPublish
 	nChannel  = nChannel  or MY_RollMonitor.nPublishChannel
 
-	LIB.Talk(nChannel, ('[%s][%s][%s]%s\n'):format(
+	LIB.SendChat(nChannel, ('[%s][%s][%s]%s\n'):format(
 		PACKET_INFO.SHORT_NAME, _L['roll monitor'],
 		TIME_LIMIT_TITLE[MY_RollMonitor.nTimeLimit],
 		SORT_TYPE_INFO[nSortType].szName
 	), { parsers = { name = false } })
-	LIB.Talk(nChannel, _L['-------------------------------'] .. '\n')
+	LIB.SendChat(nChannel, _L['-------------------------------'] .. '\n')
 	local tNames = {}
 	for i, aRecord in ipairs(MY_RollMonitor.GetResult(nSortType)) do
 		if nLimit <= 0 or i <= nLimit then
-			LIB.Talk(nChannel, _L('[%s] rolls for %d times, valid score is %s.', aRecord.szName, aRecord.nCount, gsub(aRecord.nRoll, '(%d+%.%d%d)%d+','%1')) .. '\n')
+			LIB.SendChat(nChannel, _L('[%s] rolls for %d times, valid score is %s.', aRecord.szName, aRecord.nCount, gsub(aRecord.nRoll, '(%d+%.%d%d)%d+','%1')) .. '\n')
 		end
 		tNames[aRecord.szName] = true
 	end
@@ -289,10 +289,10 @@ function MY_RollMonitor.Echo(nSortType, nLimit, nChannel, bShowUnroll)
 			end
 		end
 		if szUnrolledNames~='' then
-			LIB.Talk(nChannel, szUnrolledNames .. _L['haven\'t roll yet.']..'\n')
+			LIB.SendChat(nChannel, szUnrolledNames .. _L['haven\'t roll yet.']..'\n')
 		end
 	end
-	LIB.Talk(nChannel, _L['-------------------------------'] .. '\n')
+	LIB.SendChat(nChannel, _L['-------------------------------'] .. '\n')
 end
 
 -- 重新绘制结果显示区域
@@ -307,7 +307,7 @@ function MY_RollMonitor.DrawBoard(ui)
 		local tNames = {}
 		for _, aRecord in ipairs(MY_RollMonitor.GetResult()) do
 			szHTML = szHTML ..
-				LIB.GetCopyLinkText() ..
+				LIB.GetChatCopyXML() ..
 				GetFormatText('['..aRecord.szName..']', nil, nil, nil, nil, 515, nil, 'namelink_0') ..
 				GetFormatText(_L( ' rolls for %d times, valid score is %s.', aRecord.nCount, (gsub(aRecord.nRoll,'(%d+%.%d%d)%d+','%1')) ) .. '\n')
 			for _, nTime in ipairs(aRecord.aTime) do
@@ -327,7 +327,7 @@ function MY_RollMonitor.DrawBoard(ui)
 			end
 			if szUnrolledNames ~= '' then
 				szHTML = szHTML ..
-				LIB.GetCopyLinkText() ..
+				LIB.GetChatCopyXML() ..
 				szUnrolledNames .. GetFormatText(_L['haven\'t roll yet.'])
 			end
 		end

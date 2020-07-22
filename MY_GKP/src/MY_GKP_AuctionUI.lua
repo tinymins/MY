@@ -248,7 +248,7 @@ function D.Open(ds, tab, szMode)
 				if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 					LIB.Systopmsg(_L['Please unlock talk lock, otherwise gkp will not able to sync to teammate.'])
 				else
-					LIB.Talk(PLAYER_TALK_CHANNEL.RAID, {
+					LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, {
 						D.GetFormatLink(tab),
 						D.GetFormatLink(' '.. nMoney .. g_tStrings.STR_GOLD),
 						D.GetFormatLink(_L[' Distribute to ']),
@@ -265,7 +265,7 @@ function D.Open(ds, tab, szMode)
 				if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 					LIB.Systopmsg(_L['Please unlock talk lock, otherwise gkp will not able to sync to teammate.'])
 				else
-					LIB.Talk(PLAYER_TALK_CHANNEL.RAID, {
+					LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, {
 						D.GetFormatLink(tab.szPlayer, true),
 						D.GetFormatLink(' '.. tab.szName),
 						D.GetFormatLink(' '.. nMoney ..g_tStrings.STR_GOLD),
@@ -279,7 +279,7 @@ function D.Open(ds, tab, szMode)
 				if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 					LIB.Systopmsg(_L['Please unlock talk lock, otherwise gkp will not able to sync to teammate.'])
 				else
-					LIB.Talk(PLAYER_TALK_CHANNEL.RAID, {
+					LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, {
 						D.GetFormatLink(tab.szName),
 						D.GetFormatLink(' '.. nMoney ..g_tStrings.STR_GOLD),
 						D.GetFormatLink(_L['Manually make record to']),

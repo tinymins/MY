@@ -47,15 +47,17 @@ local _L = LIB.LoadLangPack()
 local RENDERED_FLAG_KEY = NSFormatString('b{$NS}ChatRendered')
 local ITEM_LBUTTONDOWN_KEY = NSFormatString('__{$NS}_OnItemLButtonDown')
 
-function LIB.GetChatInputEdit()
-	return Station.Lookup('Lowest2/EditBox/Edit_Input')
-		or Station.Lookup('Normal1/EditBox/Edit_Input')
+-- 获取聊天输入框
+-- (WndEdit?) LIB.GetChatInput()
+function LIB.GetChatInput()
+	local frame = Station.SearchFrame('EditBox')
+	return frame and frame:Lookup('Edit_Input')
 end
 
 -- 海鳗里面抠出来的
 -- 聊天复制并发布
 function LIB.RepeatChatLine(hTime)
-	local edit = LIB.GetChatInputEdit()
+	local edit = LIB.GetChatInput()
 	if not edit then
 		return
 	end
@@ -65,7 +67,7 @@ function LIB.RepeatChatLine(hTime)
 		return
 	end
 	local nChannel, szName = EditBox_GetChannel()
-	if LIB.CanTalk(nChannel) then
+	if LIB.CanUseChatChannel(nChannel) then
 		GetClientPlayer().Talk(nChannel, szName or '', tMsg)
 		edit:ClearText()
 	end
@@ -114,7 +116,8 @@ local function GetCopyLinkScript(opt)
 end
 
 -- 获取复制聊天行字符串
-function LIB.GetCopyLinkText(szText, opt)
+-- (string) LIB.GetChatCopyXML(szText: string, opt?: table)
+function LIB.GetChatCopyXML(szText, opt)
 	if not IsString(szText) then
 		szText = _L[' * ']
 	end
@@ -125,7 +128,8 @@ function LIB.GetCopyLinkText(szText, opt)
 end
 
 -- 获取复制聊天行时间串
-function LIB.GetTimeLinkText(dwTime, opt)
+-- (string) LIB.GetChatTimeXML(szText: string, opt?: table)
+function LIB.GetChatTimeXML(dwTime, opt)
 	if not IsTable(opt) then
 		opt = { f = 10 }
 	end
@@ -133,17 +137,28 @@ function LIB.GetTimeLinkText(dwTime, opt)
 	return GetFormatText(szText, opt.f, opt.r, opt.g, opt.b, 82691, GetCopyLinkScript(opt), 'timelink')
 end
 
-function LIB.ClearTalkInput()
-	local edit = LIB.GetChatInputEdit()
+-- 将焦点设置到聊天栏
+-- (void) LIB.FocusChatInput()
+function LIB.FocusChatInput()
+	local edit = LIB.GetChatInput()
+	if edit then
+		Station.SetFocusWindow(edit)
+	end
+end
+
+-- 清空聊天栏
+-- (void) LIB.ClearChatInput()
+function LIB.ClearChatInput()
+	local edit = LIB.GetChatInput()
 	if not edit then
 		return
 	end
 	edit:ClearText()
 end
 
--- LIB.InsertTalkInput(szType, ...data)
-function LIB.InsertTalkInput(szType, ...)
-	local edit = LIB.GetChatInputEdit()
+-- LIB.InsertChatInput(szType, ...data)
+function LIB.InsertChatInput(szType, ...)
+	local edit = LIB.GetChatInput()
 	if not edit then
 		return
 	end
@@ -170,7 +185,7 @@ end
 
 -- 复制聊天行
 function LIB.CopyChatLine(hTime, bTextEditor, bRichText)
-	local edit = LIB.GetChatInputEdit()
+	local edit = LIB.GetChatInput()
 	if bTextEditor then
 		edit = UI.OpenTextEditor():Find('.WndEdit')[1]
 	end
@@ -310,8 +325,8 @@ function ChatLinkEvents.OnNameLClick(element, link)
 			end
 		end
 	else
-		LIB.SwitchChat(UI(link):Text())
-		local edit = LIB.GetChatInputEdit()
+		LIB.SwitchChatChannel(UI(link):Text())
+		local edit = LIB.GetChatInput()
 		if edit then
 			Station.SetFocusWindow(edit)
 		end
@@ -469,7 +484,7 @@ end
 
 -- 复制Item到输入框
 function LIB.CopyChatItem(p)
-	local edit = LIB.GetChatInputEdit()
+	local edit = LIB.GetChatInput()
 	if not edit then
 		return
 	end
@@ -507,16 +522,16 @@ function LIB.CopyChatItem(p)
 end
 
 -- 从界面聊天元素解析原始聊天消息数据
--- (aSay: table) LIB.ParseChatContent(oData: Element, tOption: table)
--- (aSay: table) LIB.ParseChatContent(oData: XMLString, tOption: table)
--- (aSay: table) LIB.ParseChatContent(oData: XMLNode, tOption: table)
+-- (aSay: table) LIB.ParseChatData(oData: Element, tOption: table)
+-- (aSay: table) LIB.ParseChatData(oData: XMLString, tOption: table)
+-- (aSay: table) LIB.ParseChatData(oData: XMLNode, tOption: table)
 do
-local function ParseChatContent(oData, tOption, aContent, bIgnoreRange)
+local function ParseChatData(oData, tOption, aContent, bIgnoreRange)
 	if IsString(oData) then
 		local aXMLNode = LIB.XMLDecode(oData)
 		if aXMLNode then
 			for _, node in ipairs(aXMLNode) do
-				ParseChatContent(node, tOption, aContent, true)
+				ParseChatData(node, tOption, aContent, true)
 			end
 		end
 	elseif LIB.XMLIsNode(oData) then
@@ -531,7 +546,7 @@ local function ParseChatContent(oData, tOption, aContent, bIgnoreRange)
 			local nStartIndex = not bIgnoreRange and tOption.nStartIndex or 0
 			local nEndIndex = not bIgnoreRange and tOption.nEndIndex or (#children - 1)
 			for nIndex = nStartIndex, nEndIndex do
-				ParseChatContent(children[nIndex + 1], tOption, aContent, true)
+				ParseChatData(children[nIndex + 1], tOption, aContent, true)
 			end
 		elseif nodeType == 'text' then -- 文字内容
 			if nodeName == 'itemlink' then -- 物品链接
@@ -669,7 +684,7 @@ local function ParseChatContent(oData, tOption, aContent, bIgnoreRange)
 			local nStartIndex = not bIgnoreRange and tOption.nStartIndex or 0
 			local nEndIndex = not bIgnoreRange and tOption.nEndIndex or (h:GetItemCount() - 1)
 			for nIndex = nStartIndex, nEndIndex do
-				ParseChatContent(elem:Lookup(nIndex), tOption, aContent, true)
+				ParseChatData(elem:Lookup(nIndex), tOption, aContent, true)
 			end
 		elseif elemType == 'Text' then -- 文字内容
 			local elemText = elem:GetText()
@@ -787,14 +802,14 @@ local function ParseChatContent(oData, tOption, aContent, bIgnoreRange)
 	end
 	return aContent
 end
-function LIB.ParseChatContent(oData, tOption)
-	return ParseChatContent(oData, tOption, {}, false)
+function LIB.ParseChatData(oData, tOption)
+	return ParseChatData(oData, tOption, {}, false)
 end
 end
 
 -- 从原始聊天消息数据构建界面元素富文本字符串
--- (aSay: table) LIB.StringifyChatContent(aSay: table, r?: number, g?: number, b?: number, font?: number)
-function LIB.StringifyChatContent(t, r, g, b, f)
+-- (aSay: table) LIB.XmlifyChatData(aSay: table, r?: number, g?: number, b?: number, font?: number)
+function LIB.XmlifyChatData(t, r, g, b, f)
 	local aXML = {}
 	for _, v in ipairs(t) do
 		if v.type == 'text' then
@@ -807,8 +822,8 @@ function LIB.StringifyChatContent(t, r, g, b, f)
 end
 
 -- 从原始聊天消息数据构建纯阅读字符串
--- (string) LIB.StringifyChatContentText(aSay: table)
-function LIB.StringifyChatContentText(t)
+-- (string) LIB.StringifyChatText(aSay: table)
+function LIB.StringifyChatText(t)
 	local t1 = {}
 	for _, v in ipairs(t) do
 		insert(t1, v.text)
@@ -817,9 +832,9 @@ function LIB.StringifyChatContentText(t)
 end
 
 -- 判断某个频道能否发言
--- (bool) LIB.CanTalk(number nChannel)
-function LIB.CanTalk(nChannel)
-	for _, v in ipairs({'WHISPER', 'TEAM', 'RAID', 'BATTLE_FIELD', 'NEARBY', 'TONG', 'TONG_ALLIANCE' }) do
+-- (bool) LIB.CanUseChatChannel(number nChannel)
+function LIB.CanUseChatChannel(nChannel)
+	for _, v in ipairs({'WHISPER', 'TEAM', 'RAID', 'BATTLE_FIELD', 'NEARBY', 'TONG', 'TONG_ALLIANCE'}) do
 		if nChannel == PLAYER_TALK_CHANNEL[v] then
 			return true
 		end
@@ -827,8 +842,11 @@ function LIB.CanTalk(nChannel)
 	return false
 end
 
+-- 切换聊天频道
+-- (void) LIB.SwitchChatChannel(number nChannel)
+-- (void) LIB.SwitchChatChannel(string szHeader)
+-- (void) LIB.SwitchChatChannel(string szName)
 do
--- get channel header
 local TALK_CHANNEL_HEADER = {
 	[PLAYER_TALK_CHANNEL.NEARBY] = '/s ',
 	[PLAYER_TALK_CHANNEL.FRIENDS] = '/o ',
@@ -842,16 +860,12 @@ local TALK_CHANNEL_HEADER = {
 	[PLAYER_TALK_CHANNEL.CAMP] = '/c ',
 	[PLAYER_TALK_CHANNEL.WORLD] = '/h ',
 }
--- 切换聊天频道
--- (void) LIB.SwitchChat(number nChannel)
--- (void) LIB.SwitchChat(string szHeader)
--- (void) LIB.SwitchChat(string szName)
-function LIB.SwitchChat(nChannel)
+function LIB.SwitchChatChannel(nChannel)
 	local szHeader = TALK_CHANNEL_HEADER[nChannel]
 	if szHeader then
 		SwitchChatChannel(szHeader)
 	elseif nChannel == PLAYER_TALK_CHANNEL.WHISPER then
-		local edit = LIB.GetChatInputEdit()
+		local edit = LIB.GetChatInput()
 		if edit then
 			edit:GetRoot():Show()
 			edit:SetText('/w ')
@@ -860,7 +874,7 @@ function LIB.SwitchChat(nChannel)
 	elseif type(nChannel) == 'string' then
 		if sub(nChannel, 1, 1) == '/' then
 			if nChannel == '/cafk' or nChannel == '/catr' then
-				local edit = LIB.GetChatInputEdit()
+				local edit = LIB.GetChatInput()
 				if edit then
 					edit:ClearText()
 					for _, v in ipairs({{ type = 'text', text = nChannel }}) do
@@ -875,14 +889,6 @@ function LIB.SwitchChat(nChannel)
 		end
 	end
 end
-end
-
--- 将焦点设置到聊天栏
-function LIB.FocusChatInput()
-	local edit = LIB.GetChatInputEdit()
-	if edit then
-		Station.SetFocusWindow(edit)
-	end
 end
 
 do
@@ -908,7 +914,6 @@ local function InitEmotion()
 		EMOTION_CACHE = t
 	end
 end
-
 -- 获取聊天表情列表
 -- typedef emo table
 -- (emo[]) LIB.GetChatEmotion()                             -- 返回所有表情列表
@@ -927,7 +932,6 @@ function LIB.GetChatEmotion(arg0, arg1, arg2)
 	end
 	return Clone(t)
 end
-
 -- parse faceicon in talking message
 local function ParseFaceIcon(t)
 	InitEmotion()
@@ -1113,7 +1117,7 @@ end
 -- 格式化聊天内容
 -- szText        -- 聊天内容，（亦可为兼容 KPlayer.Talk 的 table）
 -- parserOptions -- 解析规则，参见 @parserOptions 定义
-local function StandardizeTalkData(szText, parserOptions)
+local function StandardizeChatData(szText, parserOptions)
 	-- 聊天内容格式标准化
 	local tSay = nil
 	if IsTable(szText) then
@@ -1172,8 +1176,8 @@ end
 -- bNoEscape      -- *可选* 不解析聊天内容中的表情图片和名字，默认为 false
 function LIB.SetChatInput(szText, parsers)
 	local parserOptions = StandardizeParserOptions(parsers)
-	local tSay = StandardizeTalkData(szText, parserOptions)
-	local edit = LIB.GetChatInputEdit()
+	local tSay = StandardizeChatData(szText, parserOptions)
+	local edit = LIB.GetChatInput()
 	if edit then
 		edit:ClearText()
 		for _, v in ipairs(tSay) do
@@ -1183,7 +1187,7 @@ function LIB.SetChatInput(szText, parsers)
 end
 
 -- 发布聊天内容
--- (void) LIB.Talk(mixed uTarget, string szText[, boolean bNoEscape, [boolean bSaveDeny] ])
+-- (void) LIB.SendChat(mixed uTarget, string szText[, boolean bNoEscape, [boolean bSaveDeny] ])
 -- uTarget   -- 聊天目标：
 --              1、(number) PLAYER_TALK_CHANNLE.* 战场/团队聊天频道可智能切换
 --              2、(string) 密聊的目标角色名
@@ -1194,14 +1198,14 @@ end
 --              tOptions.parsers.name    (boolean)        解析聊天内容中的名字，默认解析
 --              tOptions.parsers.emotion (boolean)        解析聊天内容中的表情图片和名字，默认解析
 --              tOptions.save            (boolean)        在聊天输入栏保留不可发言的频道内容，默认为 false
-function LIB.Talk(nChannel, szText, tOptions)
+function LIB.SendChat(nChannel, szText, tOptions)
 	if not tOptions then
 		tOptions = {}
 	end
 	-- 检查是否转向设置输入框
-	if tOptions.save and not LIB.CanTalk(nChannel) then
+	if tOptions.save and not LIB.CanUseChatChannel(nChannel) then
 		LIB.SetChatInput(szText, tOptions.parsers)
-		LIB.SwitchChat(nChannel)
+		LIB.SwitchChatChannel(nChannel)
 		LIB.FocusChatInput()
 		return
 	end
@@ -1220,9 +1224,9 @@ function LIB.Talk(nChannel, szText, tOptions)
 		parserOptions.sws = false
 		parserOptions.len = false
 	end
-	local tSay = StandardizeTalkData(szText, parserOptions)
+	local tSay = StandardizeChatData(szText, parserOptions)
 	if bSystem then
-		local szXml = LIB.StringifyChatContent(tSay, GetMsgFontColor('MSG_SYS'))
+		local szXml = LIB.XmlifyChatData(tSay, GetMsgFontColor('MSG_SYS'))
 		return LIB.Sysmsg({ szXml, rich = true })
 	end
 	-- 检查标签并发送
@@ -1247,7 +1251,7 @@ function LIB.EditBoxInsertItemInfo(dwTabType, dwIndex, nBookInfo, nVersion)
 	if not nVersion then
 		nVersion = GLOBAL.CURRENT_ITEM_VERSION
 	end
-	local edit = LIB.GetChatInputEdit()
+	local edit = LIB.GetChatInput()
 	if itemInfo.nGenre == ITEM_GENRE.BOOK then
 		if not nBookInfo then
 			return false
@@ -1284,7 +1288,7 @@ local metaAlignment = { __index = function() return 'L' end }
 local function MergeHW(s)
 	return s:gsub(W_SPACE, 'W'):gsub(' (W*) ', W_SPACE .. '%1'):gsub('W', W_SPACE)
 end
-function LIB.TabTalk(nChannel, aTable, aAlignment)
+function LIB.SendTabChat(nChannel, aTable, aAlignment)
 	local aLenHW, aMaxLenHW = {}, {}
 	for i, aText in ipairs(aTable) do
 		aLenHW[i] = {}
@@ -1295,7 +1299,7 @@ function LIB.TabTalk(nChannel, aTable, aAlignment)
 	end
 	local aAlignment = setmetatable(aAlignment or {}, metaAlignment)
 	for i, aText in ipairs(aTable) do
-		local aTalk, szFixL, szFixR = {}
+		local aSay, szFixL, szFixR = {}
 		local nFixLenFW, nFixLenHW
 		for j, szText in ipairs(aText) do
 			nFixLenFW = floor(max(0, aMaxLenHW[j] - aLenHW[i][j]) / 2)
@@ -1306,15 +1310,15 @@ function LIB.TabTalk(nChannel, aTable, aAlignment)
 			szFixL = W_SPACE:rep(ceil(nFixLenFW / 2)) .. SPACE:rep(ceil(nFixLenHW / 2))
 			szFixR = W_SPACE:rep(floor(nFixLenFW / 2)) .. SPACE:rep(floor(nFixLenHW / 2))
 			if aAlignment[j] == 'M' then
-				aTalk[j] = szFixL .. szText .. szFixR
+				aSay[j] = szFixL .. szText .. szFixR
 			elseif aAlignment[j] == 'R' then
-				aTalk[j] = MergeHW(szFixL .. szFixR) .. szText
+				aSay[j] = MergeHW(szFixL .. szFixR) .. szText
 			else
-				aTalk[j] = szText .. MergeHW(szFixL .. szFixR)
+				aSay[j] = szText .. MergeHW(szFixL .. szFixR)
 			end
 		end
-		-- LIB.Sysmsg(concat(aTalk, '|'))
-		LIB.Talk(nChannel, (concat(aTalk, ' ')))
+		-- LIB.Sysmsg(concat(aSay, '|'))
+		LIB.SendChat(nChannel, (concat(aSay, ' ')))
 	end
 end
 end
@@ -1399,7 +1403,7 @@ local DAILY_LIMIT_TABLE_KEY = {
 	[PLAYER_TALK_CHANNEL.NEARBY ] = 'NearbyChannelDailyLimit',
 	[PLAYER_TALK_CHANNEL.WHISPER] = 'WhisperDailyLimit',
 }
-function LIB.GetChannelDailyLimit(nLevel, nChannel)
+function LIB.GetChatChannelDailyLimit(nLevel, nChannel)
 	local LevelUpData = GetRegisterChannelLimitTable()
 	if not LevelUpData then
 		return false
@@ -1416,78 +1420,9 @@ function LIB.GetChannelDailyLimit(nLevel, nChannel)
 end
 end
 
-local PLAYER_TALK_CHANNEL_MSG_TYPE = {
-	[PLAYER_TALK_CHANNEL.WHISPER          ] = 'MSG_WHISPER'          ,
-	[PLAYER_TALK_CHANNEL.NEARBY           ] = 'MSG_NORMAL'           ,
-	[PLAYER_TALK_CHANNEL.TEAM             ] = 'MSG_PARTY'            ,
-	[PLAYER_TALK_CHANNEL.TONG             ] = 'MSG_GUILD'            ,
-	[PLAYER_TALK_CHANNEL.TONG_ALLIANCE    ] = 'MSG_GUILD_ALLIANCE'   ,
-	[PLAYER_TALK_CHANNEL.TONG_SYS         ] = 'MSG_GUILD'            ,
-	[PLAYER_TALK_CHANNEL.WORLD            ] = 'MSG_WORLD'            ,
-	[PLAYER_TALK_CHANNEL.FORCE            ] = 'MSG_SCHOOL'           ,
-	[PLAYER_TALK_CHANNEL.CAMP             ] = 'MSG_CAMP'             ,
-	[PLAYER_TALK_CHANNEL.FRIENDS          ] = 'MSG_FRIEND'           ,
-	[PLAYER_TALK_CHANNEL.RAID             ] = 'MSG_TEAM'             ,
-	[PLAYER_TALK_CHANNEL.SENCE            ] = 'MSG_MAP'              ,
-	[PLAYER_TALK_CHANNEL.BATTLE_FIELD     ] = 'MSG_BATTLE_FILED'     ,
-	[PLAYER_TALK_CHANNEL.LOCAL_SYS        ] = 'MSG_SYS'              ,
-	[PLAYER_TALK_CHANNEL.GM_MESSAGE       ] = 'MSG_SYS'              ,
-	[PLAYER_TALK_CHANNEL.NPC_WHISPER      ] = 'MSG_NPC_WHISPER'      ,
-	[PLAYER_TALK_CHANNEL.NPC_SAY_TO       ] = 'MSG_NPC_WHISPER'      ,
-	[PLAYER_TALK_CHANNEL.NPC_NEARBY       ] = 'MSG_NPC_NEARBY'       ,
-	[PLAYER_TALK_CHANNEL.NPC_PARTY        ] = 'MSG_NPC_PARTY'        ,
-	[PLAYER_TALK_CHANNEL.NPC_SENCE        ] = 'MSG_NPC_YELL'         ,
-	[PLAYER_TALK_CHANNEL.FACE             ] = 'MSG_FACE'             ,
-	[PLAYER_TALK_CHANNEL.NPC_FACE         ] = 'MSG_NPC_FACE'         ,
-	[PLAYER_TALK_CHANNEL.NPC_SAY_TO_CAMP  ] = 'MSG_CAMP'             ,
-	[PLAYER_TALK_CHANNEL.IDENTITY         ] = 'MSG_IDENTITY'         ,
-	[PLAYER_TALK_CHANNEL.BULLET_SCREEN    ] = 'MSG_JJC_BULLET_SCREEN',
-	[PLAYER_TALK_CHANNEL.BATTLE_FIELD_SIDE] = 'MSG_BATTLE_FIELD_SIDE',
-}
-function LIB.TalkChannel2MsgType(nChannel)
-	return PLAYER_TALK_CHANNEL_MSG_TYPE[nChannel]
-end
-
-do
-local MSG_GROUP = {
-    {
-        szCaption = g_tStrings.CHANNEL_CHANNEL,
-        tChannels = {
-            'MSG_NORMAL', 'MSG_PARTY', 'MSG_MAP', 'MSG_BATTLE_FILED', 'MSG_GUILD', 'MSG_GUILD_ALLIANCE', 'MSG_SCHOOL', 'MSG_WORLD',
-            'MSG_TEAM', 'MSG_CAMP', 'MSG_GROUP', 'MSG_WHISPER', 'MSG_SEEK_MENTOR', 'MSG_FRIEND', 'MSG_IDENTITY', 'MSG_SYS',
-        },
-    }, {
-        szCaption = g_tStrings.FIGHT_CHANNEL,
-        tChannels = {
-            [g_tStrings.STR_NAME_OWN] = {
-                'MSG_SKILL_SELF_HARMFUL_SKILL', 'MSG_SKILL_SELF_BENEFICIAL_SKILL', 'MSG_SKILL_SELF_BUFF',
-                'MSG_SKILL_SELF_BE_HARMFUL_SKILL', 'MSG_SKILL_SELF_BE_BENEFICIAL_SKILL', 'MSG_SKILL_SELF_DEBUFF',
-                'MSG_SKILL_SELF_SKILL', 'MSG_SKILL_SELF_MISS', 'MSG_SKILL_SELF_FAILED', 'MSG_SELF_DEATH',
-            },
-            [g_tStrings.TEAMMATE] = {
-                'MSG_SKILL_PARTY_HARMFUL_SKILL', 'MSG_SKILL_PARTY_BENEFICIAL_SKILL', 'MSG_SKILL_PARTY_BUFF',
-                'MSG_SKILL_PARTY_BE_HARMFUL_SKILL', 'MSG_SKILL_PARTY_BE_BENEFICIAL_SKILL', 'MSG_SKILL_PARTY_DEBUFF',
-                'MSG_SKILL_PARTY_SKILL', 'MSG_SKILL_PARTY_MISS', 'MSG_PARTY_DEATH',
-            },
-            [g_tStrings.OTHER_PLAYER] = {'MSG_SKILL_OTHERS_SKILL', 'MSG_SKILL_OTHERS_MISS', 'MSG_OTHERS_DEATH'},
-            ['NPC'] = {'MSG_SKILL_NPC_SKILL', 'MSG_SKILL_NPC_MISS', 'MSG_NPC_DEATH'},
-            [g_tStrings.OTHER] = {'MSG_OTHER_ENCHANT', 'MSG_OTHER_SCENE'},
-        },
-    }, {
-        szCaption = g_tStrings.CHANNEL_COMMON,
-        tChannels = {
-            [g_tStrings.ENVIROMENT] = {'MSG_NPC_NEARBY', 'MSG_NPC_YELL', 'MSG_NPC_PARTY', 'MSG_NPC_WHISPER'},
-            [g_tStrings.EARN] = {
-                'MSG_MONEY', 'MSG_EXP', 'MSG_ITEM', 'MSG_REPUTATION', 'MSG_CONTRIBUTE',
-                'MSG_ATTRACTION', 'MSG_PRESTIGE', 'MSG_TRAIN', 'MSG_DESGNATION',
-                'MSG_ACHIEVEMENT', 'MSG_MENTOR_VALUE', 'MSG_THEW_STAMINA', 'MSG_TONG_FUND'
-            },
-        },
-    }
-}
 function LIB.GetMsgTypeMenu(fnAction, tChecked)
 	local t = {}
-	for _, cg in ipairs(MSG_GROUP) do
+	for _, cg in ipairs(CONSTANT.MSG_TYPE_MENU) do
 		local t1 = { szOption = cg.szCaption }
 		if cg.tChannels[1] then
 			for _, szChannel in ipairs(cg.tChannels) do
@@ -1522,8 +1457,10 @@ function LIB.GetMsgTypeMenu(fnAction, tChecked)
 	end
 	return t
 end
-end
 
+-----------------------------------------------------------------------------------------
+-- 聊天栏 HOOK
+-----------------------------------------------------------------------------------------
 do
 -- HOOK聊天栏
 local CHAT_HOOK = {

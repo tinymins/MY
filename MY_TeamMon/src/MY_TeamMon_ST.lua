@@ -217,7 +217,7 @@ local function SetSTAction(ui, nLeft, nPer)
 		if ui.bTalk and me.IsInParty() then
 			if not ui.szTalk or ui.szTalk ~= floor(nLeft) then
 				ui.szTalk = floor(nLeft)
-				LIB.Talk(PLAYER_TALK_CHANNEL.RAID, _L('[%s] remaining %ds.', obj:GetName(), floor(nLeft)))
+				LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, _L('[%s] remaining %ds.', obj:GetName(), floor(nLeft)))
 			end
 		end
 	else

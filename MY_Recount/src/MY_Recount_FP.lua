@@ -884,7 +884,7 @@ function D.PopupRowMenu(frame, rec)
 				else
 					szText = szText .. '-'
 				end
-				LIB.Talk(nChannel, szText)
+				LIB.SendChat(nChannel, szText)
 			end,
 		})
 	end

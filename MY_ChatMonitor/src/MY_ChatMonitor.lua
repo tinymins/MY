@@ -174,7 +174,7 @@ function D.GetHTML(rec)
     if MY_Farbnamen and MY_Farbnamen.Render then
         html = MY_Farbnamen.Render(html)
     end
-    html = LIB.GetTimeLinkText(rec.time, {
+    html = LIB.GetChatTimeXML(rec.time, {
         r = rec.r, g = rec.g, b = rec.b,
         f = rec.font, s = O.szTimestrap,
     }) .. html
@@ -201,7 +201,7 @@ function D.OnMsgArrive(szChannel, szMsg, nFont, bRich, r, g, b, dwTalkerID, szNa
     if bRich then
         rec.html = szMsg
         -- 格式化消息
-        local tMsgContent = LIB.ParseChatContent(szMsg)
+        local tMsgContent = LIB.ParseChatData(szMsg)
         -- 拼接消息
         if szChannel == 'MSG_SYS' then -- 系统消息
             for i, v in ipairs(tMsgContent) do

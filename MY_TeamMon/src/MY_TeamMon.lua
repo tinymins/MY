@@ -559,7 +559,7 @@ function D.Talk(szType, szMsg, szTarget)
 			szMsg = wgsub(szMsg, _L['['] .. g_tStrings.STR_YOU .. _L[']'], ' [' .. szTarget .. '] ')
 		end
 		if me.IsInParty() then
-			LIB.Talk(PLAYER_TALK_CHANNEL.RAID, szMsg, { uuid = szKey .. GetStringCRC(szType .. szMsg) })
+			LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, szMsg, { uuid = szKey .. GetStringCRC(szType .. szMsg) })
 		end
 	elseif szType == 'WHISPER' then
 		if szTarget then
@@ -569,7 +569,7 @@ function D.Talk(szType, szMsg, szTarget)
 		if szTarget == me.szName then
 			LIB.OutputWhisper(szMsg, _L['MY_TeamMon'])
 		else
-			LIB.Talk(szTarget, szMsg, { uuid = szKey .. GetStringCRC(szType .. szMsg) })
+			LIB.SendChat(szTarget, szMsg, { uuid = szKey .. GetStringCRC(szType .. szMsg) })
 		end
 	elseif szType == 'RAID_WHISPER' then
 		if me.IsInParty() then
@@ -580,7 +580,7 @@ function D.Talk(szType, szMsg, szTarget)
 				if szName == me.szName then
 					LIB.OutputWhisper(szText, _L['MY_TeamMon'])
 				else
-					LIB.Talk(szName, szText, { uuid = szKey .. GetStringCRC(szType .. szText .. szName) })
+					LIB.SendChat(szName, szText, { uuid = szKey .. GetStringCRC(szType .. szText .. szName) })
 				end
 			end
 		end

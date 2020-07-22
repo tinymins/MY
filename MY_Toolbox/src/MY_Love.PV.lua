@@ -225,7 +225,7 @@ function D.HookPlayerViewPanel()
 				if D.GetOtherLover(mp.dwPlayer) then
 					local tar = D.GetPlayerInfo(mp.dwPlayer)
 					if tar then
-						LIB.Talk(tar.szName, MY_Love.szJabber)
+						LIB.SendChat(tar.szName, MY_Love.szJabber)
 					end
 				else
 					D.PvRequestOtherLover(this:GetRoot())

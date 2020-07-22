@@ -576,7 +576,7 @@ function D.GetPublishMenu()
 		end
 		local DataDisplay = MY_Recount.GetDisplayData()
 		local eTimeChannel = MY_Recount_UI.bSysTimeMode and STAT_TYPE_KEY[MY_Recount_UI.nChannel]
-		LIB.Talk(
+		LIB.SendChat(
 			nChannel,
 			'[' .. PACKET_INFO.SHORT_NAME .. ']'
 			.. _L['Fight recount'] .. ' - '
@@ -585,7 +585,7 @@ function D.GetPublishMenu()
 			.. '(' .. LIB.FormatTimeCounter(MY_Recount_DS.GeneFightTime(DataDisplay, eTimeChannel), '%M:%ss') .. ')',
 			{ parsers = { name = false } }
 		)
-		LIB.Talk(nChannel, '------------------------')
+		LIB.SendChat(nChannel, '------------------------')
 		local hList      = frame:Lookup('Wnd_Main', 'Handle_List')
 		local szUnit     = (' ' .. hList.szUnit) or ''
 		local nTimeCount = hList.nTimeCount or 0
@@ -621,10 +621,10 @@ function D.GetPublishMenu()
 				)
 			end
 
-			LIB.Talk(nChannel, szText)
+			LIB.SendChat(nChannel, szText)
 		end
 
-		LIB.Talk(nChannel, '------------------------')
+		LIB.SendChat(nChannel, '------------------------')
 	end
 	for nChannel, szChannel in pairs({
 		[PLAYER_TALK_CHANNEL.RAID] = 'MSG_TEAM',

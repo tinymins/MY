@@ -345,7 +345,7 @@ end
 
 function D.OnAppendEdit()
 	local handle = this:GetParent()
-	local edit = LIB.GetChatInputEdit()
+	local edit = LIB.GetChatInput()
 	edit:ClearText()
 	for i = this:GetIndex(), handle:GetItemCount() do
 		local h = handle:Lookup(i)

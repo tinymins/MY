@@ -99,7 +99,7 @@ function D.AddToList(tar, dwCaster, dwTime, szEvent)
 		if not me.IsInParty() then
 			nChannel = PLAYER_TALK_CHANNEL.NEARBY
 		end
-		LIB.Talk(nChannel, O.szSay)
+		LIB.SendChat(nChannel, O.szSay)
 	end
 end
 

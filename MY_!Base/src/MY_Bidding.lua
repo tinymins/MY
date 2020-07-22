@@ -49,7 +49,7 @@ local D = {}
 local O = {}
 local BIDDING_CACHE = {}
 
-function D.CheckTalkLock()
+function D.CheckChatLock()
 	if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 		LIB.Systopmsg(_L['Please unlock safety talk lock first!'])
 		return false
@@ -67,7 +67,7 @@ function D.Open(tConfig)
 	if not LIB.IsDistributer() then
 		return LIB.Systopmsg(_L['You are not distributer!'])
 	end
-	if not D.CheckTalkLock() then
+	if not D.CheckChatLock() then
 		return
 	end
 	if not tConfig.szItem and not tConfig.dwTabType then
@@ -345,13 +345,13 @@ function D.PublishConfig(tConfig, bInit)
 	insert(aSay, {
 		type = 'text',
 		text = _L(', min price is %s, bidding step is %s.',
-			D.GetMoneyTalkText(tConfig.nPriceMin),
-			D.GetMoneyTalkText(tConfig.nPriceStep)),
+			D.GetMoneyChatText(tConfig.nPriceMin),
+			D.GetMoneyChatText(tConfig.nPriceStep)),
 		})
-	LIB.Talk(PLAYER_TALK_CHANNEL.RAID, aSay, { parsers = { name = false } })
+	LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, aSay, { parsers = { name = false } })
 end
 
-function D.GetMoneyTalkText(nGold)
+function D.GetMoneyChatText(nGold)
 	if nGold >= 10000 then
 		local nBrick = floor(nGold / 10000)
 		local nGold = nGold % 10000
@@ -547,7 +547,7 @@ function MY_BiddingBase.OnLButtonClick()
 		if not LIB.IsDistributer() then
 			return LIB.Systopmsg(_L['You are not distributer!'])
 		end
-		if not D.CheckTalkLock() then
+		if not D.CheckChatLock() then
 			return
 		end
 		local tConfig = frame.tUnsavedConfig
@@ -564,7 +564,7 @@ function MY_BiddingBase.OnLButtonClick()
 	elseif name == 'WndButton_ConfigCancel' then
 		D.SwitchConfig(frame, false)
 	elseif name == 'WndButton_BiddingP' then
-		if not D.CheckTalkLock() then
+		if not D.CheckChatLock() then
 			return
 		end
 		local szKey = D.GetKey(frame)
@@ -595,7 +595,7 @@ function MY_BiddingBase.OnLButtonClick()
 		insert(aSay, 1, { type = 'text', text = _L['Exit from bidding '] })
 		insert(aSay, { type = 'text', text = _L[', P.'] })
 		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_BIDDING_P', { szKey = szKey })
-		LIB.Talk(PLAYER_TALK_CHANNEL.RAID, aSay, { parsers = { name = false } })
+		LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, aSay, { parsers = { name = false } })
 	elseif name == 'WndButton_Bidding' then
 		local szKey = D.GetKey(frame)
 		local nPrice, nPriceSelf, bP = D.GetQuickBiddingPrice(szKey)
@@ -603,17 +603,17 @@ function MY_BiddingBase.OnLButtonClick()
 			return LIB.Systopmsg(_L['You have already p.'])
 		end
 		if IsShiftKeyDown() then
-			if not D.CheckTalkLock() then
+			if not D.CheckChatLock() then
 				return
 			end
 			if nPriceSelf then
-				return LIB.Systopmsg(_L('You already have a vaild price at %s.', D.GetMoneyTalkText(nPriceSelf)))
+				return LIB.Systopmsg(_L('You already have a vaild price at %s.', D.GetMoneyChatText(nPriceSelf)))
 			end
 			local aSay = D.ConfigToEditStruct(BIDDING_CACHE[szKey].tConfig)
 			insert(aSay, 1, { type = 'text', text = _L['Want to buy '] })
-			insert(aSay, { type = 'text', text = _L(', bidding for %s.', D.GetMoneyTalkText(nPrice)) })
+			insert(aSay, { type = 'text', text = _L(', bidding for %s.', D.GetMoneyChatText(nPrice)) })
 			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_BIDDING_ACTION', { szKey = szKey, nPrice = nPrice })
-			LIB.Talk(PLAYER_TALK_CHANNEL.RAID, aSay, { parsers = { name = false } })
+			LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, aSay, { parsers = { name = false } })
 		else
 			this:GetParent():GetParent()
 				:Lookup('Wnd_CustomBidding/WndEditBox_CustomBidding/WndEdit_CustomBidding')
@@ -654,19 +654,19 @@ function MY_BiddingBase.OnLButtonClick()
 			LIB.Systopmsg(_L('Nearest price is %d and %d', nPriceNear, nPriceNear + tConfig.nPriceMin))
 			return
 		end
-		if not D.CheckTalkLock() then
+		if not D.CheckChatLock() then
 			return
 		end
 		local aSay = D.ConfigToEditStruct(BIDDING_CACHE[szKey].tConfig)
 		insert(aSay, 1, { type = 'text', text = _L['Want to buy '] })
-		insert(aSay, { type = 'text', text = _L(', bidding for %s.', D.GetMoneyTalkText(nPrice)) })
+		insert(aSay, { type = 'text', text = _L(', bidding for %s.', D.GetMoneyChatText(nPrice)) })
 		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_BIDDING_ACTION', { szKey = szKey, nPrice = nPrice })
-		LIB.Talk(PLAYER_TALK_CHANNEL.RAID, aSay, { parsers = { name = false } })
+		LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, aSay, { parsers = { name = false } })
 		D.SwitchCustomBidding(frame, false)
 	elseif name == 'WndButton_CustomBiddingCancel' then
 		D.SwitchCustomBidding(frame, false)
 	elseif name == 'WndButton_Publish' then
-		if not D.CheckTalkLock() then
+		if not D.CheckChatLock() then
 			return
 		end
 		local szKey = D.GetKey(frame)
@@ -688,9 +688,9 @@ function MY_BiddingBase.OnLButtonClick()
 			end
 		end
 		insert(aSay, { type = 'text', text = _L['.'] })
-		LIB.Talk(PLAYER_TALK_CHANNEL.RAID, aSay, { parsers = { name = false } })
+		LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, aSay, { parsers = { name = false } })
 	elseif name == 'WndButton_Finish' then
-		if not D.CheckTalkLock() then
+		if not D.CheckChatLock() then
 			return
 		end
 		local szKey = D.GetKey(frame)
@@ -713,7 +713,7 @@ function MY_BiddingBase.OnLButtonClick()
 		end
 		insert(aSay, { type = 'text', text = _L[', bidding finished.'] })
 		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_BIDDING_FINISH', { szKey = szKey })
-		LIB.Talk(PLAYER_TALK_CHANNEL.RAID, aSay, { parsers = { name = false } })
+		LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, aSay, { parsers = { name = false } })
 	end
 end
 
@@ -749,7 +749,7 @@ function MY_BiddingBase.OnItemLButtonClick()
 		if not LIB.IsDistributer() then
 			return LIB.Systopmsg(_L['You are not distributer!'])
 		end
-		if not D.CheckTalkLock() then
+		if not D.CheckChatLock() then
 			return
 		end
 		local frame = this:GetRoot()
@@ -767,7 +767,7 @@ function MY_BiddingBase.OnItemLButtonClick()
 				return LIB.Systopmsg(_L['You are not distributer!'])
 			end
 			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_BIDDING_DELETE', { szKey = szKey, dwTalkerID = rec.dwTalkerID })
-			LIB.Talk(PLAYER_TALK_CHANNEL.RAID, aSay, { parsers = { name = false } })
+			LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, aSay, { parsers = { name = false } })
 		end)
 	end
 end

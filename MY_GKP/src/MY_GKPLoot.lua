@@ -425,7 +425,7 @@ function D.OnLButtonClick()
 					for k, v in ipairs(aItemData) do
 						insert(t, MY_GKP.GetFormatLink(v.item))
 					end
-					LIB.Talk(PLAYER_TALK_CHANNEL.RAID, t)
+					LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, t)
 				end,
 			},
 			{ bDevide = true },
@@ -1258,7 +1258,7 @@ function D.GetItemBiddingMenu(dwDoodadID, data)
 					MY_RollMonitor.Clear({echo=false})
 				end
 			end
-			LIB.Talk(PLAYER_TALK_CHANNEL.RAID, { MY_GKP.GetFormatLink(data.item), MY_GKP.GetFormatLink(_L['Roll the dice if you wang']) })
+			LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, { MY_GKP.GetFormatLink(data.item), MY_GKP.GetFormatLink(_L['Roll the dice if you wang']) })
 			return 0
 		end
 	})
@@ -1284,7 +1284,7 @@ function D.GetItemBiddingMenu(dwDoodadID, data)
 						dwDoodadID = dwDoodadID,
 						data = data,
 					})
-					LIB.Talk(PLAYER_TALK_CHANNEL.RAID, {
+					LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, {
 						MY_GKP.GetFormatLink(data.item),
 						MY_GKP.GetFormatLink(_L(' %d Gold Start Bidding, off a price if you want.', v[1])),
 					})

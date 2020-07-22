@@ -67,7 +67,7 @@ LIB.RegisterBgMsg('MY_VERSION_CHECK', function(_, oData, nChannel, dwTalkerID, s
 	end
 	local bSilent = oData[1]
 	if not bSilent and LIB.IsInParty() then
-		LIB.Talk(PLAYER_TALK_CHANNEL.RAID, _L('I\'ve installed MY plugins v%s', LIB.GetVersion()))
+		LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, _L('I\'ve installed MY plugins v%s', LIB.GetVersion()))
 	end
 	LIB.SendBgMsg(szTalkerName, 'MY_VERSION_REPLY', LIB.GetVersion(), true)
 end)

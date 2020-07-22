@@ -87,7 +87,7 @@ local function UpdateChannelDailyLimit(hRadio, bPlus)
 		O.tChannelCount[nChannel] = (O.tChannelCount[nChannel] or 0) + (bPlus and 1 or 0)
 
 		local nDailyCount = O.tChannelCount[nChannel]
-		local nDailyLimit = LIB.GetChannelDailyLimit(me.nLevel, nChannel)
+		local nDailyLimit = LIB.GetChatChannelDailyLimit(me.nLevel, nChannel)
 		if nDailyLimit then
 			if nDailyLimit > 0 then
 				dwPercent = (nDailyLimit - nDailyCount) / nDailyLimit
@@ -136,8 +136,8 @@ local function OnClsCheck()
 end
 
 local function OnAwayCheck()
-	LIB.SwitchChat('/afk')
-	local edit = LIB.GetChatInputEdit()
+	LIB.SwitchChatChannel('/afk')
+	local edit = LIB.GetChatInput()
 	if edit then
 		edit:GetRoot():Show()
 		if edit:GetText() == '' then
@@ -149,14 +149,14 @@ local function OnAwayCheck()
 end
 
 local function OnAwayUncheck()
-	LIB.SwitchChat('/cafk')
+	LIB.SwitchChatChannel('/cafk')
 end
 
 local function OnAwayTip() return O.szAway or g_tStrings.STR_AUTO_REPLAY_LEAVE end
 
 local function OnBusyCheck()
-	LIB.SwitchChat('/atr')
-	local edit = LIB.GetChatInputEdit()
+	LIB.SwitchChatChannel('/atr')
+	local edit = LIB.GetChatInput()
 	if edit then
 		edit:GetRoot():Show()
 		if edit:GetText() == '' then
@@ -168,7 +168,7 @@ local function OnBusyCheck()
 end
 
 local function OnBusyUncheck()
-	LIB.SwitchChat('/catr')
+	LIB.SwitchChatChannel('/catr')
 end
 
 local function OnBusyTip() return O.szBusy end
@@ -189,7 +189,7 @@ local function OnWhisperCheck()
 			szOption = whisper[1],
 			rgb = info and info.rgb or {202, 126, 255},
 			fnAction = function()
-				LIB.SwitchChat(whisper[1])
+				LIB.SwitchChatChannel(whisper[1])
 				LIB.DelayCall(LIB.FocusChatInput)
 			end,
 			szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',
@@ -215,9 +215,9 @@ local function OnWhisperCheck()
 						insert(t, v)
 					elseif IsTable(v) and IsString(v[1]) then
 						if today == LIB.FormatTime(v[2], '%yyyy%MM%dd') then
-							insert(t, LIB.GetTimeLinkText(v[2], {r = r, g = g, b = b, s = '[%hh:%mm:%ss]'}) .. v[1])
+							insert(t, LIB.GetChatTimeXML(v[2], {r = r, g = g, b = b, s = '[%hh:%mm:%ss]'}) .. v[1])
 						else
-							insert(t, LIB.GetTimeLinkText(v[2], {r = r, g = g, b = b, s = '[%M.%dd.%hh:%mm:%ss]'}) .. v[1])
+							insert(t, LIB.GetChatTimeXML(v[2], {r = r, g = g, b = b, s = '[%M.%dd.%hh:%mm:%ss]'}) .. v[1])
 						end
 					end
 				end
@@ -238,13 +238,13 @@ local function OnWhisperCheck()
 			szOption = g_tStrings.CHANNEL_WHISPER_SIGN,
 			rgb = {202, 126, 255},
 			fnAction = function()
-				LIB.SwitchChat(PLAYER_TALK_CHANNEL.WHISPER)
+				LIB.SwitchChatChannel(PLAYER_TALK_CHANNEL.WHISPER)
 				LIB.DelayCall(LIB.FocusChatInput)
 			end,
 		})
 		PopupMenu(t)
 	else
-		LIB.SwitchChat(PLAYER_TALK_CHANNEL.WHISPER)
+		LIB.SwitchChatChannel(PLAYER_TALK_CHANNEL.WHISPER)
 	end
 	this:Check(false)
 end
@@ -280,8 +280,8 @@ end
 local m_tChannelTime = {}
 
 local function OnChannelCheck()
-	LIB.SwitchChat(this.info.channel)
-	local edit = LIB.GetChatInputEdit()
+	LIB.SwitchChatChannel(this.info.channel)
+	local edit = LIB.GetChatInput()
 	if edit then
 		edit:GetRoot():Show()
 		Station.SetFocusWindow(edit)
@@ -296,10 +296,10 @@ function D.ApplyBattlefieldChannelSwitch()
 			local bIsBattleField = (GetClientPlayer().GetScene().nType == MAP_TYPE.BATTLE_FIELD)
 			local nChannel, szName = EditBox_GetChannel()
 			if bIsBattleField and (nChannel == PLAYER_TALK_CHANNEL.RAID or nChannel == PLAYER_TALK_CHANNEL.TEAM) then
-				O.JJCAutoSwitchTalkChannel_OrgChannel = nChannel
-				LIB.SwitchChat(PLAYER_TALK_CHANNEL.BATTLE_FIELD)
+				O.JJCAutoSwitchChatChannel_OrgChannel = nChannel
+				LIB.SwitchChatChannel(PLAYER_TALK_CHANNEL.BATTLE_FIELD)
 			elseif not bIsBattleField and nChannel == PLAYER_TALK_CHANNEL.BATTLE_FIELD then
-				LIB.SwitchChat(O.JJCAutoSwitchTalkChannel_OrgChannel or PLAYER_TALK_CHANNEL.RAID)
+				LIB.SwitchChatChannel(O.JJCAutoSwitchChatChannel_OrgChannel or PLAYER_TALK_CHANNEL.RAID)
 			end
 		end)
 	else
@@ -472,7 +472,7 @@ end
 
 local function OnChatSetAFK()
 	if type(arg0) == 'table' then
-		O.szAway = LIB.StringifyChatContentText(arg0)
+		O.szAway = LIB.StringifyChatText(arg0)
 	else
 		O.szAway = arg0 and tostring(arg0)
 	end
@@ -481,7 +481,7 @@ LIB.RegisterEvent('ON_CHAT_SET_AFK', OnChatSetAFK)
 
 local function OnChatSetATR()
 	if type(arg0) == 'table' then
-		O.szBusy = LIB.StringifyChatContentText(arg0):sub(4)
+		O.szBusy = LIB.StringifyChatText(arg0):sub(4)
 	else
 		O.szBusy = arg0 and tostring(arg0)
 	end

@@ -191,12 +191,12 @@ function TI.CreateFrame(a, b)
 					end
 					if yy ~= '' then
 						for i = 0, 2 do -- ·¢Èý´Î
-							LIB.Talk(PLAYER_TALK_CHANNEL.RAID, yy)
+							LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, yy)
 						end
 					end
 					local message = ui:Children('#Message'):Text():gsub('\n', ' ')
 					if message ~= '' then
-						LIB.Talk(PLAYER_TALK_CHANNEL.RAID, message)
+						LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, message)
 					end
 				else
 					SetDataToClip(yy)

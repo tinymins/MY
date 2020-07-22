@@ -388,7 +388,7 @@ function MY_CataclysmParty_Base.OnItemLButtonClick()
 	end
 	if IsAltKeyDown() then
 		if this.bBuff and CFG.bBuffAltPublish then
-			LIB.Talk(
+			LIB.SendChat(
 				PLAYER_TALK_CHANNEL.RAID,
 				_L(
 					'[%s] got buff [%s]x%d, remaining %ds.',

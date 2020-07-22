@@ -214,7 +214,7 @@ end
 -- 初始化/生效 设置
 function D.Apply()
 	local shaBack = Station.Lookup('Lowest2/ChatPanel1/Wnd_Message', 'Shadow_Back')
-	local editInput = LIB.GetChatInputEdit()
+	local editInput = LIB.GetChatInput()
 	if not shaBack or not editInput then
 		return
 	end
@@ -228,7 +228,7 @@ function D.Apply()
 		LIB.HookChatPanel('AFTER.MY_AutoHideChat', function(h)
 			-- if input box get focus then return
 			local focus = Station.GetFocusWindow()
-			if focus and focus == LIB.GetChatInputEdit() then
+			if focus and focus == LIB.GetChatInput() then
 				return
 			end
 			-- show when new msg
