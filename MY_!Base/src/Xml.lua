@@ -127,15 +127,6 @@ local function XMLGetNodeChildren(node)
 end
 
 local function XMLDecode(xml)
-	local function str2var(str)
-		if str == 'true' then
-			return true
-		elseif str == 'false' then
-			return false
-		elseif tonumber(str) then
-			return tonumber(str)
-		end
-	end
 	local insert, remove, concat, unpack = table.insert, table.remove, table.concat, table.unpack or unpack
 	local find, sub, gsub, char, byte = string.find, string.sub, string.gsub, string.char, string.byte
 	local function bytes2string(bytes)
@@ -161,6 +152,9 @@ local function XMLDecode(xml)
 	local byte_apos, byte_quot, byte_escape, byte_slash = (byte('"')) , (byte('"')), (byte('\\')), (byte('/'))
 	local byte_lt, byte_gt, byte_amp, byte_eq, byte_space = (byte('<')), (byte('>')), (byte('&')), (byte('=')), (byte(' '))
 	local byte_char_n, byte_char_t, byte_lf, byte_tab = (byte('n')), (byte('t')), (byte('\n')), (byte('\t'))
+	local byte_char_r, byte_char_u, byte_char_e, byte_char_f = (byte('r')), (byte('u')), (byte('e')), (byte('f'))
+	local byte_char_l, byte_char_a, byte_char_s = (byte('l')), (byte('a')), (byte('s'))
+	local byte_zero, byte_nine, byte_dot = (byte('0')), (byte('9')), (byte('.'))
 	local pos1, pos2, byte_quote, key, b_escaping, bytes_string
 	-- <        label         attribute_key=attribute_value>        text_key=text_value<        /     label         >
 	-- label_lt label_opening attribute                    label_gt text               label_lt slash label_closing label_gt
@@ -232,7 +226,20 @@ local function XMLDecode(xml)
 				bytes_string = {}
 				pos1 = pos + 1
 			elseif byte_current ~= byte_space then
-				state = 'attribute_value'
+				if byte_current >= byte_zero and byte_current <= byte_nine then
+					state = 'attribute_value_number'
+				elseif byte_current == byte_dot then
+					state = 'attribute_value_dot_number'
+				elseif byte_current == byte_char_t then
+					state = 'attribute_value_pending_t'
+				elseif byte_current == byte_char_f then
+					state = 'attribute_value_pending_f'
+				elseif byte_current == byte_gt then
+					state = 'text'
+				else
+					state = 'attribute'
+					pos = pos - 1
+				end
 				pos1 = pos
 			end
 		elseif state == 'attribute_value_string' then
@@ -252,13 +259,70 @@ local function XMLDecode(xml)
 			else
 				insert(bytes_string, byte_current)
 			end
-		elseif state == 'attribute_value' then
-			if byte_current == byte_space then
-				p.attrs[key] = str2var(xml:sub(pos1, pos))
+		elseif state == 'attribute_value_number' or state == 'attribute_value_dot_number' then
+			if byte_current == byte_dot and state == 'attribute_value_number' then
+				state = 'attribute_value_dot_number'
+			elseif byte_current < byte_zero or byte_current > byte_nine then
+				p.attrs[key] = tonumber(xml:sub(pos1, pos - 1))
+				if byte_current == byte_space then
+					state = 'attribute'
+				elseif byte_current == byte_gt then
+					state = 'text'
+				else
+					state = 'attribute'
+					pos = pos - 1
+				end
+			end
+		elseif state == 'attribute_value_pending_t' then
+			if byte_current == byte_char_r then
+				state = 'attribute_value_pending_tr'
+			else
 				state = 'attribute'
-			elseif byte_current == byte_gt then
-				p.attrs[key] = str2var(xml:sub(pos1, pos - 1))
-				state = 'text'
+				pos = pos - 2
+			end
+		elseif state == 'attribute_value_pending_tr' then
+			if byte_current == byte_char_u then
+				state = 'attribute_value_pending_tru'
+			else
+				state = 'attribute'
+				pos = pos - 3
+			end
+		elseif state == 'attribute_value_pending_tru' then
+			if byte_current == byte_char_e then
+				p.attrs[key] = true
+				state = 'attribute'
+			else
+				state = 'attribute'
+				pos = pos - 4
+			end
+		elseif state == 'attribute_value_pending_f' then
+			if byte_current == byte_char_a then
+				state = 'attribute_value_pending_fa'
+			else
+				state = 'attribute'
+				pos = pos - 2
+			end
+		elseif state == 'attribute_value_pending_fa' then
+			if byte_current == byte_char_l then
+				state = 'attribute_value_pending_fal'
+			else
+				state = 'attribute'
+				pos = pos - 3
+			end
+		elseif state == 'attribute_value_pending_fal' then
+			if byte_current == byte_char_s then
+				state = 'attribute_value_pending_fals'
+			else
+				state = 'attribute'
+				pos = pos - 4
+			end
+		elseif state == 'attribute_value_pending_fals' then
+			if byte_current == byte_char_e then
+				p.attrs[key] = false
+				state = 'attribute'
+			else
+				state = 'attribute'
+				pos = pos - 5
 			end
 		elseif state == 'text_key' then
 			if byte_current == byte_space then
@@ -284,7 +348,20 @@ local function XMLDecode(xml)
 				bytes_string = {}
 				pos1 = pos + 1
 			elseif byte_current ~= byte_space then
-				state = 'text_value'
+				if byte_current >= byte_zero and byte_current <= byte_nine then
+					state = 'text_value_number'
+				elseif byte_current == byte_dot then
+					state = 'text_value_dot_number'
+				elseif byte_current == byte_char_t then
+					state = 'text_value_pending_t'
+				elseif byte_current == byte_char_f then
+					state = 'text_value_pending_f'
+				elseif byte_current == byte_lt then
+					state = 'label_lt'
+				else
+					state = 'text'
+					pos = pos - 1
+				end
 				pos1 = pos
 			end
 		elseif state == 'text_value_string' then
@@ -304,13 +381,70 @@ local function XMLDecode(xml)
 			else
 				insert(bytes_string, byte_current)
 			end
-		elseif state == 'text_value' then
-			if byte_current == byte_space then
-				p.data[key] = str2var(xml:sub(pos1, pos))
+		elseif state == 'text_value_number' or state == 'text_value_dot_number' then
+			if byte_current == byte_dot and state == 'text_value_number' then
+				state = 'text_value_dot_number'
+			elseif byte_current < byte_zero or byte_current > byte_nine then
+				p.data[key] = tonumber(xml:sub(pos1, pos - 1))
+				if byte_current == byte_space then
+					state = 'text'
+				elseif byte_current == byte_gt then
+					state = 'text'
+				else
+					state = 'text'
+					pos = pos - 1
+				end
+			end
+		elseif state == 'text_value_pending_t' then
+			if byte_current == byte_char_r then
+				state = 'text_value_pending_tr'
+			else
 				state = 'text'
-			elseif byte_current == byte_lt then
-				p.data[key] = str2var(xml:sub(pos1, pos - 1))
-				state = 'label_lt'
+				pos = pos - 2
+			end
+		elseif state == 'text_value_pending_tr' then
+			if byte_current == byte_char_u then
+				state = 'text_value_pending_tru'
+			else
+				state = 'text'
+				pos = pos - 3
+			end
+		elseif state == 'text_value_pending_tru' then
+			if byte_current == byte_char_e then
+				p.data[key] = true
+				state = 'text'
+			else
+				state = 'text'
+				pos = pos - 4
+			end
+		elseif state == 'text_value_pending_f' then
+			if byte_current == byte_char_a then
+				state = 'text_value_pending_fa'
+			else
+				state = 'text'
+				pos = pos - 2
+			end
+		elseif state == 'text_value_pending_fa' then
+			if byte_current == byte_char_l then
+				state = 'text_value_pending_fal'
+			else
+				state = 'text'
+				pos = pos - 3
+			end
+		elseif state == 'text_value_pending_fal' then
+			if byte_current == byte_char_s then
+				state = 'text_value_pending_fals'
+			else
+				state = 'text'
+				pos = pos - 4
+			end
+		elseif state == 'text_value_pending_fals' then
+			if byte_current == byte_char_e then
+				p.data[key] = false
+				state = 'text'
+			else
+				state = 'text'
+				pos = pos - 5
 			end
 		end
 		pos = pos + 1
