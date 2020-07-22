@@ -506,105 +506,290 @@ function LIB.CopyChatItem(p)
 	end
 end
 
--- 解析消息
-function LIB.FormatChatContent(szMsg)
-	local aXMLNode = LIB.XMLDecode(szMsg)
-	local t2 = {}
-	if aXMLNode then
-		for _, node in ipairs(aXMLNode) do
-			local nodeType = LIB.XMLGetNodeType(node)
-			local nodeName = LIB.XMLGetNodeData(node, 'name')
-			local nodeText = LIB.XMLGetNodeData(node, 'text')
-			local nodeScript = LIB.XMLGetNodeData(node, 'script')
-			local nodeUserdata = LIB.XMLGetNodeData(node, 'userdata')
-			-- 静态表情
-			if nodeType == 'image' then
+-- 从界面聊天元素解析原始聊天消息
+-- (aSay: table) LIB.FormatChatContent(oData: Element, tOption: table)
+-- (aSay: table) LIB.FormatChatContent(oData: XMLString, tOption: table)
+-- (aSay: table) LIB.FormatChatContent(oData: XMLNode, tOption: table)
+do
+local function FormatChatContent(oData, tOption, aContent, bIgnoreRange)
+	if IsString(oData) then
+		local aXMLNode = LIB.XMLDecode(oData)
+		if aXMLNode then
+			for _, node in ipairs(aXMLNode) do
+				FormatChatContent(node, tOption, aContent, true)
+			end
+		end
+	elseif LIB.XMLIsNode(oData) then
+		local node = oData
+		local nodeType = LIB.XMLGetNodeType(node)
+		local nodeName = LIB.XMLGetNodeData(node, 'name') or ''
+		local nodeText = LIB.XMLGetNodeData(node, 'text')
+		local nodeScript = LIB.XMLGetNodeData(node, 'script')
+		local nodeUserdata = LIB.XMLGetNodeData(node, 'userdata')
+		if nodeType == 'handle' then -- 子元素递归
+			local children = LIB.XMLGetNodeChildren(node)
+			local nStartIndex = not bIgnoreRange and tOption.nStartIndex or 0
+			local nEndIndex = not bIgnoreRange and tOption.nEndIndex or (#children - 1)
+			for nIndex = nStartIndex, nEndIndex do
+				FormatChatContent(children[nIndex + 1], tOption, aContent, true)
+			end
+		elseif nodeType == 'text' then -- 文字内容
+			if nodeName == 'itemlink' then -- 物品链接
+				insert(aContent, {
+					type = 'item',
+					text = nodeText, innerText = nodeText:sub(2, -2), item = nodeUserdata,
+				})
+			elseif nodeName == 'iteminfolink' then -- 物品信息
+				local version, tab, index = match(nodeScript, 'this.nVersion=(%d+)%s*this.dwTabType=(%d+)%s*this.dwIndex=(%d+)')
+				insert(aContent, {
+					type = 'iteminfo',
+					text = nodeText, innerText = nodeText:sub(2, -2),
+					version = version, tabtype = tab, index = index,
+				})
+			elseif nodeName:sub(1, 9) == 'namelink_' then -- 姓名
+				insert(aContent, {
+					type = 'name',
+					text = nodeText, innerText = nodeText,
+					name = nodeText:sub(2, -2), id = nodeName:sub(10),
+				})
+			elseif nodeName == 'questlink' then -- 任务
+				insert(aContent, {
+					type = 'quest',
+					text = nodeText, innerText = nodeText:sub(2, -2), questid = nodeUserdata,
+				})
+			elseif nodeName == 'recipelink' then -- 生活技艺
+				local craft, recipe = match(nodeScript, 'this.dwCraftID=(%d+)%s*this.dwRecipeID=(%d+)')
+				insert(aContent, {
+					type = 'recipe',
+					text = nodeText, innerText = nodeText:sub(2, -2),
+					craftid = craft, recipeid = recipe,
+				})
+			elseif nodeName == 'skilllink' then -- 技能
+				local skillinfo = match(nodeScript, 'this.skillKey=%{(.-)%}')
+				local skillKey = {}
+				for w in gmatch(skillinfo, '(.-)%,') do
+					local k, v  = match(w, '(.-)=(%w+)')
+					skillKey[k] = v
+				end
+				skillKey.type = 'skill'
+				skillKey.text = nodeText
+				skillKey.innerText = nodeText:sub(2, -2)
+				insert(aContent, skillKey)
+			elseif nodeName == 'designationlink' then -- 称号
+				local id, fix = match(nodeScript, 'this.dwID=(%d+)%s*this.bPrefix=(.-)')
+				insert(aContent, {
+					type = 'designation',
+					text = nodeText, innerText = nodeText:sub(2, -2), id = id, prefix = fix,
+				})
+			elseif nodeName == 'skillrecipelink' then -- 技能秘籍
+				local id, level = match(nodeScript, 'this.dwID=(%d+)%s*this.dwLevel=(%d+)')
+				insert(aContent, {
+					type = 'skillrecipe',
+					text = nodeText, innerText = nodeText:sub(2, -2), id = id, level = level,
+				})
+			elseif nodeName == 'booklink' then -- 书籍
+				local version, tab, index, id = match(nodeScript, 'this.nVersion=(%d+)%s*this.dwTabType=(%d+)%s*this.dwIndex=(%d+)%s*this.nBookRecipeID=(%d+)')
+				insert(aContent, {
+					type = 'book',
+					text = nodeText, innerText = nodeText:sub(2, -2),
+					version = version, tabtype = tab, index = index, bookinfo = id,
+				})
+			elseif nodeName == 'achievementlink' then -- 成就
+				local id = match(nodeScript, 'this.dwID=(%d+)')
+				insert(aContent, {
+					type = 'achievement',
+					text = nodeText, innerText = nodeText:sub(2, -2), id = id,
+				})
+			elseif nodeName == 'enchantlink' then -- 强化
+				local pro, craft, recipe = match(nodeScript, 'this.dwProID=(%d+)%s*this.dwCraftID=(%d+)%s*this.dwRecipeID=(%d+)')
+				insert(aContent, {
+					type = 'enchant',
+					text = nodeText, innerText = nodeText:sub(2, -2),
+					proid = pro, craftid = craft, recipeid = recipe,
+				})
+			elseif nodeName == 'eventlink' then -- 事件
+				local eventname, linkinfo = match(nodeScript, 'this.szName="(.-)"%s*this.szLinkInfo="(.-)"$')
+				if not eventname then
+					eventname, linkinfo = match(nodeScript, 'this.szName="(.-)"%s*this.szLinkInfo="(.-)"')
+				end
+				insert(aContent, {
+					type = 'eventlink',
+					text = nodeText, innerText = nodeText:sub(2, -2),
+					name = eventname, linkinfo = linkinfo:gsub('\\(.)', '%1'),
+				})
+			elseif not IsEmpty(nodeText) then -- 未知类型的字符串、普通文本
+				insert(aContent, {
+					type = 'text',
+					text = nodeText, innerText = nodeText,
+				})
+			end
+		elseif nodeType == 'image' or nodeType == 'animate' then -- 表情
+			if sub(nodeName, 1, 8) == 'emotion_' then -- 表情
+				local dwID = tonumber((nodeName:sub(9)))
+				if dwID then
+					local emo = LIB.GetChatEmotion(dwID)
+					if emo then
+						insert(aContent, {
+							type = 'emotion',
+							text = emo.szCmd, innerText = emo.szCmd, id = emo.dwID,
+						})
+					end
+				end
+			else -- 货币单位
 				local path = LIB.XMLGetNodeData(node, 'path')
 				local frame = LIB.XMLGetNodeData(node, 'frame')
-				local emo = LIB.GetChatEmotion(path, frame, 'image')
-				if emo then
-					insert(t2, {type = 'emotion', text = emo.szCmd, innerText = emo.szCmd, id = emo.dwID})
+				if path == 'ui\\image\\common\\money.uitex' and frame == 0 then
+					insert(aContent, {
+						type = 'text',
+						text = _L['Gold'], innerText = _L['Gold'],
+					})
+				elseif path == 'ui\\image\\common\\money.uitex' and frame == 2 then
+					insert(aContent, {
+						type = 'text',
+						text = _L['Silver'], innerText = _L['Silver'],
+					})
+				elseif path == 'ui\\image\\common\\money.uitex' and frame == 1 then
+					insert(aContent, {
+						type = 'text',
+						text = _L['Copper'], innerText = _L['Copper'],
+					})
+				elseif path == 'ui\\image\\common\\money.uitex' and (frame == 31 or frame == 32 or frame == 33 or frame == 34) then
+					insert(aContent, {
+						type = 'text',
+						text = _L['Brics'], innerText = _L['Brics'],
+					})
 				end
-			-- 动态表情
-			elseif nodeType == 'animate' then
-				local path = LIB.XMLGetNodeData(node, 'path')
-				local group = LIB.XMLGetNodeData(node, 'group')
-				local emo = LIB.GetChatEmotion(path, group, 'animate')
-				if emo then
-					insert(t2, {type = 'emotion', text = emo.szCmd, innerText = emo.szCmd, id = emo.dwID})
-				end
-			-- 文字内容
-			elseif nodeType == 'text' then
-				local is_normaltext = false
-				-- 普通文字
-				if not nodeName then
-					is_normaltext = true
-				-- 物品链接
-				elseif nodeName == 'itemlink' then
-					insert(t2, {type = 'item', text = nodeText, innerText = nodeText:sub(2, -2), item = nodeUserdata})
-				-- 物品信息
-				elseif nodeName == 'iteminfolink' then
-					local version, tab, index = match(nodeScript, 'this.nVersion=(%d+)%s*this.dwTabType=(%d+)%s*this.dwIndex=(%d+)')
-					insert(t2, {type = 'iteminfo', text = nodeText, innerText = nodeText:sub(2, -2), version = version, tabtype = tab, index = index})
-				-- 姓名
-				elseif nodeName:sub(1, 9) == 'namelink_' then
-					insert(t2, {type = 'name', text = nodeText, innerText = nodeText, name = nodeText:sub(2, -2), id = nodeName:sub(10)})
-				-- 任务
-				elseif nodeName == 'questlink' then
-					insert(t2, {type = 'quest', text = nodeText, innerText = nodeText:sub(2, -2), questid = nodeUserdata})
-				-- 生活技艺
-				elseif nodeName == 'recipelink' then
-					local craft, recipe = match(nodeScript, 'this.dwCraftID=(%d+)%s*this.dwRecipeID=(%d+)')
-					insert(t2, {type = 'recipe', text = nodeText, innerText = nodeText:sub(2, -2), craftid = craft, recipeid = recipe})
-				-- 技能
-				elseif nodeName == 'skilllink' then
-					local skillinfo = match(nodeScript, 'this.skillKey=%{(.-)%}')
-					local skillKey = {}
-					for w in gmatch(skillinfo, '(.-)%,') do
-						local k, v  = match(w, '(.-)=(%w+)')
-						skillKey[k] = v
+			end
+		end
+	elseif IsElement(oData) then
+		local elem = oData
+		local elemType = elem:GetType()
+		local elemName = elem:GetName()
+		if elemType == 'Handle' then -- 子元素递归
+			local nStartIndex = not bIgnoreRange and tOption.nStartIndex or 0
+			local nEndIndex = not bIgnoreRange and tOption.nEndIndex or (h:GetItemCount() - 1)
+			for nIndex = nStartIndex, nEndIndex do
+				FormatChatContent(elem:Lookup(nIndex), tOption, aContent, true)
+			end
+		elseif elemType == 'Text' then -- 文字内容
+			local elemText = elem:GetText()
+			local elemUserdata = elem:GetUserData()
+			if elemName == 'itemlink' then -- 物品链接
+				insert(aContent, {
+					type = 'item',
+					text = elemText, innerText = elemText:sub(2, -2), item = elemUserdata,
+				})
+			elseif elemName == 'iteminfolink' then -- 物品信息
+				insert(aContent, {
+					type = 'iteminfo',
+					text = elemText, innerText = elemText:sub(2, -2),
+					version = elem.nVersion, tabtype = elem.dwTabType, index = elem.dwIndex,
+				})
+			elseif sub(elemName, 1, 9) == 'namelink_' then -- 姓名
+				insert(aContent, {
+					type = 'name',
+					text = elemText, innerText = elemText,
+					name = match(elemText, '%[(.*)%]'), id = elemName:sub(10),
+				})
+			elseif elemName == 'questlink' then -- 任务
+				insert(aContent, {
+					type = 'quest',
+					text = elemText, innerText = elemText:sub(2, -2), questid = elemUserdata,
+				})
+			elseif elemName == 'recipelink' then -- 生活技艺
+				insert(aContent, {
+					type = 'recipe',
+					text = elemText, innerText = elemText:sub(2, -2),
+					craftid = elem.dwCraftID, recipeid = elem.dwRecipeID,
+				})
+			elseif elemName == 'skilllink' then -- 技能
+				local skillKey = Clone(elem.skillKey)
+				skillKey.type = 'skill'
+				skillKey.text = elemText
+				skillKey.innerText = elemText:sub(2, -2)
+				insert(aContent, skillKey)
+			elseif elemName =='designationlink' then -- 称号
+				insert(aContent, {
+					type = 'designation',
+					text = elemText, innerText = elemText:sub(2, -2), id = elem.dwID, prefix = elem.bPrefix,
+				})
+			elseif elemName =='skillrecipelink' then -- 技能秘籍
+				insert(aContent, {
+					type = 'skillrecipe',
+					text = elemText, innerText = elemText:sub(2, -2), id = elem.dwID, level = elem.dwLevelD,
+				})
+			elseif elemName =='booklink' then -- 书籍
+				insert(aContent, {
+					type = 'book',
+					text = elemText, innerText = elemText:sub(2, -2),
+					version = elem.nVersion, tabtype = elem.dwTabType, index = elem.dwIndex, bookinfo = elem.nBookRecipeID,
+				})
+			elseif elemName =='achievementlink' then -- 成就
+				insert(aContent, {
+					type = 'achievement',
+					text = elemText, innerText = elemText:sub(2, -2), id = elem.dwID,
+				})
+			elseif elemName == 'enchantlink' then -- 强化
+				insert(aContent, {
+					type = 'enchant',
+					text = elemText, innerText = elemText:sub(2, -2),
+					proid = elem.dwProID, craftid = elem.dwCraftID, recipeid = elem.dwRecipeID,
+				})
+			elseif elemName =='eventlink' then -- 事件
+				insert(aContent, {
+					type = 'eventlink',
+					text = elemText, innerText = elemText:sub(2, -2),
+					name = elem.szName, linkinfo = elem.szLinkInfo,
+				})
+			elseif not IsEmpty(elemText) then -- 未知类型的字符串、普通文本
+				insert(aContent, {
+					type = 'text',
+					text = elemText, innerText = elemText,
+				})
+			end
+		elseif elemType == 'Image' or elemType == 'Animate' then
+			if sub(elemName, 1, 8) == 'emotion_' then -- 表情
+				local dwID = tonumber((elemName:sub(9)))
+				if dwID then
+					local emo = LIB.GetChatEmotion(dwID)
+					if emo then
+						insert(aContent, {
+							type = 'emotion',
+							text = emo.szCmd, innerText = emo.szCmd, id = emo.dwID,
+						})
 					end
-					skillKey.text = nodeText
-					skillKey.innerText = nodeText:sub(2, -2)
-					insert(t2, skillKey)
-				-- 称号
-				elseif nodeName == 'designationlink' then
-					local id, fix = match(nodeScript, 'this.dwID=(%d+)%s*this.bPrefix=(.-)')
-					insert(t2, {type = 'designation', text = nodeText, innerText = nodeText:sub(2, -2), id = id, prefix = fix})
-				-- 技能秘籍
-				elseif nodeName == 'skillrecipelink' then
-					local id, level = match(nodeScript, 'this.dwID=(%d+)%s*this.dwLevel=(%d+)')
-					insert(t2, {type = 'skillrecipe', text = nodeText, innerText = nodeText:sub(2, -2), id = id, level = level})
-				-- 书籍
-				elseif nodeName == 'booklink' then
-					local version, tab, index, id = match(nodeScript, 'this.nVersion=(%d+)%s*this.dwTabType=(%d+)%s*this.dwIndex=(%d+)%s*this.nBookRecipeID=(%d+)')
-					insert(t2, {type = 'book', text = nodeText, innerText = nodeText:sub(2, -2), version = version, tabtype = tab, index = index, bookinfo = id})
-				-- 成就
-				elseif nodeName == 'achievementlink' then
-					local id = match(nodeScript, 'this.dwID=(%d+)')
-					insert(t2, {type = 'achievement', text = nodeText, innerText = nodeText:sub(2, -2), id = id})
-				-- 强化
-				elseif nodeName == 'enchantlink' then
-					local pro, craft, recipe = match(nodeScript, 'this.dwProID=(%d+)%s*this.dwCraftID=(%d+)%s*this.dwRecipeID=(%d+)')
-					insert(t2, {type = 'enchant', text = nodeText, innerText = nodeText:sub(2, -2), proid = pro, craftid = craft, recipeid = recipe})
-				-- 事件
-				elseif nodeName == 'eventlink' then
-					local eventname, linkinfo = match(nodeScript, 'this.szName="(.-)"%s*this.szLinkInfo="(.-)"$')
-					if not eventname then
-						eventname, linkinfo = match(nodeScript, 'this.szName="(.-)"%s*this.szLinkInfo="(.-)"')
-					end
-					insert(t2, {type = 'eventlink', text = nodeText, innerText = nodeText:sub(2, -2), name = eventname, linkinfo = linkinfo:gsub('\\(.)', '%1')})
-				-- 未知类型的字符串
-				elseif nodeText then
-					is_normaltext = true
 				end
-				if is_normaltext then
-					insert(t2, {type = 'text', text = nodeText, innerText = nodeText})
+			else -- 货币单位
+				local path, frame = elem:GetImagePath()
+				if path == 'ui\\image\\common\\money.uitex' and frame == 0 then
+					insert(aContent, {
+						type = 'text',
+						text = _L['Gold'], innerText = _L['Gold'],
+					})
+				elseif path == 'ui\\image\\common\\money.uitex' and frame == 2 then
+					insert(aContent, {
+						type = 'text',
+						text = _L['Silver'], innerText = _L['Silver'],
+					})
+				elseif path == 'ui\\image\\common\\money.uitex' and frame == 1 then
+					insert(aContent, {
+						type = 'text',
+						text = _L['Copper'], innerText = _L['Copper'],
+					})
+				elseif path == 'ui\\image\\common\\money.uitex' and (frame == 31 or frame == 32 or frame == 33 or frame == 34) then
+					insert(aContent, {
+						type = 'text',
+						text = _L['Brics'], innerText = _L['Brics'],
+					})
 				end
 			end
 		end
 	end
-	return t2
+	return aContent
+end
+function LIB.FormatChatContent(oData, tOption)
+	return FormatChatContent(oData, tOption, {}, false)
+end
 end
 
 function LIB.StringifyChatContent(t, r, g, b)
