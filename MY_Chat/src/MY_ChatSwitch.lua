@@ -472,7 +472,7 @@ end
 
 local function OnChatSetAFK()
 	if type(arg0) == 'table' then
-		O.szAway = LIB.StringfyChatContent(arg0)
+		O.szAway = LIB.StringifyChatContentText(arg0)
 	else
 		O.szAway = arg0 and tostring(arg0)
 	end
@@ -481,7 +481,7 @@ LIB.RegisterEvent('ON_CHAT_SET_AFK', OnChatSetAFK)
 
 local function OnChatSetATR()
 	if type(arg0) == 'table' then
-		O.szBusy = LIB.StringfyChatContent(arg0):sub(4)
+		O.szBusy = LIB.StringifyChatContentText(arg0):sub(4)
 	else
 		O.szBusy = arg0 and tostring(arg0)
 	end

@@ -806,8 +806,9 @@ function LIB.StringifyChatContent(t, r, g, b, f)
 	return concat(aXML)
 end
 
--- 字符串化一个聊天table结构体
-function LIB.StringfyChatContent(t)
+-- 从原始聊天消息数据构建纯阅读字符串
+-- (string) LIB.StringifyChatContentText(aSay: table)
+function LIB.StringifyChatContentText(t)
 	local t1 = {}
 	for _, v in ipairs(t) do
 		insert(t1, v.text)
