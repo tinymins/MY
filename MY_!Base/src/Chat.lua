@@ -104,7 +104,7 @@ local function GetCopyLinkScript(opt)
 		.. handlerEntry .. '.OnCopyMouseEnter;this.OnItemMouseLeave=' .. handlerEntry .. '.OnCopyMouseLeave;'
 	if opt.lclick ~= false then
 		szScript = szScript .. 'this.bLButton=true;this.OnItemLButtonDown='.. handlerEntry .. '.OnCopyLClick;'
-			.. 'this.szRichText="' .. EncodeLUAData(opt.richtext or '') .. '"'
+			.. 'this.szRichText=' .. EncodeLUAData(opt.richtext or '')
 	end
 	if opt.mclick ~= false then
 		szScript = szScript .. 'this.bMButton=true;this.OnItemMButtonDown='.. handlerEntry .. '.OnCopyMClick;'
