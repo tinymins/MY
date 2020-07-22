@@ -175,12 +175,46 @@ function LIB.InsertChatInput(szType, ...)
 			text = szText,
 			id = achi.dwID,
 		}
+	elseif szType == 'iteminfo' then
+		local dwTabType, dwIndex, nBookInfo, nVersion = ...
+		local itemInfo = GetItemInfo(dwTabType, dwIndex)
+		if itemInfo then
+			if not nVersion then
+				nVersion = GLOBAL.CURRENT_ITEM_VERSION
+			end
+			if itemInfo.nGenre == ITEM_GENRE.BOOK then
+				if nBookInfo then
+					local nBookID, nSegmentID = GlobelRecipeID2BookID(nBookInfo)
+					if nBookID then
+						szText = '[' .. Table_GetSegmentName(nBookID, nSegmentID) .. ']'
+						data = {
+							type = 'book',
+							text = szText,
+							version = nVersion,
+							tabtype = dwTabType,
+							index = dwIndex,
+							bookinfo = nBookInfo,
+						}
+					end
+				end
+			else
+				szText = '[' .. LIB.GetItemNameByItemInfo(itemInfo) .. ']'
+				data = {
+					type = 'iteminfo',
+					text = szText,
+					version = nVersion,
+					tabtype = dwTabType,
+					index = dwIndex,
+				}
+			end
+		end
 	end
 	if not szText or not data then
-		return
+		return false
 	end
 	edit:GetRoot():Show()
 	edit:InsertObj(szText, data)
+	return true
 end
 
 -- ∏¥÷∆¡ƒÃÏ––
@@ -1241,44 +1275,6 @@ function LIB.SendChat(nChannel, szText, tOptions)
 	end
 	me.Talk(nChannel, szTarget, tSay)
 end
-end
-
-function LIB.EditBoxInsertItemInfo(dwTabType, dwIndex, nBookInfo, nVersion)
-	local itemInfo = GetItemInfo(dwTabType, dwIndex)
-	if not itemInfo then
-		return false
-	end
-	if not nVersion then
-		nVersion = GLOBAL.CURRENT_ITEM_VERSION
-	end
-	local edit = LIB.GetChatInput()
-	if itemInfo.nGenre == ITEM_GENRE.BOOK then
-		if not nBookInfo then
-			return false
-		end
-		local nBookID, nSegmentID = GlobelRecipeID2BookID(nBookInfo)
-		local szName = '[' .. Table_GetSegmentName(nBookID, nSegmentID) .. ']'
-		edit:InsertObj(szName, {
-			type = 'book',
-			text = szName,
-			version = nVersion,
-			tabtype = dwTabType,
-			index = dwIndex,
-			bookinfo = nBookInfo,
-		})
-		Station.SetFocusWindow(edit)
-	else
-		local szName = '[' .. LIB.GetItemNameByItemInfo(itemInfo) .. ']'
-		edit:InsertObj(szName, {
-			type = 'iteminfo',
-			text = szName,
-			version = nVersion,
-			tabtype = dwTabType,
-			index = dwIndex,
-		})
-		Station.SetFocusWindow(edit)
-	end
-	return true
 end
 
 do

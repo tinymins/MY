@@ -299,7 +299,7 @@ function PS.OnPanelActive(wnd)
 				'onlclick',
 				function(id, text, data)
 					if data and IsCtrlKeyDown() then
-						LIB.EditBoxInsertItemInfo(data.dwTabType, data.dwIndex, data.dwRecipeID)
+						LIB.InsertChatInput('iteminfo', data.dwTabType, data.dwIndex, data.dwRecipeID)
 					end
 					return false
 				end
