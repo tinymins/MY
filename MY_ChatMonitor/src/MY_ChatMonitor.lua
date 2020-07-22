@@ -177,6 +177,7 @@ function D.GetHTML(rec)
     html = LIB.GetChatTimeXML(rec.time, {
         r = rec.r, g = rec.g, b = rec.b,
         f = rec.font, s = O.szTimestrap,
+        richtext = html,
     }) .. html
     return html
 end
