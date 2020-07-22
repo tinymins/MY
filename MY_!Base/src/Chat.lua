@@ -438,8 +438,8 @@ LIB.ChatLinkEvents = SetmetaReadonly(ChatLinkEvents)
 
 -- 聊天界面元素通用事件绑定函数（this）
 local ChatLinkEventHandlers = {}
-for k, f in pairs(LIB.ChatLinkEvents) do
-	LIB.ChatLinkEventHandlers[k] = function()
+for k, f in pairs(ChatLinkEvents) do
+	ChatLinkEventHandlers[k] = function()
 		f(this)
 	end
 end
