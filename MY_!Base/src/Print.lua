@@ -44,21 +44,14 @@ local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAD
 -------------------------------------------------------------------------------------------------------
 local _L = LIB.LoadLangPack()
 
--- 显示本地信息 LIB.Sysmsg(oTitle, oContent, eTheme)
---   LIB.Sysmsg({'Error!', wrap = true}, 'MY', CONSTANT.MSG_THEME.ERROR)
---   LIB.Sysmsg({'New message', r = 0, g = 0, b = 0, wrap = true}, 'MY')
---   LIB.Sysmsg({{'New message', r = 0, g = 0, b = 0, rich = false}, wrap = true}, 'MY')
---   LIB.Sysmsg('New message', {'MY', 'DB', r = 0, g = 0, b = 0})
--- 显示中央信息 LIB.Topmsg(oTitle, oContent, eTheme)
---   参见 LIB.Sysmsg 参数解释
-do
 local THEME_LIST = {
 	-- [CONSTANT.MSG_THEME.NORMAL ] = { r = 255, g = 255, b =   0 },
 	[CONSTANT.MSG_THEME.ERROR  ] = { r = 255, g =  86, b =  86 },
 	[CONSTANT.MSG_THEME.WARNING] = { r = 255, g = 170, b = 170 },
 	[CONSTANT.MSG_THEME.SUCCESS] = { r =   0, g = 255, b = 127 },
 }
-local function StringifySysmsgObject(aMsg, oContent, cfg, bTitle)
+
+local function StringifySysmsgObject(aMsg, oContent, cfg, bTitle, bEcho)
 	local cfgContent = setmetatable({}, { __index = cfg })
 	if IsTable(oContent) then
 		cfgContent.rich, cfgContent.wrap = oContent.rich, oContent.wrap
@@ -85,8 +78,12 @@ local function StringifySysmsgObject(aMsg, oContent, cfg, bTitle)
 	if cfgContent.wrap and not bTitle then
 		insert(aMsg, GetFormatText('\n', cfgContent.f, cfgContent.r, cfgContent.g, cfgContent.b))
 	end
+	if bEcho then
+		insert(aMsg, 1, CONSTANT.XML_ADDON_ECHO_MARK)
+	end
 end
-local function OutputMessageEx(szType, szTheme, oTitle, oContent)
+
+local function OutputMessageEx(szType, szTheme, oTitle, oContent, bEcho)
 	local aMsg = {}
 	-- 字体颜色优先级：单个节点 > 根节点定义 > 预设样式 > 频道设置
 	-- 频道设置
@@ -113,12 +110,16 @@ local function OutputMessageEx(szType, szTheme, oTitle, oContent)
 	end
 
 	-- 处理数据
-	StringifySysmsgObject(aMsg, oTitle, cfg, true)
-	StringifySysmsgObject(aMsg, oContent, cfg, false)
+	StringifySysmsgObject(aMsg, oTitle, cfg, true, bEcho)
+	StringifySysmsgObject(aMsg, oContent, cfg, false, false)
 	OutputMessage(szType, concat(aMsg), true)
 end
 
--- 显示本地信息
+-- 显示本地信息 LIB.Sysmsg(oTitle, oContent, eTheme)
+--   LIB.Sysmsg({'Error!', wrap = true}, 'MY', CONSTANT.MSG_THEME.ERROR)
+--   LIB.Sysmsg({'New message', r = 0, g = 0, b = 0, wrap = true}, 'MY')
+--   LIB.Sysmsg({{'New message', r = 0, g = 0, b = 0, rich = false}, wrap = true}, 'MY')
+--   LIB.Sysmsg('New message', {'MY', 'DB', r = 0, g = 0, b = 0})
 function LIB.Sysmsg(...)
 	local argc, oTitle, oContent, eTheme = select('#', ...), nil
 	if argc == 1 then
@@ -144,7 +145,8 @@ function LIB.Sysmsg(...)
 	return OutputMessageEx('MSG_SYS', eTheme, oTitle, oContent)
 end
 
--- 显示中央信息
+-- 显示中央信息 LIB.Topmsg(oTitle, oContent, eTheme)
+--   参见 LIB.Sysmsg 参数解释
 function LIB.Topmsg(...)
 	local argc, oTitle, oContent, eTheme = select('#', ...), nil
 	if argc == 1 then
@@ -171,7 +173,6 @@ function LIB.Topmsg(...)
 		and 'MSG_ANNOUNCE_RED'
 		or 'MSG_ANNOUNCE_YELLOW'
 	return OutputMessageEx(szType, eTheme, oTitle, oContent)
-end
 end
 
 function LIB.Systopmsg(...)
@@ -234,8 +235,9 @@ function LIB.Debug(...)
 		else
 			eTheme = CONSTANT.MSG_THEME.NORMAL
 		end
-		LIB.Sysmsg(szTitle, oContent, eTheme)
-	elseif nLevel >= PACKET_INFO.DELOG_LEVEL then
+		return OutputMessageEx('MSG_SYS', eTheme, szTitle, oContent, true)
+	end
+	if nLevel >= PACKET_INFO.DELOG_LEVEL then
 		Log('[DEBUG_LEVEL][LEVEL_' .. nLevel .. '][' .. szTitle .. ']' .. szContent)
 	end
 end
