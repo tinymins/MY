@@ -134,9 +134,8 @@ do
 local function UpdateTeamMonData()
 	if MY_TeamMon and MY_TeamMon.IterTable and MY_TeamMon.GetTable then
 		local aBuff = {}
-		local dwMapID = LIB.GetMapID(true)
 		for _, szType in ipairs({'BUFF', 'DEBUFF'}) do
-			for _, data in MY_TeamMon.IterTable(MY_TeamMon.GetTable(szType), dwMapID, true) do
+			for _, data in MY_TeamMon.IterTable(MY_TeamMon.GetTable(szType), 0, true) do
 				if data.aCataclysmBuff then
 					for _, v in ipairs(data.aCataclysmBuff) do
 						v = Clone(v)

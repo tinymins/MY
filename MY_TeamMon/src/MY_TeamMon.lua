@@ -683,10 +683,8 @@ function D.CreateData(szEvent)
 				OTHER = {},
 			}
 			local cache = CACHE.MAP[vType]
-			for _, d in D.IterTable(data, LIB.GetMapID()) do
-				for k, v in ipairs(d) do
-					talk[#talk + 1] = v
-				end
+			for _, v in D.IterTable(data, dwMapID, true) do
+				talk[#talk + 1] = v
 			end
 			for k, v in ipairs(talk) do
 				if v.szContent then
@@ -1848,6 +1846,9 @@ end
 function D.IterTable(data, dwMapID, bIterItem)
 	local res = {}
 	if data then
+		if dwMapID == 0 then
+			dwMapID = LIB.GetMapID(true)
+		end
 		if data[MY_TM_SPECIAL_MAP.COMMON] then
 			insert(res, data[MY_TM_SPECIAL_MAP.COMMON])
 		end

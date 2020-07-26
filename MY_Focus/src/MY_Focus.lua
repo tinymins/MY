@@ -995,12 +995,11 @@ do
 local function UpdateTeamMonData()
 	if MY_TeamMon and MY_TeamMon.IterTable and MY_TeamMon.GetTable then
 		local aFocus = {}
-		local dwMapID = LIB.GetMapID(true)
 		for _, ds in ipairs({
 			{ szType = 'NPC', dwType = TARGET.NPC},
 			{ szType = 'DOODAD', dwType = TARGET.DOODAD},
 		}) do
-			for _, data in MY_TeamMon.IterTable(MY_TeamMon.GetTable(ds.szType), dwMapID, true) do
+			for _, data in MY_TeamMon.IterTable(MY_TeamMon.GetTable(ds.szType), 0, true) do
 				if data.aFocus then
 					for _, p in ipairs(data.aFocus) do
 						local rule = Clone(p)
