@@ -539,7 +539,9 @@ function D.OnEvent(szEvent)
 	elseif szEvent == 'MY_TM_NPC_LIFE_CHANGE' or szEvent == 'MY_TM_NPC_MANA_CHANGE' then
 		D.OnNpcInfoChange(szEvent, arg0, arg1, arg2)
 	elseif szEvent == 'LOADING_END' or szEvent == 'MY_TM_CREATE_CACHE' or szEvent == 'MY_TM_LOADING_END' then
+		D.FireCrossMapEvent('before')
 		D.CreateData(szEvent)
+		D.FireCrossMapEvent('after')
 	end
 end
 
@@ -1730,6 +1732,32 @@ function D.OnNpcAllLeave(dwTemplateID)
 	local szReceiver = LIB.GetTemplateName(TARGET.NPC, dwTemplateID)
 	if data then
 		D.CountdownEvent(data, MY_TM_TYPE.NPC_ALLLEAVE, szSender, szReceiver)
+	end
+end
+
+local MAP_ID, PREV_MAP_ID
+function D.FireCrossMapEvent(szWhen)
+	local dwMapID = LIB.GetMapID(true)
+	if szWhen == 'before' then
+		if PREV_MAP_ID and PREV_MAP_ID ~= dwMapID then
+			local map = PREV_MAP_ID and LIB.GetMapInfo(PREV_MAP_ID)
+			if map then
+				local szEvent = 'CHAT'
+				local szContent = _L('Leave map %s.', map.szName)
+				D.OnCallMessage(szEvent, szContent)
+			end
+			PREV_MAP_ID = dwMapID
+		end
+	elseif szWhen == 'after' then
+		if MAP_ID ~= dwMapID then
+			local map = LIB.GetMapInfo(dwMapID)
+			if map then
+				local szEvent = 'CHAT'
+				local szContent = _L('Enter map %s.', map.szName)
+				D.OnCallMessage(szEvent, szContent)
+			end
+			MAP_ID = dwMapID
+		end
 	end
 end
 

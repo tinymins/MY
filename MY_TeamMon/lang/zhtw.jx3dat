@@ -1,6 +1,8 @@
 -- language data (zhtw) updated at 2015/02/23 10:11:27
 return {
 	['MY_TeamMon'] = '團隊監控',
+	['Leave map %s.'] = '你已離開地圖【%s】。',
+	['Enter map %s.'] = '你已進入地圖【%s】。',
 	-- MY_TeamMon_CA.lua --
 	['MY_TeamMon_CA'] = '中央提醒',
 	-- MY_TeamMon_BL.lua --
