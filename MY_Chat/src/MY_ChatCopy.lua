@@ -76,7 +76,7 @@ local function onNewChatLine(h, i, szMsg, szChannel, dwTime, nR, nG, nB)
 		local szTime = ''
 		for ii = i, h:GetItemCount() - 1 do
 			local el = h:Lookup(i)
-			if el:GetType() == 'Text' and not el:GetName():find('^namelink_%d+$') then
+			if el:GetType() == 'Text' and not el:GetName():find('^namelink_%d+$') and el:GetText() ~= '' then
 				nR, nG, nB = el:GetFontColor()
 				break
 			end
