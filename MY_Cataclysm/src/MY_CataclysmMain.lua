@@ -144,7 +144,7 @@ local function UpdateTeamMonData()
 							v.nLevel = data.nLevel
 						end
 						v.nIcon = data.nIcon
-						insert(CTM_BUFF_TEAMMON, v)
+						insert(aBuff, v)
 					end
 				end
 			end
