@@ -1953,53 +1953,12 @@ function D.GetData(szType, dwID, nLevel)
 	end
 end
 
-local function UpgradeFocusData(data, aFocus)
-	if not aFocus then
-		return
-	end
-	local nCount = 0
-	for dwMapID, aData in pairs(aFocus) do
-		if not data['NPC'][dwMapID] then
-			data['NPC'][dwMapID] = {}
-		end
-		for _, focus in ipairs(aData) do
-			local npc
-			for _, p in ipairs(data['NPC'][dwMapID]) do
-				if p.dwID == focus.dwID then
-					npc = p
-					break
-				end
-			end
-			if not npc then
-				npc = {
-					["nFrame"] = focus.nFrame,
-					["dwID"] = focus.dwID,
-				}
-				insert(data['NPC'][dwMapID], npc)
-			end
-			if not npc.aFocus then
-				npc.aFocus = {}
-			end
-			insert(npc.aFocus, {
-				szDisplay = focus.szDisplay,
-				tRelation = focus.tRelation,
-				nMaxDistance = focus.nMaxDistance,
-			})
-			nCount = nCount + 1
-		end
-	end
-	if nCount > 0 then
-		LIB.Sysmsg(_L['MY_TeamMon'], _L('%s focus rules converted, if you are data author please notice that focus auto convert will not last long, you should export your data again.', nCount), CONSTANT.MSG_THEME.ERROR)
-	end
-end
-
 function D.LoadUserData()
 	local data = LIB.LoadLUAData(GetDataPath())
 	if data then
 		for k, v in pairs(D.FILE) do
 			D.FILE[k] = data[k] or {}
 		end
-		UpgradeFocusData(D.FILE, data['FOCUS'])
 		FireUIEvent('MY_TM_DATA_RELOAD')
 	else
 		local szLang = select(3, GetVersion())
@@ -2059,9 +2018,6 @@ function D.LoadConfigureFile(config)
 				end
 				fnMergeData(tab_data)
 			end
-		end
-		if config.tList['NPC'] then
-			UpgradeFocusData(D.FILE, data['FOCUS'])
 		end
 		FireUIEvent('MY_TM_CREATE_CACHE')
 		FireUIEvent('MY_TM_DATA_RELOAD')
