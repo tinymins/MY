@@ -108,3 +108,99 @@ local function onNewChatLine(h, i, szMsg, szChannel, dwTime, nR, nG, nB)
 	end
 end
 LIB.HookChatPanel('AFTER.MY_ChatCopy', onNewChatLine)
+
+function MY_ChatCopy.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
+	x = X
+	ui:Append('WndCheckBox', {
+		x = x, y = y, w = 250,
+		text = _L['chat copy'],
+		checked = MY_ChatCopy.bChatCopy,
+		oncheck = function(bChecked)
+			MY_ChatCopy.bChatCopy = bChecked
+		end,
+	})
+	y = y + deltaY
+
+	x = x + ui:Append('WndCheckBox', {
+		x = x, y = y, w = 250,
+		text = _L['chat time'],
+		checked = MY_ChatCopy.bChatTime,
+		oncheck = function(bChecked)
+			if bChecked and _G.HM_ToolBox then
+				_G.HM_ToolBox.bChatTime = false
+			end
+			MY_ChatCopy.bChatTime = bChecked
+		end,
+	}):AutoWidth():Width()
+
+	ui:Append('WndComboBox', {
+		x = x, y = y, w = 150,
+		text = _L['chat time format'],
+		menu = function()
+			return {{
+				szOption = _L['hh:mm'],
+				bMCheck = true,
+				bChecked = MY_ChatCopy.eChatTime == 'HOUR_MIN',
+				fnAction = function()
+					MY_ChatCopy.eChatTime = 'HOUR_MIN'
+				end,
+				fnDisable = function()
+					return not MY_ChatCopy.bChatTime
+				end,
+			},{
+				szOption = _L['hh:mm:ss'],
+				bMCheck = true,
+				bChecked = MY_ChatCopy.eChatTime == 'HOUR_MIN_SEC',
+				fnAction = function()
+					MY_ChatCopy.eChatTime = 'HOUR_MIN_SEC'
+				end,
+				fnDisable = function()
+					return not MY_ChatCopy.bChatTime
+				end,
+			}}
+		end,
+	})
+	y = y + deltaY
+
+	x = X + 25
+	ui:Append('WndCheckBox', {
+		x = x, y = y, w = 250,
+		text = _L['always show *'],
+		checked = MY_ChatCopy.bChatCopyAlwaysShowMask,
+		oncheck = function(bChecked)
+			MY_ChatCopy.bChatCopyAlwaysShowMask = bChecked
+		end,
+		isdisable = function()
+			return not MY_ChatCopy.bChatCopy
+		end,
+	})
+	y = y + deltaY
+
+	ui:Append('WndCheckBox', {
+		x = x, y = y, w = 250,
+		text = _L['always be white'],
+		checked = MY_ChatCopy.bChatCopyAlwaysWhite,
+		oncheck = function(bChecked)
+			MY_ChatCopy.bChatCopyAlwaysWhite = bChecked
+		end,
+		isdisable = function()
+			return not MY_ChatCopy.bChatCopy
+		end,
+	})
+	y = y + deltaY
+
+	ui:Append('WndCheckBox', {
+		x = x, y = y, w = 250,
+		text = _L['hide system msg copy'],
+		checked = MY_ChatCopy.bChatCopyNoCopySysmsg,
+		oncheck = function(bChecked)
+			MY_ChatCopy.bChatCopyNoCopySysmsg = bChecked
+		end,
+		isdisable = function()
+			return not MY_ChatCopy.bChatCopy
+		end,
+	})
+	y = y + deltaY
+
+	return x, y
+end

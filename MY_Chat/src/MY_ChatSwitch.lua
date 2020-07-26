@@ -497,6 +497,81 @@ function D.ReInitUI()
 end
 LIB.RegisterStorageInit('MY_CHAT', D.ReInitUI)
 
+function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
+	x = X
+	ui:Append('WndCheckBox', {
+		x = x, y = y, w = 250,
+		text = _L['display panel'],
+		checked = LIB.GetStorage('BoolValues.MY_ChatSwitch_DisplayPanel'),
+		oncheck = function(bChecked)
+			LIB.SetStorage('BoolValues.MY_ChatSwitch_DisplayPanel', bChecked)
+			D.ReInitUI()
+		end,
+	})
+	y = y + lineHeight
+
+	x = x + 25
+
+	ui:Append('WndCheckBox', {
+		x = x, y = y, w = 250,
+		text = _L['lock postion'],
+		checked = LIB.GetStorage('BoolValues.MY_ChatSwitch_LockPostion'),
+		oncheck = function(bChecked)
+			LIB.SetStorage('BoolValues.MY_ChatSwitch_LockPostion', bChecked)
+			D.ReInitUI()
+		end,
+		isdisable = function()
+			return not LIB.GetStorage('BoolValues.MY_ChatSwitch_DisplayPanel')
+		end,
+	})
+	y = y + lineHeight
+
+	ui:Append('WndComboBox', {
+		x = x, y = y, w = 150, h = 25,
+		text = _L['channel setting'],
+		menu = function()
+			local t = {
+				szOption = _L['channel setting'],
+				fnDisable = function()
+					return not LIB.GetStorage('BoolValues.MY_ChatSwitch_DisplayPanel')
+				end,
+			}
+			for i, v in ipairs(CHANNEL_LIST) do
+				insert(t, {
+					szOption = v.title, rgb = v.color,
+					bCheck = true, bChecked = not LIB.GetStorage('BoolValues.MY_ChatSwitch_CH' .. i),
+					fnAction = function()
+						LIB.SetStorage(
+							'BoolValues.MY_ChatSwitch_CH' .. i,
+							not LIB.GetStorage('BoolValues.MY_ChatSwitch_CH' .. i)
+						)
+						D.ReInitUI()
+					end,
+				})
+			end
+			return t
+		end,
+		isdisable = function()
+			return not LIB.GetStorage('BoolValues.MY_ChatSwitch_DisplayPanel')
+		end,
+	})
+	y = y + lineHeight
+
+	x = X
+	-- 竞技场频道切换
+	ui:Append('WndCheckBox', {
+		x = x, y = y, w = 'auto',
+		text = _L['Auto switch talk channel when into battle field'],
+		checked = MY_ChatSwitch.bAutoSwitchBfChannel,
+		oncheck = function(bChecked)
+			MY_ChatSwitch.bAutoSwitchBfChannel = bChecked
+		end,
+	})
+	y = y + lineHeight
+
+	return x, y
+end
+
 --------------------------------------------------------------------------
 -- Global exports
 --------------------------------------------------------------------------
@@ -506,6 +581,11 @@ local settings = {
 		{
 			root = D,
 			preset = 'UIEvent',
+		},
+		{
+			fields = {
+				OnPanelActivePartial = D.OnPanelActivePartial,
+			},
 		},
 		{
 			fields = {
@@ -538,195 +618,3 @@ local settings = {
 }
 MY_ChatSwitch = LIB.GeneGlobalNS(settings)
 end
-
---------------------------------------------------------------------------
--- PS
---------------------------------------------------------------------------
-local PS = {}
-function PS.OnPanelActive(wnd)
-	local ui = UI(wnd)
-	local W, H = ui:Size()
-	local X, Y = 20, 20
-	local x, y = X, Y
-	local deltaX = 25
-	local deltaY = 31
-
-	if (MY_Farbnamen and MY_Farbnamen.OnPanelActivePartial) then
-		x, y = MY_Farbnamen.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
-	end
-
-	x = X
-	ui:Append('WndCheckBox', {
-		x = x, y = y, w = 250,
-		text = _L['display panel'],
-		checked = LIB.GetStorage('BoolValues.MY_ChatSwitch_DisplayPanel'),
-		oncheck = function(bChecked)
-			LIB.SetStorage('BoolValues.MY_ChatSwitch_DisplayPanel', bChecked)
-			D.ReInitUI()
-		end,
-	})
-	y = y + deltaY
-
-	ui:Append('WndCheckBox', {
-		x = x + deltaX, y = y, w = 250,
-		text = _L['lock postion'],
-		checked = LIB.GetStorage('BoolValues.MY_ChatSwitch_LockPostion'),
-		oncheck = function(bChecked)
-			LIB.SetStorage('BoolValues.MY_ChatSwitch_LockPostion', bChecked)
-			D.ReInitUI()
-		end,
-		isdisable = function()
-			return not LIB.GetStorage('BoolValues.MY_ChatSwitch_DisplayPanel')
-		end,
-	})
-	y = y + deltaY
-
-	ui:Append('WndComboBox', {
-		x = x + deltaX, y = y, w = 150, h = 25,
-		text = _L['channel setting'],
-		menu = function()
-			local t = {
-				szOption = _L['channel setting'],
-				fnDisable = function()
-					return not LIB.GetStorage('BoolValues.MY_ChatSwitch_DisplayPanel')
-				end,
-			}
-			for i, v in ipairs(CHANNEL_LIST) do
-				insert(t, {
-					szOption = v.title, rgb = v.color,
-					bCheck = true, bChecked = not LIB.GetStorage('BoolValues.MY_ChatSwitch_CH' .. i),
-					fnAction = function()
-						LIB.SetStorage(
-							'BoolValues.MY_ChatSwitch_CH' .. i,
-							not LIB.GetStorage('BoolValues.MY_ChatSwitch_CH' .. i)
-						)
-						D.ReInitUI()
-					end,
-				})
-			end
-			return t
-		end,
-		isdisable = function()
-			return not LIB.GetStorage('BoolValues.MY_ChatSwitch_DisplayPanel')
-		end,
-	})
-	y = y + deltaY
-
-	ui:Append('WndCheckBox', {
-		x = x, y = y, w = 250,
-		text = _L['team balloon'],
-		checked = MY_TeamBalloon.Enable(),
-		oncheck = function(bChecked)
-			MY_TeamBalloon.Enable(bChecked)
-		end,
-	})
-	y = y + deltaY
-
-	ui:Append('WndCheckBox', {
-		x = x, y = y, w = 250,
-		text = _L['chat time'],
-		checked = MY_ChatCopy.bChatTime,
-		oncheck = function(bChecked)
-			if bChecked and _G.HM_ToolBox then
-				_G.HM_ToolBox.bChatTime = false
-			end
-			MY_ChatCopy.bChatTime = bChecked
-		end,
-	})
-	y = y + deltaY
-
-	ui:Append('WndComboBox', {
-		x = x + deltaX, y = y, w = 150,
-		text = _L['chat time format'],
-		menu = function()
-			return {{
-				szOption = _L['hh:mm'],
-				bMCheck = true,
-				bChecked = MY_ChatCopy.eChatTime == 'HOUR_MIN',
-				fnAction = function()
-					MY_ChatCopy.eChatTime = 'HOUR_MIN'
-				end,
-				fnDisable = function()
-					return not MY_ChatCopy.bChatTime
-				end,
-			},{
-				szOption = _L['hh:mm:ss'],
-				bMCheck = true,
-				bChecked = MY_ChatCopy.eChatTime == 'HOUR_MIN_SEC',
-				fnAction = function()
-					MY_ChatCopy.eChatTime = 'HOUR_MIN_SEC'
-				end,
-				fnDisable = function()
-					return not MY_ChatCopy.bChatTime
-				end,
-			}}
-		end,
-	})
-	y = y + deltaY
-
-	ui:Append('WndCheckBox', {
-		x = x, y = y, w = 250,
-		text = _L['chat copy'],
-		checked = MY_ChatCopy.bChatCopy,
-		oncheck = function(bChecked)
-			MY_ChatCopy.bChatCopy = bChecked
-		end,
-	})
-	y = y + deltaY
-
-	ui:Append('WndCheckBox', {
-		x = x + deltaX, y = y, w = 250,
-		text = _L['always show *'],
-		checked = MY_ChatCopy.bChatCopyAlwaysShowMask,
-		oncheck = function(bChecked)
-			MY_ChatCopy.bChatCopyAlwaysShowMask = bChecked
-		end,
-		isdisable = function()
-			return not MY_ChatCopy.bChatCopy
-		end,
-	})
-	y = y + deltaY
-
-	ui:Append('WndCheckBox', {
-		x = x + deltaX, y = y, w = 250,
-		text = _L['always be white'],
-		checked = MY_ChatCopy.bChatCopyAlwaysWhite,
-		oncheck = function(bChecked)
-			MY_ChatCopy.bChatCopyAlwaysWhite = bChecked
-		end,
-		isdisable = function()
-			return not MY_ChatCopy.bChatCopy
-		end,
-	})
-	y = y + deltaY
-
-	ui:Append('WndCheckBox', {
-		x = x + deltaX, y = y, w = 250,
-		text = _L['hide system msg copy'],
-		checked = MY_ChatCopy.bChatCopyNoCopySysmsg,
-		oncheck = function(bChecked)
-			MY_ChatCopy.bChatCopyNoCopySysmsg = bChecked
-		end,
-		isdisable = function()
-			return not MY_ChatCopy.bChatCopy
-		end,
-	})
-	y = y + deltaY
-
-	x, y = MY_AutoHideChat.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x, y = X, y + deltaY
-
-	-- 竞技场频道切换
-	ui:Append('WndCheckBox', {
-		x = x, y = y, w = 'auto',
-		text = _L['Auto switch talk channel when into battle field'],
-		checked = MY_ChatSwitch.bAutoSwitchBfChannel,
-		oncheck = function(bChecked)
-			MY_ChatSwitch.bAutoSwitchBfChannel = bChecked
-		end,
-	})
-	y = y + deltaY
-
-	x, y = MY_WhisperMetion.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-end
-LIB.RegisterPanel('MY_ChatSwitch', _L['chat helper'], _L['Chat'], 'UI/Image/UICommon/ActivePopularize2.UITex|20', PS)

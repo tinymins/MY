@@ -184,3 +184,18 @@ local function Init()
 end
 LIB.RegisterInit('MY_TeamBalloon', Init)
 end
+
+function MY_TeamBalloon.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
+	x = X
+	ui:Append('WndCheckBox', {
+		x = x, y = y, w = 250,
+		text = _L['team balloon'],
+		checked = MY_TeamBalloon.Enable(),
+		oncheck = function(bChecked)
+			MY_TeamBalloon.Enable(bChecked)
+		end,
+	})
+	y = y + lineHeight
+
+	return x, y
+end
