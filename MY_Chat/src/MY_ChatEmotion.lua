@@ -1,7 +1,7 @@
 --------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
--- @desc     : ÁÄÌìÖúÊÖ
+-- @desc     : ÁÄÌì¸¨Öú
 -- @author   : ÜøÒÁ @Ë«ÃÎÕò @×··çõæÓ°
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
@@ -44,30 +44,94 @@ local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAD
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Chat'
 local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
-local MODULE_NAME = 'MY_Chat'
+local MODULE_NAME = 'MY_ChatEmotion'
 local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
 if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
 	return
 end
 --------------------------------------------------------------------------
+local D = {}
+local O = {
+	bFixSize = false,
+	nSize = 25,
+}
+RegisterCustomData('MY_ChatEmotion.bFixSize')
+RegisterCustomData('MY_ChatEmotion.nSize')
 
-local PS = {}
-function PS.OnPanelActive(wnd)
-	local ui = UI(wnd)
-	local W, H = ui:Size()
-	local X, Y = 20, 20
-	local x, y = X, Y
-	local lineHeight = 31
-
-	if MY_Farbnamen and MY_Farbnamen.OnPanelActivePartial then
-		x, y = MY_Farbnamen.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
+LIB.HookChatPanel('BEFORE.MY_ChatEmotion', function(h, szMsg, ...)
+	if O.bFixSize then
+		local aXMLNode = LIB.XMLDecode(szMsg)
+		if aXMLNode then
+			for _, node in ipairs(aXMLNode) do
+				local szType = LIB.XMLGetNodeType(node)
+				local szName = LIB.XMLGetNodeData(node, 'name')
+				if (szType == 'animate' or szType == 'image')
+				and szName and szName:sub(1, 8) == 'emotion_' then
+					LIB.XMLSetNodeData(node, 'w', O.nSize)
+					LIB.XMLSetNodeData(node, 'h', O.nSize)
+				end
+			end
+			szMsg = LIB.XMLEncode(aXMLNode)
+		end
 	end
-	x, y = MY_ChatSwitch.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
-	x, y = MY_TeamBalloon.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
-	x, y = MY_ChatCopy.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
-	x, y = MY_AutoHideChat.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
-	x, y = MY_WhisperMetion.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
-	x, y = MY_ChatEmotion.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
+	return szMsg
+end)
+
+function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
+	x = X
+	x = x + ui:Append('WndCheckBox', {
+		x = x, y = y, w = 250,
+		text = _L['Resize emotion'],
+		checked = MY_ChatEmotion.bFixSize,
+		oncheck = function(bChecked)
+			MY_ChatEmotion.bFixSize = bChecked
+		end,
+	}):AutoWidth():Width() + 5
+	ui:Append('WndTrackbar', {
+		x = x, y = y, w = 100, h = 25,
+		value = MY_ChatEmotion.nSize,
+		range = {1, 300},
+		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		textfmt = function(v) return _L('Size: %d', v) end,
+		onchange = function(val)
+			MY_ChatEmotion.nSize = val
+		end,
+		autoenable = function() return MY_ChatEmotion.bFixSize end,
+	})
+	y = y + lineHeight
+
+	return x, y
 end
-LIB.RegisterPanel('MY_ChatSwitch', _L['chat helper'], _L['Chat'], 'UI/Image/UICommon/ActivePopularize2.UITex|20', PS)
+
+--------------------------------------------------------------------------
+-- Global exports
+--------------------------------------------------------------------------
+do
+local settings = {
+	exports = {
+		{
+			fields = {
+				OnPanelActivePartial = D.OnPanelActivePartial,
+			},
+		},
+		{
+			fields = {
+				bFixSize = true,
+				nSize = true,
+			},
+			root = O,
+		},
+	},
+	imports = {
+		{
+			fields = {
+				bFixSize = true,
+				nSize = true,
+			},
+			root = O,
+		},
+	},
+}
+MY_ChatEmotion = LIB.GeneGlobalNS(settings)
+end
