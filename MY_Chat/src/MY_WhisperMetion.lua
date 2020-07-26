@@ -124,7 +124,7 @@ function D.Apply()
 end
 LIB.RegisterInit('MY_WhisperMetion', D.Apply)
 
-function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
 	x = X
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 'auto',
@@ -134,7 +134,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 			MY_WhisperMetion.bEnable = bChecked
 		end,
 	})
-	y = y + 25
+	y = y + lineHeight
 	return x, y
 end
 
