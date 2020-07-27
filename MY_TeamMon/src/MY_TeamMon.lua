@@ -541,7 +541,7 @@ function D.OnEvent(szEvent)
 	elseif szEvent == 'LOADING_END' or szEvent == 'MY_TM_CREATE_CACHE' or szEvent == 'MY_TM_LOADING_END' then
 		D.FireCrossMapEvent('before')
 		D.CreateData(szEvent)
-		D.FireCrossMapEvent('after')
+		LIB.DelayCall('MY_TeamMon__FireCrossMapEvent__after', D.FireCrossMapEvent, 'after')
 	end
 end
 
