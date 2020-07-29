@@ -1711,15 +1711,22 @@ end
 
 do
 local nIndex = 0
-function LIB.Alert(szName, szMsg, fnAction, szSure, fnCancelAction)
+function LIB.Alert(szName, szMsg, fnAction, szSure, fnCancelAction, nCountDownTime)
 	if IsFunction(szMsg) or IsNil(szMsg) then
-		szMsg, fnAction, szSure, fnCancelAction = szName, szMsg, fnAction, szSure
+		szMsg, fnAction, szSure, fnCancelAction, nCountDownTime = szName, szMsg, fnAction, szSure, fnCancelAction
 		szName = NSFormatString('{$NS}_Alert') .. nIndex
 		nIndex = nIndex + 1
 	else
 		szName = NSFormatString('{$NS}_AlertCRC') .. GetStringCRC(szName)
 	end
 	local nW, nH = Station.GetClientSize()
+	if fnCancelAction == 'FORBIDDEN' then
+		fnCancelAction = function()
+			LIB.DelayCall(function()
+				LIB.Alert(szName, szMsg, fnAction, szSure, fnCancelAction, nCountDownTime)
+			end)
+		end
+	end
 	local tMsg = {
 		x = nW / 2, y = nH / 3,
 		szName = szName,
@@ -1729,6 +1736,8 @@ function LIB.Alert(szName, szMsg, fnAction, szSure, fnCancelAction)
 		{
 			szOption = szSure or g_tStrings.STR_HOTKEY_SURE,
 			fnAction = fnAction,
+			bDelayCountDown = nCountDownTime and true or false,
+			nCountDownTime = nCountDownTime,
 		},
 	}
 	MessageBox(tMsg)
