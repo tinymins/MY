@@ -1212,15 +1212,15 @@ function D.OnNpcEvent(npc, bEnter)
 				end
 				-- 头顶报警
 				if O.bPushScreenHead and cfg.bScreenHead then
-					local szNote, szName = nil, FilterCustomText(data.szName, szSender, szReceiver)
-					if not LIB.IsShieldedVersion('MY_TargetMon', 2) then
-						szNote = FilterCustomText(data.szNote, szSender, szReceiver) or szName
+					local szText, szName = nil, FilterCustomText(data.szName, szSender, szReceiver)
+					if data.szNote and not LIB.IsShieldedVersion('MY_TargetMon', 2) then
+						szText = FilterCustomText(data.szNote, szSender, szReceiver)
 					end
 					FireUIEvent('MY_LIFEBAR_COUNTDOWN', npc.dwID, 'NPC', 'MY_TM_NPC_' .. npc.dwID, {
-						szText = szNote,
+						szText = szText,
 						col = data.col,
 					})
-					FireUIEvent('MY_TM_SA_CREATE', 'NPC', npc.dwID, { text = szNote, col = data.col, szName = szName })
+					FireUIEvent('MY_TM_SA_CREATE', 'NPC', npc.dwID, { text = szText, col = data.col, szName = szName })
 				end
 			end
 			if nTime - CACHE.NPC_LIST[npc.dwTemplateID].nTime < 500 then -- 0.5秒内进入相同的NPC直接忽略
@@ -1355,15 +1355,15 @@ function D.OnDoodadEvent(doodad, bEnter)
 			if cfg then
 				-- 头顶报警
 				if O.bPushScreenHead and cfg.bScreenHead then
-					local szNote, szName = nil, FilterCustomText(data.szName, szSender, szReceiver)
-					if not LIB.IsShieldedVersion('MY_TargetMon', 2) then
-						szNote = FilterCustomText(data.szNote, szSender, szReceiver) or szName
+					local szText, szName = nil, FilterCustomText(data.szName, szSender, szReceiver)
+					if data.szNote and not LIB.IsShieldedVersion('MY_TargetMon', 2) then
+						szText = FilterCustomText(data.szNote, szSender, szReceiver) or szName
 					end
 					FireUIEvent('MY_LIFEBAR_COUNTDOWN', doodad.dwID, 'DOODAD', 'MY_TM_DOODAD_' .. doodad.dwID, {
-						szText = szNote,
+						szText = szText,
 						col = data.col,
 					})
-					FireUIEvent('MY_TM_SA_CREATE', 'DOODAD', doodad.dwID, { text = szNote, col = data.col, szName = szName })
+					FireUIEvent('MY_TM_SA_CREATE', 'DOODAD', doodad.dwID, { text = szText, col = data.col, szName = szName })
 				end
 			end
 			if nTime - CACHE.DOODAD_LIST[doodad.dwTemplateID].nTime < 500 then
@@ -1509,15 +1509,17 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 			end
 			local aXml, aText = {}, {}
 			local szNote = nil
-			if data.szNote then
+			if data.szNote and not LIB.IsShieldedVersion('MY_TargetMon', 2) then
 				szNote = data.szNote:gsub('$me', me.szName)
 				if dwReceiverID then
 					szNote = szNote:gsub('$team', szReceiver)
 				end
 			end
-			if szReceiver and not szNote then
+			if szNote then
+				ConstructSpeech(aText, aXml, FilterCustomText(szNote, szSender, szReceiver) or szContent, 44, 255, 255, 255)
+			elseif szReceiver and wlen(szContent) > 30 then
 				ConstructSpeech(aText, aXml, MY_TM_LEFT_BRACKET, MY_TM_LEFT_BRACKET_XML)
-				ConstructSpeech(aText, aXml, szNpcName or _L['JX3'], 44, 255, 255, 0)
+				ConstructSpeech(aText, aXml, szSender, 44, 255, 255, 0)
 				ConstructSpeech(aText, aXml, MY_TM_RIGHT_BRACKET, MY_TM_RIGHT_BRACKET_XML)
 				ConstructSpeech(aText, aXml, _L['is calling'], 44, 255, 255, 255)
 				ConstructSpeech(aText, aXml, MY_TM_LEFT_BRACKET, MY_TM_LEFT_BRACKET_XML)
@@ -1525,7 +1527,11 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 				ConstructSpeech(aText, aXml, MY_TM_RIGHT_BRACKET, MY_TM_RIGHT_BRACKET_XML)
 				ConstructSpeech(aText, aXml, _L['\'s name.'], 44, 255, 255, 255)
 			else
-				ConstructSpeech(aText, aXml, FilterCustomText(szNote, szSender, szReceiver) or szContent, 44, 255, 255, 255)
+				ConstructSpeech(aText, aXml, MY_TM_LEFT_BRACKET, MY_TM_LEFT_BRACKET_XML)
+				ConstructSpeech(aText, aXml, szSender, 44, 255, 255, 0)
+				ConstructSpeech(aText, aXml, MY_TM_RIGHT_BRACKET, MY_TM_RIGHT_BRACKET_XML)
+				ConstructSpeech(aText, aXml, g_tStrings.HEADER_SHOW_SAY, 44, 255, 255, 0)
+				ConstructSpeech(aText, aXml, szContent, 44, 255, 255, 0)
 			end
 			local szXml, szText = concat(aXml), concat(aText)
 			if dwReceiverID then -- 点了人名
@@ -1574,7 +1580,7 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 				end
 			end
 			if O.bPushTeamChannel and cfg.bTeamChannel then
-				if szReceiver and not data.szNote then
+				if szReceiver and not szNote then
 					D.Talk('RAID', szText, szReceiver)
 				else
 					D.Talk('RAID', szText)
