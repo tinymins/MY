@@ -1689,6 +1689,9 @@ function LIB.GetNearFurniture(nDis)
 			info.dwID = dwID
 			info.nInstID = p.InstID
 			info.nBaseID = p.BaseId
+			info.nX = p.nX
+			info.nY = p.nY
+			info.nZ = p.nZ
 			insert(aFurniture, info)
 			tID[dwID] = true
 		end
