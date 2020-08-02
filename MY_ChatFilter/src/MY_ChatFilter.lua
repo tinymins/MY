@@ -106,7 +106,6 @@ local l_tChannelHeader = {
 LIB.HookChatPanel('FILTER.MY_ChatFilter', function(h, szMsg, szChannel, dwTime)
 	-- 插件消息UUID过滤
 	if MY_ChatFilter.bFilterDuplicateAddonTalk then
-		local me = GetClientPlayer()
 		local tSay = LIB.ParseChatData(szMsg)
 		if not h.MY_tDuplicateUUID then
 			h.MY_tDuplicateUUID = {}
@@ -137,8 +136,11 @@ LIB.HookChatPanel('FILTER.MY_ChatFilter', function(h, szMsg, szChannel, dwTime)
 	-- 重复内容刷屏屏蔽（系统频道除外）
 	if MY_ChatFilter.bFilterDuplicate
 	and MY_ChatFilter.tApplyDuplicateChannels[szChannel] then
-		-- 计算过滤记录
-		local szText, szName = LIB.GetPureText(szMsg), ''
+		-- 解析聊天纯字符串
+		local aSay = LIB.ParseChatData(szMsg)
+		local szText = LIB.StringifyChatText(aSay)
+		-- 解析发言人名字
+		local szName = ''
 		if l_tChannelHeader[szChannel] then
 			local nS, nE = wfind(szText, l_tChannelHeader[szChannel])
 			if nS and nE then
@@ -150,9 +152,7 @@ LIB.HookChatPanel('FILTER.MY_ChatFilter', function(h, szMsg, szChannel, dwTime)
 			end
 		end
 		szText = szText:gsub('[ \n]', '')
-		if szText == '' then -- 纯表情纯链接就不屏蔽了
-			return true
-		end
+		-- 判断是否区分发言者
 		if not MY_ChatFilter.bFilterDuplicateIgnoreID then
 			szText = szName .. ':' .. szText
 		end
