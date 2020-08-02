@@ -504,3 +504,18 @@ function LIB.OutputItemInfoTip(Rect, dwTabType, dwIndex, nBookInfo)
 	Rect = ConvRectEl(Rect)
 	OutputTip(szXml, 345, Rect)
 end
+
+function LIB.OutputItemTip(Rect, dwItemID)
+	if not IsTable(Rect) and not IsNil(Rect) then
+		Rect, dwItemID = nil, Rect
+	end
+	local item = GetItem(dwItemID)
+	local szXml = GetItemTip(item)
+	if not Rect then
+		local x, y = Cursor.GetPos()
+		local w, h = 40, 40
+		Rect = {x, y, w, h}
+	end
+	Rect = ConvRectEl(Rect)
+	OutputTip(szXml, 345, Rect)
+end
