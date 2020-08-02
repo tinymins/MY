@@ -85,6 +85,16 @@ RegisterCustomData('MY_AutoSell.bSellBlueBook')
 RegisterCustomData('MY_AutoSell.tSellItem')
 RegisterCustomData('MY_AutoSell.tProtectItem')
 
+function D.SellItem(nNpcID, nShopID, dwBox, dwX, nCount, szReason, szName, nUiId)
+	local me = GetClientPlayer()
+	local item = me.GetItem(dwBox, dwX)
+	if not item or item.nUiId ~= nUiId then
+		return
+	end
+	SellItem(nNpcID, nShopID, dwBox, dwX, nCount)
+	LIB.Sysmsg(_L('Auto sell %s item: %s.', szReason, szName))
+end
+
 -- 自动售出物品
 function D.AutoSellItem(nNpcID, nShopID)
 	if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) then
@@ -92,14 +102,19 @@ function D.AutoSellItem(nNpcID, nShopID)
 	end
 	local me = GetClientPlayer()
 	local nIndex = LIB.GetBagPackageIndex()
+	local aSell = {}
 	for dwBox = nIndex, nIndex + LIB.GetBagPackageCount() do
 		local dwSize = me.GetBoxSize(dwBox) - 1
 		for dwX = 0, dwSize do
 			local item = me.GetItem(dwBox, dwX)
 			if item and item.bCanTrade then
-				local bSell, szReason = item.nQuality == 0, ''
+				local bSell, szReason = false, ''
 				local szName = LIB.GetObjectName(item)
 				if not O.tProtectItem[szName] then
+					if item.nQuality == 0 and O.bSellGray then
+						bSell = true
+						szReason = _L['Gray item']
+					end
 					if not bSell and O.tSellItem[szName] then
 						bSell = true
 						szReason = _L['Specified']
@@ -124,11 +139,56 @@ function D.AutoSellItem(nNpcID, nShopID)
 					elseif item.bCanStack then
 						nCount = item.nStackNum
 					end
-					SellItem(nNpcID, nShopID, dwBox, dwX, nCount)
-					LIB.Sysmsg(_L('Auto sell %s item: %s.', szReason, szName))
+					local r, g, b = GetItemFontColorByQuality(item.nQuality)
+					local sell = {
+						nNpcID = nNpcID, nShopID = nShopID, dwBox = dwBox, dwX = dwX, nCount = nCount,
+						szReason = szReason, szName = szName, nUiId = item.nUiId, r = r, g = g, b = b,
+					}
+					insert(aSell, sell)
 				end
 			end
 		end
+	end
+	sort(aSell, function(a, b)
+		if a.szReason == b.szReason then
+			return a.nUiId > b.nUiId
+		end
+		return a.szReason > b.szReason
+	end)
+	if #aSell > 0 then
+		local aXML, szReason = {}
+		insert(aXML, GetFormatText(_L['Confirm auto sell?']))
+		insert(aXML, CONSTANT.XML_LINE_BREAKER)
+		for _, v in ipairs(aSell) do
+			if v.szReason ~= szReason then
+				insert(aXML, CONSTANT.XML_LINE_BREAKER)
+				insert(aXML, GetFormatText(v.szReason .. g_tStrings.STR_CHINESE_MAOHAO))
+				szReason = v.szReason
+			end
+			insert(aXML, CONSTANT.XML_LINE_BREAKER)
+			insert(aXML, GetFormatText(g_tStrings.STR_TWO_CHINESE_SPACE .. '['.. v.szName ..']', 166, v.r, v.g, v.b))
+			insert(aXML, GetFormatText(' x' .. v.nCount))
+		end
+		insert(aXML, CONSTANT.XML_LINE_BREAKER)
+		insert(aXML, CONSTANT.XML_LINE_BREAKER)
+		insert(aXML, GetFormatText(_L['Some items may not be able to buy back once you sell it, and there is also a limit number rule by official, change auto sell rules in plugin if you want.']))
+		local nW, nH = Station.GetClientSize()
+		local tMsg = {
+			x = nW / 2, y = nH / 3,
+			szName = 'MY_AutoSell__Confirm',
+			szMessage = concat(aXML),
+			bRichText = true,
+			szAlignment = 'CENTER',
+			{
+				szOption = g_tStrings.STR_HOTKEY_SURE,
+				fnAction = function()
+					for _, v in ipairs(aSell) do
+						D.SellItem(v.nNpcID, v.nShopID, v.dwBox, v.dwX, v.nCount, v.szReason, v.szName, v.nUiId)
+					end
+				end,
+			}, { szOption = g_tStrings.STR_HOTKEY_CANCEL },
+		}
+		MessageBox(tMsg)
 	end
 end
 
