@@ -96,7 +96,7 @@ function D.SellItem(nNpcID, nShopID, dwBox, dwX, nCount, szReason, szName, nUiId
 end
 
 -- 自动售出物品
-function D.AutoSellItem(nNpcID, nShopID)
+function D.AutoSellItem(nNpcID, nShopID, bIgnoreGray)
 	if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) then
 		return
 	end
@@ -111,7 +111,7 @@ function D.AutoSellItem(nNpcID, nShopID)
 				local bSell, szReason = false, ''
 				local szName = LIB.GetObjectName(item)
 				if not O.tProtectItem[szName] then
-					if item.nQuality == 0 and O.bSellGray then
+					if item.nQuality == 0 and O.bSellGray and not bIgnoreGray then
 						bSell = true
 						szReason = _L['Gray item']
 					end
@@ -195,7 +195,9 @@ end
 function D.CheckEnable()
 	if O.bEnable then
 		LIB.RegisterEvent('SHOP_OPENSHOP', function()
-			D.AutoSellItem(arg4, arg0)
+			local chk = Station.Lookup('Normal/ShopPanel/CheckBox_AutoSell')
+			local bIgnoreGray = chk and chk:IsCheckBoxChecked() or false
+			D.AutoSellItem(arg4, arg0, bIgnoreGray)
 		end)
 	else
 		LIB.RegisterEvent('SHOP_OPENSHOP', false)
