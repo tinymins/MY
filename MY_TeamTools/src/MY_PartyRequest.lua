@@ -61,6 +61,7 @@ local O = {
 	bRefuseLowLv  = false,
 	bRefuseRobot  = false,
 	bAcceptTong   = false,
+	bAcceptCamp   = false,
 	bAcceptFriend = false,
 	bAcceptAll    = false,
 	bAcceptCustom = false,
@@ -70,6 +71,7 @@ RegisterCustomData('MY_PartyRequest.bEnable')
 RegisterCustomData('MY_PartyRequest.bRefuseLowLv')
 RegisterCustomData('MY_PartyRequest.bRefuseRobot')
 RegisterCustomData('MY_PartyRequest.bAcceptTong')
+RegisterCustomData('MY_PartyRequest.bAcceptCamp')
 RegisterCustomData('MY_PartyRequest.bAcceptFriend')
 RegisterCustomData('MY_PartyRequest.bAcceptAll')
 RegisterCustomData('MY_PartyRequest.bAcceptCustom')
@@ -119,6 +121,14 @@ function D.GetMenu()
 			bCheck = true, bChecked = MY_PartyRequest.bAcceptTong,
 			fnAction = function()
 				MY_PartyRequest.bAcceptTong = not MY_PartyRequest.bAcceptTong
+			end,
+			fnDisable = function() return not MY_PartyRequest.bEnable end,
+		},
+		{
+			szOption = _L['Auto accept same camp'],
+			bCheck = true, bChecked = MY_PartyRequest.bAcceptCamp,
+			fnAction = function()
+				MY_PartyRequest.bAcceptCamp = not MY_PartyRequest.bAcceptCamp
 			end,
 			fnDisable = function() return not MY_PartyRequest.bEnable end,
 		},
@@ -310,6 +320,10 @@ function D.GetRequestStatus(info)
 		szStatus = 'accept'
 		szMsg = _L('Auto tong member friend %s(%s %d%s) party request, go to MY/raid/teamtools panel if you want to turn off this feature.',
 			info.szName, g_tStrings.tForceTitle[info.dwForce], info.nLevel, g_tStrings.STR_LEVEL)
+	elseif info.bSameCamp and O.bAcceptCamp then
+		szStatus = 'accept'
+		szMsg = _L('Auto camp %s(%s %d%s) party request, go to MY/raid/teamtools panel if you want to turn off this feature.',
+			info.szName, g_tStrings.tForceTitle[info.dwForce], info.nLevel, g_tStrings.STR_LEVEL)
 	end
 	if szStatus == 'normal' and not info.bFriend and not info.bTongMember then
 		if O.bRefuseRobot and info.dwID and info.nLevel == PACKET_INFO.MAX_PLAYER_LEVEL then
@@ -395,6 +409,7 @@ function D.OnApplyRequest(event)
 		info = {}
 		PR_PARTY_REQUEST[szName] = info
 	end
+	local me = LIB.GetClientInfo()
 	-- 判断对方是否已在进组列表中
 	info.szType      = event == 'PARTY_INVITE_REQUEST' and 'invite' or 'request'
 	info.szName      = szName
@@ -403,6 +418,7 @@ function D.OnApplyRequest(event)
 	info.nLevel      = nLevel
 	info.bFriend     = LIB.IsFriend(szName)
 	info.bTongMember = LIB.IsTongMember(szName)
+	info.bSameCamp   = info.nCamp == me.nCamp
 	info.dwDelayTime = nil
 	-- 获取dwID
 	local tar = LIB.GetObject(TARGET.PLAYER, szName)
@@ -492,6 +508,7 @@ local settings = {
 				bRefuseLowLv  = true,
 				bRefuseRobot  = true,
 				bAcceptTong   = true,
+				bAcceptCamp   = true,
 				bAcceptFriend = true,
 				bAcceptAll    = true,
 				bAcceptCustom = true,
@@ -507,6 +524,7 @@ local settings = {
 				bRefuseLowLv  = true,
 				bRefuseRobot  = true,
 				bAcceptTong   = true,
+				bAcceptCamp   = true,
 				bAcceptFriend = true,
 				bAcceptAll    = true,
 				bAcceptCustom = true,
