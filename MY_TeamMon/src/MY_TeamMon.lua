@@ -1212,15 +1212,15 @@ function D.OnNpcEvent(npc, bEnter)
 				end
 				-- 头顶报警
 				if O.bPushScreenHead and cfg.bScreenHead then
-					local szText, szName = nil, FilterCustomText(data.szName, szSender, szReceiver)
-					if data.szNote and not LIB.IsShieldedVersion('MY_TargetMon', 2) then
-						szText = FilterCustomText(data.szNote, szSender, szReceiver)
+					local szNote, szName = nil, FilterCustomText(data.szName, szSender, szReceiver)
+					if not LIB.IsShieldedVersion('MY_TargetMon', 2) then
+						szNote = FilterCustomText(data.szNote, szSender, szReceiver) or szName
 					end
 					FireUIEvent('MY_LIFEBAR_COUNTDOWN', npc.dwID, 'NPC', 'MY_TM_NPC_' .. npc.dwID, {
-						szText = szText,
+						szText = szNote,
 						col = data.col,
 					})
-					FireUIEvent('MY_TM_SA_CREATE', 'NPC', npc.dwID, { text = szText, col = data.col, szName = szName })
+					FireUIEvent('MY_TM_SA_CREATE', 'NPC', npc.dwID, { text = szNote, col = data.col, szName = szName })
 				end
 			end
 			if nTime - CACHE.NPC_LIST[npc.dwTemplateID].nTime < 500 then -- 0.5秒内进入相同的NPC直接忽略
@@ -1355,15 +1355,15 @@ function D.OnDoodadEvent(doodad, bEnter)
 			if cfg then
 				-- 头顶报警
 				if O.bPushScreenHead and cfg.bScreenHead then
-					local szText, szName = nil, FilterCustomText(data.szName, szSender, szReceiver)
-					if data.szNote and not LIB.IsShieldedVersion('MY_TargetMon', 2) then
-						szText = FilterCustomText(data.szNote, szSender, szReceiver) or szName
+					local szNote, szName = nil, FilterCustomText(data.szName, szSender, szReceiver)
+					if not LIB.IsShieldedVersion('MY_TargetMon', 2) then
+						szNote = FilterCustomText(data.szNote, szSender, szReceiver) or szName
 					end
 					FireUIEvent('MY_LIFEBAR_COUNTDOWN', doodad.dwID, 'DOODAD', 'MY_TM_DOODAD_' .. doodad.dwID, {
-						szText = szText,
+						szText = szNote,
 						col = data.col,
 					})
-					FireUIEvent('MY_TM_SA_CREATE', 'DOODAD', doodad.dwID, { text = szText, col = data.col, szName = szName })
+					FireUIEvent('MY_TM_SA_CREATE', 'DOODAD', doodad.dwID, { text = szNote, col = data.col, szName = szName })
 				end
 			end
 			if nTime - CACHE.DOODAD_LIST[doodad.dwTemplateID].nTime < 500 then
@@ -1473,10 +1473,10 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 		local team     = GetClientTeam()
 		for k, v in ipairs_r(cache.OTHER) do
 			local content = v.szContent
-			if v.szContent:find('$me') then
+			if v.szContent:find('$me', nil, true) then
 				content = v.szContent:gsub('$me', me.szName) -- 转换me是自己名字
 			end
-			if bInParty and content:find('$team') then
+			if bInParty and content:find('$team', nil, true) then
 				local c = content
 				for kk, vv in ipairs(team.GetTeamMemberList()) do
 					if find(szContent, c:gsub('$team', team.GetClientTeamMemberName(vv)), nil, true) and (v.szTarget == szNpcName or v.szTarget == '%') then -- hit
@@ -1507,36 +1507,43 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 				dwReceiverID = me.dwID
 				szReceiver = me.szName
 			end
-			local aXml, aText = {}, {}
+			local aXml, aText, aTalkXml, aTalkText = {}, {}, {}, {}
 			local szNote = nil
-			if data.szNote and not LIB.IsShieldedVersion('MY_TargetMon', 2) then
+			if data.szNote then
 				szNote = data.szNote:gsub('$me', me.szName)
 				if dwReceiverID then
 					szNote = szNote:gsub('$team', szReceiver)
 				end
 			end
+			if szReceiver then
+				ConstructSpeech(aTalkText, aTalkXml, MY_TM_LEFT_BRACKET, MY_TM_LEFT_BRACKET_XML)
+				ConstructSpeech(aTalkText, aTalkXml, szSender, 44, 255, 255, 0)
+				ConstructSpeech(aTalkText, aTalkXml, MY_TM_RIGHT_BRACKET, MY_TM_RIGHT_BRACKET_XML)
+				ConstructSpeech(aTalkText, aTalkXml, _L['is calling'], 44, 255, 255, 255)
+				ConstructSpeech(aTalkText, aTalkXml, MY_TM_LEFT_BRACKET, MY_TM_LEFT_BRACKET_XML)
+				ConstructSpeech(aTalkText, aTalkXml, szReceiver == me.szName and g_tStrings.STR_YOU or szReceiver, 44, 255, 255, 0)
+				ConstructSpeech(aTalkText, aTalkXml, MY_TM_RIGHT_BRACKET, MY_TM_RIGHT_BRACKET_XML)
+				ConstructSpeech(aTalkText, aTalkXml, _L['\'s name.'], 44, 255, 255, 255)
+			else
+				ConstructSpeech(aTalkText, aTalkXml, MY_TM_LEFT_BRACKET, MY_TM_LEFT_BRACKET_XML)
+				ConstructSpeech(aTalkText, aTalkXml, szSender, 44, 255, 255, 0)
+				ConstructSpeech(aTalkText, aTalkXml, MY_TM_RIGHT_BRACKET, MY_TM_RIGHT_BRACKET_XML)
+				ConstructSpeech(aTalkText, aTalkXml, g_tStrings.HEADER_SHOW_SAY, 44, 255, 255, 0)
+				ConstructSpeech(aTalkText, aTalkXml, szContent, 44, 255, 255, 0)
+			end
 			if szNote then
 				ConstructSpeech(aText, aXml, FilterCustomText(szNote, szSender, szReceiver) or szContent, 44, 255, 255, 255)
-			elseif szReceiver and wlen(szContent) > 30 then
-				ConstructSpeech(aText, aXml, MY_TM_LEFT_BRACKET, MY_TM_LEFT_BRACKET_XML)
-				ConstructSpeech(aText, aXml, szSender, 44, 255, 255, 0)
-				ConstructSpeech(aText, aXml, MY_TM_RIGHT_BRACKET, MY_TM_RIGHT_BRACKET_XML)
-				ConstructSpeech(aText, aXml, _L['is calling'], 44, 255, 255, 255)
-				ConstructSpeech(aText, aXml, MY_TM_LEFT_BRACKET, MY_TM_LEFT_BRACKET_XML)
-				ConstructSpeech(aText, aXml, szReceiver == me.szName and g_tStrings.STR_YOU or szReceiver, 44, 255, 255, 0)
-				ConstructSpeech(aText, aXml, MY_TM_RIGHT_BRACKET, MY_TM_RIGHT_BRACKET_XML)
-				ConstructSpeech(aText, aXml, _L['\'s name.'], 44, 255, 255, 255)
-			else
-				ConstructSpeech(aText, aXml, MY_TM_LEFT_BRACKET, MY_TM_LEFT_BRACKET_XML)
-				ConstructSpeech(aText, aXml, szSender, 44, 255, 255, 0)
-				ConstructSpeech(aText, aXml, MY_TM_RIGHT_BRACKET, MY_TM_RIGHT_BRACKET_XML)
-				ConstructSpeech(aText, aXml, g_tStrings.HEADER_SHOW_SAY, 44, 255, 255, 0)
-				ConstructSpeech(aText, aXml, szContent, 44, 255, 255, 0)
 			end
-			local szXml, szText = concat(aXml), concat(aText)
+			local szXml, szText, szTalkXml, szTalkText = concat(aXml), concat(aText), concat(aTalkXml), concat(aTalkText)
+			if IsEmpty(szXml) then
+				szXml = szTalkXml
+			end
+			if IsEmpty(szText) then
+				szText = szTalkText
+			end
 			if dwReceiverID then -- 点了人名
 				if O.bPushWhisperChannel and cfg.bWhisperChannel then
-					D.Talk('WHISPER', szText, szReceiver)
+					D.Talk('WHISPER', szTalkText, szReceiver)
 				end
 				-- 头顶报警
 				if O.bPushScreenHead and cfg.bScreenHead then
@@ -1553,7 +1560,7 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 				end
 			else -- 没点名
 				if O.bPushWhisperChannel and cfg.bWhisperChannel then
-					D.Talk('RAID_WHISPER', szText)
+					D.Talk('RAID_WHISPER', szTalkText)
 				end
 				-- 头顶报警
 				if O.bPushScreenHead and cfg.bScreenHead and not LIB.IsShieldedVersion('MY_TargetMon', 2) then
@@ -1580,10 +1587,10 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 				end
 			end
 			if O.bPushTeamChannel and cfg.bTeamChannel then
-				if szReceiver and not szNote then
-					D.Talk('RAID', szText, szReceiver)
+				if szReceiver and not data.szNote then
+					D.Talk('RAID', szTalkText, szReceiver)
 				else
-					D.Talk('RAID', szText)
+					D.Talk('RAID', szTalkText)
 				end
 			end
 		end

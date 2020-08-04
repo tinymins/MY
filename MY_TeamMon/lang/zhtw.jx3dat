@@ -122,8 +122,7 @@ return {
 	['Countdown TYPE 20'] = '觸發監聽系統信息', --
 	['NPC can not change the icon'] = '無法更改系統角色的圖標',
 	['Warning box'] = '系統警告框',
-	-- ['Alert content'] = '報警內容',
-	['Alert content'] = '備注信息',
+	['Alert content'] = '報警內容',
 	['Tips: $me behalf of self, $team behalf of team, only allow once each'] = '小提示：$me 代表自己的名字，$team 代表團玩家的名字，一條喊話中僅允許使用一次。',
 	['Speaker'] = '喊話對象',
 	['Content'] = '喊話內容',
