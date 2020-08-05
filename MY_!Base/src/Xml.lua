@@ -63,26 +63,30 @@ local function bytes2string(bytes)
 	end
 end
 
-local function XMLEscape(str)
-	local bytes2string, insert, byte = bytes2string, insert, string.byte
-	local bytes_string, len, byte_current = {}, #str
-	local byte_char_n, byte_char_t, byte_quote = (byte('n')), (byte('t')), (byte('"'))
-	local byte_lf, byte_tab, byte_escape = (byte('\n')), (byte('\t')), (byte('\\'))
-	for i = 1, len do
-		byte_current = byte(str, i)
-		if byte_current == byte_lf then
-			insert(bytes_string, byte_escape)
-			-- byte_current = byte_char_n
-		elseif byte_current == byte_tab then
-			insert(bytes_string, byte_escape)
-			-- byte_current = byte_char_t
-		elseif byte_current == byte_escape or byte_current == byte_quote then
-			insert(bytes_string, byte_escape)
-		end
-		insert(bytes_string, byte_current)
+local XMLEscape = EncodeComponentsString
+	and function(s)
+		return EncodeComponentsString(s):sub(2, -2)
 	end
-	return bytes2string(bytes_string)
-end
+	or function(str)
+		local bytes2string, insert, byte = bytes2string, insert, string.byte
+		local bytes_string, len, byte_current = {}, #str
+		local byte_char_n, byte_char_t, byte_quote = (byte('n')), (byte('t')), (byte('"'))
+		local byte_lf, byte_tab, byte_escape = (byte('\n')), (byte('\t')), (byte('\\'))
+		for i = 1, len do
+			byte_current = byte(str, i)
+			if byte_current == byte_lf then
+				insert(bytes_string, byte_escape)
+				-- byte_current = byte_char_n
+			elseif byte_current == byte_tab then
+				insert(bytes_string, byte_escape)
+				-- byte_current = byte_char_t
+			elseif byte_current == byte_escape or byte_current == byte_quote then
+				insert(bytes_string, byte_escape)
+			end
+			insert(bytes_string, byte_current)
+		end
+		return bytes2string(bytes_string)
+	end
 
 local function XMLUnescape(str)
 	local bytes2string, insert, byte = bytes2string, insert, string.byte
