@@ -64,7 +64,24 @@ local function bytes2string(bytes)
 end
 
 local function XMLEscape(str)
-	return (str:gsub('\\', '\\\\'):gsub('"', '\\"'))
+	local bytes2string, insert, byte = bytes2string, insert, string.byte
+	local bytes_string, len, byte_current = {}, #str
+	local byte_char_n, byte_char_t, byte_quote = (byte('n')), (byte('t')), (byte('"'))
+	local byte_lf, byte_tab, byte_escape = (byte('\n')), (byte('\t')), (byte('\\'))
+	for i = 1, len do
+		byte_current = byte(str, i)
+		if byte_current == byte_lf then
+			insert(bytes_string, byte_escape)
+			-- byte_current = byte_char_n
+		elseif byte_current == byte_tab then
+			insert(bytes_string, byte_escape)
+			-- byte_current = byte_char_t
+		elseif byte_current == byte_escape or byte_current == byte_quote then
+			insert(bytes_string, byte_escape)
+		end
+		insert(bytes_string, byte_current)
+	end
+	return bytes2string(bytes_string)
 end
 
 local function XMLUnescape(str)
@@ -254,7 +271,7 @@ local function XMLDecode(xml)
 			elseif byte_current == byte_escape then
 				b_escaping = true
 			elseif byte_current == byte_quote then
-				p.attrs[key] = bytes2string(bytes_string)
+				p.attrs[key] = XMLUnescape(bytes2string(bytes_string))
 				state = 'attribute'
 			else
 				insert(bytes_string, byte_current)
@@ -376,7 +393,7 @@ local function XMLDecode(xml)
 			elseif byte_current == byte_escape then
 				b_escaping = true
 			elseif byte_current == byte_quote then
-				p.data[key] = bytes2string(bytes_string)
+				p.data[key] = XMLUnescape(bytes2string(bytes_string))
 				state = 'text'
 			else
 				insert(bytes_string, byte_current)
