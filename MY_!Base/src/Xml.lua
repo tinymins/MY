@@ -100,6 +100,8 @@ local function XMLUnescape(str)
 				byte_current = byte_lf
 			elseif byte_current == byte_char_t then
 				byte_current = byte_tab
+			elseif byte_current ~= byte_lf and byte_current ~= byte_escape then
+				insert(bytes_string, byte_escape)
 			end
 			insert(bytes_string, byte_current)
 		elseif byte_current == byte_escape then
