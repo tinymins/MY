@@ -52,8 +52,8 @@ local THEME_LIST = {
 }
 
 function LIB.EncodeEchoMsgHeader(szChannel, oData)
-	return '<text>text="" addonecho=1 channel="' .. LIB.XMLEncode(EncodeLUAData(szChannel))
-		.. '" data="' .. LIB.XMLEncode(EncodeLUAData(oData)) .. '" </text>'
+	return '<text>text="" addonecho=1 channel="' .. LIB.XMLEscape(EncodeLUAData(szChannel))
+		.. '" data="' .. LIB.XMLEscape(EncodeLUAData(oData)) .. '" </text>'
 end
 
 function LIB.ContainsEchoMsgHeader(szMsg)
@@ -62,9 +62,9 @@ end
 
 function LIB.DecodeEchoMsgHeader(aXMLNode)
 	if LIB.XMLIsNode(aXMLNode) then
-		if LIB.XMLGetNodeAttr(aXMLNode, 'addonecho') then
-			local szChannel = DecodeLUAData(LIB.XMLGetNodeAttr(aXMLNode, 'channel'))
-			local oData = DecodeLUAData(LIB.XMLGetNodeAttr(aXMLNode, 'data'))
+		if LIB.XMLGetNodeData(aXMLNode, 'addonecho') then
+			local szChannel = DecodeLUAData(LIB.XMLGetNodeData(aXMLNode, 'channel'))
+			local oData = DecodeLUAData(LIB.XMLGetNodeData(aXMLNode, 'data'))
 			return true, szChannel, oData
 		end
 	elseif IsArray(aXMLNode) then
