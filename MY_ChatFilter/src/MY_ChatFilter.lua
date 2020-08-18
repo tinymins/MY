@@ -104,13 +104,17 @@ local l_tChannelHeader = {
 }
 
 LIB.HookChatPanel('FILTER.MY_ChatFilter', function(h, szMsg, szChannel, dwTime)
+	local aXMLNode, aSay
 	-- 插件消息UUID过滤
 	if MY_ChatFilter.bFilterDuplicateAddonTalk then
-		local tSay = LIB.ParseChatData(szMsg)
+		if not aXMLNode then
+			aXMLNode = LIB.XMLDecode(szMsg)
+			aSay = LIB.ParseChatData(aXMLNode)
+		end
 		if not h.MY_tDuplicateUUID then
 			h.MY_tDuplicateUUID = {}
 		end
-		for _, element in ipairs(tSay) do
+		for _, element in ipairs(aSay) do
 			if element.type == 'eventlink' and element.name == '' then
 				local data = LIB.JsonDecode(element.linkinfo)
 				if data and data.uuid then
@@ -134,10 +138,23 @@ LIB.HookChatPanel('FILTER.MY_ChatFilter', function(h, szMsg, szChannel, dwTime)
 		end
 	end
 	-- 重复内容刷屏屏蔽（系统频道除外）
+	if szChannel == 'MSG_SYS' and LIB.ContainsEchoMsgHeader(szMsg) then
+		if not aXMLNode then
+			aXMLNode = LIB.XMLDecode(szMsg)
+			aSay = LIB.ParseChatData(aXMLNode)
+		end
+		local bHasEcho, szEchoChannel = LIB.DecodeEchoMsgHeader(aXMLNode)
+		if bHasEcho and szEchoChannel then
+			szChannel = szEchoChannel
+		end
+	end
 	if MY_ChatFilter.bFilterDuplicate
 	and MY_ChatFilter.tApplyDuplicateChannels[szChannel] then
+		if not aXMLNode then
+			aXMLNode = LIB.XMLDecode(szMsg)
+			aSay = LIB.ParseChatData(aXMLNode)
+		end
 		-- 解析聊天纯字符串
-		local aSay = LIB.ParseChatData(szMsg)
 		local szText = LIB.StringifyChatText(aSay)
 		-- 解析发言人名字
 		local szName = ''
