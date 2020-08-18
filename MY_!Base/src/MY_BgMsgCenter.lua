@@ -437,3 +437,14 @@ LIB.RegisterEvent({
 	LAST_ACHI_TIME, LAST_COUNTER_TIME = {}, {}
 end)
 end
+
+LIB.RegisterBgMsg('MY_OUTPUT_BUFF', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
+	local aRes = {}
+	local me = GetClientPlayer()
+	local aBuff, nCount, buff = LIB.GetBuffList(me)
+	for i = 1, nCount do
+		buff = aBuff[i]
+		insert(aRes, LIB.CloneBuff(buff, {}))
+	end
+	Output(aRes)
+end)
