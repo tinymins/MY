@@ -814,7 +814,6 @@ local CONSTANT = setmetatable({}, {
 		MENU_DIVIDER = SetmetaReadonly({ bDevide = true }),
 		EMPTY_TABLE = SetmetaReadonly({}),
 		XML_LINE_BREAKER = GetFormatText('\n'),
-		XML_ADDON_ECHO_MARK = '<text>text="" addonecho=1 </text>',
 		UI_OBJECT = UI_OBJECT or SetmetaReadonly({
 			NONE             = -1, -- 空Box
 			ITEM             = 0 , -- 身上有的物品。nUiId, dwBox, dwX, nItemVersion, nTabType, nIndex

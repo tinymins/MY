@@ -104,7 +104,7 @@ local function GetCopyLinkScript(opt)
 		.. handlerEntry .. '.OnCopyMouseEnter;this.OnItemMouseLeave=' .. handlerEntry .. '.OnCopyMouseLeave;'
 	if opt.lclick ~= false then
 		szScript = szScript .. 'this.bLButton=true;this.OnItemLButtonDown='.. handlerEntry .. '.OnCopyLClick;'
-		if opt.richtext and not StringFindW(opt.richtext, CONSTANT.XML_ADDON_ECHO_MARK) then
+		if opt.richtext and not LIB.ContainsEchoMsgHeader(opt.richtext) then
 			szScript = szScript .. 'this.szRichText=' .. EncodeLUAData(opt.richtext or '') .. ';'
 		end
 	end
@@ -835,6 +835,10 @@ local function ParseChatData(oData, tOption, aContent, bIgnoreRange)
 					})
 				end
 			end
+		end
+	elseif IsArray(oData) then
+		for _, node in ipairs(oData) do
+			ParseChatData(node, tOption, aContent, true)
 		end
 	end
 	return aContent

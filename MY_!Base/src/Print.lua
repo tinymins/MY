@@ -51,6 +51,32 @@ local THEME_LIST = {
 	[CONSTANT.MSG_THEME.SUCCESS] = { r =   0, g = 255, b = 127 },
 }
 
+function LIB.EncodeEchoMsgHeader(szChannel, oData)
+	return '<text>text="" addonecho=1 channel="' .. LIB.XMLEncode(EncodeLUAData(szChannel))
+		.. '" data="' .. LIB.XMLEncode(EncodeLUAData(oData)) .. '" </text>'
+end
+
+function LIB.ContainsEchoMsgHeader(szMsg)
+	return find(szMsg, '<text>text="" addonecho=1 channel="', nil, true) ~= nil
+end
+
+function LIB.DecodeEchoMsgHeader(aXMLNode)
+	if LIB.XMLIsNode(aXMLNode) then
+		if LIB.XMLGetNodeAttr(aXMLNode, 'addonecho') then
+			local szChannel = DecodeLUAData(LIB.XMLGetNodeAttr(aXMLNode, 'channel'))
+			local oData = DecodeLUAData(LIB.XMLGetNodeAttr(aXMLNode, 'data'))
+			return true, szChannel, oData
+		end
+	elseif IsArray(aXMLNode) then
+		for _, node in ipairs(aXMLNode) do
+			local bHasInfo, szChannel, oData = LIB.DecodeEchoMsgHeader(node)
+			if bHasInfo then
+				return bHasInfo, szChannel, oData
+			end
+		end
+	end
+end
+
 local function StringifySysmsgObject(aMsg, oContent, cfg, bTitle, bEcho)
 	local cfgContent = setmetatable({}, { __index = cfg })
 	if IsTable(oContent) then
@@ -79,7 +105,7 @@ local function StringifySysmsgObject(aMsg, oContent, cfg, bTitle, bEcho)
 		insert(aMsg, GetFormatText('\n', cfgContent.f, cfgContent.r, cfgContent.g, cfgContent.b))
 	end
 	if bEcho then
-		insert(aMsg, 1, CONSTANT.XML_ADDON_ECHO_MARK)
+		insert(aMsg, 1, LIB.EncodeEchoMsgHeader())
 	end
 end
 

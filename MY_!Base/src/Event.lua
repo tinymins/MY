@@ -703,7 +703,7 @@ local function MsgMonHandler(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID
 			return
 		end
 		-- filter addon echo message.
-		if StringFindW(szMsg, CONSTANT.XML_ADDON_ECHO_MARK) == 1 then
+		if LIB.ContainsEchoMsgHeader(szMsg) then
 			return
 		end
 	end

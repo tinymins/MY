@@ -279,7 +279,7 @@ function D.OnMsgArrive(szChannel, szMsg, nFont, bRich, r, g, b, dwTalkerID, szNa
     local html = D.GetHTML(rec)
     -- 如果设置重定向到系统消息则输出（输出时加个标记防止又被自己捕捉了死循环）
     if O.bRedirectSysChannel and szChannel ~= 'MSG_SYS' then
-        OutputMessage('MSG_SYS', CONSTANT.XML_ADDON_ECHO_MARK .. szMsg, true)
+        OutputMessage('MSG_SYS', LIB.EncodeEchoMsgHeader(szChannel) .. szMsg, true)
     end
     -- 广播消息
     OutputMessage('MSG_MY_MONITOR', szMsg, true, nil, nil, dwTalkerID, szName)
