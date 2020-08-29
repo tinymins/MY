@@ -1679,7 +1679,7 @@ function LIB.GetNearFurniture(nDis)
 		return CONSTANT.EMPTY_TABLE
 	end
 	if not nDis then
-		nDis = 6
+		nDis = 256
 	end
 	local aFurniture, tID = {}, {}
 	for _, p in ipairs(Homeland_GetNearbyObjectsInfo(nDis)) do
