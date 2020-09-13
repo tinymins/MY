@@ -352,7 +352,7 @@ return {
     ['Auto memorize book has been disabled due to SHIFT key pressed.'] = '你按住了Shift键，自动阅读被禁用。',
 
     ['MY_FriendTipLocation'] = '好友位置',
-    ['Show all friend tip location'] = '社交界面显示全部所在地',
+    ['Show all friend tip location'] = '社交界面显示双向二重好感度好友所在地',
     ['(Different camp)'] = '（对立阵营）',
 
     ['MY_DynamicActionBarPos'] = '动态技能栏位置',
