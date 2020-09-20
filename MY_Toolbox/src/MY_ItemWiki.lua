@@ -1,7 +1,7 @@
 --------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
--- @desc     : 常用工具
+-- @desc     : 物品百科查询
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
@@ -52,70 +52,92 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
 end
 --------------------------------------------------------------------------
 
+local D = {}
+local O = {
+	bEnable = false,
+	nW = 850,
+	nH = 610,
+}
+RegisterCustomData('MY_ItemWiki.bEnable')
+RegisterCustomData('MY_ItemWiki.nW')
+RegisterCustomData('MY_ItemWiki.nH')
+
+function D.OnWebSizeChange()
+	O.nW, O.nH = this:GetSize()
+end
+
+function D.Open(nUiId)
+	local szName = LIB.GetItemNameByUIID(nUiId)
+	if not szName then
+		return
+	end
+	local szURL = 'https://page.j3cx.com/item/' .. nUiId .. '?'
+		.. LIB.EncodePostData(LIB.UrlEncode({
+			lang = AnsiToUTF8(LIB.GetLang()),
+			player = AnsiToUTF8(GetUserRoleName()),
+		}))
+	local szKey = 'ItemWiki_' .. nUiId
+	local szTitle = szName
+	szKey = MY_Web.Open(szURL, {
+		key = szKey,
+		title = szTitle,
+		w = O.nW, h = O.nH,
+	})
+	UI(MY_Web.GetFrame(szKey)):Size(D.OnWebSizeChange)
+end
+
+function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+	x = x + ui:Append('WndCheckBox', {
+		x = x, y = y, w = 'auto',
+		text = _L['Hold SHIFT and r-click bag box to show item wiki'],
+		checked = MY_ItemWiki.bEnable,
+		oncheck = function(bChecked)
+			MY_ItemWiki.bEnable = bChecked
+		end,
+	}):Width() + 5
+	return x, y
+end
+
+-- Global exports
 do
-local TARGET_TYPE, TARGET_ID
-local function onHotKey()
-	if TARGET_TYPE then
-		LIB.SetTarget(TARGET_TYPE, TARGET_ID)
-		TARGET_TYPE, TARGET_ID = nil
-	else
-		TARGET_TYPE, TARGET_ID = LIB.GetTarget()
-		LIB.SetTarget(TARGET.PLAYER, UI_GetClientPlayerID())
-	end
+local settings = {
+	exports = {
+		{
+			fields = {
+				Open = D.Open,
+				OnPanelActivePartial = D.OnPanelActivePartial,
+			},
+		},
+		{
+			fields = {
+				bEnable = true,
+				nW = true,
+				nH = true,
+			},
+			root = O,
+		},
+	},
+	imports = {
+		{
+			fields = {
+				bEnable = true,
+				nW = true,
+				nH = true,
+			},
+			root = O,
+		},
+	},
+}
+MY_ItemWiki = LIB.GeneGlobalNS(settings)
 end
-LIB.RegisterHotKey('MY_AutoLoopMeAndTarget', _L['Loop target between me and target'], onHotKey)
-end
 
-local PS = {}
-function PS.OnPanelActive(wnd)
-	local ui = UI(wnd)
-	local X, Y = 25, 25
-	local W, H = ui:Size()
-	local x, y = X, Y
-	local deltaY = 28
-
-	-- 目标
-	x = X
-	y = y + ui:Append('Text', { x = x, y = y, h = 'auto', text = _L['Target'], color = {255, 255, 0} }):Height() + 5
-	x = x + 10
-	x, y = MY_FooterTip.OnPanelActivePartial(ui, X + 10, Y, W, H, x, y, deltaY)
-
-	-- 战斗
-	x = X
-	y = y + ui:Append('Text', { x = x, y = y, h = 'auto', text = _L['Battle'], color = {255, 255, 0} }):Height() + 5
-	x = x + 10
-	x, y = MY_VisualSkill.OnPanelActivePartial(ui, X + 10, Y, W, H, x, y, deltaY)
-	x, y = MY_DynamicActionBarPos.OnPanelActivePartial(ui, X + 10, Y, W, H, x, y, deltaY)
-	x, y = MY_ArenaHelper.OnPanelActivePartial(ui, X + 10, Y, W, H, x, y, deltaY)
-	x, y = MY_ShenxingHelper.OnPanelActivePartial(ui, X + 10, Y, W, H, x, y, deltaY)
-
-	-- 其他
-	x = X
-	y = y + ui:Append('Text', { x = x, y = y, h = 'auto', text = _L['Others'], color = {255, 255, 0} }):Height() + 5
-	x = x + 10
-	x, y = MY_AchievementWiki.OnPanelActivePartial(ui, X + 10, Y, W, H, x, y, deltaY)
-	x, y = MY_YunMacro.OnPanelActivePartial(ui, X + 10, Y, W, H, x, y, deltaY)
-	x, y = X + 10, y + deltaY
-	x, y = MY_ItemWiki.OnPanelActivePartial(ui, X + 10, Y, W, H, x, y, deltaY)
-
-	x, y = X + 10, y + deltaY
-	if MY_BagEx then
-		x, y = MY_BagEx.OnPanelActivePartial(ui, X + 10, Y, W, H, x, y, deltaY)
+Box_AppendAddonMenu({function(box)
+	if not IsElement(box) or box:GetType() ~= 'Box' then
+		return
 	end
-	if MY_BagSort then
-		x, y = MY_BagSort.OnPanelActivePartial(ui, X + 10, Y, W, H, x, y, deltaY)
+	local nUiId = box:GetObjectData()
+	if IsEmpty(nUiId) then
+		return
 	end
-	x, y = MY_HideAnnounceBg.OnPanelActivePartial(ui, X + 10, Y, W, H, x, y, deltaY)
-	x, y = MY_FriendTipLocation.OnPanelActivePartial(ui, X + 10, Y, W, H, x, y, deltaY)
-
-	x, y = X + 10, y + deltaY
-	x, y = MY_Domesticate.OnPanelActivePartial(ui, X + 10, Y, W, H, x, y, deltaY)
-	x, y = MY_Memo.OnPanelActivePartial(ui, X + 10, Y, W, H, x, y, deltaY)
-
-	-- 右侧浮动
-	MY_GongzhanCheck.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
-	MY_LockFrame.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
-	MY_AutoSell.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
-	MY_DynamicItem.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
-end
-LIB.RegisterPanel('MY_ToolBox', _L['MY_ToolBox'], _L['General'], 'UI/Image/Common/Money.UITex|243', PS)
+	return {{ szOption = _L['Item wiki'], fnAction = function() D.Open(nUiId) end }}
+end})

@@ -292,6 +292,8 @@ return {
     ['FIREWORK_TITLE_162308'] = '在吗？',
     ['FIREWORK_TITLE_158577'] = '玲珑心',
     ['Achievement wiki'] = '点击成就界面图标显示成就百科',
+    ['Item wiki'] = '物品百科',
+    ['Hold SHIFT and r-click bag box to show item wiki'] = '按住SHIFT右键点击背包物品显示物品百科',
 
     -- MY_LockFrame
     ['Lock frame position'] = '锁定窗口位置',
