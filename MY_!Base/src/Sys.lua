@@ -465,7 +465,6 @@ end
 local szDataRoot = LIB.FormatPath({'', PATH_TYPE.DATA})
 local szPassphrase = GetPassphrase(666, 233)
 local CACHE = {}
-local passfile = LIB.GetLUADataPath({'config/manifest.jx3dat', PATH_TYPE.GLOBAL})
 function GetLUADataPathPassphrase(szPath)
 	-- ȥ��Ŀ¼ǰ׺
 	if szPath:sub(1, szDataRoot:len()) ~= szDataRoot then
@@ -498,6 +497,16 @@ function GetLUADataPathPassphrase(szPath)
 		end
 	end
 	return CACHE[szDomain][szPath], bNew
+end
+local GUID
+function LIB.GetClientGUID()
+	if not GUID then
+		GUID = MD5(
+			GetLUADataPathPassphrase(LIB.GetLUADataPath({'GUID', PATH_TYPE.GLOBAL}))
+				.. '::' .. EncodeLUAData({GetSystemCScreen()})
+			)
+	end
+	return GUID
 end
 end
 
