@@ -66,17 +66,20 @@ function D.OnWebSizeChange()
 	O.nW, O.nH = this:GetSize()
 end
 
-function D.Open(nUiId)
-	local szName = LIB.GetItemNameByUIID(nUiId)
+function D.Open(dwTabType, dwTabIndex, nBookID)
+	if nBookID < 0 then
+		nBookID = nil
+	end
+	local szName = LIB.GetObjectName('ITEM_INFO', dwTabType, dwTabIndex, nBookID)
 	if not szName then
 		return
 	end
-	local szURL = 'https://page.j3cx.com/item/' .. nUiId .. '?'
+	local szURL = 'https://page.j3cx.com/item/' .. concat({dwTabType, dwTabIndex, nBookID}, '/') .. '?'
 		.. LIB.EncodePostData(LIB.UrlEncode({
 			lang = AnsiToUTF8(LIB.GetLang()),
 			player = AnsiToUTF8(GetUserRoleName()),
 		}))
-	local szKey = 'ItemWiki_' .. nUiId
+	local szKey = 'ItemWiki_' .. concat({dwTabType, dwTabIndex, nBookID}, '_')
 	local szTitle = szName
 	szKey = MY_Web.Open(szURL, {
 		key = szKey,
@@ -135,9 +138,16 @@ Box_AppendAddonMenu({function(box)
 	if not IsElement(box) or box:GetType() ~= 'Box' then
 		return
 	end
-	local nUiId = box:GetObjectData()
-	if IsEmpty(nUiId) then
+	local _, dwBox, dwX = box:GetObjectData()
+	if not dwBox or not dwX then
 		return
 	end
-	return {{ szOption = _L['Item wiki'], fnAction = function() D.Open(nUiId) end }}
+	local item = GetPlayerItem(GetClientPlayer(), dwBox, dwX)
+	if not item then
+		return
+	end
+	local dwTabType = item.dwTabType
+	local dwTabIndex = item.dwIndex
+	local nBookID = item.nGenre == ITEM_GENRE.BOOK and item.nBookID or -1
+	return {{ szOption = _L['Item wiki'], fnAction = function() D.Open(dwTabType, dwTabIndex, nBookID) end }}
 end})
