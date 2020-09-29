@@ -530,7 +530,7 @@ function LIB.GetPostDataCRC(tData, szPassphrase)
 		insert(r, szPassphrase)
 	end
 	for _, v in ipairs(a) do
-		if v.k ~= '_' and v.k ~= 'crc' then
+		if v.k ~= '_' and v.k ~= '_c' then
 			insert(r, tostring(v.k) .. ':' .. tostring(v.v))
 		end
 	end
@@ -539,8 +539,8 @@ end
 end
 
 function LIB.SignPostData(tData, szPassphrase)
-	local szCRC = LIB.GetPostDataCRC(tData, szPassphrase)
-	tData.crc = szCRC
+	tData._t = GetCurrentTime()
+	tData._c = LIB.GetPostDataCRC(tData, szPassphrase)
 	tData._ = GetCurrentTime()
 	return tData
 end
