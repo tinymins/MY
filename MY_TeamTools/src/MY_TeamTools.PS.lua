@@ -109,48 +109,6 @@ function PS.OnPanelActive(wnd)
 	nX, nY = MY_SocialRequest.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
 
 	nX, nY = MY_TeamRestore.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
-
-	nX = X
-	nY = nY + 10
-	nY = nY + ui:Append('Text', { x = nX, y = nY, text = _L['Character Certification'], font = 27 }):Height() + 5
-	nX = X + 10
-	nX = nX + ui:Append('Text', { x = nX, y = nY, w = 'auto', text = _L('Current character: %s', GetUserRoleName()) }):Width() + 30
-	nX = nX + ui:Append('Text', { x = nX, y = nY, w = 'auto', text = _L['Status: '] }):Width()
-	nX = nX + ui:Append('Text', { name = 'Text_CCStatus', x = nX, y = nY, w = 100, text = _L['Loading'] }):Width()
-	nX = nX + ui:Append('WndButton', { name = 'Btn_CCStatus', x = nX, y = nY + 2, buttonstyle = 2, text = _L['Bind'], enable = false }):Width()
-
-	nX = X
-	nY = nY + 20
-	-- tips
-	nY = nY + 28
-	ui:Append('Text', { text = _L['Tips'], x = X, y = nY, font = 27 })
-	nX = X + 10
-	nY = nY + 35
-
-	nY = nY + ui:Append('Text', {
-		x = nX, y = nY, w = W - nX * 2, multiline = true, valign = 0,
-		r = 255, g = 255, b = 0,
-		text = _L['1. Character certification is the most important thing you should do before JX3BOX pve ranking.'],
-	}):AutoHeight():Height() + 3
-	nY = nY + ui:Append('Text', {
-		x = nX, y = nY, w = W - nX * 2, multiline = true, valign = 0,
-		r = 255, g = 255, b = 0,
-		text = _L['2. Only with the "share" checkbox above checked and character certificated, you can join the ranking.'],
-	}):AutoHeight():Height() + 3
-	nY = nY + ui:Append('Text', {
-		x = nX, y = nY, w = W - nX * 2, multiline = true, valign = 0,
-		r = 255, g = 255, b = 0,
-		text = _L['3. Character certification will bind role with JX3BOX account, and will upload some information.'],
-		}):AutoHeight():Height() + 3
-	nY = nY + ui:Append('Text', {
-		x = nX, y = nY, w = W - nX * 2, multiline = true, valign = 0,
-		r = 255, g = 255, b = 0,
-		text = _L['4. Checked the "share" checkbox, will upload team member info while killing dungeon bosses.'],
-	}):AutoHeight():Height() + 3
-	nY = nY + ui:Append('Text', {
-		x = nX, y = nY, w = W - nX * 2, multiline = true, valign = 0,
-		r = 255, g = 255, b = 0,
-		text = _L['5. For further information, please visit JX3BOX.'],
-	}):AutoHeight():Height() + 3
+	nX, nY = MY_JBind.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
 end
 LIB.RegisterPanel('MY_TeamTools', _L['MY_TeamTools'], _L['Raid'], 5962, PS)
