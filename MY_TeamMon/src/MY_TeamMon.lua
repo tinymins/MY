@@ -1499,14 +1499,16 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 		end
 	end
 	if data then
-		local nClass = szEvent == 'TALK' and MY_TM_TYPE.TALK_MONITOR or MY_TM_TYPE.CHAT_MONITOR
+		local nClass = szEvent == 'TALK'
+			and MY_TM_TYPE.TALK_MONITOR
+			or MY_TM_TYPE.CHAT_MONITOR
+		if data.szContent:find('$me', nil, true) then
+			dwReceiverID = me.dwID
+			szReceiver = me.szName
+		end
 		D.CountdownEvent(data, nClass, szSender, szReceiver)
 		local cfg = data[nClass]
 		if cfg then
-			if data.szContent:find('$me') then
-				dwReceiverID = me.dwID
-				szReceiver = me.szName
-			end
 			local aXml, aText, aTalkXml, aTalkText = {}, {}, {}, {}
 			local szNote = nil
 			if data.szNote then
