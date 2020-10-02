@@ -448,3 +448,63 @@ LIB.RegisterBgMsg('MY_OUTPUT_BUFF', function(_, data, nChannel, dwTalkerID, szTa
 	end
 	Output(aRes)
 end)
+
+
+-- ½ÇÉ« GlobalID
+do local LAST_TIME
+LIB.RegisterBgMsg('MY_GLOBAL_ID_REQUEST', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
+	if bSelf then
+		--[[#DEBUG BEGIN]]
+		LIB.Debug(PACKET_INFO.NAME_SPACE, 'Global id request sent.', DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
+		return
+	end
+	local aRequestID, aRefreshID = data[1], data[2]
+	local dwID = UI_GetClientPlayerID()
+	local bRequest, bRefresh, bResponse = false, false, false
+	if not bResponse then
+		if aRequestID then
+			for _, v in ipairs(aRequestID) do
+				if bRequest then
+					break
+				end
+				if v == dwID then
+					bRequest = true
+				end
+			end
+		else
+			bRequest = true
+		end
+		if bRequest then
+			bResponse = true
+		end
+	end
+	if not bResponse then
+		if aRefreshID then
+			for _, v in ipairs(aRefreshID) do
+				if bRefresh then
+					break
+				end
+				if v == dwID then
+					bRefresh = true
+				end
+			end
+		else
+			bRefresh = true
+		end
+		if bRefresh then
+			if not LAST_TIME then
+				bResponse = true
+			end
+		end
+	end
+	--[[#DEBUG BEGIN]]
+	LIB.Debug(PACKET_INFO.NAME_SPACE, 'Global id request from ' .. szTalkerName
+		.. ', will ' .. (bResponse and '' or 'not ') .. 'response.', DEBUG_LEVEL.LOG)
+	--[[#DEBUG END]]
+	if bResponse then
+		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GLOBAL_ID', LIB.GetClientUUID(), true)
+		LAST_TIME = GetCurrentTime()
+	end
+end)
+end
