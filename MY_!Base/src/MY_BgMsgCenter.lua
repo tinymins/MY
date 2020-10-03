@@ -459,6 +459,9 @@ LIB.RegisterBgMsg('MY_GLOBAL_ID_REQUEST', function(_, data, nChannel, dwTalkerID
 		--[[#DEBUG END]]
 		return
 	end
+	if LAST_TIME + 5 > GetCurrentTime() then
+		return
+	end
 	local aRequestID, aRefreshID = data[1], data[2]
 	local dwID = UI_GetClientPlayerID()
 	local bRequest, bRefresh, bResponse = false, false, false
