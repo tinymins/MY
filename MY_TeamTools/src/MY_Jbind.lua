@@ -90,12 +90,18 @@ function D.FetchBindStatus(resolve, reject)
 end
 
 function D.Bind(szToken, resolve, reject)
+	local dwID = UI_GetClientPlayerID()
+	if IsRemotePlayer(dwID) then
+		LIB.Alert(_L['You are crossing server, please do this after backing.'])
+		return
+	end
 	local me = GetClientPlayer()
 	local szURL = 'https://push.j3cx.com/role/bind?'
 		.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
 			token = AnsiToUTF8(szToken),
 			jx3id = AnsiToUTF8(LIB.GetClientUUID()),
 			server = AnsiToUTF8(LIB.GetRealServer(2)),
+			id = AnsiToUTF8(dwID),
 			name = AnsiToUTF8(LIB.GetUserRoleName()),
 			mount = me.GetKungfuMount().dwMountType,
 			type = me.nRoleType,
