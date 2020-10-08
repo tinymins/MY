@@ -173,7 +173,7 @@ function LIB.OutputTeamMemberTip(Rect, dwID, szExtraXml)
 		insert(xml, GetFormatText(FormatString(g_tStrings.TIP_PLAYER_ID, dwID), 102))
 		local szGUID = LIB.GetPlayerGUID(dwID)
 		if szGUID then
-			insert(xml, GetFormatText(szGUID .. '\n', 102))
+			insert(xml, GetFormatText('GUID: ' .. szGUID .. '\n', 102))
 		end
 	end
 	Rect = ConvRectEl(Rect)
