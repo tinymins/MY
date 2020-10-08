@@ -206,8 +206,9 @@ LIB.RegisterEvent({
 				-- мет╠
 				for _, dwTarID in ipairs(team.GetTeamMemberList()) do
 					local info = team.GetMemberInfo(dwTarID)
+					local guid = LIB.GetPlayerGUID(dwTarID) or 0
 					if info then
-						insert(aTeammate, info.szName .. ',' .. info.dwMountKungfuID)
+						insert(aTeammate, info.szName .. ',' .. info.dwMountKungfuID .. ',' .. guid)
 					end
 				end
 			else
