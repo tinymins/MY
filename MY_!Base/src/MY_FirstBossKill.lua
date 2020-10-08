@@ -81,6 +81,7 @@ function D.ShareBKR(p, bOnymous, onfulfilled, oncomplete)
 	local szNameU = AnsiToUTF8(p.szName)
 	local szLeaderU = AnsiToUTF8(p.szLeader)
 	local szTeammateU = AnsiToUTF8(p.szTeammate)
+	local szClientGUIDU = AnsiToUTF8(p.szClientGUID)
 	local szURL = 'https://push.j3cx.com/api/bkr/uploads?'
 		.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
 			g = AnsiToUTF8(LIB.GetLang()),
@@ -88,6 +89,7 @@ function D.ShareBKR(p, bOnymous, onfulfilled, oncomplete)
 			n = szNameU,
 			l = szLeaderU,
 			m = szTeammateU,
+			u = szClientGUIDU,
 			a = p.dwAchieveID,
 			t = p.dwTime,
 			d = p.nFightTime,
@@ -220,6 +222,7 @@ LIB.RegisterEvent({
 				dwAchieveID = dwAchieveID,
 				dwTime = GetCurrentTime(),
 				nFightTime = LIB.GetFightTime(),
+				szClientGUID = LIB.GetClientGUID(),
 			}
 			insert(BOSS_ACHIEVE_ACQUIRE_LOG, rec)
 			BOSS_ACHIEVE_ACQUIRE_STATE[dwAchieveID] = true
