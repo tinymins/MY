@@ -57,6 +57,7 @@ local O = {
 }
 RegisterCustomData('MY_FirstBossKill.bEnable')
 
+local BOSS_MAP_ACHIEVE_ACQUIRE = LIB.LoadLUAData({'temporary/fbk-achieves.jx3dat', PATH_TYPE.GLOBAL}) -- 地图对应的上报成就表（远程）
 local BOSS_ACHIEVE_ACQUIRE_LOG = {} -- 等待上传的首领击杀信息
 local BOSS_ACHIEVE_ACQUIRE_STATE = {} -- 当前地图首领击杀状态
 local DATA_FILE = {'data/boss_achieve_acquire.jx3dat', PATH_TYPE.ROLE}
@@ -134,14 +135,36 @@ function D.CheckUpdateAcquire()
 	end
 end
 
-LIB.RegisterEvent('LOADING_ENDING.MY_FirstBossKill', function()
+function D.UpdateMapBossAchieveAcquire()
 	if not LIB.IsInDungeon() then
 		return
+	end
+	if not BOSS_MAP_ACHIEVE_ACQUIRE then
+		LIB.Ajax({
+			method = 'get',
+			url = 'https://cdn.j3cx.com/config/fbk-achieves.json'
+				.. '?lang=' .. LIB.GetLang()
+				.. '&_=' .. GetCurrentTime(),
+			success = function(html, status)
+				local data = LIB.JsonDecode(html)
+				if IsTable(data) then
+					BOSS_MAP_ACHIEVE_ACQUIRE = data
+					LIB.SaveLUAData(
+						{'temporary/fbk-achieves.jx3dat', PATH_TYPE.GLOBAL},
+						data)
+					D.UpdateMapBossAchieveAcquire()
+				end
+			end,
+		})
 	end
 	local me = GetClientPlayer()
 	local dwMapID = me.GetMapID()
 	local tBossAchieveAcquireState = {}
-	for _, dwAchieveID in ipairs(LIB.GetMapAchievements(dwMapID) or CONSTANT.EMPTY_TABLE) do
+	for _, dwAchieveID in sipairs(
+		LIB.GetMapAchievements(dwMapID) or CONSTANT.EMPTY_TABLE,
+		IsTable(BOSS_MAP_ACHIEVE_ACQUIRE) and BOSS_MAP_ACHIEVE_ACQUIRE[dwMapID] or CONSTANT.EMPTY_TABLE,
+		IsTable(BOSS_MAP_ACHIEVE_ACQUIRE) and BOSS_MAP_ACHIEVE_ACQUIRE['*'] or CONSTANT.EMPTY_TABLE
+	) do
 		local achi = Table_GetAchievement(dwAchieveID)
 		if achi and wfind(achi.szName, _L['Full win']) then
 			for _, s in ipairs(LIB.SplitString(achi.szSubAchievements, '|', true)) do
@@ -159,7 +182,8 @@ LIB.RegisterEvent('LOADING_ENDING.MY_FirstBossKill', function()
 	end
 	--[[#DEBUG END]]
 	BOSS_ACHIEVE_ACQUIRE_STATE = tBossAchieveAcquireState
-end)
+end
+LIB.RegisterEvent('LOADING_ENDING.MY_FirstBossKill', D.UpdateMapBossAchieveAcquire)
 
 LIB.RegisterEvent({
 	'NEW_ACHIEVEMENT.MY_FirstBossKill',
