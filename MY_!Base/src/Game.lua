@@ -1790,6 +1790,7 @@ function LIB.GetClientInfo(arg0)
 			m_ClientInfo.dwPetID           = me.dwPetID
 			m_ClientInfo.dwMapID           = me.GetMapID()
 			m_ClientInfo.szMapName         = Table_GetMapName(me.GetMapID())
+			m_ClientInfo.szGlobalID        = me.GetGlobalID()
 		end
 	end
 	if not m_ClientInfo then
@@ -4304,4 +4305,46 @@ function LIB.IsMacroValid(szMacro)
 	end
 	return true
 end
+end
+
+do
+	local REQUEST_TIME = {}
+	local PLAYER_GUID = {}
+	local function RequestTeammateGUID()
+		local me = GetClientPlayer()
+		local team = GetClientTeam()
+		if not me or IsRemotePlayer(me.dwID) or not team or not me.IsInParty() then
+			return
+		end
+		local nTime = GetTime()
+		local aRequestGUID = {}
+		for _, dwTarID in ipairs(team.GetTeamMemberList()) do
+			local info = team.GetMemberInfo(dwTarID)
+			if not PLAYER_GUID[dwTarID]
+			and (info and info.bIsOnLine)
+			and (not REQUEST_TIME[dwTarID] or nTime - REQUEST_TIME[dwTarID] > 2000) then
+				insert(aRequestGUID, dwTarID)
+				REQUEST_TIME[dwTarID] = nTime
+			end
+		end
+		if not IsEmpty(aRequestGUID) then
+			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GLOBAL_ID_REQUEST', {aRequestGUID}, true)
+		end
+	end
+	LIB.RegisterEvent('LOADING_END', RequestTeammateGUID)
+	LIB.RegisterEvent('PARTY_UPDATE_BASE_INFO', RequestTeammateGUID)
+	LIB.RegisterEvent('PARTY_LEVEL_UP_RAID', RequestTeammateGUID)
+	LIB.RegisterEvent('PARTY_ADD_MEMBER', RequestTeammateGUID)
+	LIB.RegisterEvent('PARTY_SET_MEMBER_ONLINE_FLAG', RequestTeammateGUID)
+
+	LIB.RegisterBgMsg('MY_GLOBAL_ID', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
+		PLAYER_GUID[dwTalkerID] = data
+	end)
+
+	function LIB.GetPlayerGUID(dwID)
+		if dwID == UI_GetClientPlayerID() then
+			return LIB.GetClientInfo('szGlobalID')
+		end
+		return PLAYER_GUID[dwID]
+	end
 end
