@@ -99,6 +99,7 @@ function D.Bind(szToken, resolve, reject)
 	local szURL = 'https://push.j3cx.com/role/bind?'
 		.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
 			token = AnsiToUTF8(szToken),
+			cguid = LIB.GetClientGUID(),
 			jx3id = AnsiToUTF8(LIB.GetClientUUID()),
 			server = AnsiToUTF8(LIB.GetRealServer(2)),
 			id = AnsiToUTF8(dwID),
