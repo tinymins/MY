@@ -501,10 +501,11 @@ end
 local GUID
 function LIB.GetClientGUID()
 	if not GUID then
-		GUID = MD5(
-			GetLUADataPathPassphrase(LIB.GetLUADataPath({'GUID', PATH_TYPE.GLOBAL}))
-				.. '::' .. EncodeLUAData({GetSystemCScreen()})
-			)
+		local szRandom = GetLUADataPathPassphrase(LIB.GetLUADataPath({'GUID', PATH_TYPE.GLOBAL}))
+		local szPrefix = MD5(szRandom):sub(1, 4)
+		local nCSW, nCSH = GetSystemCScreen()
+		local szCS = MD5(nCSW .. ',' .. nCSH):sub(1, 4)
+		GUID = ('%s%X%s'):format(szPrefix, GetStringCRC(szRandom), szCS)
 	end
 	return GUID
 end
