@@ -136,9 +136,6 @@ function D.CheckUpdateAcquire()
 end
 
 function D.UpdateMapBossAchieveAcquire()
-	if not LIB.IsInDungeon() then
-		return
-	end
 	if not BOSS_MAP_ACHIEVE_ACQUIRE then
 		LIB.Ajax({
 			method = 'get',
