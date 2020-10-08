@@ -171,6 +171,10 @@ function LIB.OutputTeamMemberTip(Rect, dwID, szExtraXml)
 	end
 	if IsCtrlKeyDown() then
 		insert(xml, GetFormatText(FormatString(g_tStrings.TIP_PLAYER_ID, dwID), 102))
+		local szGUID = LIB.GetPlayerGUID(dwID)
+		if szGUID then
+			insert(xml, GetFormatText(szGUID .. '\n', 102))
+		end
 	end
 	Rect = ConvRectEl(Rect)
 	OutputTip(concat(xml), 345, Rect)
