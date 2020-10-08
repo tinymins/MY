@@ -76,7 +76,7 @@ function D.OnAlertPetChange(_, bAlertPet)
 	if bAlertPet then
 		LIB.RegisterEvent('NPC_LEAVE_SCENE.MY_Force__AlertPet', function()
 			local me = GetClientPlayer()
-			if me then
+			if me and me.dwForceID == FORCE_TYPE.WU_DU then
 				local pet = me.GetPet()
 				if pet and pet.dwID == arg0 and (GetLogicFrameCount() - O.nFrameXJ) >= 32 then
 					OutputWarningMessage('MSG_WARNING_YELLOW', _L('Your pet [%s] disappeared!',  pet.szName))
