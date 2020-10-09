@@ -25,6 +25,7 @@ return {
 
     ['Save history on exit'] = '退出游戲時保存數據',
     ['Save history immediately'] = '脫離戰鬥時保存數據',
+    ['Rec everything only in dungeon'] = '僅在秘境中啟用復盤',
     ['Do not save history everything'] = '不保存歷史復盤數據',
 
     ['Display as per second'            ] = '顯示每秒平均數值',

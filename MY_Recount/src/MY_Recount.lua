@@ -506,6 +506,17 @@ function D.GetHistoryMenu()
 	insert(t, tt)
 
 	insert(t, { bDevide = true })
+	if MY_Recount_DS.bRecEverything and (not MY_Recount_DS.bREOnlyDungeon or IsShiftKeyDown()) then
+		insert(t, {
+			szOption = _L['Rec everything only in dungeon'],
+			bCheck = true,
+			bChecked = MY_Recount_DS.bREOnlyDungeon,
+			fnAction = function()
+				MY_Recount_DS.bREOnlyDungeon = not MY_Recount_DS.bREOnlyDungeon
+			end,
+			fnDisable = function() return not MY_Recount_DS.bRecEverything end,
+		})
+	end
 	insert(t, {
 		szOption = _L['Save history on exit'],
 		bCheck = true, bChecked = MY_Recount_DS.bSaveHistoryOnExit,

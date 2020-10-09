@@ -413,7 +413,9 @@ local EVERYTHING_TYPE = {
 }
 local VERSION = 2
 
-local D = {}
+local D = {
+	bRecEverything = false, -- 计算出来的是否采集复盘数据开关，过图重算
+}
 local O = {
 	bEnable            = false, -- 数据记录总开关 防止官方SB技能BUFF脚本瞎几把写超高频太卡甩锅给界面逻辑
 	bSaveHistoryOnExit = false, -- 退出游戏时保存历史数据
@@ -421,6 +423,7 @@ local O = {
 	nMaxHistory        = 10   , -- 最大历史数据数量
 	nMinFightTime      = 30   , -- 最小战斗时间
 	bRecEverything     = true , -- 是否采集复盘数据
+	bREOnlyDungeon     = true , -- 仅在秘境中启用
 	bSaveEverything    = false, -- 保存战斗记录时是否存储复盘数据
 }
 local Data          -- 当前战斗数据记录
@@ -473,13 +476,14 @@ function D.LoadData()
 			end
 			D.SaveHistory()
 		end
-		O.bEnable            = data.bEnable or false
-		O.bSaveHistoryOnExit = data.bSaveHistoryOnExit or data.bSaveHistory or false
-		O.bSaveHistoryOnExFi = data.bSaveHistoryOnExFi or false
-		O.nMaxHistory        = data.nMaxHistory or 10
-		O.nMinFightTime      = data.nMinFightTime or 30
-		O.bRecEverything     = data.bRecEverything or false
-		O.bSaveEverything    = data.bSaveEverything1 or false
+		O.bEnable            = Get(data, 'bEnable', false)
+		O.bSaveHistoryOnExit = Get(data, 'bSaveHistoryOnExit', false)
+		O.bSaveHistoryOnExFi = Get(data, 'bSaveHistoryOnExFi', false)
+		O.nMaxHistory        = Get(data, 'nMaxHistory', 10)
+		O.nMinFightTime      = Get(data, 'nMinFightTime', 30)
+		O.bRecEverything     = Get(data, 'bRecEverything', false)
+		O.bREOnlyDungeon     = Get(data, 'bREOnlyDungeon', true)
+		O.bSaveEverything    = Get(data, 'bSaveEverything1', false)
 		MY_Recount_UI.CheckOpen()
 	end
 	D.InitData()
@@ -494,6 +498,7 @@ function D.SaveData()
 		nMaxHistory        = O.nMaxHistory       ,
 		nMinFightTime      = O.nMinFightTime     ,
 		bRecEverything     = O.bRecEverything    ,
+		bREOnlyDungeon     = O.bREOnlyDungeon    ,
 		bSaveEverything1   = O.bSaveEverything   ,
 	}
 	LIB.SaveLUAData(SZ_CFG_FILE, data, DS_DATA_CONFIG)
@@ -608,11 +613,16 @@ function D.SaveHistory()
 	UNSAVED_CACHE = {}
 end
 
+function D.UpdateIsRecEverything()
+	D.bRecEverything = O.bRecEverything and (not O.bREOnlyDungeon or LIB.IsInDungeon())
+end
+
 -- 过图清除当前战斗数据
 do
 local function onLoadingEnding()
 	D.Flush()
 	ABSORB_CACHE = {}
+	D.UpdateIsRecEverything()
 	FireUIEvent('MY_RECOUNT_NEW_FIGHT')
 end
 LIB.RegisterEvent('LOADING_ENDING', onLoadingEnding)
@@ -1006,7 +1016,7 @@ end
 
 -- 插入复盘数据
 function D.InsertEverything(data, nLFC, nTime, nTick, szName, ...)
-	if not O.bRecEverything then
+	if not D.bRecEverything then
 		return
 	end
 	insert(data[DK.EVERYTHING], {nLFC, nTime, nTick, szName, ...})
@@ -2276,6 +2286,7 @@ local settings = {
 				nMaxHistory        = true,
 				nMinFightTime      = true,
 				bRecEverything     = true,
+				bREOnlyDungeon     = true,
 				bSaveEverything    = true,
 			},
 			root = O,
@@ -2290,11 +2301,13 @@ local settings = {
 				nMaxHistory        = true,
 				nMinFightTime      = true,
 				bRecEverything     = true,
+				bREOnlyDungeon     = true,
 				bSaveEverything    = true,
 			},
 			triggers = {
 				bEnable = function()
 					D.SaveData()
+					D.UpdateIsRecEverything()
 					MY_Recount_UI.CheckOpen()
 				end,
 				bSaveHistoryOnExit = D.SaveData,
@@ -2302,6 +2315,10 @@ local settings = {
 				nMaxHistory        = D.SaveData,
 				nMinFightTime      = D.SaveData,
 				bRecEverything     = D.SaveData,
+				bREOnlyDungeon = function()
+					D.SaveData()
+					D.UpdateIsRecEverything()
+				end,
 				bSaveEverything    = D.SaveData,
 			},
 			root = O,
