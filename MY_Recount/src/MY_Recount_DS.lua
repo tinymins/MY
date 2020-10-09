@@ -422,7 +422,7 @@ local O = {
 	bSaveHistoryOnExFi = false, -- 脱离战斗时保存历史数据
 	nMaxHistory        = 10   , -- 最大历史数据数量
 	nMinFightTime      = 30   , -- 最小战斗时间
-	bRecEverything     = true , -- 是否采集复盘数据
+	bRecEverything     = false, -- 是否采集复盘数据
 	bREOnlyDungeon     = true , -- 仅在秘境中启用
 	bSaveEverything    = false, -- 保存战斗记录时是否存储复盘数据
 }
@@ -481,9 +481,9 @@ function D.LoadData()
 		O.bSaveHistoryOnExFi = Get(data, 'bSaveHistoryOnExFi', false)
 		O.nMaxHistory        = Get(data, 'nMaxHistory', 10)
 		O.nMinFightTime      = Get(data, 'nMinFightTime', 30)
-		O.bRecEverything     = Get(data, 'bRecEverything', false)
+		O.bRecEverything     = false -- Get(data, 'bRecEverything', false)
 		O.bREOnlyDungeon     = Get(data, 'bREOnlyDungeon', true)
-		O.bSaveEverything    = Get(data, 'bSaveEverything1', false)
+		O.bSaveEverything    = false -- Get(data, 'bSaveEverything', false)
 		MY_Recount_UI.CheckOpen()
 	end
 	D.InitData()
@@ -499,7 +499,7 @@ function D.SaveData()
 		nMinFightTime      = O.nMinFightTime     ,
 		bRecEverything     = O.bRecEverything    ,
 		bREOnlyDungeon     = O.bREOnlyDungeon    ,
-		bSaveEverything1   = O.bSaveEverything   ,
+		bSaveEverything    = O.bSaveEverything   ,
 	}
 	LIB.SaveLUAData(SZ_CFG_FILE, data, DS_DATA_CONFIG)
 end
