@@ -140,7 +140,7 @@ end
 function D.UpdateMapBossAchieveAcquire()
 	if not BOSS_MAP_ACHIEVE_ACQUIRE then
 		LIB.Ajax({
-			method = 'get',
+			driver = 'auto', mode = 'auto', method = 'auto',
 			url = 'https://cdn.j3cx.com/config/fbk-achieves.json'
 				.. '?lang=' .. LIB.GetLang()
 				.. '&_=' .. GetCurrentTime(),
