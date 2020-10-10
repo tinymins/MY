@@ -135,7 +135,7 @@ MY_ItemWiki = LIB.GeneGlobalNS(settings)
 end
 
 Box_AppendAddonMenu({function(box)
-	if not IsElement(box) or box:GetType() ~= 'Box' then
+	if not IsElement(box) or box:GetType() ~= 'Box' or not O.bEnable then
 		return
 	end
 	local _, dwBox, dwX = box:GetObjectData()
