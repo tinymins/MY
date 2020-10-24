@@ -817,6 +817,7 @@ local FORCE_TYPE = FORCE_TYPE or SetmetaReadonly({
 	MING_JIAO = 10, -- √˜ΩÃ
 	CANG_YUN  = 21, -- ≤‘‘∆
 	LING_XUE  = 25, -- ¡Ë—©
+	YAN_TIAN  = 211, -- —‹ÃÏ
 })
 local CONSTANT = setmetatable({}, {
 	__index = {
@@ -1086,6 +1087,7 @@ local CONSTANT = setmetatable({}, {
 				{ FORCE_TYPE.BA_DAO   , { 106, 108, 189 } }, -- ∞‘µ∂
 				{ FORCE_TYPE.PENG_LAI , { 171, 227, 250 } }, -- ≈Ó¿≥
 				{ FORCE_TYPE.LING_XUE , IsStreaming() and { 253, 86, 86 } or { 161,   9,  34 } }, -- ¡Ë—©
+				{ FORCE_TYPE.YAN_TIAN , { 166,  83, 251 } }, -- —‹ÃÏ
 			}),
 			{
 				__index = function(t, k)
@@ -1095,22 +1097,23 @@ local CONSTANT = setmetatable({}, {
 			}),
 		FORCE_COLOR_BG_DEFAULT = setmetatable(
 			KvpToObject({
-				{ FORCE_TYPE.JIANG_HU , { 220, 220, 220 }}, -- Ω≠∫˛
-				{ FORCE_TYPE.SHAO_LIN , { 125, 112,  10 }}, -- …Ÿ¡÷
-				{ FORCE_TYPE.WAN_HUA  , {  47,  14,  70 }}, -- ÕÚª®
-				{ FORCE_TYPE.TIAN_CE  , { 105,  14,  14 }}, -- ÃÏ≤ﬂ
-				{ FORCE_TYPE.CHUN_YANG, {   8,  90, 113 }}, -- ¥ø—Ù 56,175,255,232
-				{ FORCE_TYPE.QI_XIU   , { 162,  74, 129 }}, -- ∆ﬂ–„
-				{ FORCE_TYPE.WU_DU    , {   7,  82, 154 }}, -- ŒÂ∂æ
-				{ FORCE_TYPE.TANG_MEN , {  75, 113,  40 }}, -- Ã∆√≈
-				{ FORCE_TYPE.CANG_JIAN, { 148, 152,  27 }}, -- ≤ÿΩ£
-				{ FORCE_TYPE.GAI_BANG , { 159, 102,  37 }}, -- ÿ§∞Ô
-				{ FORCE_TYPE.MING_JIAO, { 145,  80,  17 }}, -- √˜ΩÃ
-				{ FORCE_TYPE.CANG_YUN , { 157,  47,   2 }}, -- ≤‘‘∆
-				{ FORCE_TYPE.CHANG_GE , {  31, 120, 103 }}, -- ≥§∏Ë
-				{ FORCE_TYPE.BA_DAO   , {  49,  39, 110 }}, -- ∞‘µ∂
-				{ FORCE_TYPE.PENG_LAI , {  93,  97, 126 }}, -- ≈Ó¿≥
-				{ FORCE_TYPE.LING_XUE , { 161,   9,  34 }}, -- ¡Ë—©
+				{ FORCE_TYPE.JIANG_HU , { 220, 220, 220 } }, -- Ω≠∫˛
+				{ FORCE_TYPE.SHAO_LIN , { 125, 112,  10 } }, -- …Ÿ¡÷
+				{ FORCE_TYPE.WAN_HUA  , {  47,  14,  70 } }, -- ÕÚª®
+				{ FORCE_TYPE.TIAN_CE  , { 105,  14,  14 } }, -- ÃÏ≤ﬂ
+				{ FORCE_TYPE.CHUN_YANG, {   8,  90, 113 } }, -- ¥ø—Ù 56,175,255,232
+				{ FORCE_TYPE.QI_XIU   , { 162,  74, 129 } }, -- ∆ﬂ–„
+				{ FORCE_TYPE.WU_DU    , {   7,  82, 154 } }, -- ŒÂ∂æ
+				{ FORCE_TYPE.TANG_MEN , {  75, 113,  40 } }, -- Ã∆√≈
+				{ FORCE_TYPE.CANG_JIAN, { 148, 152,  27 } }, -- ≤ÿΩ£
+				{ FORCE_TYPE.GAI_BANG , { 159, 102,  37 } }, -- ÿ§∞Ô
+				{ FORCE_TYPE.MING_JIAO, { 145,  80,  17 } }, -- √˜ΩÃ
+				{ FORCE_TYPE.CANG_YUN , { 157,  47,   2 } }, -- ≤‘‘∆
+				{ FORCE_TYPE.CHANG_GE , {  31, 120, 103 } }, -- ≥§∏Ë
+				{ FORCE_TYPE.BA_DAO   , {  49,  39, 110 } }, -- ∞‘µ∂
+				{ FORCE_TYPE.PENG_LAI , {  93,  97, 126 } }, -- ≈Ó¿≥
+				{ FORCE_TYPE.LING_XUE , { 161,   9,  34 } }, -- ¡Ë—©
+				{ FORCE_TYPE.YAN_TIAN , {  96,  45, 148 } }, -- —‹ÃÏ
 			}),
 			{
 				__index = function(t, k)
