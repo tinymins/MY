@@ -780,6 +780,15 @@ end
 -----------------------------------------------
 -- 枚举
 -----------------------------------------------
+local function KvpToObject(kvp)
+	local t = {}
+	for _, v in ipairs(kvp) do
+		if not IsNil(v[1]) then
+			t[v[1]] = v[2]
+		end
+	end
+	return t
+end
 local DEBUG_LEVEL = SetmetaReadonly({
 	PMLOG   = 0,
 	LOG     = 1,
@@ -1034,95 +1043,105 @@ local CONSTANT = setmetatable({}, {
 			{ dwID = 10533, nIcon = 10709, szUITex = 'ui/image/icon/JNPL_18_10_30_27.uitex'  , nFrame = 45 }, -- 蓬莱
 			{ dwID = 10585, nIcon = 12128, szUITex = 'ui/image/icon/JNLXG_19_10_21_9.uitex'  , nFrame = 74 }, -- 凌雪
 		},
-		FORCE_AVATAR = setmetatable({
-			[FORCE_TYPE.JIANG_HU ] = { 'ui\\Image\\PlayerAvatar\\jianghu.tga'  , -2, false }, -- 江湖
-			[FORCE_TYPE.SHAO_LIN ] = { 'ui\\Image\\PlayerAvatar\\shaolin.tga'  , -2, false }, -- 少林
-			[FORCE_TYPE.WAN_HUA  ] = { 'ui\\Image\\PlayerAvatar\\wanhua.tga'   , -2, false }, -- 万花
-			[FORCE_TYPE.TIAN_CE  ] = { 'ui\\Image\\PlayerAvatar\\tiance.tga'   , -2, false }, -- 天策
-			[FORCE_TYPE.CHUN_YANG] = { 'ui\\Image\\PlayerAvatar\\chunyang.tga' , -2, false }, -- 纯阳
-			[FORCE_TYPE.QI_XIU   ] = { 'ui\\Image\\PlayerAvatar\\qixiu.tga'    , -2, false }, -- 七秀
-			[FORCE_TYPE.WU_DU    ] = { 'ui\\Image\\PlayerAvatar\\wudu.tga'     , -2, false }, -- 五毒
-			[FORCE_TYPE.TANG_MEN ] = { 'ui\\Image\\PlayerAvatar\\tangmen.tga'  , -2, false }, -- 唐门
-			[FORCE_TYPE.CANG_JIAN] = { 'ui\\Image\\PlayerAvatar\\cangjian.tga' , -2, false }, -- 藏剑
-			[FORCE_TYPE.GAI_BANG ] = { 'ui\\Image\\PlayerAvatar\\gaibang.tga'  , -2, false }, -- 丐帮
-			[FORCE_TYPE.MING_JIAO] = { 'ui\\Image\\PlayerAvatar\\mingjiao.tga' , -2, false }, -- 明教
-			[FORCE_TYPE.CANG_YUN ] = { 'ui\\Image\\PlayerAvatar\\cangyun.tga'  , -2, false }, -- 苍云
-			[FORCE_TYPE.CHANG_GE ] = { 'ui\\Image\\PlayerAvatar\\changge.tga'  , -2, false }, -- 长歌
-			[FORCE_TYPE.BA_DAO   ] = { 'ui\\Image\\PlayerAvatar\\badao.tga'    , -2, false }, -- 霸刀
-			[FORCE_TYPE.PENG_LAI ] = { 'ui\\Image\\PlayerAvatar\\penglai.tga'  , -2, false }, -- 蓬莱
-			[FORCE_TYPE.LING_XUE ] = { 'ui\\Image\\PlayerAvatar\\lingxuege.tga', -2, false }, -- 凌雪
-		}, {
-			__index = function(t, k)
-				return t[FORCE_TYPE.JIANG_HU]
-			end,
-			__metatable = true,
-		}),
-		FORCE_COLOR_FG_DEFAULT = setmetatable({
-			[FORCE_TYPE.JIANG_HU ] = { 255, 255, 255 }, -- 江湖
-			[FORCE_TYPE.SHAO_LIN ] = { 255, 178,  95 }, -- 少林
-			[FORCE_TYPE.WAN_HUA  ] = { 196, 152, 255 }, -- 万花
-			[FORCE_TYPE.TIAN_CE  ] = { 255, 111,  83 }, -- 天策
-			[FORCE_TYPE.CHUN_YANG] = {  22, 216, 216 }, -- 纯阳
-			[FORCE_TYPE.QI_XIU   ] = { 255, 129, 176 }, -- 七秀
-			[FORCE_TYPE.WU_DU    ] = {  55, 147, 255 }, -- 五毒
-			[FORCE_TYPE.TANG_MEN ] = { 121, 183,  54 }, -- 唐门
-			[FORCE_TYPE.CANG_JIAN] = { 214, 249,  93 }, -- 藏剑
-			[FORCE_TYPE.GAI_BANG ] = { 205, 133,  63 }, -- 丐帮
-			[FORCE_TYPE.MING_JIAO] = { 240,  70,  96 }, -- 明教
-			[FORCE_TYPE.CANG_YUN ] = IsStreaming() and { 255, 143, 80 } or { 180, 60, 0 }, -- 苍云
-			[FORCE_TYPE.CHANG_GE ] = { 100, 250, 180 }, -- 长歌
-			[FORCE_TYPE.BA_DAO   ] = { 106, 108, 189 }, -- 霸刀
-			[FORCE_TYPE.PENG_LAI ] = { 171, 227, 250 }, -- 蓬莱
-			[FORCE_TYPE.LING_XUE ] = IsStreaming() and { 253, 86, 86 } or { 161,   9,  34 }, -- 凌雪
-		}, {
-			__index = function(t, k)
-				return { 225, 225, 225 }
-			end,
-			__metatable = true,
-		}),
-		FORCE_COLOR_BG_DEFAULT = setmetatable({
-			[FORCE_TYPE.JIANG_HU ] = { 220, 220, 220 }, -- 江湖
-			[FORCE_TYPE.SHAO_LIN ] = { 125, 112,  10 }, -- 少林
-			[FORCE_TYPE.WAN_HUA  ] = {  47,  14,  70 }, -- 万花
-			[FORCE_TYPE.TIAN_CE  ] = { 105,  14,  14 }, -- 天策
-			[FORCE_TYPE.CHUN_YANG] = {   8,  90, 113 }, -- 纯阳 56,175,255,232
-			[FORCE_TYPE.QI_XIU   ] = { 162,  74, 129 }, -- 七秀
-			[FORCE_TYPE.WU_DU    ] = {   7,  82, 154 }, -- 五毒
-			[FORCE_TYPE.TANG_MEN ] = {  75, 113,  40 }, -- 唐门
-			[FORCE_TYPE.CANG_JIAN] = { 148, 152,  27 }, -- 藏剑
-			[FORCE_TYPE.GAI_BANG ] = { 159, 102,  37 }, -- 丐帮
-			[FORCE_TYPE.MING_JIAO] = { 145,  80,  17 }, -- 明教
-			[FORCE_TYPE.CANG_YUN ] = { 157,  47,   2 }, -- 苍云
-			[FORCE_TYPE.CHANG_GE ] = {  31, 120, 103 }, -- 长歌
-			[FORCE_TYPE.BA_DAO   ] = {  49,  39, 110 }, -- 霸刀
-			[FORCE_TYPE.PENG_LAI ] = {  93,  97, 126 }, -- 蓬莱
-			[FORCE_TYPE.LING_XUE ] = { 161,   9,  34 }, -- 凌雪
-		}, {
-			__index = function(t, k)
-				return { 200, 200, 200 } -- NPC 以及未知门派
-			end,
-			__metatable = true,
-		}),
-		CAMP_COLOR_FG_DEFAULT = setmetatable({
-			[CAMP.NEUTRAL] = { 255, 255, 255 }, -- 中立
-			[CAMP.GOOD   ] = {  60, 128, 220 }, -- 浩气盟
-			[CAMP.EVIL   ] = IsStreaming() and { 255, 63, 63 } or { 160, 30, 30 }, -- 恶人谷
-		}, {
-			__index = function(t, k)
-				return { 225, 225, 225 }
-			end,
-			__metatable = true,
-		}),
-		CAMP_COLOR_BG_DEFAULT = setmetatable({
-			[CAMP.NEUTRAL] = { 255, 255, 255 }, -- 中立
-			[CAMP.GOOD   ] = {  60, 128, 220 }, -- 浩气盟
-			[CAMP.EVIL   ] = { 160,  30,  30 }, -- 恶人谷
-		}, {
-			__index = function(t, k)
-				return { 225, 225, 225 }
-			end,
-			__metatable = true,
-		}),
+		FORCE_AVATAR = setmetatable(
+			KvpToObject({
+				{ FORCE_TYPE.JIANG_HU , {'ui\\Image\\PlayerAvatar\\jianghu.tga'  , -2, false} }, -- 江湖
+				{ FORCE_TYPE.SHAO_LIN , {'ui\\Image\\PlayerAvatar\\shaolin.tga'  , -2, false} }, -- 少林
+				{ FORCE_TYPE.WAN_HUA  , {'ui\\Image\\PlayerAvatar\\wanhua.tga'   , -2, false} }, -- 万花
+				{ FORCE_TYPE.TIAN_CE  , {'ui\\Image\\PlayerAvatar\\tiance.tga'   , -2, false} }, -- 天策
+				{ FORCE_TYPE.CHUN_YANG, {'ui\\Image\\PlayerAvatar\\chunyang.tga' , -2, false} }, -- 纯阳
+				{ FORCE_TYPE.QI_XIU   , {'ui\\Image\\PlayerAvatar\\qixiu.tga'    , -2, false} }, -- 七秀
+				{ FORCE_TYPE.WU_DU    , {'ui\\Image\\PlayerAvatar\\wudu.tga'     , -2, false} }, -- 五毒
+				{ FORCE_TYPE.TANG_MEN , {'ui\\Image\\PlayerAvatar\\tangmen.tga'  , -2, false} }, -- 唐门
+				{ FORCE_TYPE.CANG_JIAN, {'ui\\Image\\PlayerAvatar\\cangjian.tga' , -2, false} }, -- 藏剑
+				{ FORCE_TYPE.GAI_BANG , {'ui\\Image\\PlayerAvatar\\gaibang.tga'  , -2, false} }, -- 丐帮
+				{ FORCE_TYPE.MING_JIAO, {'ui\\Image\\PlayerAvatar\\mingjiao.tga' , -2, false} }, -- 明教
+				{ FORCE_TYPE.CANG_YUN , {'ui\\Image\\PlayerAvatar\\cangyun.tga'  , -2, false} }, -- 苍云
+				{ FORCE_TYPE.CHANG_GE , {'ui\\Image\\PlayerAvatar\\changge.tga'  , -2, false} }, -- 长歌
+				{ FORCE_TYPE.BA_DAO   , {'ui\\Image\\PlayerAvatar\\badao.tga'    , -2, false} }, -- 霸刀
+				{ FORCE_TYPE.PENG_LAI , {'ui\\Image\\PlayerAvatar\\penglai.tga'  , -2, false} }, -- 蓬莱
+				{ FORCE_TYPE.LING_XUE , {'ui\\Image\\PlayerAvatar\\lingxuege.tga', -2, false} }, -- 凌雪
+			}),
+			{
+				__index = function(t, k)
+					return t[FORCE_TYPE.JIANG_HU]
+				end,
+				__metatable = true,
+			}),
+		FORCE_COLOR_FG_DEFAULT = setmetatable(
+			KvpToObject({
+				{ FORCE_TYPE.JIANG_HU , { 255, 255, 255 } }, -- 江湖
+				{ FORCE_TYPE.SHAO_LIN , { 255, 178,  95 } }, -- 少林
+				{ FORCE_TYPE.WAN_HUA  , { 196, 152, 255 } }, -- 万花
+				{ FORCE_TYPE.TIAN_CE  , { 255, 111,  83 } }, -- 天策
+				{ FORCE_TYPE.CHUN_YANG, {  22, 216, 216 } }, -- 纯阳
+				{ FORCE_TYPE.QI_XIU   , { 255, 129, 176 } }, -- 七秀
+				{ FORCE_TYPE.WU_DU    , {  55, 147, 255 } }, -- 五毒
+				{ FORCE_TYPE.TANG_MEN , { 121, 183,  54 } }, -- 唐门
+				{ FORCE_TYPE.CANG_JIAN, { 214, 249,  93 } }, -- 藏剑
+				{ FORCE_TYPE.GAI_BANG , { 205, 133,  63 } }, -- 丐帮
+				{ FORCE_TYPE.MING_JIAO, { 240,  70,  96 } }, -- 明教
+				{ FORCE_TYPE.CANG_YUN , IsStreaming() and { 255, 143, 80 } or { 180, 60, 0 } }, -- 苍云
+				{ FORCE_TYPE.CHANG_GE , { 100, 250, 180 } }, -- 长歌
+				{ FORCE_TYPE.BA_DAO   , { 106, 108, 189 } }, -- 霸刀
+				{ FORCE_TYPE.PENG_LAI , { 171, 227, 250 } }, -- 蓬莱
+				{ FORCE_TYPE.LING_XUE , IsStreaming() and { 253, 86, 86 } or { 161,   9,  34 } }, -- 凌雪
+			}),
+			{
+				__index = function(t, k)
+					return { 225, 225, 225 }
+				end,
+				__metatable = true,
+			}),
+		FORCE_COLOR_BG_DEFAULT = setmetatable(
+			KvpToObject({
+				{ FORCE_TYPE.JIANG_HU , { 220, 220, 220 }}, -- 江湖
+				{ FORCE_TYPE.SHAO_LIN , { 125, 112,  10 }}, -- 少林
+				{ FORCE_TYPE.WAN_HUA  , {  47,  14,  70 }}, -- 万花
+				{ FORCE_TYPE.TIAN_CE  , { 105,  14,  14 }}, -- 天策
+				{ FORCE_TYPE.CHUN_YANG, {   8,  90, 113 }}, -- 纯阳 56,175,255,232
+				{ FORCE_TYPE.QI_XIU   , { 162,  74, 129 }}, -- 七秀
+				{ FORCE_TYPE.WU_DU    , {   7,  82, 154 }}, -- 五毒
+				{ FORCE_TYPE.TANG_MEN , {  75, 113,  40 }}, -- 唐门
+				{ FORCE_TYPE.CANG_JIAN, { 148, 152,  27 }}, -- 藏剑
+				{ FORCE_TYPE.GAI_BANG , { 159, 102,  37 }}, -- 丐帮
+				{ FORCE_TYPE.MING_JIAO, { 145,  80,  17 }}, -- 明教
+				{ FORCE_TYPE.CANG_YUN , { 157,  47,   2 }}, -- 苍云
+				{ FORCE_TYPE.CHANG_GE , {  31, 120, 103 }}, -- 长歌
+				{ FORCE_TYPE.BA_DAO   , {  49,  39, 110 }}, -- 霸刀
+				{ FORCE_TYPE.PENG_LAI , {  93,  97, 126 }}, -- 蓬莱
+				{ FORCE_TYPE.LING_XUE , { 161,   9,  34 }}, -- 凌雪
+			}),
+			{
+				__index = function(t, k)
+					return { 200, 200, 200 } -- NPC 以及未知门派
+				end,
+				__metatable = true,
+			}),
+		CAMP_COLOR_FG_DEFAULT = setmetatable(
+			KvpToObject({
+				{ CAMP.NEUTRAL, { 255, 255, 255 } }, -- 中立
+				{ CAMP.GOOD   , {  60, 128, 220 } }, -- 浩气盟
+				{ CAMP.EVIL   , IsStreaming() and { 255, 63, 63 } or { 160, 30, 30 } }, -- 恶人谷
+			}),
+			{
+				__index = function(t, k)
+					return { 225, 225, 225 }
+				end,
+				__metatable = true,
+			}),
+		CAMP_COLOR_BG_DEFAULT = setmetatable(
+			KvpToObject({
+				{ CAMP.NEUTRAL, { 255, 255, 255 } }, -- 中立
+				{ CAMP.GOOD   , {  60, 128, 220 } }, -- 浩气盟
+				{ CAMP.EVIL   , { 160,  30,  30 } }, -- 恶人谷
+			}),
+			{
+				__index = function(t, k)
+					return { 225, 225, 225 }
+				end,
+				__metatable = true,
+			}),
 		MSG_THEME = SetmetaReadonly({
 			NORMAL = 0,
 			ERROR = 1,
@@ -1209,23 +1228,23 @@ local CONSTANT = setmetatable({}, {
 			LIDU_GHOST_TOWN = {
 				{18317, 64489},
 			},
-			FORCE_ROUTINE = {
-				[FORCE_TYPE.TIAN_CE  ] = {{8206, 16747}, {11254, 16747}, {11255, 16747}}, -- 天策
-				[FORCE_TYPE.CHUN_YANG] = {{8347, 16747}, {8398, 16747}}, -- 纯阳
-				[FORCE_TYPE.WAN_HUA  ] = {{8348, 16747}, {8399, 16747}}, -- 万花
-				[FORCE_TYPE.SHAO_LIN ] = {{8349, 16747}, {8400, 16747}}, -- 少林
-				[FORCE_TYPE.QI_XIU   ] = {{8350, 16747}, {8401, 16747}}, -- 七秀
-				[FORCE_TYPE.CANG_JIAN] = {{8351, 16747}, {8402, 16747}}, -- 藏剑
-				[FORCE_TYPE.WU_DU    ] = {{8352, 16747}, {8403, 16747}}, -- 五毒
-				[FORCE_TYPE.TANG_MEN ] = {{8353, 16747}, {8404, 16747}}, -- 唐门
-				[FORCE_TYPE.MING_JIAO] = {{9796, 16747}, {9797, 16747}}, -- 明教
-				[FORCE_TYPE.GAI_BANG ] = {{11245, 16747}, {11246, 16747}}, -- 丐帮
-				[FORCE_TYPE.CANG_YUN ] = {{12701, 16747}, {12702, 16747}}, -- 苍云
-				[FORCE_TYPE.CHANG_GE ] = {{14731, 16747}, {14732, 16747}}, -- 长歌
-				[FORCE_TYPE.BA_DAO   ] = {{16205, 16747}, {16206, 16747}}, -- 霸刀
-				[FORCE_TYPE.PENG_LAI ] = {{19225, 16747}, {19226, 16747}}, -- 蓬莱
-				[FORCE_TYPE.LING_XUE ] = {{21068, 16747}}, -- 凌雪阁
-			},
+			FORCE_ROUTINE = KvpToObject({
+				{ FORCE_TYPE.TIAN_CE  , {{8206, 16747}, {11254, 16747}, {11255, 16747}} }, -- 天策
+				{ FORCE_TYPE.CHUN_YANG, {{8347, 16747}, {8398, 16747}} }, -- 纯阳
+				{ FORCE_TYPE.WAN_HUA  , {{8348, 16747}, {8399, 16747}} }, -- 万花
+				{ FORCE_TYPE.SHAO_LIN , {{8349, 16747}, {8400, 16747}} }, -- 少林
+				{ FORCE_TYPE.QI_XIU   , {{8350, 16747}, {8401, 16747}} }, -- 七秀
+				{ FORCE_TYPE.CANG_JIAN, {{8351, 16747}, {8402, 16747}} }, -- 藏剑
+				{ FORCE_TYPE.WU_DU    , {{8352, 16747}, {8403, 16747}} }, -- 五毒
+				{ FORCE_TYPE.TANG_MEN , {{8353, 16747}, {8404, 16747}} }, -- 唐门
+				{ FORCE_TYPE.MING_JIAO, {{9796, 16747}, {9797, 16747}} }, -- 明教
+				{ FORCE_TYPE.GAI_BANG , {{11245, 16747}, {11246, 16747}} }, -- 丐帮
+				{ FORCE_TYPE.CANG_YUN , {{12701, 16747}, {12702, 16747}} }, -- 苍云
+				{ FORCE_TYPE.CHANG_GE , {{14731, 16747}, {14732, 16747}} }, -- 长歌
+				{ FORCE_TYPE.BA_DAO   , {{16205, 16747}, {16206, 16747}} }, -- 霸刀
+				{ FORCE_TYPE.PENG_LAI , {{19225, 16747}, {19226, 16747}} }, -- 蓬莱
+				{ FORCE_TYPE.LING_XUE , {{21068, 16747}} }, -- 凌雪阁
+			}),
 			PICKING_FAIRY_GRASS = {{8332, 16747}},
 			FIND_DRAGON_VEINS = {{13600, 16747}},
 			SNEAK_ROUTINE = {{7669, 16747}},
@@ -1254,34 +1273,34 @@ local CONSTANT = setmetatable({}, {
 			SPRINT_POINT    = 11,
 			FAKE_FELLOW_PET = 12,
 		},
-		PLAYER_TALK_CHANNEL_TO_MSG_TYPE = {
-			[PLAYER_TALK_CHANNEL.WHISPER          ] = 'MSG_WHISPER'          ,
-			[PLAYER_TALK_CHANNEL.NEARBY           ] = 'MSG_NORMAL'           ,
-			[PLAYER_TALK_CHANNEL.TEAM             ] = 'MSG_PARTY'            ,
-			[PLAYER_TALK_CHANNEL.TONG             ] = 'MSG_GUILD'            ,
-			[PLAYER_TALK_CHANNEL.TONG_ALLIANCE    ] = 'MSG_GUILD_ALLIANCE'   ,
-			[PLAYER_TALK_CHANNEL.TONG_SYS         ] = 'MSG_GUILD'            ,
-			[PLAYER_TALK_CHANNEL.WORLD            ] = 'MSG_WORLD'            ,
-			[PLAYER_TALK_CHANNEL.FORCE            ] = 'MSG_SCHOOL'           ,
-			[PLAYER_TALK_CHANNEL.CAMP             ] = 'MSG_CAMP'             ,
-			[PLAYER_TALK_CHANNEL.FRIENDS          ] = 'MSG_FRIEND'           ,
-			[PLAYER_TALK_CHANNEL.RAID             ] = 'MSG_TEAM'             ,
-			[PLAYER_TALK_CHANNEL.SENCE            ] = 'MSG_MAP'              ,
-			[PLAYER_TALK_CHANNEL.BATTLE_FIELD     ] = 'MSG_BATTLE_FILED'     ,
-			[PLAYER_TALK_CHANNEL.LOCAL_SYS        ] = 'MSG_SYS'              ,
-			[PLAYER_TALK_CHANNEL.GM_MESSAGE       ] = 'MSG_SYS'              ,
-			[PLAYER_TALK_CHANNEL.NPC_WHISPER      ] = 'MSG_NPC_WHISPER'      ,
-			[PLAYER_TALK_CHANNEL.NPC_SAY_TO       ] = 'MSG_NPC_WHISPER'      ,
-			[PLAYER_TALK_CHANNEL.NPC_NEARBY       ] = 'MSG_NPC_NEARBY'       ,
-			[PLAYER_TALK_CHANNEL.NPC_PARTY        ] = 'MSG_NPC_PARTY'        ,
-			[PLAYER_TALK_CHANNEL.NPC_SENCE        ] = 'MSG_NPC_YELL'         ,
-			[PLAYER_TALK_CHANNEL.FACE             ] = 'MSG_FACE'             ,
-			[PLAYER_TALK_CHANNEL.NPC_FACE         ] = 'MSG_NPC_FACE'         ,
-			[PLAYER_TALK_CHANNEL.NPC_SAY_TO_CAMP  ] = 'MSG_CAMP'             ,
-			[PLAYER_TALK_CHANNEL.IDENTITY         ] = 'MSG_IDENTITY'         ,
-			[PLAYER_TALK_CHANNEL.BULLET_SCREEN    ] = 'MSG_JJC_BULLET_SCREEN',
-			[PLAYER_TALK_CHANNEL.BATTLE_FIELD_SIDE] = 'MSG_BATTLE_FIELD_SIDE',
-		},
+		PLAYER_TALK_CHANNEL_TO_MSG_TYPE = KvpToObject({
+			{ PLAYER_TALK_CHANNEL.WHISPER          , 'MSG_WHISPER'           },
+			{ PLAYER_TALK_CHANNEL.NEARBY           , 'MSG_NORMAL'            },
+			{ PLAYER_TALK_CHANNEL.TEAM             , 'MSG_PARTY'             },
+			{ PLAYER_TALK_CHANNEL.TONG             , 'MSG_GUILD'             },
+			{ PLAYER_TALK_CHANNEL.TONG_ALLIANCE    , 'MSG_GUILD_ALLIANCE'    },
+			{ PLAYER_TALK_CHANNEL.TONG_SYS         , 'MSG_GUILD'             },
+			{ PLAYER_TALK_CHANNEL.WORLD            , 'MSG_WORLD'             },
+			{ PLAYER_TALK_CHANNEL.FORCE            , 'MSG_SCHOOL'            },
+			{ PLAYER_TALK_CHANNEL.CAMP             , 'MSG_CAMP'              },
+			{ PLAYER_TALK_CHANNEL.FRIENDS          , 'MSG_FRIEND'            },
+			{ PLAYER_TALK_CHANNEL.RAID             , 'MSG_TEAM'              },
+			{ PLAYER_TALK_CHANNEL.SENCE            , 'MSG_MAP'               },
+			{ PLAYER_TALK_CHANNEL.BATTLE_FIELD     , 'MSG_BATTLE_FILED'      },
+			{ PLAYER_TALK_CHANNEL.LOCAL_SYS        , 'MSG_SYS'               },
+			{ PLAYER_TALK_CHANNEL.GM_MESSAGE       , 'MSG_SYS'               },
+			{ PLAYER_TALK_CHANNEL.NPC_WHISPER      , 'MSG_NPC_WHISPER'       },
+			{ PLAYER_TALK_CHANNEL.NPC_SAY_TO       , 'MSG_NPC_WHISPER'       },
+			{ PLAYER_TALK_CHANNEL.NPC_NEARBY       , 'MSG_NPC_NEARBY'        },
+			{ PLAYER_TALK_CHANNEL.NPC_PARTY        , 'MSG_NPC_PARTY'         },
+			{ PLAYER_TALK_CHANNEL.NPC_SENCE        , 'MSG_NPC_YELL'          },
+			{ PLAYER_TALK_CHANNEL.FACE             , 'MSG_FACE'              },
+			{ PLAYER_TALK_CHANNEL.NPC_FACE         , 'MSG_NPC_FACE'          },
+			{ PLAYER_TALK_CHANNEL.NPC_SAY_TO_CAMP  , 'MSG_CAMP'              },
+			{ PLAYER_TALK_CHANNEL.IDENTITY         , 'MSG_IDENTITY'          },
+			{ PLAYER_TALK_CHANNEL.BULLET_SCREEN    , 'MSG_JJC_BULLET_SCREEN' },
+			{ PLAYER_TALK_CHANNEL.BATTLE_FIELD_SIDE, 'MSG_BATTLE_FIELD_SIDE' },
+		}),
 		MSG_TYPE_MENU = {
 			{
 				szCaption = g_tStrings.CHANNEL_CHANNEL,
