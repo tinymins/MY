@@ -923,6 +923,8 @@ local CONSTANT = setmetatable({}, {
 			WU_DU       = 9,      -- 五毒内功
 			TANG_MEN    = 10,     -- 唐门内功
 			CANG_YUN    = 18,     -- 苍云内功
+			LING_XUE    = 22,     -- 凌雪内功
+			YAN_TIAN    = 23,     -- 衍天内功
 		}),
 		PEEK_OTHER_PLAYER_RESPOND = PEEK_OTHER_PLAYER_RESPOND or SetmetaReadonly({
 			INVALID             = 0,

@@ -98,6 +98,7 @@ return {
 		[10464] = '刀',
 		[10533] = '蓬',
 		[10585] = '凌',
+		[10615] = '衍',
 	},
 	['Take back permissions'] = '收回許可權',
 	['Take back all permissions'] = '收回所有許可權',
