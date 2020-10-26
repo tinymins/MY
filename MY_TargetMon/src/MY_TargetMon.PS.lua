@@ -1247,7 +1247,7 @@ function PS.OnPanelActive(wnd)
 	local w, h = ui:Size()
 	local X, Y = 20, 20
 	local x, y = X, Y
-	ui:ContainerType(CONSTANT.WND_CONTAINER_STYLE.WND_CONTAINER_STYLE_LEFT_TOP)
+	ui:ContainerType(CONSTANT.WND_CONTAINER_STYLE.LEFT_TOP)
 
 	local OpenDetail = DrawDetail(ui)
 	for _, config in ipairs(D.GetConfigList()) do

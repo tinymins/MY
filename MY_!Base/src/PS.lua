@@ -419,7 +419,7 @@ function LIB.SwitchTab(szID, bForceUpdate)
 	scroll:SetScrollPos(0)
 	wnd:Clear()
 	wnd:Lookup('', ''):Clear()
-	wnd:SetContainerType(CONSTANT.WND_CONTAINER_STYLE.WND_CONTAINER_STYLE_CUSTOM)
+	wnd:SetContainerType(CONSTANT.WND_CONTAINER_STYLE.CUSTOM)
 
 	-- ready to draw
 	if not tab then

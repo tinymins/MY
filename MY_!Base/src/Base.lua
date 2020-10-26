@@ -934,12 +934,12 @@ local CONSTANT = setmetatable({}, {
 			TOO_FAR             = 4,
 		}),
 		WND_CONTAINER_STYLE = _G.WND_CONTAINER_STYLE or SetmetaReadonly({
-			WND_CONTAINER_STYLE_CUSTOM       = 0,
-			WND_CONTAINER_STYLE_LEFT_TOP     = 1,
-			WND_CONTAINER_STYLE_LEFT_BOTTOM  = 2,
-			WND_CONTAINER_STYLE_RIGHT_TOP    = 3,
-			WND_CONTAINER_STYLE_RIGHT_BOTTOM = 4,
-			WND_CONTAINER_STYLE_END          = 5,
+			CUSTOM       = 0,
+			LEFT_TOP     = 1,
+			LEFT_BOTTOM  = 2,
+			RIGHT_TOP    = 3,
+			RIGHT_BOTTOM = 4,
+			END          = 5,
 		}),
 		MIC_STATE = MIC_STATE or SetmetaReadonly({
 			NOT_AVIAL = 1,
