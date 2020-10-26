@@ -62,4 +62,4 @@
 
 * 团队面板心法简化文字 `MY_Cataclysm\lang\zhcn.jx3dat` `KUNGFU_`
 * 全局门派配色 `MY_!Base\src\Base.lua` `FORCE_COLOR_BG_DEFAULT` `FORCE_COLOR_FG_DEFAULT`
-* 全局门派心法枚举 `MY_!Base\src\Base.lua` `FORCE_TYPE` `KUNGFU_TYPE` `KUNGFU_LIST`
+* 全局门派心法枚举 `MY_!Base\src\Base.lua` `FORCE_TYPE` `KUNGFU_TYPE` `KUNGFU_TYPE`
