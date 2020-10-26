@@ -729,6 +729,9 @@ function D.GetDisplayList()
 						bDeletable = via.bDeletable
 					end
 				end
+				if bFocus and (p.dwType == TARGET.NPC or p.dwType == TARGET.PLAYER) and me.bIsolated ~= KObject.bIsolated then
+					bFocus = false
+				end
 				if bFocus and O.bHideDeath then
 					if p.dwType == TARGET.NPC or p.dwType == TARGET.PLAYER then
 						bFocus = KObject.nMoveState ~= MOVE_STATE.ON_DEATH

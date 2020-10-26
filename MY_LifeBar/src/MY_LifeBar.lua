@@ -446,6 +446,10 @@ function CheckInvalidRect(dwType, dwID, me, object)
 		return
 	end
 	bVisible = true
+	-- ÏÔÊ¾±ê¼ÇÅÐ¶Ï
+	if bVisible and (dwType == TARGET.NPC or dwType == TARGET.PLAYER) and me.bIsolated ~= object.bIsolated then
+		bVisible = false
+	end
 	-- ¾àÀëÅÐ¶Ï
 	if bVisible and Config.nDistance > 0 then
 		nDisX, nDisY, nDisZ = me.nX - object.nX, me.nY - object.nY, (me.nZ - object.nZ) * 0.125
