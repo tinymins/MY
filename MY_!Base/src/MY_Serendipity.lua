@@ -324,6 +324,7 @@ LIB.RegisterEvent('OPEN_WINDOW.MY_Serendipity_HouseFlowerPrice', function()
 		LIB.EnsureAjax({
 			url = 'https://push.j3cx.com/api/flower/uploads?'
 				.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
+					S = AnsiToUTF8(LIB.GetRealServer(1)),
 					s = AnsiToUTF8(LIB.GetRealServer(2)),
 					m = AnsiToUTF8(szMapLine),
 					u = AnsiToUTF8(szUnit),
