@@ -159,20 +159,29 @@ function D.UpdateMapBossAchieveAcquire()
 	local me = GetClientPlayer()
 	local dwMapID = me.GetMapID()
 	local tBossAchieveAcquireState = {}
+	-- 根据成就名称自动识别地图全胜成就
+	local aMapAchievements = {}
+	for _, dwAchieveID in ipairs(LIB.GetMapAchievements(dwMapID) or CONSTANT.EMPTY_TABLE) do
+		local achi = Table_GetAchievement(dwAchieveID)
+		if achi and wfind(achi.szName, _L['Full win']) then
+			insert(aMapAchievements, dwAchieveID)
+		end
+	end
+	-- 初始化所有监听成就状态
 	for _, dwAchieveID in sipairs(
-		LIB.GetMapAchievements(dwMapID) or CONSTANT.EMPTY_TABLE,
+		aMapAchievements,
 		IsTable(BOSS_MAP_ACHIEVE_ACQUIRE) and BOSS_MAP_ACHIEVE_ACQUIRE[dwMapID] or CONSTANT.EMPTY_TABLE,
 		IsTable(BOSS_MAP_ACHIEVE_ACQUIRE) and BOSS_MAP_ACHIEVE_ACQUIRE['*'] or CONSTANT.EMPTY_TABLE
 	) do
 		local achi = Table_GetAchievement(dwAchieveID)
-		if achi and wfind(achi.szName, _L['Full win']) then
+		if achi then
 			for _, s in ipairs(LIB.SplitString(achi.szSubAchievements, '|', true)) do
 				local dwSubAchieve = tonumber(s)
 				if dwSubAchieve then
 					tBossAchieveAcquireState[dwSubAchieve] = me.IsAchievementAcquired(dwSubAchieve)
 				end
 			end
-			-- aBossAchieve[dwAchieveID] = me.IsAchievementAcquired(dwAchieveID)
+			tBossAchieveAcquireState[dwAchieveID] = me.IsAchievementAcquired(dwAchieveID)
 		end
 	end
 	--[[#DEBUG BEGIN]]
