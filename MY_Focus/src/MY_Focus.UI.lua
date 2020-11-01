@@ -596,6 +596,22 @@ function D.OnItemRButtonClick()
 				end,
 			})
 		end
+		insert(t, {
+			szOption = _L['Copy information'],
+			fnAction = function()
+				local aText = {
+					'Type: ' .. dwType,
+					'ID: ' .. dwID,
+				}
+				local obj = LIB.GetObject(dwType, dwID)
+				if obj then
+					insert(aText, 'Name: ' .. LIB.GetObjectName(obj))
+					insert(aText, 'TemplateID: ' .. obj.dwTemplateID)
+					insert(aText, 'Pos: ' .. '[' .. LIB.GetMapID() .. '] ' .. obj.nX .. ', ' .. obj.nY .. ',' .. obj.nZ)
+				end
+				UI.OpenTextEditor((concat(aText, '\n')))
+			end,
+		})
 		local bLock = dwType == l_dwLockType and dwID == l_dwLockID
 		insert(t, {
 			szOption = bLock and _L['Unlock focus'] or _L['Lock focus'],

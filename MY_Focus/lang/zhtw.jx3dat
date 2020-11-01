@@ -39,6 +39,7 @@ return {
     ['Current scale-x is %d%%.'] = '界面X軸縮放%d%%。',
     ['Current scale-y is %d%%.'] = '界面Y軸縮放%d%%。',
 
+    ['Copy information'] = '複製信息',
     ['Lock focus'] = '鎖定目標',
     ['Unlock focus'] = '取消鎖定目標',
     ['Can not use in shielded map!'] = '當前地圖，禁止使用。',
