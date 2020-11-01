@@ -314,8 +314,7 @@ LIB.RegisterEvent('OPEN_WINDOW.MY_Serendipity_HouseFlowerPrice', function()
 	if not O.bEnable then
 		return
 	end
-	local tar = GetTargetHandle(GetClientPlayer().GetTarget())
-	if not tar or tar.dwTemplateID ~= 99172 then
+	if not LIB.IsInHLMap() then
 		return
 	end
 	local szUnit, szPrice, szItem = arg1:match(_L['Today I want every (%d-%s-) number sold at (%d-%s-) for (%s+)'])
