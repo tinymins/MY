@@ -49,3 +49,9 @@ nID	szName	szNick	dwMapID	dwNpc		aDoodad	dwPet	aItemAcquired	dwQuest	dwAchieve	s
 46	冰蓝花客		30	0		{5053}	83	{{ITEM_TABLE_TYPE.OTHER, 22754}, {ITEM_TABLE_TYPE.CUST_TRINKET, 13052}}	12875	4459			3	1	15448																	
 47	红羽大将军	大公鸡	101	0		{5155}	98	{{ITEM_TABLE_TYPE.OTHER, 23381}, {ITEM_TABLE_TYPE.CUST_TRINKET, 13223}}	13573	4577			3	1	15445																	
 48	商周客		103	0		{5316}	111	{{ITEM_TABLE_TYPE.OTHER, 23842}, {ITEM_TABLE_TYPE.CUST_TRINKET, 13909}}	14065	4616			3	1	15447																	
+49	雀斑		49	99195	王厨娘		337	{{ITEM_TABLE_TYPE.CUST_TRINKET, 27910}}		7798	莫贪杯		3	0	17297	{"<G>你这孩子咋回事，大娘都说了三遍没事了，你咋听不懂呢还搁这儿逼逼叨叨的，好赖话都不会听的嘛？"}						{"<G>没事没事，大娘腿脚利索着呢！"}										
+50	瓜皮		325	70597	林云飞		338	{{ITEM_TABLE_TYPE.CUST_TRINKET, 27911}}		7797	露园事		3	0	17156	{"<G>好了，今天你也辛苦啦，三把都不合适了，我自己来就行。"}	{"你今日挑选了三把骨杖都不合适，暂且歇息吧。"}					{"<G>哎，不行不行，你看看上头都有裂纹呢。我们林文家主那个铁手一捏就成粉末了，你歇歇吧！还是我自己来挑吧！"}										
+51	金错刀		333		落单少侠		339	{{ITEM_TABLE_TYPE.CUST_TRINKET, 27912}}		7799	瀛洲梦		3	1	17291																	
+52	土土		334	102012	算命先生		359	{{ITEM_TABLE_TYPE.CUST_TRINKET, 27932}}		9022	话玄虚		3	1	18358																	
+53	小小苏		473			{8604}	360	{{ITEM_TABLE_TYPE.CUST_TRINKET, 27933}}		9023	白月皎		3	0	18367								{"你仔细地观察了一下这个兔子窝，没有发现什么痕迹。"}									
+54	崽崽		9	102833	红师农		361	{{ITEM_TABLE_TYPE.CUST_TRINKET, 27935}}		9024	尘网中		3	1	18626																	
