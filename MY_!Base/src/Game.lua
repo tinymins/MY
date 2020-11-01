@@ -1673,16 +1673,12 @@ function LIB.GetFurnitureInfo(szKey, oVal)
 end
 end
 
-local Homeland_GetNearbyObjectsInfo = GetGameAPI('Homeland_GetNearbyObjectsInfo')
 function LIB.GetNearFurniture(nDis)
-	if not Homeland_GetNearbyObjectsInfo then
-		return CONSTANT.EMPTY_TABLE
-	end
 	if not nDis then
 		nDis = 256
 	end
 	local aFurniture, tID = {}, {}
-	for _, p in ipairs(Homeland_GetNearbyObjectsInfo(nDis)) do
+	for _, p in ipairs(GetNearbyFurnitureInfoList('ui get objects info v_0', nDis)) do
 		local dwID = LIB.NumberBitShl(p.BaseId, 32, 64) + p.InstID
 		local info = not tID[dwID] and LIB.GetFurnitureInfo('nRepresentID', p.RepresentID)
 		if info then
@@ -3143,6 +3139,49 @@ function LIB.GetSkillCDProgress(KObject, dwID, nLevel, bIgnorePublic)
 end
 end
 
+-- 秘笈是否激活 全名/短名
+do
+local RECIPE_CACHE = {}
+local function onRecipeUpdate()
+    RECIPE_CACHE = {}
+end
+LIB.RegisterEvent({"SYNC_ROLE_DATA_END", "SKILL_UPDATE", "SKILL_RECIPE_LIST_UPDATE"}, onRecipeUpdate)
+
+local function GetShortName(sz) -- 获取秘笈短名
+	local nStart, nEnd = string.find(sz, "·")
+	return nStart and wgsub(string.sub(sz, nEnd + 1), _L[">"], "")
+end
+
+function LIB.IsRecipeActive(szRecipeName)
+    local me = GetClientPlayer()
+    if not RECIPE_CACHE[szRecipeName] then
+        if not me then
+            return
+        end
+
+        for id, lv in pairs(me.GetAllSkillList())do
+            for _, info in pairs(me.GetSkillRecipeList(id, lv) or {}) do
+                local t = Table_GetSkillRecipe(info.recipe_id , info.recipe_level)
+                if t and (szRecipeName == t.szName or szRecipeName == GetShortName(t.szName)) then
+                    RECIPE_CACHE[szRecipeName] = info.active and 1 or 0
+                    break
+                end
+            end
+
+            if RECIPE_CACHE[szRecipeName] then
+                break
+            end
+        end
+
+        if not RECIPE_CACHE[szRecipeName] then
+            RECIPE_CACHE[szRecipeName] = 0
+        end
+    end
+
+    return RECIPE_CACHE[szRecipeName] == 1
+end
+end
+
 -- 登出游戏
 -- (void) LIB.Logout(bCompletely)
 -- bCompletely 为true返回登陆页 为false返回角色页 默认为false
@@ -3385,6 +3424,19 @@ end
 function LIB.IsInStarveMap()
 	local me = GetClientPlayer()
 	return me and LIB.IsStarveMap(me.GetMapID())
+end
+
+-- 判断地图是不是家园地图
+-- (bool) LIB.IsHLMap(dwMapID)
+function LIB.IsHLMap(dwMapID)
+	return select(2, GetMapParams(dwMapID)) == MAP_TYPE.COMMUNITY
+end
+
+-- 判断当前地图是不是家园地图
+-- (bool) LIB.IsInHLMap()
+function LIB.IsInHLMap()
+	local me = GetClientPlayer()
+	return me and LIB.IsHLMap(me.GetMapID())
 end
 
 -- 判断地图是不是新背包地图
