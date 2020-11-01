@@ -607,7 +607,7 @@ function D.OnItemRButtonClick()
 				if obj then
 					insert(aText, 'Name: ' .. LIB.GetObjectName(obj))
 					insert(aText, 'TemplateID: ' .. obj.dwTemplateID)
-					insert(aText, 'Pos: ' .. '[' .. LIB.GetMapID() .. '] ' .. obj.nX .. ', ' .. obj.nY .. ',' .. obj.nZ)
+					insert(aText, 'Pos: ' .. '[' .. LIB.GetMapID() .. '] ' .. obj.nX .. ', ' .. obj.nY .. ', ' .. obj.nZ)
 				end
 				UI.OpenTextEditor((concat(aText, '\n')))
 			end,
