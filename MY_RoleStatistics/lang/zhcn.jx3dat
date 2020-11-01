@@ -113,6 +113,7 @@ return {
     ['Too many column selected, width overflow, please delete some!'] = '选择列过多已超出宽度限制，请先删除一些列！',
 
     ['Map mark'] = '地图显示位置',
+    ['Tip hide finished'] = '浮动框隐藏已完成',
     ['Map mark hide acquired'] = '隐藏已有跟宠',
     ['Float panel'] = '头像浮动图标',
     ['Save DB'] = '统计当前角色',

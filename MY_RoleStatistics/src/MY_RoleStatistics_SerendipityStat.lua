@@ -107,6 +107,7 @@ local O = {
 	bAdviceSaveDB = false,
 	bMapMark = false,
 	bMapMarkHideAcquired = true,
+	bTipHideFinished = false,
 }
 RegisterCustomData('Global/MY_RoleStatistics_SerendipityStat.aColumn')
 RegisterCustomData('Global/MY_RoleStatistics_SerendipityStat.szSort')
@@ -117,6 +118,7 @@ RegisterCustomData('MY_RoleStatistics_SerendipityStat.bAdviceSaveDB', 20200618)
 RegisterCustomData('MY_RoleStatistics_SerendipityStat.bAdviceFloatEntry')
 RegisterCustomData('MY_RoleStatistics_SerendipityStat.bMapMark')
 RegisterCustomData('MY_RoleStatistics_SerendipityStat.bMapMarkHideAcquired')
+RegisterCustomData('MY_RoleStatistics_SerendipityStat.bTipHideFinished')
 
 -----------------------------------------------------------------------------------------------
 -- 多个渠道奇遇次数监控
@@ -781,31 +783,33 @@ function D.OutputRowTip(this, rec)
 	local tLuckPet = D.GetLuckyFellowPet()
 	for _, serendipity in ipairs(SERENDIPITY_LIST) do
 		local col = COLUMN_DICT[serendipity.nID]
-		local hItem = hList:AppendItemFromIni(SZ_TIP_INI, 'Handle_Item')
-		local szName = serendipity.szName
-		if serendipity.szNick then
-			szName = szName .. '<' .. serendipity.szNick .. '>'
-		end
-		hItem:Lookup('Image_Lucky'):SetVisible(serendipity.dwPet and tLuckPet[serendipity.dwPet] or false)
-		hItem:Lookup('Text_Name'):SetText(szName)
-		hItem:Lookup('Text_Name'):SetFontColor(255, 255, 128)
-		hItem:Lookup('Text_Name').OnItemLButtonClick = function()
-			if serendipity.dwAchieve and MY_AchievementWiki then
-				MY_AchievementWiki.Open(serendipity.dwAchieve)
-				Wnd.CloseWindow(frame)
-			end
-		end
-		hItem:Lookup('Text_Name'):RegisterEvent(16)
-		local map = serendipity.dwMapID and LIB.GetMapInfo(serendipity.dwMapID)
-		hItem:Lookup('Text_Map'):SetText(map and map.szName or '')
-		if dwMapID == serendipity.dwMapID then
-			hItem:Lookup('Text_Map'):SetFontColor(168, 240, 240)
-		else
-			hItem:Lookup('Text_Map'):SetFontColor(192, 192, 192)
-		end
 		local szText, r, g, b = col.GetText(rec)
-		hItem:Lookup('Text_State'):SetText(szText)
-		hItem:Lookup('Text_State'):SetFontColor(r, g, b)
+		if not O.bTipHideFinished or szText ~= _L['Finished'] then
+			local hItem = hList:AppendItemFromIni(SZ_TIP_INI, 'Handle_Item')
+			local szName = serendipity.szName
+			if serendipity.szNick then
+				szName = szName .. '<' .. serendipity.szNick .. '>'
+			end
+			hItem:Lookup('Image_Lucky'):SetVisible(serendipity.dwPet and tLuckPet[serendipity.dwPet] or false)
+			hItem:Lookup('Text_Name'):SetText(szName)
+			hItem:Lookup('Text_Name'):SetFontColor(255, 255, 128)
+			hItem:Lookup('Text_Name').OnItemLButtonClick = function()
+				if serendipity.dwAchieve and MY_AchievementWiki then
+					MY_AchievementWiki.Open(serendipity.dwAchieve)
+					Wnd.CloseWindow(frame)
+				end
+			end
+			hItem:Lookup('Text_Name'):RegisterEvent(16)
+			local map = serendipity.dwMapID and LIB.GetMapInfo(serendipity.dwMapID)
+			hItem:Lookup('Text_Map'):SetText(map and map.szName or '')
+			if dwMapID == serendipity.dwMapID then
+				hItem:Lookup('Text_Map'):SetFontColor(168, 240, 240)
+			else
+				hItem:Lookup('Text_Map'):SetFontColor(192, 192, 192)
+			end
+			hItem:Lookup('Text_State'):SetText(szText)
+			hItem:Lookup('Text_State'):SetFontColor(r, g, b)
+		end
 	end
 	hList:FormatAllItemPos()
 	local nDeltaY = select(2, hList:GetAllItemSize()) + hList:GetRelY() - hList:GetH()
@@ -858,6 +862,16 @@ function D.OnInitPage()
 	local wnd = frameTemp:Lookup('Wnd_Total')
 	wnd:ChangeRelation(page, true, true)
 	Wnd.CloseWindow(frameTemp)
+
+	UI(wnd):Append('WndCheckBox', {
+		x = 380, y = 21, w = 160,
+		text = _L['Tip hide finished'],
+		checked = MY_RoleStatistics_SerendipityStat.bTipHideFinished,
+		oncheck = function()
+			MY_RoleStatistics_SerendipityStat.bTipHideFinished = not MY_RoleStatistics_SerendipityStat.bTipHideFinished
+		end,
+		autoenable = function() return MY_RoleStatistics_SerendipityStat.bFloatEntry end,
+	})
 
 	UI(wnd):Append('WndCheckBox', {
 		x = 540, y = 21, w = 130,
@@ -1373,6 +1387,7 @@ local settings = {
 				bAdviceSaveDB = true,
 				bMapMark = true,
 				bMapMarkHideAcquired = true,
+				bTipHideFinished = true,
 			},
 			root = O,
 		},
@@ -1388,6 +1403,7 @@ local settings = {
 				bAdviceSaveDB = true,
 				bMapMark = true,
 				bMapMarkHideAcquired = true,
+				bTipHideFinished = true,
 			},
 			triggers = {
 				bFloatEntry = D.UpdateFloatEntry,
