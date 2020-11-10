@@ -51,7 +51,9 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], 0x2013900) then
 	return
 end
 --------------------------------------------------------------------------
-local D = {}
+local D = {
+	dwFightBeginTime = 0,
+}
 local O = {
 	bEnable = false,
 }
@@ -76,6 +78,12 @@ function D.SaveData()
 end
 LIB.RegisterFlush('MY_FirstBossKill', D.SaveData)
 
+LIB.RegisterEvent('MY_FIGHT_HINT', function()
+	if arg0 then
+		D.dwFightBeginTime = GetCurrentTime()
+	end
+end)
+
 function D.ShareBKR(p, bOnymous, onfulfilled, oncomplete)
 	local szServerU = AnsiToUTF8(p.szServer)
 	local szNameU = AnsiToUTF8(p.szName)
@@ -93,6 +101,7 @@ function D.ShareBKR(p, bOnymous, onfulfilled, oncomplete)
 			a = p.dwAchieveID,
 			t = p.dwTime,
 			d = p.nFightTime,
+			b = p.dwFightBeginTime,
 			o = bOnymous and 1 or 0,
 		}, 'MY_BKR_AhfB6aBL9o$8R9t3ka6Uk6@#^^KHLoMtZCdS@5e2@T')))
 	--[[#DEBUG BEGIN]]
@@ -230,6 +239,7 @@ LIB.RegisterEvent({
 				szTeammate = concat(aTeammate, ';'),
 				dwAchieveID = dwAchieveID,
 				dwTime = GetCurrentTime(),
+				dwFightBeginTime = D.dwFightBeginTime,
 				nFightTime = LIB.GetFightTime(),
 				szClientGUID = LIB.GetClientGUID(),
 			}
