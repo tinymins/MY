@@ -492,16 +492,20 @@ function GetLUADataPathPassphrase(szPath)
 		CACHE[szDomain] = LoadLUAData(szFilePath, { passphrase = szPassphrase }) or {}
 		if not CACHE[szDomain][szPath] then
 			bNew = true
-			CACHE[szDomain][szPath] = GetPassphrase(random(1, 0xffff), random(64, 128))
+			CACHE[szDomain][szPath] = LIB.GetUUID():gsub('-', '')
 			SaveLUAData(szFilePath, CACHE[szDomain], { passphrase = szPassphrase })
 		end
 	end
 	return CACHE[szDomain][szPath], bNew
 end
+end
+
+-- 获取插件软唯一标示符
+do
 local GUID
 function LIB.GetClientGUID()
 	if not GUID then
-		local szRandom = GetLUADataPathPassphrase(LIB.GetLUADataPath({'GUID', PATH_TYPE.GLOBAL}))
+		local szRandom = GetLUADataPathPassphrase(LIB.GetLUADataPath({'GUIDv2', PATH_TYPE.GLOBAL}))
 		local szPrefix = MD5(szRandom):sub(1, 4)
 		local nCSW, nCSH = GetSystemCScreen()
 		local szCS = MD5(nCSW .. ',' .. nCSH):sub(1, 4)
