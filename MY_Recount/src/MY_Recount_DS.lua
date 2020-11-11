@@ -654,14 +654,15 @@ end)
 function D.GetPlayer(dwID)
 	local me = GetClientPlayer()
 	local team = GetClientTeam()
+	local fCurrentLife, fMaxLife = LIB.GetObjectLife(me)
 	local p, info
 	if dwID == UI_GetClientPlayerID() then
 		p = me
 		info = {
 			dwMountKungfuID = UI_GetPlayerMountKungfuID(),
 			szName = me.szName,
-			nMaxLife = me.nMaxLife,
-			nCurrentLife = me.nCurrentLife,
+			fCurrentLife = fCurrentLife,
+			fMaxLife = fMaxLife,
 		}
 	else
 		p = GetPlayer(dwID)
@@ -1757,9 +1758,9 @@ for _, v in ipairs({
 		local nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
 		local dwID, dwTemplateID = arg0, 0
 		local KObject = LIB.GetObject(dwType, dwID)
-		local nCurrentLife, nMaxLife, nCurrentMana, nMaxMana = 0, 0
+		local fCurrentLife, fMaxLife, nCurrentMana, nMaxMana = 0, 0
 		if KObject and (dwType == TARGET.NPC or dwType == TARGET.PLAYER) then
-			nCurrentLife, nMaxLife = KObject.nCurrentLife, KObject.nMaxLife
+			fCurrentLife, fMaxLife = LIB.GetObjectLife(KObject)
 			nCurrentMana, nMaxMana = KObject.nCurrentMana, KObject.nMaxMana
 		end
 		if dwType == TARGET.NPC or dwType == TARGET.DOODAD then
@@ -1777,7 +1778,7 @@ for _, v in ipairs({
 			EVERYTHING_TYPE.ENTER_LEAVE_SCENE, nEnter,
 			TARGET.NPC, dwID,
 			LIB.GetObjectName(TARGET.NPC, dwID, 'never'), dwTemplateID,
-			nCurrentLife, nMaxLife, nCurrentMana, nMaxMana
+			fCurrentLife, fMaxLife, nCurrentMana, nMaxMana
 		)
 	end)
 end
@@ -1837,9 +1838,9 @@ LIB.RegisterEvent({'MY_NPC_FIGHT_HINT', 'MY_PLAYER_FIGHT_HINT'}, function(e)
 	local dwID, bFight, dwTemplateID = arg0, arg1, 0
 	local KObject = LIB.GetObject(dwType, dwID)
 	local szName = LIB.GetObjectName(KObject, 'never') or ''
-	local nCurrentLife, nMaxLife, nCurrentMana, nMaxMana = 0, 0
+	local fCurrentLife, fMaxLife, nCurrentMana, nMaxMana = 0, 0
 	if KObject then
-		nCurrentLife, nMaxLife = KObject.nCurrentLife, KObject.nMaxLife
+		fCurrentLife, fMaxLife = LIB.GetObjectLife(KObject)
 		nCurrentMana, nMaxMana = KObject.nCurrentMana, KObject.nMaxMana
 	end
 	if dwType == TARGET.NPC or dwType == TARGET.DOODAD then
@@ -1857,7 +1858,7 @@ LIB.RegisterEvent({'MY_NPC_FIGHT_HINT', 'MY_PLAYER_FIGHT_HINT'}, function(e)
 		EVERYTHING_TYPE.FIGHT_HINT,
 		dwType, dwID, bFight,
 		szName, dwTemplateID,
-		nCurrentLife, nMaxLife, nCurrentMana, nMaxMana
+		fCurrentLife, fMaxLife, nCurrentMana, nMaxMana
 	)
 end)
 -- À¿Õˆ»’÷æ

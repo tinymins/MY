@@ -218,8 +218,9 @@ local function OpenRaidDragPanel(dwMemberID)
 	local hImageLife = hMember:Lookup('Image_Health')
 	local hImageMana = hMember:Lookup('Image_Mana')
 	if tMemberInfo.bIsOnLine then
-		if tMemberInfo.nMaxLife > 0 then
-			hImageLife:SetPercentage(tMemberInfo.nCurrentLife / tMemberInfo.nMaxLife)
+		local fCurrentLife, fMaxLife = LIB.GetObjectLife(tMemberInfo)
+		if fMaxLife > 0 then
+			hImageLife:SetPercentage(fCurrentLife / fMaxLife)
 		end
 		if tMemberInfo.nMaxMana > 0 and tMemberInfo.nMaxMana ~= 1 then
 			hImageMana:SetPercentage(tMemberInfo.nCurrentMana / tMemberInfo.nMaxMana)
@@ -1777,20 +1778,18 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 	end
 	-- 气血计算 因为sync 必须拿出来单独算
 	local obj = npc or player
-	local nLifePercentage, nCurrentLife, nMaxLife
-	if obj and obj.nMaxLife ~= 1 and obj.nCurrentLife ~= 1 and obj.nCurrentLife ~= 255
-	and obj.nMaxLife ~= 255 and obj.nCurrentLife < 1000000 and obj.nCurrentLife > - 1000 then -- obj sync err fix
-		nCurrentLife = obj.nCurrentLife
-		nMaxLife = obj.nMaxLife
-	else
-		nCurrentLife = info.nCurrentLife
-		nMaxLife = info.nMaxLife
+	local fLifePercentage
+	local fCurrentLife, fMaxLife = LIB.GetObjectLife(obj)
+	if not fCurrentLife or fCurrentLife < - 1000
+	or fMaxLife == 1 or fCurrentLife == 1
+	or fCurrentLife == 255 or fMaxLife == 255 then -- obj sync err fix
+		fCurrentLife, fMaxLife = LIB.GetObjectLife(info)
 	end
-	nMaxLife     = max(1, nMaxLife)
-	nCurrentLife = max(0, nCurrentLife)
-	nLifePercentage = nMaxLife ~= 0 and (nCurrentLife / nMaxLife)
-	if not nLifePercentage or nLifePercentage < 0 or nLifePercentage > 1 then
-		nLifePercentage = 1
+	fMaxLife     = max(1, fMaxLife)
+	fCurrentLife = max(0, fCurrentLife)
+	fLifePercentage = fMaxLife ~= 0 and (fCurrentLife / fMaxLife)
+	if not fLifePercentage or fLifePercentage < 0 or fLifePercentage > 1 then
+		fLifePercentage = 1
 	end
 	Lsha:SetVisible(bSha)
 	Msha:SetVisible(bSha)
@@ -1866,7 +1865,7 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 	-- 掉血警告 必须早于血条绘制
 	if CFG.bHPHitAlert then
 		local lifeFade = hLife:Lookup('Shadow_Life_Fade')
-		if CTM_LIFE_CACHE[dwID] and CTM_LIFE_CACHE[dwID] > nLifePercentage then
+		if CTM_LIFE_CACHE[dwID] and CTM_LIFE_CACHE[dwID] > fLifePercentage then
 			local nAlpha, nW, nH = lifeFade:GetAlpha(), 0, 0
 			if nAlpha == 0 then
 				if bSha then
@@ -1897,10 +1896,10 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 		hLife:Lookup('Shadow_Life_Fade'):Hide()
 	end
 	-- 缓存
-	if not CFG.bFasterHP or bRefresh or (CFG.bFasterHP and CTM_LIFE_CACHE[dwID] ~= nLifePercentage) then
+	if not CFG.bFasterHP or bRefresh or (CFG.bFasterHP and CTM_LIFE_CACHE[dwID] ~= fLifePercentage) then
 		if bSha then
 			-- 颜色计算
-			local nNewW = hLife:GetW() * nLifePercentage
+			local nNewW = hLife:GetW() * fLifePercentage
 			local r, g, b = unpack(CFG.tOtherCol[2]) -- 不在线就灰色了
 			if info.bIsOnLine then
 				if CFG.nBGColorMode == CTM_BG_COLOR_MODE.BY_DISTANCE then
@@ -1922,7 +1921,7 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 			self:DrawShadow(Lsha, nNewW, Lsha:GetH(), r, g, b, nAlpha, CFG.bLifeGradient)
 			Lsha:Show()
 		else
-			local nRelX = Limg:GetRelX() + Limg:GetW() * nLifePercentage - Ledg:GetW()
+			local nRelX = Limg:GetRelX() + Limg:GetW() * fLifePercentage - Ledg:GetW()
 			Ledg:Show()
 			Ledg:SetAlpha(nAlpha)
 			Ledg:SetRelX(nRelX)
@@ -1934,13 +1933,13 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 			end
 			Limg:Show()
 			Limg:SetAlpha(nAlpha)
-			Limg:SetPercentage(nLifePercentage)
+			Limg:SetPercentage(fLifePercentage)
 		end
 
 		if not CTM_LIFE_CACHE[dwID] then
 			CTM_LIFE_CACHE[dwID] = 0
 		else
-			CTM_LIFE_CACHE[dwID] = nLifePercentage
+			CTM_LIFE_CACHE[dwID] = fLifePercentage
 		end
 		-- 数值绘制
 		local life = h:Lookup('Text_Life')
@@ -1969,11 +1968,11 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 					return val
 				end
 				if CFG.nHPShownMode2 == 2 then
-					life:SetText(fnAction(nCurrentLife, nMaxLife))
+					life:SetText(fnAction(fCurrentLife, fMaxLife))
 				elseif CFG.nHPShownMode2 == 1 then
-					local nShownLife = nMaxLife - nCurrentLife
+					local nShownLife = fMaxLife - fCurrentLife
 					if nShownLife > 0 then
-						life:SetText('-' .. fnAction(nShownLife, nMaxLife))
+						life:SetText('-' .. fnAction(nShownLife, fMaxLife))
 					else
 						life:SetText('')
 					end

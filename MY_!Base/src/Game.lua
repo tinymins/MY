@@ -1275,6 +1275,15 @@ function LIB.GetObject(arg0, arg1, arg2)
 	return p, info, b
 end
 
+-- 获取目标血量和最大血量
+function LIB.GetObjectLife(obj)
+	if not obj then
+		return
+	end
+	return obj.fCurrentLife64 or obj.nCurrentLife,
+		obj.fMaxLife64 or obj.nMaxLife
+end
+
 -- 根据模板ID获取NPC真实名称
 local NPC_NAME_CACHE, DOODAD_NAME_CACHE = {}, {}
 function LIB.GetTemplateName(dwType, dwTemplateID)
@@ -1792,7 +1801,9 @@ function LIB.GetClientInfo(arg0)
 			m_ClientInfo.nUsedTrainValue   = me.nUsedTrainValue
 			m_ClientInfo.nDirectionXY      = me.nDirectionXY
 			m_ClientInfo.nCurrentLife      = me.nCurrentLife
+			m_ClientInfo.fCurrentLife64    = me.fCurrentLife64
 			m_ClientInfo.nMaxLife          = me.nMaxLife
+			m_ClientInfo.fMaxLife64        = me.fMaxLife64
 			m_ClientInfo.nMaxLifeBase      = me.nMaxLifeBase
 			m_ClientInfo.nCurrentMana      = me.nCurrentMana
 			m_ClientInfo.nMaxMana          = me.nMaxMana

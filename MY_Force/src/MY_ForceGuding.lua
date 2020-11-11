@@ -257,12 +257,13 @@ function D.OnUseManaChange(_, bUseMana)
 			if not me then
 				return
 			end
+			local fCurrentLife, fMaxLife = LIB.GetObjectLife(me)
 			-- 不在地上
 			if me.bOnHorse or me.nMoveState ~= MOVE_STATE.ON_STAND or me.GetOTActionState() ~= 0 then
 				return
 			end
 			-- 血蓝很足
-			if (me.nCurrentMana / me.nMaxMana) > (O.nManaMp / 100) and (me.nCurrentLife / me.nMaxLife) > (O.nManaHp / 100) then
+			if (me.nCurrentMana / me.nMaxMana) > (O.nManaMp / 100) and (fCurrentLife / fMaxLife) > (O.nManaHp / 100) then
 				return
 			end
 			-- 在读条

@@ -434,7 +434,7 @@ local function fxTarget(r, g, b, a) return 255 - (255 - r) * 0.3, 255 - (255 - g
 local function fxDeath(r, g, b, a) return ceil(r * 0.4), ceil(g * 0.4), ceil(b * 0.4), a end
 local function fxDeathTarget(r, g, b, a) return ceil(r * 0.45), ceil(g * 0.45), ceil(b * 0.45), a end
 local lb, info, bVisible, bFight, nDisX, nDisY, nDisZ, fTextScale, dwTarType, dwTarID, relation, force, nPriority, szName, szTongName, r, g, b
-local aCountDown, szCountDown, bPet, bShowName, bShowKungfu, kunfu, bShowTong, bShowTitle, bShowLife, bShowLifePercent, tEffect
+local aCountDown, szCountDown, bPet, bShowName, bShowKungfu, kunfu, bShowTong, bShowTitle, bShowLife, bShowLifePercent, tEffect, fCurrentLife, fMaxLife
 function CheckInvalidRect(dwType, dwID, me, object)
 	lb = LB_CACHE[dwID]
 	info = dwType == TARGET.PLAYER and me.IsPlayerInMyParty(dwID) and GetClientTeam().GetMemberInfo(dwID) or nil
@@ -598,11 +598,11 @@ function CheckInvalidRect(dwType, dwID, me, object)
 		end
 		lb:SetTitleVisible(bShowTitle)
 		-- ÑªÌõ²¿·Ö
-		if info and info.nMaxLife and info.nMaxLife ~= 0 then
-			lb:SetLife(info.nCurrentLife, info.nMaxLife)
-		else
-			lb:SetLife(object.nCurrentLife, object.nMaxLife)
+		fCurrentLife, fMaxLife = LIB.GetObjectLife(info)
+		if not fCurrentLife or fMaxLife == 0 then
+			fCurrentLife, fMaxLife = LIB.GetObjectLife(object)
 		end
+		lb:SetLife(fCurrentLife, fMaxLife)
 		bShowLife = szName ~= '' and GetConfigComputeValue('ShowLife', relation, force, bFight, bPet)
 		if bShowLife then
 			lb:SetLifeBar(Config.nLifeOffsetX, Config.nLifeOffsetY, Config.nLifeWidth, Config.nLifeHeight, Config.nLifePadding)

@@ -311,16 +311,16 @@ function D.UpdateItem(hItem, p)
 	hItem:Lookup('Handle_R/Handle_LMN/Text_Name'):SetText(szName or KObject.dwID)
 	-- ÑªÁ¿
 	if dwType ~= TARGET.DOODAD then
-		local nCurrentLife, nMaxLife = info.nCurrentLife, info.nMaxLife
+		local fCurrentLife, fMaxLife = LIB.GetObjectLife(info)
 		local nCurrentMana, nMaxMana = info.nCurrentMana, info.nMaxMana
-		local szLife = LIB.FormatNumberDot(nCurrentLife, 1, false, true)
-		if nMaxLife > 0 then
-			local nPercent = floor(nCurrentLife / nMaxLife * 100)
+		local szLife = LIB.FormatNumberDot(fCurrentLife, 1, false, true)
+		if fMaxLife > 0 then
+			local nPercent = floor(fCurrentLife / fMaxLife * 100)
 			if nPercent > 100 then
 				nPercent = 100
 			end
 			szLife = szLife .. '(' .. nPercent .. '%)'
-			hItem:Lookup('Handle_R/Handle_LMN/Image_Health'):SetPercentage(nCurrentLife / nMaxLife)
+			hItem:Lookup('Handle_R/Handle_LMN/Image_Health'):SetPercentage(fCurrentLife / fMaxLife)
 			hItem:Lookup('Handle_R/Handle_LMN/Text_Health'):SetText(szLife)
 		end
 		if nMaxMana > 0 then

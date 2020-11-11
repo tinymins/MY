@@ -409,8 +409,9 @@ function D.OnFrameBreathe()
 					-- 	LIB.SetTarget(dwType, dwID)
 					-- end
 					-- 血量变化检查
-					if npc.nMaxLife > 1 then
-						local nLife = floor(npc.nCurrentLife / npc.nMaxLife * 100)
+					local fCurrentLife, fMaxLife = LIB.GetObjectLife(npc)
+					if fMaxLife > 1 then
+						local nLife = floor(fCurrentLife / fMaxLife * 100)
 						if tab.nLife ~= nLife then
 							local nStart = tab.nLife or nLife
 							local bIncrease = nLife >= nStart

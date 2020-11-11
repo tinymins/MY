@@ -697,12 +697,13 @@ function D.GetDisplayList()
 			end
 			local KObject = LIB.GetObject(p.dwType, p.dwID)
 			if KObject then
+				local fCurrentLife, fMaxLife = LIB.GetObjectLife(KObject)
 				local bFocus, tRule, szVia, bDeletable = false
 				for _, via in ipairs(p.aVia) do
 					if via.tRule then
 						local bRuleFocus = true
 						if bRuleFocus and via.tRule.tLife.bEnable
-						and not LIB.JudgeOperator(via.tRule.tLife.szOperator, KObject.nCurrentLife / KObject.nMaxLife * 100, via.tRule.tLife.nValue) then
+						and not LIB.JudgeOperator(via.tRule.tLife.szOperator, fCurrentLife / fMaxLife * 100, via.tRule.tLife.nValue) then
 							bRuleFocus = false
 						end
 						if bRuleFocus and via.tRule.nMaxDistance ~= 0
