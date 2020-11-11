@@ -325,6 +325,7 @@ LIB.RegisterEvent('OPEN_WINDOW.MY_Serendipity_HouseFlowerPrice', function()
 				.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
 					S = AnsiToUTF8(LIB.GetRealServer(1)),
 					s = AnsiToUTF8(LIB.GetRealServer(2)),
+					c = IsFunction(GetCenterID) and GetCenterID() or -1,
 					m = AnsiToUTF8(szMapLine),
 					u = AnsiToUTF8(szUnit),
 					p = AnsiToUTF8(szPrice),
