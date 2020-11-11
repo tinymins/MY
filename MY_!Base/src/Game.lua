@@ -103,6 +103,20 @@ end
 
 do
 local HL_INFO_CACHE = {}
+local HL_INFO_CALLBACK = {}
+local function FindHLInfo(aList, tQuery)
+	for _, info in ipairs(aList) do
+		if tQuery.dwMapID and tQuery.nCopyIndex
+		and tQuery.dwMapID == info.dwMapID and tQuery.nCopyIndex == info.nCopyIndex then
+			return info
+		end
+		if tQuery.dwCenterID and tQuery.dwMapID and tQuery.nLineIndex
+		and tQuery.dwCenterID == info.dwCenterID and tQuery.dwMapID == info.dwMapID and tQuery.nLineIndex == info.nLineIndex then
+			return info
+		end
+	end
+end
+
 LIB.RegisterEvent(NSFormatString('HOME_LAND_RESULT_CODE_INT.{$NS}#HL'), function()
 	local nResultType = arg0
 	if nResultType == CONSTANT.HOMELAND_RESULT_CODE.APPLY_COMMUNITY_INFO then -- …Í«Î∑÷œﬂœÍ«È
@@ -120,23 +134,27 @@ LIB.RegisterEvent(NSFormatString('HOME_LAND_RESULT_CODE_INT.{$NS}#HL'), function
 			szCenterName = szCenterName,
 			nLineIndex = nLineIndex,
 		}))
+		for i, v in ipairs_r(HL_INFO_CALLBACK) do
+			local info = FindHLInfo(HL_INFO_CACHE, v.tQuery)
+			if info then
+				SafeCall(v.fnCallback, info)
+				remove(HL_INFO_CALLBACK, i)
+			end
+		end
 	end
 end)
 
-function LIB.GetHLLineInfo(tQuery)
-	for _, info in ipairs(HL_INFO_CACHE) do
-		local bMatch = true
-		for k, v in pairs(tQuery) do
-			if info[k] ~= v then
-				bMatch = false
-				break
-			end
-		end
-		if bMatch then
-			return info
-		end
+function LIB.GetHLLineInfo(tQuery, fnCallback)
+	local info = FindHLInfo(HL_INFO_CACHE, tQuery)
+	if info then
+		SafeCall(fnCallback, info)
+		return info
 	end
 	if IsFunction(HomeLand_ApplyCommunityInfo) and tQuery.dwMapID and tQuery.nCopyIndex then
+		insert(HL_INFO_CALLBACK, {
+			tQuery = tQuery,
+			fnCallback = fnCallback,
+		})
 		if tQuery.nLineIndex then
 			HomeLand_ApplyCommunityInfo(tQuery.dwMapID, tQuery.nCopyIndex, tQuery.nLineIndex)
 		else

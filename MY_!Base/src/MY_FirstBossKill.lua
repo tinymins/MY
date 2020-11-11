@@ -114,6 +114,7 @@ function D.ShareBKR(p, bOnymous, onfulfilled, oncomplete)
 		complete = oncomplete,
 	}
 	LIB.Ajax(tConfig)
+	LIB.EnsureAjax(tConfig)
 end
 
 function D.CheckUpdateAcquire()
