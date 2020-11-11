@@ -189,7 +189,7 @@ def run(mode):
             __compress(addon)
 
     # Package files
-    file_name = '!src-dist/releases/%s_%s_v%s.7z' % (pkg_name, time.strftime('%Y%m%d%H%M%S', time.localtime()), version_info.get('current'))
+    file_name = '!src-dist/dist/%s_%s_v%s.7z' % (pkg_name, time.strftime('%Y%m%d%H%M%S', time.localtime()), version_info.get('current'))
     base_message = ''
     base_hash = ''
     if not is_full and version_info.get('current') != '' and version_info.get('previous_hash') != '':
