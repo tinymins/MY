@@ -1299,6 +1299,9 @@ local CONSTANT = setmetatable({}, {
 			SPRINT_POINT    = 11,
 			FAKE_FELLOW_PET = 12,
 		},
+		HOMELAND_RESULT_CODE = _G.HOMELAND_RESULT_CODE or {
+			APPLY_COMMUNITY_INFO = 503,
+		},
 		PLAYER_TALK_CHANNEL_TO_MSG_TYPE = KvpToObject({
 			{ PLAYER_TALK_CHANNEL.WHISPER          , 'MSG_WHISPER'           },
 			{ PLAYER_TALK_CHANNEL.NEARBY           , 'MSG_NORMAL'            },

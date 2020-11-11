@@ -102,6 +102,51 @@ function LIB.GetRealServer(nIndex)
 end
 
 do
+local HL_INFO_CACHE = {}
+LIB.RegisterEvent(NSFormatString('HOME_LAND_RESULT_CODE_INT.{$NS}#HL'), function()
+	local nResultType = arg0
+	if nResultType == CONSTANT.HOMELAND_RESULT_CODE.APPLY_COMMUNITY_INFO then -- …Í«Î∑÷œﬂœÍ«È
+		local dwMapID, nCopyIndex, dwCenterID, nLineIndex = arg1, arg2, arg3, arg4
+		local szCenterName
+		for _, info in ipairs(IsFunction(HomeLand_GetRelationCenter) and HomeLand_GetRelationCenter(dwCenterID) or CONSTANT.EMPTY_TABLE) do
+			if info.dwCenterID == dwCenterID then
+				szCenterName = info.szCenterName
+			end
+		end
+		insert(HL_INFO_CACHE, SetmetaReadonly({
+			dwMapID = dwMapID,
+			nCopyIndex = nCopyIndex,
+			dwCenterID = dwCenterID,
+			szCenterName = szCenterName,
+			nLineIndex = nLineIndex,
+		}))
+	end
+end)
+
+function LIB.GetHLLineInfo(tQuery)
+	for _, info in ipairs(HL_INFO_CACHE) do
+		local bMatch = true
+		for k, v in pairs(tQuery) do
+			if info[k] ~= v then
+				bMatch = false
+				break
+			end
+		end
+		if bMatch then
+			return info
+		end
+	end
+	if IsFunction(HomeLand_ApplyCommunityInfo) and tQuery.dwMapID and tQuery.nCopyIndex then
+		if tQuery.nLineIndex then
+			HomeLand_ApplyCommunityInfo(tQuery.dwMapID, tQuery.nCopyIndex, tQuery.nLineIndex)
+		else
+			HomeLand_ApplyCommunityInfo(tQuery.dwMapID, tQuery.nCopyIndex)
+		end
+	end
+end
+end
+
+do
 local S2L_CACHE = setmetatable({}, { __mode = 'k' })
 local L2S_CACHE = setmetatable({}, { __mode = 'k' })
 function LIB.ConvertNpcID(dwID, eType)
