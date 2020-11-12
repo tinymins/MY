@@ -124,8 +124,7 @@ function D.OnFrameBreathe()
 			end
 			if p and info and buff then
 				local nDistance = LIB.GetDistance(p)
-				local fCurrentLife, fMaxLife = LIB.GetObjectLife(info)
-				h:Lookup('Image_life'):SetPercentage(fCurrentLife / max(fMaxLife, 1))
+				h:Lookup('Image_life'):SetPercentage(info.fCurrentLife64 / max(info.fMaxLife64, 1))
 				h:Lookup('Text_Name'):SetText(i + 1 .. ' ' .. info.szName)
 				if nDistance > DISTANCE then
 					h:Lookup('Image_life'):SetAlpha(150)
@@ -246,27 +245,28 @@ function D.ClosePanel()
 end
 
 function D.GetPlayer(dwID)
-	local me = GetClientPlayer()
-	local team = GetClientTeam()
-	local fCurrentLife, fMaxLife = LIB.GetObjectLife(me)
-	local p, info
+	local player, info
 	if dwID == UI_GetClientPlayerID() then
-		p = me
+		player = GetClientPlayer()
 		info = {
 			dwMountKungfuID = UI_GetPlayerMountKungfuID(),
-			szName = me.szName,
-			fCurrentLife = fCurrentLife,
-			fMaxLife = fMaxLife,
+			szName = player.szName,
 		}
 	else
-		p = GetPlayer(dwID)
-		info = team.GetMemberInfo(dwID)
+		player = GetPlayer(dwID)
+		info = GetClientTeam().GetMemberInfo(dwID)
 	end
-	return p, info
+	if info then
+		if player then
+			info.fCurrentLife64, info.fMaxLife64 = LIB.GetObjectLife(player)
+		else
+			info.fCurrentLife64, info.fMaxLife64 = LIB.GetObjectLife(info)
+		end
+	end
+	return player, info
 end
 
 function D.OnTableInsert(dwID, dwBuffID, nLevel, nIcon)
-	local team = GetClientTeam()
 	local p, info = D.GetPlayer(dwID)
 	if not p or not info then
 		return
@@ -296,11 +296,10 @@ function D.OnTableInsert(dwID, dwBuffID, nLevel, nIcon)
 	if dwTargetID == dwID then
 		h:Lookup('Image_Select'):Show()
 	end
-	local fCurrentLife, fMaxLife = LIB.GetObjectLife(info)
 	h:SetUserData(nSortLFC * 1000 + dwID % 1000)
 	h:Lookup('Image_KungFu'):FromIconID(Table_GetSkillIconID(info.dwMountKungfuID) or 1435)
 	h:Lookup('Text_Name'):SetText(nCount .. ' ' .. info.szName)
-	h:Lookup('Image_life'):SetPercentage(fCurrentLife / max(fMaxLife, 1))
+	h:Lookup('Image_life'):SetPercentage(info.fCurrentLife64 / max(info.fMaxLife64, 1))
 	local box = h:Lookup('Box_Icon')
 	local _, icon = LIB.GetBuffName(dwBuffID, nLevel)
 	if nIcon then

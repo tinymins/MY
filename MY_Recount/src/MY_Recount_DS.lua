@@ -652,23 +652,25 @@ LIB.RegisterEvent('MY_FIGHT_HINT', function()
 end)
 
 function D.GetPlayer(dwID)
-	local me = GetClientPlayer()
-	local team = GetClientTeam()
-	local fCurrentLife, fMaxLife = LIB.GetObjectLife(me)
-	local p, info
+	local player, info
 	if dwID == UI_GetClientPlayerID() then
-		p = me
+		player = GetClientPlayer()
 		info = {
 			dwMountKungfuID = UI_GetPlayerMountKungfuID(),
-			szName = me.szName,
-			fCurrentLife = fCurrentLife,
-			fMaxLife = fMaxLife,
+			szName = player.szName,
 		}
 	else
-		p = GetPlayer(dwID)
-		info = team.GetMemberInfo(dwID)
+		player = GetPlayer(dwID)
+		info = GetClientTeam().GetMemberInfo(dwID)
 	end
-	return p, info
+	if info then
+		if player then
+			info.fCurrentLife64, info.fMaxLife64 = LIB.GetObjectLife(player)
+		else
+			info.fCurrentLife64, info.fMaxLife64 = LIB.GetObjectLife(info)
+		end
+	end
+	return player, info
 end
 
 -- ################################################################################################## --
