@@ -333,6 +333,7 @@ LIB.RegisterEvent('OPEN_WINDOW.MY_Serendipity_HouseFlowerPrice', function()
 						n = line and line.szCenterName or '',
 						c = line and line.dwCenterID or -1,
 						l = line and line.nLineIndex or -1,
+						a = me.GetMapID(),
 						m = AnsiToUTF8(szMapLine),
 						u = AnsiToUTF8(szUnit),
 						p = AnsiToUTF8(szPrice),
