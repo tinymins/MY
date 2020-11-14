@@ -323,6 +323,7 @@ LIB.RegisterEvent('OPEN_WINDOW.MY_Serendipity_HouseFlowerPrice', function()
 	end
 	local szUnit, szPrice, szItem = arg1:match(_L['Today I want every (%d-%s-) number sold at (%d-%s-) for (%s+)'])
 	local szMapLine = Station.Lookup('Normal/Minimap/Wnd_Minimap/Wnd_Over', 'Text_Fresher'):GetText()
+	local map = LIB.GetMapInfo(me.GetMapID())
 	if szUnit then
 		local function fnAction(line)
 			LIB.EnsureAjax({
@@ -330,15 +331,16 @@ LIB.RegisterEvent('OPEN_WINDOW.MY_Serendipity_HouseFlowerPrice', function()
 					.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
 						S = AnsiToUTF8(LIB.GetRealServer(1)),
 						s = AnsiToUTF8(LIB.GetRealServer(2)),
-						n = line and line.szCenterName or '',
-						c = line and line.dwCenterID or -1,
-						l = line and line.nLineIndex or -1,
-						a = me.GetMapID(),
 						m = AnsiToUTF8(szMapLine),
 						u = AnsiToUTF8(szUnit),
 						p = AnsiToUTF8(szPrice),
 						i = AnsiToUTF8(szItem),
 						t = GetCurrentTime(),
+						cn = line and line.szCenterName or '',
+						ci = line and line.dwCenterID or -1,
+						li = line and line.nLineIndex or -1,
+						mi = map and map.dwID,
+						mn = map and AnsiToUTF8(map.szName),
 					}, 'MY_r8395yrtsiolty79osd')))
 				})
 			LIB.DelayCall(NSFormatString('{$NS}#FLOWER_REPORT'), false)

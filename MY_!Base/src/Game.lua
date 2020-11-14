@@ -117,12 +117,13 @@ local function FindHLInfo(aList, tQuery)
 	end
 end
 
+local GetRelationCenter = GetRelationCenter or HomeLand_GetRelationCenter
 LIB.RegisterEvent(NSFormatString('HOME_LAND_RESULT_CODE_INT.{$NS}#HL'), function()
 	local nResultType = arg0
 	if nResultType == CONSTANT.HOMELAND_RESULT_CODE.APPLY_COMMUNITY_INFO then -- …Í«Î∑÷œﬂœÍ«È
 		local dwMapID, nCopyIndex, dwCenterID, nLineIndex = arg1, arg2, arg3, arg4
 		local szCenterName
-		for _, info in ipairs(IsFunction(HomeLand_GetRelationCenter) and HomeLand_GetRelationCenter(dwCenterID) or CONSTANT.EMPTY_TABLE) do
+		for _, info in ipairs(IsFunction(GetRelationCenter) and GetRelationCenter(dwCenterID) or CONSTANT.EMPTY_TABLE) do
 			if info.dwCenterID == dwCenterID then
 				szCenterName = info.szCenterName
 			end
