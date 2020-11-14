@@ -4475,3 +4475,104 @@ do
 		return PLAYER_GUID[dwID]
 	end
 end
+
+
+do
+	local function PatternReplacer(szContent, tMapping)
+		if szContent == 'me' then
+			return LIB.GetUserRoleName()
+		end
+		if not IsNil(tMapping[szContent]) then
+			return tMapping[szContent]
+		end
+		if szContent:match('^%d+$') then
+			return tMapping[tonumber(szContent)]
+		end
+		local szType = szContent:sub(1, 1)
+		local dwID, nLevel = unpack(LIB.SplitString(szContent:sub(2), ','))
+		if dwID then
+			dwID = tonumber(dwID)
+		end
+		if nLevel then
+			nLevel = tonumber(nLevel)
+		end
+		if szType == 'N' then
+			return LIB.GetTemplateName(TARGET.NPC, dwID)
+		end
+		if szType == 'D' then
+			return LIB.GetTemplateName(TARGET.DOODAD, dwID)
+		end
+		if szType == 'S' then
+			return LIB.GetSkillName(dwID, nLevel)
+		end
+		if szType == 'B' then
+			return LIB.GetBuffName(dwID, nLevel)
+		end
+		if szType == 'M' then
+			local map = LIB.GetMapInfo(dwID)
+			if map then
+				return map.szName
+			end
+		end
+		-- return '$' .. szType .. szContent
+	end
+	local CACHE, CACHE_KEY, MAX_CACHE = {}, {}, 100
+	function LIB.RenderTemplateString(szOriginText, tTextMapping, nTextLimit, bReplaceSensitiveWord)
+		if not szOriginText then
+			return
+		end
+		local szKey = EncodeLUAData({szOriginText, tTextMapping, nTextLimit, bReplaceSensitiveWord})
+		if not CACHE[szKey] then
+			if bReplaceSensitiveWord then
+				szOriginText = LIB.ReplaceSensitiveWord(szOriginText)
+			end
+			local szText = ''
+			local nOriginLen, nLen, nPos = len(szOriginText), 0, 1
+			local szPart, nStart, nEnd, szContent
+			while nPos <= nOriginLen do
+				szPart, nStart, nEnd, szContent = nil
+				nStart = StringFindW(szOriginText, '{$', nPos)
+				if nStart then
+					nEnd = StringFindW(szOriginText, '}', nStart + 2)
+					if nEnd then
+						szContent = szOriginText:sub(nStart + 2, nEnd - 1)
+					end
+				end
+				if not nStart then
+					szPart = szOriginText:sub(nPos)
+					nPos = nOriginLen + 1
+				elseif not nEnd then
+					szPart = szOriginText:sub(nPos, nStart + 1)
+					nPos = nStart + 2
+				elseif nStart > nPos then
+					szPart = szOriginText:sub(nPos, nStart - 1)
+					nPos = nStart
+				end
+				if szPart then
+					if nTextLimit > 0 and nLen + wlen(szPart) > nTextLimit then
+						szPart = wsub(szPart, 1, nTextLimit - nLen)
+						szText = szText .. szPart
+						nLen = nTextLimit
+						break
+					else
+						szText = szText .. szPart
+						nLen = nLen + wlen(szPart)
+					end
+				end
+				if szContent then
+					szPart = PatternReplacer(szContent, tTextMapping)
+					if szPart then
+						szText = szText .. szPart
+					end
+					nPos = nEnd + 1
+				end
+				if #CACHE_KEY >= MAX_CACHE then
+					CACHE[remove(CACHE_KEY, 1)] = nil
+				end
+				CACHE[szKey] = szText
+				insert(CACHE_KEY, szKey)
+			end
+		end
+		return CACHE[szKey]
+	end
+end

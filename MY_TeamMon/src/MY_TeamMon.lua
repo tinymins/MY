@@ -225,126 +225,20 @@ local function GetDataPath()
 	return szPath
 end
 
-local ParseCustomText, FilterCustomText
-do
-local function PatternNameReplacer(szContent, szSender, szReceiver)
-	if szContent == 'me' then
-		return MY_TM_CORE_NAME
-	end
-	if szContent == 'sender' then
-		return szSender
-	end
-	if szContent == 'receiver' then
-		return szReceiver
-	end
-	local szType = szContent:sub(1, 1)
-	local dwID, nLevel = unpack(MY_SplitString(szContent:sub(2), ','))
-	if dwID then
-		dwID = tonumber(dwID)
-	end
-	if nLevel then
-		nLevel = tonumber(nLevel)
-	end
-	if szType == 'N' then
-		return LIB.GetTemplateName(TARGET.NPC, dwID)
-	end
-	if szType == 'D' then
-		return LIB.GetTemplateName(TARGET.DOODAD, dwID)
-	end
-	if szType == 'S' then
-		return LIB.GetSkillName(dwID, nLevel)
-	end
-	if szType == 'B' then
-		return LIB.GetBuffName(dwID, nLevel)
-	end
-	if szType == 'M' then
-		local map = LIB.GetMapInfo(dwID)
-		if map then
-			return map.szName
-		end
-	end
-	-- return '$' .. szType .. szContent
-end
-local PARSE_TEXT_CACHE = {}
-local FILTER_TEXT_CACHE = {}
-local MAX_CUSTOM_TEXT_LEN = 8
-local function FormatCustomText(szOrigin, szSender, szReceiver, bNoLimit)
-	if not szOrigin then
-		return
-	end
-	local cache = bNoLimit and PARSE_TEXT_CACHE or FILTER_TEXT_CACHE
-	if IsNil(cache[szOrigin])
-	or (IsTable(cache[szOrigin]) and not (cache[szOrigin][szSender] and cache[szOrigin][szSender][szReceiver])) then
-		if IsString(szOrigin) then
-			szOrigin = LIB.ReplaceSensitiveWord(szOrigin)
-			local szText = ''
-			local nOriginLen, nLen, nPos = len(szOrigin), 0, 1
-			local szPart, nStart, nEnd, szContent
-			while nPos <= nOriginLen do
-				szPart, nStart, nEnd, szContent = nil
-				nStart = StringFindW(szOrigin, '{$', nPos)
-				if nStart then
-					nEnd = StringFindW(szOrigin, '}', nStart + 2)
-					if nEnd then
-						szContent = szOrigin:sub(nStart + 2, nEnd - 1)
-					end
-				end
-				if not nStart then
-					szPart = szOrigin:sub(nPos)
-					nPos = nOriginLen + 1
-				elseif not nEnd then
-					szPart = szOrigin:sub(nPos, nStart + 1)
-					nPos = nStart + 2
-				elseif nStart > nPos then
-					szPart = szOrigin:sub(nPos, nStart - 1)
-					nPos = nStart
-				end
-				if szPart then
-					if not bNoLimit and nLen + wlen(szPart) > MAX_CUSTOM_TEXT_LEN then
-						szPart = wsub(szPart, 1, MAX_CUSTOM_TEXT_LEN - nLen)
-						szText = szText .. szPart
-						nLen = MAX_CUSTOM_TEXT_LEN
-						break
-					else
-						szText = szText .. szPart
-						nLen = nLen + wlen(szPart)
-					end
-				end
-				if szContent then
-					szPart = PatternNameReplacer(szContent, szSender, szReceiver)
-					if szPart then
-						szText = szText .. szPart
-					end
-					nPos = nEnd + 1
-				end
-			end
-			if szOrigin:find('{$me}', nil, true) or szOrigin:find('{$sender}', nil, true) or szOrigin:find('{$receiver}', nil, true) then
-				if not cache[szOrigin] then
-					cache[szOrigin] = {}
-				end
-				if not cache[szOrigin][szSender] then
-					cache[szOrigin][szSender] = {}
-				end
-				cache[szOrigin][szSender][szReceiver] = szText
-			else
-				cache[szOrigin] = szText
-			end
-		else
-			cache[szOrigin] = szOrigin
-		end
-	end
-	if IsTable(cache[szOrigin]) then
-		return cache[szOrigin][szSender][szReceiver]
-	end
-	return cache[szOrigin]
+local function FilterCustomText(szOrigin, szSender, szReceiver)
+	local tTextMapping = {
+		sender = szSender or '',
+		receiver = szReceiver or '',
+	}
+	return LIB.RenderTemplateString(szOrigin, tTextMapping, -1, true)
 end
 
-function FilterCustomText(szOrigin, szSender, szReceiver)
-	return FormatCustomText(szOrigin, szSender or '', szReceiver or '', false)
-end
-function ParseCustomText(szOrigin, szSender, szReceiver)
-	return FormatCustomText(szOrigin, szSender or '{$sender}', szReceiver or '{$receiver}', true)
-end
+local function ParseCustomText(szOrigin, szSender, szReceiver)
+	local tTextMapping = {
+		sender = szSender or '{$sender}',
+		receiver = szReceiver or '{$receiver}',
+	}
+	return LIB.RenderTemplateString(szOrigin, tTextMapping, 8, true)
 end
 
 local function ConstructSpeech(aText, aXml, szText, nFont, nR, nG, nB)
