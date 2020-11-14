@@ -1511,13 +1511,6 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 		local cfg = data[nClass]
 		if cfg then
 			local aXml, aText, aTalkXml, aTalkText = {}, {}, {}, {}
-			local szNote = nil
-			if data.szNote then
-				szNote = data.szNote:gsub('$me', me.szName)
-				if dwReceiverID then
-					szNote = szNote:gsub('$team', szReceiver)
-				end
-			end
 			if szReceiver then
 				ConstructSpeech(aTalkText, aTalkXml, MY_TM_LEFT_BRACKET, MY_TM_LEFT_BRACKET_XML)
 				ConstructSpeech(aTalkText, aTalkXml, szSender, 44, 255, 255, 0)
@@ -1534,8 +1527,8 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 				ConstructSpeech(aTalkText, aTalkXml, g_tStrings.HEADER_SHOW_SAY, 44, 255, 255, 0)
 				ConstructSpeech(aTalkText, aTalkXml, szContent, 44, 255, 255, 0)
 			end
-			if szNote then
-				ConstructSpeech(aText, aXml, FilterCustomText(szNote, szSender, szReceiver) or szContent, 44, 255, 255, 255)
+			if data.szNote then
+				ConstructSpeech(aText, aXml, FilterCustomText(data.szNote, szSender, szReceiver) or szContent, 44, 255, 255, 255)
 			end
 			local szXml, szText, szTalkXml, szTalkText = concat(aXml), concat(aText), concat(aTalkXml), concat(aTalkText)
 			if IsEmpty(szXml) then
