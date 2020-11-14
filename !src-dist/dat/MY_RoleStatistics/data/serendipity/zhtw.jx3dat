@@ -761,8 +761,11 @@ return {
 			dwAchieve = 7797,
 			szAchieve = "露園事",
 			nMaxAttemptNum = 3,
-			nBuffType = 1,
-			dwBuffID = 17156
+			nBuffType = 0,
+			dwBuffID = 17156,
+			aRejectOpenWindow = {"<G>好了，今天你也辛苦啦，三把都不合適了，我自己來就行。"},
+			aRejectWarningMessage = {"你今日挑選了三把骨杖都不合適，暫且歇息吧。"},
+			aFailureOpenWindow = {"<G>哎，不行不行，你看看上頭都有裂紋呢。我們林文家主那個鐵手一捏就成粉末了，你歇歇吧！還是我自己來挑吧！"}
 		},
 		{
 			nID = 51,
@@ -799,8 +802,9 @@ return {
 			dwAchieve = 9023,
 			szAchieve = "白月皎",
 			nMaxAttemptNum = 3,
-			nBuffType = 1,
-			dwBuffID = 18367
+			nBuffType = 0,
+			dwBuffID = 18367,
+			aFailureWarningMessage = {"你仔細地觀察了一下這個兔子窩，沒有發現什麼痕跡。"}
 		},
 		{
 			nID = 54,
@@ -1373,6 +1377,76 @@ return {
 			dwType = TARGET.DOODAD,
 			dwID = 5316,
 			aPosition = {{25065, 89647, 1100352},{27100, 86955, 1100096},{23048, 48363, 1194048},{99326, 66725, 1163648},{110628, 96671, 1183744},{71672, 24100, 1188352},{90357, 16312, 1226240},{18847, 81609, 1110912}}
+		},
+		{
+			dwPet = 337,
+			nSerendipityID = 49,
+			dwMapID = 49,
+			szType = "TRIGGER",
+			dwType = TARGET.NPC,
+			dwID = 99195,
+			aPosition = {{49977,16734,1134016}}
+		},
+		{
+			dwPet = 338,
+			nSerendipityID = 50,
+			dwMapID = 325,
+			szType = "TRIGGER",
+			dwType = TARGET.NPC,
+			dwID = 70597,
+			aPosition = {{66183,82929,1154304}}
+		},
+		{
+			dwPet = 338,
+			nSerendipityID = 50,
+			dwMapID = 325,
+			szType = "LOOT",
+			dwType = TARGET.DOODAD,
+			dwID = 8255,
+			aPosition = {{66184,83084,1154240}}
+		},
+		{
+			dwPet = 339,
+			nSerendipityID = 51,
+			dwMapID = 172,
+			szType = "LOOT",
+			dwType = TARGET.NPC,
+			dwID = 25876,
+			aPosition = {{22636,53321,1052544}}
+		},
+		{
+			dwPet = 339,
+			nSerendipityID = 51,
+			dwMapID = 333,
+			szType = "TRIGGER",
+			dwType = TARGET.NPC
+		},
+		{
+			dwPet = 359,
+			nSerendipityID = 52,
+			dwMapID = 334,
+			szType = "TRIGGER",
+			dwType = TARGET.NPC,
+			dwID = 102012,
+			aPosition = {{21903,41046,1057856}}
+		},
+		{
+			dwPet = 360,
+			nSerendipityID = 53,
+			dwMapID = 473,
+			szType = "TRIGGER",
+			dwType = TARGET.DOODAD,
+			dwID = 8600,
+			aPosition = {{93604,57294,1110528},{93237,56560,1109568},{91235,57825,1108928}}
+		},
+		{
+			dwPet = 361,
+			nSerendipityID = 54,
+			dwMapID = 9,
+			szType = "TRIGGER",
+			dwType = TARGET.NPC,
+			dwID = 102833,
+			aPosition = {{53449,14247,1066816}}
 		}
 	}
 }
