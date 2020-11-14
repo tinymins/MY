@@ -679,8 +679,8 @@ function D.CreateData(szEvent)
 	-- 单独重建TALK数据
 	do
 		for _, vType in ipairs({ 'TALK', 'CHAT' }) do
-			local data  = D.FILE[vType]
-			local talk  = D.DATA[vType]
+			local data = D.FILE[vType]
+			local talk = D.DATA[vType]
 			CACHE.MAP[vType] = {
 				HIT   = {},
 				OTHER = {},
@@ -693,7 +693,7 @@ function D.CreateData(szEvent)
 				if v.szContent then
 					if v.szContent:find('$me') or v.szContent:find('$team') or v.bSearch or v.bReg then
 						insert(cache.OTHER, v)
-					else
+					elseif not cache.HIT[v.szContent] then -- 按照数据优先级顺序（地图＞地图组＞通用），同级按照下标先后顺序，只取第一个匹配结果
 						cache.HIT[v.szContent] = cache.HIT[v.szContent] or {}
 						cache.HIT[v.szContent][v.szTarget or 'sys'] = v
 					end
@@ -1472,7 +1472,7 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 	if not data then
 		local bInParty = me.IsInParty()
 		local team     = GetClientTeam()
-		for k, v in ipairs_r(cache.OTHER) do
+		for k, v in ipairs(cache.OTHER) do -- 按照数据优先级顺序（地图＞地图组＞通用），同级按照下标先后顺序，只取第一个匹配结果
 			local content = v.szContent
 			if v.szContent:find('$me', nil, true) then
 				content = v.szContent:gsub('$me', me.szName) -- 转换me是自己名字
