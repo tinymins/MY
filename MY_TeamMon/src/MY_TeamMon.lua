@@ -225,20 +225,18 @@ local function GetDataPath()
 	return szPath
 end
 
-local function FilterCustomText(szOrigin, szSender, szReceiver)
-	local tTextMapping = {
-		sender = szSender,
-		receiver = szReceiver,
-	}
-	return LIB.RenderTemplateString(szOrigin, tTextMapping, -1, true, false)
+local function FilterCustomText(szTemplate, szSender, szReceiver, aBackreferences)
+	local tVar = Clone(aBackreferences) or {}
+	tVar.sender = szSender
+	tVar.receiver = szReceiver
+	return LIB.RenderTemplateString(szTemplate, tVar, -1, true, false)
 end
 
-local function ParseCustomText(szOrigin, szSender, szReceiver)
-	local tTextMapping = {
-		sender = szSender,
-		receiver = szReceiver,
-	}
-	return LIB.RenderTemplateString(szOrigin, tTextMapping, 8, true, true)
+local function ParseCustomText(szTemplate, szSender, szReceiver, aBackreferences)
+	local tVar = Clone(aBackreferences) or {}
+	tVar.sender = szSender
+	tVar.receiver = szReceiver
+	return LIB.RenderTemplateString(szTemplate, tVar, 8, true, true)
 end
 
 local function ConstructSpeech(aText, aXml, szText, nFont, nR, nG, nB)
@@ -585,7 +583,7 @@ function D.CreateData(szEvent)
 			end
 			for k, v in ipairs(talk) do
 				if v.szContent then
-					if v.szContent:find('$me') or v.szContent:find('$team') or v.bSearch or v.bReg then
+					if v.szContent:find('{$me}') or v.szContent:find('{$team}') or v.bSearch or v.bReg then -- 具有通配符和搜索标记的数据不作 HIT 高速匹配策略考虑
 						insert(cache.OTHER, v)
 					elseif not cache.HIT[v.szContent] then -- 按照数据优先级顺序（地图＞地图组＞通用），同级按照下标先后顺序，只取第一个匹配结果
 						cache.HIT[v.szContent] = cache.HIT[v.szContent] or {}
@@ -1355,40 +1353,45 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 	end
 	local cache, data = CACHE.MAP[szEvent], nil
 	if cache.HIT[szContent] then
-		if cache.HIT[szContent][szNpcName or 'sys'] then
-			data = cache.HIT[szContent][szNpcName or 'sys']
-		elseif cache.HIT[szContent]['%'] then
-			data = cache.HIT[szContent]['%']
-		end
+		data = cache.HIT[szContent][szNpcName or 'sys']
+			or cache.HIT[szContent]['%']
 	end
-	-- 不适用wstring 性能考虑为前提
-	local szSender, dwReceiverID, szReceiver = szNpcName or _L['JX3']
-	if not data then
+	local szSender, dwReceiverID, szReceiver, aBackreferences = szNpcName or _L['JX3']
+	if not data then -- 涉及匹配的规则不会被缓存，不适用 wstring ，性能考虑为前提
 		local bInParty = me.IsInParty()
 		local team     = GetClientTeam()
-		for k, v in ipairs(cache.OTHER) do -- 按照数据优先级顺序（地图＞地图组＞通用），同级按照下标先后顺序，只取第一个匹配结果
+		for _, v in ipairs(cache.OTHER) do -- 按照数据优先级顺序（地图＞地图组＞通用），同级按照下标先后顺序，只取第一个匹配结果
 			local content = v.szContent
-			if v.szContent:find('$me', nil, true) then
-				content = v.szContent:gsub('$me', me.szName) -- 转换me是自己名字
+			if v.szContent:find('{$me}', nil, true) then
+				dwReceiverID = me.dwID
+				szReceiver = me.szName
+				content = v.szContent:gsub('{$me}', me.szName) -- 转换me是自己名字
+			else
+				dwReceiverID, szReceiver = nil
 			end
-			if bInParty and content:find('$team', nil, true) then
+			if bInParty and content:find('{$team}', nil, true) then
 				local c = content
 				for kk, vv in ipairs(team.GetTeamMemberList()) do
-					if find(szContent, c:gsub('$team', team.GetClientTeamMemberName(vv)), nil, true) and (v.szTarget == szNpcName or v.szTarget == '%') then -- hit
+					if find(szContent, c:gsub('{$team}', team.GetClientTeamMemberName(vv)), nil, true) and (v.szTarget == szNpcName or v.szTarget == '%') then -- hit
 						data = v
 						dwReceiverID = vv
 						szReceiver = team.GetClientTeamMemberName(vv)
 						break
 					end
 				end
-			else
-				if v.szTarget == szNpcName or v.szTarget == '%' then
-					if (v.bReg and find(szContent, content)) or
-						(not v.bReg and find(szContent, content, nil, true))
-					then
+			elseif v.szTarget == szNpcName or v.szTarget == '%' then
+				if v.bReg then
+					local res = {find(szContent, content)}
+					if res[1] then
+						remove(res, 1)
+						remove(res, 1)
 						data = v
+						aBackreferences = res
 						break
 					end
+				elseif find(szContent, content, nil, true) then
+					data = v
+					break
 				end
 			end
 		end
@@ -1397,7 +1400,7 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 		local nClass = szEvent == 'TALK'
 			and MY_TM_TYPE.TALK_MONITOR
 			or MY_TM_TYPE.CHAT_MONITOR
-		if data.szContent:find('$me', nil, true) then
+		if not dwReceiverID and not szReceiver and data.szContent:find('{$me}', nil, true) then
 			dwReceiverID = me.dwID
 			szReceiver = me.szName
 		end
@@ -1422,7 +1425,7 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 				ConstructSpeech(aTalkText, aTalkXml, szContent, 44, 255, 255, 0)
 			end
 			if data.szNote then
-				ConstructSpeech(aText, aXml, FilterCustomText(data.szNote, szSender, szReceiver) or szContent, 44, 255, 255, 255)
+				ConstructSpeech(aText, aXml, FilterCustomText(data.szNote, szSender, szReceiver, aBackreferences) or szContent, 44, 255, 255, 255)
 			end
 			local szXml, szText, szTalkXml, szTalkText = concat(aXml), concat(aText), concat(aTalkXml), concat(aTalkText)
 			if IsEmpty(szXml) then

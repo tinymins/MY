@@ -2283,7 +2283,7 @@ function D.OpenSettingPanel(data, szType)
 				FireUIEvent('MY_TM_CREATE_CACHE')
 			end,
 		}):Pos('BOTTOMRIGHT')
-		nX, nY = ui:Append('Text', { x = nX, y = nY, text = _L['Tips: $me behalf of self, $team behalf of team, only allow once each'], alpha = 200 }):Pos('BOTTOMRIGHT')
+		nX, nY = ui:Append('Text', { x = nX, y = nY, text = _L['Tips: {$me} behalf of self, {$team} behalf of team.'], alpha = 200 }):Pos('BOTTOMRIGHT')
 		nX, nY = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Trigger talk'], font = 27 }):Pos('BOTTOMRIGHT')
 		local cfg = data[MY_TM_TYPE.TALK_MONITOR] or {}
 		nX = ui:Append('WndCheckBox', {
@@ -2351,7 +2351,7 @@ function D.OpenSettingPanel(data, szType)
 				FireUIEvent('MY_TM_CREATE_CACHE')
 			end,
 		}):Pos('BOTTOMRIGHT')
-		nX, nY = ui:Append('Text', { x = nX, y = nY, text = _L['Tips: $me behalf of self, $team behalf of team, only allow once each'], alpha = 200 }):Pos('BOTTOMRIGHT')
+		nX, nY = ui:Append('Text', { x = nX, y = nY, text = _L['Tips: {$me} behalf of self, {$team} behalf of team.'], alpha = 200 }):Pos('BOTTOMRIGHT')
 		nX, nY = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Trigger chat'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
 		local cfg = data[MY_TM_TYPE.CHAT_MONITOR] or {}
 		nX = ui:Append('WndCheckBox', {

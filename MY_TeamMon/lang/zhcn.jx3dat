@@ -123,7 +123,7 @@ return {
 	['NPC can not change the icon'] = '无法更改系统角色的图标',
 	['Warning box'] = '系统警告框',
 	['Alert content'] = '报警内容',
-	['Tips: $me behalf of self, $team behalf of team, only allow once each'] = '小提示：$me 代表自己的名字，$team 代表团玩家的名字，一条喊话中仅允许使用一次。',
+	['Tips: {$me} behalf of self, {$team} behalf of team.'] = '小提示：{$me} 代表自己的名字，{$team} 代表团玩家的名字。',
 	['Speaker'] = '喊话对象',
 	['Content'] = '喊话内容',
 	['Chat content'] = '系统喊话',
