@@ -4478,15 +4478,16 @@ end
 
 
 do
-	local function PatternReplacer(szContent, tMapping)
+	local function PatternReplacer(szContent, tVar, bKeepNMTS)
+		-- 由于涉及缓存，所以该函数仅允许替换静态映射关系
 		if szContent == 'me' then
 			return LIB.GetUserRoleName()
 		end
-		if not IsNil(tMapping[szContent]) then
-			return tMapping[szContent]
+		if not IsNil(tVar[szContent]) then
+			return tVar[szContent]
 		end
 		if szContent:match('^%d+$') then
-			return tMapping[tonumber(szContent)]
+			return tVar[tonumber(szContent)]
 		end
 		local szType = szContent:sub(1, 1)
 		local dwID, nLevel = unpack(LIB.SplitString(szContent:sub(2), ','))
@@ -4514,45 +4515,48 @@ do
 				return map.szName
 			end
 		end
-		-- return '$' .. szType .. szContent
+		-- keep none-matched template string
+		if bKeepNMTS then
+			return '{$' .. szContent .. '}'
+		end
 	end
 	local CACHE, CACHE_KEY, MAX_CACHE = {}, {}, 100
-	function LIB.RenderTemplateString(szOriginText, tTextMapping, nTextLimit, bReplaceSensitiveWord)
-		if not szOriginText then
+	function LIB.RenderTemplateString(szTemplate, tVar, nMaxLen, bReplaceSensitiveWord, bKeepNMTS)
+		if not szTemplate then
 			return
 		end
-		local szKey = EncodeLUAData({szOriginText, tTextMapping, nTextLimit, bReplaceSensitiveWord})
+		local szKey = EncodeLUAData({szTemplate, tVar, nMaxLen, bReplaceSensitiveWord, bKeepNMTS})
 		if not CACHE[szKey] then
 			if bReplaceSensitiveWord then
-				szOriginText = LIB.ReplaceSensitiveWord(szOriginText)
+				szTemplate = LIB.ReplaceSensitiveWord(szTemplate)
 			end
 			local szText = ''
-			local nOriginLen, nLen, nPos = len(szOriginText), 0, 1
+			local nOriginLen, nLen, nPos = len(szTemplate), 0, 1
 			local szPart, nStart, nEnd, szContent
 			while nPos <= nOriginLen do
 				szPart, nStart, nEnd, szContent = nil
-				nStart = StringFindW(szOriginText, '{$', nPos)
+				nStart = StringFindW(szTemplate, '{$', nPos)
 				if nStart then
-					nEnd = StringFindW(szOriginText, '}', nStart + 2)
+					nEnd = StringFindW(szTemplate, '}', nStart + 2)
 					if nEnd then
-						szContent = szOriginText:sub(nStart + 2, nEnd - 1)
+						szContent = szTemplate:sub(nStart + 2, nEnd - 1)
 					end
 				end
 				if not nStart then
-					szPart = szOriginText:sub(nPos)
+					szPart = szTemplate:sub(nPos)
 					nPos = nOriginLen + 1
 				elseif not nEnd then
-					szPart = szOriginText:sub(nPos, nStart + 1)
+					szPart = szTemplate:sub(nPos, nStart + 1)
 					nPos = nStart + 2
 				elseif nStart > nPos then
-					szPart = szOriginText:sub(nPos, nStart - 1)
+					szPart = szTemplate:sub(nPos, nStart - 1)
 					nPos = nStart
 				end
 				if szPart then
-					if nTextLimit > 0 and nLen + wlen(szPart) > nTextLimit then
-						szPart = wsub(szPart, 1, nTextLimit - nLen)
+					if nMaxLen > 0 and nLen + wlen(szPart) > nMaxLen then
+						szPart = wsub(szPart, 1, nMaxLen - nLen)
 						szText = szText .. szPart
-						nLen = nTextLimit
+						nLen = nMaxLen
 						break
 					else
 						szText = szText .. szPart
@@ -4560,7 +4564,7 @@ do
 					end
 				end
 				if szContent then
-					szPart = PatternReplacer(szContent, tTextMapping)
+					szPart = PatternReplacer(szContent, tVar, bKeepNMTS)
 					if szPart then
 						szText = szText .. szPart
 					end

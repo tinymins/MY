@@ -227,18 +227,18 @@ end
 
 local function FilterCustomText(szOrigin, szSender, szReceiver)
 	local tTextMapping = {
-		sender = szSender or '',
-		receiver = szReceiver or '',
+		sender = szSender,
+		receiver = szReceiver,
 	}
-	return LIB.RenderTemplateString(szOrigin, tTextMapping, -1, true)
+	return LIB.RenderTemplateString(szOrigin, tTextMapping, -1, true, false)
 end
 
 local function ParseCustomText(szOrigin, szSender, szReceiver)
 	local tTextMapping = {
-		sender = szSender or '{$sender}',
-		receiver = szReceiver or '{$receiver}',
+		sender = szSender,
+		receiver = szReceiver,
 	}
-	return LIB.RenderTemplateString(szOrigin, tTextMapping, 8, true)
+	return LIB.RenderTemplateString(szOrigin, tTextMapping, 8, true, true)
 end
 
 local function ConstructSpeech(aText, aXml, szText, nFont, nR, nG, nB)
