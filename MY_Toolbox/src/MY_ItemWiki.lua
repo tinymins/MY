@@ -149,5 +149,26 @@ Box_AppendAddonMenu({function(box)
 	local dwTabType = item.dwTabType
 	local dwTabIndex = item.dwIndex
 	local nBookID = item.nGenre == ITEM_GENRE.BOOK and item.nBookID or -1
-	return {{ szOption = _L['Item wiki'], fnAction = function() D.Open(dwTabType, dwTabIndex, nBookID) end }}
+	local menu = {{ szOption = _L['Item wiki'], fnAction = function() D.Open(dwTabType, dwTabIndex, nBookID) end }}
+	if CONSTANT.FLOWERS_UIID[item.nUiId] then
+		insert(menu, {
+			szOption = _L['Lookup price'],
+			fnAction = function()
+				local me = GetClientPlayer()
+				local line = LIB.GetHLLineInfo({ dwMapID = me.GetMapID(), nCopyIndex = me.GetScene().nCopyIndex })
+				local szURL = 'https://page.j3cx.com/flowers/' .. concat({dwTabType, dwTabIndex}, '/') .. '?'
+					.. LIB.EncodePostData(LIB.UrlEncode({
+						lang = AnsiToUTF8(LIB.GetLang()),
+						server = AnsiToUTF8(line and line.szCenterName or LIB.GetRealServer(2)),
+						item = AnsiToUTF8(item.szName),
+						tabtype = dwTabType, tabindex = dwTabIndex, uiid = item.nUiId, player = AnsiToUTF8(GetUserRoleName()),
+					}))
+				MY_Web.Open(szURL, {
+					key = 'FlowerPrice_' .. concat({dwTabType, dwTabIndex}, '_'),
+					title = item.szName,
+				})
+			end,
+		})
+	end
+	return menu
 end})
