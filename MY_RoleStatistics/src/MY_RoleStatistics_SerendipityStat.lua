@@ -56,7 +56,7 @@ local PASSPHRASE = 'gbn9@#4uirae823&^*423otyeaseaw'
 if LIB.IsDebugClient('MY_RoleStatistics_SerendipityStat', true) then
 	-- 自动生成内置加密数据
 	local DAT_ROOT = 'MY_RoleStatistics/data/serendipity/'
-	local SRC_ROOT = PACKET_INFO.ROOT .. '!src-dist/dat/' .. DAT_ROOT
+	local SRC_ROOT = PACKET_INFO.ROOT .. '!src-dist/data/' .. DAT_ROOT
 	for _, szFile in ipairs(CPath.GetFileList(SRC_ROOT)) do
 		LIB.Sysmsg(_L['Encrypt and compressing: '] .. DAT_ROOT .. szFile)
 		local data = LoadDataFromFile(SRC_ROOT .. szFile)

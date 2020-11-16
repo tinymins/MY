@@ -10,7 +10,7 @@ try:
 except:
     pass
 
-from l_mapping import zh2Hant, zh2Hans, zh2TW, zh2HK, zh2CN, zh2SG
+from .mapping import zh2Hant, zh2Hans, zh2TW, zh2HK, zh2CN, zh2SG
 
 import sys
 py3k = sys.version_info >= (3, 0, 0)

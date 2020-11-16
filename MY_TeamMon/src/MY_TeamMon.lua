@@ -1743,7 +1743,7 @@ function D.Init()
 	if not MY_TM_DATA_EMBEDDED_ENCRYPTED then
 		-- 自动生成内置加密数据
 		local DAT_ROOT = 'MY_TeamMon/data/'
-		local SRC_ROOT = PACKET_INFO.ROOT .. '!src-dist/dat/' .. DAT_ROOT
+		local SRC_ROOT = PACKET_INFO.ROOT .. '!src-dist/data/' .. DAT_ROOT
 		for _, szFile in ipairs(CPath.GetFileList(SRC_ROOT)) do
 			LIB.Sysmsg(_L['Encrypt and compressing: '] .. DAT_ROOT .. szFile)
 			local uuid = szFile:sub(1, -13)

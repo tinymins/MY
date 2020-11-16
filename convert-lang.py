@@ -8,8 +8,9 @@
     Python Version: 3.7
 '''
 
-import sys, os, codecs, re, time, json, zlib, re
-from l_converter import Converter
+import codecs, importlib, json, os, re, sys, time, zlib
+
+Converter = importlib.import_module('!src-dist.plib.language.converter').Converter
 
 FILE_MAPPING = {
     'zhcn.lang': { 'out': 'zhtw.lang', 'type': 'lang' },

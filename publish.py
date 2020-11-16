@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import time, os, re, codecs
-from l_converter import Converter
+import codecs, importlib, os, re, time
+
+Converter = importlib.import_module('!src-dist.plib.language.converter').Converter
 
 def __is_interface(path):
     name = os.path.basename(path).lower()
@@ -114,7 +115,7 @@ def __7zip(file_name, base_message, base_hash):
     if base_hash != '':
         # Generate file change list since previous release commit
         def pathToModule(path):
-            return re.sub('(?:^\\!src-dist/dat/|["/].*$)', '', path)
+            return re.sub('(?:^\\!src-dist/data/|["/].*$)', '', path)
         paths = {
             'package.ini': True,
             'package.ini.*': True,
