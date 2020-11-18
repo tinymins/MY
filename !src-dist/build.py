@@ -6,7 +6,7 @@
 import argparse, codecs, importlib, os, re, time
 import plib.utils as utils
 import plib.git as git
-from plib.environment import get_current_packet_id, set_packet_as_cwd
+from plib.environment import get_current_packet_id, get_packet_path, set_packet_as_cwd
 from plib.language.converter import Converter
 import plib.environment as env
 
@@ -124,7 +124,7 @@ def __7zip(file_name, base_message, base_hash):
 
 	# Prepare for 7z compressing
 	print('zippping...')
-	os.system('7z a -t7z ' + file_name + ' -xr!manifest.dat -xr!manifest.key -xr!publisher.key -x@7zipignore.txt' + cmd_suffix)
+	os.system('start ./!src-dist/bin/7z.exe /wait /b a -t7z ' + file_name + ' -xr!manifest.dat -xr!manifest.key -xr!publisher.key -x@.7zipignore' + cmd_suffix)
 	print('File(s) compressing acomplished!')
 	print('Url: ' + file_name)
 	print('Based on git commit "%s(%s)".' % (base_message, base_hash) if base_hash != '' else 'Full package.')

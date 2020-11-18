@@ -17,16 +17,20 @@ def get_interface_path():
 		parent = child
 	return None
 
-def set_packet_as_cwd(name=None):
+def get_packet_path(name=None):
 	if name:
 		interface_path = get_interface_path()
 		if interface_path is None:
-			raise Exception('Can not detect interface path!')
-		packet_path = os.path.abspath(os.path.join(interface_path, name))
-		os.chdir(packet_path)
+			return None
+		return os.path.abspath(os.path.join(interface_path, name))
 	else:
-		packet_path = os.path.abspath(os.path.join(__file__, os.pardir, os.pardir, os.pardir))
-		os.chdir(packet_path)
+		return os.path.abspath(os.path.join(__file__, os.pardir, os.pardir, os.pardir))
+
+def set_packet_as_cwd(name=None):
+	packet_path = get_packet_path(name)
+	if packet_path is None:
+		raise Exception('Can not find packet path!')
+	os.chdir(packet_path)
 
 def get_current_packet_id():
 	packet_path = os.path.abspath(os.path.join(__file__, os.pardir, os.pardir, os.pardir))

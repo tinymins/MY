@@ -2,5 +2,4 @@
 /\!src-dist          export-ignore
 /MYDev_*             export-ignore
 /.*                  export-ignore
-/7z*                 export-ignore
 /*.py                export-ignore

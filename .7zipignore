@@ -2,7 +2,6 @@
 *.py
 *.pyc
 .*
-7z*
 MYDev_*
 README.md
 \!src-dist
