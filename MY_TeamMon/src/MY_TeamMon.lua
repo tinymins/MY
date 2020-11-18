@@ -1371,13 +1371,16 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 			end
 			if bInParty and content:find('{$team}', nil, true) then
 				local c = content
-				for kk, vv in ipairs(team.GetTeamMemberList()) do
+				for _, vv in ipairs(team.GetTeamMemberList()) do
 					if find(szContent, c:gsub('{$team}', team.GetClientTeamMemberName(vv)), nil, true) and (v.szTarget == szNpcName or v.szTarget == '%') then -- hit
 						data = v
 						dwReceiverID = vv
 						szReceiver = team.GetClientTeamMemberName(vv)
 						break
 					end
+				end
+				if dwReceiverID and szReceiver then
+					break
 				end
 			elseif v.szTarget == szNpcName or v.szTarget == '%' then
 				if v.bReg then
