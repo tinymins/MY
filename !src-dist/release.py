@@ -4,10 +4,11 @@
 版本标签创建自动化
 '''
 
-import time, os, re, codecs, win32api, datetime, argparse
+import time, os, re, codecs, datetime, argparse
 import plib.utils as utils
 import plib.git as git
 import plib.environment as env
+from plib.time import set_system_time, sync_ntp_time
 
 def __get_release_commit_list():
 	commit_list = []
@@ -90,8 +91,7 @@ if __name__ == '__main__':
 		if args.mock_time:
 			t = datetime.datetime.fromtimestamp(release.get('timestamp'))
 			print('Changing time to %d-%d-%d %d:%d:%d' % (t.year, t.month, t.day, t.hour, t.minute, t.second))
-			tt = datetime.datetime.utcfromtimestamp(release.get('timestamp'))
-			win32api.SetSystemTime(tt.year, tt.month, 0, tt.day, tt.hour, tt.minute, tt.second, 0)
+			set_system_time(t.year, t.month, t.day, t.hour, t.minute, t.second)
 
 		print('Creating tag V%d on %s...' % (changlog.get('version'), release.get('hash')))
 		message = 'Release V%d\n%s' % (changlog.get('version'), changlog.get('message'))
@@ -99,5 +99,10 @@ if __name__ == '__main__':
 			f.write(message)
 		os.system('git tag -a V%d %s -f -F commit_msg.txt' % (changlog.get('version'), release.get('hash')))
 		os.remove('commit_msg.txt')
+
+		if args.mock_time:
+			sync_ntp_time()
+			print('Idle for 5 seconds.')
+			time.sleep(5)
 
 	print('Jobs Acomplished.')
