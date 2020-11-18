@@ -4,6 +4,6 @@
 .*
 MYDev_*
 README.md
-\!src-dist
+!src-dist
 header.tpl.lua
 __pycache__
