@@ -53,6 +53,7 @@ if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description='Automatic release branch tags.')
 	parser.add_argument('--mock-time', action='store_true', help='Tagger at commit time.')
 	parser.add_argument('--overwrite', action='store_true', help='Overwrite exist tag.')
+	parser.add_argument('--dry-run', action='store_true', help='Dry run.')
 	args = parser.parse_args()
 
 	env.set_packet_as_cwd()
@@ -91,17 +92,22 @@ if __name__ == '__main__':
 		if args.mock_time:
 			t = datetime.datetime.fromtimestamp(release.get('timestamp'))
 			print('Changing time to %d-%d-%d %d:%d:%d' % (t.year, t.month, t.day, t.hour, t.minute, t.second))
-			set_system_time(t.year, t.month, t.day, t.hour, t.minute, t.second)
+
+			if not args.dry_run:
+				set_system_time(t.year, t.month, t.day, t.hour, t.minute, t.second)
 
 		print('Creating tag V%d on %s...' % (changlog.get('version'), release.get('hash')))
-		message = 'Release V%d\n%s' % (changlog.get('version'), changlog.get('message'))
-		with codecs.open('commit_msg.txt','w',encoding='utf8') as f:
-			f.write(message)
-		os.system('git tag -a V%d %s -f -F commit_msg.txt' % (changlog.get('version'), release.get('hash')))
-		os.remove('commit_msg.txt')
+
+		if not args.dry_run:
+			message = 'Release V%d\n%s' % (changlog.get('version'), changlog.get('message'))
+			with codecs.open('commit_msg.txt','w',encoding='utf8') as f:
+				f.write(message)
+			os.system('git tag -a V%d %s -f -F commit_msg.txt' % (changlog.get('version'), release.get('hash')))
+			os.remove('commit_msg.txt')
 
 		if args.mock_time:
-			sync_ntp_time()
+			if not args.dry_run:
+				sync_ntp_time()
 			print('Idle for 5 seconds.')
 			time.sleep(5)
 
