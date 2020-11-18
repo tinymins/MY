@@ -8,9 +8,10 @@
     Python Version: 3.7
 '''
 
-import codecs, importlib, json, os, re, sys, time, zlib
-
-Converter = importlib.import_module('!src-dist.plib.language.converter').Converter
+import codecs, json, os, re, sys, time
+import plib.utils as utils
+import plib.environment as env
+from plib.language.converter import Converter
 
 FILE_MAPPING = {
     'zhcn.lang': { 'out': 'zhtw.lang', 'type': 'lang' },
@@ -25,16 +26,6 @@ FOLDER_MAPPING = {
     # 'zhcn': { 'out': 'zhtw', 'type': 'lang' },
 }
 IGNORE_FOLDER = ['.git', '@DATA']
-
-def __is_interface(path):
-    name = os.path.basename(path).lower()
-    return name == 'interface' or name == 'interfacesource'
-
-def __get_file_crc(fileName):
-    prev = 0
-    for eachLine in open(fileName,'rb'):
-        prev = zlib.crc32(eachLine, prev)
-    return '%X'%(prev & 0xFFFFFFFF)
 
 def __load_crc_cache(root_path):
     crcs = {}
@@ -55,11 +46,11 @@ def __save_crc_cache(root_path, crcs):
         print('Crc cache saved: ' + crc_file)
 
 def __is_path_include(pkg_name, cwd, d):
-    if __is_interface(cwd) and os.path.isfile(os.path.join(cwd, d)):
+    if env.is_interface_path(cwd) and os.path.isfile(os.path.join(cwd, d)):
         return False
     if d in IGNORE_FOLDER:
         return False
-    if not __is_interface(cwd) and __is_interface(os.path.dirname(cwd)) and pkg_name != '':
+    if not env.is_interface_path(cwd) and env.is_interface_path(os.path.dirname(cwd)) and pkg_name != '':
         if os.path.basename(cwd) == pkg_name:
             return True
         elif os.path.exists(os.path.join(cwd, 'package.ini')):
@@ -92,7 +83,7 @@ def convert_progress(argv):
     pkg_name = ''
     root_path = params['--path']
     header_file = os.path.join(root_path, 'header.tpl.lua')
-    if (not __is_interface(root_path)) and __is_interface(os.path.dirname(root_path)):
+    if (not env.is_interface_path(root_path)) and env.is_interface_path(os.path.dirname(root_path)):
         pkg_name = os.path.basename(root_path)
         root_path = os.path.dirname(root_path)
 
@@ -107,7 +98,7 @@ def convert_progress(argv):
         for _, line in enumerate(codecs.open(header_file,'r',encoding='gbk')):
             header = header + line
         print('Header loaded: ' + header_file)
-        crc_header = __get_file_crc(header_file)
+        crc_header = utils.get_file_crc(header_file)
         relpath = header_file.replace(root_path, '')
         if crc_header != crcs.get(relpath):
             header_changed = True
@@ -138,7 +129,7 @@ def convert_progress(argv):
             if extname == '.lua' and header != '' and basename != pkg_name and filename != 'src.lua':
                 print('--------------------------------')
                 print('Update header: ' + filepath)
-                crc_text = __get_file_crc(filepath)
+                crc_text = utils.get_file_crc(filepath)
                 if not crc_changed:
                     crc_changed = crc_text != crcs.get(relpath)
                 if header_changed or crc_changed:
@@ -155,7 +146,7 @@ def convert_progress(argv):
                         with codecs.open(filepath,'w',encoding='gbk') as f:
                             f.write(ret_text)
                             print('File saved...')
-                        crc_text = __get_file_crc(filepath)
+                        crc_text = utils.get_file_crc(filepath)
                     else:
                         print('Already up to date.')
                     crcs[relpath] = crc_text
@@ -185,7 +176,7 @@ def convert_progress(argv):
             if fileType and folderOut and fileOut:
                 print('--------------------------------')
                 print('Convert language: ' + filepath)
-                crc_text = __get_file_crc(filepath)
+                crc_text = utils.get_file_crc(filepath)
                 if not crc_changed:
                     crc_changed = crc_text != crcs.get(relpath)
                 if fileType == 'package':
@@ -208,7 +199,7 @@ def convert_progress(argv):
                             with codecs.open(filepath,'w',encoding='gbk') as f:
                                 f.write(all_the_text)
                                 print('File saved: ' + filepath)
-                            crc_text = __get_file_crc(filepath)
+                            crc_text = utils.get_file_crc(filepath)
 
                         # all_the_text = all_the_text.decode('gbk')
                         all_the_text = converter.convert(all_the_text)
@@ -236,6 +227,7 @@ def convert_progress(argv):
         time.sleep(10)
 
 if __name__ == "__main__":
+    env.set_packet_as_cwd()
     try:
         argv
     except NameError:
