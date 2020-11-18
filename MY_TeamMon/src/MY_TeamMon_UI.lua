@@ -2284,6 +2284,15 @@ function D.OpenSettingPanel(data, szType)
 			end,
 		}):Pos('BOTTOMRIGHT')
 		nX = ui:Append('Text', { x = nX, y = nY, text = _L['Tips: {$me} behalf of self, {$team} behalf of team.'], alpha = 200 }):Pos('BOTTOMRIGHT')
+		nX = ui:Append('WndCheckBox', {
+			x = 540, y = nY + 3, w = 50,
+			text = _L['Partical search'], tip = _L['Supports match partical.'], tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+			checked = data.bSearch,
+			oncheck = function(bCheck)
+				data.bSearch = bCheck
+				FireUIEvent('MY_TM_CREATE_CACHE')
+			end,
+		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX, nY = ui:Append('WndCheckBox', {
 			x = 640, y = nY + 3, w = 50,
 			text = _L['Regexp match'], tip = _L['Supports backreference in note string, format: ${index}.'], tippostype = UI.TIP_POSITION.BOTTOM_TOP,
@@ -2361,6 +2370,15 @@ function D.OpenSettingPanel(data, szType)
 			end,
 		}):Pos('BOTTOMRIGHT')
 		nX = ui:Append('Text', { x = nX, y = nY, text = _L['Tips: {$me} behalf of self, {$team} behalf of team.'], alpha = 200 }):Pos('BOTTOMRIGHT')
+		nX = ui:Append('WndCheckBox', {
+			x = 540, y = nY + 3, w = 50,
+			text = _L['Partical search'], tip = _L['Supports match partical.'], tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+			checked = data.bSearch,
+			oncheck = function(bCheck)
+				data.bSearch = bCheck
+				FireUIEvent('MY_TM_CREATE_CACHE')
+			end,
+		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX, nY = ui:Append('WndCheckBox', {
 			x = 640, y = nY + 3, w = 50,
 			text = _L['Regexp match'], tip = _L['Supports backreference in note string, format: ${index}.'], tippostype = UI.TIP_POSITION.BOTTOM_TOP,
