@@ -166,6 +166,7 @@ Box_AppendAddonMenu({function(box)
 				MY_Web.Open(szURL, {
 					key = 'FlowerPrice_' .. concat({dwTabType, dwTabIndex}, '_'),
 					title = item.szName,
+					controls = false,
 				})
 			end,
 		})
