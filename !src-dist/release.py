@@ -1,30 +1,13 @@
 # -*- coding: utf-8 -*-
 # pip install pypiwin32
+'''
+版本标签创建自动化
+'''
 
 import time, os, re, codecs, win32api, datetime, argparse
-
-def __is_interface(path):
-    name = os.path.basename(path).lower()
-    return name == 'interface' or name == 'interfacesource'
-
-# Get interface root path
-pkg_name = ''
-root_path = os.path.abspath(os.getcwd())
-if not __is_interface(root_path) and __is_interface(os.path.dirname(root_path)):
-    pkg_name = os.path.basename(root_path)
-    root_path = os.path.dirname(root_path)
-
-def __exit(msg):
-    print(msg)
-    exit()
-
-def __assert(condition, msg):
-    if not condition:
-        __exit(msg)
-
-def __is_git_clean():
-    status = os.popen('git status').read().strip().split('\n')
-    return status[len(status) - 1] == 'nothing to commit, working tree clean'
+import plib.utils as utils
+import plib.git as git
+import plib.environment as env
 
 def __get_release_commit_list():
     commit_list = []
@@ -51,7 +34,7 @@ def __get_release_tag_list():
 def __get_changelog_list():
     info = None
     changelog_list = []
-    for _, line in enumerate(codecs.open('%s_CHANGELOG.txt' % pkg_name,'r',encoding='gbk')):
+    for _, line in enumerate(codecs.open('%s_CHANGELOG.txt' % env.get_current_packet_id(),'r',encoding='gbk')):
         try:
             if len(line) == 0:
                 continue
@@ -71,13 +54,15 @@ if __name__ == '__main__':
     parser.add_argument('--overwrite', action='store_true', help='Overwrite exist tag.')
     args = parser.parse_args()
 
-    __assert(__is_git_clean(), 'Error: branch has uncommited file change(s)!')
+    env.set_packet_as_cwd()
+
+    utils.assert_exit(git.is_clean(), 'Error: branch has uncommited file change(s)!')
 
     os.system('git checkout master')
-    __assert(__is_git_clean(), 'Error: branch has uncommited file change(s)!')
+    utils.assert_exit(git.is_clean(), 'Error: branch has uncommited file change(s)!')
 
     os.system('git rebase prelease')
-    __assert(__is_git_clean(), 'Error: resolve conflict and remove uncommited changes first!')
+    utils.assert_exit(git.is_clean(), 'Error: resolve conflict and remove uncommited changes first!')
 
     print('Reading changelog and version list...')
     changelog_list = __get_changelog_list()

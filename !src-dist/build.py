@@ -1,19 +1,14 @@
 # -*- coding: utf-8 -*-
+'''
+新版本打包自动化
+'''
 
-import codecs, importlib, os, re, time
-
-Converter = importlib.import_module('!src-dist.plib.language.converter').Converter
-
-def __is_interface(path):
-    name = os.path.basename(path).lower()
-    return name == 'interface' or name == 'interfacesource'
-
-# Get interface root path
-pkg_name = ''
-root_path = os.path.abspath(os.getcwd())
-if not __is_interface(root_path) and __is_interface(os.path.dirname(root_path)):
-    pkg_name = os.path.basename(root_path)
-    root_path = os.path.dirname(root_path)
+import argparse, codecs, importlib, os, re, time
+import plib.utils as utils
+import plib.git as git
+from plib.environment import get_current_packet_id, set_packet_as_cwd
+from plib.language.converter import Converter
+import plib.environment as env
 
 def __compress(addon):
     '''
@@ -75,22 +70,11 @@ def __compress(addon):
         f.write(converter.convert(info_content))
     print('Update info done...')
 
-def __is_git_clean():
-    status = os.popen('git status').read().strip().split('\n')
-    return status[len(status) - 1] == 'nothing to commit, working tree clean'
-
-def __get_current_branch():
-    name_list = os.popen('git branch').read().strip().split('\n')
-    for name in name_list:
-        if name[0:1] == '*':
-            return name[2:]
-    return ''
-
 def __get_version_info():
     '''Get version information'''
     # Read version from Base.lua
     current_version = 0
-    for line in open('%s_!Base/src/Base.lua' % pkg_name):
+    for line in open('%s_!Base/src/Base.lua' % get_current_packet_id()):
         if line[6:15] == '_VERSION_':
             current_version = int(line[-6:-3])
     # Read max and previous release commit
@@ -145,35 +129,25 @@ def __7zip(file_name, base_message, base_hash):
     print('Url: ' + file_name)
     print('Based on git commit "%s(%s)".' % (base_message, base_hash) if base_hash != '' else 'Full package.')
 
-
-def __exit(msg):
-    print(msg)
-    exit()
-
-def __assert(condition, msg):
-    if not condition:
-        __exit(msg)
-
-def run(mode):
-    is_full = mode.find('full') >= 0
-    is_release = mode.find('release') >= 0
+def run(is_full, is_source):
+    print('> RELEASE MODE: %s, %s.' % ('full' if is_full else 'diff', 'source' if is_source else 'dist'))
     version_info = __get_version_info()
 
-    if is_release:
+    if not is_source:
         # Merge master into prelease
-        if __get_current_branch() == 'master':
-            __assert(__is_git_clean(), 'Error: master branch has uncommited file change(s)!')
+        if git.get_current_branch() == 'master':
+            utils.assert_exit(git.is_clean(), 'Error: master branch has uncommited file change(s)!')
             os.system('git checkout prelease || git checkout -b prelease')
             os.system('git rebase master')
-            os.system('code "%s_!Base/src/Base.lua"' % pkg_name)
-            os.system('code "%s_CHANGELOG.txt"' % pkg_name)
-            __exit('Switched to prelease branch. Please commit release info and then run this script again!')
+            os.system('code "%s_!Base/src/Base.lua"' % get_current_packet_id())
+            os.system('code "%s_CHANGELOG.txt"' % get_current_packet_id())
+            utils.exit_with_message('Switched to prelease branch. Please commit release info and then run this script again!')
 
         # Merge prelease into stable
-        if __get_current_branch() == 'prelease':
+        if git.get_current_branch() == 'prelease':
             os.system('git reset master')
             version_info = __get_version_info()
-            __assert(version_info.get('current') > version_info.get('max'),
+            utils.assert_exit(version_info.get('current') > version_info.get('max'),
                 'Error: current version(%s) must be larger than max history version(%d)!' % (version_info.get('current'), version_info.get('max')))
             os.system('git add * && git commit -m "Release V%s"' % version_info.get('current'))
             os.system('git checkout stable || git checkout -b stable')
@@ -181,8 +155,8 @@ def run(mode):
             os.system('git rebase prelease')
 
         # Check if branch
-        __assert(__is_git_clean(), 'Error: resolve conflict and remove uncommited changes first!')
-        __assert(__get_current_branch() == 'stable', 'Error: current branch is not on stable!')
+        utils.assert_exit(git.is_clean(), 'Error: resolve conflict and remove uncommited changes first!')
+        utils.assert_exit(git.get_current_branch() == 'stable', 'Error: current branch is not on stable!')
 
     # Compress and concat source file
     for addon in os.listdir('./'):
@@ -190,7 +164,7 @@ def run(mode):
             __compress(addon)
 
     # Package files
-    file_name = '!src-dist/dist/%s_%s_v%s.7z' % (pkg_name, time.strftime('%Y%m%d%H%M%S', time.localtime()), version_info.get('current'))
+    file_name = '!src-dist/dist/%s_%s_v%s.7z' % (get_current_packet_id(), time.strftime('%Y%m%d%H%M%S', time.localtime()), version_info.get('current'))
     base_message = ''
     base_hash = ''
     if not is_full and version_info.get('current') != '' and version_info.get('previous_hash') != '':
@@ -199,11 +173,18 @@ def run(mode):
     __7zip(file_name, base_message, base_hash)
 
     # Revert source code modify by compressing
-    if is_release:
+    if not is_source:
         os.system('git reset HEAD --hard')
         os.system('git checkout master')
     time.sleep(5)
     print('Exiting...')
 
 if __name__ == '__main__':
-    run('diff release')
+    parser = argparse.ArgumentParser(description='One-key release packet product helper.')
+    parser.add_argument('--full', action='store_true', help='Package full plugin packet.')
+    parser.add_argument('--no-build', action='store_true', help='Package source code.')
+    args = parser.parse_args()
+
+    env.set_packet_as_cwd()
+
+    run(args.full, args.no_build)

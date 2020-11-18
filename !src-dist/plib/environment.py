@@ -27,3 +27,7 @@ def set_packet_as_cwd(name=None):
 	else:
 		packet_path = os.path.abspath(os.path.join(__file__, os.pardir, os.pardir, os.pardir))
 		os.chdir(packet_path)
+
+def get_current_packet_id():
+	packet_path = os.path.abspath(os.path.join(__file__, os.pardir, os.pardir, os.pardir))
+	return os.path.basename(packet_path)
