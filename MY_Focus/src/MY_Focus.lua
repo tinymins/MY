@@ -697,12 +697,16 @@ function D.GetDisplayList()
 			end
 			local KObject = LIB.GetObject(p.dwType, p.dwID)
 			if KObject then
-				local fCurrentLife, fMaxLife = LIB.GetObjectLife(KObject)
+				local fCurrentLife, fMaxLife
+				if p.dwType == TARGET.PLAYER or p.dwType == TARGET.NPC then
+					fCurrentLife, fMaxLife = LIB.GetObjectLife(KObject)
+				end
 				local bFocus, tRule, szVia, bDeletable = false
 				for _, via in ipairs(p.aVia) do
 					if via.tRule then
 						local bRuleFocus = true
 						if bRuleFocus and via.tRule.tLife.bEnable
+						and fCurrentLife and fMaxLife
 						and not LIB.JudgeOperator(via.tRule.tLife.szOperator, fCurrentLife / fMaxLife * 100, via.tRule.tLife.nValue) then
 							bRuleFocus = false
 						end
