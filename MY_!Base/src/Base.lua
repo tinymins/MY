@@ -139,8 +139,8 @@ end
 local function IsStreaming()
 	return _G.SM_IsEnable and _G.SM_IsEnable()
 end
-local _BUILD_                = '20201114'
-local _VERSION_              = 0x2019100
+local _BUILD_                = '20201119'
+local _VERSION_              = 0x2019200
 local _MENU_COLOR_           = {255, 165, 79}
 local _MAX_PLAYER_LEVEL_     = 100
 local _INTERFACE_ROOT_       = 'Interface/'
