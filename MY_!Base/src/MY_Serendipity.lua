@@ -336,7 +336,7 @@ LIB.RegisterEvent('OPEN_WINDOW.MY_Serendipity_HouseFlowerPrice', function()
 						p = AnsiToUTF8(szPrice),
 						i = AnsiToUTF8(szItem),
 						t = GetCurrentTime(),
-						cn = line and line.szCenterName or '',
+						cn = line and AnsiToUTF8(line.szCenterName) or '',
 						ci = line and line.dwCenterID or -1,
 						li = line and line.nLineIndex or -1,
 						mi = map and map.dwID,
