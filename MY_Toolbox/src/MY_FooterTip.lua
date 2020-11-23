@@ -189,7 +189,7 @@ function D.Apply()
 			if O.bTongMemberNav and Navigator_Remove then
 				Navigator_Remove('MY_GUILDMEMBER_TIP.' .. dwID)
 			else
-				local sha = hShaList:Lookup(tostring(dwID))
+				local sha = hShaList:IsValid() and hShaList:Lookup(tostring(dwID))
 				if sha then
 					sha:Hide()
 					insert(hShaList.freeShadows, sha)
