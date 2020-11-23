@@ -75,8 +75,8 @@ def __get_version_info():
 	# Read version from Base.lua
 	current_version = 0
 	for line in open('%s_!Base/src/Base.lua' % get_current_packet_id()):
-		if line[6:15] == '_VERSION_':
-			current_version = int(line[-6:-3])
+		if line[6:23] == '_NATURAL_VERSION_':
+			current_version = int(line.split(' ')[-1])
 	# Read max and previous release commit
 	commit_list = os.popen('git log --grep Release --pretty=format:"%s|%p"').read().split('\n')
 	max_version, prev_version, prev_version_message, prev_version_hash = 0, 0, '', ''

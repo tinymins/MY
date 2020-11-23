@@ -150,7 +150,7 @@ return {
 
 	['[%s] wants to get your location, would you like to share?'] = '[%s] 希望取得你當前所在地圖位置，你是否願意共享當前位置信息？',
 	['[%s] want to see your info, OK?'] = '團長 [%s] 想知曉您的裝備、心法，是否告知？',
-	['I\'ve installed MY plugins v%s'] = '我已安裝茗伊插件集 v%s。',
+	['I\'ve installed MY plugins v%s <%s>'] = '我已安裝茗伊插件集 v%s <%s>。',
 
 	['LClick to copy to editbox.\n'] = '左鍵複製到聊天欄\n',
 	['MClick to remove this line.\n'] = '中鍵刪除該行文本\n',
@@ -403,8 +403,8 @@ return {
 	['JX3 is pround of you!'] = '劍網3幸甚有你！',
 	['Thanks for your kindness!'] = '感謝各位無私付出的小可愛！',
 
-
-	['%s requires base library version upper than v%s, current at v%s.'] = '%s依賴茗伊基礎庫且要求版本不低於v%s，當前基礎庫版本為v%s。',
+	['%s requires a invalid base library version value: %s.'] = '%s依賴茗伊基礎庫但無法解析該版本號：%s。',
+	['%s requires base library version at %s, current at %s.'] = '%s依賴茗伊基礎庫且要求版本匹配%s，當前基礎庫版本為%s。',
 	['%s Database is malformed, do you want to repair database now? Repair database may take a long time and cause a disconnection.'] = '%s資料庫已損壞，需要修複後方可使用，但是修複可能造成臨時頓卡掉線,是否立即修複？',
 	['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'] = '接下來如有頓卡請耐心等待，不要結束進程，否則您的資料庫可能造成不可逆的數據損壞，點擊確認開始操作。',
 	['Database file locked, repair database failed! : %s'] = '資料庫文件被占用，修複失敗！(%s)',

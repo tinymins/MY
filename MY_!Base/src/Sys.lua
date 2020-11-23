@@ -1036,7 +1036,7 @@ local function FormatStorageData(me, d)
 		n = LIB.GetUserRoleName(), i = UI_GetClientPlayerID(), c = me.nCamp,
 		S = LIB.GetRealServer(1), s = LIB.GetRealServer(2), r = me.nRoleType,
 		_ = GetCurrentTime(), t = LIB.GetTongName(), d = d,
-		m = LIB.IsStreaming() and 1 or 0, v = select(2, LIB.GetVersion()),
+		m = LIB.IsStreaming() and 1 or 0, v = PACKET_INFO.VERSION,
 	})))
 end
 -- 个人数据版本号
@@ -1368,7 +1368,7 @@ local function RegisterMenu(aList, tKey, arg0, arg1)
 end
 
 local function GenerateMenu(aList, bMainMenu, dwTarType, dwTarID)
-	if not LIB.AssertVersion('', '', 0x2000100) then
+	if not LIB.AssertVersion('', '', '^3.0.0') then
 		return
 	end
 	local menu = {}

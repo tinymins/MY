@@ -55,7 +55,7 @@ local function GetAdvText()
 	if not me then
 		return ''
 	end
-	return _L('%s, welcome to use %s!', me.szName, PACKET_INFO.NAME) .. 'v' .. LIB.GetVersion()
+	return _L('%s, welcome to use %s!', me.szName, PACKET_INFO.NAME)
 end
 
 local function GetSvrText()

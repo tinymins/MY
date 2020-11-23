@@ -54,7 +54,7 @@ function LIB.GetFrame()
 end
 
 function LIB.OpenPanel()
-	if not LIB.AssertVersion('', '', 0x2000100) then
+	if not LIB.AssertVersion('', '', '^3.0.0') then
 		return
 	end
 	if not LIB.IsInitialized() then
@@ -615,7 +615,7 @@ function D.OnFrameCreate()
 	this.MAIN_WND = this:Lookup('Wnd_Total/WndScroll_MainPanel/WndContainer_MainPanel')
 	this.MAIN_HANDLE = this:Lookup('Wnd_Total/WndScroll_MainPanel/WndContainer_MainPanel', '')
 	local fScale = 1 + max(Font.GetOffset() * 0.03, 0)
-	this:Lookup('', 'Text_Title'):SetText(PACKET_INFO.NAME .. ' v' .. LIB.GetVersion() .. ' Build ' .. PACKET_INFO.BUILD)
+	this:Lookup('', 'Text_Title'):SetText(_L('%s V%s Build %s %s', PACKET_INFO.NAME, PACKET_INFO.NATURAL_VERSION, PACKET_INFO.VERSION, PACKET_INFO.BUILD))
 	this:Lookup('', 'Text_Author'):SetText('-- by ' .. PACKET_INFO.AUTHOR_SIGNATURE)
 	this:Lookup('Wnd_Total/Btn_Weibo', 'Text_Default'):SetText(_L('Author @%s', PACKET_INFO.AUTHOR_WEIBO))
 	this:Lookup('Wnd_Total/Btn_Weibo', 'Image_Icon'):FromUITex(PACKET_INFO.UITEX_ICON, PACKET_INFO.MAINICON_FRAME)

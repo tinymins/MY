@@ -67,9 +67,9 @@ LIB.RegisterBgMsg('MY_VERSION_CHECK', function(_, oData, nChannel, dwTalkerID, s
 	end
 	local bSilent = oData[1]
 	if not bSilent and LIB.IsInParty() then
-		LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, _L('I\'ve installed MY plugins v%s', LIB.GetVersion()))
+		LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, _L('I\'ve installed MY plugins v%s <%s>', PACKET_INFO.VERSION, PACKET_INFO.NATURAL_VERSION))
 	end
-	LIB.SendBgMsg(szTalkerName, 'MY_VERSION_REPLY', LIB.GetVersion(), true)
+	LIB.SendBgMsg(szTalkerName, 'MY_VERSION_REPLY', {PACKET_INFO.VERSION, PACKET_INFO.NATURAL_VERSION, PACKET_INFO.BUILD}, true)
 end)
 
 -- 测试用（调试工具）

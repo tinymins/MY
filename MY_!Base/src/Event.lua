@@ -208,7 +208,7 @@ local function OnInit()
 	if not INIT_EVENT then
 		return
 	end
-	if not LIB.AssertVersion('', '', 0x2000100) then
+	if not LIB.AssertVersion('', '', '^3.0.0') then
 		return
 	end
 	LIB.CreateDataRoot(PATH_TYPE.ROLE)
@@ -218,8 +218,8 @@ local function OnInit()
 	CommonEventFirer(INIT_EVENT)
 	INIT_EVENT = nil
 	-- 显示欢迎信息
-	local me = GetClientPlayer()
-	LIB.Sysmsg(_L('%s, welcome to use %s!', me.szName, PACKET_INFO.NAME) .. ' v' .. LIB.GetVersion() .. ' Build ' .. PACKET_INFO.BUILD)
+	LIB.Sysmsg(_L('%s, welcome to use %s!', LIB.GetUserRoleName(), PACKET_INFO.NAME)
+		.. _L(' v%s Build %s %s', PACKET_INFO.NATURAL_VERSION, PACKET_INFO.VERSION, PACKET_INFO.BUILD))
 end
 LIB.RegisterEvent('LOADING_ENDING', OnInit) -- 不能用FIRST_LOADING_END 不然注册快捷键就全跪了
 

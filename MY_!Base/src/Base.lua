@@ -140,7 +140,8 @@ local function IsStreaming()
 	return _G.SM_IsEnable and _G.SM_IsEnable()
 end
 local _BUILD_                = '20201119'
-local _VERSION_              = 0x2019200
+local _NATURAL_VERSION_      = 192
+local _VERSION_              = '3.0.0'
 local _MENU_COLOR_           = {255, 165, 79}
 local _MAX_PLAYER_LEVEL_     = 100
 local _INTERFACE_ROOT_       = 'Interface/'
@@ -750,6 +751,7 @@ local tInfo = {
 	MENUICON_HOVER_FRAME = _MENUICON_HOVER_FRAME_,
 	UICOMPONENT_ROOT     = _UICOMPONENT_ROOT_    ,
 	VERSION              = _VERSION_             ,
+	NATURAL_VERSION      = _NATURAL_VERSION_     ,
 	BUILD                = _BUILD_               ,
 	NAME_SPACE           = _NAME_SPACE_          ,
 	DEBUG_LEVEL          = _DEBUG_LEVEL_         ,
@@ -1492,27 +1494,122 @@ _G[_NAME_SPACE_] = LIB
 -- »ù´¡º¯Êý
 -----------------------------------------------
 
--- (string, number) LIB.GetVersion()
-function LIB.GetVersion(dwVersion)
-	local dwVersion = dwVersion or _VERSION_
-	local szVersion = format('%X.%X.%02X', dwVersion / 0x1000000,
-		floor(dwVersion / 0x10000) % 0x100, floor(dwVersion / 0x100) % 0x100)
-	if  dwVersion % 0x100 ~= 0 then
-		szVersion = szVersion .. 'b' .. tostring(dwVersion % 0x100)
+-- (table) LIB.GetVersion(string szVersion)
+function LIB.GetVersion(szVersion)
+	local aVersion = SplitString(szVersion, '.')
+	if not aVersion or #aVersion < 3 or #aVersion > 4 then
+		return
 	end
-	return szVersion, dwVersion
+	local tVersion = {
+		nMajor = tonumber(aVersion[1]),
+		nMinor = tonumber(aVersion[2]),
+		nPatch = tonumber(aVersion[3]),
+	}
+	if aVersion[4] then
+		if find(aVersion[4], 'alpha', nil, true) then
+			tVersion.nAlpha = tonumber((sub(aVersion[4], 6)))
+		elseif find(aVersion[4], 'beta', nil, true) then
+			tVersion.nBeta = tonumber((sub(aVersion[4], 5)))
+		end
+	end
+	return tVersion
 end
 
-function LIB.AssertVersion(szKey, szCaption, dwMinVersion)
-	if _VERSION_ < dwMinVersion then
-		if not IsEmpty(szCaption) then
+function LIB.AssertVersion(szKey, szCaption, szRequireVersion)
+	if not IsString(szRequireVersion) then
+		LIB.Sysmsg(_L(
+			'%s requires a invalid base library version value: %s.',
+			szCaption, EncodeLUAData(szRequireVersion)))
+		return IsDebugClient() or false
+	end
+	local szOp = sub(szRequireVersion, 1, 1)
+	if szOp == '^' or szOp == '~' then
+		szRequireVersion = sub(szRequireVersion, 2)
+	else
+		szOp = '='
+	end
+	local tRequireVersion = LIB.GetVersion(szRequireVersion)
+	if not tRequireVersion then
+		LIB.Sysmsg(_L(
+			'%s requires a invalid base library version value: %s.',
+			szCaption, EncodeLUAData(szRequireVersion)))
+		return IsDebugClient() or false
+	end
+	local tCurrentVersion = LIB.GetVersion(_VERSION_)
+	if szOp == '=' then
+		if tRequireVersion.nMajor ~= tCurrentVersion.nMajor
+		or tRequireVersion.nMinor ~= tCurrentVersion.nMinor
+		or tRequireVersion.nPatch ~= tCurrentVersion.nPatch
+		or tRequireVersion.nAlpha ~= tCurrentVersion.nAlpha
+		or tRequireVersion.nBeta ~= tCurrentVersion.nBeta then
 			LIB.Sysmsg(_L(
-				'%s requires base library version upper than v%s, current at v%s.',
-				szCaption, LIB.GetVersion(dwMinVersion), LIB.GetVersion()))
+				'%s requires base library version at %s, current at %s.',
+				szCaption, szOp .. szRequireVersion, _VERSION_))
+			return IsDebugClient() or false
 		end
-		if not IsDebugClient() then
-			return false
+	elseif szOp == '^' then
+		if tRequireVersion.nMajor == tCurrentVersion.nMajor then
+			if tRequireVersion.nMinor < tCurrentVersion.nMinor then
+				return true
+			end
+			if tRequireVersion.nMinor == tCurrentVersion.nMinor then
+				if tRequireVersion.nPatch < tCurrentVersion.nPatch then
+					return true
+				end
+				if tRequireVersion.nPatch == tCurrentVersion.nPatch then
+					if tRequireVersion.nAlpha and not tCurrentVersion.nAlpha then
+						return true
+					end
+					if tRequireVersion.nAlpha and tCurrentVersion.nAlpha and tRequireVersion.nAlpha < tCurrentVersion.nAlpha then
+						return true
+					end
+					if tRequireVersion.nAlpha == tCurrentVersion.nAlpha then
+						if tRequireVersion.nBeta and not tCurrentVersion.nBeta then
+							return true
+						end
+						if tRequireVersion.nBeta and tCurrentVersion.nBeta and tRequireVersion.nBeta < tCurrentVersion.nBeta then
+							return true
+						end
+						if tRequireVersion.nBeta == tCurrentVersion.nBeta then
+							return true
+						end
+					end
+				end
+			end
 		end
+		LIB.Sysmsg(_L(
+			'%s requires base library version at %s, current at %s.',
+			szCaption, szOp .. szRequireVersion, _VERSION_))
+		return IsDebugClient() or false
+	elseif szOp == '~' then
+		if tRequireVersion.nMajor == tCurrentVersion.nMajor and tRequireVersion.nMinor == tCurrentVersion.nMinor then
+			if tRequireVersion.nPatch < tCurrentVersion.nPatch then
+				return true
+			end
+			if tRequireVersion.nPatch == tCurrentVersion.nPatch then
+				if tRequireVersion.nAlpha and not tCurrentVersion.nAlpha then
+					return true
+				end
+				if tRequireVersion.nAlpha and tCurrentVersion.nAlpha and tRequireVersion.nAlpha < tCurrentVersion.nAlpha then
+					return true
+				end
+				if tRequireVersion.nAlpha == tCurrentVersion.nAlpha then
+					if tRequireVersion.nBeta and not tCurrentVersion.nBeta then
+						return true
+					end
+					if tRequireVersion.nBeta and tCurrentVersion.nBeta and tRequireVersion.nBeta < tCurrentVersion.nBeta then
+						return true
+					end
+					if tRequireVersion.nBeta == tCurrentVersion.nBeta then
+						return true
+					end
+				end
+			end
+		end
+		LIB.Sysmsg(_L(
+			'%s requires base library version at %s, current at %s.',
+			szCaption, szOp .. szRequireVersion, _VERSION_))
+		return IsDebugClient() or false
 	end
 	return true
 end
