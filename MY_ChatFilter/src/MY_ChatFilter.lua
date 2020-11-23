@@ -199,8 +199,9 @@ LIB.HookChatPanel('FILTER.MY_ChatFilter', function(h, szMsg, szChannel, dwTime)
 	return true
 end)
 
-LIB.RegisterPanel('MY_DuplicateChatFilter', _L['duplicate chat filter'], _L['Chat'],
-'ui/Image/UICommon/yirong3.UITex|104', {OnPanelActive = function(wnd)
+local PS = {}
+
+function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
 	local w, h = ui:Size()
 	local x, y = 20, 30
@@ -264,4 +265,6 @@ LIB.RegisterPanel('MY_DuplicateChatFilter', _L['duplicate chat filter'], _L['Cha
 		end,
 	})
 	y = y + 30
-end})
+end
+
+LIB.RegisterPanel(_L['Chat'], 'MY_DuplicateChatFilter', _L['duplicate chat filter'], 'ui/Image/UICommon/yirong3.UITex|104', PS)

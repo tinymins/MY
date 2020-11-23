@@ -549,4 +549,4 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + deltaY
 end
-LIB.RegisterPanel('MY_Focus', _L['Focus list'], _L['Target'], 'ui/Image/button/SystemButton_1.UITex|9', PS)
+LIB.RegisterPanel(_L['Target'], 'MY_Focus', _L['Focus list'], 'ui/Image/button/SystemButton_1.UITex|9', PS)

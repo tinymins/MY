@@ -751,7 +751,7 @@ function PS.OnPanelActive(frame)
 		autoenable = function() return (MY_GKPDoodad.bShowName or MY_GKPDoodad.bInteract) and MY_GKPDoodad.bCustom end,
 	})
 end
-LIB.RegisterPanel('MY_GKPDoodad', _L['GKP Doodad helper'], _L['General'], 90, PS)
+LIB.RegisterPanel(_L['General'], 'MY_GKPDoodad', _L['GKP Doodad helper'], 90, PS)
 
 -- Global exports
 do

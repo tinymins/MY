@@ -235,4 +235,4 @@ function PS.OnPanelActive(frame)
 		end,
 	}):AutoWidth():Height() + 3
 end
-LIB.RegisterPanel('MY_Cataclysm_Interface', _L['Interface settings'], _L['Raid'], 'ui/Image/UICommon/RaidTotal.uitex|74', PS)
+LIB.RegisterPanel(_L['Raid'], 'MY_Cataclysm_Interface', _L['Interface settings'], 'ui/Image/UICommon/RaidTotal.uitex|74', PS)

@@ -241,4 +241,4 @@ function PS.OnPanelActive(frame)
 	ui:Append('WndEditBox', { name = 'Edit_Result', x = x + 10, y = y + 150, limit = 9999, w = 480, h = 200, multiline = true, text = O.szResult })
 end
 
-LIB.RegisterPanel('MYDev_UIFindStation', _L['MYDev_UIFindStation'], _L['Development'], 2791, PS)
+LIB.RegisterPanel(_L['Development'], 'MYDev_UIFindStation', _L['MYDev_UIFindStation'], 2791, PS)

@@ -250,4 +250,4 @@ function PS.OnPanelActive(wnd)
 	}):AutoWidth():Pos('BOTTOMRIGHT')
 end
 
-LIB.RegisterPanel('MY_TeamMon', _L['MY_TeamMon'], _L['Raid'], 'ui/Image/UICommon/FBlist.uitex|34', PS)
+LIB.RegisterPanel(_L['Raid'], 'MY_TeamMon', _L['MY_TeamMon'], 'ui/Image/UICommon/FBlist.uitex|34', PS)

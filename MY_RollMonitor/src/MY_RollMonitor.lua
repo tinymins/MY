@@ -500,4 +500,4 @@ function PS.OnPanelDeactive()
 	LIB.BreatheCall('MY_RollMonitorRedraw', false)
 end
 
-LIB.RegisterPanel('RollMonitor', _L['roll monitor'], _L['General'], 'UI/Image/UICommon/LoginCommon.UITex|30', PS)
+LIB.RegisterPanel(_L['General'], 'RollMonitor', _L['roll monitor'], 'UI/Image/UICommon/LoginCommon.UITex|30', PS)

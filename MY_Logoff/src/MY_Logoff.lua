@@ -210,7 +210,7 @@ function PS.OnPanelActive(wnd)
 	x = X + 10
 	ui:Append('Text', { x = x, y = y, w = w - x * 2, text = _L['MY_Logoff TIPS'], font = 27, multiline = true, valign = 0 })
 end
-LIB.RegisterPanel('Logoff', _L['Express logoff'], _L['System'], 'UI/Image/UICommon/LoginSchool.UITex|24', PS)
+LIB.RegisterPanel(_L['System'], 'Logoff', _L['Express logoff'], 'UI/Image/UICommon/LoginSchool.UITex|24', PS)
 
 do
 local menu = {

@@ -321,10 +321,10 @@ function LIB.GetCurrentTabID()
 end
 
 -- 注册选项卡
--- (void) LIB.RegisterPanel(szKey, szName, szCategory, szIconTex, options)
+-- (void) LIB.RegisterPanel(szCategory, szKey, szName, szIconTex, options)
+-- szCategory      选项卡所在分类
 -- szKey           选项卡唯一 KEY
 -- szName          选项卡按钮标题
--- szCategory      选项卡所在分类
 -- szIconTex       选项卡图标文件|图标帧
 -- options         选项卡各种响应函数 {
 --   options.bShielded               屏蔽的选项卡
@@ -333,8 +333,8 @@ end
 --   options.OnPanelActive(wnd)      选项卡激活    wnd为当前MainPanel
 --   options.OnPanelDeactive(wnd)    选项卡取消激活
 -- }
--- Ex： LIB.RegisterPanel( 'Test', '测试标签', '测试', 'UI/Image/UICommon/ScienceTreeNode.UITex|123', { OnPanelActive = function(wnd) end } )
-function LIB.RegisterPanel(szKey, szName, szCategory, szIconTex, options)
+-- Ex： LIB.RegisterPanel('测试', 'Test', '测试标签', 'UI/Image/UICommon/ScienceTreeNode.UITex|123', { OnPanelActive = function(wnd) end })
+function LIB.RegisterPanel(szCategory, szKey, szName, szIconTex, options)
 	-- 分类不存在则创建
 	if not options.bHide and not lodash.find(PANEL_CATEGORY_LIST, function(tCategory) return tCategory.szName == szCategory end) then
 		insert(PANEL_CATEGORY_LIST, {

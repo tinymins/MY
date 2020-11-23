@@ -189,4 +189,4 @@ function PS.OnPanelDeactive()
 	LIB.BreatheCall('GlobalConfig', false)
 end
 
-LIB.RegisterPanel('GlobalConfig', _L['GlobalConfig'], _L['System'], 'ui\\Image\\Minimap\\Minimap.UITex|181', PS)
+LIB.RegisterPanel(_L['System'], 'GlobalConfig', _L['GlobalConfig'], 'ui\\Image\\Minimap\\Minimap.UITex|181', PS)

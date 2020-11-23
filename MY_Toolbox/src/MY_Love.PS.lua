@@ -281,4 +281,4 @@ function PS.OnPanelDeactive()
 	O.bPanelActive = false
 end
 
-LIB.RegisterPanel('MY_Love', _L['MY_Love'], _L['Target'], 329, PS)
+LIB.RegisterPanel(_L['Target'], 'MY_Love', _L['MY_Love'], 329, PS)

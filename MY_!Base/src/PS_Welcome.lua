@@ -269,4 +269,4 @@ function PS.OnPanelBreathe(wnd)
 	ui:Fetch('Text_Memory'):Text(GetMemoryText())
 end
 
-LIB.RegisterPanel('Welcome', _L['Welcome'], nil, '', PS)
+LIB.RegisterPanel(nil, 'Welcome', _L['Welcome'], '', PS)

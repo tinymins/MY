@@ -281,6 +281,6 @@ RegisterEvent('MY_BASE_LOADING_END', function()
 		D.RemoveBreathe()
 	end
 
-	MY.RegisterPanel('MY_LuaWatcher', _L['MY_LuaWatcher'], _L['Development'], 'ui/Image/UICommon/BattleFiled.UITex|7', PS)
+	MY.RegisterPanel(_L['Development'], 'MY_LuaWatcher', _L['MY_LuaWatcher'], 'ui/Image/UICommon/BattleFiled.UITex|7', PS)
 end)
 --[[#DEBUG END]]

@@ -267,7 +267,7 @@ LIB.RegisterInit('MY_INFOTIP', function()
 end)
 
 
-LIB.RegisterPanel( 'MY_InfoTip', _L['MY_InfoTip'], _L['System'], 'ui/Image/UICommon/ActivePopularize2.UITex|22', { OnPanelActive = function(wnd)
+LIB.RegisterPanel(_L['System'], 'MY_InfoTip', _L['MY_InfoTip'], 'ui/Image/UICommon/ActivePopularize2.UITex|22', { OnPanelActive = function(wnd)
     local ui = UI(wnd)
     local w, h = ui:Size()
     local x, y = 50, 20

@@ -321,4 +321,4 @@ function PS.OnPanelDeactive()
 	D.StopSearch()
 end
 
-LIB.RegisterPanel('MY_ItemInfoSearch', _L['MY_ItemInfoSearch'], _L['General'], 'ui/Image/UICommon/ActivePopularize2.UITex|30', PS)
+LIB.RegisterPanel(_L['General'], 'MY_ItemInfoSearch', _L['MY_ItemInfoSearch'], 'ui/Image/UICommon/ActivePopularize2.UITex|30', PS)

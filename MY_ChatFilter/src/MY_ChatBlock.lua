@@ -390,4 +390,4 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 end
-LIB.RegisterPanel('MY_ChatBlock', _L['MY_ChatBlock'], _L['Chat'], 'UI/Image/Common/Money.UITex|243', PS)
+LIB.RegisterPanel(_L['Chat'], 'MY_ChatBlock', _L['MY_ChatBlock'], 'UI/Image/Common/Money.UITex|243', PS)

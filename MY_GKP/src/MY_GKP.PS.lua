@@ -271,4 +271,4 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + 28
 end
-LIB.RegisterPanel('MY_GKP', _L['GKP Golden Team Record'], _L['General'], 2490, PS)
+LIB.RegisterPanel(_L['General'], 'MY_GKP', _L['GKP Golden Team Record'], 2490, PS)

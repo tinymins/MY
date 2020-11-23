@@ -536,4 +536,4 @@ end
 function PS.OnPanelDeactive()
 	_C.list = nil
 end
-LIB.RegisterPanel('MY_Anmerkungen_Player_Note', _L['Player note'], _L['Target'], 'ui/Image/button/ShopButton.UITex|12', PS)
+LIB.RegisterPanel(_L['Target'], 'MY_Anmerkungen_Player_Note', _L['Player note'], 'ui/Image/button/ShopButton.UITex|12', PS)

@@ -203,7 +203,7 @@ function PS.OnPanelActive(frame)
 	})
 	ui:Append('Text', { name = 'Text_Preview', x = 20, y = nY + 50, txt = _L['JX3'], font = O.dwFontScheme, scale = O.fScale})
 end
-LIB.RegisterPanel('MY_TeamMon_LT', _L['MY_TeamMon_LT'], _L['Raid'], 'ui/Image/TargetPanel/Target.uitex|59', PS)
+LIB.RegisterPanel(_L['Raid'], 'MY_TeamMon_LT', _L['MY_TeamMon_LT'], 'ui/Image/TargetPanel/Target.uitex|59', PS)
 
 -- Global exports
 do

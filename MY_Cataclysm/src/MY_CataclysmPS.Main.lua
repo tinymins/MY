@@ -297,4 +297,4 @@ function PS.OnPanelActive(frame)
 	-- end, true, true):Pos('BOTTOMRIGHT')
 	y = y + 25
 end
-LIB.RegisterPanel('MY_Cataclysm', _L['Cataclysm'], _L['Raid'], 'ui/Image/UICommon/RaidTotal.uitex|62', PS)
+LIB.RegisterPanel(_L['Raid'], 'MY_Cataclysm', _L['Cataclysm'], 'ui/Image/UICommon/RaidTotal.uitex|62', PS)

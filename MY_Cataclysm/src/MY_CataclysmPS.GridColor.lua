@@ -360,4 +360,4 @@ function PS.OnPanelActive(frame)
 		}):AutoWidth():Width() + 5
 	end
 end
-LIB.RegisterPanel('MY_Cataclysm_GridColor', _L['Grid Color'], _L['Raid'], 'ui/Image/UICommon/RaidTotal.uitex|71', PS)
+LIB.RegisterPanel(_L['Raid'], 'MY_Cataclysm_GridColor', _L['Grid Color'], 'ui/Image/UICommon/RaidTotal.uitex|71', PS)

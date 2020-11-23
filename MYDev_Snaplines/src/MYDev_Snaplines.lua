@@ -402,9 +402,7 @@ end
 LIB.RegisterInit('MYDEV_SNAPLINES', MYDev_Snaplines.ReloadUI)
 
 -- ×¢²áÃæ°å
-LIB.RegisterPanel(
-	'Dev_Snaplines', _L['Snaplines'], _L['Development'],
-	'ui/Image/UICommon/PlugIn.UITex|1', {
+LIB.RegisterPanel(_L['Development'], 'Dev_Snaplines', _L['Snaplines'], 'ui/Image/UICommon/PlugIn.UITex|1', {
 	OnPanelActive = function(wnd)
 		local ui = UI(wnd)
 		local w, h = ui:Size()

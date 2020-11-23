@@ -70,4 +70,4 @@ function PS.OnPanelActive(wnd)
 	x, y = MY_WhisperMetion.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
 	x, y = MY_ChatEmotion.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
 end
-LIB.RegisterPanel('MY_ChatSwitch', _L['chat helper'], _L['Chat'], 'UI/Image/UICommon/ActivePopularize2.UITex|20', PS)
+LIB.RegisterPanel(_L['Chat'], 'MY_ChatSwitch', _L['chat helper'], 'UI/Image/UICommon/ActivePopularize2.UITex|20', PS)

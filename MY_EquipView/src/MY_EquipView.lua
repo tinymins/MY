@@ -133,4 +133,4 @@ _C.PS = {
 	end
 }
 
-LIB.RegisterPanel('MY_EquipView', _L['equip view'], _L['General'], 'ui/Image/UICommon/CommonPanel7.UITex|23', _C.PS)
+LIB.RegisterPanel(_L['General'], 'MY_EquipView', _L['equip view'], 'ui/Image/UICommon/CommonPanel7.UITex|23', _C.PS)

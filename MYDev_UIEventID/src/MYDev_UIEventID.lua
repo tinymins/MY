@@ -101,9 +101,7 @@ _C.SetEventID = function(ui, nEventID)
 	end
 end
 
-LIB.RegisterPanel(
-'Dev_UIEventID', _L['UIEventID'], _L['Development'],
-'ui/Image/UICommon/BattleFiled.UITex|7', {
+LIB.RegisterPanel(_L['Development'], 'Dev_UIEventID', _L['UIEventID'], 'ui/Image/UICommon/BattleFiled.UITex|7', {
 OnPanelActive = function(wnd)
 	local ui = UI(wnd)
 	local x, y = 10, 30

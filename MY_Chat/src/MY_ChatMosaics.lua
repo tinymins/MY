@@ -318,4 +318,4 @@ function PS.OnPanelActive(wnd)
 	y = y + 30
 end
 
-LIB.RegisterPanel('MY_Chat_ChatMosaics', _L['chat mosaics'], _L['Chat'], 'ui/Image/UICommon/yirong3.UITex|50', PS)
+LIB.RegisterPanel(_L['Chat'], 'MY_Chat_ChatMosaics', _L['chat mosaics'], 'ui/Image/UICommon/yirong3.UITex|50', PS)

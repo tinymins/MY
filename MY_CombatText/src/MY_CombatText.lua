@@ -1237,7 +1237,7 @@ function PS.OnPanelActive(frame)
 		})
 	end
 end
-LIB.RegisterPanel('MY_CombatText', _L['CombatText'], _L['System'], 2041, PS)
+LIB.RegisterPanel(_L['System'], 'MY_CombatText', _L['CombatText'], 2041, PS)
 
 local function GetPlayerID()
 	local me = GetControlPlayer()

@@ -152,4 +152,4 @@ function PS.OnPanelActive(wnd)
 		}):Pos('BOTTOMRIGHT') + 10
 	end
 end
-LIB.RegisterPanel('MY_TeamAD', _L['MY_TeamAD'], _L['Raid'], 5958, PS)
+LIB.RegisterPanel(_L['Raid'], 'MY_TeamAD', _L['MY_TeamAD'], 5958, PS)

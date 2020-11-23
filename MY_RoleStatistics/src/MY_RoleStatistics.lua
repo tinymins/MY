@@ -426,4 +426,4 @@ function PS.OnPanelActive(wnd)
 	x = X + 10
 	ui:Append('Text', { x = x, y = y, w = w, text = _L['MY_RoleStatistics TIPS'], font = 27, multiline = true, valign = 0 })
 end
-LIB.RegisterPanel('MY_RoleStatistics', _L['MY_RoleStatistics'], _L['General'], 13491, PS)
+LIB.RegisterPanel(_L['General'], 'MY_RoleStatistics', _L['MY_RoleStatistics'], 13491, PS)

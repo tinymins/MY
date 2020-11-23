@@ -565,7 +565,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	}):Pos('BOTTOMRIGHT')
 end
-LIB.RegisterPanel('MY_Taoguan', _L[MODULE_NAME], _L['Target'], 119, PS)
+LIB.RegisterPanel(_L['Target'], 'MY_Taoguan', _L[MODULE_NAME], 119, PS)
 
 ---------------------------------------------------------------------
 -- 注册事件、初始化

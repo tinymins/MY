@@ -365,4 +365,4 @@ function PS.OnPanelActive(wnd)
 		onchange = function(val) MY_TargetFace.nShapeAlpha = (100 - val) * 2 end,
 	})
 end
-LIB.RegisterPanel('MY_Target', _L['MY_Target'], _L['Target'], 2136, PS)
+LIB.RegisterPanel(_L['Target'], 'MY_Target', _L['MY_Target'], 2136, PS)

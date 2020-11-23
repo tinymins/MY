@@ -163,7 +163,7 @@ _C.Trick = function()
 	end
 end
 
-LIB.RegisterPanel('TalkEx', _L['talk ex'], _L['Chat'], 'UI/Image/UICommon/ScienceTreeNode.UITex|123', { OnPanelActive = function(wnd)
+LIB.RegisterPanel(_L['Chat'], 'TalkEx', _L['talk ex'], 'UI/Image/UICommon/ScienceTreeNode.UITex|123', { OnPanelActive = function(wnd)
 	local ui = UI(wnd)
 	local w, h = ui:Size()
 	-------------------------------------

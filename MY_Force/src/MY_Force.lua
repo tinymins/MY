@@ -472,4 +472,4 @@ function PS.OnPanelActive(frame)
 	y = y + 28
 	x, y = MY_ChangGeShadow.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 end
-LIB.RegisterPanel('MY_Force', _L['MY_Force'], _L['Target'], 327, PS)
+LIB.RegisterPanel(_L['Target'], 'MY_Force', _L['MY_Force'], 327, PS)

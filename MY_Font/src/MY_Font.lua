@@ -223,6 +223,6 @@ function PS.OnPanelActive(wnd)
 		end
 	end
 end
-LIB.RegisterPanel('MY_Font', _L['MY_Font'], _L['System'], 'ui/Image/UICommon/CommonPanel7.UITex|36', PS)
+LIB.RegisterPanel(_L['System'], 'MY_Font', _L['MY_Font'], 'ui/Image/UICommon/CommonPanel7.UITex|36', PS)
 
 MY_Font = OBJ

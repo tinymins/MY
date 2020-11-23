@@ -696,4 +696,4 @@ function PS.OnPanelDeactive()
     l_uiBoard = nil
 end
 
-LIB.RegisterPanel('MY_ChatMonitor', _L['MY_ChatMonitor'], _L['Chat'], 'UI/Image/Minimap/Minimap.UITex|197', PS)
+LIB.RegisterPanel(_L['Chat'], 'MY_ChatMonitor', _L['MY_ChatMonitor'], 'UI/Image/Minimap/Minimap.UITex|197', PS)
