@@ -69,7 +69,7 @@ function D.Apply()
 	if Navigator_Remove then
 		Navigator_Remove('MY_FRIEND_TIP')
 	end
-	if O.bFriend then
+	if O.bFriend and not LIB.IsInShieldedMap() then
 		local hShaList = UI.GetShadowHandle('MY_FriendHeadTip')
 		if not hShaList.freeShadows then
 			hShaList.freeShadows = {}
@@ -142,7 +142,7 @@ function D.Apply()
 	if Navigator_Remove then
 		Navigator_Remove('MY_GUILDMEMBER_TIP')
 	end
-	if O.bTongMember then
+	if O.bTongMember and not LIB.IsInShieldedMap() then
 		local hShaList = UI.GetShadowHandle('MY_TongMemberHeadTip')
 		if not hShaList.freeShadows then
 			hShaList.freeShadows = {}
@@ -210,7 +210,7 @@ function D.Apply()
 		UI.GetShadowHandle('MY_TongMemberHeadTip'):Hide()
 	end
 end
-LIB.RegisterInit('MY_FooterTip', D.Apply)
+LIB.RegisterEvent('LOADING_ENDING.MY_FooterTip', D.Apply)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 	-- ∫√”—∏ﬂ¡¡
