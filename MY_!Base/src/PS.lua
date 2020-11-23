@@ -44,11 +44,13 @@ local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAD
 -------------------------------------------------------------------------------------------------------
 local _L = LIB.LoadLangPack()
 local INI_PATH = PACKET_INFO.FRAMEWORK_ROOT ..'ui/MY.ini'
+
+local D = {}
 ---------------------------------------------------------------------------------------------
 -- 界面开关
 ---------------------------------------------------------------------------------------------
 function LIB.GetFrame()
-	return Station.Lookup(NSFormatString('Normal/{$NS}'))
+	return Station.Lookup(NSFormatString('Normal/{$NS}_PS'))
 end
 
 function LIB.OpenPanel()
@@ -60,7 +62,7 @@ function LIB.OpenPanel()
 	end
 	local frame = LIB.GetFrame()
 	if not frame then
-		frame = Wnd.OpenWindow(INI_PATH, PACKET_INFO.NAME_SPACE)
+		frame = Wnd.OpenWindow(INI_PATH, NSFormatString('{$NS}_PS'))
 		frame:Hide()
 		frame.bVisible = false
 		LIB.CheckTutorial()
@@ -73,7 +75,7 @@ function LIB.ClosePanel()
 	if not frame then
 		return
 	end
-	LIB.SwitchTab()
+	LIB.SwitchTab('Welcome')
 	LIB.HidePanel(false, true)
 	Wnd.CloseWindow(frame)
 end
@@ -169,111 +171,47 @@ function LIB.FocusPanel(bForce)
 	Station.SetFocusWindow(frame)
 end
 
-function LIB.ResizePanel(nWidth, nHeight)
-	local hFrame = LIB.GetFrame()
-	if not hFrame then
-		return
-	end
-	LIB.UI(hFrame):Size(nWidth, nHeight)
-end
-
 function LIB.IsPanelVisible()
-	return LIB.GetFrame() and LIB.GetFrame():IsVisible()
+	local frame = LIB.GetFrame()
+	return frame and frame:IsVisible()
 end
 
--- if panel visible
 function LIB.IsPanelOpened()
-	return Station.Lookup(NSFormatString('Normal/{$NS}'))
+	return not not LIB.GetFrame()
 end
 
 ---------------------------------------------------------------------------------------------
 -- 选项卡
 ---------------------------------------------------------------------------------------------
-do
-local TABS_LIST, TAB_WELCOME = {
-	{ id = _L['General'] },
-	{ id = _L['Target'] },
-	{ id = _L['Chat'] },
-	{ id = _L['Battle'] },
-	{ id = _L['Raid'] },
-	{ id = _L['System'] },
-	{ id = _L['Search'] },
-	{ id = _L['Others'] },
+local PANEL_CATEGORY_LIST = {
+	{ szName = _L['General'] },
+	{ szName = _L['Target' ] },
+	{ szName = _L['Chat'   ] },
+	{ szName = _L['Battle' ] },
+	{ szName = _L['Raid'   ] },
+	{ szName = _L['System' ] },
+	{ szName = _L['Search' ] },
+	{ szName = _L['Others' ] },
 }
---[[ tTabs:
-	{
-		{
-			id = ,
-			{
-				[tab]
-			}, {...}
-		},
-		{
-			[category]
-		}, {...}
-	}
-]]
-local function IsTabVisible(tab)
-	if tab.bShielded and LIB.IsShieldedVersion() then
-		return false
+local PANEL_TAB_LIST = {}
+
+local function IsShieldedTab(tTab)
+	if tTab.bShielded and LIB.IsShieldedVersion() then
+		return true
 	end
-	if tab.szShieldedKey then
-		if LIB.IsShieldedVersion(tab.szShieldedKey, tab.nShielded) then
-			return false
+	if tTab.szShieldedKey then
+		if LIB.IsShieldedVersion(tTab.szShieldedKey, tTab.nShielded) then
+			return true
 		end
 	else
-		if tab.nShielded and LIB.IsShieldedVersion(tab.nShielded) then
-			return false
+		if tTab.nShielded and LIB.IsShieldedVersion(tTab.nShielded) then
+			return true
 		end
 	end
-	if tab.IsShielded then
-		return not tab.IsShielded()
+	if tTab.IsShielded then
+		return tTab.IsShielded()
 	end
-	return true
-end
-function LIB.RedrawCategory(szCategory)
-	local frame = LIB.GetFrame()
-	if not frame then
-		return
-	end
-
-	-- draw category
-	local wndCategoryList = frame:Lookup('Wnd_Total/WndContainer_Category')
-	wndCategoryList:Clear()
-	for _, ctg in ipairs(TABS_LIST) do
-		local nCount = 0
-		for i, tab in ipairs(ctg) do
-			if IsTabVisible(tab) then
-				nCount = nCount + 1
-			end
-		end
-		if nCount > 0 then
-			local chkCategory = wndCategoryList:AppendContentFromIni(INI_PATH, 'CheckBox_Category')
-			chkCategory.szCategory = ctg.id
-			chkCategory:Lookup('', 'Text_Category'):SetText(ctg.id)
-			chkCategory.OnCheckBoxCheck = function()
-				if chkCategory.bActived then
-					return
-				end
-				wndCategoryList.szCategory = chkCategory.szCategory
-
-				PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
-				local p = chkCategory:GetParent():GetFirstChild()
-				while p do
-					if p.szCategory ~= chkCategory.szCategory then
-						p.bActived = false
-						p:Check(false)
-					end
-					p = p:GetNext()
-				end
-				LIB.RedrawTabs(chkCategory.szCategory)
-			end
-			szCategory = szCategory or ctg.id
-		end
-	end
-	wndCategoryList:FormatAllContentPos()
-
-	LIB.SwitchCategory(szCategory)
+	return false
 end
 
 -- LIB.SwitchCategory(szCategory)
@@ -292,113 +230,45 @@ function LIB.SwitchCategory(szCategory)
 		chk = container:GetFirstChild()
 	end
 	if chk then
-		container.szCategory = chk.szCategory
 		chk:Check(true)
 	end
 end
 
-function LIB.RedrawTabs(szCategory)
-	local frame = LIB.GetFrame()
-	if not (frame and szCategory) then
-		return
-	end
-
-	-- draw tabs
-	local hTabs = frame:Lookup('Wnd_Total/WndScroll_Tabs', '')
-	hTabs:Clear()
-
-	for _, ctg in ipairs(TABS_LIST) do
-		if ctg.id == szCategory then
-			for i, tab in ipairs(ctg) do
-				if IsTabVisible(tab) then
-					local hTab = hTabs:AppendItemFromIni(INI_PATH, 'Handle_Tab')
-					hTab.szID = tab.szID
-					hTab:Lookup('Text_Tab'):SetText(tab.szTitle)
-					if tab.szIconTex == 'FromIconID' then
-						hTab:Lookup('Image_TabIcon'):FromIconID(tab.dwIconFrame)
-					elseif tab.dwIconFrame then
-						hTab:Lookup('Image_TabIcon'):FromUITex(tab.szIconTex, tab.dwIconFrame)
-					else
-						hTab:Lookup('Image_TabIcon'):FromTextureFile(tab.szIconTex)
-					end
-					hTab:Lookup('Image_Bg'):FromUITex(PACKET_INFO.UITEX_COMMON, 3)
-					hTab:Lookup('Image_Bg_Active'):FromUITex(PACKET_INFO.UITEX_COMMON, 1)
-					hTab:Lookup('Image_Bg_Hover'):FromUITex(PACKET_INFO.UITEX_COMMON, 2)
-					hTab.OnItemLButtonClick = function()
-						LIB.SwitchTab(this.szID)
-					end
-					hTab.OnItemMouseEnter = function()
-						this:Lookup('Image_Bg_Hover'):Show()
-					end
-					hTab.OnItemMouseLeave = function()
-						this:Lookup('Image_Bg_Hover'):Hide()
-					end
-				end
-			end
-		end
-	end
-	hTabs:FormatAllItemPos()
-
-	LIB.SwitchTab()
-end
-
-function LIB.SwitchTab(szID, bForceUpdate)
+function LIB.SwitchTab(szKey, bForceUpdate)
 	local frame = LIB.GetFrame()
 	if not frame then
 		return
 	end
-
-	local category, tab
-	if szID then
-		for _, ctg in ipairs(TABS_LIST) do
-			for _, p in ipairs(ctg) do
-				if p.szID == szID then
-					category, tab = ctg, p
-				end
-			end
-		end
+	local tTab = lodash.find(PANEL_TAB_LIST, function(tTab) return tTab.szKey == szKey end)
+	if not tTab then
 		--[[#DEBUG BEGIN]]
-		if not tab then
-			LIB.Debug(NSFormatString('{$NS}.SwitchTab#') .. szID, _L('Cannot find tab: %s', szID), DEBUG_LEVEL.WARNING)
+		if not tTab then
+			LIB.Debug(NSFormatString('{$NS}.SwitchTab'), _L('Cannot find tab: %s', szKey), DEBUG_LEVEL.WARNING)
 		end
 		--[[#DEBUG END]]
+		return
 	end
-
-	-- check if category is right
-	if category then
-		local szCategory = frame:Lookup('Wnd_Total/WndContainer_Category').szCategory
-		if category.id ~= szCategory then
-			LIB.SwitchCategory(category.id)
+	-- 判断主分类是否正确
+	if tTab.szCategory and frame.szCurrentCategoryName ~= tTab.szCategory then
+		LIB.SwitchCategory(tTab.szCategory)
+	end
+	-- 判断标签页是否已激活
+	if frame.szCurrentTabKey == tTab.szKey and not bForceUpdate then
+		return
+	end
+	if frame.szCurrentTabKey ~= tTab.szKey then
+		PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
+	end
+	-- 处理标签页背景选中状态
+	local scrollTabs = frame:Lookup('Wnd_Total/WndScroll_Tabs', '')
+	for i = 0, scrollTabs:GetItemCount() - 1 do
+		if scrollTabs:Lookup(i).szKey == szKey then
+			scrollTabs:Lookup(i):Lookup('Image_Bg_Active'):Show()
+		else
+			scrollTabs:Lookup(i):Lookup('Image_Bg_Active'):Hide()
 		end
 	end
-
-	-- check if tab is alreay actived and update tab active status
-	if tab then
-		-- get tab window
-		local hTab
-		local hTabs = frame:Lookup('Wnd_Total/WndScroll_Tabs', '')
-		for i = 0, hTabs:GetItemCount() - 1 do
-			if hTabs:Lookup(i).szID == szID then
-				hTab = hTabs:Lookup(i)
-			end
-		end
-		if (not hTab) or (hTab.bActived and not bForceUpdate) then
-			return
-		end
-		if not hTab.bActived then
-			PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
-		end
-
-		-- deal with ui response
-		local hTabs = hTab:GetParent()
-		for i = 0, hTabs:GetItemCount() - 1 do
-			hTabs:Lookup(i).bActived = false
-			hTabs:Lookup(i):Lookup('Image_Bg_Active'):Hide()
-		end
-		hTab.bActived = true
-		hTab:Lookup('Image_Bg_Active'):Show()
-	end
-
+	-- 事件处理、界面绘制
 	-- get main panel
 	local wnd = frame.MAIN_WND
 	local scroll = frame.MAIN_SCROLL
@@ -420,31 +290,25 @@ function LIB.SwitchTab(szID, bForceUpdate)
 	wnd:Clear()
 	wnd:Lookup('', ''):Clear()
 	wnd:SetContainerType(CONSTANT.WND_CONTAINER_STYLE.CUSTOM)
-
 	-- ready to draw
-	if not tab then
-		tab = TAB_WELCOME
-	end
-	if tab then
-		if tab.OnPanelActive then
-			local res, err, trace = XpCall(tab.OnPanelActive, wnd)
-			if not res then
-				FireUIEvent('CALL_LUA_ERROR', err .. NSFormatString('\n{$NS}#OnPanelActive\n') .. trace .. '\n')
-			end
-			wnd:FormatAllContentPos()
+	if tTab.OnPanelActive then
+		local res, err, trace = XpCall(tTab.OnPanelActive, wnd)
+		if not res then
+			FireUIEvent('CALL_LUA_ERROR', err .. NSFormatString('\n{$NS}#OnPanelActive\n') .. trace .. '\n')
 		end
-		wnd.OnPanelActive   = tab.OnPanelActive
-		wnd.OnPanelResize   = tab.OnPanelResize
-		wnd.OnPanelScroll   = tab.OnPanelScroll
-		wnd.OnPanelBreathe  = tab.OnPanelBreathe
-		wnd.OnPanelDeactive = tab.OnPanelDeactive
+		wnd:FormatAllContentPos()
 	end
-	wnd.szID = szID
+	wnd.OnPanelActive   = tTab.OnPanelActive
+	wnd.OnPanelResize   = tTab.OnPanelResize
+	wnd.OnPanelScroll   = tTab.OnPanelScroll
+	wnd.OnPanelBreathe  = tTab.OnPanelBreathe
+	wnd.OnPanelDeactive = tTab.OnPanelDeactive
+	frame.szCurrentTabKey = szKey
 end
 
-function LIB.RedrawTab(szID)
-	if LIB.GetCurrentTabID() == szID then
-		LIB.SwitchTab(szID, true)
+function LIB.RedrawTab(szKey)
+	if LIB.GetCurrentTabID() == szKey then
+		LIB.SwitchTab(szKey, true)
 	end
 end
 
@@ -453,87 +317,137 @@ function LIB.GetCurrentTabID()
 	if not frame then
 		return
 	end
-	return frame.MAIN_WND.szID
+	return frame.szCurrentTabKey
 end
 
 -- 注册选项卡
--- (void) LIB.RegisterPanel( szID, szTitle, szCategory, szIconTex, options )
--- szID            选项卡唯一ID
--- szTitle         选项卡按钮标题
+-- (void) LIB.RegisterPanel(szKey, szName, szCategory, szIconTex, options)
+-- szKey           选项卡唯一 KEY
+-- szName          选项卡按钮标题
 -- szCategory      选项卡所在分类
 -- szIconTex       选项卡图标文件|图标帧
 -- options         选项卡各种响应函数 {
+--   options.bShielded               屏蔽的选项卡
+--   options.nShielded               屏蔽等级的选项卡
+--   options.bWelcome                欢迎页（默认页）选项卡
 --   options.OnPanelActive(wnd)      选项卡激活    wnd为当前MainPanel
 --   options.OnPanelDeactive(wnd)    选项卡取消激活
---   options.bShielded               国服和谐的选项卡
 -- }
 -- Ex： LIB.RegisterPanel( 'Test', '测试标签', '测试', 'UI/Image/UICommon/ScienceTreeNode.UITex|123', { OnPanelActive = function(wnd) end } )
-function LIB.RegisterPanel(szID, szTitle, szCategory, szIconTex, options)
-	-- 格式化图标信息
-	if IsNumber(szIconTex) then
-		szIconTex = 'FromIconID|' .. szIconTex
-	elseif not IsString(szIconTex) then
-		szIconTex = 'UI/Image/Common/Logo.UITex|6'
+function LIB.RegisterPanel(szKey, szName, szCategory, szIconTex, options)
+	-- 分类不存在则创建
+	if not options.bHide and not lodash.find(PANEL_CATEGORY_LIST, function(tCategory) return tCategory.szName == szCategory end) then
+		insert(PANEL_CATEGORY_LIST, {
+			szName = szCategory,
+		})
 	end
-	local dwIconFrame = gsub(szIconTex, '.*%|(%d+)', '%1')
-	if dwIconFrame then
-		dwIconFrame = tonumber(dwIconFrame)
-	end
-	szIconTex = gsub(szIconTex, '%|.*', '')
-	-- 创建数据结构
-	local tab = {
-		szID            = szID                   ,
-		szTitle         = szTitle                ,
-		szCategory      = szCategory             ,
-		szIconTex       = szIconTex              ,
-		dwIconFrame     = dwIconFrame            ,
-		bShielded       = options.bShielded      ,
-		nShielded       = options.nShielded      ,
-		IsShielded      = options.IsShielded     ,
-		OnPanelActive   = options.OnPanelActive  ,
-		OnPanelScroll   = options.OnPanelScroll  ,
-		OnPanelResize   = options.OnPanelResize  ,
-		OnPanelBreathe  = options.OnPanelBreathe ,
-		OnPanelDeactive = options.OnPanelDeactive,
-	}
-	-- 判断是不是欢迎页
-	if options.bWelcome then
-		-- 欢迎页直接赋值
-		if not TAB_WELCOME then
-			TAB_WELCOME = tab
+	-- 移除已存在的
+	for i, tTab in ipairs(PANEL_TAB_LIST) do
+		if tTab.szKey == szKey then
+			remove(tTab, i)
+			break
 		end
-	else
-		-- 普通标签页搜索或创建分类后插入
-		local category
-		for _, ctg in ipairs(TABS_LIST) do
-			for i = #ctg, 1, -1 do
-				if ctg[i].szID == szID then
-					remove(ctg, i)
-				end
+	end
+	-- 判断非注销面板调用
+	if szName ~= false then
+		-- 格式化图标信息
+		if IsNumber(szIconTex) then
+			szIconTex = 'FromIconID|' .. szIconTex
+		elseif not IsString(szIconTex) then
+			szIconTex = 'UI/Image/Common/Logo.UITex|6'
+		end
+		local dwIconFrame = gsub(szIconTex, '.*%|(%d+)', '%1')
+		if dwIconFrame then
+			dwIconFrame = tonumber(dwIconFrame)
+			szIconTex = gsub(szIconTex, '%|.*', '')
+		end
+		-- 创建数据结构、插入数组
+		insert(PANEL_TAB_LIST, {
+			szKey           = szKey                                   ,
+			szName          = szName                                  ,
+			szCategory      = szCategory                              ,
+			szIconTex       = szIconTex                               ,
+			dwIconFrame     = dwIconFrame                             ,
+			nPriority       = options.nPriority or GetStringCRC(szKey),
+			bWelcome        = options.bWelcome                        ,
+			bHide           = options.bHide                           ,
+			bShielded       = options.bShielded                       ,
+			nShielded       = options.nShielded                       ,
+			IsShielded      = options.IsShielded                      ,
+			OnPanelActive   = options.OnPanelActive                   ,
+			OnPanelScroll   = options.OnPanelScroll                   ,
+			OnPanelResize   = options.OnPanelResize                   ,
+			OnPanelBreathe  = options.OnPanelBreathe                  ,
+			OnPanelDeactive = options.OnPanelDeactive                 ,
+		})
+		-- 重新根据权重排序数组
+		sort(PANEL_TAB_LIST, function(t1, t2)
+			if t1.bWelcome then
+				return true
+			elseif t2.bWelcome then
+				return false
+			else
+				return t1.nPriority > t2.nPriority
 			end
-			if ctg.id == szCategory then
-				category = ctg
-			end
-		end
-		if not category then
-			category = {
-				id = szCategory,
-			}
-			insert(TABS_LIST, category)
-		end
-		insert(category, tab)
-
-		if LIB.IsInitialized() then
-			LIB.RedrawCategory()
-		end
+		end)
 	end
-end
+	-- 通知重绘
+	FireUIEvent(NSFormatString('{$NS}_PANEL_UPDATE'))
 end
 
 ---------------------------------------------------------------------------------------------
 -- 窗口函数
 ---------------------------------------------------------------------------------------------
-local function OnSizeChanged()
+function D.ResizePanel(frame, nWidth, nHeight)
+	UI(frame):Size(nWidth, nHeight)
+end
+
+function D.RedrawCategory(frame, szCategory)
+	local container = frame:Lookup('Wnd_Total/WndContainer_Category')
+	container:Clear()
+	for _, tCategory in ipairs(PANEL_CATEGORY_LIST) do
+		if lodash.some(PANEL_TAB_LIST, function(tTab) return tTab.szCategory == tCategory.szName and not tTab.bHide and not IsShieldedTab(tTab) end) then
+			local chkCategory = container:AppendContentFromIni(INI_PATH, 'CheckBox_Category')
+			if not szCategory then
+				szCategory = tCategory.szName
+			end
+			chkCategory.szCategory = tCategory.szName
+			chkCategory:Lookup('', 'Text_Category'):SetText(tCategory.szName)
+		end
+	end
+	container:FormatAllContentPos()
+	LIB.SwitchCategory(szCategory)
+end
+
+function D.RedrawTabs(frame, szCategory)
+	local scroll = frame:Lookup('Wnd_Total/WndScroll_Tabs', '')
+	scroll:Clear()
+	for _, tTab in ipairs(PANEL_TAB_LIST) do
+		if tTab.szCategory == szCategory and not tTab.bHide and not IsShieldedTab(tTab) then
+			local hTab = scroll:AppendItemFromIni(INI_PATH, 'Handle_Tab')
+			hTab.szKey = tTab.szKey
+			hTab:Lookup('Text_Tab'):SetText(tTab.szName)
+			if tTab.szIconTex == 'FromIconID' then
+				hTab:Lookup('Image_TabIcon'):FromIconID(tTab.dwIconFrame)
+			elseif tTab.dwIconFrame then
+				hTab:Lookup('Image_TabIcon'):FromUITex(tTab.szIconTex, tTab.dwIconFrame)
+			else
+				hTab:Lookup('Image_TabIcon'):FromTextureFile(tTab.szIconTex)
+			end
+			hTab:Lookup('Image_Bg'):FromUITex(PACKET_INFO.UITEX_COMMON, 3)
+			hTab:Lookup('Image_Bg_Active'):FromUITex(PACKET_INFO.UITEX_COMMON, 1)
+			hTab:Lookup('Image_Bg_Hover'):FromUITex(PACKET_INFO.UITEX_COMMON, 2)
+		end
+	end
+	scroll:FormatAllItemPos()
+	local tWelcomeTab = lodash.find(PANEL_TAB_LIST, function(tTab) return tTab.szCategory == szCategory and tTab.bWelcome and not IsShieldedTab(tTab) end)
+		or lodash.find(PANEL_TAB_LIST, function(tTab) return not tTab.szCategory and tTab.bWelcome and not IsShieldedTab(tTab) end)
+	if tWelcomeTab then
+		LIB.SwitchTab(tWelcomeTab.szKey)
+	end
+end
+
+function D.OnSizeChanged()
 	local frame = this
 	if not frame then
 		return
@@ -552,15 +466,15 @@ local function OnSizeChanged()
 	wnd:Lookup('WndScroll_Tabs', ''):FormatAllItemPos()
 	wnd:Lookup('WndScroll_Tabs/ScrollBar_Tabs'):SetSize(16, nHeight - 111)
 
-	local hWnd = wnd:Lookup('', '')
+	local hWndTotal = wnd:Lookup('', '')
 	wnd:Lookup('', ''):SetSize(nWidth, nHeight)
-	hWnd:Lookup('Image_Breaker'):SetSize(6, nHeight - 340)
-	hWnd:Lookup('Image_TabBg'):SetSize(nWidth - 2, 33)
-	hWnd:Lookup('Handle_DBClick'):SetSize(nWidth, 54)
+	hWndTotal:Lookup('Image_Breaker'):SetSize(6, nHeight - 340)
+	hWndTotal:Lookup('Image_TabBg'):SetSize(nWidth - 2, 33)
+	hWndTotal:Lookup('Handle_DBClick'):SetSize(nWidth, 54)
 
 	local bHideTabs = nWidth < 550
 	wnd:Lookup('WndScroll_Tabs'):SetVisible(not bHideTabs)
-	hWnd:Lookup('Image_Breaker'):SetVisible(not bHideTabs)
+	hWndTotal:Lookup('Image_Breaker'):SetVisible(not bHideTabs)
 
 	if bHideTabs then
 		nWidth = nWidth + 181
@@ -603,25 +517,25 @@ local function OnSizeChanged()
 	frame:SetPoint(an.s, 0, 0, an.r, an.x, an.y)
 end
 
-function LIB.OnItemLButtonDBClick()
+function D.OnItemLButtonDBClick()
 	local name = this:GetName()
 	if name == 'Handle_DBClick' then
 		this:GetRoot():Lookup('CheckBox_Maximize'):ToggleCheck()
 	end
 end
 
-function LIB.OnMouseWheel()
-	local p = this
-	while p do
-		if p:GetType() == 'WndContainer' then
+function D.OnMouseWheel()
+	local el = this
+	while el do
+		if el:GetType() == 'WndContainer' then
 			return
 		end
-		p = p:GetParent()
+		el = el:GetParent()
 	end
 	return true
 end
 
-function LIB.OnLButtonClick()
+function D.OnLButtonClick()
 	local name = this:GetName()
 	if name == 'Btn_Close' then
 		LIB.ClosePanel()
@@ -630,41 +544,61 @@ function LIB.OnLButtonClick()
 	end
 end
 
-do local anchor, w, h
-function LIB.OnCheckBoxCheck()
+function D.OnItemLButtonClick()
 	local name = this:GetName()
-	if name == 'CheckBox_Maximize' then
-		local ui = LIB.UI(this:GetRoot())
-		anchor = ui:Anchor()
-		w, h = ui:Size()
+	if name == 'Handle_Tab' then
+		LIB.SwitchTab(this.szKey)
+	end
+end
+
+function D.OnCheckBoxCheck()
+	local name = this:GetName()
+	if name == 'CheckBox_Category' then
+		local frame = this:GetRoot()
+		local container = this:GetParent()
+		local el = container:GetFirstChild()
+		while el do
+			if el ~= this then
+				el:Check(false)
+			end
+			el = el:GetNext()
+		end
+		frame.szCurrentCategoryName = this.szCategory
+		PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
+		D.RedrawTabs(frame, this.szCategory)
+	elseif name == 'CheckBox_Maximize' then
+		local frame = this:GetRoot()
+		local ui = UI(frame)
+		frame.tMaximizeAnchor = ui:Anchor()
+		frame.nMaximizeW, frame.nMaximizeH = ui:Size()
 		ui:Pos(0, 0):Event('UI_SCALED.FRAME_MAXIMIZE_RESIZE', function()
 			ui:Size(Station.GetClientSize())
 		end):Drag(false)
-		LIB.ResizePanel(Station.GetClientSize())
+		D.ResizePanel(frame, Station.GetClientSize())
 	end
 end
 
-function LIB.OnCheckBoxUncheck()
+function D.OnCheckBoxUncheck()
 	local name = this:GetName()
 	if name == 'CheckBox_Maximize' then
-		LIB.ResizePanel(w, h)
-		LIB.UI(this:GetRoot())
+		local frame = this:GetRoot()
+		D.ResizePanel(frame, frame.nMaximizeW, frame.nMaximizeH)
+		UI(this:GetRoot())
 			:Event('UI_SCALED.FRAME_MAXIMIZE_RESIZE')
 			:Drag(true)
-			:Anchor(anchor)
+			:Anchor(frame.tMaximizeAnchor)
 	end
 end
-end
 
-function LIB.OnDragButtonBegin()
+function D.OnDragButtonBegin()
 	local name = this:GetName()
 	if name == 'Btn_Drag' then
 		this.fDragX, this.fDragY = Station.GetMessagePos()
-		this.fDragW, this.fDragH = LIB.UI(this:GetRoot()):Size()
+		this.fDragW, this.fDragH = UI(this:GetRoot()):Size()
 	end
 end
 
-function LIB.OnDragButton()
+function D.OnDragButton()
 	local name = this:GetName()
 	if name == 'Btn_Drag' then
 		HideTip()
@@ -672,12 +606,11 @@ function LIB.OnDragButton()
 		local nDeltaX, nDeltaY = nX - this.fDragX, nY - this.fDragY
 		local nW = max(this.fDragW + nDeltaX, 500)
 		local nH = max(this.fDragH + nDeltaY, 300)
-		LIB.ResizePanel(nW, nH)
+		D.ResizePanel(this:GetRoot(), nW, nH)
 	end
 end
 
-function LIB.OnFrameCreate()
-	this.intact = true
+function D.OnFrameCreate()
 	this.MAIN_SCROLL = this:Lookup('Wnd_Total/WndScroll_MainPanel/ScrollBar_MainPanel')
 	this.MAIN_WND = this:Lookup('Wnd_Total/WndScroll_MainPanel/WndContainer_MainPanel')
 	this.MAIN_HANDLE = this:Lookup('Wnd_Total/WndScroll_MainPanel/WndContainer_MainPanel', '')
@@ -687,13 +620,12 @@ function LIB.OnFrameCreate()
 	this:Lookup('Wnd_Total/Btn_Weibo', 'Text_Default'):SetText(_L('Author @%s', PACKET_INFO.AUTHOR_WEIBO))
 	this:Lookup('Wnd_Total/Btn_Weibo', 'Image_Icon'):FromUITex(PACKET_INFO.UITEX_ICON, PACKET_INFO.MAINICON_FRAME)
 	this:Lookup('Btn_Drag'):RegisterLButtonDrag()
-	LIB.RedrawCategory()
-	LIB.ResizePanel(960 * fScale, 630 * fScale)
-	LIB.ExecuteWithThis(this, OnSizeChanged)
+	UI(this):Size(D.OnSizeChanged)
+	D.RedrawCategory(this)
+	D.ResizePanel(this, 960 * fScale, 630 * fScale)
 	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
 	this:CorrectPos()
 	this:RegisterEvent('UI_SCALED')
-	LIB.UI(this):Size(OnSizeChanged)
 end
 
 function LIB.OnFrameBreathe()
@@ -705,11 +637,11 @@ end
 function LIB.OnEvent(event)
 	if event == 'UI_SCALED' then
 		LIB.ExecuteWithThis(this.MAIN_SCROLL, LIB.OnScrollBarPosChanged)
-		OnSizeChanged()
+		D.OnSizeChanged()
 	end
 end
 
-function LIB.OnScrollBarPosChanged()
+function D.OnScrollBarPosChanged()
 	local name = this:GetName()
 	if name == 'ScrollBar_MainPanel' then
 		local wnd = this:GetRoot().MAIN_WND
@@ -724,511 +656,15 @@ function LIB.OnScrollBarPosChanged()
 	end
 end
 
----------------------------------------------------------------------------------------------
--- 基础库界面注册
----------------------------------------------------------------------------------------------
--- 欢迎页
+-- Global exports
 do
-local PS = { bWelcome = true }
-local function GetMemoryText()
-	return format('Memory:%.1fMB', collectgarbage('count') / 1024)
-end
-local function GetAdvText()
-	local me = GetClientPlayer()
-	if not me then
-		return ''
-	end
-	return _L('%s, welcome to use %s!', me.szName, PACKET_INFO.NAME) .. 'v' .. LIB.GetVersion()
-end
-local function GetSvrText()
-	local nFeeTime = LIB.GetTimeOfFee() - GetCurrentTime()
-	return LIB.GetServer() .. ' (' .. LIB.GetRealServer() .. ')'
-		.. g_tStrings.STR_CONNECT
-		.. (nFeeTime > 0 and LIB.FormatTimeCounter(nFeeTime, _L['Fee left %H:%mm:%ss']) or _L['Fee left unknown'])
-end
-function PS.OnPanelActive(wnd)
-	local ui = LIB.UI(wnd)
-	local w, h = ui:Size()
-	ui:Append('Shadow', { name = 'Shadow_Adv', x = 0, y = 0, color = { 140, 140, 140 } })
-	ui:Append('Image', { name = 'Image_Adv', x = 0, y = 0, image = PACKET_INFO.UITEX_POSTER, imageframe = min(GetTime() % 3, 1) })
-	ui:Append('Text', { name = 'Text_Adv', x = 10, y = 300, w = 557, font = 200, text = GetAdvText() })
-	ui:Append('Text', { name = 'Text_Memory', x = 10, y = 300, w = 150, alpha = 150, font = 162, text = GetMemoryText(), halign = 2 })
-	ui:Append('Text', { name = 'Text_Svr', x = 10, y = 345, w = 557, font = 204, text = GetSvrText(), alpha = 220 })
-	local x = 7
-	-- 奇遇分享
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = 375,
-		name = 'WndCheckBox_SerendipityNotify',
-		text = _L['Show share notify.'],
-		checked = MY_Serendipity.bEnable,
-		oncheck = function()
-			MY_Serendipity.bEnable = not MY_Serendipity.bEnable
-		end,
-		tip = _L['Monitor serendipity and show share notify.'],
-		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
-	}):AutoWidth():Width()
-	local xS0 = x + ui:Append('WndCheckBox', {
-		x = x, y = 375,
-		name = 'WndCheckBox_SerendipityAutoShare',
-		text = _L['Auto share.'],
-		checked = MY_Serendipity.bAutoShare,
-		oncheck = function()
-			MY_Serendipity.bAutoShare = not MY_Serendipity.bAutoShare
-		end,
-	}):AutoWidth():Width()
-	-- 自动分享子项
-	x = xS0
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = 375,
-		name = 'WndCheckBox_SerendipitySilentMode',
-		text = _L['Silent mode.'],
-		checked = MY_Serendipity.bSilentMode,
-		oncheck = function()
-			MY_Serendipity.bSilentMode = not MY_Serendipity.bSilentMode
-		end,
-		autovisible = function() return MY_Serendipity.bAutoShare end,
-	}):AutoWidth():Width()
-	x = x + 5
-	x = x + ui:Append('WndEditBox', {
-		x = x, y = 375, w = 105, h = 25,
-		name = 'WndEditBox_SerendipitySilentMode',
-		placeholder = _L['Realname, leave blank for anonymous.'],
-		tip = _L['Realname, leave blank for anonymous.'],
-		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
-		limit = 6,
-		text = LIB.LoadLUAData({'config/realname.jx3dat', PATH_TYPE.ROLE}) or GetClientPlayer().szName:gsub('@.-$', ''),
-		onchange = function(szText)
-			LIB.SaveLUAData({'config/realname.jx3dat', PATH_TYPE.ROLE}, szText)
-		end,
-		autovisible = function() return MY_Serendipity.bAutoShare end,
-	}):Width()
-	-- 手动分享子项
-	x = xS0
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = 375,
-		name = 'WndCheckBox_SerendipityNotifyTip',
-		text = _L['Show notify tip.'],
-		checked = MY_Serendipity.bPreview,
-		oncheck = function()
-			MY_Serendipity.bPreview = not MY_Serendipity.bPreview
-		end,
-		autovisible = function() return not MY_Serendipity.bAutoShare end,
-	}):AutoWidth():Width()
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = 375,
-		name = 'WndCheckBox_SerendipityNotifySound',
-		text = _L['Play notify sound.'],
-		checked = MY_Serendipity.bSound,
-		oncheck = function()
-			MY_Serendipity.bSound = not MY_Serendipity.bSound
-		end,
-		autoenable = function() return not MY_Serendipity.bAutoShare end,
-		autovisible = function() return not MY_Serendipity.bAutoShare end,
-	}):AutoWidth():Width()
-	x = x + ui:Append('WndButton', {
-		x = x, y = 375,
-		name = 'WndButton_SerendipitySearch',
-		text = _L['serendipity'],
-		onclick = function()
-			LIB.OpenBrowser('https://j3cx.com/serendipity')
-		end,
-	}):AutoWidth():Width() + 5
-	-- 数据位置
-	x = x + ui:Append('WndButton', {
-		x = x, y = 405,
-		name = 'WndButton_UserPreference',
-		text = _L['User preference storage'],
-		menu = function()
-			return {
-				{
-					szOption = _L['User preference'],
-					fnMouseEnter = function()
-						local nX, nY = this:GetAbsX(), this:GetAbsY()
-						local nW, nH = this:GetW(), this:GetH()
-						OutputTip(GetFormatText(_L['User preference'] .. _L['Storage location'], nil, 255, 255, 0), 600, {nX, nY, nW, nH}, ALW.BOTTOM_TOP)
-					end,
-					fnAction = function()
-						local szRoot = LIB.GetAbsolutePath({'', PATH_TYPE.ROLE}):gsub('/', '\\')
-						LIB.OpenFolder(szRoot)
-						UI.OpenTextEditor(szRoot)
-					end,
-				},
-				{
-					szOption = _L['Server preference'],
-					fnMouseEnter = function()
-						local nX, nY = this:GetAbsX(), this:GetAbsY()
-						local nW, nH = this:GetW(), this:GetH()
-						OutputTip(GetFormatText(_L['Server preference'] .. _L['Storage location'], nil, 255, 255, 0), 600, {nX, nY, nW, nH}, ALW.BOTTOM_TOP)
-					end,
-					fnAction = function()
-						local szRoot = LIB.GetAbsolutePath({'', PATH_TYPE.SERVER}):gsub('/', '\\')
-						LIB.OpenFolder(szRoot)
-						UI.OpenTextEditor(szRoot)
-					end,
-				},
-				{
-					szOption = _L['Global preference'],
-					fnMouseEnter = function()
-						local nX, nY = this:GetAbsX(), this:GetAbsY()
-						local nW, nH = this:GetW(), this:GetH()
-						OutputTip(GetFormatText(_L['Global preference'] .. _L['Storage location'], nil, 255, 255, 0), 600, {nX, nY, nW, nH}, ALW.BOTTOM_TOP)
-					end,
-					fnAction = function()
-						local szRoot = LIB.GetAbsolutePath({'', PATH_TYPE.GLOBAL}):gsub('/', '\\')
-						LIB.OpenFolder(szRoot)
-						UI.OpenTextEditor(szRoot)
-					end,
-				},
-				{
-					szOption = _L['Flush data'],
-					fnMouseEnter = function()
-						local nX, nY = this:GetAbsX(), this:GetAbsY()
-						local nW, nH = this:GetW(), this:GetH()
-						OutputTip(GetFormatText(_L['Config and data will be saved when exit game, click to save immediately'], nil, 255, 255, 0), 600, {nX, nY, nW, nH}, ALW.BOTTOM_TOP)
-					end,
-					fnAction = function()
-						LIB.FireFlush()
-					end,
-				},
-			}
-		end,
-	}):AutoWidth():Width() + 5
-	x = x + ui:Append('WndButton', {
-		name = 'WndButton_AddonErrorMessage',
-		x = x, y = 405,
-		text = _L['Error message'],
-		tip = _L['Show error message'],
-		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
-		onclick = function()
-			if IsCtrlKeyDown() and IsAltKeyDown() and IsShiftKeyDown() then
-				LIB.IsDebugClient('MYDev_UIEditor', true, true)
-				LIB.IsDebugClient('MYDev_UIManager', true, true)
-				LIB.IsDebugClient('MYDev_UIFindStation', true, true)
-				LIB.Systopmsg(_L['Debug tools has been enabled...'])
-				LIB.ReopenPanel()
-				return
-			end
-			UI.OpenTextEditor(LIB.GetAddonErrorMessage())
-		end,
-	}):AutoWidth():Width() + 5
-	PS.OnPanelResize(wnd)
-end
-function PS.OnPanelResize(wnd)
-	local ui = LIB.UI(wnd)
-	local w, h = ui:Size()
-	local scaleH = w / 557 * 278
-	local bottomH = 90
-	if scaleH > h - bottomH then
-		ui:Fetch('Shadow_Adv'):Size((h - bottomH) / 278 * 557, (h - bottomH))
-		ui:Fetch('Image_Adv'):Size((h - bottomH) / 278 * 557, (h - bottomH))
-		ui:Fetch('Text_Memory'):Pos(w - 150, h - bottomH + 10)
-		ui:Fetch('Text_Adv'):Pos(10, h - bottomH + 10)
-		ui:Fetch('Text_Svr'):Pos(10, h - bottomH + 35)
-	else
-		ui:Fetch('Shadow_Adv'):Size(w, scaleH)
-		ui:Fetch('Image_Adv'):Size(w, scaleH)
-		ui:Fetch('Text_Memory'):Pos(w - 150, scaleH + 10)
-		ui:Fetch('Text_Adv'):Pos(10, scaleH + 10)
-		ui:Fetch('Text_Svr'):Pos(10, scaleH + 35)
-	end
-	ui:Fetch('WndCheckBox_SerendipityNotify'):Top(scaleH + 65)
-	ui:Fetch('WndCheckBox_SerendipityAutoShare'):Top(scaleH + 65)
-	ui:Fetch('WndCheckBox_SerendipitySilentMode'):Top(scaleH + 65)
-	ui:Fetch('WndEditBox_SerendipitySilentMode'):Top(scaleH + 65)
-	ui:Fetch('WndCheckBox_SerendipityNotifyTip'):Top(scaleH + 65)
-	ui:Fetch('WndCheckBox_SerendipityNotifySound'):Top(scaleH + 65)
-	ui:Fetch('WndButton_SerendipitySearch'):Top(scaleH + 65)
-	ui:Fetch('WndButton_UserPreference'):Top(scaleH + 65)
-	ui:Fetch('WndButton_AddonErrorMessage'):Top(scaleH + 65)
-end
-function PS.OnPanelBreathe(wnd)
-	local ui = LIB.UI(wnd)
-	ui:Fetch('Text_Adv'):Text(GetAdvText())
-	ui:Fetch('Text_Svr'):Text(GetSvrText())
-	ui:Fetch('Text_Memory'):Text(GetMemoryText())
-end
-LIB.RegisterPanel('Welcome', _L['Welcome'], _L['System'], '', PS)
-end
-
--- 全局染色设置
-do
-local PS = {}
-function PS.OnPanelActive(wnd)
-	local ui = UI(wnd)
-	local w, h = ui:Size()
-	local X, Y = 20, 20
-	local x, y = X, Y
-
-	ui:Append('Text', {
-		x = X - 10, y = y,
-		text = _L['Force color'],
-		color = { 255, 255, 0 },
-	}):AutoWidth()
-	x, y = X, y + 30
-	for _, dwForceID in pairs_c(CONSTANT.FORCE_TYPE) do
-		local x0 = x
-		local sha = ui:Append('Shadow', {
-			x = x, y = y, w = 100, h = 25,
-			text = g_tStrings.tForceTitle[dwForceID],
-			color = { LIB.GetForceColor(dwForceID, 'background') },
-		})
-		local txt = ui:Append('Text', {
-			x = x + 5, y = y, w = 100, h = 25,
-			text = g_tStrings.tForceTitle[dwForceID],
-			color = { LIB.GetForceColor(dwForceID, 'foreground') },
-		})
-		x = x + 105
-		ui:Append('Shadow', {
-			x = x, y = y, w = 25, h = 25,
-			color = { LIB.GetForceColor(dwForceID, 'foreground') },
-			onclick = function()
-				local this = this
-				UI.OpenColorPicker(function(r, g, b)
-					LIB.SetForceColor(dwForceID, 'foreground', { r, g, b })
-					txt:Color(r, g, b)
-					UI(this):Color(r, g, b)
-				end)
-			end,
-		})
-		x = x + 30
-		ui:Append('Shadow', {
-			x = x, y = y, w = 25, h = 25,
-			color = { LIB.GetForceColor(dwForceID, 'background') },
-			onclick = function()
-				local this = this
-				UI.OpenColorPicker(function(r, g, b)
-					LIB.SetForceColor(dwForceID, 'background', { r, g, b })
-					sha:Color(r, g, b)
-					UI(this):Color(r, g, b)
-				end)
-			end,
-		})
-		x = x + 40
-
-		if 2 * x - x0 > w then
-			x = X
-			y = y + 35
-		end
-	end
-	ui:Append('WndButton', {
-		x = x, y = y, w = 160,
-		buttonstyle = 2,
-		text = _L['Restore default'],
-		onclick = function()
-			LIB.SetForceColor('reset')
-			LIB.SwitchTab('GlobalColor', true)
-		end,
-	})
-
-	y = y + 45
-	ui:Append('Text', {
-		x = X - 10, y = y,
-		text = _L['Camp color'],
-		color = { 255, 255, 0 },
-	}):AutoWidth()
-	x, y = X, y + 30
-	for _, nCamp in ipairs({ CAMP.NEUTRAL, CAMP.GOOD, CAMP.EVIL }) do
-		local x0 = x
-		local sha = ui:Append('Shadow', {
-			x = x, y = y, w = 100, h = 25,
-			text = g_tStrings.STR_CAMP_TITLE[nCamp],
-			color = { LIB.GetCampColor(nCamp, 'background') },
-		})
-		local txt = ui:Append('Text', {
-			x = x + 5, y = y, w = 100, h = 25,
-			text = g_tStrings.STR_CAMP_TITLE[nCamp],
-			color = { LIB.GetCampColor(nCamp, 'foreground') },
-		})
-		x = x + 105
-		ui:Append('Shadow', {
-			x = x, y = y, w = 25, h = 25,
-			color = { LIB.GetCampColor(nCamp, 'foreground') },
-			onclick = function()
-				local this = this
-				UI.OpenColorPicker(function(r, g, b)
-					LIB.SetCampColor(nCamp, 'foreground', { r, g, b })
-					txt:Color(r, g, b)
-					UI(this):Color(r, g, b)
-				end)
-			end,
-		})
-		x = x + 30
-		ui:Append('Shadow', {
-			x = x, y = y, w = 25, h = 25,
-			color = { LIB.GetCampColor(nCamp, 'background') },
-			onclick = function()
-				local this = this
-				UI.OpenColorPicker(function(r, g, b)
-					LIB.SetCampColor(nCamp, 'background', { r, g, b })
-					sha:Color(r, g, b)
-					UI(this):Color(r, g, b)
-				end)
-			end,
-		})
-		x = x + 40
-
-		if 2 * x - x0 > w then
-			x = X
-			y = y + 35
-		end
-	end
-	ui:Append('WndButton', {
-		x = x, y = y, w = 160,
-		text = _L['Restore default'],
-		buttonstyle = 2,
-		onclick = function()
-			LIB.SetCampColor('reset')
-			LIB.SwitchTab('GlobalColor', true)
-		end,
-	})
-end
-LIB.RegisterPanel('GlobalColor', _L['GlobalColor'], _L['System'], 'ui\\Image\\button\\CommonButton_1.UITex|70', PS)
-end
-
--- 全局杂项设置
-do
-local PS = {}
-function PS.OnPanelActive(wnd)
-	local ui = UI(wnd)
-	local w, h = ui:Size()
-	local X, Y = 20, 20
-	local x, y = X, Y
-
-	ui:Append('Text', {
-		x = X - 10, y = y,
-		text = _L['Distance type'],
-		color = { 255, 255, 0 },
-	}):AutoWidth()
-	x, y = X, y + 30
-
-	for _, p in ipairs(LIB.GetDistanceTypeList()) do
-		x = x + ui:Append('WndRadioBox', {
-			x = x, y = y, w = 100, h = 25, group = 'distance type',
-			text = p.szText,
-			checked = LIB.GetGlobalDistanceType() == p.szType,
-			oncheck = function(bChecked)
-				if not bChecked then
-					return
-				end
-				LIB.SetGlobalDistanceType(p.szType)
-			end,
-		}):AutoWidth():Width() + 10
-	end
-	x, y = X, y + 30
-
-	ui:Append('Text', {
-		x = X - 10, y = y,
-		text = _L['Notify center'],
-		color = { 255, 255, 0 },
-	}):AutoWidth()
-	y = y + 30
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, w = 200, h = 25,
-		text = _L['Show in minimap'],
-		checked = MY_Notify.bEntry,
-		oncheck = function(bChecked)
-			MY_Notify.bEntry = bChecked
-			MY_Notify.UpdateEntry()
-		end,
-	}):AutoWidth():Width() + 5
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, w = 100, h = 25,
-		text = _L['Order desc'],
-		checked = MY_Notify.bDesc,
-		oncheck = function(bChecked)
-			MY_Notify.bDesc = bChecked
-			MY_Notify.DrawNotifies()
-		end,
-	}):AutoWidth():Width() + 5
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, w = 100, h = 25,
-		text = _L['Disable dismiss'],
-		checked = MY_Notify.bDisableDismiss,
-		oncheck = function(bChecked)
-			MY_Notify.bDisableDismiss = bChecked
-		end,
-	}):AutoWidth():Width() + 5
-	x, y = X, y + 30
-
-	ui:Append('Text', {
-		x = X - 10, y = y,
-		text = _L['Hover entry'],
-		color = { 255, 255, 0 },
-	}):AutoWidth()
-	y = y + 30
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, w = 100, h = 25,
-		text = _L['Enable'],
-		checked = MY_HoverEntry.bEnable,
-		oncheck = function(bChecked)
-			MY_HoverEntry.bEnable = bChecked
-		end,
-	}):AutoWidth():Width() + 5
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, w = 100, h = 25,
-		text = _L['Hover popup'],
-		checked = MY_HoverEntry.bHoverMenu,
-		oncheck = function(bChecked)
-			MY_HoverEntry.bHoverMenu = bChecked
-		end,
-		autoenable = function() return MY_HoverEntry.bEnable end,
-	}):AutoWidth():Width() + 5
-	x = x + ui:Append('WndTrackbar', {
-		x = x, y = y, w = 100, h = 25,
-		value = MY_HoverEntry.nSize,
-		range = {1, 300},
-		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
-		textfmt = function(v) return _L('Size: %d', v) end,
-		onchange = function(val)
-			MY_HoverEntry.nSize = val
-		end,
-		autoenable = function() return MY_HoverEntry.bEnable end,
-	}):AutoWidth():Width() + 5
-	x, y = X, y + 30
-
-	ui:Append('Text', {
-		x = X - 10, y = y,
-		text = _L['System Info'],
-		color = { 255, 255, 0 },
-	}):AutoWidth()
-	y = y + 30
-
-	local uiMemory = ui:Append('Text', {
-		x = x, y = y, w = 150,
-		alpha = 150, font = 162,
-	})
-	y = y + 25
-
-	local uiSize = ui:Append('Text', {
-		x = x, y = y, w = 150,
-		alpha = 150, font = 162,
-	})
-	y = y + 25
-
-	local uiUIScale = ui:Append('Text', {
-		x = x, y = y, w = 150,
-		alpha = 150, font = 162,
-	})
-	y = y + 25
-
-	local uiFontScale = ui:Append('Text', {
-		x = x, y = y, w = 150,
-		alpha = 150, font = 162,
-	})
-	y = y + 25
-
-	local function onRefresh()
-		uiMemory:Text(format('Memory: %.2fMB', collectgarbage('count') / 1024))
-		uiSize:Text(format('UISize: %.2fx%.2f', Station.GetClientSize()))
-		uiUIScale:Text(format('UIScale: %.2f (%.2f)', LIB.GetUIScale(), LIB.GetOriginUIScale()))
-		uiFontScale:Text(format('FontScale: %.2f (%.2f)', LIB.GetFontScale(), Font.GetOffset()))
-	end
-	onRefresh()
-	LIB.BreatheCall('GlobalConfig', onRefresh)
-end
-
-function PS.OnPanelDeactive()
-	LIB.BreatheCall('GlobalConfig', false)
-end
-LIB.RegisterPanel('GlobalConfig', _L['GlobalConfig'], _L['System'], 'ui\\Image\\Minimap\\Minimap.UITex|181', PS)
+local settings = {
+	exports = {
+		{
+			root = D,
+			preset = 'UIEvent'
+		},
+	},
+}
+MY_PS = LIB.GeneGlobalNS(settings)
 end

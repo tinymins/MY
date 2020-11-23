@@ -2258,6 +2258,9 @@ local PRESETS = {
 		'OnEditSpecialKeyDown',
 		'OnCheckBoxCheck',
 		'OnCheckBoxUncheck',
+		'OnDragButton',
+		'OnDragButtonBegin',
+		'OnDragButtonEnd',
 		'OnActivePage',
 	}),
 }
