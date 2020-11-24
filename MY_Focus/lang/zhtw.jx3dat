@@ -29,6 +29,7 @@ return {
     ['Right click list to delete'] = '右鍵點擊列表可刪除',
 
     ['Auto focus'              ] = '啟用默認焦點',
+    ['Add'                     ] = '添加',
     ['Add auto focus'          ] = '添加默認焦點',
     ['Namelist manager'        ] = '管理默認焦點',
     ['Delete focus'            ] = '刪除焦點',

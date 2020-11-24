@@ -2,6 +2,7 @@
 return {
     -- MY_RollMon.lua
     ['roll monitor'] = '点数监控',
+	['restart'] = '重新开始',
     ['publish'] = '发布',
     ['publish setting'] = '发布设置',
     ['publish while restart'] = '重新开始时喊话',

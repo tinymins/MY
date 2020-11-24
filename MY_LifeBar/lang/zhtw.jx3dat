@@ -114,4 +114,5 @@ return {
 
     ['This function has been shielded by official except in dungeon'] = '應官方要求，該功能已停止在秘境外使用',
     ['Compressing: '] = '壓縮數據：',
+	['Reset config'] = '恢復默認設置',
 }

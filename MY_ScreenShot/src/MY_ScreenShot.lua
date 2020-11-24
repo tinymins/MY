@@ -153,7 +153,7 @@ _MY_ScreenShot.OnPanelActive = function(wnd)
     end
 
     ui:Append('WndCheckBox', 'WndCheckBox_UseGlobal'):Pos(30,30):Width(200)
-      :Text(_L['use global config']):Tip(_L['Check to use global config, otherwise use private setting.'])
+      :Text(_L['Use global config']):Tip(_L['Check to use global config, otherwise use private setting.'])
       :Check(function(bChecked) MY_ScreenShot.bUseGlobalConfig = bChecked fnRefreshPanel(ui) end)
       :Check(MY_ScreenShot.bUseGlobalConfig)
 
@@ -197,7 +197,7 @@ _MY_ScreenShot.OnPanelActive = function(wnd)
       :Click(function() LIB.SetHotKey('MY_ScreenShot_Hotkey',1,44,false,false,false) end)
 
     ui:Append('Text', 'Text_SetHotkey'):Pos(w-140, 60):Color(255,255,0)
-      :Text(_L['>> set hotkey <<'])
+      :Text(_L['>> Set hotkey <<'])
       :Click(function() LIB.SetHotKey() end)
 
     fnRefreshPanel(ui)

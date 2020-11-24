@@ -238,6 +238,7 @@ return {
 	['ERR404: Meta address not found!'] = '错误404：订阅地址不存在！',
 	['Downloader is not ready!'] = '数据下载器未就绪！',
 	['Dowloading in progress, please wait...'] = '数据下载正在进行中，请稍后...',
+	['Please unlock talk lock first.'] = '请先解除聊天锁。',
 	['Decode %s failed!'] = '解码[%s]失败！',
 	['Please input meta address:'] = '请输入订阅地址，添加多个使用分号分隔：',
 	['Please select one dataset first!'] = '请先选择一个数据项！',

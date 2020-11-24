@@ -18,6 +18,9 @@ return {
     ['Shot screen succeed, file saved as %s .'] = '截图成功，文件已保存：%s',
     ['Shotscreen destination folder error: %s not exist. File has been save to default folder.'] = '截图文件夹设置错误：%s目录不存在。截图将保存到默认文件夹。',
 
+	['>> Set hotkey <<'] = '>> 设置快捷键 <<',
     ['set default screenshot tool'] = '设置为默认截图工具',
     ['as default already'] = '已设为默认截图工具',
+
+	['Use global config'] = '使用所有角色公共设置',
 }

@@ -171,7 +171,7 @@ function MY_Anmerkungen.OpenPlayerNoteEditPanel(dwID, szName)
 	})
 	ui:Append('Text', {
 		x = x + 230, y = y - 3, w = 80, alpha = 200,
-		text = _L['delete'], color = {255,0,0},
+		text = _L['Delete'], color = {255,0,0},
 		onhover = function(bIn) UI(this):Alpha((bIn and 255) or 200) end,
 		onclick = function()
 			MY_Anmerkungen.SetPlayerNote(ui:Children('#WndEditBox_ID'):Text())

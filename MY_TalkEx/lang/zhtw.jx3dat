@@ -2,7 +2,10 @@
 return {
     -- MY_TalkEx.lua
     ['talk ex'] = '喊話輔助',
+	['all force'] = '所有人',
     ['TalkEx Talk'] = '喊話輔助 - 發送',
+	['send'] = '發送',
+	['send to'] = '發送到',
     ['have a trick with'] = '調侃一下',
     ['teammates where'] = '團隊中',
     ['nearby players where'] = '附近的',

@@ -49,6 +49,7 @@ return {
     ['Detected [%s] has GongZhan buff for %s.'] = '检测到[%s]共战江湖气劲剩余%s。',
     ['Nearby GongZhan Total Count: %d.'] = '附近共战数量：%d。',
     ['------------------------------------'] = '————————————————————————',
+	['send to ...'] = '发送到...',
 
     ['Visual skill'] = '显示历史招式列表',
     ['Display %d skills.'] = '显示%d格。',
@@ -79,6 +80,8 @@ return {
     ['Content:'] = '内容：',
     ['Alert when group'] = 'TA进组时对话框警告我。',
     ['Tip when group'] = 'TA进组时聊天栏提示我。',
+	['sure'] = '确定',
+	['cancel'] = '取消',
     ['Tip: [%s] is in your team.\nNote: %s'] = '提示：[%s]进入你所在的队伍。\n备注：%s',
     ['Tip: [%s](Leader) is in your team.\nNote: %s'] = '提示：[%s]（团长）进入你所在的队伍。\n备注：%s',
     ['Import'] = '导入',

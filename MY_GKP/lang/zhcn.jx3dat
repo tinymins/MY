@@ -77,6 +77,7 @@ return {
 	['New Protocol  Format: Protocol\'s Name, Money'] = '新方案 格式：方案名,金钱',
 	['Edit All Protocols'] = '编辑所有方案',
 	['New Protocol Format: Money, Step; Money, Step'] = '新方案 格式：底价,加价;底价,加价...',
+	['Please unlock talk lock first.'] = '请先解除聊天锁。',
 	['No Record'] = '没有记录',
 	['System Information as Shown Below\n\n'] = '----------  统计信息如下  ----------\n\n',
 	['Total Cosumption:'] = '总计消费：',

@@ -68,10 +68,10 @@ RegisterCustomData('MY_Farbnamen.bInsertIcon')
 local _MY_Farbnamen = {
 	tForceString = Clone(g_tStrings.tForceTitle),
 	tRoleType    = {
-		[ROLE_TYPE.STANDARD_MALE  ] = _L['man'],
-		[ROLE_TYPE.STANDARD_FEMALE] = _L['woman'],
-		[ROLE_TYPE.LITTLE_BOY     ] = _L['boy'],
-		[ROLE_TYPE.LITTLE_GIRL    ] = _L['girl'],
+		[ROLE_TYPE.STANDARD_MALE  ] = _L['Man'],
+		[ROLE_TYPE.STANDARD_FEMALE] = _L['Woman'],
+		[ROLE_TYPE.LITTLE_BOY     ] = _L['Boy'],
+		[ROLE_TYPE.LITTLE_GIRL    ] = _L['Girl'],
 	},
 	tCampString  = Clone(g_tStrings.STR_GUILD_CAMP_NAME),
 	aPlayerQueu = {},

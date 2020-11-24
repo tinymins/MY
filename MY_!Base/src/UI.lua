@@ -4412,7 +4412,7 @@ function UI.OpenColorPicker(callback, t)
 		return OpenColorTablePanel(callback,nil,nil,t)
 	end
 	local ui = UI.CreateFrame(NSFormatString('{$NS}_ColorTable'), { simple = true, close = true, esc = true })
-	  :Size(900, 500):Text(_L['color picker']):Anchor({s='CENTER', r='CENTER', x=0, y=0})
+	  :Size(900, 500):Text(_L['Color Picker']):Anchor({s='CENTER', r='CENTER', x=0, y=0})
 	local fnHover = function(bHover, r, g, b)
 		if bHover then
 			this:SetAlpha(255)
@@ -4495,7 +4495,7 @@ function UI.OpenColorPicker(callback, t)
 		end
 	end})
 	x = x + 50
-	ui:Append('WndButton', { text = _L['color picker ex'], x = x + 5, y = y + 3, w = 50, h = 30, onclick = function()
+	ui:Append('WndButton', { text = _L['Color Picker Pro'], x = x + 5, y = y + 3, w = 50, h = 30, onclick = function()
 		UI.OpenColorPickerEx(callback):Pos(ui:Pos())
 		ui:Remove()
 	end})
@@ -4544,7 +4544,7 @@ function UI.OpenColorPickerEx(fnAction)
 		return floor(r * 255), floor(g * 255), floor(b * 255)
 	end
 
-	local wnd = UI.CreateFrame(NSFormatString('{$NS}_ColorPickerEx'), { w = 346, h = 430, text = _L['color picker ex'], simple = true, close = true, esc = true, x = fX + 15, y = fY + 15 })
+	local wnd = UI.CreateFrame(NSFormatString('{$NS}_ColorPickerEx'), { w = 346, h = 430, text = _L['Color Picker Pro'], simple = true, close = true, esc = true, x = fX + 15, y = fY + 15 })
 	local fnHover = function(bHover, r, g, b)
 		if bHover then
 			wnd:Children('#Select'):Color(r, g, b)
@@ -4606,7 +4606,7 @@ end
 
 -- 打开字体选择
 function UI.OpenFontPicker(callback, t)
-	local ui, i = UI.CreateFrame(NSFormatString('{$NS}_Font_Picker'), { simple = true, close = true, esc = true, text = _L['Font picker'] }), 0
+	local ui, i = UI.CreateFrame(NSFormatString('{$NS}_Font_Picker'), { simple = true, close = true, esc = true, text = _L['Font Picker'] }), 0
 	while 1 do
 		local font = i
 		local txt = ui:Append('Text', {
@@ -4773,7 +4773,7 @@ function UI.OpenTextEditor(szText, szFrameName)
 		ui:Children('.WndEditBox'):Size(ui:Size(true))
 	end
 	ui = UI.CreateFrame(szFrameName, {
-		w = w, h = h, text = _L['text editor'], alpha = 180,
+		w = w, h = h, text = _L['Text Editor'], alpha = 180,
 		anchor = { s='CENTER', r='CENTER', x=0, y=0 },
 		simple = true, close = true, esc = true,
 		dragresize = true, minimize = true, ondragresize = OnResize,
@@ -4803,7 +4803,7 @@ function UI.OpenListEditor(szFrameName, tTextList, OnAdd, OnDel)
 			if nButton == UI.MOUSE_EVENT.RBUTTON then
 				hHandle.Selected = true
 				UI.PopupMenu({{
-					szOption = _L['delete'],
+					szOption = _L['Delete'],
 					fnAction = function()
 						muDel:Click()
 					end,
@@ -4824,7 +4824,7 @@ function UI.OpenListEditor(szFrameName, tTextList, OnAdd, OnDel)
 	local muList = ui:Append('WndScrollBox', { handlestyle = 3, x = 0, y = 30, w = 340, h = 380 })
 	-- add
 	ui:Append('WndButton', {
-		x = 180, y = 0, w = 80, text = _L['add'],
+		x = 180, y = 0, w = 80, text = _L['Add'],
 		onclick = function()
 			local szText = muEditBox:Text()
 			-- 加入表
@@ -4839,7 +4839,7 @@ function UI.OpenListEditor(szFrameName, tTextList, OnAdd, OnDel)
 	})
 	-- del
 	muDel = ui:Append('WndButton', {
-		x = 260, y = 0, w = 80, text = _L['delete'],
+		x = 260, y = 0, w = 80, text = _L['Delete'],
 		onclick = function()
 			muList:Children():Each(function(ui)
 				if this.Selected then

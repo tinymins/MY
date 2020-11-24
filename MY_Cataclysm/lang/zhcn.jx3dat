@@ -100,6 +100,7 @@ return {
 		[10585] = '凌',
 		[10615] = '衍',
 	},
+	['Please unlock talk lock first.'] = '请先解除聊天锁。',
 	['Take back permissions'] = '收回权限',
 	['Take back all permissions'] = '收回所有权限',
 	['Take back leader permission'] = '收回队长权限',

@@ -365,18 +365,11 @@ function LIB.GetTargetContextMenu(dwType, szName, dwID)
 	if dwType == TARGET.PLAYER then
 		-- 复制
 		insert(t, {
-			szOption = _L['copy'],
+			szOption = _L['Copy'],
 			fnAction = function()
 				LIB.SendChat(GetClientPlayer().szName, '[' .. szName .. ']')
 			end,
 		})
-		-- 密聊
-		-- insert(t, {
-		--     szOption = _L['whisper'],
-		--     fnAction = function()
-		--         LIB.SwitchChatChannel(szName)
-		--     end,
-		-- })
 		-- 密聊 好友 邀请入帮 跟随
 		Call(InsertPlayerCommonMenu, t, dwID, szName)
 		-- insert invite team
@@ -393,7 +386,7 @@ function LIB.GetTargetContextMenu(dwType, szName, dwID)
 		-- insert view equip
 		if dwID and UI_GetClientPlayerID() ~= dwID then
 			insert(t, {
-				szOption = _L['show equipment'],
+				szOption = _L['View equipment'],
 				fnAction = function()
 					ViewInviteToPlayer(dwID)
 				end,
@@ -881,7 +874,7 @@ LIB.RegisterTargetAddonMenu(NSFormatString('{$NS}#Game#Bosslist'), function()
 		local dwTemplateID = p.dwTemplateID
 		if LIB.IsBoss(dwMapID, dwTemplateID) then
 			return {
-				szOption = _L['Remove from Boss list'],
+				szOption = _L['Remove from BOSS list'],
 				fnAction = function()
 					GenerateList(true)
 					if not BOSS_LIST_CUSTOM[dwMapID] then
@@ -902,7 +895,7 @@ LIB.RegisterTargetAddonMenu(NSFormatString('{$NS}#Game#Bosslist'), function()
 			}
 		else
 			return {
-				szOption = _L['Add to Boss list'],
+				szOption = _L['Add to BOSS list'],
 				fnAction = function()
 					GenerateList(true)
 					if not BOSS_LIST_CUSTOM[dwMapID] then
@@ -943,7 +936,7 @@ local function GenerateList(bForceRefresh)
 	if bForceRefresh or not INPC_LIST then
 		INPC_LIST = {}
 		LIB.SaveLUAData(CACHE_PATH, INPC_LIST)
-		LIB.Sysmsg(_L('Important Npc list updated to v%s.', select(2, GetVersion())))
+		LIB.Sysmsg(_L('Important-NPC list updated to v%s.', select(2, GetVersion())))
 	end
 	for dwMapID, tInfo in pairs(LIB.LoadLUAData(PACKET_INFO.FRAMEWORK_ROOT .. 'data/inpclist/{$lang}.jx3dat') or {}) do
 		if not INPC_LIST[dwMapID] then
@@ -994,7 +987,7 @@ LIB.RegisterTargetAddonMenu(NSFormatString('{$NS}#Game#ImportantNpclist'), funct
 		local dwTemplateID = p.dwTemplateID
 		if LIB.IsImportantNpc(dwMapID, dwTemplateID, true) then
 			return {
-				szOption = _L['Remove from important npc list'],
+				szOption = _L['Remove from Important-NPC list'],
 				fnAction = function()
 					GenerateList(true)
 					if not INPC_LIST_CUSTOM[dwMapID] then
@@ -1014,7 +1007,7 @@ LIB.RegisterTargetAddonMenu(NSFormatString('{$NS}#Game#ImportantNpclist'), funct
 			}
 		else
 			return {
-				szOption = _L['Add to important npc list'],
+				szOption = _L['Add to Important-NPC list'],
 				fnAction = function()
 					GenerateList(true)
 					if not INPC_LIST_CUSTOM[dwMapID] then
@@ -2606,7 +2599,7 @@ function LIB.Equip(szName)
 					j=j + 1
 				elseif LIB.GetItemNameByUIID(item.nUiId) == szName then -- LIB.GetItemNameByItem(item)
 					local eRetCode, nEquipPos = me.GetEquipPos(i, j)
-					if szName == _L['ji guan'] or szName == _L['nu jian'] then
+					if szName == _L['Ji Guan'] or szName == _L['Nu Jian'] then
 						for k = 0,15 do
 							if me.GetItem(INVENTORY_INDEX.BULLET_PACKAGE, k) == nil then
 								OnExchangeItem(i, j, INVENTORY_INDEX.BULLET_PACKAGE, k)
@@ -3613,11 +3606,11 @@ end
 local function SyncMember(team, dwID, szName, state)
 	if state.bForm then --如果这货之前有阵眼
 		team.SetTeamFormationLeader(dwID, state.nGroup) -- 阵眼给他
-		LIB.Sysmsg(_L('restore formation of %d group: %s', state.nGroup + 1, szName))
+		LIB.Sysmsg(_L('Restore formation of %d group: %s', state.nGroup + 1, szName))
 	end
 	if state.nMark then -- 如果这货之前有标记
 		team.SetTeamMark(state.nMark, dwID) -- 标记给他
-		LIB.Sysmsg(_L('restore player marked as [%s]: %s', MARK_NAME[state.nMark], szName))
+		LIB.Sysmsg(_L('Restore player marked as [%s]: %s', MARK_NAME[state.nMark], szName))
 	end
 end
 -- 恢复团队信息
@@ -3648,7 +3641,7 @@ function LIB.SetTeamInfo(tTeamInfo)
 		for _, dwID in pairs(tGroupInfo.MemberList) do
 			local szName = team.GetClientTeamMemberName(dwID)
 			if not szName then
-				LIB.Sysmsg(_L('unable get player of %d group: #%d', nGroup + 1, dwID))
+				LIB.Sysmsg(_L('Unable get player of %d group: #%d', nGroup + 1, dwID))
 			else
 				if not tSaved[szName] then
 					szName = gsub(szName, '@.*', '')
@@ -3656,10 +3649,10 @@ function LIB.SetTeamInfo(tTeamInfo)
 				local state = tSaved[szName]
 				if not state then
 					insert(tWrong[nGroup], { dwID = dwID, szName = szName, state = nil })
-					LIB.Sysmsg(_L('unknown status: %s', szName))
+					LIB.Sysmsg(_L('Unknown status: %s', szName))
 				elseif state.nGroup == nGroup then
 					SyncMember(team, dwID, szName, state)
-					LIB.Sysmsg(_L('need not adjust: %s', szName))
+					LIB.Sysmsg(_L('Need not adjust: %s', szName))
 				else
 					insert(tWrong[nGroup], { dwID = dwID, szName = szName, state = state })
 				end
@@ -3671,7 +3664,7 @@ function LIB.SetTeamInfo(tTeamInfo)
 				end
 				if szName == tTeamInfo.szDistribute and dwID ~= team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.DISTRIBUTE) then
 					team.SetAuthorityInfo(TEAM_AUTHORITY_TYPE.DISTRIBUTE, dwID)
-					LIB.Sysmsg(_L('restore distributor: %s', szName))
+					LIB.Sysmsg(_L('Restore distributor: %s', szName))
 				end
 			end
 		end
@@ -3694,11 +3687,11 @@ function LIB.SetTeamInfo(tTeamInfo)
 				if not dst.state or dst.state.nGroup ~= nGroup then
 					insert(tWrong[nGroup], dst)
 				else -- bingo
-					LIB.Sysmsg(_L('change group of [%s] to %d', dst.szName, nGroup + 1))
+					LIB.Sysmsg(_L('Change group of [%s] to %d', dst.szName, nGroup + 1))
 					SyncMember(team, dst.dwID, dst.szName, dst.state)
 				end
 			end
-			LIB.Sysmsg(_L('change group of [%s] to %d', src.szName, src.state.nGroup + 1))
+			LIB.Sysmsg(_L('Change group of [%s] to %d', src.szName, src.state.nGroup + 1))
 			SyncMember(team, src.dwID, src.szName, src.state)
 			nIndex = GetWrongIndex(tWrong[nGroup], true) -- update nIndex
 		end
@@ -3709,11 +3702,11 @@ function LIB.SetTeamInfo(tTeamInfo)
 	end
 	if dwMark ~= 0 and dwMark ~= me.dwID then
 		team.SetAuthorityInfo(TEAM_AUTHORITY_TYPE.MARK, dwMark)
-		LIB.Sysmsg(_L('restore team marker: %s', tTeamInfo.szMark))
+		LIB.Sysmsg(_L('Restore team marker: %s', tTeamInfo.szMark))
 	end
 	if dwLeader ~= 0 and dwLeader ~= me.dwID then
 		team.SetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER, dwLeader)
-		LIB.Sysmsg(_L('restore team leader: %s', tTeamInfo.szLeader))
+		LIB.Sysmsg(_L('Restore team leader: %s', tTeamInfo.szLeader))
 	end
 	LIB.Sysmsg(_L['Team list restored'])
 end

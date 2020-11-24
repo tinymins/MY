@@ -238,7 +238,7 @@ local menu = {
 	}, {
 		bDevide  = true,
 	}, {
-		szOption = _L['set hotkey'],
+		szOption = _L['Set hotkey'],
 		fnAction = function()
 			LIB.SetHotKey()
 		end,

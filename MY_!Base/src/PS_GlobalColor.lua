@@ -176,4 +176,4 @@ function PS.OnPanelActive(wnd)
 	})
 end
 
-LIB.RegisterPanel(_L['System'], 'GlobalColor', _L['GlobalColor'], 'ui\\Image\\button\\CommonButton_1.UITex|70', PS)
+LIB.RegisterPanel(_L['System'], 'GlobalColor', _L['Global color'], 'ui\\Image\\button\\CommonButton_1.UITex|70', PS)

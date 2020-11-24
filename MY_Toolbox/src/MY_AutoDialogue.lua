@@ -506,7 +506,7 @@ end
 function D.GetConfigMenu()
 	return {
 		szOption = _L['Autochat'], {
-			szOption = _L['enable'],
+			szOption = _L['Enable'],
 			bCheck = true, bChecked = MY_AutoDialogue.bEnable,
 			fnAction = function()
 				MY_AutoDialogue.bEnable = not MY_AutoDialogue.bEnable

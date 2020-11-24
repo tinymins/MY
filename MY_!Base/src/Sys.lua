@@ -230,12 +230,12 @@ end
 
 LIB.RegisterInit(NSFormatString('{$NS}#BIND_HOTKEY'), function()
 	-- hotkey
-	Hotkey.AddBinding(NSFormatString('{$NS}_Total'), _L['Open/Close main panel'], PACKET_INFO.NAME, LIB.TogglePanel, nil)
+	Hotkey.AddBinding(NSFormatString('{$NS}_Total'), _L['Toggle main panel'], PACKET_INFO.NAME, LIB.TogglePanel, nil)
 	for _, v in ipairs(HOTKEY_CACHE) do
 		Hotkey.AddBinding(v.szName, v.szTitle, '', v.fnDown, v.fnUp)
 	end
 	for i = 1, 5 do
-		Hotkey.AddBinding(NSFormatString('{$NS}_HotKey_Null_')..i, _L['none-function hotkey'], '', function() end, nil)
+		Hotkey.AddBinding(NSFormatString('{$NS}_HotKey_Null_')..i, _L['None-function hotkey'], '', function() end, nil)
 	end
 end)
 if PACKET_INFO.DEBUG_LEVEL <= DEBUG_LEVEL.DEBUG then

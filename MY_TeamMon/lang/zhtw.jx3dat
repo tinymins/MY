@@ -238,6 +238,7 @@ return {
 	['ERR404: Meta address not found!'] = '錯誤404：訂閱地址不存在！',
 	['Downloader is not ready!'] = '數據下載器未就緒！',
 	['Dowloading in progress, please wait...'] = '數據下載正在進行中，請稍後...',
+	['Please unlock talk lock first.'] = '請先解除聊天鎖。',
 	['Decode %s failed!'] = '解碼[%s]失敗！',
 	['Please input meta address:'] = '請輸入訂閱地址，添加多個使用分號分隔：',
 	['Please select one dataset first!'] = '請先選擇一個數據項！',

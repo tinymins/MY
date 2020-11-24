@@ -114,7 +114,7 @@ function PS.OnPanelActive(wnd)
 	end
 	list:ListBox('onmenu', function(oID, szText, tData)
 		local t = {{
-			szOption = _L['delete'],
+			szOption = _L['Delete'],
 			fnAction = function()
 				MY_Focus.RemoveFocusPattern(tData.szPattern)
 				list:ListBox('delete', 'id', oID)
@@ -258,7 +258,7 @@ function PS.OnPanelActive(wnd)
 	-- add
 	ui:Append('WndButton', {
 		x = wl - 80, y = y, w = 80,
-		text = _L['add'],
+		text = _L['Add'],
 		onclick = function()
 			GetUserInput(_L['Add auto focus'], function(szText)
 				local tData = MY_Focus.SetFocusPattern(szText)

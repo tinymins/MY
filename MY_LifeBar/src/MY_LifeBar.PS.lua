@@ -930,7 +930,7 @@ function PS.OnPanelActive(wnd)
 	})
 
 	ui:Append('WndButton', {
-		x = x + 65, y = y, w = 125, text = _L['reset config'],
+		x = x + 65, y = y, w = 125, text = _L['Reset config'],
 		onclick = function()
 			Config('reset')
 		end,
