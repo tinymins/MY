@@ -233,6 +233,165 @@ function mt:__tostring()
   if self.build      then table.insert(buffer, "+" .. self.build) end
   return table.concat(buffer)
 end
+-- This works like "satisfies" (fuzzy matching) in npm.
+-- https://docs.npmjs.com/cli/v6/using-npm/semver
+-- A version range is a set of comparators which specify versions that satisfy the range.
+-- A comparator is composed of an operator and a version. The set of primitive operators is:
+--   < Less than
+--   <= Less than or equal to
+--   > Greater than
+--   >= Greater than or equal to
+--   = Equal. If no operator is specified, then equality is assumed, so this operator
+--     is optional, but MAY be included.
+-- Comparators can be joined by whitespace to form a comparator set, which is satisfied by
+-- the intersection of all of the comparators it includes.
+-- A range is composed of one or more comparator sets, joined by ||. A version matches
+-- a range if and only if every comparator in at least one of the ||-separated comparator
+-- sets is satisfied by the version.
+-- A "version" is described by the v2.0.0 specification found at https://semver.org/.
+-- A leading "=" or "v" character is stripped off and ignored.
+function mt:__mod(str)
+  -- version range := comparator sets
+  if str:find("||", nil, true) then
+    local start, pos, part = 1
+    while true do
+      pos = str:find("||", start, true)
+      part = str:sub(start, pos and (pos - 1))
+      if self % part then
+        return true
+      end
+      if not pos then
+        return false
+      end
+      start = pos + 2
+    end
+  end
+  -- comparator set := comparators
+  str = str:gsub("%s+", " ")
+           :gsub("^%s+", "")
+           :gsub("%s+$", "")
+  if str:find(" ", nil, true) then
+    local start, pos, part = 1
+    while true do
+      pos = str:find(" ", start, true)
+      part = str:sub(start, pos and (pos - 1))
+      -- Hyphen Ranges: X.Y.Z - A.B.C
+      -- https://docs.npmjs.com/cli/v6/using-npm/semver#hyphen-ranges-xyz---abc
+      if pos and str:sub(pos, pos + 2) == " - " then
+        if not (self % (">=" .. part)) then
+          return false
+        end
+        start = pos + 3
+        pos = str:find(" ", start, true)
+        part = str:sub(start, pos and (pos - 1))
+        if not (self % ("<=" .. part)) then
+          return false
+        end
+      else
+        if not (self % part) then
+          return false
+        end
+      end
+      if not pos then
+        return true
+      end
+      start = pos + 1
+    end
+    return true
+  end
+  -- comparators := operator + version
+  str = str:gsub("^=", "")
+           :gsub("^v", "")
+  -- X-Ranges *
+  -- Any of X, x, or * may be used to "stand in" for one of the numeric values in the [major, minor, patch] tuple.
+  -- https://docs.npmjs.com/cli/v6/using-npm/semver#x-ranges-12x-1x-12-
+  if str == "" or str == "*" then
+    return self % ">=0.0.0"
+  end
+  local pos = str:find("%d")
+  assert(pos, "Version range must starts with number: " .. str)
+  -- X-Ranges 1.2.x 1.X 1.2.*
+  -- Any of X, x, or * may be used to "stand in" for one of the numeric values in the [major, minor, patch] tuple.
+  -- https://docs.npmjs.com/cli/v6/using-npm/semver#x-ranges-12x-1x-12-
+  local operator = pos == 1 and "=" or str:sub(1, pos - 1)
+  local version = str:sub(pos):gsub("%.[xX*]", "")
+  local xrange = math.max(0, 2 - select(2, version:gsub("%.", "")))
+  for _ = 1, xrange do
+      version = version .. ".0"
+  end
+  local sv = semver(version)
+  if operator == "<" then
+    return self < sv
+  end
+  -- primitive operators
+  -- https://docs.npmjs.com/cli/v6/using-npm/semver#ranges
+  if operator == "<=" then
+    if xrange > 0 then
+      if xrange == 1 then
+        sv = sv:nextMinor()
+      elseif xrange == 2 then
+        sv = sv:nextMajor()
+      end
+      return self < sv
+    end
+    return self <= sv
+  end
+  if operator == ">" then
+    if xrange > 0 then
+      if xrange == 1 then
+        sv = sv:nextMinor()
+      elseif xrange == 2 then
+        sv = sv:nextMajor()
+      end
+      return self >= sv
+    end
+    return self > sv
+  end
+  if operator == ">=" then
+    return self >= sv
+  end
+  if operator == "=" then
+    if xrange > 0 then
+      if self < sv then
+        return false
+      end
+      if xrange == 1 then
+        sv = sv:nextMinor()
+      elseif xrange == 2 then
+        sv = sv:nextMajor()
+      end
+      return self < sv
+    end
+    return self == sv
+  end
+  -- Caret Ranges ^1.2.3 ^0.2.5 ^0.0.4
+  -- Allows changes that do not modify the left-most non-zero digit in the [major, minor, patch] tuple.
+  -- In other words, this allows patch and minor updates for versions 1.0.0 and above, patch updates for
+  -- versions 0.X >=0.1.0, and no updates for versions 0.0.X.
+  -- https://docs.npmjs.com/cli/v6/using-npm/semver#caret-ranges-123-025-004
+  if operator == "^" then
+    if sv.major == 0 and xrange < 2 then
+      if sv.minor == 0 and xrange < 1 then
+        return self.major == 0 and self.minor == 0 and self >= sv and self < sv:nextPatch()
+      end
+      return self.major == 0 and self >= sv and self < sv:nextMinor()
+    end
+    return self.major == sv.major and self >= sv and self < sv:nextMajor()
+  end
+  -- Tilde Ranges ~1.2.3 ~1.2 ~1
+  -- Allows patch-level changes if a minor version is specified on the comparator. Allows minor-level changes if not.
+  -- https://docs.npmjs.com/cli/v6/using-npm/semver#tilde-ranges-123-12-1
+  if operator == "~" then
+    if self < sv then
+      return false
+    end
+    if xrange == 2 then
+      return self < sv:nextMajor()
+    end
+    return self < sv:nextMinor()
+  end
+  assert(false, "Invaild operator found: " .. operator)
+end
 
 local function new(major, minor, patch, prerelease, build)
   assert(major, "At least one parameter is needed")

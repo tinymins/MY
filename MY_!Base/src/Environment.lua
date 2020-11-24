@@ -58,7 +58,7 @@ function LIB.AssertVersion(szKey, szCaption, szRequireVersion)
 			szCaption, EncodeLUAData(szRequireVersion)))
 		return IsDebugClient() or false
 	end
-	if not (LIB.Semver(szRequireVersion) ^ LIB.Semver(PACKET_INFO.VERSION)) then
+	if not (LIB.Semver(PACKET_INFO.VERSION) % szRequireVersion) then
 		LIB.Sysmsg(_L(
 			'%s requires base library version at %s, current at %s.',
 			szCaption, szRequireVersion, PACKET_INFO.VERSION))
