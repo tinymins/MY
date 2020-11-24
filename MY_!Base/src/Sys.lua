@@ -1840,7 +1840,7 @@ end
 
 local COLOR_NAME_RGB = {}
 do
-	local aColor = LIB.LoadLUAData(PACKET_INFO.FRAMEWORK_ROOT .. 'data/colors/')
+	local aColor = LIB.LoadLUAData(PACKET_INFO.FRAMEWORK_ROOT .. 'data/colors/{$lang}.jx3dat')
 	for szColor, aKey in ipairs(aColor) do
 		local nR, nG, nB = LIB.Hex2RGB(szColor)
 		if nR then
