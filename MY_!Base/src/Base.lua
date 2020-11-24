@@ -1502,6 +1502,7 @@ local LIB = {
 	EncodeLUAData    = EncodeLUAData   ,
 	DecodeLUAData    = DecodeLUAData   ,
 	RandomChild      = RandomChild     ,
+	KvpToObject      = KvpToObject     ,
 	GetTraceback     = GetTraceback    ,
 	IsStreaming      = IsStreaming     ,
 	NSFormatString   = NSFormatString  ,
