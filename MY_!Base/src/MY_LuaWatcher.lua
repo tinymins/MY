@@ -208,7 +208,7 @@ function D.RemoveBreathe()
 end
 
 RegisterEvent('MY_BASE_LOADING_END', function()
-	local _L = MY.LoadLangPack()
+	local _L = MY.LoadLangPack(MY.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/dev/')
 	local PS = {}
 
 	function PS.OnPanelActive(wnd)

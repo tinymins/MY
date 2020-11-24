@@ -163,6 +163,7 @@ return {
 
     ['MY_RoleStatistics_SerendipityStat'] = '奇遇统计',
     ['Serendipity'] = '奇遇',
+	['Refresh'] = '刷新',
     ['Trigger'] = '触发点',
     ['Loot item'] = '物品获取',
     [' - '] = '·',
