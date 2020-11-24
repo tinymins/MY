@@ -51,6 +51,22 @@ function LIB.GetLang()
 	return lang
 end
 
+function LIB.AssertVersion(szKey, szCaption, szRequireVersion)
+	if not IsString(szRequireVersion) then
+		LIB.Sysmsg(_L(
+			'%s requires a invalid base library version value: %s.',
+			szCaption, EncodeLUAData(szRequireVersion)))
+		return IsDebugClient() or false
+	end
+	if not (LIB.Semver(szRequireVersion) ^ LIB.Semver(PACKET_INFO.VERSION)) then
+		LIB.Sysmsg(_L(
+			'%s requires base library version at %s, current at %s.',
+			szCaption, szRequireVersion, PACKET_INFO.VERSION))
+		return IsDebugClient() or false
+	end
+	return true
+end
+
 -- 获取功能屏蔽等级
 do
 local DELAY_EVENT = {}
