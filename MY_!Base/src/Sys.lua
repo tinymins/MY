@@ -1840,14 +1840,13 @@ end
 
 local COLOR_NAME_RGB = {}
 do
-	local tColor = LIB.LoadLUAData(PACKET_INFO.FRAMEWORK_ROOT .. 'data/colors.jx3dat')
-	for id, col in pairs(tColor) do
-		local r, g, b = LIB.Hex2RGB(col)
-		if r then
-			if _L.COLOR_NAME[id] then
-				COLOR_NAME_RGB[_L.COLOR_NAME[id]] = {r, g, b}
+	local aColor = LIB.LoadLUAData(PACKET_INFO.FRAMEWORK_ROOT .. 'data/colors/')
+	for szColor, aKey in ipairs(aColor) do
+		local nR, nG, nB = LIB.Hex2RGB(szColor)
+		if nR then
+			for _, szKey in ipairs(aKey) do
+				COLOR_NAME_RGB[szKey] = {nR, nG, nB}
 			end
-			COLOR_NAME_RGB[id] = {r, g, b}
 		end
 	end
 end
