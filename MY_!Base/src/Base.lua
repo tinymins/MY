@@ -160,9 +160,59 @@ local _MENUICON_FRAME_       = 14
 local _MENUICON_HOVER_FRAME_ = 14
 local _DEBUG_LEVEL_          = tonumber(LoadLUAData(_DATA_ROOT_ .. 'debug.level.jx3dat') or nil) or 4
 local _DELOG_LEVEL_          = tonumber(LoadLUAData(_DATA_ROOT_ .. 'delog.level.jx3dat') or nil) or 4
+-------------------------------------------------------------------------------------------------------
+-- 初始化调试工具
+-------------------------------------------------------------------------------------------------------
 -----------------------------------------------
+-- 数据设为只读
+-----------------------------------------------
+local SetmetaReadonly = SetmetaReadonly or function(t)
+	for k, v in pairs(t) do
+		if type(v) == 'table' then
+			t[k] = SetmetaReadonly(v)
+		end
+	end
+	return setmetatable({}, {
+		__index     = t,
+		__newindex  = function() assert(false, 'table is readonly\n') end,
+		__metatable = {
+			const_table = t,
+		},
+	})
+end
+local DEBUG_LEVEL = SetmetaReadonly({
+	PMLOG   = 0,
+	LOG     = 1,
+	WARNING = 2,
+	ERROR   = 3,
+	DEBUG   = 3,
+})
+---------------------------------------------------
+-- 调试工具
+---------------------------------------------------
+if _DEBUG_LEVEL_ <= DEBUG_LEVEL.DEBUG then
+	if not ECHO_LUA_ERROR then
+		ECHO_LUA_ERROR = { ID = _NAME_SPACE_ }
+	elseif type(ECHO_LUA_ERROR) == 'table' then
+		ECHO_LUA_ERROR.ID = _NAME_SPACE_
+	end
+	RegisterEvent('CALL_LUA_ERROR', function()
+		if ECHO_LUA_ERROR and ECHO_LUA_ERROR.ID == _NAME_SPACE_ then
+			print(arg0)
+			OutputMessage('MSG_SYS', arg0)
+		end
+	end)
+	TraceButton_AppendAddonMenu({{
+		szOption = 'ReloadUIAddon',
+		fnAction = function()
+			ReloadUIAddon()
+		end,
+	}})
+end
+Log('[' .. _NAME_SPACE_ .. '] Debug level ' .. _DEBUG_LEVEL_ .. ' / delog level ' .. _DELOG_LEVEL_)
+-------------------------------------------------------------------------------------------------------
 -- 加载语言包
------------------------------------------------
+-------------------------------------------------------------------------------------------------------
 local function LoadLangPack(szLangFolder)
 	local _, _, szLang = GetVersion()
 	local t0 = LoadLUAData(_FRAMEWORK_ROOT_..'lang/default') or {}
@@ -212,31 +262,13 @@ local _AUTHOR_PROTECT_NAMES_ = {
 	[char(0xE8, 0x8C, 0x97, 0xE4, 0xBC, 0x8A, 0xE4, 0xBC, 0x8A)] = true, -- 繁体
 }
 local _AUTHOR_FAKE_HEADER_ = GetFormatText(_L['[Fake author]'], 8, 255, 95, 159)
-Log('[' .. _NAME_SPACE_ .. '] Debug level ' .. _DEBUG_LEVEL_ .. ' / delog level ' .. _DELOG_LEVEL_)
----------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------
 -- 通用函数
----------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------
 -----------------------------------------------
 -- 克隆数据
 -----------------------------------------------
 local Clone = clone
------------------------------------------------
--- 数据设为只读
------------------------------------------------
-local SetmetaReadonly = SetmetaReadonly or function(t)
-	for k, v in pairs(t) do
-		if type(v) == 'table' then
-			t[k] = SetmetaReadonly(v)
-		end
-	end
-	return setmetatable({}, {
-		__index     = t,
-		__newindex  = function() assert(false, 'table is readonly\n') end,
-		__metatable = {
-			const_table = t,
-		},
-	})
-end
 -----------------------------------------------
 -- Lua数据序列化
 -----------------------------------------------
@@ -791,13 +823,6 @@ local function KvpToObject(kvp)
 	end
 	return t
 end
-local DEBUG_LEVEL = SetmetaReadonly({
-	PMLOG   = 0,
-	LOG     = 1,
-	WARNING = 2,
-	ERROR   = 3,
-	DEBUG   = 3,
-})
 local PATH_TYPE = SetmetaReadonly({
 	NORMAL = 0,
 	DATA   = 1,
@@ -1489,67 +1514,3 @@ local LIB = {
 }
 _G[_NAME_SPACE_] = LIB
 ---------------------------------------------------------------------------------------------
-
------------------------------------------------
--- HOOK 全局声音表
------------------------------------------------
-if not HookSound then
-	local hook = {}
-	function HookSound(szSound, szKey, fnCondition)
-		if not hook[szSound] then
-			hook[szSound] = {}
-		end
-		hook[szSound][szKey] = fnCondition
-	end
-	local sounds = {}
-	for k, v in pairs(g_sound) do
-		sounds[k], g_sound[k] = g_sound[k], nil
-	end
-	local function getsound(t, k)
-		if hook[k] then
-			for szKey, fnCondition in pairs(hook[k]) do
-				if fnCondition() then
-					return
-				end
-			end
-		end
-		return sounds[k]
-	end
-	local function setsound(t, k, v)
-		sounds[k] = v
-	end
-	setmetatable(g_sound, {__index = getsound, __newindex = setsound})
-
-	local function resumegsound()
-		setmetatable(g_sound, nil)
-		for k, v in pairs(sounds) do
-			g_sound[k] = v
-		end
-	end
-	RegisterEvent('GAME_EXIT', resumegsound)
-	RegisterEvent('PLAYER_EXIT_GAME', resumegsound)
-	RegisterEvent('RELOAD_UI_ADDON_BEGIN', resumegsound)
-end
-
----------------------------------------------------
--- 事件、快捷键、菜单注册
----------------------------------------------------
-if _DEBUG_LEVEL_ <= DEBUG_LEVEL.DEBUG then
-	if not ECHO_LUA_ERROR then
-		ECHO_LUA_ERROR = { ID = PACKET_INFO.NAME_SPACE }
-	elseif IsTable(ECHO_LUA_ERROR) then
-		ECHO_LUA_ERROR.ID = PACKET_INFO.NAME_SPACE
-	end
-	RegisterEvent('CALL_LUA_ERROR', function()
-		if ECHO_LUA_ERROR and ECHO_LUA_ERROR.ID == PACKET_INFO.NAME_SPACE then
-			print(arg0)
-			OutputMessage('MSG_SYS', arg0)
-		end
-	end)
-	TraceButton_AppendAddonMenu({{
-		szOption = 'ReloadUIAddon',
-		fnAction = function()
-			ReloadUIAddon()
-		end,
-	}})
-end
