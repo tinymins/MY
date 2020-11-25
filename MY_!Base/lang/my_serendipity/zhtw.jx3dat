@@ -14,6 +14,8 @@ return {
 	['Yes'] = '是',
 	['No'] = '否',
 
+	['Today I want every (%d-%s-) number sold at (%d-%s-) for (%s+)'] = '今天我以每(%d+[^%d]-)(%d+[^%d]-)的價格回收(.+)你想',
+
 	['Anonymous'] = '匿名俠士',
 	['JX3 is pround of you!'] = '劍網3幸甚有你！',
 	['Thanks for your kindness!'] = '感謝各位無私付出的小可愛！',

@@ -49,6 +49,4 @@ return {
 	['Your valid price is '] = '你当前有效出价为：',
 	['You already have a vaild price at %s.'] = '你已有有效出价%s，无需重复出价。',
 	['Sure to delete %s\'s bidding record?'] = '确定要作废[%s]的出价记录？',
-
-	['Today I want every (%d-%s-) number sold at (%d-%s-) for (%s+)'] = '今天我以每(%d+[^%d]-)(%d+[^%d]-)的价格回收(.+)你想',
 }
