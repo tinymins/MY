@@ -42,9 +42,6 @@ return {
 	['PTC_WORLD'] = '世界',
 	['PTC_LOCAL_SYS'] = '系统',
 
-	['Ji Guan'] = '机关',
-	['Nu Jian'] = '弩箭',
-
 	['Man']   = '成男',
 	['Woman'] = '成女',
 	['Boy']   = '少侠',

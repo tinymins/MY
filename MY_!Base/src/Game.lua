@@ -2597,9 +2597,9 @@ function LIB.Equip(szName)
 				local item = me.GetItem(i, j)
 				if item == nil then
 					j=j + 1
-				elseif LIB.GetItemNameByUIID(item.nUiId) == szName then -- LIB.GetItemNameByItem(item)
-					local eRetCode, nEquipPos = me.GetEquipPos(i, j)
-					if szName == _L['Ji Guan'] or szName == _L['Nu Jian'] then
+				elseif LIB.GetItemNameByUIID(item.nUiId) == szName then
+					if szName == g_tStrings.tBulletDetail[BULLET_DETAIL.SNARE]
+					or szName == g_tStrings.tBulletDetail[BULLET_DETAIL.BOLT] then
 						for k = 0,15 do
 							if me.GetItem(INVENTORY_INDEX.BULLET_PACKAGE, k) == nil then
 								OnExchangeItem(i, j, INVENTORY_INDEX.BULLET_PACKAGE, k)
@@ -2608,6 +2608,7 @@ function LIB.Equip(szName)
 						end
 						return
 					else
+						local eRetCode, nEquipPos = me.GetEquipPos(i, j)
 						OnExchangeItem(i, j, INVENTORY_INDEX.EQUIP, nEquipPos)
 						return
 					end
