@@ -1,0 +1,13 @@
+return {
+	['GlobalConfig'] = '全局设置',
+	['Distance type'] = '默认距离计算方式',
+	['Notify center'] = '消息中心',
+	['Show in minimap'] = '显示小地图入口',
+	['Order desc'] = '逆序显示',
+	['Disable dismiss'] = '禁止消息自动消失',
+	['System Info'] = '系统信息',
+
+	['Hover entry'] = '悬浮入口',
+	['Hover popup'] = '鼠标滑过立即弹出',
+	['Size: %d'] = '大小：%d',
+}

@@ -6,6 +6,8 @@ return {
     ['Mingyi self buff monitor'] = '茗伊自身BUFF監控',
     ['Mingyi target buff monitor'] = '茗伊目標BUFF監控',
 
+	['Encrypt and compressing: '] = '更新加密壓縮：',
+
     ['Enable'] = '啟用',
     ['Hide others buff'] = '只看我的',
     ['Hide others buff TIP'] = '只顯示來源屬於自己的氣勁',
@@ -67,6 +69,7 @@ return {
     },
     ['Export'] = '導出',
     ['Ensure export'] = '確認導出',
+	['Streaming client does not support export!'] = '雲端客戶端不支持導出功能！',
     ['Press ALT to export as default data.\n Press CTRL to export as plain.'] = '按住ALT導出為內置數據。\n按住CTRL導出為非壓縮明文文件。',
     ['Ensure export (with indent)'] = '確認導出（格式化輸出）',
     ['Ensure export (as embedded)'] = '確認導出（保存為內置數據）',

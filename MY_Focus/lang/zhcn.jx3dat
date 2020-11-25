@@ -19,6 +19,7 @@ return {
     ['May cause some problem in dungeon map'] = '获取信息更加精准但是可能造成性能和其他问题（建议秘境中不要开启）',
     ['Show focus\'s target'] = '显示目标的目标',
     ['Show 3d distance'] = '显示三维坐标距离',
+	['Distance type'] = '默认距离计算方式',
     ['Hide dead object'] = '隐藏重伤的目标',
     ['Display kungfu icon instead of location'] = '显示内功心法图标',
     ['Enable scene navi'] = '启用场景目标追踪',

@@ -1,0 +1,7 @@
+return {
+	['Share boss kill'] = '首次击败分享',
+	['Share boss kill record for kill rank.'] = '公开分享首次击败秘境首领相关团队与战斗信息，用于数据统计。',
+	['Try share boss kill: %s - %ds (%s).'] = '正在分享：%s，战斗%d秒，%s。',
+	['Share boss kill success: %s - %ds (%s).'] = '成功分享：%s，战斗%d秒，%s。',
+	['Full win'] = '全胜',
+}

@@ -42,8 +42,6 @@ local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCal
 local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
 local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
 -------------------------------------------------------------------------------------------------------
-local _L = LIB.LoadLangPack()
------------------------------------------------------------------------------------------------------------
 
 LIB.RegisterEvent('OPEN_WINDOW.MY_DebugLogs', function()
 	if not LIB.IsDebugClient(true) then

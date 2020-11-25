@@ -45,7 +45,7 @@ local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAD
 local PLUGIN_NAME = 'MY_!Base'
 local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MYDev_UIManager'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/dev/')
+local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/devs/')
 --------------------------------------------------------------------------
 if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^3.0.0') then
 	return

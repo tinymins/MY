@@ -4,6 +4,8 @@ return {
     ['%s stat has not been enabled, this character\'s data will not be saved, are you willing to save this character?\nYou can change this config by click option button on the top-right conner.'] = '%s尚未啟用，該角色數據不會被統計並顯示到列表中，是否要現在開啟該角色的統計功能？\n選擇後該提示不會再次出現，日後您可以在該界面右上角點擊齒輪，隨時再次修改此項配置。',
     ['%s stat float entry has not been enabled, are you willing to enable it?\nYou can change this config by click option button on the top-right conner.'] = '%s頭像浮動入口尚未啟用，無法快速查看該角色的統計信息，是否要現在開啟浮動入口功能？\n選擇後該提示不會再次出現，日後您可以在該界面右上角點擊齒輪，隨時再次修改此項配置。',
 
+    ['Encrypt and compressing: '] = '更新加密壓縮：',
+
     ['MY_RoleStatistics_BagStat'] = '背包統計',
 
     ['%d pages'] = '共%d頁',
@@ -14,7 +16,6 @@ return {
     ['Bankx%d Bagx%d Totalx%d'] = '倉庫x%d 背包x%d 總x%d',
     ['%s (%s)\tBankx%d Bagx%d Totalx%d\n'] = '%s (%s)\t倉庫x%d 背包x%d 總x%d\n',
     ['Are you sure to delete item record of %s?'] = '確定要清空[%s]的背包物品記錄嗎？',
-
 
     ['MY_RoleStatistics_RoleStat'] = '角色統計',
 

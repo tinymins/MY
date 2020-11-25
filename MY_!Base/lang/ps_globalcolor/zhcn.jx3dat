@@ -1,0 +1,6 @@
+return {
+	['Global color'] = '全局配色',
+	['Force color'] = '门派配色',
+	['Camp color'] = '阵营配色',
+	['Restore default'] = '恢复默认',
+}

@@ -220,13 +220,13 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 	if id == 'week_team_dungeon' then
 		return {
 			id = id,
-			szTitle = _L['Week routine: '] .. _L.ACTIVITY_MAP_TYPE.WEEK_TEAM_DUNGEON,
+			szTitle = _L['Week routine: '] .. _L.ACTIVITY_WEEK_TEAM_DUNGEON,
 			nWidth = DUNGEON_WIDTH * #LIB.GetActivityMap('WEEK_TEAM_DUNGEON'),
 		}
 	elseif id == 'week_raid_dungeon' then
 		return {
 			id = id,
-			szTitle = _L['Week routine: '] .. _L.ACTIVITY_MAP_TYPE.WEEK_RAID_DUNGEON,
+			szTitle = _L['Week routine: '] .. _L.ACTIVITY_WEEK_RAID_DUNGEON,
 			nWidth = DUNGEON_WIDTH * #LIB.GetActivityMap('WEEK_RAID_DUNGEON'),
 		}
 	elseif wfind(id, 'dungeon_') then

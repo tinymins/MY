@@ -42,8 +42,6 @@ local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCal
 local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
 local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
 -------------------------------------------------------------------------------------------------------
-local _L = LIB.LoadLangPack()
------------------------------------------------------------------------------------------------------------
 
 local PLUGIN_NAME = 'MY_PopupMenu'
 local COLOR_TABLE_NAME = 'MY_ColorTable'

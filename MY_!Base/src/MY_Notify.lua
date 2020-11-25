@@ -53,7 +53,7 @@ RegisterCustomData('MY_Notify.bEntry')
 RegisterCustomData('MY_Notify.bDesc')
 RegisterCustomData('MY_Notify.bDisableDismiss')
 
-local _L = LIB.LoadLangPack()
+local _L = LIB.LoadLangPack(PACKET_INFO.FRAMEWORK_ROOT .. 'lang/my_notify/')
 local D = {}
 local NOTIFY_LIST = {}
 local INI_PATH = PACKET_INFO.FRAMEWORK_ROOT .. 'ui/MY_Notify.ini'

@@ -446,21 +446,21 @@ local function InitTaskList(bReload)
 			if id == 'week_team_dungeon' then
 				return {
 					id = id,
-					szTitle = _L.ACTIVITY_MAP_TYPE.WEEK_TEAM_DUNGEON,
+					szTitle = _L.ACTIVITY_WEEK_TEAM_DUNGEON,
 					eType = TASK_TYPE.WEEKLY,
 					aQuestInfo = LIB.GetActivityQuest('WEEK_TEAM_DUNGEON'),
 				}
 			elseif id == 'week_raid_dungeon' then
 				return {
 					id = id,
-					szTitle = _L.ACTIVITY_MAP_TYPE.WEEK_RAID_DUNGEON,
+					szTitle = _L.ACTIVITY_WEEK_RAID_DUNGEON,
 					eType = TASK_TYPE.WEEKLY,
 					aQuestInfo = LIB.GetActivityQuest('WEEK_RAID_DUNGEON'),
 				}
 			elseif id == 'week_public_quest' then
 				return {
 					id = id,
-					szTitle = _L.ACTIVITY_MAP_TYPE.WEEK_PUBLIC_QUEST,
+					szTitle = _L.ACTIVITY_WEEK_PUBLIC_QUEST,
 					eType = TASK_TYPE.WEEKLY,
 					aQuestInfo = LIB.GetActivityQuest('WEEK_PUBLIC_QUEST'),
 				}

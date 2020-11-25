@@ -2,6 +2,7 @@ return {
 	['MY_TeamMon'] = '團隊監控',
 	['Leave map %s.'] = '你已離開地圖【%s】。',
 	['Enter map %s.'] = '你已進入地圖【%s】。',
+	['Encrypt and compressing: '] = '更新加密壓縮：',
 	-- MY_TeamMon_CA.lua --
 	['MY_TeamMon_CA'] = '中央提醒',
 	-- MY_TeamMon_BL.lua --

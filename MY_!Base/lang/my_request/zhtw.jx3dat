@@ -1,0 +1,4 @@
+return {
+	['Request list'] = '請求列表',
+	['Clear list and close?'] = '清空列表並關閉？',
+}

@@ -45,7 +45,7 @@ local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAD
 -----------------------------------------------
 -- 本地函数和变量
 -----------------------------------------------
-local _L = LIB.LoadLangPack()
+local _L = LIB.LoadLangPack(PACKET_INFO.FRAMEWORK_ROOT .. 'lang/libs/')
 
 -- #######################################################################################################
 --                                 #                   # # # #   # # # #
@@ -633,9 +633,9 @@ function LIB.GetActivityQuest(szType)
 	local date = TimeToDate(GetCurrentTime())
 	local aActive = Table_GetActivityOfDay(date.year, date.month, date.day, ACTIVITY_UI.CALENDER)
 	for _, p in ipairs(aActive) do
-		if (szType == 'WEEK_TEAM_DUNGEON' and p.szName == _L.ACTIVITY_MAP_TYPE.WEEK_TEAM_DUNGEON)
-		or (szType == 'WEEK_RAID_DUNGEON' and p.szName == _L.ACTIVITY_MAP_TYPE.WEEK_RAID_DUNGEON)
-		or (szType == 'WEEK_PUBLIC_QUEST' and p.szName == _L.ACTIVITY_MAP_TYPE.WEEK_PUBLIC_QUEST) then
+		if (szType == 'WEEK_TEAM_DUNGEON' and p.szName == _L.ACTIVITY_WEEK_TEAM_DUNGEON)
+		or (szType == 'WEEK_RAID_DUNGEON' and p.szName == _L.ACTIVITY_WEEK_RAID_DUNGEON)
+		or (szType == 'WEEK_PUBLIC_QUEST' and p.szName == _L.ACTIVITY_WEEK_PUBLIC_QUEST) then
 			for _, szQuestID in ipairs(LIB.SplitString(p.szQuestID, ';')) do
 				local tLine = Table_GetCalenderActivityQuest(szQuestID)
 				if tLine and tLine.nNpcTemplateID ~= -1 then

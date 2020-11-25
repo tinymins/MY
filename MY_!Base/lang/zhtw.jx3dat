@@ -1,12 +1,7 @@
 return {
-	-- common
 	['*'] = '※',
 	[' * '] = ' ※ ',
 	STR_SPLIT_DOT = '·',
-	['Addon comm.'] = '插件消息',
-
-	['serendipity'] = '奇遇查詢',
-	['online time'] = '開服時間',
 
 	['General'] = '常用',
 	['Chat'] = '聊天',
@@ -16,11 +11,6 @@ return {
 	['Battle'] = '戰鬥',
 	['Others'] = '其它',
 	['Development'] = '開發',
-
-	['Global color'] = '全局配色',
-	['Force color'] = '門派配色',
-	['Camp color'] = '陣營配色',
-	['Restore default'] = '恢復默認',
 
 	['Nearby channel'] = '近聊頻道',
 	['Friend channel'] = '好友頻道',
@@ -63,55 +53,6 @@ return {
 
 	['Copy'] = '複製',
 	['Paste'] = '粘貼',
-	['View equipment'] = '查看裝備',
-
-	['None-function hotkey'] = '空白快捷鍵',
-	['Display only chat panel'] = '僅顯示聊天欄',
-
-	-- MY.lua
-	PLUGIN_NAME                = '茗伊插件集',
-	PLUGIN_SHORT_NAME          = '茗伊插件',
-	PLUGIN_AUTHOR              = '茗伊 @ 夢江南',
-	PLUGIN_AUTHOR_WEIBO        = '茗伊',
-	PLUGIN_AUTHOR_SIGNATURE    = '茗伊 @夢江南',
-	['%s, welcome to use %s!'] = '歡迎%s使用%s！',
-	['Author @%s'            ] = '作者 @%s',
-	['Toggle main panel'     ] = '打開/關閉主界面',
-	['Icon Picker'           ] = '圖標選擇器',
-	['Font Picker'           ] = '字體選擇器',
-	['Color Picker'          ] = '顏色選擇器',
-	['Color Picker Pro'      ] = '調色板',
-	['Text Editor'           ] = '文本編輯器',
-	['Font %d'               ] = '字體 %d',
-
-	['[Author]'] = '〔插件君〕',
-	['[Fake author]'] = '〔該玩家非插件君，注意謹防上當受騙〕',
-
-	['Boss list updated to v%s.'] = '首領列表已成功更新至v%s。',
-	['Add to BOSS list'] = '加入首領列表',
-	['Remove from BOSS list'] = '從首領列表中移除',
-	['Important-NPC list updated to v%s.'] = '重要角色列表已成功更新至v%s。',
-	['Add to Important-NPC list'] = '加入重要角色列表',
-	['Remove from Important-NPC list'] = '從重要角色列表中移除',
-
-	['[%s] wants to get your location, would you like to share?'] = '[%s] 希望取得你當前所在地圖位置，你是否願意共享當前位置信息？',
-	['[%s] want to see your info, OK?'] = '團長 [%s] 想知曉您的裝備、心法，是否告知？',
-	['I\'ve installed MY plugins v%s <%s>'] = '我已安裝茗伊插件集 v%s <%s>。',
-
-	['LClick to copy to editbox.\n'] = '左鍵複製到聊天欄\n',
-	['MClick to remove this line.\n'] = '中鍵刪除該行文本\n',
-	['RClick to repeat this line.\n'] = '右鍵發佈到當前頻道\n',
-
-
-	['Invalid player ID!']           = '您要查看裝備的玩家ID不合法！',
-	['Peek other player failed!']    = '查看裝備失敗！',
-	['Can not find player to peek!'] = '您要查看的玩家不存在！',
-	['Player is too far to peek!']   = '距離太遠查看裝備失敗！',
-
-	['Stop cast skill'] = '打斷自身讀條',
-
-	['ADVENTURE_PATT'] = '“(.-)”[女俠在].-觸發奇遇【(.-)】',
-	['ADVENTURE_PATT2'] = '恭喜俠士(.-)在.-中獲得稀有掉落%[(.-)%]',
 
 	['Gold'] = '金',
 	['Silver'] = '銀',
@@ -129,176 +70,7 @@ return {
 	['Dart' ] = '飛鏢',
 	['Fan'  ] = '扇子',
 
-	['Restore formation of %d group: %s'         ] = '恢復第%d小隊陣眼[%s]。',
-	['Restore player marked as [%s]: %s'         ] = '恢復標記%s為[%s]。',
-	['You are not team leader, permission denied'] = '你不是隊長，無權操作隊伍。',
-	['Unable get player of %d group: #%d'        ] = '無法獲取第%d小隊成員名字#%d。',
-	['Unknown status: %s'                        ] = '成員未知狀態：[%s]。',
-	['Need not adjust: %s'                       ] = '[%s]無需調整。',
-	['Restore distributor: %s'                   ] = '恢復分配者為[%s]。',
-	['Change group of [%s] to %d'                ] = '調整[%s]到第%d小隊。',
-	['Restore team leader: %s'                   ] = '恢復隊長為[%s]。',
-	['Restore team marker: %s'                   ] = '恢復標記者為[%s]。',
-	['Team list restored'                        ] = '小隊狀態已恢復。',
-
-	['Mingyi plugins storage data'] = '茗伊插件集數據存檔',
-	['Config and storage data of plugins'] = '插件的本地數據配置',
-	['Global storage'] = '公共數據',
-	['All characters public data'] = '所有角色公共數據存檔',
-	['All characters in this server'] = '所有該伺服器公共數據存檔',
-
-	OPERATOR = {
-		['=='] = '等於',
-		['==='] = '等於',
-		['!='] = '不等於',
-		['!=='] = '不等於',
-		['~='] = '不等於',
-		['<'] = '小於',
-		['>='] = '不小於',
-		['>'] = '大於',
-		['<='] = '不大於',
-	},
-
-	['Syntax error at line %d'] = '語法解析錯誤發生在第%d行',
-	['Unknown action at line %d'] = '未知的指令發生在第%d行',
-	['Unknown action skill at line %d'] = '未知的指令招式名稱發生在第%d行',
-	['Unknown action buff at line %d'] = '未知的指令氣勁名稱發生在第%d行',
-	['Unknown condition at line %d'] = '未知的條件指令發生在第%d行',
-	['Unknown condition skill at line %d'] = '未知的條件招式名稱發生在第%d行',
-	['Unknown condition buff at line %d'] = '未知的條件氣勁名稱發生在第%d行',
-
-	['MY_Notify'] = '茗伊消息中心',
-	['Show share notify.'] = '啟用數據分享提示',
-	['Show notify tip.'] = '顯示提示框',
-	['Play notify sound.'] = '播放提示音',
-	['Auto share.'] = '自動分享',
-	['Silent mode.'] = '靜默模式',
-	['Realname, leave blank for anonymous.'] = '分享者名稱(匿名請留空)',
-	['Monitor serendipity and show share notify.'] = '收集系統公告與自身奇遇觸發事件、科舉題目以及家園花價等信息，便於有分享精神的俠士可以通過網頁上傳分享從而提供日後查詢。',
-	['You got %s, would you like to share?'] = '你觸發了%s，是否願意點擊分享到公共數據查詢中？',
-	['[%s] got %s, would you like to share?'] = '[%s]觸發了%s，是否願意點擊分享到公共數據查詢中？',
-	['You finished %s, would you like to share?'] = '你獲得了%s，是否願意點擊分享到公共數據查詢中？',
-	['[%s] finished %s, would you like to share?'] = '[%s]獲得了%s，是否願意點擊分享到公共數據查詢中？',
-	['Please input your realname, left blank for anonymous report:'] = '輸入您希望顯示的分享者名稱，匿名分享請留空：',
-	['Storage location'] = '存儲位置',
-	['User preference storage'] = '配置存儲',
-	['User preference'] = '角色數據',
-	['Server preference'] = '伺服器數據',
-	['Global preference'] = '全局數據',
-	['Error message'] = '錯誤反饋',
-	['Show error message'] = '點擊查看錯誤日誌，請在上報問題時複製提交',
-	['Debug tools has been enabled...'] = '測試工具已激活_(:彡」∠)_',
-	['Flush data'] = '保存數據',
-	['Config and data will be saved when exit game, click to save immediately'] = '設置數據將在退出游戲後自動保存，點擊立刻保存',
-
-	['Welcome to use %s, would you like to start quick tutorial now?'] = '歡迎使用%s，部分設置尚未初始化，是否立即開始個性化嚮導？',
-	['Quickset'] = '一鍵設置',
-	['Manually'] = '手動設置',
-	['Later'] = '以後再說',
-	['BgMsg cannot be send due to talk lock, data will be sent as soon as talk unlocked.'] = '聊天鎖已阻止插件通信，數據已暫存等待解鎖後重新發送。',
-
-	['Would you like to share serendipity?'] = '是否希望分享世界奇遇公告和自身奇遇到茗伊公共查詢？',
-	['Would you like to auto share serendipity?'] = '是否希望自動分享奇遇到茗伊公共查詢？',
-	['Would you like to share serendipity silently?'] = '是否希望開啟自動分享奇遇靜默模式？',
-	['Yes'] = '是',
-	['No'] = '否',
-
-	['Anonymous'] = '匿名俠士',
-	['JX3 is pround of you!'] = '劍網3幸甚有你！',
-	['Thanks for your kindness!'] = '感謝各位無私付出的小可愛！',
-
-	['%s requires a invalid base library version value: %s.'] = '%s依賴基礎庫但無法解析該依賴版本號：%s。',
-	['%s requires base library version at %s, current at %s.'] = '%s依賴基礎庫@%s，當前版本為 %s。',
-	['%s Database is malformed, do you want to repair database now? Repair database may take a long time and cause a disconnection.'] = '%s資料庫已損壞，需要修複後方可使用，但是修複可能造成臨時頓卡掉線,是否立即修複？',
-	['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'] = '接下來如有頓卡請耐心等待，不要結束進程，否則您的資料庫可能造成不可逆的數據損壞，點擊確認開始操作。',
-	['Database file locked, repair database failed! : %s'] = '資料庫文件被占用，修複失敗！(%s)',
-	['%s Database repair finished!'] = '%s資料庫修複完成！',
-
-	['Default'] = '默認',
-	['Bing.ogg'] = '呯',
-	['Notify.ogg'] = '叮咚',
-	['Hold ctrl when move in to preview.'] = '按住CTRL滑入可試聽。',
-
-	['[%s] want to see your char info, OK?'] = '[%s] 想知曉您的當前屬性是否告知？',
-
-	['GlobalConfig'] = '全局設置',
-	['Distance type'] = '默認距離計算方式',
-	['Notify center'] = '消息中心',
-	['Show in minimap'] = '顯示小地圖入口',
-	['Order desc'] = '逆序顯示',
-	['Disable dismiss'] = '禁止消息自動消失',
-	['System Info'] = '系統信息',
-	DISTANCE_TYPE = {
-		['gwwean'] = '郭氏距離',
-		['euclidean'] = '歐氏距離',
-		['plane'] = '平面距離',
-		['global'] = '全局默認',
-	},
-
-	['Encrypt and compressing: '] = '更新加密壓縮：',
-
-	-- MY_Request
-	['Request list'] = '請求列表',
-	['Clear list and close?'] = '清空列表並關閉？',
-
-	['Team dungeon'] = '小隊秘境',
-	['Raid dungeon'] = '團隊秘境',
-	['Duo dungeon'] = '雙人秘境',
-	GAME_VERSION_NAME = {
-		'破曉之路', -- 2009-10-22
-		'撼世禪劫·戰寶迦蘭', -- 2010-2-8
-		'藏劍山莊', -- 2010-5-26
-		'戰魂劫', -- 2010-10-28
-		'龍爭虎鬥', -- 2011-1-20
-		'血龍出淵', -- 2011-4-28
-		'風起稻香',
-		'巴蜀風雲', -- 2011-5-19
-		'一代宗師', -- 2011-11-16
-		'燭火燎天', -- 2012-4-19
-		'洱海驚龍', -- 2012-7-12
-		'日月明尊', -- 2012-11-22
-		'安史之亂', -- 2013-6-8
-		'亂世長安', -- 2013-9-16
-		'血戰天策', -- 2013-11-21
-		'逐鹿中原', -- 2014-4-23
-		'蒼雪龍城', -- 2014-11-24
-		'俠義乾坤', -- 2015-4-20
-		'劍膽琴心', -- 2015-10-28
-		'風骨霸刀', -- 2016-10-17
-		'日月凌空', -- 2017-4-20
-		'重製版', -- 2017-12-29
-		'世外蓬萊', -- 2018-12-21
-	},
-	MAP_GROUP = {
-		['Birth / School'] = '稻香村、門派',
-		['City / Old city'] = '主城',
-		['Village / Camp'] = '野外',
-		['Battle field / Arena'] = '戰場、競技場',
-		['Other dungeon'] = '其它秘境',
-		['Other'] = '其它地圖',
-	},
-
-	ACTIVITY_MAP_TYPE = {
-		['WEEK_TEAM_DUNGEON'] = '武林通鑒·秘境',
-		['WEEK_RAID_DUNGEON'] = '武林通鑒·團隊秘境',
-		['WEEK_PUBLIC_QUEST'] = '武林通鑒·公共任務',
-	},
-
-	['Point left time: (%d+)h(%d+)m(%d+)s'] = '點卡剩餘時間為：(%d+)小時(%d+)分(%d+)秒',
-	['Month time to: (%d+)y(%d+)m(%d+)d (%d+)h(%d+)m'] = '包月時間截止至：(%d+)/(%d+)/(%d+) (%d+):(%d+)',
-	['Fee left %H:%mm:%ss'] = '計費剩餘：%H小時%mm分鐘%ss秒',
-	['Fee left unknown'] = '計費剩餘：未知',
-
-	['Hover entry'] = '懸浮入口',
-	['Hover popup'] = '滑鼠滑過立即彈出',
-	['Size: %d'] = '大小：%d',
-
-	['Streaming client does not support export!'] = '雲端客戶端不支持導出功能！',
-
-	-- MY_FirstBossKill.lua --
-	['Share boss kill'] = '首次擊敗分享',
-	['Share boss kill record for kill rank.'] = '公開分享首次擊敗秘境首領相關團隊與戰鬥信息，用於數據統計。',
-	['Try share boss kill: %s - %ds (%s).'] = '正在分享：%s，戰鬥%d秒，%s。',
-	['Share boss kill success: %s - %ds (%s).'] = '成功分享：%s，戰鬥%d秒，%s。',
-	['Full win'] = '全勝',
+	['ACTIVITY_WEEK_TEAM_DUNGEON'] = '武林通鑒·秘境',
+	['ACTIVITY_WEEK_RAID_DUNGEON'] = '武林通鑒·團隊秘境',
+	['ACTIVITY_WEEK_PUBLIC_QUEST'] = '武林通鑒·公共任務',
 }

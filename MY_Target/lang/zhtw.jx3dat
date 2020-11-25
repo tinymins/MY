@@ -3,6 +3,7 @@ return {
     ['MY_TargetDirection'] = '目標指示',
 	['%.1f feet'] = '%.1f 尺',
 	['Show target direction'] = '顯示目標方位指示',
+	['Distance type'] = '默認距離計算方式',
 
     ['MY_TargetFace'] = '目標面向',
     ['Options'] = '功能選項',

@@ -5,6 +5,7 @@ return {
     ['Realtime database commit'] = '聊天记录实时写入数据库',
     ['Auto connect database'] = '登录时自动连接数据库',
     ['Export chatlog'] = '导出聊天记录',
+	['Streaming client does not support export!'] = '云端客户端不支持导出功能！',
     ['Optimize datebase'] = '优化数据库',
     ['Optimize datebase will take a long time and may cause a disconnection, are you sure to continue?'] = '优化数据库可以加快查询速度解决部分顿卡问题，但如果本地聊天记录较多操作可能会造成临时顿卡掉线，是否继续？',
     ['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'] = '接下来如有顿卡请耐心等待，不要结束进程，否则您的聊天记录可能造成不可逆的数据损坏，点击确认开始操作。',
