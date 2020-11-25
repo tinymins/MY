@@ -1,4 +1,3 @@
--- language data (zhcn) updated at 2015/02/23 10:11:27
 return {
 	-- TS.lua --
 	['Well done! %s in %d group first to attack %s!!'] = '%d小队的 %s 率先攻击了 %s！获取不一定准确，仅供参考！',

@@ -1,4 +1,3 @@
--- language data (zhtw) updated at 2015/02/23 10:11:27
 return {
 	['MY_TeamMon'] = '團隊監控',
 	['Leave map %s.'] = '你已離開地圖【%s】。',

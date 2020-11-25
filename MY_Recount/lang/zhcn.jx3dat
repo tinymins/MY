@@ -1,4 +1,3 @@
--- language data (zhcn) updated at 2014-12-27 22:15:14
 return {
     ['MY_Recount'] = '战斗统计',
     ['Enable recording'] = '记录战斗统计数据',

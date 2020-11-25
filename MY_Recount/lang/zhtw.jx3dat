@@ -1,4 +1,3 @@
--- language data (zhtw) updated at 2014-12-27 22:15:14
 return {
     ['MY_Recount'] = '戰鬥統計',
     ['Enable recording'] = '記錄戰鬥統計數據',

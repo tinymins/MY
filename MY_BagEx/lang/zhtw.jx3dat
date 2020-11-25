@@ -1,4 +1,3 @@
--- language data (zhtw) updated at 2014-4-10 03:38:11
 return {
     ['MY_BagSort'] = '背包整理',
     ['Guild box closed or page changed, sort exited!'] = '幫會倉庫已關閉或頁碼發生變化，停止整理！',

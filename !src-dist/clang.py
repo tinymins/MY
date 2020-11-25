@@ -184,7 +184,6 @@ def convert_progress(argv):
                     cpkg_path = cwd
                 if crc_changed:
                     try:
-                        # all_the_text = "-- language data (zhtw) updated at " + time.strftime('%Y-%m-%d %H:%I:%M',time.localtime(time.time())) + "\r\n"
                         all_the_text = ""
                         for count, line in enumerate(codecs.open(filepath,'r',encoding='gbk')):
                             if fileType == 'lang' and count == 0 and line.find('-- language data') == 0:

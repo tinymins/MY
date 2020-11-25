@@ -1,4 +1,3 @@
--- language data (zhcn) updated at 2014-4-10 03:38:11
 return {
     ['MY_Farbnamen'] = '门派染色',
     ['Enable MY_Farbnamen'] = '启用门派染色',

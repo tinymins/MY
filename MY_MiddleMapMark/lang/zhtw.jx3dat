@@ -1,4 +1,3 @@
--- language data (zhtw) updated at 2014-4-10 03:38:11
 return {
     ['Type to search, use comma to split.'] = '輸入文字進行搜索，半形逗號分隔多個搜索項。\n如：皇竹草,甜象草',
     ['middle map mark'] = '地圖搜索',
