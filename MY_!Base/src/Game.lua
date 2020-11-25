@@ -2586,36 +2586,28 @@ LIB.RegisterEvent({
 end)
 end
 
--- 装备名为szName的装备
+-- 装备指定名字的装备
 -- (void) LIB.Equip(szName)
 -- szName  装备名称
 function LIB.Equip(szName)
-	local me = GetClientPlayer()
-	for i=1,6 do
-		if me.GetBoxSize(i) > 0 then
-			for j = 0, me.GetBoxSize(i) - 1 do
-				local item = me.GetItem(i, j)
-				if item == nil then
-					j=j + 1
-				elseif LIB.GetItemNameByUIID(item.nUiId) == szName then
-					if szName == g_tStrings.tBulletDetail[BULLET_DETAIL.SNARE]
-					or szName == g_tStrings.tBulletDetail[BULLET_DETAIL.BOLT] then
-						for k = 0,15 do
-							if me.GetItem(INVENTORY_INDEX.BULLET_PACKAGE, k) == nil then
-								OnExchangeItem(i, j, INVENTORY_INDEX.BULLET_PACKAGE, k)
-								return
-							end
-						end
-						return
-					else
-						local eRetCode, nEquipPos = me.GetEquipPos(i, j)
-						OnExchangeItem(i, j, INVENTORY_INDEX.EQUIP, nEquipPos)
-						return
+	LIB.WalkBagItem(function(it, dwBox, dwX)
+		if LIB.GetItemNameByUIID(it.nUiId) == szName then
+			if szName == g_tStrings.tBulletDetail[BULLET_DETAIL.SNARE]
+			or szName == g_tStrings.tBulletDetail[BULLET_DETAIL.BOLT] then
+				local me = GetClientPlayer()
+				for nIndex = 0, 15 do
+					if me.GetItem(INVENTORY_INDEX.BULLET_PACKAGE, nIndex) == nil then
+						OnExchangeItem(dwBox, dwX, INVENTORY_INDEX.BULLET_PACKAGE, nIndex)
+						break
 					end
 				end
+			else
+				local nEquipPos = select(2, GetClientPlayer().GetEquipPos(dwBox, dwX))
+				OnExchangeItem(dwBox, dwX, INVENTORY_INDEX.EQUIP, nEquipPos)
 			end
+			return 0
 		end
-	end
+	end)
 end
 
 -- 使用物品
