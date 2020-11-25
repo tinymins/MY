@@ -505,7 +505,7 @@ end
 do local function StringSorter(p1, p2)
 	local k1, k2, c1, c2 = tostring(p1.k), tostring(p2.k)
 	for i = 1, max(#k1, #k2) do
-		c1, c2 = byte(k1, i, 1), byte(k2, i, 1)
+		c1, c2 = byte(k1, i, i), byte(k2, i, i)
 		if not c1 then
 			if not c2 then
 				return false
