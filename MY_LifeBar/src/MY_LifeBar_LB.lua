@@ -384,13 +384,13 @@ function LB:DrawTexts(force)
 			end
 			if self.kungfu_visible and self.kungfu_text and self.kungfu_text ~= '' then
 				if text ~= '' then
-					text = text .. _L.STR_SPLIT_DOT
+					text = text .. _L.SPLIT_DOT
 				end
 				text = text .. self.kungfu_text
 			end
 			if self.distance_visible and self.distance and self.distance ~= 0 then
 				if text ~= '' then
-					text = text .. _L.STR_SPLIT_DOT
+					text = text .. _L.SPLIT_DOT
 				end
 				text = text .. self.distance_fmt:format(self.distance)
 			end

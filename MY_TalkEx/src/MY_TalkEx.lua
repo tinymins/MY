@@ -83,10 +83,10 @@ for i, v in pairs(g_tStrings.tForceTitle) do
 end
 _C.tTrickFilter = { ['NEARBY'] = _L['nearby players where'], ['RAID'] = _L['teammates where'], }
 _C.tTrickChannels = {
-	[PLAYER_TALK_CHANNEL.TEAM         ] = { szName = _L['team channel'         ], tCol = GetMsgFontColor('MSG_TEAM'          , true) },
-	[PLAYER_TALK_CHANNEL.RAID         ] = { szName = _L['raid channel'         ], tCol = GetMsgFontColor('MSG_TEAM'          , true) },
-	[PLAYER_TALK_CHANNEL.TONG         ] = { szName = _L['tong channel'         ], tCol = GetMsgFontColor('MSG_GUILD'         , true) },
-	[PLAYER_TALK_CHANNEL.TONG_ALLIANCE] = { szName = _L['tong alliance channel'], tCol = GetMsgFontColor('MSG_GUILD_ALLIANCE', true) },
+	[PLAYER_TALK_CHANNEL.TEAM         ] = { szName = _L['PTC_TEAM_CHANNEL'         ], tCol = GetMsgFontColor('MSG_TEAM'          , true) },
+	[PLAYER_TALK_CHANNEL.RAID         ] = { szName = _L['PTC_RAID_CHANNEL'         ], tCol = GetMsgFontColor('MSG_TEAM'          , true) },
+	[PLAYER_TALK_CHANNEL.TONG         ] = { szName = _L['PTC_TONG_CHANNEL'         ], tCol = GetMsgFontColor('MSG_GUILD'         , true) },
+	[PLAYER_TALK_CHANNEL.TONG_ALLIANCE] = { szName = _L['PTC_TONG_ALLIANCE'], tCol = GetMsgFontColor('MSG_GUILD_ALLIANCE', true) },
 }
 
 local _dwTalkTick = 0

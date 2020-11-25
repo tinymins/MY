@@ -405,8 +405,8 @@ function MY_Farbnamen.GetTip(szName)
 		end
 		-- 门派 体型 阵营
 		insert(tTip, GetFormatText(
-			(_MY_Farbnamen.tForceString[tInfo.dwForceID] or tInfo.dwForceID or _L['Unknown force']) .. _L.STR_SPLIT_DOT ..
-			(_MY_Farbnamen.tRoleType[tInfo.nRoleType] or tInfo.nRoleType or  _L['Unknown gender'])    .. _L.STR_SPLIT_DOT ..
+			(_MY_Farbnamen.tForceString[tInfo.dwForceID] or tInfo.dwForceID or _L['Unknown force']) .. _L.SPLIT_DOT ..
+			(_MY_Farbnamen.tRoleType[tInfo.nRoleType] or tInfo.nRoleType or  _L['Unknown gender'])    .. _L.SPLIT_DOT ..
 			(_MY_Farbnamen.tCampString[tInfo.nCamp] or tInfo.nCamp or  _L['Unknown camp']), 136
 		))
 		insert(tTip, CONSTANT.XML_LINE_BREAKER)

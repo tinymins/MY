@@ -126,9 +126,9 @@ local SORT_TYPE_INFO = {
 	},
 }
 local PUBLISH_CHANNELS = {
-	{ nChannel = PLAYER_TALK_CHANNEL.TEAM, szName = _L['team channel'], rgb = GetMsgFontColor('MSG_TEAM'  , true) },
-	{ nChannel = PLAYER_TALK_CHANNEL.RAID, szName = _L['raid channel'], rgb = GetMsgFontColor('MSG_TEAM'  , true) },
-	{ nChannel = PLAYER_TALK_CHANNEL.TONG, szName = _L['tong channel'], rgb = GetMsgFontColor('MSG_GUILD' , true) },
+	{ nChannel = PLAYER_TALK_CHANNEL.TEAM, szName = _L['PTC_TEAM_CHANNEL'], rgb = GetMsgFontColor('MSG_TEAM'  , true) },
+	{ nChannel = PLAYER_TALK_CHANNEL.RAID, szName = _L['PTC_RAID_CHANNEL'], rgb = GetMsgFontColor('MSG_TEAM'  , true) },
+	{ nChannel = PLAYER_TALK_CHANNEL.TONG, szName = _L['PTC_TONG_CHANNEL'], rgb = GetMsgFontColor('MSG_GUILD' , true) },
 }
 local TIME_LIMIT = {-1, 60, 120, 180, 300, 600, 1200, 1800, 3600}
 local TIME_LIMIT_TITLE = {
