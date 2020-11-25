@@ -237,7 +237,7 @@ local function LoadLangPack(szLangFolder)
 	})
 	return t0
 end
-local _L = LoadLangPack(PACKET_INFO.FRAMEWORK_ROOT .. 'lang/libs/')
+local _L = LoadLangPack(_FRAMEWORK_ROOT_ .. 'lang/libs/')
 local _NAME_             = _L.PLUGIN_NAME
 local _SHORT_NAME_       = _L.PLUGIN_SHORT_NAME
 local _AUTHOR_           = _L.PLUGIN_AUTHOR
