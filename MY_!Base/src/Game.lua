@@ -1731,11 +1731,11 @@ function LIB.GetFurnitureInfo(szKey, oVal)
 		for i = 2, g_tTable.HomelandFurnitureInfo:GetRowCount() do
 			local tLine = g_tTable.HomelandFurnitureInfo:GetRow(i)
 			if tLine and tLine[szKey] then
-				CACHE[szKey][tLine[szKey]] = tLine
+				CACHE[szKey][tLine[szKey]] = SetmetaReadonly(tLine)
 			end
 		end
 	end
-	return Clone(CACHE[szKey][oVal])
+	return CACHE[szKey][oVal]
 end
 end
 
@@ -1748,12 +1748,11 @@ function LIB.GetNearFurniture(nDis)
 		local dwID = LIB.NumberBitShl(p.BaseId, 32, 64) + p.InstID
 		local info = not tID[dwID] and LIB.GetFurnitureInfo('nRepresentID', p.RepresentID)
 		if info then
+			info = setmetatable(p, { __index = info })
 			info.dwID = dwID
 			info.nInstID = p.InstID
 			info.nBaseID = p.BaseId
-			info.nX = p.nX
-			info.nY = p.nY
-			info.nZ = p.nZ
+			info.nGameID = HomeLand_GetFurniture2GameID(p.RepresentID)
 			insert(aFurniture, info)
 			tID[dwID] = true
 		end
