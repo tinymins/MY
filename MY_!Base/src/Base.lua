@@ -141,7 +141,7 @@ local function IsStreaming()
 end
 local _BUILD_                = '20201124'
 local _NATURAL_VERSION_      = 193
-local _VERSION_              = '3.0.0'
+local _VERSION_              = '3.0.1'
 local _MENU_COLOR_           = {255, 165, 79}
 local _MAX_PLAYER_LEVEL_     = 100
 local _INTERFACE_ROOT_       = 'Interface/'
