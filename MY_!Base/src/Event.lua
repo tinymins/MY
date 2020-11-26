@@ -208,7 +208,7 @@ local function OnInit()
 	if not INIT_EVENT then
 		return
 	end
-	if not LIB.AssertVersion('', '', '^3.0.0') then
+	if not LIB.AssertVersion('', '', '*') then
 		return
 	end
 	LIB.CreateDataRoot(PATH_TYPE.ROLE)

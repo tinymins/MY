@@ -54,7 +54,7 @@ function LIB.GetFrame()
 end
 
 function LIB.OpenPanel()
-	if not LIB.AssertVersion('', '', '^3.0.0') then
+	if not LIB.AssertVersion('', '', '*') then
 		return
 	end
 	if not LIB.IsInitialized() then
