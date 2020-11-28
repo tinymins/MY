@@ -4253,14 +4253,14 @@ end
 
 function LIB.GetPlayerEquipInfo(player)
 	local tEquipInfo = {}
-	for nItemIndex = 0, EQUIPMENT_INVENTORY.TOTAL do
+	for nItemIndex = 0, EQUIPMENT_INVENTORY.TOTAL - 1 do
 		local item = GetPlayerItem(player, INVENTORY_INDEX.EQUIP, nItemIndex)
 		if item then
 			-- 五行石
 			local aSlotItem = {}
 			for i = 1, item.GetSlotCount() do
 				local nEnchantID = item.GetMountDiamondEnchantID(i - 1)
-				if nEnchantID > 0 then
+				if nEnchantID and nEnchantID > 0 then
 					local dwTabType, dwTabIndex = GetDiamondInfoFromEnchantID(nEnchantID)
 					if dwTabType and dwTabIndex then
 						aSlotItem[i] = {dwTabType, dwTabIndex}
@@ -4269,7 +4269,7 @@ function LIB.GetPlayerEquipInfo(player)
 			end
 			-- 五彩石
 			local nEnchantID = item.GetMountFEAEnchantID()
-			if nEnchantID ~= 0 then
+			if nEnchantID and nEnchantID ~= 0 then
 				local dwTabType, dwTabIndex = GetColorDiamondInfoFromEnchantID(nEnchantID)
 				if dwTabType and dwTabIndex then
 					aSlotItem[0] = {dwTabType, dwTabIndex}
