@@ -104,6 +104,8 @@ LIB.RegisterEvent('OPEN_WINDOW.MY_ShareChat', function()
 					li = line and line.nLineIndex or -1, -- Line Index
 					mi = map and map.dwID, -- Map ID
 					mn = map and AnsiToUTF8(map.szName), -- Map Name
+					nt = npc.dwTemplateID, -- NPC Template ID
+					nn = LIB.GetObjectName(npc), -- NPC Name
 				}, 'MY_huadfiuadfioadfios178291hsy')))
 			})
 		LIB.DelayCall(szDelayID, false)
