@@ -51,7 +51,7 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^3.0.1') then
 	return
 end
 --------------------------------------------------------------------------
-local CFG, PS = MY_Cataclysm.CFG, {}
+local CFG, PS = MY_Cataclysm.CFG, { nPriority = 1 }
 
 function PS.OnPanelActive(frame)
 	local ui = UI(frame)

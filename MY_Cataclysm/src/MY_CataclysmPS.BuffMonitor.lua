@@ -55,7 +55,7 @@ end
 local D = {
 	ReloadCataclysmPanel = MY_Cataclysm.ReloadCataclysmPanel,
 }
-local CFG, PS = MY_Cataclysm.CFG, {}
+local CFG, PS = MY_Cataclysm.CFG, { nPriority = 5 }
 
 -- ½âÎö
 local function EncodeBuffRuleList(aBuffList)

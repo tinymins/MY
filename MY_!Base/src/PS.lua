@@ -361,24 +361,25 @@ function LIB.RegisterPanel(szCategory, szKey, szName, szIconTex, options)
 			dwIconFrame = tonumber(dwIconFrame)
 			szIconTex = gsub(szIconTex, '%|.*', '')
 		end
+		local nPriority = options.nPriority or (GetStringCRC(szKey) + 100000)
 		-- 创建数据结构、插入数组
 		insert(PANEL_TAB_LIST, {
-			szKey           = szKey                                   ,
-			szName          = szName                                  ,
-			szCategory      = szCategory                              ,
-			szIconTex       = szIconTex                               ,
-			dwIconFrame     = dwIconFrame                             ,
-			nPriority       = options.nPriority or GetStringCRC(szKey),
-			bWelcome        = options.bWelcome                        ,
-			bHide           = options.bHide                           ,
-			bShielded       = options.bShielded                       ,
-			nShielded       = options.nShielded                       ,
-			IsShielded      = options.IsShielded                      ,
-			OnPanelActive   = options.OnPanelActive                   ,
-			OnPanelScroll   = options.OnPanelScroll                   ,
-			OnPanelResize   = options.OnPanelResize                   ,
-			OnPanelBreathe  = options.OnPanelBreathe                  ,
-			OnPanelDeactive = options.OnPanelDeactive                 ,
+			szKey           = szKey                  ,
+			szName          = szName                 ,
+			szCategory      = szCategory             ,
+			szIconTex       = szIconTex              ,
+			dwIconFrame     = dwIconFrame            ,
+			nPriority       = nPriority              ,
+			bWelcome        = options.bWelcome       ,
+			bHide           = options.bHide          ,
+			bShielded       = options.bShielded      ,
+			nShielded       = options.nShielded      ,
+			IsShielded      = options.IsShielded     ,
+			OnPanelActive   = options.OnPanelActive  ,
+			OnPanelScroll   = options.OnPanelScroll  ,
+			OnPanelResize   = options.OnPanelResize  ,
+			OnPanelBreathe  = options.OnPanelBreathe ,
+			OnPanelDeactive = options.OnPanelDeactive,
 		})
 		-- 重新根据权重排序数组
 		sort(PANEL_TAB_LIST, function(t1, t2)
@@ -387,7 +388,7 @@ function LIB.RegisterPanel(szCategory, szKey, szName, szIconTex, options)
 			elseif t2.bWelcome then
 				return false
 			else
-				return t1.nPriority > t2.nPriority
+				return t1.nPriority < t2.nPriority
 			end
 		end)
 	end

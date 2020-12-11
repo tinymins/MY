@@ -51,7 +51,7 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^3.0.1') then
 	return
 end
 --------------------------------------------------------------------------
-local PS = {}
+local PS = { nPriority = 0 }
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
 	local X, Y = 20, 30
