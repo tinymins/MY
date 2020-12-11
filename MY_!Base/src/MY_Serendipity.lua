@@ -310,46 +310,6 @@ LIB.RegisterEvent('QUEST_FINISHED', function()
 	end
 end)
 
-LIB.RegisterEvent('OPEN_WINDOW.MY_Serendipity_HouseFlowerPrice', function()
-	if not O.bEnable then
-		return
-	end
-	if not LIB.IsInHLMap() then
-		return
-	end
-	local me = GetClientPlayer()
-	if not me then
-		return
-	end
-	local szUnit, szPrice, szItem = arg1:match(_L['Today I want every (%d-%s-) number sold at (%d-%s-) for (%s+)'])
-	local szMapLine = Station.Lookup('Normal/Minimap/Wnd_Minimap/Wnd_Over', 'Text_Fresher'):GetText()
-	local map = LIB.GetMapInfo(me.GetMapID())
-	if szUnit then
-		local function fnAction(line)
-			LIB.EnsureAjax({
-				url = 'https://push.j3cx.com/api/flower/uploads?'
-					.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
-						S = AnsiToUTF8(LIB.GetRealServer(1)),
-						s = AnsiToUTF8(LIB.GetRealServer(2)),
-						m = AnsiToUTF8(szMapLine),
-						u = AnsiToUTF8(szUnit),
-						p = AnsiToUTF8(szPrice),
-						i = AnsiToUTF8(szItem),
-						t = GetCurrentTime(),
-						cn = line and AnsiToUTF8(line.szCenterName) or '',
-						ci = line and line.dwCenterID or -1,
-						li = line and line.nLineIndex or -1,
-						mi = map and map.dwID,
-						mn = map and AnsiToUTF8(map.szName),
-					}, 'MY_r8395yrtsiolty79osd')))
-				})
-			LIB.DelayCall(NSFormatString('{$NS}#FLOWER_REPORT'), false)
-		end
-		LIB.DelayCall(NSFormatString('{$NS}#FLOWER_REPORT'), 5000, fnAction)
-		LIB.GetHLLineInfo({ dwMapID = me.GetMapID(), nCopyIndex = me.GetScene().nCopyIndex }, fnAction)
-	end
-end)
-
 LIB.RegisterInit(function()
 	LIB.RegisterTutorial({
 		szKey = 'MY_Serendipity',
