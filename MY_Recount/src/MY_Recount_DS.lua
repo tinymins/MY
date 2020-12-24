@@ -618,7 +618,7 @@ function D.UpdateIsRecEverything()
 end
 
 -- 过图清除当前战斗数据
-LIB.RegisterEvent({'LOADING_ENDING', 'RELOAD_UI_ADDON_END', 'BATTLE_FIELD_END', 'ARENA_END'}, function()
+LIB.RegisterEvent({'LOADING_ENDING', 'RELOAD_UI_ADDON_END', 'BATTLE_FIELD_END', 'ARENA_END', 'MY_CLIENT_PLAYER_LEAVE_SCENE'}, function()
 	D.FlushData()
 	SKILL_EFFECT_CACHE = {}
 	BUFF_UPDATE_CACHE = {}

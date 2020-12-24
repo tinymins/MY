@@ -1714,6 +1714,9 @@ LIB.RegisterEvent('PLAYER_ENTER_SCENE', function()
 	NEARBY_FIGHT[arg0] = player and player.bFightState or false
 end)
 LIB.RegisterEvent('PLAYER_LEAVE_SCENE', function()
+	if UI_GetClientPlayerID() == arg0 then
+		FireUIEvent(NSFormatString('{$NS}_CLIENT_PLAYER_LEAVE_SCENE'))
+	end
 	NEARBY_PLAYER[arg0] = nil
 	NEARBY_FIGHT[arg0] = nil
 end)
