@@ -1,0 +1,8 @@
+[MY_JBBind]
+name=角色綁定
+desc=綁定角色到魔盒網站賬號。
+package=MY
+version=1.0
+default=1
+dependence=MY_!Base
+lua_0=src/MY_JBBind.lua

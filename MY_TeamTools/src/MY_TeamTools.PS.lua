@@ -107,8 +107,6 @@ function PS.OnPanelActive(wnd)
 	nX, nY = MY_RideRequest.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
 	nX, nY = MY_EvokeRequest.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
 	nX, nY = MY_SocialRequest.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
-
 	nX, nY = MY_TeamRestore.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
-	nX, nY = MY_JBind.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
 end
 LIB.RegisterPanel(_L['Raid'], 'MY_TeamTools', _L['MY_TeamTools'], 5962, PS)

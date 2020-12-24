@@ -42,9 +42,9 @@ local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCal
 local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
 local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
 -------------------------------------------------------------------------------------------------------
-local PLUGIN_NAME = 'MY_TeamTools'
+local PLUGIN_NAME = 'MY_JBBind'
 local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
-local MODULE_NAME = 'MY_JBind'
+local MODULE_NAME = 'MY_JBBind'
 local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
 if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^3.0.1') then
@@ -148,7 +148,13 @@ function D.Unbind(resolve, reject)
 	})
 end
 
-function D.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
+local PS = { nPriority = 0, bWelcome = true }
+function PS.OnPanelActive(wnd)
+	local ui = UI(wnd)
+	local X, Y = 20, 30
+	local nX, nY = X, Y
+	local W, H = ui:Size()
+
 	local uiCCStatus, uiBtnCCStatus
 	local function UpdateUI()
 		if O.pending then
@@ -168,8 +174,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
 		uiBtnCCStatus:Enable(not O.pending)
 		uiBtnCCStatus:Left(uiCCStatus:Left() + uiCCStatus:Width() + 20)
 	end
-	nX = X
-	nY = nY + 10
+
 	nY = nY + ui:Append('Text', { x = nX, y = nY, text = _L['Character Certification'], font = 27 }):Height() + 5
 	nX = X + 10
 	nX = nX + ui:Append('Text', { x = nX, y = nY, w = 'auto', text = _L('Current character: %s', GetUserRoleName()) }):Width() + 20
@@ -251,19 +256,5 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
 
 	nX = X
 	nY = nY + 20
-	return nX, nY
 end
-
--- Global exports
-do
-local settings = {
-	exports = {
-		{
-			fields = {
-				OnPanelActivePartial = D.OnPanelActivePartial,
-			},
-		},
-	},
-}
-MY_JBind = LIB.GeneGlobalNS(settings)
-end
+LIB.RegisterPanel(_L['JX3BOX'], 'MY_JBBind', _L['MY_JBBind'], 5962, PS)

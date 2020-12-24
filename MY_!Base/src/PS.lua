@@ -190,6 +190,7 @@ local PANEL_CATEGORY_LIST = {
 	{ szName = _L['Battle' ] },
 	{ szName = _L['Raid'   ] },
 	{ szName = _L['System' ] },
+	{ szName = _L['JX3BOX' ] },
 	{ szName = _L['Search' ] },
 	{ szName = _L['Others' ] },
 }
