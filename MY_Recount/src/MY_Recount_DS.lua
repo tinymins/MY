@@ -618,16 +618,15 @@ function D.UpdateIsRecEverything()
 end
 
 -- 过图清除当前战斗数据
-do
-local function onLoadingEnding()
-	D.Flush()
+LIB.RegisterEvent({'LOADING_ENDING', 'RELOAD_UI_ADDON_END', 'BATTLE_FIELD_END', 'ARENA_END'}, function()
+	D.FlushData()
+	SKILL_EFFECT_CACHE = {}
+	BUFF_UPDATE_CACHE = {}
 	ABSORB_CACHE = {}
 	D.UpdateIsRecEverything()
+	D.InitData()
 	FireUIEvent('MY_RECOUNT_NEW_FIGHT')
-end
-LIB.RegisterEvent('LOADING_ENDING', onLoadingEnding)
-LIB.RegisterEvent('RELOAD_UI_ADDON_END', onLoadingEnding)
-end
+end)
 
 -- 退出战斗 保存数据
 LIB.RegisterEvent('MY_FIGHT_HINT', function()
@@ -1444,58 +1443,64 @@ function D.InitData()
 end
 end
 
--- Data数据压入历史记录 并重新初始化Data
-function D.Flush()
-	if Data and Data[DK.UUID] then
-		-- 过滤空记录
-		if IsEmpty(Data[DK.BE_DAMAGE][DK_REC.STAT])
-		and IsEmpty(Data[DK.DAMAGE][DK_REC.STAT])
-		and IsEmpty(Data[DK.HEAL][DK_REC.STAT])
-		and IsEmpty(Data[DK.BE_HEAL][DK_REC.STAT]) then
-			return
-		end
+-- Data数据压入历史记录
+function D.FlushData()
+	-- 过滤空记录
+	if not Data or not Data[DK.UUID] then
+		return
+	end
+	if IsEmpty(Data[DK.BE_DAMAGE][DK_REC.STAT])
+	and IsEmpty(Data[DK.DAMAGE][DK_REC.STAT])
+	and IsEmpty(Data[DK.HEAL][DK_REC.STAT])
+	and IsEmpty(Data[DK.BE_HEAL][DK_REC.STAT]) then
+		return
+	end
 
-		-- 计算受伤最多的名字作为战斗名称
-		local nMaxValue, szBossName = 0, nil
-		local nEnemyMaxValue, szEnemyBossName = 0, nil
-		for id, p in pairs(Data[DK.BE_DAMAGE][DK_REC.STAT]) do
+	-- 计算受伤最多的名字作为战斗名称
+	local nMaxValue, szBossName = 0, nil
+	local nEnemyMaxValue, szEnemyBossName = 0, nil
+	for id, p in pairs(Data[DK.BE_DAMAGE][DK_REC.STAT]) do
+		if nEnemyMaxValue < p[DK_REC_STAT.TOTAL_EFFECT] and not D.IsParty(id) then
+			nEnemyMaxValue  = p[DK_REC_STAT.TOTAL_EFFECT]
+			szEnemyBossName = D.GetNameAusID(Data, id)
+		end
+		if nMaxValue < p[DK_REC_STAT.TOTAL_EFFECT] and id ~= UI_GetClientPlayerID() then
+			nMaxValue  = p[DK_REC_STAT.TOTAL_EFFECT]
+			szBossName = D.GetNameAusID(Data, id)
+		end
+	end
+	-- 如果没有 则计算输出最多的NPC名字作为战斗名称
+	if not szBossName or not szEnemyBossName then
+		for id, p in pairs(Data[DK.DAMAGE][DK_REC.STAT]) do
 			if nEnemyMaxValue < p[DK_REC_STAT.TOTAL_EFFECT] and not D.IsParty(id) then
 				nEnemyMaxValue  = p[DK_REC_STAT.TOTAL_EFFECT]
 				szEnemyBossName = D.GetNameAusID(Data, id)
 			end
-			if nMaxValue < p[DK_REC_STAT.TOTAL_EFFECT] and id ~= UI_GetClientPlayerID() then
+			if nMaxValue < p[DK_REC_STAT.TOTAL_EFFECT] and not tonumber(id) then
 				nMaxValue  = p[DK_REC_STAT.TOTAL_EFFECT]
 				szBossName = D.GetNameAusID(Data, id)
 			end
 		end
-		-- 如果没有 则计算输出最多的NPC名字作为战斗名称
-		if not szBossName or not szEnemyBossName then
-			for id, p in pairs(Data[DK.DAMAGE][DK_REC.STAT]) do
-				if nEnemyMaxValue < p[DK_REC_STAT.TOTAL_EFFECT] and not D.IsParty(id) then
-					nEnemyMaxValue  = p[DK_REC_STAT.TOTAL_EFFECT]
-					szEnemyBossName = D.GetNameAusID(Data, id)
-				end
-				if nMaxValue < p[DK_REC_STAT.TOTAL_EFFECT] and not tonumber(id) then
-					nMaxValue  = p[DK_REC_STAT.TOTAL_EFFECT]
-					szBossName = D.GetNameAusID(Data, id)
-				end
-			end
-		end
-		Data[DK.BOSSNAME] = szEnemyBossName or szBossName or g_tStrings.STR_NAME_UNKNOWN
+	end
+	Data[DK.BOSSNAME] = szEnemyBossName or szBossName or g_tStrings.STR_NAME_UNKNOWN
 
-		local nFightTick = LIB.GetFightTime() or 0
-		Data[DK.TIME_DURING] = floor(nFightTick / 1000) + Data[DK.TIME_DURING] + 1
-		Data[DK.TICK_DURING] = nFightTick + Data[DK.TICK_DURING] + 1
+	local nFightTick = LIB.GetFightTime() or 0
+	Data[DK.TIME_DURING] = floor(nFightTick / 1000) + Data[DK.TIME_DURING] + 1
+	Data[DK.TICK_DURING] = nFightTick + Data[DK.TICK_DURING] + 1
 
-		if Data[DK.TIME_DURING] > O.nMinFightTime then
-			local szFilePath = LIB.FormatPath(DS_ROOT) .. D.GetDataFileName(Data)
-			HISTORY_CACHE[szFilePath] = Data
-			UNSAVED_CACHE[szFilePath] = Data
-			if O.bSaveHistoryOnExFi then
-				D.SaveHistory()
-			end
+	if Data[DK.TIME_DURING] > O.nMinFightTime then
+		local szFilePath = LIB.FormatPath(DS_ROOT) .. D.GetDataFileName(Data)
+		HISTORY_CACHE[szFilePath] = Data
+		UNSAVED_CACHE[szFilePath] = Data
+		if O.bSaveHistoryOnExFi then
+			D.SaveHistory()
 		end
 	end
+end
+
+-- Data数据压入历史记录 并重新初始化Data
+function D.Flush()
+	D.FlushData()
 	D.InitData()
 end
 
