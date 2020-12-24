@@ -148,6 +148,30 @@ function D.Unbind(resolve, reject)
 	})
 end
 
+function D.FetchTodayRecommentPosts(resolve, reject)
+	local szURL = 'https://pull.j3cx.com/api/today/recomment/posts?'
+		.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
+			lang = AnsiToUTF8(LIB.GetLang()),
+			server = AnsiToUTF8(LIB.GetRealServer(2)),
+		}, '60d2806b-9e5f-4853-8f84-575fe5521a7f')))
+	LIB.Ajax({
+		driver = 'auto', mode = 'auto', method = 'auto',
+		url = szURL,
+		charset = 'utf8',
+		success = function(szHTML)
+			local res = LIB.JsonDecode(szHTML)
+			if Get(res, {'code'}) == 0 then
+				SafeCall(resolve, res.data)
+			else
+				SafeCall(reject)
+			end
+		end,
+		error = function()
+			SafeCall(reject)
+		end,
+	})
+end
+
 local PS = { nPriority = 0, bWelcome = true }
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
@@ -222,39 +246,24 @@ function PS.OnPanelActive(wnd)
 
 	nX = X
 	nY = nY + 20
-	-- tips
-	nY = nY + 28
-	ui:Append('Text', { text = _L['Tips'], x = X, y = nY, font = 27 })
-	nX = X + 10
-	nY = nY + 35
 
-	nY = nY + ui:Append('Text', {
-		x = nX, y = nY, w = W - nX * 2, multiline = true, valign = 0,
-		r = 255, g = 255, b = 0,
-		text = _L['1. Character certification is the most important thing you should do before JX3BOX pve ranking.'],
-	}):AutoHeight():Height() + 3
-	nY = nY + ui:Append('Text', {
-		x = nX, y = nY, w = W - nX * 2, multiline = true, valign = 0,
-		r = 255, g = 255, b = 0,
-		text = _L['2. Only with the "share" checkbox above checked and character certificated, you can join the ranking.'],
-	}):AutoHeight():Height() + 3
-	nY = nY + ui:Append('Text', {
-		x = nX, y = nY, w = W - nX * 2, multiline = true, valign = 0,
-		r = 255, g = 255, b = 0,
-		text = _L['3. Character certification will bind role with JX3BOX account, and will upload some information.'],
-		}):AutoHeight():Height() + 3
-	nY = nY + ui:Append('Text', {
-		x = nX, y = nY, w = W - nX * 2, multiline = true, valign = 0,
-		r = 255, g = 255, b = 0,
-		text = _L['4. Checked the "share" checkbox, will upload team member info while killing dungeon bosses.'],
-	}):AutoHeight():Height() + 3
-	nY = nY + ui:Append('Text', {
-		x = nX, y = nY, w = W - nX * 2, multiline = true, valign = 0,
-		r = 255, g = 255, b = 0,
-		text = _L['5. For further information, please visit JX3BOX.'],
-	}):AutoHeight():Height() + 3
+	D.FetchTodayRecommentPosts(function(data)
+		nY = nY + 48
+		ui:Append('Text', { text = _L['Today recomment posts'], x = X, y = nY, font = 27 })
+		nX = X + 10
+		nY = nY + 35
 
-	nX = X
-	nY = nY + 20
+		-- [{"url":"https://www.jx3box.com/bbs/?pid=8104#/","title":""}]
+		for _, post in ipairs(data) do
+			nY = nY + ui:Append('Text', {
+				x = nX, y = nY, w = W - nX * 2,
+				r = 255, g = 255, b = 255,
+				text = LIB.ReplaceSensitiveWord(post.title),
+				onclick = function()
+					LIB.OpenBrowser(post.url)
+				end,
+			}):AutoHeight():Height() + 5
+		end
+	end)
 end
 LIB.RegisterPanel(_L['JX3BOX'], 'MY_JBBind', _L['MY_JBBind'], 5962, PS)
