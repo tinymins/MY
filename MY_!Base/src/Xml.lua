@@ -98,13 +98,13 @@ local XMLEscape = EncodeComponentsString
 	end
 
 local XMLUnescape = (DecodeComponentsString
-		and function(s)
-			return DecodeComponentsString('"' .. s .. '"')
+		and function(str)
+			return DecodeComponentsString(str)
 		end)
-	-- or (GetPureText
-	-- 	and function(s)
-	-- 		return GetPureText('<text>text="' .. s .. '"</text>')
-	-- 	end)
+	or (GetPureText
+		and function(str)
+			return GetPureText('<text>text=' .. str .. '</text>')
+		end)
 	or function(str)
 		local bytes2string, insert, byte = bytes2string, insert, string.byte
 		local bytes_string, b_escaping, len, byte_current = {}, false, #str
@@ -189,7 +189,7 @@ local function XMLDecode(xml)
 	local state = 'text'
 	local pos, xlen = 1, #xml
 	local byte_current
-	local pos1, pos2, byte_quoting_char, key, b_escaping, bytes_string
+	local pos1, pos2, byte_quoting_char, key, b_escaping
 	-- <        label         attribute_key=attribute_value>        text_key=text_value<        /     label         >
 	-- label_lt label_opening attribute                    label_gt text               label_lt slash label_closing label_gt
 	while pos <= xlen do
@@ -257,8 +257,7 @@ local function XMLDecode(xml)
 			or byte_current == byte_quote then
 				byte_quoting_char = byte_current
 				state = 'attribute_value_string'
-				bytes_string = {}
-				pos1 = pos + 1
+				pos1 = pos
 			elseif byte_current ~= byte_space then
 				if byte_current >= byte_zero and byte_current <= byte_nine then
 					state = 'attribute_value_number'
@@ -279,19 +278,11 @@ local function XMLDecode(xml)
 		elseif state == 'attribute_value_string' then
 			if b_escaping then
 				b_escaping = false
-				if byte_current == byte_char_n then
-					byte_current = byte_lf
-				elseif byte_current == byte_char_t then
-					byte_current = byte_tab
-				end
-				insert(bytes_string, byte_current)
 			elseif byte_current == byte_escape then
 				b_escaping = true
 			elseif byte_current == byte_quoting_char then
-				p.attrs[key] = XMLUnescape(bytes2string(bytes_string))
+				p.attrs[key] = XMLUnescape((xml:sub(pos1, pos)))
 				state = 'attribute'
-			else
-				insert(bytes_string, byte_current)
 			end
 		elseif state == 'attribute_value_number' or state == 'attribute_value_dot_number' then
 			if byte_current == byte_dot and state == 'attribute_value_number' then
@@ -379,8 +370,7 @@ local function XMLDecode(xml)
 			or byte_current == byte_quote then
 				byte_quoting_char = byte_current
 				state = 'text_value_string'
-				bytes_string = {}
-				pos1 = pos + 1
+				pos1 = pos
 			elseif byte_current ~= byte_space then
 				if byte_current >= byte_zero and byte_current <= byte_nine then
 					state = 'text_value_number'
@@ -401,19 +391,11 @@ local function XMLDecode(xml)
 		elseif state == 'text_value_string' then
 			if b_escaping then
 				b_escaping = false
-				if byte_current == byte_char_n then
-					byte_current = byte_lf
-				elseif byte_current == byte_char_t then
-					byte_current = byte_tab
-				end
-				insert(bytes_string, byte_current)
 			elseif byte_current == byte_escape then
 				b_escaping = true
 			elseif byte_current == byte_quoting_char then
-				p.data[key] = XMLUnescape(bytes2string(bytes_string))
+				p.data[key] = XMLUnescape((xml:sub(pos1, pos)))
 				state = 'text'
-			else
-				insert(bytes_string, byte_current)
 			end
 		elseif state == 'text_value_number' or state == 'text_value_dot_number' then
 			if byte_current == byte_dot and state == 'text_value_number' then
