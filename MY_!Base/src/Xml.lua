@@ -97,10 +97,14 @@ local XMLEscape = EncodeComponentsString
 		return bytes2string(bytes_string)
 	end
 
-local XMLUnescape = DecodeComponentsString
-	and function(s)
-		return DecodeComponentsString('"' + s + '"')
-	end
+local XMLUnescape = (DecodeComponentsString
+		and function(s)
+			return DecodeComponentsString('"' .. s .. '"')
+		end)
+	or (GetPureText
+		and function(s)
+			return GetPureText('<text>text="' .. s .. '"</text>')
+		end)
 	or function(str)
 		local bytes2string, insert, byte = bytes2string, insert, string.byte
 		local bytes_string, b_escaping, len, byte_current = {}, false, #str
