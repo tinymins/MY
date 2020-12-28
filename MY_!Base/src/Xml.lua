@@ -75,9 +75,6 @@ local function bytes2string(bytes)
 end
 
 local XMLEncodeComponent = EncodeComponentsString
-	and function(s)
-		return EncodeComponentsString(s):sub(2, -2)
-	end
 	or function(str)
 		local bytes2string, insert, byte = bytes2string, insert, string.byte
 		local bytes_string, len, byte_current = {}, #str
@@ -97,10 +94,7 @@ local XMLEncodeComponent = EncodeComponentsString
 		return bytes2string(bytes_string)
 	end
 
-local XMLDecodeComponent = (DecodeComponentsString
-		and function(str)
-			return DecodeComponentsString(str)
-		end)
+local XMLDecodeComponent = DecodeComponentsString
 	or (GetPureText
 		and function(str)
 			return GetPureText('<text>text=' .. str .. '</text>')
@@ -483,9 +477,7 @@ local function XMLEncode(xml)
 			insert(t, k)
 			insert(t, '=')
 			if type(v) == 'string' then
-				insert(t, '"')
 				insert(t, XMLEncodeComponent(v))
-				insert(t, '"')
 			elseif type(v) == 'boolean' then
 				insert(t, (( v and 'true' ) or 'false'))
 			else
@@ -500,9 +492,7 @@ local function XMLEncode(xml)
 			insert(t, k)
 			insert(t, '=')
 			if type(v) == 'string' then
-				insert(t, '"')
 				insert(t, XMLEncodeComponent(v))
-				insert(t, '"')
 			elseif type(v) == 'boolean' then
 				insert(t, (( v and 'true' ) or 'false'))
 			else
@@ -548,11 +538,11 @@ LIB.XMLDecode = XMLDecode
 -- (string) LIB.XMLEncode(xml: XMLNode[] | XMLNode)
 LIB.XMLEncode = XMLEncode
 
--- ×ªÒå XML ×Ö·û´®
+-- ±àÂë XML ×Ö·û´®
 -- (string) LIB.XMLEncodeComponent(raw_str: string)
 LIB.XMLEncodeComponent = XMLEncodeComponent
 
--- ·´×ªÒå XML ×Ö·û´®
+-- ½âÂë XML ×Ö·û´®
 -- (string) LIB.XMLDecodeComponent(escaped_str: string)
 LIB.XMLDecodeComponent = XMLDecodeComponent
 
