@@ -52,8 +52,8 @@ local THEME_LIST = {
 }
 
 function LIB.EncodeEchoMsgHeader(szChannel, oData)
-	return '<text>text="" addonecho=1 channel="' .. LIB.XMLEscape(EncodeLUAData(szChannel))
-		.. '" data="' .. LIB.XMLEscape(EncodeLUAData(oData)) .. '" </text>'
+	return '<text>text="" addonecho=1 channel=' .. LIB.XMLEncodeComponent(EncodeLUAData(szChannel))
+		.. ' data=' .. LIB.XMLEncodeComponent(EncodeLUAData(oData)) .. ' </text>'
 end
 
 function LIB.ContainsEchoMsgHeader(szMsg)

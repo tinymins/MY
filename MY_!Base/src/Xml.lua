@@ -74,7 +74,7 @@ local function bytes2string(bytes)
 	end
 end
 
-local XMLEscape = EncodeComponentsString
+local XMLEncodeComponent = EncodeComponentsString
 	and function(s)
 		return EncodeComponentsString(s):sub(2, -2)
 	end
@@ -97,7 +97,7 @@ local XMLEscape = EncodeComponentsString
 		return bytes2string(bytes_string)
 	end
 
-local XMLUnescape = (DecodeComponentsString
+local XMLDecodeComponent = (DecodeComponentsString
 		and function(str)
 			return DecodeComponentsString(str)
 		end)
@@ -281,7 +281,7 @@ local function XMLDecode(xml)
 			elseif byte_current == byte_escape then
 				b_escaping = true
 			elseif byte_current == byte_quoting_char then
-				p.attrs[key] = XMLUnescape((xml:sub(pos1, pos)))
+				p.attrs[key] = XMLDecodeComponent((xml:sub(pos1, pos)))
 				state = 'attribute'
 			end
 		elseif state == 'attribute_value_number' or state == 'attribute_value_dot_number' then
@@ -394,7 +394,7 @@ local function XMLDecode(xml)
 			elseif byte_current == byte_escape then
 				b_escaping = true
 			elseif byte_current == byte_quoting_char then
-				p.data[key] = XMLUnescape((xml:sub(pos1, pos)))
+				p.data[key] = XMLDecodeComponent((xml:sub(pos1, pos)))
 				state = 'text'
 			end
 		elseif state == 'text_value_number' or state == 'text_value_dot_number' then
@@ -484,7 +484,7 @@ local function XMLEncode(xml)
 			insert(t, '=')
 			if type(v) == 'string' then
 				insert(t, '"')
-				insert(t, XMLEscape(v))
+				insert(t, XMLEncodeComponent(v))
 				insert(t, '"')
 			elseif type(v) == 'boolean' then
 				insert(t, (( v and 'true' ) or 'false'))
@@ -501,7 +501,7 @@ local function XMLEncode(xml)
 			insert(t, '=')
 			if type(v) == 'string' then
 				insert(t, '"')
-				insert(t, XMLEscape(v))
+				insert(t, XMLEncodeComponent(v))
 				insert(t, '"')
 			elseif type(v) == 'boolean' then
 				insert(t, (( v and 'true' ) or 'false'))
@@ -549,12 +549,12 @@ LIB.XMLDecode = XMLDecode
 LIB.XMLEncode = XMLEncode
 
 -- 转义 XML 字符串
--- (string) LIB.XMLEscape(raw_str: string)
-LIB.XMLEscape = XMLEscape
+-- (string) LIB.XMLEncodeComponent(raw_str: string)
+LIB.XMLEncodeComponent = XMLEncodeComponent
 
 -- 反转义 XML 字符串
--- (string) LIB.XMLUnescape(escaped_str: string)
-LIB.XMLUnescape = XMLUnescape
+-- (string) LIB.XMLDecodeComponent(escaped_str: string)
+LIB.XMLDecodeComponent = XMLDecodeComponent
 
 -- XML 转纯文字
 -- (string) LIB.XMLGetPureText(xml: XMLNode[] | XMLNode)
