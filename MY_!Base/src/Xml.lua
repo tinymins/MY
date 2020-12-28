@@ -48,6 +48,17 @@ local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild,
 local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
 -------------------------------------------------------------------------------------------------------
 
+local byte_escape, byte_slash = (byte('\\')), (byte('/'))
+local byte_apos  , byte_quote = (byte('\'')), (byte('"'))
+local byte_lf    , byte_tab   = (byte('\n')), (byte('\t'))
+local byte_lt    , byte_gt    = (byte('<')) , (byte('>'))
+local byte_amp   , byte_eq    = (byte('&')) , (byte('='))
+local byte_space , byte_dot   = (byte(' ')) , (byte('.'))
+local byte_zero  , byte_nine  = (byte('0')) , (byte('9'))
+local byte_char_a, byte_char_e, byte_char_f = (byte('a')), (byte('e')), (byte('f'))
+local byte_char_l, byte_char_n, byte_char_r = (byte('l')), (byte('n')), (byte('r'))
+local byte_char_s, byte_char_t, byte_char_u = (byte('s')), (byte('t')), (byte('u'))
+
 local function bytes2string(bytes)
 	local char, insert, concat, unpack = string.char, insert, concat, unpack
 	local count = #bytes
@@ -70,8 +81,6 @@ local XMLEscape = EncodeComponentsString
 	or function(str)
 		local bytes2string, insert, byte = bytes2string, insert, string.byte
 		local bytes_string, len, byte_current = {}, #str
-		local byte_char_n, byte_char_t, byte_quote = (byte('n')), (byte('t')), (byte('"'))
-		local byte_lf, byte_tab, byte_escape = (byte('\n')), (byte('\t')), (byte('\\'))
 		for i = 1, len do
 			byte_current = byte(str, i)
 			if byte_current == byte_lf then
@@ -95,7 +104,6 @@ local XMLUnescape = DecodeComponentsString
 	or function(str)
 		local bytes2string, insert, byte = bytes2string, insert, string.byte
 		local bytes_string, b_escaping, len, byte_current = {}, false, #str
-		local byte_char_n, byte_char_t, byte_lf, byte_tab, byte_escape = (byte('n')), (byte('t')), (byte('\n')), (byte('\t')), (byte('\\'))
 		for i = 1, len do
 			byte_current = byte(str, i)
 			if b_escaping then
@@ -177,13 +185,7 @@ local function XMLDecode(xml)
 	local state = 'text'
 	local pos, xlen = 1, #xml
 	local byte_current
-	local byte_apos, byte_quot, byte_escape, byte_slash = (byte('"')) , (byte('"')), (byte('\\')), (byte('/'))
-	local byte_lt, byte_gt, byte_amp, byte_eq, byte_space = (byte('<')), (byte('>')), (byte('&')), (byte('=')), (byte(' '))
-	local byte_char_n, byte_char_t, byte_lf, byte_tab = (byte('n')), (byte('t')), (byte('\n')), (byte('\t'))
-	local byte_char_r, byte_char_u, byte_char_e, byte_char_f = (byte('r')), (byte('u')), (byte('e')), (byte('f'))
-	local byte_char_l, byte_char_a, byte_char_s = (byte('l')), (byte('a')), (byte('s'))
-	local byte_zero, byte_nine, byte_dot = (byte('0')), (byte('9')), (byte('.'))
-	local pos1, pos2, byte_quote, key, b_escaping, bytes_string
+	local pos1, pos2, byte_quoting_char, key, b_escaping, bytes_string
 	-- <        label         attribute_key=attribute_value>        text_key=text_value<        /     label         >
 	-- label_lt label_opening attribute                    label_gt text               label_lt slash label_closing label_gt
 	while pos <= xlen do
@@ -248,8 +250,8 @@ local function XMLDecode(xml)
 			end
 		elseif state == 'attribute_eq' then
 			if byte_current == byte_apos
-			or byte_current == byte_quot then
-				byte_quote = byte_current
+			or byte_current == byte_quote then
+				byte_quoting_char = byte_current
 				state = 'attribute_value_string'
 				bytes_string = {}
 				pos1 = pos + 1
@@ -281,7 +283,7 @@ local function XMLDecode(xml)
 				insert(bytes_string, byte_current)
 			elseif byte_current == byte_escape then
 				b_escaping = true
-			elseif byte_current == byte_quote then
+			elseif byte_current == byte_quoting_char then
 				p.attrs[key] = XMLUnescape(bytes2string(bytes_string))
 				state = 'attribute'
 			else
@@ -370,8 +372,8 @@ local function XMLDecode(xml)
 			end
 		elseif state == 'text_eq' then
 			if byte_current == byte_apos
-			or byte_current == byte_quot then
-				byte_quote = byte_current
+			or byte_current == byte_quote then
+				byte_quoting_char = byte_current
 				state = 'text_value_string'
 				bytes_string = {}
 				pos1 = pos + 1
@@ -403,7 +405,7 @@ local function XMLDecode(xml)
 				insert(bytes_string, byte_current)
 			elseif byte_current == byte_escape then
 				b_escaping = true
-			elseif byte_current == byte_quote then
+			elseif byte_current == byte_quoting_char then
 				p.data[key] = XMLUnescape(bytes2string(bytes_string))
 				state = 'text'
 			else
