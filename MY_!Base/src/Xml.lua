@@ -88,30 +88,35 @@ local XMLEscape = EncodeComponentsString
 		return bytes2string(bytes_string)
 	end
 
-local function XMLUnescape(str)
-	local bytes2string, insert, byte = bytes2string, insert, string.byte
-	local bytes_string, b_escaping, len, byte_current = {}, false, #str
-	local byte_char_n, byte_char_t, byte_lf, byte_tab, byte_escape = (byte('n')), (byte('t')), (byte('\n')), (byte('\t')), (byte('\\'))
-	for i = 1, len do
-		byte_current = byte(str, i)
-		if b_escaping then
-			b_escaping = false
-			if byte_current == byte_char_n then
-				byte_current = byte_lf
-			elseif byte_current == byte_char_t then
-				byte_current = byte_tab
-			elseif byte_current ~= byte_lf and byte_current ~= byte_escape then
-				insert(bytes_string, byte_escape)
-			end
-			insert(bytes_string, byte_current)
-		elseif byte_current == byte_escape then
-			b_escaping = true
-		else
-			insert(bytes_string, byte_current)
-		end
+local XMLUnescape = DecodeComponentsString
+	and function(s)
+		return DecodeComponentsString('"' + s + '"')
 	end
-	return bytes2string(bytes_string)
-end
+	or function(str)
+		local bytes2string, insert, byte = bytes2string, insert, string.byte
+		local bytes_string, b_escaping, len, byte_current = {}, false, #str
+		local byte_char_n, byte_char_t, byte_lf, byte_tab, byte_escape = (byte('n')), (byte('t')), (byte('\n')), (byte('\t')), (byte('\\'))
+		for i = 1, len do
+			byte_current = byte(str, i)
+			if b_escaping then
+				b_escaping = false
+				-- if byte_current == byte_char_n then
+					-- byte_current = byte_lf
+				-- elseif byte_current == byte_char_t then
+					-- byte_current = byte_tab
+				-- else
+				if byte_current ~= byte_lf and byte_current ~= byte_escape then
+					insert(bytes_string, byte_escape)
+				end
+				insert(bytes_string, byte_current)
+			elseif byte_current == byte_escape then
+				b_escaping = true
+			else
+				insert(bytes_string, byte_current)
+			end
+		end
+		return bytes2string(bytes_string)
+	end
 
 local function XMLCreateNode(type)
 	return { type = type, attrs = {}, data = {}, children = {} }
