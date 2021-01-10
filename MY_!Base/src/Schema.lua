@@ -3,6 +3,7 @@
 -- @link     : https://jx3.derzh.com/
 -- @desc     : LUA SCHEMA ¿â
 -- @author   : ÜøÒÁ @Ë«ÃÎÕò @×··çõæÓ°
+-- @ref      : https://github.com/sschoener/lua-schema
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
 --------------------------------------------------------
@@ -686,3 +687,11 @@ function schema.Test(fn, msg)
 end
 
 LIB.Schema = schema
+
+function LIB.SchemaGet(data, schemaVal, defaultVal)
+    local err = schema.CheckSchema(data, schemaVal)
+    if err then
+        return Clone(defaultVal)
+    end
+    return data
+end
