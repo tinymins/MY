@@ -53,7 +53,6 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^3.0.1') then
 end
 --------------------------------------------------------------------------
 
-local JsonEncode = LIB.JsonEncode
 local ParseCustomText       = MY_TeamMon.ParseCustomText
 local FilterCustomText      = MY_TeamMon.FilterCustomText
 local MY_TM_TYPE            = MY_TeamMon.MY_TM_TYPE
@@ -1112,7 +1111,7 @@ function D.GetSearchCache(data)
 		MY_TMUI_SEARCH_CACHE[MY_TMUI_SELECT_TYPE] = {}
 	end
 	local cache = MY_TMUI_SEARCH_CACHE[MY_TMUI_SELECT_TYPE]
-	local szString
+	local szString, tParsedData
 	if data.dwMapID and data.nIndex then
 		if cache[data.dwMapID] and cache[data.dwMapID][data.nIndex] then
 			szString = cache[data.dwMapID][data.nIndex]
@@ -1120,12 +1119,18 @@ function D.GetSearchCache(data)
 			if not cache[data.dwMapID] then
 				cache[data.dwMapID] = {}
 			end
-			szString = JsonEncode(data)
-			szString = szString .. ParseCustomText(szString)
+			tParsedData = {}
+			for k, v in pairs(data) do
+				tParsedData[k] = v
+			end
+			if tParsedData.szName then
+				tParsedData.szName = ParseCustomText(tParsedData.szName)
+			end
+			szString = EncodeLUAData(data) .. EncodeLUAData(tParsedData)
 			cache[data.dwMapID][data.nIndex] = szString
 		end
 	else -- 临时记录 暂时还不做缓存处理
-		szString = JsonEncode(data)
+		szString = EncodeLUAData(data)
 	end
 	return szString
 end
