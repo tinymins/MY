@@ -260,6 +260,8 @@ return {
 	['Sync team'] = '同步團隊',
 	['Check update'] = '檢查更新',
 	['Refresh list'] = '刷新列表',
+	['Prev page'] = '上一頁',
+	['Next page'] = '下一頁',
 	['Add url'] = '添加訂閱',
 	['Remove url'] = '刪除訂閱',
 	['Embedded dataset cannot be removed!'] = '內置數據不可刪除！',

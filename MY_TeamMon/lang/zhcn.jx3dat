@@ -260,6 +260,8 @@ return {
 	['Sync team'] = '同步团队',
 	['Check update'] = '检查更新',
 	['Refresh list'] = '刷新列表',
+	['Prev page'] = '上一页',
+	['Next page'] = '下一页',
 	['Add url'] = '添加订阅',
 	['Remove url'] = '删除订阅',
 	['Embedded dataset cannot be removed!'] = '内置数据不可删除！',

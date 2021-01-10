@@ -274,7 +274,12 @@ function GetAttachBlobURL(szAttach, szURL)
 end
 end
 
-local REPO_META_LIST = {{
+local REPO_META_PAGE = {
+	nIndex = 1,
+	nSize = 30,
+	nTotal = 1,
+}
+local REPO_META_LIST = {
 	szKey = 'DEFAULT',
 	szAuthor = _L['Default'],
 	szTitle = _L['Default monitor data'],
@@ -282,7 +287,7 @@ local REPO_META_LIST = {{
 	szDataUrl = './data.jx3dat',
 	szURL = GetRawURL('tinymins@github'),
 	szAboutURL = GetBlobURL('tinymins@github:MY_TeamMon/README.md'),
-}}
+}
 local META_TEMPLATE = {
 	szURL = '',
 	szDataURL = './data.jx3dat',
@@ -397,25 +402,51 @@ function D.DownloadFavMetaList()
 	end
 end
 
-function D.RequestRepoMetaList()
+function D.RequestRepoMetaList(nPage)
 	LIB.Ajax({
 		driver = 'auto', mode = 'auto', method = 'auto',
-		url = 'https://pull.j3cx.com/api/dbm/subscribe?'
+		url = 'https://pull.j3cx.com/api/dbm/subscribe/all?'
 			.. LIB.EncodePostData(LIB.UrlEncode({
 				lang = AnsiToUTF8(LIB.GetLang()),
+				page = nPage or REPO_META_PAGE.nIndex,
+				pageSize = 15,
 			})),
 		charset = 'utf8',
 		success = function(szHTML)
 			local res = LIB.JsonDecode(szHTML)
-			if not IsTable(res) then
-				return
+			local s = LIB.Schema
+			local schema = s.Record({
+				data = s.Collection(s.Record({
+					about = s.String,
+					author = s.String,
+					data_url = s.String,
+					key = s.String,
+					name = s.String,
+					update = s.String,
+					version = s.Number,
+				})),
+				page = s.Record({
+					index = s.Number,
+					size = s.Number,
+					total = s.Number,
+				}),
+			})
+			local err = s.CheckSchema(res, schema)
+			if err then
+				return LIB.Debug('MY_TeamMon::RequestRepoMetaList: ' .. err.message, DEBUG_LEVEL.WARNING)
 			end
+			local tPage = {
+				nIndex = res.page.index,
+				nSize = res.page.size,
+				nTotal = res.page.total,
+			}
 			local aMeta = {}
-			for _, info in ipairs(res) do
+			for _, info in ipairs(res.data) do
 				info = D.MetaJsonToLua(info, '', info.key)
 				info.bEmbedded = true
 				insert(aMeta, info)
 			end
+			REPO_META_PAGE = tPage
 			REPO_META_LIST = aMeta
 			FireUIEvent('MY_TM_RR_REPO_META_LIST_UPDATE')
 		end,
@@ -522,6 +553,11 @@ function D.UpdateRepoList(frame)
 		container:GetParent().metaInfoSel = nil
 	end
 	container:FormatAllContentPos()
+	-- ÍÆ¼öÒ³Âë
+	local page = frame:Lookup('PageSet_Menu/Page_Repo')
+	page:Lookup('Btn_RepoPrevPage'):Enable(REPO_META_PAGE.nIndex > 1)
+	page:Lookup('Btn_RepoNextPage'):Enable(REPO_META_PAGE.nIndex < REPO_META_PAGE.nTotal)
+	page:Lookup('', 'Text_Repo_Page'):SetText(REPO_META_PAGE.nIndex .. ' / ' .. REPO_META_PAGE.nTotal)
 end
 
 function D.UpdateFavList(frame)
@@ -572,6 +608,8 @@ function D.OnFrameCreate()
 	this:Lookup('PageSet_Menu/Page_Repo/Btn_RepoSyncTeam', 'Text_RepoSyncTeam'):SetText(_L['Sync team'])
 	this:Lookup('PageSet_Menu/Page_Fav/Btn_FavCheckUpdate', 'Text_FavCheckUpdate'):SetText(_L['Check update'])
 	this:Lookup('PageSet_Menu/Page_Repo/Btn_RepoCheckUpdate', 'Text_RepoCheckUpdate'):SetText(_L['Refresh list'])
+	this:Lookup('PageSet_Menu/Page_Repo/Btn_RepoPrevPage', 'Text_RepoPrevPage'):SetText(_L['Prev page'])
+	this:Lookup('PageSet_Menu/Page_Repo/Btn_RepoNextPage', 'Text_RepoNextPage'):SetText(_L['Next page'])
 	this:Lookup('PageSet_Menu/Page_Fav/Btn_FavAddUrl', 'Text_FavAddUrl'):SetText(_L['Add url'])
 	this:Lookup('PageSet_Menu/Page_Fav/Btn_FavRemoveUrl', 'Text_FavRemoveUrl'):SetText(_L['Remove url'])
 	this:Lookup('PageSet_Menu/Page_Fav/Btn_FavExportUrl', 'Text_FavExportUrl'):SetText(_L['Export meta url'])
@@ -683,6 +721,10 @@ function D.OnLButtonClick()
 		D.DownloadFavMetaList()
 	elseif name == 'Btn_RepoCheckUpdate' then
 		D.RequestRepoMetaList()
+	elseif name == 'Btn_RepoPrevPage' then
+		D.RequestRepoMetaList(REPO_META_PAGE.nIndex - 1)
+	elseif name == 'Btn_RepoNextPage' then
+		D.RequestRepoMetaList(REPO_META_PAGE.nIndex + 1)
 	end
 end
 
