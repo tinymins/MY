@@ -213,7 +213,7 @@ function D.OnSkillCast(frame, dwSkillID, dwSkillLevel)
 		return
 	end
 	-- 特殊图标技能屏蔽
-	if dwIconID == 1817 --[[闭阵]] or dwIconID == 533 --[[打坐]] or dwIconID == 13 --[[子技能]] then
+	if dwIconID == 1817 --[[闭阵]] or dwIconID == 533 --[[打坐]] or dwIconID == 0 --[[子技能]] or dwIconID == 13 --[[子技能]] then
 		return
 	end
 	-- 阵法释放技能屏蔽
