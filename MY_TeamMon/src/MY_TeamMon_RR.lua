@@ -56,9 +56,11 @@ end
 local D = {}
 local O = {
 	szLastKey = '',
+	szLastSURL = '',
 	szLastVersion = '',
 }
 RegisterCustomData('Global/MY_TeamMon_RR.szLastKey')
+RegisterCustomData('Global/MY_TeamMon_RR.szLastSURL')
 RegisterCustomData('Global/MY_TeamMon_RR.szLastVersion')
 
 local LANG = LIB.GetLang()
@@ -351,7 +353,7 @@ function D.MetaJsonToLua(res, szURL, szKey)
 	}
 end
 
-function D.DownloadMeta(info, onSuccess, onError)
+function D.DownloadMeta(info, onSuccess, onError, bSilent)
 	local szURL = GetRawURL(info.szURL) or info.szURL
 	if info.szKey then
 		META_DOWNLOADING[info.szKey] = true
@@ -364,7 +366,9 @@ function D.DownloadMeta(info, onSuccess, onError)
 		success = function(szHTML)
 			local res, err = LIB.JsonDecode(szHTML)
 			if not res then
-				SafeCall(onError, _L['ERR: Info content is illegal!'] .. '\n\n' .. err)
+				if not bSilent then
+					SafeCall(onError, _L['ERR: Info content is illegal!'] .. '\n\n' .. err)
+				end
 				return
 			end
 			local info = D.MetaJsonToLua(res, szURL, info.szKey)
@@ -379,7 +383,9 @@ function D.DownloadMeta(info, onSuccess, onError)
 		end,
 		error = function(html, status)
 			if status == 404 then
-				SafeCall(onError, _L['ERR404: Meta address not found!'])
+				if not bSilent then
+					SafeCall(onError, _L['ERR404: Meta address not found!'])
+				end
 				return
 			end
 			--[[#DEBUG BEGIN]]
@@ -441,8 +447,13 @@ function D.RequestRepoMetaList(nPage)
 				nTotal = res.page.total,
 			}
 			local aMeta = {}
-			for _, info in ipairs(res.data) do
-				info = D.MetaJsonToLua(info, '', info.key)
+			for _, info in ipairs(res) do
+				info = D.MetaJsonToLua(
+					info,
+					'https://pull.j3cx.com/api/dbm/feed?'.. LIB.EncodePostData(LIB.UrlEncode({
+						key = AnsiToUTF8(info.key),
+					})),
+					info.key)
 				info.bEmbedded = true
 				insert(aMeta, info)
 			end
@@ -460,6 +471,7 @@ function D.LoadConfigureFile(szFile, info)
 			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TeamMon_RR', {'LOAD', info.szTitle}, true)
 		end
 		O.szLastKey = info.szKey
+		O.szLastSURL = GetShortURL(info.szURL)
 		O.szLastVersion = info.szVersion
 		FireUIEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
 	end)
@@ -475,7 +487,7 @@ function D.DownloadData(info, callback)
 		return D.LoadConfigureFile(szUUID .. '.jx3dat', info)
 	end
 	if DATA_DOWNLOADING[info.szKey] then
-		return LIB.Topmsg(_L['Dowloading in progress, please wait...'])
+		return LIB.Topmsg(_L['Downloading in progress, please wait...'])
 	end
 	DATA_DOWNLOADING[info.szKey] = true
 	LIB.DownloadFile(info.szDataURL, function(szPath)
@@ -827,6 +839,26 @@ LIB.RegisterBgMsg('MY_TeamMon_RR', function(_, data, _, _, szTalker, _)
 	end
 end)
 
+LIB.RegisterInit('MY_TeamMon_RR', function()
+	if not IsEmpty(O.szLastSURL) then
+		D.DownloadMeta({ szURL = O.szLastSURL }, function(info)
+			if O.szLastVersion ~= info.szVersion then
+				LIB.Confirm(
+					_L('New version found for TeamMon_RR\nSURL: %s\nName: %s\nTime: %s\n\nDo you want to update data now?',
+						GetShortURL(info.szURL) or ' - ',
+						LIB.ReplaceSensitiveWord(info.szTitle),
+						LIB.ReplaceSensitiveWord(info.szUpdateTime)),
+					function()
+						D.DownloadData(info, function()
+							FireUIEvent('MY_TM_RR_REPO_META_LIST_UPDATE')
+						end)
+						FireUIEvent('MY_TM_RR_REPO_META_LIST_UPDATE')
+					end)
+			end
+		end)
+	end
+end)
+
 -- Global exports
 do
 local settings = {
@@ -846,6 +878,7 @@ local settings = {
 		{
 			fields = {
 				szLastKey = true,
+				szLastSURL = true,
 				szLastVersion = true,
 			},
 			root = O,
@@ -855,6 +888,7 @@ local settings = {
 		{
 			fields = {
 				szLastKey = true,
+				szLastSURL = true,
 				szLastVersion = true,
 			},
 			root = O,
