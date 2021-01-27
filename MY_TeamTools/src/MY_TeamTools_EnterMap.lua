@@ -242,8 +242,12 @@ end
 function D.OnLButtonClick()
 	local szName = this:GetName()
 	if szName == 'Btn_All' then
-		RT_SELECT_MAP = nil
-		D.UpdatePage(this:GetParent():GetParent())
+		if IsCtrlKeyDown() or IsShiftKeyDown() then
+			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_ENTER_MAP_REQ', nil, true)
+		else
+			RT_SELECT_MAP = nil
+			D.UpdatePage(this:GetParent():GetParent())
+		end
 	elseif szName == 'Btn_Clear' then
 		LIB.Confirm(_L['Clear record'], D.ClearEnterMapLog)
 	end
