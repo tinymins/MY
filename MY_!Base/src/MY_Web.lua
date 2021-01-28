@@ -215,6 +215,9 @@ function MY_Web.Open(url, options)
 		frame:Lookup('Wnd_Controls'):Hide()
 		frame:Lookup('', 'Image_TitleBg'):SetH(48)
 	end
+	if options.readonly then
+		frame:Lookup('Wnd_Controls/Edit_Input'):Enable(false)
+	end
 	if options.title then
 		frame:Lookup('', 'Text_Title'):SetText(options.title)
 	end
