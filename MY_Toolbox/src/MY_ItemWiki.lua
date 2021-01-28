@@ -85,6 +85,7 @@ function D.Open(dwTabType, dwTabIndex, nBookID)
 		key = szKey,
 		title = szTitle,
 		w = O.nW, h = O.nH,
+		readonly = true,
 	})
 	UI(MY_Web.GetFrame(szKey)):Size(D.OnWebSizeChange)
 end

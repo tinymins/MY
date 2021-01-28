@@ -138,7 +138,7 @@ function D.Hook()
 					lang = AnsiToUTF8(LIB.GetLang()),
 					name = AnsiToUTF8(szName),
 				}))
-			MY_Web.Open(szURL, { key = 'MY_YunMacro_' .. GetStringCRC(szName), layer = 'Topmost' })
+			MY_Web.Open(szURL, { key = 'MY_YunMacro_' .. GetStringCRC(szName), layer = 'Topmost', readonly = true })
 		end,
 	})
 	UI(frame):Append('WndButton', {
