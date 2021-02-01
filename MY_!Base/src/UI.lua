@@ -1807,6 +1807,7 @@ function UI:Autocomplete(method, arg1, arg2)
 					local nW, nH = raw:GetSize()
 					menu.szLayer = 'Topmost2'
 					menu.nMiniWidth = nW
+					menu.nWidth = nW
 					menu.x, menu.y = nX, nY + nH
 					menu.bDisableSound = true
 					menu.bShowKillFocus = true
@@ -3711,9 +3712,12 @@ function UI:Menu(lmenu, rmenu, bNoAutoBind)
 		if type(menu) ~= 'table' then
 			return
 		end
-		menu.nMiniWidth = nW
 		menu.x = nX
 		menu.y = nY + nH
+		menu.nMiniWidth = nW
+		if menu.bAlignWidth then
+			menu.nWidth = nW
+		end
 		menu.bVisibleWhenHideUI = true
 		UI.PopupMenu(menu)
 	end
