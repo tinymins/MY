@@ -448,7 +448,7 @@ function PS.OnPanelActive(wnd)
         x = 80, y = 15, w = w - 246, h = 25,
         text = _L['Click to config monitors'],
         menu = function()
-            local menu = {}
+            local menu = { bAlignWidth = true }
             for i, p in ipairs(KEYWORD_LIST) do
                 local m = LIB.GetMsgTypeMenu(function(szChannel)
                     p.tChannel[szChannel] = not p.tChannel[szChannel]
