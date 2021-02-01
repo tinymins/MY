@@ -306,7 +306,9 @@ function LIB.Ajax(settings)
 			if settings.success then
 				CallWithThis(settings, settings.success, szContent, 200)
 			end
-			insert(RRWC_FREE, RequestID)
+			-- 有宕机问题，禁用 FREE 池，直接销毁句柄
+			-- insert(RRWC_FREE, RequestID)
+			Wnd.CloseWindow(this:GetRoot())
 		end
 
 		-- do with this remote request
