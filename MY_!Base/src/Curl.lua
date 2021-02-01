@@ -323,7 +323,7 @@ function LIB.Ajax(settings)
 				if settings.error then
 					CallWithThis(settings, settings.error, '', 0, false)
 				end
-				insert(RRWC_FREE, RequestID)
+				-- insert(RRWC_FREE, RequestID)
 			end)
 		end
 
@@ -387,7 +387,7 @@ function LIB.Ajax(settings)
 				if settings.complete then
 					CallWithThis(settings, settings.complete, '', 500, false)
 				end
-				insert(RRWP_FREE, RequestID)
+				-- insert(RRWP_FREE, RequestID)
 			end)
 		end
 
