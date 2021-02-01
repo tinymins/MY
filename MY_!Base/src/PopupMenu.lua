@@ -88,7 +88,9 @@ local DIFF_KEYS = { -- 用于自动扫描菜单数据是否有更新的键
 
 --[[
 	menu = {
+		nWidth = 200,
 		nMinWidth = 100,
+		nMaxWidth = 300,
 		{
 			szOption = 'Option 0',
 			bDisable = true,
@@ -273,12 +275,12 @@ function D.UpdateScrollContainerWidth(scroll, nHeaderWidth, nContentWidth, nFoot
 	local nWidth, nHeight = container:GetSize()
 	scroll:Lookup('Scroll_Menu'):SetH(nHeight)
 	scroll:Lookup('Scroll_Menu'):SetRelX(bInlineContainer and (nWidth - nPaddingRight) or nWidth)
+	scroll:Lookup('Scroll_Menu/WndButton_Scroll_Menu'):SetH(min(nHeight * 2 / 3, 40))
 	scroll:SetW(max(nWidth, scroll:Lookup('Scroll_Menu'):GetRelX() + scroll:Lookup('Scroll_Menu'):GetW()))
 end
 
 -- 绘制选项列表
 function D.DrawScrollContainer(scroll, top, menu, nLevel, bInlineContainer)
-	local nMinWidth = menu.nMinWidth or menu.nMiniWidth or 0
 	local nHeaderWidth, nContentWidth, nFooterWidth = 10, 0, 10
 	local nPaddingTop, nPaddingBottom, nPaddingLeft, nPaddingRight = D.GetPadding(top)
 	local container = scroll:Lookup('WndContainer_Menu')
@@ -446,7 +448,17 @@ function D.DrawScrollContainer(scroll, top, menu, nLevel, bInlineContainer)
 	scroll:SetH(nHeight)
 	-- 非嵌套层则开始更新所有宽度
 	if not bInlineContainer then
-		nContentWidth = max(nMinWidth - nHeaderWidth - nFooterWidth - nPaddingLeft - nPaddingRight, nContentWidth)
+		if menu.nWidth then
+			nContentWidth = max(menu.nWidth - nHeaderWidth - nFooterWidth - nPaddingLeft - nPaddingRight, 0)
+		else
+			local nMinWidth = menu.nMinWidth or menu.nMiniWidth
+			if nMinWidth then
+				nContentWidth = max(nMinWidth - nHeaderWidth - nFooterWidth - nPaddingLeft - nPaddingRight, nContentWidth)
+			end
+			if menu.nMaxWidth then
+				nContentWidth = max(min(nContentWidth, menu.nMaxWidth - nHeaderWidth - nFooterWidth - nPaddingLeft - nPaddingRight), 0)
+			end
+		end
 		D.UpdateScrollContainerWidth(scroll, nHeaderWidth, nContentWidth, nFooterWidth, nPaddingRight, false)
 		D.UpdateMouseOver(scroll, Cursor.GetPos())
 	end
