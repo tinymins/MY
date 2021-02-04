@@ -447,7 +447,7 @@ function D.RequestRepoMetaList(nPage)
 				nTotal = res.page.total,
 			}
 			local aMeta = {}
-			for _, info in ipairs(res) do
+			for _, info in ipairs(res.data) do
 				info = D.MetaJsonToLua(
 					info,
 					'https://pull.j3cx.com/api/dbm/feed?'.. LIB.EncodePostData(LIB.UrlEncode({
