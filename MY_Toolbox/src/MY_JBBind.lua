@@ -42,7 +42,7 @@ local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCal
 local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
 local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
 -------------------------------------------------------------------------------------------------------
-local PLUGIN_NAME = 'MY_JBBind'
+local PLUGIN_NAME = 'MY_Toolbox'
 local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_JBBind'
 local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
@@ -172,7 +172,10 @@ function D.FetchTodayRecommentPosts(resolve, reject)
 	})
 end
 
-local PS = { nPriority = 0, bWelcome = true }
+local PS = {
+	-- nPriority = 0,
+	-- bWelcome = true,
+}
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
 	local X, Y = 20, 30
@@ -266,4 +269,4 @@ function PS.OnPanelActive(wnd)
 		end
 	end)
 end
-LIB.RegisterPanel(_L['JX3BOX'], 'MY_JBBind', _L['MY_JBBind'], 5962, PS)
+LIB.RegisterPanel(_L['System'], 'MY_JBBind', _L['MY_JBBind'], 5962, PS)
