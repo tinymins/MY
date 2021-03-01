@@ -407,5 +407,7 @@ return {
     ['Please unlock equip lock first!'] = '请先解除玲珑密保锁！',
     ['Sure to unbind character certification?'] = '确认要解除当前“角色认证”吗？',
 
+    ['Dungeon Rank'] = '秘境百强榜',
+
     ['Today recomment posts'] = '今日推荐',
 }

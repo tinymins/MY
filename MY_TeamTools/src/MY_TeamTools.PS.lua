@@ -97,8 +97,6 @@ function PS.OnPanelActive(wnd)
 		}):AutoWidth():Width() + 5
 	end
 
-	nX, nY = MY_FirstBossKill.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
-
 	nX = X
 	nY = nY + 10
 	nY = nY + ui:Append('Text', { x = nX, y = nY, text = _L['Party Request'], font = 27 }):Height() + 5

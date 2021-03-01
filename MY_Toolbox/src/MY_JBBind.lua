@@ -178,10 +178,11 @@ local PS = {
 }
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
-	local X, Y = 20, 30
+	local X, Y = 20, 20
 	local nX, nY = X, Y
 	local W, H = ui:Size()
 
+	-- 角色认证
 	local uiCCStatus, uiBtnCCStatus
 	local function UpdateUI()
 		if O.pending then
@@ -202,7 +203,7 @@ function PS.OnPanelActive(wnd)
 		uiBtnCCStatus:Left(uiCCStatus:Left() + uiCCStatus:Width() + 20)
 	end
 
-	nY = nY + ui:Append('Text', { x = nX, y = nY, text = _L['Character Certification'], font = 27 }):Height() + 5
+	nY = nY + ui:Append('Text', { x = nX, y = nY, text = _L['Character Certification'], font = 27 }):Height() + 2
 	nX = X + 10
 	nX = nX + ui:Append('Text', { x = nX, y = nY, w = 'auto', text = _L('Current character: %s', GetUserRoleName()) }):Width() + 20
 	nX = nX + ui:Append('Text', { x = nX, y = nY, w = 'auto', text = _L['Status: '] }):Width()
@@ -243,15 +244,24 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	nX = nX + uiBtnCCStatus:Width()
+	nX = X
+	nY = nY + 20
 
 	UpdateUI()
 	D.FetchBindStatus(UpdateUI, UpdateUI)
 
+	-- 秘境百强榜
+	nX = X
+	nY = nY + 20
+	nY = nY + ui:Append('Text', { x = nX, y = nY, text = _L['Dungeon Rank'], font = 27 }):Height() + 2
+	nX = X + 10
+	nX, nY = MY_AchievementRank.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
+
+	-- 今日推荐
 	nX = X
 	nY = nY + 20
 
 	D.FetchTodayRecommentPosts(function(data)
-		nY = nY + 48
 		ui:Append('Text', { text = _L['Today recomment posts'], x = X, y = nY, font = 27 })
 		nX = X + 10
 		nY = nY + 35

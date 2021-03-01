@@ -407,5 +407,7 @@ return {
     ['Please unlock equip lock first!'] = '請先解除玲瓏密保鎖！',
     ['Sure to unbind character certification?'] = '確認要解除當前“角色認證”嗎？',
 
+    ['Dungeon Rank'] = '秘境百強榜',
+
     ['Today recomment posts'] = '今日推薦',
 }
