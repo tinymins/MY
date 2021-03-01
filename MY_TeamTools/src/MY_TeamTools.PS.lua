@@ -98,7 +98,7 @@ function PS.OnPanelActive(wnd)
 	end
 
 	nX = X
-	nY = nY + 10
+	nY = nY + 30
 	nY = nY + ui:Append('Text', { x = nX, y = nY, text = _L['Party Request'], font = 27 }):Height() + 5
 	nX = X + 10
 	nX, nY = MY_PartyRequest.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
