@@ -107,7 +107,7 @@ function D.ShareBKR(p, bOnymous, onfulfilled, oncomplete)
 	local szLeaderU = AnsiToUTF8(p.szLeader)
 	local szTeammateU = AnsiToUTF8(p.szTeammate)
 	local szClientGUIDU = AnsiToUTF8(p.szClientGUID)
-	local szURL = 'https://push.j3cx.com/api/bkr/uploads?'
+	local szURL = 'https://push.j3cx.com/api/achievement-rank/uploads?'
 		.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
 			lang = AnsiToUTF8(LIB.GetLang()),
 			server = szServerU,
@@ -171,7 +171,7 @@ function D.UpdateMapBossAchieveAcquire()
 	if not BOSS_MAP_ACHIEVE_ACQUIRE then
 		LIB.Ajax({
 			driver = 'auto', mode = 'auto', method = 'auto',
-			url = 'https://cdn.j3cx.com/config/fbk-achieves.json'
+			url = 'https://cdn.j3cx.com/config/achievement-rank.json'
 				.. '?lang=' .. LIB.GetLang()
 				.. '&_=' .. GetCurrentTime(),
 			success = function(html, status)
