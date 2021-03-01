@@ -81,6 +81,23 @@ LIB.RegisterFlush('MY_FirstBossKill', D.SaveData)
 LIB.RegisterEvent('MY_FIGHT_HINT', function()
 	if arg0 then
 		D.dwFightBeginTime = GetCurrentTime()
+		D.dwDamage = 0
+		D.dwTherapy = 0
+	end
+end)
+LIB.RegisterEvent('SYS_MSG', function()
+	if arg0 == 'UI_OME_SKILL_EFFECT_LOG' then
+		-- 技能最终产生的效果（生命值的变化）；
+		-- (arg1)dwCaster：施放者 (arg2)dwTarget：目标 (arg3)bReact：是否为反击 (arg4)nType：Effect类型 (arg5)dwID:Effect的ID
+		-- (arg6)dwLevel：Effect的等级 (arg7)bCriticalStrike：是否会心 (arg8)nCount：tResultCount数据表中元素个数 (arg9)tResult：数值集合
+		local KCaster = LIB.GetObject(arg1)
+		if KCaster and not IsPlayer(arg1) and KCaster.dwEmployer and KCaster.dwEmployer ~= 0 then -- 宠物的数据算在主人统计中
+			KCaster = LIB.GetObject(KCaster.dwEmployer)
+		end
+		if KCaster.dwID == UI_GetClientPlayerID() then
+			D.dwDamage = D.dwDamage + (arg9[SKILL_RESULT_TYPE.EFFECTIVE_DAMAGE] or 0)
+			D.dwTherapy = D.dwTherapy + (arg9[SKILL_RESULT_TYPE.EFFECTIVE_THERAPY] or 0)
+		end
 	end
 end)
 
@@ -92,17 +109,20 @@ function D.ShareBKR(p, bOnymous, onfulfilled, oncomplete)
 	local szClientGUIDU = AnsiToUTF8(p.szClientGUID)
 	local szURL = 'https://push.j3cx.com/api/bkr/uploads?'
 		.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
-			g = AnsiToUTF8(LIB.GetLang()),
-			s = szServerU,
-			n = szNameU,
-			l = szLeaderU,
-			m = szTeammateU,
-			u = szClientGUIDU,
-			a = p.dwAchieveID,
-			t = p.dwTime,
-			d = p.nFightTime,
-			b = p.dwFightBeginTime,
-			o = bOnymous and 1 or 0,
+			lang = AnsiToUTF8(LIB.GetLang()),
+			server = szServerU,
+			name = szNameU,
+			leader = szLeaderU,
+			teammate = szTeammateU,
+			guid = szClientGUIDU,
+			achieve = p.dwAchieveID,
+			time = p.dwTime,
+			fightBegin = p.dwFightBeginTime,
+			fightDuring = p.nFightTime,
+			damage = p.dwDamage,
+			therapy = p.dwTherapy,
+			roleType = p.nRoleType,
+			onymous = bOnymous and 1 or 0,
 		}, 'MY_BKR_AhfB6aBL9o$8R9t3ka6Uk6@#^^KHLoMtZCdS@5e2@T')))
 	--[[#DEBUG BEGIN]]
 	LIB.Debug(szURL, DEBUG_LEVEL.LOG)
@@ -241,6 +261,8 @@ LIB.RegisterEvent({
 				dwAchieveID = dwAchieveID,
 				dwTime = GetCurrentTime(),
 				dwFightBeginTime = D.dwFightBeginTime,
+				dwDamage = D.dwDamage,
+				nRoleType = me.nRoleType,
 				nFightTime = LIB.GetFightTime(),
 				szClientGUID = LIB.GetClientGUID(),
 			}
