@@ -102,7 +102,7 @@ end
 
 local function OnClsCheck()
 	local function Cls(bAll)
-		for i = 1, 10 do
+		for i = 1, 32 do
 			local h = Station.Lookup('Lowest2/ChatPanel' .. i .. '/Wnd_Message', 'Handle_Message')
 			local hCheck = Station.Lookup('Lowest2/ChatPanel' .. i .. '/CheckBox_Title')
 			if h and (bAll or (hCheck and hCheck:IsCheckBoxChecked())) then
