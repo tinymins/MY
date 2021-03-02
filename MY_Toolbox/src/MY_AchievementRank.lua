@@ -53,6 +53,8 @@ end
 --------------------------------------------------------------------------
 local D = {
 	dwFightBeginTime = 0,
+	dwDamage = 0,
+	dwTherapy = 0,
 }
 local O = {
 	bEnable = false,
