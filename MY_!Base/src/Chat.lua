@@ -865,11 +865,18 @@ end
 -- 从原始聊天消息数据构建纯阅读字符串
 -- (string) LIB.StringifyChatText(aSay: table)
 function LIB.StringifyChatText(t)
-	local t1 = {}
+	local aText = {}
 	for _, v in ipairs(t) do
-		insert(t1, v.text)
+		if v.text then -- v.type == 'text' or v.type == 'name'
+			insert(aText, v.text)
+		elseif v.type == 'emotion' then
+			local emo = LIB.GetChatEmotion(v.id)
+			if emo then
+				insert(aText, emo.szCmd)
+			end
+		end
 	end
-	return concat(t1)
+	return concat(aText)
 end
 
 -- 判断某个频道能否发言
