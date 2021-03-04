@@ -157,12 +157,7 @@ function D.OnTalkFilter(nChannel, t, dwTalkerID, szName, bEcho, bOnlyShowBallon,
 	if not szType then
 		return
 	end
-	local szText = ''
-	for _, v in ipairs(t) do
-		if v.text then
-			szText = szText .. v.text
-		end
-	end
+	local szText = LIB.StringifyChatText(t)
 	if D.IsBlockMsg(szText, szType, dwTalkerID) then
 		return true
 	end
