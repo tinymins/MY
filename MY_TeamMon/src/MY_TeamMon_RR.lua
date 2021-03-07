@@ -70,6 +70,35 @@ local MY_TM_DATA_ROOT = MY_TeamMon.MY_TM_DATA_ROOT
 local MY_TM_DATA_PASSPHRASE = '89g45ynbtldnsryu98rbny9ps7468hb6npyusiryuxoldg7lbn894bn678b496746'
 local META_DOWNLOADING, DATA_DOWNLOADING = {}, {}
 
+local Schema = LIB.Schema
+local META_LUA_SCHEMA = Schema.Record({
+	szURL = Schema.Optional(Schema.String),
+	szAboutURL = Schema.Optional(Schema.String),
+	szAuthor = Schema.String,
+	szDataURL = Schema.String,
+	szKey = Schema.Optional(Schema.String),
+	szTitle = Schema.String,
+	szUpdateTime = Schema.Optional(Schema.String),
+	szVersion = Schema.String,
+}, true)
+local META_JSON_SCHEMA = Schema.Record({
+	about = Schema.Optional(Schema.String),
+	author = Schema.String,
+	data_url = Schema.String,
+	key = Schema.Optional(Schema.String),
+	name = Schema.String,
+	update = Schema.Optional(Schema.String),
+	version = Schema.String,
+}, true)
+local META_LIST_JSON_SCHEMA = Schema.Record({
+	data = Schema.Collection(META_JSON_SCHEMA),
+	page = Schema.Record({
+		index = Schema.Number,
+		size = Schema.Number,
+		total = Schema.Number,
+	}, true),
+}, true)
+
 -- 陆服环境下，以下缩写均对等
 -- tinymins
 -- tinymins?master
@@ -295,16 +324,6 @@ local REPO_META_LIST = {
 	szURL = GetRawURL('tinymins@github'),
 	szAboutURL = GetBlobURL('tinymins@github:MY_TeamMon/README.md'),
 }
-local META_TEMPLATE = {
-	szURL = '',
-	szDataURL = './data.jx3dat',
-	szKey = '',
-	szVersion = '',
-	szAuthor = '',
-	szTitle = '',
-	szUpdateTime = '',
-	szAboutURL = '',
-}
 
 function D.GetFrame()
 	return Station.SearchFrame('MY_TeamMon_RR')
@@ -326,44 +345,63 @@ function D.ClosePanel()
 end
 
 function D.LoadFavMetaList()
-	return LIB.LoadLUAData({'userdata/TeamMon/MetaList.jx3dat', PATH_TYPE.GLOBAL}) or {}
+	return LIB.LoadLUAData({'userdata/teammon/metalist.jx3dat', PATH_TYPE.GLOBAL}) or {}
 end
 
 function D.SaveFavMetaList(aMeta)
-	LIB.SaveLUAData({'userdata/TeamMon/MetaList.jx3dat', PATH_TYPE.GLOBAL}, aMeta)
+	LIB.SaveLUAData({'userdata/teammon/metalist.jx3dat', PATH_TYPE.GLOBAL}, aMeta)
 	FireUIEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
 end
 
-function D.AddFavMeta(info)
+function D.AddFavMeta(info, szReplaceKey)
 	local aMeta = D.LoadFavMetaList()
-	for _, p in spairs(aMeta, REPO_META_LIST) do
-		if p.szURL == info.szURL then
-			return
+	local nIndex
+	if szReplaceKey then
+		for i, p in ipairs_r(aMeta) do
+			if p.szKey == szReplaceKey then
+				remove(aMeta, i)
+				nIndex = i
+			end
 		end
 	end
-	insert(aMeta, info)
-	D.SaveFavMetaList(aMeta)
-end
-
-function D.MetaJsonToLua(res, szURL, szKey)
-	return {
-		szURL = szURL,
-		szDataURL = GetAttachRawURL(res.data_url or './data.jx3dat', szURL),
-		szKey = szKey or LIB.GetUUID(),
-		szAuthor = res.author or '',
-		szTitle = res.name or '',
-		szUpdateTime = res.update or '',
-		szAboutURL = GetAttachBlobURL(res.about or '', szURL),
-		szVersion = res.version or '',
-	}
-end
-
-function D.DownloadMeta(info, onSuccess, onError, bSilent)
-	local szURL = GetRawURL(info.szURL) or info.szURL
-	if info.szKey then
-		META_DOWNLOADING[info.szKey] = true
-		FireUIEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
+	for i, p in ipairs_r(aMeta) do
+		if p.szKey == info.szKey then
+			remove(aMeta, i)
+			nIndex = i
+		end
 	end
+	if nIndex then
+		insert(aMeta, nIndex, info)
+	else
+		insert(aMeta, info)
+	end
+	D.SaveFavMetaList(aMeta)
+	FireUIEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
+end
+
+-- 格式化描述内容
+-- 进入该函数的数据必须为安全数据，即已经过 Schema 检测的数据。
+function D.FormatMetaInfo(res)
+	local szURL = res.szURL or res.url
+	local info = {
+		szURL = szURL,
+		szDataURL = GetAttachRawURL(res.szDataURL or res.data_url or './data.jx3dat', szURL),
+		szKey = GetShortURL(szURL) or ('H' .. GetStringCRC(szURL)),
+		szAuthor = res.szAuthor or res.author or '',
+		szTitle = res.szTitle or res.name or '',
+		szUpdateTime = res.szUpdateTime or res.update or '',
+		szAboutURL = GetAttachBlobURL(res.szAboutURL or res.about or '', szURL),
+		szVersion = res.szVersion or res.version or '',
+	}
+	if IsEmpty(info.szURL) or IsEmpty(info.szTitle) or IsEmpty(info.szVersion) then
+		return
+	end
+	return info
+end
+
+-- 根据描述文件地址，获取描述内容
+function D.FetchMeta(szURL, onSuccess, onError)
+	local szURL = GetRawURL(szURL) or szURL
 	LIB.Ajax({
 		driver = 'auto', mode = 'auto', method = 'auto',
 		url = szURL,
@@ -371,26 +409,29 @@ function D.DownloadMeta(info, onSuccess, onError, bSilent)
 		success = function(szHTML)
 			local res, err = LIB.JsonDecode(szHTML)
 			if not res then
-				if not bSilent then
-					SafeCall(onError, _L['ERR: Info content is illegal!'] .. '\n\n' .. err)
-				end
+				SafeCall(onError, _L['ERR: Decode info content as json failed!'])
 				return
 			end
-			local info = D.MetaJsonToLua(res, szURL, info.szKey)
-			local aMeta = D.LoadFavMetaList()
-			for i, p in ipairs(aMeta) do
-				if p.szKey == info.szKey then
-					aMeta[i] = info
+			local errs = Schema.CheckSchema(res, META_JSON_SCHEMA)
+			if errs then
+				local aErrmsgs = {}
+				for i, err in ipairs(errs) do
+					insert(aErrmsgs, '  ' .. i .. '. ' .. err.message)
 				end
+				SafeCall(onError, _L['ERR: Info content is illegal!'] .. '\n\n' .. concat(aErrmsgs, '\n'))
+				return
 			end
-			D.SaveFavMetaList(aMeta)
+			res.url = szURL
+			local info = D.FormatMetaInfo(res)
+			if not info then
+				SafeCall(onError, _L['ERR: Info content is illegal!'])
+				return
+			end
 			SafeCall(onSuccess, info)
 		end,
 		error = function(html, status)
 			if status == 404 then
-				if not bSilent then
-					SafeCall(onError, _L['ERR404: Meta address not found!'])
-				end
+				SafeCall(onError, _L['ERR404: Meta address not found!'])
 				return
 			end
 			--[[#DEBUG BEGIN]]
@@ -398,22 +439,31 @@ function D.DownloadMeta(info, onSuccess, onError, bSilent)
 			--[[#DEBUG END]]
 			SafeCall(onError)
 		end,
-		complete = function()
-			if info.szKey then
-				META_DOWNLOADING[info.szKey] = nil
-			end
-			FireUIEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
-		end,
 	})
 end
 
-function D.DownloadFavMetaList()
+function D.FetchFavMetaList()
 	for _, info in ipairs(D.LoadFavMetaList()) do
-		D.DownloadMeta(info)
+		META_DOWNLOADING[info.szKey] = true
+		D.FetchMeta(
+			info.szURL,
+			function(res)
+				META_DOWNLOADING[info.szKey] = nil
+				D.AddFavMeta(res, info.szKey)
+			end,
+			function(err)
+				META_DOWNLOADING[info.szKey] = nil
+				LIB.Debug(
+					_L['MY_TeamMon_RR'],
+					err ..'\n' ..  info.szURL,
+					DEBUG_LEVEL.WARNING)
+				FireUIEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
+			end)
 	end
+	FireUIEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
 end
 
-function D.RequestRepoMetaList(nPage)
+function D.FetchRepoMetaList(nPage)
 	LIB.Ajax({
 		driver = 'auto', mode = 'auto', method = 'auto',
 		url = 'https://pull.j3cx.com/api/dbm/subscribe/all?'
@@ -425,26 +475,13 @@ function D.RequestRepoMetaList(nPage)
 		charset = 'utf8',
 		success = function(szHTML)
 			local res = LIB.JsonDecode(szHTML)
-			local s = LIB.Schema
-			local schema = s.Record({
-				data = s.Collection(s.Record({
-					about = s.String,
-					author = s.String,
-					data_url = s.String,
-					key = s.String,
-					name = s.String,
-					update = s.String,
-					version = s.Number,
-				})),
-				page = s.Record({
-					index = s.Number,
-					size = s.Number,
-					total = s.Number,
-				}),
-			})
-			local err = s.CheckSchema(res, schema)
-			if err then
-				return LIB.Debug('MY_TeamMon::RequestRepoMetaList: ' .. err.message, DEBUG_LEVEL.WARNING)
+			local errs = Schema.CheckSchema(res, META_LIST_JSON_SCHEMA)
+			if errs then
+				local aErrmsgs = {}
+				for i, err in ipairs(errs) do
+					insert(aErrmsgs, i .. '. ' .. err.message)
+				end
+				return LIB.Debug(_L['MY_TeamMon_RR'], _L['Fetch repo meta list failed.'] .. '\n' .. concat(aErrmsgs, '\n'), DEBUG_LEVEL.WARNING)
 			end
 			local tPage = {
 				nIndex = res.page.index,
@@ -453,14 +490,14 @@ function D.RequestRepoMetaList(nPage)
 			}
 			local aMeta = {}
 			for _, info in ipairs(res.data) do
-				info = D.MetaJsonToLua(
-					info,
-					'https://pull.j3cx.com/api/dbm/feed?'.. LIB.EncodePostData(LIB.UrlEncode({
-						key = AnsiToUTF8(info.key),
-					})),
-					info.key)
-				info.bEmbedded = true
-				insert(aMeta, info)
+				info.url = 'https://pull.j3cx.com/api/dbm/feed?'.. LIB.EncodePostData(LIB.UrlEncode({
+					key = AnsiToUTF8(info.key),
+				}))
+				info = D.FormatMetaInfo(info)
+				if info then
+					info.bEmbedded = true
+					insert(aMeta, info)
+				end
 			end
 			REPO_META_PAGE = tPage
 			REPO_META_LIST = aMeta
@@ -607,10 +644,10 @@ function D.CheckPageInit(page)
 	end
 	if p:GetName() == 'Page_Repo' then
 		D.UpdateRepoList(this:GetRoot())
-		D.RequestRepoMetaList()
+		D.FetchRepoMetaList()
 	elseif p:GetName() == 'Page_Fav' then
 		D.UpdateFavList(this:GetRoot())
-		D.DownloadFavMetaList()
+		D.FetchFavMetaList()
 	end
 	p.bInit = true
 end
@@ -663,16 +700,24 @@ function D.OnLButtonClick()
 			end)
 			FireUIEvent('MY_TM_RR_REPO_META_LIST_UPDATE')
 		else
-			D.DownloadMeta(this:GetParent().info, function(info)
-				D.DownloadData(info, function()
+			local info = this:GetParent().info
+			META_DOWNLOADING[info.szKey] = true
+			D.FetchMeta(
+				info.szURL,
+				function(info)
+					META_DOWNLOADING[info.szKey] = nil
+					D.DownloadData(info, function()
+						FireUIEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
+					end)
+					FireUIEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
+				end,
+				function(szErrmsg)
+					if szErrmsg then
+						LIB.Alert(szErrmsg .. '\n' ..  info.szURL)
+					end
+					META_DOWNLOADING[info.szKey] = nil
 					FireUIEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
 				end)
-				FireUIEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
-			end, function(szErrmsg)
-				if szErrmsg then
-					LIB.Alert(szErrmsg)
-				end
-			end)
 		end
 	elseif name == 'Btn_FavAddUrl' then
 		GetUserInput(_L['Please input meta address:'], function(szText)
@@ -688,16 +733,18 @@ function D.OnLButtonClick()
 					end
 					return
 				end
-				D.DownloadMeta({ szURL = szURL }, function(info)
-					D.AddFavMeta(info)
-					D.UpdateFavList(frame)
-					ProcessQueue()
-				end, function(szErrmsg)
-					if szErrmsg then
-						insert(aErrmsg, szErrmsg)
-					end
-					ProcessQueue()
-				end)
+				D.FetchMeta(
+					szURL,
+					function(info)
+						D.AddFavMeta(info)
+						ProcessQueue()
+					end,
+					function(szErrmsg)
+						if szErrmsg then
+							insert(aErrmsg, szErrmsg)
+						end
+						ProcessQueue()
+					end)
 			end
 			ProcessQueue()
 		end)
@@ -738,13 +785,13 @@ function D.OnLButtonClick()
 		end
 		D.ShareMetaToRaid(info)
 	elseif name == 'Btn_FavCheckUpdate' then
-		D.DownloadFavMetaList()
+		D.FetchFavMetaList()
 	elseif name == 'Btn_RepoCheckUpdate' then
-		D.RequestRepoMetaList()
+		D.FetchRepoMetaList()
 	elseif name == 'Btn_RepoPrevPage' then
-		D.RequestRepoMetaList(REPO_META_PAGE.nIndex - 1)
+		D.FetchRepoMetaList(REPO_META_PAGE.nIndex - 1)
 	elseif name == 'Btn_RepoNextPage' then
-		D.RequestRepoMetaList(REPO_META_PAGE.nIndex + 1)
+		D.FetchRepoMetaList(REPO_META_PAGE.nIndex + 1)
 	end
 end
 
@@ -821,10 +868,14 @@ function D.OnItemMouseLeave()
 end
 
 LIB.RegisterBgMsg('MY_TeamMon_RR', function(_, data, _, _, szTalker, _)
-	local action, info = data[1], data[2]
+	local action = data[1]
 	if action == 'SYNC' then
-		info = LIB.FormatDataStructure(info, META_TEMPLATE)
-		if not IsEmpty(info.szTitle) then
+		local errs = Schema.CheckSchema(data[2], META_LUA_SCHEMA)
+		if errs then
+			return
+		end
+		local info = D.FormatMetaInfo(data[2])
+		if info then
 			LIB.Confirm(
 				_L('%s request download:', szTalker)
 					.. '\n' .. _L('Title: %s', info.szTitle)
@@ -836,39 +887,39 @@ LIB.RegisterBgMsg('MY_TeamMon_RR', function(_, data, _, _, szTalker, _)
 						and ''
 						or '\n' .. _L('Update time: %s', info.szUpdateTime)),
 				function()
-					if not IsEmpty(info.szURL) then
-						D.AddFavMeta(info)
-					end
+					D.AddFavMeta(info)
 					D.DownloadData(info)
 				end)
 		end
 	elseif action == 'LOAD' then
-		LIB.Sysmsg(_L('%s loaded %s', szTalker, info))
+		LIB.Sysmsg(_L('%s loaded %s', szTalker, data[2]))
 	end
 end)
 
 LIB.RegisterInit('MY_TeamMon_RR', function()
 	if not IsEmpty(O.szLastURL) then
-		D.DownloadMeta({ szURL = O.szLastURL }, function(info)
-			if O.szLastVersion ~= info.szVersion and O.szLastSkipVersion ~= info.szVersion then
-				LIB.Confirm(
-					_L('New version found for TeamMon_RR\nSURL: %s\nName: %s\nTime: %s\n\nDo you want to update data now?',
-						GetShortURL(info.szURL) or ' - ',
-						LIB.ReplaceSensitiveWord(info.szTitle),
-						LIB.ReplaceSensitiveWord(info.szUpdateTime)),
-					function()
-						D.DownloadData(info, function()
+		D.FetchMeta(
+			O.szLastURL,
+			function(info)
+				if O.szLastVersion ~= info.szVersion and O.szLastSkipVersion ~= info.szVersion then
+					LIB.Confirm(
+						_L('New version found for TeamMon_RR\nSURL: %s\nName: %s\nTime: %s\n\nDo you want to update data now?',
+							GetShortURL(info.szURL) or ' - ',
+							LIB.ReplaceSensitiveWord(info.szTitle),
+							LIB.ReplaceSensitiveWord(info.szUpdateTime)),
+						function()
+							D.DownloadData(info, function()
+								FireUIEvent('MY_TM_RR_REPO_META_LIST_UPDATE')
+							end)
 							FireUIEvent('MY_TM_RR_REPO_META_LIST_UPDATE')
-						end)
-						FireUIEvent('MY_TM_RR_REPO_META_LIST_UPDATE')
-					end,
-					function()
-						O.szLastSkipVersion = info.szVersion
-					end,
-					_L['Update'],
-					_L['Skip current version'])
-			end
-		end)
+						end,
+						function()
+							O.szLastSkipVersion = info.szVersion
+						end,
+						_L['Update'],
+						_L['Skip current version'])
+				end
+			end)
 	end
 end)
 
