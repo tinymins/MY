@@ -55,13 +55,11 @@ end
 
 local D = {}
 local O = {
-	szLastKey = '',
-	szLastSURL = '',
+	szLastURL = '',
 	szLastVersion = '',
 	szLastSkipVersion = '',
 }
-RegisterCustomData('Global/MY_TeamMon_RR.szLastKey')
-RegisterCustomData('Global/MY_TeamMon_RR.szLastSURL')
+RegisterCustomData('Global/MY_TeamMon_RR.szLastURL')
 RegisterCustomData('Global/MY_TeamMon_RR.szLastVersion')
 RegisterCustomData('Global/MY_TeamMon_RR.szLastSkipVersion')
 
@@ -472,8 +470,7 @@ function D.LoadConfigureFile(szFile, info)
 		if me.IsInParty() then
 			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TeamMon_RR', {'LOAD', info.szTitle}, true)
 		end
-		O.szLastKey = info.szKey
-		O.szLastSURL = GetShortURL(info.szURL)
+		O.szLastURL = GetShortURL(info.szURL) or GetRawURL(info.szURL)
 		O.szLastVersion = info.szVersion
 		O.szLastSkipVersion = nil
 		FireUIEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
@@ -542,7 +539,10 @@ function D.AppendMetaInfoItem(container, p, pSel)
 	wnd:Lookup('Btn_Download', 'Text_Download'):SetText(
 		(META_DOWNLOADING[p.szKey] and _L['Fetching...'])
 		or (DATA_DOWNLOADING[p.szKey] and _L['Downloading...'])
-		or (p.szKey == O.szLastKey and (p.szVersion == O.szLastVersion and _L['Last select'] or _L['Can update']))
+		or ((GetShortURL(p.szURL) or GetRawURL(p.szURL)) == O.szLastURL and (
+			p.szVersion == O.szLastVersion
+				and _L['Last select']
+				or _L['Can update']))
 		or _L['Download']
 	)
 	wnd:Lookup('Btn_Download'):Enable(not META_DOWNLOADING[p.szKey] and not DATA_DOWNLOADING[p.szKey])
@@ -843,8 +843,9 @@ LIB.RegisterBgMsg('MY_TeamMon_RR', function(_, data, _, _, szTalker, _)
 end)
 
 LIB.RegisterInit('MY_TeamMon_RR', function()
-	if not IsEmpty(O.szLastSURL) then
-		D.DownloadMeta({ szURL = O.szLastSURL }, function(info)
+	local szURL = not IsEmpty(O.szLastURL) and GetRawURL(szURL)
+	if szURL then
+		D.DownloadMeta({ szURL = szURL }, function(info)
 			if O.szLastVersion ~= info.szVersion and O.szLastSkipVersion ~= info.szVersion then
 				LIB.Confirm(
 					_L('New version found for TeamMon_RR\nSURL: %s\nName: %s\nTime: %s\n\nDo you want to update data now?',
@@ -885,8 +886,7 @@ local settings = {
 		},
 		{
 			fields = {
-				szLastKey = true,
-				szLastSURL = true,
+				szLastURL = true,
 				szLastVersion = true,
 			},
 			root = O,
@@ -895,8 +895,7 @@ local settings = {
 	imports = {
 		{
 			fields = {
-				szLastKey = true,
-				szLastSURL = true,
+				szLastURL = true,
 				szLastVersion = true,
 			},
 			root = O,
