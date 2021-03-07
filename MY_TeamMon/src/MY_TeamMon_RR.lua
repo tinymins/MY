@@ -344,38 +344,38 @@ function D.ClosePanel()
 	frame:Hide()
 end
 
-function D.LoadFavMetaList()
+function D.LoadFavMetaInfoList()
 	return LIB.LoadLUAData({'userdata/teammon/metalist.jx3dat', PATH_TYPE.GLOBAL}) or {}
 end
 
-function D.SaveFavMetaList(aMeta)
-	LIB.SaveLUAData({'userdata/teammon/metalist.jx3dat', PATH_TYPE.GLOBAL}, aMeta)
+function D.SaveFavMetaInfoList(aMetaInfo)
+	LIB.SaveLUAData({'userdata/teammon/metalist.jx3dat', PATH_TYPE.GLOBAL}, aMetaInfo)
 	FireUIEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
 end
 
-function D.AddFavMeta(info, szReplaceKey)
-	local aMeta = D.LoadFavMetaList()
+function D.AddFavMetaInfo(info, szReplaceKey)
+	local aMetaInfo = D.LoadFavMetaInfoList()
 	local nIndex
 	if szReplaceKey then
-		for i, p in ipairs_r(aMeta) do
+		for i, p in ipairs_r(aMetaInfo) do
 			if p.szKey == szReplaceKey then
-				remove(aMeta, i)
+				remove(aMetaInfo, i)
 				nIndex = i
 			end
 		end
 	end
-	for i, p in ipairs_r(aMeta) do
+	for i, p in ipairs_r(aMetaInfo) do
 		if p.szKey == info.szKey then
-			remove(aMeta, i)
+			remove(aMetaInfo, i)
 			nIndex = i
 		end
 	end
 	if nIndex then
-		insert(aMeta, nIndex, info)
+		insert(aMetaInfo, nIndex, info)
 	else
-		insert(aMeta, info)
+		insert(aMetaInfo, info)
 	end
-	D.SaveFavMetaList(aMeta)
+	D.SaveFavMetaInfoList(aMetaInfo)
 	FireUIEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
 end
 
@@ -400,7 +400,7 @@ function D.FormatMetaInfo(res)
 end
 
 -- 根据描述文件地址，获取描述内容
-function D.FetchMeta(szURL, onSuccess, onError)
+function D.FetchMetaInfo(szURL, onSuccess, onError)
 	local szURL = GetRawURL(szURL) or szURL
 	LIB.Ajax({
 		driver = 'auto', mode = 'auto', method = 'auto',
@@ -431,25 +431,25 @@ function D.FetchMeta(szURL, onSuccess, onError)
 		end,
 		error = function(html, status)
 			if status == 404 then
-				SafeCall(onError, _L['ERR404: Meta address not found!'])
+				SafeCall(onError, _L['ERR404: MetaInfo address not found!'])
 				return
 			end
 			--[[#DEBUG BEGIN]]
-			LIB.Debug(_L['MY_TeamMon_RR'], 'ERROR Get Meta: ' .. status .. '\n' .. UTF8ToAnsi(html), DEBUG_LEVEL.WARNING)
+			LIB.Debug(_L['MY_TeamMon_RR'], 'ERROR Get MetaInfo: ' .. status .. '\n' .. UTF8ToAnsi(html), DEBUG_LEVEL.WARNING)
 			--[[#DEBUG END]]
 			SafeCall(onError)
 		end,
 	})
 end
 
-function D.FetchFavMetaList()
-	for _, info in ipairs(D.LoadFavMetaList()) do
+function D.FetchFavMetaInfoList()
+	for _, info in ipairs(D.LoadFavMetaInfoList()) do
 		META_DOWNLOADING[info.szKey] = true
-		D.FetchMeta(
+		D.FetchMetaInfo(
 			info.szURL,
 			function(res)
 				META_DOWNLOADING[info.szKey] = nil
-				D.AddFavMeta(res, info.szKey)
+				D.AddFavMetaInfo(res, info.szKey)
 			end,
 			function(err)
 				META_DOWNLOADING[info.szKey] = nil
@@ -463,7 +463,7 @@ function D.FetchFavMetaList()
 	FireUIEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
 end
 
-function D.FetchRepoMetaList(nPage)
+function D.FetchRepoMetaInfoList(nPage)
 	LIB.Ajax({
 		driver = 'auto', mode = 'auto', method = 'auto',
 		url = 'https://pull.j3cx.com/api/dbm/subscribe/all?'
@@ -488,7 +488,7 @@ function D.FetchRepoMetaList(nPage)
 				nSize = res.page.size,
 				nTotal = res.page.total,
 			}
-			local aMeta = {}
+			local aMetaInfo = {}
 			for _, info in ipairs(res.data) do
 				info.url = 'https://pull.j3cx.com/api/dbm/feed?'.. LIB.EncodePostData(LIB.UrlEncode({
 					key = AnsiToUTF8(info.key),
@@ -496,11 +496,11 @@ function D.FetchRepoMetaList(nPage)
 				info = D.FormatMetaInfo(info)
 				if info then
 					info.bEmbedded = true
-					insert(aMeta, info)
+					insert(aMetaInfo, info)
 				end
 			end
 			REPO_META_PAGE = tPage
-			REPO_META_LIST = aMeta
+			REPO_META_LIST = aMetaInfo
 			FireUIEvent('MY_TM_RR_REPO_META_LIST_UPDATE')
 		end,
 	})
@@ -550,7 +550,7 @@ function D.DownloadData(info, callback)
 	end)
 end
 
-function D.ShareMetaToRaid(info, bSure)
+function D.ShareMetaInfoToRaid(info, bSure)
 	if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 		return LIB.Alert('TALK_LOCK', _L['Please unlock talk lock first.'])
 	end
@@ -562,7 +562,7 @@ function D.ShareMetaToRaid(info, bSure)
 	end
 	if not bSure then
 		LIB.Confirm(_L['Confirm?'], function()
-			D.ShareMetaToRaid(info, true)
+			D.ShareMetaInfoToRaid(info, true)
 		end)
 		return
 	end
@@ -626,7 +626,7 @@ function D.UpdateFavList(frame)
 	local pSel, bSel = page.metaInfoSel, false
 	local container = page:Lookup('WndScroll_Fav/WndContainer_Fav_List')
 	container:Clear()
-	for _, p in ipairs(D.LoadFavMetaList()) do
+	for _, p in ipairs(D.LoadFavMetaInfoList()) do
 		if D.AppendMetaInfoItem(container, p, pSel) then
 			bSel = true
 		end
@@ -644,10 +644,10 @@ function D.CheckPageInit(page)
 	end
 	if p:GetName() == 'Page_Repo' then
 		D.UpdateRepoList(this:GetRoot())
-		D.FetchRepoMetaList()
+		D.FetchRepoMetaInfoList()
 	elseif p:GetName() == 'Page_Fav' then
 		D.UpdateFavList(this:GetRoot())
-		D.FetchFavMetaList()
+		D.FetchFavMetaInfoList()
 	end
 	p.bInit = true
 end
@@ -702,7 +702,7 @@ function D.OnLButtonClick()
 		else
 			local info = this:GetParent().info
 			META_DOWNLOADING[info.szKey] = true
-			D.FetchMeta(
+			D.FetchMetaInfo(
 				info.szURL,
 				function(info)
 					META_DOWNLOADING[info.szKey] = nil
@@ -733,10 +733,10 @@ function D.OnLButtonClick()
 					end
 					return
 				end
-				D.FetchMeta(
+				D.FetchMetaInfo(
 					szURL,
 					function(info)
-						D.AddFavMeta(info)
+						D.AddFavMetaInfo(info)
 						ProcessQueue()
 					end,
 					function(szErrmsg)
@@ -758,24 +758,24 @@ function D.OnLButtonClick()
 			return MY.Topmsg(_L['Embedded dataset cannot be removed!'])
 		end
 		LIB.Confirm(_L['Confirm?'], function()
-			local aMeta = D.LoadFavMetaList()
-			for i, p in ipairs_r(aMeta) do
+			local aMetaInfo = D.LoadFavMetaInfoList()
+			for i, p in ipairs_r(aMetaInfo) do
 				if p.szKey == info.szKey then
-					remove(aMeta, i)
+					remove(aMetaInfo, i)
 				end
 			end
 			if page and page.metaInfoSel and page.metaInfoSel.szKey == info.szKey then
 				page.metaInfoSel = nil
 			end
-			D.SaveFavMetaList(aMeta)
+			D.SaveFavMetaInfoList(aMetaInfo)
 			D.UpdateFavList(frame)
 		end)
 	elseif name == 'Btn_FavExportUrl' then
-		local aMetaURL = {}
-		for _, info in ipairs(D.LoadFavMetaList()) do
-			insert(aMetaURL, GetShortURL(info.szURL) or GetRawURL(info.szURL))
+		local aMetaInfoURL = {}
+		for _, info in ipairs(D.LoadFavMetaInfoList()) do
+			insert(aMetaInfoURL, GetShortURL(info.szURL) or GetRawURL(info.szURL))
 		end
-		UI.OpenTextEditor(concat(aMetaURL, ';'))
+		UI.OpenTextEditor(concat(aMetaInfoURL, ';'))
 	elseif name == 'Btn_Info' then
 		LIB.OpenBrowser(this:GetParent().info.szAboutURL)
 	elseif name == 'Btn_FavSyncTeam' or name == 'Btn_RepoSyncTeam' then
@@ -783,15 +783,15 @@ function D.OnLButtonClick()
 		if not info then
 			return MY.Topmsg(_L['Please select one dataset first!'])
 		end
-		D.ShareMetaToRaid(info)
+		D.ShareMetaInfoToRaid(info)
 	elseif name == 'Btn_FavCheckUpdate' then
-		D.FetchFavMetaList()
+		D.FetchFavMetaInfoList()
 	elseif name == 'Btn_RepoCheckUpdate' then
-		D.FetchRepoMetaList()
+		D.FetchRepoMetaInfoList()
 	elseif name == 'Btn_RepoPrevPage' then
-		D.FetchRepoMetaList(REPO_META_PAGE.nIndex - 1)
+		D.FetchRepoMetaInfoList(REPO_META_PAGE.nIndex - 1)
 	elseif name == 'Btn_RepoNextPage' then
-		D.FetchRepoMetaList(REPO_META_PAGE.nIndex + 1)
+		D.FetchRepoMetaInfoList(REPO_META_PAGE.nIndex + 1)
 	end
 end
 
@@ -831,7 +831,7 @@ function D.OnItemRButtonClick()
 		insert(t, {
 			szOption = _L['Sync team'],
 			fnAction = function()
-				D.ShareMetaToRaid(wnd.info)
+				D.ShareMetaInfoToRaid(wnd.info)
 			end,
 		})
 		PopupMenu(t)
@@ -844,7 +844,7 @@ function D.OnItemMouseEnter()
 		local wnd = this:GetParent()
 		local szTip = ''
 		if not IsEmpty(wnd.info.szURL) then
-			szTip = szTip .. _L('Meta URL: %s', wnd.info.szURL)
+			szTip = szTip .. _L('MetaInfo URL: %s', wnd.info.szURL)
 		end
 		local szShortURL = GetShortURL(wnd.info.szURL)
 		if not IsEmpty(szShortURL) then
@@ -882,12 +882,12 @@ LIB.RegisterBgMsg('MY_TeamMon_RR', function(_, data, _, _, szTalker, _)
 					.. '\n' .. _L('Author: %s', info.szAuthor)
 					.. (IsEmpty(info.szURL)
 						and ''
-						or '\n' .. _L('Meta URL: %s', info.szURL))
+						or '\n' .. _L('MetaInfo URL: %s', info.szURL))
 					.. (IsEmpty(info.szUpdateTime)
 						and ''
 						or '\n' .. _L('Update time: %s', info.szUpdateTime)),
 				function()
-					D.AddFavMeta(info)
+					D.AddFavMetaInfo(info)
 					D.DownloadData(info)
 				end)
 		end
@@ -898,7 +898,7 @@ end)
 
 LIB.RegisterInit('MY_TeamMon_RR', function()
 	if not IsEmpty(O.szLastURL) then
-		D.FetchMeta(
+		D.FetchMetaInfo(
 			O.szLastURL,
 			function(info)
 				if O.szLastVersion ~= info.szVersion and O.szLastSkipVersion ~= info.szVersion then
