@@ -462,10 +462,12 @@ local function GetPassphrase(nSeed, nLen)
 	end
 	return char(unpack(a))
 end
-local szDataRoot = LIB.FormatPath({'', PATH_TYPE.DATA})
+local szDataRoot = StringLowerW(LIB.FormatPath({'', PATH_TYPE.DATA}))
 local szPassphrase = GetPassphrase(666, 233)
 local CACHE = {}
 function GetLUADataPathPassphrase(szPath)
+	-- 忽略大小写
+	szPath = StringLowerW(szPath)
 	-- 去除目录前缀
 	if szPath:sub(1, szDataRoot:len()) ~= szDataRoot then
 		return
@@ -490,6 +492,11 @@ function GetLUADataPathPassphrase(szPath)
 	if not CACHE[szDomain] or not CACHE[szDomain][szPath] then
 		local szFilePath = szDataRoot .. szDomain .. '/manifest.jx3dat'
 		CACHE[szDomain] = LoadLUAData(szFilePath, { passphrase = szPassphrase }) or {}
+		-- 临时大小写兼容逻辑
+		for szPath, v in pairs(CACHE[szDomain]) do
+			CACHE[szDomain][szPath] = nil
+			CACHE[szDomain][StringLowerW(szPath)] = v
+		end
 		if not CACHE[szDomain][szPath] then
 			bNew = true
 			CACHE[szDomain][szPath] = LIB.GetUUID():gsub('-', '')
