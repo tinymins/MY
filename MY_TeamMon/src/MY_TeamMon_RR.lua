@@ -892,6 +892,7 @@ local settings = {
 			fields = {
 				szLastURL = true,
 				szLastVersion = true,
+				szLastSkipVersion = true,
 			},
 			root = O,
 		},
@@ -901,6 +902,7 @@ local settings = {
 			fields = {
 				szLastURL = true,
 				szLastVersion = true,
+				szLastSkipVersion = true,
 			},
 			root = O,
 		},
