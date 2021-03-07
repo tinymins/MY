@@ -47,7 +47,7 @@ local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Toolbox'
 local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^3.0.1') then
+if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^3.0.8') then
 	return
 end
 --------------------------------------------------------------------------
@@ -110,11 +110,11 @@ function D.HookNonwarMap()
 				img.copy = true
 				img.OnItemMouseEnter = function()
 					img:SetAlpha(255)
-					return LIB.FORMAT_WMSG_RET(true, true)
+					return UI.FormatWMsgRet(true, true)
 				end
 				img.OnItemMouseLeave = function()
 					img:SetAlpha(200)
-					return LIB.FORMAT_WMSG_RET(true, true)
+					return UI.FormatWMsgRet(true, true)
 				end
 				img:SetAlpha(200)
 				img:SetSize(img.w / fS, img.h / fS)

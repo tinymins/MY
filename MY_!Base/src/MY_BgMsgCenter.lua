@@ -281,7 +281,7 @@ do
 				OnSwitchMap(dwMapID, dwID, aMapCopy, dwTime)
 			end)
 		end
-		return LIB.FORMAT_WMSG_RET(true, true)
+		return UI.FormatWMsgRet(true, true)
 	end
 
 	local function OnFBAppendItemFromIni(hList)

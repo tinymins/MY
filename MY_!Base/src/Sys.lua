@@ -2378,17 +2378,6 @@ function LIB.EditBox_AppendLinkItem(dwID)
 	return true
 end
 
-function LIB.FORMAT_WMSG_RET(stop, callFrame)
-	local ret = 0
-	if stop then
-		ret = ret + 1 --01
-	end
-	if callFrame then
-		ret = ret + 2 --10
-	end
-	return ret
-end
-
 -------------------------------------------
 -- ”Ô“Ùœ‡πÿ API
 -------------------------------------------

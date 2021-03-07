@@ -5177,6 +5177,18 @@ function UI.LookupFrame(szName)
 	end
 end
 
+-- FORMAT_WMSG_RET
+function UI.FormatWMsgRet(stop, callFrame)
+	local ret = 0
+	if stop then
+		ret = ret + 1 --01
+	end
+	if callFrame then
+		ret = ret + 2 --10
+	end
+	return ret
+end
+
 UI.UpdateItemInfoBoxObject = _G.UpdateItemInfoBoxObject or UpdataItemInfoBoxObject
 
 LIB.UI = UI
