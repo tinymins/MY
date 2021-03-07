@@ -475,7 +475,7 @@ function D.LoadConfigureFile(szFile, info)
 		if me.IsInParty() then
 			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TeamMon_RR', {'LOAD', info.szTitle}, true)
 		end
-		O.szLastURL = GetShortURL(info.szURL) or GetRawURL(info.szURL)
+		O.szLastURL = GetShortURL(info.szURL) or info.szURL
 		O.szLastVersion = info.szVersion
 		O.szLastSkipVersion = nil
 		FireUIEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
@@ -544,7 +544,7 @@ function D.AppendMetaInfoItem(container, p, pSel)
 	wnd:Lookup('Btn_Download', 'Text_Download'):SetText(
 		(META_DOWNLOADING[p.szKey] and _L['Fetching...'])
 		or (DATA_DOWNLOADING[p.szKey] and _L['Downloading...'])
-		or ((GetShortURL(p.szURL) or GetRawURL(p.szURL)) == O.szLastURL and (
+		or ((GetShortURL(p.szURL) or p.szURL) == O.szLastURL and (
 			p.szVersion == O.szLastVersion
 				and _L['Last select']
 				or _L['Can update']))
@@ -848,9 +848,8 @@ LIB.RegisterBgMsg('MY_TeamMon_RR', function(_, data, _, _, szTalker, _)
 end)
 
 LIB.RegisterInit('MY_TeamMon_RR', function()
-	local szURL = not IsEmpty(O.szLastURL) and GetRawURL(szURL)
-	if szURL then
-		D.DownloadMeta({ szURL = szURL }, function(info)
+	if not IsEmpty(O.szLastURL) then
+		D.DownloadMeta({ szURL = O.szLastURL }, function(info)
 			if O.szLastVersion ~= info.szVersion and O.szLastSkipVersion ~= info.szVersion then
 				LIB.Confirm(
 					_L('New version found for TeamMon_RR\nSURL: %s\nName: %s\nTime: %s\n\nDo you want to update data now?',
