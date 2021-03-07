@@ -94,6 +94,7 @@ function PS.OnPanelActive(wnd)
 	y = y + ui:Append('Text', { x = x, y = y, h = 'auto', text = _L['Others'], color = {255, 255, 0} }):Height() + 5
 	x = x + 10
 	x, y = MY_AchievementWiki.OnPanelActivePartial(ui, X + 10, Y, W, H, x, y, deltaY)
+	x, y = MY_PetWiki.OnPanelActivePartial(ui, X + 10, Y, W, H, x, y, deltaY)
 	x, y = MY_YunMacro.OnPanelActivePartial(ui, X + 10, Y, W, H, x, y, deltaY)
 	x, y = X + 10, y + deltaY
 	x, y = MY_ItemWiki.OnPanelActivePartial(ui, X + 10, Y, W, H, x, y, deltaY)

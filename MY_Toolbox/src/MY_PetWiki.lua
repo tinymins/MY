@@ -1,7 +1,7 @@
 --------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
--- @desc     : 成就查询
+-- @desc     : 宠物百科
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
@@ -47,7 +47,7 @@ local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Toolbox'
 local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^3.0.1') then
+if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^3.0.8') then
 	return
 end
 --------------------------------------------------------------------------
@@ -58,26 +58,26 @@ local O = {
 	nW = 850,
 	nH = 610,
 }
-RegisterCustomData('MY_AchievementWiki.bEnable')
-RegisterCustomData('MY_AchievementWiki.nW')
-RegisterCustomData('MY_AchievementWiki.nH')
+RegisterCustomData('MY_PetWiki.bEnable')
+RegisterCustomData('MY_PetWiki.nW')
+RegisterCustomData('MY_PetWiki.nH')
 
 function D.OnWebSizeChange()
 	O.nW, O.nH = this:GetSize()
 end
 
-function D.Open(dwAchievement)
-	local achi = Table_GetAchievement(dwAchievement)
-	if not achi then
+function D.Open(dwPetIndex)
+	local tPet = Table_GetFellowPet(dwPetIndex)
+	if not tPet then
 		return
 	end
-	local szURL = 'https://page.j3cx.com/wiki/' .. dwAchievement .. '?'
+	local szURL = 'https://page.j3cx.com/pet/' .. dwPetIndex .. '?'
 		.. LIB.EncodePostData(LIB.UrlEncode({
 			lang = AnsiToUTF8(LIB.GetLang()),
 			player = AnsiToUTF8(GetUserRoleName()),
 		}))
-	local szKey = 'AchievementWiki_' .. dwAchievement
-	local szTitle = achi.szName .. ' - ' .. achi.szDesc
+	local szKey = 'PetsWiki_' .. dwPetIndex
+	local szTitle = tPet.szName .. ' - ' .. LIB.XMLGetPureText(tPet.szDesc)
 	szKey = MY_Web.Open(szURL, {
 		key = szKey,
 		title = szTitle,
@@ -87,101 +87,110 @@ function D.Open(dwAchievement)
 	UI(MY_Web.GetFrame(szKey)):Size(D.OnWebSizeChange)
 end
 
-function D.OnAchieveItemMouseEnter()
-	if O.bEnable then
-		this:SetObjectMouseOver(true)
-		local x, y = this:GetAbsPos()
-		local w, h = this:GetSize()
-		local xml = {}
-		insert(xml, GetFormatText(_L['Click for achievement wiki'], 41))
-		if IsCtrlKeyDown() then
-			local h = this:GetParent()
-			local t = {}
-			for k, v in pairs(h) do
-				if k ~= '___id' and k ~= '___type' then
-					insert(t, k .. ': ' .. EncodeLUAData(v, '  '))
-				end
-			end
-			insert(xml, GetFormatText('\n\n' .. g_tStrings.DEBUG_INFO_ITEM_TIP .. '\n', 102))
-			insert(xml, GetFormatText(concat(t, '\n'), 102))
-		end
-		OutputTip(concat(xml), 300, { x, y, w, h })
-	end
-end
-
-function D.OnAchieveItemMouseLeave()
-	if O.bEnable then
-		this:SetObjectMouseOver(false)
-		HideTip()
-	end
-end
-
-function D.OnAchieveItemLButtonClick()
+function D.OnPetItemLButtonClick()
 	local name = this:GetName()
-	if name == 'Box_AchiBox' and O.bEnable then
-		D.Open(this:GetParent().dwAchievement)
+	if name == 'Handle_Prefer' then
+		if O.bEnable and this.tPet and not IsCtrlKeyDown() and not IsAltKeyDown() then
+			D.Open(this.tPet.dwPetIndex)
+			return
+		end
+	elseif name == 'Box_PetItem' or name:find('Box_MedalPet_') then
+		if O.bEnable and this.tPet and not IsCtrlKeyDown() and not IsAltKeyDown() and this:IsObjectSelected() then
+			D.Open(this.tPet.dwPetIndex)
+			return
+		end
 	end
+	return UI.FormatWMsgRet(false, true)
 end
 
-function D.OnAchieveAppendItem(res, hList)
+function D.OnPetAppendItem(res, hList)
 	local hItem = res[1]
 	if not hItem then
 		return
 	end
-	local boxAchi = hItem:Lookup('Box_AchiBox') or hItem:Lookup('Box_AchiBoxShort')
-	local txtName = hItem:Lookup('Text_AchiName')
-	local txtDescribe = hItem:Lookup('Text_AchiDescribe')
-	if not boxAchi or not txtName or not txtDescribe then
-		return
-	end
-	boxAchi:RegisterEvent(ITEM_EVENT.LBUTTONCLICK)
-	boxAchi:RegisterEvent(ITEM_EVENT.MOUSEENTERLEAVE)
-	UnhookTableFunc(boxAchi, 'OnItemMouseEnter', D.OnAchieveItemMouseEnter)
-	UnhookTableFunc(boxAchi, 'OnItemMouseLeave', D.OnAchieveItemMouseLeave)
-	UnhookTableFunc(boxAchi, 'OnItemLButtonClick', D.OnAchieveItemLButtonClick)
-	HookTableFunc(boxAchi, 'OnItemMouseEnter', D.OnAchieveItemMouseEnter)
-	HookTableFunc(boxAchi, 'OnItemMouseLeave', D.OnAchieveItemMouseLeave)
-	HookTableFunc(boxAchi, 'OnItemLButtonClick', D.OnAchieveItemLButtonClick)
+	local boxPet = hItem:Lookup('Box_PetItem')
+	boxPet:RegisterEvent(ITEM_EVENT.LBUTTONCLICK)
+	UnhookTableFunc(boxPet, 'OnItemLButtonClick', D.OnPetItemLButtonClick)
+	HookTableFunc(boxPet, 'OnItemLButtonClick', D.OnPetItemLButtonClick)
 end
 
-function D.HookAchieveHandle(h)
+function D.OnPetAppendList(res, hTotal)
+	local hGroup = res[1]
+	if not hGroup then
+		return
+	end
+	local hList = hGroup and hGroup:Lookup((hGroup:GetName():gsub('Handle_Pets', 'Handle_List')))
+	if not hList then
+		return
+	end
+	for i = 0, hList:GetItemCount() - 1 do
+		D.OnPetAppendItem({hList:Lookup(i)}, hList)
+	end
+	UnhookTableFunc(hList, 'AppendItemFromIni', D.OnPetAppendItem)
+	HookTableFunc(hList, 'AppendItemFromIni', D.OnPetAppendItem, { bAfterOrigin = true, bPassReturn = true, bHookReturn = true })
+end
+
+function D.HookPetHandle(h)
 	if not h then
 		return
 	end
 	for i = 0, h:GetItemCount() - 1 do
-		D.OnAchieveAppendItem({h:Lookup(i)}, h)
+		D.OnPetAppendList({h:Lookup(i)}, h)
 	end
-	HookTableFunc(h, 'AppendItemFromData', D.OnAchieveAppendItem, { bAfterOrigin = true, bPassReturn = true })
+	UnhookTableFunc(h, 'AppendItemFromIni', D.OnPetAppendList)
+	HookTableFunc(h, 'AppendItemFromIni', D.OnPetAppendList, { bAfterOrigin = true, bPassReturn = true, bHookReturn = true })
 end
 
-function D.HookAchieveFrame(frame)
-	D.HookAchieveHandle(frame:Lookup('PageSet_Achievement/Page_Achievement/WndScroll_AShow', ''))
-	D.HookAchieveHandle(frame:Lookup('PageSet_Achievement/Page_TopRecord/WndScroll_TRShow', ''))
-	D.HookAchieveHandle(frame:Lookup('PageSet_Achievement/Page_Summary/WndContainer_AchiPanel/PageSet_Achi/Page_Chi/PageSet_RecentAchi/Page_Scene', ''))
-	D.HookAchieveHandle(frame:Lookup('PageSet_Achievement/Page_Summary/WndContainer_AchiPanel/PageSet_Achi/Page_Chi/PageSet_RecentAchi/Page_AlmostFinish', ''))
+function D.HookPetFrame(frame)
+	local hMedalPets = frame:Lookup('PageSet_All/Page_MedalCollected/Wnd_MedalCollect', 'Handle_MedalPets')
+	if hMedalPets then
+		for nNum = 1, 10 do
+			local hMedal = hMedalPets:Lookup('Handle_MedalPet_' .. nNum)
+			if hMedal then
+				for nIndex = 1, nNum do
+					local boxPet = hMedal:Lookup('Box_MedalPet_' .. nNum .. '_' .. nIndex)
+					if boxPet then
+						boxPet:RegisterEvent(ITEM_EVENT.LBUTTONCLICK)
+						UnhookTableFunc(boxPet, 'OnItemLButtonClick', D.OnPetItemLButtonClick)
+						HookTableFunc(boxPet, 'OnItemLButtonClick', D.OnPetItemLButtonClick, { bAfterOrigin = true, bPassReturn = true, bHookReturn = true })
+					end
+				end
+			end
+		end
+	end
+	local hPreferList = frame:Lookup('PageSet_All/Page_MyPet/WndScroll_Pets/WndContainer_Pets/Wnd_Prefer', '')
+	if hPreferList then
+		for i = 0, hPreferList:GetItemCount() - 1 do
+			local hPet = hPreferList:Lookup(i)
+			hPet:RegisterEvent(ITEM_EVENT.LBUTTONCLICK)
+			UnhookTableFunc(hPet, 'OnItemLButtonClick', D.OnPetItemLButtonClick)
+			HookTableFunc(hPet, 'OnItemLButtonClick', D.OnPetItemLButtonClick, { bAfterOrigin = true, bPassReturn = true, bHookReturn = true })
+		end
+	end
+	D.HookPetHandle(frame:Lookup('PageSet_All/Page_MyPet/WndScroll_Pets/WndContainer_Pets/Wnd_Pets', ''))
 end
 
-LIB.RegisterInit('MY_AchievementWiki', function()
-	local frame = Station.Lookup('Normal/AchievementPanel')
+LIB.RegisterInit('MY_PetWiki', function()
+	local frame = Station.Lookup('Normal/NewPet')
 	if not frame then
 		return
 	end
-	D.HookAchieveFrame(frame)
+	D.HookPetFrame(frame)
 end)
 
-LIB.RegisterFrameCreate('AchievementPanel.MY_AchievementWiki', function(name, frame)
-	D.HookAchieveFrame(frame)
+LIB.RegisterFrameCreate('NewPet.MY_PetWiki', function(name, frame)
+	D.HookPetFrame(frame)
 end)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, w = 'auto',
-		text = _L['Achievement wiki'],
-		tip = _L['Click icon on achievemnt panel to view achievement wiki'],
+		text = _L['Pet wiki'],
+		tip = _L['Click icon on pet panel to view pet wiki'],
 		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
-		checked = MY_AchievementWiki.bEnable,
+		checked = MY_PetWiki.bEnable,
 		oncheck = function(bChecked)
-			MY_AchievementWiki.bEnable = bChecked
+			MY_PetWiki.bEnable = bChecked
 		end,
 	}):Width() + 5
 	return x, y
@@ -217,5 +226,5 @@ local settings = {
 		},
 	},
 }
-MY_AchievementWiki = LIB.GeneGlobalNS(settings)
+MY_PetWiki = LIB.GeneGlobalNS(settings)
 end
