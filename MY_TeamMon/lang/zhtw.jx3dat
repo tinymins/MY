@@ -264,6 +264,8 @@ return {
 	['Author: %s'] = '作者：%s',
 	['%s loaded %s'] = '[%s]載入了團隊監控數據：%s。',
 	['Sync team'] = '同步團隊',
+	['Add fav success, you can switch to fav page to see.'] = '數據收藏成功，前往收藏數據分頁即可查看。',
+	['Add fav'] = '加入收藏',
 	['Check update'] = '檢查更新',
 	['Refresh list'] = '刷新列表',
 	['Prev page'] = '上一頁',

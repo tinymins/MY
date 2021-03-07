@@ -843,6 +843,8 @@ function D.OnItemRButtonClick()
 	local name = this:GetName()
 	if name == 'Handle_Item' then
 		local wnd = this:GetParent()
+		local page = wnd:GetParent():GetParent():GetParent()
+		local bFav = page:GetName() == 'Page_Fav'
 		local t = {{
 			szOption = _L['Copy meta url'],
 			fnAction = function()
@@ -864,6 +866,15 @@ function D.OnItemRButtonClick()
 				D.ShareMetaInfoToRaid(wnd.info)
 			end,
 		})
+		if not bFav then
+			insert(t, {
+				szOption = _L['Add fav'],
+				fnAction = function()
+					D.AddFavMetaInfo(wnd.info)
+					LIB.Systopmsg(_L['Add fav success, you can switch to fav page to see.'])
+				end,
+			})
+		end
 		PopupMenu(t)
 	end
 end
