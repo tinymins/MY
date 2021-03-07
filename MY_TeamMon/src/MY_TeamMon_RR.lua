@@ -239,15 +239,19 @@ local function GetURL(szURL, szType)
 		return szUser
 	end
 end
+-- 将地址转化为 GIT 仓库浏览地址
 function GetRawURL(szURL)
 	return GetURL(szURL, 'RAW')
 end
+-- 将地址转化为 GIT 仓库源文件下载地址
 function GetBlobURL(szURL)
 	return GetURL(szURL, 'BLOB')
 end
+-- 将地址转化为短链接
 function GetShortURL(szURL)
 	return GetURL(szURL, 'SHORT')
 end
+-- 根据描述文件中的相对文件地址 计算绝对 GIT 仓库浏览地址
 function GetAttachRawURL(szAttach, szURL)
 	if not szAttach then
 		return
@@ -261,6 +265,7 @@ function GetAttachRawURL(szAttach, szURL)
 	end
 	return LIB.NormalizePath(LIB.ConcatPath(LIB.GetParentPath(szURL), szAttach))
 end
+-- 根据描述文件中的相对文件地址 计算绝对 GIT 仓库源文件下载地址
 function GetAttachBlobURL(szAttach, szURL)
 	if not szAttach then
 		return
