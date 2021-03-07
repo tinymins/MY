@@ -58,10 +58,12 @@ local O = {
 	szLastKey = '',
 	szLastSURL = '',
 	szLastVersion = '',
+	szLastSkipVersion = '',
 }
 RegisterCustomData('Global/MY_TeamMon_RR.szLastKey')
 RegisterCustomData('Global/MY_TeamMon_RR.szLastSURL')
 RegisterCustomData('Global/MY_TeamMon_RR.szLastVersion')
+RegisterCustomData('Global/MY_TeamMon_RR.szLastSkipVersion')
 
 local LANG = LIB.GetLang()
 local INI_PATH = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_RR.ini'
@@ -473,6 +475,7 @@ function D.LoadConfigureFile(szFile, info)
 		O.szLastKey = info.szKey
 		O.szLastSURL = GetShortURL(info.szURL)
 		O.szLastVersion = info.szVersion
+		O.szLastSkipVersion = nil
 		FireUIEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
 	end)
 end
@@ -842,7 +845,7 @@ end)
 LIB.RegisterInit('MY_TeamMon_RR', function()
 	if not IsEmpty(O.szLastSURL) then
 		D.DownloadMeta({ szURL = O.szLastSURL }, function(info)
-			if O.szLastVersion ~= info.szVersion then
+			if O.szLastVersion ~= info.szVersion and O.szLastSkipVersion ~= info.szVersion then
 				LIB.Confirm(
 					_L('New version found for TeamMon_RR\nSURL: %s\nName: %s\nTime: %s\n\nDo you want to update data now?',
 						GetShortURL(info.szURL) or ' - ',
@@ -853,7 +856,12 @@ LIB.RegisterInit('MY_TeamMon_RR', function()
 							FireUIEvent('MY_TM_RR_REPO_META_LIST_UPDATE')
 						end)
 						FireUIEvent('MY_TM_RR_REPO_META_LIST_UPDATE')
-					end)
+					end,
+					function()
+						O.szLastSkipVersion = info.szVersion
+					end,
+					_L['Update'],
+					_L['Skip current version'])
 			end
 		end)
 	end

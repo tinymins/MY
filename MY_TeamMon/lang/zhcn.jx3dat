@@ -238,6 +238,8 @@ return {
 	['ERR404: Meta address not found!'] = '错误404：订阅地址不存在！',
 	['Downloader is not ready!'] = '数据下载器未就绪！',
 	['New version found for TeamMon_RR\nSURL: %s\nName: %s\nTime: %s\n\nDo you want to update data now?'] = '团队监控数据订阅有更新\n短链：%s\n标题：%s\n时间：%s\n\n是否立即下载更新数据？',
+	['Update'] = '更新',
+	['Skip current version'] = '跳过此版本',
 	['Downloading in progress, please wait...'] = '数据下载正在进行中，请稍后...',
 	['Please unlock talk lock first.'] = '请先解除聊天锁。',
 	['Decode %s failed!'] = '解码[%s]失败！',
