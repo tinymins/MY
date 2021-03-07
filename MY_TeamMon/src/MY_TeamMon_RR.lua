@@ -569,9 +569,8 @@ function D.ShareMetaInfoToRaid(info, bSure)
 	LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TeamMon_RR', {'SYNC', info})
 end
 
-function D.AppendMetaInfoItem(container, p, pSel)
+function D.AppendMetaInfoItem(container, p, bSel)
 	local wnd = container:AppendContentFromIni(INI_PATH, 'Wnd_Item')
-	local bSel = pSel and p.szKey == pSel.szKey
 	wnd:Lookup('', 'Text_Item_Author'):SetText(LIB.ReplaceSensitiveWord(p.szAuthor))
 	wnd:Lookup('', 'Text_Item_Title'):SetText(LIB.ReplaceSensitiveWord(p.szTitle))
 	wnd:Lookup('', 'Text_Item_Download'):SetText(LIB.ReplaceSensitiveWord(p.szUpdateTime))
@@ -589,7 +588,6 @@ function D.AppendMetaInfoItem(container, p, pSel)
 	)
 	wnd:Lookup('Btn_Download'):Enable(not META_DOWNLOADING[p.szKey] and not DATA_DOWNLOADING[p.szKey])
 	wnd.info = p
-	return bSel
 end
 
 function D.UpdateRepoList(frame)
@@ -598,16 +596,18 @@ function D.UpdateRepoList(frame)
 	end
 	-- ÍÆ¼ö
 	local page = frame:Lookup('PageSet_Menu/Page_Repo')
-	local pSel, bSel = page.metaInfoSel, false
+	local szSel, bSel = page.szMetaInfoKeySel, false
 	local container = page:Lookup('WndScroll_Repo/WndContainer_Repo_List')
 	container:Clear()
 	for _, p in ipairs(REPO_META_LIST) do
-		if D.AppendMetaInfoItem(container, p, pSel) then
+		local bS = szSel and p.szKey == szSel
+		if bS then
 			bSel = true
 		end
+		D.AppendMetaInfoItem(container, p, bS)
 	end
 	if not bSel then
-		container:GetParent().metaInfoSel = nil
+		container:GetParent():GetParent().szMetaInfoKeySel = nil
 	end
 	container:FormatAllContentPos()
 	-- ÍÆ¼öÒ³Âë
@@ -623,16 +623,18 @@ function D.UpdateFavList(frame)
 	end
 	-- ÊÕ²Ø
 	local page = frame:Lookup('PageSet_Menu/Page_Fav')
-	local pSel, bSel = page.metaInfoSel, false
+	local szSel, bSel = page.szMetaInfoKeySel, false
 	local container = page:Lookup('WndScroll_Fav/WndContainer_Fav_List')
 	container:Clear()
 	for _, p in ipairs(D.LoadFavMetaInfoList()) do
-		if D.AppendMetaInfoItem(container, p, pSel) then
+		local bS = szSel and p.szKey == szSel
+		if bS then
 			bSel = true
 		end
+		D.AppendMetaInfoItem(container, p, bS)
 	end
 	if not bSel then
-		container:GetParent().metaInfoSel = nil
+		container:GetParent():GetParent().szMetaInfoKeySel = nil
 	end
 	container:FormatAllContentPos()
 end
@@ -650,6 +652,28 @@ function D.CheckPageInit(page)
 		D.FetchFavMetaInfoList()
 	end
 	p.bInit = true
+end
+
+function D.GetFavMetaInfoSel(frame)
+	local container = frame:Lookup('PageSet_Menu/Page_Fav/WndScroll_Fav/WndContainer_Fav_List')
+	local szMetaInfoKeySel = container:GetParent():GetParent().szMetaInfoKeySel
+	for i = 0, container:GetAllContentCount() - 1 do
+		local wnd = container:LookupContent(i)
+		if wnd.info.szKey == szMetaInfoKeySel then
+			return wnd.info
+		end
+	end
+end
+
+function D.GetRepoMetaInfoSel(frame)
+	local container = frame:Lookup('PageSet_Menu/Page_Repo/WndScroll_Repo/WndContainer_Repo_List')
+	local szMetaInfoKeySel = container:GetParent():GetParent().szMetaInfoKeySel
+	for i = 0, container:GetAllContentCount() - 1 do
+		local wnd = container:LookupContent(i)
+		if wnd.info.szKey == szMetaInfoKeySel then
+			return wnd.info
+		end
+	end
 end
 
 function D.OnFrameCreate()
@@ -750,7 +774,7 @@ function D.OnLButtonClick()
 		end)
 	elseif name == 'Btn_FavRemoveUrl' then
 		local page = this:GetParent()
-		local info = page.metaInfoSel
+		local info = D.GetFavMetaInfoSel(this:GetRoot())
 		if not info then
 			return MY.Topmsg(_L['Please select one dataset first!'])
 		end
@@ -764,8 +788,8 @@ function D.OnLButtonClick()
 					remove(aMetaInfo, i)
 				end
 			end
-			if page and page.metaInfoSel and page.metaInfoSel.szKey == info.szKey then
-				page.metaInfoSel = nil
+			if page and page.szMetaInfoKeySel == info.szKey then
+				page.szMetaInfoKeySel = nil
 			end
 			D.SaveFavMetaInfoList(aMetaInfo)
 			D.UpdateFavList(frame)
@@ -778,8 +802,14 @@ function D.OnLButtonClick()
 		UI.OpenTextEditor(concat(aMetaInfoURL, ';'))
 	elseif name == 'Btn_Info' then
 		LIB.OpenBrowser(this:GetParent().info.szAboutURL)
-	elseif name == 'Btn_FavSyncTeam' or name == 'Btn_RepoSyncTeam' then
-		local info = this:GetParent().metaInfoSel
+	elseif name == 'Btn_FavSyncTeam' then
+		local info = D.GetFavMetaInfoSel(this:GetRoot())
+		if not info then
+			return MY.Topmsg(_L['Please select one dataset first!'])
+		end
+		D.ShareMetaInfoToRaid(info)
+	elseif name == 'Btn_RepoSyncTeam' then
+		local info = D.GetRepoMetaInfoSel(this:GetRoot())
 		if not info then
 			return MY.Topmsg(_L['Please select one dataset first!'])
 		end
@@ -805,7 +835,7 @@ function D.OnItemLButtonClick()
 			wnd:Lookup('', 'Image_Item_Sel'):Hide()
 		end
 		wnd:Lookup('', 'Image_Item_Sel'):Show()
-		container:GetParent():GetParent().metaInfoSel = wnd.info
+		container:GetParent():GetParent().szMetaInfoKeySel = wnd.info.szKey
 	end
 end
 
