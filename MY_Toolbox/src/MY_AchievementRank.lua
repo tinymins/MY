@@ -96,7 +96,7 @@ LIB.RegisterEvent('SYS_MSG', function()
 		if KCaster and not IsPlayer(arg1) and KCaster.dwEmployer and KCaster.dwEmployer ~= 0 then -- 宠物的数据算在主人统计中
 			KCaster = LIB.GetObject(KCaster.dwEmployer)
 		end
-		if KCaster.dwID == UI_GetClientPlayerID() then
+		if KCaster and KCaster.dwID == UI_GetClientPlayerID() then
 			D.dwDamage = D.dwDamage + (arg9[SKILL_RESULT_TYPE.EFFECTIVE_DAMAGE] or 0)
 			D.dwTherapy = D.dwTherapy + (arg9[SKILL_RESULT_TYPE.EFFECTIVE_THERAPY] or 0)
 		end
