@@ -968,7 +968,7 @@ function D.OpenImportPanel(szDefault, szTitle, fnAction)
 						nil,
 						nil,
 						'FORBIDDEN',
-						5)
+						2)
 				end
 				LIB.Alert(_L('Import success: %s', szTitle or szMsg), fnAlert2, nil, fnAlert2)
 				ui:Remove()
