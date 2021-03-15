@@ -154,3 +154,27 @@ function LIB.NumberBitShr(n1, n2)
 	end
 	return LIB.Bitmap2Number(t1)
 end
+
+-- 格式化数字为指定进制下的字符串表示
+function LIB.NumberBaseN(n, b, digits)
+	n = floor(n)
+	if not b or b == 10 then
+		return tostring(n)
+	end
+	if not digits then
+		digits = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+	end
+	assert(b <= #digits, 'Number base can not be larger than digits length.')
+	local t = {}
+	local sign = ''
+	if n < 0 then
+		sign = '-'
+		n = -n
+	end
+	repeat
+		local d = (n % b) + 1
+		n = floor(n / b)
+		insert(t, 1, digits:sub(d, d))
+	until n == 0
+	return sign .. concat(t, '')
+end
