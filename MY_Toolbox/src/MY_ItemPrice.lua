@@ -1,7 +1,7 @@
 --------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
--- @desc     : 物品百科查询
+-- @desc     : 物品价格查询
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
@@ -55,12 +55,12 @@ end
 local D = {}
 local O = {
 	bEnable = false,
-	nW = 850,
-	nH = 610,
+	nW = 480,
+	nH = 640,
 }
-RegisterCustomData('MY_ItemWiki.bEnable')
-RegisterCustomData('MY_ItemWiki.nW')
-RegisterCustomData('MY_ItemWiki.nH')
+RegisterCustomData('MY_ItemPrice.bEnable')
+RegisterCustomData('MY_ItemPrice.nW')
+RegisterCustomData('MY_ItemPrice.nH')
 
 function D.OnWebSizeChange()
 	O.nW, O.nH = this:GetSize()
@@ -74,12 +74,19 @@ function D.Open(dwTabType, dwTabIndex, nBookID)
 	if not szName then
 		return
 	end
-	local szURL = 'https://page.j3cx.com/item/' .. concat({dwTabType, dwTabIndex, nBookID}, '/') .. '?'
+	local me = GetClientPlayer()
+	local line = LIB.GetHLLineInfo({ dwMapID = me.GetMapID(), nCopyIndex = me.GetScene().nCopyIndex })
+	local aPath = {dwTabType, dwTabIndex}
+	if nBookID then
+		insert(aPath, nBookID)
+	end
+	local szURL = 'https://page.j3cx.com/item/' .. concat(aPath, '/') .. '/price?'
 		.. LIB.EncodePostData(LIB.UrlEncode({
 			lang = AnsiToUTF8(LIB.GetLang()),
-			player = AnsiToUTF8(GetUserRoleName()),
+			server = AnsiToUTF8(line and line.szCenterName or LIB.GetRealServer(2)),
+			player = AnsiToUTF8(GetUserRoleName()), item = AnsiToUTF8(szName),
 		}))
-	local szKey = 'ItemWiki_' .. concat({dwTabType, dwTabIndex, nBookID}, '_')
+	local szKey = 'ItemPrice_' .. concat(aPath, '_')
 	local szTitle = szName
 	szKey = MY_Web.Open(szURL, {
 		key = szKey,
@@ -93,12 +100,12 @@ end
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, w = 'auto',
-		text = _L['Item wiki'],
-		checked = MY_ItemWiki.bEnable,
+		text = _L['Item price'],
+		checked = MY_ItemPrice.bEnable,
 		oncheck = function(bChecked)
-			MY_ItemWiki.bEnable = bChecked
+			MY_ItemPrice.bEnable = bChecked
 		end,
-		tip = _L['Hold SHIFT and r-click bag box to show item wiki'],
+		tip = _L['Hold SHIFT and r-click bag box to show item price'],
 		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 	}):Width() + 5
 	return x, y
@@ -134,7 +141,7 @@ local settings = {
 		},
 	},
 }
-MY_ItemWiki = LIB.GeneGlobalNS(settings)
+MY_ItemPrice = LIB.GeneGlobalNS(settings)
 end
 
 Box_AppendAddonMenu({function(box)
@@ -152,5 +159,112 @@ Box_AppendAddonMenu({function(box)
 	local dwTabType = item.dwTabType
 	local dwTabIndex = item.dwIndex
 	local nBookID = item.nGenre == ITEM_GENRE.BOOK and item.nBookID or -1
-	return {{ szOption = _L['Item wiki'], fnAction = function() D.Open(dwTabType, dwTabIndex, nBookID) end }}
+	local menu = {{ szOption = _L['Item wiki'], fnAction = function() D.Open(dwTabType, dwTabIndex, nBookID) end }}
+	if not item.bBind then
+		insert(menu, {
+			szOption = _L['Lookup price'],
+			fnAction = function() D.Open(dwTabType, dwTabIndex, nBookID) end,
+		})
+	elseif CONSTANT.FLOWERS_UIID[item.nUiId] then
+		insert(menu, {
+			szOption = _L['Lookup flower price'],
+			fnAction = function() D.Open(dwTabType, dwTabIndex, nBookID) end,
+		})
+	end
+	return menu
 end})
+
+local function GetItemKey(it)
+	if it.nGenre == ITEM_GENRE.BOOK then
+		return LIB.NumberBaseN(it.dwTabType, 32) .. '_'
+			.. LIB.NumberBaseN(it.dwIndex, 32) .. '_'
+			.. LIB.NumberBaseN(it.nBookID, 32)
+	end
+	return LIB.NumberBaseN(it.dwTabType, 32) .. '_' .. LIB.NumberBaseN(it.dwIndex, 32)
+end
+LIB.RegisterEvent('AUCTION_LOOKUP_RESPOND', function()
+	if not O.bEnable then
+		return
+	end
+	if arg0 == AUCTION_RESPOND_CODE.SUCCEED then
+		-- 获取数据
+		local AuctionClient = GetAuctionClient()
+		local nCount, aInfo = AuctionClient.GetLookupResult(arg1)
+		SaveLUAData('interface/a.jx3dat', {AuctionClient.GetLookupResult(arg1)}, {indent = '\t'})
+		local tItemPrice = {}
+		for _, info in ipairs(aInfo) do
+			local szKey = GetItemKey(info.Item)
+			local nPrice = GoldSilverAndCopperToMoney(info.BuyItNowPrice.nGold, info.BuyItNowPrice.nSilver, info.BuyItNowPrice.nCopper)
+			if not tItemPrice[szKey] then
+				tItemPrice[szKey] = {}
+			end
+			if not tItemPrice[szKey][nPrice] then
+				tItemPrice[szKey][nPrice] = 0
+			end
+			tItemPrice[szKey][nPrice] = tItemPrice[szKey][nPrice] + (info.Item.bCanStack and info.Item.nStackNum or 1)
+		end
+		local aData = {}
+		-- 重组数据
+		for szKey, tPrice in pairs(tItemPrice) do
+			local aPriceStat = {}
+			for nPrice, nCount in pairs(tPrice) do
+				insert(aPriceStat, {
+					nPrice = nPrice,
+					nCount = nCount,
+				})
+			end
+			-- 价格升序
+			sort(aPriceStat, function(a, b)
+				return a.nPrice < b.nPrice
+			end)
+			-- 价格序列化
+			local aPrice = {}
+			for i, v in ipairs(aPriceStat) do
+				-- 压缩数据长度，仅第一个为32进制价格，后面的为与前一个的价格差
+				if i == 1 then
+					aPrice[i] = LIB.NumberBaseN(v.nPrice, 32)
+				else
+					aPrice[i] = LIB.NumberBaseN(v.nPrice - aPriceStat[i - 1].nPrice, 32)
+				end
+				aPrice[i] = aPrice[i] .. '_' .. LIB.NumberBaseN(v.nCount, 32)
+			end
+			-- 压缩数据长度，因为很多人会一件售卖，所以差价实际是一样的，也就是等差数列，所以重复的等差使用简写（.nRepeat）
+			local nIndex, nRepeat = 2, 0
+			while nIndex < #aPrice do
+				nRepeat = 0
+				while aPrice[nIndex] == aPrice[nIndex + 1] do
+					nRepeat = nRepeat + 1
+					remove(aPrice, nIndex + 1)
+				end
+				if nRepeat > 0 then
+					aPrice[nIndex] = aPrice[nIndex] .. '.' .. nRepeat
+				end
+				nIndex = nIndex + 1
+			end
+			insert(aData, szKey .. '-' .. concat(aPrice, '-'))
+		end
+		local szData = concat(aData, ' ')
+		local szURL = 'https://push.j3cx.com/api/item/price?'
+			.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
+				l = AnsiToUTF8(LIB.GetLang()),
+				r = AnsiToUTF8(LIB.GetRealServer(1)), -- Region
+				s = AnsiToUTF8(LIB.GetRealServer(2)), -- Server
+				t = GetCurrentTime(), -- Time
+				d = AnsiToUTF8(szData), -- Price data
+			}, 'e87d2e0a-d3bd-4095-af48-e50dfe58f36b')))
+		-- 延迟一帧 否则系统还没更新界面数据
+		LIB.DelayCall(function()
+			-- 保证第一页
+			local txtPage = Station.Lookup('Normal/AuctionPanel/PageSet_Totle/Page_Business/Wnd_Result2', 'Text_Page')
+			if not txtPage or not txtPage:GetText():find('1-', nil, true) then
+				return
+			end
+			-- 保证一口价升序
+			local imgPriceUp = Station.Lookup('Normal/AuctionPanel/PageSet_Totle/Page_Business/Wnd_Result2/CheckBox_Price', 'Image_PriceNameUp')
+			if not imgPriceUp or not imgPriceUp:IsVisible() then
+				return
+			end
+			LIB.Ajax({ driver = 'auto', mode = 'auto', method = 'auto', url = szURL })
+		end)
+	end
+end)
