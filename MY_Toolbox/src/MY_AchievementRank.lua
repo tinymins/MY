@@ -169,6 +169,18 @@ function D.CheckUpdateAcquire()
 	end
 end
 
+function D.ShotAchievementAcquire()
+	local me = GetClientPlayer()
+	local aAcquired = {}
+	for i = 1, g_tTable.Achievement:GetRowCount() do
+		local achi = g_tTable.Achievement:GetRow(i)
+		if me.IsAchievementAcquired(achi.dwID) then
+			insert(aAcquired, achi.dwID)
+		end
+	end
+	LIB.SaveLUAData({'data/achievement_acquire_shot.jx3dat', PATH_TYPE.ROLE}, aAcquired, { crc = false, passphrase = false })
+end
+
 function D.UpdateMapBossAchieveAcquire()
 	if not BOSS_MAP_ACHIEVE_ACQUIRE then
 		LIB.Ajax({
@@ -274,7 +286,10 @@ LIB.RegisterEvent({
 		end
 	end
 	D.CheckUpdateAcquire()
+	-- D.ShotAchievementAcquire()
 end)
+
+LIB.RegisterExit('MY_AchievementRank', D.ShotAchievementAcquire)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	x = x + ui:Append('WndCheckBox', {
