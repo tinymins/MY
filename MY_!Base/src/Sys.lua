@@ -491,10 +491,10 @@ function GetLUADataPathPassphrase(szPath)
 	local bNew = false
 	if not CACHE[szDomain] or not CACHE[szDomain][szPath] then
 		local szFilePath = szDataRoot .. szDomain .. '/manifest.jx3dat'
-		CACHE[szDomain] = LoadLUAData(szFilePath, { passphrase = szPassphrase }) or {}
+		local tManifest = LoadLUAData(szFilePath, { passphrase = szPassphrase }) or {}
 		-- ¡Ÿ ±¥Û–°–¥ºÊ»›¬ﬂº≠
-		for szPath, v in pairs(CACHE[szDomain]) do
-			CACHE[szDomain][szPath] = nil
+		CACHE[szDomain] = {}
+		for szPath, v in pairs(tManifest) do
 			CACHE[szDomain][StringLowerW(szPath)] = v
 		end
 		if not CACHE[szDomain][szPath] then
