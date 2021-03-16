@@ -302,7 +302,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 		tip = _L['Share boss kill record for kill rank.'],
 		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
 	}):AutoWidth():Width() + 5
-	y = y + 20
+
 	return x, y
 end
 

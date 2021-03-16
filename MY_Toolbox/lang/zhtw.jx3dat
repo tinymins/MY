@@ -416,4 +416,24 @@ return {
     ['Dungeon Rank'] = '秘境百強榜',
 
     ['Today recomment posts'] = '今日推薦',
+
+    -- MY_JBEventVote.lua
+    ['MY_JBEventVote'] = '秘境百強榜',
+    ['ERR: Decode eventlist content as json failed!'] = '錯誤：解碼榜單列表失敗！',
+    ['ERR: Eventlist content is illegal!'] = '錯誤：榜單列表內容數據結構不符合約束！',
+    ['ERR404: Eventlist address not found!'] = '錯誤：榜單列表地址不存在！',
+    ['Team Name'] = '團隊名稱',
+    ['Server'] = '伺服器',
+    ['Leader'] = '團長',
+    ['Slogan'] = '宣言',
+    ['Vote Count'] = '人氣',
+    ['Vote'] = '投票',
+    ['ERR: Decode rankdata content as json failed!'] = '錯誤：解碼列表失敗！',
+    ['ERR: Rankdata content is illegal!'] = '錯誤：列表內容數據結構不符合約束！',
+    ['ERR404: Rankdata address not found!'] = '錯誤：列表地址不存在！',
+    ['Vote'] = '投票',
+    ['View Detail'] = '查看詳情',
+    ['ERR: Decode vote content as json failed!'] = '錯誤：解碼投票結果失敗！',
+    ['ERR: Vote content is illegal!'] = '錯誤：投票結果內容數據結構不符合約束！',
+    ['ERR404: Vote address not found!'] = '錯誤：投票結果地址不存在！',
 }

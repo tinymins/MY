@@ -256,10 +256,11 @@ function PS.OnPanelActive(wnd)
 	nY = nY + ui:Append('Text', { x = nX, y = nY, text = _L['Dungeon Rank'], font = 27 }):Height() + 2
 	nX = X + 10
 	nX, nY = MY_AchievementRank.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
+	nX, nY = MY_JBEventVote.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
 
 	-- ΩÒ»’Õ∆ºˆ
 	nX = X
-	nY = nY + 20
+	nY = nY + 40
 
 	D.FetchTodayRecommentPosts(function(data)
 		ui:Append('Text', { text = _L['Today recomment posts'], x = X, y = nY, font = 27 })
