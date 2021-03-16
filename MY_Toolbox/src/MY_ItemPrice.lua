@@ -256,7 +256,7 @@ LIB.RegisterEvent('AUCTION_LOOKUP_RESPOND', function()
 		LIB.DelayCall(function()
 			-- 保证第一页
 			local txtPage = Station.Lookup('Normal/AuctionPanel/PageSet_Totle/Page_Business/Wnd_Result2', 'Text_Page')
-			if not txtPage or not txtPage:GetText():find('1-', nil, true) then
+			if not txtPage or txtPage:GetText():find('1-', nil, true) ~= 1 then
 				return
 			end
 			-- 保证一口价升序
