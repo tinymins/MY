@@ -108,10 +108,15 @@ function D.OnPetAppendItem(res, hList)
 	if not hItem then
 		return
 	end
-	local boxPet = hItem:Lookup('Box_PetItem')
-	boxPet:RegisterEvent(ITEM_EVENT.LBUTTONCLICK)
-	UnhookTableFunc(boxPet, 'OnItemLButtonClick', D.OnPetItemLButtonClick)
-	HookTableFunc(boxPet, 'OnItemLButtonClick', D.OnPetItemLButtonClick)
+	LIB.DelayCall(function()
+		local boxPet = hItem:IsValid() and hItem:Lookup('Box_PetItem')
+		if not boxPet then
+			return
+		end
+		boxPet:RegisterEvent(ITEM_EVENT.LBUTTONCLICK)
+		UnhookTableFunc(boxPet, 'OnItemLButtonClick', D.OnPetItemLButtonClick)
+		HookTableFunc(boxPet, 'OnItemLButtonClick', D.OnPetItemLButtonClick)
+	end)
 end
 
 function D.OnPetAppendList(res, hTotal)
@@ -127,7 +132,7 @@ function D.OnPetAppendList(res, hTotal)
 		D.OnPetAppendItem({hList:Lookup(i)}, hList)
 	end
 	UnhookTableFunc(hList, 'AppendItemFromIni', D.OnPetAppendItem)
-	HookTableFunc(hList, 'AppendItemFromIni', D.OnPetAppendItem, { bAfterOrigin = true, bPassReturn = true, bHookReturn = true })
+	HookTableFunc(hList, 'AppendItemFromIni', D.OnPetAppendItem, { bAfterOrigin = true, bPassReturn = true })
 end
 
 function D.HookPetHandle(h)
@@ -138,7 +143,7 @@ function D.HookPetHandle(h)
 		D.OnPetAppendList({h:Lookup(i)}, h)
 	end
 	UnhookTableFunc(h, 'AppendItemFromIni', D.OnPetAppendList)
-	HookTableFunc(h, 'AppendItemFromIni', D.OnPetAppendList, { bAfterOrigin = true, bPassReturn = true, bHookReturn = true })
+	HookTableFunc(h, 'AppendItemFromIni', D.OnPetAppendList, { bAfterOrigin = true, bPassReturn = true })
 end
 
 function D.HookPetFrame(frame)
