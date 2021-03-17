@@ -93,10 +93,6 @@ function D.FetchEventList(frame)
 			}, '84cf7ba4-7fbb-4d59-9eb2-9b0ce89494ed'))),
 		charset = 'utf8',
 		success = function(szHTML)
-			szHTML = '{"code":0,"msg":"活动列表","data":[\
-			{"id": "1","name": "活动名称，可用于显示","achieve_ids": "8548,8549..  一段以半角逗号分隔的成就ID字符串"},\
-			{"id": "2","name": "活动名称2","achieve_ids": "8548,8549..  一段以半角逗号分隔的成就ID字符串"}\
-			]}'
 			local res, err = LIB.JsonDecode(szHTML)
 			if not res then
 				LIB.Alert(_L['ERR: Decode eventlist content as json failed!'] ..err)
@@ -141,6 +137,7 @@ function D.UpdateEventList(frame, aEventList)
 		page:Lookup('Wnd_Event/WndScroll_Event', 'Handle_EventColumns/Handle_EventColumn_Leader/Handle_EventColumn_Leader_Title/Text_EventColumn_Leader_Title'):SetText(_L['Leader'])
 		page:Lookup('Wnd_Event/WndScroll_Event', 'Handle_EventColumns/Handle_EventColumn_Slogan/Handle_EventColumn_Slogan_Title/Text_EventColumn_Slogan_Title'):SetText(_L['Slogan'])
 		page:Lookup('Wnd_Event/WndScroll_Event', 'Handle_EventColumns/Handle_EventColumn_Count/Handle_EventColumn_Count_Title/Text_EventColumn_Count_Title'):SetText(_L['Vote Count'])
+		page:Lookup('Wnd_Event/WndScroll_Event/WndContainer_List'):Clear()
 		checkbox:ChangeRelation(pageset, true, true)
 		page:ChangeRelation(pageset, true, true)
 		Wnd.CloseWindow(frameMod)
@@ -168,31 +165,6 @@ function D.FetchRankList(frame, szEventID)
 			}, '84cf7ba4-7fbb-4d59-9eb2-9b0ce89494ed'))),
 		charset = 'utf8',
 		success = function(szHTML)
-			szHTML = '{"code":0,"msg":"活动列表","data":[\
-			{\
-				"event_id": "1",\
-				"team_id": "1",\
-				"count": 100,\
-				"name": "Schema.String",\
-				"server": "Schema.String",\
-				"leader_name": "Schema.String",\
-				"slogan": "Schema.String",\
-				"link": "https://jx3box.com/1",\
-				"checked": 0\
-				},\
-			{\
-				"event_id": "1",\
-				"team_id": "2",\
-				"count": 100,\
-				"name": "Schema.String",\
-				"server": "Schema.String",\
-				"leader_name": "Schema.String",\
-				"slogan": "Schema.String",\
-				"link": "https://jx3box.com/2",\
-				"checked": 0\
-				}\
-				]\
-			}'
 			local res, err = LIB.JsonDecode(szHTML)
 			if not res then
 				LIB.Alert(_L['ERR: Decode rankdata content as json failed!'] ..err)
@@ -258,10 +230,6 @@ function D.Vote(frame, szEventID, szTeamID)
 			}, '84cf7ba4-7fbb-4d59-9eb2-9b0ce89494ed'))),
 		charset = 'utf8',
 		success = function(szHTML)
-			szHTML = '{"code":0,"msg":"成功","data":{\
-				"count": 100\
-				}\
-			}'
 			local res, err = LIB.JsonDecode(szHTML)
 			if not res then
 				LIB.Alert(_L['ERR: Decode vote content as json failed!'] ..err)
