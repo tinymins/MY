@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import codecs, os, re, luadata
+import codecs, os, re, requests, luadata
 
 # https://raw.githubusercontent.com/mozillazg/pinyin-data/master/pinyin.txt
 
@@ -50,6 +50,11 @@ def __remove_pinyin_tone(s):
 		s = s.replace(k, TONG_MAP[k])
 	return s
 
+def __update_pinyin(file):
+	url = 'https://raw.githubusercontent.com/mozillazg/pinyin-data/master/pinyin.txt'
+	r = requests.get(url, allow_redirects=True)
+	open(file, 'wb').write(r.content)
+
 def __load_pinyin(src_file):
 	pinyin = {}
 	for _, line in enumerate(codecs.open(src_file,'r',encoding='utf8')):
@@ -70,10 +75,11 @@ def __load_pinyin(src_file):
 	return pinyin
 
 def __save_pinyin(dst_file, pinyin):
-	luadata.write(pinyin, dst_file, encoding='gbk')
+	luadata.write(dst_file, pinyin, encoding='gbk')
 
 if __name__ == '__main__':
 	src_file = os.path.abspath(os.path.join(__file__, '..', 'pinyin.txt'))
+	__update_pinyin(src_file)
 	pinyin = __load_pinyin(src_file)
 	dst_file = os.path.abspath(os.path.join(__file__, '..', '..', '..', '..', 'MY_!Base/data/pinyin/zhcn.jx3dat'))
 	__save_pinyin(dst_file, pinyin)
