@@ -159,7 +159,7 @@ function PS.OnPanelActive(wnd)
 	local W, H = ui:Size()
 
 	-- ╫ги╚хож╓
-	local uiCCStatus, uiBtnCCStatus
+	local uiCCStatus, uiBtnCCStatus, uiBtnCCLink
 	local function UpdateUI()
 		if O.pending then
 			uiCCStatus:Text(_L['Loading'])
@@ -177,6 +177,7 @@ function PS.OnPanelActive(wnd)
 		uiCCStatus:AutoWidth()
 		uiBtnCCStatus:Enable(not O.pending)
 		uiBtnCCStatus:Left(uiCCStatus:Left() + uiCCStatus:Width() + 20)
+		uiBtnCCLink:Left(uiBtnCCStatus:Left() + uiBtnCCStatus:Width() + 10)
 	end
 
 	nY = nY + ui:Append('Text', { x = nX, y = nY, text = _L['Character Certification'], font = 27 }):Height() + 2
@@ -220,6 +221,14 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	nX = nX + uiBtnCCStatus:Width()
+	uiBtnCCLink = ui:Append('WndButton', {
+		x = nX, y = nY + 2, w = 120,
+		buttonstyle = 2, text = _L['Login team platform'],
+		onclick = function()
+			LIB.OpenBrowser('https://page.j3cx.com/jx3box/team')
+		end,
+	})
+	nX = nX + uiBtnCCLink:Width()
 	nX = X
 	nY = nY + 20
 
