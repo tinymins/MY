@@ -61,13 +61,19 @@ local O = {
 }
 RegisterCustomData('MY_JBAchievementRank.bEnable')
 
-local BOSS_MAP_ACHIEVE_ACQUIRE = LIB.LoadLUAData({'temporary/fbk-achieves.jx3dat', PATH_TYPE.GLOBAL}) -- 地图对应的上报成就表（远程）
+local BOSS_MAP_ACHIEVE_ACQUIRE = LIB.LoadLUAData({'temporary/achievement_rank.jx3dat', PATH_TYPE.GLOBAL}) -- 地图对应的上报成就表（远程）
 local BOSS_ACHIEVE_ACQUIRE_LOG = {} -- 等待上传的首领击杀信息
 local BOSS_ACHIEVE_ACQUIRE_STATE = {} -- 当前地图首领击杀状态
-local DATA_FILE = {'data/boss_achieve_acquire.jx3dat', PATH_TYPE.ROLE}
+local DATA_FILE_OLD = {'data/boss_achieve_acquire.jx3dat', PATH_TYPE.ROLE}
+local DATA_FILE = {'userdata/achievement_rank_acquire.jx3dat', PATH_TYPE.ROLE}
 
 function D.LoadData()
-	BOSS_ACHIEVE_ACQUIRE_LOG = LIB.LoadLUAData(DATA_FILE) or {}
+	local szPathOld = LIB.FormatPath(DATA_FILE_OLD)
+	local szPath = LIB.FormatPath(DATA_FILE)
+	if IsLocalFileExist(szPathOld) then
+		CPath.Move(szPathOld, szPath)
+	end
+	BOSS_ACHIEVE_ACQUIRE_LOG = LIB.LoadLUAData(szPath) or {}
 end
 LIB.RegisterInit('MY_JBAchievementRank', D.LoadData)
 
@@ -178,7 +184,7 @@ function D.ShotAchievementAcquire()
 			insert(aAcquired, achi.dwID)
 		end
 	end
-	LIB.SaveLUAData({'data/achievement_acquire_shot.jx3dat', PATH_TYPE.ROLE}, aAcquired, { crc = false, passphrase = false })
+	LIB.SaveLUAData({'userdata/achievement_acquire_shot.jx3dat', PATH_TYPE.ROLE}, aAcquired, { crc = false, passphrase = false })
 end
 
 function D.UpdateMapBossAchieveAcquire()
