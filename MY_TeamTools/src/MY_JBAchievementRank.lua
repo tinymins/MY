@@ -42,10 +42,10 @@ local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCal
 local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
 local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
 -------------------------------------------------------------------------------------------------------
-local PLUGIN_NAME = 'MY_Toolbox'
+local PLUGIN_NAME = 'MY_TeamTools'
 local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
-local MODULE_NAME = 'MY_Toolbox'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/achievement-rank/')
+local MODULE_NAME = 'MY_TeamTools'
+local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/jx3box/')
 --------------------------------------------------------------------------
 if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^3.0.8') then
 	return
@@ -59,7 +59,7 @@ local D = {
 local O = {
 	bEnable = false,
 }
-RegisterCustomData('MY_AchievementRank.bEnable')
+RegisterCustomData('MY_JBAchievementRank.bEnable')
 
 local BOSS_MAP_ACHIEVE_ACQUIRE = LIB.LoadLUAData({'temporary/fbk-achieves.jx3dat', PATH_TYPE.GLOBAL}) -- 地图对应的上报成就表（远程）
 local BOSS_ACHIEVE_ACQUIRE_LOG = {} -- 等待上传的首领击杀信息
@@ -69,7 +69,7 @@ local DATA_FILE = {'data/boss_achieve_acquire.jx3dat', PATH_TYPE.ROLE}
 function D.LoadData()
 	BOSS_ACHIEVE_ACQUIRE_LOG = LIB.LoadLUAData(DATA_FILE) or {}
 end
-LIB.RegisterInit('MY_AchievementRank', D.LoadData)
+LIB.RegisterInit('MY_JBAchievementRank', D.LoadData)
 
 function D.SaveData()
 	local aAchieveAcquireLog = Clone(BOSS_ACHIEVE_ACQUIRE_LOG)
@@ -78,7 +78,7 @@ function D.SaveData()
 	end
 	LIB.SaveLUAData(DATA_FILE, aAchieveAcquireLog)
 end
-LIB.RegisterFlush('MY_AchievementRank', D.SaveData)
+LIB.RegisterFlush('MY_JBAchievementRank', D.SaveData)
 
 LIB.RegisterEvent('MY_FIGHT_HINT', function()
 	if arg0 then
@@ -235,13 +235,13 @@ function D.UpdateMapBossAchieveAcquire()
 	--[[#DEBUG END]]
 	BOSS_ACHIEVE_ACQUIRE_STATE = tBossAchieveAcquireState
 end
-LIB.RegisterEvent('LOADING_ENDING.MY_AchievementRank', D.UpdateMapBossAchieveAcquire)
+LIB.RegisterEvent('LOADING_ENDING.MY_JBAchievementRank', D.UpdateMapBossAchieveAcquire)
 
 LIB.RegisterEvent({
-	'NEW_ACHIEVEMENT.MY_AchievementRank',
-	'SYNC_ACHIEVEMENT_DATA.MY_AchievementRank',
-	'UPDATE_ACHIEVEMENT_POINT.MY_AchievementRank',
-	'UPDATE_ACHIEVEMENT_COUNT.MY_AchievementRank',
+	'NEW_ACHIEVEMENT.MY_JBAchievementRank',
+	'SYNC_ACHIEVEMENT_DATA.MY_JBAchievementRank',
+	'UPDATE_ACHIEVEMENT_POINT.MY_JBAchievementRank',
+	'UPDATE_ACHIEVEMENT_COUNT.MY_JBAchievementRank',
 }, function()
 	local me = GetClientPlayer()
 	for dwAchieveID, bAcquired in pairs(BOSS_ACHIEVE_ACQUIRE_STATE) do
@@ -289,15 +289,15 @@ LIB.RegisterEvent({
 	-- D.ShotAchievementAcquire()
 end)
 
-LIB.RegisterExit('MY_AchievementRank', D.ShotAchievementAcquire)
+LIB.RegisterExit('MY_JBAchievementRank', D.ShotAchievementAcquire)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y,
-		checked = MY_AchievementRank.bEnable,
+		checked = MY_JBAchievementRank.bEnable,
 		text = _L['Share boss kill'],
 		oncheck = function(bChecked)
-			MY_AchievementRank.bEnable = bChecked
+			MY_JBAchievementRank.bEnable = bChecked
 		end,
 		tip = _L['Share boss kill record for kill rank.'],
 		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
@@ -338,5 +338,5 @@ local settings = {
 		},
 	},
 }
-MY_AchievementRank = LIB.GeneGlobalNS(settings)
+MY_JBAchievementRank = LIB.GeneGlobalNS(settings)
 end

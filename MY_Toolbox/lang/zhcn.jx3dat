@@ -392,48 +392,4 @@ return {
     ['Please input macro name first.'] = '请先输入宏名称。',
 
     ['MY_RoleStatistics'] = '角色统计',
-
-    -- MY_JBBind.lua
-    ['MY_JBBind'] = '魔盒认证',
-    ['Character Certification'] = '角色认证',
-    ['Current character: %s'] = '当前角色：%s',
-    ['Status: '] = '状态：',
-    ['Loading'] = '加载中…',
-    ['Unknown'] = '未知',
-    ['Click fetch'] = '点击获取',
-    ['Not bind'] = '未绑定',
-    ['You are crossing server, please do this after backing.'] = '当前处于跨服状态，请在结束跨服后再试。',
-    ['Request failed.'] = '请求失败',
-    ['Click bind'] = '点击绑定',
-    ['Binded (ID: %s)'] = '已绑定（ID：%s）',
-    ['Click unbind'] = '点击解绑',
-    ['Please input certification code:'] = '请输入“角色认证”验证码：',
-    ['Bind succeed!'] = '恭喜您！角色绑定成功！',
-    ['Unbind succeed!'] = '角色认证解除成功！',
-    ['Please unlock equip lock first!'] = '请先解除玲珑密保锁！',
-    ['Sure to unbind character certification?'] = '确认要解除当前“角色认证”吗？',
-
-    ['Dungeon Rank'] = '秘境百强榜',
-
-    ['Today recomment posts'] = '今日推荐',
-
-    -- MY_JBEventVote.lua
-    ['MY_JBEventVote'] = '秘境百强榜',
-    ['ERR: Decode eventlist content as json failed!'] = '错误：解码榜单列表失败！',
-    ['ERR: Eventlist content is illegal!'] = '错误：榜单列表内容数据结构不符合约束！',
-    ['ERR404: Eventlist address not found!'] = '错误：榜单列表地址不存在！',
-    ['Team Name'] = '团队名称',
-    ['Server'] = '服务器',
-    ['Leader'] = '团长',
-    ['Slogan'] = '宣言',
-    ['Vote Count'] = '人气',
-    ['Vote'] = '投票',
-    ['ERR: Decode rankdata content as json failed!'] = '错误：解码列表失败！',
-    ['ERR: Rankdata content is illegal!'] = '错误：列表内容数据结构不符合约束！',
-    ['ERR404: Rankdata address not found!'] = '错误：列表地址不存在！',
-    ['Vote'] = '投票',
-    ['View Detail'] = '查看详情',
-    ['ERR: Decode vote content as json failed!'] = '错误：解码投票结果失败！',
-    ['ERR: Vote content is illegal!'] = '错误：投票结果内容数据结构不符合约束！',
-    ['ERR404: Vote address not found!'] = '错误：投票结果地址不存在！',
 }

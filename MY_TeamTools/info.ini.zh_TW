@@ -20,3 +20,6 @@ lua_11=src/MY_SocialRequest.lua
 lua_12=src/MY_WorldMark.lua
 lua_13=src/MY_TeamRestore.lua
 lua_14=src/MY_TeamTools.PS.lua
+lua_15=src/MY_JBEventVote.lua
+lua_16=src/MY_JBAchievementRank.lua
+lua_17=src/MY_JBBind.lua

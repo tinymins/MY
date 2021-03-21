@@ -42,10 +42,10 @@ local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCal
 local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
 local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
 -------------------------------------------------------------------------------------------------------
-local PLUGIN_NAME = 'MY_Toolbox'
+local PLUGIN_NAME = 'MY_TeamTools'
 local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_JBBind'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/jx3box/')
 --------------------------------------------------------------------------
 if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^3.0.1') then
 	return
@@ -231,7 +231,7 @@ function PS.OnPanelActive(wnd)
 	nY = nY + 20
 	nY = nY + ui:Append('Text', { x = nX, y = nY, text = _L['Dungeon Rank'], font = 27 }):Height() + 2
 	nX = X + 10
-	nX, nY = MY_AchievementRank.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
+	nX, nY = MY_JBAchievementRank.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
 	nX, nY = MY_JBEventVote.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
 end
-LIB.RegisterPanel(_L['System'], 'MY_JBBind', _L['MY_JBBind'], 5962, PS)
+LIB.RegisterPanel(_L['Raid'], 'MY_JX3BOX', _L['Team Platform'], 5962, PS)
