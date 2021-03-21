@@ -148,30 +148,6 @@ function D.Unbind(resolve, reject)
 	})
 end
 
-function D.FetchTodayRecommentPosts(resolve, reject)
-	local szURL = 'https://pull.j3cx.com/api/today/recomment/posts?'
-		.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
-			lang = AnsiToUTF8(LIB.GetLang()),
-			server = AnsiToUTF8(LIB.GetRealServer(2)),
-		}, '60d2806b-9e5f-4853-8f84-575fe5521a7f')))
-	LIB.Ajax({
-		driver = 'auto', mode = 'auto', method = 'auto',
-		url = szURL,
-		charset = 'utf8',
-		success = function(szHTML)
-			local res = LIB.JsonDecode(szHTML)
-			if Get(res, {'code'}) == 0 then
-				SafeCall(resolve, res.data)
-			else
-				SafeCall(reject)
-			end
-		end,
-		error = function()
-			SafeCall(reject)
-		end,
-	})
-end
-
 local PS = {
 	-- nPriority = 0,
 	-- bWelcome = true,
@@ -257,27 +233,5 @@ function PS.OnPanelActive(wnd)
 	nX = X + 10
 	nX, nY = MY_AchievementRank.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
 	nX, nY = MY_JBEventVote.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
-
-	-- ΩÒ»’Õ∆ºˆ
-	nX = X
-	nY = nY + 40
-
-	D.FetchTodayRecommentPosts(function(data)
-		ui:Append('Text', { text = _L['Today recomment posts'], x = X, y = nY, font = 27 })
-		nX = X + 10
-		nY = nY + 35
-
-		-- [{"url":"https://www.jx3box.com/bbs/?pid=8104#/","title":""}]
-		for _, post in ipairs(data) do
-			nY = nY + ui:Append('Text', {
-				x = nX, y = nY, w = W - nX * 2,
-				r = 255, g = 255, b = 255,
-				text = LIB.ReplaceSensitiveWord(post.title),
-				onclick = function()
-					LIB.OpenBrowser(post.url)
-				end,
-			}):AutoHeight():Height() + 5
-		end
-	end)
 end
 LIB.RegisterPanel(_L['System'], 'MY_JBBind', _L['MY_JBBind'], 5962, PS)
