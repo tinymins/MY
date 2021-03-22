@@ -57,7 +57,7 @@ local FONT_DIR = PACKET_INFO.ROOT:gsub('%./', '/') .. 'MY_FontResource/font/'
 local FONT_LIST = LIB.LoadLUAData(FONT_DIR .. '{$lang}.jx3dat') or {}
 
 function D.GetList()
-	local aList, tExist, szLang = {}, {}, LIB.GetLang()
+	local aList, tExist, szLang = {}, {}, LIB.GetGameLanguage()
 	for _, p in ipairs(Font.GetFontPathList() or {}) do
 		local szFile = p.szFile:gsub('/', '\\')
 		local szKey = szFile:lower()

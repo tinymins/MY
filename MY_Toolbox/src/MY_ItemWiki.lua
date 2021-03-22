@@ -76,7 +76,8 @@ function D.Open(dwTabType, dwTabIndex, nBookID)
 	end
 	local szURL = 'https://page.j3cx.com/item/' .. concat({dwTabType, dwTabIndex, nBookID}, '/') .. '?'
 		.. LIB.EncodePostData(LIB.UrlEncode({
-			lang = AnsiToUTF8(LIB.GetLang()),
+			l = AnsiToUTF8(LIB.GetGameLanguage()),
+			L = AnsiToUTF8(LIB.GetGameEdition()),
 			player = AnsiToUTF8(GetUserRoleName()),
 		}))
 	local szKey = 'ItemWiki_' .. concat({dwTabType, dwTabIndex, nBookID}, '_')

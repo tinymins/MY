@@ -73,7 +73,8 @@ function D.Open(dwAchievement)
 	end
 	local szURL = 'https://page.j3cx.com/wiki/' .. dwAchievement .. '?'
 		.. LIB.EncodePostData(LIB.UrlEncode({
-			lang = AnsiToUTF8(LIB.GetLang()),
+			l = AnsiToUTF8(LIB.GetGameLanguage()),
+			L = AnsiToUTF8(LIB.GetGameEdition()),
 			player = AnsiToUTF8(GetUserRoleName()),
 		}))
 	local szKey = 'AchievementWiki_' .. dwAchievement

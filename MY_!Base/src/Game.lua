@@ -835,7 +835,7 @@ local function GenerateList(bForceRefresh)
 			end
 		end
 		LIB.SaveLUAData(CACHE_PATH, BOSS_LIST)
-		LIB.Sysmsg(_L('Boss list updated to v%s.', select(2, GetVersion())))
+		LIB.Sysmsg(_L('Boss list updated to v%s.', LIB.GetGameVersion()))
 	end
 
 	for dwMapID, tInfo in pairs(LIB.LoadLUAData(PACKET_INFO.FRAMEWORK_ROOT .. 'data/bosslist/{$lang}.jx3dat') or {}) do
@@ -936,7 +936,7 @@ local function GenerateList(bForceRefresh)
 	if bForceRefresh or not INPC_LIST then
 		INPC_LIST = {}
 		LIB.SaveLUAData(CACHE_PATH, INPC_LIST)
-		LIB.Sysmsg(_L('Important-NPC list updated to v%s.', select(2, GetVersion())))
+		LIB.Sysmsg(_L('Important-NPC list updated to v%s.', LIB.GetGameVersion()))
 	end
 	for dwMapID, tInfo in pairs(LIB.LoadLUAData(PACKET_INFO.FRAMEWORK_ROOT .. 'data/inpclist/{$lang}.jx3dat') or {}) do
 		if not INPC_LIST[dwMapID] then

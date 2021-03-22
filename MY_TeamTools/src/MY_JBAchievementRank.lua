@@ -117,7 +117,8 @@ function D.ShareBKR(p, bOnymous, onfulfilled, oncomplete)
 	local szClientGUIDU = AnsiToUTF8(p.szClientGUID)
 	local szURL = 'https://push.j3cx.com/api/achievement-rank/uploads?'
 		.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
-			lang = AnsiToUTF8(LIB.GetLang()),
+			l = AnsiToUTF8(LIB.GetGameLanguage()),
+			L = AnsiToUTF8(LIB.GetGameEdition()),
 			server = szServerU,
 			name = szNameU,
 			leader = szLeaderU,
@@ -192,7 +193,8 @@ function D.UpdateMapBossAchieveAcquire()
 		LIB.Ajax({
 			driver = 'auto', mode = 'auto', method = 'auto',
 			url = 'https://cdn.j3cx.com/config/achievement-rank.json'
-				.. '?lang=' .. LIB.GetLang()
+				.. '?l=' .. LIB.GetGameLanguage()
+				.. '&L=' .. LIB.GetGameEdition()
 				.. '&_=' .. GetCurrentTime(),
 			success = function(html, status)
 				local data = LIB.JsonDecode(html)

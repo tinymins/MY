@@ -74,7 +74,7 @@ local function getHeader()
 	local szHeader = [[<!DOCTYPE html>
 <html>
 <head><meta http-equiv='Content-Type' content='text/html; charset=]]
-	.. ((LIB.GetLang() == 'zhcn' and 'GBK') or 'UTF-8') .. [[' />
+	.. ((LIB.GetGameLanguage() == 'zhcn' and 'GBK') or 'UTF-8') .. [[' />
 <style>
 *{font-size: 12px}
 a{line-height: 16px}

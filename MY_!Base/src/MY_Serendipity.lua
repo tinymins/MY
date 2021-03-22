@@ -94,7 +94,8 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTi
 	local bSelf = szName == LIB.GetClientInfo().szName
 	local szNameU = AnsiToUTF8(szName)
 	local szNameCRC = ('%x%x%x'):format(szNameU:byte(), GetStringCRC(szNameU), szNameU:byte(-1))
-	local szLang = LIB.GetLang()
+	local szLang = LIB.GetGameLanguage()
+	local szEdition = LIB.GetGameEdition()
 	local nCount = bSelf and 0 or 1
 	local function fnAction(szReporter)
 		if szReporter == '' and nMethod ~= 1 then
@@ -115,7 +116,7 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTi
 				})) })
 			LIB.EnsureAjax({ url = 'https://push.j3cx.com/api/serendipity/uploads?'
 				.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
-					l = szLang,
+					l = szLang, L = szEdition,
 					S = szRegionU, s = szServerU, a = szSerendipityU,
 					n = szNameU, N = szNameCRC, R = szReporterU,
 					f = nStatus, t = dwTime, c = nCount, m = nMethod,

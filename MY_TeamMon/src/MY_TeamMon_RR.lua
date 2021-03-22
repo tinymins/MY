@@ -63,7 +63,7 @@ RegisterCustomData('Global/MY_TeamMon_RR.szLastURL')
 RegisterCustomData('Global/MY_TeamMon_RR.szLastVersion')
 RegisterCustomData('Global/MY_TeamMon_RR.szLastSkipVersion')
 
-local LANG = LIB.GetLang()
+local EDITION = LIB.GetGameEdition()
 local INI_PATH = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_RR.ini'
 local MY_TM_META_ROOT = MY_TeamMon.MY_TM_META_ROOT
 local MY_TM_DATA_ROOT = MY_TeamMon.MY_TM_DATA_ROOT
@@ -143,7 +143,7 @@ local PROVIDER_PARAMS = {
 local DEFAULT_PROVIDER = 'jx3box'
 local DEFAULT_PROJECT = 'JX3_MY_DATA'
 local DEFAULT_BRANCH = 'master'
-local DEFAULT_PATH = 'MY_TeamMon/' .. LANG .. '/meta.json'
+local DEFAULT_PATH = 'MY_TeamMon/' .. EDITION .. '/meta.json'
 local function GetURL(szURL, szType)
 	local szSimple, szUser, szProvider, szProject, szBranch, szPath, nPos
 	if wfind(szURL, '://') then
@@ -468,7 +468,8 @@ function D.FetchRepoMetaInfoList(nPage)
 		driver = 'auto', mode = 'auto', method = 'auto',
 		url = 'https://pull.j3cx.com/api/dbm/subscribe/all?'
 			.. LIB.EncodePostData(LIB.UrlEncode({
-				lang = AnsiToUTF8(LIB.GetLang()),
+				l = AnsiToUTF8(LIB.GetGameLanguage()),
+				L = AnsiToUTF8(LIB.GetGameEdition()),
 				page = nPage or REPO_META_PAGE.nIndex,
 				pageSize = 15,
 			})),

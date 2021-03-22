@@ -61,8 +61,9 @@ function D.FetchBindStatus(resolve, reject)
 	if IsNil(O.uid) then
 		local szURL = 'https://pull.j3cx.com/role/query?'
 			.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
+				l = AnsiToUTF8(LIB.GetGameLanguage()),
+				L = AnsiToUTF8(LIB.GetGameEdition()),
 				jx3id = AnsiToUTF8(LIB.GetClientUUID()),
-				lang = AnsiToUTF8(LIB.GetLang()),
 			}, '7228b445-14cb-465f-8dd2-019cbbbb2ce7')))
 		O.pending = true
 		LIB.Ajax({
@@ -98,6 +99,8 @@ function D.Bind(szToken, resolve, reject)
 	local me = GetClientPlayer()
 	local szURL = 'https://push.j3cx.com/role/bind?'
 		.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
+			l = AnsiToUTF8(LIB.GetGameLanguage()),
+			L = AnsiToUTF8(LIB.GetGameEdition()),
 			token = AnsiToUTF8(szToken),
 			cguid = LIB.GetClientGUID(),
 			jx3id = AnsiToUTF8(LIB.GetClientUUID()),
@@ -106,7 +109,6 @@ function D.Bind(szToken, resolve, reject)
 			name = AnsiToUTF8(LIB.GetUserRoleName()),
 			mount = me.GetKungfuMount().dwMountType,
 			type = me.nRoleType,
-			lang = AnsiToUTF8(LIB.GetLang()),
 		}, '7228b445-14cb-465f-8dd2-019cbbbb2ce7')))
 	LIB.Ajax({
 		driver = 'auto', mode = 'auto', method = 'auto',
@@ -128,8 +130,9 @@ end
 function D.Unbind(resolve, reject)
 	local szURL = 'https://push.j3cx.com/role/unbind?'
 		.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
+			l = AnsiToUTF8(LIB.GetGameLanguage()),
+			L = AnsiToUTF8(LIB.GetGameEdition()),
 			jx3id = AnsiToUTF8(LIB.GetClientUUID()),
-			lang = AnsiToUTF8(LIB.GetLang()),
 		}, '7228b445-14cb-465f-8dd2-019cbbbb2ce7')))
 	LIB.Ajax({
 		driver = 'auto', mode = 'auto', method = 'auto',

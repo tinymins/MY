@@ -45,12 +45,6 @@ local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAD
 local _L = LIB.LoadLangPack(PACKET_INFO.FRAMEWORK_ROOT .. 'lang/libs/')
 ---------------------------------------------------------------------------------------------------
 
--- 获取游戏语言
-function LIB.GetLang()
-	local _, _, lang = GetVersion()
-	return lang
-end
-
 function LIB.AssertVersion(szKey, szCaption, szRequireVersion)
 	if not IsString(szRequireVersion) then
 		LIB.Sysmsg(_L(
@@ -70,7 +64,7 @@ end
 -- 获取功能屏蔽等级
 do
 local DELAY_EVENT = {}
-local SHIELDED_LEVEL = { ['*'] = LIB.GetLang() == 'zhcn' and 0 or 1 }
+local SHIELDED_LEVEL = { ['*'] = LIB.GetGameLanguage() == 'zhcn' and 0 or 1 }
 function LIB.IsShieldedVersion(szKey, nLevel, bSet)
 	if not IsString(szKey) then
 		szKey, nLevel, bSet = '*', szKey, nLevel

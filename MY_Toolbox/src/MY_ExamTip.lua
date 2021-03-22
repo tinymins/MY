@@ -112,7 +112,8 @@ local function QueryData(szQues)
 		driver = 'auto', mode = 'auto', method = 'auto',
 		url = 'https://pull.j3cx.com/api/exam?'
 			.. LIB.EncodePostData(LIB.UrlEncode({
-				lang = AnsiToUTF8(LIB.GetLang()),
+				l = AnsiToUTF8(LIB.GetGameLanguage()),
+				L = AnsiToUTF8(LIB.GetGameEdition()),
 				q = AnsiToUTF8(szQues),
 			})),
 		success = function(html, status)
@@ -169,7 +170,8 @@ function D.SubmitData(tExamData, bAllRight)
 		driver = 'auto', mode = 'auto', method = 'auto',
 		url = 'https://push.j3cx.com/api/exam/uploads?'
 			.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
-				lang = AnsiToUTF8(LIB.GetLang()),
+				l = AnsiToUTF8(LIB.GetGameLanguage()),
+				L = AnsiToUTF8(LIB.GetGameEdition()),
 				data = LIB.JsonEncode(data),
 				perfect = bAllRight and 1 or 0,
 			}, 'idiadoHUiogyui()&*hHUO'))),

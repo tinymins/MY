@@ -1898,11 +1898,11 @@ function D.LoadUserData()
 		end
 		FireUIEvent('MY_TM_DATA_RELOAD')
 	else
-		local szLang = select(3, GetVersion())
+		local szEdition = LIB.GetGameEdition()
 		local config = {
 			nMode = 1,
 			tList = {},
-			szFileName = szLang ..  '.jx3dat',
+			szFileName = szEdition ..  '.jx3dat',
 		}
 		-- default data
 		for _, v in ipairs(MY_TM_TYPE_LIST) do
@@ -1970,7 +1970,7 @@ function D.SaveConfigureFile(config)
 	end
 	-- HM.20170504: add meta data
 	data['__meta'] = {
-		szLang = select(3, GetVersion()),
+		szEdition = LIB.GetGameEdition(),
 		szAuthor = not IsEmpty(config.szAuthor)
 			and config.szAuthor
 			or GetUserRoleName(),

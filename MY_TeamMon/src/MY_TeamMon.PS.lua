@@ -223,7 +223,7 @@ function PS.OnPanelActive(wnd)
 				szOption = _L['Import data (local)'],
 				fnAction = function() MY_TeamMon_UI.OpenImportPanel() end,
 			})
-			local szLang = select(3, GetVersion())
+			local szLang = LIB.GetGameLanguage()
 			if szLang == 'zhcn' or szLang == 'zhtw' then
 				insert(menu, {
 					szOption = _L['Import data (web)'],

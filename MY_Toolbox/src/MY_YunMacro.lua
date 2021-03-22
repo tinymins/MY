@@ -85,7 +85,8 @@ function D.Hook()
 				driver = 'auto', mode = 'auto', method = 'auto',
 				url = 'https://pull.j3cx.com/api/macro/query?'
 					.. LIB.EncodePostData(LIB.UrlEncode({
-						lang = AnsiToUTF8(LIB.GetLang()),
+						l = AnsiToUTF8(LIB.GetGameLanguage()),
+						L = AnsiToUTF8(LIB.GetGameEdition()),
 						name = AnsiToUTF8(szName),
 					})),
 				success = function(szHTML)
@@ -135,7 +136,8 @@ function D.Hook()
 			end
 			local szURL = 'https://page.j3cx.com/macro/details?'
 				.. LIB.EncodePostData(LIB.UrlEncode({
-					lang = AnsiToUTF8(LIB.GetLang()),
+					l = AnsiToUTF8(LIB.GetGameLanguage()),
+					L = AnsiToUTF8(LIB.GetGameEdition()),
 					name = AnsiToUTF8(szName),
 				}))
 			MY_Web.Open(szURL, { key = 'MY_YunMacro_' .. GetStringCRC(szName), layer = 'Topmost', readonly = true })
@@ -149,7 +151,8 @@ function D.Hook()
 		onclick = function()
 			local szURL = 'https://page.j3cx.com/macro/tops?'
 				.. LIB.EncodePostData(LIB.UrlEncode({
-					lang = AnsiToUTF8(LIB.GetLang()),
+					l = AnsiToUTF8(LIB.GetGameLanguage()),
+					L = AnsiToUTF8(LIB.GetGameEdition()),
 					kungfu = tostring(UI_GetPlayerMountKungfuID()),
 				}))
 			LIB.OpenBrowser(szURL)

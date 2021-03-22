@@ -214,10 +214,35 @@ if _DEBUG_LEVEL_ <= DEBUG_LEVEL.DEBUG then
 end
 Log('[' .. _NAME_SPACE_ .. '] Debug level ' .. _DEBUG_LEVEL_ .. ' / delog level ' .. _DELOG_LEVEL_)
 -------------------------------------------------------------------------------------------------------
+-- 获取游戏语言
+-------------------------------------------------------------------------------------------------------
+local function GetGameLanguage()
+	-- local szVersionLineFullName, szVersion, szVersionLineName, szVersionEx, szVersionName = GetVersion()
+	local _, _, lang = GetVersion()
+	if lang == 'classic' then
+		return 'zhcn'
+	end
+	return lang
+end
+-------------------------------------------------------------------------------------------------------
+-- 获取游戏发行版编码
+-------------------------------------------------------------------------------------------------------
+local function GetGameEdition()
+	local _, _, lang, ver = GetVersion()
+	return lang .. '_' .. ver
+end
+-------------------------------------------------------------------------------------------------------
+-- 获取游戏版本号
+-------------------------------------------------------------------------------------------------------
+local function GetGameVersion()
+	local _, ver = GetVersion()
+	return ver
+end
+-------------------------------------------------------------------------------------------------------
 -- 加载语言包
 -------------------------------------------------------------------------------------------------------
 local function LoadLangPack(szLangFolder)
-	local _, _, szLang = GetVersion()
+	local szLang = GetGameLanguage()
 	local t0 = LoadLUAData(_FRAMEWORK_ROOT_..'lang/default') or {}
 	local t1 = LoadLUAData(_FRAMEWORK_ROOT_..'lang/' .. szLang) or {}
 	for k, v in pairs(t1) do
@@ -1510,6 +1535,9 @@ local LIB = {
 	IsStreaming      = IsStreaming     ,
 	NSFormatString   = NSFormatString  ,
 	GetGameAPI       = GetGameAPI      ,
+	GetGameLanguage  = GetGameLanguage ,
+	GetGameEdition   = GetGameEdition  ,
+	GetGameVersion   = GetGameVersion  ,
 	LoadLangPack     = LoadLangPack    ,
 	CONSTANT         = CONSTANT        ,
 	PATH_TYPE        = PATH_TYPE       ,

@@ -326,11 +326,11 @@ function LIB.FormatPath(oFilePath, tParams)
 		if ePathType == PATH_TYPE.DATA then
 			szFilePath = PACKET_INFO.DATA_ROOT .. szFilePath
 		elseif ePathType == PATH_TYPE.GLOBAL then
-			szFilePath = PACKET_INFO.DATA_ROOT .. '!all-users@{$lang}/' .. szFilePath
+			szFilePath = PACKET_INFO.DATA_ROOT .. '!all-users@{$edition}/' .. szFilePath
 		elseif ePathType == PATH_TYPE.ROLE then
-			szFilePath = PACKET_INFO.DATA_ROOT .. '{$uid}@{$lang}/' .. szFilePath
+			szFilePath = PACKET_INFO.DATA_ROOT .. '{$uid}@{$edition}/' .. szFilePath
 		elseif ePathType == PATH_TYPE.SERVER then
-			szFilePath = PACKET_INFO.DATA_ROOT .. '#{$relserver}@{$lang}/' .. szFilePath
+			szFilePath = PACKET_INFO.DATA_ROOT .. '#{$relserver}@{$edition}/' .. szFilePath
 		end
 	end
 	-- if exist {$uid} then add user role identity
@@ -343,11 +343,15 @@ function LIB.FormatPath(oFilePath, tParams)
 	end
 	-- if exist {$lang} then add language identity
 	if find(szFilePath, '{$lang}', nil, true) then
-		szFilePath = szFilePath:gsub('{%$lang}', tParams['lang'] or lower(LIB.GetLang()))
+		szFilePath = szFilePath:gsub('{%$lang}', tParams['lang'] or lower(LIB.GetGameLanguage()))
+	end
+	-- if exist {$edition} then add edition identity
+	if find(szFilePath, '{$edition}', nil, true) then
+		szFilePath = szFilePath:gsub('{%$edition}', tParams['edition'] or lower(LIB.GetGameEdition()))
 	end
 	-- if exist {$version} then add version identity
 	if find(szFilePath, '{$version}', nil, true) then
-		szFilePath = szFilePath:gsub('{%$version}', tParams['version'] or select(2, GetVersion()))
+		szFilePath = szFilePath:gsub('{%$version}', tParams['version'] or lower(LIB.GetGameVersion()))
 	end
 	-- if exist {$date} then add date identity
 	if find(szFilePath, '{$date}', nil, true) then
@@ -1065,8 +1069,9 @@ LIB.BreatheCall(NSFormatString('{$NS}#STORAGE_DATA'), 200, function()
 		payload = 'json',
 		url = 'https://storage.j3cx.com/api/storage',
 		data = {
+			l = AnsiToUTF8(LIB.GetGameLanguage()),
+			L = AnsiToUTF8(LIB.GetGameEdition()),
 			data = FormatStorageData(me),
-			lang = LIB.GetLang(),
 		},
 		success = function(html, status)
 			local data = LIB.JsonDecode(html)
@@ -1121,8 +1126,9 @@ function LIB.StorageData(szKey, oData)
 			payload = 'json',
 			url = 'https://storage.uploads.j3cx.com/api/storage/uploads',
 			data = {
+				l = AnsiToUTF8(LIB.GetGameLanguage()),
+				L = AnsiToUTF8(LIB.GetGameEdition()),
 				data = FormatStorageData(me, { k = szKey, o = oData }),
-				lang = LIB.GetLang(),
 			},
 			success = function(html, status)
 				local data = LIB.JsonDecode(html)

@@ -58,7 +58,8 @@ LIB.RegisterInit('MY_ShareChat', function()
 		LIB.Ajax({
 			driver = 'auto', mode = 'auto', method = 'auto',
 			url = 'https://cdn.j3cx.com/config/npc-chat.json'
-				.. '?lang=' .. LIB.GetLang()
+				.. '?l=' .. AnsiToUTF8(LIB.GetGameLanguage())
+				.. '&L=' .. AnsiToUTF8(LIB.GetGameEdition())
 				.. '&_=' .. GetCurrentTime(),
 			success = function(html, status)
 				local data = LIB.JsonDecode(html)

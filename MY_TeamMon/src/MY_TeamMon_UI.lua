@@ -177,7 +177,7 @@ function D.OnFrameCreate()
 		menu = function()
 			local menu = {}
 			insert(menu, { szOption = _L['Import data (local)'], fnAction = function() D.OpenImportPanel() end }) -- 有传参 不要改
-			local szLang = select(3, GetVersion())
+			local szLang = LIB.GetGameLanguage()
 			if szLang == 'zhcn' or szLang == 'zhtw' then
 				insert(menu, { szOption = _L['Import data (web)'], fnAction = MY_TeamMon_RR.OpenPanel })
 			end
@@ -1011,7 +1011,7 @@ function D.OpenExportPanel()
 		end,
 	}):Pos('BOTTOMRIGHT')
 	nY = nY + 10
-	local szFileName = 'TM-' .. select(3, GetVersion()) .. FormatTime('-%Y%m%d_%H.%M', GetCurrentTime())
+	local szFileName = 'TM-' .. LIB.GetGameEdition() .. FormatTime('-%Y%m%d_%H.%M', GetCurrentTime())
 	nX, nY = ui:Append('Text', { x = 20, y = nY, text = _L['File name'], font = 27 }):Pos('BOTTOMRIGHT')
 	nX, nY = ui:Append('WndEditBox', {
 		x = 25, y = nY, w = 500, h = 25,

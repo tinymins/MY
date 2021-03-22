@@ -82,7 +82,8 @@ function D.Open(dwTabType, dwTabIndex, nBookID)
 	end
 	local szURL = 'https://page.j3cx.com/item/' .. concat(aPath, '/') .. '/price?'
 		.. LIB.EncodePostData(LIB.UrlEncode({
-			lang = AnsiToUTF8(LIB.GetLang()),
+			l = AnsiToUTF8(LIB.GetGameLanguage()),
+			L = AnsiToUTF8(LIB.GetGameEdition()),
 			server = AnsiToUTF8(line and line.szCenterName or LIB.GetRealServer(2)),
 			player = AnsiToUTF8(GetUserRoleName()), item = AnsiToUTF8(szName),
 		}))
@@ -246,7 +247,8 @@ LIB.RegisterEvent('AUCTION_LOOKUP_RESPOND', function()
 		local szData = concat(aData, ' ')
 		local szURL = 'https://push.j3cx.com/api/item/price?'
 			.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
-				l = AnsiToUTF8(LIB.GetLang()),
+				l = AnsiToUTF8(LIB.GetGameLanguage()),
+				L = AnsiToUTF8(LIB.GetGameEdition()),
 				r = AnsiToUTF8(LIB.GetRealServer(1)), -- Region
 				s = AnsiToUTF8(LIB.GetRealServer(2)), -- Server
 				t = GetCurrentTime(), -- Time

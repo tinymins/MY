@@ -88,8 +88,9 @@ function D.FetchEventList(frame)
 		driver = 'auto', mode = 'auto', method = 'auto',
 		url = 'https://pull.j3cx.com/event/list?'
 			.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
+				l = AnsiToUTF8(LIB.GetGameLanguage()),
+				L = AnsiToUTF8(LIB.GetGameEdition()),
 				jx3id = AnsiToUTF8(LIB.GetClientUUID()),
-				lang = AnsiToUTF8(LIB.GetLang()),
 			}, '84cf7ba4-7fbb-4d59-9eb2-9b0ce89494ed'))),
 		charset = 'utf8',
 		success = function(szHTML)
@@ -159,8 +160,9 @@ function D.FetchRankList(frame, szEventID)
 		driver = 'auto', mode = 'auto', method = 'auto',
 		url = 'https://pull.j3cx.com/rank/list?'
 			.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
+				l = AnsiToUTF8(LIB.GetGameLanguage()),
+				L = AnsiToUTF8(LIB.GetGameEdition()),
 				jx3id = AnsiToUTF8(LIB.GetClientUUID()),
-				lang = AnsiToUTF8(LIB.GetLang()),
 				event_id = szEventID,
 			}, '84cf7ba4-7fbb-4d59-9eb2-9b0ce89494ed'))),
 		charset = 'utf8',
@@ -223,8 +225,9 @@ function D.Vote(frame, szEventID, szTeamID)
 		driver = 'auto', mode = 'auto', method = 'auto',
 		url = 'https://push.j3cx.com/rank/vote?'
 			.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
+				l = AnsiToUTF8(LIB.GetGameLanguage()),
+				L = AnsiToUTF8(LIB.GetGameEdition()),
 				jx3id = AnsiToUTF8(LIB.GetClientUUID()),
-				lang = AnsiToUTF8(LIB.GetLang()),
 				event_id = szEventID,
 				team_id = szTeamID,
 			}, '84cf7ba4-7fbb-4d59-9eb2-9b0ce89494ed'))),

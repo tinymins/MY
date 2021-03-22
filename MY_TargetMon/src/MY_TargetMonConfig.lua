@@ -52,7 +52,7 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^3.0.1') then
 	return
 end
 --------------------------------------------------------------------------
-local LANG = LIB.GetLang()
+local LANG = LIB.GetGameLanguage()
 local INIT_STATE = 'NONE'
 local C, D = { PASSPHRASE = {213, 166, 13}, PASSPHRASE_EMBEDDED = {211, 98, 5} }, {}
 local ROLE_CONFIG_FILE = {'config/my_targetmon.jx3dat', PATH_TYPE.ROLE}
