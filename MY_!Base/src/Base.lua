@@ -166,19 +166,22 @@ local _DELOG_LEVEL_          = tonumber(LoadLUAData(_DATA_ROOT_ .. 'delog.level.
 -----------------------------------------------
 -- 数据设为只读
 -----------------------------------------------
-local SetmetaReadonly = SetmetaReadonly or function(t)
-	for k, v in pairs(t) do
-		if type(v) == 'table' then
-			t[k] = SetmetaReadonly(v)
+local SetmetaReadonly = SetmetaReadonly
+if not SetmetaReadonly then
+	SetmetaReadonly = function(t)
+		for k, v in pairs(t) do
+			if type(v) == 'table' then
+				t[k] = SetmetaReadonly(v)
+			end
 		end
+		return setmetatable({}, {
+			__index     = t,
+			__newindex  = function() assert(false, 'table is readonly\n') end,
+			__metatable = {
+				const_table = t,
+			},
+		})
 	end
-	return setmetatable({}, {
-		__index     = t,
-		__newindex  = function() assert(false, 'table is readonly\n') end,
-		__metatable = {
-			const_table = t,
-		},
-	})
 end
 local DEBUG_LEVEL = SetmetaReadonly({
 	PMLOG   = 0,
