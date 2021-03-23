@@ -236,12 +236,12 @@ function D.GetFrame()
 	return Station.Lookup('Normal/MY_CataclysmMain')
 end
 
-local CTM_LOOT_MODE = {
-	[PARTY_LOOT_MODE.FREE_FOR_ALL] = {'ui/Image/TargetPanel/Target.UITex', 60},
-	[PARTY_LOOT_MODE.DISTRIBUTE]   = {'ui/Image/UICommon/CommonPanel2.UITex', 92},
-	[PARTY_LOOT_MODE.GROUP_LOOT]   = {'ui/Image/UICommon/LoginCommon.UITex', 29},
-	[PARTY_LOOT_MODE.BIDDING]      = {'ui/Image/UICommon/GoldTeam.UITex', 6},
-}
+local CTM_LOOT_MODE = LIB.KvpToObject({
+	{PARTY_LOOT_MODE.FREE_FOR_ALL, {'ui/Image/TargetPanel/Target.UITex'   , 60}},
+	{PARTY_LOOT_MODE.DISTRIBUTE  , {'ui/Image/UICommon/CommonPanel2.UITex', 92}},
+	{PARTY_LOOT_MODE.GROUP_LOOT  , {'ui/Image/UICommon/LoginCommon.UITex' , 29}},
+	{PARTY_LOOT_MODE.BIDDING     , {'ui/Image/UICommon/GoldTeam.UITex'    ,  6}},
+})
 local CTM_LOOT_QUALITY = {
 	[0] = 2399,
 	[1] = 2396,
