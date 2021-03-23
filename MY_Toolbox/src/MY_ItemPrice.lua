@@ -29,7 +29,8 @@ local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
 -- lib apis caching
 local LIB = MY
-local UI, DEBUG_LEVEL, PATH_TYPE, PACKET_INFO = LIB.UI, LIB.DEBUG_LEVEL, LIB.PATH_TYPE, LIB.PACKET_INFO
+local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
+local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
 local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
 local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
 local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
@@ -37,10 +38,10 @@ local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals,
 local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
 local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
 local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
+local EncodeLUAData, DecodeLUAData = LIB.EncodeLUAData, LIB.DecodeLUAData
+local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
 local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
 local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Toolbox'
 local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -82,8 +83,8 @@ function D.Open(dwTabType, dwTabIndex, nBookID)
 	end
 	local szURL = 'https://page.j3cx.com/item/' .. concat(aPath, '/') .. '/price?'
 		.. LIB.EncodePostData(LIB.UrlEncode({
-			l = AnsiToUTF8(LIB.GetGameLanguage()),
-			L = AnsiToUTF8(LIB.GetGameEdition()),
+			l = AnsiToUTF8(GLOBAL.GAME_LANG),
+			L = AnsiToUTF8(GLOBAL.GAME_EDITION),
 			server = AnsiToUTF8(line and line.szCenterName or LIB.GetRealServer(2)),
 			player = AnsiToUTF8(GetUserRoleName()), item = AnsiToUTF8(szName),
 		}))
@@ -247,8 +248,8 @@ LIB.RegisterEvent('AUCTION_LOOKUP_RESPOND', function()
 		local szData = concat(aData, ' ')
 		local szURL = 'https://push.j3cx.com/api/item/price?'
 			.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
-				l = AnsiToUTF8(LIB.GetGameLanguage()),
-				L = AnsiToUTF8(LIB.GetGameEdition()),
+				l = AnsiToUTF8(GLOBAL.GAME_LANG),
+				L = AnsiToUTF8(GLOBAL.GAME_EDITION),
 				r = AnsiToUTF8(LIB.GetRealServer(1)), -- Region
 				s = AnsiToUTF8(LIB.GetRealServer(2)), -- Server
 				t = GetCurrentTime(), -- Time

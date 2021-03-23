@@ -29,7 +29,8 @@ local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
 -- lib apis caching
 local LIB = MY
-local UI, DEBUG_LEVEL, PATH_TYPE, PACKET_INFO = LIB.UI, LIB.DEBUG_LEVEL, LIB.PATH_TYPE, LIB.PACKET_INFO
+local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
+local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
 local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
 local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
 local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
@@ -37,10 +38,10 @@ local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals,
 local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
 local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
 local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
+local EncodeLUAData, DecodeLUAData = LIB.EncodeLUAData, LIB.DecodeLUAData
+local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
 local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
 local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TeamTools'
 local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -61,8 +62,8 @@ function D.FetchBindStatus(resolve, reject)
 	if IsNil(O.uid) then
 		local szURL = 'https://pull.j3cx.com/role/query?'
 			.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
-				l = AnsiToUTF8(LIB.GetGameLanguage()),
-				L = AnsiToUTF8(LIB.GetGameEdition()),
+				l = AnsiToUTF8(GLOBAL.GAME_LANG),
+				L = AnsiToUTF8(GLOBAL.GAME_EDITION),
 				jx3id = AnsiToUTF8(LIB.GetClientUUID()),
 			}, '7228b445-14cb-465f-8dd2-019cbbbb2ce7')))
 		O.pending = true
@@ -99,8 +100,8 @@ function D.Bind(szToken, resolve, reject)
 	local me = GetClientPlayer()
 	local szURL = 'https://push.j3cx.com/role/bind?'
 		.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
-			l = AnsiToUTF8(LIB.GetGameLanguage()),
-			L = AnsiToUTF8(LIB.GetGameEdition()),
+			l = AnsiToUTF8(GLOBAL.GAME_LANG),
+			L = AnsiToUTF8(GLOBAL.GAME_EDITION),
 			token = AnsiToUTF8(szToken),
 			cguid = LIB.GetClientGUID(),
 			jx3id = AnsiToUTF8(LIB.GetClientUUID()),
@@ -130,8 +131,8 @@ end
 function D.Unbind(resolve, reject)
 	local szURL = 'https://push.j3cx.com/role/unbind?'
 		.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
-			l = AnsiToUTF8(LIB.GetGameLanguage()),
-			L = AnsiToUTF8(LIB.GetGameEdition()),
+			l = AnsiToUTF8(GLOBAL.GAME_LANG),
+			L = AnsiToUTF8(GLOBAL.GAME_EDITION),
 			jx3id = AnsiToUTF8(LIB.GetClientUUID()),
 		}, '7228b445-14cb-465f-8dd2-019cbbbb2ce7')))
 	LIB.Ajax({

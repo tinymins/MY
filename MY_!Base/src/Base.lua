@@ -214,37 +214,24 @@ if _DEBUG_LEVEL_ <= DEBUG_LEVEL.DEBUG then
 end
 Log('[' .. _NAME_SPACE_ .. '] Debug level ' .. _DEBUG_LEVEL_ .. ' / delog level ' .. _DELOG_LEVEL_)
 -------------------------------------------------------------------------------------------------------
--- 获取游戏语言
+-- 游戏语言、游戏发行版编码、游戏版本号
 -------------------------------------------------------------------------------------------------------
-local function GetGameLanguage()
-	-- local szVersionLineFullName, szVersion, szVersionLineName, szVersionEx, szVersionName = GetVersion()
-	local _, _, lang = GetVersion()
-	if lang == 'classic' then
-		return 'zhcn'
+local _GAME_LANG_, _GAME_EDITION_, _GAME_VERSION_
+do
+	local szVersionLineFullName, szVersion, szVersionLineName, szVersionEx, szVersionName = GetVersion()
+	_GAME_LANG_ = lower(szVersionLineName)
+	if _GAME_LANG_ == 'classic' then
+		_GAME_LANG_ = 'zhcn'
 	end
-	return lang
-end
--------------------------------------------------------------------------------------------------------
--- 获取游戏发行版编码
--------------------------------------------------------------------------------------------------------
-local function GetGameEdition()
-	local _, _, lang, ver = GetVersion()
-	return lang .. '_' .. ver
-end
--------------------------------------------------------------------------------------------------------
--- 获取游戏版本号
--------------------------------------------------------------------------------------------------------
-local function GetGameVersion()
-	local _, ver = GetVersion()
-	return ver
+	_GAME_EDITION_ = lower(szVersionLineName .. '_' .. szVersionEx)
+	_GAME_VERSION_ = lower(szVersion)
 end
 -------------------------------------------------------------------------------------------------------
 -- 加载语言包
 -------------------------------------------------------------------------------------------------------
 local function LoadLangPack(szLangFolder)
-	local szLang = GetGameLanguage()
 	local t0 = LoadLUAData(_FRAMEWORK_ROOT_..'lang/default') or {}
-	local t1 = LoadLUAData(_FRAMEWORK_ROOT_..'lang/' .. szLang) or {}
+	local t1 = LoadLUAData(_FRAMEWORK_ROOT_..'lang/' .. _GAME_LANG_) or {}
 	for k, v in pairs(t1) do
 		t0[k] = v
 	end
@@ -254,7 +241,7 @@ local function LoadLangPack(szLangFolder)
 		for k, v in pairs(t2) do
 			t0[k] = v
 		end
-		local t3 = LoadLUAData(szLangFolder..'/' .. szLang) or {}
+		local t3 = LoadLUAData(szLangFolder..'/' .. _GAME_LANG_) or {}
 		for k, v in pairs(t3) do
 			t0[k] = v
 		end
@@ -851,6 +838,14 @@ local function KvpToObject(kvp)
 	end
 	return t
 end
+local GLOBAL = setmetatable({}, {
+	__index = setmetatable({
+		GAME_LANG     = _GAME_LANG_   ,
+		GAME_EDITION  = _GAME_EDITION_,
+		GAME_VERSION  = _GAME_VERSION_,
+	}, { __index = _G.GLOBAL }),
+	__newindex = function() end,
+})
 local PATH_TYPE = SetmetaReadonly({
 	NORMAL = 0,
 	DATA   = 1,
@@ -1535,10 +1530,8 @@ local LIB = {
 	IsStreaming      = IsStreaming     ,
 	NSFormatString   = NSFormatString  ,
 	GetGameAPI       = GetGameAPI      ,
-	GetGameLanguage  = GetGameLanguage ,
-	GetGameEdition   = GetGameEdition  ,
-	GetGameVersion   = GetGameVersion  ,
 	LoadLangPack     = LoadLangPack    ,
+	GLOBAL           = GLOBAL          ,
 	CONSTANT         = CONSTANT        ,
 	PATH_TYPE        = PATH_TYPE       ,
 	DEBUG_LEVEL      = DEBUG_LEVEL     ,

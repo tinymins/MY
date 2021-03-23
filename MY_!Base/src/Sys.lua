@@ -29,7 +29,8 @@ local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
 -- lib apis caching
 local LIB = MY
-local UI, DEBUG_LEVEL, PATH_TYPE, PACKET_INFO = LIB.UI, LIB.DEBUG_LEVEL, LIB.PATH_TYPE, LIB.PACKET_INFO
+local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
+local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
 local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
 local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
 local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
@@ -37,10 +38,10 @@ local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals,
 local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
 local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
 local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
+local EncodeLUAData, DecodeLUAData = LIB.EncodeLUAData, LIB.DecodeLUAData
+local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
 local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
 local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local EncodeLUAData, DecodeLUAData, CONSTANT = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.CONSTANT
 -------------------------------------------------------------------------------------------------------
 local _L = LIB.LoadLangPack(PACKET_INFO.FRAMEWORK_ROOT .. 'lang/libs/')
 ---------------------------------------------------------------------------------------------------
@@ -343,15 +344,15 @@ function LIB.FormatPath(oFilePath, tParams)
 	end
 	-- if exist {$lang} then add language identity
 	if find(szFilePath, '{$lang}', nil, true) then
-		szFilePath = szFilePath:gsub('{%$lang}', tParams['lang'] or lower(LIB.GetGameLanguage()))
+		szFilePath = szFilePath:gsub('{%$lang}', tParams['lang'] or GLOBAL.GAME_LANG)
 	end
 	-- if exist {$edition} then add edition identity
 	if find(szFilePath, '{$edition}', nil, true) then
-		szFilePath = szFilePath:gsub('{%$edition}', tParams['edition'] or lower(LIB.GetGameEdition()))
+		szFilePath = szFilePath:gsub('{%$edition}', tParams['edition'] or GLOBAL.GAME_EDITION)
 	end
 	-- if exist {$version} then add version identity
 	if find(szFilePath, '{$version}', nil, true) then
-		szFilePath = szFilePath:gsub('{%$version}', tParams['version'] or lower(LIB.GetGameVersion()))
+		szFilePath = szFilePath:gsub('{%$version}', tParams['version'] or GLOBAL.GAME_VERSION)
 	end
 	-- if exist {$date} then add date identity
 	if find(szFilePath, '{$date}', nil, true) then
@@ -1069,8 +1070,8 @@ LIB.BreatheCall(NSFormatString('{$NS}#STORAGE_DATA'), 200, function()
 		payload = 'json',
 		url = 'https://storage.j3cx.com/api/storage',
 		data = {
-			l = AnsiToUTF8(LIB.GetGameLanguage()),
-			L = AnsiToUTF8(LIB.GetGameEdition()),
+			l = AnsiToUTF8(GLOBAL.GAME_LANG),
+			L = AnsiToUTF8(GLOBAL.GAME_EDITION),
 			data = FormatStorageData(me),
 		},
 		success = function(html, status)
@@ -1126,8 +1127,8 @@ function LIB.StorageData(szKey, oData)
 			payload = 'json',
 			url = 'https://storage.uploads.j3cx.com/api/storage/uploads',
 			data = {
-				l = AnsiToUTF8(LIB.GetGameLanguage()),
-				L = AnsiToUTF8(LIB.GetGameEdition()),
+				l = AnsiToUTF8(GLOBAL.GAME_LANG),
+				L = AnsiToUTF8(GLOBAL.GAME_EDITION),
 				data = FormatStorageData(me, { k = szKey, o = oData }),
 			},
 			success = function(html, status)
