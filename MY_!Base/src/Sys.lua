@@ -310,6 +310,11 @@ end
 --   当路径为绝对路径时(以斜杠开头)不作处理
 --   当路径为相对路径时 相对于插件`{NS}#DATA`目录
 --   可以传入表{szPath, ePathType}
+local PATH_TYPE_MOVE_STATE = {
+	[PATH_TYPE.GLOBAL] = 'PENDING',
+	[PATH_TYPE.ROLE] = 'PENDING',
+	[PATH_TYPE.SERVER] = 'PENDING',
+}
 function LIB.FormatPath(oFilePath, tParams)
 	if not tParams then
 		tParams = {}
@@ -319,6 +324,24 @@ function LIB.FormatPath(oFilePath, tParams)
 		szFilePath, ePathType = unpack(oFilePath)
 	else
 		szFilePath, ePathType = oFilePath, PATH_TYPE.NORMAL
+	end
+	-- 兼容旧版数据位置
+	if PATH_TYPE_MOVE_STATE[ePathType] == 'PENDING' then
+		PATH_TYPE_MOVE_STATE[ePathType] = nil
+		local szPath = LIB.FormatPath({'', ePathType})
+		if not IsLocalFileExist(szPath) then
+			local szOriginPath
+			if ePathType == PATH_TYPE.GLOBAL then
+				szOriginPath = LIB.FormatPath({'!all-users@{$lang}/', PATH_TYPE.DATA})
+			elseif ePathType == PATH_TYPE.ROLE then
+				szOriginPath = LIB.FormatPath({'{$uid}@{$lang}/', PATH_TYPE.DATA})
+			elseif ePathType == PATH_TYPE.SERVER then
+				szOriginPath = LIB.FormatPath({'#{$relserver}@{$lang}/', PATH_TYPE.DATA})
+			end
+			if IsLocalFileExist(szOriginPath) then
+				CPath.Move(szOriginPath, szPath)
+			end
+		end
 	end
 	-- Unified the directory separator
 	szFilePath = gsub(szFilePath, '\\', '/')
