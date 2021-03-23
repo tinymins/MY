@@ -1212,6 +1212,13 @@ end
 
 local SetOnlineAddonCustomData = _G.SetOnlineAddonCustomData or SetAddonCustomData
 function LIB.SetStorage(szKey, ...)
+	if GLOBAL.GAME_EDITION == 'classic' then
+		local oFilePath = {'userdata/localstorage.jx3dat', PATH_TYPE.ROLE}
+		local data = LIB.LoadLUAData(oFilePath) or {}
+		data[szKey] = {...}
+		LIB.SaveLUAData(oFilePath, data)
+		return
+	end
 	local szPriKey, szSubKey = szKey
 	local nPos = StringFindW(szKey, '.')
 	if nPos then
@@ -1270,6 +1277,11 @@ end
 
 local GetOnlineAddonCustomData = _G.GetOnlineAddonCustomData or GetAddonCustomData
 function LIB.GetStorage(szKey)
+	if GLOBAL.GAME_EDITION == 'classic' then
+		local oFilePath = {'userdata/localstorage.jx3dat', PATH_TYPE.ROLE}
+		local data = LIB.LoadLUAData(oFilePath) or {}
+		return unpack(data[szKey] or {})
+	end
 	local szPriKey, szSubKey = szKey
 	local nPos = StringFindW(szKey, '.')
 	if nPos then
