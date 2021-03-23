@@ -437,7 +437,7 @@ local ChatLinkEvents = {
 		end
 	end,
 }
-LIB.ChatLinkEvents = SetmetaReadonly(ChatLinkEvents)
+LIB.ChatLinkEvents = LIB.SetmetaReadonly(ChatLinkEvents)
 
 -- 聊天界面元素通用事件绑定函数（this）
 local ChatLinkEventHandlers = {}
@@ -446,7 +446,7 @@ for k, f in pairs(ChatLinkEvents) do
 		f(this)
 	end
 end
-LIB.ChatLinkEventHandlers = SetmetaReadonly(ChatLinkEventHandlers)
+LIB.ChatLinkEventHandlers = LIB.SetmetaReadonly(ChatLinkEventHandlers)
 
 -- 绑定link事件响应
 -- (userdata) LIB.RenderChatLink(userdata link)                   处理link的各种事件绑定 namelink是一个超链接Text元素

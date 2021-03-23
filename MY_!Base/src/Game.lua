@@ -129,7 +129,7 @@ LIB.RegisterEvent(NSFormatString('HOME_LAND_RESULT_CODE_INT.{$NS}#HL'), function
 				szCenterName = info.szCenterName
 			end
 		end
-		insert(HL_INFO_CACHE, SetmetaReadonly({
+		insert(HL_INFO_CACHE, LIB.SetmetaReadonly({
 			dwMapID = dwMapID,
 			nCopyIndex = nCopyIndex,
 			dwCenterID = dwCenterID,
@@ -1735,7 +1735,7 @@ function LIB.GetFurnitureInfo(szKey, oVal)
 		for i = 2, g_tTable.HomelandFurnitureInfo:GetRowCount() do
 			local tLine = g_tTable.HomelandFurnitureInfo:GetRow(i)
 			if tLine and tLine[szKey] then
-				CACHE[szKey][tLine[szKey]] = SetmetaReadonly(tLine)
+				CACHE[szKey][tLine[szKey]] = LIB.SetmetaReadonly(tLine)
 			end
 		end
 	end
