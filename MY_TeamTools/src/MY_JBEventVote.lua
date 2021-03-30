@@ -309,6 +309,10 @@ function D.Close()
 end
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
+	local me = GetClientPlayer()
+	if not me or me.nMaxLevel ~= me.nLevel then
+		return
+	end
 	x = x + ui:Append('WndButton', {
 		x = x, y = y, w = 'auto',
 		buttonstyle = 2,
