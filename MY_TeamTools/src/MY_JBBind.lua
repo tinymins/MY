@@ -155,6 +155,7 @@ end
 local PS = {
 	-- nPriority = 0,
 	-- bWelcome = true,
+	nShielded = LIB.IsDebugServer() and 2 or nil,
 }
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
