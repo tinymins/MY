@@ -170,7 +170,7 @@ end
 -- 获取是否测试服务器
 function LIB.IsDebugServer()
 	local ip = select(7, GetUserServer())
-	if ip:find('^192%.') or ip:find('^10%.') then
+	if ip:find('^192%.168%.') or ip:find('^10%.') then
 		return true
 	end
 	return false
