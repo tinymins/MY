@@ -59,18 +59,17 @@ local D = {}
 local Schema = LIB.Schema
 local EVENT_LIST_SCHEMA = Schema.Record({
 	data = Schema.Collection(Schema.Record({
-		id = Schema.String, -- 活动ID
-		name = Schema.String, -- 活动名称，可用于显示
 		achieve_ids = Schema.String, -- 8548,8549..  一段以半角逗号分隔的成就ID字符串
-		-- vote_start -- 投票开启时间
-		-- vote_end -- 投票结束时间
+		id = Schema.Number, -- 活动ID
+		name = Schema.String, -- 活动名称，可用于显示
+		vote_end = Schema.String, -- 投票结束时间
+		vote_start = Schema.String, -- 投票开启时间
 	}, true)),
 }, true)
 local RANK_DATA_SCHEMA = Schema.Record({
 	data = Schema.Collection(Schema.Record({
-		-- ID
-		event_id = Schema.String, -- 活动ID
-		team_id = Schema.String, -- 团队ID
+		id = Schema.Number, -- 团队ID
+		event_id = Schema.Number, -- 活动ID
 		count = Schema.Number, -- 票数
 		name = Schema.String, -- 团队名称
 		server = Schema.String, -- 团队服务器
@@ -97,7 +96,7 @@ function D.FetchEventList(frame)
 		success = function(szHTML)
 			local res, err = LIB.JsonDecode(szHTML)
 			if not res then
-				LIB.Alert(_L['ERR: Decode eventlist content as json failed!'] ..err)
+				LIB.Alert(_L['ERR: Decode eventlist content as json failed!'] .. err)
 				Wnd.CloseWindow(frame)
 				return
 			end
@@ -280,7 +279,7 @@ function D.OnLButtonClick()
 	elseif name == 'Btn_Info' then
 		LIB.OpenBrowser(this:GetParent().eve.link)
 	elseif name == 'Btn_Vote' then
-		D.Vote(this:GetRoot(), this:GetParent().eve.event_id, this:GetParent().eve.team_id)
+		D.Vote(this:GetRoot(), this:GetParent().eve.event_id, this:GetParent().eve.id)
 	end
 end
 
