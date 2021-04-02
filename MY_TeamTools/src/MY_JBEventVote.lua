@@ -67,8 +67,8 @@ local EVENT_LIST_SCHEMA = Schema.Record({
 		achieve_ids = Schema.String, -- 8548,8549..  一段以半角逗号分隔的成就ID字符串
 		id = Schema.Number, -- 活动ID
 		name = Schema.String, -- 活动名称，可用于显示
-		vote_end = Schema.String, -- 投票结束时间
-		vote_start = Schema.String, -- 投票开启时间
+		vote_start = Schema.Number, -- 投票开启时间
+		vote_end = Schema.Number, -- 投票结束时间
 	}, true)),
 }, true)
 local RANK_DATA_SCHEMA = Schema.Record({
@@ -158,8 +158,8 @@ function D.UpdateEventList(frame)
 		checkbox:Show()
 		checkbox:Lookup('', 'Text_CheckEvent'):SetText(LIB.ReplaceSensitiveWord(eve.name))
 		checkbox:SetRelX(checkbox:GetRelX() + checkbox:GetW() * (i - 1))
-		checkbox.szEventID = eve.id
-		page.szEventID = eve.id
+		checkbox.eve = eve
+		page.eve = eve
 	end
 	if D.aEventList[1] then
 		D.FetchRankList(frame, D.aEventList[1].id)
@@ -214,28 +214,31 @@ function D.UpdateEvent(frame)
 	local page = pageset:GetFirstChild()
 	local szEventSearch = wgsub(D.szEventSearch, ' ', ',')
 	while page do
-		if page:GetName() == 'Page_Event' and (D.tChangedEventID[page.szEventID] or D.tChangedEventID['*']) then
+		if page:GetName() == 'Page_Event' and (D.tChangedEventID[page.eve.id] or D.tChangedEventID['*']) then
+			local bInTime = page.eve.vote_start <= GetCurrentTime() and page.eve.vote_end >= GetCurrentTime()
+			local bVoted = Get(D.tEventRankInfo, {page.eve.id, 'record', 'status'}, 0) ~= 0
+			local nVotedTeamID = Get(D.tEventRankInfo, {page.eve.id, 'record', 'team_id'}, 0)
 			local container = page:Lookup('Wnd_Event/WndScroll_Event/WndContainer_List')
 			container:Clear()
-			for i, eve in ipairs(Get(D.tEventRankInfo, {page.szEventID, 'list'}, {})) do
+			for i, team in ipairs(Get(D.tEventRankInfo, {page.eve.id, 'list'}, {})) do
 				if IsEmpty(D.szEventSearch)
-				or LIB.StringSimpleMatch(eve.server .. ',' .. eve.name, szEventSearch) then
+				or LIB.StringSimpleMatch(team.server .. ',' .. team.name, szEventSearch) then
 					local wnd = container:AppendContentFromIni(SZ_MOD_INI, 'Wnd_Row')
-					wnd:Lookup('', 'Text_ItemName'):SetText(LIB.ReplaceSensitiveWord(eve.name))
-					wnd:Lookup('', 'Text_ItemServer'):SetText(LIB.ReplaceSensitiveWord(eve.server))
-					wnd:Lookup('', 'Text_ItemLeader'):SetText(LIB.ReplaceSensitiveWord(eve.leader_name))
-					wnd:Lookup('', 'Text_ItemSlogan'):SetText(LIB.ReplaceSensitiveWord(eve.slogan))
-					wnd:Lookup('', 'Text_ItemCount'):SetText(LIB.ReplaceSensitiveWord(eve.count))
+					wnd:Lookup('', 'Text_ItemName'):SetText(LIB.ReplaceSensitiveWord(team.name))
+					wnd:Lookup('', 'Text_ItemServer'):SetText(LIB.ReplaceSensitiveWord(team.server))
+					wnd:Lookup('', 'Text_ItemLeader'):SetText(LIB.ReplaceSensitiveWord(team.leader_name))
+					wnd:Lookup('', 'Text_ItemSlogan'):SetText(LIB.ReplaceSensitiveWord(team.slogan))
+					wnd:Lookup('', 'Text_ItemCount'):SetText(LIB.ReplaceSensitiveWord(team.count))
 					wnd:Lookup('', 'Image_RowBg'):SetVisible(i % 2 == 1)
-					if Get(D.tEventRankInfo, {page.szEventID, 'record', 'status'}, 0) == 0 then
+					if bInTime and not bVoted then
 						wnd:Lookup('Btn_Vote', 'Text_Vote'):SetText(_L['Vote'])
-					elseif Get(D.tEventRankInfo, {page.szEventID, 'record', 'team_id'}, 0) == eve.id then
+					elseif nVotedTeamID == team.id then
 						wnd:Lookup('Btn_Vote', 'Text_Vote'):SetText(_L['Voted'])
 					else
 						wnd:Lookup('Btn_Vote', 'Text_Vote'):Hide()
 					end
 					wnd:Lookup('Btn_Info', 'Text_Info'):SetText(_L['View Detail'])
-					wnd.eve = eve
+					wnd.team = team
 				end
 			end
 			container:FormatAllContentPos()
@@ -308,9 +311,43 @@ function D.OnLButtonClick()
 	if name == 'Btn_Close' then
 		Wnd.CloseWindow(this:GetRoot())
 	elseif name == 'Btn_Info' then
-		LIB.OpenBrowser(this:GetParent().eve.link)
+		LIB.OpenBrowser(this:GetParent().team.link)
 	elseif name == 'Btn_Vote' then
-		D.Vote(this:GetRoot(), this:GetParent().eve.event_id, this:GetParent().eve.id)
+		D.Vote(this:GetRoot(), this:GetParent().team.event_id, this:GetParent().team.id)
+	end
+end
+
+function D.OnMouseEnter()
+	local name = this:GetName()
+	if name == 'WndCheck_Event' then
+		local aXml = {}
+		insert(aXml, GetFormatText(this.eve.name, 82))
+		insert(aXml, CONSTANT.XML_LINE_BREAKER)
+		insert(aXml, GetFormatText(_L['Finish achieves: '], 82))
+		for _, szAcheveID in ipairs(LIB.SplitString(this.eve.achieve_ids, ',', true)) do
+			insert(aXml, GetFormatText('[' .. Get(Table_GetAchievement(szAcheveID), {'szName'}, '') .. ']', 82))
+			if IsCtrlKeyDown() then
+				insert(aXml, GetFormatText('(' .. szAcheveID .. ')', 102))
+			end
+		end
+		insert(aXml, CONSTANT.XML_LINE_BREAKER)
+		insert(aXml, GetFormatText(_L['Start time: '], 82))
+		insert(aXml, GetFormatText(LIB.FormatTime(this.eve.vote_start, '%yyyy/%MM/%dd %hh:%mm:%ss'), 82))
+		insert(aXml, CONSTANT.XML_LINE_BREAKER)
+		insert(aXml, GetFormatText(_L['End time: '], 82))
+		insert(aXml, GetFormatText(LIB.FormatTime(this.eve.vote_end, '%yyyy/%MM/%dd %hh:%mm:%ss'), 82))
+		insert(aXml, CONSTANT.XML_LINE_BREAKER)
+		if IsCtrlKeyDown() then
+			insert(aXml, GetFormatText('ID: ' .. this.eve.id, 102))
+		end
+		LIB.OutputTip(this, concat(aXml), true, ALW.TOP_BOTTOM, 400)
+	end
+end
+
+function D.OnMouseLeave()
+	local name = this:GetName()
+	if name == 'WndCheck_Event' then
+		HideTip()
 	end
 end
 
@@ -339,7 +376,7 @@ function D.OnActivePage()
 	local name = this:GetName()
 	if name == 'PageSet_All' then
 		local page = this:GetActivePage()
-		D.FetchRankList(frame, page.szEventID)
+		D.FetchRankList(frame, page.eve.id)
 	end
 end
 
