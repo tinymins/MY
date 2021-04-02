@@ -67,17 +67,23 @@ local EVENT_LIST_SCHEMA = Schema.Record({
 	}, true)),
 }, true)
 local RANK_DATA_SCHEMA = Schema.Record({
-	data = Schema.Collection(Schema.Record({
-		id = Schema.Number, -- 团队ID
-		event_id = Schema.Number, -- 活动ID
-		count = Schema.Number, -- 票数
-		name = Schema.String, -- 团队名称
-		server = Schema.String, -- 团队服务器
-		leader_name = Schema.String, -- 团长名字
-		slogan = Schema.String, -- 参赛宣言，已由运营审核
-		link = Schema.String, -- 团队主页（查看详情的链接地址）
-		checked = Schema.Number, -- 默认为0，当为1时代表该用户已投票该队伍
-	}, true)),
+	data = Schema.Record({
+		list = Schema.Collection(Schema.Record({
+			id = Schema.Number, -- 团队ID
+			event_id = Schema.Number, -- 活动ID
+			count = Schema.Number, -- 票数
+			name = Schema.String, -- 团队名称
+			server = Schema.String, -- 团队服务器
+			leader_name = Schema.String, -- 团长名字
+			slogan = Schema.String, -- 参赛宣言，已由运营审核
+			link = Schema.String, -- 团队主页（查看详情的链接地址）
+			checked = Schema.Number, -- 默认为0，当为1时代表该用户已投票该队伍
+		}, true),
+		record = Schema.Collection(Schema.Record({
+			status = Schema.Number, -- 是否已投票
+			team_id = Schema.Number, -- 已投票的团队ID
+		}, true),
+	}, true),
 }, true)
 local VOTE_SCHEMA = Schema.Record({
 	msg = Schema.String,
