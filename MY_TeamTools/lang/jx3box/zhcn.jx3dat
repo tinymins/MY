@@ -42,6 +42,7 @@ return {
     ['Slogan'] = '宣言',
     ['Vote Count'] = '人气',
     ['Vote'] = '投票',
+    ['Voted'] = '已投',
     ['ERR: Decode rankdata content as json failed!'] = '错误：解码列表失败！',
     ['ERR: Rankdata content is illegal!'] = '错误：列表内容数据结构不符合约束！',
     ['ERR404: Rankdata address not found!'] = '错误：列表地址不存在！',

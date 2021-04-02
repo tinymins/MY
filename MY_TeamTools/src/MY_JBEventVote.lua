@@ -52,9 +52,14 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^3.0.1') then
 	return
 end
 --------------------------------------------------------------------------
-local INI_PATH = PACKET_INFO.ROOT .. 'MY_ToolBox/ui/MY_JBEventVote.ini'
-local SZ_MOD_INI = PACKET_INFO.ROOT .. 'MY_ToolBox/ui/MY_JBEventVote__Mod.ini'
-local D = {}
+local INI_PATH = PLUGIN_ROOT .. '/ui/MY_JBEventVote.ini'
+local SZ_MOD_INI = PLUGIN_ROOT .. '/ui/MY_JBEventVote__Mod.ini'
+local D = {
+	aEventList = {},
+	tChangedEventID = {},
+	tEventRankInfo = {},
+	szEventSearch = '',
+}
 
 local Schema = LIB.Schema
 local EVENT_LIST_SCHEMA = Schema.Record({
@@ -78,8 +83,8 @@ local RANK_DATA_SCHEMA = Schema.Record({
 			slogan = Schema.String, -- 参赛宣言，已由运营审核
 			link = Schema.String, -- 团队主页（查看详情的链接地址）
 			checked = Schema.Number, -- 默认为0，当为1时代表该用户已投票该队伍
-		}, true),
-		record = Schema.Collection(Schema.Record({
+		}, true)),
+		record = Schema.Record({
 			status = Schema.Number, -- 是否已投票
 			team_id = Schema.Number, -- 已投票的团队ID
 		}, true),
@@ -116,7 +121,8 @@ function D.FetchEventList(frame)
 				Wnd.CloseWindow(frame)
 				return
 			end
-			D.UpdateEventList(frame, res.data)
+			D.aEventList = res.data
+			D.UpdateEventList(frame)
 		end,
 		error = function(html, status)
 			if status == 404 then
@@ -132,10 +138,10 @@ function D.FetchEventList(frame)
 	})
 end
 
-function D.UpdateEventList(frame, aEventList)
+function D.UpdateEventList(frame)
 	frame.bInitPageset = true
 	local pageset = frame:Lookup('PageSet_All')
-	for i, eve in ipairs(aEventList) do
+	for i, eve in ipairs(D.aEventList) do
 		local frameMod = Wnd.OpenWindow(SZ_MOD_INI, 'MY_JBEventVote__Mod')
 		local checkbox = frameMod:Lookup('PageSet_All/WndCheck_Event')
 		local page = frameMod:Lookup('PageSet_All/Page_Event')
@@ -155,8 +161,8 @@ function D.UpdateEventList(frame, aEventList)
 		checkbox.szEventID = eve.id
 		page.szEventID = eve.id
 	end
-	if aEventList[1] then
-		D.FetchRankList(frame, aEventList[1].id)
+	if D.aEventList[1] then
+		D.FetchRankList(frame, D.aEventList[1].id)
 	end
 	frame.bInitPageset = nil
 end
@@ -187,7 +193,9 @@ function D.FetchRankList(frame, szEventID)
 				LIB.Alert(_L['ERR: Rankdata content is illegal!'] .. '\n\n' .. LIB.ReplaceSensitiveWord(concat(aErrmsgs, '\n')))
 				return
 			end
-			D.UpdateEvent(frame, szEventID, res.data)
+			D.tChangedEventID[szEventID] = true
+			D.tEventRankInfo[szEventID] = res.data
+			D.UpdateEvent(frame)
 		end,
 		error = function(html, status)
 			if status == 404 then
@@ -201,29 +209,40 @@ function D.FetchRankList(frame, szEventID)
 	})
 end
 
-function D.UpdateEvent(frame, szEventID, aRankList)
+function D.UpdateEvent(frame)
 	local pageset = frame:Lookup('PageSet_All')
 	local page = pageset:GetFirstChild()
+	local szEventSearch = wgsub(D.szEventSearch, ' ', ',')
 	while page do
-		if page:GetName() == 'Page_Event' and page.szEventID == szEventID then
+		if page:GetName() == 'Page_Event' and (D.tChangedEventID[page.szEventID] or D.tChangedEventID['*']) then
 			local container = page:Lookup('Wnd_Event/WndScroll_Event/WndContainer_List')
 			container:Clear()
-			for i, eve in ipairs(aRankList) do
-				local wnd = container:AppendContentFromIni(SZ_MOD_INI, 'Wnd_Row')
-				wnd:Lookup('', 'Text_ItemName'):SetText(LIB.ReplaceSensitiveWord(eve.name))
-				wnd:Lookup('', 'Text_ItemServer'):SetText(LIB.ReplaceSensitiveWord(eve.server))
-				wnd:Lookup('', 'Text_ItemLeader'):SetText(LIB.ReplaceSensitiveWord(eve.leader_name))
-				wnd:Lookup('', 'Text_ItemSlogan'):SetText(LIB.ReplaceSensitiveWord(eve.slogan))
-				wnd:Lookup('', 'Text_ItemCount'):SetText(LIB.ReplaceSensitiveWord(eve.count))
-				wnd:Lookup('', 'Image_RowBg'):SetVisible(i % 2 == 1)
-				wnd:Lookup('Btn_Vote', 'Text_Vote'):SetText(_L['Vote'])
-				wnd:Lookup('Btn_Info', 'Text_Info'):SetText(_L['View Detail'])
-				wnd.eve = eve
+			for i, eve in ipairs(Get(D.tEventRankInfo, {page.szEventID, 'list'}, {})) do
+				if IsEmpty(D.szEventSearch)
+				or LIB.StringSimpleMatch(eve.server .. ',' .. eve.name, szEventSearch) then
+					local wnd = container:AppendContentFromIni(SZ_MOD_INI, 'Wnd_Row')
+					wnd:Lookup('', 'Text_ItemName'):SetText(LIB.ReplaceSensitiveWord(eve.name))
+					wnd:Lookup('', 'Text_ItemServer'):SetText(LIB.ReplaceSensitiveWord(eve.server))
+					wnd:Lookup('', 'Text_ItemLeader'):SetText(LIB.ReplaceSensitiveWord(eve.leader_name))
+					wnd:Lookup('', 'Text_ItemSlogan'):SetText(LIB.ReplaceSensitiveWord(eve.slogan))
+					wnd:Lookup('', 'Text_ItemCount'):SetText(LIB.ReplaceSensitiveWord(eve.count))
+					wnd:Lookup('', 'Image_RowBg'):SetVisible(i % 2 == 1)
+					if Get(D.tEventRankInfo, {page.szEventID, 'record', 'status'}, 0) == 0 then
+						wnd:Lookup('Btn_Vote', 'Text_Vote'):SetText(_L['Vote'])
+					elseif Get(D.tEventRankInfo, {page.szEventID, 'record', 'team_id'}, 0) == eve.id then
+						wnd:Lookup('Btn_Vote', 'Text_Vote'):SetText(_L['Voted'])
+					else
+						wnd:Lookup('Btn_Vote', 'Text_Vote'):Hide()
+					end
+					wnd:Lookup('Btn_Info', 'Text_Info'):SetText(_L['View Detail'])
+					wnd.eve = eve
+				end
 			end
 			container:FormatAllContentPos()
 		end
 		page = page:GetNext()
 	end
+	D.tChangedEventID = {}
 end
 
 function D.Vote(frame, szEventID, szTeamID)
@@ -269,9 +288,15 @@ function D.Vote(frame, szEventID, szTeamID)
 end
 
 function D.OnFrameCreate()
+	this.bInitializing = true
 	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
 	this:Lookup('', 'Text_Title'):SetText(_L['MY_JBEventVote'])
+	this:Lookup('Wnd_Search/Edit_Search'):SetText(D.szEventSearch)
+	D.tChangedEventID['*'] = true
+	this.bInitializing = nil
 	D.OnEvent('UI_SCALED')
+	D.UpdateEventList(this)
+	D.UpdateEvent(this)
 	D.FetchEventList(this)
 end
 
@@ -289,8 +314,25 @@ function D.OnLButtonClick()
 	end
 end
 
+function D.OnEditChanged()
+	local frame = this:GetRoot()
+	if not frame or frame.bInitializing then
+		return
+	end
+	local name = this:GetName()
+	local frame = this:GetRoot()
+	if name == 'Edit_Search' then
+		D.szEventSearch = LIB.TrimString(this:GetText())
+		D.tChangedEventID['*'] = true
+		LIB.DelayCall('MY_JBEventVote__Search', 300, function() D.UpdateEvent(frame) end)
+	end
+end
+
 function D.OnActivePage()
 	local frame = this:GetRoot()
+	if not frame or frame.bInitializing then
+		return
+	end
 	if frame.bInitPageset then
 		return
 	end
