@@ -2046,7 +2046,11 @@ function LIB.GetAccount()
 end
 
 function LIB.OpenBrowser(szAddr)
-	OpenBrowser(szAddr)
+	if _G.OpenBrowser then
+		_G.OpenBrowser(szAddr)
+	else
+		UI.OpenIE(szAddr)
+	end
 end
 
 function LIB.ArrayToObject(arr)
