@@ -1,6 +1,6 @@
 --------------------------------------------------------
 -- This file is part of the JX3 Plugin Boilerplate.
--- @desc     : 基础库加载完成处理
+-- @desc     : 界面工具库
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
 --------------------------------------------------------
 -------------------------------------------------------------------------------------------------------
@@ -41,33 +41,99 @@ local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild,
 local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
 local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
 -------------------------------------------------------------------------------------------------------
-local PROXY = {}
-if IsDebugClient() then
-function PROXY.DebugSetVal(szKey, oVal)
-	PROXY[szKey] = oVal
-end
-end
+local _L = LIB.LoadLangPack(PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 
-for k, v in pairs(LIB) do
-	PROXY[k] = v
-	LIB[k] = nil
-end
-setmetatable(LIB, {
-	__metatable = true,
-	__index = PROXY,
-	__newindex = function() assert(false, NSFormatString('DO NOT modify {$NS} after initialized!!!')) end,
-	__tostring = function(t) return NSFormatString('{$NS} (base library)') end,
-})
-FireUIEvent(NSFormatString('{$NS}_BASE_LOADING_END'))
-
-LIB.RegisterInit(NSFormatString('{$NS}#AUTHOR_TIP'), function()
-	local Farbnamen = _G.MY_Farbnamen
-	if Farbnamen and Farbnamen.RegisterHeader then
-		for dwID, szName in pairs_c(PACKET_INFO.AUTHOR_ROLES) do
-			Farbnamen.RegisterHeader(szName, dwID, PACKET_INFO.AUTHOR_HEADER)
+function UI.GetTreePath(raw)
+	local tTreePath = {}
+	if IsTable(raw) and raw.GetTreePath then
+		insert(tTreePath, (raw:GetTreePath()):sub(1, -2))
+		while(raw and raw:GetType():sub(1, 3) ~= 'Wnd') do
+			local szName = raw:GetName()
+			if not szName or szName == '' then
+				insert(tTreePath, 2, raw:GetIndex())
+			else
+				insert(tTreePath, 2, szName)
+			end
+			raw = raw:GetParent()
 		end
-		for szName, _ in pairs_c(PACKET_INFO.AUTHOR_PROTECT_NAMES) do
-			Farbnamen.RegisterHeader(szName, '*', PACKET_INFO.AUTHOR_FAKE_HEADER)
+	else
+		insert(tTreePath, tostring(raw))
+	end
+	return concat(tTreePath, '/')
+end
+
+do
+local ui, cache
+function UI.GetTempElement(szType)
+	if not IsString(szType) then
+		return
+	end
+	local szKey = nil
+	local nPos = StringFindW(szType, '.')
+	if nPos then
+		szKey = sub(szType, nPos + 1)
+		szType = sub(szType, 1, nPos - 1)
+	end
+	if not IsString(szKey) then
+		szKey = 'Default'
+	end
+	if not cache or not ui or ui:Count() == 0 then
+		cache = {}
+		ui = UI.CreateFrame(NSFormatString('{$NS}#TempElement'), { empty = true }):Hide()
+	end
+	local szName = szType .. '_' .. szKey
+	local raw = cache[szName]
+	if not raw then
+		raw = ui:Append(szType, {
+			name = szName,
+		})[1]
+		cache[szName] = raw
+	end
+	return raw
+end
+end
+
+function UI.ScrollIntoView(el, scrollY, nOffsetY, scrollX, nOffsetX)
+	local elParent, nParentW, nParentH = el:GetParent()
+	local nX, nY = el:GetAbsX() - elParent:GetAbsX(), el:GetAbsY() - elParent:GetAbsY()
+	if elParent:GetType() == 'WndContainer' then
+		nParentW, nParentH = elParent:GetAllContentSize()
+	else
+		nParentW, nParentH = elParent:GetAllItemSize()
+	end
+	if nOffsetY then
+		nY = nY + nOffsetY
+	end
+	if scrollY then
+		scrollY:SetScrollPos(nY / nParentH * scrollY:GetStepCount())
+	end
+	if nOffsetX then
+		nX = nX + nOffsetX
+	end
+	if scrollX then
+		scrollX:SetScrollPos(nX / nParentW * scrollX:GetStepCount())
+	end
+end
+
+function UI.LookupFrame(szName)
+	for _, v in ipairs(UI.LAYER_LIST) do
+		local frame = Station.Lookup(v .. '/' .. szName)
+		if frame then
+			return frame
 		end
 	end
-end)
+end
+
+-- FORMAT_WMSG_RET
+function UI.FormatWMsgRet(stop, callFrame)
+	local ret = 0
+	if stop then
+		ret = ret + 1 --01
+	end
+	if callFrame then
+		ret = ret + 2 --10
+	end
+	return ret
+end
+
+UI.UpdateItemInfoBoxObject = _G.UpdateItemInfoBoxObject or UpdataItemInfoBoxObject

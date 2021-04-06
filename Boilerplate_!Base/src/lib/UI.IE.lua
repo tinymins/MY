@@ -1,6 +1,6 @@
 --------------------------------------------------------
 -- This file is part of the JX3 Plugin Boilerplate.
--- @desc     : 基础库加载完成处理
+-- @desc     : IE
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
 --------------------------------------------------------
 -------------------------------------------------------------------------------------------------------
@@ -41,33 +41,120 @@ local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild,
 local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
 local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
 -------------------------------------------------------------------------------------------------------
-local PROXY = {}
-if IsDebugClient() then
-function PROXY.DebugSetVal(szKey, oVal)
-	PROXY[szKey] = oVal
-end
+local _L = LIB.LoadLangPack(PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
+
+-- 判断浏览器是否已开启
+local function IsInternetExplorerOpened(nIndex)
+	local frame = Station.Lookup('Topmost/IE' .. nIndex)
+	if frame and frame:IsVisible() then
+		return true
+	end
+	return false
 end
 
-for k, v in pairs(LIB) do
-	PROXY[k] = v
-	LIB[k] = nil
-end
-setmetatable(LIB, {
-	__metatable = true,
-	__index = PROXY,
-	__newindex = function() assert(false, NSFormatString('DO NOT modify {$NS} after initialized!!!')) end,
-	__tostring = function(t) return NSFormatString('{$NS} (base library)') end,
-})
-FireUIEvent(NSFormatString('{$NS}_BASE_LOADING_END'))
-
-LIB.RegisterInit(NSFormatString('{$NS}#AUTHOR_TIP'), function()
-	local Farbnamen = _G.MY_Farbnamen
-	if Farbnamen and Farbnamen.RegisterHeader then
-		for dwID, szName in pairs_c(PACKET_INFO.AUTHOR_ROLES) do
-			Farbnamen.RegisterHeader(szName, dwID, PACKET_INFO.AUTHOR_HEADER)
-		end
-		for szName, _ in pairs_c(PACKET_INFO.AUTHOR_PROTECT_NAMES) do
-			Farbnamen.RegisterHeader(szName, '*', PACKET_INFO.AUTHOR_FAKE_HEADER)
+-- 获取浏览器绝对位置
+local function IE_GetNewIEFramePos()
+	local nLastTime = 0
+	local nLastIndex = nil
+	for i = 1, 10, 1 do
+		local frame = Station.Lookup('Topmost/IE' .. i)
+		if frame and frame:IsVisible() then
+			if frame.nOpenTime > nLastTime then
+				nLastTime = frame.nOpenTime
+				nLastIndex = i
+			end
 		end
 	end
-end)
+	if nLastIndex then
+		local frame = Station.Lookup('Topmost/IE' .. nLastIndex)
+		local x, y = frame:GetAbsPos()
+		local wC, hC = Station.GetClientSize()
+		if x + 890 <= wC and y + 630 <= hC then
+			return x + 30, y + 30
+		end
+	end
+	return 40, 40
+end
+
+-- 打开浏览器
+function UI.OpenIE(szAddr, bDisableSound, w, h)
+	local nIndex, nLast = nil, nil
+	for i = 1, 10, 1 do
+		if not IsInternetExplorerOpened(i) then
+			nIndex = i
+			break
+		elseif not nLast then
+			nLast = i
+		end
+	end
+	if not nIndex then
+		OutputMessage('MSG_ANNOUNCE_RED', g_tStrings.MSG_OPEN_TOO_MANY)
+		return nil
+	end
+	local x, y = IE_GetNewIEFramePos()
+	local frame = Wnd.OpenWindow('InternetExplorer', 'IE' .. nIndex)
+	frame.bIE = true
+	frame.nIndex = nIndex
+
+	if w and h then
+		UI.ResizeIE(frame, w, h)
+	end
+	frame:BringToTop()
+	if nLast then
+		frame:SetAbsPos(x, y)
+		frame:CorrectPos()
+		frame.x = x
+		frame.y = y
+	else
+		frame:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
+		frame.x, frame.y = frame:GetAbsPos()
+	end
+	local webPage = frame:Lookup('WebPage_Page')
+	if szAddr then
+		webPage:Navigate(szAddr)
+	end
+	Station.SetFocusWindow(webPage)
+	if not bDisableSound then
+		PlaySound(SOUND.UI_SOUND,g_sound.OpenFrame)
+	end
+	return webPage
+end
+
+function UI.ResizeIE(frame, w, h)
+	if w < 400 then w = 400 end
+	if h < 200 then h = 200 end
+	local handle = frame:Lookup('', '')
+	handle:SetSize(w, h)
+	handle:Lookup('Image_Bg'):SetSize(w, h)
+	handle:Lookup('Image_BgT'):SetSize(w - 6, 64)
+	if not frame.bQuestionnaire then
+		handle:Lookup('Image_Edit'):SetSize(w - 300, 25)
+	end
+	handle:Lookup('Text_Title'):SetSize(w - 168, 30)
+	handle:FormatAllItemPos()
+
+	local webPage = frame:Lookup('WebPage_Page')
+	if frame.bQuestionnaire then
+		webPage:SetSize(w - 20, h - 140)
+	else
+		webPage:SetSize(w - 12, h - 76)
+		frame:Lookup('Edit_Input'):SetSize(w - 306, 20)
+		frame:Lookup('Btn_GoTo'):SetRelPos(w - 110, 38)
+	end
+
+	frame:Lookup('Btn_Close'):SetRelPos(w - 40, 10)
+	frame:Lookup('CheckBox_MaxSize'):SetRelPos(w - 70, 10)
+
+	frame:Lookup('Btn_DL'):SetSize(10, h - 20)
+	frame:Lookup('Btn_DT'):SetSize(w - 20, 10)
+	frame:Lookup('Btn_DTR'):SetRelPos(w - 10, 0)
+	frame:Lookup('Btn_DR'):SetRelPos(w - 10, 10)
+	frame:Lookup('Btn_DR'):SetSize(10, h - 20)
+	frame:Lookup('Btn_DRB'):SetRelPos(w - 10, h - 10)
+	frame:Lookup('Btn_DB'):SetRelPos(10, h - 10)
+	frame:Lookup('Btn_DB'):SetSize(w - 20, 10)
+	frame:Lookup('Btn_DLB'):SetRelPos(0, h - 10)
+
+	frame:SetSize(w, h)
+	frame:SetDragArea(0, 0, w, 30)
+end

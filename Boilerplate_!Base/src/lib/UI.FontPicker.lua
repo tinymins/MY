@@ -1,6 +1,6 @@
 --------------------------------------------------------
 -- This file is part of the JX3 Plugin Boilerplate.
--- @desc     : 基础库加载完成处理
+-- @desc     : FontPicker
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
 --------------------------------------------------------
 -------------------------------------------------------------------------------------------------------
@@ -41,33 +41,34 @@ local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild,
 local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
 local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
 -------------------------------------------------------------------------------------------------------
-local PROXY = {}
-if IsDebugClient() then
-function PROXY.DebugSetVal(szKey, oVal)
-	PROXY[szKey] = oVal
-end
-end
+local _L = LIB.LoadLangPack(PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 
-for k, v in pairs(LIB) do
-	PROXY[k] = v
-	LIB[k] = nil
-end
-setmetatable(LIB, {
-	__metatable = true,
-	__index = PROXY,
-	__newindex = function() assert(false, NSFormatString('DO NOT modify {$NS} after initialized!!!')) end,
-	__tostring = function(t) return NSFormatString('{$NS} (base library)') end,
-})
-FireUIEvent(NSFormatString('{$NS}_BASE_LOADING_END'))
-
-LIB.RegisterInit(NSFormatString('{$NS}#AUTHOR_TIP'), function()
-	local Farbnamen = _G.MY_Farbnamen
-	if Farbnamen and Farbnamen.RegisterHeader then
-		for dwID, szName in pairs_c(PACKET_INFO.AUTHOR_ROLES) do
-			Farbnamen.RegisterHeader(szName, dwID, PACKET_INFO.AUTHOR_HEADER)
+-- 打开字体选择
+function UI.OpenFontPicker(callback, t)
+	local ui, i = UI.CreateFrame(NSFormatString('{$NS}_Font_Picker'), { simple = true, close = true, esc = true, text = _L['Font Picker'] }), 0
+	while 1 do
+		local font = i
+		local txt = ui:Append('Text', {
+			w = 70, x = i % 10 * 80 + 20, y = floor(i / 10) * 25,
+			font = font, alpha = 200, text = _L('Font %d', font),
+			onclick = function()
+				if callback then
+					callback(font)
+				end
+				if not IsCtrlKeyDown() then
+					ui:Remove()
+				end
+			end,
+			onhover = function(bIn)
+				UI(this):Alpha(bIn and 255 or 200)
+			end,
+		})
+		-- remove unexist font
+		if txt:Font() ~= font then
+			txt:Remove()
+			break
 		end
-		for szName, _ in pairs_c(PACKET_INFO.AUTHOR_PROTECT_NAMES) do
-			Farbnamen.RegisterHeader(szName, '*', PACKET_INFO.AUTHOR_FAKE_HEADER)
-		end
+		i = i + 1
 	end
-end)
+	return ui:Size(820, 70 + floor(i / 10) * 25):Anchor({ s = 'CENTER', r = 'CENTER', x = 0, y = 0 }):Focus()
+end
