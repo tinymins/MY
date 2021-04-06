@@ -1,0 +1,3 @@
+return {
+	['HoverEntry'] = '浮動快捷入口',
+}

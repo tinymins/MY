@@ -1,0 +1,37 @@
+return {
+	-- globalcolor
+	['Global color'] = '全局配色',
+	['Force color'] = '門派配色',
+	['Camp color'] = '陣營配色',
+	['Restore default'] = '恢復默認',
+
+	-- globalconfig
+	['GlobalConfig'] = '全局設置',
+	['Distance type'] = '默認距離計算方式',
+	['Notify center'] = '消息中心',
+	['Show in minimap'] = '顯示小地圖入口',
+	['Order desc'] = '逆序顯示',
+	['Disable dismiss'] = '禁止消息自動消失',
+	['System Info'] = '系統信息',
+
+	['Hover entry'] = '懸浮入口',
+	['Hover popup'] = '滑鼠滑過立即彈出',
+	['Size: %d'] = '大小：%d',
+
+	-- welcome
+	['%s, welcome to use %s!'] = '歡迎%s使用%s！',
+
+	['Storage location'] = '存儲位置',
+	['User preference storage'] = '配置存儲',
+	['User preference'] = '角色數據',
+	['Server preference'] = '伺服器數據',
+	['Global preference'] = '全局數據',
+	['Error message'] = '錯誤反饋',
+	['Show error message'] = '點擊查看錯誤日誌，請在上報問題時複製提交',
+	['Debug tools has been enabled...'] = '測試工具已激活_(:彡」∠)_',
+	['Flush data'] = '保存數據',
+	['Config and data will be saved when exit game, click to save immediately'] = '設置數據將在退出游戲後自動保存，點擊立刻保存',
+
+	['Fee left %H:%mm:%ss'] = '計費剩餘：%H小時%mm分鐘%ss秒',
+	['Fee left unknown'] = '計費剩餘：未知',
+}

@@ -1,0 +1,9 @@
+﻿.luacheckrc
+*.pyc
+manifest.dat
+manifest.key
+publisher.key
+__pycache__
+/squishy
+/*/src.lua
+/\!src-dist/dist/

@@ -1,0 +1,15 @@
+language: python
+sudo: false
+
+env:
+  - LUA="lua=5.1"
+
+before_install:
+  - pip install hererocks
+  - pip install codecov
+  - hererocks here --$LUA -r latest
+  - source here/bin/activate
+  - luarocks install luacheck
+
+script:
+  - luacheck 'Boilerplate_!Base' Boilerplate_Resource

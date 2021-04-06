@@ -1,0 +1,37 @@
+return {
+	-- globalcolor
+	['Global color'] = '全局配色',
+	['Force color'] = '门派配色',
+	['Camp color'] = '阵营配色',
+	['Restore default'] = '恢复默认',
+
+	-- globalconfig
+	['GlobalConfig'] = '全局设置',
+	['Distance type'] = '默认距离计算方式',
+	['Notify center'] = '消息中心',
+	['Show in minimap'] = '显示小地图入口',
+	['Order desc'] = '逆序显示',
+	['Disable dismiss'] = '禁止消息自动消失',
+	['System Info'] = '系统信息',
+
+	['Hover entry'] = '悬浮入口',
+	['Hover popup'] = '鼠标滑过立即弹出',
+	['Size: %d'] = '大小：%d',
+
+	-- welcome
+	['%s, welcome to use %s!'] = '欢迎%s使用%s！',
+
+	['Storage location'] = '存储位置',
+	['User preference storage'] = '配置存储',
+	['User preference'] = '角色数据',
+	['Server preference'] = '服务器数据',
+	['Global preference'] = '全局数据',
+	['Error message'] = '错误反馈',
+	['Show error message'] = '点击查看错误日志，请在上报问题时复制提交',
+	['Debug tools has been enabled...'] = '测试工具已激活_(:彡」∠)_',
+	['Flush data'] = '保存数据',
+	['Config and data will be saved when exit game, click to save immediately'] = '设置数据将在退出游戏后自动保存，点击立刻保存',
+
+	['Fee left %H:%mm:%ss'] = '计费剩余：%H小时%mm分钟%ss秒',
+	['Fee left unknown'] = '计费剩余：未知',
+}

@@ -1,0 +1,10 @@
+Farme	Left	Top	Width	High	File
+0	0	0	256	32	C:\Users\Webster\Desktop\计时条\橙色.tga
+1	0	34	256	32	C:\Users\Webster\Desktop\计时条\粉色.tga
+2	0	68	256	32	C:\Users\Webster\Desktop\计时条\红色.tga
+3	0	102	256	32	C:\Users\Webster\Desktop\计时条\黄色.tga
+4	0	136	256	32	C:\Users\Webster\Desktop\计时条\灰色.tga
+5	0	170	256	32	C:\Users\Webster\Desktop\计时条\蓝色.tga
+6	0	204	256	32	C:\Users\Webster\Desktop\计时条\绿色.tga
+7	0	238	256	32	C:\Users\Webster\Desktop\计时条\青色.tga
+8	0	272	256	32	C:\Users\Webster\Desktop\计时条\紫色.tga
