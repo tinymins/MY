@@ -81,5 +81,5 @@ if __name__ == '__main__':
 	src_file = os.path.abspath(os.path.join(__file__, '..', 'pinyin.txt'))
 	__update_pinyin(src_file)
 	pinyin = __load_pinyin(src_file)
-	dst_file = os.path.abspath(os.path.join(__file__, '..', '..', '..', '..', 'BP_!Base/data/pinyin/zhcn.jx3dat'))
+	dst_file = os.path.abspath(os.path.join(__file__, '..', '..', '..', '..', 'Boilerplate_!Base/data/pinyin/zhcn.jx3dat'))
 	__save_pinyin(dst_file, pinyin)
