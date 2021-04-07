@@ -93,7 +93,7 @@ function D.OnEvent(event)
 end
 
 function UI.GetShadowHandle(szName)
-	local frame = Station.Search(FRAME_NAME)
+	local frame = Station.SearchFrame(FRAME_NAME)
 	if frame and not IsElement(frame) then -- 关闭无效的 frame 句柄
 		Wnd.CloseWindow(FRAME_NAME)
 		frame = nil
