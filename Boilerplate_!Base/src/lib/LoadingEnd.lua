@@ -1,5 +1,5 @@
 --------------------------------------------------------
--- This file is part of the JX3 Plugin Boilerplate.
+-- This file is part of the JX3 Plugin Project.
 -- @desc     : 基础库加载完成处理
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
 --------------------------------------------------------

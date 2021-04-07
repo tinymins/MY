@@ -1,5 +1,5 @@
 --------------------------------------------------------
--- This file is part of the JX3 Plugin Boilerplate.
+-- This file is part of the JX3 Plugin Project.
 -- @desc     : ×Ö·û´®´¦Àí
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
 --------------------------------------------------------
@@ -367,7 +367,11 @@ function LIB.ReplaceSensitiveWord(szText)
 	if not _G.TextFilterReplace then
 		return szText
 	end
-	return select(2, _G.TextFilterReplace(szText))
+	local bResult, szResult = _G.TextFilterReplace(szText)
+	if not bResult then
+		return szText
+	end
+	return szResult
 end
 
 do

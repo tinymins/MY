@@ -1,4 +1,11 @@
 return {
+	-- LuaWatcher
+	['LuaWatcher'] = '調用統計',
+	['Start'] = '開始',
+	['Stop'] = '結束',
+	['Refresh'] = '刷新',
+	['Reset'] = '重置',
+
 	-- Dev_UIEditor.lua
 	['Dev_UIEditor'] = '窗口查看',
 

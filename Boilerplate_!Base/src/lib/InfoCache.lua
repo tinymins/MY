@@ -1,5 +1,5 @@
 --------------------------------------------------------
--- This file is part of the JX3 Plugin Boilerplate.
+-- This file is part of the JX3 Plugin Project.
 -- @desc     : 键值对文件分隔快速存储模块
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
 --------------------------------------------------------

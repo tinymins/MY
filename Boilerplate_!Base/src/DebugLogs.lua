@@ -1,5 +1,5 @@
 --------------------------------------------------------
--- This file is part of the JX3 Plugin Boilerplate.
+-- This file is part of the JX3 Plugin Project.
 -- @desc     : 各种调试信息输出
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
 --------------------------------------------------------
