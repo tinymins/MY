@@ -140,7 +140,7 @@ def run(is_full, is_source):
 			os.system('git checkout prelease || git checkout -b prelease')
 			os.system('git rebase master')
 			os.system('code "%s_!Base/src/Base.lua"' % get_current_packet_id())
-			os.system('code "%s_CHANGELOG.txt"' % get_current_packet_id())
+			os.system('code "CHANGELOG.md"' % get_current_packet_id())
 			utils.exit_with_message('Switched to prelease branch. Please commit release info and then run this script again!')
 
 		# Merge prelease into stable

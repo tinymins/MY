@@ -2,7 +2,7 @@
 *.py
 *.pyc
 .*
-MYDev_*
+BoilerplateDev_*
 README.md
 !src-dist
 header.tpl.lua

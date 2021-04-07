@@ -1,5 +1,0 @@
-return {
-	['[%s] wants to get your location, would you like to share?'] = '[%s] 希望取得你當前所在地圖位置，你是否願意共享當前位置信息？',
-	['[%s] want to see your info, OK?'] = '團長 [%s] 想知曉您的裝備、心法，是否告知？',
-	['I\'ve installed MY plugins v%s <%s>'] = '我已安裝茗伊插件集 v%s <%s>。',
-}

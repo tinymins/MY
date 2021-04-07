@@ -1,0 +1,4 @@
+Farme	Left	Top	Width	High	File
+0	0	0	100	100	C:\Users\root\Desktop\Ðþ¾§Ð¡ICON.tga
+1	102	0	100	100	C:\Users\root\Desktop\Ã¨×¦.tga
+2	204	0	100	100	C:\Users\root\Desktop\(new)Ã¨×¦.tga

@@ -1,3 +1,10 @@
+--------------------------------------------------------
+-- This file is part of the JX3 Plugin Project.
+-- @desc     : Base64 ´¦ÀíÄ£¿é
+-- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
+--------------------------------------------------------
+-- Base64-encoding
+-- Sourced from http://en.wikipedia.org/wiki/Base64
 -------------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
@@ -36,3 +43,93 @@ local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild,
 local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
 local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
 -------------------------------------------------------------------------------------------------------
+
+local __author__ = 'Daniel Lindsley'
+local __version__ = 'scm-1'
+local __license__ = 'BSD'
+
+local index_table = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+
+local function to_binary(integer)
+	local remaining = tonumber(integer)
+	local bin_bits = ''
+
+	for i = 7, 0, -1 do
+		local current_power = pow(2, i)
+
+		if remaining >= current_power then
+			bin_bits = bin_bits .. '1'
+			remaining = remaining - current_power
+		else
+			bin_bits = bin_bits .. '0'
+		end
+	end
+
+	return bin_bits
+end
+
+local function from_binary(bin_bits)
+	return tonumber(bin_bits, 2)
+end
+
+
+local function to_base64(to_encode)
+	local bit_pattern = ''
+	local encoded = ''
+	local trailing = ''
+
+	for i = 1, len(to_encode) do
+		bit_pattern = bit_pattern .. to_binary(byte(sub(to_encode, i, i)))
+	end
+
+	-- Check the number of bytes. If it's not evenly divisible by three,
+	-- zero-pad the ending & append on the correct number of ``=``s.
+	if mod(len(bit_pattern), 3) == 2 then
+		trailing = '=='
+		bit_pattern = bit_pattern .. '0000000000000000'
+	elseif mod(len(bit_pattern), 3) == 1 then
+		trailing = '='
+		bit_pattern = bit_pattern .. '00000000'
+	end
+
+	for i = 1, len(bit_pattern), 6 do
+		local byte = sub(bit_pattern, i, i+5)
+		local offset = tonumber(from_binary(byte))
+		encoded = encoded .. sub(index_table, offset+1, offset+1)
+	end
+
+	return sub(encoded, 1, -1 - len(trailing)) .. trailing
+end
+
+
+local function from_base64(to_decode)
+	local padded = to_decode:gsub('%s', '')
+	local unpadded = padded:gsub('=', '')
+	local bit_pattern = ''
+	local decoded = ''
+
+	for i = 1, len(unpadded) do
+		local char = sub(to_decode, i, i)
+		local offset, _ = find(index_table, char)
+		if offset == nil then
+			error('Invalid character \'' .. char .. '\' found.')
+		end
+
+		bit_pattern = bit_pattern .. sub(to_binary(offset-1), 3)
+	end
+
+	for i = 1, len(bit_pattern), 8 do
+		local byte = sub(bit_pattern, i, i+7)
+		decoded = decoded .. char(from_binary(byte))
+	end
+
+	local padding_length = padded:len()-unpadded:len()
+
+	if (padding_length == 1 or padding_length == 2) then
+		decoded = decoded:sub(1,-2)
+	end
+	return decoded
+end
+
+LIB.Base64Encode = to_base64
+LIB.Base64Decode = from_base64

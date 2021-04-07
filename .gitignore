@@ -1,4 +1,5 @@
-﻿*.pyc
+﻿.luacheckrc
+*.pyc
 manifest.dat
 manifest.key
 publisher.key

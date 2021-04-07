@@ -1,3 +1,8 @@
+--------------------------------------------------------
+-- This file is part of the JX3 Plugin Project.
+-- @desc     : TextEditor
+-- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
+--------------------------------------------------------
 -------------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
@@ -36,3 +41,25 @@ local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild,
 local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
 local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
 -------------------------------------------------------------------------------------------------------
+local _L = LIB.LoadLangPack(PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
+
+-- 打开文本编辑器
+function UI.OpenTextEditor(szText, szFrameName)
+	if not szFrameName then
+		szFrameName = NSFormatString('{$NS}_DefaultTextEditor')
+	end
+	local w, h, ui = 400, 300, nil
+	local function OnResize()
+		ui:Children('.WndEditBox'):Size(ui:Size(true))
+	end
+	ui = UI.CreateFrame(szFrameName, {
+		w = w, h = h, text = _L['Text Editor'], alpha = 180,
+		anchor = { s='CENTER', r='CENTER', x=0, y=0 },
+		simple = true, close = true, esc = true,
+		dragresize = true, minimize = true, ondragresize = OnResize,
+	})
+	ui:Append('WndEditBox', { x = 0, y = 0, multiline = true, text = szText })
+	ui:Focus()
+	OnResize()
+	return ui
+end
