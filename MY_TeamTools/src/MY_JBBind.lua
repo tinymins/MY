@@ -158,15 +158,21 @@ local PS = {
 	-- bWelcome = true,
 	nShielded = LIB.IsDebugServer() and 2 or nil,
 }
+
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
 	local X, Y = 20, 20
 	local nX, nY = X, Y
 	local W, H = ui:Size()
+	local szPSUUID = LIB.GetUUID()
+	O.szPSUUID = szPSUUID
 
 	-- ╫ги╚хож╓
 	local uiCCStatus, uiBtnCCStatus, uiBtnCCLink
 	local function UpdateUI()
+		if O.szPSUUID ~= PS_UUID then
+			return
+		end
 		if O.pending then
 			uiCCStatus:Text(_L['Loading'])
 			uiBtnCCStatus:Text(_L['Click fetch'])
@@ -249,4 +255,9 @@ function PS.OnPanelActive(wnd)
 	nX, nY = MY_JBAchievementRank.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
 	nX, nY = MY_JBEventVote.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
 end
+
+function PS.OnPanelDeactive()
+	O.szPSUUID = nil
+end
+
 LIB.RegisterPanel(_L['Raid'], 'MY_JX3BOX', _L['Team Platform'], 5962, PS)
