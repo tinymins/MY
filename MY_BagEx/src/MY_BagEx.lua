@@ -18,10 +18,11 @@ local match, rep, sub, upper, lower = string.match, string.rep, string.sub, stri
 local type, tonumber, tostring = type, tonumber, tostring
 local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
 local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math.mod or math.fmod, math.modf, math.pow, math.sqrt
+local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
 local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat, unpack = table.insert, table.remove, table.concat, table.unpack or unpack
-local pack, sort, getn = table.pack or function(...) return {...} end, table.sort, table.getn
+local insert, remove, concat = table.insert, table.remove, table.concat
+local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
+local sort, getn = table.sort, table['getn'] or function(t) return #t end
 -- jx3 apis caching
 local wsub, wlen, wfind, wgsub = wstring.sub, wstring.len, StringFindW, StringReplaceW
 local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
