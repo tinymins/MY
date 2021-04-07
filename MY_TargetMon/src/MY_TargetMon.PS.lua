@@ -519,7 +519,7 @@ local function DrawDetail(ui)
 				nIconHeight = 22,
 				szLayer = 'ICON_RIGHTMOST',
 				fnClickIcon = function()
-					UI.OpenIconPanel(function(dwIcon)
+					UI.OpenIconPicker(function(dwIcon)
 						mon.iconid = dwIcon
 					end)
 					UI.ClosePopupMenu()
@@ -545,7 +545,7 @@ local function DrawDetail(ui)
 						if mon.ignoreId then
 							return
 						end
-						UI.OpenIconPanel(function(dwIcon)
+						UI.OpenIconPicker(function(dwIcon)
 							D.ModifyMonitorId(info, 'iconid', dwIcon)
 						end)
 						UI.ClosePopupMenu()
@@ -570,7 +570,7 @@ local function DrawDetail(ui)
 							if mon.ignoreId or info.ignoreLevel then
 								return
 							end
-							UI.OpenIconPanel(function(dwIcon)
+							UI.OpenIconPicker(function(dwIcon)
 								info.iconid = dwIcon
 							end)
 							UI.ClosePopupMenu()
@@ -595,7 +595,7 @@ local function DrawDetail(ui)
 								nIconHeight = 22,
 								szLayer = 'ICON_RIGHTMOST',
 								fnClickIcon = function()
-									UI.OpenIconPanel(function(dwIcon)
+									UI.OpenIconPicker(function(dwIcon)
 										D.ModifyMonitorLevel(infoLevel, 'iconid', dwIcon)
 									end)
 									UI.ClosePopupMenu()

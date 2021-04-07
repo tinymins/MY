@@ -116,13 +116,13 @@ end
 
 function D.AcceptRequest(info)
 	REQUEST_LIST[info.szName] = nil
-	MY_Request.Remove('MY_SocialRequest', info.szName)
+	UI.RemoveRequest('MY_SocialRequest', info.szName)
 	info.fnAccept()
 end
 
 function D.RefuseRequest(info)
 	REQUEST_LIST[info.szName] = nil
-	MY_Request.Remove('MY_SocialRequest', info.szName)
+	UI.RemoveRequest('MY_SocialRequest', info.szName)
 	info.fnRefuse()
 end
 
@@ -173,7 +173,7 @@ function D.OnMessageBoxOpen()
 						info.dwID = data.dwID
 					end
 				end
-				MY_Request.Replace('MY_SocialRequest', info.szName, info)
+				UI.ReplaceRequest('MY_SocialRequest', info.szName, info)
 				-- ¹Ø±Õ¶Ô»°¿ò
 				frame.fnAutoClose = nil
 				frame.fnCancelAction = nil
@@ -261,4 +261,4 @@ function R.OnClear()
 	REQUEST_LIST = {}
 end
 
-MY_Request.Register('MY_SocialRequest', R)
+UI.RegisterRequest('MY_SocialRequest', R)

@@ -263,9 +263,9 @@ end
 -- 判断是否需要更新界面
 function D.CheckRequestUpdate(info)
 	if not info.szName or not info.fnAccept or (info.dwDelayTime and info.dwDelayTime > GetTime()) then
-		MY_Request.Remove('MY_PartyRequest', info.szName)
+		UI.RemoveRequest('MY_PartyRequest', info.szName)
 	else
-		MY_Request.Replace('MY_PartyRequest', info.szName, info)
+		UI.ReplaceRequest('MY_PartyRequest', info.szName, info)
 	end
 end
 
@@ -294,13 +294,13 @@ end
 
 function D.AcceptRequest(info)
 	PR_PARTY_REQUEST[info.szName] = nil
-	MY_Request.Remove('MY_PartyRequest', info.szName)
+	UI.RemoveRequest('MY_PartyRequest', info.szName)
 	info.fnAccept()
 end
 
 function D.RefuseRequest(info)
 	PR_PARTY_REQUEST[info.szName] = nil
-	MY_Request.Remove('MY_PartyRequest', info.szName)
+	UI.RemoveRequest('MY_PartyRequest', info.szName)
 	info.fnRefuse()
 end
 
@@ -602,4 +602,4 @@ function R.OnClear()
 	PR_PARTY_REQUEST = {}
 end
 
-MY_Request.Register('MY_PartyRequest', R)
+UI.RegisterRequest('MY_PartyRequest', R)

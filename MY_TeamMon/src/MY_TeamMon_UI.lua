@@ -1691,7 +1691,7 @@ function D.OpenSettingPanel(data, szType)
 		end
 		if szType ~= 'NPC' and szType ~= 'TALK' and szType ~= 'CHAT' then
 			insert(menu, { szOption = _L['Edit icon'], fnAction = function()
-				UI.OpenIconPanel(function(nNewIcon)
+				UI.OpenIconPicker(function(nNewIcon)
 					nIcon = nNewIcon
 					data.nIcon = nNewIcon
 					box:SetObjectIcon(nNewIcon)
@@ -2552,7 +2552,7 @@ function D.OpenSettingPanel(data, szType)
 			onhover = function(bHover) this:SetObjectMouseOver(bHover) end,
 			onclick = function()
 				local box = this
-				UI.OpenIconPanel(function(nIcon)
+				UI.OpenIconPicker(function(nIcon)
 					v.nIcon = nIcon
 					box:SetObjectIcon(nIcon)
 				end)

@@ -222,13 +222,13 @@ end
 
 function D.AcceptRequest(info)
 	RIDE_LIST[info.szName] = nil
-	MY_Request.Remove('MY_RideRequest', info.szName)
+	UI.RemoveRequest('MY_RideRequest', info.szName)
 	info.fnAccept()
 end
 
 function D.RefuseRequest(info)
 	RIDE_LIST[info.szName] = nil
-	MY_Request.Remove('MY_RideRequest', info.szName)
+	UI.RemoveRequest('MY_RideRequest', info.szName)
 	info.fnRefuse()
 end
 
@@ -321,7 +321,7 @@ function D.OnMessageBoxOpen()
 					end
 				end
 				if not D.DoAutoAction(info) then
-					MY_Request.Replace('MY_RideRequest', info.szName, info)
+					UI.ReplaceRequest('MY_RideRequest', info.szName, info)
 				end
 				-- ¹Ø±Õ¶Ô»°¿ò
 				frame.fnAutoClose = nil
@@ -421,4 +421,4 @@ function R.OnClear()
 	RIDE_LIST = {}
 end
 
-MY_Request.Register('MY_RideRequest', R)
+UI.RegisterRequest('MY_RideRequest', R)
