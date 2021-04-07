@@ -35,7 +35,7 @@ def __get_release_tag_list():
 def __get_changelog_list():
 	info = None
 	changelog_list = []
-	for _, line in enumerate(codecs.open('CHANGELOG.md' % env.get_current_packet_id(),'r',encoding='gbk')):
+	for _, line in enumerate(codecs.open('CHANGELOG.md' % env.get_current_packet_id(),'r',encoding='utf8')):
 		try:
 			if len(line) == 0:
 				continue

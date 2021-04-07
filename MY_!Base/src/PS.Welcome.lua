@@ -250,13 +250,6 @@ function PS.OnPanelResize(wnd)
 		ui:Fetch('Text_Adv'):Pos(10, scaleH + 10)
 		ui:Fetch('Text_Svr'):Pos(10, scaleH + 35)
 	end
-	ui:Fetch('WndCheckBox_SerendipityNotify'):Top(scaleH + 65)
-	ui:Fetch('WndCheckBox_SerendipityAutoShare'):Top(scaleH + 65)
-	ui:Fetch('WndCheckBox_SerendipitySilentMode'):Top(scaleH + 65)
-	ui:Fetch('WndEditBox_SerendipitySilentMode'):Top(scaleH + 65)
-	ui:Fetch('WndCheckBox_SerendipityNotifyTip'):Top(scaleH + 65)
-	ui:Fetch('WndCheckBox_SerendipityNotifySound'):Top(scaleH + 65)
-	ui:Fetch('WndButton_SerendipitySearch'):Top(scaleH + 65)
 	ui:Fetch('WndButton_UserPreference'):Top(scaleH + 65)
 	ui:Fetch('WndButton_AddonErrorMessage'):Top(scaleH + 65)
 end
