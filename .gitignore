@@ -1,4 +1,4 @@
-﻿.luacheckrc
+.luacheckrc
 *.pyc
 manifest.dat
 manifest.key
