@@ -1,3 +1,8 @@
+--------------------------------------------------------
+-- This file is part of the JX3 Plugin Project.
+-- @desc     : 基础库加载完成处理
+-- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
+--------------------------------------------------------
 -------------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
@@ -36,3 +41,33 @@ local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild,
 local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
 local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
 -------------------------------------------------------------------------------------------------------
+local PROXY = {}
+if IsDebugClient() then
+function PROXY.DebugSetVal(szKey, oVal)
+	PROXY[szKey] = oVal
+end
+end
+
+for k, v in pairs(LIB) do
+	PROXY[k] = v
+	LIB[k] = nil
+end
+setmetatable(LIB, {
+	__metatable = true,
+	__index = PROXY,
+	__newindex = function() assert(false, NSFormatString('DO NOT modify {$NS} after initialized!!!')) end,
+	__tostring = function(t) return NSFormatString('{$NS} (base library)') end,
+})
+FireUIEvent(NSFormatString('{$NS}_BASE_LOADING_END'))
+
+LIB.RegisterInit(NSFormatString('{$NS}#AUTHOR_TIP'), function()
+	local Farbnamen = _G.MY_Farbnamen
+	if Farbnamen and Farbnamen.RegisterHeader then
+		for dwID, szName in pairs_c(PACKET_INFO.AUTHOR_ROLES) do
+			Farbnamen.RegisterHeader(szName, dwID, PACKET_INFO.AUTHOR_HEADER)
+		end
+		for szName, _ in pairs_c(PACKET_INFO.AUTHOR_PROTECT_NAMES) do
+			Farbnamen.RegisterHeader(szName, '*', PACKET_INFO.AUTHOR_FAKE_HEADER)
+		end
+	end
+end)

@@ -1,3 +1,8 @@
+--------------------------------------------------------
+-- This file is part of the JX3 Plugin Project.
+-- @desc     : 查询全局配置表函数库
+-- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
+--------------------------------------------------------
 -------------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
@@ -36,3 +41,97 @@ local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild,
 local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
 local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
 -------------------------------------------------------------------------------------------------------
+
+function LIB.Table_GetCommonEnchantDesc(enchant_id)
+	if IsFunction(_G.Table_GetCommonEnchantDesc) then
+		return _G.Table_GetCommonEnchantDesc(enchant_id)
+	end
+	local res = g_tTable.CommonEnchant:Search(enchant_id)
+	if res then
+		return res.desc
+	end
+end
+
+function LIB.Table_GetProfessionName(dwProfessionID)
+	if IsFunction(_G.Table_GetProfessionName) then
+		return _G.Table_GetProfessionName(dwProfessionID)
+	end
+	local szName = ''
+	local tProfession = g_tTable.ProfessionName:Search(dwProfessionID)
+	if tProfession then
+		szName = tProfession.szName
+	end
+	return szName
+end
+
+function LIB.Table_GetDoodadTemplateName(dwTemplateID)
+	if IsFunction(_G.Table_GetDoodadTemplateName) then
+		return _G.Table_GetDoodadTemplateName(dwTemplateID)
+	end
+	local szName = ''
+	local tDoodad = g_tTable.DoodadTemplate:Search(dwTemplateID)
+	if tDoodad then
+		szName = tDoodad.szName
+	end
+	return szName
+end
+
+function LIB.Table_IsTreasureBattleFieldMap(dwMapID)
+	if IsFunction(_G.Table_IsTreasureBattleFieldMap) then
+		return _G.Table_IsTreasureBattleFieldMap(dwMapID)
+	end
+	return false
+end
+
+function LIB.Table_GetTeamRecruit()
+	if IsFunction(_G.Table_GetTeamRecruit) then
+		return _G.Table_GetTeamRecruit()
+	end
+	local res = {}
+	local nCount = g_tTable.TeamRecruit:GetRowCount()
+	for i = 2, nCount do
+		local tLine = g_tTable.TeamRecruit:GetRow(i)
+		local dwType = tLine.dwType
+		local szTypeName = tLine.szTypeName
+
+		if dwType > 0 then
+			res[dwType] = res[dwType] or {Type=dwType, TypeName=szTypeName}
+			res[dwType].bParent = true
+			local dwSubType = tLine.dwSubType
+			local szSubTypeName = tLine.szSubTypeName
+			if dwSubType > 0 then
+				res[dwType][dwSubType] = res[dwType][dwSubType] or {SubType=dwSubType, SubTypeName=szSubTypeName}
+				res[dwType][dwSubType].bParent = true
+				insert(res[dwType][dwSubType], tLine)
+			else
+				insert(res[dwType], tLine)
+			end
+		end
+	end
+	return res
+end
+
+function LIB.Table_IsSimplePlayer(dwTemplateID)
+	if IsFunction(_G.Table_IsSimplePlayer) then
+		return _G.Table_IsSimplePlayer(dwTemplateID)
+	end
+	local tLine = g_tTable.SimplePlayer:Search(dwTemplateID)
+	if tLine then
+		return true
+	end
+	return false
+end
+
+do
+local cache = {}
+function LIB.Table_GetSkillExtCDID(dwID)
+	if IsFunction(_G.Table_GetSkillExtCDID) then
+		return _G.Table_GetSkillExtCDID(dwID)
+	end
+	if cache[dwID] == nil then
+		local tLine = g_tTable.SkillExtCDID:Search(dwID)
+		cache[dwID] = tLine and tLine.dwExtID or false
+	end
+	return cache[dwID] and cache[dwID] or nil
+end
+end

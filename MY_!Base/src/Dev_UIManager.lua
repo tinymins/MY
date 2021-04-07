@@ -1,3 +1,8 @@
+--------------------------------------------------------
+-- This file is part of the JX3 Plugin Project.
+-- @desc     : UI窗口枚举器
+-- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
+--------------------------------------------------------
 -------------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
@@ -36,3 +41,55 @@ local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild,
 local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
 local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
 -------------------------------------------------------------------------------------------------------
+
+local _L = LIB.LoadLangPack(PACKET_INFO.FRAMEWORK_ROOT .. '/lang/devs/')
+---------------------------------------------------------------------
+-- 本地函数和变量
+---------------------------------------------------------------------
+local UI_DESC = _L.UI_DESC or {}
+
+local function GetMeun(ui)
+	local menu, frames = { szOption = ui }, {}
+	local frame = Station.Lookup(ui):GetFirstChild()
+	while frame do
+		insert(frames, { szName = frame:GetName() })
+		frame = frame:GetNext()
+	end
+	sort(frames, function(a, b) return a.szName < b.szName end)
+	for k, v in ipairs(frames) do
+		local szPath = ui .. '/' .. v.szName
+		local frame = Station.Lookup(szPath)
+		local szOption = v.szName
+		if UI_DESC[szPath] then
+			szOption = szOption .. ' (' .. UI_DESC[szPath]  .. ')'
+		end
+		insert(menu, {
+			szOption = szOption,
+			bCheck = true,
+			bChecked = frame:IsVisible(),
+			rgb = frame:IsAddOn() and { 255, 255, 255 } or { 255, 255, 0 },
+			fnAction = function()
+				if frame:IsVisible() then
+					frame:Hide()
+				else
+					frame:Show()
+				end
+				if IsCtrlKeyDown() then
+					Wnd.CloseWindow(frame)
+				end
+			end
+		})
+	end
+	return menu
+end
+
+TraceButton_AppendAddonMenu({function()
+	if not LIB.IsDebugClient('Dev_UIManager') then
+		return
+	end
+	local menu = { szOption = _L['Dev_UIManager'] }
+	for k, v in ipairs({ 'Lowest', 'Lowest1', 'Lowest2', 'Normal', 'Normal1', 'Normal2', 'Topmost', 'Topmost1', 'Topmost2' })do
+		insert(menu, GetMeun(v))
+	end
+	return {menu}
+end})

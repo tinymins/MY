@@ -1,3 +1,8 @@
+--------------------------------------------------------
+-- This file is part of the JX3 Plugin Project.
+-- @desc     : 集中渲染阴影
+-- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
+--------------------------------------------------------
 -------------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
@@ -36,3 +41,119 @@ local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild,
 local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
 local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
 -------------------------------------------------------------------------------------------------------
+
+local D = {}
+local INI_PATH = PACKET_INFO.FRAMEWORK_ROOT .. 'ui/Shadows.ini'
+local FRAME_NAME = NSFormatString('{$NS}_Shadows')
+
+function D.OnFrameCreate()
+	this:RegisterEvent('LOADING_END')
+	this:RegisterEvent('COINSHOP_ON_OPEN')
+	this:RegisterEvent('COINSHOP_ON_CLOSE')
+	this:RegisterEvent('ENTER_STORY_MODE')
+	this:RegisterEvent('LEAVE_STORY_MODE')
+	this:RegisterEvent('ON_FRAME_CREATE')
+	UI(this):BringToBottom()
+end
+
+do
+local VISIBLE = true
+function D.OnFrameBreathe()
+	if Station.IsVisible() then
+		if not VISIBLE then
+			local h = this:Lookup('', '')
+			for i = 0, h:GetItemCount() - 1 do
+				h:Lookup(i):SetVisible(true)
+			end
+			VISIBLE = true
+		end
+	else
+		if VISIBLE then
+			local h, hh = this:Lookup('', '')
+			for i = 0, h:GetItemCount() - 1 do
+				hh = h:Lookup(i)
+				hh:SetVisible(hh.bShowWhenUIHide or false)
+			end
+			VISIBLE = false
+		end
+	end
+end
+end
+
+function D.OnEvent(event)
+	if event == 'LOADING_END' then
+		this:Show()
+	elseif event == 'COINSHOP_ON_OPEN' or event == 'ENTER_STORY_MODE' then
+		this:HideWhenUIHide()
+	elseif event == 'COINSHOP_ON_CLOSE' or event == 'LEAVE_STORY_MODE' then
+		this:ShowWhenUIHide()
+	elseif event == 'ON_FRAME_CREATE' then
+		UI(this):BringToBottom()
+	end
+end
+
+function UI.GetShadowHandle(szName)
+	local frame = Station.Search(FRAME_NAME)
+	if frame and not IsElement(frame) then -- 关闭无效的 frame 句柄
+		Wnd.CloseWindow(FRAME_NAME)
+		frame = nil
+	end
+	if not frame then
+		frame = Wnd.OpenWindow(INI_PATH, FRAME_NAME)
+	end
+	local sh = frame:Lookup('', szName)
+	if sh and not IsElement(sh) then -- 关闭无效的 sh 句柄
+		frame:Lookup('', ''):Remove(sh)
+		sh = nil
+	end
+	if not sh then
+		frame:Lookup('', ''):AppendItemFromString(format('<handle> name="%s" </handle>', szName))
+		--[[#DEBUG BEGIN]]
+		LIB.Debug('UI', 'Create sh # ' .. szName, DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
+		sh = frame:Lookup('', szName)
+	end
+	return sh
+end
+
+function UI.SetShadowHandleParam(szName, tParam)
+	local sh = UI.GetShadowHandle(szName)
+	for k, v in pairs(tParam) do
+		sh[k] = v
+	end
+end
+
+do local VISIBLES = {}
+function UI.TempSetShadowHandleVisible(bVisible)
+	local frame = Station.SearchFrame(FRAME_NAME)
+	if not frame then
+		return insert(VISIBLES, true)
+	end
+	insert(VISIBLES, frame:IsVisible() or false)
+	frame:SetVisible(bVisible)
+end
+
+function UI.RevertShadowHandleVisible()
+	if #VISIBLES == 0 then
+		return
+	end
+	local bVisible = remove(VISIBLES)
+	local frame = Station.SearchFrame(FRAME_NAME)
+	if frame then
+		frame:SetVisible(bVisible)
+	end
+end
+end
+
+-- Global exports
+do
+local settings = {
+	exports = {
+		{
+			root = D,
+			preset = 'UIEvent'
+		},
+	},
+}
+_G[FRAME_NAME] = LIB.GeneGlobalNS(settings)
+end

@@ -1,3 +1,8 @@
+--------------------------------------------------------
+-- This file is part of the JX3 Plugin Project.
+-- @desc     : FontPicker
+-- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
+--------------------------------------------------------
 -------------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
@@ -36,3 +41,34 @@ local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild,
 local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
 local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
 -------------------------------------------------------------------------------------------------------
+local _L = LIB.LoadLangPack(PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
+
+-- 打开字体选择
+function UI.OpenFontPicker(callback, t)
+	local ui, i = UI.CreateFrame(NSFormatString('{$NS}_Font_Picker'), { simple = true, close = true, esc = true, text = _L['Font Picker'] }), 0
+	while 1 do
+		local font = i
+		local txt = ui:Append('Text', {
+			w = 70, x = i % 10 * 80 + 20, y = floor(i / 10) * 25,
+			font = font, alpha = 200, text = _L('Font %d', font),
+			onclick = function()
+				if callback then
+					callback(font)
+				end
+				if not IsCtrlKeyDown() then
+					ui:Remove()
+				end
+			end,
+			onhover = function(bIn)
+				UI(this):Alpha(bIn and 255 or 200)
+			end,
+		})
+		-- remove unexist font
+		if txt:Font() ~= font then
+			txt:Remove()
+			break
+		end
+		i = i + 1
+	end
+	return ui:Size(820, 70 + floor(i / 10) * 25):Anchor({ s = 'CENTER', r = 'CENTER', x = 0, y = 0 }):Focus()
+end

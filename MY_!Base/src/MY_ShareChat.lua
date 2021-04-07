@@ -1,3 +1,11 @@
+--------------------------------------------------------
+-- This file is part of the JX3 Mingyi Plugin.
+-- @link     : https://jx3.derzh.com/
+-- @desc     : 分享NPC对话框
+-- @author   : 茗伊 @双梦镇 @追风蹑影
+-- @modifier : Emil Zhai (root@derzh.com)
+-- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+--------------------------------------------------------
 -------------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
@@ -36,3 +44,75 @@ local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild,
 local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
 local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
 -------------------------------------------------------------------------------------------------------
+local PLUGIN_NAME = 'MY_!Base'
+local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local MODULE_NAME = 'MY_!Base'
+local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+--------------------------------------------------------------------------
+if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '*') then
+	return
+end
+--------------------------------------------------------------------------
+local SHARE_CHAT = LIB.LoadLUAData({'temporary/share-chats.jx3dat', PATH_TYPE.GLOBAL}) -- NPC上报对话模板表（远程）
+
+LIB.RegisterInit('MY_ShareChat', function()
+	if not SHARE_CHAT then
+		LIB.Ajax({
+			driver = 'auto', mode = 'auto', method = 'auto',
+			url = 'https://cdn.j3cx.com/config/npc-chat.json'
+				.. '?l=' .. AnsiToUTF8(GLOBAL.GAME_LANG)
+				.. '&L=' .. AnsiToUTF8(GLOBAL.GAME_EDITION)
+				.. '&_=' .. GetCurrentTime(),
+			success = function(html, status)
+				local data = LIB.JsonDecode(html)
+				if IsTable(data) then
+					SHARE_CHAT = {}
+					for _, dwTemplateID in ipairs(data) do
+						SHARE_CHAT[dwTemplateID] = true
+					end
+					LIB.SaveLUAData({'temporary/share-chats.jx3dat', PATH_TYPE.GLOBAL}, SHARE_CHAT)
+				end
+			end,
+		})
+	end
+end)
+
+LIB.RegisterEvent('OPEN_WINDOW.MY_ShareChat', function()
+	if not MY_Serendipity.bEnable then
+		return
+	end
+	local me = GetClientPlayer()
+	if not me then
+		return
+	end
+	local dwTargetID = arg3
+	local npc = GetNpc(dwTargetID)
+	local bShare = npc and SHARE_CHAT and SHARE_CHAT[npc.dwTemplateID]
+	if not bShare then
+		return
+	end
+	local szContent = arg1
+	local map = LIB.GetMapInfo(me.GetMapID())
+	local szDelayID
+	local function fnAction(line)
+		LIB.EnsureAjax({
+			url = 'https://push.j3cx.com/api/npc-chat?'
+				.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
+					r = AnsiToUTF8(LIB.GetRealServer(1)), -- Region
+					s = AnsiToUTF8(LIB.GetRealServer(2)), -- Server
+					c = AnsiToUTF8(szContent), -- Content
+					t = GetCurrentTime(), -- Time
+					cn = line and AnsiToUTF8(line.szCenterName) or '', -- Center Name
+					ci = line and line.dwCenterID or -1, -- Center ID
+					li = line and line.nLineIndex or -1, -- Line Index
+					mi = map and map.dwID, -- Map ID
+					mn = map and AnsiToUTF8(map.szName), -- Map Name
+					nt = npc.dwTemplateID, -- NPC Template ID
+					nn = LIB.GetObjectName(npc), -- NPC Name
+				}, 'MY_huadfiuadfioadfios178291hsy')))
+			})
+		LIB.DelayCall(szDelayID, false)
+	end
+	szDelayID = LIB.DelayCall(5000, fnAction)
+	LIB.GetHLLineInfo({ dwMapID = me.GetMapID(), nCopyIndex = me.GetScene().nCopyIndex }, fnAction)
+end)

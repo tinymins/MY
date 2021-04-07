@@ -1,5 +1,5 @@
 # export ignore
 /\!src-dist          export-ignore
-/BoilerplateDev_*    export-ignore
+/MYDev_*             export-ignore
 /.*                  export-ignore
 /*.py                export-ignore

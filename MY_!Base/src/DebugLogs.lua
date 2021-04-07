@@ -1,3 +1,8 @@
+--------------------------------------------------------
+-- This file is part of the JX3 Plugin Project.
+-- @desc     : 各种调试信息输出
+-- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
+--------------------------------------------------------
 -------------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
@@ -36,3 +41,39 @@ local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild,
 local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
 local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
 -------------------------------------------------------------------------------------------------------
+
+LIB.RegisterEvent(NSFormatString('OPEN_WINDOW.{$NS}_DebugLogs'), function()
+	if not LIB.IsDebugClient(true) then
+		return
+	end
+	Log('Event: OPEN_WINDOW')
+	Log('== EVENT ARGS BEGIN ==')
+	Log(tostring(arg0))
+	Log(tostring(arg1))
+	Log('== EVENT ARGS END ==')
+end)
+
+LIB.RegisterEvent(NSFormatString('ON_WARNING_MESSAGE.{$NS}_DebugLogs'), function()
+	if not LIB.IsDebugClient(true) then
+		return
+	end
+	Log('Event: ON_WARNING_MESSAGE')
+	Log('== EVENT ARGS BEGIN ==')
+	Log(tostring(arg0))
+	Log(tostring(arg1))
+	Log('== EVENT ARGS END ==')
+end)
+
+LIB.RegisterMsgMonitor(NSFormatString('MSG_NPC_NEARBY.{$NS}_DebugLogs'), function(szChannel, szMsg, nFont, bRich)
+	if not LIB.IsDebugClient(true) then
+		return
+	end
+	if bRich then
+		szMsg = GetPureText(szMsg)
+	end
+	Log('Msg: MSG_NPC_NEARBY')
+	Log('== MSG INFO BEGIN ==')
+	Log('Channel: ' .. tostring(szChannel))
+	Log('Msg: ' .. tostring(szMsg))
+	Log('== MSG INFO END ==')
+end)
