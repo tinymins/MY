@@ -62,6 +62,13 @@ UI.TIP_HIDEWAY = LIB.SetmetaReadonly({
 	HIDE         = 101,
 	ANIMATE_HIDE = 102,
 })
+UI.BUTTON_STYLE = LIB.SetmetaReadonly({
+	DEFAULT          = 1,
+	FLAT             = 2,
+	FLAT_LACE_BORDER = 3,
+	SKEUOMORPHISM    = 4,
+	OPTION           = 'OPTION',
+})
 UI.TRACKBAR_STYLE = LIB.SetmetaReadonly({
 	SHOW_VALUE    = false,
 	SHOW_PERCENT  = true,
@@ -87,8 +94,9 @@ UI.EDIT_TYPE = LIB.SetmetaReadonly({
 	WIDE_CHAR = 2, -- ÖÐÓ¢ÎÄ
 })
 UI.LAYER_LIST = {'Lowest', 'Lowest1', 'Lowest2', 'Normal', 'Normal1', 'Normal2', 'Topmost', 'Topmost1', 'Topmost2'}
-UI.BUTTON_STYLE = {
-	DEFAULT = {
+
+local BUTTON_STYLE_CONFIG = {
+	[UI.BUTTON_STYLE.DEFAULT] = {
 		nWidth = 100,
 		nHeight = 26,
 		szImage = 'ui/Image/UICommon/CommonPanel.UITex',
@@ -97,7 +105,7 @@ UI.BUTTON_STYLE = {
 		nMouseDownGroup = 27,
 		nDisableGroup = 28,
 	},
-	FLAT = {
+	[UI.BUTTON_STYLE.FLAT] = {
 		nWidth = 100,
 		nHeight = 25,
 		szImage = 'ui/image/uicommon/logincommon.uitex',
@@ -106,7 +114,7 @@ UI.BUTTON_STYLE = {
 		nMouseDownGroup = 56,
 		nDisableGroup = 60,
 	},
-	FLAT_LACE_BORDER = {
+	[UI.BUTTON_STYLE.FLAT_LACE_BORDER] = {
 		nWidth = 148,
 		nHeight = 33,
 		szImage = PACKET_INFO.FRAMEWORK_ROOT .. 'img/WndButton.UITex',
@@ -115,7 +123,7 @@ UI.BUTTON_STYLE = {
 		nMouseDownGroup = 2,
 		nDisableGroup = 3,
 	},
-	SKEUOMORPHISM = {
+	[UI.BUTTON_STYLE.SKEUOMORPHISM] = {
 		nWidth = 148,
 		nHeight = 33,
 		szImage = PACKET_INFO.FRAMEWORK_ROOT .. 'img/WndButton.UITex',
@@ -124,7 +132,7 @@ UI.BUTTON_STYLE = {
 		nMouseDownGroup = 6,
 		nDisableGroup = 7,
 	},
-	OPTION = {
+	[UI.BUTTON_STYLE.OPTION] = {
 		nWidth = 22,
 		nHeight = 24,
 		szImage = 'ui/Image/UICommon/CommonPanel2.UITex',
@@ -2689,7 +2697,7 @@ local function SetComponentSize(raw, nOuterWidth, nOuterHeight, nInnerWidth, nIn
 			raw:SetSize(nWidth, nHeight)
 			hnd:SetSize(nWidth, nHeight)
 		end
-	elseif componentType == 'WndButton' and IsSamePath(raw:GetAnimatePath(), UI.BUTTON_STYLE.DEFAULT.szImage) then
+	elseif componentType == 'WndButton' and IsSamePath(raw:GetAnimatePath(), BUTTON_STYLE_CONFIG.DEFAULT.szImage) then
 		local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
 		local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
 		local txt = GetComponentElement(raw, 'TEXT')
@@ -3424,7 +3432,7 @@ end
 -- (self) UI:ButtonStyle(eButtonStyle)
 function OO:ButtonStyle(eButtonStyle)
 	self:_checksum()
-	local tStyle = UI.BUTTON_STYLE[eButtonStyle]
+	local tStyle = BUTTON_STYLE_CONFIG[eButtonStyle]
 	if tStyle then
 		for _, raw in ipairs(self.raws) do
 			if GetComponentType(raw) == 'WndButton' then
