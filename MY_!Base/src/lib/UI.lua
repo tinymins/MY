@@ -2697,7 +2697,7 @@ local function SetComponentSize(raw, nOuterWidth, nOuterHeight, nInnerWidth, nIn
 			raw:SetSize(nWidth, nHeight)
 			hnd:SetSize(nWidth, nHeight)
 		end
-	elseif componentType == 'WndButton' and IsSamePath(raw:GetAnimatePath(), BUTTON_STYLE_CONFIG.DEFAULT.szImage) then
+	elseif componentType == 'WndButton' and IsSamePath(raw:GetAnimatePath(), BUTTON_STYLE_CONFIG[UI.BUTTON_STYLE.DEFAULT].szImage) then
 		local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
 		local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
 		local txt = GetComponentElement(raw, 'TEXT')
