@@ -1540,25 +1540,25 @@ local function BeforeChatAppendItemFromString(h, szMsg, ...) -- h, szMsg, szChan
 end
 
 local function AfterChatAppendItemFromString(h, ...)
-	if not l_hPrevItem then
-		return
-	end
-	local nCount = h:GetItemCount()
-	local nStart = -1
-	if l_hPrevItem == 0 then
-		nStart = 0
-	elseif l_hPrevItem and l_hPrevItem:IsValid() then
-		nStart = l_hPrevItem:GetIndex() + 1
-	end
-	if nStart >= 0 and nStart < nCount then
-		for szKey, fnAction in pairs(CHAT_HOOK.AFTER) do
-			local res, err, trace = XpCall(fnAction, h, nStart, ...)
-			if not res then
-				FireUIEvent('CALL_LUA_ERROR', err .. '\nHookChatPanel.AFTER: ' .. szKey .. '\n' .. trace .. '\n')
+	if l_hPrevItem then
+		local nCount = h:GetItemCount()
+		local nStart = -1
+		if l_hPrevItem == 0 then
+			nStart = 0
+		elseif l_hPrevItem and l_hPrevItem:IsValid() then
+			nStart = l_hPrevItem:GetIndex() + 1
+		end
+		if nStart >= 0 and nStart < nCount then
+			for szKey, fnAction in pairs(CHAT_HOOK.AFTER) do
+				local res, err, trace = XpCall(fnAction, h, nStart, ...)
+				if not res then
+					FireUIEvent('CALL_LUA_ERROR', err .. '\nHookChatPanel.AFTER: ' .. szKey .. '\n' .. trace .. '\n')
+				end
 			end
 		end
+		l_hPrevItem = nil
 	end
-	l_hPrevItem = nil
+	return h, ...
 end
 
 local HOOKED_UI = setmetatable({}, { __mode = 'k' })
