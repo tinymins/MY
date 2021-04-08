@@ -109,15 +109,6 @@ local CUSTOM_BOX_EXTENT_ANIMATE = {
 	{'ui/Image/Common/Box.UITex|20'},
 }
 local CUSTOM_CDBAR_STYLES = {
-	PACKET_INFO.UITEX_POSTER .. '|' .. 0,
-	PACKET_INFO.UITEX_POSTER .. '|' .. 1,
-	PACKET_INFO.UITEX_POSTER .. '|' .. 2,
-	PACKET_INFO.UITEX_POSTER .. '|' .. 3,
-	PACKET_INFO.UITEX_POSTER .. '|' .. 4,
-	PACKET_INFO.UITEX_POSTER .. '|' .. 5,
-	PACKET_INFO.UITEX_POSTER .. '|' .. 6,
-	PACKET_INFO.UITEX_POSTER .. '|' .. 7,
-	PACKET_INFO.UITEX_POSTER .. '|' .. 8,
 	'/ui/Image/Common/Money.UITex|168',
 	'/ui/Image/Common/Money.UITex|203',
 	'/ui/Image/Common/Money.UITex|204',
@@ -142,6 +133,9 @@ local CUSTOM_CDBAR_STYLES = {
 	'/ui/Image/Common/Money.UITex|233',
 	'/ui/Image/Common/Money.UITex|234',
 }
+for i = PACKET_INFO.ST_FRAME_COUNT, 0, -1 do
+	insert(CUSTOM_CDBAR_STYLES, 1, PACKET_INFO.ST_UITEX .. '|' .. i)
+end
 
 ----------------------------------------------------------------------------------------------
 -- …Ë÷√ΩÁ√Ê

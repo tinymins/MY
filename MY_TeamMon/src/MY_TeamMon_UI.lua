@@ -2496,7 +2496,7 @@ function D.OpenSettingPanel(data, szType)
 							fnAction = function()
 								v.nFrame = i
 							end,
-							szIcon = PACKET_INFO.UITEX_ST,
+							szIcon = PACKET_INFO.ST_UITEX,
 							nFrame = i,
 							szLayer = 'ICON_FILL',
 						})

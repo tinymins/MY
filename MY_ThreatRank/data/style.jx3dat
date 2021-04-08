@@ -56,11 +56,11 @@ return {
 		{ 168, 15 }
 	},
 	{
-		{ "interface/MY/MY_DBM/img/ST_UI.UITex", 6 },
-		{ "interface/MY/MY_DBM/img/ST_UI.UITex", 4 },
-		{ "interface/MY/MY_DBM/img/ST_UI.UITex", 0 },
-		{ "interface/MY/MY_DBM/img/ST_UI.UITex", 2 },
-		{ "interface/MY/MY_DBM/img/ST_UI.UITex", 5 },
+		{ "interface/MY/MY_Resource/img/ST.UITex", 6 },
+		{ "interface/MY/MY_Resource/img/ST.UITex", 4 },
+		{ "interface/MY/MY_Resource/img/ST.UITex", 0 },
+		{ "interface/MY/MY_Resource/img/ST.UITex", 2 },
+		{ "interface/MY/MY_Resource/img/ST.UITex", 5 },
 		{ 168, 15 }
 	},
 
