@@ -88,7 +88,7 @@ UI.EDIT_TYPE = LIB.SetmetaReadonly({
 })
 UI.LAYER_LIST = {'Lowest', 'Lowest1', 'Lowest2', 'Normal', 'Normal1', 'Normal2', 'Topmost', 'Topmost1', 'Topmost2'}
 UI.BUTTON_STYLE = {
-	{
+	DEFAULT = {
 		nWidth = 100,
 		nHeight = 26,
 		szImage = 'ui/Image/UICommon/CommonPanel.UITex',
@@ -97,7 +97,7 @@ UI.BUTTON_STYLE = {
 		nMouseDownGroup = 27,
 		nDisableGroup = 28,
 	},
-	{
+	FLAT = {
 		nWidth = 100,
 		nHeight = 25,
 		szImage = 'ui/image/uicommon/logincommon.uitex',
@@ -106,16 +106,7 @@ UI.BUTTON_STYLE = {
 		nMouseDownGroup = 56,
 		nDisableGroup = 60,
 	},
-	{
-		nWidth = 148,
-		nHeight = 33,
-		szImage = PACKET_INFO.FRAMEWORK_ROOT .. 'img/WndButton.UITex',
-		nNormalGroup = 4,
-		nMouseOverGroup = 5,
-		nMouseDownGroup = 6,
-		nDisableGroup = 7,
-	},
-	{
+	FLAT_LACE_BORDER = {
 		nWidth = 148,
 		nHeight = 33,
 		szImage = PACKET_INFO.FRAMEWORK_ROOT .. 'img/WndButton.UITex',
@@ -123,6 +114,15 @@ UI.BUTTON_STYLE = {
 		nMouseOverGroup = 1,
 		nMouseDownGroup = 2,
 		nDisableGroup = 3,
+	},
+	SKEUOMORPHISM = {
+		nWidth = 148,
+		nHeight = 33,
+		szImage = PACKET_INFO.FRAMEWORK_ROOT .. 'img/WndButton.UITex',
+		nNormalGroup = 4,
+		nMouseOverGroup = 5,
+		nMouseDownGroup = 6,
+		nDisableGroup = 7,
 	},
 	OPTION = {
 		nWidth = 22,
@@ -2689,7 +2689,7 @@ local function SetComponentSize(raw, nOuterWidth, nOuterHeight, nInnerWidth, nIn
 			raw:SetSize(nWidth, nHeight)
 			hnd:SetSize(nWidth, nHeight)
 		end
-	elseif componentType == 'WndButton' and IsSamePath(raw:GetAnimatePath(), UI.BUTTON_STYLE[1].szImage) then
+	elseif componentType == 'WndButton' and IsSamePath(raw:GetAnimatePath(), UI.BUTTON_STYLE.DEFAULT.szImage) then
 		local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
 		local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
 		local txt = GetComponentElement(raw, 'TEXT')
@@ -3421,10 +3421,10 @@ function OO:TrackbarStyle(nTrackbarStyle)
 	return self
 end
 
--- (self) UI:ButtonStyle(nButtonStyle)
-function OO:ButtonStyle(nButtonStyle)
+-- (self) UI:ButtonStyle(eButtonStyle)
+function OO:ButtonStyle(eButtonStyle)
 	self:_checksum()
-	local tStyle = UI.BUTTON_STYLE[nButtonStyle]
+	local tStyle = UI.BUTTON_STYLE[eButtonStyle]
 	if tStyle then
 		for _, raw in ipairs(self.raws) do
 			if GetComponentType(raw) == 'WndButton' then
