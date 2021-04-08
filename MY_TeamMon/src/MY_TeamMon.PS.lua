@@ -67,7 +67,7 @@ function PS.OnPanelActive(wnd)
 
 	-- ui:Append('WndButton', {
 	-- 	x = 400, y = 20, text = g_tStrings.HELP_PANEL,
-	-- 	buttonstyle = 'FLAT',
+	-- 	buttonstyle = UI.BUTTON_STYLE.FLAT,
 	-- 	onclick = function()
 	-- 		OpenInternetExplorer('https://github.com/luckyyyyy/JH/blob/dev/JH_DBM/README.md')
 	-- 	end,
@@ -208,17 +208,17 @@ function PS.OnPanelActive(wnd)
 	}):AutoWidth():Pos('BOTTOMRIGHT')
 	nX = ui:Append('WndButton', {
 		x = X + 5, y = nY + 15, text = _L['Data panel'],
-		buttonstyle = 'FLAT',
+		buttonstyle = UI.BUTTON_STYLE.FLAT,
 		onclick = MY_TeamMon_UI.TogglePanel,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
 	nX = ui:Append('WndButton', {
 		x = nX + 5, y = nY + 15, text = _L['Export data'],
-		buttonstyle = 'FLAT',
+		buttonstyle = UI.BUTTON_STYLE.FLAT,
 		onclick = MY_TeamMon_UI.OpenExportPanel,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
 	nX = ui:Append('WndButton', {
 		x = nX + 5, y = nY + 15, text = _L['Import data'],
-		buttonstyle = 'FLAT',
+		buttonstyle = UI.BUTTON_STYLE.FLAT,
 		menu = function()
 			local menu = {}
 			insert(menu, {
@@ -243,7 +243,7 @@ function PS.OnPanelActive(wnd)
 	}):AutoWidth():Pos('BOTTOMRIGHT')
 	nX = ui:Append('WndButton', {
 		x = nX + 5, y = nY + 15, text = _L['Open data folder'],
-		buttonstyle = 'FLAT',
+		buttonstyle = UI.BUTTON_STYLE.FLAT,
 		onclick = function()
 			local szRoot = LIB.GetAbsolutePath(MY_TM_DATA_ROOT):gsub('/', '\\')
 			LIB.OpenFolder(szRoot)

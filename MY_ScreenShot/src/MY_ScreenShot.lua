@@ -194,7 +194,7 @@ _MY_ScreenShot.OnPanelActive = function(wnd)
       end)
       :Tip(_L['Set destination folder which screenshot file will be saved. Absolute path required.\nEx: D:/JX3_ScreenShot/\nAttention: let it blank will save screenshot to default folder.'],UI.TIP_POSITION.TOP_BOTTOM)
 
-    ui:Append('WndButton', 'WndButton_HotkeyCheck'):Pos(w-180, 30):ButtonStyle('FLAT'):Width(170)
+    ui:Append('WndButton', 'WndButton_HotkeyCheck'):Pos(w-180, 30):ButtonStyle(UI.BUTTON_STYLE.FLAT):Width(170)
       :Text(_L['set default screenshot tool'])
       :Click(function() LIB.SetHotKey('MY_ScreenShot_Hotkey',1,44,false,false,false) end)
 

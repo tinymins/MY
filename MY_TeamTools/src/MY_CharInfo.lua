@@ -81,7 +81,7 @@ function CharInfo.CreateFrame(dwID, szName)
 	ui:Append('WndButton', {
 		name = 'LOOKUP', x = 70, y = 360,
 		text = g_tStrings.STR_LOOKUP,
-		buttonstyle = 'FLAT',
+		buttonstyle = UI.BUTTON_STYLE.FLAT,
 		onclick = function()
 			ViewInviteToPlayer(dwID)
 		end,

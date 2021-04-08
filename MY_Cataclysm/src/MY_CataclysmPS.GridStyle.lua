@@ -149,7 +149,7 @@ function PS.OnPanelActive(frame)
 	x = x + ui:Append('WndButton', {
 		x = x, y = y - 3,
 		text = _L['Name font'],
-		buttonstyle = 'FLAT',
+		buttonstyle = UI.BUTTON_STYLE.FLAT,
 		onclick = function()
 			UI.OpenFontPicker(function(nFont)
 				CFG.nNameFont = nFont
@@ -264,7 +264,7 @@ function PS.OnPanelActive(frame)
 	ui:Append('WndButton', {
 		x = x, y = y - 1,
 		text = _L['Life font'],
-		buttonstyle = 'FLAT',
+		buttonstyle = UI.BUTTON_STYLE.FLAT,
 		onclick = function()
 			UI.OpenFontPicker(function(nFont)
 				CFG.nLifeFont = nFont
@@ -316,7 +316,7 @@ function PS.OnPanelActive(frame)
 	x = x + ui:Append('WndButton', {
 		x = x, y = y,
 		text = g_tStrings.STR_SKILL_MANA .. g_tStrings.FONT,
-		buttonstyle = 'FLAT',
+		buttonstyle = UI.BUTTON_STYLE.FLAT,
 		onclick = function()
 			UI.OpenFontPicker(function(nFont)
 				CFG.nManaFont = nFont

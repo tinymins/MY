@@ -142,7 +142,7 @@ function PS.OnPanelActive(frame)
 	if CFG.bEnableDistance then
 		y = y + ui:Append('WndButton', {
 			x = x, y = y, text = _L['Edit Distance Level'],
-			buttonstyle = 'FLAT_LACE_BORDER',
+			buttonstyle = UI.BUTTON_STYLE.FLAT_LACE_BORDER,
 			onclick = function()
 				GetUserInput(_L['distance, distance, ...'], function(szText)
 					local t = LIB.SplitString(LIB.TrimString(szText), ',')

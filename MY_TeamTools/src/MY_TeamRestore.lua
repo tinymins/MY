@@ -335,7 +335,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
 	for i, v in ipairs(O.SaveList) do
 		nX = ui:Append('WndButton', {
 			x = nX + 5, y = nY, w = 80, text = v.name,
-			buttonstyle = 'FLAT',
+			buttonstyle = UI.BUTTON_STYLE.FLAT,
 			tip = v.name .. '\n' .. _L['Left click to recovery, right click for more.'],
 			tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 			onlclick = function()
@@ -409,7 +409,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
 
 	nX = ui:Append('WndButton', {
 		x = nX + 5, y = nY, text = _L['Save Team'],
-		buttonstyle = 'FLAT',
+		buttonstyle = UI.BUTTON_STYLE.FLAT,
 		onclick = function()
 			GetUserInput(_L['Save team name'], function(text)
 				D.Save(nil, text)

@@ -177,7 +177,7 @@ function TI.CreateFrame(a, b)
 			x = x, y = y, text = LIB.IsLeader()
 				and (GLOBAL.GAME_LANG == 'zhcn' and _L['Paste YY'] or _L['Paste DC'])
 				or (GLOBAL.GAME_LANG == 'zhcn' and _L['Copy YY'] or _L['Copy DC']),
-			buttonstyle = 'FLAT',
+			buttonstyle = UI.BUTTON_STYLE.FLAT,
 			onclick = function()
 				local yy = ui:Children('#YY'):Text()
 				if LIB.IsLeader() then
@@ -231,14 +231,14 @@ function TI.CreateFrame(a, b)
 			name = 'WndBtn_RaidTools',
 			x = x, y = y, w = 96,
 			text = _L['MY_TeamTools'],
-			buttonstyle = 'FLAT',
+			buttonstyle = UI.BUTTON_STYLE.FLAT,
 			onclick = MY_TeamTools.Toggle,
 		}):AutoWidth():Width() + 5
 		x = x + ui:Append('WndButton', {
 			name = 'WndBtn_GKP',
 			x = x, y = y, w = 96,
 			text = _L['GKP Golden Team Record'],
-			buttonstyle = 'FLAT',
+			buttonstyle = UI.BUTTON_STYLE.FLAT,
 			onclick = function()
 				if MY_GKP then
 					MY_GKP_MI.TogglePanel()
@@ -252,7 +252,7 @@ function TI.CreateFrame(a, b)
 				name = 'WndBtn_TeamMon',
 				x = x, y = y, w = 96,
 				text = _L['Import Data'],
-				buttonstyle = 'FLAT',
+				buttonstyle = UI.BUTTON_STYLE.FLAT,
 				onclick = MY_TeamMon_RR.OpenPanel,
 			}):AutoWidth():Width() + 5
 		end

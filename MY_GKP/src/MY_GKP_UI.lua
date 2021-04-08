@@ -323,7 +323,7 @@ function MY_GKP_UI.OnFrameCreate()
 	ui:Append('WndButton', {
 		name = 'Btn_AddManually',
 		x = 20, y = 660, w = 120, text = _L['Add Manually'],
-		buttonstyle = 'FLAT_LACE_BORDER',
+		buttonstyle = UI.BUTTON_STYLE.FLAT_LACE_BORDER,
 		onclick = function()
 			if not LIB.IsDistributer() and not LIB.IsDebugClient('MY_GKP') then -- debug
 				return LIB.Alert('MY_GKP_UI', _L['You are not the distrubutor.'])
@@ -337,7 +337,7 @@ function MY_GKP_UI.OnFrameCreate()
 	ui:Append('WndButton', {
 		name = 'Btn_Calculate',
 		x = nX, y = 620, w = 120, text = g_tStrings.GOLD_TEAM_SYLARY_LIST,
-		buttonstyle = 'FLAT_LACE_BORDER',
+		buttonstyle = UI.BUTTON_STYLE.FLAT_LACE_BORDER,
 		onclick = function()
 			local ds = this:GetRoot().ds
 			local me = GetClientPlayer()
@@ -372,7 +372,7 @@ function MY_GKP_UI.OnFrameCreate()
 	ui:Append('WndButton', {
 		name = 'GOLD_TEAM_BID_LIST',
 		x = nX, y = 660, w = 120, text = g_tStrings.GOLD_TEAM_BID_LIST,
-		buttonstyle = 'FLAT_LACE_BORDER',
+		buttonstyle = UI.BUTTON_STYLE.FLAT_LACE_BORDER,
 		onclick = function()
 			if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 				return LIB.Alert('TALK_LOCK', _L['Please unlock talk lock first.'])
@@ -416,7 +416,7 @@ function MY_GKP_UI.OnFrameCreate()
 	ui:Append('WndButton', {
 		name = 'Debt',
 		x = nX, y = 660, w = 120, text = _L['Debt Issued'],
-		buttonstyle = 'FLAT_LACE_BORDER',
+		buttonstyle = UI.BUTTON_STYLE.FLAT_LACE_BORDER,
 		onclick = function()
 			if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 				return LIB.Alert('TALK_LOCK', _L['Please unlock talk lock first.'])
@@ -491,7 +491,7 @@ function MY_GKP_UI.OnFrameCreate()
 	ui:Append('WndButton', {
 		name = 'Btn_ClearRecord',
 		x = nX, y = 660, w = 120, text = _L['Clear Record'],
-		buttonstyle = 'FLAT_LACE_BORDER',
+		buttonstyle = UI.BUTTON_STYLE.FLAT_LACE_BORDER,
 		onclick = function()
 			local fnAction = function()
 				MY_GKP_MI.NewDS()
@@ -504,7 +504,7 @@ function MY_GKP_UI.OnFrameCreate()
 	ui:Append('WndButton', {
 		name = 'Btn_HistoryRecord',
 		x = nX, y = 660, w = 120, text = _L['History record'],
-		buttonstyle = 'FLAT_LACE_BORDER',
+		buttonstyle = UI.BUTTON_STYLE.FLAT_LACE_BORDER,
 		menu = function()
 			local menu = {}
 			local aFiles = MY_GKP.GetHistoryFiles()
@@ -552,7 +552,7 @@ function MY_GKP_UI.OnFrameCreate()
 	ui:Append('WndButton', {
 		name = 'Btn_SyncRecord',
 		x = nX, y = 660, w = 120, text = _L['Manual SYNC'],
-		buttonstyle = 'FLAT_LACE_BORDER',
+		buttonstyle = UI.BUTTON_STYLE.FLAT_LACE_BORDER,
 		tip = _L['Left click to sync from others, right click to sync to others'],
 		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
 		lmenu = function()
@@ -609,7 +609,7 @@ function MY_GKP_UI.OnFrameCreate()
 	ui:Append('WndButton', {
 		name = 'Btn_SetCaption',
 		x = nX, y = 660, w = 120, text = _L['Set record caption'],
-		buttonstyle = 'FLAT_LACE_BORDER',
+		buttonstyle = UI.BUTTON_STYLE.FLAT_LACE_BORDER,
 		menu = function()
 			local ds = this:GetRoot().ds
 			GetUserInput(_L['Please input new caption'],function(szText)
@@ -625,7 +625,7 @@ function MY_GKP_UI.OnFrameCreate()
 	ui:Append('WndButton', {
 		name = 'Btn_SetHistory',
 		x = nX, y = 660, w = 120, text = _L['Set current record'],
-		buttonstyle = 'FLAT_LACE_BORDER',
+		buttonstyle = UI.BUTTON_STYLE.FLAT_LACE_BORDER,
 		menu = function()
 			local frame = this:GetRoot()
 			LIB.Confirm(_L['Are you sure to cover the current information with the last record data?'], function()

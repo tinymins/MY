@@ -187,7 +187,7 @@ function PS.OnPanelActive(frame)
 	nX = ui:Append('WndButton', {
 		x = X + 10, y = nY + 5,
 		text = g_tStrings.FONT,
-		buttonstyle = 'FLAT',
+		buttonstyle = UI.BUTTON_STYLE.FLAT,
 		onclick = function()
 			UI.OpenFontPicker(function(nFont)
 				O.dwFontScheme = nFont
@@ -198,7 +198,7 @@ function PS.OnPanelActive(frame)
 	ui:Append('WndButton', {
 		x = nX + 10, y = nY + 5,
 		text = _L['Preview'],
-		buttonstyle = 'FLAT',
+		buttonstyle = UI.BUTTON_STYLE.FLAT,
 		onclick = function()
 			D.UpdateText(_L['PVE everyday, Xuanjing everyday!'])
 		end,

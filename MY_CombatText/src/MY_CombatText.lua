@@ -1234,7 +1234,7 @@ function PS.OnPanelActive(frame)
 		ui:Append('WndButton', {
 			x = 460, y = 15, w = 120,
 			text = _L['Load CombatText Config'],
-			buttonstyle = 'FLAT_LACE_BORDER',
+			buttonstyle = UI.BUTTON_STYLE.FLAT_LACE_BORDER,
 			onclick = CombatText.CheckEnable,
 		})
 	end

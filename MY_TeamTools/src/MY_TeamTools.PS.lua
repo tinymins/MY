@@ -63,7 +63,7 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndButton', {
 		x = W - 165, y = nY, w = 150, h = 38,
 		text = _L['Open Panel'],
-		buttonstyle = 'FLAT_LACE_BORDER',
+		buttonstyle = UI.BUTTON_STYLE.FLAT_LACE_BORDER,
 		onclick = MY_TeamTools.Open,
 	})
 

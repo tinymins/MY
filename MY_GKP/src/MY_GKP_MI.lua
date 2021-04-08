@@ -203,7 +203,7 @@ LIB.RegisterBgMsg('MY_GKP', function(_, data, nChannel, dwID, szName, bIsSelf)
 				local ui = UI.CreateFrame(szFrameName, { w = 800, h = 400, text = _L['GKP Golden Team Record'], close = true, anchor = 'CENTER' })
 				local x, y = 20, 50
 				ui:Append('Text', { x = x, y = y, w = 760, h = 30, text = _L[data[3]], halign = 1, font = 236, color = { 255, 255, 0 } })
-				ui:Append('WndButton', { name = 'ScreenShot', x = x + 590, y = y, text = _L['Print Ticket'], buttonstyle = 'FLAT_LACE_BORDER' }):Toggle(false):Click(function()
+				ui:Append('WndButton', { name = 'ScreenShot', x = x + 590, y = y, text = _L['Print Ticket'], buttonstyle = UI.BUTTON_STYLE.FLAT_LACE_BORDER }):Toggle(false):Click(function()
 					local scale         = Station.GetUIScale()
 					local left, top     = ui:Pos()
 					local width, height = ui:Size()
@@ -305,7 +305,7 @@ LIB.RegisterBgMsg('MY_GKP', function(_, data, nChannel, dwID, szName, bIsSelf)
 						if LIB.IsDistributer() then
 							ui:Append('WndButton', {
 								w = 91, h = 26, x = x + 620, y = y + 70 + 30 * n + 5, text = _L['salary'],
-								buttonstyle = 'SKEUOMORPHISM',
+								buttonstyle = UI.BUTTON_STYLE.SKEUOMORPHISM,
 								onclick = function()
 									LIB.Confirm(_L['Confirm?'], function()
 										MY_GKP.Bidding(nMoney)

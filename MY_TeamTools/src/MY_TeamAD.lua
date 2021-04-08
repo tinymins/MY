@@ -92,7 +92,7 @@ function PS.OnPanelActive(wnd)
 	nX, nY = ui:Append('Text', { x = nX, y = nY, text = _L['Save Talk'], font = 27 }):Pos('BOTTOMRIGHT')
 
 	nX = X + 10
-	nX = ui:Append('WndButton', { x = nX, y = nY + 10, text = _L['Save Advertising'], buttonstyle = 'FLAT' }):Click(function(bChecked)
+	nX = ui:Append('WndButton', { x = nX, y = nY + 10, text = _L['Save Advertising'], buttonstyle = UI.BUTTON_STYLE.FLAT }):Click(function(bChecked)
 		local edit = LIB.GetChatInput()
 		local txt, data = edit:GetText(), edit:GetTextStruct()
 		if LIB.TrimString(txt) == '' then
@@ -126,7 +126,7 @@ function PS.OnPanelActive(wnd)
 		end
 		nX = ui:Append('WndButton', {
 			x = nX, y = nY, w = 80, text = v.key,
-			buttonstyle = 'FLAT',
+			buttonstyle = UI.BUTTON_STYLE.FLAT,
 			onlclick = function()
 				LIB.SetChatInput(v.ad)
 				LIB.FocusChatInput()

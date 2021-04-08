@@ -565,7 +565,7 @@ function PS.OnPanelActive(wnd)
 
     ui:Append('WndButton', {
         x = w - 26, y = 15, w = 25, h = 25,
-        buttonstyle = 'OPTION',
+        buttonstyle = UI.BUTTON_STYLE.OPTION,
         menu = function()
             local t = {
                 {
