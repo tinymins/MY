@@ -956,7 +956,7 @@ function D.OpenRuleEditor(tData, onChangeNotify, bHideBase)
 	ui:Append('WndButton', {
 		x = (W - 100) / 2, y = nY, w = 100,
 		text = g_tStrings.STR_FRIEND_DEL, color = { 255, 0, 0 },
-		buttonstyle = 2,
+		buttonstyle = 'FLAT',
 		onclick = function()
 			LIB.Confirm(_L['Sure to delete?'], function()
 				onChangeNotify()

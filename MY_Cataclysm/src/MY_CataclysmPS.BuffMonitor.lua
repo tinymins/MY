@@ -111,7 +111,7 @@ function PS.OnPanelActive(frame)
 	x = X
 	x = x + ui:Append('WndButton', {
 		x = x, y = y, w = 100,
-		buttonstyle = 2,
+		buttonstyle = 'FLAT',
 		text = _L['Add'],
 		onclick = function()
 			local rec = {}
@@ -122,7 +122,7 @@ function PS.OnPanelActive(frame)
 	}):AutoHeight():Width() + 5
 	x = x + ui:Append('WndButton', {
 		x = x, y = y, w = 100,
-		buttonstyle = 2,
+		buttonstyle = 'FLAT',
 		text = _L['Edit'],
 		onclick = function()
 			local ui = UI.CreateFrame('MY_Cataclysm_BuffConfig', {
@@ -142,7 +142,7 @@ function PS.OnPanelActive(frame)
 			ui:Append('WndButton', {
 				x = x, y = y, w = 310,
 				text = _L['Sure'],
-				buttonstyle = 2,
+				buttonstyle = 'FLAT',
 				onclick = function()
 					CFG.aBuffList = DecodeBuffRuleList(edit:Text())
 					MY_Cataclysm.UpdateBuffListCache()

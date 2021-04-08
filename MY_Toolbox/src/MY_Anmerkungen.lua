@@ -425,7 +425,7 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndButton', {
 		x = x, y = y, w = 110,
 		text = _L['Create'],
-		buttonstyle = 2,
+		buttonstyle = 'FLAT',
 		onclick = function()
 			MY_Anmerkungen.OpenPlayerNoteEditPanel()
 		end,
@@ -435,7 +435,7 @@ function PS.OnPanelActive(wnd)
 		ui:Append('WndButton', {
 			x = w - 230, y = y, w = 110,
 			text = _L['Import'],
-			buttonstyle = 2,
+			buttonstyle = 'FLAT',
 			onclick = function()
 				GetUserInput(_L['Please input import data:'], function(szVal)
 					local config = DecodeLUAData(szVal)
@@ -503,7 +503,7 @@ function PS.OnPanelActive(wnd)
 		ui:Append('WndButton', {
 			x = w - 110, y = y, w = 110,
 			text = _L['Export'],
-			buttonstyle = 2,
+			buttonstyle = 'FLAT',
 			onclick = function()
 				UI.OpenTextEditor(EncodeLUAData({
 					server   = LIB.GetRealServer(),

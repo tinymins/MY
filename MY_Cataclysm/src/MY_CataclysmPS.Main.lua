@@ -88,7 +88,7 @@ function PS.OnPanelActive(frame)
 	y = y + ui:Append('WndButton', {
 		x = x, y = y + 3,
 		text = _L['Restore default'],
-		buttonstyle = 2,
+		buttonstyle = 'FLAT',
 		onclick = function()
 			MY_Cataclysm.ConfirmRestoreConfig()
 		end,

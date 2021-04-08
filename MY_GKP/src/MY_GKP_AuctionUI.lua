@@ -80,7 +80,7 @@ function D.Open(ds, tab, szMode)
 
 	local hBox = ui:Append('Box', { name = 'Box', x = x + 175, y = y + 40, h = 48, w = 48 })
 	local hCheckBox = ui:Append('WndCheckBox', { name = 'WndCheckBox', x = x + 50, y = y + 260, font = 65, text = _L['Equiptment Boss'] })
-	local hButton = ui:Append('WndButton', { name = 'Success', x = x + 175, y = y + 260, text = g_tStrings.STR_HOTKEY_SURE, buttonstyle = 3 })
+	local hButton = ui:Append('WndButton', { name = 'Success', x = x + 175, y = y + 260, text = g_tStrings.STR_HOTKEY_SURE, buttonstyle = 'FLAT_LACE_BORDER' })
 	ui:Remove(function()
 		if bProcessed then
 			return

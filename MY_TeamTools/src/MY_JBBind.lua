@@ -200,7 +200,7 @@ function PS.OnPanelActive(wnd)
 	nX = nX + uiCCStatus:Width()
 	uiBtnCCStatus = ui:Append('WndButton', {
 		x = nX, y = nY + 2,
-		buttonstyle = 2, text = _L['Bind'], enable = false,
+		buttonstyle = 'FLAT', text = _L['Bind'], enable = false,
 		onclick = function()
 			if IsEmpty(O.uid) then
 				GetUserInput(_L['Please input certification code:'], function(szText)
@@ -235,7 +235,7 @@ function PS.OnPanelActive(wnd)
 	nX = nX + uiBtnCCStatus:Width()
 	uiBtnCCLink = ui:Append('WndButton', {
 		x = nX, y = nY + 2, w = 120,
-		buttonstyle = 2, text = _L['Login team platform'],
+		buttonstyle = 'FLAT', text = _L['Login team platform'],
 		onclick = function()
 			LIB.OpenBrowser('https://page.j3cx.com/jx3box/team')
 		end,

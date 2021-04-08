@@ -210,7 +210,7 @@ local function DrawDetail(ui)
 	uiWrapper:Append('WndButton', {
 		x = x1 + w1 - 60, y = y0 - 1, w = 60, h = 28,
 		text = _L['Add'],
-		buttonstyle = 2,
+		buttonstyle = 'FLAT',
 		onclick = function() InsertMonitor() end,
 	})
 
@@ -679,7 +679,7 @@ local function DrawDetail(ui)
 		x = x0 + w0 / 2 - 50, y = y0 + h0 - 30,
 		w = 100, h = 30,
 		text = _L['Close'],
-		buttonstyle = 2,
+		buttonstyle = 'FLAT',
 		onclick = function()
 			l_config = nil
 			uiWrapper:Hide()
@@ -720,7 +720,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		x = w - 180, y = y,
 		w = 50, h = 25,
 		text = _L['Move Up'],
-		buttonstyle = 2,
+		buttonstyle = 'FLAT',
 		onclick = function()
 			D.MoveConfig(config, -1)
 			LIB.SwitchTab('MY_TargetMon', true)
@@ -730,7 +730,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		x = w - 125, y = y,
 		w = 50, h = 25,
 		text = _L['Move Down'],
-		buttonstyle = 2,
+		buttonstyle = 'FLAT',
 		onclick = function()
 			D.MoveConfig(config, 1)
 			LIB.SwitchTab('MY_TargetMon', true)
@@ -740,7 +740,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		x = w - 70, y = y,
 		w = 60, h = 25,
 		text = _L['Delete'],
-		buttonstyle = 2,
+		buttonstyle = 'FLAT',
 		onclick = function()
 			D.DeleteConfig(config, IsCtrlKeyDown())
 			LIB.SwitchTab('MY_TargetMon', true)
@@ -995,7 +995,7 @@ local function DrawPreview(ui, config, OpenDetail)
 	uiWnd:Append('WndButton', {
 		x = xr + 140, y = y, w = 102,
 		text = _L['Set monitor'],
-		buttonstyle = 2,
+		buttonstyle = 'FLAT',
 		onclick = function() OpenDetail(config) end,
 		autoenable = function() return config.enable end,
 	})
@@ -1099,7 +1099,7 @@ local function DrawControls(ui, OpenDetail)
 		x = x, y = y,
 		w = 60, h = 30,
 		text = _L['Create'],
-		buttonstyle = 2,
+		buttonstyle = 'FLAT',
 		onclick = function()
 			local config = D.CreateConfig()
 			DrawPreview(ui, config, OpenDetail)
@@ -1112,7 +1112,7 @@ local function DrawControls(ui, OpenDetail)
 		x = x, y = y,
 		w = 60, h = 30,
 		text = _L['Import'],
-		buttonstyle = 2,
+		buttonstyle = 'FLAT',
 		onclick = function()
 			local file = GetOpenFileName(
 				_L['Please select import target monitor data file.'],
@@ -1141,7 +1141,7 @@ local function DrawControls(ui, OpenDetail)
 		x = x, y = y,
 		w = 60, h = 30,
 		text = _L['Export'],
-		buttonstyle = 2,
+		buttonstyle = 'FLAT',
 		tip = _L['Press ALT to export as default data.\n Press CTRL to export as plain.'],
 		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 		menu = function()
@@ -1200,7 +1200,7 @@ local function DrawControls(ui, OpenDetail)
 		x = x, y = y,
 		w = 80, h = 30,
 		text = _L['Save As Default'],
-		buttonstyle = 2,
+		buttonstyle = 'FLAT',
 		onclick = function()
 			LIB.Confirm(_L['Sure to save as default?'], function()
 				D.SaveConfig(true)
@@ -1212,7 +1212,7 @@ local function DrawControls(ui, OpenDetail)
 		x = x, y = y,
 		w = 80, h = 30,
 		text = _L['Reset Default'],
-		buttonstyle = 2,
+		buttonstyle = 'FLAT',
 		onclick = function()
 			LIB.Dialog(_L['Sure to reset default?'], {
 				{
