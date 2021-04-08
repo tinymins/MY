@@ -1,0 +1,4 @@
+return {
+	['Default'] = '默认',
+	['alert_sound.ogg'] = '默认提示音',
+}

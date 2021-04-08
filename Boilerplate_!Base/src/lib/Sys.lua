@@ -1242,9 +1242,9 @@ local function GenerateMenu(aList, bMainMenu, dwTarType, dwTarID)
 			bCheck = true,
 			bChecked = LIB.IsPanelVisible(),
 
-			szIcon = PACKET_INFO.UITEX_ICON,
-			nFrame = PACKET_INFO.MENUICON_FRAME,
-			nMouseOverFrame = PACKET_INFO.MENUICON_HOVER_FRAME,
+			szIcon = PACKET_INFO.LOGO_UITEX,
+			nFrame = PACKET_INFO.LOGO_MENU_FRAME,
+			nMouseOverFrame = PACKET_INFO.LOGO_MENU_HOVER_FRAME,
 			szLayer = 'ICON_RIGHT',
 			fnClickIcon = LIB.TogglePanel,
 		}

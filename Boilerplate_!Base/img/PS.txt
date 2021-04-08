@@ -1,0 +1,4 @@
+Farme	Left	Top	Width	High	File
+0	0	0	224	63	C:\Users\root\Desktop\Tab_1.tga
+1	0	65	224	63	C:\Users\root\Desktop\Tab_2.tga
+2	0	130	224	63	C:\Users\root\Desktop\Tab_3.tga

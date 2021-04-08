@@ -109,20 +109,20 @@ UI.BUTTON_STYLE = {
 	{
 		nWidth = 148,
 		nHeight = 33,
-		szImage = PACKET_INFO.UITEX_COMMON,
-		nNormalGroup = 5,
-		nMouseOverGroup = 6,
-		nMouseDownGroup = 7,
-		nDisableGroup = 8,
+		szImage = PACKET_INFO.FRAMEWORK_ROOT .. 'img/WndButton.UITex',
+		nNormalGroup = 4,
+		nMouseOverGroup = 5,
+		nMouseDownGroup = 6,
+		nDisableGroup = 7,
 	},
 	{
 		nWidth = 148,
 		nHeight = 33,
-		szImage = PACKET_INFO.UITEX_COMMON,
-		nNormalGroup = 1,
-		nMouseOverGroup = 2,
-		nMouseDownGroup = 3,
-		nDisableGroup = 4,
+		szImage = PACKET_INFO.FRAMEWORK_ROOT .. 'img/WndButton.UITex',
+		nNormalGroup = 0,
+		nMouseOverGroup = 1,
+		nMouseDownGroup = 2,
+		nDisableGroup = 3,
 	},
 	OPTION = {
 		nWidth = 22,
@@ -4150,7 +4150,7 @@ function UI.CreateFrame(szName, opt)
 	end
 	frm = Wnd.OpenWindow(szIniFile, szName)
 	if not opt.simple and not opt.empty then
-		frm:Lookup('', 'Image_Icon'):FromUITex(PACKET_INFO.UITEX_ICON, PACKET_INFO.MAINICON_FRAME)
+		frm:Lookup('', 'Image_Icon'):FromUITex(PACKET_INFO.LOGO_UITEX, PACKET_INFO.LOGO_MAIN_FRAME)
 	end
 	frm:ChangeRelation(opt.level)
 	frm:Show()

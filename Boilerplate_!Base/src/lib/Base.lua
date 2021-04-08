@@ -46,27 +46,28 @@ end
 local function IsStreaming()
 	return _G.SM_IsEnable and _G.SM_IsEnable()
 end
-local _BUILD_                = '19700101'
-local _NATURAL_VERSION_      = 0
-local _VERSION_              = '0.0.0'
-local _MENU_COLOR_           = {255, 255, 255}
-local _MAX_PLAYER_LEVEL_     = 100
-local _INTERFACE_ROOT_       = 'Interface/'
-local _NAME_SPACE_           = 'Boilerplate'
-local _ADDON_ROOT_           = _INTERFACE_ROOT_ .. _NAME_SPACE_ .. '/'
-local _DATA_ROOT_            = (IsStreaming() and (_G.GetUserDataFolder() .. '/' .. GetUserAccount() .. '/interface/') or _INTERFACE_ROOT_) .. _NAME_SPACE_ .. '#DATA/'
-local _FRAMEWORK_ROOT_       = _ADDON_ROOT_ .. _NAME_SPACE_ .. '_!Base/'
-local _PSS_ST_               = _FRAMEWORK_ROOT_ .. 'img/ST.pss'
-local _UITEX_ST_             = _FRAMEWORK_ROOT_ .. 'img/ST_UI.UITex'
-local _UITEX_COMMON_         = _FRAMEWORK_ROOT_ .. 'img/UICommon.UITex'
-local _UICOMPONENT_ROOT_     = _FRAMEWORK_ROOT_ .. 'ui/components/'
-local _UITEX_POSTER_         = _ADDON_ROOT_ .. _NAME_SPACE_ .. '_Resource/img/Poster.UITex'
-local _UITEX_ICON_           = _FRAMEWORK_ROOT_ .. 'img/Logo.UITex'
-local _MAINICON_FRAME_       = 0
-local _MENUICON_FRAME_       = 1
-local _MENUICON_HOVER_FRAME_ = 2
-local _DEBUG_LEVEL_          = tonumber(LoadLUAData(_DATA_ROOT_ .. 'debug.level.jx3dat') or nil) or 4
-local _DELOG_LEVEL_          = tonumber(LoadLUAData(_DATA_ROOT_ .. 'delog.level.jx3dat') or nil) or 4
+local _BUILD_                 = '19700101'
+local _NATURAL_VERSION_       = 0
+local _VERSION_               = '0.0.0'
+local _MENU_COLOR_            = {255, 255, 255}
+local _MAX_PLAYER_LEVEL_      = 100
+local _INTERFACE_ROOT_        = 'Interface/'
+local _NAME_SPACE_            = 'Boilerplate'
+local _ADDON_ROOT_            = _INTERFACE_ROOT_ .. _NAME_SPACE_ .. '/'
+local _DATA_ROOT_             = (IsStreaming() and (_G.GetUserDataFolder() .. '/' .. GetUserAccount() .. '/interface/') or _INTERFACE_ROOT_) .. _NAME_SPACE_ .. '#DATA/'
+local _FRAMEWORK_ROOT_        = _ADDON_ROOT_ .. _NAME_SPACE_ .. '_!Base/'
+local _UICOMPONENT_ROOT_      = _FRAMEWORK_ROOT_ .. 'ui/components/'
+local _LOGO_UITEX_            = _FRAMEWORK_ROOT_ .. 'img/Logo.UITex'
+local _LOGO_MAIN_FRAME_       = 0
+local _LOGO_MENU_FRAME_       = 1
+local _LOGO_MENU_HOVER_FRAME_ = 2
+local _POSTER_UITEX_          = _ADDON_ROOT_ .. _NAME_SPACE_ .. '_Resource/img/Poster.UITex'
+local _POSTER_FRAME_COUNT_    = 1
+local _ST_PSS_                = _ADDON_ROOT_ .. _NAME_SPACE_ .. '_Resource/img/ST.pss'
+local _ST_UITEX_              = _ADDON_ROOT_ .. _NAME_SPACE_ .. '_Resource/img/ST.UITex'
+local _ST_FRAME_COUNT_        = 9
+local _DEBUG_LEVEL_           = tonumber(LoadLUAData(_DATA_ROOT_ .. 'debug.level.jx3dat') or nil) or 4
+local _DELOG_LEVEL_           = tonumber(LoadLUAData(_DATA_ROOT_ .. 'delog.level.jx3dat') or nil) or 4
 -------------------------------------------------------------------------------------------------------
 -- 初始化调试工具
 -------------------------------------------------------------------------------------------------------
@@ -682,36 +683,38 @@ end
 local PACKET_INFO
 do
 local tInfo = {
-	NAME                 = _NAME_                ,
-	SHORT_NAME           = _SHORT_NAME_          ,
-	UITEX_COMMON         = _UITEX_COMMON_        ,
-	UITEX_POSTER         = _UITEX_POSTER_        ,
-	UITEX_ST             = _UITEX_ST_            ,
-	UITEX_ICON           = _UITEX_ICON_          ,
-	MAINICON_FRAME       = _MAINICON_FRAME_      ,
-	MENUICON_FRAME       = _MENUICON_FRAME_      ,
-	MENUICON_HOVER_FRAME = _MENUICON_HOVER_FRAME_,
-	UICOMPONENT_ROOT     = _UICOMPONENT_ROOT_    ,
-	VERSION              = _VERSION_             ,
-	NATURAL_VERSION      = _NATURAL_VERSION_     ,
-	BUILD                = _BUILD_               ,
-	NAME_SPACE           = _NAME_SPACE_          ,
-	DEBUG_LEVEL          = _DEBUG_LEVEL_         ,
-	DELOG_LEVEL          = _DELOG_LEVEL_         ,
-	INTERFACE_ROOT       = _INTERFACE_ROOT_      ,
-	ROOT                 = _ADDON_ROOT_          ,
-	DATA_ROOT            = _DATA_ROOT_           ,
-	FRAMEWORK_ROOT       = _FRAMEWORK_ROOT_      ,
-	AUTHOR               = _AUTHOR_              ,
-	AUTHOR_WEIBO         = _AUTHOR_WEIBO_        ,
-	AUTHOR_WEIBO_URL     = _AUTHOR_WEIBO_URL_    ,
-	AUTHOR_SIGNATURE     = _AUTHOR_SIGNATURE_    ,
-	AUTHOR_ROLES         = _AUTHOR_ROLES_        ,
-	AUTHOR_HEADER        = _AUTHOR_HEADER_       ,
-	AUTHOR_PROTECT_NAMES = _AUTHOR_PROTECT_NAMES_,
-	AUTHOR_FAKE_HEADER   = _AUTHOR_FAKE_HEADER_  ,
-	MENU_COLOR           = _MENU_COLOR_          ,
-	MAX_PLAYER_LEVEL     = _MAX_PLAYER_LEVEL_    ,
+	NAME                  = _NAME_                 ,
+	SHORT_NAME            = _SHORT_NAME_           ,
+	VERSION               = _VERSION_              ,
+	NATURAL_VERSION       = _NATURAL_VERSION_      ,
+	BUILD                 = _BUILD_                ,
+	NAME_SPACE            = _NAME_SPACE_           ,
+	DEBUG_LEVEL           = _DEBUG_LEVEL_          ,
+	DELOG_LEVEL           = _DELOG_LEVEL_          ,
+	INTERFACE_ROOT        = _INTERFACE_ROOT_       ,
+	ROOT                  = _ADDON_ROOT_           ,
+	DATA_ROOT             = _DATA_ROOT_            ,
+	FRAMEWORK_ROOT        = _FRAMEWORK_ROOT_       ,
+	UICOMPONENT_ROOT      = _UICOMPONENT_ROOT_     ,
+	LOGO_UITEX            = _LOGO_UITEX_           ,
+	LOGO_MAIN_FRAME       = _LOGO_MAIN_FRAME_      ,
+	LOGO_MENU_FRAME       = _LOGO_MENU_FRAME_      ,
+	LOGO_MENU_HOVER_FRAME = _LOGO_MENU_HOVER_FRAME_,
+	POSTER_UITEX          = _POSTER_UITEX_         ,
+	POSTER_FRAME_COUNT    = _POSTER_FRAME_COUNT_   ,
+	ST_PSS                = _ST_PSS_               ,
+	ST_UITEX              = _ST_UITEX_             ,
+	ST_FRAME_COUNT        = _ST_FRAME_COUNT_       ,
+	AUTHOR                = _AUTHOR_               ,
+	AUTHOR_WEIBO          = _AUTHOR_WEIBO_         ,
+	AUTHOR_WEIBO_URL      = _AUTHOR_WEIBO_URL_     ,
+	AUTHOR_SIGNATURE      = _AUTHOR_SIGNATURE_     ,
+	AUTHOR_ROLES          = _AUTHOR_ROLES_         ,
+	AUTHOR_HEADER         = _AUTHOR_HEADER_        ,
+	AUTHOR_PROTECT_NAMES  = _AUTHOR_PROTECT_NAMES_ ,
+	AUTHOR_FAKE_HEADER    = _AUTHOR_FAKE_HEADER_   ,
+	MENU_COLOR            = _MENU_COLOR_           ,
+	MAX_PLAYER_LEVEL      = _MAX_PLAYER_LEVEL_     ,
 }
 PACKET_INFO = SetmetaReadonly(tInfo)
 -- 更新最高玩家等级数据

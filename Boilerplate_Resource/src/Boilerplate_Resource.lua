@@ -1,6 +1,6 @@
 --------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
--- @desc     : 悬浮功能入口
+-- @desc     : 二进制资源
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
 --------------------------------------------------------
 -------------------------------------------------------------------------------------------------------
@@ -41,79 +41,49 @@ local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild,
 local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
 local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
 -------------------------------------------------------------------------------------------------------
+local PLUGIN_NAME = NSFormatString('{$NS}_Resource')
+local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local MODULE_NAME = NSFormatString('{$NS}_Resource')
+local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+--------------------------------------------------------------------------
+if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^0.0.0') then
+	return
+end
+--------------------------------------------------------------------------
 
-local _L = LIB.LoadLangPack(PACKET_INFO.FRAMEWORK_ROOT .. 'lang/hoverentry/')
-local D = {}
-local O = {
-	bEnable = false,
-	nSize = 30,
-	anchor = { x = -362, y = -78, s = 'BOTTOMCENTER', r = 'BOTTOMCENTER' },
-	bHoverMenu = false,
+local C, D = {}, {}
+
+C.aSound = {
+	-- {
+	-- 	type = _L['Wuer'],
+	-- 	{ id = 2, file = 'WE/voice-52001.ogg' },
+	-- 	{ id = 3, file = 'WE/voice-52002.ogg' },
+	-- },
 }
-local FRAME_NAME = NSFormatString('{$NS}_HoverEntry')
-RegisterCustomData(FRAME_NAME .. '.bEnable')
-RegisterCustomData(FRAME_NAME .. '.nSize')
-RegisterCustomData(FRAME_NAME .. '.anchor')
-RegisterCustomData(FRAME_NAME .. '.bHoverMenu')
 
-function D.Popup()
-	local addonmenu = LIB.GetTraceButtonAddonMenu()[1]
-	local menu = {
-		bDisableSound = true,
-		{
-			szOption = addonmenu.szOption,
-			rgb = addonmenu.rgb,
-		},
-		CONSTANT.MENU_DIVIDER,
-	}
-	for i, v in ipairs(addonmenu) do
-		insert(menu, v)
+do
+local root = PLUGIN_ROOT .. '/audio/'
+local function GetSoundList(tSound)
+	local t = {}
+	if tSound.type then
+		t.szType = tSound.type
+	elseif tSound.id then
+		t.dwID = tSound.id
+		t.szName = _L[tSound.file]
+		t.szPath = root .. tSound.file
 	end
-	UI.PopupMenu(menu)
-end
-
-function D.CheckEnable()
-	Wnd.CloseWindow(FRAME_NAME)
-	if O.bEnable then
-		local frame = UI.CreateFrame(FRAME_NAME, {
-			empty = true,
-			w = O.nSize, h = O.nSize,
-			anchor = O.anchor,
-		})
-		UI(frame):Append('Image', {
-			w = O.nSize, h = O.nSize,
-			image = PACKET_INFO.LOGO_UITEX,
-			imageframe = PACKET_INFO.LOGO_MAIN_FRAME,
-			onhover = function(bIn)
-				if bIn and O.bHoverMenu then
-					D.Popup()
-				end
-			end,
-			onclick = D.Popup,
-		})
+	for _, v in ipairs(tSound) do
+		local t1 = GetSoundList(v)
+		if t1 then
+			insert(t, t1)
+		end
 	end
-end
-LIB.RegisterInit('HoverEntry', D.CheckEnable)
-
-function D.OnFrameCreate()
-	this:RegisterEvent('UI_SCALED')
-	this:RegisterEvent('ON_ENTER_CUSTOM_UI_MODE')
-	this:RegisterEvent('ON_LEAVE_CUSTOM_UI_MODE')
+	return t
 end
 
-function D.OnEvent(event)
-	if event == 'UI_SCALED' then
-		UI(this):Anchor(O.anchor)
-	elseif event == 'ON_ENTER_CUSTOM_UI_MODE' then
-		UpdateCustomModeWindow(this, _L['HoverEntry'])
-	elseif event == 'ON_LEAVE_CUSTOM_UI_MODE' then
-		O.anchor = GetFrameAnchor(this)
-		UpdateCustomModeWindow(this, _L['HoverEntry'])
-	end
+function D.GetSoundList()
+	return GetSoundList(C.aSound)
 end
-
-function D.OnFrameDragEnd()
-	O.anchor = GetFrameAnchor(this)
 end
 
 -- Global exports
@@ -121,35 +91,11 @@ do
 local settings = {
 	exports = {
 		{
-			root = D,
-			preset = 'UIEvent'
-		},
-		{
 			fields = {
-				bEnable = true,
-				nSize = true,
-				anchor = true,
-				bHoverMenu = true,
+				GetSoundList = D.GetSoundList,
 			},
-			root = O,
-		},
-	},
-	imports = {
-		{
-			fields = {
-				bEnable = true,
-				nSize = true,
-				anchor = true,
-				bHoverMenu = true,
-			},
-			triggers = {
-				bEnable = D.CheckEnable,
-				nSize = D.CheckEnable,
-				anchor = D.CheckEnable,
-			},
-			root = O,
 		},
 	},
 }
-_G[FRAME_NAME] = LIB.GeneGlobalNS(settings)
+_G[MODULE_NAME] = LIB.GeneGlobalNS(settings)
 end
