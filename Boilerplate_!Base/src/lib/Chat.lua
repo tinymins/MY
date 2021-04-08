@@ -1166,15 +1166,15 @@ end
 -- parserOptions -- 解析规则，参见 @parserOptions 定义
 local function StandardizeChatData(szText, parserOptions)
 	-- 聊天内容格式标准化
-	local tSay = nil
+	local aSay = nil
 	if IsTable(szText) then
-		tSay = Clone(szText)
+		aSay = Clone(szText)
 	else
-		tSay = {{ type = 'text', text = szText }}
+		aSay = {{ type = 'text', text = szText }}
 	end
 	-- 过滤换行符
 	if LIB.IsShieldedVersion('TALK', 2) then
-		for _, v in ipairs(tSay) do
+		for _, v in ipairs(aSay) do
 			if v.text then
 				v.text = wgsub(v.text, '\n', ' ')
 			end
@@ -1185,19 +1185,19 @@ local function StandardizeChatData(szText, parserOptions)
 	end
 	-- 表情转义
 	if parserOptions.emotion then
-		tSay = ParseFaceIcon(tSay)
+		aSay = ParseFaceIcon(aSay)
 	end
 	-- 名字转义
 	if parserOptions.name then
-		tSay = ParseName(tSay)
+		aSay = ParseName(aSay)
 	end
 	-- 安全性和长度校验
 	if parserOptions.sws then
-		tSay = ParseAntiSWS(tSay)
+		aSay = ParseAntiSWS(aSay)
 	end
 	if parserOptions.len and LIB.IsShieldedVersion('TALK') then
 		local nLen = 0
-		for i, v in ipairs(tSay) do
+		for i, v in ipairs(aSay) do
 			if nLen <= 64 then
 				nLen = nLen + wlen(v.text or v.name or '')
 				if nLen > 64 then
@@ -1207,27 +1207,51 @@ local function StandardizeChatData(szText, parserOptions)
 					if v.name then
 						v.name = wsub(v.name, 1, 64 - nLen)
 					end
-					for j = #tSay, i + 1, -1 do
-						remove(tSay, j)
+					for j = #aSay, i + 1, -1 do
+						remove(aSay, j)
 					end
 				end
 			end
 		end
 	end
-	return tSay
+	return aSay
+end
+
+-- 聊天数据签名
+-- aSay        -- 标准化聊天内容
+-- uuid        -- 消息唯一标识符
+-- me          -- 玩家自身角色对象
+local function SignChatData(aSay, uuid, me)
+	if not aSay[1] or aSay[1].name ~= '' or aSay[1].type ~= 'eventlink' then
+		insert(aSay, 1, { type = 'eventlink', name = '', text = '' })
+	end
+	local dwTime = GetCurrentTime()
+	local szLinkInfo = LIB.JsonEncode({
+		_ = dwTime,
+		c = LIB.IsDebugClient(true)
+			and GetStringCRC(me.szName .. dwTime .. '8545ada2-f687-4c95-8558-27cbf823745a')
+			or nil,
+		via = PACKET_INFO.NAME_SPACE,
+		uuid = uuid and tostring(uuid),
+	})
+	aSay[1].linkinfo = szLinkInfo
+	return aSay
 end
 
 -- 设置聊天内容
--- (void) LIB.SetChatInput(string szText[, boolean bNoEscape])
--- szText         -- 聊天内容，（亦可为兼容 KPlayer.Talk 的 table）
--- bNoEscape      -- *可选* 不解析聊天内容中的表情图片和名字，默认为 false
-function LIB.SetChatInput(szText, parsers)
-	local parserOptions = StandardizeParserOptions(parsers)
-	local tSay = StandardizeChatData(szText, parserOptions)
+-- (void) LIB.SetChatInput(string szText[, table parsers, [string uuid]])
+-- szText    -- 聊天内容，（亦可为兼容 KPlayer.Talk 的 table）
+-- parsers   -- *可选* 解析器参数，参见 LIB.SendChat: tOptions.parsers
+-- uuid      -- *可选* 消息唯一标识符，参见 LIB.SendChat: tOptions.uuid
+function LIB.SetChatInput(szText, parsers, uuid)
+	local me = GetClientPlayer()
 	local edit = LIB.GetChatInput()
-	if edit then
+	if me and edit then
+		local parserOptions = StandardizeParserOptions(parsers)
+		local aSay = StandardizeChatData(szText, parserOptions)
+		local aSignSay = SignChatData(aSay, uuid, me)
 		edit:ClearText()
-		for _, v in ipairs(tSay) do
+		for _, v in ipairs(aSignSay) do
 			edit:InsertObj(v.text, v)
 		end
 	end
@@ -1271,22 +1295,14 @@ function LIB.SendChat(nChannel, szText, tOptions)
 		parserOptions.sws = false
 		parserOptions.len = false
 	end
-	local tSay = StandardizeChatData(szText, parserOptions)
+	local aSay = StandardizeChatData(szText, parserOptions)
 	if bSystem then
-		local szXml = LIB.XmlifyChatData(tSay, GetMsgFontColor('MSG_SYS'))
+		local szXml = LIB.XmlifyChatData(aSay, GetMsgFontColor('MSG_SYS'))
 		return LIB.Sysmsg({ szXml, rich = true })
 	end
-	-- 检查标签并发送
-	if not tSay[1] or tSay[1].name ~= '' or tSay[1].type ~= 'eventlink' then
-		insert(tSay, 1, {
-			type = 'eventlink', name = '',
-			linkinfo = LIB.JsonEncode({
-				via = PACKET_INFO.NAME_SPACE,
-				uuid = tOptions.uuid and tostring(tOptions.uuid),
-			})
-		})
-	end
-	me.Talk(nChannel, szTarget, tSay)
+	-- 签名并发送
+	local aSignSay = SignChatData(aSay, tOptions.uuid, me)
+	me.Talk(nChannel, szTarget, aSay)
 end
 end
 
@@ -1623,7 +1639,7 @@ end)
 end
 
 -- 防止山寨
-RegisterTalkFilter(function(nChannel, t, dwTalkerID, szName, bEcho, bOnlyShowBallon, bSecurity, bGMAccount, bCheater, dwTitleID, dwIdePetTemplateID)
+RegisterTalkFilter(function(nChannel, aSay, dwTalkerID, szName, bEcho, bOnlyShowBallon, bSecurity, bGMAccount, bCheater, dwTitleID, dwIdePetTemplateID)
 	if IsRemotePlayer(dwTalkerID) then
 		return
 	end
@@ -1631,6 +1647,13 @@ RegisterTalkFilter(function(nChannel, t, dwTalkerID, szName, bEcho, bOnlyShowBal
 	local nPos = StringFindW(szName, '@')
 	if nPos then
 		szRealName = szName:sub(1, nPos - 1)
+	end
+	local p = aSay[1]
+	if p and p.type == 'eventlink' and p.name == '' then
+		local data = LIB.JsonDecode(p.linkinfo)
+		if data and data._ and data.c and data.c == GetStringCRC(szName .. data._ .. '8545ada2-f687-4c95-8558-27cbf823745a') then
+			return
+		end
 	end
 	if UI_GetClientPlayerID() ~= dwTalkerID and PACKET_INFO.AUTHOR_PROTECT_NAMES[szRealName] and PACKET_INFO.AUTHOR_ROLES[dwTalkerID] ~= szName then
 		return true
