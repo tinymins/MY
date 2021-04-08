@@ -149,7 +149,7 @@ function UI.OpenIconPicker(fnAction)
 	ui:Append('WndButton', {
 		x = 800, y = 580,
 		text = g_tStrings.STR_HOTKEY_SURE,
-		buttonstyle = 2,
+		buttonstyle = 'FLAT',
 		onclick = function()
 			local nIcon = tonumber(ui:Children('#Icon'):Text())
 			if nIcon then
