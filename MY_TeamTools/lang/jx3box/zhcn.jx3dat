@@ -9,6 +9,7 @@ return {
     ['Loading'] = '加载中…',
     ['Unknown'] = '未知',
     ['Click fetch'] = '点击获取',
+    ['Bind'] = '绑定',
     ['Not bind'] = '未绑定',
     ['You are crossing server, please do this after backing.'] = '当前处于跨服状态，请在结束跨服后再试。',
     ['Request failed.'] = '请求失败',

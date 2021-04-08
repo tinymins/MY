@@ -170,7 +170,7 @@ function PS.OnPanelActive(wnd)
 	-- ╫ги╚хож╓
 	local uiCCStatus, uiBtnCCStatus, uiBtnCCLink
 	local function UpdateUI()
-		if O.szPSUUID ~= PS_UUID then
+		if O.szPSUUID ~= szPSUUID then
 			return
 		end
 		if O.pending then
