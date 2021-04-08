@@ -82,8 +82,8 @@ function D.CheckEnable()
 		})
 		UI(frame):Append('Image', {
 			w = O.nSize, h = O.nSize,
-			image = PACKET_INFO.UITEX_ICON,
-			imageframe = PACKET_INFO.MAINICON_FRAME,
+			image = PACKET_INFO.LOGO_UITEX,
+			imageframe = PACKET_INFO.LOGO_MAIN_FRAME,
 			onhover = function(bIn)
 				if bIn and O.bHoverMenu then
 					D.Popup()

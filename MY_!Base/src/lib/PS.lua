@@ -43,6 +43,7 @@ local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCal
 -------------------------------------------------------------------------------------------------------
 local _L = LIB.LoadLangPack(PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 local INI_PATH = PACKET_INFO.FRAMEWORK_ROOT ..'ui/PS.ini'
+local IMG_PATH = PACKET_INFO.FRAMEWORK_ROOT ..'img/PS.UITex'
 local FRAME_NAME = NSFormatString('{$NS}_PS')
 
 local D = {}
@@ -436,9 +437,9 @@ function D.RedrawTabs(frame, szCategory)
 			else
 				hTab:Lookup('Image_TabIcon'):FromTextureFile(tTab.szIconTex)
 			end
-			hTab:Lookup('Image_Bg'):FromUITex(PACKET_INFO.UITEX_COMMON, 3)
-			hTab:Lookup('Image_Bg_Active'):FromUITex(PACKET_INFO.UITEX_COMMON, 1)
-			hTab:Lookup('Image_Bg_Hover'):FromUITex(PACKET_INFO.UITEX_COMMON, 2)
+			hTab:Lookup('Image_Bg'):FromUITex(IMG_PATH, 0)
+			hTab:Lookup('Image_Bg_Active'):FromUITex(IMG_PATH, 1)
+			hTab:Lookup('Image_Bg_Hover'):FromUITex(IMG_PATH, 2)
 		end
 	end
 	scroll:FormatAllItemPos()
@@ -620,7 +621,7 @@ function D.OnFrameCreate()
 	this:Lookup('', 'Text_Title'):SetText(_L('%s V%s Build %s %s', PACKET_INFO.NAME, PACKET_INFO.NATURAL_VERSION, PACKET_INFO.VERSION, PACKET_INFO.BUILD))
 	this:Lookup('', 'Text_Author'):SetText('-- by ' .. PACKET_INFO.AUTHOR_SIGNATURE)
 	this:Lookup('Wnd_Total/Btn_Weibo', 'Text_Default'):SetText(_L('Author @%s', PACKET_INFO.AUTHOR_WEIBO))
-	this:Lookup('Wnd_Total/Btn_Weibo', 'Image_Icon'):FromUITex(PACKET_INFO.UITEX_ICON, PACKET_INFO.MAINICON_FRAME)
+	this:Lookup('Wnd_Total/Btn_Weibo', 'Image_Icon'):FromUITex(PACKET_INFO.LOGO_UITEX, PACKET_INFO.LOGO_MAIN_FRAME)
 	this:Lookup('Btn_Drag'):RegisterLButtonDrag()
 	UI(this):Size(D.OnSizeChanged)
 	D.RedrawCategory(this)

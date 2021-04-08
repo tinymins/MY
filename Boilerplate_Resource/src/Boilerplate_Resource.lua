@@ -1,10 +1,7 @@
 --------------------------------------------------------
--- This file is part of the JX3 Mingyi Plugin.
--- @link     : https://jx3.derzh.com/
+-- This file is part of the JX3 Plugin Project.
 -- @desc     : 二进制资源
--- @author   : 茗伊 @双梦镇 @追风蹑影
--- @modifier : Emil Zhai (root@derzh.com)
--- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+-- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
 --------------------------------------------------------
 -------------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -44,9 +41,9 @@ local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild,
 local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
 local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
 -------------------------------------------------------------------------------------------------------
-local PLUGIN_NAME = 'MY_Resource'
+local PLUGIN_NAME = NSFormatString('{$NS}_Resource')
 local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
-local MODULE_NAME = 'MY_Resource'
+local MODULE_NAME = NSFormatString('{$NS}_Resource')
 local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
 if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^3.0.0') then
@@ -65,7 +62,7 @@ C.aSound = {
 }
 
 do
-local root = PACKET_INFO.ROOT .. 'MY_Resource/audio/'
+local root = PLUGIN_ROOT .. '/audio/'
 local function GetSoundList(tSound)
 	local t = {}
 	if tSound.type then
@@ -100,5 +97,5 @@ local settings = {
 		},
 	},
 }
-MY_Resource = LIB.GeneGlobalNS(settings)
+_G[MODULE_NAME] = LIB.GeneGlobalNS(settings)
 end
