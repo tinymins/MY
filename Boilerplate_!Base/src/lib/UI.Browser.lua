@@ -43,7 +43,7 @@ local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCal
 -------------------------------------------------------------------------------------------------------
 
 local D = {}
-local FRAME_NAME = NSFormatString('{$NS}_Web')
+local FRAME_NAME = NSFormatString('{$NS}_Browser')
 
 local function UpdateControls(frame, action, url)
 	local wndWeb = frame:Lookup('Wnd_Web/WndWeb')
@@ -81,7 +81,7 @@ function D.OnLButtonClick()
 	elseif name == 'Btn_OuterOpen' then
 		LIB.OpenBrowser(frame:Lookup('Wnd_Controls/Edit_Input'):GetText())
 	elseif name == 'Btn_Close' then
-		UI.CloseWeb(frame)
+		UI.CloseBrowser(frame)
 	end
 end
 
@@ -199,7 +199,7 @@ function D.Open(url, options)
 	if WINDOWS[szKey] then
 		Wnd.CloseWindow(WINDOWS[szKey])
 	end
-	WINDOWS[szKey] = Wnd.OpenWindow(PACKET_INFO.FRAMEWORK_ROOT .. 'ui/Web.ini', FRAME_NAME)
+	WINDOWS[szKey] = Wnd.OpenWindow(PACKET_INFO.FRAMEWORK_ROOT .. 'ui/Browser.ini', FRAME_NAME)
 
 	local frame = WINDOWS[szKey]
 	frame:SetName(FRAME_NAME .. '#' .. szKey)
@@ -208,9 +208,17 @@ function D.Open(url, options)
 	end
 	local ui = UI(frame)
 	if options.driver == 'ie' then
-		ui:Children('#Wnd_Web'):Append('WndWebPage', { name = 'WndWeb' })
+		ui:Fetch('Wnd_Web'):Append('WndWebPage', { name = 'WndWeb' })
 	else --if options.driver == 'chrome' then
-		ui:Children('#Wnd_Web'):Append('WndWebCef', { name = 'WndWeb' })
+		ui:Fetch('Wnd_Web'):Append('WndWebCef', { name = 'WndWeb' })
+	end
+	if ui:Fetch('Wnd_Web/WndWeb'):Count() == 0 then
+		ui:Fetch('Wnd_Web'):Append('WndWebPage', { name = 'WndWeb' })
+	end
+	if ui:Fetch('Wnd_Web/WndWeb'):Count() == 0 then
+		LIB.Debug(NSFormatString('{$NS}.UI.Browser'), 'Create WndWebPage/WndWebCef failed!', DEBUG_LEVEL.ERROR)
+		Wnd.CloseWindow(frame)
+		return
 	end
 	if options.controls == false then
 		frame:Lookup('Wnd_Controls'):Hide()
@@ -219,9 +227,7 @@ function D.Open(url, options)
 	if options.readonly then
 		frame:Lookup('Wnd_Controls/Edit_Input'):Enable(false)
 	end
-	if options.title then
-		frame:Lookup('', 'Text_Title'):SetText(options.title)
-	end
+	frame:Lookup('', 'Text_Title'):SetText(options.title or '')
 	frame:Lookup('Wnd_Controls/Edit_Input'):SetText(url)
 	ui:MinSize(290, 150)
 	ui:Size(OnResizePanel)
@@ -263,6 +269,6 @@ local settings = {
 _G[FRAME_NAME] = LIB.GeneGlobalNS(settings)
 end
 
-UI.GetWebFrame = D.GetFrame
-UI.Open = D.Open
-UI.Close = D.Close
+UI.LookupBrowser = D.GetFrame
+UI.OpenBrowser = D.Open
+UI.CloseBrowser = D.Close

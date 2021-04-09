@@ -2049,7 +2049,7 @@ function LIB.OpenBrowser(szAddr)
 	if _G.OpenBrowser then
 		_G.OpenBrowser(szAddr)
 	else
-		UI.OpenIE(szAddr)
+		UI.OpenBrowser(szAddr)
 	end
 end
 
