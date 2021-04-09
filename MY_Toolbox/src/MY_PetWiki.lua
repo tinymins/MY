@@ -81,13 +81,13 @@ function D.Open(dwPetIndex)
 		}))
 	local szKey = 'PetsWiki_' .. dwPetIndex
 	local szTitle = tPet.szName .. ' - ' .. LIB.XMLGetPureText(tPet.szDesc)
-	szKey = MY_Web.Open(szURL, {
+	szKey = UI.OpenBrowser(szURL, {
 		key = szKey,
 		title = szTitle,
 		w = O.nW, h = O.nH,
 		readonly = true,
 	})
-	UI(MY_Web.GetFrame(szKey)):Size(D.OnWebSizeChange)
+	UI(UI.LookupBrowser(szKey)):Size(D.OnWebSizeChange)
 end
 
 function D.OnPetItemLButtonClick()

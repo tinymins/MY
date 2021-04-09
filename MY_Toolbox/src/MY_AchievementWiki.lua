@@ -81,13 +81,13 @@ function D.Open(dwAchievement)
 		}))
 	local szKey = 'AchievementWiki_' .. dwAchievement
 	local szTitle = achi.szName .. ' - ' .. achi.szDesc
-	szKey = MY_Web.Open(szURL, {
+	szKey = UI.OpenBrowser(szURL, {
 		key = szKey,
 		title = szTitle,
 		w = O.nW, h = O.nH,
 		readonly = true,
 	})
-	UI(MY_Web.GetFrame(szKey)):Size(D.OnWebSizeChange)
+	UI(UI.LookupBrowser(szKey)):Size(D.OnWebSizeChange)
 end
 
 function D.OnAchieveItemMouseEnter()

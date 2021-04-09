@@ -84,13 +84,13 @@ function D.Open(dwTabType, dwTabIndex, nBookID)
 		}))
 	local szKey = 'ItemWiki_' .. concat({dwTabType, dwTabIndex, nBookID}, '_')
 	local szTitle = szName
-	szKey = MY_Web.Open(szURL, {
+	szKey = UI.OpenBrowser(szURL, {
 		key = szKey,
 		title = szTitle,
 		w = O.nW, h = O.nH,
 		readonly = true,
 	})
-	UI(MY_Web.GetFrame(szKey)):Size(D.OnWebSizeChange)
+	UI(UI.LookupBrowser(szKey)):Size(D.OnWebSizeChange)
 end
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
