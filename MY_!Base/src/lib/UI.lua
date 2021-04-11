@@ -3261,7 +3261,7 @@ function OO:ItemInfo(...)
 				UpdataItemBoxObject(raw)
 			else
 				local KItemInfo = GetItemInfo(data[2], data[3])
-				if KItemInfo.nGenre == ITEM_GENRE.BOOK and #data == 4 then -- 西山居BUG
+				if KItemInfo and KItemInfo.nGenre == ITEM_GENRE.BOOK and #data == 4 then -- 西山居BUG
 					insert(data, 4, 99999)
 				end
 				local res, err, trace = XpCall(UpdataItemInfoBoxObject, raw, unpack(data)) -- 防止itemtab不一样
