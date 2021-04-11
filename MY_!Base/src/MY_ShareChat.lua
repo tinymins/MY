@@ -59,7 +59,7 @@ LIB.RegisterInit('MY_ShareChat', function()
 	if not SHARE_CHAT then
 		LIB.Ajax({
 			driver = 'auto', mode = 'auto', method = 'auto',
-			url = 'https://cdn.j3cx.com/config/npc-chat.json'
+			url = 'https://pull.j3cx.com/api/share-chats'
 				.. '?l=' .. AnsiToUTF8(GLOBAL.GAME_LANG)
 				.. '&L=' .. AnsiToUTF8(GLOBAL.GAME_EDITION)
 				.. '&_=' .. GetCurrentTime(),

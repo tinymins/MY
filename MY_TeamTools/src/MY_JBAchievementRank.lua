@@ -194,7 +194,7 @@ function D.UpdateMapBossAchieveAcquire()
 	if not BOSS_MAP_ACHIEVE_ACQUIRE then
 		LIB.Ajax({
 			driver = 'auto', mode = 'auto', method = 'auto',
-			url = 'https://cdn.j3cx.com/config/achievement-rank.json'
+			url = 'https://pull.j3cx.com/api/achievement-rank'
 				.. '?l=' .. GLOBAL.GAME_LANG
 				.. '&L=' .. GLOBAL.GAME_EDITION
 				.. '&_=' .. GetCurrentTime(),
