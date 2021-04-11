@@ -141,7 +141,8 @@ function PS.OnPanelActive(frame)
 	x = X + 10
 	if CFG.bEnableDistance then
 		y = y + ui:Append('WndButton', {
-			x = x, y = y, text = _L['Edit Distance Level'],
+			x = x, y = y, w = 150, h = 35,
+			text = _L['Edit Distance Level'],
 			buttonstyle = 'SKEUOMORPHISM_LACE_BORDER',
 			onclick = function()
 				GetUserInput(_L['distance, distance, ...'], function(szText)
