@@ -148,7 +148,8 @@ local settings = {
 		{
 			fields = {
 				GetSoundList = D.GetSoundList,
-				GetWndButtonStyle = D.GetWndButtonStyle,
+				GetWndButtonStyleName = D.GetWndButtonStyleName,
+				GetWndButtonStyleConfig = D.GetWndButtonStyleConfig,
 			},
 		},
 	},
