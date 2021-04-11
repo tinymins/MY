@@ -23,7 +23,7 @@ local insert, remove, concat = table.insert, table.remove, table.concat
 local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
 local sort, getn = table.sort, table['getn'] or function(t) return #t end
 -- jx3 apis caching
-local wsub, wlen, wfind, wgsub = wstring.sub, wstring.len, StringFindW, StringReplaceW
+local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
 local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer

@@ -21,7 +21,7 @@ local insert, remove, concat = table.insert, table.remove, table.concat
 local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
 local sort, getn = table.sort, table['getn'] or function(t) return #t end
 -- jx3 apis caching
-local wsub, wlen, wfind, wgsub = wstring.sub, wstring.len, StringFindW, StringReplaceW
+local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
 local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
@@ -448,12 +448,13 @@ function LIB.ConcatPath(...)
 	return szPath
 end
 
--- 删除目录中的./与../
+-- 替换目录分隔符为反斜杠，并且删除目录中的.\与..\
 function LIB.NormalizePath(szPath)
-	szPath = szPath:gsub('/%./', '/')
+	szPath = szPath:gsub('/', '\\')
+	szPath = szPath:gsub('\\%.\\', '\\')
 	local nPos1, nPos2
 	while true do
-		nPos1, nPos2 = szPath:find('[^/]*/%.%./')
+		nPos1, nPos2 = szPath:find('[^\\]*\\%.%.\\')
 		if not nPos1 then
 			break
 		end

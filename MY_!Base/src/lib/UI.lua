@@ -21,7 +21,7 @@ local insert, remove, concat = table.insert, table.remove, table.concat
 local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
 local sort, getn = table.sort, table['getn'] or function(t) return #t end
 -- jx3 apis caching
-local wsub, wlen, wfind, wgsub = wstring.sub, wstring.len, StringFindW, StringReplaceW
+local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
 local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
@@ -110,7 +110,7 @@ local BUTTON_STYLE_CONFIG = {
 	},
 }
 local function GetButtonStyleName(raw)
-	local szImage = raw:GetAnimatePath()
+	local szImage = wlower(raw:GetAnimatePath())
 	local nNormalGroup = raw:GetAnimateGroupNormal()
 	local GetStyleName = Get(_G, {NSFormatString('{$NS}_Resource'), 'GetWndButtonStyleName'})
 	if IsFunction(GetStyleName) then
@@ -120,7 +120,7 @@ local function GetButtonStyleName(raw)
 		end
 	end
 	for e, p in ipairs(BUTTON_STYLE_CONFIG) do
-		if p.szImage == szImage and p.nNormalGroup == nNormalGroup then
+		if wlower(p.szImage) == szImage and p.nNormalGroup == nNormalGroup then
 			return e
 		end
 	end
@@ -139,10 +139,6 @@ local function CallWithThis(context, fn, ...)
 	local rtc = {Call(fn, ...)}
 	this = _this
 	return unpack(rtc)
-end
-
-local function IsSamePath(p1, p2)
-	return p1:gsub('/', '\\'):lower() == p2:gsub('/', '\\'):lower()
 end
 
 -----------------------------------------------------------
