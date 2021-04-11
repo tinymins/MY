@@ -110,7 +110,7 @@ local BUTTON_STYLE_CONFIG = {
 	},
 }
 local function GetButtonStyleName(raw)
-	local szImage = raw:GetAnimatePath()
+	local szImage = wlower(raw:GetAnimatePath())
 	local nNormalGroup = raw:GetAnimateGroupNormal()
 	local GetStyleName = Get(_G, {NSFormatString('{$NS}_Resource'), 'GetWndButtonStyleName'})
 	if IsFunction(GetStyleName) then
@@ -120,7 +120,7 @@ local function GetButtonStyleName(raw)
 		end
 	end
 	for e, p in ipairs(BUTTON_STYLE_CONFIG) do
-		if p.szImage == szImage and p.nNormalGroup == nNormalGroup then
+		if wlower(p.szImage) == szImage and p.nNormalGroup == nNormalGroup then
 			return e
 		end
 	end
@@ -139,10 +139,6 @@ local function CallWithThis(context, fn, ...)
 	local rtc = {Call(fn, ...)}
 	this = _this
 	return unpack(rtc)
-end
-
-local function IsSamePath(p1, p2)
-	return p1:gsub('/', '\\'):lower() == p2:gsub('/', '\\'):lower()
 end
 
 -----------------------------------------------------------
