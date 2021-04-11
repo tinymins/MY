@@ -92,7 +92,7 @@ local BUTTON_STYLE_CONFIG = {
 	DEFAULT = {
 		nWidth = 100,
 		nHeight = 26,
-		nMarginBottom = 3,
+		nPaddingBottom = 3,
 		szImage = 'ui/Image/UICommon/CommonPanel.UITex',
 		nNormalGroup = 25,
 		nMouseOverGroup = 26,
@@ -2691,19 +2691,19 @@ local function SetComponentSize(raw, nOuterWidth, nOuterHeight, nInnerWidth, nIn
 		local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
 		local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
 		local txt = GetComponentElement(raw, 'TEXT')
-		local nMarginTop, nMarginRight, nMarginBottom, nMarginLeft = 0, 0, 0, 0
+		local nPaddingTop, nPaddingRight, nPaddingBottom, nPaddingLeft = 0, 0, 0, 0
 		local eStyle = GetButtonStyleName(wnd)
 		local tStyle = GetButtonStyleConfig(eStyle)
 		if tStyle then
-			nMarginTop = (tStyle.nMarginTop or 0) * (nHeight / tStyle.nHeight)
-			nMarginRight = (tStyle.nMarginRight or 0) * (nWidth / tStyle.nWidth)
-			nMarginBottom = (tStyle.nMarginBottom or 0) * (nHeight / tStyle.nHeight)
-			nMarginLeft = (tStyle.nMarginLeft or 0) * (nWidth / tStyle.nWidth)
+			nPaddingTop = (tStyle.nPaddingTop or 0) * (nHeight / tStyle.nHeight)
+			nPaddingRight = (tStyle.nPaddingRight or 0) * (nWidth / tStyle.nWidth)
+			nPaddingBottom = (tStyle.nPaddingBottom or 0) * (nHeight / tStyle.nHeight)
+			nPaddingLeft = (tStyle.nPaddingLeft or 0) * (nWidth / tStyle.nWidth)
 		end
 		wnd:SetSize(nWidth, nHeight)
-		txt:SetRelPos(nMarginTop, nMarginLeft)
-		txt:SetSize(nWidth, nHeight - nMarginLeft - nMarginRight)
-		hdl:SetSize(nWidth, nHeight - nMarginTop - nMarginBottom)
+		txt:SetRelPos(nPaddingTop, nPaddingLeft)
+		txt:SetSize(nWidth - nPaddingLeft - nPaddingRight, nHeight - nPaddingTop - nPaddingBottom)
+		hdl:SetSize(nWidth, nHeight)
 		hdl:FormatAllItemPos()
 	elseif componentType == 'WndCheckBox' then
 		local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
