@@ -166,7 +166,7 @@ function LIB.InsertChatInput(szType, ...)
 	local szText, data
 	if szType == 'achievement' then
 		local dwAchieve = ...
-		local achi = Table_GetAchievement(dwAchieve)
+		local achi = LIB.GetAchievement(dwAchieve)
 		if not achi then
 			return
 		end
