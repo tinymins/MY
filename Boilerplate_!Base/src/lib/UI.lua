@@ -130,7 +130,6 @@ local function GetButtonStyleConfig(eButtonStyle)
 	return IsFunction(GetStyleConfig)
 		and GetStyleConfig(eButtonStyle)
 		or BUTTON_STYLE_CONFIG[eButtonStyle]
-		or BUTTON_STYLE_CONFIG.DEFAULT
 end
 
 local function CallWithThis(context, fn, ...)
@@ -3438,7 +3437,7 @@ function OO:ButtonStyle(...)
 		end
 	else
 		local eButtonStyle = ...
-		local tStyle = GetButtonStyleConfig(eButtonStyle)
+		local tStyle = GetButtonStyleConfig(eButtonStyle) or BUTTON_STYLE_CONFIG.DEFAULT
 		for _, raw in ipairs(self.raws) do
 			if GetComponentType(raw) == 'WndButton' then
 				raw:SetAnimatePath((wgsub(tStyle.szImage, '/', '\\')))
