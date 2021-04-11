@@ -1091,8 +1091,6 @@ LIB.BreatheCall(NSFormatString('{$NS}#STORAGE_DATA'), 200, function()
 	end
 	m_nStorageVer = LIB.LoadLUAData({'config/storageversion.jx3dat', PATH_TYPE.ROLE}) or {}
 	LIB.Ajax({
-		method = 'post',
-		payload = 'json',
 		url = 'https://storage.j3cx.com/api/storage',
 		data = {
 			l = AnsiToUTF8(GLOBAL.GAME_LANG),
@@ -1148,8 +1146,6 @@ function LIB.StorageData(szKey, oData)
 			return
 		end
 		LIB.Ajax({
-			method = 'post',
-			payload = 'json',
 			url = 'https://storage.uploads.j3cx.com/api/storage/uploads',
 			data = {
 				l = AnsiToUTF8(GLOBAL.GAME_LANG),
