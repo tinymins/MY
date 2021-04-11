@@ -89,7 +89,11 @@ RegisterCustomData('MY_GKPDoodad.bRecent')
 local INI_SHADOW = PACKET_INFO.UICOMPONENT_ROOT .. 'Shadow.ini'
 
 local function GetDoodadTemplateName(dwID)
-	return GetDoodadTemplate(dwID).szName
+	local doodad = GetDoodadTemplate(dwID)
+	if not doodad then
+		return
+	end
+	return doodad.szName
 end
 
 local function IsShielded()
@@ -214,7 +218,10 @@ LIB.RegisterInit('MY_GKPDoodad', function()
 	if IsEmpty(O.szCustom) then
 		local t = {}
 		for _, v in ipairs({ 3874, 4255, 4315, 5622, 5732 }) do
-			insert(t, GetDoodadTemplateName(v))
+			local szName = GetDoodadTemplateName(v)
+			if szName then
+				insert(t, szName)
+			end
 		end
 		O.szCustom = concat(t, '|')
 		D.ReloadCustom()
@@ -664,24 +671,27 @@ function PS.OnPanelActive(frame)
 				nX = X + 10
 			end
 		else
-			ui:Append('WndCheckBox', {
-				x = nX, y = nY,
-				text = GetDoodadTemplateName(v),
-				checked = MY_GKPDoodad.tCraft[v],
-				oncheck = function(bChecked)
-					if bChecked then
-						MY_GKPDoodad.tCraft[v] = true
-					else
-						MY_GKPDoodad.tCraft[v] = nil
-					end
-					D.RescanNearby()
-				end,
-				autoenable = function() return MY_GKPDoodad.bShowName or MY_GKPDoodad.bInteract end,
-			})
-			nX = nX + 90
-			if nX > 500 then
-				nX = X + 10
-				nY = nY + nLineHeightS
+			local szName = GetDoodadTemplateName(v)
+			if szName then
+				ui:Append('WndCheckBox', {
+					x = nX, y = nY,
+					text = szName,
+					checked = MY_GKPDoodad.tCraft[v],
+					oncheck = function(bChecked)
+						if bChecked then
+							MY_GKPDoodad.tCraft[v] = true
+						else
+							MY_GKPDoodad.tCraft[v] = nil
+						end
+						D.RescanNearby()
+					end,
+					autoenable = function() return MY_GKPDoodad.bShowName or MY_GKPDoodad.bInteract end,
+				})
+				nX = nX + 90
+				if nX > 500 then
+					nX = X + 10
+					nY = nY + nLineHeightS
+				end
 			end
 		end
 	end
