@@ -120,7 +120,7 @@ local function GetButtonStyleName(raw)
 		end
 	end
 	for e, p in pairs(BUTTON_STYLE_CONFIG) do
-		if wlower(p.szImage) == szImage and p.nNormalGroup == nNormalGroup then
+		if wlower(LIB.NormalizePath(p.szImage)) == szImage and p.nNormalGroup == nNormalGroup then
 			return e
 		end
 	end
