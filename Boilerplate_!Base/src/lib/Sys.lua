@@ -448,12 +448,13 @@ function LIB.ConcatPath(...)
 	return szPath
 end
 
--- 删除目录中的./与../
+-- 替换目录分隔符为反斜杠，并且删除目录中的.\与..\
 function LIB.NormalizePath(szPath)
-	szPath = szPath:gsub('/%./', '/')
+	szPath = szPath:gsub('/', '\\')
+	szPath = szPath:gsub('\\%.\\', '\\')
 	local nPos1, nPos2
 	while true do
-		nPos1, nPos2 = szPath:find('[^/]*/%.%./')
+		nPos1, nPos2 = szPath:find('[^\\]*\\%.%.\\')
 		if not nPos1 then
 			break
 		end
