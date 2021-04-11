@@ -27,7 +27,7 @@ local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
 -------------------------------------------------------------------------------------------------------
 -- wstring ÐÞÕý
-local _wsub = wsub
+local _wsub = wstring.sub
 local function wsub(str, s, e)
 	local nLen = wlen(str)
 	if s < 0 then
