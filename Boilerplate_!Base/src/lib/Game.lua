@@ -4226,6 +4226,11 @@ function LIB.GetPlayerAvatar(dwForceID, nRoleType, dwAvatarID)
 	return szFile, nFrame, bAnimate
 end
 
+-- 获取成就信息
+function LIB.GetAchievement(dwAchieveID)
+	return g_tTable.Achievement:Search(dwAchieveID)
+end
+
 -- 获取一个地图的成就列表（区分是否包含五甲）
 local MAP_ACHI_NORMAL, MAP_ACHI_ALL
 function LIB.GetMapAchievements(dwMapID, bWujia)
