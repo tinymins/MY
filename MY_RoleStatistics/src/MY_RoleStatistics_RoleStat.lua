@@ -1117,7 +1117,7 @@ function D.OnInitPage()
 
 	UI(wnd):Append('WndButton', {
 		x = 25, y = 552, w = 25, h = 25,
-		buttonstyle = UI.BUTTON_STYLE.OPTION,
+		buttonstyle = 'OPTION',
 		onclick = function()
 			O.bConfigSummary = not O.bConfigSummary
 			D.UpdateUI(page)

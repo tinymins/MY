@@ -175,7 +175,7 @@ function D.OnFrameCreate()
 	ui:Append('WndButton', {
 		x = 900, y = 52, w = 140, h = 27,
 		text = g_tStrings.SYS_MENU,
-		buttonstyle = UI.BUTTON_STYLE.FLAT_LACE_BORDER,
+		buttonstyle = 'SKEUOMORPHISM_LACE_BORDER',
 		menu = function()
 			local menu = {}
 			insert(menu, { szOption = _L['Import data (local)'], fnAction = function() D.OpenImportPanel() end }) -- 有传参 不要改
@@ -230,7 +230,7 @@ function D.OnFrameCreate()
 	uiPageSetMain:Append('WndButton', {
 		x = 920, y = 40,
 		text = _L['Clear record'],
-		buttonstyle = UI.BUTTON_STYLE.FLAT,
+		buttonstyle = 'FLAT',
 		onclick = function()
 			LIB.Confirm(_L['Confirm?'], function()
 				MY_TeamMon.ClearTemp(MY_TMUI_SELECT_TYPE)
@@ -907,7 +907,7 @@ function D.OpenImportPanel(szDefault, szTitle, fnAction)
 	nX, nY = ui:Append('WndButton', {
 		x = nX + 5, y = nY,
 		text = _L['Browse'],
-		buttonstyle = UI.BUTTON_STYLE.FLAT,
+		buttonstyle = 'FLAT',
 		enable = not szDefault,
 		onclick = function()
 			local szFile = GetOpenFileName(
@@ -947,7 +947,7 @@ function D.OpenImportPanel(szDefault, szTitle, fnAction)
 	}):AutoWidth():Pos('BOTTOMRIGHT')
 	ui:Append('WndButton', {
 		x = 285, y = nY + 30, text = g_tStrings.STR_HOTKEY_SURE,
-		buttonstyle = UI.BUTTON_STYLE.FLAT_LACE_BORDER,
+		buttonstyle = 'FLAT_LACE_BORDER',
 		onclick = function()
 			local config = {
 				bFullPath  = not szDefault,
@@ -1067,7 +1067,7 @@ function D.OpenExportPanel()
 	}):AutoWidth():Pos('BOTTOMRIGHT')
 	ui:Append('WndButton', {
 		x = 285, y = nY + 30, text = g_tStrings.STR_HOTKEY_SURE,
-		buttonstyle = UI.BUTTON_STYLE.FLAT_LACE_BORDER,
+		buttonstyle = 'FLAT_LACE_BORDER',
 		onclick = function()
 			local config = {
 				szFileName = szFileName,
@@ -1437,7 +1437,7 @@ function D.OpenAddPanel(szType, data)
 	}):Pos('BOTTOMRIGHT')
 	ui:Append('WndButton', {
 		x = 120, y = nY + 40, text = _L['Add'],
-		buttonstyle = UI.BUTTON_STYLE.FLAT_LACE_BORDER,
+		buttonstyle = 'FLAT_LACE_BORDER',
 		onclick = function()
 			local txt = ui:Children('#map'):Text()
 			local map = MY_TeamMon.GetMapInfo(txt)
@@ -1488,7 +1488,7 @@ function D.OpenJsonPanel(data, fnAction)
 	ui:Append('WndButton',{
 		x = 30, y = 440,
 		text = g_tStrings.STR_HOTKEY_SURE,
-		buttonstyle = UI.BUTTON_STYLE.FLAT_LACE_BORDER,
+		buttonstyle = 'FLAT_LACE_BORDER',
 		onclick = function()
 			LIB.Confirm(_L['Confirm?'], function()
 				local dat = DecodeLUAData(ui:Children('#CODE'):Text())
@@ -2673,7 +2673,7 @@ function D.OpenSettingPanel(data, szType)
 	nX = ui:Append('WndButton', {
 		x = 30, y = nY + 10,
 		text = _L['Add countdown'],
-		buttonstyle = UI.BUTTON_STYLE.FLAT,
+		buttonstyle = 'FLAT',
 		enable = not (data.tCountdown and #data.tCountdown > 10),
 		onclick = function()
 			if not data.tCountdown then
@@ -2810,7 +2810,7 @@ function D.OpenSettingPanel(data, szType)
 		nX = ui:Append('WndButton', {
 			x = 30, y = nY + 10,
 			text = _L['Add circle'],
-			buttonstyle = UI.BUTTON_STYLE.FLAT,
+			buttonstyle = 'FLAT',
 			enable = not (data.aCircle and #data.aCircle > 10),
 			onclick = function()
 				if not data.aCircle then
@@ -2837,7 +2837,7 @@ function D.OpenSettingPanel(data, szType)
 				nX = nX + ui:Append('WndButton', {
 					x = nX, y = nY, w = 100,
 					text = MY_Focus.FormatRuleText(p, true),
-					buttonstyle = UI.BUTTON_STYLE.FLAT,
+					buttonstyle = 'FLAT',
 					onclick = function()
 						local ui = UI(this)
 						MY_Focus.OpenRuleEditor(p, function(dat)
@@ -2869,7 +2869,7 @@ function D.OpenSettingPanel(data, szType)
 			nX = ui:Append('WndButton', {
 				x = nX, y = nY, w = 100,
 				text = _L['Add focus'],
-				buttonstyle = UI.BUTTON_STYLE.FLAT,
+				buttonstyle = 'FLAT',
 				onclick = function()
 					if not data.aFocus then
 						data.aFocus = {}
@@ -2891,7 +2891,7 @@ function D.OpenSettingPanel(data, szType)
 				nX = nX + ui:Append('WndButton', {
 					x = nX, y = nY, w = 100,
 					text = MY_Cataclysm.EncodeBuffRule(p, true),
-					buttonstyle = UI.BUTTON_STYLE.FLAT,
+					buttonstyle = 'FLAT',
 					onclick = function()
 						local ui = UI(this)
 						MY_Cataclysm.OpenBuffRuleEditor(p, function(dat)
@@ -2923,7 +2923,7 @@ function D.OpenSettingPanel(data, szType)
 			nX = ui:Append('WndButton', {
 				x = nX, y = nY, w = 100,
 				text = _L['Add buff rule'],
-				buttonstyle = UI.BUTTON_STYLE.FLAT,
+				buttonstyle = 'FLAT',
 				onclick = function()
 					if not data.aCataclysmBuff then
 						data.aCataclysmBuff = {}
@@ -2938,7 +2938,7 @@ function D.OpenSettingPanel(data, szType)
 	end
 	-- nX = ui:Append('WndButton', {
 	-- 	x = 640, y = nY + 10, text = g_tStrings.HELP_PANEL,
-	-- 	buttonstyle = UI.BUTTON_STYLE.FLAT,
+	-- 	buttonstyle = 'FLAT',
 	-- 	onclick = function()
 	-- 		OpenInternetExplorer('https://github.com/luckyyyyy/JH/blob/master/JH_DBM/README.md')
 	-- 	end,
@@ -2946,7 +2946,7 @@ function D.OpenSettingPanel(data, szType)
 	ui:Append('WndButton', {
 		x = 335, y = nY + 10,
 		text = g_tStrings.STR_FRIEND_DEL, color = { 255, 0, 0 },
-		buttonstyle = UI.BUTTON_STYLE.FLAT,
+		buttonstyle = 'FLAT',
 		onclick = function()
 			LIB.Confirm(_L['Sure to delete?'], function()
 				D.RemoveData(data.dwMapID, data.nIndex, szName or _L['This data'])

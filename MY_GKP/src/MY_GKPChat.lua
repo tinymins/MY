@@ -129,7 +129,7 @@ function Chat.OpenFrame(item, menu, data)
 		ui:Append('WndButton', {
 			x = 380, y = 38,
 			text = _L['Stop Bidding'],
-			buttonstyle = UI.BUTTON_STYLE.FLAT,
+			buttonstyle = 'FLAT',
 			onclick = function()
 				LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, _L['--- Stop Bidding ---'])
 				LIB.DelayCall(1000, function() UnRegisterMsgMonitor(Chat.OnMsgArrive) end)

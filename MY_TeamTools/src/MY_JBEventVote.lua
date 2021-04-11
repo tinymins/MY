@@ -400,7 +400,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 	end
 	x = x + ui:Append('WndButton', {
 		x = x, y = y, w = 'auto',
-		buttonstyle = UI.BUTTON_STYLE.FLAT,
+		buttonstyle = 'FLAT',
 		text = _L['MY_JBEventVote'],
 		onclick = function()
 			D.Open()

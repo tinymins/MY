@@ -178,7 +178,7 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndButton', {
 		x = w - 165, y = y, w = 150, h = 38,
 		text = _L['Open Panel'],
-		buttonstyle = UI.BUTTON_STYLE.FLAT_LACE_BORDER,
+		buttonstyle = 'SKEUOMORPHISM_LACE_BORDER',
 		onclick = MY_GKP_MI.OpenPanel,
 	})
 	y = y + 28

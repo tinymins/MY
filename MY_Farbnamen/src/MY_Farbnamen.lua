@@ -632,7 +632,7 @@ function MY_Farbnamen.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
 
 	x = x + ui:Append('WndButton', {
 		x = x, y = y, w = 'auto',
-		buttonstyle = UI.BUTTON_STYLE.FLAT,
+		buttonstyle = 'FLAT',
 		text = _L['Customize color'],
 		onclick = function()
 			LIB.ShowPanel()
@@ -646,7 +646,7 @@ function MY_Farbnamen.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
 
 	x = x + ui:Append('WndButton', {
 		x = x, y = y, w = 'auto',
-		buttonstyle = UI.BUTTON_STYLE.FLAT,
+		buttonstyle = 'FLAT',
 		text = _L['Reset data'],
 		onclick = function()
 			LIB.Confirm(_L['Are you sure to reset farbnamen data? All character\'s data cache will be removed.'], function()

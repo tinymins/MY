@@ -465,7 +465,7 @@ function MY_Cataclysm.OpenBuffRuleEditor(rec, onChangeNotify, bHideBase)
 	ui:Append('WndButton', {
 		x = (w - 120) / 2, y = y, w = 120,
 		text = _L['Delete'], color = {223, 63, 95},
-		buttonstyle = UI.BUTTON_STYLE.FLAT,
+		buttonstyle = 'FLAT',
 		onclick = function()
 			local function fnAction()
 				onChangeNotify()
