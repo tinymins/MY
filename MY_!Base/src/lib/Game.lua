@@ -4226,9 +4226,14 @@ function LIB.GetPlayerAvatar(dwForceID, nRoleType, dwAvatarID)
 	return szFile, nFrame, bAnimate
 end
 
--- 获取成就信息
+-- 获取成就基础信息
 function LIB.GetAchievement(dwAchieveID)
 	return g_tTable.Achievement:Search(dwAchieveID)
+end
+
+-- 获取成就描述信息
+function LIB.GetAchievementInfo(dwAchieveID)
+	return g_tTable.AchievementInfo:Search(dwAchieveID)
 end
 
 -- 获取一个地图的成就列表（区分是否包含五甲）
