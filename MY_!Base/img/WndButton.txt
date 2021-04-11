@@ -1,9 +1,0 @@
-Farme	Left	Top	Width	High	File
-0	0	0	123	40	C:\Users\root\Desktop\FlatButton_1.tga
-1	125	0	123	40	C:\Users\root\Desktop\FlatButton_2.tga
-2	250	0	123	40	C:\Users\root\Desktop\FlatButton_3.tga
-3	375	0	123	40	C:\Users\root\Desktop\FlatButton_4.tga
-4	0	42	104	26	C:\Users\root\Desktop\SkeuomorphismButton_1.tga
-5	106	42	104	26	C:\Users\root\Desktop\SkeuomorphismButton_2.tga
-6	212	42	104	26	C:\Users\root\Desktop\SkeuomorphismButton_3.tga
-7	318	42	104	26	C:\Users\root\Desktop\SkeuomorphismButton_4.tga

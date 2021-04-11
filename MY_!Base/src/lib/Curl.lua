@@ -124,9 +124,11 @@ local function CreateWebPageFrame()
 	return szRequestID, hFrame
 end
 
-local Curl_Create = _G.Curl_Create
-local CURL_HttpRqst = _G.CURL_HttpRqst
-local CURL_HttpPost = _G.CURL_HttpPostEx or _G.CURL_HttpPost
+local Curl_Create = SafeCall(_G.Curl_Create, 'https://ping.j3cx.com/') and _G.Curl_Create or nil
+local CURL_HttpRqst = SafeCall(_G.CURL_HttpRqst, 'https://ping.j3cx.com/') and _G.CURL_HttpRqst or nil
+local CURL_HttpPost = (SafeCall(_G.CURL_HttpPostEx, 'TEST', 'https://ping.j3cx.com/') and _G.CURL_HttpPostEx)
+	or (SafeCall(_G.CURL_HttpPost, 'TEST', 'https://ping.j3cx.com/') and _G.CURL_HttpPost)
+	or nil
 function LIB.Ajax(settings)
 	assert(settings and settings.url)
 	setmetatable(settings, l_ajaxsettingsmeta)

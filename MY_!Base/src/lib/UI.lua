@@ -62,13 +62,6 @@ UI.TIP_HIDEWAY = LIB.SetmetaReadonly({
 	HIDE         = 101,
 	ANIMATE_HIDE = 102,
 })
-UI.BUTTON_STYLE = LIB.SetmetaReadonly({
-	DEFAULT          = 1,
-	FLAT             = 2,
-	FLAT_LACE_BORDER = 3,
-	SKEUOMORPHISM    = 4,
-	OPTION           = 'OPTION',
-})
 UI.TRACKBAR_STYLE = LIB.SetmetaReadonly({
 	SHOW_VALUE    = false,
 	SHOW_PERCENT  = true,
@@ -96,43 +89,17 @@ UI.EDIT_TYPE = LIB.SetmetaReadonly({
 UI.LAYER_LIST = {'Lowest', 'Lowest1', 'Lowest2', 'Normal', 'Normal1', 'Normal2', 'Topmost', 'Topmost1', 'Topmost2'}
 
 local BUTTON_STYLE_CONFIG = {
-	[UI.BUTTON_STYLE.DEFAULT] = {
+	DEFAULT = {
 		nWidth = 100,
 		nHeight = 26,
+		nMarginBottom = 3,
 		szImage = 'ui/Image/UICommon/CommonPanel.UITex',
 		nNormalGroup = 25,
 		nMouseOverGroup = 26,
 		nMouseDownGroup = 27,
 		nDisableGroup = 28,
 	},
-	[UI.BUTTON_STYLE.FLAT] = {
-		nWidth = 100,
-		nHeight = 25,
-		szImage = 'ui/image/uicommon/logincommon.uitex',
-		nNormalGroup = 54,
-		nMouseOverGroup = 55,
-		nMouseDownGroup = 56,
-		nDisableGroup = 60,
-	},
-	[UI.BUTTON_STYLE.FLAT_LACE_BORDER] = {
-		nWidth = 148,
-		nHeight = 33,
-		szImage = PACKET_INFO.FRAMEWORK_ROOT .. 'img/WndButton.UITex',
-		nNormalGroup = 0,
-		nMouseOverGroup = 1,
-		nMouseDownGroup = 2,
-		nDisableGroup = 3,
-	},
-	[UI.BUTTON_STYLE.SKEUOMORPHISM] = {
-		nWidth = 148,
-		nHeight = 33,
-		szImage = PACKET_INFO.FRAMEWORK_ROOT .. 'img/WndButton.UITex',
-		nNormalGroup = 4,
-		nMouseOverGroup = 5,
-		nMouseDownGroup = 6,
-		nDisableGroup = 7,
-	},
-	[UI.BUTTON_STYLE.OPTION] = {
+	OPTION = {
 		nWidth = 22,
 		nHeight = 24,
 		szImage = 'ui/Image/UICommon/CommonPanel2.UITex',
@@ -142,6 +109,29 @@ local BUTTON_STYLE_CONFIG = {
 		nDisableGroup = 56,
 	},
 }
+local function GetButtonStyleName(raw)
+	local szImage = raw:GetAnimatePath()
+	local nNormalGroup = raw:GetAnimateGroupNormal()
+	local GetStyleName = Get(_G, {NSFormatString('{$NS}_Resource'), 'GetWndButtonStyleName'})
+	if IsFunction(GetStyleName) then
+		local eStyle = GetStyleName(szImage, nNormalGroup)
+		if eStyle then
+			return eStyle
+		end
+	end
+	for e, p in ipairs(BUTTON_STYLE_CONFIG) do
+		if p.szImage == szImage and p.nNormalGroup == nNormalGroup then
+			return e
+		end
+	end
+end
+local function GetButtonStyleConfig(eButtonStyle)
+	local GetStyleConfig = Get(_G, {NSFormatString('{$NS}_Resource'), 'GetWndButtonStyleConfig'})
+	return IsFunction(GetStyleConfig)
+		and GetStyleConfig(eButtonStyle)
+		or BUTTON_STYLE_CONFIG[eButtonStyle]
+		or BUTTON_STYLE_CONFIG.DEFAULT
+end
 
 local function CallWithThis(context, fn, ...)
 	local _this = this
@@ -2697,13 +2687,23 @@ local function SetComponentSize(raw, nOuterWidth, nOuterHeight, nInnerWidth, nIn
 			raw:SetSize(nWidth, nHeight)
 			hnd:SetSize(nWidth, nHeight)
 		end
-	elseif componentType == 'WndButton' and IsSamePath(raw:GetAnimatePath(), BUTTON_STYLE_CONFIG[UI.BUTTON_STYLE.DEFAULT].szImage) then
+	elseif componentType == 'WndButton' then
 		local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
 		local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
 		local txt = GetComponentElement(raw, 'TEXT')
+		local nMarginTop, nMarginRight, nMarginBottom, nMarginLeft = 0, 0, 0, 0
+		local eStyle = GetButtonStyleName(wnd)
+		local tStyle = GetButtonStyleConfig(eStyle)
+		if tStyle then
+			nMarginTop = (tStyle.nMarginTop or 0) * (nHeight / tStyle.nHeight)
+			nMarginRight = (tStyle.nMarginRight or 0) * (nWidth / tStyle.nWidth)
+			nMarginBottom = (tStyle.nMarginBottom or 0) * (nHeight / tStyle.nHeight)
+			nMarginLeft = (tStyle.nMarginLeft or 0) * (nWidth / tStyle.nWidth)
+		end
 		wnd:SetSize(nWidth, nHeight)
-		txt:SetSize(nWidth, nHeight - 3)
-		hdl:SetSize(nWidth, nHeight - 3)
+		txt:SetRelPos(nMarginTop, nMarginLeft)
+		txt:SetSize(nWidth, nHeight - nMarginLeft - nMarginRight)
+		hdl:SetSize(nWidth, nHeight - nMarginTop - nMarginBottom)
 		hdl:FormatAllItemPos()
 	elseif componentType == 'WndCheckBox' then
 		local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
@@ -3430,10 +3430,19 @@ function OO:TrackbarStyle(nTrackbarStyle)
 end
 
 -- (self) UI:ButtonStyle(eButtonStyle)
-function OO:ButtonStyle(eButtonStyle)
+function OO:ButtonStyle(...)
 	self:_checksum()
-	local tStyle = BUTTON_STYLE_CONFIG[eButtonStyle]
-	if tStyle then
+	if select('#', ...) == 0 then
+		local raw = self.raws[1]
+		if raw then
+			raw = GetComponentElement(raw, 'BUTTON')
+			if raw and raw.GetAnimatePath and raw.GetAnimateGroupNormal then
+				return GetButtonStyleName(raw)
+			end
+		end
+	else
+		local eButtonStyle = ...
+		local tStyle = GetButtonStyleConfig(eButtonStyle)
 		for _, raw in ipairs(self.raws) do
 			if GetComponentType(raw) == 'WndButton' then
 				raw:SetAnimatePath((wgsub(tStyle.szImage, '/', '\\')))
@@ -3444,8 +3453,8 @@ function OO:ButtonStyle(eButtonStyle)
 				SetComponentSize(raw, tStyle.nWidth, tStyle.nHeight)
 			end
 		end
+		return self
 	end
-	return self
 end
 
 -- (self) UI:FormatChildrenPos()

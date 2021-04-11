@@ -86,6 +86,61 @@ function D.GetSoundList()
 end
 end
 
+do
+local BUTTON_STYLE_CONFIG = LIB.SetmetaReadonly{
+	FLAT = {
+		nWidth = 100,
+		nHeight = 25,
+		szImage = PACKET_INFO.FRAMEWORK_ROOT .. 'img/WndButton.UITex',
+		nNormalGroup = 8,
+		nMouseOverGroup = 9,
+		nMouseDownGroup = 10,
+		nDisableGroup = 11,
+	},
+	FLAT_LACE_BORDER = {
+		nWidth = 148,
+		nHeight = 33,
+		szImage = PACKET_INFO.FRAMEWORK_ROOT .. 'img/WndButton.UITex',
+		nNormalGroup = 0,
+		nMouseOverGroup = 1,
+		nMouseDownGroup = 2,
+		nDisableGroup = 3,
+	},
+	SKEUOMORPHISM = {
+		nWidth = 148,
+		nHeight = 33,
+		szImage = PACKET_INFO.FRAMEWORK_ROOT .. 'img/WndButton.UITex',
+		nNormalGroup = 4,
+		nMouseOverGroup = 5,
+		nMouseDownGroup = 6,
+		nDisableGroup = 7,
+	},
+	SKEUOMORPHISM_LACE_BORDER = {
+		nWidth = 224,
+		nHeight = 64,
+		nMarginTop = 2,
+		nMarginRight = 9,
+		nMarginBottom = 10,
+		nMarginLeft = 6,
+		szImage = PACKET_INFO.FRAMEWORK_ROOT .. 'img/WndButton.UITex',
+		nNormalGroup = 12,
+		nMouseOverGroup = 13,
+		nMouseDownGroup = 14,
+		nDisableGroup = 15,
+	},
+}
+function D.GetWndButtonStyleConfig(eStyle)
+	return BUTTON_STYLE_CONFIG[eStyle]
+end
+function D.GetWndButtonStyleName(szImage, nNormalGroup)
+	for e, p in ipairs(BUTTON_STYLE_CONFIG) do
+		if p.szImage == szImage and p.nNormalGroup == nNormalGroup then
+			return e
+		end
+	end
+end
+end
+
 -- Global exports
 do
 local settings = {
@@ -93,6 +148,7 @@ local settings = {
 		{
 			fields = {
 				GetSoundList = D.GetSoundList,
+				GetWndButtonStyle = D.GetWndButtonStyle,
 			},
 		},
 	},

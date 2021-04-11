@@ -1,0 +1,17 @@
+Farme	Left	Top	Width	High	File
+0	0	0	123	40	C:\Users\root\Desktop\FlatLaceButton_1.tga
+1	125	0	123	40	C:\Users\root\Desktop\FlatLaceButton_2.tga
+2	0	42	123	40	C:\Users\root\Desktop\FlatLaceButton_3.tga
+3	125	42	123	40	C:\Users\root\Desktop\FlatLaceButton_4.tga
+4	38	220	104	26	C:\Users\root\Desktop\SkeuomorphismButton_1.tga
+5	144	220	104	26	C:\Users\root\Desktop\SkeuomorphismButton_2.tga
+6	38	248	104	26	C:\Users\root\Desktop\SkeuomorphismButton_3.tga
+7	144	248	104	26	C:\Users\root\Desktop\SkeuomorphismButton_4.tga
+8	12	84	236	32	C:\Users\root\Desktop\FlatButton_1.tga
+9	12	118	236	32	C:\Users\root\Desktop\FlatButton_2.tga
+10	12	152	236	32	C:\Users\root\Desktop\FlatButton_3.tga
+11	12	186	236	32	C:\Users\root\Desktop\FlatButton_4.tga
+12	250	0	221	64	C:\Users\root\Desktop\SkeuomorphismLaceButton_1.tga
+13	250	66	221	64	C:\Users\root\Desktop\SkeuomorphismLaceButton_2.tga
+14	250	198	221	64	C:\Users\root\Desktop\SkeuomorphismLaceButton_3.tga
+15	250	132	221	64	C:\Users\root\Desktop\SkeuomorphismLaceButton_4.tga

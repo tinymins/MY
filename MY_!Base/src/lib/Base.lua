@@ -282,7 +282,17 @@ local _AUTHOR_FAKE_HEADER_ = GetFormatText(_L['[Fake author]'], 8, 255, 95, 159)
 -----------------------------------------------
 -- 克隆数据
 -----------------------------------------------
-local Clone = clone
+local function Clone(var)
+	if type(var) == 'table' then
+		local ret = {}
+		for k, v in pairs(var) do
+			ret[Clone(k)] = Clone(v)
+		end
+		return ret
+	else
+		return var
+	end
+end
 -----------------------------------------------
 -- Lua数据序列化
 -----------------------------------------------
