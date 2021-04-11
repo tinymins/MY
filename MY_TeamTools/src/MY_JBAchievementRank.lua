@@ -154,7 +154,7 @@ function D.CheckUpdateAcquire()
 	end
 	for _, p in ipairs(BOSS_ACHIEVE_ACQUIRE_LOG) do
 		if not p.bPending then
-			local szAchieve = Table_GetAchievement(p.dwAchieveID).szName
+			local szAchieve = LIB.GetAchievement(p.dwAchieveID).szName
 			local szTime = LIB.FormatTime(p.dwTime, '%yyyy-%MM-%dd %hh:%mm:%ss')
 			p.bPending = true
 			LIB.Sysmsg(_L('Try share boss kill: %s - %ds (%s).', szAchieve, p.nFightTime / 1000, szTime))
@@ -216,7 +216,7 @@ function D.UpdateMapBossAchieveAcquire()
 	-- 根据成就名称自动识别地图全胜成就
 	local aMapAchievements = {}
 	for _, dwAchieveID in ipairs(LIB.GetMapAchievements(dwMapID) or CONSTANT.EMPTY_TABLE) do
-		local achi = Table_GetAchievement(dwAchieveID)
+		local achi = LIB.GetAchievement(dwAchieveID)
 		if achi and wfind(achi.szName, _L['Full win']) then
 			insert(aMapAchievements, dwAchieveID)
 		end
@@ -227,7 +227,7 @@ function D.UpdateMapBossAchieveAcquire()
 		IsTable(BOSS_MAP_ACHIEVE_ACQUIRE) and BOSS_MAP_ACHIEVE_ACQUIRE[dwMapID] or CONSTANT.EMPTY_TABLE,
 		IsTable(BOSS_MAP_ACHIEVE_ACQUIRE) and BOSS_MAP_ACHIEVE_ACQUIRE['*'] or CONSTANT.EMPTY_TABLE
 	) do
-		local achi = Table_GetAchievement(dwAchieveID)
+		local achi = LIB.GetAchievement(dwAchieveID)
 		if achi then
 			for _, s in ipairs(LIB.SplitString(achi.szSubAchievements, '|', true)) do
 				local dwSubAchieve = tonumber(s)

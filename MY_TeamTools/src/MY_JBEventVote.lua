@@ -326,7 +326,7 @@ function D.OnMouseEnter()
 		insert(aXml, CONSTANT.XML_LINE_BREAKER)
 		insert(aXml, GetFormatText(_L['Finish achieves: '], 82))
 		for _, szAcheveID in ipairs(LIB.SplitString(this.eve.achieve_ids, ',', true)) do
-			insert(aXml, GetFormatText('[' .. Get(Table_GetAchievement(szAcheveID), {'szName'}, '') .. ']', 82))
+			insert(aXml, GetFormatText('[' .. Get(LIB.GetAchievement(szAcheveID), {'szName'}, '') .. ']', 82))
 			if IsCtrlKeyDown() then
 				insert(aXml, GetFormatText('(' .. szAcheveID .. ')', 102))
 			end

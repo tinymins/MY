@@ -69,7 +69,7 @@ function D.OnWebSizeChange()
 end
 
 function D.Open(dwAchievement)
-	local achi = Table_GetAchievement(dwAchievement)
+	local achi = LIB.GetAchievement(dwAchievement)
 	if not achi then
 		return
 	end

@@ -109,7 +109,7 @@ function D.GetColumns()
 		},
 	}
 	for _, dwAchieveID in ipairs(O.aAchievement) do
-		local achi = Table_GetAchievement(dwAchieveID)
+		local achi = LIB.GetAchievement(dwAchieveID)
 		if achi then
 			insert(aCol, {
 				id = 'achievement_' .. dwAchieveID,
@@ -217,7 +217,7 @@ function D.UpdateAchievementID()
 		end
 	else
 		for _, dwAchieveID in ipairs(LIB.GetMapAchievements(O.dwMapID) or CONSTANT.EMPTY_TABLE) do
-			local achi = Table_GetAchievement(dwAchieveID)
+			local achi = LIB.GetAchievement(dwAchieveID)
 			if achi
 			and (not O.bIntelligentHide or achi.dwSub ~= 10) -- Òþ²ØÉùÍû³É¾Í
 			and (IsEmpty(O.szSearch) or wfind(achi.szName, O.szSearch) or wfind(achi.szDesc, O.szSearch)) then
@@ -270,7 +270,7 @@ function D.GetPlayerAchievementStat(dwID, dwAchieveID)
 		if ACHIEVE_CACHE[dwID][dwAchieveID] then
 			return 'FINISH'
 		end
-		local achi = Table_GetAchievement(dwAchieveID)
+		local achi = LIB.GetAchievement(dwAchieveID)
 		if achi then
 			local aProgressCounter = {}
 			if COUNTER_CACHE[dwID] then
@@ -293,13 +293,13 @@ end
 do local ACHIEVE_POINT_CACHE = {}
 function D.GetAchievementPoint(dwAchieveID)
 	if not ACHIEVE_POINT_CACHE[dwAchieveID] then
-		local nAchievePoint = select(2, Table_GetAchievementInfo(dwAchieveID))
-		local achi = Table_GetAchievement(dwAchieveID)
+		local nAchievePoint = Get(LIB.GetAchievementInfo(dwAchieveID), {'nPoint'}, 0)
+		local achi = LIB.GetAchievement(dwAchieveID)
 		if achi then
 			for _, s in ipairs(LIB.SplitString(achi.szCounters, '|', true)) do
 				local dwCounter = tonumber(s)
 				if dwCounter then
-					nAchievePoint = nAchievePoint + select(2, Table_GetAchievementInfo(dwCounter))
+					nAchievePoint = nAchievePoint + Get(LIB.GetAchievementInfo(dwCounter), {'nPoint'}, 0)
 				end
 			end
 		end
@@ -311,7 +311,7 @@ end
 
 do
 local function AnalysisAchievementRequest(dwAchieveID, tAchieveID, tCounterID)
-	local info = Table_GetAchievement(dwAchieveID)
+	local info = LIB.GetAchievement(dwAchieveID)
 	if info then
 		tAchieveID[dwAchieveID] = true
 		for _, s in ipairs(LIB.SplitString(info.szCounters, '|', true)) do
@@ -469,7 +469,7 @@ function D.OutputRowTip(this, rec)
 end
 
 function D.OutputAchieveTip(dwAchieveID, dwID)
-	local achi = Table_GetAchievement(dwAchieveID)
+	local achi = LIB.GetAchievement(dwAchieveID)
 	if not achi then
 		return
 	end
@@ -488,7 +488,7 @@ function D.OutputAchieveTip(dwAchieveID, dwID)
 			else
 				insert(aXml, GetFormatText('(', 162, 255, 255, 255))
 				for i, progress in ipairs(aProgressCounter) do
-					local nTriggerVal, nPoint, nExp, nPrefix, nPostfix, nShiftID = Table_GetAchievementInfo(progress.dwCounter)
+					local nTriggerVal = Get(LIB.GetAchievementInfo(progress.dwCounter), {'nTriggerVal'}, 1)
 					if i ~= 1 then
 						insert(aXml, GetFormatText(', ', 162, 255, 255, 255))
 					end
@@ -508,7 +508,7 @@ function D.OutputAchieveTip(dwAchieveID, dwID)
 	for _, s in ipairs(LIB.SplitString(achi.szSubAchievements, '|', true)) do
 		local dwSubAchieveID = tonumber(s)
 		if dwSubAchieveID then
-			local achi = Table_GetAchievement(dwSubAchieveID)
+			local achi = LIB.GetAchievement(dwSubAchieveID)
 			if dwID then
 				local szStat, aProgressCounter = D.GetPlayerAchievementStat(dwID, dwSubAchieveID)
 				if achi then
@@ -525,7 +525,7 @@ function D.OutputAchieveTip(dwAchieveID, dwID)
 				if not IsEmpty(aProgressCounter) then
 					insert(aXml, GetFormatText(' (', 162, 255, 255, 255))
 					for i, progress in ipairs(aProgressCounter) do
-						local nTriggerVal, nPoint, nExp, nPrefix, nPostfix, nShiftID = Table_GetAchievementInfo(progress.dwCounter)
+						local nTriggerVal = Get(LIB.GetAchievementInfo(progress.dwCounter), {'nTriggerVal'}, 1)
 						if i ~= 1 then
 							insert(aXml, GetFormatText(', ', 162, 255, 255, 255))
 						end
