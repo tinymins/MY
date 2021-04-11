@@ -116,8 +116,12 @@ local BUTTON_STYLE_CONFIG = LIB.SetmetaReadonly{
 		nDisableGroup = 7,
 	},
 	SKEUOMORPHISM_LACE_BORDER = {
-		nWidth = 148,
-		nHeight = 33,
+		nWidth = 224,
+		nHeight = 64,
+		nMarginTop = 2,
+		nMarginRight = 9,
+		nMarginBottom = 10,
+		nMarginLeft = 6,
 		szImage = PACKET_INFO.FRAMEWORK_ROOT .. 'img/WndButton.UITex',
 		nNormalGroup = 12,
 		nMouseOverGroup = 13,
@@ -125,8 +129,15 @@ local BUTTON_STYLE_CONFIG = LIB.SetmetaReadonly{
 		nDisableGroup = 15,
 	},
 }
-function D.GetWndButtonStyle(eStyle)
+function D.GetWndButtonStyleConfig(eStyle)
 	return BUTTON_STYLE_CONFIG[eStyle]
+end
+function D.GetWndButtonStyleName(szImage, nNormalGroup)
+	for e, p in ipairs(BUTTON_STYLE_CONFIG) do
+		if p.szImage == szImage and p.nNormalGroup == nNormalGroup then
+			return e
+		end
+	end
 end
 end
 

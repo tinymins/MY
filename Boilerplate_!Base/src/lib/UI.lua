@@ -92,6 +92,7 @@ local BUTTON_STYLE_CONFIG = {
 	DEFAULT = {
 		nWidth = 100,
 		nHeight = 26,
+		nMarginBottom = 3,
 		szImage = 'ui/Image/UICommon/CommonPanel.UITex',
 		nNormalGroup = 25,
 		nMouseOverGroup = 26,
@@ -108,6 +109,29 @@ local BUTTON_STYLE_CONFIG = {
 		nDisableGroup = 56,
 	},
 }
+local function GetButtonStyleName(raw)
+	local szImage = raw:GetAnimatePath()
+	local nNormalGroup = raw:GetAnimateGroupNormal()
+	local GetStyleName = Get(_G, {NSFormatString('{$NS}_Resource'), 'GetWndButtonStyleName'})
+	if IsFunction(GetStyleName) then
+		local eStyle = GetStyleName(szImage, nNormalGroup)
+		if eStyle then
+			return eStyle
+		end
+	end
+	for e, p in ipairs(BUTTON_STYLE_CONFIG) do
+		if p.szImage == szImage and p.nNormalGroup == nNormalGroup then
+			return e
+		end
+	end
+end
+local function GetButtonStyleConfig(eButtonStyle)
+	local GetStyleConfig = Get(_G, {NSFormatString('{$NS}_Resource'), 'GetWndButtonStyleConfig'})
+	return IsFunction(GetStyleConfig)
+		and GetStyleConfig(eButtonStyle)
+		or BUTTON_STYLE_CONFIG[eButtonStyle]
+		or BUTTON_STYLE_CONFIG.DEFAULT
+end
 
 local function CallWithThis(context, fn, ...)
 	local _this = this
@@ -2663,13 +2687,23 @@ local function SetComponentSize(raw, nOuterWidth, nOuterHeight, nInnerWidth, nIn
 			raw:SetSize(nWidth, nHeight)
 			hnd:SetSize(nWidth, nHeight)
 		end
-	elseif componentType == 'WndButton' and IsSamePath(raw:GetAnimatePath(), BUTTON_STYLE_CONFIG.DEFAULT.szImage) then
+	elseif componentType == 'WndButton' then
 		local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
 		local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
 		local txt = GetComponentElement(raw, 'TEXT')
+		local nMarginTop, nMarginRight, nMarginBottom, nMarginLeft = 0, 0, 0, 0
+		local eStyle = GetButtonStyleName(wnd)
+		local tStyle = GetButtonStyleConfig(eStyle)
+		if tStyle then
+			nMarginTop = (tStyle.nMarginTop or 0) * (nHeight / tStyle.nHeight)
+			nMarginRight = (tStyle.nMarginRight or 0) * (nWidth / tStyle.nWidth)
+			nMarginBottom = (tStyle.nMarginBottom or 0) * (nHeight / tStyle.nHeight)
+			nMarginLeft = (tStyle.nMarginLeft or 0) * (nWidth / tStyle.nWidth)
+		end
 		wnd:SetSize(nWidth, nHeight)
-		txt:SetSize(nWidth, nHeight - 3)
-		hdl:SetSize(nWidth, nHeight - 3)
+		txt:SetRelPos(nMarginTop, nMarginLeft)
+		txt:SetSize(nWidth, nHeight - nMarginLeft - nMarginRight)
+		hdl:SetSize(nWidth, nHeight - nMarginTop - nMarginBottom)
 		hdl:FormatAllItemPos()
 	elseif componentType == 'WndCheckBox' then
 		local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
@@ -3396,24 +3430,31 @@ function OO:TrackbarStyle(nTrackbarStyle)
 end
 
 -- (self) UI:ButtonStyle(eButtonStyle)
-function OO:ButtonStyle(eButtonStyle)
+function OO:ButtonStyle(...)
 	self:_checksum()
-	local GetStyle = Get(_G, {NSFormatString('{$NS}_Resource'), 'GetWndButtonStyle'})
-	local tStyle = IsFunction(GetStyle)
-		and GetStyle(eButtonStyle)
-		or BUTTON_STYLE_CONFIG[eButtonStyle]
-		or BUTTON_STYLE_CONFIG.DEFAULT
-	for _, raw in ipairs(self.raws) do
-		if GetComponentType(raw) == 'WndButton' then
-			raw:SetAnimatePath((wgsub(tStyle.szImage, '/', '\\')))
-			raw:SetAnimateGroupNormal(tStyle.nNormalGroup)
-			raw:SetAnimateGroupMouseOver(tStyle.nMouseOverGroup)
-			raw:SetAnimateGroupMouseDown(tStyle.nMouseDownGroup)
-			raw:SetAnimateGroupDisable(tStyle.nDisableGroup)
-			SetComponentSize(raw, tStyle.nWidth, tStyle.nHeight)
+	if select('#', ...) == 0 then
+		local raw = self.raws[1]
+		if raw then
+			raw = GetComponentElement(raw, 'BUTTON')
+			if raw and raw.GetAnimatePath and raw.GetAnimateGroupNormal then
+				return GetButtonStyleName(raw)
+			end
 		end
+	else
+		local eButtonStyle = ...
+		local tStyle = GetButtonStyleConfig(eButtonStyle)
+		for _, raw in ipairs(self.raws) do
+			if GetComponentType(raw) == 'WndButton' then
+				raw:SetAnimatePath((wgsub(tStyle.szImage, '/', '\\')))
+				raw:SetAnimateGroupNormal(tStyle.nNormalGroup)
+				raw:SetAnimateGroupMouseOver(tStyle.nMouseOverGroup)
+				raw:SetAnimateGroupMouseDown(tStyle.nMouseDownGroup)
+				raw:SetAnimateGroupDisable(tStyle.nDisableGroup)
+				SetComponentSize(raw, tStyle.nWidth, tStyle.nHeight)
+			end
+		end
+		return self
 	end
-	return self
 end
 
 -- (self) UI:FormatChildrenPos()
