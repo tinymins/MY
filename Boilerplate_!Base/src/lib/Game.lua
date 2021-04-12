@@ -1292,8 +1292,8 @@ function LIB.GetObjectLife(obj)
 	if not obj then
 		return
 	end
-	return obj.fCurrentLife64 or obj.nCurrentLife,
-		obj.fMaxLife64 or obj.nMaxLife
+	return GLOBAL.GAME_BRANCH ~= 'classic' and obj.fCurrentLife64 or obj.nCurrentLife,
+		GLOBAL.GAME_BRANCH ~= 'classic' and obj.fMaxLife64 or obj.nMaxLife
 end
 
 -- 根据模板ID获取NPC真实名称
@@ -1821,9 +1821,9 @@ function LIB.GetClientInfo(arg0)
 			m_ClientInfo.nUsedTrainValue   = me.nUsedTrainValue
 			m_ClientInfo.nDirectionXY      = me.nDirectionXY
 			m_ClientInfo.nCurrentLife      = me.nCurrentLife
-			m_ClientInfo.fCurrentLife64    = me.fCurrentLife64
+			m_ClientInfo.fCurrentLife64    = GLOBAL.GAME_BRANCH ~= 'classic' and me.fCurrentLife64 or nil
 			m_ClientInfo.nMaxLife          = me.nMaxLife
-			m_ClientInfo.fMaxLife64        = me.fMaxLife64
+			m_ClientInfo.fMaxLife64        = GLOBAL.GAME_BRANCH ~= 'classic' and me.fMaxLife64 or nil
 			m_ClientInfo.nMaxLifeBase      = me.nMaxLifeBase
 			m_ClientInfo.nCurrentMana      = me.nCurrentMana
 			m_ClientInfo.nMaxMana          = me.nMaxMana
