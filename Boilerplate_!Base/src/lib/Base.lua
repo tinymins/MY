@@ -122,15 +122,16 @@ if _DEBUG_LEVEL_ <= DEBUG_LEVEL.DEBUG then
 end
 Log('[' .. _NAME_SPACE_ .. '] Debug level ' .. _DEBUG_LEVEL_ .. ' / delog level ' .. _DELOG_LEVEL_)
 -------------------------------------------------------------------------------------------------------
--- 游戏语言、游戏发行版编码、游戏版本号
+-- 游戏语言、游戏运营分支编码、游戏发行版编码、游戏版本号
 -------------------------------------------------------------------------------------------------------
-local _GAME_LANG_, _GAME_EDITION_, _GAME_VERSION_
+local _GAME_LANG_, _GAME_BRANCH_, _GAME_EDITION_, _GAME_VERSION_
 do
 	local szVersionLineFullName, szVersion, szVersionLineName, szVersionEx, szVersionName = GetVersion()
 	_GAME_LANG_ = lower(szVersionLineName)
 	if _GAME_LANG_ == 'classic' then
 		_GAME_LANG_ = 'zhcn'
 	end
+	_GAME_BRANCH_ = lower(szVersionLineName)
 	_GAME_EDITION_ = lower(szVersionLineName .. '_' .. szVersionEx)
 	_GAME_VERSION_ = lower(szVersion)
 end
@@ -749,6 +750,7 @@ end
 local GLOBAL = setmetatable({}, {
 	__index = setmetatable({
 		GAME_LANG     = _GAME_LANG_   ,
+		GAME_BRANCH  = _GAME_BRANCH_,
 		GAME_EDITION  = _GAME_EDITION_,
 		GAME_VERSION  = _GAME_VERSION_,
 	}, { __index = _G.GLOBAL }),
