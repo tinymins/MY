@@ -1821,9 +1821,9 @@ function LIB.GetClientInfo(arg0)
 			m_ClientInfo.nUsedTrainValue   = me.nUsedTrainValue
 			m_ClientInfo.nDirectionXY      = me.nDirectionXY
 			m_ClientInfo.nCurrentLife      = me.nCurrentLife
-			m_ClientInfo.fCurrentLife64    = GLOBAL.GAME_BRANCH ~= 'classic' and me.fCurrentLife64 or nil
 			m_ClientInfo.nMaxLife          = me.nMaxLife
-			m_ClientInfo.fMaxLife64        = GLOBAL.GAME_BRANCH ~= 'classic' and me.fMaxLife64 or nil
+			m_ClientInfo.fCurrentLife64,
+			m_ClientInfo.fMaxLife64        = LIB.GetObjectLife(me)
 			m_ClientInfo.nMaxLifeBase      = me.nMaxLifeBase
 			m_ClientInfo.nCurrentMana      = me.nCurrentMana
 			m_ClientInfo.nMaxMana          = me.nMaxMana
