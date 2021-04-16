@@ -2439,7 +2439,7 @@ function LIB.GVoiceBase_GetMicState(...)
 	if IsFunction(_G.GVoiceBase_GetMicState) then
 		return _G.GVoiceBase_GetMicState(...)
 	end
-	return MIC_STATE.CLOSE_NOT_IN_ROOM
+	return CONSTANT.MIC_STATE.CLOSE_NOT_IN_ROOM
 end
 
 function LIB.GVoiceBase_SwitchMicState(...)
