@@ -2794,13 +2794,15 @@ local BUFF_CACHE
 function LIB.IsBossFocusBuff(dwID, nLevel, nStackNum)
 	if not BUFF_CACHE then
 		BUFF_CACHE = {}
-		for i = 2, g_tTable.BossFocusBuff:GetRowCount() do
-			local tLine = g_tTable.BossFocusBuff:GetRow(i)
-			if tLine then
-				if not BUFF_CACHE[tLine.nBuffID] then
-					BUFF_CACHE[tLine.nBuffID] = {}
+		if g_tTable.BossFocusBuff then
+			for i = 2, g_tTable.BossFocusBuff:GetRowCount() do
+				local tLine = g_tTable.BossFocusBuff:GetRow(i)
+				if tLine then
+					if not BUFF_CACHE[tLine.nBuffID] then
+						BUFF_CACHE[tLine.nBuffID] = {}
+					end
+					BUFF_CACHE[tLine.nBuffID][tLine.nBuffLevel] = tLine.nBuffStack
 				end
-				BUFF_CACHE[tLine.nBuffID][tLine.nBuffLevel] = tLine.nBuffStack
 			end
 		end
 	end
