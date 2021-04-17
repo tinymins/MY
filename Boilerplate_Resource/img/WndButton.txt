@@ -15,3 +15,7 @@ Farme	Left	Top	Width	High	File
 13	250	66	221	64	C:\Users\root\Desktop\SkeuomorphismLaceButton_2.tga
 14	250	198	221	64	C:\Users\root\Desktop\SkeuomorphismLaceButton_3.tga
 15	250	132	221	64	C:\Users\root\Desktop\SkeuomorphismLaceButton_4.tga
+16	473	0	21	21	C:\Users\root\Desktop\问号1_0.tga
+17	473	23	21	21	C:\Users\root\Desktop\问号2_0.tga
+18	473	46	21	21	C:\Users\root\Desktop\问号3_0.tga
+19	473	69	21	21	C:\Users\root\Desktop\问号4_0.tga
