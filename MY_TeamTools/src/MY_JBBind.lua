@@ -224,7 +224,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
 		x = nX, y = nY + 2, w = 120,
 		buttonstyle = 'FLAT', text = _L['Login team platform'],
 		onclick = function()
-			LIB.OpenBrowser('https://page.j3cx.com/jx3box/team')
+			LIB.OpenBrowser('https://page.j3cx.com/jx3box/team/platform')
 		end,
 	})
 	nX = nX + uiBtnCCLink:Width()

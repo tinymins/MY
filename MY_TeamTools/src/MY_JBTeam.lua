@@ -1,7 +1,7 @@
 --------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
--- @desc     : JX3BOX 分页
+-- @desc     : 快捷入团
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
@@ -53,34 +53,140 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^3.0.1') then
 	return
 end
 --------------------------------------------------------------------------
+local D = {}
+local O = {}
 
-local PS = {
-	-- nPriority = 0,
-	-- bWelcome = true,
-	nShielded = LIB.IsDebugServer() and 2 or nil,
-}
-
-function PS.OnPanelActive(wnd)
-	local ui = UI(wnd)
-	local X, Y = 20, 20
-	local nX, nY = X, Y
-	local W, H = ui:Size()
-
-	-- 角色认证
-	nX, nY = MY_JBBind.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
-
-	-- 快捷入团
-	nX = X
-	nY = nY + 16
-	nX, nY = MY_JBTeam.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
-
-	-- 秘境百强榜
-	nX = X
-	nY = nY + 20
-	nY = nY + ui:Append('Text', { x = nX, y = nY, text = _L['Dungeon Rank'], font = 27 }):Height() + 2
-	nX = X + 10
-	nX, nY = MY_JBAchievementRank.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
-	nX, nY = MY_JBEventVote.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
+function D.ApplyAPI(szAction, szTeam, resolve, reject)
+	local dwID = UI_GetClientPlayerID()
+	if IsRemotePlayer(dwID) then
+		LIB.Alert(_L['You are crossing server, please do this after backing.'])
+		return
+	end
+	local me = GetClientPlayer()
+	local szURL = 'https://push.j3cx.com/team/'
+		.. (szAction == 'join' and 'join' or 'quit')
+		.. '?'
+		.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
+			l = AnsiToUTF8(GLOBAL.GAME_LANG),
+			L = AnsiToUTF8(GLOBAL.GAME_EDITION),
+			team = AnsiToUTF8(szTeam),
+			cguid = LIB.GetClientGUID(),
+			jx3id = AnsiToUTF8(LIB.GetClientUUID()),
+			server = AnsiToUTF8(LIB.GetRealServer(2)),
+			id = AnsiToUTF8(dwID),
+			name = AnsiToUTF8(LIB.GetUserRoleName()),
+			mount = me.GetKungfuMount().dwMountType,
+			body_type = me.nRoleType,
+		}, szAction == 'join' and '3a0e8712-db2e-4dd5-a089-169fe2b4093b' or '26f76228-1f64-479a-a6d3-2cff034fcf08')))
+	LIB.Ajax({
+		driver = 'auto', mode = 'auto', method = 'auto',
+		url = szURL,
+		charset = 'utf8',
+		success = function(szHTML)
+			local res = LIB.JsonDecode(szHTML)
+			if Get(res, {'code'}) == 0 then
+				SafeCall(resolve)
+			else
+				SafeCall(reject, LIB.ReplaceSensitiveWord(Get(res, {'msg'}, _L['Request failed.'])))
+			end
+		end,
+	})
 end
 
-LIB.RegisterPanel(_L['Raid'], 'MY_JX3BOX', _L['Team Platform'], 5962, PS)
+function D.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
+	-- 快捷入团
+	nY = nY + ui:Append('Text', { x = nX, y = nY, text = _L['Quick team'], font = 27 }):Height() + 2
+	nX = X + 10
+	local bLoading
+	nX = nX + ui:Append('Text', { x = nX, y = nY, w = 'auto', text = _L['Team name/id:'] }):Width()
+	local uiInput = ui:Append('WndEditBox', { x = nX, y = nY + 2, w = 150, h = 25 })
+	nX = nX + uiInput:Width() + 5
+	nX = nX + ui:Append('WndButton', {
+		x = nX, y = nY + 2,
+		buttonstyle = 'FLAT', text = _L['Apply join team'],
+		onclick = function()
+			if bLoading then
+				return LIB.Systopmsg(_L['Processing, please wait.'])
+			end
+			local szTeam = uiInput:Text()
+			if IsEmpty(szTeam) then
+				return LIB.Alert(_L['Please input team name/id.'])
+			end
+			if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) then
+				return LIB.Topmsg(_L['Please unlock equip lock first!'], CONSTANT.MSG_THEME.ERROR)
+			end
+			LIB.Confirm(_L('Sure to apply join team %s?', szTeam), function()
+				bLoading = true
+				D.ApplyAPI(
+					'join',
+					szTeam,
+					function()
+						bLoading = false
+						LIB.Alert(_L['Apply succeed!'])
+						uiInput:Text('')
+					end,
+					function(szMsg)
+						bLoading = false
+						LIB.Alert(_L['Apply failed!'] .. szMsg)
+					end)
+			end)
+		end,
+	}):Width() + 5
+	nX = nX + ui:Append('WndButton', {
+		x = nX, y = nY + 2,
+		buttonstyle = 'FLAT', text = _L['Apply quit team'],
+		onclick = function()
+			if bLoading then
+				return LIB.Systopmsg('Processing, please wait.')
+			end
+			local szTeam = uiInput:Text()
+			if IsEmpty(szTeam) then
+				return LIB.Alert(_L['Please input team name/id.'])
+			end
+			if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) then
+				return LIB.Topmsg(_L['Please unlock equip lock first!'], CONSTANT.MSG_THEME.ERROR)
+			end
+			LIB.Confirm(_L('Sure to apply quit team %s?', szTeam), function()
+				bLoading = true
+				D.ApplyAPI(
+					'quit',
+					szTeam,
+					function()
+						bLoading = false
+						LIB.Alert(_L['Quit succeed!'])
+						uiInput:Text('')
+					end,
+					function(szMsg)
+						bLoading = false
+						LIB.Alert(_L['Quit failed!'] .. szMsg)
+					end)
+			end)
+		end,
+	}):Width() + 5
+	nX = nX + ui:Append('WndButton', {
+		x = nX, y = nY + 5, w = 20, h = 20,
+		buttonstyle = 'QUESTION',
+		onclick = function()
+			UI.OpenBrowser('https://page.j3cx.com/jx3box/team/about')
+		end,
+	}):Width()
+
+	nX = X
+	nY = nY + 20
+
+	return nX, nY
+end
+
+-- Global exports
+do
+local settings = {
+	exports = {
+		{
+			fields = {
+				OnPanelActivePartial = D.OnPanelActivePartial,
+			},
+		},
+	},
+}
+MY_JBTeam = LIB.GeneGlobalNS(settings)
+end

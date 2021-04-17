@@ -54,4 +54,18 @@ return {
     ['ERR: Decode vote content as json failed!'] = '錯誤：解碼投票結果失敗！',
     ['ERR: Vote content is illegal!'] = '錯誤：投票結果內容數據結構不符合約束！',
     ['ERR404: Vote address not found!'] = '錯誤：投票結果地址不存在！',
+
+    -- MY_JBTeam.lua
+    ['Quick team'] = '快捷入團',
+    ['Team name/id:'] = '團名/ID：',
+    ['Apply join team'] = '申請入團',
+    ['Processing, please wait.'] = '操作中，請稍後。',
+    ['Please input team name/id.'] = '請先輸入團隊名稱/ID。',
+    ['Sure to apply join team %s?'] = '確定要申請加入團隊 %s 嗎？',
+    ['Apply succeed!'] = '申請成功！',
+    ['Apply failed!'] = '申請失敗！',
+    ['Apply quit team'] = '退出團隊',
+    ['Sure to apply quit team %s?'] = '確定要退出團隊 %s 嗎？',
+    ['Quit succeed!'] = '退出成功！',
+    ['Quit failed!'] = '退出失敗！',
 }
