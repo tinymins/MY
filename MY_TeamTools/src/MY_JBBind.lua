@@ -24,7 +24,7 @@ local insert, remove, concat = table.insert, table.remove, table.concat
 local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
 local sort, getn = table.sort, table['getn'] or function(t) return #t end
 -- jx3 apis caching
-local wsub, wlen, wfind, wgsub = wstring.sub, wstring.len, StringFindW, StringReplaceW
+local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
 local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
@@ -153,24 +153,11 @@ function D.Unbind(resolve, reject)
 	})
 end
 
-local PS = {
-	-- nPriority = 0,
-	-- bWelcome = true,
-	nShielded = LIB.IsDebugServer() and 2 or nil,
-}
-
-function PS.OnPanelActive(wnd)
-	local ui = UI(wnd)
-	local X, Y = 20, 20
-	local nX, nY = X, Y
-	local W, H = ui:Size()
-	local szPSUUID = LIB.GetUUID()
-	O.szPSUUID = szPSUUID
-
+function D.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
 	-- 角色认证
 	local uiCCStatus, uiBtnCCStatus, uiBtnCCLink
 	local function UpdateUI()
-		if O.szPSUUID ~= szPSUUID then
+		if uiCCStatus:Count() == 0 or uiBtnCCStatus:Count() == 0 or uiBtnCCLink:Count() == 0 then
 			return
 		end
 		if O.pending then
@@ -247,17 +234,19 @@ function PS.OnPanelActive(wnd)
 	UpdateUI()
 	D.FetchBindStatus(UpdateUI, UpdateUI)
 
-	-- 秘境百强榜
-	nX = X
-	nY = nY + 20
-	nY = nY + ui:Append('Text', { x = nX, y = nY, text = _L['Dungeon Rank'], font = 27 }):Height() + 2
-	nX = X + 10
-	nX, nY = MY_JBAchievementRank.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
-	nX, nY = MY_JBEventVote.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
+	return nX, nY
 end
 
-function PS.OnPanelDeactive()
-	O.szPSUUID = nil
+-- Global exports
+do
+local settings = {
+	exports = {
+		{
+			fields = {
+				OnPanelActivePartial = D.OnPanelActivePartial,
+			},
+		},
+	},
+}
+MY_JBBind = LIB.GeneGlobalNS(settings)
 end
-
-LIB.RegisterPanel(_L['Raid'], 'MY_JX3BOX', _L['Team Platform'], 5962, PS)

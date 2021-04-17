@@ -23,3 +23,4 @@ lua_14=src/MY_TeamTools.PS.lua
 lua_15=src/MY_JBEventVote.lua
 lua_16=src/MY_JBAchievementRank.lua
 lua_17=src/MY_JBBind.lua
+lua_18=src/MY_JB.PS.lua
