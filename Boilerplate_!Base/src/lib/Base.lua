@@ -63,8 +63,6 @@ local _LOGO_MENU_FRAME_       = 1
 local _LOGO_MENU_HOVER_FRAME_ = 2
 local _POSTER_UITEX_          = _ADDON_ROOT_ .. _NAME_SPACE_ .. '_Resource/img/Poster.UITex'
 local _POSTER_FRAME_COUNT_    = 1
-local _ST_UITEX_              = _ADDON_ROOT_ .. _NAME_SPACE_ .. '_Resource/img/ST.UITex'
-local _ST_FRAME_COUNT_        = 9
 local _DEBUG_LEVEL_           = tonumber(LoadLUAData(_DATA_ROOT_ .. 'debug.level.jx3dat') or nil) or 4
 local _DELOG_LEVEL_           = tonumber(LoadLUAData(_DATA_ROOT_ .. 'delog.level.jx3dat') or nil) or 4
 -------------------------------------------------------------------------------------------------------
@@ -712,8 +710,6 @@ local tInfo = {
 	LOGO_MENU_HOVER_FRAME = _LOGO_MENU_HOVER_FRAME_,
 	POSTER_UITEX          = _POSTER_UITEX_         ,
 	POSTER_FRAME_COUNT    = _POSTER_FRAME_COUNT_   ,
-	ST_UITEX              = _ST_UITEX_             ,
-	ST_FRAME_COUNT        = _ST_FRAME_COUNT_       ,
 	AUTHOR                = _AUTHOR_               ,
 	AUTHOR_WEIBO          = _AUTHOR_WEIBO_         ,
 	AUTHOR_WEIBO_URL      = _AUTHOR_WEIBO_URL_     ,
