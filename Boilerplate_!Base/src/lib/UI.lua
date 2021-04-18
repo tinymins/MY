@@ -99,6 +99,19 @@ local BUTTON_STYLE_CONFIG = {
 		nMouseDownGroup = 27,
 		nDisableGroup = 28,
 	},
+	LINK = LIB.SetmetaReadonly({
+		nWidth = 60,
+		nHeight = 25,
+		szImage = 'ui/Image/UICommon/CommonPanel.UITex',
+		nNormalGroup = -1,
+		nMouseOverGroup = -1,
+		nMouseDownGroup = -1,
+		nDisableGroup = -1,
+		nNormalFont = 162,
+		nMouseOverFont = 0,
+		nMouseDownFont = 162,
+		nDisableFont = 161,
+	}),
 	OPTION = {
 		nWidth = 22,
 		nHeight = 24,
@@ -266,82 +279,95 @@ do local l_type = setmetatable({}, { __mode = 'k' })
 	end
 end
 
+-- 通过组件根节点和目标功能区类型，获取功能UI实例对象。
+-- 如：获取“按钮盒”的“按钮”实例、“文本”实例。
 local function GetComponentElement(raw, elementType)
 	local element
 	local componentType = GetComponentType(raw)
 	local componentBaseType = raw:GetBaseType()
-	if elementType == 'ITEM' then
+	if elementType == 'ITEM' then -- 获取 Item 类UI实例
 		if componentBaseType ~= 'Wnd' then
 			element = raw
 		end
-	elseif elementType == 'WND' then
+	elseif elementType == 'WND' then -- 获取 Wnd 类UI实例
 		if componentBaseType == 'Wnd' then
 			element = raw
 		end
-	elseif elementType == 'MAIN_WINDOW' then
+	elseif elementType == 'MAIN_WINDOW' then -- 获取用于主要 Wnd 类功能区、子元素容器UI实例
 		if componentType == 'WndFrame' then
 			element = raw:Lookup('Wnd_Total') or raw
+		elseif componentType == 'WndButtonBox' then
+			element = raw:Lookup('WndButton')
 		elseif componentBaseType == 'Wnd' then
 			element = raw
 		end
-	elseif elementType == 'MAIN_HANDLE' then
+	elseif elementType == 'MAIN_HANDLE' then -- 获取用于主要 Item 类功能区、子元素容器UI实例
 		if componentType == 'WndScrollBox' then
 			element = raw:Lookup('', 'Handle_Padding/Handle_Scroll')
-		elseif componentType == 'WndFrame' then
-			element = GetComponentElement(raw, 'MAIN_WINDOW'):Lookup('', '')
 		elseif componentType == 'Handle' or componentType == 'CheckBox' then
 			element = raw
 		elseif componentBaseType == 'Wnd' then
-			element = raw:Lookup('', '')
+			local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
+			if wnd then
+				element = wnd:Lookup('', '')
+			end
 		end
-	elseif elementType == 'CHECKBOX' then
+	elseif elementType == 'CHECKBOX' then -- 获取复选框UI实例
 		if componentType == 'WndCheckBox' or componentType == 'WndRadioBox' or componentType == 'CheckBox' then
 			element = raw
 		end
-	elseif elementType == 'COMBOBOX' then
+	elseif elementType == 'COMBOBOX' then -- 获取下拉框UI实例
 		if componentType == 'WndComboBox' or componentType == 'WndEditComboBox' or componentType == 'WndAutocomplete' then
 			element = raw:Lookup('Btn_ComboBox')
 		end
-	elseif elementType == 'EDIT' then
+	elseif elementType == 'EDIT' then -- 获取输入框UI实例
 		if componentType == 'WndEdit' then
 			element = raw
 		elseif componentType == 'WndEditBox' or componentType == 'WndEditComboBox' or componentType == 'WndAutocomplete' then
 			element = raw:Lookup('WndEdit_Default')
 		end
-	elseif elementType == 'BUTTON' then
-		if componentType == 'WndButton' then
+	elseif elementType == 'BUTTON' then -- 获取按钮UI实例
+		if componentType == 'WndButtonBox' then
+			local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
+			if wnd then
+				element = wnd
+			end
+		elseif componentType == 'WndButton' then
 			element = raw
 		end
-	elseif elementType == 'WEB' then
+	elseif elementType == 'WEB' then -- 获取浏览器UI实例
 		if componentType == 'WndWebPage'
 		or componentType == 'WndWebCef' then
 			element = raw
 		end
-	elseif elementType == 'WEBPAGE' then
+	elseif elementType == 'WEBPAGE' then -- 获取IE浏览器UI实例
 		if componentType == 'WndWebPage' then
 			element = raw
 		end
-	elseif elementType == 'WEBCEF' then
+	elseif elementType == 'WEBCEF' then -- 获取Chrome浏览器UI实例
 		if componentType == 'WndWebCef' then
 			element = raw
 		end
-	elseif elementType == 'TRACKBAR' then
+	elseif elementType == 'TRACKBAR' then -- 获取拖动条UI实例
 		if componentType == 'WndTrackbar' then
 			element = raw:Lookup('WndNewScrollBar_Default')
 		end
-	elseif elementType == 'TEXT' then
+	elseif elementType == 'TEXT' then -- 获取文本UI实例
 		if componentType == 'WndScrollBox' then
 			element = raw:Lookup('', 'Handle_Padding/Handle_Scroll/Text_Default')
 		elseif componentType == 'WndFrame' then
 			element = raw:Lookup('', 'Text_Title') or raw:Lookup('', 'Text_Default')
-		elseif componentBaseType == 'Wnd' then
-			element = raw:Lookup('', 'Text_Default')
 		elseif componentType == 'Handle' or componentType == 'CheckBox' then
 			element = raw:Lookup('Text_Default')
 		elseif componentType == 'Text' then
 			element = raw
+		elseif componentBaseType == 'Wnd' then
+			local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
+			if wnd then
+				element = wnd:Lookup('', 'Text_Default')
+			end
 		end
-	elseif elementType == 'IMAGE' then
+	elseif elementType == 'IMAGE' then -- 获取图片UI实例
 		if componentType == 'WndEditBox' or componentType == 'WndComboBox' or componentType == 'WndEditComboBox'
 		or componentType == 'WndAutocomplete' or componentType == 'WndScrollBox' then
 			element = raw:Lookup('', 'Image_Default')
@@ -350,11 +376,11 @@ local function GetComponentElement(raw, elementType)
 		elseif componentType == 'Image' then
 			element = raw
 		end
-	elseif elementType == 'SHADOW' then
+	elseif elementType == 'SHADOW' then -- 获取阴影UI实例
 		if componentType == 'Shadow' then
 			element = raw
 		end
-	elseif elementType == 'BOX' then
+	elseif elementType == 'BOX' then -- 获取游戏盒子UI实例
 		if componentType == 'Box' then
 			element = raw
 		end
@@ -2682,23 +2708,44 @@ local function SetComponentSize(raw, nOuterWidth, nOuterHeight, nInnerWidth, nIn
 			raw:SetSize(nWidth, nHeight)
 			hnd:SetSize(nWidth, nHeight)
 		end
-	elseif componentType == 'WndButton' then
-		local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
+	elseif componentType == 'WndButton' or componentType == 'WndButtonBox' then
+		local btn = GetComponentElement(raw, 'MAIN_WINDOW')
 		local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
 		local txt = GetComponentElement(raw, 'TEXT')
-		local nPaddingTop, nPaddingRight, nPaddingBottom, nPaddingLeft = 0, 0, 0, 0
-		local eStyle = GetButtonStyleName(wnd)
+		local nMarginTop, nMarginRight, nMarginBottom, nMarginLeft = 0, 0, 0, 0 -- 按钮外部边距
+		local nPaddingTop, nPaddingRight, nPaddingBottom, nPaddingLeft = 0, 0, 0, 0 -- 按钮内部边距
+		local eStyle = GetButtonStyleName(btn)
 		local tStyle = GetButtonStyleConfig(eStyle)
 		if tStyle then
-			nPaddingTop = (tStyle.nPaddingTop or 0) * (nHeight / tStyle.nHeight)
-			nPaddingRight = (tStyle.nPaddingRight or 0) * (nWidth / tStyle.nWidth)
-			nPaddingBottom = (tStyle.nPaddingBottom or 0) * (nHeight / tStyle.nHeight)
-			nPaddingLeft = (tStyle.nPaddingLeft or 0) * (nWidth / tStyle.nWidth)
+			nMarginTop = tStyle.nMarginTop or 0
+			nMarginRight = tStyle.nMarginRight or 0
+			nMarginBottom = tStyle.nMarginBottom or 0
+			nMarginLeft = tStyle.nMarginLeft or 0
+			nPaddingTop = tStyle.nPaddingTop or 0
+			nPaddingRight = tStyle.nPaddingRight or 0
+			nPaddingBottom = tStyle.nPaddingBottom or 0
+			nPaddingLeft = tStyle.nPaddingLeft or 0
+			local fScaleX = nWidth / (tStyle.nWidth + nMarginRight + nMarginLeft + nPaddingRight + nPaddingLeft)
+			local fScaleY = nHeight / (tStyle.nHeight + nMarginTop + nMarginBottom + nPaddingTop + nPaddingBottom)
+			nMarginTop = nMarginTop * fScaleY
+			nMarginRight = nMarginRight * fScaleX
+			nMarginBottom = nMarginBottom * fScaleY
+			nMarginLeft = nMarginLeft * fScaleX
+			nPaddingTop = nPaddingTop * fScaleY
+			nPaddingRight = nPaddingRight * fScaleX
+			nPaddingBottom = nPaddingBottom * fScaleY
+			nPaddingLeft = nPaddingLeft * fScaleX
 		end
-		wnd:SetSize(nWidth, nHeight)
-		txt:SetRelPos(nPaddingTop, nPaddingLeft)
-		txt:SetSize(nWidth - nPaddingLeft - nPaddingRight, nHeight - nPaddingTop - nPaddingBottom)
+		if componentType == 'WndButtonBox' then
+			raw:SetSize(nWidth, nHeight)
+			btn:SetRelPos(nMarginLeft, nMarginTop)
+		end
+		btn:SetSize(nWidth - nMarginLeft - nMarginRight, nHeight - nMarginTop - nMarginBottom)
+		hdl:SetRelPos(-nMarginLeft, -nMarginTop)
+		hdl:SetAbsPos(btn:GetAbsX() - nMarginLeft, btn:GetAbsY() - nMarginTop) -- 这个 Wnd 的直接 Handle 坐标不刷新问题两年前就报了，没人修，妈的。
 		hdl:SetSize(nWidth, nHeight)
+		txt:SetRelPos(nMarginLeft + nPaddingLeft, nMarginTop + nPaddingTop)
+		txt:SetSize(nWidth - nMarginLeft - nPaddingLeft - nMarginRight - nPaddingRight, nHeight - nMarginTop - nPaddingTop - nMarginBottom - nPaddingBottom)
 		hdl:FormatAllItemPos()
 	elseif componentType == 'WndCheckBox' then
 		local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
@@ -3438,13 +3485,50 @@ function OO:ButtonStyle(...)
 	else
 		local eButtonStyle = ...
 		local tStyle = GetButtonStyleConfig(eButtonStyle) or BUTTON_STYLE_CONFIG.DEFAULT
+		local function UpdateButtonBoxFont(raw)
+			local btn = GetComponentElement(raw, 'BUTTON')
+			local txt = GetComponentElement(raw, 'TEXT')
+			if not btn or not txt then
+				return
+			end
+			local nFont = nil
+			if not btn:IsEnabled() then
+				nFont = tStyle.nDisableFont
+			elseif GetComponentProp(raw, 'bDown') then
+				nFont = tStyle.nMouseDownFont
+			elseif GetComponentProp(raw, 'bIn') then
+				nFont = tStyle.nMouseOverFont
+			else
+				nFont = tStyle.nNormalFont
+			end
+			if nFont then
+				txt:SetFontScheme(nFont)
+			end
+		end
 		for _, raw in ipairs(self.raws) do
-			if GetComponentType(raw) == 'WndButton' then
-				raw:SetAnimatePath((wgsub(tStyle.szImage, '/', '\\')))
-				raw:SetAnimateGroupNormal(tStyle.nNormalGroup)
-				raw:SetAnimateGroupMouseOver(tStyle.nMouseOverGroup)
-				raw:SetAnimateGroupMouseDown(tStyle.nMouseDownGroup)
-				raw:SetAnimateGroupDisable(tStyle.nDisableGroup)
+			local btn = GetComponentElement(raw, 'BUTTON')
+			if btn then
+				btn:SetAnimatePath((wgsub(tStyle.szImage, '/', '\\')))
+				btn:SetAnimateGroupNormal(tStyle.nNormalGroup)
+				btn:SetAnimateGroupMouseOver(tStyle.nMouseOverGroup)
+				btn:SetAnimateGroupMouseDown(tStyle.nMouseDownGroup)
+				btn:SetAnimateGroupDisable(tStyle.nDisableGroup)
+				raw.OnMouseIn = function()
+					SetComponentProp(raw, 'bIn', true)
+					UpdateButtonBoxFont(raw)
+				end
+				raw.OnMouseOut = function()
+					SetComponentProp(raw, 'bIn', false)
+					UpdateButtonBoxFont(raw)
+				end
+				btn:Lookup('', '').OnItemLButtonDown = function()
+					SetComponentProp(raw, 'bDown', true)
+					UpdateButtonBoxFont(raw)
+				end
+				btn:Lookup('', '').OnItemLButtonUp = function()
+					SetComponentProp(raw, 'bDown', false)
+					UpdateButtonBoxFont(raw)
+				end
 				SetComponentSize(raw, tStyle.nWidth, tStyle.nHeight)
 			end
 		end

@@ -137,6 +137,23 @@ local BUTTON_STYLE_CONFIG = {
 		nMouseDownGroup = 18,
 		nDisableGroup = 19,
 	}),
+	UNDERLINE_LINK = LIB.SetmetaReadonly({
+		nWidth = 60,
+		nHeight = 26,
+		nMarginTop = 14,
+		nMarginBottom = 2,
+		nPaddingTop = -14,
+		nPaddingBottom = -2,
+		szImage = PLUGIN_ROOT .. '/img/WndButton.UITex',
+		nNormalGroup = 20,
+		nMouseOverGroup = 21,
+		nMouseDownGroup = 22,
+		nDisableGroup = 23,
+		nNormalFont = 162,
+		nMouseOverFont = 0,
+		nMouseDownFont = 162,
+		nDisableFont = 161,
+	}),
 }
 function D.GetWndButtonStyleName(szImage, nNormalGroup)
 	szImage = wlower(LIB.NormalizePath(szImage))
