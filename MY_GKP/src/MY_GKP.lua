@@ -240,6 +240,7 @@ function D.GetTeamMemberMenu(fnAction, bDisable, bSelf)
 				rgb      = { LIB.GetForceColor(v.dwForce) },
 				fnAction = function()
 					fnAction(v)
+					UI.ClosePopupMenu()
 				end
 			})
 		end

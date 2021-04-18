@@ -312,8 +312,8 @@ function MY_GKP_UI.OnFrameCreate()
 	local ui = UI(this)
 	ui:Text(_L['GKP Golden Team Record']):Anchor('CENTER')
 	ui:Append('WndButton', {
-		x = 875, y = 48, w = 100, h = 35,
-		text = g_tStrings.STR_LOG_SET,
+		x = 955, y = 54, w = 20, h = 20,
+		buttonstyle = 'OPTION',
 		onclick = function()
 			LIB.ShowPanel()
 			LIB.FocusPanel()
