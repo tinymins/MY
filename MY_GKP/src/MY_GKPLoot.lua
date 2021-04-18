@@ -264,7 +264,7 @@ function D.OnFrameCreate()
 end
 
 function D.OnFrameBreathe()
-	local nLFC = GetLogicFrameCount()
+	local nLFYC = GetLogicFrameCount()
 	local me = GetClientPlayer()
 	local wnd = this:Lookup('Scroll_DoodadList/WndContainer_DoodadList'):LookupContent(0)
 	while wnd do
@@ -274,11 +274,11 @@ function D.OnFrameBreathe()
 		local hList, hItem = wnd:Lookup('', 'Handle_ItemList')
 		for i = 0, hList:GetItemCount() - 1 do
 			hItem = hList:Lookup(i)
-			if (not hItem.nAutoLootLFC or nLFC - hItem.nAutoLootLFC >= GKP_AUTO_LOOT_DEBOUNCE_TIME)
+			if (not hItem.nAutoLootLFC or nLFYC - hItem.nAutoLootLFC >= GKP_AUTO_LOOT_DEBOUNCE_TIME)
 			and D.IsItemAutoPickup(hItem.itemData, O.tItemConfig, doodad, bCanDialog)
 			and not hItem.itemData.bDist and not hItem.itemData.bNeedRoll and not hItem.itemData.bBidding then
 				LIB.ExecuteWithThis(hItem, D.OnItemLButtonClick)
-				hItem.nAutoLootLFC = nLFC
+				hItem.nAutoLootLFC = nLFYC
 			end
 		end
 		wnd:Lookup('', 'Image_DoodadTitleBg'):SetFrame(bCanDialog and 0 or 3)

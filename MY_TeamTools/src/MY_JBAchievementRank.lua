@@ -301,9 +301,14 @@ end)
 
 LIB.RegisterExit('MY_JBAchievementRank', D.ShotAchievementAcquire)
 
-function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y,
+function D.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
+	nX = X
+	nY = nLFY
+	nY = nY + ui:Append('Text', { x = nX, y = nY, text = _L['Dungeon Rank'], font = 27 }):Height() + 2
+
+	nX = X + 10
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY,
 		checked = MY_JBAchievementRank.bEnable,
 		text = _L['Share boss kill'],
 		oncheck = function(bChecked)
@@ -313,7 +318,14 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
 	}):AutoWidth():Width() + 5
 
-	return x, y
+	nX = nX + ui:Append('Text', {
+		x = nX, y = nY, h = 25,
+		text = _L['(Checked this option to join dungeon rank.)'],
+		color = { 172, 172, 172 },
+	}):AutoWidth():Width() + 5
+
+	nLFY = nY + LH
+	return nX, nY, nLFY
 end
 
 -- Global exports

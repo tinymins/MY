@@ -22,18 +22,20 @@ return {
     ['Please unlock equip lock first!'] = '请先解除玲珑密保锁！',
     ['Sure to unbind character certification?'] = '确认要解除当前“角色认证”吗？',
     ['Login team platform'] = '登录团队平台',
-    ['Dungeon Rank'] = '秘境百强榜',
     ['Today recomment posts'] = '今日推荐',
 
     -- JBAchievementRank.lua
-	['Share boss kill'] = '参加百强榜（分享首次击败秘境首领）',
-	['Share boss kill record for kill rank.'] = '公开分享首次击败秘境首领相关团队与战斗信息，用于数据统计。',
+    ['Dungeon Rank'] = '赛事上报',
+	['Share boss kill'] = '分享首次击败秘境首领',
+	['Share boss kill record for kill rank.'] = '参加秘境百强榜，公开分享首次击败秘境首领相关团队与战斗信息。',
+    ['(Checked this option to join dungeon rank.)'] = '（秘境百强榜参赛期间，需勾选方能上报）',
 	['Try share boss kill: %s - %ds (%s).'] = '正在分享：%s，战斗%d秒，%s。',
 	['Share boss kill success: %s - %ds (%s).'] = '成功分享：%s，战斗%d秒，%s。',
 	['Full win'] = '全胜',
 
     -- MY_JBEventVote.lua
-    ['MY_JBEventVote'] = '秘境百强榜',
+    ['Dungeon Vote'] = '赛事投票',
+    ['MY_JBEventVote'] = '团队投票',
     ['ERR: Decode eventlist content as json failed!'] = '错误：解码榜单列表失败！',
     ['ERR: Eventlist content is illegal!'] = '错误：榜单列表内容数据结构不符合约束！',
     ['ERR404: Eventlist address not found!'] = '错误：榜单列表地址不存在！',

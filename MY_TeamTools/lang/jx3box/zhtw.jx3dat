@@ -22,12 +22,13 @@ return {
     ['Please unlock equip lock first!'] = '請先解除玲瓏密保鎖！',
     ['Sure to unbind character certification?'] = '確認要解除當前“角色認證”嗎？',
     ['Login team platform'] = '登錄團隊平臺',
-    ['Dungeon Rank'] = '秘境百強榜',
     ['Today recomment posts'] = '今日推薦',
 
     -- JBAchievementRank.lua
-	['Share boss kill'] = '參加百強榜（分享首次擊敗秘境首領）',
-	['Share boss kill record for kill rank.'] = '公開分享首次擊敗秘境首領相關團隊與戰鬥信息，用於數據統計。',
+    ['Dungeon Rank'] = '賽事上報',
+	['Share boss kill'] = '分享首次擊敗秘境首領',
+	['Share boss kill record for kill rank.'] = '參加秘境百強榜，公開分享首次擊敗秘境首領相關團隊與戰鬥信息。',
+    ['(Checked this option to join dungeon rank.)'] = '（秘境百強榜參賽期間，需勾選方能上報）',
 	['Try share boss kill: %s - %ds (%s).'] = '正在分享：%s，戰鬥%d秒，%s。',
 	['Share boss kill success: %s - %ds (%s).'] = '成功分享：%s，戰鬥%d秒，%s。',
 	['Full win'] = '全勝',

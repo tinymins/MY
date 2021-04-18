@@ -93,9 +93,12 @@ function D.ApplyAPI(szAction, szTeam, resolve, reject)
 	})
 end
 
-function D.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
+function D.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
 	-- øÏΩ›»ÎÕ≈
+	nX = X
+	nY = nLFY
 	nY = nY + ui:Append('Text', { x = nX, y = nY, text = _L['Quick team'], font = 27 }):Height() + 2
+
 	nX = X + 10
 	local bLoading
 	nX = nX + ui:Append('Text', { x = nX, y = nY, w = 'auto', text = _L['Team name/id:'] }):Width()
@@ -171,10 +174,8 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
 		end,
 	}):Width()
 
-	nX = X
-	nY = nY + 20
-
-	return nX, nY
+	nLFY = nY + LH
+	return nX, nY, nLFY
 end
 
 -- Global exports

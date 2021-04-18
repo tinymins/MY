@@ -62,25 +62,27 @@ local PS = {
 
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
-	local X, Y = 20, 20
-	local nX, nY = X, Y
+	local X, Y, LH = 20, 20, 30
 	local W, H = ui:Size()
+	local nX, nY, nLFY = X, Y, Y
 
 	-- 角色认证
-	nX, nY = MY_JBBind.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
+	nX, nY, nLFY = MY_JBBind.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
 
 	-- 快捷入团
 	nX = X
-	nY = nY + 16
-	nX, nY = MY_JBTeam.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
+	nLFY = nLFY + 5
+	nX, nY, nLFY = MY_JBTeam.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
 
-	-- 秘境百强榜
+	-- 赛事上报
 	nX = X
-	nY = nY + 20
-	nY = nY + ui:Append('Text', { x = nX, y = nY, text = _L['Dungeon Rank'], font = 27 }):Height() + 2
-	nX = X + 10
-	nX, nY = MY_JBAchievementRank.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
-	nX, nY = MY_JBEventVote.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
+	nLFY = nLFY + 5
+	nX, nY, nLFY = MY_JBAchievementRank.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
+
+	-- 赛事投票
+	nX = X
+	nLFY = nLFY + 5
+	nX, nY, nLFY = MY_JBEventVote.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
 end
 
 LIB.RegisterPanel(_L['Raid'], 'MY_JX3BOX', _L['Team Platform'], 5962, PS)

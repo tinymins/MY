@@ -283,11 +283,11 @@ function D.OnTableInsert(dwID, dwBuffID, nLevel, nIcon)
 	end
 	local dwTargetType, dwTargetID = Target_GetTargetData()
 	-- 判断是否有8帧之内的气劲 如果有则排序时候应当拥有相同的权重（解决不同客户端同步团队BUFF顺序不一致的问题）
-	local nLFC = GetLogicFrameCount()
-	local nSortLFC = nLFC
+	local nLFYC = GetLogicFrameCount()
+	local nSortLFC = nLFYC
 	for i = O.handle:GetItemCount() - 1, 0, -1 do
 		local hItem = O.handle:Lookup(i)
-		if nLFC - hItem.nLFC <= GLOBAL.GAME_FPS / 2 and nLFC - hItem.nSortLFC <= GLOBAL.GAME_FPS / 2 then
+		if nLFYC - hItem.nLFYC <= GLOBAL.GAME_FPS / 2 and nLFYC - hItem.nSortLFC <= GLOBAL.GAME_FPS / 2 then
 			nSortLFC = hItem.nSortLFC
 			break
 		end
@@ -322,7 +322,7 @@ function D.OnTableInsert(dwID, dwBuffID, nLevel, nIcon)
 		box:SetOverText(0, buff.nStackNum)
 	end
 	h.data = data
-	h.nLFC = nLFC
+	h.nLFYC = nLFYC
 	h.nSortLFC = nSortLFC
 	h:Show()
 	O.handle:Sort()

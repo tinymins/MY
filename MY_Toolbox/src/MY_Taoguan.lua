@@ -206,11 +206,11 @@ function D.BreakCanStateTransfer()
 	if not me or not D.bEnable then
 		return
 	end
-	local nLFC = GetLogicFrameCount()
+	local nLFYC = GetLogicFrameCount()
 	-- 确认掉砸金蛋确认框
 	LIB.DoMessageBox('PlayerMessageBoxCommon')
 	-- 吃药还在CD则等待
-	if nLFC - D.nUseItemLFC < ITEM_CD then
+	if nLFYC - D.nUseItemLFC < ITEM_CD then
 		return
 	end
 	-- 检查吃药BUFF满足情况
@@ -225,7 +225,7 @@ function D.BreakCanStateTransfer()
 				end
 				-- 否则尝试吃药
 				if D.UseBagItem(item.szName, O['bPauseNo' .. item.szID]) then
-					D.nUseItemLFC = nLFC
+					D.nUseItemLFC = nLFYC
 					-- 吃成功了，等待下次状态机转移函数调用
 					return
 				end
@@ -238,7 +238,7 @@ function D.BreakCanStateTransfer()
 		end
 	end
 	-- 锤子还在CD则等待
-	if nLFC - D.nUseHammerLFC < HAMMER_CD then
+	if nLFYC - D.nUseHammerLFC < HAMMER_CD then
 		return
 	end
 	-- 寻找能砸的陶罐
@@ -254,7 +254,7 @@ function D.BreakCanStateTransfer()
 	-- 没有能砸的陶罐考虑自己放一个
 	if not npcTaoguan and O.bUseTaoguan then
 		if D.UseBagItem(TAOGUAN) then
-			D.nUseItemLFC = nLFC
+			D.nUseItemLFC = nLFYC
 		end
 	end
 	-- 还是没有找到罐子则等待
@@ -267,7 +267,7 @@ function D.BreakCanStateTransfer()
 	if D.nPoint >= O.nUseXiaojinchui then
 		if D.UseBagItem(XIAOJINCHUI, O.bPauseNoXiaojinchui) then
 			-- 砸成功了，等锤子CD
-			D.nUseHammerLFC = nLFC
+			D.nUseHammerLFC = nLFYC
 			return
 		end
 		if O.bPauseNoXiaojinchui then
@@ -279,13 +279,13 @@ function D.BreakCanStateTransfer()
 	-- 需要用小银锤，砸他丫的
 	if D.UseBagItem(XIAOYINCHUI) then
 		-- 砸成功了，等锤子CD
-		D.nUseHammerLFC = nLFC
+		D.nUseHammerLFC = nLFYC
 		return
 	end
 	-- 没有小银锤时使用小金锤？
 	if O.bNoYinchuiUseJinchui and D.UseBagItem(XIAOJINCHUI) then
 		-- 砸成功了，等锤子CD
-		D.nUseHammerLFC = nLFC
+		D.nUseHammerLFC = nLFYC
 		return
 	end
 	-- 没有金锤也没有银锤，凉了呀

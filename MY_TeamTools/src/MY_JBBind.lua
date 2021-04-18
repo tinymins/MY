@@ -153,7 +153,7 @@ function D.Unbind(resolve, reject)
 	})
 end
 
-function D.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
+function D.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
 	-- ╫ги╚хож╓
 	local uiCCStatus, uiBtnCCStatus, uiBtnCCLink
 	local function UpdateUI()
@@ -179,7 +179,10 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
 		uiBtnCCLink:Left(uiBtnCCStatus:Left() + uiBtnCCStatus:Width() + 10)
 	end
 
+	nX = X
+	nY = nLFY
 	nY = nY + ui:Append('Text', { x = nX, y = nY, text = _L['Character Certification'], font = 27 }):Height() + 2
+
 	nX = X + 10
 	nX = nX + ui:Append('Text', { x = nX, y = nY, w = 'auto', text = _L('Current character: %s', GetUserRoleName()) }):Width() + 20
 	nX = nX + ui:Append('Text', { x = nX, y = nY, w = 'auto', text = _L['Status: '] }):Width()
@@ -228,13 +231,12 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
 		end,
 	})
 	nX = nX + uiBtnCCLink:Width()
-	nX = X
-	nY = nY + 20
 
 	UpdateUI()
 	D.FetchBindStatus(UpdateUI, UpdateUI)
 
-	return nX, nY
+	nLFY = nY + LH
+	return nX, nY, nLFY
 end
 
 -- Global exports

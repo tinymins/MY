@@ -393,13 +393,19 @@ function D.Close()
 	Wnd.CloseWindow('MY_JBEventVote')
 end
 
-function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
+function D.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
 	local me = GetClientPlayer()
 	if not me or me.nMaxLevel ~= me.nLevel then
 		return
 	end
-	x = x + ui:Append('WndButton', {
-		x = x, y = y, w = 'auto',
+
+	nX = X
+	nY = nLFY
+	nY = nY + ui:Append('Text', { x = nX, y = nY, text = _L['Dungeon Vote'], font = 27 }):Height() + 2
+
+	nX = X + 10
+	nX = nX + ui:Append('WndButton', {
+		x = nX, y = nY, w = 'auto',
 		buttonstyle = 'FLAT',
 		text = _L['MY_JBEventVote'],
 		onclick = function()
@@ -407,8 +413,8 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 		end,
 	}):Width() + 5
 
-	x = X
-	return x, y
+	nLFY = nY + LH
+	return nX, nY, nLFY
 end
 
 ---------------------------------------------------------------------
