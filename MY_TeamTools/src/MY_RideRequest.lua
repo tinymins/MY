@@ -402,10 +402,23 @@ function R.Drawer(container, info)
 	wnd.OnMouseEnter = D.OnMouseEnter
 	wnd.OnMouseLeave = D.OnMouseLeave
 	wnd:Lookup('', 'Text_Name'):SetText(info.szName)
-	wnd:Lookup('Btn_Accept').OnLButtonClick = D.OnLButtonClick
-	wnd:Lookup('Btn_Accept', 'Text_Accept'):SetText(g_tStrings.STR_ACCEPT)
-	wnd:Lookup('Btn_Refuse').OnLButtonClick = D.OnLButtonClick
-	wnd:Lookup('Btn_Refuse', 'Text_Refuse'):SetText(g_tStrings.STR_REFUSE)
+
+	local ui = UI(wnd)
+	ui:Append('WndButton', {
+		name = 'Btn_Accept',
+		x = 240, y = 9, w = 60, h = 34,
+		buttonstyle = 'FLAT',
+		text = g_tStrings.STR_ACCEPT,
+		onclick = D.OnLButtonClick,
+	})
+	ui:Append('WndButton', {
+		name = 'Btn_Refuse',
+		x = 305, y = 9, w = 60, h = 34,
+		buttonstyle = 'FLAT',
+		text = g_tStrings.STR_REFUSE,
+		onclick = D.OnLButtonClick,
+	})
+
 	return wnd
 end
 

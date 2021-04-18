@@ -575,14 +575,35 @@ function R.Drawer(container, info)
 	hItem:Lookup('Text_Name'):SetText(info.szName)
 	hItem:Lookup('Text_Level'):SetText(info.nLevel)
 
-	wnd:Lookup('Btn_Accept').OnLButtonClick = D.OnLButtonClick
-	wnd:Lookup('Btn_Accept', 'Text_Accept'):SetText(g_tStrings.STR_ACCEPT)
-	wnd:Lookup('Btn_Refuse').OnLButtonClick = D.OnLButtonClick
-	wnd:Lookup('Btn_Refuse', 'Text_Refuse'):SetText(g_tStrings.STR_REFUSE)
-	wnd:Lookup('Btn_Lookup').OnMouseEnter = D.OnMouseEnter
-	wnd:Lookup('Btn_Lookup').OnMouseLeave = D.OnMouseLeave
-	wnd:Lookup('Btn_Lookup').OnLButtonClick = D.OnLButtonClick
-	wnd:Lookup('Btn_Lookup', 'Text_Lookup'):SetText(info.dwID and g_tStrings.STR_LOOKUP or _L['Ask details'])
+	local ui = UI(wnd)
+	ui:Append('WndButton', {
+		name = 'Btn_Accept',
+		x = 240, y = 9, w = 60, h = 34,
+		buttonstyle = 'FLAT',
+		text = g_tStrings.STR_ACCEPT,
+		onclick = D.OnLButtonClick,
+	})
+	ui:Append('WndButton', {
+		name = 'Btn_Refuse',
+		x = 305, y = 9, w = 60, h = 34,
+		buttonstyle = 'FLAT',
+		text = g_tStrings.STR_REFUSE,
+		onclick = D.OnLButtonClick,
+	})
+	ui:Append('WndButton', {
+		name = 'Btn_Lookup',
+		x = 370, y = 9, w = 82, h = 34,
+		buttonstyle = 'FLAT',
+		text = info.dwID and g_tStrings.STR_LOOKUP or _L['Ask details'],
+		onhover = function(bIn)
+			if bIn then
+				D.OnMouseEnter()
+			else
+				D.OnMouseLeave()
+			end
+		end,
+		onclick = D.OnLButtonClick,
+	})
 
 	return wnd
 end
