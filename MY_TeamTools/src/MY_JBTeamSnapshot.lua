@@ -102,6 +102,9 @@ function D.CreateSnapshot()
 				LIB.Alert(_L['Upload snapshot failed!'] .. LIB.ReplaceSensitiveWord(Get(res, {'msg'}, _L['Request failed.'])))
 			end
 		end,
+		error = function()
+			LIB.Alert(_L['Upload snapshot failed!'])
+		end,
 	})
 end
 
