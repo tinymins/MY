@@ -1,0 +1,12 @@
+Farme	Left	Top	Width	High	File
+0	0	0	352	35	C:\Users\root\Desktop\¼ÓºÅ_1.tga
+1	0	37	352	35	C:\Users\root\Desktop\¼ÓºÅ_2.tga
+2	0	74	352	35	C:\Users\root\Desktop\¼ÓºÅ_3.tga
+3	0	111	352	35	C:\Users\root\Desktop\¼õºÅ_1.tga
+4	0	148	352	35	C:\Users\root\Desktop\¼õºÅ_2.tga
+5	0	185	352	35	C:\Users\root\Desktop\¼õºÅ_3.tga
+6	0	222	288	65	C:\Users\root\Desktop\°´Å¥_1.tga
+7	0	289	288	65	C:\Users\root\Desktop\°´Å¥_2.tga
+8	0	356	288	65	C:\Users\root\Desktop\°´Å¥_3.tga
+9	0	423	288	65	C:\Users\root\Desktop\°´Å¥_4.tga
+10	290	222	24	24	C:\Users\root\Desktop\À¶Ô².tga

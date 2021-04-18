@@ -175,7 +175,7 @@ function D.OnFrameCreate()
 	ui:Append('WndButton', {
 		x = 900, y = 52, w = 140, h = 27,
 		text = g_tStrings.SYS_MENU,
-		buttonstyle = 'SKEUOMORPHISM_LACE_BORDER',
+		buttonstyle = 'FLAT_LACE_BORDER',
 		menu = function()
 			local menu = {}
 			insert(menu, { szOption = _L['Import data (local)'], fnAction = function() D.OpenImportPanel() end }) -- 有传参 不要改
