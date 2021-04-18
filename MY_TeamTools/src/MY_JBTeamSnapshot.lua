@@ -139,7 +139,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
 		buttonstyle = 'LINK',
 		text = _L['>> View Snapshots <<'],
 		onclick = function()
-			UI.OpenBrowser('https://page.j3cx.com/jx3box/team/snapshot')
+			LIB.OpenBrowser('https://page.j3cx.com/jx3box/team/snapshot')
 		end,
 	}):AutoWidth():Width() + 5
 

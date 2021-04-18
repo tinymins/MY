@@ -1034,6 +1034,15 @@ function MY_CataclysmMain.OnLButtonClick()
 			-- 人数统计
 			insert(menu, { bDevide = true })
 			D.InsertForceCountMenu(menu)
+			-- 团队快照上传
+			if LIB.IsLeader() and IsTable(MY_JBTeamSnapshot) and IsFunction(MY_JBTeamSnapshot.CreateSnapshot) then
+				insert(menu, {
+					szOption = _L['Upload team snapshot'],
+					fnAction = function()
+						MY_JBTeamSnapshot.CreateSnapshot()
+					end,
+				})
+			end
 			insert(menu, { bDevide = true })
 		end
 		insert(menu, { szOption = _L['Interface settings'], rgb = { 255, 255, 0 }, fnAction = function()

@@ -1,6 +1,7 @@
 return {
 	-- MY_CataclysmMain.lua --
 	['Interface settings'] = '界面设置',
+	['Upload team snapshot'] = '团队快照上传',
 	['Cataclysm'] = '团队面板',
 	['Please hold down Ctrl, change it'] = '请按住Ctrl来更改分配模式。',
 	['Enable Cataclysm Team Panel'] = '启用团队面板',
