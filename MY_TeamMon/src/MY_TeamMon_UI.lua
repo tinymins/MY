@@ -2495,8 +2495,9 @@ function D.OpenSettingPanel(data, szType)
 							bChecked = v.nFrame == i,
 							fnAction = function()
 								v.nFrame = i
+								UI.ClosePopupMenu()
 							end,
-							szIcon = PACKET_INFO.ST_UITEX,
+							szIcon = PLUGIN_ROOT .. '/img/ST.UITex',
 							nFrame = i,
 							szLayer = 'ICON_FILL',
 						})

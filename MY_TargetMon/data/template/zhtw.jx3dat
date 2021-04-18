@@ -27,7 +27,7 @@ return {
 	cdBar               = false , -- 顯示倒計時條
 	cdBarWidth          = 240   , -- 倒計時條寬度
 	playSound           = true  , -- 是否播放聲音
-	cdBarUITex          = "Interface/MY/MY_Resource/img/ST.UITex|7",  -- 倒計時條圖素
+	cdBarUITex          = "UI/Image/Common/Money.UITex|210",  -- 倒計時條圖素
 	boxBgUITex          = "UI/Image/Common/Box.UITex|44",  -- Box背景圖素
 	anchor = { y = 152, x = -343, s = "TOPLEFT", r = "CENTER" },
 	monitors = {

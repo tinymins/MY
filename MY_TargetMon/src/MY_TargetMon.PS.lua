@@ -133,9 +133,6 @@ local CUSTOM_CDBAR_STYLES = {
 	'/ui/Image/Common/Money.UITex|233',
 	'/ui/Image/Common/Money.UITex|234',
 }
-for i = PACKET_INFO.ST_FRAME_COUNT, 0, -1 do
-	insert(CUSTOM_CDBAR_STYLES, 1, PACKET_INFO.ST_UITEX .. '|' .. i)
-end
 
 ----------------------------------------------------------------------------------------------
 -- …Ë÷√ΩÁ√Ê
@@ -904,6 +901,7 @@ local function DrawPreview(ui, config, OpenDetail)
 					szOption = p[2] or p[1],
 					fnAction = function()
 						D.ModifyConfig(config, 'boxBgUITex', p[1])
+						UI.ClosePopupMenu()
 					end,
 					szIcon = szIcon,
 					nFrame = nFrame,
@@ -931,6 +929,7 @@ local function DrawPreview(ui, config, OpenDetail)
 					szOption = text,
 					fnAction = function()
 						D.ModifyConfig(config, 'cdBarUITex', text)
+						UI.ClosePopupMenu()
 					end,
 					szIcon = szIcon,
 					nFrame = nFrame,
