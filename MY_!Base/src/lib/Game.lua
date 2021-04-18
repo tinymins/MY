@@ -495,10 +495,12 @@ function LIB.GetTypeGroupMap()
 	end
 	-- 类型排序权重
 	local tWeight = {} -- { ['风起稻香'] = 20, ['风起稻香 - 小队秘境'] = 21 }
-	for i = 2, g_tTable.DLCInfo:GetRowCount() do
-		local tLine = g_tTable.DLCInfo:GetRow(i)
-		local szVersionName = LIB.TrimString(tLine.szDLCName)
-		tWeight[szVersionName] = 2000 + i * 10
+	if g_tTable.DLCInfo then
+		for i = 2, g_tTable.DLCInfo:GetRowCount() do
+			local tLine = g_tTable.DLCInfo:GetRow(i)
+			local szVersionName = LIB.TrimString(tLine.szDLCName)
+			tWeight[szVersionName] = 2000 + i * 10
+		end
 	end
 	for i, szVersionName in ipairs(_L.GAME_VERSION_NAME) do
 		tWeight[szVersionName] = 1000 + i * 10
