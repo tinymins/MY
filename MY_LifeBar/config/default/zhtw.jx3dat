@@ -58,137 +58,137 @@ local __TEMPLATE__ = {
 		Self = { -- 自己
 			__META__,
 			__VALUE__ = {
-				DifferentiateForce = false,
-				Player = { 26, 156, 227 },
-				Npc    = { 26, 156, 227 },
-				[FORCE_TYPE.JIANG_HU ] = { 255, 255, 255 }, -- 江湖
-				[FORCE_TYPE.SHAO_LIN ] = { 255, 178, 95  }, -- 少林
-				[FORCE_TYPE.WAN_HUA  ] = { 196, 152, 255 }, -- 萬花
-				[FORCE_TYPE.TIAN_CE  ] = { 255, 111, 83  }, -- 天策
-				[FORCE_TYPE.CHUN_YANG] = { 22 , 216, 216 }, -- 純陽 56,175,255
-				[FORCE_TYPE.QI_XIU   ] = { 255, 129, 176 }, -- 七秀
-				[FORCE_TYPE.WU_DU    ] = { 55 , 147, 255 }, -- 五毒
-				[FORCE_TYPE.TANG_MEN ] = { 121, 183, 54  }, -- 唐門
-				[FORCE_TYPE.CANG_JIAN] = { 214, 249, 93  }, -- 藏劍
-				[FORCE_TYPE.GAI_BANG ] = { 205, 133, 63  }, -- 丐幫
-				[FORCE_TYPE.MING_JIAO] = { 240, 70 , 96  }, -- 明教
-				[FORCE_TYPE.CANG_YUN ] = { 180, 60 , 0   }, -- 蒼雲
-				[FORCE_TYPE.CHANG_GE ] = { 100, 250, 180 }, -- 長歌
-				[FORCE_TYPE.BA_DAO   ] = { 106, 108, 189 }, -- 霸刀
+				{'DifferentiateForce', false},
+				{'Player', { 26, 156, 227 }},
+				{'Npc', { 26, 156, 227 }},
+				{FORCE_TYPE.JIANG_HU , { 255, 255, 255 }}, -- 江湖
+				{FORCE_TYPE.SHAO_LIN , { 255, 178, 95  }}, -- 少林
+				{FORCE_TYPE.WAN_HUA  , { 196, 152, 255 }}, -- 萬花
+				{FORCE_TYPE.TIAN_CE  , { 255, 111, 83  }}, -- 天策
+				{FORCE_TYPE.CHUN_YANG, { 22 , 216, 216 }}, -- 純陽 56,175,255
+				{FORCE_TYPE.QI_XIU   , { 255, 129, 176 }}, -- 七秀
+				{FORCE_TYPE.WU_DU    , { 55 , 147, 255 }}, -- 五毒
+				{FORCE_TYPE.TANG_MEN , { 121, 183, 54  }}, -- 唐門
+				{FORCE_TYPE.CANG_JIAN, { 214, 249, 93  }}, -- 藏劍
+				{FORCE_TYPE.GAI_BANG , { 205, 133, 63  }}, -- 丐幫
+				{FORCE_TYPE.MING_JIAO, { 240, 70 , 96  }}, -- 明教
+				{FORCE_TYPE.CANG_YUN , { 180, 60 , 0   }}, -- 蒼雲
+				{FORCE_TYPE.CHANG_GE , { 100, 250, 180 }}, -- 長歌
+				{FORCE_TYPE.BA_DAO   , { 106, 108, 189 }}, -- 霸刀
 			},
 			__ARRAY_TEMPLATE__ = { 26, 156, 227 },
 		},
 		Party = { -- 團隊
 			__META__,
 			__VALUE__ = {
-				DifferentiateForce = false,
-				Player = { 23, 133, 194 },
-				Npc    = { 23, 133, 194 },
-				[FORCE_TYPE.JIANG_HU ] = { 255, 255, 255 }, -- 江湖
-				[FORCE_TYPE.SHAO_LIN ] = { 255, 178, 95  }, -- 少林
-				[FORCE_TYPE.WAN_HUA  ] = { 196, 152, 255 }, -- 萬花
-				[FORCE_TYPE.TIAN_CE  ] = { 255, 111, 83  }, -- 天策
-				[FORCE_TYPE.CHUN_YANG] = { 22 , 216, 216 }, -- 純陽 56,175,255
-				[FORCE_TYPE.QI_XIU   ] = { 255, 129, 176 }, -- 七秀
-				[FORCE_TYPE.WU_DU    ] = { 55 , 147, 255 }, -- 五毒
-				[FORCE_TYPE.TANG_MEN ] = { 121, 183, 54  }, -- 唐門
-				[FORCE_TYPE.CANG_JIAN] = { 214, 249, 93  }, -- 藏劍
-				[FORCE_TYPE.GAI_BANG ] = { 205, 133, 63  }, -- 丐幫
-				[FORCE_TYPE.MING_JIAO] = { 240, 70 , 96  }, -- 明教
-				[FORCE_TYPE.CANG_YUN ] = { 180, 60 , 0   }, -- 蒼雲
-				[FORCE_TYPE.CHANG_GE ] = { 100, 250, 180 }, -- 長歌
-				[FORCE_TYPE.BA_DAO   ] = { 106, 108, 189 }, -- 霸刀
+				{'DifferentiateForce', false},
+				{'Player', { 23, 133, 194 }},
+				{'Npc', { 23, 133, 194 }},
+				{FORCE_TYPE.JIANG_HU , { 255, 255, 255 }}, -- 江湖
+				{FORCE_TYPE.SHAO_LIN , { 255, 178, 95  }}, -- 少林
+				{FORCE_TYPE.WAN_HUA  , { 196, 152, 255 }}, -- 萬花
+				{FORCE_TYPE.TIAN_CE  , { 255, 111, 83  }}, -- 天策
+				{FORCE_TYPE.CHUN_YANG, { 22 , 216, 216 }}, -- 純陽 56,175,255
+				{FORCE_TYPE.QI_XIU   , { 255, 129, 176 }}, -- 七秀
+				{FORCE_TYPE.WU_DU    , { 55 , 147, 255 }}, -- 五毒
+				{FORCE_TYPE.TANG_MEN , { 121, 183, 54  }}, -- 唐門
+				{FORCE_TYPE.CANG_JIAN, { 214, 249, 93  }}, -- 藏劍
+				{FORCE_TYPE.GAI_BANG , { 205, 133, 63  }}, -- 丐幫
+				{FORCE_TYPE.MING_JIAO, { 240, 70 , 96  }}, -- 明教
+				{FORCE_TYPE.CANG_YUN , { 180, 60 , 0   }}, -- 蒼雲
+				{FORCE_TYPE.CHANG_GE , { 100, 250, 180 }}, -- 長歌
+				{FORCE_TYPE.BA_DAO   , { 106, 108, 189 }}, -- 霸刀
 			},
 			__ARRAY_TEMPLATE__ = { 23, 133, 194 },
 		},
 		Enemy = { -- 敵對
 			__META__,
 			__VALUE__ = {
-				DifferentiateForce = false,
-				Player = { 203, 53, 9 },
-				Npc    = { 203, 53, 9 },
-				[FORCE_TYPE.JIANG_HU ] = { 255, 255, 255 }, -- 江湖
-				[FORCE_TYPE.SHAO_LIN ] = { 255, 178, 95  }, -- 少林
-				[FORCE_TYPE.WAN_HUA  ] = { 196, 152, 255 }, -- 萬花
-				[FORCE_TYPE.TIAN_CE  ] = { 255, 111, 83  }, -- 天策
-				[FORCE_TYPE.CHUN_YANG] = { 22 , 216, 216 }, -- 純陽 56,175,255
-				[FORCE_TYPE.QI_XIU   ] = { 255, 129, 176 }, -- 七秀
-				[FORCE_TYPE.WU_DU    ] = { 55 , 147, 255 }, -- 五毒
-				[FORCE_TYPE.TANG_MEN ] = { 121, 183, 54  }, -- 唐門
-				[FORCE_TYPE.CANG_JIAN] = { 214, 249, 93  }, -- 藏劍
-				[FORCE_TYPE.GAI_BANG ] = { 205, 133, 63  }, -- 丐幫
-				[FORCE_TYPE.MING_JIAO] = { 240, 70 , 96  }, -- 明教
-				[FORCE_TYPE.CANG_YUN ] = { 180, 60 , 0   }, -- 蒼雲
-				[FORCE_TYPE.CHANG_GE ] = { 100, 250, 180 }, -- 長歌
-				[FORCE_TYPE.BA_DAO   ] = { 106, 108, 189 }, -- 霸刀
+				{'DifferentiateForce', false},
+				{'Player', { 203, 53, 9 }},
+				{'Npc', { 203, 53, 9 }},
+				{FORCE_TYPE.JIANG_HU , { 255, 255, 255 }}, -- 江湖
+				{FORCE_TYPE.SHAO_LIN , { 255, 178, 95  }}, -- 少林
+				{FORCE_TYPE.WAN_HUA  , { 196, 152, 255 }}, -- 萬花
+				{FORCE_TYPE.TIAN_CE  , { 255, 111, 83  }}, -- 天策
+				{FORCE_TYPE.CHUN_YANG, { 22 , 216, 216 }}, -- 純陽 56,175,255
+				{FORCE_TYPE.QI_XIU   , { 255, 129, 176 }}, -- 七秀
+				{FORCE_TYPE.WU_DU    , { 55 , 147, 255 }}, -- 五毒
+				{FORCE_TYPE.TANG_MEN , { 121, 183, 54  }}, -- 唐門
+				{FORCE_TYPE.CANG_JIAN, { 214, 249, 93  }}, -- 藏劍
+				{FORCE_TYPE.GAI_BANG , { 205, 133, 63  }}, -- 丐幫
+				{FORCE_TYPE.MING_JIAO, { 240, 70 , 96  }}, -- 明教
+				{FORCE_TYPE.CANG_YUN , { 180, 60 , 0   }}, -- 蒼雲
+				{FORCE_TYPE.CHANG_GE , { 100, 250, 180 }}, -- 長歌
+				{FORCE_TYPE.BA_DAO   , { 106, 108, 189 }}, -- 霸刀
 			},
 			__ARRAY_TEMPLATE__ = { 203, 53, 9 },
 		},
 		Neutrality = { -- 中立
 			__META__,
 			__VALUE__ = {
-				DifferentiateForce = false,
-				Player = { 238, 238, 15 },
-				Npc    = { 238, 238, 15 },
-				[FORCE_TYPE.JIANG_HU ] = { 255, 255, 255 }, -- 江湖
-				[FORCE_TYPE.SHAO_LIN ] = { 255, 178, 95  }, -- 少林
-				[FORCE_TYPE.WAN_HUA  ] = { 196, 152, 255 }, -- 萬花
-				[FORCE_TYPE.TIAN_CE  ] = { 255, 111, 83  }, -- 天策
-				[FORCE_TYPE.CHUN_YANG] = { 22 , 216, 216 }, -- 純陽 56,175,255
-				[FORCE_TYPE.QI_XIU   ] = { 255, 129, 176 }, -- 七秀
-				[FORCE_TYPE.WU_DU    ] = { 55 , 147, 255 }, -- 五毒
-				[FORCE_TYPE.TANG_MEN ] = { 121, 183, 54  }, -- 唐門
-				[FORCE_TYPE.CANG_JIAN] = { 214, 249, 93  }, -- 藏劍
-				[FORCE_TYPE.GAI_BANG ] = { 205, 133, 63  }, -- 丐幫
-				[FORCE_TYPE.MING_JIAO] = { 240, 70 , 96  }, -- 明教
-				[FORCE_TYPE.CANG_YUN ] = { 180, 60 , 0   }, -- 蒼雲
-				[FORCE_TYPE.CHANG_GE ] = { 100, 250, 180 }, -- 長歌
-				[FORCE_TYPE.BA_DAO   ] = { 106, 108, 189 }, -- 霸刀
+				{'DifferentiateForce', false},
+				{'Player', { 238, 238, 15 }},
+				{'Npc', { 238, 238, 15 }},
+				{FORCE_TYPE.JIANG_HU , { 255, 255, 255 }}, -- 江湖
+				{FORCE_TYPE.SHAO_LIN , { 255, 178, 95  }}, -- 少林
+				{FORCE_TYPE.WAN_HUA  , { 196, 152, 255 }}, -- 萬花
+				{FORCE_TYPE.TIAN_CE  , { 255, 111, 83  }}, -- 天策
+				{FORCE_TYPE.CHUN_YANG, { 22 , 216, 216 }}, -- 純陽 56,175,255
+				{FORCE_TYPE.QI_XIU   , { 255, 129, 176 }}, -- 七秀
+				{FORCE_TYPE.WU_DU    , { 55 , 147, 255 }}, -- 五毒
+				{FORCE_TYPE.TANG_MEN , { 121, 183, 54  }}, -- 唐門
+				{FORCE_TYPE.CANG_JIAN, { 214, 249, 93  }}, -- 藏劍
+				{FORCE_TYPE.GAI_BANG , { 205, 133, 63  }}, -- 丐幫
+				{FORCE_TYPE.MING_JIAO, { 240, 70 , 96  }}, -- 明教
+				{FORCE_TYPE.CANG_YUN , { 180, 60 , 0   }}, -- 蒼雲
+				{FORCE_TYPE.CHANG_GE , { 100, 250, 180 }}, -- 長歌
+				{FORCE_TYPE.BA_DAO   , { 106, 108, 189 }}, -- 霸刀
 			},
 			__ARRAY_TEMPLATE__ = { 238, 238, 15 },
 		},
 		Ally = { -- 相同陣營
 			__META__,
 			__VALUE__ = {
-				DifferentiateForce = false,
-				Player = { 63 , 210, 94 },
-				Npc    = { 63 , 210, 94 },
-				[FORCE_TYPE.JIANG_HU ] = { 255, 255, 255 }, -- 江湖
-				[FORCE_TYPE.SHAO_LIN ] = { 255, 178, 95  }, -- 少林
-				[FORCE_TYPE.WAN_HUA  ] = { 196, 152, 255 }, -- 萬花
-				[FORCE_TYPE.TIAN_CE  ] = { 255, 111, 83  }, -- 天策
-				[FORCE_TYPE.CHUN_YANG] = { 22 , 216, 216 }, -- 純陽 56,175,255
-				[FORCE_TYPE.QI_XIU   ] = { 255, 129, 176 }, -- 七秀
-				[FORCE_TYPE.WU_DU    ] = { 55 , 147, 255 }, -- 五毒
-				[FORCE_TYPE.TANG_MEN ] = { 121, 183, 54  }, -- 唐門
-				[FORCE_TYPE.CANG_JIAN] = { 214, 249, 93  }, -- 藏劍
-				[FORCE_TYPE.GAI_BANG ] = { 205, 133, 63  }, -- 丐幫
-				[FORCE_TYPE.MING_JIAO] = { 240, 70 , 96  }, -- 明教
-				[FORCE_TYPE.CANG_YUN ] = { 180, 60 , 0   }, -- 蒼雲
-				[FORCE_TYPE.CHANG_GE ] = { 100, 250, 180 }, -- 長歌
-				[FORCE_TYPE.BA_DAO   ] = { 106, 108, 189 }, -- 霸刀
+				{'DifferentiateForce', false},
+				{'Player', { 63 , 210, 94 }},
+				{'Npc', { 63 , 210, 94 }},
+				{FORCE_TYPE.JIANG_HU , { 255, 255, 255 }}, -- 江湖
+				{FORCE_TYPE.SHAO_LIN , { 255, 178, 95  }}, -- 少林
+				{FORCE_TYPE.WAN_HUA  , { 196, 152, 255 }}, -- 萬花
+				{FORCE_TYPE.TIAN_CE  , { 255, 111, 83  }}, -- 天策
+				{FORCE_TYPE.CHUN_YANG, { 22 , 216, 216 }}, -- 純陽 56,175,255
+				{FORCE_TYPE.QI_XIU   , { 255, 129, 176 }}, -- 七秀
+				{FORCE_TYPE.WU_DU    , { 55 , 147, 255 }}, -- 五毒
+				{FORCE_TYPE.TANG_MEN , { 121, 183, 54  }}, -- 唐門
+				{FORCE_TYPE.CANG_JIAN, { 214, 249, 93  }}, -- 藏劍
+				{FORCE_TYPE.GAI_BANG , { 205, 133, 63  }}, -- 丐幫
+				{FORCE_TYPE.MING_JIAO, { 240, 70 , 96  }}, -- 明教
+				{FORCE_TYPE.CANG_YUN , { 180, 60 , 0   }}, -- 蒼雲
+				{FORCE_TYPE.CHANG_GE , { 100, 250, 180 }}, -- 長歌
+				{FORCE_TYPE.BA_DAO   , { 106, 108, 189 }}, -- 霸刀
 			},
 			__ARRAY_TEMPLATE__ = { 63 , 210, 94 },
 		},
 		Foe = { -- 仇人
 			__META__,
 			__VALUE__ = {
-				DifferentiateForce = false,
-				Player = { 197, 26, 201 },
-				[FORCE_TYPE.JIANG_HU ] = { 255, 255, 255 }, -- 江湖
-				[FORCE_TYPE.SHAO_LIN ] = { 255, 178, 95  }, -- 少林
-				[FORCE_TYPE.WAN_HUA  ] = { 196, 152, 255 }, -- 萬花
-				[FORCE_TYPE.TIAN_CE  ] = { 255, 111, 83  }, -- 天策
-				[FORCE_TYPE.CHUN_YANG] = { 22 , 216, 216 }, -- 純陽 56,175,255
-				[FORCE_TYPE.QI_XIU   ] = { 255, 129, 176 }, -- 七秀
-				[FORCE_TYPE.WU_DU    ] = { 55 , 147, 255 }, -- 五毒
-				[FORCE_TYPE.TANG_MEN ] = { 121, 183, 54  }, -- 唐門
-				[FORCE_TYPE.CANG_JIAN] = { 214, 249, 93  }, -- 藏劍
-				[FORCE_TYPE.GAI_BANG ] = { 205, 133, 63  }, -- 丐幫
-				[FORCE_TYPE.MING_JIAO] = { 240, 70 , 96  }, -- 明教
-				[FORCE_TYPE.CANG_YUN ] = { 180, 60 , 0   }, -- 蒼雲
-				[FORCE_TYPE.CHANG_GE ] = { 100, 250, 180 }, -- 長歌
-				[FORCE_TYPE.BA_DAO   ] = { 106, 108, 189 }, -- 霸刀
+				{'DifferentiateForce', false},
+				{'Player', { 197, 26, 201 }},
+				{FORCE_TYPE.JIANG_HU , { 255, 255, 255 }}, -- 江湖
+				{FORCE_TYPE.SHAO_LIN , { 255, 178, 95  }}, -- 少林
+				{FORCE_TYPE.WAN_HUA  , { 196, 152, 255 }}, -- 萬花
+				{FORCE_TYPE.TIAN_CE  , { 255, 111, 83  }}, -- 天策
+				{FORCE_TYPE.CHUN_YANG, { 22 , 216, 216 }}, -- 純陽 56,175,255
+				{FORCE_TYPE.QI_XIU   , { 255, 129, 176 }}, -- 七秀
+				{FORCE_TYPE.WU_DU    , { 55 , 147, 255 }}, -- 五毒
+				{FORCE_TYPE.TANG_MEN , { 121, 183, 54  }}, -- 唐門
+				{FORCE_TYPE.CANG_JIAN, { 214, 249, 93  }}, -- 藏劍
+				{FORCE_TYPE.GAI_BANG , { 205, 133, 63  }}, -- 丐幫
+				{FORCE_TYPE.MING_JIAO, { 240, 70 , 96  }}, -- 明教
+				{FORCE_TYPE.CANG_YUN , { 180, 60 , 0   }}, -- 蒼雲
+				{FORCE_TYPE.CHANG_GE , { 100, 250, 180 }}, -- 長歌
+				{FORCE_TYPE.BA_DAO   , { 106, 108, 189 }}, -- 霸刀
 			},
 			__ARRAY_TEMPLATE__ = { 197, 26, 201 },
 		},

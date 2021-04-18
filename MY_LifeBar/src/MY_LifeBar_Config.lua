@@ -61,12 +61,14 @@ local function LoadDefaultTemplate(szStyle)
 	if not template then
 		return
 	end
-	for _, dwForceID in pairs_c(CONSTANT.FORCE_TYPE) do
-		for _, szRelation in ipairs({ 'Self', 'Party', 'Enemy', 'Neutrality', 'Ally', 'Foe' }) do
-			if not template[1].Color[szRelation].__VALUE__[dwForceID] then
-				template[1].Color[szRelation].__VALUE__[dwForceID] = { LIB.GetForceColor(dwForceID, 'foreground') }
+	for _, szRelation in ipairs({ 'Self', 'Party', 'Enemy', 'Neutrality', 'Ally', 'Foe' }) do
+		local tVal = LIB.KvpToObject(template[1].Color[szRelation].__VALUE__)
+		for _, dwForceID in pairs_c(CONSTANT.FORCE_TYPE) do
+			if not tVal[dwForceID] then
+				tVal[dwForceID] = { LIB.GetForceColor(dwForceID, 'foreground') }
 			end
 		end
+		template[1].Color[szRelation].__VALUE__ = tVal
 	end
 	if LIB.IsStreaming() then -- ÔÆ¶ËÎ¢µ÷¶ÔÁ¢ÑÕÉ«·ÀÖ¹Ñ¹ËõÄ£ºý
 		for _, szType in ipairs({ 'Player', 'Npc' }) do
