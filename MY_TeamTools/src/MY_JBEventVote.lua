@@ -395,25 +395,23 @@ end
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
 	local me = GetClientPlayer()
-	if not me or me.nMaxLevel ~= me.nLevel then
-		return
+	if me and me.nMaxLevel == me.nLevel then
+		nX = X
+		nY = nLFY
+		nY = nY + ui:Append('Text', { x = nX, y = nY, text = _L['Dungeon Vote'], font = 27 }):Height() + 2
+
+		nX = X + 10
+		nX = nX + ui:Append('WndButton', {
+			x = nX, y = nY, w = 'auto',
+			buttonstyle = 'FLAT',
+			text = _L['MY_JBEventVote'],
+			onclick = function()
+				D.Open()
+			end,
+		}):Width() + 5
+
+		nLFY = nY + LH
 	end
-
-	nX = X
-	nY = nLFY
-	nY = nY + ui:Append('Text', { x = nX, y = nY, text = _L['Dungeon Vote'], font = 27 }):Height() + 2
-
-	nX = X + 10
-	nX = nX + ui:Append('WndButton', {
-		x = nX, y = nY, w = 'auto',
-		buttonstyle = 'FLAT',
-		text = _L['MY_JBEventVote'],
-		onclick = function()
-			D.Open()
-		end,
-	}):Width() + 5
-
-	nLFY = nY + LH
 	return nX, nY, nLFY
 end
 
