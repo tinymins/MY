@@ -70,4 +70,13 @@ return {
     ['Sure to apply quit team %s?'] = '确定要退出团队 %s 吗？',
     ['Quit succeed!'] = '退出成功！',
     ['Quit failed!'] = '退出失败！',
+
+    -- MY_JBTeamSnapshot.lua
+    ['Team Snapshot'] = '团队快照',
+    ['Team name/id:'] = '团名/ID：',
+    ['(Input: Team@Server:Passcode)'] = '（输入：团队名称@服务器名:团队密码）',
+    ['Upload Snapshot'] = '快照上传',
+    ['>> View Snapshots <<'] = '>> 查看快照 <<',
+    ['Upload snapshot succeed!'] = '快照上传成功！',
+    ['Upload snapshot failed!'] = '快照上传失败！',
 }

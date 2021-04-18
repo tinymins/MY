@@ -1,7 +1,7 @@
 --------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
--- @desc     : JX3BOX 分页
+-- @desc     : 快捷入团
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
@@ -53,41 +53,125 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^3.0.1') then
 	return
 end
 --------------------------------------------------------------------------
-
-local PS = {
-	-- nPriority = 0,
-	-- bWelcome = true,
-	nShielded = LIB.IsDebugServer() and 2 or nil,
+local D = {}
+local O = {
+	szTeam = '',
 }
+RegisterCustomData('MY_JBTeamSnapshot.szTeam')
 
-function PS.OnPanelActive(wnd)
-	local ui = UI(wnd)
-	local X, Y, LH = 20, 20, 30
-	local W, H = ui:Size()
-	local nX, nY, nLFY = X, Y, Y
-
-	-- 角色认证
-	nX, nY, nLFY = MY_JBBind.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
-
-	-- 快捷入团
-	nX = X
-	nLFY = nLFY + 5
-	nX, nY, nLFY = MY_JBTeam.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
-
-	-- 赛事上报
-	nX = X
-	nLFY = nLFY + 5
-	nX, nY, nLFY = MY_JBAchievementRank.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
-
-	-- 赛事投票
-	nX = X
-	nLFY = nLFY + 5
-	nX, nY, nLFY = MY_JBEventVote.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
-
-	-- 团队快照
-	nX = X
-	nLFY = nLFY + 5
-	nX, nY, nLFY = MY_JBTeamSnapshot.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
+function D.CreateSnapshot()
+	local dwID = UI_GetClientPlayerID()
+	if IsRemotePlayer(dwID) then
+		LIB.Alert(_L['You are crossing server, please do this after backing.'])
+		return
+	end
+	if IsEmpty(O.szTeam) then
+		LIB.ShowPanel()
+		LIB.SwitchTab('MY_JX3BOX')
+		return LIB.Alert(_L['Please input team name/id.'])
+	end
+	local aTeammate = {}
+	local team = LIB.IsInParty() and GetClientTeam()
+	if team then
+		for _, dwTarID in ipairs(team.GetTeamMemberList()) do
+			local info = team.GetMemberInfo(dwTarID)
+			local guid = LIB.GetPlayerGUID(dwTarID) or 0
+			insert(aTeammate, dwID .. ',' .. guid)
+		end
+	end
+	local me = GetClientPlayer()
+	local szURL = 'https://push.j3cx.com/team/snapshot?'
+		.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
+			l = AnsiToUTF8(GLOBAL.GAME_LANG),
+			L = AnsiToUTF8(GLOBAL.GAME_EDITION),
+			team = AnsiToUTF8(O.szTeam),
+			cguid = LIB.GetClientGUID(),
+			jx3id = AnsiToUTF8(LIB.GetClientUUID()),
+			server = AnsiToUTF8(LIB.GetRealServer(2)),
+			teammate = AnsiToUTF8(concat(aTeammate, ';')),
+		}, '361aaabd-b494-4c28-ad8b-e9c297bb4739')))
+	LIB.Ajax({
+		driver = 'auto', mode = 'auto', method = 'auto',
+		url = szURL,
+		charset = 'utf8',
+		success = function(szHTML)
+			local res = LIB.JsonDecode(szHTML)
+			if Get(res, {'code'}) == 0 then
+				LIB.Alert(_L['Upload snapshot succeed!'])
+			else
+				LIB.Alert(_L['Upload snapshot failed!'] .. LIB.ReplaceSensitiveWord(Get(res, {'msg'}, _L['Request failed.'])))
+			end
+		end,
+	})
 end
 
-LIB.RegisterPanel(_L['Raid'], 'MY_JX3BOX', _L['Team Platform'], 5962, PS)
+function D.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
+	-- 快捷入团
+	nX = X
+	nY = nLFY
+	nY = nY + ui:Append('Text', { x = nX, y = nY, text = _L['Team Snapshot'], font = 27 }):Height() + 2
+
+	nX = X + 10
+	local bLoading
+	nX = nX + ui:Append('Text', { x = nX, y = nY, w = 'auto', text = _L['Team name/id:'] }):Width()
+	ui:Append('Text', {
+		x = nX, y = nY + LH, h = 25,
+		text = _L['(Input: Team@Server:Passcode)'],
+		color = { 172, 172, 172 },
+	}):AutoWidth()
+	nX = nX + ui:Append('WndEditBox', {
+		x = nX, y = nY + 2, w = 300, h = 25,
+		text = O.szTeam,
+		onchange = function(szText)
+			O.szTeam = szText
+		end,
+	}):Width() + 5
+	nX = nX + ui:Append('WndButton', {
+		x = nX, y = nY + 2,
+		buttonstyle = 'FLAT', text = _L['Upload Snapshot'],
+		onclick = function()
+			D.CreateSnapshot()
+		end,
+	}):Width() + 5
+	nX = nX + ui:Append('WndButtonBox', {
+		x = nX, y = nY + 5, w = 130, h = 20,
+		color = { 234, 235, 185 },
+		buttonstyle = 'LINK',
+		text = _L['>> View Snapshots <<'],
+		onclick = function()
+			UI.OpenBrowser('https://page.j3cx.com/jx3box/team/snapshot')
+		end,
+	}):AutoWidth():Width() + 5
+
+	nLFY = nY + LH
+	return nX, nY, nLFY
+end
+
+-- Global exports
+do
+local settings = {
+	exports = {
+		{
+			fields = {
+				CreateSnapshot = D.CreateSnapshot,
+				OnPanelActivePartial = D.OnPanelActivePartial,
+			},
+		},
+		{
+			fields = {
+				szTeam = true,
+			},
+			root = O,
+		},
+	},
+	imports = {
+		{
+			fields = {
+				szTeam = true,
+			},
+			root = O,
+		},
+	},
+}
+MY_JBTeamSnapshot = LIB.GeneGlobalNS(settings)
+end

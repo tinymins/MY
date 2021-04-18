@@ -34,7 +34,8 @@ return {
 	['Full win'] = '全勝',
 
     -- MY_JBEventVote.lua
-    ['MY_JBEventVote'] = '秘境百強榜',
+    ['Dungeon Vote'] = '賽事投票',
+    ['MY_JBEventVote'] = '團隊投票',
     ['ERR: Decode eventlist content as json failed!'] = '錯誤：解碼榜單列表失敗！',
     ['ERR: Eventlist content is illegal!'] = '錯誤：榜單列表內容數據結構不符合約束！',
     ['ERR404: Eventlist address not found!'] = '錯誤：榜單列表地址不存在！',
@@ -69,4 +70,13 @@ return {
     ['Sure to apply quit team %s?'] = '確定要退出團隊 %s 嗎？',
     ['Quit succeed!'] = '退出成功！',
     ['Quit failed!'] = '退出失敗！',
+
+    -- MY_JBTeamSnapshot.lua
+    ['Team Snapshot'] = '團隊快照',
+    ['Team name/id:'] = '團名/ID：',
+    ['(Input: Team@Server:Passcode)'] = '（輸入：團隊名稱@伺服器名:團隊密碼）',
+    ['Upload Snapshot'] = '快照上傳',
+    ['>> View Snapshots <<'] = '>> 查看快照 <<',
+    ['Upload snapshot succeed!'] = '快照上傳成功！',
+    ['Upload snapshot failed!'] = '快照上傳失敗！',
 }
