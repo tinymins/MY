@@ -103,7 +103,7 @@ function PS.OnPanelActive(wnd)
 		end
 	end
 	ui:Append('WndButton', {
-		x = x, y = y, w = 160,
+		x = x, y = y, w = 160, h = 25,
 		buttonstyle = 'FLAT',
 		text = _L['Restore default'],
 		onclick = function()
@@ -165,7 +165,7 @@ function PS.OnPanelActive(wnd)
 		end
 	end
 	ui:Append('WndButton', {
-		x = x, y = y, w = 160,
+		x = x, y = y, w = 160, h = 25,
 		text = _L['Restore default'],
 		buttonstyle = 'FLAT',
 		onclick = function()
