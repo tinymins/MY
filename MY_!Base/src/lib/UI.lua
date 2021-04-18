@@ -3492,6 +3492,7 @@ function OO:ButtonStyle(...)
 				return
 			end
 			local nFont = nil
+			local r, g, b = txt:GetFontColor()
 			if not btn:IsEnabled() then
 				nFont = tStyle.nDisableFont
 			elseif GetComponentProp(raw, 'bDown') then
@@ -3503,6 +3504,7 @@ function OO:ButtonStyle(...)
 			end
 			if nFont then
 				txt:SetFontScheme(nFont)
+				txt:SetFontColor(r, g, b)
 			end
 		end
 		for _, raw in ipairs(self.raws) do
