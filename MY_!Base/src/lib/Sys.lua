@@ -2213,23 +2213,38 @@ function LIB.ConnectDatabase(szCaption, oPath, fnAction)
 end
 end
 
+do
+local CURRENT_ACCOUNT
 function LIB.GetAccount()
-	if Login_GetAccount then
-		return Login_GetAccount()
-	end
-	if GetUserAccount then
-		return GetUserAccount()
-	end
-	local szAccount
-	local bSuccess, hFrame = XpCall(function() return Wnd.OpenWindow('LoginPassword') end)
-	if bSuccess and hFrame then
-		local hEdit = hFrame:Lookup('WndPassword/Edit_Account')
-		if hEdit then
-			szAccount = hEdit:GetText()
+	if IsNil(CURRENT_ACCOUNT) then
+		if not CURRENT_ACCOUNT and Login_GetAccount then
+			local bSuccess, szAccount = XpCall(Login_GetAccount)
+			if bSuccess and not IsEmpty(szAccount) then
+				CURRENT_ACCOUNT = szAccount
+			end
 		end
-		Wnd.CloseWindow(hFrame)
+		if not CURRENT_ACCOUNT and GetUserAccount then
+			local bSuccess, szAccount = XpCall(GetUserAccount)
+			if bSuccess and not IsEmpty(szAccount) then
+				CURRENT_ACCOUNT = szAccount
+			end
+		end
+		if not CURRENT_ACCOUNT then
+			local bSuccess, hFrame = XpCall(function() return Wnd.OpenWindow('LoginPassword') end)
+			if bSuccess and hFrame then
+				local hEdit = hFrame:Lookup('WndPassword/Edit_Account')
+				if hEdit then
+					CURRENT_ACCOUNT = hEdit:GetText()
+				end
+				Wnd.CloseWindow(hFrame)
+			end
+		end
+		if not CURRENT_ACCOUNT then
+			CURRENT_ACCOUNT = false
+		end
 	end
-	return szAccount
+	return CURRENT_ACCOUNT or nil
+end
 end
 
 function LIB.OpenBrowser(szAddr)
