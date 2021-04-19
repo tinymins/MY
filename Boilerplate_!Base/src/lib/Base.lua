@@ -741,6 +741,7 @@ local function KvpToObject(kvp)
 	end
 	return t
 end
+
 local GLOBAL = setmetatable({}, {
 	__index = setmetatable({
 		GAME_LANG     = _GAME_LANG_   ,
@@ -750,6 +751,7 @@ local GLOBAL = setmetatable({}, {
 	}, { __index = _G.GLOBAL }),
 	__newindex = function() end,
 })
+
 local PATH_TYPE = SetmetaReadonly({
 	NORMAL = 0,
 	DATA   = 1,
@@ -757,22 +759,36 @@ local PATH_TYPE = SetmetaReadonly({
 	GLOBAL = 3,
 	SERVER = 4,
 })
-local FORCE_TYPE = FORCE_TYPE or SetmetaReadonly({
-	JIANG_HU  = 0 , -- 江湖
-	SHAO_LIN  = 1 , -- 少林
-	WAN_HUA   = 2 , -- 万花
-	TIAN_CE   = 3 , -- 天策
-	CHUN_YANG = 4 , -- 纯阳
-	QI_XIU    = 5 , -- 七秀
-	WU_DU     = 6 , -- 五毒
-	TANG_MEN  = 7 , -- 唐门
-	CANG_JIAN = 8 , -- 藏剑
-	GAI_BANG  = 9 , -- 丐帮
-	MING_JIAO = 10, -- 明教
-	CANG_YUN  = 21, -- 苍云
-	LING_XUE  = 25, -- 凌雪
-	YAN_TIAN  = 211, -- 衍天
-})
+
+local FORCE_TYPE = (function()
+	local FORCE_TYPE = _G.FORCE_TYPE or SetmetaReadonly({
+		JIANG_HU  = 0 , -- 江湖
+		SHAO_LIN  = 1 , -- 少林
+		WAN_HUA   = 2 , -- 万花
+		TIAN_CE   = 3 , -- 天策
+		CHUN_YANG = 4 , -- 纯阳
+		QI_XIU    = 5 , -- 七秀
+		WU_DU     = 6 , -- 五毒
+		TANG_MEN  = 7 , -- 唐门
+		CANG_JIAN = 8 , -- 藏剑
+		GAI_BANG  = 9 , -- 丐帮
+		MING_JIAO = 10, -- 明教
+		CANG_YUN  = 21, -- 苍云
+		CHANG_GE  = 22, -- 长歌
+		BA_DAO    = 23, -- 霸刀
+		PENG_LAI  = 24, -- 蓬莱
+		LING_XUE  = 25, -- 凌雪
+		YAN_TIAN  = 211, -- 衍天
+	})
+	local res = {}
+	for k, v in pairs_c(FORCE_TYPE) do
+		if g_tStrings.tForceTitle[v] then
+			res[k] = v
+		end
+	end
+	return SetmetaReadonly(res)
+end)()
+
 local CONSTANT = setmetatable({}, {
 	__index = {
 		MENU_DIVIDER = SetmetaReadonly({ bDevide = true }),
@@ -865,21 +881,33 @@ local CONSTANT = setmetatable({}, {
 			TOTAL         = 25,
 		}),
 		FORCE_TYPE = FORCE_TYPE,
-		KUNGFU_TYPE = KUNGFU_TYPE or SetmetaReadonly({
-			TIAN_CE     = 1,      -- 天策内功
-			WAN_HUA     = 2,      -- 万花内功
-			CHUN_YANG   = 3,      -- 纯阳内功
-			QI_XIU      = 4,      -- 七秀内功
-			SHAO_LIN    = 5,      -- 少林内功
-			CANG_JIAN   = 6,      -- 藏剑内功
-			GAI_BANG    = 7,      -- 丐帮内功
-			MING_JIAO   = 8,      -- 明教内功
-			WU_DU       = 9,      -- 五毒内功
-			TANG_MEN    = 10,     -- 唐门内功
-			CANG_YUN    = 18,     -- 苍云内功
-			LING_XUE    = 22,     -- 凌雪内功
-			YAN_TIAN    = 23,     -- 衍天内功
-		}),
+		KUNGFU_TYPE = (function()
+			local KUNGFU_TYPE = _G.KUNGFU_TYPE or SetmetaReadonly({
+				TIAN_CE     = 1,      -- 天策内功
+				WAN_HUA     = 2,      -- 万花内功
+				CHUN_YANG   = 3,      -- 纯阳内功
+				QI_XIU      = 4,      -- 七秀内功
+				SHAO_LIN    = 5,      -- 少林内功
+				CANG_JIAN   = 6,      -- 藏剑内功
+				GAI_BANG    = 7,      -- 丐帮内功
+				MING_JIAO   = 8,      -- 明教内功
+				WU_DU       = 9,      -- 五毒内功
+				TANG_MEN    = 10,     -- 唐门内功
+				CANG_YUN    = 18,     -- 苍云内功
+				CHANG_GE    = 19,     -- 长歌内功
+				BA_DAO      = 20,     -- 霸刀内功
+				PENG_LAI    = 21,     -- 蓬莱内功
+				LING_XUE    = 22,     -- 凌雪内功
+				YAN_TIAN    = 23,     -- 衍天内功
+			})
+			local res = {}
+			for k, v in pairs_c(KUNGFU_TYPE) do
+				if g_tStrings.tForceTitle[v] then
+					res[k] = v
+				end
+			end
+			return SetmetaReadonly(res)
+		end)(),
 		PEEK_OTHER_PLAYER_RESPOND = PEEK_OTHER_PLAYER_RESPOND or SetmetaReadonly({
 			INVALID             = 0,
 			SUCCESS             = 1,
@@ -968,40 +996,49 @@ local CONSTANT = setmetatable({}, {
 		},
 		DOODAD_NAME = {},
 		DOODAD_NAME_FIX = {},
-		-- skillid, uitex, frame
-		KUNGFU_LIST = {
-			-- MT
-			{ dwID = 10062, nIcon = 632  , szUITex = 'ui/Image/icon/skill_tiance01.UITex'    , nFrame = 0  }, -- 铁牢
-			{ dwID = 10243, nIcon = 3864 , szUITex = 'ui/Image/icon/mingjiao_taolu_7.UITex'  , nFrame = 0  }, -- 明尊
-			{ dwID = 10389, nIcon = 6315 , szUITex = 'ui/Image/icon/Skill_CangY_33.UITex'    , nFrame = 0  }, -- 铁骨
-			{ dwID = 10002, nIcon = 429  , szUITex = 'ui/Image/icon/skill_shaolin14.UITex'   , nFrame = 0  }, -- 少林
-			-- 治疗
-			{ dwID = 10080, nIcon = 887  , szUITex = 'ui/Image/icon/skill_qixiu02.UITex'     , nFrame = 0  }, -- 云裳
-			{ dwID = 10176, nIcon = 2767 , szUITex = 'ui/Image/icon/wudu_neigong_2.UITex'    , nFrame = 0  }, -- 补天
-			{ dwID = 10028, nIcon = 412  , szUITex = 'ui/Image/icon/skill_wanhua23.UITex'    , nFrame = 0  }, -- 离经
-			{ dwID = 10448, nIcon = 7067 , szUITex = 'ui/Image/icon/skill_0514_23.UITex'     , nFrame = 0  }, -- 相知
-			-- 内功
-			{ dwID = 10225, nIcon = 3184 , szUITex = 'ui/Image/icon/skill_tangm_20.UITex'    , nFrame = 0  }, -- 天罗
-			{ dwID = 10081, nIcon = 888  , szUITex = 'ui/Image/icon/skill_qixiu03.UITex'     , nFrame = 0  }, -- 冰心
-			{ dwID = 10175, nIcon = 2766 , szUITex = 'ui/Image/icon/wudu_neigong_1.UITex'    , nFrame = 0  }, -- 毒经
-			{ dwID = 10242, nIcon = 3865 , szUITex = 'ui/Image/icon/mingjiao_taolu_8.UITex'  , nFrame = 0  }, -- 焚影
-			{ dwID = 10014, nIcon = 627  , szUITex = 'ui/Image/icon/skill_chunyang21.UITex'  , nFrame = 0  }, -- 紫霞
-			{ dwID = 10021, nIcon = 406  , szUITex = 'ui/Image/icon/skill_wanhua17.UITex'    , nFrame = 0  }, -- 花间
-			{ dwID = 10003, nIcon = 425  , szUITex = 'ui/Image/icon/skill_shaolin10.UITex'   , nFrame = 0  }, -- 易经
-			{ dwID = 10447, nIcon = 7071 , szUITex = 'ui/Image/icon/skill_0514_27.UITex'     , nFrame = 0  }, -- 莫问
-			{ dwID = 10615, nIcon = 13894, szUITex = 'ui/image/icon/skill_20_9_14_1.uitex'   , nFrame = 19 }, -- 太玄
-			-- 外功
-			{ dwID = 10390, nIcon = 6314 , szUITex = 'ui/Image/icon/Skill_CangY_32.UITex'    , nFrame = 0  }, -- 分山
-			{ dwID = 10224, nIcon = 3165 , szUITex = 'ui/Image/icon/skill_tangm_01.UITex'    , nFrame = 0  }, -- 鲸鱼
-			{ dwID = 10144, nIcon = 2376 , szUITex = 'ui/Image/icon/cangjian_neigong_1.UITex', nFrame = 0  }, -- 问水
-			{ dwID = 10145, nIcon = 2377 , szUITex = 'ui/Image/icon/cangjian_neigong_2.UITex', nFrame = 0  }, -- 山居
-			{ dwID = 10015, nIcon = 619  , szUITex = 'ui/Image/icon/skill_chunyang13.UITex'  , nFrame = 0  }, -- 剑纯
-			{ dwID = 10026, nIcon = 633  , szUITex = 'ui/Image/icon/skill_tiance02.UITex'    , nFrame = 0  }, -- 傲雪
-			{ dwID = 10268, nIcon = 4610 , szUITex = 'ui/Image/icon/skill_GB_30.UITex'       , nFrame = 0  }, -- 笑尘
-			{ dwID = 10464, nIcon = 8424 , szUITex = 'ui/Image/icon/daoj_16_8_25_16.UITex'   , nFrame = 0  }, -- 霸刀
-			{ dwID = 10533, nIcon = 10709, szUITex = 'ui/image/icon/JNPL_18_10_30_27.uitex'  , nFrame = 45 }, -- 蓬莱
-			{ dwID = 10585, nIcon = 12128, szUITex = 'ui/image/icon/JNLXG_19_10_21_9.uitex'  , nFrame = 74 }, -- 凌雪
-		},
+		KUNGFU_LIST = (function()
+			-- skillid, uitex, frame
+			local KUNGFU_LIST = {
+				-- MT
+				{ dwForceID = FORCE_TYPE.TIAN_CE  , dwID = 10062, nIcon = 632  , szUITex = 'ui/Image/icon/skill_tiance01.UITex'    , nFrame = 0  }, -- 铁牢
+				{ dwForceID = FORCE_TYPE.MING_JIAO, dwID = 10243, nIcon = 3864 , szUITex = 'ui/Image/icon/mingjiao_taolu_7.UITex'  , nFrame = 0  }, -- 明尊
+				{ dwForceID = FORCE_TYPE.CANG_YUN , dwID = 10389, nIcon = 6315 , szUITex = 'ui/Image/icon/Skill_CangY_33.UITex'    , nFrame = 0  }, -- 铁骨
+				{ dwForceID = FORCE_TYPE.SHAO_LIN , dwID = 10002, nIcon = 429  , szUITex = 'ui/Image/icon/skill_shaolin14.UITex'   , nFrame = 0  }, -- 少林
+				-- 治疗
+				{ dwForceID = FORCE_TYPE.QI_XIU   , dwID = 10080, nIcon = 887  , szUITex = 'ui/Image/icon/skill_qixiu02.UITex'     , nFrame = 0  }, -- 云裳
+				{ dwForceID = FORCE_TYPE.WU_DU    , dwID = 10176, nIcon = 2767 , szUITex = 'ui/Image/icon/wudu_neigong_2.UITex'    , nFrame = 0  }, -- 补天
+				{ dwForceID = FORCE_TYPE.WAN_HUA  , dwID = 10028, nIcon = 412  , szUITex = 'ui/Image/icon/skill_wanhua23.UITex'    , nFrame = 0  }, -- 离经
+				{ dwForceID = FORCE_TYPE.CHANG_GE , dwID = 10448, nIcon = 7067 , szUITex = 'ui/Image/icon/skill_0514_23.UITex'     , nFrame = 0  }, -- 相知
+				-- 内功
+				{ dwForceID = FORCE_TYPE.TANG_MEN , dwID = 10225, nIcon = 3184 , szUITex = 'ui/Image/icon/skill_tangm_20.UITex'    , nFrame = 0  }, -- 天罗
+				{ dwForceID = FORCE_TYPE.QI_XIU   , dwID = 10081, nIcon = 888  , szUITex = 'ui/Image/icon/skill_qixiu03.UITex'     , nFrame = 0  }, -- 冰心
+				{ dwForceID = FORCE_TYPE.WU_DU    , dwID = 10175, nIcon = 2766 , szUITex = 'ui/Image/icon/wudu_neigong_1.UITex'    , nFrame = 0  }, -- 毒经
+				{ dwForceID = FORCE_TYPE.MING_JIAO, dwID = 10242, nIcon = 3865 , szUITex = 'ui/Image/icon/mingjiao_taolu_8.UITex'  , nFrame = 0  }, -- 焚影
+				{ dwForceID = FORCE_TYPE.CHUN_YANG, dwID = 10014, nIcon = 627  , szUITex = 'ui/Image/icon/skill_chunyang21.UITex'  , nFrame = 0  }, -- 紫霞
+				{ dwForceID = FORCE_TYPE.WAN_HUA  , dwID = 10021, nIcon = 406  , szUITex = 'ui/Image/icon/skill_wanhua17.UITex'    , nFrame = 0  }, -- 花间
+				{ dwForceID = FORCE_TYPE.SHAO_LIN , dwID = 10003, nIcon = 425  , szUITex = 'ui/Image/icon/skill_shaolin10.UITex'   , nFrame = 0  }, -- 易经
+				{ dwForceID = FORCE_TYPE.CHANG_GE , dwID = 10447, nIcon = 7071 , szUITex = 'ui/Image/icon/skill_0514_27.UITex'     , nFrame = 0  }, -- 莫问
+				{ dwForceID = FORCE_TYPE.YAN_TIAN , dwID = 10615, nIcon = 13894, szUITex = 'ui/image/icon/skill_20_9_14_1.uitex'   , nFrame = 19 }, -- 太玄
+				-- 外功
+				{ dwForceID = FORCE_TYPE.CANG_YUN , dwID = 10390, nIcon = 6314 , szUITex = 'ui/Image/icon/Skill_CangY_32.UITex'    , nFrame = 0  }, -- 分山
+				{ dwForceID = FORCE_TYPE.TANG_MEN , dwID = 10224, nIcon = 3165 , szUITex = 'ui/Image/icon/skill_tangm_01.UITex'    , nFrame = 0  }, -- 鲸鱼
+				{ dwForceID = FORCE_TYPE.CANG_JIAN, dwID = 10144, nIcon = 2376 , szUITex = 'ui/Image/icon/cangjian_neigong_1.UITex', nFrame = 0  }, -- 问水
+				{ dwForceID = FORCE_TYPE.CANG_JIAN, dwID = 10145, nIcon = 2377 , szUITex = 'ui/Image/icon/cangjian_neigong_2.UITex', nFrame = 0  }, -- 山居
+				{ dwForceID = FORCE_TYPE.CHUN_YANG, dwID = 10015, nIcon = 619  , szUITex = 'ui/Image/icon/skill_chunyang13.UITex'  , nFrame = 0  }, -- 剑纯
+				{ dwForceID = FORCE_TYPE.TIAN_CE  , dwID = 10026, nIcon = 633  , szUITex = 'ui/Image/icon/skill_tiance02.UITex'    , nFrame = 0  }, -- 傲雪
+				{ dwForceID = FORCE_TYPE.GAI_BANG , dwID = 10268, nIcon = 4610 , szUITex = 'ui/Image/icon/skill_GB_30.UITex'       , nFrame = 0  }, -- 笑尘
+				{ dwForceID = FORCE_TYPE.BA_DAO   , dwID = 10464, nIcon = 8424 , szUITex = 'ui/Image/icon/daoj_16_8_25_16.UITex'   , nFrame = 0  }, -- 霸刀
+				{ dwForceID = FORCE_TYPE.PENG_LAI , dwID = 10533, nIcon = 10709, szUITex = 'ui/image/icon/JNPL_18_10_30_27.uitex'  , nFrame = 45 }, -- 蓬莱
+				{ dwForceID = FORCE_TYPE.LING_XUE , dwID = 10585, nIcon = 12128, szUITex = 'ui/image/icon/JNLXG_19_10_21_9.uitex'  , nFrame = 74 }, -- 凌雪
+			}
+			local res = {}
+			for _, v in ipairs(KUNGFU_LIST) do
+				if v.dwForceID and Table_GetSkill(v.dwID) then
+					insert(res, v)
+				end
+			end
+			return res
+		end)(),
 		FORCE_AVATAR = setmetatable(
 			KvpToObject({
 				{ FORCE_TYPE.JIANG_HU , {'ui\\Image\\PlayerAvatar\\jianghu.tga'  , -2, false} }, -- 江湖
