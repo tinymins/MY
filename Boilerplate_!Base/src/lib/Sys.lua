@@ -2035,8 +2035,8 @@ function LIB.GetAccount()
 		return GetUserAccount()
 	end
 	local szAccount
-	local hFrame = Wnd.OpenWindow('LoginPassword')
-	if hFrame then
+	local bSuccess, hFrame = XpCall(function() return Wnd.OpenWindow('LoginPassword') end)
+	if bSuccess and hFrame then
 		local hEdit = hFrame:Lookup('WndPassword/Edit_Account')
 		if hEdit then
 			szAccount = hEdit:GetText()
