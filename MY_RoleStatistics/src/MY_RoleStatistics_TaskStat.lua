@@ -496,7 +496,7 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 				if IsCtrlKeyDown() then
 					insert(aTitleTipXml, GetFormatText('(' .. aInfo[1] .. ')', 162, 255, 128, 0))
 				end
-				insert(aTitleTipXml, GetFormatText('[' .. Table_GetQuestStringInfo(aInfo[1]).szName .. ']\n', 162, 255, 255, 0))
+				insert(aTitleTipXml, GetFormatText('[' .. Get(Table_GetQuestStringInfo(aInfo[1]), 'szName', '') .. ']\n', 162, 255, 255, 0))
 			end
 			if task.aQuestInfo then
 				for _, aInfo in ipairs(task.aQuestInfo) do
@@ -571,7 +571,7 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 				if IsCtrlKeyDown() then
 					insert(aXml, GetFormatText('(' .. aInfo[1] .. ')', 162, 255, 128, 0))
 				end
-				insert(aXml, GetFormatText('[' .. Table_GetQuestStringInfo(aInfo[1]).szName .. ']: ', 162, 255, 255, 0))
+				insert(aXml, GetFormatText('[' .. Get(Table_GetQuestStringInfo(aInfo[1]), 'szName', '') .. ']: ', 162, 255, 255, 0))
 				if rec.task_info[aInfo[1]] == TASK_STATE.ACCEPTABLE then
 					insert(aXml, GetFormatText(_L['Acceptable'] .. '\n', 162, 255, 255, 255))
 				elseif rec.task_info[aInfo[1]] == TASK_STATE.UNACCEPTABLE then

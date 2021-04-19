@@ -188,7 +188,7 @@ local function GeneWeeklyCompare(id)
 		return v1 > v2 and 1 or -1
 	end
 end
-local COLUMN_LIST = {
+local COLUMN_LIST = lodash.filter({
 	-- guid,
 	-- account,
 	{ -- ¥Û«¯
@@ -338,6 +338,7 @@ local COLUMN_LIST = {
 	},
 	{ -- ‘∞’¨±“
 		id = 'architecture',
+		bVisible = GLOBAL.GAME_BRANCH ~= 'classic',
 		szTitle = _L['Architecture'],
 		nWidth = 60,
 		GetFormatText = GeneWeeklyFormatText('architecture'),
@@ -346,6 +347,7 @@ local COLUMN_LIST = {
 	},
 	{ -- ‘∞’¨±“÷‹”‡
 		id = 'architecture_remain',
+		bVisible = GLOBAL.GAME_BRANCH ~= 'classic',
 		szTitle = _L['Architecture remain'],
 		szShortTitle = _L['Arch_remain'],
 		nWidth = 60,
@@ -521,7 +523,8 @@ local COLUMN_LIST = {
 		end,
 		Compare = GeneCommonCompare('time'),
 	},
-}
+}, function(p) return p.bVisible ~= false end)
+
 local COLUMN_DICT = {}
 for _, p in ipairs(COLUMN_LIST) do
 	if not p.Compare then
@@ -740,8 +743,8 @@ function D.GetClientPlayerRec()
 	rec.exam_print = me.nExamPrint
 	rec.exam_print_remain = me.GetExamPrintRemainSpace()
 	rec.achievement_score = me.GetAchievementRecord()
-	rec.architecture = me.nArchitecture
-	rec.architecture_remain = me.GetArchitectureRemainSpace()
+	rec.architecture = me.nArchitecture or 0
+	rec.architecture_remain = IsFunction(me.GetArchitectureRemainSpace) and me.GetArchitectureRemainSpace() or 0,
 	rec.coin = me.nCoin
 	rec.mentor_score = me.dwTAEquipsScore
 	rec.starve = LIB.GetItemAmountInAllPackages(5, 34797, true)
