@@ -54,6 +54,10 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^3.0.1') then
 end
 --------------------------------------------------------------------------
 
+if GLOBAL.GAME_BRANCH == 'classic' then
+	return
+end
+
 local PASSPHRASE = 'gbn9@#4uirae823&^*423otyeaseaw'
 if LIB.IsDebugClient('MY_RoleStatistics_SerendipityStat', true) then
 	-- 自动生成内置加密数据
