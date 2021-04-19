@@ -56,6 +56,7 @@ end
 --------------------------------------------------------------------------
 
 local ANCHOR = {x = 65, y = 250, s = 'CENTER', r = 'CENTER'}
+local INI_PATH = PLUGIN_ROOT .. '/ui/PlayerBar.ini'
 local O = {
 	bEnable = false,
 	tAnchor = {},
@@ -452,7 +453,7 @@ function D.CopyHandle(frame)
 		if not Station.Lookup('Normal/PlayerBar', D.szShow) then
 			D.szShow = 'Handle_' .. D.szShowSub
 		end
-		hTotal:AppendItemFromIni('ui\\config\\default\\PlayerBar.ini', D.szShow)
+		hTotal:AppendItemFromIni(INI_PATH, D.szShow)
 		local h = hTotal:Lookup(D.szShow)
 		if D.szShowSub == 'MJ' then
 			h:AppendItemFromString('<image>x=-4 y=-1 w=44 h=40 path="ui\\Image\\UICommon\\skills2.UITex" frame=11</image>')
