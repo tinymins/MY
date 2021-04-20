@@ -83,6 +83,37 @@ local LOG_DOODAD_INFO_TIME_LIMIT = 10000 -- ½»»¥Îï¼þÐÅÏ¢ÔÙ´Î¼ÇÂ¼×îÐ¡Ê±¼ä¼ä¸ô
 local LOG_REPLAY = {} -- ×î½üµÄÊý¾Ý £¨½øÕ½Ê±ºò½«×î½üµÄÊý¾ÝÑ¹½øÀ´£©
 local LOG_REPLAY_FRAME = GLOBAL.GAME_FPS * 1 -- ½øÕ½Ê±ºò½«¶à¾ÃµÄÊý¾ÝÑ¹½øÀ´£¨Âß¼­Ö¡£©
 
+local LOG_TYPE = {
+	FIGHT_TIME                            = 1,
+	PLAYER_ENTER_SCENE                    = 2,
+	PLAYER_LEAVE_SCENE                    = 3,
+	PLAYER_INFO                           = 4,
+	PLAYER_FIGHT_HINT                     = 5,
+	NPC_ENTER_SCENE                       = 6,
+	NPC_LEAVE_SCENE                       = 7,
+	NPC_INFO                              = 8,
+	NPC_FIGHT_HINT                        = 9,
+	DOODAD_ENTER_SCENE                    = 10,
+	DOODAD_LEAVE_SCENE                    = 11,
+	DOODAD_INFO                           = 12,
+	BUFF_UPDATE                           = 13,
+	PLAYER_SAY                            = 14,
+	ON_WARNING_MESSAGE                    = 15,
+	PARTY_ADD_MEMBER                      = 16,
+	PARTY_SET_MEMBER_ONLINE_FLAG          = 17,
+	MSG_SYS                               = 18,
+	SYS_MSG_UI_OME_SKILL_CAST_LOG         = 19,
+	SYS_MSG_UI_OME_SKILL_CAST_RESPOND_LOG = 20,
+	SYS_MSG_UI_OME_SKILL_EFFECT_LOG       = 21,
+	SYS_MSG_UI_OME_SKILL_BLOCK_LOG        = 22,
+	SYS_MSG_UI_OME_SKILL_SHIELD_LOG       = 23,
+	SYS_MSG_UI_OME_SKILL_MISS_LOG         = 24,
+	SYS_MSG_UI_OME_SKILL_HIT_LOG          = 25,
+	SYS_MSG_UI_OME_SKILL_DODGE_LOG        = 26,
+	SYS_MSG_UI_OME_COMMON_HEALTH_LOG      = 27,
+	SYS_MSG_UI_OME_DEATH_NOTIFY           = 28,
+}
+
 -- ¸üÐÂÆôÓÃ×´Ì¬
 function D.UpdateEnable()
 	local bEnable = O.bEnable and (not O.bOnlyDungeon or LIB.IsInDungeon())
@@ -174,6 +205,7 @@ function D.InsertLog(szEvent, oData, bReplay)
 	if not LOG_ENABLE then
 		return
 	end
+	assert(szEvent, 'error: missing event id')
 	-- Éú³ÉÈÕÖ¾ÐÐ
 	local nLFC = GetLogicFrameCount()
 	local szLog = nLFC
@@ -225,7 +257,7 @@ LIB.RegisterEvent('MY_FIGHT_HINT', function()
 	end
 	local bFighting, szUUID, nDuring = arg0, arg1, arg2
 	if not bFighting then
-		D.InsertLog('FIGHT_TIME', { bFighting, szUUID, nDuring })
+		D.InsertLog(LOG_TYPE.FIGHT_TIME, { bFighting, szUUID, nDuring })
 	end
 	if bFighting then -- ½øÈëÐÂµÄÕ½¶·
 		D.OpenCombatLogs()
@@ -234,7 +266,7 @@ LIB.RegisterEvent('MY_FIGHT_HINT', function()
 		D.CloseCombatLogs()
 	end
 	if bFighting then
-		D.InsertLog('FIGHT_TIME', { bFighting, szUUID, nDuring })
+		D.InsertLog(LOG_TYPE.FIGHT_TIME, { bFighting, szUUID, nDuring })
 	end
 end)
 
@@ -281,14 +313,14 @@ function D.OnTargetUpdate(dwID, bForce)
 				tEquipInfo.dwTemporaryEnchantLeftSeconds,
 			})
 		end
-		D.InsertLog('PLAYER_INFO', { dwID, szName, dwForceID, dwMountKungfuID, nEquipScore, aEquip })
+		D.InsertLog(LOG_TYPE.PLAYER_INFO, { dwID, szName, dwForceID, dwMountKungfuID, nEquipScore, aEquip })
 	else
 		local npc = GetNpc(dwID)
 		if not npc then
 			return
 		end
 		local szName = LIB.GetObjectName(npc, 'never') or ''
-		D.InsertLog('NPC_INFO', { dwID, szName, npc.dwTemplateID, npc.dwEmployer, npc.nX, npc.nY, npc.nZ })
+		D.InsertLog(LOG_TYPE.NPC_INFO, { dwID, szName, npc.dwTemplateID, npc.dwEmployer, npc.nX, npc.nY, npc.nZ })
 	end
 	LOG_TARGET_INFO_TIME[dwID] = GetTime()
 end
@@ -302,7 +334,7 @@ function D.OnDoodadUpdate(dwID, bForce)
 	if not doodad then
 		return
 	end
-	D.InsertLog('DOODAD_INFO', { dwID, doodad.dwTemplateID, doodad.nX, doodad.nY, doodad.nZ })
+	D.InsertLog(LOG_TYPE.DOODAD_INFO, { dwID, doodad.dwTemplateID, doodad.nX, doodad.nY, doodad.nZ })
 	LOG_DOODAD_INFO_TIME[dwID] = GetTime()
 end
 
@@ -316,14 +348,14 @@ LIB.RegisterEvent('SYS_MSG', function()
 		-- (arg1)dwCaster£º¼¼ÄÜÊ©·ÅÕß (arg2)dwSkillID£º¼¼ÄÜID (arg3)dwLevel£º¼¼ÄÜµÈ¼¶
 		-- D.OnSkillCast(arg1, arg2, arg3)
 		D.OnTargetUpdate(arg1)
-		D.InsertLog('SYS_MSG.UI_OME_SKILL_CAST_LOG', { arg1, arg2, arg3 })
+		D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_SKILL_CAST_LOG, { arg1, arg2, arg3 })
 	elseif arg0 == 'UI_OME_SKILL_CAST_RESPOND_LOG' then
 		-- ¼¼ÄÜÊ©·Å½á¹ûÈÕÖ¾£»
 		-- (arg1)dwCaster£º¼¼ÄÜÊ©·ÅÕß (arg2)dwSkillID£º¼¼ÄÜID
 		-- (arg3)dwLevel£º¼¼ÄÜµÈ¼¶ (arg4)nRespond£º¼ûÃ¶¾ÙÐÍ[[SKILL_RESULT_CODE]]
 		-- D.OnSkillCastRespond(arg1, arg2, arg3, arg4)
 		D.OnTargetUpdate(arg1)
-		D.InsertLog('SYS_MSG.UI_OME_SKILL_CAST_RESPOND_LOG', { arg1, arg2, arg3, arg4 })
+		D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_SKILL_CAST_RESPOND_LOG, { arg1, arg2, arg3, arg4 })
 	elseif arg0 == 'UI_OME_SKILL_EFFECT_LOG' then
 		-- if not LIB.IsInArena() then
 		-- ¼¼ÄÜ×îÖÕ²úÉúµÄÐ§¹û£¨ÉúÃüÖµµÄ±ä»¯£©£»
@@ -331,54 +363,54 @@ LIB.RegisterEvent('SYS_MSG', function()
 		-- (arg6)dwLevel£ºEffectµÄµÈ¼¶ (arg7)bCriticalStrike£ºÊÇ·ñ»áÐÄ (arg8)nCount£ºtResultCountÊý¾Ý±íÖÐÔªËØ¸öÊý (arg9)tResultCount£ºÊýÖµ¼¯ºÏ
 		D.OnTargetUpdate(arg1)
 		D.OnTargetUpdate(arg2)
-		D.InsertLog('SYS_MSG.UI_OME_SKILL_EFFECT_LOG', { arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9 })
+		D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_SKILL_EFFECT_LOG, { arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9 })
 	elseif arg0 == 'UI_OME_SKILL_BLOCK_LOG' then
 		-- ¸ñµ²ÈÕÖ¾£»
 		-- (arg1)dwCaster£ºÊ©·ÅÕß (arg2)dwTarget£ºÄ¿±ê (arg3)nType£ºEffectµÄÀàÐÍ
 		-- (arg4)dwID£ºEffectµÄID (arg5)dwLevel£ºEffectµÄµÈ¼¶ (arg6)nDamageType£ºÉËº¦ÀàÐÍ£¬¼ûÃ¶¾ÙÐÍ[[SKILL_RESULT_TYPE]]
 		D.OnTargetUpdate(arg1)
 		D.OnTargetUpdate(arg2)
-		D.InsertLog('SYS_MSG.UI_OME_SKILL_BLOCK_LOG', { arg1, arg2, arg3, arg4, arg5, arg6 })
+		D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_SKILL_BLOCK_LOG, { arg1, arg2, arg3, arg4, arg5, arg6 })
 	elseif arg0 == 'UI_OME_SKILL_SHIELD_LOG' then
 		-- ¼¼ÄÜ±»ÆÁ±ÎÈÕÖ¾£»
 		-- (arg1)dwCaster£ºÊ©·ÅÕß (arg2)dwTarget£ºÄ¿±ê
 		-- (arg3)nType£ºEffectµÄÀàÐÍ (arg4)dwID£ºEffectµÄID (arg5)dwLevel£ºEffectµÄµÈ¼¶
 		D.OnTargetUpdate(arg1)
 		D.OnTargetUpdate(arg2)
-		D.InsertLog('SYS_MSG.UI_OME_SKILL_SHIELD_LOG', { arg1, arg2, arg3, arg4, arg5 })
+		D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_SKILL_SHIELD_LOG, { arg1, arg2, arg3, arg4, arg5 })
 	elseif arg0 == 'UI_OME_SKILL_MISS_LOG' then
 		-- ¼¼ÄÜÎ´ÃüÖÐÄ¿±êÈÕÖ¾£»
 		-- (arg1)dwCaster£ºÊ©·ÅÕß (arg2)dwTarget£ºÄ¿±ê
 		-- (arg3)nType£ºEffectµÄÀàÐÍ (arg4)dwID£ºEffectµÄID (arg5)dwLevel£ºEffectµÄµÈ¼¶
 		D.OnTargetUpdate(arg1)
 		D.OnTargetUpdate(arg2)
-		D.InsertLog('SYS_MSG.UI_OME_SKILL_MISS_LOG', { arg1, arg2, arg3, arg4, arg5 })
+		D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_SKILL_MISS_LOG, { arg1, arg2, arg3, arg4, arg5 })
 	elseif arg0 == 'UI_OME_SKILL_HIT_LOG' then
 		-- ¼¼ÄÜÃüÖÐÄ¿±êÈÕÖ¾£»
 		-- (arg1)dwCaster£ºÊ©·ÅÕß (arg2)dwTarget£ºÄ¿±ê
 		-- (arg3)nType£ºEffectµÄÀàÐÍ (arg4)dwID£ºEffectµÄID (arg5)dwLevel£ºEffectµÄµÈ¼¶
 		D.OnTargetUpdate(arg1)
 		D.OnTargetUpdate(arg2)
-		D.InsertLog('SYS_MSG.UI_OME_SKILL_HIT_LOG', { arg1, arg2, arg3, arg4, arg5 })
+		D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_SKILL_HIT_LOG, { arg1, arg2, arg3, arg4, arg5 })
 	elseif arg0 == 'UI_OME_SKILL_DODGE_LOG' then
 		-- ¼¼ÄÜ±»ÉÁ±ÜÈÕÖ¾£»
 		-- (arg1)dwCaster£ºÊ©·ÅÕß (arg2)dwTarget£ºÄ¿±ê
 		-- (arg3)nType£ºEffectµÄÀàÐÍ (arg4)dwID£ºEffectµÄID (arg5)dwLevel£ºEffectµÄµÈ¼¶
 		D.OnTargetUpdate(arg1)
 		D.OnTargetUpdate(arg2)
-		D.InsertLog('SYS_MSG.UI_OME_SKILL_DODGE_LOG', { arg1, arg2, arg3, arg4, arg5 })
+		D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_SKILL_DODGE_LOG, { arg1, arg2, arg3, arg4, arg5 })
 	elseif arg0 == 'UI_OME_COMMON_HEALTH_LOG' then
 		-- ÆÕÍ¨ÖÎÁÆÈÕÖ¾£»
 		-- (arg1)dwCharacterID£º³ÐÁÆÍæ¼ÒID (arg2)nDeltaLife£ºÔö¼ÓÑªÁ¿Öµ
 		-- D.OnCommonHealth(arg1, arg2)
 		D.OnTargetUpdate(arg1)
-		D.InsertLog('SYS_MSG.UI_OME_COMMON_HEALTH_LOG', { arg1, arg2 })
+		D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_COMMON_HEALTH_LOG, { arg1, arg2 })
 	elseif arg0 == 'UI_OME_DEATH_NOTIFY' then
 		-- ËÀÍöÈÕÖ¾£»
 		-- (arg1)dwCharacterID£ºËÀÍöÄ¿±êID (arg2)dwKiller£º»÷É±ÕßID
 		D.OnTargetUpdate(arg1)
 		D.OnTargetUpdate(arg2)
-		D.InsertLog('SYS_MSG.UI_OME_DEATH_NOTIFY', { arg1, arg2 })
+		D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_DEATH_NOTIFY, { arg1, arg2 })
 	end
 end)
 
@@ -394,7 +426,7 @@ LIB.RegisterEvent('BUFF_UPDATE', function()
 	-- arg4£ºdwBuffID£¬arg5£ºnStackNum£¬arg6£ºnEndFrame£¬arg7£º£¿update all?
 	-- arg8£ºnLevel£¬arg9£ºdwSkillSrcID
 	D.OnTargetUpdate(arg0)
-	D.InsertLog('BUFF_UPDATE', { arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11 })
+	D.InsertLog(LOG_TYPE.BUFF_UPDATE, { arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11 })
 end)
 
 LIB.RegisterEvent('PLAYER_ENTER_SCENE', function()
@@ -402,7 +434,7 @@ LIB.RegisterEvent('PLAYER_ENTER_SCENE', function()
 		return
 	end
 	D.OnTargetUpdate(arg0)
-	D.InsertLog('PLAYER_ENTER_SCENE', { arg0 })
+	D.InsertLog(LOG_TYPE.PLAYER_ENTER_SCENE, { arg0 })
 end)
 
 LIB.RegisterEvent('PLAYER_LEAVE_SCENE', function()
@@ -410,7 +442,7 @@ LIB.RegisterEvent('PLAYER_LEAVE_SCENE', function()
 		return
 	end
 	D.OnTargetUpdate(arg0)
-	D.InsertLog('PLAYER_LEAVE_SCENE', { arg0 })
+	D.InsertLog(LOG_TYPE.PLAYER_LEAVE_SCENE, { arg0 })
 end)
 
 LIB.RegisterEvent('NPC_ENTER_SCENE', function()
@@ -418,7 +450,7 @@ LIB.RegisterEvent('NPC_ENTER_SCENE', function()
 		return
 	end
 	D.OnTargetUpdate(arg0)
-	D.InsertLog('NPC_ENTER_SCENE', { arg0 })
+	D.InsertLog(LOG_TYPE.NPC_ENTER_SCENE, { arg0 })
 end)
 
 LIB.RegisterEvent('NPC_LEAVE_SCENE', function()
@@ -426,7 +458,7 @@ LIB.RegisterEvent('NPC_LEAVE_SCENE', function()
 		return
 	end
 	D.OnTargetUpdate(arg0)
-	D.InsertLog('NPC_LEAVE_SCENE', { arg0 })
+	D.InsertLog(LOG_TYPE.NPC_LEAVE_SCENE, { arg0 })
 end)
 
 LIB.RegisterEvent('DOODAD_ENTER_SCENE', function()
@@ -434,7 +466,7 @@ LIB.RegisterEvent('DOODAD_ENTER_SCENE', function()
 		return
 	end
 	D.OnDoodadUpdate(arg0)
-	D.InsertLog('DOODAD_ENTER_SCENE', { arg0 })
+	D.InsertLog(LOG_TYPE.DOODAD_ENTER_SCENE, { arg0 })
 end)
 
 LIB.RegisterEvent('DOODAD_LEAVE_SCENE', function()
@@ -442,7 +474,7 @@ LIB.RegisterEvent('DOODAD_LEAVE_SCENE', function()
 		return
 	end
 	D.OnDoodadUpdate(arg0)
-	D.InsertLog('DOODAD_LEAVE_SCENE', { arg0 })
+	D.InsertLog(LOG_TYPE.DOODAD_LEAVE_SCENE, { arg0 })
 end)
 
 -- ÏµÍ³ÏûÏ¢ÈÕÖ¾
@@ -458,7 +490,7 @@ LIB.RegisterMsgMonitor('MSG_SYS.MY_Recount_DS_Everything', function(szChannel, s
 		szText = LIB.GetPureText(szMsg)
 	end
 	szText = szText:gsub('\r', '')
-	D.InsertLog('MSG_SYS', { szText, szChannel })
+	D.InsertLog(LOG_TYPE.MSG_SYS, { szText, szChannel })
 end)
 
 -- ½ÇÉ«º°»°ÈÕÖ¾
@@ -472,7 +504,7 @@ LIB.RegisterEvent('PLAYER_SAY', function()
 		local szText = LIB.GetPureText(arg0)
 		if szText and szText ~= '' then
 			D.OnTargetUpdate(arg1)
-			D.InsertLog('PLAYER_SAY', { szText, arg1, arg2, arg3 })
+			D.InsertLog(LOG_TYPE.PLAYER_SAY, { szText, arg1, arg2, arg3 })
 		end
 	end
 end)
@@ -483,7 +515,7 @@ LIB.RegisterEvent('ON_WARNING_MESSAGE', function()
 		return
 	end
 	-- arg0: szWarningType, arg1: szText
-	D.InsertLog('ON_WARNING_MESSAGE', { arg0, arg1 })
+	D.InsertLog(LOG_TYPE.ON_WARNING_MESSAGE, { arg0, arg1 })
 end)
 
 -- Íæ¼Ò½øÈëÍË³öÕ½¶·ÈÕÖ¾
@@ -499,7 +531,7 @@ LIB.RegisterEvent('MY_PLAYER_FIGHT_HINT', function()
 		nCurrentMana, nMaxMana = KObject.nCurrentMana, KObject.nMaxMana
 	end
 	D.OnTargetUpdate(dwID, true)
-	D.InsertLog('PLAYER_FIGHT_HINT', { dwID, bFight, fCurrentLife, fMaxLife, nCurrentMana, nMaxMana })
+	D.InsertLog(LOG_TYPE.PLAYER_FIGHT_HINT, { dwID, bFight, fCurrentLife, fMaxLife, nCurrentMana, nMaxMana })
 end)
 
 -- NPC ½øÈëÍË³öÕ½¶·ÈÕÖ¾
@@ -515,7 +547,7 @@ LIB.RegisterEvent('MY_NPC_FIGHT_HINT', function()
 		nCurrentMana, nMaxMana = KObject.nCurrentMana, KObject.nMaxMana
 	end
 	D.OnTargetUpdate(dwID, true)
-	D.InsertLog('NPC_FIGHT_HINT', { dwID, bFight, fCurrentLife, fMaxLife, nCurrentMana, nMaxMana })
+	D.InsertLog(LOG_TYPE.NPC_FIGHT_HINT, { dwID, bFight, fCurrentLife, fMaxLife, nCurrentMana, nMaxMana })
 end)
 
 -- ÉÏÏßÏÂÏßÈÕÖ¾
@@ -525,7 +557,7 @@ LIB.RegisterEvent('PARTY_SET_MEMBER_ONLINE_FLAG', function()
 	end
 	-- arg0: dwTeamID, arg1: dwMemberID, arg2: nOnlineFlag
 	D.OnTargetUpdate(arg1)
-	D.InsertLog('PARTY_SET_MEMBER_ONLINE_FLAG', { arg0, arg1, arg2 })
+	D.InsertLog(LOG_TYPE.PARTY_SET_MEMBER_ONLINE_FLAG, { arg0, arg1, arg2 })
 end)
 
 -- ½ø³öÕ½¶·ÔÝÀë¼ÇÂ¼
@@ -543,9 +575,9 @@ LIB.RegisterEvent('MY_RECOUNT_NEW_FIGHT', function() -- ¿ªÕ½É¨Ãè¶ÓÓÑ ¼ÇÂ¼¿ªÕ½¾ÍË
 		if info then
 			D.OnTargetUpdate(dwID)
 			if not info.bIsOnLine then
-				D.InsertLog('PARTY_SET_MEMBER_ONLINE_FLAG', { team.dwTeamID, dwID, 0 })
+				D.InsertLog(LOG_TYPE.PARTY_SET_MEMBER_ONLINE_FLAG, { team.dwTeamID, dwID, 0 })
 			elseif info.bDeathFlag then
-				D.InsertLog('SYS_MSG.UI_OME_DEATH_NOTIFY', { dwID, nil })
+				D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_DEATH_NOTIFY, { dwID, nil })
 			end
 		end
 	end
@@ -558,7 +590,7 @@ LIB.RegisterEvent('PARTY_ADD_MEMBER', function()
 	end
 	-- arg0: dwTeamID, arg1: dwMemberID, arg2: nGroupIndex
 	D.OnTargetUpdate(arg1)
-	D.InsertLog('PARTY_ADD_MEMBER', { arg0, arg1, arg2 })
+	D.InsertLog(LOG_TYPE.PARTY_ADD_MEMBER, { arg0, arg1, arg2 })
 end)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
