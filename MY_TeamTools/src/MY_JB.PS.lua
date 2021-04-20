@@ -57,7 +57,9 @@ end
 local PS = {
 	-- nPriority = 0,
 	-- bWelcome = true,
-	nShielded = LIB.IsDebugServer() and 2 or nil,
+	nShielded = (LIB.IsDebugServer() or (GetCurrentTime() < 1619020800 and not LIB.IsDebugClient('MY_JB')))
+		and 2
+		or nil,
 }
 
 function PS.OnPanelActive(wnd)
@@ -78,6 +80,7 @@ function PS.OnPanelActive(wnd)
 	nX = X
 	nLFY = nLFY + 5
 	nX, nY, nLFY = MY_JBAchievementRank.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
+	nX, nY, nLFY = MY_CombatLogs.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
 
 	-- ÈüÊÂÍ¶Æ±
 	nX = X

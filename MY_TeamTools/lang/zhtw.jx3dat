@@ -199,4 +199,11 @@ return {
 	['Save Advertising'] = '保存喊話',
 	['Save Advertising Name'] = '保存名(如：燭龍殿2/HG) 5字內',
 	['Advertising List'] = '喊話列表 （左鍵導入聊天框，右鍵更多選項）',
+
+    -- MY_CombatLogs.lua
+    ['MY_CombatLogs'] = '戰鬥事件記錄',
+    ['Only in dungeon'] = '僅在秘境中啟用',
+    ['Max history'] = '最大歷史記錄',
+    ['Min fight time'] = '最小戰鬥時間',
+    ['%s second(s)'] = '%s秒',
 }

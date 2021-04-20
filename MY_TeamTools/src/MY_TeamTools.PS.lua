@@ -57,8 +57,9 @@ local PS = { nPriority = 0 }
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
 	local X, Y = 20, 30
-	local nX, nY = X, Y
+	local nX, nY, nLFY = X, Y, Y
 	local W, H = ui:Size()
+	local LH = 25
 
 	ui:Append('WndButton', {
 		x = W - 165, y = nY, w = 150, h = 38,
@@ -98,6 +99,9 @@ function PS.OnPanelActive(wnd)
 			end,
 		}):AutoWidth():Width() + 5
 	end
+
+	nLFY = nY + LH
+	nX, nY, nLFY = MY_CombatLogs.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
 
 	nX = X
 	nY = nY + 30
