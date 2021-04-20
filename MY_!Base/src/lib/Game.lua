@@ -2845,8 +2845,11 @@ end
 -- (mixed) LIB.IsInvincible([object KObject])
 -- @return <nil >: invalid KObject
 -- @return <bool>: object invincible state
-function LIB.IsInvincible(KObject)
-	KObject = KObject or GetClientPlayer()
+function LIB.IsInvincible(...)
+	local KObject = ...
+	if select('#', ...) == 0 then
+		KObject = GetClientPlayer()
+	end
 	if not KObject then
 		return nil
 	elseif LIB.GetBuff(KObject, 961) then
@@ -2856,10 +2859,31 @@ function LIB.IsInvincible(KObject)
 	end
 end
 
+-- 获取对象是否被隔离
+-- (mixed) LIB.IsIsolated([object KObject])
+-- @return <nil >: invalid KObject
+-- @return <bool>: object isolated state
+function LIB.IsIsolated(...)
+	local KObject = ...
+	if select('#', ...) == 0 then
+		KObject = GetClientPlayer()
+	end
+	if not KObject then
+		return false
+	end
+	if GLOBAL.GAME_BRANCH == 'classic' then
+		return false
+	end
+	return KObject.bIsolated
+end
+
 -- 获取对象当前是否可读条
 -- (bool) LIB.CanOTAction([object KObject])
-function LIB.CanOTAction(KObject)
-	KObject = KObject or GetClientPlayer()
+function LIB.CanOTAction(...)
+	local KObject = ...
+	if select('#', ...) == 0 then
+		KObject = GetClientPlayer()
+	end
 	if not KObject then
 		return
 	end
