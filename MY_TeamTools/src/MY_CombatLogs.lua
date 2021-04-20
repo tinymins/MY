@@ -121,9 +121,12 @@ function D.UpdateEnable()
 	local bEnable = O.bEnable and (not O.bOnlyDungeon or LIB.IsInDungeon())
 	if not bEnable and LOG_ENABLE then
 		D.CloseCombatLogs()
+	elseif bEnable and not LOG_ENABLE and LIB.IsFighting() then
+		D.OpenCombatLogs()
 	end
 	LOG_ENABLE = bEnable
 end
+LIB.RegisterEvent('LOADING_ENDING', D.UpdateEnable)
 
 -- 加载历史数据列表
 function D.GetHistoryFiles()
