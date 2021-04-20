@@ -470,7 +470,8 @@ function CheckInvalidRect(dwType, dwID, me, object)
 	and not object.CanSeeName()
 	and (object.dwTemplateID ~= CHANGGE_REAL_SHADOW_TPLID or (bShieldedVersion and IsEnemy(me.dwID, dwID)))
 	and (
-		not Config.bShowSpecialNpc or (bShieldedVersion and not LIB.IsInDungeon())
+		bShieldedVersion
+		or not Config.bShowSpecialNpc or (bShieldedVersion and not LIB.IsInDungeon())
 		or (Config.bShowSpecialNpcOnlyEnemy and not IsEnemy(me.dwID, dwID))
 		or NPC_HIDDEN[object.dwTemplateID]
 	) then

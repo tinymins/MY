@@ -830,33 +830,35 @@ function PS.OnPanelActive(wnd)
 		autoenable = function() return D.IsEnabled() and Config.bShowObjectID end,
 	}):AutoWidth():Width()
 
-	x = X
-	y = y + offsety - 10
-	x = x + ui:Append('WndCheckBox', {
-		name = 'WndCheckBox_ShowSpecialNpc',
-		x = x, y = y, text = _L['Show special npc'],
-		checked = Config.bShowSpecialNpc,
-		oncheck = function(bChecked)
-			Config.bShowSpecialNpc = bChecked
-			D.Reset()
-		end,
-		tip = _L['This function has been shielded by official except in dungeon'],
-		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
-		autoenable = function() return D.IsEnabled() end,
-	}):AutoWidth():Width() + 5
-	ui:Append('WndCheckBox', {
-		name = 'WndCheckBox_ShowSpecialNpcOnlyEnemy',
-		x = x, y = y, w = 'auto',
-		text = _L['Only enemy'],
-		checked = Config.bShowSpecialNpcOnlyEnemy,
-		oncheck = function(bChecked)
-			Config.bShowSpecialNpcOnlyEnemy = bChecked
-			D.Reset()
-		end,
-		tip = _L['This function has been shielded by official except in dungeon'],
-		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
-		autoenable = function() return D.IsEnabled() and Config.bShowSpecialNpc end,
-	})
+	if not LIB.IsShieldedVersion('MY_LifeBar') then
+		x = X
+		y = y + offsety - 10
+		x = x + ui:Append('WndCheckBox', {
+			name = 'WndCheckBox_ShowSpecialNpc',
+			x = x, y = y, text = _L['Show special npc'],
+			checked = Config.bShowSpecialNpc,
+			oncheck = function(bChecked)
+				Config.bShowSpecialNpc = bChecked
+				D.Reset()
+			end,
+			tip = _L['This function has been shielded by official except in dungeon'],
+			tippostype = UI.TIP_POSITION.TOP_BOTTOM,
+			autoenable = function() return D.IsEnabled() end,
+		}):AutoWidth():Width() + 5
+		ui:Append('WndCheckBox', {
+			name = 'WndCheckBox_ShowSpecialNpcOnlyEnemy',
+			x = x, y = y, w = 'auto',
+			text = _L['Only enemy'],
+			checked = Config.bShowSpecialNpcOnlyEnemy,
+			oncheck = function(bChecked)
+				Config.bShowSpecialNpcOnlyEnemy = bChecked
+				D.Reset()
+			end,
+			tip = _L['This function has been shielded by official except in dungeon'],
+			tippostype = UI.TIP_POSITION.TOP_BOTTOM,
+			autoenable = function() return D.IsEnabled() and Config.bShowSpecialNpc end,
+		})
+	end
 
 	x = X
 	y = y + offsety - 10
