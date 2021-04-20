@@ -416,7 +416,7 @@ function LIB.GetAbsolutePath(oPath)
 	if szPath:sub(2, 2) == ':' then
 		return szPath
 	end
-	return GetRootPath():gsub('\\', '/') .. '/' .. LIB.GetRelativePath(szPath, {'', PATH_TYPE.NORMAL}):gsub('^[./\\]*', '')
+	return LIB.NormalizePath(GetRootPath():gsub('\\', '/') .. '/' .. LIB.GetRelativePath(szPath, {'', PATH_TYPE.NORMAL}):gsub('^[./\\]*', ''))
 end
 
 function LIB.GetLUADataPath(oFilePath)
