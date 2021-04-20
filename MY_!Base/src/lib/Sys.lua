@@ -1087,8 +1087,9 @@ LIB.BreatheCall(NSFormatString('{$NS}#STORAGE_DATA'), 200, function()
 	if not me or IsRemotePlayer(me.dwID) or not LIB.GetTongName() then
 		return
 	end
+	LIB.BreatheCall(NSFormatString('{$NS}#STORAGE_DATA'), false)
 	if LIB.IsDebugServer() then
-		return 0
+		return
 	end
 	m_nStorageVer = LIB.LoadLUAData({'config/storageversion.jx3dat', PATH_TYPE.ROLE}) or {}
 	LIB.Ajax({
@@ -1131,7 +1132,6 @@ LIB.BreatheCall(NSFormatString('{$NS}#STORAGE_DATA'), 200, function()
 			end
 		end
 	})
-	return 0
 end)
 LIB.RegisterFlush(NSFormatString('{$NS}#STORAGE_DATA'), function()
 	LIB.SaveLUAData({'config/storageversion.jx3dat', PATH_TYPE.ROLE}, m_nStorageVer)
