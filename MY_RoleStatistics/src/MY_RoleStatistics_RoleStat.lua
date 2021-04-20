@@ -744,7 +744,7 @@ function D.GetClientPlayerRec()
 	rec.exam_print_remain = me.GetExamPrintRemainSpace()
 	rec.achievement_score = me.GetAchievementRecord()
 	rec.architecture = me.nArchitecture or 0
-	rec.architecture_remain = IsFunction(me.GetArchitectureRemainSpace) and me.GetArchitectureRemainSpace() or 0,
+	rec.architecture_remain = IsFunction(me.GetArchitectureRemainSpace) and me.GetArchitectureRemainSpace() or 0
 	rec.coin = me.nCoin
 	rec.mentor_score = me.dwTAEquipsScore
 	rec.starve = LIB.GetItemAmountInAllPackages(5, 34797, true)
