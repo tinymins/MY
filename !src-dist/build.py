@@ -139,8 +139,8 @@ def run(is_full, is_source):
 			utils.assert_exit(git.is_clean(), 'Error: master branch has uncommited file change(s)!')
 			os.system('git checkout prelease || git checkout -b prelease')
 			os.system('git rebase master')
-			os.system('code "%s_!Base/src/lib/Base.lua"' % get_current_packet_id())
-			os.system('code "CHANGELOG.md"' % get_current_packet_id())
+			os.system('code "./%s_!Base/src/lib/Base.lua"' % get_current_packet_id())
+			os.system('code "./CHANGELOG.md"')
 			utils.exit_with_message('Switched to prelease branch. Please commit release info and then run this script again!')
 
 		# Merge prelease into stable
