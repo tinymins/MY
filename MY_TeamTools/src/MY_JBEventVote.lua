@@ -271,7 +271,7 @@ function D.Vote(frame, szEventID, szTeamID)
 				jx3id = AnsiToUTF8(LIB.GetClientUUID()),
 				event_id = szEventID,
 				team_id = szTeamID,
-			}, '84cf7ba4-7fbb-4d59-9eb2-9b0ce89494ed'))),
+			}, 'e97919f4-1409-4995-9c3e-ff48fc07554b'))),
 		charset = 'utf8',
 		success = function(szHTML)
 			local res, err = LIB.JsonDecode(szHTML)
