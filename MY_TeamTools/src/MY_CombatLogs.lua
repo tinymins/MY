@@ -59,11 +59,13 @@ local O = {
 	nMaxHistory = 300, -- ×î´óÀúÊ·Êý¾ÝÊýÁ¿
 	nMinFightTime = 30, -- ×îÐ¡Õ½¶·Ê±¼ä
 	bOnlyDungeon = true, -- ½öÔÚÃØ¾³ÖÐÆôÓÃ
+	bOnlySelf = true, -- ½ö¼ÇÂ¼ºÍ×Ô¼ºÓÐ¹ØµÄ
 }
 RegisterCustomData('MY_CombatLogs.bEnable')
 RegisterCustomData('MY_CombatLogs.nMaxHistory')
 RegisterCustomData('MY_CombatLogs.nMinFightTime')
 RegisterCustomData('MY_CombatLogs.bOnlyDungeon')
+RegisterCustomData('MY_CombatLogs.bOnlySelf')
 
 
 local D = {}
@@ -270,6 +272,19 @@ LIB.RegisterEvent('MY_FIGHT_HINT', function()
 	end
 end)
 
+function D.WillRecID(dwID)
+	if O.bOnlySelf then
+		if not IsPlayer(dwID) then
+			local npc = GetNpc(dwID)
+			if npc then
+				dwID = npc.dwEmployer
+			end
+		end
+		return dwID == UI_GetClientPlayerID()
+	end
+	return true
+end
+
 -- ±£´æÄ¿±êÐÅÏ¢
 function D.OnTargetUpdate(dwID, bForce)
 	if not IsNumber(dwID) then
@@ -347,70 +362,90 @@ LIB.RegisterEvent('SYS_MSG', function()
 		-- ¼¼ÄÜÊ©·ÅÈÕÖ¾£»
 		-- (arg1)dwCaster£º¼¼ÄÜÊ©·ÅÕß (arg2)dwSkillID£º¼¼ÄÜID (arg3)dwLevel£º¼¼ÄÜµÈ¼¶
 		-- D.OnSkillCast(arg1, arg2, arg3)
-		D.OnTargetUpdate(arg1)
-		D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_SKILL_CAST_LOG, { arg1, arg2, arg3 })
+		if D.WillRecID(arg1) then
+			D.OnTargetUpdate(arg1)
+			D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_SKILL_CAST_LOG, { arg1, arg2, arg3 })
+		end
 	elseif arg0 == 'UI_OME_SKILL_CAST_RESPOND_LOG' then
 		-- ¼¼ÄÜÊ©·Å½á¹ûÈÕÖ¾£»
 		-- (arg1)dwCaster£º¼¼ÄÜÊ©·ÅÕß (arg2)dwSkillID£º¼¼ÄÜID
 		-- (arg3)dwLevel£º¼¼ÄÜµÈ¼¶ (arg4)nRespond£º¼ûÃ¶¾ÙÐÍ[[SKILL_RESULT_CODE]]
 		-- D.OnSkillCastRespond(arg1, arg2, arg3, arg4)
-		D.OnTargetUpdate(arg1)
-		D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_SKILL_CAST_RESPOND_LOG, { arg1, arg2, arg3, arg4 })
+		if D.WillRecID(arg1) then
+			D.OnTargetUpdate(arg1)
+			D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_SKILL_CAST_RESPOND_LOG, { arg1, arg2, arg3, arg4 })
+		end
 	elseif arg0 == 'UI_OME_SKILL_EFFECT_LOG' then
 		-- if not LIB.IsInArena() then
 		-- ¼¼ÄÜ×îÖÕ²úÉúµÄÐ§¹û£¨ÉúÃüÖµµÄ±ä»¯£©£»
 		-- (arg1)dwCaster£ºÊ©·ÅÕß (arg2)dwTarget£ºÄ¿±ê (arg3)bReact£ºÊÇ·ñÎª·´»÷ (arg4)nType£ºEffectÀàÐÍ (arg5)dwID:EffectµÄID
 		-- (arg6)dwLevel£ºEffectµÄµÈ¼¶ (arg7)bCriticalStrike£ºÊÇ·ñ»áÐÄ (arg8)nCount£ºtResultCountÊý¾Ý±íÖÐÔªËØ¸öÊý (arg9)tResultCount£ºÊýÖµ¼¯ºÏ
-		D.OnTargetUpdate(arg1)
-		D.OnTargetUpdate(arg2)
-		D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_SKILL_EFFECT_LOG, { arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9 })
+		if D.WillRecID(arg1) or D.WillRecID(arg2) then
+			D.OnTargetUpdate(arg1)
+			D.OnTargetUpdate(arg2)
+			D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_SKILL_EFFECT_LOG, { arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9 })
+		end
 	elseif arg0 == 'UI_OME_SKILL_BLOCK_LOG' then
 		-- ¸ñµ²ÈÕÖ¾£»
 		-- (arg1)dwCaster£ºÊ©·ÅÕß (arg2)dwTarget£ºÄ¿±ê (arg3)nType£ºEffectµÄÀàÐÍ
 		-- (arg4)dwID£ºEffectµÄID (arg5)dwLevel£ºEffectµÄµÈ¼¶ (arg6)nDamageType£ºÉËº¦ÀàÐÍ£¬¼ûÃ¶¾ÙÐÍ[[SKILL_RESULT_TYPE]]
-		D.OnTargetUpdate(arg1)
-		D.OnTargetUpdate(arg2)
-		D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_SKILL_BLOCK_LOG, { arg1, arg2, arg3, arg4, arg5, arg6 })
+		if D.WillRecID(arg1) or D.WillRecID(arg2) then
+			D.OnTargetUpdate(arg1)
+			D.OnTargetUpdate(arg2)
+			D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_SKILL_BLOCK_LOG, { arg1, arg2, arg3, arg4, arg5, arg6 })
+		end
 	elseif arg0 == 'UI_OME_SKILL_SHIELD_LOG' then
 		-- ¼¼ÄÜ±»ÆÁ±ÎÈÕÖ¾£»
 		-- (arg1)dwCaster£ºÊ©·ÅÕß (arg2)dwTarget£ºÄ¿±ê
 		-- (arg3)nType£ºEffectµÄÀàÐÍ (arg4)dwID£ºEffectµÄID (arg5)dwLevel£ºEffectµÄµÈ¼¶
-		D.OnTargetUpdate(arg1)
-		D.OnTargetUpdate(arg2)
-		D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_SKILL_SHIELD_LOG, { arg1, arg2, arg3, arg4, arg5 })
+		if D.WillRecID(arg1) or D.WillRecID(arg2) then
+			D.OnTargetUpdate(arg1)
+			D.OnTargetUpdate(arg2)
+			D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_SKILL_SHIELD_LOG, { arg1, arg2, arg3, arg4, arg5 })
+		end
 	elseif arg0 == 'UI_OME_SKILL_MISS_LOG' then
 		-- ¼¼ÄÜÎ´ÃüÖÐÄ¿±êÈÕÖ¾£»
 		-- (arg1)dwCaster£ºÊ©·ÅÕß (arg2)dwTarget£ºÄ¿±ê
 		-- (arg3)nType£ºEffectµÄÀàÐÍ (arg4)dwID£ºEffectµÄID (arg5)dwLevel£ºEffectµÄµÈ¼¶
-		D.OnTargetUpdate(arg1)
-		D.OnTargetUpdate(arg2)
-		D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_SKILL_MISS_LOG, { arg1, arg2, arg3, arg4, arg5 })
+		if D.WillRecID(arg1) or D.WillRecID(arg2) then
+			D.OnTargetUpdate(arg1)
+			D.OnTargetUpdate(arg2)
+			D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_SKILL_MISS_LOG, { arg1, arg2, arg3, arg4, arg5 })
+		end
 	elseif arg0 == 'UI_OME_SKILL_HIT_LOG' then
 		-- ¼¼ÄÜÃüÖÐÄ¿±êÈÕÖ¾£»
 		-- (arg1)dwCaster£ºÊ©·ÅÕß (arg2)dwTarget£ºÄ¿±ê
 		-- (arg3)nType£ºEffectµÄÀàÐÍ (arg4)dwID£ºEffectµÄID (arg5)dwLevel£ºEffectµÄµÈ¼¶
-		D.OnTargetUpdate(arg1)
-		D.OnTargetUpdate(arg2)
-		D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_SKILL_HIT_LOG, { arg1, arg2, arg3, arg4, arg5 })
+		if D.WillRecID(arg1) or D.WillRecID(arg2) then
+			D.OnTargetUpdate(arg1)
+			D.OnTargetUpdate(arg2)
+			D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_SKILL_HIT_LOG, { arg1, arg2, arg3, arg4, arg5 })
+		end
 	elseif arg0 == 'UI_OME_SKILL_DODGE_LOG' then
 		-- ¼¼ÄÜ±»ÉÁ±ÜÈÕÖ¾£»
 		-- (arg1)dwCaster£ºÊ©·ÅÕß (arg2)dwTarget£ºÄ¿±ê
 		-- (arg3)nType£ºEffectµÄÀàÐÍ (arg4)dwID£ºEffectµÄID (arg5)dwLevel£ºEffectµÄµÈ¼¶
-		D.OnTargetUpdate(arg1)
-		D.OnTargetUpdate(arg2)
-		D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_SKILL_DODGE_LOG, { arg1, arg2, arg3, arg4, arg5 })
+		if D.WillRecID(arg1) or D.WillRecID(arg2) then
+			D.OnTargetUpdate(arg1)
+			D.OnTargetUpdate(arg2)
+			D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_SKILL_DODGE_LOG, { arg1, arg2, arg3, arg4, arg5 })
+		end
 	elseif arg0 == 'UI_OME_COMMON_HEALTH_LOG' then
 		-- ÆÕÍ¨ÖÎÁÆÈÕÖ¾£»
 		-- (arg1)dwCharacterID£º³ÐÁÆÍæ¼ÒID (arg2)nDeltaLife£ºÔö¼ÓÑªÁ¿Öµ
 		-- D.OnCommonHealth(arg1, arg2)
-		D.OnTargetUpdate(arg1)
-		D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_COMMON_HEALTH_LOG, { arg1, arg2 })
+		if D.WillRecID(arg1) then
+			D.OnTargetUpdate(arg1)
+			D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_COMMON_HEALTH_LOG, { arg1, arg2 })
+		end
 	elseif arg0 == 'UI_OME_DEATH_NOTIFY' then
 		-- ËÀÍöÈÕÖ¾£»
 		-- (arg1)dwCharacterID£ºËÀÍöÄ¿±êID (arg2)dwKiller£º»÷É±ÕßID
-		D.OnTargetUpdate(arg1)
-		D.OnTargetUpdate(arg2)
-		D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_DEATH_NOTIFY, { arg1, arg2 })
+		if D.WillRecID(arg1) or D.WillRecID(arg2) then
+			D.OnTargetUpdate(arg1)
+			D.OnTargetUpdate(arg2)
+			D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_DEATH_NOTIFY, { arg1, arg2 })
+		end
 	end
 end)
 
@@ -425,40 +460,50 @@ LIB.RegisterEvent('BUFF_UPDATE', function()
 	-- arg0£ºdwPlayerID£¬arg1£ºbDelete£¬arg2£ºnIndex£¬arg3£ºbCanCancel
 	-- arg4£ºdwBuffID£¬arg5£ºnStackNum£¬arg6£ºnEndFrame£¬arg7£º£¿update all?
 	-- arg8£ºnLevel£¬arg9£ºdwSkillSrcID
-	D.OnTargetUpdate(arg0)
-	D.InsertLog(LOG_TYPE.BUFF_UPDATE, { arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11 })
+	if D.WillRecID(arg0) then
+		D.OnTargetUpdate(arg0)
+		D.InsertLog(LOG_TYPE.BUFF_UPDATE, { arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11 })
+	end
 end)
 
 LIB.RegisterEvent('PLAYER_ENTER_SCENE', function()
 	if not LOG_ENABLE then
 		return
 	end
-	D.OnTargetUpdate(arg0)
-	D.InsertLog(LOG_TYPE.PLAYER_ENTER_SCENE, { arg0 })
+	if D.WillRecID(arg0) then
+		D.OnTargetUpdate(arg0)
+		D.InsertLog(LOG_TYPE.PLAYER_ENTER_SCENE, { arg0 })
+	end
 end)
 
 LIB.RegisterEvent('PLAYER_LEAVE_SCENE', function()
 	if not LOG_ENABLE then
 		return
 	end
-	D.OnTargetUpdate(arg0)
-	D.InsertLog(LOG_TYPE.PLAYER_LEAVE_SCENE, { arg0 })
+	if D.WillRecID(arg0) then
+		D.OnTargetUpdate(arg0)
+		D.InsertLog(LOG_TYPE.PLAYER_LEAVE_SCENE, { arg0 })
+	end
 end)
 
 LIB.RegisterEvent('NPC_ENTER_SCENE', function()
 	if not LOG_ENABLE then
 		return
 	end
-	D.OnTargetUpdate(arg0)
-	D.InsertLog(LOG_TYPE.NPC_ENTER_SCENE, { arg0 })
+	if D.WillRecID(arg0) then
+		D.OnTargetUpdate(arg0)
+		D.InsertLog(LOG_TYPE.NPC_ENTER_SCENE, { arg0 })
+	end
 end)
 
 LIB.RegisterEvent('NPC_LEAVE_SCENE', function()
 	if not LOG_ENABLE then
 		return
 	end
-	D.OnTargetUpdate(arg0)
-	D.InsertLog(LOG_TYPE.NPC_LEAVE_SCENE, { arg0 })
+	if D.WillRecID(arg0) then
+		D.OnTargetUpdate(arg0)
+		D.InsertLog(LOG_TYPE.NPC_LEAVE_SCENE, { arg0 })
+	end
 end)
 
 LIB.RegisterEvent('DOODAD_ENTER_SCENE', function()
@@ -500,7 +545,7 @@ LIB.RegisterEvent('PLAYER_SAY', function()
 	end
 	-- arg0: szContent, arg1: dwTalkerID, arg2: nChannel, arg3: szName, arg4: bOnlyShowBallon
 	-- arg5: bSecurity, arg6: bGMAccount, arg7: bCheater, arg8: dwTitleID, arg9: szMsg
-	if not IsPlayer(arg1) then
+	if not IsPlayer(arg1) and D.WillRecID(arg1) then
 		local szText = LIB.GetPureText(arg0)
 		if szText and szText ~= '' then
 			D.OnTargetUpdate(arg1)
@@ -524,6 +569,9 @@ LIB.RegisterEvent('MY_PLAYER_FIGHT_HINT', function()
 		return
 	end
 	local dwID, bFight = arg0, arg1
+	if not D.WillRecID(dwID) then
+		return
+	end
 	local KObject = LIB.GetObject(TARGET.PLAYER, dwID)
 	local fCurrentLife, fMaxLife, nCurrentMana, nMaxMana = -1, -1, -1, -1
 	if KObject then
@@ -540,6 +588,9 @@ LIB.RegisterEvent('MY_NPC_FIGHT_HINT', function()
 		return
 	end
 	local dwID, bFight = arg0, arg1
+	if not D.WillRecID(dwID) then
+		return
+	end
 	local KObject = LIB.GetObject(TARGET.NPC, dwID)
 	local fCurrentLife, fMaxLife, nCurrentMana, nMaxMana = -1, -1, -1, -1
 	if KObject then
@@ -556,6 +607,9 @@ LIB.RegisterEvent('PARTY_SET_MEMBER_ONLINE_FLAG', function()
 		return
 	end
 	-- arg0: dwTeamID, arg1: dwMemberID, arg2: nOnlineFlag
+	if not D.WillRecID(arg1) then
+		return
+	end
 	D.OnTargetUpdate(arg1)
 	D.InsertLog(LOG_TYPE.PARTY_SET_MEMBER_ONLINE_FLAG, { arg0, arg1, arg2 })
 end)
@@ -572,7 +626,7 @@ LIB.RegisterEvent('MY_RECOUNT_NEW_FIGHT', function() -- ¿ªÕ½É¨Ãè¶ÓÓÑ ¼ÇÂ¼¿ªÕ½¾ÍË
 	end
 	for _, dwID in ipairs(team.GetTeamMemberList()) do
 		local info = team.GetMemberInfo(dwID)
-		if info then
+		if info and D.WillRecID(dwID) then
 			D.OnTargetUpdate(dwID)
 			if not info.bIsOnLine then
 				D.InsertLog(LOG_TYPE.PARTY_SET_MEMBER_ONLINE_FLAG, { team.dwTeamID, dwID, 0 })
@@ -589,8 +643,10 @@ LIB.RegisterEvent('PARTY_ADD_MEMBER', function()
 		return
 	end
 	-- arg0: dwTeamID, arg1: dwMemberID, arg2: nGroupIndex
-	D.OnTargetUpdate(arg1)
-	D.InsertLog(LOG_TYPE.PARTY_ADD_MEMBER, { arg0, arg1, arg2 })
+	if D.WillRecID(arg1) then
+		D.OnTargetUpdate(arg1)
+		D.InsertLog(LOG_TYPE.PARTY_ADD_MEMBER, { arg0, arg1, arg2 })
+	end
 end)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
@@ -615,6 +671,14 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
 				bChecked = MY_CombatLogs.bOnlyDungeon,
 				fnAction = function()
 					MY_CombatLogs.bOnlyDungeon = not MY_CombatLogs.bOnlyDungeon
+				end,
+			})
+			insert(menu, {
+				szOption = _L['Only self related'],
+				bCheck = true,
+				bChecked = MY_CombatLogs.bOnlySelf,
+				fnAction = function()
+					MY_CombatLogs.bOnlySelf = not MY_CombatLogs.bOnlySelf
 				end,
 			})
 			local m0 = { szOption = _L['Max history'] }
@@ -673,6 +737,7 @@ local settings = {
 				nMaxHistory   = true,
 				nMinFightTime = true,
 				bOnlyDungeon  = true,
+				bOnlySelf     = true,
 			},
 			root = O,
 		},
@@ -684,10 +749,12 @@ local settings = {
 				nMaxHistory   = true,
 				nMinFightTime = true,
 				bOnlyDungeon  = true,
+				bOnlySelf     = true,
 			},
 			triggers = {
-				bEnable = D.UpdateEnable,
+				bEnable      = D.UpdateEnable,
 				bOnlyDungeon = D.UpdateEnable,
+				bOnlySelf    = D.UpdateEnable,
 			},
 			root = O,
 		},
