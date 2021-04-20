@@ -45,7 +45,7 @@ return {
     ['Slogan'] = '宣言',
     ['Vote Count'] = '人氣',
     ['Vote'] = '投票',
-    ['Voted'] = '已投',
+    ['Voted'] = '已投票',
     ['Finish achieves: '] = '完成成就：',
     ['Start time: '] = '開始時間：',
     ['End time: '] = '結束時間：',
