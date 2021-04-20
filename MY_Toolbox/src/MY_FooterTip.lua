@@ -82,7 +82,9 @@ function D.Apply()
 				return
 			end
 			local tar = GetPlayer(dwID)
-			if not tar then
+			local me = GetClientPlayer()
+			if not tar or not me
+			or LIB.IsIsolated(tar) ~= LIB.IsIsolated(me) then
 				return
 			end
 			local p = LIB.GetFriend(dwID)
@@ -127,17 +129,40 @@ function D.Apply()
 			end
 		end
 		RescanNearby()
+		LIB.RegisterEvent('ON_ISOLATED.MY_FRIEND_TIP', function(event)
+			-- dwCharacterID, nIsolated
+			local me = GetClientPlayer()
+			if arg0 == UI_GetClientPlayerID() then
+				for _, p in ipairs(LIB.GetNearPlayer()) do
+					if LIB.IsIsolated(p) == LIB.IsIsolated(me) then
+						OnPlayerEnter(p.dwID)
+					else
+						OnPlayerLeave(p.dwID)
+					end
+				end
+			else
+				local tar = GetPlayer(arg0)
+				if tar then
+					if LIB.IsIsolated(tar) == LIB.IsIsolated(me) then
+						OnPlayerEnter(arg0)
+					else
+						OnPlayerLeave(arg0)
+					end
+				end
+			end
+		end)
 		LIB.RegisterEvent('PLAYER_ENTER_SCENE.MY_FRIEND_TIP', function(event) OnPlayerEnter(arg0) end)
 		LIB.RegisterEvent('PLAYER_LEAVE_SCENE.MY_FRIEND_TIP', function(event) OnPlayerLeave(arg0) end)
 		LIB.RegisterEvent('DELETE_FELLOWSHIP.MY_FRIEND_TIP', function(event) RescanNearby() end)
 		LIB.RegisterEvent('PLAYER_FELLOWSHIP_UPDATE.MY_FRIEND_TIP', function(event) RescanNearby() end)
 		LIB.RegisterEvent('PLAYER_FELLOWSHIP_CHANGE.MY_FRIEND_TIP', function(event) RescanNearby() end)
 	else
-		LIB.RegisterEvent('PLAYER_ENTER_SCENE.MY_FRIEND_TIP')
-		LIB.RegisterEvent('PLAYER_LEAVE_SCENE.MY_FRIEND_TIP')
-		LIB.RegisterEvent('DELETE_FELLOWSHIP.MY_FRIEND_TIP')
-		LIB.RegisterEvent('PLAYER_FELLOWSHIP_UPDATE.MY_FRIEND_TIP')
-		LIB.RegisterEvent('PLAYER_FELLOWSHIP_CHANGE.MY_FRIEND_TIP')
+		LIB.RegisterEvent('ON_ISOLATED.MY_FRIEND_TIP', false)
+		LIB.RegisterEvent('PLAYER_ENTER_SCENE.MY_FRIEND_TIP', false)
+		LIB.RegisterEvent('PLAYER_LEAVE_SCENE.MY_FRIEND_TIP', false)
+		LIB.RegisterEvent('DELETE_FELLOWSHIP.MY_FRIEND_TIP', false)
+		LIB.RegisterEvent('PLAYER_FELLOWSHIP_UPDATE.MY_FRIEND_TIP', false)
+		LIB.RegisterEvent('PLAYER_FELLOWSHIP_CHANGE.MY_FRIEND_TIP', false)
 		UI.GetShadowHandle('MY_FriendHeadTip'):Hide()
 	end
 	-- 帮会成员高亮
@@ -160,8 +185,11 @@ function D.Apply()
 			end
 			local tar = GetPlayer(dwID)
 			local me = GetClientPlayer()
-			if not tar or not me or me.dwTongID == 0
-			or me.dwID == tar.dwID or tar.dwTongID ~= me.dwTongID then
+			if not tar or not me
+			or me.dwTongID == 0
+			or me.dwID == tar.dwID
+			or tar.dwTongID ~= me.dwTongID
+			or LIB.IsIsolated(tar) ~= LIB.IsIsolated(me) then
 				return
 			end
 			if tar.szName == '' then
@@ -204,9 +232,32 @@ function D.Apply()
 			end
 			OnPlayerEnter(p.dwID)
 		end
+		LIB.RegisterEvent('ON_ISOLATED.MY_GUILDMEMBER_TIP', function(event)
+			-- dwCharacterID, nIsolated
+			local me = GetClientPlayer()
+			if arg0 == UI_GetClientPlayerID() then
+				for _, p in ipairs(LIB.GetNearPlayer()) do
+					if LIB.IsIsolated(p) == LIB.IsIsolated(me) then
+						OnPlayerEnter(p.dwID)
+					else
+						OnPlayerLeave(p.dwID)
+					end
+				end
+			else
+				local tar = GetPlayer(arg0)
+				if tar then
+					if LIB.IsIsolated(tar) == LIB.IsIsolated(me) then
+						OnPlayerEnter(arg0)
+					else
+						OnPlayerLeave(arg0)
+					end
+				end
+			end
+		end)
 		LIB.RegisterEvent('PLAYER_ENTER_SCENE.MY_GUILDMEMBER_TIP', function(event) OnPlayerEnter(arg0) end)
 		LIB.RegisterEvent('PLAYER_LEAVE_SCENE.MY_GUILDMEMBER_TIP', function(event) OnPlayerLeave(arg0) end)
 	else
+		LIB.RegisterEvent('ON_ISOLATED.MY_GUILDMEMBER_TIP', false)
 		LIB.RegisterEvent('PLAYER_ENTER_SCENE.MY_GUILDMEMBER_TIP', false)
 		LIB.RegisterEvent('PLAYER_LEAVE_SCENE.MY_GUILDMEMBER_TIP', false)
 		UI.GetShadowHandle('MY_TongMemberHeadTip'):Hide()
