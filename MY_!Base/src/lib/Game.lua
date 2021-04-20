@@ -2162,17 +2162,20 @@ local function ListenFightStateChange()
 				local szEdition = GLOBAL.GAME_EDITION
 				local szServer = LIB.GetRealServer()
 				local dwTime = GetCurrentTime()
-				local nTeamMember, dwTeamID = 0, 0
+				local dwTeamID, nTeamMember, dwTeamXorID = 0, 0, 0
+				if team then
+					dwTeamID = team.dwTeamID
+				end
 				if me and team and me.IsInParty() then
 					for _, dwTarID in ipairs(team.GetTeamMemberList()) do
 						nTeamMember = nTeamMember + 1
-						dwTeamID = LIB.NumberBitXor(dwTeamID, dwTarID)
+						dwTeamXorID = LIB.NumberBitXor(dwTeamXorID, dwTarID)
 					end
 				elseif me then
 					nTeamMember = 1
-					dwTeamID = me.dwID
+					dwTeamXorID = me.dwID
 				end
-				FIGHT_UUID = szEdition .. '::' .. szServer .. '::' .. dwTime .. '::' .. dwTeamID .. '/' .. nTeamMember
+				FIGHT_UUID = szEdition .. '::' .. szServer .. '::' .. dwTime .. '::' .. dwTeamID .. '::' .. dwTeamXorID .. '/' .. nTeamMember
 				FireUIEvent(NSFormatString('{$NS}_FIGHT_HINT'), true, FIGHT_UUID, 0)
 			end
 		end
