@@ -57,9 +57,11 @@ end
 local PS = {
 	-- nPriority = 0,
 	-- bWelcome = true,
-	nShielded = (LIB.IsDebugServer() or (GetCurrentTime() < 1619020800 and not LIB.IsDebugClient('MY_JB')))
-		and 2
-		or nil,
+	IsShielded = function()
+		return (LIB.IsDebugServer() or (GetCurrentTime() < 1619020800 and LIB.IsShieldedVersion('MY_JB')))
+			and true
+			or false
+	end,
 }
 
 function PS.OnPanelActive(wnd)
