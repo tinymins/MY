@@ -2845,8 +2845,11 @@ end
 -- (mixed) LIB.IsInvincible([object KObject])
 -- @return <nil >: invalid KObject
 -- @return <bool>: object invincible state
-function LIB.IsInvincible(KObject)
-	KObject = KObject or GetClientPlayer()
+function LIB.IsInvincible(...)
+	local KObject = ...
+	if select('#', ...) == 0 then
+		KObject = GetClientPlayer()
+	end
 	if not KObject then
 		return nil
 	elseif LIB.GetBuff(KObject, 961) then
@@ -2876,8 +2879,11 @@ end
 
 -- 获取对象当前是否可读条
 -- (bool) LIB.CanOTAction([object KObject])
-function LIB.CanOTAction(KObject)
-	KObject = KObject or GetClientPlayer()
+function LIB.CanOTAction(...)
+	local KObject = ...
+	if select('#', ...) == 0 then
+		KObject = GetClientPlayer()
+	end
 	if not KObject then
 		return
 	end
