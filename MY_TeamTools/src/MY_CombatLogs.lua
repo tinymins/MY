@@ -653,6 +653,10 @@ LIB.RegisterEvent('PARTY_ADD_MEMBER', function()
 end)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
+	if (LIB.IsDebugServer() or (GetCurrentTime() < 1619020800 and LIB.IsShieldedVersion('MY_JB'))) then
+		return nX, nY, nLFY
+	end
+
 	nX = nX + ui:Append('WndCheckBox', {
 		x = nX, y = nY, w = 200,
 		text = _L['MY_CombatLogs'],
