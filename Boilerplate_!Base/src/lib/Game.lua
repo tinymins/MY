@@ -2156,7 +2156,23 @@ local function ListenFightStateChange()
 			or GetTickCount() - FIGHT_END_TICK > 5000 then
 				-- 新的一轮战斗开始
 				FIGHT_BEGIN_TICK = GetTickCount()
-				FIGHT_UUID = FIGHT_BEGIN_TICK
+				-- 生成战斗全服唯一标示
+				local me = GetClientPlayer()
+				local team = GetClientTeam()
+				local szEdition = GLOBAL.GAME_EDITION
+				local szServer = LIB.GetRealServer()
+				local dwTime = GetCurrentTime()
+				local nTeamMember, dwTeamID = 0, 0
+				if me and team and me.IsInParty() then
+					for _, dwTarID in ipairs(team.GetTeamMemberList()) do
+						nTeamMember = nTeamMember + 1
+						dwTeamID = LIB.NumberBitXor(dwTeamID, dwTarID)
+					end
+				elseif me then
+					nTeamMember = 1
+					dwTeamID = me.dwID
+				end
+				FIGHT_UUID = szEdition .. '::' .. szServer .. '::' .. dwTime .. '::' .. dwTeamID .. '/' .. nTeamMember
 				FireUIEvent(NSFormatString('{$NS}_FIGHT_HINT'), true, FIGHT_UUID, 0)
 			end
 		end
