@@ -963,16 +963,17 @@ function D.OpenImportPanel(szDefault, szTitle, fnAction)
 			local bStatus, szMsg, tMeta = MY_TeamMon.LoadConfigureFile(config)
 			if bStatus then
 				LIB.Sysmsg(_L['MY_TeamMon'], _L('Load config success: %s', tostring(szMsg)), CONSTANT.MSG_THEME.SUCCESS)
-				local function fnAlert2()
-					local szAuthor = tMeta and LIB.ReplaceSensitiveWord(tostring(tMeta.szAuthor)) or _L['Unknown author']
-					LIB.Alert(
-						_L('Plugin is plugin, data is data, plugin author is plugin author, data author is data author..\nYou just loaded data\'s author is %s, it works on mingyi plugin team monitor addon.\n%s is data author, do not response for plugin problems. MingYi is plugin author, do not response for data problems.\n\nIf there is some strange headtop, focus, buff or talk, please try to use other author\'s data, and response to current author %s, plugin author MingYi does not response for this.', szAuthor, szAuthor, szAuthor),
-						nil,
-						nil,
-						'FORBIDDEN',
-						2)
-				end
-				LIB.Alert(_L('Import success: %s', szTitle or szMsg), fnAlert2, nil, fnAlert2)
+				-- local function fnAlert2()
+				-- 	local szAuthor = tMeta and LIB.ReplaceSensitiveWord(tostring(tMeta.szAuthor)) or _L['Unknown author']
+				-- 	LIB.Alert(
+				-- 		_L('Plugin is plugin, data is data, plugin author is plugin author, data author is data author..\nYou just loaded data\'s author is %s, it works on mingyi plugin team monitor addon.\n%s is data author, do not response for plugin problems. MingYi is plugin author, do not response for data problems.\n\nIf there is some strange headtop, focus, buff or talk, please try to use other author\'s data, and response to current author %s, plugin author MingYi does not response for this.', szAuthor, szAuthor, szAuthor),
+				-- 		nil,
+				-- 		nil,
+				-- 		'FORBIDDEN',
+				-- 		2)
+				-- end
+				-- LIB.Alert(_L('Import success: %s', szTitle or szMsg), fnAlert2, nil, fnAlert2)
+				LIB.Alert(_L('Import success: %s', szTitle or szMsg))
 				ui:Remove()
 				if MY_LifeBar and not MY_LifeBar.bEnabled then
 					MY_LifeBar.bEnabled = true
