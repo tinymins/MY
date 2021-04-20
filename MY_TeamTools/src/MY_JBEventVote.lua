@@ -231,14 +231,26 @@ function D.UpdateEvent(frame)
 					wnd:Lookup('', 'Text_ItemSlogan'):SetText(LIB.ReplaceSensitiveWord(team.slogan))
 					wnd:Lookup('', 'Text_ItemCount'):SetText(LIB.ReplaceSensitiveWord(team.count))
 					wnd:Lookup('', 'Image_RowBg'):SetVisible(i % 2 == 1)
+					local ui = UI(wnd)
+					ui:Append('WndButton', {
+						name = 'Btn_Info',
+						x = 860, y = 3, w = 100, h = 25,
+						buttonstyle = 'LINK',
+						text = _L['View Detail'],
+					})
+					local btn = ui:Append('WndButton', {
+						name = 'Btn_Vote',
+						x = 960, y = 3, w = 80, h = 25,
+						buttonstyle = 'SKEUOMORPHISM',
+					})
 					if bInTime and not bVoted then
-						wnd:Lookup('Btn_Vote', 'Text_Vote'):SetText(_L['Vote'])
+						btn:Text(_L['Vote'])
 					elseif nVotedTeamID == team.id then
-						wnd:Lookup('Btn_Vote', 'Text_Vote'):SetText(_L['Voted'])
+						btn:Text(_L['Voted'])
+						btn:Enable(false)
 					else
-						wnd:Lookup('Btn_Vote', 'Text_Vote'):Hide()
+						btn:Hide()
 					end
-					wnd:Lookup('Btn_Info', 'Text_Info'):SetText(_L['View Detail'])
 					wnd.team = team
 				end
 			end
