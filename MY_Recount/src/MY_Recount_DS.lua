@@ -635,10 +635,10 @@ LIB.RegisterEvent('MY_FIGHT_HINT', function()
 	if not O.bEnable then
 		return
 	end
-	local nLFYC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
+	local nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
 	local bFighting, szUUID, nDuring = arg0, arg1, arg2
 	if not bFighting then
-		D.InsertEverything(Data, nLFYC, nTime, nTick, EVERYTHING_TYPE.FIGHT_TIME, bFighting, szUUID, nDuring)
+		D.InsertEverything(Data, nLFC, nTime, nTick, EVERYTHING_TYPE.FIGHT_TIME, bFighting, szUUID, nDuring)
 	end
 	if bFighting and szUUID ~= Data[DK.UUID] then -- 进入新的战斗
 		D.InitData()
@@ -648,7 +648,7 @@ LIB.RegisterEvent('MY_FIGHT_HINT', function()
 		D.Flush()
 	end
 	if bFighting then
-		D.InsertEverything(Data, nLFYC, nTime, nTick, EVERYTHING_TYPE.FIGHT_TIME, bFighting, szUUID, nDuring)
+		D.InsertEverything(Data, nLFC, nTime, nTick, EVERYTHING_TYPE.FIGHT_TIME, bFighting, szUUID, nDuring)
 	end
 end)
 
@@ -810,7 +810,7 @@ end
 -- (number) nResultCount: 造成效果的数值数量（tResult长度）
 -- (table ) tResult     : 所有效果数值集合
 do local KCaster, KTarget, dwTargetEmployer, me, szEffectID, nTherapy, nEffectTherapy, nDamage, nEffectDamage, szType
-function D.ProcessSkillEffect(nLFYC, nTime, nTick, dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nResultCount, tResult)
+function D.ProcessSkillEffect(nLFC, nTime, nTick, dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nResultCount, tResult)
 	-- 获取释放对象和承受对象
 	KCaster = LIB.GetObject(dwCaster)
 	if KCaster and not IsPlayer(dwCaster) and KCaster.dwEmployer and KCaster.dwEmployer ~= 0 then -- 宠物的数据算在主人统计中
@@ -859,7 +859,7 @@ function D.ProcessSkillEffect(nLFYC, nTime, nTick, dwCaster, dwTarget, nEffectTy
 	nEffectDamage = tResult[SKILL_RESULT_TYPE.EFFECTIVE_DAMAGE] or 0
 
 	D.InsertEverything(Data,
-		nLFYC, nTime, nTick,
+		nLFC, nTime, nTick,
 		EVERYTHING_TYPE.SKILL_EFFECT, dwCaster, dwTarget,
 		nEffectType, dwEffectID, dwEffectLevel, szEffectID,
 		nSkillResult, nTherapy, nEffectTherapy, nDamage, nEffectDamage,
@@ -894,19 +894,19 @@ function D.ProcessSkillEffect(nLFYC, nTime, nTick, dwCaster, dwTarget, nEffectTy
 end
 end
 
-do local nLFYC, nTime, nTick
+do local nLFC, nTime, nTick
 function D.OnSkillEffect(dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nResultCount, tResult)
-	nLFYC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
-	while SKILL_EFFECT_CACHE[1] and nLFYC - SKILL_EFFECT_CACHE[1][1] > LOG_REPLAY_FRAME do
+	nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
+	while SKILL_EFFECT_CACHE[1] and nLFC - SKILL_EFFECT_CACHE[1][1] > LOG_REPLAY_FRAME do
 		remove(SKILL_EFFECT_CACHE, 1)
 	end
-	insert(SKILL_EFFECT_CACHE, {nLFYC, nTime, nTick, dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nResultCount, tResult})
-	D.ProcessSkillEffect(nLFYC, nTime, nTick, dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nResultCount, tResult)
+	insert(SKILL_EFFECT_CACHE, {nLFC, nTime, nTick, dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nResultCount, tResult})
+	D.ProcessSkillEffect(nLFC, nTime, nTick, dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nResultCount, tResult)
 end
 end
 
 do local KCaster, szEffectID
-function D.ProcessBuffUpdate(nLFYC, nTime, nTick, dwCaster, dwTarget, dwBuffID, dwBuffLevel, nStackNum, bDelete, nEndFrame, bCanCancel)
+function D.ProcessBuffUpdate(nLFC, nTime, nTick, dwCaster, dwTarget, dwBuffID, dwBuffLevel, nStackNum, bDelete, nEndFrame, bCanCancel)
 	KCaster = LIB.GetObject(dwCaster)
 	if KCaster and not IsPlayer(dwCaster) and KCaster.dwEmployer and KCaster.dwEmployer ~= 0 then -- 宠物的数据算在主人统计中
 		dwCaster = KCaster.dwEmployer
@@ -916,41 +916,41 @@ function D.ProcessBuffUpdate(nLFYC, nTime, nTick, dwCaster, dwTarget, dwBuffID, 
 	D.InitObjectData(Data, dwTarget)
 	D.InsertEverything(
 		Data,
-		nLFYC, nTime, nTick,
+		nLFC, nTime, nTick,
 		EVERYTHING_TYPE.BUFF_UPDATE,
 		dwCaster, dwTarget, dwBuffID, dwBuffLevel, szEffectID, bDelete, nStackNum, nEndFrame, bCanCancel)
 end
 end
 
-do local nLFYC, nTime, nTick
+do local nLFC, nTime, nTick
 function D.OnBuffUpdate(dwCaster, dwTarget, dwBuffID, dwBuffLevel, nStackNum, bDelete, nEndFrame, bCanCancel)
 	if dwBuffID == 0 then
 		return
 	end
-	nLFYC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
-	while BUFF_UPDATE_CACHE[1] and nLFYC - BUFF_UPDATE_CACHE[1][1] > LOG_REPLAY_FRAME do
+	nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
+	while BUFF_UPDATE_CACHE[1] and nLFC - BUFF_UPDATE_CACHE[1][1] > LOG_REPLAY_FRAME do
 		remove(BUFF_UPDATE_CACHE, 1)
 	end
-	insert(BUFF_UPDATE_CACHE, {nLFYC, nTime, nTick, dwCaster, dwTarget, dwBuffID, dwBuffLevel, nStackNum, bDelete, nEndFrame, bCanCancel})
-	D.ProcessBuffUpdate(nLFYC, nTime, nTick, dwCaster, dwTarget, dwBuffID, dwBuffLevel, nStackNum, bDelete, nEndFrame, bCanCancel)
+	insert(BUFF_UPDATE_CACHE, {nLFC, nTime, nTick, dwCaster, dwTarget, dwBuffID, dwBuffLevel, nStackNum, bDelete, nEndFrame, bCanCancel})
+	D.ProcessBuffUpdate(nLFC, nTime, nTick, dwCaster, dwTarget, dwBuffID, dwBuffLevel, nStackNum, bDelete, nEndFrame, bCanCancel)
 end
 end
 
-do local nCurLFC, nLFYC, nTime, nTick, dwCaster, dwTarget,
+do local nCurLFC, nLFC, nTime, nTick, dwCaster, dwTarget,
 	nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nResultCount, tResult,
 	dwBuffID, dwBuffLevel, nStackNum, bDelete, nEndFrame, bCanCancel
 function D.ReplayRecentLog()
 	nCurLFC = GetLogicFrameCount()
 	for _, v in ipairs(SKILL_EFFECT_CACHE) do
-		nLFYC, nTime, nTick, dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nResultCount, tResult = unpack(v)
-		if nCurLFC - nLFYC <= LOG_REPLAY_FRAME then
-			D.ProcessSkillEffect(nLFYC, nTime, nTick, dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nResultCount, tResult)
+		nLFC, nTime, nTick, dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nResultCount, tResult = unpack(v)
+		if nCurLFC - nLFC <= LOG_REPLAY_FRAME then
+			D.ProcessSkillEffect(nLFC, nTime, nTick, dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nResultCount, tResult)
 		end
 	end
 	for _, v in ipairs(BUFF_UPDATE_CACHE) do
-		nLFYC, nTime, nTick, dwCaster, dwTarget, dwBuffID, dwBuffLevel, nStackNum, bDelete, nEndFrame, bCanCancel = unpack(v)
-		if nCurLFC - nLFYC <= LOG_REPLAY_FRAME then
-			D.ProcessBuffUpdate(nLFYC, nTime, nTick, dwCaster, dwTarget, dwBuffID, dwBuffLevel, nStackNum, bDelete, nEndFrame, bCanCancel)
+		nLFC, nTime, nTick, dwCaster, dwTarget, dwBuffID, dwBuffLevel, nStackNum, bDelete, nEndFrame, bCanCancel = unpack(v)
+		if nCurLFC - nLFC <= LOG_REPLAY_FRAME then
+			D.ProcessBuffUpdate(nLFC, nTime, nTick, dwCaster, dwTarget, dwBuffID, dwBuffLevel, nStackNum, bDelete, nEndFrame, bCanCancel)
 		end
 	end
 end
@@ -1019,11 +1019,11 @@ end
 end
 
 -- 插入复盘数据
-function D.InsertEverything(data, nLFYC, nTime, nTick, szName, ...)
+function D.InsertEverything(data, nLFC, nTime, nTick, szName, ...)
 	if not D.bRecEverything then
 		return
 	end
-	insert(data[DK.EVERYTHING], {nLFYC, nTime, nTick, szName, ...})
+	insert(data[DK.EVERYTHING], {nLFC, nTime, nTick, szName, ...})
 end
 
 -- 将一条记录插入数组
@@ -1507,7 +1507,7 @@ function D.Flush()
 end
 
 -- 系统日志监控（数据源）
-do local aAbsorbInfo, nLFYC
+do local aAbsorbInfo, nLFC
 LIB.RegisterEvent('SYS_MSG', function()
 	if not O.bEnable then
 		return
@@ -1537,10 +1537,10 @@ LIB.RegisterEvent('SYS_MSG', function()
 		-- 盾化解伤害补偿至盾提供者的治疗量
 		if arg9[SKILL_RESULT_TYPE.ABSORB_DAMAGE] then
 			aAbsorbInfo = ABSORB_CACHE[arg2]
-			nLFYC = GetLogicFrameCount()
+			nLFC = GetLogicFrameCount()
 			if aAbsorbInfo then
 				for _, tAbsorbInfo in ipairs(aAbsorbInfo) do
-					if tAbsorbInfo.nEndFrame >= nLFYC then
+					if tAbsorbInfo.nEndFrame >= nLFC then
 						D.OnSkillEffect(
 							tAbsorbInfo.dwSrcID, arg2,
 							tAbsorbInfo.nEffectType, tAbsorbInfo.dwEffectID, tAbsorbInfo.dwEffectLevel,
@@ -1644,7 +1644,7 @@ end
 
 
 -- 系统BUFF监控（数据源）
-do local nAbsorbPriority, nLFYC, aAbsorbInfo, tAbsorbInfo
+do local nAbsorbPriority, nLFC, aAbsorbInfo, tAbsorbInfo
 local function AbsorbSorter(p1, p2)
 	if p1.nPriority == p2.nPriority then
 		return p1.dwInitTime < p2.dwInitTime
@@ -1671,23 +1671,23 @@ LIB.RegisterEvent('BUFF_UPDATE', function()
 				break
 			end
 		end
-		nLFYC = GetLogicFrameCount()
+		nLFC = GetLogicFrameCount()
 		if arg1 then
 			if tAbsorbInfo then
-				tAbsorbInfo.nEndFrame = nLFYC
+				tAbsorbInfo.nEndFrame = nLFC
 			end
 		else
 			if not tAbsorbInfo then
 				tAbsorbInfo = {
 					nPriority = nAbsorbPriority,
 					dwViaID = arg4,
-					dwInitTime = nLFYC,
+					dwInitTime = nLFC,
 				}
 				insert(aAbsorbInfo, tAbsorbInfo)
 				sort(aAbsorbInfo, AbsorbSorter)
 			end
 			if arg7 then
-				tAbsorbInfo.dwInitTime = nLFYC
+				tAbsorbInfo.dwInitTime = nLFC
 				sort(aAbsorbInfo, AbsorbSorter)
 			end
 			tAbsorbInfo.dwSrcID = arg9
@@ -1764,7 +1764,7 @@ for _, v in ipairs({
 			return
 		end
 		-- 插入数据到日志
-		local nLFYC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
+		local nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
 		local dwID, dwTemplateID = arg0, 0
 		local KObject = LIB.GetObject(dwType, dwID)
 		local fCurrentLife, fMaxLife, nCurrentMana, nMaxMana = 0, 0
@@ -1783,7 +1783,7 @@ for _, v in ipairs({
 			D.SavePlayerInfo(Data, dwID, true)
 		end
 		D.InsertEverything(
-			Data, nLFYC, nTime, nTick,
+			Data, nLFC, nTime, nTick,
 			EVERYTHING_TYPE.ENTER_LEAVE_SCENE, nEnter,
 			TARGET.NPC, dwID,
 			LIB.GetObjectName(TARGET.NPC, dwID, 'never'), dwTemplateID,
@@ -1799,9 +1799,9 @@ LIB.RegisterMsgMonitor('MSG_SYS.MY_Recount_DS_Everything', function(szChannel, s
 	if bRich then
 		szMsg = LIB.GetPureText(szMsg)
 	end
-	local nLFYC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
+	local nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
 	D.InsertEverything(
-		Data, nLFYC, nTime, nTick,
+		Data, nLFC, nTime, nTick,
 		EVERYTHING_TYPE.SYS_MSG, szMsg:gsub('\r', '')
 	)
 end)
@@ -1814,9 +1814,9 @@ LIB.RegisterEvent('PLAYER_SAY', function()
 		local szText = LIB.GetPureText(arg0)
 		if szText and szText ~= '' then
 			local npc = GetNpc(arg1)
-			local nLFYC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
+			local nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
 			D.InsertEverything(
-				Data, nLFYC, nTime, nTick,
+				Data, nLFC, nTime, nTick,
 				EVERYTHING_TYPE.PLAYER_SAY,
 				-- szContent, dwNpcID, szNpcName, dwNpcTemplateID
 				szText, arg1, arg3 == '' and '%' or arg3, npc and npc.dwTemplateID or 0
@@ -1829,9 +1829,9 @@ LIB.RegisterEvent('ON_WARNING_MESSAGE', function()
 	if not O.bEnable then
 		return
 	end
-	local nLFYC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
+	local nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
 	D.InsertEverything(
-		Data, nLFYC, nTime, nTick,
+		Data, nLFC, nTime, nTick,
 		EVERYTHING_TYPE.WARNING_MESSAGE,
 		-- szContent
 		arg1
@@ -1842,7 +1842,7 @@ LIB.RegisterEvent({'MY_NPC_FIGHT_HINT', 'MY_PLAYER_FIGHT_HINT'}, function(e)
 	if not O.bEnable then
 		return
 	end
-	local nLFYC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
+	local nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
 	local dwType = e == 'MY_NPC_FIGHT_HINT' and TARGET.NPC or TARGET.PLAYER
 	local dwID, bFight, dwTemplateID = arg0, arg1, 0
 	local KObject = LIB.GetObject(dwType, dwID)
@@ -1863,7 +1863,7 @@ LIB.RegisterEvent({'MY_NPC_FIGHT_HINT', 'MY_PLAYER_FIGHT_HINT'}, function(e)
 		D.SavePlayerInfo(Data, dwID, true)
 	end
 	D.InsertEverything(
-		Data, nLFYC, nTime, nTick,
+		Data, nLFC, nTime, nTick,
 		EVERYTHING_TYPE.FIGHT_HINT,
 		dwType, dwID, bFight,
 		szName, dwTemplateID,
@@ -1879,11 +1879,11 @@ LIB.RegisterEvent('SYS_MSG', function()
 		return
 	end
 	-- 插入数据到日志
-	local nLFYC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
+	local nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
 	local dwID, dwKiller = arg1, arg2
 	if LIB.IsParty(dwID) or LIB.IsParty(dwKiller) then
 		D.InsertEverything(
-			Data, nLFYC, nTime, nTick,
+			Data, nLFC, nTime, nTick,
 			EVERYTHING_TYPE.DEATH, dwID, dwKiller,
 			LIB.GetObjectName(IsPlayer(dwID) and TARGET.PLAYER or TARGET.NPC, dwID),
 			LIB.GetObjectName(IsPlayer(dwKiller) and TARGET.PLAYER or TARGET.NPC, dwKiller)
@@ -1896,9 +1896,9 @@ LIB.RegisterEvent('PARTY_SET_MEMBER_ONLINE_FLAG', function()
 		return
 	end
 	if LIB.IsParty(arg1) then
-		local nLFYC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
+		local nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
 		D.InsertEverything(
-			Data, nLFYC, nTime, nTick,
+			Data, nLFC, nTime, nTick,
 			EVERYTHING_TYPE.ONLINE, arg1, arg2,
 			LIB.GetObjectName(TARGET.PLAYER, arg1)
 		)
