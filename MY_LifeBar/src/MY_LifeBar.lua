@@ -449,7 +449,7 @@ function CheckInvalidRect(dwType, dwID, me, object)
 	end
 	bVisible = true
 	-- œ‘ æ±Íº«≈–∂œ
-	if bVisible and (dwType == TARGET.NPC or dwType == TARGET.PLAYER) and me.bIsolated ~= object.bIsolated then
+	if bVisible and (dwType == TARGET.NPC or dwType == TARGET.PLAYER) and LIB.IsIsolated(me) ~= LIB.IsIsolated(object) then
 		bVisible = false
 	end
 	-- æ‡¿Î≈–∂œ
