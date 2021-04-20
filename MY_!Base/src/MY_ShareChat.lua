@@ -53,13 +53,13 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '*') then
 	return
 end
 --------------------------------------------------------------------------
-local SHARE_CHAT = LIB.LoadLUAData({'temporary/share-chats.jx3dat', PATH_TYPE.GLOBAL}) -- NPC上报对话模板表（远程）
+local SHARE_CHAT = LIB.LoadLUAData({'temporary/npc-chat.jx3dat', PATH_TYPE.GLOBAL}) -- NPC上报对话模板表（远程）
 
 LIB.RegisterInit('MY_ShareChat', function()
 	if not SHARE_CHAT then
 		LIB.Ajax({
 			driver = 'auto', mode = 'auto', method = 'auto',
-			url = 'https://pull.j3cx.com/api/share-chats'
+			url = 'https://pull.j3cx.com/config/npc-chat'
 				.. '?l=' .. AnsiToUTF8(GLOBAL.GAME_LANG)
 				.. '&L=' .. AnsiToUTF8(GLOBAL.GAME_EDITION)
 				.. '&_=' .. GetCurrentTime(),
@@ -70,7 +70,7 @@ LIB.RegisterInit('MY_ShareChat', function()
 					for _, dwTemplateID in ipairs(data) do
 						SHARE_CHAT[dwTemplateID] = true
 					end
-					LIB.SaveLUAData({'temporary/share-chats.jx3dat', PATH_TYPE.GLOBAL}, SHARE_CHAT)
+					LIB.SaveLUAData({'temporary/npc-chat.jx3dat', PATH_TYPE.GLOBAL}, SHARE_CHAT)
 				end
 			end,
 		})
