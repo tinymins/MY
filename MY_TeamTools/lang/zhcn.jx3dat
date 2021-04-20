@@ -206,4 +206,5 @@ return {
     ['Max history'] = '最大历史记录',
     ['Min fight time'] = '最小战斗时间',
     ['%s second(s)'] = '%s秒',
+	['Show data files'] = '打开数据目录',
 }

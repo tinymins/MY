@@ -507,7 +507,7 @@ LIB.RegisterEvent('MY_NPC_FIGHT_HINT', function()
 	if not LOG_ENABLE then
 		return
 	end
-	local dwID, bFight, dwTemplateID = arg0, arg1, 0
+	local dwID, bFight = arg0, arg1
 	local KObject = LIB.GetObject(TARGET.NPC, dwID)
 	local fCurrentLife, fMaxLife, nCurrentMana, nMaxMana = -1, -1, -1, -1
 	if KObject then
@@ -572,7 +572,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
 	}):AutoWidth():Width() + 5
 
 	nX = nX + ui:Append('WndButton', {
-		x = nX, y = nY + 2, w = 25, h = 25,
+		x = nX, y = nY, w = 25, h = 25,
 		buttonstyle = 'OPTION',
 		autoenable = function() return MY_CombatLogs.bEnable end,
 		menu = function()
@@ -611,6 +611,12 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
 				})
 			end
 			insert(menu, m0)
+			insert(menu, {
+				szOption = _L['Show data files'],
+				fnAction = function()
+					UI.OpenTextEditor(LIB.GetAbsolutePath(DS_ROOT))
+				end,
+			})
 			return menu
 		end,
 	}):AutoWidth():Width() + 5
