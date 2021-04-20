@@ -55,6 +55,7 @@ end
 --------------------------------------------------------------------------
 local D = {
 	dwFightBeginTime = 0,
+	szFightUUID = '',
 	dwDamage = 0,
 	dwTherapy = 0,
 }
@@ -91,6 +92,7 @@ LIB.RegisterFlush('MY_JBAchievementRank', D.SaveData)
 LIB.RegisterEvent('MY_FIGHT_HINT', function()
 	if arg0 then
 		D.dwFightBeginTime = GetCurrentTime()
+		D.szFightUUID = arg1
 		D.dwDamage = 0
 		D.dwTherapy = 0
 	end
@@ -117,6 +119,7 @@ function D.ShareBKR(p, bOnymous, onfulfilled, oncomplete)
 	local szLeaderU = AnsiToUTF8(p.szLeader)
 	local szTeammateU = AnsiToUTF8(p.szTeammate)
 	local szClientGUIDU = AnsiToUTF8(p.szClientGUID)
+	local szFightUUIDU = AnsiToUTF8(p.szFightUUID)
 	local szURL = 'https://push.j3cx.com/api/achievement-rank/uploads?'
 		.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
 			l = AnsiToUTF8(GLOBAL.GAME_LANG),
@@ -130,6 +133,7 @@ function D.ShareBKR(p, bOnymous, onfulfilled, oncomplete)
 			time = p.dwTime,
 			fightBegin = p.dwFightBeginTime,
 			fightDuring = p.nFightTime,
+			fightUUID = szFightUUIDU,
 			damage = p.dwDamage,
 			therapy = p.dwTherapy,
 			roleType = p.nRoleType,
@@ -285,6 +289,7 @@ LIB.RegisterEvent({
 				dwAchieveID = dwAchieveID,
 				dwTime = GetCurrentTime(),
 				dwFightBeginTime = D.dwFightBeginTime,
+				szFightUUID = D.szFightUUID,
 				dwDamage = D.dwDamage,
 				nRoleType = me.nRoleType,
 				nFightTime = LIB.GetFightTime(),
