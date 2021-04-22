@@ -74,7 +74,7 @@ local function onFrameCreate()
 			ui:Find('.Text'):FontScale(fAbsCoefficient)
 			frame:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
 		end
-		ui:Append(PACKET_INFO.ROOT .. 'MY_Toolbox/ui/Btn_MagnifierUp.ini:WndButton', {
+		ui:Append(PLUGIN_ROOT .. '/ui/Btn_MagnifierUp.ini:WndButton', {
 			name = 'Btn_MY_MagnifierUp',
 			x = config.x, y = config.y, w = config.w, h = config.h,
 			onclick = function()
