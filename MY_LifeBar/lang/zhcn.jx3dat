@@ -80,6 +80,7 @@ return {
     ['Show when ui hide'] = '界面隐藏时仍然显示',
     ['Show kungfu'] = '显示心法',
     ['Show distance'] = '显示距离',
+    ['Decimal number'] = '精确小数点位数',
 
     ['Neutrality'] = '中立关系',
     ['Enemy'] = '敌对关系',

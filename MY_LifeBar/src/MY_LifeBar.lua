@@ -487,7 +487,7 @@ function CheckInvalidRect(dwType, dwID, me, object)
 		if not lb then
 			-- 创建和设置不会改变的东西
 			lb = LB(dwType, dwID)
-			lb:SetDistanceFmt('%d' .. g_tStrings.STR_METER)
+			lb:SetDistanceFmt('%.' .. Config.nDistanceDecimal .. 'f' .. g_tStrings.STR_METER)
 			lb:SetDistance(0)
 			LB_CACHE[dwID] = lb
 		end

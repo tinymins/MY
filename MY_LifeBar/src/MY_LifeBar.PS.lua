@@ -884,6 +884,27 @@ function PS.OnPanelActive(wnd)
 		autoenable = function() return D.IsEnabled() end,
 	})
 
+	ui:Append('WndButton', {
+		x = x + 180, y = y, w = 'auto',
+		buttonstyle = 'OPTION',
+		menu = function()
+			local m = { szOption = _L['Decimal number'] }
+			for i = 0, 2 do
+				insert(m, {
+					szOption = i,
+					bCheck = true, bMCheck = true,
+					bChecked = Config.nDistanceDecimal == i,
+					fnAction = function()
+						Config.nDistanceDecimal = i
+						D.Reset()
+					end,
+				})
+			end
+			return { m }
+		end,
+		autoenable = function() return D.IsEnabled() end,
+	})
+
 	y = y + offsety - 10
 	ui:Append('WndCheckBox', {
 		name = 'WndCheckBox_ScreenPosSort',
