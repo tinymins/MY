@@ -1130,7 +1130,7 @@ LIB.RegisterTutorial({
 		fnAction = function()
 			O.bEnable = false
 			PUBLIC_CONFIG_CHANGED = true
-			MY_Focus.Close()
+			MY_FocusUI.Close()
 			LIB.RedrawTab('MY_Focus')
 		end,
 	},
