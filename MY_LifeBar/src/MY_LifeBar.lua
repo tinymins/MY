@@ -63,7 +63,7 @@ local GetConfigValue, GetConfigComputeValue
 do
 local cfg, value
 function GetConfigValue(key, relation, force)
-	cfg, value = Config[key][relation]
+	cfg, value = Config[key][relation], nil
 	if force == 'Npc' or force == 'Player' then
 		value = cfg[force]
 	else
@@ -513,7 +513,7 @@ function CheckInvalidRect(dwType, dwID, me, object)
 		-- 倒计时/名字/帮会/称号部分
 		aCountDown, szCountDown = COUNTDOWN_CACHE[dwID], ''
 		while aCountDown and #aCountDown > 0 do
-			local tData, szText, nSec, fPer = aCountDown[1]
+			local tData, szText, nSec, fPer = aCountDown[1], nil, nil, nil
 			if tData.szType == 'BUFF' or tData.szType == 'DEBUFF' then
 				local KBuff = object.GetBuff(tData.dwBuffID, 0)
 				if KBuff then
