@@ -2741,12 +2741,26 @@ local function SetComponentSize(raw, nOuterWidth, nOuterHeight, nInnerWidth, nIn
 			btn:SetRelPos(nMarginLeft, nMarginTop)
 		end
 		btn:SetSize(nWidth - nMarginLeft - nMarginRight, nHeight - nMarginTop - nMarginBottom)
-		hdl:SetRelPos(-nMarginLeft, -nMarginTop)
-		hdl:SetAbsPos(btn:GetAbsX() - nMarginLeft, btn:GetAbsY() - nMarginTop) -- 这个 Wnd 的直接 Handle 坐标不刷新问题两年前就报了，没人修，妈的。
-		hdl:SetSize(nWidth, nHeight)
-		txt:SetRelPos(nMarginLeft + nPaddingLeft, nMarginTop + nPaddingTop)
-		txt:SetSize(nWidth - nMarginLeft - nPaddingLeft - nMarginRight - nPaddingRight, nHeight - nMarginTop - nPaddingTop - nMarginBottom - nPaddingBottom)
-		hdl:FormatAllItemPos()
+		if hdl then
+			if not txt then
+				for i = 0, hdl:GetItemCount() - 1 do
+					txt = hdl:Lookup(i)
+					if txt:GetType() == 'Text' then
+						break
+					end
+					txt = nil
+				end
+			end
+			hdl:SetRelPos(-nMarginLeft, -nMarginTop)
+			hdl:SetAbsPos(btn:GetAbsX() - nMarginLeft, btn:GetAbsY() - nMarginTop) -- 这个 Wnd 的直接 Handle 坐标不刷新问题两年前就报了，没人修，妈的。
+			hdl:SetSize(nWidth, nHeight)
+			hdl:FormatAllItemPos()
+		end
+		if txt then
+			txt:SetRelPos(nMarginLeft + nPaddingLeft, nMarginTop + nPaddingTop)
+			txt:SetSize(nWidth - nMarginLeft - nPaddingLeft - nMarginRight - nPaddingRight, nHeight - nMarginTop - nPaddingTop - nMarginBottom - nPaddingBottom)
+			txt:GetParent():FormatAllItemPos()
+		end
 	elseif componentType == 'WndCheckBox' then
 		local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
 		local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
