@@ -437,6 +437,20 @@ local function fxDeath(r, g, b, a) return ceil(r * 0.4), ceil(g * 0.4), ceil(b *
 local function fxDeathTarget(r, g, b, a) return ceil(r * 0.45), ceil(g * 0.45), ceil(b * 0.45), a end
 local lb, info, bVisible, bFight, nDisX, nDisY, nDisZ, fTextScale, dwTarType, dwTarID, relation, force, nPriority, szName, szTongName, r, g, b
 local aCountDown, szCountDown, bPet, bShowName, bShowKungfu, kunfu, bShowTong, bShowTitle, bShowLife, bShowLifePercent, tEffect, fCurrentLife, fMaxLife
+local bSpecialNpcVisible
+local function IsSpecialNpcVisible(dwID, me, object)
+	if not IsBoolean(bSpecialNpcVisible) then
+		bSpecialNpcVisible = false
+		if object.dwTemplateID == CHANGGE_REAL_SHADOW_TPLID and (not bShieldedVersion or not IsEnemy(me.dwID, dwID)) then
+			bSpecialNpcVisible = true
+		elseif not bShieldedVersion
+		and Config.bShowSpecialNpc and (not bShieldedVersion or LIB.IsInDungeon())
+		and (not Config.bShowSpecialNpcOnlyEnemy or IsEnemy(me.dwID, dwID)) then
+			bSpecialNpcVisible = true
+		end
+	end
+	return bSpecialNpcVisible
+end
 function CheckInvalidRect(dwType, dwID, me, object)
 	lb = LB_CACHE[dwID]
 	info = dwType == TARGET.PLAYER and me.IsPlayerInMyParty(dwID) and GetClientTeam().GetMemberInfo(dwID) or nil
@@ -448,6 +462,7 @@ function CheckInvalidRect(dwType, dwID, me, object)
 		return
 	end
 	bVisible = true
+	bSpecialNpcVisible = nil
 	-- 显示标记判断
 	if bVisible and (dwType == TARGET.NPC or dwType == TARGET.PLAYER) and LIB.IsIsolated(me) ~= LIB.IsIsolated(object) then
 		bVisible = false
@@ -465,16 +480,7 @@ function CheckInvalidRect(dwType, dwID, me, object)
 	-- if bVisible then
 	-- 	bVisible = fPitch > -0.8 or D.GetNz(me.nZ,object.nZ) < Config.nDistance / 2.5
 	-- end
-	if bVisible
-	and dwType == TARGET.NPC
-	and not object.CanSeeName()
-	and (object.dwTemplateID ~= CHANGGE_REAL_SHADOW_TPLID or (bShieldedVersion and IsEnemy(me.dwID, dwID)))
-	and (
-		bShieldedVersion
-		or not Config.bShowSpecialNpc or (bShieldedVersion and not LIB.IsInDungeon())
-		or (Config.bShowSpecialNpcOnlyEnemy and not IsEnemy(me.dwID, dwID))
-		or NPC_HIDDEN[object.dwTemplateID]
-	) then
+	if bVisible and dwType == TARGET.NPC and NPC_HIDDEN[object.dwTemplateID] then
 		bVisible = false
 	end
 	if bVisible then
@@ -564,6 +570,9 @@ function CheckInvalidRect(dwType, dwID, me, object)
 		lb:SetCD(szCountDown)
 		-- 名字
 		bShowName = GetConfigComputeValue('ShowName', relation, force, bFight, bPet)
+		if bShowName and dwType == TARGET.NPC and not object.CanSeeName() then
+			bShowName = IsSpecialNpcVisible(dwID, me, object)
+		end
 		if bShowName then
 			lb:SetName(szName)
 		end
@@ -607,6 +616,9 @@ function CheckInvalidRect(dwType, dwID, me, object)
 		end
 		lb:SetLife(fCurrentLife, fMaxLife)
 		bShowLife = szName ~= '' and GetConfigComputeValue('ShowLife', relation, force, bFight, bPet)
+		if bShowLife and dwType == TARGET.NPC and not object.CanSeeLifeBar() then
+			bShowLife = IsSpecialNpcVisible(dwID, me, object)
+		end
 		if bShowLife then
 			lb:SetLifeBar(Config.nLifeOffsetX, Config.nLifeOffsetY, Config.nLifeWidth, Config.nLifeHeight, Config.nLifePadding)
 			lb:SetLifeBarBorder(Config.nLifeBorder, Config.nLifeBorderR, Config.nLifeBorderG, Config.nLifeBorderB)
