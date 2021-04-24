@@ -180,17 +180,15 @@ function PS.OnPanelActive(frame)
 		end,
 	}):AutoWidth():Width() + 5
 
-	local me = GetClientPlayer()
-	if me.dwForceID == CONSTANT.FORCE_TYPE.WU_DU then
-		x = x + ui:Append('WndCheckBox', {
-			x = x, y = y, text = _L['ZuiWu Effect'],
-			color = { LIB.GetForceColor(6) },
-			checked = CFG.bShowEffect,
-			oncheck = function(bCheck)
-				CFG.bShowEffect = bCheck
-			end,
-		}):AutoWidth():Width() + 5
-	end
+	x = x + ui:Append('WndCheckBox', {
+		x = x, y = y, text = _L['ZuiWu Effect'],
+		checked = CFG.bShowEffect,
+		oncheck = function(bCheck)
+			CFG.bShowEffect = bCheck
+		end,
+		tip = _L['Show effect when teammate get ZuiWu, only your ZuiWu will be showen while you\'re BuTianJue.'],
+		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+	}):AutoWidth():Width() + 5
 
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['Show central party member tag'],

@@ -19,6 +19,7 @@ return {
 	['Show caution animate'] = '显示警告特效',
 	['Show screen head'] = '显示头顶警告',
 	['ZuiWu Effect'] = '醉舞范围',
+	['Show effect when teammate get ZuiWu, only your ZuiWu will be showen while you\'re BuTianJue.'] = '显示受到醉舞治疗的队友特效，当你的心法为补天诀时将仅显示受到你的醉舞效果治疗的队友。',
 	['Name/Icon/Mana/Life Display'] = '名字、图标、内力和血量显示方案',
 	['Life font'] = '血量字体',
 	['Name font'] = '名字字体',
