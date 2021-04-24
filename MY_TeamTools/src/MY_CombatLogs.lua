@@ -331,7 +331,8 @@ function D.OnTargetUpdate(dwID, bForce)
 				tEquipInfo.dwTemporaryEnchantLeftSeconds,
 			})
 		end
-		D.InsertLog(LOG_TYPE.PLAYER_INFO, { dwID, szName, dwForceID, dwMountKungfuID, nEquipScore, aEquip })
+		local szGUID = LIB.GetPlayerGUID(dwID) or ''
+		D.InsertLog(LOG_TYPE.PLAYER_INFO, { dwID, szName, dwForceID, dwMountKungfuID, nEquipScore, aEquip, szGUID })
 	else
 		local npc = GetNpc(dwID)
 		if not npc then
