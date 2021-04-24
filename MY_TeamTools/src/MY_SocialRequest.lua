@@ -246,14 +246,14 @@ function R.Drawer(container, info)
 	local ui = UI(wnd)
 	ui:Append('WndButton', {
 		name = 'Btn_Accept',
-		x = 240, y = 9, w = 60, h = 34,
+		x = 326, y = 9, w = 60, h = 34,
 		buttonstyle = 'FLAT',
 		text = _L['Add'],
 		onclick = D.OnLButtonClick,
 	})
 	ui:Append('WndButton', {
 		name = 'Btn_Refuse',
-		x = 305, y = 9, w = 60, h = 34,
+		x = 393, y = 9, w = 60, h = 34,
 		buttonstyle = 'FLAT',
 		text = _L['Ignore'],
 		onclick = D.OnLButtonClick,
