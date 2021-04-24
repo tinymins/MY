@@ -4348,6 +4348,34 @@ function LIB.GetPlayerEquipInfo(player)
 	return tEquipInfo
 end
 
+function LIB.GetPlayerTalentInfo(...)
+	local player = ...
+	if select('#', ...) == 0 then
+		player = GetClientPlayer()
+	end
+	if not player then
+		return
+	end
+	local aInfo, aRes = player.GetTalentInfo(), {}
+	for i, info in ipairs(aInfo) do
+		local skill = info.SkillArray[info.nSelectIndex]
+		if skill then
+			aRes[i] = {
+				nIndex = info.nSelectIndex,
+				dwSkillID = skill.dwSkillID,
+				dwSkillLevel = skill.dwSkillLevel,
+			}
+		else
+			aRes[i] = {
+				nIndex = info.nSelectIndex,
+				dwSkillID = 0,
+				dwSkillLevel = 0,
+			}
+		end
+	end
+	return aRes
+end
+
 do
 local MACRO_ACTION_DATATYPE = {
 	['cast'] = 'SKILL',
