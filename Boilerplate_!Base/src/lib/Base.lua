@@ -970,6 +970,8 @@ local CONSTANT = setmetatable({}, {
 			[442] = true, -- 浪客行·胡杨林道
 			[443] = true, -- 浪客行·浮景峰
 			[461] = true, -- 浪客行·落樱林
+			[527] = true, -- 浪客行·苍离岛
+			[528] = true, -- 浪客行·漓水
 		},
 		-- 相同名字的地图 全部指向同一个ID
 		MAP_NAME_FIX = {
