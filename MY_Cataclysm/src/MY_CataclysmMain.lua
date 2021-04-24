@@ -944,6 +944,7 @@ function MY_CataclysmMain.OnFrameBreathe()
 	MY_CataclysmParty:RefreshTTarget()
 	MY_CataclysmParty:RefreshBossTarget()
 	MY_CataclysmParty:RefreshBossFocus()
+	MY_CataclysmParty:RefreshSputtering()
 	local fPrepare, szPrepare, nAlpha
 	local dwType, dwID = me.GetTarget()
 	if dwType == TARGET.NPC then

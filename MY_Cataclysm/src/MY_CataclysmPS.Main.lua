@@ -192,6 +192,35 @@ function PS.OnPanelActive(frame)
 		}):AutoWidth():Width() + 5
 	end
 
+	x = x + ui:Append('WndCheckBox', {
+		x = x, y = y, text = _L['Show central party member tag'],
+		checked = CFG.bShowSputtering,
+		oncheck = function(bCheck)
+			CFG.bShowSputtering = bCheck
+		end,
+		tip = _L['Show color on right top pos of central member of each party'],
+		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+	}):AutoWidth():Width() + 5
+	x = x + ui:Append('WndButton', {
+		x = x, y = y, w = 25, h = 25,
+		buttonstyle = 'OPTION',
+		menu = function()
+			return {
+				{
+					szOption = _L['Set sputtering distance'],
+					fnAction = function()
+						GetUserInputNumber(
+							CFG.nSputteringDistance,
+							1000,
+							nil,
+							function(val) CFG.nSputteringDistance = val or CFG.nSputteringDistance end)
+					end,
+				},
+			}
+		end,
+		autoenable = function() return CFG.bShowSputtering end,
+	}):Width() + 5
+
 	x = X + 10
 	y = y + 25
 	x = x + ui:Append('WndCheckBox', {

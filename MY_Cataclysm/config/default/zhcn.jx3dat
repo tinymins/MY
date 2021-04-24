@@ -58,6 +58,8 @@ return {
 	bShowScreenHead        = true,
 	bShowGroupNumber       = true,
 	bShowEffect            = false, -- 五毒醉舞提示 万花距离提示 晚点做
+	bShowSputtering        = false,
+	nSputteringDistance    = 15,
 	aBuffList              = {},
 	tDistanceLevel         = { 20, 22, 200 },
 	tManaColor             = { 0, 96, 255 },

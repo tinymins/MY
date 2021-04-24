@@ -1999,6 +1999,43 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 	end
 end
 
+-- ÷ÿªÊΩ¶…‰÷˙ ÷
+function CTM:RefreshSputtering()
+	local team = GetClientTeam()
+	if CFG.bShowSputtering then
+		for nGroup = 0, team.nGroupNum - 1 do
+			local tGroupInfo = team.GetGroupInfo(nGroup)
+			local nMaxCount, tCount = 1, {}
+			for _, dwID in pairs(tGroupInfo.MemberList) do
+				local info, nCount = team.GetMemberInfo(dwID), 0
+				if not info.bDeathFlag and info.bIsOnLine then
+					for _, dwID2 in pairs(tGroupInfo.MemberList) do
+						local info2 = team.GetMemberInfo(dwID2)
+						if not info2.bDeathFlag and info2.bIsOnLine
+						and LIB.GetDistance(info.nPosX, info.nPosY, info.nPosZ, info2.nPosX, info2.nPosY, info2.nPosZ, 'gwwean') <= CFG.nSputteringDistance then
+							nCount = nCount + 1
+						end
+					end
+					if nCount > nMaxCount then
+						nMaxCount = nCount
+					end
+				end
+				tCount[dwID] = nCount
+			end
+			for _, dwID in pairs(tGroupInfo.MemberList) do
+				CTM_CACHE[dwID]:Lookup('Handle_Sputtering'):SetVisible(tCount[dwID] == nMaxCount)
+			end
+		end
+	else
+		for nGroup = 0, team.nGroupNum - 1 do
+			local tGroupInfo = team.GetGroupInfo(nGroup)
+			for _, dwID in pairs(tGroupInfo.MemberList) do
+				CTM_CACHE[dwID]:Lookup('Handle_Sputtering'):Hide()
+			end
+		end
+	end
+end
+
 function CTM:DrawShadow(sha, x, y, r, g, b, a, bGradient) -- ÷ÿªÊ»˝Ω«…»
 	sha:SetTriangleFan(GEOMETRY_TYPE.TRIANGLE)
 	sha:ClearTriangleFanPoint()
