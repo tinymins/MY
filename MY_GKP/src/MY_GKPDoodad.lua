@@ -296,7 +296,7 @@ end
 function D.OnAutoDoodad()
 	local me = GetClientPlayer()
 	-- auto interact
-	if not me or me.GetOTActionState() ~= 0
+	if not me or LIB.GetOTActionState(me) ~= CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_IDLE
 		or (me.nMoveState ~= MOVE_STATE.ON_STAND and me.nMoveState ~= MOVE_STATE.ON_FLOAT)
 		-- or IsDialoguePanelOpened()
 	then
@@ -351,7 +351,7 @@ end
 
 function D.CloseLootWindow()
 	local me = GetClientPlayer()
-	if me and me.GetSkillOTActionState() == CHARACTER_OTACTION_TYPE.ACTION_PICKING then
+	if me and LIB.GetOTActionState(me) == CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_PICKING then
 		me.OnCloseLootWindow()
 	end
 end

@@ -524,9 +524,13 @@ function CheckInvalidRect(dwType, dwID, me, object)
 					end
 				end
 			elseif tData.szType == 'CASTING' then
-				local nType, dwSkillID, dwSkillLevel, fCastPercent = object.GetSkillOTActionState()
+				local nType, dwSkillID, dwSkillLevel, fCastPercent = LIB.GetOTActionState(object)
 				if dwSkillID == tData.dwSkillID
-				and (nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE or nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL) then
+				and (
+					nType == CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
+					or nType == CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL
+					or nType == CONSTANT.CHARACTER_OTACTION_TYPE.ANCIENT_ACTION_PREPARE
+				) then
 					fPer = fCastPercent
 					szText = tData.szText or LIB.GetSkillName(dwSkillID, dwSkillLevel)
 				end

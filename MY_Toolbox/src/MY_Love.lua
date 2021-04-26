@@ -222,7 +222,9 @@ function D.UseDoubleLoveItem(aInfo, aUIID, callback)
 			if not me then
 				return 0
 			end
-			if me.GetSkillOTActionState() == 6 then -- otActionItemSkill
+			local nType = LIB.GetOTActionState(me)
+			if nType == CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_ITEM_SKILL
+			or nType == CONSTANT.CHARACTER_OTACTION_TYPE.ANCIENT_ACTION_PREPARE then -- otActionItemSkill
 				nFinishTime = GetTime() + 500
 			elseif GetTime() > nFinishTime then
 				callback(D.GetBagItemNum(dwBox, dwX) ~= nNum)

@@ -337,17 +337,14 @@ function D.UpdateItem(hItem, p)
 	end
 	-- ∂¡Ãı
 	if dwType ~= TARGET.DOODAD then
-		local nType, dwSkillID, dwSkillLevel, fProgress = KObject.GetSkillOTActionState()
+		local nType, dwSkillID, dwSkillLevel, fProgress = LIB.GetOTActionState(KObject)
 		if MY_Focus.bTraversal and dwType == TARGET.PLAYER
-		and (
-			nType ~= CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
-			and nType ~= CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL
-			and KObject.GetOTActionState() == 1
-		) then
+		and nType ~= CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_IDLE then
 			LIB.WithTarget(dwType, dwID, function()
-				local nType, dwSkillID, dwSkillLevel, fProgress = KObject.GetSkillOTActionState()
-				if nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
-				or nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL then
+				local nType, dwSkillID, dwSkillLevel, fProgress = LIB.GetOTActionState(KObject)
+				if nType == CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
+				or nType == CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL
+				or nType == CONSTANT.CHARACTER_OTACTION_TYPE.ANCIENT_ACTION_PREPARE then
 					hItem:Lookup('Handle_R/Handle_Progress/Image_Progress'):SetPercentage(fProgress)
 					hItem:Lookup('Handle_R/Handle_Progress/Text_Progress'):SetText((LIB.GetSkillName(dwSkillID, dwSkillLevel)))
 				else
@@ -356,8 +353,9 @@ function D.UpdateItem(hItem, p)
 				end
 			end)
 		else
-			if nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
-			or nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL then
+			if nType == CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
+			or nType == CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL
+			or nType == CONSTANT.CHARACTER_OTACTION_TYPE.ANCIENT_ACTION_PREPARE then
 				hItem:Lookup('Handle_R/Handle_Progress/Image_Progress'):SetPercentage(fProgress)
 				hItem:Lookup('Handle_R/Handle_Progress/Text_Progress'):SetText((LIB.GetSkillName(dwSkillID, dwSkillLevel)))
 			else

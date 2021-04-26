@@ -261,7 +261,7 @@ function D.OnUseManaChange(_, bUseMana)
 			end
 			local fCurrentLife, fMaxLife = LIB.GetObjectLife(me)
 			-- 不在地上
-			if me.bOnHorse or me.nMoveState ~= MOVE_STATE.ON_STAND or me.GetOTActionState() ~= 0 then
+			if me.bOnHorse or me.nMoveState ~= MOVE_STATE.ON_STAND then
 				return
 			end
 			-- 血蓝很足
@@ -269,7 +269,7 @@ function D.OnUseManaChange(_, bUseMana)
 				return
 			end
 			-- 在读条
-			if me.GetSkillOTActionState() ~= CHARACTER_OTACTION_TYPE.ACTION_IDLE then
+			if LIB.GetOTActionState(me) ~= CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_IDLE then
 				return
 			end
 			-- 吃不了

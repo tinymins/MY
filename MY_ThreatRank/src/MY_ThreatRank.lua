@@ -155,10 +155,11 @@ function TS.OnFrameBreathe()
 	local p = GetNpc(this.dwTargetID)
 	if p then
 		ApplyCharacterThreatRankList(this.dwTargetID)
-		local nType, dwSkillID, dwSkillLevel, fCastPercent = p.GetSkillOTActionState()
+		local nType, dwSkillID, dwSkillLevel, fCastPercent = LIB.GetOTActionState(p)
 		local fCurrentLife, fMaxLife = LIB.GetObjectLife(p)
-		if nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
-		or nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL then
+		if nType == CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
+		or nType == CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL
+		or nType == CONSTANT.CHARACTER_OTACTION_TYPE.ANCIENT_ACTION_PREPARE then
 			this.CastBar:Show()
 			this.CastBar:SetPercentage(fCastPercent)
 			local szName = LIB.GetSkillName(dwSkillID, dwSkillLevel)

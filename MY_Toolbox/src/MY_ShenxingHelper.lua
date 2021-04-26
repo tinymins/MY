@@ -250,10 +250,11 @@ function D.CheckAvoidBlackShenxingEnable()
 				return
 			end
 
-			local nType, dwSkillID, dwSkillLevel, fProgress = player.GetSkillOTActionState()
+			local nType, dwSkillID, dwSkillLevel, fProgress = LIB.GetOTActionState(player)
 			if not ((
-				nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
-				or nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL
+				nType == CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
+				or nType == CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL
+				or nType == CONSTANT.CHARACTER_OTACTION_TYPE.ANCIENT_ACTION_PREPARE
 			) and dwSkillID == 3691) then
 				return
 			end
