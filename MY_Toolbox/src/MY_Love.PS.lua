@@ -58,6 +58,8 @@ local D = {
 	GetLover = MY_Love.GetLover,
 	SetLover = MY_Love.SetLover,
 	FixLover = MY_Love.FixLover,
+	BackupLover = MY_Love.BackupLover,
+	RestoreLover = MY_Love.RestoreLover,
 	RemoveLover = MY_Love.RemoveLover,
 	FormatLoverString = MY_Love.FormatLoverString,
 }
@@ -86,7 +88,7 @@ function D.GetLoverMenu(nType)
 	for _, v in ipairs(aGroup) do
 		local aFriend = me.GetFellowshipInfo(v.id) or {}
 		for _, vv in ipairs(aFriend) do
-			if vv.istwoway and vv.attraction >= MY_Love.nLoveAttraction and (nType ~= 1 or vv.attraction >= MY_Love.nDoubleLoveAttraction) then
+			if vv.attraction >= MY_Love.nLoveAttraction and (nType ~= 1 or vv.attraction >= MY_Love.nDoubleLoveAttraction) then
 				insert(m0, {
 					szOption = vv.name,
 					fnDisable = function() return not vv.isonline end,
@@ -132,6 +134,20 @@ function PS.OnPanelActive(wnd)
 		if not lover or not lover.dwID or lover.dwID == 0 then
 			nX = X + 10
 			nX = ui:Append('Text', { text = _L['No lover :-('], font = 19, x = nX, y = nY }):Pos('BOTTOMRIGHT')
+			nX = ui:Append('Text', {
+				text = _L['[Restore]'], x = nX + 10, y = nY,
+				onclick = function()
+					local szFilePath = GetOpenFileName(
+						_L['Please select lover backup data file:'],
+						'JX3 Lover File(*.lover.jx3dat)\0*.jx3dat\0JX3 File(*.jx3dat)\0*.jx3dat\0All Files(*.*)\0*.*\0\0',
+						LIB.FormatPath({ 'export/lover_backup/', PATH_TYPE.GLOBAL })
+					)
+					if szFilePath == '' then
+						return
+					end
+					D.RestoreLover(szFilePath)
+				end,
+			}):AutoWidth():Pos('BOTTOMRIGHT')
 			-- create lover
 			nX = X + 10
 			nY = nY + 36
@@ -182,6 +198,7 @@ function PS.OnPanelActive(wnd)
 			nX = ui:Append('Text', { text = _L['[Break love]'], x = nX + 10, y = nY, onclick = D.RemoveLover }):AutoWidth():Pos('BOTTOMRIGHT')
 			if lover.nLoverType == 1 then
 				nX = ui:Append('Text', { text = _L['[Recovery]'], x = nX + 10, y = nY, onclick = D.FixLover }):AutoWidth():Pos('BOTTOMRIGHT')
+				nX = ui:Append('Text', { text = _L['[Backup]'], x = nX + 10, y = nY, onclick = D.BackupLover }):AutoWidth():Pos('BOTTOMRIGHT')
 			end
 			ui:Append('WndCheckBox', {
 				x = nX + 10, y = nY + 2,
@@ -274,6 +291,10 @@ function PS.OnPanelActive(wnd)
 	nY = nY + ui:Append('Text', {
 		x = nX, y = nY, w = W - nX * 2, multiline = true, valign = 0,
 		text = _L['6. Lover can see each other\'s location, delete friend can prevent this.'],
+	}):AutoHeight():Height() + 3
+	nY = nY + ui:Append('Text', {
+		x = nX, y = nY, w = W - nX * 2, multiline = true, valign = 0,
+		text = _L['7. Backup lover requires both online and teamed up, backup data can be used to restore data while server merge or player crossing server.'],
 	}):AutoHeight():Height() + 3
 	O.bPanelActive = true
 end

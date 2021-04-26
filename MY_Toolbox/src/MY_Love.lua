@@ -165,6 +165,18 @@ RegisterCustomData('MY_Love.bAutoReplyLover')
 -- 本地函数和变量
 ---------------------------------------------------------------------
 
+local Schema = LIB.Schema
+local BACKUP_DATA_SCHEMA = Schema.Record({
+	szName = Schema.String,
+	szUUID = Schema.String,
+	szLoverName = Schema.String,
+	szLoverUUID = Schema.String,
+	nLoverType = Schema.Number,
+	nLoverTime = Schema.Number,
+	nSendItem = Schema.Number,
+	nReceiveItem = Schema.Number,
+})
+
 -- 功能屏蔽
 function D.IsShielded()
 	return false
@@ -608,6 +620,81 @@ function D.GetOtherLover(dwID)
 	return O.tOtherLover[dwID]
 end
 
+local BACKUP_PASS_PHRASE = '78ed108e-cedd-40ef-8dcc-1529db94b3c9'
+function D.BackupLover(...)
+	local szLoverName, szLoverUUID = ...
+	if not LIB.IsRemoteStorage() then
+		return LIB.Alert(_L['Please enable sync common ui config first'])
+	end
+	if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) or LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
+		return LIB.Systopmsg(_L['Backup lover is a sensitive action, please unlock to continue.'])
+	end
+	local lover = Clone(O.lover)
+	if select('#', ...) == 2 then
+		if szLoverName == lover.szName and szLoverUUID then
+			local szPath = LIB.FormatPath(
+				{
+					'export/lover_backup/'
+						.. LIB.GetUserRoleName() .. '_' .. LIB.GetClientUUID() .. '-'
+						.. szLoverName .. '_' .. szLoverUUID .. '-'
+						.. LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss')
+						.. '.lover.jx3dat',
+					PATH_TYPE.ROLE
+				})
+			LIB.SaveLUAData(
+				szPath,
+				{
+					szName = LIB.GetUserRoleName(),
+					szUUID = LIB.GetClientUUID(),
+					szLoverName = szLoverName,
+					szLoverUUID = szLoverUUID,
+					nLoverType = lover.nLoverType,
+					nLoverTime = lover.nLoverTime,
+					nSendItem = lover.nSendItem,
+					nReceiveItem = lover.nReceiveItem,
+				},
+				{ passphrase = BACKUP_PASS_PHRASE }
+			)
+			local szFullPath = LIB.GetAbsolutePath(szPath)
+			LIB.Alert(_L('Backup lover successed, file located at: %s.', szFullPath))
+			LIB.Sysmsg(_L('Backup lover successed, file located at: %s.', szFullPath))
+		end
+	else
+		if lover.nLoverType == 1 then -- 双向
+			local info = GetClientTeam().GetMemberInfo(lover.dwID)
+			if not info or not info.bIsOnLine then
+				LIB.Systopmsg(_L['Lover must in your team and online to do backup.'])
+			else
+				LIB.SendBgMsg(lover.szName, 'MY_LOVE', {'BACKUP'})
+				LIB.Systopmsg(_L['Backup request has been sent, wait please.'])
+			end
+		else
+			LIB.Systopmsg(_L['Backup feature only supports mutual love!'])
+		end
+	end
+end
+
+function D.RestoreLover(szFilePath)
+	local data = LIB.LoadLUAData(szFilePath, { passphrase = BACKUP_PASS_PHRASE })
+	local errs = Schema.CheckSchema(data, BACKUP_DATA_SCHEMA)
+	if errs then
+		return LIB.Alert(_L['Error: file is not a valid lover backup!'])
+	end
+	if data.szUUID == LIB.GetClientUUID() then
+		GetUserInput(_L['Please input your lover\'s current name:'], function(szLoverName)
+			szLoverName = wgsub(wgsub(LIB.TrimString(szLoverName), '[', ''), ']', '')
+			LIB.Confirm(
+				_L('Send restore lover request to [%s]?', szLoverName),
+				function()
+					LIB.SendBgMsg(szLoverName, 'MY_LOVE', {'RESTORE', data})
+				end
+			)
+		end, nil, nil, nil, data.szLoverName)
+	else
+		LIB.Alert(_L['This file is not your lover backup, please check!'])
+	end
+end
+
 -------------------------------------
 -- 事件处理
 -------------------------------------
@@ -785,6 +872,41 @@ local function OnBgTalk(_, aData, nChannel, dwTalkerID, szTalkerName, bSelf)
 				szLoverTitle = data[9] or '',
 			}
 			FireUIEvent('MY_LOVE_OTHER_UPDATE', dwTalkerID)
+		elseif szKey == 'BACKUP' then
+			if O.lover.dwID == dwTalkerID then
+				LIB.Confirm(_L('[%s] want to backup lover relation with you, do you agree?', szTalkerName), function()
+					if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) or LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
+						LIB.Systopmsg(_L['Backup lover is a sensitive action, please unlock to continue.'])
+						return false
+					end
+					LIB.SendBgMsg(szTalkerName, 'MY_LOVE', {'BACKUP_ANS', LIB.GetClientUUID()})
+				end)
+			else
+				LIB.SendBgMsg(szTalkerName, 'MY_LOVE', {'BACKUP_ANS_NOT_LOVER'})
+			end
+		elseif szKey == 'BACKUP_ANS' then
+			D.BackupLover(szTalkerName, data)
+		elseif szKey == 'BACKUP_ANS_NOT_LOVER' then
+			LIB.Alert(_L['Peer is not your lover, please check, or do fix lover first.'])
+		elseif szKey == 'RESTORE' then
+			if data.szLoverUUID == LIB.GetClientUUID() then
+				LIB.Confirm(_L('[%s] want to restore lover relation with you, do you agree?', szTalkerName), function()
+					if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) or LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
+						LIB.Systopmsg(_L['Restore lover is a sensitive action, please unlock to continue.'])
+						return false
+					end
+					LIB.SendBgMsg(szTalkerName, 'MY_LOVE', {'RESTORE_AGREE', data})
+				end)
+			else
+				LIB.SendBgMsg(szTalkerName, 'MY_LOVE', {'RESTORE_NOT_ME', data})
+			end
+		elseif szKey == 'RESTORE_AGREE' then
+			if LIB.GetClientUUID() == data.szUUID and not Schema.CheckSchema(data, BACKUP_DATA_SCHEMA) then
+				D.SaveLover(data.nLoverTime, dwTalkerID, data.nLoverType, data.nSendItem, data.nReceiveItem)
+				LIB.Alert(_L['Restore lover succeed!'])
+			end
+		elseif szKey == 'RESTORE_NOT_ME' then
+			LIB.Alert(_L['Peer is not your lover in this backup, please check.'])
 		elseif szKey == 'DATA_NOT_SYNC' then
 			LIB.Alert(_L('[%s] disabled ui config sync, unable to read data.', szTalkerName))
 		end
@@ -867,6 +989,8 @@ local settings = {
 				GetLover = D.GetLover,
 				SetLover = D.SetLover,
 				FixLover = D.FixLover,
+				BackupLover = D.BackupLover,
+				RestoreLover = D.RestoreLover,
 				RemoveLover = D.RemoveLover,
 				FormatLoverString = D.FormatLoverString,
 				GetPlayerInfo = D.GetPlayerInfo,
