@@ -2877,6 +2877,28 @@ function LIB.IsIsolated(...)
 	return KObject.bIsolated
 end
 
+-- 获取对象运功状态
+function LIB.GetOTActionState(...)
+	local KObject = ...
+	if select('#', ...) == 0 then
+		KObject = GetClientPlayer()
+	end
+	if not KObject then
+		return
+	end
+	local nType, dwSkillID, dwSkillLevel, fCastPercent
+	local bNewAPI = pcall(function() assert(KObject.GetSkillOTActionState) end)
+	if bNewAPI then
+		nType, dwSkillID, dwSkillLevel, fCastPercent = KObject.GetSkillOTActionState()
+	else
+		nType, dwSkillID, dwSkillLevel, fCastPercent = KObject.GetSkillPrepareState()
+		nType = nType
+			and CONSTANT.CHARACTER_OTACTION_TYPE.ANCIENT_ACTION_PREPARE
+			or CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_IDLE
+	end
+	return nType, dwSkillID, dwSkillLevel, fCastPercent
+end
+
 -- 获取对象当前是否可读条
 -- (bool) LIB.CanOTAction([object KObject])
 function LIB.CanOTAction(...)
@@ -4346,34 +4368,6 @@ function LIB.GetPlayerEquipInfo(player)
 		end
 	end
 	return tEquipInfo
-end
-
-function LIB.GetPlayerTalentInfo(...)
-	local player = ...
-	if select('#', ...) == 0 then
-		player = GetClientPlayer()
-	end
-	if not player then
-		return
-	end
-	local aInfo, aRes = player.GetTalentInfo(), {}
-	for i, info in ipairs(aInfo) do
-		local skill = info.SkillArray[info.nSelectIndex]
-		if skill then
-			aRes[i] = {
-				nIndex = info.nSelectIndex,
-				dwSkillID = skill.dwSkillID,
-				dwSkillLevel = skill.dwSkillLevel,
-			}
-		else
-			aRes[i] = {
-				nIndex = info.nSelectIndex,
-				dwSkillID = 0,
-				dwSkillLevel = 0,
-			}
-		end
-	end
-	return aRes
 end
 
 do
