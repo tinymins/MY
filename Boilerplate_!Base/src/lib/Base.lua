@@ -880,6 +880,24 @@ local CONSTANT = setmetatable({}, {
 			ARROW         = 24, -- °µÆ÷
 			TOTAL         = 25,
 		}),
+		CHARACTER_OTACTION_TYPE = setmetatable({}, {
+			__index = setmetatable(
+				{
+					ACTION_IDLE            = 0,
+					ACTION_SKILL_PREPARE   = 1,
+					ACTION_SKILL_CHANNEL   = 2,
+					ACTION_RECIPE_PREPARE  = 3,
+					ACTION_PICK_PREPARE    = 4,
+					ACTION_PICKING         = 5,
+					ACTION_ITEM_SKILL      = 6,
+					ACTION_CUSTOM_PREPARE  = 7,
+					ACTION_CUSTOM_CHANNEL  = 8,
+					ACTION_SKILL_HOARD     = 9,
+					ANCIENT_ACTION_PREPARE = 1000,
+				},
+				{ __index = _G.CHARACTER_OTACTION_TYPE }),
+			__newindex = function() end,
+		}),
 		FORCE_TYPE = FORCE_TYPE,
 		KUNGFU_TYPE = (function()
 			local KUNGFU_TYPE = _G.KUNGFU_TYPE or SetmetaReadonly({
