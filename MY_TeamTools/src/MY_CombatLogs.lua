@@ -743,7 +743,9 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
 			insert(menu, {
 				szOption = _L['Show data files'],
 				fnAction = function()
-					UI.OpenTextEditor(LIB.GetAbsolutePath(DS_ROOT))
+					local szRoot = LIB.GetAbsolutePath(DS_ROOT)
+					LIB.OpenFolder(szRoot)
+					UI.OpenTextEditor(szRoot)
 				end,
 			})
 			return menu
