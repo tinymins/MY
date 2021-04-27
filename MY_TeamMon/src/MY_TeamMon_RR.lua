@@ -945,7 +945,8 @@ LIB.RegisterInit('MY_TeamMon_RR', function()
 		D.FetchMetaInfo(
 			O.szLastURL,
 			function(info)
-				if O.szLastVersion ~= info.szVersion and O.szLastSkipVersion ~= info.szVersion then
+				local szPrimaryVersion = info.szVersion:gsub('%..+$', '')
+				if O.szLastVersion:gsub('%..+$', '') ~= szPrimaryVersion and O.szLastSkipVersion:gsub('%..+$', '') ~= szPrimaryVersion then
 					LIB.Confirm(
 						_L('New version found for TeamMon_RR\nSURL: %s\nName: %s\nTime: %s\n\nDo you want to update data now?',
 							GetShortURL(info.szURL) or ' - ',
