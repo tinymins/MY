@@ -81,6 +81,7 @@ local LOG_TARGET_INFO_TIME = {} -- 目标信息记录时间
 local LOG_TARGET_INFO_TIME_LIMIT = 10000 -- 目标信息再次记录最小时间间隔
 local LOG_DOODAD_INFO_TIME = {} -- 交互物件信息记录时间
 local LOG_DOODAD_INFO_TIME_LIMIT = 10000 -- 交互物件信息再次记录最小时间间隔
+local LOG_NAMING_COUNT = {} -- 记录中NPC被提及的数量统计，用于命名记录文件
 
 local LOG_REPLAY = {} -- 最近的数据 （进战时候将最近的数据压进来）
 local LOG_REPLAY_FRAME = GLOBAL.GAME_FPS * 1 -- 进战时候将多久的数据压进来（逻辑帧）
@@ -171,6 +172,7 @@ function D.OpenCombatLogs()
 	LOG_CACHE = {}
 	LOG_TARGET_INFO_TIME = {}
 	LOG_DOODAD_INFO_TIME = {}
+	LOG_NAMING_COUNT = {}
 	LOG_CRC = 0
 	Log(LOG_FILE, '', 'clear')
 end
@@ -185,7 +187,14 @@ function D.CloseCombatLogs()
 	if GetCurrentTime() - LOG_TIME < O.nMinFightTime then
 		CPath.DelFile(LOG_FILE)
 	else
-		CPath.Move(LOG_FILE, wsub(LOG_FILE, 1, -5))
+		local szName, nCount = '', 0
+		for _, p in pairs(LOG_NAMING_COUNT) do
+			if p.nCount > nCount then
+				nCount = p.nCount
+				szName = '-' .. p.szName
+			end
+		end
+		CPath.Move(LOG_FILE, wsub(LOG_FILE, 1, -9) .. szName .. '.jcl')
 	end
 	LOG_FILE = nil
 end
@@ -293,10 +302,19 @@ function D.OnTargetUpdate(dwID, bForce)
 	if not IsNumber(dwID) then
 		return
 	end
+	local bIsPlayer = IsPlayer(dwID)
+	if not bIsPlayer then
+		if not LOG_NAMING_COUNT[dwID] then
+			LOG_NAMING_COUNT[dwID] = {
+				nCount = 0,
+				szName = '',
+			}
+		end
+		LOG_NAMING_COUNT[dwID].nCount = LOG_NAMING_COUNT[dwID].nCount + 1
+	end
 	if not bForce and LOG_TARGET_INFO_TIME[dwID] and LOG_TARGET_INFO_TIME[dwID] - GetTime() < LOG_TARGET_INFO_TIME_LIMIT then
 		return
 	end
-	local bIsPlayer = IsPlayer(dwID)
 	if bIsPlayer then
 		local player = GetPlayer(dwID)
 		if not player then
@@ -349,6 +367,7 @@ function D.OnTargetUpdate(dwID, bForce)
 			return
 		end
 		local szName = LIB.GetObjectName(npc, 'never') or ''
+		LOG_NAMING_COUNT[dwID].szName = szName
 		D.InsertLog(LOG_TYPE.NPC_INFO, { dwID, szName, npc.dwTemplateID, npc.dwEmployer, npc.nX, npc.nY, npc.nZ })
 	end
 	LOG_TARGET_INFO_TIME[dwID] = GetTime()
