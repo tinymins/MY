@@ -4370,6 +4370,10 @@ function LIB.GetPlayerEquipInfo(player)
 	return tEquipInfo
 end
 
+local PLAYER_TALENT_UPDATED = {}
+LIB.RegisterEvent('ON_UPDATE_TALENT', function()
+	PLAYER_TALENT_UPDATED[arg0] = true
+end)
 function LIB.GetPlayerTalentInfo(...)
 	local player = ...
 	if select('#', ...) == 0 then
@@ -4378,7 +4382,15 @@ function LIB.GetPlayerTalentInfo(...)
 	if not player then
 		return
 	end
-	local aInfo, aRes = player.GetTalentInfo(), {}
+	if not PLAYER_TALENT_UPDATED[player.dwID] and player.dwID ~= UI_GetClientPlayerID() then
+		return
+	end
+	local aInfo = player.GetTalentInfo()
+	if not aInfo then
+		PLAYER_TALENT_UPDATED[player.dwID] = nil
+		return
+	end
+	local aRes = {}
 	for i, info in ipairs(aInfo) do
 		local skill = info.SkillArray[info.nSelectIndex]
 		if skill then
