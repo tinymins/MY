@@ -630,6 +630,9 @@ function CheckInvalidRect(dwType, dwID, me, object)
 		lb:SetLifeBarVisible(bShowLife)
 		-- 血量数值部分
 		bShowLifePercent = GetConfigComputeValue('ShowLifePer', relation, force, bFight, bPet)
+		if bShowLifePercent and dwType == TARGET.NPC and not object.CanSeeLifeBar() then
+			bShowLifePercent = IsSpecialNpcVisible(dwID, me, object)
+		end
 		if bShowLifePercent then
 			lb:SetLifeText(Config.nLifePerOffsetX, Config.nLifePerOffsetY, Config.bHideLifePercentageDecimal and '%.0f' or '%.1f')
 		end
