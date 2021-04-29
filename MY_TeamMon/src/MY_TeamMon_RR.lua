@@ -56,14 +56,7 @@ end
 --------------------------------------------------------------------------
 
 local D = {}
-local O = {
-	szLastURL = '',
-	szLastVersion = '',
-	szLastSkipVersion = '',
-}
-RegisterCustomData('Global/MY_TeamMon_RR.szLastURL')
-RegisterCustomData('Global/MY_TeamMon_RR.szLastVersion')
-RegisterCustomData('Global/MY_TeamMon_RR.szLastSkipVersion')
+local O = {}
 
 local EDITION = GLOBAL.GAME_EDITION
 local INI_PATH = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_RR.ini'
@@ -355,6 +348,29 @@ function D.SaveFavMetaInfoList(aMetaInfo)
 	FireUIEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
 end
 
+do
+local tConfig, nUpdateLFC
+function D.GetGlobalConfig(szKey)
+	if not tConfig or GetLogicFrameCount() ~= nUpdateLFC then
+		tConfig = LIB.LoadLUAData({'userdata/teammon/configure.jx3dat', PATH_TYPE.GLOBAL})
+		nUpdateLFC = GetLogicFrameCount()
+	end
+	if IsTable(tConfig) then
+		return tConfig[szKey]
+	end
+end
+
+function D.SetGlobalConfig(szKey, oVal)
+	tConfig = LIB.LoadLUAData({'userdata/teammon/configure.jx3dat', PATH_TYPE.GLOBAL})
+	if not IsTable(tConfig) then
+		tConfig = {}
+	end
+	tConfig[szKey] = oVal
+	nUpdateLFC = GetLogicFrameCount()
+	LIB.SaveLUAData({'userdata/teammon/configure.jx3dat', PATH_TYPE.GLOBAL}, tConfig)
+end
+end
+
 function D.AddFavMetaInfo(info, szReplaceKey)
 	local aMetaInfo = D.LoadFavMetaInfoList()
 	local nIndex
@@ -509,15 +525,58 @@ function D.FetchRepoMetaInfoList(nPage)
 	})
 end
 
+function D.CheckUpdate()
+	local szLastURL = D.GetGlobalConfig('szLastURL')
+	if IsEmpty(szLastURL) then
+		return
+	end
+	local function ParseVersion(szVersion)
+		if IsString(szVersion) then
+			local nPos = wfind(szVersion, '.')
+			if nPos then
+				local szMajorVersion = szVersion:sub(1, nPos)
+				local szMinorVersion = szVersion:sub(nPos + 1)
+				return szMajorVersion, szMinorVersion
+			end
+		end
+		return '', ''
+	end
+	D.FetchMetaInfo(
+		szLastURL,
+		function(info)
+			local szPrimaryVersion = ParseVersion(info.szVersion)
+			local szLastPrimaryVersion = ParseVersion(D.GetGlobalConfig('szLastVersion'))
+			local szLastSkipPrimaryVersion = ParseVersion(D.GetGlobalConfig('szLastSkipVersion'))
+			if szPrimaryVersion ~= szLastPrimaryVersion and szPrimaryVersion ~= szLastSkipPrimaryVersion then
+				LIB.Confirm(
+					_L('New version found for TeamMon_RR\nSURL: %s\nName: %s\nTime: %s\n\nDo you want to update data now?',
+						GetShortURL(info.szURL) or ' - ',
+						LIB.ReplaceSensitiveWord(info.szTitle),
+						LIB.ReplaceSensitiveWord(info.szUpdateTime)),
+					function()
+						D.DownloadData(info, function()
+							FireUIEvent('MY_TM_RR_REPO_META_LIST_UPDATE')
+						end)
+						FireUIEvent('MY_TM_RR_REPO_META_LIST_UPDATE')
+					end,
+					function()
+						D.SetGlobalConfig('szLastSkipVersion', info.szVersion)
+					end,
+					_L['Update'],
+					_L['Skip current version'])
+			end
+		end)
+end
+
 function D.LoadConfigureFile(szFile, info)
 	MY_TeamMon_UI.OpenImportPanel(szFile, info.szTitle .. ' - ' .. info.szAuthor, function()
 		local me = GetClientPlayer()
 		if me.IsInParty() then
 			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TeamMon_RR', {'LOAD', info.szTitle}, true)
 		end
-		O.szLastURL = GetShortURL(info.szURL) or info.szURL
-		O.szLastVersion = info.szVersion
-		O.szLastSkipVersion = nil
+		D.SetGlobalConfig('szLastURL', GetShortURL(info.szURL) or info.szURL)
+		O.SetGlobalConfig('szVersion', info.szVersion)
+		D.SetGlobalConfig('szLastSkipVersion', nil)
 		FireUIEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
 	end)
 end
@@ -583,8 +642,8 @@ function D.AppendMetaInfoItem(container, p, bSel)
 	wnd:Lookup('Btn_Download', 'Text_Download'):SetText(
 		(META_DOWNLOADING[p.szKey] and _L['Fetching...'])
 		or (DATA_DOWNLOADING[p.szKey] and _L['Downloading...'])
-		or ((GetShortURL(p.szURL) or p.szURL) == O.szLastURL and (
-			p.szVersion == O.szLastVersion
+		or ((GetShortURL(p.szURL) or p.szURL) == D.GetGlobalConfig('szLastURL') and (
+			p.szVersion == D.GetGlobalConfig('szLastVersion')
 				and _L['Last select']
 				or _L['Can update']))
 		or _L['Download']
@@ -940,31 +999,9 @@ LIB.RegisterBgMsg('MY_TeamMon_RR', function(_, data, _, _, szTalker, _)
 	end
 end)
 
-LIB.RegisterInit('MY_TeamMon_RR', function()
-	if not IsEmpty(O.szLastURL) then
-		D.FetchMetaInfo(
-			O.szLastURL,
-			function(info)
-				local szPrimaryVersion = info.szVersion:gsub('%..+$', '')
-				if O.szLastVersion:gsub('%..+$', '') ~= szPrimaryVersion and O.szLastSkipVersion:gsub('%..+$', '') ~= szPrimaryVersion then
-					LIB.Confirm(
-						_L('New version found for TeamMon_RR\nSURL: %s\nName: %s\nTime: %s\n\nDo you want to update data now?',
-							GetShortURL(info.szURL) or ' - ',
-							LIB.ReplaceSensitiveWord(info.szTitle),
-							LIB.ReplaceSensitiveWord(info.szUpdateTime)),
-						function()
-							D.DownloadData(info, function()
-								FireUIEvent('MY_TM_RR_REPO_META_LIST_UPDATE')
-							end)
-							FireUIEvent('MY_TM_RR_REPO_META_LIST_UPDATE')
-						end,
-						function()
-							O.szLastSkipVersion = info.szVersion
-						end,
-						_L['Update'],
-						_L['Skip current version'])
-				end
-			end)
+LIB.RegisterEvent('LOADING_END.MY_TeamMon_RR', function()
+	if LIB.IsInDungeon() then
+		D.CheckUpdate()
 	end
 end)
 
@@ -983,24 +1020,6 @@ local settings = {
 				IsOpened        = D.GetFrame,
 				TogglePanel     = D.TogglePanel,
 			},
-		},
-		{
-			fields = {
-				szLastURL = true,
-				szLastVersion = true,
-				szLastSkipVersion = true,
-			},
-			root = O,
-		},
-	},
-	imports = {
-		{
-			fields = {
-				szLastURL = true,
-				szLastVersion = true,
-				szLastSkipVersion = true,
-			},
-			root = O,
 		},
 	},
 }
