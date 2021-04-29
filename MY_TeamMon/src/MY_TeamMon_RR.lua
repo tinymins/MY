@@ -60,8 +60,7 @@ local O = {}
 
 local EDITION = GLOBAL.GAME_EDITION
 local INI_PATH = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_RR.ini'
-local MY_TM_META_ROOT = MY_TeamMon.MY_TM_META_ROOT
-local MY_TM_DATA_ROOT = MY_TeamMon.MY_TM_DATA_ROOT
+local MY_TM_REMOTE_DATA_ROOT = MY_TeamMon.MY_TM_REMOTE_DATA_ROOT
 local MY_TM_DATA_PASSPHRASE = '89g45ynbtldnsryu98rbny9ps7468hb6npyusiryuxoldg7lbn894bn678b496746'
 local META_DOWNLOADING, DATA_DOWNLOADING = {}, {}
 
@@ -340,11 +339,11 @@ function D.ClosePanel()
 end
 
 function D.LoadFavMetaInfoList()
-	return LIB.LoadLUAData({'userdata/teammon/metalist.jx3dat', PATH_TYPE.GLOBAL}) or {}
+	return LIB.LoadLUAData({'userdata/team_mon/metalist.jx3dat', PATH_TYPE.GLOBAL}) or {}
 end
 
 function D.SaveFavMetaInfoList(aMetaInfo)
-	LIB.SaveLUAData({'userdata/teammon/metalist.jx3dat', PATH_TYPE.GLOBAL}, aMetaInfo)
+	LIB.SaveLUAData({'userdata/team_mon/metalist.jx3dat', PATH_TYPE.GLOBAL}, aMetaInfo)
 	FireUIEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
 end
 
@@ -352,7 +351,7 @@ do
 local tConfig, nUpdateLFC
 function D.GetGlobalConfig(szKey)
 	if not tConfig or GetLogicFrameCount() ~= nUpdateLFC then
-		tConfig = LIB.LoadLUAData({'userdata/teammon/configure.jx3dat', PATH_TYPE.GLOBAL})
+		tConfig = LIB.LoadLUAData({'userdata/team_mon/configure.jx3dat', PATH_TYPE.GLOBAL})
 		nUpdateLFC = GetLogicFrameCount()
 	end
 	if IsTable(tConfig) then
@@ -361,13 +360,13 @@ function D.GetGlobalConfig(szKey)
 end
 
 function D.SetGlobalConfig(szKey, oVal)
-	tConfig = LIB.LoadLUAData({'userdata/teammon/configure.jx3dat', PATH_TYPE.GLOBAL})
+	tConfig = LIB.LoadLUAData({'userdata/team_mon/configure.jx3dat', PATH_TYPE.GLOBAL})
 	if not IsTable(tConfig) then
 		tConfig = {}
 	end
 	tConfig[szKey] = oVal
 	nUpdateLFC = GetLogicFrameCount()
-	LIB.SaveLUAData({'userdata/teammon/configure.jx3dat', PATH_TYPE.GLOBAL}, tConfig)
+	LIB.SaveLUAData({'userdata/team_mon/configure.jx3dat', PATH_TYPE.GLOBAL}, tConfig)
 end
 end
 
@@ -586,12 +585,12 @@ function D.LoadConfigureFile(szFile, info, bSilent)
 end
 
 function D.DownloadData(info, callback, bSilent)
-	local szUUID = 'R-'
-		.. ('%08X'):format(GetStringCRC(info.szDataURL))
-		.. ('%08X'):format(GetStringCRC(info.szVersion))
+	local szUUID = 'r-'
+		.. ('%08x'):format(GetStringCRC(info.szDataURL))
+		.. ('%08x'):format(GetStringCRC(info.szVersion))
 	local LUA_CONFIG = { passphrase = MY_TM_DATA_PASSPHRASE, crc = true, compress = true }
-	local p = LIB.LoadLUAData(MY_TM_META_ROOT .. szUUID .. '.jx3dat', LUA_CONFIG)
-	if p and p.szVersion == info.szVersion and IsLocalFileExist(MY_TM_DATA_ROOT .. szUUID .. '.jx3dat') then
+	local p = LIB.LoadLUAData(MY_TM_REMOTE_DATA_ROOT .. szUUID .. '.meta.jx3dat', LUA_CONFIG)
+	if p and p.szVersion == info.szVersion and IsLocalFileExist(MY_TM_REMOTE_DATA_ROOT .. szUUID .. '.jx3dat') then
 		return D.LoadConfigureFile(szUUID .. '.jx3dat', info, bSilent)
 	end
 	if DATA_DOWNLOADING[info.szKey] then
@@ -606,8 +605,8 @@ function D.DownloadData(info, callback, bSilent)
 		local data = LIB.LoadLUAData(szPath, LUA_CONFIG)
 		if data then
 			local szFile = szUUID .. '.jx3dat'
-			LIB.SaveLUAData(MY_TM_META_ROOT .. szUUID .. '.jx3dat', info, LUA_CONFIG)
-			LIB.SaveLUAData(MY_TM_DATA_ROOT .. szFile, data, LUA_CONFIG)
+			LIB.SaveLUAData(MY_TM_REMOTE_DATA_ROOT .. szUUID .. '.meta.jx3dat', info, LUA_CONFIG)
+			LIB.SaveLUAData(MY_TM_REMOTE_DATA_ROOT .. szFile, data, LUA_CONFIG)
 			D.LoadConfigureFile(szFile, info, bSilent)
 		elseif not bSilent then
 			LIB.Topmsg(_L('Decode %s failed!', info.szTitle))

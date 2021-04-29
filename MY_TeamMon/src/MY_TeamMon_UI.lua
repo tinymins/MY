@@ -55,31 +55,31 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
-local ParseCustomText       = MY_TeamMon.ParseCustomText
-local FilterCustomText      = MY_TeamMon.FilterCustomText
-local MY_TM_TYPE            = MY_TeamMon.MY_TM_TYPE
-local MY_TM_SCRUTINY_TYPE   = MY_TeamMon.MY_TM_SCRUTINY_TYPE
-local MY_TM_DATA_ROOT       = MY_TeamMon.MY_TM_DATA_ROOT
-local MY_TM_SPECIAL_MAP     = MY_TeamMon.MY_TM_SPECIAL_MAP
-local MY_TMUI_INIFILE       = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI.ini'
-local MY_TMUI_ITEM_L        = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI_ITEM_L.ini'
-local MY_TMUI_TALK_L        = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI_TALK_L.ini'
-local MY_TMUI_ITEM_R        = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI_ITEM_R.ini'
-local MY_TMUI_TALK_R        = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI_TALK_R.ini'
-local MY_TMUI_TYPE          = { 'BUFF', 'DEBUFF', 'CASTING', 'NPC', 'DOODAD', 'TALK', 'CHAT' }
-local MY_TMUI_SELECT_TYPE   = MY_TMUI_TYPE[1]
-local MY_TMUI_SELECT_MAP    = _L['All data']
-local MY_TMUI_TREE_EXPAND   = { [_L['All']] = true } -- 默认第一项展开
-local MY_TMUI_ITEM_PER_PAGE = 27
+local ParseCustomText        = MY_TeamMon.ParseCustomText
+local FilterCustomText       = MY_TeamMon.FilterCustomText
+local MY_TM_TYPE             = MY_TeamMon.MY_TM_TYPE
+local MY_TM_SCRUTINY_TYPE    = MY_TeamMon.MY_TM_SCRUTINY_TYPE
+local MY_TM_REMOTE_DATA_ROOT = MY_TeamMon.MY_TM_REMOTE_DATA_ROOT
+local MY_TM_SPECIAL_MAP      = MY_TeamMon.MY_TM_SPECIAL_MAP
+local MY_TMUI_INIFILE        = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI.ini'
+local MY_TMUI_ITEM_L         = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI_ITEM_L.ini'
+local MY_TMUI_TALK_L         = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI_TALK_L.ini'
+local MY_TMUI_ITEM_R         = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI_ITEM_R.ini'
+local MY_TMUI_TALK_R         = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI_TALK_R.ini'
+local MY_TMUI_TYPE           = { 'BUFF', 'DEBUFF', 'CASTING', 'NPC', 'DOODAD', 'TALK', 'CHAT' }
+local MY_TMUI_SELECT_TYPE    = MY_TMUI_TYPE[1]
+local MY_TMUI_SELECT_MAP     = _L['All data']
+local MY_TMUI_TREE_EXPAND    = { [_L['All']] = true } -- 默认第一项展开
+local MY_TMUI_ITEM_PER_PAGE  = 27
 local MY_TMUI_SEARCH
 local MY_TMUI_MAP_SEARCH
-local MY_TMUI_DRAG          = false
-local MY_TMUI_GLOBAL_SEARCH = false
-local MY_TMUI_SEARCH_CACHE  = {}
-local MY_TMUI_PANEL_ANCHOR  = { s = 'CENTER', r = 'CENTER', x = 0, y = 0 }
-local MY_TMUI_ANCHOR        = {}
-local CHECKBOX_HEIGHT       = 30
-local BUTTON2_HEIGHT        = 30
+local MY_TMUI_DRAG           = false
+local MY_TMUI_GLOBAL_SEARCH  = false
+local MY_TMUI_SEARCH_CACHE   = {}
+local MY_TMUI_PANEL_ANCHOR   = { s = 'CENTER', r = 'CENTER', x = 0, y = 0 }
+local MY_TMUI_ANCHOR         = {}
+local CHECKBOX_HEIGHT        = 30
+local BUTTON2_HEIGHT         = 30
 local D = {}
 
 local MY_TMUI_DOODAD_ICON = {
@@ -191,7 +191,7 @@ function D.OnFrameCreate()
 			})
 			insert(menu, { szOption = _L['Export data'], fnAction = D.OpenExportPanel })
 			insert(menu, { szOption = _L['Open data folder'], fnAction = function()
-				local szRoot = LIB.GetAbsolutePath(MY_TM_DATA_ROOT):gsub('/', '\\')
+				local szRoot = LIB.GetAbsolutePath(MY_TM_REMOTE_DATA_ROOT):gsub('/', '\\')
 				LIB.OpenFolder(szRoot)
 				UI.OpenTextEditor(szRoot)
 			end })
@@ -913,7 +913,7 @@ function D.OpenImportPanel(szDefault, szTitle, fnAction)
 			local szFile = GetOpenFileName(
 				_L['please select data file.'],
 				'JX3 File(*.jx3dat)\0*.jx3dat\0All Files(*.*)\0*.*\0\0',
-				MY_TeamMon.MY_TM_DATA_ROOT
+				MY_TeamMon.MY_TM_REMOTE_DATA_ROOT
 			)
 			if not IsEmpty(szFile) then
 				ui:Children('#FilePtah'):Text(szFile)

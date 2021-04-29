@@ -55,7 +55,7 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
-local MY_TM_DATA_ROOT = MY_TeamMon.MY_TM_DATA_ROOT
+local MY_TM_REMOTE_DATA_ROOT = MY_TeamMon.MY_TM_REMOTE_DATA_ROOT
 
 local PS = {}
 
@@ -245,7 +245,7 @@ function PS.OnPanelActive(wnd)
 		x = nX + 5, y = nY + 15, text = _L['Open data folder'],
 		buttonstyle = 'FLAT',
 		onclick = function()
-			local szRoot = LIB.GetAbsolutePath(MY_TM_DATA_ROOT):gsub('/', '\\')
+			local szRoot = LIB.GetAbsolutePath(MY_TM_REMOTE_DATA_ROOT):gsub('/', '\\')
 			LIB.OpenFolder(szRoot)
 			UI.OpenTextEditor(szRoot)
 		end,

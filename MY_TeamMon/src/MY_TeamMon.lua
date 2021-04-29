@@ -60,8 +60,7 @@ local MY_GetFormatText, MY_GetPureText = LIB.GetFormatText, LIB.GetPureText
 local FireUIEvent, MY_IsVisibleBuff, Table_IsSkillShow = FireUIEvent, LIB.IsVisibleBuff, Table_IsSkillShow
 local GetHeadTextForceFontColor, TargetPanel_SetOpenState = GetHeadTextForceFontColor, TargetPanel_SetOpenState
 
-local MY_TM_META_ROOT = LIB.FormatPath({'userdata/TeamMon/Meta/', PATH_TYPE.GLOBAL})
-local MY_TM_DATA_ROOT = LIB.FormatPath({'userdata/TeamMon/Data/', PATH_TYPE.GLOBAL})
+local MY_TM_REMOTE_DATA_ROOT = LIB.FormatPath({'userdata/team_mon/remote/', PATH_TYPE.GLOBAL})
 local MY_TM_DATA_PASSPHRASE = '89g45ynbtldnsryu98rbny9ps7468hb6npyusiryuxoldg7lbn894bn678b496746'
 local MY_TM_DATA_EMBEDDED_ENCRYPTED = false
 local MY_TM_TYPE = {
@@ -224,10 +223,13 @@ RegisterCustomData('MY_TeamMon.bPushPartyBuffList')
 local function GetDataPath()
 	local ePathType = O.bCommon and PATH_TYPE.GLOBAL or PATH_TYPE.ROLE
 	local szPathV1 = LIB.FormatPath({'userdata/TeamMon/Config.jx3dat', ePathType})
-	local szPath = LIB.FormatPath({'userdata/teammon/data.jx3dat', ePathType})
+	local szPath = LIB.FormatPath({'userdata/team_mon/local.jx3dat', ePathType})
 	if IsLocalFileExist(szPathV1) then
 		local data = LIB.LoadLUAData(szPathV1)
-		LIB.SaveLUAData(szPath, { data = data })
+		LIB.SaveLUAData(szPath, {
+			data = data,
+			config = {},
+		})
 		CPath.DelFile(szPathV1)
 	end
 	Log('[MY_TeamMon] Data path: ' .. szPath)
@@ -1766,7 +1768,7 @@ function D.Init()
 					data = DecodeData(data)
 				end
 				data = EncodeData(data, true, true)
-				SaveDataToFile(data, LIB.FormatPath({'userdata/TeamMon/Data/' .. uuid .. '.jx3dat', PATH_TYPE.GLOBAL}, {lang = lang}), MY_TM_DATA_PASSPHRASE)
+				SaveDataToFile(data, LIB.FormatPath({'userdata/team_mon/data/' .. uuid .. '.jx3dat', PATH_TYPE.GLOBAL}, {lang = lang}), MY_TM_DATA_PASSPHRASE)
 			end
 		end
 		MY_TM_DATA_EMBEDDED_ENCRYPTED = true
@@ -1780,6 +1782,7 @@ function D.SaveData()
 		GetDataPath(),
 		{
 			data = D.FILE,
+			config = D.CONFIG,
 		})
 end
 
@@ -1905,10 +1908,11 @@ end
 
 function D.LoadUserData()
 	local data = LIB.LoadLUAData(GetDataPath())
-	if IsTable(data) and IsTable(data.data) then
+	if IsTable(data) then
 		for k, v in pairs(D.FILE) do
 			D.FILE[k] = data.data[k] or {}
 		end
+		D.CONFIG = data.config or {}
 		FireUIEvent('MY_TM_DATA_RELOAD')
 	else
 		D.LoadConfigureFile(
@@ -1924,7 +1928,7 @@ end
 function D.LoadConfigureFile(szFileName, aType, szMode, fnAction)
 	local szFullPath = szFileName:sub(2, 2) == ':'
 		and szFileName
-		or LIB.GetAbsolutePath(MY_TM_DATA_ROOT .. szFileName)
+		or LIB.GetAbsolutePath(MY_TM_REMOTE_DATA_ROOT .. szFileName)
 	local szFilePath = LIB.GetRelativePath(szFullPath, {'', PATH_TYPE.NORMAL}) or szFullPath
 	if not IsFileExist(szFilePath) then
 		SafeCall(fnAction, false, 'File does not exist.')
@@ -1990,7 +1994,7 @@ function D.SaveConfigureFile(config)
 		nTimeStamp = GetCurrentTime()
 	}
 	local szRoot = GetRootPath():gsub('\\', '/')
-	local szPath = MY_TM_DATA_ROOT .. config.szFileName
+	local szPath = MY_TM_REMOTE_DATA_ROOT .. config.szFileName
 	if config.eType == 'JSON' or config.eType == 'JSON_FORMATED' then
 		if config.eType ~= 'JSON' then
 			szPath = szPath .. '.' .. config.eType:lower():sub(6)
@@ -2178,28 +2182,27 @@ local settings = {
 		},
 		{
 			fields = {
-				FilterCustomText    = FilterCustomText   ,
-				ParseCustomText     = ParseCustomText    ,
-				Enable              = D.Enable           ,
-				GetTable            = D.GetTable         ,
-				IterTable           = D.IterTable        ,
-				GetMapName          = D.GetMapName       ,
-				GetMapInfo          = D.GetMapInfo       ,
-				GetData             = D.GetData          ,
-				GetIntervalData     = D.GetIntervalData  ,
-				RemoveData          = D.RemoveData       ,
-				MoveData            = D.MoveData         ,
-				CheckSameData       = D.CheckSameData    ,
-				ClearTemp           = D.ClearTemp        ,
-				AddData             = D.AddData          ,
-				SaveConfigureFile   = D.SaveConfigureFile,
-				LoadConfigureFile   = D.LoadConfigureFile,
-				Exchange            = D.Exchange         ,
-				MY_TM_META_ROOT     = MY_TM_META_ROOT    ,
-				MY_TM_DATA_ROOT     = MY_TM_DATA_ROOT    ,
-				MY_TM_SPECIAL_MAP   = MY_TM_SPECIAL_MAP  ,
-				MY_TM_TYPE          = MY_TM_TYPE         ,
-				MY_TM_SCRUTINY_TYPE = MY_TM_SCRUTINY_TYPE,
+				FilterCustomText       = FilterCustomText      ,
+				ParseCustomText        = ParseCustomText       ,
+				Enable                 = D.Enable              ,
+				GetTable               = D.GetTable            ,
+				IterTable              = D.IterTable           ,
+				GetMapName             = D.GetMapName          ,
+				GetMapInfo             = D.GetMapInfo          ,
+				GetData                = D.GetData             ,
+				GetIntervalData        = D.GetIntervalData     ,
+				RemoveData             = D.RemoveData          ,
+				MoveData               = D.MoveData            ,
+				CheckSameData          = D.CheckSameData       ,
+				ClearTemp              = D.ClearTemp           ,
+				AddData                = D.AddData             ,
+				SaveConfigureFile      = D.SaveConfigureFile   ,
+				LoadConfigureFile      = D.LoadConfigureFile   ,
+				Exchange               = D.Exchange            ,
+				MY_TM_REMOTE_DATA_ROOT = MY_TM_REMOTE_DATA_ROOT,
+				MY_TM_SPECIAL_MAP      = MY_TM_SPECIAL_MAP     ,
+				MY_TM_TYPE             = MY_TM_TYPE            ,
+				MY_TM_SCRUTINY_TYPE    = MY_TM_SCRUTINY_TYPE   ,
 			},
 		},
 		{
