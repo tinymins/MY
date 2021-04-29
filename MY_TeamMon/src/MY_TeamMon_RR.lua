@@ -568,30 +568,37 @@ function D.CheckUpdate()
 		end)
 end
 
-function D.LoadConfigureFile(szFile, info)
-	MY_TeamMon_UI.OpenImportPanel(szFile, info.szTitle .. ' - ' .. info.szAuthor, function()
-		local me = GetClientPlayer()
-		if me.IsInParty() then
-			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TeamMon_RR', {'LOAD', info.szTitle}, true)
-		end
-		D.SetGlobalConfig('szLastURL', GetShortURL(info.szURL) or info.szURL)
-		O.SetGlobalConfig('szVersion', info.szVersion)
-		D.SetGlobalConfig('szLastSkipVersion', nil)
-		FireUIEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
-	end)
+function D.LoadConfigureFile(szFile, info, bSilent)
+	if bSilent then
+		MY_TeamMon.LoadConfigureFile(szFile, nil, 'REPLACE')
+	else
+		MY_TeamMon_UI.OpenImportPanel(szFile, info.szTitle .. ' - ' .. info.szAuthor, function()
+			local me = GetClientPlayer()
+			if me.IsInParty() then
+				LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TeamMon_RR', {'LOAD', info.szTitle}, true)
+			end
+			D.SetGlobalConfig('szLastURL', GetShortURL(info.szURL) or info.szURL)
+			O.SetGlobalConfig('szVersion', info.szVersion)
+			D.SetGlobalConfig('szLastSkipVersion', nil)
+			FireUIEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
+		end)
+	end
 end
 
-function D.DownloadData(info, callback)
+function D.DownloadData(info, callback, bSilent)
 	local szUUID = 'R-'
 		.. ('%08X'):format(GetStringCRC(info.szDataURL))
 		.. ('%08X'):format(GetStringCRC(info.szVersion))
 	local LUA_CONFIG = { passphrase = MY_TM_DATA_PASSPHRASE, crc = true, compress = true }
 	local p = LIB.LoadLUAData(MY_TM_META_ROOT .. szUUID .. '.jx3dat', LUA_CONFIG)
 	if p and p.szVersion == info.szVersion and IsLocalFileExist(MY_TM_DATA_ROOT .. szUUID .. '.jx3dat') then
-		return D.LoadConfigureFile(szUUID .. '.jx3dat', info)
+		return D.LoadConfigureFile(szUUID .. '.jx3dat', info, bSilent)
 	end
 	if DATA_DOWNLOADING[info.szKey] then
-		return LIB.Topmsg(_L['Downloading in progress, please wait...'])
+		if not bSilent then
+			LIB.Topmsg(_L['Downloading in progress, please wait...'])
+		end
+		return
 	end
 	DATA_DOWNLOADING[info.szKey] = true
 	LIB.DownloadFile(info.szDataURL, function(szPath)
@@ -601,8 +608,8 @@ function D.DownloadData(info, callback)
 			local szFile = szUUID .. '.jx3dat'
 			LIB.SaveLUAData(MY_TM_META_ROOT .. szUUID .. '.jx3dat', info, LUA_CONFIG)
 			LIB.SaveLUAData(MY_TM_DATA_ROOT .. szFile, data, LUA_CONFIG)
-			D.LoadConfigureFile(szFile, info)
-		else
+			D.LoadConfigureFile(szFile, info, bSilent)
+		elseif not bSilent then
 			LIB.Topmsg(_L('Decode %s failed!', info.szTitle))
 		end
 		SafeCall(callback, true)
@@ -991,7 +998,7 @@ LIB.RegisterBgMsg('MY_TeamMon_RR', function(_, data, _, _, szTalker, _)
 						or '\n' .. _L('Update time: %s', info.szUpdateTime)),
 				function()
 					D.AddFavMetaInfo(info)
-					D.DownloadData(info)
+					D.DownloadData(info, nil, true)
 				end)
 		end
 	elseif action == 'LOAD' then

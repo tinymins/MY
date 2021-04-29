@@ -922,75 +922,76 @@ function D.OpenImportPanel(szDefault, szTitle, fnAction)
 	}):Pos('BOTTOMRIGHT')
 	nY = nY + 10
 	nX, nY = ui:Append('Text', { x = 20, y = nY, text = _L['Import mode'], font = 27 }):Pos('BOTTOMRIGHT')
-	local nType = 1
+	local szMode = 'REPLACE'
 	nX = ui:Append('WndRadioBox', {
 		x = 25, y = nY,
 		text = _L['Cover'],
 		group = 'type', checked = true,
 		oncheck = function()
-			nType = 1
+			szMode = 'REPLACE'
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
 	nX = ui:Append('WndRadioBox', {
 		x = nX + 5, y = nY,
 		text = _L['Merge priority new file'], group = 'type',
 		oncheck = function()
-			nType = 3
+			szMode = 'MERGE_OVERWRITE'
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
 	nX, nY = ui:Append('WndRadioBox', {
 		x = nX + 5, y = nY,
 		text = _L['Merge priority old file'], group = 'type',
 		oncheck = function()
-			nType = 2
+			szMode = 'MERGE_SKIP'
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
 	ui:Append('WndButton', {
 		x = 285, y = nY + 30, text = g_tStrings.STR_HOTKEY_SURE,
 		buttonstyle = 'FLAT_LACE_BORDER',
 		onclick = function()
-			local config = {
-				bFullPath  = not szDefault,
-				szFileName = szDefault or ui:Children('#FilePtah'):Text(),
-				nMode      = nType,
-				tList      = {}
-			}
+			local szFileName = szDefault or ui:Children('#FilePtah'):Text()
+			local aType      = {}
 			for k, v in ipairs(MY_TMUI_TYPE) do
 				if ui:Children('#' .. v):Check() then
-					config.tList[v] = true
+					insert(aType, v)
 				end
 			end
-			local bStatus, szMsg, tMeta = MY_TeamMon.LoadConfigureFile(config)
-			if bStatus then
-				LIB.Sysmsg(_L['MY_TeamMon'], _L('Load config success: %s', tostring(szMsg)), CONSTANT.MSG_THEME.SUCCESS)
-				-- local function fnAlert2()
-				-- 	local szAuthor = tMeta and LIB.ReplaceSensitiveWord(tostring(tMeta.szAuthor)) or _L['Unknown author']
-				-- 	LIB.Alert(
-				-- 		_L('Plugin is plugin, data is data, plugin author is plugin author, data author is data author..\nYou just loaded data\'s author is %s, it works on mingyi plugin team monitor addon.\n%s is data author, do not response for plugin problems. MingYi is plugin author, do not response for data problems.\n\nIf there is some strange headtop, focus, buff or talk, please try to use other author\'s data, and response to current author %s, plugin author MingYi does not response for this.', szAuthor, szAuthor, szAuthor),
-				-- 		nil,
-				-- 		nil,
-				-- 		'FORBIDDEN',
-				-- 		2)
-				-- end
-				-- LIB.Alert(_L('Import success: %s', szTitle or szMsg), fnAlert2, nil, fnAlert2)
-				LIB.Alert(_L('Import success: %s', szTitle or szMsg))
-				ui:Remove()
-				if MY_LifeBar and not MY_LifeBar.bEnabled then
-					MY_LifeBar.bEnabled = true
-				end
-				if MY_TeamMon and not MY_TeamMon.bEnabled then
-					MY_TeamMon.bEnabled = true
-				end
-				if MY_Focus and not MY_Focus.bEnabled then
-					MY_Focus.bEnabled = true
-				end
-				if fnAction then
-					fnAction()
-				end
-			else
-				LIB.Sysmsg(_L['MY_TeamMon'], _L('Load config failed: %s', tostring(szMsg)), CONSTANT.MSG_THEME.ERROR)
-				LIB.Alert(_L('Import failed: %s', szTitle or _L[szMsg]))
-			end
+			MY_TeamMon.LoadConfigureFile(
+				szFileName,
+				aType,
+				szMode,
+				function(bStatus, szMsg, tMeta)
+					if bStatus then
+						LIB.Sysmsg(_L['MY_TeamMon'], _L('Load config success: %s', tostring(szMsg)), CONSTANT.MSG_THEME.SUCCESS)
+						-- local function fnAlert2()
+						-- 	local szAuthor = tMeta and LIB.ReplaceSensitiveWord(tostring(tMeta.szAuthor)) or _L['Unknown author']
+						-- 	LIB.Alert(
+						-- 		_L('Plugin is plugin, data is data, plugin author is plugin author, data author is data author..\nYou just loaded data\'s author is %s, it works on mingyi plugin team monitor addon.\n%s is data author, do not response for plugin problems. MingYi is plugin author, do not response for data problems.\n\nIf there is some strange headtop, focus, buff or talk, please try to use other author\'s data, and response to current author %s, plugin author MingYi does not response for this.', szAuthor, szAuthor, szAuthor),
+						-- 		nil,
+						-- 		nil,
+						-- 		'FORBIDDEN',
+						-- 		2)
+						-- end
+						-- LIB.Alert(_L('Import success: %s', szTitle or szMsg), fnAlert2, nil, fnAlert2)
+						LIB.Alert(_L('Import success: %s', szTitle or szMsg))
+						ui:Remove()
+						if MY_LifeBar and not MY_LifeBar.bEnabled then
+							MY_LifeBar.bEnabled = true
+						end
+						if MY_TeamMon and not MY_TeamMon.bEnabled then
+							MY_TeamMon.bEnabled = true
+						end
+						if MY_Focus and not MY_Focus.bEnabled then
+							MY_Focus.bEnabled = true
+						end
+						if fnAction then
+							fnAction()
+						end
+					else
+						LIB.Sysmsg(_L['MY_TeamMon'], _L('Load config failed: %s', tostring(szMsg)), CONSTANT.MSG_THEME.ERROR)
+						LIB.Alert(_L('Import failed: %s', szTitle or _L[szMsg]))
+					end
+				end)
 		end,
 	})
 end

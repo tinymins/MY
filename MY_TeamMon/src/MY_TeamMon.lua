@@ -1900,69 +1900,68 @@ function D.LoadUserData()
 		end
 		FireUIEvent('MY_TM_DATA_RELOAD')
 	else
-		local szEdition = GLOBAL.GAME_EDITION
-		local config = {
-			nMode = 1,
-			tList = {},
-			szFileName = szEdition ..  '.jx3dat',
-		}
-		-- default data
-		for _, v in ipairs(MY_TM_TYPE_LIST) do
-			config.tList[v] = true
-		end
-		D.LoadConfigureFile(config)
+		D.LoadConfigureFile(
+			GLOBAL.GAME_EDITION ..  '.jx3dat',
+			MY_TM_TYPE_LIST,
+			'REPLACE',
+			function()
+				D.Log('load custom data finish!')
+			end)
 	end
-	D.Log('load custom data success!')
 end
 
-function D.LoadConfigureFile(config)
-	local szFullPath = config.szFileName:sub(2, 2) == ':'
-		and config.szFileName
-		or LIB.GetAbsolutePath(MY_TM_DATA_ROOT .. config.szFileName)
+function D.LoadConfigureFile(szFileName, aType, szMode, fnAction)
+	local szFullPath = szFileName:sub(2, 2) == ':'
+		and szFileName
+		or LIB.GetAbsolutePath(MY_TM_DATA_ROOT .. szFileName)
 	local szFilePath = LIB.GetRelativePath(szFullPath, {'', PATH_TYPE.NORMAL}) or szFullPath
 	if not IsFileExist(szFilePath) then
-		return false, 'File does not exist.'
+		SafeCall(fnAction, false, 'File does not exist.')
+		return
 	end
 	local data = LIB.LoadLUAData(szFilePath, { passphrase = MY_TM_DATA_PASSPHRASE })
 		or LIB.LoadLUAData(szFilePath, { passphrase = false })
 	if not data then
-		return false, 'Can not read data file.'
-	else
-		if config.nMode == 1 then
-			for k, v in pairs(config.tList) do
-				D.FILE[k] = data[k] or {}
-			end
-		elseif config.nMode == 2 or config.nMode == 3 then
-			local fnMergeData = function(tab_data)
-				for szType, _ in pairs(config.tList) do
-					if tab_data[szType] then
-						for k, v in pairs(tab_data[szType]) do
-							for kk, vv in ipairs(v) do
-								if not D.CheckSameData(szType, k, vv.dwID or vv.szContent, vv.nLevel or vv.szTarget) then
-									D.FILE[szType][k] = D.FILE[szType][k] or {}
-									insert(D.FILE[szType][k], vv)
-								end
+		SafeCall(fnAction, false, 'Can not read data file.')
+		return
+	end
+	if not aType then
+		aType = MY_TM_TYPE_LIST
+	end
+	if szMode == 'REPLACE' then
+		for _, k in ipairs(aType) do
+			D.FILE[k] = data[k] or {}
+		end
+	elseif szMode == 'MERGE_OVERWRITE' or szMode == 'MERGE_SKIP' then
+		local fnMergeData = function(tab_data)
+			for _, szType in ipairs(aType) do
+				if tab_data[szType] then
+					for k, v in pairs(tab_data[szType]) do
+						for kk, vv in ipairs(v) do
+							if not D.CheckSameData(szType, k, vv.dwID or vv.szContent, vv.nLevel or vv.szTarget) then
+								D.FILE[szType][k] = D.FILE[szType][k] or {}
+								insert(D.FILE[szType][k], vv)
 							end
 						end
 					end
 				end
 			end
-			if config.nMode == 2 then -- 源文件优先
-				fnMergeData(data)
-			elseif config.nMode == 3 then -- 新文件优先
-				-- 其实就是交换下顺序
-				local tab_data = clone(D.FILE)
-				for k, v in pairs(config.tList) do
-					D.FILE[k] = data[k] or {}
-				end
-				fnMergeData(tab_data)
-			end
 		end
-		FireUIEvent('MY_TM_CREATE_CACHE')
-		FireUIEvent('MY_TM_DATA_RELOAD')
-		FireUIEvent('MY_TMUI_DATA_RELOAD')
-		return true, szFullPath:gsub('\\', '/'), Clone(data.__meta)
+		if szMode == 'MERGE_SKIP' then -- 源文件优先
+			fnMergeData(data)
+		elseif szMode == 'MERGE_OVERWRITE' then -- 新文件优先
+			-- 其实就是交换下顺序
+			local tab_data = clone(D.FILE)
+			for _, k in ipairs(aType) do
+				D.FILE[k] = data[k] or {}
+			end
+			fnMergeData(tab_data)
+		end
 	end
+	FireUIEvent('MY_TM_CREATE_CACHE')
+	FireUIEvent('MY_TM_DATA_RELOAD')
+	FireUIEvent('MY_TMUI_DATA_RELOAD')
+	SafeCall(fnAction, true, szFullPath:gsub('\\', '/'), Clone(data.__meta))
 end
 
 function D.SaveConfigureFile(config)
