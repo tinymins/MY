@@ -222,7 +222,14 @@ RegisterCustomData('MY_TeamMon.bPushBuffList')
 RegisterCustomData('MY_TeamMon.bPushPartyBuffList')
 
 local function GetDataPath()
-	local szPath = LIB.FormatPath({'userdata/TeamMon/Config.jx3dat', O.bCommon and PATH_TYPE.GLOBAL or PATH_TYPE.ROLE})
+	local ePathType = O.bCommon and PATH_TYPE.GLOBAL or PATH_TYPE.ROLE
+	local szPathV1 = LIB.FormatPath({'userdata/TeamMon/Config.jx3dat', ePathType})
+	local szPath = LIB.FormatPath({'userdata/teammon/data.jx3dat', ePathType})
+	if IsLocalFileExist(szPathV1) then
+		local data = LIB.LoadLUAData(szPathV1)
+		LIB.SaveLUAData(szPath, { data = data })
+		CPath.DelFile(szPathV1)
+	end
 	Log('[MY_TeamMon] Data path: ' .. szPath)
 	return szPath
 end
@@ -1769,7 +1776,11 @@ function D.Init()
 end
 
 function D.SaveData()
-	LIB.SaveLUAData(GetDataPath(), D.FILE)
+	LIB.SaveLUAData(
+		GetDataPath(),
+		{
+			data = D.FILE,
+		})
 end
 
 -- 获取整个表
@@ -1894,9 +1905,9 @@ end
 
 function D.LoadUserData()
 	local data = LIB.LoadLUAData(GetDataPath())
-	if data then
+	if IsTable(data) and IsTable(data.data) then
 		for k, v in pairs(D.FILE) do
-			D.FILE[k] = data[k] or {}
+			D.FILE[k] = data.data[k] or {}
 		end
 		FireUIEvent('MY_TM_DATA_RELOAD')
 	else
