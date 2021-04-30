@@ -545,19 +545,20 @@ function D.CheckUpdate()
 end
 
 function D.LoadConfigureFile(szFile, info, bSilent)
+	local function fnAction()
+		local me = GetClientPlayer()
+		if not bSilent and me.IsInParty() then
+			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TeamMon_RR', {'LOAD', info.szTitle}, true)
+		end
+		MY_TeamMon.SetUserConfig('RR.LastURL', GetShortURL(info.szURL) or info.szURL)
+		MY_TeamMon.SetUserConfig('RR.Version', info.szVersion)
+		MY_TeamMon.SetUserConfig('RR.LastSkipVersion', nil)
+		FireUIEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
+	end
 	if bSilent then
-		MY_TeamMon.ImportDataFromFile(szFile, nil, 'REPLACE')
+		MY_TeamMon.ImportDataFromFile(szFile, nil, 'REPLACE', fnAction)
 	else
-		MY_TeamMon_UI.OpenImportPanel(szFile, info.szTitle .. ' - ' .. info.szAuthor, function()
-			local me = GetClientPlayer()
-			if me.IsInParty() then
-				LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TeamMon_RR', {'LOAD', info.szTitle}, true)
-			end
-			MY_TeamMon.SetUserConfig('RR.LastURL', GetShortURL(info.szURL) or info.szURL)
-			MY_TeamMon.SetUserConfig('RR.Version', info.szVersion)
-			MY_TeamMon.SetUserConfig('RR.LastSkipVersion', nil)
-			FireUIEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
-		end)
+		MY_TeamMon_UI.OpenImportPanel(szFile, info.szTitle .. ' - ' .. info.szAuthor, fnAction)
 	end
 end
 
