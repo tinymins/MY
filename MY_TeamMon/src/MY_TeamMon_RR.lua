@@ -569,7 +569,7 @@ end
 
 function D.LoadConfigureFile(szFile, info, bSilent)
 	if bSilent then
-		MY_TeamMon.LoadConfigureFile(szFile, nil, 'REPLACE')
+		MY_TeamMon.ImportDataFromFile(szFile, nil, 'REPLACE')
 	else
 		MY_TeamMon_UI.OpenImportPanel(szFile, info.szTitle .. ' - ' .. info.szAuthor, function()
 			local me = GetClientPlayer()

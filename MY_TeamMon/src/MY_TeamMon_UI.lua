@@ -956,7 +956,7 @@ function D.OpenImportPanel(szDefault, szTitle, fnAction)
 					insert(aType, v)
 				end
 			end
-			MY_TeamMon.LoadConfigureFile(
+			MY_TeamMon.ImportDataFromFile(
 				szFileName,
 				aType,
 				szMode,
@@ -1026,13 +1026,13 @@ function D.OpenExportPanel()
 	}):Pos('BOTTOMRIGHT')
 	nY = nY + 10
 	nX, nY = ui:Append('Text', { x = 20, y = nY, text = _L['File format'], font = 27 }):Pos('BOTTOMRIGHT')
-	local eType = 'LUA_ENCRYPTED'
+	local szFormat = 'LUA_ENCRYPTED'
 	nX = ui:Append('WndRadioBox', {
 		x = 25, y = nY,
 		text = _L['Lua encrypted'], group = 'type',
 		checked = true,
 		oncheck = function()
-			eType = 'LUA_ENCRYPTED'
+			szFormat = 'LUA_ENCRYPTED'
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
 	nX = ui:Append('WndRadioBox', {
@@ -1040,7 +1040,7 @@ function D.OpenExportPanel()
 		text = _L['Lua plain'], group = 'type',
 		checked = false,
 		oncheck = function()
-			eType = 'LUA'
+			szFormat = 'LUA'
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
 	nX = ui:Append('WndRadioBox', {
@@ -1048,7 +1048,7 @@ function D.OpenExportPanel()
 		text = _L['Lua formated'], group = 'type',
 		checked = false,
 		oncheck = function()
-			eType = 'LUA_FORMATED'
+			szFormat = 'LUA_FORMATED'
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
 	nX = ui:Append('WndRadioBox', {
@@ -1056,7 +1056,7 @@ function D.OpenExportPanel()
 		text = _L['JSON'], group = 'type',
 		checked = false,
 		oncheck = function()
-			eType = 'JSON'
+			szFormat = 'JSON'
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
 	nX, nY = ui:Append('WndRadioBox', {
@@ -1064,29 +1064,30 @@ function D.OpenExportPanel()
 		text = _L['JSON formated'], group = 'type',
 		checked = false,
 		oncheck = function()
-			eType = 'JSON_FORMATED'
+			szFormat = 'JSON_FORMATED'
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
 	ui:Append('WndButton', {
 		x = 285, y = nY + 30, text = g_tStrings.STR_HOTKEY_SURE,
 		buttonstyle = 'FLAT_LACE_BORDER',
 		onclick = function()
-			local config = {
-				szFileName = szFileName,
-				szAuthor = szAuthor,
-				tList = {},
-				eType = eType,
-			}
-			for k, v in ipairs(MY_TMUI_TYPE) do
+			local aType = {}
+			for _, v in ipairs(MY_TMUI_TYPE) do
 				if ui:Children('#' .. v):Check() then
-					config.tList[v] = true
+					insert(aType, v)
 				end
 			end
-			local szPath = MY_TeamMon.SaveConfigureFile(config)
-			local szMsg = _L('Export success: %s', szPath)
-			LIB.Alert(szMsg)
-			LIB.Sysmsg(szMsg)
-			ui:Remove()
+			MY_TeamMon.ExportDataToFile(
+				szFileName,
+				aType,
+				szFormat,
+				szAuthor,
+				function(szPath)
+					local szMsg = _L('Export success: %s', szPath)
+					LIB.Alert(szMsg)
+					LIB.Sysmsg(szMsg)
+					ui:Remove()
+				end)
 		end,
 	})
 end

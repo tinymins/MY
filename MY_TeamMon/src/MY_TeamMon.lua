@@ -1778,6 +1778,7 @@ function D.Init()
 	Wnd.OpenWindow(MY_TM_INIFILE, 'MY_TeamMon')
 end
 
+-- 保存用户监控数据、配置
 function D.SaveUserData()
 	LIB.SaveLUAData(
 		GetUserDataPath(),
@@ -1785,6 +1786,123 @@ function D.SaveUserData()
 			data = D.FILE,
 			config = D.CONFIG,
 		})
+end
+
+-- 加载用户监控数据、配置
+function D.LoadUserData()
+	local data = LIB.LoadLUAData(GetUserDataPath())
+	if IsTable(data) then
+		for k, v in pairs(D.FILE) do
+			D.FILE[k] = data.data[k] or {}
+		end
+		D.CONFIG = data.config or {}
+		FireUIEvent('MY_TM_DATA_RELOAD')
+	else
+		D.ImportDataFromFile(
+			GLOBAL.GAME_EDITION ..  '.jx3dat',
+			MY_TM_TYPE_LIST,
+			'REPLACE',
+			function()
+				D.Log('load custom data finish!')
+			end)
+	end
+end
+
+-- 从文件导入数据
+function D.ImportDataFromFile(szFileName, aType, szMode, fnAction)
+	local szFullPath = szFileName:sub(2, 2) == ':'
+		and szFileName
+		or LIB.GetAbsolutePath(MY_TM_REMOTE_DATA_ROOT .. szFileName)
+	local szFilePath = LIB.GetRelativePath(szFullPath, {'', PATH_TYPE.NORMAL}) or szFullPath
+	if not IsFileExist(szFilePath) then
+		SafeCall(fnAction, false, 'File does not exist.')
+		return
+	end
+	local data = LIB.LoadLUAData(szFilePath, { passphrase = MY_TM_DATA_PASSPHRASE })
+		or LIB.LoadLUAData(szFilePath, { passphrase = false })
+	if not data then
+		SafeCall(fnAction, false, 'Can not read data file.')
+		return
+	end
+	if not aType then
+		aType = MY_TM_TYPE_LIST
+	end
+	if szMode == 'REPLACE' then
+		for _, k in ipairs(aType) do
+			D.FILE[k] = data[k] or {}
+		end
+	elseif szMode == 'MERGE_OVERWRITE' or szMode == 'MERGE_SKIP' then
+		local fnMergeData = function(tab_data)
+			for _, szType in ipairs(aType) do
+				if tab_data[szType] then
+					for k, v in pairs(tab_data[szType]) do
+						for kk, vv in ipairs(v) do
+							if not D.CheckSameData(szType, k, vv.dwID or vv.szContent, vv.nLevel or vv.szTarget) then
+								D.FILE[szType][k] = D.FILE[szType][k] or {}
+								insert(D.FILE[szType][k], vv)
+							end
+						end
+					end
+				end
+			end
+		end
+		if szMode == 'MERGE_SKIP' then -- 源文件优先
+			fnMergeData(data)
+		elseif szMode == 'MERGE_OVERWRITE' then -- 新文件优先
+			-- 其实就是交换下顺序
+			local tab_data = clone(D.FILE)
+			for _, k in ipairs(aType) do
+				D.FILE[k] = data[k] or {}
+			end
+			fnMergeData(tab_data)
+		end
+	end
+	FireUIEvent('MY_TM_CREATE_CACHE')
+	FireUIEvent('MY_TM_DATA_RELOAD')
+	FireUIEvent('MY_TMUI_DATA_RELOAD')
+	SafeCall(fnAction, true, szFullPath:gsub('\\', '/'), Clone(data.__meta))
+end
+
+-- 导出数据到文件
+function D.ExportDataToFile(szFileName, aType, szFormat, szAuthor, fnAction)
+	local data = {}
+	for _, k in ipairs(aType) do
+		data[k] = D.FILE[k]
+	end
+	-- HM.20170504: add meta data
+	data['__meta'] = {
+		szEdition = GLOBAL.GAME_EDITION,
+		szAuthor = not IsEmpty(szAuthor)
+			and szAuthor
+			or GetUserRoleName(),
+		szServer = select(4, GetUserServer()),
+		nTimeStamp = GetCurrentTime(),
+	}
+	local szRoot = GetRootPath():gsub('\\', '/')
+	local szPath = MY_TM_REMOTE_DATA_ROOT .. szFileName
+	if szFormat == 'JSON' or szFormat == 'JSON_FORMATED' then
+		if szFormat ~= 'JSON' then
+			szPath = szPath .. '.' .. szFormat:lower():sub(6)
+		end
+		szPath = szPath .. '.json'
+		SaveDataToFile(LIB.JsonEncode(data, szFormat == 'JSON_FORMATED'), szPath)
+	else
+		if szFormat ~= 'LUA' then
+			szPath = szPath .. '.' .. szFormat:lower():sub(5)
+		end
+		szPath = szPath .. '.jx3dat'
+		local option = {
+			passphrase = szFormat == 'LUA_ENCRYPTED'
+				and MY_TM_DATA_PASSPHRASE
+				or false,
+			crc = szFormat == 'LUA_ENCRYPTED',
+			compress = szFormat == 'LUA_ENCRYPTED',
+			indent = szFormat == 'LUA_FORMATED' and '\t' or nil,
+		}
+		LIB.SaveLUAData(szPath, data, option)
+	end
+	LIB.GetAbsolutePath(szPath):gsub('/', '\\')
+	SafeCall(fnAction, szRoot .. szPath)
 end
 
 -- 获取整个表
@@ -1905,120 +2023,6 @@ function D.GetData(szType, dwID, nLevel)
 	-- else
 		-- D.Log('IGNORE TYPE:' .. szType .. ' ID:' .. dwID .. ' LEVEL:' .. (nLevel or 0))
 	end
-end
-
-function D.LoadUserData()
-	local data = LIB.LoadLUAData(GetUserDataPath())
-	if IsTable(data) then
-		for k, v in pairs(D.FILE) do
-			D.FILE[k] = data.data[k] or {}
-		end
-		D.CONFIG = data.config or {}
-		FireUIEvent('MY_TM_DATA_RELOAD')
-	else
-		D.LoadConfigureFile(
-			GLOBAL.GAME_EDITION ..  '.jx3dat',
-			MY_TM_TYPE_LIST,
-			'REPLACE',
-			function()
-				D.Log('load custom data finish!')
-			end)
-	end
-end
-
-function D.LoadConfigureFile(szFileName, aType, szMode, fnAction)
-	local szFullPath = szFileName:sub(2, 2) == ':'
-		and szFileName
-		or LIB.GetAbsolutePath(MY_TM_REMOTE_DATA_ROOT .. szFileName)
-	local szFilePath = LIB.GetRelativePath(szFullPath, {'', PATH_TYPE.NORMAL}) or szFullPath
-	if not IsFileExist(szFilePath) then
-		SafeCall(fnAction, false, 'File does not exist.')
-		return
-	end
-	local data = LIB.LoadLUAData(szFilePath, { passphrase = MY_TM_DATA_PASSPHRASE })
-		or LIB.LoadLUAData(szFilePath, { passphrase = false })
-	if not data then
-		SafeCall(fnAction, false, 'Can not read data file.')
-		return
-	end
-	if not aType then
-		aType = MY_TM_TYPE_LIST
-	end
-	if szMode == 'REPLACE' then
-		for _, k in ipairs(aType) do
-			D.FILE[k] = data[k] or {}
-		end
-	elseif szMode == 'MERGE_OVERWRITE' or szMode == 'MERGE_SKIP' then
-		local fnMergeData = function(tab_data)
-			for _, szType in ipairs(aType) do
-				if tab_data[szType] then
-					for k, v in pairs(tab_data[szType]) do
-						for kk, vv in ipairs(v) do
-							if not D.CheckSameData(szType, k, vv.dwID or vv.szContent, vv.nLevel or vv.szTarget) then
-								D.FILE[szType][k] = D.FILE[szType][k] or {}
-								insert(D.FILE[szType][k], vv)
-							end
-						end
-					end
-				end
-			end
-		end
-		if szMode == 'MERGE_SKIP' then -- 源文件优先
-			fnMergeData(data)
-		elseif szMode == 'MERGE_OVERWRITE' then -- 新文件优先
-			-- 其实就是交换下顺序
-			local tab_data = clone(D.FILE)
-			for _, k in ipairs(aType) do
-				D.FILE[k] = data[k] or {}
-			end
-			fnMergeData(tab_data)
-		end
-	end
-	FireUIEvent('MY_TM_CREATE_CACHE')
-	FireUIEvent('MY_TM_DATA_RELOAD')
-	FireUIEvent('MY_TMUI_DATA_RELOAD')
-	SafeCall(fnAction, true, szFullPath:gsub('\\', '/'), Clone(data.__meta))
-end
-
-function D.SaveConfigureFile(config)
-	local data = {}
-	for k, v in pairs(config.tList) do
-		data[k] = D.FILE[k]
-	end
-	-- HM.20170504: add meta data
-	data['__meta'] = {
-		szEdition = GLOBAL.GAME_EDITION,
-		szAuthor = not IsEmpty(config.szAuthor)
-			and config.szAuthor
-			or GetUserRoleName(),
-		szServer = select(4, GetUserServer()),
-		nTimeStamp = GetCurrentTime()
-	}
-	local szRoot = GetRootPath():gsub('\\', '/')
-	local szPath = MY_TM_REMOTE_DATA_ROOT .. config.szFileName
-	if config.eType == 'JSON' or config.eType == 'JSON_FORMATED' then
-		if config.eType ~= 'JSON' then
-			szPath = szPath .. '.' .. config.eType:lower():sub(6)
-		end
-		szPath = szPath .. '.json'
-		SaveDataToFile(LIB.JsonEncode(data, config.eType == 'JSON_FORMATED'), szPath)
-	else
-		if config.eType ~= 'LUA' then
-			szPath = szPath .. '.' .. config.eType:lower():sub(5)
-		end
-		szPath = szPath .. '.jx3dat'
-		local option = {
-			passphrase = config.eType == 'LUA_ENCRYPTED'
-				and MY_TM_DATA_PASSPHRASE
-				or false,
-			crc = config.eType == 'LUA_ENCRYPTED',
-			compress = config.eType == 'LUA_ENCRYPTED',
-			indent = config.eType == 'LUA_FORMATED' and '\t' or nil,
-		}
-		LIB.SaveLUAData(szPath, data, option)
-	end
-	LIB.GetAbsolutePath(szPath):gsub('/', '\\')
-	return szRoot .. szPath
 end
 
 -- 删除 移动 添加 清空
@@ -2197,8 +2201,8 @@ local settings = {
 				CheckSameData          = D.CheckSameData       ,
 				ClearTemp              = D.ClearTemp           ,
 				AddData                = D.AddData             ,
-				SaveConfigureFile      = D.SaveConfigureFile   ,
-				LoadConfigureFile      = D.LoadConfigureFile   ,
+				ExportDataToFile       = D.ExportDataToFile    ,
+				ImportDataFromFile     = D.ImportDataFromFile  ,
 				Exchange               = D.Exchange            ,
 				MY_TM_REMOTE_DATA_ROOT = MY_TM_REMOTE_DATA_ROOT,
 				MY_TM_SPECIAL_MAP      = MY_TM_SPECIAL_MAP     ,
