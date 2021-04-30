@@ -960,9 +960,11 @@ function D.OpenImportPanel(szDefault, szTitle, fnAction)
 				szFileName,
 				aType,
 				szMode,
-				function(bStatus, szMsg, tMeta)
+				function(bStatus, ...)
 					if bStatus then
-						LIB.Sysmsg(_L['MY_TeamMon'], _L('Load config success: %s', tostring(szMsg)), CONSTANT.MSG_THEME.SUCCESS)
+						-- bStatus, szFilePath, tMeta
+						local szFilePath, tMeta = ...
+						LIB.Sysmsg(_L['MY_TeamMon'], _L('Load config success: %s', tostring(szFilePath)), CONSTANT.MSG_THEME.SUCCESS)
 						-- local function fnAlert2()
 						-- 	local szAuthor = tMeta and LIB.ReplaceSensitiveWord(tostring(tMeta.szAuthor)) or _L['Unknown author']
 						-- 	LIB.Alert(
@@ -972,8 +974,8 @@ function D.OpenImportPanel(szDefault, szTitle, fnAction)
 						-- 		'FORBIDDEN',
 						-- 		2)
 						-- end
-						-- LIB.Alert(_L('Import success: %s', szTitle or szMsg), fnAlert2, nil, fnAlert2)
-						LIB.Alert(_L('Import success: %s', szTitle or szMsg))
+						-- LIB.Alert(_L('Import success: %s', szTitle or szFilePath), fnAlert2, nil, fnAlert2)
+						LIB.Alert(_L('Import success: %s', szTitle or szFilePath))
 						ui:Remove()
 						if MY_LifeBar and not MY_LifeBar.bEnabled then
 							MY_LifeBar.bEnabled = true
@@ -984,12 +986,13 @@ function D.OpenImportPanel(szDefault, szTitle, fnAction)
 						if MY_Focus and not MY_Focus.bEnabled then
 							MY_Focus.bEnabled = true
 						end
-						if fnAction then
-							fnAction()
-						end
+						SafeCall(fnAction, bStatus, szFilePath, aType, szMode, tMeta)
 					else
-						LIB.Sysmsg(_L['MY_TeamMon'], _L('Load config failed: %s', tostring(szMsg)), CONSTANT.MSG_THEME.ERROR)
+						-- bStatus, szMsg
+						local szMsg = ...
+						LIB.Sysmsg(_L['MY_TeamMon'], _L('Load config failed: %s', _L[szMsg]), CONSTANT.MSG_THEME.ERROR)
 						LIB.Alert(_L('Import failed: %s', szTitle or _L[szMsg]))
+						SafeCall(fnAction, bStatus, szMsg)
 					end
 				end)
 		end,

@@ -506,6 +506,14 @@ function D.CheckUpdate()
 	if IsEmpty(szLastURL) then
 		return
 	end
+	local aType = MY_TeamMon.GetUserConfig('RR.LastType')
+	local szLastCRC = MY_TeamMon.GetUserConfig('RR.LastCRC')
+	if IsEmpty(aType) or not IsTable(aType) or IsEmpty(szLastCRC) then
+		return
+	end
+	if D.GetDataCRC(aType) ~= szLastCRC then
+		return
+	end
 	local function ParseVersion(szVersion)
 		if IsString(szVersion) then
 			local nPos = wfind(szVersion, '.')
@@ -530,9 +538,12 @@ function D.CheckUpdate()
 						LIB.ReplaceSensitiveWord(info.szTitle),
 						LIB.ReplaceSensitiveWord(info.szUpdateTime)),
 					function()
-						D.DownloadData(info, function()
-							FireUIEvent('MY_TM_RR_REPO_META_LIST_UPDATE')
-						end)
+						D.DownloadData(
+							info,
+							function()
+								FireUIEvent('MY_TM_RR_REPO_META_LIST_UPDATE')
+							end,
+							aType)
 						FireUIEvent('MY_TM_RR_REPO_META_LIST_UPDATE')
 					end,
 					function()
@@ -544,35 +555,48 @@ function D.CheckUpdate()
 		end)
 end
 
-function D.LoadConfigureFile(szFile, info, bSilent)
-	local function fnAction()
-		local me = GetClientPlayer()
-		if not bSilent and me.IsInParty() then
-			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TeamMon_RR', {'LOAD', info.szTitle}, true)
-		end
-		MY_TeamMon.SetUserConfig('RR.LastURL', GetShortURL(info.szURL) or info.szURL)
-		MY_TeamMon.SetUserConfig('RR.Version', info.szVersion)
-		MY_TeamMon.SetUserConfig('RR.LastSkipVersion', nil)
-		FireUIEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
+function D.GetDataCRC(aType)
+	local tCRC = {}
+	for _, k in ipairs(aType) do
+		tCRC[k] = MY_TeamMon.GetTable(k)
 	end
-	if bSilent then
-		MY_TeamMon.ImportDataFromFile(szFile, nil, 'REPLACE', fnAction)
+	return GetStringCRC(EncodeLUAData(tCRC))
+end
+
+function D.LoadConfigureFile(szFile, info, aSilentType)
+	local function fnAction(bStatus, ...)
+		if bStatus then
+			local szFilePath, aType, szMode, tMeta = ...
+			local me = GetClientPlayer()
+			if not aSilentType and me.IsInParty() then
+				LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TeamMon_RR', {'LOAD', info.szTitle}, true)
+			end
+			MY_TeamMon.SetUserConfig('RR.Version', info.szVersion)
+			MY_TeamMon.SetUserConfig('RR.LastURL', GetShortURL(info.szURL) or info.szURL)
+			MY_TeamMon.SetUserConfig('RR.LastType', aType)
+			MY_TeamMon.SetUserConfig('RR.LastCRC', D.GetDataCRC(aType))
+			MY_TeamMon.SetUserConfig('RR.LastSkipVersion', nil)
+			FireUIEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
+		end
+	end
+	if aSilentType then
+		MY_TeamMon.ImportDataFromFile(szFile, aSilentType, 'REPLACE', fnAction)
 	else
 		MY_TeamMon_UI.OpenImportPanel(szFile, info.szTitle .. ' - ' .. info.szAuthor, fnAction)
 	end
 end
 
-function D.DownloadData(info, callback, bSilent)
+function D.DownloadData(info, callback, aSilentType)
 	local szUUID = 'r-'
 		.. ('%08x'):format(GetStringCRC(info.szDataURL))
 		.. ('%08x'):format(GetStringCRC(info.szVersion))
 	local LUA_CONFIG = { passphrase = MY_TM_DATA_PASSPHRASE, crc = true, compress = true }
 	local p = LIB.LoadLUAData(MY_TM_REMOTE_DATA_ROOT .. szUUID .. '.meta.jx3dat', LUA_CONFIG)
 	if p and p.szVersion == info.szVersion and IsLocalFileExist(MY_TM_REMOTE_DATA_ROOT .. szUUID .. '.jx3dat') then
-		return D.LoadConfigureFile(szUUID .. '.jx3dat', info, bSilent)
+		return D.LoadConfigureFile(szUUID .. '.jx3dat', info, aSilentType)
 	end
 	if DATA_DOWNLOADING[info.szKey] then
-		if not bSilent then
+		if not aSilentType then
 			LIB.Topmsg(_L['Downloading in progress, please wait...'])
 		end
 		return
@@ -585,8 +609,8 @@ function D.DownloadData(info, callback, bSilent)
 			local szFile = szUUID .. '.jx3dat'
 			LIB.SaveLUAData(MY_TM_REMOTE_DATA_ROOT .. szUUID .. '.meta.jx3dat', info, LUA_CONFIG)
 			LIB.SaveLUAData(MY_TM_REMOTE_DATA_ROOT .. szFile, data, LUA_CONFIG)
-			D.LoadConfigureFile(szFile, info, bSilent)
-		elseif not bSilent then
+			D.LoadConfigureFile(szFile, info, aSilentType)
+		elseif not aSilentType then
 			LIB.Topmsg(_L('Decode %s failed!', info.szTitle))
 		end
 		SafeCall(callback, true)
@@ -975,7 +999,7 @@ LIB.RegisterBgMsg('MY_TeamMon_RR', function(_, data, _, _, szTalker, _)
 						or '\n' .. _L('Update time: %s', info.szUpdateTime)),
 				function()
 					D.AddFavMetaInfo(info)
-					D.DownloadData(info, nil, true)
+					D.DownloadData(info)
 				end)
 		end
 	elseif action == 'LOAD' then
@@ -984,9 +1008,7 @@ LIB.RegisterBgMsg('MY_TeamMon_RR', function(_, data, _, _, szTalker, _)
 end)
 
 LIB.RegisterEvent('LOADING_END.MY_TeamMon_RR', function()
-	if LIB.IsInDungeon() then
-		D.CheckUpdate()
-	end
+	D.CheckUpdate()
 end)
 
 -- Global exports
