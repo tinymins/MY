@@ -367,8 +367,8 @@ local function var2str(var, indent, level)
 end
 
 function D.InsertTip(aXml, szTitle, szValue)
-	insert(aXml, GetFormatText(szTitle, 67))
-	insert(aXml, GetFormatText(szValue .. '\n', 44))
+	insert(aXml, GetFormatText(tostring(szTitle), 67))
+	insert(aXml, GetFormatText(tostring(szValue) .. '\n', 44))
 end
 
 function D.GetTipInfo(el)
