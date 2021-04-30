@@ -1521,12 +1521,47 @@ function D.OpenSettingPanel(data, szType)
 	end
 	local function GetScrutinyTypeMenu()
 		local menu = {
-			{ szOption = g_tStrings.STR_GUILD_ALL, bMCheck = true, bChecked = type(data.nScrutinyType) == 'nil', fnAction = function() data.nScrutinyType = nil end },
+			{
+				szOption = g_tStrings.STR_GUILD_ALL,
+				bMCheck = true,
+				bChecked = type(data.nScrutinyType) == 'nil',
+				fnAction = function()
+					data.nScrutinyType = nil
+				end,
+			},
 			-- { bDevide = true },
-			{ szOption = g_tStrings.MENTOR_SELF, bMCheck = true, bChecked = data.nScrutinyType == MY_TM_SCRUTINY_TYPE.SELF, fnAction = function() data.nScrutinyType = MY_TM_SCRUTINY_TYPE.SELF end },
-			{ szOption = _L['Team'], bMCheck = true, bChecked = data.nScrutinyType == MY_TM_SCRUTINY_TYPE.TEAM, fnAction = function() data.nScrutinyType = MY_TM_SCRUTINY_TYPE.TEAM end },
-			{ szOption = _L['Enemy'], bMCheck = true, bChecked = data.nScrutinyType == MY_TM_SCRUTINY_TYPE.ENEMY, fnAction = function() data.nScrutinyType = MY_TM_SCRUTINY_TYPE.ENEMY end },
-			{ szOption = g_tStrings.STR_RAID_TIP_TARGET, bMCheck = true, bChecked = data.nScrutinyType == MY_TM_SCRUTINY_TYPE.TARGET, fnAction = function() data.nScrutinyType = MY_TM_SCRUTINY_TYPE.TARGET end },
+			{
+				szOption = g_tStrings.MENTOR_SELF,
+				bMCheck = true,
+				bChecked = data.nScrutinyType == MY_TM_SCRUTINY_TYPE.SELF,
+				fnAction = function()
+					data.nScrutinyType = MY_TM_SCRUTINY_TYPE.SELF
+				end,
+			},
+			{
+				szOption = _L['Team'],
+				bMCheck = true,
+				bChecked = data.nScrutinyType == MY_TM_SCRUTINY_TYPE.TEAM,
+				fnAction = function()
+					data.nScrutinyType = MY_TM_SCRUTINY_TYPE.TEAM
+				end,
+			},
+			{
+				szOption = _L['Enemy'],
+				bMCheck = true,
+				bChecked = data.nScrutinyType == MY_TM_SCRUTINY_TYPE.ENEMY,
+				fnAction = function()
+					data.nScrutinyType = MY_TM_SCRUTINY_TYPE.ENEMY
+				end,
+			},
+			{
+				szOption = g_tStrings.STR_RAID_TIP_TARGET,
+				bMCheck = true,
+				bChecked = data.nScrutinyType == MY_TM_SCRUTINY_TYPE.TARGET,
+				fnAction = function()
+					data.nScrutinyType = MY_TM_SCRUTINY_TYPE.TARGET
+				end,
+			},
 		}
 		return menu
 	end
