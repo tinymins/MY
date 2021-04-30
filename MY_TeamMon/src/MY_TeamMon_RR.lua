@@ -347,29 +347,6 @@ function D.SaveFavMetaInfoList(aMetaInfo)
 	FireUIEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
 end
 
-do
-local tConfig, nUpdateLFC
-function D.GetGlobalConfig(szKey)
-	if not tConfig or GetLogicFrameCount() ~= nUpdateLFC then
-		tConfig = LIB.LoadLUAData({'userdata/team_mon/configure.jx3dat', PATH_TYPE.GLOBAL})
-		nUpdateLFC = GetLogicFrameCount()
-	end
-	if IsTable(tConfig) then
-		return tConfig[szKey]
-	end
-end
-
-function D.SetGlobalConfig(szKey, oVal)
-	tConfig = LIB.LoadLUAData({'userdata/team_mon/configure.jx3dat', PATH_TYPE.GLOBAL})
-	if not IsTable(tConfig) then
-		tConfig = {}
-	end
-	tConfig[szKey] = oVal
-	nUpdateLFC = GetLogicFrameCount()
-	LIB.SaveLUAData({'userdata/team_mon/configure.jx3dat', PATH_TYPE.GLOBAL}, tConfig)
-end
-end
-
 function D.AddFavMetaInfo(info, szReplaceKey)
 	local aMetaInfo = D.LoadFavMetaInfoList()
 	local nIndex
@@ -525,7 +502,7 @@ function D.FetchRepoMetaInfoList(nPage)
 end
 
 function D.CheckUpdate()
-	local szLastURL = D.GetGlobalConfig('szLastURL')
+	local szLastURL = MY_TeamMon.GetUserConfig('RR.LastURL')
 	if IsEmpty(szLastURL) then
 		return
 	end
@@ -544,8 +521,8 @@ function D.CheckUpdate()
 		szLastURL,
 		function(info)
 			local szPrimaryVersion = ParseVersion(info.szVersion)
-			local szLastPrimaryVersion = ParseVersion(D.GetGlobalConfig('szLastVersion'))
-			local szLastSkipPrimaryVersion = ParseVersion(D.GetGlobalConfig('szLastSkipVersion'))
+			local szLastPrimaryVersion = ParseVersion(MY_TeamMon.GetUserConfig('RR.LastVersion'))
+			local szLastSkipPrimaryVersion = ParseVersion(MY_TeamMon.GetUserConfig('RR.LastSkipVersion'))
 			if szPrimaryVersion ~= szLastPrimaryVersion and szPrimaryVersion ~= szLastSkipPrimaryVersion then
 				LIB.Confirm(
 					_L('New version found for TeamMon_RR\nSURL: %s\nName: %s\nTime: %s\n\nDo you want to update data now?',
@@ -559,7 +536,7 @@ function D.CheckUpdate()
 						FireUIEvent('MY_TM_RR_REPO_META_LIST_UPDATE')
 					end,
 					function()
-						D.SetGlobalConfig('szLastSkipVersion', info.szVersion)
+						MY_TeamMon.SetUserConfig('RR.LastSkipVersion', info.szVersion)
 					end,
 					_L['Update'],
 					_L['Skip current version'])
@@ -576,9 +553,9 @@ function D.LoadConfigureFile(szFile, info, bSilent)
 			if me.IsInParty() then
 				LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TeamMon_RR', {'LOAD', info.szTitle}, true)
 			end
-			D.SetGlobalConfig('szLastURL', GetShortURL(info.szURL) or info.szURL)
-			O.SetGlobalConfig('szVersion', info.szVersion)
-			D.SetGlobalConfig('szLastSkipVersion', nil)
+			MY_TeamMon.SetUserConfig('RR.LastURL', GetShortURL(info.szURL) or info.szURL)
+			MY_TeamMon.SetUserConfig('RR.Version', info.szVersion)
+			MY_TeamMon.SetUserConfig('RR.LastSkipVersion', nil)
 			FireUIEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
 		end)
 	end
@@ -648,8 +625,8 @@ function D.AppendMetaInfoItem(container, p, bSel)
 	wnd:Lookup('Btn_Download', 'Text_Download'):SetText(
 		(META_DOWNLOADING[p.szKey] and _L['Fetching...'])
 		or (DATA_DOWNLOADING[p.szKey] and _L['Downloading...'])
-		or ((GetShortURL(p.szURL) or p.szURL) == D.GetGlobalConfig('szLastURL') and (
-			p.szVersion == D.GetGlobalConfig('szLastVersion')
+		or ((GetShortURL(p.szURL) or p.szURL) == MY_TeamMon.GetUserConfig('RR.LastURL') and (
+			p.szVersion == MY_TeamMon.GetUserConfig('RR.LastVersion')
 				and _L['Last select']
 				or _L['Can update']))
 		or _L['Download']

@@ -1808,6 +1808,16 @@ function D.LoadUserData()
 	end
 end
 
+-- 获取用户配置项
+function D.GetUserConfig(szKey)
+	return D.CONFIG[szKey]
+end
+
+-- 设置用户配置项
+function D.SetUserConfig(szKey, oVal)
+	D.CONFIG[szKey] = oVal
+end
+
 -- 从文件导入数据
 function D.ImportDataFromFile(szFileName, aType, szMode, fnAction)
 	local szFullPath = szFileName:sub(2, 2) == ':'
