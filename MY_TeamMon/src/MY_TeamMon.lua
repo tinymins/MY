@@ -174,9 +174,10 @@ local CACHE = {
 }
 
 local D = {
-	FILE  = {}, -- 文件原始数据
-	TEMP  = {}, -- 近期事件记录
-	DATA  = {},  -- 需要监控的数据合集
+	FILE   = {}, -- 文件原始数据
+	CONFIG = {}, -- 文件原始配置项
+	TEMP   = {}, -- 近期事件记录
+	DATA   = {}, -- 需要监控的数据合集
 }
 
 -- 初始化table 虽然写法没有直接写来得好 但是为了方便以后改动
@@ -220,7 +221,7 @@ RegisterCustomData('MY_TeamMon.bPushWhisperChannel')
 RegisterCustomData('MY_TeamMon.bPushBuffList')
 RegisterCustomData('MY_TeamMon.bPushPartyBuffList')
 
-local function GetDataPath()
+local function GetUserDataPath()
 	local ePathType = O.bCommon and PATH_TYPE.GLOBAL or PATH_TYPE.ROLE
 	local szPathV1 = LIB.FormatPath({'userdata/TeamMon/Config.jx3dat', ePathType})
 	local szPath = LIB.FormatPath({'userdata/team_mon/local.jx3dat', ePathType})
@@ -1777,9 +1778,9 @@ function D.Init()
 	Wnd.OpenWindow(MY_TM_INIFILE, 'MY_TeamMon')
 end
 
-function D.SaveData()
+function D.SaveUserData()
 	LIB.SaveLUAData(
-		GetDataPath(),
+		GetUserDataPath(),
 		{
 			data = D.FILE,
 			config = D.CONFIG,
@@ -1907,7 +1908,7 @@ function D.GetData(szType, dwID, nLevel)
 end
 
 function D.LoadUserData()
-	local data = LIB.LoadLUAData(GetDataPath())
+	local data = LIB.LoadLUAData(GetUserDataPath())
 	if IsTable(data) then
 		for k, v in pairs(D.FILE) do
 			D.FILE[k] = data.data[k] or {}
@@ -2169,7 +2170,7 @@ function D.OnShare(_, data, nChannel, dwID, szName, bIsSelf)
 end
 
 LIB.RegisterInit('MY_TeamMon', D.Init)
-LIB.RegisterFlush('MY_TeamMon', D.SaveData)
+LIB.RegisterFlush('MY_TeamMon', D.SaveUserData)
 LIB.RegisterBgMsg('MY_TM_SHARE', D.OnShare)
 
 -- Global exports
