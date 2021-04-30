@@ -645,18 +645,27 @@ function D.AppendMetaInfoItem(container, p, bSel)
 	wnd:Lookup('', 'Text_Item_Title'):SetText(LIB.ReplaceSensitiveWord(p.szTitle))
 	wnd:Lookup('', 'Text_Item_Download'):SetText(LIB.ReplaceSensitiveWord(p.szUpdateTime))
 	wnd:Lookup('', 'Image_Item_Sel'):SetVisible(bSel)
-	wnd:Lookup('Btn_Info'):SetVisible(not IsEmpty(p.szAboutURL))
-	wnd:Lookup('Btn_Info', 'Text_Info'):SetText(_L['See details'])
-	wnd:Lookup('Btn_Download', 'Text_Download'):SetText(
-		(META_DOWNLOADING[p.szKey] and _L['Fetching...'])
-		or (DATA_DOWNLOADING[p.szKey] and _L['Downloading...'])
-		or ((GetShortURL(p.szURL) or p.szURL) == MY_TeamMon.GetUserConfig('RR.LastURL') and (
-			p.szVersion == MY_TeamMon.GetUserConfig('RR.LastVersion')
-				and _L['Last select']
-				or _L['Can update']))
-		or _L['Download']
-	)
-	wnd:Lookup('Btn_Download'):Enable(not META_DOWNLOADING[p.szKey] and not DATA_DOWNLOADING[p.szKey])
+	if not IsEmpty(p.szAboutURL) then
+		UI(wnd):Append('WndButton', {
+			name = 'Btn_Info',
+			x = 760, y = 1, w = 90, h = 30,
+			buttonstyle = 'LINK',
+			text = _L['See details'],
+		})
+	end
+	UI(wnd):Append('WndButton', {
+		name = 'Btn_Download',
+		x = 860, y = 1, w = 90, h = 30,
+		buttonstyle = 'SKEUOMORPHISM',
+		text = (META_DOWNLOADING[p.szKey] and _L['Fetching...'])
+			or (DATA_DOWNLOADING[p.szKey] and _L['Downloading...'])
+			or ((GetShortURL(p.szURL) or p.szURL) == MY_TeamMon.GetUserConfig('RR.LastURL') and (
+				p.szVersion == MY_TeamMon.GetUserConfig('RR.LastVersion')
+					and _L['Last select']
+					or _L['Can update']))
+			or _L['Download'],
+		enable = not META_DOWNLOADING[p.szKey] and not DATA_DOWNLOADING[p.szKey],
+	})
 	wnd.info = p
 end
 
