@@ -308,6 +308,24 @@ local DecodeLUAData = _G.str2var or function(szText)
 	return data
 end
 -----------------------------------------------
+-- 计算数据散列值
+-----------------------------------------------
+local function GetLUADataHash(data)
+	local szType = type(data)
+	if szType == 'table' then
+		local aChild = {}
+		for k, v in pairs(data) do
+			insert(aChild, { k = GetLUADataHash(k), v = GetLUADataHash(v) })
+		end
+		sort(aChild, function(a, b) return a.k > b.k end)
+		for i = 1, #aChild do
+			aChild[i] = concat(aChild[i], ':')
+		end
+		return GetLUADataHash('{}::' .. concat(aChild, ';'))
+	end
+	return tostring(GetStringCRC(szType .. ':' .. tostring(data)))
+end
+-----------------------------------------------
 -- 读取数据
 -----------------------------------------------
 local function Get(var, keys, dft)
@@ -1589,6 +1607,7 @@ local LIB = {
 	ApplyPatch       = ApplyPatch      ,
 	EncodeLUAData    = EncodeLUAData   ,
 	DecodeLUAData    = DecodeLUAData   ,
+	GetLUADataHash   = GetLUADataHash  ,
 	RandomChild      = RandomChild     ,
 	KvpToObject      = KvpToObject     ,
 	GetTraceback     = GetTraceback    ,
