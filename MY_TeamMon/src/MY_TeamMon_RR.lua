@@ -560,7 +560,7 @@ function D.LoadConfigureFile(szFile, info, aSilentType)
 			if not aSilentType and me.IsInParty() then
 				LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TeamMon_RR', {'LOAD', info.szTitle}, true)
 			end
-			MY_TeamMon.SetUserConfig('RR.Version', info.szVersion)
+			MY_TeamMon.SetUserConfig('RR.LastVersion', info.szVersion)
 			MY_TeamMon.SetUserConfig('RR.LastURL', GetShortURL(info.szURL) or info.szURL)
 			MY_TeamMon.SetUserConfig('RR.LastType', aType)
 			MY_TeamMon.SetUserConfig('RR.LastCRC', D.GetDataCRC(aType))
