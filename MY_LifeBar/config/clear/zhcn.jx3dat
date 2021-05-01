@@ -331,6 +331,8 @@ local __TEMPLATE__ = {
 		['MSG_NPC_PARTY'        ] = { bEnable = true, nDuring = 9000 },
 		['MSG_NPC_YELL'         ] = { bEnable = true, nDuring = 9000 },
 		['MSG_NPC_WHISPER'      ] = { bEnable = true, nDuring = 9000 },
+		['MSG_STORY_NPC'        ] = { bEnable = true, nDuring = 9000 },
+		['MSG_STORY_PLAYER'     ] = { bEnable = true, nDuring = 9000 },
 		['MSG_BATTLE_FIELD_SIDE'] = { bEnable = true, nDuring = 5000 },
 	},
 }
