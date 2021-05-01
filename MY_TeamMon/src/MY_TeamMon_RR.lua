@@ -522,6 +522,7 @@ function D.CheckUpdate()
 				local szMinorVersion = szVersion:sub(nPos + 1)
 				return szMajorVersion, szMinorVersion
 			end
+			return szVersion, ''
 		end
 		return '', ''
 	end
@@ -530,28 +531,16 @@ function D.CheckUpdate()
 		function(info)
 			local szPrimaryVersion = ParseVersion(info.szVersion)
 			local szLastPrimaryVersion = ParseVersion(MY_TeamMon.GetUserConfig('RR.LastVersion'))
-			local szLastSkipPrimaryVersion = ParseVersion(MY_TeamMon.GetUserConfig('RR.LastSkipVersion'))
-			if szPrimaryVersion ~= szLastPrimaryVersion and szPrimaryVersion ~= szLastSkipPrimaryVersion then
-				LIB.Confirm(
-					_L('New version found for TeamMon_RR\nSURL: %s\nName: %s\nTime: %s\n\nDo you want to update data now?',
-						GetShortURL(info.szURL) or ' - ',
-						LIB.ReplaceSensitiveWord(info.szTitle),
-						LIB.ReplaceSensitiveWord(info.szUpdateTime)),
-					function()
-						D.DownloadData(
-							info,
-							function()
-								FireUIEvent('MY_TM_RR_REPO_META_LIST_UPDATE')
-							end,
-							aType)
-						FireUIEvent('MY_TM_RR_REPO_META_LIST_UPDATE')
-					end,
-					function()
-						MY_TeamMon.SetUserConfig('RR.LastSkipVersion', info.szVersion)
-					end,
-					_L['Update'],
-					_L['Skip current version'])
+			if IsEmpty(szPrimaryVersion) or szPrimaryVersion == szLastPrimaryVersion then
+				return
 			end
+			D.DownloadData(
+				info,
+				function()
+					FireUIEvent('MY_TM_RR_REPO_META_LIST_UPDATE')
+				end,
+				aType)
+			FireUIEvent('MY_TM_RR_REPO_META_LIST_UPDATE')
 		end)
 end
 
@@ -575,7 +564,6 @@ function D.LoadConfigureFile(szFile, info, aSilentType)
 			MY_TeamMon.SetUserConfig('RR.LastURL', GetShortURL(info.szURL) or info.szURL)
 			MY_TeamMon.SetUserConfig('RR.LastType', aType)
 			MY_TeamMon.SetUserConfig('RR.LastCRC', D.GetDataCRC(aType))
-			MY_TeamMon.SetUserConfig('RR.LastSkipVersion', nil)
 			FireUIEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
 		end
 	end
