@@ -63,7 +63,7 @@ RegisterCustomData('MY_MibaoHelper.bEnable')
 function D.OnInit()
 	-- 刚进游戏好像获取不到锁状态 20秒之后再说吧
 	LIB.DelayCall('MY_LOCK_TIP_DELAY', 20000, function()
-		if not LIB.IsPhoneLock() then -- 手机密保还提示个鸡
+		if not LIB.IsPhoneLock() and GetClientPlayer() then -- 手机密保还提示个鸡
 			local state, nResetTime = Lock_State()
 			if state == 'PASSWORD_LOCK' then
 				LIB.DelayCall('MY_LOCK_TIP', 100000, function()
