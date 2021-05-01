@@ -534,10 +534,25 @@ function D.CheckUpdate()
 			if IsEmpty(szPrimaryVersion) or szPrimaryVersion == szLastPrimaryVersion then
 				return
 			end
+			--[[#DEBUG BEGIN]]
+			local nTime = GetTime()
+			LIB.Debug(
+				'MY_TeamMon_RR',
+				'Hash matched, auto update comfirmed: ' .. szLastPrimaryVersion
+					.. ' -> ' .. szPrimaryVersion
+					.. ' (' .. concat(aType, ',') .. ')',
+				DEBUG_LEVEL.LOG)
+			--[[#DEBUG END]]
 			D.DownloadData(
 				info,
 				function()
 					FireUIEvent('MY_TM_RR_REPO_META_LIST_UPDATE')
+					--[[#DEBUG BEGIN]]
+					LIB.Debug(
+						'MY_TeamMon_RR',
+						'Auto update complete, cost time ' .. (GetTime() - nTime) .. 'ms',
+						DEBUG_LEVEL.LOG)
+					--[[#DEBUG END]]
 				end,
 				aType)
 			FireUIEvent('MY_TM_RR_REPO_META_LIST_UPDATE')
@@ -549,10 +564,18 @@ function D.GetDataCRC(aType)
 	for _, k in ipairs(aType) do
 		tCRC[k] = MY_TeamMon.GetTable(k)
 	end
-	return GetStringCRC(EncodeLUAData(tCRC))
+	return LIB.GetLUADataHash(tCRC)
 end
 
 function D.LoadConfigureFile(szFile, info, aSilentType)
+	--[[#DEBUG BEGIN]]
+	LIB.Debug(
+		'MY_TeamMon_RR',
+		'Load configure file ' .. szFile
+			.. ' info: ' .. EncodeLUAData(info)
+			.. ' silentType: ' .. EncodeLUAData(aSilentType),
+		DEBUG_LEVEL.LOG)
+	--[[#DEBUG END]]
 	local function fnAction(bStatus, ...)
 		if bStatus then
 			local szFilePath, aType, szMode, tMeta = ...
@@ -581,7 +604,9 @@ function D.DownloadData(info, callback, aSilentType)
 	local LUA_CONFIG = { passphrase = MY_TM_DATA_PASSPHRASE, crc = true, compress = true }
 	local p = LIB.LoadLUAData(MY_TM_REMOTE_DATA_ROOT .. szUUID .. '.meta.jx3dat', LUA_CONFIG)
 	if p and p.szVersion == info.szVersion and IsLocalFileExist(MY_TM_REMOTE_DATA_ROOT .. szUUID .. '.jx3dat') then
-		return D.LoadConfigureFile(szUUID .. '.jx3dat', info, aSilentType)
+		D.LoadConfigureFile(szUUID .. '.jx3dat', info, aSilentType)
+		SafeCall(callback, true)
+		return
 	end
 	if DATA_DOWNLOADING[info.szKey] then
 		if not aSilentType then
@@ -589,6 +614,13 @@ function D.DownloadData(info, callback, aSilentType)
 		end
 		return
 	end
+	--[[#DEBUG BEGIN]]
+	LIB.Debug(
+		'MY_TeamMon_RR',
+		'Start download file. info: ' .. EncodeLUAData(info)
+			.. ' silentType: ' .. EncodeLUAData(aSilentType),
+		DEBUG_LEVEL.LOG)
+	--[[#DEBUG END]]
 	DATA_DOWNLOADING[info.szKey] = true
 	LIB.DownloadFile(info.szDataURL, function(szPath)
 		DATA_DOWNLOADING[info.szKey] = nil
@@ -1005,7 +1037,10 @@ LIB.RegisterBgMsg('MY_TeamMon_RR', function(_, data, _, _, szTalker, _)
 end)
 
 LIB.RegisterEvent('LOADING_END.MY_TeamMon_RR', function()
-	D.CheckUpdate()
+	if LIB.IsInDungeon() then
+		D.CheckUpdate()
+		LIB.RegisterEvent('LOADING_END.MY_TeamMon_RR', false)
+	end
 end)
 
 -- Global exports
