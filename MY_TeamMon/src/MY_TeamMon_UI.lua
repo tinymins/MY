@@ -962,8 +962,7 @@ function D.OpenImportPanel(szDefault, szTitle, fnAction)
 				szMode,
 				function(bStatus, ...)
 					if bStatus then
-						-- bStatus, szFilePath, tMeta
-						local szFilePath, tMeta = ...
+						local szFilePath, aType, szMode, tMeta = ...
 						LIB.Sysmsg(_L['MY_TeamMon'], _L('Load config success: %s', tostring(szFilePath)), CONSTANT.MSG_THEME.SUCCESS)
 						-- local function fnAlert2()
 						-- 	local szAuthor = tMeta and LIB.ReplaceSensitiveWord(tostring(tMeta.szAuthor)) or _L['Unknown author']

@@ -1835,7 +1835,7 @@ function D.ImportDataFromFile(szFileName, aType, szMode, fnAction)
 		return
 	end
 	if not aType then
-		aType = MY_TM_TYPE_LIST
+		aType = Clone(MY_TM_TYPE_LIST)
 	end
 	if szMode == 'REPLACE' then
 		for _, k in ipairs(aType) do
@@ -1870,7 +1870,8 @@ function D.ImportDataFromFile(szFileName, aType, szMode, fnAction)
 	FireUIEvent('MY_TM_CREATE_CACHE')
 	FireUIEvent('MY_TM_DATA_RELOAD')
 	FireUIEvent('MY_TMUI_DATA_RELOAD')
-	SafeCall(fnAction, true, szFullPath:gsub('\\', '/'), Clone(data.__meta))
+	-- szFilePath, aType, szMode, tMeta
+	SafeCall(fnAction, true, szFullPath:gsub('\\', '/'), aType, szMode, Clone(data.__meta))
 end
 
 -- 导出数据到文件
