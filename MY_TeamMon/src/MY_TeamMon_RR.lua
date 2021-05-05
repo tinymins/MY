@@ -511,60 +511,62 @@ function D.CheckUpdate()
 	if IsEmpty(aType) or not IsTable(aType) or IsEmpty(szLastCRC) then
 		return
 	end
-	if D.GetDataCRC(aType) ~= szLastCRC then
-		return
-	end
-	local function ParseVersion(szVersion)
-		if IsString(szVersion) then
-			local nPos = wfind(szVersion, '.')
-			if nPos then
-				local szMajorVersion = szVersion:sub(1, nPos)
-				local szMinorVersion = szVersion:sub(nPos + 1)
-				return szMajorVersion, szMinorVersion
-			end
-			return szVersion, ''
+	D.GetDataCRC(aType, function(szCRC)
+		if szCRC ~= szLastCRC then
+			return
 		end
-		return '', ''
-	end
-	D.FetchMetaInfo(
-		szLastURL,
-		function(info)
-			local szPrimaryVersion = ParseVersion(info.szVersion)
-			local szLastPrimaryVersion = ParseVersion(MY_TeamMon.GetUserConfig('RR.LastVersion'))
-			if IsEmpty(szPrimaryVersion) or szPrimaryVersion == szLastPrimaryVersion then
-				return
+		local function ParseVersion(szVersion)
+			if IsString(szVersion) then
+				local nPos = wfind(szVersion, '.')
+				if nPos then
+					local szMajorVersion = szVersion:sub(1, nPos)
+					local szMinorVersion = szVersion:sub(nPos + 1)
+					return szMajorVersion, szMinorVersion
+				end
+				return szVersion, ''
 			end
-			--[[#DEBUG BEGIN]]
-			local nTime = GetTime()
-			LIB.Debug(
-				'MY_TeamMon_RR',
-				'Hash matched, auto update comfirmed: ' .. szLastPrimaryVersion
-					.. ' -> ' .. szPrimaryVersion
-					.. ' (' .. concat(aType, ',') .. ')',
-				DEBUG_LEVEL.LOG)
-			--[[#DEBUG END]]
-			D.DownloadData(
-				info,
-				function()
-					FireUIEvent('MY_TM_RR_REPO_META_LIST_UPDATE')
-					--[[#DEBUG BEGIN]]
-					LIB.Debug(
-						'MY_TeamMon_RR',
-						'Auto update complete, cost time ' .. (GetTime() - nTime) .. 'ms',
-						DEBUG_LEVEL.LOG)
-					--[[#DEBUG END]]
-				end,
-				aType)
-			FireUIEvent('MY_TM_RR_REPO_META_LIST_UPDATE')
-		end)
+			return '', ''
+		end
+		D.FetchMetaInfo(
+			szLastURL,
+			function(info)
+				local szPrimaryVersion = ParseVersion(info.szVersion)
+				local szLastPrimaryVersion = ParseVersion(MY_TeamMon.GetUserConfig('RR.LastVersion'))
+				if IsEmpty(szPrimaryVersion) or szPrimaryVersion == szLastPrimaryVersion then
+					return
+				end
+				--[[#DEBUG BEGIN]]
+				local nTime = GetTime()
+				LIB.Debug(
+					'MY_TeamMon_RR',
+					'Hash matched, auto update comfirmed: ' .. szLastPrimaryVersion
+						.. ' -> ' .. szPrimaryVersion
+						.. ' (' .. concat(aType, ',') .. ')',
+					DEBUG_LEVEL.LOG)
+				--[[#DEBUG END]]
+				D.DownloadData(
+					info,
+					function()
+						FireUIEvent('MY_TM_RR_REPO_META_LIST_UPDATE')
+						--[[#DEBUG BEGIN]]
+						LIB.Debug(
+							'MY_TeamMon_RR',
+							'Auto update complete, cost time ' .. (GetTime() - nTime) .. 'ms',
+							DEBUG_LEVEL.LOG)
+						--[[#DEBUG END]]
+					end,
+					aType)
+				FireUIEvent('MY_TM_RR_REPO_META_LIST_UPDATE')
+			end)
+	end)
 end
 
-function D.GetDataCRC(aType)
+function D.GetDataCRC(aType, fnCallback)
 	local tCRC = {}
 	for _, k in ipairs(aType) do
 		tCRC[k] = MY_TeamMon.GetTable(k)
 	end
-	return LIB.GetLUADataHash(tCRC)
+	LIB.GetLUADataHash(tCRC, fnCallback)
 end
 
 function D.LoadConfigureFile(szFile, info, aSilentType)
@@ -583,10 +585,12 @@ function D.LoadConfigureFile(szFile, info, aSilentType)
 			if not aSilentType and me.IsInParty() then
 				LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TeamMon_RR', {'LOAD', info.szTitle}, true)
 			end
-			MY_TeamMon.SetUserConfig('RR.LastVersion', info.szVersion)
-			MY_TeamMon.SetUserConfig('RR.LastURL', GetShortURL(info.szURL) or info.szURL)
-			MY_TeamMon.SetUserConfig('RR.LastType', aType)
-			MY_TeamMon.SetUserConfig('RR.LastCRC', D.GetDataCRC(aType))
+			D.GetDataCRC(aType, function(szCRC)
+				MY_TeamMon.SetUserConfig('RR.LastVersion', info.szVersion)
+				MY_TeamMon.SetUserConfig('RR.LastURL', GetShortURL(info.szURL) or info.szURL)
+				MY_TeamMon.SetUserConfig('RR.LastType', aType)
+				MY_TeamMon.SetUserConfig('RR.LastCRC', szCRC)
+			end)
 			FireUIEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
 		end
 	end
@@ -1037,10 +1041,11 @@ LIB.RegisterBgMsg('MY_TeamMon_RR', function(_, data, _, _, szTalker, _)
 end)
 
 LIB.RegisterEvent('LOADING_END.MY_TeamMon_RR', function()
-	if LIB.IsInDungeon() then
-		D.CheckUpdate()
-		LIB.RegisterEvent('LOADING_END.MY_TeamMon_RR', false)
+	if LIB.IsDebugServer() then
+		return
 	end
+	D.CheckUpdate()
+	LIB.RegisterEvent('LOADING_END.MY_TeamMon_RR', false)
 end)
 
 -- Global exports
