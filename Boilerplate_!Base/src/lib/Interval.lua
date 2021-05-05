@@ -54,30 +54,46 @@ local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCal
 -- FinallyThrottle 确保延迟调用的节流    毫秒       1 / GLOBAL.GAME_FPS
 ---------------------------------------------------------------------
 if DelayCall and BreatheCall and FrameCall and RenderCall then
-	LIB.DelayCall = function(arg0, ...)
-		if IsString(arg0) then
-			arg0 = NSFormatString('{$NS}__') .. arg0
+	local function WrapIntervalCall(IntervalCall)
+		return function(szKey, nInterval, fnAction, oArg)
+			local bUnreg
+			if type(szKey) == 'function' then
+				-- DelayCall(fnAction[, oArg])
+				szKey, nInterval, fnAction, oArg = nil, 0, szKey, nInterval
+			elseif type(szKey) == 'number' then
+				-- DelayCall(nInterval, fnAction[, oArg])
+				szKey, nInterval, fnAction, oArg = nil, szKey, nInterval, fnAction
+			elseif type(nInterval) == 'function' then
+				-- DelayCall(szKey, fnAction[, oArg])
+				nInterval, fnAction, oArg = 0, nInterval, fnAction
+			elseif type(nInterval) == 'boolean' then
+				-- DelayCall(szKey, false)
+				nInterval, bUnreg = nil, true
+			elseif nInterval and type(fnAction) ~= 'function' then
+				-- DelayCall(szKey, nInterval)
+				fnAction = nil
+			end
+			if fnAction then -- reg
+				if not szKey then -- 匿名调用
+					szKey = GetTickCount()
+					while IntervalCall(tostring(szKey)) do
+						szKey = szKey + 0.1
+					end
+					szKey = tostring(szKey)
+				end
+			end
+			assert(IsString(szKey), 'IntervalCall Key MUST be string.')
+			local szNSKey = NSFormatString('{$NS}__') .. szKey
+			if bUnreg then
+				return szKey, select(2, IntervalCall(szNSKey, false))
+			end
+			return szKey, select(2, IntervalCall(szNSKey, nInterval, fnAction, oArg))
 		end
-		return DelayCall(arg0, ...)
 	end
-	LIB.BreatheCall = function(arg0, ...)
-		if IsString(arg0) then
-			arg0 = NSFormatString('{$NS}__') .. arg0
-		end
-		return BreatheCall(arg0, ...)
-	end
-	LIB.FrameCall = function(arg0, ...)
-		if IsString(arg0) then
-			arg0 = NSFormatString('{$NS}__') .. arg0
-		end
-		return FrameCall(arg0, ...)
-	end
-	LIB.RenderCall = function(arg0, ...)
-		if IsString(arg0) then
-			arg0 = NSFormatString('{$NS}__') .. arg0
-		end
-		return RenderCall(arg0, ...)
-	end
+	LIB.DelayCall = WrapIntervalCall(DelayCall)
+	LIB.BreatheCall = WrapIntervalCall(BreatheCall)
+	LIB.FrameCall = WrapIntervalCall(FrameCall)
+	LIB.RenderCall = WrapIntervalCall(RenderCall)
 else
 
 local _time      -- current time
