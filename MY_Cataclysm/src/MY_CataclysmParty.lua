@@ -2027,6 +2027,7 @@ function CTM:RefreshSputtering()
 			end
 			for _, dwID in pairs(tGroupInfo.MemberList) do
 				CTM_CACHE[dwID]:Lookup('Handle_Sputtering'):SetVisible(tCount[dwID] == nMaxCount)
+				CTM_CACHE[dwID]:Lookup('Handle_Sputtering/Text_Sputtering'):SetText(nMaxCount)
 			end
 		end
 	else
