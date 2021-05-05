@@ -310,6 +310,7 @@ end
 -----------------------------------------------
 -- 计算数据散列值
 -----------------------------------------------
+local function KSorter(a, b) return a.k > b.k end
 local function GetLUADataHash(data)
 	local szType = type(data)
 	if szType == 'table' then
@@ -317,9 +318,9 @@ local function GetLUADataHash(data)
 		for k, v in pairs(data) do
 			insert(aChild, { k = GetLUADataHash(k), v = GetLUADataHash(v) })
 		end
-		sort(aChild, function(a, b) return a.k > b.k end)
-		for i = 1, #aChild do
-			aChild[i] = concat(aChild[i], ':')
+		sort(aChild, KSorter)
+		for i, v in ipairs(aChild) do
+			aChild[i] = v.k .. ':' .. v.v
 		end
 		return GetLUADataHash('{}::' .. concat(aChild, ';'))
 	end
