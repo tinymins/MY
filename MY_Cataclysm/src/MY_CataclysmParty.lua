@@ -2009,11 +2009,13 @@ function CTM:RefreshSputtering()
 			local nMaxCount, tCount = 1, {}
 			for _, dwID in pairs(tGroupInfo.MemberList) do
 				local info, nCount = team.GetMemberInfo(dwID), 0
-				if not info.bDeathFlag and info.bIsOnLine then
+				local player = GetPlayer(dwID)
+				if player and not info.bDeathFlag and info.bIsOnLine then
 					for _, dwID2 in pairs(tGroupInfo.MemberList) do
 						local info2 = team.GetMemberInfo(dwID2)
-						if not info2.bDeathFlag and info2.bIsOnLine
-						and LIB.GetDistance(info.nPosX, info.nPosY, info.nPosZ, info2.nPosX, info2.nPosY, info2.nPosZ, 'gwwean') <= CFG.nSputteringDistance then
+						local player2 = GetPlayer(dwID2)
+						if player2 and not info2.bDeathFlag and info2.bIsOnLine
+						and LIB.GetDistance(player.nX, player.nY, player.nZ, player2.nX, player2.nY, player2.nZ, 'gwwean') <= CFG.nSputteringDistance then
 							nCount = nCount + 1
 						end
 					end
