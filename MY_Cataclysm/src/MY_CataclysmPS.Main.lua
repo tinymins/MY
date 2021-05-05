@@ -313,17 +313,24 @@ function PS.OnPanelActive(frame)
 		end,
 		autoenable = function() return CFG.bAltView end,
 	}):AutoWidth():Width() + 5
-	-- y = y + ui:Append('WndCheckBox', { x = 10, y = nY, text = _L['Faster Refresh HP(Greater performance loss)'], checked = CFG.bFasterHP, enable = false })
-	-- :Click(function(bCheck)
-	-- 	CFG.bFasterHP = bCheck
-	-- 	if MY_Cataclysm.GetFrame() then
-	-- 		if bCheck then
-	-- 			MY_Cataclysm.GetFrame():RegisterEvent('RENDER_FRAME_UPDATE')
-	-- 		else
-	-- 			MY_Cataclysm.GetFrame():UnRegisterEvent('RENDER_FRAME_UPDATE')
-	-- 		end
-	-- 	end
-	-- end, true, true):Pos('BOTTOMRIGHT')
+
+	x = X + 10
+	y = y + 25
+	y = y + ui:Append('WndCheckBox', {
+		x = x, y = y, w = 'auto',
+		text = _L['Faster Refresh HP (Greater performance loss)'],
+		checked = CFG.bFasterHP,
+		oncheck = function(bCheck)
+			CFG.bFasterHP = bCheck
+			if MY_Cataclysm.GetFrame() then
+				if bCheck then
+					MY_Cataclysm.GetFrame():RegisterEvent('RENDER_FRAME_UPDATE')
+				else
+					MY_Cataclysm.GetFrame():UnRegisterEvent('RENDER_FRAME_UPDATE')
+				end
+			end
+		end,
+	}):Pos('BOTTOMRIGHT')
 	y = y + 25
 end
 LIB.RegisterPanel(_L['Raid'], 'MY_Cataclysm', _L['Cataclysm'], 'ui/Image/UICommon/RaidTotal.uitex|62', PS)

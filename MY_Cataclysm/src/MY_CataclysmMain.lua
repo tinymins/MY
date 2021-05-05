@@ -214,7 +214,7 @@ function D.SetConfig(Config, bKeepBuff)
 			end
 		end
 	end
-	CTM_CONFIG_PLAYER.bFasterHP = false
+	-- CTM_CONFIG_PLAYER.bFasterHP = false
 	setmetatable(CFG, {
 		__index = CTM_CONFIG_PLAYER,
 		__newindex = CTM_CONFIG_PLAYER,

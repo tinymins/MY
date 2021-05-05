@@ -54,7 +54,7 @@ return {
 	['Don\'t show tip in fight'] = '戰鬥中不顯示',
 	['Alt view player'] = '按住ALT點擊查看裝備',
 	['Disable in fight'] = '戰鬥中禁用',
-	['Faster Refresh HP(Greater performance loss)'] = '更快的血量刷新（目前官方有BUG，暫時關閉）',
+	['Faster Refresh HP (Greater performance loss)'] = '更快的血量刷新（要求更多的性能開銷）',
 	['Grid Style'] = '格子樣式',
 	['Grid Color'] = '背景顏色',
 	['Panel'] = '面板',
