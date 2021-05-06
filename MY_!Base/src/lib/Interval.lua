@@ -84,10 +84,13 @@ if DelayCall and BreatheCall and FrameCall and RenderCall then
 			end
 			assert(IsString(szKey), 'IntervalCall Key MUST be string.')
 			local szNSKey = NSFormatString('{$NS}__') .. szKey
-			if bUnreg then
-				return szKey, select(2, IntervalCall(szNSKey, false))
+			local aRetVal = bUnreg
+				and {IntervalCall(szNSKey, false)}
+				or {IntervalCall(szNSKey, nInterval, fnAction, oArg)}
+			if IsString(aRetVal[1]) then
+				aRetVal[1] = szKey
 			end
-			return szKey, select(2, IntervalCall(szNSKey, nInterval, fnAction, oArg))
+			return unpack(aRetVal)
 		end
 	end
 	LIB.DelayCall = WrapIntervalCall(DelayCall)
