@@ -249,7 +249,7 @@ function LIB.CopyChatLine(hTime, bTextEditor, bRichText)
 						edit:InsertObj(szText, { type = 'item', text = szText, item = p:GetUserData() })
 					elseif szName == 'iteminfolink' then
 						edit:InsertObj(szText, { type = 'iteminfo', text = szText, version = p.nVersion, tabtype = p.dwTabType, index = p.dwIndex })
-					elseif sub(szName, 1, 8) == 'namelink' then
+					elseif szName == 'namelink' or sub(szName, 1, 9) == 'namelink_' then
 						if bBegin == nil then
 							bBegin = false
 						end
@@ -468,7 +468,7 @@ function LIB.RenderChatLink(arg1, arg2)
 					end
 
 					local handlerEntry = NSFormatString('{$NS}.ChatLinkEventHandlers')
-					if name:sub(1, 8) == 'namelink' then
+					if name == 'namelink' or name:sub(1, 9) == 'namelink_' then
 						script = script .. 'this.' .. RENDERED_FLAG_KEY .. '=true;this.OnItemLButtonDown='
 							.. handlerEntry .. '.OnNameLClick;this.OnItemRButtonDown='
 							.. handlerEntry .. '.OnNameRClick'
@@ -502,7 +502,7 @@ function LIB.RenderChatLink(arg1, arg2)
 		end
 		local ui = UI(element)
 		local name = ui:Name()
-		if name:sub(1, 8) == 'namelink' then
+		if name == 'namelink' or name:sub(1, 9) == 'namelink_' then
 			ui:LClick(function() ChatLinkEvents.OnNameLClick(element, link) end)
 			ui:RClick(function() ChatLinkEvents.OnNameRClick(element, link) end)
 		elseif name == 'copy' or name == 'copylink' then
@@ -530,7 +530,7 @@ function LIB.CopyChatItem(p)
 			edit:InsertObj(szText, { type = 'item', text = szText, item = p:GetUserData() })
 		elseif szName == 'iteminfolink' then
 			edit:InsertObj(szText, { type = 'iteminfo', text = szText, version = p.nVersion, tabtype = p.dwTabType, index = p.dwIndex })
-		elseif sub(szName, 1, 8) == 'namelink' then
+		elseif szName == 'namelink' or sub(szName, 1, 9) == 'namelink_' then
 			edit:InsertObj(szText, { type = 'name', text = szText, name = match(szText, '%[(.*)%]') })
 		elseif szName == 'questlink' then
 			edit:InsertObj(szText, { type = 'quest', text = szText, questid = p:GetUserData() })
