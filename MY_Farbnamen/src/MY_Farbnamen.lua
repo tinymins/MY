@@ -308,8 +308,11 @@ function D.RenderHandle(h, tOption, bIgnoreRange)
 end
 
 function D.RenderEl(el, tOption, bIgnoreRange)
-	if el:GetType() == 'Text' and el:GetName():sub(1, 8) == 'namelink' then
-		return D.RenderNamelink(el, tOption)
+	if el:GetType() == 'Text' then
+		local name = el:GetName()
+		if name == 'namelink' or name:sub(1, 9) == 'namelink_' then
+			return D.RenderNamelink(el, tOption)
+		end
 	end
 	if el:GetType() == 'Handle' then
 		return D.RenderHandle(el, tOption, bIgnoreRange)
