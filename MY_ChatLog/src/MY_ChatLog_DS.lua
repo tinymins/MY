@@ -83,6 +83,7 @@ local CHANNELS = {
 	[20] = 'MSG_THEW_STAMINA',
 	[21] = 'MSG_TONG_FUND',
 	[22] = 'MSG_MY_MONITOR',
+	[23] = 'MSG_SSG_WHISPER',
 }
 local CHANNELS_R = LIB.FlipObjectKV(CHANNELS)
 

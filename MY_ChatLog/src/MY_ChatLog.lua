@@ -79,18 +79,20 @@ local TONG_MEMBER_LOGOUT_MSG = '^' .. LIB.EscapeString(g_tStrings.STR_GUILD_MEMB
 -- Êý¾Ý¿â¿ØÖÆÆ÷
 ------------------------------------------------------------------------------------------------------
 local LOG_TYPE = {
-	{ szKey = 'whisper', szTitle = g_tStrings.tChannelName['MSG_WHISPER'       ], aChannel = {'MSG_WHISPER'       }},
-	{ szKey = 'party'  , szTitle = g_tStrings.tChannelName['MSG_PARTY'         ], aChannel = {'MSG_PARTY'         }},
-	{ szKey = 'team'   , szTitle = g_tStrings.tChannelName['MSG_TEAM'          ], aChannel = {'MSG_TEAM'          }},
-	{ szKey = 'friend' , szTitle = g_tStrings.tChannelName['MSG_FRIEND'        ], aChannel = {'MSG_FRIEND'        }},
-	{ szKey = 'guild'  , szTitle = g_tStrings.tChannelName['MSG_GUILD'         ], aChannel = {'MSG_GUILD'         }},
-	{ szKey = 'guild_a', szTitle = g_tStrings.tChannelName['MSG_GUILD_ALLIANCE'], aChannel = {'MSG_GUILD_ALLIANCE'}},
-	{ szKey = 'death'  , szTitle = _L['Death Log'], aChannel = {'MSG_SELF_DEATH', 'MSG_SELF_KILL', 'MSG_PARTY_DEATH', 'MSG_PARTY_KILL'}},
-	{ szKey = 'journal', szTitle = _L['Journal Log'], aChannel = {
-		'MSG_MONEY', 'MSG_ITEM', --'MSG_EXP', 'MSG_REPUTATION', 'MSG_CONTRIBUTE', 'MSG_ATTRACTION', 'MSG_PRESTIGE',
-		-- 'MSG_TRAIN', 'MSG_MENTOR_VALUE', 'MSG_THEW_STAMINA', 'MSG_TONG_FUND'
-	}},
-	{ szKey = 'monitor', szTitle = _L['MY Monitor'], aChannel = {'MSG_MY_MONITOR'}},
+	{ szKey = 'whisper', szTitle = g_tStrings.tChannelName['MSG_WHISPER'], aChannel = {'MSG_WHISPER', 'MSG_SSG_WHISPER'} },
+	{ szKey = 'party'  , szTitle = g_tStrings.tChannelName['MSG_PARTY'], aChannel = {'MSG_PARTY'} },
+	{ szKey = 'team'   , szTitle = g_tStrings.tChannelName['MSG_TEAM'], aChannel = {'MSG_TEAM'} },
+	{ szKey = 'friend' , szTitle = g_tStrings.tChannelName['MSG_FRIEND'], aChannel = {'MSG_FRIEND'} },
+	{ szKey = 'guild'  , szTitle = g_tStrings.tChannelName['MSG_GUILD'], aChannel = {'MSG_GUILD'} },
+	{ szKey = 'guild_a', szTitle = g_tStrings.tChannelName['MSG_GUILD_ALLIANCE'], aChannel = {'MSG_GUILD_ALLIANCE'} },
+	{ szKey = 'death'  , szTitle = _L['Death Log'], aChannel = {'MSG_SELF_DEATH', 'MSG_SELF_KILL', 'MSG_PARTY_DEATH', 'MSG_PARTY_KILL'} },
+	{
+		szKey = 'journal', szTitle = _L['Journal Log'], aChannel = {
+			'MSG_MONEY', 'MSG_ITEM', --'MSG_EXP', 'MSG_REPUTATION', 'MSG_CONTRIBUTE', 'MSG_ATTRACTION', 'MSG_PRESTIGE',
+			-- 'MSG_TRAIN', 'MSG_MENTOR_VALUE', 'MSG_THEW_STAMINA', 'MSG_TONG_FUND'
+		},
+	},
+	{ szKey = 'monitor', szTitle = _L['MY Monitor'], aChannel = {'MSG_MY_MONITOR'} },
 }
 local LOG_LIMIT = (LIB.IsStreaming() and not LIB.IsDebugClient())
 	and {
