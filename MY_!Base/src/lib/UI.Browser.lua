@@ -229,6 +229,7 @@ function D.Open(url, options)
 	end
 	frame:Lookup('', 'Text_Title'):SetText(options.title or '')
 	frame:Lookup('Wnd_Controls/Edit_Input'):SetText(url)
+	frame:Lookup('Wnd_Controls/Edit_Input'):SetCaretPos(0)
 	ui:MinSize(290, 150)
 	ui:Size(OnResizePanel)
 	ui:Size(options.w or 500, options.h or 600)
