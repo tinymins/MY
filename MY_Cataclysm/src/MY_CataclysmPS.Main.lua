@@ -214,6 +214,42 @@ function PS.OnPanelActive(frame)
 							function(val) CFG.nSputteringDistance = val or CFG.nSputteringDistance end)
 					end,
 				},
+				{
+					szOption = _L['Set sputtering font color'],
+					fnAction = function()
+						UI.OpenColorPicker(function(r, g, b)
+							CFG.tSputteringFontColor = { r, g, b }
+						end)
+					end,
+				},
+				{
+					szOption = _L['Set sputtering font alpha'],
+					fnAction = function()
+						local fnAction = function(f)
+							CFG.nSputteringFontAlpha = ceil((1 - f) * 255)
+						end
+						local fPosX, fPosY = Cursor.GetPos()
+						GetUserPercentage(fnAction, nil, 1 - CFG.nSputteringFontAlpha / 255, _L['Set sputtering font alpha'], { fPosX, fPosY, fPosX + 1, fPosY + 1 })
+					end,
+				},
+				{
+					szOption = _L['Set sputtering shadow color'],
+					fnAction = function()
+						UI.OpenColorPicker(function(r, g, b)
+							CFG.tSputteringShadowColor = { r, g, b }
+						end)
+					end,
+				},
+				{
+					szOption = _L['Set sputtering shadow alpha'],
+					fnAction = function()
+						local fnAction = function(f)
+							CFG.nSputteringShadowAlpha = ceil((1 - f) * 255)
+						end
+						local fPosX, fPosY = Cursor.GetPos()
+						GetUserPercentage(fnAction, nil, 1 - CFG.nSputteringShadowAlpha / 255, _L['Set sputtering shadow alpha'], { fPosX, fPosY, fPosX + 1, fPosY + 1 })
+					end,
+				},
 			}
 		end,
 		autoenable = function() return CFG.bShowSputtering end,

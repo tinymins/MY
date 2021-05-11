@@ -2027,7 +2027,11 @@ function CTM:RefreshSputtering()
 			end
 			for _, dwID in pairs(tGroupInfo.MemberList) do
 				CTM_CACHE[dwID]:Lookup('Handle_Sputtering'):SetVisible(tCount[dwID] == nMaxCount)
+				CTM_CACHE[dwID]:Lookup('Handle_Sputtering/Text_Sputtering'):SetAlpha(CFG.nSputteringFontAlpha)
 				CTM_CACHE[dwID]:Lookup('Handle_Sputtering/Text_Sputtering'):SetText(nMaxCount)
+				CTM_CACHE[dwID]:Lookup('Handle_Sputtering/Text_Sputtering'):SetFontColor(unpack(CFG.tSputteringFontColor))
+				CTM_CACHE[dwID]:Lookup('Handle_Sputtering/Shadow_Sputtering'):SetAlpha(CFG.nSputteringShadowAlpha)
+				CTM_CACHE[dwID]:Lookup('Handle_Sputtering/Shadow_Sputtering'):SetColorRGB(unpack(CFG.tSputteringShadowColor))
 			end
 		end
 	else

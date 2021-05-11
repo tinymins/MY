@@ -59,6 +59,10 @@ return {
 	bShowGroupNumber       = true,
 	bShowEffect            = false, -- 五毒醉舞提示 万花距离提示 晚点做
 	bShowSputtering        = false,
+	tSputteringFontColor   = { 79, 255, 108 },
+	nSputteringFontAlpha   = 192,
+	tSputteringShadowColor = { 79, 255, 108 },
+	nSputteringShadowAlpha = 192,
 	nSputteringDistance    = 15,
 	aBuffList              = {},
 	tDistanceLevel         = { 20, 22, 200 },
