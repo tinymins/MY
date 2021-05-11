@@ -162,7 +162,7 @@ Box_AppendAddonMenu({function(box)
 	local dwTabType = item.dwTabType
 	local dwTabIndex = item.dwIndex
 	local nBookID = item.nGenre == ITEM_GENRE.BOOK and item.nBookID or -1
-	local menu = {{ szOption = _L['Item price'], fnAction = function() D.Open(dwTabType, dwTabIndex, nBookID) end }}
+	local menu = {}
 	if not item.bBind then
 		insert(menu, {
 			szOption = _L['Lookup price'],
