@@ -53,275 +53,369 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 	return
 end
 --------------------------------------------------------------------------
-local _Cache = {
-    bFighting = false,
-    nLastFightStartTimestarp = 0,
-    nLastFightEndTimestarp = 0,
+
+local D = {}
+local O = {}
+
+local CONFIG_FILE_PATH = {'config/infotip.jx3dat', PATH_TYPE.ROLE}
+local INFO_TIP_LIST = {
+	-- 网络延迟
+	{
+		id = 'Ping',
+		i18n = {
+			name = _L['Ping monitor'], prefix = _L['Ping: '], content = '%d',
+		},
+		configtpl = {
+			bEnable = false, bShowBg = false, bShowTitle = false,
+			rgb = { 95, 255, 95 }, nFont = 48,
+			anchor = { x = -133, y = -111, s = 'BOTTOMCENTER', r = 'BOTTOMCENTER' },
+		},
+		cache = {},
+		GetFormatString = function(data)
+			return format(data.cache.formatString, GetPingValue() / 2)
+		end,
+	},
+	-- 倍速显示（显示服务器有多卡……）
+	{
+		id = 'TimeMachine',
+		i18n = {
+			name = _L['Time machine'], prefix = _L['Rate: '], content = 'x%.2f',
+		},
+		configtpl = {
+			bEnable = false, bShowBg = false, bShowTitle = true,
+			rgb = { 31, 255, 31 },
+			anchor = { x = -276, y = -111, s = 'BOTTOMCENTER', r = 'BOTTOMCENTER' },
+		},
+		cache = {
+			tTimeMachineRec = {},
+			nTimeMachineLFC = GetLogicFrameCount(),
+		},
+		GetFormatString = function(data)
+			local s = 1
+			if data.cache.nTimeMachineLFC ~= GetLogicFrameCount() then
+				local tm = data.cache.tTimeMachineRec[GLOBAL.GAME_FPS] or {}
+				tm.frame = GetLogicFrameCount()
+				tm.tick  = GetTickCount()
+				for i = GLOBAL.GAME_FPS, 1, -1 do
+					data.cache.tTimeMachineRec[i] = data.cache.tTimeMachineRec[i - 1]
+				end
+				data.cache.tTimeMachineRec[1] = tm
+				data.cache.nTimeMachineLFC = GetLogicFrameCount()
+			end
+			local tm = data.cache.tTimeMachineRec[GLOBAL.GAME_FPS]
+			if tm then
+				s = 1000 * (GetLogicFrameCount() - tm.frame) / GLOBAL.GAME_FPS / (GetTickCount() - tm.tick)
+			end
+			return format(data.cache.formatString, s)
+		end,
+	},
+	-- 目标距离
+	{
+		id = 'Distance',
+		i18n = {
+			name = _L['Target distance'], prefix = _L['Distance: '], content = _L['%.1f Foot'],
+		},
+		configtpl = {
+			bEnable = false, bShowBg = false, bShowTitle = false,
+			rgb = { 255, 255, 0 }, nFont = 209,
+			anchor = { x = 203, y = -106, s = 'CENTER', r = 'CENTER' },
+		},
+		cache = {},
+		GetFormatString = function(data)
+			local p, s = LIB.GetObject(LIB.GetTarget()), _L['No Target']
+			if p then
+				s = format(data.cache.formatString, LIB.GetDistance(p))
+			end
+			return s
+		end,
+	},
+	-- 系统时间
+	{
+		id = 'SysTime',
+		i18n = {
+			name = _L['System time'], prefix = _L['Time: '], content = '%02d:%02d:%02d',
+		},
+		configtpl = {
+			bEnable = false, bShowBg = true, bShowTitle = true,
+			anchor = { x = 285, y = -18, s = 'BOTTOMLEFT', r = 'BOTTOMLEFT' },
+		},
+		cache = {},
+		GetFormatString = function(data)
+			local tDateTime = TimeToDate(GetCurrentTime())
+			return format(data.cache.formatString, tDateTime.hour, tDateTime.minute, tDateTime.second)
+		end,
+	},
+	-- 战斗计时
+	{
+		id = 'FightTime',
+		i18n = {
+			name = _L['Fight clock'], prefix = _L['Fight Clock: '], content = '',
+		},
+		configtpl = {
+			bEnable = false, bShowBg = false, bShowTitle = false,
+			rgb = { 255, 0, 128 }, nFont = 199,
+			anchor = { x = 353, y = -117, s = 'BOTTOMCENTER', r = 'BOTTOMCENTER' },
+		},
+		cache = {},
+		GetFormatString = function(data)
+			if LIB.GetFightUUID() or LIB.GetLastFightUUID() then
+				return data.cache.formatString .. LIB.GetFightTime('H:mm:ss')
+			else
+				return _L['Never Fight']
+			end
+		end,
+	},
+	-- 莲花和藕倒计时
+	{
+		id = 'LotusTime',
+		i18n = {
+			name = _L['Lotus clock'], prefix = _L['Lotus Clock: '], content = '%d:%d:%d',
+		},
+		configtpl = {
+			bEnable = false, bShowBg = true, bShowTitle = true,
+			anchor = { x = -290, y = -38, s = 'BOTTOMRIGHT', r = 'BOTTOMRIGHT' },
+		},
+		cache = {},
+		GetFormatString = function(data)
+			local nTotal = 6 * 60 * 60 - GetLogicFrameCount() / 16 % (6 * 60 * 60)
+			return format(data.cache.formatString, floor(nTotal / (60 * 60)), floor(nTotal / 60 % 60), floor(nTotal % 60))
+		end,
+	},
+	-- 角色坐标
+	{
+		id = 'GPS',
+		i18n = {
+			name = _L['GPS'], prefix = _L['Location: '], content = '[%d]%d,%d,%d',
+		},
+		configtpl = {
+			bEnable = false, bShowBg = true, bShowTitle = false,
+			rgb = { 255, 255, 255 }, nFont = 0,
+			anchor = { x = -21, y = 250, s = 'TOPRIGHT', r = 'TOPRIGHT' },
+		},
+		cache = {},
+		GetFormatString = function(data)
+			local player, text = GetClientPlayer(), ''
+			if player then
+				text = format(data.cache.formatString, player.GetMapID(), player.nX, player.nY, player.nZ)
+			end
+			return text
+		end,
+	},
+	-- 角色速度
+	{
+		id = 'Speedometer',
+		i18n = {
+			name = _L['Speedometer'], prefix = _L['Speed: '], content = _L['%.2f f/s'],
+		},
+		configtpl = {
+			bEnable = false, bShowBg = false, bShowTitle = false,
+			rgb = { 255, 255, 255 }, nFont = 0,
+			anchor = { x = -10, y = 210, s = 'TOPRIGHT', r = 'TOPRIGHT' },
+		},
+		cache = {
+			tSpeedometerRec = {},
+			nSpeedometerLFC = GetLogicFrameCount(),
+		},
+		GetFormatString = function(data)
+			local s = 0
+			local me = GetClientPlayer()
+			if me and data.cache.nSpeedometerLFC ~= GetLogicFrameCount() then
+				local sm = data.cache.tSpeedometerRec[GLOBAL.GAME_FPS] or {}
+				sm.framecount = GetLogicFrameCount()
+				sm.x, sm.y, sm.z = me.nX, me.nY, me.nZ
+				for i = GLOBAL.GAME_FPS, 1, -1 do
+					data.cache.tSpeedometerRec[i] = data.cache.tSpeedometerRec[i - 1]
+				end
+				data.cache.tSpeedometerRec[1] = sm
+				data.cache.nSpeedometerLFC = GetLogicFrameCount()
+			end
+			local sm = data.cache.tSpeedometerRec[GLOBAL.GAME_FPS]
+			if sm and me then
+				s = sqrt(pow(me.nX - sm.x, 2) + pow(me.nY - sm.y, 2) + pow((me.nZ - sm.z) / 8, 2)) / 64
+					/ (GetLogicFrameCount() - sm.framecount) * GLOBAL.GAME_FPS
+			end
+			return format(data.cache.formatString, s)
+		end
+	},
 }
-local Config_Default = {
-    Ping        = { -- 网络延迟
-    	bEnable = false, bShowBg = false, bShowTitle = false, rgb = { 95, 255, 95 },
-    	anchor = { x = -133, y = -111, s = 'BOTTOMCENTER', r = 'BOTTOMCENTER' }, nFont = 48,
-    },
-    TimeMachine = { -- 倍速显示（显示服务器有多卡……）
-        bEnable = false, bShowBg = false, bShowTitle = true, rgb = { 31, 255, 31 },
-        anchor  = { x = -276, y = -111, s = 'BOTTOMCENTER', r = 'BOTTOMCENTER' },
-    },
-    FPS         = { -- FPS
-        bEnable = false, bShowBg = true, bShowTitle = true,
-    	anchor  = { x = -10, y = -220, s = 'BOTTOMRIGHT', r = 'BOTTOMRIGHT' },
-    },
-    Distance    = { -- 目标距离
-        bEnable = false, bShowBg = false, bShowTitle = false, rgb = { 255, 255, 0 },
-        anchor  = { x = 203, y = -106, s = 'CENTER', r = 'CENTER' }, nFont = 209,
-    },
-    SysTime     = { -- 系统时间
-        bEnable = false, bShowBg = true, bShowTitle = true,
-    	anchor  = { x = 285, y = -18, s = 'BOTTOMLEFT', r = 'BOTTOMLEFT' },
-    },
-    FightTime   = { -- 战斗计时
-        bEnable = false, bShowBg = false, bShowTitle = false, rgb = { 255, 0, 128 },
-        anchor  = { x = 353, y = -117, s = 'BOTTOMCENTER', r = 'BOTTOMCENTER' }, nFont = 199,
-    },
-    LotusTime   = { -- 桂花和藕倒计时
-        bEnable = false, bShowBg = true, bShowTitle = true,
-        anchor  = { x = -290, y = -38, s = 'BOTTOMRIGHT', r = 'BOTTOMRIGHT' },
-    },
-    GPS         = { -- 角色坐标
-        bEnable = false, bShowBg = true, bShowTitle = false, rgb = { 255, 255, 255 },
-        anchor  = { x = -21, y = 250, s = 'TOPRIGHT', r = 'TOPRIGHT' }, nFont = 0,
-    },
-    Speedometer = { -- 角色速度
-        bEnable = false, bShowBg = false, bShowTitle = false, rgb = { 255, 255, 255 },
-        anchor  = { x = -10, y = 210, s = 'TOPRIGHT', r = 'TOPRIGHT' }, nFont = 0,
-    },
-}
-local _C = {}
-MY_InfoTip = {}
-MY_InfoTip.Config = Clone(Config_Default)
-_C.tTm = {}
-_C.nTmFrameCount = GetLogicFrameCount()
-_C.tSm = {}
-_C.nSmFrameCount = GetLogicFrameCount()
-MY_InfoTip.Cache = {
-    Ping         = { -- Ping
-        formatString = '', title = _L['Ping monitor'], prefix = _L['Ping: '], content = _L['%d'],
-        GetContent = function() return format(MY_InfoTip.Cache.Ping.formatString, GetPingValue() / 2) end
-    },
-    TimeMachine  = { -- 倍速显示
-        formatString = '', title = _L['Time machine'], prefix = _L['Rate: '], content = 'x%.2f',
-        GetContent = function()
-            local s = 1
-            if _C.nTmFrameCount ~= GetLogicFrameCount() then
-                local tm = _C.tTm[GLOBAL.GAME_FPS] or {}
-                tm.frame = GetLogicFrameCount()
-                tm.tick  = GetTickCount()
-                for i = GLOBAL.GAME_FPS, 1, -1 do
-                    _C.tTm[i] = _C.tTm[i - 1]
-                end
-                _C.tTm[1] = tm
-                _C.nTmFrameCount = GetLogicFrameCount()
-            end
-            local tm = _C.tTm[GLOBAL.GAME_FPS]
-            if tm then
-                s = 1000 * (GetLogicFrameCount() - tm.frame) / GLOBAL.GAME_FPS / (GetTickCount() - tm.tick)
-            end
-            return format(MY_InfoTip.Cache.TimeMachine.formatString, s)
-        end
-    },
-    Distance  = { -- 目标距离
-        formatString = '', title = _L['Target distance'], prefix = _L['Distance: '], content = _L['%.1f Foot'],
-        GetContent = function()
-            local p, s = LIB.GetObject(LIB.GetTarget()), _L['No Target']
-            if p then
-                s = format(MY_InfoTip.Cache.Distance.formatString, LIB.GetDistance(p))
-            end
-            return s
-        end
-    },
-    SysTime   = { -- 系统时间
-        formatString = '', title = _L['System time'], prefix = _L['Time: '], content = _L['%02d:%02d:%02d'],
-        GetContent = function()
-            local tDateTime = TimeToDate(GetCurrentTime())
-            return format(MY_InfoTip.Cache.SysTime.formatString, tDateTime.hour, tDateTime.minute, tDateTime.second)
-        end
-    },
-    FightTime = { -- 战斗计时
-        formatString = '', title = _L['Fight clock'], prefix = _L['Fight Clock: '], content = '',
-        GetContent = function()
-            if LIB.GetFightUUID() or LIB.GetLastFightUUID() then
-                return MY_InfoTip.Cache.FightTime.formatString .. LIB.GetFightTime('H:mm:ss')
-            else
-                return _L['Never Fight']
-            end
-        end
-    },
-    LotusTime = { -- 莲花和藕倒计时
-        formatString = '', title = _L['Lotus clock'], prefix = _L['Lotus Clock: '], content = _L['%d:%d:%d'],
-        GetContent = function()
-            local nTotal = 6*60*60 - GetLogicFrameCount()/16%(6*60*60)
-            return format(MY_InfoTip.Cache.LotusTime.formatString, floor(nTotal/(60*60)), floor(nTotal/60%60), floor(nTotal%60))
-        end
-    },
-    GPS = { -- 角色坐标
-        formatString = '', title = _L['GPS'], prefix = _L['Location: '], content = _L['[%d]%d,%d,%d'],
-        GetContent = function()
-            local player, text = GetClientPlayer(), ''
-            if player then
-                text = format(MY_InfoTip.Cache.GPS.formatString, player.GetMapID(), player.nX, player.nY, player.nZ)
-            end
-            return text
-        end
-    },
-    Speedometer = { -- 角色速度
-        formatString = '', title = _L['Speedometer'], prefix = _L['Speed: '], content = _L['%.2f f/s'],
-        GetContent = function()
-            local s = 0
-            local me = GetClientPlayer()
-            if me and _C.nSmFrameCount ~= GetLogicFrameCount() then
-                local sm = _C.tSm[GLOBAL.GAME_FPS] or {}
-                sm.framecount = GetLogicFrameCount()
-                sm.x, sm.y, sm.z = me.nX, me.nY, me.nZ
-                for i = GLOBAL.GAME_FPS, 1, -1 do
-                    _C.tSm[i] = _C.tSm[i - 1]
-                end
-                _C.tSm[1] = sm
-                _C.nSmFrameCount = GetLogicFrameCount()
-            end
-            local sm = _C.tSm[GLOBAL.GAME_FPS]
-            if sm and me then
-                s = sqrt(pow(me.nX - sm.x, 2) + pow(me.nY - sm.y, 2) + pow((me.nZ - sm.z) / 8, 2)) / 64
-                    / (GetLogicFrameCount() - sm.framecount) * GLOBAL.GAME_FPS
-            end
-            return format(MY_InfoTip.Cache.Speedometer.formatString, s)
-        end
-    },
-}
-local _SZ_CONFIG_FILE_ = {'config/infotip.jx3dat', PATH_TYPE.ROLE}
-local _Cache = {}
-local SaveConfig = function() LIB.SaveLUAData(_SZ_CONFIG_FILE_, MY_InfoTip.Config) end
-local LoadConfig = function()
-    local szOrgFile = LIB.GetLUADataPath({'config/MY_INFO_TIP/{$uid}.{$lang}.jx3dat', PATH_TYPE.DATA})
-    local szFilePath = LIB.GetLUADataPath(_SZ_CONFIG_FILE_)
-    if IsLocalFileExist(szOrgFile) then
-        CPath.Move(szOrgFile, szFilePath)
-    end
-    local config = LIB.LoadLUAData(szFilePath)
-    if config then
-        if not MY_InfoTip.Config then
-            MY_InfoTip.Config = {}
-        end
-        for k, v in pairs(config) do
-            MY_InfoTip.Config[k] = config[k] or MY_InfoTip.Config[k]
-        end
-    end
+
+function D.SaveConfig()
+	local tConfig = {}
+	for _, v in ipairs(INFO_TIP_LIST) do
+		if not v.config then
+			return
+		end
+		tConfig[v.id] = v.config
+	end
+	LIB.SaveLUAData(CONFIG_FILE_PATH, tConfig)
 end
+
+function D.LoadConfig()
+	local tConfig = LIB.LoadLUAData(CONFIG_FILE_PATH)
+	if not IsTable(tConfig) then
+		tConfig = {}
+	end
+	for _, v in ipairs(INFO_TIP_LIST) do
+		v.config = LIB.FormatDataStructure(tConfig[v.id], v.configtpl)
+	end
+end
+
 LIB.RegisterEvent('CUSTOM_UI_MODE_SET_DEFAULT', function()
-    for k, v in pairs(Config_Default) do
-        MY_InfoTip.Config[k].anchor = v.anchor
-    end
-    MY_InfoTip.Reload()
+	for _, v in ipairs(INFO_TIP_LIST) do
+		if not v.config then
+			return
+		end
+		v.config.anchor = Clone(v.configtpl.anchor)
+	end
+	D.ReinitUI()
+	D.SaveConfig()
 end)
+
 -- 显示信息条
-MY_InfoTip.Reload = function()
-    for id, cache in pairs(MY_InfoTip.Cache) do
-        local cfg = MY_InfoTip.Config[id]
-        local frm = UI('Normal/MY_InfoTip_'..id)
-        if cfg.bEnable then
-            if frm:Count()==0 then
-                frm = UI.CreateFrame('MY_InfoTip_'..id, {empty = true}):Size(220,30):Event('UI_SCALED', function()
-                    UI(this):Anchor(cfg.anchor)
-                end):CustomMode(cache.title, function(anchor)
-                    UI(this):BringToTop()
-                    cfg.anchor = anchor
-                    SaveConfig()
-                end, function(anchor)
-                    cfg.anchor = anchor
-                    SaveConfig()
-                end):Drag(0,0,0,0):Drag(false):Penetrable(true)
-                frm:Append('Image', 'Image_Default'):Size(220,30):Image('UI/Image/UICommon/Commonpanel.UITex',86):Alpha(180)
-                frm:Append('Text', 'Text_Default'):Size(220,30):Text(cache.title):Font(2)[1]:SetHAlign(1)
-                local txt = frm:Find('#Text_Default')
-                frm:Breathe(function() txt:Text(cache.GetContent()) end)
-            end
-            if cfg.bShowBg then
-                frm:Find('#Image_Default'):Show()
-            else
-                frm:Find('#Image_Default'):Hide()
-            end
-            if cfg.bShowTitle then
-                cache.formatString = _L[cache.prefix] .. _L[cache.content]
-            else
-                cache.formatString = _L[cache.content]
-            end
-            frm:Children('#Text_Default'):Font(cfg.nFont or 0):Color(cfg.rgb or {255,255,255})
-            frm:Anchor(cfg.anchor)
-        else
-            frm:Remove()
-        end
-    end
-    SaveConfig()
+function D.ReinitUI()
+	for _, data in ipairs(INFO_TIP_LIST) do
+		if not data.config then
+			return
+		end
+		local ui = UI('Normal/MY_InfoTip_' .. data.id)
+		if data.config.bEnable then
+			if ui:Count() == 0 then
+				ui = UI.CreateFrame('MY_InfoTip_' .. data.id, { empty = true })
+					:Size(220,30)
+					:Event(
+						'UI_SCALED',
+						function()
+							UI(this):Anchor(data.config.anchor)
+						end)
+					:CustomMode(
+						data.i18n.name,
+						function(anchor)
+							UI(this):BringToTop()
+							data.config.anchor = anchor
+							D.SaveConfig()
+						end,
+						function(anchor)
+							data.config.anchor = anchor
+							D.SaveConfig()
+						end)
+					:Drag(0, 0, 0, 0)
+					:Drag(false)
+					:Penetrable(true)
+				ui:Append('Image', {
+					name = 'Image_Default',
+					w = 220, h = 30,
+					alpha = 180,
+					image = 'UI/Image/UICommon/Commonpanel.UITex', imageframe = 86,
+				})
+				local txt = ui:Append('Text', {
+					name = 'Text_Default',
+					w = 220, h = 30,
+					text = data.i18n.name,
+					font = 2, valign = 1, halign = 1,
+				})
+				ui:Breathe(function() txt:Text(data.GetFormatString(data)) end)
+			end
+			data.cache.formatString = data.config.bShowTitle
+				and data.i18n.prefix .. data.i18n.content
+				or data.i18n.content
+			ui:Fetch('Image_Default'):Visible(data.config.bShowBg)
+			ui:Fetch('Text_Default')
+				:Font(data.config.nFont or 0)
+				:Color(data.config.rgb or { 255, 255, 255 })
+			ui:Anchor(data.config.anchor)
+		else
+			ui:Remove()
+		end
+	end
 end
+
 -- 注册INIT事件
 LIB.RegisterInit('MY_INFOTIP', function()
-    LoadConfig()
-    MY_InfoTip.Reload()
+	D.LoadConfig()
+	D.ReinitUI()
 end)
 
+local PS = {}
 
-LIB.RegisterPanel(_L['System'], 'MY_InfoTip', _L['MY_InfoTip'], 'ui/Image/UICommon/ActivePopularize2.UITex|22', { OnPanelActive = function(wnd)
-    local ui = UI(wnd)
-    local w, h = ui:Size()
-    local x, y = 50, 20
+function PS.OnPanelActive(wnd)
+	local ui = UI(wnd)
+	local w, h = ui:Size()
+	local x, y = 50, 20
 
-    ui:Append('Text', 'Text_InfoTip')
-      :Pos(x, y):Width(350)
-      :Text(_L['Infomation tips']):Color(255,255,0)
-    y = y + 5
+	ui:Append('Text', {
+		name = 'Text_InfoTip',
+		x=  x, y = y, w = 350,
+		text = _L['Infomation tips'],
+		color = {255, 255, 0},
+	})
+	y = y + 5
 
-    for id, cache in pairs(MY_InfoTip.Cache) do
-        x, y = 55, y + 30
+	for _, data in ipairs(INFO_TIP_LIST) do
+		x, y = 55, y + 30
 
-        local cfg = MY_InfoTip.Config[id]
-        ui:Append('WndCheckBox', 'WndCheckBox_InfoTip_'..id):Pos(x, y):Width(250)
-          :Text(cache.title):Check(cfg.bEnable or false)
-          :Check(function(bChecked)
-            cfg.bEnable = bChecked
-            MY_InfoTip.Reload()
-          end)
-        x = x + 220
-        ui:Append('WndCheckBox', 'WndCheckBox_InfoTipTitle_'..id):Pos(x, y):Width(60)
-          :Text(_L['Title']):Check(cfg.bShowTitle or false)
-          :Check(function(bChecked)
-            cfg.bShowTitle = bChecked
-            MY_InfoTip.Reload()
-          end)
-        x = x + 70
-        ui:Append('WndCheckBox', 'WndCheckBox_InfoTipBg_'..id):Pos(x, y):Width(60)
-          :Text(_L['Background']):Check(cfg.bShowBg or false)
-          :Check(function(bChecked)
-            cfg.bShowBg = bChecked
-            MY_InfoTip.Reload()
-          end)
-        x = x + 70
-        ui:Append('WndButton', 'WndButton_InfoTipFont_'..id):Pos(x, y)
-          :Width(50):Text(_L['Font'])
-          :Click(function()
-            UI.OpenFontPicker(function(f)
-                cfg.nFont = f
-                MY_InfoTip.Reload()
-            end)
-          end)
-        x = x + 60
-        ui:Append('Shadow', 'Shadow_InfoTipColor_'..id):Pos(x, y)
-          :Size(20, 20):Color(cfg.rgb or {255,255,255})
-          :Click(function()
-            local me = this
-            UI.OpenColorPicker(function(r, g, b)
-                UI(me):Color(r, g, b)
-                cfg.rgb = { r, g, b }
-                MY_InfoTip.Reload()
-            end)
-          end)
-    end
-end})
+		ui:Append('WndCheckBox', {
+			name = 'WndCheckBox_InfoTip_' .. data.id,
+			x = x, y = y, w = 250,
+			text = data.i18n.name,
+			checked = data.config.bEnable or false,
+			oncheck = function(bChecked)
+				data.config.bEnable = bChecked
+				D.ReinitUI()
+				D.SaveConfig()
+			end,
+		})
+		x = x + 220
+		ui:Append('WndCheckBox', {
+			name = 'WndCheckBox_InfoTipTitle_' .. data.id,
+			x = x, y = y, w = 60,
+			text = _L['Title'],
+			checked = data.config.bShowTitle or false,
+			oncheck = function(bChecked)
+				data.config.bShowTitle = bChecked
+				D.ReinitUI()
+				D.SaveConfig()
+			end,
+		})
+		x = x + 70
+		ui:Append('WndCheckBox', {
+			name = 'WndCheckBox_InfoTipBg_' .. data.id,
+			x = x, y = y, w = 60,
+			text = _L['Background'],
+			checked = data.config.bShowBg or false,
+			oncheck = function(bChecked)
+				data.config.bShowBg = bChecked
+				D.ReinitUI()
+				D.SaveConfig()
+			end,
+		})
+		x = x + 70
+		ui:Append('WndButton', {
+			name = 'WndButton_InfoTipFont_' .. data.id,
+			x = x, y = y, w = 50,
+			text = _L['Font'],
+			onclick = function()
+				UI.OpenFontPicker(function(f)
+					data.config.nFont = f
+					D.ReinitUI()
+					D.SaveConfig()
+				end)
+			end,
+		})
+		x = x + 60
+		ui:Append('Shadow', {
+			name = 'Shadow_InfoTipColor_' .. data.id,
+			x = x, y = y, w = 20, h = 20,
+			color = data.config.rgb or {255, 255, 255},
+			onclick = function()
+				local el = this
+				UI.OpenColorPicker(function(r, g, b)
+					UI(el):Color(r, g, b)
+					data.config.rgb = { r, g, b }
+					D.ReinitUI()
+					D.SaveConfig()
+				end)
+			end,
+		})
+	end
+end
+LIB.RegisterPanel(_L['System'], 'MY_InfoTip', _L['MY_InfoTip'], 'ui/Image/UICommon/ActivePopularize2.UITex|22', PS)
