@@ -276,7 +276,7 @@ function PS.OnPanelActive(wnd)
 
 	-- ср╡Ю
 	local x, y = xr, yr
-	local deltaY = (h - y * 2) / 21
+	local deltaY = (h - y * 2) / 20
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = wr, text = _L['Hide when empty'],
 		checked = MY_Focus.bAutoHide,
@@ -415,18 +415,6 @@ function PS.OnPanelActive(wnd)
 		oncheck = function(bChecked)
 			MY_Focus.bShowTarget = bChecked
 			MY_Focus.RescanNearby()
-		end,
-		autoenable = function() return MY_Focus.IsEnabled() end,
-	})
-	y = y + deltaY
-
-	ui:Append('WndCheckBox', {
-		x = x, y = y,w = wr, text = _L['Traversal object'],
-		tip = _L['May cause some problem in dungeon map'],
-		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
-		checked = MY_Focus.bTraversal,
-		oncheck = function(bChecked)
-			MY_Focus.bTraversal = bChecked
 		end,
 		autoenable = function() return MY_Focus.IsEnabled() end,
 	})

@@ -338,30 +338,14 @@ function D.UpdateItem(hItem, p)
 	-- 读条
 	if dwType ~= TARGET.DOODAD then
 		local nType, dwSkillID, dwSkillLevel, fProgress = LIB.GetOTActionState(KObject)
-		if MY_Focus.bTraversal and dwType == TARGET.PLAYER
-		and nType ~= CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_IDLE then
-			LIB.WithTarget(dwType, dwID, function()
-				local nType, dwSkillID, dwSkillLevel, fProgress = LIB.GetOTActionState(KObject)
-				if nType == CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
-				or nType == CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL
-				or nType == CONSTANT.CHARACTER_OTACTION_TYPE.ANCIENT_ACTION_PREPARE then
-					hItem:Lookup('Handle_R/Handle_Progress/Image_Progress'):SetPercentage(fProgress)
-					hItem:Lookup('Handle_R/Handle_Progress/Text_Progress'):SetText((LIB.GetSkillName(dwSkillID, dwSkillLevel)))
-				else
-					hItem:Lookup('Handle_R/Handle_Progress/Image_Progress'):SetPercentage(0)
-					hItem:Lookup('Handle_R/Handle_Progress/Text_Progress'):SetText('')
-				end
-			end)
+		if nType == CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
+		or nType == CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL
+		or nType == CONSTANT.CHARACTER_OTACTION_TYPE.ANCIENT_ACTION_PREPARE then
+			hItem:Lookup('Handle_R/Handle_Progress/Image_Progress'):SetPercentage(fProgress)
+			hItem:Lookup('Handle_R/Handle_Progress/Text_Progress'):SetText((LIB.GetSkillName(dwSkillID, dwSkillLevel)))
 		else
-			if nType == CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
-			or nType == CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL
-			or nType == CONSTANT.CHARACTER_OTACTION_TYPE.ANCIENT_ACTION_PREPARE then
-				hItem:Lookup('Handle_R/Handle_Progress/Image_Progress'):SetPercentage(fProgress)
-				hItem:Lookup('Handle_R/Handle_Progress/Text_Progress'):SetText((LIB.GetSkillName(dwSkillID, dwSkillLevel)))
-			else
-				hItem:Lookup('Handle_R/Handle_Progress/Image_Progress'):SetPercentage(0)
-				hItem:Lookup('Handle_R/Handle_Progress/Text_Progress'):SetText('')
-			end
+			hItem:Lookup('Handle_R/Handle_Progress/Image_Progress'):SetPercentage(0)
+			hItem:Lookup('Handle_R/Handle_Progress/Text_Progress'):SetText('')
 		end
 	end
 	-- 目标的目标
