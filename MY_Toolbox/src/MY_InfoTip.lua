@@ -116,13 +116,13 @@ local INFO_TIP_LIST = {
 			name = _L['Target distance'], prefix = _L['Distance: '], content = _L['%.1f Foot'],
 		},
 		configtpl = {
-			bEnable = false, bShowBg = false, bShowTitle = false,
+			bEnable = false, bShowBg = false, bShowTitle = false, bPlaceholder = true,
 			rgb = { 255, 255, 0 }, nFont = 209,
 			anchor = { x = 203, y = -106, s = 'CENTER', r = 'CENTER' },
 		},
 		cache = {},
 		GetFormatString = function(data)
-			local p, s = LIB.GetObject(LIB.GetTarget()), _L['No Target']
+			local p, s = LIB.GetObject(LIB.GetTarget()), data.config.bPlaceholder and _L['No Target'] or ''
 			if p then
 				s = format(data.cache.formatString, LIB.GetDistance(p))
 			end
@@ -152,7 +152,7 @@ local INFO_TIP_LIST = {
 			name = _L['Fight clock'], prefix = _L['Fight Clock: '], content = '',
 		},
 		configtpl = {
-			bEnable = false, bShowBg = false, bShowTitle = false,
+			bEnable = false, bShowBg = false, bShowTitle = false, bPlaceholder = true,
 			rgb = { 255, 0, 128 }, nFont = 199,
 			anchor = { x = 353, y = -117, s = 'BOTTOMCENTER', r = 'BOTTOMCENTER' },
 		},
@@ -160,9 +160,8 @@ local INFO_TIP_LIST = {
 		GetFormatString = function(data)
 			if LIB.GetFightUUID() or LIB.GetLastFightUUID() then
 				return data.cache.formatString .. LIB.GetFightTime('H:mm:ss')
-			else
-				return _L['Never Fight']
 			end
+			return data.config.bPlaceholder and _L['Never Fight'] or ''
 		end,
 	},
 	-- 莲花和藕倒计时
@@ -340,18 +339,18 @@ local PS = {}
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
 	local w, h = ui:Size()
-	local x, y = 50, 20
+	local x, y = 45, 40
 
 	ui:Append('Text', {
 		name = 'Text_InfoTip',
-		x=  x, y = y, w = 350,
+		x = x, y = y, w = 350,
 		text = _L['Infomation tips'],
 		color = {255, 255, 0},
 	})
 	y = y + 5
 
 	for _, data in ipairs(INFO_TIP_LIST) do
-		x, y = 55, y + 30
+		x, y = 60, y + 30
 
 		ui:Append('WndCheckBox', {
 			name = 'WndCheckBox_InfoTip_' .. data.id,
@@ -365,6 +364,22 @@ function PS.OnPanelActive(wnd)
 			end,
 		})
 		x = x + 220
+
+		if IsBoolean(data.config.bPlaceholder) then
+			ui:Append('WndCheckBox', {
+				name = 'WndCheckBox_InfoTipPlaceholder_' .. data.id,
+				x = x, y = y, w = 100,
+				text = _L['Placeholder'],
+				checked = data.config.bPlaceholder or false,
+				oncheck = function(bChecked)
+					data.config.bPlaceholder = bChecked
+					D.ReinitUI()
+					D.SaveConfig()
+				end,
+			})
+		end
+		x = x + 100
+
 		ui:Append('WndCheckBox', {
 			name = 'WndCheckBox_InfoTipTitle_' .. data.id,
 			x = x, y = y, w = 60,
@@ -377,6 +392,7 @@ function PS.OnPanelActive(wnd)
 			end,
 		})
 		x = x + 70
+
 		ui:Append('WndCheckBox', {
 			name = 'WndCheckBox_InfoTipBg_' .. data.id,
 			x = x, y = y, w = 60,
@@ -389,6 +405,7 @@ function PS.OnPanelActive(wnd)
 			end,
 		})
 		x = x + 70
+
 		ui:Append('WndButton', {
 			name = 'WndButton_InfoTipFont_' .. data.id,
 			x = x, y = y, w = 50,
@@ -402,6 +419,7 @@ function PS.OnPanelActive(wnd)
 			end,
 		})
 		x = x + 60
+
 		ui:Append('Shadow', {
 			name = 'Shadow_InfoTipColor_' .. data.id,
 			x = x, y = y, w = 20, h = 20,

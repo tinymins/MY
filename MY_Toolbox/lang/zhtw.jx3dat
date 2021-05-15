@@ -21,6 +21,7 @@ return {
     ['Speedometer'    ] = '角色速度',
     ['Fight clock'    ] = '戰鬥計時',
     ['Lotus clock'    ] = '藕和桂花',
+    ['Placeholder'    ] = '空值文案',
     ['Background'     ] = '背景'    ,
     ['Title'          ] = '標題'    ,
     ['Font'           ] = '字體'    ,
