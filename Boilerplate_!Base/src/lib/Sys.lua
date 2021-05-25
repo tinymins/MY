@@ -371,6 +371,10 @@ function LIB.FormatPath(oFilePath, tParams)
 	if find(szFilePath, '{$edition}', nil, true) then
 		szFilePath = szFilePath:gsub('{%$edition}', tParams['edition'] or GLOBAL.GAME_EDITION)
 	end
+	-- if exist {$branch} then add branch identity
+	if find(szFilePath, '{$branch}', nil, true) then
+		szFilePath = szFilePath:gsub('{%$branch}', tParams['branch'] or GLOBAL.GAME_BRANCH)
+	end
 	-- if exist {$version} then add version identity
 	if find(szFilePath, '{$version}', nil, true) then
 		szFilePath = szFilePath:gsub('{%$version}', tParams['version'] or GLOBAL.GAME_VERSION)
