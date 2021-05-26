@@ -73,26 +73,18 @@ function PS.OnPanelActive(wnd)
 		ui:Append('Shadow', {
 			x = x, y = y, w = 25, h = 25,
 			color = { LIB.GetForceColor(dwForceID, 'foreground') },
-			onclick = function()
-				local this = this
-				UI.OpenColorPicker(function(r, g, b)
-					LIB.SetForceColor(dwForceID, 'foreground', { r, g, b })
-					txt:Color(r, g, b)
-					UI(this):Color(r, g, b)
-				end)
+			oncolorpick = function(r, g, b)
+				txt:Color(r, g, b)
+				LIB.SetForceColor(dwForceID, 'foreground', { r, g, b })
 			end,
 		})
 		x = x + 30
 		ui:Append('Shadow', {
 			x = x, y = y, w = 25, h = 25,
 			color = { LIB.GetForceColor(dwForceID, 'background') },
-			onclick = function()
-				local this = this
-				UI.OpenColorPicker(function(r, g, b)
-					LIB.SetForceColor(dwForceID, 'background', { r, g, b })
-					sha:Color(r, g, b)
-					UI(this):Color(r, g, b)
-				end)
+			oncolorpick = function(r, g, b)
+				sha:Color(r, g, b)
+				LIB.SetForceColor(dwForceID, 'background', { r, g, b })
 			end,
 		})
 		x = x + 40
@@ -135,26 +127,18 @@ function PS.OnPanelActive(wnd)
 		ui:Append('Shadow', {
 			x = x, y = y, w = 25, h = 25,
 			color = { LIB.GetCampColor(nCamp, 'foreground') },
-			onclick = function()
-				local this = this
-				UI.OpenColorPicker(function(r, g, b)
-					LIB.SetCampColor(nCamp, 'foreground', { r, g, b })
-					txt:Color(r, g, b)
-					UI(this):Color(r, g, b)
-				end)
+			oncolorpick = function(r, g, b)
+				txt:Color(r, g, b)
+				LIB.SetCampColor(nCamp, 'foreground', { r, g, b })
 			end,
 		})
 		x = x + 30
 		ui:Append('Shadow', {
 			x = x, y = y, w = 25, h = 25,
 			color = { LIB.GetCampColor(nCamp, 'background') },
-			onclick = function()
-				local this = this
-				UI.OpenColorPicker(function(r, g, b)
-					LIB.SetCampColor(nCamp, 'background', { r, g, b })
-					sha:Color(r, g, b)
-					UI(this):Color(r, g, b)
-				end)
+			oncolorpick = function(r, g, b)
+				sha:Color(r, g, b)
+				LIB.SetCampColor(nCamp, 'background', { r, g, b })
 			end,
 		})
 		x = x + 40

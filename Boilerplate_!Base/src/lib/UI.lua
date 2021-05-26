@@ -207,6 +207,7 @@ local function ApplyUIArguments(ui, arg)
 		if arg.onclick            ~= nil then ui:Click          (arg.onclick    ) end
 		if arg.onlclick           ~= nil then ui:LClick         (arg.onlclick   ) end
 		if arg.onrclick           ~= nil then ui:RClick         (arg.onrclick   ) end
+		if arg.oncolorpick        ~= nil then ui:ColorPick      (arg.oncolorpick) end
 		if arg.checked            ~= nil then ui:Check          (arg.checked    ) end
 		if arg.oncheck            ~= nil then ui:Check          (arg.oncheck    ) end
 		if arg.onchange           ~= nil then ui:Change         (arg.onchange   ) end
@@ -2334,6 +2335,28 @@ function OO:Color(r, g, b)
 			end
 		end
 	end
+end
+
+-- (self) Instance:ColorPick((r: number r, g: number, b: number) => void)
+function OO:ColorPick(cb)
+	self:_checksum()
+	if IsFunction(cb) then
+		local element
+		for _, raw in ipairs(self.raws) do
+			element = GetComponentElement(raw, 'SHADOW')
+			if element then
+				UI(raw):LClick(function()
+					UI.OpenColorPicker(function(r, g, b)
+						CallWithThis(raw, cb, r, g, b)
+						UI(raw):Color(r, g, b)
+					end)
+				end)
+			end
+		end
+	else
+		self:LClick()
+	end
+	return self
 end
 
 function OO:DrawEclipse(nX, nY, nMajorAxis, nMinorAxis, nR, nG, nB, nA, dwRotate, dwPitch, dwRad, nAccuracy)
