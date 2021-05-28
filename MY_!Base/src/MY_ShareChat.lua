@@ -56,7 +56,7 @@ end
 local SHARE_NPC_CHAT_FILE = {'temporary/share-npc-chat.jx3dat', PATH_TYPE.GLOBAL}
 local SHARE_NPC_CHAT = LIB.LoadLUAData(SHARE_NPC_CHAT_FILE) -- NPC上报对话模板表（远程）
 
-LIB.RegisterInit('MY_ShareChat', function()
+LIB.RegisterInit('MY_ShareChat__Npc', function()
 	if not SHARE_NPC_CHAT then
 		LIB.Ajax({
 			driver = 'auto', mode = 'auto', method = 'auto',
@@ -78,7 +78,7 @@ LIB.RegisterInit('MY_ShareChat', function()
 	end
 end)
 
-LIB.RegisterEvent('OPEN_WINDOW.MY_ShareChat', function()
+LIB.RegisterEvent('OPEN_WINDOW.MY_ShareChat__Npc', function()
 	if not MY_Serendipity.bEnable then
 		return
 	end
@@ -99,6 +99,8 @@ LIB.RegisterEvent('OPEN_WINDOW.MY_ShareChat', function()
 		LIB.EnsureAjax({
 			url = 'https://push.j3cx.com/api/npc-chat?'
 				.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
+					l = AnsiToUTF8(GLOBAL.GAME_LANG),
+					L = AnsiToUTF8(GLOBAL.GAME_EDITION),
 					r = AnsiToUTF8(LIB.GetRealServer(1)), -- Region
 					s = AnsiToUTF8(LIB.GetRealServer(2)), -- Server
 					c = AnsiToUTF8(szContent), -- Content
@@ -116,4 +118,72 @@ LIB.RegisterEvent('OPEN_WINDOW.MY_ShareChat', function()
 	end
 	szDelayID = LIB.DelayCall(5000, fnAction)
 	LIB.GetHLLineInfo({ dwMapID = me.GetMapID(), nCopyIndex = me.GetScene().nCopyIndex }, fnAction)
+end)
+
+--------------------------------------------------------------------------
+local SHARE_SYSMSG_FILE = {'temporary/share-sysmsg.jx3dat', PATH_TYPE.GLOBAL} -- 系统信息上报模板表（远程）
+local SHARE_SYSMSG = LIB.LoadLUAData(SHARE_SYSMSG_FILE) -- 系统信息上报模板表（远程）
+
+LIB.RegisterInit('MY_ShareChat__Sysmsg', function()
+	if not SHARE_SYSMSG then
+		LIB.Ajax({
+			driver = 'auto', mode = 'auto', method = 'auto',
+			url = 'https://pull.j3cx.com/config/share-sysmsg'
+				.. '?l=' .. AnsiToUTF8(GLOBAL.GAME_LANG)
+				.. '&L=' .. AnsiToUTF8(GLOBAL.GAME_EDITION)
+				.. '&_=' .. GetCurrentTime(),
+			success = function(html, status)
+				local data = LIB.JsonDecode(html)
+				if IsTable(data) then
+					SHARE_SYSMSG = {}
+					for _, szPattern in ipairs(data) do
+						if IsString(szPattern) then
+							insert(SHARE_SYSMSG, szPattern)
+						end
+					end
+					LIB.SaveLUAData(SHARE_SYSMSG_FILE, SHARE_SYSMSG)
+				end
+			end,
+		})
+	end
+end)
+
+LIB.RegisterMsgMonitor('MSG_SYS.MY_ShareChat__Sysmsg', function(szChannel, szMsg, nFont, bRich, r, g, b)
+	local me = GetClientPlayer()
+	if not me then
+		return
+	end
+	if not SHARE_SYSMSG then
+		return
+	end
+	-- 跨服中免打扰
+	if IsRemotePlayer(me.dwID) then
+		return
+	end
+	-- 确认是真实系统消息
+	if LIB.ContainsEchoMsgHeader(szMsg) then
+		return
+	end
+	-- OutputMessage('MSG_SYS', "<image>path=\"UI/Image/Minimap/Minimap.UITex\" frame=184</image><text>text=\"“一只蠢盾盾”侠士正在为人传功，不经意间触发奇遇【雪山恩仇】！正是：侠心义行，偏遭奇症缠身；雪峰疗伤，却逢绝世奇缘。\" font=10 r=255 g=255 b=0 </text><text>text=\"\\\n\"</text>", true)
+	-- “醉戈止战”侠士福缘非浅，触发奇遇【阴阳两界】，此千古奇缘将开启怎样的奇妙际遇，令人神往！
+	-- 恭喜侠士江阙阙在25人英雄会战唐门中获得稀有掉落[夜话·白鹭]！
+	if bRich then
+		szMsg = GetPureText(szMsg)
+	end
+	for _, szPattern in ipairs(SHARE_SYSMSG) do
+		if find(szMsg, szPattern) then
+			LIB.EnsureAjax({
+				url = 'https://push.j3cx.com/api/share-sysmsg?'
+					.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
+						l = AnsiToUTF8(GLOBAL.GAME_LANG),
+						L = AnsiToUTF8(GLOBAL.GAME_EDITION),
+						regin = AnsiToUTF8(LIB.GetRealServer(1)), -- Region
+						server = AnsiToUTF8(LIB.GetRealServer(2)), -- Server
+						content = AnsiToUTF8(szMsg), -- Content
+						time = GetCurrentTime(), -- Time
+					}, '89eb9924-e683-4302-a007-8d53b25fd9d1')))
+				})
+			return
+		end
+	end
 end)

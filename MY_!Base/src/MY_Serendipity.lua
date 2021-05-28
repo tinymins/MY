@@ -96,8 +96,6 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTi
 	local bSelf = szName == LIB.GetClientInfo().szName
 	local szNameU = AnsiToUTF8(szName)
 	local szNameCRC = ('%x%x%x'):format(szNameU:byte(), GetStringCRC(szNameU), szNameU:byte(-1))
-	local szLang = GLOBAL.GAME_LANG
-	local szEdition = GLOBAL.GAME_EDITION
 	local nCount = bSelf and 0 or 1
 	local function fnAction(szReporter)
 		if szReporter == '' and nMethod ~= 1 then
@@ -110,7 +108,9 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTi
 			LIB.Debug('Prepare for uploading serendipity ' .. szSerendipity .. ' by '
 				.. szName .. '#' .. szNameCRC .. ' via ' .. szReporter, DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
-			LIB.EnsureAjax({ url = 'https://serendipity.uploads.j3cx.com/api/serendipity/uploads?l=' .. szLang
+			LIB.EnsureAjax({ url = 'https://serendipity.uploads.j3cx.com/api/serendipity/uploads?'
+				.. 'l=' .. AnsiToUTF8(GLOBAL.GAME_LANG)
+				.. '&L=' .. AnsiToUTF8(GLOBAL.GAME_EDITION)
 				.. '&data=' .. LIB.EncryptString(LIB.JsonEncode({
 					S = szRegionU, s = szServerU, a = szSerendipityU,
 					n = szNameU, N = szNameCRC, R = szReporterU,
@@ -118,7 +118,8 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTi
 				})) })
 			LIB.EnsureAjax({ url = 'https://push.j3cx.com/api/serendipity/uploads?'
 				.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
-					l = szLang, L = szEdition,
+					l = AnsiToUTF8(GLOBAL.GAME_LANG),
+					L = AnsiToUTF8(GLOBAL.GAME_EDITION),
 					S = szRegionU, s = szServerU, a = szSerendipityU,
 					n = szNameU, N = szNameCRC, R = szReporterU,
 					f = nStatus, t = dwTime, c = nCount, m = nMethod,

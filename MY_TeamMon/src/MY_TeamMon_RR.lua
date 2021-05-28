@@ -486,6 +486,8 @@ function D.FetchRepoMetaInfoList(nPage)
 			local aMetaInfo = {}
 			for _, info in ipairs(res.data) do
 				info.url = 'https://pull.j3cx.com/api/dbm/feed?'.. LIB.EncodePostData(LIB.UrlEncode({
+					l = AnsiToUTF8(GLOBAL.GAME_LANG),
+					L = AnsiToUTF8(GLOBAL.GAME_EDITION),
 					key = AnsiToUTF8(info.key),
 				}))
 				info = D.FormatMetaInfo(info)
