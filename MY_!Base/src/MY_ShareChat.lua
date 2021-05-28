@@ -53,7 +53,7 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '*') then
 	return
 end
 --------------------------------------------------------------------------
-local NPC_CHAT = LIB.LoadLUAData({'temporary/npc-chat.jx3dat', PATH_TYPE.GLOBAL}) -- NPC上报对话模板表（远程）
+local NPC_CHAT = LIB.LoadLUAData({'temporary/share-npc-chat.jx3dat', PATH_TYPE.GLOBAL}) -- NPC上报对话模板表（远程）
 
 LIB.RegisterInit('MY_ShareChat', function()
 	if not NPC_CHAT then
