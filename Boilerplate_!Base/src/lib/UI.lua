@@ -1235,8 +1235,8 @@ local _tItemXML = {
 	['Box'] = '<box>w=48 h=48 eventid=525311 </box>',
 	['Shadow'] = '<shadow>w=15 h=15 eventid=277 </shadow>',
 	['Handle'] = '<handle>firstpostype=0 w=10 h=10 </handle>',
-	['CheckBox'] = '<handle>name="CheckBox" w=100 h=28 <image>name="Image_Default" w=28 h=28 path="ui\\Image\\button\\CommonButton_1.UITex" frame=5 </image><text>name="Text_Default" valign=1 showall=0 autoetc=1 x=29 w=71 h=28 </text></handle>',
-	['ColorBox'] = '<handle>name="ColorBox" w=100 h=28 eventid=277 <shadow>name="Shadow_Default" w=28 h=28 </shadow><text>name="Text_Default" valign=1 showall=0 autoetc=1 x=29 w=71 h=28 </text></handle>',
+	['CheckBox'] = '<handle>name="CheckBox" w=100 h=28 <image>name="Image_Default" w=28 h=28 path="ui\\Image\\button\\CommonButton_1.UITex" frame=5 </image><text>name="Text_Default" font=162 valign=1 showall=0 autoetc=1 x=29 w=71 h=28 </text></handle>',
+	['ColorBox'] = '<handle>name="ColorBox" w=100 h=28 eventid=277 <shadow>name="Shadow_Default" w=28 h=28 </shadow><text>name="Text_Default" font=162 valign=1 showall=0 autoetc=1 x=29 w=71 h=28 </text></handle>',
 }
 local _nTempWndCount = 0
 -- append
