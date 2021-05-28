@@ -53,10 +53,10 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '*') then
 	return
 end
 --------------------------------------------------------------------------
-local SHARE_CHAT = LIB.LoadLUAData({'temporary/npc-chat.jx3dat', PATH_TYPE.GLOBAL}) -- NPC上报对话模板表（远程）
+local NPC_CHAT = LIB.LoadLUAData({'temporary/npc-chat.jx3dat', PATH_TYPE.GLOBAL}) -- NPC上报对话模板表（远程）
 
 LIB.RegisterInit('MY_ShareChat', function()
-	if not SHARE_CHAT then
+	if not NPC_CHAT then
 		LIB.Ajax({
 			driver = 'auto', mode = 'auto', method = 'auto',
 			url = 'https://pull.j3cx.com/config/npc-chat'
@@ -66,11 +66,11 @@ LIB.RegisterInit('MY_ShareChat', function()
 			success = function(html, status)
 				local data = LIB.JsonDecode(html)
 				if IsTable(data) then
-					SHARE_CHAT = {}
+					NPC_CHAT = {}
 					for _, dwTemplateID in ipairs(data) do
-						SHARE_CHAT[dwTemplateID] = true
+						NPC_CHAT[dwTemplateID] = true
 					end
-					LIB.SaveLUAData({'temporary/npc-chat.jx3dat', PATH_TYPE.GLOBAL}, SHARE_CHAT)
+					LIB.SaveLUAData({'temporary/npc-chat.jx3dat', PATH_TYPE.GLOBAL}, NPC_CHAT)
 				end
 			end,
 		})
@@ -87,7 +87,7 @@ LIB.RegisterEvent('OPEN_WINDOW.MY_ShareChat', function()
 	end
 	local dwTargetID = arg3
 	local npc = GetNpc(dwTargetID)
-	local bShare = npc and SHARE_CHAT and SHARE_CHAT[npc.dwTemplateID]
+	local bShare = npc and NPC_CHAT and NPC_CHAT[npc.dwTemplateID]
 	if not bShare then
 		return
 	end
