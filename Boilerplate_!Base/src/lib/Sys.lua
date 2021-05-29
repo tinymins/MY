@@ -754,6 +754,7 @@ function LIB.ReleaseSettingsDatabase()
 			DATABASE_INSTANCE[eType] = nil
 		end
 	end
+	NEED_FLUSH = false
 end
 
 function LIB.FlushSettingsDatabase()
