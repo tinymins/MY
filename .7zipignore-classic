@@ -7,4 +7,5 @@ README.md
 !src-dist
 header.tpl.lua
 __pycache__
-*/data/*/classic.jx3dat
+*/data/*/zhcn.jx3dat
+*/data/*/zhtw.jx3dat
