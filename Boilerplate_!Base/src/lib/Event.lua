@@ -213,7 +213,7 @@ local function OnInit()
 	LIB.CreateDataRoot(PATH_TYPE.ROLE)
 	LIB.CreateDataRoot(PATH_TYPE.GLOBAL)
 	LIB.CreateDataRoot(PATH_TYPE.SERVER)
-	LIB.LoadDataBase()
+	LIB.ConnectSettingsDatabase()
 	CommonEventFirer(INIT_EVENT)
 	INIT_EVENT = nil
 	-- œ‘ æª∂”≠–≈œ¢
@@ -239,7 +239,7 @@ local EXIT_EVENT = { szName = 'Exit', bSingleEvent = true }
 local function OnExit()
 	LIB.FireFlush()
 	CommonEventFirer(EXIT_EVENT)
-	LIB.ReleaseDataBase()
+	LIB.ReleaseSettingsDatabase()
 end
 LIB.RegisterEvent('GAME_EXIT', OnExit)
 LIB.RegisterEvent('PLAYER_EXIT_GAME', OnExit)
@@ -270,7 +270,7 @@ local RELOAD_EVENT = { szName = 'Reload', bSingleEvent = true }
 local function OnReload()
 	LIB.FlushCoroutine()
 	CommonEventFirer(RELOAD_EVENT)
-	LIB.ReleaseDataBase()
+	LIB.ReleaseSettingsDatabase()
 end
 LIB.RegisterEvent('RELOAD_UI_ADDON_BEGIN', OnReload)
 
