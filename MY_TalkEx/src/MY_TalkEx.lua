@@ -53,243 +53,347 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 	return
 end
 --------------------------------------------------------------------------
-MY_TalkEx = MY_TalkEx or {}
-local _C = {}
-MY_TalkEx.tTalkChannels     = {}
-MY_TalkEx.szTalk            = ''
-MY_TalkEx.szTrickFilter     = 'RAID'
-MY_TalkEx.nTrickForce       = 4
-MY_TalkEx.nTrickChannel     = PLAYER_TALK_CHANNEL.RAID
-MY_TalkEx.szTrickTextBegin  = _L['$zj look around and have a little thought.']
-MY_TalkEx.szTrickText       = _L['$zj epilate $mb\'s feather clearly.']
-MY_TalkEx.szTrickTextEnd    = _L['$zj collected the feather epilated just now and wanted it sold well.']
-RegisterCustomData('MY_TalkEx.tTalkChannels')
-RegisterCustomData('MY_TalkEx.szTalk')
-RegisterCustomData('MY_TalkEx.nTrickChannel')
-RegisterCustomData('MY_TalkEx.szTrickFilter')
-RegisterCustomData('MY_TalkEx.nTrickForce')
-RegisterCustomData('MY_TalkEx.szTrickTextBegin')
-RegisterCustomData('MY_TalkEx.szTrickText')
-RegisterCustomData('MY_TalkEx.szTrickTextEnd')
+local D = {
+	dwTalkTick = 0,
+}
+local O = {}
 
-_C.tTalkChannels = {
+LIB.RegisterUserSettings('MY_TalkEx.szTalkText', {
+	ePathType = PATH_TYPE.ROLE,
+	szGroup = _L['MY_TalkEx'],
+	szLabel = _L['TalkText'],
+	oDefaultValue = '',
+})
+LIB.RegisterUserSettings('MY_TalkEx.aTalkChannel', {
+	ePathType = PATH_TYPE.ROLE,
+	szGroup = _L['MY_TalkEx'],
+	szLabel = _L['TalkChannels'],
+	oDefaultValue = {},
+})
+LIB.RegisterUserSettings('MY_TalkEx.nTrickChannel', {
+	ePathType = PATH_TYPE.ROLE,
+	szGroup = _L['MY_TalkEx'],
+	szLabel = _L['TalkTrick'],
+	oDefaultValue = PLAYER_TALK_CHANNEL.RAID,
+})
+LIB.RegisterUserSettings('MY_TalkEx.szTrickFilter', {
+	ePathType = PATH_TYPE.ROLE,
+	szGroup = _L['MY_TalkEx'],
+	szLabel = _L['TalkTrick'],
+	oDefaultValue = 'RAID',
+})
+LIB.RegisterUserSettings('MY_TalkEx.nTrickForce', {
+	ePathType = PATH_TYPE.ROLE,
+	szGroup = _L['MY_TalkEx'],
+	szLabel = _L['TalkTrick'],
+	oDefaultValue = CONSTANT.FORCE_TYPE.CHUN_YANG,
+})
+LIB.RegisterUserSettings('MY_TalkEx.szTrickTextBegin', {
+	ePathType = PATH_TYPE.ROLE,
+	szGroup = _L['MY_TalkEx'],
+	szLabel = _L['TalkTrick'],
+	oDefaultValue = _L['$zj look around and have a little thought.'],
+})
+LIB.RegisterUserSettings('MY_TalkEx.szTrickText', {
+	ePathType = PATH_TYPE.ROLE,
+	szGroup = _L['MY_TalkEx'],
+	szLabel = _L['TalkTrick'],
+	oDefaultValue = _L['$zj epilate $mb\'s feather clearly.'],
+})
+LIB.RegisterUserSettings('MY_TalkEx.szTrickTextEnd', {
+	ePathType = PATH_TYPE.ROLE,
+	szGroup = _L['MY_TalkEx'],
+	szLabel = _L['TalkTrick'],
+	oDefaultValue = _L['$zj collected the feather epilated just now and wanted it sold well.'],
+})
+
+function D.LoadSettings()
+	O.szTalkText       = LIB.GetUserSettings('MY_TalkEx.szTalkText'      )
+	O.aTalkChannel     = LIB.GetUserSettings('MY_TalkEx.aTalkChannel'    )
+	O.nTrickChannel    = LIB.GetUserSettings('MY_TalkEx.nTrickChannel'   )
+	O.szTrickFilter    = LIB.GetUserSettings('MY_TalkEx.szTrickFilter'   )
+	O.nTrickForce      = LIB.GetUserSettings('MY_TalkEx.nTrickForce'     )
+	O.szTrickTextBegin = LIB.GetUserSettings('MY_TalkEx.szTrickTextBegin')
+	O.szTrickText      = LIB.GetUserSettings('MY_TalkEx.szTrickText'     )
+	O.szTrickTextEnd   = LIB.GetUserSettings('MY_TalkEx.szTrickTextEnd'  )
+end
+
+--------------------------------------------------------------------------
+
+local TALK_CHANNEL_LIST = {
 	{ nChannel = PLAYER_TALK_CHANNEL.NEARBY       , szID = 'MSG_NORMAL'         },
 	{ nChannel = PLAYER_TALK_CHANNEL.TEAM         , szID = 'MSG_PARTY'          },
 	{ nChannel = PLAYER_TALK_CHANNEL.RAID         , szID = 'MSG_TEAM'           },
 	{ nChannel = PLAYER_TALK_CHANNEL.TONG         , szID = 'MSG_GUILD'          },
 	{ nChannel = PLAYER_TALK_CHANNEL.TONG_ALLIANCE, szID = 'MSG_GUILD_ALLIANCE' },
 }
-_C.tForceTitle = { [-1] = _L['all force'] }
+
+local FORCE_LIST = {{ dwForceID = -1, szLabel = _L['Everyone'] }}
 for i, v in pairs(g_tStrings.tForceTitle) do
-	_C.tForceTitle[i] = v -- GetForceTitle(i)
+	insert(FORCE_LIST, { dwForceID = i, szLabel = v })
 end
-_C.tTrickFilter = { ['NEARBY'] = _L['nearby players where'], ['RAID'] = _L['teammates where'], }
-_C.tTrickChannels = {
-	[PLAYER_TALK_CHANNEL.TEAM         ] = { szName = _L['PTC_TEAM_CHANNEL'         ], tCol = GetMsgFontColor('MSG_TEAM'          , true) },
-	[PLAYER_TALK_CHANNEL.RAID         ] = { szName = _L['PTC_RAID_CHANNEL'         ], tCol = GetMsgFontColor('MSG_TEAM'          , true) },
-	[PLAYER_TALK_CHANNEL.TONG         ] = { szName = _L['PTC_TONG_CHANNEL'         ], tCol = GetMsgFontColor('MSG_GUILD'         , true) },
-	[PLAYER_TALK_CHANNEL.TONG_ALLIANCE] = { szName = _L['PTC_TONG_ALLIANCE'], tCol = GetMsgFontColor('MSG_GUILD_ALLIANCE', true) },
+sort(FORCE_LIST, function(a, b) return a.dwForceID > b.dwForceID end)
+
+local TRICK_FILTER_LIST = {
+	{ szKey = 'NEARBY', szLabel = _L['Nearby players where'] },
+	{ szKey = 'RAID'  , szLabel = _L['Teammates where'     ] },
 }
 
-local _dwTalkTick = 0
-_C.Talk = function()
-	if #MY_TalkEx.szTalk == 0 then
-		return LIB.Sysmsg(_L['please input something.'], CONSTANT.MSG_THEME.ERROR)
-	end
+local TRICK_CHANNEL_LIST = {
+	{ nChannel = PLAYER_TALK_CHANNEL.TEAM         , szName = _L['PTC_TEAM_CHANNEL' ], tCol = GetMsgFontColor('MSG_TEAM'          , true) },
+	{ nChannel = PLAYER_TALK_CHANNEL.RAID         , szName = _L['PTC_RAID_CHANNEL' ], tCol = GetMsgFontColor('MSG_TEAM'          , true) },
+	{ nChannel = PLAYER_TALK_CHANNEL.TONG         , szName = _L['PTC_TONG_CHANNEL' ], tCol = GetMsgFontColor('MSG_GUILD'         , true) },
+	{ nChannel = PLAYER_TALK_CHANNEL.TONG_ALLIANCE, szName = _L['PTC_TONG_ALLIANCE'], tCol = GetMsgFontColor('MSG_GUILD_ALLIANCE', true) },
+}
 
-	if not LIB.IsShieldedVersion('DEVELOP') and LIB.ProcessCommand
-	and MY_TalkEx.szTalk:sub(1, 8) == '/script ' then
-		LIB.ProcessCommand(MY_TalkEx.szTalk:sub(9))
-	else
-		-- 防止刷屏
-		if GetTime() - _dwTalkTick < 1000 then
-			return OutputMessage('MSG_ANNOUNCE_YELLOW', _L['You are talking too quick!'])
-		end
-		_dwTalkTick = GetTime()
-		-- 近聊不放在第一个会导致发不出去
-		if MY_TalkEx.tTalkChannels[PLAYER_TALK_CHANNEL.NEARBY] then
-			LIB.SendChat(PLAYER_TALK_CHANNEL.NEARBY, MY_TalkEx.szTalk)
-		end
-		-- 遍历发送队列
-		for nChannel, _ in pairs(MY_TalkEx.tTalkChannels) do
-			if nChannel ~= PLAYER_TALK_CHANNEL.NEARBY then
-				LIB.SendChat(nChannel, MY_TalkEx.szTalk)
-			end
+--------------------------------------------------------------------------
+
+function D.Talk()
+	if #O.szTalkText == 0 then
+		return LIB.Systopmsg(_L['Please input something.'], CONSTANT.MSG_THEME.ERROR)
+	end
+	-- 调试工具
+	if LIB.ProcessCommand and sub(O.szTalkText, 1, 8) == '/script ' then
+		local szCommand = sub(O.szTalkText, 9)
+		return LIB.ProcessCommand(szCommand)
+	end
+	-- 防止刷屏
+	if GetTime() - D.dwTalkTick < 1000 then
+		return OutputMessage('MSG_ANNOUNCE_YELLOW', _L['You are talking too quick!'])
+	end
+	D.dwTalkTick = GetTime()
+	-- 近聊不放在第一个会导致发不出去
+	if lodash.includes(O.aTalkChannel, PLAYER_TALK_CHANNEL.NEARBY) then
+		LIB.SendChat(PLAYER_TALK_CHANNEL.NEARBY, O.szTalkText)
+	end
+	-- 遍历发送队列
+	for _, nChannel in ipairs(O.aTalkChannel) do
+		if nChannel ~= PLAYER_TALK_CHANNEL.NEARBY then
+			LIB.SendChat(nChannel, O.szTalkText)
 		end
 	end
 end
-LIB.RegisterHotKey('MY_TalkEx_Talk', _L['TalkEx Talk'], _C.Talk, nil)
+LIB.RegisterHotKey('MY_TalkEx_Talk', _L['TalkEx Talk'], D.Talk, nil)
 
-_C.Trick = function()
-	if #MY_TalkEx.szTrickText == 0 then
-		return LIB.Sysmsg(_L['please input something.'], CONSTANT.MSG_THEME.ERROR)
+function D.Trick()
+	if #O.szTrickText == 0 then
+		return LIB.Sysmsg(_L['Please input something.'], CONSTANT.MSG_THEME.ERROR)
 	end
 	local t = {}
-	if MY_TalkEx.szTrickFilter == 'RAID' then
+	local me = GetClientPlayer()
+	if not me then
+		return
+	end
+	if O.szTrickFilter == 'RAID' then
 		local team = GetClientTeam()
-		local me = GetClientPlayer()
-		if team and me and (me.IsInParty() or me.IsInRaid()) then
+		if team and (me.IsInParty() or me.IsInRaid()) then
 			for _, dwID in ipairs(team.GetTeamMemberList()) do
 				local info = team.GetMemberInfo(dwID)
-				if info and (MY_TalkEx.nTrickForce == -1 or MY_TalkEx.nTrickForce == info.dwForceID) then
+				if info and (O.nTrickForce == -1 or O.nTrickForce == info.dwForceID) then
 					insert(t, info.szName)
 				end
 			end
 		end
-	elseif MY_TalkEx.szTrickFilter == 'NEARBY' then
+	elseif O.szTrickFilter == 'NEARBY' then
 		for _, p in ipairs(LIB.GetNearPlayer()) do
-			if MY_TalkEx.nTrickForce == -1 or MY_TalkEx.nTrickForce == p.dwForceID then
+			if O.nTrickForce == -1 or O.nTrickForce == p.dwForceID then
 				insert(t, p.szName)
 			end
 		end
 	end
 	-- 去掉自己 _(:з」∠)_调侃自己是闹哪样
 	for i = #t, 1, -1 do
-		if t[i] == GetClientPlayer().szName then
+		if t[i] == me.szName then
 			remove(t, i)
 		end
 	end
 	-- none target
 	if #t == 0 then
-		return LIB.Sysmsg(_L['no trick target found.'], CONSTANT.MSG_THEME.ERROR)
+		return LIB.Systopmsg(_L['No trick target found.'], CONSTANT.MSG_THEME.ERROR)
 	end
 	-- start tricking
-	if #MY_TalkEx.szTrickTextBegin > 0 then
-		LIB.SendChat(MY_TalkEx.nTrickChannel, MY_TalkEx.szTrickTextBegin)
+	if #O.szTrickTextBegin > 0 then
+		LIB.SendChat(O.nTrickChannel, O.szTrickTextBegin)
 	end
 	for _, szName in ipairs(t) do
-		LIB.SendChat(MY_TalkEx.nTrickChannel, (MY_TalkEx.szTrickText:gsub('%$mb', '[' .. szName .. ']')))
+		LIB.SendChat(O.nTrickChannel, (O.szTrickText:gsub('%$mb', '[' .. szName .. ']')))
 	end
-	if #MY_TalkEx.szTrickTextEnd > 0 then
-		LIB.SendChat(MY_TalkEx.nTrickChannel, MY_TalkEx.szTrickTextEnd)
+	if #O.szTrickTextEnd > 0 then
+		LIB.SendChat(O.nTrickChannel, O.szTrickTextEnd)
 	end
 end
 
-LIB.RegisterPanel(_L['Chat'], 'TalkEx', _L['talk ex'], 'UI/Image/UICommon/ScienceTreeNode.UITex|123', { OnPanelActive = function(wnd)
+local PS = {}
+function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
 	local w, h = ui:Size()
+	D.LoadSettings()
 	-------------------------------------
 	-- 喊话部分
 	-------------------------------------
 	-- 喊话输入框
-	ui:Append('WndEditBox', 'WndEdit_Talk'):Pos(25,15)
-	  :Size(w-136,208):Multiline(true)
-	  :Text(MY_TalkEx.szTalk)
-	  :Change(function(text) MY_TalkEx.szTalk = text end)
+	ui:Append('WndEditBox', {
+		x = 25, y = 15,
+		w = w - 136, h = 208, multiline = true,
+		text = O.szTalkText,
+		onchange = function(text)
+			O.szTalkText = text
+			LIB.SetUserSettings('MY_TalkEx.szTalkText', O.szTalkText)
+		end,
+	})
 	-- 喊话频道
-	local y = 12
-	local nChannelCount = #_C.tTalkChannels
-	for i, p in ipairs(_C.tTalkChannels) do
-		ui:Append('WndCheckBox', 'WndCheckBox_TalkEx_' .. p.nChannel)
-		  :Pos(w - 110, y + (i - 1) * 180 / nChannelCount)
-		  :Text(g_tStrings.tChannelName[p.szID])
-		  :Color(GetMsgFontColor(p.szID, true))
-		  :Check(
-		  	function() MY_TalkEx.tTalkChannels[p.nChannel] = true end,
-		  	function() MY_TalkEx.tTalkChannels[p.nChannel] = nil  end)
-		  :Check(MY_TalkEx.tTalkChannels[p.nChannel] or false)
+	local y = 16
+	local nChannelCount = #TALK_CHANNEL_LIST
+	for i, p in ipairs(TALK_CHANNEL_LIST) do
+		ui:Append('WndCheckBox', {
+			x = w - 110, y = y + (i - 1) * 180 / nChannelCount,
+			text = g_tStrings.tChannelName[p.szID],
+			color = GetMsgFontColor(p.szID, true),
+			checked = lodash.includes(O.aTalkChannel, p.nChannel),
+			oncheck = function(bCheck)
+				for i, v in ipairs_r(O.aTalkChannel) do
+					if v == p.nChannel then
+						remove(O.aTalkChannel, i)
+					end
+				end
+				if bCheck then
+					insert(O.aTalkChannel, p.nChannel)
+				end
+				LIB.SetUserSettings('MY_TalkEx.aTalkChannel', O.aTalkChannel)
+			end,
+		})
 	end
 	-- 喊话按钮
-	ui:Append('WndButton', 'WndButton_Talk')
-	  :Pos(w-110,200):Width(90)
-	  :Text(_L['send'],{255,255,255})
-	  :Click(function()
-	  	if IsAltKeyDown() and IsShiftKeyDown() and LIB.ProcessCommand
-	  	and MY_TalkEx.szTalk:sub(1, 8) == '/script ' then
-	  		LIB.ProcessCommand(MY_TalkEx.szTalk:sub(9))
-	  	else
-	  		_C.Talk()
-	  		local ui = UI(this)
-			ui:Enable(false)
-			LIB.DelayCall(1000, function()
-				ui:Enable(true)
-			end)
-	  	end
-	  end, function()
-		LIB.SetChatInput(MY_TalkEx.szTalk)
-		LIB.FocusChatInput()
-	  end)
+	ui:Append('WndButton', {
+		x = w - 110, y = 195, w = 90,
+		text = _L['Send'],
+		onlclick = function()
+			if IsCtrlKeyDown() or IsAltKeyDown() or IsShiftKeyDown() then
+				LIB.SetChatInput(O.szTalkText)
+				LIB.FocusChatInput()
+			else
+				D.Talk()
+			end
+		end,
+		onrclick = function()
+			LIB.SetChatInput(O.szTalkText)
+			LIB.FocusChatInput()
+		end,
+	})
 	-------------------------------------
 	-- 调侃部分
 	-------------------------------------
 	-- <hr />
-	ui:Append('Image', 'Image_TalkEx_Spliter')
-	  :Pos(5, 235):Size(w-10, 1):Image('UI/Image/UICommon/ScienceTreeNode.UITex',62)
+	ui:Append('Image', {
+		x = 5, y = 235,
+		w = w - 10, h = 1,
+		image = 'UI/Image/UICommon/ScienceTreeNode.UITex', imageframe = 62,
+	})
 	-- 文本标题
-	ui:Append('Text', 'Text_Trick_With')
-	  :Pos(27, 240):Text(_L['have a trick with'])
+	ui:Append('Text', { x = 27, y = 240, text = _L['Have a trick with'] })
 	-- 调侃对象范围过滤器
-	ui:Append('WndComboBox', 'WndComboBox_Trick_Filter')
-	  :Pos(95, 241):Size(80,25):Menu(function()
-	  	local t = {}
-	  	for szFilterId,szTitle in pairs(_C.tTrickFilter) do
-	  		insert(t,{
-	  			szOption = szTitle,
-	  			fnAction = function()
-	  				ui:Find('#WndComboBox_Trick_Filter'):Text(szTitle)
-	  				MY_TalkEx.szTrickFilter = szFilterId
-	  			end,
-	  		})
-	  	end
-	  	return t
-	  end)
-	  :Text(_C.tTrickFilter[MY_TalkEx.szTrickFilter] or '')
+	ui:Append('WndComboBox', {
+		x = 95, y = 241, w = 100, h = 25,
+		text = Get(lodash.find(TRICK_FILTER_LIST, function(p) return p.szKey == O.szTrickFilter end), 'szLabel', '???'),
+		menu = function()
+			local ui = UI(this)
+			local t = {}
+			for _, p in ipairs(TRICK_FILTER_LIST) do
+				insert(t, {
+					szOption = p.szLabel,
+					fnAction = function()
+						ui:Text(p.szLabel)
+						O.szTrickFilter = p.szKey
+						LIB.SetUserSettings('MY_TalkEx.szTrickFilter', O.szTrickFilter)
+						UI.ClosePopupMenu()
+					end,
+				})
+			end
+			return t
+		end,
+	})
 	-- 调侃门派过滤器
-	ui:Append('WndComboBox', 'WndComboBox_Trick_Force')
-	  :Pos(175, 241):Size(80,25)
-	  :Text(_C.tForceTitle[MY_TalkEx.nTrickForce])
-	  :Menu(function()
-	  	local t = {}
-	  	for szFilterId,szTitle in pairs(_C.tForceTitle) do
-	  		insert(t,{
-	  			szOption = szTitle,
-	  			fnAction = function()
-	  				ui:Find('#WndComboBox_Trick_Force'):Text(szTitle)
-	  				MY_TalkEx.nTrickForce = szFilterId
-	  			end,
-	  		})
-	  	end
-	  	return t
-	  end)
+	ui:Append('WndComboBox', {
+		x = 195, y = 241, w = 80, h = 25,
+		text = Get(lodash.find(FORCE_LIST, function(p) return p.dwForceID == O.nTrickForce end), 'szLabel', '???'),
+		menu = function()
+			local ui = UI(this)
+			local t = {}
+			for _, p in ipairs(FORCE_LIST) do
+				insert(t, {
+					szOption = p.szLabel,
+					fnAction = function()
+						ui:Text(p.szLabel)
+						O.nTrickForce = p.dwForceID
+						LIB.SetUserSettings('MY_TalkEx.nTrickForce', O.nTrickForce)
+						UI.ClosePopupMenu()
+					end,
+				})
+			end
+			return t
+		end,
+	})
 	-- 调侃内容输入框：第一句
-	ui:Append('WndEditBox', 'WndEdit_TrickBegin')
-	  :Pos(25, 269):Size(w-136, 25):Text(MY_TalkEx.szTrickTextBegin)
-	  :Change(function() MY_TalkEx.szTrickTextBegin = this:GetText() end)
+	ui:Append('WndEditBox', {
+		x = 25, y = 269,
+		w = w - 136, h = 25,
+		text = O.szTrickTextBegin,
+		onchange = function()
+			O.szTrickTextBegin = this:GetText()
+			LIB.SetUserSettings('MY_TalkEx.szTrickTextBegin', O.szTrickTextBegin)
+		end,
+	})
 	-- 调侃内容输入框：调侃内容
-	ui:Append('WndEditBox', 'WndEdit_Trick')
-	  :Pos(25, 294):Size(w-136, 55)
-	  :Multiline(true):Text(MY_TalkEx.szTrickText)
-	  :Change(function() MY_TalkEx.szTrickText = this:GetText() end)
+	ui:Append('WndEditBox', {
+		x = 25, y = 294, w = w - 136, h = 55,
+		multiline = true, text = O.szTrickText,
+		onchange = function()
+			O.szTrickText = this:GetText()
+			LIB.SetUserSettings('MY_TalkEx.szTrickText', O.szTrickText)
+		end,
+	})
 	-- 调侃内容输入框：最后一句
-	ui:Append('WndEditBox', 'WndEdit_TrickEnd')
-	  :Pos(25, 349):Size(w-136, 25)
-	  :Text(MY_TalkEx.szTrickTextEnd)
-	  :Change(function() MY_TalkEx.szTrickTextEnd = this:GetText() end)
+	ui:Append('WndEditBox', {
+		x = 25, y = 349, w = w - 136, h = 25,
+		text = O.szTrickTextEnd,
+		onchange = function()
+			O.szTrickTextEnd = this:GetText()
+			LIB.SetUserSettings('MY_TalkEx.szTrickTextEnd', O.szTrickTextEnd)
+		end,
+	})
 	-- 调侃发送频道提示框
-	ui:Append('Text', 'Text_Trick_Sendto')
-	  :Pos(27, 379):Size(100, 26):Text(_L['send to'])
+	ui:Append('Text', { x = 27, y = 379, w = 100, h = 26, text = _L['Send to'] })
 	-- 调侃发送频道
-	ui:Append('WndComboBox', 'WndComboBox_Trick_Sendto_Filter')
-	  :Pos(80, 379):Size(100, 25)
-	  :Menu(function()
-	  	local t = {}
-	  	for nTrickChannel, tChannel in pairs(_C.tTrickChannels) do
-	  		insert(t,{
-	  			rgb = tChannel.tCol,
-	  			szOption = tChannel.szName,
-	  			fnAction = function()
-	  				MY_TalkEx.nTrickChannel = nTrickChannel
-	  				ui:Find('#WndComboBox_Trick_Sendto_Filter'):Text(tChannel.szName):Color(tChannel.tCol)
-	  			end,
-	  		})
-	  	end
-	  	return t
-	  end)
-	  :Text(_C.tTrickChannels[MY_TalkEx.nTrickChannel].szName or '')
-	  :Color(_C.tTrickChannels[MY_TalkEx.nTrickChannel].tCol)
+	ui:Append('WndComboBox', {
+		x = 80, y = 379, w = 100, h = 25,
+		text = Get(lodash.find(TRICK_CHANNEL_LIST, function(p) return p.nChannel == O.nTrickChannel end), 'szName', '???'),
+		color = Get(lodash.find(TRICK_CHANNEL_LIST, function(p) return p.nChannel == O.nTrickChannel end), 'tCol'),
+		menu = function()
+			local ui = UI(this)
+			local t = {}
+			for _, p in ipairs(TRICK_CHANNEL_LIST) do
+				insert(t, {
+					rgb = p.tCol,
+					szOption = p.szName,
+					fnAction = function()
+						O.nTrickChannel = p.nChannel
+						ui:Text(p.szName)
+						ui:Color(p.tCol)
+						LIB.SetUserSettings('MY_TalkEx.nTrickChannel', O.nTrickChannel)
+						UI.ClosePopupMenu()
+					end,
+				})
+			end
+			return t
+		end,
+	})
 	-- 调侃按钮
-	ui:Append('WndButton', 'WndButton_Trick')
-	  :Pos(435, 379):Color({255,255,255})
-	  :Text(_L['have a trick with'])
-	  :Click(_C.Trick)
-end})
+	ui:Append('WndButton', {
+		x = w - 210, y = 379, w = 100,
+		color = {255, 255, 255},
+		text = _L['Trick'],
+		onclick = D.Trick,
+	})
+end
+
+LIB.RegisterPanel(_L['Chat'], 'TalkEx', _L['MY_TalkEx'], 'UI/Image/UICommon/ScienceTreeNode.UITex|123', PS)
