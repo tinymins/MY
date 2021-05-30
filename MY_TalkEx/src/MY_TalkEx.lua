@@ -132,7 +132,7 @@ local FORCE_LIST = {{ dwForceID = -1, szLabel = _L['Everyone'] }}
 for i, v in pairs(g_tStrings.tForceTitle) do
 	insert(FORCE_LIST, { dwForceID = i, szLabel = v })
 end
-sort(FORCE_LIST, function(a, b) return a.dwForceID > b.dwForceID end)
+sort(FORCE_LIST, function(a, b) return a.dwForceID < b.dwForceID end)
 
 local TRICK_FILTER_LIST = {
 	{ szKey = 'NEARBY', szLabel = _L['Nearby players where'] },
