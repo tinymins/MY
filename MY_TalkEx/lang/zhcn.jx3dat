@@ -9,6 +9,16 @@ return {
     ['TalkEx Talk'] = '喊话辅助 - 发送',
 	['Send'] = '发送',
 	['Send to'] = '发送到',
+
+    ['Joke talk'] = '骚话大全',
+    ['Search'] = '搜索',
+    ['Copy'] = '复制',
+    ['Share'] = '分享',
+    ['Confirm share joke:'] = '确认分享下方骚话内容到公共库中？（分享可能由于审核关系不会实时更新）',
+    ['Share onymously'] = '分享',
+    ['Share anonymously'] = '匿名分享',
+    ['Share error: server error.'] = '分享失败，服务无响应。',
+
     ['Have a trick with'] = '调侃一下',
     ['Trick'] = '调侃一下',
     ['Teammates where'] = '团队中',

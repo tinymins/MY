@@ -237,7 +237,7 @@ function PS.OnPanelActive(wnd)
 	-- 喊话输入框
 	ui:Append('WndEditBox', {
 		x = nX, y = nY,
-		w = w - 136, h = 208, multiline = true,
+		w = w - 136, h = 188, multiline = true,
 		text = O.szTalkText,
 		onchange = function(text)
 			O.szTalkText = text
@@ -249,7 +249,7 @@ function PS.OnPanelActive(wnd)
 	local nChannelCount = #TALK_CHANNEL_LIST
 	for i, p in ipairs(TALK_CHANNEL_LIST) do
 		ui:Append('WndCheckBox', {
-			x = w - 110, y = nY + (i - 1) * 180 / nChannelCount,
+			x = w - 110, y = nY + (i - 1) * 160 / nChannelCount,
 			text = g_tStrings.tChannelName[p.szID],
 			color = GetMsgFontColor(p.szID, true),
 			checked = lodash.includes(O.aTalkChannel, p.nChannel),
@@ -267,7 +267,7 @@ function PS.OnPanelActive(wnd)
 		})
 	end
 	-- 喊话按钮
-	nY = nY + 180
+	nY = nY + 160
 	ui:Append('WndButton', {
 		x = w - 110, y = nY, w = 90,
 		text = _L['Send'],
@@ -284,8 +284,9 @@ function PS.OnPanelActive(wnd)
 			LIB.FocusChatInput()
 		end,
 	})
+
 	-------------------------------------
-	-- 调侃部分
+	-- 骚话部分
 	-------------------------------------
 	-- <hr />
 	nX = X
@@ -296,7 +297,124 @@ function PS.OnPanelActive(wnd)
 		image = 'UI/Image/UICommon/ScienceTreeNode.UITex', imageframe = 62,
 	})
 	-- 文本标题
-	nY = nY + 20
+	nY = nY + 5
+	nX = nX + ui:Append('Text', { x = nX, y = nY, w = 'auto', h = 25, text = _L['Joke talk'] }):Width() + 5
+	-- 骚话内容搜索输入框
+	nX = nX + 5
+	nY = nY + 2
+	nX = ui:Append('WndEditBox', {
+		x = nX, y = nY,
+		w = 150, h = 25,
+		text = O.szJokeSearch,
+		onchange = function(szText)
+			O.szJokeSearch = szText
+		end,
+	}):Pos('BOTTOMRIGHT') + 5
+	-- 骚话内容搜索按钮
+	nX = nX + ui:Append('WndButton', {
+		x = nX, y = nY,
+		w = 50, h = 25,
+		text = _L['Search'],
+		onclick = function()
+			LIB.Ajax({
+				driver = 'auto', mode = 'auto', method = 'auto',
+				url = 'https://pull.j3cx.com/joke/random?'
+					.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
+						l = AnsiToUTF8(GLOBAL.GAME_LANG),
+						L = AnsiToUTF8(GLOBAL.GAME_EDITION),
+						q = AnsiToUTF8(O.szJokeSearch or ''),
+					}, 'c7355a0b-0d97-4ae1-b417-43a5c4e562ec'))),
+				success = function(html, status)
+					local res = LIB.JsonDecode(html)
+					if IsTable(res) then
+						ui:Fetch('WndEditBox_JokeText'):Text(res.data.content)
+					end
+				end,
+			})
+		end,
+	}):Width() + 5
+	-- 骚话输入框
+	nX = X
+	nY = nY + LH
+	nX = nX + ui:Append('WndEditBox', {
+		name = 'WndEditBox_JokeText',
+		x = nX, y = nY,
+		w = w - X * 2 - 115, h = 25,
+		text = O.szJokeText,
+		onchange = function(szText)
+			O.szJokeText = szText
+		end,
+	}):Width() + 5
+	-- 骚话复制按钮
+	nX = ui:Append('WndButton', {
+		x = nX, y = nY,
+		w = 50, h = 25,
+		text = _L['Copy'],
+		onclick = function()
+			LIB.SetChatInput(O.szJokeText)
+			LIB.FocusChatInput()
+		end,
+		autoenable = function() return not IsEmpty(O.szJokeText) end,
+	}):Pos('BOTTOMRIGHT') + 5
+	-- 骚话分享按钮
+	nX = ui:Append('WndButton', {
+		x = nX, y = nY,
+		w = 50, h = 25,
+		text = _L['Share'],
+		onclick = function()
+			local function fnAction(bAnonymous)
+				LIB.Ajax({
+					driver = 'auto', mode = 'auto', method = 'auto',
+					url = 'https://push.j3cx.com/joke?'
+						.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
+							l = AnsiToUTF8(GLOBAL.GAME_LANG),
+							L = AnsiToUTF8(GLOBAL.GAME_EDITION),
+							content = AnsiToUTF8(O.szJokeSearch or ''),
+							server = AnsiToUTF8(LIB.GetRealServer(2)),
+							role = bAnonymous and '' or AnsiToUTF8(LIB.GetUserRoleName()),
+							id = bAnonymous and '' or AnsiToUTF8(UI_GetClientPlayerID()),
+							jx3id = bAnonymous and '' or AnsiToUTF8(LIB.GetClientUUID()),
+						}, 'c7355a0b-0d97-4ae1-b417-43a5c4e562ec'))),
+					success = function(html, status)
+						local res = LIB.JsonDecode(html)
+						if IsTable(res) then
+							ui:Fetch('WndEditBox_JokeText'):Text(data.data.content)
+							LIB.Alert(LIB.ReplaceSensitiveWord(res.msg))
+						else
+							LIB.Systopmsg(_L['Share error: server error.'], CONSTANT.MSG_THEME.ERROR)
+						end
+					end,
+				})
+			end
+			local nW, nH = Station.GetClientSize()
+			local tMsg = {
+				x = nW / 2, y = nH / 3,
+				szName = 'MY_TalkEx_Joke',
+				szMessage = _L['Confirm share joke:'] .. '\n\n' .. O.szJokeText,
+				szAlignment = 'CENTER',
+				fnCancelAction = fnCancelAction,
+				{ szOption = _L['Share onymously'], fnAction = function() fnAction(false) end },
+				{ szOption = _L['Share anonymously'], fnAction = function() fnAction(true) end },
+				{ szOption = g_tStrings.STR_HOTKEY_CANCEL },
+			}
+			MessageBox(tMsg)
+		end,
+		autoenable = function() return not IsEmpty(O.szJokeText) end,
+	}):Pos('BOTTOMRIGHT') + 5
+	nY = nY + 40
+
+	-------------------------------------
+	-- 调侃部分
+	-------------------------------------
+	-- <hr />
+	nX = X
+	ui:Append('Image', {
+		x = X, y = nY,
+		w = w - X * 2, h = 1,
+		image = 'UI/Image/UICommon/ScienceTreeNode.UITex', imageframe = 62,
+	})
+	-- 文本标题
+	nY = nY + 5
 	nX = nX + ui:Append('Text', { x = nX, y = nY, w = 'auto', h = 25, text = _L['Have a trick with'] }):Width() + 5
 	-- 调侃对象范围过滤器
 	nX = nX + ui:Append('WndComboBox', {
