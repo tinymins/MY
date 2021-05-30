@@ -227,13 +227,16 @@ local PS = {}
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
 	local w, h = ui:Size()
+	local X, Y, LH = 25, 20, 30
+	local nX, nY, nLFY = X, Y, Y
+
 	D.LoadSettings()
 	-------------------------------------
 	-- 喊话部分
 	-------------------------------------
 	-- 喊话输入框
 	ui:Append('WndEditBox', {
-		x = 25, y = 15,
+		x = nX, y = nY,
 		w = w - 136, h = 208, multiline = true,
 		text = O.szTalkText,
 		onchange = function(text)
@@ -242,11 +245,11 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	-- 喊话频道
-	local y = 16
+	nY = Y
 	local nChannelCount = #TALK_CHANNEL_LIST
 	for i, p in ipairs(TALK_CHANNEL_LIST) do
 		ui:Append('WndCheckBox', {
-			x = w - 110, y = y + (i - 1) * 180 / nChannelCount,
+			x = w - 110, y = nY + (i - 1) * 180 / nChannelCount,
 			text = g_tStrings.tChannelName[p.szID],
 			color = GetMsgFontColor(p.szID, true),
 			checked = lodash.includes(O.aTalkChannel, p.nChannel),
@@ -264,8 +267,9 @@ function PS.OnPanelActive(wnd)
 		})
 	end
 	-- 喊话按钮
+	nY = nY + 180
 	ui:Append('WndButton', {
-		x = w - 110, y = 195, w = 90,
+		x = w - 110, y = nY, w = 90,
 		text = _L['Send'],
 		onlclick = function()
 			if IsCtrlKeyDown() or IsAltKeyDown() or IsShiftKeyDown() then
@@ -284,16 +288,19 @@ function PS.OnPanelActive(wnd)
 	-- 调侃部分
 	-------------------------------------
 	-- <hr />
+	nX = X
+	nY = nY + 40
 	ui:Append('Image', {
-		x = 5, y = 235,
-		w = w - 10, h = 1,
+		x = X, y = nY,
+		w = w - X * 2, h = 1,
 		image = 'UI/Image/UICommon/ScienceTreeNode.UITex', imageframe = 62,
 	})
 	-- 文本标题
-	ui:Append('Text', { x = 27, y = 240, text = _L['Have a trick with'] })
+	nY = nY + 20
+	nX = nX + ui:Append('Text', { x = nX, y = nY, w = 'auto', h = 25, text = _L['Have a trick with'] }):Width() + 5
 	-- 调侃对象范围过滤器
-	ui:Append('WndComboBox', {
-		x = 95, y = 241, w = 100, h = 25,
+	nX = nX + ui:Append('WndComboBox', {
+		x = nX, y = nY, w = 100, h = 25,
 		text = Get(lodash.find(TRICK_FILTER_LIST, function(p) return p.szKey == O.szTrickFilter end), 'szLabel', '???'),
 		menu = function()
 			local ui = UI(this)
@@ -311,10 +318,10 @@ function PS.OnPanelActive(wnd)
 			end
 			return t
 		end,
-	})
+	}):Width() + 5
 	-- 调侃门派过滤器
-	ui:Append('WndComboBox', {
-		x = 195, y = 241, w = 80, h = 25,
+	nX = nX + ui:Append('WndComboBox', {
+		x = nX, y = nY, w = 80, h = 25,
 		text = Get(lodash.find(FORCE_LIST, function(p) return p.dwForceID == O.nTrickForce end), 'szLabel', '???'),
 		menu = function()
 			local ui = UI(this)
@@ -332,40 +339,43 @@ function PS.OnPanelActive(wnd)
 			end
 			return t
 		end,
-	})
+	}):Width() + 5
+	nX = X
+	nY = nY + LH
+
 	-- 调侃内容输入框：第一句
-	ui:Append('WndEditBox', {
-		x = 25, y = 269,
+	nY = nY + ui:Append('WndEditBox', {
+		x = nX, y = nY,
 		w = w - 136, h = 25,
 		text = O.szTrickTextBegin,
 		onchange = function()
 			O.szTrickTextBegin = this:GetText()
 			LIB.SetUserSettings('MY_TalkEx.szTrickTextBegin', O.szTrickTextBegin)
 		end,
-	})
+	}):Height() + 5
 	-- 调侃内容输入框：调侃内容
-	ui:Append('WndEditBox', {
-		x = 25, y = 294, w = w - 136, h = 55,
+	nY = nY + ui:Append('WndEditBox', {
+		x = nX, y = nY, w = w - 136, h = 55,
 		multiline = true, text = O.szTrickText,
 		onchange = function()
 			O.szTrickText = this:GetText()
 			LIB.SetUserSettings('MY_TalkEx.szTrickText', O.szTrickText)
 		end,
-	})
+	}):Height() + 5
 	-- 调侃内容输入框：最后一句
-	ui:Append('WndEditBox', {
-		x = 25, y = 349, w = w - 136, h = 25,
+	nY = nY + ui:Append('WndEditBox', {
+		x = nX, y = nY, w = w - 136, h = 25,
 		text = O.szTrickTextEnd,
 		onchange = function()
 			O.szTrickTextEnd = this:GetText()
 			LIB.SetUserSettings('MY_TalkEx.szTrickTextEnd', O.szTrickTextEnd)
 		end,
-	})
+	}):Height() + 5
 	-- 调侃发送频道提示框
-	ui:Append('Text', { x = 27, y = 379, w = 100, h = 26, text = _L['Send to'] })
+	nX = nX + ui:Append('Text', { x = nX, y = nY, w = 'auto', h = 25, text = _L['Send to'] }):Width() + 5
 	-- 调侃发送频道
-	ui:Append('WndComboBox', {
-		x = 80, y = 379, w = 100, h = 25,
+	nX = nX + ui:Append('WndComboBox', {
+		x = nX, y = nY, w = 100, h = 25,
 		text = Get(lodash.find(TRICK_CHANNEL_LIST, function(p) return p.nChannel == O.nTrickChannel end), 'szName', '???'),
 		color = Get(lodash.find(TRICK_CHANNEL_LIST, function(p) return p.nChannel == O.nTrickChannel end), 'tCol'),
 		menu = function()
@@ -386,10 +396,10 @@ function PS.OnPanelActive(wnd)
 			end
 			return t
 		end,
-	})
+	}):Width() + 5
 	-- 调侃按钮
 	ui:Append('WndButton', {
-		x = w - 210, y = 379, w = 100,
+		x = w - 210, y = nY, w = 100,
 		color = {255, 255, 255},
 		text = _L['Trick'],
 		onclick = D.Trick,
