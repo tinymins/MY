@@ -207,6 +207,7 @@ local function ApplyUIArguments(ui, arg)
 		if arg.onclick            ~= nil then ui:Click          (arg.onclick    ) end
 		if arg.onlclick           ~= nil then ui:LClick         (arg.onlclick   ) end
 		if arg.onrclick           ~= nil then ui:RClick         (arg.onrclick   ) end
+		if arg.oncolorpick        ~= nil then ui:ColorPick      (arg.oncolorpick) end
 		if arg.checked            ~= nil then ui:Check          (arg.checked    ) end
 		if arg.oncheck            ~= nil then ui:Check          (arg.oncheck    ) end
 		if arg.onchange           ~= nil then ui:Change         (arg.onchange   ) end
@@ -304,7 +305,7 @@ local function GetComponentElement(raw, elementType)
 	elseif elementType == 'MAIN_HANDLE' then -- 获取用于主要 Item 类功能区、子元素容器UI实例
 		if componentType == 'WndScrollBox' then
 			element = raw:Lookup('', 'Handle_Padding/Handle_Scroll')
-		elseif componentType == 'Handle' or componentType == 'CheckBox' then
+		elseif componentType == 'Handle' or componentType == 'CheckBox' or componentType == 'ColorBox' then
 			element = raw
 		elseif componentBaseType == 'Wnd' then
 			local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
@@ -357,7 +358,7 @@ local function GetComponentElement(raw, elementType)
 			element = raw:Lookup('', 'Handle_Padding/Handle_Scroll/Text_Default')
 		elseif componentType == 'WndFrame' then
 			element = raw:Lookup('', 'Text_Title') or raw:Lookup('', 'Text_Default')
-		elseif componentType == 'Handle' or componentType == 'CheckBox' then
+		elseif componentType == 'Handle' or componentType == 'CheckBox' or componentType == 'ColorBox' then
 			element = raw:Lookup('Text_Default')
 		elseif componentType == 'Text' then
 			element = raw
@@ -377,6 +378,9 @@ local function GetComponentElement(raw, elementType)
 			element = raw
 		end
 	elseif elementType == 'SHADOW' then -- 获取阴影UI实例
+		if componentType == 'ColorBox' then
+			element = raw:Lookup('Shadow_Default')
+		end
 		if componentType == 'Shadow' then
 			element = raw
 		end
@@ -683,6 +687,28 @@ local function InitComponent(raw, szType)
 		raw.Enable = function(_, bEnabled)
 			SetComponentProp(raw, 'bDisabled', not bEnabled)
 			UpdateCheckState(raw)
+		end
+		raw.IsEnabled = function()
+			return not GetComponentProp(raw, 'bDisabled')
+		end
+	elseif szType == 'Shadow' or szType == 'ColorBox' then
+		SetComponentProp(raw, 'OnColorPickCBs', {})
+		raw:RegisterEvent(831)
+		raw.OnItemLButtonClick = function()
+			-- 兼容普通 Shadow 组件，无注册事件不弹框
+			if szType == 'Shadow' and #GetComponentProp(raw, 'OnColorPickCBs') == 0 then
+				return
+			end
+			-- 颜色组件，无论是否注册过都弹框
+			UI.OpenColorPicker(function(r, g, b)
+				for _, cb in ipairs(GetComponentProp(raw, 'OnColorPickCBs')) do
+					CallWithThis(raw, cb, r, g, b)
+				end
+				UI(raw):Color(r, g, b)
+			end)
+		end
+		raw.Enable = function(_, bEnabled)
+			SetComponentProp(raw, 'bDisabled', not bEnabled)
 		end
 		raw.IsEnabled = function()
 			return not GetComponentProp(raw, 'bDisabled')
@@ -1208,8 +1234,9 @@ local _tItemXML = {
 	['Image'] = '<image>w=100 h=100 </image>',
 	['Box'] = '<box>w=48 h=48 eventid=525311 </box>',
 	['Shadow'] = '<shadow>w=15 h=15 eventid=277 </shadow>',
-	['Handle'] = '<handle>firstpostype=0 w=10 h=10</handle>',
-	['CheckBox'] = '<handle>name="CheckBox" w=100 h=28 <image>name="Image_Default" w=28 h=28 path="ui\\Image\\button\\CommonButton_1.UITex" frame=5</image><text>name="Text_Default" valign=1 x=29 w=71 h=28</text></handle>',
+	['Handle'] = '<handle>firstpostype=0 w=10 h=10 </handle>',
+	['CheckBox'] = '<handle>name="CheckBox" w=100 h=28 <image>name="Image_Default" w=28 h=28 path="ui\\Image\\button\\CommonButton_1.UITex" frame=5 </image><text>name="Text_Default" font=162 valign=1 showall=0 autoetc=1 x=29 w=71 h=28 </text></handle>',
+	['ColorBox'] = '<handle>name="ColorBox" w=100 h=28 eventid=277 <shadow>name="Shadow_Default" w=28 h=28 </shadow><text>name="Text_Default" font=162 valign=1 showall=0 autoetc=1 x=29 w=71 h=28 </text></handle>',
 }
 local _nTempWndCount = 0
 -- append
@@ -2336,6 +2363,23 @@ function OO:Color(r, g, b)
 	end
 end
 
+-- (self) Instance:ColorPick((r: number r, g: number, b: number) => void)
+function OO:ColorPick(cb)
+	self:_checksum()
+	if IsFunction(cb) then
+		local element
+		for _, raw in ipairs(self.raws) do
+			local aOnColorPickCBs = GetComponentProp(raw, 'OnColorPickCBs')
+			if aOnColorPickCBs then
+				insert(aOnColorPickCBs, cb)
+			end
+		end
+	else
+		self:LClick()
+	end
+	return self
+end
+
 function OO:DrawEclipse(nX, nY, nMajorAxis, nMinorAxis, nR, nG, nB, nA, dwRotate, dwPitch, dwRad, nAccuracy)
 	nR, nG, nB, nA = nR or 255, nG or 255, nB or 255, nA or 255
 	dwRotate, dwPitch, dwRad = dwRotate or 0, dwPitch or 0, dwRad or (2 * PI)
@@ -2779,6 +2823,17 @@ local function SetComponentSize(raw, nOuterWidth, nOuterHeight, nInnerWidth, nIn
 		txt:SetRelPos(nHeight + 1, 0)
 		hdl:SetSize(nWidth, nHeight)
 		hdl:FormatAllItemPos()
+	elseif componentType == 'ColorBox' then
+		local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
+		local sha = GetComponentElement(raw, 'SHADOW')
+		local txt = GetComponentElement(raw, 'TEXT')
+		local nGap = min(nHeight * 0.3, 8)
+		nWidth = max(nWidth, nHeight + nGap)
+		sha:SetSize(nHeight, nHeight)
+		txt:SetSize(nWidth - nHeight - nGap, nHeight)
+		txt:SetRelPos(nHeight + nGap, 0)
+		hdl:SetSize(nWidth, nHeight)
+		hdl:FormatAllItemPos()
 	elseif componentType == 'WndComboBox' then
 		local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
 		local cmb = GetComponentElement(raw, 'COMBOBOX')
@@ -3021,7 +3076,9 @@ local function AutoSize(raw, bAutoWidth, bAutoHeight)
 		if componentType == 'WndCheckBox'
 		or componentType == 'WndRadioBox'
 		or componentType == 'WndComboBox'
-		or componentType == 'WndTrackbar' then
+		or componentType == 'WndTrackbar'
+		or componentType == 'CheckBox'
+		or componentType == 'ColorBox' then
 			local txt = GetComponentElement(raw, 'TEXT')
 			if txt then
 				local ui = UI(raw)

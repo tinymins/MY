@@ -371,6 +371,10 @@ function LIB.FormatPath(oFilePath, tParams)
 	if find(szFilePath, '{$edition}', nil, true) then
 		szFilePath = szFilePath:gsub('{%$edition}', tParams['edition'] or GLOBAL.GAME_EDITION)
 	end
+	-- if exist {$branch} then add branch identity
+	if find(szFilePath, '{$branch}', nil, true) then
+		szFilePath = szFilePath:gsub('{%$branch}', tParams['branch'] or GLOBAL.GAME_BRANCH)
+	end
 	-- if exist {$version} then add version identity
 	if find(szFilePath, '{$version}', nil, true) then
 		szFilePath = szFilePath:gsub('{%$version}', tParams['version'] or GLOBAL.GAME_VERSION)
@@ -728,34 +732,83 @@ function LIB.RegisterCustomData(szVarPath, nVersion, szDomain)
 	end
 end
 
---szName [, szDataFile]
-function LIB.RegisterUserData(szName, szFileName, onLoad)
+do
+local DATABASE_TYPE_LIST = { PATH_TYPE.ROLE, PATH_TYPE.SERVER, PATH_TYPE.GLOBAL }
+local DATABASE_INSTANCE = {}
+local USER_SETTINGS_INFO = {}
+local FLUSH_TIME = 0
+local NEED_FLUSH = false
 
+function LIB.ConnectSettingsDatabase()
+	for _, eType in ipairs(DATABASE_TYPE_LIST) do
+		if not DATABASE_INSTANCE[eType] then
+			DATABASE_INSTANCE[eType] = UnQLite_Open(LIB.FormatPath({'userdata/settings.udb', eType}))
+		end
+	end
 end
 
-do local USER_DB
-function LIB.LoadDataBase()
-	if USER_DB then
+function LIB.ReleaseSettingsDatabase()
+	for _, eType in ipairs(DATABASE_TYPE_LIST) do
+		if DATABASE_INSTANCE[eType] then
+			DATABASE_INSTANCE[eType]:Release()
+			DATABASE_INSTANCE[eType] = nil
+		end
+	end
+	NEED_FLUSH = false
+end
+
+function LIB.FlushSettingsDatabase()
+	if not NEED_FLUSH then
 		return
 	end
-	USER_DB = UnQLite_Open(LIB.FormatPath({'userdata/base.udb', PATH_TYPE.ROLE}))
+	LIB.ReleaseSettingsDatabase()
+	LIB.ConnectSettingsDatabase()
 end
 
-function LIB.ReleaseDataBase()
-	if not USER_DB then
-		return
+function LIB.RegisterUserSettings(szKey, eType, szGroupLabel, szDescription, szVersion)
+	assert(IsString(szKey) and #szKey > 0, 'RegisterUserSettings: `Key` should be a non-empty string value.')
+	assert(not USER_SETTINGS_INFO[szKey], 'RegisterUserSettings: duplicated `Key` found.')
+	assert(lodash.includes(DATABASE_TYPE_LIST, eType), 'RegisterUserSettings: `Type` value is not valid.')
+	assert(IsString(szGroupLabel) and #szGroupLabel > 0, 'RegisterUserSettings: `GroupLabel` should be a non-empty string value.')
+	assert(IsString(szDescription) and #szDescription > 0, 'RegisterUserSettings: `Description` should be a non-empty string value.')
+	assert(IsNil(szVersion) or IsString(szVersion) or IsNumber(szVersion), 'RegisterUserSettings: `Version` should be a nil, string or number value.')
+	USER_SETTINGS_INFO[szKey] = { szKey = szKey, eType = eType, szGroupLabel = szGroupLabel, szDescription = szDescription, szVersion = szVersion }
+end
+
+function LIB.GetRegisterUserSettingsList()
+	local aRes = {}
+	for _, v in pairs(USER_SETTINGS_INFO) do
+		insert(aRes, Clone(v))
 	end
-	USER_DB:Release()
-	USER_DB = nil
+	return aRes
 end
 
-function LIB.GetUserData(szKey)
-	return USER_DB:Get(szKey)
+function LIB.GetUserSettings(szKey)
+	local info = USER_SETTINGS_INFO[szKey]
+	assert(info, 'GetUserSettings: `Key` has not been registered.')
+	local db = DATABASE_INSTANCE[info.eType]
+	assert(db, 'GetUserSettings: Database not connected.')
+	local data = db:Get(szKey)
+	if IsTable(data) and data.v == info.szVersion then
+		return data.d
+	end
 end
 
-function LIB.SetUserData(szKey, oValue)
-	return USER_DB:Set(szKey, oValue)
+function LIB.SetUserSettings(szKey, oValue)
+	local info = USER_SETTINGS_INFO[szKey]
+	assert(info, 'SetUserSettings: `Key` has not been registered.')
+	local db = DATABASE_INSTANCE[info.eType]
+	assert(db, 'GetUserSettings: Database not connected.')
+	db:Set(szKey, { d = oValue, v = info.szVersion })
+	NEED_FLUSH = true
 end
+
+LIB.RegisterIdle(NSFormatString('{$NS}#FlushSettingsDatabase'), function()
+	if GetCurrentTime() - FLUSH_TIME > 60 then
+		LIB.FlushSettingsDatabase()
+		FLUSH_TIME = GetCurrentTime()
+	end
+end)
 end
 
 -- Format data's structure as struct descripted.
