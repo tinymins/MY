@@ -786,7 +786,7 @@ function LIB.GetRegisterUserSettingsList()
 	return aRes
 end
 
-function LIB.GetUserSettings(szKey)
+function LIB.GetUserSettings(szKey, oDefault)
 	local info = USER_SETTINGS_INFO[szKey]
 	assert(info, 'GetUserSettings: `Key` has not been registered.')
 	local db = DATABASE_INSTANCE[info.eType]
@@ -795,6 +795,7 @@ function LIB.GetUserSettings(szKey)
 	if IsTable(data) and data.v == info.szVersion then
 		return data.d
 	end
+	return oDefault
 end
 
 function LIB.SetUserSettings(szKey, oValue)

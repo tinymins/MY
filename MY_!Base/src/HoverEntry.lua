@@ -44,28 +44,24 @@ local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCal
 
 local _L = LIB.LoadLangPack(PACKET_INFO.FRAMEWORK_ROOT .. 'lang/hoverentry/')
 local D = {}
-local O = {
-	bEnable = false,
-	nSize = 30,
-	anchor = { x = -362, y = -78, s = 'BOTTOMCENTER', r = 'BOTTOMCENTER' },
-	bHoverMenu = false,
-}
+local O = {}
 local FRAME_NAME = NSFormatString('{$NS}_HoverEntry')
+
 local KEY_ENABLE = NSFormatString('{$NS}_HoverEntry.bEnable')
 local KEY_SIZE = NSFormatString('{$NS}_HoverEntry.nSize')
 local KEY_ANCHOR = NSFormatString('{$NS}_HoverEntry.anchor')
 local KEY_HOVER_MENU = NSFormatString('{$NS}_HoverEntry.bHoverMenu')
 
-LIB.RegisterUserSettings(KEY_ENABLE    , MY.PATH_TYPE.ROLE, _L['HoverEntry'], _L['Enable status'])
-LIB.RegisterUserSettings(KEY_SIZE      , MY.PATH_TYPE.ROLE, _L['HoverEntry'], _L['Size'         ])
-LIB.RegisterUserSettings(KEY_ANCHOR    , MY.PATH_TYPE.ROLE, _L['HoverEntry'], _L['Anchor'       ])
-LIB.RegisterUserSettings(KEY_HOVER_MENU, MY.PATH_TYPE.ROLE, _L['HoverEntry'], _L['Hover popup'  ])
+LIB.RegisterUserSettings(KEY_ENABLE    , PATH_TYPE.ROLE, _L['HoverEntry'], _L['Enable status'])
+LIB.RegisterUserSettings(KEY_SIZE      , PATH_TYPE.ROLE, _L['HoverEntry'], _L['Size'         ])
+LIB.RegisterUserSettings(KEY_ANCHOR    , PATH_TYPE.ROLE, _L['HoverEntry'], _L['Anchor'       ])
+LIB.RegisterUserSettings(KEY_HOVER_MENU, PATH_TYPE.ROLE, _L['HoverEntry'], _L['Hover popup'  ])
 
 function D.LoadSettings()
-	O.bEnable = LIB.GetUserSettings(KEY_ENABLE)
-	O.nSize = LIB.GetUserSettings(KEY_SIZE)
-	O.anchor = LIB.GetUserSettings(KEY_ANCHOR)
-	O.bHoverMenu = LIB.GetUserSettings(KEY_HOVER_MENU)
+	O.bEnable    = LIB.GetUserSettings(KEY_ENABLE    , false)
+	O.nSize      = LIB.GetUserSettings(KEY_SIZE      , 30)
+	O.anchor     = LIB.GetUserSettings(KEY_ANCHOR    , { x = -362, y = -78, s = 'BOTTOMCENTER', r = 'BOTTOMCENTER' })
+	O.bHoverMenu = LIB.GetUserSettings(KEY_HOVER_MENU, false)
 	D.CheckEnable()
 end
 LIB.RegisterInit('HoverEntry', D.LoadSettings)
