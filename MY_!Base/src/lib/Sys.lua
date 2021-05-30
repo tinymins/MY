@@ -766,11 +766,14 @@ function LIB.FlushSettingsDatabase()
 end
 
 function LIB.RegisterUserSettings(szKey, eType, szGroupLabel, szDescription, szVersion)
+	if not szDescription then
+		szGroupLabel, szDescription, szVersion = nil, nil, szGroupLabel
+	end
 	assert(IsString(szKey) and #szKey > 0, 'RegisterUserSettings: `Key` should be a non-empty string value.')
 	assert(not USER_SETTINGS_INFO[szKey], 'RegisterUserSettings: duplicated `Key` found.')
 	assert(lodash.includes(DATABASE_TYPE_LIST, eType), 'RegisterUserSettings: `Type` value is not valid.')
-	assert(IsString(szGroupLabel) and #szGroupLabel > 0, 'RegisterUserSettings: `GroupLabel` should be a non-empty string value.')
-	assert(IsString(szDescription) and #szDescription > 0, 'RegisterUserSettings: `Description` should be a non-empty string value.')
+	assert(IsNil(szGroupLabel) or (IsString(szGroupLabel) and #szGroupLabel > 0), 'RegisterUserSettings: `GroupLabel` should be nil or a non-empty string value.')
+	assert(IsNil(szDescription) or (IsString(szDescription) and #szDescription > 0), 'RegisterUserSettings: `Description` should be nil or a non-empty string value.')
 	assert(IsNil(szVersion) or IsString(szVersion) or IsNumber(szVersion), 'RegisterUserSettings: `Version` should be a nil, string or number value.')
 	USER_SETTINGS_INFO[szKey] = { szKey = szKey, eType = eType, szGroupLabel = szGroupLabel, szDescription = szDescription, szVersion = szVersion }
 end
