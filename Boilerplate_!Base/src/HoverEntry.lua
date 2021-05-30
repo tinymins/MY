@@ -51,10 +51,24 @@ local O = {
 	bHoverMenu = false,
 }
 local FRAME_NAME = NSFormatString('{$NS}_HoverEntry')
-RegisterCustomData(FRAME_NAME .. '.bEnable')
-RegisterCustomData(FRAME_NAME .. '.nSize')
-RegisterCustomData(FRAME_NAME .. '.anchor')
-RegisterCustomData(FRAME_NAME .. '.bHoverMenu')
+local KEY_ENABLE = NSFormatString('{$NS}_HoverEntry.bEnable')
+local KEY_SIZE = NSFormatString('{$NS}_HoverEntry.nSize')
+local KEY_ANCHOR = NSFormatString('{$NS}_HoverEntry.anchor')
+local KEY_HOVER_MENU = NSFormatString('{$NS}_HoverEntry.bHoverMenu')
+
+LIB.RegisterUserSettings(KEY_ENABLE    , MY.PATH_TYPE.ROLE, _L['HoverEntry'], _L['Enable status'])
+LIB.RegisterUserSettings(KEY_SIZE      , MY.PATH_TYPE.ROLE, _L['HoverEntry'], _L['Size'         ])
+LIB.RegisterUserSettings(KEY_ANCHOR    , MY.PATH_TYPE.ROLE, _L['HoverEntry'], _L['Anchor'       ])
+LIB.RegisterUserSettings(KEY_HOVER_MENU, MY.PATH_TYPE.ROLE, _L['HoverEntry'], _L['Hover popup'  ])
+
+function D.LoadSettings()
+	O.bEnable = LIB.GetUserSettings(KEY_ENABLE)
+	O.nSize = LIB.GetUserSettings(KEY_SIZE)
+	O.anchor = LIB.GetUserSettings(KEY_ANCHOR)
+	O.bHoverMenu = LIB.GetUserSettings(KEY_HOVER_MENU)
+	D.CheckEnable()
+end
+LIB.RegisterInit('HoverEntry', D.LoadSettings)
 
 function D.Popup()
 	local addonmenu = LIB.GetTraceButtonAddonMenu()[1]
@@ -93,7 +107,6 @@ function D.CheckEnable()
 		})
 	end
 end
-LIB.RegisterInit('HoverEntry', D.CheckEnable)
 
 function D.OnFrameCreate()
 	this:RegisterEvent('UI_SCALED')
@@ -114,6 +127,56 @@ end
 
 function D.OnFrameDragEnd()
 	O.anchor = GetFrameAnchor(this)
+	LIB.SetUserSettings(KEY_ANCHOR, O.anchor)
+end
+
+function D.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
+	nX = X
+	nY = nLFY
+	ui:Append('Text', {
+		x = X - 10, y = nY,
+		text = _L['Hover entry'],
+		color = { 255, 255, 0 },
+	}):AutoWidth()
+	nY = nY + 30
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 100, h = 25,
+		text = _L['Enable'],
+		checked = O.bEnable,
+		oncheck = function(bChecked)
+			O.bEnable = bChecked
+			D.CheckEnable()
+			LIB.SetUserSettings(KEY_ENABLE, O.bEnable)
+		end,
+	}):AutoWidth():Width() + 5
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 100, h = 25,
+		text = _L['Hover popup'],
+		checked = O.bHoverMenu,
+		oncheck = function(bChecked)
+			O.bHoverMenu = bChecked
+			D.CheckEnable()
+			LIB.SetUserSettings(KEY_HOVER_MENU, O.bHoverMenu)
+		end,
+		autoenable = function() return O.bEnable end,
+	}):AutoWidth():Width() + 5
+	nX = nX + ui:Append('WndTrackbar', {
+		x = nX, y = nY, w = 100, h = 25,
+		value = O.nSize,
+		range = {1, 300},
+		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		textfmt = function(v) return _L('Size: %d', v) end,
+		onchange = function(val)
+			O.nSize = val
+			D.CheckEnable()
+			LIB.SetUserSettings(KEY_SIZE, O.nSize)
+		end,
+		autoenable = function() return O.bEnable end,
+	}):AutoWidth():Width() + 5
+	nX, nY = X, nY + 30
+
+	nLFY = nY + LH
+	return nX, nY, nLFY
 end
 
 -- Global exports
@@ -126,28 +189,8 @@ local settings = {
 		},
 		{
 			fields = {
-				bEnable = true,
-				nSize = true,
-				anchor = true,
-				bHoverMenu = true,
+				OnPanelActivePartial = D.OnPanelActivePartial,
 			},
-			root = O,
-		},
-	},
-	imports = {
-		{
-			fields = {
-				bEnable = true,
-				nSize = true,
-				anchor = true,
-				bHoverMenu = true,
-			},
-			triggers = {
-				bEnable = D.CheckEnable,
-				nSize = D.CheckEnable,
-				anchor = D.CheckEnable,
-			},
-			root = O,
 		},
 	},
 }

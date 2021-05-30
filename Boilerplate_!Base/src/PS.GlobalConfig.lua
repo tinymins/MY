@@ -47,20 +47,20 @@ local PS = {}
 
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
-	local w, h = ui:Size()
-	local X, Y = 20, 20
-	local x, y = X, Y
+	local W, H = ui:Size()
+	local X, Y, LH = 20, 20, 30
+	local nX, nY, nLFY = X, Y, Y
 
 	ui:Append('Text', {
-		x = X - 10, y = y,
+		x = X - 10, y = nY,
 		text = _L['Distance type'],
 		color = { 255, 255, 0 },
 	}):AutoWidth()
-	x, y = X, y + 30
+	nX, nY = X, nY + 30
 
 	for _, p in ipairs(LIB.GetDistanceTypeList()) do
-		x = x + ui:Append('WndRadioBox', {
-			x = x, y = y, w = 100, h = 25, group = 'distance type',
+		nX = nX + ui:Append('WndRadioBox', {
+			x = nX, y = nY, w = 100, h = 25, group = 'distance type',
 			text = p.szText,
 			checked = LIB.GetGlobalDistanceType() == p.szType,
 			oncheck = function(bChecked)
@@ -71,77 +71,44 @@ function PS.OnPanelActive(wnd)
 			end,
 		}):AutoWidth():Width() + 10
 	end
-	x, y = X, y + 30
+	nX, nY = X, nY + 30
+	nLFY = nY
 
 	local HoverEntry = _G[NSFormatString('{$NS}_HoverEntry')]
 	if HoverEntry then
-		ui:Append('Text', {
-			x = X - 10, y = y,
-			text = _L['Hover entry'],
-			color = { 255, 255, 0 },
-		}):AutoWidth()
-		y = y + 30
-		x = x + ui:Append('WndCheckBox', {
-			x = x, y = y, w = 100, h = 25,
-			text = _L['Enable'],
-			checked = HoverEntry.bEnable,
-			oncheck = function(bChecked)
-				HoverEntry.bEnable = bChecked
-			end,
-		}):AutoWidth():Width() + 5
-		x = x + ui:Append('WndCheckBox', {
-			x = x, y = y, w = 100, h = 25,
-			text = _L['Hover popup'],
-			checked = HoverEntry.bHoverMenu,
-			oncheck = function(bChecked)
-				HoverEntry.bHoverMenu = bChecked
-			end,
-			autoenable = function() return HoverEntry.bEnable end,
-		}):AutoWidth():Width() + 5
-		x = x + ui:Append('WndTrackbar', {
-			x = x, y = y, w = 100, h = 25,
-			value = HoverEntry.nSize,
-			range = {1, 300},
-			trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
-			textfmt = function(v) return _L('Size: %d', v) end,
-			onchange = function(val)
-				HoverEntry.nSize = val
-			end,
-			autoenable = function() return HoverEntry.bEnable end,
-		}):AutoWidth():Width() + 5
-		x, y = X, y + 30
+		nX, nY, nLFY = HoverEntry.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
 	end
 
 	ui:Append('Text', {
-		x = X - 10, y = y,
+		x = X - 10, y = nY,
 		text = _L['System Info'],
 		color = { 255, 255, 0 },
 	}):AutoWidth()
-	y = y + 30
+	nY = nY + 30
 
 	local uiMemory = ui:Append('Text', {
-		x = x, y = y, w = 150,
+		x = nX, y = nY, w = 150,
 		alpha = 150, font = 162,
 	})
-	y = y + 25
+	nY = nY + 25
 
 	local uiSize = ui:Append('Text', {
-		x = x, y = y, w = 150,
+		x = nX, y = nY, w = 150,
 		alpha = 150, font = 162,
 	})
-	y = y + 25
+	nY = nY + 25
 
 	local uiUIScale = ui:Append('Text', {
-		x = x, y = y, w = 150,
+		x = nX, y = nY, w = 150,
 		alpha = 150, font = 162,
 	})
-	y = y + 25
+	nY = nY + 25
 
 	local uiFontScale = ui:Append('Text', {
-		x = x, y = y, w = 150,
+		x = nX, y = nY, w = 150,
 		alpha = 150, font = 162,
 	})
-	y = y + 25
+	nY = nY + 25
 
 	local function onRefresh()
 		uiMemory:Text(format('Memory: %.2fMB', collectgarbage('count') / 1024))

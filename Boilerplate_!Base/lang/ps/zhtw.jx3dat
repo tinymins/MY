@@ -14,10 +14,6 @@ return {
 	['Disable dismiss'] = '禁止消息自動消失',
 	['System Info'] = '系統信息',
 
-	['Hover entry'] = '懸浮入口',
-	['Hover popup'] = '滑鼠滑過立即彈出',
-	['Size: %d'] = '大小：%d',
-
 	-- welcome
 	['%s, welcome to use %s!'] = '歡迎%s使用%s！',
 
