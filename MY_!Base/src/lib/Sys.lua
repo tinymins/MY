@@ -740,18 +740,18 @@ local FLUSH_TIME = 0
 local NEED_FLUSH = false
 
 function LIB.ConnectSettingsDatabase()
-	for _, eType in ipairs(DATABASE_TYPE_LIST) do
-		if not DATABASE_INSTANCE[eType] then
-			DATABASE_INSTANCE[eType] = UnQLite_Open(LIB.FormatPath({'userdata/settings.udb', eType}))
+	for _, ePathType in ipairs(DATABASE_TYPE_LIST) do
+		if not DATABASE_INSTANCE[ePathType] then
+			DATABASE_INSTANCE[ePathType] = UnQLite_Open(LIB.FormatPath({'userdata/settings.udb', ePathType}))
 		end
 	end
 end
 
 function LIB.ReleaseSettingsDatabase()
-	for _, eType in ipairs(DATABASE_TYPE_LIST) do
-		if DATABASE_INSTANCE[eType] then
-			DATABASE_INSTANCE[eType]:Release()
-			DATABASE_INSTANCE[eType] = nil
+	for _, ePathType in ipairs(DATABASE_TYPE_LIST) do
+		if DATABASE_INSTANCE[ePathType] then
+			DATABASE_INSTANCE[ePathType]:Release()
+			DATABASE_INSTANCE[ePathType] = nil
 		end
 	end
 	NEED_FLUSH = false
@@ -765,17 +765,39 @@ function LIB.FlushSettingsDatabase()
 	LIB.ConnectSettingsDatabase()
 end
 
-function LIB.RegisterUserSettings(szKey, eType, szGroupLabel, szDescription, szVersion)
-	if not szDescription then
-		szGroupLabel, szDescription, szVersion = nil, nil, szGroupLabel
+function LIB.RegisterUserSettings(szKey, tOption)
+	local ePathType, szDataKey, szGroup, szLabel, szVersion, oDefaultValue
+	if IsTable(tOption) then
+		ePathType = tOption.ePathType
+		szDataKey = tOption.szDataKey
+		szGroup = tOption.szGroup
+		szLabel = tOption.szLabel
+		szVersion = tOption.szVersion
+		oDefaultValue = tOption.oDefaultValue
+	end
+	if not ePathType then
+		ePathType = PATH_TYPE.ROLE
+	end
+	if not szDataKey then
+		szDataKey = szKey
 	end
 	assert(IsString(szKey) and #szKey > 0, 'RegisterUserSettings: `Key` should be a non-empty string value.')
 	assert(not USER_SETTINGS_INFO[szKey], 'RegisterUserSettings: duplicated `Key` found.')
-	assert(lodash.includes(DATABASE_TYPE_LIST, eType), 'RegisterUserSettings: `Type` value is not valid.')
-	assert(IsNil(szGroupLabel) or (IsString(szGroupLabel) and #szGroupLabel > 0), 'RegisterUserSettings: `GroupLabel` should be nil or a non-empty string value.')
-	assert(IsNil(szDescription) or (IsString(szDescription) and #szDescription > 0), 'RegisterUserSettings: `Description` should be nil or a non-empty string value.')
+	assert(IsString(szDataKey) and #szDataKey > 0, 'RegisterUserSettings: `DataKey` should be a non-empty string value.')
+	assert(not lodash.some(USER_SETTINGS_INFO, function(p) return p.szDataKey == szDataKey and p.ePathType == ePathType end), 'RegisterUserSettings: duplicated `DataKey` + `PathType` found.')
+	assert(lodash.includes(DATABASE_TYPE_LIST, ePathType), 'RegisterUserSettings: `PathType` value is not valid.')
+	assert(IsNil(szGroup) or (IsString(szGroup) and #szGroup > 0), 'RegisterUserSettings: `Group` should be nil or a non-empty string value.')
+	assert(IsNil(szLabel) or (IsString(szLabel) and #szLabel > 0), 'RegisterUserSettings: `Label` should be nil or a non-empty string value.')
 	assert(IsNil(szVersion) or IsString(szVersion) or IsNumber(szVersion), 'RegisterUserSettings: `Version` should be a nil, string or number value.')
-	USER_SETTINGS_INFO[szKey] = { szKey = szKey, eType = eType, szGroupLabel = szGroupLabel, szDescription = szDescription, szVersion = szVersion }
+	USER_SETTINGS_INFO[szKey] = {
+		szKey = szKey,
+		ePathType = ePathType,
+		szDataKey = szDataKey,
+		szGroup = szGroup,
+		szLabel = szLabel,
+		szVersion = szVersion,
+		oDefaultValue = oDefaultValue,
+	}
 end
 
 function LIB.GetRegisterUserSettingsList()
@@ -786,24 +808,24 @@ function LIB.GetRegisterUserSettingsList()
 	return aRes
 end
 
-function LIB.GetUserSettings(szKey, oDefault)
+function LIB.GetUserSettings(szKey)
 	local info = USER_SETTINGS_INFO[szKey]
 	assert(info, 'GetUserSettings: `Key` has not been registered.')
-	local db = DATABASE_INSTANCE[info.eType]
+	local db = DATABASE_INSTANCE[info.ePathType]
 	assert(db, 'GetUserSettings: Database not connected.')
-	local data = db:Get(szKey)
+	local data = db:Get(info.szDataKey)
 	if IsTable(data) and data.v == info.szVersion then
 		return data.d
 	end
-	return oDefault
+	return info.oDefaultValue
 end
 
 function LIB.SetUserSettings(szKey, oValue)
 	local info = USER_SETTINGS_INFO[szKey]
 	assert(info, 'SetUserSettings: `Key` has not been registered.')
-	local db = DATABASE_INSTANCE[info.eType]
+	local db = DATABASE_INSTANCE[info.ePathType]
 	assert(db, 'GetUserSettings: Database not connected.')
-	db:Set(szKey, { d = oValue, v = info.szVersion })
+	db:Set(info.szDataKey, { d = oValue, v = info.szVersion })
 	NEED_FLUSH = true
 end
 

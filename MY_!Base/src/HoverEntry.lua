@@ -52,16 +52,36 @@ local KEY_SIZE = NSFormatString('{$NS}_HoverEntry.nSize')
 local KEY_ANCHOR = NSFormatString('{$NS}_HoverEntry.anchor')
 local KEY_HOVER_MENU = NSFormatString('{$NS}_HoverEntry.bHoverMenu')
 
-LIB.RegisterUserSettings(KEY_ENABLE    , PATH_TYPE.ROLE, _L['HoverEntry'], _L['Enable status'])
-LIB.RegisterUserSettings(KEY_SIZE      , PATH_TYPE.ROLE, _L['HoverEntry'], _L['Size'         ])
-LIB.RegisterUserSettings(KEY_ANCHOR    , PATH_TYPE.ROLE, _L['HoverEntry'], _L['Anchor'       ])
-LIB.RegisterUserSettings(KEY_HOVER_MENU, PATH_TYPE.ROLE, _L['HoverEntry'], _L['Hover popup'  ])
+LIB.RegisterUserSettings(KEY_ENABLE, {
+	ePathType = PATH_TYPE.ROLE,
+	szGroup = _L['HoverEntry'],
+	szLabel = _L['Enable status'],
+	oDefaultValue = false,
+})
+LIB.RegisterUserSettings(KEY_SIZE, {
+	ePathType = PATH_TYPE.ROLE,
+	szGroup = _L['HoverEntry'],
+	szLabel = _L['Size'],
+	oDefaultValue = 30,
+})
+LIB.RegisterUserSettings(KEY_ANCHOR, {
+	ePathType = PATH_TYPE.ROLE,
+	szGroup = _L['HoverEntry'],
+	szLabel = _L['Anchor'],
+	oDefaultValue = { x = -362, y = -78, s = 'BOTTOMCENTER', r = 'BOTTOMCENTER' },
+})
+LIB.RegisterUserSettings(KEY_HOVER_MENU, {
+	ePathType = PATH_TYPE.ROLE,
+	szGroup = _L['HoverEntry'],
+	szLabel = _L['Hover popup'],
+	oDefaultValue = false,
+})
 
 function D.LoadSettings()
-	O.bEnable    = LIB.GetUserSettings(KEY_ENABLE    , false)
-	O.nSize      = LIB.GetUserSettings(KEY_SIZE      , 30)
-	O.anchor     = LIB.GetUserSettings(KEY_ANCHOR    , { x = -362, y = -78, s = 'BOTTOMCENTER', r = 'BOTTOMCENTER' })
-	O.bHoverMenu = LIB.GetUserSettings(KEY_HOVER_MENU, false)
+	O.bEnable    = LIB.GetUserSettings(KEY_ENABLE    )
+	O.nSize      = LIB.GetUserSettings(KEY_SIZE      )
+	O.anchor     = LIB.GetUserSettings(KEY_ANCHOR    )
+	O.bHoverMenu = LIB.GetUserSettings(KEY_HOVER_MENU)
 	D.CheckEnable()
 end
 LIB.RegisterInit('HoverEntry', D.LoadSettings)
