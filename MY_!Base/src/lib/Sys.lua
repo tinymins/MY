@@ -847,21 +847,36 @@ function LIB.SetUserSettings(szKey, xValue)
 	NEED_FLUSH = true
 end
 
-function LIB.CreateUserSettingsProxy(tProxy)
+-- 创建用户设置代理对象
+-- LIB.CreateUserSettingsProxy({ [string szLocalKey] = string szGlobalKey })
+-- LIB.CreateUserSettingsProxy(string szNameSpace)
+function LIB.CreateUserSettingsProxy(xProxy)
 	local tSettings = {}
 	local tLoaded = {}
+	local tProxy = IsTable(xProxy) and xProxy or {}
+	for k, v in pairs(tProxy) do
+		assert(IsString(k), '`Key` ' .. EncodeLUAData(k) .. ' of proxy should be a string value.')
+		assert(IsString(v), '`Val` ' .. EncodeLUAData(v) .. ' of proxy should be a string value.')
+	end
+	local function GetGlobalKey(k)
+		if not tProxy[k] then
+			if IsString(xProxy) then
+				tProxy[k] = xProxy .. '.' .. k
+			end
+			assert(tProxy[k], '`Key` ' .. EncodeLUAData(k) .. ' not found in proxy table.')
+		end
+		return tProxy[k]
+	end
 	return setmetatable(tSettings, {
 		__index = function(_, k)
-			assert(tProxy[k], '`Key` ' .. EncodeLUAData(k) .. ' not found in proxy table.')
 			if not tLoaded[k] then
-				tSettings[k] = LIB.GetUserSettings(tProxy[k])
+				tSettings[k] = LIB.GetUserSettings(GetGlobalKey(k))
 				tLoaded[k] = true
 			end
 			return tSettings[k]
 		end,
 		__newindex = function(_, k, v)
-			assert(tProxy[k], '`Key` ' .. EncodeLUAData(k) .. ' not found in proxy table.')
-			LIB.SetUserSettings(tProxy[k], v)
+			LIB.SetUserSettings(GetGlobalKey(k), v)
 			tSettings[k] = v
 			tLoaded[k] = true
 		end,
