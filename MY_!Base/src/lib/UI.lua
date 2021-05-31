@@ -212,6 +212,8 @@ local function ApplyUIArguments(ui, arg)
 		if arg.oncheck            ~= nil then ui:Check          (arg.oncheck    ) end
 		if arg.onchange           ~= nil then ui:Change         (arg.onchange   ) end
 		if arg.ondragging or arg.ondrag  then ui:Drag(arg.ondragging, arg.ondrag) end
+		if arg.customlayout              then ui:CustomLayout  (arg.customlayout) end
+		if arg.oncustomlayout            then ui:CustomLayout(arg.oncustomlayout, arg.customlayoutpoint) end
 		if arg.events             ~= nil then for _, v in ipairs(arg.events) do ui:Event(unpack(v)) end end
 		if arg.uievents           ~= nil then for _, v in ipairs(arg.uievents) do ui:UIEvent(unpack(v)) end end
 		if arg.listbox            ~= nil then for _, v in ipairs(arg.listbox) do ui:ListBox(unpack(v)) end end
@@ -3805,26 +3807,20 @@ function OO:UIEvent(szEvent, fnEvent)
 	return self
 end
 
--- customMode 设置Frame的CustomMode
--- (self) Instance:CustomMode(string szTip, function fnOnEnterCustomMode, function fnOnLeaveCustomMode)
-function OO:CustomMode(szTip, fnOnEnterCustomMode, fnOnLeaveCustomMode, szPoint)
+-- 设置 Frame 的 CustomMode 事件
+-- (self) Instance:CustomLayout(string szTip)
+-- (self) Instance:CustomLayout(function fnOnCustomLayout, string szPointType)
+function OO:CustomLayout(arg0, arg1)
 	self:_checksum()
-	if IsString(szTip) then
-		self:Event('ON_ENTER_CUSTOM_UI_MODE', function()
-			UpdateCustomModeWindow(this, szTip, GetComponentProp(this, 'bPenetrable'))
-		end):Event('ON_LEAVE_CUSTOM_UI_MODE', function()
-			UpdateCustomModeWindow(this, szTip, GetComponentProp(this, 'bPenetrable'))
-		end)
-		if IsFunction(fnOnEnterCustomMode) then
-			self:Event('ON_ENTER_CUSTOM_UI_MODE', function()
-				fnOnEnterCustomMode(GetFrameAnchor(this, szPoint))
-			end)
-		end
-		if IsFunction(fnOnLeaveCustomMode) then
-			self:Event('ON_LEAVE_CUSTOM_UI_MODE', function()
-				fnOnLeaveCustomMode(GetFrameAnchor(this, szPoint))
-			end)
-		end
+	if IsString(arg0) then
+		self:Filter('.Frame')
+			:Event('ON_ENTER_CUSTOM_UI_MODE', function() UpdateCustomModeWindow(this, arg0, GetComponentProp(this, 'bPenetrable')) end)
+			:Event('ON_LEAVE_CUSTOM_UI_MODE', function() UpdateCustomModeWindow(this, arg0, GetComponentProp(this, 'bPenetrable')) end)
+	end
+	if IsFunction(arg0) then
+		self:Filter('.Frame')
+			:Event('ON_ENTER_CUSTOM_UI_MODE', function() arg0(true , GetFrameAnchor(this, arg1)) end)
+			:Event('ON_LEAVE_CUSTOM_UI_MODE', function() arg0(false, GetFrameAnchor(this, arg1)) end)
 	end
 	return self
 end
