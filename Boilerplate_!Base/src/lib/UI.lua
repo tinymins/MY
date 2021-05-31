@@ -92,6 +92,7 @@ local BUTTON_STYLE_CONFIG = {
 	DEFAULT = {
 		nWidth = 100,
 		nHeight = 26,
+		nMarginBottom = -3,
 		nPaddingBottom = 3,
 		szImage = 'ui/Image/UICommon/CommonPanel.UITex',
 		nNormalGroup = 25,
