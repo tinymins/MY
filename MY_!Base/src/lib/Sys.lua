@@ -911,7 +911,7 @@ function LIB.CreateUserSettingsModule(szModule, szGroupLabel, tSettings)
 		if szGroupLabel then
 			tOption.szGroup = szGroupLabel
 		end
-		LIB.RegisterUserSettings(szKey, tSettings)
+		LIB.RegisterUserSettings(szKey, tOption)
 		tProxy[k] = szKey
 	end
 	return LIB.CreateUserSettingsProxy(tProxy)
