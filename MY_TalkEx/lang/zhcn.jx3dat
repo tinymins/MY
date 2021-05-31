@@ -12,8 +12,11 @@ return {
 
     ['Joke talk'] = '骚话大全',
     ['Search'] = '搜索',
+    ['Click to search jokes.'] = '搜索骚话',
     ['Copy'] = '复制',
+    ['Click to copy joke to chat panel.'] = '复制骚话到聊天栏',
     ['Share'] = '分享',
+    ['Click to share your joke to remote.'] = '分享您编写的骚话到公共库中',
     ['Confirm share joke:'] = '确认分享下方骚话内容到公共库中？（分享可能由于审核关系不会实时更新）',
     ['Share onymously'] = '分享',
     ['Share anonymously'] = '匿名分享',

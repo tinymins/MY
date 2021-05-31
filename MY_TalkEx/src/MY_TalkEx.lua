@@ -245,7 +245,7 @@ function PS.OnPanelActive(wnd)
 	-- 喊话输入框
 	ui:Append('WndEditBox', {
 		x = nX, y = nY,
-		w = w - 136, h = 188, multiline = true,
+		w = w - 136, h = 148, multiline = true,
 		text = O.szTalkText,
 		onchange = function(text)
 			O.szTalkText = text
@@ -257,7 +257,7 @@ function PS.OnPanelActive(wnd)
 	local nChannelCount = #TALK_CHANNEL_LIST
 	for i, p in ipairs(TALK_CHANNEL_LIST) do
 		ui:Append('WndCheckBox', {
-			x = w - 110, y = nY + (i - 1) * 160 / nChannelCount,
+			x = w - 110, y = nY + (i - 1) * 120 / nChannelCount,
 			text = g_tStrings.tChannelName[p.szID],
 			color = GetMsgFontColor(p.szID, true),
 			checked = lodash.includes(O.aTalkChannel, p.nChannel),
@@ -275,7 +275,7 @@ function PS.OnPanelActive(wnd)
 		})
 	end
 	-- 喊话按钮
-	nY = nY + 160
+	nY = nY + 122
 	ui:Append('WndButton', {
 		x = w - 110, y = nY, w = 90,
 		text = _L['Send'],
@@ -299,17 +299,13 @@ function PS.OnPanelActive(wnd)
 	-- <hr />
 	nX = X
 	nY = nY + 40
-	ui:Append('Image', {
-		x = X, y = nY,
-		w = w - X * 2, h = 1,
-		image = 'UI/Image/UICommon/ScienceTreeNode.UITex', imageframe = 62,
-	})
+	ui:Append('Shadow', { x = X, y = nY, w = w - X * 2, h = 1, color = {255, 255, 255}, alpha = 128 })
 	-- 文本标题
 	nY = nY + 5
 	nX = nX + ui:Append('Text', { x = nX, y = nY, w = 'auto', h = 25, text = _L['Joke talk'] }):Width() + 5
 	-- 骚话内容搜索输入框
-	nX = nX + 5
-	nY = nY + 2
+	nX = X
+	nY = nY + LH
 	nX = ui:Append('WndEditBox', {
 		x = nX, y = nY,
 		w = 150, h = 25,
@@ -340,18 +336,8 @@ function PS.OnPanelActive(wnd)
 				end,
 			})
 		end,
-	}):Width() + 5
-	-- 骚话输入框
-	nX = X
-	nY = nY + LH
-	nX = nX + ui:Append('WndEditBox', {
-		name = 'WndEditBox_JokeText',
-		x = nX, y = nY,
-		w = w - X * 2 - 115, h = 25,
-		text = O.szJokeText,
-		onchange = function(szText)
-			O.szJokeText = szText
-		end,
+		tip = _L['Click to search jokes.'],
+		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
 	}):Width() + 5
 	-- 骚话复制按钮
 	nX = ui:Append('WndButton', {
@@ -363,6 +349,8 @@ function PS.OnPanelActive(wnd)
 			LIB.FocusChatInput()
 		end,
 		autoenable = function() return not IsEmpty(O.szJokeText) end,
+		tip = _L['Click to copy joke to chat panel.'],
+		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
 	}):Pos('BOTTOMRIGHT') + 5
 	-- 骚话分享按钮
 	nX = ui:Append('WndButton', {
@@ -408,21 +396,33 @@ function PS.OnPanelActive(wnd)
 			MessageBox(tMsg)
 		end,
 		autoenable = function() return not IsEmpty(O.szJokeText) end,
+		tip = _L['Click to share your joke to remote.'],
+		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
 	}):Pos('BOTTOMRIGHT') + 5
-	nY = nY + 40
+	-- 骚话输入框
+	nX = X
+	nY = nY + LH
+	nX = nX + ui:Append('WndEditBox', {
+		name = 'WndEditBox_JokeText',
+		x = nX, y = nY,
+		w = w - X * 2, h = 75,
+		text = O.szJokeText,
+		onchange = function(szText)
+			O.szJokeText = szText
+		end,
+	}):Width() + 5
+	nY = nY + 75
+
+	nY = nY + 10
 
 	-------------------------------------
 	-- 调侃部分
 	-------------------------------------
 	-- <hr />
 	nX = X
-	ui:Append('Image', {
-		x = X, y = nY,
-		w = w - X * 2, h = 1,
-		image = 'UI/Image/UICommon/ScienceTreeNode.UITex', imageframe = 62,
-	})
+	ui:Append('Shadow', { x = X, y = nY, w = w - X * 2, h = 1, color = {255, 255, 255}, alpha = 128 })
 	-- 文本标题
-	nY = nY + 5
+	nY = nY + 10
 	nX = nX + ui:Append('Text', { x = nX, y = nY, w = 'auto', h = 25, text = _L['Have a trick with'] }):Width() + 5
 	-- 调侃对象范围过滤器
 	nX = nX + ui:Append('WndComboBox', {
@@ -472,7 +472,7 @@ function PS.OnPanelActive(wnd)
 	-- 调侃内容输入框：第一句
 	nY = nY + ui:Append('WndEditBox', {
 		x = nX, y = nY,
-		w = w - 136, h = 25,
+		w = w - X * 2, h = 25,
 		text = O.szTrickTextBegin,
 		onchange = function(szText)
 			O.szTrickTextBegin = szText
@@ -481,7 +481,7 @@ function PS.OnPanelActive(wnd)
 	}):Height() + 5
 	-- 调侃内容输入框：调侃内容
 	nY = nY + ui:Append('WndEditBox', {
-		x = nX, y = nY, w = w - 136, h = 55,
+		x = nX, y = nY, w = w - X * 2, h = 55,
 		multiline = true, text = O.szTrickText,
 		onchange = function(szText)
 			O.szTrickText = szText
@@ -490,7 +490,7 @@ function PS.OnPanelActive(wnd)
 	}):Height() + 5
 	-- 调侃内容输入框：最后一句
 	nY = nY + ui:Append('WndEditBox', {
-		x = nX, y = nY, w = w - 136, h = 25,
+		x = nX, y = nY, w = w - X * 2, h = 25,
 		text = O.szTrickTextEnd,
 		onchange = function(szText)
 			O.szTrickTextEnd = szText
@@ -525,7 +525,7 @@ function PS.OnPanelActive(wnd)
 	}):Width() + 5
 	-- 调侃按钮
 	ui:Append('WndButton', {
-		x = w - 210, y = nY, w = 100,
+		x = w - X - 100, y = nY, w = 100,
 		color = {255, 255, 255},
 		text = _L['Trick'],
 		onclick = D.Trick,
