@@ -764,7 +764,7 @@ local settings = {
 		},
 	},
 }
-_G[PLUGIN_NAME] = LIB.GeneGlobalNS(settings)
+_G[PLUGIN_NAME] = LIB.CreateModule(settings)
 end
 
 UI.PopupMenu = D.Open

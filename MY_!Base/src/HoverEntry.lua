@@ -41,54 +41,39 @@ local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild,
 local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
 local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
 -------------------------------------------------------------------------------------------------------
-
+local PLUGIN_NAME = NSFormatString('{$NS}_HoverEntry')
+local PLUGIN_ROOT = PACKET_INFO.FRAMEWORK_ROOT
+local MODULE_NAME = NSFormatString('{$NS}_HoverEntry')
 local _L = LIB.LoadLangPack(PACKET_INFO.FRAMEWORK_ROOT .. 'lang/hoverentry/')
+--------------------------------------------------------------------------
+local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['HoverEntry'], {
+	bEnable = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['Enable status'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	nSize = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['Size'],
+		xSchema = Schema.Number,
+		xDefaultValue = 30,
+	},
+	anchor = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['Anchor'],
+		xSchema = Schema.FrameAnchor,
+		xDefaultValue = { x = -362, y = -78, s = 'BOTTOMCENTER', r = 'BOTTOMCENTER' },
+	},
+	bHoverMenu = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['Hover popup'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+})
 local D = {}
-local O = {}
-local FRAME_NAME = NSFormatString('{$NS}_HoverEntry')
-
-local KEY_ENABLE = NSFormatString('{$NS}_HoverEntry.bEnable')
-local KEY_SIZE = NSFormatString('{$NS}_HoverEntry.nSize')
-local KEY_ANCHOR = NSFormatString('{$NS}_HoverEntry.anchor')
-local KEY_HOVER_MENU = NSFormatString('{$NS}_HoverEntry.bHoverMenu')
-
-LIB.RegisterUserSettings(KEY_ENABLE, {
-	ePathType = PATH_TYPE.ROLE,
-	szGroup = _L['HoverEntry'],
-	szLabel = _L['Enable status'],
-	xSchema = Schema.Boolean,
-	xDefaultValue = false,
-})
-LIB.RegisterUserSettings(KEY_SIZE, {
-	ePathType = PATH_TYPE.ROLE,
-	szGroup = _L['HoverEntry'],
-	szLabel = _L['Size'],
-	xSchema = Schema.Number,
-	xDefaultValue = 30,
-})
-LIB.RegisterUserSettings(KEY_ANCHOR, {
-	ePathType = PATH_TYPE.ROLE,
-	szGroup = _L['HoverEntry'],
-	szLabel = _L['Anchor'],
-	xSchema = Schema.FrameAnchor,
-	xDefaultValue = { x = -362, y = -78, s = 'BOTTOMCENTER', r = 'BOTTOMCENTER' },
-})
-LIB.RegisterUserSettings(KEY_HOVER_MENU, {
-	ePathType = PATH_TYPE.ROLE,
-	szGroup = _L['HoverEntry'],
-	szLabel = _L['Hover popup'],
-	xSchema = Schema.Boolean,
-	xDefaultValue = false,
-})
-
-function D.LoadSettings()
-	O.bEnable    = LIB.GetUserSettings(KEY_ENABLE    )
-	O.nSize      = LIB.GetUserSettings(KEY_SIZE      )
-	O.anchor     = LIB.GetUserSettings(KEY_ANCHOR    )
-	O.bHoverMenu = LIB.GetUserSettings(KEY_HOVER_MENU)
-	D.CheckEnable()
-end
-LIB.RegisterInit('HoverEntry', D.LoadSettings)
+local FRAME_NAME = MODULE_NAME
 
 function D.Popup()
 	local addonmenu = LIB.GetTraceButtonAddonMenu()[1]
@@ -127,6 +112,7 @@ function D.CheckEnable()
 		})
 	end
 end
+LIB.RegisterInit('HoverEntry', D.CheckEnable)
 
 function D.OnFrameCreate()
 	this:RegisterEvent('UI_SCALED')
@@ -147,7 +133,6 @@ end
 
 function D.OnFrameDragEnd()
 	O.anchor = GetFrameAnchor(this)
-	LIB.SetUserSettings(KEY_ANCHOR, O.anchor)
 end
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
@@ -166,7 +151,6 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
 		oncheck = function(bChecked)
 			O.bEnable = bChecked
 			D.CheckEnable()
-			LIB.SetUserSettings(KEY_ENABLE, O.bEnable)
 		end,
 	}):AutoWidth():Width() + 5
 	nX = nX + ui:Append('WndCheckBox', {
@@ -176,7 +160,6 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
 		oncheck = function(bChecked)
 			O.bHoverMenu = bChecked
 			D.CheckEnable()
-			LIB.SetUserSettings(KEY_HOVER_MENU, O.bHoverMenu)
 		end,
 		autoenable = function() return O.bEnable end,
 	}):AutoWidth():Width() + 5
@@ -189,7 +172,6 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
 		onchange = function(val)
 			O.nSize = val
 			D.CheckEnable()
-			LIB.SetUserSettings(KEY_SIZE, O.nSize)
 		end,
 		autoenable = function() return O.bEnable end,
 	}):AutoWidth():Width() + 5
@@ -214,5 +196,5 @@ local settings = {
 		},
 	},
 }
-_G[FRAME_NAME] = LIB.GeneGlobalNS(settings)
+_G[FRAME_NAME] = LIB.CreateModule(settings)
 end

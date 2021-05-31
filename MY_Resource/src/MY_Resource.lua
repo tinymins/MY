@@ -181,5 +181,5 @@ local settings = {
 		},
 	},
 }
-_G[MODULE_NAME] = LIB.GeneGlobalNS(settings)
+_G[MODULE_NAME] = LIB.CreateModule(settings)
 end
