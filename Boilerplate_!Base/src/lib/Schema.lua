@@ -685,6 +685,17 @@ function schema.Test(fn, msg)
     return CheckTest
 end
 
+------------------------------
+--          CUSTOM          --
+------------------------------
+
+schema.FrameAnchor = schema.Record({
+    s = schema.OneOf("TOPLEFT", "TOPCENTER", "TOPRIGHT", "RIGHTCENTER", "BOTTOMRIGHT", "BOTTOMCENTER", "BOTTOMLEFT", "LEFTCENTER", "CENTER"),
+    r = schema.OneOf("TOPLEFT", "TOPCENTER", "TOPRIGHT", "RIGHTCENTER", "BOTTOMRIGHT", "BOTTOMCENTER", "BOTTOMLEFT", "LEFTCENTER", "CENTER"),
+    x = schema.Number,
+    y = schema.Number,
+})
+
 LIB.Schema = schema
 
 function LIB.SchemaGet(data, schemaVal, defaultVal)
