@@ -196,5 +196,5 @@ local settings = {
 		},
 	},
 }
-_G[FRAME_NAME] = LIB.GeneGlobalNS(settings)
+_G[FRAME_NAME] = LIB.CreateModule(settings)
 end

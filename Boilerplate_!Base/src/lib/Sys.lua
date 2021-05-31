@@ -2435,7 +2435,7 @@ local PRESETS = {
 		'OnActivePage',
 	}),
 }
-function LIB.GeneGlobalNS(options)
+function LIB.CreateModule(options)
 	local exports = Get(options, 'exports', {})
 	for _, export in ipairs(exports) do
 		if not export.presets then
