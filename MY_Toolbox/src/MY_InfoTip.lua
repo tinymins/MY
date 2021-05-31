@@ -286,17 +286,15 @@ function D.ReinitUI()
 						function()
 							UI(this):Anchor(data.config.anchor)
 						end)
-					:CustomMode(
-						data.i18n.name,
-						function(anchor)
+					:CustomLayout(data.i18n.name)
+					:CustomLayout(function(bEnter, anchor)
+						if bEnter then
 							UI(this):BringToTop()
+						else
 							data.config.anchor = anchor
 							D.SaveConfig()
-						end,
-						function(anchor)
-							data.config.anchor = anchor
-							D.SaveConfig()
-						end)
+						end
+					end)
 					:Drag(0, 0, 0, 0)
 					:Drag(false)
 					:Penetrable(true)
