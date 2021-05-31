@@ -74,39 +74,10 @@ function PS.OnPanelActive(wnd)
 	nX, nY = X, nY + 30
 	nLFY = nY
 
-	ui:Append('Text', {
-		x = X - 10, y = y,
-		text = _L['Notify center'],
-		color = { 255, 255, 0 },
-	}):AutoWidth()
-	y = y + 30
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, w = 200, h = 25,
-		text = _L['Show in minimap'],
-		checked = MY_Notify.bEntry,
-		oncheck = function(bChecked)
-			MY_Notify.bEntry = bChecked
-			MY_Notify.UpdateEntry()
-		end,
-	}):AutoWidth():Width() + 5
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, w = 100, h = 25,
-		text = _L['Order desc'],
-		checked = MY_Notify.bDesc,
-		oncheck = function(bChecked)
-			MY_Notify.bDesc = bChecked
-			MY_Notify.DrawNotifies()
-		end,
-	}):AutoWidth():Width() + 5
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, w = 100, h = 25,
-		text = _L['Disable dismiss'],
-		checked = MY_Notify.bDisableDismiss,
-		oncheck = function(bChecked)
-			MY_Notify.bDisableDismiss = bChecked
-		end,
-	}):AutoWidth():Width() + 5
-	x, y = X, y + 30
+	local Notify = _G[NSFormatString('{$NS}_Notify')]
+	if Notify then
+		nX, nY, nLFY = Notify.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
+	end
 
 	local HoverEntry = _G[NSFormatString('{$NS}_HoverEntry')]
 	if HoverEntry then

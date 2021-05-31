@@ -44,24 +44,47 @@ local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild,
 local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
 local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
 -------------------------------------------------------------------------------------------------------
-
-MY_Notify = {}
-MY_Notify.anchor = { x = -100, y = -150, s = 'BOTTOMRIGHT', r = 'BOTTOMRIGHT' }
-MY_Notify.bEntry = false
-MY_Notify.bDesc = false
-MY_Notify.bDisableDismiss = false
-RegisterCustomData('MY_Notify.anchor')
-RegisterCustomData('MY_Notify.bEntry')
-RegisterCustomData('MY_Notify.bDesc')
-RegisterCustomData('MY_Notify.bDisableDismiss')
-
+local PLUGIN_NAME = NSFormatString('{$NS}_Notify')
+local PLUGIN_ROOT = PACKET_INFO.FRAMEWORK_ROOT
+local MODULE_NAME = NSFormatString('{$NS}_Notify')
 local _L = LIB.LoadLangPack(PACKET_INFO.FRAMEWORK_ROOT .. 'lang/my_notify/')
+--------------------------------------------------------------------------
+local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['MY_Notify'], {
+	anchor = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['Anchor'],
+		xSchema = Schema.FrameAnchor,
+		xDefaultValue = { x = -100, y = -150, s = 'BOTTOMRIGHT', r = 'BOTTOMRIGHT' },
+	},
+	bEntry = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['Entry settings'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bDesc = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['Sort settings'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bDisableDismiss = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['Disable dismiss settings'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+})
 local D = {}
+
+local FRAME_NAME = MODULE_NAME
+local TIP_FRAME_NAME = MODULE_NAME .. 'Tip'
+
 local NOTIFY_LIST = {}
 local INI_PATH = PACKET_INFO.FRAMEWORK_ROOT .. 'ui/MY_Notify.ini'
 local ENTRY_INI_PATH = PACKET_INFO.FRAMEWORK_ROOT .. 'ui/MY_NotifyIcon.ini'
 
-function MY_Notify.Create(opt)
+function D.Create(opt)
 	insert(NOTIFY_LIST, {
 		bUnread = true,
 		szKey = opt.szKey,
@@ -79,7 +102,7 @@ function MY_Notify.Create(opt)
 	end
 	return opt.szKey
 end
-LIB.CreateNotify = MY_Notify.Create
+LIB.CreateNotify = D.Create
 
 function D.Dismiss(szKey, bOnlyData)
 	for i, v in ipairs_r(NOTIFY_LIST) do
@@ -95,16 +118,16 @@ function D.Dismiss(szKey, bOnlyData)
 	D.DrawNotifies(true)
 end
 
-function MY_Notify.Dismiss(...)
-	if MY_Notify.bDisableDismiss then
+function D.Dismiss(...)
+	if O.bDisableDismiss then
 		return
 	end
 	return D.Dismiss(...)
 end
-LIB.DismissNotify = MY_Notify.Dismiss
+LIB.DismissNotify = D.Dismiss
 
-function MY_Notify.OpenPanel()
-	Wnd.OpenWindow(INI_PATH, 'MY_Notify')
+function D.OpenPanel()
+	Wnd.OpenWindow(INI_PATH, FRAME_NAME)
 end
 
 function D.UpdateEntry()
@@ -113,7 +136,7 @@ function D.UpdateEntry()
 		return
 	end
 	local bShow, nUnread = false, 0
-	if MY_Notify.bEntry then
+	if O.bEntry then
 		for _, v in ipairs(NOTIFY_LIST) do
 			if v.bUnread then
 				nUnread = nUnread + 1
@@ -124,22 +147,22 @@ function D.UpdateEntry()
 	local wItem = container:Lookup('Wnd_News_XJ')
 	if bShow then
 		-- if not wItem then
-		-- 	wItem = container:AppendContentFromIni(ENTRY_INI_PATH, 'Wnd_MY_NotifyIcon')
+		-- 	wItem = container:AppendContentFromIni(ENTRY_INI_PATH, 'Wnd_' .. FRAME_NAME .. 'Icon')
 		-- 	-- container:SetW(container:GetW() + wItem:GetW())
-		-- 	local h = wItem:Lookup('Wnd_MY_NotifyIcon_Inner', '')
-		-- 	h:Lookup('Image_MY_NotifyIcon'):SetAlpha(230)
-		-- 	h.OnItemMouseEnter = function() this:Lookup('Image_MY_NotifyIcon'):SetAlpha(255) end
-		-- 	h.OnItemMouseLeave = function() this:Lookup('Image_MY_NotifyIcon'):SetAlpha(230) end
-		-- 	h.OnItemLButtonDown = function() this:Lookup('Image_MY_NotifyIcon'):SetAlpha(230) end
-		-- 	h.OnItemLButtonUp = function() this:Lookup('Image_MY_NotifyIcon'):SetAlpha(255) end
-		-- 	h.OnItemLButtonClick = function() MY_Notify.OpenPanel() end
+		-- 	local h = wItem:Lookup('Wnd_' .. FRAME_NAME .. 'Icon_Inner', '')
+		-- 	h:Lookup('Image_' .. FRAME_NAME .. 'Icon'):SetAlpha(230)
+		-- 	h.OnItemMouseEnter = function() this:Lookup('Image_' .. FRAME_NAME .. 'Icon'):SetAlpha(255) end
+		-- 	h.OnItemMouseLeave = function() this:Lookup('Image_' .. FRAME_NAME .. 'Icon'):SetAlpha(230) end
+		-- 	h.OnItemLButtonDown = function() this:Lookup('Image_' .. FRAME_NAME .. 'Icon'):SetAlpha(230) end
+		-- 	h.OnItemLButtonUp = function() this:Lookup('Image_' .. FRAME_NAME .. 'Icon'):SetAlpha(255) end
+		-- 	h.OnItemLButtonClick = function() D.OpenPanel() end
 		-- 	container:FormatAllContentPos()
 		-- end
-		-- wItem:Lookup('Wnd_MY_NotifyIcon_Inner', 'Handle_MY_NotifyIcon_Num'):SetVisible(nUnread > 0)
-		-- wItem:Lookup('Wnd_MY_NotifyIcon_Inner', 'Handle_MY_NotifyIcon_Num/Text_MY_NotifyIcon_Num'):SetText(nUnread)
+		-- wItem:Lookup('Wnd_' .. FRAME_NAME .. 'Icon_Inner', 'Handle_' .. FRAME_NAME .. 'Icon_Num'):SetVisible(nUnread > 0)
+		-- wItem:Lookup('Wnd_' .. FRAME_NAME .. 'Icon_Inner', 'Handle_' .. FRAME_NAME .. 'Icon_Num/Text_' .. FRAME_NAME .. 'Icon_Num'):SetText(nUnread)
 		wItem:Show()
 		wItem:Lookup('Btn_News_XJ', 'Image_Red_Pot'):SetVisible(nUnread > 0)
-		wItem:Lookup('Btn_News_XJ').OnLButtonClick = function() MY_Notify.OpenPanel() end
+		wItem:Lookup('Btn_News_XJ').OnLButtonClick = function() D.OpenPanel() end
 		container:FormatAllContentPos()
 	else
 		-- if wItem then
@@ -151,33 +174,32 @@ function D.UpdateEntry()
 		container:FormatAllContentPos()
 	end
 end
-MY_Notify.UpdateEntry = D.UpdateEntry
-LIB.RegisterInit('MY_Notify', D.UpdateEntry)
+LIB.RegisterInit(FRAME_NAME, D.UpdateEntry)
 
 function D.RemoveEntry()
 	local container = Station.Lookup('Normal/TopMenu/WndContainer_List')
 	if not container then
 		return
 	end
-	local wItem = container:Lookup('Wnd_MY_NotifyIcon')
+	local wItem = container:Lookup('Wnd_' .. FRAME_NAME .. 'Icon')
 	if wItem then
 		wItem:Destroy()
 		container:FormatAllContentPos()
 	end
 end
-LIB.RegisterReload('MY_Notify', D.RemoveEntry)
+LIB.RegisterReload(FRAME_NAME, D.RemoveEntry)
 
 function D.DrawNotifies(bAutoClose)
 	if bAutoClose and #NOTIFY_LIST == 0 then
-		return Wnd.CloseWindow('MY_Notify')
+		return Wnd.CloseWindow(FRAME_NAME)
 	end
-	local hList = Station.Lookup('Normal/MY_Notify/Window_Main/WndScroll_Notify', 'Handle_Notifies')
+	local hList = Station.Lookup('Normal/' .. FRAME_NAME .. '/Window_Main/WndScroll_Notify', 'Handle_Notifies')
 	if not hList then
 		return
 	end
 	hList:Clear()
 	local nStart, nCount, nStep = 1, min(#NOTIFY_LIST, 100), 1
-	if MY_Notify.bDesc then
+	if O.bDesc then
 		nStart, nStep = #NOTIFY_LIST, -1
 	end
 	for nIndex = nStart, nStart + (nCount - 1) * nStep, nStep do
@@ -215,14 +237,13 @@ function D.DrawNotifies(bAutoClose)
 	end
 	hList:FormatAllItemPos()
 end
-MY_Notify.DrawNotifies = D.DrawNotifies
 
-function MY_Notify.OnFrameCreate()
+function D.OnFrameCreate()
 	D.DrawNotifies()
 	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
 end
 
-function MY_Notify.OnItemLButtonClick()
+function D.OnItemLButtonClick()
 	local name = this:GetName()
 	if name == 'Handle_Notify'
 	or name == 'Handle_Notify_View'
@@ -250,7 +271,7 @@ function MY_Notify.OnItemLButtonClick()
 	end
 end
 
-function MY_Notify.OnLButtonClick()
+function D.OnLButtonClick()
 	local name = this:GetName()
 	if name == 'Btn_Close' then
 		Wnd.CloseWindow(this:GetRoot())
@@ -263,10 +284,10 @@ function D.ShowTip(szMsg)
 	l_uiTipBoard:Clear():Append(szMsg)
 	l_uiFrame:FadeTo(500, 255)
 	local szHoverFrame = Station.GetMouseOverWindow() and Station.GetMouseOverWindow():GetRoot():GetName()
-	if szHoverFrame == 'MY_NotifyTip' then
-		LIB.DelayCall('MY_NotifyTip_Hide', 5000)
+	if szHoverFrame == TIP_FRAME_NAME then
+		LIB.DelayCall(TIP_FRAME_NAME .. '_Hide', 5000)
 	else
-		LIB.DelayCall('MY_NotifyTip_Hide', 5000, function()
+		LIB.DelayCall(TIP_FRAME_NAME .. '_Hide', 5000, function()
 			l_uiFrame:FadeOut(500)
 		end)
 	end
@@ -277,19 +298,22 @@ local function OnInit()
 		return
 	end
 	-- init tip frame
-	l_uiFrame = UI.CreateFrame('MY_NotifyTip', {
+	l_uiFrame = UI.CreateFrame(TIP_FRAME_NAME, {
 		level = 'Topmost', empty = true,
 		w = 250, h = 150, visible = false,
-		events = {{ 'UI_SCALED', function() l_uiFrame:Anchor(MY_Notify.anchor) end }},
+		anchor = O.anchor,
+		events = {{ 'UI_SCALED', function() l_uiFrame:Anchor(O.anchor) end }},
+		customlayout = _L[FRAME_NAME],
+		oncustomlayout = function(bEnter, anchor)
+			if bEnter then
+				LIB.DelayCall(TIP_FRAME_NAME .. '_Hide', false)
+				l_uiFrame:Show():Alpha(255)
+			else
+				O.anchor = l_uiFrame:Anchor()
+				l_uiFrame:Alpha(0):Hide()
+			end
+		end,
 	})
-	:CustomMode(_L['MY_Notify'], function()
-		LIB.DelayCall('MY_NotifyTip_Hide')
-		l_uiFrame:Show():Alpha(255)
-	end, function()
-		MY_Notify.anchor = l_uiFrame:Anchor()
-		l_uiFrame:Alpha(0):Hide()
-	end)
-	:Anchor(MY_Notify.anchor)
 	-- init tip panel handle and bind animation function
 	l_uiTipBoard = l_uiFrame:Append('WndScrollBox', {
 		handlestyle = 3, x = 0, y = 0, w = 250, h = 150,
@@ -297,7 +321,7 @@ local function OnInit()
 			if LIB.IsInCustomUIMode() then
 				return
 			end
-			MY_Notify.OpenPanel()
+			D.OpenPanel()
 			l_uiFrame:FadeOut(500)
 		end,
 		onhover = function(bIn)
@@ -305,15 +329,74 @@ local function OnInit()
 				return
 			end
 			if bIn then
-				LIB.DelayCall('MY_NotifyTip_Hide')
+				LIB.DelayCall(TIP_FRAME_NAME .. '_Hide')
 				l_uiFrame:FadeIn(500)
 			else
-				LIB.DelayCall('MY_NotifyTip_Hide', function()
+				LIB.DelayCall(TIP_FRAME_NAME .. '_Hide', function()
 					l_uiFrame:FadeOut(500)
 				end, 5000)
 			end
 		end,
 	})
 end
-LIB.RegisterInit('MY_NotifyTip', OnInit)
+LIB.RegisterInit(TIP_FRAME_NAME, OnInit)
+end
+
+function D.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
+	nX = X
+	nY = nLFY
+
+	ui:Append('Text', {
+		x = X - 10, y = nY,
+		text = _L['Notify center'],
+		color = { 255, 255, 0 },
+	}):AutoWidth()
+	nY = nY + 30
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 200, h = 25,
+		text = _L['Show in minimap'],
+		checked = O.bEntry,
+		oncheck = function(bChecked)
+			O.bEntry = bChecked
+			D.UpdateEntry()
+		end,
+	}):AutoWidth():Width() + 5
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 100, h = 25,
+		text = _L['Order desc'],
+		checked = O.bDesc,
+		oncheck = function(bChecked)
+			O.bDesc = bChecked
+			D.DrawNotifies()
+		end,
+	}):AutoWidth():Width() + 5
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 100, h = 25,
+		text = _L['Disable dismiss'],
+		checked = O.bDisableDismiss,
+		oncheck = function(bChecked)
+			O.bDisableDismiss = bChecked
+		end,
+	}):AutoWidth():Width() + 5
+
+	nLFY = nY + LH
+	return nX, nY, nLFY
+end
+
+-- Global exports
+do
+local settings = {
+	exports = {
+		{
+			root = D,
+			preset = 'UIEvent'
+		},
+		{
+			fields = {
+				OnPanelActivePartial = D.OnPanelActivePartial,
+			},
+		},
+	},
+}
+_G[FRAME_NAME] = LIB.CreateModule(settings)
 end

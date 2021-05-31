@@ -1,3 +1,10 @@
 return {
 	['MY_Notify'] = '茗伊消息中心',
+	['Entry settings'] = '小地圖入口設置',
+	['Sort settings'] = '排序設置',
+	['Disable dismiss settings'] = '自動消失設置',
+	['Notify center'] = '消息中心',
+	['Show in minimap'] = '顯示小地圖入口',
+	['Order desc'] = '逆序顯示',
+	['Disable dismiss'] = '禁止消息自動消失',
 }
