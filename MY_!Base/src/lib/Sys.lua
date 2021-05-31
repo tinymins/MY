@@ -876,7 +876,7 @@ function LIB.CreateUserSettingsProxy(xProxy)
 		end
 		return tProxy[k]
 	end
-	return setmetatable(tSettings, {
+	return setmetatable({}, {
 		__index = function(_, k)
 			if not tLoaded[k] then
 				tSettings[k] = LIB.GetUserSettings(GetGlobalKey(k))
