@@ -765,6 +765,9 @@ function LIB.FlushSettingsDatabase()
 	LIB.ConnectSettingsDatabase()
 end
 
+-- 注册单个用户配置项
+-- @param {string} szKey 配置项全局唯一键
+-- @param {table} tOption 自定义配置项
 function LIB.RegisterUserSettings(szKey, tOption)
 	local ePathType, szDataKey, szGroup, szLabel, szVersion, xDefaultValue, xSchema
 	if IsTable(tOption) then
@@ -813,6 +816,9 @@ function LIB.GetRegisterUserSettingsList()
 	return aRes
 end
 
+-- 获取用户配置项值
+-- @param {string} szKey 配置项全局唯一键
+-- @return 值
 function LIB.GetUserSettings(szKey)
 	local info = USER_SETTINGS_INFO[szKey]
 	assert(info, 'GetUserSettings: `Key` has not been registered.')
@@ -828,6 +834,9 @@ function LIB.GetUserSettings(szKey)
 	return Clone(info.xDefaultValue)
 end
 
+-- 保存用户配置项值
+-- @param {string} szKey 配置项全局唯一键
+-- @param {unknown} xValue 值
 function LIB.SetUserSettings(szKey, xValue)
 	local info = USER_SETTINGS_INFO[szKey]
 	assert(info, 'SetUserSettings: `Key` has not been registered.')
@@ -848,8 +857,8 @@ function LIB.SetUserSettings(szKey, xValue)
 end
 
 -- 创建用户设置代理对象
--- LIB.CreateUserSettingsProxy({ [string szLocalKey] = string szGlobalKey })
--- LIB.CreateUserSettingsProxy(string szNameSpace)
+-- @param {string | table} xProxy 配置项代理表，或模块命名空间
+-- @return 配置项读写代理对象
 function LIB.CreateUserSettingsProxy(xProxy)
 	local tSettings = {}
 	local tLoaded = {}
@@ -881,6 +890,31 @@ function LIB.CreateUserSettingsProxy(xProxy)
 			tLoaded[k] = true
 		end,
 	})
+end
+
+-- 创建模块用户配置项表，并获得代理对象
+-- @param {string} szModule 模块命名空间
+-- @param {string} *szGroupLabel 模块标题
+-- @param {table} tSettings 模块用户配置表
+-- @return 配置项读写代理对象
+function LIB.CreateUserSettingsModule(szModule, szGroupLabel, tSettings)
+	if IsTable(szGroupLabel) then
+		szGroupLabel, tSettings = nil, szGroupLabel
+	end
+	local tProxy = {}
+	for k, v in pairs(tSettings) do
+		local szKey = szModule .. '.' .. k
+		local tOption = Clone(v)
+		if tOption.szStoreKey then
+			tOption.szStoreKey = szModule .. '.' .. tOption.szStoreKey
+		end
+		if szGroupLabel then
+			tOption.szGroup = szGroupLabel
+		end
+		LIB.RegisterUserSettings(szKey, tSettings)
+		tProxy[k] = szKey
+	end
+	return LIB.CreateUserSettingsProxy(tProxy)
 end
 
 LIB.RegisterIdle(NSFormatString('{$NS}#FlushSettingsDatabase'), function()
