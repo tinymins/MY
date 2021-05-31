@@ -790,6 +790,9 @@ function LIB.RegisterUserSettings(szKey, tOption)
 	assert(IsNil(szGroup) or (IsString(szGroup) and #szGroup > 0), 'RegisterUserSettings: `Group` should be nil or a non-empty string value.')
 	assert(IsNil(szLabel) or (IsString(szLabel) and #szLabel > 0), 'RegisterUserSettings: `Label` should be nil or a non-empty string value.')
 	assert(IsNil(szVersion) or IsString(szVersion) or IsNumber(szVersion), 'RegisterUserSettings: `Version` should be a nil, string or number value.')
+	if xSchema then
+		assert(not Schema.CheckSchema(xDefaultValue, xSchema), 'RegisterUserSettings: `DefaultValue` cannot pass `Schema` check.')
+	end
 	USER_SETTINGS_INFO[szKey] = {
 		szKey = szKey,
 		ePathType = ePathType,
@@ -825,12 +828,22 @@ function LIB.GetUserSettings(szKey)
 	return Clone(info.xDefaultValue)
 end
 
-function LIB.SetUserSettings(szKey, oValue)
+function LIB.SetUserSettings(szKey, xValue)
 	local info = USER_SETTINGS_INFO[szKey]
 	assert(info, 'SetUserSettings: `Key` has not been registered.')
 	local db = DATABASE_INSTANCE[info.ePathType]
 	assert(db, 'GetUserSettings: Database not connected.')
-	db:Set(info.szDataKey, { d = oValue, v = info.szVersion })
+	if info.xSchema then
+		local errs = Schema.CheckSchema(xValue, info.xSchema)
+		if errs then
+			local aErrmsgs = {}
+			for i, err in ipairs(errs) do
+				insert(aErrmsgs, i .. '. ' .. err.message)
+			end
+			return LIB.Debug(_L.PLUGIN_SHORT_NAME, 'SetUserSettings: ' .. szKey .. ', schema check failed.\n' .. concat(aErrmsgs, '\n'), DEBUG_LEVEL.WARNING)
+		end
+	end
+	db:Set(info.szDataKey, { d = xValue, v = info.szVersion })
 	NEED_FLUSH = true
 end
 
