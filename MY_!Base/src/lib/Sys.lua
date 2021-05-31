@@ -36,7 +36,7 @@ local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals,
 local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
 local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
 local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData = LIB.EncodeLUAData, LIB.DecodeLUAData
+local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
 local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
 local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
 local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
@@ -766,14 +766,15 @@ function LIB.FlushSettingsDatabase()
 end
 
 function LIB.RegisterUserSettings(szKey, tOption)
-	local ePathType, szDataKey, szGroup, szLabel, szVersion, oDefaultValue
+	local ePathType, szDataKey, szGroup, szLabel, szVersion, xDefaultValue, xSchema
 	if IsTable(tOption) then
 		ePathType = tOption.ePathType
 		szDataKey = tOption.szDataKey
 		szGroup = tOption.szGroup
 		szLabel = tOption.szLabel
 		szVersion = tOption.szVersion
-		oDefaultValue = tOption.oDefaultValue
+		xDefaultValue = tOption.xDefaultValue
+		xSchema = tOption.xSchema
 	end
 	if not ePathType then
 		ePathType = PATH_TYPE.ROLE
@@ -789,6 +790,9 @@ function LIB.RegisterUserSettings(szKey, tOption)
 	assert(IsNil(szGroup) or (IsString(szGroup) and #szGroup > 0), 'RegisterUserSettings: `Group` should be nil or a non-empty string value.')
 	assert(IsNil(szLabel) or (IsString(szLabel) and #szLabel > 0), 'RegisterUserSettings: `Label` should be nil or a non-empty string value.')
 	assert(IsNil(szVersion) or IsString(szVersion) or IsNumber(szVersion), 'RegisterUserSettings: `Version` should be a nil, string or number value.')
+	if xSchema then
+		assert(not Schema.CheckSchema(xDefaultValue, xSchema), 'RegisterUserSettings: `DefaultValue` cannot pass `Schema` check.')
+	end
 	USER_SETTINGS_INFO[szKey] = {
 		szKey = szKey,
 		ePathType = ePathType,
@@ -796,7 +800,8 @@ function LIB.RegisterUserSettings(szKey, tOption)
 		szGroup = szGroup,
 		szLabel = szLabel,
 		szVersion = szVersion,
-		oDefaultValue = oDefaultValue,
+		xDefaultValue = xDefaultValue,
+		xSchema = xSchema,
 	}
 end
 
@@ -815,17 +820,30 @@ function LIB.GetUserSettings(szKey)
 	assert(db, 'GetUserSettings: Database not connected.')
 	local data = db:Get(info.szDataKey)
 	if IsTable(data) and data.v == info.szVersion then
+		if info.xSchema then
+			return LIB.SchemaGet(data.d, info.xSchema, info.xDefaultValue)
+		end
 		return data.d
 	end
-	return info.oDefaultValue
+	return Clone(info.xDefaultValue)
 end
 
-function LIB.SetUserSettings(szKey, oValue)
+function LIB.SetUserSettings(szKey, xValue)
 	local info = USER_SETTINGS_INFO[szKey]
 	assert(info, 'SetUserSettings: `Key` has not been registered.')
 	local db = DATABASE_INSTANCE[info.ePathType]
 	assert(db, 'GetUserSettings: Database not connected.')
-	db:Set(info.szDataKey, { d = oValue, v = info.szVersion })
+	if info.xSchema then
+		local errs = Schema.CheckSchema(xValue, info.xSchema)
+		if errs then
+			local aErrmsgs = {}
+			for i, err in ipairs(errs) do
+				insert(aErrmsgs, i .. '. ' .. err.message)
+			end
+			return LIB.Debug(_L.PLUGIN_SHORT_NAME, 'SetUserSettings: ' .. szKey .. ', schema check failed.\n' .. concat(aErrmsgs, '\n'), DEBUG_LEVEL.WARNING)
+		end
+	end
+	db:Set(info.szDataKey, { d = xValue, v = info.szVersion })
 	NEED_FLUSH = true
 end
 

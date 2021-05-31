@@ -36,7 +36,7 @@ local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals,
 local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
 local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
 local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData = LIB.EncodeLUAData, LIB.DecodeLUAData
+local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
 local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
 local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
 local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
@@ -56,25 +56,29 @@ LIB.RegisterUserSettings(KEY_ENABLE, {
 	ePathType = PATH_TYPE.ROLE,
 	szGroup = _L['HoverEntry'],
 	szLabel = _L['Enable status'],
-	oDefaultValue = false,
+	xSchema = Schema.Boolean,
+	xDefaultValue = false,
 })
 LIB.RegisterUserSettings(KEY_SIZE, {
 	ePathType = PATH_TYPE.ROLE,
 	szGroup = _L['HoverEntry'],
 	szLabel = _L['Size'],
-	oDefaultValue = 30,
+	xSchema = Schema.Number,
+	xDefaultValue = 30,
 })
 LIB.RegisterUserSettings(KEY_ANCHOR, {
 	ePathType = PATH_TYPE.ROLE,
 	szGroup = _L['HoverEntry'],
 	szLabel = _L['Anchor'],
-	oDefaultValue = { x = -362, y = -78, s = 'BOTTOMCENTER', r = 'BOTTOMCENTER' },
+	xSchema = Schema.FrameAnchor,
+	xDefaultValue = { x = -362, y = -78, s = 'BOTTOMCENTER', r = 'BOTTOMCENTER' },
 })
 LIB.RegisterUserSettings(KEY_HOVER_MENU, {
 	ePathType = PATH_TYPE.ROLE,
 	szGroup = _L['HoverEntry'],
 	szLabel = _L['Hover popup'],
-	oDefaultValue = false,
+	xSchema = Schema.Boolean,
+	xDefaultValue = false,
 })
 
 function D.LoadSettings()
