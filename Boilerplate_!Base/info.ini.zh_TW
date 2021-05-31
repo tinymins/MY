@@ -49,4 +49,5 @@ lua_42=src\Dev_UIFindStation.lua
 lua_43=src\PS.Welcome.lua
 lua_44=src\PS.GlobalColor.lua
 lua_45=src\PS.GlobalConfig.lua
+lua_46=src\PS.UISample.lua
 package=Boilerplate
