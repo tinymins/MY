@@ -847,6 +847,27 @@ function LIB.SetUserSettings(szKey, xValue)
 	NEED_FLUSH = true
 end
 
+function LIB.CreateUserSettingsProxy(tProxy)
+	local tSettings = {}
+	local tLoaded = {}
+	return setmetatable(tSettings, {
+		__index = function(_, k)
+			assert(tProxy[k], '`Key` ' .. EncodeLUAData(k) .. ' not found in proxy table.')
+			if not tLoaded[k] then
+				tSettings[k] = LIB.GetUserSettings(tProxy[k])
+				tLoaded[k] = true
+			end
+			return tSettings[k]
+		end,
+		__newindex = function(_, k, v)
+			assert(tProxy[k], '`Key` ' .. EncodeLUAData(k) .. ' not found in proxy table.')
+			LIB.SetUserSettings(tProxy[k], v)
+			tSettings[k] = v
+			tLoaded[k] = true
+		end,
+	})
+end
+
 LIB.RegisterIdle(NSFormatString('{$NS}#FlushSettingsDatabase'), function()
 	if GetCurrentTime() - FLUSH_TIME > 60 then
 		LIB.FlushSettingsDatabase()
