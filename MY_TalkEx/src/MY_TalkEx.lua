@@ -62,49 +62,57 @@ LIB.RegisterUserSettings('MY_TalkEx.szTalkText', {
 	ePathType = PATH_TYPE.ROLE,
 	szGroup = _L['MY_TalkEx'],
 	szLabel = _L['TalkText'],
-	oDefaultValue = '',
+	xSchema = Schema.String,
+	xDefaultValue = '',
 })
 LIB.RegisterUserSettings('MY_TalkEx.aTalkChannel', {
 	ePathType = PATH_TYPE.ROLE,
 	szGroup = _L['MY_TalkEx'],
 	szLabel = _L['TalkChannels'],
-	oDefaultValue = {},
+	xSchema = Schema.Collection(Schema.Number),
+	xDefaultValue = {},
 })
 LIB.RegisterUserSettings('MY_TalkEx.nTrickChannel', {
 	ePathType = PATH_TYPE.ROLE,
 	szGroup = _L['MY_TalkEx'],
 	szLabel = _L['TalkTrick'],
-	oDefaultValue = PLAYER_TALK_CHANNEL.RAID,
+	xSchema = Schema.Number,
+	xDefaultValue = PLAYER_TALK_CHANNEL.RAID,
 })
 LIB.RegisterUserSettings('MY_TalkEx.szTrickFilter', {
 	ePathType = PATH_TYPE.ROLE,
 	szGroup = _L['MY_TalkEx'],
 	szLabel = _L['TalkTrick'],
-	oDefaultValue = 'RAID',
+	xSchema = Schema.String,
+	xDefaultValue = 'RAID',
 })
 LIB.RegisterUserSettings('MY_TalkEx.nTrickForce', {
 	ePathType = PATH_TYPE.ROLE,
 	szGroup = _L['MY_TalkEx'],
 	szLabel = _L['TalkTrick'],
-	oDefaultValue = CONSTANT.FORCE_TYPE.CHUN_YANG,
+	xSchema = Schema.Number,
+	xDefaultValue = CONSTANT.FORCE_TYPE.CHUN_YANG,
 })
 LIB.RegisterUserSettings('MY_TalkEx.szTrickTextBegin', {
 	ePathType = PATH_TYPE.ROLE,
 	szGroup = _L['MY_TalkEx'],
 	szLabel = _L['TalkTrick'],
-	oDefaultValue = _L['$zj look around and have a little thought.'],
+	xSchema = Schema.String,
+	xDefaultValue = _L['$zj look around and have a little thought.'],
 })
 LIB.RegisterUserSettings('MY_TalkEx.szTrickText', {
 	ePathType = PATH_TYPE.ROLE,
 	szGroup = _L['MY_TalkEx'],
 	szLabel = _L['TalkTrick'],
-	oDefaultValue = _L['$zj epilate $mb\'s feather clearly.'],
+	xSchema = Schema.String,
+	xDefaultValue = _L['$zj epilate $mb\'s feather clearly.'],
 })
 LIB.RegisterUserSettings('MY_TalkEx.szTrickTextEnd', {
 	ePathType = PATH_TYPE.ROLE,
 	szGroup = _L['MY_TalkEx'],
 	szLabel = _L['TalkTrick'],
-	oDefaultValue = _L['$zj collected the feather epilated just now and wanted it sold well.'],
+	xSchema = Schema.String,
+	xDefaultValue = _L['$zj collected the feather epilated just now and wanted it sold well.'],
 })
 
 function D.LoadSettings()
@@ -466,8 +474,8 @@ function PS.OnPanelActive(wnd)
 		x = nX, y = nY,
 		w = w - 136, h = 25,
 		text = O.szTrickTextBegin,
-		onchange = function()
-			O.szTrickTextBegin = this:GetText()
+		onchange = function(szText)
+			O.szTrickTextBegin = szText
 			LIB.SetUserSettings('MY_TalkEx.szTrickTextBegin', O.szTrickTextBegin)
 		end,
 	}):Height() + 5
@@ -475,8 +483,8 @@ function PS.OnPanelActive(wnd)
 	nY = nY + ui:Append('WndEditBox', {
 		x = nX, y = nY, w = w - 136, h = 55,
 		multiline = true, text = O.szTrickText,
-		onchange = function()
-			O.szTrickText = this:GetText()
+		onchange = function(szText)
+			O.szTrickText = szText
 			LIB.SetUserSettings('MY_TalkEx.szTrickText', O.szTrickText)
 		end,
 	}):Height() + 5
@@ -484,8 +492,8 @@ function PS.OnPanelActive(wnd)
 	nY = nY + ui:Append('WndEditBox', {
 		x = nX, y = nY, w = w - 136, h = 25,
 		text = O.szTrickTextEnd,
-		onchange = function()
-			O.szTrickTextEnd = this:GetText()
+		onchange = function(szText)
+			O.szTrickTextEnd = szText
 			LIB.SetUserSettings('MY_TalkEx.szTrickTextEnd', O.szTrickTextEnd)
 		end,
 	}):Height() + 5
