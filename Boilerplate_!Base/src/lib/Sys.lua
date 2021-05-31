@@ -766,14 +766,14 @@ function LIB.FlushSettingsDatabase()
 end
 
 function LIB.RegisterUserSettings(szKey, tOption)
-	local ePathType, szDataKey, szGroup, szLabel, szVersion, oDefaultValue, xSchema
+	local ePathType, szDataKey, szGroup, szLabel, szVersion, xDefaultValue, xSchema
 	if IsTable(tOption) then
 		ePathType = tOption.ePathType
 		szDataKey = tOption.szDataKey
 		szGroup = tOption.szGroup
 		szLabel = tOption.szLabel
 		szVersion = tOption.szVersion
-		oDefaultValue = tOption.oDefaultValue
+		xDefaultValue = tOption.xDefaultValue
 		xSchema = tOption.xSchema
 	end
 	if not ePathType then
@@ -797,7 +797,7 @@ function LIB.RegisterUserSettings(szKey, tOption)
 		szGroup = szGroup,
 		szLabel = szLabel,
 		szVersion = szVersion,
-		oDefaultValue = oDefaultValue,
+		xDefaultValue = xDefaultValue,
 		xSchema = xSchema,
 	}
 end
@@ -818,11 +818,11 @@ function LIB.GetUserSettings(szKey)
 	local data = db:Get(info.szDataKey)
 	if IsTable(data) and data.v == info.szVersion then
 		if info.xSchema then
-			return LIB.SchemaGet(data.d, info.xSchema, info.oDefaultValue)
+			return LIB.SchemaGet(data.d, info.xSchema, info.xDefaultValue)
 		end
 		return data.d
 	end
-	return Clone(info.oDefaultValue)
+	return Clone(info.xDefaultValue)
 end
 
 function LIB.SetUserSettings(szKey, oValue)

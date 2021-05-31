@@ -56,25 +56,25 @@ LIB.RegisterUserSettings(KEY_ENABLE, {
 	ePathType = PATH_TYPE.ROLE,
 	szGroup = _L['HoverEntry'],
 	szLabel = _L['Enable status'],
-	oDefaultValue = false,
+	xDefaultValue = false,
 })
 LIB.RegisterUserSettings(KEY_SIZE, {
 	ePathType = PATH_TYPE.ROLE,
 	szGroup = _L['HoverEntry'],
 	szLabel = _L['Size'],
-	oDefaultValue = 30,
+	xDefaultValue = 30,
 })
 LIB.RegisterUserSettings(KEY_ANCHOR, {
 	ePathType = PATH_TYPE.ROLE,
 	szGroup = _L['HoverEntry'],
 	szLabel = _L['Anchor'],
-	oDefaultValue = { x = -362, y = -78, s = 'BOTTOMCENTER', r = 'BOTTOMCENTER' },
+	xDefaultValue = { x = -362, y = -78, s = 'BOTTOMCENTER', r = 'BOTTOMCENTER' },
 })
 LIB.RegisterUserSettings(KEY_HOVER_MENU, {
 	ePathType = PATH_TYPE.ROLE,
 	szGroup = _L['HoverEntry'],
 	szLabel = _L['Hover popup'],
-	oDefaultValue = false,
+	xDefaultValue = false,
 })
 
 function D.LoadSettings()
