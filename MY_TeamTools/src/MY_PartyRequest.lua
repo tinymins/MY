@@ -536,7 +536,7 @@ local settings = {
 		},
 	},
 }
-MY_PartyRequest = LIB.GeneGlobalNS(settings)
+MY_PartyRequest = LIB.CreateModule(settings)
 end
 
 --------------------------------------------------------------------------------

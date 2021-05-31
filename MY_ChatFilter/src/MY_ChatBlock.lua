@@ -234,7 +234,7 @@ local settings = {
 		},
 	},
 }
-MY_ChatBlock = LIB.GeneGlobalNS(settings)
+MY_ChatBlock = LIB.CreateModule(settings)
 end
 
 local PS = {}

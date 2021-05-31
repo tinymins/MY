@@ -220,5 +220,5 @@ local settings = {
 		},
 	},
 }
-MY_AchievementWiki = LIB.GeneGlobalNS(settings)
+MY_AchievementWiki = LIB.CreateModule(settings)
 end

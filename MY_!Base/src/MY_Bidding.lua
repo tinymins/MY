@@ -377,7 +377,7 @@ local settings = {
 		},
 	},
 }
-MY_Bidding = LIB.GeneGlobalNS(settings)
+MY_Bidding = LIB.CreateModule(settings)
 end
 
 -------------------------------------------------------------------------------------------------------

@@ -345,5 +345,5 @@ local settings = {
 		},
 	},
 }
-MY_FooterTip = LIB.GeneGlobalNS(settings)
+MY_FooterTip = LIB.CreateModule(settings)
 end

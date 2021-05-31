@@ -249,5 +249,5 @@ local settings = {
 		},
 	},
 }
-MY_TargetFace = LIB.GeneGlobalNS(settings)
+MY_TargetFace = LIB.CreateModule(settings)
 end

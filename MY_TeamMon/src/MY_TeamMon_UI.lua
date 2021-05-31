@@ -3065,5 +3065,5 @@ local settings = {
 		},
 	},
 }
-MY_TeamMon_UI = LIB.GeneGlobalNS(settings)
+MY_TeamMon_UI = LIB.CreateModule(settings)
 end

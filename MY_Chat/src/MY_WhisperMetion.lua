@@ -168,5 +168,5 @@ local settings = {
 		},
 	},
 }
-MY_WhisperMetion = LIB.GeneGlobalNS(settings)
+MY_WhisperMetion = LIB.CreateModule(settings)
 end

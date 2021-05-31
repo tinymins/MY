@@ -377,5 +377,5 @@ local settings = {
 		},
 	},
 }
-MY_VisualSkill = LIB.GeneGlobalNS(settings)
+MY_VisualSkill = LIB.CreateModule(settings)
 end

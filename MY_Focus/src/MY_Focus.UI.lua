@@ -680,5 +680,5 @@ local settings = {
 		},
 	},
 }
-MY_FocusUI = LIB.GeneGlobalNS(settings)
+MY_FocusUI = LIB.CreateModule(settings)
 end

@@ -415,7 +415,7 @@ local settings = {
 		},
 	},
 }
-MY_ChatMonitor = LIB.GeneGlobalNS(settings)
+MY_ChatMonitor = LIB.CreateModule(settings)
 end
 
 -------------------------------------------------------------------------------------------------------

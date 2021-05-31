@@ -139,5 +139,5 @@ local settings = {
 		},
 	},
 }
-MY_AutoMemorizeBook = LIB.GeneGlobalNS(settings)
+MY_AutoMemorizeBook = LIB.CreateModule(settings)
 end

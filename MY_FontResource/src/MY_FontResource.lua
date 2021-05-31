@@ -97,5 +97,5 @@ local settings = {
 		},
 	},
 }
-MY_FontResource = LIB.GeneGlobalNS(settings)
+MY_FontResource = LIB.CreateModule(settings)
 end

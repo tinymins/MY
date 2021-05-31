@@ -176,5 +176,5 @@ local settings = {
 		},
 	},
 }
-MY_JBTeamSnapshot = LIB.GeneGlobalNS(settings)
+MY_JBTeamSnapshot = LIB.CreateModule(settings)
 end

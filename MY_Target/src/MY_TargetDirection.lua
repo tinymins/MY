@@ -255,5 +255,5 @@ local settings = {
 		},
 	},
 }
-MY_TargetDirection = LIB.GeneGlobalNS(settings)
+MY_TargetDirection = LIB.CreateModule(settings)
 end

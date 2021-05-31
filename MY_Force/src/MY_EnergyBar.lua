@@ -619,5 +619,5 @@ local settings = {
 		},
 	},
 }
-MY_EnergyBar = LIB.GeneGlobalNS(settings)
+MY_EnergyBar = LIB.CreateModule(settings)
 end

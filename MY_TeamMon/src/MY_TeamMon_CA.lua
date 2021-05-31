@@ -170,5 +170,5 @@ local settings = {
 		},
 	},
 }
-MY_TeamMon_CA = LIB.GeneGlobalNS(settings)
+MY_TeamMon_CA = LIB.CreateModule(settings)
 end

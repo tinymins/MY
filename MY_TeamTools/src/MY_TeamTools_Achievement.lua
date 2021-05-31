@@ -884,7 +884,7 @@ local settings = {
 		},
 	},
 }
-MY_TeamTools.RegisterModule('Achievement', _L['MY_TeamTools_Achievement'], LIB.GeneGlobalNS(settings))
+MY_TeamTools.RegisterModule('Achievement', _L['MY_TeamTools_Achievement'], LIB.CreateModule(settings))
 end
 
 -- Global exports
@@ -907,5 +907,5 @@ local settings = {
 		},
 	},
 }
-MY_TeamTools_Achievement = LIB.GeneGlobalNS(settings)
+MY_TeamTools_Achievement = LIB.CreateModule(settings)
 end

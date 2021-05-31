@@ -289,5 +289,5 @@ local settings = {
 		},
 	},
 }
-MY_Domesticate = LIB.GeneGlobalNS(settings)
+MY_Domesticate = LIB.CreateModule(settings)
 end

@@ -186,5 +186,5 @@ local settings = {
 		},
 	},
 }
-MY_ArenaHelper = LIB.GeneGlobalNS(settings)
+MY_ArenaHelper = LIB.CreateModule(settings)
 end

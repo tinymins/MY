@@ -155,5 +155,5 @@ local settings = {
 		},
 	},
 }
-MY_JiugongHelper = LIB.GeneGlobalNS(settings)
+MY_JiugongHelper = LIB.CreateModule(settings)
 end

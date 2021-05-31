@@ -1378,7 +1378,7 @@ local settings = {
 		},
 	},
 }
-MY_RoleStatistics.RegisterModule('SerendipityStat', _L['MY_RoleStatistics_SerendipityStat'], LIB.GeneGlobalNS(settings))
+MY_RoleStatistics.RegisterModule('SerendipityStat', _L['MY_RoleStatistics_SerendipityStat'], LIB.CreateModule(settings))
 end
 
 -- Global exports
@@ -1423,5 +1423,5 @@ local settings = {
 		},
 	},
 }
-MY_RoleStatistics_SerendipityStat = LIB.GeneGlobalNS(settings)
+MY_RoleStatistics_SerendipityStat = LIB.CreateModule(settings)
 end

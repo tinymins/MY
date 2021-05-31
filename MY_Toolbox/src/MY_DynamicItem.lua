@@ -578,5 +578,5 @@ local settings = {
 		},
 	},
 }
-MY_DynamicItem = LIB.GeneGlobalNS(settings)
+MY_DynamicItem = LIB.CreateModule(settings)
 end

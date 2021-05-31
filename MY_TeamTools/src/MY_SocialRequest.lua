@@ -225,7 +225,7 @@ local settings = {
 		},
 	},
 }
-MY_SocialRequest = LIB.GeneGlobalNS(settings)
+MY_SocialRequest = LIB.CreateModule(settings)
 end
 
 --------------------------------------------------------------------------------

@@ -365,5 +365,5 @@ local settings = {
 		},
 	},
 }
-MY_AutoSell = LIB.GeneGlobalNS(settings)
+MY_AutoSell = LIB.CreateModule(settings)
 end

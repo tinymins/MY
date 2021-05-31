@@ -288,7 +288,7 @@ local settings = {
 		},
 	},
 }
-MY_TeamTools.RegisterModule('EnterMap', _L['MY_TeamTools_EnterMap'], LIB.GeneGlobalNS(settings))
+MY_TeamTools.RegisterModule('EnterMap', _L['MY_TeamTools_EnterMap'], LIB.CreateModule(settings))
 end
 
 -- Global exports
@@ -302,5 +302,5 @@ local settings = {
 		},
 	},
 }
-MY_TeamTools_EnterMap = LIB.GeneGlobalNS(settings)
+MY_TeamTools_EnterMap = LIB.CreateModule(settings)
 end

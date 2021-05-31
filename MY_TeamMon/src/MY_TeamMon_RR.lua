@@ -1068,5 +1068,5 @@ local settings = {
 		},
 	},
 }
-MY_TeamMon_RR = LIB.GeneGlobalNS(settings)
+MY_TeamMon_RR = LIB.CreateModule(settings)
 end

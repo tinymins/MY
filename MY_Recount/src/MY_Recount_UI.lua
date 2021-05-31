@@ -794,5 +794,5 @@ local settings = {
 		},
 	},
 }
-MY_Recount_UI = LIB.GeneGlobalNS(settings)
+MY_Recount_UI = LIB.CreateModule(settings)
 end

@@ -359,5 +359,5 @@ local settings = {
 		},
 	},
 }
-MY_TeamMon_PBL = LIB.GeneGlobalNS(settings)
+MY_TeamMon_PBL = LIB.CreateModule(settings)
 end

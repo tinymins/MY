@@ -444,5 +444,5 @@ local settings = {
 		},
 	},
 }
-MY_JBEventVote = LIB.GeneGlobalNS(settings)
+MY_JBEventVote = LIB.CreateModule(settings)
 end

@@ -349,7 +349,7 @@ local settings = {
 		},
 	},
 }
-MY_RoleStatistics = LIB.GeneGlobalNS(settings)
+MY_RoleStatistics = LIB.CreateModule(settings)
 end
 
 do

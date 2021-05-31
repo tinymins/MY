@@ -234,5 +234,5 @@ local settings = {
 		},
 	},
 }
-MY_PetWiki = LIB.GeneGlobalNS(settings)
+MY_PetWiki = LIB.CreateModule(settings)
 end

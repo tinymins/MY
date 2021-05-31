@@ -276,5 +276,5 @@ local settings = {
 		},
 	},
 }
-MY_LockFrame = LIB.GeneGlobalNS(settings)
+MY_LockFrame = LIB.CreateModule(settings)
 end

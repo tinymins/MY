@@ -326,5 +326,5 @@ local settings = {
 		},
 	},
 }
-MY_AutoHideChat = LIB.GeneGlobalNS(settings)
+MY_AutoHideChat = LIB.CreateModule(settings)
 end

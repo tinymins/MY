@@ -779,5 +779,5 @@ local settings = {
 		},
 	},
 }
-MY_TargetMonConfig = LIB.GeneGlobalNS(settings)
+MY_TargetMonConfig = LIB.CreateModule(settings)
 end

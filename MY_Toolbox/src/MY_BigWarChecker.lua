@@ -244,5 +244,5 @@ local settings = {
 		},
 	},
 }
-MY_BigWarChecker = LIB.GeneGlobalNS(settings)
+MY_BigWarChecker = LIB.CreateModule(settings)
 end

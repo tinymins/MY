@@ -138,5 +138,5 @@ local settings = {
 		},
 	},
 }
-MY_DialogNameLink = LIB.GeneGlobalNS(settings)
+MY_DialogNameLink = LIB.CreateModule(settings)
 end

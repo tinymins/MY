@@ -243,5 +243,5 @@ local settings = {
 		},
 	},
 }
-MY_ChangGeShadow = LIB.GeneGlobalNS(settings)
+MY_ChangGeShadow = LIB.CreateModule(settings)
 end

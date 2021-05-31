@@ -1288,7 +1288,7 @@ local settings = {
 		},
 	},
 }
-MY_RoleStatistics.RegisterModule('TaskStat', _L['MY_RoleStatistics_TaskStat'], LIB.GeneGlobalNS(settings))
+MY_RoleStatistics.RegisterModule('TaskStat', _L['MY_RoleStatistics_TaskStat'], LIB.CreateModule(settings))
 end
 
 -- Global exports
@@ -1325,5 +1325,5 @@ local settings = {
 		},
 	},
 }
-MY_RoleStatistics_TaskStat = LIB.GeneGlobalNS(settings)
+MY_RoleStatistics_TaskStat = LIB.CreateModule(settings)
 end

@@ -282,5 +282,5 @@ local settings = {
 		},
 	},
 }
-MY_TargetLine = LIB.GeneGlobalNS(settings)
+MY_TargetLine = LIB.CreateModule(settings)
 end

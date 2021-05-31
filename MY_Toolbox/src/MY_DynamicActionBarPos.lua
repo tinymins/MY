@@ -240,5 +240,5 @@ local settings = {
 		},
 	},
 }
-MY_DynamicActionBarPos = LIB.GeneGlobalNS(settings)
+MY_DynamicActionBarPos = LIB.CreateModule(settings)
 end

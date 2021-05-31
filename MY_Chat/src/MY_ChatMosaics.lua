@@ -196,7 +196,7 @@ local settings = {
 		},
 	},
 }
-MY_ChatMosaics = LIB.GeneGlobalNS(settings)
+MY_ChatMosaics = LIB.CreateModule(settings)
 end
 
 local PS = {}

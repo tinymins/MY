@@ -421,5 +421,5 @@ local settings = {
 		},
 	},
 }
-MY_BagSort = LIB.GeneGlobalNS(settings)
+MY_BagSort = LIB.CreateModule(settings)
 end

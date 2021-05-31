@@ -639,5 +639,5 @@ local settings = {
 		},
 	},
 }
-MY_Taoguan = LIB.GeneGlobalNS(settings)
+MY_Taoguan = LIB.CreateModule(settings)
 end

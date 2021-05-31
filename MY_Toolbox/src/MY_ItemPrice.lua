@@ -144,7 +144,7 @@ local settings = {
 		},
 	},
 }
-MY_ItemPrice = LIB.GeneGlobalNS(settings)
+MY_ItemPrice = LIB.CreateModule(settings)
 end
 
 Box_AppendAddonMenu({function(box)

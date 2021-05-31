@@ -365,5 +365,5 @@ local settings = {
 		},
 	},
 }
-MY_JBAchievementRank = LIB.GeneGlobalNS(settings)
+MY_JBAchievementRank = LIB.CreateModule(settings)
 end

@@ -618,5 +618,5 @@ local settings = {
 		},
 	},
 }
-MY_ChatSwitch = LIB.GeneGlobalNS(settings)
+MY_ChatSwitch = LIB.CreateModule(settings)
 end

@@ -408,7 +408,7 @@ local settings = {
 		},
 	},
 }
-MY_TeamTools = LIB.GeneGlobalNS(settings)
+MY_TeamTools = LIB.CreateModule(settings)
 end
 
 do

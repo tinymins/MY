@@ -250,5 +250,5 @@ local settings = {
 		},
 	},
 }
-MY_JBBind = LIB.GeneGlobalNS(settings)
+MY_JBBind = LIB.CreateModule(settings)
 end

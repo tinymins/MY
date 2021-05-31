@@ -110,5 +110,5 @@ local settings = {
 		},
 	},
 }
-MY_MibaoHelper = LIB.GeneGlobalNS(settings)
+MY_MibaoHelper = LIB.CreateModule(settings)
 end

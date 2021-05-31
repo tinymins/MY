@@ -828,5 +828,5 @@ local settings = {
 		},
 	},
 }
-MY_GKPDoodad = LIB.GeneGlobalNS(settings)
+MY_GKPDoodad = LIB.CreateModule(settings)
 end

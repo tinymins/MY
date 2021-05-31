@@ -110,5 +110,5 @@ local settings = {
 		},
 	},
 }
-MY_HideAnnounceBg = LIB.GeneGlobalNS(settings)
+MY_HideAnnounceBg = LIB.CreateModule(settings)
 end

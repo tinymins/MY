@@ -313,5 +313,5 @@ local settings = {
 		},
 	},
 }
-MY_GKP_AuctionUI = LIB.GeneGlobalNS(settings)
+MY_GKP_AuctionUI = LIB.CreateModule(settings)
 end

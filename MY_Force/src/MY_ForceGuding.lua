@@ -327,5 +327,5 @@ local settings = {
 		},
 	},
 }
-MY_ForceGuding = LIB.GeneGlobalNS(settings)
+MY_ForceGuding = LIB.CreateModule(settings)
 end

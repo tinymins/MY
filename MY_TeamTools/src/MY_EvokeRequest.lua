@@ -222,7 +222,7 @@ local settings = {
 		},
 	},
 }
-MY_EvokeRequest = LIB.GeneGlobalNS(settings)
+MY_EvokeRequest = LIB.CreateModule(settings)
 end
 
 --------------------------------------------------------------------------------

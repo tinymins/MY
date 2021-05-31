@@ -406,7 +406,7 @@ local settings = {
 		},
 	},
 }
-MY_ChatLog = LIB.GeneGlobalNS(settings)
+MY_ChatLog = LIB.CreateModule(settings)
 end
 
 -- ===== –‘ƒ‹≤‚ ‘ =====

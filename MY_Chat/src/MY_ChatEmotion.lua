@@ -135,5 +135,5 @@ local settings = {
 		},
 	},
 }
-MY_ChatEmotion = LIB.GeneGlobalNS(settings)
+MY_ChatEmotion = LIB.CreateModule(settings)
 end

@@ -1167,7 +1167,7 @@ local settings = {
 		},
 	},
 }
-MY_TeamTools.RegisterModule('Summary', _L['MY_TeamTools_Summary'], LIB.GeneGlobalNS(settings))
+MY_TeamTools.RegisterModule('Summary', _L['MY_TeamTools_Summary'], LIB.CreateModule(settings))
 end
 
 -- Global exports
@@ -1180,5 +1180,5 @@ local settings = {
 		},
 	},
 }
-MY_TeamTools_Summary = LIB.GeneGlobalNS(settings)
+MY_TeamTools_Summary = LIB.CreateModule(settings)
 end

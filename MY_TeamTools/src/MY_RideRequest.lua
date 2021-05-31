@@ -385,7 +385,7 @@ local settings = {
 		},
 	},
 }
-MY_RideRequest = LIB.GeneGlobalNS(settings)
+MY_RideRequest = LIB.CreateModule(settings)
 end
 
 --------------------------------------------------------------------------------

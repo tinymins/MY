@@ -295,7 +295,7 @@ local settings = {
 		},
 	},
 }
-MY_Force = LIB.GeneGlobalNS(settings)
+MY_Force = LIB.CreateModule(settings)
 end
 
 -------------------------------------

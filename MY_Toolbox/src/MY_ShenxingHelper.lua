@@ -365,5 +365,5 @@ local settings = {
 		},
 	},
 }
-MY_ShenxingHelper = LIB.GeneGlobalNS(settings)
+MY_ShenxingHelper = LIB.CreateModule(settings)
 end

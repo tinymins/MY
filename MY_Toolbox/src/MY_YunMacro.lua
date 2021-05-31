@@ -232,5 +232,5 @@ local settings = {
 		},
 	},
 }
-MY_YunMacro = LIB.GeneGlobalNS(settings)
+MY_YunMacro = LIB.CreateModule(settings)
 end

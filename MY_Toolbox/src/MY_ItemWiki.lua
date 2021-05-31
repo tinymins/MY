@@ -137,7 +137,7 @@ local settings = {
 		},
 	},
 }
-MY_ItemWiki = LIB.GeneGlobalNS(settings)
+MY_ItemWiki = LIB.CreateModule(settings)
 end
 
 Box_AppendAddonMenu({function(box)

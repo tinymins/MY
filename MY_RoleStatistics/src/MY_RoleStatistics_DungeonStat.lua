@@ -987,7 +987,7 @@ local settings = {
 		},
 	},
 }
-MY_RoleStatistics.RegisterModule('DungeonStat', _L['MY_RoleStatistics_DungeonStat'], LIB.GeneGlobalNS(settings))
+MY_RoleStatistics.RegisterModule('DungeonStat', _L['MY_RoleStatistics_DungeonStat'], LIB.CreateModule(settings))
 end
 
 -- Global exports
@@ -1024,5 +1024,5 @@ local settings = {
 		},
 	},
 }
-MY_RoleStatistics_DungeonStat = LIB.GeneGlobalNS(settings)
+MY_RoleStatistics_DungeonStat = LIB.CreateModule(settings)
 end

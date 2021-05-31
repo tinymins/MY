@@ -636,5 +636,5 @@ local settings = {
 		},
 	},
 }
-MY_GKP_MI = LIB.GeneGlobalNS(settings)
+MY_GKP_MI = LIB.CreateModule(settings)
 end

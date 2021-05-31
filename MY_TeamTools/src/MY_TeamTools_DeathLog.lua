@@ -482,7 +482,7 @@ local settings = {
 		},
 	},
 }
-MY_TeamTools.RegisterModule('DeathLog', _L['MY_TeamTools_DeathLog'], LIB.GeneGlobalNS(settings))
+MY_TeamTools.RegisterModule('DeathLog', _L['MY_TeamTools_DeathLog'], LIB.CreateModule(settings))
 end
 
 -- Global exports
@@ -497,5 +497,5 @@ local settings = {
 		},
 	},
 }
-MY_TeamTools_DeathLog = LIB.GeneGlobalNS(settings)
+MY_TeamTools_DeathLog = LIB.CreateModule(settings)
 end

@@ -1040,5 +1040,5 @@ local settings = {
 		},
 	},
 }
-MY_Love = LIB.GeneGlobalNS(settings)
+MY_Love = LIB.CreateModule(settings)
 end

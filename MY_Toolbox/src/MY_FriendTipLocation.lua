@@ -157,5 +157,5 @@ local settings = {
 		},
 	},
 }
-MY_FriendTipLocation = LIB.GeneGlobalNS(settings)
+MY_FriendTipLocation = LIB.CreateModule(settings)
 end

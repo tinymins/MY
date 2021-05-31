@@ -244,5 +244,5 @@ local settings = {
 		},
 	},
 }
-MY_Memo = LIB.GeneGlobalNS(settings)
+MY_Memo = LIB.CreateModule(settings)
 end

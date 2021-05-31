@@ -795,5 +795,5 @@ local settings = {
 		},
 	},
 }
-MY_CombatLogs = LIB.GeneGlobalNS(settings)
+MY_CombatLogs = LIB.CreateModule(settings)
 end

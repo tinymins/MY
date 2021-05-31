@@ -173,5 +173,5 @@ local settings = {
 		},
 	},
 }
-MY_GongzhanCheck = LIB.GeneGlobalNS(settings)
+MY_GongzhanCheck = LIB.CreateModule(settings)
 end

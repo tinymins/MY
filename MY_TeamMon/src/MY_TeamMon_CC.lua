@@ -420,5 +420,5 @@ local settings = {
 		},
 	},
 }
-MY_TeamMon_CC = LIB.GeneGlobalNS(settings)
+MY_TeamMon_CC = LIB.CreateModule(settings)
 end

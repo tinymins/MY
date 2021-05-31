@@ -433,5 +433,5 @@ local settings = {
 		},
 	},
 }
-MY_TeamRestore = LIB.GeneGlobalNS(settings)
+MY_TeamRestore = LIB.CreateModule(settings)
 end

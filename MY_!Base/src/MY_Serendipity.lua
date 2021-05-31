@@ -451,5 +451,5 @@ local settings = {
 		},
 	},
 }
-MY_Serendipity = LIB.GeneGlobalNS(settings)
+MY_Serendipity = LIB.CreateModule(settings)
 end
