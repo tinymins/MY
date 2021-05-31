@@ -92,6 +92,7 @@ local BUTTON_STYLE_CONFIG = {
 	DEFAULT = {
 		nWidth = 100,
 		nHeight = 26,
+		nMarginBottom = -3,
 		nPaddingBottom = 3,
 		szImage = 'ui/Image/UICommon/CommonPanel.UITex',
 		nNormalGroup = 25,
@@ -389,6 +390,14 @@ local function GetComponentElement(raw, elementType)
 	elseif elementType == 'BOX' then -- 获取游戏盒子UI实例
 		if componentType == 'Box' then
 			element = raw
+		end
+	elseif elementType == 'INNER_RAW' then -- 获取可设置内部大小的子组件
+		if componentType == 'WndTrackbar' then
+			element = raw:Lookup('WndNewScrollBar_Default')
+		elseif componentType == 'CheckBox' then
+			element = raw:Lookup('Image_Default')
+		elseif componentType == 'ColorBox' then
+			element = raw:Lookup('Shadow_Default')
 		end
 	end
 	return element
@@ -1237,8 +1246,8 @@ local _tItemXML = {
 	['Box'] = '<box>w=48 h=48 eventid=525311 </box>',
 	['Shadow'] = '<shadow>w=15 h=15 eventid=277 </shadow>',
 	['Handle'] = '<handle>firstpostype=0 w=10 h=10 </handle>',
-	['CheckBox'] = '<handle>name="CheckBox" w=100 h=28 <image>name="Image_Default" w=28 h=28 path="ui\\Image\\button\\CommonButton_1.UITex" frame=5 </image><text>name="Text_Default" font=162 valign=1 showall=0 autoetc=1 x=29 w=71 h=28 </text></handle>',
-	['ColorBox'] = '<handle>name="ColorBox" w=100 h=28 eventid=277 <shadow>name="Shadow_Default" w=28 h=28 </shadow><text>name="Text_Default" font=162 valign=1 showall=0 autoetc=1 x=29 w=71 h=28 </text></handle>',
+	['CheckBox'] = '<handle>name="CheckBox" firstpostype=0 w=100 h=28 <image>name="Image_Default" w=28 h=28 path="ui\\Image\\button\\CommonButton_1.UITex" frame=5 </image><text>name="Text_Default" font=162 valign=1 showall=0 x=29 w=71 h=28 </text></handle>',
+	['ColorBox'] = '<handle>name="ColorBox" firstpostype=0 w=100 h=28 eventid=277 <shadow>name="Shadow_Default" w=28 h=28 </shadow><text>name="Text_Default" font=162 valign=1 showall=0 x=29 w=71 h=28 </text></handle>',
 }
 local _nTempWndCount = 0
 -- append
@@ -2629,24 +2638,24 @@ end
 end
 
 -- (number) Instance:Width()
--- (self) Instance:Width(number)
+-- (self) Instance:Width(number[, number])
 function OO:Width(nWidth, nRawWidth)
 	if nWidth then
 		return self:Size(nWidth, nil, nRawWidth, nil)
 	else
-		local w, h = self:Size()
-		return w
+		local w, h, rw, rh = self:Size()
+		return w, rw
 	end
 end
 
 -- (number) Instance:Height()
--- (self) Instance:Height(number)
+-- (self) Instance:Height(number[, number])
 function OO:Height(nHeight, nRawHeight)
 	if nHeight then
 		return self:Size(nil, nHeight, nil, nRawHeight)
 	else
-		local w, h = self:Size()
-		return h
+		local w, h, rw, rh = self:Size()
+		return h, rh
 	end
 end
 
@@ -2829,11 +2838,19 @@ local function SetComponentSize(raw, nOuterWidth, nOuterHeight, nInnerWidth, nIn
 		local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
 		local sha = GetComponentElement(raw, 'SHADOW')
 		local txt = GetComponentElement(raw, 'TEXT')
-		local nGap = min(nHeight * 0.3, 8)
-		nWidth = max(nWidth, nHeight + nGap)
-		sha:SetSize(nHeight, nHeight)
-		txt:SetSize(nWidth - nHeight - nGap, nHeight)
-		txt:SetRelPos(nHeight + nGap, 0)
+		local inner = GetComponentElement(raw, 'INNER_RAW')
+		if not nInnerWidth then
+			nInnerWidth = nHeight
+		end
+		if not nInnerHeight then
+			nInnerHeight = nHeight
+		end
+		local nGap = min(nInnerWidth * 0.3, 8)
+		nWidth = max(nWidth, nInnerWidth + nGap)
+		sha:SetSize(nInnerWidth, nInnerHeight)
+		sha:SetRelPos(0, (nHeight - nInnerHeight) / 2)
+		txt:SetSize(nWidth - nInnerWidth - nGap, nHeight)
+		txt:SetRelPos(nInnerWidth + nGap, 0)
 		hdl:SetSize(nWidth, nHeight)
 		hdl:FormatAllItemPos()
 	elseif componentType == 'WndComboBox' then
@@ -2958,25 +2975,37 @@ end
 -- (number, number) Instance:Size(bInnerSize)
 -- (self) Instance:Size(nLeft, nTop)
 -- (self) Instance:Size(OnSizeChanged)
-function OO:Size(arg0, arg1, arg2, arg3)
+function OO:Size(...)
 	self:_checksum()
-	if arg0 == 'auto' and arg1 == 'auto' then
-		return self:AutoSize()
-	elseif arg0 == 'auto' then
-		arg0 = nil
-		self:AutoWidth()
-	elseif arg1 == 'auto' then
-		arg1 = nil
-		self:AutoHeight()
-	end
-	if IsFunction(arg0) then
-		for _, raw in ipairs(self.raws) do
-			UI(raw):UIEvent('OnSizeChanged', arg0)
-		end
-		return self
-	elseif IsNumber(arg0) or IsNumber(arg1) or IsNumber(arg2) or IsNumber(arg3) then
-		for _, raw in ipairs(self.raws) do
-			SetComponentSize(raw, arg0 or raw:GetW(), arg1 or raw:GetH(), arg2, arg3)
+	if select('#', ...) > 0 then
+		local arg0, arg1, arg2, arg3 = ...
+		if IsFunction(arg0) then
+			for _, raw in ipairs(self.raws) do
+				UI(raw):UIEvent('OnSizeChanged', arg0)
+			end
+		else
+			local nWidth, nHeight = arg0, arg1
+			local nRawWidth, nRawHeight = arg2, arg3
+			local bAutoWidth = nWidth == 'auto'
+			local bAutoHeight = nHeight == 'auto'
+			if bAutoWidth then
+				nWidth = nil
+			end
+			if bAutoHeight then
+				nHeight = nil
+			end
+			if IsNumber(nWidth) or IsNumber(nHeight) or IsNumber(nRawWidth) or IsNumber(nRawHeight) then
+				for _, raw in ipairs(self.raws) do
+					SetComponentSize(raw, nWidth or raw:GetW(), nHeight or raw:GetH(), nRawWidth, nRawHeight)
+				end
+			end
+			if bAutoWidth and bAutoHeight then
+				self:AutoSize()
+			elseif bAutoWidth then
+				self:AutoWidth()
+			elseif bAutoHeight then
+				self:AutoHeight()
+			end
 		end
 		return self
 	else
@@ -2991,7 +3020,7 @@ function OO:Size(arg0, arg1, arg2, arg3)
 			if raw.GetSize then
 				w, h = raw:GetSize()
 			end
-			raw = GetComponentElement(raw, 'TRACKBAR')
+			raw = GetComponentElement(raw, 'INNER_RAW')
 			if raw then
 				rw, rh = raw:GetSize()
 			end
@@ -3081,6 +3110,9 @@ local function AutoSize(raw, bAutoWidth, bAutoHeight)
 		or componentType == 'WndTrackbar'
 		or componentType == 'CheckBox'
 		or componentType == 'ColorBox' then
+			local bWillAffectRaw = componentType == 'WndCheckBox'
+				or componentType == 'WndRadioBox'
+				or componentType == 'WndComboBox'
 			local txt = GetComponentElement(raw, 'TEXT')
 			if txt then
 				local ui = UI(raw)
@@ -3091,13 +3123,13 @@ local function AutoSize(raw, bAutoWidth, bAutoHeight)
 				local deltaW = txt:GetW() - oW
 				local deltaH = txt:GetH() - oH
 				if bAutoWidth then
-					if RW then
+					if RW and bWillAffectRaw then
 						RW = RW + deltaW
 					end
 					W = W + deltaW
 				end
 				if bAutoHeight then
-					if RH then
+					if RH and bWillAffectRaw then
 						RH = RH + deltaH
 					end
 					H = H + deltaH
