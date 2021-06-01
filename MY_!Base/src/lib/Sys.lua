@@ -785,16 +785,24 @@ function LIB.RegisterUserSettings(szKey, tOption)
 	if not szDataKey then
 		szDataKey = szKey
 	end
-	assert(IsString(szKey) and #szKey > 0, 'RegisterUserSettings: `Key` should be a non-empty string value.')
-	assert(not USER_SETTINGS_INFO[szKey], 'RegisterUserSettings: duplicated `Key` found.')
-	assert(IsString(szDataKey) and #szDataKey > 0, 'RegisterUserSettings: `DataKey` should be a non-empty string value.')
-	assert(not lodash.some(USER_SETTINGS_INFO, function(p) return p.szDataKey == szDataKey and p.ePathType == ePathType end), 'RegisterUserSettings: duplicated `DataKey` + `PathType` found.')
-	assert(lodash.includes(DATABASE_TYPE_LIST, ePathType), 'RegisterUserSettings: `PathType` value is not valid.')
-	assert(IsNil(szGroup) or (IsString(szGroup) and #szGroup > 0), 'RegisterUserSettings: `Group` should be nil or a non-empty string value.')
-	assert(IsNil(szLabel) or (IsString(szLabel) and #szLabel > 0), 'RegisterUserSettings: `Label` should be nil or a non-empty string value.')
-	assert(IsNil(szVersion) or IsString(szVersion) or IsNumber(szVersion), 'RegisterUserSettings: `Version` should be a nil, string or number value.')
+	local szErrHeader = 'RegisterUserSettings KEY(' .. EncodeLUAData(szKey) .. '): '
+	assert(IsString(szKey) and #szKey > 0, szErrHeader .. '`Key` should be a non-empty string value.')
+	assert(not USER_SETTINGS_INFO[szKey], szErrHeader .. 'duplicated `Key` found.')
+	assert(IsString(szDataKey) and #szDataKey > 0, szErrHeader .. '`DataKey` should be a non-empty string value.')
+	assert(not lodash.some(USER_SETTINGS_INFO, function(p) return p.szDataKey == szDataKey and p.ePathType == ePathType end), szErrHeader .. 'duplicated `DataKey` + `PathType` found.')
+	assert(lodash.includes(DATABASE_TYPE_LIST, ePathType), szErrHeader .. '`PathType` value is not valid.')
+	assert(IsNil(szGroup) or (IsString(szGroup) and #szGroup > 0), szErrHeader .. '`Group` should be nil or a non-empty string value.')
+	assert(IsNil(szLabel) or (IsString(szLabel) and #szLabel > 0), szErrHeader .. '`Label` should be nil or a non-empty string value.')
+	assert(IsNil(szVersion) or IsString(szVersion) or IsNumber(szVersion), szErrHeader .. '`Version` should be a nil, string or number value.')
 	if xSchema then
-		assert(not Schema.CheckSchema(xDefaultValue, xSchema), 'RegisterUserSettings: `DefaultValue` cannot pass `Schema` check.')
+		local errs = Schema.CheckSchema(xDefaultValue, xSchema)
+		if errs then
+			local aErrmsgs = {}
+			for i, err in ipairs(errs) do
+				insert(aErrmsgs, '  ' .. i .. '. ' .. err.message)
+			end
+			assert(false, szErrHeader .. '`DefaultValue` cannot pass `Schema` check.' .. '\n' .. concat(aErrmsgs, '\n'))
+		end
 	end
 	USER_SETTINGS_INFO[szKey] = {
 		szKey = szKey,
