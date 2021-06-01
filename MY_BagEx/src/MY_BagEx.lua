@@ -451,7 +451,7 @@ local settings = {
 	exports = {
 		{
 			fields = {
-				OnPanelActivePartial = OnPanelActivePartial,
+				OnPanelActivePartial = D.OnPanelActivePartial,
 			},
 		},
 	},
