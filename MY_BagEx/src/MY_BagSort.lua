@@ -54,9 +54,15 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
-local D = {}
-local O = {
-	bGuildBank = true,
+local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['MY_BagEx'], {
+	bGuildBank = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['Guild package sort and stack settings'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+})
+local D = {
 	-- ÎïÆ·ÅÅÐòË³Ðò
 	aGenre = {
 		[ITEM_GENRE.TASK_ITEM] = 1,
@@ -135,12 +141,12 @@ function D.ItemSorter(a, b)
 	if not b.dwID then
 		return true
 	end
-	local gA, gB = O.aGenre[a.nGenre] or (100 + a.nGenre), O.aGenre[b.nGenre] or (100 + b.nGenre)
+	local gA, gB = D.aGenre[a.nGenre] or (100 + a.nGenre), D.aGenre[b.nGenre] or (100 + b.nGenre)
 	if gA == gB then
 		if b.nUiId == a.nUiId and b.bCanStack then
 			return a.nStackNum > b.nStackNum
 		elseif a.nGenre == ITEM_GENRE.EQUIPMENT then
-			local sA, sB = O.aSub[a.nSub] or (100 + a.nSub), O.aSub[b.nSub] or (100 + b.nSub)
+			local sA, sB = D.aSub[a.nSub] or (100 + a.nSub), D.aSub[b.nSub] or (100 + b.nSub)
 			if sA == sB then
 				if b.nSub == EQUIPMENT_SUB.MELEE_WEAPON or b.nSub == EQUIPMENT_SUB.RANGE_WEAPON then
 					if a.nDetail < b.nDetail then
@@ -377,9 +383,10 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, w = 200,
 		text = _L['Guild package sort and stack'],
-		checked = MY_BagSort.bGuildBank,
+		checked = O.bGuildBank,
 		oncheck = function(bChecked)
-			MY_BagSort.bGuildBank = bChecked
+			O.bGuildBank = bChecked
+			D.CheckInjection()
 		end,
 	}):AutoWidth():Width() + 5
 	x = X
@@ -401,23 +408,6 @@ local settings = {
 			fields = {
 				OnPanelActivePartial = D.OnPanelActivePartial,
 			},
-		},
-		{
-			fields = {
-				bGuildBank = true,
-			},
-			root = O,
-		},
-	},
-	imports = {
-		{
-			fields = {
-				bGuildBank = true,
-			},
-			triggers = {
-				bGuildBank = D.CheckInjection,
-			},
-			root = O,
 		},
 	},
 }

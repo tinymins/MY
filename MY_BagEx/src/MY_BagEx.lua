@@ -58,7 +58,7 @@ local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['MY_BagEx'], {
 	bEnable = {
 		ePathType = PATH_TYPE.ROLE,
 		szLabel = _L['Bag search settings'],
-		xSchema = Schema.Number,
+		xSchema = Schema.Boolean,
 		xDefaultValue = true,
 	},
 })

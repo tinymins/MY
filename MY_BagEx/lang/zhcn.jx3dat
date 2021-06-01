@@ -1,6 +1,7 @@
 return {
     ['MY_BagEx'] = '背包助手',
     ['Bag search settings'] = '背包搜索设置',
+    ['Guild package sort and stack settings'] = '帮会仓库整理与堆叠设置',
 
     ['MY_BagSort'] = '背包整理',
     ['Guild box closed or page changed, sort exited!'] = '帮会仓库已关闭或页码发生变化，停止整理！',
