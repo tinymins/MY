@@ -53,25 +53,51 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 	return
 end
 --------------------------------------------------------------------------
-MY_ChatCopy = {}
-MY_ChatCopy.bChatCopy = true
-MY_ChatCopy.bChatTime = true
-MY_ChatCopy.eChatTime = 'HOUR_MIN_SEC'
-MY_ChatCopy.bChatCopyAlwaysShowMask = false
-MY_ChatCopy.bChatCopyAlwaysWhite = false
-MY_ChatCopy.bChatCopyNoCopySysmsg = false
-RegisterCustomData('MY_ChatCopy.bChatCopy')
-RegisterCustomData('MY_ChatCopy.bChatTime')
-RegisterCustomData('MY_ChatCopy.eChatTime')
-RegisterCustomData('MY_ChatCopy.bChatCopyAlwaysShowMask')
-RegisterCustomData('MY_ChatCopy.bChatCopyAlwaysWhite')
-RegisterCustomData('MY_ChatCopy.bChatCopyNoCopySysmsg')
+local O = LIB.CreateUserSettingsModule('MY_ChatCopy', _L['MY_Chat'], {
+	bChatCopy = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ChatCopy'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bChatTime = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ChatCopy'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	eChatTime = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ChatCopy'],
+		xSchema = Schema.String,
+		xDefaultValue = 'HOUR_MIN_SEC',
+	},
+	bChatCopyAlwaysShowMask = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ChatCopy'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bChatCopyAlwaysWhite = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ChatCopy'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bChatCopyNoCopySysmsg = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ChatCopy'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+})
+local D = {}
 
 local function onNewChatLine(h, i, szMsg, szChannel, dwTime, nR, nG, nB)
-	if szMsg and i and h:GetItemCount() > i and (MY_ChatCopy.bChatTime or MY_ChatCopy.bChatCopy) then
+	if szMsg and i and h:GetItemCount() > i and (O.bChatTime or O.bChatCopy) then
 		-- chat time
 		-- check if timestrap can insert
-		if MY_ChatCopy.bChatCopyNoCopySysmsg and szChannel == 'SYS_MSG' then
+		if O.bChatCopyNoCopySysmsg and szChannel == 'SYS_MSG' then
 			return
 		end
 		-- create timestrap text
@@ -83,17 +109,17 @@ local function onNewChatLine(h, i, szMsg, szChannel, dwTime, nR, nG, nB)
 				break
 			end
 		end
-		if MY_ChatCopy.bChatCopy and (MY_ChatCopy.bChatCopyAlwaysShowMask or not MY_ChatCopy.bChatTime) then
+		if O.bChatCopy and (O.bChatCopyAlwaysShowMask or not O.bChatTime) then
 			local _r, _g, _b = nR, nG, nB
-			if MY_ChatCopy.bChatCopyAlwaysWhite then
+			if O.bChatCopyAlwaysWhite then
 				_r, _g, _b = 255, 255, 255
 			end
 			szTime = LIB.GetChatCopyXML(_L[' * '], { r = _r, g = _g, b = _b, richtext = szMsg })
-		elseif MY_ChatCopy.bChatCopyAlwaysWhite then
+		elseif O.bChatCopyAlwaysWhite then
 			nR, nG, nB = 255, 255, 255
 		end
-		if MY_ChatCopy.bChatTime then
-			if MY_ChatCopy.eChatTime == 'HOUR_MIN_SEC' then
+		if O.bChatTime then
+			if O.eChatTime == 'HOUR_MIN_SEC' then
 				szTime = szTime .. LIB.GetChatTimeXML(dwTime, {
 					r = nR, g = nG, b = nB, f = 10,
 					s = '[%hh:%mm:%ss]', richtext = szMsg,
@@ -111,14 +137,14 @@ local function onNewChatLine(h, i, szMsg, szChannel, dwTime, nR, nG, nB)
 end
 LIB.HookChatPanel('AFTER.MY_ChatCopy', onNewChatLine)
 
-function MY_ChatCopy.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
+function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 	x = X
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 250,
 		text = _L['chat copy'],
-		checked = MY_ChatCopy.bChatCopy,
+		checked = O.bChatCopy,
 		oncheck = function(bChecked)
-			MY_ChatCopy.bChatCopy = bChecked
+			O.bChatCopy = bChecked
 		end,
 	})
 	y = y + deltaY
@@ -126,12 +152,12 @@ function MY_ChatCopy.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, w = 250,
 		text = _L['chat time'],
-		checked = MY_ChatCopy.bChatTime,
+		checked = O.bChatTime,
 		oncheck = function(bChecked)
 			if bChecked and _G.HM_ToolBox then
 				_G.HM_ToolBox.bChatTime = false
 			end
-			MY_ChatCopy.bChatTime = bChecked
+			O.bChatTime = bChecked
 		end,
 	}):AutoWidth():Width()
 
@@ -142,22 +168,22 @@ function MY_ChatCopy.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 			return {{
 				szOption = _L['hh:mm'],
 				bMCheck = true,
-				bChecked = MY_ChatCopy.eChatTime == 'HOUR_MIN',
+				bChecked = O.eChatTime == 'HOUR_MIN',
 				fnAction = function()
-					MY_ChatCopy.eChatTime = 'HOUR_MIN'
+					O.eChatTime = 'HOUR_MIN'
 				end,
 				fnDisable = function()
-					return not MY_ChatCopy.bChatTime
+					return not O.bChatTime
 				end,
 			},{
 				szOption = _L['hh:mm:ss'],
 				bMCheck = true,
-				bChecked = MY_ChatCopy.eChatTime == 'HOUR_MIN_SEC',
+				bChecked = O.eChatTime == 'HOUR_MIN_SEC',
 				fnAction = function()
-					MY_ChatCopy.eChatTime = 'HOUR_MIN_SEC'
+					O.eChatTime = 'HOUR_MIN_SEC'
 				end,
 				fnDisable = function()
-					return not MY_ChatCopy.bChatTime
+					return not O.bChatTime
 				end,
 			}}
 		end,
@@ -168,12 +194,12 @@ function MY_ChatCopy.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 250,
 		text = _L['always show *'],
-		checked = MY_ChatCopy.bChatCopyAlwaysShowMask,
+		checked = O.bChatCopyAlwaysShowMask,
 		oncheck = function(bChecked)
-			MY_ChatCopy.bChatCopyAlwaysShowMask = bChecked
+			O.bChatCopyAlwaysShowMask = bChecked
 		end,
 		isdisable = function()
-			return not MY_ChatCopy.bChatCopy
+			return not O.bChatCopy
 		end,
 	})
 	y = y + deltaY
@@ -181,12 +207,12 @@ function MY_ChatCopy.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 250,
 		text = _L['always be white'],
-		checked = MY_ChatCopy.bChatCopyAlwaysWhite,
+		checked = O.bChatCopyAlwaysWhite,
 		oncheck = function(bChecked)
-			MY_ChatCopy.bChatCopyAlwaysWhite = bChecked
+			O.bChatCopyAlwaysWhite = bChecked
 		end,
 		isdisable = function()
-			return not MY_ChatCopy.bChatCopy
+			return not O.bChatCopy
 		end,
 	})
 	y = y + deltaY
@@ -194,15 +220,29 @@ function MY_ChatCopy.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 250,
 		text = _L['hide system msg copy'],
-		checked = MY_ChatCopy.bChatCopyNoCopySysmsg,
+		checked = O.bChatCopyNoCopySysmsg,
 		oncheck = function(bChecked)
-			MY_ChatCopy.bChatCopyNoCopySysmsg = bChecked
+			O.bChatCopyNoCopySysmsg = bChecked
 		end,
 		isdisable = function()
-			return not MY_ChatCopy.bChatCopy
+			return not O.bChatCopy
 		end,
 	})
 	y = y + deltaY
 
 	return x, y
+end
+
+-- Global exports
+do
+local settings = {
+	exports = {
+		{
+			fields = {
+				OnPanelActivePartial = D.OnPanelActivePartial,
+			},
+		},
+	},
+}
+MY_ChatCopy = LIB.CreateModule(settings)
 end
