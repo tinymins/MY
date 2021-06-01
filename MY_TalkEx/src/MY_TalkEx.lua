@@ -56,75 +56,64 @@ end
 local D = {
 	dwTalkTick = 0,
 }
-local O = {}
-
-LIB.RegisterUserSettings('MY_TalkEx.szTalkText', {
-	ePathType = PATH_TYPE.ROLE,
-	szGroup = _L['MY_TalkEx'],
-	szLabel = _L['TalkText'],
-	xSchema = Schema.String,
-	xDefaultValue = '',
+local O = LIB.CreateUserSettingsModule('MY_TalkEx', _L['MY_TalkEx'], {
+	szTalkText = {
+		ePathType = PATH_TYPE.ROLE,
+		szGroup = _L['MY_TalkEx'],
+		szLabel = _L['TalkText'],
+		xSchema = Schema.String,
+		xDefaultValue = '',
+	},
+	aTalkChannel = {
+		ePathType = PATH_TYPE.ROLE,
+		szGroup = _L['MY_TalkEx'],
+		szLabel = _L['TalkChannels'],
+		xSchema = Schema.Collection(Schema.Number),
+		xDefaultValue = {},
+	},
+	nTrickChannel = {
+		ePathType = PATH_TYPE.ROLE,
+		szGroup = _L['MY_TalkEx'],
+		szLabel = _L['TalkTrick'],
+		xSchema = Schema.Number,
+		xDefaultValue = PLAYER_TALK_CHANNEL.RAID,
+	},
+	szTrickFilter = {
+		ePathType = PATH_TYPE.ROLE,
+		szGroup = _L['MY_TalkEx'],
+		szLabel = _L['TalkTrick'],
+		xSchema = Schema.String,
+		xDefaultValue = 'RAID',
+	},
+	nTrickForce = {
+		ePathType = PATH_TYPE.ROLE,
+		szGroup = _L['MY_TalkEx'],
+		szLabel = _L['TalkTrick'],
+		xSchema = Schema.Number,
+		xDefaultValue = CONSTANT.FORCE_TYPE.CHUN_YANG,
+	},
+	szTrickTextBegin = {
+		ePathType = PATH_TYPE.ROLE,
+		szGroup = _L['MY_TalkEx'],
+		szLabel = _L['TalkTrick'],
+		xSchema = Schema.String,
+		xDefaultValue = _L['$zj look around and have a little thought.'],
+	},
+	szTrickText = {
+		ePathType = PATH_TYPE.ROLE,
+		szGroup = _L['MY_TalkEx'],
+		szLabel = _L['TalkTrick'],
+		xSchema = Schema.String,
+		xDefaultValue = _L['$zj epilate $mb\'s feather clearly.'],
+	},
+	szTrickTextEnd = {
+		ePathType = PATH_TYPE.ROLE,
+		szGroup = _L['MY_TalkEx'],
+		szLabel = _L['TalkTrick'],
+		xSchema = Schema.String,
+		xDefaultValue = _L['$zj collected the feather epilated just now and wanted it sold well.'],
+	},
 })
-LIB.RegisterUserSettings('MY_TalkEx.aTalkChannel', {
-	ePathType = PATH_TYPE.ROLE,
-	szGroup = _L['MY_TalkEx'],
-	szLabel = _L['TalkChannels'],
-	xSchema = Schema.Collection(Schema.Number),
-	xDefaultValue = {},
-})
-LIB.RegisterUserSettings('MY_TalkEx.nTrickChannel', {
-	ePathType = PATH_TYPE.ROLE,
-	szGroup = _L['MY_TalkEx'],
-	szLabel = _L['TalkTrick'],
-	xSchema = Schema.Number,
-	xDefaultValue = PLAYER_TALK_CHANNEL.RAID,
-})
-LIB.RegisterUserSettings('MY_TalkEx.szTrickFilter', {
-	ePathType = PATH_TYPE.ROLE,
-	szGroup = _L['MY_TalkEx'],
-	szLabel = _L['TalkTrick'],
-	xSchema = Schema.String,
-	xDefaultValue = 'RAID',
-})
-LIB.RegisterUserSettings('MY_TalkEx.nTrickForce', {
-	ePathType = PATH_TYPE.ROLE,
-	szGroup = _L['MY_TalkEx'],
-	szLabel = _L['TalkTrick'],
-	xSchema = Schema.Number,
-	xDefaultValue = CONSTANT.FORCE_TYPE.CHUN_YANG,
-})
-LIB.RegisterUserSettings('MY_TalkEx.szTrickTextBegin', {
-	ePathType = PATH_TYPE.ROLE,
-	szGroup = _L['MY_TalkEx'],
-	szLabel = _L['TalkTrick'],
-	xSchema = Schema.String,
-	xDefaultValue = _L['$zj look around and have a little thought.'],
-})
-LIB.RegisterUserSettings('MY_TalkEx.szTrickText', {
-	ePathType = PATH_TYPE.ROLE,
-	szGroup = _L['MY_TalkEx'],
-	szLabel = _L['TalkTrick'],
-	xSchema = Schema.String,
-	xDefaultValue = _L['$zj epilate $mb\'s feather clearly.'],
-})
-LIB.RegisterUserSettings('MY_TalkEx.szTrickTextEnd', {
-	ePathType = PATH_TYPE.ROLE,
-	szGroup = _L['MY_TalkEx'],
-	szLabel = _L['TalkTrick'],
-	xSchema = Schema.String,
-	xDefaultValue = _L['$zj collected the feather epilated just now and wanted it sold well.'],
-})
-
-function D.LoadSettings()
-	O.szTalkText       = LIB.GetUserSettings('MY_TalkEx.szTalkText'      )
-	O.aTalkChannel     = LIB.GetUserSettings('MY_TalkEx.aTalkChannel'    )
-	O.nTrickChannel    = LIB.GetUserSettings('MY_TalkEx.nTrickChannel'   )
-	O.szTrickFilter    = LIB.GetUserSettings('MY_TalkEx.szTrickFilter'   )
-	O.nTrickForce      = LIB.GetUserSettings('MY_TalkEx.nTrickForce'     )
-	O.szTrickTextBegin = LIB.GetUserSettings('MY_TalkEx.szTrickTextBegin')
-	O.szTrickText      = LIB.GetUserSettings('MY_TalkEx.szTrickText'     )
-	O.szTrickTextEnd   = LIB.GetUserSettings('MY_TalkEx.szTrickTextEnd'  )
-end
 
 --------------------------------------------------------------------------
 
@@ -249,7 +238,6 @@ function PS.OnPanelActive(wnd)
 		text = O.szTalkText,
 		onchange = function(text)
 			O.szTalkText = text
-			LIB.SetUserSettings('MY_TalkEx.szTalkText', O.szTalkText)
 		end,
 	})
 	-- 喊话频道
@@ -270,7 +258,7 @@ function PS.OnPanelActive(wnd)
 				if bCheck then
 					insert(O.aTalkChannel, p.nChannel)
 				end
-				LIB.SetUserSettings('MY_TalkEx.aTalkChannel', O.aTalkChannel)
+				O.aTalkChannel = O.aTalkChannel
 			end,
 		})
 	end
@@ -437,7 +425,6 @@ function PS.OnPanelActive(wnd)
 					fnAction = function()
 						ui:Text(p.szLabel)
 						O.szTrickFilter = p.szKey
-						LIB.SetUserSettings('MY_TalkEx.szTrickFilter', O.szTrickFilter)
 						UI.ClosePopupMenu()
 					end,
 				})
@@ -458,7 +445,6 @@ function PS.OnPanelActive(wnd)
 					fnAction = function()
 						ui:Text(p.szLabel)
 						O.nTrickForce = p.dwForceID
-						LIB.SetUserSettings('MY_TalkEx.nTrickForce', O.nTrickForce)
 						UI.ClosePopupMenu()
 					end,
 				})
@@ -476,7 +462,6 @@ function PS.OnPanelActive(wnd)
 		text = O.szTrickTextBegin,
 		onchange = function(szText)
 			O.szTrickTextBegin = szText
-			LIB.SetUserSettings('MY_TalkEx.szTrickTextBegin', O.szTrickTextBegin)
 		end,
 	}):Height() + 5
 	-- 调侃内容输入框：调侃内容
@@ -485,7 +470,6 @@ function PS.OnPanelActive(wnd)
 		multiline = true, text = O.szTrickText,
 		onchange = function(szText)
 			O.szTrickText = szText
-			LIB.SetUserSettings('MY_TalkEx.szTrickText', O.szTrickText)
 		end,
 	}):Height() + 5
 	-- 调侃内容输入框：最后一句
@@ -494,7 +478,6 @@ function PS.OnPanelActive(wnd)
 		text = O.szTrickTextEnd,
 		onchange = function(szText)
 			O.szTrickTextEnd = szText
-			LIB.SetUserSettings('MY_TalkEx.szTrickTextEnd', O.szTrickTextEnd)
 		end,
 	}):Height() + 5
 	-- 调侃发送频道提示框
@@ -515,7 +498,6 @@ function PS.OnPanelActive(wnd)
 						O.nTrickChannel = p.nChannel
 						ui:Text(p.szName)
 						ui:Color(p.tCol)
-						LIB.SetUserSettings('MY_TalkEx.nTrickChannel', O.nTrickChannel)
 						UI.ClosePopupMenu()
 					end,
 				})
