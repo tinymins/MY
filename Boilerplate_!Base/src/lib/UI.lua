@@ -372,7 +372,14 @@ local function GetComponentElement(raw, elementType)
 			end
 		end
 	elseif elementType == 'PLACEHOLDER' then -- 获取占位文本UI实例
-		element = wnd:Lookup('', 'Text_Placeholder')
+		if componentType == 'Handle' or componentType == 'CheckBox' or componentType == 'ColorBox' then
+			element = raw:Lookup('Text_Placeholder')
+		elseif componentBaseType == 'Wnd' then
+			local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
+			if wnd then
+				element = wnd:Lookup('', 'Text_Placeholder')
+			end
+		end
 	elseif elementType == 'IMAGE' then -- 获取图片UI实例
 		if componentType == 'WndEditBox' or componentType == 'WndComboBox' or componentType == 'WndEditComboBox'
 		or componentType == 'WndAutocomplete' or componentType == 'WndScrollBox' then
