@@ -54,9 +54,15 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
-MY_BagEx = {}
-MY_BagEx.bEnable = true
-RegisterCustomData('MY_BagEx.bEnable')
+local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['MY_BagEx'], {
+	bEnable = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['Bag search settings'],
+		xSchema = Schema.Number,
+		xDefaultValue = true,
+	},
+})
+local D = {}
 
 local l_tItemText = {}
 
@@ -385,9 +391,6 @@ local function Unhook()
 end
 
 local function Apply(bEnable)
-	if bEnable == nil then
-		bEnable = MY_BagEx.bEnable
-	end
 	if bEnable then
 		Hook()
 		LIB.RegisterFrameCreate('BigBagPanel.MY_BAGEX', Hook)
@@ -401,9 +404,9 @@ local function Apply(bEnable)
 	end
 end
 
-function MY_BagEx.Enable(bEnable)
-	MY_BagEx.bEnable = bEnable
-	Apply()
+function D.Enable(bEnable)
+	O.bEnable = bEnable
+	Apply(bEnable)
 end
 
 do
@@ -419,25 +422,39 @@ local function OnBagItemUpdate()
 	end
 end
 LIB.RegisterEvent({'BAG_ITEM_UPDATE', 'GUILD_BANK_PANEL_UPDATE', 'LOADING_END'}, function()
-	if not MY_BagEx.bEnable then
+	if not O.bEnable then
 		return
 	end
 	LIB.DelayCall('MY_BagEx', 100, OnBagItemUpdate)
 end)
 end
 
-LIB.RegisterInit('MY_BAGEX', function() Apply() end)
+LIB.RegisterInit('MY_BAGEX', function() Apply(O.bEnable) end)
 LIB.RegisterReload('MY_BAGEX', function() Apply(false) end)
 
-function MY_BagEx.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
+function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, w = 200,
 		text = _L['Package searcher'],
-		checked = MY_BagEx.bEnable,
+		checked = O.bEnable,
 		oncheck = function(bChecked)
-			MY_BagEx.Enable(bChecked)
+			D.Enable(bChecked)
 		end,
 	}):AutoWidth():Width() + 5
 	-- y = y + 25
 	return x, y
+end
+
+-- Global exports
+do
+local settings = {
+	exports = {
+		{
+			fields = {
+				OnPanelActivePartial = OnPanelActivePartial,
+			},
+		},
+	},
+}
+MY_BagEx = LIB.CreateModule(settings)
 end
