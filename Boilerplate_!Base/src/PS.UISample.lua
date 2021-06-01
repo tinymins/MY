@@ -53,7 +53,7 @@ local COMPONENT_SAMPLE = {
 	{'Handle', 'Handle', { w = COMPONENT_H, h = COMPONENT_H }},
 	{'Box', 'Box', { w = COMPONENT_H, h = COMPONENT_H, frame = 233 }},
 	{'Image', 'Image', { w = COMPONENT_H, h = COMPONENT_H, image = PACKET_INFO.POSTER_UITEX, imageframe = GetTime() % PACKET_INFO.POSTER_FRAME_COUNT }},
-	{'WndAutoComplete', 'WndAutoComplete', { w = 200, h = COMPONENT_H, font = 162, text = 'WndAutoComplete' }},
+	{'WndAutocomplete', 'WndAutocomplete', { w = 200, h = COMPONENT_H, font = 162, text = 'WndAutocomplete' }},
 	{'WndButtonBox', 'WndButtonBox', { w = 'auto', h = COMPONENT_H, font = 162, text = 'WndButtonBox' }},
 	{'WndButtonBox Themed', 'WndButtonBox', { w = 'auto', h = COMPONENT_H, font = 162, text = 'WndButtonBox', buttonstyle = 'FLAT' }},
 	{'WndButtonBox Option', 'WndButtonBox', { w = COMPONENT_H, h = COMPONENT_H, font = 162, buttonstyle = 'OPTION' }},
