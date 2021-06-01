@@ -371,6 +371,8 @@ local function GetComponentElement(raw, elementType)
 				element = wnd:Lookup('', 'Text_Default')
 			end
 		end
+	elseif elementType == 'PLACEHOLDER' then -- 获取占位文本UI实例
+		element = wnd:Lookup('', 'Text_Placeholder')
 	elseif elementType == 'IMAGE' then -- 获取图片UI实例
 		if componentType == 'WndEditBox' or componentType == 'WndComboBox' or componentType == 'WndEditComboBox'
 		or componentType == 'WndAutocomplete' or componentType == 'WndScrollBox' then
@@ -2320,10 +2322,19 @@ function OO:Font(nFont)
 			if element then
 				element:SetFontScheme(nFont)
 			end
+			element = GetComponentElement(raw, 'PLACEHOLDER')
+			if element then
+				local r, g, b = element:GetFontColor()
+				element:SetFontScheme(nFont)
+				element:SetFontColor(r, g, b)
+			end
 			element = GetComponentElement(raw, 'EDIT')
 			if element then
 				element:SetFontScheme(nFont)
 				element:SetSelectFontScheme(nFont)
+				local r, g, b = element:GetPlaceholderFontColor()
+				element:SetPlaceholderFontScheme(nFont)
+				element:SetPlaceholderFontColor(r, g, b)
 			end
 		end
 		return self
