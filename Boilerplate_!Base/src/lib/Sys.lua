@@ -768,6 +768,13 @@ end
 -- 注册单个用户配置项
 -- @param {string} szKey 配置项全局唯一键
 -- @param {table} tOption 自定义配置项
+--   {PATH_TYPE} tOption.ePathType 配置项保存位置（当前角色、当前服务器、全局）
+--   {string} tOption.szDataKey 配置项入库时的键值，一般不需要手动指定，默认与配置项全局键值一致
+--   {string} tOption.szGroup 配置项分组组标题，用于导入导出显示，禁止导入导出请留空
+--   {string} tOption.szLabel 配置标题，用于导入导出显示，禁止导入导出请留空
+--   {string} tOption.szVersion 数据版本号，加载数据时会丢弃版本不一致的数据
+--   {any} tOption.xDefaultValue 数据默认值
+--   {schema} tOption.xSchema 数据类型约束对象，通过 Schema 库生成
 function LIB.RegisterUserSettings(szKey, tOption)
 	local ePathType, szDataKey, szGroup, szLabel, szVersion, xDefaultValue, xSchema
 	if IsTable(tOption) then
@@ -832,12 +839,12 @@ function LIB.GetUserSettings(szKey)
 	assert(info, 'GetUserSettings: `Key` has not been registered.')
 	local db = DATABASE_INSTANCE[info.ePathType]
 	assert(db, 'GetUserSettings: Database not connected.')
-	local data = db:Get(info.szDataKey)
-	if IsTable(data) and data.v == info.szVersion then
+	local res = db:Get(info.szDataKey)
+	if IsTable(res) and res.v == info.szVersion then
 		if info.xSchema then
-			return LIB.SchemaGet(data.d, info.xSchema, info.xDefaultValue)
+			return LIB.SchemaGet(res.d, info.xSchema, info.xDefaultValue)
 		end
-		return data.d
+		return res.d
 	end
 	return Clone(info.xDefaultValue)
 end
