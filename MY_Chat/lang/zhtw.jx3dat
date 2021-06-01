@@ -3,6 +3,7 @@ return {
     ['MY_AutoHideChat'] = '自動隱藏聊天欄',
     ['MY_ChatSwitch'] = '聊天助手',
     ['MY_ChatCopy'] = '聊天複製',
+    ['MY_ChatEmotion'] = '聊天表情',
 
     ['SAY']      = '說',
     ['MAP']      = '地',

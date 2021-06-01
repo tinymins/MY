@@ -53,13 +53,21 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 	return
 end
 --------------------------------------------------------------------------
+local O = LIB.CreateUserSettingsModule('MY_ChatEmotion', _L['MY_Chat'], {
+	bFixSize = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ChatEmotion'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	nSize = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ChatEmotion'],
+		xSchema = Schema.Number,
+		xDefaultValue = 25,
+	},
+})
 local D = {}
-local O = {
-	bFixSize = false,
-	nSize = 25,
-}
-RegisterCustomData('MY_ChatEmotion.bFixSize')
-RegisterCustomData('MY_ChatEmotion.nSize')
 
 LIB.HookChatPanel('BEFORE.MY_ChatEmotion', function(h, szMsg, ...)
 	if O.bFixSize then
@@ -116,22 +124,6 @@ local settings = {
 			fields = {
 				OnPanelActivePartial = D.OnPanelActivePartial,
 			},
-		},
-		{
-			fields = {
-				bFixSize = true,
-				nSize = true,
-			},
-			root = O,
-		},
-	},
-	imports = {
-		{
-			fields = {
-				bFixSize = true,
-				nSize = true,
-			},
-			root = O,
 		},
 	},
 }
