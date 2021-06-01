@@ -1,4 +1,6 @@
 return {
+    ['MY_Chat'] = '聊天助手',
+    ['MY_AutoHideChat'] = '自动隐藏聊天栏',
     ['MY_ChatSwitch'] = '聊天助手',
 
     ['SAY']      = '说',

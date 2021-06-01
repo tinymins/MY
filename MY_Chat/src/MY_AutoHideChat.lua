@@ -61,11 +61,15 @@ local STATE = {
 	HIDDING = 4, -- ½¥±äÒþ²ØÖÐ
 }
 local m_nState = STATE.SHOW
+local O = LIB.CreateUserSettingsModule('MY_Chat', _L[MODULE_NAME], {
+	bEnable = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_AutoHideChat'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+})
 local D = {}
-local O = {
-	bEnable = false,
-}
-RegisterCustomData('MY_AutoHideChat.bEnable')
 
 -- get sys chat bg alpha
 function D.GetBgAlpha()
@@ -112,7 +116,7 @@ function D.ShowChatPanel(nShowFrame, nDelayFrame, callback)
 	LIB.BreatheCall('MY_AutoHideChat_Show', function()
 		local nFrame = GetLogicFrameCount()
 		if nFrame - nDelayFrame < nStartFrame then
-			O.fAhBgAlpha = D.GetBgAlpha()
+			D.fAhBgAlpha = D.GetBgAlpha()
 			return
 		end
 		-- calc new alpha
@@ -122,11 +126,11 @@ function D.ShowChatPanel(nShowFrame, nDelayFrame, callback)
 			local hFrame = Station.Lookup('Lowest2/ChatPanel' .. i)
 			if hFrame then
 				hFrame:SetAlpha(nAlpha)
-				hFrame:Lookup('Wnd_Message', 'Shadow_Back'):SetAlpha(nAlpha * O.fAhBgAlpha)
+				hFrame:Lookup('Wnd_Message', 'Shadow_Back'):SetAlpha(nAlpha * D.fAhBgAlpha)
 			end
 		end
 		Station.Lookup('Lowest1/ChatTitleBG'):SetAlpha(nAlpha)
-		Station.Lookup('Lowest1/ChatTitleBG', 'Image_BG'):SetAlpha(nAlpha * O.fAhBgAlpha)
+		Station.Lookup('Lowest1/ChatTitleBG', 'Image_BG'):SetAlpha(nAlpha * D.fAhBgAlpha)
 		if nAlpha == 255 then
 			m_nState = STATE.SHOW
 			if callback then
@@ -150,7 +154,7 @@ function D.HideChatPanel(nHideFrame, nDelayFrame, callback)
 	-- switch case
 	if m_nState == STATE.SHOW then
 		-- get bg alpha
-		O.fAhBgAlpha = D.GetBgAlpha()
+		D.fAhBgAlpha = D.GetBgAlpha()
 	elseif m_nState == STATE.SHOWING then
 		return
 	elseif m_nState == STATE.HIDE then
@@ -172,7 +176,7 @@ function D.HideChatPanel(nHideFrame, nDelayFrame, callback)
 	LIB.BreatheCall('MY_AutoHideChat_Hide', function()
 		local nFrame = GetLogicFrameCount()
 		if nFrame - nDelayFrame < nStartFrame then
-			O.fAhBgAlpha = D.GetBgAlpha()
+			D.fAhBgAlpha = D.GetBgAlpha()
 			return
 		end
 		-- calc new alpha
@@ -194,7 +198,7 @@ function D.HideChatPanel(nHideFrame, nDelayFrame, callback)
 			local hFrame = Station.Lookup('Lowest2/ChatPanel' .. i)
 			if hFrame then
 				hFrame:SetAlpha(nAlpha)
-				hFrame:Lookup('Wnd_Message', 'Shadow_Back'):SetAlpha(nAlpha * O.fAhBgAlpha)
+				hFrame:Lookup('Wnd_Message', 'Shadow_Back'):SetAlpha(nAlpha * D.fAhBgAlpha)
 				-- hide if alpha turns to zero
 				if nAlpha == 0 then
 					hFrame:SetMousePenetrable(true)
@@ -202,7 +206,7 @@ function D.HideChatPanel(nHideFrame, nDelayFrame, callback)
 			end
 		end
 		Station.Lookup('Lowest1/ChatTitleBG'):SetAlpha(nAlpha)
-		Station.Lookup('Lowest1/ChatTitleBG', 'Image_BG'):SetAlpha(nAlpha * O.fAhBgAlpha)
+		Station.Lookup('Lowest1/ChatTitleBG', 'Image_BG'):SetAlpha(nAlpha * D.fAhBgAlpha)
 		if nAlpha == 0 then
 			m_nState = STATE.HIDE
 			if callback then
@@ -222,9 +226,9 @@ function D.Apply()
 	end
 	if O.bEnable then
 		-- get bg alpha
-		if not O.fAhBgAlpha then
-			O.fAhBgAlpha = shaBack:GetAlpha() / 255
-			O.bAhAnimate = O.bAhAnimate or false
+		if not D.fAhBgAlpha then
+			D.fAhBgAlpha = shaBack:GetAlpha() / 255
+			D.bAhAnimate = D.bAhAnimate or false
 		end
 		-- hook chat panel as event listener
 		LIB.HookChatPanel('AFTER.MY_AutoHideChat', function(h)
@@ -289,9 +293,10 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, w = 'auto',
 		text = _L['Auto hide chat panel'],
-		checked = MY_AutoHideChat.bEnable,
+		checked = O.bEnable,
 		oncheck = function(bChecked)
-			MY_AutoHideChat.bEnable = bChecked
+			O.bEnable = bChecked
+			D.Apply()
 		end,
 	}):Width()
 	y = y + lineHeight
@@ -306,23 +311,6 @@ local settings = {
 			fields = {
 				OnPanelActivePartial = D.OnPanelActivePartial,
 			},
-		},
-		{
-			fields = {
-				bEnable = true,
-			},
-			root = O,
-		},
-	},
-	imports = {
-		{
-			fields = {
-				bEnable = true,
-			},
-			triggers = {
-				bEnable = D.Apply,
-			},
-			root = O,
 		},
 	},
 }
