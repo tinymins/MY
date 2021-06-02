@@ -219,7 +219,6 @@ function PS.OnPanelActive(wnd)
 	local X, Y, LH = 25, 20, 30
 	local nX, nY, nLFY = X, Y, Y
 
-	D.LoadSettings()
 	-------------------------------------
 	-- 喊话部分
 	-------------------------------------
@@ -289,9 +288,9 @@ function PS.OnPanelActive(wnd)
 	nX = ui:Append('WndEditBox', {
 		x = nX, y = nY,
 		w = 150, h = 25,
-		text = O.szJokeSearch,
+		text = D.szJokeSearch,
 		onchange = function(szText)
-			O.szJokeSearch = szText
+			D.szJokeSearch = szText
 		end,
 	}):Pos('BOTTOMRIGHT') + 5
 	-- 骚话内容搜索按钮
@@ -306,7 +305,7 @@ function PS.OnPanelActive(wnd)
 					.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
 						l = AnsiToUTF8(GLOBAL.GAME_LANG),
 						L = AnsiToUTF8(GLOBAL.GAME_EDITION),
-						q = AnsiToUTF8(O.szJokeSearch or ''),
+						q = AnsiToUTF8(D.szJokeSearch or ''),
 					}, 'c7355a0b-0d97-4ae1-b417-43a5c4e562ec'))),
 				success = function(html, status)
 					local res = LIB.JsonDecode(html)
@@ -325,10 +324,10 @@ function PS.OnPanelActive(wnd)
 		w = 50, h = 25,
 		text = _L['Copy'],
 		onclick = function()
-			LIB.SetChatInput(O.szJokeText)
+			LIB.SetChatInput(D.szJokeText)
 			LIB.FocusChatInput()
 		end,
-		autoenable = function() return not IsEmpty(O.szJokeText) end,
+		autoenable = function() return not IsEmpty(D.szJokeText) end,
 		tip = _L['Click to copy joke to chat panel.'],
 		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
 	}):Pos('BOTTOMRIGHT') + 5
@@ -345,7 +344,7 @@ function PS.OnPanelActive(wnd)
 						.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
 							l = AnsiToUTF8(GLOBAL.GAME_LANG),
 							L = AnsiToUTF8(GLOBAL.GAME_EDITION),
-							content = AnsiToUTF8(O.szJokeSearch or ''),
+							content = AnsiToUTF8(D.szJokeSearch or ''),
 							server = AnsiToUTF8(LIB.GetRealServer(2)),
 							role = bAnonymous and '' or AnsiToUTF8(LIB.GetUserRoleName()),
 							id = bAnonymous and '' or AnsiToUTF8(UI_GetClientPlayerID()),
@@ -366,7 +365,7 @@ function PS.OnPanelActive(wnd)
 			local tMsg = {
 				x = nW / 2, y = nH / 3,
 				szName = 'MY_TalkEx_Joke',
-				szMessage = _L['Confirm share joke:'] .. '\n\n' .. O.szJokeText,
+				szMessage = _L['Confirm share joke:'] .. '\n\n' .. D.szJokeText,
 				szAlignment = 'CENTER',
 				fnCancelAction = fnCancelAction,
 				{ szOption = _L['Share onymously'], fnAction = function() fnAction(false) end },
@@ -375,7 +374,7 @@ function PS.OnPanelActive(wnd)
 			}
 			MessageBox(tMsg)
 		end,
-		autoenable = function() return not IsEmpty(O.szJokeText) end,
+		autoenable = function() return not IsEmpty(D.szJokeText) end,
 		tip = _L['Click to share your joke to remote.'],
 		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
 	}):Pos('BOTTOMRIGHT') + 5
@@ -386,9 +385,9 @@ function PS.OnPanelActive(wnd)
 		name = 'WndEditBox_JokeText',
 		x = nX, y = nY,
 		w = w - X * 2, h = 75,
-		text = O.szJokeText,
+		text = D.szJokeText,
 		onchange = function(szText)
-			O.szJokeText = szText
+			D.szJokeText = szText
 		end,
 	}):Width() + 5
 	nY = nY + 75
