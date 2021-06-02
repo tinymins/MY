@@ -53,23 +53,70 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 	return
 end
 --------------------------------------------------------------------------
+local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['MY_Chat'], {
+	aWhisper = {
+		ePathType = PATH_TYPE.ROLE,
+		xSchema = Schema.Collection(
+			Schema.Tuple(
+				Schema.String, -- szName
+				Schema.Collection( -- aHistory
+					Schema.OneOf(
+						Schema.String, -- szMsg
+						Schema.Tuple(Schema.String, Schema.Number) -- szMsg, nTime
+					)
+				)
+			)
+		),
+		xDefaultValue = {},
+	},
+	szAway = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ChatSwitch'],
+		xSchema = Schema.String,
+		xDefaultValue = '',
+	},
+	szBusy = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ChatSwitch'],
+		xSchema = Schema.String,
+		xDefaultValue = '',
+	},
+	tChannelCount = {
+		ePathType = PATH_TYPE.ROLE,
+		xSchema = Schema.Record({
+			szDate = Schema.String,
+			tCount = Schema.Map(Schema.Number, Schema.Number),
+		}),
+		xDefaultValue = {
+			szDate = '',
+			tCount = {},
+		},
+	},
+	bAlertBeforeClear = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ChatSwitch'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bAutoSwitchBfChannel = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ChatSwitch'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+})
+local D = {}
+
+LIB.RegisterInit('MY_ChatSwitch__DataCompatible', function()
+	if D.aWhisper then
+		O.aWhisper = D.aWhisper
+	end
+	D.aWhisper = nil
+end)
+RegisterCustomData('MY_ChatSwitch.aWhisper', 1)
+
 local INI_PATH = PACKET_INFO.ROOT .. 'MY_Chat/ui/MY_ChatSwitch.ini'
 local CD_REFRESH_OFFSET = 7 * 60 * 60 -- 7µã¸üÐÂCD
-local D = {}
-local O = {
-	aWhisper = {},
-	szAway = nil,
-	szBusy = nil,
-	tChannelCount = {},
-	bAlertBeforeClear = true,
-	bAutoSwitchBfChannel = true,
-}
-RegisterCustomData('MY_ChatSwitch.szAway')
-RegisterCustomData('MY_ChatSwitch.szBusy')
-RegisterCustomData('MY_ChatSwitch.aWhisper', 1)
-RegisterCustomData('MY_ChatSwitch.tChannelCount')
-RegisterCustomData('MY_ChatSwitch.bAlertBeforeClear')
-RegisterCustomData('MY_ChatSwitch.bAutoSwitchBfChannel')
 
 local function UpdateChannelDailyLimit(hRadio, bPlus)
 	local me = GetClientPlayer()
@@ -83,12 +130,19 @@ local function UpdateChannelDailyLimit(hRadio, bPlus)
 	local nChannel = info.channel
 	if nChannel then
 		local szDate = LIB.FormatTime(GetCurrentTime() - CD_REFRESH_OFFSET, '%yyyy%MM%dd')
-		if O.tChannelCount.szDate ~= szDate then
-			O.tChannelCount = {szDate = szDate}
+		local tChannelCount = O.tChannelCount
+		if tChannelCount.szDate ~= szDate then
+			tChannelCount = {
+				szDate = szDate,
+				tCount = {},
+			}
+			O.tChannelCount = tChannelCount
 		end
-		O.tChannelCount[nChannel] = (O.tChannelCount[nChannel] or 0) + (bPlus and 1 or 0)
-
-		local nDailyCount = O.tChannelCount[nChannel]
+		local nDailyCount = (tChannelCount.tCount[nChannel] or 0) + (bPlus and 1 or 0)
+		if nDailyCount ~= tChannelCount.tCount[nChannel] then
+			tChannelCount.tCount[nChannel] = nDailyCount
+			O.tChannelCount = tChannelCount
+		end
 		local nDailyLimit = LIB.GetChatChannelDailyLimit(me.nLevel, nChannel)
 		if nDailyLimit then
 			if nDailyLimit > 0 then
@@ -143,7 +197,11 @@ local function OnAwayCheck()
 	if edit then
 		edit:GetRoot():Show()
 		if edit:GetText() == '' then
-			edit:InsertText(O.szAway or g_tStrings.STR_AUTO_REPLAY_LEAVE)
+			edit:InsertText(
+				IsEmpty(O.szAway)
+					and g_tStrings.STR_AUTO_REPLAY_LEAVE
+					or O.szAway
+			)
 			edit:SelectAll()
 		end
 		Station.SetFocusWindow(edit)
@@ -154,7 +212,11 @@ local function OnAwayUncheck()
 	LIB.SwitchChatChannel('/cafk')
 end
 
-local function OnAwayTip() return O.szAway or g_tStrings.STR_AUTO_REPLAY_LEAVE end
+local function OnAwayTip()
+	return IsEmpty(O.szAway)
+		and g_tStrings.STR_AUTO_REPLAY_LEAVE
+		or O.szAway
+end
 
 local function OnBusyCheck()
 	LIB.SwitchChatChannel('/atr')
@@ -162,7 +224,11 @@ local function OnBusyCheck()
 	if edit then
 		edit:GetRoot():Show()
 		if edit:GetText() == '' then
-			edit:InsertText(O.szBusy or g_tStrings.STR_AUTO_REPLAY_LEAVE)
+			edit:InsertText(
+				IsEmpty(O.szBusy)
+					and g_tStrings.STR_AUTO_REPLAY_LEAVE
+					or O.szBusy
+			)
 			edit:SelectAll()
 		end
 		Station.SetFocusWindow(edit)
@@ -173,7 +239,11 @@ local function OnBusyUncheck()
 	LIB.SwitchChatChannel('/catr')
 end
 
-local function OnBusyTip() return O.szBusy end
+local function OnBusyTip()
+	return IsEmpty(O.szBusy)
+		and g_tStrings.STR_AUTO_REPLAY_LEAVE
+		or O.szBusy
+end
 
 local function OnMosaicsCheck()
 	MY_ChatMosaics.bEnabled = true
@@ -476,7 +546,7 @@ local function OnChatSetAFK()
 	if type(arg0) == 'table' then
 		O.szAway = LIB.StringifyChatText(arg0)
 	else
-		O.szAway = arg0 and tostring(arg0)
+		O.szAway = arg0 and tostring(arg0) or ''
 	end
 end
 LIB.RegisterEvent('ON_CHAT_SET_AFK', OnChatSetAFK)
@@ -485,7 +555,7 @@ local function OnChatSetATR()
 	if type(arg0) == 'table' then
 		O.szBusy = LIB.StringifyChatText(arg0):sub(4)
 	else
-		O.szBusy = arg0 and tostring(arg0)
+		O.szBusy = arg0 and tostring(arg0) or ''
 	end
 end
 LIB.RegisterEvent('ON_CHAT_SET_ATR', OnChatSetATR)
@@ -564,9 +634,10 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 'auto',
 		text = _L['Auto switch talk channel when into battle field'],
-		checked = MY_ChatSwitch.bAutoSwitchBfChannel,
+		checked = O.bAutoSwitchBfChannel,
 		oncheck = function(bChecked)
-			MY_ChatSwitch.bAutoSwitchBfChannel = bChecked
+			O.bAutoSwitchBfChannel = bChecked
+			D.Apply()
 		end,
 	})
 	y = y + lineHeight
@@ -592,29 +663,16 @@ local settings = {
 		{
 			fields = {
 				aWhisper = true,
-				szAway = true,
-				szBusy = true,
-				tChannelCount = true,
-				bAlertBeforeClear = true,
-				bAutoSwitchBfChannel = true,
 			},
-			root = O,
+			root = D,
 		},
 	},
 	imports = {
 		{
 			fields = {
 				aWhisper = true,
-				szAway = true,
-				szBusy = true,
-				tChannelCount = true,
-				bAlertBeforeClear = true,
-				bAutoSwitchBfChannel = true,
 			},
-			triggers = {
-				bAutoSwitchBfChannel = D.Apply,
-			},
-			root = O,
+			root = D,
 		},
 	},
 }
