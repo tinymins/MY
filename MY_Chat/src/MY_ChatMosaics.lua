@@ -53,17 +53,30 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 	return
 end
 --------------------------------------------------------------------------
-local D = {}
-local O = {
+local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['MY_Chat'], {
+	tIgnoreNames = { -- 忽略名单
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ChatMosaics'],
+		xSchema = Schema.Map(Schema.String, Schema.Boolean),
+		xDefaultValue = {},
+	},
+	nMosaicsMode = { -- 局部打码模式
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ChatMosaics'],
+		xSchema = Schema.Number,
+		xDefaultValue = 1,
+	},
+	bIgnoreOwnName = { -- 不打码自己的名字
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ChatMosaics'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+})
+local D = {
 	bEnabled = false,            -- 启用状态
 	szMosaics = _L.MOSAICS_CHAR, -- 马赛克字符
-	tIgnoreNames = {},           -- 忽略名单
-	nMosaicsMode = 1,            -- 局部打码模式
-	bIgnoreOwnName = false,      -- 不打码自己的名字
 }
-RegisterCustomData('MY_ChatMosaics.tIgnoreNames')
-RegisterCustomData('MY_ChatMosaics.nMosaicsMode')
-RegisterCustomData('MY_ChatMosaics.bIgnoreOwnName')
 
 function D.ResetMosaics()
 	-- re mosaics
@@ -73,7 +86,7 @@ function D.ResetMosaics()
 	end
 	D.bForceUpdate = nil
 	-- hook chat panel
-	if O.bEnabled then
+	if D.bEnabled then
 		LIB.HookChatPanel('AFTER.MY_ChatMosaics', function(h, nIndex)
 			D.Mosaics(h, nIndex)
 		end)
@@ -88,7 +101,7 @@ function D.NameLink_GetText(h, ...)
 end
 
 function D.MosaicsString(szText)
-	if not O.bEnabled then
+	if not D.bEnabled then
 		return szText
 	end
 	local bQuote = szText:sub(1, 1) == '[' and szText:sub(-1, -1) == ']'
@@ -98,15 +111,15 @@ function D.MosaicsString(szText)
 	if (not O.bIgnoreOwnName or szText ~= GetClientPlayer().szName) and not O.tIgnoreNames[szText] then
 		local nLen = wlen(szText)
 		if O.nMosaicsMode == 3 and nLen > 2 then
-			szText = wsub(szText, 1, 1) .. rep(O.szMosaics, nLen - 2) .. wsub(szText, nLen, nLen)
+			szText = wsub(szText, 1, 1) .. rep(D.szMosaics, nLen - 2) .. wsub(szText, nLen, nLen)
 		elseif O.nMosaicsMode == 1 and nLen > 1 then
-			szText = wsub(szText, 1, 1) .. rep(O.szMosaics, nLen - 1)
+			szText = wsub(szText, 1, 1) .. rep(D.szMosaics, nLen - 1)
 		elseif O.nMosaicsMode == 2 and nLen > 1 then
-			szText = rep(O.szMosaics, nLen - 1) .. wsub(szText, nLen, nLen)
+			szText = rep(D.szMosaics, nLen - 1) .. wsub(szText, nLen, nLen)
 		elseif O.nMosaicsMode == 4 or nLen <= 1 then
-			szText = rep(O.szMosaics, nLen)
+			szText = rep(D.szMosaics, nLen)
 		else
-			szText = wsub(szText, 1, 1) .. rep(O.szMosaics, nLen - 1)
+			szText = wsub(szText, 1, 1) .. rep(D.szMosaics, nLen - 1)
 		end
 	end
 	if bQuote then
@@ -120,7 +133,7 @@ function D.Mosaics(h, nPos, nLen)
 		return
 	end
 	if h:GetType() == 'Text' then
-		if O.bEnabled then
+		if D.bEnabled then
 			if not h.__MY_ChatMosaics_szText or D.bForceUpdate then
 				h.__MY_ChatMosaics_szText = h.__MY_ChatMosaics_szText or h:GetText()
 				if not h.__MY_ChatMosaics_GetText then
@@ -170,29 +183,21 @@ local settings = {
 		{
 			fields = {
 				bEnabled = true,
-				szMosaics = true,
-				tIgnoreNames = true,
-				nMosaicsMode = true,
-				bIgnoreOwnName = true,
 			},
-			root = O,
+			root = D,
 		},
 	},
 	imports = {
 		{
 			fields = {
 				bEnabled = true,
-				szMosaics = true,
-				tIgnoreNames = true,
-				nMosaicsMode = true,
-				bIgnoreOwnName = true,
 			},
 			triggers = {
 				bEnabled = function ()
 					D.ResetMosaics()
 				end,
 			},
-			root = O,
+			root = D,
 		},
 	},
 }
@@ -220,9 +225,9 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndCheckBox', {
 		text = _L['no mosaics on my own name'],
 		x = x, y = y, w = 400,
-		checked = MY_ChatMosaics.bIgnoreOwnName,
+		checked = O.bIgnoreOwnName,
 		oncheck = function(bCheck)
-			MY_ChatMosaics.bIgnoreOwnName = bCheck
+			O.bIgnoreOwnName = bCheck
 			D.ResetMosaics()
 		end,
 	})
@@ -232,10 +237,10 @@ function PS.OnPanelActive(wnd)
 		text = _L['part mosaics A (mosaics except 1st and last character)'],
 		x = x, y = y, w = 400,
 		group = 'PART_MOSAICS',
-		checked = MY_ChatMosaics.nMosaicsMode == 1,
+		checked = O.nMosaicsMode == 1,
 		oncheck = function(bCheck)
 			if bCheck then
-				MY_ChatMosaics.nMosaicsMode = 1
+				O.nMosaicsMode = 1
 				D.ResetMosaics()
 			end
 		end,
@@ -246,10 +251,10 @@ function PS.OnPanelActive(wnd)
 		text = _L['part mosaics B (mosaics except 1st character)'],
 		x = x, y = y, w = 400,
 		group = 'PART_MOSAICS',
-		checked = MY_ChatMosaics.nMosaicsMode == 2,
+		checked = O.nMosaicsMode == 2,
 		oncheck = function(bCheck)
 			if bCheck then
-				MY_ChatMosaics.nMosaicsMode = 2
+				O.nMosaicsMode = 2
 				D.ResetMosaics()
 			end
 		end,
@@ -260,10 +265,10 @@ function PS.OnPanelActive(wnd)
 		text = _L['part mosaics C (mosaics except last character)'],
 		x = x, y = y, w = 400,
 		group = 'PART_MOSAICS',
-		checked = MY_ChatMosaics.nMosaicsMode == 3,
+		checked = O.nMosaicsMode == 3,
 		oncheck = function(bCheck)
 			if bCheck then
-				MY_ChatMosaics.nMosaicsMode = 3
+				O.nMosaicsMode = 3
 				D.ResetMosaics()
 			end
 		end,
@@ -274,10 +279,10 @@ function PS.OnPanelActive(wnd)
 		text = _L['part mosaics D (mosaics all character)'],
 		x = x, y = y, w = 400,
 		group = 'PART_MOSAICS',
-		checked = MY_ChatMosaics.nMosaicsMode == 4,
+		checked = O.nMosaicsMode == 4,
 		oncheck = function(bCheck)
 			if bCheck then
-				MY_ChatMosaics.nMosaicsMode = 4
+				O.nMosaicsMode = 4
 				D.ResetMosaics()
 			end
 		end,
@@ -287,12 +292,12 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndEditBox', {
 		placeholder = _L['mosaics character'],
 		x = x, y = y, w = w - 2 * x, h = 25,
-		text = MY_ChatMosaics.szMosaics,
+		text = D.szMosaics,
 		onchange = function(szText)
 			if szText == '' then
-				MY_ChatMosaics.szMosaics = _L.MOSAICS_CHAR
+				D.szMosaics = _L.MOSAICS_CHAR
 			else
-				MY_ChatMosaics.szMosaics = szText
+				D.szMosaics = szText
 			end
 			D.ResetMosaics()
 		end,
@@ -304,16 +309,17 @@ function PS.OnPanelActive(wnd)
 		x = x, y = y, w = w - 2 * x, h = h - y - 50,
 		text = (function()
 			local t = {}
-			for szName, _ in pairs(MY_ChatMosaics.tIgnoreNames) do
+			for szName, _ in pairs(O.tIgnoreNames) do
 				insert(t, szName)
 			end
 			concat(t, ',')
 		end)(),
 		onchange = function(szText)
-			MY_ChatMosaics.tIgnoreNames = {}
+			local tIgnoreNames = {}
 			for _, szName in ipairs(LIB.SplitString(szText, ',')) do
-				MY_ChatMosaics.tIgnoreNames[szName] = true
+				tIgnoreNames[szName] = true
 			end
+			O.tIgnoreNames = tIgnoreNames
 			D.ResetMosaics()
 		end,
 	})

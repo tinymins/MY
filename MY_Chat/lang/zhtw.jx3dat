@@ -4,6 +4,7 @@ return {
     ['MY_ChatSwitch'] = '聊天助手',
     ['MY_ChatCopy'] = '聊天複製',
     ['MY_ChatEmotion'] = '聊天表情',
+    ['MY_ChatMosaics'] = '聊天打馬',
 
     ['SAY']      = '說',
     ['MAP']      = '地',
