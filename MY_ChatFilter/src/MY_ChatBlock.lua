@@ -115,13 +115,11 @@ function D.SaveBlockWords()
 end
 
 function D.LoadBlockWords()
-	local aBlockWords = {}
 	local data = LIB.LoadLUAData(CONFIG_PATH, { passphrase = false }) or LIB.LoadLUAData(CONFIG_PATH)
 	if data and IsTable(data.aBlockWords) then
-		aBlockWords = data.aBlockWords
+		O.aBlockWords = data.aBlockWords
+		CPath.DelFile(LIB.FormatPath(CONFIG_PATH))
 	end
-	O.aBlockWords = aBlockWords
-	CPath.DelFile(LIB.FormatPath(CONFIG_PATH))
 	D.CheckEnable()
 end
 
