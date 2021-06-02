@@ -5,6 +5,7 @@ return {
     ['MY_ChatCopy'] = '聊天复制',
     ['MY_ChatEmotion'] = '聊天表情',
     ['MY_ChatMosaics'] = '聊天打马',
+    ['MY_TeamBalloon'] = '聊天泡泡',
 
     ['SAY']      = '说',
     ['MAP']      = '地',

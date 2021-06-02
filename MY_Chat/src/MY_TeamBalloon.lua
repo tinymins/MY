@@ -57,8 +57,16 @@ local INI_PATH = PACKET_INFO.ROOT .. 'MY_Chat/ui/MY_TeamBalloon.ini'
 local DISPLAY_TIME = 5000
 local ANIMATE_SHOW_TIME = 500
 local ANIMATE_HIDE_TIME = 500
-MY_TeamBalloon = { bEnable = true }
-RegisterCustomData('MY_TeamBalloon.bEnable')
+
+local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['MY_Chat'], {
+	bEnable = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ChatSwitch'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+})
+local D = {}
 
 local function AppendBalloon(hFrame, dwID, szMsg)
 	local hTotal = hFrame:Lookup('', '')
@@ -140,17 +148,17 @@ local function OnSay(hFrame, szMsg, dwID, nChannel)
 	end
 end
 
-function MY_TeamBalloon.OnFrameCreate()
+function D.OnFrameCreate()
 	this:RegisterEvent('PLAYER_SAY')
 end
 
-function MY_TeamBalloon.OnEvent(event)
+function D.OnEvent(event)
 	if event == 'PLAYER_SAY' then
 		OnSay(this, arg0, arg1, arg2)
 	end
 end
 
-function MY_TeamBalloon.OnFrameBreathe()
+function D.OnFrameBreathe()
 	local hTotal = this:Lookup('', '')
 	for i = 0, hTotal:GetItemCount() - 1 do
 		local hBalloon = hTotal:Lookup(i)
@@ -167,37 +175,54 @@ function MY_TeamBalloon.OnFrameBreathe()
 	end
 end
 
-function MY_TeamBalloon.Enable(...)
-	if select('#', ...) == 1 then
-		MY_TeamBalloon.bEnable = not not ...
-		if MY_TeamBalloon.bEnable then
-			Wnd.OpenWindow(INI_PATH, 'MY_TeamBalloon')
-		else
-			Wnd.CloseWindow('MY_TeamBalloon')
-		end
+function D.Apply()
+	local bEnable = O.bEnable
+	if bEnable then
+		Wnd.OpenWindow(INI_PATH, 'MY_TeamBalloon')
 	else
-		return MY_TeamBalloon.bEnable
+		Wnd.CloseWindow('MY_TeamBalloon')
 	end
 end
 
 do
 local function Init()
-	MY_TeamBalloon.Enable(MY_TeamBalloon.bEnable)
+	D.Apply()
 end
 LIB.RegisterInit('MY_TeamBalloon', Init)
 end
 
-function MY_TeamBalloon.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
+function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
 	x = X
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 250,
 		text = _L['team balloon'],
-		checked = MY_TeamBalloon.Enable(),
+		checked = O.bEnable,
 		oncheck = function(bChecked)
-			MY_TeamBalloon.Enable(bChecked)
+			O.bEnable = bChecked
+			D.Apply()
 		end,
 	})
 	y = y + lineHeight
 
 	return x, y
+end
+
+--------------------------------------------------------------------------
+-- Global exports
+--------------------------------------------------------------------------
+do
+local settings = {
+	exports = {
+		{
+			root = D,
+			preset = 'UIEvent',
+		},
+		{
+			fields = {
+				OnPanelActivePartial = D.OnPanelActivePartial,
+			},
+		},
+	},
+}
+MY_TeamBalloon = LIB.CreateModule(settings)
 end
