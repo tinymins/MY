@@ -54,11 +54,15 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
+local O = LIB.CreateUserSettingsModule('MY_WhisperMetion', _L['MY_Chat'], {
+	bEnable = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_WhisperMetion'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+})
 local D = {}
-local O = {
-	bEnable = true,
-}
-RegisterCustomData('MY_WhisperMetion.bEnable')
 
 function D.Apply()
 	if O.bEnable then
@@ -148,23 +152,6 @@ local settings = {
 			fields = {
 				OnPanelActivePartial = D.OnPanelActivePartial,
 			},
-		},
-		{
-			fields = {
-				bEnable = true,
-			},
-			root = O,
-		},
-	},
-	imports = {
-		{
-			fields = {
-				bEnable = true,
-			},
-			triggers = {
-				bEnable = D.Apply,
-			},
-			root = O,
 		},
 	},
 }

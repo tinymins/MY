@@ -6,6 +6,7 @@ return {
     ['MY_ChatEmotion'] = '聊天表情',
     ['MY_ChatMosaics'] = '聊天打马',
     ['MY_TeamBalloon'] = '聊天泡泡',
+    ['MY_WhisperMetion'] = '聊天点名提醒',
 
     ['SAY']      = '说',
     ['MAP']      = '地',
