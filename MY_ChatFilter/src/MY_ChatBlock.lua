@@ -84,60 +84,44 @@ local DEFAULT_KW_CONFIG = {
 	bIgnoreCase = true, bIgnoreEnEm = true, bIgnoreSpace = true,
 }
 
+local O = LIB.CreateUserSettingsModule('MY_ChatBlock', _L['MY_Chat'], {
+	bBlockWords = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ChatBlock'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	aBlockWords = {
+		ePathType = PATH_TYPE.GLOBAL,
+		szLabel = _L['MY_ChatBlock'],
+		xSchema = Schema.Collection(Schema.Record({
+			szKeyword = Schema.String,
+			tMsgType = Schema.Map(Schema.String, Schema.Boolean),
+			bIgnoreAcquaintance = Schema.Boolean,
+			bIgnoreCase = Schema.Boolean,
+			bIgnoreEnEm = Schema.Boolean,
+			bIgnoreSpace = Schema.Boolean,
+		})),
+		xDefaultValue = {},
+	},
+})
 local D = {}
-local O = {
-	bBlockWords = true,
-	aBlockWords = {},
-}
-RegisterCustomData('MY_ChatBlock.bBlockWords')
 
+local CONFIG_PATH = {'config/chatblockwords.jx3dat', PATH_TYPE.GLOBAL}
 function D.SaveBlockWords()
-	LIB.SaveLUAData(
-		{'config/chatblockwords.jx3dat', PATH_TYPE.GLOBAL},
-		{ aBlockWords = O.aBlockWords },
-		{ passphrase = false })
+	-- LIB.SaveLUAData(CONFIG_PATH, { aBlockWords = O.aBlockWords }, { passphrase = false })
+	O.aBlockWords = O.aBlockWords
 	LIB.StorageData('MY_CHAT_BLOCKWORD', O.aBlockWords)
 end
 
 function D.LoadBlockWords()
 	local aBlockWords = {}
-	local data = LIB.LoadLUAData(
-		{'config/chatblockwords.jx3dat', PATH_TYPE.GLOBAL},
-		{ passphrase = false })
-	or LIB.LoadLUAData({'config/chatblockwords.jx3dat', PATH_TYPE.GLOBAL})
-	if data then
-		if IsTable(data.aBlockWords) then
-			aBlockWords = data.aBlockWords
-		end
-		-- ¼æÈÝ¾É°æÊý¾Ý
-		if data.blockwords then
-			for i, bw in ipairs(data.blockwords) do
-				if IsTable(bw) and IsTable(bw.channel) then
-					if bw.keyword then
-						local bwNew = {
-							szKeyword = bw.keyword,
-							tMsgType = {},
-							bIgnoreAcquaintance = bw.ignoreAcquaintance,
-							bIgnoreCase = bw.ignoreCase,
-							bIgnoreEnEm = bw.ignoreEnEm,
-							bIgnoreSpace = bw.ignoreSpace,
-						}
-						for k, v in pairs(bw.channel) do
-							if k == 'SYSTEM' then
-								k = 'LOCAL_SYS'
-							end
-							local k = PLAYER_TALK_CHANNEL[k] and TALK_CHANNEL_MSG_TYPE[PLAYER_TALK_CHANNEL[k]]
-							if k then
-								bwNew.tMsgType[k] = v
-							end
-						end
-						insert(aBlockWords, bwNew)
-					end
-				end
-			end
-		end
+	local data = LIB.LoadLUAData(CONFIG_PATH, { passphrase = false }) or LIB.LoadLUAData(CONFIG_PATH)
+	if data and IsTable(data.aBlockWords) then
+		aBlockWords = data.aBlockWords
 	end
 	O.aBlockWords = aBlockWords
+	CPath.DelFile(LIB.FormatPath(CONFIG_PATH))
 	D.CheckEnable()
 end
 
@@ -222,17 +206,6 @@ local settings = {
 			root = O,
 		},
 	},
-	imports = {
-		{
-			fields = {
-				bBlockWords = true,
-			},
-			triggers = {
-				bBlockWords = D.CheckEnable,
-			},
-			root = O,
-		},
-	},
 }
 MY_ChatBlock = LIB.CreateModule(settings)
 end
@@ -247,9 +220,10 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 70,
 		text = _L['Enable'],
-		checked = MY_ChatBlock.bBlockWords,
+		checked = O.bBlockWords,
 		oncheck = function(bCheck)
-			MY_ChatBlock.bBlockWords = bCheck
+			O.bBlockWords = bCheck
+			D.CheckEnable()
 		end,
 	})
 	x = x + 70
