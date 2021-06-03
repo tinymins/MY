@@ -775,8 +775,9 @@ end
 --   {string} tOption.szVersion 数据版本号，加载数据时会丢弃版本不一致的数据
 --   {any} tOption.xDefaultValue 数据默认值
 --   {schema} tOption.xSchema 数据类型约束对象，通过 Schema 库生成
+--   {boolean} tOption.bDataSet 是否为配置项组（如用户多套自定义偏好），配置项组在读写时需要额外传入一个组下配置项唯一键值（即多套自定义偏好中某一项的名字）
 function LIB.RegisterUserSettings(szKey, tOption)
-	local ePathType, szDataKey, szGroup, szLabel, szVersion, xDefaultValue, xSchema
+	local ePathType, szDataKey, szGroup, szLabel, szVersion, xDefaultValue, xSchema, bDataSet
 	if IsTable(tOption) then
 		ePathType = tOption.ePathType
 		szDataKey = tOption.szDataKey
@@ -785,6 +786,7 @@ function LIB.RegisterUserSettings(szKey, tOption)
 		szVersion = tOption.szVersion
 		xDefaultValue = tOption.xDefaultValue
 		xSchema = tOption.xSchema
+		bDataSet = tOption.bDataSet
 	end
 	if not ePathType then
 		ePathType = PATH_TYPE.ROLE
@@ -820,6 +822,7 @@ function LIB.RegisterUserSettings(szKey, tOption)
 		szVersion = szVersion,
 		xDefaultValue = xDefaultValue,
 		xSchema = xSchema,
+		bDataSet = bDataSet,
 	}
 end
 
@@ -833,30 +836,44 @@ end
 
 -- 获取用户配置项值
 -- @param {string} szKey 配置项全局唯一键
+-- @param {string} szDataSetKey 配置项组（如用户多套自定义偏好）唯一键，当且仅当 szKey 对应注册项携带 bDataSet 标记位时有效
 -- @return 值
-function LIB.GetUserSettings(szKey)
+function LIB.GetUserSettings(szKey, szDataSetKey)
 	local info = USER_SETTINGS_INFO[szKey]
 	assert(info, 'GetUserSettings: `Key` has not been registered.')
 	local db = DATABASE_INSTANCE[info.ePathType]
 	assert(db, 'GetUserSettings: Database not connected.')
 	local res = db:Get(info.szDataKey)
 	if IsTable(res) and res.v == info.szVersion then
-		if info.xSchema then
-			return LIB.SchemaGet(res.d, info.xSchema, info.xDefaultValue)
+		local data = res.d
+		if info.bDataSet then
+			assert(IsString(szDataSetKey), 'GetUserSettings: `DataSetKey` should be a string value.')
+			if IsTable(data) then
+				data = data[szDataSetKey]
+			else
+				data = nil
+			end
 		end
-		return res.d
+		if info.xSchema then
+			return LIB.SchemaGet(data, info.xSchema, info.xDefaultValue)
+		end
+		return data
 	end
 	return Clone(info.xDefaultValue)
 end
 
 -- 保存用户配置项值
 -- @param {string} szKey 配置项全局唯一键
+-- @param {string} szDataSetKey 配置项组（如用户多套自定义偏好）唯一键，当且仅当 szKey 对应注册项携带 bDataSet 标记位时有效
 -- @param {unknown} xValue 值
-function LIB.SetUserSettings(szKey, xValue)
+function LIB.SetUserSettings(szKey, szDataSetKey, xValue)
 	local info = USER_SETTINGS_INFO[szKey]
 	assert(info, 'SetUserSettings: `Key` has not been registered.')
 	local db = DATABASE_INSTANCE[info.ePathType]
 	assert(db, 'GetUserSettings: Database not connected.')
+	if not info.bDataSet then
+		xValue = szDataSetKey
+	end
 	if info.xSchema then
 		local errs = Schema.CheckSchema(xValue, info.xSchema)
 		if errs then
@@ -865,6 +882,16 @@ function LIB.SetUserSettings(szKey, xValue)
 				insert(aErrmsgs, i .. '. ' .. err.message)
 			end
 			return LIB.Debug(_L.PLUGIN_SHORT_NAME, 'SetUserSettings: ' .. szKey .. ', schema check failed.\n' .. concat(aErrmsgs, '\n'), DEBUG_LEVEL.WARNING)
+		end
+	end
+	if info.bDataSet then
+		assert(IsString(szDataSetKey), 'SetUserSettings: `DataSetKey` should be a string value.')
+		local res = db:Get(info.szDataKey)
+		if IsTable(res) and res.v == info.szVersion and IsTable(res.d) then
+			res.d[szDataSetKey] = xValue
+			xValue = res.d
+		else
+			xValue = { [szDataSetKey] = xValue }
 		end
 	end
 	db:Set(info.szDataKey, { d = xValue, v = info.szVersion })
