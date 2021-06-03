@@ -70,15 +70,7 @@ local RRWP_FREE = {}
 local RRWC_FREE = {}
 local CALL_AJAX = {}
 local AJAX_TAG = NSFormatString('{$NS}_AJAX#')
-local l_ajaxsettingsmeta = {
-	__index = {
-		method = 'get',
-		payload = 'form',
-		driver = 'auto',
-		timeout = 60000,
-		charset = 'utf8',
-	}
-}
+local AJAX_BRIDGE_PATH = PACKET_INFO.DATA_ROOT .. '#cache/curl/'
 
 local function EncodePostData(data, t, prefix)
 	if type(data) == 'table' then
@@ -129,9 +121,69 @@ local CURL_HttpRqst = SafeCall(_G.CURL_HttpRqst, 'https://ping.j3cx.com/') and _
 local CURL_HttpPost = (SafeCall(_G.CURL_HttpPostEx, 'TEST', 'https://ping.j3cx.com/') and _G.CURL_HttpPostEx)
 	or (SafeCall(_G.CURL_HttpPost, 'TEST', 'https://ping.j3cx.com/') and _G.CURL_HttpPost)
 	or nil
-function LIB.Ajax(settings)
-	assert(settings and settings.url)
-	setmetatable(settings, l_ajaxsettingsmeta)
+local AJAX_SETTING_KEYS = { 'url', 'data', 'method', 'payload', 'driver', 'timeout', 'charset', 'complete', 'fulfilled', 'success', 'error' }
+
+-- (void) LIB.Ajax(settings)       -- 发起远程 HTTP 请求
+-- settings           -- 请求配置项
+-- settings.url       -- 请求地址
+-- settings.data      -- 请求数据
+-- settings.method    -- 请求方式
+-- settings.payload   -- 请求实体类型
+-- settings.driver    -- 请求驱动方式
+-- settings.timeout   -- 请求超时时间
+-- settings.charset   -- 请求编码方式
+-- settings.complete  -- 请求完成回调事件，无论成功失败，回调链： complete -> fulfilled -> success
+-- settings.fulfilled -- 请求成功回调事件，不关心数据，回调链： complete -> fulfilled -> success
+-- settings.success   -- 请求成功回调事件，携带数据，回调链： complete -> fulfilled -> success
+-- settings.error     -- 请求失败回调事件，可能携带数据，回调链： complete -> error
+function LIB.Ajax(rawSettings)
+	assert(IsTable(rawSettings) and IsString(rawSettings.url))
+	local id = lower(LIB.GetUUID())
+	local bridgein = AJAX_BRIDGE_PATH .. id .. '.' .. GLOBAL.GAME_LANG .. '.jx3dat'
+	local bridgeout = AJAX_BRIDGE_PATH .. id .. '.result.' .. GLOBAL.GAME_LANG .. '.jx3dat'
+	local events = {
+		closebridge = function()
+			CPath.DelFile(bridgein)
+			CPath.DelFile(bridgeout)
+			LIB.DelayCall(NSFormatString('{$NS}RRDF_TO_') .. id, false)
+			LIB.BreatheCall(NSFormatString('{$NS}RRDF_TO_') .. id, false)
+		end,
+	}
+	local config = {
+		method = 'get',
+		payload = 'form',
+		driver = 'auto',
+		timeout = 60000,
+		charset = 'utf8',
+	}
+	local settings = setmetatable({}, {
+		__index = function(_, k)
+			return events[k] or config[k]
+		end,
+		__newindex = function(_, k, v)
+			if IsFunction(v) then
+				-- 确保回调被不会多次调用
+				local flag = false
+				events[k] = function(...)
+					if not flag then
+						flag = true
+						v(...)
+					end
+				end
+				config[k] = nil
+			else
+				config[k] = v
+				events[k] = nil
+			end
+		end,
+	})
+
+	for k, v in pairs(rawSettings) do
+		if lodash.includes(AJAX_SETTING_KEYS, k) then
+			settings[k] = v
+		end
+	end
+	settings.id = id
 
 	local url, data = settings.url, settings.data
 	if settings.charset == 'utf8' then
@@ -213,6 +265,31 @@ function LIB.Ajax(settings)
 		DEBUG_LEVEL.LOG
 	)
 	--[[#DEBUG END]]
+	LIB.SaveLUAData(bridgein, config, { crc = false, passphrase = false })
+	LIB.BreatheCall(NSFormatString('{$NS}RRDF_TO_') .. id, 200, function()
+		local data = LIB.LoadLUAData(bridgeout, { passphrase = false })
+		if IsTable(data) then
+			if settings.closebridge then
+				XpCall(settings.closebridge)
+			end
+			if settings.complete then
+				CallWithThis(settings, settings.complete, data.content, data.status, not Empty(data.status))
+			end
+			if IsNumber(data.status) and data.status >= 200 and data.status < 400 then
+				if settings.fulfilled then
+					CallWithThis(settings, settings.fulfilled)
+				end
+				if settings.success then
+					CallWithThis(settings, settings.success, data.content, data.status)
+				end
+			else
+				if settings.error then
+					CallWithThis(settings, settings.error, data.content, data.status, not Empty(data.status))
+				end
+			end
+		end
+	end)
+	LIB.DelayCall(NSFormatString('{$NS}RRDF_TO_') .. id, settings.timeout, closebridge)
 	if driver == 'curl' then
 		if not Curl_Create then
 			return CallWithThis(settings, settings.error, '', 0, false)
@@ -232,6 +309,9 @@ function LIB.Ajax(settings)
 			curl:AddHeader('Content-Type: application/x-www-form-urlencoded')
 		end
 		curl:OnComplete(function(html, code, success)
+			if settings.closebridge then
+				XpCall(settings.closebridge)
+			end
 			if settings.complete then
 				if settings.charset == 'utf8' then
 					html = UTF8ToAnsi(html)
@@ -343,17 +423,21 @@ function LIB.Ajax(settings)
 				--[[#DEBUG BEGIN]]
 				LIB.Debug(NSFormatString('{$NS}RRWP::OnDocumentComplete'), format('%s - %s', szTitle, szUrl), DEBUG_LEVEL.LOG)
 				--[[#DEBUG END]]
+				if settings.closebridge then
+					XpCall(settings.closebridge)
+				end
 				-- 注销超时处理时钟
 				LIB.DelayCall(NSFormatString('{$NS}RRWP_TO_') .. RequestID, false)
+				-- 完成回调函数
+				if settings.complete then
+					CallWithThis(settings, settings.complete, szContent, 200, true)
+				end
 				-- 成功回调函数
 				if settings.fulfilled then
 					CallWithThis(settings, settings.fulfilled)
 				end
 				if settings.success then
 					CallWithThis(settings, settings.success, szContent, 200)
-				end
-				if settings.complete then
-					CallWithThis(settings, settings.complete, szContent, 200, true)
 				end
 				insert(RRWP_FREE, RequestID)
 			end
@@ -369,12 +453,15 @@ function LIB.Ajax(settings)
 				--[[#DEBUG BEGIN]]
 				LIB.Debug(NSFormatString('{$NS}RRWP::Timeout'), settings.url, DEBUG_LEVEL.WARNING) -- log
 				--[[#DEBUG END]]
-				-- request timeout, call timeout function.
-				if settings.error then
-					CallWithThis(settings, settings.error, '', 0, false)
+				if settings.closebridge then
+					XpCall(settings.closebridge)
 				end
 				if settings.complete then
 					CallWithThis(settings, settings.complete, '', 500, false)
+				end
+				-- request timeout, call timeout function.
+				if settings.error then
+					CallWithThis(settings, settings.error, '', 0, false)
 				end
 				-- insert(RRWP_FREE, RequestID)
 			end)
@@ -413,6 +500,9 @@ local function OnCurlRequestResult()
 		local status = bSuccess and 200 or 500
 		if settings.charset == 'utf8' and IsString(html) then
 			html = UTF8ToAnsi(html)
+		end
+		if settings.closebridge then
+			XpCall(settings.closebridge)
 		end
 		if settings.complete then
 			CallWithThis(settings, settings.complete, html, status, bSuccess or dwBufferSize > 0)
