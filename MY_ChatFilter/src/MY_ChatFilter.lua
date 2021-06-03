@@ -53,40 +53,58 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 	return
 end
 --------------------------------------------------------------------------
-MY_ChatFilter = {}
-local _C = {}
-local MY_ChatFilter = MY_ChatFilter
+
+local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['MY_Chat'], {
+	bFilterDuplicate = { -- 屏蔽重复聊天
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ChatFilter'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bFilterDuplicateIgnoreID = { -- 不同玩家重复聊天也屏蔽
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ChatFilter'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bFilterDuplicateContinuous = { -- 仅屏蔽连续的重复聊天
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ChatFilter'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bFilterDuplicateAddonTalk = { -- 屏蔽UUID相同的插件消息
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ChatFilter'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	tApplyDuplicateChannels = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ChatFilter'],
+		xSchema = Schema.Map(Schema.String, Schema.Boolean),
+		xDefaultValue = {
+			['MSG_SYS'           ] = false,
+			['MSG_NORMAL'        ] = true,
+			['MSG_PARTY'         ] = false,
+			['MSG_MAP'           ] = true,
+			['MSG_BATTLE_FILED'  ] = true,
+			['MSG_GUILD'         ] = true,
+			['MSG_GUILD_ALLIANCE'] = true,
+			['MSG_SCHOOL'        ] = true,
+			['MSG_WORLD'         ] = true,
+			['MSG_TEAM'          ] = false,
+			['MSG_CAMP'          ] = true,
+			['MSG_GROUP'         ] = true,
+			['MSG_WHISPER'       ] = false,
+			['MSG_SEEK_MENTOR'   ] = true,
+			['MSG_FRIEND'        ] = false,
+		},
+	},
+})
+local D = {}
 local MAX_CHAT_RECORD = 10
 local MAX_UUID_RECORD = 10
-MY_ChatFilter.bFilterDuplicate           = true   -- 屏蔽重复聊天
-MY_ChatFilter.bFilterDuplicateIgnoreID   = false  -- 不同玩家重复聊天也屏蔽
-MY_ChatFilter.bFilterDuplicateContinuous = true   -- 仅屏蔽连续的重复聊天
-MY_ChatFilter.bFilterDuplicateAddonTalk  = true   -- 屏蔽UUID相同的插件消息
-RegisterCustomData('MY_ChatFilter.bFilterDuplicate')
-RegisterCustomData('MY_ChatFilter.bFilterDuplicateIgnoreID')
-RegisterCustomData('MY_ChatFilter.bFilterDuplicateContinuous')
-RegisterCustomData('MY_ChatFilter.bFilterDuplicateAddonTalk')
-
-MY_ChatFilter.tApplyDuplicateChannels = {
-	['MSG_SYS'           ] = false,
-	['MSG_NORMAL'        ] = true,
-	['MSG_PARTY'         ] = false,
-	['MSG_MAP'           ] = true,
-	['MSG_BATTLE_FILED'  ] = true,
-	['MSG_GUILD'         ] = true,
-	['MSG_GUILD_ALLIANCE'] = true,
-	['MSG_SCHOOL'        ] = true,
-	['MSG_WORLD'         ] = true,
-	['MSG_TEAM'          ] = false,
-	['MSG_CAMP'          ] = true,
-	['MSG_GROUP'         ] = true,
-	['MSG_WHISPER'       ] = false,
-	['MSG_SEEK_MENTOR'   ] = true,
-	['MSG_FRIEND'        ] = false,
-}
-for k, _ in pairs(MY_ChatFilter.tApplyDuplicateChannels) do
-	RegisterCustomData('MY_ChatFilter.tApplyDuplicateChannels.' .. k)
-end
 
 local l_tChannelHeader = {
 	['MSG_WHISPER'] = g_tStrings.STR_TALK_HEAD_SAY,
@@ -108,7 +126,7 @@ local l_tChannelHeader = {
 LIB.HookChatPanel('FILTER.MY_ChatFilter', function(h, szMsg, szChannel, dwTime)
 	local aXMLNode, aSay
 	-- 插件消息UUID过滤
-	if MY_ChatFilter.bFilterDuplicateAddonTalk then
+	if O.bFilterDuplicateAddonTalk then
 		if not aXMLNode then
 			aXMLNode = LIB.XMLDecode(szMsg)
 			aSay = LIB.ParseChatData(aXMLNode)
@@ -150,8 +168,8 @@ LIB.HookChatPanel('FILTER.MY_ChatFilter', function(h, szMsg, szChannel, dwTime)
 			szChannel = szEchoChannel
 		end
 	end
-	if MY_ChatFilter.bFilterDuplicate
-	and MY_ChatFilter.tApplyDuplicateChannels[szChannel] then
+	if O.bFilterDuplicate
+	and O.tApplyDuplicateChannels[szChannel] then
 		if not aXMLNode then
 			aXMLNode = LIB.XMLDecode(szMsg)
 			aSay = LIB.ParseChatData(aXMLNode)
@@ -172,13 +190,13 @@ LIB.HookChatPanel('FILTER.MY_ChatFilter', function(h, szMsg, szChannel, dwTime)
 		end
 		szText = szText:gsub('[ \n]', '')
 		-- 判断是否区分发言者
-		if not MY_ChatFilter.bFilterDuplicateIgnoreID then
+		if not O.bFilterDuplicateIgnoreID then
 			szText = szName .. ':' .. szText
 		end
 		-- 判断是否需要过滤
 		if not h.MY_tDuplicateLog then
 			h.MY_tDuplicateLog = {}
-		elseif MY_ChatFilter.bFilterDuplicateContinuous then
+		elseif O.bFilterDuplicateContinuous then
 			if h.MY_tDuplicateLog[1] == szText then
 				return false
 			end
@@ -211,9 +229,9 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndCheckBox', {
 		text = _L['filter duplicate chat'],
 		x = x, y = y, w = 400,
-		checked = MY_ChatFilter.bFilterDuplicate,
+		checked = O.bFilterDuplicate,
 		oncheck = function(bCheck)
-			MY_ChatFilter.bFilterDuplicate = bCheck
+			O.bFilterDuplicate = bCheck
 		end,
 	})
 	y = y + 30
@@ -221,9 +239,9 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndCheckBox', {
 		text = _L['filter duplicate chat ignore id'],
 		x = x, y = y, w = 400,
-		checked = MY_ChatFilter.bFilterDuplicateIgnoreID,
+		checked = O.bFilterDuplicateIgnoreID,
 		oncheck = function(bCheck)
-			MY_ChatFilter.bFilterDuplicateIgnoreID = bCheck
+			O.bFilterDuplicateIgnoreID = bCheck
 		end,
 	})
 	y = y + 30
@@ -231,9 +249,9 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndCheckBox', {
 		text = _L['only filter continuous duplicate chat'],
 		x = x, y = y, w = 400,
-		checked = MY_ChatFilter.bFilterDuplicateContinuous,
+		checked = O.bFilterDuplicateContinuous,
 		oncheck = function(bCheck)
-			MY_ChatFilter.bFilterDuplicateContinuous = bCheck
+			O.bFilterDuplicateContinuous = bCheck
 		end,
 	})
 	y = y + 30
@@ -242,13 +260,14 @@ function PS.OnPanelActive(wnd)
 		x = x, y = y, w = 330, h = 25,
 		menu = function()
 			local t = {}
-			for szChannelID, bFilter in pairs(MY_ChatFilter.tApplyDuplicateChannels) do
+			for szChannelID, bFilter in pairs(O.tApplyDuplicateChannels) do
 				insert(t, {
 					szOption = g_tStrings.tChannelName[szChannelID],
 					bCheck = true, bChecked = bFilter,
 					rgb = GetMsgFontColor(szChannelID, true),
 					fnAction = function()
-						MY_ChatFilter.tApplyDuplicateChannels[szChannelID] = not MY_ChatFilter.tApplyDuplicateChannels[szChannelID]
+						O.tApplyDuplicateChannels[szChannelID] = not O.tApplyDuplicateChannels[szChannelID]
+						O.tApplyDuplicateChannels = O.tApplyDuplicateChannels
 					end,
 				})
 			end
@@ -261,9 +280,9 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndCheckBox', {
 		text = _L['filter duplicate addon message'],
 		x = x, y = y, w = 400,
-		checked = MY_ChatFilter.bFilterDuplicateAddonTalk,
+		checked = O.bFilterDuplicateAddonTalk,
 		oncheck = function(bCheck)
-			MY_ChatFilter.bFilterDuplicateAddonTalk = bCheck
+			O.bFilterDuplicateAddonTalk = bCheck
 		end,
 	})
 	y = y + 30

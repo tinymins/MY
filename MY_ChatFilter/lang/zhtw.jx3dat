@@ -1,6 +1,8 @@
 return {
     ['MY_Chat'] = '聊天助手',
     ['MY_ChatBlock'] = '聊天過濾',
+    ['MY_ChatFilter'] = '刷屏屏蔽',
+
     ['Channels'] = '頻道設置',
     ['Enable'] = '啟用',
     ['Edit'] = '編輯',
