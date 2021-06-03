@@ -178,8 +178,9 @@ function LIB.Ajax(rawSettings)
 		end,
 	})
 
-	for k, v in pairs(rawSettings) do
-		if lodash.includes(AJAX_SETTING_KEYS, k) then
+	for _, k in ipairs(AJAX_SETTING_KEYS) do
+		local v = rawSettings[k]
+		if not IsNil(v) then
 			settings[k] = v
 		end
 	end
