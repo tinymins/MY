@@ -339,7 +339,7 @@ function D.UpdatePage(frame, bKeepScroll)
 			h:Clear()
 			h:AppendItemFromString(LIB.GetChatTimeXML(rec.nTime, {
 				r = r, g = g, b = b, f = f,
-				s = '[%yyyy/%MM/%dd][%hh:%mm:%ss]', mclick = false, richtext = rec.szMsg,
+				s = '[%yyyy/%MM/%dd][%hh:%mm:%ss]', richtext = rec.szMsg,
 			}))
 			local nCount = h:GetItemCount()
 			h:AppendItemFromString(rec.szMsg)
