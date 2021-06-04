@@ -881,7 +881,7 @@ function LIB.SetUserSettings(szKey, szDataSetKey, xValue)
 			for i, err in ipairs(errs) do
 				insert(aErrmsgs, i .. '. ' .. err.message)
 			end
-			return LIB.Debug(_L.PLUGIN_SHORT_NAME, 'SetUserSettings: ' .. szKey .. ', schema check failed.\n' .. concat(aErrmsgs, '\n'), DEBUG_LEVEL.WARNING)
+			assert(false, 'SetUserSettings: ' .. szKey .. ', schema check failed.\n' .. concat(aErrmsgs, '\n'), DEBUG_LEVEL.WARNING)
 		end
 	end
 	if info.bDataSet then
