@@ -283,10 +283,10 @@ end
 			end
 			-- filters
 			if szChannel == 'MSG_GUILD' then
-				if O.bIgnoreTongOnlineMsg and szText:find(TONG_ONLINE_MSG) then
+				if D.bInitialized and O.bIgnoreTongOnlineMsg and szText:find(TONG_ONLINE_MSG) then
 					return
 				end
-				if O.bIgnoreTongMemberLogMsg and (
+				if D.bInitialized and O.bIgnoreTongMemberLogMsg and (
 					szText:find(TONG_MEMBER_LOGIN_MSG) or szText:find(TONG_MEMBER_LOGOUT_MSG)
 				) then
 					return
@@ -294,7 +294,7 @@ end
 			end
 			if MAIN_DS then
 				MAIN_DS:InsertMsg(szChannel, szText, szMsg, szTalker, GetCurrentTime())
-				if O.bRealtimeCommit and not LIB.IsShieldedVersion('MY_ChatLog') then
+				if D.bInitialized and O.bRealtimeCommit and not LIB.IsShieldedVersion('MY_ChatLog') then
 					MAIN_DS:FlushDB()
 				end
 			else
@@ -324,6 +324,7 @@ function D.OnInit()
 	if O.bAutoConnectDB then
 		D.InitDB('ask')
 	end
+	D.bInitialized = true
 end
 LIB.RegisterInit('MY_ChatLog_InitDB', D.OnInit)
 
