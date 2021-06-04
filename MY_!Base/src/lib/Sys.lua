@@ -839,15 +839,16 @@ end
 -- @param {string} szDataSetKey 配置项组（如用户多套自定义偏好）唯一键，当且仅当 szKey 对应注册项携带 bDataSet 标记位时有效
 -- @return 值
 function LIB.GetUserSettings(szKey, szDataSetKey)
+	local szErrHeader = 'GetUserSettings KEY(' .. EncodeLUAData(szKey) .. '): '
 	local info = USER_SETTINGS_INFO[szKey]
-	assert(info, 'GetUserSettings: `Key` has not been registered.')
+	assert(info, szErrHeader ..'`Key` has not been registered.')
 	local db = DATABASE_INSTANCE[info.ePathType]
-	assert(db, 'GetUserSettings: Database not connected.')
+	assert(db, szErrHeader ..'Database not connected.')
 	local res = db:Get(info.szDataKey)
 	if IsTable(res) and res.v == info.szVersion then
 		local data = res.d
 		if info.bDataSet then
-			assert(IsString(szDataSetKey), 'GetUserSettings: `DataSetKey` should be a string value.')
+			assert(IsString(szDataSetKey), szErrHeader ..'`DataSetKey` should be a string value.')
 			if IsTable(data) then
 				data = data[szDataSetKey]
 			else
@@ -867,10 +868,11 @@ end
 -- @param {string} szDataSetKey 配置项组（如用户多套自定义偏好）唯一键，当且仅当 szKey 对应注册项携带 bDataSet 标记位时有效
 -- @param {unknown} xValue 值
 function LIB.SetUserSettings(szKey, szDataSetKey, xValue)
+	local szErrHeader = 'SetUserSettings KEY(' .. EncodeLUAData(szKey) .. '): '
 	local info = USER_SETTINGS_INFO[szKey]
-	assert(info, 'SetUserSettings: `Key` has not been registered.')
+	assert(info, szErrHeader .. '`Key` has not been registered.')
 	local db = DATABASE_INSTANCE[info.ePathType]
-	assert(db, 'GetUserSettings: Database not connected.')
+	assert(db, szErrHeader .. 'Database not connected.')
 	if not info.bDataSet then
 		xValue = szDataSetKey
 	end
@@ -881,11 +883,11 @@ function LIB.SetUserSettings(szKey, szDataSetKey, xValue)
 			for i, err in ipairs(errs) do
 				insert(aErrmsgs, i .. '. ' .. err.message)
 			end
-			assert(false, 'SetUserSettings: ' .. szKey .. ', schema check failed.\n' .. concat(aErrmsgs, '\n'), DEBUG_LEVEL.WARNING)
+			assert(false, szErrHeader .. '' .. szKey .. ', schema check failed.\n' .. concat(aErrmsgs, '\n'), DEBUG_LEVEL.WARNING)
 		end
 	end
 	if info.bDataSet then
-		assert(IsString(szDataSetKey), 'SetUserSettings: `DataSetKey` should be a string value.')
+		assert(IsString(szDataSetKey), szErrHeader .. '`DataSetKey` should be a string value.')
 		local res = db:Get(info.szDataKey)
 		if IsTable(res) and res.v == info.szVersion and IsTable(res.d) then
 			res.d[szDataSetKey] = xValue
