@@ -68,91 +68,117 @@ end
         ...
     }
 ]]
-local D = {}
-local _C = {}
 local DATA_FILE = 'userdata/chatmonitor.jx3dat'
 local CONFIG_FILE = 'config/chatmonitor.jx3dat'
 local RECORD_LIST, RECORD_HASH = {}, {}
-local KEYWORD_LIST = {}
 local DEFAULE_CHANNEL = {
     ['MSG_NORMAL'] = true, ['MSG_CAMP' ] = true, ['MSG_WORLD' ] = true, ['MSG_MAP'     ] = true,
     ['MSG_SCHOOL'] = true, ['MSG_GUILD'] = true, ['MSG_FRIEND'] = true, ['MSG_IDENTITY'] = true,
 }
-local O = {
-    bCapture            = false,
-    nMaxRecord          = 30,
-    bShowPreview        = true,
-    bPlaySound          = true,
-    bRedirectSysChannel = false,
-    bIgnoreSame         = false,
-    -- bRealtimeSave       = false,
-    bDistinctServer     = false,
-    szTimestrap         = '[%hh:%mm:%ss]',
-    anchor              = { x = -100, y = -150, s = 'BOTTOMRIGHT', r = 'BOTTOMRIGHT' },
-}
-RegisterCustomData('MY_ChatMonitor.bCapture')
-RegisterCustomData('MY_ChatMonitor.nMaxRecord')
-RegisterCustomData('MY_ChatMonitor.bShowPreview')
-RegisterCustomData('MY_ChatMonitor.bPlaySound')
-RegisterCustomData('MY_ChatMonitor.bRedirectSysChannel')
-RegisterCustomData('MY_ChatMonitor.bIgnoreSame', 1)
--- RegisterCustomData('MY_ChatMonitor.bRealtimeSave')
-RegisterCustomData('MY_ChatMonitor.bDistinctServer')
-RegisterCustomData('MY_ChatMonitor.szTimestrap', 1)
-RegisterCustomData('MY_ChatMonitor.anchor')
--- 兼容保留
-RegisterCustomData('MY_ChatMonitor.szKeyWords')
-RegisterCustomData('MY_ChatMonitor.bIsRegexp')
-RegisterCustomData('MY_ChatMonitor.tChannels')
+local O = LIB.CreateUserSettingsModule('MY_ChatMonitor', _L['MY_Chat'], {
+    aKeyword = {
+		ePathType = PATH_TYPE.GLOBAL,
+		szLabel = _L['MY_ChatMonitor'],
+		xSchema = Schema.Collection(Schema.Record({
+            szKeyword = Schema.String,
+            bEnable = Schema.Boolean,
+            bIsRegexp = Schema.Boolean,
+            tChannel = Schema.Map(Schema.String, Schema.Boolean),
+        })),
+		xDefaultValue = {{
+            szKeyword = _L.CHAT_MONITOR_KEYWORDS_SAMPLE,
+            bEnable = true,
+            bIsRegexp = false,
+            tChannel = Clone(DEFAULE_CHANNEL),
+        }},
+	},
+    bCapture = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ChatMonitor'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+    nMaxRecord = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ChatMonitor'],
+		xSchema = Schema.Number,
+		xDefaultValue = 30,
+	},
+    bShowPreview = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ChatMonitor'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+    bPlaySound = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ChatMonitor'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+    bRedirectSysChannel = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ChatMonitor'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+    bIgnoreSame = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ChatMonitor'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+    -- bRealtimeSave = {
+	-- 	ePathType = PATH_TYPE.ROLE,
+	-- 	szLabel = _L['MY_ChatMonitor'],
+	-- 	xSchema = Schema.Boolean,
+	-- 	xDefaultValue = false,
+	-- },
+    bDistinctServer = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ChatMonitor'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+    szTimestrap = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ChatMonitor'],
+		xSchema = Schema.String,
+		xDefaultValue = '[%hh:%mm:%ss]',
+	},
+    anchor = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ChatMonitor'],
+		xSchema = Schema.FrameAnchor,
+		xDefaultValue = { x = -100, y = -150, s = 'BOTTOMRIGHT', r = 'BOTTOMRIGHT' },
+	},
+})
+local D = {}
 
 local l_uiBtn, l_uiBoard
 
 function D.LoadConfig()
-    local aKeyword = LIB.LoadLUAData({CONFIG_FILE, PATH_TYPE.GLOBAL})
-    if not aKeyword then
-        aKeyword = {{
-            szKeyword = _L.CHAT_MONITOR_KEYWORDS_SAMPLE,
-            tChannel = Clone(DEFAULE_CHANNEL),
-            bEnable = true,
-            bIsRegexp = false,
-        }}
-    end
-    for i, p in ipairs(aKeyword) do
-        if IsString(p) then -- 兼容保留
-            aKeyword[i] = {
-                szKeyword = p,
-                tChannel = Clone(MY_ChatMonitor.tChannels or DEFAULE_CHANNEL),
-                bEnable = true,
-                bIsRegexp = MY_ChatMonitor.bIsRegexp or false,
-            }
-        end
-    end
-    -- 兼容保留
-    if MY_ChatMonitor.szKeyWords then
-        local bExist
+    local szPath = LIB.FormatPath({CONFIG_FILE, PATH_TYPE.GLOBAL})
+    local aKeyword = LIB.LoadLUAData(szPath)
+    if aKeyword then
+        CPath.DelFile(szPath)
+        -- 兼容保留
         for i, p in ipairs(aKeyword) do
-            if p.szKeyword == MY_ChatMonitor.szKeyWords then
-                bExist = true
-                break
+            if IsString(p) then
+                aKeyword[i] = {
+                    szKeyword = p,
+                    bEnable = true,
+                    bIsRegexp = false,
+                    tChannel = Clone(DEFAULE_CHANNEL),
+                }
             end
         end
-        if not bExist then
-            insert(aKeyword, {
-                szKeyword = MY_ChatMonitor.szKeyWords,
-                tChannel = Clone(MY_ChatMonitor.tChannels or DEFAULE_CHANNEL),
-                bEnable = true,
-                bIsRegexp = MY_ChatMonitor.bIsRegexp or false,
-            })
-        end
-        MY_ChatMonitor.szKeyWords = nil
-        MY_ChatMonitor.tChannels = nil
-        MY_ChatMonitor.bIsRegexp = nil
+        O.aKeyword = aKeyword
     end
-    KEYWORD_LIST = aKeyword
 end
 
 function D.SaveConfig()
-    LIB.SaveLUAData({CONFIG_FILE, PATH_TYPE.GLOBAL}, KEYWORD_LIST)
+    O.aKeyword = O.aKeyword
 end
 
 function D.SaveData()
@@ -250,7 +276,7 @@ function D.OnMsgArrive(szChannel, szMsg, nFont, bRich, r, g, b, dwTalkerID, szNa
     --------------------------------------------------------------------------------------
     -- 开始计算是否符合过滤器要求
     local bMatch = false
-    for _, p in ipairs(KEYWORD_LIST) do
+    for _, p in ipairs(O.aKeyword) do
         if p.bEnable and p.tChannel[szChannel] then
             if p.bIsRegexp then -- regexp
                 if find(rec.text, p.szKeyword) then
@@ -343,11 +369,11 @@ end
 LIB.RegisterExit('MY_ChatMonitor', D.Exit)
 
 function D.RegisterMsgMonitor()
-    for _, szChannel in ipairs(O.aCurrentChannel or CONSTANT.EMPTY_TABLE) do
+    for _, szChannel in ipairs(D.aCurrentChannel or CONSTANT.EMPTY_TABLE) do
         LIB.RegisterMsgMonitor(szChannel .. '.MY_ChatMonitor', false)
     end
     local tChannel = {}
-    for _, p in ipairs(KEYWORD_LIST) do
+    for _, p in ipairs(O.aKeyword) do
         if p.bEnable then
             for szChannel, bCapture in pairs(p.tChannel) do
                 if bCapture then
@@ -363,59 +389,7 @@ function D.RegisterMsgMonitor()
     for _, szChannel in ipairs(aChannel) do
         LIB.RegisterMsgMonitor(szChannel .. '.MY_ChatMonitor', D.OnMsgArrive)
     end
-    O.aCurrentChannel = aChannel
-end
-
--------------------------------------------------------------------------------------------------------
--- 全局导出
--------------------------------------------------------------------------------------------------------
--- Global exports
-do
-local settings = {
-	exports = {
-		{
-			fields = {
-                bCapture            = true,
-                nMaxRecord          = true,
-                bShowPreview        = true,
-                bPlaySound          = true,
-                bRedirectSysChannel = true,
-                bIgnoreSame         = true,
-                -- bRealtimeSave       = true,
-                bDistinctServer     = true,
-                szTimestrap         = true,
-                anchor              = true,
-                -- 兼容保留
-                szKeyWords          = true,
-                bIsRegexp           = true,
-                tChannels           = true,
-			},
-			root = O,
-		},
-	},
-	imports = {
-		{
-			fields = {
-                bCapture            = true,
-                nMaxRecord          = true,
-                bShowPreview        = true,
-                bPlaySound          = true,
-                bRedirectSysChannel = true,
-                bIgnoreSame         = true,
-                -- bRealtimeSave       = true,
-                bDistinctServer     = true,
-                szTimestrap         = true,
-                anchor              = true,
-                -- 兼容保留
-                szKeyWords          = true,
-                bIsRegexp           = true,
-                tChannels           = true,
-			},
-			root = O,
-		},
-	},
-}
-MY_ChatMonitor = LIB.CreateModule(settings)
+    D.aCurrentChannel = aChannel
 end
 
 -------------------------------------------------------------------------------------------------------
@@ -426,12 +400,12 @@ LIB.RegisterHotKey('MY_ChatMonitor_Hotkey', _L['MY_ChatMonitor'], function()
         if l_uiBtn then
             l_uiBtn:Text(_L['start'])
         end
-        MY_ChatMonitor.bCapture = false
+        O.bCapture = false
     else
         if l_uiBtn then
             l_uiBtn:Text(_L['stop'])
         end
-        MY_ChatMonitor.bCapture = true
+        O.bCapture = true
     end
 end, nil)
 
@@ -451,7 +425,7 @@ function PS.OnPanelActive(wnd)
         text = _L['Click to config monitors'],
         menu = function()
             local menu = { bAlignWidth = true }
-            for i, p in ipairs(KEYWORD_LIST) do
+            for i, p in ipairs(O.aKeyword) do
                 local m = LIB.GetMsgTypeMenu(function(szChannel)
                     p.tChannel[szChannel] = not p.tChannel[szChannel]
                     D.SaveConfig()
@@ -516,7 +490,7 @@ function PS.OnPanelActive(wnd)
                 insert(m, {
                     szOption = _L['Delete'],
                     fnAction = function()
-                        remove(KEYWORD_LIST, i)
+                        remove(O.aKeyword, i)
                         D.SaveConfig()
                         D.RegisterMsgMonitor()
                         UI.ClosePopupMenu()
@@ -536,11 +510,11 @@ function PS.OnPanelActive(wnd)
                         if IsEmpty(szText) then
                             return
                         end
-                        insert(KEYWORD_LIST, {
+                        insert(O.aKeyword, {
                             szKeyword = szText,
-                            tChannel = Clone(DEFAULE_CHANNEL),
                             bEnable = true,
                             bIsRegexp = false,
+                            tChannel = Clone(DEFAULE_CHANNEL),
                         })
                         D.SaveConfig()
                         D.RegisterMsgMonitor()
@@ -572,85 +546,85 @@ function PS.OnPanelActive(wnd)
                     szOption = _L['timestrap format'], {
                         szOption = '[%hh:%mm:%ss]',
                         fnAction = function()
-                            MY_ChatMonitor.szTimestrap = '[%hh:%mm:%ss]'
+                            O.szTimestrap = '[%hh:%mm:%ss]'
                         end,
                         bCheck = true, bMCheck = true,
-                        bChecked = MY_ChatMonitor.szTimestrap == '[%hh:%mm:%ss]'
+                        bChecked = O.szTimestrap == '[%hh:%mm:%ss]'
                     }, {
                         szOption = '[%MM/%dd %hh:%mm:%ss]',
                         fnAction = function()
-                            MY_ChatMonitor.szTimestrap = '[%MM/%dd %hh:%mm:%ss]'
+                            O.szTimestrap = '[%MM/%dd %hh:%mm:%ss]'
                         end,
                         bCheck = true, bMCheck = true,
-                        bChecked = MY_ChatMonitor.szTimestrap == '[%MM/%dd %hh:%mm:%ss]'
+                        bChecked = O.szTimestrap == '[%MM/%dd %hh:%mm:%ss]'
                     }, {
                         szOption = _L['custom'],
                         fnAction = function()
                             GetUserInput(_L['custom timestrap (eg:[%yyyy/%MM/%dd_%hh:%mm:%ss])'], function(szText)
-                                MY_ChatMonitor.szTimestrap = szText
-                            end, nil, nil, nil, MY_ChatMonitor.szTimestrap)
+                                O.szTimestrap = szText
+                            end, nil, nil, nil, O.szTimestrap)
                         end,
                     },
                 },
                 {
                     szOption = _L['max record count'],
                     fnAction = function()
-                        GetUserInputNumber(MY_ChatMonitor.nMaxRecord, 1000, nil, function(val)
-                            MY_ChatMonitor.nMaxRecord = val or MY_ChatMonitor.nMaxRecord
+                        GetUserInputNumber(O.nMaxRecord, 1000, nil, function(val)
+                            O.nMaxRecord = val or O.nMaxRecord
                         end, nil, function() return not LIB.IsPanelVisible() end)
                     end,
                 },
                 {
                     szOption = _L['show message preview box'],
                     fnAction = function()
-                        MY_ChatMonitor.bShowPreview = not MY_ChatMonitor.bShowPreview
+                        O.bShowPreview = not O.bShowPreview
                     end,
                     bCheck = true,
-                    bChecked = MY_ChatMonitor.bShowPreview
+                    bChecked = O.bShowPreview
                 },
                 {
                     szOption = _L['play new message alert sound'],
                     fnAction = function()
-                        MY_ChatMonitor.bPlaySound = not MY_ChatMonitor.bPlaySound
+                        O.bPlaySound = not O.bPlaySound
                     end,
                     bCheck = true,
-                    bChecked = MY_ChatMonitor.bPlaySound
+                    bChecked = O.bPlaySound
                 },
                 {
                     szOption = _L['output to system channel'],
                     fnAction = function()
-                        MY_ChatMonitor.bRedirectSysChannel = not MY_ChatMonitor.bRedirectSysChannel
+                        O.bRedirectSysChannel = not O.bRedirectSysChannel
                     end,
                     bCheck = true,
-                    bChecked = MY_ChatMonitor.bRedirectSysChannel
+                    bChecked = O.bRedirectSysChannel
                 },
                 {
                     szOption = _L['ignore same message'],
                     fnAction = function()
-                        MY_ChatMonitor.bIgnoreSame = not MY_ChatMonitor.bIgnoreSame
+                        O.bIgnoreSame = not O.bIgnoreSame
                     end,
                     bCheck = true,
-                    bChecked = MY_ChatMonitor.bIgnoreSame
+                    bChecked = O.bIgnoreSame
                 }
             }
             if IsShiftKeyDown() then
                 -- insert(t, {
                 --     szOption = _L['Realtime save'],
                 --     fnAction = function()
-                --         MY_ChatMonitor.bRealtimeSave = not MY_ChatMonitor.bRealtimeSave
+                --         O.bRealtimeSave = not O.bRealtimeSave
                 --     end,
                 --     bCheck = true,
-                --     bChecked = MY_ChatMonitor.bRealtimeSave
+                --     bChecked = O.bRealtimeSave
                 -- })
                 insert(t, {
                     szOption = _L['Distinct server'],
                     fnAction = function()
-                        MY_ChatMonitor.bDistinctServer = not MY_ChatMonitor.bDistinctServer
+                        O.bDistinctServer = not O.bDistinctServer
                         D.LoadData()
                         LIB.SwitchTab('MY_ChatMonitor', true)
                     end,
                     bCheck = true,
-                    bChecked = MY_ChatMonitor.bDistinctServer
+                    bChecked = O.bDistinctServer
                 })
             end
             return t
@@ -660,14 +634,14 @@ function PS.OnPanelActive(wnd)
     l_uiBtn = ui:Append('WndButton', {
         name = 'Button_ChatMonitor_Switcher',
         x = w - 134, y = 15, w = 50,
-        text = (MY_ChatMonitor.bCapture and _L['stop']) or _L['start'],
+        text = (O.bCapture and _L['stop']) or _L['start'],
         onclick = function()
-            if MY_ChatMonitor.bCapture then
+            if O.bCapture then
                 UI(this):Text(_L['start'])
-                MY_ChatMonitor.bCapture = false
+                O.bCapture = false
             else
                 UI(this):Text(_L['stop'])
-                MY_ChatMonitor.bCapture = true
+                O.bCapture = true
             end
         end,
     })
