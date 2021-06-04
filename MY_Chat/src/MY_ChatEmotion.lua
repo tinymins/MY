@@ -69,23 +69,25 @@ local O = LIB.CreateUserSettingsModule('MY_ChatEmotion', _L['MY_Chat'], {
 })
 local D = {}
 
-LIB.HookChatPanel('BEFORE.MY_ChatEmotion', function(h, szMsg, ...)
-	if O.bFixSize then
-		local aXMLNode = LIB.XMLDecode(szMsg)
-		if aXMLNode then
-			for _, node in ipairs(aXMLNode) do
-				local szType = LIB.XMLGetNodeType(node)
-				local szName = LIB.XMLGetNodeData(node, 'name')
-				if (szType == 'animate' or szType == 'image')
-				and szName and szName:sub(1, 8) == 'emotion_' then
-					LIB.XMLSetNodeData(node, 'w', O.nSize)
-					LIB.XMLSetNodeData(node, 'h', O.nSize)
+LIB.RegisterInit('MY_ChatEmotion', function()
+	LIB.HookChatPanel('BEFORE.MY_ChatEmotion', function(h, szMsg, ...)
+		if O.bFixSize then
+			local aXMLNode = LIB.XMLDecode(szMsg)
+			if aXMLNode then
+				for _, node in ipairs(aXMLNode) do
+					local szType = LIB.XMLGetNodeType(node)
+					local szName = LIB.XMLGetNodeData(node, 'name')
+					if (szType == 'animate' or szType == 'image')
+					and szName and szName:sub(1, 8) == 'emotion_' then
+						LIB.XMLSetNodeData(node, 'w', O.nSize)
+						LIB.XMLSetNodeData(node, 'h', O.nSize)
+					end
 				end
+				szMsg = LIB.XMLEncode(aXMLNode)
 			end
-			szMsg = LIB.XMLEncode(aXMLNode)
 		end
-	end
-	return szMsg
+		return szMsg
+	end)
 end)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
