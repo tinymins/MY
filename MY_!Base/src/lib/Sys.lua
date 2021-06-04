@@ -838,17 +838,25 @@ end
 -- @param {string} szKey 配置项全局唯一键
 -- @param {string} szDataSetKey 配置项组（如用户多套自定义偏好）唯一键，当且仅当 szKey 对应注册项携带 bDataSet 标记位时有效
 -- @return 值
-function LIB.GetUserSettings(szKey, szDataSetKey)
+function LIB.GetUserSettings(szKey, ...)
+	local nParameter = select('#', ...) + 1
 	local szErrHeader = 'GetUserSettings KEY(' .. EncodeLUAData(szKey) .. '): '
 	local info = USER_SETTINGS_INFO[szKey]
 	assert(info, szErrHeader ..'`Key` has not been registered.')
 	local db = DATABASE_INSTANCE[info.ePathType]
 	assert(db, szErrHeader ..'Database not connected.')
+	local szDataSetKey
+	if info.bDataSet then
+		assert(nParameter == 2, szErrHeader .. '2 parameters expected, got ' .. nParameter)
+		szDataSetKey = ...
+		assert(IsString(szDataSetKey) or IsNumber(szDataSetKey), szErrHeader ..'`DataSetKey` should be a string or number value.')
+	else
+		assert(nParameter == 1, szErrHeader .. '1 parameters expected, got ' .. nParameter)
+	end
 	local res = db:Get(info.szDataKey)
 	if IsTable(res) and res.v == info.szVersion then
 		local data = res.d
 		if info.bDataSet then
-			assert(IsString(szDataSetKey), szErrHeader ..'`DataSetKey` should be a string value.')
 			if IsTable(data) then
 				data = data[szDataSetKey]
 			else
@@ -867,14 +875,21 @@ end
 -- @param {string} szKey 配置项全局唯一键
 -- @param {string} szDataSetKey 配置项组（如用户多套自定义偏好）唯一键，当且仅当 szKey 对应注册项携带 bDataSet 标记位时有效
 -- @param {unknown} xValue 值
-function LIB.SetUserSettings(szKey, szDataSetKey, xValue)
+function LIB.SetUserSettings(szKey, ...)
+	local nParameter = select('#', ...) + 1
 	local szErrHeader = 'SetUserSettings KEY(' .. EncodeLUAData(szKey) .. '): '
 	local info = USER_SETTINGS_INFO[szKey]
 	assert(info, szErrHeader .. '`Key` has not been registered.')
 	local db = DATABASE_INSTANCE[info.ePathType]
 	assert(db, szErrHeader .. 'Database not connected.')
-	if not info.bDataSet then
-		xValue = szDataSetKey
+	local szDataSetKey, xValue
+	if info.bDataSet then
+		assert(nParameter == 3, szErrHeader .. '3 parameters expected, got ' .. nParameter)
+		szDataSetKey, xValue = ...
+		assert(IsString(szDataSetKey) or IsNumber(szDataSetKey), szErrHeader ..'`DataSetKey` should be a string or number value.')
+	else
+		assert(nParameter == 2, szErrHeader .. '2 parameters expected, got ' .. nParameter)
+		xValue = ...
 	end
 	if info.xSchema then
 		local errs = Schema.CheckSchema(xValue, info.xSchema)
@@ -887,7 +902,6 @@ function LIB.SetUserSettings(szKey, szDataSetKey, xValue)
 		end
 	end
 	if info.bDataSet then
-		assert(IsString(szDataSetKey), szErrHeader .. '`DataSetKey` should be a string value.')
 		local res = db:Get(info.szDataKey)
 		if IsTable(res) and res.v == info.szVersion and IsTable(res.d) then
 			res.d[szDataSetKey] = xValue
@@ -905,6 +919,7 @@ end
 -- @return 配置项读写代理对象
 function LIB.CreateUserSettingsProxy(xProxy)
 	local tSettings = {}
+	local tDataSet = {}
 	local tLoaded = {}
 	local tProxy = IsTable(xProxy) and xProxy or {}
 	for k, v in pairs(tProxy) do
@@ -923,10 +938,32 @@ function LIB.CreateUserSettingsProxy(xProxy)
 	return setmetatable({}, {
 		__index = function(_, k)
 			if not tLoaded[k] then
-				tSettings[k] = LIB.GetUserSettings(GetGlobalKey(k))
+				local info = USER_SETTINGS_INFO[k]
+				if info and info.bDataSet then
+					-- 配置项组，初始化读写模块
+					local tDSSettings = {}
+					local tDSLoaded = {}
+					tDataSet[k] = setmetatable({}, {
+						__index = function(_, kds)
+							if not tDSLoaded[kds] then
+								tDSSettings[kds] = LIB.GetUserSettings(GetGlobalKey(k), kds)
+								tDSLoaded[kds] = true
+							end
+							return tDSSettings[kds]
+						end,
+						__newindex = function(_, kds, vds)
+							LIB.SetUserSettings(GetGlobalKey(k), kds, vds)
+							tDSSettings[kds] = vds
+							tDSLoaded[kds] = true
+						end,
+					})
+				else
+					-- 普通数据，加载数据内容
+					tSettings[k] = LIB.GetUserSettings(GetGlobalKey(k))
+				end
 				tLoaded[k] = true
 			end
-			return tSettings[k]
+			return tDataSet[k] or tSettings[k]
 		end,
 		__newindex = function(_, k, v)
 			LIB.SetUserSettings(GetGlobalKey(k), v)
