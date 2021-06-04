@@ -1,5 +1,6 @@
 return {
 	-- CombatText --
+	['MY_CombatText'] = '戰鬥文字',
 	['CombatText'] = '戰鬥文字',
 	['Font Size'] = '文字大小',
 	['times'] = '倍',
@@ -46,4 +47,5 @@ return {
 	['critical beaten'] = '受傷會心',
 	['critical heaten'] = '治療會心',
 	['ZuiWu Effect'] = '自己的醉舞提示正在接受治療的目標',
+	['[MY] Same time combat text reach limit %d, please check server script.'] = '[MY] 同屏戰鬥文字已抵達上限%d個，建議檢查服務端腳本是不是給外包亂寫了，卡成PPT不要甩鍋給界面組。',
 }

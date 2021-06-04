@@ -213,47 +213,151 @@ local COMBAT_TEXT_CACHE  = { -- buff的名字cache
 }
 local CombatText = {}
 
-MY_CombatText = {
-	bEnable      = true,
-	bRender      = true,
-	fScale       = 1,
-	nStyle       = 1, -- default
-	nMaxAlpha    = 240,
-	nTime        = 40,
-	nFadeIn      = 4,
-	nFadeOut     = 8,
-	nFont        = 19,
-	bImmunity    = false,
-	bCritical    = false,
-	tCriticalC   = { 255, 255, 255 },
-	tCriticalH   = { 0,   255, 0   },
-	tCriticalB   = LIB.IsStreaming() and { 253, 86, 86 } or { 255, 0, 0 },
+local O = LIB.CreateUserSettingsModule('MY_CombatText', _L['MY_Chat'], {
+	bEnable = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_CombatText'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bRender = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_CombatText'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	fScale = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_CombatText'],
+		xSchema = Schema.Number,
+		xDefaultValue = 1,
+	},
+	nStyle = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_CombatText'],
+		xSchema = Schema.Number,
+		xDefaultValue = 1,
+	},
+	nMaxAlpha = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_CombatText'],
+		xSchema = Schema.Number,
+		xDefaultValue = 240,
+	},
+	nTime = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_CombatText'],
+		xSchema = Schema.Number,
+		xDefaultValue = 40,
+	},
+	nFadeIn = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_CombatText'],
+		xSchema = Schema.Number,
+		xDefaultValue = 4,
+	},
+	nFadeOut = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_CombatText'],
+		xSchema = Schema.Number,
+		xDefaultValue = 8,
+	},
+	nFont = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_CombatText'],
+		xSchema = Schema.Number,
+		xDefaultValue = 19,
+	},
+	bImmunity = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_CombatText'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bCritical = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_CombatText'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	tCriticalC = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_CombatText'],
+		xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+		xDefaultValue = { 255, 255, 255 },
+	},
+	tCriticalH = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_CombatText'],
+		xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+		xDefaultValue = { 0, 255, 0 },
+	},
+	tCriticalB = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_CombatText'],
+		xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+		xDefaultValue = LIB.IsStreaming() and { 253, 86, 86 } or { 255, 0, 0 },
+	},
 	-- $name 名字 $sn   技能名 $crit 会心 $val  数值
-	szSkill      = '$sn' .. g_tStrings.STR_COLON .. '$crit $val',
-	szTherapy    = '$sn' .. g_tStrings.STR_COLON .. '$crit +$val',
-	szDamage     = '$sn' .. g_tStrings.STR_COLON .. '$crit -$val',
-	bCasterNotI  = false,
-	bSnShorten2  = false,
-	bTherEffOnly = false,
+	szSkill = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_CombatText'],
+		xSchema = Schema.String,
+		xDefaultValue = '$sn' .. g_tStrings.STR_COLON .. '$crit $val',
+	},
+	szTherapy = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_CombatText'],
+		xSchema = Schema.String,
+		xDefaultValue = '$sn' .. g_tStrings.STR_COLON .. '$crit +$val',
+	},
+	szDamage = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_CombatText'],
+		xSchema = Schema.String,
+		xDefaultValue = '$sn' .. g_tStrings.STR_COLON .. '$crit -$val',
+	},
+	bCasterNotI = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_CombatText'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bSnShorten2 = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_CombatText'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bTherEffOnly = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_CombatText'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
 	col = { -- 颜色呗
-		['DAMAGE']                               = LIB.IsStreaming() and { 253, 86, 86 } or { 255, 0, 0 }, -- 自己受到的伤害
-		[SKILL_RESULT_TYPE.THERAPY]              = { 0,   255, 0   }, -- 治疗
-		[SKILL_RESULT_TYPE.PHYSICS_DAMAGE]       = { 255, 255, 255 }, -- 外公
-		[SKILL_RESULT_TYPE.SOLAR_MAGIC_DAMAGE]   = { 255, 128, 128 }, -- 阳
-		[SKILL_RESULT_TYPE.NEUTRAL_MAGIC_DAMAGE] = { 255, 255, 0   }, -- 混元
-		[SKILL_RESULT_TYPE.LUNAR_MAGIC_DAMAGE]   = { 12,  242, 255 }, -- 阴
-		[SKILL_RESULT_TYPE.POISON_DAMAGE]        = { 128, 255, 128 }, -- 有毒啊
-		[SKILL_RESULT_TYPE.REFLECTIED_DAMAGE]    = { 255, 128, 128 }, -- 反弹 ？？
-	}
-}
-LIB.RegisterCustomData('MY_CombatText', 2)
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_CombatText'],
+		xSchema = Schema.Map(Schema.OneOf(Schema.String, Schema.Number), Schema.Tuple(Schema.Number, Schema.Number, Schema.Number)),
+		xDefaultValue = {
+			['DAMAGE']                               = LIB.IsStreaming() and { 253, 86, 86 } or { 255, 0, 0 }, -- 自己受到的伤害
+			[SKILL_RESULT_TYPE.THERAPY]              = { 0,   255, 0   }, -- 治疗
+			[SKILL_RESULT_TYPE.PHYSICS_DAMAGE]       = { 255, 255, 255 }, -- 外公
+			[SKILL_RESULT_TYPE.SOLAR_MAGIC_DAMAGE]   = { 255, 128, 128 }, -- 阳
+			[SKILL_RESULT_TYPE.NEUTRAL_MAGIC_DAMAGE] = { 255, 255, 0   }, -- 混元
+			[SKILL_RESULT_TYPE.LUNAR_MAGIC_DAMAGE]   = { 12,  242, 255 }, -- 阴
+			[SKILL_RESULT_TYPE.POISON_DAMAGE]        = { 128, 255, 128 }, -- 有毒啊
+			[SKILL_RESULT_TYPE.REFLECTIED_DAMAGE]    = { 255, 128, 128 }, -- 反弹 ？？
+		},
+	},
+})
+local D = {}
 
 local function IsEnabled()
-	return MY_CombatText.bEnable
+	return O.bEnable
 end
-local MY_CombatText = MY_CombatText
 
-function MY_CombatText.OnFrameCreate()
+function D.OnFrameCreate()
 	for k, v in ipairs(COMBAT_TEXT_EVENT) do
 		this:RegisterEvent(v)
 	end
@@ -297,7 +401,7 @@ end
 -- for i=1, 5 do FireEvent('SKILL_BUFF', UI_GetClientPlayerID(), true, 103, 1) end
 -- FireUIEvent('SKILL_MISS', UI_GetClientPlayerID(), UI_GetClientPlayerID())
 -- FireUIEvent('SYS_MSG', 'UI_OME_EXP_LOG', UI_GetClientPlayerID(), UI_GetClientPlayerID())
-function MY_CombatText.OnEvent(szEvent)
+function D.OnEvent(szEvent)
 	if szEvent == 'FIGHT_HINT' then -- 进出战斗文字
 		if arg0 then
 			OutputMessage('MSG_ANNOUNCE_RED', g_tStrings.STR_MSG_ENTER_FIGHT)
@@ -313,7 +417,7 @@ function MY_CombatText.OnEvent(szEvent)
 	elseif szEvent == 'SKILL_BUFF' then
 		CombatText.OnSkillBuff(arg0, arg1, arg2, arg3)
 	elseif szEvent == 'BUFF_IMMUNITY' then
-		if not MY_CombatText.bImmunity and arg1 == COMBAT_TEXT_PLAYERID then
+		if not O.bImmunity and arg1 == COMBAT_TEXT_PLAYERID then
 			CombatText.OnBuffImmunity(arg0)
 		end
 	elseif szEvent == 'SKILL_MISS' then
@@ -368,12 +472,12 @@ end
 
 function CombatText.OnFrameRender()
 	local nTime     = GetTime()
-	local nFadeIn   = MY_CombatText.nFadeIn
-	local nFadeOut  = MY_CombatText.nFadeOut
-	local nMaxAlpha = MY_CombatText.nMaxAlpha
-	local nFont     = MY_CombatText.nFont
-	local nDelay    = MY_CombatText.nTime
-	local g_fScale  = MY_CombatText.fScale
+	local nFadeIn   = O.nFadeIn
+	local nFadeOut  = O.nFadeOut
+	local nMaxAlpha = O.nMaxAlpha
+	local nFont     = O.nFont
+	local nDelay    = O.nTime
+	local g_fScale  = O.fScale
 	for k, v in pairs(COMBAT_TEXT_SHADOW) do
 		local nFrame = (nTime - v.nTime) / nDelay + 1 -- 每一帧是多少毫秒 这里越小 动画越快
 		local nBefore = floor(nFrame)
@@ -509,12 +613,12 @@ function CombatText.OnFrameRender()
 	end
 end
 
-MY_CombatText.OnFrameBreathe = CombatText.OnFrameRender
-MY_CombatText.OnFrameRender  = CombatText.OnFrameRender
+D.OnFrameBreathe = CombatText.OnFrameRender
+D.OnFrameRender  = CombatText.OnFrameRender
 
 function CombatText.TrajectoryCount()
-	if MY_CombatText.fScale < 1.5 then
-		return floor(3.5 / COMBAT_TEXT_UI_SCALE / MY_CombatText.fScale)
+	if O.fScale < 1.5 then
+		return floor(3.5 / COMBAT_TEXT_UI_SCALE / O.fScale)
 	else
 		return floor(3.5 / COMBAT_TEXT_UI_SCALE)
 	end
@@ -605,8 +709,8 @@ function CombatText.OnSkillText(dwCasterID, dwTargetID, bCriticalStrike, nType, 
 	-- 过滤 有效治疗 有效伤害 西区内力 化解治疗
 	if nType == SKILL_RESULT_TYPE.EFFECTIVE_DAMAGE
 --	or nType == SKILL_RESULT_TYPE.EFFECTIVE_THERAPY
-	or (nType == SKILL_RESULT_TYPE.EFFECTIVE_THERAPY and not MY_CombatText.bTherEffOnly)
-	or (nType == SKILL_RESULT_TYPE.THERAPY and MY_CombatText.bTherEffOnly)
+	or (nType == SKILL_RESULT_TYPE.EFFECTIVE_THERAPY and not O.bTherEffOnly)
+	or (nType == SKILL_RESULT_TYPE.THERAPY and O.bTherEffOnly)
 	or nType == SKILL_RESULT_TYPE.TRANSFER_MANA
 	or nType == SKILL_RESULT_TYPE.ABSORB_THERAPY
 	or nType == SKILL_RESULT_TYPE.TRANSFER_LIFE
@@ -650,13 +754,13 @@ function CombatText.OnSkillText(dwCasterID, dwTargetID, bCriticalStrike, nType, 
 	end
 	-- replace
 	if nType == SKILL_RESULT_TYPE.THERAPY then
-		szReplaceText = MY_CombatText.szTherapy
+		szReplaceText = O.szTherapy
 	else
-		szReplaceText = MY_CombatText.szSkill
+		szReplaceText = O.szSkill
 	end
 	-- point color
 	local szPoint = 'TOP'
-	local col     = MY_CombatText.col[nType]
+	local col     = O.col[nType]
 	if COMBAT_TEXT_STRING[nType] then
 		szText = COMBAT_TEXT_STRING[nType]
 		if dwTargetID == COMBAT_TEXT_PLAYERID then
@@ -667,8 +771,8 @@ function CombatText.OnSkillText(dwCasterID, dwTargetID, bCriticalStrike, nType, 
 		if dwTargetID == COMBAT_TEXT_PLAYERID then
 			szPoint = 'BOTTOM_RIGHT'
 		end
-		if bCriticalStrike and MY_CombatText.bCritical then
-			col = MY_CombatText.tCriticalH
+		if bCriticalStrike and O.bCritical then
+			col = O.tCriticalH
 		end
 	else
 		if dwTargetID == COMBAT_TEXT_PLAYERID then
@@ -681,19 +785,19 @@ function CombatText.OnSkillText(dwCasterID, dwTargetID, bCriticalStrike, nType, 
 			local hSkill = GetSkill(dwSkillID, dwSkillLevel)
 			if hSkill and hSkill.dwBelongSchool ~= 18 and hSkill.dwBelongSchool ~= 0 then
 				nType = SKILL_RESULT_TYPE.REFLECTIED_DAMAGE
-				col = MY_CombatText.col[SKILL_RESULT_TYPE.REFLECTIED_DAMAGE]
+				col = O.col[SKILL_RESULT_TYPE.REFLECTIED_DAMAGE]
 			end
 		end
 		if nType ~= SKILL_RESULT_TYPE.REFLECTIED_DAMAGE then
-			col = MY_CombatText.col['DAMAGE']
-			if bCriticalStrike and MY_CombatText.bCritical then
-				col = MY_CombatText.tCriticalB
+			col = O.col['DAMAGE']
+			if bCriticalStrike and O.bCritical then
+				col = O.tCriticalB
 			end
 		end
-		szReplaceText = MY_CombatText.szDamage
+		szReplaceText = O.szDamage
 	end
-	if szPoint == 'TOP' and bCriticalStrike and nType ~= SKILL_RESULT_TYPE.THERAPY and MY_CombatText.bCritical then
-		col = MY_CombatText.tCriticalC
+	if szPoint == 'TOP' and bCriticalStrike and nType ~= SKILL_RESULT_TYPE.THERAPY and O.bCritical then
+		col = O.tCriticalC
 	end
 	-- draw text
 	if not szText then -- 还未被定义的
@@ -705,10 +809,10 @@ function CombatText.OnSkillText(dwCasterID, dwTargetID, bCriticalStrike, nType, 
 				szCasterName = p.szName
 			end
 		end
-		if MY_CombatText.bCasterNotI and szCasterName == GetClientPlayer().szName then
+		if O.bCasterNotI and szCasterName == GetClientPlayer().szName then
 			szCasterName = ''
 		end
-		if MY_CombatText.bSnShorten2 then
+		if O.bSnShorten2 then
 			szName = wsub(szName, 1, 2) -- wstring是兼容台服的 台服utf-8
 		end
 		szText = szReplaceText
@@ -775,7 +879,7 @@ function CombatText.OnCommonHealth(dwCharacterID, nDeltaLife)
 		end
 	end
 	local szText = nDeltaLife > 0 and '+' .. nDeltaLife or nDeltaLife
-	local col    = nDeltaLife > 0 and MY_CombatText.col[SKILL_RESULT_TYPE.THERAPY] or MY_CombatText.col['DAMAGE']
+	local col    = nDeltaLife > 0 and O.col[SKILL_RESULT_TYPE.THERAPY] or O.col['DAMAGE']
 	CombatText.CreateText(shadow, dwCharacterID, szText, szPoint, 'COMMON_HEALTH', false, col)
 end
 
@@ -824,7 +928,7 @@ function CombatText.GetFreeShadow()
 		return sha
 	end
 	Log('[MY] CombatText Get Free Item Failed!!!')
-	Log('[MY] 同屏战斗文字已抵达上限' .. COMBAT_TEXT_MAX_COUNT .. '个，建议检查服务端脚本是不是给外包乱写了，卡成PPT不要甩锅给界面组。')
+	Log(_L('[MY] Same time combat text reach limit %d, please check server script.', COMBAT_TEXT_MAX_COUNT))
 end
 
 function CombatText.LoadConfig()
@@ -848,13 +952,13 @@ end
 function CombatText.CheckEnable()
 	local frame = Station.Lookup('Lowest/CombatText')
 	local ui = Station.Lookup('Lowest/MY_CombatText')
-	if MY_CombatText.bRender then
+	if O.bRender then
 		COMBAT_TEXT_INIFILE = PACKET_INFO.ROOT .. 'MY_CombatText/ui/MY_CombatText_Render.ini'
 	else
 		COMBAT_TEXT_INIFILE = PACKET_INFO.ROOT .. 'MY_CombatText/ui/MY_CombatText.ini'
 	end
-	if MY_CombatText.bEnable then
-		COMBAT_TEXT_SCALE.CRITICAL = COMBAT_TEXT_STYLES[MY_CombatText.nStyle] and COMBAT_TEXT_STYLES[MY_CombatText.nStyle] or COMBAT_TEXT_STYLES[0]
+	if O.bEnable then
+		COMBAT_TEXT_SCALE.CRITICAL = COMBAT_TEXT_STYLES[O.nStyle] and COMBAT_TEXT_STYLES[O.nStyle] or COMBAT_TEXT_STYLES[0]
 		CombatText.LoadConfig()
 		if ui then
 			Wnd.CloseWindow(ui)
@@ -880,13 +984,30 @@ function CombatText.CheckEnable()
 			return me['TOP']
 		end
 	end })
-	setmetatable(MY_CombatText.col, { __index = function() return COMBAT_TEXT_COLOR.WHITE end })
+	setmetatable(O.col, { __index = function() return COMBAT_TEXT_COLOR.WHITE end })
 	local mt = { __index = function(me)
 		return me[#me]
 	end }
 	setmetatable(COMBAT_TEXT_SCALE.CRITICAL, mt)
 	setmetatable(COMBAT_TEXT_SCALE.NORMAL,   mt)
 end
+
+
+--------------------------------------------------------------------------
+-- Global exports
+--------------------------------------------------------------------------
+do
+local settings = {
+	exports = {
+		{
+			root = D,
+			preset = 'UIEvent',
+		},
+	},
+}
+MY_CombatText = LIB.CreateModule(settings)
+end
+
 
 local PS = {}
 function PS.OnPanelActive(frame)
@@ -901,9 +1022,9 @@ function PS.OnPanelActive(frame)
 
 	ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['Enable CombatText'], color = { 255, 128, 0 },
-		checked = MY_CombatText.bEnable,
+		checked = O.bEnable,
 		oncheck = function(bCheck)
-			MY_CombatText.bEnable = bCheck
+			O.bEnable = bCheck
 			CombatText.CheckEnable()
 		end,
 	})
@@ -911,9 +1032,9 @@ function PS.OnPanelActive(frame)
 
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 200, text = _L['Enable Render'],
-		checked = MY_CombatText.bRender,
+		checked = O.bRender,
 		oncheck = function(bCheck)
-			MY_CombatText.bRender = bCheck
+			O.bRender = bCheck
 			CombatText.CheckEnable()
 		end,
 		autoenable = IsEnabled,
@@ -922,9 +1043,9 @@ function PS.OnPanelActive(frame)
 
 	ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['Disable Immunity'],
-		checked = MY_CombatText.bImmunity,
+		checked = O.bImmunity,
 		oncheck = function(bCheck)
-			MY_CombatText.bImmunity = bCheck
+			O.bImmunity = bCheck
 		end,
 		autoenable = IsEnabled,
 	})
@@ -937,9 +1058,9 @@ function PS.OnPanelActive(frame)
 		x = x, y = y, text = '',
 		range = {1, 255},
 		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
-		value = MY_CombatText.nMaxAlpha,
+		value = O.nMaxAlpha,
 		onchange = function(nVal)
-			MY_CombatText.nMaxAlpha = nVal
+			O.nMaxAlpha = nVal
 		end,
 		autoenable = IsEnabled,
 	})
@@ -951,9 +1072,9 @@ function PS.OnPanelActive(frame)
 		x = x, y = y, textfmt = function(val) return val .. _L['ms'] end,
 		range = {700, 2500},
 		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
-		value = MY_CombatText.nTime * COMBAT_TEXT_TOTAL,
+		value = O.nTime * COMBAT_TEXT_TOTAL,
 		onchange = function(nVal)
-			MY_CombatText.nTime = nVal / COMBAT_TEXT_TOTAL
+			O.nTime = nVal / COMBAT_TEXT_TOTAL
 		end,
 		autoenable = IsEnabled,
 	})
@@ -966,9 +1087,9 @@ function PS.OnPanelActive(frame)
 		x = x, y = y, textfmt = function(val) return val .. _L['Frame'] end,
 		range = {0, 15},
 		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
-		value = MY_CombatText.nFadeIn,
+		value = O.nFadeIn,
 		onchange = function(nVal)
-			MY_CombatText.nFadeIn = nVal
+			O.nFadeIn = nVal
 		end,
 		autoenable = IsEnabled,
 	})
@@ -980,9 +1101,9 @@ function PS.OnPanelActive(frame)
 		x = x, y = y, textfmt = function(val) return val .. _L['Frame'] end,
 		rang = {0, 15},
 		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
-		value = MY_CombatText.nFadeOut,
+		value = O.nFadeOut,
 		onchange = function(nVal)
-			MY_CombatText.nFadeOut = nVal
+			O.nFadeOut = nVal
 		end,
 		autoenable = IsEnabled,
 	})
@@ -995,9 +1116,9 @@ function PS.OnPanelActive(frame)
 		x = x, y = y, textfmt = function(val) return (val / 100) .. _L['times'] end,
 		range = {50, 200},
 		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
-		value = MY_CombatText.fScale * 100,
+		value = O.fScale * 100,
 		onchange = function(nVal)
-			MY_CombatText.fScale = nVal / 100
+			O.fScale = nVal / 100
 			COMBAT_TEXT_TRAJECTORY = CombatText.TrajectoryCount()
 		end,
 		autoenable = IsEnabled,
@@ -1012,9 +1133,9 @@ function PS.OnPanelActive(frame)
 	ui:Append('WndRadioBox', {
 		x = x, y = y + 5, text = _L['hit feel'],
 		group = 'style',
-		checked = MY_CombatText.nStyle == 0,
+		checked = O.nStyle == 0,
 		oncheck = function()
-			MY_CombatText.nStyle = 0
+			O.nStyle = 0
 			COMBAT_TEXT_SCALE.CRITICAL = COMBAT_TEXT_STYLES[0]
 		end,
 		autoenable = IsEnabled,
@@ -1024,9 +1145,9 @@ function PS.OnPanelActive(frame)
 	ui:Append('WndRadioBox', {
 		x = x, y = y + 5, text = _L['low hit feel'],
 		group = 'style',
-		checked = MY_CombatText.nStyle == 1,
+		checked = O.nStyle == 1,
 		oncheck = function()
-			MY_CombatText.nStyle = 1
+			O.nStyle = 1
 			COMBAT_TEXT_SCALE.CRITICAL = COMBAT_TEXT_STYLES[1]
 		end,
 		autoenable = IsEnabled,
@@ -1036,9 +1157,9 @@ function PS.OnPanelActive(frame)
 	ui:Append('WndRadioBox', {
 		x = x, y = y + 5, text = _L['soft'],
 		group = 'style',
-		checked = MY_CombatText.nStyle == 2,
+		checked = O.nStyle == 2,
 		oncheck = function()
-			MY_CombatText.nStyle = 2
+			O.nStyle = 2
 			COMBAT_TEXT_SCALE.CRITICAL = COMBAT_TEXT_STYLES[2]
 		end,
 		autoenable = IsEnabled,
@@ -1048,9 +1169,9 @@ function PS.OnPanelActive(frame)
 	ui:Append('WndRadioBox', {
 		x = x, y = y + 5, text = _L['Scale only'],
 		group = 'style',
-		checked = MY_CombatText.nStyle == 3,
+		checked = O.nStyle == 3,
 		oncheck = function()
-			MY_CombatText.nStyle = 3
+			O.nStyle = 3
 			COMBAT_TEXT_SCALE.CRITICAL = COMBAT_TEXT_STYLES[3]
 		end,
 		autoenable = IsEnabled,
@@ -1066,23 +1187,23 @@ function PS.OnPanelActive(frame)
 	ui:Append('Text', { x = x, y = y, text = _L['Skill Style'], color = { 255, 255, 200 }, autoenable = IsEnabled })
 	x = x + 110
 	ui:Append('WndEditBox', {
-		x = x, y = y, w = 250, h = 25, text = MY_CombatText.szSkill, limit = 30,
+		x = x, y = y, w = 250, h = 25, text = O.szSkill, limit = 30,
 		onchange = function(szText)
-			MY_CombatText.szSkill = szText
+			O.szSkill = szText
 		end,
 		autoenable = IsEnabled,
 	})
 	x = x + 250
-	if MY_CombatText.bCritical then
+	if O.bCritical then
 		x = x + 10
 		ui:Append('Text', { x = x, y = y, text = _L['critical beat'], autoenable = IsEnabled }) --会心伤害
 		x = x + 70
 		ui:Append('Shadow', {
-			x = x, y = y + 8, color = MY_CombatText.tCriticalC, w = 15, h = 15,
+			x = x, y = y + 8, color = O.tCriticalC, w = 15, h = 15,
 			onclick = function()
 				local this = this
 				UI.OpenColorPicker(function(r, g, b)
-					MY_CombatText.tCriticalC = { r, g, b }
+					O.tCriticalC = { r, g, b }
 					UI(this):Color(r, g, b)
 				end)
 			end,
@@ -1095,23 +1216,23 @@ function PS.OnPanelActive(frame)
 	ui:Append('Text', { x = x, y = y, text = _L['Damage Style'], color = { 255, 255, 200 }, autoenable = IsEnabled })
 	x = x + 110
 	ui:Append('WndEditBox', {
-		x = x, y = y, w = 250, h = 25, text = MY_CombatText.szDamage, limit = 30,
+		x = x, y = y, w = 250, h = 25, text = O.szDamage, limit = 30,
 		onchange = function(szText)
-			MY_CombatText.szDamage = szText
+			O.szDamage = szText
 		end,
 		autoenable = IsEnabled,
 	})
 	x = x + 250
-	if MY_CombatText.bCritical then
+	if O.bCritical then
 		x = x + 10
 		ui:Append('Text', { x = x, y = y, text = _L['critical beaten'], autoenable = IsEnabled }) --会心承伤
 		x = x + 70
 		ui:Append('Shadow', {
-			x = x, y = y + 8, color = MY_CombatText.tCriticalB, w = 15, h = 15,
+			x = x, y = y + 8, color = O.tCriticalB, w = 15, h = 15,
 			onclick = function()
 				local this = this
 				UI.OpenColorPicker(function(r, g, b)
-					MY_CombatText.tCriticalB = { r, g, b }
+					O.tCriticalB = { r, g, b }
 					UI(this):Color(r, g, b)
 				end)
 			end,
@@ -1124,23 +1245,23 @@ function PS.OnPanelActive(frame)
 	ui:Append('Text', { x = x, y = y, text = _L['Therapy Style'], color = { 255, 255, 200 }, autoenable = IsEnabled })
 	x = x + 110
 	ui:Append('WndEditBox', {
-		x = x, y = y, w = 250, h = 25, text = MY_CombatText.szTherapy, limit = 30,
+		x = x, y = y, w = 250, h = 25, text = O.szTherapy, limit = 30,
 		onchange = function(szText)
-			MY_CombatText.szTherapy = szText
+			O.szTherapy = szText
 		end,
 		autoenable = IsEnabled,
 	})
 	x = x + 250
-	if MY_CombatText.bCritical then
+	if O.bCritical then
 		x = x + 10
 		ui:Append('Text', { x = x, y = y, text = _L['critical heaten'], autoenable = IsEnabled }) --会心承疗
 		x = x + 70
 		ui:Append('Shadow', {
-			x = x, y = y + 8, color = MY_CombatText.tCriticalH, w = 15, h = 15,
+			x = x, y = y + 8, color = O.tCriticalH, w = 15, h = 15,
 			onclick = function()
 				local this = this
 				UI.OpenColorPicker(function(r, g, b)
-					MY_CombatText.tCriticalH = { r, g, b }
+					O.tCriticalH = { r, g, b }
 					UI(this):Color(r, g, b)
 				end)
 			end,
@@ -1154,27 +1275,27 @@ function PS.OnPanelActive(frame)
 	y = y + deltaY
 
 	ui:Append('WndCheckBox', {
-		x = x, y = y, w = 190, text = _L['$name not me'], checked = MY_CombatText.bCasterNotI,
+		x = x, y = y, w = 190, text = _L['$name not me'], checked = O.bCasterNotI,
 		oncheck = function(bCheck)
-			MY_CombatText.bCasterNotI = bCheck
+			O.bCasterNotI = bCheck
 		end,
 		autoenable = IsEnabled,
 	})
 	x = x + 190
 
 	ui:Append('WndCheckBox', {
-		x = x, y = y, w = 110, text = _L['$sn shorten(2)'], checked = MY_CombatText.bSnShorten2,
+		x = x, y = y, w = 110, text = _L['$sn shorten(2)'], checked = O.bSnShorten2,
 		oncheck = function(bCheck)
-			MY_CombatText.bSnShorten2 = bCheck
+			O.bSnShorten2 = bCheck
 		end,
 		autoenable = IsEnabled,
 	})
 	x = x + 110
 
 	ui:Append('WndCheckBox', {
-		x = x, y = y, w = 140, text = _L['therapy effective only'], checked = MY_CombatText.bTherEffOnly,
+		x = x, y = y, w = 140, text = _L['therapy effective only'], checked = O.bTherEffOnly,
 		oncheck = function(bCheck)
-			MY_CombatText.bTherEffOnly = bCheck
+			O.bTherEffOnly = bCheck
 		end,
 		autoenable = IsEnabled,
 	})
@@ -1184,10 +1305,10 @@ function PS.OnPanelActive(frame)
 		x = x, y = y, text = _L['Font edit'],
 		onclick = function()
 			UI.OpenFontPicker(function(nFont)
-				MY_CombatText.nFont = nFont
+				O.nFont = nFont
 			end)
 		end,
-		tip = function() return _L('Current font: %d', MY_CombatText.nFont) end,
+		tip = function() return _L('Current font: %d', O.nFont) end,
 		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
 		autoenable = IsEnabled,
 	})
@@ -1199,9 +1320,9 @@ function PS.OnPanelActive(frame)
 	y = y + deltaY
 
 	ui:Append('WndCheckBox', {
-		x = x, y = y, text = _L['Critical Color'], checked = MY_CombatText.bCritical and true or false,
+		x = x, y = y, text = _L['Critical Color'], checked = O.bCritical and true or false,
 		oncheck = function(bCheck)
-			MY_CombatText.bCritical = bCheck
+			O.bCritical = bCheck
 			LIB.ShowPanel()
 			LIB.FocusPanel()
 			LIB.SwitchTab('MY_CombatText', true)
@@ -1212,7 +1333,7 @@ function PS.OnPanelActive(frame)
 
 	x = X + 10
 	local i = 0
-	for k, v in pairs(MY_CombatText.col) do
+	for k, v in pairs(O.col) do
 		if k ~= SKILL_RESULT_TYPE.EFFECTIVE_THERAPY then
 			ui:Append('Text', { x = x + (i % 8) * 65, y = y + 30 * floor(i / 8), text = _L['CombatText Color ' .. k], autoenable = IsEnabled })
 			ui:Append('Shadow', {
@@ -1220,7 +1341,7 @@ function PS.OnPanelActive(frame)
 				onclick = function()
 					local this = this
 					UI.OpenColorPicker(function(r, g, b)
-						MY_CombatText.col[k] = { r, g, b }
+						O.col[k] = { r, g, b }
 						UI(this):Color(r, g, b)
 					end)
 				end,
