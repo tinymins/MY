@@ -58,14 +58,27 @@ end
 ---------------------------------------------------------------
 LIB.CreateDataRoot(PATH_TYPE.SERVER)
 
+local O = LIB.CreateUserSettingsModule('MY_Farbnamen', _L['MY_Farbnamen'], {
+	bEnable = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Farbnamen'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bInsertIcon = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Farbnamen'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	nInsertIconSize = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Farbnamen'],
+		xSchema = Schema.Number,
+		xDefaultValue = 23,
+	},
+})
 local D = {}
-MY_Farbnamen = MY_Farbnamen or {
-	bEnabled = true,
-	bInsertIcon = false,
-	nInsertIconSize = 23,
-}
-RegisterCustomData('MY_Farbnamen.bEnabled')
-RegisterCustomData('MY_Farbnamen.bInsertIcon')
 
 local _MY_Farbnamen = {
 	tForceString = Clone(g_tStrings.tForceTitle),
@@ -219,7 +232,7 @@ function D.RenderXml(szMsg, tOption)
 			if name and name:sub(1, 9) == 'namelink_' then
 				if tOption.bColor or tOption.bInsertIcon then
 					local szName = gsub(LIB.XMLGetNodeData(node, 'text'), '[%[%]]', '')
-					local tInfo = MY_Farbnamen.GetAusName(szName)
+					local tInfo = D.GetAusName(szName)
 					if tInfo then
 						if tOption.bColor then
 							LIB.XMLSetNodeData(node, 'r', tInfo.rgb[1])
@@ -253,7 +266,7 @@ function D.RenderXml(szMsg, tOption)
 	end
 	-- szMsg = gsub( szMsg, '<text>([^<]-)text='([^<]-)'([^<]-name='namelink_%d-'[^<]-)</text>', function (szExtra1, szName, szExtra2)
 	--     szName = gsub(szName, '[%[%]]', '')
-	--     local tInfo = MY_Farbnamen.GetAusName(szName)
+	--     local tInfo = D.GetAusName(szName)
 	--     if tInfo then
 	--         szExtra1 = gsub(szExtra1, '[rgb]=%d+', '')
 	--         szExtra2 = gsub(szExtra2, '[rgb]=%d+', '')
@@ -272,7 +285,7 @@ function D.RenderNamelink(namelink, tOption)
 	local ui, nNumOffset = UI(namelink), 0
 	if tOption.bColor or tOption.bInsertIcon then
 		local szName = gsub(namelink:GetText(), '[%[%]]', '')
-		local tInfo = MY_Farbnamen.GetAusName(szName)
+		local tInfo = D.GetAusName(szName)
 		if tInfo then
 			if tOption.bColor then
 				ui:Color(tInfo.rgb)
@@ -291,7 +304,7 @@ function D.RenderNamelink(namelink, tOption)
 		end
 	end
 	if tOption.bTip then
-		ui:Hover(MY_Farbnamen.ShowTip, HideTip, true)
+		ui:Hover(D.ShowTip, HideTip, true)
 	end
 	return namelink, nNumOffset
 end
@@ -332,15 +345,15 @@ function D.MergeOption(dst, src)
 end
 
 -- 开放的名称染色接口
--- (userdata) MY_Farbnamen.Render(userdata namelink)    处理namelink染色 namelink是一个姓名Text元素
--- (string) MY_Farbnamen.Render(string szMsg)           格式化szMsg 处理里面的名字
-function MY_Farbnamen.Render(szMsg, tOption)
+-- (userdata) Render(userdata namelink)    处理namelink染色 namelink是一个姓名Text元素
+-- (string) Render(string szMsg)           格式化szMsg 处理里面的名字
+function D.Render(szMsg, tOption)
 	tOption = D.MergeOption(
 		{
 			bColor = true,
 			bTip = true,
-			bInsertIcon = MY_Farbnamen.bInsertIcon or false,
-			nInsertIconSize = MY_Farbnamen.nInsertIconSize or 23,
+			bInsertIcon = O.bInsertIcon or false,
+			nInsertIconSize = O.nInsertIconSize or 23,
 		},
 		tOption)
 	if IsString(szMsg) then
@@ -353,13 +366,13 @@ end
 
 -- 插入聊天内容的 HOOK （过滤、加入时间 ）
 LIB.HookChatPanel('BEFORE.MY_FARBNAMEN', function(h, szMsg, ...)
-	if MY_Farbnamen.bEnabled then
-		szMsg = MY_Farbnamen.Render(szMsg, true)
+	if O.bEnabled then
+		szMsg = D.Render(szMsg, true)
 	end
 	return szMsg
 end)
 
-function MY_Farbnamen.RegisterHeader(szName, dwID, szHeaderXml)
+function D.RegisterHeader(szName, dwID, szHeaderXml)
 	if not HEADER_XML[szName] then
 		HEADER_XML[szName] = {}
 	end
@@ -372,8 +385,8 @@ function MY_Farbnamen.RegisterHeader(szName, dwID, szHeaderXml)
 	HEADER_XML[szName][dwID] = szHeaderXml
 end
 
-function MY_Farbnamen.GetTip(szName)
-	local tInfo = MY_Farbnamen.GetAusName(szName)
+function D.GetTip(szName)
+	local tInfo = D.GetAusName(szName)
 	if tInfo then
 		local tTip = {}
 		-- author info
@@ -433,7 +446,7 @@ function MY_Farbnamen.GetTip(szName)
 	end
 end
 
-function MY_Farbnamen.ShowTip(namelink)
+function D.ShowTip(namelink)
 	if type(namelink) ~= 'table' then
 		namelink = this
 	end
@@ -444,7 +457,7 @@ function MY_Farbnamen.ShowTip(namelink)
 	local x, y = namelink:GetAbsPos()
 	local w, h = namelink:GetSize()
 
-	local szTip = MY_Farbnamen.GetTip(szName)
+	local szTip = D.GetTip(szName)
 	if szTip then
 		OutputTip(szTip, 450, {x, y, w, h}, UI.TIP_POSITION.TOP_BOTTOM)
 	end
@@ -512,7 +525,7 @@ LIB.RegisterExit('MY_Farbnamen_Save', OnExit)
 end
 
 -- 通过szName获取信息
-function MY_Farbnamen.Get(szKey)
+function D.Get(szKey)
 	local info = l_remoteinfocache[szKey] or l_infocache[szKey]
 	if not info then
 		if type(szKey) == 'string' then
@@ -547,16 +560,15 @@ function MY_Farbnamen.Get(szKey)
 		}
 	end
 end
-MY_Farbnamen.GetAusName = MY_Farbnamen.Get
 
 -- 通过dwID获取信息
-function MY_Farbnamen.GetAusID(dwID)
-	MY_Farbnamen.AddAusID(dwID)
-	return MY_Farbnamen.Get(dwID)
+function D.GetAusID(dwID)
+	D.AddAusID(dwID)
+	return D.Get(dwID)
 end
 
 -- 保存指定dwID的玩家
-function MY_Farbnamen.AddAusID(dwID)
+function D.AddAusID(dwID)
 	local player = GetPlayer(dwID)
 	if not player or not player.szName or player.szName == '' then
 		return false
@@ -594,13 +606,13 @@ end
 --------------------------------------------------------------
 -- 菜单
 --------------------------------------------------------------
-function MY_Farbnamen.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
+function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, w = 'auto',
 		text = _L['Enable MY_Farbnamen'],
-		checked = MY_Farbnamen.bEnabled,
+		checked = O.bEnabled,
 		oncheck = function()
-			MY_Farbnamen.bEnabled = not MY_Farbnamen.bEnabled
+			O.bEnabled = not O.bEnabled
 		end,
 	}):Width() + 5
 
@@ -609,25 +621,25 @@ function MY_Farbnamen.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, w = 'auto',
 		text = _L['Insert force icon'],
-		checked = MY_Farbnamen.bInsertIcon,
+		checked = O.bInsertIcon,
 		oncheck = function()
-			MY_Farbnamen.bInsertIcon = not MY_Farbnamen.bInsertIcon
+			O.bInsertIcon = not O.bInsertIcon
 		end,
 		autoenable = function()
-			return MY_Farbnamen.bEnabled
+			return O.bEnabled
 		end,
 	}):Width() + 5
 
 	x = x + ui:Append('WndTrackbar', {
 		x = x, y = y, w = 100, h = 25,
-		value = MY_Farbnamen.nInsertIconSize,
+		value = O.nInsertIconSize,
 		range = {1, 300},
 		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		textfmt = function(v) return _L('Icon size: %dpx', v) end,
 		onchange = function(val)
-			MY_Farbnamen.nInsertIconSize = val
+			O.nInsertIconSize = val
 		end,
-		autoenable = function() return MY_Farbnamen.bInsertIcon end,
+		autoenable = function() return O.bInsertIcon end,
 	}):AutoWidth():Width() + 5
 
 	x = X + 25
@@ -643,7 +655,7 @@ function MY_Farbnamen.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
 			LIB.SwitchTab('GlobalColor')
 		end,
 		autoenable = function()
-			return MY_Farbnamen.bEnabled
+			return O.bEnabled
 		end,
 	}):Width() + 5
 
@@ -661,7 +673,7 @@ function MY_Farbnamen.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
 			end)
 		end,
 		autoenable = function()
-			return MY_Farbnamen.bEnabled
+			return O.bEnabled
 		end,
 	}):Width() + 5
 
@@ -669,7 +681,7 @@ function MY_Farbnamen.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
 
 	return x, y
 end
-LIB.RegisterAddonMenu('MY_Farbenamen', MY_Farbnamen.GetMenu)
+LIB.RegisterAddonMenu('MY_Farbenamen', D.GetMenu)
 --------------------------------------------------------------
 -- 注册事件
 --------------------------------------------------------------
@@ -677,7 +689,7 @@ do
 local l_peeklist = {}
 local function onBreathe()
 	for dwID, nRetryCount in pairs(l_peeklist) do
-		if MY_Farbnamen.AddAusID(dwID) or nRetryCount > 5 then
+		if D.AddAusID(dwID) or nRetryCount > 5 then
 			l_peeklist[dwID] = nil
 		else
 			l_peeklist[dwID] = nRetryCount + 1
@@ -694,4 +706,27 @@ end
 LIB.RegisterEvent('PEEK_OTHER_PLAYER', OnPeekPlayer)
 LIB.RegisterEvent('PLAYER_ENTER_SCENE', function() l_peeklist[arg0] = 0 end)
 LIB.RegisterEvent('ON_GET_TONG_NAME_NOTIFY', function() l_tongnames[arg1], l_tongnames_w[arg1] = arg2, arg2 end)
+end
+
+--------------------------------------------------------------------------
+-- Global exports
+--------------------------------------------------------------------------
+do
+local settings = {
+	exports = {
+		{
+			fields = {
+				Render               = D.Render              ,
+				RegisterHeader       = D.RegisterHeader      ,
+				GetTip               = D.GetTip              ,
+				ShowTip              = D.ShowTip             ,
+				Get                  = D.Get                 ,
+				GetAusID             = D.GetAusID            ,
+				GetAusName           = D.Get                 ,
+				OnPanelActivePartial = D.OnPanelActivePartial,
+			},
+		},
+	},
+}
+MY_Farbnamen = LIB.CreateModule(settings)
 end
