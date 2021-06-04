@@ -1,4 +1,5 @@
 return {
+    ['MY_Chat'] = '聊天助手',
     ['MY_ChatLog'] = '聊天记录',
     ['Filter tong online message'] = '过滤帮会上线公告提示',
     ['Filter tong member log message'] = '过滤帮会成员上线提示',

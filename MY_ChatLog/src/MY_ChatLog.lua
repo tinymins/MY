@@ -54,19 +54,39 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
+local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['MY_Chat'], {
+	bIgnoreTongOnlineMsg = { -- 帮会上线通知
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ChatLog'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bIgnoreTongMemberLogMsg = { -- 帮会成员上线下线提示
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ChatLog'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bRealtimeCommit = { -- 实时写入数据库
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ChatLog'],
+		xSchema = IsDebugClient() and Schema.Boolean or false,
+		xDefaultValue = false,
+	},
+	bAutoConnectDB = { -- 登录时自动连接数据库
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ChatLog'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	tUncheckedChannel = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ChatLog'],
+		xSchema = Schema.Map(Schema.String, Schema.Boolean),
+		xDefaultValue = {},
+	},
+})
 local D = {}
-local O = {
-	bIgnoreTongOnlineMsg    = true , -- 帮会上线通知
-	bIgnoreTongMemberLogMsg = true , -- 帮会成员上线下线提示
-	bRealtimeCommit         = false, -- 实时写入数据库
-	bAutoConnectDB          = false, -- 登录时自动连接数据库
-	tUncheckedChannel       = {}   ,
-}
-RegisterCustomData('MY_ChatLog.bIgnoreTongOnlineMsg')
-RegisterCustomData('MY_ChatLog.bIgnoreTongMemberLogMsg')
-RegisterCustomData('MY_ChatLog.bRealtimeCommit')
-RegisterCustomData('MY_ChatLog.bAutoConnectDB')
-RegisterCustomData('MY_ChatLog.tUncheckedChannel')
 
 ------------------------------------------------------------------------------------------------------
 -- 数据采集
