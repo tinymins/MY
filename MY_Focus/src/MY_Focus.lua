@@ -62,57 +62,203 @@ local l_tTempFocusList = {
 	[TARGET.NPC]    = {},   -- dwTemplateID
 	[TARGET.DOODAD] = {},   -- dwTemplateID
 }
-local PRIVATE_CONFIG_LOADED = false
-local PRIVATE_CONFIG_CHANGED = false
-local PUBLIC_CONFIG_LOADED = false
-local PUBLIC_CONFIG_CHANGED = false
-local O, D = {}, {}
-local PRIVATE_DEFAULT = {
-	bEnable     = false   , -- 是否启用
-	szStyle     = 'common', -- 样式
-	bMinimize   = false   , -- 是否最小化
-	bAutoHide   = true    , -- 无焦点时隐藏
-	nMaxDisplay = 5       , -- 最大显示数量
-	fScaleX     = 1       , -- 缩放比例
-	fScaleY     = 1       , -- 缩放比例
-	anchor      = { x=-300, y=220, s='TOPRIGHT', r='TOPRIGHT' }, -- 默认坐标
-}
-local PUBLIC_DEFAULT = {
-	bFocusINpc         = true    , -- 焦点重要NPC
-	bFocusFriend       = false   , -- 焦点附近好友
-	bFocusTong         = false   , -- 焦点帮会成员
-	bOnlyPublicMap     = true    , -- 仅在公共地图焦点好友帮会成员
-	bSortByDistance    = false   , -- 优先焦点近距离目标
-	bFocusEnemy        = false   , -- 焦点敌对玩家
-	bFocusAnmerkungen  = true    , -- 焦点记在小本本里的玩家
-	bAutoFocus         = true    , -- 启用默认焦点
-	bTeamMonFocus      = true    , -- 启用团队监控焦点
-	bHideDeath         = false   , -- 隐藏死亡目标
-	bDisplayKungfuIcon = false   , -- 显示心法图标
-	bFocusJJCParty     = false   , -- 焦竞技场队友
-	bFocusJJCEnemy     = true    , -- 焦竞技场敌队
-	bShowTarget        = false   , -- 显示目标目标
-	szDistanceType     = 'global', -- 坐标距离计算方式
-	bHealHelper        = false   , -- 辅助治疗模式
-	bShowTipRB         = false   , -- 在屏幕右下角显示信息
-	bEnableSceneNavi   = false   , -- 场景追踪点
-	tAutoFocus         = nil     , -- 旧版默认焦点数据
-	tFocusList         = nil     , -- 旧版永久焦点数据
-	aPatternFocus      = {}      , -- 默认焦点
-	tStaticFocus       = {         -- 永久焦点
-		[TARGET.PLAYER] = {},    -- dwID
-		[TARGET.NPC]    = {},    -- dwTemplateID
-		[TARGET.DOODAD] = {},    -- dwTemplateID
+local O = LIB.CreateUserSettingsModule('MY_Focus', _L['MY_Focus'], {
+	bEnable = { -- 是否启用
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['Basic settings'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
 	},
-}
-for k, v in pairs(PRIVATE_DEFAULT) do
-	O[k] = Clone(v)
-end
-for k, v in pairs(PUBLIC_DEFAULT) do
-	O[k] = Clone(v)
-end
-RegisterCustomData('MY_Focus.tAutoFocus')
-RegisterCustomData('MY_Focus.tFocusList')
+	bMinimize = { -- 是否最小化
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['Basic settings'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bAutoHide = { -- 无焦点时隐藏
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['Basic settings'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	nMaxDisplay = { -- 最大显示数量
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['Basic settings'],
+		xSchema = Schema.Number,
+		xDefaultValue = 5,
+	},
+	fScaleX = { -- 缩放比例
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['Basic settings'],
+		xSchema = Schema.Number,
+		xDefaultValue = 1,
+	},
+	fScaleY = { -- 缩放比例
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['Basic settings'],
+		xSchema = Schema.Number,
+		xDefaultValue = 1,
+	},
+	anchor = { -- 默认坐标
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['Basic settings'],
+		xSchema = Schema.FrameAnchor,
+		xDefaultValue = { x=-300, y=220, s='TOPRIGHT', r='TOPRIGHT' },
+	},
+
+	bFocusINpc = { -- 焦点重要NPC
+		ePathType = PATH_TYPE.GLOBAL,
+		szLabel = _L['Basic settings'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bFocusFriend = { -- 焦点附近好友
+		ePathType = PATH_TYPE.GLOBAL,
+		szLabel = _L['Basic settings'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bFocusTong = { -- 焦点帮会成员
+		ePathType = PATH_TYPE.GLOBAL,
+		szLabel = _L['Basic settings'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bOnlyPublicMap = { -- 仅在公共地图焦点好友帮会成员
+		ePathType = PATH_TYPE.GLOBAL,
+		szLabel = _L['Basic settings'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bSortByDistance = { -- 优先焦点近距离目标
+		ePathType = PATH_TYPE.GLOBAL,
+		szLabel = _L['Basic settings'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bFocusEnemy = { -- 焦点敌对玩家
+		ePathType = PATH_TYPE.GLOBAL,
+		szLabel = _L['Basic settings'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bFocusAnmerkungen = { -- 焦点记在小本本里的玩家
+		ePathType = PATH_TYPE.GLOBAL,
+		szLabel = _L['Basic settings'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bAutoFocus = { -- 启用默认焦点
+		ePathType = PATH_TYPE.GLOBAL,
+		szLabel = _L['Basic settings'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bTeamMonFocus = { -- 启用团队监控焦点
+		ePathType = PATH_TYPE.GLOBAL,
+		szLabel = _L['Basic settings'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bHideDeath = { -- 隐藏死亡目标
+		ePathType = PATH_TYPE.GLOBAL,
+		szLabel = _L['Basic settings'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bDisplayKungfuIcon = { -- 显示心法图标
+		ePathType = PATH_TYPE.GLOBAL,
+		szLabel = _L['Basic settings'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bFocusJJCParty = { -- 焦竞技场队友
+		ePathType = PATH_TYPE.GLOBAL,
+		szLabel = _L['Basic settings'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bFocusJJCEnemy = { -- 焦竞技场敌队
+		ePathType = PATH_TYPE.GLOBAL,
+		szLabel = _L['Basic settings'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bShowTarget = { -- 显示目标目标
+		ePathType = PATH_TYPE.GLOBAL,
+		szLabel = _L['Basic settings'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	szDistanceType = { -- 坐标距离计算方式
+		ePathType = PATH_TYPE.GLOBAL,
+		szLabel = _L['Basic settings'],
+		xSchema = Schema.String,
+		xDefaultValue = 'global',
+	},
+	bHealHelper = { -- 辅助治疗模式
+		ePathType = PATH_TYPE.GLOBAL,
+		szLabel = _L['Basic settings'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bShowTipRB = { -- 在屏幕右下角显示信息
+		ePathType = PATH_TYPE.GLOBAL,
+		szLabel = _L['Basic settings'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bEnableSceneNavi = { -- 场景追踪点
+		ePathType = PATH_TYPE.GLOBAL,
+		szLabel = _L['Basic settings'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	aPatternFocus = { -- 默认焦点
+		ePathType = PATH_TYPE.GLOBAL,
+		szLabel = _L['Auto focus'],
+		xSchema = Schema.Collection(Schema.Record({
+			szMethod = Schema.String,
+			szPattern = Schema.String,
+			szDisplay = Schema.String,
+			dwMapID = Schema.Number,
+			tType = Schema.MixedTable({
+				bAll = Schema.Optional(Schema.Boolean),
+				[TARGET.NPC] = Schema.Optional(Schema.Boolean),
+				[TARGET.PLAYER] = Schema.Optional(Schema.Boolean),
+				[TARGET.DOODAD] = Schema.Optional(Schema.Boolean),
+			}),
+			tRelation = Schema.Record({
+				bAll = Schema.Optional(Schema.Boolean),
+				bEnemy = Schema.Optional(Schema.Boolean),
+				bAlly = Schema.Optional(Schema.Boolean),
+			}),
+			tLife = Schema.Record({
+				bEnable = Schema.Boolean,
+				szOperator = Schema.String,
+				nValue = Schema.Number,
+			}),
+			nMaxDistance = Schema.Number,
+		})),
+		xDefaultValue = {},
+	},
+
+	tStaticFocus = { -- 永久焦点
+		ePathType = PATH_TYPE.SERVER,
+		szLabel = _L['Static focus'],
+		xSchema = Schema.MixedTable({
+			[TARGET.PLAYER] = Schema.Map(Schema.Number, Schema.Boolean), -- dwID
+			[TARGET.NPC]    = Schema.Map(Schema.Number, Schema.Boolean), -- dwTemplateID
+			[TARGET.DOODAD] = Schema.Map(Schema.Number, Schema.Boolean), -- dwTemplateID
+		}),
+		xDefaultValue = {
+			[TARGET.PLAYER] = {}, -- dwID
+			[TARGET.NPC]    = {}, -- dwTemplateID
+			[TARGET.DOODAD] = {}, -- dwTemplateID
+		},
+	},
+})
+local D = {}
 
 function D.IsShielded() return LIB.IsShieldedVersion('MY_Focus') and LIB.IsInShieldedMap() end
 function D.IsEnabled() return O.bEnable and not D.IsShielded() end
@@ -165,101 +311,48 @@ function D.CheckFrameOpen(bForceReload)
 	end
 end
 
-function D.LoadPublicConfig()
-	if PUBLIC_CONFIG_CHANGED then
-		D.SaveConfig()
+function D.LoadConfig()
+	local szRolePath = LIB.FormatPath({'config/focus.jx3dat', PATH_TYPE.ROLE})
+	local szGlobalPath = LIB.FormatPath({'config/focus/', PATH_TYPE.GLOBAL})
+	local szServerPath = LIB.FormatPath({'config/focus/', PATH_TYPE.SERVER})
+	local aPath = {}
+	for _, szPath in ipairs(CPath.GetFileList(szGlobalPath)) do
+		insert(aPath, szGlobalPath .. szPath)
 	end
-	-- 加载全局公共配置
-	local config = LIB.LoadLUAData({'config/focus/' .. O.szStyle .. '.jx3dat', PATH_TYPE.GLOBAL}) or {}
-	for k, v in pairs(PUBLIC_DEFAULT) do
-		if IsNil(config[k]) then
-			O[k] = Clone(v)
-		else
-			O[k] = config[k]
+	for _, szPath in ipairs(CPath.GetFileList(szServerPath)) do
+		insert(aPath, szServerPath .. szPath)
+	end
+	insert(aPath, szRolePath)
+	for _, szPath in ipairs(aPath) do
+		local config = LIB.LoadLUAData(szPath)
+		CPath.DelFile(szPath)
+		if config then
+			for k, v in pairs(config) do
+				-- 永久焦点与默认焦点数据需要合并处理
+				if k == 'tStaticFocus' then
+					for _, eType in ipairs({ TARGET.PLAYER, TARGET.NPC, TARGET.DOODAD }) do
+						if not IsTable(v[eType]) then
+							v[eType] = {}
+						end
+						for kk, vv in pairs(O.tStaticFocus[eType]) do
+							SafeCall(Set, v, kk, vv)
+						end
+					end
+				elseif k == 'aPatternFocus' then
+					for _, vv in ipairs(O.aPatternFocus) do
+						SafeCall(insert, v, vv)
+					end
+				end
+				SafeCall(Set, O, k, v)
+			end
 		end
 	end
-	-- 加载服务器全局配置
-	local config = LIB.LoadLUAData({'config/focus/' .. O.szStyle .. '.jx3dat', PATH_TYPE.SERVER}) or {}
-	-- 玩家永久焦点需要分开大区 否则会冲突
-	if config.tStaticFocus and config.tStaticFocus[TARGET.PLAYER] then
-		O.tStaticFocus[TARGET.PLAYER] = config.tStaticFocus[TARGET.PLAYER]
-	elseif not O.tStaticFocus[TARGET.PLAYER] then
-		O.tStaticFocus[TARGET.PLAYER] = {}
-	end
-	-- 设置标记位
-	PUBLIC_CONFIG_LOADED = true
-	-- 旧版数据转码
-	D.OnSetAncientPatternFocus()
-	D.OnSetAncientStaticFocus()
 	-- 扫描附近玩家
 	D.RescanNearby()
 end
 
-function D.SavePublicConfig()
-	if not PUBLIC_CONFIG_LOADED or not PUBLIC_CONFIG_CHANGED then
-		return
-	end
-	-- 保存全局公共配置
-	local config = {}
-	for k, v in pairs(PUBLIC_DEFAULT) do
-		config[k] = O[k]
-	end
-	config.tStaticFocus = {
-		[TARGET.NPC] = O.tStaticFocus[TARGET.NPC],
-		[TARGET.DOODAD] = O.tStaticFocus[TARGET.DOODAD],
-	}
-	LIB.SaveLUAData({'config/focus/' .. O.szStyle .. '.jx3dat', PATH_TYPE.GLOBAL}, config)
-	-- 保存服务器公共配置
-	local config = {
-		tStaticFocus = { [TARGET.PLAYER] = O.tStaticFocus[TARGET.PLAYER] }
-	}
-	LIB.SaveLUAData({'config/focus/' .. O.szStyle .. '.jx3dat', PATH_TYPE.SERVER}, config)
-	-- 设置标记位
-	PUBLIC_CONFIG_CHANGED = false
-end
-
-function D.LoadConfig()
-	local config = LIB.LoadLUAData({'config/focus.jx3dat', PATH_TYPE.ROLE}) or {}
-	for k, v in pairs(PRIVATE_DEFAULT) do
-		if IsNil(config[k]) then
-			O[k] = Clone(v)
-		else
-			O[k] = config[k]
-		end
-	end
-	PRIVATE_CONFIG_LOADED = true
-	D.LoadPublicConfig()
-end
-
-function D.SaveConfig()
-	if PRIVATE_CONFIG_LOADED and PRIVATE_CONFIG_CHANGED then
-		local config = {}
-		for k, v in pairs(PRIVATE_DEFAULT) do
-			config[k] = O[k]
-		end
-		LIB.SaveLUAData({'config/focus.jx3dat', PATH_TYPE.ROLE}, config)
-		PRIVATE_CONFIG_CHANGED = false
-	end
-	D.SavePublicConfig()
-end
-LIB.RegisterIdle('MY_Focus_Save', D.SaveConfig)
-
-function D.BeforeConfigChange(k)
-	if k == 'szStyle' then
-		D.SaveConfig()
-	end
-end
-
 function D.OnConfigChange(k, v)
-	if not IsNil(PRIVATE_DEFAULT[k]) then
-		PRIVATE_CONFIG_CHANGED = true
-	elseif not IsNil(PUBLIC_DEFAULT[k]) then
-		PUBLIC_CONFIG_CHANGED = true
-	end
-	if k == 'szStyle' then
-		D.LoadPublicConfig()
-		D.CheckFrameOpen(true)
-	elseif k == 'bEnable' then
+	if k == 'bEnable' then
 		D.CheckFrameOpen()
 	elseif k == 'fScaleX' or k == 'fScaleY' then
 		FireUIEvent('MY_FOCUS_SCALE_UPDATE')
@@ -282,7 +375,7 @@ function D.SetFocusPattern(szPattern, tData)
 		if v.szPattern == szPattern then
 			nIndex = i
 			remove(O.aPatternFocus, i)
-			PUBLIC_CONFIG_CHANGED = true
+			O.aPatternFocus = O.aPatternFocus
 		end
 	end
 	-- 格式化数据
@@ -293,10 +386,10 @@ function D.SetFocusPattern(szPattern, tData)
 	-- 更新焦点列表
 	if nIndex then
 		insert(O.aPatternFocus, nIndex, tData)
-		PUBLIC_CONFIG_CHANGED = true
+		O.aPatternFocus = O.aPatternFocus
 	else
 		insert(O.aPatternFocus, tData)
-		PUBLIC_CONFIG_CHANGED = true
+		O.aPatternFocus = O.aPatternFocus
 	end
 	D.RescanNearby()
 	return tData
@@ -309,7 +402,7 @@ function D.RemoveFocusPattern(szPattern)
 		if O.aPatternFocus[i].szPattern == szPattern then
 			p = O.aPatternFocus[i]
 			remove(O.aPatternFocus, i)
-			PUBLIC_CONFIG_CHANGED = true
+			O.aPatternFocus = O.aPatternFocus
 		end
 	end
 	if not p then
@@ -344,7 +437,7 @@ function D.SetFocusID(dwType, dwID, bSave)
 			return
 		end
 		O.tStaticFocus[dwType][dwTemplateID] = true
-		PUBLIC_CONFIG_CHANGED = true
+		O.tStaticFocus = O.tStaticFocus
 		D.RescanNearby()
 	else
 		if l_tTempFocusList[dwType][dwID] then
@@ -366,7 +459,7 @@ function D.RemoveFocusID(dwType, dwID)
 	local dwTemplateID = dwType == TARGET.PLAYER and dwID or KObject.dwTemplateID
 	if O.tStaticFocus[dwType][dwTemplateID] then
 		O.tStaticFocus[dwType][dwTemplateID] = nil
-		PUBLIC_CONFIG_CHANGED = true
+		O.tStaticFocus = O.tStaticFocus
 		D.RescanNearby()
 	end
 end
@@ -968,38 +1061,6 @@ function D.OpenRuleEditor(tData, onChangeNotify, bHideBase)
 	ui:Size(W, nY + 40):Anchor('CENTER')
 end
 
-function D.OnSetAncientPatternFocus()
-	if not IsTable(O.tAutoFocus) then
-		return
-	end
-	local tExist = {}
-	for _, p in ipairs(O.aPatternFocus) do
-		tExist[p.szPattern] = true
-	end
-	for _, v in ipairs(O.tAutoFocus) do
-		local p = D.FormatAutoFocusData(v)
-		if not tExist[p.szPattern] then
-			insert(O.aPatternFocus, p)
-			tExist[p.szPattern] = true
-			D.OnConfigChange('aPatternFocus', O.aPatternFocus)
-		end
-	end
-end
-
-function D.OnSetAncientStaticFocus()
-	if not IsTable(O.tAutoFocus) then
-		return
-	end
-	for dwType, tFocus in pairs(O.tFocusList) do
-		if O.tStaticFocus[dwType] then
-			for dwID, bFocus in pairs(tFocus) do
-				O.tStaticFocus[dwType][dwID] = bFocus
-				D.OnConfigChange('tStaticFocus', O.tStaticFocus)
-			end
-		end
-	end
-end
-
 do
 local function UpdateTeamMonData()
 	if MY_TeamMon and MY_TeamMon.IterTable and MY_TeamMon.GetTable then
@@ -1077,11 +1138,6 @@ local function onInit()
 	D.RescanNearby()
 end
 LIB.RegisterInit('MY_Focus', onInit)
-
-local function Flush()
-	D.SaveConfig()
-end
-LIB.RegisterFlush('MY_Focus', Flush)
 end
 
 do
@@ -1119,7 +1175,6 @@ LIB.RegisterTutorial({
 		bDefault = true,
 		fnAction = function()
 			O.bEnable = true
-			PUBLIC_CONFIG_CHANGED = true
 			MY_FocusUI.Open()
 			LIB.RedrawTab('MY_Focus')
 		end,
@@ -1128,7 +1183,6 @@ LIB.RegisterTutorial({
 		szOption = _L['Not use'],
 		fnAction = function()
 			O.bEnable = false
-			PUBLIC_CONFIG_CHANGED = true
 			MY_FocusUI.Close()
 			LIB.RedrawTab('MY_Focus')
 		end,
@@ -1142,7 +1196,6 @@ local settings = {
 		{
 			fields = {
 				bEnable = true,
-				szStyle = true,
 				bMinimize = true,
 				bFocusINpc = true,
 				bFocusFriend = true,
@@ -1194,7 +1247,6 @@ local settings = {
 		{
 			fields = {
 				bEnable = true,
-				szStyle = true,
 				bMinimize = true,
 				bFocusINpc = true,
 				bFocusFriend = true,
@@ -1219,14 +1271,11 @@ local settings = {
 				anchor = true,
 				fScaleX = true,
 				fScaleY = true,
-				tAutoFocus = true,
-				tFocusList = true,
 			},
 			triggers = {
-				bEnable = {D.BeforeConfigChange, D.OnConfigChange},
-				szStyle = {D.BeforeConfigChange, D.OnConfigChange},
-				bMinimize = {D.BeforeConfigChange, D.OnConfigChange},
-				anchor = {D.BeforeConfigChange, D.OnConfigChange},
+				bEnable = D.OnConfigChange,
+				bMinimize = D.OnConfigChange,
+				anchor = D.OnConfigChange,
 				bFocusINpc = D.OnConfigChange,
 				bFocusFriend = D.OnConfigChange,
 				bFocusTong = D.OnConfigChange,
@@ -1249,8 +1298,6 @@ local settings = {
 				bEnableSceneNavi = D.OnConfigChange,
 				fScaleX = D.OnConfigChange,
 				fScaleY = D.OnConfigChange,
-				tAutoFocus = D.OnSetAncientPatternFocus,
-				tFocusList = D.OnSetAncientStaticFocus,
 			},
 			root = O,
 		},

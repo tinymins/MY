@@ -78,19 +78,6 @@ function PS.OnPanelActive(wnd)
 		autoenable = function() return not MY_Focus.IsShielded() end,
 	}):AutoWidth():Width() + 10
 
-	ui:Append('WndEditBox', {
-		x = x, y = y, w = wl - x, h = 25,
-		placeholder = _L['Style'],
-		text = MY_Focus.szStyle,
-		onblur = function()
-			local szStyle = UI(this):Text():gsub('%s', '')
-			if szStyle == '' then
-				return
-			end
-			MY_Focus.szStyle = szStyle
-			LIB.SwitchTab('MY_Focus', true)
-		end,
-	})
 	x, y = xl, y + 25
 
 	-- <hr />

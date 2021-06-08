@@ -96,6 +96,5 @@ return {
     ['Would you like to use MY focus?'] = '是否启用焦点列表？',
     ['Use'] = '使用',
     ['Not use'] = '不使用',
-    ['Style'] = '样式',
 	['Sure to delete?'] = '确认要删除？',
 }
