@@ -56,7 +56,7 @@ end
 
 local DEBUG_LOOT = false -- 测试拾取分配 强制进入分配模式并最终不调用分配接口
 local GKP_LOOT_ANCHOR  = { s = 'CENTER', r = 'CENTER', x = 0, y = 0 }
-local GKP_LOOT_INIFILE = PLUGIN_ROOT .. '/ui/MY_GKP_Loot.ini'
+local GKP_LOOT_INIFILE = PLUGIN_ROOT .. '/ui/MY_GKPLoot.ini'
 local MY_GKP_LOOT_BOSS -- 散件老板
 local GKP_AUTO_LOOT_DEBOUNCE_TIME = GLOBAL.GAME_FPS / 2 -- 自动拾取时延
 
@@ -74,50 +74,171 @@ local GKP_ITEM_QUALITIES = {
 	{ nQuality = CONSTANT.ITEM_QUALITY.NACARAT, szTitle = g_tStrings.STR_ROLLQUALITY_NACARAT },
 }
 
+local O = LIB.CreateUserSettingsModule('MY_GKPLoot', _L['MY_GKP'], {
+	bOn = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_GKPLoot'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bOnlyInTeamDungeon = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_GKPLoot'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bOnlyInRaidDungeon = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_GKPLoot'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bOnlyInBattlefield = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_GKPLoot'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bVertical = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_GKPLoot'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bSetColor = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_GKPLoot'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	nConfirmQuality = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_GKPLoot'],
+		xSchema = Schema.Number,
+		xDefaultValue = 3,
+	},
+	bShow2ndKungfuLoot = { -- 显示第二心法装备推荐提示图标
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_GKPLoot'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	tConfirm = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_GKPLoot'],
+		xSchema = Schema.Map(Schema.String, Schema.Boolean),
+		xDefaultValue = {
+			Huangbaba  = true,
+			Book       = true,
+			Pendant    = true,
+			Outlook    = true,
+			Pet        = true,
+			Horse      = true,
+			HorseEquip = true,
+		},
+	},
+	tFilterQuality = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_GKPLoot'],
+		xSchema = Schema.Map(Schema.Number, Schema.Boolean),
+		xDefaultValue = {},
+	},
+	bFilterGrayItem = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_GKPLoot'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bNameFilter = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_GKPLoot'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	tNameFilter = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_GKPLoot'],
+		xSchema = Schema.Map(Schema.String, Schema.Boolean),
+		xDefaultValue = {},
+	},
+	bFilterBookRead = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_GKPLoot'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bFilterBookHave = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_GKPLoot'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bAutoPickupFilterBookRead = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_GKPLoot'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bAutoPickupFilterBookHave = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_GKPLoot'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bAutoPickupTaskItem = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_GKPLoot'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bAutoPickupBook = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_GKPLoot'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	tAutoPickupQuality = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_GKPLoot'],
+		xSchema = Schema.Map(Schema.Number, Schema.Boolean),
+		xDefaultValue = {},
+	},
+	tAutoPickupNames = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_GKPLoot'],
+		xSchema = Schema.Map(Schema.String, Schema.Boolean),
+		xDefaultValue = {},
+	},
+	tAutoPickupFilters = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_GKPLoot'],
+		xSchema = Schema.Map(Schema.String, Schema.Boolean),
+		xDefaultValue = {},
+	},
+})
 local D = {
 	aDoodadID = {},
 }
-local O_DEFAULT = {
-	bOn = false,
-	bOnlyInTeamDungeon = false,
-	bOnlyInRaidDungeon = false,
-	bOnlyInBattlefield = false,
-	bVertical = true,
-	bSetColor = true,
-	nConfirmQuality = 3,
-	tConfirm = {
-		Huangbaba  = true,
-		Book       = true,
-		Pendant    = true,
-		Outlook    = true,
-		Pet        = true,
-		Horse      = true,
-		HorseEquip = true,
-	},
-	tItemConfig = {
-		tFilterQuality = {},
-		bFilterGrayItem = true,
-		bNameFilter = false,
-		tNameFilter = {},
-		bFilterBookRead = false,
-		bFilterBookHave = false,
-		bAutoPickupFilterBookRead = false,
-		bAutoPickupFilterBookHave = false,
-		bAutoPickupTaskItem = false,
-		bAutoPickupBook = false,
-		tAutoPickupQuality = {},
-		tAutoPickupNames = {},
-		tAutoPickupFilters = {},
-	},
-}
-local O = Clone(O_DEFAULT)
-RegisterCustomData('MY_GKP_Loot.bOn')
-RegisterCustomData('MY_GKP_Loot.bOnlyInTeamDungeon')
-RegisterCustomData('MY_GKP_Loot.bOnlyInRaidDungeon')
-RegisterCustomData('MY_GKP_Loot.bOnlyInBattlefield')
-RegisterCustomData('MY_GKP_Loot.bVertical')
-RegisterCustomData('MY_GKP_Loot.bSetColor')
-RegisterCustomData('MY_GKP_Loot.nConfirmQuality')
+local ITEM_CONFIG = setmetatable({}, {
+	__index = function(_, k)
+		if k == 'tFilterQuality'
+			or k == 'bFilterGrayItem'
+			or k == 'bNameFilter'
+			or k == 'tNameFilter'
+			or k == 'bFilterBookRead'
+			or k == 'bFilterBookHave'
+			or k == 'bAutoPickupFilterBookRead'
+			or k == 'bAutoPickupFilterBookHave'
+			or k == 'bAutoPickupTaskItem'
+			or k == 'bAutoPickupBook'
+			or k == 'tAutoPickupQuality'
+			or k == 'tAutoPickupNames'
+			or k == 'tAutoPickupFilters'
+		then
+			return O[k]
+		end
+	end,
+})
 RegisterCustomData('MY_GKP_Loot.tConfirm')
 RegisterCustomData('MY_GKP_Loot.tItemConfig')
 
@@ -127,18 +248,18 @@ function D.UpdateShielded()
 		or 0
 end
 
-LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_GKP_Loot', function()
+LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_GKPLoot', function()
 	if arg0 and arg0 ~= 'MY_GKPLoot' then
 		return
 	end
 	D.UpdateShielded()
 end)
 
-LIB.RegisterEvent('LOADING_END.MY_GKP_Loot', function()
+LIB.RegisterEvent('LOADING_END.MY_GKPLoot', function()
 	D.UpdateShielded()
 	D.aDoodadID = {}
-	MY_GKP_Loot.tItemConfig.tFilterQuality = {}
-	MY_GKP_Loot.tItemConfig.bNameFilter = false
+	O.tFilterQuality = {}
+	O.bNameFilter = false
 end)
 
 function D.IsEnabled()
@@ -275,7 +396,7 @@ function D.OnFrameBreathe()
 		for i = 0, hList:GetItemCount() - 1 do
 			hItem = hList:Lookup(i)
 			if (not hItem.nAutoLootLFC or nLFC - hItem.nAutoLootLFC >= GKP_AUTO_LOOT_DEBOUNCE_TIME)
-			and D.IsItemAutoPickup(hItem.itemData, O.tItemConfig, doodad, bCanDialog)
+			and D.IsItemAutoPickup(hItem.itemData, ITEM_CONFIG, doodad, bCanDialog)
 			and not hItem.itemData.bDist and not hItem.itemData.bNeedRoll and not hItem.itemData.bBidding then
 				LIB.ExecuteWithThis(hItem, D.OnItemLButtonClick)
 				hItem.nAutoLootLFC = nLFC
@@ -415,7 +536,8 @@ function D.OnLButtonClick()
 				szOption = _L['Set Force Color'],
 				bCheck = true, bChecked = O.bSetColor,
 				fnAction = function()
-					MY_GKP_Loot.bSetColor = not MY_GKP_Loot.bSetColor
+					O.bSetColor = not O.bSetColor
+					FireUIEvent('MY_GKP_LOOT_RELOAD')
 				end,
 			},
 			{ bDevide = true },
@@ -434,7 +556,8 @@ function D.OnLButtonClick()
 			{
 				szOption = _L['switch styles'],
 				fnAction = function()
-					MY_GKP_Loot.bVertical = not MY_GKP_Loot.bVertical
+					O.bVertical = not O.bVertical
+					FireUIEvent('MY_GKP_LOOT_RELOAD')
 				end,
 			},
 			{ bDevide = true },
@@ -580,7 +703,7 @@ function D.OnItemLButtonClick()
 		if data.bDist then
 			if not doodad then
 				--[[#DEBUG BEGIN]]
-				LIB.Debug('MY_GKP_Loot:OnItemLButtonClick', 'Doodad does not exist!', DEBUG_LEVEL.WARNING)
+				LIB.Debug('MY_GKPLoot:OnItemLButtonClick', 'Doodad does not exist!', DEBUG_LEVEL.WARNING)
 				--[[#DEBUG END]]
 				return D.RemoveLootList(dwDoodadID)
 			end
@@ -614,7 +737,7 @@ function D.OnItemLButtonClick()
 			local doodad     = GetDoodad(dwDoodadID)
 			if not doodad then
 				--[[#DEBUG BEGIN]]
-				LIB.Debug('MY_GKP_Loot:OnItemLButtonClick', 'Doodad does not exist!', DEBUG_LEVEL.WARNING)
+				LIB.Debug('MY_GKPLoot:OnItemLButtonClick', 'Doodad does not exist!', DEBUG_LEVEL.WARNING)
 				--[[#DEBUG END]]
 				return D.RemoveLootList(dwDoodadID)
 			end
@@ -652,9 +775,9 @@ function D.GetFilterMenu()
 		{
 			szOption = _L['Filter book read'],
 			bCheck = true,
-			bChecked = MY_GKP_Loot.tItemConfig.bFilterBookRead,
+			bChecked = O.bFilterBookRead,
 			fnAction = function()
-				MY_GKP_Loot.tItemConfig.bFilterBookRead = not MY_GKP_Loot.tItemConfig.bFilterBookRead
+				O.bFilterBookRead = not O.bFilterBookRead
 				D.ReloadFrame()
 			end,
 		},
@@ -662,9 +785,9 @@ function D.GetFilterMenu()
 		{
 			szOption = _L['Filter book have'],
 			bCheck = true,
-			bChecked = MY_GKP_Loot.tItemConfig.bFilterBookHave,
+			bChecked = O.bFilterBookHave,
 			fnAction = function()
-				MY_GKP_Loot.tItemConfig.bFilterBookHave = not MY_GKP_Loot.tItemConfig.bFilterBookHave
+				O.bFilterBookHave = not O.bFilterBookHave
 				D.ReloadFrame()
 			end,
 		},
@@ -672,9 +795,9 @@ function D.GetFilterMenu()
 		{
 			szOption = _L['Filter gray item'],
 			bCheck = true,
-			bChecked = MY_GKP_Loot.tItemConfig.bFilterGrayItem,
+			bChecked = O.bFilterGrayItem,
 			fnAction = function()
-				MY_GKP_Loot.tItemConfig.bFilterGrayItem = not MY_GKP_Loot.tItemConfig.bFilterGrayItem
+				O.bFilterGrayItem = not O.bFilterGrayItem
 				D.ReloadFrame()
 			end,
 		},
@@ -693,9 +816,9 @@ function D.GetFilterMenu()
 			szOption = p.szTitle,
 			rgb = { GetItemFontColorByQuality(p.nQuality) },
 			bCheck = true,
-			bChecked = MY_GKP_Loot.tItemConfig.tFilterQuality[p.nQuality],
+			bChecked = O.tFilterQuality[p.nQuality],
 			fnAction = function()
-				MY_GKP_Loot.tItemConfig.tFilterQuality[p.nQuality] = not MY_GKP_Loot.tItemConfig.tFilterQuality[p.nQuality]
+				O.tFilterQuality[p.nQuality] = not O.tFilterQuality[p.nQuality]
 				D.ReloadFrame()
 			end,
 		})
@@ -710,21 +833,22 @@ function D.GetFilterMenu()
 		},
 		{
 			szOption = _L['Enable'],
-			bCheck = true, bChecked = MY_GKP_Loot.tItemConfig.bNameFilter,
+			bCheck = true, bChecked = O.bNameFilter,
 			fnAction = function()
-				MY_GKP_Loot.tItemConfig.bNameFilter = not MY_GKP_Loot.tItemConfig.bNameFilter
+				O.bNameFilter = not O.bNameFilter
 				D.ReloadFrame()
 			end,
 		},
 		CONSTANT.MENU_DIVIDER,
 	}
-	for szName, bEnable in pairs(MY_GKP_Loot.tItemConfig.tNameFilter) do
+	for szName, bEnable in pairs(O.tNameFilter) do
 		insert(t1, {
 			szOption = szName,
 			bCheck = true,
 			bChecked = bEnable,
 			fnAction = function()
-				MY_GKP_Loot.tItemConfig.tNameFilter[szName] = not MY_GKP_Loot.tItemConfig.tNameFilter[szName]
+				O.tNameFilter[szName] = not O.tNameFilter[szName]
+				O.tNameFilter = O.tNameFilter
 				D.ReloadFrame()
 			end,
 			szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',
@@ -734,32 +858,33 @@ function D.GetFilterMenu()
 			nIconHeight = 17,
 			szLayer = 'ICON_RIGHTMOST',
 			fnClickIcon = function()
-				MY_GKP_Loot.tItemConfig.tNameFilter[szName] = nil
+				O.tNameFilter[szName] = nil
+				O.tNameFilter = O.tNameFilter
 				UI.ClosePopupMenu()
 				D.ReloadFrame()
 			end,
-			fnDisable = function() return not MY_GKP_Loot.tItemConfig.bNameFilter end,
+			fnDisable = function() return not O.bNameFilter end,
 		})
 	end
-	if not IsEmpty(MY_GKP_Loot.tItemConfig.tNameFilter) then
+	if not IsEmpty(O.tNameFilter) then
 		insert(t1, CONSTANT.MENU_DIVIDER)
 	end
 	insert(t1, {
 		szOption = _L['Add'],
 		fnAction = function()
 			GetUserInput(_L['Please input filter name'], function(szText)
-				MY_GKP_Loot.tItemConfig.tNameFilter[szText] = true
+				O.tNameFilter[szText] = true
+				O.tNameFilter = O.tNameFilter
 				D.ReloadFrame()
 			end, nil, nil, nil, '', nil)
 		end,
-		fnDisable = function() return not MY_GKP_Loot.tItemConfig.bNameFilter end,
+		fnDisable = function() return not O.bNameFilter end,
 	})
 	insert(t, t1)
 	return t
 end
 
 function D.GetAutoPickupMenu()
-	local tItemConfig = O.tItemConfig
 	local t = { szOption = _L['Auto pickup'] }
 	insert(t, { szOption = _L['Filters have higher priority'], bDisable = true })
 	-- 拾取过滤
@@ -767,28 +892,29 @@ function D.GetAutoPickupMenu()
 	insert(t, {
 		szOption = _L['Filter book read'],
 		bCheck = true,
-		bChecked = MY_GKP_Loot.tItemConfig.bAutoPickupFilterBookRead,
+		bChecked = O.bAutoPickupFilterBookRead,
 		fnAction = function()
-			MY_GKP_Loot.tItemConfig.bAutoPickupFilterBookRead = not MY_GKP_Loot.tItemConfig.bAutoPickupFilterBookRead
+			O.bAutoPickupFilterBookRead = not O.bAutoPickupFilterBookRead
 		end,
 	})
 	-- 过滤已有书籍
 	insert(t, {
 		szOption = _L['Filter book have'],
 		bCheck = true,
-		bChecked = MY_GKP_Loot.tItemConfig.bAutoPickupFilterBookHave,
+		bChecked = O.bAutoPickupFilterBookHave,
 		fnAction = function()
-			MY_GKP_Loot.tItemConfig.bAutoPickupFilterBookHave = not MY_GKP_Loot.tItemConfig.bAutoPickupFilterBookHave
+			O.bAutoPickupFilterBookHave = not O.bAutoPickupFilterBookHave
 		end,
 	})
 	-- 自动拾取物品过滤
 	local t1 = { szOption = _L['Auto pickup filters'] }
-	for s, b in pairs(tItemConfig.tAutoPickupFilters or {}) do
+	for s, b in pairs(O.tAutoPickupFilters or {}) do
 		insert(t1, {
 			szOption = s,
 			bCheck = true, bChecked = b,
 			fnAction = function()
-				tItemConfig.tAutoPickupFilters[s] = not tItemConfig.tAutoPickupFilters[s]
+				O.tAutoPickupFilters[s] = not O.tAutoPickupFilters[s]
+				O.tAutoPickupFilters = O.tAutoPickupFilters
 			end,
 			szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',
 			nFrame = 49,
@@ -797,7 +923,8 @@ function D.GetAutoPickupMenu()
 			nIconHeight = 17,
 			szLayer = 'ICON_RIGHTMOST',
 			fnClickIcon = function()
-				tItemConfig.tAutoPickupFilters[s] = nil
+				O.tAutoPickupFilters[s] = nil
+				O.tAutoPickupFilters = O.tAutoPickupFilters
 				UI.ClosePopupMenu()
 			end,
 		})
@@ -809,7 +936,8 @@ function D.GetAutoPickupMenu()
 		szOption = _L['Add new'],
 		fnAction = function()
 			GetUserInput(_L['Please input new auto pickup filter:'], function(text)
-				tItemConfig.tAutoPickupFilters[text] = true
+				O.tAutoPickupFilters[text] = true
+				O.tAutoPickupFilters = O.tAutoPickupFilters
 			end)
 		end,
 	})
@@ -819,17 +947,17 @@ function D.GetAutoPickupMenu()
 	-- 自动拾取任务物品
 	insert(t, {
 		szOption = _L['Auto pickup quest item'],
-		bCheck = true, bChecked = tItemConfig.bAutoPickupTaskItem,
+		bCheck = true, bChecked = O.bAutoPickupTaskItem,
 		fnAction = function()
-			tItemConfig.bAutoPickupTaskItem = not tItemConfig.bAutoPickupTaskItem
+			O.bAutoPickupTaskItem = not O.bAutoPickupTaskItem
 		end,
 	})
 	-- 自动拾取书籍
 	insert(t, {
 		szOption = _L['Auto pickup book'],
-		bCheck = true, bChecked = tItemConfig.bAutoPickupBook,
+		bCheck = true, bChecked = O.bAutoPickupBook,
 		fnAction = function()
-			tItemConfig.bAutoPickupBook = not tItemConfig.bAutoPickupBook
+			O.bAutoPickupBook = not O.bAutoPickupBook
 		end,
 	})
 	-- 自动拾取品级
@@ -839,21 +967,22 @@ function D.GetAutoPickupMenu()
 			szOption = p.szTitle,
 			rgb = { GetItemFontColorByQuality(p.nQuality) },
 			bCheck = true,
-			bChecked = tItemConfig.tAutoPickupQuality[p.nQuality],
+			bChecked = O.tAutoPickupQuality[p.nQuality],
 			fnAction = function()
-				tItemConfig.tAutoPickupQuality[p.nQuality] = not tItemConfig.tAutoPickupQuality[p.nQuality]
+				O.tAutoPickupQuality[p.nQuality] = not O.tAutoPickupQuality[p.nQuality]
 			end,
 		})
 	end
 	insert(t, t1)
 	-- 自动拾取物品名称
 	local t1 = { szOption = _L['Auto pickup names'] }
-	for s, b in pairs(tItemConfig.tAutoPickupNames or {}) do
+	for s, b in pairs(O.tAutoPickupNames or {}) do
 		insert(t1, {
 			szOption = s,
 			bCheck = true, bChecked = b,
 			fnAction = function()
-				tItemConfig.tAutoPickupNames[s] = not tItemConfig.tAutoPickupNames[s]
+				O.tAutoPickupNames[s] = not O.tAutoPickupNames[s]
+				O.tAutoPickupNames = O.tAutoPickupNames
 			end,
 			szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',
 			nFrame = 49,
@@ -862,7 +991,8 @@ function D.GetAutoPickupMenu()
 			nIconHeight = 17,
 			szLayer = 'ICON_RIGHTMOST',
 			fnClickIcon = function()
-				tItemConfig.tAutoPickupNames[s] = nil
+				O.tAutoPickupNames[s] = nil
+				O.tAutoPickupNames = O.tAutoPickupNames
 				UI.ClosePopupMenu()
 			end,
 		})
@@ -874,7 +1004,8 @@ function D.GetAutoPickupMenu()
 		szOption = _L['Add new'],
 		fnAction = function()
 			GetUserInput(_L['Please input new auto pickup name:'], function(text)
-				tItemConfig.tAutoPickupNames[text] = true
+				O.tAutoPickupNames[text] = true
+				O.tAutoPickupNames = O.tAutoPickupNames
 			end)
 		end,
 	})
@@ -962,7 +1093,7 @@ function D.AuthCheck(dwID)
 	local doodad         = GetDoodad(dwID)
 	if not doodad then
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('MY_GKP_Loot:AuthCheck', 'Doodad does not exist!', DEBUG_LEVEL.WARNING)
+		LIB.Debug('MY_GKPLoot:AuthCheck', 'Doodad does not exist!', DEBUG_LEVEL.WARNING)
 		--[[#DEBUG END]]
 		return
 	end
@@ -1042,14 +1173,14 @@ function D.DistributeItem(dwID, info, szAutoDistType, bSkipRecordPanel)
 	local item = GetItem(info.dwID)
 	if not item then
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('MY_GKP_Loot', 'Item does not exist, check!!', DEBUG_LEVEL.WARNING)
+		LIB.Debug('MY_GKPLoot', 'Item does not exist, check!!', DEBUG_LEVEL.WARNING)
 		--[[#DEBUG END]]
 		local aItemData = D.GetDoodadLootInfo(info.dwDoodadID)
 		for k, v in ipairs(aItemData) do
 			if v.nQuality == info.nQuality and LIB.GetItemNameByItem(v.item) == info.szName then
 				info.dwID = v.item.dwID
 				--[[#DEBUG BEGIN]]
-				LIB.Debug('MY_GKP_Loot', 'Item matching, ' .. LIB.GetItemNameByItem(v.item), DEBUG_LEVEL.LOG)
+				LIB.Debug('MY_GKPLoot', 'Item matching, ' .. LIB.GetItemNameByItem(v.item), DEBUG_LEVEL.LOG)
 				--[[#DEBUG END]]
 				break
 			end
@@ -1381,7 +1512,7 @@ local function IsItemDataSuitable(data)
 		if szSuit == 'SUITABLE' then
 			if data.szType == 'EQUIPMENT' or data.szType == 'WEAPON' then
 				szSuit = LIB.IsItemFitKungfu(data.item) and 'SUITABLE' or 'NOT_SUITABLE'
-				if szSuit == 'NOT_SUITABLE' and MY_GKP.bShow2ndKungfuLoot then
+				if szSuit == 'NOT_SUITABLE' and MY_GKPLoot.bShow2ndKungfuLoot then
 					for _, dwKungfuID in ipairs(aKungfu) do
 						if LIB.IsItemFitKungfu(data.item, dwKungfuID) then
 							szSuit = 'MAYBE_SUITABLE'
@@ -1429,7 +1560,7 @@ function D.DrawLootList(dwID, bRemove)
 			end
 		end
 	else
-		local config = O.tItemConfig
+		local config = ITEM_CONFIG
 		-- 计算掉落
 		local aItemData, nMoney, szName, bSpecial = D.GetDoodadLootInfo(dwID)
 		if nMoney > 0 then
@@ -1445,14 +1576,14 @@ function D.DrawLootList(dwID, bRemove)
 			end
 		end
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('MY_GKP_Loot', ('Doodad %d, items %d, display %d.'):format(dwID, #aItemData, nCount), DEBUG_LEVEL.LOG)
+		LIB.Debug('MY_GKPLoot', ('Doodad %d, items %d, display %d.'):format(dwID, #aItemData, nCount), DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 
 		if not szName or nCount == 0 then
 			if not szName then
 				D.RemoveLootList(dwID)
 				--[[#DEBUG BEGIN]]
-				LIB.Debug('MY_GKP_Loot:DrawLootList', 'Doodad does not exist!', DEBUG_LEVEL.LOG)
+				LIB.Debug('MY_GKPLoot:DrawLootList', 'Doodad does not exist!', DEBUG_LEVEL.LOG)
 				--[[#DEBUG END]]
 			elseif frame then
 				D.DrawLootList(dwID, true)
@@ -1551,13 +1682,13 @@ function D.RemoveLootList(dwID)
 end
 
 function D.GetFrame()
-	return Station.Lookup('Normal/MY_GKP_Loot')
+	return Station.Lookup('Normal/MY_GKPLoot')
 end
 
 function D.OpenFrame()
 	local frame = D.GetFrame()
 	if not frame then
-		frame = Wnd.OpenWindow(GKP_LOOT_INIFILE, 'MY_GKP_Loot')
+		frame = Wnd.OpenWindow(GKP_LOOT_INIFILE, 'MY_GKPLoot')
 		PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
 	end
 	return frame
@@ -1748,7 +1879,7 @@ function D.HideSystemLoot()
 end
 
 
-LIB.RegisterEvent('HELP_EVENT.MY_GKP_Loot', function()
+LIB.RegisterEvent('HELP_EVENT.MY_GKPLoot', function()
 	if not D.IsEnabled() then
 		return
 	end
@@ -1776,7 +1907,7 @@ LIB.RegisterEvent('OPEN_DOODAD', function()
 		return D.DrawLootList(arg0, true)
 	end
 	--[[#DEBUG BEGIN]]
-	LIB.Debug('MY_GKP_Loot', 'Open Doodad: ' .. arg0, DEBUG_LEVEL.LOG)
+	LIB.Debug('MY_GKPLoot', 'Open Doodad: ' .. arg0, DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 	D.InsertLootList(arg0)
 	D.HideSystemLoot()
@@ -1824,6 +1955,165 @@ LIB.RegisterEvent('MY_GKP_LOOT_BOSS', function()
 	end
 end)
 
+function D.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
+	nX, nY = X, nLFY
+	ui:Append('Text', { text = _L['GKP Doodad helper'], x = nX, y = nY, font = 27 })
+
+	nX, nY = X + 10, nY + LH
+	nX = ui:Append('WndCheckBox', {
+		x = nX, y = nY,
+		text = _L['Enable MY_GKPLoot'],
+		checked = O.bOn,
+		oncheck = function(bChecked)
+			O.bOn = bChecked
+		end,
+	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
+	nX = ui:Append('WndCheckBox', {
+		x = nX, y = nY,
+		text = _L['Team dungeon'],
+		checked = O.bOnlyInTeamDungeon,
+		oncheck = function(bChecked)
+			O.bOnlyInTeamDungeon = bChecked
+		end,
+		tip = _L['Only enable in checked map (uncheck all for all map)'],
+		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+		autoenable = function() return O.bOn end,
+	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
+	nX = ui:Append('WndCheckBox', {
+		x = nX, y = nY,
+		text = _L['Raid dungeon'],
+		checked = O.bOnlyInRaidDungeon,
+		oncheck = function(bChecked)
+			O.bOnlyInRaidDungeon = bChecked
+		end,
+		tip = _L['Only enable in checked map (uncheck all for all map)'],
+		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+		autoenable = function() return O.bOn end,
+	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
+	nX = ui:Append('WndCheckBox', {
+		x = nX, y = nY,
+		text = _L['Battlefield'],
+		checked = O.bOnlyInBattlefield,
+		oncheck = function(bChecked)
+			O.bOnlyInBattlefield = bChecked
+		end,
+		tip = _L['Only enable in checked map (uncheck all for all map)'],
+		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+		autoenable = function() return O.bOn end,
+	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
+
+	nX, nY = X + 10, nY + LH
+
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY,
+		text = _L['Show 2nd kungfu fit icon'],
+		checked = O.bShow2ndKungfuLoot,
+		oncheck = function()
+			O.bShow2ndKungfuLoot = not O.bShow2ndKungfuLoot
+			FireUIEvent('MY_GKP_LOOT_RELOAD')
+		end,
+		autoenable = function() return O.bOn end,
+	}):AutoWidth():Width() + 10
+
+	nX, nY = X + 10, nY + LH
+	nX = nX + ui:Append('WndComboBox', {
+		x = nX, y = nY, w = 200,
+		text = _L['Confirm when distribute'],
+		lmenu = function()
+			local t = {}
+			insert(t, { szOption = _L['Category'], bDisable = true })
+			for _, szKey in ipairs({
+				'Huangbaba',
+				'Book',
+				'Pendant',
+				'Outlook',
+				'Pet',
+				'Horse',
+				'HorseEquip',
+			}) do
+				insert(t, {
+					szOption = _L[szKey],
+					bCheck = true,
+					bChecked = O.tConfirm[szKey],
+					fnAction = function()
+						O.tConfirm[szKey] = not O.tConfirm[szKey]
+						O.tConfirm = O.tConfirm
+					end,
+				})
+			end
+			insert(t, CONSTANT.MENU_DIVIDER)
+			insert(t, { szOption = _L['Quality'], bDisable = true })
+			for i, s in ipairs({
+				[1] = g_tStrings.STR_WHITE,
+				[2] = g_tStrings.STR_ROLLQUALITY_GREEN,
+				[3] = g_tStrings.STR_ROLLQUALITY_BLUE,
+				[4] = g_tStrings.STR_ROLLQUALITY_PURPLE,
+				[5] = g_tStrings.STR_ROLLQUALITY_NACARAT,
+			}) do
+				insert(t, {
+					szOption = _L('Reach %s', s),
+					rgb = i == -1 and {255, 255, 255} or { GetItemFontColorByQuality(i) },
+					bCheck = true, bMCheck = true,
+					bChecked = i == O.nConfirmQuality,
+					fnAction = function()
+						O.nConfirmQuality = i
+					end,
+				})
+			end
+			return t
+		end,
+		autoenable = function() return O.bOn end,
+	}):AutoWidth():Width() + 5
+	nX = nX + ui:Append('WndComboBox', {
+		x = nX, y = nY, w = 200,
+		text = _L['Loot item filter'],
+		menu = D.GetFilterMenu,
+		autoenable = function() return O.bOn end,
+	}):AutoWidth():Width() + 5
+	nX = nX + ui:Append('WndComboBox', {
+		x = nX, y = nY, w = 200,
+		text = _L['Auto pickup'],
+		menu = D.GetAutoPickupMenu,
+		autoenable = function() return O.bOn end,
+	}):AutoWidth():Width() + 5
+
+	return nX, nY, nLFY
+end
+
+-- Global exports
+do
+local settings = {
+	imports = {
+		{
+			fields = {
+				tConfirm = true,
+				tItemConfig = true,
+			},
+			triggers = {
+				tConfirm = function(_, v)
+					if not v then
+						return
+					end
+					D.tConfirm = nil
+					O.tConfirm = v
+				end,
+				tItemConfig = function(_, v)
+					if not IsTable(v) then
+						return
+					end
+					D.tItemConfig = nil
+					for k, v in pairs(v) do
+						SafeCall(Set, O, k, v)
+					end
+				end,
+			},
+			root = D,
+		},
+	},
+}
+MY_GKP_Loot = LIB.CreateModule(settings)
+end
+
 -- Global exports
 do
 local settings = {
@@ -1834,29 +2124,20 @@ local settings = {
 		},
 		{
 			fields = {
-				IsEnabled          = D.IsEnabled         ,
-				CanDialog          = D.CanDialog         ,
-				IsItemDisplay      = D.IsItemDisplay     ,
-				IsItemAutoPickup   = D.IsItemAutoPickup  ,
-				GetMessageBox      = D.GetMessageBox     ,
-				GetaPartyMember    = D.GetaPartyMember   ,
-				GetFilterMenu      = D.GetFilterMenu     ,
-				GetAutoPickupMenu  = D.GetAutoPickupMenu ,
-				GetItemData        = D.GetItemData       ,
-				GetItemBiddingMenu = D.GetItemBiddingMenu,
+				IsEnabled            = D.IsEnabled           ,
+				CanDialog            = D.CanDialog           ,
+				IsItemDisplay        = D.IsItemDisplay       ,
+				IsItemAutoPickup     = D.IsItemAutoPickup    ,
+				GetMessageBox        = D.GetMessageBox       ,
+				GetaPartyMember      = D.GetaPartyMember     ,
+				GetItemData          = D.GetItemData         ,
+				GetItemBiddingMenu   = D.GetItemBiddingMenu  ,
+				OnPanelActivePartial = D.OnPanelActivePartial,
 			},
 		},
 		{
 			fields = {
 				bOn = true,
-				bOnlyInTeamDungeon = true,
-				bOnlyInRaidDungeon = true,
-				bOnlyInBattlefield = true,
-				bVertical = true,
-				bSetColor = true,
-				nConfirmQuality = true,
-				tConfirm = true,
-				tItemConfig = true,
 			},
 			root = O,
 		},
@@ -1873,42 +2154,10 @@ local settings = {
 		{
 			fields = {
 				bOn = true,
-				bOnlyInTeamDungeon = true,
-				bOnlyInRaidDungeon = true,
-				bOnlyInBattlefield = true,
-				bVertical = true,
-				bSetColor = true,
-				nConfirmQuality = true,
-				tConfirm = true,
-				tItemConfig = true,
-			},
-			triggers = {
-				bOn = function(_, bOn)
-					if bOn then
-						LIB.SetGlobalValue('LR_Loot_Panel.UsrData.bOn', false)
-					end
-				end,
-				bVertical = function()
-					FireUIEvent('MY_GKP_LOOT_RELOAD')
-				end,
-				bSetColor = function()
-					FireUIEvent('MY_GKP_LOOT_RELOAD')
-				end,
-				tItemConfig = function(_, tItemConfig)
-					if IsTable(tItemConfig) then
-						for k, v in pairs(O_DEFAULT.tItemConfig) do
-							if type(v) ~= type(tItemConfig[k]) then
-								tItemConfig[k] = Clone(v)
-							end
-						end
-					else
-						O.tItemConfig = Clone(O_DEFAULT.tItemConfig)
-					end
-				end,
 			},
 			root = O,
 		},
 	},
 }
-MY_GKP_Loot = LIB.CreateModule(settings)
+MY_GKPLoot = LIB.CreateModule(settings)
 end

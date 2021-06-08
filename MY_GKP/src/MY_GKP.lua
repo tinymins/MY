@@ -53,70 +53,116 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 	return
 end
 --------------------------------------------------------------------------
-local D = {}
-local O = {
-	bOn                  = true,  -- enable
-	bMoneyTalk           = false, -- 金钱变动喊话
-	bAlertMessage        = true,  -- 进入秘境提醒清空数据
-	bMoneySystem         = false, -- 记录系统金钱变动
-	bDisplayEmptyRecords = true,  -- show 0 record
-	bAutoSync            = true,  -- 自动接收分配者的同步信息
-	bShowGoldBrick       = true,
-	bShow2ndKungfuLoot   = true,  -- 显示第二心法装备推荐提示图标
+local O = LIB.CreateUserSettingsModule('MY_GKP', _L['MY_GKP'], {
+	bOn = { -- enable
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_GKP'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bMoneyTalk = { -- 金钱变动喊话
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_GKP'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bAlertMessage = { -- 进入秘境提醒清空数据
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_GKP'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bMoneySystem = { -- 记录系统金钱变动
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_GKP'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bDisplayEmptyRecords = { -- show 0 record
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_GKP'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bAutoSync = { -- 自动接收分配者的同步信息
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_GKP'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bShowGoldBrick = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_GKP'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
 	aSubsidies = { -- 补贴方案
-		{ _L['Treasure Chests'], '', true},
-		-- { LIB.GetItemNameByUIID(73214), '', true},
-		{ _L['Boss'], '', true},
-		{ _L['Banquet Allowance'], -1000, true},
-		{ _L['Fines'], '', true},
-		{ _L['Other'], '', true},
+		ePathType = PATH_TYPE.GLOBAL,
+		szLabel = _L['Allowance Protocols'],
+		xSchema = Schema.Collection(Schema.Tuple(
+			Schema.String,
+			Schema.OneOf(Schema.String, Schema.Number),
+			Schema.Boolean
+		)),
+		xDefaultValue = {
+			{ _L['Treasure Chests'], '', true},
+			-- { LIB.GetItemNameByUIID(73214), '', true},
+			{ _L['Boss'], '', true},
+			{ _L['Banquet Allowance'], -1000, true},
+			{ _L['Fines'], '', true},
+			{ _L['Other'], '', true},
+		},
 	},
 	aScheme = { -- 拍卖方案
-		{ 100, 100, true },
-		{ 1000, 1000, true },
-		{ 2000, 1000, true },
-		{ 3000, 1000, true },
-		{ 4000, 1000, true },
-		{ 5000, 1000, true },
-		{ 6000, 1000, true },
-		{ 7000, 1000, true },
-		{ 8000, 1000, true },
-		{ 9000, 1000, true },
-		{ 10000, 2000, true },
-		{ 20000, 2000, true },
-		{ 50000, 2000, true },
-		{ 100000, 5000, true },
+		ePathType = PATH_TYPE.GLOBAL,
+		szLabel = _L['Auction Protocols'],
+		xSchema = Schema.Collection(Schema.Tuple(
+			Schema.Number,
+			Schema.Number,
+			Schema.Boolean
+		)),
+		xDefaultValue = {
+			{ 100, 100, true },
+			{ 1000, 1000, true },
+			{ 2000, 1000, true },
+			{ 3000, 1000, true },
+			{ 4000, 1000, true },
+			{ 5000, 1000, true },
+			{ 6000, 1000, true },
+			{ 7000, 1000, true },
+			{ 8000, 1000, true },
+			{ 9000, 1000, true },
+			{ 10000, 2000, true },
+			{ 20000, 2000, true },
+			{ 50000, 2000, true },
+			{ 100000, 5000, true },
+		},
 	},
-	bSyncSystem = true,
-	bNewBidding = true,
-}
-RegisterCustomData('MY_GKP.bOn')
-RegisterCustomData('MY_GKP.bMoneyTalk')
-RegisterCustomData('MY_GKP.bAlertMessage')
-RegisterCustomData('MY_GKP.bMoneySystem')
-RegisterCustomData('MY_GKP.bDisplayEmptyRecords')
-RegisterCustomData('MY_GKP.bAutoSync')
-RegisterCustomData('MY_GKP.bShowGoldBrick')
-RegisterCustomData('MY_GKP.bShow2ndKungfuLoot')
-RegisterCustomData('MY_GKP.bSyncSystem')
-RegisterCustomData('MY_GKP.bNewBidding')
+	bSyncSystem = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_GKP'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bNewBidding = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_GKP'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+})
+local D = {}
 
 ---------------------------------------------------------------------->
 -- 数据处理
 ----------------------------------------------------------------------<
-function D.SaveConfig()
-	local Config = {
-		Subsidies = O.aSubsidies,
-		Scheme2 = O.aScheme,
-	}
-	LIB.SaveLUAData({'config/gkp.cfg', PATH_TYPE.GLOBAL}, Config)
-end
-
 function D.LoadConfig()
-	local Config = LIB.LoadLUAData({'config/gkp.cfg', PATH_TYPE.GLOBAL})
+	local szPath = LIB.FormatPath({'config/gkp.cfg', PATH_TYPE.GLOBAL})
+	local Config = LIB.LoadLUAData(szPath)
 	if Config then
-		O.aSubsidies = Config.Subsidies
-		O.aScheme = Config.Scheme2 or O.aScheme
+		CPath.DelFile(szPath)
+		SafeCall(Set, O, 'aSubsidies', Config.Subsidies)
+		SafeCall(Set, O, 'aScheme', Config.Scheme2 or O.aScheme)
 	end
 end
 
@@ -347,7 +393,6 @@ local settings = {
 				bDisplayEmptyRecords = true,
 				bAutoSync = true,
 				bShowGoldBrick = true,
-				bShow2ndKungfuLoot = true,
 				aSubsidies = true,
 				aScheme = true,
 				bSyncSystem = true,
@@ -366,7 +411,6 @@ local settings = {
 				bDisplayEmptyRecords = true,
 				bAutoSync = true,
 				bShowGoldBrick = true,
-				bShow2ndKungfuLoot = true,
 				aSubsidies = true,
 				aScheme = true,
 				bSyncSystem = true,
@@ -380,8 +424,6 @@ local settings = {
 					FireUIEvent('MY_GKP_DATA_UPDATE', '', 'AUCTION')
 					FireUIEvent('MY_GKP_DATA_UPDATE', '', 'PAYMENT')
 				end,
-				aSubsidies = D.SaveConfig,
-				aScheme = D.SaveConfig,
 			},
 			root = O,
 		},

@@ -65,11 +65,11 @@ function D.OnGoldTeamLootListItemRButtonClick()
 	if not d then
 		return
 	end
-	local data = MY_GKP_Loot.GetItemData(GetClientPlayer(), d, tData.nLootIndex)
+	local data = MY_GKPLoot.GetItemData(GetClientPlayer(), d, tData.nLootIndex)
 	if not data then
 		return
 	end
-	UI.PopupMenu(MY_GKP_Loot.GetItemBiddingMenu(tData.dwDoodadID, data))
+	UI.PopupMenu(MY_GKPLoot.GetItemBiddingMenu(tData.dwDoodadID, data))
 end
 
 function D.HookGoldTeamLootList()
