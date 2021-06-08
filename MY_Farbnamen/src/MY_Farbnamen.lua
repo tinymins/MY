@@ -366,7 +366,7 @@ end
 
 -- 插入聊天内容的 HOOK （过滤、加入时间 ）
 LIB.HookChatPanel('BEFORE.MY_FARBNAMEN', function(h, szMsg, ...)
-	if O.bEnabled then
+	if D.bInitialized and O.bEnable then
 		szMsg = D.Render(szMsg, true)
 	end
 	return szMsg
@@ -560,6 +560,7 @@ function D.Get(szKey)
 		}
 	end
 end
+D.GetAusName = D.Get
 
 -- 通过dwID获取信息
 function D.GetAusID(dwID)
@@ -603,6 +604,8 @@ function D.AddAusID(dwID)
 	end
 end
 
+LIB.RegisterInit('MY_Farbnamen', function() D.bInitialized = true end)
+
 --------------------------------------------------------------
 -- 菜单
 --------------------------------------------------------------
@@ -610,9 +613,9 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, w = 'auto',
 		text = _L['Enable MY_Farbnamen'],
-		checked = O.bEnabled,
+		checked = O.bEnable,
 		oncheck = function()
-			O.bEnabled = not O.bEnabled
+			O.bEnable = not O.bEnable
 		end,
 	}):Width() + 5
 
@@ -626,7 +629,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
 			O.bInsertIcon = not O.bInsertIcon
 		end,
 		autoenable = function()
-			return O.bEnabled
+			return O.bEnable
 		end,
 	}):Width() + 5
 
@@ -655,7 +658,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
 			LIB.SwitchTab('GlobalColor')
 		end,
 		autoenable = function()
-			return O.bEnabled
+			return O.bEnable
 		end,
 	}):Width() + 5
 
@@ -673,7 +676,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
 			end)
 		end,
 		autoenable = function()
-			return O.bEnabled
+			return O.bEnable
 		end,
 	}):Width() + 5
 
@@ -722,7 +725,7 @@ local settings = {
 				ShowTip              = D.ShowTip             ,
 				Get                  = D.Get                 ,
 				GetAusID             = D.GetAusID            ,
-				GetAusName           = D.Get                 ,
+				GetAusName           = D.GetAusName          ,
 				OnPanelActivePartial = D.OnPanelActivePartial,
 			},
 		},

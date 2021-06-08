@@ -94,7 +94,7 @@ local O = LIB.CreateUserSettingsModule('MY_ChatCopy', _L['MY_Chat'], {
 local D = {}
 
 local function onNewChatLine(h, i, szMsg, szChannel, dwTime, nR, nG, nB)
-	if szMsg and i and h:GetItemCount() > i and (O.bChatTime or O.bChatCopy) then
+	if szMsg and i and D.bInitialized and h:GetItemCount() > i and (O.bChatTime or O.bChatCopy) then
 		-- chat time
 		-- check if timestrap can insert
 		if O.bChatCopyNoCopySysmsg and szChannel == 'SYS_MSG' then
@@ -136,6 +136,8 @@ local function onNewChatLine(h, i, szMsg, szChannel, dwTime, nR, nG, nB)
 	end
 end
 LIB.HookChatPanel('AFTER.MY_ChatCopy', onNewChatLine)
+
+LIB.RegisterInit('MY_ChatCopy', function() D.bInitialized = true end)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 	x = X
