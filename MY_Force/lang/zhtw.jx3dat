@@ -19,7 +19,7 @@ return {
     -- MY_ForceGuding
     ['I have put the GUDING, hurry to eat if you lack of mana. *la la la*'] = '法寶 [仙王蠱鼎] 已祭出，內力不足抓緊享用，用茗伊插件看得見~#玫瑰#玫瑰~~',
     ['Auto eat GUDING'] = '自動吃仙王蠱鼎',
-    ['MY_ForceGuding'] = '茗伊蠱鼎',
+    ['MY_ForceGuding'] = '蠱鼎助手',
     ['Display GUDING of teammate, change color'] = '突出顯示團隊里的仙王蠱鼎，設置顏色',
     ['Auto talk in team channel after puting GUDING'] = '喊話提醒隊友來吃',
     ['Talk message'] = '喊話內容',
@@ -27,6 +27,7 @@ return {
     [', or life below '] = '，或血低於',
 
     -- MY_ChangGeShadow
+    ['MY_ChangGeShadow'] = '長歌影子助手',
     ['Show changge shadow index'] = '顯示長歌影子次序',
     ['Show distance'] = '顯示距離',
     ['Show countdown'] = '顯示時間',

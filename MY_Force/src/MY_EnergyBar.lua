@@ -55,18 +55,25 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
-local ANCHOR = {x = 65, y = 250, s = 'CENTER', r = 'CENTER'}
-local INI_PATH = PLUGIN_ROOT .. '/ui/PlayerBar.ini'
-local O = {
-	bEnable = false,
-	tAnchor = {},
-}
-RegisterCustomData('MY_EnergyBar.bEnable')
-RegisterCustomData('MY_EnergyBar.tAnchor')
-
 ---------------------------------------------------------------------
 -- 本地函数和变量
 ---------------------------------------------------------------------
+local INI_PATH = PLUGIN_ROOT .. '/ui/PlayerBar.ini'
+
+local O = LIB.CreateUserSettingsModule('MY_EnergyBar', _L['MY_Force'], {
+	bEnable = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_EnergyBar'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	tAnchor = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_EnergyBar'],
+		xSchema = Schema.FrameAnchor,
+		xDefaultValue = { x = 65, y = 250, s = 'CENTER', r = 'CENTER' },
+	},
+})
 local D = {
 	nBombCount = 0,
 	tBombMsg = {},
@@ -102,9 +109,6 @@ local D = {
 
 function D.UpdateAnchor(frame)
 	local an = O.tAnchor
-	if IsEmpty(an) then
-		an = ANCHOR
-	end
 	frame:SetPoint(an.s, 0, 0, an.r, an.x, an.y)
 	frame:CorrectPos()
 end
@@ -564,22 +568,20 @@ function D.Apply()
 	else
 		local frame = Station.Lookup('Normal/MY_EnergyBar')
 		if not frame then
-			local an = O.tAnchor
-			if IsEmpty(an) then
-				an = ANCHOR
-			end
-			UI.CreateFrame('MY_EnergyBar', { empty = true, w = 400, h = 60, penetrable = true, anchor = an })
+			UI.CreateFrame('MY_EnergyBar', { empty = true, w = 400, h = 60, penetrable = true, anchor = O.tAnchor })
 		end
 	end
 end
+LIB.RegisterInit('MY_EnergyBar', D.Apply)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y,
 		text = _L['Enable MY_EnergyBar'],
-		checked = MY_EnergyBar.bEnable,
+		checked = O.bEnable,
 		oncheck = function(bChecked)
-			MY_EnergyBar.bEnable = bChecked
+			O.bEnable = bChecked
+			D.Apply()
 		end,
 	}):AutoWidth():Width() + 5
 	return x, y
@@ -597,25 +599,6 @@ local settings = {
 			fields = {
 				OnPanelActivePartial = D.OnPanelActivePartial,
 			},
-		},
-		{
-			fields = {
-				bEnable = true,
-				tAnchor = true,
-			},
-			root = O,
-		},
-	},
-	imports = {
-		{
-			fields = {
-				bEnable = true,
-				tAnchor = true,
-			},
-			triggers = {
-				bEnable = D.Apply,
-			},
-			root = O,
 		},
 	},
 }

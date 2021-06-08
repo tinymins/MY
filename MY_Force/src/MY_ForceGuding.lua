@@ -54,17 +54,51 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
-local D = {}
-local O = {
-	-- 导出设置
-	bEnable = true, -- 总开关
-	bAutoSay = false, -- 摆鼎后自动说话
-	szSay = _L['I have put the GUDING, hurry to eat if you lack of mana. *la la la*'],
-	color = { 255, 0, 128 }, -- 名称颜色，默认绿色
-	bUseMana = false, -- 路过时自动吃毒锅
-	nManaMp = 80, -- 自动吃的 MP 百分比
-	nManaHp = 80, -- 自动吃的 HP 百分比
-	-- 本地变量
+local O = LIB.CreateUserSettingsModule('MY_ForceGuding', _L['MY_Force'], {
+	bEnable = { -- 总开关
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ForceGuding'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bAutoSay = { -- 摆鼎后自动说话
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ForceGuding'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	szSay = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ForceGuding'],
+		xSchema = Schema.String,
+		xDefaultValue = _L['I have put the GUDING, hurry to eat if you lack of mana. *la la la*'],
+	},
+	color = { -- 名称颜色，默认绿色
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ForceGuding'],
+		xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+		xDefaultValue = { 255, 0, 128 },
+	},
+	bUseMana = { -- 路过时自动吃毒锅
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ForceGuding'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	nManaMp = { -- 自动吃的 MP 百分比
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ForceGuding'],
+		xSchema = Schema.Number,
+		xDefaultValue = 80,
+	},
+	nManaHp = { -- 自动吃的 HP 百分比
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ForceGuding'],
+		xSchema = Schema.Number,
+		xDefaultValue = 80,
+	},
+})
+local D = {
 	nMaxDelay = 500, -- 释放和出现的最大时差，单位毫秒
 	nMaxTime = 60000, -- 存在的最大时间，单位毫秒
 	dwSkillID = 2234,
@@ -73,13 +107,6 @@ local O = {
 	tCast = {}, -- 技能释放记录
 	nFrame = 0, -- 上次自动吃鼎、绘制帧次
 }
-RegisterCustomData('MY_ForceGuding.bEnable')
-RegisterCustomData('MY_ForceGuding.bAutoSay')
-RegisterCustomData('MY_ForceGuding.szSay')
-RegisterCustomData('MY_ForceGuding.color')
-RegisterCustomData('MY_ForceGuding.bUseMana')
-RegisterCustomData('MY_ForceGuding.nManaMp')
-RegisterCustomData('MY_ForceGuding.nManaHp')
 
 --[[#DEBUG BEGIN]]
 -- debug
@@ -90,7 +117,7 @@ end
 
 -- add to list
 function D.AddToList(tar, dwCaster, dwTime, szEvent)
-	O.tList[tar.dwID] = { dwCaster = dwCaster, dwTime = dwTime }
+	D.tList[tar.dwID] = { dwCaster = dwCaster, dwTime = dwTime }
 	-- bg notify
 	local me = GetClientPlayer()
 	if szEvent == 'DO_SKILL_CAST' and me.IsInParty() then
@@ -107,7 +134,7 @@ end
 
 -- remove record
 function D.RemoveFromList(dwID)
-	O.tList[dwID] = nil
+	D.tList[dwID] = nil
 end
 
 -------------------------------------
@@ -116,8 +143,8 @@ end
 -- skill cast log
 function D.OnSkillCast(dwCaster, dwSkillID, dwLevel, szEvent)
 	local player = GetPlayer(dwCaster)
-	if player and dwSkillID == O.dwSkillID and (dwCaster == UI_GetClientPlayerID() or LIB.IsParty(dwCaster)) then
-		insert(O.tCast, { dwCaster = dwCaster, dwTime = GetTime(), szEvent = szEvent })
+	if player and dwSkillID == D.dwSkillID and (dwCaster == UI_GetClientPlayerID() or LIB.IsParty(dwCaster)) then
+		insert(D.tCast, { dwCaster = dwCaster, dwTime = GetTime(), szEvent = szEvent })
 		--[[#DEBUG BEGIN]]
 		D.Debug('[' .. player.szName .. '] cast [' .. LIB.GetSkillName(dwSkillID, dwLevel) .. '#' .. szEvent .. ']')
 		--[[#DEBUG END]]
@@ -127,20 +154,20 @@ end
 -- doodad enter
 function D.OnDoodadEnter()
 	local tar = GetDoodad(arg0)
-	if not tar or O.tList[arg0] or tar.dwTemplateID ~= O.dwTemplateID then
+	if not tar or D.tList[arg0] or tar.dwTemplateID ~= D.dwTemplateID then
 		return
 	end
 	--[[#DEBUG BEGIN]]
 	D.Debug('[' .. tar.szName .. '] enter scene')
 	--[[#DEBUG END]]
 	-- find caster
-	for k, v in ipairs(O.tCast) do
+	for k, v in ipairs(D.tCast) do
 		local nTime = GetTime() - v.dwTime
 		--[[#DEBUG BEGIN]]
 		D.Debug('checking [#' .. v.dwCaster .. '], delay [' .. nTime .. ']')
 		--[[#DEBUG END]]
-		if nTime < O.nMaxDelay then
-			remove(O.tCast, k)
+		if nTime < D.nMaxDelay then
+			remove(D.tCast, k)
 			D.AddToList(tar, v.dwCaster, v.dwTime, v.szEvent)
 			--[[#DEBUG BEGIN]]
 			D.Debug('matched [' .. tar.szName .. '] casted by [#' .. v.dwCaster .. ']')
@@ -149,9 +176,9 @@ function D.OnDoodadEnter()
 		end
 	end
 	-- purge
-	for k, v in pairs(O.tCast) do
-		if (GetTime() - v.dwTime) > O.nMaxDelay then
-			remove(O.tCast, k)
+	for k, v in pairs(D.tCast) do
+		if (GetTime() - v.dwTime) > D.nMaxDelay then
+			remove(D.tCast, k)
 		end
 	end
 end
@@ -160,8 +187,8 @@ end
 function D.OnSkillNotify(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
 	if not bSelf then
 		local dwID = tonumber(data[1])
-		if not O.tList[dwID] then
-			O.tList[dwID] = { dwCaster = tonumber(data[2]), dwTime = GetTime() }
+		if not D.tList[dwID] then
+			D.tList[dwID] = { dwCaster = tonumber(data[2]), dwTime = GetTime() }
 			--[[#DEBUG BEGIN]]
 			D.Debug('received notify from [#' .. data[2] .. ']')
 			--[[#DEBUG END]]
@@ -169,12 +196,13 @@ function D.OnSkillNotify(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
 	end
 end
 
-function D.OnEnableChange(_, bEnable)
+function D.OnEnableChange()
+	local bEnable = O.bEnable
 	local h = UI.GetShadowHandle('MY_ForceGuding')
 	h:Clear()
 	if bEnable then
 		h:AppendItemFromString('<shadow>name="Shadow_Label"</shadow>')
-		O.pLabel = h:Lookup('Shadow_Label')
+		D.pLabel = h:Lookup('Shadow_Label')
 		LIB.RegisterEvent('SYS_MSG.MY_ForceGuding', function()
 			if arg0 == 'UI_OME_SKILL_HIT_LOG' then
 				D.OnSkillCast(arg1, arg4, arg5, arg0)
@@ -192,13 +220,13 @@ function D.OnEnableChange(_, bEnable)
 		LIB.BreatheCall('MY_ForceGuding', function()
 			-- skip frame
 			local nFrame = GetLogicFrameCount()
-			if nFrame >= O.nFrame and (nFrame - O.nFrame) < 8 then
+			if nFrame >= D.nFrame and (nFrame - D.nFrame) < 8 then
 				return
 			end
-			O.nFrame = nFrame
+			D.nFrame = nFrame
 			-- check empty
-			local sha, me = O.pLabel, GetClientPlayer()
-			if not me or not MY_ForceGuding.bEnable or IsEmpty(O.tList) then
+			local sha, me = D.pLabel, GetClientPlayer()
+			if not me or not MY_ForceGuding.bEnable or IsEmpty(D.tList) then
 				return sha:Hide()
 			end
 			-- color, alpha
@@ -212,8 +240,8 @@ function D.OnEnableChange(_, bEnable)
 			sha:SetTriangleFan(GEOMETRY_TYPE.TEXT)
 			sha:ClearTriangleFanPoint()
 			sha:Show()
-			for k, v in pairs(O.tList) do
-				local nLeft = v.dwTime + O.nMaxTime - GetTime()
+			for k, v in pairs(D.tList) do
+				local nLeft = v.dwTime + D.nMaxTime - GetTime()
 				if nLeft < 0 then
 					D.RemoveFromList(k)
 				else
@@ -241,16 +269,17 @@ function D.OnEnableChange(_, bEnable)
 	end
 end
 
-function D.OnUseManaChange(_, bUseMana)
+function D.OnUseManaChange()
+	local bUseMana = O.bUseMana
 	if bUseMana and not LIB.IsShieldedVersion('MY_ForceGuding') then
 		LIB.BreatheCall('MY_ForceGuding__UseMana', function()
 			local nFrame = GetLogicFrameCount()
 			-- check to use mana
-			if not O.bUseMana or (O.nManaFrame and O.nManaFrame > (nFrame - 4)) then
+			if not O.bUseMana or (D.nManaFrame and D.nManaFrame > (nFrame - 4)) then
 				return
 			end
 			-- 没鼎
-			local aList = O.tList
+			local aList = D.tList
 			if IsEmpty(aList) then
 				return
 			end
@@ -281,7 +310,7 @@ function D.OnUseManaChange(_, bUseMana)
 			for k, _ in pairs(aList) do
 				local doo = GetDoodad(k)
 				if doo and LIB.GetDistance(doo) < 6 then
-					O.nManaFrame = GetLogicFrameCount()
+					D.nManaFrame = GetLogicFrameCount()
 					LIB.InteractDoodad(doo.dwID)
 					LIB.Sysmsg(_L['Auto eat GUDING'])
 					break
@@ -292,6 +321,11 @@ function D.OnUseManaChange(_, bUseMana)
 		LIB.BreatheCall('MY_ForceGuding__UseMana', false)
 	end
 end
+
+LIB.RegisterInit('', function()
+	D.OnEnableChange()
+	D.OnUseManaChange()
+end)
 
 -------------------------------------
 -- 全局导出接口
@@ -306,6 +340,8 @@ local settings = {
 				szSay    = true,
 				color    = true,
 				bUseMana = true,
+				nManaMp  = true,
+				nManaHp  = true,
 			},
 			root = O,
 		},
@@ -318,6 +354,8 @@ local settings = {
 				szSay    = true,
 				color    = true,
 				bUseMana = true,
+				nManaMp  = true,
+				nManaHp  = true,
 			},
 			triggers = {
 				bEnable  = D.OnEnableChange,

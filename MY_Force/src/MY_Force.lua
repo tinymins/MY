@@ -54,33 +54,57 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
-local D = {}
-local O = {
-	-- 导出设置
-	bAlertPet      = true , -- 五毒宠物消失提醒
-	bMarkPet       = false, -- 五毒宠物标记
-	bFeedHorse     = true , -- 提示喂马
-	bWarningDebuff = false, -- 警告 debuff 类型
-	nDebuffNum     = 3    , -- debuff 类型达到几个时警告
-	bAlertWanted   = false, -- 在线被悬赏时提醒自己
-	-- 本地变量
+local O = LIB.CreateUserSettingsModule('MY_Force', _L['MY_Force'], {
+	bAlertPet = { -- 五毒宠物消失提醒
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Force'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bMarkPet = { -- 五毒宠物标记
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Force'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bFeedHorse = { -- 提示喂马
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Force'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bWarningDebuff = { -- 警告 debuff 类型
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Force'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	nDebuffNum = { -- debuff 类型达到几个时警告
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Force'],
+		xSchema = Schema.Number,
+		xDefaultValue = 3,
+	},
+	bAlertWanted = { -- 在线被悬赏时提醒自己
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Force'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+})
+local D = {
 	nFrameXJ = 0, -- 献祭、各种召唤跟宠的帧数
 }
-RegisterCustomData('MY_Force.bAlertPet')
-RegisterCustomData('MY_Force.bMarkPet')
-RegisterCustomData('MY_Force.bFeedHorse')
-RegisterCustomData('MY_Force.bWarningDebuff')
-RegisterCustomData('MY_Force.nDebuffNum')
-RegisterCustomData('MY_Force.bAlertWanted')
 
 -- check pet of 5D （XJ：2226）
-function D.OnAlertPetChange(_, bAlertPet)
+function D.OnAlertPetChange()
+	local bAlertPet = O.bAlertPet
 	if bAlertPet then
 		LIB.RegisterEvent('NPC_LEAVE_SCENE.MY_Force__AlertPet', function()
 			local me = GetClientPlayer()
 			if me and me.dwForceID == FORCE_TYPE.WU_DU then
 				local pet = me.GetPet()
-				if pet and pet.dwID == arg0 and (GetLogicFrameCount() - O.nFrameXJ) >= 32 then
+				if pet and pet.dwID == arg0 and (GetLogicFrameCount() - D.nFrameXJ) >= 32 then
 					OutputWarningMessage('MSG_WARNING_YELLOW', _L('Your pet [%s] disappeared!',  pet.szName))
 					PlaySound(SOUND.UI_SOUND, g_sound.CloseAuction)
 				end
@@ -90,7 +114,7 @@ function D.OnAlertPetChange(_, bAlertPet)
 			if arg0 == UI_GetClientPlayerID() then
 				-- 献祭、各种召唤：2965，2221 ~ 2226
 				if arg1 == 2965 or (arg1 >= 2221 and arg1 <= 2226) then
-					O.nFrameXJ = GetLogicFrameCount()
+					D.nFrameXJ = GetLogicFrameCount()
 				end
 			end
 		end)
@@ -116,7 +140,8 @@ local function UpdatePetMark(bMark)
 		SceneObject_SetTitleEffect(TARGET.NPC, pet.dwID, dwEffect)
 	end
 end
-function D.OnMarkPetChange(_, bMarkPet)
+function D.OnMarkPetChange()
+	local bMarkPet = O.bMarkPet
 	if bMarkPet then
 		LIB.RegisterEvent({'NPC_ENTER_SCENE.MY_Force__MarkPet', 'NPC_DISPLAY_DATA_UPDATE.MY_Force__MarkPet'}, function()
 			local pet = GetClientPlayer().GetPet()
@@ -139,7 +164,8 @@ end
 end
 
 -- check feed horse
-function D.OnFeedHorseChange(_, bFeedHorse)
+function D.OnFeedHorseChange()
+	local bFeedHorse = O.bFeedHorse
 	if bFeedHorse then
 		LIB.RegisterEvent('SYS_MSG.MY_Force__FeedHorse', function()
 			local me = GetClientPlayer()
@@ -165,7 +191,8 @@ function D.OnFeedHorseChange(_, bFeedHorse)
 end
 
 -- check warning buff type
-function D.OnWarningDebuffChange(_, bWarningDebuff)
+function D.OnWarningDebuffChange()
+	local bWarningDebuff = O.bWarningDebuff
 	if bWarningDebuff then
 		LIB.RegisterEvent('BUFF_UPDATE.MY_Force__WarningDebuff', function()
 			-- buff update：
@@ -218,15 +245,16 @@ local function OnMsgAnnounce(szMsg)
 		fW()
 		LIB.DelayCall(2000, fW)
 		LIB.DelayCall(4000, fW)
-		O.bHasWanted = true
+		D.bHasWanted = true
 	end
 end
-function D.OnAlertWantedChange(_, bAlertWanted)
+function D.OnAlertWantedChange()
+	local bAlertWanted = O.bAlertWanted
 	if bAlertWanted then
 		-- 变化时更新头顶效果
 		LIB.RegisterEvent('PLAYER_STATE_UPDATE.MY_Force__AlertWanted', function()
 			if arg0 == UI_GetClientPlayerID() then
-				if O.bHasWanted then
+				if D.bHasWanted then
 					SceneObject_SetTitleEffect(TARGET.PLAYER, arg0, 47)
 				end
 			end
@@ -234,8 +262,8 @@ function D.OnAlertWantedChange(_, bAlertWanted)
 		-- 重伤后删除头顶效果
 		LIB.RegisterEvent('SYS_MSG.MY_Force__AlertWanted', function()
 			if arg0 == 'UI_OME_DEATH_NOTIFY' then
-				if O.bHasWanted and arg1 == UI_GetClientPlayerID() then
-					O.bHasWanted = nil
+				if D.bHasWanted and arg1 == UI_GetClientPlayerID() then
+					D.bHasWanted = nil
 					SceneObject_SetTitleEffect(TARGET.PLAYER, arg1, 0)
 				end
 			end
@@ -256,47 +284,13 @@ LIB.RegisterEvent('LOADING_END.MY_Force', function()
 	end
 end)
 
--------------------------------------
--- 全局导出接口
--------------------------------------
-do
-local settings = {
-	exports = {
-		{
-			fields = {
-				bAlertPet      = true,
-				bMarkPet       = true,
-				bFeedHorse     = true,
-				bWarningDebuff = true,
-				nDebuffNum     = true,
-				bAlertWanted   = true,
-			},
-			root = O,
-		},
-	},
-	imports = {
-		{
-			fields = {
-				bAlertPet      = true,
-				bMarkPet       = true,
-				bFeedHorse     = true,
-				bWarningDebuff = true,
-				nDebuffNum     = true,
-				bAlertWanted   = true,
-			},
-			triggers = {
-				bAlertPet      = D.OnAlertPetChange,
-				bMarkPet       = D.OnMarkPetChange,
-				bFeedHorse     = D.OnFeedHorseChange,
-				bWarningDebuff = D.OnWarningDebuffChange,
-				bAlertWanted   = D.OnAlertWantedChange,
-			},
-			root = O,
-		},
-	},
-}
-MY_Force = LIB.CreateModule(settings)
-end
+LIB.RegisterInit('MY_Force', function()
+	D.OnAlertPetChange()
+	D.OnMarkPetChange()
+	D.OnFeedHorseChange()
+	D.OnWarningDebuffChange()
+	D.OnAlertWantedChange()
+end)
 
 -------------------------------------
 -- 设置界面
@@ -317,18 +311,20 @@ function PS.OnPanelActive(frame)
 	x = ui:Append('WndCheckBox', {
 		x = x, y = y,
 		text = _L['Alert when pet disappear unexpectedly (for 5D)'],
-		checked = MY_Force.bAlertPet,
+		checked = O.bAlertPet,
 		oncheck = function(bChecked)
-			MY_Force.bAlertPet = bChecked
+			O.bAlertPet = bChecked
+			D.OnAlertPetChange()
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
 	-- mark pet
 	ui:Append('WndCheckBox', {
 		x = x, y = y,
 		text = _L['Mark pet'],
-		checked = MY_Force.bMarkPet,
+		checked = O.bMarkPet,
 		oncheck = function(bChecked)
-			MY_Force.bMarkPet = bChecked
+			O.bMarkPet = bChecked
+			D.OnMarkPetChange()
 		end,
 	}):AutoWidth()
 	-- crlf
@@ -421,9 +417,11 @@ function PS.OnPanelActive(frame)
 	-- hungry
 	x = ui:Append('WndCheckBox', {
 		x = x, y = y,
-		text = _L['Alert when horse is hungry'], checked = MY_Force.bFeedHorse,
+		text = _L['Alert when horse is hungry'],
+		checked = O.bFeedHorse,
 		oncheck = function(bChecked)
-			MY_Force.bFeedHorse = bChecked
+			O.bFeedHorse = bChecked
+			D.OnFeedHorseChange()
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
 	-- crlf
@@ -433,9 +431,10 @@ function PS.OnPanelActive(frame)
 	ui:Append('WndCheckBox', {
 		x = x, y = y,
 		text = _L['Alert when I am wanted publishing online'],
-		checked = MY_Force.bAlertWanted,
+		checked = O.bAlertWanted,
 		oncheck = function(bChecked)
-			MY_Force.bAlertWanted = bChecked
+			O.bAlertWanted = bChecked
+			D.OnAlertWantedChange()
 		end,
 	})
 	-- crlf
@@ -445,15 +444,16 @@ function PS.OnPanelActive(frame)
 	x = ui:Append('WndCheckBox', {
 		x = x, y = y,
 		text = _L['Alert when my same type of debuff reached a certain number '],
-		checked = MY_Force.bWarningDebuff,
+		checked = O.bWarningDebuff,
 		oncheck = function(bChecked)
-			MY_Force.bWarningDebuff = bChecked
+			O.bWarningDebuff = bChecked
+			D.OnWarningDebuffChange()
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
 	ui:Append('WndComboBox', {
 		x = x, y = y, w = 50, h = 25,
-		autoenable = function() return MY_Force.bWarningDebuff end,
-		text = tostring(MY_Force.nDebuffNum),
+		autoenable = function() return O.bWarningDebuff end,
+		text = tostring(O.nDebuffNum),
 		menu = function()
 			local ui = UI(this)
 			local m0 = {}
@@ -461,7 +461,7 @@ function PS.OnPanelActive(frame)
 				insert(m0, {
 					szOption = tostring(i),
 					fnAction = function()
-						MY_Force.nDebuffNum = i
+						O.nDebuffNum = i
 						ui:Text(tostring(i))
 					end,
 				})

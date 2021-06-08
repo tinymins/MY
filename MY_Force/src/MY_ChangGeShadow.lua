@@ -54,17 +54,33 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
+local O = LIB.CreateUserSettingsModule('MY_ChangGeShadow', _L['MY_Force'], {
+	bEnable = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ChangGeShadow'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bShowDistance = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ChangGeShadow'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bShowCD = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ChangGeShadow'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	fScale = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ChangGeShadow'],
+		xSchema = Schema.Number,
+		xDefaultValue = 1.5,
+	},
+})
 local D = {}
-local O = {
-	bEnable = false,
-	bShowDistance = false,
-	bShowCD = false,
-	fScale = 1.5,
-}
-RegisterCustomData('MY_ChangGeShadow.bEnable')
-RegisterCustomData('MY_ChangGeShadow.bShowDistance')
-RegisterCustomData('MY_ChangGeShadow.bShowCD')
-RegisterCustomData('MY_ChangGeShadow.fScale')
 
 function D.Apply()
 	if O.bEnable then
@@ -138,9 +154,10 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, w = 'auto',
 		text = _L['Show changge shadow index'],
-		checked = MY_ChangGeShadow.bEnable,
+		checked = O.bEnable,
 		oncheck = function(bChecked)
-			MY_ChangGeShadow.bEnable = bChecked
+			O.bEnable = bChecked
+			D.Apply()
 		end,
 		tip = function(self)
 			if not self:Enable() then
@@ -156,9 +173,10 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, w = 'auto',
 		text = _L['Show distance'],
-		checked = MY_ChangGeShadow.bShowDistance,
+		checked = O.bShowDistance,
 		oncheck = function(bChecked)
-			MY_ChangGeShadow.bShowDistance = bChecked
+			O.bShowDistance = bChecked
+			D.Apply()
 		end,
 		tip = function(self)
 			if not self:Enable() then
@@ -174,9 +192,10 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, w = 'auto',
 		text = _L['Show countdown'],
-		checked = MY_ChangGeShadow.bShowCD,
+		checked = O.bShowCD,
 		oncheck = function(bChecked)
-			MY_ChangGeShadow.bShowCD = bChecked
+			O.bShowCD = bChecked
+			D.Apply()
 		end,
 		tip = function(self)
 			if not self:Enable() then
@@ -194,9 +213,10 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 		textfmt = function(val) return _L('Scale: %d%%.', val) end,
 		range = {10, 800},
 		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
-		value = MY_ChangGeShadow.fScale * 100,
+		value = O.fScale * 100,
 		onchange = function(val)
-			MY_ChangGeShadow.fScale = val / 100
+			O.fScale = val / 100
+			D.Apply()
 		end,
 		autoenable = function()
 			local me = GetClientPlayer()
@@ -214,32 +234,6 @@ local settings = {
 			fields = {
 				OnPanelActivePartial = D.OnPanelActivePartial,
 			},
-		},
-		{
-			fields = {
-				bEnable = true,
-				bShowDistance = true,
-				bShowCD = true,
-				fScale = true,
-			},
-			root = O,
-		},
-	},
-	imports = {
-		{
-			fields = {
-				bEnable = true,
-				bShowDistance = true,
-				bShowCD = true,
-				fScale = true,
-			},
-			triggers = {
-				bEnable = D.Apply,
-				bShowDistance = D.Apply,
-				bShowCD = D.Apply,
-				fScale = D.Apply,
-			},
-			root = O,
 		},
 	},
 }
