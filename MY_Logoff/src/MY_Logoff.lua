@@ -54,11 +54,20 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
-MY_Logoff = {}
-MY_Logoff.bIdleOff = false
-MY_Logoff.nIdleOffTime = 30
-RegisterCustomData('MY_Logoff.bIdleOff')
-RegisterCustomData('MY_Logoff.nIdleOffTime')
+local O = LIB.CreateUserSettingsModule('MY_Logoff', _L['MY_Logoff'], {
+	bIdleOff = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Logoff'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	nIdleOffTime = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Logoff'],
+		xSchema = Schema.Number,
+		xDefaultValue = 30,
+	},
+})
 
 local function Logoff(bCompletely, bUnfight, bNotDead)
 	if LIB.BreatheCall('MY_LOGOFF') then
@@ -87,7 +96,7 @@ local function Logoff(bCompletely, bUnfight, bNotDead)
 end
 
 local function IdleOff()
-	if not MY_Logoff.bIdleOff then
+	if not O.bIdleOff then
 		if LIB.BreatheCall('MY_LOGOFF_IDLE') then
 			LIB.Sysmsg(_L['Idle off has been cancelled.'])
 			LIB.BreatheCall('MY_LOGOFF_IDLE', false)
@@ -99,7 +108,7 @@ local function IdleOff()
 	end
 	local function onBreatheCall()
 		local nIdleTime = (Station.GetIdleTime()) / 1000 - 300
-		local remainTime = MY_Logoff.nIdleOffTime * 60 - nIdleTime
+		local remainTime = O.nIdleOffTime * 60 - nIdleTime
 		if remainTime <= 0 then
 			return LIB.Logout(true)
 		end
@@ -123,7 +132,7 @@ local function IdleOff()
 		end
 	end
 	LIB.BreatheCall('MY_LOGOFF_IDLE', 1000, onBreatheCall)
-	LIB.Sysmsg(_L('Idle off has been started, you\'ll auto logoff if you keep idle for %dm.', MY_Logoff.nIdleOffTime))
+	LIB.Sysmsg(_L('Idle off has been started, you\'ll auto logoff if you keep idle for %dm.', O.nIdleOffTime))
 end
 
 local function onInit()
@@ -146,9 +155,9 @@ function PS.OnPanelActive(wnd)
 	x = X + 10
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['Enable'],
-		checked = MY_Logoff.bIdleOff,
+		checked = O.bIdleOff,
 		oncheck = function(bChecked)
-			MY_Logoff.bIdleOff = bChecked
+			O.bIdleOff = bChecked
 			IdleOff()
 		end,
 	}):AutoWidth():Width() + 5
@@ -158,12 +167,12 @@ function PS.OnPanelActive(wnd)
 		textfmt = function(val) return _L('Auto logoff when keep idle for %dmin.', val) end,
 		range = {1, 1440},
 		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
-		value = MY_Logoff.nIdleOffTime,
+		value = O.nIdleOffTime,
 		onchange = function(val)
-			MY_Logoff.nIdleOffTime = val
+			O.nIdleOffTime = val
 			LIB.DelayCall('MY_LOGOFF_IDLE_TIME_CHANGE', 500, IdleOff)
 		end,
-		autoenable = function() return MY_Logoff.bIdleOff end,
+		autoenable = function() return O.bIdleOff end,
 	})
 	y = y + 40
 
