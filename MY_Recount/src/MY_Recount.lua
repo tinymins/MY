@@ -114,11 +114,15 @@ local PUBLISH_MODE = {
 	BOTH   = 3, -- 同时显示有效和总数
 }
 
+local O = LIB.CreateUserSettingsModule('MY_Recount', _L['MY_Recount'], {
+	nPublishMode = { -- 发布模式
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Recount'],
+		xSchema = Schema.Number,
+		xDefaultValue = PUBLISH_MODE.EFFECT,
+	},
+})
 local D = {}
-local O = {
-	nPublishMode = PUBLISH_MODE.EFFECT, -- 发布模式
-}
-RegisterCustomData('MY_Recount.nPublishMode')
 
 local DataDisplay
 
