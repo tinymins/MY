@@ -84,17 +84,32 @@ DB:Execute('CREATE INDEX IF NOT EXISTS ItemInfo_name_idx ON ItemInfo(name)')
 DB:Execute('CREATE INDEX IF NOT EXISTS ItemInfo_desc_idx ON ItemInfo(desc)')
 local DB_ItemInfoW = DB:Prepare('REPLACE INTO ItemInfo (tabtype, tabindex, tabsubindex, name, desc) VALUES (?, ?, ?, ?, ?)')
 
+local O = LIB.CreateUserSettingsModule('MY_RoleStatistics_BagStat', _L['MY_RoleStatistics'], {
+	bCompactMode = {
+		ePathType = PATH_TYPE.GLOBAL,
+		szLabel = _L['MY_RoleStatistics_BagStat'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	tUncheckedNames = {
+		ePathType = PATH_TYPE.GLOBAL,
+		xSchema = Schema.Map(Schema.String, Schema.Boolean),
+		xDefaultValue = {},
+	},
+	bSaveDB = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_RoleStatistics_BagStat'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bAdviceSaveDB = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_RoleStatistics_BagStat'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+})
 local D = {}
-local O = {
-	bCompactMode = false,
-	tUncheckedNames = {},
-	bSaveDB = false,
-	bAdviceSaveDB = false,
-}
-RegisterCustomData('Global/MY_RoleStatistics_BagStat.bCompactMode')
-RegisterCustomData('Global/MY_RoleStatistics_BagStat.tUncheckedNames')
-RegisterCustomData('MY_RoleStatistics_BagStat.bSaveDB', 20200618)
-RegisterCustomData('MY_RoleStatistics_BagStat.bAdviceSaveDB', 20200618)
 
 do
 local GetItemText

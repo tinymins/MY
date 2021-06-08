@@ -97,34 +97,73 @@ local InfoR = DB:Prepare('SELECT * FROM Info WHERE account LIKE ? OR name LIKE ?
 local InfoD = DB:Prepare('DELETE FROM Info WHERE guid = ?')
 local MINI_MAP_POINT_MAX_DISTANCE = pow(300, 2)
 
-local D = {}
-local O = {
+local O = LIB.CreateUserSettingsModule('MY_RoleStatistics_SerendipityStat', _L['MY_RoleStatistics'], {
 	aColumn = {
-		'name',
-		'force',
-		1, 2, 3, 4, 5, 6, 7, 8, 9,
-		'time_days',
+		ePathType = PATH_TYPE.GLOBAL,
+		szLabel = _L['MY_RoleStatistics_SerendipityStat'],
+		xSchema = Schema.Collection(Schema.OneOf(Schema.String, Schema.Number)),
+		xDefaultValue = {
+			'name',
+			'force',
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			'time_days',
+		},
 	},
-	szSort = 'time_days',
-	szSortOrder = 'desc',
-	bFloatEntry = false,
-	bAdviceFloatEntry = false,
-	bSaveDB = false,
-	bAdviceSaveDB = false,
-	bMapMark = false,
-	bMapMarkHideAcquired = true,
-	bTipHideFinished = false,
-}
-RegisterCustomData('Global/MY_RoleStatistics_SerendipityStat.aColumn')
-RegisterCustomData('Global/MY_RoleStatistics_SerendipityStat.szSort')
-RegisterCustomData('Global/MY_RoleStatistics_SerendipityStat.szSortOrder')
-RegisterCustomData('MY_RoleStatistics_SerendipityStat.bFloatEntry')
-RegisterCustomData('MY_RoleStatistics_SerendipityStat.bSaveDB', 20200618)
-RegisterCustomData('MY_RoleStatistics_SerendipityStat.bAdviceSaveDB', 20200618)
-RegisterCustomData('MY_RoleStatistics_SerendipityStat.bAdviceFloatEntry')
-RegisterCustomData('MY_RoleStatistics_SerendipityStat.bMapMark')
-RegisterCustomData('MY_RoleStatistics_SerendipityStat.bMapMarkHideAcquired')
-RegisterCustomData('MY_RoleStatistics_SerendipityStat.bTipHideFinished')
+	szSort = {
+		ePathType = PATH_TYPE.GLOBAL,
+		szLabel = _L['MY_RoleStatistics_SerendipityStat'],
+		xSchema = Schema.String,
+		xDefaultValue = 'time_days',
+	},
+	szSortOrder = {
+		ePathType = PATH_TYPE.GLOBAL,
+		szLabel = _L['MY_RoleStatistics_SerendipityStat'],
+		xSchema = Schema.String,
+		xDefaultValue = 'desc',
+	},
+	bFloatEntry = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_RoleStatistics_SerendipityStat'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bAdviceFloatEntry = {
+		ePathType = PATH_TYPE.ROLE,
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bSaveDB = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_RoleStatistics_SerendipityStat'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bAdviceSaveDB = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_RoleStatistics_SerendipityStat'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bMapMark = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_RoleStatistics_SerendipityStat'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bMapMarkHideAcquired = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_RoleStatistics_SerendipityStat'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bTipHideFinished = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_RoleStatistics_SerendipityStat'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+})
+local D = {}
 
 -----------------------------------------------------------------------------------------------
 -- 多个渠道奇遇次数监控

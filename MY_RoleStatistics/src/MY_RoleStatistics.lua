@@ -54,8 +54,8 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
-local D = {}
-local O = {
+local O = {}
+local D = {
 	aModule = {},
 }
 local Framework = {}
@@ -86,13 +86,13 @@ end
 
 -- ×¢²á×ÓÄ£¿é
 function D.RegisterModule(szID, szName, env)
-	for i, v in ipairs_r(O.aModule) do
+	for i, v in ipairs_r(D.aModule) do
 		if v.szID == szID then
-			remove(O.aModule, i)
+			remove(D.aModule, i)
 		end
 	end
 	if szName and env then
-		insert(O.aModule, {
+		insert(D.aModule, {
 			szID = szID,
 			szName = szName,
 			env = env,
@@ -108,7 +108,7 @@ end
 function D.InitPageSet(frame)
 	frame.bInitPageset = true
 	local pageset = frame:Lookup('PageSet_All')
-	for i, m in ipairs(O.aModule) do
+	for i, m in ipairs(D.aModule) do
 		local frameMod = Wnd.OpenWindow(SZ_MOD_INI, 'MY_RoleStatisticsMod')
 		local checkbox = frameMod:Lookup('PageSet_Total/WndCheck_Default')
 		local page = frameMod:Lookup('PageSet_Total/Page_Default')
@@ -129,7 +129,7 @@ function D.ActivePage(frame, szModule, bFirst)
 	local pageset = frame:Lookup('PageSet_All')
 	local pageActive = pageset:GetActivePage()
 	local nActiveIndex, nToIndex = pageActive.nIndex, nil
-	for i, m in ipairs(O.aModule) do
+	for i, m in ipairs(D.aModule) do
 		if m.szID == szModule or i == szModule then
 			nToIndex = i
 		end
@@ -156,7 +156,7 @@ function Framework.OnLButtonClick()
 	elseif name == 'Btn_Option' then
 		local menu = {}
 		local tFloatEntryMenu = { szOption = _L['Float panel'] }
-		for _, m in ipairs(O.aModule) do
+		for _, m in ipairs(D.aModule) do
 			if m and m.env.szFloatEntry then
 				insert(tFloatEntryMenu, {
 					szOption = m.szName,
@@ -171,7 +171,7 @@ function Framework.OnLButtonClick()
 			insert(menu, tFloatEntryMenu)
 		end
 		local tSaveDBMenu = { szOption = _L['Save DB'] }
-		for _, m in ipairs(O.aModule) do
+		for _, m in ipairs(D.aModule) do
 			if m and m.env.szSaveDB then
 				insert(tSaveDBMenu, {
 					szOption = m.szName,
@@ -204,7 +204,7 @@ function Framework.OnActivePage()
 	if name == 'PageSet_All' then
 		local page = this:GetActivePage()
 		if page.nIndex then
-			local m = O.aModule[page.nIndex]
+			local m = D.aModule[page.nIndex]
 			if not page.bInit then
 				if m and m.env.OnInitPage then
 					local _this = this
@@ -253,7 +253,7 @@ for _, szEvent in ipairs({
 		local page = this:Lookup('PageSet_All'):GetFirstChild()
 		while page do
 			if page:GetName() == 'Page_Default' and page.bInit then
-				local m = O.aModule[page.nIndex]
+				local m = D.aModule[page.nIndex]
 				if m and m.env[szEvent] then
 					local _this = this
 					this = page
@@ -318,7 +318,7 @@ for _, szEvent in ipairs({
 			end
 		end
 		if page and page ~= this then
-			local m = O.aModule[page.nIndex]
+			local m = D.aModule[page.nIndex]
 			if m and m.env[szEvent] then
 				return m.env[szEvent](...)
 			end
@@ -379,7 +379,7 @@ function PS.OnPanelActive(wnd)
 	})
 
 	local aFloatEntry, aSaveDB = {}, {}
-	for _, m in ipairs(O.aModule) do
+	for _, m in ipairs(D.aModule) do
 		if m and m.env.szFloatEntry then
 			insert(aFloatEntry, { szName = m.szName, szKey = m.env.szFloatEntry })
 		end

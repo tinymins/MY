@@ -68,34 +68,62 @@ local DB_DungeonInfoG = DB:Prepare('SELECT * FROM DungeonInfo WHERE guid = ?')
 local DB_DungeonInfoR = DB:Prepare('SELECT * FROM DungeonInfo WHERE account LIKE ? OR name LIKE ? OR region LIKE ? OR server LIKE ? ORDER BY time DESC')
 local DB_DungeonInfoD = DB:Prepare('DELETE FROM DungeonInfo WHERE guid = ?')
 
-local D = {}
-local O = {
+local O = LIB.CreateUserSettingsModule('MY_RoleStatistics_DungeonStat', _L['MY_RoleStatistics'], {
 	aColumn = {
-		'name',
-		'force',
-		'week_team_dungeon',
-		'week_raid_dungeon',
-		'dungeon_427',
-		'dungeon_428',
-		'time_days',
+		ePathType = PATH_TYPE.GLOBAL,
+		szLabel = _L['MY_RoleStatistics_DungeonStat'],
+		xSchema = Schema.Collection(Schema.String),
+		xDefaultValue = {
+			'name',
+			'force',
+			'week_team_dungeon',
+			'week_raid_dungeon',
+			'dungeon_427',
+			'dungeon_428',
+			'time_days',
+		},
 	},
-	szSort = 'time_days',
-	szSortOrder = 'desc',
+	szSort = {
+		ePathType = PATH_TYPE.GLOBAL,
+		szLabel = _L['MY_RoleStatistics_DungeonStat'],
+		xSchema = Schema.String,
+		xDefaultValue = 'time_days',
+	},
+	szSortOrder = {
+		ePathType = PATH_TYPE.GLOBAL,
+		szLabel = _L['MY_RoleStatistics_DungeonStat'],
+		xSchema = Schema.String,
+		xDefaultValue = 'desc',
+	},
+	bFloatEntry = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_RoleStatistics_DungeonStat'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bAdviceFloatEntry = {
+		ePathType = PATH_TYPE.ROLE,
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bSaveDB = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_RoleStatistics_DungeonStat'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bAdviceSaveDB = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_RoleStatistics_DungeonStat'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+})
+local D = {
 	tMapSaveCopy = {}, -- 单秘境 CD
 	tMapProgress = {}, -- 单首领 CD
 	bMapProgressApplied = false, -- 是否请求过秘境进度
-	bFloatEntry = false,
-	bAdviceFloatEntry = false,
-	bSaveDB = false,
-	bAdviceSaveDB = false,
 }
-RegisterCustomData('Global/MY_RoleStatistics_DungeonStat.aColumn')
-RegisterCustomData('Global/MY_RoleStatistics_DungeonStat.szSort')
-RegisterCustomData('Global/MY_RoleStatistics_DungeonStat.szSortOrder')
-RegisterCustomData('MY_RoleStatistics_DungeonStat.bFloatEntry')
-RegisterCustomData('MY_RoleStatistics_DungeonStat.bAdviceFloatEntry')
-RegisterCustomData('MY_RoleStatistics_DungeonStat.bSaveDB', 20200618)
-RegisterCustomData('MY_RoleStatistics_DungeonStat.bAdviceSaveDB', 20200618)
 
 local EXCEL_WIDTH = 960
 local DUNGEON_WIDTH = 80
@@ -367,8 +395,8 @@ function D.GetClientPlayerRec(bForceUpdate)
 	rec.level = me.nLevel
 	rec.equip_score = me.GetBaseEquipScore() + me.GetStrengthEquipScore() + me.GetMountsEquipScore()
 	rec.time = GetCurrentTime()
-	rec.copy_info = O.tMapSaveCopy
-	rec.progress_info = O.tMapProgress
+	rec.copy_info = D.tMapSaveCopy
+	rec.progress_info = D.tMapProgress
 	return rec
 end
 end
@@ -534,12 +562,12 @@ function D.UpdateUI(page)
 end
 
 function D.OnGetMapSaveCopyResopnse(tMapCopy)
-	O.tMapSaveCopy = tMapCopy
+	D.tMapSaveCopy = tMapCopy
 end
 
 function D.UpdateMapProgress(bForceUpdate)
 	-- 如果不是强制刷新秘境进度并且已经请求过，则不再重复发起
-	if not bForceUpdate and O.bMapProgressApplied then
+	if not bForceUpdate and D.bMapProgressApplied then
 		return
 	end
 	local me = GetClientPlayer()
@@ -556,10 +584,10 @@ function D.UpdateMapProgress(bForceUpdate)
 			for i, boss in ipairs(aProgressBoss) do
 				aProgress[i] = GetDungeonRoleProgress(dwID, UI_GetClientPlayerID(), boss.dwProgressID)
 			end
-			O.tMapProgress[dwID] = aProgress
+			D.tMapProgress[dwID] = aProgress
 		end
 	end
-	O.bMapProgressApplied = true
+	D.bMapProgressApplied = true
 	LIB.GetMapSaveCopy(D.OnGetMapSaveCopyResopnse)
 end
 

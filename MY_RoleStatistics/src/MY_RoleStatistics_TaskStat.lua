@@ -72,43 +72,70 @@ local DB_TaskInfoG = DB:Prepare('SELECT * FROM TaskInfo WHERE guid = ?')
 local DB_TaskInfoR = DB:Prepare('SELECT * FROM TaskInfo WHERE account LIKE ? OR name LIKE ? OR region LIKE ? OR server LIKE ? ORDER BY time DESC')
 local DB_TaskInfoD = DB:Prepare('DELETE FROM TaskInfo WHERE guid = ?')
 
-local D = {}
-local O = {
+local O = LIB.CreateUserSettingsModule('MY_RoleStatistics_TaskStat', _L['MY_RoleStatistics'], {
 	aColumn = {
-		'name',
-		'force',
-		'big_war', -- 大战
-		'teahouse', -- 茶馆
-		'crystal_scramble', -- 晶矿争夺
-		'stronghold_trade', -- 据点贸易
-		'dragon_gate_despair', -- 龙门绝境
-		'lexus_reality', -- 列星虚境
-		'lidu_ghost_town', -- 李渡鬼城
-		'public_routine', -- 公共日常
-		'force_routine', -- 勤修不辍
-		'rookie_routine', -- 浪客行
-		'picking_fairy_grass', -- 采仙草
-		'find_dragon_veins', -- 寻龙脉
-		'illustration_routine', -- 美人图
-		'sneak_routine', -- 美人图潜行
-		'exam_sheng', -- 省试
-		'exam_hui', -- 会试
-		'time_days',
+		ePathType = PATH_TYPE.GLOBAL,
+		szLabel = _L['MY_RoleStatistics_TaskStat'],
+		xSchema = Schema.Collection(Schema.String),
+		xDefaultValue = {
+			'name',
+			'force',
+			'big_war', -- 大战
+			'teahouse', -- 茶馆
+			'crystal_scramble', -- 晶矿争夺
+			'stronghold_trade', -- 据点贸易
+			'dragon_gate_despair', -- 龙门绝境
+			'lexus_reality', -- 列星虚境
+			'lidu_ghost_town', -- 李渡鬼城
+			'public_routine', -- 公共日常
+			'force_routine', -- 勤修不辍
+			'rookie_routine', -- 浪客行
+			'picking_fairy_grass', -- 采仙草
+			'find_dragon_veins', -- 寻龙脉
+			'illustration_routine', -- 美人图
+			'sneak_routine', -- 美人图潜行
+			'exam_sheng', -- 省试
+			'exam_hui', -- 会试
+			'time_days',
+		},
 	},
-	szSort = 'time_days',
-	szSortOrder = 'desc',
-	bFloatEntry = false,
-	bAdviceFloatEntry = false,
-	bSaveDB = false,
-	bAdviceSaveDB = false,
-}
-RegisterCustomData('Global/MY_RoleStatistics_TaskStat.aColumn')
-RegisterCustomData('Global/MY_RoleStatistics_TaskStat.szSort')
-RegisterCustomData('Global/MY_RoleStatistics_TaskStat.szSortOrder')
-RegisterCustomData('MY_RoleStatistics_TaskStat.bFloatEntry')
-RegisterCustomData('MY_RoleStatistics_TaskStat.bAdviceFloatEntry')
-RegisterCustomData('MY_RoleStatistics_TaskStat.bSaveDB', 20200618)
-RegisterCustomData('MY_RoleStatistics_TaskStat.bAdviceSaveDB', 20200618)
+	szSort = {
+		ePathType = PATH_TYPE.GLOBAL,
+		szLabel = _L['MY_RoleStatistics_TaskStat'],
+		xSchema = Schema.String,
+		xDefaultValue = 'time_days',
+	},
+	szSortOrder = {
+		ePathType = PATH_TYPE.GLOBAL,
+		szLabel = _L['MY_RoleStatistics_TaskStat'],
+		xSchema = Schema.String,
+		xDefaultValue = 'desc',
+	},
+	bFloatEntry = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_RoleStatistics_TaskStat'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bAdviceFloatEntry = {
+		ePathType = PATH_TYPE.ROLE,
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bSaveDB = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_RoleStatistics_TaskStat'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bAdviceSaveDB = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_RoleStatistics_TaskStat'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+})
+local D = {}
 
 local TASK_TYPE = {
 	DAILY = 1,

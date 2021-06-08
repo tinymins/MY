@@ -73,53 +73,91 @@ local DB_RoleInfoG = DB:Prepare('SELECT * FROM RoleInfo WHERE guid = ?')
 local DB_RoleInfoR = DB:Prepare('SELECT * FROM RoleInfo WHERE account LIKE ? OR name LIKE ? OR region LIKE ? OR server LIKE ? ORDER BY time DESC')
 local DB_RoleInfoD = DB:Prepare('DELETE FROM RoleInfo WHERE guid = ?')
 
-local D = {}
-local O = {
+local O = LIB.CreateUserSettingsModule('MY_RoleStatistics_RoleStat', _L['MY_RoleStatistics'], {
 	aColumn = {
-		'name',
-		'force',
-		'level',
-		'achievement_score',
-		'pet_score',
-		'justice',
-		'justice_remain',
-		'exam_print',
-		'coin',
-		'money',
-		'time_days',
+		ePathType = PATH_TYPE.GLOBAL,
+		szLabel = _L['MY_RoleStatistics_RoleStat'],
+		xSchema = Schema.Collection(Schema.String),
+		xDefaultValue = {
+			'name',
+			'force',
+			'level',
+			'achievement_score',
+			'pet_score',
+			'justice',
+			'justice_remain',
+			'exam_print',
+			'coin',
+			'money',
+			'time_days',
+		},
 	},
-	szSort = 'time_days',
-	szSortOrder = 'desc',
+	szSort = {
+		ePathType = PATH_TYPE.GLOBAL,
+		szLabel = _L['MY_RoleStatistics_RoleStat'],
+		xSchema = Schema.String,
+		xDefaultValue = 'time_days',
+	},
+	szSortOrder = {
+		ePathType = PATH_TYPE.GLOBAL,
+		szLabel = _L['MY_RoleStatistics_RoleStat'],
+		xSchema = Schema.String,
+		xDefaultValue = 'desc',
+	},
 	aAlertColumn = {
-		'money',
-		'achievement_score',
-		'pet_score',
-		'contribution',
-		'justice',
-		'starve',
-		'prestige',
-		'camp_point',
-		'arena_award',
-		'exam_print',
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_RoleStatistics_RoleStat'],
+		xSchema = Schema.Collection(Schema.String),
+		xDefaultValue = {
+			'money',
+			'achievement_score',
+			'pet_score',
+			'contribution',
+			'justice',
+			'starve',
+			'prestige',
+			'camp_point',
+			'arena_award',
+			'exam_print',
+		},
 	},
-	tAlertTodayVal = nil,
+	tAlertTodayVal = {
+		ePathType = PATH_TYPE.ROLE,
+		xSchema = Schema.Any,
+		xDefaultValue = nil,
+	},
+	tSummaryIgnoreGUID = {
+		ePathType = PATH_TYPE.ROLE,
+		xSchema = Schema.Any,
+		xDefaultValue = {},
+	},
+	bFloatEntry = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_RoleStatistics_RoleStat'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bAdviceFloatEntry = {
+		ePathType = PATH_TYPE.ROLE,
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bSaveDB = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_RoleStatistics_RoleStat'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bAdviceSaveDB = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_RoleStatistics_RoleStat'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+})
+local D = {
 	dwLastAlertTime = 0,
-	tSummaryIgnoreGUID = {},
-	bFloatEntry = false,
-	bAdviceFloatEntry = false,
-	bSaveDB = false,
-	bAdviceSaveDB = false,
 }
-RegisterCustomData('Global/MY_RoleStatistics_RoleStat.aColumn')
-RegisterCustomData('Global/MY_RoleStatistics_RoleStat.szSort')
-RegisterCustomData('Global/MY_RoleStatistics_RoleStat.szSortOrder')
-RegisterCustomData('MY_RoleStatistics_RoleStat.aAlertColumn')
-RegisterCustomData('MY_RoleStatistics_RoleStat.tAlertTodayVal')
-RegisterCustomData('MY_RoleStatistics_RoleStat.tSummaryIgnoreGUID')
-RegisterCustomData('MY_RoleStatistics_RoleStat.bFloatEntry')
-RegisterCustomData('MY_RoleStatistics_RoleStat.bAdviceFloatEntry')
-RegisterCustomData('MY_RoleStatistics_RoleStat.bSaveDB', 20200618)
-RegisterCustomData('MY_RoleStatistics_RoleStat.bAdviceSaveDB', 20200618)
 
 local function GetFormatSysmsgText(szText)
 	return GetFormatText(szText, GetMsgFont('MSG_SYS'), GetMsgFontColor('MSG_SYS'))
@@ -917,7 +955,7 @@ function D.UpdateUI(page)
 				O.tSummaryIgnoreGUID[rec.guid] = not bCheck or nil
 				D.UpdateUI(page)
 			end,
-			visible = O.bConfigSummary or false,
+			visible = D.bConfigSummary or false,
 		})
 		-- 格式化位置
 		hRow:FormatAllItemPos()
@@ -1122,7 +1160,7 @@ function D.OnInitPage()
 		x = 25, y = 552, w = 25, h = 25,
 		buttonstyle = 'OPTION',
 		onclick = function()
-			O.bConfigSummary = not O.bConfigSummary
+			D.bConfigSummary = not D.bConfigSummary
 			D.UpdateUI(page)
 		end,
 	})
@@ -1287,14 +1325,14 @@ LIB.RegisterFrameCreate('OptionPanel.MY_RoleStatistics_RoleStat__AlertCol', func
 		end
 	end
 	local szText, szDailyText = concat(aText, GetFormatSysmsgText(_L[','])), concat(aDailyText, GetFormatSysmsgText(_L[',']))
-	if GetTime() - O.dwLastAlertTime > 10000 or O.szLastAlert ~= szText or O.szLastDailyAlert ~= szDailyText then
+	if GetTime() - D.dwLastAlertTime > 10000 or O.szLastAlert ~= szText or O.szLastDailyAlert ~= szDailyText then
 		if not IsEmpty(szText) and szText ~= szDailyText then
 			LIB.Sysmsg({ GetFormatSysmsgText(_L['Current online ']) .. szText .. GetFormatSysmsgText(_L['.']), rich = true })
 		end
 		if not IsEmpty(szDailyText) then
 			LIB.Sysmsg({ GetFormatSysmsgText(_L['Today online ']) .. szDailyText .. GetFormatSysmsgText(_L['.']), rich = true })
 		end
-		O.dwLastAlertTime = GetTime()
+		D.dwLastAlertTime = GetTime()
 		O.szLastAlert = szText
 		O.szLastDailyAlert = szDailyText
 	end
