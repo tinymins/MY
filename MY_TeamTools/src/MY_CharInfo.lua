@@ -54,10 +54,15 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
-MY_CharInfo = {
-	bEnable = true,
-}
-LIB.RegisterCustomData('MY_CharInfo')
+local O = LIB.CreateUserSettingsModule('MY_CharInfo', _L['MY_TeamTools'], {
+	bEnable = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_CharInfo'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+})
+local D = {}
 
 local CharInfo = {}
 
@@ -175,7 +180,7 @@ end, function(szMsgID, nSegCount, nSegRecv, nSegIndex, nChannel, dwID, szName, b
 end)
 
 -- public API
-function MY_CharInfo.ViewCharInfoToPlayer(dwID)
+function D.ViewCharInfoToPlayer(dwID)
 	if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 		return LIB.Alert('TALK_LOCK', _L['Please unlock talk lock first.'])
 	end
@@ -217,10 +222,39 @@ local function GetInfoPanelMenu()
 		return {
 			szOption = g_tStrings.STR_LOOK .. g_tStrings.STR_EQUIP_ATTR,
 			fnAction = function()
-				MY_CharInfo.ViewCharInfoToPlayer(dwID)
+				D.ViewCharInfoToPlayer(dwID)
 			end
 		}
 	end
 end
 LIB.RegisterTargetAddonMenu('MY_CharInfo', GetInfoPanelMenu)
+end
+
+
+-- Global exports
+do
+local settings = {
+	exports = {
+		{
+			fields = {
+				ViewCharInfoToPlayer = D.ViewCharInfoToPlayer,
+			},
+		},
+		{
+			fields = {
+				bEnable = true,
+			},
+			root = O,
+		},
+	},
+	imports = {
+		{
+			fields = {
+				bEnable = true,
+			},
+			root = O,
+		},
+	},
+}
+MY_CharInfo = LIB.CreateModule(settings)
 end
