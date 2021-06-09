@@ -157,50 +157,82 @@ m_tRecords = {
 	}, ...
 }
 ]]
-MY_RollMonitor = { nSortType = 1, nTimeLimit = -1, nPublish = 0, nPublishChannel = PLAYER_TALK_CHANNEL.RAID, bPublishRestart = true }
-RegisterCustomData('MY_RollMonitor.nSortType')
-RegisterCustomData('MY_RollMonitor.nTimeLimit')
-RegisterCustomData('MY_RollMonitor.nPublish')
-RegisterCustomData('MY_RollMonitor.bPublishRestart')
-RegisterCustomData('MY_RollMonitor.nPublishChannel')
-local _C = {}
+local O = LIB.CreateUserSettingsModule('MY_RollMonitor', _L['MY_RollMonitor'], {
+	nSortType = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_RollMonitor'],
+		xSchema = Schema.Number,
+		xDefaultValue = 1,
+	},
+	nTimeLimit = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_RollMonitor'],
+		xSchema = Schema.Number,
+		xDefaultValue = -1,
+	},
+	nPublish = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_RollMonitor'],
+		xSchema = Schema.Number,
+		xDefaultValue = 0,
+	},
+	nPublishChannel = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_RollMonitor'],
+		xSchema = Schema.Number,
+		xDefaultValue = PLAYER_TALK_CHANNEL.RAID,
+	},
+	bPublishUnroll = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_RollMonitor'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bPublishRestart = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_RollMonitor'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+})
+local D = {}
 
 -- 事件响应处理
 -- 打开面板
--- (void) MY_RollMonitor.OpenPanel()
-function MY_RollMonitor.OpenPanel()
+-- (void) D.OpenPanel()
+function D.OpenPanel()
 	LIB.ShowPanel()
 	LIB.FocusPanel()
 	LIB.SwitchTab('RollMonitor')
 end
 
 -- 清空ROLL点
--- (void) MY_RollMonitor.Clear(nChannel, bEcho)
+-- (void) D.Clear(nChannel, bEcho)
 -- (boolean) bEcho   : 是否发送重新开始聊天消息
 -- (number)  nChannel: 发送频道
-function MY_RollMonitor.Clear(bEcho, nChannel)
+function D.Clear(bEcho, nChannel)
 	if bEcho == nil then
-		bEcho = MY_RollMonitor.bPublishRestart
+		bEcho = O.bPublishRestart
 	end
 	if bEcho then
-		nChannel = nChannel or MY_RollMonitor.nPublishChannel
+		nChannel = nChannel or O.nPublishChannel
 		LIB.SendChat(nChannel, _L['----------- roll restart -----------'] .. '\n')
 	end
 	m_tRecords = {}
-	MY_RollMonitor.DrawBoard()
+	D.DrawBoard()
 end
 
 -- 获得个人ROLL点结果
--- MY_RollMonitor.GetPersonResult(szName, nSortType, nTimeLimit)
--- MY_RollMonitor.GetPersonResult(aRecord, nSortType, nTimeLimit)
+-- D.GetPersonResult(szName, nSortType, nTimeLimit)
+-- D.GetPersonResult(aRecord, nSortType, nTimeLimit)
 -- (string)    szName     : 要获取的玩家名字
 -- (table)     aRecord    : 要获取的原始数据
 -- (SORT_TYPE) nSortType  : 排序方式 值参见枚举
 -- (number)    nTimeLimit : 监测时间限制 如最近5分钟则传300
-function MY_RollMonitor.GetPersonResult(szName, nSortType, nTimeLimit)
+function D.GetPersonResult(szName, nSortType, nTimeLimit)
 	-- 格式化参数
-	nSortType = nSortType or MY_RollMonitor.nSortType
-	nTimeLimit = nTimeLimit or MY_RollMonitor.nTimeLimit
+	nSortType = nSortType or O.nSortType
+	nTimeLimit = nTimeLimit or O.nTimeLimit
 	local nStartTime = 0
 	if nTimeLimit > 0 then
 		nStartTime = GetCurrentTime() - nTimeLimit
@@ -235,17 +267,17 @@ function MY_RollMonitor.GetPersonResult(szName, nSortType, nTimeLimit)
 end
 
 -- 获得全部排序结果
--- (void) MY_RollMonitor.GetResult(nSortType, nTimeLimit)
+-- (void) D.GetResult(nSortType, nTimeLimit)
 -- (SORT_TYPE) nSortType  : 排序方式 值参见枚举
 -- (number)    nTimeLimit : 监测时间限制 如最近5分钟则传300(-1表示不限时)
-function MY_RollMonitor.GetResult(nSortType, nTimeLimit)
+function D.GetResult(nSortType, nTimeLimit)
 	-- 格式化参数
-	nSortType = nSortType or MY_RollMonitor.nSortType
-	nTimeLimit = nTimeLimit or MY_RollMonitor.nTimeLimit
+	nSortType = nSortType or O.nSortType
+	nTimeLimit = nTimeLimit or O.nTimeLimit
 	-- 获取结果并排序
 	local t = {}
 	for _, aRecord in pairs(m_tRecords) do
-		aRecord = MY_RollMonitor.GetPersonResult(aRecord, nSortType, nTimeLimit)
+		aRecord = D.GetPersonResult(aRecord, nSortType, nTimeLimit)
 		if aRecord then
 			insert(t, aRecord)
 		end
@@ -255,27 +287,27 @@ function MY_RollMonitor.GetResult(nSortType, nTimeLimit)
 end
 
 -- 发布ROLL点
--- (void) MY_RollMonitor.Echo(nSortType, nLimit, nChannel, bShowUnroll)
+-- (void) D.Echo(nSortType, nLimit, nChannel, bShowUnroll)
 -- (enum)    nSortType  : 排序方式 枚举[SORT_TYPE]
 -- (number)  nLimit     : 最大显示条数限制
 -- (number)  nChannel   : 发送频道
 -- (boolean) bShowUnroll: 是否显示未ROLL点
-function MY_RollMonitor.Echo(nSortType, nLimit, nChannel, bShowUnroll)
+function D.Echo(nSortType, nLimit, nChannel, bShowUnroll)
 	if bShowUnroll == nil then
-		bShowUnroll = MY_RollMonitor.bPublishUnroll
+		bShowUnroll = O.bPublishUnroll
 	end
-	nSortType = nSortType or MY_RollMonitor.nSortType
-	nLimit    = nLimit    or MY_RollMonitor.nPublish
-	nChannel  = nChannel  or MY_RollMonitor.nPublishChannel
+	nSortType = nSortType or O.nSortType
+	nLimit    = nLimit    or O.nPublish
+	nChannel  = nChannel  or O.nPublishChannel
 
 	LIB.SendChat(nChannel, ('[%s][%s][%s]%s\n'):format(
 		PACKET_INFO.SHORT_NAME, _L['roll monitor'],
-		TIME_LIMIT_TITLE[MY_RollMonitor.nTimeLimit],
+		TIME_LIMIT_TITLE[O.nTimeLimit],
 		SORT_TYPE_INFO[nSortType].szName
 	), { parsers = { name = false } })
 	LIB.SendChat(nChannel, _L['-------------------------------'] .. '\n')
 	local tNames = {}
-	for i, aRecord in ipairs(MY_RollMonitor.GetResult(nSortType)) do
+	for i, aRecord in ipairs(D.GetResult(nSortType)) do
 		if nLimit <= 0 or i <= nLimit then
 			LIB.SendChat(nChannel, _L('[%s] rolls for %d times, valid score is %s.', aRecord.szName, aRecord.nCount, gsub(aRecord.nRoll, '(%d+%.%d%d)%d+','%1')) .. '\n')
 		end
@@ -298,8 +330,8 @@ function MY_RollMonitor.Echo(nSortType, nLimit, nChannel, bShowUnroll)
 end
 
 -- 重新绘制结果显示区域
--- (void) MY_RollMonitor.DrawBoard(ui uiBoard)
-function MY_RollMonitor.DrawBoard(ui)
+-- (void) D.DrawBoard(ui uiBoard)
+function D.DrawBoard(ui)
 	if not ui then
 		ui = m_uiBoard
 	end
@@ -307,7 +339,7 @@ function MY_RollMonitor.DrawBoard(ui)
 	if ui then
 		local szHTML = ''
 		local tNames = {}
-		for _, aRecord in ipairs(MY_RollMonitor.GetResult()) do
+		for _, aRecord in ipairs(D.GetResult()) do
 			szHTML = szHTML ..
 				LIB.GetChatCopyXML() ..
 				GetFormatText('['..aRecord.szName..']', nil, nil, nil, nil, 515, nil, 'namelink_0') ..
@@ -345,7 +377,7 @@ end
 local function CheckBoardRedraw()
 	if m_aRecTime[1]
 	and m_aRecTime[1] < GetCurrentTime() then
-		MY_RollMonitor.DrawBoard()
+		D.DrawBoard()
 	end
 end
 
@@ -371,9 +403,26 @@ local function OnMsgArrive(szMsg, nFont, bRich, r, g, b)
 	if not isRoll then
 		return
 	end
-	MY_RollMonitor.DrawBoard()
+	D.DrawBoard()
 end
 RegisterMsgMonitor(OnMsgArrive, {'MSG_SYS'})
+
+
+-- Global exports
+do
+local settings = {
+	exports = {
+		{
+			fields = {
+				OpenPanel = D.OpenPanel,
+				Clear = D.Clear,
+			},
+		},
+	},
+}
+MY_RollMonitor = LIB.CreateModule(settings)
+end
+
 
 -- 标签激活响应函数
 function PS.OnPanelActive(wnd)
@@ -382,15 +431,15 @@ function PS.OnPanelActive(wnd)
 	-- 记录模式
 	ui:Append('WndComboBox', {
 		x = 20, y = 10, w = 180,
-		text = SORT_TYPE_INFO[MY_RollMonitor.nSortType].szName,
+		text = SORT_TYPE_INFO[O.nSortType].szName,
 		menu = function(raw)
 			local t = {}
 			for _, nSortType in ipairs(SORT_TYPE_LIST) do
 				insert(t, {
 					szOption = SORT_TYPE_INFO[nSortType].szName,
 					fnAction = function()
-						MY_RollMonitor.nSortType = nSortType
-						MY_RollMonitor.DrawBoard()
+						O.nSortType = nSortType
+						D.DrawBoard()
 						UI(raw):Text(SORT_TYPE_INFO[nSortType].szName)
 						return 0
 					end,
@@ -402,7 +451,7 @@ function PS.OnPanelActive(wnd)
 	-- 有效时间
 	ui:Append('WndComboBox', {
 		x = 210, y = 10, w = 120,
-		text = TIME_LIMIT_TITLE[MY_RollMonitor.nTimeLimit],
+		text = TIME_LIMIT_TITLE[O.nTimeLimit],
 		menu = function(raw)
 			local t = {}
 			for _, nSec in ipairs(TIME_LIMIT) do
@@ -410,8 +459,8 @@ function PS.OnPanelActive(wnd)
 					szOption = TIME_LIMIT_TITLE[nSec],
 					fnAction = function()
 						UI(raw):Text(TIME_LIMIT_TITLE[nSec])
-						MY_RollMonitor.nTimeLimit = nSec
-						MY_RollMonitor.DrawBoard()
+						O.nTimeLimit = nSec
+						D.DrawBoard()
 						return 0
 					end,
 				})
@@ -422,20 +471,20 @@ function PS.OnPanelActive(wnd)
 	-- 清空
 	ui:Append('WndButton', {
 		x = w - 176, y = 10, w = 90, text = _L['restart'],
-		onlclick = function(nButton) MY_RollMonitor.Clear() end,
+		onlclick = function(nButton) D.Clear() end,
 		rmenu = function()
 			local t = {{
 				szOption = _L['publish while restart'],
-				bCheck = true, bMCheck = false, bChecked = MY_RollMonitor.bPublishRestart,
-				fnAction = function() MY_RollMonitor.bPublishRestart = not MY_RollMonitor.bPublishRestart end,
+				bCheck = true, bMCheck = false, bChecked = O.bPublishRestart,
+				fnAction = function() O.bPublishRestart = not O.bPublishRestart end,
 			}, { bDevide = true }}
 			for _, tChannel in ipairs(PUBLISH_CHANNELS) do
 				insert(t, {
 					szOption = tChannel.szName,
 					rgb = tChannel.rgb,
-					bCheck = true, bMCheck = true, bChecked = MY_RollMonitor.nPublishChannel == tChannel.nChannel,
+					bCheck = true, bMCheck = true, bChecked = O.nPublishChannel == tChannel.nChannel,
 					fnAction = function()
-						MY_RollMonitor.nPublishChannel = tChannel.nChannel
+						O.nPublishChannel = tChannel.nChannel
 					end
 				})
 			end
@@ -447,28 +496,28 @@ function PS.OnPanelActive(wnd)
 	-- 发布
 	ui:Append('WndButton', {
 		x = w - 86, y = 10, w = 80, text = _L['publish'],
-		onlclick = function() MY_RollMonitor.Echo() end,
+		onlclick = function() D.Echo() end,
 		rmenu = function()
 			local t = { {
 				szOption = _L['publish setting'], {
-					bCheck = true, bMCheck = true, bChecked = MY_RollMonitor.nPublish == 3,
-					fnAction = function() MY_RollMonitor.nPublish = 3 end,
+					bCheck = true, bMCheck = true, bChecked = O.nPublish == 3,
+					fnAction = function() O.nPublish = 3 end,
 					szOption = _L('publish top %d', 3)
 				}, {
-					bCheck = true, bMCheck = true, bChecked = MY_RollMonitor.nPublish == 5,
-					fnAction = function() MY_RollMonitor.nPublish = 5 end,
+					bCheck = true, bMCheck = true, bChecked = O.nPublish == 5,
+					fnAction = function() O.nPublish = 5 end,
 					szOption = _L('publish top %d', 5)
 				}, {
-					bCheck = true, bMCheck = true, bChecked = MY_RollMonitor.nPublish == 10,
-					fnAction = function() MY_RollMonitor.nPublish = 10 end,
+					bCheck = true, bMCheck = true, bChecked = O.nPublish == 10,
+					fnAction = function() O.nPublish = 10 end,
 					szOption = _L('publish top %d', 10)
 				}, {
-					bCheck = true, bMCheck = true, bChecked = MY_RollMonitor.nPublish == 0,
-					fnAction = function() MY_RollMonitor.nPublish = 0 end,
+					bCheck = true, bMCheck = true, bChecked = O.nPublish == 0,
+					fnAction = function() O.nPublish = 0 end,
 					szOption = _L['publish all']
 				}, { bDevide = true }, {
-					bCheck = true, bChecked = MY_RollMonitor.bPublishUnroll,
-					fnAction = function() MY_RollMonitor.bPublishUnroll = not MY_RollMonitor.bPublishUnroll end,
+					bCheck = true, bChecked = O.bPublishUnroll,
+					fnAction = function() O.bPublishUnroll = not O.bPublishUnroll end,
 					szOption = _L['publish unroll']
 				}
 			}, { bDevide = true } }
@@ -476,9 +525,9 @@ function PS.OnPanelActive(wnd)
 				insert( t, {
 					szOption = tChannel.szName,
 					rgb = tChannel.rgb,
-					bCheck = true, bMCheck = true, bChecked = MY_RollMonitor.nPublishChannel == tChannel.nChannel,
+					bCheck = true, bMCheck = true, bChecked = O.nPublishChannel == tChannel.nChannel,
 					fnAction = function()
-						MY_RollMonitor.nPublishChannel = tChannel.nChannel
+						O.nPublishChannel = tChannel.nChannel
 					end
 				} )
 			end
@@ -493,7 +542,7 @@ function PS.OnPanelActive(wnd)
 		x = 20,  y = 40, w = w - 26, h = h - 60,
 		handlestyle = 3, text = _L['average score with out pole']
 	})
-	MY_RollMonitor.DrawBoard()
+	D.DrawBoard()
 	LIB.BreatheCall('MY_RollMonitorRedraw', 1000, CheckBoardRedraw)
 end
 
