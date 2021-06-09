@@ -54,24 +54,88 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
-MY_ThreatRank = {
-	bEnable       = true,  -- 开启
-	bInDungeon    = true, -- 只有秘境内才开启
-	nBGAlpha      = 30,    -- 背景透明度
-	nMaxBarCount  = 7,     -- 最大列表
-	bForceColor   = false, -- 根据门派着色
-	bForceIcon    = true,  -- 显示门派图标 团队时显示心法
-	nOTAlertLevel = 1,     -- OT提醒
-	bOTAlertSound = true,  -- OT 播放声音
-	bSpecialSelf  = true,  -- 特殊颜色显示自己
-	bTopTarget    = true,  -- 置顶当前目标
-	bShowPercent  = true,  -- 是否为显示百分比模式
-	tAnchor       = {},
-	nStyle        = 2,
-}
-LIB.RegisterCustomData('MY_ThreatRank')
+local O = LIB.CreateUserSettingsModule('MY_ThreatRank', _L['MY_ThreatRank'], {
+	bEnable = { -- 开启
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ThreatRank'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bInDungeon = { -- 只有秘境内才开启
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ThreatRank'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	nBGAlpha = { -- 背景透明度
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ThreatRank'],
+		xSchema = Schema.Number,
+		xDefaultValue = 30,
+	},
+	nMaxBarCount = { -- 最大列表
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ThreatRank'],
+		xSchema = Schema.Number,
+		xDefaultValue = 7,
+	},
+	bForceColor = { -- 根据门派着色
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ThreatRank'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bForceIcon = { -- 显示门派图标 团队时显示心法
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ThreatRank'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	nOTAlertLevel = { -- OT提醒
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ThreatRank'],
+		xSchema = Schema.Number,
+		xDefaultValue = 1,
+	},
+	bOTAlertSound = { -- OT 播放声音
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ThreatRank'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bSpecialSelf = { -- 特殊颜色显示自己
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ThreatRank'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bTopTarget = { -- 置顶当前目标
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ThreatRank'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bShowPercent = { -- 是否为显示百分比模式
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ThreatRank'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	tAnchor = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ThreatRank'],
+		xSchema = Schema.FrameAnchor,
+		xDefaultValue = { s = 'TOPRIGHT', r = 'TOPRIGHT', x = 300, y = -300 },
+	},
+	nStyle = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ThreatRank'],
+		xSchema = Schema.Number,
+		xDefaultValue = 2,
+	},
+})
 
-local TS = MY_ThreatRank
+local TS = {}
 local ipairs, pairs = ipairs, pairs
 local GetPlayer, GetNpc, IsPlayer, ApplyCharacterThreatRankList = GetPlayer, GetNpc, IsPlayer, ApplyCharacterThreatRankList
 local GetClientPlayer, GetClientTeam = GetClientPlayer, GetClientTeam
@@ -87,7 +151,7 @@ local TS_INIFILE = PACKET_INFO.ROOT .. 'MY_ThreatRank/ui/MY_ThreatRank.ini'
 local _TS = {
 	tStyle = LoadLUAData(PACKET_INFO.ROOT .. 'MY_ThreatRank/data/style.jx3dat'),
 }
-local function IsEnabled() return TS.bEnable end
+local function IsEnabled() return O.bEnable end
 
 function TS.OnFrameCreate()
 	this:RegisterEvent('CHARACTER_THREAT_RANKLIST')
@@ -100,7 +164,7 @@ function TS.OnFrameCreate()
 	this.nTime          = 0
 	this.bSelfTreatRank = 0
 	this.bg         = this:Lookup('', 'Image_Background')
-	this.bg:SetAlpha(255 * TS.nBGAlpha / 100)
+	this.bg:SetAlpha(255 * O.nBGAlpha / 100)
 	this.handle     = this:Lookup('', 'Handle_List')
 	this.txt        = this:Lookup('', 'Handle_TargetInfo'):Lookup('Text_Name')
 	this.CastBar    = this:Lookup('', 'Handle_TargetInfo'):Lookup('Image_Cast_Bar')
@@ -251,7 +315,7 @@ end
 
 function TS.OnFrameDragEnd()
 	this:CorrectPos()
-	TS.tAnchor = GetFrameAnchor(this)
+	O.tAnchor = GetFrameAnchor(this)
 end
 
 function _TS.GetFrame()
@@ -259,8 +323,8 @@ function _TS.GetFrame()
 end
 
 function _TS.CheckOpen()
-	if TS.bEnable then
-		if TS.bInDungeon then
+	if O.bEnable then
+		if O.bInDungeon then
 			if LIB.IsInDungeon() then
 				_TS.OpenPanel()
 			else
@@ -304,12 +368,8 @@ function _TS.UnBreathe()
 end
 
 function _TS.UpdateAnchor(frame)
-	local a = TS.tAnchor
-	if not IsEmpty(a) then
-		frame:SetPoint(a.s, 0, 0, a.r, a.x, a.y)
-	else
-		frame:SetPoint('TOPRIGHT', -300, 300, 'TOPRIGHT', 0, 0)
-	end
+	local a = O.tAnchor
+	frame:SetPoint(a.s, 0, 0, a.r, a.x, a.y)
 	this:CorrectPos()
 end
 
@@ -343,13 +403,13 @@ function _TS.UpdateThreatBars(tList, dwTargetID, dwApplyID)
 			tMyRank = v
 		end
 	end
-	this.bg:SetH(55 + 24 * min(#tThreat, TS.nMaxBarCount))
+	this.bg:SetH(55 + 24 * min(#tThreat, O.nMaxBarCount))
 	this.handle:Clear()
 	local KGnpc = GetNpc(dwApplyID)
 	if #tThreat > 0 and KGnpc then
 		this:Show()
 		if #tThreat >= 2 then
-			if TS.bTopTarget and tList[dwTargetID] then
+			if O.bTopTarget and tList[dwTargetID] then
 				for k, v in ipairs(tThreat) do
 					if v.id == dwTargetID then
 						insert(tThreat, 1, remove(tThreat, k))
@@ -365,28 +425,28 @@ function _TS.UpdateThreatBars(tList, dwTargetID, dwApplyID)
 			tThreat[1].val = nTopRank -- 修正一些无仇恨的技能，这样单人会显示0%，很不好看。
 		end
 
-		local dat = _TS.tStyle[TS.nStyle] or _TS.tStyle[1]
+		local dat = _TS.tStyle[O.nStyle] or _TS.tStyle[1]
 		local show = false
 		for k, v in ipairs(tThreat) do
-			if k > TS.nMaxBarCount then break end
+			if k > O.nMaxBarCount then break end
 			if UI_GetClientPlayerID() == v.id then
-				if TS.nOTAlertLevel > 0 and GetNpcIntensity(KGnpc) > 2 then
-					if this.bSelfTreatRank < TS.nOTAlertLevel and v.val / nTopRank >= TS.nOTAlertLevel then
-						LIB.Topmsg(_L('** You Threat more than %d, 120% is Out of Taunt! **', TS.nOTAlertLevel * 100))
-						if TS.bOTAlertSound then
+				if O.nOTAlertLevel > 0 and GetNpcIntensity(KGnpc) > 2 then
+					if this.bSelfTreatRank < O.nOTAlertLevel and v.val / nTopRank >= O.nOTAlertLevel then
+						LIB.Topmsg(_L('** You Threat more than %d, 120% is Out of Taunt! **', O.nOTAlertLevel * 100))
+						if O.bOTAlertSound then
 							PlaySound(SOUND.UI_SOUND, _L['SOUND_nat_view2'])
 						end
 					end
 				end
 				this.bSelfTreatRank = v.val / nTopRank
 				show = true
-			elseif k == TS.nMaxBarCount and not show and tList[UI_GetClientPlayerID()] then -- 始终显示自己的
+			elseif k == O.nMaxBarCount and not show and tList[UI_GetClientPlayerID()] then -- 始终显示自己的
 				v = tMyRank
 			end
 
 			local item = this.handle:AppendItemFromData(this.hItemData, k)
 			local nThreatPercentage, fDiff = 0, 0
-			if MY_ThreatRank.bShowPercent then
+			if O.bShowPercent then
 				if v.val ~= 0 then
 					fDiff = v.val / nTopRank
 					nThreatPercentage = fDiff * (100 / 120)
@@ -422,7 +482,7 @@ function _TS.UpdateThreatBars(tList, dwTargetID, dwApplyID)
 						end
 					end
 				end
-				if TS.bForceColor and p then
+				if O.bForceColor and p then
 					r, g, b = MY_GetForceColor(p.dwForceID)
 				else
 					r, g, b = 255, 255, 255
@@ -436,7 +496,7 @@ function _TS.UpdateThreatBars(tList, dwTargetID, dwApplyID)
 			item:Lookup('Text_ThreatName'):SetText(v.sort .. '.' .. szName)
 			item:Lookup('Text_ThreatName'):SetFontScheme(dat[6][1])
 			item:Lookup('Text_ThreatName'):SetFontColor(r, g, b)
-			if TS.bForceIcon then
+			if O.bForceIcon then
 				local info = LIB.IsParty(v.id) and IsPlayer(v.id) and team.GetMemberInfo(v.id)
 				if info then
 					item:Lookup('Image_Icon'):FromIconID(Table_GetSkillIconID(info.dwMountKungfuID, 1))
@@ -458,7 +518,7 @@ function _TS.UpdateThreatBars(tList, dwTargetID, dwApplyID)
 			elseif fDiff >= 0.01 then
 				item:Lookup('Image_Treat_Bar'):FromUITex(unpack(dat[1]))
 			end
-			if TS.bSpecialSelf and v.id == UI_GetClientPlayerID() then
+			if O.bSpecialSelf and v.id == UI_GetClientPlayerID() then
 				item:Lookup('Image_Treat_Bar'):FromUITex(unpack(dat[5]))
 			end
 			item:Lookup('Image_Treat_Bar'):SetPercentage(nThreatPercentage)
@@ -482,20 +542,20 @@ function PS.OnPanelActive(frame)
 	y = y + 28
 
 	ui:Append('WndCheckBox', {
-		x = x, y = y, w = 130, checked = TS.bEnable, text = _L['Enable ThreatScrutiny'],
+		x = x, y = y, w = 130, checked = O.bEnable, text = _L['Enable ThreatScrutiny'],
 		oncheck = function(bChecked)
-			TS.bEnable = bChecked
+			O.bEnable = bChecked
 			_TS.CheckOpen()
 		end,
 	})
 	x = x + 130
 
 	ui:Append('WndCheckBox', {
-		x = x, y = y, w = 250, checked = TS.bInDungeon,
-		enable = TS.bEnable,
+		x = x, y = y, w = 250, checked = O.bInDungeon,
+		enable = O.bEnable,
 		text = _L['Only in the map type is Dungeon Enable plug-in'],
 		oncheck = function(bChecked)
-			TS.bInDungeon = bChecked
+			O.bInDungeon = bChecked
 			_TS.CheckOpen()
 		end,
 		autoenable = IsEnabled,
@@ -507,12 +567,12 @@ function PS.OnPanelActive(frame)
 	x = x + 10
 	y = y + 28
 	ui:Append('WndCheckBox', {
-		x = x, y = y, checked = TS.nOTAlertLevel == 1, text = _L['OT Alert'],
+		x = x, y = y, checked = O.nOTAlertLevel == 1, text = _L['OT Alert'],
 		oncheck = function(bChecked)
 			if bChecked then -- 以后可以做% 暂时先不管
-				TS.nOTAlertLevel = 1
+				O.nOTAlertLevel = 1
 			else
-				TS.nOTAlertLevel = 0
+				O.nOTAlertLevel = 0
 			end
 		end,
 		autoenable = IsEnabled,
@@ -520,11 +580,11 @@ function PS.OnPanelActive(frame)
 	y = y + 28
 
 	ui:Append('WndCheckBox', {
-		x = x, y = y, checked = TS.bOTAlertSound, text = _L['OT Alert Sound'],
+		x = x, y = y, checked = O.bOTAlertSound, text = _L['OT Alert Sound'],
 		oncheck = function(bChecked)
-			TS.bOTAlertSound = bChecked
+			O.bOTAlertSound = bChecked
 		end,
-		autoenable = function() return IsEnabled() and TS.nOTAlertLevel == 1 end,
+		autoenable = function() return IsEnabled() and O.nOTAlertLevel == 1 end,
 	})
 	y = y + 28
 
@@ -534,45 +594,45 @@ function PS.OnPanelActive(frame)
 
 	x = x + 10
 	ui:Append('WndCheckBox', {
-		x = x , y = y, checked = TS.bShowPercent, text = _L['Show percent'],
+		x = x , y = y, checked = O.bShowPercent, text = _L['Show percent'],
 		oncheck = function(bChecked)
-			TS.bShowPercent = bChecked
+			O.bShowPercent = bChecked
 		end,
 		autoenable = IsEnabled,
 	})
 
 	y = y + 28
 	ui:Append('WndCheckBox', {
-		x = x , y = y, checked = TS.bTopTarget, text = _L['Top Target'],
+		x = x , y = y, checked = O.bTopTarget, text = _L['Top Target'],
 		oncheck = function(bChecked)
-			TS.bTopTarget = bChecked
+			O.bTopTarget = bChecked
 		end,
 		autoenable = IsEnabled,
 	})
 	y = y + 28
 
 	ui:Append('WndCheckBox', {
-		x = x , y = y, checked = TS.bForceColor, text = g_tStrings.STR_RAID_COLOR_NAME_SCHOOL,
+		x = x , y = y, checked = O.bForceColor, text = g_tStrings.STR_RAID_COLOR_NAME_SCHOOL,
 		oncheck = function(bChecked)
-			TS.bForceColor = bChecked
+			O.bForceColor = bChecked
 		end,
 		autoenable = IsEnabled,
 	})
 	y = y + 28
 
 	ui:Append('WndCheckBox', {
-		x = x , y = y, checked = TS.bForceIcon, text = g_tStrings.STR_SHOW_KUNGFU,
+		x = x , y = y, checked = O.bForceIcon, text = g_tStrings.STR_SHOW_KUNGFU,
 		oncheck = function(bChecked)
-			TS.bForceIcon = bChecked
+			O.bForceIcon = bChecked
 		end,
 		autoenable = IsEnabled,
 	})
 	y = y + 28
 
 	ui:Append('WndCheckBox', {
-		x = x , y = y, w = 200, checked = TS.bSpecialSelf, text = _L['Special Self'],
+		x = x , y = y, w = 200, checked = O.bSpecialSelf, text = _L['Special Self'],
 		oncheck = function(bChecked)
-			TS.bSpecialSelf = bChecked
+			O.bSpecialSelf = bChecked
 		end,
 		autoenable = IsEnabled,
 	})
@@ -586,9 +646,9 @@ function PS.OnPanelActive(frame)
 				insert(t, {
 					szOption = _L('Style %d', k),
 					bMCheck = true,
-					bChecked = TS.nStyle == k,
+					bChecked = O.nStyle == k,
 					fnAction = function()
-						TS.nStyle = k
+						O.nStyle = k
 					end,
 				})
 			end
@@ -606,9 +666,9 @@ function PS.OnPanelActive(frame)
 				insert(t, {
 					szOption = v,
 					bMCheck = true,
-					bChecked = TS.nMaxBarCount == v,
+					bChecked = O.nMaxBarCount == v,
 					fnAction = function()
-						TS.nMaxBarCount = v
+						O.nMaxBarCount = v
 					end,
 				})
 			end
@@ -625,12 +685,12 @@ function PS.OnPanelActive(frame)
 	ui:Append('WndTrackbar', {
 		x = x, y = y, text = '',
 		range = {0, 100},
-		value = TS.nBGAlpha,
+		value = O.nBGAlpha,
 		onchange = function(nVal)
-			TS.nBGAlpha = nVal
+			O.nBGAlpha = nVal
 			local frame = _TS.GetFrame()
 			if frame then
-				frame.bg:SetAlpha(255 * TS.nBGAlpha / 100)
+				frame.bg:SetAlpha(255 * O.nBGAlpha / 100)
 			end
 		end,
 		autoenable = IsEnabled,
@@ -644,11 +704,11 @@ local function GetMenu()
 		szOption = g_tStrings.HATRED_COLLECT,
 		bCheck = true, bChecked = not not _TS.GetFrame(),
 		fnAction = function()
-			TS.bInDungeon = false
+			O.bInDungeon = false
 			if not _TS.GetFrame() then -- 这样才对嘛  按按钮应该强制开启和关闭
-				TS.bEnable = true
+				O.bEnable = true
 			else
-				TS.bEnable = false
+				O.bEnable = false
 			end
 			_TS.CheckOpen()
 		end
