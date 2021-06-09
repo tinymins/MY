@@ -1325,7 +1325,7 @@ LIB.RegisterFrameCreate('OptionPanel.MY_RoleStatistics_RoleStat__AlertCol', func
 		end
 	end
 	local szText, szDailyText = concat(aText, GetFormatSysmsgText(_L[','])), concat(aDailyText, GetFormatSysmsgText(_L[',']))
-	if GetTime() - D.dwLastAlertTime > 10000 or O.szLastAlert ~= szText or O.szLastDailyAlert ~= szDailyText then
+	if GetTime() - D.dwLastAlertTime > 10000 or D.szLastAlert ~= szText or D.szLastDailyAlert ~= szDailyText then
 		if not IsEmpty(szText) and szText ~= szDailyText then
 			LIB.Sysmsg({ GetFormatSysmsgText(_L['Current online ']) .. szText .. GetFormatSysmsgText(_L['.']), rich = true })
 		end
@@ -1333,8 +1333,8 @@ LIB.RegisterFrameCreate('OptionPanel.MY_RoleStatistics_RoleStat__AlertCol', func
 			LIB.Sysmsg({ GetFormatSysmsgText(_L['Today online ']) .. szDailyText .. GetFormatSysmsgText(_L['.']), rich = true })
 		end
 		D.dwLastAlertTime = GetTime()
-		O.szLastAlert = szText
-		O.szLastDailyAlert = szDailyText
+		D.szLastAlert = szText
+		D.szLastDailyAlert = szDailyText
 	end
 end)
 
