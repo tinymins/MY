@@ -64,13 +64,13 @@ local O = LIB.CreateUserSettingsModule('MY_CombatLogs', _L['MY_TeamTools'], {
 	nMaxHistory = { -- 最大历史数据数量
 		ePathType = PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatLogs'],
-		xSchema = Schema.Boolean,
+		xSchema = Schema.Number,
 		xDefaultValue = 300,
 	},
 	nMinFightTime = { -- 最小战斗时间
 		ePathType = PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatLogs'],
-		xSchema = Schema.Boolean,
+		xSchema = Schema.Number,
 		xDefaultValue = 30,
 	},
 	bOnlyDungeon = { -- 仅在秘境中启用
