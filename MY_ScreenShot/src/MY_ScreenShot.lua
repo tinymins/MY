@@ -53,54 +53,93 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 	return
 end
 --------------------------------------------------------------------------
-local _GLOBAL_CONFIG_ = {'config/screenshot.jx3dat', PATH_TYPE.GLOBAL}
-local _MY_ScreenShot = {}
-MY_ScreenShot = MY_ScreenShot or {}
-MY_ScreenShot.Const = {}
-MY_ScreenShot.Const.SHOW_UI = 1
-MY_ScreenShot.Const.HIDE_UI = 2
-MY_ScreenShot.globalConfig = {
-    szFileExName = 'jpg',
-    nQuality = 100,
-    bAutoHideUI = false,
-    szFilePath = '',
+local SCREENSHOT_MODE = {
+    SHOW_UI = 1,
+    HIDE_UI = 2,
 }
-MY_ScreenShot.globalConfig = LIB.LoadLUAData(_GLOBAL_CONFIG_) or MY_ScreenShot.globalConfig
-MY_ScreenShot.bUseGlobalConfig = true
-MY_ScreenShot.privateConfig = {
-    szFileExName = 'jpg',
-    nQuality = 100,
-    bAutoHideUI = false,
-    szFilePath = '',
-}
-RegisterCustomData('MY_ScreenShot.bUseGlobalConfig')
-for k, _ in pairs(MY_ScreenShot.privateConfig) do
-    RegisterCustomData('MY_ScreenShot.privateConfig.' .. k)
-end
--- 取设置
-MY_ScreenShot.SetConfig = function(szKey, oValue)
-    if MY_ScreenShot.bUseGlobalConfig then
-        MY_ScreenShot.globalConfig[szKey] = oValue
-        LIB.SaveLUAData(_GLOBAL_CONFIG_, MY_ScreenShot.globalConfig)
-    else
-        MY_ScreenShot.privateConfig[szKey] = oValue
-    end
-end
--- 存设置
-MY_ScreenShot.GetConfig = function(szKey)
-    if MY_ScreenShot.bUseGlobalConfig then
-        return MY_ScreenShot.globalConfig[szKey]
-    else
-        return MY_ScreenShot.privateConfig[szKey]
-    end
-end
-_MY_ScreenShot.ShotScreen = function(szFilePath, nQuality)
+local OR = LIB.CreateUserSettingsModule('MY_ScreenShot', _L['MY_ScreenShot'], {
+    bUseGlobalConfig = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ScreenShot'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+    szFileExName = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ScreenShot'],
+		xSchema = Schema.String,
+		xDefaultValue = 'jpg',
+	},
+    nQuality = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ScreenShot'],
+		xSchema = Schema.Number,
+		xDefaultValue = 100,
+	},
+    bAutoHideUI = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ScreenShot'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+    szFilePath = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ScreenShot'],
+		xSchema = Schema.String,
+		xDefaultValue = '',
+	},
+})
+local OG = LIB.CreateUserSettingsModule('MY_ScreenShot', _L['MY_ScreenShot'], {
+    szFileExName = {
+		ePathType = PATH_TYPE.GLOBAL,
+		szLabel = _L['MY_ScreenShot'],
+		xSchema = Schema.String,
+		xDefaultValue = 'jpg',
+	},
+    nQuality = {
+		ePathType = PATH_TYPE.GLOBAL,
+		szLabel = _L['MY_ScreenShot'],
+		xSchema = Schema.Number,
+		xDefaultValue = 100,
+	},
+    bAutoHideUI = {
+		ePathType = PATH_TYPE.GLOBAL,
+		szLabel = _L['MY_ScreenShot'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+    szFilePath = {
+		ePathType = PATH_TYPE.GLOBAL,
+		szLabel = _L['MY_ScreenShot'],
+		xSchema = Schema.String,
+		xDefaultValue = '',
+	},
+})
+local O = setmetatable({}, {
+    __index = function(_, k)
+        if k == 'bUseGlobalConfig' or not OR.bUseGlobalConfig then
+            return OR[k]
+        end
+        return OG[k]
+    end,
+    __newindex = function(_, k, v)
+        if k == 'bUseGlobalConfig' or not OR.bUseGlobalConfig then
+            OR[k] = v
+        else
+            OG[k] = v
+        end
+    end,
+})
+local D = {}
+
+function D.ShotScreen(szFilePath, nQuality)
     local szFullPath = ScreenShot(szFilePath, nQuality)
     LIB.Sysmsg(_L('Shot screen succeed, file saved as %s .', szFullPath))
 end
-MY_ScreenShot.ShotScreen = function(nShowUI)
+
+function D.ShotScreenEx(nShowUI)
     -- 生成可使用的完整截图目录
-    local szFolderPath = MY_ScreenShot.GetConfig('szFilePath')
+    local szFolderPath = O.szFilePath
     if szFolderPath~='' and not (sub(szFolderPath,2,2)==':' and IsFileExist(szFolderPath)) then
         LIB.Sysmsg(_L('Shotscreen destination folder error: %s not exist. File has been save to default folder.', szFolderPath))
         szFolderPath = ''
@@ -111,86 +150,94 @@ MY_ScreenShot.ShotScreen = function(nShowUI)
         local tDateTime = TimeToDate(GetCurrentTime())
         local i = 0
         repeat
-            szFilePath = szFolderPath .. (format('%04d-%02d-%02d_%02d-%02d-%02d-%03d', tDateTime.year, tDateTime.month, tDateTime.day, tDateTime.hour, tDateTime.minute, tDateTime.second, i)) ..'.' .. MY_ScreenShot.GetConfig('szFileExName')
+            szFilePath = szFolderPath .. (format('%04d-%02d-%02d_%02d-%02d-%02d-%03d', tDateTime.year, tDateTime.month, tDateTime.day, tDateTime.hour, tDateTime.minute, tDateTime.second, i)) ..'.' .. O.szFileExName
             i=i+1
         until not IsFileExist(szFilePath)
     else
-        szFilePath = MY_ScreenShot.GetConfig('szFileExName')
+        szFilePath = O.szFileExName
     end
     -- 根据nShowUI不同方式实现截图
     local bStationVisible = Station.IsVisible()
-    if nShowUI == MY_ScreenShot.Const.HIDE_UI and bStationVisible then
+    if nShowUI == SCREENSHOT_MODE.HIDE_UI and bStationVisible then
         Station.Hide()
         UI.TempSetShadowHandleVisible(false)
         LIB.DelayCall(100, function()
-            _MY_ScreenShot.ShotScreen(szFilePath, MY_ScreenShot.GetConfig('nQuality'))
+            D.ShotScreen(szFilePath, O.nQuality)
             LIB.DelayCall(300, function()
                 Station.Show()
                 UI.RevertShadowHandleVisible()
             end)
         end)
-    elseif nShowUI == MY_ScreenShot.Const.SHOW_UI and not bStationVisible then
+    elseif nShowUI == SCREENSHOT_MODE.SHOW_UI and not bStationVisible then
         Station.Show()
         UI.TempSetShadowHandleVisible(true)
         LIB.DelayCall(100, function()
-            _MY_ScreenShot.ShotScreen(szFilePath, MY_ScreenShot.GetConfig('nQuality'))
+            D.ShotScreen(szFilePath, O.nQuality)
             LIB.DelayCall(300, function()
                 Station.Hide()
                 UI.RevertShadowHandleVisible()
             end)
         end)
     else
-        _MY_ScreenShot.ShotScreen(szFilePath, MY_ScreenShot.GetConfig('nQuality'))
+        D.ShotScreen(szFilePath, O.nQuality)
     end
 end
--- 标签栏激活
-_MY_ScreenShot.OnPanelActive = function(wnd)
+
+-- 快捷键绑定
+LIB.RegisterHotKey('MY_ScreenShot_Hotkey', _L['shotscreen'], function() D.ShotScreenEx((O.bAutoHideUI and SCREENSHOT_MODE.HIDE_UI) or nil) end, nil)
+LIB.RegisterHotKey('MY_ScreenShot_Hotkey_HideUI', _L['shotscreen without ui'], function() D.ShotScreenEx(SCREENSHOT_MODE.HIDE_UI) end, nil)
+LIB.RegisterHotKey('MY_ScreenShot_Hotkey_ShowUI', _L['shotscreen with ui'], function() D.ShotScreenEx(SCREENSHOT_MODE.SHOW_UI) end, nil)
+
+-- 面板注册
+local PS = {}
+
+function PS.OnPanelActive(wnd)
     local ui = UI(wnd)
     local w, h = ui:Size()
     local fnRefreshPanel = function(ui)
-        ui:Children('#WndCheckBox_HideUI'):Check(MY_ScreenShot.GetConfig('bAutoHideUI'))
-        ui:Children('#WndCombo_FileExName'):Text(MY_ScreenShot.GetConfig('szFileExName'))
-        ui:Children('#WndTrackbar_Quality'):Value(MY_ScreenShot.GetConfig('nQuality'))
-        ui:Children('#WndEditBox_SsRoot'):Text(MY_ScreenShot.GetConfig('szFilePath'))
+        ui:Children('#WndCheckBox_HideUI'):Check(O.bAutoHideUI)
+        ui:Children('#WndCombo_FileExName'):Text(O.szFileExName)
+        ui:Children('#WndTrackbar_Quality'):Value(O.nQuality)
+        ui:Children('#WndEditBox_SsRoot'):Text(O.szFilePath)
     end
 
     ui:Append('WndCheckBox', 'WndCheckBox_UseGlobal'):Pos(30,30):Width(200)
       :Text(_L['Use global config']):Tip(_L['Check to use global config, otherwise use private setting.'])
-      :Check(function(bChecked) MY_ScreenShot.bUseGlobalConfig = bChecked fnRefreshPanel(ui) end)
-      :Check(MY_ScreenShot.bUseGlobalConfig)
+      :Check(function(bChecked) O.bUseGlobalConfig = bChecked fnRefreshPanel(ui) end)
+      :Check(O.bUseGlobalConfig)
 
     ui:Append('WndCheckBox', 'WndCheckBox_HideUI'):Pos(30,70)
       :Text(_L['auto hide ui while shot screen']):Tip(_L['Check it if you want to hide ui automatic.'])
-      :Check(function(bChecked) MY_ScreenShot.SetConfig('bAutoHideUI', bChecked) end)
-      :Check(MY_ScreenShot.GetConfig('bAutoHideUI'))
+      :Check(function(bChecked) O.bAutoHideUI = bChecked end)
+      :Check(O.bAutoHideUI)
 
     ui:Append('Text', 'Text_FileExName'):Text(_L['file format']):Pos(30,110)
     ui:Append('WndComboBox', 'WndCombo_FileExName'):Pos(110,110):Width(80)
       :Menu(function()
         return {
-            {szOption = 'jpg', bChecked = MY_ScreenShot.GetConfig('szFileExName')=='jpg', rgb = GetMsgFontColor('MSG_SYS', true), fnAction = function() MY_ScreenShot.SetConfig('szFileExName', 'jpg') ui:Children('#WndCombo_FileExName'):Text(MY_ScreenShot.GetConfig('szFileExName')) end, fnAutoClose = function() return true end},
-            {szOption = 'png', bChecked = MY_ScreenShot.GetConfig('szFileExName')=='png', rgb = GetMsgFontColor('MSG_SYS', true), fnAction = function() MY_ScreenShot.SetConfig('szFileExName', 'png') ui:Children('#WndCombo_FileExName'):Text(MY_ScreenShot.GetConfig('szFileExName')) end, fnAutoClose = function() return true end},
-            {szOption = 'bmp', bChecked = MY_ScreenShot.GetConfig('szFileExName')=='bmp', rgb = GetMsgFontColor('MSG_SYS', true), fnAction = function() MY_ScreenShot.SetConfig('szFileExName', 'bmp') ui:Children('#WndCombo_FileExName'):Text(MY_ScreenShot.GetConfig('szFileExName')) end, fnAutoClose = function() return true end},
-            {szOption = 'tga', bChecked = MY_ScreenShot.GetConfig('szFileExName')=='tga', rgb = GetMsgFontColor('MSG_SYS', true), fnAction = function() MY_ScreenShot.SetConfig('szFileExName', 'tga') ui:Children('#WndCombo_FileExName'):Text(MY_ScreenShot.GetConfig('szFileExName')) end, fnAutoClose = function() return true end},
+            {szOption = 'jpg', bChecked = O.szFileExName=='jpg', rgb = GetMsgFontColor('MSG_SYS', true), fnAction = function() O.szFileExName = 'jpg' ui:Children('#WndCombo_FileExName'):Text(O.szFileExName) end, fnAutoClose = function() return true end},
+            {szOption = 'png', bChecked = O.szFileExName=='png', rgb = GetMsgFontColor('MSG_SYS', true), fnAction = function() O.szFileExName = 'png' ui:Children('#WndCombo_FileExName'):Text(O.szFileExName) end, fnAutoClose = function() return true end},
+            {szOption = 'bmp', bChecked = O.szFileExName=='bmp', rgb = GetMsgFontColor('MSG_SYS', true), fnAction = function() O.szFileExName = 'bmp' ui:Children('#WndCombo_FileExName'):Text(O.szFileExName) end, fnAutoClose = function() return true end},
+            {szOption = 'tga', bChecked = O.szFileExName=='tga', rgb = GetMsgFontColor('MSG_SYS', true), fnAction = function() O.szFileExName = 'tga' ui:Children('#WndCombo_FileExName'):Text(O.szFileExName) end, fnAutoClose = function() return true end},
         }
       end)
-      :Text(MY_ScreenShot.GetConfig('szFileExName'))
+      :Text(O.szFileExName)
 
     ui:Append('Text', 'Text_Quality'):Text(_L['set quality (0-100)']):Pos(30,150)
     ui:Append('WndTrackbar', 'WndTrackbar_Quality'):Pos(180,150)
       :TrackbarStyle(false):Range(0, 100)
       :Tip(_L['Set screenshot quality(0-100): the larger number, the image will use more hdd space.'])
-      :Change(function(nValue) MY_ScreenShot.SetConfig('nQuality', nValue) end)
+      :Change(function(nValue) O.nQuality = nValue end)
 
     ui:Append('Text', 'Text_SsRoot'):Text(_L['set folder']):Pos(30,190)
     ui:Append('WndEditBox', 'WndEditBox_SsRoot'):Pos(30,220):Size(620,100)
-      :Text(MY_ScreenShot.GetConfig('szFilePath'))
+      :Text(O.szFilePath)
       :Change(function(szValue)
         szValue = gsub(szValue, '^%s*(.-)%s*$', '%1')
         szValue = gsub(szValue, '\\', '/')
         szValue = gsub(szValue, '^(.-)/*$', '%1')
         szValue = szValue..((#szValue>0 and '/') or '')
-        MY_ScreenShot.SetConfig('szFilePath', szValue)
+        O.szFilePath = szValue
       end)
       :Tip(_L['Set destination folder which screenshot file will be saved. Absolute path required.\nEx: D:/JX3_ScreenShot/\nAttention: let it blank will save screenshot to default folder.'],UI.TIP_POSITION.TOP_BOTTOM)
 
@@ -214,12 +261,9 @@ _MY_ScreenShot.OnPanelActive = function(wnd)
         end
     end)
 end
-_MY_ScreenShot.OnPanelDeactive = function( ... )
+
+function PS.OnPanelDeactive()
     LIB.BreatheCall('MY_ScreenShot_Hotkey_Check', false)
 end
--- 快捷键绑定
------------------------------------------------
-LIB.RegisterHotKey('MY_ScreenShot_Hotkey', _L['shotscreen'], function() MY_ScreenShot.ShotScreen((MY_ScreenShot.GetConfig('bAutoHideUI') and MY_ScreenShot.Const.HIDE_UI) or nil) end, nil)
-LIB.RegisterHotKey('MY_ScreenShot_Hotkey_HideUI', _L['shotscreen without ui'], function() MY_ScreenShot.ShotScreen(MY_ScreenShot.Const.HIDE_UI) end, nil)
-LIB.RegisterHotKey('MY_ScreenShot_Hotkey_ShowUI', _L['shotscreen with ui'], function() MY_ScreenShot.ShotScreen(MY_ScreenShot.Const.SHOW_UI) end, nil)
-LIB.RegisterPanel(_L['System'], 'ScreenShot', _L['screenshot helper'], 'UI/Image/UICommon/Commonpanel.UITex|9', { OnPanelActive = _MY_ScreenShot.OnPanelActive, OnPanelDeactive = _MY_ScreenShot.OnPanelDeactive })
+
+LIB.RegisterPanel(_L['System'], 'ScreenShot', _L['screenshot helper'], 'UI/Image/UICommon/Commonpanel.UITex|9', PS)
