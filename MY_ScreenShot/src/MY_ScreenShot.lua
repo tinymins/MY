@@ -64,52 +64,58 @@ local OR = LIB.CreateUserSettingsModule('MY_ScreenShot', _L['MY_ScreenShot'], {
 		xSchema = Schema.Boolean,
 		xDefaultValue = true,
 	},
-    szFileExName = {
+    szFileExName_Global = {
 		ePathType = PATH_TYPE.ROLE,
+        szStoreKey = 'szFileExName',
 		szLabel = _L['MY_ScreenShot'],
 		xSchema = Schema.String,
 		xDefaultValue = 'jpg',
 	},
-    nQuality = {
+    nQuality_Global = {
 		ePathType = PATH_TYPE.ROLE,
+        szStoreKey = 'nQuality',
 		szLabel = _L['MY_ScreenShot'],
 		xSchema = Schema.Number,
 		xDefaultValue = 100,
 	},
-    bAutoHideUI = {
+    bAutoHideUI_Global = {
 		ePathType = PATH_TYPE.ROLE,
+        szStoreKey = 'bAutoHideUI',
 		szLabel = _L['MY_ScreenShot'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
-    szFilePath = {
+    szFilePath_Global = {
 		ePathType = PATH_TYPE.ROLE,
+        szStoreKey = 'szFilePath',
 		szLabel = _L['MY_ScreenShot'],
 		xSchema = Schema.String,
 		xDefaultValue = '',
 	},
-})
-local OG = LIB.CreateUserSettingsModule('MY_ScreenShot', _L['MY_ScreenShot'], {
-    szFileExName = {
+    szFileExName_Role = {
 		ePathType = PATH_TYPE.GLOBAL,
+        szStoreKey = 'szFileExName',
 		szLabel = _L['MY_ScreenShot'],
 		xSchema = Schema.String,
 		xDefaultValue = 'jpg',
 	},
-    nQuality = {
+    nQuality_Role = {
 		ePathType = PATH_TYPE.GLOBAL,
+        szStoreKey = 'nQuality',
 		szLabel = _L['MY_ScreenShot'],
 		xSchema = Schema.Number,
 		xDefaultValue = 100,
 	},
-    bAutoHideUI = {
+    bAutoHideUI_Role = {
 		ePathType = PATH_TYPE.GLOBAL,
+        szStoreKey = 'bAutoHideUI',
 		szLabel = _L['MY_ScreenShot'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
-    szFilePath = {
+    szFilePath_Role = {
 		ePathType = PATH_TYPE.GLOBAL,
+        szStoreKey = 'szFilePath',
 		szLabel = _L['MY_ScreenShot'],
 		xSchema = Schema.String,
 		xDefaultValue = '',
@@ -117,16 +123,21 @@ local OG = LIB.CreateUserSettingsModule('MY_ScreenShot', _L['MY_ScreenShot'], {
 })
 local O = setmetatable({}, {
     __index = function(_, k)
-        if k == 'bUseGlobalConfig' or not OR.bUseGlobalConfig then
+        if k == 'bUseGlobalConfig' then
             return OR[k]
         end
-        return OG[k]
+        if OR.bUseGlobalConfig then
+            return OR[k .. '_Global']
+        end
+        return OR[k .. '_Role']
     end,
     __newindex = function(_, k, v)
-        if k == 'bUseGlobalConfig' or not OR.bUseGlobalConfig then
+        if k == 'bUseGlobalConfig' then
             OR[k] = v
+        elseif OR.bUseGlobalConfig then
+            OR[k .. '_Global'] = v
         else
-            OG[k] = v
+            OG[k .. '_Role'] = v
         end
     end,
 })
