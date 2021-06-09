@@ -196,30 +196,74 @@ do
 	end
 end
 
-local O = {
-	bEnable             = true,
-	bCommon             = true,
-	bPushScreenHead     = true,
-	bPushCenterAlarm    = true,
-	bPushBigFontAlarm   = true,
-	bPushTeamPanel      = true, -- 面板buff监控
-	bPushFullScreen     = true, -- 全屏泛光
-	bPushTeamChannel    = false, -- 团队报警
-	bPushWhisperChannel = false, -- 密聊报警
-	bPushBuffList       = true,
-	bPushPartyBuffList  = true,
-}
-RegisterCustomData('MY_TeamMon.bEnable')
-RegisterCustomData('MY_TeamMon.bCommon')
-RegisterCustomData('MY_TeamMon.bPushScreenHead')
-RegisterCustomData('MY_TeamMon.bPushCenterAlarm')
-RegisterCustomData('MY_TeamMon.bPushBigFontAlarm')
-RegisterCustomData('MY_TeamMon.bPushTeamPanel')
-RegisterCustomData('MY_TeamMon.bPushFullScreen')
-RegisterCustomData('MY_TeamMon.bPushTeamChannel')
-RegisterCustomData('MY_TeamMon.bPushWhisperChannel')
-RegisterCustomData('MY_TeamMon.bPushBuffList')
-RegisterCustomData('MY_TeamMon.bPushPartyBuffList')
+local O = LIB.CreateUserSettingsModule('MY_TeamMon', _L['MY_TeamMon'], {
+	bEnable = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TeamMon'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bCommon = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TeamMon'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bPushScreenHead = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TeamMon'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bPushCenterAlarm = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TeamMon'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bPushBigFontAlarm = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TeamMon'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bPushTeamPanel = { -- 面板buff监控
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TeamMon'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bPushFullScreen = { -- 全屏泛光
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TeamMon'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bPushTeamChannel = { -- 团队报警
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TeamMon'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bPushWhisperChannel = { -- 密聊报警
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TeamMon'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bPushBuffList = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TeamMon'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bPushPartyBuffList = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TeamMon'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+})
 
 local function GetUserDataPath()
 	local ePathType = O.bCommon and PATH_TYPE.GLOBAL or PATH_TYPE.ROLE

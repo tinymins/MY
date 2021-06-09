@@ -58,14 +58,21 @@ end
 local GetBuff = LIB.GetBuff
 
 -- 这个需要重写 构思已有 就是没时间。。
-local ANCHOR = { s = 'CENTER', r = 'CENTER', x = 400, y = 0 } -- szSide, szRelSide, fOffsetX, fOffsetY
+local O = LIB.CreateUserSettingsModule('MY_TeamMon_PBL', _L['MY_TeamMon'], {
+	bHoverSelect = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TeamMon_PBL'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	tAnchor = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TeamMon_PBL'],
+		xSchema = Schema.FrameAnchor,
+		xDefaultValue = { s = 'CENTER', r = 'CENTER', x = 400, y = 0 },
+	},
+})
 local D = {}
-local O = {
-	bHoverSelect = false,
-	tAnchor = {},
-}
-RegisterCustomData('MY_TeamMon_PBL.bHoverSelect')
-RegisterCustomData('MY_TeamMon_PBL.tAnchor')
 
 local TEMP_TARGET_TYPE, TEMP_TARGET_ID
 local CACHE_LIST = setmetatable({}, { __mode = 'v' })
@@ -207,7 +214,7 @@ function D.OpenPanel()
 end
 
 function D.UpdateAnchor(frame)
-	local a = IsEmpty(O.tAnchor) and ANCHOR or O.tAnchor
+	local a = O.tAnchor
 	frame:SetPoint(a.s, 0, 0, a.r, a.x, a.y)
 	frame:CorrectPos()
 end

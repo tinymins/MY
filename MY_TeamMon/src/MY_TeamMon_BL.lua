@@ -59,16 +59,27 @@ local GetBuff = LIB.GetBuff
 local FilterCustomText = MY_TeamMon.FilterCustomText
 
 local BL_INIFILE = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_BL.ini'
-local ANCHOR = { s = 'TOPLEFT', r = 'CENTER', x = 300, y = -200 }
+local O = LIB.CreateUserSettingsModule('MY_TeamMon_BL', _L['MY_TeamMon'], {
+	tAnchor = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TeamMon_BL'],
+		xSchema = Schema.FrameAnchor,
+		xDefaultValue = { s = 'TOPLEFT', r = 'CENTER', x = 300, y = -200 },
+	},
+	nCount = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TeamMon_BL'],
+		xSchema = Schema.Number,
+		xDefaultValue = 8,
+	},
+	fScale = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TeamMon_BL'],
+		xSchema = Schema.Number,
+		xDefaultValue = 1,
+	},
+})
 local D = {}
-local O = {
-	tAnchor = {},
-	nCount = 8,
-	fScale = 1,
-}
-RegisterCustomData('MY_TeamMon_BL.tAnchor')
-RegisterCustomData('MY_TeamMon_BL.nCount')
-RegisterCustomData('MY_TeamMon_BL.fScale')
 
 -- FireUIEvent('MY_TM_BL_CREATE', 103, 1, { 255, 0, 0 })
 local function CreateBuffList(dwID, nLevel, col, tArgs, szSender, szReceiver)
@@ -226,7 +237,7 @@ function D.ReSize(fScale, nCount)
 end
 
 function D.UpdateAnchor(frame)
-	local a = IsEmpty(O.tAnchor) and ANCHOR or O.tAnchor
+	local a = O.tAnchor
 	frame:SetPoint(a.s, 0, 0, a.r, a.x, a.y)
 	frame:CorrectPos()
 end

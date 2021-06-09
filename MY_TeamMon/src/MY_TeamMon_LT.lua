@@ -55,21 +55,41 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
-local D = {}
-local O = {
-	tAnchor      = {},
-	fScale       = 1.5,
-	fPause       = 1,
-	fFadeOut     = 0.3,
-	dwFontScheme = 23,
-}
-RegisterCustomData('MY_TeamMon_LT.tAnchor')
-RegisterCustomData('MY_TeamMon_LT.fScale')
-RegisterCustomData('MY_TeamMon_LT.fPause')
-RegisterCustomData('MY_TeamMon_LT.fFadeOut')
-RegisterCustomData('MY_TeamMon_LT.dwFontScheme')
-
 local INIFILE = PACKET_INFO.ROOT ..  'MY_TeamMon/ui/MY_TeamMon_LT.ini'
+
+local O = LIB.CreateUserSettingsModule('MY_TeamMon_LT', _L['MY_TeamMon'], {
+	tAnchor = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TeamMon_LT'],
+		xSchema = Schema.FrameAnchor,
+		xDefaultValue = { s = 'CENTER', r = 'CENTER', x = 0, y = 0 },
+	},
+	fScale = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TeamMon_LT'],
+		xSchema = Schema.Number,
+		xDefaultValue = 1.5,
+	},
+	fPause = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TeamMon_LT'],
+		xSchema = Schema.Number,
+		xDefaultValue = 1,
+	},
+	fFadeOut = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TeamMon_LT'],
+		xSchema = Schema.Number,
+		xDefaultValue = 0.3,
+	},
+	dwFontScheme = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TeamMon_LT'],
+		xSchema = Schema.Number,
+		xDefaultValue = 23,
+	},
+})
+local D = {}
 
 function D.OnFrameCreate()
 	this:RegisterEvent('ON_ENTER_CUSTOM_UI_MODE')

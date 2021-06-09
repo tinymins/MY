@@ -56,12 +56,15 @@ end
 --------------------------------------------------------------------------
 
 local CA_INIFILE = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_CA.ini'
-local ANCHOR = { s = 'CENTER', r = 'CENTER', x = 0, y = 350 }
+local O = LIB.CreateUserSettingsModule('MY_TeamMon_CA', _L['MY_TeamMon'], {
+	tAnchor = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TeamMon_CA'],
+		xSchema = Schema.FrameAnchor,
+		xDefaultValue = { s = 'CENTER', r = 'CENTER', x = 0, y = 350 },
+	},
+})
 local D = {}
-local O = {
-	tAnchor = {}
-}
-RegisterCustomData('MY_TeamMon_CA.tAnchor')
 
 -- FireUIEvent('MY_TM_CA_CREATE', 'test', 3)
 local function CreateCentralAlert(szMsg, nTime, bXml)
@@ -133,7 +136,7 @@ function D.OnFrameDragEnd()
 end
 
 function D.UpdateAnchor(frame)
-	local a = IsEmpty(O.tAnchor) and ANCHOR or O.tAnchor
+	local a = O.tAnchor
 	frame:SetPoint(a.s, 0, 0, a.r, a.x, a.y)
 	frame:CorrectPos()
 end

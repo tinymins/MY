@@ -58,14 +58,23 @@ end
 local SplitString, TrimString, FormatTimeCounter = LIB.SplitString, LIB.TrimString, LIB.FormatTimeCounter
 local FilterCustomText = MY_TeamMon.FilterCustomText
 
-local ANCHOR = { s = 'TOPRIGHT', r = 'CENTER', x = -250, y = -300 } -- szSide, szRelSide, fOffsetX, fOffsetY
+local O = LIB.CreateUserSettingsModule('MY_TeamMon_ST', _L['MY_TeamMon'], {
+	bEnable = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TeamMon_ST'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	tAnchor = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TeamMon_ST'],
+		xSchema = Schema.FrameAnchor,
+		xDefaultValue = { s = 'TOPRIGHT', r = 'CENTER', x = -250, y = -300 },
+	},
+})
 local D = {}
 
-MY_TeamMon_ST = {
-	bEnable = true,
-	tAnchor = {},
-}
-LIB.RegisterCustomData('MY_TeamMon_ST')
+MY_TeamMon_ST = {}
 
 -- ST class
 local ST = {}
@@ -203,7 +212,7 @@ end
 
 function MY_TeamMon_ST.OnFrameDragEnd()
 	this:CorrectPos()
-	MY_TeamMon_ST.tAnchor = GetFrameAnchor(this, 'TOPLEFT')
+	O.tAnchor = GetFrameAnchor(this, 'TOPLEFT')
 end
 
 local function SetSTAction(ui, nLeft, nPer)
@@ -272,7 +281,7 @@ function MY_TeamMon_ST.OnFrameBreathe()
 end
 
 function D.UpdateAnchor(frame)
-	local a = IsEmpty(MY_TeamMon_ST.tAnchor) and ANCHOR or MY_TeamMon_ST.tAnchor
+	local a = O.tAnchor
 	frame:SetPoint(a.s, 0, 0, a.r, a.x, a.y)
 	frame:CorrectPos()
 end
