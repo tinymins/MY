@@ -262,7 +262,14 @@ LIB.RegisterEvent('LOADING_END.MY_GKPLoot', function()
 	O.bNameFilter = false
 end)
 
+LIB.RegisterInit('MY_GKPLoot', function()
+	D.bInitialized = true
+end)
+
 function D.IsEnabled()
+	if not D.bInitialized then
+		return false
+	end
 	if not O.bOn then
 		return false
 	end
