@@ -53,11 +53,15 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 	return
 end
 --------------------------------------------------------------------------
+local O = LIB.CreateUserSettingsModule('MY_JBTeamSnapshot', _L['MY_TeamTools'], {
+	szTeam = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_JBTeamSnapshot'],
+		xSchema = Schema.String,
+		xDefaultValue = '',
+	},
+})
 local D = {}
-local O = {
-	szTeam = '',
-}
-RegisterCustomData('MY_JBTeamSnapshot.szTeam')
 
 function D.CreateSnapshot()
 	local dwID = UI_GetClientPlayerID()

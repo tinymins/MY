@@ -58,25 +58,62 @@ local PR_INI_PATH = PACKET_INFO.ROOT .. 'MY_TeamTools/ui/MY_PartyRequest.ini'
 local PR_EQUIP_REQUEST = {}
 local PR_PARTY_REQUEST = {}
 
-local O = {
-	bEnable       = true,
-	bRefuseLowLv  = false,
-	bRefuseRobot  = false,
-	bAcceptTong   = false,
-	bAcceptCamp   = false,
-	bAcceptFriend = false,
-	bAcceptAll    = false,
-	bAcceptCustom = false,
-	tAcceptCustom = {},
-}
-RegisterCustomData('MY_PartyRequest.bEnable')
-RegisterCustomData('MY_PartyRequest.bRefuseLowLv')
-RegisterCustomData('MY_PartyRequest.bRefuseRobot')
-RegisterCustomData('MY_PartyRequest.bAcceptTong')
-RegisterCustomData('MY_PartyRequest.bAcceptCamp')
-RegisterCustomData('MY_PartyRequest.bAcceptFriend')
-RegisterCustomData('MY_PartyRequest.bAcceptAll')
-RegisterCustomData('MY_PartyRequest.bAcceptCustom')
+local O = LIB.CreateUserSettingsModule('MY_PartyRequest', _L['MY_TeamTools'], {
+	bEnable = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_PartyRequest'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bRefuseLowLv = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_PartyRequest'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bRefuseRobot = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_PartyRequest'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bAcceptTong = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_PartyRequest'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bAcceptCamp = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_PartyRequest'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bAcceptFriend = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_PartyRequest'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bAcceptAll = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_PartyRequest'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bAcceptCustom = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_PartyRequest'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	tAcceptCustom = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_PartyRequest'],
+		xSchema = Schema.Map(Schema.String, Schema.Boolean),
+		xDefaultValue = {},
+	},
+})
 RegisterCustomData('MY_PartyRequest.tAcceptCustom')
 
 function D.GetMenu()
@@ -84,79 +121,79 @@ function D.GetMenu()
 		szOption = _L['MY_PartyRequest'],
 		{
 			szOption = _L['Enable'],
-			bCheck = true, bChecked = MY_PartyRequest.bEnable,
+			bCheck = true, bChecked = O.bEnable,
 			fnAction = function()
-				MY_PartyRequest.bEnable = not MY_PartyRequest.bEnable
+				O.bEnable = not O.bEnable
 			end,
 		},
 		CONSTANT.MENU_DIVIDER,
 		{
 			szOption = _L['Auto refuse low level player'],
-			bCheck = true, bChecked = MY_PartyRequest.bRefuseLowLv,
+			bCheck = true, bChecked = O.bRefuseLowLv,
 			fnAction = function()
-				MY_PartyRequest.bRefuseLowLv = not MY_PartyRequest.bRefuseLowLv
+				O.bRefuseLowLv = not O.bRefuseLowLv
 			end,
-			fnDisable = function() return not MY_PartyRequest.bEnable end,
+			fnDisable = function() return not O.bEnable end,
 		},
 		{
 			szOption = _L['Auto refuse robot player'],
-			bCheck = true, bChecked = MY_PartyRequest.bRefuseRobot,
+			bCheck = true, bChecked = O.bRefuseRobot,
 			fnAction = function()
-				MY_PartyRequest.bRefuseRobot = not MY_PartyRequest.bRefuseRobot
+				O.bRefuseRobot = not O.bRefuseRobot
 			end,
 			fnMouseEnter = function()
 				local szXml = GetFormatText(_L['Full level and equip score less than 2/3 of yours'], nil, 255, 255, 0)
 				OutputTip(szXml, 600, {this:GetAbsX(), this:GetAbsY(), this:GetW(), this:GetH()}, ALW.RIGHT_LEFT)
 			end,
-			fnDisable = function() return not MY_PartyRequest.bEnable end,
+			fnDisable = function() return not O.bEnable end,
 		},
 		{
 			szOption = _L['Auto accept friend'],
-			bCheck = true, bChecked = MY_PartyRequest.bAcceptFriend,
+			bCheck = true, bChecked = O.bAcceptFriend,
 			fnAction = function()
-				MY_PartyRequest.bAcceptFriend = not MY_PartyRequest.bAcceptFriend
+				O.bAcceptFriend = not O.bAcceptFriend
 			end,
-			fnDisable = function() return not MY_PartyRequest.bEnable end,
+			fnDisable = function() return not O.bEnable end,
 		},
 		{
 			szOption = _L['Auto accept tong member'],
-			bCheck = true, bChecked = MY_PartyRequest.bAcceptTong,
+			bCheck = true, bChecked = O.bAcceptTong,
 			fnAction = function()
-				MY_PartyRequest.bAcceptTong = not MY_PartyRequest.bAcceptTong
+				O.bAcceptTong = not O.bAcceptTong
 			end,
-			fnDisable = function() return not MY_PartyRequest.bEnable end,
+			fnDisable = function() return not O.bEnable end,
 		},
 		{
 			szOption = _L['Auto accept same camp'],
-			bCheck = true, bChecked = MY_PartyRequest.bAcceptCamp,
+			bCheck = true, bChecked = O.bAcceptCamp,
 			fnAction = function()
-				MY_PartyRequest.bAcceptCamp = not MY_PartyRequest.bAcceptCamp
+				O.bAcceptCamp = not O.bAcceptCamp
 			end,
-			fnDisable = function() return not MY_PartyRequest.bEnable end,
+			fnDisable = function() return not O.bEnable end,
 		},
 		{
 			szOption = _L['Auto accept all'],
-			bCheck = true, bChecked = MY_PartyRequest.bAcceptAll,
+			bCheck = true, bChecked = O.bAcceptAll,
 			fnAction = function()
-				MY_PartyRequest.bAcceptAll = not MY_PartyRequest.bAcceptAll
+				O.bAcceptAll = not O.bAcceptAll
 			end,
-			fnDisable = function() return not MY_PartyRequest.bEnable end,
+			fnDisable = function() return not O.bEnable end,
 		},
 	}
 	local t = {
 		szOption = _L['Auto accept specific names'],
-		bCheck = true, bChecked = MY_PartyRequest.bAcceptCustom,
+		bCheck = true, bChecked = O.bAcceptCustom,
 		fnAction = function()
-			MY_PartyRequest.bAcceptCustom = not MY_PartyRequest.bAcceptCustom
+			O.bAcceptCustom = not O.bAcceptCustom
 		end,
-		fnDisable = function() return not MY_PartyRequest.bEnable end,
+		fnDisable = function() return not O.bEnable end,
 	}
-	for szName, bEnable in pairs(MY_PartyRequest.tAcceptCustom) do
+	for szName, bEnable in pairs(O.tAcceptCustom) do
 		insert(t, {
 			szOption = szName,
 			bCheck = true, bChecked = bEnable,
 			fnAction = function()
-				MY_PartyRequest.tAcceptCustom[szName] = not MY_PartyRequest.tAcceptCustom[szName]
+				O.tAcceptCustom[szName] = not O.tAcceptCustom[szName]
 			end,
 			szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',
 			nFrame = 49,
@@ -165,10 +202,10 @@ function D.GetMenu()
 			nIconHeight = 17,
 			szLayer = 'ICON_RIGHTMOST',
 			fnClickIcon = function()
-				MY_PartyRequest.tAcceptCustom[szName] = nil
+				O.tAcceptCustom[szName] = nil
 				UI.ClosePopupMenu()
 			end,
-			fnDisable = function() return not MY_PartyRequest.bEnable or not MY_PartyRequest.bAcceptCustom end,
+			fnDisable = function() return not O.bEnable or not O.bAcceptCustom end,
 		})
 	end
 	if #t ~= 0 then
@@ -179,11 +216,11 @@ function D.GetMenu()
 		fnAction = function()
 			GetUserInput(_L['Please input custom name, multiple split with ",[]":'], function(val)
 				for _, v in ipairs(LIB.SplitString(val, {',', '[', ']'}, true)) do
-					MY_PartyRequest.tAcceptCustom[v] = true
+					O.tAcceptCustom[v] = true
 				end
 			end)
 		end,
-		fnDisable = function() return not MY_PartyRequest.bEnable or not MY_PartyRequest.bAcceptCustom end,
+		fnDisable = function() return not O.bEnable or not O.bAcceptCustom end,
 	})
 	insert(menu, t)
 	return menu
@@ -478,6 +515,13 @@ LIB.RegisterEvent('PARTY_INVITE_REQUEST.MY_PartyRequest', D.OnApplyRequest)
 LIB.RegisterEvent('PARTY_APPLY_REQUEST.MY_PartyRequest' , D.OnApplyRequest)
 LIB.RegisterEvent('ON_MESSAGE_BOX_OPEN.MY_PartyRequest' , D.OnMessageBoxOpen)
 
+LIB.RegisterInit('MY_PartyRequest', function()
+	if D.tAcceptCustom then
+		O.tAcceptCustom = D.tAcceptCustom
+		D.tAcceptCustom = nil
+	end
+end)
+
 LIB.RegisterBgMsg('RL', function(_, data, nChannel, dwID, szName, bIsSelf)
 	if not bIsSelf then
 		if data[1] == 'Feedback' then
@@ -506,33 +550,17 @@ local settings = {
 		},
 		{
 			fields = {
-				bEnable       = true,
-				bRefuseLowLv  = true,
-				bRefuseRobot  = true,
-				bAcceptTong   = true,
-				bAcceptCamp   = true,
-				bAcceptFriend = true,
-				bAcceptAll    = true,
-				bAcceptCustom = true,
 				tAcceptCustom = true,
 			},
-			root = O,
+			root = D,
 		},
 	},
 	imports = {
 		{
 			fields = {
-				bEnable       = true,
-				bRefuseLowLv  = true,
-				bRefuseRobot  = true,
-				bAcceptTong   = true,
-				bAcceptCamp   = true,
-				bAcceptFriend = true,
-				bAcceptAll    = true,
-				bAcceptCustom = true,
 				tAcceptCustom = true,
 			},
-			root = O,
+			root = D,
 		},
 	},
 }

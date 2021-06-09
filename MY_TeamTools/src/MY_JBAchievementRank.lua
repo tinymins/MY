@@ -53,16 +53,20 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 	return
 end
 --------------------------------------------------------------------------
+local O = LIB.CreateUserSettingsModule('MY_JBAchievementRank', _L['MY_TeamTools'], {
+	bEnable = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_JBAchievementRank'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+})
 local D = {
 	dwFightBeginTime = 0,
 	szFightUUID = '',
 	dwDamage = 0,
 	dwTherapy = 0,
 }
-local O = {
-	bEnable = false,
-}
-RegisterCustomData('MY_JBAchievementRank.bEnable')
 
 local BOSS_MAP_ACHIEVE_ACQUIRE = LIB.LoadLUAData({'temporary/achievement_rank.jx3dat', PATH_TYPE.GLOBAL}) -- 地图对应的上报成就表（远程）
 local BOSS_ACHIEVE_ACQUIRE_LOG = {} -- 等待上传的首领击杀信息

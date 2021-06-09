@@ -54,24 +54,57 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 local INI_PATH = PACKET_INFO.ROOT .. 'MY_TeamTools/ui/MY_RideRequest.ini'
+local O = LIB.CreateUserSettingsModule('MY_RideRequest', _L['MY_TeamTools'], {
+	bEnable = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_RideRequest'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bRefuseOthers = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_RideRequest'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bRefuseUnknown = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_RideRequest'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bAcceptTong = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_RideRequest'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bAcceptFriend = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_RideRequest'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bAcceptAll = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_RideRequest'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bAcceptCustom = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_RideRequest'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	tAcceptCustom = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_RideRequest'],
+		xSchema = Schema.Map(Schema.String, Schema.Boolean),
+		xDefaultValue = {},
+	},
+})
 local D = {}
-local O = {
-	bEnable = false,
-	bRefuseOthers  = false,
-	bRefuseUnknown = false,
-	bAcceptTong    = false,
-	bAcceptFriend  = false,
-	bAcceptAll     = false,
-	bAcceptCustom  = false,
-	tAcceptCustom  = {},
-}
-RegisterCustomData('MY_RideRequest.bEnable')
-RegisterCustomData('MY_RideRequest.bRefuseOthers')
-RegisterCustomData('MY_RideRequest.bRefuseUnknown')
-RegisterCustomData('MY_RideRequest.bAcceptTong')
-RegisterCustomData('MY_RideRequest.bAcceptFriend')
-RegisterCustomData('MY_RideRequest.bAcceptAll')
-RegisterCustomData('MY_RideRequest.bAcceptCustom')
 RegisterCustomData('MY_RideRequest.tAcceptCustom')
 
 local RIDE_MSG = {}
@@ -97,51 +130,51 @@ function D.GetMenu()
 		szOption = _L['MY_RideRequest'],
 		{
 			szOption = _L['Enable'],
-			bCheck = true, bChecked = MY_RideRequest.bEnable,
+			bCheck = true, bChecked = O.bEnable,
 			fnAction = function()
-				MY_RideRequest.bEnable = not MY_RideRequest.bEnable
+				O.bEnable = not O.bEnable
 			end,
 		},
 		CONSTANT.MENU_DIVIDER,
 		{
 			szOption = _L['Auto accept friend'],
-			bCheck = true, bChecked = MY_RideRequest.bAcceptFriend,
+			bCheck = true, bChecked = O.bAcceptFriend,
 			fnAction = function()
-				MY_RideRequest.bAcceptFriend = not MY_RideRequest.bAcceptFriend
+				O.bAcceptFriend = not O.bAcceptFriend
 			end,
-			fnDisable = function() return not MY_RideRequest.bEnable end,
+			fnDisable = function() return not O.bEnable end,
 		},
 		{
 			szOption = _L['Auto accept tong member'],
-			bCheck = true, bChecked = MY_RideRequest.bAcceptTong,
+			bCheck = true, bChecked = O.bAcceptTong,
 			fnAction = function()
-				MY_RideRequest.bAcceptTong = not MY_RideRequest.bAcceptTong
+				O.bAcceptTong = not O.bAcceptTong
 			end,
-			fnDisable = function() return not MY_RideRequest.bEnable end,
+			fnDisable = function() return not O.bEnable end,
 		},
 		{
 			szOption = _L['Auto accept all'],
-			bCheck = true, bChecked = MY_RideRequest.bAcceptAll,
+			bCheck = true, bChecked = O.bAcceptAll,
 			fnAction = function()
-				MY_RideRequest.bAcceptAll = not MY_RideRequest.bAcceptAll
+				O.bAcceptAll = not O.bAcceptAll
 			end,
-			fnDisable = function() return not MY_RideRequest.bEnable end,
+			fnDisable = function() return not O.bEnable end,
 		},
 	}
 	local t = {
 		szOption = _L['Auto accept specific names'],
-		bCheck = true, bChecked = MY_RideRequest.bAcceptCustom,
+		bCheck = true, bChecked = O.bAcceptCustom,
 		fnAction = function()
-			MY_RideRequest.bAcceptCustom = not MY_RideRequest.bAcceptCustom
+			O.bAcceptCustom = not O.bAcceptCustom
 		end,
-		fnDisable = function() return not MY_RideRequest.bEnable end,
+		fnDisable = function() return not O.bEnable end,
 	}
-	for szName, bEnable in pairs(MY_RideRequest.tAcceptCustom) do
+	for szName, bEnable in pairs(O.tAcceptCustom) do
 		insert(t, {
 			szOption = szName,
 			bCheck = true, bChecked = bEnable,
 			fnAction = function()
-				MY_RideRequest.tAcceptCustom[szName] = not MY_RideRequest.tAcceptCustom[szName]
+				O.tAcceptCustom[szName] = not O.tAcceptCustom[szName]
 			end,
 			szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',
 			nFrame = 49,
@@ -150,10 +183,10 @@ function D.GetMenu()
 			nIconHeight = 17,
 			szLayer = 'ICON_RIGHTMOST',
 			fnClickIcon = function()
-				MY_RideRequest.tAcceptCustom[szName] = nil
+				O.tAcceptCustom[szName] = nil
 				UI.ClosePopupMenu()
 			end,
-			fnDisable = function() return not MY_RideRequest.bEnable or not MY_RideRequest.bAcceptCustom end,
+			fnDisable = function() return not O.bEnable or not O.bAcceptCustom end,
 		})
 	end
 	if #t ~= 0 then
@@ -164,28 +197,28 @@ function D.GetMenu()
 		fnAction = function()
 			GetUserInput(_L['Please input custom name, multiple split with ",[]":'], function(val)
 				for _, v in ipairs(LIB.SplitString(val, {',', '[', ']'}, true)) do
-					MY_RideRequest.tAcceptCustom[v] = true
+					O.tAcceptCustom[v] = true
 				end
 			end)
 		end,
-		fnDisable = function() return not MY_RideRequest.bEnable or not MY_RideRequest.bAcceptCustom end,
+		fnDisable = function() return not O.bEnable or not O.bAcceptCustom end,
 	})
 	insert(menu, t)
 	insert(menu, {
 		szOption = _L['Auto refuse others'],
-		bCheck = true, bChecked = MY_RideRequest.bRefuseOthers,
+		bCheck = true, bChecked = O.bRefuseOthers,
 		fnAction = function()
-			MY_RideRequest.bRefuseOthers = not MY_RideRequest.bRefuseOthers
+			O.bRefuseOthers = not O.bRefuseOthers
 		end,
-		fnDisable = function() return not MY_RideRequest.bEnable end,
+		fnDisable = function() return not O.bEnable end,
 	})
 	insert(menu, {
 		szOption = _L['Auto refuse unknown'],
-		bCheck = true, bChecked = MY_RideRequest.bRefuseUnknown,
+		bCheck = true, bChecked = O.bRefuseUnknown,
 		fnAction = function()
-			MY_RideRequest.bRefuseUnknown = not MY_RideRequest.bRefuseUnknown
+			O.bRefuseUnknown = not O.bRefuseUnknown
 		end,
-		fnDisable = function() return not MY_RideRequest.bEnable end,
+		fnDisable = function() return not O.bEnable end,
 	})
 	return menu
 end
@@ -335,6 +368,13 @@ end
 
 LIB.RegisterEvent('ON_MESSAGE_BOX_OPEN.MY_RideRequest' , D.OnMessageBoxOpen)
 
+LIB.RegisterInit('MY_RideRequest', function()
+	if D.tAcceptCustom then
+		O.tAcceptCustom = D.tAcceptCustom
+		D.tAcceptCustom = nil
+	end
+end)
+
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	x = x + ui:Append('WndComboBox', {
 		x = x, y = y, w = 120,
@@ -357,31 +397,17 @@ local settings = {
 		},
 		{
 			fields = {
-				bEnable = true,
-				bRefuseOthers = true,
-				bRefuseUnknown = true,
-				bAcceptTong = true,
-				bAcceptFriend = true,
-				bAcceptAll = true,
-				bAcceptCustom = true,
 				tAcceptCustom = true,
 			},
-			root = O,
+			root = D,
 		},
 	},
 	imports = {
 		{
 			fields = {
-				bEnable = true,
-				bRefuseOthers = true,
-				bRefuseUnknown = true,
-				bAcceptTong = true,
-				bAcceptFriend = true,
-				bAcceptAll = true,
-				bAcceptCustom = true,
 				tAcceptCustom = true,
 			},
-			root = O,
+			root = D,
 		},
 	},
 }

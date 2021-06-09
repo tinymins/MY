@@ -54,11 +54,15 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 local INI_PATH = PACKET_INFO.ROOT .. 'MY_TeamTools/ui/MY_EvokeRequest.ini'
+local O = LIB.CreateUserSettingsModule('MY_EvokeRequest', _L['MY_TeamTools'], {
+	bEnable = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_EvokeRequest'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+})
 local D = {}
-local O = {
-	bEnable = false,
-}
-RegisterCustomData('MY_EvokeRequest.bEnable')
 
 local EVOKE_MSG = {
 	['A2M'] = g_tStrings.MENTOR_APPRENTICE_EVOKE_MSG,

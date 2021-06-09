@@ -54,11 +54,15 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 local INI_PATH = PACKET_INFO.ROOT .. 'MY_TeamTools/ui/MY_SocialRequest.ini'
+local O = LIB.CreateUserSettingsModule('MY_SocialRequest', _L['MY_TeamTools'], {
+	bEnable = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_SocialRequest'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+})
 local D = {}
-local O = {
-	bEnable = false,
-}
-RegisterCustomData('MY_SocialRequest.bEnable')
 
 local REQUEST_MSG = {}
 local REQUEST_LIST = {}
