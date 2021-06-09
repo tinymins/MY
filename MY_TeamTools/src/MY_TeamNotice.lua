@@ -58,13 +58,32 @@ local TI = {
 	szNote = '',
 }
 
-MY_TeamNotice = {
-	bEnable = true,
-	nWidth = 320,
-	nHeight = 195,
-	anchor = { s = 'CENTER', r = 'CENTER', x = 0, y = 0 },
-}
-LIB.RegisterCustomData('MY_TeamNotice')
+local O = LIB.CreateUserSettingsModule('MY_TeamNotice', _L['MY_TeamTools'], {
+	bEnable = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TeamNotice'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	nWidth = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TeamNotice'],
+		xSchema = Schema.Number,
+		xDefaultValue = 320,
+	},
+	nHeight = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TeamNotice'],
+		xSchema = Schema.Number,
+		xDefaultValue = 195,
+	},
+	anchor = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TeamNotice'],
+		xSchema = Schema.FrameAnchor,
+		xDefaultValue = { s = 'CENTER', r = 'CENTER', x = 0, y = 0 },
+	},
+})
 
 function TI.SaveList()
 	LIB.SaveLUAData({'config/yy.jx3dat', PATH_TYPE.GLOBAL}, TI.tList, { indent = '\t', passphrase = false, crc = false })
@@ -95,9 +114,9 @@ function TI.CreateFrame(a, b)
 			if not ui then
 				return
 			end
-			MY_TeamNotice.nWidth  = ui:Width()
-			MY_TeamNotice.nHeight = ui:Height()
-			MY_TeamNotice.anchor  = ui:Anchor()
+			O.nWidth  = ui:Width()
+			O.nHeight = ui:Height()
+			O.anchor  = ui:Anchor()
 			local W, H = ui:Size(true)
 			ui:Fetch('YY'):Width(ui:Width() - 160)
 			local uiBtn = ui:Fetch('Btn_YY')
@@ -108,9 +127,9 @@ function TI.CreateFrame(a, b)
 			uiMessage:Size(W - 20, uiBtns:Top() - uiMessage:Top() - 10)
 		end
 		ui = UI.CreateFrame('MY_TeamNotice', {
-			w = MY_TeamNotice.nWidth, h = MY_TeamNotice.nHeight,
+			w = O.nWidth, h = O.nHeight,
 			text = _L['Team Message'],
-			anchor = MY_TeamNotice.anchor,
+			anchor = O.anchor,
 			simple = true, close = true, dragresize = true,
 			minwidth = 320, minheight = 195,
 			setting = function()
@@ -280,14 +299,14 @@ function TI.CreateFrame(a, b)
 					LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', {'reply', arg1, TI.szYY, TI.szNote})
 				end
 			elseif szEvent == 'UI_SCALED' then
-				ui:Anchor(MY_TeamNotice.anchor)
+				ui:Anchor(O.anchor)
 			elseif szEvent == 'TEAM_AUTHORITY_CHANGED' then
 				ui:Fetch('Btn_YY'):Text(LIB.IsLeader() and _L['Paste YY'] or _L['Copy YY'])
 			end
 		end
 		frame.OnFrameDragSetPosEnd = function()
 			this:CorrectPos()
-			MY_TeamNotice.anchor = GetFrameAnchor(this)
+			O.anchor = GetFrameAnchor(this)
 		end
 		PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
 	end
@@ -299,7 +318,7 @@ function TI.OpenFrame()
 	if LIB.IsInZombieMap() then
 		return LIB.Topmsg(_L['TeamNotice is disabled in this map.'])
 	end
-	MY_TeamNotice.bEnable = true
+	O.bEnable = true
 	if LIB.IsInParty() then
 		if LIB.IsLeader() then
 			TI.CreateFrame()
@@ -319,13 +338,13 @@ LIB.RegisterEvent('PARTY_LEVEL_UP_RAID.TEAM_NOTICE', function()
 	end
 	if LIB.IsLeader() then
 		LIB.Confirm(_L['Edit team info?'], function()
-			MY_TeamNotice.bEnable = true
+			O.bEnable = true
 			TI.CreateFrame()
 		end)
 	end
 end)
 LIB.RegisterEvent('FIRST_LOADING_END.TEAM_NOTICE', function()
-	if not MY_TeamNotice.bEnable then
+	if not O.bEnable then
 		return
 	end
 	-- 不存在队长不队长的问题了
@@ -354,7 +373,7 @@ LIB.RegisterEvent({'PARTY_DISBAND.TEAM_NOTICE', 'PARTY_DELETE_MEMBER.TEAM_NOTICE
 end)
 
 LIB.RegisterEvent('ON_BG_CHANNEL_MSG.LR_TeamNotice', function()
-	if not MY_TeamNotice.bEnable then
+	if not O.bEnable then
 		return
 	end
 	local szMsgID, nChannel, dwID, szName, aMsg, bSelf = arg0, arg1, arg2, arg3, arg4, arg2 == UI_GetClientPlayerID()
@@ -371,7 +390,7 @@ LIB.RegisterEvent('ON_BG_CHANNEL_MSG.LR_TeamNotice', function()
 end)
 
 LIB.RegisterBgMsg('TI', function(_, data, nChannel, dwID, szName, bIsSelf)
-	if not MY_TeamNotice.bEnable then
+	if not O.bEnable then
 		return
 	end
 	if not bIsSelf then
@@ -406,7 +425,30 @@ LIB.RegisterAddonMenu(function()
 	}}
 end)
 
-local ui = {
-	OpenFrame = TI.OpenFrame
+-- Global exports
+do
+local settings = {
+	exports = {
+		{
+			fields = {
+				OpenFrame = TI.OpenFrame,
+			},
+		},
+		{
+			fields = {
+				bEnable = true,
+			},
+			root = O,
+		},
+	},
+	imports = {
+		{
+			fields = {
+				bEnable = true,
+			},
+			root = O,
+		},
+	},
 }
-setmetatable(MY_TeamNotice, { __index = ui, __metatable = true })
+MY_TeamNotice = LIB.CreateModule(settings)
+end

@@ -54,17 +54,22 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 local SZ_INI = PACKET_INFO.ROOT .. 'MY_TeamTools/ui/MY_TeamTools_Achievement.ini'
-local D = {}
-local O = {
+local O = LIB.CreateUserSettingsModule('MY_TeamTools_Achievement', _L['MY_TeamTools'], {
+	bIntelligentHide = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TeamTools_Achievement'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+})
+local D = {
 	dwMapID = 0,
 	szSearch = '',
-	bIntelligentHide = true,
 	szSort = 'name',
 	szSortOrder = 'asc',
 	aAchievement = {},
 	aSearchAC = {},
 }
-RegisterCustomData('MY_TeamTools_Achievement.bIntelligentHide')
 
 local MAX_ALL_MAP_ACHI = 40
 local ACHIEVE_CACHE = {}
@@ -108,7 +113,7 @@ function D.GetColumns()
 			Compare = GeneCommonCompare('name'),
 		},
 	}
-	for _, dwAchieveID in ipairs(O.aAchievement) do
+	for _, dwAchieveID in ipairs(D.aAchievement) do
 		local achi = LIB.GetAchievement(dwAchieveID)
 		if achi then
 			insert(aCol, {
@@ -180,8 +185,8 @@ function D.GetDispColumns()
 end
 
 function D.UpdateSearchAC()
-	local info = g_tTable.DungeonInfo:Search(O.dwMapID)
-	O.aSearchAC = info
+	local info = g_tTable.DungeonInfo:Search(D.dwMapID)
+	D.aSearchAC = info
 		and LIB.SplitString(info.szBossInfo, ' ', true)
 		or {}
 	FireUIEvent('MY_TEAMTOOLS_ACHI_SEARCH_AC')
@@ -202,13 +207,13 @@ end
 
 function D.UpdateAchievementID()
 	local aAchievement = {}
-	if O.dwMapID == 0 then
+	if D.dwMapID == 0 then
 		local nCount = g_tTable.Achievement:GetRowCount()
 		for i = 2, nCount do
 			local achi = g_tTable.Achievement:GetRow(i)
 			if achi and achi.nVisible == 1 and achi.dwGeneral == 1
 			and (not O.bIntelligentHide or achi.dwSub ~= 10) -- 隐藏声望成就
-			and (IsEmpty(O.szSearch) or wfind(achi.szName, O.szSearch) or wfind(achi.szDesc, O.szSearch)) then
+			and (IsEmpty(D.szSearch) or wfind(achi.szName, D.szSearch) or wfind(achi.szDesc, D.szSearch)) then
 				insert(aAchievement, achi)
 				if #aAchievement >= MAX_ALL_MAP_ACHI then
 					break
@@ -216,11 +221,11 @@ function D.UpdateAchievementID()
 			end
 		end
 	else
-		for _, dwAchieveID in ipairs(LIB.GetMapAchievements(O.dwMapID) or CONSTANT.EMPTY_TABLE) do
+		for _, dwAchieveID in ipairs(LIB.GetMapAchievements(D.dwMapID) or CONSTANT.EMPTY_TABLE) do
 			local achi = LIB.GetAchievement(dwAchieveID)
 			if achi
 			and (not O.bIntelligentHide or achi.dwSub ~= 10) -- 隐藏声望成就
-			and (IsEmpty(O.szSearch) or wfind(achi.szName, O.szSearch) or wfind(achi.szDesc, O.szSearch)) then
+			and (IsEmpty(D.szSearch) or wfind(achi.szName, D.szSearch) or wfind(achi.szDesc, D.szSearch)) then
 				insert(aAchievement, achi)
 			end
 		end
@@ -229,7 +234,7 @@ function D.UpdateAchievementID()
 	for i, achi in ipairs(aAchievement) do
 		aAchievement[i] = achi.dwID
 	end
-	O.aAchievement = aAchievement
+	D.aAchievement = aAchievement
 	FireUIEvent('MY_TEAMTOOLS_ACHI')
 end
 
@@ -237,8 +242,8 @@ LIB.RegisterEvent('LOADING_ENDING', function()
 	if MY_TeamTools.IsOpened() then
 		return
 	end
-	O.dwMapID = GetClientPlayer().GetMapID()
-	O.szSearch = ''
+	D.dwMapID = GetClientPlayer().GetMapID()
+	D.szSearch = ''
 	D.UpdateSearchAC()
 	D.UpdateAchievementID()
 end)
@@ -352,7 +357,7 @@ end
 end
 
 function D.UpdateSelfData()
-	local aAchieveID, aCounterID = D.AnalysisAchievementRequest(O.aAchievement)
+	local aAchieveID, aCounterID = D.AnalysisAchievementRequest(D.aAchievement)
 	local me = GetClientPlayer()
 	if not ACHIEVE_CACHE[me.dwID] then
 		ACHIEVE_CACHE[me.dwID] = {}
@@ -371,7 +376,7 @@ end
 
 function D.RequestTeamData()
 	-- 计算强制请求和刷新请求列表
-	local aAchieveID, aCounterID = D.AnalysisAchievementRequest(O.aAchievement)
+	local aAchieveID, aCounterID = D.AnalysisAchievementRequest(D.aAchievement)
 	local aRequestID, aRefreshID, tRequestID = {}, {}, {}
 	local aTeamMemberList = D.GetTeamMemberList(true)
 	for _, dwID in ipairs(aTeamMemberList) do
@@ -546,7 +551,7 @@ end
 
 function D.UpdatePage(page)
 	UI(page):Fetch('Wnd_Total/WndAutocomplete_Map')
-		:Text(D.tMapName[O.dwMapID] or '', WNDEVENT_FIRETYPE.PREVENT)
+		:Text(D.tMapName[D.dwMapID] or '', WNDEVENT_FIRETYPE.PREVENT)
 
 	local hCols = page:Lookup('Wnd_Total/WndScroll_Stat', 'Handle_StatColumns')
 	hCols:Clear()
@@ -579,16 +584,16 @@ function D.UpdatePage(page)
 		hTitle:FormatAllItemPos()
 		imgAsc:SetRelX(nWidth - nSortDelta)
 		imgDesc:SetRelX(nWidth - nSortDelta)
-		if O.szSort == col.id then
+		if D.szSort == col.id then
 			Sorter = function(r1, r2)
-				if O.szSortOrder == 'asc' then
+				if D.szSortOrder == 'asc' then
 					return col.Compare(r1, r2) < 0
 				end
 				return col.Compare(r1, r2) > 0
 			end
 		end
-		imgAsc:SetVisible(O.szSort == col.id and O.szSortOrder == 'asc')
-		imgDesc:SetVisible(O.szSort == col.id and O.szSortOrder == 'desc')
+		imgAsc:SetVisible(D.szSort == col.id and D.szSortOrder == 'asc')
+		imgDesc:SetVisible(D.szSort == col.id and D.szSortOrder == 'desc')
 		hCol:FormatAllItemPos()
 		nX = nX + nWidth
 	end
@@ -651,7 +656,7 @@ function D.DelayUpdatePage(page)
 end
 
 function D.SetSearch(szSearch)
-	O.szSearch = szSearch
+	D.szSearch = szSearch
 	D.UpdateAchievementID()
 end
 
@@ -661,7 +666,7 @@ function D.OnInitPage()
 		insert(tMapMenu, {
 			szOption = _L['All map'],
 			fnAction = function()
-				O.dwMapID = 0
+				D.dwMapID = 0
 				D.UpdateSearchAC()
 				D.UpdateAchievementID()
 				D.RequestTeamData()
@@ -673,7 +678,7 @@ function D.OnInitPage()
 		insert(tMapMenu, {
 			szOption = _L['Current map'],
 			fnAction = function()
-				O.dwMapID = GetClientPlayer().GetMapID()
+				D.dwMapID = GetClientPlayer().GetMapID()
 				D.UpdateSearchAC()
 				D.UpdateAchievementID()
 				D.RequestTeamData()
@@ -686,7 +691,7 @@ function D.OnInitPage()
 				insert(tSub, {
 					szOption = info.szName,
 					fnAction = function()
-						O.dwMapID = info.dwID
+						D.dwMapID = info.dwID
 						D.UpdateSearchAC()
 						D.UpdateAchievementID()
 						D.RequestTeamData()
@@ -714,7 +719,7 @@ function D.OnInitPage()
 		name = 'WndAutocomplete_Map',
 		onchange = function(szText)
 			if D.tMapID[szText] then
-				O.dwMapID = D.tMapID[szText]
+				D.dwMapID = D.tMapID[szText]
 				D.UpdateSearchAC()
 				D.UpdateAchievementID()
 				D.RequestTeamData()
@@ -727,7 +732,7 @@ function D.OnInitPage()
 	nX = nX + UI(wnd):Append('WndAutocomplete', {
 		x = nX, y = 20, w = 200,
 		name = 'WndAutocomplete_Search',
-		text = O.szSearch,
+		text = D.szSearch,
 		placeholder = _L['Search'],
 		onchange = function(szText)
 			LIB.Debounce(
@@ -737,7 +742,7 @@ function D.OnInitPage()
 				szText)
 			LIB.Debounce('MY_TeamTools_Achievement_RequestTeamData', 2000, D.RequestTeamData)
 		end,
-		autocomplete = {{'option', 'source', O.aSearchAC}},
+		autocomplete = {{'option', 'source', D.aSearchAC}},
 		onclick = function() UI(this):Autocomplete('search', '') end,
 		onblur = function()
 			D.RequestTeamData()
@@ -788,7 +793,7 @@ function D.OnEvent(event)
 	if event == 'MY_TEAMTOOLS_ACHI' then
 		D.DelayUpdatePage(this)
 	elseif event == 'MY_TEAMTOOLS_ACHI_SEARCH_AC' then
-		UI(this):Fetch('Wnd_Total/WndAutocomplete_Search'):Autocomplete('option', 'source', O.aSearchAC)
+		UI(this):Fetch('Wnd_Total/WndAutocomplete_Search'):Autocomplete('option', 'source', D.aSearchAC)
 	elseif event == 'ON_MY_MOSAICS_RESET' then
 		D.UpdatePage(this)
 	elseif event == 'NEW_ACHIEVEMENT' or event == 'SYNC_ACHIEVEMENT_DATA'
@@ -823,10 +828,10 @@ function D.OnItemLButtonClick()
 			end
 		elseif this.col.id then
 			local page = this:GetParent():GetParent():GetParent():GetParent():GetParent()
-			if O.szSort == this.col.id then
-				O.szSortOrder = O.szSortOrder == 'asc' and 'desc' or 'asc'
+			if D.szSort == this.col.id then
+				D.szSortOrder = D.szSortOrder == 'asc' and 'desc' or 'asc'
 			else
-				O.szSort = this.col.id
+				D.szSort = this.col.id
 			end
 			D.UpdatePage(page)
 		end

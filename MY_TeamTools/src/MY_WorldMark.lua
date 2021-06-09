@@ -55,7 +55,6 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
-local D = {}
 local WM_LIST = {
 	[20107] = { id = 1,  col = { 255, 255, 255 } },
 	[20108] = { id = 2,  col = { 255, 128, 0   } },
@@ -70,10 +69,15 @@ local WM_LIST = {
 }
 local WM_POINT  = {}
 
-MY_WorldMark = {
-	bEnable = true
-}
-LIB.RegisterCustomData('MY_WorldMark')
+local O = LIB.CreateUserSettingsModule('MY_WorldMark', _L['MY_TeamTools'], {
+	bEnable = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_WorldMark'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+})
+local D = {}
 
 function D.OnNpcEvent()
 	local npc = GetNpc(arg0)
@@ -148,7 +152,7 @@ function D.Draw(Point, sha, col)
 end
 
 function D.GetEvent()
-	if MY_WorldMark.bEnable and not LIB.IsShieldedVersion('MY_WorldMark') then
+	if O.bEnable and not LIB.IsShieldedVersion('MY_WorldMark') then
 		return {
 			{'DO_SKILL_CAST', D.OnDoSkillCast},
 			{'NPC_LEAVE_SCENE', D.OnNpcLeave},
@@ -161,7 +165,7 @@ function D.GetEvent()
 	end
 end
 
-function MY_WorldMark.CheckEnable()
+function D.CheckEnable()
 	LIB.RegisterModuleEvent('MY_WorldMark', D.GetEvent())
 end
 
@@ -169,6 +173,35 @@ LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_WorldMark', function()
 	if arg0 and arg0 ~= 'MY_WorldMark' then
 		return
 	end
-	MY_WorldMark.CheckEnable()
+	D.CheckEnable()
 end)
-LIB.RegisterInit('MY_WorldMark', MY_WorldMark.CheckEnable)
+LIB.RegisterInit('MY_WorldMark', D.CheckEnable)
+
+
+-- Global exports
+do
+local settings = {
+	exports = {
+		{
+			fields = {
+				CheckEnable = D.CheckEnable,
+			},
+		},
+		{
+			fields = {
+				bEnable = true,
+			},
+			root = O,
+		},
+	},
+	imports = {
+		{
+			fields = {
+				bEnable = true,
+			},
+			root = O,
+		},
+	},
+}
+MY_WorldMark = LIB.CreateModule(settings)
+end
