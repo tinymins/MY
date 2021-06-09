@@ -90,13 +90,13 @@ local function CreateBuffList(dwID, nLevel, col, tArgs, szSender, szReceiver)
 	local buff = GetBuff(GetClientPlayer(), dwID, level)
 	if buff then
 		local ui, bScale
-		if O.handle:Lookup(key) then
-			ui = O.handle:Lookup(key)
+		if D.handle:Lookup(key) then
+			ui = D.handle:Lookup(key)
 		else
-			if O.handle:GetItemCount() >= O.nCount then
+			if D.handle:GetItemCount() >= O.nCount then
 				return
 			end
-			ui =  O.handle:AppendItemFromData(O.hItem, key)
+			ui = D.handle:AppendItemFromData(D.hItem, key)
 			bScale = true
 		end
 		local szName, nIcon = LIB.GetBuffName(dwID, nLevel)
@@ -121,7 +121,7 @@ local function CreateBuffList(dwID, nLevel, col, tArgs, szSender, szReceiver)
 		end
 		ui.bDelete = nil
 		ui:SetAlpha(255)
-		O.handle:FormatAllItemPos()
+		D.handle:FormatAllItemPos()
 	end
 end
 
@@ -131,9 +131,9 @@ function D.OnFrameCreate()
 	this:RegisterEvent('ON_LEAVE_CUSTOM_UI_MODE')
 	this:RegisterEvent('MY_TM_BL_CREATE')
 	this:RegisterEvent('MY_TM_BL_RESIZE')
-	O.hItem = this:CreateItemData(BL_INIFILE, 'Handle_Item')
-	O.handle = this:Lookup('', '')
-	O.handle:Clear()
+	D.hItem = this:CreateItemData(BL_INIFILE, 'Handle_Item')
+	D.handle = this:Lookup('', '')
+	D.handle:Clear()
 	D.ReSize(O.fScale, O.nCount)
 	D.UpdateAnchor(this)
 end
@@ -175,14 +175,14 @@ end
 function D.OnFrameBreathe()
 	local me = GetClientPlayer()
 	if not me then return end
-	for i = O.handle:GetItemCount() -1, 0, -1 do
-		local h = O.handle:Lookup(i)
+	for i = D.handle:GetItemCount() -1, 0, -1 do
+		local h = D.handle:Lookup(i)
 		if h and h:IsValid() then
 			if h.bDelete then
 				local nAlpha = h:GetAlpha()
 				if nAlpha == 0 then
-					O.handle:RemoveItem(h)
-					O.handle:FormatAllItemPos()
+					D.handle:RemoveItem(h)
+					D.handle:FormatAllItemPos()
 				else
 					h:SetAlpha(max(0, nAlpha - 30))
 					h:Lookup('Animate_Update'):SetAlpha(0)
@@ -231,9 +231,9 @@ function D.ReSize(fScale, nCount)
 	end
 	nCount = nCount or O.nCount
 	this:SetSize(nCount * 55 * O.fScale, 90 * O.fScale)
-	O.handle:SetSize(nCount * 55 * O.fScale, 90 * O.fScale)
+	D.handle:SetSize(nCount * 55 * O.fScale, 90 * O.fScale)
 	O.nCount = nCount
-	O.handle:FormatAllItemPos()
+	D.handle:FormatAllItemPos()
 end
 
 function D.UpdateAnchor(frame)

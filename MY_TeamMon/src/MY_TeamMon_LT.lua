@@ -97,8 +97,8 @@ function D.OnFrameCreate()
 	this:RegisterEvent('UI_SCALED')
 	this:RegisterEvent('MY_TM_LARGE_TEXT')
 	D.UpdateAnchor(this)
-	O.frame = this
-	O.txt = this:Lookup('', 'Text_Total')
+	D.frame = this
+	D.txt = this:Lookup('', 'Text_Total')
 end
 
 function D.OnEvent(szEvent)
@@ -107,11 +107,11 @@ function D.OnEvent(szEvent)
 			return
 		end
 		if szEvent == 'ON_LEAVE_CUSTOM_UI_MODE' then
-			O.frame:Hide()
+			D.frame:Hide()
 		else
-			O.frame:FadeIn(0)
-			O.frame:SetAlpha(255)
-			O.frame:Show()
+			D.frame:FadeIn(0)
+			D.frame:SetAlpha(255)
+			D.frame:Show()
 		end
 		UpdateCustomModeWindow(this, _L['MY_TeamMon_LT'], true)
 	elseif szEvent == 'UI_SCALED' then
@@ -136,7 +136,7 @@ function D.UpdateAnchor(frame)
 end
 
 function D.Init()
-	return O.frame or Wnd.OpenWindow(INIFILE, 'MY_TeamMon_LT')
+	return D.frame or Wnd.OpenWindow(INIFILE, 'MY_TeamMon_LT')
 end
 
 function D.UpdateText(txt, col)
@@ -146,13 +146,13 @@ function D.UpdateText(txt, col)
 	if not col then
 		col = { 255, 128, 0 }
 	end
-	O.txt:SetText(txt)
-	O.txt:SetFontScheme(O.dwFontScheme)
-	O.txt:SetFontScale(O.fScale)
-	O.txt:SetFontColor(unpack(col))
-	O.frame:FadeIn(0)
-	O.frame:SetAlpha(255)
-	O.frame:Show()
+	D.txt:SetText(txt)
+	D.txt:SetFontScheme(O.dwFontScheme)
+	D.txt:SetFontScale(O.fScale)
+	D.txt:SetFontColor(unpack(col))
+	D.frame:FadeIn(0)
+	D.frame:SetAlpha(255)
+	D.frame:Show()
 	O.nTime = GetTime()
 	LIB.BreatheCall('MY_TeamMon_LT', D.OnBreathe)
 end
@@ -161,7 +161,7 @@ function D.OnBreathe()
 	local nTime = GetTime()
 	if O.nTime and (nTime - O.nTime) / 1000 > O.fPause then
 		O.nTime = nil
-		O.frame:FadeOut(O.fFadeOut * 10)
+		D.frame:FadeOut(O.fFadeOut * 10)
 		LIB.BreatheCall('MY_TeamMon_LT', false)
 	end
 end

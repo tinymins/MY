@@ -84,11 +84,11 @@ function D.OnFrameCreate()
 	this:RegisterEvent('ON_LEAVE_CUSTOM_UI_MODE')
 	this:RegisterEvent('TARGET_CHANGE')
 	this:RegisterEvent('MY_TM_PARTY_BUFF_LIST')
-	O.hItem = this:CreateItemData(PBL_INI_FILE, 'Handle_Item')
-	O.frame = this
-	O.handle = this:Lookup('', 'Handle_List')
-	O.bg = this:Lookup('', 'Image_Bg')
-	O.handle:Clear()
+	D.hItem = this:CreateItemData(PBL_INI_FILE, 'Handle_Item')
+	D.frame = this
+	D.handle = this:Lookup('', 'Handle_List')
+	D.bg = this:Lookup('', 'Image_Bg')
+	D.handle:Clear()
 	this:Lookup('', 'Text_Title'):SetText(_L['MY_TeamMon_PBL'])
 	D.UpdateAnchor(this)
 end
@@ -103,11 +103,11 @@ function D.OnEvent(event)
 	elseif event == 'ON_ENTER_CUSTOM_UI_MODE' or event == 'ON_LEAVE_CUSTOM_UI_MODE' then
 		UpdateCustomModeWindow(this, _L['MY_TeamMon_PBL'])
 		if event == 'ON_ENTER_CUSTOM_UI_MODE' then
-			O.frame:Show()
+			D.frame:Show()
 		else
-			D.SwitchPanel(O.handle:GetItemCount())
-			O.frame:EnableDrag(true) -- 还是支持拖动的
-			O.frame:SetDragArea(0, 0, 200, 30)
+			D.SwitchPanel(D.handle:GetItemCount())
+			D.frame:EnableDrag(true) -- 还是支持拖动的
+			D.frame:SetDragArea(0, 0, 200, 30)
 		end
 	end
 end
@@ -122,8 +122,8 @@ function D.OnFrameBreathe()
 	elseif dwKungfuID == 10028 then -- 奶花修正
 		DISTANCE = 24
 	end
-	for i = O.handle:GetItemCount() -1, 0, -1 do
-		local h = O.handle:Lookup(i)
+	for i = D.handle:GetItemCount() -1, 0, -1 do
+		local h = D.handle:Lookup(i)
 		if h and h:IsValid() then
 			local data = h.data
 			local p, info = D.GetPlayer(data.dwID)
@@ -151,9 +151,9 @@ function D.OnFrameBreathe()
 					box:SetOverText(0, buff.nStackNum)
 				end
 			else
-				O.handle:RemoveItem(h)
-				O.handle:FormatAllItemPos()
-				D.SwitchPanel(O.handle:GetItemCount())
+				D.handle:RemoveItem(h)
+				D.handle:FormatAllItemPos()
+				D.SwitchPanel(D.handle:GetItemCount())
 			end
 		end
 	end
@@ -169,7 +169,7 @@ function D.OnLButtonClick()
 		}
 		PopupMenu(menu)
 	elseif szName == 'Btn_Close' then
-		O.handle:Clear()
+		D.handle:Clear()
 		D.SwitchPanel(0)
 	end
 end
@@ -209,7 +209,7 @@ function D.OnFrameDragEnd()
 end
 
 function D.OpenPanel()
-	local frame = O.frame or Wnd.OpenWindow(PBL_INI_FILE, 'MY_TeamMon_PBL')
+	local frame = D.frame or Wnd.OpenWindow(PBL_INI_FILE, 'MY_TeamMon_PBL')
 	D.SwitchPanel(0)
 end
 
@@ -221,8 +221,8 @@ end
 
 function D.SwitchSelect()
 	local dwType, dwID = Target_GetTargetData()
-	for i = O.handle:GetItemCount() -1, 0, -1 do
-		local h = O.handle:Lookup(i)
+	for i = D.handle:GetItemCount() -1, 0, -1 do
+		local h = D.handle:Lookup(i)
 		if h and h:IsValid() then
 			local sel = h:Lookup('Image_Select')
 			if sel and sel:IsValid() then
@@ -238,19 +238,19 @@ end
 
 function D.SwitchPanel(nCount)
 	local h = 40
-	O.frame:SetH(h * nCount + 30)
-	O.bg:SetH(h * nCount + 30)
-	O.handle:SetH(h * nCount)
+	D.frame:SetH(h * nCount + 30)
+	D.bg:SetH(h * nCount + 30)
+	D.handle:SetH(h * nCount)
 	if nCount == 0 then
-		O.frame:Hide()
+		D.frame:Hide()
 	else
-		O.frame:Show()
+		D.frame:Show()
 	end
 end
 
 function D.ClosePanel()
-	Wnd.CloseWindow(O.frame)
-	O.frame = nil
+	Wnd.CloseWindow(D.frame)
+	D.frame = nil
 end
 
 function D.GetPlayer(dwID)
@@ -292,16 +292,16 @@ function D.OnTableInsert(dwID, dwBuffID, nLevel, nIcon)
 	-- 判断是否有8帧之内的气劲 如果有则排序时候应当拥有相同的权重（解决不同客户端同步团队BUFF顺序不一致的问题）
 	local nLFC = GetLogicFrameCount()
 	local nSortLFC = nLFC
-	for i = O.handle:GetItemCount() - 1, 0, -1 do
-		local hItem = O.handle:Lookup(i)
+	for i = D.handle:GetItemCount() - 1, 0, -1 do
+		local hItem = D.handle:Lookup(i)
 		if nLFC - hItem.nLFC <= GLOBAL.GAME_FPS / 2 and nLFC - hItem.nSortLFC <= GLOBAL.GAME_FPS / 2 then
 			nSortLFC = hItem.nSortLFC
 			break
 		end
 	end
 	local data = { dwID = dwID, dwBuffID = dwBuffID, nLevel = nLevel }
-	local h = O.handle:AppendItemFromData(O.hItem)
-	local nCount = O.handle:GetItemCount()
+	local h = D.handle:AppendItemFromData(D.hItem)
+	local nCount = D.handle:GetItemCount()
 	if dwTargetID == dwID then
 		h:Lookup('Image_Select'):Show()
 	end
@@ -332,8 +332,8 @@ function D.OnTableInsert(dwID, dwBuffID, nLevel, nIcon)
 	h.nLFC = nLFC
 	h.nSortLFC = nSortLFC
 	h:Show()
-	O.handle:Sort()
-	O.handle:FormatAllItemPos()
+	D.handle:Sort()
+	D.handle:FormatAllItemPos()
 	D.SwitchPanel(nCount)
 	CACHE_LIST[key] = h
 end

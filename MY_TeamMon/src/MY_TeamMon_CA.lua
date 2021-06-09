@@ -68,7 +68,7 @@ local D = {}
 
 -- FireUIEvent('MY_TM_CA_CREATE', 'test', 3)
 local function CreateCentralAlert(szMsg, nTime, bXml)
-	local msg = O.msg
+	local msg = D.msg
 	nTime = nTime or 3
 	msg:Clear()
 	if not bXml then
@@ -78,11 +78,11 @@ local function CreateCentralAlert(szMsg, nTime, bXml)
 	msg:FormatAllItemPos()
 	local w, h = msg:GetAllItemSize()
 	msg:SetRelPos((480 - w) / 2, (45 - h) / 2 - 1)
-	O.handle:FormatAllItemPos()
+	D.handle:FormatAllItemPos()
 	msg.nTime   = nTime
 	msg.nCreate = GetTime()
-	O.frame:SetAlpha(255)
-	O.frame:Show()
+	D.frame:SetAlpha(255)
+	D.frame:Show()
 end
 
 function D.OnFrameCreate()
@@ -90,27 +90,27 @@ function D.OnFrameCreate()
 	this:RegisterEvent('ON_ENTER_CUSTOM_UI_MODE')
 	this:RegisterEvent('ON_LEAVE_CUSTOM_UI_MODE')
 	this:RegisterEvent('MY_TM_CA_CREATE')
-	O.frame  = this
-	O.handle = this:Lookup('', '')
-	O.msg    = this:Lookup('', 'MessageBox')
+	D.frame  = this
+	D.handle = this:Lookup('', '')
+	D.msg    = this:Lookup('', 'MessageBox')
 	D.UpdateAnchor(this)
 end
 
 function D.OnFrameRender()
 	local nNow = GetTime()
-	if O.msg.nCreate then
-		local nTime = ((nNow - O.msg.nCreate) / 1000)
-		local nLeft  = O.msg.nTime - nTime
+	if D.msg.nCreate then
+		local nTime = ((nNow - D.msg.nCreate) / 1000)
+		local nLeft  = D.msg.nTime - nTime
 		if nLeft < 0 then
-			O.msg.nCreate = nil
-			O.frame:Hide()
+			D.msg.nCreate = nil
+			D.frame:Hide()
 		else
 			local nTimeLeft = nTime * 1000 % 750
 			local nAlpha = 50 * nTimeLeft / 750
 			if floor(nTime / 0.75) % 2 == 1 then
 				nAlpha = 50 - nAlpha
 			end
-			O.frame:SetAlpha(255 - nAlpha)
+			D.frame:SetAlpha(255 - nAlpha)
 		end
 	end
 end
