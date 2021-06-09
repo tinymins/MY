@@ -1012,6 +1012,7 @@ end
 local PS = {}
 function PS.OnPanelActive(frame)
 	local ui = UI(frame)
+	local W, H = ui:Size()
 	local X, Y = 20, 10
 	local x, y = X, Y
 	local deltaY = 28
@@ -1353,7 +1354,7 @@ function PS.OnPanelActive(frame)
 
 	if IsFileExist(COMBAT_TEXT_CONFIG) then
 		ui:Append('WndButton', {
-			x = 460, y = 15, w = 120,
+			x = W - 120 - X, y = 15, w = 120, h = 40,
 			text = _L['Load CombatText Config'],
 			buttonstyle = 'SKEUOMORPHISM_LACE_BORDER',
 			onclick = CombatText.CheckEnable,
