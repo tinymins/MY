@@ -54,20 +54,38 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
-local O = {
-	bEnable = false, -- 数据记录总开关
-	nMaxHistory = 300, -- 最大历史数据数量
-	nMinFightTime = 30, -- 最小战斗时间
-	bOnlyDungeon = true, -- 仅在秘境中启用
-	bOnlySelf = true, -- 仅记录和自己有关的
-}
-RegisterCustomData('MY_CombatLogs.bEnable')
-RegisterCustomData('MY_CombatLogs.nMaxHistory')
-RegisterCustomData('MY_CombatLogs.nMinFightTime')
-RegisterCustomData('MY_CombatLogs.bOnlyDungeon')
-RegisterCustomData('MY_CombatLogs.bOnlySelf')
-
-
+local O = LIB.CreateUserSettingsModule('MY_CombatLogs', _L['MY_TeamTools'], {
+	bEnable = { -- 数据记录总开关
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_CombatLogs'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	nMaxHistory = { -- 最大历史数据数量
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_CombatLogs'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = 300,
+	},
+	nMinFightTime = { -- 最小战斗时间
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_CombatLogs'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = 30,
+	},
+	bOnlyDungeon = { -- 仅在秘境中启用
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_CombatLogs'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bOnlySelf = { -- 仅记录和自己有关的
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_CombatLogs'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+})
 local D = {}
 local DS_ROOT = {'userdata/combat_logs/', PATH_TYPE.ROLE}
 
