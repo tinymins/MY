@@ -57,27 +57,63 @@ end
 local INI_PATH = PACKET_INFO.ROOT .. 'MY_Target/ui/MY_TargetLine.ini'
 local IMG_PATH = PACKET_INFO.ROOT .. 'MY_Target/img/MY_TargetLine.uitex'
 
-local O = {
-	bTarget       = false,         -- 启用目标追踪线
-	bTargetRL     = true,          -- 启用新版连线
-	bTTarget      = false,         -- 显示目标与目标的目标连接线
-	bTTargetRL    = true,          -- 启用新版连线
-	bAtHead       = true,          -- 连接线从头部开始
-	nLineWidth    = 3,             -- 连接线宽度
-	nLineAlpha    = 150,           -- 连接线不透明度
-	tTargetColor  = { 0, 255, 0 }, -- 颜色
-	tTTargetColor = { 255, 0, 0 }, -- 颜色
-}
+local O = LIB.CreateUserSettingsModule('MY_TargetLine', _L['MY_Target'], {
+	bTarget = { -- 启用目标追踪线
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TargetLine'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bTargetRL = { -- 启用新版连线
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TargetLine'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bTTarget = { -- 显示目标与目标的目标连接线
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TargetLine'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bTTargetRL = { -- 启用新版连线
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TargetLine'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bAtHead = { -- 连接线从头部开始
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TargetLine'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	nLineWidth = { -- 连接线宽度
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TargetLine'],
+		xSchema = Schema.Number,
+		xDefaultValue = 3,
+	},
+	nLineAlpha = { -- 连接线不透明度
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TargetLine'],
+		xSchema = Schema.Number,
+		xDefaultValue = 150,
+	},
+	tTargetColor = { -- 颜色
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TargetLine'],
+		xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+		xDefaultValue = { 0, 255, 0 },
+	},
+	tTTargetColor = { -- 颜色
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TargetLine'],
+		xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+		xDefaultValue = { 255, 0, 0 },
+	},
+})
 local C, D = {}, {}
-
-RegisterCustomData('MY_TargetLine.bTarget')
-RegisterCustomData('MY_TargetLine.bTargetRL')
-RegisterCustomData('MY_TargetLine.bTTarget')
-RegisterCustomData('MY_TargetLine.bTTargetRL')
-RegisterCustomData('MY_TargetLine.nLineWidth')
-RegisterCustomData('MY_TargetLine.nLineAlpha')
-RegisterCustomData('MY_TargetLine.tTargetColor')
-RegisterCustomData('MY_TargetLine.tTTargetColor')
 
 function D.RequireRerender()
 	C.bReRender = true

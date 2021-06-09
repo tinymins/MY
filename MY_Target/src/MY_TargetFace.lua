@@ -55,36 +55,87 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
-local O = {
-	bTargetFace        = false,           -- 是否画出目标面向
-	bTTargetFace       = false,           -- 是否画出目标的目标的面向
-	nSectorDegree      = 110,             -- 扇形角度
-	nSectorRadius      = 6,               -- 扇形半径（尺）
-	nSectorAlpha       = 80,              -- 扇形透明度
-	tTargetFaceColor   = { 255, 0, 128 }, -- 目标面向颜色
-	tTTargetFaceColor  = { 0, 128, 255 }, -- 目标的目标面向颜色
-	bTargetShape       = false,           -- 目标脚底圈圈
-	bTTargetShape      = false,           -- 目标的目标脚底圈圈
-	nShapeRadius       = 2,               -- 脚底圈圈半径
-	nShapeAlpha        = 100,             -- 脚底圈圈透明度
-	tTargetShapeColor  = { 255, 0, 0 },   -- 目标脚底圈圈颜色
-	tTTargetShapeColor = { 0, 0, 255 },   -- 目标的目标脚底圈圈颜色
-}
+local O = LIB.CreateUserSettingsModule('MY_TargetFace', _L['MY_Target'], {
+	bTargetFace = { -- 是否画出目标面向
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TargetFace'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bTTargetFace = { -- 是否画出目标的目标的面向
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TargetFace'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	nSectorDegree = { -- 扇形角度
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TargetFace'],
+		xSchema = Schema.Number,
+		xDefaultValue = 110,
+	},
+	nSectorRadius = { -- 扇形半径（尺）
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TargetFace'],
+		xSchema = Schema.Number,
+		xDefaultValue = 6,
+	},
+	nSectorAlpha = { -- 扇形透明度
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TargetFace'],
+		xSchema = Schema.Number,
+		xDefaultValue = 80,
+	},
+	tTargetFaceColor = { -- 目标面向颜色
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TargetFace'],
+		xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+		xDefaultValue = { 255, 0, 128 },
+	},
+	tTTargetFaceColor = { -- 目标的目标面向颜色
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TargetFace'],
+		xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+		xDefaultValue = { 0, 128, 255 },
+	},
+	bTargetShape = { -- 目标脚底圈圈
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TargetFace'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bTTargetShape = { -- 目标的目标脚底圈圈
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TargetFace'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	nShapeRadius = { -- 脚底圈圈半径
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TargetFace'],
+		xSchema = Schema.Number,
+		xDefaultValue = 2,
+	},
+	nShapeAlpha = { -- 脚底圈圈透明度
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TargetFace'],
+		xSchema = Schema.Number,
+		xDefaultValue = 100,
+	},
+	tTargetShapeColor = { -- 目标脚底圈圈颜色
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TargetFace'],
+		xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+		xDefaultValue = { 255, 0, 0 },
+	},
+	tTTargetShapeColor = { -- 目标的目标脚底圈圈颜色
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TargetFace'],
+		xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+		xDefaultValue = { 0, 0, 255 },
+	},
+})
 local C, D = {}, {}
-
-RegisterCustomData('MY_TargetFace.bTargetFace')
-RegisterCustomData('MY_TargetFace.bTTargetFace')
-RegisterCustomData('MY_TargetFace.nSectorDegree')
-RegisterCustomData('MY_TargetFace.nSectorRadius')
-RegisterCustomData('MY_TargetFace.nSectorAlpha')
-RegisterCustomData('MY_TargetFace.tTargetFaceColor')
-RegisterCustomData('MY_TargetFace.tTTargetFaceColor')
-RegisterCustomData('MY_TargetFace.bTargetShape')
-RegisterCustomData('MY_TargetFace.bTTargetShape')
-RegisterCustomData('MY_TargetFace.nShapeRadius')
-RegisterCustomData('MY_TargetFace.nShapeAlpha')
-RegisterCustomData('MY_TargetFace.tTargetShapeColor')
-RegisterCustomData('MY_TargetFace.tTTargetShapeColor')
 
 function D.RequireRerender()
 	C.bReRender = true

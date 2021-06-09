@@ -57,16 +57,27 @@ end
 local INI_PATH = PACKET_INFO.ROOT .. 'MY_Target/ui/MY_TargetDirection.ini'
 local IMG_PATH = PACKET_INFO.ROOT .. 'MY_Target/img/MY_TargetDirection.uitex'
 
-local O = {
-	bEnable = false,
-	tAnchor = {},
-	eDistanceType = 'global',
-}
+local O = LIB.CreateUserSettingsModule('MY_TargetDirection', _L['MY_Target'], {
+	bEnable = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TargetDirection'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	tAnchor = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TargetDirection'],
+		xSchema = Schema.FrameAnchor,
+		xDefaultValue = { s = 'CENTER', r = 'CENTER', x = 250, y = 100 },
+	},
+	eDistanceType = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TargetDirection'],
+		xSchema = Schema.String,
+		xDefaultValue = 'global',
+	},
+})
 local D = {}
-
-RegisterCustomData('MY_TargetDirection.bEnable')
-RegisterCustomData('MY_TargetDirection.tAnchor')
-RegisterCustomData('MY_TargetDirection.eDistanceType')
 
 function D.GetFrame()
 	return Station.Lookup('Normal/MY_TargetDirection')
@@ -90,11 +101,7 @@ function D.UpdateAnchor()
 		return
 	end
 	local a = O.tAnchor
-	if not IsEmpty(a) then
-		frame:SetPoint(a.s, 0, 0, a.r, a.x, a.y)
-	else
-		frame:SetPoint('CENTER', 0, 0, 'CENTER', 250, 100)
-	end
+	frame:SetPoint(a.s, 0, 0, a.r, a.x, a.y)
 	frame:CorrectPos()
 end
 
@@ -218,6 +225,11 @@ function D.OnFrameDragEnd()
 	this:CorrectPos()
 	O.tAnchor = GetFrameAnchor(this)
 end
+
+LIB.RegisterInit('MY_TargetDirection', function()
+	D.CheckEnable()
+	D.UpdateAnchor()
+end)
 
 -- Global exports
 do
