@@ -401,7 +401,9 @@ local function GetComponentElement(raw, elementType)
 			element = raw
 		end
 	elseif elementType == 'INNER_RAW' then -- 获取可设置内部大小的子组件
-		if componentType == 'WndTrackbar' then
+		if componentType == 'WndFrame' then
+			element = GetComponentElement(raw, 'MAIN_WINDOW')
+		elseif componentType == 'WndTrackbar' then
 			element = raw:Lookup('WndNewScrollBar_Default')
 		elseif componentType == 'CheckBox' then
 			element = raw:Lookup('Image_Default')
