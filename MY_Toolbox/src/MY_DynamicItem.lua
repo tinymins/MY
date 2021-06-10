@@ -56,20 +56,41 @@ end
 
 local SZ_INI = PLUGIN_ROOT .. '/ui/MY_DynamicItem.ini'
 
-local D = {}
-local O = {
-	bEnable = false,
-	bShowBg = true,
-	nNum = 16,
-	nCol = 16,
-	anchor = { s = 'BOTTOMCENTER', r = 'BOTTOMCENTER', x = 26, y = -226 },
+local O = LIB.CreateUserSettingsModule('MY_DynamicItem', _L['MY_Toolbox'], {
+	bEnable = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_DynamicItem'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bShowBg = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_DynamicItem'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	nNum = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_DynamicItem'],
+		xSchema = Schema.Number,
+		xDefaultValue = 16,
+	},
+	nCol = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_DynamicItem'],
+		xSchema = Schema.Number,
+		xDefaultValue = 16,
+	},
+	anchor = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_DynamicItem'],
+		xSchema = Schema.FrameAnchor,
+		xDefaultValue = { s = 'BOTTOMCENTER', r = 'BOTTOMCENTER', x = 26, y = -226 },
+	},
+})
+local D = {
 	aList = {},
 }
-RegisterCustomData('MY_DynamicItem.bEnable')
-RegisterCustomData('MY_DynamicItem.bShowBg')
-RegisterCustomData('MY_DynamicItem.nNum')
-RegisterCustomData('MY_DynamicItem.nCol')
-RegisterCustomData('MY_DynamicItem.anchor')
 
 local MAP_NAME_FIX = setmetatable({
 	[296] = 297, -- ÁúÃÅ¾ø¾³
@@ -101,12 +122,12 @@ end
 function D.SaveMapConfig()
 	LIB.SaveLUAData(
 		{'userdata/dynamic_item/' .. D.GetMapID() .. '.jx3dat', PATH_TYPE.GLOBAL},
-		O.aList,
+		D.aList,
 		{ passphrase = false, crc = false })
 end
 
 function D.LoadMapConfig()
-	O.aList = LIB.LoadLUAData(
+	D.aList = LIB.LoadLUAData(
 		{'userdata/dynamic_item/' .. D.GetMapID() .. '.jx3dat', PATH_TYPE.GLOBAL},
 		{ passphrase = false })
 		or LIB.LoadLUAData(PLUGIN_ROOT .. '/data/dynamic_item/' .. D.GetMapID() .. '.jx3dat')
@@ -233,7 +254,7 @@ function D.UpdateListCD(frame)
 	for i = 1, O.nNum do
 		local hItem = hList:Lookup(i - 1)
 		local box = hItem:Lookup('Box_Item')
-		local data, nTime = O.aList[i], 0
+		local data, nTime = D.aList[i], 0
 		if data then
 			if data[1] == UI_OBJECT.ITEM_INFO then
 				nTime = UpdataItemCDProgress(me, box, 0, data[2], data[3]) or 0
@@ -250,7 +271,7 @@ function D.UpdateList(frame)
 	for i = 1, O.nNum do
 		local hItem = hList:Lookup(i - 1)
 		local box = hItem:Lookup('Box_Item')
-		local data = O.aList[i]
+		local data = D.aList[i]
 		if data then
 			if data[1] == UI_OBJECT.ITEM_INFO then
 				local nAmount = LIB.GetItemAmount(data[2], data[3], data[4])
@@ -299,7 +320,7 @@ function D.ParseBoxItem(box)
 			end
 		end
 	end
-	O.aList[box.nIndex] = tItem or {}
+	D.aList[box.nIndex] = tItem or {}
 end
 
 function D.UpdateHotKey(frame)

@@ -54,23 +54,51 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
+local O = LIB.CreateUserSettingsModule('MY_Domesticate', _L['MY_Toolbox'], {
+	bAlert = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Domesticate'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	nAlertNum = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Domesticate'],
+		xSchema = Schema.Number,
+		xDefaultValue = 100,
+	},
+	dwAutoFeedCubTabType = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Domesticate'],
+		xSchema = Schema.Optional(Schema.Number),
+		xDefaultValue = nil,
+	},
+	dwAutoFeedCubTabIndex = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Domesticate'],
+		xSchema = Schema.Optional(Schema.Number),
+		xDefaultValue = nil,
+	},
+	dwAutoFeedFoodTabType = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Domesticate'],
+		xSchema = Schema.Optional(Schema.Number),
+		xDefaultValue = nil,
+	},
+	dwAutoFeedFoodTabIndex = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Domesticate'],
+		xSchema = Schema.Optional(Schema.Number),
+		xDefaultValue = nil,
+	},
+	nAutoFeedFoodMeasure = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Domesticate'],
+		xSchema = Schema.Optional(Schema.Number),
+		xDefaultValue = nil,
+	},
+})
 local D = {}
-local O = {
-	bAlert = false,
-	nAlertNum = 100,
-	dwAutoFeedCubTabType = nil,
-	dwAutoFeedCubTabIndex = nil,
-	dwAutoFeedFoodTabType = nil,
-	dwAutoFeedFoodTabIndex = nil,
-	nAutoFeedFoodMeasure = nil,
-}
-RegisterCustomData('MY_Domesticate.bAlert')
-RegisterCustomData('MY_Domesticate.nAlertNum')
-RegisterCustomData('MY_Domesticate.dwAutoFeedCubTabType')
-RegisterCustomData('MY_Domesticate.dwAutoFeedCubTabIndex')
-RegisterCustomData('MY_Domesticate.dwAutoFeedFoodTabType')
-RegisterCustomData('MY_Domesticate.dwAutoFeedFoodTabIndex')
-RegisterCustomData('MY_Domesticate.nAutoFeedFoodMeasure')
 
 function D.SetAutoFeed(dwAutoFeedCubTabType, dwAutoFeedCubTabIndex, dwAutoFeedFoodTabType, dwAutoFeedFoodTabIndex)
 	local bValid

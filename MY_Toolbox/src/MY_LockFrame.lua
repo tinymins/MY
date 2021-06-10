@@ -54,29 +54,38 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
-local D = {}
-local O = {
-	-- 设置项
-	bEnable = false,
-	tEnable = {
-		['JX_TargetList'] = true,
-		['MY_FocusUI'] = true,
-		['WhoSeeMe'] = true,
-		['HatredPanel'] = true,
-		['FightingStatistic'] = true,
-		['MY_ThreatRank'] = true,
-		['MY_Recount_UI'] = true,
-		['LR_AS_FP'] = true,
-		['QuestTraceList'] = true,
-		['ChatPanel'] = true,
-		['DynamicActionBar'] = true,
-		['ExteriorAction'] = true,
-		['MentorMessage'] = true,
-		['JX_TeamCD'] = true,
-		['JX_HeightMeter'] = true,
-		['Matrix'] = true,
+local O = LIB.CreateUserSettingsModule('MY_LockFrame', _L['MY_Toolbox'], {
+	bEnable = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_LockFrame'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
 	},
-	-- 本地变量
+	tEnable = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_LockFrame'],
+		xSchema = Schema.Map(Schema.String, Schema.Boolean),
+		xDefaultValue = {
+			['JX_TargetList'] = true,
+			['MY_FocusUI'] = true,
+			['WhoSeeMe'] = true,
+			['HatredPanel'] = true,
+			['FightingStatistic'] = true,
+			['MY_ThreatRank'] = true,
+			['MY_Recount_UI'] = true,
+			['LR_AS_FP'] = true,
+			['QuestTraceList'] = true,
+			['ChatPanel'] = true,
+			['DynamicActionBar'] = true,
+			['ExteriorAction'] = true,
+			['MentorMessage'] = true,
+			['JX_TeamCD'] = true,
+			['JX_HeightMeter'] = true,
+			['Matrix'] = true,
+		},
+	},
+})
+local D = {
 	bTempDisable = false,
 	tLockList = {
 		'WhoSeeMe',
@@ -124,8 +133,6 @@ local O = {
 		['JX_HeightMeter'] = 'JX_HeightMeter', -- 剑心·高度标线 [Normal/JX_HeightMeter]
 	},
 }
-RegisterCustomData('MY_LockFrame.bEnable')
-RegisterCustomData('MY_LockFrame.tEnable')
 
 local HOOKED_UI = setmetatable({}, { __mode = 'k' })
 local UI_DRAGABLE = setmetatable({}, { __mode = 'k' })
@@ -155,10 +162,10 @@ function D.UnlockFrame(frame)
 end
 
 function D.IsFrameLock(frame)
-	if not O.bEnable or O.bTempDisable or not frame then
+	if not O.bEnable or D.bTempDisable or not frame then
 		return false
 	end
-	local szLock = O.tLockID[frame:GetName()]
+	local szLock = D.tLockID[frame:GetName()]
 	return szLock and O.tEnable[szLock] ~= false
 end
 
@@ -190,15 +197,15 @@ function D.CheckAllFrame()
 		end)
 		LIB.RegisterSpecialKeyEvent('*.MY_LockFrame', function()
 			if IsCtrlKeyDown() and (IsShiftKeyDown() or IsAltKeyDown()) then
-				if not O.bTempDisable then
+				if not D.bTempDisable then
 					LIB.Topmsg(_L['MY_LockFrame has been temporary disabled.'])
-					O.bTempDisable = true
+					D.bTempDisable = true
 					D.CheckAllFrame()
 				end
 			else
-				if O.bTempDisable then
+				if D.bTempDisable then
 					LIB.Topmsg(_L['MY_LockFrame has been enabled.'])
-					O.bTempDisable = false
+					D.bTempDisable = false
 					D.CheckAllFrame()
 				end
 			end
@@ -226,7 +233,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 					end,
 				}, CONSTANT.MENU_DIVIDER,
 			}
-			for _, k in ipairs(O.tLockList) do
+			for _, k in ipairs(D.tLockList) do
 				insert(t, {
 					szOption = _L['LOCK_FRAME_' .. k],
 					bCheck = true, bChecked = MY_LockFrame.tEnable[k] ~= false,

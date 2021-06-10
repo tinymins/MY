@@ -54,11 +54,15 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
+local O = LIB.CreateUserSettingsModule('MY_MibaoHelper', _L['MY_Toolbox'], {
+	bEnable = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_MibaoHelper'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+})
 local D = {}
-local O = {
-	bEnable = true,
-}
-RegisterCustomData('MY_MibaoHelper.bEnable')
 
 function D.OnInit()
 	-- 刚进游戏好像获取不到锁状态 20秒之后再说吧

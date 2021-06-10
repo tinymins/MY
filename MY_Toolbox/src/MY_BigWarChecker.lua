@@ -54,11 +54,15 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
+local O = LIB.CreateUserSettingsModule('MY_BigWarChecker', _L['MY_Toolbox'], {
+	bEnable = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_BigWarChecker'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+})
 local D = {}
-local O = {
-	bEnable = true,
-}
-RegisterCustomData('MY_BigWarChecker.bEnable')
 
 local function IsBigWarFinishable(me)
 	for _, aQuestInfo in ipairs(CONSTANT.QUEST_INFO.BIG_WARS) do

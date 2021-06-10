@@ -54,17 +54,33 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
+local O = LIB.CreateUserSettingsModule('MY_FooterTip', _L['MY_Toolbox'], {
+	bFriend = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_FooterTip'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bFriendNav = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_FooterTip'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bTongMember = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_FooterTip'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bTongMemberNav = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_FooterTip'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+})
 local D = {}
-local O = {
-	bFriend = false,
-	bFriendNav = false,
-	bTongMember = false,
-	bTongMemberNav = false,
-}
-RegisterCustomData('MY_FooterTip.bFriend')
-RegisterCustomData('MY_FooterTip.bFriendNav')
-RegisterCustomData('MY_FooterTip.bTongMember')
-RegisterCustomData('MY_FooterTip.bTongMemberNav')
 
 function D.Apply()
 	-- ∫√”—∏ﬂ¡¡

@@ -54,13 +54,21 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
+local O = LIB.CreateUserSettingsModule('MY_ArenaHelper', _L['MY_Toolbox'], {
+	bRestoreAuthorityInfo = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ArenaHelper'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bAutoShowModel = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ArenaHelper'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+})
 local D = {}
-local O = {
-	bRestoreAuthorityInfo = true,
-	bAutoShowModel = false,
-}
-RegisterCustomData('MY_ArenaHelper.bRestoreAuthorityInfo')
-RegisterCustomData('MY_ArenaHelper.bAutoShowModel')
 
 -- auto restore team authourity info in arena
 do local l_tTeamInfo, l_bConfigEnd

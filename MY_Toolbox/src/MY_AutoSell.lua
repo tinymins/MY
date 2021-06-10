@@ -54,36 +54,67 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
-local D = {}
-local O = {
-	bEnable = false, -- 打开商店后自动售出总开关
-	bSellGray = true, -- 自动出售灰色物品
-	bSellWhiteBook = false, -- 自动出售已读白书
-	bSellGreenBook = false, -- 自动出售已读绿书
-	bSellBlueBook = false, -- 自动出售已读蓝书
+local O = LIB.CreateUserSettingsModule('MY_AutoSell', _L['MY_Toolbox'], {
+	bEnable = { -- 打开商店后自动售出总开关,
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_AutoSell'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bSellGray = { -- 自动出售灰色物品,
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_AutoSell'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bSellWhiteBook = { -- 自动出售已读白书,
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_AutoSell'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bSellGreenBook = { -- 自动出售已读绿书,
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_AutoSell'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bSellBlueBook = { -- 自动出售已读蓝书,
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_AutoSell'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
 	tSellItem = {
-		[LIB.GetObjectName('ITEM_INFO', 5, 2863)] = true, -- 银叶子
-		[LIB.GetObjectName('ITEM_INFO', 5, 2864)] = true, -- 真银叶子
-		[LIB.GetObjectName('ITEM_INFO', 5, 2865)] = true, -- 大片真银叶子
-		[LIB.GetObjectName('ITEM_INFO', 5, 2866)] = true, -- 金粉末
-		[LIB.GetObjectName('ITEM_INFO', 5, 2867)] = true, -- 金叶子
-		[LIB.GetObjectName('ITEM_INFO', 5, 2868)] = true, -- 大片金叶子
-		[LIB.GetObjectName('ITEM_INFO', 5, 11682)] = true, -- 金条
-		[LIB.GetObjectName('ITEM_INFO', 5, 11683)] = true, -- 金块
-		[LIB.GetObjectName('ITEM_INFO', 5, 11640)] = true, -- 金砖
-		[LIB.GetObjectName('ITEM_INFO', 5, 17130)] = true, -- 银叶子·试炼之地
-		[LIB.GetObjectName('ITEM_INFO', 5, 22974)] = true, -- 破碎的金玄玉
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_AutoSell'],
+		xSchema = Schema.Map(Schema.String, Schema.Boolean),
+		xDefaultValue = {
+			[LIB.GetObjectName('ITEM_INFO', 5, 2863)] = true, -- 银叶子
+			[LIB.GetObjectName('ITEM_INFO', 5, 2864)] = true, -- 真银叶子
+			[LIB.GetObjectName('ITEM_INFO', 5, 2865)] = true, -- 大片真银叶子
+			[LIB.GetObjectName('ITEM_INFO', 5, 2866)] = true, -- 金粉末
+			[LIB.GetObjectName('ITEM_INFO', 5, 2867)] = true, -- 金叶子
+			[LIB.GetObjectName('ITEM_INFO', 5, 2868)] = true, -- 大片金叶子
+			[LIB.GetObjectName('ITEM_INFO', 5, 11682)] = true, -- 金条
+			[LIB.GetObjectName('ITEM_INFO', 5, 11683)] = true, -- 金块
+			[LIB.GetObjectName('ITEM_INFO', 5, 11640)] = true, -- 金砖
+			[LIB.GetObjectName('ITEM_INFO', 5, 17130)] = true, -- 银叶子·试炼之地
+			[LIB.GetObjectName('ITEM_INFO', 5, 22974)] = true, -- 破碎的金玄玉
+		},
 	},
 	tProtectItem = {
-		[LIB.GetObjectName('ITEM_INFO', 5, 789)] = true, -- 真丝肚兜
-		[LIB.GetObjectName('ITEM_INFO', 5, 797)] = true, -- 春宫图册
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_AutoSell'],
+		xSchema = Schema.Map(Schema.String, Schema.Boolean),
+		xDefaultValue = {
+			[LIB.GetObjectName('ITEM_INFO', 5, 789)] = true, -- 真丝肚兜
+			[LIB.GetObjectName('ITEM_INFO', 5, 797)] = true, -- 春宫图册
+		},
 	},
-}
-RegisterCustomData('MY_AutoSell.bEnable', 2)
-RegisterCustomData('MY_AutoSell.bSellGray')
-RegisterCustomData('MY_AutoSell.bSellWhiteBook')
-RegisterCustomData('MY_AutoSell.bSellGreenBook')
-RegisterCustomData('MY_AutoSell.bSellBlueBook')
+})
+local D = {}
+
 RegisterCustomData('MY_AutoSell.tSellItem')
 RegisterCustomData('MY_AutoSell.tProtectItem')
 
@@ -205,7 +236,17 @@ function D.CheckEnable()
 		LIB.RegisterEvent('SHOP_OPENSHOP', false)
 	end
 end
-LIB.RegisterInit('MY_AutoSell', D.CheckEnable)
+LIB.RegisterInit('MY_AutoSell', function()
+	if D.tSellItem then
+		SafeCall(Set, O, 'tSellItem', D.tSellItem)
+		D.tSellItem = nil
+	end
+	if D.tProtectItem then
+		SafeCall(Set, O, 'tProtectItem', D.tProtectItem)
+		D.tProtectItem = nil
+	end
+	D.CheckEnable()
+end)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	ui:Append('WndComboBox', {
@@ -216,44 +257,48 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 				{ szOption = _L['Auto sell when open shop'], bDisable = true },
 				{
 					szOption = _L['Enable'],
-					bCheck = true, bChecked = MY_AutoSell.bEnable,
-					fnAction = function(d, b) MY_AutoSell.bEnable = b end,
+					bCheck = true, bChecked = O.bEnable,
+					fnAction = function(d, b)
+						O.bEnable = b
+						D.CheckEnable()
+					end,
 				},
 				{
 					szOption = _L['Sell grey items'],
-					bCheck = true, bChecked = MY_AutoSell.bSellGray,
-					fnAction = function(d, b) MY_AutoSell.bSellGray = b end,
-					fnDisable = function() return not MY_AutoSell.bEnable end,
+					bCheck = true, bChecked = O.bSellGray,
+					fnAction = function(d, b) O.bSellGray = b end,
+					fnDisable = function() return not O.bEnable end,
 				},
 				{
 					szOption = _L['Sell read white books'],
-					bCheck = true, bChecked = MY_AutoSell.bSellWhiteBook,
-					fnAction = function(d, b) MY_AutoSell.bSellWhiteBook = b end,
-					fnDisable = function() return not MY_AutoSell.bEnable end,
+					bCheck = true, bChecked = O.bSellWhiteBook,
+					fnAction = function(d, b) O.bSellWhiteBook = b end,
+					fnDisable = function() return not O.bEnable end,
 				},
 				{
-					szOption = _L['Sell read green books'], bCheck = true, bChecked = MY_AutoSell.bSellGreenBook,
-					fnAction = function(d, b) MY_AutoSell.bSellGreenBook = b end,
-					fnDisable = function() return not MY_AutoSell.bEnable end
+					szOption = _L['Sell read green books'], bCheck = true, bChecked = O.bSellGreenBook,
+					fnAction = function(d, b) O.bSellGreenBook = b end,
+					fnDisable = function() return not O.bEnable end
 				},
 				{
-					szOption = _L['Sell read blue books'], bCheck = true, bChecked = MY_AutoSell.bSellBlueBook,
-					fnAction = function(d, b) MY_AutoSell.bSellBlueBook = b end,
-					fnDisable = function() return not MY_AutoSell.bEnable end,
+					szOption = _L['Sell read blue books'], bCheck = true, bChecked = O.bSellBlueBook,
+					fnAction = function(d, b) O.bSellBlueBook = b end,
+					fnDisable = function() return not O.bEnable end,
 				},
 				{ bDevide = true },
 			}
 			-- 自定义售卖物品
 			local m1 = {
 				szOption = _L['Sell specified items'],
-				fnDisable = function() return not MY_AutoSell.bEnable end,
+				fnDisable = function() return not O.bEnable end,
 				{
 					szOption = _L['* New *'],
 					fnAction = function()
 						GetUserInput(_L['Name of item'], function(szText)
 							local szText = gsub(szText, '^%s*%[?(.-)%]?%s*$', '%1')
 							if szText ~= '' then
-								MY_AutoSell.tSellItem[szText] = true
+								O.tSellItem[szText] = true
+								O.tSellItem = O.tSellItem
 							end
 						end)
 					end
@@ -261,13 +306,14 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 				{ bDevide = true },
 			}
 			local m2 = { bInline = true, nMaxHeight = 550 }
-			for k, v in pairs(MY_AutoSell.tSellItem) do
+			for k, v in pairs(O.tSellItem) do
 				insert(m2, {
-					szOption = k, bCheck = true, bChecked = v, fnAction = function(d, b) MY_AutoSell.tSellItem[k] = b end,
+					szOption = k, bCheck = true, bChecked = v, fnAction = function(d, b) O.tSellItem[k] = b end,
 					{
 						szOption = _L['Remove'],
 						fnAction = function()
-							MY_AutoSell.tSellItem[k] = nil
+							O.tSellItem[k] = nil
+							O.tSellItem = O.tSellItem
 							for i, v in ipairs(m2) do
 								if v.szOption == k then
 									remove(m2, i)
@@ -284,14 +330,15 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 			-- 自定义不卖物品
 			local m1 = {
 				szOption = _L['Protect specified items'],
-				fnDisable = function() return not MY_AutoSell.bEnable end,
+				fnDisable = function() return not O.bEnable end,
 				{
 					szOption = _L['* New *'],
 					fnAction = function()
 						GetUserInput(_L['Name of item'], function(szText)
 							local szText = gsub(szText, '^%s*%[?(.-)%]?%s*$', '%1')
 							if szText ~= '' then
-								MY_AutoSell.tProtectItem[szText] = true
+								O.tProtectItem[szText] = true
+								O.tProtectItem = O.tProtectItem
 							end
 						end)
 					end
@@ -299,13 +346,14 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 				{ bDevide = true },
 			}
 			local m2 = { bInline = true, nMaxHeight = 550 }
-			for k, v in pairs(MY_AutoSell.tProtectItem) do
+			for k, v in pairs(O.tProtectItem) do
 				insert(m2, {
-					szOption = k, bCheck = true, bChecked = v, fnAction = function(d, b) MY_AutoSell.tProtectItem[k] = b end,
+					szOption = k, bCheck = true, bChecked = v, fnAction = function(d, b) O.tProtectItem[k] = b end,
 					{
 						szOption = _L['Remove'],
 						fnAction = function()
-							MY_AutoSell.tProtectItem[k] = nil
+							O.tProtectItem[k] = nil
+							O.tProtectItem = O.tProtectItem
 							for i, v in ipairs(m2) do
 								if v.szOption == k then
 									remove(m2, i)
@@ -336,32 +384,19 @@ local settings = {
 		},
 		{
 			fields = {
-				bEnable = true,
-				bSellGray = true,
-				bSellWhiteBook = true,
-				bSellGreenBook = true,
-				bSellBlueBook = true,
 				tSellItem = true,
 				tProtectItem = true,
 			},
-			root = O,
+			root = D,
 		},
 	},
 	imports = {
 		{
 			fields = {
-				bEnable = true,
-				bSellGray = true,
-				bSellWhiteBook = true,
-				bSellGreenBook = true,
-				bSellBlueBook = true,
 				tSellItem = true,
 				tProtectItem = true,
 			},
-			triggers = {
-				bEnable = D.CheckEnable,
-			},
-			root = O,
+			root = D,
 		},
 	},
 }

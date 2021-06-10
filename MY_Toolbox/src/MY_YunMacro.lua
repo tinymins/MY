@@ -54,11 +54,15 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
+local O = LIB.CreateUserSettingsModule('MY_YunMacro', _L['MY_Toolbox'], {
+	bEnable = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_YunMacro'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+})
 local D = {}
-local O = {
-	bEnable = false,
-}
-RegisterCustomData('MY_YunMacro.bEnable')
 
 function D.Hook()
 	local frame = Station.SearchFrame('MacroSettingPanel')

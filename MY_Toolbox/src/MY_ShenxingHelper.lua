@@ -54,15 +54,27 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
+local O = LIB.CreateUserSettingsModule('MY_ShenxingHelper', _L['MY_Toolbox'], {
+	bAncientMap = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ShenxingHelper'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bOpenAllMap = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ShenxingHelper'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bAvoidBlackCD = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ShenxingHelper'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+})
 local D = {}
-local O = {
-	bAncientMap = true,
-	bOpenAllMap = true,
-	bAvoidBlackCD = true,
-}
-RegisterCustomData('MY_ShenxingHelper.bAncientMap')
-RegisterCustomData('MY_ShenxingHelper.bOpenAllMap')
-RegisterCustomData('MY_ShenxingHelper.bAvoidBlackCD')
 
 local NONWAR_DATA = {
 	{ id =  8, x =   70, y =    5 }, -- ÂåÑô

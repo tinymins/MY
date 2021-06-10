@@ -54,16 +54,23 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
+local O = LIB.CreateUserSettingsModule('MY_HideAnnounceBg', _L['MY_Toolbox'], {
+	bEnable = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_HideAnnounceBg'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+})
 local D = {}
-local O = {
-	bEnable = false,
-}
-RegisterCustomData('MY_HideAnnounceBg.bEnable')
 
 function D.Apply()
+	if not O.bEnable then
+		return
+	end
 	local h = Station.Lookup('Topmost2/GMAnnouncePanel', 'Handle_MsgBg')
 	if h then
-		h:SetVisible(not O.bEnable)
+		h:Hide()
 	end
 end
 LIB.RegisterInit('MY_HideAnnounceBg', D.Apply)

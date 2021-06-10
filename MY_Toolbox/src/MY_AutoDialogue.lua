@@ -53,26 +53,55 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 	return
 end
 --------------------------------------------------------------------------
-local D = {}
 local DIALOGUE
 local CURRENT_WINDOW
 local CURRENT_CONTENTS
 
-MY_AutoDialogue = {}
-MY_AutoDialogue.bEnable = false
-MY_AutoDialogue.bEchoOn = true
-MY_AutoDialogue.bAutoClose = true
-MY_AutoDialogue.bEnableShift = true
-MY_AutoDialogue.bAutoSelectSg = false
-MY_AutoDialogue.bAutoSelectSp = false
-MY_AutoDialogue.bSkipQuestTalk = false
-RegisterCustomData('MY_AutoDialogue.bEnable')
-RegisterCustomData('MY_AutoDialogue.bEchoOn', 1)
-RegisterCustomData('MY_AutoDialogue.bAutoClose', 1)
-RegisterCustomData('MY_AutoDialogue.bEnableShift')
-RegisterCustomData('MY_AutoDialogue.bAutoSelectSg')
-RegisterCustomData('MY_AutoDialogue.bAutoSelectSp')
-RegisterCustomData('MY_AutoDialogue.bSkipQuestTalk')
+local O = LIB.CreateUserSettingsModule('MY_AutoDialogue', _L['MY_Toolbox'], {
+	bEnable = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_AutoDialogue'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bEchoOn = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_AutoDialogue'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bAutoClose = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_AutoDialogue'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bEnableShift = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_AutoDialogue'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bAutoSelectSg = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_AutoDialogue'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bAutoSelectSp = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_AutoDialogue'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bSkipQuestTalk = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_AutoDialogue'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+})
+local D = {}
 
 ---------------------------------------------------------------------------
 -- Êý¾Ý´æ´¢
@@ -199,17 +228,17 @@ function D.ProcessDialogInfo(frame, aInfo, dwTarType, dwTarID, dwIndex)
 		end
 	end
 	if not LIB.IsInDungeon() then
-		if not option and MY_AutoDialogue.bAutoSelectSp and #dialog.aOptions == 1 and dialog.aOptions[1].szContext == '' then
+		if not option and O.bAutoSelectSp and #dialog.aOptions == 1 and dialog.aOptions[1].szContext == '' then
 			option = dialog.aOptions[1]
 			nRepeat = 1
 		end
-		if not option and MY_AutoDialogue.bAutoSelectSg and #dialog.aOptions == 1 then
+		if not option and O.bAutoSelectSg and #dialog.aOptions == 1 then
 			option = dialog.aOptions[1]
 			nRepeat = 1
 		end
 	end
 	if option and option.dwID then
-		if MY_AutoDialogue.bAutoClose then
+		if O.bAutoClose then
 			frame:Hide()
 			Station.Show()
 			rlcmd('dialogue with npc 0')
@@ -217,7 +246,7 @@ function D.ProcessDialogInfo(frame, aInfo, dwTarType, dwTarID, dwIndex)
 		for i = 1, nRepeat do
 			GetClientPlayer().WindowSelect(dwIndex, option.dwID)
 		end
-		if MY_AutoDialogue.bEchoOn then
+		if O.bEchoOn then
 			LIB.Sysmsg(_L('Conversation with [%s]: %s', dialog.szName, dialog.szContext:gsub('%s', '')))
 			if option.szContext and option.szContext ~= '' then
 				LIB.Sysmsg(_L('Conversation with [%s] auto chose: %s', dialog.szName, option.szContext))
@@ -235,7 +264,7 @@ function D.AutoDialogue()
 	if not DIALOGUE then
 		D.LoadData()
 	end
-	if MY_AutoDialogue.bEnableShift and IsShiftKeyDown() then
+	if O.bEnableShift and IsShiftKeyDown() then
 		LIB.Sysmsg(_L['Auto interact disabled due to SHIFT key pressed.'])
 		return
 	end
@@ -252,7 +281,7 @@ end
 local function onOpenWindow()
 	CURRENT_WINDOW = arg0
 	CURRENT_CONTENTS = arg1
-	if not MY_AutoDialogue.bEnable or LIB.IsShieldedVersion('MY_AutoDialogue') then
+	if not O.bEnable or LIB.IsShieldedVersion('MY_AutoDialogue') then
 		return
 	end
 	LIB.DelayCall('MY_AutoDialogue__AutoDialogue', D.AutoDialogue)
@@ -280,7 +309,7 @@ local function HookSkipQuestTalk()
 	if not frame then
 		return 0
 	end
-	if MY_AutoDialogue.bSkipQuestTalk then
+	if O.bSkipQuestTalk then
 		if not frame.__SkipQuestHackEl then
 			local w, h = Station.GetClientSize()
 			frame.__SkipQuestEl = frame:Lookup('Btn_Skip')
@@ -509,45 +538,45 @@ function D.GetConfigMenu()
 	return {
 		szOption = _L['Autochat'], {
 			szOption = _L['Enable'],
-			bCheck = true, bChecked = MY_AutoDialogue.bEnable,
+			bCheck = true, bChecked = O.bEnable,
 			fnAction = function()
-				MY_AutoDialogue.bEnable = not MY_AutoDialogue.bEnable
+				O.bEnable = not O.bEnable
 			end
 		}, {
 			szOption = _L['Echo when autochat'],
-			bCheck = true, bChecked = MY_AutoDialogue.bEchoOn,
+			bCheck = true, bChecked = O.bEchoOn,
 			fnAction = function()
-				MY_AutoDialogue.bEchoOn = not MY_AutoDialogue.bEchoOn
+				O.bEchoOn = not O.bEchoOn
 			end
 		}, {
 			szOption = _L['Auto chat when only one selection'],
-			bCheck = true, bChecked = MY_AutoDialogue.bAutoSelectSg,
+			bCheck = true, bChecked = O.bAutoSelectSg,
 			fnAction = function()
-				MY_AutoDialogue.bAutoSelectSg = not MY_AutoDialogue.bAutoSelectSg
+				O.bAutoSelectSg = not O.bAutoSelectSg
 			end
 		}, {
 			szOption = _L['Auto chat when only one space selection'],
-			bCheck = true, bChecked = MY_AutoDialogue.bAutoSelectSp,
+			bCheck = true, bChecked = O.bAutoSelectSp,
 			fnAction = function()
-				MY_AutoDialogue.bAutoSelectSp = not MY_AutoDialogue.bAutoSelectSp
+				O.bAutoSelectSp = not O.bAutoSelectSp
 			end
 		}, {
 			szOption = _L['Disable when shift key pressed'],
-			bCheck = true, bChecked = MY_AutoDialogue.bEnableShift,
+			bCheck = true, bChecked = O.bEnableShift,
 			fnAction = function()
-				MY_AutoDialogue.bEnableShift = not MY_AutoDialogue.bEnableShift
+				O.bEnableShift = not O.bEnableShift
 			end
 		}, {
 			szOption = _L['Close after auto chat'],
-			bCheck = true, bChecked = MY_AutoDialogue.bAutoClose,
+			bCheck = true, bChecked = O.bAutoClose,
 			fnAction = function()
-				MY_AutoDialogue.bAutoClose = not MY_AutoDialogue.bAutoClose
+				O.bAutoClose = not O.bAutoClose
 			end
 		}, {
 			szOption = _L['Skip quest talk'],
-			bCheck = true, bChecked = MY_AutoDialogue.bSkipQuestTalk,
+			bCheck = true, bChecked = O.bSkipQuestTalk,
 			fnAction = function()
-				MY_AutoDialogue.bSkipQuestTalk = not MY_AutoDialogue.bSkipQuestTalk
+				O.bSkipQuestTalk = not O.bSkipQuestTalk
 			end
 		},
 	}

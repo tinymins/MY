@@ -54,15 +54,27 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
+local O = LIB.CreateUserSettingsModule('MY_AchievementWiki', _L['MY_Toolbox'], {
+	bEnable = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_AchievementWiki'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	nW = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_AchievementWiki'],
+		xSchema = Schema.Number,
+		xDefaultValue = 850,
+	},
+	nH = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_AchievementWiki'],
+		xSchema = Schema.Number,
+		xDefaultValue = 610,
+	},
+})
 local D = {}
-local O = {
-	bEnable = false,
-	nW = 850,
-	nH = 610,
-}
-RegisterCustomData('MY_AchievementWiki.bEnable')
-RegisterCustomData('MY_AchievementWiki.nW')
-RegisterCustomData('MY_AchievementWiki.nH')
 
 function D.OnWebSizeChange()
 	O.nW, O.nH = this:GetSize()

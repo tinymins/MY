@@ -90,49 +90,121 @@ local FILTER_ITEM = {
 	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6031), bFilter = false }, -- 如意锦囊
 	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6043), bFilter = false }, -- 锁住的月光宝盒
 }
-
-local DEFAULT_O = {
-	nPausePoint              = 327680, -- 停砸分数线
-	bUseTaoguan              = true  , -- 必要时使用背包的陶罐
-	bNoYinchuiUseJinchui     = false , -- 没小银锤时使用小金锤
-	nUseXiaojinchui          = 320   , -- 优先使用小金锤的分数
-	bPauseNoXiaojinchui      = true  , -- 缺少小金锤时停砸
-	nUseXingyunXiangnang     = 80    , -- 开始吃幸运香囊的分数
-	bPauseNoXingyunXiangnang = false , -- 缺少幸运香囊时停砸
-	nUseXingyunJinnang       = 80    , -- 开始吃幸运锦囊的分数
-	bPauseNoXingyunJinnang   = false , -- 缺少幸运锦囊时停砸
-	nUseRuyiXiangnang        = 80    , -- 开始吃如意香囊的分数
-	bPauseNoRuyiXiangnang    = false , -- 缺少如意香囊时停砸
-	nUseRuyiJinnang          = 80    , -- 开始吃如意锦囊的分数
-	bPauseNoRuyiJinnang      = false , -- 缺少如意锦囊时停砸
-	nUseJiyougu              = 1280  , -- 开始吃寄忧谷的分数
-	bPauseNoJiyougu          = true  , -- 缺少寄忧谷时停砸
-	nUseZuisheng             = 1280  , -- 开始吃醉生的分数
-	bPauseNoZuisheng         = true  , -- 缺少醉生时停砸
-	tFilterItem = {},
-}
+local FILTER_ITEM_DEFAULT = {}
 for _, p in ipairs(FILTER_ITEM) do
-	DEFAULT_O.tFilterItem[p.szName] = p.bFilter
+	FILTER_ITEM_DEFAULT[p.szName] = p.bFilter
 end
-local O = Clone(DEFAULT_O)
-RegisterCustomData('MY_Taoguan.nPausePoint')
-RegisterCustomData('MY_Taoguan.bUseTaoguan')
-RegisterCustomData('MY_Taoguan.bNoYinchuiUseJinchui')
-RegisterCustomData('MY_Taoguan.nUseXiaojinchui')
-RegisterCustomData('MY_Taoguan.bPauseNoXiaojinchui')
-RegisterCustomData('MY_Taoguan.nUseXingyunXiangnang')
-RegisterCustomData('MY_Taoguan.bPauseNoXingyunXiangnang')
-RegisterCustomData('MY_Taoguan.nUseXingyunJinnang')
-RegisterCustomData('MY_Taoguan.bPauseNoXingyunJinnang')
-RegisterCustomData('MY_Taoguan.nUseRuyiXiangnang')
-RegisterCustomData('MY_Taoguan.bPauseNoRuyiXiangnang')
-RegisterCustomData('MY_Taoguan.nUseRuyiJinnang')
-RegisterCustomData('MY_Taoguan.bPauseNoRuyiJinnang')
-RegisterCustomData('MY_Taoguan.nUseJiyougu')
-RegisterCustomData('MY_Taoguan.bPauseNoJiyougu')
-RegisterCustomData('MY_Taoguan.nUseZuisheng')
-RegisterCustomData('MY_Taoguan.bPauseNoZuisheng')
-RegisterCustomData('MY_Taoguan.tFilterItem')
+
+local O = LIB.CreateUserSettingsModule('MY_Taoguan', _L['MY_Toolbox'], {
+	nPausePoint = { -- 停砸分数线
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Taoguan'],
+		xSchema = Schema.Number,
+		xDefaultValue = 327680,
+	},
+	bUseTaoguan = { -- 必要时使用背包的陶罐
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Taoguan'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bNoYinchuiUseJinchui = { -- 没小银锤时使用小金锤
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Taoguan'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	nUseXiaojinchui = { -- 优先使用小金锤的分数
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Taoguan'],
+		xSchema = Schema.Number,
+		xDefaultValue = 320,
+	},
+	bPauseNoXiaojinchui = { -- 缺少小金锤时停砸
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Taoguan'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	nUseXingyunXiangnang = { -- 开始吃幸运香囊的分数
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Taoguan'],
+		xSchema = Schema.Number,
+		xDefaultValue = 80,
+	},
+	bPauseNoXingyunXiangnang = { -- 缺少幸运香囊时停砸
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Taoguan'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	nUseXingyunJinnang = { -- 开始吃幸运锦囊的分数
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Taoguan'],
+		xSchema = Schema.Number,
+		xDefaultValue = 80,
+	},
+	bPauseNoXingyunJinnang = { -- 缺少幸运锦囊时停砸
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Taoguan'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	nUseRuyiXiangnang = { -- 开始吃如意香囊的分数
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Taoguan'],
+		xSchema = Schema.Number,
+		xDefaultValue = 80,
+	},
+	bPauseNoRuyiXiangnang = { -- 缺少如意香囊时停砸
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Taoguan'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	nUseRuyiJinnang = { -- 开始吃如意锦囊的分数
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Taoguan'],
+		xSchema = Schema.Number,
+		xDefaultValue = 80,
+	},
+	bPauseNoRuyiJinnang = { -- 缺少如意锦囊时停砸
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Taoguan'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	nUseJiyougu = { -- 开始吃寄忧谷的分数
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Taoguan'],
+		xSchema = Schema.Number,
+		xDefaultValue = 1280,
+	},
+	bPauseNoJiyougu = { -- 缺少寄忧谷时停砸
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Taoguan'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	nUseZuisheng = { -- 开始吃醉生的分数
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Taoguan'],
+		xSchema = Schema.Number,
+		xDefaultValue = 1280,
+	},
+	bPauseNoZuisheng = { -- 缺少醉生时停砸
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Taoguan'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	tFilterItem = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Taoguan'],
+		xSchema = Schema.Map(Schema.String, Schema.Boolean),
+		xDefaultValue = FILTER_ITEM_DEFAULT,
+	},
+})
 
 ---------------------------------------------------------------------
 -- 本地函数和变量
@@ -511,7 +583,7 @@ function PS.OnPanelActive(wnd)
 				})
 			end
 			for k, v in pairs(MY_Taoguan.tFilterItem) do
-				if DEFAULT_O.tFilterItem[k] == nil then
+				if FILTER_ITEM_DEFAULT[k] == nil then
 					insert(m0, {
 						szOption = k,
 						bCheck = true, bChecked = v,
@@ -560,9 +632,7 @@ function PS.OnPanelActive(wnd)
 		x = nX, y = nY, w = 130, h = 30,
 		text = _L['Restore default config'],
 		onclick = function()
-			for k, v in pairs(DEFAULT_O) do
-				MY_Taoguan[k] = v
-			end
+			O('reset')
 			LIB.SwitchTab('MY_Taoguan', true)
 		end,
 	}):Pos('BOTTOMRIGHT')
@@ -628,7 +698,7 @@ local settings = {
 					if IsEmpty(O.tFilterItem) then
 						O.tFilterItem = {}
 					end
-					for v, b in pairs(DEFAULT_O.tFilterItem) do
+					for v, b in pairs(FILTER_ITEM_DEFAULT) do
 						if O.tFilterItem[v] == nil then
 							O.tFilterItem[v] = b
 						end

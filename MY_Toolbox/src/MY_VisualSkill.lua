@@ -55,17 +55,33 @@ end
 --------------------------------------------------------------------------
 local INI_PATH = PACKET_INFO.ROOT .. 'MY_ToolBox/ui/MY_VisualSkill.ini'
 local DEFAULT_ANCHOR = { x = 0, y = -220, s = 'BOTTOMCENTER', r = 'BOTTOMCENTER' }
+local O = LIB.CreateUserSettingsModule('MY_VisualSkill', _L['MY_Toolbox'], {
+	bEnable = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_VisualSkill'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bPenetrable = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_VisualSkill'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	nVisualSkillBoxCount = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_VisualSkill'],
+		xSchema = Schema.Number,
+		xDefaultValue = 5,
+	},
+	anchor = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_VisualSkill'],
+		xSchema = Schema.FrameAnchor,
+		xDefaultValue = Clone(DEFAULT_ANCHOR),
+	},
+})
 local D = {}
-local O = {
-	bEnable = false,
-	bPenetrable = true,
-	nVisualSkillBoxCount = 5,
-	anchor = Clone(DEFAULT_ANCHOR),
-}
-RegisterCustomData('MY_VisualSkill.bEnable')
-RegisterCustomData('MY_VisualSkill.bPenetrable')
-RegisterCustomData('MY_VisualSkill.nVisualSkillBoxCount')
-RegisterCustomData('MY_VisualSkill.anchor')
 
 local BOX_WIDTH = 48
 local BOX_ANIMATION_TIME = 300

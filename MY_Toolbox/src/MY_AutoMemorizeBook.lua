@@ -54,11 +54,15 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
+local O = LIB.CreateUserSettingsModule('MY_AutoMemorizeBook', _L['MY_Toolbox'], {
+	bEnable = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_AutoMemorizeBook'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+})
 local D = {}
-local O = {
-	bEnable = false,
-}
-RegisterCustomData('MY_AutoMemorizeBook.bEnable')
 
 function D.Hook()
 	local frame = Station.Lookup('Normal/CraftReaderPanel')
@@ -69,8 +73,8 @@ function D.Hook()
 		name = 'MY_AutoMemorizeBook',
 		x = 50, y = 482,
 		text = _L['MY_AutoMemorizeBook'],
-		checked = MY_AutoMemorizeBook.bEnable,
-		oncheck = function() MY_AutoMemorizeBook.bEnable = not MY_AutoMemorizeBook.bEnable end,
+		checked = O.bEnable,
+		oncheck = function() O.bEnable = not O.bEnable end,
 	})
 end
 
@@ -115,29 +119,3 @@ LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_AutoMemorizeBook', function()
 	end
 	D.CheckEnable()
 end)
-
--- Global exports
-do
-local settings = {
-	exports = {
-		{
-			fields = {
-				bEnable = true,
-			},
-			root = O,
-		},
-	},
-	imports = {
-		{
-			fields = {
-				bEnable = true,
-			},
-			triggers = {
-				bEnable = D.CheckEnable,
-			},
-			root = O,
-		},
-	},
-}
-MY_AutoMemorizeBook = LIB.CreateModule(settings)
-end

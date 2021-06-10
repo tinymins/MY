@@ -54,11 +54,15 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
+local O = LIB.CreateUserSettingsModule('MY_DialogNameLink', _L['MY_Toolbox'], {
+	bEnable = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_DialogNameLink'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+})
 local D = {}
-local O = {
-	bEnable = true,
-}
-RegisterCustomData('MY_DialogNameLink.bAncientMap')
 
 function D.Apply()
 	LIB.RegisterEvent('OPEN_WINDOW.NAMELINKER', function(event)

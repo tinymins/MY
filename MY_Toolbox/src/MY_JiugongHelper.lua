@@ -54,11 +54,15 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
+local O = LIB.CreateUserSettingsModule('MY_JiugongHelper', _L['MY_Toolbox'], {
+	bEnable = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_JiugongHelper'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+})
 local D = {}
-local O = {
-	bEnable = true,
-}
-RegisterCustomData('MY_JiugongHelper.bEnable')
 
 function D.Apply()
 	LIB.RegisterEvent('OPEN_WINDOW.JIUGONG_HELPER', function(event)

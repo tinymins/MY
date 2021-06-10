@@ -54,14 +54,21 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
+local O = LIB.CreateUserSettingsModule('MY_DynamicActionBarPos', _L['MY_Toolbox'], {
+	bEnable = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_DynamicActionBarPos'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	tAnchors = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_DynamicActionBarPos'],
+		xSchema = Schema.Map(Schema.String, Schema.FrameAnchor),
+		xDefaultValue = {},
+	},
+})
 local D = {}
-local O = {
-	-- 设置项
-	bEnable = true,
-	tAnchors = {},
-}
-RegisterCustomData('MY_DynamicActionBarPos.bEnable')
-RegisterCustomData('MY_DynamicActionBarPos.tAnchors')
 
 local HOOK_FRAME_NAME = {
 	'DynamicActionBar', -- 各种动态技能栏

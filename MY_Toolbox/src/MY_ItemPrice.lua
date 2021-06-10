@@ -54,15 +54,27 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
+local O = LIB.CreateUserSettingsModule('MY_ItemPrice', _L['MY_Toolbox'], {
+	bEnable = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ItemPrice'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	nW = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ItemPrice'],
+		xSchema = Schema.Number,
+		xDefaultValue = 480,
+	},
+	nH = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_ItemPrice'],
+		xSchema = Schema.Number,
+		xDefaultValue = 640,
+	},
+})
 local D = {}
-local O = {
-	bEnable = false,
-	nW = 480,
-	nH = 640,
-}
-RegisterCustomData('MY_ItemPrice.bEnable')
-RegisterCustomData('MY_ItemPrice.nW')
-RegisterCustomData('MY_ItemPrice.nH')
 
 function D.OnWebSizeChange()
 	O.nW, O.nH = this:GetSize()
