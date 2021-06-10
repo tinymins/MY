@@ -718,20 +718,6 @@ end
 LIB.GetLUADataHash = GetLUADataHash
 end
 
--- 注册用户定义数据，支持全局变量数组遍历
--- (void) LIB.RegisterCustomData(string szVarPath[, number nVersion])
-function LIB.RegisterCustomData(szVarPath, nVersion, szDomain)
-	szDomain = szDomain or 'Role'
-	local oVar = Get(_G, szVarPath)
-	if IsTable(oVar) then
-		for k, _ in pairs(oVar) do
-			RegisterCustomData(szDomain .. '/' .. szVarPath .. '.' .. k, nVersion)
-		end
-	else
-		RegisterCustomData(szDomain .. '/' .. szVarPath, nVersion)
-	end
-end
-
 do
 local DATABASE_TYPE_LIST = { PATH_TYPE.ROLE, PATH_TYPE.SERVER, PATH_TYPE.GLOBAL }
 local DATABASE_INSTANCE = {}
