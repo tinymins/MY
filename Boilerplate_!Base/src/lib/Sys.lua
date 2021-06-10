@@ -918,6 +918,42 @@ function LIB.SetUserSettings(szKey, ...)
 	NEED_FLUSH = true
 end
 
+-- 删除用户配置项值（恢复默认值）
+-- @param {string} szKey 配置项全局唯一键
+-- @param {string} szDataSetKey 配置项组（如用户多套自定义偏好）唯一键，当且仅当 szKey 对应注册项携带 bDataSet 标记位时有效
+function LIB.ResetUserSettings(szKey, ...)
+	local nParameter = select('#', ...) + 1
+	local szErrHeader = 'ResetUserSettings KEY(' .. EncodeLUAData(szKey) .. '): '
+	local info = USER_SETTINGS_INFO[szKey]
+	assert(info, szErrHeader .. '`Key` has not been registered.')
+	local db = DATABASE_INSTANCE[info.ePathType]
+	assert(db, szErrHeader .. 'Database not connected.')
+	local szDataSetKey
+	if info.bDataSet then
+		assert(nParameter == 1 or nParameter == 2, szErrHeader .. '1 or 2 parameter(s) expected, got ' .. nParameter)
+		szDataSetKey = ...
+		assert(IsString(szDataSetKey) or IsNumber(szDataSetKey) or IsNil(szDataSetKey), szErrHeader ..'`DataSetKey` should be a string or number or nil value.')
+	else
+		assert(nParameter == 1, szErrHeader .. '1 parameters expected, got ' .. nParameter)
+	end
+	if info.bDataSet then
+		local res = db:Get(info.szDataKey)
+		if IsTable(res) and res.v == info.szVersion and IsTable(res.d) and szDataSetKey then
+			res.d[szDataSetKey] = nil
+			if IsEmpty(res.d) then
+				db:Delete(info.szDataKey)
+			else
+				db:Set(info.szDataKey, res)
+			end
+		else
+			db:Delete(info.szDataKey)
+		end
+	else
+		db:Delete(info.szDataKey)
+	end
+	NEED_FLUSH = true
+end
+
 -- 创建用户设置代理对象
 -- @param {string | table} xProxy 配置项代理表，或模块命名空间
 -- @return 配置项读写代理对象
