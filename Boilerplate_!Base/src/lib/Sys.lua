@@ -990,8 +990,8 @@ function LIB.CreateUserSettingsModule(szModule, szGroupLabel, tSettings)
 	for k, v in pairs(tSettings) do
 		local szKey = szModule .. '.' .. k
 		local tOption = Clone(v)
-		if tOption.szStoreKey then
-			tOption.szStoreKey = szModule .. '.' .. tOption.szStoreKey
+		if tOption.szDataKey then
+			tOption.szDataKey = szModule .. '.' .. tOption.szDataKey
 		end
 		if szGroupLabel then
 			tOption.szGroup = szGroupLabel
