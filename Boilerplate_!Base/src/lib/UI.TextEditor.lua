@@ -50,7 +50,8 @@ function UI.OpenTextEditor(szText, szFrameName)
 	end
 	local w, h, ui = 400, 300, nil
 	local function OnResize()
-		ui:Children('.WndEditBox'):Size(ui:Size(true))
+		local nW, nH = select(3, ui:Size())
+		ui:Children('.WndEditBox'):Size(nW, nH)
 	end
 	ui = UI.CreateFrame(szFrameName, {
 		w = w, h = h, text = _L['Text Editor'], alpha = 180,
