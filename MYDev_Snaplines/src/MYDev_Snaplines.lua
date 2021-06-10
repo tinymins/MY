@@ -55,33 +55,75 @@ end
 --------------------------------------------------------------------------
 -- 数据存储
 --------------------------------------------------------------------------
+local O = LIB.CreateUserSettingsModule('MYDev_Snaplines', {
+	bEnable = {
+		ePathType = PATH_TYPE.ROLE,
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bDetectBox = {
+		ePathType = PATH_TYPE.ROLE,
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bShowWndSnaplines = {
+		ePathType = PATH_TYPE.ROLE,
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bShowWndTip = {
+		ePathType = PATH_TYPE.ROLE,
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bShowItemTip = {
+		ePathType = PATH_TYPE.ROLE,
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bShowItemSnaplines = {
+		ePathType = PATH_TYPE.ROLE,
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bShowTip = {
+		ePathType = PATH_TYPE.ROLE,
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bShowData = {
+		ePathType = PATH_TYPE.ROLE,
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	rgbWndSnaplines = {
+		ePathType = PATH_TYPE.ROLE,
+		xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+		xDefaultValue = {0, 0, 0},
+	},
+	rgbItemSnaplines = {
+		ePathType = PATH_TYPE.ROLE,
+		xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+		xDefaultValue = {0, 255, 0},
+	},
+	rgbTip = {
+		ePathType = PATH_TYPE.ROLE,
+		xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+		xDefaultValue = {255, 255, 0},
+	},
+	nTipFont = {
+		ePathType = PATH_TYPE.ROLE,
+		xSchema = Schema.Number,
+		xDefaultValue = 40,
+	},
+	bAutoScale = {
+		ePathType = PATH_TYPE.ROLE,
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+})
+
 MYDev_Snaplines = {}
-MYDev_Snaplines.bEnable = false
-RegisterCustomData('MYDev_Snaplines.bEnable')
-MYDev_Snaplines.bDetectBox = true
-RegisterCustomData('MYDev_Snaplines.bDetectBox')
-MYDev_Snaplines.bShowWndSnaplines = true
-RegisterCustomData('MYDev_Snaplines.bShowWndSnaplines')
-MYDev_Snaplines.bShowWndTip = true
-RegisterCustomData('MYDev_Snaplines.bShowWndTip')
-MYDev_Snaplines.bShowItemTip = true
-RegisterCustomData('MYDev_Snaplines.bShowItemTip')
-MYDev_Snaplines.bShowItemSnaplines = true
-RegisterCustomData('MYDev_Snaplines.bShowItemSnaplines')
-MYDev_Snaplines.bShowTip = true
-RegisterCustomData('MYDev_Snaplines.bShowTip')
-MYDev_Snaplines.bShowData = true
-RegisterCustomData('MYDev_Snaplines.bShowData')
-MYDev_Snaplines.rgbWndSnaplines = {0, 0, 0}
-RegisterCustomData('MYDev_Snaplines.rgbWndSnaplines')
-MYDev_Snaplines.rgbItemSnaplines = {0, 255, 0}
-RegisterCustomData('MYDev_Snaplines.rgbItemSnaplines')
-MYDev_Snaplines.rgbTip = {255, 255, 0}
-RegisterCustomData('MYDev_Snaplines.rgbTip')
-MYDev_Snaplines.nTipFont = 40
-RegisterCustomData('MYDev_Snaplines.nTipFont')
-MYDev_Snaplines.bAutoScale = true
-RegisterCustomData('MYDev_Snaplines.bAutoScale')
 --------------------------------------------------------------------------
 -- 本地函数
 --------------------------------------------------------------------------
@@ -234,14 +276,14 @@ local function InsertElementDataTip(hElem, tTip)
 end
 
 local function InsertElementTip(hElem, tTip)
-	if MYDev_Snaplines.bShowTip
-	or MYDev_Snaplines.bShowData then
+	if O.bShowTip
+	or O.bShowData then
 		InsertElementBasicTip(hElem, tTip)
 	end
-	if MYDev_Snaplines.bShowTip then
+	if O.bShowTip then
 		InsertElementDetailTip(hElem, tTip)
 	end
-	if MYDev_Snaplines.bShowData then
+	if O.bShowData then
 		InsertElementDataTip(hElem, tTip)
 	end
 end
@@ -252,26 +294,26 @@ end
 function MYDev_Snaplines.OnFrameCreate()
 	local W, H = Station.GetClientSize()
 	-- Wnd辅助线
-	if MYDev_Snaplines.bShowWndSnaplines then
-		this:Lookup('', 'Handle_Snaplines_Wnd/Shadow_HoverWndLeft'  ):SetColorRGB(unpack(MYDev_Snaplines.rgbWndSnaplines))
-		this:Lookup('', 'Handle_Snaplines_Wnd/Shadow_HoverWndRight' ):SetColorRGB(unpack(MYDev_Snaplines.rgbWndSnaplines))
-		this:Lookup('', 'Handle_Snaplines_Wnd/Shadow_HoverWndTop'   ):SetColorRGB(unpack(MYDev_Snaplines.rgbWndSnaplines))
-		this:Lookup('', 'Handle_Snaplines_Wnd/Shadow_HoverWndBottom'):SetColorRGB(unpack(MYDev_Snaplines.rgbWndSnaplines))
+	if O.bShowWndSnaplines then
+		this:Lookup('', 'Handle_Snaplines_Wnd/Shadow_HoverWndLeft'  ):SetColorRGB(unpack(O.rgbWndSnaplines))
+		this:Lookup('', 'Handle_Snaplines_Wnd/Shadow_HoverWndRight' ):SetColorRGB(unpack(O.rgbWndSnaplines))
+		this:Lookup('', 'Handle_Snaplines_Wnd/Shadow_HoverWndTop'   ):SetColorRGB(unpack(O.rgbWndSnaplines))
+		this:Lookup('', 'Handle_Snaplines_Wnd/Shadow_HoverWndBottom'):SetColorRGB(unpack(O.rgbWndSnaplines))
 	else
 		this:Lookup('', 'Handle_Snaplines_Wnd'):Hide()
 	end
 	-- Item辅助线
-	if MYDev_Snaplines.bShowItemSnaplines then
-		this:Lookup('', 'Handle_Snaplines_Item/Shadow_HoverItemLeft'  ):SetColorRGB(unpack(MYDev_Snaplines.rgbItemSnaplines))
-		this:Lookup('', 'Handle_Snaplines_Item/Shadow_HoverItemRight' ):SetColorRGB(unpack(MYDev_Snaplines.rgbItemSnaplines))
-		this:Lookup('', 'Handle_Snaplines_Item/Shadow_HoverItemTop'   ):SetColorRGB(unpack(MYDev_Snaplines.rgbItemSnaplines))
-		this:Lookup('', 'Handle_Snaplines_Item/Shadow_HoverItemBottom'):SetColorRGB(unpack(MYDev_Snaplines.rgbItemSnaplines))
+	if O.bShowItemSnaplines then
+		this:Lookup('', 'Handle_Snaplines_Item/Shadow_HoverItemLeft'  ):SetColorRGB(unpack(O.rgbItemSnaplines))
+		this:Lookup('', 'Handle_Snaplines_Item/Shadow_HoverItemRight' ):SetColorRGB(unpack(O.rgbItemSnaplines))
+		this:Lookup('', 'Handle_Snaplines_Item/Shadow_HoverItemTop'   ):SetColorRGB(unpack(O.rgbItemSnaplines))
+		this:Lookup('', 'Handle_Snaplines_Item/Shadow_HoverItemBottom'):SetColorRGB(unpack(O.rgbItemSnaplines))
 	else
 		this:Lookup('', 'Handle_Snaplines_Item'):Hide()
 	end
 	-- 文字
-	this:Lookup('', 'Handle_Tip/Text_HoverTip'):SetFontScheme(MYDev_Snaplines.nTipFont)
-	this:Lookup('', 'Handle_Tip/Text_HoverTip'):SetFontColor(unpack(MYDev_Snaplines.rgbTip))
+	this:Lookup('', 'Handle_Tip/Text_HoverTip'):SetFontScheme(O.nTipFont)
+	this:Lookup('', 'Handle_Tip/Text_HoverTip'):SetFontColor(unpack(O.rgbTip))
 
 	MYDev_Snaplines.OnEvent('UI_SCALED')
 end
@@ -289,18 +331,18 @@ function MYDev_Snaplines.OnFrameBreathe()
 		local tTip = {}
 		insert(tTip, _L('CursorX: %s', nCursorX))
 		insert(tTip, _L('CursorY: %s', nCursorY))
-		if MYDev_Snaplines.bShowWndTip then
+		if O.bShowWndTip then
 			InsertElementTip(hWnd, tTip)
 		end
 		-- Wnd辅助线位置
-		if MYDev_Snaplines.bShowWndSnaplines then
+		if O.bShowWndSnaplines then
 			this:Lookup('', 'Handle_Snaplines_Wnd/Shadow_HoverWndLeft'  ):SetAbsPos(nWndX - 2    , 0)
 			this:Lookup('', 'Handle_Snaplines_Wnd/Shadow_HoverWndRight' ):SetAbsPos(nWndX + nWndW, 0)
 			this:Lookup('', 'Handle_Snaplines_Wnd/Shadow_HoverWndTop'   ):SetAbsPos(0, nWndY - 2    )
 			this:Lookup('', 'Handle_Snaplines_Wnd/Shadow_HoverWndBottom'):SetAbsPos(0, nWndY + nWndH)
 		end
 		-- 检测鼠标所在Box信息
-		if MYDev_Snaplines.bDetectBox and not (hItem and hItem:GetType() == 'Box') then
+		if O.bDetectBox and not (hItem and hItem:GetType() == 'Box') then
 			UI(hWnd):Find('.Box'):Each(function()
 				if this:PtInItem(nCursorX, nCursorY) then
 					insert(tTip, '---------------------')
@@ -314,11 +356,11 @@ function MYDev_Snaplines.OnFrameBreathe()
 			local nItemX, nItemY = hItem:GetAbsPos()
 			local nItemW, nItemH = hItem:GetSize()
 			insert(tTip, _L['-------------------'])
-			if MYDev_Snaplines.bShowItemTip then
+			if O.bShowItemTip then
 				InsertElementTip(hItem, tTip)
 			end
 			-- Item辅助线位置
-			if MYDev_Snaplines.bShowItemSnaplines then
+			if O.bShowItemSnaplines then
 				this:Lookup('', 'Handle_Snaplines_Item'):Show()
 				this:Lookup('', 'Handle_Snaplines_Item/Shadow_HoverItemLeft'  ):SetAbsPos(nItemX - 2     , 0)
 				this:Lookup('', 'Handle_Snaplines_Item/Shadow_HoverItemRight' ):SetAbsPos(nItemX + nItemW, 0)
@@ -331,7 +373,7 @@ function MYDev_Snaplines.OnFrameBreathe()
 		hText:SetText(concat(tTip, '\n'))
 
 		-- 缩放
-		if MYDev_Snaplines.bAutoScale then
+		if O.bAutoScale then
 			-- hText:EnableScale(true)
 			hText:SetFontScale(1)
 			hText:AutoSize()
@@ -397,7 +439,7 @@ end
 -- 重载界面
 MYDev_Snaplines.ReloadUI = function()
 	Wnd.CloseWindow('MYDev_Snaplines')
-	if MYDev_Snaplines.bEnable then
+	if O.bEnable then
 		Wnd.OpenWindow(PACKET_INFO.ROOT .. 'MYDev_Snaplines/ui/MYDev_Snaplines.ini', 'MYDev_Snaplines')
 	end
 end
@@ -412,28 +454,28 @@ LIB.RegisterPanel(_L['Development'], 'Dev_Snaplines', _L['Snaplines'], 'ui/Image
 
 		ui:Append('WndCheckBox', 'WndCheckBox_ShowTreePath')
 		  :Pos(x, y):Width(300)
-		  :Text(_L['enable tree path view']):Check(MYDev_Snaplines.bEnable or false)
+		  :Text(_L['enable tree path view']):Check(O.bEnable or false)
 		  :Check(function(bCheck)
-			MYDev_Snaplines.bEnable = bCheck
+			O.bEnable = bCheck
 			MYDev_Snaplines.ReloadUI()
 		end)
 		y = y + 40
 
 		ui:Append('WndCheckBox', 'WndCheckBox_ShowTip')
 		  :Pos(x, y):Width(200)
-		  :Text(_L['show tip']):Check(MYDev_Snaplines.bShowTip or false)
+		  :Text(_L['show tip']):Check(O.bShowTip or false)
 		  :Check(function(bCheck)
-			MYDev_Snaplines.bShowTip = bCheck
+			O.bShowTip = bCheck
 			MYDev_Snaplines.ReloadUI()
 		end)
 		x = x + 200
 		ui:Append('Shadow', 'Shadow_TipColor'):Pos(x, y)
-		  :Size(20, 20):Color(MYDev_Snaplines.rgbTip or {255,255,255})
+		  :Size(20, 20):Color(O.rgbTip or {255,255,255})
 		  :Click(function()
 			local me = this
 			UI.OpenColorPicker(function(r, g, b)
 				UI(me):Color(r, g, b)
-				MYDev_Snaplines.rgbTip = { r, g, b }
+				O.rgbTip = { r, g, b }
 				MYDev_Snaplines.ReloadUI()
 			end)
 		  end)
@@ -442,7 +484,7 @@ LIB.RegisterPanel(_L['Development'], 'Dev_Snaplines', _L['Snaplines'], 'ui/Image
 		  :Width(50):Text(_L['font'])
 		  :Click(function()
 			UI.OpenFontPicker(function(f)
-				MYDev_Snaplines.nTipFont = f
+				O.nTipFont = f
 				MYDev_Snaplines.ReloadUI()
 			end)
 		  end)
@@ -450,45 +492,45 @@ LIB.RegisterPanel(_L['Development'], 'Dev_Snaplines', _L['Snaplines'], 'ui/Image
 		y = y + 40
 		ui:Append('WndCheckBox', 'WndCheckBox_ShowData')
 		  :Pos(x, y):Width(200)
-		  :Text(_L['show data']):Check(MYDev_Snaplines.bShowData or false)
+		  :Text(_L['show data']):Check(O.bShowData or false)
 		  :Check(function(bCheck)
-			MYDev_Snaplines.bShowData = bCheck
+			O.bShowData = bCheck
 			MYDev_Snaplines.ReloadUI()
 		end)
 		y = y + 40
 
 		ui:Append('WndCheckBox', 'WndCheckBox_ShowWndTip')
 		  :Pos(x, y):Width(200)
-		  :Text(_L['show wnd tip']):Check(MYDev_Snaplines.bShowWndTip or false)
+		  :Text(_L['show wnd tip']):Check(O.bShowWndTip or false)
 		  :Check(function(bCheck)
-			MYDev_Snaplines.bShowWndTip = bCheck
+			O.bShowWndTip = bCheck
 			MYDev_Snaplines.ReloadUI()
 		end)
 		y = y + 40
 		ui:Append('WndCheckBox', 'WndCheckBox_ShowItemTip')
 		  :Pos(x, y):Width(200)
-		  :Text(_L['show item tip']):Check(MYDev_Snaplines.bShowItemTip or false)
+		  :Text(_L['show item tip']):Check(O.bShowItemTip or false)
 		  :Check(function(bCheck)
-			MYDev_Snaplines.bShowItemTip = bCheck
+			O.bShowItemTip = bCheck
 			MYDev_Snaplines.ReloadUI()
 		end)
 		y = y + 40
 
 		ui:Append('WndCheckBox', 'WndCheckBox_ShowWndSnaplines')
 		  :Pos(x, y):Width(200)
-		  :Text(_L['show wnd snaplines']):Check(MYDev_Snaplines.bShowWndSnaplines or false)
+		  :Text(_L['show wnd snaplines']):Check(O.bShowWndSnaplines or false)
 		  :Check(function(bCheck)
-			MYDev_Snaplines.bShowWndSnaplines = bCheck
+			O.bShowWndSnaplines = bCheck
 			MYDev_Snaplines.ReloadUI()
 		end)
 		x = x + 200
 		ui:Append('Shadow', 'Shadow_WndSnaplinesColor'):Pos(x, y)
-		  :Size(20, 20):Color(MYDev_Snaplines.rgbWndSnaplines or {255,255,255})
+		  :Size(20, 20):Color(O.rgbWndSnaplines or {255,255,255})
 		  :Click(function()
 			local me = this
 			UI.OpenColorPicker(function(r, g, b)
 				UI(me):Color(r, g, b)
-				MYDev_Snaplines.rgbWndSnaplines = { r, g, b }
+				O.rgbWndSnaplines = { r, g, b }
 				MYDev_Snaplines.ReloadUI()
 			end)
 		  end)
@@ -497,19 +539,19 @@ LIB.RegisterPanel(_L['Development'], 'Dev_Snaplines', _L['Snaplines'], 'ui/Image
 
 		ui:Append('WndCheckBox', 'WndCheckBox_ShowItemSnaplines')
 		  :Pos(x, y):Width(200)
-		  :Text(_L['show item snaplines']):Check(MYDev_Snaplines.bShowItemSnaplines or false)
+		  :Text(_L['show item snaplines']):Check(O.bShowItemSnaplines or false)
 		  :Check(function(bCheck)
-			MYDev_Snaplines.bShowItemSnaplines = bCheck
+			O.bShowItemSnaplines = bCheck
 			MYDev_Snaplines.ReloadUI()
 		end)
 		x = x + 200
 		ui:Append('Shadow', 'Shadow_ItemSnaplinesColor'):Pos(x, y)
-		  :Size(20, 20):Color(MYDev_Snaplines.rgbItemSnaplines or {255,255,255})
+		  :Size(20, 20):Color(O.rgbItemSnaplines or {255,255,255})
 		  :Click(function()
 			local me = this
 			UI.OpenColorPicker(function(r, g, b)
 				UI(me):Color(r, g, b)
-				MYDev_Snaplines.rgbItemSnaplines = { r, g, b }
+				O.rgbItemSnaplines = { r, g, b }
 				MYDev_Snaplines.ReloadUI()
 			end)
 		  end)
@@ -518,15 +560,15 @@ LIB.RegisterPanel(_L['Development'], 'Dev_Snaplines', _L['Snaplines'], 'ui/Image
 
 		ui:Append('WndCheckBox', 'WndCheckBox_AutoDetectBox')
 		  :Pos(x, y):Width(200)
-		  :Text(_L['auto detect box']):Check(MYDev_Snaplines.bDetectBox or false)
+		  :Text(_L['auto detect box']):Check(O.bDetectBox or false)
 		  :Check(function(bCheck)
-			MYDev_Snaplines.bDetectBox = bCheck
+			O.bDetectBox = bCheck
 		end)
 		y = y + 40
 
 		ui:Append('WndCheckBox', {
-			x = x, y = y, w = 200, text = _L['auto scale'], checked = MYDev_Snaplines.bAutoScale,
-			oncheck = function(bCheck) MYDev_Snaplines.bAutoScale = bCheck end
+			x = x, y = y, w = 200, text = _L['auto scale'], checked = O.bAutoScale,
+			oncheck = function(bCheck) O.bAutoScale = bCheck end
 		})
 		y = y + 40
 
@@ -536,9 +578,9 @@ LIB.RegisterPanel(_L['Development'], 'Dev_Snaplines', _L['Snaplines'], 'ui/Image
 	end
 })
 -- 注册快捷键
-LIB.RegisterHotKey('MY_Dev_Snaplines'         , _L['Snaplines']           , function() MYDev_Snaplines.bEnable   = not MYDev_Snaplines.bEnable   MYDev_Snaplines.ReloadUI() end, nil)
-LIB.RegisterHotKey('MY_Dev_Snaplines_ShowTip' , _L['Snaplines - ShowTip'] , function() MYDev_Snaplines.bShowTip  = not MYDev_Snaplines.bShowTip  MYDev_Snaplines.ReloadUI() end, nil)
-LIB.RegisterHotKey('MY_Dev_Snaplines_ShowData', _L['Snaplines - ShowData'], function() MYDev_Snaplines.bShowData = not MYDev_Snaplines.bShowData MYDev_Snaplines.ReloadUI() end, nil)
+LIB.RegisterHotKey('MY_Dev_Snaplines'         , _L['Snaplines']           , function() O.bEnable   = not O.bEnable   MYDev_Snaplines.ReloadUI() end, nil)
+LIB.RegisterHotKey('MY_Dev_Snaplines_ShowTip' , _L['Snaplines - ShowTip'] , function() O.bShowTip  = not O.bShowTip  MYDev_Snaplines.ReloadUI() end, nil)
+LIB.RegisterHotKey('MY_Dev_Snaplines_ShowData', _L['Snaplines - ShowData'], function() O.bShowData = not O.bShowData MYDev_Snaplines.ReloadUI() end, nil)
 -- For Debug
 if IsDebugClient and IsDebugClient() then
 	LIB.RegisterInit('Dev_Snaplines_Hotkey', function()

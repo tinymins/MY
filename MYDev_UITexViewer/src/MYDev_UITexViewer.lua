@@ -53,10 +53,15 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 	return
 end
 --------------------------------------------------------------------------
+local O = LIB.CreateUserSettingsModule('MYDev_UITexViewer', {
+	szUITexPath = {
+		ePathType = PATH_TYPE.ROLE,
+		xSchema = Schema.String,
+		xDefaultValue = '',
+	},
+})
 local _Cache = {}
 MYDev_UITexViewer = {}
-MYDev_UITexViewer.szUITexPath = ''
-RegisterCustomData('MYDev_UITexViewer.szUITexPath')
 
 _Cache.OnPanelActive = function(wnd)
     local ui = UI(wnd)
@@ -72,7 +77,7 @@ _Cache.OnPanelActive = function(wnd)
       :Pos(x, h-30):Size(w-20, 25):Multiline(true)
 
     ui:Append('WndAutocomplete', 'WndAutocomplete_UITexPath')
-      :Pos(x, y):Size(w-20, 25):Text(MYDev_UITexViewer.szUITexPath)
+      :Pos(x, y):Size(w-20, 25):Text(O.szUITexPath)
       :Change(function(szText)
         local tInfo = KG_Table.Load(szText .. '.txt', {
         -- 图片文件帧信息表的表头名字
@@ -87,7 +92,7 @@ _Cache.OnPanelActive = function(wnd)
             return
         end
 
-        MYDev_UITexViewer.szUITexPath = szText
+        O.szUITexPath = szText
         uiBoard:Clear()
         for i = 0, 256 do
             local tLine = tInfo:Search(i)
