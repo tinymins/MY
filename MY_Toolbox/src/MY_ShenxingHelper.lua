@@ -250,7 +250,7 @@ LIB.RegisterFrameCreate('WorldMap.MY_ShenxingHelper__OpenAllMap', D.CheckOpenAll
 -- ·ÀÖ¹ÉñÐÐCD±»ºÚ
 --------------------------------------------------------------------------
 function D.CheckAvoidBlackShenxingEnable()
-	if D.bReady and O.bEnable then
+	if D.bReady and O.bAvoidBlackCD then
 		LIB.RegisterEvent('DO_SKILL_CAST.MY_AvoidBlackShenxingCD', function()
 			local dwID, dwSkillID, dwSkillLevel = arg0, arg1, arg2
 			if not(UI_GetClientPlayerID() == dwID and

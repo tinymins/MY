@@ -134,6 +134,7 @@ local O = LIB.CreateUserSettingsModule('MY_GKPDoodad', _L['MY_GKP'], {
 		xDefaultValue = true,
 	},
 })
+local O2 = {}
 RegisterCustomData('MY_GKPDoodad.tNameColor')
 RegisterCustomData('MY_GKPDoodad.tCraft')
 RegisterCustomData('MY_GKPDoodad.szCustom')
@@ -270,9 +271,9 @@ end
 
 LIB.RegisterInit('MY_GKPDoodad', function()
 	for _, k in ipairs({'tNameColor', 'tCraft', 'szCustom'}) do
-		if D[k] then
-			SafeCall(Set, O, k, D[k])
-			D[k] = nil
+		if O2[k] then
+			SafeCall(Set, O, k, O2[k])
+			O2[k] = nil
 		end
 	end
 	-- 粮草堆，散落的镖银，阵营首领战利品、押运奖赏
@@ -752,7 +753,7 @@ local settings = {
 				tCraft = true,
 				szCustom = true,
 			},
-			root = D,
+			root = O2,
 		},
 	},
 }

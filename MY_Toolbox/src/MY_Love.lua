@@ -974,7 +974,7 @@ end
 -- player enter
 do
 local function OnPlayerEnterScene()
-	if O.bAutoFocus and arg0 == D.lover.dwID
+	if D.bReady and O.bAutoFocus and arg0 == D.lover.dwID
 	and MY_Focus and MY_Focus.SetFocusID and not LIB.IsInArena() then
 		MY_Focus.SetFocusID(TARGET.PLAYER, arg0)
 	end
@@ -985,6 +985,7 @@ end
 -- on init
 do
 local function OnInit()
+	D.bReady = true
 	D.UpdateLocalLover()
 end
 LIB.RegisterInit('MY_Love', OnInit)
