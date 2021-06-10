@@ -881,6 +881,10 @@ function LIB.SetUserSettings(szKey, ...)
 	local info = USER_SETTINGS_INFO[szKey]
 	assert(info, szErrHeader .. '`Key` has not been registered.')
 	local db = DATABASE_INSTANCE[info.ePathType]
+	if not db and LIB.IsDebugClient() then
+		LIB.Debug(PACKET_INFO.NAME_SPACE, szErrHeader .. 'Database not connected!!!', DEBUG_LEVEL.WARNING)
+		return
+	end
 	assert(db, szErrHeader .. 'Database not connected.')
 	local szDataSetKey, xValue
 	if info.bDataSet then
@@ -898,7 +902,7 @@ function LIB.SetUserSettings(szKey, ...)
 			for i, err in ipairs(errs) do
 				insert(aErrmsgs, i .. '. ' .. err.message)
 			end
-			assert(false, szErrHeader .. '' .. szKey .. ', schema check failed.\n' .. concat(aErrmsgs, '\n'), DEBUG_LEVEL.WARNING)
+			assert(false, szErrHeader .. '' .. szKey .. ', schema check failed.\n' .. concat(aErrmsgs, '\n'))
 		end
 	end
 	if info.bDataSet then
