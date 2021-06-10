@@ -516,9 +516,11 @@ LIB.RegisterEvent('PARTY_APPLY_REQUEST.MY_PartyRequest' , D.OnApplyRequest)
 LIB.RegisterEvent('ON_MESSAGE_BOX_OPEN.MY_PartyRequest' , D.OnMessageBoxOpen)
 
 LIB.RegisterInit('MY_PartyRequest', function()
-	if D.tAcceptCustom then
-		O.tAcceptCustom = D.tAcceptCustom
-		D.tAcceptCustom = nil
+	for _, k in ipairs({'tAcceptCustom'}) do
+		if D[k] then
+			SafeCall(Set, O, k, D[k])
+			D[k] = nil
+		end
 	end
 end)
 

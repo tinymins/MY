@@ -369,9 +369,11 @@ end
 LIB.RegisterEvent('ON_MESSAGE_BOX_OPEN.MY_RideRequest' , D.OnMessageBoxOpen)
 
 LIB.RegisterInit('MY_RideRequest', function()
-	if D.tAcceptCustom then
-		O.tAcceptCustom = D.tAcceptCustom
-		D.tAcceptCustom = nil
+	for _, k in ipairs({'tAcceptCustom'}) do
+		if D[k] then
+			SafeCall(Set, O, k, D[k])
+			D[k] = nil
+		end
 	end
 end)
 

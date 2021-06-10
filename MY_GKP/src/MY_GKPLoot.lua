@@ -263,6 +263,18 @@ LIB.RegisterEvent('LOADING_END.MY_GKPLoot', function()
 end)
 
 LIB.RegisterInit('MY_GKPLoot', function()
+	for _, k in ipairs({'tConfirm'}) do
+		if D[k] then
+			SafeCall(Set, O, k, D[k])
+			D[k] = nil
+		end
+	end
+	if D.tItemConfig and IsTable(v) then
+		for k, v in pairs(D.tItemConfig) do
+			SafeCall(Set, O, k, v)
+		end
+		D.tItemConfig = nil
+	end
 	D.bInitialized = true
 end)
 
@@ -2095,24 +2107,6 @@ local settings = {
 			fields = {
 				tConfirm = true,
 				tItemConfig = true,
-			},
-			triggers = {
-				tConfirm = function(_, v)
-					if not v then
-						return
-					end
-					D.tConfirm = nil
-					O.tConfirm = v
-				end,
-				tItemConfig = function(_, v)
-					if not IsTable(v) then
-						return
-					end
-					D.tItemConfig = nil
-					for k, v in pairs(v) do
-						SafeCall(Set, O, k, v)
-					end
-				end,
 			},
 			root = D,
 		},

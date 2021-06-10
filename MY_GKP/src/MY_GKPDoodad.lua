@@ -269,6 +269,12 @@ function D.ReloadCustom()
 end
 
 LIB.RegisterInit('MY_GKPDoodad', function()
+	for _, k in ipairs({'tNameColor', 'tCraft', 'szCustom'}) do
+		if D[k] then
+			SafeCall(Set, O, k, D[k])
+			D[k] = nil
+		end
+	end
 	-- 粮草堆，散落的镖银，阵营首领战利品、押运奖赏
 	if IsEmpty(O.szCustom) then
 		local t = {}
@@ -745,29 +751,6 @@ local settings = {
 				tNameColor = true,
 				tCraft = true,
 				szCustom = true,
-			},
-			triggers = {
-				tNameColor = function(_, v)
-					if not v then
-						return
-					end
-					D.tNameColor = nil
-					O.tNameColor = v
-				end,
-				tCraft = function(_, v)
-					if not v then
-						return
-					end
-					D.tCraft = nil
-					O.tCraft = v
-				end,
-				szCustom = function(_, v)
-					if not v then
-						return
-					end
-					D.szCustom = nil
-					O.szCustom = v
-				end,
 			},
 			root = D,
 		},

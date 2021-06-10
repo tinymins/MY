@@ -108,10 +108,12 @@ local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['MY_Chat'], {
 local D = {}
 
 LIB.RegisterInit('MY_ChatSwitch__DataCompatible', function()
-	if D.aWhisper then
-		O.aWhisper = D.aWhisper
+	for _, k in ipairs({'aWhisper'}) do
+		if D[k] then
+			SafeCall(Set, O, k, D[k])
+			D[k] = nil
+		end
 	end
-	D.aWhisper = nil
 end)
 RegisterCustomData('MY_ChatSwitch.aWhisper', 1)
 

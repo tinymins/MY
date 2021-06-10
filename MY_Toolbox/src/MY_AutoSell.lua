@@ -237,13 +237,11 @@ function D.CheckEnable()
 	end
 end
 LIB.RegisterInit('MY_AutoSell', function()
-	if D.tSellItem then
-		SafeCall(Set, O, 'tSellItem', D.tSellItem)
-		D.tSellItem = nil
-	end
-	if D.tProtectItem then
-		SafeCall(Set, O, 'tProtectItem', D.tProtectItem)
-		D.tProtectItem = nil
+	for _, k in ipairs({'tSellItem', 'tProtectItem'}) do
+		if D[k] then
+			SafeCall(Set, O, k, D[k])
+			D[k] = nil
+		end
 	end
 	D.CheckEnable()
 end)

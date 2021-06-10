@@ -160,13 +160,6 @@ for _, p in ipairs(D.aLoverItem) do
 	assert(not D.tLoverItem[p.nItem], 'MY_Love item index conflict: ' .. p.nItem)
 	D.tLoverItem[p.nItem] = p
 end
-RegisterCustomData('MY_Love.bQuiet')
-RegisterCustomData('MY_Love.szNone', 2)
-RegisterCustomData('MY_Love.szJabber')
-RegisterCustomData('MY_Love.szSign')
-RegisterCustomData('MY_Love.bAutoFocus')
-RegisterCustomData('MY_Love.bHookPlayerView')
-RegisterCustomData('MY_Love.bAutoReplyLover')
 
 --[[
 Ω£œ¿«È‘µ
