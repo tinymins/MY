@@ -314,7 +314,7 @@ function D.Close()
 end
 
 function D.Reload()
-	if O.bEnable then
+	if D.bReady and O.bEnable then
 		local frame = D.GetFrame()
 		if frame then
 			D.CorrectBoxCount(frame)
@@ -325,7 +325,11 @@ function D.Reload()
 		D.Close()
 	end
 end
-LIB.RegisterInit('MY_VISUALSKILL', D.Reload)
+
+LIB.RegisterInit('MY_VisualSkill', function()
+	D.bReady = true
+	D.Reload()
+end)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 	x = x + ui:Append('WndCheckBox', {

@@ -1292,9 +1292,15 @@ function D.ApplyFloatEntry(bFloatEntry)
 	end
 end
 function D.UpdateFloatEntry()
+	if not D.bReady then
+		return
+	end
 	D.ApplyFloatEntry(O.bFloatEntry)
 end
-LIB.RegisterInit('MY_RoleStatistics_TaskEntry', D.UpdateFloatEntry)
+LIB.RegisterInit('MY_RoleStatistics_TaskEntry', function()
+	D.bReady = true
+	D.UpdateFloatEntry()
+end)
 LIB.RegisterReload('MY_RoleStatistics_TaskEntry', function() D.ApplyFloatEntry(false) end)
 LIB.RegisterFrameCreate('SprintPower.MY_RoleStatistics_TaskEntry', D.UpdateFloatEntry)
 

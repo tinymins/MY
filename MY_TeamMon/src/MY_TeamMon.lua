@@ -1782,7 +1782,7 @@ function D.Close()
 end
 
 function D.Enable(bEnable, bFireUIEvent)
-	if bEnable then
+	if D.bReady and bEnable then
 		local res, err = pcall(D.Open)
 		if not res then
 			return LIB.Debug(err, DEBUG_LEVEL.WARNING)
@@ -2228,7 +2228,10 @@ function D.OnShare(_, data, nChannel, dwID, szName, bIsSelf)
 	end
 end
 
-LIB.RegisterInit('MY_TeamMon', D.Init)
+LIB.RegisterInit('MY_TeamMon', function()
+	D.bReady = true
+	D.Init()
+end)
 LIB.RegisterFlush('MY_TeamMon', D.SaveUserData)
 LIB.RegisterBgMsg('MY_TM_SHARE', D.OnShare)
 

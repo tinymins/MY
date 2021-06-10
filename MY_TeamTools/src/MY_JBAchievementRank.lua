@@ -82,7 +82,10 @@ function D.LoadData()
 	end
 	BOSS_ACHIEVE_ACQUIRE_LOG = LIB.LoadLUAData(szPath) or {}
 end
-LIB.RegisterInit('MY_JBAchievementRank', D.LoadData)
+LIB.RegisterInit('MY_JBAchievementRank', function()
+	D.bReady = true
+	D.LoadData()
+end)
 
 function D.SaveData()
 	local aAchieveAcquireLog = Clone(BOSS_ACHIEVE_ACQUIRE_LOG)
@@ -157,7 +160,7 @@ function D.ShareBKR(p, bOnymous, onfulfilled, oncomplete)
 end
 
 function D.CheckUpdateAcquire()
-	if not O.bEnable then
+	if not D.bReady or not O.bEnable then
 		return
 	end
 	for _, p in ipairs(BOSS_ACHIEVE_ACQUIRE_LOG) do

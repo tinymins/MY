@@ -101,16 +101,19 @@ function D.Unhook()
 end
 
 function D.CheckEnable()
-	if LIB.IsShieldedVersion('MY_FriendTipLocation') or not O.bEnable then
-		D.Unhook()
-		LIB.RegisterFrameCreate('FriendTip.MY_FriendTipLocation', false)
-	else
+	if D.bReady and O.bEnable and not LIB.IsShieldedVersion('MY_FriendTipLocation') then
 		D.Hook()
 		LIB.RegisterFrameCreate('FriendTip.MY_FriendTipLocation', D.Hook)
+	else
+		D.Unhook()
+		LIB.RegisterFrameCreate('FriendTip.MY_FriendTipLocation', false)
 	end
 end
 
-LIB.RegisterInit('MY_FriendTipLocation', D.CheckEnable)
+LIB.RegisterInit('MY_FriendTipLocation', function()
+	D.bReady = true
+	D.CheckEnable()
+end)
 LIB.RegisterReload('MY_FriendTipLocation', D.Unhook)
 LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_FriendTipLocation', function()
 	if arg0 and arg0 ~= 'MY_FriendTipLocation' then

@@ -275,11 +275,11 @@ LIB.RegisterInit('MY_GKPLoot', function()
 		end
 		D.tItemConfig = nil
 	end
-	D.bInitialized = true
+	D.bReady = true
 end)
 
 function D.IsEnabled()
-	if not D.bInitialized then
+	if not D.bReady then
 		return false
 	end
 	if not O.bOn then

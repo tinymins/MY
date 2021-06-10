@@ -377,7 +377,7 @@ function D.OnTMDataReload()
 end
 
 function D.CheckEnable()
-	if O.bEnable and not LIB.IsShieldedVersion('MY_TargetMon', 2) then
+	if D.bReady and O.bEnable and not LIB.IsShieldedVersion('MY_TargetMon', 2) then
 		LIB.RegisterModuleEvent('MY_TeamMon_CC', {
 			{ '#BREATHE', D.OnBreathe },
 			{ 'NPC_ENTER_SCENE', function() D.OnObjectEnterScene(TARGET.NPC, arg0) end },
@@ -401,7 +401,10 @@ LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_TeamMon_CC', function()
 	end
 	D.CheckEnable()
 end)
-LIB.RegisterInit('MY_TeamMon_CC', D.CheckEnable)
+LIB.RegisterInit('MY_TeamMon_CC', function()
+	D.bReady = true
+	D.CheckEnable()
+end)
 
 -- Global exports
 do

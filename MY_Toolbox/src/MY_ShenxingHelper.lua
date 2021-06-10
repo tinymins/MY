@@ -156,7 +156,7 @@ function D.UnhookNonwarMap()
 end
 
 function D.CheckNonwarMapEnable()
-	if O.bAncientMap and not LIB.IsShieldedVersion('MY_ShenxingHelper') then
+	if D.bReady and O.bAncientMap and not LIB.IsShieldedVersion('MY_ShenxingHelper') then
 		D.HookNonwarMap()
 	else
 		D.UnhookNonwarMap()
@@ -220,7 +220,7 @@ function D.UnhookOpenAllMap()
 end
 
 function D.CheckOpenAllMapEnable()
-	if O.bOpenAllMap and not LIB.IsShieldedVersion('MY_ShenxingHelper') then
+	if D.bReady and O.bOpenAllMap and not LIB.IsShieldedVersion('MY_ShenxingHelper') then
 		LIB.RegisterEvent({
 			'LOADING_END.MY_ShenxingHelper__OpenAllMap',
 			'UPDATE_ROAD_TRACK_FORCE.MY_ShenxingHelper__OpenAllMap',
@@ -250,7 +250,7 @@ LIB.RegisterFrameCreate('WorldMap.MY_ShenxingHelper__OpenAllMap', D.CheckOpenAll
 -- ·ÀÖ¹ÉñÐÐCD±»ºÚ
 --------------------------------------------------------------------------
 function D.CheckAvoidBlackShenxingEnable()
-	if O.bEnable then
+	if D.bReady and O.bEnable then
 		LIB.RegisterEvent('DO_SKILL_CAST.MY_AvoidBlackShenxingCD', function()
 			local dwID, dwSkillID, dwSkillLevel = arg0, arg1, arg2
 			if not(UI_GetClientPlayerID() == dwID and
@@ -298,7 +298,10 @@ LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_ShenxingHelper', function()
 	end
 	D.CheckEnable()
 end)
-LIB.RegisterInit('MY_ShenxingHelper', D.CheckEnable)
+LIB.RegisterInit('MY_ShenxingHelper', function()
+	D.bReady = true
+	D.CheckEnable()
+end)
 LIB.RegisterReload('MY_ShenxingHelper', D.RemoveHook)
 
 --------------------------------------------------------------------------

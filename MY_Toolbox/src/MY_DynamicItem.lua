@@ -142,7 +142,7 @@ function D.CheckEnable()
 	if not GetClientPlayer() then
 		return
 	end
-	if O.bEnable then
+	if D.bReady and O.bEnable then
 		Wnd.OpenWindow(SZ_INI, MODULE_NAME)
 	else
 		Wnd.CloseWindow(MODULE_NAME)
@@ -500,7 +500,10 @@ for i = 1, 32 do
 		end)
 end
 
-LIB.RegisterInit(MODULE_NAME, D.CheckEnable)
+LIB.RegisterInit(MODULE_NAME, function()
+	D.bReady = true
+	D.CheckEnable()
+end)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	ui:Append('WndComboBox', {

@@ -1219,9 +1219,15 @@ function D.ApplyFloatEntry(bFloatEntry)
 	end
 end
 function D.UpdateFloatEntry()
+	if not D.bReady then
+		return
+	end
 	D.ApplyFloatEntry(O.bFloatEntry)
 end
-LIB.RegisterInit('MY_RoleStatistics_SerendipityEntry', D.UpdateFloatEntry)
+LIB.RegisterInit('MY_RoleStatistics_SerendipityEntry', function()
+	D.bReady = true
+	D.UpdateFloatEntry()
+end)
 LIB.RegisterReload('MY_RoleStatistics_SerendipityEntry', function() D.ApplyFloatEntry(false) end)
 LIB.RegisterFrameCreate('SprintPower.MY_RoleStatistics_SerendipityEntry', D.UpdateFloatEntry)
 
@@ -1389,7 +1395,7 @@ end
 LIB.RegisterReload('MY_RoleStatistics_SerendipityMapMark', D.UnhookMapMark)
 
 function D.CheckMapMark()
-	if O.bMapMark then
+	if D.bReady and O.bMapMark then
 		D.HookMapMark()
 		D.DrawMapMark()
 		D.HookMiniMapMark()
@@ -1398,7 +1404,10 @@ function D.CheckMapMark()
 		D.UnhookMiniMapMark()
 	end
 end
-LIB.RegisterInit('MY_RoleStatistics_SerendipityMapMark', D.CheckMapMark)
+LIB.RegisterInit('MY_RoleStatistics_SerendipityMapMark', function()
+	D.bReady = true
+	D.CheckMapMark()
+end)
 
 -- Module exports
 do

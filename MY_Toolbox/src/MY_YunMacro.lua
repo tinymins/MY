@@ -184,7 +184,7 @@ function D.Unhook()
 end
 
 function D.Apply()
-	if O.bEnable then
+	if D.bReady and O.bEnable then
 		D.Hook()
 		LIB.RegisterFrameCreate('MacroSettingPanel.MY_YunMacro', D.Hook)
 		LIB.RegisterReload('MY_YunMacro', D.Unhook)
@@ -194,7 +194,11 @@ function D.Apply()
 		LIB.RegisterReload('MY_YunMacro', false)
 	end
 end
-LIB.RegisterInit('MY_YunMacro', D.Apply)
+
+LIB.RegisterInit('MY_YunMacro', function()
+	D.bReady = true
+	D.Apply()
+end)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	x = x + ui:Append('WndCheckBox', {

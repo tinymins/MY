@@ -197,7 +197,7 @@ function D.OnSkillNotify(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
 end
 
 function D.OnEnableChange()
-	local bEnable = O.bEnable
+	local bEnable = D.bReady and O.bEnable
 	local h = UI.GetShadowHandle('MY_ForceGuding')
 	h:Clear()
 	if bEnable then
@@ -270,7 +270,7 @@ function D.OnEnableChange()
 end
 
 function D.OnUseManaChange()
-	local bUseMana = O.bUseMana
+	local bUseMana = D.bReady and O.bUseMana
 	if bUseMana and not LIB.IsShieldedVersion('MY_ForceGuding') then
 		LIB.BreatheCall('MY_ForceGuding__UseMana', function()
 			local nFrame = GetLogicFrameCount()
@@ -322,7 +322,8 @@ function D.OnUseManaChange()
 	end
 end
 
-LIB.RegisterInit('', function()
+LIB.RegisterInit('MY_ForceGuding', function()
+	D.bReady = true
 	D.OnEnableChange()
 	D.OnUseManaChange()
 end)

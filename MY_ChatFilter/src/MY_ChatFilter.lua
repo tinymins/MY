@@ -126,7 +126,7 @@ local l_tChannelHeader = {
 LIB.HookChatPanel('FILTER.MY_ChatFilter', function(h, szMsg, szChannel, dwTime)
 	local aXMLNode, aSay
 	-- 插件消息UUID过滤
-	if D.bInitialized and O.bFilterDuplicateAddonTalk then
+	if D.bReady and O.bFilterDuplicateAddonTalk then
 		if not aXMLNode then
 			aXMLNode = LIB.XMLDecode(szMsg)
 			aSay = LIB.ParseChatData(aXMLNode)
@@ -168,7 +168,7 @@ LIB.HookChatPanel('FILTER.MY_ChatFilter', function(h, szMsg, szChannel, dwTime)
 			szChannel = szEchoChannel
 		end
 	end
-	if D.bInitialized and O.bFilterDuplicate and O.tApplyDuplicateChannels[szChannel] then
+	if D.bReady and O.bFilterDuplicate and O.tApplyDuplicateChannels[szChannel] then
 		if not aXMLNode then
 			aXMLNode = LIB.XMLDecode(szMsg)
 			aSay = LIB.ParseChatData(aXMLNode)
@@ -217,7 +217,7 @@ LIB.HookChatPanel('FILTER.MY_ChatFilter', function(h, szMsg, szChannel, dwTime)
 	end
 	return true
 end)
-LIB.RegisterInit('MY_ChatFilter', function() D.bInitialized = true end)
+LIB.RegisterInit('MY_ChatFilter', function() D.bReady = true end)
 
 local PS = {}
 

@@ -106,7 +106,7 @@ function D.UpdateAnchor()
 end
 
 function D.CheckEnable()
-	if O.bEnable then
+	if D.bReady and O.bEnable then
 		D.OpenPanel()
 	else
 		D.ClosePanel()
@@ -227,6 +227,7 @@ function D.OnFrameDragEnd()
 end
 
 LIB.RegisterInit('MY_TargetDirection', function()
+	D.bReady = true
 	D.CheckEnable()
 	D.UpdateAnchor()
 end)

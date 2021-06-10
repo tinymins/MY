@@ -65,15 +65,18 @@ local O = LIB.CreateUserSettingsModule('MY_HideAnnounceBg', _L['MY_Toolbox'], {
 local D = {}
 
 function D.Apply()
-	if not O.bEnable then
-		return
-	end
-	local h = Station.Lookup('Topmost2/GMAnnouncePanel', 'Handle_MsgBg')
-	if h then
-		h:Hide()
+	if D.bReady and O.bEnable then
+		local h = Station.Lookup('Topmost2/GMAnnouncePanel', 'Handle_MsgBg')
+		if h then
+			h:Hide()
+		end
 	end
 end
-LIB.RegisterInit('MY_HideAnnounceBg', D.Apply)
+
+LIB.RegisterInit('MY_HideAnnounceBg', function()
+	D.bReady = true
+	D.Apply()
+end)
 LIB.RegisterFrameCreate('GMAnnouncePanel.MY_HideAnnounceBg', D.Apply)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)

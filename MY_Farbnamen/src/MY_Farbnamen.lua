@@ -366,7 +366,7 @@ end
 
 -- 插入聊天内容的 HOOK （过滤、加入时间 ）
 LIB.HookChatPanel('BEFORE.MY_FARBNAMEN', function(h, szMsg, ...)
-	if D.bInitialized and O.bEnable then
+	if D.bReady and O.bEnable then
 		szMsg = D.Render(szMsg, true)
 	end
 	return szMsg
@@ -604,7 +604,7 @@ function D.AddAusID(dwID)
 	end
 end
 
-LIB.RegisterInit('MY_Farbnamen', function() D.bInitialized = true end)
+LIB.RegisterInit('MY_Farbnamen', function() D.bReady = true end)
 
 --------------------------------------------------------------
 -- 菜单

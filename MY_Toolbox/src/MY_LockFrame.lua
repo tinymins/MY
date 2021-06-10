@@ -162,7 +162,7 @@ function D.UnlockFrame(frame)
 end
 
 function D.IsFrameLock(frame)
-	if not O.bEnable or D.bTempDisable or not frame then
+	if not D.bReady or not O.bEnable or D.bTempDisable or not frame then
 		return false
 	end
 	local szLock = D.tLockID[frame:GetName()]
@@ -191,7 +191,7 @@ function D.CheckAllFrame()
 			frmIter = frmIter:GetNext()
 		end
 	end
-	if O.bEnable then
+	if D.bReady and O.bEnable then
 		LIB.RegisterEvent('ON_FRAME_CREATE.MY_LockFrame', function()
 			D.CheckFrame(arg0)
 		end)
@@ -216,7 +216,10 @@ function D.CheckAllFrame()
 	end
 end
 
-LIB.RegisterInit('MY_LockFrame', D.CheckAllFrame)
+LIB.RegisterInit('MY_LockFrame', function()
+	D.bReady = true
+	D.CheckAllFrame()
+end)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	ui:Append('WndComboBox', {

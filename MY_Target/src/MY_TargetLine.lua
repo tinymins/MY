@@ -148,6 +148,9 @@ end
 local bCurTargetRL, dwCurTarLineSrcID, dwCurTarLineDstID, shaTLine
 local bCurTTargetRL, dwCurTTarLineSrcID, dwCurTTarLineDstID, shaTTLine
 function D.UpdateLine()
+	if not D.bReady then
+		return
+	end
 	local me = GetClientPlayer()
 	local dwTarType, dwTarID = LIB.GetTarget(me)
 	local tar = LIB.GetObject(dwTarType, dwTarID)
@@ -255,7 +258,7 @@ end
 
 function D.CheckEnable()
 	C.bShielded = LIB.IsShieldedVersion('MY_TargetLine')
-	if (O.bTarget or O.bTTarget) and not C.bShielded then
+	if D.bReady and (O.bTarget or O.bTTarget) and not C.bShielded then
 		LIB.BreatheCall('MY_TargetLine', D.UpdateLine)
 	else
 		LIB.BreatheCall('MY_TargetLine', false)
@@ -269,7 +272,10 @@ LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_TargetLine', function()
 	end
 	D.CheckEnable()
 end)
-LIB.RegisterInit('MY_TargetLine', D.CheckEnable)
+LIB.RegisterInit('MY_TargetLine', function()
+	D.bReady = true
+	D.CheckEnable()
+end)
 
 -- Global exports
 do

@@ -191,7 +191,7 @@ function D.UnHookDomesticatePanel()
 end
 
 function D.CheckAutoFeedEnable()
-	if D.IsAutoFeedValid(GetClientPlayer()) then
+	if D.bReady and D.IsAutoFeedValid(GetClientPlayer()) then
 		LIB.BreatheCall('MY_Domesticate__AutoFeed', 30000, function()
 			local me = GetClientPlayer()
 			if not me then
@@ -225,7 +225,7 @@ function D.CheckAutoFeedEnable()
 end
 
 function D.CheckAlertEnable()
-	if O.bAlert then
+	if D.bReady and O.bAlert then
 		LIB.BreatheCall('MY_Domesticate__Alert', 60000, function()
 			local me = GetClientPlayer()
 			if not me then
@@ -247,8 +247,11 @@ function D.CheckAlertEnable()
 	end
 end
 
-LIB.RegisterInit('MY_Domesticate__AutoFeed', D.CheckAutoFeedEnable)
-LIB.RegisterInit('MY_Domesticate__Alert', D.CheckAlertEnable)
+LIB.RegisterInit('MY_Domesticate', function()
+	D.bReady = true
+	D.CheckAutoFeedEnable()
+	D.CheckAlertEnable()
+end)
 LIB.RegisterFrameCreate('DomesticatePanel.MY_Domesticate', D.HookDomesticatePanel)
 LIB.RegisterReload('MY_Domesticate', D.UnHookDomesticatePanel)
 

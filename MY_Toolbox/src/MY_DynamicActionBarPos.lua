@@ -189,7 +189,7 @@ end
 
 function D.CheckEnable()
 	for _, szName in ipairs(HOOK_FRAME_NAME) do
-		if O.bEnable then
+		if D.bReady and O.bEnable then
 			D.Hook(szName)
 		else
 			D.Unhook(szName)
@@ -197,12 +197,16 @@ function D.CheckEnable()
 	end
 end
 
+LIB.RegisterInit('MY_DynamicActionBarPos', function()
+	D.bReady = true
+	D.CheckEnable()
+end)
+
 LIB.RegisterReload('MY_DynamicActionBarPos', function()
 	for _, szName in ipairs(HOOK_FRAME_NAME) do
 		D.Unhook(szName)
 	end
 end)
-LIB.RegisterInit('MY_DynamicActionBarPos', D.CheckEnable)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 	ui:Append('WndCheckBox', {

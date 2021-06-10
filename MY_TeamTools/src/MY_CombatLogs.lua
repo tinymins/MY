@@ -137,7 +137,7 @@ local LOG_TYPE = {
 
 -- ¸üÐÂÆôÓÃ×´Ì¬
 function D.UpdateEnable()
-	local bEnable = O.bEnable and (not O.bOnlyDungeon or LIB.IsInDungeon())
+	local bEnable = D.bReady and O.bEnable and (not O.bOnlyDungeon or LIB.IsInDungeon())
 	if not bEnable and LOG_ENABLE then
 		D.CloseCombatLogs()
 	elseif bEnable and not LOG_ENABLE and LIB.IsFighting() then
@@ -698,6 +698,11 @@ LIB.RegisterEvent('PARTY_ADD_MEMBER', function()
 		D.OnTargetUpdate(arg1)
 		D.InsertLog(LOG_TYPE.PARTY_ADD_MEMBER, { arg0, arg1, arg2 })
 	end
+end)
+
+LIB.RegisterInit('MY_CombatLogs', function()
+	D.bReady = true
+	D.UpdateEnable()
 end)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
