@@ -955,7 +955,7 @@ function LIB.ResetUserSettings(szKey, ...)
 end
 
 -- 创建用户设置代理对象
--- @param {string | table} xProxy 配置项代理表，或模块命名空间
+-- @param {string | table} xProxy 配置项代理表（ alias => globalKey ），或模块命名空间
 -- @return 配置项读写代理对象
 function LIB.CreateUserSettingsProxy(xProxy)
 	local tSettings = {}
@@ -1009,6 +1009,19 @@ function LIB.CreateUserSettingsProxy(xProxy)
 			LIB.SetUserSettings(GetGlobalKey(k), v)
 			tSettings[k] = v
 			tLoaded[k] = true
+		end,
+		__call = function(_, cmd, arg0)
+			if cmd == 'reset' then
+				if not IsTable(arg0) then
+					arg0 = {}
+					for k, _ in pairs(tProxy) do
+						insert(arg0, k)
+					end
+				end
+				for _, k in ipairs(arg0) do
+					LIB.ResetUserSettings(GetGlobalKey(k))
+				end
+			end
 		end,
 	})
 end
