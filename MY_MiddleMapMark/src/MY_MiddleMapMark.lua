@@ -522,6 +522,8 @@ function D.Search(bForce)
 					item.decoded = info.decoded
 					item.type = 'Doodad'
 					item.name = info.name
+					item.x = info.x
+					item.y = info.y
 					item.title = info.title
 					item.level = info.level
 					item.templateid = info.templateid
