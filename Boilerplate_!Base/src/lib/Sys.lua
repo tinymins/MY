@@ -869,7 +869,7 @@ function LIB.SetUserSettings(szKey, ...)
 	local db = DATABASE_INSTANCE[info.ePathType]
 	if not db and LIB.IsDebugClient() then
 		LIB.Debug(PACKET_INFO.NAME_SPACE, szErrHeader .. 'Database not connected!!!', DEBUG_LEVEL.WARNING)
-		return
+		return false
 	end
 	assert(db, szErrHeader .. 'Database not connected.')
 	local szDataSetKey, xValue
@@ -902,6 +902,7 @@ function LIB.SetUserSettings(szKey, ...)
 	end
 	db:Set(info.szDataKey, { d = xValue, v = info.szVersion })
 	NEED_FLUSH = true
+	return true
 end
 
 -- 删除用户配置项值（恢复默认值）
@@ -978,7 +979,9 @@ function LIB.CreateUserSettingsProxy(xProxy)
 							return tDSSettings[kds]
 						end,
 						__newindex = function(_, kds, vds)
-							LIB.SetUserSettings(GetGlobalKey(k), kds, vds)
+							if not LIB.SetUserSettings(GetGlobalKey(k), kds, vds) then
+								return
+							end
 							tDSSettings[kds] = vds
 							tDSLoaded[kds] = true
 						end,
@@ -992,7 +995,9 @@ function LIB.CreateUserSettingsProxy(xProxy)
 			return tDataSet[k] or tSettings[k]
 		end,
 		__newindex = function(_, k, v)
-			LIB.SetUserSettings(GetGlobalKey(k), v)
+			if not LIB.SetUserSettings(GetGlobalKey(k), v) then
+				return
+			end
 			tSettings[k] = v
 			tLoaded[k] = true
 		end,
