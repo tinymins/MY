@@ -646,7 +646,8 @@ local ALERT_COLUMN = {
 		id = 'starve',
 		szTitle = _L['Starve'],
 		GetValue = function(me)
-			return LIB.GetItemAmountInAllPackages(5, 34797, true)
+			return LIB.GetItemAmountInAllPackages(ITEM_TABLE_TYPE.OTHER, 34797, true)
+				+ LIB.GetItemAmountInAllPackages(ITEM_TABLE_TYPE.OTHER, 40259, true)
 		end,
 		GetCompareText = GeneCommonCompareText('starve', 'Starve'),
 	},
