@@ -496,14 +496,14 @@ function PS.OnPanelActive(wnd)
 	nX = ui:Append('Text', { text = _L['Stop simple broken can when score reaches'], x = nX, y = nY }):AutoWidth():Pos('BOTTOMRIGHT') + 5
 	nX = ui:Append('WndComboBox', {
 		x = nX, y = nY, w = 100, h = 25,
-		text = MY_Taoguan.nPausePoint,
+		text = O.nPausePoint,
 		menu = function()
 			local ui = UI(this)
 			local m0 = {}
 			for i = 2, MAX_POINT_POW do
 				local v = 10 * 2 ^ i
 				insert(m0, { szOption = tostring(v), fnAction = function()
-					MY_Taoguan.nPausePoint = v
+					O.nPausePoint = v
 					ui:Text(tostring(v))
 				end })
 			end
@@ -513,8 +513,8 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndCheckBox', {
 		x = nX, y = nY, w = 200,
 		text = _L['Put can if needed?'],
-		checked = MY_Taoguan.bUseTaoguan,
-		oncheck = function(bChecked) MY_Taoguan.bUseTaoguan = bChecked end,
+		checked = O.bUseTaoguan,
+		oncheck = function(bChecked) O.bUseTaoguan = bChecked end,
 	}):AutoWidth()
 
 	-- 没有小银锤时使用小金锤
@@ -523,8 +523,8 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndCheckBox', {
 		x = nX, y = nY, w = 200,
 		text = _L('When no %s use %s?', XIAOYINCHUI, XIAOJINCHUI),
-		checked = MY_Taoguan.bNoYinchuiUseJinchui,
-		oncheck = function(bChecked) MY_Taoguan.bNoYinchuiUseJinchui = bChecked end,
+		checked = O.bNoYinchuiUseJinchui,
+		oncheck = function(bChecked) O.bNoYinchuiUseJinchui = bChecked end,
 	}):AutoWidth()
 
 	-- 各种东西使用分数和缺少停砸
@@ -576,19 +576,21 @@ function PS.OnPanelActive(wnd)
 			for _, p in ipairs(FILTER_ITEM) do
 				insert(m0, {
 					szOption = p.szName,
-					bCheck = true, bChecked = MY_Taoguan.tFilterItem[p.szName],
+					bCheck = true, bChecked = O.tFilterItem[p.szName],
 					fnAction = function(d, b)
-						MY_Taoguan.tFilterItem[p.szName] = b
+						O.tFilterItem[p.szName] = b
+						O.tFilterItem = O.tFilterItem
 					end,
 				})
 			end
-			for k, v in pairs(MY_Taoguan.tFilterItem) do
+			for k, v in pairs(O.tFilterItem) do
 				if FILTER_ITEM_DEFAULT[k] == nil then
 					insert(m0, {
 						szOption = k,
 						bCheck = true, bChecked = v,
 						fnAction = function(d, b)
-							MY_Taoguan.tFilterItem[k] = b
+							O.tFilterItem[k] = b
+							O.tFilterItem = O.tFilterItem
 						end,
 						szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',
 						nFrame = 49,
@@ -597,7 +599,8 @@ function PS.OnPanelActive(wnd)
 						nIconHeight = 17,
 						szLayer = 'ICON_RIGHTMOST',
 						fnClickIcon = function()
-							MY_Taoguan.tFilterItem[k] = nil
+							O.tFilterItem[k] = nil
+							O.tFilterItem = O.tFilterItem
 							UI.ClosePopupMenu()
 						end,
 					})
@@ -638,76 +641,3 @@ function PS.OnPanelActive(wnd)
 	}):Pos('BOTTOMRIGHT')
 end
 LIB.RegisterPanel(_L['Target'], 'MY_Taoguan', _L[MODULE_NAME], 119, PS)
-
----------------------------------------------------------------------
--- 注册事件、初始化
----------------------------------------------------------------------
-
--- Global exports
-do
-local settings = {
-	exports = {
-		{
-			fields = {
-				nPausePoint = true,
-				bUseTaoguan = true,
-				bNoYinchuiUseJinchui = true,
-				nUseXiaojinchui = true,
-				bPauseNoXiaojinchui = true,
-				nUseXingyunXiangnang = true,
-				bPauseNoXingyunXiangnang = true,
-				nUseXingyunJinnang = true,
-				bPauseNoXingyunJinnang = true,
-				nUseRuyiXiangnang = true,
-				bPauseNoRuyiXiangnang = true,
-				nUseRuyiJinnang = true,
-				bPauseNoRuyiJinnang = true,
-				nUseJiyougu = true,
-				bPauseNoJiyougu = true,
-				nUseZuisheng = true,
-				bPauseNoZuisheng = true,
-				tFilterItem = true,
-			},
-			root = O,
-		},
-	},
-	imports = {
-		{
-			fields = {
-				nPausePoint = true,
-				bUseTaoguan = true,
-				bNoYinchuiUseJinchui = true,
-				nUseXiaojinchui = true,
-				bPauseNoXiaojinchui = true,
-				nUseXingyunXiangnang = true,
-				bPauseNoXingyunXiangnang = true,
-				nUseXingyunJinnang = true,
-				bPauseNoXingyunJinnang = true,
-				nUseRuyiXiangnang = true,
-				bPauseNoRuyiXiangnang = true,
-				nUseRuyiJinnang = true,
-				bPauseNoRuyiJinnang = true,
-				nUseJiyougu = true,
-				bPauseNoJiyougu = true,
-				nUseZuisheng = true,
-				bPauseNoZuisheng = true,
-				tFilterItem = true,
-			},
-			triggers = {
-				tFilterItem = function()
-					if IsEmpty(O.tFilterItem) then
-						O.tFilterItem = {}
-					end
-					for v, b in pairs(FILTER_ITEM_DEFAULT) do
-						if O.tFilterItem[v] == nil then
-							O.tFilterItem[v] = b
-						end
-					end
-				end,
-			},
-			root = O,
-		},
-	},
-}
-MY_Taoguan = LIB.CreateModule(settings)
-end
