@@ -221,6 +221,7 @@ end
 -- Global exports
 do
 local settings = {
+	name = FRAME_NAME,
 	exports = {
 		{
 			root = D,

@@ -2510,10 +2510,13 @@ end
 -- Global exports
 do
 local PRESETS = {
-	UIEvent = LIB.ArrayToObject({
+	UIEvent = {
 		'OnFrameCreate',
 		'OnFrameDestroy',
 		'OnFrameBreathe',
+		'OnFrameShow',
+		'OnFrameHide',
+		'OnFrameSetFocus',
 		'OnFrameRender',
 		'OnFrameDragEnd',
 		'OnFrameDragSetPosEnd',
@@ -2558,91 +2561,118 @@ local PRESETS = {
 		'OnDragButtonBegin',
 		'OnDragButtonEnd',
 		'OnActivePage',
-	}),
+	},
 }
-function LIB.CreateModule(options)
-	local exports = Get(options, 'exports', {})
-	for _, export in ipairs(exports) do
-		if not export.presets then
-			export.presets = {}
-		end
-		if export.preset then
-			insert(export.presets, export.preset)
-			export.preset = nil
-		end
-		for i, s in ipairs_r(export.presets) do
-			if not PRESETS[s] then
-				remove(export.presets, i)
-			end
-		end
-	end
-	local function getter(_, k)
-		local found, v, trigger, getter = false, nil, nil, nil
-		for _, export in ipairs(exports) do
-			trigger = Get(export, {'triggers', k})
-			if trigger then
-				trigger(k)
-			end
-			if not found then
-				getter, found = Get(export, {'getters', k})
-				if getter then
-					v = getter(k)
+local function FormatModuleProxy(options)
+	local entries = {} -- entries
+	local interceptors = {} -- before trigger, return anything if want to intercept
+	local triggers = {} -- aftet trigger, will not be called while intercepted by interceptors
+	if options then
+		local statics = {} -- static root
+		for _, option in ipairs(options) do
+			if option.root then
+				local presets = option.presets or {} -- presets = {"XXX"},
+				if option.preset then -- preset = "XXX",
+					insert(presets, option.preset)
 				end
-			end
-			if not found then
-				v, found = Get(export, {'fields', k})
-				if found then
-					if export.root and not IsNil(v) then
-						v = export.root[k]
-					end
-				else -- if not found
-					for _, presetName in ipairs(export.presets) do
-						local presetKeys = PRESETS[presetName]
-						if presetKeys and presetKeys[k] then
-							if IsFunction(export.root[k]) then
-								v = export.root[k]
-								found = true
-								break
-							end
+				for i, s in ipairs(presets) do
+					if PRESETS[s] then
+						for _, k in ipairs(PRESETS[s]) do
+							entries[k] = option.root
 						end
 					end
 				end
 			end
-			if found then
-				return v
+			if IsTable(options.fields) then
+				for k, v in pairs(options.fields) do
+					if IsNumber(k) and IsString(v) then -- "XXX",
+						entries[v] = exports.root
+					elseif IsString(k) and IsFunction(v) then -- XXX = D.XXX,
+						statics[k] = v
+						entries[k] = statics
+					elseif IsString(k) then -- XXX = true,
+						entries[k] = exports.root
+					end
+				end
+			end
+			if IsTable(options.interceptors) then
+				for k, v in pairs(options.interceptors) do
+					if IsString(k) and IsFunction(v) then -- XXX = function(k) end,
+						interceptors[k] = v
+					end
+				end
+			end
+			if IsTable(options.triggers) then
+				for k, v in pairs(options.triggers) do
+					if IsString(k) and IsFunction(v) then -- XXX = function(k, v) end,
+						triggers[k] = v
+					end
+				end
 			end
 		end
 	end
-
-	local imports = Get(options, 'imports', {})
-	local function setter(_, k, v)
-		local found, trigger, setter, res = false, nil, nil, nil
-		for _, import in ipairs(imports) do
-			trigger = Get(import, {'triggers', k})
-			if IsTable(trigger) and IsFunction(trigger[1]) then
-				trigger[1](k, v)
-			end
-			if not found then
-				setter, found = Get(import, {'setters', k})
-				if setter then
-					setter(k, v)
-					found = true
-				end
-			end
-			if not found then
-				res, found = Get(import, {'fields', k})
-				if res and import.root then
-					import.root[k] = v
-				end
-			end
-			if IsTable(trigger) and IsFunction(trigger[2]) then
-				trigger[2](k, v)
-			elseif IsFunction(trigger) then
-				trigger(k, v)
-			end
-			if found then
+	return entries, interceptors, triggers
+end
+local function ParameterCounter(...)
+	return select('#', ...), ...
+end
+function LIB.CreateModule(options)
+	local name = options.name or 'Unnamed'
+	local exportEntries, exportInterceptors, exportTriggers = FormatModuleProxy(options.exports)
+	local importEntries, importInterceptors, importTriggers = FormatModuleProxy(options.imports)
+	local function getter(_, k)
+		if not exportEntries[k] then
+			local errmsg = 'Module `' .. name .. '` get value failed, unregistered properity `' .. k .. '`.'
+			if LIB.IsDebugClient() then
+				LIB.Debug(PACKET_INFO.NAME_SPACE, errmsg, DEBUG_LEVEL.WARNING)
 				return
 			end
+			assert(false, errmsg)
+		end
+		local interceptor = exportInterceptors[k]
+		if interceptor then
+			local pc, value = ParameterCounter(interceptor(k))
+			if pc >= 1 then
+				return value
+			end
+		end
+		local value = nil
+		local root = exportEntries[k]
+		if root then
+			value = root[k]
+		end
+		local trigger = exportTriggers[k]
+		if trigger then
+			trigger(k, value)
+		end
+		return value
+	end
+	local function setter(_, k, v)
+		if not importEntries[k] then
+			local errmsg = 'Module `' .. name .. '` set value failed, unregistered properity `' .. k .. '`.'
+			if LIB.IsDebugClient() then
+				LIB.Debug(PACKET_INFO.NAME_SPACE, errmsg, DEBUG_LEVEL.WARNING)
+				return
+			end
+			assert(false, errmsg)
+		end
+		local interceptor = importInterceptors[k]
+		if interceptor then
+			local pc, res, value = ParameterCounter(pcall(interceptor, k, v))
+			if not res then
+				return
+			end
+			if pc >= 2 then
+				v = value
+			end
+		end
+		local root = importEntries[k]
+		if root then
+			root[k] = v
+		end
+		local trigger = importTriggers[k]
+		if trigger then
+			trigger(k, v)
 		end
 	end
 	return setmetatable({}, { __index = getter, __newindex = setter })
