@@ -2627,7 +2627,7 @@ local PRESETS = {
 		'OnWndResizeEnd',
 	},
 }
-local function FormatModuleProxy(options)
+local function FormatModuleProxy(options, name)
 	local entries = {} -- entries
 	local interceptors = {} -- before trigger, return anything if want to intercept
 	local triggers = {} -- aftet trigger, will not be called while intercepted by interceptors
@@ -2683,8 +2683,8 @@ local function ParameterCounter(...)
 end
 function LIB.CreateModule(options)
 	local name = options.name or 'Unnamed'
-	local exportEntries, exportInterceptors, exportTriggers = FormatModuleProxy(options.exports)
-	local importEntries, importInterceptors, importTriggers = FormatModuleProxy(options.imports)
+	local exportEntries, exportInterceptors, exportTriggers = FormatModuleProxy(options.exports, name)
+	local importEntries, importInterceptors, importTriggers = FormatModuleProxy(options.imports, name)
 	local function getter(_, k)
 		if not exportEntries[k] then
 			local errmsg = 'Module `' .. name .. '`: get value failed, unregistered properity `' .. k .. '`.'
