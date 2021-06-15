@@ -2710,7 +2710,7 @@ function LIB.CreateModule(options)
 	end
 	local function setter(_, k, v)
 		if not importEntries[k] then
-			local errmsg = 'Module `' .. name .. '` set value failed, unregistered properity `' .. k .. '`.'
+			local errmsg = 'Module `' .. name .. '`: set value failed, unregistered properity `' .. k .. '`.'
 			if LIB.IsDebugClient() then
 				LIB.Debug(PACKET_INFO.NAME_SPACE, errmsg, DEBUG_LEVEL.WARNING)
 				return
