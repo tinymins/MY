@@ -175,10 +175,11 @@ local settings = {
 	exports = {
 		{
 			fields = {
-				GetSoundList = D.GetSoundList,
-				GetWndButtonStyleName = D.GetWndButtonStyleName,
-				GetWndButtonStyleConfig = D.GetWndButtonStyleConfig,
+				'GetSoundList',
+				'GetWndButtonStyleName',
+				'GetWndButtonStyleConfig',
 			},
+			root = D,
 		},
 	},
 }
