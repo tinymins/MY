@@ -2736,7 +2736,7 @@ function LIB.CreateModule(options)
 			trigger(k, v)
 		end
 	end
-	return setmetatable({}, { __index = getter, __newindex = setter })
+	return setmetatable({}, { __index = getter, __newindex = setter, __metatable = true })
 end
 end
 
