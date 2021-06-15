@@ -171,6 +171,7 @@ end
 -- Global exports
 do
 local settings = {
+	name = MODULE_NAME,
 	exports = {
 		{
 			fields = {
