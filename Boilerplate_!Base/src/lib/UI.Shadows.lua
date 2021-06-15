@@ -151,8 +151,8 @@ local settings = {
 	name = FRAME_NAME,
 	exports = {
 		{
+			preset = 'UIEvent',
 			root = D,
-			preset = 'UIEvent'
 		},
 	},
 }
