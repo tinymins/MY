@@ -187,7 +187,7 @@ local settings = {
 	name = FRAME_NAME,
 	exports = {
 		{
-			preset = 'UIEvent'
+			preset = 'UIEvent',
 			fields = {
 				'OnPanelActivePartial',
 			},
