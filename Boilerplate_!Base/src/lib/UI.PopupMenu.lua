@@ -754,14 +754,12 @@ local settings = {
 	name = FRAME_NAME,
 	exports = {
 		{
-			fields = {
-				Open = D.Open,
-				Close = D.Close,
-			},
-		},
-		{
-			root = D,
 			preset = 'UIEvent'
+			fields = {
+				'Open',
+				'Close',
+			},
+			root = D,
 		},
 	},
 }

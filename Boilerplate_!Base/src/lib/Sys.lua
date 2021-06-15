@@ -2647,27 +2647,28 @@ local function FormatModuleProxy(options)
 					end
 				end
 			end
-			if IsTable(options.fields) then
-				for k, v in pairs(options.fields) do
+			if IsTable(option.fields) then
+				for k, v in pairs(option.fields) do
 					if IsNumber(k) and IsString(v) then -- "XXX",
-						entries[v] = exports.root
-					elseif IsString(k) and IsFunction(v) then -- XXX = D.XXX,
+						if not IsTable(option.root) then
+							assert(false, 'Module `' .. name .. '`: static field `' .. v .. '` must be declared with a table root.')
+						end
+						entries[v] = option.root
+					elseif IsString(k) then -- XXX = D.XXX,
 						statics[k] = v
 						entries[k] = statics
-					elseif IsString(k) then -- XXX = true,
-						entries[k] = exports.root
 					end
 				end
 			end
-			if IsTable(options.interceptors) then
-				for k, v in pairs(options.interceptors) do
+			if IsTable(option.interceptors) then
+				for k, v in pairs(option.interceptors) do
 					if IsString(k) and IsFunction(v) then -- XXX = function(k) end,
 						interceptors[k] = v
 					end
 				end
 			end
-			if IsTable(options.triggers) then
-				for k, v in pairs(options.triggers) do
+			if IsTable(option.triggers) then
+				for k, v in pairs(option.triggers) do
 					if IsString(k) and IsFunction(v) then -- XXX = function(k, v) end,
 						triggers[k] = v
 					end
@@ -2686,7 +2687,7 @@ function LIB.CreateModule(options)
 	local importEntries, importInterceptors, importTriggers = FormatModuleProxy(options.imports)
 	local function getter(_, k)
 		if not exportEntries[k] then
-			local errmsg = 'Module `' .. name .. '` get value failed, unregistered properity `' .. k .. '`.'
+			local errmsg = 'Module `' .. name .. '`: get value failed, unregistered properity `' .. k .. '`.'
 			if LIB.IsDebugClient() then
 				LIB.Debug(PACKET_INFO.NAME_SPACE, errmsg, DEBUG_LEVEL.WARNING)
 				return

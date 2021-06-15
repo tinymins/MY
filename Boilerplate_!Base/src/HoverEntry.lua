@@ -187,13 +187,11 @@ local settings = {
 	name = FRAME_NAME,
 	exports = {
 		{
-			root = D,
 			preset = 'UIEvent'
-		},
-		{
 			fields = {
-				OnPanelActivePartial = D.OnPanelActivePartial,
+				'OnPanelActivePartial',
 			},
+			root = D,
 		},
 	},
 }
