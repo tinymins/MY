@@ -2267,6 +2267,7 @@ local settings = {
 				'ExportDataToFile',
 				'Exchange',
 			},
+			root = D,
 		},
 		{
 			fields = {
