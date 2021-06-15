@@ -2873,12 +2873,8 @@ function LIB.CreateModule(options)
 	local importEntries, importInterceptors, importTriggers = FormatModuleProxy(options.imports, name)
 	local function getter(_, k)
 		if not exportEntries[k] then
-			local errmsg = 'Module `' .. name .. '`: get value failed, unregistered properity `' .. k .. '`.'
-			if LIB.IsDebugClient() then
-				LIB.Debug(PACKET_INFO.NAME_SPACE, errmsg, DEBUG_LEVEL.WARNING)
-				return
-			end
-			assert(false, errmsg)
+			LIB.Debug(PACKET_INFO.NAME_SPACE, 'Module `' .. name .. '`: get value failed, unregistered properity `' .. k .. '`.', DEBUG_LEVEL.WARNING)
+			return
 		end
 		local interceptor = exportInterceptors[k]
 		if interceptor then
