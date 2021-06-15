@@ -432,12 +432,13 @@ local settings = {
 	exports = {
 		{
 			fields = {
-				OpenFrame = TI.OpenFrame,
+				'OpenFrame',
 			},
+			root = TI,
 		},
 		{
 			fields = {
-				bEnable = true,
+				'bEnable',
 			},
 			root = O,
 		},
@@ -445,7 +446,7 @@ local settings = {
 	imports = {
 		{
 			fields = {
-				bEnable = true,
+				'bEnable',
 			},
 			root = O,
 		},

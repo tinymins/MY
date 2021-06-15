@@ -233,16 +233,16 @@ local settings = {
 	name = 'MY_TeamMon_LT',
 	exports = {
 		{
+			preset = 'UIEvent',
 			root = D,
-			preset = 'UIEvent'
 		},
 		{
 			fields = {
-				tAnchor      = true,
-				fScale       = true,
-				fPause       = true,
-				fFadeOut     = true,
-				dwFontScheme = true,
+				'tAnchor',
+				'fScale',
+				'fPause',
+				'fFadeOut',
+				'dwFontScheme',
 			},
 			root = O,
 		},
@@ -250,11 +250,11 @@ local settings = {
 	imports = {
 		{
 			fields = {
-				tAnchor      = true,
-				fScale       = true,
-				fPause       = true,
-				fFadeOut     = true,
-				dwFontScheme = true,
+				'tAnchor',
+				'fScale',
+				'fPause',
+				'fFadeOut',
+				'dwFontScheme',
 			},
 			root = O,
 		},

@@ -174,13 +174,14 @@ local settings = {
 	exports = {
 		{
 			fields = {
-				OnPanelActivePartial = D.OnPanelActivePartial,
+				'OnPanelActivePartial',
 			},
+			root = D,
 		},
 		{
 			fields = {
-				bRestoreAuthorityInfo = true,
-				bAutoShowModel = true,
+				'bRestoreAuthorityInfo',
+				'bAutoShowModel',
 			},
 			root = O,
 		},
@@ -188,8 +189,8 @@ local settings = {
 	imports = {
 		{
 			fields = {
-				bRestoreAuthorityInfo = true,
-				bAutoShowModel = true,
+				'bRestoreAuthorityInfo',
+				'bAutoShowModel',
 			},
 			root = O,
 		},

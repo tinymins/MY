@@ -336,15 +336,16 @@ local settings = {
 	exports = {
 		{
 			fields = {
-				OnPanelActivePartial = D.OnPanelActivePartial,
+				'OnPanelActivePartial',
 			},
+			root = D,
 		},
 		{
 			fields = {
-				bFriend = true,
-				bFriendNav = true,
-				bTongMember = true,
-				bTongMemberNav = true,
+				'bFriend',
+				'bFriendNav',
+				'bTongMember',
+				'bTongMemberNav',
 			},
 			root = O,
 		},
@@ -352,10 +353,10 @@ local settings = {
 	imports = {
 		{
 			fields = {
-				bFriend = true,
-				bFriendNav = true,
-				bTongMember = true,
-				bTongMemberNav = true,
+				'bFriend',
+				'bFriendNav',
+				'bTongMember',
+				'bTongMemberNav',
 			},
 			triggers = {
 				bFriend = D.Apply,

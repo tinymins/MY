@@ -643,10 +643,10 @@ local settings = {
 	exports = {
 		{
 			fields = {
-				bCompactMode = true,
-				tUncheckedNames = true,
-				bSaveDB = true,
-				bAdviceSaveDB = true,
+				'bCompactMode',
+				'tUncheckedNames',
+				'bSaveDB',
+				'bAdviceSaveDB',
 			},
 			root = O,
 		},
@@ -654,10 +654,10 @@ local settings = {
 	imports = {
 		{
 			fields = {
-				bCompactMode = true,
-				tUncheckedNames = true,
-				bSaveDB = true,
-				bAdviceSaveDB = true,
+				'bCompactMode',
+				'tUncheckedNames',
+				'bSaveDB',
+				'bAdviceSaveDB',
 			},
 			triggers = {
 				bCompactMode = function()

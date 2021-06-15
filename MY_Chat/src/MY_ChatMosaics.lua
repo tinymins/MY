@@ -172,18 +172,11 @@ local settings = {
 	name = 'MY_ChatMosaics',
 	exports = {
 		{
+			preset = 'UIEvent',
 			fields = {
-				Mosaics = D.Mosaics,
-				MosaicsString = D.MosaicsString,
-			},
-		},
-		{
-			root = D,
-			preset = 'UIEvent'
-		},
-		{
-			fields = {
-				bEnabled = true,
+				'Mosaics',
+				'MosaicsString',
+				'bEnabled',
 			},
 			root = D,
 		},
@@ -191,7 +184,7 @@ local settings = {
 	imports = {
 		{
 			fields = {
-				bEnabled = true,
+				'bEnabled',
 			},
 			triggers = {
 				bEnabled = function ()

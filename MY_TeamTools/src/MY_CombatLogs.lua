@@ -787,16 +787,17 @@ local settings = {
 	exports = {
 		{
 			fields = {
-				OnPanelActivePartial = D.OnPanelActivePartial,
+				'OnPanelActivePartial',
 			},
+			root = D,
 		},
 		{
 			fields = {
-				bEnable       = true,
-				nMaxHistory   = true,
-				nMinFightTime = true,
-				bOnlyDungeon  = true,
-				bOnlySelf     = true,
+				'bEnable',
+				'nMaxHistory',
+				'nMinFightTime',
+				'bOnlyDungeon',
+				'bOnlySelf',
 			},
 			root = O,
 		},
@@ -804,11 +805,11 @@ local settings = {
 	imports = {
 		{
 			fields = {
-				bEnable       = true,
-				nMaxHistory   = true,
-				nMinFightTime = true,
-				bOnlyDungeon  = true,
-				bOnlySelf     = true,
+				'bEnable',
+				'nMaxHistory',
+				'nMinFightTime',
+				'bOnlyDungeon',
+				'bOnlySelf',
 			},
 			triggers = {
 				bEnable      = D.UpdateEnable,

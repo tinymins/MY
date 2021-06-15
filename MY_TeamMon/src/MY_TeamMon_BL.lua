@@ -254,14 +254,14 @@ local settings = {
 	name = 'MY_TeamMon_BL',
 	exports = {
 		{
+			preset = 'UIEvent',
 			root = D,
-			preset = 'UIEvent'
 		},
 		{
 			fields = {
-				tAnchor = true,
-				nCount  = true,
-				fScale  = true,
+				'tAnchor',
+				'nCount',
+				'fScale',
 			},
 			root = O,
 		},
@@ -269,9 +269,9 @@ local settings = {
 	imports = {
 		{
 			fields = {
-				tAnchor = true,
-				nCount  = true,
-				fScale  = true,
+				'tAnchor',
+				'nCount',
+				'fScale',
 			},
 			root = O,
 		},

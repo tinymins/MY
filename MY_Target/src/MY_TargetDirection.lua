@@ -239,27 +239,23 @@ local settings = {
 	exports = {
 		{
 			fields = {
-				bEnable = true,
-				tAnchor = true,
-				eDistanceType = true,
+				'bEnable',
+				'tAnchor',
+				'eDistanceType',
 			},
 			root = O,
 		},
 		{
-			fields = {
-				OnFrameCreate  = D.OnFrameCreate ,
-				OnFrameBreathe = D.OnFrameBreathe,
-				OnFrameDragEnd = D.OnFrameDragEnd,
-				OnEvent        = D.OnEvent       ,
-			},
+			preset = 'UIEvent',
+			root = D,
 		},
 	},
 	imports = {
 		{
 			fields = {
-				bEnable = true,
-				tAnchor = true,
-				eDistanceType = true,
+				'bEnable',
+				'tAnchor',
+				'eDistanceType',
 			},
 			triggers = {
 				bEnable = D.CheckEnable,

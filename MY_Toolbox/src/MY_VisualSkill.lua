@@ -365,19 +365,17 @@ local settings = {
 	exports = {
 		{
 			fields = {
-				OnPanelActivePartial = D.OnPanelActivePartial,
-			},
-		},
-		{
 			preset = 'UIEvent',
+				'OnPanelActivePartial',
+			},
 			root = D,
 		},
 		{
 			fields = {
-				bEnable              = true,
-				bPenetrable          = true,
-				nVisualSkillBoxCount = true,
-				anchor               = true,
+				'bEnable',
+				'bPenetrable',
+				'nVisualSkillBoxCount',
+				'anchor',
 			},
 			root = O,
 		},
@@ -385,10 +383,10 @@ local settings = {
 	imports = {
 		{
 			fields = {
-				bEnable              = true,
-				bPenetrable          = true,
-				nVisualSkillBoxCount = true,
-				anchor               = true,
+				'bEnable',
+				'bPenetrable',
+				'nVisualSkillBoxCount',
+				'anchor',
 			},
 			triggers = {
 				bEnable              = D.Reload,

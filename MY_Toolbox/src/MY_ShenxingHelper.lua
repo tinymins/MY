@@ -353,14 +353,15 @@ local settings = {
 	exports = {
 		{
 			fields = {
-				OnPanelActivePartial = D.OnPanelActivePartial,
+				'OnPanelActivePartial',
 			},
+			root = D,
 		},
 		{
 			fields = {
-				bAncientMap = true,
-				bOpenAllMap = true,
-				bAvoidBlackCD = true,
+				'bAncientMap',
+				'bOpenAllMap',
+				'bAvoidBlackCD',
 			},
 			root = O,
 		},
@@ -368,9 +369,9 @@ local settings = {
 	imports = {
 		{
 			fields = {
-				bAncientMap = true,
-				bOpenAllMap = true,
-				bAvoidBlackCD = true,
+				'bAncientMap',
+				'bOpenAllMap',
+				'bAvoidBlackCD',
 			},
 			triggers = {
 				bAncientMap = D.CheckNonwarMapEnable,

@@ -287,18 +287,19 @@ local settings = {
 	exports = {
 		{
 			fields = {
-				OnPanelActivePartial = D.OnPanelActivePartial,
+				'OnPanelActivePartial',
 			},
+			root = D,
 		},
 		{
 			fields = {
-				bAlert = true,
-				nAlertNum = true,
-				dwAutoFeedCubTabType = true,
-				dwAutoFeedCubTabIndex = true,
-				dwAutoFeedFoodTabType = true,
-				dwAutoFeedFoodTabIndex = true,
-				nAutoFeedFoodMeasure = true,
+				'bAlert',
+				'nAlertNum',
+				'dwAutoFeedCubTabType',
+				'dwAutoFeedCubTabIndex',
+				'dwAutoFeedFoodTabType',
+				'dwAutoFeedFoodTabIndex',
+				'nAutoFeedFoodMeasure',
 			},
 			root = O,
 		},
@@ -306,13 +307,13 @@ local settings = {
 	imports = {
 		{
 			fields = {
-				bAlert = true,
-				nAlertNum = true,
-				dwAutoFeedCubTabType = true,
-				dwAutoFeedCubTabIndex = true,
-				dwAutoFeedFoodTabType = true,
-				dwAutoFeedFoodTabIndex = true,
-				nAutoFeedFoodMeasure = true,
+				'bAlert',
+				'nAlertNum',
+				'dwAutoFeedCubTabType',
+				'dwAutoFeedCubTabIndex',
+				'dwAutoFeedFoodTabType',
+				'dwAutoFeedFoodTabIndex',
+				'nAutoFeedFoodMeasure',
 			},
 			triggers = {
 				bAlert = D.CheckAlertEnable,

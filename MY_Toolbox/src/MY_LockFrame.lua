@@ -262,13 +262,14 @@ local settings = {
 	exports = {
 		{
 			fields = {
-				OnPanelActivePartial = D.OnPanelActivePartial,
+				'OnPanelActivePartial',
 			},
+			root = D,
 		},
 		{
 			fields = {
-				bEnable = true,
-				tEnable = true,
+				'bEnable',
+				'tEnable',
 			},
 			root = O,
 		},
@@ -276,8 +277,8 @@ local settings = {
 	imports = {
 		{
 			fields = {
-				bEnable = true,
-				tEnable = true,
+				'bEnable',
+				'tEnable',
 			},
 			triggers = {
 				bEnable = D.CheckAllFrame,

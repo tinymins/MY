@@ -899,7 +899,7 @@ local settings = {
 	exports = {
 		{
 			fields = {
-				bIntelligentHide = true,
+				'bIntelligentHide',
 			},
 			root = O,
 		},
@@ -907,7 +907,7 @@ local settings = {
 	imports = {
 		{
 			fields = {
-				bIntelligentHide = true,
+				'bIntelligentHide',
 			},
 			root = O,
 		},

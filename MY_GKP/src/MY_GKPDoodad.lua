@@ -743,16 +743,16 @@ local settings = {
 	name = 'MY_GKPDoodad',
 	exports = {
 		{
-			root = D,
 			preset = 'UIEvent',
+			root = D,
 		},
 	},
 	imports = {
 		{
 			fields = {
-				tNameColor = true,
-				tCraft = true,
-				szCustom = true,
+				'tNameColor',
+				'tCraft',
+				'szCustom',
 			},
 			root = O2,
 		},

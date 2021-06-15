@@ -346,13 +346,13 @@ local settings = {
 	name = 'MY_TeamMon_PBL',
 	exports = {
 		{
+			preset = 'UIEvent',
 			root = D,
-			preset = 'UIEvent'
 		},
 		{
 			fields = {
-				bHoverSelect = true,
-				tAnchor      = true,
+				'bHoverSelect',
+				'tAnchor',
 			},
 			root = O,
 		},
@@ -360,8 +360,8 @@ local settings = {
 	imports = {
 		{
 			fields = {
-				bHoverSelect = true,
-				tAnchor      = true,
+				'bHoverSelect',
+				'tAnchor',
 			},
 			root = O,
 		},

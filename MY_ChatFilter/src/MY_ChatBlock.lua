@@ -200,7 +200,7 @@ local settings = {
 	exports = {
 		{
 			fields = {
-				bBlockWords = true,
+				'bBlockWords',
 			},
 			root = O,
 		},

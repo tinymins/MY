@@ -564,21 +564,19 @@ local settings = {
 	name = 'MY_DynamicItem',
 	exports = {
 		{
-			root = D,
-			preset = 'UIEvent'
-		},
-		{
+			preset = 'UIEvent',
 			fields = {
-				OnPanelActivePartial = D.OnPanelActivePartial,
+				'OnPanelActivePartial',
 			},
+			root = D,
 		},
 		{
 			fields = {
-				bEnable = true,
-				bShowBg = true,
-				nNum = true,
-				nCol = true,
-				anchor = true,
+				'bEnable',
+				'bShowBg',
+				'nNum',
+				'nCol',
+				'anchor',
 			},
 			root = O,
 		},
@@ -586,11 +584,11 @@ local settings = {
 	imports = {
 		{
 			fields = {
-				bEnable = true,
-				bShowBg = true,
-				nNum = true,
-				nCol = true,
-				anchor = true,
+				'bEnable',
+				'bShowBg',
+				'nNum',
+				'nCol',
+				'anchor',
 			},
 			triggers = {
 				bEnable = D.CheckEnable,

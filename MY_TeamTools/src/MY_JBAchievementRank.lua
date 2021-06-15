@@ -347,12 +347,13 @@ local settings = {
 	exports = {
 		{
 			fields = {
-				OnPanelActivePartial = D.OnPanelActivePartial,
+				'OnPanelActivePartial',
 			},
+			root = D,
 		},
 		{
 			fields = {
-				bEnable = true,
+				'bEnable',
 			},
 			root = O,
 		},
@@ -360,7 +361,7 @@ local settings = {
 	imports = {
 		{
 			fields = {
-				bEnable = true,
+				'bEnable',
 			},
 			triggers = {
 				bEnable = function(_, v)

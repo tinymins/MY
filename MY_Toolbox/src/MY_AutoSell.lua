@@ -378,13 +378,9 @@ local settings = {
 	exports = {
 		{
 			fields = {
-				OnPanelActivePartial = D.OnPanelActivePartial,
-			},
-		},
-		{
-			fields = {
-				tSellItem = true,
-				tProtectItem = true,
+				'tSellItem',
+				'tProtectItem',
+				'OnPanelActivePartial',
 			},
 			root = D,
 		},
@@ -392,8 +388,8 @@ local settings = {
 	imports = {
 		{
 			fields = {
-				tSellItem = true,
-				tProtectItem = true,
+				'tSellItem',
+				'tProtectItem',
 			},
 			root = D,
 		},

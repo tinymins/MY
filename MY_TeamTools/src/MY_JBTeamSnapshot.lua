@@ -161,13 +161,14 @@ local settings = {
 	exports = {
 		{
 			fields = {
-				CreateSnapshot = D.CreateSnapshot,
-				OnPanelActivePartial = D.OnPanelActivePartial,
+				'CreateSnapshot',
+				'OnPanelActivePartial',
 			},
+			root = D,
 		},
 		{
 			fields = {
-				szTeam = true,
+				'szTeam',
 			},
 			root = O,
 		},
@@ -175,7 +176,7 @@ local settings = {
 	imports = {
 		{
 			fields = {
-				szTeam = true,
+				'szTeam',
 			},
 			root = O,
 		},

@@ -413,8 +413,8 @@ local settings = {
 	exports = {
 		{
 			fields = {
-				bEnable = true,
-				bBorder = true,
+				'bEnable',
+				'bBorder',
 			},
 			root = O,
 		},
@@ -422,8 +422,8 @@ local settings = {
 	imports = {
 		{
 			fields = {
-				bEnable = true,
-				bBorder = true,
+				'bEnable',
+				'bBorder',
 			},
 			triggers = {
 				bEnable = D.CheckEnable,

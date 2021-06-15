@@ -395,12 +395,8 @@ local settings = {
 	exports = {
 		{
 			fields = {
-				OnPanelActivePartial = D.OnPanelActivePartial,
-			},
-		},
-		{
-			fields = {
-				tAcceptCustom = true,
+				'tAcceptCustom',
+				'OnPanelActivePartial',
 			},
 			root = D,
 		},
@@ -408,7 +404,7 @@ local settings = {
 	imports = {
 		{
 			fields = {
-				tAcceptCustom = true,
+				'tAcceptCustom',
 			},
 			root = D,
 		},

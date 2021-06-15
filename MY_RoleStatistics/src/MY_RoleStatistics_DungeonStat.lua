@@ -1031,12 +1031,12 @@ local settings = {
 	exports = {
 		{
 			fields = {
-				aColumn = true,
-				szSort = true,
-				szSortOrder = true,
-				bFloatEntry = true,
-				bSaveDB = true,
-				bAdviceSaveDB = true,
+				'aColumn',
+				'szSort',
+				'szSortOrder',
+				'bFloatEntry',
+				'bSaveDB',
+				'bAdviceSaveDB',
 			},
 			root = O,
 		},
@@ -1044,12 +1044,12 @@ local settings = {
 	imports = {
 		{
 			fields = {
-				aColumn = true,
-				szSort = true,
-				szSortOrder = true,
-				bFloatEntry = true,
-				bSaveDB = true,
-				bAdviceSaveDB = true,
+				'aColumn',
+				'szSort',
+				'szSortOrder',
+				'bFloatEntry',
+				'bSaveDB',
+				'bAdviceSaveDB',
 			},
 			triggers = {
 				bFloatEntry = D.UpdateFloatEntry,

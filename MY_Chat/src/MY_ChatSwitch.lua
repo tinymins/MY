@@ -655,17 +655,10 @@ local settings = {
 	name = 'MY_ChatSwitch',
 	exports = {
 		{
-			root = D,
 			preset = 'UIEvent',
-		},
-		{
 			fields = {
-				OnPanelActivePartial = D.OnPanelActivePartial,
-			},
-		},
-		{
-			fields = {
-				aWhisper = true,
+				'aWhisper',
+				'OnPanelActivePartial',
 			},
 			root = D,
 		},
@@ -673,7 +666,7 @@ local settings = {
 	imports = {
 		{
 			fields = {
-				aWhisper = true,
+				'aWhisper',
 			},
 			root = D,
 		},

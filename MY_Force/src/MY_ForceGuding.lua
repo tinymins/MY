@@ -337,13 +337,13 @@ local settings = {
 	exports = {
 		{
 			fields = {
-				bEnable  = true,
-				bAutoSay = true,
-				szSay    = true,
-				color    = true,
-				bUseMana = true,
-				nManaMp  = true,
-				nManaHp  = true,
+				'bEnable',
+				'bAutoSay',
+				'szSay',
+				'color',
+				'bUseMana',
+				'nManaMp',
+				'nManaHp',
 			},
 			root = O,
 		},
@@ -351,13 +351,13 @@ local settings = {
 	imports = {
 		{
 			fields = {
-				bEnable  = true,
-				bAutoSay = true,
-				szSay    = true,
-				color    = true,
-				bUseMana = true,
-				nManaMp  = true,
-				nManaHp  = true,
+				'bEnable',
+				'bAutoSay',
+				'szSay',
+				'color',
+				'bUseMana',
+				'nManaMp',
+				'nManaHp',
 			},
 			triggers = {
 				bEnable  = D.OnEnableChange,

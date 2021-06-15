@@ -238,12 +238,13 @@ local settings = {
 	exports = {
 		{
 			fields = {
-				ViewCharInfoToPlayer = D.ViewCharInfoToPlayer,
+				'ViewCharInfoToPlayer',
 			},
+			root = D,
 		},
 		{
 			fields = {
-				bEnable = true,
+				'bEnable',
 			},
 			root = O,
 		},
@@ -251,7 +252,7 @@ local settings = {
 	imports = {
 		{
 			fields = {
-				bEnable = true,
+				'bEnable',
 			},
 			root = O,
 		},

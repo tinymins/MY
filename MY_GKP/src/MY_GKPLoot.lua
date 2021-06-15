@@ -2106,8 +2106,8 @@ local settings = {
 	imports = {
 		{
 			fields = {
-				tConfirm = true,
-				tItemConfig = true,
+				'tConfirm',
+				'tItemConfig',
 			},
 			root = D,
 		},
@@ -2122,25 +2122,23 @@ local settings = {
 	name = 'MY_GKPLoot',
 	exports = {
 		{
-			root = D,
 			preset = 'UIEvent',
-		},
-		{
 			fields = {
-				IsEnabled            = D.IsEnabled           ,
-				CanDialog            = D.CanDialog           ,
-				IsItemDisplay        = D.IsItemDisplay       ,
-				IsItemAutoPickup     = D.IsItemAutoPickup    ,
-				GetMessageBox        = D.GetMessageBox       ,
-				GetaPartyMember      = D.GetaPartyMember     ,
-				GetItemData          = D.GetItemData         ,
-				GetItemBiddingMenu   = D.GetItemBiddingMenu  ,
-				OnPanelActivePartial = D.OnPanelActivePartial,
+				'IsEnabled',
+				'CanDialog',
+				'IsItemDisplay',
+				'IsItemAutoPickup',
+				'GetMessageBox',
+				'GetaPartyMember',
+				'GetItemData',
+				'GetItemBiddingMenu',
+				'OnPanelActivePartial',
 			},
+			root = D,
 		},
 		{
 			fields = {
-				bOn = true,
+				'bOn',
 			},
 			root = O,
 		},
@@ -2148,15 +2146,15 @@ local settings = {
 	imports = {
 		{
 			fields = {
-				CanDialog = true,
-				IsItemDisplay = true,
-				IsItemAutoPickup = true,
+				'CanDialog',
+				'IsItemDisplay',
+				'IsItemAutoPickup',
 			},
 			root = D,
 		},
 		{
 			fields = {
-				bOn = true,
+				'bOn',
 			},
 			root = O,
 		},

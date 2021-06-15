@@ -398,11 +398,11 @@ local settings = {
 	exports = {
 		{
 			fields = {
-				bEnable     = true,
-				bSound      = true,
-				bPreview    = true,
-				bAutoShare  = true,
-				bSilentMode = true,
+				'bEnable',
+				'bSound',
+				'bPreview',
+				'bAutoShare',
+				'bSilentMode',
 			},
 			root = O,
 		},
@@ -410,11 +410,11 @@ local settings = {
 	imports = {
 		{
 			fields = {
-				bEnable     = true,
-				bSound      = true,
-				bPreview    = true,
-				bAutoShare  = true,
-				bSilentMode = true,
+				'bEnable',
+				'bSound',
+				'bPreview',
+				'bAutoShare',
+				'bSilentMode',
 			},
 			triggers = {
 				bEnable = function(_, v)

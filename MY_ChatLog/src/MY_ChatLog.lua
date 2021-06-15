@@ -392,22 +392,23 @@ local settings = {
 	exports = {
 		{
 			fields = {
-				Open = D.Open,
-				GetRoot = D.GetRoot,
-				InitDB = D.InitDB,
-				OptimizeDB = D.OptimizeDB,
-				ImportDB = D.ImportDB,
 				LOG_TYPE = LOG_TYPE,
 				MSGTYPE_COLOR = MSGTYPE_COLOR,
+				'Open',
+				'GetRoot',
+				'InitDB',
+				'OptimizeDB',
+				'ImportDB',
 			},
+			root = D,
 		},
 		{
 			fields = {
-				bIgnoreTongOnlineMsg    = true,
-				bIgnoreTongMemberLogMsg = true,
-				bRealtimeCommit         = true,
-				bAutoConnectDB          = true,
-				tUncheckedChannel       = true,
+				'bIgnoreTongOnlineMsg',
+				'bIgnoreTongMemberLogMsg',
+				'bRealtimeCommit',
+				'bAutoConnectDB',
+				'tUncheckedChannel',
 			},
 			root = O,
 		},
@@ -415,11 +416,11 @@ local settings = {
 	imports = {
 		{
 			fields = {
-				bIgnoreTongOnlineMsg    = true,
-				bIgnoreTongMemberLogMsg = true,
-				bRealtimeCommit         = true,
-				bAutoConnectDB          = true,
-				tUncheckedChannel       = true,
+				'bIgnoreTongOnlineMsg',
+				'bIgnoreTongMemberLogMsg',
+				'bRealtimeCommit',
+				'bAutoConnectDB',
+				'tUncheckedChannel',
 			},
 			root = O,
 		},

@@ -685,16 +685,6 @@ local settings = {
 	exports = {
 		{
 			fields = {
-				SetDisplayData = D.SetDisplayData,
-				GetDisplayData = D.GetDisplayData,
-				GetMenu = D.GetMenu,
-				GetHistoryMenu = D.GetHistoryMenu,
-				GetPublishMenu = D.GetPublishMenu,
-				GetTargetShowName = D.GetTargetShowName,
-				IsImportantEffect = D.IsImportantEffect,
-				StatContainsImportantEffect = D.StatContainsImportantEffect,
-				StatSkillContainsImportantEffect = D.StatSkillContainsImportantEffect,
-				StatTargetContainsImportantEffect = D.StatTargetContainsImportantEffect,
 				STAT_TYPE = STAT_TYPE,
 				STAT_TYPE_LIST = STAT_TYPE_LIST,
 				STAT_TYPE_KEY = STAT_TYPE_KEY,
@@ -703,11 +693,22 @@ local settings = {
 				PUBLISH_MODE = PUBLISH_MODE,
 				SKILL_RESULT = SKILL_RESULT,
 				SKILL_RESULT_NAME = SKILL_RESULT_NAME,
+				'SetDisplayData',
+				'GetDisplayData',
+				'GetMenu',
+				'GetHistoryMenu',
+				'GetPublishMenu',
+				'GetTargetShowName',
+				'IsImportantEffect',
+				'StatContainsImportantEffect',
+				'StatSkillContainsImportantEffect',
+				'StatTargetContainsImportantEffect',
 			},
+			root = D,
 		},
 		{
 			fields = {
-				nPublishMode = true,
+				'nPublishMode',
 			},
 			root = O,
 		},
@@ -715,7 +716,7 @@ local settings = {
 	imports = {
 		{
 			fields = {
-				nPublishMode = true,
+				'nPublishMode',
 			},
 			root = O,
 		},

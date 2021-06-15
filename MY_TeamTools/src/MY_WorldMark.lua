@@ -185,12 +185,13 @@ local settings = {
 	exports = {
 		{
 			fields = {
-				CheckEnable = D.CheckEnable,
+				'CheckEnable',
 			},
+			root = D,
 		},
 		{
 			fields = {
-				bEnable = true,
+				'bEnable',
 			},
 			root = O,
 		},
@@ -198,7 +199,7 @@ local settings = {
 	imports = {
 		{
 			fields = {
-				bEnable = true,
+				'bEnable',
 			},
 			root = O,
 		},

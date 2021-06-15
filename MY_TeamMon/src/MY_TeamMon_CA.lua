@@ -155,12 +155,12 @@ local settings = {
 	name = 'MY_TeamMon_CA',
 	exports = {
 		{
+			preset = 'UIEvent',
 			root = D,
-			preset = 'UIEvent'
 		},
 		{
 			fields = {
-				tAnchor = true,
+				'tAnchor',
 			},
 			root = O,
 		},
@@ -168,7 +168,7 @@ local settings = {
 	imports = {
 		{
 			fields = {
-				tAnchor = true,
+				'tAnchor',
 			},
 			root = O,
 		},

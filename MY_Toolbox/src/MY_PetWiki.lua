@@ -223,15 +223,16 @@ local settings = {
 	exports = {
 		{
 			fields = {
-				Open = D.Open,
-				OnPanelActivePartial = D.OnPanelActivePartial,
+				'Open',
+				'OnPanelActivePartial',
 			},
+			root = D,
 		},
 		{
 			fields = {
-				bEnable = true,
-				nW = true,
-				nH = true,
+				'bEnable',
+				'nW',
+				'nH',
 			},
 			root = O,
 		},
@@ -239,9 +240,9 @@ local settings = {
 	imports = {
 		{
 			fields = {
-				bEnable = true,
-				nW = true,
-				nH = true,
+				'bEnable',
+				'nW',
+				'nH',
 			},
 			root = O,
 		},
