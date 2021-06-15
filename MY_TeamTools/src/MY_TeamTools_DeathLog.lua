@@ -470,6 +470,7 @@ end
 -- Module exports
 do
 local settings = {
+	name = 'MY_TeamTools_DeathLog',
 	exports = {
 		{
 			fields = {

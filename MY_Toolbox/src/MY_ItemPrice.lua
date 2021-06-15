@@ -129,6 +129,7 @@ end
 -- Global exports
 do
 local settings = {
+	name = 'MY_ItemPrice',
 	exports = {
 		{
 			fields = {

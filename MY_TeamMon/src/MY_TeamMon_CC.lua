@@ -409,6 +409,7 @@ end)
 -- Global exports
 do
 local settings = {
+	name = 'MY_TeamMon_CC',
 	exports = {
 		{
 			fields = {

@@ -343,6 +343,7 @@ LIB.RegisterInit('MY_TeamMon_PBL', D.OpenPanel)
 -- Global exports
 do
 local settings = {
+	name = 'MY_TeamMon_PBL',
 	exports = {
 		{
 			root = D,

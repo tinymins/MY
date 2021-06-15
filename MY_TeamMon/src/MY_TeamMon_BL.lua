@@ -251,6 +251,7 @@ LIB.RegisterInit('MY_TeamMon_BL', D.Init)
 -- Global exports
 do
 local settings = {
+	name = 'MY_TeamMon_BL',
 	exports = {
 		{
 			root = D,

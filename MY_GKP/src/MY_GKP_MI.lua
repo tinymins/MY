@@ -620,6 +620,7 @@ LIB.RegisterAddonMenu({ szOption = _L['Golden Team Record'], fnAction = D.OpenPa
 -- Global exports
 do
 local settings = {
+	name = 'MY_GKP_MI',
 	exports = {
 		{
 			fields = {

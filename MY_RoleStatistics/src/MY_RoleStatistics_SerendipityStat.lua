@@ -1412,6 +1412,7 @@ end)
 -- Module exports
 do
 local settings = {
+	name = 'MY_RoleStatistics_SerendipityStat',
 	exports = {
 		{
 			fields = {

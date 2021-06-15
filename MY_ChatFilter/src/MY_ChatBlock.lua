@@ -196,6 +196,7 @@ LIB.RegisterInit('MY_ChatBlock', D.LoadBlockWords)
 -- Global exports
 do
 local settings = {
+	name = 'MY_ChatBlock',
 	exports = {
 		{
 			fields = {

@@ -212,6 +212,7 @@ end
 --------------------------------------------------------------------------
 do
 local settings = {
+	name = 'MY_TeamBalloon',
 	exports = {
 		{
 			root = D,

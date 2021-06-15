@@ -3048,6 +3048,7 @@ LIB.RegisterHotKey('MY_TeamMon_UI', _L['Open/close MY_TeamMon'], D.TogglePanel)
 -- Global exports
 do
 local settings = {
+	name = 'MY_TeamMon_UI',
 	exports = {
 		{
 			root = D,

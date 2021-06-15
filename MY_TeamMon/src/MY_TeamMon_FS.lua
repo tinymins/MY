@@ -231,6 +231,7 @@ LIB.RegisterInit('MY_TeamMon_FS', Init)
 -- Global exports
 do
 local settings = {
+	name = 'MY_TeamMon_FS',
 	exports = {
 		{
 			root = D,

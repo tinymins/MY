@@ -652,6 +652,7 @@ end
 --------------------------------------------------------------------------
 do
 local settings = {
+	name = 'MY_ChatSwitch',
 	exports = {
 		{
 			root = D,

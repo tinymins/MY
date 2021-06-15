@@ -276,6 +276,7 @@ end
 -- Module exports
 do
 local settings = {
+	name = 'MY_TeamTools_EnterMap',
 	exports = {
 		{
 			fields = {

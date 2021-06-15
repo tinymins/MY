@@ -1007,6 +1007,7 @@ LIB.RegisterFrameCreate('SprintPower.MY_RoleStatistics_DungeonEntry', D.UpdateFl
 -- Module exports
 do
 local settings = {
+	name = 'MY_RoleStatistics_DungeonStat',
 	exports = {
 		{
 			fields = {

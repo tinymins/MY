@@ -448,6 +448,7 @@ end
 -- Global exports
 do
 local settings = {
+	name = 'MY_BagEx',
 	exports = {
 		{
 			fields = {

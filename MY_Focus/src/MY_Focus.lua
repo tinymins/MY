@@ -1192,6 +1192,7 @@ LIB.RegisterTutorial({
 -- Global exports
 do
 local settings = {
+	name = 'MY_Focus',
 	exports = {
 		{
 			fields = {

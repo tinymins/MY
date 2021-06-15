@@ -2238,6 +2238,7 @@ LIB.RegisterBgMsg('MY_TM_SHARE', D.OnShare)
 -- Global exports
 do
 local settings = {
+	name = 'MY_TeamMon',
 	exports = {
 		{
 			root = D,

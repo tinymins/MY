@@ -998,6 +998,7 @@ end
 --------------------------------------------------------------------------
 do
 local settings = {
+	name = 'MY_CombatText',
 	exports = {
 		{
 			root = D,

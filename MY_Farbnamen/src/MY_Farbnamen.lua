@@ -716,6 +716,7 @@ end
 --------------------------------------------------------------------------
 do
 local settings = {
+	name = 'MY_Farbnamen',
 	exports = {
 		{
 			fields = {

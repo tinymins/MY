@@ -411,6 +411,7 @@ RegisterMsgMonitor(OnMsgArrive, {'MSG_SYS'})
 -- Global exports
 do
 local settings = {
+	name = 'MY_RollMonitor',
 	exports = {
 		{
 			fields = {

@@ -230,6 +230,7 @@ LIB.RegisterPanel(_L['Raid'], 'MY_TeamMon_LT', _L['MY_TeamMon_LT'], 'ui/Image/Ta
 -- Global exports
 do
 local settings = {
+	name = 'MY_TeamMon_LT',
 	exports = {
 		{
 			root = D,

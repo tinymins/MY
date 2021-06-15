@@ -777,6 +777,7 @@ LIB.RegisterStorageInit('MY_Recount_UI', D.CheckOpen)
 -- Global exports
 do
 local settings = {
+	name = 'MY_Recount_UI',
 	exports = {
 		{
 			root = D,

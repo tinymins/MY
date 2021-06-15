@@ -124,6 +124,7 @@ end
 -- Global exports
 do
 local settings = {
+	name = 'MY_DialogNameLink',
 	exports = {
 		{
 			fields = {

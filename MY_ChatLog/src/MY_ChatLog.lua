@@ -388,6 +388,7 @@ LIB.RegisterHotKey('MY_ChatLog', _L['MY_ChatLog'], D.Open, nil)
 -- Global exports
 do
 local settings = {
+	name = 'MY_ChatLog',
 	exports = {
 		{
 			fields = {

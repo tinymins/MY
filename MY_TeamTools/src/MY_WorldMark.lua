@@ -181,6 +181,7 @@ LIB.RegisterInit('MY_WorldMark', D.CheckEnable)
 -- Global exports
 do
 local settings = {
+	name = 'MY_WorldMark',
 	exports = {
 		{
 			fields = {

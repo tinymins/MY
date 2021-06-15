@@ -2102,6 +2102,7 @@ end
 -- Global exports
 do
 local settings = {
+	name = 'MY_GKP_Loot',
 	imports = {
 		{
 			fields = {
@@ -2118,6 +2119,7 @@ end
 -- Global exports
 do
 local settings = {
+	name = 'MY_GKPLoot',
 	exports = {
 		{
 			root = D,

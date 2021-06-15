@@ -1053,6 +1053,7 @@ end)
 -- Global exports
 do
 local settings = {
+	name = 'MY_TeamMon_RR',
 	exports = {
 		{
 			root = D,

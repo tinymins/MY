@@ -403,6 +403,7 @@ LIB.RegisterFrameCreate('GuildBankPanel.MY_BagSort', D.CheckInjection)
 ---------------------------------------------------------------------
 do
 local settings = {
+	name = 'MY_BagSort',
 	exports = {
 		{
 			fields = {

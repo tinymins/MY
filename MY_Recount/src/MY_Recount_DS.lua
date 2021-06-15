@@ -2259,6 +2259,7 @@ end
 -- Global exports
 do
 local settings = {
+	name = 'MY_Recount_DS',
 	exports = {
 		{
 			fields = {

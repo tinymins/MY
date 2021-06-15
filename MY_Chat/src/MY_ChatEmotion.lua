@@ -121,6 +121,7 @@ end
 --------------------------------------------------------------------------
 do
 local settings = {
+	name = 'MY_ChatEmotion',
 	exports = {
 		{
 			fields = {

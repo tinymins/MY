@@ -740,6 +740,7 @@ LIB.RegisterPanel(_L['General'], 'MY_GKPDoodad', _L['GKP Doodad helper'], 90, PS
 -- Global exports
 do
 local settings = {
+	name = 'MY_GKPDoodad',
 	exports = {
 		{
 			root = D,

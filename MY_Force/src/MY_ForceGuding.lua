@@ -333,6 +333,7 @@ end)
 -------------------------------------
 do
 local settings = {
+	name = 'MY_ForceGuding',
 	exports = {
 		{
 			fields = {

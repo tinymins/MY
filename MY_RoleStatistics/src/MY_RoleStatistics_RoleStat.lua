@@ -1394,6 +1394,7 @@ LIB.RegisterFrameCreate('SprintPower.MY_RoleStatistics_RoleEntry', D.UpdateFloat
 -- Module exports
 do
 local settings = {
+	name = 'MY_RoleStatistics_RoleStat',
 	exports = {
 		{
 			fields = {
