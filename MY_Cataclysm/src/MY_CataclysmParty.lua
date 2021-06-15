@@ -642,7 +642,7 @@ function CTM:GetPartyFrame(nIndex) -- 获得组队面板
 end
 
 function CTM:BringToTop()
-	MY_Cataclysm.GetFrame():BringToTop()
+	MY_CataclysmMain.GetFrame():BringToTop()
 	for i = 0, CTM_GROUP_COUNT do
 		if self:GetPartyFrame(i) then
 			self:GetPartyFrame(i):BringToTop()
@@ -705,7 +705,7 @@ function CTM:RefreshGroupText()
 end
  -- 连接所有面板
 function CTM:AutoLinkAllPanel()
-	local frameMain = MY_Cataclysm.GetFrame()
+	local frameMain = MY_CataclysmMain.GetFrame()
 	local nX, nY = frameMain:GetRelPos()
 	nY = nY + 24
 	local nShownCount = 0
@@ -1284,7 +1284,7 @@ function CTM:DrawParty(nIndex)
 	local frame = self:GetPartyFrame(nIndex)
 	local handle = frame:Lookup('', 'Handle_Cols/Handle_Roles')
 	local tSetting = self:GetTeamInfo()
-	local hMember = MY_Cataclysm.GetFrame().hMember
+	local hMember = MY_CataclysmMain.GetFrame().hMember
 	handle:Clear()
 	for i = 1, CTM_MEMBER_COUNT do
 		local dwID = tGroup.MemberList[i]
@@ -1452,7 +1452,7 @@ function D.UpdateCharaterBuff(p, handle, key, data, buff)
 		end
 		-- create
 		if not item and handle:GetItemCount() <= CFG.nMaxShowBuff then
-			item = handle:AppendItemFromData(MY_Cataclysm.GetFrame().hBuff, key)
+			item = handle:AppendItemFromData(MY_CataclysmMain.GetFrame().hBuff, key)
 			item.bBuff = true
 			-- 描边
 			local r, g, b, a

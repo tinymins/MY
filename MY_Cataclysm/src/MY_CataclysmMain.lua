@@ -600,8 +600,7 @@ end
 -------------------------------------------------
 -- 界面创建 事件注册
 -------------------------------------------------
-MY_CataclysmMain = {}
-function MY_CataclysmMain.OnFrameCreate()
+function D.OnFrameCreate()
 	if CFG.bFasterHP then
 		this:RegisterEvent('RENDER_FRAME_UPDATE')
 	end
@@ -659,11 +658,11 @@ end
 -- 拖动窗体 OnFrameDrag
 -------------------------------------------------
 
-function MY_CataclysmMain.OnFrameDragSetPosEnd()
+function D.OnFrameDragSetPosEnd()
 	MY_CataclysmParty:AutoLinkAllPanel()
 end
 
-function MY_CataclysmMain.OnFrameDragEnd()
+function D.OnFrameDragEnd()
 	this:CorrectPos()
 	CFG.tAnchor = GetFrameAnchor(this, 'TOPLEFT')
 	MY_CataclysmParty:AutoLinkAllPanel() -- fix screen pos
@@ -701,7 +700,7 @@ local function OnBuffUpdate(dwOwnerID, dwID, nLevel, nStackNum, dwSrcID)
 		RecBuffWithTabs(BUFF_LIST[szName], dwOwnerID, dwID, dwSrcID)
 	end
 end
-function MY_CataclysmMain.OnEvent(szEvent)
+function D.OnEvent(szEvent)
 	if szEvent == 'RENDER_FRAME_UPDATE' then
 		MY_CataclysmParty:CallDrawHPMP(true)
 	elseif szEvent == 'SYS_MSG' then
@@ -934,7 +933,7 @@ function D.FrameBuffRefreshCall()
 end
 end
 
-function MY_CataclysmMain.OnFrameBreathe()
+function D.OnFrameBreathe()
 	local me = GetClientPlayer()
 	if not me then
 		return
@@ -1001,7 +1000,7 @@ function MY_CataclysmMain.OnFrameBreathe()
 end
 end
 
-function MY_CataclysmMain.OnLButtonClick()
+function D.OnLButtonClick()
 	local szName = this:GetName()
 	if szName == 'Btn_Option' then
 		local me = GetClientPlayer()
@@ -1111,15 +1110,15 @@ function MY_CataclysmMain.OnLButtonClick()
 	end
 end
 
-function MY_CataclysmMain.OnLButtonDown()
+function D.OnLButtonDown()
 	MY_CataclysmParty:BringToTop()
 end
 
-function MY_CataclysmMain.OnRButtonDown()
+function D.OnRButtonDown()
 	MY_CataclysmParty:BringToTop()
 end
 
-function MY_CataclysmMain.OnCheckBoxCheck()
+function D.OnCheckBoxCheck()
 	local name = this:GetName()
 	if name == 'CheckBox_Fold' then
 		MY_Cataclysm.bFold = true
@@ -1127,7 +1126,7 @@ function MY_CataclysmMain.OnCheckBoxCheck()
 	end
 end
 
-function MY_CataclysmMain.OnCheckBoxUncheck()
+function D.OnCheckBoxUncheck()
 	local name = this:GetName()
 	if name == 'CheckBox_Fold' then
 		MY_Cataclysm.bFold = false
@@ -1135,7 +1134,7 @@ function MY_CataclysmMain.OnCheckBoxUncheck()
 	end
 end
 
-function MY_CataclysmMain.OnMouseLeave()
+function D.OnMouseLeave()
 	local szName = this:GetName()
 	if szName == 'WndButton_GKP'
 	or szName == 'WndButton_LootMode'
@@ -1172,7 +1171,7 @@ local MIC_TIP = setmetatable({
 	end,
 })
 
-function MY_CataclysmMain.OnMouseEnter()
+function D.OnMouseEnter()
 	local szName = this:GetName()
 	if szName == 'WndButton_GKP'
 	or szName == 'WndButton_LootMode'
@@ -1244,21 +1243,34 @@ function D.ConfirmRestoreConfig()
 	})
 end
 
-local ui = {
-	GetFrame             = D.GetFrame,
-	OpenCataclysmPanel   = D.OpenCataclysmPanel,
-	CloseCataclysmPanel  = D.CloseCataclysmPanel,
-	SetConfigureName     = D.SetConfigureName,
-	SetFrameSize         = D.SetFrameSize,
-	UpdateBuffListCache  = D.UpdateBuffListCache,
-	CheckEnableTeamPanel = D.CheckEnableTeamPanel,
-	ToggleTeamPanel      = D.ToggleTeamPanel,
-	CheckCataclysmEnable = D.CheckCataclysmEnable,
-	ReloadCataclysmPanel = D.ReloadCataclysmPanel,
-	ConfirmRestoreConfig = D.ConfirmRestoreConfig,
+--------------------------------------------------------------------------
+-- Global exports
+--------------------------------------------------------------------------
+do
+local settings = {
+	name = 'MY_Cataclysm',
+	exports = {
+		{
+			preset = 'UIEvent',
+			fields = {
+				'GetFrame',
+				'OpenCataclysmPanel',
+				'CloseCataclysmPanel',
+				'SetConfigureName',
+				'SetFrameSize',
+				'UpdateBuffListCache',
+				'CheckEnableTeamPanel',
+				'ToggleTeamPanel',
+				'CheckCataclysmEnable',
+				'ReloadCataclysmPanel',
+				'ConfirmRestoreConfig',
+			},
+			root = D,
+		},
+	},
 }
-setmetatable(MY_Cataclysm, { __index = ui, __newindex = function() end, __metatable = true })
-
+MY_CataclysmMain = LIB.CreateModule(settings)
+end
 
 LIB.RegisterEvent('CTM_PANEL_TEAMATE', function()
 	D.TeammatePanel_Switch(arg0)

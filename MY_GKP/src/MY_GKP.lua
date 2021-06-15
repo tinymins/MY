@@ -383,6 +383,7 @@ local settings = {
 				'Bidding',
 				'GetTeamMemberMenu',
 				'GetHistoryFiles',
+				'DistributionItem',
 			},
 			root = D,
 		},
@@ -404,6 +405,12 @@ local settings = {
 		},
 	},
 	imports = {
+		{
+			fields = {
+				'DistributionItem',
+			},
+			root = D,
+		},
 		{
 			fields = {
 				'bOn',

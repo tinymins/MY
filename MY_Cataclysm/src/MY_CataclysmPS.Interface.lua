@@ -73,7 +73,7 @@ function PS.OnPanelActive(frame)
 				return
 			end
 			CFG.eFrameStyle = 'OFFICIAL'
-			MY_Cataclysm.ReloadCataclysmPanel()
+			MY_CataclysmMain.ReloadCataclysmPanel()
 		end,
 	}):AutoWidth():Width() + 5
 
@@ -85,7 +85,7 @@ function PS.OnPanelActive(frame)
 				return
 			end
 			CFG.eFrameStyle = 'CATACLYSM'
-			MY_Cataclysm.ReloadCataclysmPanel()
+			MY_CataclysmMain.ReloadCataclysmPanel()
 		end,
 	}):AutoWidth():Height()
 
@@ -100,7 +100,7 @@ function PS.OnPanelActive(frame)
 			nVal = nVal / 100
 			local nNewX, nNewY = nVal / CFG.fScaleX, CFG.fScaleY / CFG.fScaleY
 			CFG.fScaleX = nVal
-			if MY_Cataclysm.GetFrame() then
+			if MY_CataclysmMain.GetFrame() then
 				MY_CataclysmParty:Scale(nNewX, nNewY)
 			end
 		end,
@@ -118,7 +118,7 @@ function PS.OnPanelActive(frame)
 			nVal = nVal / 100
 			local nNewX, nNewY = CFG.fScaleX / CFG.fScaleX, nVal / CFG.fScaleY
 			CFG.fScaleY = nVal
-			if MY_Cataclysm.GetFrame() then
+			if MY_CataclysmMain.GetFrame() then
 				MY_CataclysmParty:Scale(nNewX, nNewY)
 			end
 		end,
@@ -135,7 +135,7 @@ function PS.OnPanelActive(frame)
 		checked = CFG.bShowGroupNumber,
 		oncheck = function(bCheck)
 			CFG.bShowGroupNumber = bCheck
-			MY_Cataclysm.ReloadCataclysmPanel()
+			MY_CataclysmMain.ReloadCataclysmPanel()
 		end,
 	}):Height()
 
@@ -148,7 +148,7 @@ function PS.OnPanelActive(frame)
 			trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 			onchange = function(nVal)
 				CFG.nAlpha = nVal
-				if MY_Cataclysm.GetFrame() then
+				if MY_CataclysmMain.GetFrame() then
 					FireUIEvent('CTM_SET_ALPHA')
 				end
 			end,
@@ -170,9 +170,9 @@ function PS.OnPanelActive(frame)
 				return
 			end
 			CFG.nAutoLinkMode = 5
-			if MY_Cataclysm.GetFrame() then
+			if MY_CataclysmMain.GetFrame() then
 				MY_CataclysmParty:AutoLinkAllPanel()
-				MY_Cataclysm.SetFrameSize()
+				MY_CataclysmMain.SetFrameSize()
 			end
 		end,
 	}):AutoWidth():Height() + 3
@@ -185,9 +185,9 @@ function PS.OnPanelActive(frame)
 				return
 			end
 			CFG.nAutoLinkMode = 1
-			if MY_Cataclysm.GetFrame() then
+			if MY_CataclysmMain.GetFrame() then
 				MY_CataclysmParty:AutoLinkAllPanel()
-				MY_Cataclysm.SetFrameSize()
+				MY_CataclysmMain.SetFrameSize()
 			end
 		end,
 	}):AutoWidth():Height() + 3
@@ -200,9 +200,9 @@ function PS.OnPanelActive(frame)
 				return
 			end
 			CFG.nAutoLinkMode = 2
-			if MY_Cataclysm.GetFrame() then
+			if MY_CataclysmMain.GetFrame() then
 				MY_CataclysmParty:AutoLinkAllPanel()
-				MY_Cataclysm.SetFrameSize()
+				MY_CataclysmMain.SetFrameSize()
 			end
 		end,
 	}):AutoWidth():Height() + 3
@@ -215,9 +215,9 @@ function PS.OnPanelActive(frame)
 				return
 			end
 			CFG.nAutoLinkMode = 3
-			if MY_Cataclysm.GetFrame() then
+			if MY_CataclysmMain.GetFrame() then
 				MY_CataclysmParty:AutoLinkAllPanel()
-				MY_Cataclysm.SetFrameSize()
+				MY_CataclysmMain.SetFrameSize()
 			end
 		end,
 	}):AutoWidth():Height() + 3
@@ -230,9 +230,9 @@ function PS.OnPanelActive(frame)
 				return
 			end
 			CFG.nAutoLinkMode = 4
-			if MY_Cataclysm.GetFrame() then
+			if MY_CataclysmMain.GetFrame() then
 				MY_CataclysmParty:AutoLinkAllPanel()
-				MY_Cataclysm.SetFrameSize()
+				MY_CataclysmMain.SetFrameSize()
 			end
 		end,
 	}):AutoWidth():Height() + 3

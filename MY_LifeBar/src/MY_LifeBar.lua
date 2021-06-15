@@ -89,7 +89,6 @@ end
 end
 -----------------------------------------------------------------------------------------
 
-local D = {}
 local NPC_HIDDEN = CONSTANT.NPC_HIDDEN
 local LB_CACHE = {}
 local TONG_NAME_CACHE = {}
@@ -223,16 +222,30 @@ end
 LIB.RegisterEvent('LOADING_END', onLoadingEnd)
 end
 
-MY_LifeBar = {}
-MY_LifeBar.bEnabled = false
-MY_LifeBar.szConfig = 'common'
-MY_LifeBar.bAutoHideSysHeadtop = true
-RegisterCustomData('MY_LifeBar.bEnabled')
-RegisterCustomData('MY_LifeBar.szConfig')
-RegisterCustomData('MY_LifeBar.bAutoHideSysHeadtop')
+local O = LIB.CreateUserSettingsModule('MY_LifeBar', _L['MY_LifeBar'], {
+	bEnabled = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_LifeBar'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	szConfig = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_LifeBar'],
+		xSchema = Schema.String,
+		xDefaultValue = 'common',
+	},
+	bAutoHideSysHeadtop = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_LifeBar'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+})
+local D = {}
 
 function D.IsShielded() return LIB.IsShieldedVersion('TARGET') and LIB.IsInShieldedMap() end
-function D.IsEnabled() return MY_LifeBar.bEnabled and not D.IsShielded() end
+function D.IsEnabled() return D.bReady and O.bEnabled and not D.IsShielded() end
 function D.IsMapEnabled()
 	return D.IsEnabled() and (
 		not (
@@ -303,7 +316,7 @@ function D.AutoSwitchSysHeadTop()
 	if Config.eCss == '' and D.IsMapEnabled() then
 		Config('reset')
 	end
-	if MY_LifeBar.bAutoHideSysHeadtop and D.IsMapEnabled() then
+	if O.bAutoHideSysHeadtop and D.IsMapEnabled() then
 		D.SaveSysHeadTop()
 		D.HideSysHeadTop()
 	else
@@ -393,7 +406,7 @@ function D.Reset()
 	end
 	OVERWRITE_TITLE_EFFECT = {}
 	-- ×ÔÊÊÓ¦ÕÚµ²Ë³Ðò
-	if MY_LifeBar.bEnabled and Config.bScreenPosSort then
+	if O.bEnabled and Config.bScreenPosSort then
 		local dwLastID, nCount
 		local function onGetCharacterTopScreenPos(dwID, xScreen, yScreen)
 			OBJECT_SCREEN_POS_Y_CACHE[dwID] = yScreen or 0
@@ -851,18 +864,51 @@ LIB.RegisterEvent('PLAYER_SAY', function()
 end)
 
 local function onSwitch()
-	MY_LifeBar.bEnabled = not MY_LifeBar.bEnabled
+	O.bEnabled = not O.bEnabled
 	D.Reset(true)
 end
 LIB.RegisterHotKey('MY_LifeBar_S', _L['MY_LifeBar'], onSwitch)
 
-setmetatable(MY_LifeBar, {
-	__index = {
-		Reset = D.Reset,
-		Repaint = D.Repaint,
-		IsEnabled = D.IsEnabled,
-		IsShielded = D.IsShielded,
-		UpdateShadowHandleParam = D.UpdateShadowHandleParam,
+LIB.RegisterInit('MY_LifeBar', function()
+	D.bReady = true
+end)
+
+--------------------------------------------------------------------------
+-- Global exports
+--------------------------------------------------------------------------
+do
+local settings = {
+	name = 'MY_LifeBar',
+	exports = {
+		{
+			fields = {
+				'Reset',
+				'Repaint',
+				'IsEnabled',
+				'IsShielded',
+				'UpdateShadowHandleParam',
+			},
+			root = D,
+		},
+		{
+			fields = {
+				'bEnabled',
+				'szConfig',
+				'bAutoHideSysHeadtop',
+			},
+			root = O,
+		},
 	},
-	__metatable = true,
-})
+	imports = {
+		{
+			fields = {
+				'bEnabled',
+				'szConfig',
+				'bAutoHideSysHeadtop',
+			},
+			root = O,
+		},
+	},
+}
+MY_LifeBar = LIB.CreateModule(settings)
+end

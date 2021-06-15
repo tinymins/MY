@@ -77,8 +77,8 @@ function PS.OnPanelActive(frame)
 			if szConfigName == MY_Cataclysm.szConfigName then
 				return
 			end
-			MY_Cataclysm.SetConfigureName(szConfigName)
-			MY_Cataclysm.CheckEnableTeamPanel()
+			MY_CataclysmMain.SetConfigureName(szConfigName)
+			MY_CataclysmMain.CheckEnableTeamPanel()
 			LIB.SwitchTab('MY_Cataclysm', true)
 		end,
 	}):Width() + 5
@@ -90,7 +90,7 @@ function PS.OnPanelActive(frame)
 		text = _L['Restore default'],
 		buttonstyle = 'FLAT',
 		onclick = function()
-			MY_Cataclysm.ConfirmRestoreConfig()
+			MY_CataclysmMain.ConfirmRestoreConfig()
 		end,
 	}):Height() + 20
 
@@ -100,7 +100,7 @@ function PS.OnPanelActive(frame)
 	x = x + 10
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['Enable Cataclysm Team Panel'],
-		oncheck = MY_Cataclysm.ToggleTeamPanel, checked = MY_Cataclysm.bEnable,
+		oncheck = MY_CataclysmMain.ToggleTeamPanel, checked = MY_Cataclysm.bEnable,
 	}):AutoWidth():Width() + 5
 
 	x = x + ui:Append('WndCheckBox', {
@@ -108,8 +108,8 @@ function PS.OnPanelActive(frame)
 		checked = CFG.bShowInRaid,
 		oncheck = function(bCheck)
 			CFG.bShowInRaid = bCheck
-			if MY_Cataclysm.CheckCataclysmEnable() then
-				MY_Cataclysm.ReloadCataclysmPanel()
+			if MY_CataclysmMain.CheckCataclysmEnable() then
+				MY_CataclysmMain.ReloadCataclysmPanel()
 			end
 			local me = GetClientPlayer()
 			if me.IsInParty() and not me.IsInRaid() then
@@ -123,8 +123,8 @@ function PS.OnPanelActive(frame)
 		checked = not CFG.bDrag,
 		oncheck = function(bCheck)
 			CFG.bDrag = not bCheck
-			if MY_Cataclysm.GetFrame() then
-				MY_Cataclysm.GetFrame():EnableDrag(not bCheck)
+			if MY_CataclysmMain.GetFrame() then
+				MY_CataclysmMain.GetFrame():EnableDrag(not bCheck)
 			end
 		end,
 	}):AutoWidth():Height() + 5
@@ -166,7 +166,7 @@ function PS.OnPanelActive(frame)
 		checked = CFG.bHPHitAlert,
 		oncheck = function(bCheck)
 			CFG.bHPHitAlert = bCheck
-			if MY_Cataclysm.GetFrame() then
+			if MY_CataclysmMain.GetFrame() then
 				MY_CataclysmParty:CallDrawHPMP(true, true)
 			end
 		end,
@@ -262,7 +262,7 @@ function PS.OnPanelActive(frame)
 		checked = CFG.bShowTargetTargetAni,
 		oncheck = function(bCheck)
 			CFG.bShowTargetTargetAni = bCheck
-			if MY_Cataclysm.GetFrame() then
+			if MY_CataclysmMain.GetFrame() then
 				MY_CataclysmParty:RefreshTTarget()
 			end
 		end,
@@ -358,11 +358,11 @@ function PS.OnPanelActive(frame)
 		checked = CFG.bFasterHP,
 		oncheck = function(bCheck)
 			CFG.bFasterHP = bCheck
-			if MY_Cataclysm.GetFrame() then
+			if MY_CataclysmMain.GetFrame() then
 				if bCheck then
-					MY_Cataclysm.GetFrame():RegisterEvent('RENDER_FRAME_UPDATE')
+					MY_CataclysmMain.GetFrame():RegisterEvent('RENDER_FRAME_UPDATE')
 				else
-					MY_Cataclysm.GetFrame():UnRegisterEvent('RENDER_FRAME_UPDATE')
+					MY_CataclysmMain.GetFrame():UnRegisterEvent('RENDER_FRAME_UPDATE')
 				end
 			end
 		end,

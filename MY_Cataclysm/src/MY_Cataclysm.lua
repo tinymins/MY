@@ -54,23 +54,33 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
-MY_Cataclysm = {}
-MY_Cataclysm.CFG = {}
-MY_Cataclysm.bEnable = false
-MY_Cataclysm.szConfigName = 'common'
-MY_Cataclysm.bFold = false
-MY_Cataclysm.BG_COLOR_MODE = {
-	SAME_COLOR = 0,
-	BY_DISTANCE = 1,
-	BY_FORCE = 2,
-	OFFICIAL = 3,
+local O = LIB.CreateUserSettingsModule('MY_Cataclysm', _L['MY_Cataclysm'], {
+	bEnable = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	szConfigName = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.String,
+		xDefaultValue = 'common',
+	},
+})
+local D = {
+	CFG = {},
+	bFold = false,
+	BG_COLOR_MODE = {
+		SAME_COLOR = 0,
+		BY_DISTANCE = 1,
+		BY_FORCE = 2,
+		OFFICIAL = 3,
+	},
 }
-RegisterCustomData('MY_Cataclysm.bEnable')
-RegisterCustomData('MY_Cataclysm.szConfigName')
-
 
 -- ½âÎö
-function MY_Cataclysm.EncodeBuffRule(v, bNoBasic)
+function D.EncodeBuffRule(v, bNoBasic)
 	local a = {}
 	if not bNoBasic then
 		insert(a, v.szName or v.dwID)
@@ -121,7 +131,7 @@ function MY_Cataclysm.EncodeBuffRule(v, bNoBasic)
 	return concat(a, ',')
 end
 
-function MY_Cataclysm.DecodeBuffRule(line)
+function D.DecodeBuffRule(line)
 	line = LIB.TrimString(line)
 	if line ~= '' then
 		local tab = {}
@@ -187,7 +197,7 @@ function MY_Cataclysm.DecodeBuffRule(line)
 	end
 end
 
-function MY_Cataclysm.OpenBuffRuleEditor(rec, onChangeNotify, bHideBase)
+function D.OpenBuffRuleEditor(rec, onChangeNotify, bHideBase)
 	local w, h = 320, 320
 	local ui = UI.CreateFrame('MY_Cataclysm_BuffConfig', {
 		w = w, h = h,
@@ -482,4 +492,51 @@ function MY_Cataclysm.OpenBuffRuleEditor(rec, onChangeNotify, bHideBase)
 
 	h = y + 15
 	ui:Height(h)
+end
+
+--------------------------------------------------------------------------
+-- Global exports
+--------------------------------------------------------------------------
+do
+local settings = {
+	name = 'MY_Cataclysm',
+	exports = {
+		{
+			fields = {
+				'CFG',
+				'bFold',
+				'BG_COLOR_MODE',
+				'EncodeBuffRule',
+				'DecodeBuffRule',
+				'OpenBuffRuleEditor',
+			},
+			root = D,
+		},
+		{
+			fields = {
+				'bEnable',
+				'szConfigName',
+			},
+			root = O,
+		},
+	},
+	imports = {
+		{
+			fields = {
+				'CFG',
+				'bFold',
+				'BG_COLOR_MODE',
+			},
+			root = D,
+		},
+		{
+			fields = {
+				'bEnable',
+				'szConfigName',
+			},
+			root = O,
+		},
+	},
+}
+MY_Cataclysm = LIB.CreateModule(settings)
 end

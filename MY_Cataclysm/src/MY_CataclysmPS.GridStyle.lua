@@ -70,7 +70,7 @@ function PS.OnPanelActive(frame)
 		checked = CFG.bShowAllGrid,
 		oncheck = function(bCheck)
 			CFG.bShowAllGrid = bCheck
-			MY_Cataclysm.ReloadCataclysmPanel()
+			MY_CataclysmMain.ReloadCataclysmPanel()
 		end,
 	}):AutoWidth():Height() + 5
 
@@ -94,7 +94,7 @@ function PS.OnPanelActive(frame)
 			group = 'namecolor', checked = CFG.nColoredName == p[1],
 			oncheck = function()
 				CFG.nColoredName = p[1]
-				if MY_Cataclysm.GetFrame() then
+				if MY_CataclysmMain.GetFrame() then
 					MY_CataclysmParty:CallRefreshImages(true, false, false, nil, true)
 					MY_CataclysmParty:CallDrawHPMP(true ,true)
 				end
@@ -110,7 +110,7 @@ function PS.OnPanelActive(frame)
 		textfmt = function(val) return _L('Scale %d%%', val) end,
 		onchange = function(val)
 			CFG.fNameFontScale = val / 100
-			if MY_Cataclysm.GetFrame() then
+			if MY_CataclysmMain.GetFrame() then
 				MY_CataclysmParty:CallRefreshImages(nil, nil, nil, nil, true)
 			end
 		end,
@@ -153,7 +153,7 @@ function PS.OnPanelActive(frame)
 		onclick = function()
 			UI.OpenFontPicker(function(nFont)
 				CFG.nNameFont = nFont
-				if MY_Cataclysm.GetFrame() then
+				if MY_CataclysmMain.GetFrame() then
 					MY_CataclysmParty:CallRefreshImages(true, false, false, nil, true)
 					MY_CataclysmParty:CallDrawHPMP(true, true)
 				end
@@ -175,7 +175,7 @@ function PS.OnPanelActive(frame)
 			group = 'lifemode', checked = CFG.nHPShownMode2 == p[1],
 			oncheck = function()
 				CFG.nHPShownMode2 = p[1]
-				if MY_Cataclysm.GetFrame() then
+				if MY_CataclysmMain.GetFrame() then
 					MY_CataclysmParty:CallDrawHPMP(true, true)
 				end
 			end,
@@ -190,7 +190,7 @@ function PS.OnPanelActive(frame)
 		textfmt = function(val) return _L('Scale %d%%', val) end,
 		onchange = function(val)
 			CFG.fLifeFontScale = val / 100
-			if MY_Cataclysm.GetFrame() then
+			if MY_CataclysmMain.GetFrame() then
 				MY_CataclysmParty:CallDrawHPMP(true, true)
 			end
 		end,
@@ -211,7 +211,7 @@ function PS.OnPanelActive(frame)
 			autoenable = function() return CFG.nHPShownMode2 ~= 0 end,
 			oncheck = function()
 				CFG.nHPShownNumMode = p[1]
-				if MY_Cataclysm.GetFrame() then
+				if MY_CataclysmMain.GetFrame() then
 					MY_CataclysmParty:CallDrawHPMP(true, true)
 				end
 			end,
@@ -223,7 +223,7 @@ function PS.OnPanelActive(frame)
 		checked = CFG.bShowHPDecimal,
 		oncheck = function(bCheck)
 			CFG.bShowHPDecimal = bCheck
-			if MY_Cataclysm.GetFrame() then
+			if MY_CataclysmMain.GetFrame() then
 				MY_CataclysmParty:CallDrawHPMP(true, true)
 			end
 		end,
@@ -268,7 +268,7 @@ function PS.OnPanelActive(frame)
 		onclick = function()
 			UI.OpenFontPicker(function(nFont)
 				CFG.nLifeFont = nFont
-				if MY_Cataclysm.GetFrame() then
+				if MY_CataclysmMain.GetFrame() then
 					MY_CataclysmParty:CallDrawHPMP(true, true)
 				end
 			end)
@@ -291,7 +291,7 @@ function PS.OnPanelActive(frame)
 			group = 'icon', checked = CFG.nShowIcon == p[1],
 			oncheck = function()
 				CFG.nShowIcon = p[1]
-				if MY_Cataclysm.GetFrame() then
+				if MY_CataclysmMain.GetFrame() then
 					MY_CataclysmParty:CallRefreshImages(true, false, true, nil, true)
 					MY_CataclysmParty:CallDrawHPMP(true, true)
 				end
@@ -307,7 +307,7 @@ function PS.OnPanelActive(frame)
 		checked = CFG.nShowMP,
 		oncheck = function(bCheck)
 			CFG.nShowMP = bCheck
-			if MY_Cataclysm.GetFrame() then
+			if MY_CataclysmMain.GetFrame() then
 				MY_CataclysmParty:CallDrawHPMP(true, true)
 			end
 		end,
@@ -320,7 +320,7 @@ function PS.OnPanelActive(frame)
 		onclick = function()
 			UI.OpenFontPicker(function(nFont)
 				CFG.nManaFont = nFont
-				if MY_Cataclysm.GetFrame() then
+				if MY_CataclysmMain.GetFrame() then
 					MY_CataclysmParty:CallDrawHPMP(true, true)
 				end
 			end)
@@ -336,7 +336,7 @@ function PS.OnPanelActive(frame)
 		textfmt = function(val) return _L('Scale %d%%', val) end,
 		onchange = function(val)
 			CFG.fManaFontScale = val / 100
-			if MY_Cataclysm.GetFrame() then
+			if MY_CataclysmMain.GetFrame() then
 				MY_CataclysmParty:CallDrawHPMP(true, true)
 			end
 		end,

@@ -55,7 +55,7 @@ end
 --------------------------------------------------------------------------
 
 local D = {
-	ReloadCataclysmPanel = MY_Cataclysm.ReloadCataclysmPanel,
+	ReloadCataclysmPanel = MY_CataclysmMain.ReloadCataclysmPanel,
 }
 local CFG, PS = MY_Cataclysm.CFG, { nPriority = 5 }
 
@@ -86,7 +86,7 @@ local function OpenBuffRuleEditor(rec)
 			if l_list then
 				l_list:ListBox('update', 'id', rec, {'text'}, {MY_Cataclysm.EncodeBuffRule(rec)})
 			end
-			MY_Cataclysm.UpdateBuffListCache()
+			MY_CataclysmMain.UpdateBuffListCache()
 		else
 			for i, p in ipairs(CFG.aBuffList) do
 				if p == rec then
@@ -94,7 +94,7 @@ local function OpenBuffRuleEditor(rec)
 						l_list:ListBox('delete', 'id', rec)
 					end
 					remove(CFG.aBuffList, i)
-					MY_Cataclysm.UpdateBuffListCache()
+					MY_CataclysmMain.UpdateBuffListCache()
 					break
 				end
 			end
@@ -145,7 +145,7 @@ function PS.OnPanelActive(frame)
 				buttonstyle = 'FLAT',
 				onclick = function()
 					CFG.aBuffList = DecodeBuffRuleList(edit:Text())
-					MY_Cataclysm.UpdateBuffListCache()
+					MY_CataclysmMain.UpdateBuffListCache()
 					ui:Remove()
 					LIB.DelayCall('MY_Cataclysm_Reload', 300, D.ReloadCataclysmPanel)
 					LIB.SwitchTab('MY_Cataclysm_BuffSettings', true)
@@ -219,7 +219,7 @@ function PS.OnPanelActive(frame)
 		checked = CFG.bBuffPushToOfficial,
 		oncheck = function(bCheck)
 			CFG.bBuffPushToOfficial = bCheck
-			MY_Cataclysm.UpdateBuffListCache()
+			MY_CataclysmMain.UpdateBuffListCache()
 			LIB.DelayCall('MY_Cataclysm_Reload', 300, D.ReloadCataclysmPanel)
 		end,
 	}):AutoWidth():Width() + 5
@@ -289,7 +289,7 @@ function PS.OnPanelActive(frame)
 		checked = CFG.bBuffDataTeamMon,
 		oncheck = function(bCheck)
 			CFG.bBuffDataTeamMon = bCheck
-			MY_Cataclysm.UpdateBuffListCache()
+			MY_CataclysmMain.UpdateBuffListCache()
 			LIB.DelayCall('MY_Cataclysm_Reload', 300, D.ReloadCataclysmPanel)
 		end,
 		autoenable = function() return MY_Resource and true end,

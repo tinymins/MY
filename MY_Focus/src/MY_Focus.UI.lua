@@ -661,23 +661,12 @@ local settings = {
 	name = 'MY_FocusUI',
 	exports = {
 		{
+			preset = 'UIEvent',
 			fields = {
-				Open                 = D.Open                ,
-				Close                = D.Close               ,
-				OnFrameBreathe       = D.OnFrameBreathe      ,
-				OnFrameCreate        = D.OnFrameCreate       ,
-				OnFrameDestroy       = D.OnFrameDestroy      ,
-				OnEvent              = D.OnEvent             ,
-				OnFrameDragSetPosEnd = D.OnFrameDragSetPosEnd,
-				OnItemMouseEnter     = D.OnItemMouseEnter    ,
-				OnItemRefreshTip     = D.OnItemRefreshTip    ,
-				OnItemMouseLeave     = D.OnItemMouseLeave    ,
-				OnItemLButtonClick   = D.OnItemLButtonClick  ,
-				OnItemRButtonClick   = D.OnItemRButtonClick  ,
-				OnLButtonClick       = D.OnLButtonClick      ,
-				OnCheckBoxCheck      = D.OnCheckBoxCheck     ,
-				OnCheckBoxUncheck    = D.OnCheckBoxUncheck   ,
+				'Open',
+				'Close',
 			},
+			root = D,
 		},
 	},
 }
