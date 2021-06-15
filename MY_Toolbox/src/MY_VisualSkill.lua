@@ -364,8 +364,8 @@ local settings = {
 	name = 'MY_VisualSkill',
 	exports = {
 		{
-			fields = {
 			preset = 'UIEvent',
+			fields = {
 				'OnPanelActivePartial',
 			},
 			root = D,
