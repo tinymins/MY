@@ -20,7 +20,6 @@ local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math
 local insert, remove, concat = table.insert, table.remove, table.concat
 local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
 local sort, getn = table.sort, table['getn'] or function(t) return #t end
-local iif = function(expr, truepart, falsepart) if expr then return truepart end return falsepart end
 -- jx3 apis caching
 local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
 local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
@@ -175,6 +174,15 @@ local _AUTHOR_FAKE_HEADER_ = GetFormatText(_L['[Fake author]'], 8, 255, 95, 159)
 -------------------------------------------------------------------------------------------------------
 -- 通用函数
 -------------------------------------------------------------------------------------------------------
+-----------------------------------------------
+-- 三元运算
+-----------------------------------------------
+local IIf = function(expr, truepart, falsepart)
+	if expr then
+		return truepart
+	end
+	return falsepart
+end
 -----------------------------------------------
 -- 克隆数据
 -----------------------------------------------
@@ -661,9 +669,23 @@ end
 end
 local function SafeCall(f, ...)
 	if not IsFunction(f) then
-		return false
+		return false, 'NOT CALLABLE'
 	end
 	return Call(f, ...)
+end
+local function CallWithThis(context, f, ...)
+	local _this = this
+	this = context
+	local rtc = {Call(f, ...)}
+	this = _this
+	return unpack(rtc)
+end
+local function SafeCallWithThis(context, f, ...)
+	local _this = this
+	this = context
+	local rtc = {SafeCall(f, ...)}
+	this = _this
+	return unpack(rtc)
 end
 
 local NSFormatString
@@ -1480,10 +1502,13 @@ local LIB = {
 	IsString         = IsString        ,
 	IsTable          = IsTable         ,
 	IsFunction       = IsFunction      ,
+	IIf              = IIf             ,
 	Clone            = Clone           ,
 	Call             = Call            ,
 	XpCall           = XpCall          ,
 	SafeCall         = SafeCall        ,
+	CallWithThis     = CallWithThis    ,
+	SafeCallWithThis = SafeCallWithThis,
 	SetmetaReadonly  = SetmetaReadonly ,
 	Set              = Set             ,
 	Get              = Get             ,
