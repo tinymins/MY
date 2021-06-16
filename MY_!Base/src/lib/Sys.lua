@@ -2723,6 +2723,7 @@ local PRESETS = {
 		'OnFrameHide',
 		'OnFrameKeyDown',
 		'OnFrameKeyUp',
+		'OnFrameKillFocus',
 		'OnFrameRender',
 		'OnFrameSetFocus',
 		'OnFrameShow',
