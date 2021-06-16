@@ -213,9 +213,14 @@ local settings = {
 		{
 			fields = {
 				'bEnable',
-				'OnPanelActivePartial',
 			},
 			root = O,
+		},
+		{
+			fields = {
+				'OnPanelActivePartial',
+			},
+			root = D,
 		},
 	},
 	imports = {
