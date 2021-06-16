@@ -116,6 +116,33 @@ local CURL_HttpPost = (SafeCall(_G.CURL_HttpPostEx, 'TEST', 'https://ping.j3cx.c
 	or (SafeCall(_G.CURL_HttpPost, 'TEST', 'https://ping.j3cx.com/') and _G.CURL_HttpPost)
 	or nil
 
+function LIB.CanAjax(driver, method)
+	if driver == 'curl' then
+		if not Curl_Create then
+			return false, 'Curl_Create does not exist.'
+		end
+	elseif driver == 'webcef' then
+		if method ~= 'get' then
+			return false, 'Webcef only support get method, got ' .. method .. '.'
+		end
+	elseif driver == 'webbrowser' then
+		if method ~= 'get' then
+			return false, 'Webbrowser only support get method, got ' .. method .. '.'
+		end
+	else -- if driver == 'origin' then
+		if method == 'post' then
+			if not CURL_HttpPost then
+				return false, 'CURL_HttpPost does not exist.'
+			end
+		else
+			if not CURL_HttpRqst then
+				return false, 'CURL_HttpRqst does not exist.'
+			end
+		end
+	end
+	return true
+end
+
 -- (void) LIB.Ajax(settings)       -- 发起远程 HTTP 请求
 -- settings           -- 请求配置项
 -- settings.url       -- 请求地址
@@ -287,10 +314,14 @@ function LIB.Ajax(settings)
 	LIB.DelayCall(bridgekey, config.timeout, settings.closebridge)
 	LIB.RegisterExit(bridgekey, settings.closebridge)
 
+	local canajax, errmsg = LIB.CanAjax(driver, method)
+	if not canajax then
+		LIB.Debug(NSFormatString('{$NS}_AJAX'), errmsg, DEBUG_LEVEL.WARNING)
+		settings.callback()
+		return
+	end
+
 	if driver == 'curl' then
-		if not Curl_Create then
-			return settings.callback()
-		end
 		local curl = Curl_Create(xurl)
 		if method == 'post' then
 			curl:SetMethod('POST')
@@ -331,11 +362,6 @@ function LIB.Ajax(settings)
 		curl:SetConnTimeout(config.timeout)
 		curl:Perform()
 	elseif driver == 'webcef' then
-		if method ~= 'get' then
-			LIB.Debug(NSFormatString('{$NS}_AJAX'), 'Webcef only support get method, got ' .. method, DEBUG_LEVEL.WARNING)
-			settings.callback()
-			return
-		end
 		local RequestID, hFrame
 		local nFreeWebPages = #RRWC_FREE
 		if nFreeWebPages > 0 then
@@ -388,11 +414,6 @@ function LIB.Ajax(settings)
 		-- start chrome navigate
 		wWebCef:Navigate(xurl)
 	elseif driver == 'webbrowser' then
-		if method ~= 'get' then
-			LIB.Debug(NSFormatString('{$NS}_AJAX'), 'Webbrowser only support get method, got ' .. method, DEBUG_LEVEL.WARNING)
-			settings.callback()
-			return
-		end
 		local RequestID, hFrame
 		local function OnWebPageFrameCreate()
 			local wWebPage = hFrame:Lookup('WndWebPage')
@@ -459,16 +480,8 @@ function LIB.Ajax(settings)
 		szKey = AJAX_TAG .. szKey
 		local ssl = config.url:sub(1, 6) == 'https:'
 		if method == 'post' then
-			if not CURL_HttpPost then
-				settings.callback()
-				return
-			end
 			CURL_HttpPost(szKey, xurl, xdata, ssl, config.timeout)
 		else
-			if not CURL_HttpRqst then
-				settings.callback()
-				return
-			end
 			CURL_HttpRqst(szKey, xurl, ssl, config.timeout)
 		end
 		CALL_AJAX['__addon_' .. szKey] = settings
@@ -515,6 +528,12 @@ end
 function LIB.EnsureAjax(options)
 	local key = GetStringCRC(options.url)
 	local configs, i, dc = {{'curl', 'post'}, {'origin', 'post'}, {'origin', 'get'}, {'webcef', 'get'}}, 1, nil
+	-- 移除无法访问的调用方式，但至少保留一个用于尝试桥接通信
+	for i, config in ipairs_r(configs) do
+		if i >= 1 and not LIB.CanAjax(config[1], config[2]) then
+			remove(configs, i)
+		end
+	end
 	--[[#DEBUG BEGIN]]
 	LIB.Debug('Ensure ajax ' .. key .. ' preparing: ' .. options.url, DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
