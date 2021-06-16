@@ -246,10 +246,10 @@ function LIB.Ajax(settings)
 			end
 			XpCall(settings.closebridge)
 		end
-		if not connected or not IsNumber(status) or status < 200 or status >= 400 then
-			LIB.DelayCall(bridgewaitkey, bridgewait - GetTime(), resolve)
-		else
+		if connected then
 			resolve()
+		else
+			LIB.DelayCall(bridgewaitkey, bridgewait - GetTime(), resolve)
 		end
 	end
 
