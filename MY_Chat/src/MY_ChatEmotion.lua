@@ -82,6 +82,7 @@ LIB.RegisterInit('MY_ChatEmotion', function()
 					and szName and szName:sub(1, 8) == 'emotion_' then
 						LIB.XMLSetNodeData(node, 'w', O.nSize)
 						LIB.XMLSetNodeData(node, 'h', O.nSize)
+						LIB.XMLSetNodeData(node, 'disablescale', 0)
 					end
 				end
 				szMsg = LIB.XMLEncode(aXMLNode)
