@@ -878,7 +878,7 @@ end
 -- Module exports
 do
 local settings = {
-	name = 'MY_TeamTools_Achievement',
+	name = 'MY_TeamTools_Achievement_Module',
 	exports = {
 		{
 			fields = {
@@ -897,6 +897,7 @@ end
 -- Global exports
 do
 local settings = {
+	name = 'MY_TeamTools_Achievement',
 	exports = {
 		{
 			fields = {

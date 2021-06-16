@@ -1155,7 +1155,7 @@ end
 -- Module exports
 do
 local settings = {
-	name = 'MY_TeamTools_Summary',
+	name = 'MY_TeamTools_Summary_Module',
 	exports = {
 		{
 			fields = {
@@ -1175,6 +1175,7 @@ end
 -- Global exports
 do
 local settings = {
+	name = 'MY_TeamTools_Summary',
 	exports = {
 		{
 			fields = {

@@ -1416,6 +1416,7 @@ end
 -- Global exports
 do
 local settings = {
+	name = 'MY_RoleStatistics_RoleStat',
 	exports = {
 		{
 			fields = {
