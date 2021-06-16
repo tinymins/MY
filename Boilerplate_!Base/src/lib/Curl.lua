@@ -58,19 +58,12 @@ function LIB.RemoteRequest(szUrl, fnSuccess, fnError, nTimeout)
 	return LIB.Ajax(settings)
 end
 
-local function CallWithThis(context, fn, ...)
-	local _this = this
-	this = context
-	local rtc = {Call(fn, ...)}
-	this = _this
-	return unpack(rtc)
-end
-
 do
 local RRWP_FREE = {}
 local RRWC_FREE = {}
 local CALL_AJAX = {}
 local AJAX_TAG = NSFormatString('{$NS}_AJAX#')
+local AJAX_BRIDGE_WAIT = 10000
 local AJAX_BRIDGE_PATH = PACKET_INFO.DATA_ROOT .. '#cache/curl/'
 
 local function EncodePostData(data, t, prefix)
@@ -122,7 +115,6 @@ local CURL_HttpRqst = SafeCall(_G.CURL_HttpRqst, 'https://ping.j3cx.com/') and _
 local CURL_HttpPost = (SafeCall(_G.CURL_HttpPostEx, 'TEST', 'https://ping.j3cx.com/') and _G.CURL_HttpPostEx)
 	or (SafeCall(_G.CURL_HttpPost, 'TEST', 'https://ping.j3cx.com/') and _G.CURL_HttpPost)
 	or nil
-local AJAX_SETTING_KEYS = { 'url', 'data', 'method', 'payload', 'driver', 'timeout', 'charset', 'complete', 'fulfilled', 'success', 'error' }
 
 -- (void) LIB.Ajax(settings)       -- 发起远程 HTTP 请求
 -- settings           -- 请求配置项
@@ -137,64 +129,37 @@ local AJAX_SETTING_KEYS = { 'url', 'data', 'method', 'payload', 'driver', 'timeo
 -- settings.fulfilled -- 请求成功回调事件，不关心数据，回调链： complete -> fulfilled -> success
 -- settings.success   -- 请求成功回调事件，携带数据，回调链： complete -> fulfilled -> success
 -- settings.error     -- 请求失败回调事件，可能携带数据，回调链： complete -> error
-function LIB.Ajax(rawSettings)
-	assert(IsTable(rawSettings) and IsString(rawSettings.url))
+function LIB.Ajax(settings)
+	assert(IsTable(settings) and IsString(settings.url))
+	-- standradize settings
 	local id = lower(LIB.GetUUID())
-	local bridgein = AJAX_BRIDGE_PATH .. id .. '.' .. GLOBAL.GAME_LANG .. '.jx3dat'
-	local bridgeout = AJAX_BRIDGE_PATH .. id .. '.result.' .. GLOBAL.GAME_LANG .. '.jx3dat'
-	local events = {
-		closebridge = function()
-			CPath.DelFile(bridgein)
-			CPath.DelFile(bridgeout)
-			LIB.DelayCall(NSFormatString('{$NS}RRDF_TO_') .. id, false)
-			LIB.BreatheCall(NSFormatString('{$NS}RRDF_TO_') .. id, false)
-		end,
-	}
+	local oncomplete, onerror = settings.complete, settings.error
+	local onfulfilled, onsuccess = settings.fulfilled, settings.success
 	local config = {
-		method = 'get',
-		payload = 'form',
-		driver = 'auto',
-		timeout = 60000,
-		charset = 'utf8',
+		id      = id,
+		url     = settings.url,
+		data    = IIf(IsEmpty(settings.data), nil, settings.data),
+		method  = settings.method  or 'get' ,
+		payload = settings.payload or 'form',
+		driver  = settings.driver  or 'auto',
+		timeout = settings.timeout or 60000 ,
+		charset = settings.charset or 'utf8',
 	}
-	local settings = setmetatable({}, {
-		__index = function(_, k)
-			return events[k] or config[k]
-		end,
-		__newindex = function(_, k, v)
-			if IsFunction(v) then
-				-- 确保回调被不会多次调用
-				local flag = false
-				events[k] = function(...)
-					if not flag then
-						flag = true
-						v(...)
-					end
-				end
-				config[k] = nil
-			else
-				config[k] = v
-				events[k] = nil
-			end
-		end,
-	})
+	local settings = {
+		config = setmetatable({}, {
+			__index = function(_, k)
+				return config[k]
+			end,
+			__newindex = function(_, k, v) end,
+			__metatable = true,
+		}),
+	}
 
-	for _, k in ipairs(AJAX_SETTING_KEYS) do
-		local v = rawSettings[k]
-		if not IsNil(v) then
-			settings[k] = v
-		end
-	end
-	settings.id = id
-
-	local url, data = settings.url, settings.data
-	if settings.charset == 'utf8' then
-		url  = LIB.ConvertToUTF8(url)
-		data = LIB.ConvertToUTF8(data)
-	end
-
-	local ssl = url:sub(1, 6) == 'https:'
-	local method = settings.method
+	-------------------------------
+	-- auto settings
+	-------------------------------
+	-- select auto method
+	local method = config.method
 	if method == 'auto' then
 		if Curl_Create then
 			method = 'get'
@@ -206,17 +171,8 @@ function LIB.Ajax(rawSettings)
 			method = 'get'
 		end
 	end
-	if (method == 'get' or method == 'delete') and data then
-		if not url:find('?') then
-			url = url .. '?'
-		elseif url:sub(-1) ~= '&' then
-			url = url .. '&'
-		end
-		url, data = url .. serialize(data), nil
-	end
-	assert(method == 'post' or method == 'get' or method == 'put' or method == 'delete', NSFormatString('[{$NS}_AJAX] Unknown http request type: ') .. method)
-
-	local driver = settings.driver
+	-- select auto driver
+	local driver = config.driver
 	if driver == 'auto' then
 		if Curl_Create then
 			driver = 'curl'
@@ -224,85 +180,125 @@ function LIB.Ajax(rawSettings)
 			driver = 'origin'
 		elseif CURL_HttpPost and method == 'post' then
 			driver = 'origin'
-		elseif settings.success then
+		elseif onsuccess then
 			driver = 'webbrowser'
 		else
 			driver = 'webcef'
 		end
 	end
-
-	if not settings.success and not settings.fulfilled then
-		settings.fulfilled = function()
-			--[[#DEBUG BEGIN]]
-			LIB.Debug(
-				'AJAX',
-				settings.url .. ' - ' .. settings.driver .. '/' .. settings.method
-					.. ' (' .. driver .. '/' .. method .. ')'
-					.. ': SUCCESS',
-				DEBUG_LEVEL.LOG
-			)
-			--[[#DEBUG END]]
+	if (method == 'get' or method == 'delete') and config.data then
+		if not config.url:find('?') then
+			config.url = config.url .. '?'
+		elseif config.url:sub(-1) ~= '&' then
+			config.url = config.url .. '&'
 		end
+		config.url, config.data = config.url .. serialize(config.data), nil
 	end
-	if not settings.error then
-		settings.error = function(html, status, connected)
-			--[[#DEBUG BEGIN]]
-			LIB.Debug(
-				'AJAX',
-				settings.url .. ' - ' .. settings.driver .. '/' .. settings.method
-					.. ' (' .. driver .. '/' .. method .. ')'
-					.. ': ' .. (connected and status or 'FAILED'),
-				DEBUG_LEVEL.WARNING
-			)
-			--[[#DEBUG END]]
-		end
-	end
+	assert(method == 'post' or method == 'get' or method == 'put' or method == 'delete', NSFormatString('[{$NS}_AJAX] Unknown http request type: ') .. method)
 
+	-------------------------------
+	-- finalize settings
+	-------------------------------
 	--[[#DEBUG BEGIN]]
 	LIB.Debug(
 		'AJAX',
-		settings.url .. ' - ' .. settings.driver .. '/' .. settings.method
+		config.url .. ' - ' .. config.driver .. '/' .. config.method
 			.. ' (' .. driver .. '/' .. method .. ')'
 			.. ': PREPARE READY',
 		DEBUG_LEVEL.LOG
 	)
 	--[[#DEBUG END]]
+	local bridgewait = GetTime() + AJAX_BRIDGE_WAIT
+	local bridgewaitkey = NSFormatString('{$NS}_AJAX_') .. id
+	local fulfilled = false
+	settings.callback = function(html, status)
+		if fulfilled then
+			--[[#DEBUG BEGIN]]
+			LIB.Debug(
+				'AJAX_DUP_CB',
+				config.url .. ' - ' .. config.driver .. '/' .. config.method
+					.. ' (' .. driver .. '/' .. method .. ')'
+					.. ': ' .. (status or '')
+					.. '\n' .. debug.traceback(),
+				DEBUG_LEVEL.WARNING
+			)
+			--[[#DEBUG END]]
+			return
+		end
+		local connected = html and status
+		--[[#DEBUG BEGIN]]
+		LIB.Debug(
+			'AJAX',
+			config.url .. ' - ' .. config.driver .. '/' .. config.method
+				.. ' (' .. driver .. '/' .. method .. ')'
+				.. ': ' .. (status or 'FAILED'),
+			IIf(connected, DEBUG_LEVEL.LOG, DEBUG_LEVEL.WARNING)
+		)
+		--[[#DEBUG END]]
+		local function resolve()
+			fulfilled = true
+			SafeCallWithThis(settings.config, oncomplete, html, status, not IsEmpty(status))
+			if IsNumber(status) and status >= 200 and status < 400 then
+				SafeCallWithThis(settings.config, onfulfilled)
+				SafeCallWithThis(settings.config, onsuccess, html, status)
+			else
+				SafeCallWithThis(settings.config, onerror, html, status)
+			end
+			XpCall(settings.closebridge)
+		end
+		if not connected or not IsNumber(status) or status < 200 or status >= 400 then
+			LIB.DelayCall(bridgewaitkey, bridgewait - GetTime(), resolve)
+		else
+			resolve()
+		end
+	end
+
+	-------------------------------
+	-- each driver handlers
+	-------------------------------
+	-- convert encoding
+	local xurl, xdata = config.url, config.data
+	if config.charset == 'utf8' then
+		xurl  = LIB.ConvertToUTF8(xurl)
+		xdata = LIB.ConvertToUTF8(xdata)
+	end
+	-- bridge
+	local bridgekey = NSFormatString('{$NS}RRDF_TO_') .. id
+	local bridgein = AJAX_BRIDGE_PATH .. id .. '.' .. GLOBAL.GAME_LANG .. '.jx3dat'
+	local bridgeout = AJAX_BRIDGE_PATH .. id .. '.result.' .. GLOBAL.GAME_LANG .. '.jx3dat'
+	local bridgetimeout = GetTime() + config.timeout
+	settings.closebridge = function()
+		CPath.DelFile(bridgein)
+		CPath.DelFile(bridgeout)
+		LIB.DelayCall(bridgewaitkey, false)
+		LIB.BreatheCall(bridgekey, false)
+		LIB.DelayCall(bridgekey, false)
+		LIB.RegisterExit(bridgekey, false)
+	end
 	LIB.SaveLUAData(bridgein, config, { crc = false, passphrase = false })
-	LIB.BreatheCall(NSFormatString('{$NS}RRDF_TO_') .. id, 200, function()
+	LIB.BreatheCall(bridgekey, 200, function()
 		local data = LIB.LoadLUAData(bridgeout, { passphrase = false })
 		if IsTable(data) then
-			if settings.closebridge then
-				XpCall(settings.closebridge)
-			end
-			if settings.complete then
-				CallWithThis(settings, settings.complete, data.content, data.status, not Empty(data.status))
-			end
-			if IsNumber(data.status) and data.status >= 200 and data.status < 400 then
-				if settings.fulfilled then
-					CallWithThis(settings, settings.fulfilled)
-				end
-				if settings.success then
-					CallWithThis(settings, settings.success, data.content, data.status)
-				end
-			else
-				if settings.error then
-					CallWithThis(settings, settings.error, data.content, data.status, not Empty(data.status))
-				end
-			end
+			settings.callback(data.content, data.status)
+		elseif GetTime() > bridgetimeout then
+			settings.callback()
 		end
 	end)
-	LIB.DelayCall(NSFormatString('{$NS}RRDF_TO_') .. id, settings.timeout, closebridge)
+	LIB.DelayCall(bridgekey, config.timeout, settings.closebridge)
+	LIB.RegisterExit(bridgekey, settings.closebridge)
+
 	if driver == 'curl' then
 		if not Curl_Create then
-			return CallWithThis(settings, settings.error, '', 0, false)
+			return settings.callback()
 		end
-		local curl = Curl_Create(url)
+		local curl = Curl_Create(xurl)
 		if method == 'post' then
 			curl:SetMethod('POST')
-			if settings.payload == 'json' then
+			local data = config.data
+			if config.payload == 'json' then
 				data = LIB.JsonEncode(data)
 				curl:AddHeader('Content-Type: application/json')
-			else -- if settings.payload == 'form' then
+			else -- if config.payload == 'form' then
 				data = LIB.EncodePostData(data)
 				curl:AddHeader('Content-Type: application/x-www-form-urlencoded')
 			end
@@ -310,40 +306,36 @@ function LIB.Ajax(rawSettings)
 		elseif method == 'get' then
 			curl:AddHeader('Content-Type: application/x-www-form-urlencoded')
 		end
-		curl:OnComplete(function(html, code, success)
-			if settings.closebridge then
-				XpCall(settings.closebridge)
-			end
-			if settings.complete then
-				if settings.charset == 'utf8' then
-					html = UTF8ToAnsi(html)
-				end
-				CallWithThis(settings, settings.complete, html, code, success)
-			end
-		end)
+		-- curl:OnComplete(function(html, code, success)
+		-- 	if config.charset == 'utf8' then
+		-- 		html = UTF8ToAnsi(html)
+		-- 	end
+		-- 	settings.callback(html, code)
+		-- end)
 		curl:OnSuccess(function(html, code)
-			if settings.fulfilled then
-				CallWithThis(settings, settings.fulfilled)
+			if config.charset == 'utf8' then
+				html = UTF8ToAnsi(html)
 			end
-			if settings.success then
-				if settings.charset == 'utf8' then
-					html = UTF8ToAnsi(html)
-				end
-				CallWithThis(settings, settings.success, html, code)
-			end
+			settings.callback(html, code)
 		end)
 		curl:OnError(function(html, code, connected)
-			if settings.error then
-				if settings.charset == 'utf8' then
+			if connected then
+				if config.charset == 'utf8' then
 					html = UTF8ToAnsi(html)
 				end
-				CallWithThis(settings, settings.error, html, code, connected)
+			else
+				html, code = nil, nil
 			end
+			settings.callback(html, code)
 		end)
-		curl:SetConnTimeout(settings.timeout)
+		curl:SetConnTimeout(config.timeout)
 		curl:Perform()
 	elseif driver == 'webcef' then
-		assert(method == 'get', NSFormatString('[{$NS}_AJAX] Webcef only support get method, got ') .. method)
+		if method ~= 'get' then
+			LIB.Debug(NSFormatString('{$NS}_AJAX'), 'Webcef only support get method, got ' .. method, DEBUG_LEVEL.WARNING)
+			settings.callback()
+			return
+		end
 		local RequestID, hFrame
 		local nFreeWebPages = #RRWC_FREE
 		if nFreeWebPages > 0 then
@@ -368,13 +360,8 @@ function LIB.Ajax(rawSettings)
 			--[[#DEBUG END]]
 			-- 注销超时处理时钟
 			LIB.DelayCall(NSFormatString('{$NS}RRWC_TO_') .. RequestID, false)
-			-- 成功回调函数
-			if settings.fulfilled then
-				CallWithThis(settings, settings.fulfilled)
-			end
-			if settings.success then
-				CallWithThis(settings, settings.success, szContent, 200)
-			end
+			-- 回调函数
+			settings.callback(szContent, 200)
 			-- 有宕机问题，禁用 FREE 池，直接销毁句柄
 			-- insert(RRWC_FREE, RequestID)
 			Wnd.CloseWindow(this:GetRoot())
@@ -382,27 +369,68 @@ function LIB.Ajax(rawSettings)
 
 		-- do with this remote request
 		--[[#DEBUG BEGIN]]
-		LIB.Debug(NSFormatString('{$NS}RRWC'), settings.url, DEBUG_LEVEL.LOG)
+		LIB.Debug(NSFormatString('{$NS}RRWC'), config.url, DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		-- register request timeout clock
-		if settings.timeout > 0 then
-			LIB.DelayCall(NSFormatString('{$NS}RRWC_TO_') .. RequestID, settings.timeout, function()
+		if config.timeout > 0 then
+			LIB.DelayCall(NSFormatString('{$NS}RRWC_TO_') .. RequestID, config.timeout, function()
 				--[[#DEBUG BEGIN]]
-				LIB.Debug(NSFormatString('{$NS}RRWC::Timeout'), settings.url, DEBUG_LEVEL.WARNING) -- log
+				LIB.Debug(NSFormatString('{$NS}RRWC::Timeout'), config.url, DEBUG_LEVEL.WARNING) -- log
 				--[[#DEBUG END]]
 				-- request timeout, call timeout function.
-				if settings.error then
-					CallWithThis(settings, settings.error, '', 0, false)
-				end
+				settings.callback()
+				-- 有宕机问题，禁用 FREE 池，直接销毁句柄
 				-- insert(RRWC_FREE, RequestID)
+				Wnd.CloseWindow(hFrame)
 			end)
 		end
 
 		-- start chrome navigate
-		wWebCef:Navigate(url)
+		wWebCef:Navigate(xurl)
 	elseif driver == 'webbrowser' then
-		assert(method == 'get', NSFormatString('[{$NS}_AJAX] Webbrowser only support get method, got ') .. method)
+		if method ~= 'get' then
+			LIB.Debug(NSFormatString('{$NS}_AJAX'), 'Webbrowser only support get method, got ' .. method, DEBUG_LEVEL.WARNING)
+			settings.callback()
+			return
+		end
 		local RequestID, hFrame
+		local function OnWebPageFrameCreate()
+			local wWebPage = hFrame:Lookup('WndWebPage')
+			-- bind callback function
+			wWebPage.OnDocumentComplete = function()
+				local szUrl, szTitle, szContent = this:GetLocationURL(), this:GetLocationName(), this:GetDocument()
+				if szUrl ~= szTitle or szContent ~= '' then
+					--[[#DEBUG BEGIN]]
+					LIB.Debug(NSFormatString('{$NS}RRWP::OnDocumentComplete'), format('%s - %s', szTitle, szUrl), DEBUG_LEVEL.LOG)
+					--[[#DEBUG END]]
+					-- 注销超时处理时钟
+					LIB.DelayCall(NSFormatString('{$NS}RRWP_TO_') .. RequestID, false)
+					-- 回调函数
+					settings.callback(szContent, 200)
+					-- 有宕机问题，禁用 FREE 池，直接销毁句柄
+					insert(RRWP_FREE, RequestID)
+					-- Wnd.CloseWindow(this:GetRoot())
+				end
+			end
+			-- do with this remote request
+			--[[#DEBUG BEGIN]]
+			LIB.Debug(NSFormatString('{$NS}RRWP'), config.url, DEBUG_LEVEL.LOG)
+			--[[#DEBUG END]]
+			-- register request timeout clock
+			if config.timeout > 0 then
+				LIB.DelayCall(NSFormatString('{$NS}RRWP_TO_') .. RequestID, config.timeout, function()
+					--[[#DEBUG BEGIN]]
+					LIB.Debug(NSFormatString('{$NS}RRWP::Timeout'), config.url, DEBUG_LEVEL.WARNING) -- log
+					--[[#DEBUG END]]
+					settings.callback()
+					-- 有宕机问题，禁用 FREE 池，直接销毁句柄
+					insert(RRWP_FREE, RequestID)
+					-- Wnd.CloseWindow(hFrame)
+				end)
+			end
+			-- start ie navigate
+			wWebPage:Navigate(xurl)
+		end
 		local nFreeWebPages = #RRWP_FREE
 		if nFreeWebPages > 0 then
 			RequestID = RRWP_FREE[nFreeWebPages]
@@ -410,83 +438,38 @@ function LIB.Ajax(rawSettings)
 			remove(RRWP_FREE)
 		end
 		-- create page
-		if not hFrame then
-			if LIB.IsFighting() or not Cursor.IsVisible() then
-				return LIB.DelayCall(1, LIB.Ajax, settings)
-			end
-			RequestID, hFrame = CreateWebPageFrame()
-		end
-		local wWebPage = hFrame:Lookup('WndWebPage')
-
-		-- bind callback function
-		wWebPage.OnDocumentComplete = function()
-			local szUrl, szTitle, szContent = this:GetLocationURL(), this:GetLocationName(), this:GetDocument()
-			if szUrl ~= szTitle or szContent ~= '' then
-				--[[#DEBUG BEGIN]]
-				LIB.Debug(NSFormatString('{$NS}RRWP::OnDocumentComplete'), format('%s - %s', szTitle, szUrl), DEBUG_LEVEL.LOG)
-				--[[#DEBUG END]]
-				if settings.closebridge then
-					XpCall(settings.closebridge)
+		if hFrame then
+			OnWebPageFrameCreate()
+		else
+			local szKey = NSFormatString('{$NS}_AJAX#RRWP#') .. config.id
+			LIB.BreatheCall(szKey, function()
+				if LIB.IsFighting() or not Cursor.IsVisible() then
+					return
 				end
-				-- 注销超时处理时钟
-				LIB.DelayCall(NSFormatString('{$NS}RRWP_TO_') .. RequestID, false)
-				-- 完成回调函数
-				if settings.complete then
-					CallWithThis(settings, settings.complete, szContent, 200, true)
-				end
-				-- 成功回调函数
-				if settings.fulfilled then
-					CallWithThis(settings, settings.fulfilled)
-				end
-				if settings.success then
-					CallWithThis(settings, settings.success, szContent, 200)
-				end
-				insert(RRWP_FREE, RequestID)
-			end
-		end
-
-		-- do with this remote request
-		--[[#DEBUG BEGIN]]
-		LIB.Debug(NSFormatString('{$NS}RRWP'), settings.url, DEBUG_LEVEL.LOG)
-		--[[#DEBUG END]]
-		-- register request timeout clock
-		if settings.timeout > 0 then
-			LIB.DelayCall(NSFormatString('{$NS}RRWP_TO_') .. RequestID, settings.timeout, function()
-				--[[#DEBUG BEGIN]]
-				LIB.Debug(NSFormatString('{$NS}RRWP::Timeout'), settings.url, DEBUG_LEVEL.WARNING) -- log
-				--[[#DEBUG END]]
-				if settings.closebridge then
-					XpCall(settings.closebridge)
-				end
-				if settings.complete then
-					CallWithThis(settings, settings.complete, '', 500, false)
-				end
-				-- request timeout, call timeout function.
-				if settings.error then
-					CallWithThis(settings, settings.error, '', 0, false)
-				end
-				-- insert(RRWP_FREE, RequestID)
+				LIB.BreatheCall(szKey, false)
+				RequestID, hFrame = CreateWebPageFrame()
+				OnWebPageFrameCreate()
 			end)
 		end
-
-		-- start ie navigate
-		wWebPage:Navigate(url)
 	else -- if driver == 'origin' then
 		local szKey = GetTickCount() * 100
 		while CALL_AJAX['__addon_' .. AJAX_TAG .. szKey] do
 			szKey = szKey + 1
 		end
 		szKey = AJAX_TAG .. szKey
+		local ssl = config.url:sub(1, 6) == 'https:'
 		if method == 'post' then
 			if not CURL_HttpPost then
-				return CallWithThis(settings, settings.error, '', 0, false)
+				settings.callback()
+				return
 			end
-			CURL_HttpPost(szKey, url, data, ssl, settings.timeout)
+			CURL_HttpPost(szKey, xurl, xdata, ssl, config.timeout)
 		else
 			if not CURL_HttpRqst then
-				return CallWithThis(settings, settings.error, '', 0, false)
+				settings.callback()
+				return
 			end
-			CURL_HttpRqst(szKey, url, ssl, settings.timeout)
+			CURL_HttpRqst(szKey, xurl, ssl, config.timeout)
 		end
 		CALL_AJAX['__addon_' .. szKey] = settings
 	end
@@ -499,28 +482,14 @@ local function OnCurlRequestResult()
 	local dwBufferSize = arg3
 	if CALL_AJAX[szKey] then
 		local settings = CALL_AJAX[szKey]
-		local status = bSuccess and 200 or 500
-		if settings.charset == 'utf8' and IsString(html) then
-			html = UTF8ToAnsi(html)
-		end
-		if settings.closebridge then
-			XpCall(settings.closebridge)
-		end
-		if settings.complete then
-			CallWithThis(settings, settings.complete, html, status, bSuccess or dwBufferSize > 0)
-		end
-		if bSuccess then
-			-- if settings.payload == 'json' then
-			-- 	html = LIB.JsonDecode(html)
-			-- end
-			if settings.fulfilled then
-				CallWithThis(settings, settings.fulfilled)
-			end
-			if settings.success then
-				CallWithThis(settings, settings.success, html, status)
-			end
+		if dwBufferSize == 0 then
+			settings.callback()
 		else
-			CallWithThis(settings, settings.error, html, status, dwBufferSize ~= 0)
+			local status = bSuccess and 200 or 500
+			if settings.config.charset == 'utf8' then
+				html = UTF8ToAnsi(html)
+			end
+			settings.callback(html, status)
 		end
 		CALL_AJAX[szKey] = nil
 	end
