@@ -386,6 +386,7 @@ function PS.OnPanelActive(wnd)
 		name = 'WndEditBox_JokeText',
 		x = nX, y = nY,
 		w = w - X * 2, h = 75,
+		multiline = true,
 		text = D.szJokeText,
 		onchange = function(szText)
 			D.szJokeText = szText
