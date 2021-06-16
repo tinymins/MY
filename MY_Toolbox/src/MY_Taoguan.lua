@@ -542,14 +542,14 @@ function PS.OnPanelActive(wnd)
 		}):AutoWidth():Pos('BOTTOMRIGHT') + 5
 		nX = ui:Append('WndComboBox', {
 			x = nX, y = nY, w = 100, h = 25,
-			text = MY_Taoguan['nUse' .. p.szID],
+			text = O['nUse' .. p.szID],
 			menu = function()
 				local ui = UI(this)
 				local m0 = {}
 				for i = 2, MAX_POINT_POW - 1 do
 					local v = 10 * 2 ^ i
 					insert(m0, { szOption = tostring(v), fnAction = function()
-						MY_Taoguan['nUse' .. p.szID] = v
+						O['nUse' .. p.szID] = v
 						ui:Text(tostring(v))
 					end })
 				end
@@ -559,9 +559,9 @@ function PS.OnPanelActive(wnd)
 		nX = ui:Append('WndCheckBox', {
 			x = nX, y = nY,
 			text = _L['Stop break when no item'],
-			checked = MY_Taoguan['bPauseNo' .. p.szID],
+			checked = O['bPauseNo' .. p.szID],
 			oncheck = function(bChecked)
-				MY_Taoguan['bPauseNo' .. p.szID] = bChecked
+				O['bPauseNo' .. p.szID] = bChecked
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT') + 10
 	end
