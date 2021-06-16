@@ -96,21 +96,21 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, w = 250,
 		text = _L['Resize emotion'],
-		checked = MY_ChatEmotion.bFixSize,
+		checked = O.bFixSize,
 		oncheck = function(bChecked)
-			MY_ChatEmotion.bFixSize = bChecked
+			O.bFixSize = bChecked
 		end,
 	}):AutoWidth():Width() + 5
 	ui:Append('WndTrackbar', {
 		x = x, y = y, w = 100, h = 25,
-		value = MY_ChatEmotion.nSize,
+		value = O.nSize,
 		range = {1, 300},
 		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		textfmt = function(v) return _L('Size: %d', v) end,
 		onchange = function(val)
-			MY_ChatEmotion.nSize = val
+			O.nSize = val
 		end,
-		autoenable = function() return MY_ChatEmotion.bFixSize end,
+		autoenable = function() return O.bFixSize end,
 	})
 	y = y + lineHeight
 
