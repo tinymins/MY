@@ -278,6 +278,15 @@ local _AUTHOR_FAKE_HEADER_ = GetFormatText(_L['[Fake author]'], 8, 255, 95, 159)
 -- 通用函数
 -------------------------------------------------------------------------------------------------------
 -----------------------------------------------
+-- 三元运算
+-----------------------------------------------
+local IIf = function(expr, truepart, falsepart)
+	if expr then
+		return truepart
+	end
+	return falsepart
+end
+-----------------------------------------------
 -- 克隆数据
 -----------------------------------------------
 local function Clone(var)
@@ -763,9 +772,23 @@ end
 end
 local function SafeCall(f, ...)
 	if not IsFunction(f) then
-		return false
+		return false, 'NOT CALLABLE'
 	end
 	return Call(f, ...)
+end
+local function CallWithThis(context, f, ...)
+	local _this = this
+	this = context
+	local rtc = {Call(f, ...)}
+	this = _this
+	return unpack(rtc)
+end
+local function SafeCallWithThis(context, f, ...)
+	local _this = this
+	this = context
+	local rtc = {SafeCall(f, ...)}
+	this = _this
+	return unpack(rtc)
 end
 
 local NSFormatString
@@ -1582,10 +1605,13 @@ local LIB = {
 	IsString         = IsString        ,
 	IsTable          = IsTable         ,
 	IsFunction       = IsFunction      ,
+	IIf              = IIf             ,
 	Clone            = Clone           ,
 	Call             = Call            ,
 	XpCall           = XpCall          ,
 	SafeCall         = SafeCall        ,
+	CallWithThis     = CallWithThis    ,
+	SafeCallWithThis = SafeCallWithThis,
 	SetmetaReadonly  = SetmetaReadonly ,
 	Set              = Set             ,
 	Get              = Get             ,
