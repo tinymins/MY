@@ -696,6 +696,7 @@ end
 -- Unregister: LIB.RegisterMsgMonitor(string szKey, false)
 do
 local MSGMON_EVENT = { szName = 'MsgMonitor' }
+local function FixMsgMonBug() end
 local function MsgMonHandler(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID, szName)
 	if bRich then
 		-- filter addon comm.
@@ -713,12 +714,15 @@ function MSGMON_EVENT.OnCreateEvent(szEvent)
 	if not szEvent then
 		return
 	end
+	-- BUG: 首个注册的消息监听是个聋子，收不到消息，不知道官方代码什么逻辑
+	RegisterMsgMonitor(FixMsgMonBug, { szEvent })
 	RegisterMsgMonitor(MsgMonHandler, { szEvent })
 end
 function MSGMON_EVENT.OnRemoveEvent(szEvent)
 	if not szEvent then
 		return
 	end
+	UnRegisterMsgMonitor(FixMsgMonBug, { szEvent })
 	UnRegisterMsgMonitor(MsgMonHandler, { szEvent })
 end
 function LIB.RegisterMsgMonitor(szEvent, fnAction)
