@@ -723,6 +723,7 @@ LIB.RegisterFrameCreate('regionPQreward.MY_RoleStatistics_RoleStat', function()
 	txt.__SetText = txt.SetText
 	txt.SetText = function(txt, szText)
 		local szNum = szText:match(_L['Current week can acquire (%d+) Langke Jian.'])
+			or szText:match(_L['Current week can acquire (%d+) Langke Jian or Zhushu.'])
 		if szNum then
 			INFO_CACHE['starve_remain'] = tonumber(szNum)
 		end

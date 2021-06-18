@@ -78,6 +78,7 @@ return {
     ['Today online '] = '今日在線',
     ['Current online '] = '本次登錄',
     ['Current week can acquire (%d+) Langke Jian.'] = '本周還可獲得(%d+)份浪客箋。',
+    ['Current week can acquire (%d+) Langke Jian or Zhushu.'] = '本周還可獲得(%d+)份浪客箋及注疏值。',
 
     ['Equip score increased by %s'] = '裝備分數提升了%s分',
     ['Equip score decreased by %s'] = '裝備分數降低了%s分',
