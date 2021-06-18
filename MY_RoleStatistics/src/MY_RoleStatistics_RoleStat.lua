@@ -787,7 +787,8 @@ function D.GetClientPlayerRec()
 	rec.architecture_remain = IsFunction(me.GetArchitectureRemainSpace) and me.GetArchitectureRemainSpace() or 0
 	rec.coin = me.nCoin
 	rec.mentor_score = me.dwTAEquipsScore
-	rec.starve = LIB.GetItemAmountInAllPackages(5, 34797, true)
+	rec.starve = LIB.GetItemAmountInAllPackages(ITEM_TABLE_TYPE.OTHER, 34797, true)
+		+ LIB.GetItemAmountInAllPackages(ITEM_TABLE_TYPE.OTHER, 40259, true)
 	rec.time = GetCurrentTime()
 
 	for k, v in pairs(INFO_CACHE) do
