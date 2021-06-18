@@ -60,7 +60,7 @@ local O = LIB.CreateUserSettingsModule('MY_ItemWiki', _L['MY_Toolbox'], {
 		ePathType = PATH_TYPE.ROLE,
 		szLabel = _L['MY_ItemWiki'],
 		xSchema = Schema.Boolean,
-		xDefaultValue = false,
+		xDefaultValue = true,
 	},
 	nW = {
 		ePathType = PATH_TYPE.ROLE,
