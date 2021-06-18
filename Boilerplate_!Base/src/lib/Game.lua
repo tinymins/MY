@@ -2548,15 +2548,26 @@ function LIB.GetItemAmount(dwTabType, dwIndex, nBookID)
 end
 
 do local CACHE = {}
+-- LIB.GetItemKey(dwTabType, dwIndex, nBookID)
+-- LIB.GetItemKey(KItem)
+-- LIB.GetItemKey(KItemInfo, nBookID)
 function LIB.GetItemKey(dwTabType, dwIndex, nBookID)
-	local KItemInfo = GetItemInfo(dwTabType, dwIndex)
+	local it, nGenre
+	if IsUserdata(dwTabType) then
+		it, nBookID = dwTabType, dwIndex
+		nGenre = it.nGenre
+		if not nBookID and nGenre == ITEM_GENRE.BOOK then
+			nBookID = it.nBookID or -1
+		end
+		dwTabType, dwIndex = it.dwTabType, it.dwIndex
+	else
+		local KItemInfo = GetItemInfo(dwTabType, dwIndex)
+		nGenre = KItemInfo and KItemInfo.nGenre
+	end
 	if not CACHE[dwTabType] then
 		CACHE[dwTabType] = {}
 	end
-	if KItemInfo and KItemInfo.nGenre == ITEM_GENRE.BOOK then
-		if not nBookID then
-			nBookID = -1
-		end
+	if nGenre == ITEM_GENRE.BOOK then
 		if not CACHE[dwTabType][dwIndex] then
 			CACHE[dwTabType][dwIndex] = {}
 		end
@@ -2577,7 +2588,7 @@ end
 do local CACHE, FULL_CACHE
 local function InsertItem(cache, it)
 	if it then
-		local szKey = LIB.GetItemKey(it.dwTabType, it.dwIndex, it.nBookID)
+		local szKey = LIB.GetItemKey(it)
 		cache[szKey] = (cache[szKey] or 0) + (it.bCanStack and it.nStackNum or 1)
 	end
 end
