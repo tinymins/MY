@@ -1437,6 +1437,10 @@ local settings = {
 	name = 'MY_RoleStatistics_SerendipityStat',
 	exports = {
 		{
+			preset = 'UIEvent',
+			root = D,
+		},
+		{
 			fields = {
 				'aColumn',
 				'szSort',

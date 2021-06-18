@@ -1419,6 +1419,10 @@ local settings = {
 	name = 'MY_RoleStatistics_RoleStat',
 	exports = {
 		{
+			preset = 'UIEvent',
+			root = D,
+		},
+		{
 			fields = {
 				'aColumn',
 				'szSort',

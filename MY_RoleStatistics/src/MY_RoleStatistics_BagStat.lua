@@ -644,6 +644,10 @@ local settings = {
 	name = 'MY_RoleStatistics_BagStat',
 	exports = {
 		{
+			preset = 'UIEvent',
+			root = D,
+		},
+		{
 			fields = {
 				'bCompactMode',
 				'tUncheckedNames',
