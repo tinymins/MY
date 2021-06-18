@@ -2140,6 +2140,7 @@ local settings = {
 		{
 			fields = {
 				'bOn',
+				'tAutoPickupQuality',
 			},
 			root = O,
 		},
