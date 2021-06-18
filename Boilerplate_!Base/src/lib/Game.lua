@@ -2547,17 +2547,38 @@ function LIB.GetItemAmount(dwTabType, dwIndex, nBookID)
 	return me.GetItemAmount(dwTabType, dwIndex)
 end
 
+do local CACHE = {}
+function LIB.GetItemKey(dwTabType, dwIndex, nBookID)
+	local KItemInfo = GetItemInfo(dwTabType, dwIndex)
+	if not CACHE[dwTabType] then
+		CACHE[dwTabType] = {}
+	end
+	if KItemInfo and KItemInfo.nGenre == ITEM_GENRE.BOOK then
+		if not nBookID then
+			nBookID = -1
+		end
+		if not CACHE[dwTabType][dwIndex] then
+			CACHE[dwTabType][dwIndex] = {}
+		end
+		if not CACHE[dwTabType][dwIndex][nBookID] then
+			CACHE[dwTabType][dwIndex][nBookID] = dwTabType .. ',' .. dwIndex .. ',' .. nBookID
+		end
+		return CACHE[dwTabType][dwIndex][nBookID]
+	else
+		if not CACHE[dwTabType][dwIndex] then
+			CACHE[dwTabType][dwIndex] = dwTabType .. ',' .. dwIndex
+		end
+		return CACHE[dwTabType][dwIndex]
+	end
+end
+end
+
 -- 获取一样东西在背包、装备、仓库的数量
 do local CACHE, FULL_CACHE
 local function InsertItem(cache, it)
 	if it then
-		if it.nGenre == ITEM_GENRE.BOOK then
-			local szKey = it.dwTabType .. ',' .. it.dwIndex .. ',' .. it.nBookID
-			cache[szKey] = (cache[szKey] or 0) + (it.bCanStack and it.nStackNum or 1)
-		else
-			local szKey = it.dwTabType .. ',' .. it.dwIndex
-			cache[szKey] = (cache[szKey] or 0) + (it.bCanStack and it.nStackNum or 1)
-		end
+		local szKey = LIB.GetItemKey(it.dwTabType, it.dwIndex, it.nBookID)
+		cache[szKey] = (cache[szKey] or 0) + (it.bCanStack and it.nStackNum or 1)
 	end
 end
 function LIB.GetItemAmountInAllPackages(dwTabType, dwIndex, nBookID, bFull)
@@ -2601,11 +2622,7 @@ function LIB.GetItemAmountInAllPackages(dwTabType, dwIndex, nBookID, bFull)
 			CACHE = cache
 		end
 	end
-	local szKey = dwTabType .. ',' .. dwIndex
-	if nBookID then
-		szKey = szKey .. ',' .. nBookID
-	end
-	return cache[szKey] or 0
+	return cache[LIB.GetItemKey(dwTabType, dwIndex, nBookID)] or 0
 end
 LIB.RegisterEvent({
 	NSFormatString('BAG_ITEM_UPDATE.{$NS}#LIB#GetItemAmountInAllPackages'),
