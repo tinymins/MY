@@ -615,6 +615,7 @@ function PS.OnPanelActive(wnd)
 				fnAction = function()
 					local function fnConfirm(szText)
 						O.tFilterItem[szText] = true
+						O.tFilterItem = O.tFilterItem
 					end
 					GetUserInput(_L['Please input custom name'], fnConfirm, nil, nil, nil, '', 20)
 				end,

@@ -492,6 +492,7 @@ function PS.OnPanelActive(wnd)
                     szOption = _L['Delete'],
                     fnAction = function()
                         remove(O.aKeyword, i)
+                        O.aKeyword = O.aKeyword
                         D.SaveConfig()
                         D.RegisterMsgMonitor()
                         UI.ClosePopupMenu()
@@ -517,6 +518,7 @@ function PS.OnPanelActive(wnd)
                             bIsRegexp = false,
                             tChannel = Clone(DEFAULE_CHANNEL),
                         })
+                        O.aKeyword = O.aKeyword
                         D.SaveConfig()
                         D.RegisterMsgMonitor()
                     end)

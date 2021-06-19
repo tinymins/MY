@@ -309,6 +309,7 @@ function PS.OnPanelActive(wnd)
 						remove(O.aBlockWords, i)
 					end
 				end
+				O.aBlockWords = O.aBlockWords
 				D.SaveBlockWords()
 				UI.ClosePopupMenu()
 			end,
@@ -338,6 +339,7 @@ function PS.OnPanelActive(wnd)
 			local bw = Clone(DEFAULT_KW_CONFIG)
 			bw.szKeyword = szText
 			insert(O.aBlockWords, 1, bw)
+			O.aBlockWords = O.aBlockWords
 			D.SaveBlockWords()
 			-- ¸üÐÂUI
 			list:ListBox('insert', bw.szKeyword, bw.szKeyword, bw, 1)
@@ -356,6 +358,7 @@ function PS.OnPanelActive(wnd)
 						remove(O.aBlockWords, i)
 					end
 				end
+				O.aBlockWords = O.aBlockWords
 				D.SaveBlockWords()
 			end
 		end,

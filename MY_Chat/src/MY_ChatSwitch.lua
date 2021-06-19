@@ -280,6 +280,7 @@ local function OnWhisperCheck()
 						UI.ClosePopupMenu()
 					end
 				end
+				O.aWhisper = O.aWhisper
 			end,
 			fnMouseEnter = function()
 				local t = {}
@@ -479,6 +480,7 @@ function D.OnEvent(event)
 			end
 			insert(t[2], {szMsg, GetCurrentTime()})
 			insert(O.aWhisper, t)
+			O.aWhisper = O.aWhisper
 		end
 		if dwTalkerID ~= UI_GetClientPlayerID() then
 			return

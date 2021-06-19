@@ -957,6 +957,7 @@ function D.UpdateUI(page)
 			checked = IsEmpty(O.tSummaryIgnoreGUID) or not O.tSummaryIgnoreGUID[rec.guid] or false,
 			oncheck = function(bCheck)
 				O.tSummaryIgnoreGUID[rec.guid] = not bCheck or nil
+				O.tSummaryIgnoreGUID = O.tSummaryIgnoreGUID
 				D.UpdateUI(page)
 			end,
 			visible = D.bConfigSummary or false,
@@ -1057,6 +1058,7 @@ function D.OnInitPage()
 							fnAction = function()
 								if i > 1 then
 									O.aColumn[i], O.aColumn[i - 1] = O.aColumn[i - 1], O.aColumn[i]
+									O.aColumn = O.aColumn
 									D.UpdateUI(page)
 								end
 								UI.ClosePopupMenu()
@@ -1067,6 +1069,7 @@ function D.OnInitPage()
 							fnAction = function()
 								if i < #O.aColumn then
 									O.aColumn[i], O.aColumn[i + 1] = O.aColumn[i + 1], O.aColumn[i]
+									O.aColumn = O.aColumn
 									D.UpdateUI(page)
 								end
 								UI.ClosePopupMenu()
@@ -1076,6 +1079,7 @@ function D.OnInitPage()
 							szOption = _L['Delete'],
 							fnAction = function()
 								remove(O.aColumn, i)
+								O.aColumn = O.aColumn
 								D.UpdateUI(page)
 								UI.ClosePopupMenu()
 							end,
@@ -1094,6 +1098,7 @@ function D.OnInitPage()
 								LIB.Alert(_L['Too many column selected, width overflow, please delete some!'])
 							else
 								insert(O.aColumn, col.id)
+								O.aColumn = O.aColumn
 							end
 							D.UpdateUI(page)
 							UI.ClosePopupMenu()
@@ -1121,6 +1126,7 @@ function D.OnInitPage()
 							fnAction = function()
 								if i > 1 then
 									O.aAlertColumn[i], O.aAlertColumn[i - 1] = O.aAlertColumn[i - 1], O.aAlertColumn[i]
+									O.aAlertColumn = O.aAlertColumn
 								end
 								UI.ClosePopupMenu()
 							end,
@@ -1130,6 +1136,7 @@ function D.OnInitPage()
 							fnAction = function()
 								if i < #O.aAlertColumn then
 									O.aAlertColumn[i], O.aAlertColumn[i + 1] = O.aAlertColumn[i + 1], O.aAlertColumn[i]
+									O.aAlertColumn = O.aAlertColumn
 								end
 								UI.ClosePopupMenu()
 							end,
@@ -1138,6 +1145,7 @@ function D.OnInitPage()
 							szOption = _L['Delete'],
 							fnAction = function()
 								remove(O.aAlertColumn, i)
+								O.aAlertColumn = O.aAlertColumn
 								UI.ClosePopupMenu()
 							end,
 						},
@@ -1151,6 +1159,7 @@ function D.OnInitPage()
 						szOption = col.szTitle,
 						fnAction = function()
 							insert(O.aAlertColumn, col.id)
+							O.aAlertColumn = O.aAlertColumn
 							UI.ClosePopupMenu()
 						end,
 					})
@@ -1310,6 +1319,7 @@ LIB.RegisterInit('MY_RoleStatistics_RoleStat__AlertCol', function()
 		for _, col in ipairs(ALERT_COLUMN) do
 			O.tAlertTodayVal[col.id] = col.GetValue(me)
 		end
+		O.tAlertTodayVal = O.tAlertTodayVal
 		O.tAlertTodayVal.nTime = GetCurrentTime()
 	end
 end)

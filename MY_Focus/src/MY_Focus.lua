@@ -1126,6 +1126,7 @@ local function onInit()
 		end
 		O.aPatternFocus[i] = D.FormatAutoFocusData(v)
 	end
+	O.aPatternFocus = O.aPatternFocus
 	-- ”¿æ√Ωπµ„
 	if not O.tStaticFocus then
 		O.tStaticFocus = {}
@@ -1135,6 +1136,7 @@ local function onInit()
 			O.tStaticFocus[dwType] = {}
 		end
 	end
+	O.tStaticFocus = O.tStaticFocus
 	D.CheckFrameOpen()
 	D.RescanNearby()
 end

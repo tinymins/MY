@@ -839,6 +839,7 @@ function D.GetFilterMenu()
 			bChecked = O.tFilterQuality[p.nQuality],
 			fnAction = function()
 				O.tFilterQuality[p.nQuality] = not O.tFilterQuality[p.nQuality]
+				O.tFilterQuality = O.tFilterQuality
 				D.ReloadFrame()
 			end,
 		})
@@ -990,6 +991,7 @@ function D.GetAutoPickupMenu()
 			bChecked = O.tAutoPickupQuality[p.nQuality],
 			fnAction = function()
 				O.tAutoPickupQuality[p.nQuality] = not O.tAutoPickupQuality[p.nQuality]
+				O.tAutoPickupQuality = O.tAutoPickupQuality
 			end,
 		})
 	end

@@ -116,6 +116,7 @@ function D.SaveAnchor(szName)
 		return
 	end
 	O.tAnchors[szType] = GetFrameAnchor(frame, 'TOP_LEFT')
+	O.tAnchors = O.tAnchors
 end
 
 function D.GetFrameType(frame)
