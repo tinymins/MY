@@ -432,6 +432,7 @@ local settings = {
 	name = 'MY_TeamNotice',
 	exports = {
 		{
+			preset = 'UIEvent',
 			fields = {
 				'OpenFrame',
 			},
