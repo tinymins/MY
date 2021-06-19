@@ -195,6 +195,7 @@ function D.GetMenu()
 			bCheck = true, bChecked = bEnable,
 			fnAction = function()
 				O.tAcceptCustom[szName] = not O.tAcceptCustom[szName]
+				O.tAcceptCustom = O.tAcceptCustom
 			end,
 			szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',
 			nFrame = 49,
@@ -204,6 +205,7 @@ function D.GetMenu()
 			szLayer = 'ICON_RIGHTMOST',
 			fnClickIcon = function()
 				O.tAcceptCustom[szName] = nil
+				O.tAcceptCustom = O.tAcceptCustom
 				UI.ClosePopupMenu()
 			end,
 			fnDisable = function() return not O.bEnable or not O.bAcceptCustom end,
@@ -218,6 +220,7 @@ function D.GetMenu()
 			GetUserInput(_L['Please input custom name, multiple split with ",[]":'], function(val)
 				for _, v in ipairs(LIB.SplitString(val, {',', '[', ']'}, true)) do
 					O.tAcceptCustom[v] = true
+					O.tAcceptCustom = O.tAcceptCustom
 				end
 			end)
 		end,
