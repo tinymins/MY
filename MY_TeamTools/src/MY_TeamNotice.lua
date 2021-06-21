@@ -115,9 +115,11 @@ function TI.CreateFrame(a, b)
 			if not ui then
 				return
 			end
-			O.nWidth  = ui:Width()
-			O.nHeight = ui:Height()
-			O.anchor  = ui:Anchor()
+			LIB.DelayCall('MY_TeamNotice#DragResize', 500, function()
+				O.nWidth  = ui:Width()
+				O.nHeight = ui:Height()
+				O.anchor  = ui:Anchor()
+			end)
 			local W, H = select(3, ui:Size())
 			ui:Fetch('YY'):Width(ui:Width() - 160)
 			local uiBtn = ui:Fetch('Btn_YY')
