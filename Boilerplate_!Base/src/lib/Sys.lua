@@ -722,9 +722,9 @@ end
 do
 local DATABASE_TYPE_LIST = { PATH_TYPE.ROLE, PATH_TYPE.SERVER, PATH_TYPE.GLOBAL }
 local DATABASE_INSTANCE = {}
+local DATABASE_NEED_FLUSH = {}
 local USER_SETTINGS_INFO = {}
 local FLUSH_TIME = 0
-local NEED_FLUSH = false
 
 function LIB.ConnectSettingsDatabase()
 	for _, ePathType in ipairs(DATABASE_TYPE_LIST) do
@@ -741,15 +741,16 @@ function LIB.ReleaseSettingsDatabase()
 			DATABASE_INSTANCE[ePathType] = nil
 		end
 	end
-	NEED_FLUSH = false
+	DATABASE_NEED_FLUSH = {}
 end
 
 function LIB.FlushSettingsDatabase()
-	if not NEED_FLUSH then
-		return
+	for _, ePathType in ipairs(DATABASE_TYPE_LIST) do
+		if DATABASE_INSTANCE[ePathType] and DATABASE_NEED_FLUSH[ePathType] then
+			DATABASE_INSTANCE[ePathType]:Commit()
+			DATABASE_NEED_FLUSH[ePathType] = nil
+		end
 	end
-	LIB.ReleaseSettingsDatabase()
-	LIB.ConnectSettingsDatabase()
 end
 
 -- 注册单个用户配置项
@@ -902,7 +903,7 @@ function LIB.SetUserSettings(szKey, ...)
 		end
 	end
 	db:Set(info.szDataKey, { d = xValue, v = info.szVersion })
-	NEED_FLUSH = true
+	DATABASE_NEED_FLUSH[info.ePathType] = true
 	return true
 end
 
@@ -939,7 +940,7 @@ function LIB.ResetUserSettings(szKey, ...)
 	else
 		db:Delete(info.szDataKey)
 	end
-	NEED_FLUSH = true
+	DATABASE_NEED_FLUSH[info.ePathType] = true
 end
 
 -- 创建用户设置代理对象
