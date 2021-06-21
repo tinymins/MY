@@ -208,56 +208,40 @@ LIB.RegisterEvent('AUCTION_LOOKUP_RESPOND', function()
 		-- 获取数据
 		local AuctionClient = GetAuctionClient()
 		local nCount, aInfo = AuctionClient.GetLookupResult(arg1)
-		SaveLUAData('interface/a.jx3dat', {AuctionClient.GetLookupResult(arg1)}, {indent = '\t'})
-		local tItemPrice = {}
+		local dwBaseID = HUGE
+		local tItemGroup = {}
 		for _, info in ipairs(aInfo) do
 			local szKey = GetItemKey(info.Item)
 			local nPrice = GoldSilverAndCopperToMoney(info.BuyItNowPrice.nGold, info.BuyItNowPrice.nSilver, info.BuyItNowPrice.nCopper)
-			if not tItemPrice[szKey] then
-				tItemPrice[szKey] = {}
+			if not tItemGroup[szKey] then
+				tItemGroup[szKey] = {}
 			end
-			if not tItemPrice[szKey][nPrice] then
-				tItemPrice[szKey][nPrice] = 0
-			end
-			tItemPrice[szKey][nPrice] = tItemPrice[szKey][nPrice] + (info.Item.bCanStack and info.Item.nStackNum or 1)
+			insert(tItemGroup[szKey], {
+				dwID = info.ID,
+				nCount = info.Item.bCanStack
+					and info.Item.nStackNum
+					or 1,
+				nPrice = nPrice,
+			})
+			dwBaseID = min(dwBaseID, info.ID)
 		end
 		local aData = {}
 		-- 重组数据
-		for szKey, tPrice in pairs(tItemPrice) do
-			local aPriceStat = {}
-			for nPrice, nCount in pairs(tPrice) do
-				insert(aPriceStat, {
-					nPrice = nPrice,
-					nCount = nCount,
-				})
-			end
+		for szKey, aItemInfo in pairs(tItemGroup) do
 			-- 价格升序
-			sort(aPriceStat, function(a, b)
+			sort(aItemInfo, function(a, b)
 				return a.nPrice < b.nPrice
 			end)
 			-- 价格序列化
 			local aPrice = {}
-			for i, v in ipairs(aPriceStat) do
+			for i, v in ipairs(aItemInfo) do
 				-- 压缩数据长度，仅第一个为32进制价格，后面的为与前一个的价格差
 				if i == 1 then
 					aPrice[i] = LIB.NumberBaseN(v.nPrice, 32)
 				else
-					aPrice[i] = LIB.NumberBaseN(v.nPrice - aPriceStat[i - 1].nPrice, 32)
+					aPrice[i] = LIB.NumberBaseN(v.nPrice - aItemInfo[i - 1].nPrice, 32)
 				end
-				aPrice[i] = aPrice[i] .. '_' .. LIB.NumberBaseN(v.nCount, 32)
-			end
-			-- 压缩数据长度，因为很多人会一件售卖，所以差价实际是一样的，也就是等差数列，所以重复的等差使用简写（.nRepeat）
-			local nIndex, nRepeat = 2, 0
-			while nIndex < #aPrice do
-				nRepeat = 0
-				while aPrice[nIndex] == aPrice[nIndex + 1] do
-					nRepeat = nRepeat + 1
-					remove(aPrice, nIndex + 1)
-				end
-				if nRepeat > 0 then
-					aPrice[nIndex] = aPrice[nIndex] .. '.' .. nRepeat
-				end
-				nIndex = nIndex + 1
+				aPrice[i] = aPrice[i] .. '_' .. LIB.NumberBaseN(v.nCount, 32) .. '_' .. LIB.NumberBaseN(v.dwID - dwBaseID, 32)
 			end
 			insert(aData, szKey .. '-' .. concat(aPrice, '-'))
 		end
@@ -270,6 +254,7 @@ LIB.RegisterEvent('AUCTION_LOOKUP_RESPOND', function()
 				s = AnsiToUTF8(LIB.GetRealServer(2)), -- Server
 				t = GetCurrentTime(), -- Time
 				d = AnsiToUTF8(szData), -- Price data
+				ib = LIB.NumberBaseN(dwBaseID, 32),
 			}, 'e87d2e0a-d3bd-4095-af48-e50dfe58f36b')))
 		-- 延迟一帧 否则系统还没更新界面数据
 		LIB.DelayCall(function()
