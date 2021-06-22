@@ -106,7 +106,7 @@ end
 function D.OnPetItemLButtonClick()
 	local name = this:GetName()
 	if name == 'Handle_Prefer' then
-		if O.bEnable and this.tPet and not IsCtrlKeyDown() and not IsAltKeyDown() then
+		if O.bEnable and this.tPet and not IsCtrlKeyDown() and not IsAltKeyDown() and this:Lookup('Image_PreferSelect'):IsVisible() then
 			D.Open(this.tPet.dwPetIndex)
 			return
 		end
