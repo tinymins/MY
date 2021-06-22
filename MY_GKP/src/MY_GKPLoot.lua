@@ -1892,23 +1892,51 @@ function D.GetDoodadLootInfo(dwID)
 	return aItemData, nMoney, szName, bSpecial
 end
 
-function D.HideSystemLoot()
-	local frame = Station.Lookup('Normal/LootList')
-	if frame then
-		frame:SetAbsPos(4096, 4096)
+function D.ShowSystemLoot()
+	for _, szName in ipairs({'LootList', 'GoldTeamLootList'}) do
+		local frame = Station.SearchFrame(szName)
+		if frame and frame:GetAbsX() == 4096 then
+			frame:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
+		end
 	end
-	-- Wnd.CloseWindow('LootList')
 end
 
+function D.HideSystemLoot()
+	for _, szName in ipairs({'LootList', 'GoldTeamLootList'}) do
+		local frame = Station.SearchFrame(szName)
+		if frame and frame:GetAbsX() ~= 4096 then
+			frame:SetAbsPos(4096, 4096)
+		end
+		-- Wnd.CloseWindow(szName)
+	end
+end
 
-LIB.RegisterEvent('HELP_EVENT.MY_GKPLoot', function()
-	if not D.IsEnabled() then
-		return
-	end
-	if arg0 == 'OnOpenpanel' and arg1 == 'LOOT' then
+function D.AutoSetSystemLootVisible()
+	local team = GetClientTeam()
+	local bCanBiddingDistribute = team and team.nLootMode == PARTY_LOOT_MODE.BIDDING
+		and team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.DISTRIBUTE) == UI_GetClientPlayerID()
+	if D.IsEnabled() and not bCanBiddingDistribute then
 		D.HideSystemLoot()
+	else
+		D.ShowSystemLoot()
 	end
+end
+
+LIB.RegisterFrameCreate('LootList.MY_GKPLoot', function()
+	HookTableFunc(arg0, 'SetPoint', D.AutoSetSystemLootVisible, { bAfterOrigin = true })
+	HookTableFunc(arg0, 'SetRelPos', D.AutoSetSystemLootVisible, { bAfterOrigin = true })
+	HookTableFunc(arg0, 'SetAbsPos', D.AutoSetSystemLootVisible, { bAfterOrigin = true })
+	HookTableFunc(arg0, 'CorrectPos', D.AutoSetSystemLootVisible, { bAfterOrigin = true })
 end)
+
+LIB.RegisterFrameCreate('GoldTeamLootList.MY_GKPLoot', function()
+	HookTableFunc(arg0, 'SetPoint', D.AutoSetSystemLootVisible, { bAfterOrigin = true })
+	HookTableFunc(arg0, 'SetRelPos', D.AutoSetSystemLootVisible, { bAfterOrigin = true })
+	HookTableFunc(arg0, 'SetAbsPos', D.AutoSetSystemLootVisible, { bAfterOrigin = true })
+	HookTableFunc(arg0, 'CorrectPos', D.AutoSetSystemLootVisible, { bAfterOrigin = true })
+end)
+
+LIB.RegisterEvent('TEAM_AUTHORITY_CHANGED.MY_GKPLoot', D.AutoSetSystemLootVisible)
 
 -- ÃþÏä×Ó
 LIB.RegisterEvent('OPEN_DOODAD', function()
