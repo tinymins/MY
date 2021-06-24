@@ -292,7 +292,7 @@ function LIB.SwitchTab(szKey, bForceUpdate)
 	scroll:SetScrollPos(0)
 	wnd:Clear()
 	wnd:Lookup('', ''):Clear()
-	wnd:SetContainerType(CONSTANT.WND_CONTAINER_STYLE.CUSTOM)
+	wnd:SetContainerType(UI.WND_CONTAINER_STYLE.CUSTOM)
 	-- ready to draw
 	if tTab.OnPanelActive then
 		local res, err, trace = XpCall(tTab.OnPanelActive, wnd)
