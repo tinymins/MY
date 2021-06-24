@@ -307,7 +307,7 @@ local function GetComponentElement(raw, elementType)
 			element = raw
 		end
 	elseif elementType == 'MAIN_HANDLE' then -- 获取用于主要 Item 类功能区、子元素容器UI实例
-		if componentType == 'WndScrollBox' then
+		if componentType == 'WndScrollHandleBox' then
 			element = raw:Lookup('', 'Handle_Padding/Handle_Scroll')
 		elseif componentType == 'Handle' or componentType == 'CheckBox' or componentType == 'ColorBox' then
 			element = raw
@@ -358,7 +358,7 @@ local function GetComponentElement(raw, elementType)
 			element = raw:Lookup('WndNewScrollBar_Default')
 		end
 	elseif elementType == 'TEXT' then -- 获取文本UI实例
-		if componentType == 'WndScrollBox' then
+		if componentType == 'WndScrollHandleBox' then
 			element = raw:Lookup('', 'Handle_Padding/Handle_Scroll/Text_Default')
 		elseif componentType == 'WndFrame' then
 			element = raw:Lookup('', 'Text_Title') or raw:Lookup('', 'Text_Default')
@@ -383,7 +383,7 @@ local function GetComponentElement(raw, elementType)
 		end
 	elseif elementType == 'IMAGE' then -- 获取图片UI实例
 		if componentType == 'WndEditBox' or componentType == 'WndComboBox' or componentType == 'WndEditComboBox'
-		or componentType == 'WndAutocomplete' or componentType == 'WndScrollBox' then
+		or componentType == 'WndAutocomplete' or componentType == 'WndScrollHandleBox' then
 			element = raw:Lookup('', 'Image_Default')
 		elseif componentType == 'Handle' or componentType == 'CheckBox' then
 			element = raw:Lookup('Image_Default')
@@ -1628,7 +1628,7 @@ function OO:Text(arg0, arg1)
 				if not IsString(arg0) then
 					arg0 = tostring(arg0)
 				end
-				if componentType == 'WndScrollBox' then
+				if componentType == 'WndScrollHandleBox' then
 					element = GetComponentElement(raw, 'MAIN_HANDLE')
 					element:Clear()
 					element:AppendItemFromString(GetFormatText(arg0))
@@ -2942,7 +2942,7 @@ local function SetComponentSize(raw, nOuterWidth, nOuterHeight, nInnerWidth, nIn
 			hItem:FormatAllItemPos()
 		end
 		hList:FormatAllItemPos()
-	elseif componentType == 'WndScrollBox' then
+	elseif componentType == 'WndScrollHandleBox' then
 		raw:SetSize(nWidth, nHeight)
 		raw:Lookup('', ''):SetSize(nWidth, nHeight)
 		raw:Lookup('', 'Image_Default'):SetSize(nWidth, nHeight)
@@ -3972,7 +3972,7 @@ function OO:Click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 					end
 					LIB.ExecuteWithThis(raw, fnLClick, UI.MOUSE_EVENT.LBUTTON)
 				end
-				if GetComponentType(raw) == 'WndScrollBox' then
+				if GetComponentType(raw) == 'WndScrollHandleBox' then
 					UI(GetComponentElement(raw, 'MAIN_HANDLE')):UIEvent('OnItemLButtonClick', fnAction)
 				else
 					local cmb = GetComponentElement(raw, 'COMBOBOX')
@@ -4002,7 +4002,7 @@ function OO:Click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 					end
 					LIB.ExecuteWithThis(raw, fnRClick, UI.MOUSE_EVENT.RBUTTON)
 				end
-				if GetComponentType(raw) == 'WndScrollBox' then
+				if GetComponentType(raw) == 'WndScrollHandleBox' then
 					UI(GetComponentElement(raw, 'MAIN_HANDLE')):UIEvent('OnItemRButtonClick', fnAction)
 				else
 					local cmb = GetComponentElement(raw, 'COMBOBOX')
