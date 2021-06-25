@@ -74,6 +74,7 @@ return {
 	['Team achievement request sent.'] = '刷新團隊成就請求已發送。',
 
 	-- MY_PartyRequest
+	['MY_CharInfo'] = '角色屬性',
 	['Party Request'] = '優化申請列表',
 	['MY_PartyRequest'] = '組隊助手',
 	['Party invite request.'] = '對方邀請你組隊。',
@@ -83,6 +84,7 @@ return {
 	['loading...'] = '讀取中..',
 	['If it is always loading, the target may not install plugin or refuse.'] = '如果一直提示載入中，可能是對方沒有安裝插件或者拒絕了您的請求',
 	['Allow view charinfo'] = '允許其他人查看屬性',
+	['MY_WorldMark'] = '世界標記',
 	['World mark enhance'] = '世界標記增強',
 	['Auto refuse low level player'] = '自動拒絕未滿級角色',
 	['Auto refuse robot player'] = '自動拒絕疑似工作室角色',
@@ -143,6 +145,8 @@ return {
 	['Add'] = '添加',
 	['Ignore'] = '忽略',
 
+	-- MY_TeamNotice
+	['MY_TeamNotice'] = '團隊小告示',
 	['Edit team info?'] = '是否填寫團隊小告示（團員進組可看到）',
 	['Team Message'] = '團隊告示',
 	['Asking..., If no response in longtime, team leader not enable plug-in.'] = '請求已發出，如果沒有響應可能是團長沒有開啟小告示',

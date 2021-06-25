@@ -1,5 +1,6 @@
 return {
     -- MY_Logoff.lua
+    ['MY_Logoff'] = '快速登出',
     ['Express logoff'] = '快速登出',
     ['Hotkey setting'] = '快捷鍵設置',
     ['Return to role list'] = '返回角色選擇',

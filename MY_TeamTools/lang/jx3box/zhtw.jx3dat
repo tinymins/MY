@@ -1,4 +1,5 @@
 return {
+	['MY_TeamTools'] = '團隊工具',
     ['Team Platform'] = '團隊平臺',
 
     -- MY_JBBind.lua
@@ -25,6 +26,7 @@ return {
     ['Today recomment posts'] = '今日推薦',
 
     -- JBAchievementRank.lua
+    ['MY_JBAchievementRank'] = '賽事上報',
     ['Dungeon Rank'] = '賽事上報',
 	['Share boss kill'] = '分享首次擊敗秘境首領',
 	['Share boss kill record for kill rank.'] = '參加秘境百強榜，公開分享首次擊敗秘境首領相關團隊與戰鬥信息。',
@@ -72,6 +74,7 @@ return {
     ['Quit failed!'] = '退出失敗！',
 
     -- MY_JBTeamSnapshot.lua
+    ['MY_JBTeamSnapshot'] = '團隊快照',
     ['Team Snapshot'] = '團隊快照',
     ['Team name/id:'] = '團名/ID：',
     ['(Input: Team@Server:Passcode)'] = '（輸入：團隊名稱@伺服器名:團隊密碼）',

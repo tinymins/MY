@@ -5,6 +5,8 @@ return {
 	['Encrypt and compressing: '] = '更新加密壓縮：',
 	-- MY_TeamMon_CA.lua --
 	['MY_TeamMon_CA'] = '中央提醒',
+	-- MY_TeamMon_CC.lua --
+	['MY_TeamMon_CC'] = '其它',
 	-- MY_TeamMon_BL.lua --
 	['MY_TeamMon_BL'] = '自身氣勁列表',
 	-- MY_TeamMon_PBL.lua --

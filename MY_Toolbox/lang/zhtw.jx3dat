@@ -1,7 +1,10 @@
 return {
     -- MY_Toolbox.lua
-    ['MY_ToolBox'] = '常用工具',
+    ['MY_Toolbox'] = '常用工具',
     ['MY_InfoTip'] = '信息顯示',
+
+    -- MY_FooterTip
+    ['MY_FooterTip'] = '幫會好友高亮',
     ['Friend headtop tips'] = '附近好友高亮',
     ['Friend headtop tips nav'] = '啟用場景追蹤點',
     ['Tong member headtop tips'] = '附近幫會成員高亮',
@@ -51,16 +54,22 @@ return {
     ['------------------------------------'] = '————————————————————————',
 	['send to ...'] = '發送到...',
 
+    -- MY_VisualSkill
+    ['MY_VisualSkill'] = '歷史招式',
     ['Visual skill'] = '顯示歷史招式列表',
     ['Display %d skills.'] = '顯示%d格。',
 
+    -- MY_ShenxingHelper
+    ['MY_ShenxingHelper'] = '神行千里保護',
     ['Avoid blacking shenxing cd'] = '防止開陣導致神行千里失敗',
-    ['Got zhenyan wen shenxing, your shengxing will be blacked.'] = '在神行千里運功過程中獲得陣眼，神行會進入調息狀態但角色仍然會停留在原地（邏輯組調息判定寫挫了）。',
+    ['Got zhenyan wen shenxing, your shengxing will be blacked.'] = '在神行千里運功過程中獲得陣眼，神行會進入調息狀態但角色仍然會停留在原地。',
     ['Shenxing has been cancelled, cause you got the zhenyan.'] = '您獲取到陣眼，為防止神行千里CD被黑，讀條已自動打斷。',
     ['Shenxing to ancient maps'] = '盛唐故地神行千里',
     ['Force open all map shenxing'] = '未知地圖神行千里',
     ['Shenxing can fly to undiscovered maps'] = '允許神行千里前往尚未探索過的地圖、秘境',
 
+    -- MY_JiugongHelper
+    ['MY_JiugongHelper'] = '其它',
     ['The kill sequence is: '] = '正確擊殺順序：',
     ['Failed to calc.'] = '計算失敗。',
 
@@ -106,6 +115,8 @@ return {
     ['%s record(s) commited, %s record(s) accepted!'] = '已為您自動提交了%s條題庫數據，其中%s條已被系統通過採納！',
     ['<G>Congratulations you finished the exam, please visit Yangzhou next monday for result.'] = '<G>恭喜你完成了會試，請於下周一前往揚州城幫會區前方的皇榜查閱成績。',
 
+    -- MY_AutoDialogue
+    ['MY_AutoDialogue'] = '其它',
     ['Autochat'                                        ] = '自動對話',
     ['Common'                                          ] = '通用',
     ['Auto interact disabled due to SHIFT key pressed.'] = '你按住了Shift鍵，自動對話被禁用。',
@@ -123,12 +134,18 @@ return {
         '它的主人是(.-)。',
     },
 
+    -- MY_MibaoHelper
+    ['MY_MibaoHelper'] = '密保提示',
     ['You have been loged in for 2min, you can unlock bag locker now.'] = '你已登入游戲兩分鐘，可以愉快的解除倉庫鎖啦！',
     LOCK_TIP = {},
 
+    -- MY_BigWarChecker
+    ['MY_BigWarChecker'] = '大戰提醒',
     ['Warning: Bigwar has been finished but not handed yet!'] = '茗伊提示：大戰還沒交！',
     ['This map is big war map and you did not accepted the quest, is that correct?'] = '提示：檢測到角色沒有接受當前地圖秘境大戰系列任務！',
 
+    -- MY_ArenaHelper
+    ['MY_ArenaHelper'] = '競技場助手',
     ['Auto restore team info in arena'] = '競技場中自動恢覆上次組隊信息',
     ['Auto cancel hide player in arena and battlefield'] = '競技場與戰場中自動取消屏蔽玩家與NPC',
 
@@ -150,6 +167,8 @@ return {
         '　　3、物品表每次更新都可能被修改，查詢結果只代表查詢時刻的即時狀態。',
     },
 
+    -- MY_HideAnnounceBg
+    ['MY_HideAnnounceBg'] = '其它',
     ['Hide announce bg'] = '隱藏官方公告區背景',
 
     -- MY_Taoguan
@@ -318,22 +337,35 @@ return {
     ['FIREWORK_TITLE_162307'] = '還願人',
     ['FIREWORK_TITLE_162308'] = '在嗎？',
     ['FIREWORK_TITLE_158577'] = '玲瓏心',
+
+    -- MY_AchievementWiki
+    ['MY_AchievementWiki'] = '成就百科',
     ['Achievement wiki'] = '成就百科',
     ['Click icon on achievemnt panel to view achievement wiki'] = '點擊成就界面圖標顯示成就百科',
+
+    -- MY_PetWiki
+    ['MY_PetWiki'] = '寵物百科',
     ['Pet wiki'] = '寵物百科',
     ['Click icon on pet panel to view pet wiki'] = '點擊寵物秘鑒圖標顯示寵物百科',
+
+    -- MY_ItemWiki
+    ['MY_ItemWiki'] = '物品百科',
     ['Item wiki'] = '物品百科',
     ['Hold SHIFT and r-click bag box to show item wiki'] = '按住SHIFT右鍵點擊背包物品顯示物品百科',
+
+    -- MY_ItemPrice
+    ['MY_ItemPrice'] = '物品價格',
     ['Item price'] = '物品價格',
     ['Hold SHIFT and r-click bag box to show item price'] = '按住SHIFT右鍵點擊背包物品顯示物品價格',
     ['Lookup flower price'] = '查詢花價',
     ['Lookup price'] = '查詢價格',
 
     -- MY_LockFrame
-    ['Lock frame position'] = '鎖定窗口位置',
+    ['MY_LockFrame'] = '界面鎖定',
+    ['Lock frame position'] = '界面位置鎖定',
     ['Enable (press ctrl+alt to temp unlock)'] = '啟用（按住CTRL+ALT可臨時解鎖）',
-    ['MY_LockFrame has been temporary disabled.'] = '鎖定窗口位置已臨時禁用',
-    ['MY_LockFrame has been enabled.'] = '鎖定窗口位置已重新啟用',
+    ['MY_LockFrame has been temporary disabled.'] = '界面位置鎖定已臨時禁用',
+    ['MY_LockFrame has been enabled.'] = '界面位置鎖定已重新啟用',
     ['LOCK_FRAME_JX_TargetList'] = '劍心·焦點列表',
     ['LOCK_FRAME_MY_FocusUI'] = '茗伊·焦點列表',
     ['LOCK_FRAME_WhoSeeMe'] = '誰在看我',
@@ -341,7 +373,6 @@ return {
     ['LOCK_FRAME_FightingStatistic'] = '傷害統計',
     ['LOCK_FRAME_MY_ThreatRank'] = '茗伊·仇恨統計',
     ['LOCK_FRAME_MY_Recount_UI'] = '茗伊·傷害統計',
-    ['LOCK_FRAME_LR_AS_FP'] = '懶人·賬本懸浮窗',
     ['LOCK_FRAME_QuestTraceList'] = '任務追蹤',
     ['LOCK_FRAME_Matrix'] = '陣法界面',
     ['LOCK_FRAME_ChatPanel'] = '聊天面板',
@@ -352,6 +383,7 @@ return {
     ['LOCK_FRAME_JX_HeightMeter'] = '劍心·高度標線',
 
     -- MY_AutoSell
+    ['MY_AutoSell'] = '自動出售',
     ['Auto sell items'] = '自動出售物品',
     ['Auto sell when open shop'] = '打開商店後自動出售',
     ['Enable'] = '啟用',
@@ -395,6 +427,7 @@ return {
     ['Restore dynamic action bar pos'] = '記住上次動態技能欄所在位置',
 
     -- MY_Domesticate.lua
+    ['MY_Domesticate'] = '馴養助手',
     ['measure (%d+) point'] = '飽食度(%d+)點',
     ['No enough %s to feed %s!'] = '沒有足夠的[%s]用於馴養[%s]！',
     ['Auto feed'] = '自動喂食',
@@ -405,6 +438,7 @@ return {
     ['Alert when measure larger than %d'] = '當馴養可喂養飽食度高於%d點時提醒',
 
     -- MY_YunMacro.lua
+    ['MY_YunMacro'] = '雲端宏',
     ['Sync yun macro'] = '同步雲端宏',
     ['Show yun macro details'] = '顯示詳情',
     ['Macro update failed...'] = '同步雲端宏失敗...',
@@ -417,4 +451,6 @@ return {
     ['Please input macro name first.'] = '請先輸入宏名稱。',
 
     ['MY_RoleStatistics'] = '角色統計',
+
+    ['MY_DialogNameLink'] = '其它',
 }

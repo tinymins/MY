@@ -122,4 +122,4 @@ function PS.OnPanelActive(wnd)
 	MY_AutoSell.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 	MY_DynamicItem.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 end
-LIB.RegisterPanel(_L['General'], 'MY_ToolBox', _L['MY_ToolBox'], 'UI/Image/Common/Money.UITex|243', PS)
+LIB.RegisterPanel(_L['General'], 'MY_Toolbox', _L['MY_Toolbox'], 'UI/Image/Common/Money.UITex|243', PS)

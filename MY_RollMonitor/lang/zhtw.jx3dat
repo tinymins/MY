@@ -1,5 +1,6 @@
 return {
     -- MY_RollMon.lua
+    ['MY_RollMonitor'] = '點數監控',
     ['roll monitor'] = '點數監控',
 	['restart'] = '重新開始',
     ['publish'] = '發佈',

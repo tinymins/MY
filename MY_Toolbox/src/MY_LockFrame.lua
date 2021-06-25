@@ -104,7 +104,6 @@ local D = {
 		'MY_FocusUI',
 		'MY_ThreatRank',
 		'MY_Recount_UI',
-		'LR_AS_FP',
 	},
 	tLockID = {
 		['JX_TargetList'] = 'JX_TargetList', -- 剑心·焦点列表 [Normal/JX_TargetList]
@@ -114,7 +113,6 @@ local D = {
 		['FightingStatistic'] = 'FightingStatistic', -- 伤害统计 [Normal/FightingStatistic]
 		['MY_ThreatRank'] = 'MY_ThreatRank', -- 茗伊·仇恨统计 [Normal/MY_ThreatRank]
 		['MY_Recount_UI'] = 'MY_Recount_UI', -- 茗伊·伤害统计 [Normal/MY_Recount_UI]
-		['LR_AS_FP'] = 'LR_AS_FP', -- 懒人·账本悬浮窗 [Normal/LR_AS_FP]
 		['QuestTraceList'] = 'QuestTraceList', -- 任务追踪 [Normal/QuestTraceList]
 		['Matrix'] = 'Matrix', -- 阵法界面 [Normal/Matrix]
 		['ChatPanel1'] = 'ChatPanel', -- 聊天面板 [Lowest2/ChatPanel1]

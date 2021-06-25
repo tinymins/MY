@@ -1,5 +1,6 @@
 return {
 	['MY_Notify'] = '茗伊消息中心',
+	['Anchor'] = '位置',
 	['Entry settings'] = '小地图入口设置',
 	['Sort settings'] = '排序设置',
 	['Disable dismiss settings'] = '自动消失设置',

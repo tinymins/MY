@@ -54,7 +54,7 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 	return
 end
 --------------------------------------------------------------------------
-local INI_PATH = PACKET_INFO.ROOT .. 'MY_ToolBox/ui/MY_VisualSkill.ini'
+local INI_PATH = PACKET_INFO.ROOT .. 'MY_Toolbox/ui/MY_VisualSkill.ini'
 local DEFAULT_ANCHOR = { x = 0, y = -220, s = 'BOTTOMCENTER', r = 'BOTTOMCENTER' }
 local O = LIB.CreateUserSettingsModule('MY_VisualSkill', _L['MY_Toolbox'], {
 	bEnable = {

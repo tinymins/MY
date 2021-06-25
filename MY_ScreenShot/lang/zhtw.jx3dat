@@ -1,4 +1,5 @@
 return {
+    ['MY_ScreenShot'] = '截圖助手',
     ['screenshot helper'] = '截圖助手',
 
     ['Check to use global config, otherwise use private setting.'] = '勾選該項則該角色使用公共設定，取消勾選則該角色使用單獨設定。',

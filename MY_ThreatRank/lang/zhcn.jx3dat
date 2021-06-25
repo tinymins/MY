@@ -1,5 +1,7 @@
 return {
 	-- TS.lua --
+	-- MY_ThreatRank
+	['MY_ThreatRank'] = '仇恨统计',
 	['Well done! %s in %d group first to attack %s!!'] = '%d小队的 %s 率先攻击了 %s！获取不一定准确，仅供参考！',
 	['** You Threat more than %d, 120% is Out of Taunt! **'] = '** 你的仇恨超过了 %d％ 达到 120％ 则ＯＴ！**',
 	['Enable ThreatScrutiny'] = '开启仇恨统计',

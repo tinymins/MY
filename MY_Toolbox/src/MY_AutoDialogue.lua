@@ -109,7 +109,7 @@ local D = {}
 ---------------------------------------------------------------------------
 function D.LoadData()
 	DIALOGUE = LIB.LoadLUAData({'config/auto_dialogue.jx3dat', PATH_TYPE.GLOBAL})
-		or LIB.LoadLUAData(PACKET_INFO.ROOT .. 'MY_ToolBox/data/auto_dialogue/{$lang}.jx3dat')
+		or LIB.LoadLUAData(PACKET_INFO.ROOT .. 'MY_Toolbox/data/auto_dialogue/{$lang}.jx3dat')
 		or {}
 end
 

@@ -1,5 +1,6 @@
 return {
     ['MY_Focus'] = '焦點列表',
+    ['Basic settings'] = '基礎設置',
     ['Focus list'] = '焦點列表',
     ['Enable'] = '啟用',
     ['Option'] = '設置',

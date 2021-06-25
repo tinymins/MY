@@ -208,6 +208,8 @@ return {
 	['Team dungeon'] = '小隊秘境',
 	['Raid dungeon'] = '團隊秘境',
 	['Battlefield'] = '戰場',
+	-- MY_GKPDoodad
+	['MY_GKPDoodad'] = '採集助手',
 	['Pickup helper'] = '拾取助手',
 	['Enable auto pickup'] = '自動打開掉落',
 	['Auto craft'] = '自動採集',
