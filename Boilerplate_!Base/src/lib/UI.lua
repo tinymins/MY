@@ -4240,7 +4240,11 @@ function OO:Check(fnCheck, fnUncheck, bNoAutoBind)
 		for _, raw in ipairs(self.raws) do
 			local chk = GetComponentElement(raw, 'CHECKBOX')
 			if chk then
-				chk:Check(fnCheck)
+				if fnUncheck then
+					chk:Check(fnCheck, fnUncheck)
+				else
+					chk:Check(fnCheck)
+				end
 			end
 		end
 		return self
