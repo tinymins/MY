@@ -419,16 +419,56 @@ local VERSION = 2
 local D = {
 	bRecEverything = false, -- ¼ÆËã³öÀ´µÄÊÇ·ñ²É¼¯¸´ÅÌÊý¾Ý¿ª¹Ø£¬¹ýÍ¼ÖØËã
 }
-local O = {
-	bEnable            = false, -- Êý¾Ý¼ÇÂ¼×Ü¿ª¹Ø ·ÀÖ¹¹Ù·½SB¼¼ÄÜBUFF½Å±¾Ï¹¼¸°ÑÐ´³¬¸ßÆµÌ«¿¨Ë¦¹ø¸ø½çÃæÂß¼­
-	bSaveHistoryOnExit = false, -- ÍË³öÓÎÏ·Ê±±£´æÀúÊ·Êý¾Ý
-	bSaveHistoryOnExFi = false, -- ÍÑÀëÕ½¶·Ê±±£´æÀúÊ·Êý¾Ý
-	nMaxHistory        = 10   , -- ×î´óÀúÊ·Êý¾ÝÊýÁ¿
-	nMinFightTime      = 30   , -- ×îÐ¡Õ½¶·Ê±¼ä
-	bRecEverything     = false, -- ÊÇ·ñ²É¼¯¸´ÅÌÊý¾Ý
-	bREOnlyDungeon     = true , -- ½öÔÚÃØ¾³ÖÐÆôÓÃ
-	bSaveEverything    = false, -- ±£´æÕ½¶·¼ÇÂ¼Ê±ÊÇ·ñ´æ´¢¸´ÅÌÊý¾Ý
-}
+local O = LIB.CreateUserSettingsModule('MY_Recount', _L['MY_Recount'], {
+	bEnable = { -- Êý¾Ý¼ÇÂ¼×Ü¿ª¹Ø ·ÀÖ¹¹Ù·½SB¼¼ÄÜBUFF½Å±¾Ï¹¼¸°ÑÐ´³¬¸ßÆµÌ«¿¨Ë¦¹ø¸ø½çÃæÂß¼­
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['Basic Settings'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bSaveHistoryOnExit = { -- ÍË³öÓÎÏ·Ê±±£´æÀúÊ·Êý¾Ý
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['Storage Settings'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bSaveHistoryOnExFi = { -- ÍÑÀëÕ½¶·Ê±±£´æÀúÊ·Êý¾Ý
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['Storage Settings'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	nMaxHistory = { -- ×î´óÀúÊ·Êý¾ÝÊýÁ¿
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['Storage Settings'],
+		xSchema = Schema.Number,
+		xDefaultValue = 10,
+	},
+	nMinFightTime = { -- ×îÐ¡Õ½¶·Ê±¼ä
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['Basic Settings'],
+		xSchema = Schema.Number,
+		xDefaultValue = 30,
+	},
+	bRecEverything = { -- ÊÇ·ñ²É¼¯¸´ÅÌÊý¾Ý
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['Everything Settings'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bREOnlyDungeon = { -- ½öÔÚÃØ¾³ÖÐÆôÓÃ
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['Everything Settings'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bSaveEverything = { -- ±£´æÕ½¶·¼ÇÂ¼Ê±ÊÇ·ñ´æ´¢¸´ÅÌÊý¾Ý
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['Everything Settings'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+})
 local Data          -- µ±Ç°Õ½¶·Êý¾Ý¼ÇÂ¼
 local HISTORY_CACHE = setmetatable({}, { __mode = 'v' }) -- ÀúÊ·Õ½¶·¼ÇÂ¼»º´æ { [szFile] = Data }
 local KEPT_CACHE = {} -- ±£´æÁËµ«ÊÇÌÞ³ýÁË¸´ÅÌ¼ÇÂ¼µÄÕ½¶·¼ÇÂ¼»º´æ { [szFile] = Data }
@@ -489,22 +529,13 @@ function D.LoadData()
 		O.bSaveEverything    = false -- Get(data, 'bSaveEverything', false)
 		MY_Recount_UI.CheckOpen()
 	end
+	D.bReady = true
 	D.InitData()
 end
 
 -- ÍË³öÓÎÏ·±£´æÊý¾Ý
 function D.SaveData()
-	local data = {
-		bEnable            = O.bEnable           ,
-		bSaveHistoryOnExit = O.bSaveHistoryOnExit,
-		bSaveHistoryOnExFi = O.bSaveHistoryOnExFi,
-		nMaxHistory        = O.nMaxHistory       ,
-		nMinFightTime      = O.nMinFightTime     ,
-		bRecEverything     = O.bRecEverything    ,
-		bREOnlyDungeon     = O.bREOnlyDungeon    ,
-		bSaveEverything    = O.bSaveEverything   ,
-	}
-	LIB.SaveLUAData(SZ_CFG_FILE, data, DS_DATA_CONFIG)
+	LIB.SaveLUAData(SZ_CFG_FILE, nil, DS_DATA_CONFIG)
 end
 
 -- ¼ÓÔØÀúÊ·Êý¾ÝÁÐ±í
@@ -633,7 +664,7 @@ end)
 
 -- ÍË³öÕ½¶· ±£´æÊý¾Ý
 LIB.RegisterEvent('MY_FIGHT_HINT', function()
-	if not O.bEnable then
+	if not D.bReady or not O.bEnable then
 		return
 	end
 	local nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
@@ -1510,7 +1541,7 @@ end
 -- ÏµÍ³ÈÕÖ¾¼à¿Ø£¨Êý¾ÝÔ´£©
 do local aAbsorbInfo, nLFC
 LIB.RegisterEvent('SYS_MSG', function()
-	if not O.bEnable then
+	if not D.bReady or not O.bEnable then
 		return
 	end
 	if arg0 == 'UI_OME_SKILL_CAST_LOG' then
@@ -1655,7 +1686,7 @@ end
 LIB.RegisterEvent('BUFF_UPDATE', function()
 	-- local owner, bdelete, index, cancancel, id  , stacknum, endframe, binit, level, srcid, isvalid, leftframe
 	--     = arg0 , arg1   , arg2 , arg3     , arg4, arg5    , arg6    , arg7 , arg8 , arg9 , arg10  , arg11
-	if not O.bEnable then
+	if not D.bReady or not O.bEnable then
 		return
 	end
 	nAbsorbPriority = ABSORB_BUFF[arg4]
@@ -1742,7 +1773,7 @@ function D.OnTeammateStateChange(dwID, bLeave, nAwayType, bAddWhenRecEmpty)
 	end
 end
 LIB.RegisterEvent('PARTY_UPDATE_MEMBER_INFO', function()
-	if not O.bEnable then
+	if not D.bReady or not O.bEnable then
 		return
 	end
 	local team = GetClientTeam()
@@ -1761,7 +1792,7 @@ for _, v in ipairs({
 }) do
 	local szEvent, dwType, nEnter = unpack(v)
 	LIB.RegisterEvent(szEvent, function()
-		if not O.bEnable then
+		if not D.bReady or not O.bEnable then
 			return
 		end
 		-- ²åÈëÊý¾Ýµ½ÈÕÖ¾
@@ -1794,7 +1825,7 @@ for _, v in ipairs({
 end
 -- ÏµÍ³ÏûÏ¢ÈÕÖ¾
 LIB.RegisterMsgMonitor('MSG_SYS.MY_Recount_DS_Everything', function(szChannel, szMsg, nFont, bRich)
-	if not O.bEnable then
+	if not D.bReady or not O.bEnable then
 		return
 	end
 	if bRich then
@@ -1808,7 +1839,7 @@ LIB.RegisterMsgMonitor('MSG_SYS.MY_Recount_DS_Everything', function(szChannel, s
 end)
 -- ½ÇÉ«º°»°ÈÕÖ¾
 LIB.RegisterEvent('PLAYER_SAY', function()
-	if not O.bEnable then
+	if not D.bReady or not O.bEnable then
 		return
 	end
 	if not IsPlayer(arg1) then
@@ -1827,7 +1858,7 @@ LIB.RegisterEvent('PLAYER_SAY', function()
 end)
 -- ÏµÍ³¾¯¸æ¿òÈÕÖ¾
 LIB.RegisterEvent('ON_WARNING_MESSAGE', function()
-	if not O.bEnable then
+	if not D.bReady or not O.bEnable then
 		return
 	end
 	local nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
@@ -1840,7 +1871,7 @@ LIB.RegisterEvent('ON_WARNING_MESSAGE', function()
 end)
 -- ½øÈëÍË³öÕ½¶·ÈÕÖ¾
 LIB.RegisterEvent({'MY_NPC_FIGHT_HINT', 'MY_PLAYER_FIGHT_HINT'}, function(e)
-	if not O.bEnable then
+	if not D.bReady or not O.bEnable then
 		return
 	end
 	local nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
@@ -1873,7 +1904,7 @@ LIB.RegisterEvent({'MY_NPC_FIGHT_HINT', 'MY_PLAYER_FIGHT_HINT'}, function(e)
 end)
 -- ËÀÍöÈÕÖ¾
 LIB.RegisterEvent('SYS_MSG', function()
-	if not O.bEnable then
+	if not D.bReady or not O.bEnable then
 		return
 	end
 	if arg0 ~= 'UI_OME_DEATH_NOTIFY' then
@@ -1893,7 +1924,7 @@ LIB.RegisterEvent('SYS_MSG', function()
 end)
 -- ÉÏÏßÏÂÏßÈÕÖ¾
 LIB.RegisterEvent('PARTY_SET_MEMBER_ONLINE_FLAG', function()
-	if not O.bEnable then
+	if not D.bReady or not O.bEnable then
 		return
 	end
 	if LIB.IsParty(arg1) then
@@ -1917,7 +1948,7 @@ LIB.RegisterEvent('PARTY_SET_MEMBER_ONLINE_FLAG', function()
 end)
 -- ½ø³öÕ½¶·ÔÝÀë¼ÇÂ¼
 LIB.RegisterEvent('MY_RECOUNT_NEW_FIGHT', function() -- ¿ªÕ½É¨Ãè¶ÓÓÑ ¼ÇÂ¼¿ªÕ½¾ÍËÀµô/µôÏßµÄÈË
-	if not O.bEnable then
+	if not D.bReady or not O.bEnable then
 		return
 	end
 	local team = GetClientTeam()
@@ -1937,7 +1968,7 @@ LIB.RegisterEvent('MY_RECOUNT_NEW_FIGHT', function() -- ¿ªÕ½É¨Ãè¶ÓÓÑ ¼ÇÂ¼¿ªÕ½¾ÍË
 end)
 -- ÖÐÍ¾ÓÐÈË½ø¶Ó ²¹ÉÏÔÝÀë¼ÇÂ¼
 LIB.RegisterEvent('PARTY_ADD_MEMBER', function()
-	if not O.bEnable then
+	if not D.bReady or not O.bEnable then
 		return
 	end
 	local team = GetClientTeam()

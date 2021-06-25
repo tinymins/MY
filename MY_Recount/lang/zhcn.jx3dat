@@ -1,6 +1,10 @@
 return {
     ['MY_Recount'] = '战斗统计',
-    ['MY_Recount_UI'] = '界面设置',
+    ['UI Settings'] = '界面设置',
+    ['Basic Settings'] = '基础设置',
+    ['Storage Settings'] = '存储设置',
+    ['Everything Settings'] = '复盘设置',
+
     ['Enable recording'] = '记录战斗统计数据',
     ['Enable UI'] = '显示战斗统计界面',
     ['Current fight'] = '当前统计',

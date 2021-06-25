@@ -118,7 +118,7 @@ local PUBLISH_MODE = {
 local O = LIB.CreateUserSettingsModule('MY_Recount', _L['MY_Recount'], {
 	nPublishMode = { -- 发布模式
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_Recount'],
+		szLabel = _L['Basic Settings'],
 		xSchema = Schema.Number,
 		xDefaultValue = PUBLISH_MODE.EFFECT,
 	},
