@@ -165,9 +165,19 @@ local function CommonEventFirer(E, arg0, ...)
 	if not E.tList or not szEvent then
 		return
 	end
-	if E.tList[szEvent] then
-		for _, p in ipairs(E.tList[szEvent].aList) do
-			FireEventRec(E, p, arg0, ...)
+	if szEvent == '*' then
+		for szEvent, eve in pairs(E.tList) do
+			if szEvent ~= '*' then
+				for _, p in ipairs(eve.aList) do
+					FireEventRec(E, p, arg0, ...)
+				end
+			end
+		end
+	else
+		if E.tList[szEvent] then
+			for _, p in ipairs(E.tList[szEvent].aList) do
+				FireEventRec(E, p, arg0, ...)
+			end
 		end
 	end
 	if E.tList['*'] then
