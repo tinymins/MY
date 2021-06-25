@@ -426,6 +426,10 @@ local function GetComponentElement(raw, elementType)
 			element = raw:Lookup('Image_Default')
 		elseif componentType == 'ColorBox' then
 			element = raw:Lookup('Shadow_Default')
+		elseif componentType == 'WndScrollHandleBox' then
+			element = GetComponentElement(raw, 'MAIN_HANDLE')
+		elseif componentType == 'WndScrollWindowBox' then
+			element = GetComponentElement(raw, 'CONTAINER')
 		end
 	end
 	return element
