@@ -46,6 +46,7 @@ local _L = LIB.LoadLangPack(PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 ---------------------------------------------------------------------------------------------
 -- 事件注册
 ---------------------------------------------------------------------------------------------
+do
 -- 通用注册函数
 -- CommonEventRegister(E, szID, fnAction)
 -- table    E              事件描述信息
@@ -145,6 +146,7 @@ local function CommonEventRegister(E, szID, fnAction)
 	end
 	return szID
 end
+LIB.CommonEventRegister = CommonEventRegister
 
 local function FireEventRec(E, p, ...)
 	local nStartTick = GetTickCount()
@@ -186,12 +188,16 @@ local function CommonEventFirer(E, arg0, ...)
 		end
 	end
 end
+LIB.CommonEventFirer = CommonEventFirer
+end
 
 ---------------------------------------------------------------------------------------------
 -- 监听游戏事件
 ---------------------------------------------------------------------------------------------
 do
 local GLBAL_EVENT = { szName = 'Event' }
+local CommonEventFirer = LIB.CommonEventFirer
+local CommonEventRegister = LIB.CommonEventRegister
 local function EventHandler(szEvent, ...)
 	CommonEventFirer(GLBAL_EVENT, szEvent, ...)
 end
@@ -214,6 +220,8 @@ end
 ---------------------------------------------------------------------------------------------
 do
 local INIT_EVENT = { szName = 'Initial', bSingleEvent = true }
+local CommonEventFirer = LIB.CommonEventFirer
+local CommonEventRegister = LIB.CommonEventRegister
 local function OnInit()
 	if not INIT_EVENT then
 		return
@@ -247,6 +255,8 @@ end
 ---------------------------------------------------------------------------------------------
 do
 local EXIT_EVENT = { szName = 'Exit', bSingleEvent = true }
+local CommonEventFirer = LIB.CommonEventFirer
+local CommonEventRegister = LIB.CommonEventRegister
 local function OnExit()
 	LIB.FireFlush()
 	CommonEventFirer(EXIT_EVENT)
@@ -263,6 +273,8 @@ end
 
 do
 local FLUSH_EVENT = { szName = 'Flush', bSingleEvent = true }
+local CommonEventFirer = LIB.CommonEventFirer
+local CommonEventRegister = LIB.CommonEventRegister
 function LIB.FireFlush()
 	LIB.FlushCoroutine()
 	CommonEventFirer(FLUSH_EVENT)
@@ -278,6 +290,8 @@ end
 ---------------------------------------------------------------------------------------------
 do
 local RELOAD_EVENT = { szName = 'Reload', bSingleEvent = true }
+local CommonEventFirer = LIB.CommonEventFirer
+local CommonEventRegister = LIB.CommonEventRegister
 local function OnReload()
 	LIB.FlushCoroutine()
 	CommonEventFirer(RELOAD_EVENT)
@@ -295,6 +309,8 @@ end
 ---------------------------------------------------------------------------------------------
 do
 local FRAME_CREATE_EVENT = { szName = 'FrameCreate' }
+local CommonEventFirer = LIB.CommonEventFirer
+local CommonEventRegister = LIB.CommonEventRegister
 local function OnFrameCreate()
 	CommonEventFirer(FRAME_CREATE_EVENT, arg0:GetName(), arg0)
 end
@@ -310,6 +326,8 @@ end
 ---------------------------------------------------------------------------------------------
 do
 local FRAME_DESTROY_EVENT = { szName = 'FrameCreate' }
+local CommonEventFirer = LIB.CommonEventFirer
+local CommonEventRegister = LIB.CommonEventRegister
 local function OnFrameDestroy()
 	CommonEventFirer(FRAME_DESTROY_EVENT, arg0:GetName(), arg0)
 end
@@ -325,6 +343,8 @@ end
 ---------------------------------------------------------------------------------------------
 do
 local IDLE_EVENT, TIME = { szName = 'Idle', bSingleEvent = true }, 0
+local CommonEventFirer = LIB.CommonEventFirer
+local CommonEventRegister = LIB.CommonEventRegister
 local function OnIdle()
 	local nTime = GetTime()
 	if nTime - TIME < 20000 then
@@ -363,6 +383,8 @@ end
 ---------------------------------------------------------------------------------------------
 do
 local SPECIAL_KEY_EVENT = { szName = 'SpecialKey' }
+local CommonEventFirer = LIB.CommonEventFirer
+local CommonEventRegister = LIB.CommonEventRegister
 local ALT, SHIFT, CTRL = false, false, false
 LIB.BreatheCall(NSFormatString('{$NS}#ON_SPECIAL_KEY'), function()
 	if IsShiftKeyDown() then
@@ -559,6 +581,8 @@ end
 do
 local BG_MSG_ID_PREFIX = NSFormatString('{$NS}:')
 local BG_MSG_ID_SUFFIX = ':V2'
+local CommonEventFirer = LIB.CommonEventFirer
+local CommonEventRegister = LIB.CommonEventRegister
 do
 local BG_MSG_EVENT = { szName = 'BgMsg' }
 local BG_MSG_PROGRESS_EVENT = { szName = 'BgMsgProgress' }
@@ -706,6 +730,8 @@ end
 -- Unregister: LIB.RegisterMsgMonitor(string szKey, false)
 do
 local MSGMON_EVENT = { szName = 'MsgMonitor' }
+local CommonEventFirer = LIB.CommonEventFirer
+local CommonEventRegister = LIB.CommonEventRegister
 local function FixMsgMonBug() end
 local function MsgMonHandler(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID, szName)
 	if bRich then
