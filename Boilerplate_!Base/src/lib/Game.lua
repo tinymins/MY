@@ -185,10 +185,10 @@ end
 end
 
 do
-local O = LIB.CreateUserSettingsModule('LIB', _L['Common'], {
+local O = LIB.CreateUserSettingsModule('LIB', _L['System'], {
 	szDistanceType = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['Default distance type settings'],
+		szLabel = _L['Global config'],
 		xSchema = Schema.OneOf('gwwean', 'euclidean','plane'),
 		xDefaultValue = 'gwwean',
 	},
@@ -1033,7 +1033,7 @@ end)
 end
 
 do
-local O = LIB.CreateUserSettingsModule('LIB', _L['Common'], {
+local O = LIB.CreateUserSettingsModule('LIB', _L['System'], {
 	tForceForegroundColor = {
 		ePathType = PATH_TYPE.ROLE,
 		bDataSet = true,
