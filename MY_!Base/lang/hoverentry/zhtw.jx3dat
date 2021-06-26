@@ -1,6 +1,6 @@
 return {
 	['HoverEntry'] = '懸浮入口',
-
+	['Global config'] = '全局設置',
 	['Hover popup'] = '滑鼠滑過立即彈出',
 	['Size: %d'] = '大小：%d',
 }

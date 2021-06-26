@@ -47,28 +47,28 @@ local PLUGIN_ROOT = PACKET_INFO.FRAMEWORK_ROOT
 local MODULE_NAME = NSFormatString('{$NS}_HoverEntry')
 local _L = LIB.LoadLangPack(PACKET_INFO.FRAMEWORK_ROOT .. 'lang/hoverentry/')
 --------------------------------------------------------------------------
-local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['Common'], {
+local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['System'], {
 	bEnable = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['HoverEntry'],
+		szLabel = _L['Global config'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	nSize = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['HoverEntry'],
+		szLabel = _L['Global config'],
 		xSchema = Schema.Number,
 		xDefaultValue = 30,
 	},
 	anchor = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['HoverEntry'],
+		szLabel = _L['Global config'],
 		xSchema = Schema.FrameAnchor,
 		xDefaultValue = { x = -362, y = -78, s = 'BOTTOMCENTER', r = 'BOTTOMCENTER' },
 	},
 	bHoverMenu = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['HoverEntry'],
+		szLabel = _L['Global config'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},

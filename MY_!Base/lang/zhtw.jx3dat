@@ -9,7 +9,6 @@ return {
 	['Raid'] = '團隊',
 	['Target'] = '目標',
 	['System'] = '系統',
-	['JX3BOX'] = '魔盒',
 	['Battle'] = '戰鬥',
 	['Others'] = '其它',
 	['Development'] = '開發',
