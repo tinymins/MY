@@ -1033,104 +1033,83 @@ end)
 end
 
 do
-local SZ_FORCE_COLOR_FG = 'config/player_force_color.jx3dat'
-local FORCE_COLOR_FG_GLOBAL = LIB.LoadLUAData({SZ_FORCE_COLOR_FG, PATH_TYPE.GLOBAL}) or {}
-local FORCE_COLOR_FG_CUSTOM = {}
-local FORCE_COLOR_FG = setmetatable({}, {
-	__index = function(t, k)
-		return FORCE_COLOR_FG_CUSTOM[k] or FORCE_COLOR_FG_GLOBAL[k] or CONSTANT.FORCE_COLOR_FG_DEFAULT[k]
-	end,
-})
-
-local SZ_FORCE_COLOR_BG = 'config/player_force_color_bg.jx3dat'
-local FORCE_COLOR_BG_GLOBAL = LIB.LoadLUAData({SZ_FORCE_COLOR_BG, PATH_TYPE.GLOBAL}) or {}
-local FORCE_COLOR_BG_CUSTOM = {}
-local FORCE_COLOR_BG = setmetatable({}, {
-	__index = function(t, k)
-		return FORCE_COLOR_BG_CUSTOM[k] or FORCE_COLOR_BG_GLOBAL[k] or CONSTANT.FORCE_COLOR_BG_DEFAULT[k]
-	end,
+local O = LIB.CreateUserSettingsModule('LIB', _L['Common'], {
+	tForceForegroundColor = {
+		ePathType = PATH_TYPE.ROLE,
+		bDataSet = true,
+		szLabel = _L['Force color'],
+		xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+		xDefaultValue = CONSTANT.FORCE_COLOR_FG_DEFAULT['*'],
+		tDataSetDefaultValue = CONSTANT.FORCE_COLOR_FG_DEFAULT,
+	},
+	tForceBackgroundColor = {
+		ePathType = PATH_TYPE.ROLE,
+		bDataSet = true,
+		szLabel = _L['Force color'],
+		xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+		xDefaultValue = CONSTANT.FORCE_COLOR_BG_DEFAULT['*'],
+		tDataSetDefaultValue = CONSTANT.FORCE_COLOR_BG_DEFAULT,
+	},
+	tCampForegroundColor = {
+		ePathType = PATH_TYPE.ROLE,
+		bDataSet = true,
+		szLabel = _L['Camp color'],
+		xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+		xDefaultValue = CONSTANT.CAMP_COLOR_FG_DEFAULT['*'],
+		tDataSetDefaultValue = CONSTANT.CAMP_COLOR_FG_DEFAULT,
+	},
+	tCampBackgroundColor = {
+		ePathType = PATH_TYPE.ROLE,
+		bDataSet = true,
+		szLabel = _L['Camp color'],
+		xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+		xDefaultValue = CONSTANT.CAMP_COLOR_BG_DEFAULT['*'],
+		tDataSetDefaultValue = CONSTANT.CAMP_COLOR_BG_DEFAULT,
+	},
 })
 
 local function initForceCustom()
-	FORCE_COLOR_FG_CUSTOM = LIB.LoadLUAData({SZ_FORCE_COLOR_FG, PATH_TYPE.ROLE}) or {}
-	FORCE_COLOR_BG_CUSTOM = LIB.LoadLUAData({SZ_FORCE_COLOR_BG, PATH_TYPE.ROLE}) or {}
 	FireUIEvent(NSFormatString('{$NS}_FORCE_COLOR_UPDATE'))
 end
 LIB.RegisterInit(initForceCustom)
 
 function LIB.GetForceColor(dwForce, szType)
-	local COLOR = szType == 'background'
-		and FORCE_COLOR_BG
-		or FORCE_COLOR_FG
-	if dwForce == 'all' then
-		return COLOR
+	if szType == 'background' then
+		return unpack(O.tForceBackgroundColor[dwForce])
 	end
-	return unpack(COLOR[dwForce])
+	return unpack(O.tForceForegroundColor[dwForce])
 end
 
 function LIB.SetForceColor(dwForce, szType, tCol)
 	if dwForce == 'reset' then
-		FORCE_COLOR_BG_CUSTOM = {}
-		FORCE_COLOR_FG_CUSTOM = {}
-		LIB.SaveLUAData({SZ_FORCE_COLOR_BG, PATH_TYPE.ROLE}, FORCE_COLOR_BG_CUSTOM)
-		LIB.SaveLUAData({SZ_FORCE_COLOR_FG, PATH_TYPE.ROLE}, FORCE_COLOR_FG_CUSTOM)
+		O('reset', { 'tForceForegroundColor', 'tForceBackgroundColor' })
 	elseif szType == 'background' then
-		FORCE_COLOR_BG_CUSTOM[dwForce] = tCol
-		LIB.SaveLUAData({SZ_FORCE_COLOR_BG, PATH_TYPE.ROLE}, FORCE_COLOR_BG_CUSTOM)
+		O.tForceBackgroundColor[dwForce] = tCol
 	else
-		FORCE_COLOR_FG_CUSTOM[dwForce] = tCol
-		LIB.SaveLUAData({SZ_FORCE_COLOR_FG, PATH_TYPE.ROLE}, FORCE_COLOR_FG_CUSTOM)
+		O.tForceForegroundColor[dwForce] = tCol
 	end
 	FireUIEvent(NSFormatString('{$NS}_FORCE_COLOR_UPDATE'))
 end
 
-local SZ_CAMP_COLOR_FG = 'config/player_camp_color.jx3dat'
-local CAMP_COLOR_FG_GLOBAL = LIB.LoadLUAData({SZ_CAMP_COLOR_FG, PATH_TYPE.GLOBAL}) or {}
-local CAMP_COLOR_FG_CUSTOM = {}
-local CAMP_COLOR_FG = setmetatable({}, {
-	__index = function(t, k)
-		return CAMP_COLOR_FG_CUSTOM[k] or CAMP_COLOR_FG_GLOBAL[k] or CONSTANT.CAMP_COLOR_FG_DEFAULT[k]
-	end,
-})
-
-local SZ_CAMP_COLOR_BG = 'config/player_camp_color_bg.jx3dat'
-local CAMP_COLOR_BG_GLOBAL = LIB.LoadLUAData({SZ_CAMP_COLOR_BG, PATH_TYPE.GLOBAL}) or {}
-local CAMP_COLOR_BG_CUSTOM = {}
-local CAMP_COLOR_BG = setmetatable({}, {
-	__index = function(t, k)
-		return CAMP_COLOR_BG_CUSTOM[k] or CAMP_COLOR_BG_GLOBAL[k] or CONSTANT.CAMP_COLOR_BG_DEFAULT[k]
-	end,
-})
-
 local function initCampCustom()
-	CAMP_COLOR_FG_CUSTOM = LIB.LoadLUAData({SZ_CAMP_COLOR_FG, PATH_TYPE.ROLE}) or {}
-	CAMP_COLOR_BG_CUSTOM = LIB.LoadLUAData({SZ_CAMP_COLOR_BG, PATH_TYPE.ROLE}) or {}
 	FireUIEvent(NSFormatString('{$NS}_FORCE_COLOR_UPDATE'))
 end
 LIB.RegisterInit(initCampCustom)
 
 function LIB.GetCampColor(nCamp, szType)
-	local COLOR = szType == 'background'
-		and CAMP_COLOR_BG
-		or CAMP_COLOR_FG
-	if nCamp == 'all' then
-		return COLOR
+	if szType == 'background' then
+		return unpack(O.tCampBackgroundColor[nCamp])
 	end
-	return unpack(COLOR[nCamp])
+	return unpack(O.tCampForegroundColor[nCamp])
 end
 
 function LIB.SetCampColor(nCamp, szType, tCol)
 	if nCamp == 'reset' then
-		CAMP_COLOR_BG_CUSTOM = {}
-		CAMP_COLOR_FG_CUSTOM = {}
-		LIB.SaveLUAData({SZ_CAMP_COLOR_BG, PATH_TYPE.ROLE}, CAMP_COLOR_BG_CUSTOM)
-		LIB.SaveLUAData({SZ_CAMP_COLOR_FG, PATH_TYPE.ROLE}, CAMP_COLOR_FG_CUSTOM)
+		O('reset', { 'tCampForegroundColor', 'tCampBackgroundColor' })
 	elseif szType == 'background' then
-		CAMP_COLOR_BG_CUSTOM[nCamp] = tCol
-		LIB.SaveLUAData({SZ_CAMP_COLOR_BG, PATH_TYPE.ROLE}, CAMP_COLOR_BG_CUSTOM)
+		O.tCampBackgroundColor[nCamp] = tCol
 	else
-		CAMP_COLOR_FG_CUSTOM[nCamp] = tCol
-		LIB.SaveLUAData({SZ_CAMP_COLOR_FG, PATH_TYPE.ROLE}, CAMP_COLOR_FG_CUSTOM)
+		O.tCampForegroundColor[nCamp] = tCol
 	end
 	FireUIEvent(NSFormatString('{$NS}_CAMP_COLOR_UPDATE'))
 end

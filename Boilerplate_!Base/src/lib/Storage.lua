@@ -525,8 +525,9 @@ end
 --   {any} tOption.xDefaultValue 数据默认值
 --   {schema} tOption.xSchema 数据类型约束对象，通过 Schema 库生成
 --   {boolean} tOption.bDataSet 是否为配置项组（如用户多套自定义偏好），配置项组在读写时需要额外传入一个组下配置项唯一键值（即多套自定义偏好中某一项的名字）
+--   {table} tOption.tDataSetDefaultValue 数据默认值（仅当 bDataSet 为真时生效，用于设置配置项组不同默认值）
 function LIB.RegisterUserSettings(szKey, tOption)
-	local ePathType, szDataKey, szGroup, szLabel, szVersion, xDefaultValue, xSchema, bDataSet
+	local ePathType, szDataKey, szGroup, szLabel, szVersion, xDefaultValue, xSchema, bDataSet, tDataSetDefaultValue
 	if IsTable(tOption) then
 		ePathType = tOption.ePathType
 		szDataKey = tOption.szDataKey
@@ -536,6 +537,7 @@ function LIB.RegisterUserSettings(szKey, tOption)
 		xDefaultValue = tOption.xDefaultValue
 		xSchema = tOption.xSchema
 		bDataSet = tOption.bDataSet
+		tDataSetDefaultValue = tOption.tDataSetDefaultValue
 	end
 	if not ePathType then
 		ePathType = PATH_TYPE.ROLE
@@ -561,6 +563,19 @@ function LIB.RegisterUserSettings(szKey, tOption)
 			end
 			assert(false, szErrHeader .. '`DefaultValue` cannot pass `Schema` check.' .. '\n' .. concat(aErrmsgs, '\n'))
 		end
+		if bDataSet then
+			tDataSetDefaultValue = IsTable(tDataSetDefaultValue)
+				and Clone(tDataSetDefaultValue)
+				or {}
+			local errs = Schema.CheckSchema(tDataSetDefaultValue, Schema.Map(Schema.Any, xSchema))
+			if errs then
+				local aErrmsgs = {}
+				for i, err in ipairs(errs) do
+					insert(aErrmsgs, '  ' .. i .. '. ' .. err.message)
+				end
+				assert(false, szErrHeader .. '`DataSetDefaultValue` cannot pass `Schema` check.' .. '\n' .. concat(aErrmsgs, '\n'))
+			end
+		end
 	end
 	local tInfo = {
 		szKey = szKey,
@@ -572,6 +587,7 @@ function LIB.RegisterUserSettings(szKey, tOption)
 		xDefaultValue = xDefaultValue,
 		xSchema = xSchema,
 		bDataSet = bDataSet,
+		tDataSetDefaultValue = tDataSetDefaultValue,
 	}
 	USER_SETTINGS_INFO[szKey] = tInfo
 	insert(USER_SETTINGS_LIST, tInfo)
@@ -636,10 +652,14 @@ function LIB.GetUserSettings(szKey, ...)
 				data = nil
 			end
 		end
-		if info.xSchema then
-			return LIB.SchemaGet(data, info.xSchema, info.xDefaultValue)
+		if not info.xSchema or not Schema.CheckSchema(data, info.xSchema) then
+			return data
 		end
-		return data
+	end
+	if info.bDataSet then
+		if not IsNil(info.tDataSetDefaultValue[szDataSetKey]) then
+			return Clone(info.tDataSetDefaultValue[szDataSetKey])
+		end
 	end
 	return Clone(info.xDefaultValue)
 end
@@ -752,7 +772,8 @@ function LIB.CreateUserSettingsProxy(xProxy)
 	return setmetatable({}, {
 		__index = function(_, k)
 			if not tLoaded[k] then
-				local info = USER_SETTINGS_INFO[k]
+				local szGlobalKey = GetGlobalKey(k)
+				local info = USER_SETTINGS_INFO[szGlobalKey]
 				if info and info.bDataSet then
 					-- 配置项组，初始化读写模块
 					local tDSSettings = {}
@@ -760,13 +781,13 @@ function LIB.CreateUserSettingsProxy(xProxy)
 					tDataSet[k] = setmetatable({}, {
 						__index = function(_, kds)
 							if not tDSLoaded[kds] then
-								tDSSettings[kds] = LIB.GetUserSettings(GetGlobalKey(k), kds)
+								tDSSettings[kds] = LIB.GetUserSettings(szGlobalKey, kds)
 								tDSLoaded[kds] = true
 							end
 							return tDSSettings[kds]
 						end,
 						__newindex = function(_, kds, vds)
-							if not LIB.SetUserSettings(GetGlobalKey(k), kds, vds) then
+							if not LIB.SetUserSettings(szGlobalKey, kds, vds) then
 								return
 							end
 							tDSSettings[kds] = vds
@@ -775,7 +796,7 @@ function LIB.CreateUserSettingsProxy(xProxy)
 					})
 				else
 					-- 普通数据，加载数据内容
-					tSettings[k] = LIB.GetUserSettings(GetGlobalKey(k))
+					tSettings[k] = LIB.GetUserSettings(szGlobalKey)
 				end
 				tLoaded[k] = true
 			end
