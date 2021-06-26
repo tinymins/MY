@@ -157,7 +157,7 @@ local FORCE_BAR_CSS = LIB.LoadLUAData({'config/recount/barcss.jx3dat', PATH_TYPE
 		{CONSTANT.FORCE_TYPE.PENG_LAI , { image = 'ui/Image/Common/Money.UITex', frame = 42  }}, -- 蓬莱
 	}),
 }
-insert(FORCE_BAR_CSS, {}) -- GLOBAL
+insert(FORCE_BAR_CSS, { [-1] = { r = 255, g = 255, b = 255 } }) -- GLOBAL
 
 local O = LIB.CreateUserSettingsModule('MY_Recount_UI', _L['MY_Recount'], {
 	nCss = { -- 当前样式表
@@ -243,7 +243,7 @@ local D = {}
 
 -- 根据基础库的门派配色创建配色方案
 do
-local function CalcGlobalCss()
+local function onForceColorUpdate()
 	local tCss = FORCE_BAR_CSS[1]
 	for _, dwForceID in pairs_c(CONSTANT.FORCE_TYPE) do
 		local r, g, b = LIB.GetForceColor(dwForceID, 'background')
@@ -251,11 +251,6 @@ local function CalcGlobalCss()
 	end
 	local r, g, b = LIB.GetForceColor(-1, 'background')
 	tCss[-1] = { r = r, g = g, b = b, a = 255 }
-end
-CalcGlobalCss()
-
-local function onForceColorUpdate()
-	CalcGlobalCss()
 	FireUIEvent('MY_RECOUNT_CSS_UPDATE')
 end
 LIB.RegisterEvent('MY_FORCE_COLOR_UPDATE', onForceColorUpdate)
