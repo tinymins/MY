@@ -195,23 +195,23 @@ end
 -- ¼àÌýÓÎÏ·ÊÂ¼þ
 ---------------------------------------------------------------------------------------------
 do
-local GLBAL_EVENT = { szName = 'Event' }
+local GLOBAL_EVENT = { szName = 'Event' }
 local CommonEventFirer = LIB.CommonEventFirer
 local CommonEventRegister = LIB.CommonEventRegister
 local function EventHandler(szEvent, ...)
-	CommonEventFirer(GLBAL_EVENT, szEvent, ...)
+	CommonEventFirer(GLOBAL_EVENT, szEvent, ...)
 end
-function GLBAL_EVENT.OnCreateEvent(szEvent)
+function GLOBAL_EVENT.OnCreateEvent(szEvent)
 	RegisterEvent(szEvent, EventHandler)
 end
-function GLBAL_EVENT.OnRemoveEvent(szEvent)
+function GLOBAL_EVENT.OnRemoveEvent(szEvent)
 	if not szEvent then
 		return
 	end
 	UnRegisterEvent(szEvent, EventHandler)
 end
 function LIB.RegisterEvent(szEvent, fnAction)
-	return CommonEventRegister(GLBAL_EVENT, szEvent, fnAction)
+	return CommonEventRegister(GLOBAL_EVENT, szEvent, fnAction)
 end
 end
 
