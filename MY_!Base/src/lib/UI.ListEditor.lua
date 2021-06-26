@@ -81,7 +81,7 @@ function UI.OpenListEditor(szFrameName, tTextList, OnAdd, OnDel)
 	local ui = UI.CreateFrame(szFrameName)
 	ui:Append('Image', { x = -10, y = 25, w = 360, h = 10, image = 'UI/Image/UICommon/Commonpanel.UITex', imageframe = 42 })
 	local muEditBox = ui:Append('WndEditBox', { x = 0, y = 0, w = 170, h = 25 })
-	local muList = ui:Append('WndScrollBox', { handlestyle = 3, x = 0, y = 30, w = 340, h = 380 })
+	local muList = ui:Append('WndScrollHandleBox', { handlestyle = 3, x = 0, y = 30, w = 340, h = 380 })
 	-- add
 	ui:Append('WndButton', {
 		x = 180, y = 0, w = 80, text = _L['Add'],

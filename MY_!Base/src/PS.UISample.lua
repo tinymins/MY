@@ -65,7 +65,8 @@ local COMPONENT_SAMPLE = {
 	{'WndEditComboBox', 'WndEditComboBox', { w = 200, h = COMPONENT_H, font = 162, text = 'WndEditComboBox' }},
 	-- WndListBox
 	{'WndRadioBox', 'WndRadioBox', { w = 'auto', h = COMPONENT_H, font = 162, text = 'WndRadioBox' }},
-	-- WndScrollBox
+	-- WndScrollHandleBox
+	-- WndScrollWindowBox
 	{'WndTrackbar', 'WndTrackbar', { w = 200, h = COMPONENT_H, font = 162, text = 'WndTrackbar' }},
 	{'WndTrackbar Sized', 'WndTrackbar', { w = 600, h = COMPONENT_H, rw = 400, font = 162, text = 'WndTrackbar' }},
 	-- WndWebCef

@@ -87,6 +87,13 @@ UI.EDIT_TYPE = LIB.SetmetaReadonly({
 	ASCII = 1, -- 英文
 	WIDE_CHAR = 2, -- 中英文
 })
+UI.WND_CONTAINER_STYLE = _G.WND_CONTAINER_STYLE or LIB.SetmetaReadonly({
+	CUSTOM = 0,
+	LEFT_TOP = 1,
+	LEFT_BOTTOM = 2,
+	RIGHT_TOP = 3,
+	RIGHT_BOTTOM = 4,
+})
 UI.LAYER_LIST = {'Lowest', 'Lowest1', 'Lowest2', 'Normal', 'Normal1', 'Normal2', 'Topmost', 'Topmost1', 'Topmost2'}
 
 local BUTTON_STYLE_CONFIG = {
@@ -184,6 +191,7 @@ local function ApplyUIArguments(ui, arg)
 		if arg.limit              ~= nil then ui:Limit          (arg.limit      ) end
 		if arg.scroll             ~= nil then ui:Scroll         (arg.scroll     ) end
 		if arg.handlestyle        ~= nil then ui:HandleStyle    (arg.handlestyle) end
+		if arg.containertype      ~= nil then ui:ContainerType(arg.containertype) end
 		if arg.buttonstyle        ~= nil then ui:ButtonStyle    (arg.buttonstyle) end -- must before :Size()
 		if arg.edittype           ~= nil then ui:EditType       (arg.edittype   ) end
 		if arg.visible            ~= nil then ui:Visible        (arg.visible    ) end
@@ -303,11 +311,13 @@ local function GetComponentElement(raw, elementType)
 			element = raw:Lookup('Wnd_Total') or raw
 		elseif componentType == 'WndButtonBox' then
 			element = raw:Lookup('WndButton')
+		elseif componentType == 'WndScrollWindowBox' then
+			element = raw:Lookup('WndContainer_Scroll')
 		elseif componentBaseType == 'Wnd' then
 			element = raw
 		end
 	elseif elementType == 'MAIN_HANDLE' then -- 获取用于主要 Item 类功能区、子元素容器UI实例
-		if componentType == 'WndScrollBox' then
+		if componentType == 'WndScrollHandleBox' then
 			element = raw:Lookup('', 'Handle_Padding/Handle_Scroll')
 		elseif componentType == 'Handle' or componentType == 'CheckBox' or componentType == 'ColorBox' then
 			element = raw
@@ -324,6 +334,12 @@ local function GetComponentElement(raw, elementType)
 	elseif elementType == 'COMBOBOX' then -- 获取下拉框UI实例
 		if componentType == 'WndComboBox' or componentType == 'WndEditComboBox' or componentType == 'WndAutocomplete' then
 			element = raw:Lookup('Btn_ComboBox')
+		end
+	elseif elementType == 'CONTAINER' then -- 获取子元素容器UI实例
+		if componentType == 'WndScrollWindowBox' then
+			element = raw:Lookup('WndContainer_Scroll')
+		elseif componentType == 'WndContainer' then
+			element = raw
 		end
 	elseif elementType == 'EDIT' then -- 获取输入框UI实例
 		if componentType == 'WndEdit' then
@@ -358,7 +374,7 @@ local function GetComponentElement(raw, elementType)
 			element = raw:Lookup('WndNewScrollBar_Default')
 		end
 	elseif elementType == 'TEXT' then -- 获取文本UI实例
-		if componentType == 'WndScrollBox' then
+		if componentType == 'WndScrollHandleBox' then
 			element = raw:Lookup('', 'Handle_Padding/Handle_Scroll/Text_Default')
 		elseif componentType == 'WndFrame' then
 			element = raw:Lookup('', 'Text_Title') or raw:Lookup('', 'Text_Default')
@@ -383,7 +399,7 @@ local function GetComponentElement(raw, elementType)
 		end
 	elseif elementType == 'IMAGE' then -- 获取图片UI实例
 		if componentType == 'WndEditBox' or componentType == 'WndComboBox' or componentType == 'WndEditComboBox'
-		or componentType == 'WndAutocomplete' or componentType == 'WndScrollBox' then
+		or componentType == 'WndAutocomplete' or componentType == 'WndScrollHandleBox' or componentType == 'WndScrollWindowBox' then
 			element = raw:Lookup('', 'Image_Default')
 		elseif componentType == 'Handle' or componentType == 'CheckBox' then
 			element = raw:Lookup('Image_Default')
@@ -410,6 +426,10 @@ local function GetComponentElement(raw, elementType)
 			element = raw:Lookup('Image_Default')
 		elseif componentType == 'ColorBox' then
 			element = raw:Lookup('Shadow_Default')
+		elseif componentType == 'WndScrollHandleBox' then
+			element = GetComponentElement(raw, 'MAIN_HANDLE')
+		elseif componentType == 'WndScrollWindowBox' then
+			element = GetComponentElement(raw, 'CONTAINER')
 		end
 	end
 	return element
@@ -1319,22 +1339,33 @@ function OO:Append(arg0, arg1)
 				return LIB.Debug(NSFormatString('{$NS}#UI#Append'), _L('Unable to open ini file [%s]', szFile), DEBUG_LEVEL.ERROR)
 			end
 			_nTempWndCount = _nTempWndCount + 1
-			local raw = frame:Lookup(szComponent)
-			if parentWnd and raw then -- KWndWindow
-				InitComponent(raw, szType)
-				raw:ChangeRelation(parentWnd, true, true)
-			elseif parentHandle then
-				raw = parentHandle:AppendItemFromIni(szFile, szComponent)
-				if raw then -- KItemNull
-					InitComponent(raw, szType)
-					parentHandle:FormatAllItemPos()
-				else
-					LIB.Debug(NSFormatString('{$NS}#UI#Append'), _L('Can not find wnd or item component [%s:%s]', szFile, szComponent), DEBUG_LEVEL.ERROR)
+			-- start ui append
+			raw = nil
+			if szComponent:sub(1, 3) == 'Wnd' then
+				if parentWnd then -- KWndWindow
+					raw = frame:Lookup(szComponent)
+					if raw then
+						InitComponent(raw, szType)
+						raw:ChangeRelation(parentWnd, true, true)
+						if parentWnd:GetType() == 'WndContainer' then
+							parentWnd:FormatAllContentPos()
+						end
+					end
+				end
+			else
+				if parentHandle then
+					raw = parentHandle:AppendItemFromIni(szFile, szComponent)
+					if raw then -- KItemNull
+						InitComponent(raw, szType)
+						parentHandle:FormatAllItemPos()
+					end
 				end
 			end
 			if raw then
 				ui = ui:Add(raw)
 				UI(raw):Hover(OnCommonComponentMouseEnter, OnCommonComponentMouseLeave):Change(OnCommonComponentMouseEnter)
+			else
+				LIB.Debug(NSFormatString('{$NS}#UI#Append'), _L('Can not find wnd or item component [%s:%s]', szFile, szComponent), DEBUG_LEVEL.ERROR)
 			end
 			Wnd.CloseWindow(frame)
 		end
@@ -1628,7 +1659,7 @@ function OO:Text(arg0, arg1)
 				if not IsString(arg0) then
 					arg0 = tostring(arg0)
 				end
-				if componentType == 'WndScrollBox' then
+				if componentType == 'WndScrollHandleBox' then
 					element = GetComponentElement(raw, 'MAIN_HANDLE')
 					element:Clear()
 					element:AppendItemFromString(GetFormatText(arg0))
@@ -2942,13 +2973,21 @@ local function SetComponentSize(raw, nOuterWidth, nOuterHeight, nInnerWidth, nIn
 			hItem:FormatAllItemPos()
 		end
 		hList:FormatAllItemPos()
-	elseif componentType == 'WndScrollBox' then
+	elseif componentType == 'WndScrollHandleBox' then
 		raw:SetSize(nWidth, nHeight)
 		raw:Lookup('', ''):SetSize(nWidth, nHeight)
 		raw:Lookup('', 'Image_Default'):SetSize(nWidth, nHeight)
 		raw:Lookup('', 'Handle_Padding'):SetSize(nWidth - 30, nHeight - 20)
 		raw:Lookup('', 'Handle_Padding/Handle_Scroll'):SetSize(nWidth - 30, nHeight - 20)
 		raw:Lookup('', 'Handle_Padding/Handle_Scroll'):FormatAllItemPos()
+		raw:Lookup('WndScrollBar'):SetRelX(nWidth - 20)
+		raw:Lookup('WndScrollBar'):SetH(nHeight - 20)
+	elseif componentType == 'WndScrollWindowBox' then
+		raw:SetSize(nWidth, nHeight)
+		raw:Lookup('', ''):SetSize(nWidth, nHeight)
+		raw:Lookup('', 'Image_Default'):SetSize(nWidth, nHeight)
+		raw:Lookup('WndContainer_Scroll'):SetSize(nWidth - 30, nHeight - 20)
+		raw:Lookup('WndContainer_Scroll'):FormatAllContentPos()
 		raw:Lookup('WndScrollBar'):SetRelX(nWidth - 20)
 		raw:Lookup('WndScrollBar'):SetH(nHeight - 20)
 	elseif componentType == 'WndTrackbar' then
@@ -3510,7 +3549,8 @@ function OO:ContainerType(dwType)
 	self:_checksum()
 	if dwType then
 		for _, raw in ipairs(self.raws) do
-			if GetComponentType(raw) == 'WndContainer' then
+			raw = GetComponentElement(raw, 'CONTAINER')
+			if raw then
 				raw:SetContainerType(dwType)
 			end
 		end
@@ -3972,7 +4012,7 @@ function OO:Click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 					end
 					LIB.ExecuteWithThis(raw, fnLClick, UI.MOUSE_EVENT.LBUTTON)
 				end
-				if GetComponentType(raw) == 'WndScrollBox' then
+				if GetComponentType(raw) == 'WndScrollHandleBox' then
 					UI(GetComponentElement(raw, 'MAIN_HANDLE')):UIEvent('OnItemLButtonClick', fnAction)
 				else
 					local cmb = GetComponentElement(raw, 'COMBOBOX')
@@ -4002,7 +4042,7 @@ function OO:Click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 					end
 					LIB.ExecuteWithThis(raw, fnRClick, UI.MOUSE_EVENT.RBUTTON)
 				end
-				if GetComponentType(raw) == 'WndScrollBox' then
+				if GetComponentType(raw) == 'WndScrollHandleBox' then
 					UI(GetComponentElement(raw, 'MAIN_HANDLE')):UIEvent('OnItemRButtonClick', fnAction)
 				else
 					local cmb = GetComponentElement(raw, 'COMBOBOX')
@@ -4200,7 +4240,11 @@ function OO:Check(fnCheck, fnUncheck, bNoAutoBind)
 		for _, raw in ipairs(self.raws) do
 			local chk = GetComponentElement(raw, 'CHECKBOX')
 			if chk then
-				chk:Check(fnCheck)
+				if fnUncheck then
+					chk:Check(fnCheck, fnUncheck)
+				else
+					chk:Check(fnCheck)
+				end
 			end
 		end
 		return self

@@ -1059,14 +1059,6 @@ local CONSTANT = setmetatable({}, {
 			CAN_NOT_FIND_PLAYER = 3,
 			TOO_FAR             = 4,
 		}),
-		WND_CONTAINER_STYLE = _G.WND_CONTAINER_STYLE or SetmetaReadonly({
-			CUSTOM       = 0,
-			LEFT_TOP     = 1,
-			LEFT_BOTTOM  = 2,
-			RIGHT_TOP    = 3,
-			RIGHT_BOTTOM = 4,
-			END          = 5,
-		}),
 		MIC_STATE = MIC_STATE or SetmetaReadonly({
 			NOT_AVIAL = 1,
 			CLOSE_NOT_IN_ROOM = 2,
