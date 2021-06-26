@@ -624,14 +624,13 @@ local settings = {
 	name = 'MY_RoleStatistics_BagStat',
 	exports = {
 		{
+			preset = 'UIEvent',
 			fields = {
-				OnInitPage = D.OnInitPage,
+				'OnInitPage',
 				szSaveDB = 'MY_RoleStatistics_BagStat.bSaveDB',
+				szFloatEntry = false,
 			},
-		},
-		{
 			root = D,
-			preset = 'UIEvent'
 		},
 	},
 }

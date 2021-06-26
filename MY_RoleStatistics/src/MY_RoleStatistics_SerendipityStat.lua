@@ -1416,15 +1416,13 @@ local settings = {
 	name = 'MY_RoleStatistics_SerendipityStat',
 	exports = {
 		{
+			preset = 'UIEvent',
 			fields = {
-				OnInitPage = D.OnInitPage,
-				szFloatEntry = 'MY_RoleStatistics_SerendipityStat.bFloatEntry',
+				'OnInitPage',
 				szSaveDB = 'MY_RoleStatistics_SerendipityStat.bSaveDB',
+				szFloatEntry = 'MY_RoleStatistics_SerendipityStat.bFloatEntry',
 			},
-		},
-		{
 			root = D,
-			preset = 'UIEvent'
 		},
 	},
 }

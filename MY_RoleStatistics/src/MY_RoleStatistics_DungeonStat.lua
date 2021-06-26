@@ -1011,15 +1011,13 @@ local settings = {
 	name = 'MY_RoleStatistics_DungeonStat',
 	exports = {
 		{
+			preset = 'UIEvent',
 			fields = {
-				OnInitPage = D.OnInitPage,
-				szFloatEntry = 'MY_RoleStatistics_DungeonStat.bFloatEntry',
+				'OnInitPage',
 				szSaveDB = 'MY_RoleStatistics_DungeonStat.bSaveDB',
+				szFloatEntry = 'MY_RoleStatistics_DungeonStat.bFloatEntry',
 			},
-		},
-		{
 			root = D,
-			preset = 'UIEvent'
 		},
 	},
 }

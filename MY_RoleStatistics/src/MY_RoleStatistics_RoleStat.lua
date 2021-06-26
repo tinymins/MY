@@ -1410,15 +1410,13 @@ local settings = {
 	name = 'MY_RoleStatistics_RoleStat',
 	exports = {
 		{
+			preset = 'UIEvent',
 			fields = {
-				OnInitPage = D.OnInitPage,
-				szFloatEntry = 'MY_RoleStatistics_RoleStat.bFloatEntry',
+				'OnInitPage',
 				szSaveDB = 'MY_RoleStatistics_RoleStat.bSaveDB',
+				szFloatEntry = 'MY_RoleStatistics_RoleStat.bFloatEntry',
 			},
-		},
-		{
 			root = D,
-			preset = 'UIEvent'
 		},
 	},
 }
