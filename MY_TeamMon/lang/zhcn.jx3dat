@@ -13,7 +13,7 @@ return {
 	['MY_TeamMon_PBL'] = '团队重要气劲列表',
 	['Mouse enter select'] = '鼠标滑过选中目标',
 	-- MY_TeamMon_LT.lua --
-	['MY_TeamMon_LT'] = '特大文字',
+	['MY_TeamMon_LT'] = '其它',
 	['Font scale'] = '字体缩放',
 	['Pause time'] = '停留时间',
 	['FadeIn time'] = '淡入时间',

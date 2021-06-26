@@ -223,7 +223,7 @@ end
 LIB.RegisterEvent('LOADING_END', onLoadingEnd)
 end
 
-local O = LIB.CreateUserSettingsModule('MY_LifeBar', _L['MY_LifeBar'], {
+local O = LIB.CreateUserSettingsModule('MY_LifeBar', _L['General'], {
 	bEnabled = {
 		ePathType = PATH_TYPE.ROLE,
 		szLabel = _L['MY_LifeBar'],

@@ -58,7 +58,7 @@ local SCREENSHOT_MODE = {
     SHOW_UI = 1,
     HIDE_UI = 2,
 }
-local OR = LIB.CreateUserSettingsModule('MY_ScreenShot', _L['MY_ScreenShot'], {
+local OR = LIB.CreateUserSettingsModule('MY_ScreenShot', _L['General'], {
     bUseGlobalConfig = {
 		ePathType = PATH_TYPE.ROLE,
 		szLabel = _L['MY_ScreenShot'],

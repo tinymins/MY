@@ -85,10 +85,10 @@ DB:Execute('CREATE INDEX IF NOT EXISTS ItemInfo_name_idx ON ItemInfo(name)')
 DB:Execute('CREATE INDEX IF NOT EXISTS ItemInfo_desc_idx ON ItemInfo(desc)')
 local DB_ItemInfoW = DB:Prepare('REPLACE INTO ItemInfo (tabtype, tabindex, tabsubindex, name, desc) VALUES (?, ?, ?, ?, ?)')
 
-local O = LIB.CreateUserSettingsModule('MY_RoleStatistics_BagStat', _L['MY_RoleStatistics'], {
+local O = LIB.CreateUserSettingsModule('MY_RoleStatistics_BagStat', _L['General'], {
 	bCompactMode = {
 		ePathType = PATH_TYPE.GLOBAL,
-		szLabel = _L['MY_RoleStatistics_BagStat'],
+		szLabel = _L['MY_RoleStatistics'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
@@ -99,13 +99,13 @@ local O = LIB.CreateUserSettingsModule('MY_RoleStatistics_BagStat', _L['MY_RoleS
 	},
 	bSaveDB = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_RoleStatistics_BagStat'],
+		szLabel = _L['MY_RoleStatistics'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAdviceSaveDB = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_RoleStatistics_BagStat'],
+		szLabel = _L['MY_RoleStatistics'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},

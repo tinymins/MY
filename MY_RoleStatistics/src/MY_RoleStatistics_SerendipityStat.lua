@@ -98,10 +98,10 @@ local InfoR = DB:Prepare('SELECT * FROM Info WHERE account LIKE ? OR name LIKE ?
 local InfoD = DB:Prepare('DELETE FROM Info WHERE guid = ?')
 local MINI_MAP_POINT_MAX_DISTANCE = pow(300, 2)
 
-local O = LIB.CreateUserSettingsModule('MY_RoleStatistics_SerendipityStat', _L['MY_RoleStatistics'], {
+local O = LIB.CreateUserSettingsModule('MY_RoleStatistics_SerendipityStat', _L['General'], {
 	aColumn = {
 		ePathType = PATH_TYPE.GLOBAL,
-		szLabel = _L['MY_RoleStatistics_SerendipityStat'],
+		szLabel = _L['MY_RoleStatistics'],
 		xSchema = Schema.Collection(Schema.OneOf(Schema.String, Schema.Number)),
 		xDefaultValue = {
 			'name',
@@ -112,19 +112,19 @@ local O = LIB.CreateUserSettingsModule('MY_RoleStatistics_SerendipityStat', _L['
 	},
 	szSort = {
 		ePathType = PATH_TYPE.GLOBAL,
-		szLabel = _L['MY_RoleStatistics_SerendipityStat'],
+		szLabel = _L['MY_RoleStatistics'],
 		xSchema = Schema.String,
 		xDefaultValue = 'time_days',
 	},
 	szSortOrder = {
 		ePathType = PATH_TYPE.GLOBAL,
-		szLabel = _L['MY_RoleStatistics_SerendipityStat'],
+		szLabel = _L['MY_RoleStatistics'],
 		xSchema = Schema.String,
 		xDefaultValue = 'desc',
 	},
 	bFloatEntry = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_RoleStatistics_SerendipityStat'],
+		szLabel = _L['MY_RoleStatistics'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
@@ -135,31 +135,31 @@ local O = LIB.CreateUserSettingsModule('MY_RoleStatistics_SerendipityStat', _L['
 	},
 	bSaveDB = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_RoleStatistics_SerendipityStat'],
+		szLabel = _L['MY_RoleStatistics'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAdviceSaveDB = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_RoleStatistics_SerendipityStat'],
+		szLabel = _L['MY_RoleStatistics'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bMapMark = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_RoleStatistics_SerendipityStat'],
+		szLabel = _L['MY_RoleStatistics'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bMapMarkHideAcquired = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_RoleStatistics_SerendipityStat'],
+		szLabel = _L['MY_RoleStatistics'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bTipHideFinished = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_RoleStatistics_SerendipityStat'],
+		szLabel = _L['MY_RoleStatistics'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},

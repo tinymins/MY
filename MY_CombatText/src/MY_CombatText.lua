@@ -214,7 +214,7 @@ local COMBAT_TEXT_CACHE  = { -- buffµÄÃû×Öcache
 }
 local CombatText = {}
 
-local O = LIB.CreateUserSettingsModule('MY_CombatText', _L['MY_CombatText'], {
+local O = LIB.CreateUserSettingsModule('MY_CombatText', _L['General'], {
 	bEnable = {
 		ePathType = PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],

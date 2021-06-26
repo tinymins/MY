@@ -59,7 +59,7 @@ end
 ---------------------------------------------------------------
 LIB.CreateDataRoot(PATH_TYPE.SERVER)
 
-local O = LIB.CreateUserSettingsModule('MY_Farbnamen', _L['MY_Farbnamen'], {
+local O = LIB.CreateUserSettingsModule('MY_Farbnamen', _L['General'], {
 	bEnable = {
 		ePathType = PATH_TYPE.ROLE,
 		szLabel = _L['MY_Farbnamen'],

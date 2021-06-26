@@ -60,7 +60,7 @@ return {
     ['Display %d skills.'] = '显示%d格。',
 
     -- MY_ShenxingHelper
-    ['MY_ShenxingHelper'] = '神行千里保护',
+    ['MY_ShenxingHelper'] = '神行保护',
     ['Avoid blacking shenxing cd'] = '防止开阵导致神行千里失败',
     ['Got zhenyan wen shenxing, your shengxing will be blacked.'] = '在神行千里运功过程中获得阵眼，神行会进入调息状态但角色仍然会停留在原地。',
     ['Shenxing has been cancelled, cause you got the zhenyan.'] = '您获取到阵眼，为防止神行千里CD被黑，读条已自动打断。',
@@ -415,11 +415,11 @@ return {
     ['Dynamic item %d'] = '动态物品栏 %s',
     ['Only item can be draged in'] = '动态物品栏只能放入物品',
 
-    ['MY_AutoMemorizeBook'] = '自动阅读',
+    ['MY_AutoMemorizeBook'] = '其它',
     ['Press SHIFT for temporary disable'] = '打开界面时按住SHIFT键可临时禁用',
     ['Auto memorize book has been disabled due to SHIFT key pressed.'] = '你按住了Shift键，自动阅读被禁用。',
 
-    ['MY_FriendTipLocation'] = '好友位置',
+    ['MY_FriendTipLocation'] = '其它',
     ['Show all friend tip location'] = '社交界面显示双向二重好感度好友所在地',
     ['(Different camp)'] = '（对立阵营）',
 

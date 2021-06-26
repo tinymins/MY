@@ -158,7 +158,7 @@ m_tRecords = {
 	}, ...
 }
 ]]
-local O = LIB.CreateUserSettingsModule('MY_RollMonitor', _L['MY_RollMonitor'], {
+local O = LIB.CreateUserSettingsModule('MY_RollMonitor', _L['General'], {
 	nSortType = {
 		ePathType = PATH_TYPE.ROLE,
 		szLabel = _L['MY_RollMonitor'],

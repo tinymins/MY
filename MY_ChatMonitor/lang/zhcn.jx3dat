@@ -1,5 +1,6 @@
 return {
     -- MY_ChatMonitor.lua
+    ['MY_Chat'] = '聊天助手',
     ['MY_ChatMonitor'] = '聊天监控',
     ['Enable'] = '启用',
     ['Edit'] = '编辑',

@@ -74,10 +74,10 @@ local DB_RoleInfoG = DB:Prepare('SELECT * FROM RoleInfo WHERE guid = ?')
 local DB_RoleInfoR = DB:Prepare('SELECT * FROM RoleInfo WHERE account LIKE ? OR name LIKE ? OR region LIKE ? OR server LIKE ? ORDER BY time DESC')
 local DB_RoleInfoD = DB:Prepare('DELETE FROM RoleInfo WHERE guid = ?')
 
-local O = LIB.CreateUserSettingsModule('MY_RoleStatistics_RoleStat', _L['MY_RoleStatistics'], {
+local O = LIB.CreateUserSettingsModule('MY_RoleStatistics_RoleStat', _L['General'], {
 	aColumn = {
 		ePathType = PATH_TYPE.GLOBAL,
-		szLabel = _L['MY_RoleStatistics_RoleStat'],
+		szLabel = _L['MY_RoleStatistics'],
 		xSchema = Schema.Collection(Schema.String),
 		xDefaultValue = {
 			'name',
@@ -95,19 +95,19 @@ local O = LIB.CreateUserSettingsModule('MY_RoleStatistics_RoleStat', _L['MY_Role
 	},
 	szSort = {
 		ePathType = PATH_TYPE.GLOBAL,
-		szLabel = _L['MY_RoleStatistics_RoleStat'],
+		szLabel = _L['MY_RoleStatistics'],
 		xSchema = Schema.String,
 		xDefaultValue = 'time_days',
 	},
 	szSortOrder = {
 		ePathType = PATH_TYPE.GLOBAL,
-		szLabel = _L['MY_RoleStatistics_RoleStat'],
+		szLabel = _L['MY_RoleStatistics'],
 		xSchema = Schema.String,
 		xDefaultValue = 'desc',
 	},
 	aAlertColumn = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_RoleStatistics_RoleStat'],
+		szLabel = _L['MY_RoleStatistics'],
 		xSchema = Schema.Collection(Schema.String),
 		xDefaultValue = {
 			'money',
@@ -134,7 +134,7 @@ local O = LIB.CreateUserSettingsModule('MY_RoleStatistics_RoleStat', _L['MY_Role
 	},
 	bFloatEntry = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_RoleStatistics_RoleStat'],
+		szLabel = _L['MY_RoleStatistics'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
@@ -145,13 +145,13 @@ local O = LIB.CreateUserSettingsModule('MY_RoleStatistics_RoleStat', _L['MY_Role
 	},
 	bSaveDB = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_RoleStatistics_RoleStat'],
+		szLabel = _L['MY_RoleStatistics'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAdviceSaveDB = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_RoleStatistics_RoleStat'],
+		szLabel = _L['MY_RoleStatistics'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},

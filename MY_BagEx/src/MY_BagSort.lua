@@ -55,10 +55,10 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
-local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['MY_BagEx'], {
+local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 	bGuildBank = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['Guild package sort and stack settings'],
+		szLabel = _L['MY_Toolbox'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = true,
 	},

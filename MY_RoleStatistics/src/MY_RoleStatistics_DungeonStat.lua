@@ -69,10 +69,10 @@ local DB_DungeonInfoG = DB:Prepare('SELECT * FROM DungeonInfo WHERE guid = ?')
 local DB_DungeonInfoR = DB:Prepare('SELECT * FROM DungeonInfo WHERE account LIKE ? OR name LIKE ? OR region LIKE ? OR server LIKE ? ORDER BY time DESC')
 local DB_DungeonInfoD = DB:Prepare('DELETE FROM DungeonInfo WHERE guid = ?')
 
-local O = LIB.CreateUserSettingsModule('MY_RoleStatistics_DungeonStat', _L['MY_RoleStatistics'], {
+local O = LIB.CreateUserSettingsModule('MY_RoleStatistics_DungeonStat', _L['General'], {
 	aColumn = {
 		ePathType = PATH_TYPE.GLOBAL,
-		szLabel = _L['MY_RoleStatistics_DungeonStat'],
+		szLabel = _L['MY_RoleStatistics'],
 		xSchema = Schema.Collection(Schema.String),
 		xDefaultValue = {
 			'name',
@@ -86,19 +86,19 @@ local O = LIB.CreateUserSettingsModule('MY_RoleStatistics_DungeonStat', _L['MY_R
 	},
 	szSort = {
 		ePathType = PATH_TYPE.GLOBAL,
-		szLabel = _L['MY_RoleStatistics_DungeonStat'],
+		szLabel = _L['MY_RoleStatistics'],
 		xSchema = Schema.String,
 		xDefaultValue = 'time_days',
 	},
 	szSortOrder = {
 		ePathType = PATH_TYPE.GLOBAL,
-		szLabel = _L['MY_RoleStatistics_DungeonStat'],
+		szLabel = _L['MY_RoleStatistics'],
 		xSchema = Schema.String,
 		xDefaultValue = 'desc',
 	},
 	bFloatEntry = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_RoleStatistics_DungeonStat'],
+		szLabel = _L['MY_RoleStatistics'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
@@ -109,13 +109,13 @@ local O = LIB.CreateUserSettingsModule('MY_RoleStatistics_DungeonStat', _L['MY_R
 	},
 	bSaveDB = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_RoleStatistics_DungeonStat'],
+		szLabel = _L['MY_RoleStatistics'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAdviceSaveDB = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_RoleStatistics_DungeonStat'],
+		szLabel = _L['MY_RoleStatistics'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},

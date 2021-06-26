@@ -58,22 +58,22 @@ end
 local INI_PATH = PACKET_INFO.ROOT .. 'MY_Target/ui/MY_TargetDirection.ini'
 local IMG_PATH = PACKET_INFO.ROOT .. 'MY_Target/img/MY_TargetDirection.uitex'
 
-local O = LIB.CreateUserSettingsModule('MY_TargetDirection', _L['MY_Target'], {
+local O = LIB.CreateUserSettingsModule('MY_TargetDirection', _L['General'], {
 	bEnable = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_TargetDirection'],
+		szLabel = _L['MY_Target'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	tAnchor = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_TargetDirection'],
+		szLabel = _L['MY_Target'],
 		xSchema = Schema.FrameAnchor,
 		xDefaultValue = { s = 'CENTER', r = 'CENTER', x = 250, y = 100 },
 	},
 	eDistanceType = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_TargetDirection'],
+		szLabel = _L['MY_Target'],
 		xSchema = Schema.String,
 		xDefaultValue = 'global',
 	},
