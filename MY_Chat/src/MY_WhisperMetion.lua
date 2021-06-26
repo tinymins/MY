@@ -136,9 +136,9 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 'auto',
 		text = _L['Redirect metion to whisper'],
-		checked = MY_WhisperMetion.bEnable,
+		checked = O.bEnable,
 		oncheck = function(bChecked)
-			MY_WhisperMetion.bEnable = bChecked
+			O.bEnable = bChecked
 		end,
 	})
 	y = y + lineHeight
