@@ -584,6 +584,9 @@ local function GeneCommonCompareText(id, szTitle)
 		if r1[id] == r2[id] then
 			return
 		end
+		if not r1[id] or not r2[id] then
+			return
+		end
 		local szOp = r1[id] <= r2[id]
 			and ' increased by %s'
 			or ' decreased by %s'
