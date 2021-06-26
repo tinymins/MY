@@ -96,6 +96,13 @@ function D.Open(bImport)
 			insert(tItem.aKey, us.szKey)
 		end
 	end
+	-- ≈≈–Ú
+	local tGroupRank = {}
+	for i, category in ipairs(LIB.GetPanelCategoryList()) do
+		tGroupRank[category.szName] = i
+	end
+	sort(aGroup, function(g1, g2) return (tGroupRank[g1.szGroup] or HUGE) < (tGroupRank[g2.szGroup] or HUGE) end)
+	-- ªÊ÷∆
 	local tItemChecked = {}
 	for _, tGroup in ipairs(aGroup) do
 		local uiGroupChk, tUiItemChk = nil, {}

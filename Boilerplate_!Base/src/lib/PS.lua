@@ -192,11 +192,14 @@ local PANEL_CATEGORY_LIST = {
 	{ szName = _L['Battle' ] },
 	{ szName = _L['Raid'   ] },
 	{ szName = _L['System' ] },
-	{ szName = _L['JX3BOX' ] },
 	{ szName = _L['Search' ] },
 	{ szName = _L['Others' ] },
 }
 local PANEL_TAB_LIST = {}
+
+function LIB.GetPanelCategoryList()
+	return Clone(PANEL_CATEGORY_LIST)
+end
 
 local function IsShieldedTab(tTab)
 	if tTab.bShielded and LIB.IsShieldedVersion() then
