@@ -25,6 +25,9 @@ return {
 	['Add to Important-NPC list'] = '加入重要角色列表',
 	['Remove from Important-NPC list'] = '从重要角色列表中移除',
 
+	['Force color'] = '门派配色',
+	['Camp color'] = '阵营配色',
+
 	['LClick to copy to editbox.\n'] = '左键复制到聊天栏\n',
 	['MClick to remove this line.\n'] = '中键删除该行文本\n',
 	['RClick to repeat this line.\n'] = '右键发布到当前频道\n',
@@ -142,4 +145,15 @@ return {
 
 	['Request list'] = '请求列表',
 	['Clear list and close?'] = '清空列表并关闭？',
+
+	['Import User Settings'] = '导入配置项',
+	['Export User Settings'] = '导出配置项',
+	['Import'] = '导入',
+	['Export'] = '导出',
+	['%d settings imported.'] = '成功导入 %d 条配置项。',
+	['No custom setting selected, nothing to export.'] = '请先选择您想要导出的自定义配置项。',
+	['No custom setting found, nothing to export.'] = '选中的配置项尚未进行自定义配置，默认配置无需导出。',
+	['%d settings exported, file saved in %s.'] = '成功导出 %d 条配置项，文件位于：%s。',
+
+	['Default distance type settings'] = '默认距离算法',
 }

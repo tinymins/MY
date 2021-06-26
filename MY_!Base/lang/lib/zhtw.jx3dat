@@ -25,6 +25,9 @@ return {
 	['Add to Important-NPC list'] = '加入重要角色列表',
 	['Remove from Important-NPC list'] = '從重要角色列表中移除',
 
+	['Force color'] = '門派配色',
+	['Camp color'] = '陣營配色',
+
 	['LClick to copy to editbox.\n'] = '左鍵複製到聊天欄\n',
 	['MClick to remove this line.\n'] = '中鍵刪除該行文本\n',
 	['RClick to repeat this line.\n'] = '右鍵發佈到當前頻道\n',
@@ -142,4 +145,15 @@ return {
 
 	['Request list'] = '請求列表',
 	['Clear list and close?'] = '清空列表並關閉？',
+
+	['Import User Settings'] = '導入配置項',
+	['Export User Settings'] = '導出配置項',
+	['Import'] = '導入',
+	['Export'] = '導出',
+	['%d settings imported.'] = '成功導入 %d 條配置項。',
+	['No custom setting selected, nothing to export.'] = '請先選擇您想要導出的自定義配置項。',
+	['No custom setting found, nothing to export.'] = '選中的配置項尚未進行自定義配置，默認配置無需導出。',
+	['%d settings exported, file saved in %s.'] = '成功導出 %d 條配置項，文件位於：%s。',
+
+	['Default distance type settings'] = '默認距離演算法',
 }

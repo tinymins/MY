@@ -1,10 +1,6 @@
 return {
-	['HoverEntry'] = '浮动快捷入口',
+	['HoverEntry'] = '悬浮入口',
 
-	['Enable status'] = '启用状态',
-	['Hover entry'] = '悬浮入口',
 	['Hover popup'] = '鼠标滑过立即弹出',
-	['Anchor'] = '位置',
-	['Size'] = '大小',
 	['Size: %d'] = '大小：%d',
 }

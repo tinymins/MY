@@ -47,28 +47,28 @@ local PLUGIN_ROOT = PACKET_INFO.FRAMEWORK_ROOT
 local MODULE_NAME = NSFormatString('{$NS}_HoverEntry')
 local _L = LIB.LoadLangPack(PACKET_INFO.FRAMEWORK_ROOT .. 'lang/hoverentry/')
 --------------------------------------------------------------------------
-local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['HoverEntry'], {
+local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['Common'], {
 	bEnable = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['Enable status'],
+		szLabel = _L['HoverEntry'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	nSize = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['Size'],
+		szLabel = _L['HoverEntry'],
 		xSchema = Schema.Number,
 		xDefaultValue = 30,
 	},
 	anchor = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['Anchor'],
+		szLabel = _L['HoverEntry'],
 		xSchema = Schema.FrameAnchor,
 		xDefaultValue = { x = -362, y = -78, s = 'BOTTOMCENTER', r = 'BOTTOMCENTER' },
 	},
 	bHoverMenu = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['Hover popup'],
+		szLabel = _L['HoverEntry'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
@@ -141,7 +141,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
 	nY = nLFY
 	ui:Append('Text', {
 		x = X - 10, y = nY,
-		text = _L['Hover entry'],
+		text = _L['HoverEntry'],
 		color = { 255, 255, 0 },
 	}):AutoWidth()
 	nY = nY + 30
