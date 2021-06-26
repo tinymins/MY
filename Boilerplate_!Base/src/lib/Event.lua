@@ -278,6 +278,7 @@ local CommonEventRegister = LIB.CommonEventRegister
 function LIB.FireFlush()
 	LIB.FlushCoroutine()
 	CommonEventFirer(FLUSH_EVENT)
+	LIB.FlushSettingsDatabase()
 end
 
 function LIB.RegisterFlush(...)
