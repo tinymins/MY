@@ -85,7 +85,7 @@ local DEFAULT_KW_CONFIG = {
 	bIgnoreCase = true, bIgnoreEnEm = true, bIgnoreSpace = true,
 }
 
-local O = LIB.CreateUserSettingsModule('MY_ChatBlock', _L['MY_Chat'], {
+local O = LIB.CreateUserSettingsModule('MY_ChatBlock', _L['Chat'], {
 	bBlockWords = {
 		ePathType = PATH_TYPE.ROLE,
 		szLabel = _L['MY_ChatBlock'],

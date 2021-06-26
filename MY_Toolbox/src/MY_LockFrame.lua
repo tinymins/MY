@@ -55,16 +55,16 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
-local O = LIB.CreateUserSettingsModule('MY_LockFrame', _L['MY_Toolbox'], {
+local O = LIB.CreateUserSettingsModule('MY_LockFrame', _L['General'], {
 	bEnable = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_LockFrame'],
+		szLabel = _L['MY_Toolbox'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	tEnable = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_LockFrame'],
+		szLabel = _L['MY_Toolbox'],
 		xSchema = Schema.Map(Schema.String, Schema.Boolean),
 		xDefaultValue = {
 			['JX_TargetList'] = true,

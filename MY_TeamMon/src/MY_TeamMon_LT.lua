@@ -58,34 +58,34 @@ end
 
 local INIFILE = PACKET_INFO.ROOT ..  'MY_TeamMon/ui/MY_TeamMon_LT.ini'
 
-local O = LIB.CreateUserSettingsModule('MY_TeamMon_LT', _L['MY_TeamMon'], {
+local O = LIB.CreateUserSettingsModule('MY_TeamMon_LT', _L['Raid'], {
 	tAnchor = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_TeamMon_LT'],
+		szLabel = _L['MY_TeamMon'],
 		xSchema = Schema.FrameAnchor,
 		xDefaultValue = { s = 'CENTER', r = 'CENTER', x = 0, y = 0 },
 	},
 	fScale = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_TeamMon_LT'],
+		szLabel = _L['MY_TeamMon'],
 		xSchema = Schema.Number,
 		xDefaultValue = 1.5,
 	},
 	fPause = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_TeamMon_LT'],
+		szLabel = _L['MY_TeamMon'],
 		xSchema = Schema.Number,
 		xDefaultValue = 1,
 	},
 	fFadeOut = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_TeamMon_LT'],
+		szLabel = _L['MY_TeamMon'],
 		xSchema = Schema.Number,
 		xDefaultValue = 0.3,
 	},
 	dwFontScheme = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_TeamMon_LT'],
+		szLabel = _L['MY_TeamMon'],
 		xSchema = Schema.Number,
 		xDefaultValue = 23,
 	},

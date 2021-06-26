@@ -56,7 +56,7 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
-local O = LIB.CreateUserSettingsModule('MY_TargetFace', _L['General'], {
+local O = LIB.CreateUserSettingsModule('MY_TargetFace', _L['Target'], {
 	bTargetFace = { -- 是否画出目标面向
 		ePathType = PATH_TYPE.ROLE,
 		szLabel = _L['MY_Target'],

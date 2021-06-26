@@ -57,34 +57,34 @@ end
 
 local SZ_INI = PLUGIN_ROOT .. '/ui/MY_DynamicItem.ini'
 
-local O = LIB.CreateUserSettingsModule('MY_DynamicItem', _L['MY_Toolbox'], {
+local O = LIB.CreateUserSettingsModule('MY_DynamicItem', _L['General'], {
 	bEnable = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_DynamicItem'],
+		szLabel = _L['MY_Toolbox'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bShowBg = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_DynamicItem'],
+		szLabel = _L['MY_Toolbox'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = true,
 	},
 	nNum = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_DynamicItem'],
+		szLabel = _L['MY_Toolbox'],
 		xSchema = Schema.Number,
 		xDefaultValue = 16,
 	},
 	nCol = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_DynamicItem'],
+		szLabel = _L['MY_Toolbox'],
 		xSchema = Schema.Number,
 		xDefaultValue = 16,
 	},
 	anchor = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_DynamicItem'],
+		szLabel = _L['MY_Toolbox'],
 		xSchema = Schema.FrameAnchor,
 		xDefaultValue = { s = 'BOTTOMCENTER', r = 'BOTTOMCENTER', x = 26, y = -226 },
 	},

@@ -55,7 +55,7 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
-local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['MY_Chat'], {
+local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['Chat'], {
 	bIgnoreTongOnlineMsg = { -- 帮会上线通知
 		ePathType = PATH_TYPE.ROLE,
 		szLabel = _L['MY_ChatLog'],

@@ -57,52 +57,52 @@ end
 local D = {
 	dwTalkTick = 0,
 }
-local O = LIB.CreateUserSettingsModule('MY_TalkEx', _L['MY_TalkEx'], {
+local O = LIB.CreateUserSettingsModule('MY_TalkEx', _L['Chat'], {
 	szTalkText = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['TalkText'],
+		szLabel = _L['MY_TalkEx'],
 		xSchema = Schema.String,
 		xDefaultValue = '',
 	},
 	aTalkChannel = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['TalkChannels'],
+		szLabel = _L['MY_TalkEx'],
 		xSchema = Schema.Collection(Schema.Number),
 		xDefaultValue = {},
 	},
 	nTrickChannel = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['TalkTrick'],
+		szLabel = _L['MY_TalkEx'],
 		xSchema = Schema.Number,
 		xDefaultValue = PLAYER_TALK_CHANNEL.RAID,
 	},
 	szTrickFilter = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['TalkTrick'],
+		szLabel = _L['MY_TalkEx'],
 		xSchema = Schema.String,
 		xDefaultValue = 'RAID',
 	},
 	nTrickForce = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['TalkTrick'],
+		szLabel = _L['MY_TalkEx'],
 		xSchema = Schema.Number,
 		xDefaultValue = CONSTANT.FORCE_TYPE.CHUN_YANG,
 	},
 	szTrickTextBegin = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['TalkTrick'],
+		szLabel = _L['MY_TalkEx'],
 		xSchema = Schema.String,
 		xDefaultValue = _L['$zj look around and have a little thought.'],
 	},
 	szTrickText = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['TalkTrick'],
+		szLabel = _L['MY_TalkEx'],
 		xSchema = Schema.String,
 		xDefaultValue = _L['$zj epilate $mb\'s feather clearly.'],
 	},
 	szTrickTextEnd = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['TalkTrick'],
+		szLabel = _L['MY_TalkEx'],
 		xSchema = Schema.String,
 		xDefaultValue = _L['$zj collected the feather epilated just now and wanted it sold well.'],
 	},

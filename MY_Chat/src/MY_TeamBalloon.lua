@@ -59,10 +59,10 @@ local DISPLAY_TIME = 5000
 local ANIMATE_SHOW_TIME = 500
 local ANIMATE_HIDE_TIME = 500
 
-local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['MY_Chat'], {
+local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['Chat'], {
 	bEnable = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_ChatSwitch'],
+		szLabel = _L['MY_Chat'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = true,
 	},

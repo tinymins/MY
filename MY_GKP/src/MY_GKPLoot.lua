@@ -75,7 +75,7 @@ local GKP_ITEM_QUALITIES = {
 	{ nQuality = CONSTANT.ITEM_QUALITY.NACARAT, szTitle = g_tStrings.STR_ROLLQUALITY_NACARAT },
 }
 
-local O = LIB.CreateUserSettingsModule('MY_GKPLoot', _L['MY_GKP'], {
+local O = LIB.CreateUserSettingsModule('MY_GKPLoot', _L['General'], {
 	bOn = {
 		ePathType = PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],

@@ -55,22 +55,22 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
-local O = LIB.CreateUserSettingsModule('MY_ItemPrice', _L['MY_Toolbox'], {
+local O = LIB.CreateUserSettingsModule('MY_ItemPrice', _L['General'], {
 	bEnable = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_ItemPrice'],
+		szLabel = _L['MY_Toolbox'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	nW = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_ItemPrice'],
+		szLabel = _L['MY_Toolbox'],
 		xSchema = Schema.Number,
 		xDefaultValue = 480,
 	},
 	nH = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_ItemPrice'],
+		szLabel = _L['MY_Toolbox'],
 		xSchema = Schema.Number,
 		xDefaultValue = 640,
 	},

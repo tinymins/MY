@@ -55,34 +55,34 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
-local O = LIB.CreateUserSettingsModule('MY_CombatLogs', _L['MY_TeamTools'], {
+local O = LIB.CreateUserSettingsModule('MY_CombatLogs', _L['Raid'], {
 	bEnable = { -- 数据记录总开关
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_CombatLogs'],
+		szLabel = _L['MY_TeamTools'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	nMaxHistory = { -- 最大历史数据数量
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_CombatLogs'],
+		szLabel = _L['MY_TeamTools'],
 		xSchema = Schema.Number,
 		xDefaultValue = 300,
 	},
 	nMinFightTime = { -- 最小战斗时间
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_CombatLogs'],
+		szLabel = _L['MY_TeamTools'],
 		xSchema = Schema.Number,
 		xDefaultValue = 30,
 	},
 	bOnlyDungeon = { -- 仅在秘境中启用
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_CombatLogs'],
+		szLabel = _L['MY_TeamTools'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bOnlySelf = { -- 仅记录和自己有关的
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_CombatLogs'],
+		szLabel = _L['MY_TeamTools'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = true,
 	},

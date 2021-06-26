@@ -55,7 +55,7 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
-local O = LIB.CreateUserSettingsModule('MY_Cataclysm', _L['MY_Cataclysm'], {
+local O = LIB.CreateUserSettingsModule('MY_Cataclysm', _L['Raid'], {
 	bEnable = {
 		ePathType = PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],

@@ -96,7 +96,7 @@ for _, p in ipairs(FILTER_ITEM) do
 	FILTER_ITEM_DEFAULT[p.szName] = p.bFilter
 end
 
-local O = LIB.CreateUserSettingsModule('MY_Taoguan', _L['MY_Toolbox'], {
+local O = LIB.CreateUserSettingsModule('MY_Taoguan', _L['Target'], {
 	nPausePoint = { -- Õ£‘“∑÷ ˝œﬂ
 		ePathType = PATH_TYPE.ROLE,
 		szLabel = _L['MY_Taoguan'],

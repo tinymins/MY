@@ -1,9 +1,6 @@
 return {
 	['MY_Notify'] = '消息中心',
-	['Anchor'] = '界面位置',
-	['Entry settings'] = '入口設置',
-	['Sort settings'] = '排序設置',
-	['Disable dismiss settings'] = '自動消失',
+	['GlobalConfig'] = '全局設置',
 	['Notify center'] = '消息中心',
 	['Show in minimap'] = '顯示小地圖入口',
 	['Order desc'] = '逆序顯示',

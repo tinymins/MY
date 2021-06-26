@@ -55,52 +55,52 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 local INI_PATH = PACKET_INFO.ROOT .. 'MY_TeamTools/ui/MY_RideRequest.ini'
-local O = LIB.CreateUserSettingsModule('MY_RideRequest', _L['MY_TeamTools'], {
+local O = LIB.CreateUserSettingsModule('MY_RideRequest', _L['Raid'], {
 	bEnable = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_RideRequest'],
+		szLabel = _L['MY_TeamTools'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bRefuseOthers = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_RideRequest'],
+		szLabel = _L['MY_TeamTools'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bRefuseUnknown = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_RideRequest'],
+		szLabel = _L['MY_TeamTools'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAcceptTong = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_RideRequest'],
+		szLabel = _L['MY_TeamTools'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAcceptFriend = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_RideRequest'],
+		szLabel = _L['MY_TeamTools'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAcceptAll = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_RideRequest'],
+		szLabel = _L['MY_TeamTools'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAcceptCustom = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_RideRequest'],
+		szLabel = _L['MY_TeamTools'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	tAcceptCustom = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_RideRequest'],
+		szLabel = _L['MY_TeamTools'],
 		xSchema = Schema.Map(Schema.String, Schema.Boolean),
 		xDefaultValue = {},
 	},

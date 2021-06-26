@@ -54,40 +54,40 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 	return
 end
 --------------------------------------------------------------------------
-local O = LIB.CreateUserSettingsModule('MY_ChatCopy', _L['MY_Chat'], {
+local O = LIB.CreateUserSettingsModule('MY_ChatCopy', _L['Chat'], {
 	bChatCopy = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_ChatCopy'],
+		szLabel = _L['MY_Chat'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bChatTime = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_ChatCopy'],
+		szLabel = _L['MY_Chat'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = true,
 	},
 	eChatTime = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_ChatCopy'],
+		szLabel = _L['MY_Chat'],
 		xSchema = Schema.String,
 		xDefaultValue = 'HOUR_MIN_SEC',
 	},
 	bChatCopyAlwaysShowMask = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_ChatCopy'],
+		szLabel = _L['MY_Chat'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bChatCopyAlwaysWhite = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_ChatCopy'],
+		szLabel = _L['MY_Chat'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bChatCopyNoCopySysmsg = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_ChatCopy'],
+		szLabel = _L['MY_Chat'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},

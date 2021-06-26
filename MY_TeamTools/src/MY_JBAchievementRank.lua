@@ -54,10 +54,10 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 	return
 end
 --------------------------------------------------------------------------
-local O = LIB.CreateUserSettingsModule('MY_JBAchievementRank', _L['MY_TeamTools'], {
+local O = LIB.CreateUserSettingsModule('MY_JBAchievementRank', _L['Raid'], {
 	bEnable = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_JBAchievementRank'],
+		szLabel = _L['MY_TeamTools'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},

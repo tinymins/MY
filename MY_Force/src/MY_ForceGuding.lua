@@ -55,46 +55,46 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
-local O = LIB.CreateUserSettingsModule('MY_ForceGuding', _L['MY_Force'], {
+local O = LIB.CreateUserSettingsModule('MY_ForceGuding', _L['Target'], {
 	bEnable = { -- 总开关
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_ForceGuding'],
+		szLabel = _L['MY_Force'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bAutoSay = { -- 摆鼎后自动说话
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_ForceGuding'],
+		szLabel = _L['MY_Force'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	szSay = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_ForceGuding'],
+		szLabel = _L['MY_Force'],
 		xSchema = Schema.String,
 		xDefaultValue = _L['I have put the GUDING, hurry to eat if you lack of mana. *la la la*'],
 	},
 	color = { -- 名称颜色，默认绿色
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_ForceGuding'],
+		szLabel = _L['MY_Force'],
 		xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
 		xDefaultValue = { 255, 0, 128 },
 	},
 	bUseMana = { -- 路过时自动吃毒锅
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_ForceGuding'],
+		szLabel = _L['MY_Force'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	nManaMp = { -- 自动吃的 MP 百分比
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_ForceGuding'],
+		szLabel = _L['MY_Force'],
 		xSchema = Schema.Number,
 		xDefaultValue = 80,
 	},
 	nManaHp = { -- 自动吃的 HP 百分比
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_ForceGuding'],
+		szLabel = _L['MY_Force'],
 		xSchema = Schema.Number,
 		xDefaultValue = 80,
 	},

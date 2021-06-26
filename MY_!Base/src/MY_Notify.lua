@@ -50,28 +50,28 @@ local PLUGIN_ROOT = PACKET_INFO.FRAMEWORK_ROOT
 local MODULE_NAME = NSFormatString('{$NS}_Notify')
 local _L = LIB.LoadLangPack(PACKET_INFO.FRAMEWORK_ROOT .. 'lang/my_notify/')
 --------------------------------------------------------------------------
-local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['MY_Notify'], {
+local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['System'], {
 	anchor = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['Anchor'],
+		szLabel = _L['GlobalConfig'],
 		xSchema = Schema.FrameAnchor,
 		xDefaultValue = { x = -100, y = -150, s = 'BOTTOMRIGHT', r = 'BOTTOMRIGHT' },
 	},
 	bEntry = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['Entry settings'],
+		szLabel = _L['GlobalConfig'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bDesc = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['Sort settings'],
+		szLabel = _L['GlobalConfig'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bDisableDismiss = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['Disable dismiss settings'],
+		szLabel = _L['GlobalConfig'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},

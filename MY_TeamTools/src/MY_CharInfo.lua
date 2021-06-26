@@ -55,10 +55,10 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
-local O = LIB.CreateUserSettingsModule('MY_CharInfo', _L['MY_TeamTools'], {
+local O = LIB.CreateUserSettingsModule('MY_CharInfo', _L['Raid'], {
 	bEnable = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_CharInfo'],
+		szLabel = _L['MY_TeamTools'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = true,
 	},

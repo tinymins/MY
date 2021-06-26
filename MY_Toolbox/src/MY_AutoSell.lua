@@ -55,40 +55,40 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
-local O = LIB.CreateUserSettingsModule('MY_AutoSell', _L['MY_Toolbox'], {
+local O = LIB.CreateUserSettingsModule('MY_AutoSell', _L['General'], {
 	bEnable = { -- 打开商店后自动售出总开关,
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_AutoSell'],
+		szLabel = _L['MY_Toolbox'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bSellGray = { -- 自动出售灰色物品,
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_AutoSell'],
+		szLabel = _L['MY_Toolbox'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bSellWhiteBook = { -- 自动出售已读白书,
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_AutoSell'],
+		szLabel = _L['MY_Toolbox'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bSellGreenBook = { -- 自动出售已读绿书,
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_AutoSell'],
+		szLabel = _L['MY_Toolbox'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bSellBlueBook = { -- 自动出售已读蓝书,
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_AutoSell'],
+		szLabel = _L['MY_Toolbox'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	tSellItem = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_AutoSell'],
+		szLabel = _L['MY_Toolbox'],
 		xSchema = Schema.Map(Schema.String, Schema.Boolean),
 		xDefaultValue = {
 			[LIB.GetObjectName('ITEM_INFO', 5, 2863)] = true, -- 银叶子
@@ -106,7 +106,7 @@ local O = LIB.CreateUserSettingsModule('MY_AutoSell', _L['MY_Toolbox'], {
 	},
 	tProtectItem = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_AutoSell'],
+		szLabel = _L['MY_Toolbox'],
 		xSchema = Schema.Map(Schema.String, Schema.Boolean),
 		xDefaultValue = {
 			[LIB.GetObjectName('ITEM_INFO', 5, 789)] = true, -- 真丝肚兜

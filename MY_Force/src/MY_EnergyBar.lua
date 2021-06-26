@@ -61,16 +61,16 @@ end
 ---------------------------------------------------------------------
 local INI_PATH = PLUGIN_ROOT .. '/ui/PlayerBar.ini'
 
-local O = LIB.CreateUserSettingsModule('MY_EnergyBar', _L['MY_Force'], {
+local O = LIB.CreateUserSettingsModule('MY_EnergyBar', _L['Target'], {
 	bEnable = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_EnergyBar'],
+		szLabel = _L['MY_Force'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	tAnchor = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_EnergyBar'],
+		szLabel = _L['MY_Force'],
 		xSchema = Schema.FrameAnchor,
 		xDefaultValue = { x = 65, y = 250, s = 'CENTER', r = 'CENTER' },
 	},

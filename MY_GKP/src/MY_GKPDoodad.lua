@@ -55,82 +55,82 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
-local O = LIB.CreateUserSettingsModule('MY_GKPDoodad', _L['MY_GKP'], {
+local O = LIB.CreateUserSettingsModule('MY_GKPDoodad', _L['General'], {
 	bOpenLoot = { -- 自动打开掉落
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_GKPDoodad'],
+		szLabel = _L['MY_GKPLoot'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bOpenLootEvenFight = { -- 战斗中也打开
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_GKPDoodad'],
+		szLabel = _L['MY_GKPLoot'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bShowName = { -- 显示物品名称
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_GKPDoodad'],
+		szLabel = _L['MY_GKPLoot'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	tNameColor = { -- 头顶名称颜色
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_GKPDoodad'],
+		szLabel = _L['MY_GKPLoot'],
 		xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
 		xDefaultValue = { 196, 64, 255 },
 	},
 	bMiniFlag = { -- 显示小地图标记
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_GKPDoodad'],
+		szLabel = _L['MY_GKPLoot'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bInteract = { -- 自动采集
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_GKPDoodad'],
+		szLabel = _L['MY_GKPLoot'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bInteractEvenFight = { -- 战斗中也采集
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_GKPDoodad'],
+		szLabel = _L['MY_GKPLoot'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	tCraft = { -- 草药、矿石列表
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_GKPDoodad'],
+		szLabel = _L['MY_GKPLoot'],
 		xSchema = Schema.Map(Schema.Number, Schema.Boolean),
 		xDefaultValue = {},
 	},
 	bQuestDoodad = { -- 任务物品
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_GKPDoodad'],
+		szLabel = _L['MY_GKPLoot'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAllDoodad = { -- 其它全部
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_GKPDoodad'],
+		szLabel = _L['MY_GKPLoot'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bCustom = { -- 启用自定义
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_GKPDoodad'],
+		szLabel = _L['MY_GKPLoot'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = true,
 	},
 	szCustom = { -- 自定义列表
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_GKPDoodad'],
+		szLabel = _L['MY_GKPLoot'],
 		xSchema = Schema.String,
 		xDefaultValue = '',
 	},
 	bRecent = { -- 启用自动最近5分钟采集
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_GKPDoodad'],
+		szLabel = _L['MY_GKPLoot'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = true,
 	},

@@ -419,52 +419,52 @@ local VERSION = 2
 local D = {
 	bRecEverything = false, -- 计算出来的是否采集复盘数据开关，过图重算
 }
-local O = LIB.CreateUserSettingsModule('MY_Recount', _L['MY_Recount'], {
+local O = LIB.CreateUserSettingsModule('MY_Recount', _L['Raid'], {
 	bEnable = { -- 数据记录总开关 防止官方SB技能BUFF脚本瞎几把写超高频太卡甩锅给界面逻辑
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['Basic Settings'],
+		szLabel = _L['MY_Recount'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bSaveHistoryOnExit = { -- 退出游戏时保存历史数据
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['Storage Settings'],
+		szLabel = _L['MY_Recount'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bSaveHistoryOnExFi = { -- 脱离战斗时保存历史数据
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['Storage Settings'],
+		szLabel = _L['MY_Recount'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	nMaxHistory = { -- 最大历史数据数量
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['Storage Settings'],
+		szLabel = _L['MY_Recount'],
 		xSchema = Schema.Number,
 		xDefaultValue = 10,
 	},
 	nMinFightTime = { -- 最小战斗时间
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['Basic Settings'],
+		szLabel = _L['MY_Recount'],
 		xSchema = Schema.Number,
 		xDefaultValue = 30,
 	},
 	bRecEverything = { -- 是否采集复盘数据
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['Everything Settings'],
+		szLabel = _L['MY_Recount_FP'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bREOnlyDungeon = { -- 仅在秘境中启用
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['Everything Settings'],
+		szLabel = _L['MY_Recount_FP'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bSaveEverything = { -- 保存战斗记录时是否存储复盘数据
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['Everything Settings'],
+		szLabel = _L['MY_Recount_FP'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},

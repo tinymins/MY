@@ -54,7 +54,7 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 	return
 end
 --------------------------------------------------------------------------
-local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['MY_Chat'], {
+local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['Chat'], {
 	tIgnoreNames = { -- ºöÂÔÃûµ¥
 		ePathType = PATH_TYPE.ROLE,
 		szLabel = _L['MY_ChatMosaics'],

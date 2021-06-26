@@ -58,46 +58,46 @@ local DIALOGUE
 local CURRENT_WINDOW
 local CURRENT_CONTENTS
 
-local O = LIB.CreateUserSettingsModule('MY_AutoDialogue', _L['MY_Toolbox'], {
+local O = LIB.CreateUserSettingsModule('MY_AutoDialogue', _L['General'], {
 	bEnable = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_AutoDialogue'],
+		szLabel = _L['MY_Toolbox'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bEchoOn = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_AutoDialogue'],
+		szLabel = _L['MY_Toolbox'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bAutoClose = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_AutoDialogue'],
+		szLabel = _L['MY_Toolbox'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bEnableShift = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_AutoDialogue'],
+		szLabel = _L['MY_Toolbox'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bAutoSelectSg = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_AutoDialogue'],
+		szLabel = _L['MY_Toolbox'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAutoSelectSp = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_AutoDialogue'],
+		szLabel = _L['MY_Toolbox'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bSkipQuestTalk = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_AutoDialogue'],
+		szLabel = _L['MY_Toolbox'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},

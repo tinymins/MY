@@ -56,28 +56,28 @@ end
 --------------------------------------------------------------------------
 local INI_PATH = PACKET_INFO.ROOT .. 'MY_Toolbox/ui/MY_VisualSkill.ini'
 local DEFAULT_ANCHOR = { x = 0, y = -220, s = 'BOTTOMCENTER', r = 'BOTTOMCENTER' }
-local O = LIB.CreateUserSettingsModule('MY_VisualSkill', _L['MY_Toolbox'], {
+local O = LIB.CreateUserSettingsModule('MY_VisualSkill', _L['General'], {
 	bEnable = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_VisualSkill'],
+		szLabel = _L['MY_Toolbox'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bPenetrable = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_VisualSkill'],
+		szLabel = _L['MY_Toolbox'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = true,
 	},
 	nVisualSkillBoxCount = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_VisualSkill'],
+		szLabel = _L['MY_Toolbox'],
 		xSchema = Schema.Number,
 		xDefaultValue = 5,
 	},
 	anchor = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_VisualSkill'],
+		szLabel = _L['MY_Toolbox'],
 		xSchema = Schema.FrameAnchor,
 		xDefaultValue = Clone(DEFAULT_ANCHOR),
 	},

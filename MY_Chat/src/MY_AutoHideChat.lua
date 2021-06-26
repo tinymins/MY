@@ -62,10 +62,10 @@ local STATE = {
 	HIDDING = 4, -- ½¥±äÒþ²ØÖÐ
 }
 local m_nState = STATE.SHOW
-local O = LIB.CreateUserSettingsModule('MY_Chat', _L[MODULE_NAME], {
+local O = LIB.CreateUserSettingsModule('MY_Chat', _L['Chat'], {
 	bEnable = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_AutoHideChat'],
+		szLabel = _L['MY_Chat'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},

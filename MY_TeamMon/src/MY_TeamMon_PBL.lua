@@ -59,16 +59,16 @@ end
 local GetBuff = LIB.GetBuff
 
 -- 这个需要重写 构思已有 就是没时间。。
-local O = LIB.CreateUserSettingsModule('MY_TeamMon_PBL', _L['MY_TeamMon'], {
+local O = LIB.CreateUserSettingsModule('MY_TeamMon_PBL', _L['Raid'], {
 	bHoverSelect = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_TeamMon_PBL'],
+		szLabel = _L['MY_TeamMon'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	tAnchor = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_TeamMon_PBL'],
+		szLabel = _L['MY_TeamMon'],
 		xSchema = Schema.FrameAnchor,
 		xDefaultValue = { s = 'CENTER', r = 'CENTER', x = 400, y = 0 },
 	},

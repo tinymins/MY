@@ -55,7 +55,7 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
-local O = LIB.CreateUserSettingsModule('MY_Logoff', _L['General'], {
+local O = LIB.CreateUserSettingsModule('MY_Logoff', _L['System'], {
 	bIdleOff = {
 		ePathType = PATH_TYPE.ROLE,
 		szLabel = _L['MY_Logoff'],

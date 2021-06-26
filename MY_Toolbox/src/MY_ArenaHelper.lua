@@ -55,16 +55,16 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
-local O = LIB.CreateUserSettingsModule('MY_ArenaHelper', _L['MY_Toolbox'], {
+local O = LIB.CreateUserSettingsModule('MY_ArenaHelper', _L['General'], {
 	bRestoreAuthorityInfo = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_ArenaHelper'],
+		szLabel = _L['MY_Toolbox'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bAutoShowModel = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_ArenaHelper'],
+		szLabel = _L['MY_Toolbox'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},

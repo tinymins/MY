@@ -54,16 +54,16 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 	return
 end
 --------------------------------------------------------------------------
-local O = LIB.CreateUserSettingsModule('MY_ChatEmotion', _L['MY_Chat'], {
+local O = LIB.CreateUserSettingsModule('MY_ChatEmotion', _L['Chat'], {
 	bFixSize = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_ChatEmotion'],
+		szLabel = _L['MY_Chat'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	nSize = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_ChatEmotion'],
+		szLabel = _L['MY_Chat'],
 		xSchema = Schema.Number,
 		xDefaultValue = 25,
 	},

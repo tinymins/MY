@@ -1,9 +1,6 @@
 return {
     -- MY_TalkEx.lua
     ['MY_TalkEx'] = '喊話輔助',
-    ['TalkChannels'] = '喊話頻道',
-    ['TalkText'] = '喊話內容',
-    ['TalkTrick'] = '隊友調侃',
 
 	['Everyone'] = '所有人',
     ['TalkEx Talk'] = '喊話輔助 - 發送',

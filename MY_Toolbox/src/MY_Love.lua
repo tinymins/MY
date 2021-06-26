@@ -71,7 +71,7 @@ local LOVER_DATA = {
 	bOnline = false, -- 是否在线
 }
 
-local O = LIB.CreateUserSettingsModule('MY_Love', _L['MY_Toolbox'], {
+local O = LIB.CreateUserSettingsModule('MY_Love', _L['Target'], {
 	bQuiet = { -- 免打扰（拒绝其它人的查看请求）
 		ePathType = PATH_TYPE.ROLE,
 		szLabel = _L['MY_Love'],

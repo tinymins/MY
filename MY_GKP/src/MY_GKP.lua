@@ -54,7 +54,7 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 	return
 end
 --------------------------------------------------------------------------
-local O = LIB.CreateUserSettingsModule('MY_GKP', _L['MY_GKP'], {
+local O = LIB.CreateUserSettingsModule('MY_GKP', _L['General'], {
 	bOn = { -- enable
 		ePathType = PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKP'],
@@ -99,7 +99,7 @@ local O = LIB.CreateUserSettingsModule('MY_GKP', _L['MY_GKP'], {
 	},
 	aSubsidies = { -- 补贴方案
 		ePathType = PATH_TYPE.GLOBAL,
-		szLabel = _L['Allowance Protocols'],
+		szLabel = _L['MY_GKP'],
 		xSchema = Schema.Collection(Schema.Tuple(
 			Schema.String,
 			Schema.OneOf(Schema.String, Schema.Number),
@@ -116,7 +116,7 @@ local O = LIB.CreateUserSettingsModule('MY_GKP', _L['MY_GKP'], {
 	},
 	aScheme = { -- 拍卖方案
 		ePathType = PATH_TYPE.GLOBAL,
-		szLabel = _L['Auction Protocols'],
+		szLabel = _L['MY_GKP'],
 		xSchema = Schema.Collection(Schema.Tuple(
 			Schema.Number,
 			Schema.Number,

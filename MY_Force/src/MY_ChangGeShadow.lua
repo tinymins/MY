@@ -55,28 +55,28 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
-local O = LIB.CreateUserSettingsModule('MY_ChangGeShadow', _L['MY_Force'], {
+local O = LIB.CreateUserSettingsModule('MY_ChangGeShadow', _L['Target'], {
 	bEnable = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_ChangGeShadow'],
+		szLabel = _L['MY_Force'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bShowDistance = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_ChangGeShadow'],
+		szLabel = _L['MY_Force'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bShowCD = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_ChangGeShadow'],
+		szLabel = _L['MY_Force'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	fScale = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_ChangGeShadow'],
+		szLabel = _L['MY_Force'],
 		xSchema = Schema.Number,
 		xDefaultValue = 1.5,
 	},

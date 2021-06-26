@@ -60,22 +60,22 @@ local GetBuff = LIB.GetBuff
 local FilterCustomText = MY_TeamMon.FilterCustomText
 
 local BL_INIFILE = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_BL.ini'
-local O = LIB.CreateUserSettingsModule('MY_TeamMon_BL', _L['MY_TeamMon'], {
+local O = LIB.CreateUserSettingsModule('MY_TeamMon_BL', _L['Raid'], {
 	tAnchor = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_TeamMon_BL'],
+		szLabel = _L['MY_TeamMon'],
 		xSchema = Schema.FrameAnchor,
 		xDefaultValue = { s = 'TOPLEFT', r = 'CENTER', x = 300, y = -200 },
 	},
 	nCount = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_TeamMon_BL'],
+		szLabel = _L['MY_TeamMon'],
 		xSchema = Schema.Number,
 		xDefaultValue = 8,
 	},
 	fScale = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_TeamMon_BL'],
+		szLabel = _L['MY_TeamMon'],
 		xSchema = Schema.Number,
 		xDefaultValue = 1,
 	},

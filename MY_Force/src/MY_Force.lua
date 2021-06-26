@@ -55,7 +55,7 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
-local O = LIB.CreateUserSettingsModule('MY_Force', _L['MY_Force'], {
+local O = LIB.CreateUserSettingsModule('MY_Force', _L['Target'], {
 	bAlertPet = { -- 五毒宠物消失提醒
 		ePathType = PATH_TYPE.ROLE,
 		szLabel = _L['MY_Force'],

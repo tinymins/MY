@@ -54,10 +54,10 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 	return
 end
 --------------------------------------------------------------------------
-local O = LIB.CreateUserSettingsModule('MY_JBTeamSnapshot', _L['MY_TeamTools'], {
+local O = LIB.CreateUserSettingsModule('MY_JBTeamSnapshot', _L['Raid'], {
 	szTeam = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_JBTeamSnapshot'],
+		szLabel = _L['MY_TeamTools'],
 		xSchema = Schema.String,
 		xDefaultValue = '',
 	},

@@ -70,10 +70,10 @@ local WM_LIST = {
 }
 local WM_POINT  = {}
 
-local O = LIB.CreateUserSettingsModule('MY_WorldMark', _L['MY_TeamTools'], {
+local O = LIB.CreateUserSettingsModule('MY_WorldMark', _L['Raid'], {
 	bEnable = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_WorldMark'],
+		szLabel = _L['MY_TeamTools'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = true,
 	},

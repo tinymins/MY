@@ -54,7 +54,7 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 	return
 end
 --------------------------------------------------------------------------
-local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['MY_Chat'], {
+local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['Chat'], {
 	aWhisper = {
 		ePathType = PATH_TYPE.ROLE,
 		xSchema = Schema.Collection(
@@ -72,13 +72,13 @@ local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['MY_Chat'], {
 	},
 	szAway = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_ChatSwitch'],
+		szLabel = _L['MY_Chat'],
 		xSchema = Schema.String,
 		xDefaultValue = '',
 	},
 	szBusy = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_ChatSwitch'],
+		szLabel = _L['MY_Chat'],
 		xSchema = Schema.String,
 		xDefaultValue = '',
 	},
@@ -95,13 +95,13 @@ local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['MY_Chat'], {
 	},
 	bAlertBeforeClear = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_ChatSwitch'],
+		szLabel = _L['MY_Chat'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bAutoSwitchBfChannel = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_ChatSwitch'],
+		szLabel = _L['MY_Chat'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = true,
 	},

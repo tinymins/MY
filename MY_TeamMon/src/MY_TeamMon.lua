@@ -197,7 +197,7 @@ do
 	end
 end
 
-local O = LIB.CreateUserSettingsModule('MY_TeamMon', _L['MY_TeamMon'], {
+local O = LIB.CreateUserSettingsModule('MY_TeamMon', _L['Raid'], {
 	bEnable = {
 		ePathType = PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],

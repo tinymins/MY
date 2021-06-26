@@ -55,10 +55,10 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 local SZ_INI = PACKET_INFO.ROOT .. 'MY_TeamTools/ui/MY_TeamTools_Achievement.ini'
-local O = LIB.CreateUserSettingsModule('MY_TeamTools_Achievement', _L['MY_TeamTools'], {
+local O = LIB.CreateUserSettingsModule('MY_TeamTools_Achievement', _L['Raid'], {
 	bIntelligentHide = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_TeamTools_Achievement'],
+		szLabel = _L['MY_TeamTools'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = true,
 	},

@@ -59,58 +59,58 @@ local PR_INI_PATH = PACKET_INFO.ROOT .. 'MY_TeamTools/ui/MY_PartyRequest.ini'
 local PR_EQUIP_REQUEST = {}
 local PR_PARTY_REQUEST = {}
 
-local O = LIB.CreateUserSettingsModule('MY_PartyRequest', _L['MY_TeamTools'], {
+local O = LIB.CreateUserSettingsModule('MY_PartyRequest', _L['Raid'], {
 	bEnable = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_PartyRequest'],
+		szLabel = _L['MY_TeamTools'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bRefuseLowLv = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_PartyRequest'],
+		szLabel = _L['MY_TeamTools'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bRefuseRobot = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_PartyRequest'],
+		szLabel = _L['MY_TeamTools'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAcceptTong = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_PartyRequest'],
+		szLabel = _L['MY_TeamTools'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAcceptCamp = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_PartyRequest'],
+		szLabel = _L['MY_TeamTools'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAcceptFriend = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_PartyRequest'],
+		szLabel = _L['MY_TeamTools'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAcceptAll = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_PartyRequest'],
+		szLabel = _L['MY_TeamTools'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAcceptCustom = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_PartyRequest'],
+		szLabel = _L['MY_TeamTools'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	tAcceptCustom = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_PartyRequest'],
+		szLabel = _L['MY_TeamTools'],
 		xSchema = Schema.Map(Schema.String, Schema.Boolean),
 		xDefaultValue = {},
 	},

@@ -75,16 +75,16 @@ local H_CIRCLE = UI.GetShadowHandle('Handle_Shadow_Circle')
 local H_LINE = UI.GetShadowHandle('Handle_Shadow_Line')
 local H_NAME = UI.GetShadowHandle('Handle_Shadow_Name')
 
-local O = LIB.CreateUserSettingsModule('MY_TeamMon_CC', _L['MY_TeamMon'], {
+local O = LIB.CreateUserSettingsModule('MY_TeamMon_CC', _L['Raid'], {
 	bEnable = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_TeamMon_CC'],
+		szLabel = _L['MY_TeamMon'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bBorder = { -- 全局的边框模式 边框会造成卡
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_TeamMon_CC'],
+		szLabel = _L['MY_TeamMon'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = true,
 	},

@@ -115,10 +115,10 @@ local PUBLISH_MODE = {
 	BOTH   = 3, -- 同时显示有效和总数
 }
 
-local O = LIB.CreateUserSettingsModule('MY_Recount', _L['MY_Recount'], {
+local O = LIB.CreateUserSettingsModule('MY_Recount', _L['Raid'], {
 	nPublishMode = { -- 发布模式
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['Basic Settings'],
+		szLabel = _L['MY_Recount'],
 		xSchema = Schema.Number,
 		xDefaultValue = PUBLISH_MODE.EFFECT,
 	},

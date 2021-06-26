@@ -59,16 +59,16 @@ end
 local SplitString, TrimString, FormatTimeCounter = LIB.SplitString, LIB.TrimString, LIB.FormatTimeCounter
 local FilterCustomText = MY_TeamMon.FilterCustomText
 
-local O = LIB.CreateUserSettingsModule('MY_TeamMon_ST', _L['MY_TeamMon'], {
+local O = LIB.CreateUserSettingsModule('MY_TeamMon_ST', _L['Raid'], {
 	bEnable = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_TeamMon_ST'],
+		szLabel = _L['MY_TeamMon'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = true,
 	},
 	tAnchor = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_TeamMon_ST'],
+		szLabel = _L['MY_TeamMon'],
 		xSchema = Schema.FrameAnchor,
 		xDefaultValue = { s = 'TOPRIGHT', r = 'CENTER', x = -250, y = -300 },
 	},

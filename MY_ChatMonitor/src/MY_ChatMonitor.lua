@@ -76,7 +76,7 @@ local DEFAULE_CHANNEL = {
     ['MSG_NORMAL'] = true, ['MSG_CAMP' ] = true, ['MSG_WORLD' ] = true, ['MSG_MAP'     ] = true,
     ['MSG_SCHOOL'] = true, ['MSG_GUILD'] = true, ['MSG_FRIEND'] = true, ['MSG_IDENTITY'] = true,
 }
-local O = LIB.CreateUserSettingsModule('MY_ChatMonitor', _L['MY_Chat'], {
+local O = LIB.CreateUserSettingsModule('MY_ChatMonitor', _L['Chat'], {
     aKeyword = {
 		ePathType = PATH_TYPE.GLOBAL,
 		szLabel = _L['MY_ChatMonitor'],

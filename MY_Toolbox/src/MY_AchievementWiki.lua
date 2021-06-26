@@ -55,22 +55,22 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
-local O = LIB.CreateUserSettingsModule('MY_AchievementWiki', _L['MY_Toolbox'], {
+local O = LIB.CreateUserSettingsModule('MY_AchievementWiki', _L['General'], {
 	bEnable = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_AchievementWiki'],
+		szLabel = _L['MY_Toolbox'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = true,
 	},
 	nW = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_AchievementWiki'],
+		szLabel = _L['MY_Toolbox'],
 		xSchema = Schema.Number,
 		xDefaultValue = 850,
 	},
 	nH = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_AchievementWiki'],
+		szLabel = _L['MY_Toolbox'],
 		xSchema = Schema.Number,
 		xDefaultValue = 610,
 	},

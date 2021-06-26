@@ -58,7 +58,7 @@ end
 local INI_PATH = PACKET_INFO.ROOT .. 'MY_Target/ui/MY_TargetDirection.ini'
 local IMG_PATH = PACKET_INFO.ROOT .. 'MY_Target/img/MY_TargetDirection.uitex'
 
-local O = LIB.CreateUserSettingsModule('MY_TargetDirection', _L['General'], {
+local O = LIB.CreateUserSettingsModule('MY_TargetDirection', _L['Target'], {
 	bEnable = {
 		ePathType = PATH_TYPE.ROLE,
 		szLabel = _L['MY_Target'],

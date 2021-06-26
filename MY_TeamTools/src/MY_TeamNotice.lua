@@ -59,28 +59,28 @@ local TI = {
 	szNote = '',
 }
 
-local O = LIB.CreateUserSettingsModule('MY_TeamNotice', _L['MY_TeamTools'], {
+local O = LIB.CreateUserSettingsModule('MY_TeamNotice', _L['Raid'], {
 	bEnable = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_TeamNotice'],
+		szLabel = _L['MY_TeamTools'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = true,
 	},
 	nWidth = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_TeamNotice'],
+		szLabel = _L['MY_TeamTools'],
 		xSchema = Schema.Number,
 		xDefaultValue = 320,
 	},
 	nHeight = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_TeamNotice'],
+		szLabel = _L['MY_TeamTools'],
 		xSchema = Schema.Number,
 		xDefaultValue = 195,
 	},
 	anchor = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_TeamNotice'],
+		szLabel = _L['MY_TeamTools'],
 		xSchema = Schema.FrameAnchor,
 		xDefaultValue = { s = 'CENTER', r = 'CENTER', x = 0, y = 0 },
 	},

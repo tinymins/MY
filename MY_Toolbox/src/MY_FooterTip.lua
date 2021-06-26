@@ -55,28 +55,28 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
 end
 --------------------------------------------------------------------------
 
-local O = LIB.CreateUserSettingsModule('MY_FooterTip', _L['MY_Toolbox'], {
+local O = LIB.CreateUserSettingsModule('MY_FooterTip', _L['General'], {
 	bFriend = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_FooterTip'],
+		szLabel = _L['MY_Toolbox'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bFriendNav = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_FooterTip'],
+		szLabel = _L['MY_Toolbox'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bTongMember = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_FooterTip'],
+		szLabel = _L['MY_Toolbox'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bTongMemberNav = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_FooterTip'],
+		szLabel = _L['MY_Toolbox'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},

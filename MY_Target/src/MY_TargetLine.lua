@@ -58,7 +58,7 @@ end
 local INI_PATH = PACKET_INFO.ROOT .. 'MY_Target/ui/MY_TargetLine.ini'
 local IMG_PATH = PACKET_INFO.ROOT .. 'MY_Target/img/MY_TargetLine.uitex'
 
-local O = LIB.CreateUserSettingsModule('MY_TargetLine', _L['General'], {
+local O = LIB.CreateUserSettingsModule('MY_TargetLine', _L['Target'], {
 	bTarget = { -- 启用目标追踪线
 		ePathType = PATH_TYPE.ROLE,
 		szLabel = _L['MY_Target'],

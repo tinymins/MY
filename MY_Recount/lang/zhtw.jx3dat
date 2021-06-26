@@ -1,9 +1,5 @@
 return {
     ['MY_Recount'] = '戰鬥統計',
-    ['UI Settings'] = '界面設置',
-    ['Basic Settings'] = '基礎設置',
-    ['Storage Settings'] = '存儲設置',
-    ['Everything Settings'] = '復盤設置',
 
     ['Enable recording'] = '記錄戰鬥統計數據',
     ['Enable UI'] = '顯示戰鬥統計界面',

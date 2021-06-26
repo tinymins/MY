@@ -63,161 +63,161 @@ local l_tTempFocusList = {
 	[TARGET.NPC]    = {},   -- dwTemplateID
 	[TARGET.DOODAD] = {},   -- dwTemplateID
 }
-local O = LIB.CreateUserSettingsModule('MY_Focus', _L['MY_Focus'], {
+local O = LIB.CreateUserSettingsModule('MY_Focus', _L['Target'], {
 	bEnable = { -- 是否启用
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['Basic settings'],
+		szLabel = _L['MY_Focus'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bMinimize = { -- 是否最小化
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['Basic settings'],
+		szLabel = _L['MY_Focus'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAutoHide = { -- 无焦点时隐藏
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['Basic settings'],
+		szLabel = _L['MY_Focus'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = true,
 	},
 	nMaxDisplay = { -- 最大显示数量
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['Basic settings'],
+		szLabel = _L['MY_Focus'],
 		xSchema = Schema.Number,
 		xDefaultValue = 5,
 	},
 	fScaleX = { -- 缩放比例
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['Basic settings'],
+		szLabel = _L['MY_Focus'],
 		xSchema = Schema.Number,
 		xDefaultValue = 1,
 	},
 	fScaleY = { -- 缩放比例
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['Basic settings'],
+		szLabel = _L['MY_Focus'],
 		xSchema = Schema.Number,
 		xDefaultValue = 1,
 	},
 	anchor = { -- 默认坐标
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['Basic settings'],
+		szLabel = _L['MY_Focus'],
 		xSchema = Schema.FrameAnchor,
 		xDefaultValue = { x=-300, y=220, s='TOPRIGHT', r='TOPRIGHT' },
 	},
 
 	bFocusINpc = { -- 焦点重要NPC
 		ePathType = PATH_TYPE.GLOBAL,
-		szLabel = _L['Basic settings'],
+		szLabel = _L['MY_Focus'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bFocusFriend = { -- 焦点附近好友
 		ePathType = PATH_TYPE.GLOBAL,
-		szLabel = _L['Basic settings'],
+		szLabel = _L['MY_Focus'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bFocusTong = { -- 焦点帮会成员
 		ePathType = PATH_TYPE.GLOBAL,
-		szLabel = _L['Basic settings'],
+		szLabel = _L['MY_Focus'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bOnlyPublicMap = { -- 仅在公共地图焦点好友帮会成员
 		ePathType = PATH_TYPE.GLOBAL,
-		szLabel = _L['Basic settings'],
+		szLabel = _L['MY_Focus'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bSortByDistance = { -- 优先焦点近距离目标
 		ePathType = PATH_TYPE.GLOBAL,
-		szLabel = _L['Basic settings'],
+		szLabel = _L['MY_Focus'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bFocusEnemy = { -- 焦点敌对玩家
 		ePathType = PATH_TYPE.GLOBAL,
-		szLabel = _L['Basic settings'],
+		szLabel = _L['MY_Focus'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bFocusAnmerkungen = { -- 焦点记在小本本里的玩家
 		ePathType = PATH_TYPE.GLOBAL,
-		szLabel = _L['Basic settings'],
+		szLabel = _L['MY_Focus'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bAutoFocus = { -- 启用默认焦点
 		ePathType = PATH_TYPE.GLOBAL,
-		szLabel = _L['Basic settings'],
+		szLabel = _L['MY_Focus'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bTeamMonFocus = { -- 启用团队监控焦点
 		ePathType = PATH_TYPE.GLOBAL,
-		szLabel = _L['Basic settings'],
+		szLabel = _L['MY_Focus'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bHideDeath = { -- 隐藏死亡目标
 		ePathType = PATH_TYPE.GLOBAL,
-		szLabel = _L['Basic settings'],
+		szLabel = _L['MY_Focus'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bDisplayKungfuIcon = { -- 显示心法图标
 		ePathType = PATH_TYPE.GLOBAL,
-		szLabel = _L['Basic settings'],
+		szLabel = _L['MY_Focus'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bFocusJJCParty = { -- 焦竞技场队友
 		ePathType = PATH_TYPE.GLOBAL,
-		szLabel = _L['Basic settings'],
+		szLabel = _L['MY_Focus'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bFocusJJCEnemy = { -- 焦竞技场敌队
 		ePathType = PATH_TYPE.GLOBAL,
-		szLabel = _L['Basic settings'],
+		szLabel = _L['MY_Focus'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowTarget = { -- 显示目标目标
 		ePathType = PATH_TYPE.GLOBAL,
-		szLabel = _L['Basic settings'],
+		szLabel = _L['MY_Focus'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	szDistanceType = { -- 坐标距离计算方式
 		ePathType = PATH_TYPE.GLOBAL,
-		szLabel = _L['Basic settings'],
+		szLabel = _L['MY_Focus'],
 		xSchema = Schema.String,
 		xDefaultValue = 'global',
 	},
 	bHealHelper = { -- 辅助治疗模式
 		ePathType = PATH_TYPE.GLOBAL,
-		szLabel = _L['Basic settings'],
+		szLabel = _L['MY_Focus'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bShowTipRB = { -- 在屏幕右下角显示信息
 		ePathType = PATH_TYPE.GLOBAL,
-		szLabel = _L['Basic settings'],
+		szLabel = _L['MY_Focus'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bEnableSceneNavi = { -- 场景追踪点
 		ePathType = PATH_TYPE.GLOBAL,
-		szLabel = _L['Basic settings'],
+		szLabel = _L['MY_Focus'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
 	aPatternFocus = { -- 默认焦点
 		ePathType = PATH_TYPE.GLOBAL,
-		szLabel = _L['Auto focus'],
+		szLabel = _L['MY_Focus'],
 		xSchema = Schema.Collection(Schema.Record({
 			szMethod = Schema.String,
 			szPattern = Schema.String,
@@ -246,7 +246,7 @@ local O = LIB.CreateUserSettingsModule('MY_Focus', _L['MY_Focus'], {
 
 	tStaticFocus = { -- 永久焦点
 		ePathType = PATH_TYPE.SERVER,
-		szLabel = _L['Static focus'],
+		szLabel = _L['MY_Focus'],
 		xSchema = Schema.MixedTable({
 			[TARGET.PLAYER] = Schema.Map(Schema.Number, Schema.Boolean), -- dwID
 			[TARGET.NPC]    = Schema.Map(Schema.Number, Schema.Boolean), -- dwTemplateID

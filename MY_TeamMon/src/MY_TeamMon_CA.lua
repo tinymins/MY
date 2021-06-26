@@ -57,10 +57,10 @@ end
 --------------------------------------------------------------------------
 
 local CA_INIFILE = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_CA.ini'
-local O = LIB.CreateUserSettingsModule('MY_TeamMon_CA', _L['MY_TeamMon'], {
+local O = LIB.CreateUserSettingsModule('MY_TeamMon_CA', _L['Raid'], {
 	tAnchor = {
 		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_TeamMon_CA'],
+		szLabel = _L['MY_TeamMon'],
 		xSchema = Schema.FrameAnchor,
 		xDefaultValue = { s = 'CENTER', r = 'CENTER', x = 0, y = 350 },
 	},
