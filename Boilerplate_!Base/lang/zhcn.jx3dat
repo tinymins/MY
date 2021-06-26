@@ -3,6 +3,7 @@ return {
 	[' * '] = ' ※ ',
 	['SPLIT_DOT'] = '·',
 
+	['Common'] = '通用',
 	['General'] = '常用',
 	['Chat'] = '聊天',
 	['Raid'] = '团队',

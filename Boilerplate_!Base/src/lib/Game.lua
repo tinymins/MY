@@ -185,18 +185,20 @@ end
 end
 
 do
-local DISTANCE_TYPE
-local PATH = {'config/distance_type.jx3dat', PATH_TYPE.ROLE}
+local O = LIB.CreateUserSettingsModule('LIB', _L['Common'], {
+	szDistanceType = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['Default distance type settings'],
+		xSchema = Schema.OneOf('gwwean', 'euclidean','plane'),
+		xDefaultValue = 'gwwean',
+	},
+})
 function LIB.GetGlobalDistanceType()
-	if not DISTANCE_TYPE then
-		DISTANCE_TYPE = LIB.LoadLUAData(PATH) or 'gwwean'
-	end
-	return DISTANCE_TYPE
+	return O.szDistanceType
 end
 
 function LIB.SetGlobalDistanceType(szType)
-	DISTANCE_TYPE = szType
-	LIB.SaveLUAData(PATH, DISTANCE_TYPE)
+	O.szDistanceType = szType
 end
 
 function LIB.GetDistanceTypeList(bGlobal)
