@@ -485,6 +485,8 @@ local DATABASE_INSTANCE = {}
 local DATABASE_NEED_FLUSH = {}
 local USER_SETTINGS_INFO = {}
 local USER_SETTINGS_LIST = {}
+local DATA_CACHE = {}
+local DATA_CACHE_LEAF_FLAG = {}
 local FLUSH_TIME = 0
 
 function LIB.ConnectSettingsDatabase()
@@ -507,7 +509,7 @@ end
 
 function LIB.FlushSettingsDatabase()
 	for _, ePathType in ipairs(DATABASE_TYPE_LIST) do
-		if DATABASE_INSTANCE[ePathType] and DATABASE_NEED_FLUSH[ePathType] then
+		if DATABASE_INSTANCE[ePathType] and DATABASE_NEED_FLUSH[ePathType] and DATABASE_INSTANCE[ePathType].Commit then
 			DATABASE_INSTANCE[ePathType]:Commit()
 			DATABASE_NEED_FLUSH[ePathType] = nil
 		end
@@ -628,6 +630,15 @@ end
 -- @param {string} szDataSetKey 配置项组（如用户多套自定义偏好）唯一键，当且仅当 szKey 对应注册项携带 bDataSet 标记位时有效
 -- @return 值
 function LIB.GetUserSettings(szKey, ...)
+	-- 缓存加速
+	local cache = DATA_CACHE
+	for _, k in ipairs({...}) do
+		cache = IsTable(cache) and cache[k]
+	end
+	if IsTable(cache) and cache[1] == DATA_CACHE_LEAF_FLAG then
+		return cache[2]
+	end
+	-- 参数检查
 	local nParameter = select('#', ...) + 1
 	local szErrHeader = 'GetUserSettings KEY(' .. EncodeLUAData(szKey) .. '): '
 	local info = USER_SETTINGS_INFO[szKey]
@@ -642,7 +653,8 @@ function LIB.GetUserSettings(szKey, ...)
 	else
 		assert(nParameter == 1, szErrHeader .. '1 parameters expected, got ' .. nParameter)
 	end
-	local res = db:Get(info.szDataKey)
+	-- 读数据库
+	local res, bData = db:Get(info.szDataKey), false
 	if IsTable(res) and res.v == info.szVersion then
 		local data = res.d
 		if info.bDataSet then
@@ -653,15 +665,32 @@ function LIB.GetUserSettings(szKey, ...)
 			end
 		end
 		if not info.xSchema or not Schema.CheckSchema(data, info.xSchema) then
-			return data
+			bData = true
+			res = data
 		end
 	end
+	-- 默认值
+	if not bData then
+		if info.bDataSet then
+			res = info.tDataSetDefaultValue[szDataSetKey]
+			if IsNil(res) then
+				res = info.xDefaultValue
+			end
+		else
+			res = info.xDefaultValue
+		end
+		res = Clone(res)
+	end
+	-- 缓存
 	if info.bDataSet then
-		if not IsNil(info.tDataSetDefaultValue[szDataSetKey]) then
-			return Clone(info.tDataSetDefaultValue[szDataSetKey])
+		if not DATA_CACHE[szKey] then
+			DATA_CACHE[szKey] = {}
 		end
+		DATA_CACHE[szKey][szDataSetKey] = { DATA_CACHE_LEAF_FLAG, res }
+	else
+		DATA_CACHE[szKey] = { DATA_CACHE_LEAF_FLAG, res }
 	end
-	return Clone(info.xDefaultValue)
+	return res
 end
 
 -- 保存用户配置项值
@@ -669,6 +698,7 @@ end
 -- @param {string} szDataSetKey 配置项组（如用户多套自定义偏好）唯一键，当且仅当 szKey 对应注册项携带 bDataSet 标记位时有效
 -- @param {unknown} xValue 值
 function LIB.SetUserSettings(szKey, ...)
+	-- 参数检查
 	local nParameter = select('#', ...) + 1
 	local szErrHeader = 'SetUserSettings KEY(' .. EncodeLUAData(szKey) .. '): '
 	local info = USER_SETTINGS_INFO[szKey]
@@ -688,6 +718,7 @@ function LIB.SetUserSettings(szKey, ...)
 		assert(nParameter == 2, szErrHeader .. '2 parameters expected, got ' .. nParameter)
 		xValue = ...
 	end
+	-- 数据校验
 	if info.xSchema then
 		local errs = Schema.CheckSchema(xValue, info.xSchema)
 		if errs then
@@ -698,6 +729,7 @@ function LIB.SetUserSettings(szKey, ...)
 			assert(false, szErrHeader .. '' .. szKey .. ', schema check failed.\n' .. concat(aErrmsgs, '\n'))
 		end
 	end
+	-- 写数据库
 	if info.bDataSet then
 		local res = db:Get(info.szDataKey)
 		if IsTable(res) and res.v == info.szVersion and IsTable(res.d) then
@@ -706,6 +738,12 @@ function LIB.SetUserSettings(szKey, ...)
 		else
 			xValue = { [szDataSetKey] = xValue }
 		end
+		if not DATA_CACHE[szKey] then
+			DATA_CACHE[szKey] = {}
+		end
+		DATA_CACHE[szKey][szDataSetKey] = { DATA_CACHE_LEAF_FLAG, xValue[szDataSetKey] }
+	else
+		DATA_CACHE[szKey] = { DATA_CACHE_LEAF_FLAG, xValue }
 	end
 	db:Set(info.szDataKey, { d = xValue, v = info.szVersion })
 	DATABASE_NEED_FLUSH[info.ePathType] = true
@@ -716,6 +754,7 @@ end
 -- @param {string} szKey 配置项全局唯一键
 -- @param {string} szDataSetKey 配置项组（如用户多套自定义偏好）唯一键，当且仅当 szKey 对应注册项携带 bDataSet 标记位时有效
 function LIB.ResetUserSettings(szKey, ...)
+	-- 参数检查
 	local nParameter = select('#', ...) + 1
 	local szErrHeader = 'ResetUserSettings KEY(' .. EncodeLUAData(szKey) .. '): '
 	local info = USER_SETTINGS_INFO[szKey]
@@ -730,6 +769,7 @@ function LIB.ResetUserSettings(szKey, ...)
 	else
 		assert(nParameter == 1, szErrHeader .. '1 parameters expected, got ' .. nParameter)
 	end
+	-- 写数据库
 	if info.bDataSet then
 		local res = db:Get(info.szDataKey)
 		if IsTable(res) and res.v == info.szVersion and IsTable(res.d) and szDataSetKey then
@@ -739,11 +779,16 @@ function LIB.ResetUserSettings(szKey, ...)
 			else
 				db:Set(info.szDataKey, res)
 			end
+			if DATA_CACHE[szKey] then
+				DATA_CACHE[szKey][szDataSetKey] = nil
+			end
 		else
 			db:Delete(info.szDataKey)
+			DATA_CACHE[szKey] = nil
 		end
 	else
 		db:Delete(info.szDataKey)
+		DATA_CACHE[szKey] = nil
 	end
 	DATABASE_NEED_FLUSH[info.ePathType] = true
 end
@@ -752,8 +797,7 @@ end
 -- @param {string | table} xProxy 配置项代理表（ alias => globalKey ），或模块命名空间
 -- @return 配置项读写代理对象
 function LIB.CreateUserSettingsProxy(xProxy)
-	local tSettings = {}
-	local tDataSet = {}
+	local tDataSetProxy = {}
 	local tLoaded = {}
 	local tProxy = IsTable(xProxy) and xProxy or {}
 	for k, v in pairs(tProxy) do
@@ -771,43 +815,26 @@ function LIB.CreateUserSettingsProxy(xProxy)
 	end
 	return setmetatable({}, {
 		__index = function(_, k)
+			local szGlobalKey = GetGlobalKey(k)
 			if not tLoaded[k] then
-				local szGlobalKey = GetGlobalKey(k)
 				local info = USER_SETTINGS_INFO[szGlobalKey]
 				if info and info.bDataSet then
 					-- 配置项组，初始化读写模块
-					local tDSSettings = {}
-					local tDSLoaded = {}
-					tDataSet[k] = setmetatable({}, {
+					tDataSetProxy[k] = setmetatable({}, {
 						__index = function(_, kds)
-							if not tDSLoaded[kds] then
-								tDSSettings[kds] = LIB.GetUserSettings(szGlobalKey, kds)
-								tDSLoaded[kds] = true
-							end
-							return tDSSettings[kds]
+							return LIB.GetUserSettings(szGlobalKey, kds)
 						end,
 						__newindex = function(_, kds, vds)
-							if not LIB.SetUserSettings(szGlobalKey, kds, vds) then
-								return
-							end
-							tDSSettings[kds] = vds
-							tDSLoaded[kds] = true
+							LIB.SetUserSettings(szGlobalKey, kds, vds)
 						end,
 					})
-				else
-					-- 普通数据，加载数据内容
-					tSettings[k] = LIB.GetUserSettings(szGlobalKey)
 				end
 				tLoaded[k] = true
 			end
-			return tDataSet[k] or tSettings[k]
+			return tDataSetProxy[k] or LIB.GetUserSettings(szGlobalKey)
 		end,
 		__newindex = function(_, k, v)
-			if not LIB.SetUserSettings(GetGlobalKey(k), v) then
-				return
-			end
-			tSettings[k] = v
-			tLoaded[k] = true
+			LIB.SetUserSettings(GetGlobalKey(k), v)
 		end,
 		__call = function(_, cmd, arg0)
 			if cmd == 'reset' then
