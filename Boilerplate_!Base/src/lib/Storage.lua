@@ -484,6 +484,7 @@ local DATABASE_TYPE_LIST = { PATH_TYPE.ROLE, PATH_TYPE.SERVER, PATH_TYPE.GLOBAL 
 local DATABASE_INSTANCE = {}
 local DATABASE_NEED_FLUSH = {}
 local USER_SETTINGS_INFO = {}
+local USER_SETTINGS_LIST = {}
 local FLUSH_TIME = 0
 
 function LIB.ConnectSettingsDatabase()
@@ -561,7 +562,7 @@ function LIB.RegisterUserSettings(szKey, tOption)
 			assert(false, szErrHeader .. '`DefaultValue` cannot pass `Schema` check.' .. '\n' .. concat(aErrmsgs, '\n'))
 		end
 	end
-	USER_SETTINGS_INFO[szKey] = {
+	local tInfo = {
 		szKey = szKey,
 		ePathType = ePathType,
 		szDataKey = szDataKey,
@@ -572,14 +573,12 @@ function LIB.RegisterUserSettings(szKey, tOption)
 		xSchema = xSchema,
 		bDataSet = bDataSet,
 	}
+	USER_SETTINGS_INFO[szKey] = tInfo
+	insert(USER_SETTINGS_LIST, tInfo)
 end
 
 function LIB.GetRegisterUserSettingsList()
-	local aRes = {}
-	for _, v in pairs(USER_SETTINGS_INFO) do
-		insert(aRes, Clone(v))
-	end
-	return aRes
+	return Clone(USER_SETTINGS_LIST)
 end
 
 -- 获取用户配置项值
