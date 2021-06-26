@@ -156,5 +156,5 @@ return {
 	['No custom setting found, nothing to export.'] = '选中的配置项尚未进行自定义配置，默认配置无需导出。',
 	['%d settings exported, file saved in %s.'] = '成功导出 %d 条配置项，文件位于：%s。',
 
-	['Default distance type settings'] = '默认距离算法',
+	['Default distance type settings'] = '距离算法',
 }
