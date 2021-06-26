@@ -25,6 +25,7 @@ return {
 	['Add to Important-NPC list'] = '加入重要角色列表',
 	['Remove from Important-NPC list'] = '從重要角色列表中移除',
 
+	['Global color'] = '全局配色',
 	['Force color'] = '門派配色',
 	['Camp color'] = '陣營配色',
 
