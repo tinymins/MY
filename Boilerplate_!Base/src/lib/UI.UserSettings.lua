@@ -124,9 +124,7 @@ function D.Open(bImport)
 				end,
 			})
 		for _, tItem in ipairs(tGroup.aItem) do
-			if bImport then
-				tItemChecked[tItem.szID] = true
-			end
+			tItemChecked[tItem.szID] = true
 			tUiItemChk[tItem.szID] = uiContainer:Append('WndWindow', { w = nW / 3, h = 30 })
 				:Append('WndCheckBox', {
 					x = 0, w = nW / 3,
