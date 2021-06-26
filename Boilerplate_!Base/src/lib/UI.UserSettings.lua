@@ -115,7 +115,7 @@ function D.Open(bImport)
 				w = nW,
 				text = tGroup.szGroup,
 				color = {255, 255, 0},
-				checked = bImport,
+				checked = true,
 				oncheck = function (bCheck)
 					for _, tItem in ipairs(tGroup.aItem) do
 						tItemChecked[tItem.szID] = bCheck
@@ -124,17 +124,17 @@ function D.Open(bImport)
 				end,
 			})
 		for _, tItem in ipairs(tGroup.aItem) do
-			tItemChecked[tItem.szID] = true
 			tUiItemChk[tItem.szID] = uiContainer:Append('WndWindow', { w = nW / 3, h = 30 })
 				:Append('WndCheckBox', {
 					x = 0, w = nW / 3,
 					text = tItem.szLabel,
-					checked = tItemChecked[tItem.szID],
+					checked = true,
 					oncheck = function(bCheck)
 						tItemChecked[tItem.szID] = bCheck
 						UpdateCheckboxState()
 					end,
 				})
+			tItemChecked[tItem.szID] = true
 		end
 		uiContainer:Append('WndWindow', { w = nW, h = 10 })
 	end
