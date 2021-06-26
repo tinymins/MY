@@ -82,6 +82,30 @@ function PS.OnPanelActive(wnd)
 
 	ui:Append('Text', {
 		x = X - 10, y = nY,
+		text = _L['User Settings'],
+		color = { 255, 255, 0 },
+	}):AutoWidth()
+	nX, nY = X, nY + 30
+
+	nX = nX + ui:Append('WndButtonBox', {
+		x = nX, y = nY,
+		text = _L['Export data'],
+		onclick = function()
+			LIB.OpenUserSettingsExportPanel()
+		end,
+	}):AutoWidth():Width() + 5
+
+	nX = nX + ui:Append('WndButtonBox', {
+		x = nX, y = nY,
+		text = _L['Import data'],
+		onclick = function()
+			LIB.OpenUserSettingsImportPanel()
+		end,
+	}):AutoWidth():Width() + 5
+	nX, nY = X, nY + 30
+
+	ui:Append('Text', {
+		x = X - 10, y = nY,
 		text = _L['System Info'],
 		color = { 255, 255, 0 },
 	}):AutoWidth()

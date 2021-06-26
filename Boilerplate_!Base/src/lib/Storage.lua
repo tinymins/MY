@@ -581,6 +581,32 @@ function LIB.GetRegisterUserSettingsList()
 	return Clone(USER_SETTINGS_LIST)
 end
 
+function LIB.ExportUserSettings(aKey)
+	local tKvp = {}
+	for _, szKey in ipairs(aKey) do
+		local info = USER_SETTINGS_INFO[szKey]
+		local db = info and DATABASE_INSTANCE[info.ePathType]
+		if db then
+			tKvp[szKey] = db:Get(info.szDataKey)
+		end
+	end
+	return tKvp
+end
+
+function LIB.ImportUserSettings(tKvp)
+	local nSuccess = 0
+	for szKey, xValue in pairs(tKvp) do
+		local info = USER_SETTINGS_INFO[szKey]
+		local db = info and DATABASE_INSTANCE[info.ePathType]
+		if db then
+			nSuccess = nSuccess + 1
+			db:Set(info.szDataKey, xValue)
+		end
+	end
+	FireUIEvent(NSFormatString('{$NS}_USER_SETTINGS_READY'))
+	return nSuccess
+end
+
 -- 获取用户配置项值
 -- @param {string} szKey 配置项全局唯一键
 -- @param {string} szDataSetKey 配置项组（如用户多套自定义偏好）唯一键，当且仅当 szKey 对应注册项携带 bDataSet 标记位时有效

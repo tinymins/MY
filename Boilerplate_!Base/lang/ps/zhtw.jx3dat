@@ -13,6 +13,7 @@ return {
 	['Order desc'] = '逆序顯示',
 	['Disable dismiss'] = '禁止消息自動消失',
 	['System Info'] = '系統信息',
+	['User Settings'] = '角色配置',
 
 	-- welcome
 	['%s, welcome to use %s!'] = '歡迎%s使用%s！',
@@ -26,6 +27,8 @@ return {
 	['Show error message'] = '點擊查看錯誤日誌，請在上報問題時複製提交',
 	['Debug tools has been enabled...'] = '測試工具已激活_(:彡」∠)_',
 	['Flush data'] = '保存數據',
+	['Export data'] = '導出配置',
+	['Import data'] = '導入配置',
 	['Config and data will be saved when exit game, click to save immediately'] = '設置數據將在退出游戲後自動保存，點擊立刻保存',
 
 	['Fee left %H:%mm:%ss'] = '計費剩餘：%H小時%mm分鐘%ss秒',

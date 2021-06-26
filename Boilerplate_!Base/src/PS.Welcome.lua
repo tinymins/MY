@@ -92,6 +92,7 @@ function PS.OnPanelActive(wnd)
 						local szRoot = LIB.GetAbsolutePath({'', PATH_TYPE.ROLE}):gsub('/', '\\')
 						LIB.OpenFolder(szRoot)
 						UI.OpenTextEditor(szRoot)
+						UI.ClosePopupMenu()
 					end,
 				},
 				{
@@ -105,6 +106,7 @@ function PS.OnPanelActive(wnd)
 						local szRoot = LIB.GetAbsolutePath({'', PATH_TYPE.SERVER}):gsub('/', '\\')
 						LIB.OpenFolder(szRoot)
 						UI.OpenTextEditor(szRoot)
+						UI.ClosePopupMenu()
 					end,
 				},
 				{
@@ -118,8 +120,10 @@ function PS.OnPanelActive(wnd)
 						local szRoot = LIB.GetAbsolutePath({'', PATH_TYPE.GLOBAL}):gsub('/', '\\')
 						LIB.OpenFolder(szRoot)
 						UI.OpenTextEditor(szRoot)
+						UI.ClosePopupMenu()
 					end,
 				},
+				CONSTANT.MENU_DIVIDER,
 				{
 					szOption = _L['Flush data'],
 					fnMouseEnter = function()
@@ -129,6 +133,21 @@ function PS.OnPanelActive(wnd)
 					end,
 					fnAction = function()
 						LIB.FireFlush()
+						UI.ClosePopupMenu()
+					end,
+				},
+				{
+					szOption = _L['Export data'],
+					fnAction = function()
+						LIB.OpenUserSettingsExportPanel()
+						UI.ClosePopupMenu()
+					end,
+				},
+				{
+					szOption = _L['Import data'],
+					fnAction = function()
+						LIB.OpenUserSettingsImportPanel()
+						UI.ClosePopupMenu()
 					end,
 				},
 			}

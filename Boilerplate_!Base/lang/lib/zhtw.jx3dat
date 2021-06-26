@@ -142,4 +142,13 @@ return {
 
 	['Request list'] = '請求列表',
 	['Clear list and close?'] = '清空列表並關閉？',
+
+	['Import User Settings'] = '導入配置項',
+	['Export User Settings'] = '導出配置項',
+	['Import'] = '導入',
+	['Export'] = '導出',
+	['%d settings imported.'] = '成功導入 %d 條配置項。',
+	['No custom setting selected, nothing to export.'] = '請先選擇您想要導出的自定義配置項。',
+	['No custom setting found, nothing to export.'] = '選中的配置項尚未進行自定義配置，默認配置無需導出。',
+	['%d settings exported, file saved in %s.'] = '成功導出 %d 條配置項，文件位於：%s。',
 }
