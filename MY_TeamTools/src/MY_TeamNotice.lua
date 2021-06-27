@@ -335,7 +335,7 @@ function TI.OpenFrame()
 	end
 end
 
-LIB.RegisterEvent('PARTY_LEVEL_UP_RAID.TEAM_NOTICE', function()
+LIB.RegisterEvent('PARTY_LEVEL_UP_RAID', 'TEAM_NOTICE', function()
 	if LIB.IsInZombieMap() then
 		return
 	end
@@ -346,7 +346,7 @@ LIB.RegisterEvent('PARTY_LEVEL_UP_RAID.TEAM_NOTICE', function()
 		end)
 	end
 end)
-LIB.RegisterEvent('FIRST_LOADING_END.TEAM_NOTICE', function()
+LIB.RegisterEvent('FIRST_LOADING_END', 'TEAM_NOTICE', function()
 	if not O.bEnable then
 		return
 	end
@@ -355,7 +355,7 @@ LIB.RegisterEvent('FIRST_LOADING_END.TEAM_NOTICE', function()
 		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', {'ASK'}, true)
 	end
 end)
-LIB.RegisterEvent('LOADING_END.TEAM_NOTICE', function()
+LIB.RegisterEvent('LOADING_END', 'TEAM_NOTICE', function()
 	local frame = TI.GetFrame()
 	if frame and LIB.IsInZombieMap() then
 		Wnd.CloseWindow(frame)
@@ -364,7 +364,7 @@ LIB.RegisterEvent('LOADING_END.TEAM_NOTICE', function()
 end)
 
 -- 退队时清空团队告示
-LIB.RegisterEvent({'PARTY_DISBAND.TEAM_NOTICE', 'PARTY_DELETE_MEMBER.TEAM_NOTICE'}, function(e)
+LIB.RegisterEvent({'PARTY_DISBAND', 'PARTY_DELETE_MEMBER'}, 'TEAM_NOTICE', function(e)
 	if e == 'PARTY_DISBAND' or (e == 'PARTY_DELETE_MEMBER' and arg1 == UI_GetClientPlayerID()) then
 		local frame = TI.GetFrame()
 		if frame then
@@ -375,7 +375,7 @@ LIB.RegisterEvent({'PARTY_DISBAND.TEAM_NOTICE', 'PARTY_DELETE_MEMBER.TEAM_NOTICE
 	end
 end)
 
-LIB.RegisterEvent('ON_BG_CHANNEL_MSG.LR_TeamNotice', function()
+LIB.RegisterEvent('ON_BG_CHANNEL_MSG', 'LR_TeamNotice', function()
 	if not O.bEnable then
 		return
 	end

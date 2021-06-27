@@ -101,7 +101,7 @@ local D = {
 function D.OnAlertPetChange()
 	local bAlertPet = O.bAlertPet
 	if bAlertPet then
-		LIB.RegisterEvent('NPC_LEAVE_SCENE.MY_Force__AlertPet', function()
+		LIB.RegisterEvent('NPC_LEAVE_SCENE', 'MY_Force__AlertPet', function()
 			local me = GetClientPlayer()
 			if me and me.dwForceID == FORCE_TYPE.WU_DU then
 				local pet = me.GetPet()
@@ -111,7 +111,7 @@ function D.OnAlertPetChange()
 				end
 			end
 		end)
-		LIB.RegisterEvent('DO_SKILL_CAST.MY_Force__AlertPet', function()
+		LIB.RegisterEvent('DO_SKILL_CAST', 'MY_Force__AlertPet', function()
 			if arg0 == UI_GetClientPlayerID() then
 				-- 献祭、各种召唤：2965，2221 ~ 2226
 				if arg1 == 2965 or (arg1 >= 2221 and arg1 <= 2226) then
@@ -120,8 +120,8 @@ function D.OnAlertPetChange()
 			end
 		end)
 	else
-		LIB.RegisterEvent('NPC_LEAVE_SCENE.MY_Force__AlertPet', false)
-		LIB.RegisterEvent('DO_SKILL_CAST.MY_Force__AlertPet', false)
+		LIB.RegisterEvent('NPC_LEAVE_SCENE', 'MY_Force__AlertPet', false)
+		LIB.RegisterEvent('DO_SKILL_CAST', 'MY_Force__AlertPet', false)
 	end
 end
 
@@ -144,7 +144,7 @@ end
 function D.OnMarkPetChange()
 	local bMarkPet = O.bMarkPet
 	if bMarkPet then
-		LIB.RegisterEvent({'NPC_ENTER_SCENE.MY_Force__MarkPet', 'NPC_DISPLAY_DATA_UPDATE.MY_Force__MarkPet'}, function()
+		LIB.RegisterEvent({'NPC_ENTER_SCENE', 'NPC_DISPLAY_DATA_UPDATE'}, 'MY_Force__MarkPet', function()
 			local pet = GetClientPlayer().GetPet()
 			if pet and arg0 == pet.dwID then
 				LIB.DelayCall(500, function()
@@ -158,7 +158,7 @@ function D.OnMarkPetChange()
 			end
 		end)
 	else
-		LIB.RegisterEvent({'NPC_ENTER_SCENE.MY_Force__MarkPet', 'NPC_DISPLAY_DATA_UPDATE.MY_Force__MarkPet'}, false)
+		LIB.RegisterEvent({'NPC_ENTER_SCENE', 'NPC_DISPLAY_DATA_UPDATE'}, 'MY_Force__MarkPet', false)
 	end
 	UpdatePetMark(bMarkPet)
 end
@@ -168,7 +168,7 @@ end
 function D.OnFeedHorseChange()
 	local bFeedHorse = O.bFeedHorse
 	if bFeedHorse then
-		LIB.RegisterEvent('SYS_MSG.MY_Force__FeedHorse', function()
+		LIB.RegisterEvent('SYS_MSG', 'MY_Force__FeedHorse', function()
 			local me = GetClientPlayer()
 			-- 读条技能
 			if arg0 == 'UI_OME_SKILL_CAST_LOG' and O.bFeedHorse and arg1 == me.dwID
@@ -187,7 +187,7 @@ function D.OnFeedHorseChange()
 			end
 		end)
 	else
-		LIB.RegisterEvent('SYS_MSG.MY_Force__FeedHorse', false)
+		LIB.RegisterEvent('SYS_MSG', 'MY_Force__FeedHorse', false)
 	end
 end
 
@@ -195,7 +195,7 @@ end
 function D.OnWarningDebuffChange()
 	local bWarningDebuff = O.bWarningDebuff
 	if bWarningDebuff then
-		LIB.RegisterEvent('BUFF_UPDATE.MY_Force__WarningDebuff', function()
+		LIB.RegisterEvent('BUFF_UPDATE', 'MY_Force__WarningDebuff', function()
 			-- buff update：
 			-- arg0：dwPlayerID，arg1：bDelete，arg2：nIndex，arg3：bCanCancel
 			-- arg4：dwBuffID，arg5：nStackNum，arg6：nEndFrame，arg7：？update all?
@@ -229,7 +229,7 @@ function D.OnWarningDebuffChange()
 			end
 		end)
 	else
-		LIB.RegisterEvent('BUFF_UPDATE.MY_Force__WarningDebuff', false)
+		LIB.RegisterEvent('BUFF_UPDATE', 'MY_Force__WarningDebuff', false)
 	end
 end
 
@@ -253,7 +253,7 @@ function D.OnAlertWantedChange()
 	local bAlertWanted = O.bAlertWanted
 	if bAlertWanted then
 		-- 变化时更新头顶效果
-		LIB.RegisterEvent('PLAYER_STATE_UPDATE.MY_Force__AlertWanted', function()
+		LIB.RegisterEvent('PLAYER_STATE_UPDATE', 'MY_Force__AlertWanted', function()
 			if arg0 == UI_GetClientPlayerID() then
 				if D.bHasWanted then
 					SceneObject_SetTitleEffect(TARGET.PLAYER, arg0, 47)
@@ -261,7 +261,7 @@ function D.OnAlertWantedChange()
 			end
 		end)
 		-- 重伤后删除头顶效果
-		LIB.RegisterEvent('SYS_MSG.MY_Force__AlertWanted', function()
+		LIB.RegisterEvent('SYS_MSG', 'MY_Force__AlertWanted', function()
 			if arg0 == 'UI_OME_DEATH_NOTIFY' then
 				if D.bHasWanted and arg1 == UI_GetClientPlayerID() then
 					D.bHasWanted = nil
@@ -271,21 +271,21 @@ function D.OnAlertWantedChange()
 		end)
 		RegisterMsgMonitor(OnMsgAnnounce, {'MSG_GM_ANNOUNCE'})
 	else
-		LIB.RegisterEvent('PLAYER_STATE_UPDATE.MY_Force__AlertWanted', false)
-		LIB.RegisterEvent('SYS_MSG.MY_Force__AlertWanted', false)
+		LIB.RegisterEvent('PLAYER_STATE_UPDATE', 'MY_Force__AlertWanted', false)
+		LIB.RegisterEvent('SYS_MSG', 'MY_Force__AlertWanted', false)
 		UnRegisterMsgMonitor(OnMsgAnnounce, {'MSG_GM_ANNOUNCE'})
 	end
 end
 end
 
-LIB.RegisterEvent('LOADING_END.MY_Force', function()
+LIB.RegisterEvent('LOADING_END', 'MY_Force', function()
 	local buff = Table_GetBuff(374, 1)
 	if buff then
 		buff.bShowTime = 1
 	end
 end)
 
-LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_Force', function()
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_Force', function()
 	D.OnAlertPetChange()
 	D.OnMarkPetChange()
 	D.OnFeedHorseChange()

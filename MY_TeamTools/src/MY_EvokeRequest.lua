@@ -191,7 +191,7 @@ function D.OnMessageBoxOpen()
 	end
 end
 
-LIB.RegisterEvent('ON_MESSAGE_BOX_OPEN.MY_EvokeRequest' , D.OnMessageBoxOpen)
+LIB.RegisterEvent('ON_MESSAGE_BOX_OPEN', 'MY_EvokeRequest' , D.OnMessageBoxOpen)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	x = x + ui:Append('WndComboBox', {

@@ -359,7 +359,7 @@ LIB.RegisterBgMsg('MY_GKP', function(_, data, nChannel, dwID, szName, bIsSelf)
 	end
 end)
 
-LIB.RegisterEvent('ON_BG_CHANNEL_MSG.LR_GKP', function()
+LIB.RegisterEvent('ON_BG_CHANNEL_MSG', 'LR_GKP', function()
 	local szMsgID, nChannel, dwID, szName, data, bSelf = arg0, arg1, arg2, arg3, arg4, arg2 == UI_GetClientPlayerID()
 	if szMsgID ~= 'LR_GKP' or bSelf then
 		return

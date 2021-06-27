@@ -185,7 +185,7 @@ function D.Apply()
 	end
 end
 
-LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_TeamBalloon', function()
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_TeamBalloon', function()
 	D.Apply()
 end)
 

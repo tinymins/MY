@@ -287,7 +287,7 @@ local function onOpenWindow()
 	end
 	LIB.DelayCall('MY_AutoDialogue__AutoDialogue', D.AutoDialogue)
 end
-LIB.RegisterEvent('OPEN_WINDOW.MY_AutoDialogue', onOpenWindow)
+LIB.RegisterEvent('OPEN_WINDOW', 'MY_AutoDialogue', onOpenWindow)
 end
 
 ---------------------------------------------------------------------------
@@ -340,7 +340,7 @@ LIB.RegisterInit('MY_AutoDialogue#SkipQuestTalk', onInit)
 local function onFrameCreate()
 	LIB.BreatheCall('MY_AutoDialogue#SkipQuestTalk', HookSkipQuestTalk)
 end
-LIB.RegisterFrameCreate('QuestAcceptPanel.MY_AutoDialogue#SkipQuestTalk', onFrameCreate)
+LIB.RegisterFrameCreate('QuestAcceptPanel', 'MY_AutoDialogue#SkipQuestTalk', onFrameCreate)
 end
 
 ---------------------------------------------------------------------------
@@ -468,7 +468,7 @@ function D.CreateEntry()
 	D.UpdateEntryPos()
 end
 for _, p in ipairs(ENTRY_LIST) do
-	LIB.RegisterFrameCreate(p.name .. '.MY_AutoDialogue#ENTRY', D.CreateEntry)
+	LIB.RegisterFrameCreate(p.name, 'MY_AutoDialogue#ENTRY', D.CreateEntry)
 end
 LIB.RegisterInit('MY_AutoDialogue', D.CreateEntry)
 
@@ -500,7 +500,7 @@ function D.UpdateEntryPos()
 		end
 	end
 end
-LIB.RegisterEvent('UI_SCALED.MY_AutoDialogue#ENTRY', D.UpdateEntryPos)
+LIB.RegisterEvent('UI_SCALED', 'MY_AutoDialogue#ENTRY', D.UpdateEntryPos)
 
 function D.RemoveEntry()
 	for i, p in ipairs(ENTRY_LIST) do
@@ -518,9 +518,9 @@ local function onOpenWindow()
 	end
 	D.CreateEntry()
 end
-LIB.RegisterEvent('OPEN_WINDOW.MY_AutoDialogue#ENTRY', onOpenWindow)
+LIB.RegisterEvent('OPEN_WINDOW', 'MY_AutoDialogue#ENTRY', onOpenWindow)
 
-LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_AutoDialogue#ENTRY', function()
+LIB.RegisterEvent('MY_SHIELDED_VERSION', 'MY_AutoDialogue#ENTRY', function()
 	if arg0 and arg0 ~= 'MY_AutoDialogue' then
 		return
 	end

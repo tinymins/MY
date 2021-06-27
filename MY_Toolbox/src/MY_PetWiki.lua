@@ -199,7 +199,7 @@ LIB.RegisterInit('MY_PetWiki', function()
 	D.HookPetFrame(frame)
 end)
 
-LIB.RegisterFrameCreate('NewPet.MY_PetWiki', function(name, frame)
+LIB.RegisterFrameCreate('NewPet', 'MY_PetWiki', function(name, frame)
 	D.HookPetFrame(frame)
 end)
 

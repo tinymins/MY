@@ -328,7 +328,7 @@ function D.ReinitUI()
 end
 
 -- ×¢²áINITÊÂ¼þ
-LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_INFOTIP', function()
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_INFOTIP', function()
 	D.LoadConfig()
 	D.ReinitUI()
 end)

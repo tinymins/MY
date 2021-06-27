@@ -80,24 +80,28 @@ local function LoadDefaultTemplate(szStyle)
 	return template
 end
 
-local CONFIG_DEFAULTS = setmetatable({
-	DEFAULT  = LoadDefaultTemplate('default'),
-	OFFICIAL = LoadDefaultTemplate('official'),
-	CLEAR    = LoadDefaultTemplate('clear'),
-	XLIFEBAR = LoadDefaultTemplate('xlifebar'),
-}, {
-	__call = function(t, k, d)
-		local template = t[k]
-		return LIB.FormatDataStructure(d, template[1], true, template[2])
-	end,
-	__index = function(t, k) return t.DEFAULT end,
-})
-
-if not CONFIG_DEFAULTS.DEFAULT then
-	return LIB.Debug(_L['MY_LifeBar'], _L['Default config cannot be loaded, please reinstall!!!'], DEBUG_LEVEL.ERROR)
-end
-local Config, ConfigLoaded = CONFIG_DEFAULTS('DEFAULT'), false
+local CONFIG_DEFAULTS, Config
+local ConfigLoaded = false
 local CONFIG_PATH = 'config/xlifebar/%s.jx3dat'
+
+function D.Init()
+	CONFIG_DEFAULTS = setmetatable({
+		DEFAULT  = LoadDefaultTemplate('default'),
+		OFFICIAL = LoadDefaultTemplate('official'),
+		CLEAR    = LoadDefaultTemplate('clear'),
+		XLIFEBAR = LoadDefaultTemplate('xlifebar'),
+	}, {
+		__call = function(t, k, d)
+			local template = t[k]
+			return LIB.FormatDataStructure(d, template[1], true, template[2])
+		end,
+		__index = function(t, k) return t.DEFAULT end,
+	})
+	if not CONFIG_DEFAULTS.DEFAULT then
+		return LIB.Debug(_L['MY_LifeBar'], _L['Default config cannot be loaded, please reinstall!!!'], DEBUG_LEVEL.ERROR)
+	end
+	Config = CONFIG_DEFAULTS('DEFAULT')
+end
 
 function D.GetConfigPath()
 	return (CONFIG_PATH:format(MY_LifeBar.szConfig))
@@ -125,7 +129,7 @@ local function onUIScaled()
 	D.AutoAdjustScale()
 	FireUIEvent('MY_LIFEBAR_CONFIG_UPDATE')
 end
-LIB.RegisterEvent('UI_SCALED.MY_LifeBar_Config', onUIScaled)
+LIB.RegisterEvent('UI_SCALED', 'MY_LifeBar_Config', onUIScaled)
 end
 
 function D.LoadConfig(szConfig)
@@ -161,7 +165,11 @@ function D.LoadConfig(szConfig)
 	ConfigLoaded = true
 	FireUIEvent('MY_LIFEBAR_CONFIG_LOADED')
 end
-LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_LifeBar_Config', function() D.LoadConfig() end)
+
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_LifeBar_Config', function()
+	D.Init()
+	D.LoadConfig()
+end)
 
 function D.SaveConfig()
 	if not ConfigLoaded then

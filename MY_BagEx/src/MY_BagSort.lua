@@ -94,8 +94,8 @@ function D.StackGuildBank()
 			btn:Enable(1)
 			Station.Lookup('Normal/GuildBankPanel/Btn_MY_Sort'):Enable(1)
 		end
-		LIB.RegisterEvent('TONG_EVENT_NOTIFY.MY_BagSort__Stack', false)
-		LIB.RegisterEvent('UPDATE_TONG_REPERTORY_PAGE.MY_BagSort__Stack', false)
+		LIB.RegisterEvent('TONG_EVENT_NOTIFY', 'MY_BagSort__Stack', false)
+		LIB.RegisterEvent('UPDATE_TONG_REPERTORY_PAGE', 'MY_BagSort__Stack', false)
 	end
 	local function fnLoop()
 		local me, tList = GetClientPlayer(), {}
@@ -118,8 +118,8 @@ function D.StackGuildBank()
 	end
 	frame:Lookup('Btn_MY_Stack'):Enable(0)
 	frame:Lookup('Btn_MY_Sort'):Enable(0)
-	LIB.RegisterEvent('UPDATE_TONG_REPERTORY_PAGE.MY_BagSort__Stack', fnLoop)
-	LIB.RegisterEvent('TONG_EVENT_NOTIFY.MY_BagSort__Stack', function()
+	LIB.RegisterEvent('UPDATE_TONG_REPERTORY_PAGE', 'MY_BagSort__Stack', fnLoop)
+	LIB.RegisterEvent('TONG_EVENT_NOTIFY', 'MY_BagSort__Stack', function()
 		-- TONG_EVENT_CODE.TAKE_REPERTORY_ITEM_PERMISSION_DENY_ERROR
 		if arg0 == TONG_EVENT_CODE.PUT_ITEM_IN_REPERTORY_SUCCESS then
 			fnFinish()
@@ -237,8 +237,8 @@ function D.SortGuildBank()
 			btn:Enable(1)
 			Station.Lookup('Normal/GuildBankPanel/Btn_MY_Stack'):Enable(1)
 		end
-		LIB.RegisterEvent('TONG_EVENT_NOTIFY.MY_BagSort__Sort', false)
-		LIB.RegisterEvent('UPDATE_TONG_REPERTORY_PAGE.MY_BagSort__Sort', false)
+		LIB.RegisterEvent('TONG_EVENT_NOTIFY', 'MY_BagSort__Sort', false)
+		LIB.RegisterEvent('UPDATE_TONG_REPERTORY_PAGE', 'MY_BagSort__Sort', false)
 	end
 	-- 根据排序结果与当前状态交换物品
 	local function fnNext()
@@ -308,13 +308,13 @@ function D.SortGuildBank()
 	end
 	frame:Lookup('Btn_MY_Sort'):Enable(0)
 	frame:Lookup('Btn_MY_Stack'):Enable(0)
-	LIB.RegisterEvent('UPDATE_TONG_REPERTORY_PAGE.MY_BagSort__Sort', function()
+	LIB.RegisterEvent('UPDATE_TONG_REPERTORY_PAGE', 'MY_BagSort__Sort', function()
 		if szState == 'Refreshing' then
 			szState = 'Idle'
 			fnNext()
 		end
 	end)
-	LIB.RegisterEvent('TONG_EVENT_NOTIFY.MY_BagSort__Sort', function()
+	LIB.RegisterEvent('TONG_EVENT_NOTIFY', 'MY_BagSort__Sort', function()
 		-- TONG_EVENT_CODE.TAKE_REPERTORY_ITEM_PERMISSION_DENY_ERROR
 		if arg0 == TONG_EVENT_CODE.EXCHANGE_REPERTORY_ITEM_SUCCESS then
 			szState = 'Refreshing'
@@ -395,8 +395,8 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 	return x, y
 end
 
-LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_BagSort', D.CheckInjection)
-LIB.RegisterFrameCreate('GuildBankPanel.MY_BagSort', D.CheckInjection)
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_BagSort', D.CheckInjection)
+LIB.RegisterFrameCreate('GuildBankPanel', 'MY_BagSort', D.CheckInjection)
 LIB.RegisterReload('MY_BagSort', D.RemoveInjection)
 
 ---------------------------------------------------------------------

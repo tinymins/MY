@@ -187,16 +187,16 @@ end
 function D.Apply()
 	if D.bReady and O.bEnable then
 		D.Hook()
-		LIB.RegisterFrameCreate('MacroSettingPanel.MY_YunMacro', D.Hook)
+		LIB.RegisterFrameCreate('MacroSettingPanel', 'MY_YunMacro', D.Hook)
 		LIB.RegisterReload('MY_YunMacro', D.Unhook)
 	else
 		D.Unhook()
-		LIB.RegisterFrameCreate('MacroSettingPanel.MY_YunMacro', false)
+		LIB.RegisterFrameCreate('MacroSettingPanel', 'MY_YunMacro', false)
 		LIB.RegisterReload('MY_YunMacro', false)
 	end
 end
 
-LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_YunMacro', function()
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_YunMacro', function()
 	D.bReady = true
 	D.Apply()
 end)

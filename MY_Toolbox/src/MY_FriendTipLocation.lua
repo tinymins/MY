@@ -104,19 +104,19 @@ end
 function D.CheckEnable()
 	if D.bReady and O.bEnable and not LIB.IsShieldedVersion('MY_FriendTipLocation') then
 		D.Hook()
-		LIB.RegisterFrameCreate('FriendTip.MY_FriendTipLocation', D.Hook)
+		LIB.RegisterFrameCreate('FriendTip', 'MY_FriendTipLocation', D.Hook)
 	else
 		D.Unhook()
-		LIB.RegisterFrameCreate('FriendTip.MY_FriendTipLocation', false)
+		LIB.RegisterFrameCreate('FriendTip', 'MY_FriendTipLocation', false)
 	end
 end
 
-LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_FriendTipLocation', function()
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_FriendTipLocation', function()
 	D.bReady = true
 	D.CheckEnable()
 end)
 LIB.RegisterReload('MY_FriendTipLocation', D.Unhook)
-LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_FriendTipLocation', function()
+LIB.RegisterEvent('MY_SHIELDED_VERSION', 'MY_FriendTipLocation', function()
 	if arg0 and arg0 ~= 'MY_FriendTipLocation' then
 		return
 	end

@@ -362,7 +362,7 @@ function D.Init()
     D.LoadData()
     D.RegisterMsgMonitor()
 end
-LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_CHATMONITOR', D.Init)
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_CHATMONITOR', D.Init)
 
 function D.Exit()
     D.SaveData()
@@ -371,7 +371,7 @@ LIB.RegisterExit('MY_ChatMonitor', D.Exit)
 
 function D.RegisterMsgMonitor()
     for _, szChannel in ipairs(D.aCurrentChannel or CONSTANT.EMPTY_TABLE) do
-        LIB.RegisterMsgMonitor(szChannel .. '.MY_ChatMonitor', false)
+        LIB.RegisterMsgMonitor(szChannel, 'MY_ChatMonitor', false)
     end
     local tChannel = {}
     for _, p in ipairs(O.aKeyword) do
@@ -388,7 +388,7 @@ function D.RegisterMsgMonitor()
         insert(aChannel, szChannel)
     end
     for _, szChannel in ipairs(aChannel) do
-        LIB.RegisterMsgMonitor(szChannel .. '.MY_ChatMonitor', D.OnMsgArrive)
+        LIB.RegisterMsgMonitor(szChannel, 'MY_ChatMonitor', D.OnMsgArrive)
     end
     D.aCurrentChannel = aChannel
 end

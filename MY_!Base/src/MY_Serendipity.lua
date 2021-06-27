@@ -219,7 +219,7 @@ function D.GetSerendipityName(nID)
 	end
 end
 
-LIB.RegisterEvent('ON_SERENDIPITY_TRIGGER.QIYU', function()
+LIB.RegisterEvent('ON_SERENDIPITY_TRIGGER', 'QIYU', function()
 	local me = GetClientPlayer()
 	if not me then
 		return
@@ -258,7 +258,7 @@ function D.GetSerendipityInfo(dwTabType, dwIndex)
 	end
 end
 
-LIB.RegisterMsgMonitor('MSG_SYS.QIYU', function(szChannel, szMsg, nFont, bRich, r, g, b)
+LIB.RegisterMsgMonitor('MSG_SYS', 'QIYU', function(szChannel, szMsg, nFont, bRich, r, g, b)
 	local me = GetClientPlayer()
 	if not me then
 		return

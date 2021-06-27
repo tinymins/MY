@@ -440,11 +440,11 @@ function D.Start()
 		return
 	end
 	D.bEnable = true
-	LIB.RegisterMsgMonitor('MSG_SYS.MY_Taoguan', D.MonitorZP)
+	LIB.RegisterMsgMonitor('MSG_SYS', 'MY_Taoguan', D.MonitorZP)
 	LIB.BreatheCall('MY_Taoguan', D.BreakCanStateTransfer)
-	LIB.RegisterEvent('LOOT_ITEM.MY_Taoguan', D.OnLootItem)
-	LIB.RegisterEvent('DOODAD_ENTER_SCENE.MY_Taoguan', D.OnDoodadEnter)
-	LIB.RegisterEvent('HELP_EVENT.MY_Taoguan', function()
+	LIB.RegisterEvent('LOOT_ITEM', 'MY_Taoguan', D.OnLootItem)
+	LIB.RegisterEvent('DOODAD_ENTER_SCENE', 'MY_Taoguan', D.OnDoodadEnter)
+	LIB.RegisterEvent('HELP_EVENT', 'MY_Taoguan', function()
 		if arg0 == 'OnOpenpanel' and arg1 == 'LOOT'
 			and D.bEnable and D.dwDoodadID ~= 0
 		then
@@ -461,12 +461,12 @@ function D.Stop()
 		return
 	end
 	D.bEnable = false
-	LIB.RegisterMsgMonitor('MSG_SYS.MY_Taoguan', false)
+	LIB.RegisterMsgMonitor('MSG_SYS', 'MY_Taoguan', false)
 	LIB.BreatheCall('MY_Taoguan', false)
-	LIB.RegisterEvent('NPC_ENTER_SCENE.MY_Taoguan', false)
-	LIB.RegisterEvent('LOOT_ITEM.MY_Taoguan', false)
-	LIB.RegisterEvent('DOODAD_ENTER_SCENE.MY_Taoguan', false)
-	LIB.RegisterEvent('HELP_EVENT.MY_Taoguan', false)
+	LIB.RegisterEvent('NPC_ENTER_SCENE', 'MY_Taoguan', false)
+	LIB.RegisterEvent('LOOT_ITEM', 'MY_Taoguan', false)
+	LIB.RegisterEvent('DOODAD_ENTER_SCENE', 'MY_Taoguan', false)
+	LIB.RegisterEvent('HELP_EVENT', 'MY_Taoguan', false)
 	LIB.Systopmsg(_L['Auto taoguan: off.'])
 end
 

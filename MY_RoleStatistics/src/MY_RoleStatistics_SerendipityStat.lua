@@ -172,22 +172,32 @@ local D = {}
 local SERENDIPITY_COUNTER = {}
 local REGISTER_EVENT, REGISTER_MSG = {}, {}
 
-local function RegisterEvent(szID, ...)
-	REGISTER_EVENT[szID] = true
-	return LIB.RegisterEvent(szID, ...)
-end
-
-local function RegisterMsgMonitor(szID, ...)
-	REGISTER_MSG[szID] = true
-	return LIB.RegisterMsgMonitor(szID, ...)
-end
-
-LIB.RegisterEvent('LOADING_ENDING.MY_RoleStatistics_SerendipityStat', function()
-	for k, _ in pairs(REGISTER_EVENT) do
-		LIB.RegisterEvent(k, false)
+local function RegisterEvent(szEvent, szKey, ...)
+	if not REGISTER_EVENT[szEvent] then
+		REGISTER_EVENT[szEvent] = {}
 	end
-	for k, _ in pairs(REGISTER_MSG) do
-		LIB.RegisterMsgMonitor(k, false)
+	REGISTER_EVENT[szEvent][szKey] = true
+	return LIB.RegisterEvent(szEvent, szKey, ...)
+end
+
+local function RegisterMsgMonitor(szEvent, szKey, ...)
+	if not REGISTER_MSG[szEvent] then
+		REGISTER_MSG[szEvent] = {}
+	end
+	REGISTER_MSG[szEvent][szKey] = true
+	return LIB.RegisterMsgMonitor(szEvent, szKey, ...)
+end
+
+LIB.RegisterEvent('LOADING_ENDING', 'MY_RoleStatistics_SerendipityStat', function()
+	for k, t in pairs(REGISTER_EVENT) do
+		for v, _ in pairs(t) do
+			LIB.RegisterEvent(k, v, false)
+		end
+	end
+	for k, t in pairs(REGISTER_MSG) do
+		for v, _ in pairs(t) do
+			LIB.RegisterMsgMonitor(k, v, false)
+		end
 	end
 	local function DelayTrigger()
 		FireUIEvent('MY_ROLE_STAT_SERENDIPITY_UPDATE')
@@ -214,7 +224,7 @@ LIB.RegisterEvent('LOADING_ENDING.MY_RoleStatistics_SerendipityStat', function()
 		if serendipity.dwMapID == dwMapID then
 			-- 今日失败的判断们
 			if serendipity.nBuffType == 1 then
-				RegisterEvent('BUFF_UPDATE.MY_RoleStatistics_SerendipityStat_AttemptBuff' .. serendipity.nID, function()
+				RegisterEvent('BUFF_UPDATE', 'MY_RoleStatistics_SerendipityStat_AttemptBuff' .. serendipity.nID, function()
 					-- buff update：
 					-- arg0：dwPlayerID，arg1：bDelete，arg2：nIndex，arg3：bCanCancel
 					-- arg4：dwBuffID，arg5：nStackNum，arg6：nEndFrame，arg7：？update all?
@@ -225,17 +235,17 @@ LIB.RegisterEvent('LOADING_ENDING.MY_RoleStatistics_SerendipityStat', function()
 				end)
 			end
 			if serendipity.aRejectOpenWindow then
-				RegisterEvent('OPEN_WINDOW.MY_RoleStatistics_SerendipityStat_RejectOpenWindow' .. serendipity.nID, function()
+				RegisterEvent('OPEN_WINDOW', 'MY_RoleStatistics_SerendipityStat_RejectOpenWindow' .. serendipity.nID, function()
 					SerendipityStringTrigger(arg1, serendipity.aRejectOpenWindow, serendipity.nID, serendipity.nMaxAttemptNum)
 				end)
 			end
 			if serendipity.aRejectWarningMessage then
-				RegisterEvent('ON_WARNING_MESSAGE.MY_RoleStatistics_SerendipityStat_RejectWarningMessage' .. serendipity.nID, function()
+				RegisterEvent('ON_WARNING_MESSAGE', 'MY_RoleStatistics_SerendipityStat_RejectWarningMessage' .. serendipity.nID, function()
 					SerendipityStringTrigger(arg1, serendipity.aRejectWarningMessage, serendipity.nID, serendipity.nMaxAttemptNum)
 				end)
 			end
 			if serendipity.aRejectNpcSayTo then
-				RegisterMsgMonitor('MSG_NPC_NEARBY.MY_RoleStatistics_SerendipityStat_RejectNpcSayTo' .. serendipity.nID, function(szChannel, szMsg, nFont, bRich)
+				RegisterMsgMonitor('MSG_NPC_NEARBY', 'MY_RoleStatistics_SerendipityStat_RejectNpcSayTo' .. serendipity.nID, function(szChannel, szMsg, nFont, bRich)
 					if bRich then
 						szMsg = GetPureText(szMsg)
 					end
@@ -244,12 +254,12 @@ LIB.RegisterEvent('LOADING_ENDING.MY_RoleStatistics_SerendipityStat', function()
 			end
 			-- 尝试一次的判断们
 			if serendipity.aAttemptOpenWindow then
-				RegisterEvent('OPEN_WINDOW.MY_RoleStatistics_SerendipityStat_AttemptOpenWindow' .. serendipity.nID, function()
+				RegisterEvent('OPEN_WINDOW', 'MY_RoleStatistics_SerendipityStat_AttemptOpenWindow' .. serendipity.nID, function()
 					SerendipityStringTrigger(arg1, serendipity.aAttemptOpenWindow, serendipity.nID)
 				end)
 			end
 			if serendipity.aAttemptNpcSayTo then
-				RegisterMsgMonitor('MSG_NPC_NEARBY.MY_RoleStatistics_SerendipityStat_AttemptNpcSayTo' .. serendipity.nID, function(szChannel, szMsg, nFont, bRich)
+				RegisterMsgMonitor('MSG_NPC_NEARBY', 'MY_RoleStatistics_SerendipityStat_AttemptNpcSayTo' .. serendipity.nID, function(szChannel, szMsg, nFont, bRich)
 					if bRich then
 						szMsg = GetPureText(szMsg)
 					end
@@ -257,7 +267,7 @@ LIB.RegisterEvent('LOADING_ENDING.MY_RoleStatistics_SerendipityStat', function()
 				end)
 			end
 			if serendipity.aAttemptLootItem then
-				RegisterEvent('LOOT_ITEM.MY_RoleStatistics_SerendipityStat_AttemptLootItem' .. serendipity.nID, function()
+				RegisterEvent('LOOT_ITEM', 'MY_RoleStatistics_SerendipityStat_AttemptLootItem' .. serendipity.nID, function()
 					if arg0 == UI_GetClientPlayerID() then
 						local item = GetItem(arg1)
 						if item then
@@ -272,7 +282,7 @@ LIB.RegisterEvent('LOADING_ENDING.MY_RoleStatistics_SerendipityStat', function()
 				end)
 			end
 			if serendipity.aAttemptItem then
-				RegisterEvent('BAG_ITEM_UPDATE.MY_RoleStatistics_SerendipityStat_AttemptItem' .. serendipity.nID, function()
+				RegisterEvent('BAG_ITEM_UPDATE', 'MY_RoleStatistics_SerendipityStat_AttemptItem' .. serendipity.nID, function()
 					local dwBox, dwX = arg0, arg1
 					local me = GetClientPlayer()
 					local item = GetPlayerItem(me, dwBox, dwX)
@@ -289,12 +299,12 @@ LIB.RegisterEvent('LOADING_ENDING.MY_RoleStatistics_SerendipityStat', function()
 				end)
 			end
 			if serendipity.aFailureOpenWindow then
-				RegisterEvent('OPEN_WINDOW.MY_RoleStatistics_SerendipityStat_FailureOpenWindow' .. serendipity.nID, function()
+				RegisterEvent('OPEN_WINDOW', 'MY_RoleStatistics_SerendipityStat_FailureOpenWindow' .. serendipity.nID, function()
 					SerendipityStringTrigger(arg1, serendipity.aFailureOpenWindow, serendipity.nID)
 				end)
 			end
 			if serendipity.aFailureNpcSayTo then
-				RegisterMsgMonitor('MSG_NPC_NEARBY.MY_RoleStatistics_SerendipityStat_FailureNpcSayTo' .. serendipity.nID, function(szChannel, szMsg, nFont, bRich)
+				RegisterMsgMonitor('MSG_NPC_NEARBY', 'MY_RoleStatistics_SerendipityStat_FailureNpcSayTo' .. serendipity.nID, function(szChannel, szMsg, nFont, bRich)
 					if bRich then
 						szMsg = GetPureText(szMsg)
 					end
@@ -302,12 +312,12 @@ LIB.RegisterEvent('LOADING_ENDING.MY_RoleStatistics_SerendipityStat', function()
 				end)
 			end
 			if serendipity.aFailureWarningMessage then
-				RegisterEvent('ON_WARNING_MESSAGE.MY_RoleStatistics_SerendipityStat_FailureWarningMessage' .. serendipity.nID, function()
+				RegisterEvent('ON_WARNING_MESSAGE', 'MY_RoleStatistics_SerendipityStat_FailureWarningMessage' .. serendipity.nID, function()
 					SerendipityStringTrigger(arg1, serendipity.aFailureWarningMessage, serendipity.nID)
 				end)
 			end
 			if serendipity.aFailureLootItem then
-				RegisterEvent('LOOT_ITEM.MY_RoleStatistics_SerendipityStat_FailureLootItem' .. serendipity.nID, function()
+				RegisterEvent('LOOT_ITEM', 'MY_RoleStatistics_SerendipityStat_FailureLootItem' .. serendipity.nID, function()
 					if arg0 == UI_GetClientPlayerID() then
 						local item = GetItem(arg1)
 						if item then
@@ -1230,7 +1240,7 @@ LIB.RegisterInit('MY_RoleStatistics_SerendipityEntry', function()
 	D.UpdateFloatEntry()
 end)
 LIB.RegisterReload('MY_RoleStatistics_SerendipityEntry', function() D.ApplyFloatEntry(false) end)
-LIB.RegisterFrameCreate('SprintPower.MY_RoleStatistics_SerendipityEntry', D.UpdateFloatEntry)
+LIB.RegisterFrameCreate('SprintPower', 'MY_RoleStatistics_SerendipityEntry', D.UpdateFloatEntry)
 
 -------------------------------------------------------------------------------------------------------
 -- 地图标记
@@ -1405,7 +1415,7 @@ function D.CheckMapMark()
 		D.UnhookMiniMapMark()
 	end
 end
-LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_RoleStatistics_SerendipityMapMark', function()
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_RoleStatistics_SerendipityMapMark', function()
 	D.bReady = true
 	D.CheckMapMark()
 end)

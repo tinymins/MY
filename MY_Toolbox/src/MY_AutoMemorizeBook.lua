@@ -86,14 +86,14 @@ end
 function D.CheckEnable()
 	if LIB.IsShieldedVersion('MY_AutoMemorizeBook') then
 		D.Unhook()
-		LIB.RegisterFrameCreate('CraftReaderPanel.MY_AutoMemorizeBook', false)
-		LIB.RegisterEvent('OPEN_BOOK.MY_AutoMemorizeBook', false)
-		LIB.RegisterEvent('OPEN_BOOK_NOTIFY.MY_AutoMemorizeBook', false)
+		LIB.RegisterFrameCreate('CraftReaderPanel', 'MY_AutoMemorizeBook', false)
+		LIB.RegisterEvent('OPEN_BOOK', 'MY_AutoMemorizeBook', false)
+		LIB.RegisterEvent('OPEN_BOOK_NOTIFY', 'MY_AutoMemorizeBook', false)
 	else
 		D.Hook()
-		LIB.RegisterFrameCreate('CraftReaderPanel.MY_AutoMemorizeBook', D.Hook)
+		LIB.RegisterFrameCreate('CraftReaderPanel', 'MY_AutoMemorizeBook', D.Hook)
 		if O.bEnable then
-			LIB.RegisterEvent({'OPEN_BOOK.MY_AutoMemorizeBook', 'OPEN_BOOK_NOTIFY.MY_AutoMemorizeBook'}, function(event)
+			LIB.RegisterEvent({'OPEN_BOOK', 'OPEN_BOOK_NOTIFY'}, 'MY_AutoMemorizeBook', function(event)
 				if IsShiftKeyDown() then
 					return LIB.Systopmsg(_L['Auto memorize book has been disabled due to SHIFT key pressed.'])
 				end
@@ -112,9 +112,9 @@ function D.CheckEnable()
 	end
 end
 
-LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_AutoMemorizeBook', D.CheckEnable)
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_AutoMemorizeBook', D.CheckEnable)
 LIB.RegisterReload('MY_AutoMemorizeBook', D.Unhook)
-LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_AutoMemorizeBook', function()
+LIB.RegisterEvent('MY_SHIELDED_VERSION', 'MY_AutoMemorizeBook', function()
 	if arg0 and arg0 ~= 'MY_AutoMemorizeBook' then
 		return
 	end

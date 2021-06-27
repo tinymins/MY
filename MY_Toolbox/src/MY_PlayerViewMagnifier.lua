@@ -102,7 +102,7 @@ local function onFrameCreate()
 			end,
 			tip = _L['Click to disable MY player view magnifier'],
 		})
-		LIB.RegisterEvent('UI_SCALED.MY_PlayerViewMagnifier' .. arg0:GetName(), function()
+		LIB.RegisterEvent('UI_SCALED', 'MY_PlayerViewMagnifier' .. arg0:GetName(), function()
 			if not frame or not frame:IsValid() then
 				return 0
 			end
@@ -113,5 +113,5 @@ local function onFrameCreate()
 		end)
 	end
 end
-LIB.RegisterFrameCreate('PlayerView.MY_PlayerViewMagnifier', onFrameCreate)
-LIB.RegisterFrameCreate('ExteriorView.MY_PlayerViewMagnifier', onFrameCreate)
+LIB.RegisterFrameCreate('PlayerView', 'MY_PlayerViewMagnifier', onFrameCreate)
+LIB.RegisterFrameCreate('ExteriorView', 'MY_PlayerViewMagnifier', onFrameCreate)

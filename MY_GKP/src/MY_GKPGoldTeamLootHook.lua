@@ -94,7 +94,7 @@ function D.HookGoldTeamLootList()
 		end
 	end
 end
-LIB.RegisterFrameCreate('GoldTeamLootList.MY_GKPGoldTeamLootHook', D.HookGoldTeamLootList)
+LIB.RegisterFrameCreate('GoldTeamLootList', 'MY_GKPGoldTeamLootHook', D.HookGoldTeamLootList)
 
 function D.UnhookGoldTeamLootList()
 	local h = Station.Lookup('Normal/GoldTeamLootList/WndScroll_LootList', 'Handle_LootList')

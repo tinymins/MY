@@ -327,7 +327,7 @@ local function OnEnterParty()
 		CheckPartyPlayer(dwID)
 	end
 end
-LIB.RegisterEvent('PARTY_UPDATE_BASE_INFO.MY_Anmerkungen', OnEnterParty)
+LIB.RegisterEvent('PARTY_UPDATE_BASE_INFO', 'MY_Anmerkungen', OnEnterParty)
 end
 end
 

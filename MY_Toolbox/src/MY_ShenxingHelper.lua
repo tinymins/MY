@@ -163,7 +163,7 @@ function D.CheckNonwarMapEnable()
 		D.UnhookNonwarMap()
 	end
 end
-LIB.RegisterFrameCreate('WorldMap.MY_ShenxingHelper__NonwarMap', D.CheckNonwarMapEnable)
+LIB.RegisterFrameCreate('WorldMap', 'MY_ShenxingHelper__NonwarMap', D.CheckNonwarMapEnable)
 
 --------------------------------------------------------------------------
 -- 【台服用】强开所有地图
@@ -223,36 +223,36 @@ end
 function D.CheckOpenAllMapEnable()
 	if D.bReady and O.bOpenAllMap and not LIB.IsShieldedVersion('MY_ShenxingHelper') then
 		LIB.RegisterEvent({
-			'LOADING_END.MY_ShenxingHelper__OpenAllMap',
-			'UPDATE_ROAD_TRACK_FORCE.MY_ShenxingHelper__OpenAllMap',
-			'UPDATE_ROUTE_NODE_OPEN_LIST.MY_ShenxingHelper__OpenAllMap',
-			'ON_MAP_VISIT_FLAG_CHANGED.MY_ShenxingHelper__OpenAllMap',
-			'SYNC_ROLE_DATA_END.MY_ShenxingHelper__OpenAllMap',
-			'PLAYER_LEVEL_UPDATE.MY_ShenxingHelper__OpenAllMap',
-		}, D.HookOpenAllMap)
+			'LOADING_END',
+			'UPDATE_ROAD_TRACK_FORCE',
+			'UPDATE_ROUTE_NODE_OPEN_LIST',
+			'ON_MAP_VISIT_FLAG_CHANGED',
+			'SYNC_ROLE_DATA_END',
+			'PLAYER_LEVEL_UPDATE',
+		}, 'MY_AutoMemorizeBook', D.HookOpenAllMap)
 		LIB.DelayCall('MY_ShenxingHelper__HookOpenAllMap', 200, D.HookOpenAllMap)
 		D.HookOpenAllMap()
 	else
 		LIB.RegisterEvent({
-			'LOADING_END.MY_ShenxingHelper__OpenAllMap',
-			'UPDATE_ROAD_TRACK_FORCE.MY_ShenxingHelper__OpenAllMap',
-			'UPDATE_ROUTE_NODE_OPEN_LIST.MY_ShenxingHelper__OpenAllMap',
-			'ON_MAP_VISIT_FLAG_CHANGED.MY_ShenxingHelper__OpenAllMap',
-			'SYNC_ROLE_DATA_END.MY_ShenxingHelper__OpenAllMap',
-			'PLAYER_LEVEL_UPDATE.MY_ShenxingHelper__OpenAllMap',
-		}, false)
+			'LOADING_END',
+			'UPDATE_ROAD_TRACK_FORCE',
+			'UPDATE_ROUTE_NODE_OPEN_LIST',
+			'ON_MAP_VISIT_FLAG_CHANGED',
+			'SYNC_ROLE_DATA_END',
+			'PLAYER_LEVEL_UPDATE',
+		}, 'MY_ShenxingHelper__OpenAllMap', false)
 		LIB.DelayCall('MY_ShenxingHelper__HookOpenAllMap', false)
 		D.UnhookOpenAllMap()
 	end
 end
-LIB.RegisterFrameCreate('WorldMap.MY_ShenxingHelper__OpenAllMap', D.CheckOpenAllMapEnable)
+LIB.RegisterFrameCreate('WorldMap', 'MY_ShenxingHelper__OpenAllMap', D.CheckOpenAllMapEnable)
 
 --------------------------------------------------------------------------
 -- 防止神行CD被黑
 --------------------------------------------------------------------------
 function D.CheckAvoidBlackShenxingEnable()
 	if D.bReady and O.bAvoidBlackCD then
-		LIB.RegisterEvent('DO_SKILL_CAST.MY_AvoidBlackShenxingCD', function()
+		LIB.RegisterEvent('DO_SKILL_CAST', 'MY_AvoidBlackShenxingCD', function()
 			local dwID, dwSkillID, dwSkillLevel = arg0, arg1, arg2
 			if not(UI_GetClientPlayerID() == dwID and
 			Table_IsSkillFormationCaster(dwSkillID, dwSkillLevel)) then
@@ -275,7 +275,7 @@ function D.CheckAvoidBlackShenxingEnable()
 			player.StopCurrentAction()
 		end)
 	else
-		LIB.RegisterEvent('DO_SKILL_CAST.MY_AvoidBlackShenxingCD')
+		LIB.RegisterEvent('DO_SKILL_CAST', 'MY_AvoidBlackShenxingCD')
 	end
 end
 
@@ -293,13 +293,13 @@ function D.RemoveHook()
 	D.UnhookOpenAllMap()
 end
 
-LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_ShenxingHelper', function()
+LIB.RegisterEvent('MY_SHIELDED_VERSION', 'MY_ShenxingHelper', function()
 	if arg0 and arg0 ~= 'MY_ShenxingHelper' then
 		return
 	end
 	D.CheckEnable()
 end)
-LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_ShenxingHelper', function()
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_ShenxingHelper', function()
 	D.bReady = true
 	D.CheckEnable()
 end)

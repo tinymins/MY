@@ -1824,7 +1824,7 @@ for _, v in ipairs({
 	end)
 end
 -- 系统消息日志
-LIB.RegisterMsgMonitor('MSG_SYS.MY_Recount_DS_Everything', function(szChannel, szMsg, nFont, bRich)
+LIB.RegisterMsgMonitor('MSG_SYS', 'MY_Recount_DS_Everything', function(szChannel, szMsg, nFont, bRich)
 	if not D.bReady or not O.bEnable then
 		return
 	end

@@ -575,7 +575,7 @@ LIB.RegisterEvent('DOODAD_LEAVE_SCENE', function()
 end)
 
 -- 系统消息日志
-LIB.RegisterMsgMonitor('MSG_SYS.MY_Recount_DS_Everything', function(szChannel, szMsg, nFont, bRich)
+LIB.RegisterMsgMonitor('MSG_SYS', 'MY_Recount_DS_Everything', function(szChannel, szMsg, nFont, bRich)
 	if not LOG_ENABLE then
 		return
 	end
@@ -701,7 +701,7 @@ LIB.RegisterEvent('PARTY_ADD_MEMBER', function()
 	end
 end)
 
-LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_CombatLogs', function()
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_CombatLogs', function()
 	D.bReady = true
 	D.UpdateEnable()
 end)

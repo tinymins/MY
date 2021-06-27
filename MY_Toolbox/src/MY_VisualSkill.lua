@@ -327,7 +327,7 @@ function D.Reload()
 	end
 end
 
-LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_VisualSkill', function()
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_VisualSkill', function()
 	D.bReady = true
 	D.Reload()
 end)

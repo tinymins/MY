@@ -185,7 +185,7 @@ LIB.RegisterInit('MY_AchievementWiki', function()
 	D.HookAchieveFrame(frame)
 end)
 
-LIB.RegisterFrameCreate('AchievementPanel.MY_AchievementWiki', function(name, frame)
+LIB.RegisterFrameCreate('AchievementPanel', 'MY_AchievementWiki', function(name, frame)
 	D.HookAchieveFrame(frame)
 end)
 

@@ -969,12 +969,12 @@ function PS.OnPanelActive(wnd)
 	local function onReset()
 		LoadUI(ui)
 	end
-	LIB.RegisterEvent('MY_LIFEBAR_CONFIG_LOADED.MY_LifeBarPS', onReset)
-	LIB.RegisterEvent('MY_LIFEBAR_CONFIG_UPDATE.MY_LifeBarPS', onReset)
+	LIB.RegisterEvent('MY_LIFEBAR_CONFIG_LOADED', 'MY_LifeBarPS', onReset)
+	LIB.RegisterEvent('MY_LIFEBAR_CONFIG_UPDATE', 'MY_LifeBarPS', onReset)
 end
 
 function PS.OnPanelDeactive()
-	LIB.RegisterEvent('MY_LIFEBAR_CONFIG_LOADED.MY_LifeBarPS')
-	LIB.RegisterEvent('MY_LIFEBAR_CONFIG_UPDATE.MY_LifeBarPS')
+	LIB.RegisterEvent('MY_LIFEBAR_CONFIG_LOADED', 'MY_LifeBarPS')
+	LIB.RegisterEvent('MY_LIFEBAR_CONFIG_UPDATE', 'MY_LifeBarPS')
 end
 LIB.RegisterPanel(_L['General'], 'MY_LifeBar', _L['MY_LifeBar'], 'UI/Image/LootPanel/LootPanel.UITex|74', PS)

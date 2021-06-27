@@ -146,7 +146,7 @@ function D.Apply()
 			end
 		end
 		RescanNearby()
-		LIB.RegisterEvent('ON_ISOLATED.MY_FRIEND_TIP', function(event)
+		LIB.RegisterEvent('ON_ISOLATED', 'MY_FRIEND_TIP', function(event)
 			-- dwCharacterID, nIsolated
 			local me = GetClientPlayer()
 			if arg0 == UI_GetClientPlayerID() then
@@ -168,18 +168,18 @@ function D.Apply()
 				end
 			end
 		end)
-		LIB.RegisterEvent('PLAYER_ENTER_SCENE.MY_FRIEND_TIP', function(event) OnPlayerEnter(arg0) end)
-		LIB.RegisterEvent('PLAYER_LEAVE_SCENE.MY_FRIEND_TIP', function(event) OnPlayerLeave(arg0) end)
-		LIB.RegisterEvent('DELETE_FELLOWSHIP.MY_FRIEND_TIP', function(event) RescanNearby() end)
-		LIB.RegisterEvent('PLAYER_FELLOWSHIP_UPDATE.MY_FRIEND_TIP', function(event) RescanNearby() end)
-		LIB.RegisterEvent('PLAYER_FELLOWSHIP_CHANGE.MY_FRIEND_TIP', function(event) RescanNearby() end)
+		LIB.RegisterEvent('PLAYER_ENTER_SCENE', 'MY_FRIEND_TIP', function(event) OnPlayerEnter(arg0) end)
+		LIB.RegisterEvent('PLAYER_LEAVE_SCENE', 'MY_FRIEND_TIP', function(event) OnPlayerLeave(arg0) end)
+		LIB.RegisterEvent('DELETE_FELLOWSHIP', 'MY_FRIEND_TIP', function(event) RescanNearby() end)
+		LIB.RegisterEvent('PLAYER_FELLOWSHIP_UPDATE', 'MY_FRIEND_TIP', function(event) RescanNearby() end)
+		LIB.RegisterEvent('PLAYER_FELLOWSHIP_CHANGE', 'MY_FRIEND_TIP', function(event) RescanNearby() end)
 	else
-		LIB.RegisterEvent('ON_ISOLATED.MY_FRIEND_TIP', false)
-		LIB.RegisterEvent('PLAYER_ENTER_SCENE.MY_FRIEND_TIP', false)
-		LIB.RegisterEvent('PLAYER_LEAVE_SCENE.MY_FRIEND_TIP', false)
-		LIB.RegisterEvent('DELETE_FELLOWSHIP.MY_FRIEND_TIP', false)
-		LIB.RegisterEvent('PLAYER_FELLOWSHIP_UPDATE.MY_FRIEND_TIP', false)
-		LIB.RegisterEvent('PLAYER_FELLOWSHIP_CHANGE.MY_FRIEND_TIP', false)
+		LIB.RegisterEvent('ON_ISOLATED', 'MY_FRIEND_TIP', false)
+		LIB.RegisterEvent('PLAYER_ENTER_SCENE', 'MY_FRIEND_TIP', false)
+		LIB.RegisterEvent('PLAYER_LEAVE_SCENE', 'MY_FRIEND_TIP', false)
+		LIB.RegisterEvent('DELETE_FELLOWSHIP', 'MY_FRIEND_TIP', false)
+		LIB.RegisterEvent('PLAYER_FELLOWSHIP_UPDATE', 'MY_FRIEND_TIP', false)
+		LIB.RegisterEvent('PLAYER_FELLOWSHIP_CHANGE', 'MY_FRIEND_TIP', false)
 		UI.GetShadowHandle('MY_FriendHeadTip'):Hide()
 	end
 	-- 帮会成员高亮
@@ -249,7 +249,7 @@ function D.Apply()
 			end
 			OnPlayerEnter(p.dwID)
 		end
-		LIB.RegisterEvent('ON_ISOLATED.MY_GUILDMEMBER_TIP', function(event)
+		LIB.RegisterEvent('ON_ISOLATED', 'MY_GUILDMEMBER_TIP', function(event)
 			-- dwCharacterID, nIsolated
 			local me = GetClientPlayer()
 			if arg0 == UI_GetClientPlayerID() then
@@ -271,18 +271,18 @@ function D.Apply()
 				end
 			end
 		end)
-		LIB.RegisterEvent('PLAYER_ENTER_SCENE.MY_GUILDMEMBER_TIP', function(event) OnPlayerEnter(arg0) end)
-		LIB.RegisterEvent('PLAYER_LEAVE_SCENE.MY_GUILDMEMBER_TIP', function(event) OnPlayerLeave(arg0) end)
+		LIB.RegisterEvent('PLAYER_ENTER_SCENE', 'MY_GUILDMEMBER_TIP', function(event) OnPlayerEnter(arg0) end)
+		LIB.RegisterEvent('PLAYER_LEAVE_SCENE', 'MY_GUILDMEMBER_TIP', function(event) OnPlayerLeave(arg0) end)
 	else
-		LIB.RegisterEvent('ON_ISOLATED.MY_GUILDMEMBER_TIP', false)
-		LIB.RegisterEvent('PLAYER_ENTER_SCENE.MY_GUILDMEMBER_TIP', false)
-		LIB.RegisterEvent('PLAYER_LEAVE_SCENE.MY_GUILDMEMBER_TIP', false)
+		LIB.RegisterEvent('ON_ISOLATED', 'MY_GUILDMEMBER_TIP', false)
+		LIB.RegisterEvent('PLAYER_ENTER_SCENE', 'MY_GUILDMEMBER_TIP', false)
+		LIB.RegisterEvent('PLAYER_LEAVE_SCENE', 'MY_GUILDMEMBER_TIP', false)
 		UI.GetShadowHandle('MY_TongMemberHeadTip'):Hide()
 	end
 end
 
-LIB.RegisterEvent('LOADING_ENDING.MY_FooterTip', D.Apply)
-LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_FooterTip', function()
+LIB.RegisterEvent('LOADING_ENDING', 'MY_FooterTip', D.Apply)
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_FooterTip', function()
 	D.bReady = true
 	D.Apply()
 end)

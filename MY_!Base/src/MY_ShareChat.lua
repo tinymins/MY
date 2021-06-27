@@ -79,7 +79,7 @@ LIB.RegisterInit('MY_ShareChat__Npc', function()
 	end
 end)
 
-LIB.RegisterEvent('OPEN_WINDOW.MY_ShareChat__Npc', function()
+LIB.RegisterEvent('OPEN_WINDOW', 'MY_ShareChat__Npc', function()
 	if not MY_Serendipity.bEnable then
 		return
 	end
@@ -149,7 +149,7 @@ LIB.RegisterInit('MY_ShareChat__Sysmsg', function()
 	end
 end)
 
-LIB.RegisterMsgMonitor('MSG_SYS.MY_ShareChat__Sysmsg', function(szChannel, szMsg, nFont, bRich, r, g, b)
+LIB.RegisterMsgMonitor('MSG_SYS', 'MY_ShareChat__Sysmsg', function(szChannel, szMsg, nFont, bRich, r, g, b)
 	local me = GetClientPlayer()
 	if not me then
 		return

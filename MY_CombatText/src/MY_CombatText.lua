@@ -1379,13 +1379,13 @@ local function GetPlayerID()
 		LIB.DelayCall(1000, GetPlayerID)
 	end
 end
-LIB.RegisterEvent('LOADING_END.MY_CombatText', GetPlayerID) -- 很重要的优化
-LIB.RegisterEvent('ON_NEW_PROXY_SKILL_LIST_NOTIFY.MY_CombatText', GetPlayerID) -- 长歌控制主体ID切换
-LIB.RegisterEvent('ON_CLEAR_PROXY_SKILL_LIST_NOTIFY.MY_CombatText', GetPlayerID) -- 长歌控制主体ID切换
-LIB.RegisterEvent('ON_PVP_SHOW_SELECT_PLAYER.MY_CombatText', function()
+LIB.RegisterEvent('LOADING_END', 'MY_CombatText', GetPlayerID) -- 很重要的优化
+LIB.RegisterEvent('ON_NEW_PROXY_SKILL_LIST_NOTIFY', 'MY_CombatText', GetPlayerID) -- 长歌控制主体ID切换
+LIB.RegisterEvent('ON_CLEAR_PROXY_SKILL_LIST_NOTIFY', 'MY_CombatText', GetPlayerID) -- 长歌控制主体ID切换
+LIB.RegisterEvent('ON_PVP_SHOW_SELECT_PLAYER', 'MY_CombatText', function()
 	COMBAT_TEXT_PLAYERID = arg0
 end)
-LIB.RegisterEvent('MY_COMBATTEXT_MSG.MY_CombatText', function()
+LIB.RegisterEvent('MY_COMBATTEXT_MSG', 'MY_CombatText', function()
 	CombatText.OnCenterMsg(arg0, arg1, arg2)
 end)
-LIB.RegisterEvent('FIRST_LOADING_END.MY_CombatText', CombatText.CheckEnable)
+LIB.RegisterEvent('FIRST_LOADING_END', 'MY_CombatText', CombatText.CheckEnable)

@@ -489,7 +489,7 @@ function D.RescanNearby()
 	D.ClearFocus()
 	D.ScanNearby()
 end
-LIB.RegisterEvent('MY_ANMERKUNGEN_UPDATE.MY_Focus', D.RescanNearby)
+LIB.RegisterEvent('MY_ANMERKUNGEN_UPDATE', 'MY_Focus', D.RescanNearby)
 
 function D.GetEligibleRules(tRules, dwMapID, dwType, dwID, dwTemplateID, szName, szTong)
 	local aRule = {}
@@ -1092,14 +1092,14 @@ local function UpdateTeamMonData()
 		D.RescanNearby()
 	end
 end
-LIB.RegisterEvent('LOADING_ENDING.MY_Focus', UpdateTeamMonData)
+LIB.RegisterEvent('LOADING_ENDING', 'MY_Focus', UpdateTeamMonData)
 local function onTeamMonUpdate()
 	if arg0 and not arg0['NPC'] and not arg0['DOODAD'] then
 		return
 	end
 	UpdateTeamMonData()
 end
-LIB.RegisterEvent('MY_TM_DATA_RELOAD.MY_Focus', onTeamMonUpdate)
+LIB.RegisterEvent('MY_TM_DATA_RELOAD', 'MY_Focus', onTeamMonUpdate)
 end
 
 do
@@ -1140,7 +1140,7 @@ local function onInit()
 	D.CheckFrameOpen()
 	D.RescanNearby()
 end
-LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_Focus', onInit)
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_Focus', onInit)
 end
 
 do

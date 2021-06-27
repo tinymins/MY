@@ -717,7 +717,7 @@ end
 
 do
 local INFO_CACHE = {}
-LIB.RegisterFrameCreate('regionPQreward.MY_RoleStatistics_RoleStat', function()
+LIB.RegisterFrameCreate('regionPQreward', 'MY_RoleStatistics_RoleStat', function()
 	local frame = arg0
 	if not frame then
 		return
@@ -1326,7 +1326,7 @@ LIB.RegisterInit('MY_RoleStatistics_RoleStat__AlertCol', function()
 		O.tAlertTodayVal.nTime = GetCurrentTime()
 	end
 end)
-LIB.RegisterFrameCreate('OptionPanel.MY_RoleStatistics_RoleStat__AlertCol', function()
+LIB.RegisterFrameCreate('OptionPanel', 'MY_RoleStatistics_RoleStat__AlertCol', function()
 	local me = GetClientPlayer()
 	local tVal = {}
 	for _, col in ipairs(ALERT_COLUMN) do
@@ -1400,12 +1400,12 @@ function D.UpdateFloatEntry()
 	end
 	D.ApplyFloatEntry(O.bFloatEntry)
 end
-LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_RoleStatistics_RoleEntry', function()
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_RoleStatistics_RoleEntry', function()
 	D.bReady = true
 	D.UpdateFloatEntry()
 end)
 LIB.RegisterReload('MY_RoleStatistics_RoleEntry', function() D.ApplyFloatEntry(false) end)
-LIB.RegisterFrameCreate('SprintPower.MY_RoleStatistics_RoleEntry', D.UpdateFloatEntry)
+LIB.RegisterFrameCreate('SprintPower', 'MY_RoleStatistics_RoleEntry', D.UpdateFloatEntry)
 
 -- Module exports
 do

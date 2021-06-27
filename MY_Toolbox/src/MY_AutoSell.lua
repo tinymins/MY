@@ -237,7 +237,7 @@ function D.CheckEnable()
 		LIB.RegisterEvent('SHOP_OPENSHOP', false)
 	end
 end
-LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_AutoSell', function()
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_AutoSell', function()
 	for _, k in ipairs({'tSellItem', 'tProtectItem'}) do
 		if D[k] then
 			SafeCall(Set, O, k, D[k])

@@ -1298,12 +1298,12 @@ function D.UpdateFloatEntry()
 	end
 	D.ApplyFloatEntry(O.bFloatEntry)
 end
-LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_RoleStatistics_TaskEntry', function()
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_RoleStatistics_TaskEntry', function()
 	D.bReady = true
 	D.UpdateFloatEntry()
 end)
 LIB.RegisterReload('MY_RoleStatistics_TaskEntry', function() D.ApplyFloatEntry(false) end)
-LIB.RegisterFrameCreate('SprintPower.MY_RoleStatistics_TaskEntry', D.UpdateFloatEntry)
+LIB.RegisterFrameCreate('SprintPower', 'MY_RoleStatistics_TaskEntry', D.UpdateFloatEntry)
 
 -- Module exports
 do

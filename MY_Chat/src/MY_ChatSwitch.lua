@@ -368,7 +368,7 @@ end
 function D.ApplyBattlefieldChannelSwitch()
 	-- 竞技场自动切换团队频道
 	if O.bAutoSwitchBfChannel then
-		LIB.RegisterEvent('LOADING_ENDING.MY_ChatSwitch__AutoSwitchBattlefieldChannel', function()
+		LIB.RegisterEvent('LOADING_ENDING', 'MY_ChatSwitch__AutoSwitchBattlefieldChannel', function()
 			local bIsBattleField = (GetClientPlayer().GetScene().nType == MAP_TYPE.BATTLE_FIELD)
 			local nChannel, szName = EditBox_GetChannel()
 			if bIsBattleField and (nChannel == PLAYER_TALK_CHANNEL.RAID or nChannel == PLAYER_TALK_CHANNEL.TEAM) then
@@ -379,10 +379,10 @@ function D.ApplyBattlefieldChannelSwitch()
 			end
 		end)
 	else
-		LIB.RegisterEvent('LOADING_ENDING.MY_ChatSwitch__AutoSwitchBattlefieldChannel')
+		LIB.RegisterEvent('LOADING_ENDING', 'MY_ChatSwitch__AutoSwitchBattlefieldChannel')
 	end
 end
-LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_ChatSwitch__AutoSwitchBattlefieldChannel', D.Apply)
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_ChatSwitch__AutoSwitchBattlefieldChannel', D.Apply)
 
 function D.OnFrameCreate()
 	this.tRadios = {}

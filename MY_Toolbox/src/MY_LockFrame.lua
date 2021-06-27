@@ -191,7 +191,7 @@ function D.CheckAllFrame()
 		end
 	end
 	if D.bReady and O.bEnable then
-		LIB.RegisterEvent('ON_FRAME_CREATE.MY_LockFrame', function()
+		LIB.RegisterEvent('ON_FRAME_CREATE', 'MY_LockFrame', function()
 			D.CheckFrame(arg0)
 		end)
 		LIB.RegisterSpecialKeyEvent('*.MY_LockFrame', function()
@@ -210,12 +210,12 @@ function D.CheckAllFrame()
 			end
 		end)
 	else
-		LIB.RegisterEvent('ON_FRAME_CREATE.MY_LockFrame', false)
+		LIB.RegisterEvent('ON_FRAME_CREATE', 'MY_LockFrame', false)
 		LIB.RegisterSpecialKeyEvent('*.MY_LockFrame', false)
 	end
 end
 
-LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_LockFrame', function()
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_LockFrame', function()
 	D.bReady = true
 	D.CheckAllFrame()
 end)

@@ -249,14 +249,14 @@ function D.UpdateShielded()
 		or 0
 end
 
-LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_GKPLoot', function()
+LIB.RegisterEvent('MY_SHIELDED_VERSION', 'MY_GKPLoot', function()
 	if arg0 and arg0 ~= 'MY_GKPLoot' then
 		return
 	end
 	D.UpdateShielded()
 end)
 
-LIB.RegisterEvent('LOADING_END.MY_GKPLoot', function()
+LIB.RegisterEvent('LOADING_END', 'MY_GKPLoot', function()
 	D.UpdateShielded()
 	D.aDoodadID = {}
 	O.tFilterQuality = {}
@@ -1922,21 +1922,21 @@ function D.AutoSetSystemLootVisible()
 	end
 end
 
-LIB.RegisterFrameCreate('LootList.MY_GKPLoot', function()
+LIB.RegisterFrameCreate('LootList', 'MY_GKPLoot', function()
 	HookTableFunc(arg0, 'SetPoint', D.AutoSetSystemLootVisible, { bAfterOrigin = true })
 	HookTableFunc(arg0, 'SetRelPos', D.AutoSetSystemLootVisible, { bAfterOrigin = true })
 	HookTableFunc(arg0, 'SetAbsPos', D.AutoSetSystemLootVisible, { bAfterOrigin = true })
 	HookTableFunc(arg0, 'CorrectPos', D.AutoSetSystemLootVisible, { bAfterOrigin = true })
 end)
 
-LIB.RegisterFrameCreate('GoldTeamLootList.MY_GKPLoot', function()
+LIB.RegisterFrameCreate('GoldTeamLootList', 'MY_GKPLoot', function()
 	HookTableFunc(arg0, 'SetPoint', D.AutoSetSystemLootVisible, { bAfterOrigin = true })
 	HookTableFunc(arg0, 'SetRelPos', D.AutoSetSystemLootVisible, { bAfterOrigin = true })
 	HookTableFunc(arg0, 'SetAbsPos', D.AutoSetSystemLootVisible, { bAfterOrigin = true })
 	HookTableFunc(arg0, 'CorrectPos', D.AutoSetSystemLootVisible, { bAfterOrigin = true })
 end)
 
-LIB.RegisterEvent('TEAM_AUTHORITY_CHANGED.MY_GKPLoot', D.AutoSetSystemLootVisible)
+LIB.RegisterEvent('TEAM_AUTHORITY_CHANGED', 'MY_GKPLoot', D.AutoSetSystemLootVisible)
 
 -- ÃþÏä×Ó
 LIB.RegisterEvent('OPEN_DOODAD', function()

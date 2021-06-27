@@ -170,13 +170,13 @@ function D.CheckEnable()
 	LIB.RegisterModuleEvent('MY_WorldMark', D.GetEvent())
 end
 
-LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_WorldMark', function()
+LIB.RegisterEvent('MY_SHIELDED_VERSION', 'MY_WorldMark', function()
 	if arg0 and arg0 ~= 'MY_WorldMark' then
 		return
 	end
 	D.CheckEnable()
 end)
-LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_WorldMark', D.CheckEnable)
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_WorldMark', D.CheckEnable)
 
 
 -- Global exports

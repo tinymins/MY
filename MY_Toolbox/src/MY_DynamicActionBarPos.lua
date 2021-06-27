@@ -159,14 +159,14 @@ function D.Hook(szName)
 			end
 		end
 	end
-	LIB.RegisterFrameCreate(szName .. '.MY_DynamicActionBarPos', function()
+	LIB.RegisterFrameCreate(szName, 'MY_DynamicActionBarPos', function()
 		OnFrameCreate(arg0)
 		D.UpdateAnchor(szName)
 	end)
-	LIB.RegisterFrameCreate('UI_SCALED.MY_DynamicActionBarPos__' .. szName, function()
+	LIB.RegisterFrameCreate('UI_SCALED', 'MY_DynamicActionBarPos__' .. szName, function()
 		D.UpdateAnchor(szName)
 	end)
-	LIB.RegisterEvent('ON_LEAVE_CUSTOM_UI_MODE.MY_DynamicActionBarPos__' .. szName, function()
+	LIB.RegisterEvent('ON_LEAVE_CUSTOM_UI_MODE', 'MY_DynamicActionBarPos__' .. szName, function()
 		D.SaveAnchor(szName)
 	end)
 	OnFrameCreate(UI.LookupFrame(szName))
@@ -184,9 +184,9 @@ function D.Unhook(szName)
 			frame.__MY_SetPoint = nil
 		end
 	end
-	LIB.RegisterFrameCreate(szName .. '.MY_DynamicActionBarPos', false)
-	LIB.RegisterFrameCreate('UI_SCALED.MY_DynamicActionBarPos__' .. szName, false)
-	LIB.RegisterEvent('ON_LEAVE_CUSTOM_UI_MODE.MY_DynamicActionBarPos__' .. szName, false)
+	LIB.RegisterFrameCreate(szName, 'MY_DynamicActionBarPos', false)
+	LIB.RegisterFrameCreate('UI_SCALED', 'MY_DynamicActionBarPos__' .. szName, false)
+	LIB.RegisterEvent('ON_LEAVE_CUSTOM_UI_MODE', 'MY_DynamicActionBarPos__' .. szName, false)
 end
 
 function D.CheckEnable()
@@ -199,7 +199,7 @@ function D.CheckEnable()
 	end
 end
 
-LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_DynamicActionBarPos', function()
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_DynamicActionBarPos', function()
 	D.bReady = true
 	D.CheckEnable()
 end)

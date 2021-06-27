@@ -204,20 +204,20 @@ function D.OnEnableChange()
 	if bEnable then
 		h:AppendItemFromString('<shadow>name="Shadow_Label"</shadow>')
 		D.pLabel = h:Lookup('Shadow_Label')
-		LIB.RegisterEvent('SYS_MSG.MY_ForceGuding', function()
+		LIB.RegisterEvent('SYS_MSG', 'MY_ForceGuding', function()
 			if arg0 == 'UI_OME_SKILL_HIT_LOG' then
 				D.OnSkillCast(arg1, arg4, arg5, arg0)
 			elseif arg0 == 'UI_OME_SKILL_EFFECT_LOG' then
 				D.OnSkillCast(arg1, arg5, arg6, arg0)
 			end
 		end)
-		LIB.RegisterEvent('DO_SKILL_CAST.MY_ForceGuding', function(event)
+		LIB.RegisterEvent('DO_SKILL_CAST', 'MY_ForceGuding', function(event)
 			D.OnSkillCast(arg0, arg1, arg2, event)
 		end)
-		LIB.RegisterEvent('DOODAD_ENTER_SCENE.MY_ForceGuding', function()
+		LIB.RegisterEvent('DOODAD_ENTER_SCENE', 'MY_ForceGuding', function()
 			D.OnDoodadEnter()
 		end)
-		LIB.RegisterBgMsg('MY_GUDING_NOTIFY.MY_ForceGuding', D.OnSkillNotify)
+		LIB.RegisterBgMsg('MY_GUDING_NOTIFY', 'MY_ForceGuding', D.OnSkillNotify)
 		LIB.BreatheCall('MY_ForceGuding', function()
 			-- skip frame
 			local nFrame = GetLogicFrameCount()
@@ -262,10 +262,10 @@ function D.OnEnableChange()
 			end
 		end)
 	else
-		LIB.RegisterEvent('SYS_MSG.MY_ForceGuding', false)
-		LIB.RegisterEvent('DO_SKILL_CAST.MY_ForceGuding', false)
-		LIB.RegisterEvent('DOODAD_ENTER_SCENE.MY_ForceGuding', false)
-		LIB.RegisterBgMsg('MY_GUDING_NOTIFY.MY_ForceGuding', false)
+		LIB.RegisterEvent('SYS_MSG', 'MY_ForceGuding', false)
+		LIB.RegisterEvent('DO_SKILL_CAST', 'MY_ForceGuding', false)
+		LIB.RegisterEvent('DOODAD_ENTER_SCENE', 'MY_ForceGuding', false)
+		LIB.RegisterBgMsg('MY_GUDING_NOTIFY', 'MY_ForceGuding', false)
 		LIB.BreatheCall('MY_ForceGuding', false)
 	end
 end
@@ -323,7 +323,7 @@ function D.OnUseManaChange()
 	end
 end
 
-LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_ForceGuding', function()
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_ForceGuding', function()
 	D.bReady = true
 	D.OnEnableChange()
 	D.OnUseManaChange()

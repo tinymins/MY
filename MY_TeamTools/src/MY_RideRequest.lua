@@ -370,7 +370,7 @@ function D.OnMessageBoxOpen()
 	end
 end
 
-LIB.RegisterEvent('ON_MESSAGE_BOX_OPEN.MY_RideRequest' , D.OnMessageBoxOpen)
+LIB.RegisterEvent('ON_MESSAGE_BOX_OPEN', 'MY_RideRequest' , D.OnMessageBoxOpen)
 
 LIB.RegisterInit('MY_RideRequest', function()
 	for _, k in ipairs({'tAcceptCustom'}) do

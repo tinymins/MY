@@ -227,7 +227,7 @@ function D.OnFrameDragEnd()
 	O.tAnchor = GetFrameAnchor(this)
 end
 
-LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_TargetDirection', function()
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_TargetDirection', function()
 	D.bReady = true
 	D.CheckEnable()
 	D.UpdateAnchor()

@@ -149,7 +149,7 @@ function D.Apply()
 		UI.GetShadowHandle('MY_ChangGeShadow'):Hide()
 	end
 end
-LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_ChangGeShadow', D.Apply)
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_ChangGeShadow', D.Apply)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	x = x + ui:Append('WndCheckBox', {

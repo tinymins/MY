@@ -275,7 +275,7 @@ end
 		end
 	end
 	for szChannel, _ in pairs(tChannels) do
-		LIB.RegisterMsgMonitor(szChannel .. '.MY_ChatLog', function(szChannel, szMsg, nFont, bRich, r, g, b, dwTalkerID, szTalker)
+		LIB.RegisterMsgMonitor(szChannel, 'MY_ChatLog', function(szChannel, szMsg, nFont, bRich, r, g, b, dwTalkerID, szTalker)
 			local szText = szMsg
 			if bRich then
 				szText = GetPureText(szMsg)
@@ -306,7 +306,7 @@ end
 	return aChannels
 end)()
 
-LIB.RegisterEvent('LOADING_ENDING.MY_ChatLog_Save', function()
+LIB.RegisterEvent('LOADING_ENDING', 'MY_ChatLog_Save', function()
 	if MAIN_DS then
 		MAIN_DS:FlushDB()
 	end
@@ -373,7 +373,7 @@ function D.ReleaseDB()
 end
 LIB.RegisterExit('MY_Chat_Release', D.ReleaseDB)
 
-LIB.RegisterEvent('DISCONNECT.MY_Chat_Release', function()
+LIB.RegisterEvent('DISCONNECT', 'MY_Chat_Release', function()
 	if LIB.IsShieldedVersion('DEVELOP') then
 		return
 	end

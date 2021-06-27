@@ -396,13 +396,13 @@ function D.CheckEnable()
 	end
 end
 
-LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_TeamMon_CC', function()
+LIB.RegisterEvent('MY_SHIELDED_VERSION', 'MY_TeamMon_CC', function()
 	if arg0 and arg0 ~= 'MY_TargetMon' then
 		return
 	end
 	D.CheckEnable()
 end)
-LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_TeamMon_CC', function()
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_TeamMon_CC', function()
 	D.bReady = true
 	D.CheckEnable()
 end)

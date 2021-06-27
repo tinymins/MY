@@ -514,10 +514,10 @@ function D.Feedback(szName, data, bDetail)
 	D.DelayInterval()
 end
 
-LIB.RegisterEvent('PEEK_OTHER_PLAYER.MY_PartyRequest'   , D.OnPeekPlayer  )
-LIB.RegisterEvent('PARTY_INVITE_REQUEST.MY_PartyRequest', D.OnApplyRequest)
-LIB.RegisterEvent('PARTY_APPLY_REQUEST.MY_PartyRequest' , D.OnApplyRequest)
-LIB.RegisterEvent('ON_MESSAGE_BOX_OPEN.MY_PartyRequest' , D.OnMessageBoxOpen)
+LIB.RegisterEvent('PEEK_OTHER_PLAYER', 'MY_PartyRequest'   , D.OnPeekPlayer  )
+LIB.RegisterEvent('PARTY_INVITE_REQUEST', 'MY_PartyRequest', D.OnApplyRequest)
+LIB.RegisterEvent('PARTY_APPLY_REQUEST', 'MY_PartyRequest' , D.OnApplyRequest)
+LIB.RegisterEvent('ON_MESSAGE_BOX_OPEN', 'MY_PartyRequest' , D.OnMessageBoxOpen)
 
 LIB.RegisterInit('MY_PartyRequest', function()
 	for _, k in ipairs({'tAcceptCustom'}) do

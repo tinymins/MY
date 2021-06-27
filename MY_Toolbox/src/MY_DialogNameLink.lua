@@ -67,7 +67,7 @@ local D = {}
 
 function D.Apply()
 	if D.bReady and O.bEnable then
-		LIB.RegisterEvent('OPEN_WINDOW.NAMELINKER', function(event)
+		LIB.RegisterEvent('OPEN_WINDOW', 'NAMELINKER', function(event)
 			local h
 			for _, p in ipairs({
 				{'Normal/DialoguePanel', '', 'Handle_Message'},
@@ -110,10 +110,10 @@ function D.Apply()
 			h:FormatAllItemPos()
 		end)
 	else
-		LIB.RegisterEvent('OPEN_WINDOW.NAMELINKER', false)
+		LIB.RegisterEvent('OPEN_WINDOW', 'NAMELINKER', false)
 	end
 end
-LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_DialogNameLink', function()
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_DialogNameLink', function()
 	D.bReady = true
 	D.Apply()
 end)

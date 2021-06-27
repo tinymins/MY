@@ -257,14 +257,14 @@ function D.UpdateMapBossAchieveAcquire()
 	--[[#DEBUG END]]
 	BOSS_ACHIEVE_ACQUIRE_STATE = tBossAchieveAcquireState
 end
-LIB.RegisterEvent('LOADING_ENDING.MY_JBAchievementRank', D.UpdateMapBossAchieveAcquire)
+LIB.RegisterEvent('LOADING_ENDING', 'MY_JBAchievementRank', D.UpdateMapBossAchieveAcquire)
 
 LIB.RegisterEvent({
-	'NEW_ACHIEVEMENT.MY_JBAchievementRank',
-	'SYNC_ACHIEVEMENT_DATA.MY_JBAchievementRank',
-	'UPDATE_ACHIEVEMENT_POINT.MY_JBAchievementRank',
-	'UPDATE_ACHIEVEMENT_COUNT.MY_JBAchievementRank',
-}, function()
+	'NEW_ACHIEVEMENT',
+	'SYNC_ACHIEVEMENT_DATA',
+	'UPDATE_ACHIEVEMENT_POINT',
+	'UPDATE_ACHIEVEMENT_COUNT',
+}, 'MY_JBAchievementRank', function()
 	local me = GetClientPlayer()
 	for dwAchieveID, bAcquired in pairs(BOSS_ACHIEVE_ACQUIRE_STATE) do
 		if not bAcquired and me.IsAchievementAcquired(dwAchieveID) then

@@ -492,5 +492,5 @@ local function onDataInit()
 		end
 	end
 end
-LIB.RegisterEvent('MY_TARGET_MON_DATA_INIT.MY_TargetMonView', onDataInit)
+LIB.RegisterEvent('MY_TARGET_MON_DATA_INIT', 'MY_TargetMonView', onDataInit)
 end

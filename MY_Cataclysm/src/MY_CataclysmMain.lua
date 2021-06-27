@@ -156,14 +156,14 @@ local function UpdateTeamMonData()
 		D.UpdateBuffListCache()
 	end
 end
-LIB.RegisterEvent('LOADING_ENDING.MY_CataclysmMain', UpdateTeamMonData)
+LIB.RegisterEvent('LOADING_ENDING', 'MY_CataclysmMain', UpdateTeamMonData)
 local function onTeamMonUpdate()
 	if arg0 and not arg0['BUFF'] and not arg0['DEBUFF'] then
 		return
 	end
 	UpdateTeamMonData()
 end
-LIB.RegisterEvent('MY_TM_DATA_RELOAD.MY_CataclysmMain', onTeamMonUpdate)
+LIB.RegisterEvent('MY_TM_DATA_RELOAD', 'MY_CataclysmMain', onTeamMonUpdate)
 end
 
 function D.GetConfigurePath()

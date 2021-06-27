@@ -177,20 +177,20 @@ end
 local function onPlayerStateUpdate()
 	UpdateTitleEffect(TARGET.PLAYER, arg0)
 end
-LIB.RegisterEvent('PLAYER_STATE_UPDATE.MY_LifeBar', onPlayerStateUpdate)
+LIB.RegisterEvent('PLAYER_STATE_UPDATE', 'MY_LifeBar', onPlayerStateUpdate)
 
 local function onNpcQuestMarkUpdate()
 	UpdateTitleEffect(TARGET.NPC, arg0)
 end
-LIB.RegisterEvent('QUEST_MARK_UPDATE.MY_LifeBar', onNpcQuestMarkUpdate)
-LIB.RegisterEvent('NPC_DISPLAY_DATA_UPDATE.MY_LifeBar', onNpcQuestMarkUpdate)
+LIB.RegisterEvent('QUEST_MARK_UPDATE', 'MY_LifeBar', onNpcQuestMarkUpdate)
+LIB.RegisterEvent('NPC_DISPLAY_DATA_UPDATE', 'MY_LifeBar', onNpcQuestMarkUpdate)
 
 local function onNpcQuestMarkUpdateAll()
 	for _, dwID in ipairs(LIB.GetNearNpcID()) do
 		UpdateTitleEffect(TARGET.NPC, dwID)
 	end
 end
-LIB.RegisterEvent('LEAVE_STORY_MODE.MY_LifeBar', onNpcQuestMarkUpdateAll)
+LIB.RegisterEvent('LEAVE_STORY_MODE', 'MY_LifeBar', onNpcQuestMarkUpdateAll)
 LIB.RegisterInit('MY_LifeBar_onNpcQuestMarkUpdateAll', onNpcQuestMarkUpdateAll)
 
 local function onPartySetMark()
@@ -207,15 +207,15 @@ local function onPartySetMark()
 	OVERWRITE_TITLE_EFFECT = {}
 end
 LIB.RegisterInit('MY_LifeBar_onPartySetMark', onPartySetMark)
-LIB.RegisterEvent('PARTY_SET_MARK.MY_LifeBar', onPartySetMark)
-LIB.RegisterEvent('PARTY_DELETE_MEMBER.MY_LifeBar', function()
+LIB.RegisterEvent('PARTY_SET_MARK', 'MY_LifeBar', onPartySetMark)
+LIB.RegisterEvent('PARTY_DELETE_MEMBER', 'MY_LifeBar', function()
 	local me = GetClientPlayer()
 	if me.dwID == arg1 then
 		onPartySetMark()
 	end
 end)
-LIB.RegisterEvent('PARTY_DISBAND.MY_LifeBar', onPartySetMark)
-LIB.RegisterEvent('PARTY_UPDATE_BASE_INFO.MY_LifeBar', onPartySetMark)
+LIB.RegisterEvent('PARTY_DISBAND', 'MY_LifeBar', onPartySetMark)
+LIB.RegisterEvent('PARTY_UPDATE_BASE_INFO', 'MY_LifeBar', onPartySetMark)
 
 local function onLoadingEnd()
 	OVERWRITE_TITLE_EFFECT = {}
@@ -870,7 +870,7 @@ local function onSwitch()
 end
 LIB.RegisterHotKey('MY_LifeBar_S', _L['MY_LifeBar'], onSwitch)
 
-LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_LifeBar', function()
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_LifeBar', function()
 	D.bReady = true
 end)
 

@@ -1043,12 +1043,12 @@ LIB.RegisterBgMsg('MY_TeamMon_RR', function(_, data, _, _, szTalker, _)
 	end
 end)
 
-LIB.RegisterEvent('LOADING_END.MY_TeamMon_RR', function()
+LIB.RegisterEvent('LOADING_END', 'MY_TeamMon_RR', function()
 	if LIB.IsDebugServer() then
 		return
 	end
 	D.CheckUpdate()
-	LIB.RegisterEvent('LOADING_END.MY_TeamMon_RR', false)
+	LIB.RegisterEvent('LOADING_END', 'MY_TeamMon_RR', false)
 end)
 
 -- Global exports

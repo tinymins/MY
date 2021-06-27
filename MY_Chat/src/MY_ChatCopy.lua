@@ -138,7 +138,7 @@ local function onNewChatLine(h, i, szMsg, szChannel, dwTime, nR, nG, nB)
 end
 LIB.HookChatPanel('AFTER.MY_ChatCopy', onNewChatLine)
 
-LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_ChatCopy', function()
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_ChatCopy', function()
 	D.bReady = true
 end)
 

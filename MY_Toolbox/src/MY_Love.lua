@@ -742,9 +742,9 @@ local function OnFellowshipUpdate()
 	-- 载入情缘
 	D.UpdateLocalLover()
 end
-LIB.RegisterEvent('PLAYER_FELLOWSHIP_UPDATE.MY_Love', OnFellowshipUpdate)
-LIB.RegisterEvent('FELLOWSHIP_CARD_CHANGE.MY_Love', OnFellowshipUpdate)
-LIB.RegisterEvent('UPDATE_FELLOWSHIP_CARD.MY_Love', OnFellowshipUpdate)
+LIB.RegisterEvent('PLAYER_FELLOWSHIP_UPDATE', 'MY_Love', OnFellowshipUpdate)
+LIB.RegisterEvent('FELLOWSHIP_CARD_CHANGE', 'MY_Love', OnFellowshipUpdate)
+LIB.RegisterEvent('UPDATE_FELLOWSHIP_CARD', 'MY_Love', OnFellowshipUpdate)
 end
 
 -- 回复情缘信息
@@ -969,7 +969,7 @@ local function OnPlayerFellowshipLogin()
 		end
 	end
 end
-LIB.RegisterEvent('PLAYER_FELLOWSHIP_LOGIN.MY_Love', OnPlayerFellowshipLogin)
+LIB.RegisterEvent('PLAYER_FELLOWSHIP_LOGIN', 'MY_Love', OnPlayerFellowshipLogin)
 end
 
 -- player enter
@@ -980,7 +980,7 @@ local function OnPlayerEnterScene()
 		MY_Focus.SetFocusID(TARGET.PLAYER, arg0)
 	end
 end
-LIB.RegisterEvent('PLAYER_ENTER_SCENE.MY_Love', OnPlayerEnterScene)
+LIB.RegisterEvent('PLAYER_ENTER_SCENE', 'MY_Love', OnPlayerEnterScene)
 end
 
 -- on init
@@ -1004,7 +1004,7 @@ local function onSyncUserPreferencesEnd()
 		D.UpdateProtectData()
 	end
 end
-LIB.RegisterEvent('SYNC_USER_PREFERENCES_END.MY_Love', onSyncUserPreferencesEnd)
+LIB.RegisterEvent('SYNC_USER_PREFERENCES_END', 'MY_Love', onSyncUserPreferencesEnd)
 end
 
 ---------------------------------------------------------------------

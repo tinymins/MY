@@ -346,7 +346,7 @@ local function Hook()
 		HookTableFunc(frame, 'OnFrameKeyDown', OnFrameKeyDown, { bHookReturn = true })
 	end
 
-	LIB.RegisterEvent('EXECUTE_BINDING.MY_BAGEX', function(e)
+	LIB.RegisterEvent('EXECUTE_BINDING', 'MY_BAGEX', function(e)
 		local szName, bDown = arg0, arg1
 		if Cursor.IsVisible()
 		and szName == 'OPENORCLOSEALLBAGS' and not bDown then
@@ -388,20 +388,20 @@ local function Unhook()
 		UnhookTableFunc(frame, 'OnFrameKeyDown', OnFrameKeyDown)
 	end
 
-	LIB.RegisterEvent('EXECUTE_BINDING.MY_BAGEX')
+	LIB.RegisterEvent('EXECUTE_BINDING', 'MY_BAGEX')
 end
 
 local function Apply(bEnable)
 	if bEnable then
 		Hook()
-		LIB.RegisterFrameCreate('BigBagPanel.MY_BAGEX', Hook)
-		LIB.RegisterFrameCreate('BigBankPanel.MY_BAGEX', Hook)
-		LIB.RegisterFrameCreate('GuildBankPanel.MY_BAGEX', Hook)
+		LIB.RegisterFrameCreate('BigBagPanel', 'MY_BAGEX', Hook)
+		LIB.RegisterFrameCreate('BigBankPanel', 'MY_BAGEX', Hook)
+		LIB.RegisterFrameCreate('GuildBankPanel', 'MY_BAGEX', Hook)
 	else
 		Unhook()
-		LIB.RegisterFrameCreate('BigBagPanel.MY_BAGEX', false)
-		LIB.RegisterFrameCreate('BigBankPanel.MY_BAGEX', false)
-		LIB.RegisterFrameCreate('GuildBankPanel.MY_BAGEX', false)
+		LIB.RegisterFrameCreate('BigBagPanel', 'MY_BAGEX', false)
+		LIB.RegisterFrameCreate('BigBankPanel', 'MY_BAGEX', false)
+		LIB.RegisterFrameCreate('GuildBankPanel', 'MY_BAGEX', false)
 	end
 end
 
@@ -430,7 +430,7 @@ LIB.RegisterEvent({'BAG_ITEM_UPDATE', 'GUILD_BANK_PANEL_UPDATE', 'LOADING_END'},
 end)
 end
 
-LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_BAGEX', function()
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_BAGEX', function()
 	Apply(O.bEnable)
 end)
 LIB.RegisterReload('MY_BAGEX', function() Apply(false) end)

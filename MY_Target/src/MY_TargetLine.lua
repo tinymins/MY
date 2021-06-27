@@ -267,13 +267,13 @@ function D.CheckEnable()
 	D.RequireRerender()
 	D.UpdateLine()
 end
-LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_TargetLine', function()
+LIB.RegisterEvent('MY_SHIELDED_VERSION', 'MY_TargetLine', function()
 	if arg0 and arg0 ~= 'MY_TargetLine' then
 		return
 	end
 	D.CheckEnable()
 end)
-LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_TargetLine', function()
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_TargetLine', function()
 	D.bReady = true
 	D.CheckEnable()
 end)

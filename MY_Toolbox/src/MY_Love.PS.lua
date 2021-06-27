@@ -74,7 +74,7 @@ function D.RefreshPS()
 		MY.SwitchTab('MY_Love', true)
 	end
 end
-LIB.RegisterEvent('MY_LOVE_UPDATE.MY_Love__PS', D.RefreshPS)
+LIB.RegisterEvent('MY_LOVE_UPDATE', 'MY_Love__PS', D.RefreshPS)
 
 -------------------------------------
 -- …Ë÷√ΩÁ√Ê

@@ -112,7 +112,7 @@ local function onNpcEnterScene()
 		CHANGGE_REAL_SHADOW_CACHE[arg0] = npc.dwEmployer
 	end
 end
-LIB.RegisterEvent('NPC_ENTER_SCENE.MY_Cataclysm', onNpcEnterScene)
+LIB.RegisterEvent('NPC_ENTER_SCENE', 'MY_Cataclysm', onNpcEnterScene)
 
 local function onNpcLeaveScene()
 	local npc = GetNpc(arg0)
@@ -128,7 +128,7 @@ local function onNpcLeaveScene()
 	end
 	CTM_BOSS_CACHE[npc.dwID] = nil
 end
-LIB.RegisterEvent('NPC_LEAVE_SCENE.MY_Cataclysm', onNpcLeaveScene)
+LIB.RegisterEvent('NPC_LEAVE_SCENE', 'MY_Cataclysm', onNpcLeaveScene)
 end
 
 do
@@ -141,7 +141,7 @@ local function onBossSet()
 		end
 	end
 end
-LIB.RegisterEvent('MY_SET_BOSS.MY_Cataclysm', onBossSet)
+LIB.RegisterEvent('MY_SET_BOSS', 'MY_Cataclysm', onBossSet)
 end
 
 local function SetTarget(dwType, dwID)

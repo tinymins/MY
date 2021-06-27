@@ -74,11 +74,11 @@ function D.Apply()
 	end
 end
 
-LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_HideAnnounceBg', function()
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_HideAnnounceBg', function()
 	D.bReady = true
 	D.Apply()
 end)
-LIB.RegisterFrameCreate('GMAnnouncePanel.MY_HideAnnounceBg', D.Apply)
+LIB.RegisterFrameCreate('GMAnnouncePanel', 'MY_HideAnnounceBg', D.Apply)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 	x = x + ui:Append('WndCheckBox', {

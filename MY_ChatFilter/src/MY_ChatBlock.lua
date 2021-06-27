@@ -193,7 +193,7 @@ LIB.RegisterEvent('MY_PRIVATE_STORAGE_UPDATE', function()
 	end
 end)
 LIB.RegisterInit('MY_ChatBlock', D.LoadBlockWords)
-LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_ChatBlock', D.CheckEnable)
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_ChatBlock', D.CheckEnable)
 
 -- Global exports
 do

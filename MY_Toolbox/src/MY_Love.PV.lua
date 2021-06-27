@@ -299,7 +299,7 @@ function D.OnPeekOtherPlayer()
 	O.tID2Name[tar.szName] = arg1
 	D.HookPlayerViewPanel()
 end
-LIB.RegisterEvent('PEEK_OTHER_PLAYER.MY_Love__PV', D.OnPeekOtherPlayer)
+LIB.RegisterEvent('PEEK_OTHER_PLAYER', 'MY_Love__PV', D.OnPeekOtherPlayer)
 
 function D.OnActiveLoveChange()
 	O.tActiveLove[arg0] = arg1 and true or nil

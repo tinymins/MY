@@ -164,7 +164,7 @@ local function UpdateTongRepertoryPage()
 		}
 	end
 end
-LIB.RegisterEvent('UPDATE_TONG_REPERTORY_PAGE.MY_RoleStatistics_BagStat', UpdateTongRepertoryPage)
+LIB.RegisterEvent('UPDATE_TONG_REPERTORY_PAGE', 'MY_RoleStatistics_BagStat', UpdateTongRepertoryPage)
 
 function D.FlushDB()
 	if not O.bSaveDB then

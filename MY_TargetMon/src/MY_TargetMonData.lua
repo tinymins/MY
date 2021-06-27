@@ -108,16 +108,16 @@ end
 local function onFilterChange()
 	CACHE_CONFIG = nil
 end
-LIB.RegisterEvent('LOADING_END.MY_TargetMonData', onFilterChange)
-LIB.RegisterEvent('SKILL_MOUNT_KUNG_FU.MY_TargetMonData', onFilterChange)
-LIB.RegisterEvent('SKILL_UNMOUNT_KUNG_FU.MY_TargetMonData', onFilterChange)
-LIB.RegisterEvent('MY_TARGET_MON_MONITOR_CHANGE.MY_TargetMonData', onFilterChange)
+LIB.RegisterEvent('LOADING_END', 'MY_TargetMonData', onFilterChange)
+LIB.RegisterEvent('SKILL_MOUNT_KUNG_FU', 'MY_TargetMonData', onFilterChange)
+LIB.RegisterEvent('SKILL_UNMOUNT_KUNG_FU', 'MY_TargetMonData', onFilterChange)
+LIB.RegisterEvent('MY_TARGET_MON_MONITOR_CHANGE', 'MY_TargetMonData', onFilterChange)
 
 local function onTargetMonReload()
 	onFilterChange()
 	D.OnTargetMonReload()
 end
-LIB.RegisterEvent('MY_TARGET_MON_CONFIG_INIT.MY_TargetMonData', onTargetMonReload)
+LIB.RegisterEvent('MY_TARGET_MON_CONFIG_INIT', 'MY_TargetMonData', onTargetMonReload)
 end
 
 do
@@ -188,13 +188,13 @@ end
 local function onShieldedReset()
 	SHIELDED = nil
 end
-LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_TargetMonData_Shield', function()
+LIB.RegisterEvent('MY_SHIELDED_VERSION', 'MY_TargetMonData_Shield', function()
 	if arg0 and arg0 ~= 'MY_TargetMon' then
 		return
 	end
 	onShieldedReset()
 end)
-LIB.RegisterEvent('LOADING_END.MY_TargetMonData_Shield', onShieldedReset)
+LIB.RegisterEvent('LOADING_END', 'MY_TargetMonData_Shield', onShieldedReset)
 end
 
 do
@@ -234,7 +234,7 @@ local function OnSysMsg(event)
 		OnSkill(arg5, arg6)
 	end
 end
-LIB.RegisterEvent('SYS_MSG.MY_TargetMon_SKILL', OnSysMsg)
+LIB.RegisterEvent('SYS_MSG', 'MY_TargetMon_SKILL', OnSysMsg)
 end
 
 -- 更新BUFF数据 更新监控条

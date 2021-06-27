@@ -173,7 +173,7 @@ local function onLoadingEnding()
 	end
 	FlushDB()
 end
-LIB.RegisterEvent('LOADING_ENDING.MY_MiddleMapMark', onLoadingEnding)
+LIB.RegisterEvent('LOADING_ENDING', 'MY_MiddleMapMark', onLoadingEnding)
 
 local function Flush()
 	FlushDB()
@@ -241,7 +241,7 @@ local function OnNpcEnterScene()
 	-- redraw ui
 	AutomaticRerender()
 end
-LIB.RegisterEvent('NPC_ENTER_SCENE.MY_MIDDLEMAPMARK', OnNpcEnterScene)
+LIB.RegisterEvent('NPC_ENTER_SCENE', 'MY_MIDDLEMAPMARK', OnNpcEnterScene)
 
 local REC_DOODAD_TYPES = {
 	[DOODAD_KIND.INVALID     ] = false,
@@ -300,7 +300,7 @@ local function OnDoodadEnterScene()
 	-- redraw ui
 	AutomaticRerender()
 end
-LIB.RegisterEvent('DOODAD_ENTER_SCENE.MY_MIDDLEMAPMARK', OnDoodadEnterScene)
+LIB.RegisterEvent('DOODAD_ENTER_SCENE', 'MY_MIDDLEMAPMARK', OnDoodadEnterScene)
 
 function D.SearchNpc(szText, dwMapID)
 	local aInfos

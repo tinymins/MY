@@ -501,7 +501,7 @@ for i = 1, 32 do
 		end)
 end
 
-LIB.RegisterUserSettingsUpdate('@@INIT@@.' .. MODULE_NAME, function()
+LIB.RegisterUserSettingsUpdate('@@INIT@@', MODULE_NAME, function()
 	D.bReady = true
 	D.CheckEnable()
 end)

@@ -67,7 +67,7 @@ local D = {}
 
 function D.Apply()
 	if D.bReady then
-		LIB.RegisterEvent('OPEN_WINDOW.JIUGONG_HELPER', function(event)
+		LIB.RegisterEvent('OPEN_WINDOW', 'JIUGONG_HELPER', function(event)
 			if LIB.IsShieldedVersion('MY_JiugongHelper') then
 				return
 			end
@@ -127,11 +127,11 @@ function D.Apply()
 			end)
 		end)
 	else
-		LIB.RegisterEvent('OPEN_WINDOW.JIUGONG_HELPER', false)
+		LIB.RegisterEvent('OPEN_WINDOW', 'JIUGONG_HELPER', false)
 	end
 end
 
-LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_JiugongHelper', function()
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_JiugongHelper', function()
 	D.bReady = true
 	D.Apply()
 end)

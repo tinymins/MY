@@ -248,12 +248,12 @@ function D.CheckAlertEnable()
 	end
 end
 
-LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_Domesticate', function()
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_Domesticate', function()
 	D.bReady = true
 	D.CheckAutoFeedEnable()
 	D.CheckAlertEnable()
 end)
-LIB.RegisterFrameCreate('DomesticatePanel.MY_Domesticate', D.HookDomesticatePanel)
+LIB.RegisterFrameCreate('DomesticatePanel', 'MY_Domesticate', D.HookDomesticatePanel)
 LIB.RegisterReload('MY_Domesticate', D.UnHookDomesticatePanel)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)

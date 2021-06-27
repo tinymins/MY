@@ -593,7 +593,7 @@ function D.UpdateMapProgress(bForceUpdate)
 end
 
 -- 首领死亡刷新秘境进度
-LIB.RegisterEvent('SYNC_LOOT_LIST.MY_RoleStatistics_DungeonStat__UpdateMapCopy', function()
+LIB.RegisterEvent('SYNC_LOOT_LIST', 'MY_RoleStatistics_DungeonStat__UpdateMapCopy', function()
 	if not LIB.IsInDungeon() then
 		return
 	end
@@ -998,12 +998,12 @@ function D.UpdateFloatEntry()
 	end
 	D.ApplyFloatEntry(O.bFloatEntry)
 end
-LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_RoleStatistics_DungeonEntry', function()
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_RoleStatistics_DungeonEntry', function()
 	D.bReady = true
 	D.UpdateFloatEntry()
 end)
 LIB.RegisterReload('MY_RoleStatistics_DungeonEntry', function() D.ApplyFloatEntry(false) end)
-LIB.RegisterFrameCreate('SprintPower.MY_RoleStatistics_DungeonEntry', D.UpdateFloatEntry)
+LIB.RegisterFrameCreate('SprintPower', 'MY_RoleStatistics_DungeonEntry', D.UpdateFloatEntry)
 
 -- Module exports
 do

@@ -218,7 +218,7 @@ LIB.HookChatPanel('FILTER.MY_ChatFilter', function(h, szMsg, szChannel, dwTime)
 	end
 	return true
 end)
-LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_ChatFilter', function() D.bReady = true end)
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_ChatFilter', function() D.bReady = true end)
 
 local PS = {}
 

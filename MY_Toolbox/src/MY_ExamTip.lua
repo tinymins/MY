@@ -273,11 +273,11 @@ local function OnFrameBreathe()
 	l_nExamPrintRemainSpace = GetClientPlayer().GetExamPrintRemainSpace()
 end
 
-LIB.RegisterFrameCreate('ExaminationPanel.EXAM_TIP', function(name, frame)
+LIB.RegisterFrameCreate('ExaminationPanel', 'EXAM_TIP', function(name, frame)
 	frame.OnFrameBreathe = OnFrameBreathe
 end)
 
-LIB.RegisterEvent('LOOT_ITEM.MY_EXAMTIP', function()
+LIB.RegisterEvent('LOOT_ITEM', 'MY_EXAMTIP', function()
 	if IsEmpty(INPUT_DATA_CACHE) then
 		return
 	end
@@ -294,7 +294,7 @@ LIB.RegisterEvent('LOOT_ITEM.MY_EXAMTIP', function()
 end)
 end
 
-LIB.RegisterEvent('OPEN_WINDOW.MY_EXAMTIP', function()
+LIB.RegisterEvent('OPEN_WINDOW', 'MY_EXAMTIP', function()
 	if IsEmpty(INPUT_DATA_CACHE) then
 		return
 	end
