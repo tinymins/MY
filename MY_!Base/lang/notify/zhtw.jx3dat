@@ -1,0 +1,10 @@
+return {
+	['Global config'] = '全局設置',
+	['Notify center'] = '消息中心',
+	['Show in minimap'] = '顯示小地圖入口',
+	['Order desc'] = '逆序顯示',
+	['Disable dismiss'] = '禁止消息自動消失',
+
+	['Addon notification'] = '插件消息',
+	['Click to view addon notification.'] = '點擊可查看插件的新消息。',
+}
