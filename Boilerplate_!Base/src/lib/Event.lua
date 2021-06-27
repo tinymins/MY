@@ -47,44 +47,8 @@ local _L = LIB.LoadLangPack(PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 -- 事件注册
 ---------------------------------------------------------------------------------------------
 do
--- 通用注册函数
--- CommonEventRegister(E, szID, fnAction)
--- table    E              事件描述信息
--- boolean  E.bSingleEvent 该事件没有子事件，即 szID 全部赋值给 szKey、 szEvent 为定值
--- string   szID           事件ID
--- function fnAction       事件响应函数
--- 外部使用文档：
---   RegisterXXX(string id, function fn) -- 注册
---   RegisterXXX(function fn)            -- 注册
---   RegisterXXX(string id)              -- 查询
---   RegisterXXX(string id, false)       -- 注销
--- 注：
---   当 E.bSingleEvent 为 true 时，可在id后面加一个点并紧跟
---   一个标识字符串用于防止重复或取消绑定，如 LOADING_END.xxx
--- 特别注意：当 fnAction 为 false 并且 szKey 为 nil 时会取消所有通过本函数注册的事件处理器
-local function CommonEventRegister(E, szID, fnAction)
-	if IsTable(szID) then
-		for _, szID in ipairs(szID) do
-			CommonEventRegister(E, szID, fnAction)
-		end
-		return
-	elseif IsFunction(szID) then
-		szID, fnAction = nil, szID
-	end
-	local szKey, szEvent
-	if E.bSingleEvent then
-		szKey = szID
-		szEvent = 'SINGLE_EVENT'
-	else
-		local nPos = StringFindW(szID, '.')
-		if nPos then
-			szKey = sub(szID, nPos + 1)
-			szEvent = sub(szID, 1, nPos - 1)
-		else
-			szEvent = szID
-		end
-	end
-	if IsFunction(fnAction) then
+local function CommonEventRegisterOperator(E, eAction, szEvent, szKey, fnAction)
+	if eAction == 'REG' then
 		if not E.tList then
 			E.tList = {}
 		end
@@ -97,17 +61,9 @@ local function CommonEventRegister(E, szID, fnAction)
 				E.OnCreateEvent(szEvent)
 			end
 		end
-		if not IsString(szKey) then
-			szKey = GetTickCount() * 1000
-			while E.tList[szEvent].tKey[tostring(szKey)] do
-				szKey = szKey + 1
-			end
-			szKey = tostring(szKey)
-		end
-		if szEvent == 'SINGLE_EVENT' then
-			szID = szKey
-		else
-			szID = szEvent .. '.' .. szKey
+		local szID = szKey
+		if not E.bSingleEvent then
+			szID = szEvent .. '.' .. szID
 		end
 		for i, p in ipairs_r(E.tList[szEvent].aList) do
 			if p.szKey == szKey then
@@ -117,7 +73,7 @@ local function CommonEventRegister(E, szID, fnAction)
 		end
 		insert(E.tList[szEvent].aList, { szKey = szKey, szID = szID, fnAction = fnAction })
 		E.tList[szEvent].tKey[szKey] = true
-	elseif fnAction == false then
+	elseif eAction == 'UNREG' then
 		if E.tList and E.tList[szEvent] then
 			if szKey then
 				for i, p in ipairs_r(E.tList[szEvent].aList) do
@@ -139,12 +95,86 @@ local function CommonEventRegister(E, szID, fnAction)
 				E.tList = nil
 			end
 		end
-	elseif szKey and E.tList then
-		return E.tList[szEvent] and E.tList[szEvent].tKey[szKey] or false
-	elseif not szKey and E.tList and E.tList[szEvent] then
-		return true
+	elseif eAction == 'GET' then
+		if szKey and E.tList then
+			return E.tList[szEvent] and E.tList[szEvent].tKey[szKey] or false
+		end
+		if not szKey and E.tList and E.tList[szEvent] then
+			return true
+		end
+		return false
 	end
-	return szID
+	return szKey
+end
+-- 通用注册函数
+-- CommonEventRegister(E, szEvent, szKey, fnAction)
+-- table    E              事件描述信息
+-- boolean  E.bSingleEvent 该事件没有子事件，即参数仅接受 szKey 传入， szEvent 为定值
+-- string   szEvent        事件名称，当 E.bSingleEvent 为真时省略该参数
+-- string   szKey          事件唯一标示符，用于防止重复或取消绑定
+-- function fnAction       事件响应函数
+-- 外部使用文档：
+--   E.bSingleEvent 为真：
+--     RegisterXXX(string id, function fn) -- 注册
+--     RegisterXXX(function fn)            -- 匿名注册
+--     RegisterXXX(string id)              -- 查询
+--     RegisterXXX(string id, false)       -- 注销
+--   E.bSingleEvent 为假：
+--     RegisterXXX(string event, string id, function fn) -- 注册
+--     RegisterXXX(string event, function fn)            -- 匿名注册
+--     RegisterXXX(string event, string id)              -- 查询
+--     RegisterXXX(string event, string id, false)       -- 注销
+-- 特别注意：当 fnAction 为 false 并且 szEvent、szKey 为 nil 时会取消所有通过本函数注册的事件处理器
+local function CommonEventRegister(E, xArg1, xArg2, xArg3)
+	local eAction, szEvent, szKey, fnAction
+	if E.bSingleEvent then
+		if IsFunction(xArg1) then
+			eAction, fnAction = 'REG', xArg1
+		elseif IsString(xArg1) and IsFunction(xArg2) then
+			eAction, szKey, fnAction = 'REG', xArg1, xArg2
+		elseif IsString(xArg1) and xArg2 == false then
+			eAction, szKey = 'UNREG', xArg1
+		elseif IsString(xArg1) and IsNil(xArg2) then
+			eAction, szKey = 'FIND', xArg1
+		end
+		szEvent = 'SINGLE_EVENT'
+	else
+		if (IsString(xArg1) or IsArray(xArg1)) and IsFunction(xArg2) then
+			eAction, szEvent, fnAction = 'REG', xArg1, xArg2
+		elseif (IsString(xArg1) or IsArray(xArg1)) and IsString(xArg2) and IsFunction(xArg3) then
+			eAction, szEvent, szKey, fnAction = 'REG', xArg1, xArg2, xArg3
+		elseif (IsString(xArg1) or IsArray(xArg1)) and IsString(xArg2) and xArg3 == false then
+			eAction, szEvent, szKey = 'UNREG', xArg1, xArg2
+		elseif IsString(xArg1) and IsString(xArg2) and IsNil(xArg3) then
+			eAction, szEvent, szKey = 'FIND', xArg1, xArg2
+		end
+	end
+	assert(eAction, 'Parameters type not recognized, cannot infer action type.')
+	-- 匿名注册分配随机标识符
+	if eAction == 'REG' and not IsString(szKey) then
+		szKey = GetTickCount() * 1000
+		if IsString(szEvent) then
+			if E.tList and E.tList[szEvent] then
+				while E.tList[szEvent].tKey[tostring(szKey)] do
+					szKey = szKey + 1
+				end
+			end
+		elseif IsArray(szEvent) then
+			if E.tList then
+				while lodash.some(szEvent, function(szEvent) return E.tList[szEvent] and E.tList[szEvent].tKey[tostring(szKey)] end) do
+					szKey = szKey + 1
+				end
+			end
+		end
+		szKey = tostring(szKey)
+	end
+	if IsTable(szEvent) then
+		for _, szEvent in ipairs(szEvent) do
+			CommonEventRegisterOperator(E, eAction, szEvent, szKey, fnAction)
+		end
+		return szKey
+	end
+	return CommonEventRegisterOperator(E, eAction, szEvent, szKey, fnAction)
 end
 LIB.CommonEventRegister = CommonEventRegister
 
@@ -210,8 +240,8 @@ function GLOBAL_EVENT.OnRemoveEvent(szEvent)
 	end
 	UnRegisterEvent(szEvent, EventHandler)
 end
-function LIB.RegisterEvent(szEvent, fnAction)
-	return CommonEventRegister(GLOBAL_EVENT, szEvent, fnAction)
+function LIB.RegisterEvent(...)
+	return CommonEventRegister(GLOBAL_EVENT, ...)
 end
 end
 
@@ -641,12 +671,19 @@ end
 -- LIB.RegisterBgMsg('{$NS}_CHECK_INSTALL') -- 注销
 -- LIB.RegisterBgMsg('{$NS}_CHECK_INSTALL.RECEIVER_01', function(szMsgID, nChannel, dwTalkerID, szTalkerName, bSelf, oData) LIB.SendBgMsg(szTalkerName, '{$NS}_CHECK_INSTALL_REPLY', oData) end) -- 注册
 -- LIB.RegisterBgMsg('{$NS}_CHECK_INSTALL.RECEIVER_01') -- 注销
-function LIB.RegisterBgMsg(szMsgID, fnAction, fnProgress)
+function LIB.RegisterBgMsg(szMsgID, szID, fnAction, fnProgress)
+	if not IsString(szID) then
+		szID, fnAction, fnProgress = nil, szID, fnAction
+	end
 	if fnAction == false then
 		fnProgress = false
 	end
-	local szID = CommonEventRegister(BG_MSG_EVENT, szMsgID, fnAction)
-	return CommonEventRegister(BG_MSG_PROGRESS_EVENT, szID, fnProgress)
+	if szID then
+		CommonEventRegister(BG_MSG_EVENT, szMsgID, szID, fnAction)
+	else
+		szID = CommonEventRegister(BG_MSG_EVENT, szMsgID, fnAction)
+	end
+	return CommonEventRegister(BG_MSG_PROGRESS_EVENT, szMsgID, szID, fnProgress)
 end
 end
 
@@ -762,8 +799,8 @@ function MSGMON_EVENT.OnRemoveEvent(szEvent)
 	UnRegisterMsgMonitor(FixMsgMonBug, { szEvent })
 	UnRegisterMsgMonitor(MsgMonHandler, { szEvent })
 end
-function LIB.RegisterMsgMonitor(szEvent, fnAction)
-	return CommonEventRegister(MSGMON_EVENT, szEvent, fnAction)
+function LIB.RegisterMsgMonitor(...)
+	return CommonEventRegister(MSGMON_EVENT, ...)
 end
 end
 

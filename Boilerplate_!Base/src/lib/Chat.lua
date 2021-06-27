@@ -1588,7 +1588,7 @@ local function Hook(i)
 		HookTableFunc(h, 'AppendItemFromString', AfterChatAppendItemFromString, { bAfterOrigin = true, bHookParams = true })
 	end
 end
-LIB.RegisterEvent('CHAT_PANEL_OPEN.ChatPanelHook', function(event) Hook(arg0) end)
+LIB.RegisterEvent('CHAT_PANEL_OPEN', 'ChatPanelHook', function(event) Hook(arg0) end)
 
 local function Unhook(i)
 	local h = Station.Lookup('Lowest2/ChatPanel' .. i .. '/Wnd_Message', 'Handle_Message')
@@ -1606,7 +1606,7 @@ local function HookAll()
 	end
 end
 LIB.RegisterInit('LIB#ChatPanelHook', HookAll)
-LIB.RegisterEvent('CHAT_PANEL_INIT.ChatPanelHook', HookAll)
+LIB.RegisterEvent('CHAT_PANEL_INIT', 'ChatPanelHook', HookAll)
 
 local function UnhookAll()
 	for i = 1, 10 do

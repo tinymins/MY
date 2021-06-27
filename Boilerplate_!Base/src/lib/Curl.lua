@@ -507,7 +507,7 @@ local function OnCurlRequestResult()
 		CALL_AJAX[szKey] = nil
 	end
 end
-LIB.RegisterEvent('CURL_REQUEST_RESULT.AJAX', OnCurlRequestResult)
+LIB.RegisterEvent('CURL_REQUEST_RESULT', 'AJAX', OnCurlRequestResult)
 end
 
 function LIB.DownloadFile(szPath, resolve, reject)
