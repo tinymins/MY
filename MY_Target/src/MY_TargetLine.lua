@@ -273,7 +273,7 @@ LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_TargetLine', function()
 	end
 	D.CheckEnable()
 end)
-LIB.RegisterInit('MY_TargetLine', function()
+LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_TargetLine', function()
 	D.bReady = true
 	D.CheckEnable()
 end)

@@ -139,7 +139,7 @@ end
 local function onInit()
 	LIB.DelayCall(2000, IdleOff)
 end
-LIB.RegisterInit('MY_LOGOFF', onInit)
+LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_LOGOFF', onInit)
 
 local PS = {}
 function PS.OnPanelActive(wnd)

@@ -196,7 +196,7 @@ function D.Apply()
 	end
 end
 
-LIB.RegisterInit('MY_YunMacro', function()
+LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_YunMacro', function()
 	D.bReady = true
 	D.Apply()
 end)

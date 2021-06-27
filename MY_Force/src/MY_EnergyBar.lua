@@ -573,7 +573,7 @@ function D.Apply()
 		end
 	end
 end
-LIB.RegisterInit('MY_EnergyBar', D.Apply)
+LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_EnergyBar', D.Apply)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	x = x + ui:Append('WndCheckBox', {

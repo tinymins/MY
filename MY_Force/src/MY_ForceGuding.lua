@@ -323,7 +323,7 @@ function D.OnUseManaChange()
 	end
 end
 
-LIB.RegisterInit('MY_ForceGuding', function()
+LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_ForceGuding', function()
 	D.bReady = true
 	D.OnEnableChange()
 	D.OnUseManaChange()

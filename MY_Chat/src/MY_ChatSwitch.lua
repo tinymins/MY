@@ -382,7 +382,7 @@ function D.ApplyBattlefieldChannelSwitch()
 		LIB.RegisterEvent('LOADING_ENDING.MY_ChatSwitch__AutoSwitchBattlefieldChannel')
 	end
 end
-LIB.RegisterInit('MY_ChatSwitch__AutoSwitchBattlefieldChannel', D.Apply)
+LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_ChatSwitch__AutoSwitchBattlefieldChannel', D.Apply)
 
 function D.OnFrameCreate()
 	this.tRadios = {}

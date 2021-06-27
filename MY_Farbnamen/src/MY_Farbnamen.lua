@@ -605,7 +605,7 @@ function D.AddAusID(dwID)
 	end
 end
 
-LIB.RegisterInit('MY_Farbnamen', function() D.bReady = true end)
+LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_Farbnamen', function() D.bReady = true end)
 
 --------------------------------------------------------------
 -- ²Ëµ¥

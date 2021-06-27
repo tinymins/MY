@@ -870,7 +870,7 @@ local function onSwitch()
 end
 LIB.RegisterHotKey('MY_LifeBar_S', _L['MY_LifeBar'], onSwitch)
 
-LIB.RegisterInit('MY_LifeBar', function()
+LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_LifeBar', function()
 	D.bReady = true
 end)
 

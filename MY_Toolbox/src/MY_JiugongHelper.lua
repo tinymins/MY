@@ -131,7 +131,7 @@ function D.Apply()
 	end
 end
 
-LIB.RegisterInit('MY_JiugongHelper', function()
+LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_JiugongHelper', function()
 	D.bReady = true
 	D.Apply()
 end)

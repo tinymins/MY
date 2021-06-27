@@ -285,7 +285,7 @@ LIB.RegisterEvent('LOADING_END.MY_Force', function()
 	end
 end)
 
-LIB.RegisterInit('MY_Force', function()
+LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_Force', function()
 	D.OnAlertPetChange()
 	D.OnMarkPetChange()
 	D.OnFeedHorseChange()

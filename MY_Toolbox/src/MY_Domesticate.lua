@@ -248,7 +248,7 @@ function D.CheckAlertEnable()
 	end
 end
 
-LIB.RegisterInit('MY_Domesticate', function()
+LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_Domesticate', function()
 	D.bReady = true
 	D.CheckAutoFeedEnable()
 	D.CheckAlertEnable()

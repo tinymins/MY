@@ -1140,7 +1140,7 @@ local function onInit()
 	D.CheckFrameOpen()
 	D.RescanNearby()
 end
-LIB.RegisterInit('MY_Focus', onInit)
+LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_Focus', onInit)
 end
 
 do

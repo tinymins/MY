@@ -129,7 +129,7 @@ function D.Apply()
 		LIB.RegisterMsgMonitor('MSG_NPC_WHISPER.MY_RedirectMetionToWhisper',false)
 	end
 end
-LIB.RegisterInit('MY_WhisperMetion', D.Apply)
+LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_WhisperMetion', D.Apply)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
 	x = X

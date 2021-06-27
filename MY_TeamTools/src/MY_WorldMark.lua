@@ -176,7 +176,7 @@ LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_WorldMark', function()
 	end
 	D.CheckEnable()
 end)
-LIB.RegisterInit('MY_WorldMark', D.CheckEnable)
+LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_WorldMark', D.CheckEnable)
 
 
 -- Global exports

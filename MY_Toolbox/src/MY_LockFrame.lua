@@ -215,7 +215,7 @@ function D.CheckAllFrame()
 	end
 end
 
-LIB.RegisterInit('MY_LockFrame', function()
+LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_LockFrame', function()
 	D.bReady = true
 	D.CheckAllFrame()
 end)

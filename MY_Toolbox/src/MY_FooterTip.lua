@@ -282,7 +282,7 @@ function D.Apply()
 end
 
 LIB.RegisterEvent('LOADING_ENDING.MY_FooterTip', D.Apply)
-LIB.RegisterInit('MY_FooterTip', function()
+LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_FooterTip', function()
 	D.bReady = true
 	D.Apply()
 end)

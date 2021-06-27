@@ -161,7 +161,7 @@ function D.LoadConfig(szConfig)
 	ConfigLoaded = true
 	FireUIEvent('MY_LIFEBAR_CONFIG_LOADED')
 end
-LIB.RegisterInit('MY_LifeBar_Config', function() D.LoadConfig() end)
+LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_LifeBar_Config', function() D.LoadConfig() end)
 
 function D.SaveConfig()
 	if not ConfigLoaded then

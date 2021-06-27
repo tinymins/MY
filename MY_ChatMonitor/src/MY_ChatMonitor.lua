@@ -362,7 +362,7 @@ function D.Init()
     D.LoadData()
     D.RegisterMsgMonitor()
 end
-LIB.RegisterInit('MY_CHATMONITOR', D.Init)
+LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_CHATMONITOR', D.Init)
 
 function D.Exit()
     D.SaveData()

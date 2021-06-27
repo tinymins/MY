@@ -299,7 +299,7 @@ LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_ShenxingHelper', function()
 	end
 	D.CheckEnable()
 end)
-LIB.RegisterInit('MY_ShenxingHelper', function()
+LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_ShenxingHelper', function()
 	D.bReady = true
 	D.CheckEnable()
 end)

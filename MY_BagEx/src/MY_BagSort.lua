@@ -395,9 +395,9 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 	return x, y
 end
 
-LIB.RegisterInit('MY_BagSort', D.CheckInjection)
-LIB.RegisterReload('MY_BagSort', D.RemoveInjection)
+LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_BagSort', D.CheckInjection)
 LIB.RegisterFrameCreate('GuildBankPanel.MY_BagSort', D.CheckInjection)
+LIB.RegisterReload('MY_BagSort', D.RemoveInjection)
 
 ---------------------------------------------------------------------
 -- Global exports

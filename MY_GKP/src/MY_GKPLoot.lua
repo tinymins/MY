@@ -270,7 +270,7 @@ LIB.RegisterInit('MY_GKPLoot', function()
 			D[k] = nil
 		end
 	end
-	if D.tItemConfig and IsTable(v) then
+	if D.tItemConfig and IsTable(D.tItemConfig) then
 		for k, v in pairs(D.tItemConfig) do
 			SafeCall(Set, O, k, v)
 		end

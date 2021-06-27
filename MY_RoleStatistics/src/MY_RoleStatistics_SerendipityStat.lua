@@ -1405,7 +1405,7 @@ function D.CheckMapMark()
 		D.UnhookMiniMapMark()
 	end
 end
-LIB.RegisterInit('MY_RoleStatistics_SerendipityMapMark', function()
+LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_RoleStatistics_SerendipityMapMark', function()
 	D.bReady = true
 	D.CheckMapMark()
 end)

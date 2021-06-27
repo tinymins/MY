@@ -287,7 +287,7 @@ function D.Apply()
 		D.ShowChatPanel()
 	end
 end
-LIB.RegisterInit('MY_AutoHideChat', D.Apply)
+LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_AutoHideChat', D.Apply)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
 	x = X

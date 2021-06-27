@@ -402,7 +402,7 @@ LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_TeamMon_CC', function()
 	end
 	D.CheckEnable()
 end)
-LIB.RegisterInit('MY_TeamMon_CC', function()
+LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_TeamMon_CC', function()
 	D.bReady = true
 	D.CheckEnable()
 end)

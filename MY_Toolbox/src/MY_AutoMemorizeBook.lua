@@ -112,7 +112,7 @@ function D.CheckEnable()
 	end
 end
 
-LIB.RegisterInit('MY_AutoMemorizeBook', D.CheckEnable)
+LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_AutoMemorizeBook', D.CheckEnable)
 LIB.RegisterReload('MY_AutoMemorizeBook', D.Unhook)
 LIB.RegisterEvent('MY_SHIELDED_VERSION.MY_AutoMemorizeBook', function()
 	if arg0 and arg0 ~= 'MY_AutoMemorizeBook' then

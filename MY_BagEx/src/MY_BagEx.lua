@@ -430,7 +430,9 @@ LIB.RegisterEvent({'BAG_ITEM_UPDATE', 'GUILD_BANK_PANEL_UPDATE', 'LOADING_END'},
 end)
 end
 
-LIB.RegisterInit('MY_BAGEX', function() Apply(O.bEnable) end)
+LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_BAGEX', function()
+	Apply(O.bEnable)
+end)
 LIB.RegisterReload('MY_BAGEX', function() Apply(false) end)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)

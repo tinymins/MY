@@ -701,7 +701,7 @@ LIB.RegisterEvent('PARTY_ADD_MEMBER', function()
 	end
 end)
 
-LIB.RegisterInit('MY_CombatLogs', function()
+LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_CombatLogs', function()
 	D.bReady = true
 	D.UpdateEnable()
 end)

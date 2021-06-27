@@ -185,12 +185,9 @@ function D.Apply()
 	end
 end
 
-do
-local function Init()
+LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_TeamBalloon', function()
 	D.Apply()
-end
-LIB.RegisterInit('MY_TeamBalloon', Init)
-end
+end)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
 	x = X

@@ -138,7 +138,9 @@ local function onNewChatLine(h, i, szMsg, szChannel, dwTime, nR, nG, nB)
 end
 LIB.HookChatPanel('AFTER.MY_ChatCopy', onNewChatLine)
 
-LIB.RegisterInit('MY_ChatCopy', function() D.bReady = true end)
+LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_ChatCopy', function()
+	D.bReady = true
+end)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 	x = X

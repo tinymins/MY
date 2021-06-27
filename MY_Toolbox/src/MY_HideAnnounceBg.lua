@@ -74,7 +74,7 @@ function D.Apply()
 	end
 end
 
-LIB.RegisterInit('MY_HideAnnounceBg', function()
+LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_HideAnnounceBg', function()
 	D.bReady = true
 	D.Apply()
 end)

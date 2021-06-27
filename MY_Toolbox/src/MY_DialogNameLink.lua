@@ -113,7 +113,7 @@ function D.Apply()
 		LIB.RegisterEvent('OPEN_WINDOW.NAMELINKER', false)
 	end
 end
-LIB.RegisterInit('MY_DialogNameLink', function()
+LIB.RegisterUserSettingsUpdate('@@INIT@@.MY_DialogNameLink', function()
 	D.bReady = true
 	D.Apply()
 end)
