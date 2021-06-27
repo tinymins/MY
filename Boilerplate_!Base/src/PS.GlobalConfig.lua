@@ -75,6 +75,11 @@ function PS.OnPanelActive(wnd)
 	nX, nY = X, nY + 30
 	nLFY = nY
 
+	local Notify = _G[NSFormatString('{$NS}_Notify')]
+	if Notify then
+		nX, nY, nLFY = Notify.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
+	end
+
 	local HoverEntry = _G[NSFormatString('{$NS}_HoverEntry')]
 	if HoverEntry then
 		nX, nY, nLFY = HoverEntry.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
