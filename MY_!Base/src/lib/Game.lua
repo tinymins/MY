@@ -1071,7 +1071,7 @@ local O = LIB.CreateUserSettingsModule('LIB', _L['System'], {
 local function initForceCustom()
 	FireUIEvent(NSFormatString('{$NS}_FORCE_COLOR_UPDATE'))
 end
-LIB.RegisterUserSettingsUpdate('@@INIT@@.LIB#ForceColor', initForceCustom)
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'LIB#ForceColor', initForceCustom)
 
 function LIB.GetForceColor(dwForce, szType)
 	if szType == 'background' then
@@ -1094,7 +1094,7 @@ end
 local function initCampCustom()
 	FireUIEvent(NSFormatString('{$NS}_FORCE_COLOR_UPDATE'))
 end
-LIB.RegisterUserSettingsUpdate('@@INIT@@.LIB#CampColor', initCampCustom)
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'LIB#CampColor', initCampCustom)
 
 function LIB.GetCampColor(nCamp, szType)
 	if szType == 'background' then
