@@ -540,7 +540,7 @@ function PS.OnPanelActive(wnd)
 		tipoffset = { x = -80 },
 	})
 	-- Êä³ö°å
-	m_uiBoard = ui:Append('WndScrollBox',{
+	m_uiBoard = ui:Append('WndScrollHandleBox',{
 		x = 20,  y = 40, w = w - 26, h = h - 60,
 		handlestyle = 3, text = _L['average score with out pole']
 	})

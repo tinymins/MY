@@ -659,8 +659,8 @@ function PS.OnPanelActive(wnd)
         end,
     })
 
-    l_uiBoard = ui:Append('WndScrollBox', {
-        name = 'WndScrollBox_TalkList',
+    l_uiBoard = ui:Append('WndScrollHandleBox', {
+        name = 'WndScrollHandleBox_TalkList',
         x = 20, y = 50, w = w - 21, h = h - 70, handlestyle = 3,
     })
 

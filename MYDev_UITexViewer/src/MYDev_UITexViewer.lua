@@ -71,7 +71,7 @@ _Cache.OnPanelActive = function(wnd)
 
     _Cache.tUITexList = LIB.LoadLUAData(PACKET_INFO.ROOT .. 'MYDev_UITexViewer/data/data.jx3dat') or {}
 
-    local uiBoard = ui:Append('WndScrollBox', 'WndScrollBox_ImageList')
+    local uiBoard = ui:Append('WndScrollHandleBox', 'WndScrollHandleBox_ImageList')
       :HandleStyle(3):Pos(x, y+25):Size(w-21, h - 70)
 
     local uiEdit = ui:Append('WndEditBox', 'WndEdit_Copy')
