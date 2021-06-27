@@ -1890,12 +1890,12 @@ function LIB.CreateCache(szNameMode, aEvent)
 	end
 	local function Register()
 		for _, szEvent in ipairs(aEvent) do
-			LIB.RegisterEvent(szEvent .. '.' .. szKey, Flush)
+			LIB.RegisterEvent(szEvent, szKey, Flush)
 		end
 	end
 	local function Unregister()
 		for _, szEvent in ipairs(aEvent) do
-			LIB.RegisterEvent(szEvent .. '.' .. szKey, false)
+			LIB.RegisterEvent(szEvent, szKey, false)
 		end
 	end
 	function mt.__call(_, k)
