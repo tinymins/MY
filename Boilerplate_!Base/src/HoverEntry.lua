@@ -113,7 +113,7 @@ function D.CheckEnable()
 		})
 	end
 end
-LIB.RegisterInit('HoverEntry', D.CheckEnable)
+LIB.RegisterUserSettingsUpdate('@@INIT@@.HoverEntry', D.CheckEnable)
 
 function D.OnFrameCreate()
 	this:RegisterEvent('UI_SCALED')
