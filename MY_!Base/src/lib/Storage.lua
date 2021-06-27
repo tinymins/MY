@@ -480,6 +480,17 @@ LIB.GetLUADataHash = GetLUADataHash
 end
 
 do
+---------------------------------------------------------------------------------------------
+-- 用户配置项
+---------------------------------------------------------------------------------------------
+local USER_SETTINGS_EVENT = { szName = 'UserSettings' }
+local CommonEventFirer = LIB.CommonEventFirer
+local CommonEventRegister = LIB.CommonEventRegister
+
+function LIB.RegisterUserSettingsUpdate(szEvent, fnAction)
+	return CommonEventRegister(USER_SETTINGS_EVENT, szEvent, fnAction)
+end
+
 local DATABASE_TYPE_LIST = { PATH_TYPE.ROLE, PATH_TYPE.SERVER, PATH_TYPE.GLOBAL }
 local DATABASE_INSTANCE = {}
 local DATABASE_NEED_FLUSH = {}
@@ -490,11 +501,15 @@ local DATA_CACHE_LEAF_FLAG = {}
 local FLUSH_TIME = 0
 
 function LIB.ConnectSettingsDatabase()
+	if not IsEmpty(DATABASE_INSTANCE) then
+		return
+	end
 	for _, ePathType in ipairs(DATABASE_TYPE_LIST) do
 		if not DATABASE_INSTANCE[ePathType] then
 			DATABASE_INSTANCE[ePathType] = UnQLite_Open(LIB.FormatPath({'userdata/settings.udb', ePathType}))
 		end
 	end
+	CommonEventFirer(USER_SETTINGS_EVENT, '@@INIT@@')
 end
 
 function LIB.ReleaseSettingsDatabase()
@@ -747,6 +762,7 @@ function LIB.SetUserSettings(szKey, ...)
 	end
 	db:Set(info.szDataKey, { d = xValue, v = info.szVersion })
 	DATABASE_NEED_FLUSH[info.ePathType] = true
+	CommonEventFirer(USER_SETTINGS_EVENT, szKey)
 	return true
 end
 
@@ -791,6 +807,7 @@ function LIB.ResetUserSettings(szKey, ...)
 		DATA_CACHE[szKey] = nil
 	end
 	DATABASE_NEED_FLUSH[info.ePathType] = true
+	CommonEventFirer(USER_SETTINGS_EVENT, szKey)
 end
 
 -- 创建用户设置代理对象

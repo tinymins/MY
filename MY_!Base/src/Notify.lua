@@ -353,6 +353,9 @@ LIB.RegisterInit(FRAME_NAME, function()
 	D.HookEntry()
 	D.UpdateEntry()
 end)
+LIB.RegisterUserSettingsUpdate('@@INIT@@.' .. FRAME_NAME, function()
+	D.UpdateEntry()
+end)
 LIB.RegisterReload(FRAME_NAME, D.UnhookEntry)
 
 do
