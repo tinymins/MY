@@ -2616,13 +2616,7 @@ function LIB.GetItemAmountInAllPackages(dwTabType, dwIndex, nBookID, bFull)
 	end
 	return cache[LIB.GetItemKey(dwTabType, dwIndex, nBookID)] or 0
 end
-LIB.RegisterEvent({
-	NSFormatString('BAG_ITEM_UPDATE.{$NS}#LIB#GetItemAmountInAllPackages'),
-	NSFormatString('BANK_ITEM_UPDATE.{$NS}#LIB#GetItemAmountInAllPackages'),
-	NSFormatString('LOADING_ENDING.{$NS}#LIB#GetItemAmountInAllPackages')
-}, function()
-	CACHE, FULL_CACHE = nil, nil
-end)
+LIB.RegisterEvent({'BAG_ITEM_UPDATE', 'BANK_ITEM_UPDATE', 'LOADING_ENDING'}, 'LIB#GetItemAmountInAllPackages', function() CACHE, FULL_CACHE = nil, nil end)
 end
 
 -- 装备指定名字的装备
@@ -3024,8 +3018,8 @@ local function OnSkillReplace()
 	REPLACE[arg0] = arg1
 	REPLACE[arg1] = nil
 end
-RegisterEvent("ON_SKILL_REPLACE", OnSkillReplace)
-RegisterEvent("CHANGE_SKILL_ICON", OnSkillReplace)
+RegisterEvent('ON_SKILL_REPLACE', OnSkillReplace)
+RegisterEvent('CHANGE_SKILL_ICON', OnSkillReplace)
 
 -- 获取一个心法的技能列表
 -- LIB.GetKungfuSkillIDS(dwKungfuID)
@@ -3203,7 +3197,7 @@ local SKILL_SURFACE_NUM = {}
 local function OnChangeSkillSurfaceNum()
 	SKILL_SURFACE_NUM[arg0] = arg1
 end
-RegisterEvent("CHANGE_SKILL_SURFACE_NUM", OnChangeSkillSurfaceNum)
+RegisterEvent('CHANGE_SKILL_SURFACE_NUM', OnChangeSkillSurfaceNum)
 local function GetSkillCDProgress(dwID, nLevel, dwCDID, KObject)
 	if dwCDID then
 		return KObject.GetSkillCDProgress(dwID, nLevel, dwCDID)
@@ -3293,11 +3287,11 @@ local RECIPE_CACHE = {}
 local function onRecipeUpdate()
     RECIPE_CACHE = {}
 end
-LIB.RegisterEvent({"SYNC_ROLE_DATA_END", "SKILL_UPDATE", "SKILL_RECIPE_LIST_UPDATE"}, onRecipeUpdate)
+LIB.RegisterEvent({'SYNC_ROLE_DATA_END', 'SKILL_UPDATE', 'SKILL_RECIPE_LIST_UPDATE'}, onRecipeUpdate)
 
 local function GetShortName(sz) -- 获取秘笈短名
-	local nStart, nEnd = string.find(sz, "·")
-	return nStart and wgsub(string.sub(sz, nEnd + 1), _L[">"], "")
+	local nStart, nEnd = string.find(sz, '·')
+	return nStart and wgsub(string.sub(sz, nEnd + 1), _L['>'], '')
 end
 
 function LIB.IsRecipeActive(szRecipeName)
@@ -4012,7 +4006,7 @@ function LIB.IsItemFitKungfu(itemInfo, ...)
 	if not aRecommendKungfuID then
 		local res = g_tTable.EquipRecommend:Search(itemInfo.nRecommendID)
 		aRecommendKungfuID = {}
-		for i, v in ipairs(LIB.SplitString(res.kungfu_ids, "|")) do
+		for i, v in ipairs(LIB.SplitString(res.kungfu_ids, '|')) do
 			insert(aRecommendKungfuID, tonumber(v))
 		end
 		CACHE[itemInfo.nRecommendID] = aRecommendKungfuID

@@ -468,7 +468,7 @@ function LIB.RegisterModuleEvent(arg0, arg1)
 		local tEvent, nCount = MODULE_LIST[szModule], 0
 		if tEvent then
 			for szKey, info in pairs(tEvent) do
-				if info.szEvent == "#BREATHE" then
+				if info.szEvent == '#BREATHE' then
 					LIB.BreatheCall(szKey, false)
 				else
 					LIB.RegisterEvent(szKey, false)
@@ -477,7 +477,7 @@ function LIB.RegisterModuleEvent(arg0, arg1)
 			end
 			MODULE_LIST[szModule] = nil
 			--[[#DEBUG BEGIN]]
-			LIB.Debug(NSFormatString('{$NS}#EVENT'), "Uninit # "  .. szModule .. " # Events Removed # " .. nCount, DEBUG_LEVEL.LOG)
+			LIB.Debug(NSFormatString('{$NS}#EVENT'), 'Uninit # '  .. szModule .. ' # Events Removed # ' .. nCount, DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
 		end
 	elseif IsTable(arg1) then
@@ -498,7 +498,7 @@ function LIB.RegisterModuleEvent(arg0, arg1)
 			if szSubKey then
 				szKey = szKey .. '#' .. szSubKey
 			end
-			if szEvent == "#BREATHE" then
+			if szEvent == '#BREATHE' then
 				LIB.BreatheCall(szKey, unpack(aParams))
 			else
 				LIB.RegisterEvent(szKey, unpack(aParams))
@@ -507,7 +507,7 @@ function LIB.RegisterModuleEvent(arg0, arg1)
 			tEvent[szKey] = { szEvent = szEvent }
 		end
 		--[[#DEBUG BEGIN]]
-		LIB.Debug(NSFormatString('{$NS}#EVENT'), "Init # "  .. szModule .. " # Events Added # " .. nCount, DEBUG_LEVEL.LOG)
+		LIB.Debug(NSFormatString('{$NS}#EVENT'), 'Init # '  .. szModule .. ' # Events Added # ' .. nCount, DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 	end
 end

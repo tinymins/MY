@@ -711,13 +711,13 @@ end
 -----------------------------------------------
 -- 获取调用栈
 -----------------------------------------------
-local TRACEBACK_DEL = ('\n[^\n]*' .. _NAME_SPACE_ .. '%.lua:%d+:%sin%sfunction%s\'GetTraceback\'[^\n]*'):gsub("(%%?)(.)", function(percent, letter)
-    if percent ~= "" or not letter:match("%a") then
+local TRACEBACK_DEL = ('\n[^\n]*' .. _NAME_SPACE_ .. '%.lua:%d+:%sin%sfunction%s\'GetTraceback\'[^\n]*'):gsub('(%%?)(.)', function(percent, letter)
+    if percent ~= '' or not letter:match('%a') then
 		-- if the '%' matched, or `letter` is not a letter, return "as is"
 		return percent .. letter
     else
 		-- else, return a case-insensitive character class of the matched letter
-		return format("[%s%s]", letter:lower(), letter:upper())
+		return format('[%s%s]', letter:lower(), letter:upper())
     end
 end)
 local function GetTraceback(str)
@@ -743,7 +743,7 @@ end
 local function CallErrorHandler(errMsg)
 	xpErrMsg = errMsg
 	xpTraceback = GetTraceback()
-	FireUIEvent("CALL_LUA_ERROR", GetTraceback(errMsg) .. '\n')
+	FireUIEvent('CALL_LUA_ERROR', GetTraceback(errMsg) .. '\n')
 end
 local function XpCallErrorHandler(errMsg)
 	xpErrMsg = errMsg
