@@ -487,8 +487,8 @@ local USER_SETTINGS_EVENT = { szName = 'UserSettings' }
 local CommonEventFirer = LIB.CommonEventFirer
 local CommonEventRegister = LIB.CommonEventRegister
 
-function LIB.RegisterUserSettingsUpdate(szEvent, fnAction)
-	return CommonEventRegister(USER_SETTINGS_EVENT, szEvent, fnAction)
+function LIB.RegisterUserSettingsUpdate(...)
+	return CommonEventRegister(USER_SETTINGS_EVENT, ...)
 end
 
 local DATABASE_TYPE_LIST = { PATH_TYPE.ROLE, PATH_TYPE.SERVER, PATH_TYPE.GLOBAL }
