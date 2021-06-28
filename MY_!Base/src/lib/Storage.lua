@@ -501,25 +501,35 @@ local DATA_CACHE_LEAF_FLAG = {}
 local FLUSH_TIME = 0
 
 function LIB.ConnectSettingsDatabase()
-	if not IsEmpty(DATABASE_INSTANCE) then
-		return
-	end
+	local bFireEvent = false
 	for _, ePathType in ipairs(DATABASE_TYPE_LIST) do
 		if not DATABASE_INSTANCE[ePathType] then
-			DATABASE_INSTANCE[ePathType] = UnQLite_Open(LIB.FormatPath({'userdata/settings.udb', ePathType}))
+			local szPath = LIB.FormatPath({'userdata/settings.udb', ePathType})
+			if ePathType == PATH_TYPE.ROLE then
+				local szID = LIB.GetUserSettingsPresetID()
+				if szID then
+					szPath = LIB.FormatPath({'userdata/settings/' .. szID .. '/', PATH_TYPE.GLOBAL})
+					CPath.MakeDir(szPath)
+					szPath = szPath .. 'role.udb'
+				end
+			end
+			DATABASE_INSTANCE[ePathType] = LIB.UnQLiteConnect(szPath)
+			bFireEvent = true
 		end
 	end
-	CommonEventFirer(USER_SETTINGS_EVENT, '@@INIT@@')
+	if bFireEvent then
+		CommonEventFirer(USER_SETTINGS_EVENT, '@@INIT@@')
+	end
 end
 
 function LIB.ReleaseSettingsDatabase()
 	for _, ePathType in ipairs(DATABASE_TYPE_LIST) do
 		if DATABASE_INSTANCE[ePathType] then
-			DATABASE_INSTANCE[ePathType]:Release()
+			LIB.UnQLiteDisconnect(DATABASE_INSTANCE[ePathType])
 			DATABASE_INSTANCE[ePathType] = nil
+			DATABASE_NEED_FLUSH[ePathType] = nil
 		end
 	end
-	DATABASE_NEED_FLUSH = {}
 end
 
 function LIB.FlushSettingsDatabase()
@@ -529,6 +539,45 @@ function LIB.FlushSettingsDatabase()
 			DATABASE_NEED_FLUSH[ePathType] = nil
 		end
 	end
+end
+
+function LIB.GetUserSettingsPresetID()
+	local szID = LIB.LoadLUAData({'config/usersettings-preset.jx3dat', PATH_TYPE.ROLE})
+	if IsString(szID) and not szID:find('[/?*:|\\<>]') then
+		return szID
+	end
+end
+
+function LIB.SetUserSettingsPresetID(szID)
+	if szID then
+		if szID:find('[/?*:|\\<>]') then
+			return _L['User settings preset id cannot contains special character (/?*:|\\<>).']
+		end
+		szID = wgsub(szID, '^%s+', '')
+		szID = wgsub(szID, '%s+$', '')
+	end
+	if IsEmpty(szID) then
+		szID = nil
+	end
+	if szID == LIB.GetUserSettingsPresetID() then
+		return
+	end
+	LIB.SaveLUAData({'config/usersettings-preset.jx3dat', PATH_TYPE.ROLE}, szID)
+	local db = DATABASE_INSTANCE[PATH_TYPE.ROLE]
+	if db then
+		LIB.UnQLiteDisconnect(db)
+		DATABASE_INSTANCE[PATH_TYPE.ROLE] = nil
+		DATABASE_NEED_FLUSH[PATH_TYPE.ROLE] = nil
+		LIB.ConnectSettingsDatabase()
+	end
+end
+
+function LIB.GetUserSettingsPresetList()
+	return CPath.GetFolderList(LIB.FormatPath({'userdata/settings/', PATH_TYPE.GLOBAL}))
+end
+
+function LIB.RemoveUserSettingsPreset(szID)
+	CPath.DelDir(LIB.FormatPath({'userdata/settings/' .. szID .. '/', PATH_TYPE.GLOBAL}))
 end
 
 -- 注册单个用户配置项
@@ -1244,7 +1293,32 @@ LIB.RegisterInit('LIB#Storage', OnInit)
 end
 
 ------------------------------------------------------------------------------
--- 数据库
+-- UnQLite 数据库
+------------------------------------------------------------------------------
+do
+local UNQLITE_POOL = {} -- 连接池，有BUG，不能断开连接，不然会挂。
+function LIB.UnQLiteConnect(oPath)
+	local szPath = LIB.FormatPath(oPath)
+	if not UNQLITE_POOL[szPath] then
+		UNQLITE_POOL[szPath] = UnQLite_Open(szPath)
+	end
+	return UNQLITE_POOL[szPath]
+end
+
+function LIB.UnQLiteDisconnect(db)
+	-- 有BUG，不能断开连接，不然会挂。
+	-- for k, v in pairs(UNQLITE_POOL) do
+	-- 	if v == db then
+	-- 		UNQLITE_POOL[k] = nil
+	-- 		break
+	-- 	end
+	-- end
+	-- db:Release()
+end
+end
+
+------------------------------------------------------------------------------
+-- SQLite 数据库
 ------------------------------------------------------------------------------
 
 do
@@ -1337,7 +1411,7 @@ local function ConnectMalformedDatabase(szCaption, szPath, bAlert)
 	end
 end
 
-function LIB.ConnectDatabase(szCaption, oPath, fnAction)
+function LIB.SQLiteConnect(szCaption, oPath, fnAction)
 	-- 尝试连接数据库
 	local szPath = LIB.FormatPath(oPath)
 	--[[#DEBUG BEGIN]]

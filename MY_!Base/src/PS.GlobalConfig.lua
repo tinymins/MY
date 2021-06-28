@@ -107,6 +107,71 @@ function PS.OnPanelActive(wnd)
 			LIB.OpenUserSettingsImportPanel()
 		end,
 	}):AutoWidth():Width() + 5
+
+	nX = nX + ui:Append('WndComboBox', {
+		x = nX, y = nY,
+		text = _L['Use preset user settings'],
+		menu = function()
+			local szCurrentID = LIB.GetUserSettingsPresetID()
+			local menu = {
+				{
+					szOption = _L['Role original user settings'],
+					fnAction = function()
+						LIB.SetUserSettingsPresetID()
+						UI.ClosePopupMenu()
+						LIB.SwitchTab('GlobalConfig', true)
+					end,
+					bCheck = true, bChecked = szCurrentID == nil,
+				},
+				CONSTANT.MENU_DIVIDER,
+			}
+			local aPresetID = LIB.GetUserSettingsPresetList()
+			if not IsEmpty(aPresetID) then
+				insert(menu, { szOption = _L['Preset list'], bDisable = true })
+				for _, szID in ipairs(aPresetID) do
+					local m = {
+						szOption = szID,
+						fnAction = function()
+							LIB.SetUserSettingsPresetID(szID)
+							UI.ClosePopupMenu()
+							LIB.SwitchTab('GlobalConfig', true)
+						end,
+						bCheck = true, bChecked = szCurrentID == szID,
+					}
+					if not m.bChecked then
+						m.szIcon = 'ui/Image/UICommon/CommonPanel2.UITex'
+						m.nFrame = 49
+						m.nMouseOverFrame = 51
+						m.nIconWidth = 17
+						m.nIconHeight = 17
+						m.szLayer = 'ICON_RIGHTMOST'
+						m.fnClickIcon = function()
+							LIB.RemoveUserSettingsPreset(szID)
+							UI.ClosePopupMenu()
+						end
+					end
+					insert(menu, m)
+				end
+				insert(menu, CONSTANT.MENU_DIVIDER)
+			end
+			insert(menu, {
+				szOption = _L['* New *'],
+				fnAction = function()
+					GetUserInput(
+						_L['Please input preset id:'],
+						function(szText)
+							local szErrmsg = LIB.SetUserSettingsPresetID(szText)
+							if szErrmsg then
+								LIB.Systopmsg(szErrmsg, CONSTANT.MSG_THEME.ERROR)
+								LIB.Alert(szErrmsg)
+							end
+						end,
+						nil, nil, nil, 'common')
+				end,
+			})
+			return menu
+		end,
+	}):AutoWidth():Width() + 5
 	nX, nY = X, nY + 30
 
 	ui:Append('Text', {

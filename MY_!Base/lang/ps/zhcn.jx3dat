@@ -10,6 +10,11 @@ return {
 	['Distance type'] = '默认距离计算方式',
 	['System Info'] = '系统信息',
 	['User Settings'] = '角色配置',
+	['Use preset user settings'] = '设置本地共用数据预设方案',
+	['Role original user settings'] = '不共用数据',
+	['Preset list'] = '共用数据方案',
+	['* New *'] = '添加方案',
+	['Please input preset id:'] = '请输入共用数据预设方案名：',
 
 	-- welcome
 	['serendipity'] = '奇遇查询',
