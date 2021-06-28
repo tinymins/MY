@@ -513,7 +513,7 @@ function LIB.ConnectSettingsDatabase()
 					szPath = szPath .. 'role.udb'
 				end
 			end
-			DATABASE_INSTANCE[ePathType] = UnQLite_Open(szPath)
+			DATABASE_INSTANCE[ePathType] = LIB.UnQLiteConnect(szPath)
 			bFireEvent = true
 		end
 	end
@@ -525,7 +525,7 @@ end
 function LIB.ReleaseSettingsDatabase()
 	for _, ePathType in ipairs(DATABASE_TYPE_LIST) do
 		if DATABASE_INSTANCE[ePathType] then
-			DATABASE_INSTANCE[ePathType]:Release()
+			LIB.UnQLiteDisconnect(DATABASE_INSTANCE[ePathType])
 			DATABASE_INSTANCE[ePathType] = nil
 			DATABASE_NEED_FLUSH[ePathType] = nil
 		end
@@ -565,10 +565,10 @@ function LIB.SetUserSettingsPresetID(szID)
 	LIB.SaveLUAData({'config/usersettings-preset.jx3dat', PATH_TYPE.ROLE}, szID)
 	local db = DATABASE_INSTANCE[PATH_TYPE.ROLE]
 	if db then
+		LIB.UnQLiteDisconnect(db)
 		DATABASE_INSTANCE[PATH_TYPE.ROLE] = nil
 		DATABASE_NEED_FLUSH[PATH_TYPE.ROLE] = nil
 		LIB.ConnectSettingsDatabase()
-		LIB.DelayCall(function() db:Release() end)
 	end
 end
 
@@ -1103,7 +1103,32 @@ LIB.RegisterInit('LIB#Storage', OnInit)
 end
 
 ------------------------------------------------------------------------------
--- 数据库
+-- UnQLite 数据库
+------------------------------------------------------------------------------
+do
+local UNQLITE_POOL = {} -- 连接池，有BUG，不能断开连接，不然会挂。
+function LIB.UnQLiteConnect(oPath)
+	local szPath = LIB.FormatPath(oPath)
+	if not UNQLITE_POOL[szPath] then
+		UNQLITE_POOL[szPath] = UnQLite_Open(szPath)
+	end
+	return UNQLITE_POOL[szPath]
+end
+
+function LIB.UnQLiteDisconnect(db)
+	-- 有BUG，不能断开连接，不然会挂。
+	-- for k, v in pairs(UNQLITE_POOL) do
+	-- 	if v == db then
+	-- 		UNQLITE_POOL[k] = nil
+	-- 		break
+	-- 	end
+	-- end
+	-- db:Release()
+end
+end
+
+------------------------------------------------------------------------------
+-- SQLite 数据库
 ------------------------------------------------------------------------------
 
 do
