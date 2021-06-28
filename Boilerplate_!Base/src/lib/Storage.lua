@@ -634,9 +634,10 @@ function LIB.ImportUserSettings(tKvp)
 		if db then
 			nSuccess = nSuccess + 1
 			db:Set(info.szDataKey, xValue)
+			DATA_CACHE[szKey] = nil
 		end
 	end
-	FireUIEvent(NSFormatString('{$NS}_USER_SETTINGS_READY'))
+	CommonEventFirer(USER_SETTINGS_EVENT, '@@INIT@@')
 	return nSuccess
 end
 
