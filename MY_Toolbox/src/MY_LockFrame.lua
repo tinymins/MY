@@ -194,7 +194,7 @@ function D.CheckAllFrame()
 		LIB.RegisterEvent('ON_FRAME_CREATE', 'MY_LockFrame', function()
 			D.CheckFrame(arg0)
 		end)
-		LIB.RegisterSpecialKeyEvent('*.MY_LockFrame', function()
+		LIB.RegisterSpecialKeyEvent('*', 'MY_LockFrame', function()
 			if IsCtrlKeyDown() and (IsShiftKeyDown() or IsAltKeyDown()) then
 				if not D.bTempDisable then
 					LIB.Topmsg(_L['MY_LockFrame has been temporary disabled.'])
@@ -211,7 +211,7 @@ function D.CheckAllFrame()
 		end)
 	else
 		LIB.RegisterEvent('ON_FRAME_CREATE', 'MY_LockFrame', false)
-		LIB.RegisterSpecialKeyEvent('*.MY_LockFrame', false)
+		LIB.RegisterSpecialKeyEvent('*', 'MY_LockFrame', false)
 	end
 end
 
