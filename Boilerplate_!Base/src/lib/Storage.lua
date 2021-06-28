@@ -1196,7 +1196,7 @@ local function ConnectMalformedDatabase(szCaption, szPath, bAlert)
 	end
 end
 
-function LIB.ConnectDatabase(szCaption, oPath, fnAction)
+function LIB.SQLiteConnect(szCaption, oPath, fnAction)
 	-- 尝试连接数据库
 	local szPath = LIB.FormatPath(oPath)
 	--[[#DEBUG BEGIN]]
