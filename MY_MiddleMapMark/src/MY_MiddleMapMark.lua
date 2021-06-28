@@ -420,6 +420,11 @@ function D.Unhook()
 end
 LIB.RegisterReload('MY_MiddleMapMark', D.Unhook)
 
+function D.GetEditSearch()
+	return Station.Lookup('Topmost1/MiddleMap/Wnd_NormalMap/Wnd_Tool/Edit_Search')
+		or Station.Lookup('Topmost1/MiddleMap/Wnd_Tool/Edit_Search')
+end
+
 -- start search
 local MAX_DISPLAY_COUNT = 1000
 local function OnMMMItemMouseEnter()
@@ -443,7 +448,7 @@ function D.Search(bForce)
 	if not player or not frame or not frame:IsVisible() then
 		return
 	end
-	local edit = frame:Lookup('Wnd_NormalMap/Wnd_Tool/Edit_Search')
+	local edit = D.GetEditSearch()
 	if not edit then
 		return
 	end
@@ -645,7 +650,7 @@ function PS.OnPanelActive(wnd)
 						return false
 					end
 					OpenMiddleMap(data.dwMapID, 0)
-					UI('Topmost1/MiddleMap/Wnd_NormalMap/Wnd_Tool/Edit_Search'):Text(LIB.EscapeString(data.szName))
+					UI(D.GetEditSearch()):Text(LIB.EscapeString(data.szName))
 					Station.SetFocusWindow('Topmost1/MiddleMap')
 					if not selected then -- avoid unselect
 						return false
