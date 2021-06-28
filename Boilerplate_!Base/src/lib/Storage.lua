@@ -501,15 +501,25 @@ local DATA_CACHE_LEAF_FLAG = {}
 local FLUSH_TIME = 0
 
 function LIB.ConnectSettingsDatabase()
-	if not IsEmpty(DATABASE_INSTANCE) then
-		return
-	end
+	local bFireEvent = false
 	for _, ePathType in ipairs(DATABASE_TYPE_LIST) do
 		if not DATABASE_INSTANCE[ePathType] then
-			DATABASE_INSTANCE[ePathType] = UnQLite_Open(LIB.FormatPath({'userdata/settings.udb', ePathType}))
+			local szPath = LIB.FormatPath({'userdata/settings.udb', ePathType})
+			if ePathType == PATH_TYPE.ROLE then
+				local szID = LIB.GetUserSettingsPresetID()
+				if szID then
+					szPath = LIB.FormatPath({'userdata/settings/' .. szID .. '/', PATH_TYPE.GLOBAL})
+					CPath.MakeDir(szPath)
+					szPath = szPath .. 'role.udb'
+				end
+			end
+			DATABASE_INSTANCE[ePathType] = UnQLite_Open(szPath)
+			bFireEvent = true
 		end
 	end
-	CommonEventFirer(USER_SETTINGS_EVENT, '@@INIT@@')
+	if bFireEvent then
+		CommonEventFirer(USER_SETTINGS_EVENT, '@@INIT@@')
+	end
 end
 
 function LIB.ReleaseSettingsDatabase()
@@ -517,9 +527,9 @@ function LIB.ReleaseSettingsDatabase()
 		if DATABASE_INSTANCE[ePathType] then
 			DATABASE_INSTANCE[ePathType]:Release()
 			DATABASE_INSTANCE[ePathType] = nil
+			DATABASE_NEED_FLUSH[ePathType] = nil
 		end
 	end
-	DATABASE_NEED_FLUSH = {}
 end
 
 function LIB.FlushSettingsDatabase()
@@ -529,6 +539,45 @@ function LIB.FlushSettingsDatabase()
 			DATABASE_NEED_FLUSH[ePathType] = nil
 		end
 	end
+end
+
+function LIB.GetUserSettingsPresetID()
+	local szID = LIB.LoadLUAData({'config/usersettings-preset.jx3dat', PATH_TYPE.ROLE})
+	if IsString(szID) and not szID:find('[/?*:|\\<>]') then
+		return szID
+	end
+end
+
+function LIB.SetUserSettingsPresetID(szID)
+	if szID then
+		if szID:find('[/?*:|\\<>]') then
+			return _L['User settings preset id cannot contains special character (/?*:|\\<>).']
+		end
+		szID = wgsub(szID, '^%s+', '')
+		szID = wgsub(szID, '%s+$', '')
+	end
+	if IsEmpty(szID) then
+		szID = nil
+	end
+	if szID == LIB.GetUserSettingsPresetID() then
+		return
+	end
+	LIB.SaveLUAData({'config/usersettings-preset.jx3dat', PATH_TYPE.ROLE}, szID)
+	local db = DATABASE_INSTANCE[PATH_TYPE.ROLE]
+	if db then
+		DATABASE_INSTANCE[PATH_TYPE.ROLE] = nil
+		DATABASE_NEED_FLUSH[PATH_TYPE.ROLE] = nil
+		LIB.ConnectSettingsDatabase()
+		LIB.DelayCall(function() db:Release() end)
+	end
+end
+
+function LIB.GetUserSettingsPresetList()
+	return CPath.GetFolderList(LIB.FormatPath({'userdata/settings/', PATH_TYPE.GLOBAL}))
+end
+
+function LIB.RemoveUserSettingsPreset(szID)
+	CPath.DelDir(LIB.FormatPath({'userdata/settings/' .. szID .. '/', PATH_TYPE.GLOBAL}))
 end
 
 -- 注册单个用户配置项
