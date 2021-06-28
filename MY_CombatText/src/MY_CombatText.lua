@@ -355,7 +355,7 @@ local O = LIB.CreateUserSettingsModule('MY_CombatText', _L['System'], {
 local D = {}
 
 local function IsEnabled()
-	return O.bEnable
+	return D.bReady and O.bEnable
 end
 
 function D.OnFrameCreate()
@@ -472,6 +472,9 @@ function CombatText.FreeQueue()
 end
 
 function CombatText.OnFrameRender()
+	if not D.bReady then
+		return
+	end
 	local nTime     = GetTime()
 	local nFadeIn   = O.nFadeIn
 	local nFadeOut  = O.nFadeOut
@@ -953,12 +956,12 @@ end
 function CombatText.CheckEnable()
 	local frame = Station.Lookup('Lowest/CombatText')
 	local ui = Station.Lookup('Lowest/MY_CombatText')
-	if O.bRender then
-		COMBAT_TEXT_INIFILE = PACKET_INFO.ROOT .. 'MY_CombatText/ui/MY_CombatText_Render.ini'
-	else
-		COMBAT_TEXT_INIFILE = PACKET_INFO.ROOT .. 'MY_CombatText/ui/MY_CombatText.ini'
-	end
-	if O.bEnable then
+	if IsEnabled() then
+		if O.bRender then
+			COMBAT_TEXT_INIFILE = PACKET_INFO.ROOT .. 'MY_CombatText/ui/MY_CombatText_Render.ini'
+		else
+			COMBAT_TEXT_INIFILE = PACKET_INFO.ROOT .. 'MY_CombatText/ui/MY_CombatText.ini'
+		end
 		COMBAT_TEXT_SCALE.CRITICAL = COMBAT_TEXT_STYLES[O.nStyle] and COMBAT_TEXT_STYLES[O.nStyle] or COMBAT_TEXT_STYLES[0]
 		CombatText.LoadConfig()
 		if ui then
@@ -1345,6 +1348,7 @@ function PS.OnPanelActive(frame)
 					local this = this
 					UI.OpenColorPicker(function(r, g, b)
 						O.col[k] = { r, g, b }
+						O.col = O.col
 						UI(this):Color(r, g, b)
 					end)
 				end,
@@ -1379,6 +1383,10 @@ local function GetPlayerID()
 		LIB.DelayCall(1000, GetPlayerID)
 	end
 end
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_CombatText', function()
+	D.bReady = true
+	CombatText.CheckEnable()
+end)
 LIB.RegisterEvent('LOADING_END', 'MY_CombatText', GetPlayerID) -- 很重要的优化
 LIB.RegisterEvent('ON_NEW_PROXY_SKILL_LIST_NOTIFY', 'MY_CombatText', GetPlayerID) -- 长歌控制主体ID切换
 LIB.RegisterEvent('ON_CLEAR_PROXY_SKILL_LIST_NOTIFY', 'MY_CombatText', GetPlayerID) -- 长歌控制主体ID切换
@@ -1388,4 +1396,3 @@ end)
 LIB.RegisterEvent('MY_COMBATTEXT_MSG', 'MY_CombatText', function()
 	CombatText.OnCenterMsg(arg0, arg1, arg2)
 end)
-LIB.RegisterEvent('FIRST_LOADING_END', 'MY_CombatText', CombatText.CheckEnable)
