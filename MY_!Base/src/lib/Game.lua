@@ -2882,6 +2882,7 @@ function LIB.IsIsolated(...)
 end
 
 -- 获取对象运功状态
+do local bNewAPI
 function LIB.GetOTActionState(...)
 	local KObject = ...
 	if select('#', ...) == 0 then
@@ -2891,7 +2892,12 @@ function LIB.GetOTActionState(...)
 		return
 	end
 	local nType, dwSkillID, dwSkillLevel, fCastPercent
-	local bNewAPI = pcall(function() assert(KObject.GetSkillOTActionState) end)
+	if IsNil(bNewAPI) then
+		local eType = LIB.GetObjectType(KObject)
+		if eType == 'PLAYER' or eType == 'NPC' then
+			bNewAPI = pcall(function() assert(KObject.GetSkillOTActionState) end)
+		end
+	end
 	if bNewAPI then
 		nType, dwSkillID, dwSkillLevel, fCastPercent = KObject.GetSkillOTActionState()
 	else
@@ -2901,6 +2907,7 @@ function LIB.GetOTActionState(...)
 			or CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_IDLE
 	end
 	return nType, dwSkillID, dwSkillLevel, fCastPercent
+end
 end
 
 -- 获取对象当前是否可读条
