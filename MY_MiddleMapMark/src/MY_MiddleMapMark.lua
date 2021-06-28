@@ -443,7 +443,11 @@ function D.Search(bForce)
 	if not player or not frame or not frame:IsVisible() then
 		return
 	end
-	local szKeyword = frame:Lookup('Wnd_NormalMap/Wnd_Tool/Edit_Search'):GetText()
+	local edit = frame:Lookup('Wnd_NormalMap/Wnd_Tool/Edit_Search')
+	if not edit then
+		return
+	end
+	local szKeyword = edit:GetText()
 	local dwMapID = MiddleMap.dwMapID or player.GetMapID()
 	local nMapIndex = MiddleMap.nIndex
 	if not bForce and l_dwMapID == dwMapID and l_nMapIndex == nMapIndex and l_szKeyword == szKeyword then
