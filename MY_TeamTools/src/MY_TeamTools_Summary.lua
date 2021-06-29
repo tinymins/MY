@@ -1158,30 +1158,14 @@ local settings = {
 	name = 'MY_TeamTools_Summary_Module',
 	exports = {
 		{
+			preset = 'UIEvent',
 			fields = {
-				OnInitPage = D.OnInitPage,
-				OnDeactivePage = D.OnDeactivePage,
+				'OnInitPage',
+				'OnDeactivePage',
 			},
-		},
-		{
 			root = D,
-			preset = 'UIEvent'
 		},
 	},
 }
 MY_TeamTools.RegisterModule('Summary', _L['MY_TeamTools_Summary'], LIB.CreateModule(settings))
-end
-
--- Global exports
-do
-local settings = {
-	name = 'MY_TeamTools_Summary',
-	exports = {
-		{
-			fields = {
-			},
-		},
-	},
-}
-MY_TeamTools_Summary = LIB.CreateModule(settings)
 end

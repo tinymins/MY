@@ -280,13 +280,12 @@ local settings = {
 	name = 'MY_TeamTools_EnterMap_Module',
 	exports = {
 		{
+			preset = 'UIEvent',
 			fields = {
-				OnInitPage = D.OnInitPage,
+				'OnInitPage',
+				'OnDeactivePage',
 			},
-		},
-		{
 			root = D,
-			preset = 'UIEvent'
 		},
 	},
 }
@@ -299,9 +298,11 @@ local settings = {
 	name = 'MY_TeamTools_EnterMap',
 	exports = {
 		{
+			preset = 'UIEvent',
 			fields = {
 				OnAppendEdit = D.OnAppendEdit,
 			},
+			root = D,
 		},
 	},
 }

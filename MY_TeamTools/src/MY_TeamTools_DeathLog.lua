@@ -474,13 +474,12 @@ local settings = {
 	name = 'MY_TeamTools_DeathLog_Module',
 	exports = {
 		{
+			preset = 'UIEvent',
 			fields = {
-				OnInitPage = D.OnInitPage,
+				'OnInitPage',
+				'OnDeactivePage',
 			},
-		},
-		{
 			root = D,
-			preset = 'UIEvent'
 		},
 	},
 }
@@ -493,10 +492,12 @@ local settings = {
 	name = 'MY_TeamTools_DeathLog',
 	exports = {
 		{
+			preset = 'UIEvent',
 			fields = {
 				OnShowDeathInfo = D.OnShowDeathInfo,
 				OnAppendEdit = D.OnAppendEdit,
 			},
+			root = D,
 		},
 	},
 }

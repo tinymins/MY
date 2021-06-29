@@ -881,13 +881,12 @@ local settings = {
 	name = 'MY_TeamTools_Achievement_Module',
 	exports = {
 		{
+			preset = 'UIEvent',
 			fields = {
-				OnInitPage = D.OnInitPage,
+				'OnInitPage',
+				'OnDeactivePage',
 			},
-		},
-		{
 			root = D,
-			preset = 'UIEvent'
 		},
 	},
 }
@@ -904,6 +903,10 @@ local settings = {
 				'bIntelligentHide',
 			},
 			root = O,
+		},
+		{
+			preset = 'UIEvent',
+			root = D,
 		},
 	},
 	imports = {
