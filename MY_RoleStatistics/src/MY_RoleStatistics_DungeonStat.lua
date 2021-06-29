@@ -123,7 +123,8 @@ local O = LIB.CreateUserSettingsModule('MY_RoleStatistics_DungeonStat', _L['Gene
 local D = {
 	tMapSaveCopy = {}, -- 单秘境 CD
 	tMapProgress = {}, -- 单首领 CD
-	bMapProgressApplied = false, -- 是否请求过秘境进度
+	bMapProgressValid = false, -- 客户端缓存的秘境进度有效
+	dwMapProgressRequestTime = 0, -- 最后一次请求秘境进度时间
 }
 
 local EXCEL_WIDTH = 960
@@ -568,7 +569,7 @@ end
 
 function D.UpdateMapProgress(bForceUpdate)
 	-- 如果不是强制刷新秘境进度并且已经请求过，则不再重复发起
-	if not bForceUpdate and D.bMapProgressApplied then
+	if not bForceUpdate and D.bMapProgressValid then
 		return
 	end
 	local me = GetClientPlayer()
@@ -588,17 +589,10 @@ function D.UpdateMapProgress(bForceUpdate)
 			D.tMapProgress[dwID] = aProgress
 		end
 	end
-	D.bMapProgressApplied = true
+	D.dwMapProgressRequestTime = GetTime()
+	D.bMapProgressValid = true
 	LIB.GetMapSaveCopy(D.OnGetMapSaveCopyResopnse)
 end
-
--- 首领死亡刷新秘境进度
-LIB.RegisterEvent('SYNC_LOOT_LIST', 'MY_RoleStatistics_DungeonStat__UpdateMapCopy', function()
-	if not LIB.IsInDungeon() then
-		return
-	end
-	LIB.DelayCall('MY_RoleStatistics_DungeonStat__UpdateMapCopy', 300, function() D.UpdateMapProgress() end)
-end)
 
 function D.EncodeRow(rec)
 	rec.guid   = AnsiToUTF8(rec.guid)
@@ -992,12 +986,35 @@ function D.ApplyFloatEntry(bFloatEntry)
 		btn:Destroy()
 	end
 end
+
 function D.UpdateFloatEntry()
 	if not D.bReady then
 		return
 	end
 	D.ApplyFloatEntry(O.bFloatEntry)
 end
+
+-- 首领死亡刷新秘境进度
+LIB.RegisterEvent('SYNC_LOOT_LIST', 'MY_RoleStatistics_DungeonStat__UpdateMapCopy', function()
+	if not D.bReady or not LIB.IsInDungeon() then
+		return
+	end
+	LIB.DelayCall('MY_RoleStatistics_DungeonStat__UpdateMapCopy', 300, function() D.UpdateMapProgress() end)
+end)
+LIB.RegisterEvent('UPDATE_DUNGEON_ROLE_PROGRESS', function()
+	if not D.bReady or not LIB.IsInDungeon() or GetTime() - D.dwMapProgressRequestTime < 5000 then
+		return
+	end
+	D.bMapProgressValid = false
+	D.FlushDB()
+end)
+LIB.RegisterEvent('ON_APPLY_PLAYER_SAVED_COPY_RESPOND', function()
+	if not D.bReady or not LIB.IsInDungeon() then
+		return
+	end
+	D.FlushDB()
+end)
+
 LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_RoleStatistics_DungeonEntry', function()
 	D.bReady = true
 	D.UpdateFloatEntry()
