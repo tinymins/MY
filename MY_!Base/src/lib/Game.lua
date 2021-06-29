@@ -118,7 +118,7 @@ local function FindHLInfo(aList, tQuery)
 end
 
 local GetRelationCenter = _G.GetRelationCenter or _G.HomeLand_GetRelationCenter
-LIB.RegisterEvent(NSFormatString('HOME_LAND_RESULT_CODE_INT.{$NS}#HL'), function()
+LIB.RegisterEvent('HOME_LAND_RESULT_CODE_INT', 'LIB#HL', function()
 	local nResultType = arg0
 	if nResultType == CONSTANT.HOMELAND_RESULT_CODE.APPLY_COMMUNITY_INFO then -- …Í«Î∑÷œﬂœÍ«È
 		local dwMapID, nCopyIndex, dwCenterID, nLineIndex = arg1, arg2, arg3, arg4
@@ -2251,8 +2251,8 @@ function LIB.IsFighting()
 	end
 	return bFightState
 end
-LIB.RegisterEvent(NSFormatString('LOADING_ENDING.{$NS}#PLAYER'), function() ARENA_START = nil end)
-LIB.RegisterEvent(NSFormatString('ARENA_START.{$NS}#PLAYER'), function() ARENA_START = true end)
+LIB.RegisterEvent('LOADING_ENDING', 'LIB#PLAYER', function() ARENA_START = nil end)
+LIB.RegisterEvent('ARENA_START', 'LIB#PLAYER', function() ARENA_START = true end)
 end
 
 -------------------------------------------------------------------------------------------------------------------

@@ -43,7 +43,7 @@ local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeC
 local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
 -------------------------------------------------------------------------------------------------------
 
-LIB.RegisterEvent(NSFormatString('OPEN_WINDOW.{$NS}_DebugLogs'), function()
+LIB.RegisterEvent('OPEN_WINDOW', NSFormatString('{$NS}_DebugLogs'), function()
 	if not LIB.IsDebugClient(true) then
 		return
 	end
@@ -54,7 +54,7 @@ LIB.RegisterEvent(NSFormatString('OPEN_WINDOW.{$NS}_DebugLogs'), function()
 	Log('== EVENT ARGS END ==')
 end)
 
-LIB.RegisterEvent(NSFormatString('ON_WARNING_MESSAGE.{$NS}_DebugLogs'), function()
+LIB.RegisterEvent('ON_WARNING_MESSAGE', NSFormatString('{$NS}_DebugLogs'), function()
 	if not LIB.IsDebugClient(true) then
 		return
 	end
@@ -65,7 +65,7 @@ LIB.RegisterEvent(NSFormatString('ON_WARNING_MESSAGE.{$NS}_DebugLogs'), function
 	Log('== EVENT ARGS END ==')
 end)
 
-LIB.RegisterMsgMonitor(NSFormatString('MSG_NPC_NEARBY.{$NS}_DebugLogs'), function(szChannel, szMsg, nFont, bRich)
+LIB.RegisterMsgMonitor('MSG_NPC_NEARBY', NSFormatString('{$NS}_DebugLogs'), function(szChannel, szMsg, nFont, bRich)
 	if not LIB.IsDebugClient(true) then
 		return
 	end
