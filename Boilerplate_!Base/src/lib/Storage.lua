@@ -702,7 +702,7 @@ function LIB.GetUserSettings(szKey, ...)
 			if cache[1] == DATA_CACHE_LEAF_FLAG then
 				return cache[2]
 			end
-			cache = and cache[k]
+			cache = cache[k]
 		end
 	end
 	-- ²ÎÊý¼ì²é
