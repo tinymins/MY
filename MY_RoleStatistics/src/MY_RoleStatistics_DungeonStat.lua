@@ -1014,7 +1014,9 @@ LIB.RegisterEvent('ON_APPLY_PLAYER_SAVED_COPY_RESPOND', function()
 	end
 	D.FlushDB()
 end)
-
+LIB.RegisterInit('MY_RoleStatistics_DungeonEntry', function()
+	D.UpdateMapProgress()
+end)
 LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_RoleStatistics_DungeonEntry', function()
 	D.bReady = true
 	D.UpdateFloatEntry()
