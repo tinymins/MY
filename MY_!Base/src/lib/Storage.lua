@@ -697,11 +697,13 @@ end
 function LIB.GetUserSettings(szKey, ...)
 	-- 缓存加速
 	local cache = DATA_CACHE
-	for _, k in ipairs({...}) do
-		cache = IsTable(cache) and cache[k]
-	end
-	if IsTable(cache) and cache[1] == DATA_CACHE_LEAF_FLAG then
-		return cache[2]
+	for _, k in ipairs({szKey, ...}) do
+		if IsTable(cache) then
+			if cache[1] == DATA_CACHE_LEAF_FLAG then
+				return cache[2]
+			end
+			cache = and cache[k]
+		end
 	end
 	-- 参数检查
 	local nParameter = select('#', ...) + 1
