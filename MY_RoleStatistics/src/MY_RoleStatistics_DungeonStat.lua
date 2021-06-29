@@ -291,8 +291,8 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 					end
 					local aXml = {}
 					for _, bKill in ipairs(aBossKill) do
-						insert(aXml, '<image>path="ui/Image/UITga/FBcdPanel01.UITex" name="Image_ProgressBoss" eventid=786 frame='
-							.. (bKill and 20 or 21) .. ' w=12 h=12 script="this.mapid=' .. map.dwID .. '"</image>')
+						insert(aXml, '<image>path="' .. PLUGIN_ROOT .. '/img/MY_RoleStatistics.UITex" name="Image_ProgressBoss" eventid=786 frame='
+							.. (bKill and 1 or 0) .. ' w=12 h=12 script="this.mapid=' .. map.dwID .. '"</image>')
 					end
 					return concat(aXml)
 				end
