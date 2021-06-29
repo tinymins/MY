@@ -469,11 +469,11 @@ function LIB.RegisterModuleEvent(arg0, arg1)
 	if arg1 == false then
 		local tEvent, nCount = MODULE_LIST[szModule], 0
 		if tEvent then
-			for szKey, info in pairs(tEvent) do
+			for szEvent, info in pairs(tEvent) do
 				if info.szEvent == '#BREATHE' then
-					LIB.BreatheCall(szKey, false)
+					LIB.BreatheCall(szModule .. '#BREATHE', false)
 				else
-					LIB.RegisterEvent(szKey, false)
+					LIB.RegisterEvent(szEvent, szModule, false)
 				end
 				nCount = nCount + 1
 			end
@@ -491,22 +491,13 @@ function LIB.RegisterModuleEvent(arg0, arg1)
 		end
 		for _, aParams in ipairs(arg1) do
 			local szEvent = remove(aParams, 1)
-			local nPos, szSubKey = StringFindW(szEvent, '.')
-			if nPos then
-				szSubKey = sub(szEvent, nPos + 1)
-				szEvent = sub(szEvent, 1, nPos - 1)
-			end
-			local szKey = szEvent .. '.' .. szModule
-			if szSubKey then
-				szKey = szKey .. '#' .. szSubKey
-			end
 			if szEvent == '#BREATHE' then
-				LIB.BreatheCall(szKey, unpack(aParams))
+				LIB.BreatheCall(szModule .. '#BREATHE', unpack(aParams))
 			else
-				LIB.RegisterEvent(szKey, unpack(aParams))
+				LIB.RegisterEvent(szEvent, szModule, unpack(aParams))
 			end
 			nCount = nCount + 1
-			tEvent[szKey] = { szEvent = szEvent }
+			tEvent[szEvent] = { szEvent = szEvent }
 		end
 		--[[#DEBUG BEGIN]]
 		LIB.Debug(NSFormatString('{$NS}#EVENT'), 'Init # '  .. szModule .. ' # Events Added # ' .. nCount, DEBUG_LEVEL.LOG)
