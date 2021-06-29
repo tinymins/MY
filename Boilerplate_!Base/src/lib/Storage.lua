@@ -699,10 +699,14 @@ function LIB.GetUserSettings(szKey, ...)
 	local cache = DATA_CACHE
 	for _, k in ipairs({szKey, ...}) do
 		if IsTable(cache) then
-			if cache[1] == DATA_CACHE_LEAF_FLAG then
-				return cache[2]
-			end
 			cache = cache[k]
+		end
+		if not IsTable(cache) then
+			cache = nil
+			break
+		end
+		if cache[1] == DATA_CACHE_LEAF_FLAG then
+			return cache[2]
 		end
 	end
 	-- ²ÎÊý¼ì²é
