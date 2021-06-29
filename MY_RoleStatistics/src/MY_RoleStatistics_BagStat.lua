@@ -61,7 +61,7 @@ if IsLocalFileExist(LIB.FormatPath({'userdata/bagstatistics.db', PATH_TYPE.GLOBA
 	CPath.Move(LIB.FormatPath({'userdata/bagstatistics.db', PATH_TYPE.GLOBAL}), LIB.FormatPath({'userdata/role_statistics/bag_stat.v2.db', PATH_TYPE.GLOBAL}))
 end
 
-local DB = LIB.ConnectDatabase(_L['MY_RoleStatistics_BagStat'], {'userdata/role_statistics/bag_stat.v2.db', PATH_TYPE.GLOBAL})
+local DB = LIB.SQLiteConnect(_L['MY_RoleStatistics_BagStat'], {'userdata/role_statistics/bag_stat.v2.db', PATH_TYPE.GLOBAL})
 if not DB then
 	return LIB.Sysmsg(_L['MY_RoleStatistics_BagStat'], _L['Cannot connect to database!!!'], CONSTANT.MSG_THEME.ERROR)
 end

@@ -158,7 +158,7 @@ end
 function DB:Connect(bCheck)
 	if not self:IsConnected() then
 		if bCheck then
-			self.db = LIB.ConnectDatabase(_L['MY_ChatLog'], self.szFilePath)
+			self.db = LIB.SQLiteConnect(_L['MY_ChatLog'], self.szFilePath)
 		else
 			--[[#DEBUG BEGIN]]
 			LIB.Debug(_L['MY_ChatLog'], 'Quick connect database: ' .. self.szFilePath, DEBUG_LEVEL.LOG)

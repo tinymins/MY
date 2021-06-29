@@ -56,7 +56,7 @@ end
 --------------------------------------------------------------------------
 LIB.CreateDataRoot(PATH_TYPE.GLOBAL)
 local l_szKeyword, l_dwMapID, l_nMapIndex, l_renderTime = '', nil, nil, 0
-local DB = LIB.ConnectDatabase(_L['MY_MiddleMapMark'], {'cache/npc_doodad_rec.v2.db', PATH_TYPE.GLOBAL})
+local DB = LIB.SQLiteConnect(_L['MY_MiddleMapMark'], {'cache/npc_doodad_rec.v2.db', PATH_TYPE.GLOBAL})
 if not DB then
 	return LIB.Sysmsg(_L['MY_MiddleMapMark'], _L['Cannot connect to database!!!'], CONSTANT.MSG_THEME.ERROR)
 end

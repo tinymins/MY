@@ -112,7 +112,7 @@ local function InitDB()
 	if DB_ERR_COUNT > DB_MAX_ERR_COUNT then
 		return false
 	end
-	DB = LIB.ConnectDatabase(_L['MY_Farbnamen'], {'cache/player_info.v2.db', PATH_TYPE.SERVER})
+	DB = LIB.SQLiteConnect(_L['MY_Farbnamen'], {'cache/player_info.v2.db', PATH_TYPE.SERVER})
 	if not DB then
 		local szMsg = _L['Cannot connect to database!!!']
 		if DB_ERR_COUNT > 0 then

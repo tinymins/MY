@@ -203,7 +203,7 @@ LIB.RegisterInit('MY_ChatLog_UpgradeDB', D.UpgradeDB)
 
 -- 导入数据
 function D.ImportDB(szPath)
-	local odb, nImportCount = LIB.ConnectDatabase(_L['MY_ChatLog'], szPath), 0
+	local odb, nImportCount = LIB.SQLiteConnect(_L['MY_ChatLog'], szPath), 0
 	if odb then
 		-- 老版分表机制
 		local dwGlobalID = Get(odb:Execute('SELECT * FROM ChatLogInfo WHERE key = "userguid"'), {1, 'value'})
