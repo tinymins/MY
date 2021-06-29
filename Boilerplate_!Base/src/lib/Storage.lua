@@ -1117,13 +1117,14 @@ end
 
 function LIB.UnQLiteDisconnect(db)
 	-- 有BUG，不能断开连接，不然会挂。
-	-- for k, v in pairs(UNQLITE_POOL) do
-	-- 	if v == db then
-	-- 		UNQLITE_POOL[k] = nil
-	-- 		break
-	-- 	end
-	-- end
-	-- db:Release()
+	-- 已修复，等待 KGUI 更新即可。
+	for k, v in pairs(UNQLITE_POOL) do
+		if v == db then
+			UNQLITE_POOL[k] = nil
+			break
+		end
+	end
+	db:Release()
 end
 end
 
