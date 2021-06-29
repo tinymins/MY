@@ -179,7 +179,10 @@ end
 
 function D.CheckAllFrame()
 	for _, szLayer in ipairs({'Lowest', 'Lowest1', 'Lowest2', 'Normal', 'Normal1', 'Normal2', 'Topmost', 'Topmost1', 'Topmost2'})do
-		local frmIter = Station.Lookup(szLayer):GetFirstChild()
+		local frmIter = Station.Lookup(szLayer)
+		if frmIter then
+			frmIter = frmIter:GetFirstChild()
+		end
 		while frmIter do
 			local bLock = D.IsFrameLock(frmIter)
 			if bLock then
