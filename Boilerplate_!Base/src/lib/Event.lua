@@ -95,7 +95,7 @@ local function CommonEventRegisterOperator(E, eAction, szEvent, szKey, fnAction)
 				E.tList = nil
 			end
 		end
-	elseif eAction == 'GET' then
+	elseif eAction == 'FIND' then
 		if szKey and E.tList then
 			return E.tList[szEvent] and E.tList[szEvent].tKey[szKey] or false
 		end
@@ -147,6 +147,8 @@ local function CommonEventRegister(E, xArg1, xArg2, xArg3)
 			eAction, szEvent, szKey = 'UNREG', xArg1, xArg2
 		elseif IsString(xArg1) and IsString(xArg2) and IsNil(xArg3) then
 			eAction, szEvent, szKey = 'FIND', xArg1, xArg2
+		elseif IsString(xArg1) and IsNil(xArg2) and IsNil(xArg3) then
+			eAction, szEvent = 'FIND', xArg1
 		end
 	end
 	assert(eAction, 'Parameters type not recognized, cannot infer action type.')
