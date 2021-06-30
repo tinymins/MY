@@ -718,3 +718,17 @@ end
 LIB.RegisterAddonMenu(GetMenu)
 end
 LIB.RegisterEvent('LOADING_END', _TS.CheckOpen)
+
+-- Global exports
+do
+local settings = {
+	name = 'MY_ThreatRank',
+	exports = {
+		{
+			preset = 'UIEvent',
+			root = TS,
+		},
+	},
+}
+MY_ThreatRank = LIB.CreateModule(settings)
+end
