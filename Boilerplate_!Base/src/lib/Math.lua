@@ -157,6 +157,7 @@ end
 
 -- 格式化数字为指定进制下的字符串表示
 function LIB.NumberBaseN(n, b, digits)
+	assert(IsNumber(n) and not IsHugeNumber(n), 'Input must be a no huge number value.')
 	n = floor(n)
 	if not b or b == 10 then
 		return tostring(n)
