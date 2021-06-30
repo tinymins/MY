@@ -810,12 +810,11 @@ function LIB.SetUserSettings(szKey, ...)
 		else
 			xValue = { [szDataSetKey] = xValue }
 		end
-		if not DATA_CACHE[szKey] then
-			DATA_CACHE[szKey] = {}
+		if IsTable(DATA_CACHE[szKey]) then
+			DATA_CACHE[szKey][szDataSetKey] = nil
 		end
-		DATA_CACHE[szKey][szDataSetKey] = { DATA_CACHE_LEAF_FLAG, xValue[szDataSetKey] }
 	else
-		DATA_CACHE[szKey] = { DATA_CACHE_LEAF_FLAG, xValue }
+		DATA_CACHE[szKey] = nil
 	end
 	db:Set(info.szDataKey, { d = xValue, v = info.szVersion })
 	DATABASE_NEED_FLUSH[info.ePathType] = true
