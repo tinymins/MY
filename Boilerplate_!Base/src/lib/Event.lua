@@ -264,7 +264,7 @@ local function OnInit()
 	LIB.CreateDataRoot(PATH_TYPE.ROLE)
 	LIB.CreateDataRoot(PATH_TYPE.GLOBAL)
 	LIB.CreateDataRoot(PATH_TYPE.SERVER)
-	LIB.ConnectSettingsDatabase()
+	LIB.ConnectUserSettingsDB()
 	CommonEventFirer(INIT_EVENT)
 	INIT_EVENT = nil
 	-- œ‘ æª∂”≠–≈œ¢
@@ -292,7 +292,7 @@ local CommonEventRegister = LIB.CommonEventRegister
 local function OnExit()
 	LIB.FireFlush()
 	CommonEventFirer(EXIT_EVENT)
-	LIB.ReleaseSettingsDatabase()
+	LIB.ReleaseUserSettingsDB()
 end
 LIB.RegisterEvent('GAME_EXIT', OnExit)
 LIB.RegisterEvent('PLAYER_EXIT_GAME', OnExit)
@@ -310,7 +310,7 @@ local CommonEventRegister = LIB.CommonEventRegister
 function LIB.FireFlush()
 	LIB.FlushCoroutine()
 	CommonEventFirer(FLUSH_EVENT)
-	LIB.FlushSettingsDatabase()
+	LIB.FlushUserSettingsDB()
 end
 
 function LIB.RegisterFlush(...)
@@ -328,7 +328,7 @@ local CommonEventRegister = LIB.CommonEventRegister
 local function OnReload()
 	LIB.FlushCoroutine()
 	CommonEventFirer(RELOAD_EVENT)
-	LIB.ReleaseSettingsDatabase()
+	LIB.ReleaseUserSettingsDB()
 end
 LIB.RegisterEvent('RELOAD_UI_ADDON_BEGIN', OnReload)
 

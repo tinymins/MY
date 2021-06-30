@@ -500,7 +500,7 @@ local DATA_CACHE = {}
 local DATA_CACHE_LEAF_FLAG = {}
 local FLUSH_TIME = 0
 
-function LIB.ConnectSettingsDatabase()
+function LIB.ConnectUserSettingsDB()
 	local bFireEvent = false
 	for _, ePathType in ipairs(DATABASE_TYPE_LIST) do
 		if not DATABASE_INSTANCE[ePathType] then
@@ -522,7 +522,7 @@ function LIB.ConnectSettingsDatabase()
 	end
 end
 
-function LIB.ReleaseSettingsDatabase()
+function LIB.ReleaseUserSettingsDB()
 	for _, ePathType in ipairs(DATABASE_TYPE_LIST) do
 		if DATABASE_INSTANCE[ePathType] then
 			LIB.UnQLiteDisconnect(DATABASE_INSTANCE[ePathType])
@@ -532,7 +532,7 @@ function LIB.ReleaseSettingsDatabase()
 	end
 end
 
-function LIB.FlushSettingsDatabase()
+function LIB.FlushUserSettingsDB()
 	for _, ePathType in ipairs(DATABASE_TYPE_LIST) do
 		if DATABASE_INSTANCE[ePathType] and DATABASE_NEED_FLUSH[ePathType] and DATABASE_INSTANCE[ePathType].Commit then
 			DATABASE_INSTANCE[ePathType]:Commit()
@@ -568,7 +568,7 @@ function LIB.SetUserSettingsPresetID(szID)
 		LIB.UnQLiteDisconnect(db)
 		DATABASE_INSTANCE[PATH_TYPE.ROLE] = nil
 		DATABASE_NEED_FLUSH[PATH_TYPE.ROLE] = nil
-		LIB.ConnectSettingsDatabase()
+		LIB.ConnectUserSettingsDB()
 	end
 	DATA_CACHE = {}
 end
@@ -950,9 +950,9 @@ function LIB.CreateUserSettingsModule(szModule, szGroupLabel, tSettings)
 	return LIB.CreateUserSettingsProxy(tProxy)
 end
 
-LIB.RegisterIdle(NSFormatString('{$NS}#FlushSettingsDatabase'), function()
+LIB.RegisterIdle(NSFormatString('{$NS}#FlushUserSettingsDB'), function()
 	if GetCurrentTime() - FLUSH_TIME > 60 then
-		LIB.FlushSettingsDatabase()
+		LIB.FlushUserSettingsDB()
 		FLUSH_TIME = GetCurrentTime()
 	end
 end)
