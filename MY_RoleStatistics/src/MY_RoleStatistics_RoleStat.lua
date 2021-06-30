@@ -232,41 +232,35 @@ local COLUMN_LIST = lodash.filter({
 	-- account,
 	{ -- 大区
 		id = 'region',
-		bHideInFloat = true,
 		szTitle = _L['Region'],
-		nWidth = 100,
+		nMinWidth = 100, nMaxWidth = 100,
 		GetFormatText = GeneCommonFormatText('region'),
 		Compare = GeneCommonCompare('region'),
 	},
 	{ -- 服务器
 		id = 'server',
-		bHideInFloat = true,
 		szTitle = _L['Server'],
-		nWidth = 100,
+		nMinWidth = 100, nMaxWidth = 100,
 		GetFormatText = GeneCommonFormatText('server'),
 		Compare = GeneCommonCompare('server'),
 	},
 	{ -- 名字
 		id = 'name',
-		bHideInFloat = true,
 		szTitle = _L['Name'],
-		nWidth = 130,
+		nMinWidth = 110, nMaxWidth = 200,
 		GetFormatText = function(rec)
 			local name = rec.name
 			if MY_ChatMosaics and MY_ChatMosaics.MosaicsString then
 				name = MY_ChatMosaics.MosaicsString(name)
 			end
-			return GetFormatText(name, nil, LIB.GetForceColor(rec.force, 'foreground'))
+			return GetFormatText(name, 162, LIB.GetForceColor(rec.force, 'foreground'))
 		end,
-		GetSummaryFormatText = function()
-			return GetFormatText(_L['Summary'], nil, 255, 255, 0)
-		end,
+		Compare = GeneCommonCompare('name'),
 	},
 	{ -- 门派
 		id = 'force',
-		bHideInFloat = true,
 		szTitle = _L['Force'],
-		nWidth = 50,
+		nMinWidth = 50, nMaxWidth = 70,
 		GetFormatText = function(rec)
 			return GetFormatText(g_tStrings.tForceTitle[rec.force], 162, 255, 255, 255)
 		end,
@@ -274,33 +268,23 @@ local COLUMN_LIST = lodash.filter({
 	},
 	{ -- 等级
 		id = 'level',
-		bHideInFloat = true,
 		szTitle = _L['Level'],
-		nWidth = 50,
+		nMinWidth = 50, nMaxWidth = 50,
 		GetFormatText = GeneCommonFormatText('level'),
 		Compare = GeneCommonCompare('level'),
-	},
-	{ -- 装分
-		id = 'equip_score',
-		bHideInFloat = true,
-		szTitle = _L['Equip score'],
-		szShortTitle = _L['EquSC'],
-		nWidth = 60,
-		GetFormatText = GeneCommonFormatText('equip_score'),
-		Compare = GeneCommonCompare('equip_score'),
 	},
 	{ -- 宠物分
 		id = 'pet_score',
 		bHideInFloat = true,
 		szTitle = _L['PetSC'],
-		nWidth = 55,
+		nMinWidth = 55,
 		GetFormatText = GeneCommonFormatText('pet_score'),
 		Compare = GeneCommonCompare('pet_score'),
 	},
 	{ -- 金钱
 		id = 'money',
 		szTitle = _L['Money'],
-		nWidth = 200,
+		nMinWidth = 200,
 		GetFormatText = function(rec)
 			return GetMoneyText({ nGold = rec.gold, nSilver = rec.silver, nCopper = rec.copper }, 105)
 		end,
@@ -328,7 +312,7 @@ local COLUMN_LIST = lodash.filter({
 		id = 'contribution',
 		szTitle = _L['Contribution'],
 		szShortTitle = _L['Contri'],
-		nWidth = 70,
+		nMinWidth = 70,
 		GetFormatText = GeneCommonFormatText('contribution'),
 		Compare = GeneCommonCompare('contribution'),
 	},
@@ -336,7 +320,7 @@ local COLUMN_LIST = lodash.filter({
 		id = 'contribution_remain',
 		szTitle = _L['Contribution remain'],
 		szShortTitle = _L['Contri_remain'],
-		nWidth = 70,
+		nMinWidth = 70,
 		GetFormatText = GeneWeeklyFormatText('contribution_remain'),
 		Compare = GeneWeeklyCompare('contribution_remain'),
 		GetSummaryFormatText = GeneWeeklySummaryFormatText('contribution_remain'),
@@ -345,7 +329,7 @@ local COLUMN_LIST = lodash.filter({
 		id = 'justice',
 		szTitle = _L['Justice'],
 		szShortTitle = _L['Justi'],
-		nWidth = 60,
+		nMinWidth = 60,
 		GetFormatText = GeneCommonFormatText('justice'),
 		Compare = GeneCommonCompare('justice'),
 	},
@@ -353,7 +337,7 @@ local COLUMN_LIST = lodash.filter({
 		id = 'justice_remain',
 		szTitle = _L['Justice remain'],
 		szShortTitle = _L['Justi_remain'],
-		nWidth = 60,
+		nMinWidth = 60,
 		GetFormatText = GeneWeeklyFormatText('justice_remain'),
 		Compare = GeneWeeklyCompare('justice_remain'),
 		GetSummaryFormatText = GeneWeeklySummaryFormatText('justice_remain'),
@@ -361,7 +345,7 @@ local COLUMN_LIST = lodash.filter({
 	{ -- 浪客笺
 		id = 'starve',
 		szTitle = _L['Starve'],
-		nWidth = 60,
+		nMinWidth = 60,
 		GetFormatText = GeneWeeklyFormatText('starve'),
 		Compare = GeneWeeklyCompare('starve'),
 		GetSummaryFormatText = GeneWeeklySummaryFormatText('starve'),
@@ -370,7 +354,7 @@ local COLUMN_LIST = lodash.filter({
 		id = 'starve_remain',
 		szTitle = _L['Starve remain'],
 		szShortTitle = _L['Starv_remain'],
-		nWidth = 60,
+		nMinWidth = 60,
 		GetFormatText = GeneWeeklyFormatText('starve_remain'),
 		Compare = GeneWeeklyCompare('starve_remain'),
 		GetSummaryFormatText = GeneWeeklySummaryFormatText('starve_remain'),
@@ -379,7 +363,7 @@ local COLUMN_LIST = lodash.filter({
 		id = 'architecture',
 		bVisible = GLOBAL.GAME_BRANCH ~= 'classic',
 		szTitle = _L['Architecture'],
-		nWidth = 60,
+		nMinWidth = 60,
 		GetFormatText = GeneWeeklyFormatText('architecture'),
 		Compare = GeneWeeklyCompare('architecture'),
 		GetSummaryFormatText = GeneWeeklySummaryFormatText('architecture'),
@@ -389,7 +373,7 @@ local COLUMN_LIST = lodash.filter({
 		bVisible = GLOBAL.GAME_BRANCH ~= 'classic',
 		szTitle = _L['Architecture remain'],
 		szShortTitle = _L['Arch_remain'],
-		nWidth = 60,
+		nMinWidth = 60,
 		GetFormatText = GeneWeeklyFormatText('architecture_remain'),
 		Compare = GeneWeeklyCompare('architecture_remain'),
 		GetSummaryFormatText = GeneWeeklySummaryFormatText('architecture_remain'),
@@ -399,7 +383,7 @@ local COLUMN_LIST = lodash.filter({
 		id = 'prestige',
 		szTitle = _L['Prestige'],
 		szShortTitle = _L['Presti'],
-		nWidth = 70,
+		nMinWidth = 70,
 		GetFormatText = GeneCommonFormatText('prestige'),
 		Compare = GeneCommonCompare('prestige'),
 	},
@@ -407,7 +391,7 @@ local COLUMN_LIST = lodash.filter({
 		id = 'prestige_remain',
 		szTitle = _L['Prestige remain'],
 		szShortTitle = _L['Presti_remain'],
-		nWidth = 70,
+		nMinWidth = 70,
 		GetFormatText = GeneWeeklyFormatText('prestige_remain'),
 		Compare = GeneWeeklyCompare('prestige_remain'),
 		GetSummaryFormatText = GeneWeeklySummaryFormatText('prestige_remain'),
@@ -416,7 +400,7 @@ local COLUMN_LIST = lodash.filter({
 		-- 战阶积分
 		id = 'camp_point',
 		szTitle = _L['Camp point'],
-		nWidth = 70,
+		nMinWidth = 70,
 		GetFormatText = GeneWeeklyFormatText('camp_point'),
 		Compare = GeneWeeklyCompare('camp_point'),
 		GetSummaryFormatText = GeneWeeklySummaryFormatText('camp_point'),
@@ -425,7 +409,7 @@ local COLUMN_LIST = lodash.filter({
 		-- 战阶等级
 		id = 'camp_level',
 		szTitle = _L['Camp level'],
-		nWidth = 70,
+		nMinWidth = 70,
 		GetFormatText = function(rec)
 			return GetFormatText(rec.camp_level .. ' + ' .. rec.camp_point_percentage .. '%', 162, 255, 255, 255)
 		end,
@@ -443,7 +427,7 @@ local COLUMN_LIST = lodash.filter({
 		-- 名剑币
 		id = 'arena_award',
 		szTitle = _L['Arena award'],
-		nWidth = 60,
+		nMinWidth = 60,
 		GetFormatText = GeneCommonFormatText('arena_award'),
 		Compare = GeneCommonCompare('arena_award'),
 	},
@@ -452,7 +436,7 @@ local COLUMN_LIST = lodash.filter({
 		id = 'arena_award_remain',
 		szTitle = _L['Arena award remain'],
 		szShortTitle = _L['Aren awa remain'],
-		nWidth = 60,
+		nMinWidth = 60,
 		GetFormatText = GeneWeeklyFormatText('arena_award_remain'),
 		Compare = GeneWeeklyCompare('arena_award_remain'),
 		GetSummaryFormatText = GeneWeeklySummaryFormatText('arena_award_remain'),
@@ -462,7 +446,7 @@ local COLUMN_LIST = lodash.filter({
 		id = 'exam_print',
 		szTitle = _L['Exam print'],
 		szShortTitle = _L['ExamPt'],
-		nWidth = 55,
+		nMinWidth = 55,
 		GetFormatText = GeneCommonFormatText('exam_print'),
 		Compare = GeneCommonCompare('exam_print'),
 		GetSummaryFormatText = GeneCommonSummaryFormatText('exam_print'),
@@ -472,7 +456,7 @@ local COLUMN_LIST = lodash.filter({
 		id = 'exam_print_remain',
 		szTitle = _L['Exam print remain'],
 		szShortTitle = _L['ExamPt_remain'],
-		nWidth = 55,
+		nMinWidth = 55,
 		GetFormatText = GeneWeeklyFormatText('exam_print_remain'),
 		Compare = GeneWeeklyCompare('exam_print_remain'),
 		GetSummaryFormatText = GeneWeeklySummaryFormatText('exam_print_remain'),
@@ -483,7 +467,7 @@ local COLUMN_LIST = lodash.filter({
 		bHideInFloat = true,
 		szTitle = _L['Achievement score'],
 		szShortTitle = _L['AchiSC'],
-		nWidth = 70,
+		nMinWidth = 70,
 		GetFormatText = GeneCommonFormatText('achievement_score'),
 		Compare = GeneCommonCompare('achievement_score'),
 	},
@@ -492,7 +476,7 @@ local COLUMN_LIST = lodash.filter({
 		id = 'coin',
 		bHideInFloat = true,
 		szTitle = _L['Coin'],
-		nWidth = 70,
+		nMinWidth = 70,
 		GetFormatText = GeneCommonFormatText('coin'),
 		Compare = GeneCommonCompare('coin'),
 		GetSummaryFormatText = function(recs)
@@ -511,27 +495,23 @@ local COLUMN_LIST = lodash.filter({
 		id = 'mentor_score',
 		bHideInFloat = true,
 		szTitle = _L['Mentor score'],
-		nWidth = 70,
+		nMinWidth = 70,
 		GetFormatText = GeneCommonFormatText('mentor_score'),
 		Compare = GeneCommonCompare('mentor_score'),
 	},
-	{
-		-- 时间
+	{ -- 时间
 		id = 'time',
-		bHideInFloat = true,
 		szTitle = _L['Cache time'],
-		nWidth = 165,
+		nMinWidth = 165, nMaxWidth = 200,
 		GetFormatText = function(rec)
 			return GetFormatText(LIB.FormatTime(rec.time, '%yyyy/%MM/%dd %hh:%mm:%ss'), 162, 255, 255, 255)
 		end,
 		Compare = GeneCommonCompare('time'),
 	},
-	{
-		-- 时间计时
+	{ -- 时间计时
 		id = 'time_days',
-		bHideInFloat = true,
 		szTitle = _L['Cache time days'],
-		nWidth = 120,
+		nMinWidth = 120, nMaxWidth = 120,
 		GetFormatText = function(rec)
 			local nTime = GetCurrentTime() - rec.time
 			local nSeconds = floor(nTime)
@@ -613,7 +593,7 @@ local ALERT_COLUMN = {
 	{ -- 金钱
 		id = 'money',
 		szTitle = _L['Money'],
-		nWidth = 200,
+		nMinWidth = 200,
 		GetValue = function(me)
 			return me.GetMoney()
 		end,
@@ -880,12 +860,18 @@ function D.UpdateUI(page)
 	hCols:Clear()
 
 	local aCol, nX, Sorter = D.GetColumns(), 0, nil
+	local nExtraWidth = EXCEL_WIDTH
+	for i, col in ipairs(aCol) do
+		nExtraWidth = nExtraWidth - col.nMinWidth
+	end
 	for i, col in ipairs(aCol) do
 		local hCol = hCols:AppendItemFromIni(SZ_INI, 'Handle_RoleStatColumn')
 		local txt = hCol:Lookup('Text_RoleStat_Title')
 		local imgAsc = hCol:Lookup('Image_RoleStat_Asc')
 		local imgDesc = hCol:Lookup('Image_RoleStat_Desc')
-		local nWidth = i == #aCol and (EXCEL_WIDTH - nX) or col.nWidth
+		local nWidth = i == #aCol
+			and (EXCEL_WIDTH - nX)
+			or min(nExtraWidth * col.nMinWidth / (EXCEL_WIDTH - nExtraWidth) + col.nMinWidth, col.nMaxWidth or HUGE)
 		local nSortDelta = nWidth > 70 and 25 or 15
 		if i == 0 then
 			hCol:Lookup('Image_RoleStat_Break'):Hide()
@@ -944,7 +930,9 @@ function D.UpdateUI(page)
 			hItemContent:SetW(99999)
 			hItemContent:FormatAllItemPos()
 			hItemContent:SetSizeByAllItemSize()
-			local nWidth = col.nWidth
+			local nWidth = j == #aCol
+				and (EXCEL_WIDTH - nX)
+				or min(nExtraWidth * col.nMinWidth / (EXCEL_WIDTH - nExtraWidth) + col.nMinWidth, col.nMaxWidth or HUGE)
 			if j == #aCol then
 				nWidth = EXCEL_WIDTH - nX
 			end
@@ -989,7 +977,9 @@ function D.UpdateUI(page)
 		hItemContent:SetW(99999)
 		hItemContent:FormatAllItemPos()
 		hItemContent:SetSizeByAllItemSize()
-		local nWidth = col.nWidth
+		local nWidth = j == #aCol
+			and (EXCEL_WIDTH - nX)
+			or min(nExtraWidth * col.nMinWidth / (EXCEL_WIDTH - nExtraWidth) + col.nMinWidth, col.nMaxWidth or HUGE)
 		if j == #aCol then
 			nWidth = EXCEL_WIDTH - nX
 		end
@@ -1050,7 +1040,7 @@ function D.OnInitPage()
 		x = 800, y = 20, w = 180,
 		text = _L['Columns'],
 		menu = function()
-			local t, c, nW = {}, {}, 0
+			local t, c, nMinW = {}, {}, 0
 			for i, id in ipairs(O.aColumn) do
 				local col = COLUMN_DICT[id]
 				if col then
@@ -1089,7 +1079,7 @@ function D.OnInitPage()
 						},
 					})
 					c[id] = true
-					nW = nW + col.nWidth
+					nMinW = nMinW + col.nMinWidth
 				end
 			end
 			for _, col in ipairs(COLUMN_LIST) do
@@ -1097,7 +1087,7 @@ function D.OnInitPage()
 					insert(t, {
 						szOption = col.szTitle,
 						fnAction = function()
-							if nW + col.nWidth > EXCEL_WIDTH then
+							if nMinW + col.nMinWidth > EXCEL_WIDTH then
 								LIB.Alert(_L['Too many column selected, width overflow, please delete some!'])
 							else
 								insert(O.aColumn, col.id)

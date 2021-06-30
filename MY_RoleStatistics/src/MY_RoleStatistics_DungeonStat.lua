@@ -128,7 +128,7 @@ local D = {
 }
 
 local EXCEL_WIDTH = 960
-local DUNGEON_WIDTH = 80
+local DUNGEON_MIN_WIDTH = 80
 local function GeneCommonFormatText(id)
 	return function(r)
 		return GetFormatText(r[id], 162, 255, 255, 255)
@@ -149,7 +149,7 @@ local COLUMN_LIST = {
 		id = 'region',
 		bHideInFloat = true,
 		szTitle = _L['Region'],
-		nWidth = 100,
+		nMinWidth = 100, nMaxWidth = 100,
 		GetFormatText = GeneCommonFormatText('region'),
 		Compare = GeneCommonCompare('region'),
 	},
@@ -157,7 +157,7 @@ local COLUMN_LIST = {
 		id = 'server',
 		bHideInFloat = true,
 		szTitle = _L['Server'],
-		nWidth = 100,
+		nMinWidth = 100, nMaxWidth = 100,
 		GetFormatText = GeneCommonFormatText('server'),
 		Compare = GeneCommonCompare('server'),
 	},
@@ -165,7 +165,7 @@ local COLUMN_LIST = {
 		id = 'name',
 		bHideInFloat = true,
 		szTitle = _L['Name'],
-		nWidth = 130,
+		nMinWidth = 110, nMaxWidth = 200,
 		GetFormatText = function(rec)
 			local name = rec.name
 			if MY_ChatMosaics and MY_ChatMosaics.MosaicsString then
@@ -173,12 +173,13 @@ local COLUMN_LIST = {
 			end
 			return GetFormatText(name, 162, LIB.GetForceColor(rec.force, 'foreground'))
 		end,
+		Compare = GeneCommonCompare('name'),
 	},
 	{ -- 门派
 		id = 'force',
 		bHideInFloat = true,
 		szTitle = _L['Force'],
-		nWidth = 50,
+		nMinWidth = 50, nMaxWidth = 70,
 		GetFormatText = function(rec)
 			return GetFormatText(g_tStrings.tForceTitle[rec.force], 162, 255, 255, 255)
 		end,
@@ -186,9 +187,8 @@ local COLUMN_LIST = {
 	},
 	{ -- 等级
 		id = 'level',
-		bHideInFloat = true,
 		szTitle = _L['Level'],
-		nWidth = 50,
+		nMinWidth = 50, nMaxWidth = 50,
 		GetFormatText = GeneCommonFormatText('level'),
 		Compare = GeneCommonCompare('level'),
 	},
@@ -196,27 +196,25 @@ local COLUMN_LIST = {
 		id = 'equip_score',
 		bHideInFloat = true,
 		szTitle = _L['EquSC'],
-		nWidth = 60,
+		nMinWidth = 100, nMaxWidth = 100,
 		GetFormatText = GeneCommonFormatText('equip_score'),
 		Compare = GeneCommonCompare('equip_score'),
 	},
-	{
-		-- 时间
+	{ -- 时间
 		id = 'time',
 		bHideInFloat = true,
 		szTitle = _L['Cache time'],
-		nWidth = 165,
+		nMinWidth = 165, nMaxWidth = 200,
 		GetFormatText = function(rec)
 			return GetFormatText(LIB.FormatTime(rec.time, '%yyyy/%MM/%dd %hh:%mm:%ss'), 162, 255, 255, 255)
 		end,
 		Compare = GeneCommonCompare('time'),
 	},
-	{
-		-- 时间计时
+	{ -- 时间计时
 		id = 'time_days',
 		bHideInFloat = true,
 		szTitle = _L['Cache time days'],
-		nWidth = 120,
+		nMinWidth = 120, nMaxWidth = 120,
 		GetFormatText = function(rec)
 			local nTime = GetCurrentTime() - rec.time
 			local nSeconds = floor(nTime)
@@ -253,13 +251,13 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 		return {
 			id = id,
 			szTitle = _L['Week routine: '] .. _L.ACTIVITY_WEEK_TEAM_DUNGEON,
-			nWidth = DUNGEON_WIDTH * #LIB.GetActivityMap('WEEK_TEAM_DUNGEON'),
+			nMinWidth = DUNGEON_MIN_WIDTH * #LIB.GetActivityMap('WEEK_TEAM_DUNGEON'),
 		}
 	elseif id == 'week_raid_dungeon' then
 		return {
 			id = id,
 			szTitle = _L['Week routine: '] .. _L.ACTIVITY_WEEK_RAID_DUNGEON,
-			nWidth = DUNGEON_WIDTH * #LIB.GetActivityMap('WEEK_RAID_DUNGEON'),
+			nMinWidth = DUNGEON_MIN_WIDTH * #LIB.GetActivityMap('WEEK_RAID_DUNGEON'),
 		}
 	elseif wfind(id, 'dungeon_') then
 		local id, via = wgsub(id, 'dungeon_', ''), ''
@@ -274,7 +272,7 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 			local col = { -- 秘境CD
 				id = 'dungeon_' .. id,
 				szTitle = map.szName,
-				nWidth = DUNGEON_WIDTH,
+				nMinWidth = DUNGEON_MIN_WIDTH,
 			}
 			if via then
 				local colVia = t[via]
@@ -486,12 +484,18 @@ function D.UpdateUI(page)
 	hCols:Clear()
 
 	local aCol, nX, Sorter = D.GetColumns(), 0, nil
+	local nExtraWidth = EXCEL_WIDTH
+	for i, col in ipairs(aCol) do
+		nExtraWidth = nExtraWidth - col.nMinWidth
+	end
 	for i, col in ipairs(aCol) do
 		local hCol = hCols:AppendItemFromIni(SZ_INI, 'Handle_DungeonStatColumn')
 		local txt = hCol:Lookup('Text_DungeonStat_Title')
 		local imgAsc = hCol:Lookup('Image_DungeonStat_Asc')
 		local imgDesc = hCol:Lookup('Image_DungeonStat_Desc')
-		local nWidth = i == #aCol and (EXCEL_WIDTH - nX) or col.nWidth
+		local nWidth = i == #aCol
+			and (EXCEL_WIDTH - nX)
+			or min(nExtraWidth * col.nMinWidth / (EXCEL_WIDTH - nExtraWidth) + col.nMinWidth, col.nMaxWidth or HUGE)
 		local nSortDelta = nWidth > 70 and 25 or 15
 		if i == 0 then
 			hCol:Lookup('Image_DungeonStat_Break'):Hide()
@@ -548,7 +552,9 @@ function D.UpdateUI(page)
 			hItemContent:SetW(99999)
 			hItemContent:FormatAllItemPos()
 			hItemContent:SetSizeByAllItemSize()
-			local nWidth = col.nWidth
+			local nWidth = j == #aCol
+				and (EXCEL_WIDTH - nX)
+				or min(nExtraWidth * col.nMinWidth / (EXCEL_WIDTH - nExtraWidth) + col.nMinWidth, col.nMaxWidth or HUGE)
 			if j == #aCol then
 				nWidth = EXCEL_WIDTH - nX
 			end
@@ -690,7 +696,7 @@ function D.OnInitPage()
 		x = 800, y = 20, w = 180,
 		text = _L['Columns'],
 		menu = function()
-			local t, aColumn, tChecked, nW = {}, O.aColumn, {}, 0
+			local t, aColumn, tChecked, nMinW = {}, O.aColumn, {}, 0
 			-- 已添加的
 			for i, id in ipairs(aColumn) do
 				local col = COLUMN_DICT[id]
@@ -729,7 +735,7 @@ function D.OnInitPage()
 							end,
 						},
 					})
-					nW = nW + col.nWidth
+					nMinW = nMinW + col.nMinWidth
 				end
 				tChecked[id] = true
 			end
@@ -745,7 +751,7 @@ function D.OnInitPage()
 					end
 				end
 				if not bExist then
-					if nW + nWidth > EXCEL_WIDTH then
+					if nMinW + nWidth > EXCEL_WIDTH then
 						LIB.Alert(_L['Too many column selected, width overflow, please delete some!'])
 					else
 						insert(aColumn, id)
@@ -762,7 +768,7 @@ function D.OnInitPage()
 					insert(t, {
 						szOption = col.szTitle,
 						fnAction = function()
-							fnAction(col.id, col.nWidth)
+							fnAction(col.id, col.nMinWidth)
 						end,
 					})
 				end
@@ -777,7 +783,7 @@ function D.OnInitPage()
 				end
 			end
 			local tDungeonMenu = LIB.GetDungeonMenu(function(info)
-				fnAction('dungeon_' .. info.dwID, DUNGEON_WIDTH)
+				fnAction('dungeon_' .. info.dwID, DUNGEON_MIN_WIDTH)
 			end, nil, tDungeonChecked)
 			-- 动态活动秘境选项
 			for _, szType in ipairs({
@@ -790,7 +796,7 @@ function D.OnInitPage()
 						szOption = col.szTitle,
 						bCheck = true, bChecked = tChecked[col.id],
 						fnAction = function()
-							fnAction(col.id, col.nWidth)
+							fnAction(col.id, col.nMinWidth)
 						end,
 					})
 				end
