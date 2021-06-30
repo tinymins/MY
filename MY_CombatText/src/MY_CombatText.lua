@@ -95,6 +95,7 @@ local COMBAT_TEXT_CRITICAL = { -- 需要会心跳帧的伤害类型
 local COMBAT_TEXT_IGNORE_TYPE = {}
 local COMBAT_TEXT_IGNORE = {}
 local COMBAT_TEXT_EVENT  = { 'COMMON_HEALTH_TEXT', 'SKILL_EFFECT_TEXT', 'SKILL_MISS', 'SKILL_DODGE', 'SKILL_BUFF', 'BUFF_IMMUNITY' }
+local COMBAT_TEXT_OFFICIAL_EVENT = { 'SKILL_EFFECT_TEXT', 'COMMON_HEALTH_TEXT', 'SKILL_MISS', 'SKILL_DODGE', 'SKILL_BUFF', 'BUFF_IMMUNITY', 'ON_EXP_LOG', 'SYS_MSG', 'FIGHT_HINT' }
 local COMBAT_TEXT_STRING = { -- 需要变成特定字符串的伤害类型
 	[SKILL_RESULT_TYPE.SHIELD_DAMAGE]  = g_tStrings.STR_MSG_ABSORB,
 	[SKILL_RESULT_TYPE.ABSORB_DAMAGE]  = g_tStrings.STR_MSG_ABSORB,
@@ -358,6 +359,25 @@ local function IsEnabled()
 	return D.bReady and O.bEnable
 end
 
+function D.HideOfficialCombat()
+	local frame = Station.Lookup('Lowest/CombatText')
+	if frame then
+		for _, v in ipairs(COMBAT_TEXT_OFFICIAL_EVENT) do
+			frame:UnRegisterEvent(v)
+		end
+	end
+end
+
+function D.ShowOfficialCombat()
+	local frame = Station.Lookup('Lowest/CombatText')
+	if frame then
+		for _, v in ipairs(COMBAT_TEXT_OFFICIAL_EVENT) do
+			frame:UnRegisterEvent(v)
+			frame:RegisterEvent(v)
+		end
+	end
+end
+
 function D.OnFrameCreate()
 	for k, v in ipairs(COMBAT_TEXT_EVENT) do
 		this:RegisterEvent(v)
@@ -374,14 +394,6 @@ function D.OnFrameCreate()
 	this:RegisterEvent('ENTER_STORY_MODE')
 	this:RegisterEvent('LEAVE_STORY_MODE')
 	CombatText.handle = this:Lookup('', '')
-	-- uninit
-	local frame = Station.Lookup('Lowest/CombatText')
-	local events = { 'SKILL_EFFECT_TEXT', 'COMMON_HEALTH_TEXT', 'SKILL_MISS', 'SKILL_DODGE', 'SKILL_BUFF', 'BUFF_IMMUNITY', 'ON_EXP_LOG', 'FIGHT_HINT' }
-	if frame then
-		for k, v in ipairs(events) do
-			frame:UnRegisterEvent(v)
-		end
-	end
 	CombatText.FreeQueue()
 	COMBAT_TEXT_UI_SCALE   = Station.GetUIScale()
 	COMBAT_TEXT_TRAJECTORY = CombatText.TrajectoryCount()
@@ -954,7 +966,6 @@ function CombatText.LoadConfig()
 end
 
 function CombatText.CheckEnable()
-	local frame = Station.Lookup('Lowest/CombatText')
 	local ui = Station.Lookup('Lowest/MY_CombatText')
 	if IsEnabled() then
 		if O.bRender then
@@ -968,20 +979,15 @@ function CombatText.CheckEnable()
 			Wnd.CloseWindow(ui)
 		end
 		Wnd.OpenWindow(COMBAT_TEXT_INIFILE, 'MY_CombatText')
+		D.HideOfficialCombat()
 	else
-		local events = { 'SKILL_EFFECT_TEXT', 'COMMON_HEALTH_TEXT', 'SKILL_MISS', 'SKILL_DODGE', 'SKILL_BUFF', 'BUFF_IMMUNITY', 'SYS_MSG', 'FIGHT_HINT' }
-		if frame then
-			for k, v in ipairs(events) do
-				frame:UnRegisterEvent(v)
-				frame:RegisterEvent(v)
-			end
-		end
 		if ui then
 			CombatText.FreeQueue()
 			Wnd.CloseWindow(ui)
 			LIB.BreatheCall('COMBAT_TEXT_CACHE', false)
 			collectgarbage('collect')
 		end
+		D.ShowOfficialCombat()
 	end
 	setmetatable(COMBAT_TEXT_POINT, { __index = function(me, key)
 		if key == 'TOP_LEFT' or key == 'TOP_RIGHT' then
@@ -1396,3 +1402,4 @@ end)
 LIB.RegisterEvent('MY_COMBATTEXT_MSG', 'MY_CombatText', function()
 	CombatText.OnCenterMsg(arg0, arg1, arg2)
 end)
+LIB.RegisterEvent('FIRST_LOADING_END', 'MY_CombatText', CombatText.CheckEnable)
