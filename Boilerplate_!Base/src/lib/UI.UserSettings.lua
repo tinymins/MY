@@ -176,7 +176,7 @@ function D.Open(bImport)
 					return
 				end
 				local szPath = LIB.FormatPath({'export/settings/' .. LIB.GetUserRoleName() .. '_' .. LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss') .. '.us.jx3dat', PATH_TYPE.GLOBAL})
-				LIB.SaveLUAData(szPath, tKvp, { compress = true, passphrase = false })
+				LIB.SaveLUAData(szPath, tKvp, { compress = false, crc = false, passphrase = false })
 				LIB.Systopmsg(_L('%d settings exported, file saved in %s.', nExport, szPath))
 			end
 			uiFrame:Remove()
