@@ -204,7 +204,7 @@ LIB.RegisterEvent('AUCTION_LOOKUP_RESPOND', function()
 	if not O.bEnable then
 		return
 	end
-	if arg0 == AUCTION_RESPOND_CODE.SUCCEED then
+	if arg0 == AUCTION_RESPOND_CODE.SUCCEED and arg1 == 0 then
 		-- 获取数据
 		local AuctionClient = GetAuctionClient()
 		local nCount, aInfo = AuctionClient.GetLookupResult(arg1)
@@ -224,6 +224,9 @@ LIB.RegisterEvent('AUCTION_LOOKUP_RESPOND', function()
 				nPrice = nPrice,
 			})
 			dwBaseID = min(dwBaseID, info.ID)
+		end
+		if IsHugeNumber(dwBaseID) then
+			return
 		end
 		local aData = {}
 		-- 重组数据
