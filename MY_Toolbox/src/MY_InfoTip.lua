@@ -50,7 +50,7 @@ local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_InfoTip'
 local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^4.0.0') then
+if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^5.0.0') then
 	return
 end
 --------------------------------------------------------------------------
