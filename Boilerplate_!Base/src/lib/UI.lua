@@ -1341,7 +1341,7 @@ function OO:Append(arg0, arg1)
 			_nTempWndCount = _nTempWndCount + 1
 			-- start ui append
 			raw = nil
-			if szComponent:sub(1, 3) == 'Wnd' then
+			if szType:sub(1, 3) == 'Wnd' then
 				if parentWnd then -- KWndWindow
 					raw = frame:Lookup(szComponent)
 					if raw then
