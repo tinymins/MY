@@ -570,6 +570,7 @@ function LIB.SetUserSettingsPresetID(szID)
 		DATABASE_NEED_FLUSH[PATH_TYPE.ROLE] = nil
 		LIB.ConnectSettingsDatabase()
 	end
+	DATA_CACHE = {}
 end
 
 function LIB.GetUserSettingsPresetList()
