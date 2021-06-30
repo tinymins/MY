@@ -3906,12 +3906,12 @@ end
 function OO:CustomLayout(arg0, arg1)
 	self:_checksum()
 	if IsString(arg0) then
-		self:Filter('.Frame')
+		self:Filter('.WndFrame')
 			:Event('ON_ENTER_CUSTOM_UI_MODE', function() UpdateCustomModeWindow(this, arg0, GetComponentProp(this, 'bPenetrable')) end)
 			:Event('ON_LEAVE_CUSTOM_UI_MODE', function() UpdateCustomModeWindow(this, arg0, GetComponentProp(this, 'bPenetrable')) end)
 	end
 	if IsFunction(arg0) then
-		self:Filter('.Frame')
+		self:Filter('.WndFrame')
 			:Event('ON_ENTER_CUSTOM_UI_MODE', function() arg0(true , GetFrameAnchor(this, arg1)) end)
 			:Event('ON_LEAVE_CUSTOM_UI_MODE', function() arg0(false, GetFrameAnchor(this, arg1)) end)
 	end
