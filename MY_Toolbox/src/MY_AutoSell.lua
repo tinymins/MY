@@ -228,13 +228,13 @@ end
 
 function D.CheckEnable()
 	if O.bEnable then
-		LIB.RegisterEvent('SHOP_OPENSHOP', function()
+		LIB.RegisterEvent('SHOP_OPENSHOP', 'MY_AutoSell', function()
 			local chk = Station.Lookup('Normal/ShopPanel/CheckBox_AutoSell')
 			local bIgnoreGray = chk and chk:IsCheckBoxChecked() or false
 			D.AutoSellItem(arg4, arg0, bIgnoreGray)
 		end)
 	else
-		LIB.RegisterEvent('SHOP_OPENSHOP', false)
+		LIB.RegisterEvent('SHOP_OPENSHOP', 'MY_AutoSell', false)
 	end
 end
 LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_AutoSell', function()
