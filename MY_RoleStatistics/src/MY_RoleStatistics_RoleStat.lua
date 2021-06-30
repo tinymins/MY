@@ -1322,8 +1322,8 @@ LIB.RegisterInit('MY_RoleStatistics_RoleStat__AlertCol', function()
 		for _, col in ipairs(ALERT_COLUMN) do
 			O.tAlertTodayVal[col.id] = col.GetValue(me)
 		end
-		O.tAlertTodayVal = O.tAlertTodayVal
 		O.tAlertTodayVal.nTime = GetCurrentTime()
+		O.tAlertTodayVal = O.tAlertTodayVal
 	end
 end)
 LIB.RegisterFrameCreate('OptionPanel', 'MY_RoleStatistics_RoleStat__AlertCol', function()

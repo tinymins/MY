@@ -966,6 +966,7 @@ function D.OnInitPage()
 							fnAction = function()
 								if i > 1 then
 									aColumn[i], aColumn[i - 1] = aColumn[i - 1], aColumn[i]
+									O.aColumn = aColumn
 									D.UpdateUI(page)
 								end
 								UI.ClosePopupMenu()
@@ -976,6 +977,7 @@ function D.OnInitPage()
 							fnAction = function()
 								if i < #aColumn then
 									aColumn[i], aColumn[i + 1] = aColumn[i + 1], aColumn[i]
+									O.aColumn = aColumn
 									D.UpdateUI(page)
 								end
 								UI.ClosePopupMenu()
@@ -985,6 +987,7 @@ function D.OnInitPage()
 							szOption = _L['Delete'],
 							fnAction = function()
 								remove(aColumn, i)
+								O.aColumn = aColumn
 								D.UpdateUI(page)
 								UI.ClosePopupMenu()
 							end,
@@ -1000,6 +1003,7 @@ function D.OnInitPage()
 				for i, v in ipairs(aColumn) do
 					if v == id then
 						remove(aColumn, i)
+						O.aColumn = aColumn
 						bExist = true
 						break
 					end
@@ -1009,6 +1013,7 @@ function D.OnInitPage()
 						LIB.Alert(_L['Too many column selected, width overflow, please delete some!'])
 					else
 						insert(aColumn, id)
+						O.aColumn = aColumn
 					end
 				end
 				D.FlushDB()
