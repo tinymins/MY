@@ -345,7 +345,7 @@ function PS.OnPanelActive(wnd)
 						.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
 							l = AnsiToUTF8(GLOBAL.GAME_LANG),
 							L = AnsiToUTF8(GLOBAL.GAME_EDITION),
-							content = AnsiToUTF8(D.szJokeSearch or ''),
+							content = AnsiToUTF8(D.szJokeText or ''),
 							server = AnsiToUTF8(LIB.GetRealServer(2)),
 							role = bAnonymous and '' or AnsiToUTF8(LIB.GetUserRoleName()),
 							id = bAnonymous and '' or AnsiToUTF8(UI_GetClientPlayerID()),
@@ -368,7 +368,6 @@ function PS.OnPanelActive(wnd)
 				szName = 'MY_TalkEx_Joke',
 				szMessage = _L['Confirm share joke:'] .. '\n\n' .. D.szJokeText,
 				szAlignment = 'CENTER',
-				fnCancelAction = fnCancelAction,
 				{ szOption = _L['Share onymously'], fnAction = function() fnAction(false) end },
 				{ szOption = _L['Share anonymously'], fnAction = function() fnAction(true) end },
 				{ szOption = g_tStrings.STR_HOTKEY_CANCEL },
