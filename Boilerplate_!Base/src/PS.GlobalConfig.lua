@@ -113,15 +113,25 @@ function PS.OnPanelActive(wnd)
 		text = _L['Use preset user settings'],
 		menu = function()
 			local szCurrentID = LIB.GetUserSettingsPresetID()
+			local szDefaultID = LIB.GetUserSettingsPresetID(true)
 			local menu = {
 				{
 					szOption = _L['Role original user settings'],
 					fnAction = function()
-						LIB.SetUserSettingsPresetID()
+						LIB.SetUserSettingsPresetID('')
 						UI.ClosePopupMenu()
 						LIB.SwitchTab('GlobalConfig', true)
 					end,
-					bCheck = true, bChecked = szCurrentID == nil,
+					bCheck = true, bChecked = szCurrentID == '',
+					{
+						szOption = _L['Set default preset'],
+						fnAction = function()
+							LIB.SetUserSettingsPresetID('', true)
+							UI.ClosePopupMenu()
+							LIB.SwitchTab('GlobalConfig', true)
+						end,
+						bCheck = true, bChecked = szDefaultID == '',
+					},
 				},
 				CONSTANT.MENU_DIVIDER,
 			}
@@ -137,18 +147,25 @@ function PS.OnPanelActive(wnd)
 							LIB.SwitchTab('GlobalConfig', true)
 						end,
 						bCheck = true, bChecked = szCurrentID == szID,
+						{
+							szOption = _L['Set default preset'],
+							fnAction = function()
+								LIB.SetUserSettingsPresetID(szID, true)
+								UI.ClosePopupMenu()
+								LIB.SwitchTab('GlobalConfig', true)
+							end,
+							bCheck = true, bChecked = szDefaultID == szID,
+						},
 					}
 					if not m.bChecked then
-						m.szIcon = 'ui/Image/UICommon/CommonPanel2.UITex'
-						m.nFrame = 49
-						m.nMouseOverFrame = 51
-						m.nIconWidth = 17
-						m.nIconHeight = 17
-						m.szLayer = 'ICON_RIGHTMOST'
-						m.fnClickIcon = function()
-							LIB.RemoveUserSettingsPreset(szID)
-							UI.ClosePopupMenu()
-						end
+						insert(m,
+						{
+							szOption = _L['Delete'],
+							fnAction = function()
+								LIB.RemoveUserSettingsPreset(szID)
+								UI.ClosePopupMenu()
+							end,
+						})
 					end
 					insert(menu, m)
 				end

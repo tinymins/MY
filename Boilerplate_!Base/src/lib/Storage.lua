@@ -541,14 +541,19 @@ function LIB.FlushUserSettingsDB()
 	end
 end
 
-function LIB.GetUserSettingsPresetID()
-	local szID = LIB.LoadLUAData({'config/usersettings-preset.jx3dat', PATH_TYPE.ROLE})
+function LIB.GetUserSettingsPresetID(bDefault)
+	local szPath = LIB.FormatPath({'config/usersettings-preset.jx3dat', bDefault and PATH_TYPE.GLOBAL or PATH_TYPE.ROLE})
+	if not bDefault and not IsLocalFileExist(szPath) then
+		return LIB.GetUserSettingsPresetID(true)
+	end
+	local szID = LIB.LoadLUAData(szPath)
 	if IsString(szID) and not szID:find('[/?*:|\\<>]') then
 		return szID
 	end
+	return ''
 end
 
-function LIB.SetUserSettingsPresetID(szID)
+function LIB.SetUserSettingsPresetID(szID, bDefault)
 	if szID then
 		if szID:find('[/?*:|\\<>]') then
 			return _L['User settings preset id cannot contains special character (/?*:|\\<>).']
@@ -557,12 +562,16 @@ function LIB.SetUserSettingsPresetID(szID)
 		szID = wgsub(szID, '%s+$', '')
 	end
 	if IsEmpty(szID) then
-		szID = nil
+		szID = ''
 	end
-	if szID == LIB.GetUserSettingsPresetID() then
+	if szID == LIB.GetUserSettingsPresetID(bDefault) then
 		return
 	end
-	LIB.SaveLUAData({'config/usersettings-preset.jx3dat', PATH_TYPE.ROLE}, szID)
+	local szCurrentID = LIB.GetUserSettingsPresetID()
+	LIB.SaveLUAData({'config/usersettings-preset.jx3dat', bDefault and PATH_TYPE.GLOBAL or PATH_TYPE.ROLE}, szID)
+	if szCurrentID == LIB.GetUserSettingsPresetID() then
+		return
+	end
 	local db = DATABASE_INSTANCE[PATH_TYPE.ROLE]
 	if db then
 		LIB.UnQLiteDisconnect(db)
