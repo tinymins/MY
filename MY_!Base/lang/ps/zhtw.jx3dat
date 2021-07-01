@@ -17,6 +17,7 @@ return {
 	['Preset list'] = '共用方案',
 	['* New *'] = '添加方案',
 	['Please input preset id:'] = '請輸入共用方案名：',
+	['PRESET_DESC'] = '角色獨立方案：\n在該角色上調整插件設置項，不會影響其他角色。\n\n共用配置方案：\n在該角色上調整插件設置項，勾選相同方案的都會被影響。',
 
 	-- welcome
 	['serendipity'] = '奇遇查詢',
