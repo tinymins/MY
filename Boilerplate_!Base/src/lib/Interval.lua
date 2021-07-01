@@ -55,6 +55,7 @@ local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCal
 -- FinallyThrottle 确保延迟调用的节流    毫秒       1 / GLOBAL.GAME_FPS
 ---------------------------------------------------------------------
 if DelayCall and BreatheCall and FrameCall and RenderCall then
+	local NS_PREFIX = NSFormatString('{$NS}__')
 	local function WrapIntervalCall(IntervalCall)
 		return function(szKey, nInterval, fnAction, oArg)
 			local bUnreg
@@ -77,14 +78,14 @@ if DelayCall and BreatheCall and FrameCall and RenderCall then
 			if fnAction then -- reg
 				if not szKey then -- 匿名调用
 					szKey = GetTickCount()
-					while IntervalCall(tostring(szKey)) do
+					while IntervalCall(NS_PREFIX .. tostring(szKey)) do
 						szKey = szKey + 0.1
 					end
 					szKey = tostring(szKey)
 				end
 			end
 			assert(IsString(szKey), 'IntervalCall Key MUST be string.')
-			local szNSKey = NSFormatString('{$NS}__') .. szKey
+			local szNSKey = NS_PREFIX .. szKey
 			local aRetVal = bUnreg
 				and {IntervalCall(szNSKey, false)}
 				or {IntervalCall(szNSKey, nInterval, fnAction, oArg)}
