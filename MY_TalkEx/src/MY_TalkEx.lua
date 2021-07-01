@@ -518,7 +518,7 @@ function PS.OnPanelActive(wnd)
 			uiBtn:Text(_L['Trick'])
 		else
 			uiBtn:Enable(false)
-			uiBtn:Text(_L['Trick'] .. '(' .. floor(dwTime / 1000) .. ')')
+			uiBtn:Text(_L['Trick'] .. '(' .. ceil((10000 - dwTime) / 1000) .. ')')
 		end
 	end)
 end
