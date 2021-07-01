@@ -122,11 +122,6 @@ local O = LIB.CreateUserSettingsModule('MY_RoleStatistics_RoleStat', _L['General
 			'exam_print',
 		},
 	},
-	tAlertTodayVal = {
-		ePathType = PATH_TYPE.ROLE,
-		xSchema = Schema.Any,
-		xDefaultValue = nil,
-	},
 	tSummaryIgnoreGUID = {
 		ePathType = PATH_TYPE.ROLE,
 		xSchema = Schema.Any,
@@ -158,7 +153,9 @@ local O = LIB.CreateUserSettingsModule('MY_RoleStatistics_RoleStat', _L['General
 })
 local D = {
 	dwLastAlertTime = 0,
+	tAlertTodayVal = nil,
 }
+RegisterCustomData('MY_RoleStatistics_RoleStat.tAlertTodayVal')
 
 local function GetFormatSysmsgText(szText)
 	return GetFormatText(szText, GetMsgFont('MSG_SYS'), GetMsgFontColor('MSG_SYS'))
@@ -1306,14 +1303,14 @@ LIB.RegisterInit('MY_RoleStatistics_RoleStat__AlertCol', function()
 	for _, col in ipairs(ALERT_COLUMN) do
 		ALERT_INIT_VAL[col.id] = col.GetValue(me)
 	end
-	if not IsTable(O.tAlertTodayVal) or not IsNumber(O.tAlertTodayVal.nTime)
-	or not LIB.IsInSameRefreshTime('daily', O.tAlertTodayVal.nTime) then
-		O.tAlertTodayVal = {}
+	if not IsTable(D.tAlertTodayVal) or not IsNumber(D.tAlertTodayVal.nTime)
+	or not LIB.IsInSameRefreshTime('daily', D.tAlertTodayVal.nTime) then
+		D.tAlertTodayVal = {}
 		for _, col in ipairs(ALERT_COLUMN) do
-			O.tAlertTodayVal[col.id] = col.GetValue(me)
+			D.tAlertTodayVal[col.id] = col.GetValue(me)
 		end
-		O.tAlertTodayVal.nTime = GetCurrentTime()
-		O.tAlertTodayVal = O.tAlertTodayVal
+		D.tAlertTodayVal.nTime = GetCurrentTime()
+		D.tAlertTodayVal = D.tAlertTodayVal
 	end
 end)
 LIB.RegisterFrameCreate('OptionPanel', 'MY_RoleStatistics_RoleStat__AlertCol', function()
@@ -1328,7 +1325,7 @@ LIB.RegisterFrameCreate('OptionPanel', 'MY_RoleStatistics_RoleStat__AlertCol', f
 		local col = ALERT_COLUMN_DICT[id]
 		if col then
 			insert(aText, (col.GetCompareText(ALERT_INIT_VAL, tVal)))
-			insert(aDailyText, (col.GetCompareText(O.tAlertTodayVal, tVal)))
+			insert(aDailyText, (col.GetCompareText(D.tAlertTodayVal, tVal)))
 		end
 	end
 	local szText, szDailyText = concat(aText, GetFormatSysmsgText(_L[','])), concat(aDailyText, GetFormatSysmsgText(_L[',']))
@@ -1423,6 +1420,9 @@ local settings = {
 	exports = {
 		{
 			preset = 'UIEvent',
+			fields = {
+				'tAlertTodayVal',
+			},
 			root = D,
 		},
 		{
@@ -1431,7 +1431,6 @@ local settings = {
 				'szSort',
 				'szSortOrder',
 				'aAlertColumn',
-				'tAlertTodayVal',
 				'tSummaryIgnoreGUID',
 				'bFloatEntry',
 				'bSaveDB',
@@ -1441,6 +1440,12 @@ local settings = {
 		},
 	},
 	imports = {
+		{
+			fields = {
+				'tAlertTodayVal',
+			},
+			root = D,
+		},
 		{
 			fields = {
 				'aColumn',
