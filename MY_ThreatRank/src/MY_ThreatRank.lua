@@ -718,6 +718,7 @@ end
 LIB.RegisterAddonMenu(GetMenu)
 end
 LIB.RegisterEvent('LOADING_END', _TS.CheckOpen)
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_ThreatRank', _TS.CheckOpen)
 
 -- Global exports
 do
