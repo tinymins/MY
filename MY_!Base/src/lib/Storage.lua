@@ -492,6 +492,11 @@ function LIB.RegisterUserSettingsUpdate(...)
 end
 
 local DATABASE_TYPE_LIST = { PATH_TYPE.ROLE, PATH_TYPE.SERVER, PATH_TYPE.GLOBAL }
+local DATABASE_TYPE_PRESET_FILE = {
+	[PATH_TYPE.ROLE] = 'role',
+	[PATH_TYPE.SERVER] = 'server',
+	[PATH_TYPE.GLOBAL] = 'global',
+}
 local DATABASE_INSTANCE = {}
 local DATABASE_NEED_FLUSH = {}
 local USER_SETTINGS_INFO = {}
@@ -499,27 +504,27 @@ local USER_SETTINGS_LIST = {}
 local DATA_CACHE = {}
 local DATA_CACHE_LEAF_FLAG = {}
 local FLUSH_TIME = 0
+local DATABASE_CONNECTION_ESTABLISHED = false
 
 function LIB.ConnectUserSettingsDB()
-	local bFireEvent = false
+	if DATABASE_CONNECTION_ESTABLISHED then
+		return
+	end
+	local szID, szPresetRoot = LIB.GetUserSettingsPresetID(), nil
+	if szID then
+		szPresetRoot = LIB.FormatPath({'userdata/settings/' .. szID .. '/', PATH_TYPE.GLOBAL})
+		CPath.MakeDir(szPresetRoot)
+	end
 	for _, ePathType in ipairs(DATABASE_TYPE_LIST) do
 		if not DATABASE_INSTANCE[ePathType] then
-			local szPath = LIB.FormatPath({'userdata/settings.udb', ePathType})
-			if ePathType == PATH_TYPE.ROLE then
-				local szID = LIB.GetUserSettingsPresetID()
-				if szID then
-					szPath = LIB.FormatPath({'userdata/settings/' .. szID .. '/', PATH_TYPE.GLOBAL})
-					CPath.MakeDir(szPath)
-					szPath = szPath .. 'role.udb'
-				end
-			end
+			local szPath = szPresetRoot
+				and (szPresetRoot .. DATABASE_TYPE_PRESET_FILE[ePathType] .. '.udb')
+				or LIB.FormatPath({'userdata/settings.udb', ePathType})
 			DATABASE_INSTANCE[ePathType] = LIB.UnQLiteConnect(szPath)
-			bFireEvent = true
 		end
 	end
-	if bFireEvent then
-		CommonEventFirer(USER_SETTINGS_EVENT, '@@INIT@@')
-	end
+	DATABASE_CONNECTION_ESTABLISHED = true
+	CommonEventFirer(USER_SETTINGS_EVENT, '@@INIT@@')
 end
 
 function LIB.ReleaseUserSettingsDB()
@@ -530,6 +535,7 @@ function LIB.ReleaseUserSettingsDB()
 			DATABASE_NEED_FLUSH[ePathType] = nil
 		end
 	end
+	DATA_CACHE = {}
 end
 
 function LIB.FlushUserSettingsDB()
@@ -572,11 +578,8 @@ function LIB.SetUserSettingsPresetID(szID, bDefault)
 	if szCurrentID == LIB.GetUserSettingsPresetID() then
 		return
 	end
-	local db = DATABASE_INSTANCE[PATH_TYPE.ROLE]
-	if db then
-		LIB.UnQLiteDisconnect(db)
-		DATABASE_INSTANCE[PATH_TYPE.ROLE] = nil
-		DATABASE_NEED_FLUSH[PATH_TYPE.ROLE] = nil
+	if DATABASE_CONNECTION_ESTABLISHED then
+		LIB.ReleaseUserSettingsDB()
 		LIB.ConnectUserSettingsDB()
 	end
 	DATA_CACHE = {}
