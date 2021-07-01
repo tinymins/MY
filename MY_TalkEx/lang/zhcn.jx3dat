@@ -24,6 +24,7 @@ return {
     ['Teammates where'] = '团队中',
     ['Nearby players where'] = '附近的',
     ['Please input something.'] = '请先输入一些内容。',
+    ['SLIGHT_PAUSE_MARK'] = '、',
     ['You are talking too quick!'] = '操作太过频繁，静待片刻方可！',
     ['No trick target found.'] = '找不到可以调侃的玩家，您可以尝试更改筛选条件。',
     ['$zj look around and have a little thought.'] = '$zj斜眼看了身边的羊群，冥想了一会。',

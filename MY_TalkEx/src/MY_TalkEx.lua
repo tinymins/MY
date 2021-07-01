@@ -208,9 +208,13 @@ function D.Trick()
 	if #O.szTrickTextBegin > 0 then
 		LIB.SendChat(O.nTrickChannel, O.szTrickTextBegin)
 	end
-	for _, szName in ipairs(t) do
-		LIB.SendChat(O.nTrickChannel, (O.szTrickText:gsub('%$mb', '[' .. szName .. ']')))
+	-- for _, szName in ipairs(t) do
+	-- 	LIB.SendChat(O.nTrickChannel, (O.szTrickText:gsub('%$mb', '[' .. szName .. ']')))
+	-- end
+	for i, szName in ipairs(t) do
+		t[i] = '[' .. szName .. ']'
 	end
+	LIB.SendChat(O.nTrickChannel, (O.szTrickText:gsub('%$mb', concat(t, _L.SLIGHT_PAUSE_MARK))))
 	if #O.szTrickTextEnd > 0 then
 		LIB.SendChat(O.nTrickChannel, O.szTrickTextEnd)
 	end
