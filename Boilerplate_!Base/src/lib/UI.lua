@@ -2911,14 +2911,16 @@ local function SetComponentSize(raw, nOuterWidth, nOuterHeight, nInnerWidth, nIn
 		local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
 		local txt = GetComponentElement(raw, 'TEXT')
 		local img = GetComponentElement(raw, 'IMAGE')
+		local W, H = wnd:GetSize()
+		local nDeltaW, nDeltaH = nWidth - W, nHeight - H
 		local w, h = cmb:GetSize()
-		cmb:SetRelPos(nWidth-w-5, ceil((nHeight - h)/2))
+		cmb:SetRelPos(cmb:GetRelX() + nDeltaW, cmb:GetRelY() + nDeltaH / 2)
 		cmb:Lookup('', ''):SetAbsPos(hdl:GetAbsPos())
 		cmb:Lookup('', ''):SetSize(nWidth, nHeight)
 		wnd:SetSize(nWidth, nHeight)
 		hdl:SetSize(nWidth, nHeight)
 		img:SetSize(nWidth, nHeight)
-		txt:SetSize(nWidth - w - 5 - 10, nHeight)
+		txt:SetSize(txt:GetW() + nDeltaW, nHeight)
 		hdl:FormatAllItemPos()
 	elseif componentType == 'WndEditComboBox' or componentType == 'WndAutocomplete' then
 		local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
