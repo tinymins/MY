@@ -95,9 +95,6 @@ function D.Apply()
 		end
 		hShaList:Show()
 		local function OnPlayerEnter(dwID)
-			if LIB.IsInShieldedMap() then
-				return
-			end
 			local tar = GetPlayer(dwID)
 			local me = GetClientPlayer()
 			if not tar or not me
@@ -124,9 +121,6 @@ function D.Apply()
 			end
 		end
 		local function OnPlayerLeave(dwID)
-			if LIB.IsInShieldedMap() then
-				return
-			end
 			if O.bFriendNav and Navigator_Remove then
 				Navigator_Remove('MY_FRIEND_TIP.' .. dwID)
 			else
@@ -138,9 +132,6 @@ function D.Apply()
 			end
 		end
 		local function RescanNearby()
-			if LIB.IsInShieldedMap() then
-				return
-			end
 			for _, p in ipairs(LIB.GetNearPlayer()) do
 				OnPlayerEnter(p.dwID)
 			end
@@ -193,9 +184,6 @@ function D.Apply()
 		end
 		hShaList:Show()
 		local function OnPlayerEnter(dwID, nRetryCount)
-			if LIB.IsInShieldedMap() then
-				return
-			end
 			nRetryCount = nRetryCount or 0
 			if nRetryCount > 5 then
 				return
@@ -230,9 +218,6 @@ function D.Apply()
 			end
 		end
 		local function OnPlayerLeave(dwID)
-			if LIB.IsInShieldedMap() then
-				return
-			end
 			if O.bTongMemberNav and Navigator_Remove then
 				Navigator_Remove('MY_GUILDMEMBER_TIP.' .. dwID)
 			else
@@ -244,9 +229,6 @@ function D.Apply()
 			end
 		end
 		for _, p in ipairs(LIB.GetNearPlayer()) do
-			if LIB.IsInShieldedMap() then
-				return
-			end
 			OnPlayerEnter(p.dwID)
 		end
 		LIB.RegisterEvent('ON_ISOLATED', 'MY_GUILDMEMBER_TIP', function(event)
@@ -281,11 +263,11 @@ function D.Apply()
 	end
 end
 
-LIB.RegisterEvent('LOADING_ENDING', 'MY_FooterTip', D.Apply)
 LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_FooterTip', function()
 	D.bReady = true
 	D.Apply()
 end)
+LIB.RegisterEvent('LOADING_ENDING', 'MY_FooterTip', D.Apply)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 	-- ∫√”—∏ﬂ¡¡
