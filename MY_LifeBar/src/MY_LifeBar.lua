@@ -866,12 +866,13 @@ end)
 
 local function onSwitch()
 	O.bEnabled = not O.bEnabled
-	D.Reset(true)
+	D.Reset()
 end
 LIB.RegisterHotKey('MY_LifeBar_S', _L['MY_LifeBar'], onSwitch)
 
 LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_LifeBar', function()
 	D.bReady = true
+	D.Reset()
 end)
 
 --------------------------------------------------------------------------
