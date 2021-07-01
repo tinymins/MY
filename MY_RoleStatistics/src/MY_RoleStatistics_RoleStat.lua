@@ -1387,8 +1387,10 @@ function D.UpdateFloatEntry()
 	end
 	D.ApplyFloatEntry(O.bFloatEntry)
 end
-LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_RoleStatistics_RoleEntry', function()
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_RoleStatistics_RoleStat', function()
 	D.bReady = true
+	D.UpdateSaveDB()
+	D.FlushDB()
 	D.UpdateFloatEntry()
 end)
 LIB.RegisterReload('MY_RoleStatistics_RoleEntry', function() D.ApplyFloatEntry(false) end)

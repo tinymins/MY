@@ -1420,9 +1420,12 @@ function D.CheckMapMark()
 		D.UnhookMiniMapMark()
 	end
 end
-LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_RoleStatistics_SerendipityMapMark', function()
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_RoleStatistics_SerendipityStat', function()
 	D.bReady = true
 	D.CheckMapMark()
+	D.UpdateSaveDB()
+	D.FlushDB()
+	D.UpdateFloatEntry()
 end)
 
 -- Module exports
