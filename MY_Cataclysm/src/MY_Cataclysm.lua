@@ -62,15 +62,460 @@ local O = LIB.CreateUserSettingsModule('MY_Cataclysm', _L['Raid'], {
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
-	szConfigName = {
+	eCss = {
 		ePathType = PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
 		xSchema = Schema.String,
-		xDefaultValue = 'common',
+		xDefaultValue = '',
+	},
+	eFrameStyle = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.String,
+		xDefaultValue = 'CATACLYSM',
+	},
+	bDrag = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bShowInRaid = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bEditMode = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bShowAllGrid = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	tAnchor = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.FrameAnchor,
+		xDefaultValue = { s = 'LEFTCENTER', r = 'LEFTCENTER', x = 100, y = -200 },
+	},
+	nAutoLinkMode = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Number,
+		xDefaultValue = 5,
+	},
+	nBGColorMode = { -- 0 不着色 1 根据距离 2 根据门派
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Number,
+		xDefaultValue = 1,
+	},
+	nColoredName = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Number,
+		xDefaultValue = 1,
+	},
+	nNameVAlignment = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Number,
+		xDefaultValue = 0,
+	},
+	nNameHAlignment = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Number,
+		xDefaultValue = 0,
+	},
+	nHPShownMode2 = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Number,
+		xDefaultValue = 2,
+	},
+	nHPShownNumMode = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Number,
+		xDefaultValue = 3,
+	},
+	nHPVAlignment = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Number,
+		xDefaultValue = 2,
+	},
+	nHPHAlignment = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Number,
+		xDefaultValue = 2,
+	},
+	bShowHPDecimal = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bBuffAboveMana = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	nShowMP = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bHPHitAlert = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	nShowIcon = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Number,
+		xDefaultValue = 2,
+	},
+	bShowDistance = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bShowBossTarget = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bShowBossFocus = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bEnableDistance = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bShowTargetTargetAni = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	nNameFont = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Number,
+		xDefaultValue = 40,
+	},
+	nLifeFont = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Number,
+		xDefaultValue = 15,
+	},
+	nManaFont = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Number,
+		xDefaultValue = 190,
+	},
+	fNameFontScale = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Number,
+		xDefaultValue = 1.05,
+	},
+	fLifeFontScale = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Number,
+		xDefaultValue = 1.05,
+	},
+	fManaFontScale = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Number,
+		xDefaultValue = 1,
+	},
+	nMaxShowBuff = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Number,
+		xDefaultValue = 4,
+	},
+	bLifeGradient = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bManaGradient = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	nAlpha = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Number,
+		xDefaultValue = 220,
+	},
+	fBuffScale = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Number,
+		xDefaultValue = 1,
+	},
+	bAutoBuffSize = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bAltView = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bAltViewInFight = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bHideTipInFight = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bShowTipAtRightBottom = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bTempTargetEnable = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	nTempTargetDelay = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Number,
+		xDefaultValue = 0,
+	},
+	fScaleX = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Number,
+		xDefaultValue = 1.1,
+	},
+	fScaleY = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Number,
+		xDefaultValue = 1.0,
+	},
+	bFasterHP = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bStaring = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bShowBuffTime = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bShowBuffNum = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bShowBuffReminder = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bBuffAltPublish = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bBuffPushToOfficial = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bBuffDataTeamMon = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bShowAttention = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bShowCaution = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bShowScreenHead = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bShowGroupNumber = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bShowEffect = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false, -- 五毒醉舞提示 万花距离提示 晚点做
+	},
+	bShowSputtering = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	tSputteringFontColor = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+		xDefaultValue = { 79, 255, 108 },
+	},
+	nSputteringFontAlpha = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Number,
+		xDefaultValue = 192,
+	},
+	tSputteringShadowColor = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+		xDefaultValue = { 79, 255, 108 },
+	},
+	nSputteringShadowAlpha = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Number,
+		xDefaultValue = 192,
+	},
+	nSputteringDistance = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Number,
+		xDefaultValue = 15,
+	},
+	aBuffList = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Map(Schema.Number, Schema.Any),
+		xDefaultValue = {},
+	},
+	tDistanceLevel = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+		xDefaultValue = { 20, 22, 200 },
+	},
+	tManaColor = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+		xDefaultValue = { 0, 96, 255 },
+	},
+	tDistanceCol = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Map(Schema.Number, Schema.Tuple(Schema.Number, Schema.Number, Schema.Number)),
+		xDefaultValue = {
+			{ 0,   180, 52  }, -- 绿
+			{ 0,   180, 52  }, -- 绿
+			-- 免得被说乱
+			-- { 230, 170, 40  }, -- 黄
+			{ 230, 80,  80  }, -- 红
+			{ 230, 80,  80  }, -- 红
+		},
+	},
+	tOtherCol = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Map(Schema.Number, Schema.Tuple(Schema.Number, Schema.Number, Schema.Number)),
+		xDefaultValue = {
+			{ 255, 255, 255 },
+			{ 110, 110, 110 },
+			{ 192, 192, 192 },
+		},
+	},
+	tDistanceAlpha = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Map(Schema.Number, Schema.Number),
+		xDefaultValue = {
+			255,
+			255,
+			110,
+		},
+	},
+	tOtherAlpha = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+		xDefaultValue = {
+			0,
+			255, -- 不在线
+			110, -- 出同步范围
+		},
 	},
 })
 local D = {
-	CFG = {},
+	CFG = O,
 	bFold = false,
 	BG_COLOR_MODE = {
 		SAME_COLOR = 0,
@@ -516,7 +961,6 @@ local settings = {
 		{
 			fields = {
 				'bEnable',
-				'szConfigName',
 			},
 			root = O,
 		},
@@ -533,7 +977,6 @@ local settings = {
 		{
 			fields = {
 				'bEnable',
-				'szConfigName',
 			},
 			root = O,
 		},

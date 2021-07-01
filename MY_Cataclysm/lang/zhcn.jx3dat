@@ -63,8 +63,7 @@ return {
 	['Grid Style'] = '格子样式',
 	['Grid Color'] = '背景颜色',
 	['Panel'] = '面板',
-	['configure'] = '配置（如果希望不共用设置，请随意修改为任意字符，否则请勿修改）',
-	['Configuration name'] = '配置文件名称',
+	['configure'] = '配置',
 	['Max count'] = '最大显示数量',
 	['Auto scale'] = '自动缩放',
 	['Show AllGrid'] = '显示完整的小队格子',
@@ -172,4 +171,7 @@ return {
 	['Would you like to use MY cataclysm?'] = '是否使用茗伊团队面板？',
 	['Use'] = '使用',
 	['Not use'] = '不使用',
+
+	['Load ancient config'] = '加载旧版数据',
+	['Please input ancient config name:'] = '请输入旧版数据配置名：',
 }

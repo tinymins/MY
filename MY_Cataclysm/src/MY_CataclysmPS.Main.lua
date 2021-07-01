@@ -65,29 +65,22 @@ function PS.OnPanelActive(frame)
 	y = y + ui:Append('Text', { x = x, y = y, text = _L['configure'], font = 27 }):Height()
 
 	x = X + 10
-	x = x + ui:Append('Text', { x = x, y = y, text = _L['Configuration name'] }):AutoWidth():Width() + 5
-
-	do local szConfigName = MY_Cataclysm.szConfigName
-	x = x + ui:Append('WndEditBox', {
-		x = x, y = y + 3, w = 200, h = 25,
-		text = MY_Cataclysm.szConfigName,
-		onchange = function(txt)
-			szConfigName = LIB.TrimString(txt)
-		end,
-		onblur = function()
-			if szConfigName == MY_Cataclysm.szConfigName then
-				return
-			end
-			MY_CataclysmMain.SetConfigureName(szConfigName)
-			MY_CataclysmMain.CheckEnableTeamPanel()
-			LIB.SwitchTab('MY_Cataclysm', true)
+	x = x + ui:Append('WndButton', {
+		x = x, y = y + 3, w = 120, h = 25,
+		buttonstyle = 'FLAT',
+		text = _L['Load ancient config'],
+		onclick = function()
+			GetUserInput(_L['Please input ancient config name:'], function(szText)
+				MY_CataclysmMain.LoadAncientConfigure(szText)
+				MY_CataclysmMain.CheckEnableTeamPanel()
+				LIB.SwitchTab('MY_Cataclysm', true)
+			end, nil, nil, nil, 'common')
 		end,
 	}):Width() + 5
-	end
 
 	-- »Ö¸´Ä¬ÈÏ
 	y = y + ui:Append('WndButton', {
-		x = x, y = y + 3,
+		x = x, y = y + 3, w = 100,
 		text = _L['Restore default'],
 		buttonstyle = 'FLAT',
 		onclick = function()

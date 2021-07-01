@@ -78,7 +78,6 @@ local TEAM_VOTE_REQUEST = {}
 local BUFF_LIST = {}
 local GKP_RECORD_TOTAL = 0
 local CTM_CAPTION = ''
-local CTM_CONFIG_PLAYER, CTM_CONFIG_LOADED
 local CTM_BUFF_TEAMMON = {}
 local DEBUG = false
 
@@ -166,23 +165,10 @@ end
 LIB.RegisterEvent('MY_TM_DATA_RELOAD', 'MY_CataclysmMain', onTeamMonUpdate)
 end
 
-function D.GetConfigurePath()
-	return {'config/cataclysm/' .. MY_Cataclysm.szConfigName .. '.jx3dat', PATH_TYPE.GLOBAL}
-end
-
-function D.SaveConfigure()
-	if not CTM_CONFIG_LOADED then
-		return
-	end
-	LIB.SaveLUAData(D.GetConfigurePath(), CTM_CONFIG_PLAYER)
-end
-
 function D.SetConfig(Config, bKeepBuff)
-	if bKeepBuff and CTM_CONFIG_PLAYER then
-		Config.aBuffList = CTM_CONFIG_PLAYER.aBuffList
+	if bKeepBuff then
+		Config.aBuffList = nil
 	end
-	CTM_CONFIG_LOADED = true
-	CTM_CONFIG_PLAYER = Config
 	-- update version
 	if Config.tBuffList then
 		Config.aBuffList = {}
@@ -198,40 +184,36 @@ function D.SetConfig(Config, bKeepBuff)
 	-- options fixed
 	if Config.eCss == 'OFFICIAL' then
 		for k, v in pairs(CTM_CONFIG_OFFICIAL) do
-			if type(CTM_CONFIG_PLAYER[k]) == 'nil' then
-				CTM_CONFIG_PLAYER[k] = v
+			if type(Config[k]) == 'nil' then
+				Config[k] = v
 			end
 		end
 	elseif Config.eCss == 'CATACLYSM' then
 		for k, v in pairs(CTM_CONFIG_CATACLYSM) do
-			if type(CTM_CONFIG_PLAYER[k]) == 'nil' then
-				CTM_CONFIG_PLAYER[k] = v
+			if type(Config[k]) == 'nil' then
+				Config[k] = v
 			end
 		end
 	else
 		for k, v in pairs(CTM_CONFIG_DEFAULT) do
-			if type(CTM_CONFIG_PLAYER[k]) == 'nil' then
-				CTM_CONFIG_PLAYER[k] = v
+			if type(Config[k]) == 'nil' then
+				Config[k] = v
 			end
 		end
 	end
-	-- CTM_CONFIG_PLAYER.bFasterHP = false
-	setmetatable(CFG, {
-		__index = CTM_CONFIG_PLAYER,
-		__newindex = CTM_CONFIG_PLAYER,
-	})
+	-- Config.bFasterHP = false
+	for k, v in pairs(Config) do
+		CFG[k] = v
+	end
 	D.UpdateBuffListCache()
 	D.ReloadCataclysmPanel()
 end
 
-function D.SetConfigureName(szConfigName)
-	if szConfigName then
-		if MY_Cataclysm.szConfigName then
-			D.SaveConfigure()
-		end
-		MY_Cataclysm.szConfigName = szConfigName
+function D.LoadAncientConfigure(szConfigName)
+	local xData = LIB.LoadLUAData({'config/cataclysm/' .. szConfigName .. '.jx3dat', PATH_TYPE.GLOBAL})
+	if IsTable(xData) then
+		D.SetConfig(xData)
 	end
-	D.SetConfig(LIB.LoadLUAData(D.GetConfigurePath()) or Clone(CTM_CONFIG_DEFAULT))
 end
 
 function D.GetFrame()
@@ -1257,7 +1239,7 @@ local settings = {
 				'GetFrame',
 				'OpenCataclysmPanel',
 				'CloseCataclysmPanel',
-				'SetConfigureName',
+				'LoadAncientConfigure',
 				'SetFrameSize',
 				'UpdateBuffListCache',
 				'CheckEnableTeamPanel',
@@ -1305,11 +1287,6 @@ LIB.RegisterEvent('PARTY_LEVEL_UP_RAID', function()
 	D.ReloadCataclysmPanel()
 end)
 LIB.RegisterEvent('LOADING_END', D.CheckCataclysmEnable)
-
--- ±£¥Ê∫Õ∂¡»°≈‰÷√
-LIB.RegisterInit('MY_Cataclysm', function() D.SetConfigureName() end)
-LIB.RegisterFlush('MY_Cataclysm', D.SaveConfigure)
-
 
 LIB.RegisterAddonMenu(function()
 	return { szOption = _L['Cataclysm Team Panel'], bCheck = true, bChecked = MY_Cataclysm.bEnable, fnAction = D.ToggleTeamPanel }
