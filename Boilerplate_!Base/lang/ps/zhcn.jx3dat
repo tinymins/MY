@@ -21,6 +21,7 @@ return {
 	['Preset list'] = '共用方案',
 	['* New *'] = '添加方案',
 	['Please input preset id:'] = '请输入共用方案名：',
+	['PRESET_DESC'] = '角色独立方案：\n在该角色上调整插件设置项，不会影响其他角色。\n\n共用配置方案：\n在该角色上调整插件设置项，勾选相同方案的都会被影响。',
 
 	-- welcome
 	['%s, welcome to use %s!'] = '欢迎%s使用%s！',
