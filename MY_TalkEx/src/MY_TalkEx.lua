@@ -56,6 +56,7 @@ end
 --------------------------------------------------------------------------
 local D = {
 	dwTalkTick = 0,
+	dwTalkCDTime = 0,
 }
 local O = LIB.CreateUserSettingsModule('MY_TalkEx', _L['Chat'], {
 	szTalkText = {
@@ -118,14 +119,16 @@ local TALK_CHANNEL_LIST = {
 	{ nChannel = PLAYER_TALK_CHANNEL.TONG_ALLIANCE, szID = 'MSG_GUILD_ALLIANCE' },
 }
 
-local FORCE_LIST = {{ dwForceID = -1, szLabel = _L['Everyone'] }}
+local FORCE_LIST = {
+	-- { dwForceID = -1, szLabel = _L['Everyone'] },
+}
 for i, v in pairs(g_tStrings.tForceTitle) do
 	insert(FORCE_LIST, { dwForceID = i, szLabel = v })
 end
 sort(FORCE_LIST, function(a, b) return a.dwForceID < b.dwForceID end)
 
 local TRICK_FILTER_LIST = {
-	{ szKey = 'NEARBY', szLabel = _L['Nearby players where'] },
+	-- { szKey = 'NEARBY', szLabel = _L['Nearby players where'] },
 	{ szKey = 'RAID'  , szLabel = _L['Teammates where'     ] },
 }
 
@@ -211,6 +214,7 @@ function D.Trick()
 	if #O.szTrickTextEnd > 0 then
 		LIB.SendChat(O.nTrickChannel, O.szTrickTextEnd)
 	end
+	D.dwTalkCDTime = GetTime()
 end
 
 local PS = {}
@@ -354,7 +358,6 @@ function PS.OnPanelActive(wnd)
 					success = function(html, status)
 						local res = LIB.JsonDecode(html)
 						if IsTable(res) then
-							ui:Fetch('WndEditBox_JokeText'):Text(data.data.content)
 							LIB.Alert(LIB.ReplaceSensitiveWord(res.msg))
 						else
 							LIB.Systopmsg(_L['Share error: server error.'], CONSTANT.MSG_THEME.ERROR)
@@ -498,12 +501,26 @@ function PS.OnPanelActive(wnd)
 		end,
 	}):Width() + 5
 	-- µ÷Ù©°´Å¥
-	ui:Append('WndButton', {
+	local uiBtn = ui:Append('WndButton', {
 		x = w - X - 100, y = nY, w = 100,
 		color = {255, 255, 255},
 		text = _L['Trick'],
 		onclick = D.Trick,
 	})
+	LIB.BreatheCall('MY_TalkEx__Enable', function()
+		local dwTime = GetTime() - D.dwTalkCDTime
+		if dwTime > 10000 then
+			uiBtn:Enable(true)
+			uiBtn:Text(_L['Trick'])
+		else
+			uiBtn:Enable(false)
+			uiBtn:Text(_L['Trick'] .. '(' .. floor(dwTime / 1000) .. ')')
+		end
+	end)
+end
+
+function PS.OnPanelDeactive()
+	LIB.BreatheCall('MY_TalkEx__Enable', false)
 end
 
 LIB.RegisterPanel(_L['Chat'], 'TalkEx', _L['MY_TalkEx'], 'UI/Image/UICommon/ScienceTreeNode.UITex|123', PS)
