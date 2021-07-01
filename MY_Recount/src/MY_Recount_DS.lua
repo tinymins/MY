@@ -529,7 +529,6 @@ function D.LoadData()
 		O.bSaveEverything    = false -- Get(data, 'bSaveEverything', false)
 		MY_Recount_UI.CheckOpen()
 	end
-	D.bReady = true
 	D.InitData()
 end
 
@@ -1990,6 +1989,10 @@ LIB.RegisterFlush('MY_Recount_DS', function()
 	if O.bSaveHistoryOnExit then
 		D.SaveHistory()
 	end
+end)
+
+LIB.RegisterUserSettingsUpdate('@@INIT@@', function()
+	D.bReady = true
 end)
 
 -- 同名目标数据合并
