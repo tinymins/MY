@@ -1454,7 +1454,6 @@ local settings = {
 				'szSort',
 				'szSortOrder',
 				'aAlertColumn',
-				'tAlertTodayVal',
 				'tSummaryIgnoreGUID',
 				'bFloatEntry',
 				'bSaveDB',

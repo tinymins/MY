@@ -122,8 +122,8 @@ function GetItemText(KItem)
 			local nBookID = KItem.nGenre == ITEM_GENRE.BOOK and KItem.nBookID or -1
 			local szKey = KItem.dwTabType .. ',' .. KItem.dwIndex .. ',' .. nBookID
 			if not l_tItemText[szKey] then
-				l_tItemText[szKey] = ''
-				l_tItemText[szKey] = LIB.GetPureText(GetItemTip(KItem), 'LUA')
+				local bStatus, szXml = Call(function() return GetItemTip(KItem) end)
+				l_tItemText[szKey] = bStatus and LIB.GetPureText(szXml, 'LUA') or ''
 			end
 			return l_tItemText[szKey]
 		else
