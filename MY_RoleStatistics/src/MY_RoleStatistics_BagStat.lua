@@ -614,6 +614,12 @@ function D.OnMouseEnter()
 	end
 end
 
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_RoleStatistics_BagStat', function()
+	D.bReady = true
+	D.UpdateSaveDB()
+	D.FlushDB()
+end)
+
 -- function D.OnMouseLeave()
 -- 	HideTip()
 -- end
