@@ -714,7 +714,7 @@ function D.OnObjectLeaveScene(dwType, dwID)
 	local KObject = LIB.GetObject(dwType, dwID)
 	if KObject then
 		if dwType == TARGET.NPC then
-			if O.bFocusJJCParty
+			if D.bReady and O.bFocusJJCParty
 			and KObject.dwTemplateID == CHANGGE_REAL_SHADOW_TPLID
 			and LIB.IsInArena() and not (IsEnemy(UI_GetClientPlayerID(), dwID) and LIB.IsShieldedVersion('TARGET')) then
 				D.OnSetFocus(TARGET.PLAYER, KObject.dwEmployer, LIB.GetObjectName(KObject, 'never'), _L['Auto focus party in arena'])
@@ -1104,6 +1104,7 @@ end
 
 do
 local function onInit()
+	D.bReady = true
 	-- 加载设置项数据
 	D.LoadConfig()
 	-- 密码生成
