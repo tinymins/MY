@@ -92,22 +92,6 @@ function PS.OnPanelActive(wnd)
 	}):AutoWidth()
 	nX, nY = X, nY + 30
 
-	nX = nX + ui:Append('WndButtonBox', {
-		x = nX, y = nY,
-		text = _L['Export data'],
-		onclick = function()
-			LIB.OpenUserSettingsExportPanel()
-		end,
-	}):AutoWidth():Width() + 5
-
-	nX = nX + ui:Append('WndButtonBox', {
-		x = nX, y = nY,
-		text = _L['Import data'],
-		onclick = function()
-			LIB.OpenUserSettingsImportPanel()
-		end,
-	}):AutoWidth():Width() + 5
-
 	nX = nX + ui:Append('WndComboBox', {
 		x = nX, y = nY,
 		text = _L['Use preset user settings'],
@@ -187,6 +171,22 @@ function PS.OnPanelActive(wnd)
 				end,
 			})
 			return menu
+		end,
+	}):AutoWidth():Width() + 5
+
+	nX = nX + ui:Append('WndButtonBox', {
+		x = nX, y = nY,
+		text = _L['Export data'],
+		onclick = function()
+			LIB.OpenUserSettingsExportPanel()
+		end,
+	}):AutoWidth():Width() + 5
+
+	nX = nX + ui:Append('WndButtonBox', {
+		x = nX, y = nY,
+		text = _L['Import data'],
+		onclick = function()
+			LIB.OpenUserSettingsImportPanel()
 		end,
 	}):AutoWidth():Width() + 5
 	nX, nY = X, nY + 30

@@ -14,13 +14,13 @@ return {
 	['Disable dismiss'] = '禁止消息自動消失',
 	['System Info'] = '系統信息',
 	['User Settings'] = '角色配置',
-	['Use preset user settings'] = '設置本地共用數據預設方案',
+	['Use preset user settings'] = '插件設置項方案選擇',
 	['Set default preset'] = '設為默認方案',
 	['Delete preset'] = '刪除方案',
 	['Role original user settings'] = '角色獨立方案',
-	['Preset list'] = '共用數據方案',
+	['Preset list'] = '共用方案',
 	['* New *'] = '添加方案',
-	['Please input preset id:'] = '請輸入共用數據預設方案名：',
+	['Please input preset id:'] = '請輸入共用方案名：',
 
 	-- welcome
 	['%s, welcome to use %s!'] = '歡迎%s使用%s！',
