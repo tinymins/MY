@@ -61,7 +61,7 @@ function PS.OnPanelActive(wnd)
 	local W, H = ui:Size()
 	local X, Y = 20, 20
 	local x, y = X, Y
-	local lineHeight = 30
+	local lineHeight = 29
 
 	if MY_Farbnamen and MY_Farbnamen.OnPanelActivePartial then
 		x, y = MY_Farbnamen.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
