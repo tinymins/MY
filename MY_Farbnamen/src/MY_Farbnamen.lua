@@ -76,7 +76,7 @@ local O = LIB.CreateUserSettingsModule('MY_Farbnamen', _L['General'], {
 		ePathType = PATH_TYPE.ROLE,
 		szLabel = _L['MY_Farbnamen'],
 		xSchema = Schema.Number,
-		xDefaultValue = 23,
+		xDefaultValue = 20,
 	},
 })
 local D = {}

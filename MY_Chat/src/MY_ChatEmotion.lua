@@ -65,7 +65,7 @@ local O = LIB.CreateUserSettingsModule('MY_ChatEmotion', _L['Chat'], {
 		ePathType = PATH_TYPE.ROLE,
 		szLabel = _L['MY_Chat'],
 		xSchema = Schema.Number,
-		xDefaultValue = 25,
+		xDefaultValue = 20,
 	},
 })
 local D = {}
