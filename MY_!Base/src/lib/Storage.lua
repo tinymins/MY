@@ -498,7 +498,6 @@ local DATABASE_TYPE_PRESET_FILE = {
 	[PATH_TYPE.GLOBAL] = 'global',
 }
 local DATABASE_INSTANCE = {}
-local DATABASE_NEED_FLUSH = {}
 local USER_SETTINGS_INFO = {}
 local USER_SETTINGS_LIST = {}
 local DATA_CACHE = {}
@@ -517,10 +516,14 @@ function LIB.ConnectUserSettingsDB()
 	end
 	for _, ePathType in ipairs(DATABASE_TYPE_LIST) do
 		if not DATABASE_INSTANCE[ePathType] then
-			local szPath = szPresetRoot
-				and (szPresetRoot .. DATABASE_TYPE_PRESET_FILE[ePathType] .. '.udb')
-				or LIB.FormatPath({'userdata/settings.udb', ePathType})
-			DATABASE_INSTANCE[ePathType] = LIB.UnQLiteConnect(szPath)
+			DATABASE_INSTANCE[ePathType] = {
+				pSettingsDB = LIB.UnQLiteConnect(szPresetRoot
+					and (szPresetRoot .. DATABASE_TYPE_PRESET_FILE[ePathType] .. '.udb')
+					or LIB.FormatPath({'userdata/settings.udb', ePathType})),
+				bSettingsDBCommit = false,
+				pUserdataDB = LIB.UnQLiteConnect(LIB.FormatPath({'userdata/userdata.udb', ePathType})),
+				bUserdataDBCommit = false,
+			}
 		end
 	end
 	DATABASE_CONNECTION_ESTABLISHED = true
@@ -529,10 +532,11 @@ end
 
 function LIB.ReleaseUserSettingsDB()
 	for _, ePathType in ipairs(DATABASE_TYPE_LIST) do
-		if DATABASE_INSTANCE[ePathType] then
-			LIB.UnQLiteDisconnect(DATABASE_INSTANCE[ePathType])
+		local inst = DATABASE_INSTANCE[ePathType]
+		if inst then
+			LIB.UnQLiteDisconnect(inst.pSettingsDB)
+			LIB.UnQLiteDisconnect(inst.pUserdataDB)
 			DATABASE_INSTANCE[ePathType] = nil
-			DATABASE_NEED_FLUSH[ePathType] = nil
 		end
 	end
 	DATA_CACHE = {}
@@ -540,9 +544,16 @@ end
 
 function LIB.FlushUserSettingsDB()
 	for _, ePathType in ipairs(DATABASE_TYPE_LIST) do
-		if DATABASE_INSTANCE[ePathType] and DATABASE_NEED_FLUSH[ePathType] and DATABASE_INSTANCE[ePathType].Commit then
-			DATABASE_INSTANCE[ePathType]:Commit()
-			DATABASE_NEED_FLUSH[ePathType] = nil
+		local inst = DATABASE_INSTANCE[ePathType]
+		if inst then
+			if inst.bSettingsDBCommit and inst.pSettingsDB and inst.pSettingsDB.Commit then
+				inst.pSettingsDB:Commit()
+				inst.bSettingsDBCommit = false
+			end
+			if inst.bUserdataDBCommit and inst.pUserdataDB and inst.pUserdataDB.Commit then
+				inst.pUserdataDB:Commit()
+				inst.bUserdataDBCommit = false
+			end
 		end
 	end
 end
@@ -598,6 +609,7 @@ end
 -- @param {table} tOption 自定义配置项
 --   {PATH_TYPE} tOption.ePathType 配置项保存位置（当前角色、当前服务器、全局）
 --   {string} tOption.szDataKey 配置项入库时的键值，一般不需要手动指定，默认与配置项全局键值一致
+--   {string} tOption.bUserData 配置项是否为角色数据项，为真将忽略预设方案重定向，禁止共用
 --   {string} tOption.szGroup 配置项分组组标题，用于导入导出显示，禁止导入导出请留空
 --   {string} tOption.szLabel 配置标题，用于导入导出显示，禁止导入导出请留空
 --   {string} tOption.szVersion 数据版本号，加载数据时会丢弃版本不一致的数据
@@ -606,10 +618,11 @@ end
 --   {boolean} tOption.bDataSet 是否为配置项组（如用户多套自定义偏好），配置项组在读写时需要额外传入一个组下配置项唯一键值（即多套自定义偏好中某一项的名字）
 --   {table} tOption.tDataSetDefaultValue 数据默认值（仅当 bDataSet 为真时生效，用于设置配置项组不同默认值）
 function LIB.RegisterUserSettings(szKey, tOption)
-	local ePathType, szDataKey, szGroup, szLabel, szVersion, xDefaultValue, xSchema, bDataSet, tDataSetDefaultValue
+	local ePathType, szDataKey, bUserData, szGroup, szLabel, szVersion, xDefaultValue, xSchema, bDataSet, tDataSetDefaultValue
 	if IsTable(tOption) then
 		ePathType = tOption.ePathType
 		szDataKey = tOption.szDataKey
+		bUserData = tOption.bUserData
 		szGroup = tOption.szGroup
 		szLabel = tOption.szLabel
 		szVersion = tOption.szVersion
@@ -659,6 +672,7 @@ function LIB.RegisterUserSettings(szKey, tOption)
 	local tInfo = {
 		szKey = szKey,
 		ePathType = ePathType,
+		bUserData = bUserData,
 		szDataKey = szDataKey,
 		szGroup = szGroup,
 		szLabel = szLabel,
@@ -680,8 +694,11 @@ function LIB.ExportUserSettings(aKey)
 	local tKvp = {}
 	for _, szKey in ipairs(aKey) do
 		local info = USER_SETTINGS_INFO[szKey]
-		local db = info and DATABASE_INSTANCE[info.ePathType]
-		if db then
+		local inst = info and DATABASE_INSTANCE[info.ePathType]
+		if inst then
+			local db = info.bUserData
+				and inst.pUserdataDB
+				or inst.pSettingsDB
 			tKvp[szKey] = db:Get(info.szDataKey)
 		end
 	end
@@ -692,10 +709,13 @@ function LIB.ImportUserSettings(tKvp)
 	local nSuccess = 0
 	for szKey, xValue in pairs(tKvp) do
 		local info = USER_SETTINGS_INFO[szKey]
-		local db = info and DATABASE_INSTANCE[info.ePathType]
-		if db then
-			nSuccess = nSuccess + 1
+		local inst = info and DATABASE_INSTANCE[info.ePathType]
+		if inst then
+			local db = info.bUserData
+				and inst.pUserdataDB
+				or inst.pSettingsDB
 			db:Set(info.szDataKey, xValue)
+			nSuccess = nSuccess + 1
 			DATA_CACHE[szKey] = nil
 		end
 	end
@@ -727,8 +747,11 @@ function LIB.GetUserSettings(szKey, ...)
 	local szErrHeader = 'GetUserSettings KEY(' .. EncodeLUAData(szKey) .. '): '
 	local info = USER_SETTINGS_INFO[szKey]
 	assert(info, szErrHeader ..'`Key` has not been registered.')
-	local db = DATABASE_INSTANCE[info.ePathType]
-	assert(db, szErrHeader ..'Database not connected.')
+	local inst = DATABASE_INSTANCE[info.ePathType]
+	assert(inst, szErrHeader ..'Database not connected.')
+	local db = info.bUserData
+		and inst.pUserdataDB
+		or inst.pSettingsDB
 	local szDataSetKey
 	if info.bDataSet then
 		assert(nParameter == 2, szErrHeader .. '2 parameters expected, got ' .. nParameter)
@@ -787,12 +810,15 @@ function LIB.SetUserSettings(szKey, ...)
 	local szErrHeader = 'SetUserSettings KEY(' .. EncodeLUAData(szKey) .. '): '
 	local info = USER_SETTINGS_INFO[szKey]
 	assert(info, szErrHeader .. '`Key` has not been registered.')
-	local db = DATABASE_INSTANCE[info.ePathType]
-	if not db and LIB.IsDebugClient() then
+	local inst = DATABASE_INSTANCE[info.ePathType]
+	if not inst and LIB.IsDebugClient() then
 		LIB.Debug(PACKET_INFO.NAME_SPACE, szErrHeader .. 'Database not connected!!!', DEBUG_LEVEL.WARNING)
 		return false
 	end
-	assert(db, szErrHeader .. 'Database not connected.')
+	assert(inst, szErrHeader .. 'Database not connected.')
+	local db = info.bUserData
+		and inst.pUserdataDB
+		or inst.pSettingsDB
 	local szDataSetKey, xValue
 	if info.bDataSet then
 		assert(nParameter == 3, szErrHeader .. '3 parameters expected, got ' .. nParameter)
@@ -829,7 +855,11 @@ function LIB.SetUserSettings(szKey, ...)
 		DATA_CACHE[szKey] = nil
 	end
 	db:Set(info.szDataKey, { d = xValue, v = info.szVersion })
-	DATABASE_NEED_FLUSH[info.ePathType] = true
+	if info.bUserData then
+		inst.bUserdataDBCommit = true
+	else
+		inst.bSettingsDBCommit = true
+	end
 	CommonEventFirer(USER_SETTINGS_EVENT, szKey)
 	return true
 end
@@ -843,8 +873,11 @@ function LIB.ResetUserSettings(szKey, ...)
 	local szErrHeader = 'ResetUserSettings KEY(' .. EncodeLUAData(szKey) .. '): '
 	local info = USER_SETTINGS_INFO[szKey]
 	assert(info, szErrHeader .. '`Key` has not been registered.')
-	local db = DATABASE_INSTANCE[info.ePathType]
-	assert(db, szErrHeader .. 'Database not connected.')
+	local inst = DATABASE_INSTANCE[info.ePathType]
+	assert(inst, szErrHeader .. 'Database not connected.')
+	local db = info.bUserData
+		and inst.pUserdataDB
+		or inst.pSettingsDB
 	local szDataSetKey
 	if info.bDataSet then
 		assert(nParameter == 1 or nParameter == 2, szErrHeader .. '1 or 2 parameter(s) expected, got ' .. nParameter)
@@ -874,7 +907,11 @@ function LIB.ResetUserSettings(szKey, ...)
 		db:Delete(info.szDataKey)
 		DATA_CACHE[szKey] = nil
 	end
-	DATABASE_NEED_FLUSH[info.ePathType] = true
+	if info.bUserData then
+		inst.bUserdataDBCommit = true
+	else
+		inst.bSettingsDBCommit = true
+	end
 	CommonEventFirer(USER_SETTINGS_EVENT, szKey)
 end
 
@@ -1314,21 +1351,31 @@ end
 -- UnQLite 数据库
 ------------------------------------------------------------------------------
 do
-local UNQLITE_POOL = {} -- 连接池，有BUG，不能断开连接，不然会挂。
+-- UnQLite 底层当前不支持多句柄访问，所以需要句柄池
+local UNQLITE_POOL = {}
 function LIB.UnQLiteConnect(oPath)
 	local szPath = LIB.FormatPath(oPath)
-	if not UNQLITE_POOL[szPath] then
-		UNQLITE_POOL[szPath] = UnQLite_Open(szPath)
+	local szKey = lower(szPath)
+	local rec = UNQLITE_POOL[szKey]
+	if not rec then
+		rec = {
+			nCount = 0,
+			pUserdataDB = UnQLite_Open(szPath),
+		}
+		UNQLITE_POOL[szKey]	= rec
 	end
-	return UNQLITE_POOL[szPath]
+	rec.nCount = rec.nCount + 1
+	return rec.pUserdataDB
 end
 
 function LIB.UnQLiteDisconnect(db)
-	-- 有BUG，不能断开连接，不然会挂。
-	-- 已修复，等待 KGUI 更新即可。
-	for k, v in pairs(UNQLITE_POOL) do
-		if v == db then
-			UNQLITE_POOL[k] = nil
+	for szKey, rec in pairs(UNQLITE_POOL) do
+		if rec.pUserdataDB == db then
+			rec.nCount = rec.nCount - 1
+			if rec.nCount > 0 then
+				return
+			end
+			UNQLITE_POOL[szKey] = nil
 			break
 		end
 	end
