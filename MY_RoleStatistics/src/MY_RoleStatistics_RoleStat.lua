@@ -124,7 +124,7 @@ local O = LIB.CreateUserSettingsModule('MY_RoleStatistics_RoleStat', _L['General
 	},
 	tAlertTodayVal = {
 		ePathType = PATH_TYPE.ROLE,
-		bUserdata = true,
+		bUserData = true,
 		xSchema = Schema.Any,
 		xDefaultValue = nil,
 	},

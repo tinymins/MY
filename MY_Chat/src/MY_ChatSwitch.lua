@@ -57,7 +57,7 @@ end
 local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['Chat'], {
 	aWhisper = {
 		ePathType = PATH_TYPE.ROLE,
-		bUserdata = true,
+		bUserData = true,
 		xSchema = Schema.Collection(
 			Schema.Tuple(
 				Schema.String, -- szName
@@ -85,7 +85,7 @@ local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['Chat'], {
 	},
 	tChannelCount = {
 		ePathType = PATH_TYPE.ROLE,
-		bUserdata = true,
+		bUserData = true,
 		xSchema = Schema.Record({
 			szDate = Schema.String,
 			tCount = Schema.Map(Schema.Number, Schema.Number),
