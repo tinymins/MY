@@ -49,6 +49,9 @@ return {
     ['hide system msg copy'] = '不複製系統消息',
     ['chat time format'] = '聊天時間格式',
 
+    ['Chat panel namelink ext function'] = '聊天欄角色名高級操作',
+    ['Alt show equip, shift select.'] = '按住 ALT 點擊可查看裝備，按住 SHIFT 點擊可快速選中目標（目標在附近且當前不在特殊對戰地圖）。',
+
     ['MOSAICS_CHAR'] = '…',
     ['chat mosaics'] = '聊天打馬',
     ['chat mosaics (mosaics names in chat panel)'] = '聊天打馬（聊天欄中名字打上馬賽克）',

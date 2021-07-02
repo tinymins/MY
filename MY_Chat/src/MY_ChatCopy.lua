@@ -91,6 +91,12 @@ local O = LIB.CreateUserSettingsModule('MY_ChatCopy', _L['Chat'], {
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
+	bChatNamelinkEx = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Chat'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
 })
 local D = {}
 
@@ -138,8 +144,43 @@ local function onNewChatLine(h, i, szMsg, szChannel, dwTime, nR, nG, nB)
 end
 LIB.HookChatPanel('AFTER', 'MY_ChatCopy', onNewChatLine)
 
+function D.OnChatPanelNamelinkLButtonDown(...)
+	LIB.ChatLinkEventHandlers.OnNameLClick(...)
+end
+
+function D.CheckNamelinkHook(h, nIndex, nEnd)
+	local bEnable = D.bReady and O.bChatNamelinkEx
+	if not nEnd then
+		nEnd = h:GetItemCount() - 1
+	end
+	for i = nIndex, nEnd do
+		local hItem = h:Lookup(i)
+		if hItem:GetName():find('^namelink_%d+$') then
+			UnhookTableFunc(hItem, 'OnItemLButtonDown', D.OnChatPanelNamelinkLButtonDown)
+			if bEnable then
+				HookTableFunc(hItem, 'OnItemLButtonDown', D.OnChatPanelNamelinkLButtonDown, { bAfterOrigin = true })
+			end
+		end
+	end
+end
+
+LIB.HookChatPanel('AFTER', 'MY_ChatCopy__Namelink', function(h, nIndex)
+	D.CheckNamelinkHook(h, nIndex)
+end)
+
+function D.CheckNamelinkEnable()
+	for i = 1, 10 do
+		local h = Station.Lookup('Lowest2/ChatPanel' .. i .. '/Wnd_Message', 'Handle_Message')
+			or Station.Lookup('Normal1/ChatPanel' .. i .. '/Wnd_Message', 'Handle_Message')
+		if h then
+			D.CheckNamelinkHook(h, 0)
+		end
+	end
+end
+
 LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_ChatCopy', function()
 	D.bReady = true
+	D.CheckNamelinkEnable()
 end)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
@@ -232,6 +273,20 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 		isdisable = function()
 			return not O.bChatCopy
 		end,
+	})
+	y = y + deltaY
+
+	x = X
+	ui:Append('WndCheckBox', {
+		x = x, y = y, w = 250,
+		text = _L['Chat panel namelink ext function'],
+		checked = O.bChatNamelinkEx,
+		oncheck = function(bChecked)
+			O.bChatNamelinkEx = bChecked
+			D.CheckNamelinkEnable()
+		end,
+		tip = _L['Alt show equip, shift select.'],
+		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
 	})
 	y = y + deltaY
 
