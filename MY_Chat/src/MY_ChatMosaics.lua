@@ -88,11 +88,11 @@ function D.ResetMosaics()
 	D.bForceUpdate = nil
 	-- hook chat panel
 	if D.bEnabled then
-		LIB.HookChatPanel('AFTER.MY_ChatMosaics', function(h, nIndex)
+		LIB.HookChatPanel('AFTER', 'MY_ChatMosaics', function(h, nIndex)
 			D.Mosaics(h, nIndex)
 		end)
 	else
-		LIB.HookChatPanel('AFTER.MY_ChatMosaics', false)
+		LIB.HookChatPanel('AFTER', 'MY_ChatMosaics', false)
 	end
 	FireUIEvent('ON_MY_MOSAICS_RESET')
 end

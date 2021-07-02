@@ -366,7 +366,7 @@ function D.Render(szMsg, tOption)
 end
 
 -- 插入聊天内容的 HOOK （过滤、加入时间 ）
-LIB.HookChatPanel('BEFORE.MY_FARBNAMEN', function(h, szMsg, ...)
+LIB.HookChatPanel('BEFORE', 'MY_FARBNAMEN', function(h, szMsg, ...)
 	if D.bReady and O.bEnable then
 		szMsg = D.Render(szMsg, true)
 	end

@@ -124,7 +124,7 @@ local l_tChannelHeader = {
 	['MSG_NPC_PARTY'] = g_tStrings.STR_TALK_HEAD_SAY1,
 }
 
-LIB.HookChatPanel('FILTER.MY_ChatFilter', function(h, szMsg, szChannel, dwTime)
+LIB.HookChatPanel('FILTER', 'MY_ChatFilter', function(h, szMsg, szChannel, dwTime)
 	local aXMLNode, aSay
 	-- 插件消息UUID过滤
 	if D.bReady and O.bFilterDuplicateAddonTalk then

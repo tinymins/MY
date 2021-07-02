@@ -98,7 +98,7 @@ function D.Apply()
 				OutputMessage('MSG_WHISPER', szMsg, bRich, nFont, {r, g, b}, dwTalkerID, szName)
 			end
 		end)
-		LIB.HookChatPanel('FILTER.MY_RedirectMetionToWhisper', function(h, szMsg, szChannel, dwTime)
+		LIB.HookChatPanel('FILTER', 'MY_RedirectMetionToWhisper', function(h, szMsg, szChannel, dwTime)
 			if h.__MY_LastMsg == szMsg and h.__MY_LastMsgChannel ~= szChannel and szChannel == 'MSG_WHISPER' then
 				return false
 			end
@@ -107,7 +107,7 @@ function D.Apply()
 			return true
 		end)
 	else
-		LIB.HookChatPanel('FILTER.MY_RedirectMetionToWhisper', false)
+		LIB.HookChatPanel('FILTER', 'MY_RedirectMetionToWhisper', false)
 		LIB.RegisterMsgMonitor('MSG_NORMAL', 'MY_RedirectMetionToWhisper', false)
 		LIB.RegisterMsgMonitor('MSG_PARTY', 'MY_RedirectMetionToWhisper', false)
 		LIB.RegisterMsgMonitor('MSG_MAP', 'MY_RedirectMetionToWhisper', false)

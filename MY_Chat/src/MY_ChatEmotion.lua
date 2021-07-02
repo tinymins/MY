@@ -71,7 +71,7 @@ local O = LIB.CreateUserSettingsModule('MY_ChatEmotion', _L['Chat'], {
 local D = {}
 
 LIB.RegisterInit('MY_ChatEmotion', function()
-	LIB.HookChatPanel('BEFORE.MY_ChatEmotion', function(h, szMsg, ...)
+	LIB.HookChatPanel('BEFORE', 'MY_ChatEmotion', function(h, szMsg, ...)
 		if O.bFixSize then
 			local aXMLNode = LIB.XMLDecode(szMsg)
 			if aXMLNode then

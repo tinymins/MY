@@ -232,7 +232,7 @@ function D.Apply()
 			D.bAhAnimate = D.bAhAnimate or false
 		end
 		-- hook chat panel as event listener
-		LIB.HookChatPanel('AFTER.MY_AutoHideChat', function(h)
+		LIB.HookChatPanel('AFTER', 'MY_AutoHideChat', function(h)
 			-- if input box get focus then return
 			local focus = Station.GetFocusWindow()
 			if focus and focus == LIB.GetChatInput() then
@@ -282,7 +282,7 @@ function D.Apply()
 			editInput.OnKillFocus = nil
 		end
 		editInput._MY_T_AHCP_OnKillFocus = nil
-		LIB.HookChatPanel('AFTER.MY_AutoHideChat', false)
+		LIB.HookChatPanel('AFTER', 'MY_AutoHideChat', false)
 
 		D.ShowChatPanel()
 	end
