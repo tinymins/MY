@@ -45,7 +45,6 @@ local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCal
 local _L = LIB.LoadLangPack(PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 
 local RENDERED_FLAG_KEY = NSFormatString('b{$NS}ChatRendered')
-local ITEM_LBUTTONDOWN_KEY = NSFormatString('__{$NS}_OnItemLButtonDown')
 
 -- 获取聊天输入框
 -- (WndEdit?) LIB.GetChatInput()
@@ -1612,28 +1611,6 @@ local function UnhookAll()
 end
 LIB.RegisterExit('LIB#ChatPanelHook', UnhookAll)
 LIB.RegisterReload('LIB#ChatPanelHook', UnhookAll)
-end
-
-do
-local function OnChatPanelNamelinkLButtonDown(...)
-	if this[ITEM_LBUTTONDOWN_KEY] then
-		this[ITEM_LBUTTONDOWN_KEY](...)
-	end
-	LIB.ChatLinkEventHandlers.OnNameLClick(...)
-end
-
-LIB.HookChatPanel('AFTER', 'LIB#HOOKNAME', function(h, nIndex)
-	for i = nIndex, h:GetItemCount() - 1 do
-		local hItem = h:Lookup(i)
-		if hItem:GetName():find('^namelink_%d+$') and not hItem[RENDERED_FLAG_KEY] then
-			hItem[RENDERED_FLAG_KEY] = true
-			if hItem.OnItemLButtonDown then
-				hItem[ITEM_LBUTTONDOWN_KEY] = hItem.OnItemLButtonDown
-			end
-			hItem.OnItemLButtonDown = OnChatPanelNamelinkLButtonDown
-		end
-	end
-end)
 end
 
 -- 防止山寨
