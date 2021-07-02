@@ -57,6 +57,7 @@ end
 local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['Chat'], {
 	aWhisper = {
 		ePathType = PATH_TYPE.ROLE,
+		bUserdata = true,
 		xSchema = Schema.Collection(
 			Schema.Tuple(
 				Schema.String, -- szName
