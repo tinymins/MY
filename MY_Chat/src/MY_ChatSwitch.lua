@@ -85,6 +85,7 @@ local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['Chat'], {
 	},
 	tChannelCount = {
 		ePathType = PATH_TYPE.ROLE,
+		bUserdata = true,
 		xSchema = Schema.Record({
 			szDate = Schema.String,
 			tCount = Schema.Map(Schema.Number, Schema.Number),
