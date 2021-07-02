@@ -1286,6 +1286,13 @@ LIB.RegisterEvent('PARTY_LEVEL_UP_RAID', function()
 	D.CheckCataclysmEnable()
 	D.ReloadCataclysmPanel()
 end)
+
+LIB.RegisterUserSettingsUpdate('@@INIT@@', function()
+	D.CheckCataclysmEnable()
+	D.UpdateBuffListCache()
+	D.ReloadCataclysmPanel()
+end)
+
 LIB.RegisterEvent('LOADING_END', D.CheckCataclysmEnable)
 
 LIB.RegisterAddonMenu(function()
