@@ -531,6 +531,7 @@ function LIB.ConnectUserSettingsDB()
 end
 
 function LIB.ReleaseUserSettingsDB()
+	CommonEventFirer(USER_SETTINGS_EVENT, '@@UNINIT@@')
 	for _, ePathType in ipairs(DATABASE_TYPE_LIST) do
 		local inst = DATABASE_INSTANCE[ePathType]
 		if inst then
@@ -540,6 +541,7 @@ function LIB.ReleaseUserSettingsDB()
 		end
 	end
 	DATA_CACHE = {}
+	DATABASE_CONNECTION_ESTABLISHED = false
 end
 
 function LIB.FlushUserSettingsDB()
