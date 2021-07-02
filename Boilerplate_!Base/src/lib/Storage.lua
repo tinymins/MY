@@ -521,8 +521,8 @@ function LIB.ConnectUserSettingsDB()
 					and (szPresetRoot .. DATABASE_TYPE_PRESET_FILE[ePathType] .. '.udb')
 					or LIB.FormatPath({'userdata/settings.udb', ePathType})),
 				bSettingsDBCommit = false,
-				pUserdataDB = LIB.UnQLiteConnect(LIB.FormatPath({'userdata/userdata.udb', ePathType})),
-				bUserdataDBCommit = false,
+				pUserDataDB = LIB.UnQLiteConnect(LIB.FormatPath({'userdata/userdata.udb', ePathType})),
+				bUserDataDBCommit = false,
 			}
 		end
 	end
@@ -535,7 +535,7 @@ function LIB.ReleaseUserSettingsDB()
 		local inst = DATABASE_INSTANCE[ePathType]
 		if inst then
 			LIB.UnQLiteDisconnect(inst.pSettingsDB)
-			LIB.UnQLiteDisconnect(inst.pUserdataDB)
+			LIB.UnQLiteDisconnect(inst.pUserDataDB)
 			DATABASE_INSTANCE[ePathType] = nil
 		end
 	end
@@ -550,9 +550,9 @@ function LIB.FlushUserSettingsDB()
 				inst.pSettingsDB:Commit()
 				inst.bSettingsDBCommit = false
 			end
-			if inst.bUserdataDBCommit and inst.pUserdataDB and inst.pUserdataDB.Commit then
-				inst.pUserdataDB:Commit()
-				inst.bUserdataDBCommit = false
+			if inst.bUserDataDBCommit and inst.pUserDataDB and inst.pUserDataDB.Commit then
+				inst.pUserDataDB:Commit()
+				inst.bUserDataDBCommit = false
 			end
 		end
 	end
@@ -697,7 +697,7 @@ function LIB.ExportUserSettings(aKey)
 		local inst = info and DATABASE_INSTANCE[info.ePathType]
 		if inst then
 			local db = info.bUserData
-				and inst.pUserdataDB
+				and inst.pUserDataDB
 				or inst.pSettingsDB
 			tKvp[szKey] = db:Get(info.szDataKey)
 		end
@@ -712,7 +712,7 @@ function LIB.ImportUserSettings(tKvp)
 		local inst = info and DATABASE_INSTANCE[info.ePathType]
 		if inst then
 			local db = info.bUserData
-				and inst.pUserdataDB
+				and inst.pUserDataDB
 				or inst.pSettingsDB
 			db:Set(info.szDataKey, xValue)
 			nSuccess = nSuccess + 1
@@ -750,7 +750,7 @@ function LIB.GetUserSettings(szKey, ...)
 	local inst = DATABASE_INSTANCE[info.ePathType]
 	assert(inst, szErrHeader ..'Database not connected.')
 	local db = info.bUserData
-		and inst.pUserdataDB
+		and inst.pUserDataDB
 		or inst.pSettingsDB
 	local szDataSetKey
 	if info.bDataSet then
@@ -817,7 +817,7 @@ function LIB.SetUserSettings(szKey, ...)
 	end
 	assert(inst, szErrHeader .. 'Database not connected.')
 	local db = info.bUserData
-		and inst.pUserdataDB
+		and inst.pUserDataDB
 		or inst.pSettingsDB
 	local szDataSetKey, xValue
 	if info.bDataSet then
@@ -856,7 +856,7 @@ function LIB.SetUserSettings(szKey, ...)
 	end
 	db:Set(info.szDataKey, { d = xValue, v = info.szVersion })
 	if info.bUserData then
-		inst.bUserdataDBCommit = true
+		inst.bUserDataDBCommit = true
 	else
 		inst.bSettingsDBCommit = true
 	end
@@ -876,7 +876,7 @@ function LIB.ResetUserSettings(szKey, ...)
 	local inst = DATABASE_INSTANCE[info.ePathType]
 	assert(inst, szErrHeader .. 'Database not connected.')
 	local db = info.bUserData
-		and inst.pUserdataDB
+		and inst.pUserDataDB
 		or inst.pSettingsDB
 	local szDataSetKey
 	if info.bDataSet then
@@ -908,7 +908,7 @@ function LIB.ResetUserSettings(szKey, ...)
 		DATA_CACHE[szKey] = nil
 	end
 	if info.bUserData then
-		inst.bUserdataDBCommit = true
+		inst.bUserDataDBCommit = true
 	else
 		inst.bSettingsDBCommit = true
 	end
@@ -1170,17 +1170,17 @@ function LIB.UnQLiteConnect(oPath)
 	if not rec then
 		rec = {
 			nCount = 0,
-			pUserdataDB = UnQLite_Open(szPath),
+			pUserDataDB = UnQLite_Open(szPath),
 		}
 		UNQLITE_POOL[szKey]	= rec
 	end
 	rec.nCount = rec.nCount + 1
-	return rec.pUserdataDB
+	return rec.pUserDataDB
 end
 
 function LIB.UnQLiteDisconnect(db)
 	for szKey, rec in pairs(UNQLITE_POOL) do
-		if rec.pUserdataDB == db then
+		if rec.pUserDataDB == db then
 			rec.nCount = rec.nCount - 1
 			if rec.nCount > 0 then
 				return
