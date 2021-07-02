@@ -124,21 +124,19 @@ function PS.OnPanelActive(wnd)
 		end,
 		autoenable = function() return not D.IsShielded() end,
 	}):AutoWidth():Width() + 5
-	-- 配置文件名称
-	x = x + ui:Append('WndEditBox', {
-		x = x, y = y, w = 200, h = 25,
-		placeholder = _L['Configure name'],
-		text = MY_LifeBar.szConfig,
-		onblur = function()
-			local szConfig = UI(this):Text():gsub('%s', '')
-			if szConfig == '' then
-				return
-			end
-			Config('load', szConfig)
-			LoadUI(ui)
+	-- 加载旧版配置文件
+	x = x + ui:Append('WndButton', {
+		x = x, y = y, w = 120, h = 25,
+		buttonstyle = 'FLAT',
+		text = _L['Load ancient config'],
+		onclick = function()
+			GetUserInput(_L['Please input ancient config name:'], function(szText)
+				Config('load', szText)
+				LIB.SwitchTab('MY_LifeBar', true)
+			end, nil, nil, nil, 'common')
 		end,
 		autoenable = function() return D.IsEnabled() end,
-	}):AutoWidth():Width() + 5
+	}):Width() + 5
 	x = 310
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, w = 155, text = _L['Auto hide system headtop'],
@@ -446,6 +444,7 @@ function PS.OnPanelActive(wnd)
 						UI.OpenColorPicker(function(r, g, b)
 							cfg.Player = { r, g, b }
 							opt.rgb = cfg.Player
+							Config.Color = Config.Color
 						end)
 					end
 					insert(opt, {
@@ -454,11 +453,13 @@ function PS.OnPanelActive(wnd)
 						bChecked = not cfg.DifferentiateForce,
 						fnAction = function(_, r, g, b)
 							cfg.DifferentiateForce = false
+							Config.Color = Config.Color
 						end,
 						rgb = cfg.Player,
 						fnChangeColor = function(_, r, g, b)
 							cfg.Player = {r, g, b}
 							opt.rgb = cfg.Player
+							Config.Color = Config.Color
 						end,
 					})
 					insert(opt, {
@@ -467,6 +468,7 @@ function PS.OnPanelActive(wnd)
 						bChecked = cfg.DifferentiateForce,
 						fnAction = function(_, r, g, b)
 							cfg.DifferentiateForce = true
+							Config.Color = Config.Color
 						end,
 					})
 					insert(opt, { bDevide = true })
@@ -476,6 +478,7 @@ function PS.OnPanelActive(wnd)
 							rgb = cfg[dwForceID],
 							fnChangeColor = function(_, r, g, b)
 								cfg[dwForceID] = { r, g, b }
+								Config.Color = Config.Color
 							end,
 							fnDisable = function()
 								return not cfg.DifferentiateForce
@@ -501,6 +504,7 @@ function PS.OnPanelActive(wnd)
 						UI.OpenColorPicker(function(r, g, b)
 							cfg.Npc = { r, g, b }
 							opt.rgb = cfg.Npc
+							Config.Color = Config.Color
 						end)
 					end
 					insert(t, opt)
@@ -512,7 +516,7 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + offsety
 
-	local function GeneBooleanPopupMenu(cfgs, szPlayerTip, szNpcTip)
+	local function GeneBooleanPopupMenu(szKey, cfgs, szPlayerTip, szNpcTip)
 		local t = {}
 		if szPlayerTip then
 			insert(t, { szOption = szPlayerTip, bDisable = true } )
@@ -525,6 +529,7 @@ function PS.OnPanelActive(wnd)
 						bChecked = cfg.Player.bEnable,
 						fnAction = function()
 							cfg.Player.bEnable = not cfg.Player.bEnable
+							Config[szKey] = Config[szKey]
 							D.Reset()
 						end,
 						{
@@ -533,6 +538,7 @@ function PS.OnPanelActive(wnd)
 							bChecked = cfg.Player.bOnlyFighting,
 							fnAction = function()
 								cfg.Player.bOnlyFighting = not cfg.Player.bOnlyFighting
+								Config[szKey] = Config[szKey]
 							end,
 						},
 					})
@@ -553,6 +559,7 @@ function PS.OnPanelActive(wnd)
 						bChecked = cfg.Npc.bEnable,
 						fnAction = function()
 							cfg.Npc.bEnable = not cfg.Npc.bEnable
+							Config[szKey] = Config[szKey]
 							D.Reset()
 						end,
 						{
@@ -561,6 +568,7 @@ function PS.OnPanelActive(wnd)
 							bChecked = cfg.Npc.bOnlyFighting,
 							fnAction = function()
 								cfg.Npc.bOnlyFighting = not cfg.Npc.bOnlyFighting
+								Config[szKey] = Config[szKey]
 							end,
 						},
 						{
@@ -569,6 +577,7 @@ function PS.OnPanelActive(wnd)
 							bChecked = cfg.Npc.bHidePets,
 							fnAction = function()
 								cfg.Npc.bHidePets = not cfg.Npc.bHidePets
+								Config[szKey] = Config[szKey]
 							end,
 						},
 					})
@@ -582,7 +591,7 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndComboBox', {
 		x = x, y = y, text = _L['Name display config'],
 		menu = function()
-			return GeneBooleanPopupMenu(Config.ShowName, _L['Player name display'], _L['Npc name display'])
+			return GeneBooleanPopupMenu('ShowName', Config.ShowName, _L['Player name display'], _L['Npc name display'])
 		end,
 		autoenable = function() return D.IsEnabled() end,
 	})
@@ -592,7 +601,7 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndComboBox', {
 		x = x, y = y, text = _L['Title display config'],
 		menu = function()
-			return GeneBooleanPopupMenu(Config.ShowTitle, _L['Player title display'], _L['Npc title display'])
+			return GeneBooleanPopupMenu('ShowTitle', Config.ShowTitle, _L['Player title display'], _L['Npc title display'])
 		end,
 		autoenable = function() return D.IsEnabled() end,
 	})
@@ -602,7 +611,7 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndComboBox', {
 		x = x, y = y, text = _L['Tong display config'],
 		menu = function()
-			return GeneBooleanPopupMenu(Config.ShowTong, _L['Player tong display'])
+			return GeneBooleanPopupMenu('ShowTong', Config.ShowTong, _L['Player tong display'])
 		end,
 		autoenable = function() return D.IsEnabled() end,
 	})
@@ -612,7 +621,7 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndComboBox', {
 		x = x, y = y, text = _L['Lifebar display config'],
 		menu = function()
-			local t = GeneBooleanPopupMenu(Config.ShowLife, _L['Player lifebar display'], _L['Npc lifebar display'])
+			local t = GeneBooleanPopupMenu('ShowLife', Config.ShowLife, _L['Player lifebar display'], _L['Npc lifebar display'])
 			insert(t, { bDevide = true })
 			local t1 = {
 				szOption = _L['Draw direction'],
@@ -638,7 +647,7 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndComboBox', {
 		x = x, y = y, text = _L['Lifepercentage display config'],
 		menu = function()
-			local t = GeneBooleanPopupMenu(Config.ShowLifePer, _L['Player lifepercentage display'], _L['Npc lifepercentage display'])
+			local t = GeneBooleanPopupMenu('ShowLifePer', Config.ShowLifePer, _L['Player lifepercentage display'], _L['Npc lifepercentage display'])
 			insert(t, { bDevide = true })
 			insert(t, {
 				szOption = _L['Hide decimal'],
@@ -669,6 +678,7 @@ function PS.OnPanelActive(wnd)
 						bChecked = cfg.Player.bEnable,
 						fnAction = function()
 							cfg.Player.bEnable = not cfg.Player.bEnable
+							Config.ShowBalloon = Config.ShowBalloon
 							D.Reset()
 						end,
 					})
@@ -685,6 +695,7 @@ function PS.OnPanelActive(wnd)
 						bChecked = cfg.Npc.bEnable,
 						fnAction = function()
 							cfg.Npc.bEnable = not cfg.Npc.bEnable
+							Config.ShowBalloon = Config.ShowBalloon
 							D.Reset()
 						end,
 					})
@@ -705,6 +716,7 @@ function PS.OnPanelActive(wnd)
 							bChecked = cfg.nDuring == nDuring,
 							fnAction = function()
 								cfg.nDuring = nDuring
+								Config.BalloonChannel = Config.BalloonChannel
 								D.Reset()
 							end,
 							fnDisable = function() return not cfg.bEnable end,
@@ -716,6 +728,7 @@ function PS.OnPanelActive(wnd)
 						bCheck = true, bChecked = cfg.bEnable,
 						fnAction = function()
 							cfg.bEnable = not cfg.bEnable
+							Config.BalloonChannel = Config.BalloonChannel
 							D.Reset()
 						end,
 						t1,

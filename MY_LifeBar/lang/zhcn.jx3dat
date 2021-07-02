@@ -2,7 +2,9 @@ return {
     ['MY_LifeBar'] = '头顶血条',
 
     ['Enable'] = '启用',
-    ['Configure name'] = '配置文件名称',
+	['Load ancient config'] = '加载旧版数据',
+	['Please input ancient config name:'] = '请输入旧版数据配置名：',
+
     ['Auto hide system headtop'] = '自动隐藏官方头顶',
 
     ['Only enable in checked map types'] = '勾选后仅在勾选类型的地图中启用扁平血条，全部取消勾选表示所有地图启用。',

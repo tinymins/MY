@@ -55,6 +55,637 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^5.0.0') then
 end
 --------------------------------------------------------------------------
 
+local function SchemaRelationForce(itemschema)
+	return Schema.Map(
+		Schema.OneOf('Self', 'Party', 'Enemy', 'Neutrality', 'Ally', 'Foe'),
+		function(obj, path)
+			if not IsTable(obj) then
+				return Schema.Error('Invalid value: '..path..' must be table', path)
+			end
+			for k, v in pairs(obj) do
+				path:push(k)
+				if k == 'DifferentiateForce' then
+					if not IsBoolean(v) then
+						return Schema.Error('Invalid value: ' .. path .. ' must be boolean', path)
+					end
+				else
+					local err = itemschema(v, path)
+					if err then
+						return err
+					end
+				end
+				path:pop()
+			end
+			return nil
+		end
+	)
+end
+local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
+	eCss = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = Schema.String,
+		xDefaultValue = '',
+	},
+	fDesignUIScale = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = Schema.Number,
+		xDefaultValue = 1,
+	},
+	nDesignFontOffset = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = Schema.Number,
+		xDefaultValue = 0,
+	},
+
+	nCamp = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = Schema.Number,
+		xDefaultValue = -1,
+	},
+	bOnlyInArena = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bOnlyInDungeon = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bOnlyInBattleField = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+
+	nTextOffsetY = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = Schema.Number,
+		xDefaultValue = 38,
+	},
+	nTextLineHeight = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = Schema.Number,
+		xDefaultValue = 20,
+	},
+	fTextScale = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = Schema.Number,
+		xDefaultValue = 1.2,
+	},
+	fTextSpacing = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = Schema.Number,
+		xDefaultValue = 0,
+	},
+
+	bShowSpecialNpc = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bShowSpecialNpcOnlyEnemy = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bShowObjectID = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bShowObjectIDOnlyUnnamed = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bShowKungfu = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bShowDistance = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	nDistanceDecimal = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = Schema.Number,
+		xDefaultValue = 0,
+	},
+
+	nLifeWidth = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = Schema.Number,
+		xDefaultValue = 52,
+	},
+	nLifeHeight = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = Schema.Number,
+		xDefaultValue = 2,
+	},
+	nLifePadding = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = Schema.Number,
+		xDefaultValue = 0,
+	},
+	nLifeOffsetX = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = Schema.Number,
+		xDefaultValue = 0,
+	},
+	nLifeOffsetY = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = Schema.Number,
+		xDefaultValue = 12,
+	},
+	nLifeBorder = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = Schema.Number,
+		xDefaultValue = 2,
+	},
+	nLifeBorderR = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = Schema.Number,
+		xDefaultValue = 0,
+	},
+	nLifeBorderG = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = Schema.Number,
+		xDefaultValue = 0,
+	},
+	nLifeBorderB = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = Schema.Number,
+		xDefaultValue = 0,
+	},
+	szLifeDirection = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = Schema.String,
+		xDefaultValue = 'LEFT_RIGHT',
+	},
+
+	nLifePerOffsetX = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = Schema.Number,
+		xDefaultValue = 0,
+	},
+	nLifePerOffsetY = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = Schema.Number,
+		xDefaultValue = 8,
+	},
+
+	fTitleEffectScale = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = Schema.Number,
+		xDefaultValue = 0.7,
+	},
+	nTitleEffectOffsetY = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = Schema.Number,
+		xDefaultValue = 0,
+	},
+	nBalloonOffsetY = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = Schema.Number,
+		xDefaultValue = -20,
+	},
+
+	nAlpha = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = Schema.Number,
+		xDefaultValue = 255,
+	},
+	nFont = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = Schema.Number,
+		xDefaultValue = 7,
+	},
+	nDistance = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = Schema.Number,
+		xDefaultValue = 80 * 80 * 64 * 64,
+	},
+	nVerticalDistance = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = Schema.Number,
+		xDefaultValue = 50 * 8 * 64,
+	},
+
+	bHideLifePercentageWhenFight = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bHideLifePercentageDecimal = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+
+	fGlobalUIScale = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = Schema.Number,
+		xDefaultValue = 1,
+	},
+	bSystemUIScale = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bShowWhenUIHide = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bMineOnTop = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bTargetOnTop = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	bScreenPosSort = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+
+	Color = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = SchemaRelationForce(Schema.Tuple(Schema.Number, Schema.Number, Schema.Number)),
+		xDefaultValue = {
+			Self = LIB.KvpToObject({ -- 自己
+				{'DifferentiateForce', false},
+				{'Player', { 26, 156, 227 }},
+				{'Npc', { 26, 156, 227 }},
+				{FORCE_TYPE.JIANG_HU , { 255, 255, 255 }}, -- 江湖
+				{FORCE_TYPE.SHAO_LIN , { 255, 178, 95  }}, -- 少林
+				{FORCE_TYPE.WAN_HUA  , { 196, 152, 255 }}, -- 万花
+				{FORCE_TYPE.TIAN_CE  , { 255, 111, 83  }}, -- 天策
+				{FORCE_TYPE.CHUN_YANG, { 22 , 216, 216 }}, -- 纯阳 56,175,255
+				{FORCE_TYPE.QI_XIU   , { 255, 129, 176 }}, -- 七秀
+				{FORCE_TYPE.WU_DU    , { 55 , 147, 255 }}, -- 五毒
+				{FORCE_TYPE.TANG_MEN , { 121, 183, 54  }}, -- 唐门
+				{FORCE_TYPE.CANG_JIAN, { 214, 249, 93  }}, -- 藏剑
+				{FORCE_TYPE.GAI_BANG , { 205, 133, 63  }}, -- 丐帮
+				{FORCE_TYPE.MING_JIAO, { 240, 70 , 96  }}, -- 明教
+				{FORCE_TYPE.CANG_YUN , { 180, 60 , 0   }}, -- 苍云
+				{FORCE_TYPE.CHANG_GE , { 100, 250, 180 }}, -- 长歌
+				{FORCE_TYPE.BA_DAO   , { 106, 108, 189 }}, -- 霸刀
+			}),
+			Party = LIB.KvpToObject({ -- 团队
+				{'DifferentiateForce', false},
+				{'Player', { 23, 133, 194 }},
+				{'Npc', { 23, 133, 194 }},
+				{FORCE_TYPE.JIANG_HU , { 255, 255, 255 }}, -- 江湖
+				{FORCE_TYPE.SHAO_LIN , { 255, 178, 95  }}, -- 少林
+				{FORCE_TYPE.WAN_HUA  , { 196, 152, 255 }}, -- 万花
+				{FORCE_TYPE.TIAN_CE  , { 255, 111, 83  }}, -- 天策
+				{FORCE_TYPE.CHUN_YANG, { 22 , 216, 216 }}, -- 纯阳 56,175,255
+				{FORCE_TYPE.QI_XIU   , { 255, 129, 176 }}, -- 七秀
+				{FORCE_TYPE.WU_DU    , { 55 , 147, 255 }}, -- 五毒
+				{FORCE_TYPE.TANG_MEN , { 121, 183, 54  }}, -- 唐门
+				{FORCE_TYPE.CANG_JIAN, { 214, 249, 93  }}, -- 藏剑
+				{FORCE_TYPE.GAI_BANG , { 205, 133, 63  }}, -- 丐帮
+				{FORCE_TYPE.MING_JIAO, { 240, 70 , 96  }}, -- 明教
+				{FORCE_TYPE.CANG_YUN , { 180, 60 , 0   }}, -- 苍云
+				{FORCE_TYPE.CHANG_GE , { 100, 250, 180 }}, -- 长歌
+				{FORCE_TYPE.BA_DAO   , { 106, 108, 189 }}, -- 霸刀
+			}),
+			Enemy = LIB.KvpToObject({ -- 敌对
+				{'DifferentiateForce', false},
+				{'Player', { 203, 53, 9 }},
+				{'Npc', { 203, 53, 9 }},
+				{FORCE_TYPE.JIANG_HU , { 255, 255, 255 }}, -- 江湖
+				{FORCE_TYPE.SHAO_LIN , { 255, 178, 95  }}, -- 少林
+				{FORCE_TYPE.WAN_HUA  , { 196, 152, 255 }}, -- 万花
+				{FORCE_TYPE.TIAN_CE  , { 255, 111, 83  }}, -- 天策
+				{FORCE_TYPE.CHUN_YANG, { 22 , 216, 216 }}, -- 纯阳 56,175,255
+				{FORCE_TYPE.QI_XIU   , { 255, 129, 176 }}, -- 七秀
+				{FORCE_TYPE.WU_DU    , { 55 , 147, 255 }}, -- 五毒
+				{FORCE_TYPE.TANG_MEN , { 121, 183, 54  }}, -- 唐门
+				{FORCE_TYPE.CANG_JIAN, { 214, 249, 93  }}, -- 藏剑
+				{FORCE_TYPE.GAI_BANG , { 205, 133, 63  }}, -- 丐帮
+				{FORCE_TYPE.MING_JIAO, { 240, 70 , 96  }}, -- 明教
+				{FORCE_TYPE.CANG_YUN , { 180, 60 , 0   }}, -- 苍云
+				{FORCE_TYPE.CHANG_GE , { 100, 250, 180 }}, -- 长歌
+				{FORCE_TYPE.BA_DAO   , { 106, 108, 189 }}, -- 霸刀
+			}),
+			Neutrality = LIB.KvpToObject({ -- 中立
+				{'DifferentiateForce', false},
+				{'Player', { 238, 238, 15 }},
+				{'Npc', { 238, 238, 15 }},
+				{FORCE_TYPE.JIANG_HU , { 255, 255, 255 }}, -- 江湖
+				{FORCE_TYPE.SHAO_LIN , { 255, 178, 95  }}, -- 少林
+				{FORCE_TYPE.WAN_HUA  , { 196, 152, 255 }}, -- 万花
+				{FORCE_TYPE.TIAN_CE  , { 255, 111, 83  }}, -- 天策
+				{FORCE_TYPE.CHUN_YANG, { 22 , 216, 216 }}, -- 纯阳 56,175,255
+				{FORCE_TYPE.QI_XIU   , { 255, 129, 176 }}, -- 七秀
+				{FORCE_TYPE.WU_DU    , { 55 , 147, 255 }}, -- 五毒
+				{FORCE_TYPE.TANG_MEN , { 121, 183, 54  }}, -- 唐门
+				{FORCE_TYPE.CANG_JIAN, { 214, 249, 93  }}, -- 藏剑
+				{FORCE_TYPE.GAI_BANG , { 205, 133, 63  }}, -- 丐帮
+				{FORCE_TYPE.MING_JIAO, { 240, 70 , 96  }}, -- 明教
+				{FORCE_TYPE.CANG_YUN , { 180, 60 , 0   }}, -- 苍云
+				{FORCE_TYPE.CHANG_GE , { 100, 250, 180 }}, -- 长歌
+				{FORCE_TYPE.BA_DAO   , { 106, 108, 189 }}, -- 霸刀
+			}),
+			Ally = LIB.KvpToObject({ -- 相同阵营
+				{'DifferentiateForce', false},
+				{'Player', { 63 , 210, 94 }},
+				{'Npc', { 63 , 210, 94 }},
+				{FORCE_TYPE.JIANG_HU , { 255, 255, 255 }}, -- 江湖
+				{FORCE_TYPE.SHAO_LIN , { 255, 178, 95  }}, -- 少林
+				{FORCE_TYPE.WAN_HUA  , { 196, 152, 255 }}, -- 万花
+				{FORCE_TYPE.TIAN_CE  , { 255, 111, 83  }}, -- 天策
+				{FORCE_TYPE.CHUN_YANG, { 22 , 216, 216 }}, -- 纯阳 56,175,255
+				{FORCE_TYPE.QI_XIU   , { 255, 129, 176 }}, -- 七秀
+				{FORCE_TYPE.WU_DU    , { 55 , 147, 255 }}, -- 五毒
+				{FORCE_TYPE.TANG_MEN , { 121, 183, 54  }}, -- 唐门
+				{FORCE_TYPE.CANG_JIAN, { 214, 249, 93  }}, -- 藏剑
+				{FORCE_TYPE.GAI_BANG , { 205, 133, 63  }}, -- 丐帮
+				{FORCE_TYPE.MING_JIAO, { 240, 70 , 96  }}, -- 明教
+				{FORCE_TYPE.CANG_YUN , { 180, 60 , 0   }}, -- 苍云
+				{FORCE_TYPE.CHANG_GE , { 100, 250, 180 }}, -- 长歌
+				{FORCE_TYPE.BA_DAO   , { 106, 108, 189 }}, -- 霸刀
+			}),
+			Foe = LIB.KvpToObject({ -- 仇人
+				{'DifferentiateForce', false},
+				{'Player', { 197, 26, 201 }},
+				{FORCE_TYPE.JIANG_HU , { 255, 255, 255 }}, -- 江湖
+				{FORCE_TYPE.SHAO_LIN , { 255, 178, 95  }}, -- 少林
+				{FORCE_TYPE.WAN_HUA  , { 196, 152, 255 }}, -- 万花
+				{FORCE_TYPE.TIAN_CE  , { 255, 111, 83  }}, -- 天策
+				{FORCE_TYPE.CHUN_YANG, { 22 , 216, 216 }}, -- 纯阳 56,175,255
+				{FORCE_TYPE.QI_XIU   , { 255, 129, 176 }}, -- 七秀
+				{FORCE_TYPE.WU_DU    , { 55 , 147, 255 }}, -- 五毒
+				{FORCE_TYPE.TANG_MEN , { 121, 183, 54  }}, -- 唐门
+				{FORCE_TYPE.CANG_JIAN, { 214, 249, 93  }}, -- 藏剑
+				{FORCE_TYPE.GAI_BANG , { 205, 133, 63  }}, -- 丐帮
+				{FORCE_TYPE.MING_JIAO, { 240, 70 , 96  }}, -- 明教
+				{FORCE_TYPE.CANG_YUN , { 180, 60 , 0   }}, -- 苍云
+				{FORCE_TYPE.CHANG_GE , { 100, 250, 180 }}, -- 长歌
+				{FORCE_TYPE.BA_DAO   , { 106, 108, 189 }}, -- 霸刀
+			}),
+		},
+	},
+	ShowName = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = SchemaRelationForce(Schema.Record({
+			bEnable = Schema.Boolean,
+			bOnlyFighting = Schema.Boolean,
+			bHidePets = Schema.Optional(Schema.Boolean),
+		})),
+		xDefaultValue = {
+			Self = {
+				Npc = { bEnable = true, bOnlyFighting = false, bHidePets = false },
+				Player = { bEnable = true, bOnlyFighting = false },
+			},
+			Party = {
+				Npc = { bEnable = true, bOnlyFighting = false, bHidePets = false },
+				Player = { bEnable = true, bOnlyFighting = false },
+			},
+			Enemy = {
+				Npc = { bEnable = true, bOnlyFighting = false, bHidePets = false },
+				Player = { bEnable = true, bOnlyFighting = false },
+			},
+			Neutrality = {
+				Npc = { bEnable = true, bOnlyFighting = false, bHidePets = false },
+				Player = { bEnable = true, bOnlyFighting = false },
+			},
+			Ally = {
+				Npc = { bEnable = true, bOnlyFighting = false, bHidePets = false },
+				Player = { bEnable = true, bOnlyFighting = false },
+			},
+			Foe = { Player = { bEnable = true, bOnlyFighting = false } },
+		},
+	},
+	ShowTong = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = SchemaRelationForce(Schema.Record({
+			bEnable = Schema.Boolean,
+			bOnlyFighting = Schema.Boolean,
+			bHidePets = Schema.Optional(Schema.Boolean),
+		})),
+		xDefaultValue = {
+			Self = {
+				Npc = { bEnable = false, bOnlyFighting = false, bHidePets = false },
+				Player = { bEnable = false, bOnlyFighting = false },
+			},
+			Party = { Player = { bEnable = false, bOnlyFighting = false } },
+			Enemy = { Player = { bEnable = false, bOnlyFighting = false } },
+			Neutrality = { Player = { bEnable = false, bOnlyFighting = false } },
+			Ally = { Player = { bEnable = false, bOnlyFighting = false } },
+			Foe = { Player = { bEnable = true, bOnlyFighting = false } },
+		},
+	},
+	ShowTitle = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = SchemaRelationForce(Schema.Record({
+			bEnable = Schema.Boolean,
+			bOnlyFighting = Schema.Boolean,
+			bHidePets = Schema.Optional(Schema.Boolean),
+		})),
+		xDefaultValue = {
+			Self = {
+				Npc = { bEnable = false, bOnlyFighting = false, bHidePets = false },
+				Player = { bEnable = false, bOnlyFighting = false },
+			},
+			Party = {
+				Npc = { bEnable = true, bOnlyFighting = false, bHidePets = false },
+				Player = { bEnable = false, bOnlyFighting = false },
+			},
+			Enemy = {
+				Npc = { bEnable = true, bOnlyFighting = false, bHidePets = false },
+				Player = { bEnable = false, bOnlyFighting = false },
+			},
+			Neutrality = {
+				Npc = { bEnable = true, bOnlyFighting = false, bHidePets = false },
+				Player = { bEnable = false, bOnlyFighting = false },
+			},
+			Ally = {
+				Npc = { bEnable = true, bOnlyFighting = false, bHidePets = false },
+				Player = { bEnable = false, bOnlyFighting = false },
+			},
+			Foe = { Player = { bEnable = false, bOnlyFighting = false } },
+		},
+	},
+	ShowLife = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = SchemaRelationForce(Schema.Record({
+			bEnable = Schema.Boolean,
+			bOnlyFighting = Schema.Boolean,
+			bHidePets = Schema.Optional(Schema.Boolean),
+		})),
+		xDefaultValue = {
+			Self = {
+				Npc = { bEnable = true, bOnlyFighting = false, bHidePets = false },
+				Player = { bEnable = true, bOnlyFighting = false },
+			},
+			Party = {
+				Npc = { bEnable = false, bOnlyFighting = false, bHidePets = false },
+				Player = { bEnable = false, bOnlyFighting = false },
+			},
+			Enemy = {
+				Npc = { bEnable = true, bOnlyFighting = false, bHidePets = false },
+				Player = { bEnable = false, bOnlyFighting = false },
+			},
+			Neutrality = {
+				Npc = { bEnable = false, bOnlyFighting = false, bHidePets = false },
+				Player = { bEnable = false, bOnlyFighting = false },
+			},
+			Ally = {
+				Npc = { bEnable = false, bOnlyFighting = false, bHidePets = false },
+				Player = { bEnable = false, bOnlyFighting = false },
+			},
+			Foe = { Player = { bEnable = false, bOnlyFighting = false } },
+		},
+	},
+	ShowLifePer = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = SchemaRelationForce(Schema.Record({
+			bEnable = Schema.Boolean,
+			bOnlyFighting = Schema.Boolean,
+			bHidePets = Schema.Optional(Schema.Boolean),
+		})),
+		xDefaultValue = {
+			Self = {
+				Npc = { bEnable = false, bOnlyFighting = false, bHidePets = false },
+				Player = { bEnable = false, bOnlyFighting = false },
+			},
+			Party = {
+				Npc = { bEnable = false, bOnlyFighting = false, bHidePets = false },
+				Player = { bEnable = false, bOnlyFighting = false },
+			},
+			Enemy = {
+				Npc = { bEnable = false, bOnlyFighting = false, bHidePets = false },
+				Player = { bEnable = false, bOnlyFighting = false },
+			},
+			Neutrality = {
+				Npc = { bEnable = false, bOnlyFighting = false, bHidePets = false },
+				Player = { bEnable = false, bOnlyFighting = false },
+			},
+			Ally = {
+				Npc = { bEnable = false, bOnlyFighting = false, bHidePets = false },
+				Player = { bEnable = false, bOnlyFighting = false },
+			},
+			Foe = { Player = { bEnable = false, bOnlyFighting = false } },
+		},
+	},
+	ShowBalloon = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = SchemaRelationForce(Schema.Record({
+			bEnable = Schema.Boolean,
+		})),
+		xDefaultValue = {
+			Self = {
+				Npc = { bEnable = true },
+				Player = { bEnable = true },
+			},
+			Party = {
+				Npc = { bEnable = true },
+				Player = { bEnable = true },
+			},
+			Enemy = {
+				Npc = { bEnable = true },
+				Player = { bEnable = true },
+			},
+			Neutrality = {
+				Npc = { bEnable = true },
+				Player = { bEnable = true },
+			},
+			Ally = {
+				Npc = { bEnable = true },
+				Player = { bEnable = true },
+			},
+			Foe = { Player = { bEnable = true } },
+		},
+	},
+	BalloonChannel = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = Schema.Map(
+			Schema.String,
+			Schema.Record({
+				bEnable = Schema.Boolean,
+				nDuring = Schema.Number,
+			})
+		),
+		xDefaultValue = {
+			['MSG_NORMAL'           ] = { bEnable = true, nDuring = 5000 },
+			['MSG_TEAM'             ] = { bEnable = true, nDuring = 5000 },
+			['MSG_PARTY'            ] = { bEnable = true, nDuring = 5000 },
+			['MSG_GUILD'            ] = { bEnable = true, nDuring = 9000 },
+			['MSG_MAP'              ] = { bEnable = true, nDuring = 9000 },
+			['MSG_BATTLE_FILED'     ] = { bEnable = true, nDuring = 9000 },
+			['MSG_NPC_NEARBY'       ] = { bEnable = true, nDuring = 9000 },
+			['MSG_NPC_PARTY'        ] = { bEnable = true, nDuring = 9000 },
+			['MSG_NPC_YELL'         ] = { bEnable = true, nDuring = 9000 },
+			['MSG_NPC_WHISPER'      ] = { bEnable = true, nDuring = 9000 },
+			['MSG_STORY_NPC'        ] = { bEnable = true, nDuring = 9000 },
+			['MSG_STORY_PLAYER'     ] = { bEnable = true, nDuring = 9000 },
+			['MSG_BATTLE_FIELD_SIDE'] = { bEnable = true, nDuring = 5000 },
+		},
+	},
+})
 local D = {}
 
 local function LoadDefaultTemplate(szStyle)
@@ -80,31 +711,30 @@ local function LoadDefaultTemplate(szStyle)
 	return template
 end
 
-local CONFIG_DEFAULTS, Config
-local ConfigLoaded = false
-local CONFIG_PATH = 'config/xlifebar/%s.jx3dat'
+local CONFIG_DEFAULTS = setmetatable({}, {
+	__index = function(t, k)
+		assert(k ~= 'DEFAULT', 'Default config not exist!!!')
+		return t.DEFAULT
+	end,
+})
 
-function D.Init()
-	CONFIG_DEFAULTS = setmetatable({
-		DEFAULT  = LoadDefaultTemplate('default'),
-		OFFICIAL = LoadDefaultTemplate('official'),
-		CLEAR    = LoadDefaultTemplate('clear'),
-		XLIFEBAR = LoadDefaultTemplate('xlifebar'),
-	}, {
-		__call = function(t, k, d)
-			local template = t[k]
-			return LIB.FormatDataStructure(d, template[1], true, template[2])
-		end,
-		__index = function(t, k) return t.DEFAULT end,
-	})
-	if not CONFIG_DEFAULTS.DEFAULT then
-		return LIB.Debug(_L['MY_LifeBar'], _L['Default config cannot be loaded, please reinstall!!!'], DEBUG_LEVEL.ERROR)
-	end
-	Config = CONFIG_DEFAULTS('DEFAULT')
+local function FormatConfigData(szStyle, d)
+	local template = CONFIG_DEFAULTS[szStyle]
+	return LIB.FormatDataStructure(d, template[1], true, template[2])
 end
 
-function D.GetConfigPath()
-	return (CONFIG_PATH:format(MY_LifeBar.szConfig))
+local Config = O
+local ConfigLoaded = false
+
+function D.Init()
+	CONFIG_DEFAULTS.DEFAULT  = LoadDefaultTemplate('default')
+	CONFIG_DEFAULTS.OFFICIAL = LoadDefaultTemplate('official')
+	CONFIG_DEFAULTS.CLEAR    = LoadDefaultTemplate('clear')
+	CONFIG_DEFAULTS.XLIFEBAR = LoadDefaultTemplate('xlifebar')
+	if not CONFIG_DEFAULTS.DEFAULT or not CONFIG_DEFAULTS.OFFICIAL or not CONFIG_DEFAULTS.CLEAR or not CONFIG_DEFAULTS.XLIFEBAR then
+		return LIB.Debug(_L['MY_LifeBar'], _L['Default config cannot be loaded, please reinstall!!!'], DEBUG_LEVEL.ERROR)
+	end
+	FormatConfigData('DEFAULT', O)
 end
 
 -- 根据玩家自定义界面缩放设置反向缩放 实现默认设置不受用户缩放影响
@@ -133,34 +763,31 @@ LIB.RegisterEvent('UI_SCALED', 'MY_LifeBar_Config', onUIScaled)
 end
 
 function D.LoadConfig(szConfig)
+	local tConfig
 	if IsTable(szConfig) then
-		Config = szConfig
-		ConfigLoaded = true
-	else
-		if IsString(szConfig) then
-			if MY_LifeBar.szConfig ~= szConfig then
-				if ConfigLoaded then
-					D.SaveConfig()
-				end
-				MY_LifeBar.szConfig = szConfig
-			end
-		end
-		Config = LIB.LoadLUAData({ D.GetConfigPath(), PATH_TYPE.GLOBAL })
+		tConfig = szConfig
+	elseif IsString(szConfig) then
+		tConfig = LIB.LoadLUAData({ 'config/xlifebar/' .. szConfig .. '.jx3dat', PATH_TYPE.GLOBAL })
 	end
-	if Config and not Config.fDesignUIScale then -- 兼容老数据
-		for _, key in ipairs({'ShowName', 'ShowTong', 'ShowTitle', 'ShowLife', 'ShowLifePer'}) do
-			for _, relation in ipairs({'Self', 'Party', 'Enemy', 'Neutrality', 'Ally', 'Foe'}) do
-				for _, tartype in ipairs({'Npc', 'Player'}) do
-					if Config[key] and IsTable(Config[key][relation]) and IsBoolean(Config[key][relation][tartype]) then
-						Config[key][relation][tartype] = { bEnable = Config[key][relation][tartype] }
+	if tConfig then
+		if not tConfig.fDesignUIScale then -- 兼容老数据
+			for _, key in ipairs({'ShowName', 'ShowTong', 'ShowTitle', 'ShowLife', 'ShowLifePer'}) do
+				for _, relation in ipairs({'Self', 'Party', 'Enemy', 'Neutrality', 'Ally', 'Foe'}) do
+					for _, tartype in ipairs({'Npc', 'Player'}) do
+						if tConfig[key] and IsTable(tConfig[key][relation]) and IsBoolean(tConfig[key][relation][tartype]) then
+							tConfig[key][relation][tartype] = { bEnable = tConfig[key][relation][tartype] }
+						end
 					end
 				end
 			end
+			tConfig.fDesignUIScale = LIB.GetUIScale()
+			tConfig.fMatchedFontOffset = Font.GetOffset()
 		end
-		Config.fDesignUIScale = LIB.GetUIScale()
-		Config.fMatchedFontOffset = Font.GetOffset()
+		tConfig = FormatConfigData(tConfig.eCss or 'DEFAULT', tConfig)
+		for k, v in pairs(tConfig) do
+			Call(Set, Config, {k}, v)
+		end
 	end
-	Config = CONFIG_DEFAULTS('DEFAULT', Config)
 	D.AutoAdjustScale()
 	ConfigLoaded = true
 	FireUIEvent('MY_LIFEBAR_CONFIG_LOADED')
@@ -170,14 +797,6 @@ LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_LifeBar_Config', function()
 	D.Init()
 	D.LoadConfig()
 end)
-
-function D.SaveConfig()
-	if not ConfigLoaded then
-		return
-	end
-	LIB.SaveLUAData({ D.GetConfigPath(), PATH_TYPE.GLOBAL }, Config)
-end
-LIB.RegisterFlush(D.SaveConfig)
 
 MY_LifeBar_Config = setmetatable({}, {
 	__call = function(t, op, ...)
@@ -213,19 +832,19 @@ MY_LifeBar_Config = setmetatable({}, {
 					{
 						szOption = _L['Official default style'],
 						fnAction = function()
-							D.LoadConfig(CONFIG_DEFAULTS('OFFICIAL'))
+							D.LoadConfig(FormatConfigData('OFFICIAL'))
 						end,
 					},
 					{
 						szOption = _L['Official clear style'],
 						fnAction = function()
-							D.LoadConfig(CONFIG_DEFAULTS('CLEAR'))
+							D.LoadConfig(FormatConfigData('CLEAR'))
 						end,
 					},
 					{
 						szOption = _L['XLifeBar style'],
 						fnAction = function()
-							D.LoadConfig(CONFIG_DEFAULTS('XLIFEBAR'))
+							D.LoadConfig(FormatConfigData('XLIFEBAR'))
 						end,
 					},
 					{
@@ -238,10 +857,8 @@ MY_LifeBar_Config = setmetatable({}, {
 					},
 				})
 			else
-				D.LoadConfig(CONFIG_DEFAULTS(argv[1]))
+				D.LoadConfig(FormatConfigData(argv[1]))
 			end
-		elseif op == 'save' then
-			return D.SaveConfig(...)
 		elseif op == 'load' then
 			return D.LoadConfig(...)
 		elseif op == 'loaded' then

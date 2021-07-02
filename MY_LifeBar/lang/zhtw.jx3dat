@@ -2,7 +2,9 @@ return {
     ['MY_LifeBar'] = '頭頂血條',
 
     ['Enable'] = '啟用',
-    ['Configure name'] = '配置文件名稱',
+	['Load ancient config'] = '載入舊版數據',
+	['Please input ancient config name:'] = '請輸入舊版數據配置名：',
+
     ['Auto hide system headtop'] = '自動隱藏官方頭頂',
 
     ['Only enable in checked map types'] = '勾選後僅在勾選類型的地圖中啟用扁平血條，全部取消勾選表示所有地圖啟用。',

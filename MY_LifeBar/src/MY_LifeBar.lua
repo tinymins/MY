@@ -230,12 +230,6 @@ local O = LIB.CreateUserSettingsModule('MY_LifeBar', _L['General'], {
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
-	szConfig = {
-		ePathType = PATH_TYPE.ROLE,
-		szLabel = _L['MY_LifeBar'],
-		xSchema = Schema.String,
-		xDefaultValue = 'common',
-	},
 	bAutoHideSysHeadtop = {
 		ePathType = PATH_TYPE.ROLE,
 		szLabel = _L['MY_LifeBar'],
@@ -895,7 +889,6 @@ local settings = {
 		{
 			fields = {
 				'bEnabled',
-				'szConfig',
 				'bAutoHideSysHeadtop',
 			},
 			root = O,
@@ -905,7 +898,6 @@ local settings = {
 		{
 			fields = {
 				'bEnabled',
-				'szConfig',
 				'bAutoHideSysHeadtop',
 			},
 			root = O,
