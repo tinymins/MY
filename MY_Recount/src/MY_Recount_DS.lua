@@ -1995,6 +1995,10 @@ LIB.RegisterUserSettingsUpdate('@@INIT@@', function()
 	D.bReady = true
 end)
 
+LIB.RegisterUserSettingsUpdate('@@UNINIT@@', function()
+	D.bReady = false
+end)
+
 -- 同名目标数据合并
 do local tDstDetail, id, tDstSkill, tDstSkillDetail, tDstSkillTarget, tDstTarget, tDstTargetDetail, tDstTargetSkill
 function D.MergeTargetData(tDst, tSrc, data, szChannel, bMergeNpc, bMergeEffect, bHideAnonymous)
