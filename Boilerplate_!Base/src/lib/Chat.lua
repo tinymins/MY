@@ -1622,7 +1622,7 @@ local function OnChatPanelNamelinkLButtonDown(...)
 	LIB.ChatLinkEventHandlers.OnNameLClick(...)
 end
 
-LIB.HookChatPanel(NSFormatString('AFTER.{$NS}#HOOKNAME'), function(h, nIndex)
+LIB.HookChatPanel('AFTER', 'LIB#HOOKNAME', function(h, nIndex)
 	for i = nIndex, h:GetItemCount() - 1 do
 		local hItem = h:Lookup(i)
 		if hItem:GetName():find('^namelink_%d+$') and not hItem[RENDERED_FLAG_KEY] then
