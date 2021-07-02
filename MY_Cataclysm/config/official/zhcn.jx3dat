@@ -5,7 +5,7 @@ return {
 	bShowInRaid            = false,
 	bEditMode              = false,
 	bShowAllGrid           = false,
-	tAnchor                = {},
+	tAnchor                = { s = 'LEFTCENTER', r = 'LEFTCENTER', x = 100, y = -200 },
 	nAutoLinkMode          = 5,
 	nBGColorMode           = 3, -- 0 不着色 1 根据距离 2 根据门派 3官方着色
 	nColoredName           = 0,
