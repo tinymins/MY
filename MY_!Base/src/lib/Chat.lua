@@ -1494,12 +1494,9 @@ local CHAT_HOOK = {
 	AFTER = {},
 	FILTER = {},
 }
-function LIB.HookChatPanel(szType, fnAction)
-	local szKey = nil
-	local nPos = StringFindW(szType, '.')
-	if nPos then
-		szKey = sub(szType, nPos + 1)
-		szType = sub(szType, 1, nPos - 1)
+function LIB.HookChatPanel(szType, szKey, fnAction)
+	if IsFunction(szKey) then
+		szKey, fnAction = nil, szKey
 	end
 	if not CHAT_HOOK[szType] then
 		return
