@@ -735,6 +735,7 @@ local function CallErrorHandler(errMsg)
 	xpErrMsg = errMsg
 	xpTraceback = GetTraceback():gsub('^([^\n]+\n)[^\n]+\n', '%1')
 	xpErrLog = (errMsg or '') .. '\n' .. xpTraceback
+	Log(xpErrLog)
 	FireUIEvent('CALL_LUA_ERROR', xpErrLog .. '\n')
 end
 local function XpCallErrorHandler(errMsg)
