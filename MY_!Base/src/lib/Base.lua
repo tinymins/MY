@@ -711,17 +711,8 @@ end
 -----------------------------------------------
 -- 获取调用栈
 -----------------------------------------------
-local TRACEBACK_DEL = ('\n[^\n]*' .. _NAME_SPACE_ .. '%.lua:%d+:%sin%sfunction%s\'GetTraceback\'[^\n]*'):gsub('(%%?)(.)', function(percent, letter)
-    if percent ~= '' or not letter:match('%a') then
-		-- if the '%' matched, or `letter` is not a letter, return "as is"
-		return percent .. letter
-    else
-		-- else, return a case-insensitive character class of the matched letter
-		return format('[%s%s]', letter:lower(), letter:upper())
-    end
-end)
 local function GetTraceback(str)
-	local traceback = debug and debug.traceback and debug.traceback():gsub(TRACEBACK_DEL, '')
+	local traceback = debug and debug.traceback and debug.traceback():gsub('^([^\n]+\n)[^\n]+\n', '%1')
 	if traceback then
 		if str then
 			str = str .. '\n' .. traceback
@@ -736,18 +727,19 @@ end
 -----------------------------------------------
 local Call, XpCall
 do
-local xpAction, xpArgs, xpErrMsg, xpTraceback
+local xpAction, xpArgs, xpErrMsg, xpTraceback, xpErrLog
 local function CallHandler()
 	return xpAction(unpack(xpArgs))
 end
 local function CallErrorHandler(errMsg)
 	xpErrMsg = errMsg
-	xpTraceback = GetTraceback()
-	FireUIEvent('CALL_LUA_ERROR', GetTraceback(errMsg) .. '\n')
+	xpTraceback = GetTraceback():gsub('^([^\n]+\n)[^\n]+\n', '%1')
+	xpErrLog = (errMsg or '') .. '\n' .. xpTraceback
+	FireUIEvent('CALL_LUA_ERROR', xpErrLog .. '\n')
 end
 local function XpCallErrorHandler(errMsg)
 	xpErrMsg = errMsg
-	xpTraceback = GetTraceback()
+	xpTraceback = GetTraceback():gsub('^([^\n]+\n)[^\n]+\n', '%1')
 end
 function Call(arg0, ...)
 	xpAction, xpArgs, xpErrMsg, xpTraceback = arg0, {...}, nil, nil
