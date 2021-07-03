@@ -563,12 +563,24 @@ function D.UpdateTree(frame, elRoot, bDropSel)
 end
 end
 
-TraceButton_AppendAddonMenu({function()
+local ENVIRONMENT = LIB.ENVIRONMENT
+if not ENVIRONMENT.UI_EDITOR then
+	TraceButton_AppendAddonMenu({function()
+		for _, f in ipairs(ENVIRONMENT.UI_EDITOR) do
+			local v = f()
+			if v then
+				return v
+			end
+		end
+	end})
+	ENVIRONMENT.UI_EDITOR = {}
+end
+insert(ENVIRONMENT.UI_EDITOR, function()
 	if not LIB.IsDebugClient('Dev_UIEditor') then
 		return
 	end
 	return {{ szOption = _L['Dev_UIEditor'], fnAction = D.CreateFrame }}
-end})
+end)
 
 -- Global exports
 do

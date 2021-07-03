@@ -84,7 +84,19 @@ local function GetMeun(ui)
 	return menu
 end
 
-TraceButton_AppendAddonMenu({function()
+local ENVIRONMENT = LIB.ENVIRONMENT
+if not ENVIRONMENT.UI_MANAGER then
+	TraceButton_AppendAddonMenu({function()
+		for _, f in ipairs(ENVIRONMENT.UI_MANAGER) do
+			local v = f()
+			if v then
+				return v
+			end
+		end
+	end})
+	ENVIRONMENT.UI_MANAGER = {}
+end
+insert(ENVIRONMENT.UI_MANAGER, function()
 	if not LIB.IsDebugClient('Dev_UIManager') then
 		return
 	end
@@ -93,4 +105,4 @@ TraceButton_AppendAddonMenu({function()
 		insert(menu, GetMeun(v))
 	end
 	return {menu}
-end})
+end)
