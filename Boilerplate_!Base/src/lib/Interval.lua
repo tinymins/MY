@@ -76,6 +76,18 @@ if DelayCall and BreatheCall and FrameCall and RenderCall then
 				fnAction = nil
 			end
 			if fnAction then -- reg
+				--[[#DEBUG BEGIN]]
+				local f = fnAction
+				local function GetCallReturnVal(res, ...)
+					if res then
+						return ...
+					end
+					assert(false, ...)
+				end
+				fnAction = function(...)
+					return GetCallReturnVal(Call(f, ...))
+				end
+				--[[#DEBUG END]]
 				if not szKey then -- ÄäÃûµ÷ÓÃ
 					szKey = GetTickCount()
 					while IntervalCall(NS_PREFIX .. tostring(szKey)) do
