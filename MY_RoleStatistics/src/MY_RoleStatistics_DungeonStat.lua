@@ -948,7 +948,12 @@ function D.OnItemMouseEnter()
 		local aText = {}
 		local map = LIB.GetMapInfo(this.mapid)
 		if map then
-			insert(aText, map.szName)
+			local szName = map.szName
+			local aCD = D.tMapSaveCopy[map.dwID]
+			if not IsEmpty(aCD) then
+				szName = szName .. ' (' .. concat(aCD, ', ') .. ')'
+			end
+			insert(aText, szName)
 		end
 		if name == 'Image_ProgressBoss' then
 			insert(aText, '')
