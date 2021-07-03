@@ -122,9 +122,11 @@ local O = LIB.CreateUserSettingsModule('MY_RoleStatistics_DungeonStat', _L['Gene
 })
 local D = {
 	tMapSaveCopy = {}, -- 单秘境 CD
-	tMapProgress = {}, -- 单首领 CD
-	bMapProgressValid = false, -- 客户端缓存的秘境进度有效
-	dwMapProgressRequestTime = 0, -- 最后一次请求秘境进度时间
+	bMapSaveCopyValid = false, -- 客户端缓存的单秘境 CD 数据有效
+	dwMapSaveCopyRequestTime = 0, -- 最后一次请求单秘境 CD 时间
+	tMapProgress = {}, -- 单首领 CD 进度
+	tMapProgressValid = {}, -- 客户端缓存的单首领 CD 进度数据有效
+	tMapProgressRequestTime = {}, -- 客户端缓存的单首领 CD 进度数据有效
 }
 
 local EXCEL_WIDTH = 960
@@ -402,7 +404,7 @@ end
 end
 
 function D.FlushDB(bForceUpdate)
-	if not O.bSaveDB then
+	if not D.bReady or not O.bSaveDB then
 		return
 	end
 	--[[#DEBUG BEGIN]]
@@ -427,9 +429,24 @@ function D.FlushDB(bForceUpdate)
 end
 LIB.RegisterFlush('MY_RoleStatistics_DungeonStat', function() D.FlushDB() end)
 
-do local INIT = false
+function D.InitDB()
+	local me = GetClientPlayer()
+	if me then
+		DB_DungeonInfoG:ClearBindings()
+		DB_DungeonInfoG:BindAll(AnsiToUTF8(me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName))
+		local result = DB_DungeonInfoG:GetAll()
+		local rec = result[1]
+		if rec then
+			D.DecodeRow(rec)
+			D.tMapSaveCopy = DecodeLUAData(rec.copy_info) or {}
+			D.tMapProgress = DecodeLUAData(rec.progress_info) or {}
+		end
+	end
+end
+LIB.RegisterInit('MY_RoleStatistics_DungeonStat', D.InitDB)
+
 function D.UpdateSaveDB()
-	if not INIT then
+	if not D.bReady then
 		return
 	end
 	local me = GetClientPlayer()
@@ -448,8 +465,6 @@ function D.UpdateSaveDB()
 		--[[#DEBUG END]]
 	end
 	FireUIEvent('MY_ROLE_STAT_DUNGEON_UPDATE')
-end
-LIB.RegisterInit('MY_RoleStatistics_DungeonUpdateSaveDB', function() INIT = true end)
 end
 
 function D.GetColumns()
@@ -569,15 +584,7 @@ function D.UpdateUI(page)
 	hList:FormatAllItemPos()
 end
 
-function D.OnGetMapSaveCopyResopnse(tMapCopy)
-	D.tMapSaveCopy = tMapCopy
-end
-
 function D.UpdateMapProgress(bForceUpdate)
-	-- 如果不是强制刷新秘境进度并且已经请求过，则不再重复发起
-	if not bForceUpdate and D.bMapProgressValid then
-		return
-	end
 	local me = GetClientPlayer()
 	if not me then -- 确保不可能在切换GS时请求
 		return
@@ -587,17 +594,25 @@ function D.UpdateMapProgress(bForceUpdate)
 		local dwID = szID and tonumber(szID)
 		local aProgressBoss = dwID and LIB.IsDungeonRoleProgressMap(dwID) and Table_GetCDProcessBoss(dwID)
 		if aProgressBoss then
-			ApplyDungeonRoleProgress(dwID, UI_GetClientPlayerID())
-			local aProgress = {}
-			for i, boss in ipairs(aProgressBoss) do
-				aProgress[i] = GetDungeonRoleProgress(dwID, UI_GetClientPlayerID(), boss.dwProgressID)
+			-- 强制刷新秘境进度，或者进度数据已过期并且5秒内未请求过，则发起请求
+			if bForceUpdate or (not D.tMapProgressValid[dwID] and GetTime() - D.tMapProgressRequestTime[dwID] > 5000) then
+				D.tMapProgressRequestTime[dwID] = GetTime()
+				ApplyDungeonRoleProgress(dwID, UI_GetClientPlayerID())
 			end
-			D.tMapProgress[dwID] = aProgress
+			if D.tMapProgressValid[dwID] then
+				local aProgress = {}
+				for i, boss in ipairs(aProgressBoss) do
+					aProgress[i] = GetDungeonRoleProgress(dwID, UI_GetClientPlayerID(), boss.dwProgressID)
+				end
+				D.tMapProgress[dwID] = aProgress
+			end
 		end
 	end
-	D.dwMapProgressRequestTime = GetTime()
-	D.bMapProgressValid = true
-	LIB.GetMapSaveCopy(D.OnGetMapSaveCopyResopnse)
+	-- 强制刷新秘境进度，或者进度数据已过期并且5秒内未请求过，则发起请求
+	if bForceUpdate or (not D.bMapSaveCopyValid and GetTime() - D.dwMapSaveCopyRequestTime > 5000) then
+		D.dwMapSaveCopyRequestTime = GetTime()
+		ApplyMapSaveCopy()
+	end
 end
 
 function D.EncodeRow(rec)
@@ -1005,24 +1020,30 @@ function D.UpdateFloatEntry()
 	D.ApplyFloatEntry(O.bFloatEntry)
 end
 
--- 首领死亡刷新秘境进度
+-- 首领死亡刷新秘境进度（秘境内同步拾取则视为进度更新）
 LIB.RegisterEvent('SYNC_LOOT_LIST', 'MY_RoleStatistics_DungeonStat__UpdateMapCopy', function()
 	if not D.bReady or not LIB.IsInDungeon() then
 		return
 	end
+	local me = GetClientPlayer()
+	if me then
+		D.bMapSaveCopyValid = false
+		D.tMapProgressValid[me.GetMapID()] = false
+	end
 	LIB.DelayCall('MY_RoleStatistics_DungeonStat__UpdateMapCopy', 300, function() D.UpdateMapProgress() end)
 end)
 LIB.RegisterEvent('UPDATE_DUNGEON_ROLE_PROGRESS', function()
-	if not D.bReady or not LIB.IsInDungeon() or GetTime() - D.dwMapProgressRequestTime < 5000 then
+	local dwMapID, dwPlayerID = arg0, arg1
+	if dwPlayerID ~= UI_GetClientPlayerID() then
 		return
 	end
-	D.bMapProgressValid = false
+	D.tMapProgressValid[dwMapID] = true
 	D.FlushDB()
 end)
 LIB.RegisterEvent('ON_APPLY_PLAYER_SAVED_COPY_RESPOND', function()
-	if not D.bReady or not LIB.IsInDungeon() then
-		return
-	end
+	local tMapCopy = arg0
+	D.tMapSaveCopy = tMapCopy
+	D.bMapSaveCopyValid = true
 	D.FlushDB()
 end)
 LIB.RegisterInit('MY_RoleStatistics_DungeonEntry', function()
