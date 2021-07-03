@@ -126,7 +126,7 @@ local D = {
 	dwMapSaveCopyRequestTime = 0, -- 最后一次请求单秘境 CD 时间
 	tMapProgress = {}, -- 单首领 CD 进度
 	tMapProgressValid = {}, -- 客户端缓存的单首领 CD 进度数据有效
-	tMapProgressRequestTime = {}, -- 客户端缓存的单首领 CD 进度数据有效
+	tMapProgressRequestTime = setmetatable({}, { __index = function() return 0 end }), -- 客户端缓存的单首领 CD 进度数据有效
 }
 
 local EXCEL_WIDTH = 960
@@ -517,6 +517,7 @@ function D.UpdateUI(page)
 		end
 		hCol.szSort = col.id
 		hCol.szTip = col.szTitleTip
+		hCol.szDebugTip = 'id: ' .. col.id
 		hCol:SetRelX(nX)
 		hCol:SetW(nWidth)
 		txt:SetW(nWidth)
@@ -599,7 +600,8 @@ function D.UpdateMapProgress(bForceUpdate)
 				D.tMapProgressRequestTime[dwID] = GetTime()
 				ApplyDungeonRoleProgress(dwID, UI_GetClientPlayerID())
 			end
-			if D.tMapProgressValid[dwID] then
+			-- 已经获取到进度的秘境，或者没有 CD 数据的秘境
+			if D.tMapProgressValid[dwID] or (D.bMapSaveCopyValid and not D.tMapSaveCopy[dwID]) then
 				local aProgress = {}
 				for i, boss in ipairs(aProgressBoss) do
 					aProgress[i] = GetDungeonRoleProgress(dwID, UI_GetClientPlayerID(), boss.dwProgressID)
@@ -963,6 +965,9 @@ function D.OnItemMouseEnter()
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
 		local szXml = GetFormatText(this.szTip or this:Lookup('Text_DungeonStat_Title'):GetText(), 162, 255, 255, 255)
+		if IsCtrlKeyDown() and this.szDebugTip then
+			szXml = szXml .. CONSTANT.XML_LINE_BREAKER .. GetFormatText(this.szDebugTip, 102)
+		end
 		OutputTip(szXml, 450, {x, y, w, h}, UI.TIP_POSITION.TOP_BOTTOM)
 	elseif this.tip then
 		local x, y = this:GetAbsPos()
