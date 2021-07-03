@@ -96,7 +96,7 @@ local DEBUG_LEVEL = SetmetaReadonly({
 	DEBUG   = 3,
 })
 local ENVIRONMENT = _G.PLUGIN_ENVIRONMENT
-if not type(ENVIRONMENT) == 'table' then
+if type(ENVIRONMENT) ~= 'table' then
 	ENVIRONMENT = {}
 	_G.PLUGIN_ENVIRONMENT = ENVIRONMENT
 end
