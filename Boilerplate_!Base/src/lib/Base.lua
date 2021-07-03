@@ -95,27 +95,31 @@ local DEBUG_LEVEL = SetmetaReadonly({
 	ERROR   = 3,
 	DEBUG   = 3,
 })
+local ENVIRONMENT = _G.PLUGIN_ENVIRONMENT
+if not type(ENVIRONMENT) == 'table' then
+	ENVIRONMENT = {}
+	_G.PLUGIN_ENVIRONMENT = ENVIRONMENT
+end
 ---------------------------------------------------
 -- µ÷ÊÔ¹¤¾ß
 ---------------------------------------------------
 if _DEBUG_LEVEL_ <= DEBUG_LEVEL.DEBUG then
-	if not ECHO_LUA_ERROR then
-		ECHO_LUA_ERROR = { ID = _NAME_SPACE_ }
-	elseif type(ECHO_LUA_ERROR) == 'table' then
-		ECHO_LUA_ERROR.ID = _NAME_SPACE_
-	end
-	RegisterEvent('CALL_LUA_ERROR', function()
-		if ECHO_LUA_ERROR and ECHO_LUA_ERROR.ID == _NAME_SPACE_ then
+	if not ENVIRONMENT.ECHO_LUA_ERROR then
+		RegisterEvent('CALL_LUA_ERROR', function()
 			print(arg0)
 			OutputMessage('MSG_SYS', arg0)
-		end
-	end)
-	TraceButton_AppendAddonMenu({{
-		szOption = 'ReloadUIAddon',
-		fnAction = function()
-			ReloadUIAddon()
-		end,
-	}})
+		end)
+		ENVIRONMENT.ECHO_LUA_ERROR = _NAME_SPACE_
+	end
+	if not ENVIRONMENT.RELOAD_UI_ADDON then
+		TraceButton_AppendAddonMenu({{
+			szOption = 'ReloadUIAddon',
+			fnAction = function()
+				ReloadUIAddon()
+			end,
+		}})
+		ENVIRONMENT.RELOAD_UI_ADDON = _NAME_SPACE_
+	end
 end
 Log('[' .. _NAME_SPACE_ .. '] Debug level ' .. _DEBUG_LEVEL_ .. ' / delog level ' .. _DELOG_LEVEL_)
 -------------------------------------------------------------------------------------------------------
@@ -1511,6 +1515,7 @@ local LIB = {
 	LoadLangPack     = LoadLangPack    ,
 	GLOBAL           = GLOBAL          ,
 	CONSTANT         = CONSTANT        ,
+	ENVIRONMENT      = ENVIRONMENT     ,
 	PATH_TYPE        = PATH_TYPE       ,
 	DEBUG_LEVEL      = DEBUG_LEVEL     ,
 	PACKET_INFO      = PACKET_INFO     ,
