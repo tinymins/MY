@@ -2599,11 +2599,7 @@ function LIB.GetItemAmountInAllPackages(dwTabType, dwIndex, nBookID, bFull)
 				InsertItem(cache, GetPlayerItem(me, dwBox, dwX))
 			end
 		end
-		for nLogicIndex = 0, CONSTANT.EQUIPMENT_SUIT_COUNT - 1 do
-			local nSuitIndex = me.GetEquipIDArray(nLogicIndex)
-			local dwBox = nSuitIndex == 0
-				and INVENTORY_INDEX.EQUIP
-				or INVENTORY_INDEX['EQUIP_BACKUP' .. nSuitIndex]
+		for _, dwBox in ipairs(CONSTANT.INVENTORY_EQUIP_LIST) do
 			for dwX = 0, EQUIPMENT_INVENTORY.TOTAL - 1 do
 				InsertItem(cache, GetPlayerItem(me, dwBox, dwX))
 			end
