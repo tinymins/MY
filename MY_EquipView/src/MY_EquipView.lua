@@ -90,12 +90,11 @@ _C.UpdateAllEquipBox = function() -- update boxes
 	end
 	local ui = UI(_C.wnd)
 	local me = GetClientPlayer()
-	for i = 0, CONSTANT.EQUIPMENT_SUIT_COUNT - 1 do
-		local nSuitIndex, dwBox = _C.GetSuitIndex(me, i)
+	for nIndex, dwBox in ipairs(CONSTANT.INVENTORY_EQUIP_LIST) do
 		for _, nType in ipairs(_C.tEquipPos) do
-			local box = ui:Children('#Box_' .. i .. '_' .. nType)[1]
+			local box = ui:Children('#Box_' .. nIndex .. '_' .. nType)[1]
 			local item = GetPlayerItem(me, dwBox, nType)
-			UpdataItemBoxObject(box, dwBox, nType, item, nil, nSuitIndex)
+			UpdataItemBoxObject(box, dwBox, nType, item, nil, nIndex)
 		end
 	end
 end
@@ -105,9 +104,9 @@ _C.PS = {
 	OnPanelActive = function(wnd) -- append ui items
 		_C.wnd = wnd
 		local ui = UI(wnd)
-		for i = 0, CONSTANT.EQUIPMENT_SUIT_COUNT - 1 do
+		for nIndex, dwBox in ipairs(CONSTANT.INVENTORY_EQUIP_LIST) do
 			for _, nType in ipairs(_C.tEquipPos) do
-				ui:Append('Box', 'Box_' .. i .. '_' .. nType)
+				ui:Append('Box', 'Box_' .. nIndex .. '_' .. nType)
 			end
 		end
 		_C.PS.OnPanelResize(wnd)
@@ -120,12 +119,12 @@ _C.PS = {
 		local x , y  = x0, y0
 		local dx, dy, dy2 = 50, 48, 52
 
-		for i = 0, CONSTANT.EQUIPMENT_SUIT_COUNT - 1 do
+		for nIndex, dwBox in ipairs(CONSTANT.INVENTORY_EQUIP_LIST) do
 			for _, nType in ipairs(_C.tEquipPos) do
 				if x + dx > w then
 					x, y = x0, y + dy
 				end
-				ui:Children('#Box_' .. i .. '_' .. nType):Pos(x, y)
+				ui:Children('#Box_' .. nIndex .. '_' .. nType):Pos(x, y)
 				x = x + dx
 			end
 			x, y = x0, y + dy2

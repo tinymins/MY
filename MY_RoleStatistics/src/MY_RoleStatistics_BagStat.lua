@@ -185,7 +185,14 @@ function D.FlushDB()
 	DB:Execute('BEGIN TRANSACTION')
 
 	-- ±³°ü
-	for boxtype = INVENTORY_INDEX.EQUIP, INVENTORY_INDEX.PACKAGE + 6 - 1 do
+	local aPackageBoxType = {}
+	for _, v in ipairs(CONSTANT.INVENTORY_EQUIP_LIST) do
+		insert(aPackageBoxType, v)
+	end
+	for _, v in ipairs(CONSTANT.INVENTORY_PACKAGE_LIST) do
+		insert(aPackageBoxType, v)
+	end
+	for _, boxtype in ipairs(aPackageBoxType) do
 		local count = me.GetBoxSize(boxtype)
 		for boxindex = 0, count - 1 do
 			local KItem = GetPlayerItem(me, boxtype, boxindex)
@@ -209,7 +216,7 @@ function D.FlushDB()
 	DB_OwnerInfoW:Execute()
 
 	-- ²Ö¿â
-	for boxtype = INVENTORY_INDEX.BANK, INVENTORY_INDEX.BANK + LIB.GetBankPackageCount() - 1 do
+	for _, boxtype in ipairs(CONSTANT.INVENTORY_BANK_LIST) do
 		local count = me.GetBoxSize(boxtype)
 		for boxindex = 0, count - 1 do
 			local KItem = GetPlayerItem(me, boxtype, boxindex)
