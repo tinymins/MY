@@ -113,20 +113,86 @@ local DB_OwnerInfoW = DB:Prepare('REPLACE INTO OwnerInfo (ownerkey, ownername, o
 local DB_OwnerInfoR = DB:Prepare('SELECT * FROM OwnerInfo WHERE ownername LIKE ? OR servername LIKE ? ORDER BY time DESC')
 local DB_OwnerInfoD = DB:Prepare('DELETE FROM OwnerInfo WHERE ownerkey = ?')
 local EQUIPMENT_ITEM_LIST = {
-	{ type = CONSTANT.EQUIPMENT_SUB.HELM        , pos = CONSTANT.EQUIPMENT_INVENTORY.HELM        , box = 'Handle_Equip/Box_Helm'        , durability = 'Handle_Equip/Text_Helm' },
-	{ type = CONSTANT.EQUIPMENT_SUB.CHEST       , pos = CONSTANT.EQUIPMENT_INVENTORY.CHEST       , box = 'Handle_Equip/Box_Chest'       , durability = 'Handle_Equip/Text_Chest' },
-	{ type = CONSTANT.EQUIPMENT_SUB.BANGLE      , pos = CONSTANT.EQUIPMENT_INVENTORY.BANGLE      , box = 'Handle_Equip/Box_Bangle'      , durability = 'Handle_Equip/Text_Bangle' },
-	{ type = CONSTANT.EQUIPMENT_SUB.WAIST       , pos = CONSTANT.EQUIPMENT_INVENTORY.WAIST       , box = 'Handle_Equip/Box_Waist'       , durability = 'Handle_Equip/Text_Waist' },
-	{ type = CONSTANT.EQUIPMENT_SUB.PANTS       , pos = CONSTANT.EQUIPMENT_INVENTORY.PANTS       , box = 'Handle_Equip/Box_Pants'       , durability = 'Handle_Equip/Text_Pants' },
-	{ type = CONSTANT.EQUIPMENT_SUB.BOOTS       , pos = CONSTANT.EQUIPMENT_INVENTORY.BOOTS       , box = 'Handle_Equip/Box_Boots'       , durability = 'Handle_Equip/Text_Boots' },
-	{ type = CONSTANT.EQUIPMENT_SUB.AMULET      , pos = CONSTANT.EQUIPMENT_INVENTORY.AMULET      , box = 'Handle_Equip/Box_Amulet'      },
-	{ type = CONSTANT.EQUIPMENT_SUB.PENDANT     , pos = CONSTANT.EQUIPMENT_INVENTORY.PENDANT     , box = 'Handle_Equip/Box_Pendant'     },
-	{ type = CONSTANT.EQUIPMENT_SUB.RING        , pos = CONSTANT.EQUIPMENT_INVENTORY.LEFT_RING   , box = 'Handle_Equip/Box_LeftRing'    },
-	{ type = CONSTANT.EQUIPMENT_SUB.RING        , pos = CONSTANT.EQUIPMENT_INVENTORY.RIGHT_RING  , box = 'Handle_Equip/Box_RightRing'   },
-	{ type = CONSTANT.EQUIPMENT_SUB.MELEE_WEAPON, pos = CONSTANT.EQUIPMENT_INVENTORY.MELEE_WEAPON, box = 'Handle_Weapon/Box_LightSword' , durability = 'Handle_Weapon/Text_LightSword' },
-	{ type = CONSTANT.EQUIPMENT_SUB.MELEE_WEAPON, pos = CONSTANT.EQUIPMENT_INVENTORY.BIG_SWORD   , box = 'Handle_Weapon/Box_HeavySword' , durability = 'Handle_Weapon/Text_HeavySword' },
-	{ type = CONSTANT.EQUIPMENT_SUB.RANGE_WEAPON, pos = CONSTANT.EQUIPMENT_INVENTORY.RANGE_WEAPON, box = 'Handle_Weapon/Box_RangeWeapon', durability = 'Handle_Weapon/Text_RangeWeapon' },
-	{ type = CONSTANT.EQUIPMENT_SUB.ARROW       , pos = CONSTANT.EQUIPMENT_INVENTORY.ARROW       , box = 'Handle_Weapon/Box_AmmoPouch'  },
+	{
+		label = g_tStrings.tEquipTypeNameTable[CONSTANT.EQUIPMENT_SUB.HELM or 'NULL'],
+		pos = CONSTANT.EQUIPMENT_INVENTORY.HELM,
+		box = 'Handle_Equip/Box_Helm',
+		durability = 'Handle_Equip/Text_Helm',
+	},
+	{
+		label = g_tStrings.tEquipTypeNameTable[CONSTANT.EQUIPMENT_SUB.CHEST or 'NULL'],
+		pos = CONSTANT.EQUIPMENT_INVENTORY.CHEST,
+		box = 'Handle_Equip/Box_Chest',
+		durability = 'Handle_Equip/Text_Chest',
+	},
+	{
+		label = g_tStrings.tEquipTypeNameTable[CONSTANT.EQUIPMENT_SUB.BANGLE or 'NULL'],
+		pos = CONSTANT.EQUIPMENT_INVENTORY.BANGLE,
+		box = 'Handle_Equip/Box_Bangle',
+		durability = 'Handle_Equip/Text_Bangle',
+	},
+	{
+		label = g_tStrings.tEquipTypeNameTable[CONSTANT.EQUIPMENT_SUB.WAIST or 'NULL'],
+		pos = CONSTANT.EQUIPMENT_INVENTORY.WAIST,
+		box = 'Handle_Equip/Box_Waist',
+		durability = 'Handle_Equip/Text_Waist',
+	},
+	{
+		label = g_tStrings.tEquipTypeNameTable[CONSTANT.EQUIPMENT_SUB.PANTS or 'NULL'],
+		pos = CONSTANT.EQUIPMENT_INVENTORY.PANTS,
+		box = 'Handle_Equip/Box_Pants',
+		durability = 'Handle_Equip/Text_Pants',
+	},
+	{
+		label = g_tStrings.tEquipTypeNameTable[CONSTANT.EQUIPMENT_SUB.BOOTS or 'NULL'],
+		pos = CONSTANT.EQUIPMENT_INVENTORY.BOOTS,
+		box = 'Handle_Equip/Box_Boots',
+		durability = 'Handle_Equip/Text_Boots',
+	},
+	{
+		label = g_tStrings.tEquipTypeNameTable[CONSTANT.EQUIPMENT_SUB.AMULET or 'NULL'],
+		pos = CONSTANT.EQUIPMENT_INVENTORY.AMULET,
+		box = 'Handle_Equip/Box_Amulet'
+	},
+	{
+		label = g_tStrings.tEquipTypeNameTable[CONSTANT.EQUIPMENT_SUB.PENDANT or 'NULL'],
+		pos = CONSTANT.EQUIPMENT_INVENTORY.PENDANT,
+		box = 'Handle_Equip/Box_Pendant'
+	},
+	{
+		label = g_tStrings.tEquipTypeNameTable[CONSTANT.EQUIPMENT_SUB.RING or 'NULL'],
+		pos = CONSTANT.EQUIPMENT_INVENTORY.LEFT_RING,
+		box = 'Handle_Equip/Box_LeftRing'
+	},
+	{
+		label = g_tStrings.tEquipTypeNameTable[CONSTANT.EQUIPMENT_SUB.RING or 'NULL'],
+		pos = CONSTANT.EQUIPMENT_INVENTORY.RIGHT_RING,
+		box = 'Handle_Equip/Box_RightRing'
+	},
+	{
+		label = g_tStrings.tEquipTypeNameTable[CONSTANT.EQUIPMENT_SUB.MELEE_WEAPON or 'NULL'],
+		pos = CONSTANT.EQUIPMENT_INVENTORY.MELEE_WEAPON,
+		box = 'Handle_Weapon/Box_LightSword',
+		durability = 'Handle_Weapon/Text_LightSword',
+	},
+	{
+		label = g_tStrings.WeapenDetail[WEAPON_DETAIL.BIG_SWORD or 'NULL'],
+		pos = CONSTANT.EQUIPMENT_INVENTORY.BIG_SWORD,
+		box = 'Handle_Weapon/Box_HeavySword',
+		durability = 'Handle_Weapon/Text_HeavySword',
+		force = CONSTANT.FORCE_TYPE.CANG_JIAN,
+	},
+	{
+		label = g_tStrings.tEquipTypeNameTable[CONSTANT.EQUIPMENT_SUB.RANGE_WEAPON or 'NULL'],
+		pos = CONSTANT.EQUIPMENT_INVENTORY.RANGE_WEAPON,
+		box = 'Handle_Weapon/Box_RangeWeapon',
+		durability = 'Handle_Weapon/Text_RangeWeapon',
+	},
+	{
+		label = g_tStrings.tEquipTypeNameTable[CONSTANT.EQUIPMENT_SUB.ARROW or 'NULL'],
+		pos = CONSTANT.EQUIPMENT_INVENTORY.ARROW,
+		box = 'Handle_Weapon/Box_AmmoPouch'
+	},
 }
 local EQUIPMENT_EXTRA_ITEM_LIST = {
 	{ key = 'waist'    , box = 'Handle_Equip/Box_Waist_Extend'     }, -- EQUIPMENT_SUB.WAIST_EXTEND
@@ -330,6 +396,7 @@ function D.UpdateNames(page)
 		wnd.time = rec.time
 		wnd.ownerkey   = rec.ownerkey
 		wnd.ownername  = rec.ownername
+		wnd.ownerforce = rec.ownerforce
 		wnd.servername = rec.servername
 		wnd.ownerextra = rec.ownerextra
 		local ownername = wnd.ownername
@@ -352,6 +419,18 @@ function D.UpdateItems(page)
 		wnd:Lookup('CheckBox_PageNum'):Check(wnd.nSuitIndex == D.dwCurrentSuitIndex, WNDEVENT_FIRETYPE.PREVENT)
 	end
 
+	-- 获取角色数据
+	local ownerforce = -1
+	local ownerextra = {}
+	local container = page:Lookup('Wnd_Total/WndScroll_Name/WndContainer_Name')
+	for i = 0, container:GetAllContentCount() - 1 do
+		local wnd = container:LookupContent(i)
+		if wnd.ownerkey == D.szCurrentOwnerKey then
+			ownerextra = wnd.ownerextra
+			ownerforce = wnd.ownerforce
+		end
+	end
+
 	-- 绘制右侧详情
 	local aXml = {}
 
@@ -371,14 +450,15 @@ function D.UpdateItems(page)
 	local handle = page:Lookup('Wnd_Total/Wnd_ItemPage', '')
 	-- local nTitleLen = 0
 	-- for _, info in ipairs(EQUIPMENT_ITEM_LIST) do
-	-- 	nTitleLen = max(wlen(info.type and g_tStrings.tEquipTypeNameTable[info.type] or '') + 1, nTitleLen)
+	-- 	nTitleLen = max(wlen(info.label or '') + 1, nTitleLen)
 	-- end
 	for _, info in ipairs(EQUIPMENT_ITEM_LIST) do
-		local rec = info.type and info.pos and tResult[info.pos]
+		local visible = info.label and (not info.force or info.force == ownerforce)
+		local rec = visible and info.pos and tResult[info.pos]
 		local box = info.box and handle:Lookup(info.box)
 		local txtDurability = info.durability and handle:Lookup(info.durability)
-		if info.type then
-			local szPos = g_tStrings.tEquipTypeNameTable[info.type] or ''
+		if visible then
+			local szPos = info.label or ''
 			szPos = szPos .. g_tStrings.STR_COLON
 			-- szPos = szPos .. rep(g_tStrings.STR_ONE_CHINESE_SPACE, nTitleLen - wlen(szPos))
 			insert(aXml, GetFormatText(szPos, 162))
@@ -423,22 +503,26 @@ function D.UpdateItems(page)
 				if rec.permanent_enchant ~= 0 then
 					local szImagePath = 'ui/Image/UICommon/FEPanel.UITex'
 					local nFrame = 41
-					local desc = Table_GetCommonEnchantDesc(rec.permanent_enchant)
-					if desc then
+					local szText = Table_GetCommonEnchantDesc(rec.permanent_enchant)
+					if szText then
+						szText = gsub(szText, 'font=%d+', 'font=113')
 						insert(aXml, CONSTANT.XML_LINE_BREAKER)
-						insert(aXml, GetFormatImage(szImagePath, nFrame, 24, 24))
-						insert(aXml, (gsub(desc, 'font=%d+', 'font=113')))
+						insert(aXml, GetFormatText(g_tStrings.STR_ONE_CHINESE_SPACE, 113))
+						insert(aXml, GetFormatImage(szImagePath, nFrame, 20, 20))
+						insert(aXml, GetFormatText(' ', 113))
+						insert(aXml, szText)
 					else
 						local enchantAttrib = GetItemEnchantAttrib(rec.permanent_enchant);
 						if enchantAttrib then
 							for k, v in pairs(enchantAttrib) do
-								local szText = D.FormatEnchantAttribText(v)
+								szText = D.FormatEnchantAttribText(v)
 								if szText ~= '' then
+									szText = gsub(szText, 'font=%d+', 'font=113')
 									insert(aXml, CONSTANT.XML_LINE_BREAKER)
 									insert(aXml, GetFormatText(g_tStrings.STR_ONE_CHINESE_SPACE, 113))
 									insert(aXml, GetFormatImage(szImagePath, nFrame, 20, 20))
 									insert(aXml, GetFormatText(' ', 113))
-									insert(aXml, (gsub(szText, 'font=%d+', 'font=113')))
+									insert(aXml, szText)
 								end
 							end
 						end
@@ -472,20 +556,16 @@ function D.UpdateItems(page)
 			if txtDurability then
 				txtDurability:SetText('')
 			end
-			insert(aXml, GetFormatText(_L['None'], 162))
+			if visible then
+				insert(aXml, GetFormatText(_L['None'], 162))
+			end
 		end
-		insert(aXml, CONSTANT.XML_LINE_BREAKER)
+		if visible then
+			insert(aXml, CONSTANT.XML_LINE_BREAKER)
+		end
 	end
 
 	-- 绘制挂饰、其它
-	local ownerextra = {}
-	local container = page:Lookup('Wnd_Total/WndScroll_Name/WndContainer_Name')
-	for i = 0, container:GetAllContentCount() - 1 do
-		local wnd = container:LookupContent(i)
-		if wnd.ownerkey == D.szCurrentOwnerKey then
-			ownerextra = wnd.ownerextra
-		end
-	end
 	for _, info in ipairs(EQUIPMENT_EXTRA_ITEM_LIST) do
 		local aItemData = ownerextra[info.key] or {}
 		local dwTabType, dwTabIndex = aItemData[1], aItemData[2]
