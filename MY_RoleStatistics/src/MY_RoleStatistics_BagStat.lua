@@ -181,7 +181,7 @@ function D.FlushDB()
 	DB:Execute('BEGIN TRANSACTION')
 
 	-- ±³°ü
-	for boxtype = INVENTORY_INDEX.PACKAGE, INVENTORY_INDEX.PACKAGE + 6 - 1 do
+	for boxtype = INVENTORY_INDEX.EQUIP, INVENTORY_INDEX.PACKAGE + 6 - 1 do
 		local count = me.GetBoxSize(boxtype)
 		for boxindex = 0, count - 1 do
 			local KItem = GetPlayerItem(me, boxtype, boxindex)
