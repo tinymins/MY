@@ -372,6 +372,10 @@ local TIP_COLUMN = {
 	'time_days',
 }
 
+function D.GetPlayerGUID(me)
+	return me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName
+end
+
 do
 local REC_CACHE
 function D.GetClientPlayerRec(bForceUpdate)
@@ -380,7 +384,7 @@ function D.GetClientPlayerRec(bForceUpdate)
 		return
 	end
 	local rec = REC_CACHE
-	local guid = me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName
+	local guid = D.GetPlayerGUID(me)
 	if not rec then
 		rec = {}
 		REC_CACHE = rec
@@ -433,7 +437,7 @@ function D.InitDB()
 	local me = GetClientPlayer()
 	if me then
 		DB_DungeonInfoG:ClearBindings()
-		DB_DungeonInfoG:BindAll(AnsiToUTF8(me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName))
+		DB_DungeonInfoG:BindAll(AnsiToUTF8(D.GetPlayerGUID(me)))
 		local result = DB_DungeonInfoG:GetAll()
 		local rec = result[1]
 		if rec then
@@ -458,7 +462,7 @@ function D.UpdateSaveDB()
 		LIB.Debug('MY_RoleStatistics_DungeonStat', 'Remove from database...', DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		DB_DungeonInfoD:ClearBindings()
-		DB_DungeonInfoD:BindAll(AnsiToUTF8(me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName))
+		DB_DungeonInfoD:BindAll(AnsiToUTF8(D.GetPlayerGUID(me)))
 		DB_DungeonInfoD:Execute()
 		--[[#DEBUG BEGIN]]
 		LIB.Debug('MY_RoleStatistics_DungeonStat', 'Remove from database finished...', DEBUG_LEVEL.LOG)

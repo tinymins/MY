@@ -138,6 +138,10 @@ local O = LIB.CreateUserSettingsModule('MY_RoleStatistics_TaskStat', _L['General
 })
 local D = {}
 
+function D.GetPlayerGUID(me)
+	return me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName
+end
+
 local TASK_TYPE = {
 	DAILY = 1,
 	WEEKLY = 2,
@@ -711,7 +715,7 @@ function D.GetClientPlayerRec()
 		return
 	end
 	local rec = REC_CACHE
-	local guid = me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName
+	local guid = D.GetPlayerGUID(me)
 	if not rec then
 		rec = {}
 		REC_CACHE = rec
@@ -812,7 +816,7 @@ function D.UpdateSaveDB()
 		LIB.Debug('MY_RoleStatistics_TaskStat', 'Remove from database...', DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		DB_TaskInfoD:ClearBindings()
-		DB_TaskInfoD:BindAll(AnsiToUTF8(me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName))
+		DB_TaskInfoD:BindAll(AnsiToUTF8(D.GetPlayerGUID(me)))
 		DB_TaskInfoD:Execute()
 		--[[#DEBUG BEGIN]]
 		LIB.Debug('MY_RoleStatistics_TaskStat', 'Remove from database finished...', DEBUG_LEVEL.LOG)

@@ -161,6 +161,10 @@ local D = {
 	dwLastAlertTime = 0,
 }
 
+function D.GetPlayerGUID(me)
+	return me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName
+end
+
 local function GetFormatSysmsgText(szText)
 	return GetFormatText(szText, GetMsgFont('MSG_SYS'), GetMsgFontColor('MSG_SYS'))
 end
@@ -722,7 +726,7 @@ function D.GetClientPlayerRec()
 		return
 	end
 	local rec = REC_CACHE
-	local guid = me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName
+	local guid = D.GetPlayerGUID(me)
 	if not rec then
 		rec = {
 			starve_remain = -1,
@@ -834,7 +838,7 @@ function D.UpdateSaveDB()
 		LIB.Debug('MY_RoleStatistics_RoleStat', 'Remove from database...', DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		DB_RoleInfoD:ClearBindings()
-		DB_RoleInfoD:BindAll(AnsiToUTF8(me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName))
+		DB_RoleInfoD:BindAll(AnsiToUTF8(D.GetPlayerGUID(me)))
 		DB_RoleInfoD:Execute()
 		--[[#DEBUG BEGIN]]
 		LIB.Debug('MY_RoleStatistics_RoleStat', 'Remove from database finished...', DEBUG_LEVEL.LOG)

@@ -112,6 +112,10 @@ local O = LIB.CreateUserSettingsModule('MY_RoleStatistics_BagStat', _L['General'
 })
 local D = {}
 
+function D.GetPlayerGUID(me)
+	return me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName
+end
+
 do
 local GetItemText
 do
@@ -175,7 +179,7 @@ function D.FlushDB()
 	--[[#DEBUG END]]
 	local me = GetClientPlayer()
 	local time = GetCurrentTime()
-	local ownerkey = AnsiToUTF8(me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName)
+	local ownerkey = AnsiToUTF8(D.GetPlayerGUID(me))
 	local ownername = AnsiToUTF8(me.szName)
 	local servername = AnsiToUTF8(LIB.GetRealServer(2))
 	DB:Execute('BEGIN TRANSACTION')
@@ -264,7 +268,7 @@ function D.UpdateSaveDB()
 		LIB.Debug('MY_RoleStatistics_BagStat', 'Remove from database...', DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		for _, guid in ipairs({
-			me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName,
+			AnsiToUTF8(D.GetPlayerGUID(me)),
 			'tong' .. me.dwTongID,
 		}) do
 			DB_ItemsDA:ClearBindings()

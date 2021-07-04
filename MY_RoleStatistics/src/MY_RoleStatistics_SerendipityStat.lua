@@ -166,6 +166,10 @@ local O = LIB.CreateUserSettingsModule('MY_RoleStatistics_SerendipityStat', _L['
 })
 local D = {}
 
+function D.GetPlayerGUID(me)
+	return me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName
+end
+
 -----------------------------------------------------------------------------------------------
 -- 多个渠道奇遇次数监控
 -----------------------------------------------------------------------------------------------
@@ -599,7 +603,7 @@ function D.GetClientPlayerRec()
 		return
 	end
 	local rec = REC_CACHE
-	local guid = me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName
+	local guid = D.GetPlayerGUID(me)
 	if not rec then
 		rec = {
 			serendipity_info = {},
@@ -697,7 +701,7 @@ function D.UpdateSaveDB()
 		LIB.Debug('MY_RoleStatistics_SerendipityStat', 'Remove from database...', DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		InfoD:ClearBindings()
-		InfoD:BindAll(AnsiToUTF8(me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName))
+		InfoD:BindAll(AnsiToUTF8(D.GetPlayerGUID(me)))
 		InfoD:Execute()
 		--[[#DEBUG BEGIN]]
 		LIB.Debug('MY_RoleStatistics_SerendipityStat', 'Remove from database finished...', DEBUG_LEVEL.LOG)
