@@ -298,8 +298,12 @@ function D.FlushDB()
 	DB:Execute('BEGIN TRANSACTION')
 
 	-- ±³°ü
+	local tSuitIndexToBoxType = {}
+	for suitindex, boxtype in ipairs(CONSTANT.INVENTORY_EQUIP_LIST) do
+		tSuitIndexToBoxType[me.GetEquipIDArray(suitindex - 1) + 1] = boxtype
+	end
 	for suitindex, _ in ipairs(CONSTANT.INVENTORY_EQUIP_LIST) do
-		local boxtype = CONSTANT.INVENTORY_EQUIP_LIST[me.GetEquipIDArray(suitindex - 1) + 1]
+		local boxtype = tSuitIndexToBoxType[suitindex]
 		local count = me.GetBoxSize(boxtype)
 		for boxindex = 0, count - 1 do
 			local KItem = GetPlayerItem(me, boxtype, boxindex)
