@@ -411,6 +411,7 @@ function D.UpdateNames(page)
 			ownername = MY_ChatMosaics.MosaicsString(ownername)
 		end
 		wnd:Lookup('', 'Text_Name'):SetText(ownername .. ' (' .. rec.servername .. ')')
+		wnd:Lookup('', 'Image_NameBg_Selected'):SetVisible(rec.ownerkey == D.szCurrentOwnerKey)
 		wnd.ownerinfo = rec
 	end
 	container:FormatAllContentPos()
