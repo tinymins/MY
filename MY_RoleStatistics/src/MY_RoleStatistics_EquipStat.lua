@@ -102,6 +102,9 @@ DB:Execute([[
 		ownername NVARCHAR(20),
 		ownerforce INTEGER,
 		servername NVARCHAR(20),
+		ownerrole INTEGER,
+		ownerscore INTEGER,
+		ownersuitindex INTEGER,
 		ownerextra NVARCHAR(4000),
 		time INTEGER,
 		PRIMARY KEY(ownerkey)
@@ -109,7 +112,7 @@ DB:Execute([[
 ]])
 DB:Execute('CREATE INDEX IF NOT EXISTS OwnerInfo_ownername_idx ON OwnerInfo(ownername)')
 DB:Execute('CREATE INDEX IF NOT EXISTS OwnerInfo_servername_idx ON OwnerInfo(servername)')
-local DB_OwnerInfoW = DB:Prepare('REPLACE INTO OwnerInfo (ownerkey, ownername, ownerforce, servername, ownerextra, time) VALUES (?, ?, ?, ?, ?, ?)')
+local DB_OwnerInfoW = DB:Prepare('REPLACE INTO OwnerInfo (ownerkey, ownername, ownerforce, servername, ownerrole, ownerscore, ownersuitindex, ownerextra, time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
 local DB_OwnerInfoR = DB:Prepare('SELECT * FROM OwnerInfo WHERE ownername LIKE ? OR servername LIKE ? ORDER BY time DESC')
 local DB_OwnerInfoD = DB:Prepare('DELETE FROM OwnerInfo WHERE ownerkey = ?')
 local EQUIPMENT_ITEM_LIST = {
@@ -275,6 +278,9 @@ function D.FlushDB()
 	local ownername = AnsiToUTF8(me.szName)
 	local ownerforce = me.dwForceID
 	local servername = AnsiToUTF8(LIB.GetRealServer(2))
+	local ownerrole = 0
+	local ownerscore = 0
+	local ownersuitindex = 0
 	local ownerextra = ''
 	DB:Execute('BEGIN TRANSACTION')
 
@@ -318,6 +324,9 @@ function D.FlushDB()
 	end
 
 	-- 挂饰、其它
+	ownerrole = me.nRoleType
+	ownerscore = me.GetTotalEquipScore() or 0
+	ownersuitindex = me.GetEquipIDArray(0) + 1
 	ownerextra = AnsiToUTF8(LIB.JsonEncode({
 		waist = { ITEM_TABLE_TYPE.CUST_TRINKET, (me.dwWaistItemIndex) },
 		back = { ITEM_TABLE_TYPE.CUST_TRINKET, (me.dwBackItemIndex) },
@@ -333,7 +342,7 @@ function D.FlushDB()
 	}))
 
 	DB_OwnerInfoW:ClearBindings()
-	DB_OwnerInfoW:BindAll(ownerkey, ownername, ownerforce, servername, ownerextra, time)
+	DB_OwnerInfoW:BindAll(ownerkey, ownername, ownerforce, servername, ownerrole, ownerscore, ownersuitindex, ownerextra, time)
 	DB_OwnerInfoW:Execute()
 
 	DB:Execute('END TRANSACTION')
@@ -398,6 +407,9 @@ function D.UpdateNames(page)
 		wnd.ownername  = rec.ownername
 		wnd.ownerforce = rec.ownerforce
 		wnd.servername = rec.servername
+		wnd.ownerrole = rec.ownerrole
+		wnd.ownerscore = rec.ownerscore
+		wnd.ownersuitindex = rec.ownersuitindex
 		wnd.ownerextra = rec.ownerextra
 		local ownername = wnd.ownername
 		if MY_ChatMosaics and MY_ChatMosaics.MosaicsString then
@@ -420,15 +432,25 @@ function D.UpdateItems(page)
 	end
 
 	-- 获取角色数据
+	local ownername = ''
 	local ownerforce = -1
+	local ownerrole = 0
+	local ownerscore = 0
+	local ownersuitindex = 0
 	local ownerextra = {}
 	local container = page:Lookup('Wnd_Total/WndScroll_Name/WndContainer_Name')
 	for i = 0, container:GetAllContentCount() - 1 do
 		local wnd = container:LookupContent(i)
 		if wnd.ownerkey == D.szCurrentOwnerKey then
-			ownerextra = wnd.ownerextra
+			ownername = wnd.ownername
 			ownerforce = wnd.ownerforce
+			ownerrole = wnd.ownerrole
+			ownerscore = wnd.ownerscore
+			ownersuitindex = wnd.ownersuitindex
 		end
+	end
+	if MY_ChatMosaics and MY_ChatMosaics.MosaicsString then
+		ownername = MY_ChatMosaics.MosaicsString(ownername)
 	end
 
 	-- 绘制右侧详情
@@ -587,6 +609,12 @@ function D.UpdateItems(page)
 	end
 
 	-- 绘制详情
+	local txtName = page:Lookup('Wnd_Total/Wnd_ItemPage', 'Text_RoleName')
+	txtName:SetText(ownername)
+	txtName:SetFontColor(LIB.GetForceColor(ownerforce, 'foreground'))
+	local txtEquipScore = page:Lookup('Wnd_Total/Wnd_ItemPage', 'Text_EquipScore')
+	txtEquipScore:SetVisible(ownersuitindex == D.dwCurrentSuitIndex)
+	txtEquipScore:SetText(_L('Equip score: %s', ownerscore))
 	local hBoard = page:Lookup('Wnd_Total/Wnd_ItemPage/WndScroll_EquipInfo', 'Handle_EquipInfo')
 	hBoard:Clear()
 	hBoard:AppendItemFromString(concat(aXml))
