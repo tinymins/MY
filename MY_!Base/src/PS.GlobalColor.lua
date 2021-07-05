@@ -62,12 +62,12 @@ function PS.OnPanelActive(wnd)
 		local x0 = x
 		local sha = ui:Append('Shadow', {
 			x = x, y = y, w = 100, h = 25,
-			text = g_tStrings.tForceTitle[dwForceID],
+			text = CONSTANT.FORCE_TYPE_LABEL[dwForceID],
 			color = { LIB.GetForceColor(dwForceID, 'background') },
 		})
 		local txt = ui:Append('Text', {
 			x = x + 5, y = y, w = 100, h = 25,
-			text = g_tStrings.tForceTitle[dwForceID],
+			text = CONSTANT.FORCE_TYPE_LABEL[dwForceID],
 			color = { LIB.GetForceColor(dwForceID, 'foreground') },
 		})
 		x = x + 105

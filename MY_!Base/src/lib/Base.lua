@@ -1028,6 +1028,7 @@ local CONSTANT = setmetatable({}, {
 			[ROLE_TYPE.LITTLE_GIRL    ] = _L['Girl'],
 		}),
 		FORCE_TYPE = FORCE_TYPE,
+		FORCE_TYPE_LABEL = g_tStrings.tForceTitle,
 		KUNGFU_TYPE = (function()
 			local KUNGFU_TYPE = _G.KUNGFU_TYPE or SetmetaReadonly({
 				TIAN_CE     = 1,      -- 天策内功

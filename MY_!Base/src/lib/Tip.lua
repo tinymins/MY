@@ -211,8 +211,8 @@ function LIB.OutputPlayerTip(Rect, dwID, szExtraXml)
 		insert(t, GetFormatText(FormatString(g_tStrings.STR_PLAYER_H_WHAT_LEVEL, player.nLevel), 82))
 	end
 	-- 声望
-	if g_tStrings.tForceTitle[player.dwForceID] then
-		insert(t, GetFormatText(g_tStrings.tForceTitle[player.dwForceID] .. '\n', 82))
+	if CONSTANT.FORCE_TYPE_LABEL[player.dwForceID] then
+		insert(t, GetFormatText(CONSTANT.FORCE_TYPE_LABEL[player.dwForceID] .. '\n', 82))
 	end
 	-- 所在地图
 	if IsParty(dwID, me.dwID) then
