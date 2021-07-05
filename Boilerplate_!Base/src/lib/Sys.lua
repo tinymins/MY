@@ -489,6 +489,9 @@ local function GetSoundMenu(tSound, fnAction, tCheck, bMultiple)
 				OutputTip(szXml, 600, {this:GetAbsX(), this:GetAbsY(), this:GetW(), this:GetH()}, ALW.RIGHT_LEFT)
 			end
 		end
+		t.fnMouseLeave = function()
+			HideTip()
+		end
 	end
 	for _, v in ipairs(tSound) do
 		local t1 = GetSoundMenu(v, fnAction, tCheck, bMultiple)
