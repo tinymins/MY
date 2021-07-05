@@ -1021,6 +1021,12 @@ local CONSTANT = setmetatable({}, {
 				{ __index = _G.CHARACTER_OTACTION_TYPE }),
 			__newindex = function() end,
 		}),
+		ROLE_TYPE_LABEL = SetmetaReadonly({
+			[ROLE_TYPE.STANDARD_MALE  ] = _L['Man'],
+			[ROLE_TYPE.STANDARD_FEMALE] = _L['Woman'],
+			[ROLE_TYPE.LITTLE_BOY     ] = _L['Boy'],
+			[ROLE_TYPE.LITTLE_GIRL    ] = _L['Girl'],
+		}),
 		FORCE_TYPE = FORCE_TYPE,
 		KUNGFU_TYPE = (function()
 			local KUNGFU_TYPE = _G.KUNGFU_TYPE or SetmetaReadonly({
