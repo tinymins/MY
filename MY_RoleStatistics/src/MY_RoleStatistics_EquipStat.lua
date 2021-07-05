@@ -688,7 +688,7 @@ end
 function D.OnLButtonClick()
 	local name = this:GetName()
 	if name == 'Wnd_Name' then
-		local wnd = this:GetParent()
+		local wnd = this
 		local page = this:GetParent():GetParent():GetParent():GetParent()
 		D.szCurrentOwnerKey = wnd.ownerinfo.ownerkey
 		D.UpdateNames(page)
