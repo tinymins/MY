@@ -13,6 +13,7 @@ return {
 	['Use preset user settings'] = '插件設置項方案選擇',
 	['Set default preset'] = '設為默認方案',
 	['Delete preset'] = '刪除方案',
+	['Reconnect'] = '重新載入',
 	['Role original user settings'] = '角色獨立方案',
 	['Preset list'] = '共用方案',
 	['* New *'] = '添加方案',

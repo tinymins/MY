@@ -141,9 +141,17 @@ function PS.OnPanelActive(wnd)
 							bCheck = true, bChecked = szDefaultID == szID,
 						},
 					}
-					if not m.bChecked then
-						insert(m,
-						{
+					if m.bChecked then
+						insert(m, {
+							szOption = _L['Reconnect'],
+							fnAction = function()
+								LIB.ReleaseUserSettingsDB()
+								LIB.ConnectUserSettingsDB()
+								UI.ClosePopupMenu()
+							end,
+						})
+					else
+						insert(m, {
 							szOption = _L['Delete'],
 							fnAction = function()
 								LIB.RemoveUserSettingsPreset(szID)
