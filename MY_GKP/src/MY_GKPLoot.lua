@@ -1356,6 +1356,9 @@ local function GetMemberMenu(member, aItemData, szAutoDistType, aDoodadID)
 		fnMouseEnter = function()
 			LIB.OutputTip(_L['Hold shift click to skip gkp record panel'], 136)
 		end,
+		fnMouseLeave = function()
+			HideTip()
+		end,
 	}
 end
 function D.GetDistributeMenu(aItemData, szAutoDistType)
@@ -1452,6 +1455,9 @@ function D.GetItemBiddingMenu(dwDoodadID, data)
 							or _L['Hold SHIFT click to raise new bidding panel.']
 						, nil, 255, 255, 0)
 					OutputTip(szMsg, 600, {this:GetAbsX(), this:GetAbsY(), this:GetW(), this:GetH()}, ALW.RIGHT_LEFT)
+				end,
+				fnMouseLeave = function()
+					HideTip()
 				end,
 			})
 		end

@@ -466,6 +466,9 @@ function D.GetHistoryMenu()
 			local nW, nH = this:GetW(), this:GetH()
 			OutputTip(GetFormatText(_L['Hold ctrl click to review whole fight'], nil, 255, 255, 0), 600, {nX, nY, nW, nH}, ALW.RIGHT_LEFT)
 		end,
+		fnMouseLeave = function()
+			HideTip()
+		end,
 	}}
 
 	local tt, nCount = { bInline = true, nMaxHeight = 450 }, 0
@@ -505,6 +508,9 @@ function D.GetHistoryMenu()
 				local nX, nY = this:GetAbsX(), this:GetAbsY()
 				local nW, nH = this:GetW(), this:GetH()
 				OutputTip(concat(aXml), 600, {nX, nY, nW, nH}, ALW.RIGHT_LEFT)
+			end,
+			fnMouseLeave = function()
+				HideTip()
 			end,
 		}
 		insert(tt, t1)

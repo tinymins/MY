@@ -146,6 +146,9 @@ function D.GetMenu()
 				local szXml = GetFormatText(_L['Full level and equip score less than 2/3 of yours'], nil, 255, 255, 0)
 				OutputTip(szXml, 600, {this:GetAbsX(), this:GetAbsY(), this:GetW(), this:GetH()}, ALW.RIGHT_LEFT)
 			end,
+			fnMouseLeave = function()
+				HideTip()
+			end,
 			fnDisable = function() return not O.bEnable end,
 		},
 		{

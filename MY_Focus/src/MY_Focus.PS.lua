@@ -199,6 +199,9 @@ function PS.OnPanelActive(wnd)
 				fnMouseEnter = function()
 					OutputTip(GetFormatText(tData.tLife.nValue .. '%', nil, 255, 255, 0), 600, {this:GetAbsX(), this:GetAbsY(), this:GetW(), this:GetH()}, ALW.RIGHT_LEFT)
 				end,
+				fnMouseLeave = function()
+					HideTip()
+				end,
 				fnAction = function()
 					GetUserInputNumber(tData.tLife.nValue, 100, nil, function(val)
 						tData.tLife.nValue = val
@@ -218,6 +221,9 @@ function PS.OnPanelActive(wnd)
 				end
 				OutputTip(GetFormatText(tData.nMaxDistance .. g_tStrings.STR_METER , nil, 255, 255, 0), 600, {this:GetAbsX(), this:GetAbsY(), this:GetW(), this:GetH()}, ALW.RIGHT_LEFT)
 			end,
+			fnMouseLeave = function()
+				HideTip()
+			end,
 			fnAction = function()
 				GetUserInput(_L['Please input max distance, leave blank to disable:'], function(val)
 					tData.nMaxDistance = tonumber(val) or 0
@@ -234,6 +240,9 @@ function PS.OnPanelActive(wnd)
 					return
 				end
 				OutputTip(GetFormatText(tData.szDisplay, nil, 255, 255, 0), 600, {this:GetAbsX(), this:GetAbsY(), this:GetW(), this:GetH()}, ALW.RIGHT_LEFT)
+			end,
+			fnMouseLeave = function()
+				HideTip()
 			end,
 			fnAction = function()
 				GetUserInput(_L['Please input display name, leave blank to use its own name:'], function(val)
