@@ -156,7 +156,17 @@ function Framework.OnLButtonClick()
 		D.Close()
 	elseif name == 'Btn_Option' then
 		local menu = {}
-		local tFloatEntryMenu = { szOption = _L['Float panel'] }
+		local tFloatEntryMenu = {
+			szOption = _L['Float panel'],
+			fnMouseEnter = function()
+				local nX, nY = this:GetAbsX(), this:GetAbsY()
+				local nW, nH = this:GetW(), this:GetH()
+				OutputTip(GetFormatText(_L['Enable float panel on sprint/bag/character panel.'], nil, 255, 255, 0), 600, {nX, nY, nW, nH}, ALW.TOP_BOTTOM)
+			end,
+			fnMouseLeave = function()
+				HideTip()
+			end,
+		}
 		for _, m in ipairs(D.aModule) do
 			if m and m.env.szFloatEntry then
 				insert(tFloatEntryMenu, {

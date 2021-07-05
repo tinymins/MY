@@ -97,6 +97,17 @@ local O = LIB.CreateUserSettingsModule('MY_RoleStatistics_BagStat', _L['General'
 		xSchema = Schema.Map(Schema.String, Schema.Boolean),
 		xDefaultValue = {},
 	},
+	bFloatEntry = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_RoleStatistics'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bAdviceFloatEntry = {
+		ePathType = PATH_TYPE.ROLE,
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
 	bSaveDB = {
 		ePathType = PATH_TYPE.ROLE,
 		szLabel = _L['MY_RoleStatistics'],
@@ -625,11 +636,48 @@ function D.OnMouseEnter()
 	end
 end
 
+-- ¸¡¶¯¿ò
+function D.ApplyFloatEntry(bFloatEntry)
+	local frame = Station.Lookup('Normal/BigBagPanel')
+	if not frame then
+		return
+	end
+	local btn = frame:Lookup('Btn_MY_RoleStatistics_BagEntry')
+	if bFloatEntry then
+		if btn then
+			return
+		end
+		local frameTemp = Wnd.OpenWindow(PLUGIN_ROOT .. '/ui/MY_RoleStatistics_BagEntry.ini', 'MY_RoleStatistics_BagEntry')
+		btn = frameTemp:Lookup('Btn_MY_RoleStatistics_BagEntry')
+		btn:ChangeRelation(frame, true, true)
+		btn:SetRelPos(90, 0)
+		Wnd.CloseWindow(frameTemp)
+		btn.OnLButtonClick = function()
+			MY_RoleStatistics.Open('BagStat')
+		end
+	else
+		if not btn then
+			return
+		end
+		btn:Destroy()
+	end
+end
+
+function D.UpdateFloatEntry()
+	if not D.bReady then
+		return
+	end
+	D.ApplyFloatEntry(O.bFloatEntry)
+end
+
 LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_RoleStatistics_BagStat', function()
 	D.bReady = true
 	D.UpdateSaveDB()
 	D.FlushDB()
+	D.UpdateFloatEntry()
 end)
+LIB.RegisterReload('MY_RoleStatistics_BagStat', function() D.ApplyFloatEntry(false) end)
+LIB.RegisterFrameCreate('BigBagPanel', 'MY_RoleStatistics_BagStat', D.UpdateFloatEntry)
 
 -- function D.OnMouseLeave()
 -- 	HideTip()
@@ -645,7 +693,7 @@ local settings = {
 			fields = {
 				'OnInitPage',
 				szSaveDB = 'MY_RoleStatistics_BagStat.bSaveDB',
-				szFloatEntry = false,
+				szFloatEntry = 'MY_RoleStatistics_BagStat.bFloatEntry',
 			},
 			root = D,
 		},
@@ -669,6 +717,7 @@ local settings = {
 				'tUncheckedNames',
 				'bSaveDB',
 				'bAdviceSaveDB',
+				'bFloatEntry',
 			},
 			root = O,
 		},
@@ -680,12 +729,14 @@ local settings = {
 				'tUncheckedNames',
 				'bSaveDB',
 				'bAdviceSaveDB',
+				'bFloatEntry',
 			},
 			triggers = {
 				bCompactMode = function()
 					FireUIEvent('MY_BAGSTATISTICS_MODE_CHANGE')
 				end,
 				bSaveDB = D.UpdateSaveDB,
+				bFloatEntry = D.UpdateFloatEntry,
 			},
 			root = O,
 		},
