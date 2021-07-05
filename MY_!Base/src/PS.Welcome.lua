@@ -166,6 +166,9 @@ function PS.OnPanelActive(wnd)
 						local nW, nH = this:GetW(), this:GetH()
 						OutputTip(GetFormatText(_L['User preference'] .. _L['Storage location'], nil, 255, 255, 0), 600, {nX, nY, nW, nH}, ALW.BOTTOM_TOP)
 					end,
+					fnMouseLeave = function()
+						HideTip()
+					end,
 					fnAction = function()
 						local szRoot = LIB.GetAbsolutePath({'', PATH_TYPE.ROLE}):gsub('/', '\\')
 						LIB.OpenFolder(szRoot)
@@ -179,6 +182,9 @@ function PS.OnPanelActive(wnd)
 						local nX, nY = this:GetAbsX(), this:GetAbsY()
 						local nW, nH = this:GetW(), this:GetH()
 						OutputTip(GetFormatText(_L['Server preference'] .. _L['Storage location'], nil, 255, 255, 0), 600, {nX, nY, nW, nH}, ALW.BOTTOM_TOP)
+					end,
+					fnMouseLeave = function()
+						HideTip()
 					end,
 					fnAction = function()
 						local szRoot = LIB.GetAbsolutePath({'', PATH_TYPE.SERVER}):gsub('/', '\\')
@@ -194,6 +200,9 @@ function PS.OnPanelActive(wnd)
 						local nW, nH = this:GetW(), this:GetH()
 						OutputTip(GetFormatText(_L['Global preference'] .. _L['Storage location'], nil, 255, 255, 0), 600, {nX, nY, nW, nH}, ALW.BOTTOM_TOP)
 					end,
+					fnMouseLeave = function()
+						HideTip()
+					end,
 					fnAction = function()
 						local szRoot = LIB.GetAbsolutePath({'', PATH_TYPE.GLOBAL}):gsub('/', '\\')
 						LIB.OpenFolder(szRoot)
@@ -208,6 +217,9 @@ function PS.OnPanelActive(wnd)
 						local nX, nY = this:GetAbsX(), this:GetAbsY()
 						local nW, nH = this:GetW(), this:GetH()
 						OutputTip(GetFormatText(_L['Config and data will be saved when exit game, click to save immediately'], nil, 255, 255, 0), 600, {nX, nY, nW, nH}, ALW.BOTTOM_TOP)
+					end,
+					fnMouseLeave = function()
+						HideTip()
 					end,
 					fnAction = function()
 						LIB.FireFlush()
