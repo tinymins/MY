@@ -148,6 +148,7 @@ function PS.OnPanelActive(wnd)
 								LIB.ReleaseUserSettingsDB()
 								LIB.ConnectUserSettingsDB()
 								UI.ClosePopupMenu()
+								LIB.SwitchTab('GlobalConfig', true)
 							end,
 						})
 					else
