@@ -176,5 +176,6 @@ return {
     ['MY_RoleStatistics_EquipStat'] = '装备统计',
     ['None'] = '无',
     ['Equip score: %s'] = '装备分数：%s',
+    ['%s (Lv%d)'] = '%s(%d)',
     ['%s * %s'] = '%s·%s',
 }

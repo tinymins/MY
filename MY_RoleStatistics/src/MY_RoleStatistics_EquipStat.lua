@@ -431,6 +431,7 @@ function D.UpdateItems(page)
 	local ownername = ''
 	local ownerforce = -1
 	local ownerrole = 0
+	local ownerlevel = 0
 	local ownerscore = 0
 	local ownersuitindex = 0
 	local ownerextra = {}
@@ -441,8 +442,10 @@ function D.UpdateItems(page)
 			ownername = wnd.ownerinfo.ownername
 			ownerforce = wnd.ownerinfo.ownerforce
 			ownerrole = wnd.ownerinfo.ownerrole
+			ownerlevel = wnd.ownerinfo.ownerlevel
 			ownerscore = wnd.ownerinfo.ownerscore
 			ownersuitindex = wnd.ownerinfo.ownersuitindex
+			ownerextra = wnd.ownerinfo.ownerextra
 		end
 	end
 	if MY_ChatMosaics and MY_ChatMosaics.MosaicsString then
@@ -606,7 +609,7 @@ function D.UpdateItems(page)
 
 	-- ªÊ÷∆œÍ«È
 	local txtName = page:Lookup('Wnd_Total/Wnd_ItemPage', 'Text_RoleName')
-	txtName:SetText(ownername)
+	txtName:SetText(_L('%s (Lv%d)', ownername, ownerlevel))
 	txtName:SetFontColor(LIB.GetForceColor(ownerforce, 'foreground'))
 	local txtRoleInfo = page:Lookup('Wnd_Total/Wnd_ItemPage', 'Text_RoleInfo')
 	txtRoleInfo:SetText(_L('%s * %s', CONSTANT.FORCE_TYPE_LABEL[ownerforce] or '', CONSTANT.ROLE_TYPE_LABEL[ownerrole] or ''))
