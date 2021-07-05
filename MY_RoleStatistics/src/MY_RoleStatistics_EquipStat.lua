@@ -100,9 +100,10 @@ DB:Execute([[
 	CREATE TABLE IF NOT EXISTS OwnerInfo (
 		ownerkey NVARCHAR(20),
 		ownername NVARCHAR(20),
-		ownerforce INTEGER,
 		servername NVARCHAR(20),
+		ownerforce INTEGER,
 		ownerrole INTEGER,
+		ownerlevel INTEGER,
 		ownerscore INTEGER,
 		ownersuitindex INTEGER,
 		ownerextra NVARCHAR(4000),
@@ -112,7 +113,7 @@ DB:Execute([[
 ]])
 DB:Execute('CREATE INDEX IF NOT EXISTS OwnerInfo_ownername_idx ON OwnerInfo(ownername)')
 DB:Execute('CREATE INDEX IF NOT EXISTS OwnerInfo_servername_idx ON OwnerInfo(servername)')
-local DB_OwnerInfoW = DB:Prepare('REPLACE INTO OwnerInfo (ownerkey, ownername, ownerforce, servername, ownerrole, ownerscore, ownersuitindex, ownerextra, time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
+local DB_OwnerInfoW = DB:Prepare('REPLACE INTO OwnerInfo (ownerkey, ownername, servername, ownerforce, ownerrole, ownerlevel, ownerscore, ownersuitindex, ownerextra, time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
 local DB_OwnerInfoR = DB:Prepare('SELECT * FROM OwnerInfo WHERE ownername LIKE ? OR servername LIKE ? ORDER BY time DESC')
 local DB_OwnerInfoD = DB:Prepare('DELETE FROM OwnerInfo WHERE ownerkey = ?')
 local EQUIPMENT_ITEM_LIST = {
@@ -276,9 +277,10 @@ function D.FlushDB()
 	local time = GetCurrentTime()
 	local ownerkey = AnsiToUTF8(D.GetPlayerGUID(me))
 	local ownername = AnsiToUTF8(me.szName)
-	local ownerforce = me.dwForceID
 	local servername = AnsiToUTF8(LIB.GetRealServer(2))
+	local ownerforce = 0
 	local ownerrole = 0
+	local ownerlevel = 0
 	local ownerscore = 0
 	local ownersuitindex = 0
 	local ownerextra = ''
@@ -324,7 +326,9 @@ function D.FlushDB()
 	end
 
 	-- π“ Œ°¢∆‰À¸
+	ownerforce = me.dwForceID
 	ownerrole = me.nRoleType
+	ownerlevel = me.nLevel
 	ownerscore = me.GetTotalEquipScore() or 0
 	ownersuitindex = me.GetEquipIDArray(0) + 1
 	ownerextra = AnsiToUTF8(LIB.JsonEncode({
@@ -342,7 +346,7 @@ function D.FlushDB()
 	}))
 
 	DB_OwnerInfoW:ClearBindings()
-	DB_OwnerInfoW:BindAll(ownerkey, ownername, ownerforce, servername, ownerrole, ownerscore, ownersuitindex, ownerextra, time)
+	DB_OwnerInfoW:BindAll(ownerkey, ownername, servername, ownerforce, ownerrole, ownerlevel, ownerscore, ownersuitindex, ownerextra, time)
 	DB_OwnerInfoW:Execute()
 
 	DB:Execute('END TRANSACTION')
@@ -402,20 +406,12 @@ function D.UpdateNames(page)
 	end
 	for _, rec in ipairs(result) do
 		local wnd = container:AppendContentFromIni(SZ_INI, 'Wnd_Name')
-		wnd.time = rec.time
-		wnd.ownerkey   = rec.ownerkey
-		wnd.ownername  = rec.ownername
-		wnd.ownerforce = rec.ownerforce
-		wnd.servername = rec.servername
-		wnd.ownerrole = rec.ownerrole
-		wnd.ownerscore = rec.ownerscore
-		wnd.ownersuitindex = rec.ownersuitindex
-		wnd.ownerextra = rec.ownerextra
-		local ownername = wnd.ownername
+		local ownername = rec.ownername
 		if MY_ChatMosaics and MY_ChatMosaics.MosaicsString then
 			ownername = MY_ChatMosaics.MosaicsString(ownername)
 		end
-		wnd:Lookup('', 'Text_Name'):SetText(ownername .. ' (' .. wnd.servername .. ')')
+		wnd:Lookup('', 'Text_Name'):SetText(ownername .. ' (' .. rec.servername .. ')')
+		wnd.ownerinfo = rec
 	end
 	container:FormatAllContentPos()
 	D.UpdateItems(page)
@@ -441,12 +437,12 @@ function D.UpdateItems(page)
 	local container = page:Lookup('Wnd_Total/WndScroll_Name/WndContainer_Name')
 	for i = 0, container:GetAllContentCount() - 1 do
 		local wnd = container:LookupContent(i)
-		if wnd.ownerkey == D.szCurrentOwnerKey then
-			ownername = wnd.ownername
-			ownerforce = wnd.ownerforce
-			ownerrole = wnd.ownerrole
-			ownerscore = wnd.ownerscore
-			ownersuitindex = wnd.ownersuitindex
+		if wnd.ownerinfo.ownerkey == D.szCurrentOwnerKey then
+			ownername = wnd.ownerinfo.ownername
+			ownerforce = wnd.ownerinfo.ownerforce
+			ownerrole = wnd.ownerinfo.ownerrole
+			ownerscore = wnd.ownerinfo.ownerscore
+			ownersuitindex = wnd.ownerinfo.ownersuitindex
 		end
 	end
 	if MY_ChatMosaics and MY_ChatMosaics.MosaicsString then
@@ -612,6 +608,8 @@ function D.UpdateItems(page)
 	local txtName = page:Lookup('Wnd_Total/Wnd_ItemPage', 'Text_RoleName')
 	txtName:SetText(ownername)
 	txtName:SetFontColor(LIB.GetForceColor(ownerforce, 'foreground'))
+	local txtRoleInfo = page:Lookup('Wnd_Total/Wnd_ItemPage', 'Text_RoleInfo')
+	txtRoleInfo:SetText(_L('%s * %s', CONSTANT.FORCE_TYPE_LABEL[ownerforce] or '', CONSTANT.ROLE_TYPE_LABEL[ownerrole] or ''))
 	local txtEquipScore = page:Lookup('Wnd_Total/Wnd_ItemPage', 'Text_EquipScore')
 	txtEquipScore:SetVisible(ownersuitindex == D.dwCurrentSuitIndex)
 	txtEquipScore:SetText(_L('Equip score: %s', ownerscore))
@@ -689,17 +687,17 @@ function D.OnLButtonClick()
 	if name == 'Wnd_Name' then
 		local wnd = this:GetParent()
 		local page = this:GetParent():GetParent():GetParent():GetParent()
-		D.szCurrentOwnerKey = wnd.ownerkey
+		D.szCurrentOwnerKey = wnd.ownerinfo.ownerkey
 		D.UpdateNames(page)
 	elseif name == 'Btn_Delete' then
 		local wnd = this:GetParent()
 		local page = this:GetParent():GetParent():GetParent():GetParent():GetParent()
-		LIB.Confirm(_L('Are you sure to delete item record of %s?', wnd.ownername), function()
+		LIB.Confirm(_L('Are you sure to delete item record of %s?', wnd.ownerinfo.ownername), function()
 			DB_ItemsDA:ClearBindings()
-			DB_ItemsDA:BindAll(wnd.ownerkey)
+			DB_ItemsDA:BindAll(wnd.ownerinfo.ownerkey)
 			DB_ItemsDA:Execute()
 			DB_OwnerInfoD:ClearBindings()
-			DB_OwnerInfoD:BindAll(wnd.ownerkey)
+			DB_OwnerInfoD:BindAll(wnd.ownerinfo.ownerkey)
 			DB_OwnerInfoD:Execute()
 			D.UpdateNames(page)
 		end)
@@ -733,12 +731,12 @@ function D.OnMouseEnter()
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
 		OutputTip(GetFormatText(_L(
-			this.ownername:sub(1, 1) == '['
+			this.ownerinfo.ownername:sub(1, 1) == '['
 				and 'Tong: %s\nServer: %s\nSnapshot Time: %s'
 				or 'Character: %s\nServer: %s\nSnapshot Time: %s',
-			this.ownername,
-			this.servername,
-			LIB.FormatTime(this.time, '%yyyy-%MM-%dd %hh:%mm:%ss')), nil, 255, 255, 0), 400, {x, y, w, h, false}, ALW.RIGHT_LEFT_AND_BOTTOM_TOP, false)
+			this.ownerinfo.ownername,
+			this.ownerinfo.servername,
+			LIB.FormatTime(this.ownerinfo.time, '%yyyy-%MM-%dd %hh:%mm:%ss')), nil, 255, 255, 0), 400, {x, y, w, h, false}, ALW.RIGHT_LEFT_AND_BOTTOM_TOP, false)
 	end
 end
 
