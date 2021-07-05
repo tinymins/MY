@@ -12,4 +12,4 @@ before_install:
   - luarocks install luacheck
 
 script:
-  - luacheck MYDev_Snaplines MYDev_UIEventID MYDev_UITexViewer MYDev_VarWatch 'MY_!Base' MY_BagEx MY_Cataclysm MY_Chat MY_ChatFilter MY_ChatLog MY_ChatMonitor MY_CombatText MY_EquipView MY_Farbnamen MY_Focus MY_Font MY_FontResource MY_Force MY_GKP MY_LifeBar MY_Logoff MY_MiddleMapMark MY_Recount MY_Resource MY_RoleStatistics MY_RollMonitor MY_ScreenShot MY_TalkEx MY_Target MY_TargetMon MY_TeamMon MY_TeamTools MY_ThreatRank MY_Toolbox
+  - luacheck MYDev_Snaplines MYDev_UIEventID MYDev_UITexViewer MYDev_VarWatch 'MY_!Base' MY_BagEx MY_Cataclysm MY_Chat MY_ChatFilter MY_ChatLog MY_ChatMonitor MY_CombatText MY_Farbnamen MY_Focus MY_Font MY_FontResource MY_Force MY_GKP MY_LifeBar MY_Logoff MY_MiddleMapMark MY_Recount MY_Resource MY_RoleStatistics MY_RollMonitor MY_ScreenShot MY_TalkEx MY_Target MY_TargetMon MY_TeamMon MY_TeamTools MY_ThreatRank MY_Toolbox

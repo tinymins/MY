@@ -1,8 +1,0 @@
-[MY_EquipView]
-name=裝備一覽
-desc=不切換裝備即可同時顯示多套裝備
-default=1
-version=1.0
-dependence=MY_!Base
-lua_0=src\MY_EquipView.lua
-package=MY
