@@ -504,24 +504,92 @@ local DATA_CACHE = {}
 local DATA_CACHE_LEAF_FLAG = {}
 local FLUSH_TIME = 0
 local DATABASE_CONNECTION_ESTABLISHED = false
+local EncodeByteData = _G.GetInsideEnv().EncodeByteData or _G.GetInsideEnv().VariableToString
+local DecodeByteData = _G.GetInsideEnv().DecodeByteData or _G.GetInsideEnv().StringToVariable
+
+local function SetInstanceInfoData(inst, info, data, version)
+	local setter = info.bUserData
+		and inst.pUserDataSetter
+		or inst.pSettingsSetter
+	setter:ClearBindings()
+	setter:BindAll(info.szDataKey, EncodeByteData(data), version)
+	setter:Execute()
+end
+
+local function GetInstanceInfoData(inst, info)
+	local getter = info.bUserData
+		and inst.pUserDataGetter
+		or inst.pSettingsGetter
+	getter:ClearBindings()
+	getter:BindAll(info.szDataKey)
+	local res = getter:GetNext()
+	if res then
+		-- res.value: KByteData
+		return { v = res.version, d = DecodeByteData(res.value) }
+	end
+	local db = info.bUserData
+		and inst.pUserDataUDB
+		or inst.pSettingsUDB
+	local res = db:Get(info.szDataKey)
+	if IsTable(res) then
+		if not res.v then
+			res.v = ''
+		end
+		SetInstanceInfoData(inst, info, res.d, res.v)
+		db:Delete(info.szDataKey)
+		return res
+	end
+	return nil
+end
+
+local function DeleteInstanceInfoData(inst, info)
+	local deleter = info.bUserData
+		and inst.pUserDataDeleter
+		or inst.pSettingsDeleter
+	deleter:ClearBindings()
+	deleter:BindAll(info.szDataKey)
+	deleter:Execute()
+end
 
 function LIB.ConnectUserSettingsDB()
 	if DATABASE_CONNECTION_ESTABLISHED then
 		return
 	end
-	local szID, szPresetRoot = LIB.GetUserSettingsPresetID(), nil
+	local szID, szDBPresetRoot, szUDBPresetRoot = LIB.GetUserSettingsPresetID(), nil, nil
 	if szID then
-		szPresetRoot = LIB.FormatPath({'userdata/settings/' .. szID .. '/', PATH_TYPE.GLOBAL})
-		CPath.MakeDir(szPresetRoot)
+		szDBPresetRoot = LIB.FormatPath({'config/settings/' .. szID .. '/', PATH_TYPE.GLOBAL})
+		szUDBPresetRoot = LIB.FormatPath({'userdata/settings/' .. szID .. '/', PATH_TYPE.GLOBAL})
+		CPath.MakeDir(szDBPresetRoot)
+		CPath.MakeDir(szUDBPresetRoot)
 	end
 	for _, ePathType in ipairs(DATABASE_TYPE_LIST) do
 		if not DATABASE_INSTANCE[ePathType] then
+			local pSettingsDB = LIB.SQLiteConnect('LIB.UserSettings.Settings', szDBPresetRoot
+				and (szDBPresetRoot .. DATABASE_TYPE_PRESET_FILE[ePathType] .. '.db')
+				or LIB.FormatPath({'config/settings.db', ePathType}))
+			pSettingsDB:Execute('CREATE TABLE IF NOT EXISTS data (key NVARCHAR(128), value BLOB, version NVARCHAR(128), PRIMARY KEY (key))')
+			local pSettingsSetter = pSettingsDB:Prepare('REPLACE INTO data (key, value, version) VALUES (?, ?, ?)')
+			local pSettingsGetter = pSettingsDB:Prepare('SELECT * FROM data WHERE key = ? LIMIT 1')
+			local pSettingsDeleter = pSettingsDB:Prepare('DELETE FROM data WHERE key = ?')
+			local pUserDataDB = LIB.SQLiteConnect('LIB.UserSettings.UserData', LIB.FormatPath({'userdata/userdata.db', ePathType}))
+			pUserDataDB:Execute('CREATE TABLE IF NOT EXISTS data (key NVARCHAR(128), value BLOB, version NVARCHAR(128), PRIMARY KEY (key))')
+			local pUserDataSetter = pUserDataDB:Prepare('REPLACE INTO data (key, value, version) VALUES (?, ?, ?)')
+			local pUserDataGetter = pUserDataDB:Prepare('SELECT * FROM data WHERE key = ? LIMIT 1')
+			local pUserDataDeleter = pUserDataDB:Prepare('DELETE FROM data WHERE key = ?')
 			DATABASE_INSTANCE[ePathType] = {
-				pSettingsDB = LIB.UnQLiteConnect(szPresetRoot
-					and (szPresetRoot .. DATABASE_TYPE_PRESET_FILE[ePathType] .. '.udb')
+				pSettingsUDB = LIB.UnQLiteConnect(szUDBPresetRoot
+					and (szUDBPresetRoot .. DATABASE_TYPE_PRESET_FILE[ePathType] .. '.udb')
 					or LIB.FormatPath({'userdata/settings.udb', ePathType})),
+				pSettingsDB = pSettingsDB,
+				pSettingsSetter = pSettingsSetter,
+				pSettingsGetter = pSettingsGetter,
+				pSettingsDeleter = pSettingsDeleter,
 				bSettingsDBCommit = false,
-				pUserDataDB = LIB.UnQLiteConnect(LIB.FormatPath({'userdata/userdata.udb', ePathType})),
+				pUserDataUDB = LIB.UnQLiteConnect(LIB.FormatPath({'userdata/userdata.udb', ePathType})),
+				pUserDataDB = pUserDataDB,
+				pUserDataSetter = pUserDataSetter,
+				pUserDataGetter = pUserDataGetter,
+				pUserDataDeleter = pUserDataDeleter,
 				bUserDataDBCommit = false,
 			}
 		end
@@ -535,8 +603,10 @@ function LIB.ReleaseUserSettingsDB()
 	for _, ePathType in ipairs(DATABASE_TYPE_LIST) do
 		local inst = DATABASE_INSTANCE[ePathType]
 		if inst then
-			LIB.UnQLiteDisconnect(inst.pSettingsDB)
-			LIB.UnQLiteDisconnect(inst.pUserDataDB)
+			LIB.UnQLiteDisconnect(inst.pSettingsUDB)
+			LIB.UnQLiteDisconnect(inst.pUserDataUDB)
+			LIB.SQLiteDisconnect(inst.pSettingsDB)
+			LIB.SQLiteDisconnect(inst.pUserDataDB)
 			DATABASE_INSTANCE[ePathType] = nil
 		end
 	end
@@ -545,19 +615,19 @@ function LIB.ReleaseUserSettingsDB()
 end
 
 function LIB.FlushUserSettingsDB()
-	for _, ePathType in ipairs(DATABASE_TYPE_LIST) do
-		local inst = DATABASE_INSTANCE[ePathType]
-		if inst then
-			if inst.bSettingsDBCommit and inst.pSettingsDB and inst.pSettingsDB.Commit then
-				inst.pSettingsDB:Commit()
-				inst.bSettingsDBCommit = false
-			end
-			if inst.bUserDataDBCommit and inst.pUserDataDB and inst.pUserDataDB.Commit then
-				inst.pUserDataDB:Commit()
-				inst.bUserDataDBCommit = false
-			end
-		end
-	end
+	-- for _, ePathType in ipairs(DATABASE_TYPE_LIST) do
+	-- 	local inst = DATABASE_INSTANCE[ePathType]
+	-- 	if inst then
+	-- 		if inst.bSettingsDBCommit and inst.pSettingsDB and inst.pSettingsDB.Commit then
+	-- 			inst.pSettingsDB:Commit()
+	-- 			inst.bSettingsDBCommit = false
+	-- 		end
+	-- 		if inst.bUserDataDBCommit and inst.pUserDataDB and inst.pUserDataDB.Commit then
+	-- 			inst.pUserDataDB:Commit()
+	-- 			inst.bUserDataDBCommit = false
+	-- 		end
+	-- 	end
+	-- end
 end
 
 function LIB.GetUserSettingsPresetID(bDefault)
@@ -639,6 +709,9 @@ function LIB.RegisterUserSettings(szKey, tOption)
 	if not szDataKey then
 		szDataKey = szKey
 	end
+	if not szVersion then
+		szVersion = ''
+	end
 	local szErrHeader = 'RegisterUserSettings KEY(' .. EncodeLUAData(szKey) .. '): '
 	assert(IsString(szKey) and #szKey > 0, szErrHeader .. '`Key` should be a non-empty string value.')
 	assert(not USER_SETTINGS_INFO[szKey], szErrHeader .. 'duplicated `Key` found.')
@@ -647,7 +720,7 @@ function LIB.RegisterUserSettings(szKey, tOption)
 	assert(lodash.includes(DATABASE_TYPE_LIST, ePathType), szErrHeader .. '`PathType` value is not valid.')
 	assert(IsNil(szGroup) or (IsString(szGroup) and #szGroup > 0), szErrHeader .. '`Group` should be nil or a non-empty string value.')
 	assert(IsNil(szLabel) or (IsString(szLabel) and #szLabel > 0), szErrHeader .. '`Label` should be nil or a non-empty string value.')
-	assert(IsNil(szVersion) or IsString(szVersion) or IsNumber(szVersion), szErrHeader .. '`Version` should be a nil, string or number value.')
+	assert(IsString(szVersion), szErrHeader .. '`Version` should be a string value.')
 	if xSchema then
 		local errs = Schema.CheckSchema(xDefaultValue, xSchema)
 		if errs then
@@ -698,10 +771,7 @@ function LIB.ExportUserSettings(aKey)
 		local info = USER_SETTINGS_INFO[szKey]
 		local inst = info and DATABASE_INSTANCE[info.ePathType]
 		if inst then
-			local db = info.bUserData
-				and inst.pUserDataDB
-				or inst.pSettingsDB
-			tKvp[szKey] = db:Get(info.szDataKey)
+			tKvp[szKey] = GetInstanceInfoData(inst, info)
 		end
 	end
 	return tKvp
@@ -710,13 +780,13 @@ end
 function LIB.ImportUserSettings(tKvp)
 	local nSuccess = 0
 	for szKey, xValue in pairs(tKvp) do
-		local info = USER_SETTINGS_INFO[szKey]
+		local info = IsTable(xValue) and USER_SETTINGS_INFO[szKey]
 		local inst = info and DATABASE_INSTANCE[info.ePathType]
 		if inst then
 			local db = info.bUserData
 				and inst.pUserDataDB
 				or inst.pSettingsDB
-			db:Set(info.szDataKey, xValue)
+			SetInstanceInfoData(inst, info, xValue.d, xValue.v)
 			nSuccess = nSuccess + 1
 			DATA_CACHE[szKey] = nil
 		end
@@ -763,7 +833,7 @@ function LIB.GetUserSettings(szKey, ...)
 		assert(nParameter == 1, szErrHeader .. '1 parameters expected, got ' .. nParameter)
 	end
 	-- 读数据库
-	local res, bData = db:Get(info.szDataKey), false
+	local res, bData = GetInstanceInfoData(inst, info), false
 	if IsTable(res) and res.v == info.szVersion then
 		local data = res.d
 		if info.bDataSet then
@@ -843,7 +913,7 @@ function LIB.SetUserSettings(szKey, ...)
 	end
 	-- 写数据库
 	if info.bDataSet then
-		local res = db:Get(info.szDataKey)
+		local res = GetInstanceInfoData(inst, info)
 		if IsTable(res) and res.v == info.szVersion and IsTable(res.d) then
 			res.d[szDataSetKey] = xValue
 			xValue = res.d
@@ -856,7 +926,7 @@ function LIB.SetUserSettings(szKey, ...)
 	else
 		DATA_CACHE[szKey] = nil
 	end
-	db:Set(info.szDataKey, { d = xValue, v = info.szVersion })
+	SetInstanceInfoData(inst, info, xValue, info.szVersion)
 	if info.bUserData then
 		inst.bUserDataDBCommit = true
 	else
@@ -890,23 +960,23 @@ function LIB.ResetUserSettings(szKey, ...)
 	end
 	-- 写数据库
 	if info.bDataSet then
-		local res = db:Get(info.szDataKey)
+		local res = GetInstanceInfoData(inst, info)
 		if IsTable(res) and res.v == info.szVersion and IsTable(res.d) and szDataSetKey then
 			res.d[szDataSetKey] = nil
 			if IsEmpty(res.d) then
-				db:Delete(info.szDataKey)
+				DeleteInstanceInfoData(inst, info)
 			else
-				db:Set(info.szDataKey, res)
+				SetInstanceInfoData(inst, info, res.d, info.szVersion)
 			end
 			if DATA_CACHE[szKey] then
 				DATA_CACHE[szKey][szDataSetKey] = nil
 			end
 		else
-			db:Delete(info.szDataKey)
+			DeleteInstanceInfoData(inst, info)
 			DATA_CACHE[szKey] = nil
 		end
 	else
-		db:Delete(info.szDataKey)
+		DeleteInstanceInfoData(inst, info)
 		DATA_CACHE[szKey] = nil
 	end
 	if info.bUserData then
@@ -1342,4 +1412,8 @@ function LIB.SQLiteConnect(szCaption, oPath, fnAction)
 		end
 	end
 end
+end
+
+function LIB.SQLiteDisconnect(db)
+	db:Release()
 end
