@@ -499,9 +499,10 @@ function D.UpdateItems(page)
 		if rec and rec.tabtype >= 0 then
 			local KItemInfo = GetItemInfo(rec.tabtype, rec.tabindex)
 			if KItemInfo then
+				local bMaxStrength = KItemInfo.nMaxStrengthLevel > 0 and rec.strength == KItemInfo.nMaxStrengthLevel
 				if box then
 					UI.UpdateItemInfoBoxObject(box, nil, rec.tabtype, rec.tabindex, rec.stacknum, rec.tabsubindex)
-					UpdateItemBoxExtend(box, KItemInfo.nGenre, KItemInfo.nQuality, rec.strength)
+					UpdateItemBoxExtend(box, KItemInfo.nGenre, KItemInfo.nQuality, bMaxStrength)
 					box.OnItemMouseEnter = nil
 					box.OnItemRefreshTip = nil
 					box.tip = rec.desc
