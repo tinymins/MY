@@ -566,7 +566,7 @@ function D.Get(szKey)
 			szTitle   = info.title,
 			nCamp     = info.camp,
 			szTongID  = GetTongName(info.tong) or '',
-			rgb       = { LIB.GetForceColor(info.force, 'foreground') },
+			rgb       = IsNumber(info.force) and { LIB.GetForceColor(info.force, 'foreground') } or { 255, 255, 255 },
 		}
 	end
 end
