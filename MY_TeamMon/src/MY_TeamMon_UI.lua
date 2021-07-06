@@ -980,11 +980,11 @@ function D.OpenImportPanel(szDefault, szTitle, fnAction)
 						if MY_LifeBar and not MY_LifeBar.bEnabled then
 							MY_LifeBar.bEnabled = true
 						end
-						if MY_TeamMon and not MY_TeamMon.bEnabled then
-							MY_TeamMon.bEnabled = true
+						if MY_TeamMon and not MY_TeamMon.bEnable then
+							MY_TeamMon.bEnable = true
 						end
-						if MY_Focus and not MY_Focus.bEnabled then
-							MY_Focus.bEnabled = true
+						if MY_Focus and not MY_Focus.bEnable then
+							MY_Focus.bEnable = true
 						end
 						SafeCall(fnAction, bStatus, szFilePath, aType, szMode, tMeta)
 					else
