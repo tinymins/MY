@@ -327,7 +327,7 @@ function D.FlushDB()
 				diamond_enchant = AnsiToUTF8(LIB.JsonEncode(aDiamondEnchant)) -- 五行石
 				fea_enchant = KItem.nSub == EQUIPMENT_SUB.MELEE_WEAPON and KItem.GetMountFEAEnchantID() or 0 -- 五彩石
 				permanent_enchant = KItem.dwPermanentEnchantID -- 附魔
-				desc = AnsiToUTF8(GetItemTip(KItem) or '')
+				desc = AnsiToUTF8(LIB.GetItemTip(KItem) or '')
 			end
 			DB_ItemsW:BindAll(
 				ownerkey, suitindex, boxtype, boxindex, itemid,
