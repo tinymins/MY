@@ -38,6 +38,7 @@ return {
 	['Flush data'] = '保存數據',
 	['Export data'] = '導出配置',
 	['Import data'] = '導入配置',
+	['Backup folder'] = '查看導出',
 	['Config and data will be saved when exit game, click to save immediately'] = '設置數據將在退出游戲後自動保存，點擊立刻保存',
 
 	['Fee left %H:%mm:%ss'] = '計費剩餘：%H小時%mm分鐘%ss秒',
