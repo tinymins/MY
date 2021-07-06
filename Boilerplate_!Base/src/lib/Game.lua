@@ -2288,12 +2288,12 @@ end
 -- (dwType, dwID) LIB.GetTargetTarget()       -- 取得自己当前的目标的目标类型和ID
 -- (dwType, dwID) LIB.GetTargetTarget(object) -- 取得指定操作对象当前的目标的目标类型和ID
 function LIB.GetTargetTarget(object)
-    local nTarType, dwTarID = LIB.GetTarget(object)
-    local KTar = LIB.GetObject(nTarType, dwTarID)
-    if not KTar then
-        return
-    end
-    return LIB.GetTarget(KTar)
+	local nTarType, dwTarID = LIB.GetTarget(object)
+	local KTar = LIB.GetObject(nTarType, dwTarID)
+	if not KTar then
+		return
+	end
+	return LIB.GetTarget(KTar)
 end
 
 -- 根据 dwType 类型和 dwID 设置目标
@@ -3288,7 +3288,7 @@ end
 do
 local RECIPE_CACHE = {}
 local function onRecipeUpdate()
-    RECIPE_CACHE = {}
+	RECIPE_CACHE = {}
 end
 LIB.RegisterEvent({'SYNC_ROLE_DATA_END', 'SKILL_UPDATE', 'SKILL_RECIPE_LIST_UPDATE'}, onRecipeUpdate)
 
@@ -3298,32 +3298,32 @@ local function GetShortName(sz) -- 获取秘笈短名
 end
 
 function LIB.IsRecipeActive(szRecipeName)
-    local me = GetClientPlayer()
-    if not RECIPE_CACHE[szRecipeName] then
-        if not me then
-            return
-        end
+	local me = GetClientPlayer()
+	if not RECIPE_CACHE[szRecipeName] then
+		if not me then
+			return
+		end
 
-        for id, lv in pairs(me.GetAllSkillList())do
-            for _, info in pairs(me.GetSkillRecipeList(id, lv) or {}) do
-                local t = Table_GetSkillRecipe(info.recipe_id , info.recipe_level)
-                if t and (szRecipeName == t.szName or szRecipeName == GetShortName(t.szName)) then
-                    RECIPE_CACHE[szRecipeName] = info.active and 1 or 0
-                    break
-                end
-            end
+		for id, lv in pairs(me.GetAllSkillList())do
+			for _, info in pairs(me.GetSkillRecipeList(id, lv) or {}) do
+				local t = Table_GetSkillRecipe(info.recipe_id , info.recipe_level)
+				if t and (szRecipeName == t.szName or szRecipeName == GetShortName(t.szName)) then
+					RECIPE_CACHE[szRecipeName] = info.active and 1 or 0
+					break
+				end
+			end
 
-            if RECIPE_CACHE[szRecipeName] then
-                break
-            end
-        end
+			if RECIPE_CACHE[szRecipeName] then
+				break
+			end
+		end
 
-        if not RECIPE_CACHE[szRecipeName] then
-            RECIPE_CACHE[szRecipeName] = 0
-        end
-    end
+		if not RECIPE_CACHE[szRecipeName] then
+			RECIPE_CACHE[szRecipeName] = 0
+		end
+	end
 
-    return RECIPE_CACHE[szRecipeName] == 1
+	return RECIPE_CACHE[szRecipeName] == 1
 end
 end
 
