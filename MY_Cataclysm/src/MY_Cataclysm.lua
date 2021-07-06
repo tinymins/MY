@@ -461,7 +461,7 @@ local O = LIB.CreateUserSettingsModule('MY_Cataclysm', _L['Raid'], {
 	tDistanceLevel = {
 		ePathType = PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+		xSchema = Schema.Map(Schema.Number, Schema.Number),
 		xDefaultValue = { 20, 22, 200 },
 	},
 	tManaColor = {
