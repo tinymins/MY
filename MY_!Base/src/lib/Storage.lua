@@ -514,6 +514,7 @@ local function SetInstanceInfoData(inst, info, data, version)
 	setter:ClearBindings()
 	setter:BindAll(info.szDataKey, EncodeByteData(data), version)
 	setter:Execute()
+	setter:Reset()
 end
 
 local function GetInstanceInfoData(inst, info)
@@ -523,6 +524,7 @@ local function GetInstanceInfoData(inst, info)
 	getter:ClearBindings()
 	getter:BindAll(info.szDataKey)
 	local res = getter:GetNext()
+	getter:Reset()
 	if res then
 		-- res.value: KByteData
 		return { v = res.version, d = DecodeByteData(res.value) }
@@ -1512,6 +1514,7 @@ local function DuplicateDatabase(DB_SRC, DB_DST, szCaption)
 				DB_W:Execute()
 			end
 		end
+		DB_W:Reset()
 		DB_DST:Execute('END TRANSACTION')
 		--[[#DEBUG BEGIN]]
 		LIB.Debug(szCaption, 'Duplicating table finished: ' .. szTableName, DEBUG_LEVEL.LOG)
