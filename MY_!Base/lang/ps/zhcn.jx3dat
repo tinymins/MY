@@ -43,6 +43,7 @@ return {
 	['Flush data'] = '保存数据',
 	['Export data'] = '导出配置',
 	['Import data'] = '导入配置',
+	['Backup folder'] = '查看导出',
 	['Config and data will be saved when exit game, click to save immediately'] = '设置数据将在退出游戏后自动保存，点击立刻保存',
 
 	['Fee left %H:%mm:%ss'] = '计费剩余：%H小时%mm分钟%ss秒',

@@ -200,6 +200,16 @@ function PS.OnPanelActive(wnd)
 			LIB.OpenUserSettingsImportPanel()
 		end,
 	}):AutoWidth():Width() + 5
+
+	nX = nX + ui:Append('WndButtonBox', {
+		x = nX, y = nY,
+		text = _L['Backup folder'],
+		onclick = function()
+			local szRoot = LIB.GetAbsolutePath({'export/settings/', PATH_TYPE.GLOBAL}):gsub('/', '\\')
+			LIB.OpenFolder(szRoot)
+			UI.OpenTextEditor(szRoot)
+		end,
+	}):AutoWidth():Width() + 5
 	nX, nY = X, nY + 30
 
 	ui:Append('Text', {
