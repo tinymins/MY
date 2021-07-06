@@ -45,6 +45,9 @@ local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCal
 local _L = LIB.LoadLangPack(PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 ---------------------------------------------------------------------------------------------------
 
+local EncodeByteData = GetGameAPI('EncodeByteData')
+local DecodeByteData = GetGameAPI('DecodeByteData')
+
 -- Save & Load Lua Data
 -- ##################################################################################################
 --         #       #             #                           #
@@ -504,8 +507,6 @@ local DATA_CACHE = {}
 local DATA_CACHE_LEAF_FLAG = {}
 local FLUSH_TIME = 0
 local DATABASE_CONNECTION_ESTABLISHED = false
-local EncodeByteData = _G.GetInsideEnv().EncodeByteData or _G.GetInsideEnv().VariableToString
-local DecodeByteData = _G.GetInsideEnv().DecodeByteData or _G.GetInsideEnv().StringToVariable
 
 local function SetInstanceInfoData(inst, info, data, version)
 	local setter = info.bUserData
@@ -785,9 +786,6 @@ function LIB.ImportUserSettings(tKvp)
 		local info = IsTable(xValue) and USER_SETTINGS_INFO[szKey]
 		local inst = info and DATABASE_INSTANCE[info.ePathType]
 		if inst then
-			local db = info.bUserData
-				and inst.pUserDataDB
-				or inst.pSettingsDB
 			SetInstanceInfoData(inst, info, xValue.d, xValue.v)
 			nSuccess = nSuccess + 1
 			DATA_CACHE[szKey] = nil
@@ -823,9 +821,6 @@ function LIB.GetUserSettings(szKey, ...)
 	assert(info, szErrHeader ..'`Key` has not been registered.')
 	local inst = DATABASE_INSTANCE[info.ePathType]
 	assert(inst, szErrHeader ..'Database not connected.')
-	local db = info.bUserData
-		and inst.pUserDataDB
-		or inst.pSettingsDB
 	local szDataSetKey
 	if info.bDataSet then
 		assert(nParameter == 2, szErrHeader .. '2 parameters expected, got ' .. nParameter)
@@ -890,9 +885,6 @@ function LIB.SetUserSettings(szKey, ...)
 		return false
 	end
 	assert(inst, szErrHeader .. 'Database not connected.')
-	local db = info.bUserData
-		and inst.pUserDataDB
-		or inst.pSettingsDB
 	local szDataSetKey, xValue
 	if info.bDataSet then
 		assert(nParameter == 3, szErrHeader .. '3 parameters expected, got ' .. nParameter)
@@ -949,9 +941,6 @@ function LIB.ResetUserSettings(szKey, ...)
 	assert(info, szErrHeader .. '`Key` has not been registered.')
 	local inst = DATABASE_INSTANCE[info.ePathType]
 	assert(inst, szErrHeader .. 'Database not connected.')
-	local db = info.bUserData
-		and inst.pUserDataDB
-		or inst.pSettingsDB
 	local szDataSetKey
 	if info.bDataSet then
 		assert(nParameter == 1 or nParameter == 2, szErrHeader .. '1 or 2 parameter(s) expected, got ' .. nParameter)
@@ -1418,5 +1407,87 @@ end
 end
 
 function LIB.SQLiteDisconnect(db)
+	db:Release()
+end
+
+------------------------------------------------------------------------------
+-- 基于 SQLite 的 NoSQLite 封装
+------------------------------------------------------------------------------
+
+function LIB.NoSQLiteConnect(oPath)
+	local db = LIB.SQLiteConnect('NoSQL', oPath)
+	db:Execute('CREATE TABLE IF NOT EXISTS data (key NVARCHAR(256), value BLOB, PRIMARY KEY (key))')
+	local stmtSetter = db:Prepare('REPLACE INTO data (key, value) VALUES (?, ?)')
+	local stmtGetter = db:Prepare('SELECT * FROM data WHERE key = ? LIMIT 1')
+	local stmtDeleter = db:Prepare('DELETE FROM data WHERE key = ?')
+	local stmtAllGetter = db:Prepare('SELECT * FROM data')
+	return setmetatable({}, {
+		__index = {
+			Set = function(_, k, v)
+				assert(stmtSetter, 'NoSQL connection closed.')
+				stmtSetter:ClearBindings()
+				stmtSetter:BindAll(k, EncodeByteData(v))
+				stmtSetter:Execute()
+				stmtSetter:Reset()
+			end,
+			Get = function(_, k)
+				assert(stmtGetter, 'NoSQL connection closed.')
+				stmtGetter:ClearBindings()
+				stmtGetter:BindAll(k)
+				local res = stmtGetter:GetNext()
+				stmtGetter:Reset()
+				if res then
+					res = DecodeByteData(res.value)
+				end
+				return res
+			end,
+			Delete = function(_, k)
+				assert(stmtDeleter, 'NoSQL connection closed.')
+				stmtDeleter:ClearBindings()
+				stmtDeleter:BindAll(k)
+				stmtDeleter:Execute()
+				stmtDeleter:Reset()
+			end,
+			GetAll = function(_)
+				assert(stmtAllGetter, 'NoSQL connection closed.')
+				stmtAllGetter:ClearBindings()
+				local res = stmtAllGetter:GetAll()
+				stmtAllGetter:Reset()
+				local tKvp = {}
+				if res then
+					for _, v in ipairs(res) do
+						tKvp[v.key] = DecodeByteData(v.value)
+					end
+				end
+				return tKvp
+			end,
+			Release = function(_)
+				if stmtSetter then
+					stmtSetter:Release()
+					stmtSetter = nil
+				end
+				if stmtGetter then
+					stmtGetter:Release()
+					stmtGetter = nil
+				end
+				if stmtDeleter then
+					stmtDeleter:Release()
+					stmtDeleter = nil
+				end
+				if stmtAllGetter then
+					stmtAllGetter:Release()
+					stmtAllGetter = nil
+				end
+				if db then
+					db:Release()
+					db = nil
+				end
+			end,
+		},
+		__newindex = function() end,
+	})
+end
+
+function LIB.NoSQLiteDisconnect(db)
 	db:Release()
 end
