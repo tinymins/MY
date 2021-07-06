@@ -509,6 +509,14 @@ function LIB.OutputItemInfoTip(Rect, dwTabType, dwIndex, nBookInfo)
 	OutputTip(szXml, 345, Rect)
 end
 
+function LIB.GetItemTip(KItem)
+	local bStatus, szXml = Call(GetItemTip, KItem)
+	if bStatus then
+		return szXml
+	end
+	return ''
+end
+
 function LIB.OutputItemTip(Rect, dwItemID)
 	if not IsTable(Rect) and not IsNil(Rect) then
 		Rect, dwItemID = nil, Rect
