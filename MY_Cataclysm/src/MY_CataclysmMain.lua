@@ -203,7 +203,7 @@ function D.SetConfig(Config, bKeepBuff)
 	end
 	-- Config.bFasterHP = false
 	for k, v in pairs(Config) do
-		CFG[k] = v
+		Call(Set, CFG, {k}, v)
 	end
 	D.UpdateBuffListCache()
 	D.ReloadCataclysmPanel()
