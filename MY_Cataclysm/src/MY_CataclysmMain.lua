@@ -760,18 +760,18 @@ function D.OnEvent(szEvent)
 	elseif szEvent == 'PARTY_SET_MARK' then
 		MY_CataclysmParty:RefreshMark()
 	elseif szEvent == 'TEAM_VOTE_REQUEST' then
-        -- arg0 nVoteType
-        -- arg1 nArg0
-        -- arg2 nArg1
+		-- arg0 nVoteType
+		-- arg1 nArg0
+		-- arg2 nArg1
 		if arg0 == 1 then
 			D.OnWageStart()
 		end
 	elseif szEvent == 'TEAM_VOTE_RESPOND' then
-        -- arg0 nVoteType
-        -- arg1 dwAnswerID
-        -- arg2 bYes
-        -- arg3 nArg0
-        -- arg4 nArg1
+		-- arg0 nVoteType
+		-- arg1 dwAnswerID
+		-- arg2 bYes
+		-- arg3 nArg0
+		-- arg4 nArg1
 		if arg0 == 1 then
 			MY_CataclysmParty:ChangeTeamVoteState('wage_agree', arg1, arg2 == 1 and 'resolve' or 'reject')
 		end

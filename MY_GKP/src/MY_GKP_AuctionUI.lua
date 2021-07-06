@@ -109,7 +109,7 @@ function D.Open(ds, tab, szMode)
 		end,
 	})
 	local hSource = ui:Append('WndEditBox', { name = 'Source', x = x + 140, y = y + 121, w = 185, h = 25 })
-    local hName = ui:Append('WndAutocomplete', {
+	local hName = ui:Append('WndAutocomplete', {
 		name = 'Name', x = x + 140, y = y + 91, w = 185, h = 25,
 		autocomplete = {
 			{
