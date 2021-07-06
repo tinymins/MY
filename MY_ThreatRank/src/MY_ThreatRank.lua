@@ -126,7 +126,7 @@ local O = LIB.CreateUserSettingsModule('MY_ThreatRank', _L['Target'], {
 		ePathType = PATH_TYPE.ROLE,
 		szLabel = _L['MY_ThreatRank'],
 		xSchema = Schema.FrameAnchor,
-		xDefaultValue = { s = 'TOPRIGHT', r = 'TOPRIGHT', x = 300, y = -300 },
+		xDefaultValue = { s = 'TOPRIGHT', r = 'TOPRIGHT', x = -300, y = 300 },
 	},
 	nStyle = {
 		ePathType = PATH_TYPE.ROLE,
