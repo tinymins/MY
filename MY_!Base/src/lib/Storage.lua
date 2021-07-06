@@ -1585,7 +1585,7 @@ end
 
 function LIB.NoSQLiteConnect(oPath)
 	local db = LIB.SQLiteConnect('NoSQL', oPath)
-	db:Execute('CREATE TABLE IF NOT EXISTS data (key NVARCHAR(256), value BLOB, PRIMARY KEY (key))')
+	db:Execute('CREATE TABLE IF NOT EXISTS data (key NVARCHAR(256) NOT NULL, value BLOB, PRIMARY KEY (key))')
 	local stmtSetter = db:Prepare('REPLACE INTO data (key, value) VALUES (?, ?)')
 	local stmtGetter = db:Prepare('SELECT * FROM data WHERE key = ? LIMIT 1')
 	local stmtDeleter = db:Prepare('DELETE FROM data WHERE key = ?')
