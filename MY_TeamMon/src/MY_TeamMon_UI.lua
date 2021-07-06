@@ -2954,7 +2954,7 @@ function D.OpenSettingPanel(data, szType)
 								D.OpenSettingPanel(data, szType)
 							end
 							FireUIEvent('MY_TM_DATA_RELOAD', { [szType] = true })
-						end, true)
+						end, nil, true)
 					end,
 				}):Width() + 5
 				if nX + 130 > nW then

@@ -100,6 +100,9 @@ local function OpenBuffRuleEditor(rec)
 				end
 			end
 		end
+	end, function()
+		CFG.aBuffList = CFG.aBuffList
+		LIB.SwitchTab('MY_Cataclysm_BuffMonitor', true)
 	end)
 end
 

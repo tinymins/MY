@@ -643,7 +643,7 @@ function D.DecodeBuffRule(line)
 	end
 end
 
-function D.OpenBuffRuleEditor(rec, onChangeNotify, bHideBase)
+function D.OpenBuffRuleEditor(rec, onChangeNotify, onCloseNotify, bHideBase)
 	local w, h = 320, 320
 	local ui = UI.CreateFrame('MY_Cataclysm_BuffConfig', {
 		w = w, h = h,
@@ -653,6 +653,7 @@ function D.OpenBuffRuleEditor(rec, onChangeNotify, bHideBase)
 		if not bHideBase and not rec.dwID and (not rec.szName or rec.szName == '') then
 			onChangeNotify()
 		end
+		SafeCall(onCloseNotify)
 	end)
 	local X, Y = 25, 60
 	local x, y = X, Y
