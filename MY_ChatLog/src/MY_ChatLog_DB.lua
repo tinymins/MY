@@ -238,6 +238,7 @@ function DB:SetInfo(szKey, oValue)
 	self.stmtInfoSet:ClearBindings()
 	self.stmtInfoSet:BindAll(szKey, EncodeLUAData(oValue))
 	self.stmtInfoSet:GetAll()
+	self.stmtInfoSet:Reset()
 	return true
 end
 
@@ -248,6 +249,7 @@ function DB:GetInfo(szKey)
 	self.stmtInfoGet:ClearBindings()
 	self.stmtInfoGet:BindAll(szKey)
 	local res, success = Get(self.stmtInfoGet:GetAll(), {1, 'value'})
+	self.stmtInfoGet:Reset()
 	if success then
 		res = DecodeLUAData(res)
 	end
@@ -344,10 +346,12 @@ function DB:CountMsg(aChannel, szSearch, nMinTime, nMaxTime)
 			stmt:ClearBindings()
 			stmt:BindAll(unpack(aValue))
 			aResult = stmt:GetAll()
+			stmt:Reset()
 		else
 			self.stmtCount:ClearBindings()
 			self.stmtCount:BindAll(szSearch, szSearch)
 			aResult = self.stmtCount:GetAll()
+			self.stmtCount:Reset()
 		end
 		tCount = {}
 		for _, rec in ipairs(aResult) do
@@ -384,7 +388,9 @@ function DB:SelectMsg(aChannel, szSearch, nMinTime, nMaxTime, nOffset, nLimit)
 	local stmt = self.db:Prepare(szSQL)
 	stmt:ClearBindings()
 	stmt:BindAll(unpack(aValue))
-	return (stmt:GetAll())
+	local res = stmt:GetAll()
+	stmt:Reset()
+	return res
 end
 
 function DB:GetMinRecTime()
@@ -445,6 +451,7 @@ function DB:Flush()
 			self.stmtInsert:BindAll(data.szHash, data.nChannel, data.nTime, data.szTalker, data.szText, data.szMsg)
 			self.stmtInsert:Execute()
 		end
+		self.stmtInsert:Reset()
 		self.aInsertQueue = {}
 		-- É¾³ý¼ÇÂ¼
 		for _, data in ipairs(self.aDeleteQueue) do
@@ -452,6 +459,7 @@ function DB:Flush()
 			self.stmtDelete:BindAll(data.szHash, data.nTime)
 			self.stmtDelete:Execute()
 		end
+		self.stmtDelete:Reset()
 		self.aDeleteQueue = {}
 		self.db:Execute('END TRANSACTION')
 		self:FlushCache()

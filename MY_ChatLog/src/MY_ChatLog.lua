@@ -252,6 +252,7 @@ function D.ImportDB(szPath)
 					end
 					nOffset = nOffset + nLimit
 				end
+				stmt:Reset()
 			end
 		end
 		odb:Release()

@@ -222,9 +222,14 @@ function D.FlushDB()
 		DB_ItemsDL:BindAll(ownerkey, boxtype, count)
 		DB_ItemsDL:Execute()
 	end
+	DB_ItemInfoW:Reset()
+	DB_ItemsW:Reset()
+	DB_ItemsDL:Reset()
+
 	DB_OwnerInfoW:ClearBindings()
 	DB_OwnerInfoW:BindAll(ownerkey, ownername, servername, time)
 	DB_OwnerInfoW:Execute()
+	DB_OwnerInfoW:Reset()
 
 	-- ²Ö¿â
 	for _, boxtype in ipairs(CONSTANT.INVENTORY_BANK_LIST) do
@@ -246,6 +251,9 @@ function D.FlushDB()
 		DB_ItemsDL:BindAll(ownerkey, boxtype, count)
 		DB_ItemsDL:Execute()
 	end
+	DB_ItemInfoW:Reset()
+	DB_ItemsW:Reset()
+	DB_ItemsDL:Reset()
 
 	-- °ï»á²Ö¿â
 	if not IsEmpty(l_guildcache) then
@@ -259,9 +267,13 @@ function D.FlushDB()
 			DB_ItemsW:BindAll(ownerkey, info.boxtype, info.boxindex, info.tabtype, info.tabindex, info.tabsubindex, 0, info.count, time)
 			DB_ItemsW:Execute()
 		end
+		DB_ItemInfoW:Reset()
+		DB_ItemsW:Reset()
+
 		DB_OwnerInfoW:ClearBindings()
 		DB_OwnerInfoW:BindAll(ownerkey, ownername, servername, time)
 		DB_OwnerInfoW:Execute()
+		DB_OwnerInfoW:Reset()
 	end
 
 	DB:Execute('END TRANSACTION')
@@ -296,6 +308,8 @@ function D.UpdateSaveDB()
 			DB_OwnerInfoD:BindAll(guid)
 			DB_OwnerInfoD:Execute()
 		end
+		DB_ItemsDA:Reset()
+		DB_OwnerInfoD:Reset()
 		--[[#DEBUG BEGIN]]
 		LIB.Debug('MY_RoleStatistics_BagStat', 'Remove from database finished...', DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
@@ -310,6 +324,7 @@ function D.UpdateNames(page)
 	DB_OwnerInfoR:ClearBindings()
 	DB_OwnerInfoR:BindAll(AnsiToUTF8('%' .. searchname .. '%'), AnsiToUTF8('%' .. searchname .. '%'))
 	local result = DB_OwnerInfoR:GetAll()
+	DB_OwnerInfoR:Reset()
 
 	local container = page:Lookup('Wnd_Total/WndScroll_Name/WndContainer_Name')
 	container:Clear()
@@ -370,6 +385,7 @@ function D.UpdateItems(page)
 	DB_CountR:ClearBindings()
 	DB_CountR:BindAll(searchitem, searchitem, unpack(ownerkeys))
 	local nCount = #DB_CountR:GetAll()
+	DB_CountR:Reset()
 	local nPageCount = floor(nCount / nPageSize) + 1
 	page:Lookup('Wnd_Total/Wnd_Index/Wnd_IndexEdit/WndEdit_Index'):SetText(page.nCurrentPage)
 	page:Lookup('Wnd_Total/Wnd_Index', 'Handle_IndexCount/Text_IndexCount'):SprintfText(_L['%d pages'], nPageCount)
@@ -421,6 +437,7 @@ function D.UpdateItems(page)
 	DB_ItemInfoR:ClearBindings()
 	DB_ItemInfoR:BindAll(searchitem, searchitem, unpack(ownerkeys))
 	local result = DB_ItemInfoR:GetAll()
+	DB_ItemInfoR:Reset()
 
 	local sqlbelongs = 'SELECT * FROM (SELECT ownerkey, SUM(bagcount) AS bagcount, SUM(bankcount) AS bankcount FROM BagItems WHERE tabtype = ? AND tabindex = ? AND tabsubindex = ? GROUP BY ownerkey) AS B LEFT JOIN OwnerInfo AS O ON B.ownerkey = O.ownerkey WHERE '
 	sqlbelongs = sqlbelongs .. ((#wheres == 0 and ' 1 = 0 ') or ('(' .. concat(wheres, ' OR ') .. ')'))
@@ -484,6 +501,7 @@ function D.UpdateItems(page)
 		--[[#DEBUG END]]
 		end
 	end
+	DB_BelongsR:Reset()
 	handle:FormatAllItemPos()
 	scroll:SetScrollPos(0)
 end
@@ -578,9 +596,11 @@ function D.OnLButtonClick()
 			DB_ItemsDA:ClearBindings()
 			DB_ItemsDA:BindAll(wnd.ownerkey)
 			DB_ItemsDA:Execute()
+			DB_ItemsDA:Reset()
 			DB_OwnerInfoD:ClearBindings()
 			DB_OwnerInfoD:BindAll(wnd.ownerkey)
 			DB_OwnerInfoD:Execute()
+			DB_OwnerInfoD:Reset()
 			D.UpdateNames(page)
 		end)
 	elseif name == 'Btn_SwitchMode' then

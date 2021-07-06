@@ -425,6 +425,7 @@ function D.FlushDB(bForceUpdate)
 		rec.name, rec.force, rec.level, rec.equip_score,
 		rec.copy_info, rec.progress_info, rec.time)
 	DB_DungeonInfoW:Execute()
+	DB_DungeonInfoW:Reset()
 	DB:Execute('END TRANSACTION')
 
 	--[[#DEBUG BEGIN]]
@@ -439,6 +440,7 @@ function D.InitDB()
 		DB_DungeonInfoG:ClearBindings()
 		DB_DungeonInfoG:BindAll(AnsiToUTF8(D.GetPlayerGUID(me)))
 		local result = DB_DungeonInfoG:GetAll()
+		DB_DungeonInfoG:Reset()
 		local rec = result[1]
 		if rec then
 			D.DecodeRow(rec)
@@ -464,6 +466,7 @@ function D.UpdateSaveDB()
 		DB_DungeonInfoD:ClearBindings()
 		DB_DungeonInfoD:BindAll(AnsiToUTF8(D.GetPlayerGUID(me)))
 		DB_DungeonInfoD:Execute()
+		DB_DungeonInfoD:Reset()
 		--[[#DEBUG BEGIN]]
 		LIB.Debug('MY_RoleStatistics_DungeonStat', 'Remove from database finished...', DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
@@ -548,6 +551,7 @@ function D.UpdateUI(page)
 	DB_DungeonInfoR:ClearBindings()
 	DB_DungeonInfoR:BindAll(szUSearch, szUSearch, szUSearch, szUSearch)
 	local result = DB_DungeonInfoR:GetAll()
+	DB_DungeonInfoR:Reset()
 
 	for _, rec in ipairs(result) do
 		D.DecodeRow(rec)
@@ -890,6 +894,7 @@ function D.OnLButtonClick()
 			DB_DungeonInfoD:ClearBindings()
 			DB_DungeonInfoD:BindAll(AnsiToUTF8(wnd.guid))
 			DB_DungeonInfoD:Execute()
+			DB_DungeonInfoD:Reset()
 			D.UpdateUI(page)
 		end)
 	end
@@ -922,6 +927,7 @@ function D.OnItemRButtonClick()
 					DB_DungeonInfoD:ClearBindings()
 					DB_DungeonInfoD:BindAll(AnsiToUTF8(rec.guid))
 					DB_DungeonInfoD:Execute()
+					DB_DungeonInfoD:Reset()
 					D.UpdateUI(page)
 				end,
 			},

@@ -148,6 +148,7 @@ local function InitDB()
 				end
 			end
 		end
+		DBI_W:Reset()
 		DB:Execute('END TRANSACTION')
 		--[[#DEBUG BEGIN]]
 		LIB.Debug('MY_Farbnamen', 'Farbnamen info cache trans from file to sqlite finished!', DEBUG_LEVEL.LOG)
@@ -169,6 +170,7 @@ local function InitDB()
 				end
 			end
 		end
+		DBT_W:Reset()
 		DB:Execute('END TRANSACTION')
 		--[[#DEBUG BEGIN]]
 		LIB.Debug('MY_Farbnamen', 'Farbnamen tong cache trans from file to sqlite finished!', DEBUG_LEVEL.LOG)
@@ -198,6 +200,7 @@ local function InitDB()
 					DBI_W:Execute()
 				end
 			end
+			DBI_W:Reset()
 			DB:Execute('END TRANSACTION')
 			-- °ï»á»º´æ
 			local nCount, nPageSize = Get(DB_V1:Execute('SELECT COUNT(*) AS count FROM TongCache'), {1, 'count'}, 0), 10000
@@ -209,6 +212,7 @@ local function InitDB()
 					DBI_W:Execute()
 				end
 			end
+			DBI_W:Reset()
 			DB:Execute('END TRANSACTION')
 			DB_V1:Release()
 		end
@@ -484,6 +488,7 @@ local function GetTongName(dwID)
 			szTong = data.name
 			l_tongnames[dwID] = data.name
 		end
+		DBT_RI:Reset()
 	end
 	return szTong
 end
@@ -500,6 +505,7 @@ local function Flush()
 			DBI_W:BindAll(p.id, p.name, p.force, p.role, p.level, p.title, p.camp, p.tong)
 			DBI_W:Execute()
 		end
+		DBI_W:Reset()
 		DB:Execute('END TRANSACTION')
 	end
 	if DBT_W then
@@ -509,6 +515,7 @@ local function Flush()
 			DBT_W:BindAll(id, name)
 			DBT_W:Execute()
 		end
+		DBT_W:Reset()
 		DB:Execute('END TRANSACTION')
 	end
 end
@@ -534,12 +541,14 @@ function D.Get(szKey)
 				DBI_RN:ClearBindings()
 				DBI_RN:BindAll(szKey)
 				info = DBI_RN:GetNext()
+				DBI_RN:Reset()
 			end
 		elseif type(szKey) == 'number' then
 			if InitDB() then
 				DBI_RI:ClearBindings()
 				DBI_RI:BindAll(szKey)
 				info = DBI_RI:GetNext()
+				DBI_RI:Reset()
 			end
 		end
 		if info then

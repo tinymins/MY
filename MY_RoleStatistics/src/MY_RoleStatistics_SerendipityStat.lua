@@ -613,6 +613,7 @@ function D.GetClientPlayerRec()
 		InfoG:ClearBindings()
 		InfoG:BindAll(AnsiToUTF8(guid))
 		local result = InfoG:GetAll()
+		InfoG:Reset()
 		if result and result[1] and result[1].time and IsInSamePeriod(result[1].time) then
 			rec.serendipity_info = DecodeLUAData(result[1].serendipity_info) or rec.serendipity_info
 			rec.item_count = DecodeLUAData(result[1].item_count) or rec.item_count
@@ -680,6 +681,7 @@ function D.FlushDB()
 		rec.name, rec.force, rec.camp, rec.level,
 		rec.serendipity_info, rec.item_count, rec.time)
 	InfoW:Execute()
+	InfoW:Reset()
 	DB:Execute('END TRANSACTION')
 	--[[#DEBUG BEGIN]]
 	LIB.Debug('MY_RoleStatistics_SerendipityStat', 'Flushing to database finished...', DEBUG_LEVEL.LOG)
@@ -703,6 +705,7 @@ function D.UpdateSaveDB()
 		InfoD:ClearBindings()
 		InfoD:BindAll(AnsiToUTF8(D.GetPlayerGUID(me)))
 		InfoD:Execute()
+		InfoD:Reset()
 		--[[#DEBUG BEGIN]]
 		LIB.Debug('MY_RoleStatistics_SerendipityStat', 'Remove from database finished...', DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
@@ -771,6 +774,7 @@ function D.UpdateUI(page)
 	InfoR:ClearBindings()
 	InfoR:BindAll(szUSearch, szUSearch, szUSearch, szUSearch)
 	local result = InfoR:GetAll()
+	InfoR:Reset()
 
 	for _, rec in ipairs(result) do
 		D.DecodeRow(rec)
@@ -1121,7 +1125,7 @@ function D.OnLButtonClick()
 		LIB.Confirm(_L('Are you sure to delete item record of %s?', wnd.name), function()
 			InfoD:ClearBindings()
 			InfoD:BindAll(AnsiToUTF8(wnd.guid))
-			InfoD:Execute()
+			InfoD:Reset()
 			D.UpdateUI(page)
 		end)
 	end

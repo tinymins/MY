@@ -735,6 +735,7 @@ function D.GetClientPlayerRec()
 		DB_RoleInfoG:ClearBindings()
 		DB_RoleInfoG:BindAll(AnsiToUTF8(guid))
 		local result = DB_RoleInfoG:GetAll()
+		DB_RoleInfoG:Reset()
 		if result and result[1] and result[1].time then
 			local dwTime, dwCircle = LIB.GetRefreshTime('weekly')
 			if dwTime - dwCircle < result[1].time then
@@ -812,10 +813,12 @@ function D.FlushDB()
 		rec.starve, rec.starve_remain, rec.architecture, rec.architecture_remain,
 		rec.time)
 	DB_RoleInfoW:Execute()
+	DB_RoleInfoW:Reset()
 
 	DB_RoleInfoCoinW:ClearBindings()
 	DB_RoleInfoCoinW:BindAll(rec.coin, rec.account, rec.region)
 	DB_RoleInfoCoinW:Execute()
+	DB_RoleInfoCoinW:Reset()
 
 	DB:Execute('END TRANSACTION')
 	--[[#DEBUG BEGIN]]
@@ -840,6 +843,7 @@ function D.UpdateSaveDB()
 		DB_RoleInfoD:ClearBindings()
 		DB_RoleInfoD:BindAll(AnsiToUTF8(D.GetPlayerGUID(me)))
 		DB_RoleInfoD:Execute()
+		DB_RoleInfoD:Reset()
 		--[[#DEBUG BEGIN]]
 		LIB.Debug('MY_RoleStatistics_RoleStat', 'Remove from database finished...', DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
@@ -909,6 +913,7 @@ function D.UpdateUI(page)
 	DB_RoleInfoR:ClearBindings()
 	DB_RoleInfoR:BindAll(szUSearch, szUSearch, szUSearch, szUSearch)
 	local result = DB_RoleInfoR:GetAll()
+	DB_RoleInfoR:Reset()
 
 	for _, rec in ipairs(result) do
 		D.DecodeRow(rec)
@@ -1232,6 +1237,7 @@ function D.OnLButtonClick()
 			DB_RoleInfoD:ClearBindings()
 			DB_RoleInfoD:BindAll(AnsiToUTF8(wnd.guid))
 			DB_RoleInfoD:Execute()
+			DB_RoleInfoD:Reset()
 			D.UpdateUI(page)
 		end)
 	end
@@ -1264,6 +1270,7 @@ function D.OnItemRButtonClick()
 					DB_RoleInfoD:ClearBindings()
 					DB_RoleInfoD:BindAll(AnsiToUTF8(rec.guid))
 					DB_RoleInfoD:Execute()
+					DB_RoleInfoD:Reset()
 					D.UpdateUI(page)
 				end,
 			},

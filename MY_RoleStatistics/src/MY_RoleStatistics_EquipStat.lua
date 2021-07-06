@@ -339,6 +339,8 @@ function D.FlushDB()
 		DB_ItemsDL:BindAll(ownerkey, boxtype, count)
 		DB_ItemsDL:Execute()
 	end
+	DB_ItemsW:Reset()
+	DB_ItemsDL:Reset()
 
 	-- π“ Œ°¢∆‰À¸
 	ownerforce = me.dwForceID
@@ -363,6 +365,7 @@ function D.FlushDB()
 	DB_OwnerInfoW:ClearBindings()
 	DB_OwnerInfoW:BindAll(ownerkey, ownername, servername, ownerforce, ownerrole, ownerlevel, ownerscore, ownersuitindex, ownerextra, time)
 	DB_OwnerInfoW:Execute()
+	DB_OwnerInfoW:Reset()
 
 	DB:Execute('END TRANSACTION')
 	--[[#DEBUG BEGIN]]
@@ -388,9 +391,11 @@ function D.UpdateSaveDB()
 		DB_ItemsDA:ClearBindings()
 		DB_ItemsDA:BindAll(guid)
 		DB_ItemsDA:Execute()
+		DB_ItemsDA:Reset()
 		DB_OwnerInfoD:ClearBindings()
 		DB_OwnerInfoD:BindAll(guid)
 		DB_OwnerInfoD:Execute()
+		DB_OwnerInfoD:Reset()
 		--[[#DEBUG BEGIN]]
 		LIB.Debug('MY_RoleStatistics_EquipStat', 'Remove from database finished...', DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
@@ -405,6 +410,7 @@ function D.UpdateNames(page)
 	DB_OwnerInfoR:ClearBindings()
 	DB_OwnerInfoR:BindAll(AnsiToUTF8('%' .. searchname .. '%'), AnsiToUTF8('%' .. searchname .. '%'))
 	local result = DB_OwnerInfoR:GetAll()
+	DB_OwnerInfoR:Reset()
 
 	local container = page:Lookup('Wnd_Total/WndScroll_Name/WndContainer_Name')
 	container:Clear()
@@ -475,7 +481,9 @@ function D.UpdateItems(page)
 	DB_ItemsR:ClearBindings()
 	DB_ItemsR:BindAll(AnsiToUTF8(D.szCurrentOwnerKey), D.dwCurrentSuitIndex)
 	local tResult = {}
-	for _, rec in ipairs(DB_ItemsR:GetAll()) do
+	local aRes = DB_ItemsR:GetAll()
+	DB_ItemsR:Reset()
+	for _, rec in ipairs(aRes) do
 		for k, v in pairs(rec) do
 			if IsString(v) then
 				rec[k] = UTF8ToAnsi(v)
@@ -716,9 +724,11 @@ function D.OnLButtonClick()
 			DB_ItemsDA:ClearBindings()
 			DB_ItemsDA:BindAll(wnd.ownerinfo.ownerkey)
 			DB_ItemsDA:Execute()
+			DB_ItemsDA:Reset()
 			DB_OwnerInfoD:ClearBindings()
 			DB_OwnerInfoD:BindAll(wnd.ownerinfo.ownerkey)
 			DB_OwnerInfoD:Execute()
+			DB_OwnerInfoD:Reset()
 			D.UpdateNames(page)
 		end)
 	end

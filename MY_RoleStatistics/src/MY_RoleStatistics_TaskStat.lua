@@ -459,7 +459,9 @@ local function InitTaskList(bReload)
 	-- 用户自定义数据
 	DB_TaskR:ClearBindings()
 	DB_TaskR:BindAll()
-	for _, v in ipairs(DB_TaskR:GetAll()) do
+	local aRes = DB_TaskR:GetAll()
+	DB_TaskR:Reset()
+	for _, v in ipairs(aRes) do
 		local tTaskInfo = DecodeLUAData(v.task_info) or {}
 		insert(aTask, {
 			id = v.guid,
@@ -886,6 +888,7 @@ function D.UpdateUI(page)
 	DB_TaskInfoR:ClearBindings()
 	DB_TaskInfoR:BindAll(szUSearch, szUSearch, szUSearch, szUSearch)
 	local result = DB_TaskInfoR:GetAll()
+	DB_TaskInfoR:Reset()
 
 	for _, rec in ipairs(result) do
 		D.DecodeRow(rec)

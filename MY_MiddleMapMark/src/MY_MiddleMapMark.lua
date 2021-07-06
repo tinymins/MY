@@ -113,11 +113,13 @@ if IsLocalFileExist(LIB.FormatPath({SZ_CACHE_PATH, PATH_TYPE.DATA})) then
 				DBN_W:BindAll(p.dwTemplateID, GeneNpcInfoPosKey(dwMapID, p.nX, p.nY), dwMapID, p.nX, p.nY, AnsiToUTF8(p.szName), AnsiToUTF8(p.szTitle), p.nLevel)
 				DBN_W:Execute()
 			end
+			DBN_W:Reset()
 			for _, p in ipairs(data.Doodad) do
 				DBD_W:ClearBindings()
 				DBD_W:BindAll(p.dwTemplateID, GeneDoodadInfoPosKey(dwMapID, p.nX, p.nY), dwMapID, p.nX, p.nY, AnsiToUTF8(p.szName))
 				DBD_W:Execute()
 			end
+			DBD_W:Reset()
 			--[[#DEBUG BEGIN]]
 			LIB.Debug('MY_MiddleMapMark', 'MiddleMapMark cache trans from file to sqlite finished!', DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
@@ -147,6 +149,7 @@ local function FlushDB()
 			DBN_W:Execute()
 		end
 	end
+	DBN_W:Reset()
 	l_npc = {}
 
 	for i, p in pairs(l_doodad) do
@@ -156,6 +159,7 @@ local function FlushDB()
 			DBD_W:Execute()
 		end
 	end
+	DBD_W:Reset()
 	l_doodad = {}
 
 	DB:Execute('END TRANSACTION')
@@ -167,9 +171,11 @@ local function onLoadingEnding()
 		DBN_DM:ClearBindings()
 		DBN_DM:BindAll(dwMapID)
 		DBN_DM:Execute()
+		DBN_DM:Reset()
 		DBD_DM:ClearBindings()
 		DBD_DM:BindAll(dwMapID)
 		DBD_DM:Execute()
+		DBD_DM:Reset()
 	end
 	FlushDB()
 end
@@ -309,10 +315,12 @@ function D.SearchNpc(szText, dwMapID)
 		DBN_RNM:ClearBindings()
 		DBN_RNM:BindAll(szSearch, dwMapID, szSearch, dwMapID)
 		aInfos = DBN_RNM:GetAll()
+		DBN_RNM:Reset()
 	else
 		DBN_RN:ClearBindings()
 		DBN_RN:BindAll(szSearch, szSearch)
 		aInfos = DBN_RN:GetAll()
+		DBN_RN:Reset()
 	end
 	for i = #aInfos, 1, -1 do
 		local p = aInfos[i]
@@ -337,10 +345,12 @@ function D.SearchDoodad(szText, dwMapID)
 		DBD_RNM:ClearBindings()
 		DBD_RNM:BindAll(szSearch, dwMapID)
 		aInfos = DBD_RNM:GetAll()
+		DBD_RNM:Reset()
 	else
 		DBD_RN:ClearBindings()
 		DBD_RN:BindAll(szSearch)
 		aInfos = DBD_RN:GetAll()
+		DBD_RN:Reset()
 	end
 	for i = #aInfos, 1, -1 do
 		local p = aInfos[i]
