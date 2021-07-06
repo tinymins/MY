@@ -45,6 +45,9 @@ local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCal
 local _L = LIB.LoadLangPack(PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 ---------------------------------------------------------------------------------------------------
 
+local EncodeByteData = GetGameAPI('EncodeByteData')
+local DecodeByteData = GetGameAPI('DecodeByteData')
+
 -- Save & Load Lua Data
 -- ##################################################################################################
 --         #       #             #                           #
@@ -504,30 +507,21 @@ local DATA_CACHE = {}
 local DATA_CACHE_LEAF_FLAG = {}
 local FLUSH_TIME = 0
 local DATABASE_CONNECTION_ESTABLISHED = false
-local EncodeByteData = _G.GetInsideEnv().EncodeByteData or _G.GetInsideEnv().VariableToString
-local DecodeByteData = _G.GetInsideEnv().DecodeByteData or _G.GetInsideEnv().StringToVariable
 
 local function SetInstanceInfoData(inst, info, data, version)
-	local setter = info.bUserData
-		and inst.pUserDataSetter
-		or inst.pSettingsSetter
-	setter:ClearBindings()
-	setter:BindAll(info.szDataKey, EncodeByteData(data), version)
-	setter:Execute()
-	setter:Reset()
+	local db = info.bUserData
+		and inst.pUserDataDB
+		or inst.pSettingsDB
+	db:Set(info.szDataKey, { d = data, v = version })
 end
 
 local function GetInstanceInfoData(inst, info)
-	local getter = info.bUserData
-		and inst.pUserDataGetter
-		or inst.pSettingsGetter
-	getter:ClearBindings()
-	getter:BindAll(info.szDataKey)
-	local res = getter:GetNext()
-	getter:Reset()
+	local db = info.bUserData
+		and inst.pUserDataDB
+		or inst.pSettingsDB
+	local res = db:Get(info.szDataKey)
 	if res then
-		-- res.value: KByteData
-		return { v = res.version, d = DecodeByteData(res.value) }
+		return res
 	end
 	local db = info.bUserData
 		and inst.pUserDataUDB
@@ -545,12 +539,14 @@ local function GetInstanceInfoData(inst, info)
 end
 
 local function DeleteInstanceInfoData(inst, info)
-	local deleter = info.bUserData
-		and inst.pUserDataDeleter
-		or inst.pSettingsDeleter
-	deleter:ClearBindings()
-	deleter:BindAll(info.szDataKey)
-	deleter:Execute()
+	local db = info.bUserData
+		and inst.pUserDataDB
+		or inst.pSettingsDB
+	db:Delete(info.szDataKey)
+	local db = info.bUserData
+		and inst.pUserDataUDB
+		or inst.pSettingsUDB
+	db:Delete(info.szDataKey)
 end
 
 function LIB.ConnectUserSettingsDB()
@@ -566,33 +562,17 @@ function LIB.ConnectUserSettingsDB()
 	end
 	for _, ePathType in ipairs(DATABASE_TYPE_LIST) do
 		if not DATABASE_INSTANCE[ePathType] then
-			local pSettingsDB = LIB.SQLiteConnect('LIB.UserSettings.Settings', szDBPresetRoot
-				and (szDBPresetRoot .. DATABASE_TYPE_PRESET_FILE[ePathType] .. '.db')
-				or LIB.FormatPath({'config/settings.db', ePathType}))
-			pSettingsDB:Execute('CREATE TABLE IF NOT EXISTS data (key NVARCHAR(128), value BLOB, version NVARCHAR(128), PRIMARY KEY (key))')
-			local pSettingsSetter = pSettingsDB:Prepare('REPLACE INTO data (key, value, version) VALUES (?, ?, ?)')
-			local pSettingsGetter = pSettingsDB:Prepare('SELECT * FROM data WHERE key = ? LIMIT 1')
-			local pSettingsDeleter = pSettingsDB:Prepare('DELETE FROM data WHERE key = ?')
-			local pUserDataDB = LIB.SQLiteConnect('LIB.UserSettings.UserData', LIB.FormatPath({'userdata/userdata.db', ePathType}))
-			pUserDataDB:Execute('CREATE TABLE IF NOT EXISTS data (key NVARCHAR(128), value BLOB, version NVARCHAR(128), PRIMARY KEY (key))')
-			local pUserDataSetter = pUserDataDB:Prepare('REPLACE INTO data (key, value, version) VALUES (?, ?, ?)')
-			local pUserDataGetter = pUserDataDB:Prepare('SELECT * FROM data WHERE key = ? LIMIT 1')
-			local pUserDataDeleter = pUserDataDB:Prepare('DELETE FROM data WHERE key = ?')
 			DATABASE_INSTANCE[ePathType] = {
+				pSettingsDB = LIB.NoSQLiteConnect(szDBPresetRoot
+					and (szDBPresetRoot .. DATABASE_TYPE_PRESET_FILE[ePathType] .. '.db')
+					or LIB.FormatPath({'config/settings.db', ePathType})),
 				pSettingsUDB = LIB.UnQLiteConnect(szUDBPresetRoot
 					and (szUDBPresetRoot .. DATABASE_TYPE_PRESET_FILE[ePathType] .. '.udb')
 					or LIB.FormatPath({'userdata/settings.udb', ePathType})),
-				pSettingsDB = pSettingsDB,
-				pSettingsSetter = pSettingsSetter,
-				pSettingsGetter = pSettingsGetter,
-				pSettingsDeleter = pSettingsDeleter,
-				bSettingsDBCommit = false,
+				-- bSettingsDBCommit = false,
+				pUserDataDB = LIB.NoSQLiteConnect(LIB.FormatPath({'userdata/userdata.db', ePathType})),
 				pUserDataUDB = LIB.UnQLiteConnect(LIB.FormatPath({'userdata/userdata.udb', ePathType})),
-				pUserDataDB = pUserDataDB,
-				pUserDataSetter = pUserDataSetter,
-				pUserDataGetter = pUserDataGetter,
-				pUserDataDeleter = pUserDataDeleter,
-				bUserDataDBCommit = false,
+				-- bUserDataDBCommit = false,
 			}
 		end
 	end
@@ -607,8 +587,8 @@ function LIB.ReleaseUserSettingsDB()
 		if inst then
 			LIB.UnQLiteDisconnect(inst.pSettingsUDB)
 			LIB.UnQLiteDisconnect(inst.pUserDataUDB)
-			LIB.SQLiteDisconnect(inst.pSettingsDB)
-			LIB.SQLiteDisconnect(inst.pUserDataDB)
+			LIB.NoSQLiteDisconnect(inst.pSettingsDB)
+			LIB.NoSQLiteDisconnect(inst.pUserDataDB)
 			DATABASE_INSTANCE[ePathType] = nil
 		end
 	end
@@ -785,9 +765,6 @@ function LIB.ImportUserSettings(tKvp)
 		local info = IsTable(xValue) and USER_SETTINGS_INFO[szKey]
 		local inst = info and DATABASE_INSTANCE[info.ePathType]
 		if inst then
-			local db = info.bUserData
-				and inst.pUserDataDB
-				or inst.pSettingsDB
 			SetInstanceInfoData(inst, info, xValue.d, xValue.v)
 			nSuccess = nSuccess + 1
 			DATA_CACHE[szKey] = nil
@@ -823,9 +800,6 @@ function LIB.GetUserSettings(szKey, ...)
 	assert(info, szErrHeader ..'`Key` has not been registered.')
 	local inst = DATABASE_INSTANCE[info.ePathType]
 	assert(inst, szErrHeader ..'Database not connected.')
-	local db = info.bUserData
-		and inst.pUserDataDB
-		or inst.pSettingsDB
 	local szDataSetKey
 	if info.bDataSet then
 		assert(nParameter == 2, szErrHeader .. '2 parameters expected, got ' .. nParameter)
@@ -890,9 +864,6 @@ function LIB.SetUserSettings(szKey, ...)
 		return false
 	end
 	assert(inst, szErrHeader .. 'Database not connected.')
-	local db = info.bUserData
-		and inst.pUserDataDB
-		or inst.pSettingsDB
 	local szDataSetKey, xValue
 	if info.bDataSet then
 		assert(nParameter == 3, szErrHeader .. '3 parameters expected, got ' .. nParameter)
@@ -929,11 +900,11 @@ function LIB.SetUserSettings(szKey, ...)
 		DATA_CACHE[szKey] = nil
 	end
 	SetInstanceInfoData(inst, info, xValue, info.szVersion)
-	if info.bUserData then
-		inst.bUserDataDBCommit = true
-	else
-		inst.bSettingsDBCommit = true
-	end
+	-- if info.bUserData then
+	-- 	inst.bUserDataDBCommit = true
+	-- else
+	-- 	inst.bSettingsDBCommit = true
+	-- end
 	CommonEventFirer(USER_SETTINGS_EVENT, szKey)
 	return true
 end
@@ -949,9 +920,6 @@ function LIB.ResetUserSettings(szKey, ...)
 	assert(info, szErrHeader .. '`Key` has not been registered.')
 	local inst = DATABASE_INSTANCE[info.ePathType]
 	assert(inst, szErrHeader .. 'Database not connected.')
-	local db = info.bUserData
-		and inst.pUserDataDB
-		or inst.pSettingsDB
 	local szDataSetKey
 	if info.bDataSet then
 		assert(nParameter == 1 or nParameter == 2, szErrHeader .. '1 or 2 parameter(s) expected, got ' .. nParameter)
@@ -981,11 +949,11 @@ function LIB.ResetUserSettings(szKey, ...)
 		DeleteInstanceInfoData(inst, info)
 		DATA_CACHE[szKey] = nil
 	end
-	if info.bUserData then
-		inst.bUserDataDBCommit = true
-	else
-		inst.bSettingsDBCommit = true
-	end
+	-- if info.bUserData then
+	-- 	inst.bUserDataDBCommit = true
+	-- else
+	-- 	inst.bSettingsDBCommit = true
+	-- end
 	CommonEventFirer(USER_SETTINGS_EVENT, szKey)
 end
 
@@ -1608,5 +1576,88 @@ end
 end
 
 function LIB.SQLiteDisconnect(db)
+	db:Release()
+end
+
+------------------------------------------------------------------------------
+-- 基于 SQLite 的 NoSQLite 封装
+------------------------------------------------------------------------------
+
+function LIB.NoSQLiteConnect(oPath)
+	local db = LIB.SQLiteConnect('NoSQL', oPath)
+	db:Execute('CREATE TABLE IF NOT EXISTS data (key NVARCHAR(256), value BLOB, PRIMARY KEY (key))')
+	local stmtSetter = db:Prepare('REPLACE INTO data (key, value) VALUES (?, ?)')
+	local stmtGetter = db:Prepare('SELECT * FROM data WHERE key = ? LIMIT 1')
+	local stmtDeleter = db:Prepare('DELETE FROM data WHERE key = ?')
+	local stmtAllGetter = db:Prepare('SELECT * FROM data')
+	return setmetatable({}, {
+		__index = {
+			Set = function(_, k, v)
+				assert(stmtSetter, 'NoSQL connection closed.')
+				stmtSetter:ClearBindings()
+				stmtSetter:BindAll(k, EncodeByteData(v))
+				stmtSetter:Execute()
+				stmtSetter:Reset()
+			end,
+			Get = function(_, k)
+				assert(stmtGetter, 'NoSQL connection closed.')
+				stmtGetter:ClearBindings()
+				stmtGetter:BindAll(k)
+				local res = stmtGetter:GetNext()
+				stmtGetter:Reset()
+				if res then
+					-- res.value: KByteData
+					res = DecodeByteData(res.value)
+				end
+				return res
+			end,
+			Delete = function(_, k)
+				assert(stmtDeleter, 'NoSQL connection closed.')
+				stmtDeleter:ClearBindings()
+				stmtDeleter:BindAll(k)
+				stmtDeleter:Execute()
+				stmtDeleter:Reset()
+			end,
+			GetAll = function(_)
+				assert(stmtAllGetter, 'NoSQL connection closed.')
+				stmtAllGetter:ClearBindings()
+				local res = stmtAllGetter:GetAll()
+				stmtAllGetter:Reset()
+				local tKvp = {}
+				if res then
+					for _, v in ipairs(res) do
+						tKvp[v.key] = DecodeByteData(v.value)
+					end
+				end
+				return tKvp
+			end,
+			Release = function(_)
+				if stmtSetter then
+					stmtSetter:Release()
+					stmtSetter = nil
+				end
+				if stmtGetter then
+					stmtGetter:Release()
+					stmtGetter = nil
+				end
+				if stmtDeleter then
+					stmtDeleter:Release()
+					stmtDeleter = nil
+				end
+				if stmtAllGetter then
+					stmtAllGetter:Release()
+					stmtAllGetter = nil
+				end
+				if db then
+					db:Release()
+					db = nil
+				end
+			end,
+		},
+		__newindex = function() end,
+	})
+end
+
+function LIB.NoSQLiteDisconnect(db)
 	db:Release()
 end
