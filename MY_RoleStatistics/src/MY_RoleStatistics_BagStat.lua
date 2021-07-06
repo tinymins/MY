@@ -90,7 +90,7 @@ local O = LIB.CreateUserSettingsModule('MY_RoleStatistics_BagStat', _L['General'
 		ePathType = PATH_TYPE.GLOBAL,
 		szLabel = _L['MY_RoleStatistics'],
 		xSchema = Schema.Boolean,
-		xDefaultValue = false,
+		xDefaultValue = true,
 	},
 	tUncheckedNames = {
 		ePathType = PATH_TYPE.GLOBAL,
