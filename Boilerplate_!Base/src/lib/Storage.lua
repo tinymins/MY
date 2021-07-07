@@ -565,6 +565,16 @@ local function DeleteInstanceInfoData(inst, info)
 	if db then
 		db:Delete(info.szDataKey)
 	end
+	-- »´æ÷…Ë÷√ºÊ»›
+	if info.ePathType == PATH_TYPE.ROLE then
+		local inst = DATABASE_INSTANCE[PATH_TYPE.GLOBAL]
+		local db = info.bUserData
+			and inst.pUserDataUDB
+			or inst.pSettingsUDB
+		if db then
+			db:Delete(info.szDataKey)
+		end
+	end
 end
 
 function LIB.ConnectUserSettingsDB()
