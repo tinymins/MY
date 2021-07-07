@@ -202,7 +202,13 @@ local O = LIB.CreateUserSettingsModule('MY_GKPLoot', _L['General'], {
 		ePathType = PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
 		xSchema = Schema.Map(Schema.Number, Schema.Boolean),
-		xDefaultValue = {},
+		xDefaultValue = (function()
+			local t = {}
+			for _, p in ipairs(GKP_ITEM_QUALITIES) do
+				t[p.nQuality] = true
+			end
+			return t
+		end)(),
 	},
 	tAutoPickupNames = {
 		ePathType = PATH_TYPE.ROLE,
