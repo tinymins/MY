@@ -309,6 +309,9 @@ function TI.CreateFrame(a, b)
 		end
 		frame.OnFrameDragSetPosEnd = function()
 			this:CorrectPos()
+		end
+		frame.OnFrameDragEnd = function()
+			this:CorrectPos()
 			O.anchor = GetFrameAnchor(this)
 		end
 		PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
