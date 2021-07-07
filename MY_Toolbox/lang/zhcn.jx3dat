@@ -357,6 +357,7 @@ return {
     ['MY_ItemPrice'] = '物品价格',
     ['Item price'] = '物品价格',
     ['Hold SHIFT and r-click bag box to show item price, share price when search auction.'] = '按住SHIFT右键点击背包物品显示物品价格，交易行搜索时分享搜索结果中的物品价格和数量。',
+    ['Check this will show price entry in bag item menu, and will share price when search auction, are you sure?'] = '勾选该选项后：\n1. 按住SHIFT右键点击背包物品将显示物品价格。\n2. 交易行搜索时将分享搜索结果中的物品价格和数量，不包含任何角色数据。\n\n确认要启用物品价格功能吗？',
     ['Lookup flower price'] = '查询花价',
     ['Lookup price'] = '查询价格',
 

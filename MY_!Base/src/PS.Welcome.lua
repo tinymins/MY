@@ -80,8 +80,17 @@ function PS.OnPanelActive(wnd)
 		name = 'WndCheckBox_SerendipityNotify',
 		text = _L['Show share notify.'],
 		checked = MY_Serendipity.bEnable,
-		oncheck = function()
-			MY_Serendipity.bEnable = not MY_Serendipity.bEnable
+		oncheck = function(bChecked)
+			if bChecked then
+				local ui = UI(this)
+				LIB.Confirm(_L['Check this will monitor system message for serendipity and share it, are you sure?'], function()
+					MY_Serendipity.bEnable = bChecked
+					ui:Check(true, WNDEVENT_FIRETYPE.PREVENT)
+				end)
+				ui:Check(false, WNDEVENT_FIRETYPE.PREVENT)
+			else
+				MY_Serendipity.bEnable = bChecked
+			end
 		end,
 		tip = _L['Monitor serendipity and show share notify.'],
 		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
@@ -94,6 +103,7 @@ function PS.OnPanelActive(wnd)
 		oncheck = function()
 			MY_Serendipity.bAutoShare = not MY_Serendipity.bAutoShare
 		end,
+		autoenable = function() return MY_Serendipity.bEnable end,
 	}):AutoWidth():Width()
 	-- 自动分享子项
 	x = xS0
@@ -106,6 +116,7 @@ function PS.OnPanelActive(wnd)
 			MY_Serendipity.bSilentMode = not MY_Serendipity.bSilentMode
 		end,
 		autovisible = function() return MY_Serendipity.bAutoShare end,
+		autoenable = function() return MY_Serendipity.bEnable end,
 	}):AutoWidth():Width()
 	x = x + 5
 	x = x + ui:Append('WndEditBox', {
@@ -120,6 +131,7 @@ function PS.OnPanelActive(wnd)
 			LIB.SaveLUAData({'config/realname.jx3dat', PATH_TYPE.ROLE}, szText)
 		end,
 		autovisible = function() return MY_Serendipity.bAutoShare end,
+		autoenable = function() return MY_Serendipity.bEnable end,
 	}):Width()
 	-- 手动分享子项
 	x = xS0
@@ -132,6 +144,7 @@ function PS.OnPanelActive(wnd)
 			MY_Serendipity.bPreview = not MY_Serendipity.bPreview
 		end,
 		autovisible = function() return not MY_Serendipity.bAutoShare end,
+		autoenable = function() return MY_Serendipity.bEnable end,
 	}):AutoWidth():Width()
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = 375,
@@ -141,7 +154,7 @@ function PS.OnPanelActive(wnd)
 		oncheck = function()
 			MY_Serendipity.bSound = not MY_Serendipity.bSound
 		end,
-		autoenable = function() return not MY_Serendipity.bAutoShare end,
+		autoenable = function() return MY_Serendipity.bEnable and not MY_Serendipity.bAutoShare end,
 		autovisible = function() return not MY_Serendipity.bAutoShare end,
 	}):AutoWidth():Width()
 	x = x + ui:Append('WndButton', {

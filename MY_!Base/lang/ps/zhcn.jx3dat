@@ -30,7 +30,8 @@ return {
 	['Auto share.'] = '自动分享',
 	['Silent mode.'] = '静默模式',
 	['Realname, leave blank for anonymous.'] = '分享者名称(匿名请留空)',
-	['Monitor serendipity and show share notify.'] = '收集系统公告与自身奇遇触发事件、科举题目以及家园花价等信息，便于有分享精神的侠士可以通过网页上传分享从而提供日后查询。',
+	['Monitor serendipity and show share notify.'] = '收集系统公告、NPC对话框、科举题目、自身奇遇触发等信息，便于有分享精神的侠士可以通过网页上传分享从而给所有人提供如奇遇、花价等网页查询功能。',
+	['Check this will monitor system message for serendipity and share it, are you sure?'] = '勾选该选项后：\n插件将收集系统公告、NPC对话框、科举题目、自身奇遇触发等信息，便于有分享精神的侠士可以通过网页上传分享，从而给广大侠士提供如奇遇、花价等网页公共查询功能。\n\n确认要启用分享功能吗？',
 
 	['Storage location'] = '存储位置',
 	['User preference storage'] = '配置存储',

@@ -150,6 +150,9 @@ LIB.RegisterInit('MY_ShareChat__Sysmsg', function()
 end)
 
 LIB.RegisterMsgMonitor('MSG_SYS', 'MY_ShareChat__Sysmsg', function(szChannel, szMsg, nFont, bRich, r, g, b)
+	if not MY_Serendipity.bEnable then
+		return
+	end
 	local me = GetClientPlayer()
 	if not me then
 		return
