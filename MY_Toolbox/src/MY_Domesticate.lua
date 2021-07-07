@@ -162,8 +162,8 @@ function D.HookDomesticatePanel()
 					bCheck = true, bChecked = D.IsAutoFeedValid(me),
 					fnAction = function()
 						if D.IsAutoFeedValid(me) then
-							LIB.Systopmsg(_L['Auto feed domesticate cancelled.'])
 							D.SetAutoFeed()
+							LIB.Systopmsg(_L['Auto feed domesticate cancelled.'])
 						else
 							local domesticate = GetClientPlayer().GetDomesticate()
 							local dwCubTabType, dwCubTabIndex = domesticate.dwCubTabType, domesticate.dwCubTabIndex
@@ -171,10 +171,18 @@ function D.HookDomesticatePanel()
 							if not domesticate then
 								return
 							end
-							LIB.Systopmsg(_L('Set domesticate auto feed %s to %s succeed.',
-								LIB.GetObjectName('ITEM_INFO', dwFoodTabType, dwFoodTabIndex),
-								LIB.GetObjectName('ITEM_INFO', dwCubTabType, dwCubTabIndex)))
 							D.SetAutoFeed(dwCubTabType, dwCubTabIndex, dwFoodTabType, dwFoodTabIndex)
+
+							local szFoodName = LIB.GetObjectName('ITEM_INFO', dwFoodTabType, dwFoodTabIndex)
+							local szDomesticateName = LIB.GetObjectName('ITEM_INFO', dwCubTabType, dwCubTabIndex)
+							if D.IsAutoFeedValid(me) then
+								LIB.Systopmsg(_L('Set domesticate auto feed %s to %s succeed, will auto feed when hunger point reach %d.',
+									szFoodName,
+									szDomesticateName,
+									O.nAutoFeedFoodMeasure))
+							else
+								LIB.Systopmsg(_L('Set domesticate auto feed %s to %s failed.', szFoodName, szDomesticateName))
+							end
 						end
 					end,
 				},
