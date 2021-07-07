@@ -131,6 +131,14 @@ local function wsub(str, s, e)
 	end
 	return _wsub(str, s, e)
 end
+local DEBUG_LEVEL = SetmetaReadonly({
+	PMLOG   = 0,
+	LOG     = 1,
+	WARNING = 2,
+	ERROR   = 3,
+	DEBUG   = 3,
+	NONE    = 4,
+})
 -------------------------------------------------------------------------------------------------------
 -- 本地函数变量
 -------------------------------------------------------------------------------------------------------
@@ -154,8 +162,8 @@ local _LOGO_MENU_FRAME_       = 1
 local _LOGO_MENU_HOVER_FRAME_ = 2
 local _POSTER_UITEX_          = _ADDON_ROOT_ .. _NAME_SPACE_ .. '_Resource/img/Poster.UITex'
 local _POSTER_FRAME_COUNT_    = 2
-local _DEBUG_LEVEL_           = tonumber(LoadLUAData(_DATA_ROOT_ .. 'debug.level.jx3dat') or nil) or 4
-local _DELOG_LEVEL_           = tonumber(LoadLUAData(_DATA_ROOT_ .. 'delog.level.jx3dat') or nil) or 4
+local _DEBUG_LEVEL_           = tonumber(LoadLUAData(_DATA_ROOT_ .. 'debug.level.jx3dat') or nil) or DEBUG_LEVEL.NONE
+local _DELOG_LEVEL_           = tonumber(LoadLUAData(_DATA_ROOT_ .. 'delog.level.jx3dat') or nil) or DEBUG_LEVEL.NONE
 -------------------------------------------------------------------------------------------------------
 -- 初始化调试工具
 -------------------------------------------------------------------------------------------------------
@@ -179,13 +187,6 @@ if not SetmetaReadonly then
 		})
 	end
 end
-local DEBUG_LEVEL = SetmetaReadonly({
-	PMLOG   = 0,
-	LOG     = 1,
-	WARNING = 2,
-	ERROR   = 3,
-	DEBUG   = 3,
-})
 local ENVIRONMENT = _G.PLUGIN_ENVIRONMENT
 if type(ENVIRONMENT) ~= 'table' then
 	ENVIRONMENT = {}
@@ -194,7 +195,7 @@ end
 ---------------------------------------------------
 -- 调试工具
 ---------------------------------------------------
-if _DEBUG_LEVEL_ <= DEBUG_LEVEL.DEBUG then
+if _DEBUG_LEVEL_ < DEBUG_LEVEL.NONE then
 	if not ENVIRONMENT.ECHO_LUA_ERROR then
 		RegisterEvent('CALL_LUA_ERROR', function()
 			print(arg0)
@@ -800,7 +801,7 @@ end
 
 local function GetGameAPI(szAddon, szInside)
 	local api = _G[szAddon]
-	if not api then
+	if not api and _DEBUG_LEVEL_ < DEBUG_LEVEL.NONE then
 		local env = GetInsideEnv()
 		if env then
 			api = env[szInside or szAddon]
