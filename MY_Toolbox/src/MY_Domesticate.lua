@@ -240,6 +240,9 @@ function D.CheckAlertEnable()
 			if not me then
 				return
 			end
+			if me.bFightState then
+				return
+			end
 			local domesticate = me.GetDomesticate()
 			if not domesticate then
 				return
