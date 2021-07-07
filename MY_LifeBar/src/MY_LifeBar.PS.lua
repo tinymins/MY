@@ -429,9 +429,10 @@ function PS.OnPanelActive(wnd)
 		x = x, y = y, text = _L['Color config'],
 		menu = function()
 			local t = {}
+			local tColor = Config.Color
 			-- 玩家颜色设置
 			insert(t, { szOption = _L['Player color config'], bDisable = true } )
-			for relation, cfg in pairs(Config.Color) do
+			for relation, cfg in pairs(tColor) do
 				if cfg.Player then
 					local opt = {}
 					opt.szOption = _L[relation]
@@ -444,7 +445,7 @@ function PS.OnPanelActive(wnd)
 						UI.OpenColorPicker(function(r, g, b)
 							cfg.Player = { r, g, b }
 							opt.rgb = cfg.Player
-							Config.Color = Config.Color
+							Config.Color = tColor
 						end)
 					end
 					insert(opt, {
@@ -453,13 +454,13 @@ function PS.OnPanelActive(wnd)
 						bChecked = not cfg.DifferentiateForce,
 						fnAction = function(_, r, g, b)
 							cfg.DifferentiateForce = false
-							Config.Color = Config.Color
+							Config.Color = tColor
 						end,
 						rgb = cfg.Player,
 						fnChangeColor = function(_, r, g, b)
 							cfg.Player = {r, g, b}
 							opt.rgb = cfg.Player
-							Config.Color = Config.Color
+							Config.Color = tColor
 						end,
 					})
 					insert(opt, {
@@ -468,7 +469,7 @@ function PS.OnPanelActive(wnd)
 						bChecked = cfg.DifferentiateForce,
 						fnAction = function(_, r, g, b)
 							cfg.DifferentiateForce = true
-							Config.Color = Config.Color
+							Config.Color = tColor
 						end,
 					})
 					insert(opt, { bDevide = true })
@@ -478,7 +479,7 @@ function PS.OnPanelActive(wnd)
 							rgb = cfg[dwForceID],
 							fnChangeColor = function(_, r, g, b)
 								cfg[dwForceID] = { r, g, b }
-								Config.Color = Config.Color
+								Config.Color = tColor
 							end,
 							fnDisable = function()
 								return not cfg.DifferentiateForce
@@ -491,7 +492,7 @@ function PS.OnPanelActive(wnd)
 			insert(t, { bDevide = true } )
 			-- NCP颜色设置
 			insert(t, { szOption = _L['Npc color config'], bDisable = true } )
-			for relation, cfg in pairs(Config.Color) do
+			for relation, cfg in pairs(tColor) do
 				if cfg.Npc then
 					local opt = {}
 					opt.szOption = _L[relation]
@@ -504,7 +505,7 @@ function PS.OnPanelActive(wnd)
 						UI.OpenColorPicker(function(r, g, b)
 							cfg.Npc = { r, g, b }
 							opt.rgb = cfg.Npc
-							Config.Color = Config.Color
+							Config.Color = tColor
 						end)
 					end
 					insert(t, opt)
@@ -516,11 +517,12 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + offsety
 
-	local function GeneBooleanPopupMenu(szKey, cfgs, szPlayerTip, szNpcTip)
+	local function GeneBooleanPopupMenu(szKey, szPlayerTip, szNpcTip)
 		local t = {}
+		local tRelationCfg = Config[szKey]
 		if szPlayerTip then
 			insert(t, { szOption = szPlayerTip, bDisable = true } )
-			for relation, cfg in pairs(cfgs) do
+			for relation, cfg in pairs(tRelationCfg) do
 				if cfg.Player then
 					insert(t, {
 						szOption = _L[relation],
@@ -529,7 +531,7 @@ function PS.OnPanelActive(wnd)
 						bChecked = cfg.Player.bEnable,
 						fnAction = function()
 							cfg.Player.bEnable = not cfg.Player.bEnable
-							Config[szKey] = Config[szKey]
+							Config[szKey] = tRelationCfg
 							D.Reset()
 						end,
 						{
@@ -538,7 +540,7 @@ function PS.OnPanelActive(wnd)
 							bChecked = cfg.Player.bOnlyFighting,
 							fnAction = function()
 								cfg.Player.bOnlyFighting = not cfg.Player.bOnlyFighting
-								Config[szKey] = Config[szKey]
+								Config[szKey] = tRelationCfg
 							end,
 						},
 					})
@@ -550,7 +552,7 @@ function PS.OnPanelActive(wnd)
 		end
 		if szNpcTip then
 			insert(t, { szOption = szNpcTip, bDisable = true } )
-			for relation, cfg in pairs(cfgs) do
+			for relation, cfg in pairs(tRelationCfg) do
 				if cfg.Npc then
 					insert(t, {
 						szOption = _L[relation],
@@ -559,7 +561,7 @@ function PS.OnPanelActive(wnd)
 						bChecked = cfg.Npc.bEnable,
 						fnAction = function()
 							cfg.Npc.bEnable = not cfg.Npc.bEnable
-							Config[szKey] = Config[szKey]
+							Config[szKey] = tRelationCfg
 							D.Reset()
 						end,
 						{
@@ -568,7 +570,7 @@ function PS.OnPanelActive(wnd)
 							bChecked = cfg.Npc.bOnlyFighting,
 							fnAction = function()
 								cfg.Npc.bOnlyFighting = not cfg.Npc.bOnlyFighting
-								Config[szKey] = Config[szKey]
+								Config[szKey] = tRelationCfg
 							end,
 						},
 						{
@@ -577,7 +579,7 @@ function PS.OnPanelActive(wnd)
 							bChecked = cfg.Npc.bHidePets,
 							fnAction = function()
 								cfg.Npc.bHidePets = not cfg.Npc.bHidePets
-								Config[szKey] = Config[szKey]
+								Config[szKey] = tRelationCfg
 							end,
 						},
 					})
@@ -591,7 +593,7 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndComboBox', {
 		x = x, y = y, text = _L['Name display config'],
 		menu = function()
-			return GeneBooleanPopupMenu('ShowName', Config.ShowName, _L['Player name display'], _L['Npc name display'])
+			return GeneBooleanPopupMenu('ShowName', _L['Player name display'], _L['Npc name display'])
 		end,
 		autoenable = function() return D.IsEnabled() end,
 	})
@@ -601,7 +603,7 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndComboBox', {
 		x = x, y = y, text = _L['Title display config'],
 		menu = function()
-			return GeneBooleanPopupMenu('ShowTitle', Config.ShowTitle, _L['Player title display'], _L['Npc title display'])
+			return GeneBooleanPopupMenu('ShowTitle', _L['Player title display'], _L['Npc title display'])
 		end,
 		autoenable = function() return D.IsEnabled() end,
 	})
@@ -611,7 +613,7 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndComboBox', {
 		x = x, y = y, text = _L['Tong display config'],
 		menu = function()
-			return GeneBooleanPopupMenu('ShowTong', Config.ShowTong, _L['Player tong display'])
+			return GeneBooleanPopupMenu('ShowTong', _L['Player tong display'])
 		end,
 		autoenable = function() return D.IsEnabled() end,
 	})
@@ -621,7 +623,7 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndComboBox', {
 		x = x, y = y, text = _L['Lifebar display config'],
 		menu = function()
-			local t = GeneBooleanPopupMenu('ShowLife', Config.ShowLife, _L['Player lifebar display'], _L['Npc lifebar display'])
+			local t = GeneBooleanPopupMenu('ShowLife', _L['Player lifebar display'], _L['Npc lifebar display'])
 			insert(t, { bDevide = true })
 			local t1 = {
 				szOption = _L['Draw direction'],
@@ -647,7 +649,7 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndComboBox', {
 		x = x, y = y, text = _L['Lifepercentage display config'],
 		menu = function()
-			local t = GeneBooleanPopupMenu('ShowLifePer', Config.ShowLifePer, _L['Player lifepercentage display'], _L['Npc lifepercentage display'])
+			local t = GeneBooleanPopupMenu('ShowLifePer', _L['Player lifepercentage display'], _L['Npc lifepercentage display'])
 			insert(t, { bDevide = true })
 			insert(t, {
 				szOption = _L['Hide decimal'],
@@ -668,8 +670,9 @@ function PS.OnPanelActive(wnd)
 		x = x, y = y, text = _L['Balloon display config'],
 		menu = function()
 			local t = {}
+			local tShowBalloon = Config.ShowBalloon
 			insert(t, { szOption = _L['Player balloon display'], bDisable = true } )
-			for relation, cfg in pairs(Config.ShowBalloon) do
+			for relation, cfg in pairs(tShowBalloon) do
 				if cfg.Player then
 					insert(t, {
 						szOption = _L[relation],
@@ -678,7 +681,7 @@ function PS.OnPanelActive(wnd)
 						bChecked = cfg.Player.bEnable,
 						fnAction = function()
 							cfg.Player.bEnable = not cfg.Player.bEnable
-							Config.ShowBalloon = Config.ShowBalloon
+							Config.ShowBalloon = tShowBalloon
 							D.Reset()
 						end,
 					})
@@ -686,7 +689,7 @@ function PS.OnPanelActive(wnd)
 			end
 			insert(t, { bDevide = true })
 			insert(t, { szOption = _L['Npc balloon display'], bDisable = true } )
-			for relation, cfg in pairs(Config.ShowBalloon) do
+			for relation, cfg in pairs(tShowBalloon) do
 				if cfg.Npc then
 					insert(t, {
 						szOption = _L[relation],
@@ -695,15 +698,16 @@ function PS.OnPanelActive(wnd)
 						bChecked = cfg.Npc.bEnable,
 						fnAction = function()
 							cfg.Npc.bEnable = not cfg.Npc.bEnable
-							Config.ShowBalloon = Config.ShowBalloon
+							Config.ShowBalloon = tShowBalloon
 							D.Reset()
 						end,
 					})
 				end
 			end
 			insert(t, { bDevide = true })
+			local tBalloonChannel = Config.BalloonChannel
 			insert(t, { szOption = _L['Balloon channel config'], bDisable = true } )
-			for szMsgType, cfg in pairs(Config.BalloonChannel) do
+			for szMsgType, cfg in pairs(tBalloonChannel) do
 				if g_tStrings.tChannelName[szMsgType] then
 					local t1 = {
 						szOption = _L['Balloon display time'],
@@ -716,7 +720,7 @@ function PS.OnPanelActive(wnd)
 							bChecked = cfg.nDuring == nDuring,
 							fnAction = function()
 								cfg.nDuring = nDuring
-								Config.BalloonChannel = Config.BalloonChannel
+								Config.BalloonChannel = tBalloonChannel
 								D.Reset()
 							end,
 							fnDisable = function() return not cfg.bEnable end,
@@ -728,7 +732,7 @@ function PS.OnPanelActive(wnd)
 						bCheck = true, bChecked = cfg.bEnable,
 						fnAction = function()
 							cfg.bEnable = not cfg.bEnable
-							Config.BalloonChannel = Config.BalloonChannel
+							Config.BalloonChannel = tBalloonChannel
 							D.Reset()
 						end,
 						t1,
