@@ -181,7 +181,7 @@ LIB.RegisterMsgMonitor('MSG_SYS', 'MY_ShareChat__Sysmsg', function(szChannel, sz
 					.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
 						l = AnsiToUTF8(GLOBAL.GAME_LANG),
 						L = AnsiToUTF8(GLOBAL.GAME_EDITION),
-						regin = AnsiToUTF8(LIB.GetRealServer(1)), -- Region
+						region = AnsiToUTF8(LIB.GetRealServer(1)), -- Region
 						server = AnsiToUTF8(LIB.GetRealServer(2)), -- Server
 						content = AnsiToUTF8(szMsg), -- Content
 						time = GetCurrentTime(), -- Time
