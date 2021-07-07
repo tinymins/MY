@@ -507,9 +507,13 @@ function D.OnEvent(event)
 	end
 end
 
-function D.OnFrameDragSetPosEnd()
+function D.OnFrameDragEnd()
 	this:CorrectPos()
 	MY_Focus.anchor = UI(this):Anchor('TOPRIGHT')
+end
+
+function D.OnFrameDragSetPosEnd()
+	this:CorrectPos()
 end
 
 function D.OnItemMouseEnter()
