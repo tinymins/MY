@@ -535,6 +535,22 @@ local function GetInstanceInfoData(inst, info)
 		db:Delete(info.szDataKey)
 		return res
 	end
+	-- »´æ÷…Ë÷√ºÊ»›
+	if info.ePathType == PATH_TYPE.ROLE then
+		local inst = DATABASE_INSTANCE[PATH_TYPE.GLOBAL]
+		local db = info.bUserData
+			and inst.pUserDataUDB
+			or inst.pSettingsUDB
+		local res = db:Get(info.szDataKey)
+		if IsTable(res) then
+			if not res.v then
+				res.v = ''
+			end
+			SetInstanceInfoData(inst, info, res.d, res.v)
+			db:Delete(info.szDataKey)
+			return res
+		end
+	end
 	return nil
 end
 
