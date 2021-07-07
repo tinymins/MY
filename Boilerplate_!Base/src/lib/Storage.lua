@@ -590,33 +590,16 @@ function LIB.ConnectUserSettingsDB()
 	end
 	for _, ePathType in ipairs(DATABASE_TYPE_LIST) do
 		if not DATABASE_INSTANCE[ePathType] then
-			local szRandom = tostring(random(0, 9999999))
-			local pSettingsUDB = LIB.UnQLiteConnect(szUDBPresetRoot
-				and (szUDBPresetRoot .. DATABASE_TYPE_PRESET_FILE[ePathType] .. '.udb')
-				or LIB.FormatPath({'userdata/settings.udb', ePathType}))
-			pSettingsUDB:Set('RANDOM', szRandom)
-			if pSettingsUDB:Get('RANDOM') == szRandom then
-				pSettingsUDB:Delete('RANDOM')
-			else
-				LIB.UnQLiteDisconnect(pSettingsUDB)
-				pSettingsUDB = nil
-			end
-			local pUserDataUDB = LIB.UnQLiteConnect(LIB.FormatPath({'userdata/userdata.udb', ePathType}))
-			pUserDataUDB:Set('RANDOM', szRandom)
-			if pUserDataUDB:Get('RANDOM') == szRandom then
-				pUserDataUDB:Delete('RANDOM')
-			else
-				LIB.UnQLiteDisconnect(pUserDataUDB)
-				pUserDataUDB = nil
-			end
 			DATABASE_INSTANCE[ePathType] = {
 				pSettingsDB = LIB.NoSQLiteConnect(szDBPresetRoot
 					and (szDBPresetRoot .. DATABASE_TYPE_PRESET_FILE[ePathType] .. '.db')
 					or LIB.FormatPath({'config/settings.db', ePathType})),
-				pSettingsUDB = pSettingsUDB,
+				pSettingsUDB = LIB.UnQLiteConnect(szUDBPresetRoot
+					and (szUDBPresetRoot .. DATABASE_TYPE_PRESET_FILE[ePathType] .. '.udb')
+					or LIB.FormatPath({'userdata/settings.udb', ePathType})),
 				-- bSettingsDBCommit = false,
 				pUserDataDB = LIB.NoSQLiteConnect(LIB.FormatPath({'userdata/userdata.db', ePathType})),
-				pUserDataUDB = pUserDataUDB,
+				pUserDataUDB = LIB.UnQLiteConnect(LIB.FormatPath({'userdata/userdata.udb', ePathType})),
 				-- bUserDataDBCommit = false,
 			}
 		end
@@ -1255,13 +1238,24 @@ do
 -- UnQLite 底层当前不支持多句柄访问，所以需要句柄池
 local UNQLITE_POOL = {}
 function LIB.UnQLiteConnect(oPath)
+	if not UnQLite_Open then
+		return
+	end
 	local szPath = LIB.FormatPath(oPath)
 	local szKey = lower(szPath)
 	local rec = UNQLITE_POOL[szKey]
 	if not rec then
+		local szRandom = tostring(random(0, 9999999))
+		local pUserDataDB = UnQLite_Open(szPath)
+		pUserDataDB:Set('@@__LOCK_CHECK__@@', szRandom)
+		if pUserDataDB:Get('@@__LOCK_CHECK__@@') ~= szRandom then
+			LIB.UnQLiteDisconnect(pUserDataDB)
+			return
+		end
+		pUserDataDB:Delete('@@__LOCK_CHECK__@@')
 		rec = {
 			nCount = 0,
-			pUserDataDB = UnQLite_Open(szPath),
+			pUserDataDB = pUserDataDB,
 		}
 		UNQLITE_POOL[szKey]	= rec
 	end
