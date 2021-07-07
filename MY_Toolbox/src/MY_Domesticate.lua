@@ -106,7 +106,7 @@ function D.SetAutoFeed(dwAutoFeedCubTabType, dwAutoFeedCubTabIndex, dwAutoFeedFo
 	if dwAutoFeedFoodTabType and dwAutoFeedFoodTabIndex then
 		local food = GetItemInfo(dwAutoFeedFoodTabType, dwAutoFeedFoodTabIndex)
 		if food then
-			local szText = MY.GetPureText(GetItemInfoTip(GLOBAL.CURRENT_ITEM_VERSION, 5, 23779))
+			local szText = MY.GetPureText(GetItemInfoTip(GLOBAL.CURRENT_ITEM_VERSION, dwAutoFeedFoodTabType, dwAutoFeedFoodTabIndex), 'LUA') or ''
 			local szVal = szText:match(_L['measure (%d+) point'])
 			local nAutoFeedFoodMeasure = szVal and tonumber(szVal)
 			if nAutoFeedFoodMeasure then
