@@ -526,7 +526,7 @@ local function GetInstanceInfoData(inst, info)
 	local db = info.bUserData
 		and inst.pUserDataUDB
 		or inst.pSettingsUDB
-	local res = db:Get(info.szDataKey)
+	local res = db and db:Get(info.szDataKey)
 	if IsTable(res) then
 		if not res.v then
 			res.v = ''
@@ -534,6 +534,22 @@ local function GetInstanceInfoData(inst, info)
 		SetInstanceInfoData(inst, info, res.d, res.v)
 		db:Delete(info.szDataKey)
 		return res
+	end
+	-- 全局设置兼容
+	if info.ePathType == PATH_TYPE.ROLE then
+		local inst = DATABASE_INSTANCE[PATH_TYPE.GLOBAL]
+		local db = info.bUserData
+			and inst.pUserDataUDB
+			or inst.pSettingsUDB
+		local res = db and db:Get(info.szDataKey)
+		if IsTable(res) then
+			if not res.v then
+				res.v = ''
+			end
+			SetInstanceInfoData(inst, info, res.d, res.v)
+			db:Delete(info.szDataKey)
+			return res
+		end
 	end
 	return nil
 end
@@ -546,7 +562,19 @@ local function DeleteInstanceInfoData(inst, info)
 	local db = info.bUserData
 		and inst.pUserDataUDB
 		or inst.pSettingsUDB
-	db:Delete(info.szDataKey)
+	if db then
+		db:Delete(info.szDataKey)
+	end
+	-- 全局设置兼容
+	if info.ePathType == PATH_TYPE.ROLE then
+		local inst = DATABASE_INSTANCE[PATH_TYPE.GLOBAL]
+		local db = info.bUserData
+			and inst.pUserDataUDB
+			or inst.pSettingsUDB
+		if db then
+			db:Delete(info.szDataKey)
+		end
+	end
 end
 
 function LIB.ConnectUserSettingsDB()
@@ -562,16 +590,33 @@ function LIB.ConnectUserSettingsDB()
 	end
 	for _, ePathType in ipairs(DATABASE_TYPE_LIST) do
 		if not DATABASE_INSTANCE[ePathType] then
+			local szRandom = tostring(random(0, 9999999))
+			local pSettingsUDB = LIB.UnQLiteConnect(szUDBPresetRoot
+				and (szUDBPresetRoot .. DATABASE_TYPE_PRESET_FILE[ePathType] .. '.udb')
+				or LIB.FormatPath({'userdata/settings.udb', ePathType}))
+			pSettingsUDB:Set('RANDOM', szRandom)
+			if pSettingsUDB:Get('RANDOM') == szRandom then
+				pSettingsUDB:Delete('RANDOM')
+			else
+				LIB.UnQLiteDisconnect(pSettingsUDB)
+				pSettingsUDB = nil
+			end
+			local pUserDataUDB = LIB.UnQLiteConnect(LIB.FormatPath({'userdata/userdata.udb', ePathType}))
+			pUserDataUDB:Set('RANDOM', szRandom)
+			if pUserDataUDB:Get('RANDOM') == szRandom then
+				pUserDataUDB:Delete('RANDOM')
+			else
+				LIB.UnQLiteDisconnect(pUserDataUDB)
+				pUserDataUDB = nil
+			end
 			DATABASE_INSTANCE[ePathType] = {
 				pSettingsDB = LIB.NoSQLiteConnect(szDBPresetRoot
 					and (szDBPresetRoot .. DATABASE_TYPE_PRESET_FILE[ePathType] .. '.db')
 					or LIB.FormatPath({'config/settings.db', ePathType})),
-				pSettingsUDB = LIB.UnQLiteConnect(szUDBPresetRoot
-					and (szUDBPresetRoot .. DATABASE_TYPE_PRESET_FILE[ePathType] .. '.udb')
-					or LIB.FormatPath({'userdata/settings.udb', ePathType})),
+				pSettingsUDB = pSettingsUDB,
 				-- bSettingsDBCommit = false,
 				pUserDataDB = LIB.NoSQLiteConnect(LIB.FormatPath({'userdata/userdata.db', ePathType})),
-				pUserDataUDB = LIB.UnQLiteConnect(LIB.FormatPath({'userdata/userdata.udb', ePathType})),
+				pUserDataUDB = pUserDataUDB,
 				-- bUserDataDBCommit = false,
 			}
 		end
@@ -585,8 +630,12 @@ function LIB.ReleaseUserSettingsDB()
 	for _, ePathType in ipairs(DATABASE_TYPE_LIST) do
 		local inst = DATABASE_INSTANCE[ePathType]
 		if inst then
-			LIB.UnQLiteDisconnect(inst.pSettingsUDB)
-			LIB.UnQLiteDisconnect(inst.pUserDataUDB)
+			if inst.pSettingsUDB then
+				LIB.UnQLiteDisconnect(inst.pSettingsUDB)
+			end
+			if inst.pUserDataUDB then
+				LIB.UnQLiteDisconnect(inst.pUserDataUDB)
+			end
 			LIB.NoSQLiteDisconnect(inst.pSettingsDB)
 			LIB.NoSQLiteDisconnect(inst.pUserDataDB)
 			DATABASE_INSTANCE[ePathType] = nil
