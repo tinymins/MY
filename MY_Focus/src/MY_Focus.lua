@@ -689,6 +689,7 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		-- ÅÐ¶ÏÐ¡±¾±¾
 		if not bFocus and O.bFocusAnmerkungen
 		and dwType == TARGET.PLAYER
+		and MY_Anmerkungen
 		and MY_Anmerkungen.GetPlayerNote(dwID) then
 			insert(aVia, {
 				bDeletable = false,
