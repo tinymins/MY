@@ -178,10 +178,6 @@ function D.LoadConfig()
 	end
 end
 
-function D.SaveConfig()
-	O.aKeyword = O.aKeyword
-end
-
 function D.SaveData()
 	local TYPE = O.bDistinctServer
 		and PATH_TYPE.SERVER or PATH_TYPE.ROLE
@@ -425,11 +421,12 @@ function PS.OnPanelActive(wnd)
 		x = 80, y = 15, w = w - 246, h = 25,
 		text = _L['Click to config monitors'],
 		menu = function()
+			local aKeyword = O.aKeyword
 			local menu = { bAlignWidth = true }
-			for i, p in ipairs(O.aKeyword) do
+			for i, p in ipairs(aKeyword) do
 				local m = LIB.GetMsgTypeMenu(function(szChannel)
 					p.tChannel[szChannel] = not p.tChannel[szChannel]
-					D.SaveConfig()
+					O.aKeyword = aKeyword
 					D.RegisterMsgMonitor()
 				end, p.tChannel)
 				for _, mm in ipairs(m) do
@@ -447,7 +444,7 @@ function PS.OnPanelActive(wnd)
 								return
 							end
 							p.szKeyword = szText
-							D.SaveConfig()
+							O.aKeyword = aKeyword
 							D.RegisterMsgMonitor()
 						end, nil, nil, nil, p.szKeyword)
 					end,
@@ -458,7 +455,7 @@ function PS.OnPanelActive(wnd)
 					bCheck = true, bChecked = p.bEnable,
 					fnAction = function()
 						p.bEnable = not p.bEnable
-						D.SaveConfig()
+						O.aKeyword = aKeyword
 						D.RegisterMsgMonitor()
 					end,
 				})
@@ -469,7 +466,7 @@ function PS.OnPanelActive(wnd)
 					fnAction = function()
 						if p.bIsRegexp or IsShiftKeyDown() then
 							p.bIsRegexp = not p.bIsRegexp
-							D.SaveConfig()
+							O.aKeyword = aKeyword
 						else
 							MessageBox({
 								szName = 'MY_ChatMonitor_Regexp',
@@ -478,7 +475,7 @@ function PS.OnPanelActive(wnd)
 									szOption = g_tStrings.STR_HOTKEY_SURE,
 									fnAction = function()
 										p.bIsRegexp = not p.bIsRegexp
-										D.SaveConfig()
+										O.aKeyword = aKeyword
 									end,
 								},
 								{ szOption = g_tStrings.STR_HOTKEY_CANCEL },
@@ -491,9 +488,9 @@ function PS.OnPanelActive(wnd)
 				insert(m, {
 					szOption = _L['Delete'],
 					fnAction = function()
-						remove(O.aKeyword, i)
-						O.aKeyword = O.aKeyword
-						D.SaveConfig()
+						remove(aKeyword, i)
+						O.aKeyword = aKeyword
+						O.aKeyword = aKeyword
 						D.RegisterMsgMonitor()
 						UI.ClosePopupMenu()
 					end,
@@ -512,14 +509,14 @@ function PS.OnPanelActive(wnd)
 						if IsEmpty(szText) then
 							return
 						end
-						insert(O.aKeyword, {
+						insert(aKeyword, {
 							szKeyword = szText,
 							bEnable = true,
 							bIsRegexp = false,
 							tChannel = Clone(DEFAULE_CHANNEL),
 						})
-						O.aKeyword = O.aKeyword
-						D.SaveConfig()
+						O.aKeyword = aKeyword
+						O.aKeyword = aKeyword
 						D.RegisterMsgMonitor()
 					end)
 				end,
