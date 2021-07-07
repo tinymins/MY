@@ -43,7 +43,6 @@ local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeC
 local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
 -------------------------------------------------------------------------------------------------------
 local AnsiToUTF8 = AnsiToUTF8 or _G.ansi_to_utf8
-local UrlEncodeString, UrlDecodeString = UrlEncode, UrlDecode
 --------------------------------------------
 -- 本地函数和变量
 --------------------------------------------
@@ -222,16 +221,12 @@ local function ConvertToAnsi(data)
 end
 LIB.ConvertToAnsi = ConvertToAnsi
 
-if not UrlEncodeString then
-function UrlEncodeString(szText)
+local function UrlEncodeString(szText)
 	return szText:gsub('([^0-9a-zA-Z ])', function (c) return format ('%%%02X', byte(c)) end):gsub(' ', '+')
 end
-end
 
-if not UrlDecodeString then
-function UrlDecodeString(szText)
+local function UrlDecodeString(szText)
 	return szText:gsub('+', ' '):gsub('%%(%x%x)', function(h) return char(tonumber(h, 16)) end)
-end
 end
 
 local function UrlEncode(data)
