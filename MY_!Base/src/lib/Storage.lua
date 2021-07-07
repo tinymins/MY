@@ -582,7 +582,7 @@ function LIB.ConnectUserSettingsDB()
 		return
 	end
 	local szID, szDBPresetRoot, szUDBPresetRoot = LIB.GetUserSettingsPresetID(), nil, nil
-	if szID then
+	if not IsEmpty(szID) then
 		szDBPresetRoot = LIB.FormatPath({'config/settings/' .. szID .. '/', PATH_TYPE.GLOBAL})
 		szUDBPresetRoot = LIB.FormatPath({'userdata/settings/' .. szID .. '/', PATH_TYPE.GLOBAL})
 		CPath.MakeDir(szDBPresetRoot)
