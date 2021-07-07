@@ -158,7 +158,7 @@ local D = {}
 -- 数据处理
 ----------------------------------------------------------------------<
 function D.LoadConfig()
-	local szPath = LIB.FormatPath({'config/gkp.cfg', PATH_TYPE.GLOBAL})
+	local szPath = LIB.FormatPath({'config/gkp.cfg.jx3dat', PATH_TYPE.GLOBAL})
 	local Config = LIB.LoadLUAData(szPath)
 	if Config then
 		CPath.DelFile(szPath)
