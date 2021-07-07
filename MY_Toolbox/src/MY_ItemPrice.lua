@@ -121,7 +121,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 		oncheck = function(bChecked)
 			MY_ItemPrice.bEnable = bChecked
 		end,
-		tip = _L['Hold SHIFT and r-click bag box to show item price'],
+		tip = _L['Hold SHIFT and r-click bag box to show item price, share price when search auction.'],
 		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 	}):Width() + 5
 	return x, y
