@@ -276,7 +276,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 	ui:Append('WndTrackbar', {
 		x = x, y = y, w = 130,
 		value = O.nAlertNum,
-		range = {1, 200},
+		range = {1, 1000},
 		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		textfmt = function(val) return _L('Alert when measure larger than %d', val) end,
 		onchange = function(val)
