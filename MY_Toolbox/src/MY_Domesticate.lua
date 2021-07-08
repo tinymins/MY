@@ -247,11 +247,19 @@ function D.CheckAlertEnable()
 			if not domesticate then
 				return
 			end
-			local nMeasure = domesticate.nMaxFullMeasure - domesticate.nFullMeasure
-			if nMeasure >= O.nAlertNum and domesticate.nGrowthLevel < domesticate.nMaxGrowthLevel then
-				local szDomesticate = LIB.GetObjectName('ITEM_INFO', domesticate.dwCubTabType, domesticate.dwCubTabIndex)
-				OutputWarningMessage('MSG_WARNING_YELLOW', _L('Your domesticate %s available measure is %d point!', szDomesticate, nMeasure))
-				PlaySound(SOUND.UI_SOUND, g_sound.CloseAuction)
+			if O.nAlertNum == 0 then
+				if domesticate.nFullMeasure == 0 then
+					local szDomesticate = LIB.GetObjectName('ITEM_INFO', domesticate.dwCubTabType, domesticate.dwCubTabIndex)
+					OutputWarningMessage('MSG_WARNING_YELLOW', _L('Your domesticate %s is hungery!', szDomesticate, nMeasure))
+					PlaySound(SOUND.UI_SOUND, g_sound.CloseAuction)
+				end
+			else
+				local nMeasure = domesticate.nMaxFullMeasure - domesticate.nFullMeasure
+				if nMeasure >= O.nAlertNum and domesticate.nGrowthLevel < domesticate.nMaxGrowthLevel then
+					local szDomesticate = LIB.GetObjectName('ITEM_INFO', domesticate.dwCubTabType, domesticate.dwCubTabIndex)
+					OutputWarningMessage('MSG_WARNING_YELLOW', _L('Your domesticate %s available measure is %d point!', szDomesticate, nMeasure))
+					PlaySound(SOUND.UI_SOUND, g_sound.CloseAuction)
+				end
 			end
 		end)
 	else
@@ -279,9 +287,14 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 	ui:Append('WndTrackbar', {
 		x = x, y = y, w = 130,
 		value = O.nAlertNum,
-		range = {1, 1000},
+		range = {0, 1000},
 		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
-		textfmt = function(val) return _L('Alert when measure larger than %d', val) end,
+		textfmt = function(val)
+			if val == 0 then
+				return _L['Alert when measure is empty']
+			end
+			return _L('Alert when measure larger than %d', val)
+		end,
 		onchange = function(val)
 			O.nAlertNum = val
 		end,
