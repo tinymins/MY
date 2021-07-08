@@ -527,10 +527,13 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 				GetFormatText(_L['Refresh type:'] .. TASK_TYPE_STRING[task.eType] .. '\n', 162, 255, 128, 0)
 			}
 			local function InsertTitleTipXml(aInfo)
-				if IsCtrlKeyDown() then
-					insert(aTitleTipXml, GetFormatText('(' .. aInfo[1] .. ')', 162, 255, 128, 0))
+				local info = Table_GetQuestStringInfo(aInfo[1])
+				if info then
+					if IsCtrlKeyDown() then
+						insert(aTitleTipXml, GetFormatText('(' .. aInfo[1] .. ')', 162, 255, 128, 0))
+					end
+					insert(aTitleTipXml, GetFormatText('[' .. info.szName .. ']\n', 162, 255, 255, 0))
 				end
-				insert(aTitleTipXml, GetFormatText('[' .. Get(Table_GetQuestStringInfo(aInfo[1]), 'szName', '') .. ']\n', 162, 255, 255, 0))
 			end
 			if task.aQuestInfo then
 				for _, aInfo in ipairs(task.aQuestInfo) do
