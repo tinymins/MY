@@ -170,7 +170,7 @@ end
 function D.OnLButtonClick()
 	local name = this:GetName()
 	if name == 'Btn_Select' then
-		local menu = D.GetMeun(this:GetRoot())
+		local menu = D.GetMenu(this:GetRoot())
 		local handle = this:Lookup('', '')
 		local nX, nY = handle:GetAbsPos()
 		local nW, nH = handle:GetSize()
@@ -494,11 +494,12 @@ function D.SetElement(frame, el)
 	frame:Lookup('Btn_Select', 'Text_Select'):SetText(el:GetTreePath())
 end
 
-function D.GetMeun(frame)
+function D.GetMenu(frame)
 	local menu = {}
-	for k, v in ipairs({ 'Lowest', 'Lowest1', 'Lowest2', 'Normal', 'Normal1', 'Normal2', 'Topmost', 'Topmost1', 'Topmost2' })do
+	for k, v in ipairs({ 'Lowest', 'Lowest1', 'Lowest2', 'Normal', 'Normal1', 'Normal2', 'Topmost', 'Topmost1', 'Topmost2' }) do
 		insert(menu, { szOption = v })
-		local frmIter = Station.Lookup(v):GetFirstChild()
+		local frmLayer = Station.Lookup(v)
+		local frmIter = frmLayer and frmLayer:GetFirstChild()
 		while frmIter do
 			local el = frmIter
 			insert(menu[#menu], {
