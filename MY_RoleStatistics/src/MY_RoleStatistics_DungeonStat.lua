@@ -250,17 +250,21 @@ local COLUMN_LIST = {
 }
 local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 	if id == 'week_team_dungeon' then
-		return {
-			id = id,
-			szTitle = _L['Week routine: '] .. _L.ACTIVITY_WEEK_TEAM_DUNGEON,
-			nMinWidth = DUNGEON_MIN_WIDTH * #LIB.GetActivityMap('WEEK_TEAM_DUNGEON'),
-		}
+		if GLOBAL.GAME_BRANCH ~= 'classic' then
+			return {
+				id = id,
+				szTitle = _L['Week routine: '] .. _L.ACTIVITY_WEEK_TEAM_DUNGEON,
+				nMinWidth = DUNGEON_MIN_WIDTH * #LIB.GetActivityMap('WEEK_TEAM_DUNGEON'),
+			}
+		end
 	elseif id == 'week_raid_dungeon' then
-		return {
-			id = id,
-			szTitle = _L['Week routine: '] .. _L.ACTIVITY_WEEK_RAID_DUNGEON,
-			nMinWidth = DUNGEON_MIN_WIDTH * #LIB.GetActivityMap('WEEK_RAID_DUNGEON'),
-		}
+		if GLOBAL.GAME_BRANCH ~= 'classic' then
+			return {
+				id = id,
+				szTitle = _L['Week routine: '] .. _L.ACTIVITY_WEEK_RAID_DUNGEON,
+				nMinWidth = DUNGEON_MIN_WIDTH * #LIB.GetActivityMap('WEEK_RAID_DUNGEON'),
+			}
+		end
 	elseif wfind(id, 'dungeon_') then
 		local id, via = wgsub(id, 'dungeon_', ''), ''
 		if wfind(id, '@') then

@@ -576,15 +576,20 @@ end
 LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_EnergyBar', D.Apply)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y,
-		text = _L['Enable MY_EnergyBar'],
-		checked = O.bEnable,
-		oncheck = function(bChecked)
-			O.bEnable = bChecked
-			D.Apply()
-		end,
-	}):AutoWidth():Width() + 5
+	if GLOBAL.GAME_BRANCH ~= 'classic' then
+		x = x + ui:Append('WndCheckBox', {
+			x = x, y = y,
+			text = _L['Enable MY_EnergyBar'],
+			checked = O.bEnable,
+			oncheck = function(bChecked)
+				O.bEnable = bChecked
+				D.Apply()
+			end,
+		}):AutoWidth():Width() + 5
+		-- crlf
+		x = X + 10
+		y = y + 28
+	end
 	return x, y
 end
 

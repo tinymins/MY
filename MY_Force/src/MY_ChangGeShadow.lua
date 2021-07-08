@@ -152,78 +152,80 @@ end
 LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_ChangGeShadow', D.Apply)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, w = 'auto',
-		text = _L['Show changge shadow index'],
-		checked = O.bEnable,
-		oncheck = function(bChecked)
-			O.bEnable = bChecked
-			D.Apply()
-		end,
-		tip = function(self)
-			if not self:Enable() then
-				return _L['Changge force only']
-			end
-		end,
-		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
-		autoenable = function()
-			local me = GetClientPlayer()
-			return me and me.dwForceID == CONSTANT.FORCE_TYPE.CHANG_GE
-		end,
-	}):Width() + 5
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, w = 'auto',
-		text = _L['Show distance'],
-		checked = O.bShowDistance,
-		oncheck = function(bChecked)
-			O.bShowDistance = bChecked
-			D.Apply()
-		end,
-		tip = function(self)
-			if not self:Enable() then
-				return _L['Changge force only']
-			end
-		end,
-		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
-		autoenable = function()
-			local me = GetClientPlayer()
-			return me and me.dwForceID == CONSTANT.FORCE_TYPE.CHANG_GE
-		end,
-	}):Width() + 5
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, w = 'auto',
-		text = _L['Show countdown'],
-		checked = O.bShowCD,
-		oncheck = function(bChecked)
-			O.bShowCD = bChecked
-			D.Apply()
-		end,
-		tip = function(self)
-			if not self:Enable() then
-				return _L['Changge force only']
-			end
-		end,
-		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
-		autoenable = function()
-			local me = GetClientPlayer()
-			return me and me.dwForceID == CONSTANT.FORCE_TYPE.CHANG_GE
-		end,
-	}):Width() + 5
-	ui:Append('WndTrackbar', {
-		x = x, y = y, w = 150,
-		textfmt = function(val) return _L('Scale: %d%%.', val) end,
-		range = {10, 800},
-		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
-		value = O.fScale * 100,
-		onchange = function(val)
-			O.fScale = val / 100
-			D.Apply()
-		end,
-		autoenable = function()
-			local me = GetClientPlayer()
-			return me and me.dwForceID == CONSTANT.FORCE_TYPE.CHANG_GE
-		end,
-	})
+	if GLOBAL.GAME_BRANCH ~= 'classic' then
+		x = x + ui:Append('WndCheckBox', {
+			x = x, y = y, w = 'auto',
+			text = _L['Show changge shadow index'],
+			checked = O.bEnable,
+			oncheck = function(bChecked)
+				O.bEnable = bChecked
+				D.Apply()
+			end,
+			tip = function(self)
+				if not self:Enable() then
+					return _L['Changge force only']
+				end
+			end,
+			tippostype = UI.TIP_POSITION.TOP_BOTTOM,
+			autoenable = function()
+				local me = GetClientPlayer()
+				return me and me.dwForceID == CONSTANT.FORCE_TYPE.CHANG_GE
+			end,
+		}):Width() + 5
+		x = x + ui:Append('WndCheckBox', {
+			x = x, y = y, w = 'auto',
+			text = _L['Show distance'],
+			checked = O.bShowDistance,
+			oncheck = function(bChecked)
+				O.bShowDistance = bChecked
+				D.Apply()
+			end,
+			tip = function(self)
+				if not self:Enable() then
+					return _L['Changge force only']
+				end
+			end,
+			tippostype = UI.TIP_POSITION.TOP_BOTTOM,
+			autoenable = function()
+				local me = GetClientPlayer()
+				return me and me.dwForceID == CONSTANT.FORCE_TYPE.CHANG_GE
+			end,
+		}):Width() + 5
+		x = x + ui:Append('WndCheckBox', {
+			x = x, y = y, w = 'auto',
+			text = _L['Show countdown'],
+			checked = O.bShowCD,
+			oncheck = function(bChecked)
+				O.bShowCD = bChecked
+				D.Apply()
+			end,
+			tip = function(self)
+				if not self:Enable() then
+					return _L['Changge force only']
+				end
+			end,
+			tippostype = UI.TIP_POSITION.TOP_BOTTOM,
+			autoenable = function()
+				local me = GetClientPlayer()
+				return me and me.dwForceID == CONSTANT.FORCE_TYPE.CHANG_GE
+			end,
+		}):Width() + 5
+		ui:Append('WndTrackbar', {
+			x = x, y = y, w = 150,
+			textfmt = function(val) return _L('Scale: %d%%.', val) end,
+			range = {10, 800},
+			trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+			value = O.fScale * 100,
+			onchange = function(val)
+				O.fScale = val / 100
+				D.Apply()
+			end,
+			autoenable = function()
+				local me = GetClientPlayer()
+				return me and me.dwForceID == CONSTANT.FORCE_TYPE.CHANG_GE
+			end,
+		})
+	end
 	return x, y
 end
 

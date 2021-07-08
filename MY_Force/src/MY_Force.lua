@@ -305,104 +305,106 @@ function PS.OnPanelActive(frame)
 	-- wu du
 	---------------
 	ui:Append('Text', { text = g_tStrings.tForceTitle[CONSTANT.FORCE_TYPE.WU_DU], x = x, y = y, font = 27 })
-	-- crlf
-	x = X + 10
-	y = y + 28
-	-- disappear
-	x = ui:Append('WndCheckBox', {
-		x = x, y = y,
-		text = _L['Alert when pet disappear unexpectedly (for 5D)'],
-		checked = O.bAlertPet,
-		oncheck = function(bChecked)
-			O.bAlertPet = bChecked
-			D.OnAlertPetChange()
-		end,
-	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
-	-- mark pet
-	ui:Append('WndCheckBox', {
-		x = x, y = y,
-		text = _L['Mark pet'],
-		checked = O.bMarkPet,
-		oncheck = function(bChecked)
-			O.bMarkPet = bChecked
-			D.OnMarkPetChange()
-		end,
-	}):AutoWidth()
-	-- crlf
-	x = X + 10
-	y = y + 28
-	-- guding
-	x = ui:Append('WndCheckBox', {
-		x = x, y = y,
-		text = _L['Display GUDING of teammate, change color'],
-		checked = MY_ForceGuding.bEnable,
-		oncheck = function(bChecked)
-			MY_ForceGuding.bEnable = bChecked
-		end,
-	}):AutoWidth():Pos('BOTTOMRIGHT') + 2
-	x = ui:Append('Shadow', {
-		x = x, y = y + 2, w = 18, h = 18,
-		color = MY_ForceGuding.color,
-		onclick = function()
-			local ui = UI(this)
-			OpenColorTablePanel(function(r, g, b)
-				ui:Color(r, g, b)
-				MY_ForceGuding.color = { r, g, b }
-			end)
-		end,
-	}):Pos('BOTTOMRIGHT') + 10
-	ui:Append('WndCheckBox', {
-		x = x, y = y,
-		text = _L['Auto talk in team channel after puting GUDING'],
-		checked = MY_ForceGuding.bAutoSay,
-		autoenable = function() return MY_ForceGuding.bEnable end,
-		oncheck = function(bChecked)
-			MY_ForceGuding.bAutoSay = bChecked
-		end,
-	})
-	x = X + 10
-	y = y + 28
-	ui:Append('WndEditBox', {
-		x = x, y = y, w = W - x * 2, h = 50,
-		multiline = true, limit = 512,
-		text = MY_ForceGuding.szSay,
-		autoenable = function() return MY_ForceGuding.bAutoSay end,
-		onchange = function(szText)
-			MY_ForceGuding.szSay = szText
-		end,
-	})
-	-- crlf
-	y = y + 54
-	if not LIB.IsShieldedVersion('MY_ForceGuding') then
+	if GLOBAL.GAME_BRANCH ~= 'classic' then
 		-- crlf
 		x = X + 10
+		y = y + 28
+		-- disappear
 		x = ui:Append('WndCheckBox', {
 			x = x, y = y,
-			checked = MY_ForceGuding.bUseMana,
-			text = _L['Automatic eat GUDING when mana below '],
+			text = _L['Alert when pet disappear unexpectedly (for 5D)'],
+			checked = O.bAlertPet,
 			oncheck = function(bChecked)
-				MY_ForceGuding.bUseMana = bChecked
+				O.bAlertPet = bChecked
+				D.OnAlertPetChange()
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT') + 5
-		x = ui:Append('WndTrackbar', {
-			x = x, y = y, w = 70, h = 25,
-			range = {0, 100, 50},
-			value = MY_ForceGuding.nManaMp,
-			onchange = function(nVal) MY_ForceGuding.nManaMp = nVal end,
-			autoenable = function() return MY_ForceGuding.bUseMana end,
-		}):Pos('BOTTOMRIGHT') + 65
-		x = ui:Append('Text', {
-			x = x, y = y - 3,
-			text = _L[', or life below '],
-		}):AutoWidth():Pos('BOTTOMRIGHT') + 5
-		x = ui:Append('WndTrackbar', {
-			x = x, y = y, w = 70, h = 25,
-			range = {0, 100, 50},
-			value = MY_ForceGuding.nManaHp,
-			onchange = function(nVal) MY_ForceGuding.nManaHp = nVal end,
-			autoenable = function() return MY_ForceGuding.bUseMana end,
-		}):Pos('BOTTOMRIGHT')
-		y = y + 36
+		}):AutoWidth():Pos('BOTTOMRIGHT') + 10
+		-- mark pet
+		ui:Append('WndCheckBox', {
+			x = x, y = y,
+			text = _L['Mark pet'],
+			checked = O.bMarkPet,
+			oncheck = function(bChecked)
+				O.bMarkPet = bChecked
+				D.OnMarkPetChange()
+			end,
+		}):AutoWidth()
+		-- crlf
+		x = X + 10
+		y = y + 28
+		-- guding
+		x = ui:Append('WndCheckBox', {
+			x = x, y = y,
+			text = _L['Display GUDING of teammate, change color'],
+			checked = MY_ForceGuding.bEnable,
+			oncheck = function(bChecked)
+				MY_ForceGuding.bEnable = bChecked
+			end,
+		}):AutoWidth():Pos('BOTTOMRIGHT') + 2
+		x = ui:Append('Shadow', {
+			x = x, y = y + 2, w = 18, h = 18,
+			color = MY_ForceGuding.color,
+			onclick = function()
+				local ui = UI(this)
+				OpenColorTablePanel(function(r, g, b)
+					ui:Color(r, g, b)
+					MY_ForceGuding.color = { r, g, b }
+				end)
+			end,
+		}):Pos('BOTTOMRIGHT') + 10
+		ui:Append('WndCheckBox', {
+			x = x, y = y,
+			text = _L['Auto talk in team channel after puting GUDING'],
+			checked = MY_ForceGuding.bAutoSay,
+			autoenable = function() return MY_ForceGuding.bEnable end,
+			oncheck = function(bChecked)
+				MY_ForceGuding.bAutoSay = bChecked
+			end,
+		})
+		x = X + 10
+		y = y + 28
+		ui:Append('WndEditBox', {
+			x = x, y = y, w = W - x * 2, h = 50,
+			multiline = true, limit = 512,
+			text = MY_ForceGuding.szSay,
+			autoenable = function() return MY_ForceGuding.bAutoSay end,
+			onchange = function(szText)
+				MY_ForceGuding.szSay = szText
+			end,
+		})
+		-- crlf
+		y = y + 54
+		if not LIB.IsShieldedVersion('MY_ForceGuding') then
+			-- crlf
+			x = X + 10
+			x = ui:Append('WndCheckBox', {
+				x = x, y = y,
+				checked = MY_ForceGuding.bUseMana,
+				text = _L['Automatic eat GUDING when mana below '],
+				oncheck = function(bChecked)
+					MY_ForceGuding.bUseMana = bChecked
+				end,
+			}):AutoWidth():Pos('BOTTOMRIGHT') + 5
+			x = ui:Append('WndTrackbar', {
+				x = x, y = y, w = 70, h = 25,
+				range = {0, 100, 50},
+				value = MY_ForceGuding.nManaMp,
+				onchange = function(nVal) MY_ForceGuding.nManaMp = nVal end,
+				autoenable = function() return MY_ForceGuding.bUseMana end,
+			}):Pos('BOTTOMRIGHT') + 65
+			x = ui:Append('Text', {
+				x = x, y = y - 3,
+				text = _L[', or life below '],
+			}):AutoWidth():Pos('BOTTOMRIGHT') + 5
+			x = ui:Append('WndTrackbar', {
+				x = x, y = y, w = 70, h = 25,
+				range = {0, 100, 50},
+				value = MY_ForceGuding.nManaHp,
+				onchange = function(nVal) MY_ForceGuding.nManaHp = nVal end,
+				autoenable = function() return MY_ForceGuding.bUseMana end,
+			}):Pos('BOTTOMRIGHT')
+			y = y + 36
+		end
 	end
 	-- other
 	---------------
@@ -412,9 +414,6 @@ function PS.OnPanelActive(frame)
 	x = X + 10
 	y = y + 28
 	MY_EnergyBar.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	-- crlf
-	x = X + 10
-	y = y + 28
 	-- hungry
 	x = ui:Append('WndCheckBox', {
 		x = x, y = y,

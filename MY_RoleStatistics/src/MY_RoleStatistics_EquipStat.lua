@@ -184,7 +184,8 @@ local EQUIPMENT_ITEM_LIST = {
 		pos = CONSTANT.EQUIPMENT_INVENTORY.BIG_SWORD,
 		box = 'Handle_Weapon/Box_HeavySword',
 		durability = 'Handle_Weapon/Text_HeavySword',
-		force = CONSTANT.FORCE_TYPE.CANG_JIAN,
+		background = 'Handle_Weapon/Image_HeavySword',
+		force = CONSTANT.FORCE_TYPE.CANG_JIAN or -1,
 	},
 	{
 		label = g_tStrings.tEquipTypeNameTable[CONSTANT.EQUIPMENT_SUB.RANGE_WEAPON or 'NULL'],
@@ -498,15 +499,25 @@ function D.UpdateItems(page)
 	-- 	nTitleLen = max(wlen(info.label or '') + 1, nTitleLen)
 	-- end
 	for _, info in ipairs(EQUIPMENT_ITEM_LIST) do
-		local visible = info.label and (not info.force or info.force == ownerforce)
+		local visible = info.label and (not info.force or info.force == ownerforce) and true or false
 		local rec = visible and info.pos and tResult[info.pos]
 		local box = info.box and handle:Lookup(info.box)
 		local txtDurability = info.durability and handle:Lookup(info.durability)
+		local imgBackground = info.background and handle:Lookup(info.background)
 		if visible then
 			local szPos = info.label or ''
 			szPos = szPos .. g_tStrings.STR_COLON
 			-- szPos = szPos .. rep(g_tStrings.STR_ONE_CHINESE_SPACE, nTitleLen - wlen(szPos))
 			insert(aXml, GetFormatText(szPos, 162))
+		end
+		if box then
+			box:SetVisible(visible)
+		end
+		if txtDurability then
+			txtDurability:SetVisible(visible)
+		end
+		if imgBackground then
+			imgBackground:SetVisible(visible)
 		end
 		if rec and rec.tabtype >= 0 then
 			local KItemInfo = GetItemInfo(rec.tabtype, rec.tabindex)
