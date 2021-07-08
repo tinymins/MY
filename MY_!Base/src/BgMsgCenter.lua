@@ -67,9 +67,9 @@ LIB.RegisterBgMsg(NSFormatString('{$NS}_VERSION_CHECK'), function(_, oData, nCha
 	end
 	local bSilent = oData[1]
 	if not bSilent and LIB.IsInParty() then
-		LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, _L('I\'ve installed %s v%s <%s>', PACKET_INFO.NAME, PACKET_INFO.VERSION, PACKET_INFO.NATURAL_VERSION))
+		LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, _L('I\'ve installed %s v%s', PACKET_INFO.NAME, PACKET_INFO.VERSION))
 	end
-	LIB.SendBgMsg(szTalkerName, NSFormatString('{$NS}_VERSION_REPLY'), {PACKET_INFO.VERSION, PACKET_INFO.NATURAL_VERSION, PACKET_INFO.BUILD}, true)
+	LIB.SendBgMsg(szTalkerName, NSFormatString('{$NS}_VERSION_REPLY'), {PACKET_INFO.VERSION, PACKET_INFO.BUILD}, true)
 end)
 
 -- 测试用（调试工具）
