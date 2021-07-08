@@ -49,9 +49,10 @@ local _L = LIB.LoadLangPack(PACKET_INFO.FRAMEWORK_ROOT .. '/lang/devs/')
 ---------------------------------------------------------------------
 local UI_DESC = _L.UI_DESC or {}
 
-local function GetMeun(ui)
+local function GetMenu(ui)
 	local menu, frames = { szOption = ui }, {}
-	local frame = Station.Lookup(ui):GetFirstChild()
+	local frmLayer = Station.Lookup(ui)
+	local frame = frmLayer and frmLayer:GetFirstChild()
 	while frame do
 		insert(frames, { szName = frame:GetName() })
 		frame = frame:GetNext()
@@ -101,8 +102,8 @@ insert(ENVIRONMENT.UI_MANAGER, function()
 		return
 	end
 	local menu = { szOption = _L['Dev_UIManager'] }
-	for k, v in ipairs({ 'Lowest', 'Lowest1', 'Lowest2', 'Normal', 'Normal1', 'Normal2', 'Topmost', 'Topmost1', 'Topmost2' })do
-		insert(menu, GetMeun(v))
+	for k, v in ipairs({ 'Lowest', 'Lowest1', 'Lowest2', 'Normal', 'Normal1', 'Normal2', 'Topmost', 'Topmost1', 'Topmost2' }) do
+		insert(menu, GetMenu(v))
 	end
 	return {menu}
 end)
