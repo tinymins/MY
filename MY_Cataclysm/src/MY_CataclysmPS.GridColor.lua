@@ -62,6 +62,13 @@ function PS.OnPanelActive(frame)
 	local X, Y = 20, 20
 	local x, y = X, Y
 
+	local tDistanceLevel = CFG.tDistanceLevel
+	local tDistanceCol = CFG.tDistanceCol
+	local tDistanceAlpha = CFG.tDistanceAlpha
+	local tOtherCol = CFG.tOtherCol
+	local tOtherAlpha = CFG.tOtherAlpha
+	local tManaColor = CFG.tManaColor
+
 	y = y + ui:Append('Text', { x = x, y = y, text = g_tStrings.BACK_COLOR, font = 27 }):Height()
 
 	x = x + 10
@@ -157,15 +164,14 @@ function PS.OnPanelActive(frame)
 						end
 					end
 					if #t > 0 then
-						local tDistanceCol = CFG.tDistanceCol
-						local tDistanceAlpha = CFG.tDistanceAlpha
-						CFG.tDistanceLevel = tt
-						CFG.tDistanceCol = {}
-						CFG.tDistanceAlpha = {}
+						tDistanceLevel = tt
 						for i = 1, #t do
-							insert(CFG.tDistanceCol, tDistanceCol[i] or { 255, 255, 255 })
-							insert(CFG.tDistanceAlpha, tDistanceAlpha[i] or 255)
+							insert(tDistanceCol, CFG.tDistanceCol[i] or { 255, 255, 255 })
+							insert(tDistanceAlpha, CFG.tDistanceAlpha[i] or 255)
 						end
+						CFG.tDistanceLevel = tDistanceLevel
+						CFG.tDistanceCol = tDistanceCol
+						CFG.tDistanceAlpha = tDistanceAlpha
 						LIB.SwitchTab('MY_Cataclysm_GridColor', true)
 					end
 				end)
@@ -180,14 +186,15 @@ function PS.OnPanelActive(frame)
 		ui:Append('Text', { x = x, y = y, text = g_tStrings.BACK_COLOR }):AutoWidth()
 		x = 280
 		x = x + ui:Append('Shadow', {
-			w = 22, h = 22, x = x, y = y + 3, color = CFG.tDistanceCol[1],
+			w = 22, h = 22, x = x, y = y + 3, color = tDistanceCol[1],
 			onclick = function()
 				local this = this
 				UI.OpenColorPicker(function(r, g, b)
-					CFG.tDistanceCol[1] = { r, g, b }
+					tDistanceCol[1] = { r, g, b }
 					if MY_CataclysmMain.GetFrame() then
 						MY_CataclysmParty:CallDrawHPMP(true, true)
 					end
+					CFG.tDistanceCol = tDistanceCol
 					UI(this):Color(r, g, b)
 				end)
 			end,
@@ -198,23 +205,24 @@ function PS.OnPanelActive(frame)
 	-- ∑÷∂Œæ‡¿Î±≥æ∞
 	if CFG.bEnableDistance then
 		x = X + 20
-		for i = 1, #CFG.tDistanceLevel do
-			local n = CFG.tDistanceLevel[i - 1] or 0
+		for i = 1, #tDistanceLevel do
+			local n = tDistanceLevel[i - 1] or 0
 			local text = n .. g_tStrings.STR_METER .. ' - '
-				.. CFG.tDistanceLevel[i]
+				.. tDistanceLevel[i]
 				.. g_tStrings.STR_METER .. g_tStrings.BACK_COLOR
 			ui:Append('Text', { x = x, y = y, text = text }):AutoWidth()
 			local x = 280
 			if CFG.nBGColorMode == CTM_BG_COLOR_MODE.BY_DISTANCE then
 				x = x + ui:Append('Shadow', {
-					w = 22, h = 22, x = x, y = y + 3, color = CFG.tDistanceCol[i],
+					w = 22, h = 22, x = x, y = y + 3, color = tDistanceCol[i],
 					onclick = function()
 						local this = this
 						UI.OpenColorPicker(function(r, g, b)
-							CFG.tDistanceCol[i] = { r, g, b }
+							tDistanceCol[i] = { r, g, b }
 							if MY_CataclysmMain.GetFrame() then
 								MY_CataclysmParty:CallDrawHPMP(true, true)
 							end
+							CFG.tDistanceCol = tDistanceCol
 							UI(this):Color(r, g, b)
 						end)
 					end,
@@ -223,13 +231,14 @@ function PS.OnPanelActive(frame)
 				x = x + ui:Append('WndTrackbar', {
 					x = x, y = y + 3, h = 22,
 					range = {0, 255},
-					value = CFG.tDistanceAlpha[i],
+					value = tDistanceAlpha[i],
 					trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 					onchange = function(val)
-						CFG.tDistanceAlpha[i] = val
+						tDistanceAlpha[i] = val
 						if MY_CataclysmMain.GetFrame() then
 							MY_CataclysmParty:CallDrawHPMP(true, true)
 						end
+						CFG.tDistanceAlpha = tDistanceAlpha
 					end,
 					textfmt = function(val) return _L('Alpha: %d.', val) end,
 				}):Width() + 5
@@ -243,7 +252,7 @@ function PS.OnPanelActive(frame)
 	ui:Append('Text', {
 		x = x, y = y,
 		text = CFG.bEnableDistance
-			and _L('More than %d meter', CFG.tDistanceLevel[#CFG.tDistanceLevel])
+			and _L('More than %d meter', tDistanceLevel[#tDistanceLevel])
 			or g_tStrings.STR_RAID_DISTANCE_M4,
 	}):AutoWidth()
 	x = 280
@@ -251,14 +260,15 @@ function PS.OnPanelActive(frame)
 	and CFG.nBGColorMode ~= CTM_BG_COLOR_MODE.OFFICIAL then
 		x = x + ui:Append('Shadow', {
 			w = 22, h = 22, x = x, y = y + 3,
-			color = CFG.tOtherCol[3],
+			color = tOtherCol[3],
 			onclick = function()
 				local this = this
 				UI.OpenColorPicker(function(r, g, b)
-					CFG.tOtherCol[3] = { r, g, b }
+					tOtherCol[3] = { r, g, b }
 					if MY_CataclysmMain.GetFrame() then
 						MY_CataclysmParty:CallDrawHPMP(true, true)
 					end
+					CFG.tOtherCol = tOtherCol
 					UI(this):Color(r, g, b)
 				end)
 			end,
@@ -269,13 +279,14 @@ function PS.OnPanelActive(frame)
 		x = x + ui:Append('WndTrackbar', {
 			x = x, y = y + 3, h = 22,
 			range = {0, 255},
-			value = CFG.tOtherAlpha[3],
+			value = tOtherAlpha[3],
 			trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 			onchange = function(val)
-				CFG.tOtherAlpha[3] = val
+				tOtherAlpha[3] = val
 				if MY_CataclysmMain.GetFrame() then
 					MY_CataclysmParty:CallDrawHPMP(true, true)
 				end
+				CFG.tOtherAlpha = tOtherAlpha
 			end,
 			textfmt = function(val) return _L('Alpha: %d.', val) end,
 		}):Width() + 5
@@ -288,14 +299,15 @@ function PS.OnPanelActive(frame)
 	x = 280
 	if CFG.nBGColorMode ~= CTM_BG_COLOR_MODE.OFFICIAL then
 		x = x + ui:Append('Shadow', {
-			w = 22, h = 22, x = x, y = y + 3, color = CFG.tOtherCol[2],
+			w = 22, h = 22, x = x, y = y + 3, color = tOtherCol[2],
 			onclick = function()
 				local this = this
 				UI.OpenColorPicker(function(r, g, b)
-					CFG.tOtherCol[2] = { r, g, b }
+					tOtherCol[2] = { r, g, b }
 					if MY_CataclysmMain.GetFrame() then
 						MY_CataclysmParty:CallDrawHPMP(true, true)
 					end
+					CFG.tOtherCol = tOtherCol
 					UI(this):Color(r, g, b)
 				end)
 			end,
@@ -305,13 +317,14 @@ function PS.OnPanelActive(frame)
 		x = x + ui:Append('WndTrackbar', {
 			x = x, y = y + 3, h = 22,
 			range = {0, 255},
-			value = CFG.tOtherAlpha[2],
+			value = tOtherAlpha[2],
 			trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 			onchange = function(val)
-				CFG.tOtherAlpha[2] = val
+				tOtherAlpha[2] = val
 				if MY_CataclysmMain.GetFrame() then
 					MY_CataclysmParty:CallDrawHPMP(true, true)
 				end
+				CFG.tOtherAlpha = tOtherAlpha
 			end,
 			textfmt = function(val) return _L('Alpha: %d.', val) end,
 		}):Width() + 5
@@ -323,14 +336,15 @@ function PS.OnPanelActive(frame)
 	if CFG.nBGColorMode ~= CTM_BG_COLOR_MODE.OFFICIAL then
 		ui:Append('Text', { x = x, y = y, text = g_tStrings.STR_SKILL_MANA .. g_tStrings.BACK_COLOR }):AutoWidth()
 		y = y + ui:Append('Shadow', {
-			w = 22, h = 22, x = 280, y = y + 3, color = CFG.tManaColor,
+			w = 22, h = 22, x = 280, y = y + 3, color = tManaColor,
 			onclick = function()
 				local this = this
 				UI.OpenColorPicker(function(r, g, b)
-					CFG.tManaColor = { r, g, b }
+					tManaColor = { r, g, b }
 					if MY_CataclysmMain.GetFrame() then
 						MY_CataclysmParty:CallDrawHPMP(true, true)
 					end
+					CFG.tManaColor = tManaColor
 					UI(this):Color(r, g, b)
 				end)
 			end,
