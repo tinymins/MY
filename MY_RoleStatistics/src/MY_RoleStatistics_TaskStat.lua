@@ -368,6 +368,7 @@ local function InitTaskList(bReload)
 	-- 浪客行
 	insert(aTask, {
 		id = 'rookie_routine',
+		bVisible = GLOBAL.GAME_BRANCH ~= 'classic',
 		szTitle = _L['Rookie routine'],
 		eType = TASK_TYPE.WEEKLY,
 		aQuestInfo = CONSTANT.QUEST_INFO.ROOKIE_ROUTINE,
@@ -375,6 +376,7 @@ local function InitTaskList(bReload)
 	-- 晶矿争夺
 	insert(aTask, {
 		id = 'crystal_scramble',
+		bVisible = GLOBAL.GAME_BRANCH ~= 'classic',
 		szTitle = _L['Crystal scramble'],
 		eType = TASK_TYPE.DAILY,
 		tCampQuestInfo = CONSTANT.QUEST_INFO.CAMP_CRYSTAL_SCRAMBLE,
@@ -382,6 +384,7 @@ local function InitTaskList(bReload)
 	-- 据点贸易
 	insert(aTask, {
 		id = 'stronghold_trade',
+		bVisible = GLOBAL.GAME_BRANCH ~= 'classic',
 		szTitle = _L['Stronghold trade'],
 		eType = TASK_TYPE.DAILY,
 		tCampQuestInfo = CONSTANT.QUEST_INFO.CAMP_STRONGHOLD_TRADE,
@@ -389,6 +392,7 @@ local function InitTaskList(bReload)
 	-- 龙门绝境
 	insert(aTask, {
 		id = 'dragon_gate_despair',
+		bVisible = GLOBAL.GAME_BRANCH ~= 'classic',
 		szTitle = _L['Dragon gate despair'],
 		eType = TASK_TYPE.DAILY,
 		aQuestInfo = CONSTANT.QUEST_INFO.DRAGON_GATE_DESPAIR,
@@ -396,6 +400,7 @@ local function InitTaskList(bReload)
 	-- 列星虚境
 	insert(aTask, {
 		id = 'lexus_reality',
+		bVisible = GLOBAL.GAME_BRANCH ~= 'classic',
 		szTitle = _L['Lexus reality'],
 		eType = TASK_TYPE.DAILY,
 		aQuestInfo = CONSTANT.QUEST_INFO.LEXUS_REALITY,
@@ -403,6 +408,7 @@ local function InitTaskList(bReload)
 	-- 李渡鬼城
 	insert(aTask, {
 		id = 'lidu_ghost_town',
+		bVisible = GLOBAL.GAME_BRANCH ~= 'classic',
 		szTitle = _L['Lidu ghost town'],
 		eType = TASK_TYPE.DAILY,
 		aQuestInfo = CONSTANT.QUEST_INFO.LIDU_GHOST_TOWN,
@@ -424,6 +430,7 @@ local function InitTaskList(bReload)
 	-- 寻龙脉
 	insert(aTask, {
 		id = 'find_dragon_veins',
+		bVisible = GLOBAL.GAME_BRANCH ~= 'classic',
 		szTitle = _L['Find dragon veins'],
 		eType = TASK_TYPE.DAILY,
 		aQuestInfo = CONSTANT.QUEST_INFO.FIND_DRAGON_VEINS,
@@ -475,6 +482,7 @@ local function InitTaskList(bReload)
 			tForceBuffInfo = tTaskInfo.force_buffs,
 		})
 	end
+	aTask = lodash.filter(aTask, function(p) return p.bVisible ~= false end)
 	TASK_LIST = aTask
 	-- 高速id键索引
 	local tTask = setmetatable({}, {
