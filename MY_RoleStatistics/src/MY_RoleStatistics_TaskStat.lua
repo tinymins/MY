@@ -487,6 +487,9 @@ local function InitTaskList(bReload)
 	-- ¸ßËÙid¼üË÷Òý
 	local tTask = setmetatable({}, {
 		__index = function(_, id)
+			if GLOBAL.GAME_BRANCH == 'classic' then
+				return
+			end
 			if id == 'week_team_dungeon' then
 				return {
 					id = id,
