@@ -465,15 +465,14 @@ function D.SyncSystemGKP()
 	if not MY_GKP.bSyncSystem then
 		return
 	end
-	local GetInfo = _G.GoldTeamBase_GetAllBiddingInfos
-	if not GetInfo then
-		local env = GetInsideEnv()
-		GetInfo = env and env.GoldTeamBase_GetAllBiddingInfos
-	end
+	local GetInfo = GetGameAPI('GoldTeamBase_GetAllBiddingInfos')
 	local aInfo = GetInfo and GetInfo()
 	if not aInfo then
 		return
 	end
+	--[[#DEBUG BEGIN]]
+	local nTickCount = GetTickCount()
+	--[[#DEBUG END]]
 	local ds = D.GetDS()
 	for _, v in ipairs(aInfo) do
 		local szKey = concat({
@@ -566,6 +565,13 @@ function D.SyncSystemGKP()
 			ds:SetPaymentRec(tab)
 		end
 	end
+	--[[#DEBUG BEGIN]]
+	nTickCount = GetTickCount() - nTickCount
+	LIB.Debug(
+		_L['PMTool'],
+		_L('MY_GKP_MI SyncSystemGKP in %dms.', nTickCount),
+		DEBUG_LEVEL.PMLOG)
+	--[[#DEBUG END]]
 end
 LIB.RegisterEvent('BIDDING_OPERATION', function()
 	if not MY_GKP.bSyncSystem then

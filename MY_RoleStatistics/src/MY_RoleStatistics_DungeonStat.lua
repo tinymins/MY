@@ -610,6 +610,12 @@ function D.UpdateMapProgress(bForceUpdate)
 			-- 强制刷新秘境进度，或者进度数据已过期并且5秒内未请求过，则发起请求
 			if bForceUpdate or (not D.tMapProgressValid[dwID] and GetTime() - D.tMapProgressRequestTime[dwID] > 5000) then
 				D.tMapProgressRequestTime[dwID] = GetTime()
+				--[[#DEBUG BEGIN]]
+				LIB.Debug(
+					_L['PMTool'],
+					_L('[MY_RoleStatistics_DungeonStat] ApplyDungeonRoleProgress: %d.', dwID),
+					DEBUG_LEVEL.PMLOG)
+				--[[#DEBUG END]]
 				ApplyDungeonRoleProgress(dwID, UI_GetClientPlayerID())
 			end
 			-- 已经获取到进度的秘境，或者没有 CD 数据的秘境

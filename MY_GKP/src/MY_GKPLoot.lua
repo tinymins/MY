@@ -1580,6 +1580,9 @@ function D.InsertLootList(dwID)
 end
 
 function D.DrawLootList(dwID, bRemove)
+	--[[#DEBUG BEGIN]]
+	local nTickCount = GetTickCount()
+	--[[#DEBUG END]]
 	local frame = D.GetFrame()
 	local wnd = D.GetDoodadWnd(frame, dwID)
 
@@ -1702,6 +1705,13 @@ function D.DrawLootList(dwID, bRemove)
 
 		-- 立即自动拾取一次
 		LIB.ExecuteWithThis(frame, D.OnFrameBreathe)
+		--[[#DEBUG BEGIN]]
+		nTickCount = GetTickCount() - nTickCount
+		LIB.Debug(
+			_L['PMTool'],
+			_L('DrawLootList %d in %dms.', dwID, nTickCount),
+			DEBUG_LEVEL.PMLOG)
+		--[[#DEBUG END]]
 	end
 end
 
