@@ -55,7 +55,6 @@ local function IsStreaming()
 	return _G.SM_IsEnable and _G.SM_IsEnable()
 end
 local _BUILD_                 = '19700101'
-local _NATURAL_VERSION_       = 0
 local _VERSION_               = '0.0.0'
 local _MENU_COLOR_            = {255, 255, 255}
 local _MAX_PLAYER_LEVEL_      = 100
@@ -715,7 +714,6 @@ local tInfo = {
 	NAME                  = _NAME_                 ,
 	SHORT_NAME            = _SHORT_NAME_           ,
 	VERSION               = _VERSION_              ,
-	NATURAL_VERSION       = _NATURAL_VERSION_      ,
 	BUILD                 = _BUILD_                ,
 	NAME_SPACE            = _NAME_SPACE_           ,
 	DEBUG_LEVEL           = _DEBUG_LEVEL_          ,

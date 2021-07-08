@@ -269,7 +269,7 @@ local function OnInit()
 	INIT_EVENT = nil
 	-- 显示欢迎信息
 	LIB.Sysmsg(_L('%s, welcome to use %s!', LIB.GetUserRoleName(), PACKET_INFO.NAME)
-		.. _L(' v%s Build %s %s', PACKET_INFO.NATURAL_VERSION, PACKET_INFO.VERSION, PACKET_INFO.BUILD))
+		.. _L(' v%s Build %s', PACKET_INFO.VERSION, PACKET_INFO.BUILD))
 end
 LIB.RegisterEvent('LOADING_ENDING', OnInit) -- 不能用FIRST_LOADING_END 不然注册快捷键就全跪了
 

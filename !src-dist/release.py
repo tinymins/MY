@@ -3,8 +3,17 @@
 '''
 版本标签创建自动化
 '''
+# pip3 install semver
 
-import time, os, re, codecs, datetime, argparse
+import argparse
+import codecs
+import datetime
+import os
+import re
+import re
+import semver
+import time
+
 import plib.utils as utils
 import plib.git as git
 import plib.environment as env
@@ -12,12 +21,12 @@ from plib.time import set_system_time, sync_ntp_time
 
 def __get_release_commit_list():
 	commit_list = []
-	for commit in os.popen('git log --grep Release --pretty=format:"%s|%h|%at"').read().split('\n'):
+	for commit in os.popen('git log --grep release: --pretty=format:"%h|%at|%s"').read().split('\n'):
 		try:
-			info = commit.split('|')
-			version = int(info[0][9:])
-			timestamp = int(info[2])
-			commit_list.append({ 'version': version, 'hash': info[1], 'timestamp': timestamp })
+			hash = re.sub(r'(?is)\|.+$', '', commit).strip()
+			timestamp = int(re.sub(r'(?is)\|.+$', '', re.sub(r'(?is)^\w+\|', '', commit)).strip())
+			version = re.sub(r'(?is)^\w+\|\w+\|release:\s+', '', commit).strip()
+			commit_list.append({ 'version': version, 'hash': hash, 'timestamp': timestamp })
 		except:
 			pass
 	return commit_list
@@ -26,8 +35,10 @@ def __get_release_tag_list():
 	tag_list = []
 	for tag in os.popen('git tag -l').read().split('\n'):
 		try:
-			version = int(tag[1:])
-			tag_list.append({ 'version': version, 'name': tag })
+			if tag[0:1] == 'v':
+				version = tag[1:]
+				if semver.compare(version, '0.0.0') == 1:
+					tag_list.append({ 'version': version, 'name': tag })
 		except:
 			pass
 	return tag_list
@@ -40,7 +51,7 @@ def __get_changelog_list():
 			if len(line) == 0:
 				continue
 			if line[0:1] != '*' and line[0:2] != ' *':
-				version = int(line.split('v')[1])
+				version = re.sub(r'(?is)^.+?v', '', line).strip()
 				info = { 'version': version, 'message': '' }
 				changelog_list.insert(0, info)
 			elif info != None:
@@ -96,13 +107,13 @@ if __name__ == '__main__':
 			if not args.dry_run:
 				set_system_time(t.year, t.month, t.day, t.hour, t.minute, t.second)
 
-		print('Creating tag V%d on %s...' % (changlog.get('version'), release.get('hash')))
+		print('Creating tag v%s on %s...' % (changlog.get('version'), release.get('hash')))
 
 		if not args.dry_run:
-			message = 'Release V%d\n%s' % (changlog.get('version'), changlog.get('message'))
+			message = 'Release v%s\n%s' % (changlog.get('version'), changlog.get('message'))
 			with codecs.open('commit_msg.txt','w',encoding='utf8') as f:
 				f.write(message)
-			os.system('git tag -a V%d %s -f -F commit_msg.txt' % (changlog.get('version'), release.get('hash')))
+			os.system('git tag -a v%s %s -f -F commit_msg.txt' % (changlog.get('version'), release.get('hash')))
 			os.remove('commit_msg.txt')
 
 		if args.mock_time:

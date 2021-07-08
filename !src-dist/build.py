@@ -2,8 +2,15 @@
 '''
 新版本打包自动化
 '''
+# pip3 install semver
 
-import argparse, codecs, importlib, os, re, time
+import argparse
+import codecs
+import os
+import re
+import semver
+import time
+
 import plib.utils as utils
 import plib.git as git
 from plib.environment import get_current_packet_id, get_packet_path, set_packet_as_cwd
@@ -73,22 +80,29 @@ def __compress(addon):
 def __get_version_info():
 	'''Get version information'''
 	# Read version from Base.lua
-	current_version = 0
+	current_version = ''
 	for line in open('%s_!Base/src/lib/Base.lua' % get_current_packet_id()):
-		if line[6:23] == '_NATURAL_VERSION_':
-			current_version = int(line.split(' ')[-1])
+		if line[0:16] == 'local _VERSION_ ':
+			current_version = re.sub(r'(?is)^local _VERSION_\s+=', '', line).strip()[1:-1]
 	# Read max and previous release commit
-	commit_list = os.popen('git log --grep Release --pretty=format:"%s|%p"').read().split('\n')
-	max_version, prev_version, prev_version_message, prev_version_hash = 0, 0, '', ''
+	commit_list = filter(None, os.popen('git log --grep release: --pretty=format:"%p|%s"').read().split('\n'))
+	max_version, prev_version, prev_version_message, prev_version_hash = '', '', '', ''
 	for commit in commit_list:
 		try:
-			info = commit.split('|')
-			version = int(info[0][9:])
-			if version < current_version and version > prev_version:
+			version = re.sub(r'(?is)^\w+\|release:\s+', '', commit).strip()
+			version_message = re.sub(r'(?is)^\w+\|', '', commit).strip()
+			version_hash = re.sub(r'(?is)\|.+$', '', commit).strip()
+			if max_version == '' and semver.compare(version, '0.0.0') == 1:
+				max_version = version
 				prev_version = version
-				prev_version_message = info[0]
-				prev_version_hash = info[1]
-			if version > max_version:
+				prev_version_message = version_message
+				prev_version_hash = version_hash
+				continue
+			if semver.compare(version, current_version) == -1 and semver.compare(version, prev_version) == 1:
+				prev_version = version
+				prev_version_message = version_message
+				prev_version_hash = version_hash
+			if semver(version, max_version) == 1:
 				max_version = version
 		except:
 			pass
@@ -147,9 +161,9 @@ def run(is_full, is_source):
 		if git.get_current_branch() == 'prelease':
 			os.system('git reset master')
 			version_info = __get_version_info()
-			utils.assert_exit(version_info.get('current') > version_info.get('max'),
-				'Error: current version(%s) must be larger than max history version(%d)!' % (version_info.get('current'), version_info.get('max')))
-			os.system('git add * && git commit -m "Release V%s"' % version_info.get('current'))
+			utils.assert_exit(version_info.get('max') == '' or semver.compare(version_info.get('current'), version_info.get('max')) == 1,
+				'Error: current version(%s) must be larger than max history version(%s)!' % (version_info.get('current'), version_info.get('max')))
+			os.system('git add * && git commit -m "release: %s"' % version_info.get('current'))
 			os.system('git checkout stable || git checkout -b stable')
 			os.system('git reset origin/stable --hard')
 			os.system('git rebase prelease')
