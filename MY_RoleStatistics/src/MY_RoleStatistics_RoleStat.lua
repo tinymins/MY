@@ -349,6 +349,7 @@ local COLUMN_LIST = lodash.filter({
 	},
 	{ -- ¿ÀøÕº„
 		id = 'starve',
+		bVisible = GLOBAL.GAME_BRANCH ~= 'classic',
 		szTitle = _L['Starve'],
 		nMinWidth = 60,
 		GetFormatText = GeneWeeklyFormatText('starve'),
@@ -357,6 +358,7 @@ local COLUMN_LIST = lodash.filter({
 	},
 	{ -- ¿ÀøÕº„÷‹”‡
 		id = 'starve_remain',
+		bVisible = GLOBAL.GAME_BRANCH ~= 'classic',
 		szTitle = _L['Starve remain'],
 		szShortTitle = _L['Starv_remain'],
 		nMinWidth = 60,
