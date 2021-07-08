@@ -165,12 +165,14 @@ def run(is_full, is_source):
 
 	# Package files
 	file_name = '!src-dist/dist/%s_%s_v%s.7z' % (get_current_packet_id(), time.strftime('%Y%m%d%H%M%S', time.localtime()), version_info.get('current'))
+	fullpack_file_name = '!src-dist/dist/%s_%s_v%s.full.7z' % (get_current_packet_id(), time.strftime('%Y%m%d%H%M%S', time.localtime()), version_info.get('current'))
 	base_message = ''
 	base_hash = ''
 	if not is_full and version_info.get('current') != '' and version_info.get('previous_hash') != '':
 		base_message = version_info.get('previous_message')
 		base_hash = version_info.get('previous_hash')
 	__7zip(file_name, base_message, base_hash)
+	__7zip(fullpack_file_name, base_message, '')
 
 	# Revert source code modify by compressing
 	if not is_source:
