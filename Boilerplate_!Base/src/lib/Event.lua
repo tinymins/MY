@@ -181,16 +181,21 @@ end
 LIB.CommonEventRegister = CommonEventRegister
 
 local function FireEventRec(E, p, ...)
-	local nStartTick = GetTickCount()
+	--[[#DEBUG BEGIN]]
+	local nTickCount = GetTickCount()
+	--[[#DEBUG END]]
 	local res, err, trace = XpCall(p.fnAction, ...)
 	if not res then
 		FireUIEvent('CALL_LUA_ERROR', err .. '\nOn' .. E.szName .. ': ' .. p.szID .. '\n' .. trace .. '\n')
 	end
 	--[[#DEBUG BEGIN]]
-	LIB.Debug(
-		_L['PMTool'],
-		_L('%s function <%s> %s in %dms.', E.szName, p.szID, res and _L['succeed'] or _L['failed'], GetTickCount() - nStartTick),
-		DEBUG_LEVEL.PMLOG)
+	nTickCount = GetTickCount() - nTickCount
+	if nTickCount > 50 then
+		LIB.Debug(
+			_L['PMTool'],
+			_L('%s function <%s> %s in %dms.', E.szName, p.szID, res and _L['succeed'] or _L['failed'], nTickCount),
+			DEBUG_LEVEL.PMLOG)
+	end
 	--[[#DEBUG END]]
 end
 
