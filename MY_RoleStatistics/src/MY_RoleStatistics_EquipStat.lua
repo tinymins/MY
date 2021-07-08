@@ -359,7 +359,7 @@ function D.FlushDB()
 		glasses = { ITEM_TABLE_TYPE.CUST_TRINKET, (me.dwGlassesItemIndex) },
 		lglove = { ITEM_TABLE_TYPE.CUST_TRINKET, (me.GetSelectPendent and me.GetSelectPendent(KPENDENT_TYPE.LGLOVE)) },
 		rglove = { ITEM_TABLE_TYPE.CUST_TRINKET, (me.GetSelectPendent and me.GetSelectPendent(KPENDENT_TYPE.RGLOVE)) },
-		penpet = { ITEM_TABLE_TYPE.CUST_TRINKET, (me.GetEquippedPendentPet()) },
+		penpet = { ITEM_TABLE_TYPE.CUST_TRINKET, (me.GetSelectPendent and me.GetEquippedPendentPet()) },
 	}))
 
 	DB_OwnerInfoW:ClearBindings()
