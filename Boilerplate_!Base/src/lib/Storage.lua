@@ -513,7 +513,13 @@ local function SetInstanceInfoData(inst, info, data, version)
 		and inst.pUserDataDB
 		or inst.pSettingsDB
 	if db then
+		--[[#DEBUG BEGIN]]
+		local nStartTick = GetTime()
+		--[[#DEBUG END]]
 		db:Set(info.szDataKey, { d = data, v = version })
+		--[[#DEBUG BEGIN]]
+		LIB.Debug(PACKET_INFO.NAME_SPACE, _L('User settings %s saved during %dms.', info.szDataKey, GetTickCount() - nStartTick), DEBUG_LEVEL.PMLOG)
+		--[[#DEBUG END]]
 	end
 end
 
