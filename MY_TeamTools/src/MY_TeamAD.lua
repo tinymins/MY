@@ -111,7 +111,9 @@ function PS.OnPanelActive(wnd)
 	nX = X
 	nX, nY = ui:Append('Text', { x = nX, y = nY + 5, text = _L['Gadgets'], font = 27 }):Pos('BOTTOMRIGHT')
 	for k, v in ipairs(O.tItem) do
-		nX = ui:Append('Box', { x = (k - 1) * 48 + X + 10, y = nY + 10, w = 38, h = 38 }):ItemInfo(GLOBAL.CURRENT_ITEM_VERSION, v.dwTabType, v.dwIndex):Pos('BOTTOMRIGHT')
+		if GetItemInfo(v.dwTabType, v.dwIndex) then
+			nX = ui:Append('Box', { x = (k - 1) * 48 + X + 10, y = nY + 10, w = 38, h = 38 }):ItemInfo(GLOBAL.CURRENT_ITEM_VERSION, v.dwTabType, v.dwIndex):Pos('BOTTOMRIGHT')
+		end
 	end
 
 	nX = X
