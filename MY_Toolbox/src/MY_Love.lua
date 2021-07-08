@@ -208,7 +208,7 @@ local BACKUP_DATA_SCHEMA = Schema.Record({
 
 -- 功能屏蔽
 function D.IsShielded()
-	return false
+	return GLOBAL.GAME_BRANCH == 'classic'
 end
 
 -- 获取背包指定ID物品列表
