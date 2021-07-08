@@ -512,14 +512,16 @@ local function SetInstanceInfoData(inst, info, data, version)
 	local db = info.bUserData
 		and inst.pUserDataDB
 		or inst.pSettingsDB
-	db:Set(info.szDataKey, { d = data, v = version })
+	if db then
+		db:Set(info.szDataKey, { d = data, v = version })
+	end
 end
 
 local function GetInstanceInfoData(inst, info)
 	local db = info.bUserData
 		and inst.pUserDataDB
 		or inst.pSettingsDB
-	local res = db:Get(info.szDataKey)
+	local res = db and db:Get(info.szDataKey)
 	if res then
 		return res
 	end
@@ -558,7 +560,9 @@ local function DeleteInstanceInfoData(inst, info)
 	local db = info.bUserData
 		and inst.pUserDataDB
 		or inst.pSettingsDB
-	db:Delete(info.szDataKey)
+	if db then
+		db:Delete(info.szDataKey)
+	end
 	local db = info.bUserData
 		and inst.pUserDataUDB
 		or inst.pSettingsUDB
@@ -590,15 +594,23 @@ function LIB.ConnectUserSettingsDB()
 	end
 	for _, ePathType in ipairs(DATABASE_TYPE_LIST) do
 		if not DATABASE_INSTANCE[ePathType] then
+			local pSettingsDB = LIB.NoSQLiteConnect(szDBPresetRoot
+				and (szDBPresetRoot .. DATABASE_TYPE_PRESET_FILE[ePathType] .. '.db')
+				or LIB.FormatPath({'config/settings.db', ePathType}))
+			local pUserDataDB = LIB.NoSQLiteConnect(LIB.FormatPath({'userdata/userdata.db', ePathType}))
+			if not pSettingsDB then
+				LIB.Debug(PACKET_INFO.NAME_SPACE, 'Connect user settings database failed!!! ' .. ePathType, DEBUG_LEVEL.ERROR)
+			end
+			if not pUserDataDB then
+				LIB.Debug(PACKET_INFO.NAME_SPACE, 'Connect userdata database failed!!! ' .. ePathType, DEBUG_LEVEL.ERROR)
+			end
 			DATABASE_INSTANCE[ePathType] = {
-				pSettingsDB = LIB.NoSQLiteConnect(szDBPresetRoot
-					and (szDBPresetRoot .. DATABASE_TYPE_PRESET_FILE[ePathType] .. '.db')
-					or LIB.FormatPath({'config/settings.db', ePathType})),
+				pSettingsDB = pSettingsDB,
 				pSettingsUDB = LIB.UnQLiteConnect(szUDBPresetRoot
 					and (szUDBPresetRoot .. DATABASE_TYPE_PRESET_FILE[ePathType] .. '.udb')
 					or LIB.FormatPath({'userdata/settings.udb', ePathType})),
 				-- bSettingsDBCommit = false,
-				pUserDataDB = LIB.NoSQLiteConnect(LIB.FormatPath({'userdata/userdata.db', ePathType})),
+				pUserDataDB = pUserDataDB,
 				pUserDataUDB = LIB.UnQLiteConnect(LIB.FormatPath({'userdata/userdata.udb', ePathType})),
 				-- bUserDataDBCommit = false,
 			}
@@ -619,8 +631,12 @@ function LIB.ReleaseUserSettingsDB()
 			if inst.pUserDataUDB then
 				LIB.UnQLiteDisconnect(inst.pUserDataUDB)
 			end
-			LIB.NoSQLiteDisconnect(inst.pSettingsDB)
-			LIB.NoSQLiteDisconnect(inst.pUserDataDB)
+			if inst.pSettingsDB then
+				LIB.NoSQLiteDisconnect(inst.pSettingsDB)
+			end
+			if inst.pUserDataDB then
+				LIB.NoSQLiteDisconnect(inst.pUserDataDB)
+			end
 			DATABASE_INSTANCE[ePathType] = nil
 		end
 	end
@@ -1628,11 +1644,18 @@ end
 
 function LIB.NoSQLiteConnect(oPath)
 	local db = LIB.SQLiteConnect('NoSQL', oPath)
+	if not db then
+		return
+	end
 	db:Execute('CREATE TABLE IF NOT EXISTS data (key NVARCHAR(256) NOT NULL, value BLOB, PRIMARY KEY (key))')
 	local stmtSetter = db:Prepare('REPLACE INTO data (key, value) VALUES (?, ?)')
 	local stmtGetter = db:Prepare('SELECT * FROM data WHERE key = ? LIMIT 1')
 	local stmtDeleter = db:Prepare('DELETE FROM data WHERE key = ?')
 	local stmtAllGetter = db:Prepare('SELECT * FROM data')
+	if not stmtSetter or not stmtGetter or not stmtDeleter or not stmtAllGetter then
+		LIB.NoSQLiteDisconnect(db)
+		return
+	end
 	return setmetatable({}, {
 		__index = {
 			Set = function(_, k, v)

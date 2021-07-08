@@ -110,10 +110,10 @@ local function CreateWebPageFrame()
 	return szRequestID, hFrame
 end
 
-local Curl_Create = SafeCall(_G.Curl_Create, 'https://ping.j3cx.com/') and _G.Curl_Create or nil
-local CURL_HttpRqst = SafeCall(_G.CURL_HttpRqst, 'https://ping.j3cx.com/') and _G.CURL_HttpRqst or nil
-local CURL_HttpPost = (SafeCall(_G.CURL_HttpPostEx, 'TEST', 'https://ping.j3cx.com/') and _G.CURL_HttpPostEx)
-	or (SafeCall(_G.CURL_HttpPost, 'TEST', 'https://ping.j3cx.com/') and _G.CURL_HttpPost)
+local Curl_Create = pcall(_G.Curl_Create, '') and _G.Curl_Create or nil
+local CURL_HttpRqst = pcall(_G.CURL_HttpRqst, '') and _G.CURL_HttpRqst or nil
+local CURL_HttpPost = (pcall(_G.CURL_HttpPostEx, 'TEST', '') and _G.CURL_HttpPostEx)
+	or (pcall(_G.CURL_HttpPost, 'TEST', '') and _G.CURL_HttpPost)
 	or nil
 
 function LIB.CanAjax(driver, method)
