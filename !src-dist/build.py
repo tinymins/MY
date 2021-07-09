@@ -226,8 +226,8 @@ def run(diff_ver, is_source):
 			base_message = version_info.get('previous_message')
 			base_hash = version_info.get('previous_hash')
 		__7zip(file_name_fmt % '', base_message, base_hash, '')
-		__7zip(file_name_fmt & 'remake-', base_message, base_hash, '.7zipignore-remake')
-		__7zip(file_name_fmt & 'classic-', base_message, base_hash, '.7zipignore-classic')
+		__7zip(file_name_fmt % 'remake-', base_message, base_hash, '.7zipignore-remake')
+		__7zip(file_name_fmt % 'classic-', base_message, base_hash, '.7zipignore-classic')
 
 	file_name_fmt = '!src-dist/dist/%s_%s_v%s.%sfull.7z' % (
 		get_current_packet_id(),
