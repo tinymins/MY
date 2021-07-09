@@ -248,9 +248,9 @@ function D.CheckAlertEnable()
 				return
 			end
 			if O.nAlertNum == 0 then
-				if domesticate.nFullMeasure == 0 then
+				if domesticate.nFullMeasure == 0 and domesticate.nGrowthLevel < domesticate.nMaxGrowthLevel then
 					local szDomesticate = LIB.GetObjectName('ITEM_INFO', domesticate.dwCubTabType, domesticate.dwCubTabIndex)
-					OutputWarningMessage('MSG_WARNING_YELLOW', _L('Your domesticate %s is hungery!', szDomesticate, nMeasure))
+					OutputWarningMessage('MSG_WARNING_YELLOW', _L('Your domesticate %s is hungery!', szDomesticate))
 					PlaySound(SOUND.UI_SOUND, g_sound.CloseAuction)
 				end
 			else
