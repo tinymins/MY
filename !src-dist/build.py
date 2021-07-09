@@ -134,8 +134,10 @@ def __get_version_info(diff_ver):
 		'previous_hash': prev_version_hash,
 	}
 
-def __7zip(file_name, base_message, base_hash):
+def __7zip(file_name, base_message, base_hash, extra_ignore_file):
 	cmd_suffix = ''
+	if extra_ignore_file:
+		cmd_suffix = cmd_suffix + ' -x@' + extra_ignore_file
 	if base_hash != '':
 		# Generate file change list since previous release commit
 		def pathToModule(path):
@@ -209,29 +211,33 @@ def run(diff_ver, is_source):
 			__compress(addon)
 
 	# Package files
-	file_name = ''
 	if version_info.get('previous_hash'):
-		file_name = '!src-dist/dist/%s_%s_v%s.diff-%s-%s.7z' % (
+		file_name_fmt = '!src-dist/dist/%s_%s_v%s.%sdiff-%s-%s.7z' % (
 			get_current_packet_id(),
 			time.strftime('%Y%m%d%H%M%S', time.localtime()),
 			version_info.get('current'),
+			'%s',
 			version_info.get('previous_hash'),
 			version_info.get('current_hash'),
 		)
-	base_message = ''
-	base_hash = ''
-	if version_info.get('current') != '' and version_info.get('previous_hash') != '':
-		base_message = version_info.get('previous_message')
-		base_hash = version_info.get('previous_hash')
-	if file_name:
-		__7zip(file_name, base_message, base_hash)
+		base_message = ''
+		base_hash = ''
+		if version_info.get('current') != '' and version_info.get('previous_hash') != '':
+			base_message = version_info.get('previous_message')
+			base_hash = version_info.get('previous_hash')
+		__7zip(file_name_fmt % '', base_message, base_hash)
+		__7zip(file_name_fmt & 'remake-', base_message, base_hash, '.7zipignore-remake')
+		__7zip(file_name_fmt & 'classic-', base_message, base_hash, '.7zipignore-classic')
 
-	fullpack_file_name = '!src-dist/dist/%s_%s_v%s.full.7z' % (
+	file_name_fmt = '!src-dist/dist/%s_%s_v%s.%sfull.7z' % (
 		get_current_packet_id(),
 		time.strftime('%Y%m%d%H%M%S', time.localtime()),
 		version_info.get('current'),
+		'%s',
 	)
-	__7zip(fullpack_file_name, '', '')
+	__7zip(file_name_fmt % '', '', '')
+	__7zip(file_name_fmt % 'remake-', '', '', '.7zipignore-remake')
+	__7zip(file_name_fmt % 'classic-', '', '', '.7zipignore-classic')
 
 	# Revert source code modify by compressing
 	if not is_source:
