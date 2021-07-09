@@ -329,7 +329,9 @@ function LIB.SaveLUAData(oFilePath, oData, tConfig)
 	end
 	local data = SaveLUAData(szFilePath, oData, config)
 	--[[#DEBUG BEGIN]]
-	LIB.Debug('PMTool', _L('%s saved during %dms.', szFilePath, GetTickCount() - nStartTick), DEBUG_LEVEL.PMLOG)
+	if nStartTick > 5 then
+		LIB.Debug('PMTool', _L('%s saved during %dms.', szFilePath, GetTickCount() - nStartTick), DEBUG_LEVEL.PMLOG)
+	end
 	--[[#DEBUG END]]
 	return data
 end
@@ -353,7 +355,9 @@ function LIB.LoadLUAData(oFilePath, tConfig)
 		SaveLUAData(szFilePath, data, config)
 	end
 	--[[#DEBUG BEGIN]]
-	LIB.Debug('PMTool', _L('%s loaded during %dms.', szFilePath, GetTickCount() - nStartTick), DEBUG_LEVEL.PMLOG)
+	if nStartTick > 5 then
+		LIB.Debug('PMTool', _L('%s loaded during %dms.', szFilePath, GetTickCount() - nStartTick), DEBUG_LEVEL.PMLOG)
+	end
 	--[[#DEBUG END]]
 	return data
 end
