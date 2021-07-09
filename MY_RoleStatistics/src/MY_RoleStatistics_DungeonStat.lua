@@ -127,6 +127,7 @@ local D = {
 	tMapProgress = {}, -- 单首领 CD 进度
 	tMapProgressValid = {}, -- 客户端缓存的单首领 CD 进度数据有效
 	tMapProgressRequestTime = setmetatable({}, { __index = function() return 0 end }), -- 客户端缓存的单首领 CD 进度数据有效
+	aMapProgressRequestQueue = {}, -- 单首领 CD 获取队列 （一次获取太多可能会被踢）
 }
 
 local EXCEL_WIDTH = 960
@@ -411,6 +412,29 @@ function D.GetClientPlayerRec(bForceUpdate)
 end
 end
 
+function D.ProcessProgressRequestQueue()
+	local szKey = 'MY_RoleStatistics_DungeonStat__ProcessProgressRequestQueue'
+	if #D.aMapProgressRequestQueue > 0 then
+		LIB.BreatheCall(szKey, function()
+			local dwID = remove(D.aMapProgressRequestQueue)
+			if dwID then
+				D.tMapProgressRequestTime[dwID] = GetTime()
+				--[[#DEBUG BEGIN]]
+				LIB.Debug(
+					_L['PMTool'],
+					_L('[MY_RoleStatistics_DungeonStat] ApplyDungeonRoleProgress: %d.', dwID),
+					DEBUG_LEVEL.PMLOG)
+				--[[#DEBUG END]]
+				ApplyDungeonRoleProgress(dwID, UI_GetClientPlayerID())
+			else
+				LIB.BreatheCall(szKey, false)
+			end
+		end)
+	else
+		LIB.BreatheCall(szKey, false)
+	end
+end
+
 function D.FlushDB(bForceUpdate)
 	if not D.bReady or not O.bSaveDB then
 		return
@@ -610,14 +634,9 @@ function D.UpdateMapProgress(bForceUpdate)
 		if aProgressBoss then
 			-- 强制刷新秘境进度，或者进度数据已过期并且5秒内未请求过，则发起请求
 			if bForceUpdate or (not D.tMapProgressValid[dwID] and GetTime() - D.tMapProgressRequestTime[dwID] > 5000) then
-				D.tMapProgressRequestTime[dwID] = GetTime()
-				--[[#DEBUG BEGIN]]
-				LIB.Debug(
-					_L['PMTool'],
-					_L('[MY_RoleStatistics_DungeonStat] ApplyDungeonRoleProgress: %d.', dwID),
-					DEBUG_LEVEL.PMLOG)
-				--[[#DEBUG END]]
-				ApplyDungeonRoleProgress(dwID, UI_GetClientPlayerID())
+				if not lodash.includes(D.aMapProgressRequestQueue, dwID) then
+					insert(D.aMapProgressRequestQueue, dwID)
+				end
 			end
 			-- 已经获取到进度的秘境，或者没有 CD 数据的秘境
 			if D.tMapProgressValid[dwID] or (D.bMapSaveCopyValid and not D.tMapSaveCopy[dwID]) then
@@ -628,6 +647,7 @@ function D.UpdateMapProgress(bForceUpdate)
 				D.tMapProgress[dwID] = aProgress
 			end
 		end
+		D.ProcessProgressRequestQueue()
 	end
 	-- 强制刷新秘境进度，或者进度数据已过期并且5秒内未请求过，则发起请求
 	if bForceUpdate or (not D.bMapSaveCopyValid and GetTime() - D.dwMapSaveCopyRequestTime > 5000) then
