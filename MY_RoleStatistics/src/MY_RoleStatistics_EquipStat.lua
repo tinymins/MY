@@ -283,7 +283,7 @@ function D.FlushDB()
 		return
 	end
 	--[[#DEBUG BEGIN]]
-	LIB.Debug('MY_RoleStatistics_EquipStat', 'Flushing to database...', DEBUG_LEVEL.LOG)
+	local nTickCount = GetTickCount()
 	--[[#DEBUG END]]
 	local me = GetClientPlayer()
 	local time = GetCurrentTime()
@@ -370,7 +370,8 @@ function D.FlushDB()
 
 	DB:Execute('END TRANSACTION')
 	--[[#DEBUG BEGIN]]
-	LIB.Debug('MY_RoleStatistics_EquipStat', 'Flushing to database finished...', DEBUG_LEVEL.LOG)
+	nTickCount = GetTickCount() - nTickCount
+	LIB.Debug('MY_RoleStatistics_EquipStat', _L('Flushing to database costs %dms...', nTickCount), DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 end
 LIB.RegisterFlush('MY_RoleStatistics_EquipStat', D.FlushDB)
