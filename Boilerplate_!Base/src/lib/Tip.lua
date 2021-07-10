@@ -62,6 +62,38 @@ local function ConvRectEl(Rect, ePos)
 	return Rect, ePos
 end
 
+-- 智能布局，抄官方的
+local function AdjustFramePos(frame, Rect, nPosType)
+	if not nPosType then
+		nPosType = ALW.CENTER
+	end
+
+	if Rect then
+		if Rect[5] then
+			frame:SetPoint("BOTTOMRIGHT", 0, 0, "BOTTOMRIGHT", -52, -90)
+			local x, y = frame:GetAbsPos()
+			local w, h = frame:GetSize()
+			local bX = (x > Rect[1] and x < Rect[1] + Rect[3]) or (x + w > Rect[1] and x + w < Rect[1] + Rect[3]) or (Rect[1] > x and Rect[1] < x + w) or (Rect[1] + Rect[3] > x and Rect[1] + Rect[3] < x + w)
+			local bY = (y > Rect[2] and y < Rect[2] + Rect[4]) or (y + h > Rect[2] and y + h < Rect[2] + Rect[4]) or (Rect[2] > y and Rect[2] < y + h) or (Rect[2] + Rect[4] > y and Rect[2] + Rect[4] < y + h)
+			if bX and bY then
+				local w, h = Station.GetClientSize()
+				if not bY and bX then
+					frame:SetPoint("BOTTOMRIGHT", 0, 0, "BOTTOMRIGHT", Rect[1] - w, -90)
+				else
+					frame:SetPoint("BOTTOMRIGHT", 0, 0, "BOTTOMRIGHT", -52, Rect[2] - h)
+				end
+			end
+		else
+			Rect[3] = math.max(Rect[3], 40)
+			Rect[4] = math.max(Rect[4], 40)
+
+			frame:CorrectPos(Rect[1], Rect[2], Rect[3], Rect[4], nPosType)
+		end
+	else
+		frame:SetPoint("BOTTOMRIGHT", 0, 0, "BOTTOMRIGHT", -52, -90)
+	end
+end
+
 -- nFont 为 true 表示传入的是Xml字符串 否则表示格式化的字体
 function LIB.OutputTip(Rect, szText, nFont, ePos, nMaxWidth)
 	if not IsTable(Rect) and not IsNil(Rect) then
@@ -783,4 +815,9 @@ function LIB.OutputTableTip(tOptions)
 	hTable:SetSize(nTableWidth + 8, nTableHeight + 8)
 	hTotal:SetSize(nTableWidth + 8, nTableHeight + 8)
 	frame:SetSize(nTableWidth + 8, nTableHeight + 8)
+	AdjustFramePos(frame, Rect, tOptions.nPosType)
+end
+
+function LIB.HideTableTip()
+	Wnd.CloseWindow(NSFormatString('{$NS}_OutputTableTip'))
 end
