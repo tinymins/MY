@@ -566,7 +566,11 @@ end
 
 -- LIB.OutputTableTip({
 -- 	aColumn = {
--- 		{ nPaddingRight = 20 },
+-- 		MERGE = {
+-- 			nPaddingLeft = 3,
+-- 			nPaddingRight = 3,
+-- 		},
+-- 		{ nPaddingRight = 20, nMinWidth = 100 },
 -- 	},
 -- 	aDataSource = {
 -- 		{'<text>text="1:"</text>', '<text>text="4561"</text>'},
@@ -574,9 +578,12 @@ end
 -- 		{'<text>text="123:"</text>', '<text>text="45116"</text>'},
 -- 		{'<text>text="12345:"</text>', '<text>text="422256"</text>'},
 -- 	},
--- 	Rect = Rect,
+-- 	nMinWidth = 100,
 -- 	nMaxWidth = 400,
+-- 	Rect = Rect,
+-- 	nPosType = ALW.TOP_BOTTOM,
 -- })
+-- 其中，nMinWidth、nMaxWidth 数值相同时可合并简写为 nWidth 。
 function LIB.OutputTableTip(tOptions)
 	local aColumn = tOptions.aColumn or {}
 	local aDataSource = tOptions.aDataSource
