@@ -557,6 +557,12 @@ function LIB.OutputTableTip(tOptions)
 		nTableMinWidth = nTableWidth
 		nTableMaxWidth = nTableWidth
 	end
+	if not Rect then
+		local x, y = Cursor.GetPos()
+		local w, h = 40, 40
+		Rect = {x, y, w, h}
+	end
+	Rect = ConvRectEl(Rect)
 	-- 数据源不可为空
 	if #aDataSource == 0 then
 		LIB.Debug(PACKET_INFO.NAME_SPACE, 'LIB.OutputTableTip aDataSource is empty.', DEBUG_LEVEL.WARNING)
@@ -614,6 +620,9 @@ function LIB.OutputTableTip(tOptions)
 		nTableColumnMinWidthSum = nTableColumnMinWidthSum + col.nPaddingLeft
 		nTableColumnMinWidthSum = nTableColumnMinWidthSum + col.nPaddingRight
 	end
+	do
+		local iCol = 'MERGE'
+	end
 	if nTableMaxWidth and nTableColumnMinWidthSum > nTableMaxWidth then
 		LIB.Debug(PACKET_INFO.NAME_SPACE, 'LIB.OutputTableTip summary of columns min width (including horizontal paddings) ' .. nTableColumnMinWidthSum
 			.. ' should be smaller than table max width ' .. nTableMaxWidth .. '.', DEBUG_LEVEL.WARNING)
@@ -622,16 +631,19 @@ function LIB.OutputTableTip(tOptions)
 	-- 开始创建
 	local INI_PATH = PACKET_INFO.FRAMEWORK_ROOT .. 'ui/OutputTableTip.ini'
 	local frame = Wnd.OpenWindow(INI_PATH, NSFormatString('{$NS}_OutputTableTip'))
-	local imgBg = frame:Lookup('', 'Image_Bg')
-	local hTable = frame:Lookup('', 'Handle_Table')
+	local hTotal = frame:Lookup('', '')
+	local imgBg = hTotal:Lookup('Image_Bg')
+	local hTable = hTotal:Lookup('Handle_Table')
 	hTable:Clear()
 	local aColumnWidth = {}
 	-- 渲染列、计算填充内容后各列宽
 	for iRow, aCol in ipairs(aDataSource) do
 		local hRow = hTable:AppendItemFromIni(INI_PATH, 'Handle_Row')
+		local bMergeColumnRow = #aCol < nTableColumn
 		hRow:Clear()
 		for iCol, szCol in ipairs(aCol) do
-			local tCol = aColumn[iCol]
+			local iColumnKey = bMergeColumnRow and 'MERGE' or iCol
+			local tCol = aColumn[iColumnKey]
 			local hCol = hRow:AppendItemFromIni(INI_PATH, 'Handle_Col')
 			local hCell = hCol:Lookup('Handle_Cell')
 			hCell:Clear()
@@ -647,7 +659,16 @@ function LIB.OutputTableTip(tOptions)
 			hCustom:SetW(nCellMaxWidth)
 			hCustom:FormatAllItemPos()
 			local nAW = hCustom:GetAllItemSize()
-			aColumnWidth[iCol] = max(aColumnWidth[iCol] or 0, nAW + tCol.nPaddingLeft + tCol.nPaddingRight)
+			aColumnWidth[iColumnKey] = max(aColumnWidth[iColumnKey] or 0, nAW + tCol.nPaddingLeft + tCol.nPaddingRight)
+		end
+	end
+	-- 整行合并单元格
+	if aColumnWidth['MERGE'] then
+		if nTableMaxWidth then
+			aColumnWidth['MERGE'] = min(aColumnWidth['MERGE'], nTableMaxWidth)
+		end
+		if nTableMinWidth then
+			nTableMinWidth = max(nTableMinWidth, aColumnWidth['MERGE'])
 		end
 	end
 	-- 限制各列宽配置约束
@@ -714,25 +735,27 @@ function LIB.OutputTableTip(tOptions)
 	local aRowHeight = {}
 	for iRow, aCol in ipairs(aDataSource) do
 		local hRow = hTable:Lookup(iRow - 1)
+		local bMergeColumnRow = #aCol < nTableColumn
 		local nX = 0
 		for iCol, szCol in ipairs(aCol) do
-			local tCol = aColumn[iCol]
+			local tCol = bMergeColumnRow and aColumn['MERGE'] or aColumn[iCol]
 			local hCol = hRow:Lookup(iCol - 1)
 			local hCell = hCol:Lookup('Handle_Cell')
 			local hCustom = hCell:GetItemCount() == 1 and hCell:Lookup(0)
 			if not hCustom or hCustom:GetType() ~= 'Handle' then
 				hCustom = hCell
 			end
-			local nCellWidth, nCellHeight = aColumnWidth[iCol] - tCol.nPaddingLeft - tCol.nPaddingRight, nil
+			local nColumnWidth = bMergeColumnRow and nTableWidth or aColumnWidth[iCol]
+			local nCellWidth, nCellHeight = nColumnWidth - tCol.nPaddingLeft - tCol.nPaddingRight, nil
 			hCol:SetRelX(nX)
-			hCol:SetW(aColumnWidth[iCol])
+			hCol:SetW(nColumnWidth)
 			hCell:SetRelX(tCol.nPaddingLeft)
 			hCell:SetW(nCellWidth)
 			hCustom:SetW(nCellWidth)
 			hCustom:FormatAllItemPos()
 			nCellHeight = select(2, hCustom:GetAllItemSize())
 			aRowHeight[iRow] = max(aRowHeight[iRow] or 0, nCellHeight)
-			nX = nX + aColumnWidth[iCol]
+			nX = nX + nColumnWidth
 		end
 	end
 	-- 应用各行高、计算表格总高度
@@ -749,6 +772,7 @@ function LIB.OutputTableTip(tOptions)
 			end
 			hCustom:SetH(aRowHeight[iRow])
 			hCell:SetH(aRowHeight[iRow])
+			hCol:SetH(aRowHeight[iRow])
 		end
 		hRow:SetRelY(nTableHeight)
 		hRow:FormatAllItemPos()
@@ -756,4 +780,7 @@ function LIB.OutputTableTip(tOptions)
 	end
 	hTable:FormatAllItemPos()
 	imgBg:SetSize(nTableWidth + 8, nTableHeight + 8)
+	hTable:SetSize(nTableWidth + 8, nTableHeight + 8)
+	hTotal:SetSize(nTableWidth + 8, nTableHeight + 8)
+	frame:SetSize(nTableWidth + 8, nTableHeight + 8)
 end
