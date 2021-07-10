@@ -632,7 +632,10 @@ function LIB.OutputTableTip(tOptions)
 	end
 	-- 格式化列参数、计算列宽约束
 	local nTableColumnMinWidthSum = 0
-	for iCol = 1, nTableColumn do
+	for iCol = 0, nTableColumn do
+		if iCol == 0 then
+			iCol = 'MERGE'
+		end
 		local col = aColumn[iCol]
 		if not col then
 			col = {}
@@ -648,7 +651,11 @@ function LIB.OutputTableTip(tOptions)
 			return
 		end
 		if col.nMinWidth then
-			nTableColumnMinWidthSum = nTableColumnMinWidthSum + col.nMinWidth
+			if iCol == 'MERGE' then
+				nTableMinWidth = max(nTableMinWidth or 0, col.nMinWidth)
+			else
+				nTableColumnMinWidthSum = nTableColumnMinWidthSum + col.nMinWidth
+			end
 		end
 		if not col.nPaddingLeft then
 			col.nPaddingLeft = 3
@@ -656,11 +663,13 @@ function LIB.OutputTableTip(tOptions)
 		if not col.nPaddingRight then
 			col.nPaddingRight = 3
 		end
-		nTableColumnMinWidthSum = nTableColumnMinWidthSum + col.nPaddingLeft
-		nTableColumnMinWidthSum = nTableColumnMinWidthSum + col.nPaddingRight
-	end
-	do
-		local iCol = 'MERGE'
+		if iCol == 'MERGE' then
+			nTableMinWidth = max(nTableMinWidth or 0, col.nPaddingLeft)
+			nTableMinWidth = max(nTableMinWidth or 0, col.nPaddingRight)
+		else
+			nTableColumnMinWidthSum = nTableColumnMinWidthSum + col.nPaddingLeft
+			nTableColumnMinWidthSum = nTableColumnMinWidthSum + col.nPaddingRight
+		end
 	end
 	if nTableMaxWidth and nTableColumnMinWidthSum > nTableMaxWidth then
 		LIB.Debug(PACKET_INFO.NAME_SPACE, 'LIB.OutputTableTip summary of columns min width (including horizontal paddings) ' .. nTableColumnMinWidthSum
