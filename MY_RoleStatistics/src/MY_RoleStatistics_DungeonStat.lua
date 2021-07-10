@@ -652,8 +652,18 @@ function D.UpdateMapProgress(bForceUpdate)
 					insert(D.aMapProgressRequestQueue, dwID)
 				end
 			end
+			-- 检测是否有进度数据（修正脏数据标记位）
+			local bMapProgressValid = D.tMapProgressValid[dwID]
+			if not bMapProgressValid then
+				for i, boss in ipairs(aProgressBoss) do
+					if GetDungeonRoleProgress(dwID, UI_GetClientPlayerID(), boss.dwProgressID) then
+						bMapProgressValid = true
+						break
+					end
+				end
+			end
 			-- 已经获取到进度的秘境，或者没有 CD 数据的秘境
-			if D.tMapProgressValid[dwID] or (D.bMapSaveCopyValid and not D.tMapSaveCopy[dwID]) then
+			if bMapProgressValid or (D.bMapSaveCopyValid and not D.tMapSaveCopy[dwID]) then
 				local aProgress = {}
 				for i, boss in ipairs(aProgressBoss) do
 					aProgress[i] = GetDungeonRoleProgress(dwID, UI_GetClientPlayerID(), boss.dwProgressID)
