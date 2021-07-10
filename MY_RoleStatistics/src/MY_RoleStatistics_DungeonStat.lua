@@ -627,9 +627,23 @@ function D.UpdateMapProgress(bForceUpdate)
 	if not me then -- 确保不可能在切换GS时请求
 		return
 	end
+	local tProgressBossMapID = {}
+	-- 监控数据里的地图 ID
 	for _, col in ipairs(D.GetColumns()) do
 		local szID = wfind(col.id, 'dungeon_') and wgsub(col.id, 'dungeon_', '')
 		local dwID = szID and tonumber(szID)
+		if dwID then
+			tProgressBossMapID[dwID] = true
+		end
+	end
+	-- 已经有 CD 的地图 ID
+	for k, v in pairs(D.tMapSaveCopy) do
+		if v then
+			tProgressBossMapID[k] = true
+		end
+	end
+	-- 获取这些地图的进度
+	for dwID, _ in pairs(tProgressBossMapID) do
 		local aProgressBoss = dwID and LIB.IsDungeonRoleProgressMap(dwID) and Table_GetCDProcessBoss(dwID)
 		if aProgressBoss then
 			-- 强制刷新秘境进度，或者进度数据已过期并且5秒内未请求过，则发起请求
@@ -674,36 +688,51 @@ function D.DecodeRow(rec)
 	rec.progress_info = DecodeLUAData(rec.progress_info or '') or {}
 end
 
+function D.GetDungeonRecTipInfo(rec, dwMapID)
+	local col = COLUMN_DICT['dungeon_' .. dwMapID]
+	if col then
+		local a = {}
+		local nMaxPlayerCount = select(3, GetMapParams(dwMapID))
+		insert(a, GetFormatText(col.szTitle, 162, 255, 255, 0))
+		insert(a, GetFormatText(':  ', 162, 255, 255, 0))
+		insert(a, col.GetFormatText(rec))
+		insert(a, GetFormatText('\n', 162, 255, 255, 255))
+		return { dwMapID = dwMapID, nMaxPlayerCount = nMaxPlayerCount, szXml = concat(a) }
+	else
+		local map = LIB.GetMapInfo(dwMapID)
+		local aCopyID = rec.copy_info[dwMapID]
+		if map and aCopyID then
+			local a = {}
+			local nMaxPlayerCount = select(3, GetMapParams(dwMapID))
+			insert(a, GetFormatText(map.szName, 162, 255, 255, 0))
+			insert(a, GetFormatText(':  ', 162, 255, 255, 0))
+			insert(a, GetFormatText(concat(aCopyID, ',')))
+			insert(a, GetFormatText('\n', 162, 255, 255, 255))
+			return { dwMapID = dwMapID, nMaxPlayerCount = nMaxPlayerCount, szXml = concat(a) }
+		end
+	end
+end
+
 function D.OutputRowTip(this, rec)
 	local aXml = {}
 	local bFloat = this:GetRoot():GetName() ~= 'MY_RoleStatistics'
 	for _, id in ipairs(TIP_COLUMN) do
 		if id == 'DUNGEON' then
-			local tDungeon, aDungeon = {}, {}
+			local aMapID = {}
 			for _, col in ipairs(D.GetColumns()) do
-				if wfind(col.id, 'dungeon_') then
-					local a, dwMapID = {}, tonumber(col.id:sub(#'dungeon_' + 1))
-					local nMaxPlayerCount = select(3, GetMapParams(dwMapID))
-					insert(a, GetFormatText(col.szTitle, 162, 255, 255, 0))
-					insert(a, GetFormatText(':  ', 162, 255, 255, 0))
-					insert(a, col.GetFormatText(rec))
-					insert(a, GetFormatText('\n', 162, 255, 255, 255))
-					insert(aDungeon, { dwMapID = dwMapID, nMaxPlayerCount = nMaxPlayerCount, szXml = concat(a) })
-					tDungeon[dwMapID] = true
-				end
+				local dwMapID = wfind(col.id, 'dungeon_')
+					and tonumber(col.id:sub(#'dungeon_' + 1))
+					or nil
+				insert(aMapID, dwMapID)
 			end
-			for dwMapID, aCopyID in pairs(rec.copy_info) do
-				if not tDungeon[dwMapID] then
-					local map = LIB.GetMapInfo(dwMapID)
-					if map then
-						local a = {}
-						local nMaxPlayerCount = select(3, GetMapParams(dwMapID))
-						insert(a, GetFormatText(map.szName, 162, 255, 255, 0))
-						insert(a, GetFormatText(':  ', 162, 255, 255, 0))
-						insert(a, GetFormatText(concat(aCopyID, ',')))
-						insert(a, GetFormatText('\n', 162, 255, 255, 255))
-						insert(aDungeon, { dwMapID = dwMapID, nMaxPlayerCount = nMaxPlayerCount, szXml = concat(a) })
-					end
+			for dwMapID, _ in pairs(rec.copy_info) do
+				insert(aMapID, dwMapID)
+			end
+			local tDungeon, aDungeon = {}, {}
+			for _, dwMapID in ipairs(aMapID) do
+				local info = dwMapID and not tDungeon[dwMapID] and D.GetDungeonRecTipInfo(rec, dwMapID)
+				if info then
+					insert(aDungeon, info)
 					tDungeon[dwMapID] = true
 				end
 			end
