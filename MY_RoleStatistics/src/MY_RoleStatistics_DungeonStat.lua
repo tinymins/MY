@@ -289,12 +289,16 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 			end
 			if LIB.IsDungeonRoleProgressMap(map.dwID) then
 				col.GetFormatText = function(rec)
+					local aCopyID = rec.copy_info[map.dwID]
 					local aBossKill = rec.progress_info[map.dwID]
 					local nNextTime, nCircle = LIB.GetDungeonRefreshTime(map.dwID)
 					if not aBossKill or nNextTime - nCircle > rec.time then
 						return GetFormatText(_L['--'], 162, 255, 255, 255)
 					end
 					local aXml = {}
+					if IsCtrlKeyDown() and aCopyID then
+						insert(aXml, GetFormatText(concat(aCopyID, ',') .. ' '))
+					end
 					for _, bKill in ipairs(aBossKill) do
 						insert(aXml, '<image>path="' .. PLUGIN_ROOT .. '/img/MY_RoleStatistics.UITex" name="Image_ProgressBoss" eventid=786 frame='
 							.. (bKill and 1 or 0) .. ' w=12 h=12 script="this.mapid=' .. map.dwID .. '"</image>')
