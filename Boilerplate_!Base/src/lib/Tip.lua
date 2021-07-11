@@ -911,6 +911,10 @@ function LIB.OutputTableTip(tOptions)
 		hTotal:FormatAllItemPos()
 	end
 	if frame then
+		LIB.RegisterEsc(
+			NSFormatString('{$NS}_OutputTableTip'),
+			function() return frame:IsValid() and frame:IsVisible() end,
+			function() Wnd.CloseWindow(frame) end)
 		frame:SetSize(nTableWidth + 8, nTableHeight + 8)
 		AdjustFramePos(frame, Rect, tOptions.nPosType)
 	end
