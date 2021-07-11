@@ -993,11 +993,11 @@ end
 function LIB.RegisterEsc(szID, fnCondition, fnAction, bTopmost)
 	if fnCondition and fnAction then
 		if RegisterGlobalEsc then
-			RegisterGlobalEsc(szID, fnCondition, fnAction, bTopmost)
+			RegisterGlobalEsc(PACKET_INFO.NAME_SPACE .. '#' .. szID, fnCondition, fnAction, bTopmost)
 		end
 	else
 		if UnRegisterGlobalEsc then
-			UnRegisterGlobalEsc(szID, bTopmost)
+			UnRegisterGlobalEsc(PACKET_INFO.NAME_SPACE .. '#' .. szID, bTopmost)
 		end
 	end
 end
