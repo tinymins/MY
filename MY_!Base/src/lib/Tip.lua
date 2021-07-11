@@ -62,6 +62,38 @@ local function ConvRectEl(Rect, ePos)
 	return Rect, ePos
 end
 
+-- 智能布局，抄官方的
+local function AdjustFramePos(frame, Rect, nPosType)
+	if not nPosType then
+		nPosType = ALW.CENTER
+	end
+
+	if Rect then
+		if Rect[5] then
+			frame:SetPoint("BOTTOMRIGHT", 0, 0, "BOTTOMRIGHT", -52, -90)
+			local x, y = frame:GetAbsPos()
+			local w, h = frame:GetSize()
+			local bX = (x > Rect[1] and x < Rect[1] + Rect[3]) or (x + w > Rect[1] and x + w < Rect[1] + Rect[3]) or (Rect[1] > x and Rect[1] < x + w) or (Rect[1] + Rect[3] > x and Rect[1] + Rect[3] < x + w)
+			local bY = (y > Rect[2] and y < Rect[2] + Rect[4]) or (y + h > Rect[2] and y + h < Rect[2] + Rect[4]) or (Rect[2] > y and Rect[2] < y + h) or (Rect[2] + Rect[4] > y and Rect[2] + Rect[4] < y + h)
+			if bX and bY then
+				local w, h = Station.GetClientSize()
+				if not bY and bX then
+					frame:SetPoint("BOTTOMRIGHT", 0, 0, "BOTTOMRIGHT", Rect[1] - w, -90)
+				else
+					frame:SetPoint("BOTTOMRIGHT", 0, 0, "BOTTOMRIGHT", -52, Rect[2] - h)
+				end
+			end
+		else
+			Rect[3] = math.max(Rect[3], 40)
+			Rect[4] = math.max(Rect[4], 40)
+
+			frame:CorrectPos(Rect[1], Rect[2], Rect[3], Rect[4], nPosType)
+		end
+	else
+		frame:SetPoint("BOTTOMRIGHT", 0, 0, "BOTTOMRIGHT", -52, -90)
+	end
+end
+
 -- nFont 为 true 表示传入的是Xml字符串 否则表示格式化的字体
 function LIB.OutputTip(Rect, szText, nFont, ePos, nMaxWidth)
 	if not IsTable(Rect) and not IsNil(Rect) then
@@ -530,4 +562,360 @@ function LIB.OutputItemTip(Rect, dwItemID)
 	end
 	Rect = ConvRectEl(Rect)
 	OutputTip(szXml, 345, Rect)
+end
+
+-- LIB.OutputTableTip({
+-- 	aRow = {
+-- 		DEFAULT = { -- 通用行设置
+-- 			nPaddingTop = 3,
+-- 			nPaddingBottom = 3,
+-- 			szAlignment = 'MIDDLE', -- 'TOP', 'MIDDLE', 'BOTTOM'
+-- 		},
+-- 		{ nPaddingTop = 0 }, -- 第一行
+-- },
+-- 	aColumn = {
+-- 		MERGE = { -- 整行合并单元格
+-- 			nPaddingLeft = 3,
+-- 			nPaddingRight = 3,
+-- 			nMinWidth = 100,
+-- 			szAlignment = 'RIGHT' -- 'LEFT', 'CENTER', 'RIGHT'
+-- 		},
+-- 		{ nPaddingRight = 20, nMinWidth = 100 }, -- 第一列
+-- 		{ szAlignment = 'RIGHT' },
+-- 	},
+-- 	aDataSource = {
+-- 		{'<text>text="1:"</text>', '<text>text="4561"</text>'},
+-- 		{'<text>text="23:"</text>', '<text>text="456"</text>'},
+-- 		{'<text>text="123:"</text>', '<text>text="45116"</text>'},
+-- 		{'<text>text="12345:"</text>', '<text>text="422256"</text>'},
+-- 	},
+-- 	nMinWidth = 100,
+-- 	nMaxWidth = 400,
+-- 	Rect = Rect,
+-- 	nPosType = ALW.TOP_BOTTOM,
+-- })
+-- 其中，nMinWidth、nMaxWidth 数值相同时可合并简写为 nWidth 。
+function LIB.OutputTableTip(tOptions)
+	local aRow = tOptions.aRow or {}
+	local aColumn = tOptions.aColumn or {}
+	local aDataSource = tOptions.aDataSource
+	local hTarget = tOptions.hTarget
+	local Rect = tOptions.Rect
+	local nTableWidth = tOptions.nWidth
+	local nTableMinWidth = tOptions.nMinWidth
+	local nTableMaxWidth = tOptions.nMaxWidth
+	local nTableColumn = 1
+	if nTableWidth then
+		nTableMinWidth = nTableWidth
+		nTableMaxWidth = nTableWidth
+	end
+	if hTarget then
+		Rect = nil
+	else
+		if not Rect then
+			local x, y = Cursor.GetPos()
+			local w, h = 40, 40
+			Rect = {x, y, w, h}
+		end
+		Rect = ConvRectEl(Rect)
+	end
+	-- 数据源不可为空
+	if #aDataSource == 0 then
+		LIB.Debug(PACKET_INFO.NAME_SPACE, 'LIB.OutputTableTip aDataSource is empty.', DEBUG_LEVEL.WARNING)
+		return
+	end
+	-- 计算列数
+	for iCol, aCol in ipairs(aDataSource) do
+		local nCol = #aCol
+		if nCol == 0 then
+			LIB.Debug(PACKET_INFO.NAME_SPACE, 'LIB.OutputTableTip row ' .. iCol .. ' is empty.', DEBUG_LEVEL.WARNING)
+			return
+		end
+		if nCol ~= 1 then
+			if nTableColumn == 1 then
+				nTableColumn = nCol
+			end
+			if nCol ~= nTableColumn then
+				LIB.Debug(
+					PACKET_INFO.NAME_SPACE,
+					'LIB.OutputTableTip row '
+						.. iCol .. ' columns count ('
+						.. nCol .. ') should be the same as previous columns ('
+						.. nTableColumn .. ')',
+					DEBUG_LEVEL.LOG)
+				return
+			end
+		end
+	end
+	-- 格式化列参数、计算列宽约束
+	local nTableColumnMinWidthSum = 0
+	for iCol = 0, nTableColumn do
+		if iCol == 0 then
+			iCol = 'MERGE'
+		end
+		local col = aColumn[iCol]
+		if not col then
+			col = {}
+			aColumn[iCol] = col
+		end
+		if col.nWidth then
+			col.nMinWidth = col.nWidth
+			col.nMaxWidth = col.nWidth
+		end
+		if col.nMinWidth and col.nMaxWidth and col.nMinWidth > col.nMaxWidth then
+			LIB.Debug(PACKET_INFO.NAME_SPACE, 'LIB.OutputTableTip column ' .. iCol .. ' min width ' .. col.nMinWidth
+				.. ' should be smaller than max width ' .. col.nMaxWidth .. '.', DEBUG_LEVEL.WARNING)
+			return
+		end
+		if col.nMinWidth then
+			if iCol == 'MERGE' then
+				nTableMinWidth = max(nTableMinWidth or 0, col.nMinWidth)
+			else
+				nTableColumnMinWidthSum = nTableColumnMinWidthSum + col.nMinWidth
+			end
+		end
+		if not col.nPaddingLeft then
+			col.nPaddingLeft = 3
+		end
+		if not col.nPaddingRight then
+			col.nPaddingRight = 3
+		end
+		if iCol == 'MERGE' then
+			nTableMinWidth = max(nTableMinWidth or 0, col.nPaddingLeft)
+			nTableMinWidth = max(nTableMinWidth or 0, col.nPaddingRight)
+		else
+			nTableColumnMinWidthSum = nTableColumnMinWidthSum + col.nPaddingLeft
+			nTableColumnMinWidthSum = nTableColumnMinWidthSum + col.nPaddingRight
+		end
+	end
+	if nTableMaxWidth and nTableColumnMinWidthSum > nTableMaxWidth then
+		LIB.Debug(PACKET_INFO.NAME_SPACE, 'LIB.OutputTableTip summary of columns min width (including horizontal paddings) ' .. nTableColumnMinWidthSum
+			.. ' should be smaller than table max width ' .. nTableMaxWidth .. '.', DEBUG_LEVEL.WARNING)
+		return
+	end
+	-- 格式化行参数
+	for iRow = 0, #aDataSource do
+		if iRow == 0 then
+			iRow = 'DEFAULT'
+		end
+		local row = aRow[iRow]
+		if not row then
+			row = {}
+			aRow[iRow] = row
+		end
+		if iRow ~= 'DEFAULT' then
+			setmetatable(row, { __index = aRow['DEFAULT'] })
+		end
+		if not row.nPaddingTop then
+			row.nPaddingTop = 1
+		end
+		if not row.nPaddingBottom then
+			row.nPaddingBottom = 1
+		end
+	end
+	-- 开始创建
+	local INI_PATH = PACKET_INFO.FRAMEWORK_ROOT .. 'ui/OutputTableTip.ini'
+	local frame, hTotal, imgBg, hTable
+	if hTarget then
+		hTable = hTarget:AppendItemFromIni(INI_PATH, 'Handle_Table')
+	else
+		frame = Wnd.OpenWindow(INI_PATH, NSFormatString('{$NS}_OutputTableTip'))
+		hTotal = frame:Lookup('', '')
+		imgBg = hTotal:Lookup('Image_Bg')
+		hTable = hTotal:Lookup('Handle_Table')
+	end
+	hTable:Clear()
+	local aColumnWidth = {}
+	-- 渲染列、计算填充内容后各列宽
+	for iRow, aCol in ipairs(aDataSource) do
+		local hRow = hTable:AppendItemFromIni(INI_PATH, 'Handle_Row')
+		local bMergeColumnRow = #aCol < nTableColumn
+		hRow:Clear()
+		for iCol, szCol in ipairs(aCol) do
+			local iColumnKey = bMergeColumnRow and 'MERGE' or iCol
+			local tCol = aColumn[iColumnKey]
+			local hCol = hRow:AppendItemFromIni(INI_PATH, 'Handle_Col')
+			local hCell = hCol:Lookup('Handle_Cell')
+			hCell:Clear()
+			hCell:AppendItemFromString(szCol)
+			local hCustom = hCell:GetItemCount() == 1 and hCell:Lookup(0)
+			if not hCustom or hCustom:GetType() ~= 'Handle' then
+				hCustom = hCell
+			end
+			local nCellMaxWidth = 0xffff
+			if tCol.nMaxWidth then
+				nCellMaxWidth = tCol.nMaxWidth - tCol.nPaddingLeft - tCol.nPaddingRight
+			end
+			hCustom:SetW(nCellMaxWidth)
+			hCustom:FormatAllItemPos()
+			local nAW = hCustom:GetAllItemSize()
+			aColumnWidth[iColumnKey] = max(aColumnWidth[iColumnKey] or 0, nAW + tCol.nPaddingLeft + tCol.nPaddingRight)
+		end
+	end
+	-- 整行合并单元格
+	if aColumnWidth['MERGE'] then
+		if nTableMaxWidth then
+			aColumnWidth['MERGE'] = min(aColumnWidth['MERGE'], nTableMaxWidth)
+		end
+		if nTableMinWidth then
+			nTableMinWidth = max(nTableMinWidth, aColumnWidth['MERGE'])
+		end
+	end
+	-- 限制各列宽配置约束
+	for iCol = 1, nTableColumn do
+		local col = aColumn[iCol]
+		if col.nMinWidth then
+			aColumnWidth[iCol] = max(aColumnWidth[iCol] or 0, col.nMinWidth)
+		end
+		if col.nMaxWidth then
+			aColumnWidth[iCol] = min(aColumnWidth[iCol] or HUGE, col.nMaxWidth)
+		end
+	end
+	-- 存在整体宽度限制，自动平均分布
+	if nTableMaxWidth or nTableMinWidth then
+		local nExtraWidth
+		if not nExtraWidth and nTableMaxWidth then
+			nExtraWidth = nTableMaxWidth
+			for iCol, nWidth in ipairs(aColumnWidth) do
+				nExtraWidth = nExtraWidth - nWidth
+			end
+			if nExtraWidth >= 0 then
+				nExtraWidth = nil
+			end
+		end
+		if not nExtraWidth and nTableMinWidth then
+			nExtraWidth = nTableMinWidth
+			for iCol, nWidth in ipairs(aColumnWidth) do
+				nExtraWidth = nExtraWidth - nWidth
+			end
+			if nExtraWidth <= 0 then
+				nExtraWidth = nil
+			end
+		end
+		local nLoopProtect = 0
+		while nExtraWidth and abs(nExtraWidth) > 0.0001 do
+			nLoopProtect = nLoopProtect + 1
+			assert(nLoopProtect < 300)
+			local nExtraPerCol = nExtraWidth / nTableColumn
+			for iCol, nWidth in ipairs(aColumnWidth) do
+				local tCol = aColumn[iCol]
+				local nOffset = nExtraPerCol
+				if nExtraPerCol > 0 then
+					if tCol.nMaxWidth then
+						nOffset = min(nOffset, tCol.nMaxWidth - nWidth)
+					end
+				else
+					if tCol.nMinWidth then
+						nOffset = max(nOffset, tCol.nMinWidth - nWidth)
+					end
+				end
+				aColumnWidth[iCol] = aColumnWidth[iCol] + nOffset
+				nExtraWidth = nExtraWidth - nOffset
+			end
+		end
+	end
+	-- 计算实际表格宽度
+	if not nTableWidth then
+		nTableWidth = 0
+		for _, nW in ipairs(aColumnWidth) do
+			nTableWidth = nTableWidth + nW
+		end
+	end
+	-- 应用各列宽、计算各行高
+	local aRowHeight = {}
+	for iRow, aCol in ipairs(aDataSource) do
+		local tRow = aRow[iRow]
+		local hRow = hTable:Lookup(iRow - 1)
+		local bMergeColumnRow = #aCol < nTableColumn
+		local nX = 0
+		for iCol, szCol in ipairs(aCol) do
+			local tCol = bMergeColumnRow and aColumn['MERGE'] or aColumn[iCol]
+			local hCol = hRow:Lookup(iCol - 1)
+			local hCell = hCol:Lookup('Handle_Cell')
+			local hCustom = hCell:GetItemCount() == 1 and hCell:Lookup(0)
+			if not hCustom or hCustom:GetType() ~= 'Handle' then
+				hCustom = hCell
+			end
+			local nColumnWidth = bMergeColumnRow and nTableWidth or aColumnWidth[iCol]
+			local nCellWidth, nCellHeight = nColumnWidth - tCol.nPaddingLeft - tCol.nPaddingRight, nil
+			if tCol.szAlignment == 'CENTER' or tCol.szAlignment == 'RIGHT' then
+				nCellWidth = min(nCellWidth, hCustom:GetW())
+			end
+			hCol:SetRelX(nX)
+			hCol:SetW(nColumnWidth)
+			hCell:SetW(nCellWidth)
+			hCustom:SetW(nCellWidth)
+			if tCol.szAlignment == 'CENTER' then
+				hCell:SetRelX((nColumnWidth - nCellWidth) / 2)
+				hCustom:SetHAlign(1)
+			elseif tCol.szAlignment == 'RIGHT' then
+				hCell:SetRelX(nColumnWidth - tCol.nPaddingRight - nCellWidth)
+				hCustom:SetHAlign(2)
+			else
+				hCell:SetRelX(tCol.nPaddingLeft)
+				hCustom:SetHAlign(0)
+			end
+			hCustom:FormatAllItemPos()
+			nCellHeight = select(2, hCustom:GetAllItemSize())
+			hCustom:SetH(nCellHeight)
+			aRowHeight[iRow] = max(aRowHeight[iRow] or 0, nCellHeight + tRow.nPaddingTop + tRow.nPaddingBottom)
+			nX = nX + nColumnWidth
+		end
+	end
+	-- 应用各行高、计算表格总高度
+	local nTableHeight = 0
+	for iRow, aCol in ipairs(aDataSource) do
+		local tRow = aRow[iRow]
+		local nRowHeight = aRowHeight[iRow]
+		local hRow = hTable:Lookup(iRow - 1)
+		for iCol, szCol in ipairs(aCol) do
+			local hCol = hRow:Lookup(iCol - 1)
+			local hCell = hCol:Lookup('Handle_Cell')
+			local hCustom = hCell:GetItemCount() == 1 and hCell:Lookup(0)
+			if not hCustom or hCustom:GetType() ~= 'Handle' then
+				hCustom = hCell
+			end
+			local nCellHeight = nRowHeight
+			if tRow.szAlignment == 'MIDDLE' or tRow.szAlignment == 'BOTTOM' then
+				nCellHeight = min(nCellHeight, hCustom:GetH())
+			end
+			hCell:SetH(nCellHeight)
+			hCell:SetRelY(tRow.nPaddingTop)
+			hCustom:SetH(nCellHeight)
+			if tRow.szAlignment == 'MIDDLE' then
+				hCell:SetRelY((nRowHeight - nCellHeight) / 2)
+				hCustom:SetVAlign(1)
+			elseif tRow.szAlignment == 'BOTTOM' then
+				hCell:SetRelY(nRowHeight - tRow.nPaddingBottom - nCellHeight)
+				hCustom:SetVAlign(2)
+			else
+				hCell:SetRelY(tRow.nPaddingTop)
+				hCustom:SetVAlign(0)
+			end
+			hCol:SetH(nRowHeight)
+			hCol:FormatAllItemPos()
+		end
+		hRow:SetRelY(nTableHeight)
+		hRow:FormatAllItemPos()
+		nTableHeight = nTableHeight + nRowHeight
+	end
+	hTable:FormatAllItemPos()
+	hTable:SetSize(nTableWidth + 8, nTableHeight + 8)
+	-- 更新外部元素大小
+	if imgBg then
+		imgBg:SetSize(nTableWidth + 8, nTableHeight + 8)
+	end
+	if hTotal then
+		hTable:SetRelPos(4, 4)
+		hTotal:SetSize(nTableWidth + 8, nTableHeight + 8)
+		hTotal:FormatAllItemPos()
+	end
+	if frame then
+		frame:SetSize(nTableWidth + 8, nTableHeight + 8)
+		AdjustFramePos(frame, Rect, tOptions.nPosType)
+	end
+end
+
+function LIB.HideTableTip()
+	Wnd.CloseWindow(NSFormatString('{$NS}_OutputTableTip'))
 end
