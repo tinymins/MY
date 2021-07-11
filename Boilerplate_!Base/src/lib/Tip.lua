@@ -852,7 +852,7 @@ function LIB.OutputTableTip(tOptions)
 				hCell:SetRelX(nColumnWidth - tCol.nPaddingRight - nCellWidth)
 				hCustom:SetHAlign(2)
 			else
-				hCell:SetRelX(0)
+				hCell:SetRelX(tCol.nPaddingLeft)
 				hCustom:SetHAlign(0)
 			end
 			hCustom:FormatAllItemPos()
@@ -889,7 +889,7 @@ function LIB.OutputTableTip(tOptions)
 				hCell:SetRelY(nRowHeight - tRow.nPaddingBottom - nCellHeight)
 				hCustom:SetVAlign(2)
 			else
-				hCell:SetRelY(0)
+				hCell:SetRelY(tRow.nPaddingTop)
 				hCustom:SetVAlign(0)
 			end
 			hCol:SetH(nRowHeight)
@@ -906,7 +906,9 @@ function LIB.OutputTableTip(tOptions)
 		imgBg:SetSize(nTableWidth + 8, nTableHeight + 8)
 	end
 	if hTotal then
+		hTable:SetRelPos(4, 4)
 		hTotal:SetSize(nTableWidth + 8, nTableHeight + 8)
+		hTotal:FormatAllItemPos()
 	end
 	if frame then
 		frame:SetSize(nTableWidth + 8, nTableHeight + 8)
