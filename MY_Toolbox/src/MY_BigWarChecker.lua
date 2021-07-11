@@ -72,7 +72,7 @@ local function IsBigWarFinishable(me)
 			local finished = false
 			if info.finish then
 				finished = true
-			elseif info.quest_state then
+			elseif not IsEmpty(info.quest_state) then
 				finished = true
 				for _, state in ipairs(info.quest_state) do
 					if state.need ~= state.have then
