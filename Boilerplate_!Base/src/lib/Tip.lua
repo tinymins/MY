@@ -587,6 +587,7 @@ end
 function LIB.OutputTableTip(tOptions)
 	local aColumn = tOptions.aColumn or {}
 	local aDataSource = tOptions.aDataSource
+	local hTarget = tOptions.hTarget
 	local Rect = tOptions.Rect
 	local nTableWidth = tOptions.nWidth
 	local nTableMinWidth = tOptions.nMinWidth
@@ -596,12 +597,16 @@ function LIB.OutputTableTip(tOptions)
 		nTableMinWidth = nTableWidth
 		nTableMaxWidth = nTableWidth
 	end
-	if not Rect then
-		local x, y = Cursor.GetPos()
-		local w, h = 40, 40
-		Rect = {x, y, w, h}
+	if hTarget then
+		Rect = nil
+	else
+		if not Rect then
+			local x, y = Cursor.GetPos()
+			local w, h = 40, 40
+			Rect = {x, y, w, h}
+		end
+		Rect = ConvRectEl(Rect)
 	end
-	Rect = ConvRectEl(Rect)
 	-- 数据源不可为空
 	if #aDataSource == 0 then
 		LIB.Debug(PACKET_INFO.NAME_SPACE, 'LIB.OutputTableTip aDataSource is empty.', DEBUG_LEVEL.WARNING)
@@ -678,10 +683,15 @@ function LIB.OutputTableTip(tOptions)
 	end
 	-- 开始创建
 	local INI_PATH = PACKET_INFO.FRAMEWORK_ROOT .. 'ui/OutputTableTip.ini'
-	local frame = Wnd.OpenWindow(INI_PATH, NSFormatString('{$NS}_OutputTableTip'))
-	local hTotal = frame:Lookup('', '')
-	local imgBg = hTotal:Lookup('Image_Bg')
-	local hTable = hTotal:Lookup('Handle_Table')
+	local frame, hTotal, imgBg, hTable
+	if hTarget then
+		hTable = hTarget:AppendItemFromIni(INI_PATH, 'Handle_Table')
+	else
+		frame = Wnd.OpenWindow(INI_PATH, NSFormatString('{$NS}_OutputTableTip'))
+		hTotal = frame:Lookup('', '')
+		imgBg = hTotal:Lookup('Image_Bg')
+		hTable = hTotal:Lookup('Handle_Table')
+	end
 	hTable:Clear()
 	local aColumnWidth = {}
 	-- 渲染列、计算填充内容后各列宽
@@ -827,11 +837,18 @@ function LIB.OutputTableTip(tOptions)
 		nTableHeight = nTableHeight + aRowHeight[iRow]
 	end
 	hTable:FormatAllItemPos()
-	imgBg:SetSize(nTableWidth + 8, nTableHeight + 8)
 	hTable:SetSize(nTableWidth + 8, nTableHeight + 8)
-	hTotal:SetSize(nTableWidth + 8, nTableHeight + 8)
-	frame:SetSize(nTableWidth + 8, nTableHeight + 8)
-	AdjustFramePos(frame, Rect, tOptions.nPosType)
+	-- 更新外部元素大小
+	if imgBg then
+		imgBg:SetSize(nTableWidth + 8, nTableHeight + 8)
+	end
+	if hTotal then
+		hTotal:SetSize(nTableWidth + 8, nTableHeight + 8)
+	end
+	if frame then
+		frame:SetSize(nTableWidth + 8, nTableHeight + 8)
+		AdjustFramePos(frame, Rect, tOptions.nPosType)
+	end
 end
 
 function LIB.HideTableTip()
