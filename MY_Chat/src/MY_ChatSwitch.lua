@@ -110,16 +110,6 @@ local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['Chat'], {
 })
 local D = {}
 
-LIB.RegisterInit('MY_ChatSwitch__DataCompatible', function()
-	for _, k in ipairs({'aWhisper'}) do
-		if D[k] then
-			SafeCall(Set, O, k, D[k])
-			D[k] = nil
-		end
-	end
-end)
-RegisterCustomData('MY_ChatSwitch.aWhisper', 1)
-
 local INI_PATH = PACKET_INFO.ROOT .. 'MY_Chat/ui/MY_ChatSwitch.ini'
 local CD_REFRESH_OFFSET = 7 * 60 * 60 -- 7µã¸üÐÂCD
 
@@ -135,18 +125,19 @@ local function UpdateChannelDailyLimit(hRadio, bPlus)
 	local nChannel = info.channel
 	if nChannel then
 		local szDate = LIB.FormatTime(GetCurrentTime() - CD_REFRESH_OFFSET, '%yyyy%MM%dd')
-		local tChannelCount = O.tChannelCount
+		local tChannelCount = D.tChannelCount
 		if tChannelCount.szDate ~= szDate then
 			tChannelCount = {
 				szDate = szDate,
 				tCount = {},
 			}
-			O.tChannelCount = tChannelCount
+			D.tChannelCount = tChannelCount
+			D.bChannelCountChanged = true
 		end
 		local nDailyCount = (tChannelCount.tCount[nChannel] or 0) + (bPlus and 1 or 0)
 		if nDailyCount ~= tChannelCount.tCount[nChannel] then
 			tChannelCount.tCount[nChannel] = nDailyCount
-			O.tChannelCount = tChannelCount
+			D.bChannelCountChanged = true
 		end
 		local nDailyLimit = LIB.GetChatChannelDailyLimit(me.nLevel, nChannel)
 		if nDailyLimit then
@@ -260,7 +251,7 @@ end
 
 local function OnWhisperCheck()
 	local t = {}
-	for i, whisper in ipairs(O.aWhisper) do
+	for i, whisper in ipairs(D.aWhisper) do
 		local info = MY_Farbnamen and MY_Farbnamen.Get(whisper[1])
 		insert(t, {
 			szOption = whisper[1],
@@ -276,13 +267,14 @@ local function OnWhisperCheck()
 			nIconHeight = 17,
 			szLayer = 'ICON_RIGHTMOST',
 			fnClickIcon = function()
-				for i = #O.aWhisper, 1, -1 do
-					if O.aWhisper[i][1] == whisper[1] then
-						remove(O.aWhisper, i)
+				for i = #D.aWhisper, 1, -1 do
+					if D.aWhisper[i][1] == whisper[1] then
+						remove(D.aWhisper, i)
 						UI.ClosePopupMenu()
 					end
 				end
-				O.aWhisper = O.aWhisper
+				O.aWhisper = D.aWhisper
+				D.bWhisperChanged = false
 			end,
 			fnMouseEnter = function()
 				local t = {}
@@ -309,7 +301,7 @@ local function OnWhisperCheck()
 	end
 	local x, y = this:GetAbsPos()
 	t.x = x
-	t.y = y - #O.aWhisper * 24 - 24 - 20 - 8
+	t.y = y - #D.aWhisper * 24 - 24 - 20 - 8
 	if #t > 0 then
 		insert(t, 1, CONSTANT.MENU_DIVIDER)
 		insert(t, 1, {
@@ -384,7 +376,21 @@ function D.ApplyBattlefieldChannelSwitch()
 		LIB.RegisterEvent('LOADING_ENDING', 'MY_ChatSwitch__AutoSwitchBattlefieldChannel')
 	end
 end
-LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_ChatSwitch__AutoSwitchBattlefieldChannel', D.Apply)
+
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_ChatSwitch__AutoSwitchBattlefieldChannel', function()
+	D.aWhisper = O.aWhisper
+	D.tChannelCount = O.tChannelCount
+	D.Apply()
+end)
+
+LIB.RegisterUserSettingsUpdate('@@UNINIT@@', 'MY_ChatSwitch__AutoSwitchBattlefieldChannel', function()
+	if D.bWhisperChanged then
+		O.aWhisper = D.aWhisper
+	end
+	if D.bChannelCountChanged then
+		O.tChannelCount = D.tChannelCount
+	end
+end)
 
 function D.OnFrameCreate()
 	this.tRadios = {}
@@ -466,13 +472,13 @@ function D.OnEvent(event)
 		end
 		if nChannel == PLAYER_TALK_CHANNEL.WHISPER then
 			local t
-			for i = #O.aWhisper, 1, -1 do
-				if O.aWhisper[i][1] == szName then
-					t = remove(O.aWhisper, i)
+			for i = #D.aWhisper, 1, -1 do
+				if D.aWhisper[i][1] == szName then
+					t = remove(D.aWhisper, i)
 				end
 			end
-			while #O.aWhisper > 20 do
-				remove(O.aWhisper, 1)
+			while #D.aWhisper > 20 do
+				remove(D.aWhisper, 1)
 			end
 			if not t then
 				t = {szName, {}}
@@ -481,8 +487,8 @@ function D.OnEvent(event)
 				remove(t[2], 1)
 			end
 			insert(t[2], {szMsg, GetCurrentTime()})
-			insert(O.aWhisper, t)
-			O.aWhisper = O.aWhisper
+			insert(D.aWhisper, t)
+			D.bWhisperChanged = true
 		end
 		if dwTalkerID ~= UI_GetClientPlayerID() then
 			return
@@ -662,16 +668,7 @@ local settings = {
 		{
 			preset = 'UIEvent',
 			fields = {
-				'aWhisper',
 				'OnPanelActivePartial',
-			},
-			root = D,
-		},
-	},
-	imports = {
-		{
-			fields = {
-				'aWhisper',
 			},
 			root = D,
 		},
