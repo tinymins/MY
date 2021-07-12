@@ -1839,10 +1839,15 @@ local ERROR_MSG = {}
 local function SaveErrorMessage()
 	LIB.SaveLUAData(FILE_PATH, ERROR_MSG, { passphrase = false, crc = false, indent = '\t' })
 end
+local BROKEN_KGUI = IsDebugClient() and not LIB.IsDebugServer() and not LIB.IsDebugClient(true)
 RegisterEvent('CALL_LUA_ERROR', function()
 	local szMsg = arg0
 	local szMsgL = wgsub(arg0:lower(), '\\', '/')
 	if wfind(szMsgL, KEY) then
+		if BROKEN_KGUI then
+			local szMessage = 'Your KGUI is not official, please fix client and try again.'
+			LIB.ErrorLog('[' .. PACKET_INFO.NAME_SPACE .. ']' .. szMessage .. '\n' .. _L[szMessage])
+		end
 		insert(ERROR_MSG, szMsg)
 	end
 	SaveErrorMessage()
