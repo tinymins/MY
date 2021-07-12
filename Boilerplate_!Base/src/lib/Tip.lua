@@ -591,6 +591,10 @@ end
 -- 	},
 -- 	nMinWidth = 100,
 -- 	nMaxWidth = 400,
+-- 	nPaddingTop = 10,
+-- 	nPaddingBottom = 10,
+-- 	nPaddingLeft = 10,
+-- 	nPaddingRight = 10,
 -- 	Rect = Rect,
 -- 	nPosType = ALW.TOP_BOTTOM,
 -- })
@@ -600,6 +604,10 @@ function LIB.OutputTableTip(tOptions)
 	local aColumn = tOptions.aColumn or {}
 	local aDataSource = tOptions.aDataSource
 	local hTarget = tOptions.hTarget
+	local nFramePaddingTop = tOptions.nPaddingTop or 8
+	local nFramePaddingBottom = tOptions.nPaddingBottom or 8
+	local nFramePaddingLeft = tOptions.nPaddingLeft or 8
+	local nFramePaddingRight = tOptions.nPaddingRight or 8
 	local Rect = tOptions.Rect
 	local nTableWidth = tOptions.nWidth
 	local nTableMinWidth = tOptions.nMinWidth
@@ -906,8 +914,10 @@ function LIB.OutputTableTip(tOptions)
 		imgBg:SetSize(nTableWidth + 8, nTableHeight + 8)
 	end
 	if hTotal then
-		hTable:SetRelPos(4, 4)
-		hTotal:SetSize(nTableWidth + 8, nTableHeight + 8)
+		hTable:SetRelPos(nFramePaddingLeft, nFramePaddingTop)
+		hTotal:SetSize(
+			nTableWidth + nFramePaddingLeft + nFramePaddingRight,
+			nTableHeight + nFramePaddingTop + nFramePaddingBottom)
 		hTotal:FormatAllItemPos()
 	end
 	if frame then
@@ -915,7 +925,9 @@ function LIB.OutputTableTip(tOptions)
 			NSFormatString('{$NS}_OutputTableTip'),
 			function() return frame:IsValid() and frame:IsVisible() end,
 			function() Wnd.CloseWindow(frame) end)
-		frame:SetSize(nTableWidth + 8, nTableHeight + 8)
+		frame:SetSize(
+			nTableWidth + nFramePaddingLeft + nFramePaddingRight,
+			nTableHeight + nFramePaddingTop + nFramePaddingBottom)
 		AdjustFramePos(frame, Rect, tOptions.nPosType)
 	end
 end
