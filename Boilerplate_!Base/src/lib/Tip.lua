@@ -565,6 +565,13 @@ function LIB.OutputItemTip(Rect, dwItemID)
 end
 
 -- LIB.OutputTableTip({
+-- 	aRow = {
+-- 		DEFAULT = {
+-- 			nPaddingTop = 3,
+-- 			nPaddingBottom = 3,
+-- 		},
+-- 		{ nPaddingTop = 0 },
+-- },
 -- 	aColumn = {
 -- 		MERGE = {
 -- 			nPaddingLeft = 3,
@@ -586,6 +593,7 @@ end
 -- })
 -- 其中，nMinWidth、nMaxWidth 数值相同时可合并简写为 nWidth 。
 function LIB.OutputTableTip(tOptions)
+	local aRow = tOptions.aRow or {}
 	local aColumn = tOptions.aColumn or {}
 	local aDataSource = tOptions.aDataSource
 	local hTarget = tOptions.hTarget
@@ -681,6 +689,26 @@ function LIB.OutputTableTip(tOptions)
 		LIB.Debug(PACKET_INFO.NAME_SPACE, 'LIB.OutputTableTip summary of columns min width (including horizontal paddings) ' .. nTableColumnMinWidthSum
 			.. ' should be smaller than table max width ' .. nTableMaxWidth .. '.', DEBUG_LEVEL.WARNING)
 		return
+	end
+	-- 格式化行参数
+	for iRow = 0, #aDataSource do
+		if iRow == 0 then
+			iRow = 'DEFAULT'
+		end
+		local row = aRow[iRow]
+		if not row then
+			row = {}
+			aRow[iRow] = row
+		end
+		if iRow ~= 'DEFAULT' then
+			setmetatable(row, { __index = aRow['DEFAULT'] })
+		end
+		if not row.nPaddingTop then
+			row.nPaddingTop = 1
+		end
+		if not row.nPaddingBottom then
+			row.nPaddingBottom = 1
+		end
 	end
 	-- 开始创建
 	local INI_PATH = PACKET_INFO.FRAMEWORK_ROOT .. 'ui/OutputTableTip.ini'
@@ -829,6 +857,7 @@ function LIB.OutputTableTip(tOptions)
 	-- 应用各行高、计算表格总高度
 	local nTableHeight = 0
 	for iRow, aCol in ipairs(aDataSource) do
+		local tRow = aRow[iRow]
 		local hRow = hTable:Lookup(iRow - 1)
 		for iCol, szCol in ipairs(aCol) do
 			local tCol = aColumn[iCol]
@@ -838,13 +867,15 @@ function LIB.OutputTableTip(tOptions)
 			if not hCustom or hCustom:GetType() ~= 'Handle' then
 				hCustom = hCell
 			end
-			hCustom:SetH(aRowHeight[iRow])
 			hCell:SetH(aRowHeight[iRow])
+			hCell:SetRelY(tRow.nPaddingTop)
+			hCustom:SetH(aRowHeight[iRow])
 			hCol:SetH(aRowHeight[iRow])
+			hCol:FormatAllItemPos()
 		end
 		hRow:SetRelY(nTableHeight)
 		hRow:FormatAllItemPos()
-		nTableHeight = nTableHeight + aRowHeight[iRow]
+		nTableHeight = nTableHeight + aRowHeight[iRow] + tRow.nPaddingTop + tRow.nPaddingBottom
 	end
 	hTable:FormatAllItemPos()
 	hTable:SetSize(nTableWidth + 8, nTableHeight + 8)
