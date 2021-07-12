@@ -571,6 +571,7 @@ end
 -- 			nPaddingRight = 3,
 -- 		},
 -- 		{ nPaddingRight = 20, nMinWidth = 100 },
+-- 		{ szAlignment = 'RIGHT' },
 -- 	},
 -- 	aDataSource = {
 -- 		{'<text>text="1:"</text>', '<text>text="4561"</text>'},
@@ -805,11 +806,20 @@ function LIB.OutputTableTip(tOptions)
 			end
 			local nColumnWidth = bMergeColumnRow and nTableWidth or aColumnWidth[iCol]
 			local nCellWidth, nCellHeight = nColumnWidth - tCol.nPaddingLeft - tCol.nPaddingRight, nil
+			if tCol.szAlignment == 'CENTER' or tCol.szAlignment == 'RIGHT' then
+				nCellWidth = min(nCellWidth, hCustom:GetW())
+			end
 			hCol:SetRelX(nX)
 			hCol:SetW(nColumnWidth)
-			hCell:SetRelX(tCol.nPaddingLeft)
 			hCell:SetW(nCellWidth)
 			hCustom:SetW(nCellWidth)
+			if tCol.szAlignment == 'CENTER' then
+				hCell:SetRelX((nColumnWidth - nCellWidth) / 2)
+				hCustom:SetHAlign(1)
+			elseif tCol.szAlignment == 'RIGHT' then
+				hCell:SetRelX(nColumnWidth - tCol.nPaddingRight - nCellWidth)
+				hCustom:SetHAlign(2)
+			end
 			hCustom:FormatAllItemPos()
 			nCellHeight = select(2, hCustom:GetAllItemSize())
 			aRowHeight[iRow] = max(aRowHeight[iRow] or 0, nCellHeight)
