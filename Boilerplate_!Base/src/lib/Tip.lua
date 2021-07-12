@@ -566,18 +566,21 @@ end
 
 -- LIB.OutputTableTip({
 -- 	aRow = {
--- 		DEFAULT = {
+-- 		DEFAULT = { -- 通用行设置
 -- 			nPaddingTop = 3,
 -- 			nPaddingBottom = 3,
+-- 			szAlignment = 'MIDDLE', -- 'TOP', 'MIDDLE', 'BOTTOM'
 -- 		},
--- 		{ nPaddingTop = 0 },
+-- 		{ nPaddingTop = 0 }, -- 第一行
 -- },
 -- 	aColumn = {
--- 		MERGE = {
+-- 		MERGE = { -- 整行合并单元格
 -- 			nPaddingLeft = 3,
 -- 			nPaddingRight = 3,
+-- 			nMinWidth = 100,
+-- 			szAlignment = 'RIGHT' -- 'LEFT', 'CENTER', 'RIGHT'
 -- 		},
--- 		{ nPaddingRight = 20, nMinWidth = 100 },
+-- 		{ nPaddingRight = 20, nMinWidth = 100 }, -- 第一列
 -- 		{ szAlignment = 'RIGHT' },
 -- 	},
 -- 	aDataSource = {
@@ -821,6 +824,7 @@ function LIB.OutputTableTip(tOptions)
 	-- 应用各列宽、计算各行高
 	local aRowHeight = {}
 	for iRow, aCol in ipairs(aDataSource) do
+		local tRow = aRow[iRow]
 		local hRow = hTable:Lookup(iRow - 1)
 		local bMergeColumnRow = #aCol < nTableColumn
 		local nX = 0
@@ -850,7 +854,8 @@ function LIB.OutputTableTip(tOptions)
 			end
 			hCustom:FormatAllItemPos()
 			nCellHeight = select(2, hCustom:GetAllItemSize())
-			aRowHeight[iRow] = max(aRowHeight[iRow] or 0, nCellHeight)
+			hCustom:SetH(nCellHeight)
+			aRowHeight[iRow] = max(aRowHeight[iRow] or 0, nCellHeight + tRow.nPaddingTop + tRow.nPaddingBottom)
 			nX = nX + nColumnWidth
 		end
 	end
@@ -858,24 +863,35 @@ function LIB.OutputTableTip(tOptions)
 	local nTableHeight = 0
 	for iRow, aCol in ipairs(aDataSource) do
 		local tRow = aRow[iRow]
+		local nRowHeight = aRowHeight[iRow]
 		local hRow = hTable:Lookup(iRow - 1)
 		for iCol, szCol in ipairs(aCol) do
-			local tCol = aColumn[iCol]
 			local hCol = hRow:Lookup(iCol - 1)
 			local hCell = hCol:Lookup('Handle_Cell')
 			local hCustom = hCell:GetItemCount() == 1 and hCell:Lookup(0)
 			if not hCustom or hCustom:GetType() ~= 'Handle' then
 				hCustom = hCell
 			end
-			hCell:SetH(aRowHeight[iRow])
+			local nCellHeight = nRowHeight
+			if tRow.szAlignment == 'MIDDLE' or tRow.szAlignment == 'BOTTOM' then
+				nCellHeight = min(nCellHeight, hCustom:GetH())
+			end
+			hCell:SetH(nCellHeight)
 			hCell:SetRelY(tRow.nPaddingTop)
-			hCustom:SetH(aRowHeight[iRow])
-			hCol:SetH(aRowHeight[iRow])
+			hCustom:SetH(nCellHeight)
+			if tRow.szAlignment == 'MIDDLE' then
+				hCell:SetRelY((nRowHeight - nCellHeight) / 2)
+				hCustom:SetVAlign(1)
+			elseif tRow.szAlignment == 'BOTTOM' then
+				hCell:SetRelX(nRowHeight - tRow.nPaddingBottom - nCellHeight)
+				hCustom:SetVAlign(2)
+			end
+			hCol:SetH(nRowHeight)
 			hCol:FormatAllItemPos()
 		end
 		hRow:SetRelY(nTableHeight)
 		hRow:FormatAllItemPos()
-		nTableHeight = nTableHeight + aRowHeight[iRow] + tRow.nPaddingTop + tRow.nPaddingBottom
+		nTableHeight = nTableHeight + nRowHeight
 	end
 	hTable:FormatAllItemPos()
 	hTable:SetSize(nTableWidth + 8, nTableHeight + 8)
