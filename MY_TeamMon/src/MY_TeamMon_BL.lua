@@ -80,7 +80,9 @@ local O = LIB.CreateUserSettingsModule('MY_TeamMon_BL', _L['Raid'], {
 		xDefaultValue = 1,
 	},
 })
-local D = {}
+local D = {
+	fScale = 1,
+}
 
 -- FireUIEvent('MY_TM_BL_CREATE', 103, 1, { 255, 0, 0 })
 local function CreateBuffList(dwID, nLevel, col, tArgs, szSender, szReceiver)
@@ -131,19 +133,16 @@ function D.OnFrameCreate()
 	this:RegisterEvent('ON_ENTER_CUSTOM_UI_MODE')
 	this:RegisterEvent('ON_LEAVE_CUSTOM_UI_MODE')
 	this:RegisterEvent('MY_TM_BL_CREATE')
-	this:RegisterEvent('MY_TM_BL_RESIZE')
 	D.hItem = this:CreateItemData(BL_INIFILE, 'Handle_Item')
 	D.handle = this:Lookup('', '')
 	D.handle:Clear()
-	D.ReSize(O.fScale, O.nCount)
+	D.ReSize()
 	D.UpdateAnchor(this)
 end
 
 function D.OnEvent(szEvent)
 	if szEvent == 'MY_TM_BL_CREATE' then
 		CreateBuffList(arg0, arg1, arg2, arg3, arg4, arg5)
-	elseif szEvent == 'MY_TM_BL_RESIZE' then
-		D.ReSize(arg0, arg1)
 	elseif szEvent == 'UI_SCALED' then
 		D.UpdateAnchor(this)
 	elseif szEvent == 'ON_ENTER_CUSTOM_UI_MODE' or szEvent == 'ON_LEAVE_CUSTOM_UI_MODE' then
@@ -224,16 +223,14 @@ function D.OnFrameDragEnd()
 	O.tAnchor = GetFrameAnchor(this, 'TOPLEFT')
 end
 
-function D.ReSize(fScale, nCount)
-	if fScale then
-		local fNewScale = fScale / O.fScale
+function D.ReSize()
+	if D.fScale ~= O.fScale then
+		local fNewScale = O.fScale / D.fScale
 		this:Scale(fNewScale, fNewScale)
-		O.fScale = fScale
+		D.fScale = O.fScale
 	end
-	nCount = nCount or O.nCount
-	this:SetSize(nCount * 55 * O.fScale, 90 * O.fScale)
-	D.handle:SetSize(nCount * 55 * O.fScale, 90 * O.fScale)
-	O.nCount = nCount
+	this:SetSize(O.nCount * 55 * O.fScale, 90 * O.fScale)
+	D.handle:SetSize(O.nCount * 55 * O.fScale, 90 * O.fScale)
 	D.handle:FormatAllItemPos()
 end
 
@@ -273,6 +270,10 @@ local settings = {
 				'tAnchor',
 				'nCount',
 				'fScale',
+			},
+			triggers = {
+				nCount = D.ReSize,
+				fScale = D.ReSize,
 			},
 			root = O,
 		},

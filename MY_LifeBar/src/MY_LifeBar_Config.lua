@@ -732,14 +732,18 @@ local Config = O
 local ConfigLoaded = false
 
 function D.Init()
-	CONFIG_DEFAULTS.DEFAULT  = LoadDefaultTemplate('default')
-	CONFIG_DEFAULTS.OFFICIAL = LoadDefaultTemplate('official')
-	CONFIG_DEFAULTS.CLEAR    = LoadDefaultTemplate('clear')
-	CONFIG_DEFAULTS.XLIFEBAR = LoadDefaultTemplate('xlifebar')
-	if not CONFIG_DEFAULTS.DEFAULT or not CONFIG_DEFAULTS.OFFICIAL or not CONFIG_DEFAULTS.CLEAR or not CONFIG_DEFAULTS.XLIFEBAR then
-		return LIB.Debug(_L['MY_LifeBar'], _L['Default config cannot be loaded, please reinstall!!!'], DEBUG_LEVEL.ERROR)
+	for _, p in ipairs({
+		{ key = 'DEFAULT' , name = 'default'  },
+		{ key = 'OFFICIAL', name = 'official' },
+		{ key = 'CLEAR'   , name = 'clear'    },
+		{ key = 'XLIFEBAR', name = 'xlifebar' },
+	}) do
+		local config = LoadDefaultTemplate(p.name)
+		if not config then
+			LIB.Debug(_L['MY_LifeBar'], _L['Default config cannot be loaded, please reinstall!!!'] .. ' (' .. p.name .. ')', DEBUG_LEVEL.ERROR)
+		end
+		CONFIG_DEFAULTS[p.key] = config
 	end
-	FormatConfigData('DEFAULT', O)
 end
 
 -- 根据玩家自定义界面缩放设置反向缩放 实现默认设置不受用户缩放影响

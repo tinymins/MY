@@ -181,7 +181,7 @@ function PS.OnPanelActive(wnd)
 			local menu = {}
 			for k, v in ipairs({ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 }) do
 				insert(menu, { szOption = v, bMCheck = true, bChecked = MY_TeamMon_BL.nCount == v, fnAction = function()
-					FireUIEvent('MY_TM_BL_RESIZE', nil, v)
+					MY_TeamMon_BL.nCount = v
 				end })
 			end
 			return menu
@@ -193,7 +193,7 @@ function PS.OnPanelActive(wnd)
 			local menu = {}
 			for k, v in ipairs({ 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 100 }) do
 				insert(menu, { szOption = v, bMCheck = true, bChecked = MY_TeamMon_BL.fScale == v / 55, fnAction = function()
-					FireUIEvent('MY_TM_BL_RESIZE', v / 55)
+					MY_TeamMon_BL.fScale = v / 55
 				end })
 			end
 			return menu

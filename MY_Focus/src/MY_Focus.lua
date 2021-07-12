@@ -1106,39 +1106,7 @@ end
 do
 local function onInit()
 	D.bReady = true
-	-- 加载设置项数据
 	D.LoadConfig()
-	-- 密码生成
-	local k = char(80, 65, 83, 83, 80, 72, 82, 65, 83, 69)
-	if IsTable(D[k]) then
-		for i = 0, 50 do
-			for j, v in ipairs({ 23, 112, 234, 156 }) do
-				insert(D[k], (i * j * ((31 * v) % 256)) % 256)
-			end
-		end
-		D[k] = char(unpack(D[k]))
-	end
-	-- 用户自定义默认焦点
-	if not O.aPatternFocus then
-		O.aPatternFocus = {}
-	end
-	for i, v in ipairs(O.aPatternFocus) do
-		if IsString(v) then
-			v = { szPattern = v }
-		end
-		O.aPatternFocus[i] = D.FormatAutoFocusData(v)
-	end
-	O.aPatternFocus = O.aPatternFocus
-	-- 永久焦点
-	if not O.tStaticFocus then
-		O.tStaticFocus = {}
-	end
-	for _, dwType in ipairs({TARGET.PLAYER, TARGET.NPC, TARGET.DOODAD}) do
-		if not O.tStaticFocus[dwType] then
-			O.tStaticFocus[dwType] = {}
-		end
-	end
-	O.tStaticFocus = O.tStaticFocus
 	D.CheckFrameOpen()
 	D.RescanNearby()
 end

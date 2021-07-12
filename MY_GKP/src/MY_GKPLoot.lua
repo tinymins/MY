@@ -148,7 +148,7 @@ local O = LIB.CreateUserSettingsModule('MY_GKPLoot', _L['General'], {
 		ePathType = PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
 		xSchema = Schema.Boolean,
-		xDefaultValue = true,
+		xDefaultValue = false,
 	},
 	bNameFilter = {
 		ePathType = PATH_TYPE.ROLE,
@@ -228,9 +228,7 @@ local D = {
 }
 local ITEM_CONFIG = setmetatable({}, {
 	__index = function(_, k)
-		if k == 'tFilterQuality'
-			or k == 'bFilterGrayItem'
-			or k == 'bNameFilter'
+		if k == 'bFilterGrayItem'
 			or k == 'tNameFilter'
 			or k == 'bFilterBookRead'
 			or k == 'bFilterBookHave'
@@ -243,6 +241,31 @@ local ITEM_CONFIG = setmetatable({}, {
 			or k == 'tAutoPickupFilters'
 		then
 			return O[k]
+		end
+		if k == 'tFilterQuality'
+			or k == 'bNameFilter'
+		then
+			return D[k]
+		end
+	end,
+	__newindex = function(_, k, v)
+		if k == 'bFilterGrayItem'
+			or k == 'tNameFilter'
+			or k == 'bFilterBookRead'
+			or k == 'bFilterBookHave'
+			or k == 'bAutoPickupFilterBookRead'
+			or k == 'bAutoPickupFilterBookHave'
+			or k == 'bAutoPickupTaskItem'
+			or k == 'bAutoPickupBook'
+			or k == 'tAutoPickupQuality'
+			or k == 'tAutoPickupNames'
+			or k == 'tAutoPickupFilters'
+		then
+			O[k] = v
+		elseif k == 'tFilterQuality'
+			or k == 'bNameFilter'
+		then
+			D[k] = v
 		end
 	end,
 })
@@ -265,8 +288,8 @@ end)
 LIB.RegisterEvent('LOADING_END', 'MY_GKPLoot', function()
 	D.UpdateShielded()
 	D.aDoodadID = {}
-	O.tFilterQuality = {}
-	O.bNameFilter = false
+	ITEM_CONFIG.tFilterQuality = {}
+	ITEM_CONFIG.bNameFilter = false
 end)
 
 LIB.RegisterInit('MY_GKPLoot', function()
@@ -842,10 +865,9 @@ function D.GetFilterMenu()
 			szOption = p.szTitle,
 			rgb = { GetItemFontColorByQuality(p.nQuality) },
 			bCheck = true,
-			bChecked = O.tFilterQuality[p.nQuality],
+			bChecked = ITEM_CONFIG.tFilterQuality[p.nQuality],
 			fnAction = function()
-				O.tFilterQuality[p.nQuality] = not O.tFilterQuality[p.nQuality]
-				O.tFilterQuality = O.tFilterQuality
+				ITEM_CONFIG.tFilterQuality[p.nQuality] = not ITEM_CONFIG.tFilterQuality[p.nQuality]
 				D.ReloadFrame()
 			end,
 		})
@@ -860,9 +882,9 @@ function D.GetFilterMenu()
 		},
 		{
 			szOption = _L['Enable'],
-			bCheck = true, bChecked = O.bNameFilter,
+			bCheck = true, bChecked = ITEM_CONFIG.bNameFilter,
 			fnAction = function()
-				O.bNameFilter = not O.bNameFilter
+				ITEM_CONFIG.bNameFilter = not ITEM_CONFIG.bNameFilter
 				D.ReloadFrame()
 			end,
 		},
@@ -890,7 +912,7 @@ function D.GetFilterMenu()
 				UI.ClosePopupMenu()
 				D.ReloadFrame()
 			end,
-			fnDisable = function() return not O.bNameFilter end,
+			fnDisable = function() return not ITEM_CONFIG.bNameFilter end,
 		})
 	end
 	if not IsEmpty(O.tNameFilter) then
@@ -905,7 +927,7 @@ function D.GetFilterMenu()
 				D.ReloadFrame()
 			end, nil, nil, nil, '', nil)
 		end,
-		fnDisable = function() return not O.bNameFilter end,
+		fnDisable = function() return not ITEM_CONFIG.bNameFilter end,
 	})
 	insert(t, t1)
 	return t
