@@ -62,7 +62,7 @@ end
 
 local GetConfigValue, GetConfigComputeValue
 do
-local cfg, value
+local cfg, value, bInDungeon
 function GetConfigValue(key, relation, force)
 	cfg, value = Config[key][relation], nil
 	if force == 'Npc' or force == 'Player' then
@@ -79,14 +79,26 @@ function GetConfigValue(key, relation, force)
 end
 function GetConfigComputeValue(key, relation, force, bFight, bPet)
 	cfg = GetConfigValue(key, relation, force)
-	if cfg and cfg.bEnable
-	and (not cfg.bOnlyFighting or bFight)
-	and (not cfg.bHidePets or not bPet) then
-		return true
-	else
+	if not cfg then
 		return false
 	end
+	if not cfg.bEnable then
+		return false
+	end
+	if cfg.bOnlyFighting and not bFight then
+		return false
+	end
+	if cfg.bHidePets and bPet then
+		return false
+	end
+	if cfg.bHideInDungeon and bInDungeon then
+		return false
+	end
+	return true
 end
+LIB.RegisterEvent('LOADING_ENDING', 'MY_LifeBar__GetConfigComputeValue', function()
+	bInDungeon = LIB.IsInDungeon()
+end)
 end
 -----------------------------------------------------------------------------------------
 

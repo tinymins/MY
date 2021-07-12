@@ -487,6 +487,7 @@ local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		xSchema = SchemaRelationForce(Schema.Record({
 			bEnable = Schema.Boolean,
 			bOnlyFighting = Schema.Boolean,
+			bHideInDungeon = Schema.Optional(Schema.Boolean),
 			bHidePets = Schema.Optional(Schema.Boolean),
 		})),
 		xDefaultValue = {
@@ -519,6 +520,7 @@ local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		xSchema = SchemaRelationForce(Schema.Record({
 			bEnable = Schema.Boolean,
 			bOnlyFighting = Schema.Boolean,
+			bHideInDungeon = Schema.Optional(Schema.Boolean),
 			bHidePets = Schema.Optional(Schema.Boolean),
 		})),
 		xDefaultValue = {
@@ -539,6 +541,7 @@ local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		xSchema = SchemaRelationForce(Schema.Record({
 			bEnable = Schema.Boolean,
 			bOnlyFighting = Schema.Boolean,
+			bHideInDungeon = Schema.Optional(Schema.Boolean),
 			bHidePets = Schema.Optional(Schema.Boolean),
 		})),
 		xDefaultValue = {
@@ -571,6 +574,7 @@ local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		xSchema = SchemaRelationForce(Schema.Record({
 			bEnable = Schema.Boolean,
 			bOnlyFighting = Schema.Boolean,
+			bHideInDungeon = Schema.Optional(Schema.Boolean),
 			bHidePets = Schema.Optional(Schema.Boolean),
 		})),
 		xDefaultValue = {
@@ -603,6 +607,7 @@ local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		xSchema = SchemaRelationForce(Schema.Record({
 			bEnable = Schema.Boolean,
 			bOnlyFighting = Schema.Boolean,
+			bHideInDungeon = Schema.Optional(Schema.Boolean),
 			bHidePets = Schema.Optional(Schema.Boolean),
 		})),
 		xDefaultValue = {

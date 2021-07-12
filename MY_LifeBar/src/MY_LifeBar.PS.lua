@@ -543,6 +543,15 @@ function PS.OnPanelActive(wnd)
 								Config[szKey] = tRelationCfg
 							end,
 						},
+						{
+							szOption = _L['Hide in dungeon'],
+							bCheck = true,
+							bChecked = cfg.Player.bHideInDungeon,
+							fnAction = function()
+								cfg.Player.bHideInDungeon = not cfg.Player.bHideInDungeon
+								Config[szKey] = tRelationCfg
+							end,
+						},
 					})
 				end
 			end
@@ -570,6 +579,15 @@ function PS.OnPanelActive(wnd)
 							bChecked = cfg.Npc.bOnlyFighting,
 							fnAction = function()
 								cfg.Npc.bOnlyFighting = not cfg.Npc.bOnlyFighting
+								Config[szKey] = tRelationCfg
+							end,
+						},
+						{
+							szOption = _L['Hide in dungeon'],
+							bCheck = true,
+							bChecked = cfg.Npc.bHideInDungeon,
+							fnAction = function()
+								cfg.Npc.bHideInDungeon = not cfg.Npc.bHideInDungeon
 								Config[szKey] = tRelationCfg
 							end,
 						},
