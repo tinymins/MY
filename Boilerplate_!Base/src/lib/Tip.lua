@@ -851,6 +851,9 @@ function LIB.OutputTableTip(tOptions)
 			elseif tCol.szAlignment == 'RIGHT' then
 				hCell:SetRelX(nColumnWidth - tCol.nPaddingRight - nCellWidth)
 				hCustom:SetHAlign(2)
+			else
+				hCell:SetRelX(0)
+				hCustom:SetHAlign(0)
 			end
 			hCustom:FormatAllItemPos()
 			nCellHeight = select(2, hCustom:GetAllItemSize())
@@ -883,8 +886,11 @@ function LIB.OutputTableTip(tOptions)
 				hCell:SetRelY((nRowHeight - nCellHeight) / 2)
 				hCustom:SetVAlign(1)
 			elseif tRow.szAlignment == 'BOTTOM' then
-				hCell:SetRelX(nRowHeight - tRow.nPaddingBottom - nCellHeight)
+				hCell:SetRelY(nRowHeight - tRow.nPaddingBottom - nCellHeight)
 				hCustom:SetVAlign(2)
+			else
+				hCell:SetRelY(0)
+				hCustom:SetVAlign(0)
 			end
 			hCol:SetH(nRowHeight)
 			hCol:FormatAllItemPos()
