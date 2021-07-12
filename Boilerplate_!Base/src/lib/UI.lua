@@ -3475,7 +3475,7 @@ function OO:ItemInfo(...)
 				end
 				local res, err, trace = XpCall(UpdataItemInfoBoxObject, raw, unpack(data)) -- 防止itemtab不一样
 				if not res then
-					FireUIEvent('CALL_LUA_ERROR', err .. NSFormatString('\n{$NS}#UI:ItemInfo\n') .. trace .. '\n')
+					LIB.ErrorLog(err, NSFormatString('{$NS}#UI:ItemInfo'), trace)
 				end
 			end
 		end
@@ -3494,7 +3494,7 @@ function OO:BoxInfo(nType, ...)
 			else
 				local res, err, trace = XpCall(UpdateBoxObject, raw, nType, ...) -- 防止itemtab内外网不一样
 				if not res then
-					FireUIEvent('CALL_LUA_ERROR', err .. NSFormatString('\n{$NS}#UI:BoxInfo\n') .. trace .. '\n')
+					LIB.ErrorLog(err, NSFormatString('{$NS}#UI:BoxInfo'), trace)
 				end
 			end
 		end
@@ -4581,7 +4581,7 @@ function UI.CreateFrame(szName, opt)
 				if frm.OnDragResize then
 					local res, err, trace = XpCall(frm.OnDragResize, frm:Lookup('Wnd_Total'))
 					if not res then
-						FireUIEvent('CALL_LUA_ERROR', err .. NSFormatString('\n{$NS}#OnDragResize\n') .. trace .. '\n')
+						LIB.ErrorLog(err, NSFormatString('{$NS}#UI:CreateFrame#OnDragResize'), trace)
 					end
 				end
 			end

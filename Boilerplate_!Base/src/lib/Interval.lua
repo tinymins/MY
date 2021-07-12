@@ -144,7 +144,7 @@ local function onDelayCall()
 		if dc.nNext <= _time then
 			local res, err, trace = XpCall(dc.fnAction, dc.oArg)
 			if not res then
-				FireUIEvent('CALL_LUA_ERROR', err .. '\nonDelayCall: ' .. szKey .. '\n' .. trace .. '\n')
+				LIB.ErrorLog(err, 'onDelayCall: ' .. szKey, trace)
 			end
 			_count = _count - 1
 			_delaycall_t = _tDelayCall[szKey]
@@ -245,7 +245,7 @@ local function onBreatheCall()
 			bc.nNext = _time + bc.nInterval
 			local res, err, trace = XpCall(bc.fnAction, bc.oArg)
 			if not res then
-				FireUIEvent('CALL_LUA_ERROR', err .. '\nonBreatheCall: ' .. szKey .. '\n' .. trace .. '\n')
+				LIB.ErrorLog(err, 'onBreatheCall: ' .. szKey, trace)
 			elseif err == 0 then
 				_count = _count - 1
 				_breathecall_t = _tBreatheCall[szKey]
@@ -350,7 +350,7 @@ local function onFrameCall()
 			fc.nNext = _framecount + fc.nInterval
 			local res, err, trace = XpCall(fc.fnAction, fc.oArg)
 			if not res then
-				FireUIEvent('CALL_LUA_ERROR', err .. '\nonFrameCall: ' .. szKey .. '\n' .. trace .. '\n')
+				LIB.ErrorLog(err, 'onFrameCall: ' .. szKey, trace)
 			elseif err == 0 then
 				_count = _count - 1
 				_framecall_t = _tFrameCall[szKey]
@@ -456,7 +456,7 @@ local function onRenderCall()
 			rc.nNext = _time + rc.nInterval
 			local res, err, trace = XpCall(rc.fnAction, rc.oArg)
 			if not res then
-				FireUIEvent('CALL_LUA_ERROR', err .. '\nonRenderCall: ' .. szKey .. '\n' .. trace .. '\n')
+				LIB.ErrorLog(err, 'onRenderCall: ' .. szKey, trace)
 			elseif err == 0 then
 				_rendercall_c = _rendercall_c - 1
 				_rendercall_t = _tRenderCall[szKey]
@@ -612,7 +612,7 @@ LIB.BreatheCall(NSFormatString('{$NS}#Debounce'), function()
 		if nTime >= d.nNext then
 			local res, err, trace = XpCall(d.fnAction, d.oArg)
 			if not res then
-				FireUIEvent('CALL_LUA_ERROR', err .. '\nonDebounce: ' .. szKey .. '\n' .. trace .. '\n')
+				LIB.ErrorLog(err, 'onDebounce: ' .. szKey, trace)
 			end
 			_tDebounce[szKey] = nil
 		end
@@ -657,7 +657,7 @@ function LIB.Throttle(szKey, nTime, fnAction, oArg)
 			}
 			local res, err, trace = XpCall(fnAction, oArg)
 			if not res then
-				FireUIEvent('CALL_LUA_ERROR', err .. '\nonThrottle: ' .. szKey .. '\n' .. trace .. '\n')
+				LIB.ErrorLog(err, 'onThrottle: ' .. szKey, trace)
 			end
 		end
 	elseif nTime then -- modify
