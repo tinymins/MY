@@ -563,7 +563,7 @@ function D.UpdateItems(page)
 	end
 	local sqlfrom = [[
 		(
-			SELECT B.ownerkey, B.boxtype, B.boxindex, B.tabtype, B.tabindex, B.tabsubindex, B.bagcount, B.bankcount, B.time
+			SELECT B.ownerkey, B.boxtype, B.boxindex, B.tabtype, B.tabindex, B.tabsubindex, B.strength, B.desc as itemtip, B.bagcount, B.bankcount, B.time
 				FROM BagItems
 				AS B
 			LEFT JOIN ItemInfo
@@ -585,6 +585,8 @@ function D.UpdateItems(page)
 			C.tabtype AS tabtype,
 			C.tabindex AS tabindex,
 			C.tabsubindex AS tabsubindex,
+			C.strength AS strength,
+			C.itemtip AS itemtip,
 			SUM(C.bagcount) AS bagcount,
 			SUM(C.bankcount) AS bankcount,
 			C.time AS time,
@@ -678,6 +680,7 @@ function D.UpdateItems(page)
 	for _, rec in ipairs(result) do
 		local KItemInfo = GetItemInfo(rec.tabtype, rec.tabindex)
 		if KItemInfo then
+			local bMaxStrength = KItemInfo.nMaxStrengthLevel > 0 and rec.strength == KItemInfo.nMaxStrengthLevel
 			if O.bCompactMode then
 				local hItem = handle:AppendItemFromIni(SZ_INI, 'Handle_ItemCompact')
 				local box = hItem:Lookup('Box_ItemCompact')
@@ -690,12 +693,14 @@ function D.UpdateItems(page)
 					count = count + rec.bankcount + rec.bagcount
 				end
 				UI.UpdateItemInfoBoxObject(box, nil, rec.tabtype, rec.tabindex, count, rec.tabsubindex)
+				UpdateItemBoxExtend(box, KItemInfo.nGenre, KItemInfo.nQuality, bMaxStrength)
 				box.itemdata = rec
 				box.belongsdata = result
 			else
 				local hItem = handle:AppendItemFromIni(SZ_INI, 'Handle_Item')
 				UI.UpdateItemInfoBoxObject(hItem:Lookup('Box_Item'), nil, rec.tabtype, rec.tabindex, 1, rec.tabsubindex)
 				UI.UpdateItemInfoBoxObject(hItem:Lookup('Handle_ItemInfo/Text_ItemName'), nil, rec.tabtype, rec.tabindex, 1, rec.tabsubindex)
+				UpdateItemBoxExtend(hItem:Lookup('Box_Item'), KItemInfo.nGenre, KItemInfo.nQuality, bMaxStrength)
 				hItem:Lookup('Text_ItemStatistics'):SprintfText(_L['Bankx%d Bagx%d Totalx%d'], rec.bankcount, rec.bagcount, rec.bankcount + rec.bagcount)
 				if KItemInfo.nGenre == ITEM_GENRE.TASK_ITEM then
 					hItem:Lookup('Handle_ItemInfo/Text_ItemDesc'):SetText(g_tStrings.STR_ITEM_H_QUEST_ITEM)
@@ -856,6 +861,7 @@ function D.OnLButtonClick()
 		UI.PopupMenu({
 			{
 				szOption = _L['Switch compact mode'],
+				bCheck = true, bChecked = MY_RoleStatistics_BagStat.bCompactMode,
 				fnAction = function ()
 					MY_RoleStatistics_BagStat.bCompactMode = not MY_RoleStatistics_BagStat.bCompactMode
 					UI.ClosePopupMenu()
@@ -863,6 +869,7 @@ function D.OnLButtonClick()
 			},
 			{
 				szOption = _L['Hide equipped item'],
+				bCheck = true, bChecked = MY_RoleStatistics_BagStat.bHideEquipped,
 				fnAction = function ()
 					MY_RoleStatistics_BagStat.bHideEquipped = not MY_RoleStatistics_BagStat.bHideEquipped
 					UI.ClosePopupMenu()
@@ -896,27 +903,35 @@ function D.OnItemMouseEnter()
 		local w, h = this:GetSize()
 
 		local rec = this.itemdata
-		local szTip = GetItemInfoTip(nil, rec.tabtype, rec.tabindex, nil, nil, rec.tabsubindex)
+		local aXml = {}
+
+		if IsEmpty(rec.itemtip) then
+			insert(aXml, GetItemInfoTip(nil, rec.tabtype, rec.tabindex, nil, nil, rec.tabsubindex) or '')
+		else
+			insert(aXml, UTF8ToAnsi(rec.itemtip) or '')
+		end
 
 		if IsCtrlKeyDown() then
-			szTip = szTip .. CONSTANT.XML_LINE_BREAKER
-			szTip = szTip .. GetFormatText('ItemInfo: ' .. rec.tabtype .. ', ' .. rec.tabindex, 102)
+			insert(aXml, CONSTANT.XML_LINE_BREAKER)
+			insert(aXml, GetFormatText('ItemInfo: ' .. rec.tabtype .. ', ' .. rec.tabindex, 102))
 			if rec.tabsubindex ~= -1 then
-				szTip = szTip .. GetFormatText('ItemInfo: ' .. rec.tabsubindex, 102)
+				insert(aXml, GetFormatText('ItemInfo: ' .. rec.tabsubindex, 102))
 			end
-			szTip = szTip .. CONSTANT.XML_LINE_BREAKER
-			szTip = szTip .. GetFormatText('Box: ' .. rec.boxtype .. ', ' .. rec.boxindex, 102)
-			szTip = szTip .. CONSTANT.XML_LINE_BREAKER
-			szTip = szTip .. CONSTANT.XML_LINE_BREAKER
+			insert(aXml, CONSTANT.XML_LINE_BREAKER)
+			insert(aXml, GetFormatText('Box: ' .. rec.boxtype .. ', ' .. rec.boxindex, 102))
+			insert(aXml, CONSTANT.XML_LINE_BREAKER)
+			insert(aXml, GetFormatText('Strength: ' .. rec.strength, 102))
+			insert(aXml, CONSTANT.XML_LINE_BREAKER)
+			insert(aXml, CONSTANT.XML_LINE_BREAKER)
 		end
 
-		local aTip = {}
+		local aBelongsTip = {}
 		for _, rec in ipairs(this.belongsdata) do
-			insert(aTip, _L('%s (%s)\tBankx%d Bagx%d Totalx%d\n', UTF8ToAnsi(rec.ownername), UTF8ToAnsi(rec.servername), rec.bankcount, rec.bagcount, rec.bankcount + rec.bagcount))
+			insert(aBelongsTip, _L('%s (%s)\tBankx%d Bagx%d Totalx%d\n', UTF8ToAnsi(rec.ownername), UTF8ToAnsi(rec.servername), rec.bankcount, rec.bagcount, rec.bankcount + rec.bagcount))
 		end
-		szTip = szTip .. GetFormatText(concat(aTip))
+		insert(aXml, GetFormatText(concat(aBelongsTip)))
 
-		OutputTip(szTip, 400, {x, y, w, h, false}, nil, false)
+		OutputTip(concat(aXml), 400, {x, y, w, h, false}, nil, false)
 	end
 end
 D.OnItemRefreshTip = D.OnItemMouseEnter
