@@ -814,7 +814,7 @@ function D.FlushDB()
 
 	--[[#DEBUG BEGIN]]
 	nTickCount = GetTickCount() - nTickCount
-	LIB.Debug('MY_RoleStatistics_TaskStat', _L('Flushing to database cost %dms...', nTickCount), DEBUG_LEVEL.LOG)
+	LIB.Debug('MY_RoleStatistics_TaskStat', _L('Flushing to database costs %dms...', nTickCount), DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 end
 LIB.RegisterFlush('MY_RoleStatistics_TaskStat', D.FlushDB)
