@@ -380,7 +380,7 @@ end
 LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_ChatSwitch__AutoSwitchBattlefieldChannel', function()
 	D.aWhisper = O.aWhisper
 	D.tChannelCount = O.tChannelCount
-	D.Apply()
+	D.ApplyBattlefieldChannelSwitch()
 end)
 
 LIB.RegisterUserSettingsUpdate('@@UNINIT@@', 'MY_ChatSwitch__AutoSwitchBattlefieldChannel', function()
@@ -650,7 +650,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
 		checked = O.bAutoSwitchBfChannel,
 		oncheck = function(bChecked)
 			O.bAutoSwitchBfChannel = bChecked
-			D.Apply()
+			D.ApplyBattlefieldChannelSwitch()
 		end,
 	})
 	y = y + lineHeight
