@@ -808,6 +808,7 @@ end
 do
 local COROUTINE_TIME = 1000 * 0.5 / GLOBAL.GAME_FPS -- 一次 Breathe 时最大允许执行协程时间
 local COROUTINE_LIST = {}
+local yield = coroutine and coroutine.yield or function() end
 function LIB.RegisterCoroutine(szKey, fnAction, fnCallback)
 	if IsTable(szKey) then
 		for _, szKey in ipairs(szKey) do
@@ -818,6 +819,9 @@ function LIB.RegisterCoroutine(szKey, fnAction, fnCallback)
 		szKey, fnAction = nil, szKey
 	end
 	if IsFunction(fnAction) then
+		local function fnActionWrapper()
+			fnAction(yield)
+		end
 		if not IsString(szKey) then
 			szKey = GetTickCount() * 1000
 			while COROUTINE_LIST[tostring(szKey)] do
@@ -826,12 +830,12 @@ function LIB.RegisterCoroutine(szKey, fnAction, fnCallback)
 			szKey = tostring(szKey)
 		end
 		if not coroutine then
-			Call(fnAction)
+			Call(fnActionWrapper)
 			if fnCallback then
 				Call(fnCallback)
 			end
 		else
-			COROUTINE_LIST[szKey] = { szID = szKey, coAction = coroutine.create(fnAction), fnCallback = fnCallback }
+			COROUTINE_LIST[szKey] = { szID = szKey, coAction = coroutine.create(fnActionWrapper), fnCallback = fnCallback }
 		end
 	elseif fnAction == false then
 		COROUTINE_LIST[szKey] = nil
