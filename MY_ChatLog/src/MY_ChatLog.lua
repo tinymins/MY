@@ -208,7 +208,7 @@ function D.ImportDB(szPath)
 		-- 老版分表机制
 		local dwGlobalID = Get(odb:Execute('SELECT * FROM ChatLogInfo WHERE key = "userguid"'), {1, 'value'})
 		if dwGlobalID == GetClientPlayer().GetGlobalID() then
-			for _, info in ipairs(odb:Execute('SELECT * FROM ChatLogIndex ORDER BY stime ASC') or CONSTANT.EMPTY_TABLE) do
+			for _, info in ipairs(odb:Execute('SELECT * FROM ChatLogIndex WHERE name IS NOT NULL ORDER BY stime ASC') or CONSTANT.EMPTY_TABLE) do
 				if info.etime == -1 then
 					info.etime = 0
 				end
@@ -216,7 +216,7 @@ function D.ImportDB(szPath)
 				db:SetMinTime(info.stime)
 				db:SetMaxTime(info.etime)
 				db:SetInfo('user_global_id', dwGlobalID)
-				for _, p in ipairs(odb:Execute('SELECT * FROM ' .. info.name .. ' ORDER BY time ASC') or CONSTANT.EMPTY_TABLE) do
+				for _, p in ipairs(odb:Execute('SELECT * FROM ' .. info.name .. ' WHERE talker IS NOT NULL ORDER BY time ASC') or CONSTANT.EMPTY_TABLE) do
 					nImportCount = nImportCount + 1
 					db:InsertMsg(p.channel, p.text, p.msg, p.talker, p.time, p.hash)
 				end
@@ -230,7 +230,7 @@ function D.ImportDB(szPath)
 			local nCount = Get(odb:Execute('SELECT COUNT(*) AS nCount FROM ChatLog'), {1, 'nCount'}, 0)
 			if nCount > 0 then
 				local szRoot, nOffset, nLimit, szNewPath, dbNew = D.GetRoot(), 0, 20000
-				local stmt, aRes = odb:Prepare('SELECT * FROM ChatLog ORDER BY time ASC LIMIT ' .. nLimit .. ' OFFSET ?')
+				local stmt, aRes = odb:Prepare('SELECT * FROM ChatLog WHERE talker IS NOT NULL ORDER BY time ASC LIMIT ' .. nLimit .. ' OFFSET ?')
 				while nOffset < nCount do
 					stmt:ClearBindings()
 					stmt:BindAll(nOffset)

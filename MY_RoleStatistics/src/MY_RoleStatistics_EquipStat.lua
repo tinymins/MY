@@ -57,7 +57,7 @@ end
 
 CPath.MakeDir(LIB.FormatPath({'userdata/role_statistics', PATH_TYPE.GLOBAL}))
 
-local DB = LIB.SQLiteConnect(_L['MY_RoleStatistics_EquipStat'], {'userdata/role_statistics/equip_stat.v2.db', PATH_TYPE.GLOBAL})
+local DB = LIB.SQLiteConnect(_L['MY_RoleStatistics_EquipStat'], {'userdata/role_statistics/equip_stat.v3.db', PATH_TYPE.GLOBAL})
 if not DB then
 	return LIB.Sysmsg(_L['MY_RoleStatistics_EquipStat'], _L['Cannot connect to database!!!'], CONSTANT.MSG_THEME.ERROR)
 end
@@ -65,32 +65,32 @@ local SZ_INI = PACKET_INFO.ROOT .. 'MY_RoleStatistics/ui/MY_RoleStatistics_Equip
 
 DB:Execute([[
 	CREATE TABLE IF NOT EXISTS EquipItems (
-		ownerkey NVARCHAR(20),
-		suitindex INTEGER,
-		boxtype INTEGER,
-		boxindex INTEGER,
-		itemid INTEGER,
-		tabtype INTEGER,
-		tabindex INTEGER,
-		tabsubindex INTEGER,
-		stacknum INTEGER,
-		uiid INTEGER,
-		strength INTEGER,
-		durability INTEGER,
-		diamond_enchant NVARCHAR(100),
-		fea_enchant INTEGER,
-		permanent_enchant INTEGER,
-		desc NVARCHAR(4000),
-		extra NVARCHAR(4000),
-		time INTEGER,
+		ownerkey NVARCHAR(20) NOT NULL,
+		suitindex INTEGER NOT NULL,
+		boxtype INTEGER NOT NULL,
+		boxindex INTEGER NOT NULL,
+		itemid INTEGER NOT NULL,
+		tabtype INTEGER NOT NULL,
+		tabindex INTEGER NOT NULL,
+		tabsubindex INTEGER NOT NULL,
+		stacknum INTEGER NOT NULL,
+		uiid INTEGER NOT NULL,
+		strength INTEGER NOT NULL,
+		durability INTEGER NOT NULL,
+		diamond_enchant NVARCHAR(100) NOT NULL,
+		fea_enchant INTEGER NOT NULL,
+		permanent_enchant INTEGER NOT NULL,
+		desc NVARCHAR(4000) NOT NULL,
+		time INTEGER NOT NULL,
+		extra TEXT NOT NULL,
 		PRIMARY KEY(ownerkey, boxtype, boxindex)
 	)
 ]])
 DB:Execute('CREATE INDEX IF NOT EXISTS EquipItems_tab_idx ON EquipItems(tabtype, tabindex, tabsubindex)')
 local DB_ItemsW = DB:Prepare([[
 	REPLACE INTO
-	EquipItems (ownerkey, suitindex, boxtype, boxindex, itemid, tabtype, tabindex, tabsubindex, stacknum, uiid, strength, durability, diamond_enchant, fea_enchant, permanent_enchant, desc, extra, time)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	EquipItems (ownerkey, suitindex, boxtype, boxindex, itemid, tabtype, tabindex, tabsubindex, stacknum, uiid, strength, durability, diamond_enchant, fea_enchant, permanent_enchant, desc, extra, time, extra)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ]])
 local DB_ItemsR = DB:Prepare('SELECT * FROM EquipItems WHERE ownerkey = ? and suitindex = ?')
 local DB_ItemsDL = DB:Prepare('DELETE FROM EquipItems WHERE ownerkey = ? AND boxtype = ? AND boxindex >= ?')
@@ -98,24 +98,25 @@ local DB_ItemsDA = DB:Prepare('DELETE FROM EquipItems WHERE ownerkey = ?')
 
 DB:Execute([[
 	CREATE TABLE IF NOT EXISTS OwnerInfo (
-		ownerkey NVARCHAR(20),
-		ownername NVARCHAR(20),
-		servername NVARCHAR(20),
-		ownerforce INTEGER,
-		ownerrole INTEGER,
-		ownerlevel INTEGER,
-		ownerscore INTEGER,
-		ownersuitindex INTEGER,
-		ownerextra NVARCHAR(4000),
-		time INTEGER,
+		ownerkey NVARCHAR(20) NOT NULL,
+		ownername NVARCHAR(20) NOT NULL,
+		servername NVARCHAR(20) NOT NULL,
+		ownerforce INTEGER NOT NULL,
+		ownerrole INTEGER NOT NULL,
+		ownerlevel INTEGER NOT NULL,
+		ownerscore NVARCHAR(100) NOT NULL,
+		ownersuitindex INTEGER NOT NULL,
+		time INTEGER NOT NULL,
+		extra TEXT NOT NULL,
 		PRIMARY KEY(ownerkey)
 	)
 ]])
 DB:Execute('CREATE INDEX IF NOT EXISTS OwnerInfo_ownername_idx ON OwnerInfo(ownername)')
 DB:Execute('CREATE INDEX IF NOT EXISTS OwnerInfo_servername_idx ON OwnerInfo(servername)')
-local DB_OwnerInfoW = DB:Prepare('REPLACE INTO OwnerInfo (ownerkey, ownername, servername, ownerforce, ownerrole, ownerlevel, ownerscore, ownersuitindex, ownerextra, time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+local DB_OwnerInfoW = DB:Prepare('REPLACE INTO OwnerInfo (ownerkey, ownername, servername, ownerforce, ownerrole, ownerlevel, ownerscore, ownersuitindex, time, extra) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
 local DB_OwnerInfoR = DB:Prepare('SELECT * FROM OwnerInfo WHERE ownername LIKE ? OR servername LIKE ? ORDER BY time DESC')
 local DB_OwnerInfoD = DB:Prepare('DELETE FROM OwnerInfo WHERE ownerkey = ?')
+
 local EQUIPMENT_ITEM_LIST = {
 	{
 		label = g_tStrings.tEquipTypeNameTable[CONSTANT.EQUIPMENT_SUB.HELM or 'NULL'],
@@ -278,6 +279,78 @@ function D.FormatEnchantAttribText(v)
 	end
 end
 
+function D.Migration()
+	local DB_V2_PATH = LIB.FormatPath({'userdata/role_statistics/equip_stat.v2.db', PATH_TYPE.GLOBAL})
+	if not IsLocalFileExist(DB_V2_PATH) then
+		return
+	end
+	LIB.Confirm(
+		_L['Ancient database detected, do you want to migrate data from it?'],
+		function()
+			-- ×ªÒÆV2¾É°æÊý¾Ý
+			if IsLocalFileExist(DB_V2_PATH) then
+				local DB_V2 = SQLite3_Open(DB_V2_PATH)
+				if DB_V2 then
+					DB:Execute('BEGIN TRANSACTION')
+					local aEquipItems = DB_V2:Execute('SELECT * FROM EquipItems WHERE ownerkey IS NOT NULL AND suitindex IS NOT NULL AND boxtype IS NOT NULL')
+					if aEquipItems then
+						for _, rec in ipairs(aEquipItems) do
+							DB_ItemsW:ClearBindings()
+							DB_ItemsW:BindAll(
+								rec.ownerkey,
+								rec.suitindex,
+								rec.boxtype,
+								rec.boxindex,
+								rec.itemid,
+								rec.tabtype,
+								rec.tabindex,
+								rec.tabsubindex,
+								rec.stacknum,
+								rec.uiid,
+								rec.strength,
+								rec.durability,
+								rec.diamond_enchant,
+								rec.fea_enchant,
+								rec.permanent_enchant,
+								rec.desc,
+								rec.extra,
+								rec.time,
+								''
+							)
+							DB_ItemsW:Execute()
+						end
+						DB_ItemsW:Reset()
+					end
+					local aOwnerInfo = DB_V2:Execute('SELECT * FROM OwnerInfo WHERE ownerkey IS NOT NULL AND ownername IS NOT NULL AND servername IS NOT NULL')
+					if aOwnerInfo then
+						for _, rec in ipairs(aOwnerInfo) do
+							DB_OwnerInfoW:ClearBindings()
+							DB_OwnerInfoW:BindAll(
+								rec.ownerkey,
+								rec.ownername,
+								rec.servername,
+								rec.ownerforce,
+								rec.ownerrole,
+								rec.ownerlevel,
+								'',
+								rec.ownersuitindex,
+								rec.time,
+								''
+							)
+							DB_OwnerInfoW:Execute()
+						end
+						DB_OwnerInfoW:Reset()
+					end
+					DB:Execute('END TRANSACTION')
+					DB_V2:Release()
+				end
+				CPath.Move(DB_V2_PATH, DB_V2_PATH .. '.bak' .. LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
+			end
+			FireUIEvent('MY_ROLE_STAT_EQUIP_UPDATE')
+			LIB.Alert(_L['Migrate succeed!'])
+		end)
+end
+
 function D.FlushDB()
 	if not O.bSaveDB then
 		return
@@ -333,7 +406,7 @@ function D.FlushDB()
 			DB_ItemsW:BindAll(
 				ownerkey, suitindex, boxtype, boxindex, itemid,
 				tabtype, tabindex, tabsubindex, stacknum, uiid,
-				strength, durability, diamond_enchant, fea_enchant, permanent_enchant, desc, extra, time)
+				strength, durability, diamond_enchant, fea_enchant, permanent_enchant, desc, extra, time, '')
 			DB_ItemsW:Execute()
 		end
 		DB_ItemsDL:ClearBindings()
@@ -364,7 +437,7 @@ function D.FlushDB()
 	}))
 
 	DB_OwnerInfoW:ClearBindings()
-	DB_OwnerInfoW:BindAll(ownerkey, ownername, servername, ownerforce, ownerrole, ownerlevel, ownerscore, ownersuitindex, ownerextra, time)
+	DB_OwnerInfoW:BindAll(ownerkey, ownername, servername, ownerforce, ownerrole, ownerlevel, ownerscore, ownersuitindex, time, ownerextra)
 	DB_OwnerInfoW:Execute()
 	DB_OwnerInfoW:Reset()
 
@@ -422,7 +495,7 @@ function D.UpdateNames(page)
 				rec[k] = UTF8ToAnsi(v)
 			end
 		end
-		rec.ownerextra = LIB.JsonDecode(rec.ownerextra or '') or {}
+		rec.ownerextra = LIB.JsonDecode(rec.extra or '') or {}
 	end
 	if result[1] and not lodash.some(result, function(r) return r.ownerkey == D.szCurrentOwnerKey end) then
 		D.szCurrentOwnerKey = result[1].ownerkey
@@ -680,6 +753,7 @@ function D.OnInitPage()
 end
 
 function D.OnActivePage()
+	D.Migration()
 	if not O.bAdviceSaveDB and not O.bSaveDB then
 		LIB.Confirm(_L('%s stat has not been enabled, this character\'s data will not be saved, are you willing to save this character?\nYou can change this config by click option button on the top-right conner.', _L[MODULE_NAME]), function()
 			MY_RoleStatistics_EquipStat.bSaveDB = true

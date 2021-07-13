@@ -57,11 +57,7 @@ end
 
 CPath.MakeDir(LIB.FormatPath({'userdata/role_statistics', PATH_TYPE.GLOBAL}))
 
-if IsLocalFileExist(LIB.FormatPath({'userdata/bagstatistics.db', PATH_TYPE.GLOBAL})) then
-	CPath.Move(LIB.FormatPath({'userdata/bagstatistics.db', PATH_TYPE.GLOBAL}), LIB.FormatPath({'userdata/role_statistics/bag_stat.v2.db', PATH_TYPE.GLOBAL}))
-end
-
-local DB = LIB.SQLiteConnect(_L['MY_RoleStatistics_BagStat'], {'userdata/role_statistics/bag_stat.v2.db', PATH_TYPE.GLOBAL})
+local DB = LIB.SQLiteConnect(_L['MY_RoleStatistics_BagStat'], {'userdata/role_statistics/bag_stat.v3.db', PATH_TYPE.GLOBAL})
 if not DB then
 	return LIB.Sysmsg(_L['MY_RoleStatistics_BagStat'], _L['Cannot connect to database!!!'], CONSTANT.MSG_THEME.ERROR)
 end
@@ -69,21 +65,72 @@ local SZ_INI = PACKET_INFO.ROOT .. 'MY_RoleStatistics/ui/MY_RoleStatistics_BagSt
 local PAGE_DISPLAY = 15
 local NORMAL_MODE_PAGE_SIZE = 50
 local COMPACT_MODE_PAGE_SIZE = 150
-DB:Execute('CREATE TABLE IF NOT EXISTS BagItems (ownerkey NVARCHAR(20), boxtype INTEGER, boxindex INTEGER, tabtype INTEGER, tabindex INTEGER, tabsubindex INTEGER, bagcount INTEGER, bankcount INTEGER, time INTEGER, PRIMARY KEY(ownerkey, boxtype, boxindex))')
+DB:Execute([[
+	CREATE TABLE IF NOT EXISTS BagItems (
+		ownerkey NVARCHAR(20) NOT NULL,
+		boxtype INTEGER NOT NULL,
+		boxindex INTEGER NOT NULL,
+		tabtype INTEGER NOT NULL,
+		tabindex INTEGER NOT NULL,
+		tabsubindex INTEGER NOT NULL,
+		bagcount INTEGER NOT NULL,
+		bankcount INTEGER NOT NULL,
+		itemid INTEGER NOT NULL,
+		uiid INTEGER NOT NULL,
+		exist_time INTEGER NOT NULL,
+		strength INTEGER NOT NULL,
+		durability INTEGER NOT NULL,
+		diamond_enchant NVARCHAR(100) NOT NULL,
+		fea_enchant INTEGER NOT NULL,
+		permanent_enchant INTEGER NOT NULL,
+		desc NVARCHAR(4000) NOT NULL,
+		time INTEGER NOT NULL,
+		extra TEXT NOT NULL,
+		PRIMARY KEY(ownerkey, boxtype, boxindex)
+	)
+]])
 DB:Execute('CREATE INDEX IF NOT EXISTS BagItems_tab_idx ON BagItems(tabtype, tabindex, tabsubindex)')
-local DB_ItemsW = DB:Prepare('REPLACE INTO BagItems (ownerkey, boxtype, boxindex, tabtype, tabindex, tabsubindex, bagcount, bankcount, time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
+local DB_ItemsW = DB:Prepare([[
+	REPLACE INTO BagItems (
+		ownerkey, boxtype, boxindex, tabtype, tabindex, tabsubindex, bagcount, bankcount,
+		itemid, uiid, exist_time, strength, durability, diamond_enchant, fea_enchant, permanent_enchant, desc,
+		time, extra
+	) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]])
 local DB_ItemsDL = DB:Prepare('DELETE FROM BagItems WHERE ownerkey = ? AND boxtype = ? AND boxindex >= ?')
 local DB_ItemsDA = DB:Prepare('DELETE FROM BagItems WHERE ownerkey = ?')
-DB:Execute('CREATE TABLE IF NOT EXISTS OwnerInfo (ownerkey NVARCHAR(20), ownername NVARCHAR(20), servername NVARCHAR(20), time INTEGER, PRIMARY KEY(ownerkey))')
+DB:Execute([[
+	CREATE TABLE IF NOT EXISTS OwnerInfo (
+		ownerkey NVARCHAR(20) NOT NULL,
+		ownername NVARCHAR(20) NOT NULL,
+		servername NVARCHAR(20) NOT NULL,
+		time INTEGER NOT NULL,
+		extra TEXT NOT NULL,
+		PRIMARY KEY(ownerkey)
+	)
+]])
 DB:Execute('CREATE INDEX IF NOT EXISTS OwnerInfo_ownername_idx ON OwnerInfo(ownername)')
 DB:Execute('CREATE INDEX IF NOT EXISTS OwnerInfo_servername_idx ON OwnerInfo(servername)')
-local DB_OwnerInfoW = DB:Prepare('REPLACE INTO OwnerInfo (ownerkey, ownername, servername, time) VALUES (?, ?, ?, ?)')
+local DB_OwnerInfoW = DB:Prepare('REPLACE INTO OwnerInfo (ownerkey, ownername, servername, time, extra) VALUES (?, ?, ?, ?, ?)')
 local DB_OwnerInfoR = DB:Prepare('SELECT * FROM OwnerInfo WHERE ownername LIKE ? OR servername LIKE ? ORDER BY time DESC')
 local DB_OwnerInfoD = DB:Prepare('DELETE FROM OwnerInfo WHERE ownerkey = ?')
-DB:Execute('CREATE TABLE IF NOT EXISTS ItemInfo (tabtype INTEGER, tabindex INTEGER, tabsubindex INTEGER, name NVARCHAR(20), desc NVARCHAR(800), PRIMARY KEY(tabtype, tabindex, tabsubindex))')
+DB:Execute([[
+	CREATE TABLE IF NOT EXISTS ItemInfo (
+		tabtype INTEGER NOT NULL,
+		tabindex INTEGER NOT NULL,
+		tabsubindex INTEGER NOT NULL,
+		name NVARCHAR(20) NOT NULL,
+		genre INTEGER NOT NULL,
+		quality INTEGER NOT NULL,
+		exist_type INTEGER NOT NULL,
+		desc NVARCHAR(4000) NOT NULL,
+		extra TEXT NOT NULL,
+		PRIMARY KEY(tabtype, tabindex, tabsubindex)
+	)
+]])
 DB:Execute('CREATE INDEX IF NOT EXISTS ItemInfo_name_idx ON ItemInfo(name)')
 DB:Execute('CREATE INDEX IF NOT EXISTS ItemInfo_desc_idx ON ItemInfo(desc)')
-local DB_ItemInfoW = DB:Prepare('REPLACE INTO ItemInfo (tabtype, tabindex, tabsubindex, name, desc) VALUES (?, ?, ?, ?, ?)')
+local DB_ItemInfoW = DB:Prepare('REPLACE INTO ItemInfo (tabtype, tabindex, tabsubindex, name, genre, quality, exist_type, desc, extra) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
 
 local O = LIB.CreateUserSettingsModule('MY_RoleStatistics_BagStat', _L['General'], {
 	bCompactMode = {
@@ -154,31 +201,155 @@ local function UpdateTongRepertoryPage()
 	local nPage = arg0
 	local me = GetClientPlayer()
 	for nIndex = 1, LIB.GetGuildBankBagSize(nPage) do
-		local dwType, dwX = LIB.GetGuildBankBagPos(nPage, nIndex)
-		local tabtype, tabindex, tabsubindex, name, desc, count = -1, -1, -1, '', '', 0
-		local KItem = GetPlayerItem(me, dwType, dwX)
-		if KItem then
-			tabtype = KItem.dwTabType
-			tabindex = KItem.dwIndex
-			name = KItem.szName
-			desc = GetItemText(KItem)
-			tabsubindex = KItem.nGenre == ITEM_GENRE.BOOK and KItem.nBookID or -1
-			count = KItem.bCanStack and KItem.nStackNum or 1
-		end
-		l_guildcache[dwX] = {
-			boxtype = dwType,
-			boxindex = dwX,
-			tabtype = tabtype,
-			tabindex = tabindex,
-			tabsubindex = tabsubindex,
-			name = name,
-			desc = desc,
-			count = count,
-			time = GetCurrentTime(),
+		local boxtype, boxindex = LIB.GetGuildBankBagPos(nPage, nIndex)
+		local aItemData, aItemInfoData = D.ItemToData(GetPlayerItem(me, boxtype, boxindex))
+		l_guildcache[boxtype .. ',' .. boxindex] = {
+			boxtype = boxtype,
+			boxindex = boxindex,
+			aItemData = aItemData,
+			aItemInfoData = aItemInfoData,
 		}
 	end
 end
 LIB.RegisterEvent('UPDATE_TONG_REPERTORY_PAGE', 'MY_RoleStatistics_BagStat', UpdateTongRepertoryPage)
+
+function D.Migration()
+	local DB_V2_PATH = LIB.FormatPath({'userdata/role_statistics/bag_stat.v2.db', PATH_TYPE.GLOBAL})
+	if not IsLocalFileExist(DB_V2_PATH) then
+		return
+	end
+	LIB.Confirm(
+		_L['Ancient database detected, do you want to migrate data from it?'],
+		function()
+			-- 转移V2旧版数据
+			if IsLocalFileExist(DB_V2_PATH) then
+				local DB_V2 = SQLite3_Open(DB_V2_PATH)
+				if DB_V2 then
+					DB:Execute('BEGIN TRANSACTION')
+					local aBagItems = DB_V2:Execute('SELECT * FROM BagItems WHERE ownerkey IS NOT NULL AND boxtype IS NOT NULL AND tabtype IS NOT NULL')
+					if aBagItems then
+						for _, rec in ipairs(aBagItems) do
+							DB_ItemsW:ClearBindings()
+							DB_ItemsW:BindAll(
+								rec.ownerkey,
+								rec.boxtype,
+								rec.boxindex,
+								rec.tabtype,
+								rec.tabindex,
+								rec.tabsubindex,
+								rec.bagcount,
+								rec.bankcount,
+								-1,
+								-1,
+								-1,
+								-1,
+								-1,
+								'',
+								-1,
+								-1,
+								'',
+								rec.time,
+								''
+							)
+							DB_ItemsW:Execute()
+						end
+						DB_ItemsW:Reset()
+					end
+					local aOwnerInfo = DB_V2:Execute('SELECT * FROM OwnerInfo WHERE ownerkey IS NOT NULL')
+					if aOwnerInfo then
+						for _, rec in ipairs(aOwnerInfo) do
+							DB_OwnerInfoW:ClearBindings()
+							DB_OwnerInfoW:BindAll(
+								rec.ownerkey,
+								rec.ownername,
+								rec.servername,
+								rec.time,
+								''
+							)
+							DB_OwnerInfoW:Execute()
+						end
+						DB_OwnerInfoW:Reset()
+					end
+					local aItemInfo = DB_V2:Execute('SELECT * FROM ItemInfo WHERE tabtype IS NOT NULL')
+					if aItemInfo then
+						for _, rec in ipairs(aItemInfo) do
+							DB_ItemInfoW:ClearBindings()
+							DB_ItemInfoW:BindAll(
+								rec.tabtype,
+								rec.tabindex,
+								rec.tabsubindex,
+								rec.name,
+								-1,
+								-1,
+								-1,
+								rec.desc,
+								''
+							)
+							DB_ItemInfoW:Execute()
+						end
+						DB_ItemInfoW:Reset()
+					end
+					DB:Execute('END TRANSACTION')
+					DB_V2:Release()
+				end
+				CPath.Move(DB_V2_PATH, DB_V2_PATH .. '.bak' .. LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
+			end
+			FireUIEvent('MY_ROLE_STAT_BAG_UPDATE')
+			LIB.Alert(_L['Migrate succeed!'])
+		end)
+end
+
+function D.ItemToData(KItem, szBagType)
+	local KItemInfo = KItem and GetItemInfo(KItem.dwTabType, KItem.dwIndex)
+	local tabtype, tabindex, tabsubindex, bagcount, bankcount = -1, -1, -1, 0, 0
+	local itemid, uiid, exist_time, strength, durability, diamond_enchant, fea_enchant, permanent_enchant, desc = -1, -1, -1, -1, -1, '', -1, -1, ''
+	local time, extra = GetCurrentTime(), ''
+	local aItemInfoData
+	if KItem and KItemInfo then
+		tabtype = KItem.dwTabType
+		tabindex = KItem.dwIndex
+		tabsubindex = KItem.nGenre == ITEM_GENRE.BOOK and KItem.nBookID or -1
+		aItemInfoData = {
+			tabtype,
+			tabindex,
+			tabsubindex,
+			AnsiToUTF8(KItem.szName),
+			KItem.nGenre,
+			KItem.nQuality,
+			KItemInfo.nExistType,
+			AnsiToUTF8(GetItemText(KItem)),
+			''
+		}
+
+		local aDiamondEnchant = {}
+		if KItem.nGenre == ITEM_GENRE.EQUIPMENT then
+			for i = 1, KItem.GetSlotCount() do
+				aDiamondEnchant[i] = KItem.GetMountDiamondEnchantID(i)
+			end
+		end
+		if szBagType == 'BANK' then
+			bagcount = 0
+			bankcount = KItem.bCanStack and KItem.nStackNum or 1
+		else
+			bagcount = KItem.bCanStack and KItem.nStackNum or 1
+			bankcount = 0
+		end
+		itemid = KItem.dwID
+		uiid = KItem.nUiId
+		strength = KItem.nStrengthLevel
+		durability = KItem.nCurrentDurability
+		diamond_enchant = AnsiToUTF8(LIB.JsonEncode(aDiamondEnchant)) -- 五行石
+		fea_enchant = KItem.nSub == EQUIPMENT_SUB.MELEE_WEAPON and KItem.GetMountFEAEnchantID() or 0 -- 五彩石
+		permanent_enchant = KItem.dwPermanentEnchantID -- 附魔
+		desc = AnsiToUTF8(LIB.GetItemTip(KItem) or '')
+	end
+	local aItemData = {
+		tabtype, tabindex, tabsubindex, bagcount, bankcount,
+		itemid, uiid, exist_time, strength, durability, diamond_enchant, fea_enchant, permanent_enchant, desc,
+		time, extra
+	}
+	return aItemData, aItemInfoData
+end
 
 function D.FlushDB()
 	if not O.bSaveDB then
@@ -205,16 +376,14 @@ function D.FlushDB()
 	for _, boxtype in ipairs(aPackageBoxType) do
 		local count = me.GetBoxSize(boxtype)
 		for boxindex = 0, count - 1 do
-			local KItem = GetPlayerItem(me, boxtype, boxindex)
-			DB_ItemsW:ClearBindings()
-			if KItem then
+			local aItemData, aItemInfoData = D.ItemToData(GetPlayerItem(me, boxtype, boxindex))
+			if aItemInfoData then
 				DB_ItemInfoW:ClearBindings()
-				DB_ItemInfoW:BindAll(KItem.dwTabType, KItem.dwIndex, KItem.nGenre == ITEM_GENRE.BOOK and KItem.nBookID or -1, AnsiToUTF8(KItem.szName), AnsiToUTF8(GetItemText(KItem)))
+				DB_ItemInfoW:BindAll(unpack(aItemInfoData))
 				DB_ItemInfoW:Execute()
-				DB_ItemsW:BindAll(ownerkey, boxtype, boxindex, KItem.dwTabType, KItem.dwIndex, KItem.nGenre == ITEM_GENRE.BOOK and KItem.nBookID or -1, KItem.bCanStack and KItem.nStackNum or 1, 0, time)
-			else
-				DB_ItemsW:BindAll(ownerkey, boxtype, boxindex, -1, -1, -1, 0, 0, time)
 			end
+			DB_ItemsW:ClearBindings()
+			DB_ItemsW:BindAll(ownerkey, boxtype, boxindex, unpack(aItemData))
 			DB_ItemsW:Execute()
 		end
 		DB_ItemsDL:ClearBindings()
@@ -226,7 +395,7 @@ function D.FlushDB()
 	DB_ItemsDL:Reset()
 
 	DB_OwnerInfoW:ClearBindings()
-	DB_OwnerInfoW:BindAll(ownerkey, ownername, servername, time)
+	DB_OwnerInfoW:BindAll(ownerkey, ownername, servername, time, '')
 	DB_OwnerInfoW:Execute()
 	DB_OwnerInfoW:Reset()
 
@@ -234,16 +403,14 @@ function D.FlushDB()
 	for _, boxtype in ipairs(CONSTANT.INVENTORY_BANK_LIST) do
 		local count = me.GetBoxSize(boxtype)
 		for boxindex = 0, count - 1 do
-			local KItem = GetPlayerItem(me, boxtype, boxindex)
-			DB_ItemsW:ClearBindings()
-			if KItem then
+			local aItemData, aItemInfoData = D.ItemToData(GetPlayerItem(me, boxtype, boxindex))
+			if aItemInfoData then
 				DB_ItemInfoW:ClearBindings()
-				DB_ItemInfoW:BindAll(KItem.dwTabType, KItem.dwIndex, KItem.nGenre == ITEM_GENRE.BOOK and KItem.nBookID or -1, AnsiToUTF8(KItem.szName), AnsiToUTF8(GetItemText(KItem)))
+				DB_ItemInfoW:BindAll(unpack(aItemInfoData))
 				DB_ItemInfoW:Execute()
-				DB_ItemsW:BindAll(ownerkey, boxtype, boxindex, KItem.dwTabType, KItem.dwIndex, KItem.nGenre == ITEM_GENRE.BOOK and KItem.nBookID or -1, 0, KItem.bCanStack and KItem.nStackNum or 1, time)
-			else
-				DB_ItemsW:BindAll(ownerkey, boxtype, boxindex, -1, -1, -1, 0, 0, time)
 			end
+			DB_ItemsW:ClearBindings()
+			DB_ItemsW:BindAll(ownerkey, boxtype, boxindex, unpack(aItemData))
 			DB_ItemsW:Execute()
 		end
 		DB_ItemsDL:ClearBindings()
@@ -259,18 +426,20 @@ function D.FlushDB()
 		local ownerkey = 'tong' .. me.dwTongID
 		local ownername = AnsiToUTF8('[' .. LIB.GetTongName(me.dwTongID) .. ']')
 		for _, info in pairs(l_guildcache) do
-			DB_ItemInfoW:ClearBindings()
-			DB_ItemInfoW:BindAll(info.tabtype, info.tabindex, info.tabsubindex, AnsiToUTF8(info.name), AnsiToUTF8(info.desc))
-			DB_ItemInfoW:Execute()
+			if info.aItemInfoData then
+				DB_ItemInfoW:ClearBindings()
+				DB_ItemInfoW:BindAll(unpack(info.aItemInfoData))
+				DB_ItemInfoW:Execute()
+			end
 			DB_ItemsW:ClearBindings()
-			DB_ItemsW:BindAll(ownerkey, info.boxtype, info.boxindex, info.tabtype, info.tabindex, info.tabsubindex, 0, info.count, time)
+			DB_ItemsW:BindAll(ownerkey, info.boxtype, info.boxindex, unpack(info.aItemData))
 			DB_ItemsW:Execute()
 		end
 		DB_ItemInfoW:Reset()
 		DB_ItemsW:Reset()
 
 		DB_OwnerInfoW:ClearBindings()
-		DB_OwnerInfoW:BindAll(ownerkey, ownername, servername, time)
+		DB_OwnerInfoW:BindAll(ownerkey, ownername, servername, time, '')
 		DB_OwnerInfoW:Execute()
 		DB_OwnerInfoW:Reset()
 	end
@@ -361,8 +530,37 @@ function D.UpdateItems(page)
 	D.FlushDB()
 
 	local searchitem = AnsiToUTF8('%' .. page:Lookup('Wnd_Total/Wnd_SearchItem/Edit_SearchItem'):GetText():gsub('%s+', '%%') .. '%')
-	local sqlfrom = '(SELECT B.ownerkey, B.boxtype, B.boxindex, B.tabtype, B.tabindex, B.tabsubindex, B.bagcount, B.bankcount, B.time FROM BagItems AS B LEFT JOIN ItemInfo AS I ON B.tabtype = I.tabtype AND B.tabindex = I.tabindex WHERE B.tabtype != -1 AND B.tabindex != -1 AND (I.name LIKE ? OR I.desc LIKE ?)) AS C LEFT JOIN OwnerInfo AS O ON C.ownerkey = O.ownerkey WHERE '
-	local sql  = 'SELECT C.ownerkey AS ownerkey, C.boxtype AS boxtype, C.boxindex AS boxindex, C.tabtype AS tabtype, C.tabindex AS tabindex, C.tabsubindex AS tabsubindex, SUM(C.bagcount) AS bagcount, SUM(C.bankcount) AS bankcount, C.time AS time, O.ownername AS ownername, O.servername AS servername FROM' .. sqlfrom
+	local sqlfrom = [[
+		(
+			SELECT B.ownerkey, B.boxtype, B.boxindex, B.tabtype, B.tabindex, B.tabsubindex, B.bagcount, B.bankcount, B.time
+				FROM BagItems
+				AS B
+			LEFT JOIN ItemInfo
+				AS I
+			ON
+				B.tabtype = I.tabtype AND B.tabindex = I.tabindex WHERE B.tabtype != -1 AND B.tabindex != -1 AND (I.name LIKE ? OR I.desc LIKE ?)
+		)
+			AS C
+		LEFT JOIN OwnerInfo
+			AS O
+		ON C.ownerkey = O.ownerkey
+		WHERE
+	]]
+	local sql  = [[
+		SELECT
+			C.ownerkey AS ownerkey,
+			C.boxtype AS boxtype,
+			C.boxindex AS boxindex,
+			C.tabtype AS tabtype,
+			C.tabindex AS tabindex,
+			C.tabsubindex AS tabsubindex,
+			SUM(C.bagcount) AS bagcount,
+			SUM(C.bankcount) AS bankcount,
+			C.time AS time,
+			O.ownername AS ownername,
+			O.servername AS servername
+		FROM
+	]] .. sqlfrom
 	local sqlc = 'SELECT COUNT(*) AS count FROM' .. sqlfrom
 	local nPageSize = O.bCompactMode and COMPACT_MODE_PAGE_SIZE or NORMAL_MODE_PAGE_SIZE
 	local wheres = {}
@@ -519,6 +717,8 @@ function D.OnInitPage()
 end
 
 function D.OnActivePage()
+	D.Migration()
+
 	if not O.bAdviceSaveDB and not O.bSaveDB then
 		LIB.Confirm(_L('%s stat has not been enabled, this character\'s data will not be saved, are you willing to save this character?\nYou can change this config by click option button on the top-right conner.', _L[MODULE_NAME]), function()
 			MY_RoleStatistics_BagStat.bSaveDB = true

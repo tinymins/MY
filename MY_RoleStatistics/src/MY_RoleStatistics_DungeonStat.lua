@@ -57,14 +57,30 @@ end
 
 CPath.MakeDir(LIB.FormatPath({'userdata/role_statistics', PATH_TYPE.GLOBAL}))
 
-local DB = LIB.SQLiteConnect(_L['MY_RoleStatistics_DungeonStat'], {'userdata/role_statistics/dungeon_stat.v2.db', PATH_TYPE.GLOBAL})
+local DB = LIB.SQLiteConnect(_L['MY_RoleStatistics_DungeonStat'], {'userdata/role_statistics/dungeon_stat.v3.db', PATH_TYPE.GLOBAL})
 if not DB then
 	return LIB.Sysmsg(_L['MY_RoleStatistics_DungeonStat'], _L['Cannot connect to database!!!'], CONSTANT.MSG_THEME.ERROR)
 end
 local SZ_INI = PACKET_INFO.ROOT .. 'MY_RoleStatistics/ui/MY_RoleStatistics_DungeonStat.ini'
 
-DB:Execute('CREATE TABLE IF NOT EXISTS DungeonInfo (guid NVARCHAR(20), account NVARCHAR(255), region NVARCHAR(20), server NVARCHAR(20), name NVARCHAR(20), force INTEGER, level INTEGER, equip_score INTEGER, copy_info NVARCHAR(65535), progress_info NVARCHAR(65535), time INTEGER, PRIMARY KEY(guid))')
-local DB_DungeonInfoW = DB:Prepare('REPLACE INTO DungeonInfo (guid, account, region, server, name, force, level, equip_score, copy_info, progress_info, time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+DB:Execute([[
+	CREATE TABLE IF NOT EXISTS DungeonInfo (
+		guid NVARCHAR(20) NOT NULL,
+		account NVARCHAR(255) NOT NULL,
+		region NVARCHAR(20) NOT NULL,
+		server NVARCHAR(20) NOT NULL,
+		name NVARCHAR(20) NOT NULL,
+		force INTEGER NOT NULL,
+		level INTEGER NOT NULL,
+		equip_score INTEGER NOT NULL,
+		copy_info NVARCHAR(65535) NOT NULL,
+		progress_info NVARCHAR(65535) NOT NULL,
+		time INTEGER NOT NULL,
+		extra TEXT NOT NULL,
+		PRIMARY KEY(guid)
+	)
+]])
+local DB_DungeonInfoW = DB:Prepare('REPLACE INTO DungeonInfo (guid, account, region, server, name, force, level, equip_score, copy_info, progress_info, time, extra) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
 local DB_DungeonInfoG = DB:Prepare('SELECT * FROM DungeonInfo WHERE guid = ?')
 local DB_DungeonInfoR = DB:Prepare('SELECT * FROM DungeonInfo WHERE account LIKE ? OR name LIKE ? OR region LIKE ? OR server LIKE ? ORDER BY time DESC')
 local DB_DungeonInfoD = DB:Prepare('DELETE FROM DungeonInfo WHERE guid = ?')
@@ -439,6 +455,51 @@ function D.ProcessProgressRequestQueue()
 	end
 end
 
+function D.Migration()
+	local DB_V2_PATH = LIB.FormatPath({'userdata/role_statistics/dungeon_stat.v2.db', PATH_TYPE.GLOBAL})
+	if not IsLocalFileExist(DB_V2_PATH) then
+		return
+	end
+	LIB.Confirm(
+		_L['Ancient database detected, do you want to migrate data from it?'],
+		function()
+			-- ×ªÒÆV2¾É°æÊý¾Ý
+			if IsLocalFileExist(DB_V2_PATH) then
+				local DB_V2 = SQLite3_Open(DB_V2_PATH)
+				if DB_V2 then
+					DB:Execute('BEGIN TRANSACTION')
+					local aDungeonInfo = DB_V2:Execute('SELECT * FROM DungeonInfo WHERE guid IS NOT NULL AND name IS NOT NULL')
+					if aDungeonInfo then
+						for _, rec in ipairs(aDungeonInfo) do
+							DB_DungeonInfoW:ClearBindings()
+							DB_DungeonInfoW:BindAll(
+								rec.guid,
+								rec.account,
+								rec.region,
+								rec.server,
+								rec.name,
+								rec.force,
+								rec.level,
+								rec.equip_score,
+								rec.copy_info,
+								rec.progress_info,
+								rec.time,
+								''
+							)
+							DB_DungeonInfoW:Execute()
+						end
+						DB_DungeonInfoW:Reset()
+					end
+					DB:Execute('END TRANSACTION')
+					DB_V2:Release()
+				end
+				CPath.Move(DB_V2_PATH, DB_V2_PATH .. '.bak' .. LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
+			end
+			FireUIEvent('MY_ROLE_STAT_DUNGEON_UPDATE')
+			LIB.Alert(_L['Migrate succeed!'])
+		end)
+end
+
 function D.FlushDB(bForceUpdate)
 	if not D.bReady or not O.bSaveDB then
 		return
@@ -455,7 +516,7 @@ function D.FlushDB(bForceUpdate)
 	DB_DungeonInfoW:BindAll(
 		rec.guid, rec.account, rec.region, rec.server,
 		rec.name, rec.force, rec.level, rec.equip_score,
-		rec.copy_info, rec.progress_info, rec.time)
+		rec.copy_info, rec.progress_info, rec.time, '')
 	DB_DungeonInfoW:Execute()
 	DB_DungeonInfoW:Reset()
 	DB:Execute('END TRANSACTION')
@@ -942,6 +1003,7 @@ function D.CheckAdvice()
 end
 
 function D.OnActivePage()
+	D.Migration()
 	D.CheckAdvice()
 	D.FlushDB(true)
 	D.UpdateUI(this)

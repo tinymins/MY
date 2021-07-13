@@ -112,7 +112,7 @@ local function InitDB()
 	if DB_ERR_COUNT > DB_MAX_ERR_COUNT then
 		return false
 	end
-	DB = LIB.SQLiteConnect(_L['MY_Farbnamen'], {'cache/player_info.v2.db', PATH_TYPE.SERVER})
+	DB = LIB.SQLiteConnect(_L['MY_Farbnamen'], {'cache/farbnamen.v3.db', PATH_TYPE.SERVER})
 	if not DB then
 		local szMsg = _L['Cannot connect to database!!!']
 		if DB_ERR_COUNT > 0 then
@@ -122,13 +122,33 @@ local function InitDB()
 		LIB.Sysmsg(_L['MY_Farbnamen'], szMsg, CONSTANT.MSG_THEME.ERROR)
 		return false
 	end
-	DB:Execute('CREATE TABLE IF NOT EXISTS InfoCache (id INTEGER PRIMARY KEY, name VARCHAR(20) NOT NULL, force INTEGER, role INTEGER, level INTEGER, title VARCHAR(20), camp INTEGER, tong INTEGER)')
+	DB:Execute([[
+		CREATE TABLE IF NOT EXISTS InfoCache (
+			id INTEGER NOT NULL,
+			name VARCHAR(20) NOT NULL,
+			force INTEGER NOT NULL,
+			role INTEGER NOT NULL,
+			level INTEGER NOT NULL,
+			title VARCHAR(20) NOT NULL,
+			camp INTEGER NOT NULL,
+			tong INTEGER NOT NULL,
+			extra TEXT NOT NULL,
+			PRIMARY KEY (id)
+		)
+	]])
 	DB:Execute('CREATE UNIQUE INDEX IF NOT EXISTS info_cache_name_uidx ON InfoCache(name)')
-	DBI_W  = DB:Prepare('REPLACE INTO InfoCache (id, name, force, role, level, title, camp, tong) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
+	DBI_W  = DB:Prepare('REPLACE INTO InfoCache (id, name, force, role, level, title, camp, tong, extra) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
 	DBI_RI = DB:Prepare('SELECT id, name, force, role, level, title, camp, tong FROM InfoCache WHERE id = ?')
 	DBI_RN = DB:Prepare('SELECT id, name, force, role, level, title, camp, tong FROM InfoCache WHERE name = ?')
-	DB:Execute('CREATE TABLE IF NOT EXISTS TongCache (id INTEGER PRIMARY KEY, name VARCHAR(20))')
-	DBT_W  = DB:Prepare('REPLACE INTO TongCache (id, name) VALUES (?, ?)')
+	DB:Execute([[
+		CREATE TABLE IF NOT EXISTS TongCache (
+			id INTEGER NOT NULL,
+			name VARCHAR(20) NOT NULL,
+			extra TEXT NOT NULL,
+			PRIMARY KEY(id)
+		)
+	]])
+	DBT_W  = DB:Prepare('REPLACE INTO TongCache (id, name, extra) VALUES (?, ?, ?)')
 	DBT_RI = DB:Prepare('SELECT id, name FROM TongCache WHERE id = ?')
 
 	-- 旧版文件缓存转换
@@ -143,7 +163,7 @@ local function InitDB()
 			if data then
 				for id, p in pairs(data) do
 					DBI_W:ClearBindings()
-					DBI_W:BindAll(p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8])
+					DBI_W:BindAll(p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], '')
 					DBI_W:Execute()
 				end
 			end
@@ -164,7 +184,7 @@ local function InitDB()
 				if data then
 					for id, name in pairs(data) do
 						DBT_W:ClearBindings()
-						DBT_W:BindAll(id, name)
+						DBT_W:BindAll(id, name, '')
 						DBT_W:Execute()
 					end
 				end
@@ -184,44 +204,96 @@ local function InitDB()
 		LIB.Debug('MY_Farbnamen', 'Farbnamen cleaning file cache finished!', DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 	end
-
-	-- 转移V1旧版数据
-	local DB_V1_PATH = LIB.FormatPath({'cache/player_info.db', PATH_TYPE.SERVER})
-	if IsLocalFileExist(DB_V1_PATH) then
-		local DB_V1 = SQLite3_Open(DB_V1_PATH)
-		if DB_V1 then
-			-- 角色缓存
-			local nCount, nPageSize = Get(DB_V1:Execute('SELECT COUNT(*) AS count FROM InfoCache'), {1, 'count'}, 0), 10000
-			DB:Execute('BEGIN TRANSACTION')
-			for i = 0, nCount / nPageSize do
-				for _, p in ipairs(DB_V1:Execute('SELECT id, name, force, role, level, title, camp, tong FROM InfoCache LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))) do
-					DBI_W:ClearBindings()
-					DBI_W:BindAll(p.id, p.name, p.force, p.role, p.level, p.title, p.camp, p.tong)
-					DBI_W:Execute()
-				end
-			end
-			DBI_W:Reset()
-			DB:Execute('END TRANSACTION')
-			-- 帮会缓存
-			local nCount, nPageSize = Get(DB_V1:Execute('SELECT COUNT(*) AS count FROM TongCache'), {1, 'count'}, 0), 10000
-			DB:Execute('BEGIN TRANSACTION')
-			for i = 0, nCount / nPageSize do
-				for _, p in ipairs(DB_V1:Execute('SELECT id, name FROM TongCache LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))) do
-					DBI_W:ClearBindings()
-					DBI_W:BindAll(p.id, p.name)
-					DBI_W:Execute()
-				end
-			end
-			DBI_W:Reset()
-			DB:Execute('END TRANSACTION')
-			DB_V1:Release()
-		end
-		LIB.Sysmsg(_L['MY_Farbnamen'], _L['Upgrade database finished!'])
-		CPath.DelFile(DB_V1_PATH)
-	end
 	return true
 end
 InitDB()
+
+function D.Migration()
+	local DB_V1_PATH = LIB.FormatPath({'cache/player_info.db', PATH_TYPE.SERVER})
+	local DB_V2_PATH = LIB.FormatPath({'cache/player_info.v2.db', PATH_TYPE.SERVER})
+	if not IsLocalFileExist(DB_V1_PATH) and not IsLocalFileExist(DB_V2_PATH) then
+		return
+	end
+	LIB.Confirm(
+		_L['Ancient database detected, do you want to migrate data from it?'],
+		function()
+			-- 转移V1旧版数据
+			if IsLocalFileExist(DB_V1_PATH) then
+				local DB_V1 = SQLite3_Open(DB_V1_PATH)
+				if DB_V1 then
+					-- 角色缓存
+					local nCount, nPageSize = Get(DB_V1:Execute('SELECT COUNT(*) AS count FROM InfoCache'), {1, 'count'}, 0), 10000
+					DB:Execute('BEGIN TRANSACTION')
+					for i = 0, nCount / nPageSize do
+						for _, p in ipairs(DB_V1:Execute('SELECT id, name, force, role, level, title, camp, tong FROM InfoCache LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))) do
+							DBI_W:ClearBindings()
+							DBI_W:BindAll(p.id, p.name, p.force, p.role, p.level, p.title, p.camp, p.tong, '')
+							DBI_W:Execute()
+						end
+					end
+					DBI_W:Reset()
+					DB:Execute('END TRANSACTION')
+					-- 帮会缓存
+					local nCount, nPageSize = Get(DB_V1:Execute('SELECT COUNT(*) AS count FROM TongCache'), {1, 'count'}, 0), 10000
+					DB:Execute('BEGIN TRANSACTION')
+					for i = 0, nCount / nPageSize do
+						for _, p in ipairs(DB_V1:Execute('SELECT id, name FROM TongCache LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))) do
+							DBI_T:ClearBindings()
+							DBI_T:BindAll(p.id, p.name)
+							DBI_T:Execute()
+						end
+					end
+					DBI_T:Reset()
+					DB:Execute('END TRANSACTION')
+					DB_V1:Release()
+				end
+				CPath.Move(DB_V1_PATH, DB_V1_PATH .. '.bak' .. LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
+			end
+			-- 转移V2旧版数据
+			if IsLocalFileExist(DB_V2_PATH) then
+				local DB_V2 = SQLite3_Open(DB_V2_PATH)
+				if DB_V2 then
+					DB:Execute('BEGIN TRANSACTION')
+					local aInfoCache = DB_V2:Execute('SELECT * FROM InfoCache WHERE id IS NOT NULL')
+					if aInfoCache then
+						for _, rec in ipairs(aInfoCache) do
+							DBI_W:ClearBindings()
+							DBI_W:BindAll(
+								rec.id,
+								rec.name,
+								rec.force,
+								rec.role,
+								rec.level,
+								rec.title,
+								rec.camp,
+								rec.tong,
+								''
+							)
+							DBI_W:Execute()
+						end
+						DBI_W:Reset()
+					end
+					local aTongCache = DB_V2:Execute('SELECT * FROM TongCache WHERE id IS NOT NULL')
+					if aTongCache then
+						for _, rec in ipairs(aTongCache) do
+							DBT_W:ClearBindings()
+							DBT_W:BindAll(
+								rec.id,
+								rec.name,
+								''
+							)
+							DBT_W:Execute()
+						end
+						DBT_W:Reset()
+					end
+					DB:Execute('END TRANSACTION')
+					DB_V2:Release()
+				end
+				CPath.Move(DB_V2_PATH, DB_V2_PATH .. '.bak' .. LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
+			end
+			LIB.Alert(_L['Migrate succeed!'])
+		end)
+end
 
 ---------------------------------------------------------------
 -- 聊天复制和时间显示相关
@@ -502,7 +574,7 @@ local function Flush()
 		DB:Execute('BEGIN TRANSACTION')
 		for i, p in pairs(l_infocache_w) do
 			DBI_W:ClearBindings()
-			DBI_W:BindAll(p.id, p.name, p.force, p.role, p.level, p.title, p.camp, p.tong)
+			DBI_W:BindAll(p.id, p.name, p.force, p.role, p.level, p.title, p.camp, p.tong, '')
 			DBI_W:Execute()
 		end
 		DBI_W:Reset()
@@ -512,7 +584,7 @@ local function Flush()
 		DB:Execute('BEGIN TRANSACTION')
 		for id, name in pairs(l_tongnames_w) do
 			DBT_W:ClearBindings()
-			DBT_W:BindAll(id, name)
+			DBT_W:BindAll(id, name, '')
 			DBT_W:Execute()
 		end
 		DBT_W:Reset()
@@ -620,6 +692,8 @@ LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_Farbnamen', function() D.bReady =
 -- 菜单
 --------------------------------------------------------------
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
+	D.Migration()
+
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, w = 'auto',
 		text = _L['Enable MY_Farbnamen'],

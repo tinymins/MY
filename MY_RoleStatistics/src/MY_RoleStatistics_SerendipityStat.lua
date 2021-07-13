@@ -84,15 +84,31 @@ end
 
 CPath.MakeDir(LIB.FormatPath({'userdata/role_statistics', PATH_TYPE.GLOBAL}))
 
-local DB = LIB.SQLiteConnect(_L['MY_RoleStatistics_SerendipityStat'], {'userdata/role_statistics/serendipity_stat.v2.db', PATH_TYPE.GLOBAL})
+local DB = LIB.SQLiteConnect(_L['MY_RoleStatistics_SerendipityStat'], {'userdata/role_statistics/serendipity_stat.v3.db', PATH_TYPE.GLOBAL})
 if not DB then
 	return LIB.Sysmsg(_L['MY_RoleStatistics_SerendipityStat'], _L['Cannot connect to database!!!'], CONSTANT.MSG_THEME.ERROR)
 end
 local SZ_INI = PACKET_INFO.ROOT .. 'MY_RoleStatistics/ui/MY_RoleStatistics_SerendipityStat.ini'
 local SZ_TIP_INI = PACKET_INFO.ROOT .. 'MY_RoleStatistics/ui/MY_RoleStatistics_SerendipityTip.ini'
 
-DB:Execute('CREATE TABLE IF NOT EXISTS Info (guid NVARCHAR(20), account NVARCHAR(255), region NVARCHAR(20), server NVARCHAR(20), name NVARCHAR(20), force INTEGER, camp INTEGER, level INTEGER, serendipity_info NVARCHAR(65535), item_count NVARCHAR(65535), time INTEGER, PRIMARY KEY(guid))')
-local InfoW = DB:Prepare('REPLACE INTO Info (guid, account, region, server, name, force, camp, level, serendipity_info, item_count, time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+DB:Execute([[
+	CREATE TABLE IF NOT EXISTS Info (
+		guid NVARCHAR(20) NOT NULL,
+		account NVARCHAR(255) NOT NULL,
+		region NVARCHAR(20) NOT NULL,
+		server NVARCHAR(20) NOT NULL,
+		name NVARCHAR(20) NOT NULL,
+		force INTEGER NOT NULL,
+		camp INTEGER NOT NULL,
+		level INTEGER NOT NULL,
+		serendipity_info NVARCHAR(65535) NOT NULL,
+		item_count NVARCHAR(65535) NOT NULL,
+		time INTEGER NOT NULL,
+		extra TEXT NOT NULL,
+		PRIMARY KEY(guid)
+	)
+]])
+local InfoW = DB:Prepare('REPLACE INTO Info (guid, account, region, server, name, force, camp, level, serendipity_info, item_count, time, extra) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
 local InfoG = DB:Prepare('SELECT * FROM Info WHERE guid = ?')
 local InfoR = DB:Prepare('SELECT * FROM Info WHERE account LIKE ? OR name LIKE ? OR region LIKE ? OR server LIKE ? ORDER BY time DESC')
 local InfoD = DB:Prepare('DELETE FROM Info WHERE guid = ?')
@@ -663,6 +679,51 @@ function D.GetClientPlayerRec()
 end
 end
 
+function D.Migration()
+	local DB_V2_PATH = LIB.FormatPath({'userdata/role_statistics/serendipity_stat.v2.db', PATH_TYPE.GLOBAL})
+	if not IsLocalFileExist(DB_V2_PATH) then
+		return
+	end
+	LIB.Confirm(
+		_L['Ancient database detected, do you want to migrate data from it?'],
+		function()
+			-- ×ªÒÆV2¾É°æÊý¾Ý
+			if IsLocalFileExist(DB_V2_PATH) then
+				local DB_V2 = SQLite3_Open(DB_V2_PATH)
+				if DB_V2 then
+					DB:Execute('BEGIN TRANSACTION')
+					local aInfo = DB_V2:Execute('SELECT * FROM Info WHERE guid IS NOT NULL AND region IS NOT NULL AND name IS NOT NULL')
+					if aInfo then
+						for _, rec in ipairs(aInfo) do
+							InfoW:ClearBindings()
+							InfoW:BindAll(
+								rec.guid,
+								rec.account,
+								rec.region,
+								rec.server,
+								rec.name,
+								rec.force,
+								rec.camp,
+								rec.level,
+								rec.serendipity_info,
+								rec.item_count,
+								rec.time,
+								''
+							)
+							InfoW:Execute()
+						end
+						InfoW:Reset()
+					end
+					DB:Execute('END TRANSACTION')
+					DB_V2:Release()
+				end
+				CPath.Move(DB_V2_PATH, DB_V2_PATH .. '.bak' .. LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
+			end
+			FireUIEvent('MY_ROLE_STAT_SERENDIPITY_UPDATE')
+			LIB.Alert(_L['Migrate succeed!'])
+		end)
+end
+
 function D.FlushDB()
 	if not O.bSaveDB then
 		return
@@ -679,7 +740,7 @@ function D.FlushDB()
 	InfoW:BindAll(
 		rec.guid, rec.account, rec.region, rec.server,
 		rec.name, rec.force, rec.camp, rec.level,
-		rec.serendipity_info, rec.item_count, rec.time)
+		rec.serendipity_info, rec.item_count, rec.time, '')
 	InfoW:Execute()
 	InfoW:Reset()
 	DB:Execute('END TRANSACTION')
@@ -1104,6 +1165,7 @@ function D.CheckAdvice()
 end
 
 function D.OnActivePage()
+	D.Migration()
 	D.CheckAdvice()
 	D.FlushDB()
 	D.UpdateUI(this)

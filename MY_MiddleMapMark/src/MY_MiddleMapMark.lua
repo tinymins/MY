@@ -56,22 +56,46 @@ end
 --------------------------------------------------------------------------
 LIB.CreateDataRoot(PATH_TYPE.GLOBAL)
 local l_szKeyword, l_dwMapID, l_nMapIndex, l_renderTime = '', nil, nil, 0
-local DB = LIB.SQLiteConnect(_L['MY_MiddleMapMark'], {'cache/npc_doodad_rec.v2.db', PATH_TYPE.GLOBAL})
+local DB = LIB.SQLiteConnect(_L['MY_MiddleMapMark'], {'cache/npc_doodad_rec.v3.db', PATH_TYPE.GLOBAL})
 if not DB then
 	return LIB.Sysmsg(_L['MY_MiddleMapMark'], _L['Cannot connect to database!!!'], CONSTANT.MSG_THEME.ERROR)
 end
-DB:Execute('CREATE TABLE IF NOT EXISTS NpcInfo (templateid INTEGER, poskey INTEGER, mapid INTEGER, x INTEGER, y INTEGER, name VARCHAR(20) NOT NULL, title VARCHAR(20) NOT NULL, level INTEGER, PRIMARY KEY(templateid, poskey))')
+DB:Execute([[
+	CREATE TABLE IF NOT EXISTS NpcInfo (
+		templateid INTEGER NOT NULL,
+		poskey INTEGER NOT NULL,
+		mapid INTEGER NOT NULL,
+		x INTEGER NOT NULL,
+		y INTEGER NOT NULL,
+		name VARCHAR(20) NOT NULL,
+		title VARCHAR(20) NOT NULL,
+		level INTEGER NOT NULL,
+		extra TEXT NOT NULL,
+		PRIMARY KEY(templateid, poskey)
+	)
+]])
 DB:Execute('CREATE INDEX IF NOT EXISTS mmm_name_idx ON NpcInfo(name, mapid)')
 DB:Execute('CREATE INDEX IF NOT EXISTS mmm_title_idx ON NpcInfo(title, mapid)')
 DB:Execute('CREATE INDEX IF NOT EXISTS mmm_template_idx ON NpcInfo(templateid, mapid)')
-local DBN_W  = DB:Prepare('REPLACE INTO NpcInfo (templateid, poskey, mapid, x, y, name, title, level) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
+local DBN_W  = DB:Prepare('REPLACE INTO NpcInfo (templateid, poskey, mapid, x, y, name, title, level, extra) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
 local DBN_DM  = DB:Prepare('DELETE FROM NpcInfo WHERE mapid = ?')
 local DBN_RI = DB:Prepare('SELECT templateid, poskey, mapid, x, y, name, title, level FROM NpcInfo WHERE templateid = ?')
 local DBN_RN = DB:Prepare('SELECT templateid, poskey, mapid, x, y, name, title, level FROM NpcInfo WHERE name LIKE ? OR title LIKE ?')
 local DBN_RNM = DB:Prepare('SELECT templateid, poskey, mapid, x, y, name, title, level FROM NpcInfo WHERE (name LIKE ? AND mapid = ?) OR (title LIKE ? AND mapid = ?)')
-DB:Execute('CREATE TABLE IF NOT EXISTS DoodadInfo (templateid INTEGER, poskey INTEGER, mapid INTEGER, x INTEGER, y INTEGER, name VARCHAR(20) NOT NULL, PRIMARY KEY (templateid, poskey))')
+DB:Execute([[
+	CREATE TABLE IF NOT EXISTS DoodadInfo (
+		templateid INTEGER NOT NULL,
+		poskey INTEGER NOT NULL,
+		mapid INTEGER NOT NULL,
+		x INTEGER NOT NULL,
+		y INTEGER NOT NULL,
+		name VARCHAR(20) NOT NULL,
+		extra TEXT NOT NULL,
+		PRIMARY KEY (templateid, poskey)
+	)
+]])
 DB:Execute('CREATE INDEX IF NOT EXISTS mmm_name_idx ON DoodadInfo(name, mapid)')
-local DBD_W  = DB:Prepare('REPLACE INTO DoodadInfo (templateid, poskey, mapid, x, y, name) VALUES (?, ?, ?, ?, ?, ?)')
+local DBD_W  = DB:Prepare('REPLACE INTO DoodadInfo (templateid, poskey, mapid, x, y, name, extra) VALUES (?, ?, ?, ?, ?, ?, ?)')
 local DBD_DM  = DB:Prepare('DELETE FROM DoodadInfo WHERE mapid = ?')
 local DBD_RI = DB:Prepare('SELECT templateid, poskey, mapid, x, y, name FROM DoodadInfo WHERE templateid = ?')
 local DBD_RN = DB:Prepare('SELECT templateid, poskey, mapid, x, y, name FROM DoodadInfo WHERE name LIKE ?')
@@ -99,36 +123,94 @@ local function GeneDoodadInfoPosKey(mapid, x, y)
 	return mapid * L32 + floor(x / DOODAD_MAX_DISTINCT_DISTANCE) * L16 + floor(y / DOODAD_MAX_DISTINCT_DISTANCE)
 end
 
-local SZ_CACHE_PATH = 'cache/NPC_DOODAD_REC/'
-if IsLocalFileExist(LIB.FormatPath({SZ_CACHE_PATH, PATH_TYPE.DATA})) then
-	DB:Execute('BEGIN TRANSACTION')
-	for _, dwMapID in ipairs(GetMapList()) do
-		local data = LIB.LoadLUAData({SZ_CACHE_PATH .. dwMapID .. '.{$lang}.jx3dat', PATH_TYPE.DATA})
-		if type(data) == 'string' then
-			data = LIB.JsonDecode(data)
-		end
-		if data then
-			for _, p in ipairs(data.Npc) do
-				DBN_W:ClearBindings()
-				DBN_W:BindAll(p.dwTemplateID, GeneNpcInfoPosKey(dwMapID, p.nX, p.nY), dwMapID, p.nX, p.nY, AnsiToUTF8(p.szName), AnsiToUTF8(p.szTitle), p.nLevel)
-				DBN_W:Execute()
-			end
-			DBN_W:Reset()
-			for _, p in ipairs(data.Doodad) do
-				DBD_W:ClearBindings()
-				DBD_W:BindAll(p.dwTemplateID, GeneDoodadInfoPosKey(dwMapID, p.nX, p.nY), dwMapID, p.nX, p.nY, AnsiToUTF8(p.szName))
-				DBD_W:Execute()
-			end
-			DBD_W:Reset()
-			--[[#DEBUG BEGIN]]
-			LIB.Debug('MY_MiddleMapMark', 'MiddleMapMark cache trans from file to sqlite finished!', DEBUG_LEVEL.LOG)
-			--[[#DEBUG END]]
-		end
+function D.Migration()
+	local DB_V1_ROOT = 'cache/NPC_DOODAD_REC/'
+	local DB_V1_PATH = LIB.FormatPath({DB_V1_ROOT, PATH_TYPE.DATA})
+	local DB_V2_PATH = LIB.FormatPath({'cache/npc_doodad_rec.v2.db', PATH_TYPE.GLOBAL})
+	if not IsLocalFileExist(DB_V1_PATH) and not IsLocalFileExist(DB_V2_PATH) then
+		return
 	end
-	DB:Execute('END TRANSACTION')
-	CPath.DelDir(LIB.FormatPath({SZ_CACHE_PATH, PATH_TYPE.DATA}))
+	LIB.Confirm(
+		_L['Ancient database detected, do you want to migrate data from it?'],
+		function()
+			-- 转移V1旧版数据
+			if IsLocalFileExist(DB_V1_PATH) then
+				DB:Execute('BEGIN TRANSACTION')
+				for _, dwMapID in ipairs(GetMapList()) do
+					local data = LIB.LoadLUAData({DB_V1_ROOT .. dwMapID .. '.{$lang}.jx3dat', PATH_TYPE.DATA})
+					if type(data) == 'string' then
+						data = LIB.JsonDecode(data)
+					end
+					if data then
+						for _, p in ipairs(data.Npc) do
+							DBN_W:ClearBindings()
+							DBN_W:BindAll(p.dwTemplateID, GeneNpcInfoPosKey(dwMapID, p.nX, p.nY), dwMapID, p.nX, p.nY, AnsiToUTF8(p.szName), AnsiToUTF8(p.szTitle), p.nLevel, '')
+							DBN_W:Execute()
+						end
+						DBN_W:Reset()
+						for _, p in ipairs(data.Doodad) do
+							DBD_W:ClearBindings()
+							DBD_W:BindAll(p.dwTemplateID, GeneDoodadInfoPosKey(dwMapID, p.nX, p.nY), dwMapID, p.nX, p.nY, AnsiToUTF8(p.szName), '')
+							DBD_W:Execute()
+						end
+						DBD_W:Reset()
+						--[[#DEBUG BEGIN]]
+						LIB.Debug('MY_MiddleMapMark', 'MiddleMapMark cache trans from file to sqlite finished!', DEBUG_LEVEL.LOG)
+						--[[#DEBUG END]]
+					end
+				end
+				DB:Execute('END TRANSACTION')
+				CPath.DelDir(LIB.FormatPath({DB_V1_ROOT, PATH_TYPE.DATA}))
+			end
+			-- 转移V2旧版数据
+			if IsLocalFileExist(DB_V2_PATH) then
+				local DB_V2 = SQLite3_Open(DB_V2_PATH)
+				if DB_V2 then
+					DB:Execute('BEGIN TRANSACTION')
+					local aNpcInfo = DB_V2:Execute('SELECT * FROM NpcInfo WHERE templateid IS NOT NULL')
+					if aNpcInfo then
+						for _, rec in ipairs(aNpcInfo) do
+							DBN_W:ClearBindings()
+							DBN_W:BindAll(
+								rec.templateid,
+								rec.poskey,
+								rec.mapid,
+								rec.x,
+								rec.y,
+								rec.name,
+								rec.title,
+								rec.level,
+								''
+							)
+							DBN_W:Execute()
+						end
+						DBN_W:Reset()
+					end
+					local aDoodadInfo = DB_V2:Execute('SELECT * FROM DoodadInfo WHERE templateid IS NOT NULL')
+					if aDoodadInfo then
+						for _, rec in ipairs(aDoodadInfo) do
+							DBD_W:ClearBindings()
+							DBD_W:BindAll(
+								rec.templateid,
+								rec.poskey,
+								rec.mapid,
+								rec.x,
+								rec.y,
+								rec.name,
+								''
+							)
+							DBD_W:Execute()
+						end
+						DBD_W:Reset()
+					end
+					DB:Execute('END TRANSACTION')
+					DB_V2:Release()
+				end
+				CPath.Move(DB_V2_PATH, DB_V2_PATH .. '.bak' .. LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
+			end
+			LIB.Alert(_L['Migrate succeed!'])
+		end)
 end
-
 ---------------------------------------------------------------
 -- 数据采集
 ---------------------------------------------------------------
@@ -145,7 +227,7 @@ local function FlushDB()
 	for i, p in pairs(l_npc) do
 		if not p.temp then
 			DBN_W:ClearBindings()
-			DBN_W:BindAll(p.templateid, p.poskey, p.mapid, p.x, p.y, AnsiToUTF8(p.name), AnsiToUTF8(p.title), p.level)
+			DBN_W:BindAll(p.templateid, p.poskey, p.mapid, p.x, p.y, AnsiToUTF8(p.name), AnsiToUTF8(p.title), p.level, '')
 			DBN_W:Execute()
 		end
 	end
@@ -155,7 +237,7 @@ local function FlushDB()
 	for i, p in pairs(l_doodad) do
 		if not p.temp then
 			DBD_W:ClearBindings()
-			DBD_W:BindAll(p.templateid, p.poskey, p.mapid, p.x, p.y, AnsiToUTF8(p.name))
+			DBD_W:BindAll(p.templateid, p.poskey, p.mapid, p.x, p.y, AnsiToUTF8(p.name), '')
 			DBD_W:Execute()
 		end
 	end
@@ -565,6 +647,8 @@ end
 ---------------------------------------------------------------
 local PS = {}
 function PS.OnPanelActive(wnd)
+	D.Migration()
+
 	local ui = UI(wnd)
 	local x, y = 0, 0
 	local w, h = ui:Size()

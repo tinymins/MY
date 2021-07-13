@@ -57,18 +57,42 @@ end
 
 CPath.MakeDir(LIB.FormatPath({'userdata/role_statistics', PATH_TYPE.GLOBAL}))
 
-local DB = LIB.SQLiteConnect(_L['MY_RoleStatistics_TaskStat'], {'userdata/role_statistics/task_stat.v2.db', PATH_TYPE.GLOBAL})
+local DB = LIB.SQLiteConnect(_L['MY_RoleStatistics_TaskStat'], {'userdata/role_statistics/task_stat.v3.db', PATH_TYPE.GLOBAL})
 if not DB then
 	return LIB.Sysmsg(_L['MY_RoleStatistics_TaskStat'], _L['Cannot connect to database!!!'], CONSTANT.MSG_THEME.ERROR)
 end
 local SZ_INI = PACKET_INFO.ROOT .. 'MY_RoleStatistics/ui/MY_RoleStatistics_TaskStat.ini'
 
-DB:Execute('CREATE TABLE IF NOT EXISTS Task (guid NVARCHAR(20), name NVARCHAR(255), task_info NVARCHAR(65535), PRIMARY KEY(guid))')
-local DB_TaskW = DB:Prepare('REPLACE INTO Task (guid, name, task_info) VALUES (?, ?, ?)')
+DB:Execute([[
+	CREATE TABLE IF NOT EXISTS Task (
+		guid NVARCHAR(20) NOT NULL,
+		name NVARCHAR(255) NOT NULL,
+		task_info NVARCHAR(65535) NOT NULL,
+		extra TEXT NOT NULL,
+		PRIMARY KEY(guid)
+	)
+]])
+local DB_TaskW = DB:Prepare('REPLACE INTO Task (guid, name, task_info, extra) VALUES (?, ?, ?, ?)')
 local DB_TaskR = DB:Prepare('SELECT * FROM Task')
 local DB_TaskD = DB:Prepare('DELETE FROM TaskInfo WHERE guid = ?')
-DB:Execute('CREATE TABLE IF NOT EXISTS TaskInfo (guid NVARCHAR(20), account NVARCHAR(255), region NVARCHAR(20), server NVARCHAR(20), name NVARCHAR(20), force INTEGER, camp INTEGER, level INTEGER, task_info NVARCHAR(65535), buff_info NVARCHAR(65535), time INTEGER, PRIMARY KEY(guid))')
-local DB_TaskInfoW = DB:Prepare('REPLACE INTO TaskInfo (guid, account, region, server, name, force, camp, level, task_info, buff_info, time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+DB:Execute([[
+	CREATE TABLE IF NOT EXISTS TaskInfo (
+		guid NVARCHAR(20) NOT NULL,
+		account NVARCHAR(255) NOT NULL,
+		region NVARCHAR(20) NOT NULL,
+		server NVARCHAR(20) NOT NULL,
+		name NVARCHAR(20) NOT NULL,
+		force INTEGER NOT NULL,
+		camp INTEGER NOT NULL,
+		level INTEGER NOT NULL,
+		task_info NVARCHAR(65535) NOT NULL,
+		buff_info NVARCHAR(65535) NOT NULL,
+		time INTEGER NOT NULL,
+		extra TEXT NOT NULL,
+		PRIMARY KEY(guid)
+	)
+]])
+local DB_TaskInfoW = DB:Prepare('REPLACE INTO TaskInfo (guid, account, region, server, name, force, camp, level, task_info, buff_info, time, extra) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
 local DB_TaskInfoG = DB:Prepare('SELECT * FROM TaskInfo WHERE guid = ?')
 local DB_TaskInfoR = DB:Prepare('SELECT * FROM TaskInfo WHERE account LIKE ? OR name LIKE ? OR region LIKE ? OR server LIKE ? ORDER BY time DESC')
 local DB_TaskInfoD = DB:Prepare('DELETE FROM TaskInfo WHERE guid = ?')
@@ -793,6 +817,65 @@ function D.GetClientPlayerRec()
 end
 end
 
+function D.Migration()
+	local DB_V2_PATH = LIB.FormatPath({'userdata/role_statistics/task_stat.v2.db', PATH_TYPE.GLOBAL})
+	if not IsLocalFileExist(DB_V2_PATH) then
+		return
+	end
+	LIB.Confirm(
+		_L['Ancient database detected, do you want to migrate data from it?'],
+		function()
+			-- ×ªÒÆV2¾É°æÊý¾Ý
+			if IsLocalFileExist(DB_V2_PATH) then
+				local DB_V2 = SQLite3_Open(DB_V2_PATH)
+				if DB_V2 then
+					DB:Execute('BEGIN TRANSACTION')
+					local aTask = DB_V2:Execute('SELECT * FROM Task WHERE guid IS NOT NULL AND name IS NOT NULL')
+					if aTask then
+						for _, rec in ipairs(aTask) do
+							DB_TaskW:ClearBindings()
+							DB_TaskW:BindAll(
+								rec.guid,
+								rec.name,
+								rec.task_info,
+								''
+							)
+							DB_TaskW:Execute()
+						end
+						DB_TaskW:Reset()
+					end
+					local aTaskInfo = DB_V2:Execute('SELECT * FROM TaskInfo WHERE guid IS NOT NULL AND name IS NOT NULL')
+					if aTaskInfo then
+						for _, rec in ipairs(aTaskInfo) do
+							DB_TaskInfoW:ClearBindings()
+							DB_TaskInfoW:BindAll(
+								rec.guid,
+								rec.account,
+								rec.region,
+								rec.server,
+								rec.name,
+								rec.force,
+								rec.camp,
+								rec.level,
+								rec.task_info,
+								rec.buff_info,
+								rec.time,
+								''
+							)
+							DB_TaskInfoW:Execute()
+						end
+						DB_TaskInfoW:Reset()
+					end
+					DB:Execute('END TRANSACTION')
+					DB_V2:Release()
+				end
+				CPath.Move(DB_V2_PATH, DB_V2_PATH .. '.bak' .. LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
+			end
+			FireUIEvent('MY_ROLE_STAT_TASK_UPDATE')
+			LIB.Alert(_L['Migrate succeed!'])
+		end)
+end
+
 function D.FlushDB()
 	if not O.bSaveDB then
 		return
@@ -808,7 +891,7 @@ function D.FlushDB()
 	DB_TaskInfoW:BindAll(
 		rec.guid, rec.account, rec.region, rec.server,
 		rec.name, rec.force, rec.camp, rec.level,
-		rec.task_info, rec.buff_info, rec.time)
+		rec.task_info, rec.buff_info, rec.time, '')
 	DB_TaskInfoW:Execute()
 	DB:Execute('END TRANSACTION')
 
@@ -1169,6 +1252,7 @@ function D.CheckAdvice()
 end
 
 function D.OnActivePage()
+	D.Migration()
 	D.CheckAdvice()
 	D.FlushDB()
 	D.UpdateUI(this)

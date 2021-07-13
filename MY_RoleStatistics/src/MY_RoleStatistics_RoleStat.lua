@@ -57,18 +57,52 @@ end
 
 CPath.MakeDir(LIB.FormatPath({'userdata/role_statistics', PATH_TYPE.GLOBAL}))
 
-local DB = LIB.SQLiteConnect(_L['MY_RoleStatistics_RoleStat'], {'userdata/role_statistics/role_stat.v2.db', PATH_TYPE.GLOBAL})
+local DB = LIB.SQLiteConnect(_L['MY_RoleStatistics_RoleStat'], {'userdata/role_statistics/role_stat.v3.db', PATH_TYPE.GLOBAL})
 if not DB then
 	return LIB.Sysmsg(_L['MY_RoleStatistics_RoleStat'], _L['Cannot connect to database!!!'], CONSTANT.MSG_THEME.ERROR)
 end
 local SZ_INI = PACKET_INFO.ROOT .. 'MY_RoleStatistics/ui/MY_RoleStatistics_RoleStat.ini'
 
-DB:Execute('CREATE TABLE IF NOT EXISTS RoleInfo (guid NVARCHAR(20), account NVARCHAR(255), region NVARCHAR(20), server NVARCHAR(20), name NVARCHAR(20), force INTEGER, level INTEGER, equip_score INTEGER, pet_score INTEGER, gold INTEGER, silver INTEGER, copper INTEGER, contribution INTEGER, contribution_remain INTEGER, justice INTEGER, justice_remain INTEGER, prestige INTEGER, prestige_remain INTEGER, camp_point INTEGER, camp_point_percentage INTEGER, camp_level INTEGER, arena_award INTEGER, arena_award_remain INTEGER, exam_print INTEGER, exam_print_remain INTEGER, achievement_score INTEGER, coin INTEGER, mentor_score INTEGER, time INTEGER, PRIMARY KEY(guid))')
-DB:Execute('ALTER TABLE RoleInfo ADD COLUMN starve INTEGER')
-DB:Execute('ALTER TABLE RoleInfo ADD COLUMN starve_remain INTEGER')
-DB:Execute('ALTER TABLE RoleInfo ADD COLUMN architecture INTEGER')
-DB:Execute('ALTER TABLE RoleInfo ADD COLUMN architecture_remain INTEGER')
-local DB_RoleInfoW = DB:Prepare('REPLACE INTO RoleInfo (guid, account, region, server, name, force, level, equip_score, pet_score, gold, silver, copper, contribution, contribution_remain, justice, justice_remain, prestige, prestige_remain, camp_point, camp_point_percentage, camp_level, arena_award, arena_award_remain, exam_print, exam_print_remain, achievement_score, coin, mentor_score, starve, starve_remain, architecture, architecture_remain, time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+DB:Execute([[
+	CREATE TABLE IF NOT EXISTS RoleInfo (
+		guid NVARCHAR(20) NOT NULL,
+		account NVARCHAR(255) NOT NULL,
+		region NVARCHAR(20) NOT NULL,
+		server NVARCHAR(20) NOT NULL,
+		name NVARCHAR(20) NOT NULL,
+		force INTEGER NOT NULL,
+		level INTEGER NOT NULL,
+		equip_score INTEGER NOT NULL,
+		pet_score INTEGER NOT NULL,
+		gold INTEGER NOT NULL,
+		silver INTEGER NOT NULL,
+		copper INTEGER NOT NULL,
+		contribution INTEGER NOT NULL,
+		contribution_remain INTEGER NOT NULL,
+		justice INTEGER NOT NULL,
+		justice_remain INTEGER NOT NULL,
+		prestige INTEGER NOT NULL,
+		prestige_remain INTEGER NOT NULL,
+		camp_point INTEGER NOT NULL,
+		camp_point_percentage INTEGER NOT NULL,
+		camp_level INTEGER NOT NULL,
+		arena_award INTEGER NOT NULL,
+		arena_award_remain INTEGER NOT NULL,
+		exam_print INTEGER NOT NULL,
+		exam_print_remain INTEGER NOT NULL,
+		achievement_score INTEGER NOT NULL,
+		coin INTEGER NOT NULL,
+		mentor_score INTEGER NOT NULL,
+		starve INTEGER NOT NULL,
+		starve_remain INTEGER NOT NULL,
+		architecture INTEGER NOT NULL,
+		architecture_remain INTEGER NOT NULL,
+		time INTEGER NOT NULL,
+		extra TEXT NOT NULL,
+		PRIMARY KEY(guid)
+	)
+]])
+local DB_RoleInfoW = DB:Prepare('REPLACE INTO RoleInfo (guid, account, region, server, name, force, level, equip_score, pet_score, gold, silver, copper, contribution, contribution_remain, justice, justice_remain, prestige, prestige_remain, camp_point, camp_point_percentage, camp_level, arena_award, arena_award_remain, exam_print, exam_print_remain, achievement_score, coin, mentor_score, starve, starve_remain, architecture, architecture_remain, time, extra) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
 local DB_RoleInfoCoinW = DB:Prepare('UPDATE RoleInfo SET coin = ? WHERE account = ? AND region = ?')
 local DB_RoleInfoG = DB:Prepare('SELECT * FROM RoleInfo WHERE guid = ?')
 local DB_RoleInfoR = DB:Prepare('SELECT * FROM RoleInfo WHERE account LIKE ? OR name LIKE ? OR region LIKE ? OR server LIKE ? ORDER BY time DESC')
@@ -790,6 +824,73 @@ function D.GetClientPlayerRec()
 end
 end
 
+function D.Migration()
+	local DB_V2_PATH = LIB.FormatPath({'userdata/role_statistics/role_stat.v2.db', PATH_TYPE.GLOBAL})
+	if not IsLocalFileExist(DB_V2_PATH) then
+		return
+	end
+	LIB.Confirm(
+		_L['Ancient database detected, do you want to migrate data from it?'],
+		function()
+			-- ×ªÒÆV2¾É°æÊý¾Ý
+			if IsLocalFileExist(DB_V2_PATH) then
+				local DB_V2 = SQLite3_Open(DB_V2_PATH)
+				if DB_V2 then
+					DB:Execute('BEGIN TRANSACTION')
+					local aRoleInfo = DB_V2:Execute('SELECT * FROM RoleInfo WHERE guid IS NOT NULL AND name IS NOT NULL')
+					if aRoleInfo then
+						for _, rec in ipairs(aRoleInfo) do
+							DB_RoleInfoW:ClearBindings()
+							DB_RoleInfoW:BindAll(
+								rec.guid,
+								rec.account,
+								rec.region,
+								rec.server,
+								rec.name,
+								rec.force,
+								rec.level,
+								rec.equip_score,
+								rec.pet_score,
+								rec.gold,
+								rec.silver,
+								rec.copper,
+								rec.contribution,
+								rec.contribution_remain,
+								rec.justice,
+								rec.justice_remain,
+								rec.prestige,
+								rec.prestige_remain,
+								rec.camp_point,
+								rec.camp_point_percentage,
+								rec.camp_level,
+								rec.arena_award,
+								rec.arena_award_remain,
+								rec.exam_print,
+								rec.exam_print_remain,
+								rec.achievement_score,
+								rec.coin,
+								rec.mentor_score,
+								rec.starve,
+								rec.starve_remain,
+								rec.architecture,
+								rec.architecture_remain,
+								rec.time,
+								''
+							)
+							DB_RoleInfoW:Execute()
+						end
+						DB_RoleInfoW:Reset()
+					end
+					DB:Execute('END TRANSACTION')
+					DB_V2:Release()
+				end
+				CPath.Move(DB_V2_PATH, DB_V2_PATH .. '.bak' .. LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
+			end
+			FireUIEvent('MY_ROLE_STAT_ROLE_UPDATE')
+			LIB.Alert(_L['Migrate succeed!'])
+		end)
+end
+
 function D.FlushDB()
 	if not O.bSaveDB then
 		return
@@ -813,7 +914,7 @@ function D.FlushDB()
 		rec.camp_level, rec.arena_award, rec.arena_award_remain, rec.exam_print,
 		rec.exam_print_remain, rec.achievement_score, rec.coin, rec.mentor_score,
 		rec.starve, rec.starve_remain, rec.architecture, rec.architecture_remain,
-		rec.time)
+		rec.time, '')
 	DB_RoleInfoW:Execute()
 	DB_RoleInfoW:Reset()
 
@@ -1217,6 +1318,7 @@ function D.CheckAdvice()
 end
 
 function D.OnActivePage()
+	D.Migration()
 	D.CheckAdvice()
 	D.FlushDB()
 	D.UpdateUI(this)

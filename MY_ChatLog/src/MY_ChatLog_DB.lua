@@ -169,10 +169,26 @@ function DB:Connect(bCheck)
 		LIB.Debug(_L['MY_ChatLog'], 'Init database with STMT', DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		if self.db then
-			self.db:Execute('CREATE TABLE IF NOT EXISTS ChatInfo (key NVARCHAR(128), value NVARCHAR(4096), PRIMARY KEY (key))')
+			self.db:Execute([[
+				CREATE TABLE IF NOT EXISTS ChatInfo (
+					key NVARCHAR(128) NOT NULL,
+					value NVARCHAR(4096) NOT NULL,
+					PRIMARY KEY (key)
+				)
+			]])
 			self.stmtInfoGet = self.db:Prepare('SELECT value FROM ChatInfo WHERE key = ?')
 			self.stmtInfoSet = self.db:Prepare('REPLACE INTO ChatInfo (key, value) VALUES (?, ?)')
-			self.db:Execute('CREATE TABLE IF NOT EXISTS ChatLog (hash INTEGER, channel INTEGER, time INTEGER, talker NVARCHAR(20), text NVARCHAR(400) NOT NULL, msg NVARCHAR(4000) NOT NULL, PRIMARY KEY (time, hash))')
+			self.db:Execute([[
+				CREATE TABLE IF NOT EXISTS ChatLog (
+					hash INTEGER NOT NULL,
+					channel INTEGER NOT NULL,
+					time INTEGER NOT NULL,
+					talker NVARCHAR(20) NOT NULL,
+					text NVARCHAR(400) NOT NULL,
+					msg NVARCHAR(4000) NOT NULL,
+					PRIMARY KEY (time, hash)
+				)
+			]])
 			self.db:Execute('CREATE INDEX IF NOT EXISTS ChatLog_channel_idx ON ChatLog(channel)')
 			self.db:Execute('CREATE INDEX IF NOT EXISTS ChatLog_talker_idx ON ChatLog(talker)')
 			self.db:Execute('CREATE INDEX IF NOT EXISTS ChatLog_text_idx ON ChatLog(text)')

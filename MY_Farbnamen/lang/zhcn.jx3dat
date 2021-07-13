@@ -10,10 +10,12 @@ return {
     ['[Teammate]'] = '〔队友〕',
     ['Load default setting'] = '恢复默认设置',
     ['Player ID: %d'] = '玩家ID：%d',
-    ['Upgrade database finished!'] = '数据库升级完成！',
     ['Cannot connect to database!!!'] = '无法连接到角色数据库！',
     ['Retry time: %d'] = '第%d次重试连接……',
     ['Unknown force'] = '未知门派',
     ['Unknown gender'] = '未知体型',
     ['Unknown camp'] = '未知阵营',
+
+    ['Ancient database detected, do you want to migrate data from it?'] = '发现旧版染色数据，是否立即转换数据？',
+    ['Migrate succeed!'] = '染色数据迁移成功！',
 }
