@@ -595,7 +595,7 @@ function D.UpdateItems(page)
 	end
 	local sqlwhere = ((#wheres == 0 and ' 1 = 0 ') or ('(' .. concat(wheres, ' OR ') .. ')'))
 	local sqlgroup = ' GROUP BY C.tabtype, C.tabindex'
-	sql  = sql  .. sqlwhere .. sqlgroup .. ' LIMIT ' .. nPageSize .. ' OFFSET ' .. ((page.nCurrentPage - 1) * nPageSize)
+	sql  = sql  .. sqlwhere .. sqlgroup .. ' ORDER BY C.tabtype ASC, C.tabindex ASC ' .. ' LIMIT ' .. nPageSize .. ' OFFSET ' .. ((page.nCurrentPage - 1) * nPageSize)
 	sqlc = sqlc .. sqlwhere .. sqlgroup
 
 	-- »æÖÆÒ³Âë
@@ -668,20 +668,19 @@ function D.UpdateItems(page)
 		local KItemInfo = GetItemInfo(rec.tabtype, rec.tabindex)
 		if KItemInfo then
 			if O.bCompactMode then
-				local count = 0
 				local hItem = handle:AppendItemFromIni(SZ_INI, 'Handle_ItemCompact')
 				local box = hItem:Lookup('Box_ItemCompact')
 
 				DB_BelongsR:ClearBindings()
 				DB_BelongsR:BindAll(rec.tabtype, rec.tabindex, rec.tabsubindex, unpack(ownerkeys))
 				local result = DB_BelongsR:GetAll()
-				local aTip = {}
+				local count = 0
 				for _, rec in ipairs(result) do
 					count = count + rec.bankcount + rec.bagcount
-					insert(aTip, _L('%s (%s)\tBankx%d Bagx%d Totalx%d\n', UTF8ToAnsi(rec.ownername), UTF8ToAnsi(rec.servername), rec.bankcount, rec.bagcount, rec.bankcount + rec.bagcount))
 				end
 				UI.UpdateItemInfoBoxObject(box, nil, rec.tabtype, rec.tabindex, count, rec.tabsubindex)
-				box.tip = GetItemInfoTip(nil, rec.tabtype, rec.tabindex, nil, nil, rec.tabsubindex) .. GetFormatText(concat(aTip))
+				box.itemdata = rec
+				box.belongsdata = result
 			else
 				local hItem = handle:AppendItemFromIni(SZ_INI, 'Handle_Item')
 				UI.UpdateItemInfoBoxObject(hItem:Lookup('Box_Item'), nil, rec.tabtype, rec.tabindex, 1, rec.tabsubindex)
@@ -866,10 +865,32 @@ function D.OnItemLButtonClick()
 end
 
 function D.OnItemMouseEnter()
-	if this.tip then
+	if this.itemdata and this.belongsdata then
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
-		OutputTip(this.tip, 400, {x, y, w, h, false}, nil, false)
+
+		local rec = this.itemdata
+		local szTip = GetItemInfoTip(nil, rec.tabtype, rec.tabindex, nil, nil, rec.tabsubindex)
+
+		if IsCtrlKeyDown() then
+			szTip = szTip .. CONSTANT.XML_LINE_BREAKER
+			szTip = szTip .. GetFormatText('ItemInfo: ' .. rec.tabtype .. ', ' .. rec.tabindex, 102)
+			if rec.tabsubindex ~= -1 then
+				szTip = szTip .. GetFormatText('ItemInfo: ' .. rec.tabsubindex, 102)
+			end
+			szTip = szTip .. CONSTANT.XML_LINE_BREAKER
+			szTip = szTip .. GetFormatText('Box: ' .. rec.boxtype .. ', ' .. rec.boxindex, 102)
+			szTip = szTip .. CONSTANT.XML_LINE_BREAKER
+			szTip = szTip .. CONSTANT.XML_LINE_BREAKER
+		end
+
+		local aTip = {}
+		for _, rec in ipairs(this.belongsdata) do
+			insert(aTip, _L('%s (%s)\tBankx%d Bagx%d Totalx%d\n', UTF8ToAnsi(rec.ownername), UTF8ToAnsi(rec.servername), rec.bankcount, rec.bagcount, rec.bankcount + rec.bagcount))
+		end
+		szTip = szTip .. GetFormatText(concat(aTip))
+
+		OutputTip(szTip, 400, {x, y, w, h, false}, nil, false)
 	end
 end
 D.OnItemRefreshTip = D.OnItemMouseEnter
