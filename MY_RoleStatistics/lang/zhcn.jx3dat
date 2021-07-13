@@ -11,6 +11,18 @@ return {
 
     ['MY_RoleStatistics_BagStat'] = '背包统计',
 
+    BAG_FILTER_TYPE = {
+        ['All'      ] = '全部',
+        ['Task'     ] = '任务',
+        ['Equipment'] = '装备',
+        ['Drug'     ] = '药品',
+        ['Material' ] = '材料',
+        ['Book'     ] = '书籍',
+        ['Furniture'] = '家具',
+        ['Grey'     ] = '灰色',
+        ['TimeLtd'  ] = '限时',
+    },
+
     ['%d pages'] = '共%d页',
     ['%d results'] = '共%d个结果',
     ['Character: %s\nServer: %s\nSnapshot Time: %s'] = '角色名：%s\n服务器：%s\n快照时间：%s',

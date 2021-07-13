@@ -168,7 +168,21 @@ local O = LIB.CreateUserSettingsModule('MY_RoleStatistics_BagStat', _L['General'
 		xDefaultValue = false,
 	},
 })
-local D = {}
+local D = {
+	szFilterType = 'All',
+}
+
+local FILTER_LIST = {
+	{ name = 'All'      , where = '' },
+	{ name = 'Task'     , where = 'I.genre = 2' },
+	{ name = 'Equipment', where = 'I.genre = 0' },
+	{ name = 'Drug'     , where = 'I.genre = 1 OR genre = 14' },
+	{ name = 'Material' , where = 'I.genre = 3' },
+	{ name = 'Book'     , where = 'I.genre = 4' },
+	{ name = 'Furniture', where = 'I.genre = 20', visible = GLOBAL.GAME_BRANCH ~= 'classic' },
+	{ name = 'Grey'     , where = 'I.quality = 0' },
+	{ name = 'TimeLtd'  , where = 'I.exist_type <> -1 AND I.exist_type <> ' .. ITEM_EXIST_TYPE.PERMANENT },
+}
 
 function D.GetPlayerGUID(me)
 	return me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName
@@ -530,6 +544,12 @@ function D.UpdateItems(page)
 	D.FlushDB()
 
 	local searchitem = AnsiToUTF8('%' .. page:Lookup('Wnd_Total/Wnd_SearchItem/Edit_SearchItem'):GetText():gsub('%s+', '%%') .. '%')
+	local sqlfilter = ''
+	for _, p in ipairs(FILTER_LIST) do
+		if p.name == D.szFilterType and not IsEmpty(p.where) then
+			sqlfilter = sqlfilter .. ' AND (' .. p.where .. ') '
+		end
+	end
 	local sqlfrom = [[
 		(
 			SELECT B.ownerkey, B.boxtype, B.boxindex, B.tabtype, B.tabindex, B.tabsubindex, B.bagcount, B.bankcount, B.time
@@ -538,7 +558,7 @@ function D.UpdateItems(page)
 			LEFT JOIN ItemInfo
 				AS I
 			ON
-				B.tabtype = I.tabtype AND B.tabindex = I.tabindex WHERE B.tabtype != -1 AND B.tabindex != -1 AND (I.name LIKE ? OR I.desc LIKE ?)
+				B.tabtype = I.tabtype AND B.tabindex = I.tabindex WHERE B.tabtype != -1 AND B.tabindex != -1 AND (I.name LIKE ? OR I.desc LIKE ?) ]] .. sqlfilter .. [[
 		)
 			AS C
 		LEFT JOIN OwnerInfo
@@ -726,6 +746,25 @@ function D.OnActivePage()
 		end, function()
 			MY_RoleStatistics_BagStat.bAdviceSaveDB = true
 		end)
+	end
+
+	local page = this
+	local ui = UI(page)
+	local nX, nY = 440, 20
+	for _, p in ipairs(FILTER_LIST) do
+		nX = nX + ui:Append('WndRadioBox', {
+			x = nX, y = nY, w = 'auto', h = 25,
+			group = 'FilterType',
+			text = _L.BAG_FILTER_TYPE[p.name],
+			checked = D.szFilterType == p.name,
+			oncheck = function(bChecked)
+				if not bChecked then
+					return
+				end
+				D.szFilterType = p.name
+				D.UpdateItems(page)
+			end,
+		}):AutoWidth():Width()
 	end
 	D.FlushDB()
 	D.UpdateNames(this)
