@@ -92,6 +92,7 @@ return {
     ['Foe'] = '仇人關係',
 
     ['Hide when unfight'] = '脫戰時隱藏',
+    ['Hide in dungeon'] = '秘境中隱藏',
     ['Hide pets'] = '不顯示跟寵',
     ['Hide decimal'] = '不顯示小數',
 
