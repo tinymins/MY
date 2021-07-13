@@ -22,6 +22,8 @@ return {
         ['Grey'     ] = '灰色',
         ['TimeLtd'  ] = '限時',
     },
+    ['Switch compact mode'] = '切換緊湊模式',
+    ['Hide equipped item'] = '隱藏身上裝備',
 
     ['%d pages'] = '共%d頁',
     ['%d results'] = '共%d個結果',

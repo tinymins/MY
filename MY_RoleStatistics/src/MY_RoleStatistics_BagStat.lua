@@ -139,6 +139,12 @@ local O = LIB.CreateUserSettingsModule('MY_RoleStatistics_BagStat', _L['General'
 		xSchema = Schema.Boolean,
 		xDefaultValue = true,
 	},
+	bHideEquipped = {
+		ePathType = PATH_TYPE.GLOBAL,
+		szLabel = _L['MY_RoleStatistics'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
 	tUncheckedNames = {
 		ePathType = PATH_TYPE.GLOBAL,
 		xSchema = Schema.Map(Schema.String, Schema.Boolean),
@@ -550,6 +556,11 @@ function D.UpdateItems(page)
 			sqlfilter = sqlfilter .. ' AND (' .. p.where .. ') '
 		end
 	end
+	if O.bHideEquipped then
+		for suitindex, boxtype in ipairs(CONSTANT.INVENTORY_EQUIP_LIST) do
+			sqlfilter = sqlfilter .. ' AND B.boxtype <> ' .. boxtype .. ' '
+		end
+	end
 	local sqlfrom = [[
 		(
 			SELECT B.ownerkey, B.boxtype, B.boxindex, B.tabtype, B.tabindex, B.tabsubindex, B.bagcount, B.bankcount, B.time
@@ -842,7 +853,22 @@ function D.OnLButtonClick()
 			D.UpdateNames(page)
 		end)
 	elseif name == 'Btn_SwitchMode' then
-		MY_RoleStatistics_BagStat.bCompactMode = not MY_RoleStatistics_BagStat.bCompactMode
+		UI.PopupMenu({
+			{
+				szOption = _L['Switch compact mode'],
+				fnAction = function ()
+					MY_RoleStatistics_BagStat.bCompactMode = not MY_RoleStatistics_BagStat.bCompactMode
+					UI.ClosePopupMenu()
+				end,
+			},
+			{
+				szOption = _L['Hide equipped item'],
+				fnAction = function ()
+					MY_RoleStatistics_BagStat.bHideEquipped = not MY_RoleStatistics_BagStat.bHideEquipped
+					UI.ClosePopupMenu()
+				end,
+			},
+		})
 	elseif name == 'Btn_NameAll' then
 		local parent = this:GetParent():Lookup('WndContainer_Name')
 		local page = this:GetParent():GetParent():GetParent()
@@ -994,6 +1020,7 @@ local settings = {
 		{
 			fields = {
 				'bCompactMode',
+				'bHideEquipped',
 				'tUncheckedNames',
 				'bSaveDB',
 				'bAdviceSaveDB',
@@ -1006,6 +1033,7 @@ local settings = {
 		{
 			fields = {
 				'bCompactMode',
+				'bHideEquipped',
 				'tUncheckedNames',
 				'bSaveDB',
 				'bAdviceSaveDB',
@@ -1013,6 +1041,9 @@ local settings = {
 			},
 			triggers = {
 				bCompactMode = function()
+					FireUIEvent('MY_BAGSTATISTICS_MODE_CHANGE')
+				end,
+				bHideEquipped = function()
 					FireUIEvent('MY_BAGSTATISTICS_MODE_CHANGE')
 				end,
 				bSaveDB = D.UpdateSaveDB,
