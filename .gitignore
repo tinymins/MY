@@ -6,5 +6,6 @@ publisher.key
 __pycache__
 /squishy
 /*/src.lua
+/*/src.*.lua
 /\!src-dist/dist/
 /\!src-dist/tools/targetmon-format/*.jx3dat

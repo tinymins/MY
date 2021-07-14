@@ -126,7 +126,7 @@ def convert_progress(argv):
             relpath = filepath.replace(root_path, '')
             crc_changed = False
 
-            if extname == '.lua' and header != '' and basename != pkg_name and filename != 'src.lua':
+            if extname == '.lua' and header != '' and basename != pkg_name and not (filename.startswith('src.') and filename.endswith('.lua')): # src.lua
                 print('--------------------------------')
                 print('Update header: ' + filepath)
                 crc_text = utils.get_file_crc(filepath)
