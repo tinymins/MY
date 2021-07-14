@@ -115,6 +115,7 @@ DB:Execute('CREATE INDEX IF NOT EXISTS OwnerInfo_ownername_idx ON OwnerInfo(owne
 DB:Execute('CREATE INDEX IF NOT EXISTS OwnerInfo_servername_idx ON OwnerInfo(servername)')
 local DB_OwnerInfoW = DB:Prepare('REPLACE INTO OwnerInfo (ownerkey, ownername, servername, ownerforce, ownerrole, ownerlevel, ownerscore, ownersuitindex, time, extra) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
 local DB_OwnerInfoR = DB:Prepare('SELECT * FROM OwnerInfo WHERE ownername LIKE ? OR servername LIKE ? ORDER BY time DESC')
+local DB_OwnerInfoG = DB:Prepare('SELECT * FROM OwnerInfo WHERE ownerkey = ?')
 local DB_OwnerInfoD = DB:Prepare('DELETE FROM OwnerInfo WHERE ownerkey = ?')
 
 local EQUIPMENT_ITEM_LIST = {
@@ -351,6 +352,18 @@ function D.Migration()
 		end)
 end
 
+local REC_CACHE
+LIB.RegisterEvent({'EQUIP_CHANGE', 'EQUIP_ITEM_UPDATE'}, 'MY_RoleStatistics_EquipStat', function()
+	LIB.DelayCall('MY_RoleStatistics_EquipStat_GetScore', 100, function()
+		if not REC_CACHE then
+			return
+		end
+		local me = GetClientPlayer()
+		local ownersuitindex = me.GetEquipIDArray(0) + 1
+		REC_CACHE.ownerscore[ownersuitindex] = me.GetTotalEquipScore() or 0
+	end)
+end)
+
 function D.FlushDB()
 	if not O.bSaveDB then
 		return
@@ -363,10 +376,27 @@ function D.FlushDB()
 	local ownerkey = AnsiToUTF8(D.GetPlayerGUID(me))
 	local ownername = AnsiToUTF8(me.szName)
 	local servername = AnsiToUTF8(LIB.GetRealServer(2))
+	local rec = REC_CACHE
+	if not rec then
+		rec = {
+			ownerscore = {},
+		}
+		DB_OwnerInfoG:ClearBindings()
+		DB_OwnerInfoG:BindAll(ownerkey)
+		local result = DB_OwnerInfoG:GetAll()
+		DB_OwnerInfoG:Reset()
+		if result and result[1] and result[1].ownerscore then
+			local d = DecodeLUAData(result[1].ownerscore)
+			if IsTable(d) then
+				rec.ownerscore = d
+			end
+		end
+		REC_CACHE = rec
+	end
 	local ownerforce = 0
 	local ownerrole = 0
 	local ownerlevel = 0
-	local ownerscore = 0
+	local ownerscore = rec.ownerscore
 	local ownersuitindex = 0
 	local ownerextra = ''
 	DB:Execute('BEGIN TRANSACTION')
@@ -420,8 +450,8 @@ function D.FlushDB()
 	ownerforce = me.dwForceID
 	ownerrole = me.nRoleType
 	ownerlevel = me.nLevel
-	ownerscore = me.GetTotalEquipScore() or 0
 	ownersuitindex = me.GetEquipIDArray(0) + 1
+	ownerscore[ownersuitindex] = me.GetTotalEquipScore() or 0
 	ownerextra = AnsiToUTF8(LIB.JsonEncode({
 		waist = { ITEM_TABLE_TYPE.CUST_TRINKET, (me.dwWaistItemIndex) },
 		back = { ITEM_TABLE_TYPE.CUST_TRINKET, (me.dwBackItemIndex) },
@@ -437,7 +467,7 @@ function D.FlushDB()
 	}))
 
 	DB_OwnerInfoW:ClearBindings()
-	DB_OwnerInfoW:BindAll(ownerkey, ownername, servername, ownerforce, ownerrole, ownerlevel, ownerscore, ownersuitindex, time, ownerextra)
+	DB_OwnerInfoW:BindAll(ownerkey, ownername, servername, ownerforce, ownerrole, ownerlevel, EncodeLUAData(ownerscore), ownersuitindex, time, ownerextra)
 	DB_OwnerInfoW:Execute()
 	DB_OwnerInfoW:Reset()
 
@@ -540,7 +570,7 @@ function D.UpdateItems(page)
 			ownerforce = wnd.ownerinfo.ownerforce
 			ownerrole = wnd.ownerinfo.ownerrole
 			ownerlevel = wnd.ownerinfo.ownerlevel
-			ownerscore = wnd.ownerinfo.ownerscore
+			ownerscore = DecodeLUAData(wnd.ownerinfo.ownerscore) or {}
 			ownersuitindex = wnd.ownerinfo.ownersuitindex
 			ownerextra = wnd.ownerinfo.ownerextra
 		end
@@ -724,8 +754,8 @@ function D.UpdateItems(page)
 	local txtRoleInfo = page:Lookup('Wnd_Total/Wnd_ItemPage', 'Text_RoleInfo')
 	txtRoleInfo:SetText(_L('%s * %s', CONSTANT.FORCE_TYPE_LABEL[ownerforce] or '', CONSTANT.ROLE_TYPE_LABEL[ownerrole] or ''))
 	local txtEquipScore = page:Lookup('Wnd_Total/Wnd_ItemPage', 'Text_EquipScore')
-	txtEquipScore:SetVisible(ownersuitindex == D.dwCurrentSuitIndex)
-	txtEquipScore:SetText(_L('Equip score: %s', ownerscore))
+	-- txtEquipScore:SetVisible(ownersuitindex == D.dwCurrentSuitIndex)
+	txtEquipScore:SetText(_L('Equip score: %s', ownerscore[D.dwCurrentSuitIndex] or _L['Unknown']))
 	local hBoard = page:Lookup('Wnd_Total/Wnd_ItemPage/WndScroll_EquipInfo', 'Handle_EquipInfo')
 	hBoard:Clear()
 	hBoard:AppendItemFromString(concat(aXml))
@@ -792,7 +822,7 @@ function D.OnCheckBoxCheck()
 	if name == 'CheckBox_PageNum' then
 		local page = this:GetParent():GetParent():GetParent():GetParent():GetParent():GetParent()
 		D.dwCurrentSuitIndex = this:GetParent().nSuitIndex
-		D.UpdateItems(page)
+		D.UpdateNames(page)
 	end
 end
 
