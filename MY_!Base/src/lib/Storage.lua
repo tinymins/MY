@@ -1262,7 +1262,6 @@ do
 -- 31 - 31 检测是否同步了插件设置项
 local l_tBoolValues = {
 	-- KEY = OFFSET
-	['MY_Recount_EnableUI'] = 2,
 }
 local l_watches = {}
 local BIT_NUMBER = 8

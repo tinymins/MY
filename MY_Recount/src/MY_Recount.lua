@@ -198,7 +198,7 @@ end
 -- 获取设置菜单
 function D.GetMenu()
 	local function IsUIDisabled()
-		return not MY_Recount_DS.bEnable or not LIB.GetStorage('BoolValues.MY_Recount_EnableUI')
+		return not MY_Recount_DS.bEnable or not MY_Recount_UI.bEnable
 	end
 	local t = {
 		szOption = _L['Fight recount'],
@@ -213,10 +213,9 @@ function D.GetMenu()
 		{
 			szOption = _L['Enable UI'],
 			bCheck = true,
-			bChecked = LIB.GetStorage('BoolValues.MY_Recount_EnableUI'),
+			bChecked = MY_Recount_UI.bEnable,
 			fnAction = function()
-				LIB.SetStorage('BoolValues.MY_Recount_EnableUI', not LIB.GetStorage('BoolValues.MY_Recount_EnableUI'))
-				MY_Recount_UI.CheckOpen()
+				MY_Recount_UI.bEnable = not MY_Recount_UI.bEnable
 			end,
 			fnDisable = function() return not MY_Recount_DS.bEnable end,
 		},

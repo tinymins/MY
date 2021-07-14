@@ -160,6 +160,18 @@ local FORCE_BAR_CSS = LIB.LoadLUAData({'config/recount/barcss.jx3dat', PATH_TYPE
 insert(FORCE_BAR_CSS, { [-1] = { r = 255, g = 255, b = 255 } }) -- GLOBAL
 
 local O = LIB.CreateUserSettingsModule('MY_Recount_UI', _L['Raid'], {
+	bEnable = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Recount'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	anchor = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Recount'],
+		xSchema = Schema.FrameAnchor,
+		xDefaultValue = { x = 0, y = -70, s = 'BOTTOMRIGHT', r = 'BOTTOMRIGHT' },
+	},
 	nCss = { -- 当前样式表
 		ePathType = PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount'],
@@ -265,7 +277,7 @@ function D.Close()
 end
 
 function D.CheckOpen()
-	if MY_Recount_DS.bEnable and LIB.GetStorage('BoolValues.MY_Recount_EnableUI') then
+	if MY_Recount_DS.bEnable and O.bEnable then
 		D.Open()
 	else
 		D.Close()
@@ -273,8 +285,7 @@ function D.CheckOpen()
 end
 
 function D.UpdateAnchor(frame)
-	local an = LIB.GetStorage('FrameAnchor.MY_Recount')
-		or { x = 0, y = -70, s = 'BOTTOMRIGHT', r = 'BOTTOMRIGHT' }
+	local an = O.anchor
 	frame:SetPoint(an.s, 0, 0, an.r, an.x, an.y)
 	frame:CorrectPos()
 end
@@ -616,7 +627,11 @@ end
 
 function D.OnFrameDragEnd()
 	this:CorrectPos()
-	LIB.SetStorage('FrameAnchor.MY_Recount', GetFrameAnchor(this))
+	O.anchor = GetFrameAnchor(this)
+end
+
+function D.OnFrameDragSetPosEnd()
+	this:CorrectPos()
 end
 
 function D.OnItemLButtonClick()
@@ -768,7 +783,7 @@ function D.OnCheckBoxUncheck()
 	end
 end
 
-LIB.RegisterStorageInit('MY_Recount_UI', D.CheckOpen)
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_Recount_UI', D.CheckOpen)
 
 -- Global exports
 do
@@ -788,6 +803,7 @@ local settings = {
 		},
 		{
 			fields = {
+				'bEnable',
 				'nCss',
 				'nChannel',
 				'bAwayMode',
@@ -809,6 +825,7 @@ local settings = {
 	imports = {
 		{
 			fields = {
+				'bEnable',
 				'nCss',
 				'nChannel',
 				'bAwayMode',
@@ -825,6 +842,7 @@ local settings = {
 				'anchor',
 			},
 			triggers = {
+				bEnable = function() D.CheckOpen() end,
 				nCss = function() FireUIEvent('MY_RECOUNT_UI_CONFIG_UPDATE') end,
 				bAwayMode = function() FireUIEvent('MY_RECOUNT_UI_CONFIG_UPDATE') end,
 				bSysTimeMode = function() FireUIEvent('MY_RECOUNT_UI_CONFIG_UPDATE') end,
