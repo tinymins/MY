@@ -18,6 +18,8 @@ from plib.environment import get_current_packet_id, get_packet_path, set_packet_
 from plib.language.converter import Converter
 import plib.environment as env
 
+TIME_TAG = time.strftime('%Y%m%d%H%M%S', time.localtime())
+
 def __compress(addon):
 	'''
 	Compress and concat addon source into one file.
@@ -29,7 +31,7 @@ def __compress(addon):
 	print('Compressing: %s' % addon)
 	file_count = 0
 	converter = Converter('zh-TW')
-	srcname = 'src.' + time.strftime('%Y%m%d%H%M%S', time.localtime()) + '.lua'
+	srcname = 'src.' + TIME_TAG + '.lua'
 	# Remove debug codes in source
 	for line in open('%s/info.ini' % addon):
 		parts = line.strip().split('=')
@@ -223,7 +225,7 @@ def run(diff_ver, is_source):
 	if version_info.get('previous_hash'):
 		file_name_fmt = '!src-dist/dist/%s_%s_v%s.%sdiff-%s-%s.7z' % (
 			get_current_packet_id(),
-			time.strftime('%Y%m%d%H%M%S', time.localtime()),
+			TIME_TAG,
 			version_info.get('current'),
 			'%s',
 			version_info.get('previous_hash'),
@@ -240,7 +242,7 @@ def run(diff_ver, is_source):
 
 	file_name_fmt = '!src-dist/dist/%s_%s_v%s.%sfull.7z' % (
 		get_current_packet_id(),
-		time.strftime('%Y%m%d%H%M%S', time.localtime()),
+		TIME_TAG,
 		version_info.get('current'),
 		'%s',
 	)
