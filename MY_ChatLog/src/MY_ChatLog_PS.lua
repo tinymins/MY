@@ -290,11 +290,11 @@ function D.ExportConfirm()
 				)
 				ui:Remove()
 			end
-			LIB.Confirm(
-				_L['Please choose export mode.\nHTML mode will export chatlog to human-readable file.\nDB mode will export chatlog to re-importable backup file.'],
-				function() doExport('.html') end,
-				function() doExport('.db') end,
-				_L['HTML mode'], _L['DB mode'])
+			LIB.Dialog(
+				_L['Please choose export mode.\nHTML mode will export chatlog to human-readable file.\nDB mode will export chatlog to re-importable backup file.'], {
+					{ szOption = _L['HTML mode'], fnAction = function() doExport('.html') end },
+					{ szOption = _L['DB mode'], fnAction = function() doExport('.db') end },
+				})
 		end,
 	})
 	y = y + 30

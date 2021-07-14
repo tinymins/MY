@@ -492,8 +492,10 @@ function PS.OnPanelActive(wnd)
 							MY_Anmerkungen.SaveConfig()
 							LIB.SwitchTab('MY_Anmerkungen_Player_Note', true)
 						end
-						LIB.Confirm(_L['Prefer old data or new data?'], function() Next(false) end,
-							function() Next(true) end, _L['Old data'], _L['New data'])
+						LIB.Dialog(_L['Prefer old data or new data?'], {
+							{ szOption = _L['Old data'], fnAction = function() Next(false) end },
+							{ szOption = _L['New data'], fnAction = function() Next(true) end },
+						})
 					else
 						LIB.Alert(_L['Decode data failed!'])
 					end
