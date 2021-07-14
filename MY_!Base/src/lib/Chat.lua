@@ -1527,7 +1527,7 @@ local function BeforeChatAppendItemFromString(h, szMsg, ...) -- h, szMsg, szChan
 			end
 		--[[#DEBUG BEGIN]]
 		else
-			FireUIEvent('CALL_LUA_ERROR', err .. '\nHookChatPanel.FILTER:' .. szKey .. '\n' .. trace .. '\n')
+			LIB.ErrorLog(err, 'HookChatPanel.FILTER: ' .. szKey, trace)
 		--[[#DEBUG END]]
 		end
 	end
@@ -1539,7 +1539,7 @@ local function BeforeChatAppendItemFromString(h, szMsg, ...) -- h, szMsg, szChan
 			end
 		--[[#DEBUG BEGIN]]
 		else
-			FireUIEvent('CALL_LUA_ERROR', err .. '\nHookChatPanel.BEFORE:' .. szKey .. '\n' .. trace .. '\n')
+			LIB.ErrorLog(err, 'HookChatPanel.BEFORE: ' .. szKey, trace)
 		--[[#DEBUG END]]
 		end
 	end
@@ -1565,7 +1565,7 @@ local function AfterChatAppendItemFromString(h, ...)
 			for szKey, fnAction in pairs(CHAT_HOOK.AFTER) do
 				local res, err, trace = XpCall(fnAction, h, nStart, ...)
 				if not res then
-					FireUIEvent('CALL_LUA_ERROR', err .. '\nHookChatPanel.AFTER: ' .. szKey .. '\n' .. trace .. '\n')
+					LIB.ErrorLog(err, 'HookChatPanel.AFTER: ' .. szKey, trace)
 				end
 			end
 		end

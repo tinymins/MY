@@ -282,7 +282,7 @@ function LIB.SwitchTab(szKey, bForceUpdate)
 	if wnd.OnPanelDeactive then
 		local res, err, trace = XpCall(wnd.OnPanelDeactive, wnd)
 		if not res then
-			FireUIEvent('CALL_LUA_ERROR', err .. NSFormatString('\n{$NS}#OnPanelDeactive\n') .. trace .. '\n')
+			LIB.ErrorLog(err, NSFormatString('{$NS}#OnPanelDeactive'), trace)
 		end
 	end
 	-- clear all events
@@ -300,7 +300,7 @@ function LIB.SwitchTab(szKey, bForceUpdate)
 	if tTab.OnPanelActive then
 		local res, err, trace = XpCall(tTab.OnPanelActive, wnd)
 		if not res then
-			FireUIEvent('CALL_LUA_ERROR', err .. NSFormatString('\n{$NS}#OnPanelActive\n') .. trace .. '\n')
+			LIB.ErrorLog(err, NSFormatString('{$NS}#OnPanelActive'), trace)
 		end
 		wnd:FormatAllContentPos()
 	end
@@ -499,21 +499,21 @@ function D.OnSizeChanged()
 	if hWndMainPanel.OnPanelResize then
 		local res, err, trace = XpCall(hWndMainPanel.OnPanelResize, hWndMainPanel)
 		if not res then
-			FireUIEvent('CALL_LUA_ERROR', err .. NSFormatString('\n{$NS}#OnPanelResize\n') .. trace .. '\n')
+			LIB.ErrorLog(err, NSFormatString('{$NS}#OnPanelResize'), trace)
 		end
 		hWndMainPanel:FormatAllContentPos()
 	elseif hWndMainPanel.OnPanelActive then
 		if hWndMainPanel.OnPanelDeactive then
 			local res, err, trace = XpCall(hWndMainPanel.OnPanelDeactive, hWndMainPanel)
 			if not res then
-				FireUIEvent('CALL_LUA_ERROR', err .. NSFormatString('\n{$NS}#OnPanelResize->OnPanelDeactive\n') .. trace .. '\n')
+				LIB.ErrorLog(err, NSFormatString('{$NS}#OnPanelResize->OnPanelDeactive'), trace)
 			end
 		end
 		hWndMainPanel:Clear()
 		hWndMainPanel:Lookup('', ''):Clear()
 		local res, err, trace = XpCall(hWndMainPanel.OnPanelActive, hWndMainPanel)
 		if not res then
-			FireUIEvent('CALL_LUA_ERROR', err .. NSFormatString('\n{$NS}#OnPanelResize->OnPanelActive\n') .. trace .. '\n')
+			LIB.ErrorLog(err, NSFormatString('{$NS}#OnPanelResize->OnPanelActive'), trace)
 		end
 		hWndMainPanel:FormatAllContentPos()
 	end

@@ -1422,7 +1422,7 @@ local function OnInit()
 	for szKey, fnAction in pairs(INIT_FUNC_LIST) do
 		local res, err, trace = XpCall(fnAction)
 		if not res then
-			FireUIEvent('CALL_LUA_ERROR', err .. '\nINIT_FUNC_LIST: ' .. szKey .. '\n' .. trace .. '\n')
+			LIB.ErrorLog(err, 'INIT_FUNC_LIST: ' .. szKey, trace)
 		end
 	end
 	INIT_FUNC_LIST = {}

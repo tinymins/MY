@@ -194,6 +194,16 @@ end
 ---------------------------------------------------
 -- µ÷ÊÔ¹¤¾ß
 ---------------------------------------------------
+local function ErrorLog(...)
+	local aLine, xLine = {}, nil
+	for i = 1, select('#', ...) do
+		xLine = select(i, ...)
+		aLine[i] = tostring(xLine)
+	end
+	local szFull = concat(aLine, '\n') .. '\n'
+	Log('MSG_SYS', szFull)
+	FireUIEvent('CALL_LUA_ERROR', szFull)
+end
 if _DEBUG_LEVEL_ < DEBUG_LEVEL.NONE then
 	if not ENVIRONMENT.ECHO_LUA_ERROR then
 		RegisterEvent('CALL_LUA_ERROR', function()
@@ -1655,6 +1665,7 @@ local LIB = {
 	CallWithThis     = CallWithThis    ,
 	SafeCallWithThis = SafeCallWithThis,
 	SetmetaReadonly  = SetmetaReadonly ,
+	ErrorLog         = ErrorLog        ,
 	Set              = Set             ,
 	Get              = Get             ,
 	Class            = Class           ,

@@ -2408,7 +2408,7 @@ local function WithTargetHandle()
 	LIB.SetTempTarget(r.dwType, r.dwID)
 	local res, err, trace = XpCall(r.callback)
 	if not res then
-		FireUIEvent('CALL_LUA_ERROR', err .. NSFormatString('\n{$NS}#WithTarget\n') .. trace .. '\n')
+		LIB.ErrorLog(err, NSFormatString('{$NS}#WithTarget'), trace)
 	end
 	LIB.ResumeTarget()
 

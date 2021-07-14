@@ -186,7 +186,7 @@ local function FireEventRec(E, p, ...)
 	--[[#DEBUG END]]
 	local res, err, trace = XpCall(p.fnAction, ...)
 	if not res then
-		FireUIEvent('CALL_LUA_ERROR', err .. '\nOn' .. E.szName .. ': ' .. p.szID .. '\n' .. trace .. '\n')
+		LIB.ErrorLog(err, 'On' .. E.szName .. ': ' .. p.szID, trace)
 	end
 	--[[#DEBUG BEGIN]]
 	nTickCount = GetTickCount() - nTickCount
@@ -808,6 +808,7 @@ end
 do
 local COROUTINE_TIME = 1000 * 0.5 / GLOBAL.GAME_FPS -- 一次 Breathe 时最大允许执行协程时间
 local COROUTINE_LIST = {}
+local yield = coroutine and coroutine.yield or function() end
 function LIB.RegisterCoroutine(szKey, fnAction, fnCallback)
 	if IsTable(szKey) then
 		for _, szKey in ipairs(szKey) do
@@ -818,6 +819,9 @@ function LIB.RegisterCoroutine(szKey, fnAction, fnCallback)
 		szKey, fnAction = nil, szKey
 	end
 	if IsFunction(fnAction) then
+		local function fnActionWrapper()
+			fnAction(yield)
+		end
 		if not IsString(szKey) then
 			szKey = GetTickCount() * 1000
 			while COROUTINE_LIST[tostring(szKey)] do
@@ -826,12 +830,12 @@ function LIB.RegisterCoroutine(szKey, fnAction, fnCallback)
 			szKey = tostring(szKey)
 		end
 		if not coroutine then
-			Call(fnAction)
+			Call(fnActionWrapper)
 			if fnCallback then
 				Call(fnCallback)
 			end
 		else
-			COROUTINE_LIST[szKey] = { szID = szKey, coAction = coroutine.create(fnAction), fnCallback = fnCallback }
+			COROUTINE_LIST[szKey] = { szID = szKey, coAction = coroutine.create(fnActionWrapper), fnCallback = fnCallback }
 		end
 	elseif fnAction == false then
 		COROUTINE_LIST[szKey] = nil
@@ -860,7 +864,7 @@ local function onBreathe()
 						p.bSuccess = true
 						p.aReturn = res
 					elseif not res[1] then
-						FireUIEvent('CALL_LUA_ERROR',  'OnCoroutine: ' .. p.szID .. ', Error: ' .. res[2] .. '\n')
+						LIB.ErrorLog('OnCoroutine: ' .. p.szID .. ', Error: ' .. res[2])
 					end
 				end
 				if coroutine.status(p.coAction) == 'dead' then
@@ -903,7 +907,7 @@ function LIB.FlushCoroutine(...)
 			while coroutine.status(p.coAction) == 'suspended' do
 				local status, err = coroutine.resume(p.coAction)
 				if not status then
-					FireUIEvent('CALL_LUA_ERROR',  'OnCoroutine: ' .. p.szID .. ', Error: ' .. err .. '\n')
+					LIB.ErrorLog('OnCoroutine: ' .. p.szID .. ', Error: ' .. err)
 				end
 			end
 			if p.fnCallback then
