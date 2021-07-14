@@ -1262,25 +1262,7 @@ do
 -- 31 - 31 检测是否同步了插件设置项
 local l_tBoolValues = {
 	-- KEY = OFFSET
-	['MY_ChatSwitch_DisplayPanel'] = 0,
-	['MY_ChatSwitch_LockPostion'] = 1,
 	['MY_Recount_EnableUI'] = 2,
-	['MY_ChatSwitch_CH1'] = 3,
-	['MY_ChatSwitch_CH2'] = 4,
-	['MY_ChatSwitch_CH3'] = 5,
-	['MY_ChatSwitch_CH4'] = 6,
-	['MY_ChatSwitch_CH5'] = 7,
-	['MY_ChatSwitch_CH6'] = 8,
-	['MY_ChatSwitch_CH7'] = 9,
-	['MY_ChatSwitch_CH8'] = 10,
-	['MY_ChatSwitch_CH9'] = 11,
-	['MY_ChatSwitch_CH10'] = 12,
-	['MY_ChatSwitch_CH11'] = 13,
-	['MY_ChatSwitch_CH12'] = 14,
-	['MY_ChatSwitch_CH13'] = 15,
-	['MY_ChatSwitch_CH14'] = 16,
-	['MY_ChatSwitch_CH15'] = 17,
-	['MY_ChatSwitch_CH16'] = 18,
 }
 local l_watches = {}
 local BIT_NUMBER = 8

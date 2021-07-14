@@ -55,6 +55,30 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^5.0.0') then
 end
 --------------------------------------------------------------------------
 local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['Chat'], {
+	bDisplayPanel = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Chat'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = true,
+	},
+	anchor = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Chat'],
+		xSchema = Schema.FrameAnchor,
+		xDefaultValue = { x = 10, y = -60, s = 'BOTTOMLEFT', r = 'BOTTOMLEFT' },
+	},
+	bLockPostion = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Chat'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	tChennalVisible = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Chat'],
+		xSchema = Schema.Map(Schema.String, Schema.Boolean),
+		xDefaultValue = {},
+	},
 	aWhisper = {
 		ePathType = PATH_TYPE.ROLE,
 		bUserData = true,
@@ -320,32 +344,28 @@ local function OnWhisperCheck()
 end
 
 local CHANNEL_LIST = {
-	{id = 'NEAR', title = _L['SAY'     ], head = '/s ', channel = PLAYER_TALK_CHANNEL.NEARBY       , cd = 0 , color = {255, 255, 255}}, --说
-	{id = 'SENC', title = _L['MAP'     ], head = '/y ', channel = PLAYER_TALK_CHANNEL.SENCE        , cd = 10, color = {255, 126, 126}}, --地
-	{id = 'WORL', title = _L['WORLD'   ], head = '/h ', channel = PLAYER_TALK_CHANNEL.WORLD        , cd = 60, color = {252, 204, 204}}, --世
-	{id = 'TEAM', title = _L['PARTY'   ], head = '/p ', channel = PLAYER_TALK_CHANNEL.TEAM         , cd = 0 , color = {140, 178, 253}}, --队
-	{id = 'RAID', title = _L['TEAM'    ], head = '/t ', channel = PLAYER_TALK_CHANNEL.RAID         , cd = 0 , color = { 73, 168, 241}}, --团
-	{id = 'BATT', title = _L['BATTLE'  ], head = '/b ', channel = PLAYER_TALK_CHANNEL.BATTLE_FIELD , cd = 0 , color = {255, 126, 126}}, --战
-	{id = 'TONG', title = _L['FACTION' ], head = '/g ', channel = PLAYER_TALK_CHANNEL.TONG         , cd = 0 , color = {  0, 200,  72}}, --帮
-	{id = 'FORC', title = _L['SCHOOL'  ], head = '/f ', channel = PLAYER_TALK_CHANNEL.FORCE        , cd = 20, color = {  0, 255, 255}}, --派
-	{id = 'CAMP', title = _L['CAMP'    ], head = '/c ', channel = PLAYER_TALK_CHANNEL.CAMP         , cd = 30, color = {155, 230,  58}}, --阵
-	{id = 'FRIE', title = _L['FRIEND'  ], head = '/o ', channel = PLAYER_TALK_CHANNEL.FRIENDS      , cd = 10, color = {241, 114, 183}}, --友
-	{id = 'TONG', title = _L['ALLIANCE'], head = '/a ', channel = PLAYER_TALK_CHANNEL.TONG_ALLIANCE, cd = 0 , color = {178, 240, 164}}, --盟
-	{id = 'WHIS', title = _L['WHISPER' ], channel = PLAYER_TALK_CHANNEL.WHISPER, cd = 0, onclick = OnWhisperCheck, color = {202, 126, 255}}, --密
-	{id = 'CLSC', title = _L['CLS'     ], onclick = OnClsCheck, color = {255, 0, 0}}, --清
-	{id = 'AWAY', title = _L['AWAY'    ], oncheck = OnAwayCheck, onuncheck = OnAwayUncheck, tip = OnAwayTip, color = {255, 255, 255}}, --离
-	{id = 'BUSY', title = _L['BUSY'    ], oncheck = OnBusyCheck, onuncheck = OnBusyUncheck, tip = OnBusyTip, color = {255, 255, 255}}, --扰
-	{id = 'MOSA', title = _L['MOSAICS' ], oncheck = OnMosaicsCheck, onuncheck = OnMosaicsUncheck, color = {255, 255, 255}}, --马
+	{ id = 'nearby'       , title = _L['SAY'     ], head = '/s ', channel = PLAYER_TALK_CHANNEL.NEARBY       , cd = 0 , color = {255, 255, 255} }, --说
+	{ id = 'sence'        , title = _L['MAP'     ], head = '/y ', channel = PLAYER_TALK_CHANNEL.SENCE        , cd = 10, color = {255, 126, 126} }, --地
+	{ id = 'world'        , title = _L['WORLD'   ], head = '/h ', channel = PLAYER_TALK_CHANNEL.WORLD        , cd = 60, color = {252, 204, 204} }, --世
+	{ id = 'team'         , title = _L['PARTY'   ], head = '/p ', channel = PLAYER_TALK_CHANNEL.TEAM         , cd = 0 , color = {140, 178, 253} }, --队
+	{ id = 'raid'         , title = _L['TEAM'    ], head = '/t ', channel = PLAYER_TALK_CHANNEL.RAID         , cd = 0 , color = { 73, 168, 241} }, --团
+	{ id = 'battle_field' , title = _L['BATTLE'  ], head = '/b ', channel = PLAYER_TALK_CHANNEL.BATTLE_FIELD , cd = 0 , color = {255, 126, 126} }, --战
+	{ id = 'tong'         , title = _L['FACTION' ], head = '/g ', channel = PLAYER_TALK_CHANNEL.TONG         , cd = 0 , color = {  0, 200,  72} }, --帮
+	{ id = 'force'        , title = _L['SCHOOL'  ], head = '/f ', channel = PLAYER_TALK_CHANNEL.FORCE        , cd = 20, color = {  0, 255, 255} }, --派
+	{ id = 'camp'         , title = _L['CAMP'    ], head = '/c ', channel = PLAYER_TALK_CHANNEL.CAMP         , cd = 30, color = {155, 230,  58} }, --阵
+	{ id = 'friends'      , title = _L['FRIEND'  ], head = '/o ', channel = PLAYER_TALK_CHANNEL.FRIENDS      , cd = 10, color = {241, 114, 183} }, --友
+	{ id = 'tong_alliance', title = _L['ALLIANCE'], head = '/a ', channel = PLAYER_TALK_CHANNEL.TONG_ALLIANCE, cd = 0 , color = {178, 240, 164} }, --盟
+	{ id = 'whisper'      , title = _L['WHISPER' ], channel = PLAYER_TALK_CHANNEL.WHISPER, cd = 0, onclick = OnWhisperCheck, color = {202, 126, 255} }, --密
+	{ id = 'cls'          , title = _L['CLS'     ], onclick = OnClsCheck, color = {255, 0, 0} }, --清
+	{ id = 'away'         , title = _L['AWAY'    ], oncheck = OnAwayCheck, onuncheck = OnAwayUncheck, tip = OnAwayTip, color = {255, 255, 255} }, --离
+	{ id = 'busy'         , title = _L['BUSY'    ], oncheck = OnBusyCheck, onuncheck = OnBusyUncheck, tip = OnBusyTip, color = {255, 255, 255} }, --扰
+	{ id = 'mosaics'      , title = _L['MOSAICS' ], oncheck = OnMosaicsCheck, onuncheck = OnMosaicsUncheck, color = {255, 255, 255} }, --马
 }
-local CHANNEL_DICT = {}
-local CHANNEL_TITLE = {}
 local CHANNEL_CD_TIME = {}
 for i, v in ipairs(CHANNEL_LIST) do
 	if v.channel then
-		CHANNEL_TITLE[v.channel] = v.title
 		CHANNEL_CD_TIME[v.channel] = v.cd
 	end
-	CHANNEL_DICT[v.id] = v
 end
 local m_tChannelTime = {}
 
@@ -397,13 +417,13 @@ function D.OnFrameCreate()
 	this:RegisterEvent('UI_SCALED')
 	this:RegisterEvent('PLAYER_SAY')
 	this:RegisterEvent('LOADING_ENDING')
-	this:EnableDrag(not LIB.GetStorage('BoolValues.MY_ChatSwitch_LockPostion'))
+	this:EnableDrag(not O.bLockPostion)
 
 	local nWidth, nHeight = 0, 0
 	local container = this:Lookup('WndContainer_Radios')
 	container:Clear()
 	for i, v in ipairs(CHANNEL_LIST) do
-		if not LIB.GetStorage('BoolValues.MY_ChatSwitch_CH' .. i) then
+		if O.tChennalVisible[v.id] ~= false then
 			local wnd, chk, txtTitle, txtCooldown, shaCount
 			if v.head then
 				wnd = container:AppendContentFromIni(INI_PATH, 'Wnd_Channel')
@@ -545,12 +565,15 @@ end
 
 function D.OnFrameDragEnd()
 	this:CorrectPos()
-	LIB.SetStorage('FrameAnchor.MY_ChatSwitch', GetFrameAnchor(this))
+	O.anchor = GetFrameAnchor(this)
+end
+
+function D.OnFrameDragSetPosEnd()
+	this:CorrectPos()
 end
 
 function D.UpdateAnchor(this)
-	local anchor = LIB.GetStorage('FrameAnchor.MY_ChatSwitch')
-		or { x = 10, y = -60, s = 'BOTTOMLEFT', r = 'BOTTOMLEFT' }
+	local anchor = O.anchor
 	this:SetPoint(anchor.s, 0, 0, anchor.r, anchor.x, anchor.y)
 	this:CorrectPos()
 end
@@ -575,21 +598,21 @@ LIB.RegisterEvent('ON_CHAT_SET_ATR', OnChatSetATR)
 
 function D.ReInitUI()
 	Wnd.CloseWindow('MY_ChatSwitch')
-	if not LIB.GetStorage('BoolValues.MY_ChatSwitch_DisplayPanel') then
+	if not O.bDisplayPanel then
 		return
 	end
 	Wnd.OpenWindow(INI_PATH, 'MY_ChatSwitch')
 end
-LIB.RegisterStorageInit('MY_CHAT', D.ReInitUI)
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_ChatSwitch__UI', D.ReInitUI)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
 	x = X
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 250,
 		text = _L['display panel'],
-		checked = LIB.GetStorage('BoolValues.MY_ChatSwitch_DisplayPanel'),
+		checked = O.bDisplayPanel,
 		oncheck = function(bChecked)
-			LIB.SetStorage('BoolValues.MY_ChatSwitch_DisplayPanel', bChecked)
+			O.bDisplayPanel = bChecked
 			D.ReInitUI()
 		end,
 	})
@@ -600,13 +623,13 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 250,
 		text = _L['lock postion'],
-		checked = LIB.GetStorage('BoolValues.MY_ChatSwitch_LockPostion'),
+		checked = O.bLockPostion,
 		oncheck = function(bChecked)
-			LIB.SetStorage('BoolValues.MY_ChatSwitch_LockPostion', bChecked)
+			O.bLockPostion = bChecked
 			D.ReInitUI()
 		end,
 		isdisable = function()
-			return not LIB.GetStorage('BoolValues.MY_ChatSwitch_DisplayPanel')
+			return not O.bDisplayPanel
 		end,
 	})
 	y = y + lineHeight
@@ -618,18 +641,16 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
 			local t = {
 				szOption = _L['channel setting'],
 				fnDisable = function()
-					return not LIB.GetStorage('BoolValues.MY_ChatSwitch_DisplayPanel')
+					return not O.bDisplayPanel
 				end,
 			}
 			for i, v in ipairs(CHANNEL_LIST) do
 				insert(t, {
 					szOption = v.title, rgb = v.color,
-					bCheck = true, bChecked = not LIB.GetStorage('BoolValues.MY_ChatSwitch_CH' .. i),
+					bCheck = true, bChecked = O.tChennalVisible[v.id] ~= false,
 					fnAction = function()
-						LIB.SetStorage(
-							'BoolValues.MY_ChatSwitch_CH' .. i,
-							not LIB.GetStorage('BoolValues.MY_ChatSwitch_CH' .. i)
-						)
+						O.tChennalVisible[v.id] = not O.tChennalVisible[v.id]
+						O.tChennalVisible = O.tChennalVisible
 						D.ReInitUI()
 					end,
 				})
@@ -637,7 +658,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
 			return t
 		end,
 		isdisable = function()
-			return not LIB.GetStorage('BoolValues.MY_ChatSwitch_DisplayPanel')
+			return not O.bDisplayPanel
 		end,
 	})
 	y = y + lineHeight
