@@ -162,6 +162,85 @@ for _, p in ipairs(D.aLoverItem) do
 	D.tLoverItem[p.nItem] = p
 end
 
+LIB.RegisterRemoteStorage(
+	'MY_Love', 32, 88,
+	function(aBit)
+		local dwID, nTime, nType, nSendItem, nReceiveItem, nCrc = 0, 0, 0, 0, 0, 6
+		local aByte = {}
+		for i = 1, #aBit, 8 do
+			local nByte = 0
+			for j = 1, 8 do
+				nByte = nByte * 2 + aBit[(i - 1) + j]
+			end
+			insert(aByte, nByte)
+		end
+		-- 1 crc
+		for i = 1, #aByte do
+			nCrc = LIB.NumberBitXor(nCrc, aByte[i])
+		end
+		if nCrc == 0 then
+			-- 2 - 5 dwID
+			for i = 5, 2, -1 do
+				dwID = LIB.NumberBitShl(dwID, 8)
+				dwID = LIB.NumberBitOr(dwID, aByte[i])
+			end
+			-- 6 - 9 nTime
+			for i = 9, 6, -1 do
+				nTime = LIB.NumberBitShl(nTime, 8)
+				nTime = LIB.NumberBitOr(nTime, aByte[i])
+			end
+			-- 10 (nType << 4) | ((nSendItem >> 2) & 0xf)
+			nType = LIB.NumberBitShr(aByte[10], 4)
+			nSendItem = LIB.NumberBitShl(LIB.NumberBitAnd(aByte[10], 0xf), 2)
+			-- 11 (nSendItem & 0x3) << 6 | (nReceiveItem & 0x3f)
+			nSendItem = LIB.NumberBitOr(nSendItem, LIB.NumberBitShr(aByte[11], 6))
+			nReceiveItem = LIB.NumberBitAnd(aByte[11], 0x3f)
+			return dwID, nTime, nType, nSendItem, nReceiveItem
+		end
+		return 0, 0, 0, 0, 0
+	end,
+	function(...)
+		local dwID, nTime, nType, nSendItem, nReceiveItem = ...
+		assert(dwID >= 0 and dwID <= 0xffffffff, 'Value of dwID out of 32bit unsigned int range!')
+		assert(nTime >= 0 and nTime <= 0xffffffff, 'Value of nTime out of 32bit unsigned int range!')
+		assert(nType >= 0 and nType <= 0xf, 'Value of nType out of range 4bit unsigned int range!')
+		assert(nSendItem >= 0 and nSendItem <= 0x3f, 'Value of nSendItem out of 6bit unsigned int range!')
+		assert(nReceiveItem >= 0 and nReceiveItem <= 0x3f, 'Value of nReceiveItem out of 6bit unsigned int range!')
+		local aByte, nCrc = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, 6
+		-- 2 - 5 dwID
+		for i = 2, 5 do
+			aByte[i] = LIB.NumberBitAnd(dwID, 0xff)
+			dwID = LIB.NumberBitShr(dwID, 8)
+		end
+		-- 6 - 9 nTime
+		for i = 6, 9 do
+			aByte[i] = LIB.NumberBitAnd(nTime, 0xff)
+			nTime = LIB.NumberBitShr(nTime, 8)
+		end
+		-- 10 (nType << 4) | ((nSendItem >> 2) & 0xf)
+		aByte[10] = LIB.NumberBitOr(LIB.NumberBitShl(nType, 4), LIB.NumberBitAnd(LIB.NumberBitShr(nSendItem, 2), 0xf))
+		-- 11 (nSendItem & 0x3) << 6 | (nReceiveItem & 0x3f)
+		aByte[11] = LIB.NumberBitOr(LIB.NumberBitShl(LIB.NumberBitAnd(nSendItem, 0x3), 6), LIB.NumberBitAnd(nReceiveItem, 0x3f))
+		-- 1 crc
+		for i = 2, #aByte do
+			nCrc = LIB.NumberBitXor(nCrc, aByte[i])
+		end
+		aByte[1] = nCrc
+
+		local aBit = {}
+		for _, nByte in ipairs(aByte) do
+			local aByteBit = { 0, 0, 0, 0, 0, 0, 0, 0 }
+			for i = 8, 1, -1 do
+				aByteBit[i] = mod(nByte, 2)
+				nByte = floor(nByte / 2)
+			end
+			for _, v in ipairs(aByteBit) do
+				insert(aBit, v)
+			end
+		end
+		return aBit
+	end)
+
 --[[
 ½£ÏÀÇéÔµ
 ========
@@ -334,10 +413,10 @@ function D.GetLover()
 		return
 	end
 	local szKey, me = '#HM#LOVER#', GetClientPlayer()
-	if not me or not LIB.IsRemoteStorage() then
+	if not me or not LIB.CanUseOnlineRemoteStorage() then
 		return
 	end
-	local dwLoverID, nLoverTime, nLoverType, nSendItem, nReceiveItem = LIB.GetStorage('MY_Love')
+	local dwLoverID, nLoverTime, nLoverType, nSendItem, nReceiveItem = LIB.GetRemoteStorage('MY_Love')
 	local aGroup = me.GetFellowshipGroupInfo() or {}
 	insert(aGroup, 1, { id = 0, name = g_tStrings.STR_FRIEND_GOOF_FRIEND })
 	for _, v in ipairs(aGroup) do
@@ -360,7 +439,7 @@ function D.GetLover()
 							nLoverTime = nTime
 							nSendItem = 0
 							nReceiveItem = 0
-							LIB.SetStorage('MY_Love', dwLoverID, nLoverTime, nLoverType, nSendItem, nReceiveItem)
+							LIB.SetRemoteStorage('MY_Love', dwLoverID, nLoverTime, nLoverType, nSendItem, nReceiveItem)
 							D.UpdateProtectData()
 						end
 					end
@@ -459,14 +538,14 @@ function D.SaveLover(nTime, dwID, nType, nSendItem, nReceiveItem)
 	if dwID == 0 then
 		nTime, nType, nSendItem, nReceiveItem = 1, 1, 1, 1
 	end
-	LIB.SetStorage('MY_Love', dwID, nTime, nType, nSendItem, nReceiveItem)
+	LIB.SetRemoteStorage('MY_Love', dwID, nTime, nType, nSendItem, nReceiveItem)
 	D.UpdateProtectData()
 	D.UpdateLocalLover()
 end
 
 -- ÉèÖÃÇéÔµ
 function D.SetLover(dwID, nType)
-	if not LIB.IsRemoteStorage() then
+	if not LIB.CanUseOnlineRemoteStorage() then
 		return LIB.Alert(_L['Please enable sync common ui config first'])
 	end
 	local aInfo = LIB.GetFriend(dwID)
@@ -536,7 +615,7 @@ end
 
 -- É¾³ýÇéÔµ
 function D.RemoveLover()
-	if not LIB.IsRemoteStorage() then
+	if not LIB.CanUseOnlineRemoteStorage() then
 		return LIB.Alert(_L['Please enable sync common ui config first'])
 	end
 	if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) or LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
@@ -652,7 +731,7 @@ end
 local BACKUP_PASS_PHRASE = '78ed108e-cedd-40ef-8dcc-1529db94b3c9'
 function D.BackupLover(...)
 	local szLoverName, szLoverUUID = ...
-	if not LIB.IsRemoteStorage() then
+	if not LIB.CanUseOnlineRemoteStorage() then
 		return LIB.Alert(_L['Please enable sync common ui config first'])
 	end
 	if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) or LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
@@ -778,7 +857,7 @@ local function OnBgTalk(_, aData, nChannel, dwTalkerID, szTalkerName, bSelf)
 		return
 	end
 	if not bSelf then
-		if not LIB.IsRemoteStorage() then
+		if not LIB.CanUseOnlineRemoteStorage() then
 			LIB.SendBgMsg(szTalkerName, 'MY_LOVE', {'DATA_NOT_SYNC'})
 			return
 		end
@@ -995,11 +1074,11 @@ end
 -- protect data
 do
 function D.UpdateProtectData()
-	D.aStorageData = {LIB.GetStorage('MY_Love')}
+	D.aStorageData = {LIB.GetRemoteStorage('MY_Love')}
 end
 local function onSyncUserPreferencesEnd()
 	if D.aStorageData then
-		LIB.SetStorage('MY_Love', unpack(D.aStorageData))
+		LIB.SetRemoteStorage('MY_Love', unpack(D.aStorageData))
 	else
 		D.UpdateProtectData()
 	end

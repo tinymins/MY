@@ -110,14 +110,14 @@ end
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
 	local W, H = ui:Size()
-	local X, Y = 20, 20
+	local X, Y = 20, 10
 	local nX, nY = X, Y
 	local lover = D.GetLover()
 
 	ui:Append('Text', { text = _L['Heart lover'], x = X, y = nY, font = 27 })
 	-- lover info
 	nY = nY + 36
-	if not LIB.IsRemoteStorage() then
+	if not LIB.CanUseOnlineRemoteStorage() then
 		nX = X + 10
 		nY = nY + ui:Append('Text', {
 			x = nX, y = nY, w = W - nX, h = 120,
@@ -264,7 +264,7 @@ function PS.OnPanelActive(wnd)
 	}):AutoWidth()
 
 	-- tips
-	nY = nY + 28
+	nY = nY + 10
 	ui:Append('Text', { text = _L['Tips'], x = X, y = nY, font = 27 })
 	nX = X + 10
 	nY = nY + 35
@@ -272,31 +272,31 @@ function PS.OnPanelActive(wnd)
 	nY = nY + ui:Append('Text', {
 		x = nX, y = nY, w = W - nX * 2, multiline = true, valign = 0,
 		text = _L['1. You can break love one-sided.'],
-	}):AutoHeight():Height() + 3
+	}):AutoHeight():Height() + 1
 	nY = nY + ui:Append('Text', {
 		x = nX, y = nY, w = W - nX * 2, multiline = true, valign = 0,
 		text = _L['2. Data was stored in official data segment.'],
-	}):AutoHeight():Height() + 3
+	}):AutoHeight():Height() + 1
 	nY = nY + ui:Append('Text', {
 		x = nX, y = nY, w = W - nX * 2, multiline = true, valign = 0,
 		text = _L['3. Please do not enable config async, that may cause data lose.'],
-		}):AutoHeight():Height() + 3
+		}):AutoHeight():Height() + 1
 	nY = nY + ui:Append('Text', {
 		x = nX, y = nY, w = W - nX * 2, multiline = true, valign = 0,
 		text = _L['4. To recove lover data, please ask you lover click fix button.'],
-	}):AutoHeight():Height() + 3
+	}):AutoHeight():Height() + 1
 	nY = nY + ui:Append('Text', {
 		x = nX, y = nY, w = W - nX * 2, multiline = true, valign = 0,
 		text = _L['5. Lover must be toway friend, so delete friend will cause both side none-lover.'],
-	}):AutoHeight():Height() + 3
+	}):AutoHeight():Height() + 1
 	nY = nY + ui:Append('Text', {
 		x = nX, y = nY, w = W - nX * 2, multiline = true, valign = 0,
 		text = _L['6. Lover can see each other\'s location, delete friend can prevent this.'],
-	}):AutoHeight():Height() + 3
+	}):AutoHeight():Height() + 1
 	nY = nY + ui:Append('Text', {
 		x = nX, y = nY, w = W - nX * 2, multiline = true, valign = 0,
 		text = _L['7. Backup lover requires both online and teamed up, backup data can be used to restore data while server merge or player crossing server.'],
-	}):AutoHeight():Height() + 3
+	}):AutoHeight():Height() + 1
 	O.bPanelActive = true
 end
 
