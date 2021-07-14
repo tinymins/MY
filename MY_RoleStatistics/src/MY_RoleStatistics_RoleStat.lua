@@ -362,6 +362,43 @@ local COLUMN_LIST = lodash.filter({
 			return GetMoneyText(tMoney, 105)
 		end,
 	},
+	{ -- 账号精力
+		id = 'account_stamina',
+		bVisible = GLOBAL.GAME_BRANCH ~= 'classic',
+		szTitle = _L['Account Stamina'],
+		szShortTitle = _L['Account_stami'],
+		nMinWidth = 70,
+		GetFormatText = function(rec)
+			if rec.stamina < 0 then
+				return GetFormatText('--', 162, 255, 255, 255)
+			end
+			return GetFormatText(rec.stamina .. '/' .. rec.stamina_max, 162, 255, 255, 255)
+		end,
+		Compare = GeneCommonCompare('stamina'),
+	},
+	{ -- 角色精力
+		id = 'role_stamina',
+		bVisible = GLOBAL.GAME_BRANCH ~= 'classic',
+		szTitle = _L['Role Stamina'],
+		szShortTitle = _L['Role_stami'],
+		nMinWidth = 70,
+		GetFormatText = function(rec)
+			if rec.vigor < 0 then
+				return GetFormatText('--', 162, 255, 255, 255)
+			end
+			return GetFormatText(rec.vigor .. '/' .. rec.vigor_max, 162, 255, 255, 255)
+		end,
+		Compare = GeneCommonCompare('vigor'),
+	},
+	{ -- 精力周余
+		id = 'role_stamina_remain',
+		bVisible = GLOBAL.GAME_BRANCH ~= 'classic',
+		szTitle = _L['Role Stamina Remain'],
+		szShortTitle = _L['Role_stami_remain'],
+		nMinWidth = 70,
+		GetFormatText = GeneWeeklyFormatText('vigor_remain'),
+		Compare = GeneCommonCompare('vigor_remain'),
+	},
 	{ -- 江贡
 		id = 'contribution',
 		szTitle = _L['Contribution'],
@@ -816,6 +853,14 @@ function D.GetClientPlayerRec()
 	rec.vigor = -1
 	rec.vigor_max = -1
 	rec.vigor_remain = -1
+	if GLOBAL.GAME_BRANCH ~= 'classic' then
+		rec.stamina = me.nCurrentStamina
+		rec.stamina_max = me.nMaxStamina
+		rec.stamina_remain = -1
+		rec.vigor = me.nVigor
+		rec.vigor_max = me.GetMaxVigor()
+		rec.vigor_remain = me.GetVigorRemainSpace()
+	end
 	rec.contribution = me.nContribution
 	rec.contribution_remain = me.GetContributionRemainSpace()
 	rec.justice = me.nJustice
