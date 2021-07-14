@@ -28,6 +28,7 @@ def __compress(addon):
 	print('Compressing: %s' % addon)
 	file_count = 0
 	converter = Converter('zh-TW')
+	srcname = 'src.' + time.strftime('%Y%m%d%H%M%S', time.localtime()) + '.lua'
 	# Remove debug codes in source
 	for line in open('%s/info.ini' % addon):
 		parts = line.strip().split('=')
@@ -39,11 +40,11 @@ def __compress(addon):
 			codecs.open(source_file,'w',encoding='gbk').write(source_code)
 	# Generate squishy file and execute squish
 	with open('squishy', 'w') as squishy:
-		squishy.write('Output "./%s/src.lua"\n' % addon)
+		squishy.write('Output "./%s/%s"\n' % (addon, srcname))
 		for line in open('%s/info.ini' % addon):
 			parts = line.strip().split('=')
 			if parts[0].find('lua_') == 0:
-				if parts[1] == 'src.lua':
+				if parts[1].startswith('src.') and parts[1].endswith('.lua'): # src.lua
 					print('Already compressed...')
 					return
 				file_path = os.path.join('.', addon, parts[1]).replace('\\', '/')
@@ -52,11 +53,11 @@ def __compress(addon):
 	os.popen('lua "./!src-dist/tools/react/squish" --minify-level=full').read()
 	os.remove('squishy')
 	# Modify dist file for loading modules
-	with open('./%s/src.lua' % addon, 'r+') as src:
+	with open('./%s/%s' % (addon, srcname), 'r+') as src:
 		content = src.read()
 		src.seek(0, 0)
 		src.write('local package={preload={}}\n' + content)
-	with open('./%s/src.lua' % addon, 'a') as src:
+	with open('./%s/%s' % (addon, srcname), 'a') as src:
 		src.write('\nfor _, k in ipairs({')
 		for i in range(1, file_count + 1):
 			src.write('\'%d\',' % i)
@@ -68,7 +69,7 @@ def __compress(addon):
 		parts = line.split('=')
 		if parts[0].find('lua_') == 0:
 			if parts[0] == 'lua_0':
-				info_content = info_content + 'lua_0=src.lua\n'
+				info_content = info_content + 'lua_0=' + srcname + '\n'
 		else:
 			info_content = info_content + line
 	with codecs.open('%s/info.ini' % addon,'w',encoding='gbk') as f:

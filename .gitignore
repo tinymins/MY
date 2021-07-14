@@ -6,4 +6,5 @@ publisher.key
 __pycache__
 /squishy
 /*/src.lua
+/*/src.*.lua
 /\!src-dist/dist/
