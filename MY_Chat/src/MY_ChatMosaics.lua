@@ -65,7 +65,7 @@ local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['Chat'], {
 		ePathType = PATH_TYPE.ROLE,
 		szLabel = _L['MY_ChatMosaics'],
 		xSchema = Schema.Number,
-		xDefaultValue = 1,
+		xDefaultValue = 4,
 	},
 	bIgnoreOwnName = { -- 不打码自己的名字
 		ePathType = PATH_TYPE.ROLE,
