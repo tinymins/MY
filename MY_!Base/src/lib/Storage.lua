@@ -1251,173 +1251,120 @@ end
 ------------------------------------------------------------------------------
 
 do
--- total bytes: 32
--- 0 - 3 BoolValues
--- 4 - 4 MY_Love crc
--- 5 - 8 MY_Love dwID
--- 9 - 12 MY_Love nTime
--- 13/0 - 13/4 MY_Love nType
--- 13/5 - 14/2 MY_Love nSendItem
--- 14/3 - 14/7 MY_Love nReceiveItem
--- 31 - 31 检测是否同步了插件设置项
-local l_tBoolValues = {
-	-- KEY = OFFSET
-}
-local l_watches = {}
+local REMOTE_STORAGE_REGISTER = {}
+local REMOTE_STORAGE_WATCHER = {}
 local BIT_NUMBER = 8
+local BIT_COUNT = 32 * BIT_NUMBER -- total bytes: 32
+local GetOnlineAddonCustomData = _G.GetOnlineAddonCustomData or GetAddonCustomData
+local SetOnlineAddonCustomData = _G.SetOnlineAddonCustomData or SetAddonCustomData
 
-local function OnStorageChange(szKey)
-	if not l_watches[szKey] then
+local function Byte2Bit(nByte)
+	local aBit = { 0, 0, 0, 0, 0, 0, 0, 0 }
+	for i = 8, 1, -1 do
+		aBit[i] = mod(nByte, 2)
+		nByte = floor(nByte / 2)
+	end
+	return aBit
+end
+
+local function Bit2Byte(aBit)
+	local nByte = 0
+	for i = 1, 8 do
+		nByte = nByte * 2 + (aBit[i] or 0)
+	end
+	return nByte
+end
+
+local function OnRemoteStorageChange(szKey)
+	if not REMOTE_STORAGE_WATCHER[szKey] then
 		return
 	end
-	local oVal = LIB.GetStorage(szKey)
-	for _, fnAction in ipairs(l_watches[szKey]) do
+	local oVal = LIB.GetRemoteStorage(szKey)
+	for _, fnAction in ipairs(REMOTE_STORAGE_WATCHER[szKey]) do
 		fnAction(oVal)
 	end
 end
 
-local SetOnlineAddonCustomData = _G.SetOnlineAddonCustomData or SetAddonCustomData
-function LIB.SetStorage(szKey, ...)
-	if GLOBAL.GAME_EDITION == 'classic' then
-		local oFilePath = {'userdata/localstorage.jx3dat', PATH_TYPE.ROLE}
-		local data = LIB.LoadLUAData(oFilePath) or {}
-		data[szKey] = {...}
-		LIB.SaveLUAData(oFilePath, data)
-		return
+function LIB.RegisterRemoteStorage(szKey, nBitPos, nBitNum, fnGetter, fnSetter, bForceOnline)
+	assert(nBitPos >= 0 and nBitNum > 0 and nBitPos + nBitNum <= BIT_COUNT, 'storage position out of range: ' .. szKey)
+	for _, p in pairs(REMOTE_STORAGE_REGISTER) do
+		assert(nBitPos >= p.nBitPos + p.nBitNum or nBitPos + nBitNum <= p.nBitPos, 'storage position conflicted: ' .. szKey .. ', ' .. p.szKey)
 	end
-	local szPriKey, szSubKey = szKey, nil
-	local nPos = StringFindW(szKey, '.')
-	if nPos then
-		szSubKey = sub(szKey, nPos + 1)
-		szPriKey = sub(szKey, 1, nPos - 1)
-	end
-	if szPriKey == 'BoolValues' then
-		local nBitPos = l_tBoolValues[szSubKey]
-		if not nBitPos then
-			return
-		end
-		local oVal = ...
-		local nPos = floor(nBitPos / BIT_NUMBER)
-		local nOffset = BIT_NUMBER - nBitPos % BIT_NUMBER - 1
-		local nByte = GetAddonCustomData(PACKET_INFO.NAME_SPACE, nPos, 1)
-		local nBit = floor(nByte / pow(2, nOffset)) % 2
-		if (nBit == 1) == (not not oVal) then
-			return
-		end
-		nByte = nByte + (nBit == 1 and -1 or 1) * pow(2, nOffset)
-		SetAddonCustomData(PACKET_INFO.NAME_SPACE, nPos, 1, nByte)
-	elseif szPriKey == 'FrameAnchor' then
-		local anchor = ...
-		return SetOnlineFrameAnchor(szSubKey, anchor)
-	elseif szPriKey == 'MY_Love' then
-		local dwID, nTime, nType, nSendItem, nReceiveItem = ...
-		assert(dwID >= 0 and dwID <= 0xffffffff, 'Value of dwID out of 32bit unsigned int range!')
-		assert(nTime >= 0 and nTime <= 0xffffffff, 'Value of nTime out of 32bit unsigned int range!')
-		assert(nType >= 0 and nType <= 0xf, 'Value of nType out of range 4bit unsigned int range!')
-		assert(nSendItem >= 0 and nSendItem <= 0x3f, 'Value of nSendItem out of 6bit unsigned int range!')
-		assert(nReceiveItem >= 0 and nReceiveItem <= 0x3f, 'Value of nReceiveItem out of 6bit unsigned int range!')
-		local aByte, nCrc = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, 6
-		-- 2 - 5 dwID
-		for i = 2, 5 do
-			aByte[i] = LIB.NumberBitAnd(dwID, 0xff)
-			dwID = LIB.NumberBitShr(dwID, 8)
-		end
-		-- 6 - 9 nTime
-		for i = 6, 9 do
-			aByte[i] = LIB.NumberBitAnd(nTime, 0xff)
-			nTime = LIB.NumberBitShr(nTime, 8)
-		end
-		-- 10 (nType << 4) | ((nSendItem >> 2) & 0xf)
-		aByte[10] = LIB.NumberBitOr(LIB.NumberBitShl(nType, 4), LIB.NumberBitAnd(LIB.NumberBitShr(nSendItem, 2), 0xf))
-		-- 11 (nSendItem & 0x3) << 6 | (nReceiveItem & 0x3f)
-		aByte[11] = LIB.NumberBitOr(LIB.NumberBitShl(LIB.NumberBitAnd(nSendItem, 0x3), 6), LIB.NumberBitAnd(nReceiveItem, 0x3f))
-		-- 1 crc
-		for i = 2, #aByte do
-			nCrc = LIB.NumberBitXor(nCrc, aByte[i])
-		end
-		aByte[1] = nCrc
-		SetOnlineAddonCustomData('MY', 4, 11, unpack(aByte))
-	end
-	OnStorageChange(szKey)
+	assert(IsFunction(fnGetter) and IsFunction(fnSetter), 'storage settter and getter must be function')
+	REMOTE_STORAGE_REGISTER[szKey] = {
+		szKey = szKey,
+		nBitPos = nBitPos,
+		nBitNum = nBitNum,
+		fnGetter = fnGetter,
+		fnSetter = fnSetter,
+		bForceOnline = bForceOnline,
+	}
 end
 
-local GetOnlineAddonCustomData = _G.GetOnlineAddonCustomData or GetAddonCustomData
-function LIB.GetStorage(szKey)
-	if GLOBAL.GAME_EDITION == 'classic' then
-		local oFilePath = {'userdata/localstorage.jx3dat', PATH_TYPE.ROLE}
-		local data = LIB.LoadLUAData(oFilePath) or {}
-		return unpack(data[szKey] or {})
+function LIB.SetRemoteStorage(szKey, ...)
+	local st = REMOTE_STORAGE_REGISTER[szKey]
+	assert(st, 'unknown storage key: ' .. szKey)
+
+	local aBit = st.fnSetter(...)
+	assert(#aBit == st.nBitNum, 'storage setter bit number mismatch: ' .. szKey)
+
+	local GetData = st.bForceOnline and GetOnlineAddonCustomData or GetAddonCustomData
+	local SetData = st.bForceOnline and SetOnlineAddonCustomData or SetAddonCustomData
+	local nPos = floor(st.nBitPos / BIT_NUMBER)
+	local nLen = floor((st.nBitPos + st.nBitNum - 1) / BIT_NUMBER) - nPos + 1
+	local aByte = lodash.map({GetData(PACKET_INFO.NAME_SPACE, nPos, nLen)}, Byte2Bit)
+	for nBitPos = st.nBitPos, st.nBitPos + st.nBitNum - 1 do
+		local nIndex = floor(nBitPos / BIT_NUMBER) - nPos + 1
+		local nOffset = nBitPos % BIT_NUMBER + 1
+		aByte[nIndex][nOffset] = aBit[nBitPos - st.nBitPos + 1]
 	end
-	local szPriKey, szSubKey = szKey, nil
-	local nPos = StringFindW(szKey, '.')
-	if nPos then
-		szSubKey = sub(szKey, nPos + 1)
-		szPriKey = sub(szKey, 1, nPos - 1)
-	end
-	if szPriKey == 'BoolValues' then
-		local nBitPos = l_tBoolValues[szSubKey]
-		if not nBitPos then
-			return
-		end
-		local nPos = floor(nBitPos / BIT_NUMBER)
-		local nOffset = BIT_NUMBER - nBitPos % BIT_NUMBER - 1
-		local nByte = GetAddonCustomData(PACKET_INFO.NAME_SPACE, nPos, 1)
-		local nBit = floor(nByte / pow(2, nOffset)) % 2
-		return nBit == 1
-	elseif szPriKey == 'FrameAnchor' then
-		return GetOnlineFrameAnchor(szSubKey)
-	elseif szPriKey == 'MY_Love' then
-		local dwID, nTime, nType, nSendItem, nReceiveItem, nCrc = 0, 0, 0, 0, 0, 6
-		local aByte = {GetOnlineAddonCustomData('MY', 4, 11)}
-		-- 1 crc
-		for i = 1, #aByte do
-			nCrc = LIB.NumberBitXor(nCrc, aByte[i])
-		end
-		if nCrc == 0 then
-			-- 2 - 5 dwID
-			for i = 5, 2, -1 do
-				dwID = LIB.NumberBitShl(dwID, 8)
-				dwID = LIB.NumberBitOr(dwID, aByte[i])
-			end
-			-- 6 - 9 nTime
-			for i = 9, 6, -1 do
-				nTime = LIB.NumberBitShl(nTime, 8)
-				nTime = LIB.NumberBitOr(nTime, aByte[i])
-			end
-			-- 10 (nType << 4) | ((nSendItem >> 2) & 0xf)
-			nType = LIB.NumberBitShr(aByte[10], 4)
-			nSendItem = LIB.NumberBitShl(LIB.NumberBitAnd(aByte[10], 0xf), 2)
-			-- 11 (nSendItem & 0x3) << 6 | (nReceiveItem & 0x3f)
-			nSendItem = LIB.NumberBitOr(nSendItem, LIB.NumberBitShr(aByte[11], 6))
-			nReceiveItem = LIB.NumberBitAnd(aByte[11], 0x3f)
-			return dwID, nTime, nType, nSendItem, nReceiveItem
-		end
-		return 0, 0, 0, 0, 0
-	end
+	SetData(PACKET_INFO.NAME_SPACE, nPos, nLen, unpack(lodash.map(aByte, Bit2Byte)))
+
+	OnRemoteStorageChange(szKey)
 end
 
--- 判断用户是否同步了设置项（ESC-游戏设置-综合-服务器同步设置-界面常规设置）
-function LIB.IsRemoteStorage()
+function LIB.GetRemoteStorage(szKey)
+	local st = REMOTE_STORAGE_REGISTER[szKey]
+	assert(st, 'unknown storage key: ' .. szKey)
+
+	local GetData = st.bForceOnline and GetOnlineAddonCustomData or GetAddonCustomData
+	local nPos = floor(st.nBitPos / BIT_NUMBER)
+	local nLen = floor((st.nBitPos + st.nBitNum - 1) / BIT_NUMBER) - nPos + 1
+	local aByte = lodash.map({GetData(PACKET_INFO.NAME_SPACE, nPos, nLen)}, Byte2Bit)
+	local aBit = {}
+	for nBitPos = st.nBitPos, st.nBitPos + st.nBitNum - 1 do
+		local nIndex = floor(nBitPos / BIT_NUMBER) - nPos + 1
+		local nOffset = nBitPos % BIT_NUMBER + 1
+		insert(aBit, aByte[nIndex][nOffset])
+	end
+	return st.fnGetter(aBit)
+end
+
+-- 判断是否可以访问同步设置项（ESC-游戏设置-综合-服务器同步设置-界面常规设置）
+function LIB.CanUseOnlineRemoteStorage()
+	if _G.SetOnlineAddonCustomData then
+		return true
+	end
 	local n = (GetUserPreferences(4347, 'c') + 1) % 256
 	SetOnlineAddonCustomData(PACKET_INFO.NAME_SPACE, 31, 1, n)
 	return GetUserPreferences(4347, 'c') == n
 end
 
-function LIB.WatchStorage(szKey, fnAction)
-	if not l_watches[szKey] then
-		l_watches[szKey] = {}
+function LIB.WatchRemoteStorage(szKey, fnAction)
+	if not REMOTE_STORAGE_WATCHER[szKey] then
+		REMOTE_STORAGE_WATCHER[szKey] = {}
 	end
-	insert(l_watches[szKey], fnAction)
+	insert(REMOTE_STORAGE_WATCHER[szKey], fnAction)
 end
 
 local INIT_FUNC_LIST = {}
-function LIB.RegisterStorageInit(szKey, fnAction)
+function LIB.RegisterRemoteStorageInit(szKey, fnAction)
 	INIT_FUNC_LIST[szKey] = fnAction
 end
 
 local function OnInit()
-	for szKey, _ in pairs(l_watches) do
-		OnStorageChange(szKey)
+	for szKey, _ in pairs(REMOTE_STORAGE_WATCHER) do
+		OnRemoteStorageChange(szKey)
 	end
 	for szKey, fnAction in pairs(INIT_FUNC_LIST) do
 		local res, err, trace = XpCall(fnAction)
@@ -1427,7 +1374,7 @@ local function OnInit()
 	end
 	INIT_FUNC_LIST = {}
 end
-LIB.RegisterInit('LIB#Storage', OnInit)
+LIB.RegisterInit('LIB#RemoteStorage', OnInit)
 end
 
 ------------------------------------------------------------------------------
