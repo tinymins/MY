@@ -559,7 +559,7 @@ function D.UpdateItems(page)
 	local ownerforce = -1
 	local ownerrole = 0
 	local ownerlevel = 0
-	local ownerscore = 0
+	local ownerscore = {}
 	local ownersuitindex = 0
 	local ownerextra = {}
 	local container = page:Lookup('Wnd_Total/WndScroll_Name/WndContainer_Name')
@@ -570,7 +570,10 @@ function D.UpdateItems(page)
 			ownerforce = wnd.ownerinfo.ownerforce
 			ownerrole = wnd.ownerinfo.ownerrole
 			ownerlevel = wnd.ownerinfo.ownerlevel
-			ownerscore = DecodeLUAData(wnd.ownerinfo.ownerscore) or {}
+			ownerscore = DecodeLUAData(wnd.ownerinfo.ownerscore)
+			if not IsTable(ownerscore) then
+				ownerscore = {}
+			end
 			ownersuitindex = wnd.ownerinfo.ownersuitindex
 			ownerextra = wnd.ownerinfo.ownerextra
 		end
