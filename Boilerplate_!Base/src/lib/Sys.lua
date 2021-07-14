@@ -1097,68 +1097,115 @@ end
 LIB.RegisterEvent('ON_MESSAGE_BOX_OPEN', OnMessageBoxOpen)
 end
 
-do
-local nIndex = 0
-function LIB.Alert(szName, szMsg, fnAction, szSure, fnCancelAction, nCountDownTime)
-	if IsFunction(szMsg) or IsNil(szMsg) then
-		szMsg, fnAction, szSure, fnCancelAction, nCountDownTime = szName, szMsg, fnAction, szSure, fnCancelAction
-		szName = NSFormatString('{$NS}_Alert') .. nIndex
-		nIndex = nIndex + 1
-	else
-		szName = NSFormatString('{$NS}_AlertCRC') .. GetStringCRC(szName)
+-- 弹出对话框
+-- LIB.MessageBox([szKey, ]tMsg)
+-- LIB.MessageBox([szKey, ]tMsg)
+-- 	@param szKey {string} 唯一标识符，不传自动生成
+-- 	@param tMsg {object} 更多参见官方 MessageBox 文档
+-- 	@param tMsg.fnCancelAction {function} ESC 关闭回调，可传入“FORBIDDEN”禁止手动关闭
+-- 	@return {string} 唯一标识符
+function LIB.MessageBox(szKey, tMsg)
+	if IsTable(szKey) then
+		szKey, tMsg = nil, szKey
 	end
-	local nW, nH = Station.GetClientSize()
-	if fnCancelAction == 'FORBIDDEN' then
-		fnCancelAction = function()
+	if not szKey then
+		szKey = LIB.GetUUID():gsub('-', '')
+	end
+	tMsg.szName = NSFormatString('{$NS}_MessageBox#') .. GetStringCRC(szKey)
+	if not tMsg.x or not tMsg.y then
+		local nW, nH = Station.GetClientSize()
+		tMsg.x = nW / 2
+		tMsg.y = nH / 3
+	end
+	if not tMsg.szAlignment then
+		tMsg.szAlignment = 'CENTER'
+	end
+	if tMsg.fnCancelAction == 'FORBIDDEN' then
+		tMsg.fnCancelAction = function()
 			LIB.DelayCall(function()
-				LIB.Alert(szName, szMsg, fnAction, szSure, fnCancelAction, nCountDownTime)
+				LIB.MessageBox(szKey, tMsg)
 			end)
 		end
 	end
-	local tMsg = {
-		x = nW / 2, y = nH / 3,
-		szName = szName,
-		szMessage = szMsg,
-		szAlignment = 'CENTER',
-		fnCancelAction = fnCancelAction,
-		{
-			szOption = szSure or g_tStrings.STR_HOTKEY_SURE,
-			fnAction = fnAction,
-			bDelayCountDown = nCountDownTime and true or false,
-			nCountDownTime = nCountDownTime,
-		},
-	}
 	MessageBox(tMsg)
-	return szName
-end
+	return szKey
 end
 
-function LIB.Confirm(szMsg, fnAction, fnCancel, szSure, szCancel, fnCancelAction)
-	local nW, nH = Station.GetClientSize()
-	local tMsg = {
-		x = nW / 2, y = nH / 3,
-		szName = NSFormatString('{$NS}_Confirm'),
+-- 弹出对话框 - 单按钮确认
+-- LIB.Alert([szKey, ]szMsg[, fnResolve])
+-- LIB.Alert([szKey, ]szMsg[, tOpt])
+-- 	@param szKey {string} 唯一标识符，不传自动生成
+-- 	@param szMsg {string} 正文
+-- 	@param tOpt.szResolve {string} 按钮文案
+-- 	@param tOpt.fnResolve {function} 按钮回调
+-- 	@param tOpt.nResolveCountDown {number} 确定按钮倒计时
+-- 	@param tOpt.fnCancel {function} ESC 关闭回调，可传入“FORBIDDEN”禁止手动关闭
+-- 	@return {string} 唯一标识符
+function LIB.Alert(szKey, szMsg, fnResolve)
+	if not IsString(szMsg) then
+		szKey, szMsg, fnResolve = nil, szKey, szMsg
+	end
+	local tOpt = fnResolve
+	if not IsTable(tOpt) then
+		tOpt = { fnResolve = fnResolve }
+	end
+	return LIB.MessageBox(szKey, {
 		szMessage = szMsg,
-		szAlignment = 'CENTER',
-		fnCancelAction = fnCancelAction,
+		fnCancelAction = tOpt.fnCancel,
 		{
-			szOption = szSure or g_tStrings.STR_HOTKEY_SURE,
-			fnAction = fnAction,
-		}, {
-			szOption = szCancel or g_tStrings.STR_HOTKEY_CANCEL,
-			fnAction = fnCancel,
+			szOption = tOpt.szResolve or g_tStrings.STR_HOTKEY_SURE,
+			fnAction = tOpt.fnResolve,
+			bDelayCountDown = tOpt.nResolveCountDown and true or false,
+			nCountDownTime = tOpt.nResolveCountDown,
 		},
-	}
-	MessageBox(tMsg)
+	})
 end
 
-function LIB.Dialog(szMsg, aOptions, fnCancelAction)
-	local nW, nH = Station.GetClientSize()
-	local tMsg = {
-		x = nW / 2, y = nH / 3,
-		szName = NSFormatString('{$NS}_Dialog'),
+-- 弹出对话框 - 双按钮二次确认
+-- LIB.Confirm([szKey, ]szMsg[, fnResolve[, fnReject[, fnCancel]]])
+-- LIB.Confirm([szKey, ]szMsg[, tOpt])
+-- 	@param szKey {string} 唯一标识符，不传自动生成
+-- 	@param szMsg {string} 正文
+-- 	@param tOpt.szResolve {string} 确定按钮文案
+-- 	@param tOpt.fnResolve {function} 确定回调
+-- 	@param tOpt.szReject {string} 取消按钮文案
+-- 	@param tOpt.fnReject {function} 取消回调
+-- 	@param tOpt.fnCancel {function} ESC 关闭回调，可传入“FORBIDDEN”禁止手动关闭
+-- 	@return {string} 唯一标识符
+function LIB.Confirm(szKey, szMsg, fnResolve, fnReject, fnCancel)
+	if not IsString(szMsg) then
+		szKey, szMsg, fnResolve, fnReject = nil, szKey, szMsg, fnResolve
+	end
+	local tOpt = fnResolve
+	if not IsTable(tOpt) then
+		tOpt = {
+			fnResolve = fnResolve,
+			fnReject = fnReject,
+			fnCancel = fnCancel,
+		}
+	end
+	return LIB.MessageBox(szKey, {
 		szMessage = szMsg,
-		szAlignment = 'CENTER',
+		fnCancelAction = tOpt.fnCancel,
+		{ szOption = tOpt.szResolve or g_tStrings.STR_HOTKEY_SURE, fnAction = tOpt.fnResolve },
+		{ szOption = tOpt.szReject or g_tStrings.STR_HOTKEY_CANCEL, fnAction = tOpt.fnReject },
+	})
+end
+
+-- 弹出对话框 - 自定义按钮
+-- LIB.Dialog([szKey, ]szMsg[, aOptions[, fnCancelAction]])
+-- LIB.Dialog([szKey, ]szMsg[, tOpt])
+-- 	@param szKey {string} 唯一标识符，不传自动生成
+-- 	@param szMsg {string} 正文
+-- 	@param tOpt.aOptions {array} 按钮列表，参见 MessageBox 用法
+-- 	@param tOpt.fnCancelAction {function} ESC 关闭回调，可传入“FORBIDDEN”禁止手动关闭
+-- 	@return {string} 唯一标识符
+function LIB.Dialog(szKey, szMsg, aOptions, fnCancelAction)
+	if not IsString(szMsg) then
+		szKey, szMsg, aOptions, fnCancelAction = nil, szKey, szMsg, aOptions
+	end
+	local tMsg = {
+		szMessage = szMsg,
 		fnCancelAction = fnCancelAction,
 	}
 	for i, p in ipairs(aOptions) do
@@ -1175,7 +1222,7 @@ function LIB.Dialog(szMsg, aOptions, fnCancelAction)
 		end
 		insert(tMsg, tOption)
 	end
-	MessageBox(tMsg)
+	return LIB.MessageBox(szKey, tMsg)
 end
 
 do
