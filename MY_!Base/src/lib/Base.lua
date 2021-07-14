@@ -145,8 +145,8 @@ local DEBUG_LEVEL = SetmetaReadonly({
 local function IsStreaming()
 	return _G.SM_IsEnable and _G.SM_IsEnable()
 end
-local _BUILD_                 = '20210711'
-local _VERSION_               = '5.1.4'
+local _BUILD_                 = '20210714'
+local _VERSION_               = '6.0.0'
 local _MENU_COLOR_            = {255, 165, 79}
 local _MAX_PLAYER_LEVEL_      = 100
 local _INTERFACE_ROOT_        = 'Interface/'
