@@ -647,7 +647,7 @@ function D.RemoveLover()
 								-- À´œÚ‘Ú√‹¡ƒÃ·–—
 								LIB.SendChat(lover.szName, _L['Sorry, I decided to just a swordman, bye my plugin lover'])
 								D.SaveLover(0, 0, 0, 0, 0)
-								LIB.SendChat(PLAYER_TALK_CHANNEL.TONG, _L('A blade and cut, no longer meet with [%s].', lover.szName))
+								-- LIB.SendChat(PLAYER_TALK_CHANNEL.TONG, _L('A blade and cut, no longer meet with [%s].', lover.szName))
 								LIB.Sysmsg(_L['Congratulations, do not repeat the same mistakes ah.'])
 							end)
 						end)
