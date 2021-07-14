@@ -77,6 +77,12 @@ DB:Execute([[
 		gold INTEGER NOT NULL,
 		silver INTEGER NOT NULL,
 		copper INTEGER NOT NULL,
+		stamina INTEGER NOT NULL,
+		stamina_max INTEGER NOT NULL,
+		stamina_remain INTEGER NOT NULL,
+		vigor INTEGER NOT NULL,
+		vigor_max INTEGER NOT NULL,
+		vigor_remain INTEGER NOT NULL,
 		contribution INTEGER NOT NULL,
 		contribution_remain INTEGER NOT NULL,
 		justice INTEGER NOT NULL,
@@ -102,7 +108,16 @@ DB:Execute([[
 		PRIMARY KEY(guid)
 	)
 ]])
-local DB_RoleInfoW = DB:Prepare('REPLACE INTO RoleInfo (guid, account, region, server, name, force, level, equip_score, pet_score, gold, silver, copper, contribution, contribution_remain, justice, justice_remain, prestige, prestige_remain, camp_point, camp_point_percentage, camp_level, arena_award, arena_award_remain, exam_print, exam_print_remain, achievement_score, coin, mentor_score, starve, starve_remain, architecture, architecture_remain, time, extra) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+local DB_RoleInfoW = DB:Prepare([[
+	REPLACE INTO RoleInfo (
+		guid, account, region, server, name, force, level, equip_score, pet_score, gold, silver, copper,
+		stamina, stamina_max, stamina_remain, vigor, vigor_max, vigor_remain,
+		contribution, contribution_remain, justice, justice_remain, prestige, prestige_remain, camp_point,
+		camp_point_percentage, camp_level, arena_award, arena_award_remain,
+		exam_print, exam_print_remain, achievement_score, coin, mentor_score, starve, starve_remain, architecture, architecture_remain,
+		time, extra
+	) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]])
 local DB_RoleInfoCoinW = DB:Prepare('UPDATE RoleInfo SET coin = ? WHERE account = ? AND region = ?')
 local DB_RoleInfoG = DB:Prepare('SELECT * FROM RoleInfo WHERE guid = ?')
 local DB_RoleInfoR = DB:Prepare('SELECT * FROM RoleInfo WHERE account LIKE ? OR name LIKE ? OR region LIKE ? OR server LIKE ? ORDER BY time DESC')
@@ -795,6 +810,12 @@ function D.GetClientPlayerRec()
 	rec.gold = money.nGold
 	rec.silver = money.nSilver
 	rec.copper = money.nCopper
+	rec.stamina = -1
+	rec.stamina_max = -1
+	rec.stamina_remain = -1
+	rec.vigor = -1
+	rec.vigor_max = -1
+	rec.vigor_remain = -1
 	rec.contribution = me.nContribution
 	rec.contribution_remain = me.GetContributionRemainSpace()
 	rec.justice = me.nJustice
@@ -854,6 +875,12 @@ function D.Migration()
 								rec.gold,
 								rec.silver,
 								rec.copper,
+								rec.stamina or -1,
+								rec.stamina_max or -1,
+								rec.stamina_remain or -1,
+								rec.vigor or -1,
+								rec.vigor_max or -1,
+								rec.vigor_remain or -1,
 								rec.contribution,
 								rec.contribution_remain,
 								rec.justice,
@@ -909,6 +936,7 @@ function D.FlushDB()
 		rec.guid, rec.account, rec.region, rec.server,
 		rec.name, rec.force, rec.level, rec.equip_score,
 		rec.pet_score, rec.gold, rec.silver, rec.copper,
+		rec.stamina, rec.stamina_max, rec.stamina_remain, rec.vigor, rec.vigor_max, rec.vigor_remain,
 		rec.contribution, rec.contribution_remain, rec.justice, rec.justice_remain,
 		rec.prestige, rec.prestige_remain, rec.camp_point, rec.camp_point_percentage,
 		rec.camp_level, rec.arena_award, rec.arena_award_remain, rec.exam_print,
