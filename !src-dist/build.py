@@ -6,6 +6,7 @@
 
 import argparse
 import codecs
+import glob
 import os
 import re
 import semver
@@ -38,6 +39,13 @@ def __compress(addon):
 			source_code = re.sub(r'(?is)[^\n]*--\[\[#DEBUG LINE\]\][^\n]*\n?', '', source_code)
 			source_code = re.sub(r'(?is)\n?--\[\[#DEBUG BEGIN\]\].*?--\[\[#DEBUG END\]\]\n?', '', source_code)
 			codecs.open(source_file,'w',encoding='gbk').write(source_code)
+	# Delete old files
+	acientFileList = glob.glob('./%s/src*.lua' % addon, recursive=False)
+	for filePath in acientFileList:
+		try:
+			os.remove(filePath)
+		except OSError:
+			print('Error while deleting file: ' + filePath)
 	# Generate squishy file and execute squish
 	with open('squishy', 'w') as squishy:
 		squishy.write('Output "./%s/%s"\n' % (addon, srcname))
