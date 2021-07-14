@@ -908,10 +908,14 @@ function LIB.OutputTableTip(tOptions)
 		nTableHeight = nTableHeight + nRowHeight
 	end
 	hTable:FormatAllItemPos()
-	hTable:SetSize(nTableWidth + 8, nTableHeight + 8)
+	hTable:SetSize(
+		nTableWidth + nFramePaddingLeft + nFramePaddingRight,
+		nTableHeight + nFramePaddingTop + nFramePaddingBottom)
 	-- 更新外部元素大小
 	if imgBg then
-		imgBg:SetSize(nTableWidth + 8, nTableHeight + 8)
+		imgBg:SetSize(
+			nTableWidth + nFramePaddingLeft + nFramePaddingRight,
+			nTableHeight + nFramePaddingTop + nFramePaddingBottom)
 	end
 	if hTotal then
 		hTable:SetRelPos(nFramePaddingLeft, nFramePaddingTop)
