@@ -176,191 +176,281 @@ local function UpdateChannelDailyLimit(hRadio, bPlus)
 	UI(shaCount):DrawCircle(nil, nil, nil, info.color[1], info.color[2], info.color[3], 100, PI / 2, PI * 2 * dwPercent)
 end
 
-local function OnClsCheck()
-	local function Cls(bAll)
-		for i = 1, 32 do
-			local h = Station.Lookup('Lowest2/ChatPanel' .. i .. '/Wnd_Message', 'Handle_Message')
-			local hCheck = Station.Lookup('Lowest2/ChatPanel' .. i .. '/CheckBox_Title')
-			if h and (bAll or (hCheck and hCheck:IsCheckBoxChecked())) then
-				h:Clear()
-				h:FormatAllItemPos()
-			end
-		end
-	end
-	if IsCtrlKeyDown() then
-		Cls()
-	elseif IsAltKeyDown() then
-		MessageBox({
-			szName = 'CLS_CHATPANEL_ALL',
-			szMessage = _L['Are you sure you want to clear all message panel?'], {
-				szOption = g_tStrings.STR_HOTKEY_SURE, fnAction = function()
-					Cls(true)
-				end
-			}, { szOption = g_tStrings.STR_HOTKEY_CANCEL },
-		})
-	else
-		MessageBox({
-			szName = 'CLS_CHATPANEL',
-			szMessage = _L['Are you sure you want to clear current message panel?\nPress CTRL when click can clear without alert.\nPress ALT when click can clear all window.'], {
-				szOption = g_tStrings.STR_HOTKEY_SURE, fnAction = function()
-					Cls()
-				end
-			}, { szOption = g_tStrings.STR_HOTKEY_CANCEL },
-		})
-	end
-	UI(this):Check(false)
-end
-
-local function OnAwayCheck()
-	LIB.SwitchChatChannel('/afk')
-	local edit = LIB.GetChatInput()
-	if edit then
-		edit:GetRoot():Show()
-		if edit:GetText() == '' then
-			edit:InsertText(
-				IsEmpty(O.szAway)
-					and g_tStrings.STR_AUTO_REPLAY_LEAVE
-					or O.szAway
-			)
-			edit:SelectAll()
-		end
-		Station.SetFocusWindow(edit)
-	end
-end
-
-local function OnAwayUncheck()
-	LIB.SwitchChatChannel('/cafk')
-end
-
-local function OnAwayTip()
-	return IsEmpty(O.szAway)
-		and g_tStrings.STR_AUTO_REPLAY_LEAVE
-		or O.szAway
-end
-
-local function OnBusyCheck()
-	LIB.SwitchChatChannel('/atr')
-	local edit = LIB.GetChatInput()
-	if edit then
-		edit:GetRoot():Show()
-		if edit:GetText() == '' then
-			edit:InsertText(
-				IsEmpty(O.szBusy)
-					and g_tStrings.STR_AUTO_REPLAY_LEAVE
-					or O.szBusy
-			)
-			edit:SelectAll()
-		end
-		Station.SetFocusWindow(edit)
-	end
-end
-
-local function OnBusyUncheck()
-	LIB.SwitchChatChannel('/catr')
-end
-
-local function OnBusyTip()
-	return IsEmpty(O.szBusy)
-		and g_tStrings.STR_AUTO_REPLAY_LEAVE
-		or O.szBusy
-end
-
-local function OnMosaicsCheck()
-	MY_ChatMosaics.bEnabled = true
-end
-
-local function OnMosaicsUncheck()
-	MY_ChatMosaics.bEnabled = false
-end
-
-local function OnWhisperCheck()
-	local t = {}
-	for i, whisper in ipairs(D.aWhisper) do
-		local info = MY_Farbnamen and MY_Farbnamen.Get(whisper[1])
-		insert(t, {
-			szOption = whisper[1],
-			rgb = info and info.rgb or {202, 126, 255},
-			fnAction = function()
-				LIB.SwitchChatChannel(whisper[1])
-				LIB.DelayCall(LIB.FocusChatInput)
-			end,
-			szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',
-			nFrame = 49,
-			nMouseOverFrame = 51,
-			nIconWidth = 17,
-			nIconHeight = 17,
-			szLayer = 'ICON_RIGHTMOST',
-			fnClickIcon = function()
-				for i = #D.aWhisper, 1, -1 do
-					if D.aWhisper[i][1] == whisper[1] then
-						remove(D.aWhisper, i)
-						UI.ClosePopupMenu()
-					end
-				end
-				O.aWhisper = D.aWhisper
-				D.bWhisperChanged = false
-			end,
-			fnMouseEnter = function()
-				local t = {}
-				local today = LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd')
-				local r, g, b = GetMsgFontColor('MSG_WHISPER')
-				for _, v in ipairs(whisper[2]) do
-					if IsString(v) then
-						insert(t, v)
-					elseif IsTable(v) and IsString(v[1]) then
-						if today == LIB.FormatTime(v[2], '%yyyy%MM%dd') then
-							insert(t, LIB.GetChatTimeXML(v[2], {r = r, g = g, b = b, s = '[%hh:%mm:%ss]'}) .. v[1])
-						else
-							insert(t, LIB.GetChatTimeXML(v[2], {r = r, g = g, b = b, s = '[%M.%dd.%hh:%mm:%ss]'}) .. v[1])
-						end
-					end
-				end
-				local szMsg = concat(t, '')
-				if MY_Farbnamen then
-					szMsg = MY_Farbnamen.Render(szMsg)
-				end
-				OutputTip(szMsg, 600, {this:GetAbsX(), this:GetAbsY(), this:GetW(), this:GetH()}, ALW.RIGHT_LEFT)
-			end,
-		})
-	end
-	local x, y = this:GetAbsPos()
-	t.x = x
-	t.y = y - #D.aWhisper * 24 - 24 - 20 - 8
-	if #t > 0 then
-		insert(t, 1, CONSTANT.MENU_DIVIDER)
-		insert(t, 1, {
-			szOption = g_tStrings.CHANNEL_WHISPER_SIGN,
-			rgb = {202, 126, 255},
-			fnAction = function()
-				LIB.SwitchChatChannel(PLAYER_TALK_CHANNEL.WHISPER)
-				LIB.DelayCall(LIB.FocusChatInput)
-			end,
-		})
-		PopupMenu(t)
-	else
-		LIB.SwitchChatChannel(PLAYER_TALK_CHANNEL.WHISPER)
-	end
-	this:Check(false)
-end
-
 local CHANNEL_LIST = {
-	{ id = 'nearby'       , title = _L['SAY'     ], head = '/s ', channel = PLAYER_TALK_CHANNEL.NEARBY       , cd = 0 , color = {255, 255, 255} }, --说
-	{ id = 'sence'        , title = _L['MAP'     ], head = '/y ', channel = PLAYER_TALK_CHANNEL.SENCE        , cd = 10, color = {255, 126, 126} }, --地
-	{ id = 'world'        , title = _L['WORLD'   ], head = '/h ', channel = PLAYER_TALK_CHANNEL.WORLD        , cd = 60, color = {252, 204, 204} }, --世
-	{ id = 'team'         , title = _L['PARTY'   ], head = '/p ', channel = PLAYER_TALK_CHANNEL.TEAM         , cd = 0 , color = {140, 178, 253} }, --队
-	{ id = 'raid'         , title = _L['TEAM'    ], head = '/t ', channel = PLAYER_TALK_CHANNEL.RAID         , cd = 0 , color = { 73, 168, 241} }, --团
-	{ id = 'battle_field' , title = _L['BATTLE'  ], head = '/b ', channel = PLAYER_TALK_CHANNEL.BATTLE_FIELD , cd = 0 , color = {255, 126, 126} }, --战
-	{ id = 'tong'         , title = _L['FACTION' ], head = '/g ', channel = PLAYER_TALK_CHANNEL.TONG         , cd = 0 , color = {  0, 200,  72} }, --帮
-	{ id = 'force'        , title = _L['SCHOOL'  ], head = '/f ', channel = PLAYER_TALK_CHANNEL.FORCE        , cd = 20, color = {  0, 255, 255} }, --派
-	{ id = 'camp'         , title = _L['CAMP'    ], head = '/c ', channel = PLAYER_TALK_CHANNEL.CAMP         , cd = 30, color = {155, 230,  58} }, --阵
-	{ id = 'friends'      , title = _L['FRIEND'  ], head = '/o ', channel = PLAYER_TALK_CHANNEL.FRIENDS      , cd = 10, color = {241, 114, 183} }, --友
-	{ id = 'tong_alliance', title = _L['ALLIANCE'], head = '/a ', channel = PLAYER_TALK_CHANNEL.TONG_ALLIANCE, cd = 0 , color = {178, 240, 164} }, --盟
-	{ id = 'whisper'      , title = _L['WHISPER' ], channel = PLAYER_TALK_CHANNEL.WHISPER, cd = 0, onclick = OnWhisperCheck, color = {202, 126, 255} }, --密
-	{ id = 'cls'          , title = _L['CLS'     ], onclick = OnClsCheck, color = {255, 0, 0} }, --清
-	{ id = 'away'         , title = _L['AWAY'    ], oncheck = OnAwayCheck, onuncheck = OnAwayUncheck, tip = OnAwayTip, color = {255, 255, 255} }, --离
-	{ id = 'busy'         , title = _L['BUSY'    ], oncheck = OnBusyCheck, onuncheck = OnBusyUncheck, tip = OnBusyTip, color = {255, 255, 255} }, --扰
-	{ id = 'mosaics'      , title = _L['MOSAICS' ], oncheck = OnMosaicsCheck, onuncheck = OnMosaicsUncheck, color = {255, 255, 255} }, --马
+	{ -- 说
+		id = 'nearby',
+		title = _L['SAY'],
+		head = '/s ',
+		channel = PLAYER_TALK_CHANNEL.NEARBY,
+		cd = 0,
+		color = {255, 255, 255},
+	},
+	{ -- 地
+		id = 'sence',
+		title = _L['MAP'],
+		head = '/y ',
+		channel = PLAYER_TALK_CHANNEL.SENCE,
+		cd = 10,
+		color = {255, 126, 126},
+	},
+	{ -- 世
+		id = 'world',
+		title = _L['WORLD'],
+		head = '/h ',
+		channel = PLAYER_TALK_CHANNEL.WORLD,
+		cd = 60,
+		color = {252, 204, 204},
+	},
+	{ -- 队
+		id = 'team',
+		title = _L['PARTY'],
+		head = '/p ',
+		channel = PLAYER_TALK_CHANNEL.TEAM,
+		cd = 0,
+		color = {140, 178, 253},
+	},
+	{ -- 团
+		id = 'raid',
+		title = _L['TEAM'],
+		head = '/t ',
+		channel = PLAYER_TALK_CHANNEL.RAID,
+		cd = 0,
+		color = { 73, 168, 241},
+	},
+	{ -- 战
+		id = 'battle_field',
+		title = _L['BATTLE'],
+		head = '/b ',
+		channel = PLAYER_TALK_CHANNEL.BATTLE_FIELD,
+		cd = 0,
+		color = {255, 126, 126},
+	},
+	{ -- 帮
+		id = 'tong',
+		title = _L['FACTION'],
+		head = '/g ',
+		channel = PLAYER_TALK_CHANNEL.TONG,
+		cd = 0,
+		color = {  0, 200,  72},
+	},
+	{ -- 派
+		id = 'force',
+		title = _L['SCHOOL'],
+		head = '/f ',
+		channel = PLAYER_TALK_CHANNEL.FORCE,
+		cd = 20,
+		color = {  0, 255, 255},
+	},
+	{ -- 阵
+		id = 'camp',
+		title = _L['CAMP'],
+		head = '/c ',
+		channel = PLAYER_TALK_CHANNEL.CAMP,
+		cd = 30,
+		color = {155, 230,  58},
+	},
+	{ -- 友
+		id = 'friends',
+		title = _L['FRIEND'],
+		head = '/o ',
+		channel = PLAYER_TALK_CHANNEL.FRIENDS,
+		cd = 10,
+		color = {241, 114, 183},
+	},
+	{ -- 盟
+		id = 'tong_alliance',
+		title = _L['ALLIANCE'],
+		head = '/a ',
+		channel = PLAYER_TALK_CHANNEL.TONG_ALLIANCE,
+		cd = 0,
+		color = {178, 240, 164},
+	},
+	{ -- 密
+		id = 'whisper',
+		title = _L['WHISPER'],
+		channel = PLAYER_TALK_CHANNEL.WHISPER,
+		cd = 0,
+		onclick = function()
+			local t = {}
+			for i, whisper in ipairs(D.aWhisper) do
+				local info = MY_Farbnamen and MY_Farbnamen.Get(whisper[1])
+				insert(t, {
+					szOption = whisper[1],
+					rgb = info and info.rgb or {202, 126, 255},
+					fnAction = function()
+						LIB.SwitchChatChannel(whisper[1])
+						LIB.DelayCall(LIB.FocusChatInput)
+					end,
+					szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',
+					nFrame = 49,
+					nMouseOverFrame = 51,
+					nIconWidth = 17,
+					nIconHeight = 17,
+					szLayer = 'ICON_RIGHTMOST',
+					fnClickIcon = function()
+						for i = #D.aWhisper, 1, -1 do
+							if D.aWhisper[i][1] == whisper[1] then
+								remove(D.aWhisper, i)
+								UI.ClosePopupMenu()
+							end
+						end
+						O.aWhisper = D.aWhisper
+						D.bWhisperChanged = false
+					end,
+					fnMouseEnter = function()
+						local t = {}
+						local today = LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd')
+						local r, g, b = GetMsgFontColor('MSG_WHISPER')
+						for _, v in ipairs(whisper[2]) do
+							if IsString(v) then
+								insert(t, v)
+							elseif IsTable(v) and IsString(v[1]) then
+								if today == LIB.FormatTime(v[2], '%yyyy%MM%dd') then
+									insert(t, LIB.GetChatTimeXML(v[2], {r = r, g = g, b = b, s = '[%hh:%mm:%ss]'}) .. v[1])
+								else
+									insert(t, LIB.GetChatTimeXML(v[2], {r = r, g = g, b = b, s = '[%M.%dd.%hh:%mm:%ss]'}) .. v[1])
+								end
+							end
+						end
+						local szMsg = concat(t, '')
+						if MY_Farbnamen then
+							szMsg = MY_Farbnamen.Render(szMsg)
+						end
+						OutputTip(szMsg, 600, {this:GetAbsX(), this:GetAbsY(), this:GetW(), this:GetH()}, ALW.RIGHT_LEFT)
+					end,
+				})
+			end
+			local x, y = this:GetAbsPos()
+			t.x = x
+			t.y = y - #D.aWhisper * 24 - 24 - 20 - 8
+			if #t > 0 then
+				insert(t, 1, CONSTANT.MENU_DIVIDER)
+				insert(t, 1, {
+					szOption = g_tStrings.CHANNEL_WHISPER_SIGN,
+					rgb = {202, 126, 255},
+					fnAction = function()
+						LIB.SwitchChatChannel(PLAYER_TALK_CHANNEL.WHISPER)
+						LIB.DelayCall(LIB.FocusChatInput)
+					end,
+				})
+				PopupMenu(t)
+			else
+				LIB.SwitchChatChannel(PLAYER_TALK_CHANNEL.WHISPER)
+			end
+			this:Check(false)
+		end,
+		color = {202, 126, 255},
+	},
+	{ -- 清
+		id = 'cls',
+		title = _L['CLS'],
+		onclick = function()
+			local function Cls(bAll)
+				for i = 1, 32 do
+					local h = Station.Lookup('Lowest2/ChatPanel' .. i .. '/Wnd_Message', 'Handle_Message')
+					local hCheck = Station.Lookup('Lowest2/ChatPanel' .. i .. '/CheckBox_Title')
+					if h and (bAll or (hCheck and hCheck:IsCheckBoxChecked())) then
+						h:Clear()
+						h:FormatAllItemPos()
+					end
+				end
+			end
+			if IsCtrlKeyDown() then
+				Cls()
+			elseif IsAltKeyDown() then
+				MessageBox({
+					szName = 'CLS_CHATPANEL_ALL',
+					szMessage = _L['Are you sure you want to clear all message panel?'], {
+						szOption = g_tStrings.STR_HOTKEY_SURE, fnAction = function()
+							Cls(true)
+						end
+					}, { szOption = g_tStrings.STR_HOTKEY_CANCEL },
+				})
+			else
+				MessageBox({
+					szName = 'CLS_CHATPANEL',
+					szMessage = _L['Are you sure you want to clear current message panel?\nPress CTRL when click can clear without alert.\nPress ALT when click can clear all window.'], {
+						szOption = g_tStrings.STR_HOTKEY_SURE, fnAction = function()
+							Cls()
+						end
+					}, { szOption = g_tStrings.STR_HOTKEY_CANCEL },
+				})
+			end
+			UI(this):Check(false)
+		end,
+		color = {255, 0, 0},
+	},
+	{ -- 离
+		id = 'away',
+		title = _L['AWAY'],
+		oncheck = function()
+			LIB.SwitchChatChannel('/afk')
+			local edit = LIB.GetChatInput()
+			if edit then
+				edit:GetRoot():Show()
+				if edit:GetText() == '' then
+					edit:InsertText(
+						IsEmpty(O.szAway)
+							and g_tStrings.STR_AUTO_REPLAY_LEAVE
+							or O.szAway
+					)
+					edit:SelectAll()
+				end
+				Station.SetFocusWindow(edit)
+			end
+		end,
+		onuncheck = function()
+			LIB.SwitchChatChannel('/cafk')
+		end,
+		tip = function()
+			return IsEmpty(O.szAway)
+				and g_tStrings.STR_AUTO_REPLAY_LEAVE
+				or O.szAway
+		end,
+		color = {255, 255, 255},
+	},
+	{ -- 扰
+		id = 'busy',
+		title = _L['BUSY'],
+		oncheck = function()
+			LIB.SwitchChatChannel('/atr')
+			local edit = LIB.GetChatInput()
+			if edit then
+				edit:GetRoot():Show()
+				if edit:GetText() == '' then
+					edit:InsertText(
+						IsEmpty(O.szBusy)
+							and g_tStrings.STR_AUTO_REPLAY_LEAVE
+							or O.szBusy
+					)
+					edit:SelectAll()
+				end
+				Station.SetFocusWindow(edit)
+			end
+		end,
+		onuncheck = function()
+			LIB.SwitchChatChannel('/catr')
+		end,
+		tip = function()
+			return IsEmpty(O.szBusy)
+				and g_tStrings.STR_AUTO_REPLAY_LEAVE
+				or O.szBusy
+		end,
+		color = {255, 255, 255},
+	},
+	{ -- 马
+		id = 'mosaics',
+		title = _L['MOSAICS'],
+		oncheck = function()
+			MY_ChatMosaics.bEnabled = true
+		end,
+		onuncheck = function()
+			MY_ChatMosaics.bEnabled = false
+		end,
+		color = {255, 255, 255},
+	},
 }
+
 local CHANNEL_CD_TIME = {}
 for i, v in ipairs(CHANNEL_LIST) do
 	if v.channel then
