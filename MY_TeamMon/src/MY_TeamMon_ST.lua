@@ -288,7 +288,8 @@ function D.UpdateAnchor(frame)
 end
 
 function D.Init()
-	local frame = Wnd.OpenWindow(ST_INIFILE, 'MY_TeamMon_ST')
+	Wnd.CloseWindow('MY_TeamMon_ST')
+	Wnd.OpenWindow(ST_INIFILE, 'MY_TeamMon_ST')
 end
 
 -- ¹¹Ôìº¯Êý
@@ -397,4 +398,4 @@ function ST:RemoveItem()
 	D.handle:FormatAllItemPos()
 end
 
-LIB.RegisterInit('MY_TeamMon_ST', D.Init)
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_TeamMon_ST', D.Init)

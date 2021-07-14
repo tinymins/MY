@@ -80,7 +80,8 @@ local function CreateFullScreen(szKey, tArgs)
 	end
 end
 
-local function Init()
+function D.Init()
+	Wnd.CloseWindow('MY_TeamMon_FS')
 	Wnd.OpenWindow(FS_INIFILE, 'MY_TeamMon_FS'):Hide()
 end
 
@@ -227,7 +228,7 @@ function FS:RemoveItem()
 	end
 end
 
-LIB.RegisterInit('MY_TeamMon_FS', Init)
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_TeamMon_FS', D.Init)
 
 -- Global exports
 do

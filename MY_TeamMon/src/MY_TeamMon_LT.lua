@@ -137,7 +137,8 @@ function D.UpdateAnchor(frame)
 end
 
 function D.Init()
-	return D.frame or Wnd.OpenWindow(INIFILE, 'MY_TeamMon_LT')
+	Wnd.CloseWindow('MY_TeamMon_LT')
+	Wnd.OpenWindow(INIFILE, 'MY_TeamMon_LT')
 end
 
 function D.UpdateText(txt, col)
@@ -167,7 +168,7 @@ function D.OnBreathe()
 	end
 end
 
-LIB.RegisterInit('MY_TeamMon_LT', D.Init)
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_TeamMon_LT', D.Init)
 
 local PS = { bShielded = true, nShielded = 2 }
 function PS.OnPanelActive(frame)

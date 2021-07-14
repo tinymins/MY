@@ -241,10 +241,11 @@ function D.UpdateAnchor(frame)
 end
 
 function D.Init()
-	local frame =  Wnd.OpenWindow(BL_INIFILE, 'MY_TeamMon_BL')
+	Wnd.CloseWindow('MY_TeamMon_BL')
+	Wnd.OpenWindow(BL_INIFILE, 'MY_TeamMon_BL')
 end
 
-LIB.RegisterInit('MY_TeamMon_BL', D.Init)
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_TeamMon_BL', D.Init)
 
 -- Global exports
 do

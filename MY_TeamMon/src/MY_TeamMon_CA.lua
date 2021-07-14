@@ -143,11 +143,11 @@ function D.UpdateAnchor(frame)
 end
 
 function D.Init()
-	local frame = Wnd.OpenWindow(CA_INIFILE, 'MY_TeamMon_CA')
-	frame:Hide()
+	Wnd.CloseWindow('MY_TeamMon_CA')
+	Wnd.OpenWindow(CA_INIFILE, 'MY_TeamMon_CA'):Hide()
 end
 
-LIB.RegisterInit('MY_TeamMon_CA', D.Init)
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_TeamMon_CA', D.Init)
 
 
 -- Global exports

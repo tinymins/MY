@@ -209,8 +209,9 @@ function D.OnFrameDragEnd()
 	O.tAnchor = GetFrameAnchor(this, 'TOPCENTER')
 end
 
-function D.OpenPanel()
-	local frame = D.frame or Wnd.OpenWindow(PBL_INI_FILE, 'MY_TeamMon_PBL')
+function D.Init()
+	Wnd.CloseWindow('MY_TeamMon_PBL')
+	Wnd.OpenWindow(PBL_INI_FILE, 'MY_TeamMon_PBL')
 	D.SwitchPanel(0)
 end
 
@@ -339,7 +340,7 @@ function D.OnTableInsert(dwID, dwBuffID, nLevel, nIcon)
 	CACHE_LIST[key] = h
 end
 
-LIB.RegisterInit('MY_TeamMon_PBL', D.OpenPanel)
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_TeamMon_PBL', D.Init)
 
 -- Global exports
 do
