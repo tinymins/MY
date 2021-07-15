@@ -413,7 +413,7 @@ function PS.OnPanelActive(frame)
 	-- crlf
 	x = X + 10
 	y = y + 28
-	MY_EnergyBar.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+	x, y = MY_EnergyBar.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 	-- hungry
 	x = ui:Append('WndCheckBox', {
 		x = x, y = y,
