@@ -4,6 +4,7 @@
 .*
 BoilerplateDev_*
 README.md
+CHANGELOG.md
 !src-dist
 header.tpl.lua
 __pycache__
