@@ -1001,7 +1001,7 @@ function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
 		local KObject = IsPlayer(dwCaster) and GetPlayer(dwCaster) or GetNpc(dwCaster)
 		if KObject then
 			szSender = LIB.GetObjectName(KObject)
-			szReceiver = LIB.GetObjectName(LIB.GetObject(KObject.GetTarget()))
+			szReceiver = LIB.GetObjectName(LIB.GetObject(KObject.GetTarget()), 'auto')
 		else
 			szSender = LIB.GetObjectName(IsPlayer(dwCaster) and TARGET.PLAYER or TARGET.NPC, dwCaster)
 		end
@@ -1560,7 +1560,7 @@ function D.OnDeath(dwCharacterID, dwKiller)
 		local data = D.GetData('NPC', npc.dwTemplateID)
 		if data then
 			local dwTemplateID = npc.dwTemplateID
-			local szSender = LIB.GetObjectName(LIB.GetObject(dwKiller))
+			local szSender = LIB.GetObjectName(LIB.GetObject(dwKiller), 'auto')
 			local szReceiver = LIB.GetObjectName(npc)
 			D.CountdownEvent(data, MY_TM_TYPE.NPC_DEATH, szSender, szReceiver)
 			local bAllDeath = true
