@@ -9,4 +9,6 @@ return {
         '　　4、所有物品坐標信息僅會保存在本地，不涉及任何數據內容上傳或下載。',
         '　　5、物品坐標位置每次更新都可能被官方修改，查詢結果只代表物品被記錄時刻的瞬時信息。',
     },
+    ['Ancient database detected, do you want to migrate data from it?'] = '發現舊版地圖數據，是否立即轉換數據？',
+    ['Migrate succeed!'] = '地圖數據遷移成功！',
 }
