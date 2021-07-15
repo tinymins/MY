@@ -634,8 +634,8 @@ local function GetTongName(dwID)
 		DBT_RI:BindAll(dwID)
 		local data = DBT_RI:GetNext()
 		if data then
-			szTong = data.name
-			l_tongnames[dwID] = data.name
+			szTong = UTF8ToAnsi(data.name)
+			l_tongnames[dwID] = szTong
 		end
 		DBT_RI:Reset()
 	end
@@ -701,6 +701,8 @@ function D.Get(szKey)
 			end
 		end
 		if info then
+			info.name = UTF8ToAnsi(info.name)
+			info.title = UTF8ToAnsi(info.title)
 			l_infocache[info.id] = info
 			l_infocache[info.name] = info
 		end
