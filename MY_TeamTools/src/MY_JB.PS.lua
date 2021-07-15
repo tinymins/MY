@@ -50,7 +50,7 @@ local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_JBBind'
 local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/jx3box/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^6.0.0') then
+if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^7.0.0') then
 	return
 end
 --------------------------------------------------------------------------
