@@ -56,7 +56,7 @@ end
 --------------------------------------------------------------------------
 LIB.CreateDataRoot(PATH_TYPE.GLOBAL)
 local l_szKeyword, l_dwMapID, l_nMapIndex, l_renderTime = '', nil, nil, 0
-local DB = LIB.SQLiteConnect(_L['MY_MiddleMapMark'], {'cache/npc_doodad_rec.v3.db', PATH_TYPE.GLOBAL})
+local DB = LIB.SQLiteConnect(_L['MY_MiddleMapMark'], {'cache/npc_doodad_rec.v4.db', PATH_TYPE.GLOBAL})
 if not DB then
 	return LIB.Sysmsg(_L['MY_MiddleMapMark'], _L['Cannot connect to database!!!'], CONSTANT.MSG_THEME.ERROR)
 end
@@ -67,8 +67,8 @@ DB:Execute([[
 		mapid INTEGER NOT NULL,
 		x INTEGER NOT NULL,
 		y INTEGER NOT NULL,
-		name VARCHAR(20) NOT NULL,
-		title VARCHAR(20) NOT NULL,
+		name NVARCHAR(20) NOT NULL,
+		title NVARCHAR(20) NOT NULL,
 		level INTEGER NOT NULL,
 		extra TEXT NOT NULL,
 		PRIMARY KEY(templateid, poskey)
@@ -89,7 +89,7 @@ DB:Execute([[
 		mapid INTEGER NOT NULL,
 		x INTEGER NOT NULL,
 		y INTEGER NOT NULL,
-		name VARCHAR(20) NOT NULL,
+		name NVARCHAR(20) NOT NULL,
 		extra TEXT NOT NULL,
 		PRIMARY KEY (templateid, poskey)
 	)
@@ -127,7 +127,8 @@ function D.Migration()
 	local DB_V1_ROOT = 'cache/NPC_DOODAD_REC/'
 	local DB_V1_PATH = LIB.FormatPath({DB_V1_ROOT, PATH_TYPE.DATA})
 	local DB_V2_PATH = LIB.FormatPath({'cache/npc_doodad_rec.v2.db', PATH_TYPE.GLOBAL})
-	if not IsLocalFileExist(DB_V1_PATH) and not IsLocalFileExist(DB_V2_PATH) then
+	local DB_V3_PATH = LIB.FormatPath({'cache/npc_doodad_rec.v3.db', PATH_TYPE.GLOBAL})
+	if not IsLocalFileExist(DB_V1_PATH) and not IsLocalFileExist(DB_V2_PATH) and not IsLocalFileExist(DB_V3_PATH) then
 		return
 	end
 	LIB.Confirm(
@@ -170,36 +171,40 @@ function D.Migration()
 					local aNpcInfo = DB_V2:Execute('SELECT * FROM NpcInfo WHERE templateid IS NOT NULL')
 					if aNpcInfo then
 						for _, rec in ipairs(aNpcInfo) do
-							DBN_W:ClearBindings()
-							DBN_W:BindAll(
-								rec.templateid,
-								rec.poskey,
-								rec.mapid,
-								rec.x,
-								rec.y,
-								rec.name,
-								rec.title,
-								rec.level,
-								''
-							)
-							DBN_W:Execute()
+							if rec.templateid and rec.poskey then
+								DBN_W:ClearBindings()
+								DBN_W:BindAll(
+									rec.templateid,
+									rec.poskey,
+									rec.mapid or -1,
+									rec.x or -1,
+									rec.y or -1,
+									rec.name or '',
+									rec.title or '',
+									rec.level or -1,
+									''
+								)
+								DBN_W:Execute()
+							end
 						end
 						DBN_W:Reset()
 					end
 					local aDoodadInfo = DB_V2:Execute('SELECT * FROM DoodadInfo WHERE templateid IS NOT NULL')
 					if aDoodadInfo then
 						for _, rec in ipairs(aDoodadInfo) do
-							DBD_W:ClearBindings()
-							DBD_W:BindAll(
-								rec.templateid,
-								rec.poskey,
-								rec.mapid,
-								rec.x,
-								rec.y,
-								rec.name,
-								''
-							)
-							DBD_W:Execute()
+							if rec.templateid and rec.poskey then
+								DBD_W:ClearBindings()
+								DBD_W:BindAll(
+									rec.templateid,
+									rec.poskey,
+									rec.mapid or -1,
+									rec.x or -1,
+									rec.y or -1,
+									rec.name or '',
+									''
+								)
+								DBD_W:Execute()
+							end
 						end
 						DBD_W:Reset()
 					end
@@ -207,6 +212,56 @@ function D.Migration()
 					DB_V2:Release()
 				end
 				CPath.Move(DB_V2_PATH, DB_V2_PATH .. '.bak' .. LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
+			end
+			-- ×ªÒÆV3¾É°æÊý¾Ý
+			if IsLocalFileExist(DB_V3_PATH) then
+				local DB_V3 = SQLite3_Open(DB_V3_PATH)
+				if DB_V3 then
+					DB:Execute('BEGIN TRANSACTION')
+					local aNpcInfo = DB_V3:Execute('SELECT * FROM NpcInfo WHERE templateid IS NOT NULL')
+					if aNpcInfo then
+						for _, rec in ipairs(aNpcInfo) do
+							if rec.templateid and rec.poskey then
+								DBN_W:ClearBindings()
+								DBN_W:BindAll(
+									rec.templateid,
+									rec.poskey,
+									rec.mapid or -1,
+									rec.x or -1,
+									rec.y or -1,
+									rec.name or '',
+									rec.title or '',
+									rec.level or -1,
+									''
+								)
+								DBN_W:Execute()
+							end
+						end
+						DBN_W:Reset()
+					end
+					local aDoodadInfo = DB_V3:Execute('SELECT * FROM DoodadInfo WHERE templateid IS NOT NULL')
+					if aDoodadInfo then
+						for _, rec in ipairs(aDoodadInfo) do
+							if rec.templateid and rec.poskey then
+								DBD_W:ClearBindings()
+								DBD_W:BindAll(
+									rec.templateid,
+									rec.poskey,
+									rec.mapid or -1,
+									rec.x or -1,
+									rec.y or -1,
+									rec.name or '',
+									''
+								)
+								DBD_W:Execute()
+							end
+						end
+						DBD_W:Reset()
+					end
+					DB:Execute('END TRANSACTION')
+					DB_V3:Release()
+				end
+				CPath.Move(DB_V3_PATH, DB_V3_PATH .. '.bak' .. LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
 			end
 			LIB.Alert(_L['Migrate succeed!'])
 		end)
