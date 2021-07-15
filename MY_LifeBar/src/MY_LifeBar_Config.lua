@@ -797,7 +797,6 @@ function D.LoadConfig(szConfig)
 			Call(Set, Config, {k}, v)
 		end
 	end
-	D.AutoAdjustScale()
 	ConfigLoaded = true
 	FireUIEvent('MY_LIFEBAR_CONFIG_LOADED')
 end
@@ -805,6 +804,10 @@ end
 LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_LifeBar_Config', function()
 	D.Init()
 	D.LoadConfig()
+end)
+
+LIB.RegisterInit('MY_LifeBar_Config', function()
+	D.AutoAdjustScale()
 end)
 
 MY_LifeBar_Config = setmetatable({}, {
