@@ -112,7 +112,7 @@ local function InitDB()
 	if DB_ERR_COUNT > DB_MAX_ERR_COUNT then
 		return false
 	end
-	DB = LIB.SQLiteConnect(_L['MY_Farbnamen'], {'cache/farbnamen.v3.db', PATH_TYPE.SERVER})
+	DB = LIB.SQLiteConnect(_L['MY_Farbnamen'], {'cache/farbnamen.v4.db', PATH_TYPE.SERVER})
 	if not DB then
 		local szMsg = _L['Cannot connect to database!!!']
 		if DB_ERR_COUNT > 0 then
@@ -125,11 +125,11 @@ local function InitDB()
 	DB:Execute([[
 		CREATE TABLE IF NOT EXISTS InfoCache (
 			id INTEGER NOT NULL,
-			name VARCHAR(20) NOT NULL,
+			name NVARCHAR(20) NOT NULL,
 			force INTEGER NOT NULL,
 			role INTEGER NOT NULL,
 			level INTEGER NOT NULL,
-			title VARCHAR(20) NOT NULL,
+			title NVARCHAR(20) NOT NULL,
 			camp INTEGER NOT NULL,
 			tong INTEGER NOT NULL,
 			extra TEXT NOT NULL,
@@ -143,7 +143,7 @@ local function InitDB()
 	DB:Execute([[
 		CREATE TABLE IF NOT EXISTS TongCache (
 			id INTEGER NOT NULL,
-			name VARCHAR(20) NOT NULL,
+			name NVARCHAR(20) NOT NULL,
 			extra TEXT NOT NULL,
 			PRIMARY KEY(id)
 		)
@@ -184,7 +184,7 @@ local function InitDB()
 				if data then
 					for id, name in pairs(data) do
 						DBT_W:ClearBindings()
-						DBT_W:BindAll(id, name, '')
+						DBT_W:BindAll(id, AnsiToUTF8(name), '')
 						DBT_W:Execute()
 					end
 				end
@@ -211,7 +211,8 @@ InitDB()
 function D.Migration()
 	local DB_V1_PATH = LIB.FormatPath({'cache/player_info.db', PATH_TYPE.SERVER})
 	local DB_V2_PATH = LIB.FormatPath({'cache/player_info.v2.db', PATH_TYPE.SERVER})
-	if not IsLocalFileExist(DB_V1_PATH) and not IsLocalFileExist(DB_V2_PATH) then
+	local DB_V3_PATH = LIB.FormatPath({'cache/farbnamen.v3.db', PATH_TYPE.SERVER})
+	if not IsLocalFileExist(DB_V1_PATH) and not IsLocalFileExist(DB_V2_PATH) and not IsLocalFileExist(DB_V3_PATH) then
 		return
 	end
 	LIB.Confirm(
@@ -227,7 +228,17 @@ function D.Migration()
 					for i = 0, nCount / nPageSize do
 						for _, p in ipairs(DB_V1:Execute('SELECT id, name, force, role, level, title, camp, tong FROM InfoCache LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))) do
 							DBI_W:ClearBindings()
-							DBI_W:BindAll(p.id, p.name, p.force, p.role, p.level, p.title, p.camp, p.tong, '')
+							DBI_W:BindAll(
+								p.id,
+								AnsiToUTF8(p.name),
+								p.force or -1,
+								p.role or -1,
+								p.level or -1,
+								AnsiToUTF8(p.title),
+								p.camp or -1,
+								p.tong or -1,
+								''
+							)
 							DBI_W:Execute()
 						end
 					end
@@ -238,12 +249,16 @@ function D.Migration()
 					DB:Execute('BEGIN TRANSACTION')
 					for i = 0, nCount / nPageSize do
 						for _, p in ipairs(DB_V1:Execute('SELECT id, name FROM TongCache LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))) do
-							DBI_T:ClearBindings()
-							DBI_T:BindAll(p.id, p.name)
-							DBI_T:Execute()
+							DBT_W:ClearBindings()
+							DBT_W:BindAll(
+								p.id,
+								AnsiToUTF8(p.name),
+								''
+							)
+							DBT_W:Execute()
 						end
 					end
-					DBI_T:Reset()
+					DBT_W:Reset()
 					DB:Execute('END TRANSACTION')
 					DB_V1:Release()
 				end
@@ -254,42 +269,104 @@ function D.Migration()
 				local DB_V2 = SQLite3_Open(DB_V2_PATH)
 				if DB_V2 then
 					DB:Execute('BEGIN TRANSACTION')
-					local aInfoCache = DB_V2:Execute('SELECT * FROM InfoCache WHERE id IS NOT NULL')
-					if aInfoCache then
-						for _, rec in ipairs(aInfoCache) do
-							DBI_W:ClearBindings()
-							DBI_W:BindAll(
-								rec.id,
-								rec.name,
-								rec.force,
-								rec.role,
-								rec.level,
-								rec.title,
-								rec.camp,
-								rec.tong,
-								''
-							)
-							DBI_W:Execute()
+					local nCount, nPageSize = Get(DB_V2:Execute('SELECT COUNT(*) AS count FROM InfoCache WHERE id IS NOT NULL'), {1, 'count'}, 0), 10000
+					for i = 0, nCount / nPageSize do
+						local aInfoCache = DB_V2:Execute('SELECT * FROM InfoCache WHERE id IS NOT NULL LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))
+						if aInfoCache then
+							for _, rec in ipairs(aInfoCache) do
+								if rec.id and rec.name then
+									DBI_W:ClearBindings()
+									DBI_W:BindAll(
+										rec.id,
+										AnsiToUTF8(rec.name),
+										rec.force or -1,
+										rec.role or -1,
+										rec.level or -1,
+										AnsiToUTF8(rec.title or ''),
+										rec.camp or -1,
+										rec.tong or -1,
+										''
+									)
+									DBI_W:Execute()
+								end
+							end
+							DBI_W:Reset()
 						end
-						DBI_W:Reset()
 					end
-					local aTongCache = DB_V2:Execute('SELECT * FROM TongCache WHERE id IS NOT NULL')
-					if aTongCache then
-						for _, rec in ipairs(aTongCache) do
-							DBT_W:ClearBindings()
-							DBT_W:BindAll(
-								rec.id,
-								rec.name,
-								''
-							)
-							DBT_W:Execute()
+					local nCount, nPageSize = Get(DB_V2:Execute('SELECT COUNT(*) AS count FROM TongCache WHERE id IS NOT NULL'), {1, 'count'}, 0), 10000
+					for i = 0, nCount / nPageSize do
+						local aTongCache = DB_V2:Execute('SELECT * FROM TongCache WHERE id IS NOT NULL LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))
+						if aTongCache then
+							for _, rec in ipairs(aTongCache) do
+								if rec.id and rec.name then
+									DBT_W:ClearBindings()
+									DBT_W:BindAll(
+										rec.id,
+										AnsiToUTF8(rec.name or ''),
+										''
+									)
+									DBT_W:Execute()
+								end
+							end
+							DBT_W:Reset()
 						end
-						DBT_W:Reset()
 					end
 					DB:Execute('END TRANSACTION')
 					DB_V2:Release()
 				end
 				CPath.Move(DB_V2_PATH, DB_V2_PATH .. '.bak' .. LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
+			end
+			-- 转移V3旧版数据
+			if IsLocalFileExist(DB_V3_PATH) then
+				local DB_V3 = SQLite3_Open(DB_V3_PATH)
+				if DB_V3 then
+					DB:Execute('BEGIN TRANSACTION')
+					local nCount, nPageSize = Get(DB_V3:Execute('SELECT COUNT(*) AS count FROM InfoCache WHERE id IS NOT NULL'), {1, 'count'}, 0), 10000
+					for i = 0, nCount / nPageSize do
+						local aInfoCache = DB_V3:Execute('SELECT * FROM InfoCache WHERE id IS NOT NULL LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))
+						if aInfoCache then
+							for _, rec in ipairs(aInfoCache) do
+								if rec.id and rec.name then
+									DBI_W:ClearBindings()
+									DBI_W:BindAll(
+										rec.id,
+										AnsiToUTF8(rec.name),
+										rec.force or -1,
+										rec.role or -1,
+										rec.level or -1,
+										AnsiToUTF8(rec.title or ''),
+										rec.camp or -1,
+										rec.tong or -1,
+										''
+									)
+									DBI_W:Execute()
+								end
+							end
+							DBI_W:Reset()
+						end
+					end
+					local nCount, nPageSize = Get(DB_V3:Execute('SELECT COUNT(*) AS count FROM TongCache WHERE id IS NOT NULL'), {1, 'count'}, 0), 10000
+					for i = 0, nCount / nPageSize do
+						local aTongCache = DB_V3:Execute('SELECT * FROM TongCache WHERE id IS NOT NULL LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))
+						if aTongCache then
+							for _, rec in ipairs(aTongCache) do
+								if rec.id and rec.name then
+									DBT_W:ClearBindings()
+									DBT_W:BindAll(
+										rec.id,
+										AnsiToUTF8(rec.name),
+										''
+									)
+									DBT_W:Execute()
+								end
+							end
+							DBT_W:Reset()
+						end
+					end
+					DB:Execute('END TRANSACTION')
+					DB_V3:Release()
+				end
+				CPath.Move(DB_V3_PATH, DB_V3_PATH .. '.bak' .. LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
 			end
 			LIB.Alert(_L['Migrate succeed!'])
 		end)
@@ -543,10 +620,10 @@ end
 -- 数据存储
 ---------------------------------------------------------------
 local l_infocache       = {} -- 读取数据缓存
-local l_infocache_w     = {} -- 修改数据缓存
+local l_infocache_w     = {} -- 修改数据缓存（UTF8）
 local l_remoteinfocache = {} -- 跨服数据缓存
 local l_tongnames       = {} -- 帮会数据缓存
-local l_tongnames_w     = {} -- 帮会修改数据缓存
+local l_tongnames_w     = {} -- 帮会修改数据缓存（UTF8）
 local function GetTongName(dwID)
 	if not dwID then
 		return
@@ -611,7 +688,7 @@ function D.Get(szKey)
 		if type(szKey) == 'string' then
 			if InitDB() then
 				DBI_RN:ClearBindings()
-				DBI_RN:BindAll(szKey)
+				DBI_RN:BindAll(AnsiToUTF8(szKey))
 				info = DBI_RN:GetNext()
 				DBI_RN:Reset()
 			end
@@ -662,7 +739,7 @@ function D.AddAusID(dwID)
 		info.force = player.dwForceID or -1
 		info.role  = player.nRoleType or -1
 		info.level = player.nLevel or -1
-		info.title = player.nX ~= 0 and player.szTitle or info.title
+		info.title = player.nX ~= 0 and player.szTitle or info.title or ''
 		info.camp  = player.nCamp or -1
 		info.tong  = player.dwTongID or -1
 
@@ -675,12 +752,15 @@ function D.AddAusID(dwID)
 				local szTong = GetTongClient().ApplyGetTongName(dwTongID, 254)
 				if szTong and szTong ~= '' then
 					l_tongnames[dwTongID] = szTong
-					l_tongnames_w[dwTongID] = szTong
+					l_tongnames_w[dwTongID] = AnsiToUTF8(szTong)
 				end
 			end
 			l_infocache[info.id] = info
 			l_infocache[info.name] = info
-			l_infocache_w[info.id] = info
+			local infow = Clone(info)
+			infow.name = AnsiToUTF8(info.name)
+			infow.title = AnsiToUTF8(info.title)
+			l_infocache_w[info.id] = infow
 		end
 		return true
 	end
@@ -792,7 +872,7 @@ local function OnPeekPlayer()
 end
 LIB.RegisterEvent('PEEK_OTHER_PLAYER', OnPeekPlayer)
 LIB.RegisterEvent('PLAYER_ENTER_SCENE', function() l_peeklist[arg0] = 0 end)
-LIB.RegisterEvent('ON_GET_TONG_NAME_NOTIFY', function() l_tongnames[arg1], l_tongnames_w[arg1] = arg2, arg2 end)
+LIB.RegisterEvent('ON_GET_TONG_NAME_NOTIFY', function() l_tongnames[arg1], l_tongnames_w[arg1] = arg2, AnsiToUTF8(arg2) end)
 end
 
 --------------------------------------------------------------------------
