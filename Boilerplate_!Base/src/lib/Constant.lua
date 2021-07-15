@@ -44,6 +44,7 @@ local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCal
 -------------------------------------------------------------------------------------------------------
 local _L = LIB.LoadLangPack(PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 
+local KvpToObject = LIB.KvpToObject
 local bStream = GLOBAL.GAME_PROVIDER == 'remote'
 local bClassic = GLOBAL.GAME_BRANCH == 'classic'
 
