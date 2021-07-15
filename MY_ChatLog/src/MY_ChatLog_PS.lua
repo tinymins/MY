@@ -269,7 +269,7 @@ function D.ExportConfirm()
 		x = x, y = y, w = nMaxWidth - x * 2, h = 35,
 		text = _L['Export chatlog'],
 		onclick = function()
-			if LIB.IsStreaming() then
+			if GLOBAL.GAME_PROVIDER == 'remote' then
 				return LIB.Alert(_L['Streaming client does not support export!'])
 			end
 			local function doExport(szSuffix)

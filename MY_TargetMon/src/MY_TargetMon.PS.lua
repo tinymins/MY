@@ -1172,7 +1172,7 @@ local function DrawControls(ui, OpenDetail)
 					and _L['Ensure export (as embedded)']
 					or (szIndent and _L['Ensure export (with indent)'] or _L['Ensure export']),
 				fnAction = function()
-					if LIB.IsStreaming() then
+					if GLOBAL.GAME_PROVIDER == 'remote' then
 						return LIB.Alert(_L['Streaming client does not support export!'])
 					end
 					local file = LIB.FormatPath({

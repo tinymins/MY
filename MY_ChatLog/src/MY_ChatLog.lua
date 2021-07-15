@@ -115,7 +115,7 @@ local LOG_TYPE = {
 	},
 	{ szKey = 'monitor', szTitle = _L['MY Monitor'], aChannel = {'MSG_MY_MONITOR'} },
 }
-local LOG_LIMIT = (LIB.IsStreaming() and not LIB.IsDebugClient())
+local LOG_LIMIT = (GLOBAL.GAME_PROVIDER == 'remote' and not LIB.IsDebugClient())
 	and {
 		{ aKey = {'whisper'}, nLimit = 5000 },
 		{ aKey = {'party', 'team'}, nLimit = 5000 },

@@ -104,7 +104,7 @@ local COMBAT_TEXT_STRING = { -- 需要变成特定字符串的伤害类型
 }
 local COMBAT_TEXT_COLOR = { --不需要修改的内定颜色
 	YELLOW = { 255, 255, 0   },
-	RED    = LIB.IsStreaming()
+	RED    = GLOBAL.GAME_PROVIDER == 'remote'
 		and { 253, 86, 86 }
 		or { 255, 0, 0 },
 	PURPLE = { 255, 0,   255 },
@@ -298,7 +298,7 @@ local O = LIB.CreateUserSettingsModule('MY_CombatText', _L['System'], {
 		ePathType = PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
 		xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
-		xDefaultValue = LIB.IsStreaming() and { 253, 86, 86 } or { 255, 0, 0 },
+		xDefaultValue = GLOBAL.GAME_PROVIDER == 'remote' and { 253, 86, 86 } or { 255, 0, 0 },
 	},
 	-- $name 名字 $sn   技能名 $crit 会心 $val  数值
 	szSkill = {
@@ -342,7 +342,7 @@ local O = LIB.CreateUserSettingsModule('MY_CombatText', _L['System'], {
 		szLabel = _L['MY_CombatText'],
 		xSchema = Schema.Map(Schema.OneOf(Schema.String, Schema.Number), Schema.Tuple(Schema.Number, Schema.Number, Schema.Number)),
 		xDefaultValue = {
-			['DAMAGE']                               = LIB.IsStreaming() and { 253, 86, 86 } or { 255, 0, 0 }, -- 自己受到的伤害
+			['DAMAGE']                               = GLOBAL.GAME_PROVIDER == 'remote' and { 253, 86, 86 } or { 255, 0, 0 }, -- 自己受到的伤害
 			[SKILL_RESULT_TYPE.THERAPY]              = { 0,   255, 0   }, -- 治疗
 			[SKILL_RESULT_TYPE.PHYSICS_DAMAGE]       = { 255, 255, 255 }, -- 外公
 			[SKILL_RESULT_TYPE.SOLAR_MAGIC_DAMAGE]   = { 255, 128, 128 }, -- 阳

@@ -26,7 +26,7 @@ local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount,
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
 -- lib apis caching
-local LIB = Boilerplate
+local LIB = MY
 local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
 local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
 local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash

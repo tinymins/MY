@@ -707,7 +707,7 @@ local function LoadDefaultTemplate(szStyle)
 		end
 		template[1].Color[szRelation].__VALUE__ = tVal
 	end
-	if LIB.IsStreaming() then -- 云端微调对立颜色防止压缩模糊
+	if GLOBAL.GAME_PROVIDER == 'remote' then -- 云端微调对立颜色防止压缩模糊
 		for _, szType in ipairs({ 'Player', 'Npc' }) do
 			template[1].Color.Enemy.__VALUE__[szType] = { 253, 86, 86 }
 		end
