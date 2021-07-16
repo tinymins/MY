@@ -135,8 +135,7 @@ end
 if _DEBUG_LEVEL_ < DEBUG_LEVEL.NONE then
 	if not ENVIRONMENT.ECHO_LUA_ERROR then
 		RegisterEvent('CALL_LUA_ERROR', function()
-			print(arg0)
-			OutputMessage('MSG_SYS', arg0)
+			OutputMessage('MSG_SYS', 'CALL_LUA_ERROR:\n' .. arg0 .. '\n')
 		end)
 		ENVIRONMENT.ECHO_LUA_ERROR = _NAME_SPACE_
 	end
