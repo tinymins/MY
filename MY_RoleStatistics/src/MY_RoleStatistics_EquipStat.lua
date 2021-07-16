@@ -507,7 +507,7 @@ function D.UpdateSaveDB()
 	end
 	FireUIEvent('MY_ROLE_STAT_EQUIP_UPDATE')
 end
-LIB.RegisterInit('MY_RoleStatistics_BagUpdateSaveDB', function() INIT = true end)
+LIB.RegisterInit('MY_RoleStatistics_EquipUpdateSaveDB', function() INIT = true end)
 end
 
 function D.UpdateNames(page)
