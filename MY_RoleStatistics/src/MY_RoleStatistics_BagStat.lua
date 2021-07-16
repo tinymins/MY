@@ -222,7 +222,7 @@ local function UpdateTongRepertoryPage()
 	local me = GetClientPlayer()
 	for nIndex = 1, LIB.GetGuildBankBagSize(nPage) do
 		local boxtype, boxindex = LIB.GetGuildBankBagPos(nPage, nIndex)
-		local aItemData, aItemInfoData = D.ItemToData(GetPlayerItem(me, boxtype, boxindex))
+		local aItemData, aItemInfoData = D.ItemToData(GetPlayerItem(me, boxtype, boxindex), 'BANK')
 		l_guildcache[boxtype .. ',' .. boxindex] = {
 			boxtype = boxtype,
 			boxindex = boxindex,
@@ -423,7 +423,7 @@ function D.FlushDB()
 	for _, boxtype in ipairs(CONSTANT.INVENTORY_BANK_LIST) do
 		local count = me.GetBoxSize(boxtype)
 		for boxindex = 0, count - 1 do
-			local aItemData, aItemInfoData = D.ItemToData(GetPlayerItem(me, boxtype, boxindex))
+			local aItemData, aItemInfoData = D.ItemToData(GetPlayerItem(me, boxtype, boxindex), 'BANK')
 			if aItemInfoData then
 				DB_ItemInfoW:ClearBindings()
 				DB_ItemInfoW:BindAll(unpack(aItemInfoData))
