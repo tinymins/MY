@@ -57,7 +57,7 @@ end
 
 CPath.MakeDir(LIB.FormatPath({'userdata/role_statistics', PATH_TYPE.GLOBAL}))
 
-local DB = LIB.SQLiteConnect(_L['MY_RoleStatistics_BagStat'], {'userdata/role_statistics/bag_stat.v3.db', PATH_TYPE.GLOBAL})
+local DB = LIB.SQLiteConnect(_L['MY_RoleStatistics_BagStat'], {'userdata/role_statistics/bag_stat.v4.db', PATH_TYPE.GLOBAL})
 if not DB then
 	return LIB.Sysmsg(_L['MY_RoleStatistics_BagStat'], _L['Cannot connect to database!!!'], CONSTANT.MSG_THEME.ERROR)
 end
@@ -131,6 +131,30 @@ DB:Execute([[
 DB:Execute('CREATE INDEX IF NOT EXISTS ItemInfo_name_idx ON ItemInfo(name)')
 DB:Execute('CREATE INDEX IF NOT EXISTS ItemInfo_desc_idx ON ItemInfo(desc)')
 local DB_ItemInfoW = DB:Prepare('REPLACE INTO ItemInfo (tabtype, tabindex, tabsubindex, name, genre, quality, exist_type, desc, extra) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
+
+local BOX_TYPE = LIB.KvpToObject({
+	-- 100 - 199: Equip
+	{CONSTANT.INVENTORY_INDEX.EQUIP, 100},
+	{CONSTANT.INVENTORY_INDEX.EQUIP_BACKUP1, 101},
+	{CONSTANT.INVENTORY_INDEX.EQUIP_BACKUP2, 102},
+	{CONSTANT.INVENTORY_INDEX.EQUIP_BACKUP3, 103},
+	-- 200 - 299: Bag
+	{CONSTANT.INVENTORY_INDEX.PACKAGE, 200},
+	{CONSTANT.INVENTORY_INDEX.PACKAGE1, 201},
+	{CONSTANT.INVENTORY_INDEX.PACKAGE2, 202},
+	{CONSTANT.INVENTORY_INDEX.PACKAGE3, 203},
+	{CONSTANT.INVENTORY_INDEX.PACKAGE4, 204},
+	{CONSTANT.INVENTORY_INDEX.PACKAGE_MIBAO, 205},
+	-- 300 - 399: Bank
+	{CONSTANT.INVENTORY_INDEX.BANK, 300},
+	{CONSTANT.INVENTORY_INDEX.BANK_PACKAGE1, 301},
+	{CONSTANT.INVENTORY_INDEX.BANK_PACKAGE2, 302},
+	{CONSTANT.INVENTORY_INDEX.BANK_PACKAGE3, 303},
+	{CONSTANT.INVENTORY_INDEX.BANK_PACKAGE4, 304},
+	{CONSTANT.INVENTORY_INDEX.BANK_PACKAGE5, 305},
+	-- 400 - 499: Guild Bank
+	{CONSTANT.INVENTORY_GUILD_BANK, 400}
+})
 
 local O = LIB.CreateUserSettingsModule('MY_RoleStatistics_BagStat', _L['General'], {
 	bCompactMode = {
@@ -235,7 +259,8 @@ LIB.RegisterEvent('UPDATE_TONG_REPERTORY_PAGE', 'MY_RoleStatistics_BagStat', Upd
 
 function D.Migration()
 	local DB_V2_PATH = LIB.FormatPath({'userdata/role_statistics/bag_stat.v2.db', PATH_TYPE.GLOBAL})
-	if not IsLocalFileExist(DB_V2_PATH) then
+	local DB_V3_PATH = LIB.FormatPath({'userdata/role_statistics/bag_stat.v3.db', PATH_TYPE.GLOBAL})
+	if not IsLocalFileExist(DB_V2_PATH) and not IsLocalFileExist(DB_V3_PATH) then
 		return
 	end
 	LIB.Confirm(
@@ -249,29 +274,32 @@ function D.Migration()
 					local aBagItems = DB_V2:Execute('SELECT * FROM BagItems WHERE ownerkey IS NOT NULL AND boxtype IS NOT NULL AND tabtype IS NOT NULL')
 					if aBagItems then
 						for _, rec in ipairs(aBagItems) do
-							DB_ItemsW:ClearBindings()
-							DB_ItemsW:BindAll(
-								rec.ownerkey,
-								rec.boxtype,
-								rec.boxindex,
-								rec.tabtype,
-								rec.tabindex,
-								rec.tabsubindex,
-								rec.bagcount,
-								rec.bankcount,
-								-1,
-								-1,
-								-1,
-								-1,
-								-1,
-								'',
-								-1,
-								-1,
-								'',
-								rec.time,
-								''
-							)
-							DB_ItemsW:Execute()
+							local sboxtype = BOX_TYPE[rec.boxtype]
+							if sboxtype then
+								DB_ItemsW:ClearBindings()
+								DB_ItemsW:BindAll(
+									rec.ownerkey,
+									sboxtype,
+									rec.boxindex,
+									rec.tabtype,
+									rec.tabindex,
+									rec.tabsubindex,
+									rec.bagcount,
+									rec.bankcount,
+									-1,
+									-1,
+									-1,
+									-1,
+									-1,
+									'',
+									-1,
+									-1,
+									'',
+									rec.time,
+									''
+								)
+								DB_ItemsW:Execute()
+							end
 						end
 						DB_ItemsW:Reset()
 					end
@@ -313,6 +341,82 @@ function D.Migration()
 					DB_V2:Release()
 				end
 				CPath.Move(DB_V2_PATH, DB_V2_PATH .. '.bak' .. LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
+			end
+			-- ×ªÒÆV3¾É°æÊý¾Ý
+			if IsLocalFileExist(DB_V3_PATH) then
+				local DB_V3 = SQLite3_Open(DB_V3_PATH)
+				if DB_V3 then
+					DB:Execute('BEGIN TRANSACTION')
+					local aBagItems = DB_V3:Execute('SELECT * FROM BagItems WHERE ownerkey IS NOT NULL AND boxtype IS NOT NULL AND tabtype IS NOT NULL')
+					if aBagItems then
+						for _, rec in ipairs(aBagItems) do
+							local sboxtype = BOX_TYPE[rec.boxtype]
+							if sboxtype then
+								DB_ItemsW:ClearBindings()
+								DB_ItemsW:BindAll(
+									rec.ownerkey,
+									sboxtype,
+									rec.boxindex,
+									rec.tabtype,
+									rec.tabindex,
+									rec.tabsubindex,
+									rec.bagcount,
+									rec.bankcount,
+									rec.itemid,
+									rec.uiid,
+									rec.exist_time,
+									rec.strength,
+									rec.durability,
+									rec.diamond_enchant,
+									rec.fea_enchant,
+									rec.permanent_enchant,
+									rec.desc,
+									rec.time,
+									rec.extra
+								)
+								DB_ItemsW:Execute()
+							end
+						end
+						DB_ItemsW:Reset()
+					end
+					local aOwnerInfo = DB_V3:Execute('SELECT * FROM OwnerInfo WHERE ownerkey IS NOT NULL')
+					if aOwnerInfo then
+						for _, rec in ipairs(aOwnerInfo) do
+							DB_OwnerInfoW:ClearBindings()
+							DB_OwnerInfoW:BindAll(
+								rec.ownerkey,
+								rec.ownername,
+								rec.servername,
+								rec.time,
+								rec.extra
+							)
+							DB_OwnerInfoW:Execute()
+						end
+						DB_OwnerInfoW:Reset()
+					end
+					local aItemInfo = DB_V3:Execute('SELECT * FROM ItemInfo WHERE tabtype IS NOT NULL')
+					if aItemInfo then
+						for _, rec in ipairs(aItemInfo) do
+							DB_ItemInfoW:ClearBindings()
+							DB_ItemInfoW:BindAll(
+								rec.tabtype,
+								rec.tabindex,
+								rec.tabsubindex,
+								rec.name,
+								rec.genre,
+								rec.quality,
+								rec.exist_type,
+								rec.desc,
+								rec.extra
+							)
+							DB_ItemInfoW:Execute()
+						end
+						DB_ItemInfoW:Reset()
+					end
+					DB:Execute('END TRANSACTION')
+					DB_V3:Release()
+				end
+				CPath.Move(DB_V3_PATH, DB_V3_PATH .. '.bak' .. LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
 			end
 			FireUIEvent('MY_ROLE_STAT_BAG_UPDATE')
 			LIB.Alert(_L['Migrate succeed!'])
@@ -394,21 +498,28 @@ function D.FlushDB()
 		insert(aPackageBoxType, v)
 	end
 	for _, boxtype in ipairs(aPackageBoxType) do
-		local count = me.GetBoxSize(boxtype)
-		for boxindex = 0, count - 1 do
-			local aItemData, aItemInfoData = D.ItemToData(GetPlayerItem(me, boxtype, boxindex))
-			if aItemInfoData then
-				DB_ItemInfoW:ClearBindings()
-				DB_ItemInfoW:BindAll(unpack(aItemInfoData))
-				DB_ItemInfoW:Execute()
+		local sboxtype = BOX_TYPE[boxtype]
+		if sboxtype then
+			local count = me.GetBoxSize(boxtype)
+			for boxindex = 0, count - 1 do
+				local aItemData, aItemInfoData = D.ItemToData(GetPlayerItem(me, boxtype, boxindex))
+				if aItemInfoData then
+					DB_ItemInfoW:ClearBindings()
+					DB_ItemInfoW:BindAll(unpack(aItemInfoData))
+					DB_ItemInfoW:Execute()
+				end
+				DB_ItemsW:ClearBindings()
+				DB_ItemsW:BindAll(ownerkey, sboxtype, boxindex, unpack(aItemData))
+				DB_ItemsW:Execute()
 			end
-			DB_ItemsW:ClearBindings()
-			DB_ItemsW:BindAll(ownerkey, boxtype, boxindex, unpack(aItemData))
-			DB_ItemsW:Execute()
+			DB_ItemsDL:ClearBindings()
+			DB_ItemsDL:BindAll(ownerkey, sboxtype, count)
+			DB_ItemsDL:Execute()
+			--[[#DEBUG BEGIN]]
+		else
+			LIB.Debug('MY_RoleStatistics_BagStat', 'bag boxtype not in static map: ' .. boxtype, DEBUG_LEVEL.WARNING)
+			--[[#DEBUG END]]
 		end
-		DB_ItemsDL:ClearBindings()
-		DB_ItemsDL:BindAll(ownerkey, boxtype, count)
-		DB_ItemsDL:Execute()
 	end
 	DB_ItemInfoW:Reset()
 	DB_ItemsW:Reset()
@@ -421,21 +532,28 @@ function D.FlushDB()
 
 	-- ²Ö¿â
 	for _, boxtype in ipairs(CONSTANT.INVENTORY_BANK_LIST) do
-		local count = me.GetBoxSize(boxtype)
-		for boxindex = 0, count - 1 do
-			local aItemData, aItemInfoData = D.ItemToData(GetPlayerItem(me, boxtype, boxindex), 'BANK')
-			if aItemInfoData then
-				DB_ItemInfoW:ClearBindings()
-				DB_ItemInfoW:BindAll(unpack(aItemInfoData))
-				DB_ItemInfoW:Execute()
+		local sboxtype = BOX_TYPE[boxtype]
+		if sboxtype then
+			local count = me.GetBoxSize(boxtype)
+			for boxindex = 0, count - 1 do
+				local aItemData, aItemInfoData = D.ItemToData(GetPlayerItem(me, boxtype, boxindex), 'BANK')
+				if aItemInfoData then
+					DB_ItemInfoW:ClearBindings()
+					DB_ItemInfoW:BindAll(unpack(aItemInfoData))
+					DB_ItemInfoW:Execute()
+				end
+				DB_ItemsW:ClearBindings()
+				DB_ItemsW:BindAll(ownerkey, sboxtype, boxindex, unpack(aItemData))
+				DB_ItemsW:Execute()
 			end
-			DB_ItemsW:ClearBindings()
-			DB_ItemsW:BindAll(ownerkey, boxtype, boxindex, unpack(aItemData))
-			DB_ItemsW:Execute()
+			DB_ItemsDL:ClearBindings()
+			DB_ItemsDL:BindAll(ownerkey, sboxtype, count)
+			DB_ItemsDL:Execute()
+			--[[#DEBUG BEGIN]]
+		else
+			LIB.Debug('MY_RoleStatistics_BagStat', 'bank boxtype not in static map: ' .. boxtype, DEBUG_LEVEL.WARNING)
+			--[[#DEBUG END]]
 		end
-		DB_ItemsDL:ClearBindings()
-		DB_ItemsDL:BindAll(ownerkey, boxtype, count)
-		DB_ItemsDL:Execute()
 	end
 	DB_ItemInfoW:Reset()
 	DB_ItemsW:Reset()
@@ -446,14 +564,21 @@ function D.FlushDB()
 		local ownerkey = 'tong' .. me.dwTongID
 		local ownername = AnsiToUTF8('[' .. LIB.GetTongName(me.dwTongID) .. ']')
 		for _, info in pairs(l_guildcache) do
-			if info.aItemInfoData then
-				DB_ItemInfoW:ClearBindings()
-				DB_ItemInfoW:BindAll(unpack(info.aItemInfoData))
-				DB_ItemInfoW:Execute()
+			local sboxtype = BOX_TYPE[info.boxtype]
+			if sboxtype then
+				if info.aItemInfoData then
+					DB_ItemInfoW:ClearBindings()
+					DB_ItemInfoW:BindAll(unpack(info.aItemInfoData))
+					DB_ItemInfoW:Execute()
+				end
+				DB_ItemsW:ClearBindings()
+				DB_ItemsW:BindAll(ownerkey, sboxtype, info.boxindex, unpack(info.aItemData))
+				DB_ItemsW:Execute()
+				--[[#DEBUG BEGIN]]
+			else
+				LIB.Debug('MY_RoleStatistics_BagStat', 'guild bank boxtype not in static map: ' .. info.boxtype, DEBUG_LEVEL.WARNING)
+				--[[#DEBUG END]]
 			end
-			DB_ItemsW:ClearBindings()
-			DB_ItemsW:BindAll(ownerkey, info.boxtype, info.boxindex, unpack(info.aItemData))
-			DB_ItemsW:Execute()
 		end
 		DB_ItemInfoW:Reset()
 		DB_ItemsW:Reset()
@@ -557,9 +682,7 @@ function D.UpdateItems(page)
 		end
 	end
 	if O.bHideEquipped then
-		for suitindex, boxtype in ipairs(CONSTANT.INVENTORY_EQUIP_LIST) do
-			sqlfilter = sqlfilter .. ' AND B.boxtype <> ' .. boxtype .. ' '
-		end
+		sqlfilter = sqlfilter .. ' AND B.boxtype >= 200 '
 	end
 	local sqlfrom = [[
 		(
