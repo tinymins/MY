@@ -206,10 +206,21 @@ function D.CheckAutoFeedEnable()
 			if not me then
 				return
 			end
+			if me.bFightState then
+				return
+			end
 			if not D.IsAutoFeedValid(me) then
 				return 0
 			end
 			local domesticate = me.GetDomesticate()
+			if not domesticate then
+				return
+			end
+			if domesticate.nGrowthLevel >= domesticate.nMaxGrowthLevel then
+				local szDomesticate = LIB.GetObjectName('ITEM_INFO', domesticate.dwCubTabType, domesticate.dwCubTabIndex)
+				LIB.Systopmsg(_L('Your domesticate %s is growth up!', szDomesticate))
+				return
+			end
 			local nMeasure = domesticate.nMaxFullMeasure - domesticate.nFullMeasure
 			local nRound = floor(nMeasure / O.nAutoFeedFoodMeasure)
 			local bFeed = false
@@ -245,6 +256,12 @@ function D.CheckAlertEnable()
 			end
 			local domesticate = me.GetDomesticate()
 			if not domesticate then
+				return
+			end
+			if domesticate.nGrowthLevel >= domesticate.nMaxGrowthLevel then
+				local szDomesticate = LIB.GetObjectName('ITEM_INFO', domesticate.dwCubTabType, domesticate.dwCubTabIndex)
+				OutputWarningMessage('MSG_WARNING_YELLOW', _L('Your domesticate %s is growth up!', szDomesticate))
+				PlaySound(SOUND.UI_SOUND, g_sound.CloseAuction)
 				return
 			end
 			if O.nAlertNum == 0 then

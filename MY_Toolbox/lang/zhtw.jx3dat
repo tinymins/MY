@@ -430,6 +430,7 @@ return {
     -- MY_Domesticate.lua
     ['MY_Domesticate'] = '馴養助手',
     ['measure (%d+) point'] = '飽食度(%d+)點',
+    ['Your domesticate %s is growth up!'] = '你馴養的%s已可收穫！',
     ['No enough %s to feed %s!'] = '沒有足夠的[%s]用於馴養[%s]！',
     ['Auto feed'] = '自動喂食',
     ['Auto feed domesticate cancelled.'] = '自動喂食已取消。',
