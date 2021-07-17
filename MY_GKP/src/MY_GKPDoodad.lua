@@ -525,7 +525,7 @@ end)
 -------------------------------------
 -- …Ë÷√ΩÁ√Ê
 -------------------------------------
-local PS = {}
+local PS = { nPriority = 2.1 }
 
 function PS.OnPanelActive(frame)
 	local ui = UI(frame)

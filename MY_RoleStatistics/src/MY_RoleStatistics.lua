@@ -376,7 +376,7 @@ LIB.RegisterHotKey('MY_RoleStatistics', _L['Open/Close MY_RoleStatistics'], D.To
 --------------------------------------------------------------------------
 -- …Ë÷√ΩÁ√Ê
 --------------------------------------------------------------------------
-local PS = {}
+local PS = { nPriority = 5 }
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
 	local X, Y = 25, 25

@@ -168,7 +168,8 @@ function D.GetSchemeMenu()
 	return menu
 end
 
-local PS = {}
+local PS = { nPriority = 2 }
+
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
 	local X, Y = 25, 25

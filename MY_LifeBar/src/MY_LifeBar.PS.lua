@@ -68,7 +68,7 @@ local D = {
 	UpdateShadowHandleParam = MY_LifeBar.UpdateShadowHandleParam,
 }
 
-local PS = {}
+local PS = { nPriority = 1 }
 local function LoadUI(ui)
 	ui:Children('#WndTrackbar_GlobalUIScale'):Value(Config.fGlobalUIScale * 100 * LIB.GetUIScale())
 	ui:Children('#WndTrackbar_LifeBarWidth'):Value(Config.nLifeWidth)
@@ -1012,4 +1012,4 @@ function PS.OnPanelDeactive()
 	LIB.RegisterEvent('MY_LIFEBAR_CONFIG_LOADED', 'MY_LifeBarPS')
 	LIB.RegisterEvent('MY_LIFEBAR_CONFIG_UPDATE', 'MY_LifeBarPS')
 end
-LIB.RegisterPanel(_L['General'], 'MY_LifeBar', _L['MY_LifeBar'], 'UI/Image/LootPanel/LootPanel.UITex|74', PS)
+LIB.RegisterPanel(_L['General'], 'MY_LifeBar', _L['MY_LifeBar'], 2148, PS)

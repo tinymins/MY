@@ -145,7 +145,7 @@ local TIME_LIMIT_TITLE = {
 	 [1800] = _L('last %d minute(s)', 30),
 	 [3600] = _L('last %d minute(s)', 60),
 }
-local PS = {}
+local PS = { nPriority = 3 }
 local m_uiBoard       -- 面板ui控件
 local m_tRecords = {} -- 历史ROLL点详细记录
 local m_aRecTime = {} -- 新纪录的时间戳（用来重绘面板）
@@ -553,4 +553,4 @@ function PS.OnPanelDeactive()
 	LIB.BreatheCall('MY_RollMonitorRedraw', false)
 end
 
-LIB.RegisterPanel(_L['General'], 'RollMonitor', _L['roll monitor'], 'UI/Image/UICommon/LoginCommon.UITex|30', PS)
+LIB.RegisterPanel(_L['General'], 'RollMonitor', _L['roll monitor'], 287, PS)

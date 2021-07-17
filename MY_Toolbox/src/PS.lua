@@ -69,7 +69,7 @@ end
 LIB.RegisterHotKey('MY_AutoLoopMeAndTarget', _L['Loop target between me and target'], onHotKey)
 end
 
-local PS = {}
+local PS = { nPriority = 0 }
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
 	local X, Y = 25, 25
@@ -122,4 +122,4 @@ function PS.OnPanelActive(wnd)
 	MY_AutoSell.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 	MY_DynamicItem.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 end
-LIB.RegisterPanel(_L['General'], 'MY_Toolbox', _L['MY_Toolbox'], 'UI/Image/Common/Money.UITex|243', PS)
+LIB.RegisterPanel(_L['General'], 'MY_Toolbox', _L['MY_Toolbox'], 134, PS)

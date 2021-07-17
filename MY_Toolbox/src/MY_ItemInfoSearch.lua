@@ -221,7 +221,7 @@ function D.Search(szSearch, fnProgress, fnCallback)
 	end)
 end
 
-local PS = {}
+local PS = { nPriority = 4 }
 
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
