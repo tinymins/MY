@@ -244,7 +244,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 					bCheck = true, bChecked = MY_LockFrame.tEnable[k] ~= false,
 					fnAction = function(_, b)
 						MY_LockFrame.tEnable[k] = b
-						D.CheckAllFrame()
+						MY_LockFrame.tEnable = MY_LockFrame.tEnable
 					end,
 					fnDisable = function()
 						return not MY_LockFrame.bEnable
