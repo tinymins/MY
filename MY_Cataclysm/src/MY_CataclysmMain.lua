@@ -694,7 +694,7 @@ function D.OnEvent(szEvent)
 			if arg0 == 'UI_OME_SKILL_EFFECT_LOG'
 			and arg5 == 6252
 			and arg9[SKILL_RESULT_TYPE.THERAPY]
-			and (arg1 == GetControlPlayerID() or UI_GetPlayerMountKungfuID() == 10176) then
+			and (arg1 == GetControlPlayerID() or UI_GetPlayerMountKungfuID() ~= 10176) then
 				MY_CataclysmParty:CallEffect(arg2, 500)
 			end
 		end
