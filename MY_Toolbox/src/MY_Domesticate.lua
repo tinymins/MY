@@ -213,7 +213,7 @@ function D.CheckAutoFeedEnable()
 				return 0
 			end
 			local domesticate = me.GetDomesticate()
-			if not domesticate then
+			if not domesticate or domesticate.dwCubTabType == 0 then
 				return
 			end
 			if domesticate.nGrowthLevel >= domesticate.nMaxGrowthLevel then
@@ -255,7 +255,7 @@ function D.CheckAlertEnable()
 				return
 			end
 			local domesticate = me.GetDomesticate()
-			if not domesticate then
+			if not domesticate or domesticate.dwCubTabType == 0 then
 				return
 			end
 			if domesticate.nGrowthLevel >= domesticate.nMaxGrowthLevel then
