@@ -426,6 +426,10 @@ function D.OnEvent(szEvent)
 			CombatText.OnCommonHealth(arg0, arg1)
 		end
 	elseif szEvent == 'SKILL_EFFECT_TEXT' then
+		-- 贯体治疗有效值 SKILL_EFFECT_TEXT 无法显示，于是让所有有效治疗走 SYS_MSG -> UI_OME_SKILL_EFFECT_LOG 通道
+		if arg3 == SKILL_RESULT_TYPE.EFFECTIVE_THERAPY then
+			return
+		end
 		CombatText.OnSkillText(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7)
 	elseif szEvent == 'SKILL_BUFF' then
 		CombatText.OnSkillBuff(arg0, arg1, arg2, arg3)
@@ -453,6 +457,15 @@ function D.OnEvent(szEvent)
 			if not IsPlayer(arg1) then
 				COMBAT_TEXT_LEAVE[arg1] = true
 			end
+		elseif arg0 == 'UI_OME_SKILL_EFFECT_LOG' then
+			-- 技能最终产生的效果（生命值的变化）；
+			-- (arg1)dwCaster：施放者 (arg2)dwTarget：目标 (arg3)bReact：是否为反击 (arg4)nType：Effect类型 (arg5)dwID:Effect的ID
+			-- (arg6)dwLevel：Effect的等级 (arg7)bCriticalStrike：是否会心 (arg8)nCount：tResultCount数据表中元素个数 (arg9)tResultCount：数值集合
+			-- 贯体治疗有效值 SKILL_EFFECT_TEXT 无法显示，于是让所有有效治疗走 SYS_MSG -> UI_OME_SKILL_EFFECT_LOG 通道
+			if arg9[SKILL_RESULT_TYPE.EFFECTIVE_THERAPY] then
+				CombatText.OnSkillText(arg1, arg2, arg7, SKILL_RESULT_TYPE.EFFECTIVE_THERAPY, arg9[SKILL_RESULT_TYPE.EFFECTIVE_THERAPY], arg5, arg6, arg4)
+			end
+			-- dwCasterID, dwTargetID, bCriticalStrike, nType, nValue, dwSkillID, dwSkillLevel, nEffectType
 		end
 	elseif szEvent == 'LOADING_END' then
 		this:Show()
