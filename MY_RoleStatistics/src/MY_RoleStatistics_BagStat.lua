@@ -690,7 +690,7 @@ function D.UpdateItems(page)
 	end
 	local sqlfrom = [[
 		(
-			SELECT B.ownerkey, B.boxtype, B.boxindex, B.tabtype, B.tabindex, B.tabsubindex, B.strength, B.desc as itemtip, B.bagcount, B.bankcount, B.time
+			SELECT B.ownerkey, B.boxtype, B.boxindex, B.tabtype, B.tabindex, B.tabsubindex, B.strength, B.uiid, B.desc as itemtip, B.bagcount, B.bankcount, B.time
 				FROM BagItems
 				AS B
 			LEFT JOIN ItemInfo
@@ -713,6 +713,7 @@ function D.UpdateItems(page)
 			C.tabindex AS tabindex,
 			C.tabsubindex AS tabsubindex,
 			C.strength AS strength,
+			C.uiid AS uiid,
 			C.itemtip AS itemtip,
 			SUM(C.bagcount) AS bagcount,
 			SUM(C.bankcount) AS bankcount,
@@ -1046,6 +1047,8 @@ function D.OnItemMouseEnter()
 			end
 			insert(aXml, CONSTANT.XML_LINE_BREAKER)
 			insert(aXml, GetFormatText('Box: ' .. rec.boxtype .. ', ' .. rec.boxindex, 102))
+			insert(aXml, CONSTANT.XML_LINE_BREAKER)
+			insert(aXml, GetFormatText('IconID: ' .. (Table_GetItemIconID(rec.uiid) or ''), 102))
 			insert(aXml, CONSTANT.XML_LINE_BREAKER)
 			insert(aXml, GetFormatText('Strength: ' .. rec.strength, 102))
 			insert(aXml, CONSTANT.XML_LINE_BREAKER)
