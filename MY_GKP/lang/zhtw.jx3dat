@@ -201,7 +201,7 @@ return {
 	['Hold shift click to skip gkp record panel'] = '按住SHIFT點擊可跳過價格記錄界面',
 	['Auto append'] = '茗伊金團追加',
 	-- Doodad
-	['MY_GKPLoot'] = '金團拾取',
+	['MY_GKPLoot'] = '採集拾取',
 	['GKP Doodad helper'] = '金團拾取',
 	['Enable MY_GKPLoot'] = '啟用金團拾取',
 	['Only enable in checked map (uncheck all for all map)'] = '僅在勾選地圖類型中啟用（全未勾選則在所有地圖啟用）',
