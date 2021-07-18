@@ -97,7 +97,7 @@ return {
 	['Team panel'] = '團隊面板',
 	['Only source self'] = '僅顯示來源自己的氣勁',
 	['Requires MY_LifeBar loaded.'] = '需載入並啟用扁平血條',
-	['Requires MY_LifeBar loaded.\nDue to official logic, only target is visible.'] = '需載入並啟用扁平血條\n由於官方限制，僅目標讀條進度可顯示',
+	['Requires MY_LifeBar loaded.\nDue to official logic, only target is visible.'] = '需載入並啟用扁平血條\n由於官方限制，僅目標運功狀態可顯示',
 	['Add countdown'] = '添加倒計時',
 	['Press CTRL click for advance menu'] = '按住CTRL點擊可查看高級選項',
 	['Please select type'] = '請選擇類型',

@@ -63,7 +63,7 @@ return {
     ['MY_ShenxingHelper'] = '神行保护',
     ['Avoid blacking shenxing cd'] = '防止开阵导致神行千里失败',
     ['Got zhenyan wen shenxing, your shengxing will be blacked.'] = '在神行千里运功过程中获得阵眼，神行会进入调息状态但角色仍然会停留在原地。',
-    ['Shenxing has been cancelled, cause you got the zhenyan.'] = '您获取到阵眼，为防止神行千里CD被黑，读条已自动打断。',
+    ['Shenxing has been cancelled, cause you got the zhenyan.'] = '您获取到阵眼，为防止神行千里CD被黑，运功已自动打断。',
     ['Shenxing to ancient maps'] = '盛唐故地神行千里',
     ['Force open all map shenxing'] = '未知地图神行千里',
     ['Shenxing can fly to undiscovered maps'] = '允许神行千里前往尚未探索过的地图、秘境',

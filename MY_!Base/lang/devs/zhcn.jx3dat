@@ -64,7 +64,7 @@ return {
 		['Normal2/ST_UI'             ] = 'DBM_倒计时',
 		['Topmost/BreatheBar'        ] = 'BreatheBar',
 		['Topmost/LoginMotp'         ] = 'LoginMotp',
-		['Topmost/OTActionBar'       ] = '读条显示面板',
+		['Topmost/OTActionBar'       ] = '运功显示面板',
 		['Topmost/TargetMark'        ] = '官方目标头顶标记',
 		['Topmost1/BattleTipPanel'   ] = '战场提示信息',
 		['Topmost1/PopupMenuPanel'   ] = '游戏所有弹出菜单',

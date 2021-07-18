@@ -36,7 +36,7 @@ return {
 	['Player is too far to peek!']   = '距离太远查看装备失败！',
 
 	['None-function hotkey'] = '空白快捷键',
-	['Stop cast skill'] = '打断自身读条',
+	['Stop cast skill'] = '打断自身运功',
 	['Display only chat panel'] = '仅显示聊天栏',
 
 	OPERATOR = {
