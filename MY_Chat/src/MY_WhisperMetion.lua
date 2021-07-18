@@ -139,6 +139,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
 		checked = O.bEnable,
 		oncheck = function(bChecked)
 			O.bEnable = bChecked
+			D.Apply()
 		end,
 	})
 	y = y + lineHeight
