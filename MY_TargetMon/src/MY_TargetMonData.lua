@@ -465,26 +465,32 @@ local function Skill_ShowMon(mon, dwTarKungfuID)
 end
 local function Skill_MatchMon(tSkill, mon, config)
 	local info, nIconID = nil, nil
+	local infoCool, nIconIDCool = nil, nil
 	for dwID, tMonId in pairs(mon.ids) do
 		if tMonId.enable or mon.ignoreId then
 			local skill = tSkill[dwID]
-			if skill and skill.bCool then
+			if skill then
 				-- if Base_MatchMon(mon) then
 					local tMonLevel = tMonId.levels[skill.nLevel] or CONSTANT.EMPTY_TABLE
 					if tMonLevel.enable or tMonId.ignoreLevel then
-						info = skill
-						if not mon.ignoreId then
-							if not tMonId.ignoreLevel then
-								nIconID = tMonLevel.iconid
+						if skill.bCool then
+							info = skill
+							if not mon.ignoreId then
+								if not tMonId.ignoreLevel then
+									nIconID = tMonLevel.iconid
+								end
+								if not nIconID then
+									nIconID = tMonId.iconid
+								end
 							end
 							if not nIconID then
-								nIconID = tMonId.iconid
+								nIconID = mon.iconid or skill.nIcon or 13
 							end
+							break
+						else
+							infoCool = skill
+							nIconIDCool = mon.iconid or skill.nIcon or 13
 						end
-						if not nIconID then
-							nIconID = mon.iconid or skill.nIcon or 13
-						end
-						break
 					end
 				-- end
 			end
@@ -492,6 +498,9 @@ local function Skill_MatchMon(tSkill, mon, config)
 		if info then
 			break
 		end
+	end
+	if not info then
+		info, nIconID = infoCool, nIconIDCool
 	end
 	return info, nIconID or mon.iconid
 end
@@ -505,7 +514,6 @@ local function Skill_MonToView(mon, skill, item, KObject, nIcon, config, tMonExi
 		end
 		local nTimeLeft = skill.nCdLeft * 0.0625
 		local nTimeTotal = skill.nCdTotal * 0.0625
-		local nStackNum = skill.nCdMaxCount - skill.nCdCount
 		item.bActive = false
 		item.bCd = true
 		item.fCd = 1 - nTimeLeft / nTimeTotal
@@ -515,7 +523,6 @@ local function Skill_MonToView(mon, skill, item, KObject, nIcon, config, tMonExi
 		item.dwID = skill.dwID
 		item.nLevel = skill.nLevel
 		item.nTimeLeft = nTimeLeft
-		item.szStackNum = nStackNum > 0 and nStackNum or ''
 		item.nTimeTotal = nTimeTotal
 		item.szLongName = mon.longAlias or skill.szName
 		item.szShortName = mon.shortAlias or skill.szName
@@ -528,10 +535,13 @@ local function Skill_MonToView(mon, skill, item, KObject, nIcon, config, tMonExi
 		item.bSparking = true
 		item.dwID = next(mon.ids) or -1
 		item.nLevel = item.dwID and mon.ids[item.dwID] and next(mon.ids[item.dwID].levels) or -1
-		item.szStackNum = ''
 		item.szLongName = mon.longAlias or mon.name
 		item.szShortName = mon.shortAlias or mon.name
 	end
+	local nStackNum = skill
+		and (skill.nCdMaxCount - skill.nCdCount)
+		or 0
+	item.szStackNum = nStackNum > 0 and nStackNum or ''
 	item.aLongAliasRGB = mon.rgbLongAlias
 	item.aShortAliasRGB = mon.rgbShortAlias
 	Base_MonToView(mon, skill, item, KObject, nIcon, config, tMonExist, tMonLast)
