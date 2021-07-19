@@ -3063,7 +3063,7 @@ function LIB.GetKungfuSkillIDS(dwKungfuID, dwMountKungfu)
 		end
 		CACHE[dwKungfuID][dwMountKungfu] = aSkillID or {}
 	end
-	return CACHE[dwKungfuID]
+	return CACHE[dwKungfuID][dwMountKungfu]
 end
 end
 
