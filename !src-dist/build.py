@@ -66,12 +66,15 @@ def __compress(addon):
 	with open('./%s/%s' % (addon, srcname), 'r+') as src:
 		content = src.read()
 		src.seek(0, 0)
-		src.write('local package={preload={}}\n' + content)
+		src.write('local __INIT_TIME__ = GetTime()\n')
+		src.write('local package={preload={}}\n')
+		src.write(content)
 	with open('./%s/%s' % (addon, srcname), 'a') as src:
 		src.write('\nfor _, k in ipairs({')
 		for i in range(1, file_count + 1):
 			src.write('\'%d\',' % i)
-		src.write('}) do package.preload[k]() end')
+		src.write('}) do package.preload[k]() end\n')
+		src.write('Log("[ADDON] Module %s v%s loaded during" .. (GetTime() - __INIT_TIME__) .. "ms.' % (addon, TIME_TAG))
 	print('Compress done...')
 	# Modify info.ini file
 	info_content = ''
