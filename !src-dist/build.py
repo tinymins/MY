@@ -74,7 +74,7 @@ def __compress(addon):
 		for i in range(1, file_count + 1):
 			src.write('\'%d\',' % i)
 		src.write('}) do package.preload[k]() end\n')
-		src.write('Log("[ADDON] Module %s v%s loaded during " .. (GetTime() - __INIT_TIME__) .. "ms.' % (addon, TIME_TAG))
+		src.write('Log("[ADDON] Module %s v%s loaded during " .. (GetTime() - __INIT_TIME__) .. "ms.")' % (addon, TIME_TAG))
 	print('Compress done...')
 	# Modify info.ini file
 	info_content = ''
