@@ -74,7 +74,7 @@ DB:Execute([[
 ]])
 local DB_TaskW = DB:Prepare('REPLACE INTO Task (guid, name, task_info, extra) VALUES (?, ?, ?, ?)')
 local DB_TaskR = DB:Prepare('SELECT * FROM Task')
-local DB_TaskD = DB:Prepare('DELETE FROM TaskInfo WHERE guid = ?')
+local DB_TaskD = DB:Prepare('DELETE FROM Task WHERE guid = ?')
 DB:Execute([[
 	CREATE TABLE IF NOT EXISTS TaskInfo (
 		guid NVARCHAR(20) NOT NULL,
