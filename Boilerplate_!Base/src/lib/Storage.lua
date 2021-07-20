@@ -1121,6 +1121,24 @@ function LIB.CreateDataRoot(ePathType)
 	CREATED[ePathType] = true
 	-- 创建目录
 	if ePathType == PATH_TYPE.ROLE then
+		LIB.SaveLUAData(
+			{'info.jx3dat', PATH_TYPE.ROLE},
+			{
+				id = LIB.GetClientInfo('dwID'),
+				uid = LIB.GetClientUUID(),
+				name = LIB.GetClientInfo('szName'),
+				lang = GLOBAL.GAME_LANG,
+				edition = GLOBAL.GAME_EDITION,
+				branch = GLOBAL.GAME_BRANCH,
+				version = GLOBAL.GAME_VERSION,
+				region = LIB.GetServer(1),
+				server = LIB.GetServer(2),
+				relregion = LIB.GetRealServer(1),
+				relserver = LIB.GetRealServer(2),
+				time = GetCurrentTime(),
+				timestr = LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'),
+			},
+			{ crc = false, passphrase = false })
 		CPath.MakeDir(LIB.FormatPath({'{$name}/', PATH_TYPE.ROLE}))
 	end
 	-- 版本更新时删除旧的临时目录
