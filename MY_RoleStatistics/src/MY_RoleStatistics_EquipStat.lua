@@ -408,40 +408,42 @@ function D.FlushDB()
 	end
 	for suitindex, _ in ipairs(CONSTANT.INVENTORY_EQUIP_LIST) do
 		local boxtype = tSuitIndexToBoxType[suitindex]
-		local count = me.GetBoxSize(boxtype)
-		for boxindex = 0, count - 1 do
-			local KItem = GetPlayerItem(me, boxtype, boxindex)
-			DB_ItemsW:ClearBindings()
-			local itemid, tabtype, tabindex, tabsubindex = -1, -1, -1, -1
-			local stacknum, uiid, strength, durability = 0, 0, 0, 0
-			local diamond_enchant, fea_enchant, permanent_enchant, desc, extra = 0, 0, 0, '', ''
-			if KItem then
-				local aDiamondEnchant = {}
-				for i = 1, KItem.GetSlotCount() do
-					aDiamondEnchant[i] = KItem.GetMountDiamondEnchantID(i)
+		if boxtype then
+			local count = me.GetBoxSize(boxtype)
+			for boxindex = 0, count - 1 do
+				local KItem = GetPlayerItem(me, boxtype, boxindex)
+				DB_ItemsW:ClearBindings()
+				local itemid, tabtype, tabindex, tabsubindex = -1, -1, -1, -1
+				local stacknum, uiid, strength, durability = 0, 0, 0, 0
+				local diamond_enchant, fea_enchant, permanent_enchant, desc, extra = 0, 0, 0, '', ''
+				if KItem then
+					local aDiamondEnchant = {}
+					for i = 1, KItem.GetSlotCount() do
+						aDiamondEnchant[i] = KItem.GetMountDiamondEnchantID(i)
+					end
+					itemid = KItem.dwID
+					tabtype = KItem.dwTabType
+					tabindex = KItem.dwIndex
+					tabsubindex = KItem.nGenre == ITEM_GENRE.BOOK and KItem.nBookID or -1
+					stacknum = KItem.bCanStack and KItem.nStackNum or 1
+					uiid = KItem.nUiId
+					strength = KItem.nStrengthLevel
+					durability = KItem.nCurrentDurability
+					diamond_enchant = AnsiToUTF8(LIB.JsonEncode(aDiamondEnchant)) -- 五行石
+					fea_enchant = KItem.nSub == EQUIPMENT_SUB.MELEE_WEAPON and KItem.GetMountFEAEnchantID() or 0 -- 五彩石
+					permanent_enchant = KItem.dwPermanentEnchantID -- 附魔
+					desc = AnsiToUTF8(LIB.GetItemTip(KItem) or '')
 				end
-				itemid = KItem.dwID
-				tabtype = KItem.dwTabType
-				tabindex = KItem.dwIndex
-				tabsubindex = KItem.nGenre == ITEM_GENRE.BOOK and KItem.nBookID or -1
-				stacknum = KItem.bCanStack and KItem.nStackNum or 1
-				uiid = KItem.nUiId
-				strength = KItem.nStrengthLevel
-				durability = KItem.nCurrentDurability
-				diamond_enchant = AnsiToUTF8(LIB.JsonEncode(aDiamondEnchant)) -- 五行石
-				fea_enchant = KItem.nSub == EQUIPMENT_SUB.MELEE_WEAPON and KItem.GetMountFEAEnchantID() or 0 -- 五彩石
-				permanent_enchant = KItem.dwPermanentEnchantID -- 附魔
-				desc = AnsiToUTF8(LIB.GetItemTip(KItem) or '')
+				DB_ItemsW:BindAll(
+					ownerkey, suitindex, boxtype, boxindex, itemid,
+					tabtype, tabindex, tabsubindex, stacknum, uiid,
+					strength, durability, diamond_enchant, fea_enchant, permanent_enchant, desc, extra, time, '')
+				DB_ItemsW:Execute()
 			end
-			DB_ItemsW:BindAll(
-				ownerkey, suitindex, boxtype, boxindex, itemid,
-				tabtype, tabindex, tabsubindex, stacknum, uiid,
-				strength, durability, diamond_enchant, fea_enchant, permanent_enchant, desc, extra, time, '')
-			DB_ItemsW:Execute()
+			DB_ItemsDL:ClearBindings()
+			DB_ItemsDL:BindAll(ownerkey, boxtype, count)
+			DB_ItemsDL:Execute()
 		end
-		DB_ItemsDL:ClearBindings()
-		DB_ItemsDL:BindAll(ownerkey, boxtype, count)
-		DB_ItemsDL:Execute()
 	end
 	DB_ItemsW:Reset()
 	DB_ItemsDL:Reset()
