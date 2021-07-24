@@ -414,6 +414,10 @@ function MY_TargetMonView.OnItemMouseEnter()
 			local w, h = hItem:GetW(), hItem:GetH()
 			local x, y = hItem:GetAbsX(), hItem:GetAbsY()
 			LIB.OutputBuffTip({x, y, w, h}, hItem.dwID, hItem.nLevel, hItem.nTimeLeft)
+		elseif eMonType == 'SKILL' and hItem.dwID and hItem.nLevel then
+			local w, h = hItem:GetW(), hItem:GetH()
+			local x, y = hItem:GetAbsX(), hItem:GetAbsY()
+			LIB.OutputSkillTip({x, y, w, h}, hItem.dwID, hItem.nLevel)
 		end
 		this:SetObjectMouseOver(1)
 	end
