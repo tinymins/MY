@@ -167,6 +167,14 @@ function LIB.OutputBuffTip(Rect, dwID, nLevel, nTime, szExtraXml)
 	OutputTip(concat(t), 300, Rect)
 end
 
+function LIB.OutputSkillTip(Rect, dwSkilID, dwSkillLevel)
+	if not IsTable(Rect) and not IsNil(Rect) then
+		Rect, dwID, nLevel = nil, Rect, dwID
+	end
+	Rect = ConvRectEl(Rect)
+	OutputSkillTip(dwSkilID, dwSkillLevel, Rect, false)
+end
+
 function LIB.OutputTeamMemberTip(Rect, dwID, szExtraXml)
 	if not IsTable(Rect) and not IsNil(Rect) then
 		Rect, dwID, szExtraXml = nil, Rect, dwID
