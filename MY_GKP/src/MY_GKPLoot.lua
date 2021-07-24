@@ -56,7 +56,6 @@ end
 --------------------------------------------------------------------------
 
 local DEBUG_LOOT = false -- 测试拾取分配 强制进入分配模式并最终不调用分配接口
-local GKP_LOOT_ANCHOR  = { s = 'CENTER', r = 'CENTER', x = 0, y = 0 }
 local GKP_LOOT_INIFILE = PLUGIN_ROOT .. '/ui/MY_GKPLoot.ini'
 local MY_GKP_LOOT_BOSS -- 散件老板
 local GKP_AUTO_LOOT_DEBOUNCE_TIME = GLOBAL.GAME_FPS / 2 -- 自动拾取时延
@@ -99,6 +98,11 @@ local O = LIB.CreateUserSettingsModule('MY_GKPLoot', _L['General'], {
 		szLabel = _L['MY_GKPLoot'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
+	},
+	anchor = {
+		ePathType = PATH_TYPE.ROLE,
+		xSchema = Schema.FrameAnchor,
+		xDefaultValue = { x = 0, y = 0, s = 'CENTER', r = 'CENTER' },
 	},
 	bVertical = {
 		ePathType = PATH_TYPE.ROLE,
@@ -427,7 +431,7 @@ function D.OnFrameCreate()
 	this:RegisterEvent('DOODAD_LEAVE_SCENE')
 	this:RegisterEvent('MY_GKP_LOOT_RELOAD')
 	this:RegisterEvent('MY_GKP_LOOT_BOSS')
-	local a = GKP_LOOT_ANCHOR
+	local a = O.anchor
 	this:SetPoint(a.s, 0, 0, a.r, a.x, a.y)
 	this:Lookup('Scroll_DoodadList/WndContainer_DoodadList'):Clear()
 	D.AdjustFrame(this)
@@ -504,7 +508,7 @@ function D.OnEvent(szEvent)
 		end
 		D.CloseFrame()
 	elseif szEvent == 'UI_SCALED' then
-		local a = this.anchor or GKP_LOOT_ANCHOR
+		local a = this.anchor or O.anchor
 		this:SetPoint(a.s, 0, 0, a.r, a.x, a.y)
 	elseif szEvent == 'MY_GKP_LOOT_RELOAD' or szEvent == 'MY_GKP_LOOT_BOSS' then
 		D.ReloadFrame()
@@ -513,9 +517,12 @@ end
 
 function D.OnFrameDragEnd()
 	this:CorrectPos()
-	local anchor    = GetFrameAnchor(this, 'LEFTTOP')
-	GKP_LOOT_ANCHOR = anchor
-	this.anchor     = anchor
+	this.anchor = GetFrameAnchor(this, 'LEFTTOP')
+	O.anchor = this.anchor
+end
+
+function D.OnFrameDragSetPosEnd()
+	this:CorrectPos()
 end
 
 function D.OnCheckBoxCheck()
