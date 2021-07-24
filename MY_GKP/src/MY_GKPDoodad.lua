@@ -80,6 +80,18 @@ local O = LIB.CreateUserSettingsModule('MY_GKPDoodad', _L['General'], {
 		xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
 		xDefaultValue = { 196, 64, 255 },
 	},
+	nNameFont = { -- 头顶名称字体
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_GKPLoot'],
+		xSchema = Schema.Number,
+		xDefaultValue = 40,
+	},
+	fNameScale = { -- 头顶名称缩放
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_GKPLoot'],
+		xSchema = Schema.Number,
+		xDefaultValue = 1,
+	},
 	bMiniFlag = { -- 显示小地图标记
 		ePathType = PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
@@ -348,7 +360,7 @@ function D.OnUpdateHeadName()
 					nG = nG * 0.85
 					nB = nB * 0.85
 				end
-				sha:AppendDoodadID(tar.dwID, nR, nG, nB, 255, 128, 40, szName, 0, 1)
+				sha:AppendDoodadID(tar.dwID, nR, nG, nB, 255, 128, O.nNameFont, szName, 0, O.fNameScale)
 			end
 		end
 	end
@@ -578,7 +590,7 @@ function PS.OnPanelActive(frame)
 			O.bShowName = not O.bShowName
 			D.CheckShowName()
 		end,
-	}):AutoWidth():Pos('BOTTOMRIGHT')
+	}):AutoWidth():Pos('BOTTOMRIGHT') + 5
 
 	nX = ui:Append('Shadow', {
 		name = 'Shadow_Color', x = nX + 2, y = nY + 4, w = 18, h = 18,
@@ -591,8 +603,34 @@ function PS.OnPanelActive(frame)
 			end)
 		end,
 		autoenable = function() return O.bShowName end,
-	}):Pos('BOTTOMRIGHT') + 10
+	}):Pos('BOTTOMRIGHT') + 5
 
+	nX = nX + ui:Append('WndButton', {
+		x = nX, y = nY, w = 65,
+		text = _L['Font'],
+		onclick = function()
+			UI.OpenFontPicker(function(nFont)
+				O.nNameFont = nFont
+				D.bUpdateLabel = true
+			end)
+		end,
+		autoenable = function() return O.bShowName end,
+	}):Width() + 5
+
+	nX = nX + ui:Append('WndTrackbar', {
+		x = nX, y = nY, w = 150,
+		textfmt = function(val) return _L('Font scale is %d%%.', val) end,
+		range = {10, 500},
+		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		value = O.fNameScale * 100,
+		onchange = function(val)
+			O.fNameScale = val / 100
+			D.bUpdateLabel = true
+		end,
+		autoenable = function() return O.bShowName end,
+	}):Width() + 5
+
+	nX, nY = X + 10, nY + nLineHeightM
 	nX = ui:Append('WndCheckBox', {
 		text = _L['Display minimap flag'],
 		x = nX, y = nY,

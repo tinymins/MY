@@ -217,6 +217,8 @@ return {
 	['Craft assit'] = '采集助手',
 	['Interact in fight'] = '战斗中也采集',
 	['Show the head name'] = '显示头顶名字',
+	['Font'] = '字体',
+	['Font scale is %d%%.'] = '缩放%d%%。',
 	['Display minimap flag'] = '小地图中显示',
 	['Quest items'] = '任务物品',
 	['Recent items'] = '最近采集物品',

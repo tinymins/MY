@@ -217,6 +217,8 @@ return {
 	['Craft assit'] = '採集助手',
 	['Interact in fight'] = '戰鬥中也採集',
 	['Show the head name'] = '顯示頭頂名字',
+	['Font'] = '字體',
+	['Font scale is %d%%.'] = '縮放%d%%。',
 	['Display minimap flag'] = '小地圖中顯示',
 	['Quest items'] = '任務物品',
 	['Recent items'] = '最近採集物品',
