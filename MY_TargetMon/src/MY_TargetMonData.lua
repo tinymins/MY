@@ -606,7 +606,7 @@ function UpdateView()
 						end
 						-- 通过监控项生成视图列表
 						local buff, nIcon = Buff_MatchMon(tBuff, mon, config)
-						if buff or config.hideVoid == mon.rHideVoid then
+						if (buff and buff.bCool) or config.hideVoid == mon.rHideVoid then
 							local item = aItem[nItemIndex]
 							if not item then
 								item = {}
@@ -627,7 +627,7 @@ function UpdateView()
 						end
 						-- 通过监控项生成视图列表
 						local skill, nIcon = Skill_MatchMon(tSkill, mon, config)
-						if skill or config.hideVoid == mon.rHideVoid then
+						if (skill and skill.bCool) or config.hideVoid == mon.rHideVoid then
 							local item = aItem[nItemIndex]
 							if not item then
 								item = {}
