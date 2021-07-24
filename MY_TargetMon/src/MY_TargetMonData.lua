@@ -538,7 +538,7 @@ local function Skill_MonToView(mon, skill, item, KObject, nIcon, config, tMonExi
 		item.szLongName = mon.longAlias or mon.name
 		item.szShortName = mon.shortAlias or mon.name
 	end
-	local nStackNum = skill
+	local nStackNum = (skill and skill.nCdMaxCount > 1)
 		and (skill.nCdMaxCount - skill.nCdCount)
 		or 0
 	item.szStackNum = nStackNum > 0 and nStackNum or ''
