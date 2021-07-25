@@ -533,7 +533,13 @@ local function GetInstanceInfoData(inst, info)
 	local db = info.bUserData
 		and inst.pUserDataDB
 		or inst.pSettingsDB
+	--[[#DEBUG BEGIN]]
+	local nStartTick = GetTime()
+	--[[#DEBUG END]]
 	local res = db and db:Get(info.szDataKey)
+	--[[#DEBUG BEGIN]]
+	LIB.Debug(PACKET_INFO.NAME_SPACE, _L('User settings %s loaded during %dms.', info.szDataKey, GetTickCount() - nStartTick), DEBUG_LEVEL.PMLOG)
+	--[[#DEBUG END]]
 	if res then
 		return res
 	end
