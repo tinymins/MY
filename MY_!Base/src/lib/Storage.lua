@@ -533,37 +533,15 @@ local function GetInstanceInfoData(inst, info)
 	local db = info.bUserData
 		and inst.pUserDataDB
 		or inst.pSettingsDB
+	--[[#DEBUG BEGIN]]
+	local nStartTick = GetTime()
+	--[[#DEBUG END]]
 	local res = db and db:Get(info.szDataKey)
+	--[[#DEBUG BEGIN]]
+	LIB.Debug(PACKET_INFO.NAME_SPACE, _L('User settings %s loaded during %dms.', info.szDataKey, GetTickCount() - nStartTick), DEBUG_LEVEL.PMLOG)
+	--[[#DEBUG END]]
 	if res then
 		return res
-	end
-	local db = info.bUserData
-		and inst.pUserDataUDB
-		or inst.pSettingsUDB
-	local res = db and db:Get(info.szDataKey)
-	if IsTable(res) then
-		if not res.v then
-			res.v = ''
-		end
-		SetInstanceInfoData(inst, info, res.d, res.v)
-		db:Delete(info.szDataKey)
-		return res
-	end
-	-- 全局设置兼容
-	if info.ePathType == PATH_TYPE.ROLE then
-		local inst = DATABASE_INSTANCE[PATH_TYPE.GLOBAL]
-		local db = info.bUserData
-			and inst.pUserDataUDB
-			or inst.pSettingsUDB
-		local res = db and db:Get(info.szDataKey)
-		if IsTable(res) then
-			if not res.v then
-				res.v = ''
-			end
-			SetInstanceInfoData(inst, info, res.d, res.v)
-			db:Delete(info.szDataKey)
-			return res
-		end
 	end
 	return nil
 end
@@ -574,22 +552,6 @@ local function DeleteInstanceInfoData(inst, info)
 		or inst.pSettingsDB
 	if db then
 		db:Delete(info.szDataKey)
-	end
-	local db = info.bUserData
-		and inst.pUserDataUDB
-		or inst.pSettingsUDB
-	if db then
-		db:Delete(info.szDataKey)
-	end
-	-- 全局设置兼容
-	if info.ePathType == PATH_TYPE.ROLE then
-		local inst = DATABASE_INSTANCE[PATH_TYPE.GLOBAL]
-		local db = info.bUserData
-			and inst.pUserDataUDB
-			or inst.pSettingsUDB
-		if db then
-			db:Delete(info.szDataKey)
-		end
 	end
 end
 
@@ -618,12 +580,8 @@ function LIB.ConnectUserSettingsDB()
 			end
 			DATABASE_INSTANCE[ePathType] = {
 				pSettingsDB = pSettingsDB,
-				pSettingsUDB = LIB.UnQLiteConnect(szUDBPresetRoot
-					and (szUDBPresetRoot .. DATABASE_TYPE_PRESET_FILE[ePathType] .. '.udb')
-					or LIB.FormatPath({'userdata/settings.udb', ePathType})),
 				-- bSettingsDBCommit = false,
 				pUserDataDB = pUserDataDB,
-				pUserDataUDB = LIB.UnQLiteConnect(LIB.FormatPath({'userdata/userdata.udb', ePathType})),
 				-- bUserDataDBCommit = false,
 			}
 		end
@@ -637,12 +595,6 @@ function LIB.ReleaseUserSettingsDB()
 	for _, ePathType in ipairs(DATABASE_TYPE_LIST) do
 		local inst = DATABASE_INSTANCE[ePathType]
 		if inst then
-			if inst.pSettingsUDB then
-				LIB.UnQLiteDisconnect(inst.pSettingsUDB)
-			end
-			if inst.pUserDataUDB then
-				LIB.UnQLiteDisconnect(inst.pUserDataUDB)
-			end
 			if inst.pSettingsDB then
 				LIB.NoSQLiteDisconnect(inst.pSettingsDB)
 			end
@@ -1393,53 +1345,6 @@ local function OnInit()
 	INIT_FUNC_LIST = {}
 end
 LIB.RegisterInit('LIB#RemoteStorage', OnInit)
-end
-
-------------------------------------------------------------------------------
--- UnQLite 数据库
-------------------------------------------------------------------------------
-do
--- UnQLite 底层当前不支持多句柄访问，所以需要句柄池
-local UNQLITE_POOL = {}
-function LIB.UnQLiteConnect(oPath)
-	if not UnQLite_Open then
-		return
-	end
-	local szPath = LIB.FormatPath(oPath)
-	local szKey = lower(szPath)
-	local rec = UNQLITE_POOL[szKey]
-	if not rec then
-		local szRandom = tostring(random(0, 9999999))
-		local pUserDataDB = UnQLite_Open(szPath)
-		pUserDataDB:Set('@@__LOCK_CHECK__@@', szRandom)
-		if pUserDataDB:Get('@@__LOCK_CHECK__@@') ~= szRandom then
-			LIB.UnQLiteDisconnect(pUserDataDB)
-			return
-		end
-		pUserDataDB:Delete('@@__LOCK_CHECK__@@')
-		rec = {
-			nCount = 0,
-			pUserDataDB = pUserDataDB,
-		}
-		UNQLITE_POOL[szKey]	= rec
-	end
-	rec.nCount = rec.nCount + 1
-	return rec.pUserDataDB
-end
-
-function LIB.UnQLiteDisconnect(db)
-	for szKey, rec in pairs(UNQLITE_POOL) do
-		if rec.pUserDataDB == db then
-			rec.nCount = rec.nCount - 1
-			if rec.nCount > 0 then
-				return
-			end
-			UNQLITE_POOL[szKey] = nil
-			break
-		end
-	end
-	db:Release()
-end
 end
 
 ------------------------------------------------------------------------------
