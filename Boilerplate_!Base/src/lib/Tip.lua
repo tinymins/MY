@@ -169,7 +169,7 @@ end
 
 function LIB.OutputSkillTip(Rect, dwSkilID, dwSkillLevel)
 	if not IsTable(Rect) and not IsNil(Rect) then
-		Rect, dwID, nLevel = nil, Rect, dwID
+		Rect, dwSkilID, dwSkillLevel = nil, Rect, dwSkilID
 	end
 	Rect = ConvRectEl(Rect)
 	OutputSkillTip(dwSkilID, dwSkillLevel, Rect, false)
