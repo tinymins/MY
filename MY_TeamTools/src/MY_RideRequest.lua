@@ -80,6 +80,12 @@ local O = LIB.CreateUserSettingsModule('MY_RideRequest', _L['Raid'], {
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
+	bAcceptParty = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_TeamTools'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
 	bAcceptFriend = {
 		ePathType = PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamTools'],
@@ -137,6 +143,14 @@ function D.GetMenu()
 			end,
 		},
 		CONSTANT.MENU_DIVIDER,
+		{
+			szOption = _L['Auto accept party'],
+			bCheck = true, bChecked = O.bAcceptParty,
+			fnAction = function()
+				O.bAcceptParty = not O.bAcceptParty
+			end,
+			fnDisable = function() return not O.bEnable end,
+		},
 		{
 			szOption = _L['Auto accept friend'],
 			bCheck = true, bChecked = O.bAcceptFriend,
@@ -277,6 +291,9 @@ function D.GetRequestStatus(info)
 	elseif O.bAcceptCustom and O.tAcceptCustom[info.szName] then
 		szStatus = 'accept'
 		szMsg = _L('Auto accept %s custom ride request, go to MY/raid/teamtools panel if you want to turn off this feature.', info.szName)
+	elseif info.bParty and O.bAcceptParty then
+		szStatus = 'accept'
+		szMsg = _L('Auto accept party %s ride request, go to MY/raid/teamtools panel if you want to turn off this feature.', info.szName)
 	elseif info.bFriend and O.bAcceptFriend then
 		szStatus = 'accept'
 		szMsg = _L('Auto accept friend %s ride request, go to MY/raid/teamtools panel if you want to turn off this feature.', info.szName)
@@ -336,6 +353,7 @@ function D.OnMessageBoxOpen()
 				end
 				info.szName = szName
 				info.szDesc = szMsg
+				info.bParty      = LIB.IsParty(szName)
 				info.bFriend     = LIB.IsFriend(szName)
 				info.bTongMember = LIB.IsTongMember(szName)
 				info.fnAccept = function()
