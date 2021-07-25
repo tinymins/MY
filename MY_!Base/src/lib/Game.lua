@@ -2059,6 +2059,18 @@ end
 
 -- 判断是不是队友
 function LIB.IsParty(dwID)
+	if IsString(dwID) then
+		if dwID == LIB.GetUserRoleName() then
+			return true
+		end
+		local team = GetClientTeam()
+		for _, dwTarID in ipairs(team.GetTeamMemberList()) do
+			if dwID == team.GetClientTeamMemberName(dwTarID) then
+				return true
+			end
+		end
+		return false
+	end
 	if dwID == UI_GetClientPlayerID() then
 		return true
 	end
