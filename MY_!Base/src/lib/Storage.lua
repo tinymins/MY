@@ -921,6 +921,21 @@ function LIB.SetUserSettings(szKey, ...)
 	return true
 end
 
+-- 重载刷新用户配置项缓存值
+-- @param {string} szKey 配置项全局唯一键
+-- @param {string} szDataSetKey 配置项组（如用户多套自定义偏好）唯一键，当且仅当 szKey 对应注册项携带 bDataSet 标记位时有效
+function LIB.ReloadUserSettings(szKey, szDataSetKey)
+	local root = DATA_CACHE
+	local key = szKey
+	if szDataSetKey then
+		root = root[szKey]
+		key = szDataSetKey
+	end
+	if IsTable(root) then
+		root[key] = nil
+	end
+end
+
 -- 删除用户配置项值（恢复默认值）
 -- @param {string} szKey 配置项全局唯一键
 -- @param {string} szDataSetKey 配置项组（如用户多套自定义偏好）唯一键，当且仅当 szKey 对应注册项携带 bDataSet 标记位时有效
@@ -1022,6 +1037,16 @@ function LIB.CreateUserSettingsProxy(xProxy)
 				end
 				for _, k in ipairs(arg0) do
 					LIB.ResetUserSettings(GetGlobalKey(k))
+				end
+			elseif cmd == 'reload' then
+				if not IsTable(arg0) then
+					arg0 = {}
+					for k, _ in pairs(tProxy) do
+						insert(arg0, k)
+					end
+				end
+				for _, k in ipairs(arg0) do
+					LIB.ReloadUserSettings(GetGlobalKey(k))
 				end
 			end
 		end,
