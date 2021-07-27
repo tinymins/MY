@@ -60,6 +60,11 @@ do
 		_GAME_LANG_ = 'zhcn'
 	end
 	_GAME_BRANCH_ = lower(szVersionLineName)
+	if _GAME_BRANCH_ == 'zhcn' then
+		_GAME_BRANCH_ = 'remake'
+	elseif _GAME_BRANCH_ == 'zhtw' then
+		_GAME_BRANCH_ = 'intl'
+	end
 	_GAME_EDITION_ = lower(szVersionLineName .. '_' .. szVersionEx)
 	_GAME_VERSION_ = lower(szVersion)
 
