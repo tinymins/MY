@@ -120,7 +120,7 @@ function PS.OnPanelActive(frame)
 		onclick = function()
 			local rec = {}
 			insert(CFG.aBuffList, rec)
-			l_list:ListBox('insert', rec, MY_Cataclysm.EncodeBuffRule(rec), rec)
+			l_list:ListBox('insert', { id = rec, text = MY_Cataclysm.EncodeBuffRule(rec), data = rec })
 			OpenBuffRuleEditor(rec)
 		end,
 	}):AutoHeight():Width() + 5
@@ -172,7 +172,7 @@ function PS.OnPanelActive(frame)
 		}},
 	})
 	for _, rec in ipairs(CFG.aBuffList) do
-		l_list:ListBox('insert', rec, MY_Cataclysm.EncodeBuffRule(rec), rec)
+		l_list:ListBox('insert', { id = rec, text = MY_Cataclysm.EncodeBuffRule(rec), data = rec })
 	end
 	y = h
 

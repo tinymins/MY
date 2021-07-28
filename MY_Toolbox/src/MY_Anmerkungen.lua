@@ -533,7 +533,7 @@ function PS.OnPanelActive(wnd)
 	})
 	for dwID, t in pairs(PUBLIC_PLAYER_NOTES) do
 		if tonumber(dwID) then
-			list:ListBox('insert', t.dwID, _L('[%s] %s', t.szName, t.szContent), t)
+			list:ListBox('insert', { id = t.dwID, text = _L('[%s] %s', t.szName, t.szContent), data = t })
 		end
 	end
 	_C.list = list

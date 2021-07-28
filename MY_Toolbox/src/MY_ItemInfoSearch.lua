@@ -234,15 +234,19 @@ function PS.OnPanelActive(wnd)
 		list:ListBox('clear')
 		if IsEmpty(SEARCH) then
 			for i, s in ipairs(_L['MY_ItemInfoSearch TIPS']) do
-				list:ListBox('insert', 'TIP' .. i, s, nil, { r = 255, g = 255, b = 0 })
+				list:ListBox('insert', { id = 'TIP' .. i, text = s, r = 255, g = 255, b = 0 })
 			end
 		else
 			for _, item in ipairs(RESULT) do
-				local opt = {}
+				local opt = {
+					id = item,
+					text = ' [' .. LIB.GetItemNameByItemInfo(item.itemInfo, item.dwRecipeID) .. '] - ' .. item.itemInfo.szName,
+					data = item,
+				}
 				opt.r, opt.g, opt.b = GetItemFontColorByQuality(item.itemInfo.nQuality, false)
-				list:ListBox('insert', item, ' [' .. LIB.GetItemNameByItemInfo(item.itemInfo, item.dwRecipeID) .. '] - ' .. item.itemInfo.szName, item, opt)
+				list:ListBox('insert', opt)
 			end
-			list:ListBox('insert', 'count', _L('Max display count %d, current %d.', MAX_DISP, #RESULT), nil, { r = 100, g = 100, b = 100 })
+			list:ListBox('insert', { id = 'count', text = _L('Max display count %d, current %d.', MAX_DISP, #RESULT), r = 100, g = 100, b = 100 })
 		end
 	end
 

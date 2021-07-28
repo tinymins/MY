@@ -713,7 +713,7 @@ function PS.OnPanelActive(wnd)
 		if IsEmpty(szText) then
 			list:ListBox('clear')
 			for i, s in ipairs(_L['MY_MiddleMapMark TIPS']) do
-				list:ListBox('insert', 'TIP' .. i, s, nil, { r = 255, g = 255, b = 0 })
+				list:ListBox('insert', { id = 'TIP' .. i, text = s, r = 255, g = 255, b = 0 })
 			end
 		else
 			local nMaxDisp = 500
@@ -729,10 +729,10 @@ function PS.OnPanelActive(wnd)
 				szName  = info.decoded and info.name  or UTF8ToAnsi(info.name)
 				szTitle = info.decoded and info.title or UTF8ToAnsi(info.title)
 				if not tNames[info.mapid .. szName] then
-					list:ListBox('insert', nil, '[' .. Table_GetMapName(info.mapid) .. '] ' .. szName ..
-					((szTitle and #szTitle > 0 and '<' .. szTitle .. '>') or ''), {
-						szName  = szName,
-						dwMapID = info.mapid,
+					list:ListBox('insert', {
+						text = '[' .. Table_GetMapName(info.mapid) .. '] ' .. szName
+							.. ((szTitle and #szTitle > 0 and '<' .. szTitle .. '>') or ''),
+						data = { szName  = szName, dwMapID = info.mapid },
 					})
 					nDisp = nDisp + 1
 					if nDisp >= nMaxDisp then
@@ -747,9 +747,9 @@ function PS.OnPanelActive(wnd)
 			for _, info in ipairs(infos) do
 				szName = info.decoded and info.name or UTF8ToAnsi(info.name)
 				if not tNames[info.mapid .. szName] then
-					list:ListBox('insert', nil, '[' .. Table_GetMapName(info.mapid) .. '] ' .. szName, {
-						szName  = szName,
-						dwMapID = info.mapid,
+					list:ListBox('insert', {
+						text = '[' .. Table_GetMapName(info.mapid) .. '] ' .. szName,
+						data = { szName  = szName, dwMapID = info.mapid },
 					})
 					nDisp = nDisp + 1
 					if nDisp >= nMaxDisp then

@@ -260,7 +260,7 @@ function PS.OnPanelActive(wnd)
 
 		list:ListBox('clear')
 		for _, bw in ipairs(aBlockWords) do
-			list:ListBox('insert', bw.uuid, bw.szKeyword, bw)
+			list:ListBox('insert', { id = bw.uuid, text = bw.szKeyword, data = bw })
 		end
 	end
 	ReloadBlockWords()
