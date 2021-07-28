@@ -2002,7 +2002,7 @@ function OO:ListBox(method, arg1, arg2, arg3, arg4)
 			end
 			return tData
 		elseif method == 'insert' then
-			local id, text, data, pos, r, g, b = arg1.id, arg1.text, arg1.data, arg1.index, arg1.r, arg1.g, arg1.b
+			local id, text, data, pos, r, g, b, selected = arg1.id, arg1.text, arg1.data, arg1.index, arg1.r, arg1.g, arg1.b, arg1.selected or false
 			for _, raw in ipairs(self.raws) do
 				if GetComponentType(raw) == 'WndListBox' then
 					local hList = raw:Lookup('', 'Handle_Scroll')
@@ -2030,11 +2030,13 @@ function OO:ListBox(method, arg1, arg2, arg3, arg4)
 							id = id,
 							text = text,
 							data = data,
+							selected = selected,
 						})
 						hItem:Lookup('Text_Default'):SetText(text)
 						if r and g and b then
 							hItem:Lookup('Text_Default'):SetFontColor(r, g, b)
 						end
+						hItem:Lookup('Image_Sel'):SetVisible(selected)
 						hItem.OnItemMouseEnter = GetComponentProp(raw, 'OnListItemHandleMouseEnter')
 						hItem.OnItemMouseLeave = GetComponentProp(raw, 'OnListItemHandleMouseLeave')
 						hItem.OnItemLButtonClick = GetComponentProp(raw, 'OnListItemHandleLButtonClick')
