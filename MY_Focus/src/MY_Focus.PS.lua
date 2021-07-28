@@ -100,7 +100,7 @@ function PS.OnPanelActive(wnd)
 	})
 	-- ³õÊ¼»¯list¿Ø¼þ
 	for _, v in ipairs(MY_Focus.GetAllFocusPattern()) do
-		list:ListBox('insert', MY_Focus.FormatRuleText(v), v, v)
+		list:ListBox('insert', v, MY_Focus.FormatRuleText(v), v)
 	end
 	list:ListBox('onmenu', function(oID, szText, tData)
 		local t = {{
@@ -264,7 +264,7 @@ function PS.OnPanelActive(wnd)
 				if not tData then
 					return
 				end
-				list:ListBox('insert', MY_Focus.FormatRuleText(tData), tData, tData)
+				list:ListBox('insert', tData, MY_Focus.FormatRuleText(tData), tData)
 			end, function() end, function() end, nil, '')
 		end,
 		tip = _L['Right click list to delete'],
