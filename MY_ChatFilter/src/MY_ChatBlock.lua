@@ -258,9 +258,20 @@ function PS.OnPanelActive(wnd)
 		D.aBlockWords = aBlockWords
 		D.CheckEnable()
 
+		local tSelected = {}
+		for _, v in ipairs(list:ListBox('select', 'selected')) do
+			if v.selected and v.id then
+				tSelected[v.id] = true
+			end
+		end
 		list:ListBox('clear')
 		for _, bw in ipairs(aBlockWords) do
-			list:ListBox('insert', { id = bw.uuid, text = bw.szKeyword, data = bw })
+			list:ListBox('insert', {
+				id = bw.uuid,
+				text = bw.szKeyword,
+				data = bw,
+				selected = tSelected[bw.uuid],
+			})
 		end
 	end
 	ReloadBlockWords()
