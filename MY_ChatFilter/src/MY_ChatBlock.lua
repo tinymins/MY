@@ -96,6 +96,7 @@ local O = LIB.CreateUserSettingsModule('MY_ChatBlock', _L['Chat'], {
 		ePathType = PATH_TYPE.GLOBAL,
 		szLabel = _L['MY_ChatBlock'],
 		xSchema = Schema.Collection(Schema.Record({
+			uuid = Schema.Optional(Schema.String),
 			szKeyword = Schema.String,
 			tMsgType = Schema.Map(Schema.String, Schema.Boolean),
 			bIgnoreAcquaintance = Schema.Boolean,
@@ -108,27 +109,11 @@ local O = LIB.CreateUserSettingsModule('MY_ChatBlock', _L['Chat'], {
 })
 local D = {}
 
-local CONFIG_PATH = {'config/chatblockwords.jx3dat', PATH_TYPE.GLOBAL}
-function D.SaveBlockWords()
-	-- LIB.SaveLUAData(CONFIG_PATH, { aBlockWords = O.aBlockWords }, { passphrase = false })
-	O.aBlockWords = O.aBlockWords
-	LIB.StorageData('MY_CHAT_BLOCKWORD', O.aBlockWords)
-end
-
-function D.LoadBlockWords()
-	local data = LIB.LoadLUAData(CONFIG_PATH, { passphrase = false }) or LIB.LoadLUAData(CONFIG_PATH)
-	if data and IsTable(data.aBlockWords) then
-		O.aBlockWords = data.aBlockWords
-		CPath.DelFile(LIB.FormatPath(CONFIG_PATH))
-	end
-	D.CheckEnable()
-end
-
 function D.IsBlockMsg(szText, szMsgType, dwTalkerID)
 	local bAcquaintance = dwTalkerID
 		and (LIB.GetFriend(dwTalkerID) or LIB.GetFoe(dwTalkerID) or LIB.GetTongMember(dwTalkerID))
 		or false
-	for _, bw in ipairs(O.aBlockWords) do
+	for _, bw in ipairs(D.aBlockWords) do
 		if bw.tMsgType[szMsgType] and (not bAcquaintance or not bw.bIgnoreAcquaintance)
 		and LIB.StringSimpleMatch(szText, bw.szKeyword, not bw.bIgnoreCase, not bw.bIgnoreEnEm, bw.bIgnoreSpace) then
 			return true
@@ -157,11 +142,11 @@ end
 function D.CheckEnable()
 	UnRegisterTalkFilter(D.OnTalkFilter)
 	UnRegisterMsgFilter(D.OnMsgFilter)
-	if not O.bBlockWords then
+	if not D.bReady or not D.aBlockWords or not O.bBlockWords then
 		return
 	end
 	local tChannel, tMsgType = {}, {}
-	for _, bw in ipairs(O.aBlockWords) do
+	for _, bw in ipairs(D.aBlockWords) do
 		for szType, bEnable in pairs(bw.tMsgType) do
 			if bEnable then
 				if MSG_TYPE_TALK_CHANNEL[szType] then
@@ -186,14 +171,15 @@ function D.CheckEnable()
 	end
 end
 
-LIB.RegisterEvent('MY_PRIVATE_STORAGE_UPDATE', function()
-	if arg0 == 'MY_CHAT_BLOCKWORD' then
-		O.aBlockWords = arg1
-		D.CheckEnable()
-	end
+LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_ChatBlock', function()
+	D.bReady = true
+	D.aBlockWords = O.aBlockWords
+	D.CheckEnable()
 end)
-LIB.RegisterInit('MY_ChatBlock', D.LoadBlockWords)
-LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_ChatBlock', D.CheckEnable)
+LIB.RegisterUserSettingsUpdate('@@UNINIT@@', 'MY_ChatBlock', function()
+	D.bReady = false
+	D.CheckEnable()
+end)
 
 -- Global exports
 do
@@ -216,7 +202,6 @@ function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
 	local w, h = ui:Size()
 	local x, y = 0, 0
-	D.LoadBlockWords()
 
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 70,
@@ -236,20 +221,66 @@ function PS.OnPanelActive(wnd)
 	})
 	x, y = 0, y + 30
 
-	local list = ui:Append('WndListBox', { x = x, y = y, w = w, h = h - 30 })
-	-- 初始化list控件
-	for _, bw in ipairs(O.aBlockWords) do
-		list:ListBox('insert', bw.szKeyword, bw.szKeyword, bw)
+	local aBlockWords = O.aBlockWords
+	local function SeekBlockWord(uuid)
+		for i = #aBlockWords, 1, -1 do
+			if aBlockWords[i].uuid == uuid then
+				return aBlockWords[i]
+			end
+		end
 	end
+
+	local function RemoveBlockWord(uuid)
+		for i = #aBlockWords, 1, -1 do
+			if aBlockWords[i].uuid == uuid then
+				remove(aBlockWords, i)
+			end
+		end
+	end
+
+	local list = ui:Append('WndListBox', { x = x, y = y, w = w, h = h - 30 })
+	local function ReloadBlockWords()
+		O('reload', {'aBlockWords'})
+		aBlockWords = O.aBlockWords
+
+		local bSave = false
+		for _, bw in ipairs(aBlockWords) do
+			if not bw.uuid then
+				bw.uuid = LIB.GetUUID()
+				bSave = true
+			end
+		end
+		if bSave then
+			O.aBlockWords = aBlockWords
+		end
+		aBlockWords = O.aBlockWords
+
+		D.aBlockWords = aBlockWords
+		D.CheckEnable()
+
+		list:ListBox('clear')
+		for _, bw in ipairs(aBlockWords) do
+			list:ListBox('insert', bw.uuid, bw.szKeyword, bw)
+		end
+	end
+	ReloadBlockWords()
+
+	local function SaveBlockWords()
+		O.aBlockWords = aBlockWords
+		ReloadBlockWords()
+	end
+
 	list:ListBox('onmenu', function(id, text, data)
 		local menu = LIB.GetMsgTypeMenu(function(szType)
-			if data.tMsgType[szType] then
-				data.tMsgType[szType] = nil
-			else
-				data.tMsgType[szType] = true
+			local bw = SeekBlockWord(id)
+			if bw then
+				if bw.tMsgType[szType] then
+					bw.tMsgType[szType] = nil
+				else
+					bw.tMsgType[szType] = true
+				end
+				SaveBlockWords()
 			end
-			D.CheckEnable()
-			D.SaveBlockWords()
 		end, data.tMsgType)
 		insert(menu, 1, CONSTANT.MENU_DIVIDER)
 		insert(menu, 1, {
@@ -260,9 +291,11 @@ function PS.OnPanelActive(wnd)
 					if IsEmpty(szText) then
 						return
 					end
-					data.szKeyword = szText
-					D.SaveBlockWords()
-					list:ListBox('update', 'id', id, {'text'}, {szText})
+					local bw = SeekBlockWord(id)
+					if bw then
+						bw.szKeyword = szText
+						SaveBlockWords()
+					end
 				end, nil, nil, nil, data.szKeyword)
 			end,
 		})
@@ -271,54 +304,59 @@ function PS.OnPanelActive(wnd)
 			szOption = _L['Ignore spaces'],
 			bCheck = true, bChecked = data.bIgnoreSpace,
 			fnAction = function()
-				data.bIgnoreSpace = not data.bIgnoreSpace
-				D.SaveBlockWords()
+				local bw = SeekBlockWord(id)
+				if bw then
+					bw.bIgnoreSpace = not bw.bIgnoreSpace
+					SaveBlockWords()
+				end
 			end,
 		})
 		insert(menu, {
 			szOption = _L['Ignore enem'],
 			bCheck = true, bChecked = data.bIgnoreEnEm,
 			fnAction = function()
-				data.bIgnoreEnEm = not data.bIgnoreEnEm
-				D.SaveBlockWords()
+				local bw = SeekBlockWord(id)
+				if bw then
+					bw.bIgnoreEnEm = not bw.bIgnoreEnEm
+					SaveBlockWords()
+				end
 			end,
 		})
 		insert(menu, {
 			szOption = _L['Ignore case'],
 			bCheck = true, bChecked = data.bIgnoreCase,
 			fnAction = function()
-				data.bIgnoreCase = not data.bIgnoreCase
-				D.SaveBlockWords()
+				local bw = SeekBlockWord(id)
+				if bw then
+					bw.bIgnoreCase = not bw.bIgnoreCase
+					SaveBlockWords()
+				end
 			end,
 		})
 		insert(menu, {
 			szOption = _L['Ignore acquaintance'],
 			bCheck = true, bChecked = data.bIgnoreAcquaintance,
 			fnAction = function()
-				data.bIgnoreAcquaintance = not data.bIgnoreAcquaintance
-				D.SaveBlockWords()
+				local bw = SeekBlockWord(id)
+				if bw then
+					bw.bIgnoreAcquaintance = not bw.bIgnoreAcquaintance
+					SaveBlockWords()
+				end
 			end,
 		})
 		insert(menu, CONSTANT.MENU_DIVIDER)
 		insert(menu, {
 			szOption = _L['Delete'],
 			fnAction = function()
-				list:ListBox('delete', 'id', id)
-				D.LoadBlockWords()
-				for i = #O.aBlockWords, 1, -1 do
-					if O.aBlockWords[i].szKeyword == id then
-						remove(O.aBlockWords, i)
-					end
-				end
-				O.aBlockWords = O.aBlockWords
-				D.SaveBlockWords()
+				RemoveBlockWord(id)
+				SaveBlockWords()
 				UI.ClosePopupMenu()
 			end,
 		})
 		menu.szOption = _L['Channels']
 		return menu
 	end):ListBox('onlclick', function(id, text, data, selected)
-		edit:Text(id)
+		edit:Text(text)
 	end)
 	-- add
 	ui:Append('WndButton', {
@@ -329,21 +367,12 @@ function PS.OnPanelActive(wnd)
 			if IsEmpty(szText) then
 				return
 			end
-			D.LoadBlockWords()
-			-- 验证是否重复
-			for i, bw in ipairs(O.aBlockWords) do
-				if bw.szKeyword == szText then
-					return
-				end
-			end
-			-- 加入表
+			O('reload', {'aBlockWords'})
 			local bw = Clone(DEFAULT_KW_CONFIG)
+			bw.uuid = LIB.GetUUID()
 			bw.szKeyword = szText
-			insert(O.aBlockWords, 1, bw)
-			O.aBlockWords = O.aBlockWords
-			D.SaveBlockWords()
-			-- 更新UI
-			list:ListBox('insert', bw.szKeyword, bw.szKeyword, bw, 1)
+			insert(aBlockWords, 1, bw)
+			SaveBlockWords()
 		end,
 	})
 	-- del
@@ -351,17 +380,11 @@ function PS.OnPanelActive(wnd)
 		x = w - 80, y =  0, w = 80,
 		text = _L['Delete'],
 		onclick = function()
+			O('reload', {'aBlockWords'})
 			for _, v in ipairs(list:ListBox('select', 'selected')) do
-				list:ListBox('delete', 'id', v.id)
-				D.LoadBlockWords()
-				for i = #O.aBlockWords, 1, -1 do
-					if O.aBlockWords[i].szKeyword == v.id then
-						remove(O.aBlockWords, i)
-					end
-				end
-				O.aBlockWords = O.aBlockWords
-				D.SaveBlockWords()
+				RemoveBlockWord(v.id)
 			end
+			SaveBlockWords()
 		end,
 	})
 end
