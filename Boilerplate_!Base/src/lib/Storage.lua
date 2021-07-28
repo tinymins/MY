@@ -876,14 +876,19 @@ function LIB.SetUserSettings(szKey, ...)
 		return false
 	end
 	assert(inst, szErrHeader .. 'Database not connected.')
+	local cache = DATA_CACHE[szKey]
 	local szDataSetKey, xValue
 	if info.bDataSet then
 		assert(nParameter == 3, szErrHeader .. '3 parameters expected, got ' .. nParameter)
 		szDataSetKey, xValue = ...
 		assert(IsString(szDataSetKey) or IsNumber(szDataSetKey), szErrHeader ..'`DataSetKey` should be a string or number value.')
+		cache = cache and cache[szDataSetKey]
 	else
 		assert(nParameter == 2, szErrHeader .. '2 parameters expected, got ' .. nParameter)
 		xValue = ...
+	end
+	if cache and cache[1] == DATA_CACHE_LEAF_FLAG and IsEquals(cache[2], xValue) then
+		return
 	end
 	-- 数据校验
 	if info.xSchema then
