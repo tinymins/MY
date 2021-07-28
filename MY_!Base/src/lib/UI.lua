@@ -1954,8 +1954,8 @@ end
 -- (set) list:ListBox('option', k, v)
 -- (set) list:ListBox('option', {k1=v1, k2=v2})
 -- (set) list:ListBox('select', 'all'|'unselected'|'selected')
--- (set) list:ListBox('insert', text, id, data, pos)
--- (set) list:ListBox('insert', text, id, data, {pos=pos, r=r, g=g, b=b})
+-- (set) list:ListBox('insert', id, text, data, pos)
+-- (set) list:ListBox('insert', id, text, data, {pos=pos, r=r, g=g, b=b})
 -- (set) list:ListBox('exchange', 'id'|'index', k1, k2)
 -- (set) list:ListBox('update', 'id'|'text', k, {'text', 'data'}, {szText, oData})
 -- (set) list:ListBox('delete', 'id'|'text', k)
@@ -2003,7 +2003,7 @@ function OO:ListBox(method, arg1, arg2, arg3, arg4)
 			end
 			return tData
 		elseif method == 'insert' then
-			local text, id, data, pos, r, g, b = arg1, arg2, arg3, nil, nil, nil, nil
+			local id, text, data, pos, r, g, b = arg1, arg2, arg3, nil, nil, nil, nil
 			if IsTable(arg4) then
 				pos, r, g, b = arg4.pos, arg4.r, arg4.g, arg4.b
 			else

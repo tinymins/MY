@@ -876,14 +876,19 @@ function LIB.SetUserSettings(szKey, ...)
 		return false
 	end
 	assert(inst, szErrHeader .. 'Database not connected.')
+	local cache = DATA_CACHE[szKey]
 	local szDataSetKey, xValue
 	if info.bDataSet then
 		assert(nParameter == 3, szErrHeader .. '3 parameters expected, got ' .. nParameter)
 		szDataSetKey, xValue = ...
 		assert(IsString(szDataSetKey) or IsNumber(szDataSetKey), szErrHeader ..'`DataSetKey` should be a string or number value.')
+		cache = cache and cache[szDataSetKey]
 	else
 		assert(nParameter == 2, szErrHeader .. '2 parameters expected, got ' .. nParameter)
 		xValue = ...
+	end
+	if cache and cache[1] == DATA_CACHE_LEAF_FLAG and IsEquals(cache[2], xValue) then
+		return
 	end
 	-- 数据校验
 	if info.xSchema then
@@ -924,16 +929,17 @@ end
 -- 重载刷新用户配置项缓存值
 -- @param {string} szKey 配置项全局唯一键
 -- @param {string} szDataSetKey 配置项组（如用户多套自定义偏好）唯一键，当且仅当 szKey 对应注册项携带 bDataSet 标记位时有效
-function LIB.ReloadUserSettings(szKey, szDataSetKey)
+function LIB.ReloadUserSettings(szKey, ...)
 	local root = DATA_CACHE
 	local key = szKey
-	if szDataSetKey then
+	if ... then
 		root = root[szKey]
-		key = szDataSetKey
+		key = ...
 	end
 	if IsTable(root) then
 		root[key] = nil
 	end
+	LIB.GetUserSettings(szKey, ...)
 end
 
 -- 删除用户配置项值（恢复默认值）
@@ -1028,7 +1034,17 @@ function LIB.CreateUserSettingsProxy(xProxy)
 			LIB.SetUserSettings(GetGlobalKey(k), v)
 		end,
 		__call = function(_, cmd, arg0)
-			if cmd == 'reset' then
+			if cmd == 'load' then
+				if not IsTable(arg0) then
+					arg0 = {}
+					for k, _ in pairs(tProxy) do
+						insert(arg0, k)
+					end
+				end
+				for _, k in ipairs(arg0) do
+					LIB.GetUserSettings(GetGlobalKey(k))
+				end
+			elseif cmd == 'reset' then
 				if not IsTable(arg0) then
 					arg0 = {}
 					for k, _ in pairs(tProxy) do
