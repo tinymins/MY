@@ -1956,6 +1956,7 @@ end
 -- (set) list:ListBox('select', 'all'|'unselected'|'selected')
 -- (set) list:ListBox('insert', { id=id, text=text, data=data, index=index, r=r, g=g, b=b })
 -- (set) list:ListBox('exchange', 'id'|'index', k1, k2)
+-- (set) list:ListBox('update', 'id'|'text', k, { text=szText, data=oData })
 -- (set) list:ListBox('update', 'id'|'text', k, {'text', 'data'}, {szText, oData})
 -- (set) list:ListBox('delete', 'id'|'text', k)
 -- (set) list:ListBox('clear')
@@ -2083,11 +2084,19 @@ function OO:ListBox(method, arg1, arg2, arg3, arg4)
 						local data = GetComponentProp(hItem, 'listboxItemData')
 						if (mode == 'id' and data.id == search)
 						or (mode == 'text' and data.text == search) then
-							for i, k in ipairs(argk) do
-								if k == 'data' then
-									data.data = argv[i]
-								elseif k == 'text' then
-									hItem:Lookup('Text_Default'):SetText(argv[i])
+							if argv then
+								for i, k in ipairs(argk) do
+									if k == 'text' then
+										hItem:Lookup('Text_Default'):SetText(argv[i])
+									end
+									data[k] = argv[i]
+								end
+							else
+								for k, v in ipairs(argk) do
+									if k == 'text' then
+										hItem:Lookup('Text_Default'):SetText(v)
+									end
+									data[k] = v
 								end
 							end
 						end
