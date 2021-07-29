@@ -147,7 +147,8 @@ return {
     -- MY_ArenaHelper
     ['MY_ArenaHelper'] = '名劍大會助手',
     ['Auto restore team info in arena'] = '名劍大會中自動恢覆上次組隊信息',
-    ['Auto cancel hide player in arena and battlefield'] = '名劍大會與戰場中自動取消屏蔽玩家與NPC',
+    ['Auto cancel hide player in arena'] = '名劍大會中自動取消屏蔽角色模型',
+    ['Auto cancel hide player in battlefield'] = '戰場中自動取消屏蔽角色模型',
 
     ['Loop target between me and target'] = '循環選擇自己和目標',
     ['%%.1f/%d meter(s)'] = '%%.1f/%d 尺',

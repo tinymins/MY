@@ -68,6 +68,12 @@ local O = LIB.CreateUserSettingsModule('MY_ArenaHelper', _L['General'], {
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
+	bAutoShowModelBattlefield = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_Toolbox'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
 })
 local D = {}
 
@@ -113,10 +119,10 @@ LIB.RegisterEvent('ON_REPRESENT_CMD', function()
 	end
 end)
 LIB.RegisterEvent('LOADING_END', function()
-	if not O.bAutoShowModel then
+	if not O.bAutoShowModel and not O.bAutoShowModelBattlefield then
 		return
 	end
-	if LIB.IsInArena() or LIB.IsInBattleField() then
+	if (LIB.IsInArena() and O.bAutoShowModel) or (LIB.IsInBattleField() and O.bAutoShowModelBattlefield) then
 		l_lock = true
 		rlcmd('show npc')
 		rlcmd('show player')
@@ -158,10 +164,21 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 	-- 名剑大会战场自动取消屏蔽
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 'auto',
-		text = _L['Auto cancel hide player in arena and battlefield'],
+		text = _L['Auto cancel hide player in arena'],
 		checked = MY_ArenaHelper.bAutoShowModel,
 		oncheck = function(bChecked)
 			MY_ArenaHelper.bAutoShowModel = bChecked
+		end,
+	})
+	y = y + deltaY
+
+	-- 名剑大会战场自动取消屏蔽
+	ui:Append('WndCheckBox', {
+		x = x, y = y, w = 'auto',
+		text = _L['Auto cancel hide player in battlefield'],
+		checked = MY_ArenaHelper.bAutoShowModelBattlefield,
+		oncheck = function(bChecked)
+			MY_ArenaHelper.bAutoShowModelBattlefield = bChecked
 		end,
 	})
 	y = y + deltaY
@@ -183,6 +200,7 @@ local settings = {
 			fields = {
 				'bRestoreAuthorityInfo',
 				'bAutoShowModel',
+				'bAutoShowModelBattlefield',
 			},
 			root = O,
 		},
@@ -192,6 +210,7 @@ local settings = {
 			fields = {
 				'bRestoreAuthorityInfo',
 				'bAutoShowModel',
+				'bAutoShowModelBattlefield',
 			},
 			root = O,
 		},
