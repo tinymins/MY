@@ -170,7 +170,7 @@ end
 -- 本地函数变量
 -------------------------------------------------------------------------------------------------------
 local _BUILD_                 = '20210721'
-local _VERSION_               = '7.0.2'
+local _VERSION_               = '8.0.0'
 local _MENU_COLOR_            = {255, 165, 79}
 local _MAX_PLAYER_LEVEL_      = 100
 local _INTERFACE_ROOT_        = 'Interface/'
