@@ -137,7 +137,7 @@ function PS.OnPanelActive(wnd)
 		end,
 		autoenable = function() return D.IsEnabled() end,
 	}):Width() + 5
-	x = w - 480
+	x = w - 490
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, w = 155, text = _L['Auto hide system headtop'],
 		checked = MY_LifeBar.bAutoHideSysHeadtop,

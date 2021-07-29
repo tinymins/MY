@@ -64,7 +64,7 @@ return {
     ['unmosaics names (split by comma)'] = '不打马的名字（英文半角逗号','分隔多个名字）',
 
     ['Auto hide chat panel'] = '自动隐藏聊天栏',
-    ['Auto switch talk channel when into battle field'] = '进出战场、竞技场时自动切换团队/战场频道',
+    ['Auto switch talk channel when into battle field'] = '进出战场、名剑大会时自动切换团队/战场频道',
     ['Redirect metion to whisper'] = '记录其他频道提及我的点名内容到密聊频道',
 
     ['Resize emotion'] = '统一表情尺寸',

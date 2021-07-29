@@ -3388,12 +3388,12 @@ function LIB.IsInRaid()
 	return me and me.IsInRaid()
 end
 
--- 判断当前地图是不是竞技场
+-- 判断当前地图是不是名剑大会
 -- (bool) LIB.IsInArena()
 function LIB.IsInArena()
 	local me = GetClientPlayer()
 	return me and (
-		me.GetScene().bIsArenaMap or -- JJC
+		me.GetScene().bIsArenaMap or -- 名剑大会
 		me.GetMapID() == 173 or      -- 齐物阁
 		me.GetMapID() == 181         -- 狼影殿
 	)

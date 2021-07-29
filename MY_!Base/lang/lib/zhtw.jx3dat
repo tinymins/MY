@@ -134,7 +134,7 @@ return {
 		['Birth / School'] = '稻香村、門派',
 		['City / Old city'] = '主城',
 		['Village / Camp'] = '野外',
-		['Battle field / Arena'] = '戰場、競技場',
+		['Battle field / Arena'] = '戰場、名劍大會',
 		['Other dungeon'] = '其它秘境',
 		['Other'] = '其它地圖',
 	},

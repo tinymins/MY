@@ -862,8 +862,8 @@ function D.ProcessSkillEffect(nLFC, nTime, nTick, dwCaster, dwTarget, nEffectTyp
 	if dwCaster ~= me.dwID                 -- 释放者不是自己
 	and dwTarget ~= me.dwID                -- 承受者不是自己
 	and dwTargetEmployer ~= me.dwID        -- 承受者主人不是自己
-	and not LIB.IsInArena()                 -- 不在竞技场
-	and not LIB.IsInBattleField()           -- 不在战场
+	and not LIB.IsInArena()                -- 不在名剑大会
+	and not LIB.IsInBattleField()          -- 不在战场
 	and not me.IsPlayerInMyParty(dwCaster) -- 且释放者不是队友
 	and not me.IsPlayerInMyParty(dwTarget) -- 且承受者不是队友
 	and not (dwTargetEmployer and me.IsPlayerInMyParty(dwTargetEmployer)) -- 且承受者主人不是队友

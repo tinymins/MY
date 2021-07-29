@@ -145,9 +145,9 @@ return {
     ['This map is big war map and you did not accepted the quest, is that correct?'] = '提示：檢測到角色沒有接受當前地圖秘境大戰系列任務！',
 
     -- MY_ArenaHelper
-    ['MY_ArenaHelper'] = '競技場助手',
-    ['Auto restore team info in arena'] = '競技場中自動恢覆上次組隊信息',
-    ['Auto cancel hide player in arena and battlefield'] = '競技場與戰場中自動取消屏蔽玩家與NPC',
+    ['MY_ArenaHelper'] = '名劍大會助手',
+    ['Auto restore team info in arena'] = '名劍大會中自動恢覆上次組隊信息',
+    ['Auto cancel hide player in arena and battlefield'] = '名劍大會與戰場中自動取消屏蔽玩家與NPC',
 
     ['Loop target between me and target'] = '循環選擇自己和目標',
     ['%%.1f/%d meter(s)'] = '%%.1f/%d 尺',

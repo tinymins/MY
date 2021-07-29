@@ -173,13 +173,13 @@ local O = LIB.CreateUserSettingsModule('MY_Focus', _L['Target'], {
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
-	bFocusJJCParty = { -- 焦竞技场队友
+	bFocusJJCParty = { -- 焦点名剑大会队友
 		ePathType = PATH_TYPE.ROLE,
 		szLabel = _L['MY_Focus'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
-	bFocusJJCEnemy = { -- 焦竞技场敌队
+	bFocusJJCEnemy = { -- 焦点名剑大会敌队
 		ePathType = PATH_TYPE.ROLE,
 		szLabel = _L['MY_Focus'],
 		xSchema = Schema.Boolean,
@@ -599,7 +599,7 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 			end
 		end
 
-		-- 判断竞技场
+		-- 判断名剑大会
 		if not bFocus then
 			if LIB.IsInArena() or LIB.IsInPubg() or LIB.IsInZombieMap() then
 				if dwType == TARGET.PLAYER then

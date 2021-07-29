@@ -1,7 +1,7 @@
 --------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
--- @desc     : 竞技场自动切换团队频道
+-- @desc     : 名剑大会自动切换团队频道
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
@@ -144,7 +144,7 @@ end)
 end
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
-	-- 竞技场自动恢复队伍信息
+	-- 名剑大会自动恢复队伍信息
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 'auto',
 		text = _L['Auto restore team info in arena'],
@@ -155,7 +155,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 	})
 	y = y + deltaY
 
-	-- 竞技场战场自动取消屏蔽
+	-- 名剑大会战场自动取消屏蔽
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 'auto',
 		text = _L['Auto cancel hide player in arena and battlefield'],

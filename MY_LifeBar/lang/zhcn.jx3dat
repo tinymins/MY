@@ -8,7 +8,7 @@ return {
     ['Auto hide system headtop'] = '自动隐藏官方头顶、聊天泡泡',
 
     ['Only enable in checked map types'] = '勾选后仅在勾选类型的地图中启用扁平血条，全部取消勾选表示所有地图启用。',
-    ['Arena'] = '竞技场',
+    ['Arena'] = '名剑大会',
     ['Battlefield'] = '战场',
     ['Dungeon'] = '秘境',
 

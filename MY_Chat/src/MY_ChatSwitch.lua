@@ -470,7 +470,7 @@ local function OnChannelCheck()
 end
 
 function D.ApplyBattlefieldChannelSwitch()
-	-- 竞技场自动切换团队频道
+	-- 名剑大会自动切换团队频道
 	if O.bAutoSwitchBfChannel then
 		LIB.RegisterEvent('LOADING_ENDING', 'MY_ChatSwitch__AutoSwitchBattlefieldChannel', function()
 			local bIsBattleField = (GetClientPlayer().GetScene().nType == MAP_TYPE.BATTLE_FIELD)
@@ -754,7 +754,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
 	y = y + lineHeight
 
 	x = X
-	-- 竞技场频道切换
+	-- 名剑大会频道切换
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 'auto',
 		text = _L['Auto switch talk channel when into battle field'],
