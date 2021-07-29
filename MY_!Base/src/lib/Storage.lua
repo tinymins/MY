@@ -853,9 +853,9 @@ function LIB.GetUserSettings(szKey, ...)
 		if not DATA_CACHE[szKey] then
 			DATA_CACHE[szKey] = {}
 		end
-		DATA_CACHE[szKey][szDataSetKey] = { DATA_CACHE_LEAF_FLAG, res }
+		DATA_CACHE[szKey][szDataSetKey] = { DATA_CACHE_LEAF_FLAG, res, Clone(rec) }
 	else
-		DATA_CACHE[szKey] = { DATA_CACHE_LEAF_FLAG, res }
+		DATA_CACHE[szKey] = { DATA_CACHE_LEAF_FLAG, res, Clone(rec) }
 	end
 	return res
 end
@@ -887,7 +887,7 @@ function LIB.SetUserSettings(szKey, ...)
 		assert(nParameter == 2, szErrHeader .. '2 parameters expected, got ' .. nParameter)
 		xValue = ...
 	end
-	if cache and cache[1] == DATA_CACHE_LEAF_FLAG and IsEquals(cache[2], xValue) then
+	if cache and cache[1] == DATA_CACHE_LEAF_FLAG and IsEquals(cache[3], xValue) then
 		return
 	end
 	-- 数据校验
