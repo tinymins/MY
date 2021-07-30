@@ -108,6 +108,17 @@ local BUTTON_STYLE_CONFIG = {
 		nMouseDownGroup = 27,
 		nDisableGroup = 28,
 	},
+	FLAT_RADIUS = {
+		nWidth = 44,
+		nHeight = 23,
+		nMarginBottom = 0,
+		nPaddingBottom = 0,
+		szImage = PACKET_INFO.FRAMEWORK_ROOT .. 'img/UIComponents.UITex',
+		nNormalGroup = 0,
+		nMouseOverGroup = 1,
+		nMouseDownGroup = 2,
+		nDisableGroup = 3,
+	},
 	LINK = LIB.SetmetaReadonly({
 		nWidth = 60,
 		nHeight = 25,
