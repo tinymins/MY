@@ -3,3 +3,4 @@ Farme	Left	Top	Width	High	File
 1	0	26	44	24	C:\Users\root\Desktop\SmallButton2.tga
 2	0	52	44	24	C:\Users\root\Desktop\SmallButton3.tga
 3	0	78	44	24	C:\Users\root\Desktop\SmallButton4.tga
+4	0	104	32	32	C:\Users\root\Desktop\Magnifier.tga
