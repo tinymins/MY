@@ -1,0 +1,5 @@
+Farme	Left	Top	Width	High	File
+0	0	0	44	24	C:\Users\root\Desktop\SmallButton1.tga
+1	0	26	44	24	C:\Users\root\Desktop\SmallButton2.tga
+2	0	52	44	24	C:\Users\root\Desktop\SmallButton3.tga
+3	0	78	44	24	C:\Users\root\Desktop\SmallButton4.tga
