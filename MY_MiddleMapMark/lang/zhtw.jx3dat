@@ -1,6 +1,8 @@
 return {
     ['Type to search, use comma to split.'] = '輸入文字進行搜索，半形逗號分隔多個搜索項。\n如：皇竹草,甜象草',
     ['middle map mark'] = '地圖搜索',
+    ['[Read]'] = '[已閱讀]',
+    ['[Not read]'] = '[未閱讀]',
     ['MY_MiddleMapMark TIPS'] = {
         '說明：',
         '　　1、在上方輸入框輸入您想要查詢的物品名稱，即可進行地圖物品查詢。',

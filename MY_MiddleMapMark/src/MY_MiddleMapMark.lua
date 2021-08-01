@@ -575,11 +575,25 @@ end
 -- start search
 local MAX_DISPLAY_COUNT = 1000
 local function OnMMMItemMouseEnter()
+	local me = GetClientPlayer()
 	local x, y = this:GetAbsPos()
 	local w, h = this:GetSize()
 	local szTip = (this.decoded and this.name or UTF8ToAnsi(this.name))
 		.. (this.level and this.level > 0 and (' lv.' .. this.level) or '')
 		.. (this.title and this.title ~= '' and ('\n<' .. (this.decoded and this.title or UTF8ToAnsi(this.title)) .. '>') or '')
+	if this.type == 'Doodad' then
+		local dwRecipeID = me and LIB.GetDoodadBookRecipeID(this.templateid)
+		if dwRecipeID then
+			local dwBookID, dwSegmentID = LIB.RecipeToSegmentID(dwRecipeID)
+			if dwBookID and dwSegmentID then
+				if me.IsBookMemorized(dwBookID, dwSegmentID) then
+					szTip = szTip .. '\n' .. _L['[Read]']
+				else
+					szTip = szTip .. '\n' .. _L['[Not read]']
+				end
+			end
+		end
+	end
 	if IsCtrlKeyDown() then
 		szTip = szTip .. (this.templateid and ('\n' .. this.type .. ' Template ID: ' .. this.templateid) or '')
 			.. '\n' .. this.x .. ', ' .. this.y
