@@ -185,7 +185,7 @@ function LIB.InsertChatInput(szType, ...)
 			end
 			if itemInfo.nGenre == ITEM_GENRE.BOOK then
 				if nBookInfo then
-					local nBookID, nSegmentID = GlobelRecipeID2BookID(nBookInfo)
+					local nBookID, nSegmentID = LIB.RecipeToSegmentID(nBookInfo)
 					if nBookID then
 						szText = '[' .. Table_GetSegmentName(nBookID, nSegmentID) .. ']'
 						data = {
