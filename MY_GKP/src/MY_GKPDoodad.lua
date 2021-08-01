@@ -357,9 +357,9 @@ function D.OnUpdateHeadName()
 				end
 				local fYDelta = 128
 				local nR, nG, nB, nA, bDarken = r, g, b, 255, false
-				if v.other then
-					bDarken = true
-				end
+				-- if v.other then
+				-- 	bDarken = true
+				-- end
 				local dwRecipeID = me and LIB.GetDoodadBookRecipeID(tar.dwTemplateID)
 				if dwRecipeID then
 					local dwBookID, dwSegmentID = LIB.RecipeToSegmentID(dwRecipeID)
