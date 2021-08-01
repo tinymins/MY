@@ -59,6 +59,9 @@ return {
 	['Unknown condition skill at line %d'] = '未知的條件招式名稱發生在第%d行',
 	['Unknown condition buff at line %d'] = '未知的條件氣勁名稱發生在第%d行',
 
+	['Copy inscription'] = '抄錄碑銘',
+	['Inscription * '] = '碑銘·',
+
 	['Restore formation of %d group: %s'         ] = '恢復第%d小隊陣眼[%s]。',
 	['Restore player marked as [%s]: %s'         ] = '恢復標記%s為[%s]。',
 	['You are not team leader, permission denied'] = '你不是隊長，無權操作隊伍。',

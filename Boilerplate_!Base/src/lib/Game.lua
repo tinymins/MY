@@ -4836,8 +4836,8 @@ local DOODAD_BOOK = setmetatable({}, {
 				local nCount = g_tTable.DoodadTemplate:GetRowCount()
 				for i = 2, nCount do
 					local row = g_tTable.DoodadTemplate:GetRow(i)
-					if row.szBarText == '³­Â¼±®Ãú' then
-						local szSegmentName = sub(row.szName, #'±®Ãú¡¤' + 1)
+					if row.szBarText == _L['Copy inscription'] then
+						local szSegmentName = sub(row.szName, len(_L['Inscription * ']) + 1)
 						local info = LIB.GetBookSegmentInfo(szSegmentName)
 						if info then
 							local dwRecipeID = BookID2GlobelRecipeID(info.dwBookID, info.dwSegmentID)
