@@ -153,7 +153,7 @@ function D.AutoSellItem(nNpcID, nShopID, bIgnoreGray)
 						bSell = true
 						szReason = _L['Specified']
 					end
-					if not bSell and item.nGenre == ITEM_GENRE.BOOK and me.IsBookMemorized(GlobelRecipeID2BookID(item.nBookID)) then
+					if not bSell and item.nGenre == ITEM_GENRE.BOOK and me.IsBookMemorized(LIB.RecipeToSegmentID(item.nBookID)) then
 						if O.bSellWhiteBook and item.nQuality == 1 then
 							bSell = true
 							szReason = _L['Read white book']

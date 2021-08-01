@@ -350,7 +350,7 @@ function D.IsItemDisplay(itemData, config)
 	if (config.bFilterBookRead or config.bFilterBookHave) and itemData.nGenre == ITEM_GENRE.BOOK then
 		local me = GetClientPlayer()
 		if config.bFilterBookRead then
-			local nBookID, nSegmentID = GlobelRecipeID2BookID(itemData.nBookID)
+			local nBookID, nSegmentID = LIB.RecipeToSegmentID(itemData.nBookID)
 			if me and me.IsBookMemorized(nBookID, nSegmentID) then
 				return false
 			end
@@ -382,7 +382,7 @@ function D.IsItemAutoPickup(itemData, config, doodad, bCanDialog)
 	if (config.bAutoPickupFilterBookRead or config.bAutoPickupFilterBookHave) and itemData.nGenre == ITEM_GENRE.BOOK then
 		local me = GetClientPlayer()
 		if config.bAutoPickupFilterBookRead then
-			local nBookID, nSegmentID = GlobelRecipeID2BookID(itemData.nBookID)
+			local nBookID, nSegmentID = LIB.RecipeToSegmentID(itemData.nBookID)
 			if me and me.IsBookMemorized(nBookID, nSegmentID) then
 				return false
 			end
@@ -1565,7 +1565,7 @@ local function IsItemDataSuitable(data)
 	end
 	local aKungfu = LIB.ForceIDToKungfuIDs(me.dwForceID)
 	if data.szType == 'BOOK' then
-		local nBookID, nSegmentID = GlobelRecipeID2BookID(data.item.nBookID)
+		local nBookID, nSegmentID = LIB.RecipeToSegmentID(data.item.nBookID)
 		if me.IsBookMemorized(nBookID, nSegmentID) then
 			return 'NOT_SUITABLE'
 		end

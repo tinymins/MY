@@ -161,8 +161,8 @@ function D.DoRawSearch(szSearch, fnProgress, fnCallback)
 			end
 		else
 			local row = g_tTable.BookSegment:GetRow(dwIndex)
-			local dwRecipeID = row and BookID2GlobelRecipeID(row.dwBookID, row.dwSegmentID)
-			if dwRecipeID and GlobelRecipeID2BookID(dwRecipeID) then
+			local dwRecipeID = row and LIB.SegmentToRecipeID(row.dwBookID, row.dwSegmentID)
+			if dwRecipeID and LIB.RecipeToSegmentID(dwRecipeID) then
 				local itemInfo = GetItemInfo(5, row.dwBookItemIndex)
 				if itemInfo and (
 					dwID == itemInfo.dwID or dwID == dwRecipeID
