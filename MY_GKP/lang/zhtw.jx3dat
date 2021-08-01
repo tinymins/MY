@@ -223,6 +223,8 @@ return {
 	['Quest items'] = '任務物品',
 	['Recent items'] = '最近採集物品',
 	['All other'] = '其它全部',
+	['(Read)'] = '（已閱讀）',
+	['(Not read)'] = '（未閱讀）',
 	['Customs (split by | )'] = '自定義（用|分隔）：',
 	['|'] = '｜',
 	['Tip: Enter the name of dead animals can be automatically Paoding!'] = '小提示：填入動物屍體名稱可以自動庖丁！',

@@ -341,6 +341,7 @@ function D.OnUpdateHeadName()
 	if not sha then
 		return
 	end
+	local me = GetClientPlayer()
 	local r, g, b = unpack(O.tNameColor)
 	sha:SetTriangleFan(GEOMETRY_TYPE.TEXT)
 	sha:ClearTriangleFanPoint()
@@ -354,13 +355,30 @@ function D.OnUpdateHeadName()
 				if tar.dwTemplateID == 3713 or tar.dwTemplateID == 3714 then
 					szName = Table_GetNpcTemplateName(1622)
 				end
-				local nR, nG, nB = r, g, b
+				local fYDelta = 128
+				local nR, nG, nB, nA, bDarken = r, g, b, 255, false
 				if v.other then
+					bDarken = true
+				end
+				local dwRecipeID = me and LIB.GetDoodadBookRecipeID(tar.dwTemplateID)
+				if dwRecipeID then
+					local dwBookID, dwSegmentID = LIB.RecipeToSegmentID(dwRecipeID)
+					if dwBookID and dwSegmentID then
+						if me.IsBookMemorized(dwBookID, dwSegmentID) then
+							bDarken = true
+							szName = szName .. _L['(Read)']
+						else
+							szName = szName .. _L['(Not read)']
+						end
+					end
+					fYDelta = 300
+				end
+				if bDarken then
 					nR = nR * 0.85
 					nG = nG * 0.85
 					nB = nB * 0.85
 				end
-				sha:AppendDoodadID(tar.dwID, nR, nG, nB, 255, 128, O.nNameFont, szName, 0, O.fNameScale)
+				sha:AppendDoodadID(tar.dwID, nR, nG, nB, nA, fYDelta, O.nNameFont, szName, 0, O.fNameScale)
 			end
 		end
 	end
@@ -522,6 +540,11 @@ end)
 LIB.RegisterEvent('QUEST_ACCEPTED', function()
 	if O.bQuestDoodad then
 		D.RescanNearby()
+	end
+end)
+LIB.RegisterEvent('SYS_MSG', function()
+	if arg0 == 'UI_OME_CRAFT_RESPOND' and arg1 == CRAFT_RESULT_CODE.SUCCESS then
+		D.bUpdateLabel = true
 	end
 end)
 LIB.RegisterInit('MY_GKPDoodad__BC', function()
