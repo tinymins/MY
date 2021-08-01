@@ -179,3 +179,35 @@ function LIB.NumberBaseN(n, b, digits)
 	until n == 0
 	return sign .. concat(t, '')
 end
+
+-- 物理地址 => 段地址 + 段内偏移
+function LIB.NumberToSegment(n, s)
+	-- (!(n & (n - 1)))
+	assert(IsNumber(s) and s > 0 and LIB.NumberBitAnd(s, s - 1) == 0, 'segment size must be a positive number and be power of 2')
+	if s == 0x20 and GlobelRecipeID2BookID then
+		local n, o = GlobelRecipeID2BookID(n)
+		return n - 1, o - 1
+	end
+	return n / s, n % s
+end
+
+-- 段地址 + 段内偏移 => 物理地址
+function LIB.SegmentToNumber(n, o, s)
+	-- (!(n & (n - 1)))
+	assert(IsNumber(s) and s > 0 and LIB.NumberBitAnd(s, s - 1) == 0, 'segment size must be a positive number and be power of 2')
+	if s == 0x20 and BookID2GlobelRecipeID then
+		return BookID2GlobelRecipeID(n + 1, o + 1)
+	end
+	return n * s + o
+end
+
+-- 游戏通用 “Recipe下标(基地址0)” 转 “段下标(基地址1)” + “段内下标(基地址1)”
+function LIB.RecipeToSegmentID(dwRecipeID)
+	local dwSegmentID, dwOffset = LIB.NumberToSegment(dwRecipeID, 0x20)
+	return dwSegmentID + 1, dwOffset + 1
+end
+
+-- 游戏通用 “段下标(基地址1)” + “段内下标(基地址1)” 转 “Recipe下标(基地址0)”
+function LIB.SegmentToRecipeID(dwSegmentID, dwOffset)
+	return LIB.SegmentToNumber(dwSegmentID - 1, dwOffset - 1, 0x20)
+end

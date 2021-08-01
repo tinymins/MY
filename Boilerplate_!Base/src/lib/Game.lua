@@ -2534,7 +2534,7 @@ function LIB.GetItemAmount(dwTabType, dwIndex, nBookID)
 		return
 	end
 	if nBookID then
-		local nBookID, nSegmentID = GlobelRecipeID2BookID(nBookID)
+		local nBookID, nSegmentID = LIB.RecipeToSegmentID(nBookID)
 		return me.GetItemAmount(dwTabType, dwIndex, nBookID, nSegmentID)
 	end
 	return me.GetItemAmount(dwTabType, dwIndex)
@@ -4180,7 +4180,7 @@ end
 
 function LIB.GetItemNameByItem(item)
 	if item.nGenre == ITEM_GENRE.BOOK then
-		local nBookID, nSegID = GlobelRecipeID2BookID(item.nBookID)
+		local nBookID, nSegID = LIB.RecipeToSegmentID(item.nBookID)
 		return Table_GetSegmentName(nBookID, nSegID) or g_tStrings.BOOK
 	end
 	return LIB.GetItemNameByUIID(item.nUiId)
@@ -4188,7 +4188,7 @@ end
 
 function LIB.GetItemNameByItemInfo(itemInfo, nBookInfo)
 	if itemInfo.nGenre == ITEM_GENRE.BOOK and nBookInfo then
-		local nBookID, nSegID = GlobelRecipeID2BookID(nBookInfo)
+		local nBookID, nSegID = LIB.RecipeToSegmentID(nBookInfo)
 		return Table_GetSegmentName(nBookID, nSegID) or g_tStrings.BOOK
 	end
 	return LIB.GetItemNameByUIID(itemInfo.nUiId)
@@ -4736,7 +4736,7 @@ local BOOK_SEGMENT_RECIPE = setmetatable({}, {
 					-- 	dwBookItemIndex = 7936, dwBookNumber = 2, dwPageCount = 6, nSort = 2, nSubSort = 1, nType = 1,
 					-- 	dwPageID_0 = 6, dwPageID_1 = 7, dwPageID_2 = 8, dwPageID_3 = 9, dwPageID_4 = 10, dwPageID_5 = 11, dwPageID_6 = 0, dwPageID_7 = 0, dwPageID_8 = 0, dwPageID_9 = 0
 					-- }
-					local dwRecipeID = BookID2GlobelRecipeID(row.dwBookID, row.dwSegmentID)
+					local dwRecipeID = LIB.SegmentToRecipeID(row.dwBookID, row.dwSegmentID)
 					-- Ì×Êé
 					local szBookName = LIB.TrimString(row.szBookName)
 					if not tBookName2RecipeID[szBookName] then
@@ -4789,7 +4789,7 @@ function LIB.GetBookSegmentInfo(...)
 			dwRecipeID = BOOK_SEGMENT_RECIPE('segment_name', LIB.TrimString(dwRecipeID))
 		end
 		if IsNumber(dwRecipeID) then
-			dwBookID, dwSegmentID = GlobelRecipeID2BookID(dwRecipeID)
+			dwBookID, dwSegmentID = LIB.RecipeToSegmentID(dwRecipeID)
 		end
 	else
 		dwBookID, dwSegmentID = ...
@@ -4812,7 +4812,7 @@ function LIB.GetBookAllSegmentInfo(arg0)
 	if aRecipeID then
 		local aSegmentInfo = {}
 		for _, dwRecipeID in ipairs(aRecipeID) do
-			local dwBookID, dwSegmentID = GlobelRecipeID2BookID(dwRecipeID)
+			local dwBookID, dwSegmentID = LIB.RecipeToSegmentID(dwRecipeID)
 			insert(aSegmentInfo, LIB.GetBookSegmentInfo(dwBookID, dwSegmentID))
 		end
 		return aSegmentInfo
@@ -4840,7 +4840,7 @@ local DOODAD_BOOK = setmetatable({}, {
 						local szSegmentName = sub(row.szName, len(_L['Inscription * ']) + 1)
 						local info = LIB.GetBookSegmentInfo(szSegmentName)
 						if info then
-							local dwRecipeID = BookID2GlobelRecipeID(info.dwBookID, info.dwSegmentID)
+							local dwRecipeID = LIB.SegmentToRecipeID(info.dwBookID, info.dwSegmentID)
 							tDoodadID2BookRecipe[row.nID] = dwRecipeID
 							tBookRecipe2DoodadID[dwRecipeID] = row.nID
 						end
@@ -4881,7 +4881,7 @@ function LIB.GetBookDoodadID(...)
 			dwRecipeID = BOOK_SEGMENT_RECIPE('segment_name', LIB.TrimString(dwRecipeID))
 		end
 	else
-		dwRecipeID = BookID2GlobelRecipeID(...)
+		dwRecipeID = LIB.SegmentToRecipeID(...)
 	end
 	if IsNumber(dwRecipeID) then
 		return DOODAD_BOOK('book-doodad', dwRecipeID)

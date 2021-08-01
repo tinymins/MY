@@ -453,7 +453,7 @@ function LIB.OutputDoodadTip(Rect, dwDoodadID, szExtraXml)
 
 				if recipe.nCraftType == ALL_CRAFT_TYPE.READ then
 					if recipe.dwProfessionIDExt ~= 0 then
-						local nBookID, nSegmentID = GlobelRecipeID2BookID(dwRecipeID)
+						local nBookID, nSegmentID = LIB.RecipeToSegmentID(dwRecipeID)
 						if player.IsBookMemorized(nBookID, nSegmentID) then
 							insert(t, GetFormatText(g_tStrings.TIP_ALREADY_READ, 108))
 						else
