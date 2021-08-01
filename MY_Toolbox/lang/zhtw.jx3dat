@@ -418,6 +418,7 @@ return {
     ['Only item can be draged in'] = '動態物品欄只能放入物品',
 
     ['MY_AutoMemorizeBook'] = '其它',
+    ['Auto memorize book'] = '自動閱讀',
     ['Press SHIFT for temporary disable'] = '打開界面時按住SHIFT鍵可臨時禁用',
     ['Auto memorize book has been disabled due to SHIFT key pressed.'] = '你按住了Shift鍵，自動閱讀被禁用。',
 

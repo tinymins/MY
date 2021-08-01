@@ -73,7 +73,7 @@ function D.Hook()
 	UI(frame):Append('WndCheckBox', {
 		name = 'MY_AutoMemorizeBook',
 		x = 50, y = 482,
-		text = _L['MY_AutoMemorizeBook'],
+		text = _L['Auto memorize book'],
 		checked = O.bEnable,
 		oncheck = function() O.bEnable = not O.bEnable end,
 	})
