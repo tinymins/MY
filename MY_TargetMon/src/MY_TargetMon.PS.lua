@@ -160,12 +160,11 @@ local function DrawDetail(ui)
 			or (mon.name and wfind(mon.name, l_search))
 			or (mon.longAlias and wfind(mon.longAlias, l_search))
 			or (mon.shortAlias and wfind(mon.shortAlias, l_search)) then
-				list:ListBox(
-					'insert',
-					mon.name or mon.id,
-					mon,
-					{ mon = mon }
-				)
+				list:ListBox('insert', {
+					text = mon.name or mon.id,
+					id = mon,
+					data = { mon = mon },
+				})
 			end
 		end
 	end
@@ -185,13 +184,12 @@ local function DrawDetail(ui)
 				if index then
 					D.MoveMonitor(l_config, mon, index - #l_config.monitors)
 				end
-				list:ListBox(
-					'insert',
-					mon.name or mon.id,
-					mon,
-					{ mon = mon },
-					index
-				)
+				list:ListBox('insert', {
+					text = mon.name or mon.id,
+					id = mon,
+					data = { mon = mon },
+					index = index,
+				})
 				uiSearch:Text('')
 			end
 		end, function() end, function() end, nil, l_search or '')
