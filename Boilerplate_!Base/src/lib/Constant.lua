@@ -306,7 +306,10 @@ LIB.CONSTANT = setmetatable({}, {
 			[60045] = true, -- 辉天堑铁库牢房的不知道什么东西
 		},
 		DOODAD_NAME = {},
-		DOODAD_NAME_FIX = {},
+		DOODAD_NAME_FIX = {
+			[3713] = 1, -- 遗体
+			[3714] = 1, -- 遗体
+		},
 		KUNGFU_LIST = (function()
 			-- skillid, uitex, frame
 			local KUNGFU_LIST = {
