@@ -103,68 +103,16 @@ function D.Open(dwPetIndex)
 	UI(UI.LookupBrowser(szKey)):Size(D.OnWebSizeChange)
 end
 
-function D.OnPetItemLButtonClick()
-	local name = this:GetName()
-	if name == 'Handle_Prefer' then
-		if O.bEnable and this.tPet and not IsCtrlKeyDown() and not IsAltKeyDown() and this:Lookup('Image_PreferSelect'):IsVisible() then
-			D.Open(this.tPet.dwPetIndex)
-			return
-		end
-	elseif name == 'Box_PetItem' or name:find('Box_MedalPet_') then
-		if O.bEnable and this.tPet and not IsCtrlKeyDown() and not IsAltKeyDown() and this:IsObjectSelected() then
-			D.Open(this.tPet.dwPetIndex)
-			return
-		end
-	end
-	return UI.FormatWMsgRet(false, true)
-end
-
-function D.OnPetAppendItem(res, hList)
-	local hItem = res[1]
-	if not hItem then
-		return
-	end
-	LIB.DelayCall(function()
-		local boxPet = hItem:IsValid() and hItem:Lookup('Box_PetItem')
-		if not boxPet then
-			return
-		end
-		boxPet:RegisterEvent(ITEM_EVENT.LBUTTONCLICK)
-		UnhookTableFunc(boxPet, 'OnItemLButtonClick', D.OnPetItemLButtonClick)
-		HookTableFunc(boxPet, 'OnItemLButtonClick', D.OnPetItemLButtonClick)
-	end)
-end
-
-function D.OnPetAppendList(res, hTotal)
-	local hGroup = res[1]
-	if not hGroup then
-		return
-	end
-	local hList = hGroup and hGroup:Lookup((hGroup:GetName():gsub('Handle_Pets', 'Handle_List')))
-	if not hList then
-		return
-	end
-	for i = 0, hList:GetItemCount() - 1 do
-		D.OnPetAppendItem({hList:Lookup(i)}, hList)
-	end
-	UnhookTableFunc(hList, 'AppendItemFromIni', D.OnPetAppendItem)
-	HookTableFunc(hList, 'AppendItemFromIni', D.OnPetAppendItem, { bAfterOrigin = true, bPassReturn = true })
-end
-
-function D.HookPetHandle(h)
-	if not h then
-		return
-	end
-	for i = 0, h:GetItemCount() - 1 do
-		D.OnPetAppendList({h:Lookup(i)}, h)
-	end
-	UnhookTableFunc(h, 'AppendItemFromIni', D.OnPetAppendList)
-	HookTableFunc(h, 'AppendItemFromIni', D.OnPetAppendList, { bAfterOrigin = true, bPassReturn = true })
-end
-
 function D.HookPetFrame(frame)
 	local hMedalPets = frame:Lookup('PageSet_All/Page_MedalCollected/Wnd_MedalCollect', 'Handle_MedalPets')
 	if hMedalPets then
+		local function OnPetItemLButtonClick()
+			if O.bEnable and this.tPet and not IsCtrlKeyDown() and not IsAltKeyDown() and this:IsObjectSelected() then
+				D.Open(this.tPet.dwPetIndex)
+				return
+			end
+			return UI.FormatWMsgRet(false, true)
+		end
 		for nNum = 1, 10 do
 			local hMedal = hMedalPets:Lookup('Handle_MedalPet_' .. nNum)
 			if hMedal then
@@ -172,8 +120,8 @@ function D.HookPetFrame(frame)
 					local boxPet = hMedal:Lookup('Box_MedalPet_' .. nNum .. '_' .. nIndex)
 					if boxPet then
 						boxPet:RegisterEvent(ITEM_EVENT.LBUTTONCLICK)
-						UnhookTableFunc(boxPet, 'OnItemLButtonClick', D.OnPetItemLButtonClick)
-						HookTableFunc(boxPet, 'OnItemLButtonClick', D.OnPetItemLButtonClick, { bAfterOrigin = true, bPassReturn = true, bHookReturn = true })
+						UnhookTableFunc(boxPet, 'OnItemLButtonClick', OnPetItemLButtonClick)
+						HookTableFunc(boxPet, 'OnItemLButtonClick', OnPetItemLButtonClick, { bAfterOrigin = true, bPassReturn = true, bHookReturn = true })
 					end
 				end
 			end
@@ -181,14 +129,66 @@ function D.HookPetFrame(frame)
 	end
 	local hPreferList = frame:Lookup('PageSet_All/Page_MyPet/WndScroll_Pets/WndContainer_Pets/Wnd_Prefer', '')
 	if hPreferList then
+		local function OnPetItemLButtonClick()
+			if O.bEnable and this.tPet and not IsCtrlKeyDown() and not IsAltKeyDown() and this:Lookup('Image_PreferSelect'):IsVisible() then
+				D.Open(this.tPet.dwPetIndex)
+				return
+			end
+			return UI.FormatWMsgRet(false, true)
+		end
 		for i = 0, hPreferList:GetItemCount() - 1 do
 			local hPet = hPreferList:Lookup(i)
 			hPet:RegisterEvent(ITEM_EVENT.LBUTTONCLICK)
-			UnhookTableFunc(hPet, 'OnItemLButtonClick', D.OnPetItemLButtonClick)
-			HookTableFunc(hPet, 'OnItemLButtonClick', D.OnPetItemLButtonClick, { bAfterOrigin = true, bPassReturn = true, bHookReturn = true })
+			UnhookTableFunc(hPet, 'OnItemLButtonClick', OnPetItemLButtonClick)
+			HookTableFunc(hPet, 'OnItemLButtonClick', OnPetItemLButtonClick, { bAfterOrigin = true, bPassReturn = true, bHookReturn = true })
 		end
 	end
-	D.HookPetHandle(frame:Lookup('PageSet_All/Page_MyPet/WndScroll_Pets/WndContainer_Pets/Wnd_Pets', ''))
+
+	local hPets = frame:Lookup('PageSet_All/Page_MyPet/WndScroll_Pets/WndContainer_Pets/Wnd_Pets', '')
+	if hPets then
+		local function OnPetAppendList(res, hTotal)
+			local hGroup = res[1]
+			if not hGroup then
+				return
+			end
+			local hList = hGroup and hGroup:Lookup((hGroup:GetName():gsub('Handle_Pets', 'Handle_List')))
+			if not hList then
+				return
+			end
+			local function OnPetItemLButtonClick()
+				if O.bEnable and this.tPet and not IsCtrlKeyDown() and not IsAltKeyDown() and this:IsObjectSelected() then
+					D.Open(this.tPet.dwPetIndex)
+					return
+				end
+				return UI.FormatWMsgRet(false, true)
+			end
+			local function OnPetAppendItem(res, hList)
+				local hItem = res[1]
+				if not hItem then
+					return
+				end
+				LIB.DelayCall(function()
+					local boxPet = hItem:IsValid() and hItem:Lookup('Box_PetItem')
+					if not boxPet then
+						return
+					end
+					boxPet:RegisterEvent(ITEM_EVENT.LBUTTONCLICK)
+					UnhookTableFunc(boxPet, 'OnItemLButtonClick', OnPetItemLButtonClick)
+					HookTableFunc(boxPet, 'OnItemLButtonClick', OnPetItemLButtonClick)
+				end)
+			end
+			for i = 0, hList:GetItemCount() - 1 do
+				OnPetAppendItem({hList:Lookup(i)}, hList)
+			end
+			UnhookTableFunc(hList, 'AppendItemFromIni', OnPetAppendItem)
+			HookTableFunc(hList, 'AppendItemFromIni', OnPetAppendItem, { bAfterOrigin = true, bPassReturn = true })
+		end
+		for i = 0, hPets:GetItemCount() - 1 do
+			OnPetAppendList({hPets:Lookup(i)}, hPets)
+		end
+		UnhookTableFunc(hPets, 'AppendItemFromIni', OnPetAppendList)
+		HookTableFunc(hPets, 'AppendItemFromIni', OnPetAppendList, { bAfterOrigin = true, bPassReturn = true })
+	end
 end
 
 LIB.RegisterInit('MY_PetWiki', function()
