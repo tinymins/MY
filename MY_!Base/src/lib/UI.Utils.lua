@@ -125,6 +125,96 @@ function UI.LookupFrame(szName)
 	end
 end
 
+do
+local ITEM_COUNT = {}
+local HOOK_BEFORE = setmetatable({}, { __mode = 'v' })
+local HOOK_AFTER = setmetatable({}, { __mode = 'v' })
+
+function UI.HookHandleAppend(hList, fnOnAppendItem)
+	-- 注销旧的 HOOK 函数
+	if HOOK_BEFORE[hList] then
+		UnhookTableFunc(hList, 'AppendItemFromIni'   , HOOK_BEFORE[hList])
+		UnhookTableFunc(hList, 'AppendItemFromData'  , HOOK_BEFORE[hList])
+		UnhookTableFunc(hList, 'AppendItemFromString', HOOK_BEFORE[hList])
+	end
+	if HOOK_AFTER[hList] then
+		UnhookTableFunc(hList, 'AppendItemFromIni'   , HOOK_AFTER[hList])
+		UnhookTableFunc(hList, 'AppendItemFromData'  , HOOK_AFTER[hList])
+		UnhookTableFunc(hList, 'AppendItemFromString', HOOK_AFTER[hList])
+	end
+
+	-- 生成新的 HOOK 函数
+	local function BeforeAppendItem(hList)
+		ITEM_COUNT[hList] = hList:GetItemCount()
+	end
+	HOOK_BEFORE[hList] = BeforeAppendItem
+
+	local function AfterAppendItem(hList)
+		local nCount = ITEM_COUNT[hList]
+		if not nCount then
+			return
+		end
+		ITEM_COUNT[hList] = nil
+		for i = nCount, hList:GetItemCount() - 1 do
+			local hItem = hList:Lookup(i)
+			fnOnAppendItem(hList, hItem)
+		end
+	end
+	HOOK_AFTER[hList] = AfterAppendItem
+
+	-- 应用 HOOK 函数
+	ITEM_COUNT[hList] = 0
+	AfterAppendItem(hList)
+	HookTableFunc(hList, 'AppendItemFromIni'   , BeforeAppendItem, { bAfterOrigin = false })
+	HookTableFunc(hList, 'AppendItemFromIni'   , AfterAppendItem , { bAfterOrigin = true  })
+	HookTableFunc(hList, 'AppendItemFromData'  , BeforeAppendItem, { bAfterOrigin = false })
+	HookTableFunc(hList, 'AppendItemFromData'  , AfterAppendItem , { bAfterOrigin = true  })
+	HookTableFunc(hList, 'AppendItemFromString', BeforeAppendItem, { bAfterOrigin = false })
+	HookTableFunc(hList, 'AppendItemFromString', AfterAppendItem , { bAfterOrigin = true  })
+end
+end
+
+do
+local ITEM_COUNT = {}
+local HOOK_BEFORE = setmetatable({}, { __mode = 'v' })
+local HOOK_AFTER = setmetatable({}, { __mode = 'v' })
+
+function UI.HookContainerAppend(hList, fnOnAppendContent)
+	-- 注销旧的 HOOK 函数
+	if HOOK_BEFORE[hList] then
+		UnhookTableFunc(hList, 'AppendContentFromIni'   , HOOK_BEFORE[hList])
+	end
+	if HOOK_AFTER[hList] then
+		UnhookTableFunc(hList, 'AppendContentFromIni'   , HOOK_AFTER[hList])
+	end
+
+	-- 生成新的 HOOK 函数
+	local function BeforeAppendContent(hList)
+		ITEM_COUNT[hList] = hList:GetAllContentCount()
+	end
+	HOOK_BEFORE[hList] = BeforeAppendContent
+
+	local function AfterAppendContent(hList)
+		local nCount = ITEM_COUNT[hList]
+		if not nCount then
+			return
+		end
+		ITEM_COUNT[hList] = nil
+		for i = nCount, hList:GetAllContentCount() - 1 do
+			local hContent = hList:LookupContent(i)
+			fnOnAppendContent(hList, hContent)
+		end
+	end
+	HOOK_AFTER[hList] = AfterAppendContent
+
+	-- 应用 HOOK 函数
+	ITEM_COUNT[hList] = 0
+	AfterAppendContent(hList)
+	HookTableFunc(hList, 'AppendContentFromIni'   , BeforeAppendContent, { bAfterOrigin = false })
+	HookTableFunc(hList, 'AppendContentFromIni'   , AfterAppendContent , { bAfterOrigin = true  })
+end
+end
+
 -- FORMAT_WMSG_RET
 function UI.FormatWMsgRet(stop, callFrame)
 	local ret = 0
