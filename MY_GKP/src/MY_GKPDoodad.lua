@@ -658,13 +658,14 @@ LIB.RegisterEvent('HELP_EVENT', function()
 	end
 end)
 LIB.RegisterEvent('QUEST_ACCEPTED', function()
-	if O.bQuestDoodad then
+	if D.bReady and O.bQuestDoodad then
 		D.RescanNearby()
 	end
 end)
 LIB.RegisterEvent('SYS_MSG', function()
-	if arg0 == 'UI_OME_CRAFT_RESPOND' and arg1 == CRAFT_RESULT_CODE.SUCCESS then
-		D.bUpdateLabel = true
+	if arg0 == 'UI_OME_CRAFT_RESPOND' and arg1 == CRAFT_RESULT_CODE.SUCCESS
+	and D.bReady and (O.bReadInscriptionDoodad or O.bUnreadInscriptionDoodad) then
+		D.RescanNearby()
 	end
 end)
 LIB.RegisterInit('MY_GKPDoodad__BC', function()
