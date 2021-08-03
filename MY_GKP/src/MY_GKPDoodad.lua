@@ -175,7 +175,7 @@ end
 
 local D = {
 	-- 草药、矿石列表
-	tCraft = {
+	aCraft = {
 		1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009,
 		1010, 1011, 1012, 1015, 1016, 1017, 1018, 1019, 2641,
 		2642, 2643, 3321, 3358, 3359, 3360, 3361, 4227, 4228,
@@ -184,11 +184,17 @@ local D = {
 		1020, 1021, 1022, 1023, 1024, 1025, 1027, 2644, 2645,
 		4229, 4230, 5661, 5662,
 	},
+	tCraft = {},
 	tCustom = {}, -- 自定义列表
 	tRecent = {}, -- 最近采集的东西、自动继续采集
 	tDoodad = {}, -- 待处理的 doodad 列表
 	nToLoot = 0,  -- 待拾取处理数量（用于修复判断）
+	dwUpdateMiniFlagTime = 0, -- 下次更新小地图位置时间戳
+	dwAutoInteractDoodadTime = 0, -- 下次自动交互物件时间戳
 }
+for _, v in ipairs(D.aCraft) do
+	D.tCraft[v] = true
+end
 
 function D.IsCustomDoodad(doodad)
 	if O.bCustom and D.tCustom[doodad.szName] then
@@ -218,32 +224,47 @@ function D.TryAdd(dwID, bDelay)
 	local doodad = GetDoodad(dwID)
 	if doodad then
 		local data, me = nil, GetClientPlayer()
-		if doodad.nKind == DOODAD_KIND.CORPSE or doodad.nKind == DOODAD_KIND.NPCDROP then
-			if O.bOpenLoot and doodad.CanLoot(me.dwID) then
-				data = { loot = true }
-			elseif D.IsCustomDoodad(doodad) then
-				data = { craft = true }
-			elseif D.IsRecentDoodad(doodad) then
-				data = { recent = true }
-			end
-		elseif O.bQuestDoodad and (doodad.dwTemplateID == 3713 or doodad.dwTemplateID == 3714) then
-			data = { craft = true }
-		elseif O.tCraft[doodad.dwTemplateID] then
-			data = { craft = true }
-		elseif D.IsCustomDoodad(doodad) then
-			data = { craft = true }
-		elseif D.IsRecentDoodad(doodad) then
-			data = { recent = true }
+		local ruleType, actionType = nil, nil
+		if D.tCraft[doodad.dwTemplateID] then
+			ruleType = 'craft'
+			actionType = 'craft'
+		elseif doodad.dwTemplateID == 3713 -- 遗体
+			or doodad.dwTemplateID == 3714 -- 遗体
+			or doodad.dwTemplateID == 4733 -- 恶人谷菌箱
+			or doodad.dwTemplateID == 4734 -- 浩气盟菌箱
+		then
+			ruleType = 'quest'
+			actionType = 'craft'
 		elseif doodad.HaveQuest(me.dwID) then
-			if O.bQuestDoodad then
-				data = { quest = true }
+			ruleType = 'quest'
+			actionType = 'quest'
+		elseif doodad.nKind == DOODAD_KIND.CORPSE or doodad.nKind == DOODAD_KIND.NPCDROP then
+			ruleType = 'corpse'
+			if doodad.CanLoot(me.dwID) then
+				actionType = 'loot'
+			else
+				actionType = 'craft'
 			end
-		elseif doodad.dwTemplateID == 4733 or doodad.dwTemplateID == 4734 and O.bQuestDoodad then
-			data = { craft = true }
-		elseif O.bAllDoodad and CanSelectDoodad(doodad.dwID) then
-			data = { other = true }
+		elseif CanSelectDoodad(doodad.dwID) then
+			ruleType = 'other'
+			actionType = 'other'
+		end
+
+		if (ruleType == 'corpse' and actionType == 'loot' and O.bOpenLoot)
+		or (ruleType == 'quest' and O.bQuestDoodad)
+		or (ruleType == 'craft' and O.tCraft[doodad.dwTemplateID])
+		then
+			data = { ruleType = ruleType, actionType = actionType }
+		elseif D.IsCustomDoodad(doodad) then
+			data = { ruleType = 'custom', actionType = actionType }
+		elseif D.IsRecentDoodad(doodad) then
+			data = { ruleType = 'recent', actionType = actionType }
+		elseif ruleType == 'other' and O.bAllDoodad then
+			data = { ruleType = ruleType, actionType = actionType }
 		end
 		if data then
+			local tpl = GetDoodadTemplate(doodad.dwTemplateID)
+			data.dwCraftID = tpl.dwCraftID
 			D.tDoodad[dwID] = data
 			D.bUpdateLabel = true
 		end
@@ -309,84 +330,73 @@ function D.CheckShowName()
 	local bShowName = O.bShowName and not IsShielded()
 	if bShowName and not D.pLabel then
 		D.pLabel = hName:AppendItemFromIni(INI_SHADOW, 'Shadow', 'Shadow_Name')
-		LIB.BreatheCall('MY_GKPDoodad#HeadName', function()
+		LIB.BreatheCall('MY_GKPDoodad__HeadName', function()
 			if D.bUpdateLabel then
 				D.bUpdateLabel = false
-				D.OnUpdateHeadName()
+				D.UpdateHeadName()
 			end
 		end)
 		D.bUpdateLabel = true
 	elseif not bShowName and D.pLabel then
 		hName:Clear()
 		D.pLabel = nil
-		LIB.BreatheCall('MY_GKPDoodad#HeadName', false)
+		LIB.BreatheCall('MY_GKPDoodad__HeadName', false)
 	end
-end
-
--- find & get opened dooad ID
-function D.GetOpenDoodadID()
-	local dwID = D.dwOpenID
-	if dwID then
-		D.dwOpenID = nil
-	end
-	return dwID
 end
 
 -------------------------------------
 -- 事件处理
 -------------------------------------
 -- head name
-function D.OnUpdateHeadName()
+function D.UpdateHeadName()
 	local sha = D.pLabel
 	if not sha then
 		return
 	end
 	local me = GetClientPlayer()
+	if not me then
+		return
+	end
 	local r, g, b = unpack(O.tNameColor)
 	sha:SetTriangleFan(GEOMETRY_TYPE.TEXT)
 	sha:ClearTriangleFanPoint()
 	for k, v in pairs(D.tDoodad) do
-		if not v.loot then
-			local tar = GetDoodad(k)
-			if not tar or (v.quest and not tar.HaveQuest(GetClientPlayer().dwID)) then
-				D.Remove(k)
-			else
-				local szName = tar.szName
-				if tar.dwTemplateID == 3713 or tar.dwTemplateID == 3714 then
-					szName = Table_GetNpcTemplateName(1622)
-				end
-				local fYDelta = 128
-				local nR, nG, nB, nA, bDarken = r, g, b, 255, false
-				-- if v.other then
-				-- 	bDarken = true
-				-- end
-				local dwRecipeID = me and LIB.GetDoodadBookRecipeID(tar.dwTemplateID)
-				if dwRecipeID then
-					local dwBookID, dwSegmentID = LIB.RecipeToSegmentID(dwRecipeID)
-					if dwBookID and dwSegmentID then
-						if me.IsBookMemorized(dwBookID, dwSegmentID) then
-							bDarken = true
-							szName = szName .. _L['(Read)']
-						else
-							szName = szName .. _L['(Not read)']
-						end
-					end
-					fYDelta = 300
-				end
-				if bDarken then
-					nR = nR * 0.85
-					nG = nG * 0.85
-					nB = nB * 0.85
-				end
-				sha:AppendDoodadID(tar.dwID, nR, nG, nB, nA, fYDelta, O.nNameFont, szName, 0, O.fNameScale)
+		local tar = GetDoodad(k)
+		if v.actionType ~= 'loot' then
+			local szName = LIB.GetObjectName(TARGET.DOODAD, k, 'never') or ''
+			local fYDelta = 128
+			local nR, nG, nB, nA, bDarken = r, g, b, 255, false
+			-- 将不可自动交互的颜色变暗
+			if v.ruleType == 'other' then
+				bDarken = true
 			end
+			local dwRecipeID = LIB.GetDoodadBookRecipeID(tar.dwTemplateID)
+			if dwRecipeID then
+				local dwBookID, dwSegmentID = LIB.RecipeToSegmentID(dwRecipeID)
+				if dwBookID and dwSegmentID then
+					if me.IsBookMemorized(dwBookID, dwSegmentID) then
+						bDarken = true
+						szName = szName .. _L['(Read)']
+					else
+						bDarken = false
+						szName = szName .. _L['(Not read)']
+					end
+				end
+				fYDelta = 300
+			end
+			if bDarken then
+				nR = nR * 0.85
+				nG = nG * 0.85
+				nB = nB * 0.85
+			end
+			sha:AppendDoodadID(tar.dwID, nR, nG, nB, nA, fYDelta, O.nNameFont, szName, 0, O.fNameScale)
 		end
 	end
 	sha:Show()
 end
 
 -- auto interact
-function D.OnAutoDoodad()
+function D.AutoInteractDoodad()
 	local me = GetClientPlayer()
 	-- auto interact
 	if not me or LIB.GetOTActionState(me) ~= CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_IDLE
@@ -397,23 +407,29 @@ function D.OnAutoDoodad()
 	end
 	for k, v in pairs(D.tDoodad) do
 		local doodad, bIntr, bOpen = GetDoodad(k), false, false
-		if not doodad then
-			D.Remove(k)
-		elseif doodad.CanDialog(me) then -- 若存在却不能对话只简单保留
-			if v.loot then -- 尸体只摸一次
+		if doodad and doodad.CanDialog(me) then -- 若存在却不能对话只简单保留
+			if v.actionType == 'loot' then -- 掉落是否可以打开
 				bOpen = (not me.bFightState or O.bOpenLootEvenFight) and doodad.CanLoot(me.dwID)
-				if bOpen then
-					D.dwOpenID = k
-				end
-			elseif v.craft or doodad.HaveQuest(me.dwID) then -- 任务和普通道具尝试 5 次
+			elseif (v.ruleType == 'quest' and v.actionType == 'quest')
+				or (v.ruleType ~= 'other' and v.actionType == 'craft')
+			then -- 任务和普通道具尝试 5 次
 				bIntr = (not me.bFightState or O.bInteractEvenFight) and not me.bOnHorse and IsAutoInteract()
 				-- 宴席只能吃队友的
 				if doodad.dwOwnerID ~= 0 and IsPlayer(doodad.dwOwnerID) and not LIB.IsParty(doodad.dwOwnerID) then
 					bIntr = false
 				end
-			elseif v.recent then -- 最近采集的
+				if bIntr then
+					if v.actionCount >= 5 then
+						bIntr = false
+						v.actionType = 'other'
+						D.bUpdateLabel = true
+					else
+						v.actionCount = (v.actionCount or 0) + 1
+					end
+				end
+			elseif v.ruleType == 'recent' then -- 最近采集的
 				bIntr = true
-				-- 从最近采集移除、意味着如果玩家打断这次采集就不会自动继续采集
+				-- 从最近采集移除，意味着如果玩家打断这次采集就不会自动继续采集
 				D.tRecent[doodad.dwTemplateID] = nil
 				for dwID, _ in pairs(D.tDoodad) do
 					local d = GetDoodad(dwID)
@@ -429,14 +445,21 @@ function D.OnAutoDoodad()
 			--[[#DEBUG BEGIN]]
 			LIB.Debug(_L['MY_GKPDoodad'], 'Auto open [' .. doodad.szName .. '].', DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
-			LIB.BreatheCall('AutoDoodad', 500)
+			-- 掉落只摸一次
+			D.dwOpenDoodadID = k
+			v.actionType = 'other'
+			D.bUpdateLabel = true
+			D.dwAutoInteractDoodadTime = GetTime() + 500
+			--[[#DEBUG BEGIN]]
+			LIB.Debug(_L['MY_GKPDoodad'], 'Auto open [' .. doodad.szName .. '].', DEBUG_LEVEL.LOG)
+			--[[#DEBUG END]]
 			return LIB.OpenDoodad(me, doodad)
 		end
 		if bIntr then
 			--[[#DEBUG BEGIN]]
 			LIB.Debug(_L['MY_GKPDoodad'], 'Auto interact [' .. doodad.szName .. '].', DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
-			LIB.BreatheCall('AutoDoodad', 500)
+			D.dwAutoInteractDoodadTime = GetTime() + 500
 			return LIB.InteractDoodad(k)
 		end
 	end
@@ -451,22 +474,21 @@ end
 
 -- open doodad (loot)
 function D.OnOpenDoodad(dwID)
-	-- 摸尸体且开了插件拾取框 可以安全的起身
-	if D.tDoodad[dwID] and D.tDoodad[dwID].loot and MY_GKPLoot.IsEnabled() then
-		LIB.DelayCall('MY_GKPDoodad__OnOpenDoodad', 150, D.CloseLootWindow)
-	end
-	D.Remove(dwID) -- 从列表删除
 	local doodad = GetDoodad(dwID)
-	if doodad then
-		if D.IsCustomDoodad(doodad) then --庖丁
-			D.tDoodad[dwID] = { craft = true }
-			D.bUpdateLabel = true
-		elseif D.IsRecentDoodad(doodad) then
-			D.tDoodad[dwID] = { recent = true }
-			D.bUpdateLabel = true
+	local v = D.tDoodad[dwID]
+	if v then
+		-- 摸掉落且开了插件拾取框 可以安全的起身
+		if v.actionType == 'loot' and MY_GKPLoot.IsEnabled() then
+			LIB.DelayCall('MY_GKPDoodad__OnOpenDoodad', 150, D.CloseLootWindow)
 		end
+		-- 从列表删除
+		D.Remove(dwID)
 	end
-	LIB.Debug(_L['MY_GKPDoodad'], 'OnOpenDoodad [' .. (doodad and doodad.szName or dwID) .. ']', DEBUG_LEVEL.LOG)
+	-- 如果是自定义物品、或最近采集物品，需要继续加入该物品
+	if doodad and (D.IsCustomDoodad(doodad) or D.IsRecentDoodad(doodad)) then
+		D.TryAdd(dwID)
+	end
+	LIB.Debug(_L['MY_GKPDoodad'], 'OnOpenDoodad [' .. LIB.GetObjectName(TARGET.DOODAD, dwID, 'always') .. ']', DEBUG_LEVEL.LOG)
 end
 
 -- save manual doodad
@@ -493,7 +515,7 @@ function D.OnLootDoodad()
 end
 
 -- mini flag
-function D.OnUpdateMiniFlag()
+function D.UpdateMiniFlag()
 	if not O.bMiniFlag or IsShielded() then
 		return
 	end
@@ -502,23 +524,40 @@ function D.OnUpdateMiniFlag()
 		return
 	end
 	for k, v in pairs(D.tDoodad) do
-		if not v.loot then
-			local tar = GetDoodad(k)
-			if not tar or (v.quest and not tar.HaveQuest(me.dwID)) then
-				D.Remove(k)
-			else
-				local dwType, nF1, nF2 = 5, 169, 48
-				local tpl = GetDoodadTemplate(tar.dwTemplateID)
-				if v.quest then
-					nF1 = 114
-				elseif tpl.dwCraftID == CONSTANT.CRAFT_TYPE.MINING then	-- 采金类
-					nF1, nF2 = 16, 47
-				elseif tpl.dwCraftID == CONSTANT.CRAFT_TYPE.HERBALISM then	-- 神农类
-					nF1 = 2
-				end
-				LIB.UpdateMiniFlag(dwType, tar, nF1, nF2)
+		if v.actionType ~= 'loot' then
+			local doodad = GetDoodad(k)
+			local dwType, nF1, nF2 = 5, 169, 48
+			if v.ruleType == 'quest' then
+				nF1 = 114
+			elseif v.dwCraftID == CONSTANT.CRAFT_TYPE.MINING then -- 采金类
+				nF1, nF2 = 16, 47
+			elseif v.dwCraftID == CONSTANT.CRAFT_TYPE.HERBALISM then -- 神农类
+				nF1 = 2
 			end
+			LIB.UpdateMiniFlag(dwType, doodad, nF1, nF2)
 		end
+	end
+end
+
+function D.OnBreatheCall()
+	local me = GetClientPlayer()
+	if not me then
+		return
+	end
+	for k, v in pairs(D.tDoodad) do
+		local doodad = GetDoodad(k)
+		if not doodad
+		or (v.ruleType == 'quest' and v.actionType == 'quest' and not doodad.HaveQuest(me.dwID)) then
+			D.Remove(k)
+		end
+	end
+	local dwTime = GetTime()
+	if dwTime >= D.dwAutoInteractDoodadTime then
+		D.AutoInteractDoodad()
+	end
+	if dwTime >= D.dwUpdateMiniFlagTime then
+		D.UpdateMiniFlag()
+		D.dwUpdateMiniFlagTime = dwTime + 500
 	end
 end
 
@@ -531,9 +570,10 @@ LIB.RegisterEvent('DOODAD_LEAVE_SCENE', function() D.Remove(arg0) end)
 LIB.RegisterEvent('OPEN_DOODAD', D.OnLootDoodad)
 LIB.RegisterEvent('HELP_EVENT', function()
 	if arg0 == 'OnOpenpanel' and arg1 == 'LOOT' and O.bOpenLoot then
-		local dwOpenID =  D.GetOpenDoodadID()
-		if dwOpenID then
-			D.OnOpenDoodad(dwOpenID)
+		local dwOpenDoodadID =  D.dwOpenDoodadID
+		if dwOpenDoodadID then
+			D.dwOpenDoodadID = nil
+			D.OnOpenDoodad(dwOpenDoodadID)
 		end
 	end
 end)
@@ -548,12 +588,10 @@ LIB.RegisterEvent('SYS_MSG', function()
 	end
 end)
 LIB.RegisterInit('MY_GKPDoodad__BC', function()
-	LIB.BreatheCall('MY_GKPDoodad__AutoDoodad', D.OnAutoDoodad)
-	LIB.BreatheCall('MY_GKPDoodad__UpdateMiniFlag', D.OnUpdateMiniFlag, 500)
+	LIB.BreatheCall('MY_GKPDoodad', D.OnBreatheCall)
 end)
 LIB.RegisterExit('MY_GKPDoodad__BC', function()
-	LIB.BreatheCall('MY_GKPDoodad__AutoDoodad', false)
-	LIB.BreatheCall('MY_GKPDoodad__UpdateMiniFlag', false)
+	LIB.BreatheCall('MY_GKPDoodad', false)
 end)
 
 
@@ -691,7 +729,7 @@ function PS.OnPanelActive(frame)
 
 	-- craft
 	nX, nY = X + 10, nY + nLineHeightM
-	for _, v in ipairs(D.tCraft) do
+	for _, v in ipairs(D.aCraft) do
 		if v == 0 then
 			nY = nY + 8
 			if nX ~= 10 then
