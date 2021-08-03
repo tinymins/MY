@@ -101,7 +101,9 @@ local function QueryData(szQues)
 	DisplayMessage(_L['Querying, please wait...'])
 
 	if not LOCAL_DATA_CACHE then
-		LOCAL_DATA_CACHE = LIB.LoadLUAData({'config/examtip.jx3dat', PATH_TYPE.GLOBAL}, { passphrase = false }) or {}
+		LOCAL_DATA_CACHE = LIB.LoadLUAData({'config/examtip.jx3dat', PATH_TYPE.GLOBAL}, { passphrase = false })
+			or LIB.LoadLUAData({'config/examtip.jx3dat', PATH_TYPE.GLOBAL})
+			or {}
 	end
 	if LOCAL_DATA_CACHE[szQues] then
 		for _, szAnsw in ipairs(LOCAL_DATA_CACHE[szQues]) do
