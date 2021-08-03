@@ -189,12 +189,12 @@ local function GetDoodadTemplateName(dwID)
 	return doodad.szName
 end
 
-local function IsShielded()
+local function IsShowNameDisabled()
 	return LIB.IsInShieldedMap() and LIB.IsShieldedVersion('TARGET')
 end
 
-local function IsAutoInteract()
-	return O.bInteract and not IsShiftKeyDown() and not Station.Lookup('Normal/MY_GKPLoot') and not LIB.IsShieldedVersion('MY_GKPDoodad')
+local function IsAutoInteractDisabled()
+	return not O.bInteract or IsShiftKeyDown() or Station.Lookup('Normal/MY_GKPLoot') or LIB.IsShieldedVersion('MY_GKPDoodad')
 end
 
 local D = {
@@ -401,7 +401,7 @@ end)
 -- switch name
 function D.CheckShowName()
 	local hName = UI.GetShadowHandle('MY_GKPDoodad')
-	local bShowName = O.bShowName and not IsShielded()
+	local bShowName = O.bShowName and not IsShowNameDisabled()
 	if bShowName and not D.pLabel then
 		D.pLabel = hName:AppendItemFromIni(INI_SHADOW, 'Shadow', 'Shadow_Name')
 		LIB.BreatheCall('MY_GKPDoodad__HeadName', function()
@@ -475,6 +475,7 @@ function D.AutoInteractDoodad()
 	then
 		return
 	end
+	local bAllowAutoIntr = not IsAutoInteractDisabled()
 	for dwID, info in pairs(D.tDoodad) do
 		local doodad, bIntr, bOpen = GetDoodad(dwID), false, false
 		if doodad and doodad.CanDialog(me) then -- 若存在却不能对话只简单保留
@@ -484,12 +485,12 @@ function D.AutoInteractDoodad()
 				if info.eActionType == 'loot' then
 					bOpen = true
 				else
-					bIntr = true
+					bIntr = bAllowAutoIntr
 				end
 			elseif (info.eRuleType == 'quest' and info.eActionType == 'quest')
 				or (info.eRuleType ~= 'other' and info.eRuleType ~= 'all' and info.eActionType == 'craft')
 			then -- 任务和普通道具尝试 5 次
-				bIntr = (not me.bFightState or O.bInteractEvenFight) and not me.bOnHorse and IsAutoInteract()
+				bIntr = (not me.bFightState or O.bInteractEvenFight) and not me.bOnHorse and bAllowAutoIntr
 				-- 宴席只能吃队友的
 				if doodad.dwOwnerID ~= 0 and IsPlayer(doodad.dwOwnerID) and not LIB.IsParty(doodad.dwOwnerID) then
 					bIntr = false
@@ -504,17 +505,19 @@ function D.AutoInteractDoodad()
 					end
 				end
 			elseif info.eRuleType == 'recent' then -- 最近采集的
-				bIntr = true
-				-- 从最近采集移除，意味着如果玩家打断这次采集就不会自动继续采集
-				D.tRecent[doodad.dwTemplateID] = nil
-				for k, _ in pairs(D.tDoodad) do
-					local d = GetDoodad(k)
-					if d and d.dwTemplateID == doodad.dwTemplateID then
-						D.TryAdd(k, true)
-						D.tDoodad[k] = nil
+				bIntr = bAllowAutoIntr
+				-- 如果自动采集，就先从最近采集移除，意味着如果玩家打断这次采集就不会自动继续采集
+				if bIntr then
+					D.tRecent[doodad.dwTemplateID] = nil
+					for k, _ in pairs(D.tDoodad) do
+						local d = GetDoodad(k)
+						if d and d.dwTemplateID == doodad.dwTemplateID then
+							D.TryAdd(k, true)
+							D.tDoodad[k] = nil
+						end
 					end
+					D.bUpdateLabel = true
 				end
-				D.bUpdateLabel = true
 			end
 		end
 		if bOpen then
@@ -592,7 +595,7 @@ end
 
 -- mini flag
 function D.UpdateMiniFlag()
-	if not D.bReady or not O.bMiniFlag or IsShielded() then
+	if not D.bReady or not O.bMiniFlag or IsShowNameDisabled() then
 		return
 	end
 	local me = GetClientPlayer()
