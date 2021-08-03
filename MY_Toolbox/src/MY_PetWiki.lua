@@ -104,6 +104,60 @@ function D.Open(dwPetIndex)
 end
 
 function D.HookPetFrame(frame)
+	----------------
+	-- ª≥æ…∞Ê
+	----------------
+	local hMyPets = frame:Lookup('PageSet_All/Page_MyPet/WndScroll_myPets', '')
+	if hMyPets then
+		local function OnPetItemLButtonClick()
+			if O.bEnable and this.tPet and not IsCtrlKeyDown() and not IsAltKeyDown() and this:IsObjectSelected() then
+				D.Open(this.tPet.dwPetIndex)
+				return
+			end
+			return UI.FormatWMsgRet(false, true)
+		end
+		local function OnPetsAppendItem(res, hPets)
+			local hItem = res[1]
+			if not hItem then
+				return
+			end
+			local box = hItem:Lookup('Box_petItem')
+			LIB.DelayCall(function()
+				if not box:IsValid() then
+					return
+				end
+				box:RegisterEvent(ITEM_EVENT.LBUTTONCLICK)
+				UnhookTableFunc(box, 'OnItemLButtonClick', OnPetItemLButtonClick)
+				HookTableFunc(box, 'OnItemLButtonClick', OnPetItemLButtonClick, { bAfterOrigin = true, bPassReturn = true, bHookReturn = true })
+			end)
+		end
+		local function OnMyPetsAppendItem(res, hMyPets)
+			local hItem = res[1]
+			if not hItem then
+				return
+			end
+			local hPets = hItem:Lookup('Handle_petsBox')
+			LIB.DelayCall(function()
+				if not hPets:IsValid() then
+					return
+				end
+				for i = 0, hPets:GetItemCount() - 1 do
+					OnPetsAppendItem({hPets:Lookup(i)}, hPets)
+				end
+				UnhookTableFunc(hPets, 'AppendItemFromIni', OnPetsAppendItem)
+				HookTableFunc(hPets, 'AppendItemFromIni', OnPetsAppendItem, { bAfterOrigin = true, bPassReturn = true })
+			end)
+		end
+		for i = 0, hMyPets:GetItemCount() - 1 do
+			OnMyPetsAppendItem({hMyPets:Lookup(i)}, hMyPets)
+		end
+		UnhookTableFunc(hMyPets, 'AppendItemFromIni', OnMyPetsAppendItem)
+		HookTableFunc(hMyPets, 'AppendItemFromIni', OnMyPetsAppendItem, { bAfterOrigin = true, bPassReturn = true })
+	end
+
+	----------------
+	-- ÷ÿ÷∆∞Ê
+	----------------
 	local hMedalPets = frame:Lookup('PageSet_All/Page_MedalCollected/Wnd_MedalCollect', 'Handle_MedalPets')
 	if hMedalPets then
 		local function OnPetItemLButtonClick()
@@ -127,6 +181,7 @@ function D.HookPetFrame(frame)
 			end
 		end
 	end
+
 	local hPreferList = frame:Lookup('PageSet_All/Page_MyPet/WndScroll_Pets/WndContainer_Pets/Wnd_Prefer', '')
 	if hPreferList then
 		local function OnPetItemLButtonClick()
