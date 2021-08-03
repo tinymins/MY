@@ -1338,6 +1338,44 @@ function LIB.ExecuteWithThis(context, fnAction, ...)
 	return true, unpack(rets)
 end
 
+do
+local HOOK = setmetatable({}, { __mode = 'k' })
+-- LIB.SetMemberFunctionHook(tTable, szName, fnHook, tOption) -- hook
+-- LIB.SetMemberFunctionHook(tTable, szName, szKey, fnHook, tOption) -- hook
+-- LIB.SetMemberFunctionHook(tTable, szName, szKey, false) -- unhook
+function LIB.SetMemberFunctionHook(t, xArg1, xArg2, xArg3, xArg4)
+	local eAction, szName, szKey, fnHook, tOption
+	if IsTable(t) and IsFunction(xArg2) then
+		eAction, szName, fnHook, tOption = 'REG', xArg1, xArg2, xArg3
+	elseif IsTable(t) and IsString(xArg2) and IsFunction(xArg3) then
+		eAction, szName, szKey, fnHook, tOption = 'REG', xArg1, xArg2, xArg3, xArg4
+	elseif IsTable(t) and IsString(xArg2) and xArg3 == false then
+		eAction, szName, szKey = 'UNREG', xArg1, xArg2
+	end
+	assert(eAction, 'Parameters type not recognized, cannot infer action type.')
+	-- 匿名注册分配随机标识符
+	if eAction == 'REG' and not IsString(szKey) then
+		szKey = GetTickCount() * 1000
+		while Get(HOOK, {t, szName, (tostring(szKey))}) do
+			szKey = szKey + 1
+		end
+		szKey = tostring(szKey)
+	end
+	if eAction == 'REG' or eAction == 'UNREG' then
+		local fnCurrentHook = Get(HOOK, {t, szName, szKey})
+		if fnCurrentHook then
+			Set(HOOK, {t, szName, szKey}, nil)
+			UnhookTableFunc(t, szName, fnCurrentHook)
+		end
+	end
+	if eAction == 'REG' then
+		Set(HOOK, {t, szName, szKey}, fnHook)
+		HookTableFunc(t, szName, fnHook, tOption)
+	end
+	return szKey
+end
+end
+
 function LIB.InsertOperatorMenu(t, opt, action, opts, L)
 	for _, op in ipairs(opts or { '==', '!=', '<', '>=', '>', '<=' }) do
 		insert(t, {
