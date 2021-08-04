@@ -627,8 +627,10 @@ function D.OnBreatheCall()
 		local doodad = GetDoodad(dwID)
 		if not doodad
 			or (info.eRuleType == 'quest' and info.eActionType == 'quest' and not doodad.HaveQuest(me.dwID))
+			or (info.eRuleType == 'loot' and info.eActionType == 'loot' and not doodad.CanLoot(me.dwID))
 		then
 			D.Remove(dwID)
+			D.TryAdd(dwID)
 		end
 	end
 	local dwTime = GetTime()
