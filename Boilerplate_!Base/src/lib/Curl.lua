@@ -284,10 +284,10 @@ function LIB.Ajax(settings)
 	-- each driver handlers
 	-------------------------------
 	-- convert encoding
-	local xurl, xdata = config.url, config.data
+	local xurl, xdata = config.url, config.data or ''
 	if config.charset == 'utf8' then
 		xurl  = LIB.ConvertToUTF8(xurl)
-		xdata = LIB.ConvertToUTF8(xdata)
+		xdata = LIB.ConvertToUTF8(xdata) or ''
 	end
 	-- bridge
 	local bridgekey = NSFormatString('{$NS}RRDF_TO_') .. id
