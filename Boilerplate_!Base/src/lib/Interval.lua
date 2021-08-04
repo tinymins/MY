@@ -56,7 +56,7 @@ local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCal
 ---------------------------------------------------------------------
 if DelayCall and BreatheCall and FrameCall and RenderCall then
 	local NS_PREFIX = NSFormatString('{$NS}__')
-	local function WrapIntervalCall(IntervalCall)
+	local function WrapIntervalCall(szIntervalName, IntervalCall)
 		return function(szKey, nInterval, fnAction, oArg)
 			local bUnreg
 			if type(szKey) == 'function' then
@@ -78,14 +78,18 @@ if DelayCall and BreatheCall and FrameCall and RenderCall then
 			if fnAction then -- reg
 				--[[#DEBUG BEGIN]]
 				local f = fnAction
-				local function GetCallReturnVal(res, ...)
+				local function GetXpCallReturnVal(res, ...)
 					if res then
 						return ...
 					end
-					assert(false, ...)
+					local xpErrMsg, xpTraceback = ...
+					local xpErrLog = szIntervalName .. ' failed: '
+						.. tostring(xpErrMsg or '') .. '\n' .. tostring(xpTraceback or '')
+					Log(xpErrLog)
+					FireUIEvent('CALL_LUA_ERROR', xpErrLog .. '\n')
 				end
 				fnAction = function(...)
-					return GetCallReturnVal(Call(f, ...))
+					return GetXpCallReturnVal(XpCall(f, ...))
 				end
 				--[[#DEBUG END]]
 				if not szKey then -- ÄäÃûµ÷ÓÃ
@@ -107,10 +111,10 @@ if DelayCall and BreatheCall and FrameCall and RenderCall then
 			return unpack(aRetVal)
 		end
 	end
-	LIB.DelayCall = WrapIntervalCall(DelayCall)
-	LIB.BreatheCall = WrapIntervalCall(BreatheCall)
-	LIB.FrameCall = WrapIntervalCall(FrameCall)
-	LIB.RenderCall = WrapIntervalCall(RenderCall)
+	LIB.DelayCall   = WrapIntervalCall('DelayCall'  , DelayCall  )
+	LIB.BreatheCall = WrapIntervalCall('BreatheCall', BreatheCall)
+	LIB.FrameCall   = WrapIntervalCall('FrameCall'  , FrameCall  )
+	LIB.RenderCall  = WrapIntervalCall('RenderCall' , RenderCall )
 else
 
 local _time      -- current time
