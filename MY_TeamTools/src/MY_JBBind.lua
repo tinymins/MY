@@ -193,7 +193,9 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
 		x = nX, y = nY + 2,
 		buttonstyle = 'FLAT', text = _L['Bind'], enable = false,
 		onclick = function()
-			if IsEmpty(O.uid) then
+			if O.pending then
+				D.FetchBindStatus(UpdateUI, UpdateUI)
+			elseif IsEmpty(O.uid) then
 				GetUserInput(_L['Please input certification code:'], function(szText)
 					uiBtnCCStatus:Enable(false)
 					D.Bind(
