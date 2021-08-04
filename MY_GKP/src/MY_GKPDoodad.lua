@@ -858,7 +858,7 @@ function PS.OnPanelActive(frame)
 						if bChecked then
 							O.tCraft[v] = true
 						else
-							O.tCraft[v] = nil
+							O.tCraft[v] = false
 						end
 						O.tCraft = O.tCraft
 						D.RescanNearby()
