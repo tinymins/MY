@@ -677,6 +677,13 @@ LIB.RegisterExit('MY_GKPDoodad__BC', function()
 	LIB.BreatheCall('MY_GKPDoodad', false)
 end)
 LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_GKPDoodad', function()
+	for _, dwID in ipairs(D.aCraft) do
+		if dwID ~= 0 then
+			if not IsBoolean(O.tCraft[dwID]) then
+				O.tCraft[dwID] = true
+			end
+		end
+	end
 	D.bReady = true
 end)
 LIB.RegisterUserSettingsUpdate('@@UNINIT@@', 'MY_GKPDoodad', function()
