@@ -647,8 +647,18 @@ end
 -- 注册事件、初始化
 ---------------------------------------------------------------------
 LIB.RegisterEvent('LOADING_ENDING', D.CheckShowName)
-LIB.RegisterEvent('DOODAD_ENTER_SCENE', function() D.TryAdd(arg0, true) end)
-LIB.RegisterEvent('DOODAD_LEAVE_SCENE', function() D.Remove(arg0) end)
+LIB.RegisterEvent('DOODAD_ENTER_SCENE', function()
+	if not D.bReady then
+		return
+	end
+	D.TryAdd(arg0, true)
+end)
+LIB.RegisterEvent('DOODAD_LEAVE_SCENE', function()
+	if not D.bReady then
+		return
+	end
+	D.Remove(arg0)
+end)
 LIB.RegisterEvent('OPEN_DOODAD', D.OnLootDoodad)
 LIB.RegisterEvent('HELP_EVENT', function()
 	if arg0 == 'OnOpenpanel' and arg1 == 'LOOT' and O.bOpenLoot then
@@ -684,6 +694,7 @@ LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_GKPDoodad', function()
 			end
 		end
 	end
+	D.RescanNearby()
 	D.bReady = true
 end)
 LIB.RegisterUserSettingsUpdate('@@UNINIT@@', 'MY_GKPDoodad', function()
