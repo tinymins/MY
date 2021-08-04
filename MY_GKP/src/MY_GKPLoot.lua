@@ -202,6 +202,12 @@ local O = LIB.CreateUserSettingsModule('MY_GKPLoot', _L['General'], {
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
+	bAutoPickupQuality = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_GKPLoot'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
 	tAutoPickupQuality = {
 		ePathType = PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
@@ -240,6 +246,7 @@ local ITEM_CONFIG = setmetatable({}, {
 			or k == 'bAutoPickupFilterBookHave'
 			or k == 'bAutoPickupTaskItem'
 			or k == 'bAutoPickupBook'
+			or k == 'bAutoPickupQuality'
 			or k == 'tAutoPickupQuality'
 			or k == 'tAutoPickupNames'
 			or k == 'tAutoPickupFilters'
@@ -261,6 +268,7 @@ local ITEM_CONFIG = setmetatable({}, {
 			or k == 'bAutoPickupFilterBookHave'
 			or k == 'bAutoPickupTaskItem'
 			or k == 'bAutoPickupBook'
+			or k == 'bAutoPickupQuality'
 			or k == 'tAutoPickupQuality'
 			or k == 'tAutoPickupNames'
 			or k == 'tAutoPickupFilters'
@@ -410,7 +418,7 @@ function D.IsItemAutoPickup(itemData, config, doodad, bCanDialog)
 		return true
 	end
 	-- 自动拾取品级
-	if config.tAutoPickupQuality[itemData.nQuality] then
+	if config.bAutoPickupQuality and config.tAutoPickupQuality[itemData.nQuality] then
 		return true
 	end
 	return false
@@ -1017,7 +1025,18 @@ function D.GetAutoPickupMenu()
 		end,
 	})
 	-- 自动拾取品级
-	local t1 = { szOption = _L['Auto pickup by item quality'] }
+	local t1 = {
+		szOption = _L['Auto pickup by item quality'],
+		{
+			szOption = _L['Enable'],
+			bCheck = true,
+			bChecked = O.bAutoPickupQuality,
+			fnAction = function()
+				O.bAutoPickupQuality = not O.bAutoPickupQuality
+			end,
+		},
+		CONSTANT.MENU_DIVIDER,
+	}
 	for i, p in ipairs(GKP_ITEM_QUALITIES) do
 		insert(t1, {
 			szOption = p.szTitle,
@@ -1028,6 +1047,7 @@ function D.GetAutoPickupMenu()
 				O.tAutoPickupQuality[p.nQuality] = not O.tAutoPickupQuality[p.nQuality]
 				O.tAutoPickupQuality = O.tAutoPickupQuality
 			end,
+			fnDisable = function() return not O.bAutoPickupQuality end,
 		})
 	end
 	insert(t, t1)
