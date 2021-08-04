@@ -496,7 +496,7 @@ function D.AutoInteractDoodad()
 					bIntr = false
 				end
 				if bIntr then
-					if info.nActionCount >= 5 then
+					if info.nActionCount and info.nActionCount >= 5 then
 						info.eActionType = 'other'
 						bIntr = false
 						D.bUpdateLabel = true
