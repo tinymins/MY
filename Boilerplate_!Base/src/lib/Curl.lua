@@ -484,7 +484,13 @@ function LIB.Ajax(settings)
 		else
 			CURL_HttpRqst(szKey, xurl, ssl, config.timeout)
 		end
-		CALL_AJAX['__addon_' .. szKey] = settings
+		local info = {
+			settings = settings,
+			keys = { szKey, '__addon_' .. szKey },
+		}
+		for _, k in ipairs(info.keys) do
+			CALL_AJAX[k] = info
+		end
 	end
 end
 
@@ -493,18 +499,22 @@ local function OnCurlRequestResult()
 	local bSuccess     = arg1
 	local html         = arg2
 	local dwBufferSize = arg3
-	if CALL_AJAX[szKey] then
-		local settings = CALL_AJAX[szKey]
-		if dwBufferSize == 0 then
-			settings.callback()
-		else
-			local status = bSuccess and 200 or 500
-			if settings.config.charset == 'utf8' then
-				html = UTF8ToAnsi(html)
-			end
-			settings.callback(html, status)
+	local info = CALL_AJAX[szKey]
+	if not info then
+		return
+	end
+	local settings = info.settings
+	if dwBufferSize == 0 then
+		settings.callback()
+	else
+		local status = bSuccess and 200 or 500
+		if settings.config.charset == 'utf8' then
+			html = UTF8ToAnsi(html)
 		end
-		CALL_AJAX[szKey] = nil
+		settings.callback(html, status)
+	end
+	for _, k in ipairs(info.keys) do
+		CALL_AJAX[k] = nil
 	end
 end
 LIB.RegisterEvent('CURL_REQUEST_RESULT', 'AJAX', OnCurlRequestResult)
