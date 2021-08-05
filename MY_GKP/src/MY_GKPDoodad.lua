@@ -387,6 +387,35 @@ function D.ReloadCustom()
 	D.RescanNearby()
 end
 
+-- 开始采集时调用，用于预判断最近采集列表
+function D.OnPickPrepare(doodad, nFinishLFC)
+	local t = GetDoodadTemplate(doodad.dwTemplateID)
+	if t.dwCraftID == CONSTANT.CRAFT_TYPE.MINING
+	or t.dwCraftID == CONSTANT.CRAFT_TYPE.HERBALISM
+	or t.dwCraftID == CONSTANT.CRAFT_TYPE.SKINNING then
+		D.nPickPrepareFinishLFC = nFinishLFC
+		D.dwPickPrepareDoodadID = doodad.dwID
+		D.dwPickPrepareDoodadTemplateID = doodad.dwTemplateID
+		D.tRecent[doodad.dwTemplateID] = true
+		D.RescanNearby(doodad.dwTemplateID)
+	end
+end
+
+-- 结束采集时调用，如果符合最后一次采集物品信息，加入最近采集列表
+function D.OnPickPrepareStop(doodad)
+	local dwTemplateID = D.dwPickPrepareDoodadTemplateID
+	if dwTemplateID then
+		local bSuccess = doodad
+			and doodad.dwID == D.dwPickPrepareDoodadID
+			and abs(GetLogicFrameCount() - D.nPickPrepareFinishLFC) < GLOBAL.GAME_FPS / 2
+		D.nPickPrepareFinishLFC = nil
+		D.dwPickPrepareDoodadID = nil
+		D.dwPickPrepareDoodadTemplateID = nil
+		D.tRecent[dwTemplateID] = bSuccess and true or nil
+		D.RescanNearby(dwTemplateID)
+	end
+end
+
 LIB.RegisterInit('MY_GKPDoodad', function()
 	for _, k in ipairs({'tNameColor', 'tCraft', 'szCustom'}) do
 		if O2[k] then
@@ -592,12 +621,7 @@ function D.OnLootDoodad()
 	if not doodad then
 		return
 	end
-	-- 如果符合最后一次采集物品信息，加入最近采集列表
-	if doodad.dwID == D.dwPickPrepareDoodadID
-	and abs(GetLogicFrameCount() - D.nPickPrepareFinishLFC) < GLOBAL.GAME_FPS / 2 then
-		D.tRecent[doodad.dwTemplateID] = true
-		D.RescanNearby(doodad.dwTemplateID)
-	end
+	D.OnPickPrepareStop(doodad)
 end
 
 -- mini flag
@@ -694,25 +718,13 @@ LIB.RegisterEvent('DO_PICK_PREPARE_PROGRESS', function()
 	end
 	local doodad = GetDoodad(dwDoodadID)
 	if doodad then
-		local t = GetDoodadTemplate(doodad.dwTemplateID)
-		if t.dwCraftID == CONSTANT.CRAFT_TYPE.MINING
-		or t.dwCraftID == CONSTANT.CRAFT_TYPE.HERBALISM
-		or t.dwCraftID == CONSTANT.CRAFT_TYPE.SKINNING then
-			D.nPickPrepareFinishLFC = GetLogicFrameCount() + nTotalFrame
-			D.dwPickPrepareDoodadID = doodad.dwID
-			D.dwPickPrepareDoodadTemplateID = doodad.dwTemplateID
-		end
+		D.OnPickPrepare(doodad, GetLogicFrameCount() + nTotalFrame)
 	end
 end)
 LIB.RegisterEvent('OT_ACTION_PROGRESS_BREAK', function()
     local dwID = arg0
-	if dwID == UI_GetClientPlayerID() and D.dwPickPrepareDoodadID then
-		local dwTemplateID = D.dwPickPrepareDoodadTemplateID
-		D.nPickPrepareFinishLFC = nil
-		D.dwPickPrepareDoodadID = nil
-		D.dwPickPrepareDoodadTemplateID = nil
-		D.tRecent[dwTemplateID] = nil
-		D.RescanNearby(dwTemplateID)
+	if dwID == UI_GetClientPlayerID() then
+		D.OnPickPrepareStop(false)
 	end
 end)
 LIB.RegisterInit('MY_GKPDoodad__BC', function()
