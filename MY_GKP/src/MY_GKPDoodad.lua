@@ -212,7 +212,7 @@ local D = {
 	tCustom = {}, -- 自定义列表
 	tRecent = {}, -- 最近采集的东西、自动继续采集
 	tDoodad = {}, -- 待处理的 doodad 列表
-	nToLoot = 0,  -- 待拾取处理数量（用于修复判断）
+	tLooted = {}, -- 已经拾取过的 doodad id 不再二次拾取
 	dwUpdateMiniFlagTime = 0, -- 下次更新小地图位置时间戳
 	dwAutoInteractDoodadTime = 0, -- 下次自动交互物件时间戳
 }
@@ -315,7 +315,7 @@ function D.TryAdd(dwID, bDelay)
 			info.eRuleType = 'craft'
 		elseif info.eDoodadType == 'quest' and O.bQuestDoodad then
 			info.eRuleType = 'quest'
-		elseif info.eDoodadType == 'corpse' and info.eActionType == 'loot' and O.bOpenLoot then
+		elseif info.eDoodadType == 'corpse' and info.eActionType == 'loot' and O.bOpenLoot and not D.tLooted[doodad.dwID] then
 			info.eRuleType = 'loot'
 		elseif info.eDoodadType == 'corpse' and O.bCorpseDoodad then
 			info.eRuleType = 'corpse'
@@ -566,14 +566,11 @@ function D.AutoInteractDoodad()
 			--[[#DEBUG BEGIN]]
 			LIB.Debug(_L['MY_GKPDoodad'], 'Auto open [' .. doodad.szName .. '].', DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
-			-- 掉落只摸一次
-			info.eActionType = 'other'
 			D.dwOpenDoodadID = dwID
 			D.bUpdateLabel = true
 			D.dwAutoInteractDoodadTime = GetTime() + 500
-			--[[#DEBUG BEGIN]]
-			LIB.Debug(_L['MY_GKPDoodad'], 'Auto open [' .. doodad.szName .. '].', DEBUG_LEVEL.LOG)
-			--[[#DEBUG END]]
+			-- 掉落只摸一次
+			D.tLooted[doodad.dwID] = true
 			return LIB.OpenDoodad(me, doodad)
 		end
 		if bIntr then
@@ -679,7 +676,10 @@ end
 ---------------------------------------------------------------------
 -- 注册事件、初始化
 ---------------------------------------------------------------------
-LIB.RegisterEvent('LOADING_ENDING', D.CheckShowName)
+LIB.RegisterEvent('LOADING_ENDING', function()
+	D.tLooted = {}
+	D.CheckShowName()
+end)
 LIB.RegisterEvent('DOODAD_ENTER_SCENE', function()
 	if not D.bReady then
 		return
