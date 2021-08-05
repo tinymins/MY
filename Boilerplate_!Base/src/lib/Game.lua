@@ -2910,9 +2910,7 @@ function LIB.GetOTActionState(...)
 		nType, dwSkillID, dwSkillLevel, fCastPercent = KObject.GetSkillOTActionState()
 	else
 		nType, dwSkillID, dwSkillLevel, fCastPercent = KObject.GetSkillPrepareState()
-		nType = nType
-			and CONSTANT.CHARACTER_OTACTION_TYPE.ANCIENT_ACTION_PREPARE
-			or CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_IDLE
+		nType = KObject.GetOTActionState()
 	end
 	return nType, dwSkillID, dwSkillLevel, fCastPercent
 end
