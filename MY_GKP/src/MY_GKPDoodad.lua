@@ -355,12 +355,22 @@ function D.Remove(dwID)
 end
 
 -- reload doodad
-function D.RescanNearby()
-	D.tDoodad = {}
-	for _, k in ipairs(LIB.GetNearDoodadID()) do
-		D.TryAdd(k)
+function D.RescanNearby(dwTemplateID)
+	if dwTemplateID then
+		for _, d in ipairs(LIB.GetNearDoodad()) do
+			if d.dwTemplateID == dwTemplateID then
+				D.Remove(d.dwID)
+				D.TryAdd(d.dwID)
+				D.bUpdateLabel = true
+			end
+		end
+	else
+		D.tDoodad = {}
+		for _, k in ipairs(LIB.GetNearDoodadID()) do
+			D.TryAdd(k)
+		end
+		D.bUpdateLabel = true
 	end
-	D.bUpdateLabel = true
 end
 
 function D.ReloadCustom()
@@ -586,11 +596,7 @@ function D.OnLootDoodad()
 	if doodad.dwID == D.dwPickPrepareDoodadID
 	and abs(GetLogicFrameCount() - D.nPickPrepareFinishLFC) < GLOBAL.GAME_FPS / 2 then
 		D.tRecent[doodad.dwTemplateID] = true
-		for _, d in ipairs(LIB.GetNearDoodad()) do
-			if d.dwTemplateID == doodad.dwTemplateID then
-				D.TryAdd(d.dwID)
-			end
-		end
+		D.RescanNearby(doodad.dwTemplateID)
 	end
 end
 
@@ -692,16 +698,21 @@ LIB.RegisterEvent('DO_PICK_PREPARE_PROGRESS', function()
 		if t.dwCraftID == CONSTANT.CRAFT_TYPE.MINING
 		or t.dwCraftID == CONSTANT.CRAFT_TYPE.HERBALISM
 		or t.dwCraftID == CONSTANT.CRAFT_TYPE.SKINNING then
-			D.dwPickPrepareDoodadID = doodad.dwID
 			D.nPickPrepareFinishLFC = GetLogicFrameCount() + nTotalFrame
+			D.dwPickPrepareDoodadID = doodad.dwID
+			D.dwPickPrepareDoodadTemplateID = doodad.dwTemplateID
 		end
 	end
 end)
 LIB.RegisterEvent('OT_ACTION_PROGRESS_BREAK', function()
     local dwID = arg0
-	if dwID == UI_GetClientPlayerID() then
-		D.dwPickPrepareDoodadID = nil
+	if dwID == UI_GetClientPlayerID() and D.dwPickPrepareDoodadID then
+		local dwTemplateID = D.dwPickPrepareDoodadTemplateID
 		D.nPickPrepareFinishLFC = nil
+		D.dwPickPrepareDoodadID = nil
+		D.dwPickPrepareDoodadTemplateID = nil
+		D.tRecent[dwTemplateID] = nil
+		D.RescanNearby(dwTemplateID)
 	end
 end)
 LIB.RegisterInit('MY_GKPDoodad__BC', function()
