@@ -309,6 +309,8 @@ function D.TryAdd(dwID, bDelay)
 	local info = D.GetDoodadInfo(dwID)
 	if info then
 		local doodad = GetDoodad(dwID)
+		info.bCustom = D.IsCustomDoodad(doodad)
+		info.bRecent = D.IsRecentDoodad(doodad)
 		if info.eDoodadType == 'craft' and O.tCraft[doodad.dwTemplateID] then
 			info.eRuleType = 'craft'
 		elseif info.eDoodadType == 'quest' and O.bQuestDoodad then
@@ -329,9 +331,9 @@ function D.TryAdd(dwID, bDelay)
 			info.eRuleType = 'inscription'
 		elseif info.eDoodadType == 'other' and O.bOtherDoodad then
 			info.eRuleType = 'other'
-		elseif D.IsCustomDoodad(doodad) then
+		elseif info.bCustom then
 			info.eRuleType = 'custom'
-		elseif D.IsRecentDoodad(doodad) then
+		elseif info.bRecent then
 			info.eRuleType = 'recent'
 		elseif O.bAllDoodad then
 			info.eRuleType = 'all'
@@ -471,7 +473,7 @@ function D.UpdateHeadName()
 	sha:ClearTriangleFanPoint()
 	for dwID, info in pairs(D.tDoodad) do
 		local tar = GetDoodad(dwID)
-		if info.eRuleType ~= 'loot' then
+		if info.eRuleType ~= 'loot' or info.bCustom or info.bRecent then
 			local szName = LIB.GetObjectName(TARGET.DOODAD, dwID, 'never') or ''
 			local fYDelta = 128
 			local nR, nG, nB, nA, bDarken = r, g, b, 255, false
@@ -521,7 +523,7 @@ function D.AutoInteractDoodad()
 		if doodad and doodad.CanDialog(me) then -- 若存在却不能对话只简单保留
 			if info.eRuleType == 'loot' and info.eActionType == 'loot' then -- 掉落是否可以打开
 				bOpen = (not me.bFightState or O.bOpenLootEvenFight) and doodad.CanLoot(me.dwID)
-			elseif info.eRuleType == 'custom' then
+			elseif info.bCustom then
 				if info.eActionType == 'loot' then
 					bOpen = true
 				else
@@ -544,7 +546,7 @@ function D.AutoInteractDoodad()
 						info.nActionCount = (info.nActionCount or 0) + 1
 					end
 				end
-			elseif info.eRuleType == 'recent' then -- 最近采集的
+			elseif info.bRecent then -- 最近采集的
 				bIntr = bAllowAutoIntr
 				-- 如果自动采集，就先从最近采集移除，意味着如果玩家打断这次采集就不会自动继续采集
 				if bIntr then
