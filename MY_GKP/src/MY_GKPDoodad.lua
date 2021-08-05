@@ -579,17 +579,15 @@ function D.OnLootDoodad()
 	if not doodad then
 		return
 	end
-	local t = GetDoodadTemplate(doodad.dwTemplateID)
-	if t.dwCraftID == CONSTANT.CRAFT_TYPE.MINING
-	or t.dwCraftID == CONSTANT.CRAFT_TYPE.HERBALISM
-	or t.dwCraftID == CONSTANT.CRAFT_TYPE.SKINNING then
-		D.tRecent[doodad.dwTemplateID] = true -- 加入最近采集列表
+	-- 如果符合最后一次采集物品信息，加入最近采集列表
+	if doodad.dwID == D.dwPickPrepareDoodadID
+	and abs(GetLogicFrameCount() - D.nPickPrepareFinishLFC) < GLOBAL.GAME_FPS / 2 then
+		D.tRecent[doodad.dwTemplateID] = true
 		for _, d in ipairs(LIB.GetNearDoodad()) do
 			if d.dwTemplateID == doodad.dwTemplateID then
 				D.TryAdd(d.dwID)
 			end
 		end
-		D.bUpdateLabel = true
 	end
 end
 
@@ -678,6 +676,29 @@ LIB.RegisterEvent('SYS_MSG', function()
 	if arg0 == 'UI_OME_CRAFT_RESPOND' and arg1 == CRAFT_RESULT_CODE.SUCCESS
 	and D.bReady and (O.bReadInscriptionDoodad or O.bUnreadInscriptionDoodad) then
 		D.RescanNearby()
+	end
+end)
+LIB.RegisterEvent('DO_PICK_PREPARE_PROGRESS', function()
+    local nTotalFrame, dwDoodadID = arg0, arg1
+	if nTotalFrame == 0 then
+		return
+	end
+	local doodad = GetDoodad(dwDoodadID)
+	if doodad then
+		local t = GetDoodadTemplate(doodad.dwTemplateID)
+		if t.dwCraftID == CONSTANT.CRAFT_TYPE.MINING
+		or t.dwCraftID == CONSTANT.CRAFT_TYPE.HERBALISM
+		or t.dwCraftID == CONSTANT.CRAFT_TYPE.SKINNING then
+			D.dwPickPrepareDoodadID = doodad.dwID
+			D.nPickPrepareFinishLFC = GetLogicFrameCount() + nTotalFrame
+		end
+	end
+end)
+LIB.RegisterEvent('OT_ACTION_PROGRESS_BREAK', function()
+    local dwID = arg0
+	if dwID == UI_GetClientPlayerID() then
+		D.dwPickPrepareDoodadID = nil
+		D.nPickPrepareFinishLFC = nil
 	end
 end)
 LIB.RegisterInit('MY_GKPDoodad__BC', function()
