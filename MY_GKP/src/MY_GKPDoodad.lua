@@ -432,7 +432,7 @@ function D.UpdateHeadName()
 	sha:ClearTriangleFanPoint()
 	for dwID, info in pairs(D.tDoodad) do
 		local tar = GetDoodad(dwID)
-		if info.eActionType ~= 'loot' then
+		if info.eRuleType ~= 'loot' then
 			local szName = LIB.GetObjectName(TARGET.DOODAD, dwID, 'never') or ''
 			local fYDelta = 128
 			local nR, nG, nB, nA, bDarken = r, g, b, 255, false
@@ -459,6 +459,7 @@ function D.UpdateHeadName()
 				nG = nG * 0.85
 				nB = nB * 0.85
 			end
+			-- szName = szName .. '|' .. info.eRuleType .. '|' .. info.eActionType
 			sha:AppendDoodadID(tar.dwID, nR, nG, nB, nA, fYDelta, O.nNameFont, szName, 0, O.fNameScale)
 		end
 	end
@@ -479,7 +480,7 @@ function D.AutoInteractDoodad()
 	for dwID, info in pairs(D.tDoodad) do
 		local doodad, bIntr, bOpen = GetDoodad(dwID), false, false
 		if doodad and doodad.CanDialog(me) then -- 若存在却不能对话只简单保留
-			if info.eActionType == 'loot' then -- 掉落是否可以打开
+			if info.eRuleType == 'loot' and info.eActionType == 'loot' then -- 掉落是否可以打开
 				bOpen = (not me.bFightState or O.bOpenLootEvenFight) and doodad.CanLoot(me.dwID)
 			elseif info.eRuleType == 'custom' then
 				if info.eActionType == 'loot' then
@@ -557,8 +558,10 @@ function D.OnOpenDoodad(dwID)
 	local info = D.tDoodad[dwID]
 	if info then
 		-- 摸掉落且开了插件拾取框 可以安全的起身
-		if info.eActionType == 'loot' and MY_GKPLoot.IsEnabled() then
-			LIB.DelayCall('MY_GKPDoodad__OnOpenDoodad', 150, D.CloseLootWindow)
+		if info.eRuleType == 'loot' and MY_GKPLoot.IsEnabled() then
+			LIB.DelayCall('MY_GKPDoodad__OnOpenDoodad_1',  150, D.CloseLootWindow)
+			LIB.DelayCall('MY_GKPDoodad__OnOpenDoodad_2',  300, D.CloseLootWindow)
+			LIB.DelayCall('MY_GKPDoodad__OnOpenDoodad_3', 1000, D.CloseLootWindow)
 		end
 		-- 从列表删除
 		D.Remove(dwID)
@@ -601,7 +604,7 @@ function D.UpdateMiniFlag()
 		return
 	end
 	for dwID, info in pairs(D.tDoodad) do
-		if info.eActionType ~= 'loot' then
+		if info.eRuleType ~= 'loot' and info.eActionType ~= 'loot' then
 			local doodad = GetDoodad(dwID)
 			local dwType, nF1, nF2 = 5, 169, 48
 			if info.eRuleType == 'quest' then
