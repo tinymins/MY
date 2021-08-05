@@ -391,6 +391,9 @@ end
 
 -- 开始采集时调用，用于预判断最近采集列表
 function D.OnPickPrepare(doodad, nFinishLFC)
+	if nFinishLFC - GetLogicFrameCount() <= 0 then
+		return
+	end
 	local t = GetDoodadTemplate(doodad.dwTemplateID)
 	if t.dwCraftID == CONSTANT.CRAFT_TYPE.MINING
 	or t.dwCraftID == CONSTANT.CRAFT_TYPE.HERBALISM
@@ -548,18 +551,6 @@ function D.AutoInteractDoodad()
 				end
 			elseif info.bRecent then -- 最近采集的
 				bIntr = bAllowAutoIntr
-				-- 如果自动采集，就先从最近采集移除，意味着如果玩家打断这次采集就不会自动继续采集
-				if bIntr then
-					D.tRecent[doodad.dwTemplateID] = nil
-					for k, _ in pairs(D.tDoodad) do
-						local d = GetDoodad(k)
-						if d and d.dwTemplateID == doodad.dwTemplateID then
-							D.TryAdd(k, true)
-							D.tDoodad[k] = nil
-						end
-					end
-					D.bUpdateLabel = true
-				end
 			end
 		end
 		if bOpen then
