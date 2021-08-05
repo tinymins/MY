@@ -520,7 +520,7 @@ function D.AutoInteractDoodad()
 	then
 		return
 	end
-	local bAllowAutoIntr = not IsAutoInteractDisabled()
+	local bAllowAutoIntr = (not me.bFightState or O.bInteractEvenFight) and not me.bOnHorse and not IsAutoInteractDisabled()
 	for dwID, info in pairs(D.tDoodad) do
 		local doodad, bIntr, bOpen = GetDoodad(dwID), false, false
 		if doodad and doodad.CanDialog(me) then -- 若存在却不能对话只简单保留
@@ -532,10 +532,14 @@ function D.AutoInteractDoodad()
 				else
 					bIntr = bAllowAutoIntr
 				end
+			elseif info.bRecent then
+				bIntr = bAllowAutoIntr
+			elseif info.eRuleType == 'craft' and info.eActionType == 'craft' then
+				bIntr = bAllowAutoIntr
 			elseif (info.eRuleType == 'quest' and info.eActionType == 'quest')
 				or (info.eRuleType ~= 'other' and info.eRuleType ~= 'all' and info.eActionType == 'craft')
 			then -- 任务和普通道具尝试 5 次
-				bIntr = (not me.bFightState or O.bInteractEvenFight) and not me.bOnHorse and bAllowAutoIntr
+				bIntr = bAllowAutoIntr
 				-- 宴席只能吃队友的
 				if doodad.dwOwnerID ~= 0 and IsPlayer(doodad.dwOwnerID) and not LIB.IsParty(doodad.dwOwnerID) then
 					bIntr = false
@@ -549,11 +553,9 @@ function D.AutoInteractDoodad()
 						info.nActionCount = (info.nActionCount or 0) + 1
 					end
 				end
-			elseif info.bRecent then -- 最近采集的
-				bIntr = bAllowAutoIntr
 			end
 		end
-		if bOpen then
+		if bOpen and doodad.CanLoot(me.dwID) then
 			--[[#DEBUG BEGIN]]
 			LIB.Debug(_L['MY_GKPDoodad'], 'Auto open [' .. doodad.szName .. '].', DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
@@ -564,7 +566,7 @@ function D.AutoInteractDoodad()
 			D.tLooted[doodad.dwID] = true
 			return LIB.OpenDoodad(me, doodad)
 		end
-		if bIntr then
+		if bIntr and not doodad.CanLoot(me.dwID) then
 			--[[#DEBUG BEGIN]]
 			LIB.Debug(_L['MY_GKPDoodad'], 'Auto interact [' .. doodad.szName .. '].', DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
@@ -587,7 +589,7 @@ function D.OnOpenDoodad(dwID)
 	local info = D.tDoodad[dwID]
 	if info then
 		-- 摸掉落且开了插件拾取框 可以安全的起身
-		if info.eRuleType == 'loot' and MY_GKPLoot.IsEnabled() then
+		if info.eActionType == 'loot' and MY_GKPLoot.IsEnabled() then
 			LIB.DelayCall('MY_GKPDoodad__OnOpenDoodad_1',  150, D.CloseLootWindow)
 			LIB.DelayCall('MY_GKPDoodad__OnOpenDoodad_2',  300, D.CloseLootWindow)
 			LIB.DelayCall('MY_GKPDoodad__OnOpenDoodad_3', 1000, D.CloseLootWindow)
