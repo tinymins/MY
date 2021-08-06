@@ -757,10 +757,9 @@ function D.OnItemLButtonClick()
 		local dwDoodadID = data.dwDoodadID
 		local doodad     = GetDoodad(dwDoodadID)
 		if not data.bDist and not data.bNeedRoll and not data.bBidding then
-			-- if doodad.CanDialog(me) then -- ª·µº÷¬‚“∂°
 			if doodad.CanLoot(me.dwID) then
 				LIB.OpenDoodad(me, doodad)
-			else
+			elseif not doodad.CanDialog(me) then
 				LIB.Topmsg(g_tStrings.TIP_TOO_FAR)
 			end
 		end
