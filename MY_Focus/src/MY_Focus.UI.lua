@@ -339,11 +339,12 @@ function D.UpdateItem(hItem, p)
 	-- ∂¡Ãı
 	if dwType ~= TARGET.DOODAD then
 		local nType, dwSkillID, dwSkillLevel, fProgress = LIB.GetOTActionState(KObject)
-		if nType == CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
-		or nType == CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL
-		or nType == CONSTANT.CHARACTER_OTACTION_TYPE.ANCIENT_ACTION_PREPARE then
-			hItem:Lookup('Handle_R/Handle_Progress/Image_Progress'):SetPercentage(fProgress)
-			hItem:Lookup('Handle_R/Handle_Progress/Text_Progress'):SetText((LIB.GetSkillName(dwSkillID, dwSkillLevel)))
+		if (nType == CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
+			or nType == CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL
+			or nType == CONSTANT.CHARACTER_OTACTION_TYPE.ANCIENT_ACTION_PREPARE)
+		and dwSkillID and dwSkillLevel then
+			hItem:Lookup('Handle_R/Handle_Progress/Image_Progress'):SetPercentage(fProgress or 0)
+			hItem:Lookup('Handle_R/Handle_Progress/Text_Progress'):SetText(LIB.GetSkillName(dwSkillID, dwSkillLevel) or '')
 		else
 			hItem:Lookup('Handle_R/Handle_Progress/Image_Progress'):SetPercentage(0)
 			hItem:Lookup('Handle_R/Handle_Progress/Text_Progress'):SetText('')
