@@ -534,7 +534,7 @@ function D.UpdateHeadName()
 			end
 			--[[#DEBUG BEGIN]]
 			if D.bDebug then
-				szName = szName .. '|' .. info.eRuleType .. '|' .. info.eActionType
+				szName = szName .. '|D' .. info.eDoodadType .. '|R' .. info.eRuleType .. '|A' .. info.eActionType .. '|' .. dwID
 			end
 			--[[#DEBUG END]]
 			sha:AppendDoodadID(tar.dwID, nR, nG, nB, nA, fYDelta, O.nNameFont, szName, 0, O.fNameScale)
