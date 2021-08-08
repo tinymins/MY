@@ -116,13 +116,25 @@ local O = LIB.CreateUserSettingsModule('MY_GKPDoodad', _L['General'], {
 		xSchema = Schema.Map(Schema.Number, Schema.Boolean),
 		xDefaultValue = {},
 	},
-	bQuestDoodad = { -- 任务物品
+	bMiningDoodad = { -- 采金物品
 		ePathType = PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
-	bCorpseDoodad = { -- 掉落物品
+	bHerbalismDoodad = { -- 神农物品
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_GKPLoot'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bSkinningDoodad = { -- 庖丁物品
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L['MY_GKPLoot'],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bQuestDoodad = { -- 任务物品
 		ePathType = PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
 		xSchema = Schema.Boolean,
@@ -250,10 +262,11 @@ function D.GetDoodadInfo(dwID)
 	local info = {
 		dwCraftID = tpl.dwCraftID,
 	}
+	local eOverwriteAction = doodad.CanLoot(me.dwID) and 'loot' or nil
 	-- 神农、采金
 	if D.tCraft[doodad.dwTemplateID] then
 		info.eDoodadType = 'craft'
-		info.eActionType = 'craft'
+		info.eActionType = eOverwriteAction or 'craft'
 		return info
 	end
 	-- 战场任务
@@ -263,7 +276,7 @@ function D.GetDoodadInfo(dwID)
 	or doodad.dwTemplateID == 4734 -- 浩气盟菌箱
 	then
 		info.eDoodadType = 'quest'
-		info.eActionType = 'craft'
+		info.eActionType = eOverwriteAction or 'craft'
 		return info
 	end
 	-- 通用任务
@@ -272,14 +285,22 @@ function D.GetDoodadInfo(dwID)
 		info.eActionType = 'quest'
 		return info
 	end
-	-- 掉落
-	if doodad.nKind == DOODAD_KIND.CORPSE or doodad.nKind == DOODAD_KIND.NPCDROP then
-		info.eDoodadType = 'corpse'
-		if doodad.CanLoot(me.dwID) then
-			info.eActionType = 'loot'
-		else
-			info.eActionType = 'craft'
-		end
+	-- 采金
+	if info.dwCraftID == CONSTANT.CRAFT_TYPE.MINING then
+		info.eDoodadType = 'mining'
+		info.eActionType = eOverwriteAction or 'craft'
+		return info
+	end
+	-- 神农
+	if info.dwCraftID == CONSTANT.CRAFT_TYPE.HERBALISM then
+		info.eDoodadType = 'herbalism'
+		info.eActionType = eOverwriteAction or 'craft'
+		return info
+	end
+	-- 庖丁
+	if info.dwCraftID == CONSTANT.CRAFT_TYPE.SKINNING then
+		info.eDoodadType = 'skinning'
+		info.eActionType = eOverwriteAction or 'craft'
 		return info
 	end
 	-- 碑铭
@@ -315,10 +336,14 @@ function D.TryAdd(dwID, bDelay)
 			info.eRuleType = 'craft'
 		elseif info.eDoodadType == 'quest' and O.bQuestDoodad then
 			info.eRuleType = 'quest'
-		elseif info.eDoodadType == 'corpse' and info.eActionType == 'loot' and O.bOpenLoot and not D.tLooted[doodad.dwID] then
+		elseif info.eDoodadType == 'mining' and O.bMiningDoodad then
+			info.eRuleType = 'mining'
+		elseif info.eDoodadType == 'herbalism' and O.bHerbalismDoodad then
+			info.eRuleType = 'herbalism'
+		elseif info.eDoodadType == 'skinning' and O.bSkinningDoodad then
+			info.eRuleType = 'skinning'
+		elseif info.eActionType == 'loot' and O.bOpenLoot and not D.tLooted[doodad.dwID] then
 			info.eRuleType = 'loot'
-		elseif info.eDoodadType == 'corpse' and O.bCorpseDoodad then
-			info.eRuleType = 'corpse'
 		elseif info.eDoodadType == 'inscription' and info.bMemorized and O.bReadInscriptionDoodad then
 			if O.bUnreadInscriptionDoodad then
 				info.bMemorizedLabel = true
@@ -524,17 +549,22 @@ function D.AutoInteractDoodad()
 	for dwID, info in pairs(D.tDoodad) do
 		local doodad, bIntr, bOpen = GetDoodad(dwID), false, false
 		if doodad and doodad.CanDialog(me) then -- 若存在却不能对话只简单保留
-			if info.eRuleType == 'loot' and info.eActionType == 'loot' then -- 掉落是否可以打开
-				bOpen = (not me.bFightState or O.bOpenLootEvenFight) and doodad.CanLoot(me.dwID)
-			elseif info.bCustom then
+			local bAllowAutoOpen = not D.tLooted[doodad.dwID]
+			if info.bCustom then
 				if info.eActionType == 'loot' then
-					bOpen = true
+					bOpen = bAllowAutoOpen
 				else
 					bIntr = bAllowAutoIntr
 				end
 			elseif info.bRecent then
 				bIntr = bAllowAutoIntr
-			elseif info.eRuleType == 'craft' and info.eActionType == 'craft' then
+			elseif info.eActionType == 'loot' and O.bOpenLoot then -- 掉落是否可以打开
+				bOpen = bAllowAutoOpen and (not me.bFightState or O.bOpenLootEvenFight) and doodad.CanLoot(me.dwID)
+			elseif (info.eRuleType == 'craft' and info.eActionType == 'craft')
+				or (info.eRuleType == 'mining' and info.eActionType == 'craft')
+				or (info.eRuleType == 'herbalism' and info.eActionType == 'craft')
+				or (info.eRuleType == 'skinning' and info.eActionType == 'craft')
+			then
 				bIntr = bAllowAutoIntr
 			elseif (info.eRuleType == 'quest' and info.eActionType == 'quest')
 				or (info.eRuleType ~= 'other' and info.eRuleType ~= 'all' and info.eActionType == 'craft')
@@ -597,8 +627,8 @@ function D.OnOpenDoodad(dwID)
 		-- 从列表删除
 		D.Remove(dwID)
 	end
-	-- 如果是自定义物品、或最近采集物品，需要继续加入该物品
-	if doodad and (D.IsCustomDoodad(doodad) or D.IsRecentDoodad(doodad)) then
+	-- 如果来源非自动打开掉落、或者是自定义物品、或最近采集物品，需要继续加入该物品
+	if doodad and (info.eRuleType ~= 'loot' or D.IsCustomDoodad(doodad) or D.IsRecentDoodad(doodad)) then
 		D.TryAdd(dwID)
 	end
 	LIB.Debug(_L['MY_GKPDoodad'], 'OnOpenDoodad [' .. LIB.GetObjectName(TARGET.DOODAD, dwID, 'always') .. ']', DEBUG_LEVEL.LOG)
@@ -626,7 +656,10 @@ function D.UpdateMiniFlag()
 		return
 	end
 	for dwID, info in pairs(D.tDoodad) do
-		if info.eRuleType ~= 'loot' and info.eActionType ~= 'loot' then
+		if info.eRuleType == 'quest'
+			or info.eRuleType == 'craft' or info.eRuleType == 'mining'
+			or info.eRuleType == 'herbalism' or info.eRuleType == 'skinning'
+		then
 			local doodad = GetDoodad(dwID)
 			local dwType, nF1, nF2 = 5, 169, 48
 			if info.eRuleType == 'quest' then
@@ -643,14 +676,14 @@ end
 
 function D.OnBreatheCall()
 	local me = GetClientPlayer()
-	if not me then
+	if not me or not D.bReady then
 		return
 	end
 	for dwID, info in pairs(D.tDoodad) do
 		local doodad = GetDoodad(dwID)
 		if not doodad
 			or (info.eRuleType == 'quest' and info.eActionType == 'quest' and not doodad.HaveQuest(me.dwID))
-			or (info.eRuleType == 'loot' and info.eActionType == 'loot' and not doodad.CanLoot(me.dwID))
+			or (info.eActionType == 'loot' and not doodad.CanLoot(me.dwID))
 		then
 			D.Remove(dwID)
 			D.TryAdd(dwID)
@@ -918,6 +951,39 @@ function PS.OnPanelActive(frame)
 	nY = nY + 3
 	nX = ui:Append('WndCheckBox', {
 		x = nX, y = nY,
+		text = _L['Mining doodad'],
+		checked = O.bMiningDoodad,
+		oncheck = function(bChecked)
+			O.bMiningDoodad = bChecked
+			D.RescanNearby()
+		end,
+		autoenable = function() return O.bShowName or O.bInteract end,
+	}):AutoWidth():Pos('BOTTOMRIGHT') + 7
+
+	nX = ui:Append('WndCheckBox', {
+		x = nX, y = nY,
+		text = _L['Herbalism doodad'],
+		checked = O.bHerbalismDoodad,
+		oncheck = function(bChecked)
+			O.bHerbalismDoodad = bChecked
+			D.RescanNearby()
+		end,
+		autoenable = function() return O.bShowName or O.bInteract end,
+	}):AutoWidth():Pos('BOTTOMRIGHT') + 7
+
+	nX = ui:Append('WndCheckBox', {
+		x = nX, y = nY,
+		text = _L['Skinning doodad'],
+		checked = O.bSkinningDoodad,
+		oncheck = function(bChecked)
+			O.bSkinningDoodad = bChecked
+			D.RescanNearby()
+		end,
+		autoenable = function() return O.bShowName or O.bInteract end,
+	}):AutoWidth():Pos('BOTTOMRIGHT') + 7
+
+	nX = ui:Append('WndCheckBox', {
+		x = nX, y = nY,
 		text = _L['Quest doodad'],
 		checked = O.bQuestDoodad,
 		oncheck = function(bChecked)
@@ -925,18 +991,7 @@ function PS.OnPanelActive(frame)
 			D.RescanNearby()
 		end,
 		autoenable = function() return O.bShowName or O.bInteract end,
-	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
-
-	nX = ui:Append('WndCheckBox', {
-		x = nX, y = nY,
-		text = _L['Corpse doodad'],
-		checked = O.bCorpseDoodad,
-		oncheck = function(bChecked)
-			O.bCorpseDoodad = bChecked
-			D.RescanNearby()
-		end,
-		autoenable = function() return O.bShowName or O.bInteract end,
-	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
+	}):AutoWidth():Pos('BOTTOMRIGHT') + 7
 
 	nX = ui:Append('WndCheckBox', {
 		x = nX, y = nY,
@@ -947,7 +1002,7 @@ function PS.OnPanelActive(frame)
 			D.RescanNearby()
 		end,
 		autoenable = function() return O.bShowName or O.bInteract end,
-	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
+	}):AutoWidth():Pos('BOTTOMRIGHT') + 7
 
 	nX = ui:Append('WndCheckBox', {
 		x = nX, y = nY,
@@ -958,7 +1013,7 @@ function PS.OnPanelActive(frame)
 			D.RescanNearby()
 		end,
 		autoenable = function() return O.bShowName or O.bInteract end,
-	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
+	}):AutoWidth():Pos('BOTTOMRIGHT') + 7
 
 	nX = ui:Append('WndCheckBox', {
 		x = nX, y = nY,
@@ -969,7 +1024,7 @@ function PS.OnPanelActive(frame)
 			D.RescanNearby()
 		end,
 		autoenable = function() return O.bShowName or O.bInteract end,
-	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
+	}):AutoWidth():Pos('BOTTOMRIGHT') + 7
 
 	-- recent / all
 	nX, nY = X + 10, nY + nLineHeightM
