@@ -314,6 +314,10 @@ function D.GetDoodadInfo(dwID)
 			return info
 		end
 	end
+	-- Ê¬Ìå
+	if (doodad.nKind == DOODAD_KIND.CORPSE or doodad.nKind == DOODAD_KIND.NPCDROP) and not doodad.CanDialog(me) then
+		return
+	end
 	-- ÆäËû
 	if CanSelectDoodad(doodad.dwID) then
 		info.eDoodadType = 'other'
