@@ -528,7 +528,11 @@ function D.UpdateHeadName()
 				nG = nG * 0.85
 				nB = nB * 0.85
 			end
-			-- szName = szName .. '|' .. info.eRuleType .. '|' .. info.eActionType
+			--[[#DEBUG BEGIN]]
+			if D.bDebug then
+				szName = szName .. '|' .. info.eRuleType .. '|' .. info.eActionType
+			end
+			--[[#DEBUG END]]
 			sha:AppendDoodadID(tar.dwID, nR, nG, nB, nA, fYDelta, O.nNameFont, szName, 0, O.fNameScale)
 		end
 	end
@@ -814,6 +818,20 @@ function PS.OnPanelActive(frame)
 			D.RescanNearby()
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
+
+	--[[#DEBUG BEGIN]]
+	if LIB.IsDebugClient() then
+		nX = ui:Append('WndCheckBox', {
+			x = nX, y = nY,
+			text = _L['Debug'],
+			checked = D.bDebug,
+			oncheck = function(bChecked)
+				D.bDebug = bChecked
+				D.bUpdateLabel = true
+			end,
+		}):AutoWidth():Pos('BOTTOMRIGHT') + 10
+	end
+	--[[#DEBUG END]]
 
 	nX, nY = X + 10, nY + nLineHeightM
 	nLFY = nY
