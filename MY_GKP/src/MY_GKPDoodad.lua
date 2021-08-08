@@ -819,20 +819,6 @@ function PS.OnPanelActive(frame)
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
 
-	--[[#DEBUG BEGIN]]
-	if LIB.IsDebugClient() then
-		nX = ui:Append('WndCheckBox', {
-			x = nX, y = nY,
-			text = _L['Debug'],
-			checked = D.bDebug,
-			oncheck = function(bChecked)
-				D.bDebug = bChecked
-				D.bUpdateLabel = true
-			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT') + 10
-	end
-	--[[#DEBUG END]]
-
 	nX, nY = X + 10, nY + nLineHeightM
 	nLFY = nY
 
@@ -926,6 +912,20 @@ function PS.OnPanelActive(frame)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT') + 10
 	end
+
+	--[[#DEBUG BEGIN]]
+	if LIB.IsDebugClient() then
+		nX = ui:Append('WndCheckBox', {
+			x = nX, y = nY,
+			text = _L['Debug'],
+			checked = D.bDebug,
+			oncheck = function(bChecked)
+				D.bDebug = bChecked
+				D.bUpdateLabel = true
+			end,
+		}):AutoWidth():Pos('BOTTOMRIGHT') + 10
+	end
+	--[[#DEBUG END]]
 
 	-- craft
 	nX, nY = X + 10, nY + nLineHeightM
