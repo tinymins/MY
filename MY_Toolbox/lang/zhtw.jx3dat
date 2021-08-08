@@ -70,8 +70,8 @@ return {
 
     -- MY_JiugongHelper
     ['MY_JiugongHelper'] = '其它',
-    ['The kill sequence is: '] = '正確擊殺順序：',
-    ['Failed to calc.'] = '計算失敗。',
+    ['The jiugong full sequence is: %s, blank is: %s.'] = '九宮圖：%s，空缺：%s。',
+    ['Failed to calc.'] = '九宮圖計算失敗。',
 
     ['Memo (Role)'] = '隨身便箋 (角色)',
     ['Memo (Global)'] = '隨身便箋 (公共)',

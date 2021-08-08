@@ -112,15 +112,25 @@ function D.Apply()
 						break
 					end
 				end
-				local szText = _L['The kill sequence is: ']
+				local szText
 				if tSolution then
+					local szSequence = ''
+					for i, v in ipairs(tQuestion) do
+						szSequence = szSequence .. NumberToChinese(tSolution[i])
+						if not tQuestion[i] then
+							szSequence = szSequence
+						end
+						szSequence = szSequence .. ' '
+					end
+					local szBlank = ''
 					for i, v in ipairs(tQuestion) do
 						if not tQuestion[i] then
-							szText = szText .. NumberToChinese(tSolution[i]) .. ' '
+							szBlank = szBlank .. NumberToChinese(tSolution[i]) .. ' '
 						end
 					end
+					szText = _L('The jiugong full sequence is: %s, blank is: %s.', szSequence, szBlank)
 				else
-					szText = szText .. _L['Failed to calc.']
+					szText = _L['Failed to calc.']
 				end
 				LIB.Sysmsg(szText)
 				OutputWarningMessage('MSG_WARNING_RED', szText, 10)
