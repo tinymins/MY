@@ -84,7 +84,7 @@ local O = LIB.CreateUserSettingsModule('MY_VisualSkill', _L['General'], {
 })
 local D = {}
 
-local BOX_WIDTH = 48
+local BOX_WIDTH = 46
 local BOX_ANIMATION_TIME = 300
 local BOX_SLIDEOUT_DISTANCE = 200
 
