@@ -162,26 +162,25 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 	y = y + deltaY
 
 	-- 名剑大会战场自动取消屏蔽
-	ui:Append('WndCheckBox', {
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, w = 'auto',
 		text = _L['Auto cancel hide player in arena'],
 		checked = MY_ArenaHelper.bAutoShowModel,
 		oncheck = function(bChecked)
 			MY_ArenaHelper.bAutoShowModel = bChecked
 		end,
-	})
-	y = y + deltaY
+	}):Width() + 5
 
 	-- 名剑大会战场自动取消屏蔽
-	ui:Append('WndCheckBox', {
+	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, w = 'auto',
 		text = _L['Auto cancel hide player in battlefield'],
 		checked = MY_ArenaHelper.bAutoShowModelBattlefield,
 		oncheck = function(bChecked)
 			MY_ArenaHelper.bAutoShowModelBattlefield = bChecked
 		end,
-	})
-	y = y + deltaY
+	}):Width() + 5
+
 	return x, y
 end
 

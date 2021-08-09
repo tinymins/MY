@@ -90,6 +90,7 @@ function PS.OnPanelActive(wnd)
 	x, y = MY_VisualSkill.OnPanelActivePartial(ui, X + 10, Y, W, H, x, y, deltaY)
 	x, y = MY_DynamicActionBarPos.OnPanelActivePartial(ui, X + 10, Y, W, H, x, y, deltaY)
 	x, y = MY_ArenaHelper.OnPanelActivePartial(ui, X + 10, Y, W, H, x, y, deltaY)
+	x, y = X + 10, y + deltaY
 	x, y = MY_ShenxingHelper.OnPanelActivePartial(ui, X + 10, Y, W, H, x, y, deltaY)
 
 	-- ÆäËû
