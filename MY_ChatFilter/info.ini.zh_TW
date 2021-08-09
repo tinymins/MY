@@ -1,9 +1,0 @@
-[MY_ChatFilter]
-name=聊天過濾
-desc=提供多種自定義過濾聊天的方式
-default=1
-version=1.0
-dependence=MY_!Base
-lua_0=src\MY_ChatBlock.lua
-lua_1=src\MY_ChatFilter.lua
-package=MY

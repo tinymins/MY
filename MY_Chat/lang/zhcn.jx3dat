@@ -101,4 +101,28 @@ return {
     ['$zj look around and have a little thought.'] = '$zj斜眼看了身边的羊群，冥想了一会。',
     ['$zj epilate $mb\'s feather clearly.'] = '$zj麻利的拔光了$mb的羊毛。',
     ['$zj collected the feather epilated just now and wanted it sold well.'] = '$zj收拾了一下背包里的羊毛，希望今年能卖个好价钱。',
+
+    -- MY_ChatBlock, MY_ChatFilter
+    ['MY_ChatBlock'] = '聊天过滤',
+    ['MY_ChatFilter'] = '刷屏屏蔽',
+
+    ['Channels'] = '频道设置',
+    ['Enable'] = '启用',
+    ['Edit'] = '编辑',
+    ['Please input keyword:'] = '请输入关键字：',
+    ['Add'] = '添加',
+    ['Delete'] = '删除',
+
+    ['Ignore spaces'] = '忽略空格',
+    ['Ignore case'] = '忽略大写小写',
+    ['Ignore enem'] = '忽略全角半角',
+    ['Ignore acquaintance'] = '忽略认识的人',
+    ['Type keyword, right click list to config.'] = '输入关键字添加 右键列表可配置详情',
+
+    ['duplicate chat filter'                ] = '刷屏屏蔽',
+    ['filter duplicate chat'                ] = '开启刷屏屏蔽（相同聊天内容只显示第一条）',
+    ['filter duplicate chat ignore id'      ] = '刷屏屏蔽不同玩家发送的相同聊天内容也屏蔽',
+    ['only filter continuous duplicate chat'] = '刷屏屏蔽只屏蔽连续发送的刷屏聊天记录',
+    ['select duplicate channels'            ] = '选择启用刷屏屏蔽的频道',
+    ['filter duplicate addon message'       ] = '屏蔽相同内容的插件喊话（如海鳗首领倒计时）',
 }
