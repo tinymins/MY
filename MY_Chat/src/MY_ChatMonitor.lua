@@ -45,7 +45,7 @@ local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.G
 local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
 local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
 -------------------------------------------------------------------------------------------------------
-local PLUGIN_NAME = 'MY_ChatMonitor'
+local PLUGIN_NAME = 'MY_Chat'
 local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_ChatMonitor'
 local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
@@ -321,7 +321,7 @@ function D.OnMsgArrive(szChannel, szMsg, nFont, bRich, r, g, b, dwTalkerID, szNa
 		szMsg = html,
 		fnAction = D.OnNotifyCB,
 		bPlaySound = O.bPlaySound,
-		szSound = PACKET_INFO.ROOT .. 'MY_ChatMonitor/audio/MsgArrive.ogg',
+		szSound = PLUGIN_ROOT .. '/audio/MsgArrive.ogg',
 		szCustomSound = 'MsgArrive.ogg',
 		bPopupPreview = O.bShowPreview,
 	})
