@@ -87,8 +87,12 @@ function LIB.ReopenPanel()
 		return
 	end
 	local bVisible = LIB.IsPanelVisible()
+	local szCurrentTabID = LIB.GetCurrentTabID()
 	LIB.ClosePanel()
 	LIB.OpenPanel()
+	if szCurrentTabID then
+		LIB.SwitchTab(szCurrentTabID)
+	end
 	LIB.TogglePanel(bVisible, true, true)
 end
 
