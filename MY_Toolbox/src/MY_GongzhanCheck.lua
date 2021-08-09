@@ -56,7 +56,9 @@ end
 --------------------------------------------------------------------------
 
 local D = {}
-local O = {}
+local O = {
+	nGongzhanPublishChannel = PLAYER_TALK_CHANNEL.LOCAL_SYS,
+}
 
 local tChannels = {
 	{ nChannel = PLAYER_TALK_CHANNEL.LOCAL_SYS, szName = _L['PTC_LOCAL_SYS_CHANNEL'], rgb = GetMsgFontColor('MSG_SYS'   , true) },
