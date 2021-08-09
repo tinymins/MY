@@ -116,10 +116,12 @@ function PS.OnPanelActive(wnd)
 	x, y = MY_Domesticate.OnPanelActivePartial(ui, X + 10, Y, W, H, x, y, deltaY)
 	x, y = MY_Memo.OnPanelActivePartial(ui, X + 10, Y, W, H, x, y, deltaY)
 
+	x, y = MY_AutoSell.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
+	x, y = X + 10, y + deltaY
+
 	-- ”“≤‡∏°∂Ø
 	MY_GongzhanCheck.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 	MY_LockFrame.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
-	MY_AutoSell.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 	MY_DynamicItem.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 end
 LIB.RegisterPanel(_L['General'], 'MY_Toolbox', _L['MY_Toolbox'], 134, PS)

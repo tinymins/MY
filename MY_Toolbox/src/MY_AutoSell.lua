@@ -248,48 +248,54 @@ LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_AutoSell', function()
 end)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	ui:Append('WndComboBox', {
-		x = W - 140, y = 65, w = 130,
+	x = x + ui:Append('WndCheckBox', {
+		x = x, y = y, w = 'auto',
 		text = _L['Auto sell items'],
+		checked = O.bEnable,
+		oncheck = function(bChecked)
+			O.bEnable = bChecked
+			D.CheckEnable()
+		end,
+		tip = _L['Auto sell when open shop'],
+		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
+	}):Width() + 5
+
+	-- 按类型出售
+	x = x + ui:Append('WndComboBox', {
+		x = x, y = y, w = 'auto',
+		text = _L['Auto sell by type'],
 		menu = function()
 			local m0 = {
-				{ szOption = _L['Auto sell when open shop'], bDisable = true },
-				{
-					szOption = _L['Enable'],
-					bCheck = true, bChecked = O.bEnable,
-					fnAction = function(d, b)
-						O.bEnable = b
-						D.CheckEnable()
-					end,
-				},
 				{
 					szOption = _L['Sell grey items'],
 					bCheck = true, bChecked = O.bSellGray,
 					fnAction = function(d, b) O.bSellGray = b end,
-					fnDisable = function() return not O.bEnable end,
 				},
 				{
 					szOption = _L['Sell read white books'],
 					bCheck = true, bChecked = O.bSellWhiteBook,
 					fnAction = function(d, b) O.bSellWhiteBook = b end,
-					fnDisable = function() return not O.bEnable end,
 				},
 				{
 					szOption = _L['Sell read green books'], bCheck = true, bChecked = O.bSellGreenBook,
 					fnAction = function(d, b) O.bSellGreenBook = b end,
-					fnDisable = function() return not O.bEnable end
 				},
 				{
 					szOption = _L['Sell read blue books'], bCheck = true, bChecked = O.bSellBlueBook,
 					fnAction = function(d, b) O.bSellBlueBook = b end,
-					fnDisable = function() return not O.bEnable end,
 				},
-				{ bDevide = true },
 			}
-			-- 自定义售卖物品
+			return m0
+		end,
+		autoenable = function() return O.bEnable end,
+	}):Width() + 5
+
+	-- 按名称出售
+	x = x + ui:Append('WndComboBox', {
+		x = x, y = y, w = 'auto',
+		text = _L['Auto sell by name'],
+		menu = function()
 			local m1 = {
-				szOption = _L['Sell specified items'],
-				fnDisable = function() return not O.bEnable end,
 				{
 					szOption = _L['* New *'],
 					fnAction = function()
@@ -325,11 +331,17 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 				})
 			end
 			insert(m1, m2)
-			insert(m0, m1)
-			-- 自定义不卖物品
+			return m1
+		end,
+		autoenable = function() return O.bEnable end,
+	}):Width() + 5
+
+	-- 保护不被出售的物品
+	x = x + ui:Append('WndComboBox', {
+		x = x, y = y, w = 'auto',
+		text = _L['Protect specified items'],
+		menu = function()
 			local m1 = {
-				szOption = _L['Protect specified items'],
-				fnDisable = function() return not O.bEnable end,
 				{
 					szOption = _L['* New *'],
 					fnAction = function()
@@ -365,10 +377,11 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 				})
 			end
 			insert(m1, m2)
-			insert(m0, m1)
-			return m0
+			return m1
 		end,
-	})
+		autoenable = function() return O.bEnable end,
+	}):Width() + 5
+
 	return x, y
 end
 
