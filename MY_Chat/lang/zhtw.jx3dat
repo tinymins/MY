@@ -69,4 +69,36 @@ return {
 
     ['Resize emotion'] = '統一表情尺寸',
     ['Size: %d'] = '大小：%dpx。',
+
+    -- MY_TalkEx.lua
+    ['MY_TalkEx'] = '喊話輔助',
+
+	['Everyone'] = '所有人',
+    ['TalkEx Talk'] = '喊話輔助 - 發送',
+	['Send'] = '發送',
+	['Send to'] = '發送到',
+
+    ['Joke talk'] = '騷話大全',
+    ['Search'] = '搜索',
+    ['Click to search jokes.'] = '搜索騷話',
+    ['Copy'] = '複製',
+    ['Click to copy joke to chat panel.'] = '複製騷話到聊天欄',
+    ['Share'] = '分享',
+    ['Click to share your joke to remote.'] = '分享您編寫的騷話到公共庫中',
+    ['Confirm share joke:'] = '確認分享下方騷話內容到公共庫中？（分享可能由於審核關係不會實時更新）',
+    ['Share onymously'] = '分享',
+    ['Share anonymously'] = '匿名分享',
+    ['Share error: server error.'] = '分享失敗，服務無響應。',
+
+    ['Have a trick with'] = '調侃一下',
+    ['Trick'] = '調侃一下',
+    ['Teammates where'] = '團隊中',
+    ['Nearby players where'] = '附近的',
+    ['Please input something.'] = '請先輸入一些內容。',
+    ['SLIGHT_PAUSE_MARK'] = '、',
+    ['You are talking too quick!'] = '操作太過頻繁，靜待片刻方可！',
+    ['No trick target found.'] = '找不到可以調侃的玩家，您可以嘗試更改篩選條件。',
+    ['$zj look around and have a little thought.'] = '$zj斜眼看了身邊的羊群，冥想了一會。',
+    ['$zj epilate $mb\'s feather clearly.'] = '$zj麻利的拔光了$mb的羊毛。',
+    ['$zj collected the feather epilated just now and wanted it sold well.'] = '$zj收拾了一下背包里的羊毛，希望今年能賣個好價錢。',
 }

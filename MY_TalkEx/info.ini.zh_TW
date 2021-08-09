@@ -1,8 +1,0 @@
-[MY_TalkEx]
-name=喊話增強
-desc=多頻道喊話，勾搭調侃隊友
-default=1
-version=1.0
-dependence=MY_!Base
-lua_0=src\MY_TalkEx.lua
-package=MY
