@@ -507,55 +507,49 @@ LIB.RegisterUserSettingsUpdate('@@INIT@@', MODULE_NAME, function()
 end)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	ui:Append('WndComboBox', {
-		x = W - 140, y = 121, w = 130,
+	x = x + ui:Append('WndCheckBox', {
+		x = x, y = y, w = 'auto',
 		text = _L[MODULE_NAME],
-		menu = function()
-			local t = {
-				{
-					szOption = _L['Enable'],
-					bCheck = true, bChecked = MY_DynamicItem.bEnable,
-					fnAction = function(_, b)
-						MY_DynamicItem.bEnable = b
-					end,
-				},
-				{
-					szOption = _L['Show background'],
-					bCheck = true, bChecked = MY_DynamicItem.bShowBg,
-					fnAction = function(_, b)
-						MY_DynamicItem.bShowBg = b
-					end,
-				},
-			}
-			local t1 = {
-				szOption = _L['Box number'],
-			}
-			local t2 = {
-				szOption = _L['Col number'],
-			}
-			for i = 1, 32 do
-				insert(t1, {
-					szOption = i,
-					fnAction = function()
-						MY_DynamicItem.nNum = i
-					end,
-					bMCheck = true, bChecked = i == MY_DynamicItem.nNum
-				})
-				insert(t2, {
-					szOption = i,
-					fnAction = function()
-						MY_DynamicItem.nCol = i
-					end,
-					bMCheck = true, bChecked = i == MY_DynamicItem.nCol
-				})
-			end
-			insert(t, t1)
-			insert(t, t2)
-			return t
+		checked = MY_DynamicItem.bEnable,
+		oncheck = function(bChecked)
+			MY_DynamicItem.bEnable = bChecked
 		end,
 		tip = _L['Dynamic item bar for different map'],
 		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
-	})
+	}):Width() + 5
+
+	x = x + ui:Append('WndCheckBox', {
+		x = x, y = y, w = 'auto',
+		text = _L['Show background'],
+		checked = MY_DynamicItem.bShowBg,
+		oncheck = function(bChecked)
+			MY_DynamicItem.bShowBg = bChecked
+		end,
+		autoenable = function() return MY_DynamicItem.bEnable end,
+	}):Width() + 5
+
+	x = x + ui:Append('WndTrackbar', {
+		x = x, y = y, h = 25, w = 220,
+		range = {1, 32}, value = MY_DynamicItem.nNum,
+		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		textfmt = function(v) return _L('Box number: %d', v) end,
+		onchange = function(nVal)
+			LIB.DelayCall(function() MY_DynamicItem.nNum = nVal end)
+		end,
+		autoenable = function() return MY_DynamicItem.bEnable end,
+	}):Width() + 5
+
+	x = x + ui:Append('WndTrackbar', {
+		x = x, y = y, h = 25, w = 220,
+		range = {1, 32}, value = MY_DynamicItem.nCol,
+		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		textfmt = function(v) return _L('Col number: %d', v) end,
+		onchange = function(nVal)
+			LIB.DelayCall(function() MY_DynamicItem.nCol = nVal end)
+		end,
+		autoenable = function() return MY_DynamicItem.bEnable end,
+	}):Width() + 5
+
 	return x, y
 end
 

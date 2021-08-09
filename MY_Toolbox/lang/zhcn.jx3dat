@@ -412,8 +412,8 @@ return {
     ['Dynamic item bar for different map'] = '在不同地图显示不同的物品列表',
     ['Enable'] = '启用',
     ['Show background'] = '显示背景',
-    ['Box number'] = '总格子数',
-    ['Col number'] = '列数',
+    ['Box number: %d'] = '总格子数：%d',
+    ['Col number: %d'] = '列数：%d',
     ['Dynamic item %d'] = '动态物品栏 %s',
     ['Only item can be draged in'] = '动态物品栏只能放入物品',
 
