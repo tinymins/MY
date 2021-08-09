@@ -14,7 +14,7 @@ import time
 
 import plib.utils as utils
 import plib.git as git
-from plib.environment import get_current_packet_id, get_packet_path, set_packet_as_cwd
+from plib.environment import get_current_packet_id, get_interface_path, get_packet_path, set_packet_as_cwd
 from plib.language.converter import Converter
 import plib.environment as env
 
@@ -224,16 +224,22 @@ def run(diff_ver, is_source):
 		if os.path.exists(os.path.join('./', addon, 'info.ini')):
 			__compress(addon)
 
+	dist_root = os.path.abspath(os.path.join(get_interface_path(), os.pardir))
+	if os.path.isfile(os.path.abspath(os.path.join(dist_root, 'gameupdater.exe'))):
+		dist_root = os.path.abspath(os.path.join(get_packet_path(), '!src-dist', 'dist'))
+	else:
+		dist_root = os.path.abspath(os.path.join(dist_root, os.pardir, 'dist'))
+
 	# Package files
 	if version_info.get('previous_hash'):
-		file_name_fmt = '!src-dist/dist/%s_%s_v%s.%sdiff-%s-%s.7z' % (
+		file_name_fmt = os.path.abspath(os.path.join(dist_root, '%s_%s_v%s.%sdiff-%s-%s.7z' % (
 			get_current_packet_id(),
 			TIME_TAG,
 			version_info.get('current'),
 			'%s',
 			version_info.get('previous_hash'),
 			version_info.get('current_hash'),
-		)
+		)))
 		base_message = ''
 		base_hash = ''
 		if version_info.get('current') != '' and version_info.get('previous_hash') != '':
@@ -243,12 +249,12 @@ def run(diff_ver, is_source):
 		__7zip(file_name_fmt % 'remake-', base_message, base_hash, '.7zipignore-remake')
 		__7zip(file_name_fmt % 'classic-', base_message, base_hash, '.7zipignore-classic')
 
-	file_name_fmt = '!src-dist/dist/%s_%s_v%s.%sfull.7z' % (
+	file_name_fmt = os.path.abspath(os.path.join(dist_root, '%s_%s_v%s.%sfull.7z' % (
 		get_current_packet_id(),
 		TIME_TAG,
 		version_info.get('current'),
 		'%s',
-	)
+	)))
 	__7zip(file_name_fmt % '', '', '', '')
 	__7zip(file_name_fmt % 'remake-', '', '', '.7zipignore-remake')
 	__7zip(file_name_fmt % 'classic-', '', '', '.7zipignore-classic')
