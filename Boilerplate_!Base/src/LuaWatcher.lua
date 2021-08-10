@@ -6,10 +6,6 @@
 if LoadLUAData('interface/DEBUG.jx3dat') and IsLocalFileExist('ui/DEBUG.ini') then
 	Wnd.OpenWindow('ui/DEBUG.ini')
 end
---[[#DEBUG BEGIN]]
-if not IsDebugClient() then
-	return
-end
 -------------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
@@ -209,6 +205,14 @@ end
 RegisterEvent(NS .. '_BASE_LOADING_END', function()
 	local _L = _G[NS].LoadLangPack(_G[NS].PACKET_INFO.FRAMEWORK_ROOT .. 'lang/devs/')
 	local PS = {}
+	local bInitRunning = RUNNING
+
+	function PS.IsRestricted()
+		if bInitRunning then
+			return false
+		end
+		return not _G[NS].IsDebugClient('Dev_LuaWatcher')
+	end
 
 	function PS.OnPanelActive(wnd)
 		local ui = _G[NS].UI(wnd)
@@ -282,4 +286,3 @@ RegisterEvent(NS .. '_BASE_LOADING_END', function()
 
 	_G[NS].RegisterPanel(_L['Development'], 'LuaWatcher', _L['LuaWatcher'], 'ui/Image/UICommon/BattleFiled.UITex|7', PS)
 end)
---[[#DEBUG END]]
