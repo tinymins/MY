@@ -53,6 +53,7 @@ local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
+LIB.RegisterRestriction('MY_ItemPrice', { ['*'] = false, classic = true })
 --------------------------------------------------------------------------
 
 local O = LIB.CreateUserSettingsModule('MY_ItemPrice', _L['General'], {
@@ -114,25 +115,27 @@ function D.Open(dwTabType, dwTabIndex, nBookID)
 end
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, w = 'auto',
-		text = _L['Item price'],
-		checked = MY_ItemPrice.bEnable,
-		oncheck = function(bChecked)
-			if bChecked then
-				local ui = UI(this)
-				LIB.Confirm(_L['Check this will show price entry in bag item menu, and will share price when search auction, are you sure?'], function()
+	if not LIB.IsRestricted('MY_ItemPrice') then
+		x = x + ui:Append('WndCheckBox', {
+			x = x, y = y, w = 'auto',
+			text = _L['Item price'],
+			checked = MY_ItemPrice.bEnable,
+			oncheck = function(bChecked)
+				if bChecked then
+					local ui = UI(this)
+					LIB.Confirm(_L['Check this will show price entry in bag item menu, and will share price when search auction, are you sure?'], function()
+						MY_ItemPrice.bEnable = bChecked
+						ui:Check(true, WNDEVENT_FIRETYPE.PREVENT)
+					end)
+					ui:Check(false, WNDEVENT_FIRETYPE.PREVENT)
+				else
 					MY_ItemPrice.bEnable = bChecked
-					ui:Check(true, WNDEVENT_FIRETYPE.PREVENT)
-				end)
-				ui:Check(false, WNDEVENT_FIRETYPE.PREVENT)
-			else
-				MY_ItemPrice.bEnable = bChecked
-			end
-		end,
-		tip = _L['Hold SHIFT and r-click bag box to show item price, share price when search auction.'],
-		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
-	}):Width() + 5
+				end
+			end,
+			tip = _L['Hold SHIFT and r-click bag box to show item price, share price when search auction.'],
+			tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+		}):Width() + 5
+	end
 	return x, y
 end
 
