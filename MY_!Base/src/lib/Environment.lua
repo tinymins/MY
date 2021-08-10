@@ -69,18 +69,18 @@ local RESTRICTION = {}
 -- 注册功能在不同分支下屏蔽状态
 -- LIB.RegisterRestriction('SomeFunc', { ['*'] = true, intl = false })
 function LIB.RegisterRestriction(szKey, tBranchRestricted)
-	local bShielded = nil
+	local bRestricted = nil
 	if IsTable(tBranchRestricted) then
 		if IsBoolean(tBranchRestricted[GLOBAL.GAME_BRANCH]) then
-			bShielded = tBranchRestricted[GLOBAL.GAME_BRANCH]
+			bRestricted = tBranchRestricted[GLOBAL.GAME_BRANCH]
 		elseif IsBoolean(tBranchRestricted['*']) then
-			bShielded = tBranchRestricted['*']
+			bRestricted = tBranchRestricted['*']
 		end
 	end
-	if not IsBoolean(bShielded) then
+	if not IsBoolean(bRestricted) then
 		return
 	end
-	RESTRICTION[szKey] = bShielded
+	RESTRICTION[szKey] = bRestricted
 end
 
 -- 获取功能在当前分支是否已屏蔽
@@ -88,14 +88,14 @@ end
 function LIB.IsRestricted(szKey, ...)
 	if select('#', ...) == 1 then
 		-- 设置值
-		local bShielded = ...
-		if not IsNil(bShielded) then
-			bShielded = not not bShielded
+		local bRestricted = ...
+		if not IsNil(bRestricted) then
+			bRestricted = not not bRestricted
 		end
-		if RESTRICTION[szKey] == bShielded then
+		if RESTRICTION[szKey] == bRestricted then
 			return
 		end
-		RESTRICTION[szKey] = bShielded
+		RESTRICTION[szKey] = bRestricted
 		-- 发起事件通知
 		local szEvent = NSFormatString('{$NS}.RESTRICTION')
 		if szKey == '!' then
