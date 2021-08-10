@@ -264,6 +264,7 @@ function PS.OnPanelActive(wnd)
 		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 		onclick = function()
 			if IsCtrlKeyDown() and IsAltKeyDown() and IsShiftKeyDown() then
+				LIB.IsDebugClient('Dev_LuaWatcher', true, true)
 				LIB.IsDebugClient('Dev_UIEditor', true, true)
 				LIB.IsDebugClient('Dev_UIManager', true, true)
 				LIB.IsDebugClient('Dev_UIFindStation', true, true)
