@@ -107,6 +107,9 @@ local function var2str_x(var, indent, level) -- 只解析一层table且不解析方法
 end
 
 LIB.RegisterPanel(_L['Development'], 'Dev_VarWatch', _L['VarWatch'], 'ui/Image/UICommon/BattleFiled.UITex|7', {
+	IsRestricted = function()
+		return not LIB.IsDebugClient('Dev_VarWatch')
+	end,
 	OnPanelActive = function(wnd)
 		local ui = UI(wnd)
 		local x, y = 10, 10

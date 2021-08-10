@@ -130,5 +130,8 @@ _Cache.OnPanelDeactive = function(wnd)
 end
 
 LIB.RegisterPanel(_L['Development'], 'Dev_UITexViewer', _L['UITexViewer'], 'ui/Image/UICommon/BattleFiled.UITex|7', {
+	IsRestricted = function()
+		return not LIB.IsDebugClient('Dev_UITexViewer')
+	end,
 	OnPanelActive = _Cache.OnPanelActive, OnPanelDeactive = _Cache.OnPanelDeactive
 })

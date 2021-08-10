@@ -448,6 +448,9 @@ LIB.RegisterInit('MYDEV_SNAPLINES', MYDev_Snaplines.ReloadUI)
 
 -- ×¢²áÃæ°å
 LIB.RegisterPanel(_L['Development'], 'Dev_Snaplines', _L['Snaplines'], 'ui/Image/UICommon/PlugIn.UITex|1', {
+	IsRestricted = function()
+		return not LIB.IsDebugClient('Dev_Snaplines')
+	end,
 	OnPanelActive = function(wnd)
 		local ui = UI(wnd)
 		local w, h = ui:Size()

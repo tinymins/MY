@@ -105,6 +105,9 @@ _C.SetEventID = function(ui, nEventID)
 end
 
 LIB.RegisterPanel(_L['Development'], 'Dev_UIEventID', _L['UIEventID'], 'ui/Image/UICommon/BattleFiled.UITex|7', {
+IsRestricted = function()
+	return not LIB.IsDebugClient('Dev_UIEventID')
+end,
 OnPanelActive = function(wnd)
 	local ui = UI(wnd)
 	local x, y = 10, 30
