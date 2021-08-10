@@ -53,6 +53,7 @@ local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
+LIB.RegisterRestriction('MY_ChatLog.DEVELOP', { ['*'] = true })
 --------------------------------------------------------------------------
 
 local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['Chat'], {
@@ -149,7 +150,7 @@ function D.InitDB(szMode)
 	if not szMode then
 		szMode = 'ask'
 	end
-	if szMode == 'silent' and not LIB.IsShieldedVersion('DEVELOP') then
+	if szMode == 'silent' and not LIB.IsRestricted('MY_ChatLog.DEVELOP') then
 		szMode = 'sure'
 	end
 	if not D.UpgradeDB(szMode) then
@@ -296,7 +297,7 @@ end
 			end
 			if MAIN_DS then
 				MAIN_DS:InsertMsg(szChannel, szText, szMsg, szTalker, GetCurrentTime())
-				if D.bReady and O.bRealtimeCommit and not LIB.IsShieldedVersion('MY_ChatLog') then
+				if D.bReady and O.bRealtimeCommit and not LIB.IsRestricted('MY_ChatLog.RealtimeCommit') then
 					MAIN_DS:FlushDB()
 				end
 			else
@@ -314,7 +315,7 @@ LIB.RegisterEvent('LOADING_ENDING', 'MY_ChatLog_Save', function()
 end)
 
 LIB.RegisterIdle('MY_ChatLog_Save', function()
-	if MAIN_DS and not LIB.IsShieldedVersion('DEVELOP') then
+	if MAIN_DS and not LIB.IsRestricted('MY_ChatLog.DEVELOP') then
 		MAIN_DS:FlushDB()
 	end
 end)
@@ -375,7 +376,7 @@ end
 LIB.RegisterExit('MY_Chat_Release', D.ReleaseDB)
 
 LIB.RegisterEvent('DISCONNECT', 'MY_Chat_Release', function()
-	if LIB.IsShieldedVersion('DEVELOP') then
+	if LIB.IsRestricted('MY_ChatLog.DEVELOP') then
 		return
 	end
 	D.ReleaseDB()

@@ -53,6 +53,8 @@ local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
+LIB.RegisterRestriction('MY_GKPDoodad.AutoInteract', { ['*'] = true, intl = false })
+LIB.RegisterRestriction('MY_GKPDoodad.SHIELDED_DOODAD', { ['*'] = true, intl = false })
 --------------------------------------------------------------------------
 
 local O = LIB.CreateUserSettingsModule('MY_GKPDoodad', _L['General'], {
@@ -202,11 +204,11 @@ local function GetDoodadTemplateName(dwID)
 end
 
 local function IsShowNameDisabled()
-	return LIB.IsInShieldedMap() and LIB.IsShieldedVersion('TARGET')
+	return LIB.IsInShieldedMap() and LIB.IsRestricted('MY_GKPDoodad.SHIELDED_DOODAD')
 end
 
 local function IsAutoInteractDisabled()
-	return not O.bInteract or IsShiftKeyDown() or Station.Lookup('Normal/MY_GKPLoot') or LIB.IsShieldedVersion('MY_GKPDoodad')
+	return not O.bInteract or IsShiftKeyDown() or Station.Lookup('Normal/MY_GKPLoot') or LIB.IsRestricted('MY_GKPDoodad.AutoInteract')
 end
 
 local D = {
@@ -893,7 +895,7 @@ function PS.OnPanelActive(frame)
 		autoenable = function() return O.bShowName end,
 	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
 
-	if not LIB.IsShieldedVersion('MY_GKPDoodad') then
+	if not LIB.IsRestricted('MY_GKPDoodad.AutoInteract') then
 		nX = ui:Append('WndCheckBox', {
 			x = nX, y = nY,
 			text = _L['Auto craft'],
@@ -1098,7 +1100,7 @@ function PS.OnPanelActive(frame)
 			D.ReloadCustom()
 		end,
 		tip = function()
-			if LIB.IsShieldedVersion('MY_GKPDoodad') then
+			if LIB.IsRestricted('MY_GKPDoodad.AutoInteract') then
 				return
 			end
 			return _L['Tip: Enter the name of dead animals can be automatically Paoding!']

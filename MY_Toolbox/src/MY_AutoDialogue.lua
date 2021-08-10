@@ -53,6 +53,7 @@ local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
+LIB.RegisterRestriction('MY_AutoDialogue', { ['*'] = true, intl = false })
 --------------------------------------------------------------------------
 local DIALOGUE
 local CURRENT_WINDOW
@@ -282,7 +283,7 @@ end
 local function onOpenWindow()
 	CURRENT_WINDOW = arg0
 	CURRENT_CONTENTS = arg1
-	if not O.bEnable or LIB.IsShieldedVersion('MY_AutoDialogue') then
+	if not O.bEnable or LIB.IsRestricted('MY_AutoDialogue') then
 		return
 	end
 	LIB.DelayCall('MY_AutoDialogue__AutoDialogue', D.AutoDialogue)
@@ -443,7 +444,7 @@ local ENTRY_LIST = {
 	},
 }
 function D.CreateEntry()
-	if LIB.IsShieldedVersion('MY_AutoDialogue') then
+	if LIB.IsRestricted('MY_AutoDialogue') then
 		return
 	end
 	for _, p in ipairs(ENTRY_LIST) do
@@ -473,7 +474,7 @@ end
 LIB.RegisterInit('MY_AutoDialogue', D.CreateEntry)
 
 function D.UpdateEntryPos()
-	if LIB.IsShieldedVersion('MY_AutoDialogue') then
+	if LIB.IsRestricted('MY_AutoDialogue') then
 		return
 	end
 	for _, p in ipairs(ENTRY_LIST) do
@@ -513,18 +514,18 @@ end
 LIB.RegisterReload('MY_AutoDialogue#ENTRY', D.RemoveEntry)
 
 local function onOpenWindow()
-	if LIB.IsShieldedVersion('MY_AutoDialogue') then
+	if LIB.IsRestricted('MY_AutoDialogue') then
 		return
 	end
 	D.CreateEntry()
 end
 LIB.RegisterEvent('OPEN_WINDOW', 'MY_AutoDialogue#ENTRY', onOpenWindow)
 
-LIB.RegisterEvent('MY_SHIELDED_VERSION', 'MY_AutoDialogue#ENTRY', function()
+LIB.RegisterEvent('MY_RESTRICTION', 'MY_AutoDialogue#ENTRY', function()
 	if arg0 and arg0 ~= 'MY_AutoDialogue' then
 		return
 	end
-	if LIB.IsShieldedVersion('MY_AutoDialogue') then
+	if LIB.IsRestricted('MY_AutoDialogue') then
 		D.RemoveEntry()
 	else
 		D.CreateEntry()
@@ -584,7 +585,7 @@ function D.GetConfigMenu()
 end
 
 LIB.RegisterAddonMenu('MY_AutoDialogue', function()
-	if LIB.IsShieldedVersion('MY_AutoDialogue') then
+	if LIB.IsRestricted('MY_AutoDialogue') then
 		return
 	end
 	return D.GetConfigMenu()

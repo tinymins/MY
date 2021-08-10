@@ -53,6 +53,7 @@ local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
+LIB.RegisterRestriction('MY_MiddleMapMark.MapRestriction', { ['*'] = true })
 --------------------------------------------------------------------------
 LIB.CreateDataRoot(PATH_TYPE.GLOBAL)
 local l_szKeyword, l_dwMapID, l_nMapIndex, l_renderTime = '', nil, nil, 0
@@ -343,7 +344,7 @@ end
 local NpcTpl = LIB.LoadLUAData(PACKET_INFO.ROOT .. 'MY_MiddleMapMark/data/npc/{$lang}.jx3dat')
 local DoodadTpl = LIB.LoadLUAData(PACKET_INFO.ROOT .. 'MY_MiddleMapMark/data/doodad/{$lang}.jx3dat')
 local function OnNpcEnterScene()
-	if l_tempMap and LIB.IsShieldedVersion('MY_MiddleMapMark') then
+	if l_tempMap and LIB.IsRestricted('MY_MiddleMapMark.MapRestriction') then
 		return
 	end
 	local npc = GetNpc(arg0)
@@ -405,7 +406,7 @@ local REC_DOODAD_TYPES = {
 	[DOODAD_KIND.SPRINT      ] = false, -- Çá¹¦Âä½Åµã
 }
 local function OnDoodadEnterScene()
-	if l_tempMap and LIB.IsShieldedVersion('MY_MiddleMapMark') then
+	if l_tempMap and LIB.IsRestricted('MY_MiddleMapMark.MapRestriction') then
 		return
 	end
 	local doodad = GetDoodad(arg0)

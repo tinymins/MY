@@ -53,6 +53,7 @@ local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
+LIB.RegisterRestriction('MY_JiugongHelper', { ['*'] = true, intl = false })
 --------------------------------------------------------------------------
 
 local O = LIB.CreateUserSettingsModule('MY_JiugongHelper', _L['General'], {
@@ -68,7 +69,7 @@ local D = {}
 function D.Apply()
 	if D.bReady then
 		LIB.RegisterEvent('OPEN_WINDOW', 'JIUGONG_HELPER', function(event)
-			if LIB.IsShieldedVersion('MY_JiugongHelper') then
+			if LIB.IsRestricted('MY_JiugongHelper') then
 				return
 			end
 			-- 确定当前对话对象是醉逍遥（18707）

@@ -53,6 +53,7 @@ local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
+LIB.RegisterRestriction('MY_AutoMemorizeBook', { ['*'] = true, intl = false })
 --------------------------------------------------------------------------
 
 local O = LIB.CreateUserSettingsModule('MY_AutoMemorizeBook', _L['General'], {
@@ -84,7 +85,7 @@ function D.Unhook()
 end
 
 function D.CheckEnable()
-	if LIB.IsShieldedVersion('MY_AutoMemorizeBook') then
+	if LIB.IsRestricted('MY_AutoMemorizeBook') then
 		D.Unhook()
 		LIB.RegisterFrameCreate('CraftReaderPanel', 'MY_AutoMemorizeBook', false)
 		LIB.RegisterEvent('OPEN_BOOK', 'MY_AutoMemorizeBook', false)
@@ -114,7 +115,7 @@ end
 
 LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_AutoMemorizeBook', D.CheckEnable)
 LIB.RegisterReload('MY_AutoMemorizeBook', D.Unhook)
-LIB.RegisterEvent('MY_SHIELDED_VERSION', 'MY_AutoMemorizeBook', function()
+LIB.RegisterEvent('MY_RESTRICTION', 'MY_AutoMemorizeBook', function()
 	if arg0 and arg0 ~= 'MY_AutoMemorizeBook' then
 		return
 	end

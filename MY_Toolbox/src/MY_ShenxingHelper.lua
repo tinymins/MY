@@ -53,6 +53,7 @@ local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
+LIB.RegisterRestriction('MY_ShenxingHelper', { ['*'] = true, intl = false })
 --------------------------------------------------------------------------
 
 local O = LIB.CreateUserSettingsModule('MY_ShenxingHelper', _L['General'], {
@@ -157,7 +158,7 @@ function D.UnhookNonwarMap()
 end
 
 function D.CheckNonwarMapEnable()
-	if D.bReady and O.bAncientMap and not LIB.IsShieldedVersion('MY_ShenxingHelper') then
+	if D.bReady and O.bAncientMap and not LIB.IsRestricted('MY_ShenxingHelper') then
 		D.HookNonwarMap()
 	else
 		D.UnhookNonwarMap()
@@ -221,7 +222,7 @@ function D.UnhookOpenAllMap()
 end
 
 function D.CheckOpenAllMapEnable()
-	if D.bReady and O.bOpenAllMap and not LIB.IsShieldedVersion('MY_ShenxingHelper') then
+	if D.bReady and O.bOpenAllMap and not LIB.IsRestricted('MY_ShenxingHelper') then
 		LIB.RegisterEvent({
 			'LOADING_END',
 			'UPDATE_ROAD_TRACK_FORCE',
@@ -293,7 +294,7 @@ function D.RemoveHook()
 	D.UnhookOpenAllMap()
 end
 
-LIB.RegisterEvent('MY_SHIELDED_VERSION', 'MY_ShenxingHelper', function()
+LIB.RegisterEvent('MY_RESTRICTION', 'MY_ShenxingHelper', function()
 	if arg0 and arg0 ~= 'MY_ShenxingHelper' then
 		return
 	end
@@ -320,7 +321,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 		end,
 	}):Width() + 5
 
-	if not LIB.IsShieldedVersion('MY_ShenxingHelper') then
+	if not LIB.IsRestricted('MY_ShenxingHelper') then
 		x = x + ui:Append('WndCheckBox', {
 			x = x, y = y, w = 'auto',
 			text = _L['Shenxing to ancient maps'],

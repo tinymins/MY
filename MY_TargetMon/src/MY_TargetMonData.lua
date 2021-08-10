@@ -54,6 +54,7 @@ local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
+LIB.RegisterRestriction('MY_TargetMon.MapRestriction', { ['*'] = true })
 --------------------------------------------------------------------------
 local C, D = {}, {
 	GetTargetTypeList = MY_TargetMonConfig.GetTargetTypeList,
@@ -180,7 +181,7 @@ do
 local SHIELDED
 function D.IsShielded()
 	if SHIELDED == nil then
-		SHIELDED = LIB.IsShieldedVersion('MY_TargetMon') and LIB.IsInArena()
+		SHIELDED = LIB.IsRestricted('MY_TargetMon.MapRestriction') and LIB.IsInArena()
 	end
 	return SHIELDED
 end
@@ -188,7 +189,7 @@ end
 local function onShieldedReset()
 	SHIELDED = nil
 end
-LIB.RegisterEvent('MY_SHIELDED_VERSION', 'MY_TargetMonData_Shield', function()
+LIB.RegisterEvent('MY_RESTRICTION', 'MY_TargetMonData_Shield', function()
 	if arg0 and arg0 ~= 'MY_TargetMon' then
 		return
 	end
@@ -805,7 +806,7 @@ for i = 1, 5 do
 			'MY_TargetMon_' .. i .. '_' .. j, _L('Cancel buff %d - %d', i, j),
 			i == 1 and j == 1 and _L['MY Buff Monitor'] or '',
 			function()
-				if LIB.IsShieldedVersion('MY_TargetMon') and not LIB.IsInDungeon() then
+				if LIB.IsRestricted('MY_TargetMon.MapRestriction') and not LIB.IsInDungeon() then
 					OutputMessage('MSG_ANNOUNCE_RED', _L['Cancel buff is disabled outside dungeon.'])
 					return
 				end

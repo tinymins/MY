@@ -53,6 +53,7 @@ local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
+LIB.RegisterRestriction('MY_WorldMark', { ['*'] = true, intl = false })
 --------------------------------------------------------------------------
 local PS = { nPriority = 0 }
 function PS.OnPanelActive(wnd)
@@ -89,7 +90,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	}):AutoWidth():Width() + 5
 
-	if not LIB.IsShieldedVersion('MY_WorldMark') then
+	if not LIB.IsRestricted('MY_WorldMark') then
 		nX = nX + ui:Append('WndCheckBox', {
 			x = nX, y = nY,
 			checked = MY_WorldMark.bEnable,

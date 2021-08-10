@@ -209,7 +209,7 @@ local function onBreathe()
 end
 
 function D.CheckEnable()
-	if D.bReady and not LIB.IsShieldedVersion('MY_TargetFace') and (O.bTargetFace or O.bTTargetFace or O.bTargetShape or O.bTTargetShape) then
+	if D.bReady and not LIB.IsRestricted('MY_Target.LineFace') and (O.bTargetFace or O.bTTargetFace or O.bTargetShape or O.bTTargetShape) then
 		local hShaList = UI.GetShadowHandle('MY_TargetFace')
 		for _, v in ipairs({'TargetFace', 'TargetShape', 'TTargetFace', 'TTargetShape'}) do
 			local sha = hShaList:Lookup(v)
@@ -233,7 +233,7 @@ function D.CheckEnable()
 	D.RequireRerender()
 end
 
-LIB.RegisterEvent('MY_SHIELDED_VERSION', 'MY_TargetFace', function()
+LIB.RegisterEvent('MY_RESTRICTION', 'MY_TargetFace', function()
 	if arg0 and arg0 ~= 'MY_TargetFace' then
 		return
 	end

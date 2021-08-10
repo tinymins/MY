@@ -95,6 +95,7 @@ local CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID
 local CHANGGE_REAL_SHADOW_TPLID = 46140 -- 清绝歌影 的主体影子
 local CHANGGE_REAL_SHADOW_CACHE = {}
 do
+LIB.RegisterRestriction('MY_Cataclysm.CHANGGE_SHADOW', { ['*'] = true, intl = false })
 local function onNpcEnterScene()
 	local me = GetClientPlayer()
 	local npc = GetNpc(arg0)
@@ -102,7 +103,7 @@ local function onNpcEnterScene()
 		CTM_BOSS_CACHE[npc.dwID] = npc
 	end
 	if npc.dwTemplateID == CHANGGE_REAL_SHADOW_TPLID then
-		if not (IsEnemy(UI_GetClientPlayerID(), arg0) and LIB.IsShieldedVersion('CHANGGE_SHADOW')) then
+		if not (IsEnemy(UI_GetClientPlayerID(), arg0) and LIB.IsRestricted('MY_Cataclysm.CHANGGE_SHADOW')) then
 			local dwType, dwID = LIB.GetTarget()
 			if dwType == TARGET.PLAYER and dwID == npc.dwEmployer then
 				LIB.SetTarget(TARGET.NPC, arg0)
@@ -117,7 +118,7 @@ LIB.RegisterEvent('NPC_ENTER_SCENE', 'MY_Cataclysm', onNpcEnterScene)
 local function onNpcLeaveScene()
 	local npc = GetNpc(arg0)
 	if CHANGGE_REAL_SHADOW_CACHE[arg0] then
-		if not (IsEnemy(UI_GetClientPlayerID(), arg0) and LIB.IsShieldedVersion('CHANGGE_SHADOW')) then
+		if not (IsEnemy(UI_GetClientPlayerID(), arg0) and LIB.IsRestricted('MY_Cataclysm.CHANGGE_SHADOW')) then
 			local dwType, dwID = LIB.GetTarget()
 			if dwType == TARGET.NPC and dwID == arg0 then
 				LIB.SetTarget(TARGET.PLAYER, npc.dwEmployer)
@@ -508,6 +509,7 @@ function MY_CataclysmParty_Base.OnItemMouseLeave(dst)
 end
 end
 
+LIB.RegisterRestriction('MY_Cataclysm.Seize', { ['*'] = true })
 function MY_CataclysmParty_Base.OnItemRButtonClick()
 	if not this.dwID then
 		return
@@ -585,7 +587,7 @@ function MY_CataclysmParty_Base.OnItemRButtonClick()
 					team.SetAuthorityInfo(TEAM_AUTHORITY_TYPE.DISTRIBUTE, UI_GetClientPlayerID())
 				end,
 			})
-		elseif not LIB.IsShieldedVersion('MY_CataclysmSeize', 2) then
+		elseif not LIB.IsRestricted('MY_Cataclysm.Seize') then
 			insert(menu, { bDevide = true })
 			insert(menu, {
 				szOption = _L['Take back permissions'],

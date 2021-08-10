@@ -53,6 +53,7 @@ local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
+LIB.RegisterRestriction('MY_ExamTip', { ['*'] = true, intl = false })
 --------------------------------------------------------------------------
 local LOCAL_DATA_CACHE -- 本地题库
 local INPUT_DATA_CACHE = {} -- 玩家答题缓存
@@ -182,7 +183,7 @@ function D.SubmitData(tExamData, bAllRight)
 			}, 'idiadoHUiogyui()&*hHUO'))),
 		success = function(html, status)
 			local res = LIB.JsonDecode(html)
-			if LIB.IsShieldedVersion('MY_ExamTip') or not res then
+			if LIB.IsRestricted('MY_ExamTip') or not res then
 				return
 			end
 			LIB.Sysmsg(_L['Exam tip'], _L('%s record(s) commited, %s record(s) accepted!', res.received, res.accepted))
@@ -266,7 +267,7 @@ do
 local l_nExamPrintRemainSpace = 0
 local function OnFrameBreathe()
 	local szQues, aBody = D.GatherDataFromPanel()
-	if not LIB.IsShieldedVersion('MY_ExamTip') then
+	if not LIB.IsRestricted('MY_ExamTip') then
 		QueryData(szQues)
 	end
 	if szQues and aBody then

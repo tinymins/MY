@@ -53,6 +53,7 @@ local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
+LIB.RegisterRestriction('MY_ChatLog.RealtimeCommit', { ['*'] = true, intl = false })
 --------------------------------------------------------------------------
 
 local D = {}
@@ -420,7 +421,7 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + dy
 
-	if not LIB.IsShieldedVersion('MY_ChatLog') then
+	if not LIB.IsRestricted('MY_ChatLog.RealtimeCommit') then
 		ui:Append('WndCheckBox', {
 			x = x, y = y, w = wr,
 			text = _L['Realtime database commit'],

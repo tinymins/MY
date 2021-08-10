@@ -53,6 +53,7 @@ local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
+LIB.RegisterRestriction('MY_Anmerkungen.Export', { ['*'] = true, intl = false })
 --------------------------------------------------------------------------
 local _C = {}
 local LOADED = false
@@ -432,7 +433,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 
-	if not MY.IsShieldedVersion('MY_Anmerkungen') then
+	if not MY.IsRestricted('MY_Anmerkungen.Export') then
 		ui:Append('WndButton', {
 			x = w - 230, y = y, w = 110,
 			text = _L['Import'],

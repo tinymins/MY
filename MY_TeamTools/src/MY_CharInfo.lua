@@ -53,6 +53,7 @@ local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
+LIB.RegisterRestriction('MY_CharInfo.Daddy', { ['*'] = true })
 --------------------------------------------------------------------------
 
 local O = LIB.CreateUserSettingsModule('MY_CharInfo', _L['Raid'], {
@@ -212,7 +213,7 @@ function D.ViewCharInfoToPlayer(dwID)
 		LIB.Alert(_L['Party limit'])
 	else
 		CharInfo.CreateFrame(dwID, szName)
-		LIB.SendBgMsg(nChannel, 'CHAR_INFO', {'ASK', dwID, LIB.IsShieldedVersion('MY_CharInfoDaddy', 2) and 'DEBUG'})
+		LIB.SendBgMsg(nChannel, 'CHAR_INFO', {'ASK', dwID, LIB.IsRestricted('MY_CharInfo.Daddy') and 'DEBUG'})
 	end
 end
 

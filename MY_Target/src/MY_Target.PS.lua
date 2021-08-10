@@ -53,6 +53,7 @@ local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
+LIB.RegisterRestriction('MY_Target.LineFace', { ['*'] = true, intl = false })
 --------------------------------------------------------------------------
 
 local PS = {}
@@ -84,7 +85,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	}):AutoWidth()
 
-	if LIB.IsShieldedVersion('MY_Target') then
+	if LIB.IsRestricted('MY_Target.LineFace') then
 		return
 	end
 

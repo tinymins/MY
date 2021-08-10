@@ -272,7 +272,7 @@ end
 
 function D.OnUseManaChange()
 	local bUseMana = D.bReady and O.bUseMana
-	if bUseMana and not LIB.IsShieldedVersion('MY_ForceGuding') then
+	if bUseMana and not LIB.IsRestricted('MY_ForceGuding') then
 		LIB.BreatheCall('MY_ForceGuding__UseMana', function()
 			local nFrame = GetLogicFrameCount()
 			-- check to use mana

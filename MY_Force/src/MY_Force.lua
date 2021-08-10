@@ -53,6 +53,7 @@ local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
+LIB.RegisterRestriction('MY_ForceGuding', { ['*'] = true, intl = false })
 --------------------------------------------------------------------------
 
 local O = LIB.CreateUserSettingsModule('MY_Force', _L['Target'], {
@@ -374,7 +375,7 @@ function PS.OnPanelActive(frame)
 		})
 		-- crlf
 		y = y + 54
-		if not LIB.IsShieldedVersion('MY_ForceGuding') then
+		if not LIB.IsRestricted('MY_ForceGuding') then
 			-- crlf
 			x = X + 10
 			x = ui:Append('WndCheckBox', {

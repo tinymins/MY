@@ -53,6 +53,8 @@ local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
+LIB.RegisterRestriction('MY_FriendTipLocation', { ['*'] = true, intl = false })
+LIB.RegisterRestriction('MY_FriendTipLocation.LV2', { ['*'] = true })
 --------------------------------------------------------------------------
 
 local O = LIB.CreateUserSettingsModule('MY_FriendTipLocation', _L['General'], {
@@ -85,7 +87,7 @@ function D.Hook()
 		txtLocation.SetText = function(_, szText)
 			local info = txtName and LIB.GetFriend(txtName:GetText())
 			local card = info and info.isonline and GetFellowshipCardClient().GetFellowshipCardInfo(info.id)
-			if card and ((info.istwoway and info.attraction >= 200) or not LIB.IsShieldedVersion('MY_FriendTipLocation', 2)) then
+			if card and ((info.istwoway and info.attraction >= 200) or not LIB.IsRestricted('MY_FriendTipLocation.LV2')) then
 				szText = Table_GetMapName(card.dwMapID)
 				if (me.nCamp == CAMP.EVIL and card.nCamp == CAMP.GOOD)
 				or (me.nCamp == CAMP.GOOD and card.nCamp == CAMP.EVIL) then
@@ -102,7 +104,7 @@ function D.Unhook()
 end
 
 function D.CheckEnable()
-	if D.bReady and O.bEnable and not LIB.IsShieldedVersion('MY_FriendTipLocation') then
+	if D.bReady and O.bEnable and not LIB.IsRestricted('MY_FriendTipLocation') then
 		D.Hook()
 		LIB.RegisterFrameCreate('FriendTip', 'MY_FriendTipLocation', D.Hook)
 	else
@@ -116,7 +118,7 @@ LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_FriendTipLocation', function()
 	D.CheckEnable()
 end)
 LIB.RegisterReload('MY_FriendTipLocation', D.Unhook)
-LIB.RegisterEvent('MY_SHIELDED_VERSION', 'MY_FriendTipLocation', function()
+LIB.RegisterEvent('MY_RESTRICTION', 'MY_FriendTipLocation', function()
 	if arg0 and arg0 ~= 'MY_FriendTipLocation' then
 		return
 	end
@@ -124,7 +126,7 @@ LIB.RegisterEvent('MY_SHIELDED_VERSION', 'MY_FriendTipLocation', function()
 end)
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
-	if not LIB.IsShieldedVersion('MY_FriendTipLocation') then
+	if not LIB.IsRestricted('MY_FriendTipLocation') then
 		x = x + ui:Append('WndCheckBox', {
 			x = x, y = y,
 			text = _L['Show all friend tip location'],

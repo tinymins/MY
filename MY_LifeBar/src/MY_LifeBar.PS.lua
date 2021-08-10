@@ -868,7 +868,7 @@ function PS.OnPanelActive(wnd)
 		autoenable = function() return D.IsEnabled() and Config.bShowObjectID end,
 	}):AutoWidth():Width()
 
-	if not LIB.IsShieldedVersion('MY_LifeBar') then
+	if not LIB.IsRestricted('MY_LifeBar.SpecialNpc') then
 		x = X
 		y = y + offsety - 10
 		x = x + ui:Append('WndCheckBox', {

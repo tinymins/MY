@@ -159,7 +159,7 @@ function D.UpdateLine()
 	local ttar = LIB.GetObject(dwTTarType, dwTTarID)
 	local dwTarLineSrcType, dwTarLineSrcID, dwTarLineDstType, dwTarLineDstID
 	local dwTTarLineSrcType, dwTTarLineSrcID, dwTTarLineDstType, dwTTarLineDstID
-	if not C.bShielded then
+	if not C.bRestricted then
 		if me and tar and (not ttar or ttar.dwID ~= me.dwID) then
 			dwTarLineSrcType = TARGET.PLAYER
 			dwTarLineSrcID = me.dwID
@@ -258,8 +258,8 @@ end
 end
 
 function D.CheckEnable()
-	C.bShielded = LIB.IsShieldedVersion('MY_TargetLine')
-	if D.bReady and (O.bTarget or O.bTTarget) and not C.bShielded then
+	C.bRestricted = LIB.IsRestricted('MY_Target.LineFace')
+	if D.bReady and (O.bTarget or O.bTTarget) and not C.bRestricted then
 		LIB.BreatheCall('MY_TargetLine', D.UpdateLine)
 	else
 		LIB.BreatheCall('MY_TargetLine', false)
@@ -267,7 +267,7 @@ function D.CheckEnable()
 	D.RequireRerender()
 	D.UpdateLine()
 end
-LIB.RegisterEvent('MY_SHIELDED_VERSION', 'MY_TargetLine', function()
+LIB.RegisterEvent('MY_RESTRICTION', 'MY_TargetLine', function()
 	if arg0 and arg0 ~= 'MY_TargetLine' then
 		return
 	end

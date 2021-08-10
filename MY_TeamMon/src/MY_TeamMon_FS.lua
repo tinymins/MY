@@ -54,6 +54,7 @@ local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
+LIB.RegisterRestriction('MY_TeamMon_FS', { ['*'] = true })
 --------------------------------------------------------------------------
 
 local GetBuff = LIB.GetBuff
@@ -68,7 +69,7 @@ local FS_INIFILE = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_FS.ini'
 
 -- FireUIEvent('MY_TM_FS_CREATE', Random(50, 255), { col = { Random(50, 255), Random(50, 255), Random(50, 255) }, bFlash = true})
 local function CreateFullScreen(szKey, tArgs)
-	if LIB.IsShieldedVersion('MY_TargetMon', 2) then
+	if LIB.IsRestricted('MY_TeamMon_FS') then
 		return
 	end
 	assert(type(tArgs) == 'table', 'CreateFullScreen failed!')

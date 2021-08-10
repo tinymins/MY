@@ -54,6 +54,7 @@ local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
+LIB.RegisterRestriction('MY_TeamMon_CC', { ['*'] = true })
 --------------------------------------------------------------------------
 local TARGET = TARGET
 local INI_SHADOW          = PACKET_INFO.UICOMPONENT_ROOT .. 'Shadow.ini'
@@ -359,7 +360,7 @@ function D.RescanNearby()
 	H_CIRCLE:Clear()
 	H_LINE:Clear()
 	H_NAME:Clear()
-	if LIB.IsShieldedVersion('MY_TargetMon', 2) then
+	if LIB.IsRestricted('MY_TeamMon_CC') then
 		return
 	end
 	for _, dwID in pairs(LIB.GetNearNpcID()) do
@@ -378,7 +379,7 @@ function D.OnTMDataReload()
 end
 
 function D.CheckEnable()
-	if D.bReady and O.bEnable and not LIB.IsShieldedVersion('MY_TargetMon', 2) then
+	if D.bReady and O.bEnable and not LIB.IsRestricted('MY_TeamMon_CC') then
 		LIB.RegisterModuleEvent('MY_TeamMon_CC', {
 			{ '#BREATHE', D.OnBreathe },
 			{ 'NPC_ENTER_SCENE', function() D.OnObjectEnterScene(TARGET.NPC, arg0) end },
@@ -396,7 +397,7 @@ function D.CheckEnable()
 	end
 end
 
-LIB.RegisterEvent('MY_SHIELDED_VERSION', 'MY_TeamMon_CC', function()
+LIB.RegisterEvent('MY_RESTRICTION', 'MY_TeamMon_CC', function()
 	if arg0 and arg0 ~= 'MY_TargetMon' then
 		return
 	end

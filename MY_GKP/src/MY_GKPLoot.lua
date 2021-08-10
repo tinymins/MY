@@ -53,6 +53,8 @@ local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
+LIB.RegisterRestriction('MY_GKPLoot.FastLoot', { ['*'] = true })
+LIB.RegisterRestriction('MY_GKPLoot.ForceLoot', { ['*'] = true })
 --------------------------------------------------------------------------
 
 local DEBUG_LOOT = false -- 测试拾取分配 强制进入分配模式并最终不调用分配接口
@@ -285,12 +287,12 @@ RegisterCustomData('MY_GKP_Loot.tConfirm')
 RegisterCustomData('MY_GKP_Loot.tItemConfig')
 
 function D.UpdateShielded()
-	GKP_AUTO_LOOT_DEBOUNCE_TIME = LIB.IsShieldedVersion('MY_GKPLoot', 2)
+	GKP_AUTO_LOOT_DEBOUNCE_TIME = LIB.IsRestricted('MY_GKPLoot.FastLoot')
 		and GLOBAL.GAME_FPS / 2
 		or 0
 end
 
-LIB.RegisterEvent('MY_SHIELDED_VERSION', 'MY_GKPLoot', function()
+LIB.RegisterEvent('MY_RESTRICTION', 'MY_GKPLoot', function()
 	if arg0 and arg0 ~= 'MY_GKPLoot' then
 		return
 	end
@@ -2040,7 +2042,7 @@ LIB.RegisterEvent('SYNC_LOOT_LIST', function()
 	end
 	local frame = D.GetFrame()
 	local wnd = D.GetDoodadWnd(frame, arg0)
-	if not wnd and LIB.IsShieldedVersion('MY_GKPLoot', 2) then
+	if not wnd and LIB.IsRestricted('MY_GKPLoot.ForceLoot') then
 		local bDungeonTreasure = false
 		local aItemData = D.GetDoodadLootInfo(arg0)
 		for _, v in ipairs(aItemData) do

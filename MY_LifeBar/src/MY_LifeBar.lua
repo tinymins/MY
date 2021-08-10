@@ -53,6 +53,8 @@ local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
+LIB.RegisterRestriction('MY_LifeBar.MapRestriction', { ['*'] = true })
+LIB.RegisterRestriction('MY_LifeBar.SpecialNpc', { ['*'] = true, intl = false })
 --------------------------------------------------------------------------
 
 local Config = MY_LifeBar_Config
@@ -251,7 +253,7 @@ local O = LIB.CreateUserSettingsModule('MY_LifeBar', _L['General'], {
 })
 local D = {}
 
-function D.IsShielded() return LIB.IsShieldedVersion('TARGET') and LIB.IsInShieldedMap() end
+function D.IsShielded() return LIB.IsRestricted('MY_LifeBar.MapRestriction') and LIB.IsInShieldedMap() end
 function D.IsEnabled() return D.bReady and O.bEnabled and not D.IsShielded() end
 function D.IsMapEnabled()
 	return D.IsEnabled() and (
@@ -445,12 +447,13 @@ LIB.RegisterEvent('COINSHOP_ON_CLOSE', D.AutoSwitchSysHeadTop)
 do
 local CheckInvalidRect
 do
-local bShieldedVersion = LIB.IsShieldedVersion('MY_LifeBar')
-LIB.RegisterEvent('MY_SHIELDED_VERSION', function()
+LIB.RegisterRestriction('MY_LifeBar', { ['*'] = true, intl = false })
+local bRestrictedVersion = LIB.IsRestricted('MY_LifeBar')
+LIB.RegisterEvent('MY_RESTRICTION', function()
 	if arg0 and arg0 ~= 'MY_LifeBar' then
 		return
 	end
-	bShieldedVersion = LIB.IsShieldedVersion('MY_LifeBar')
+	bRestrictedVersion = LIB.IsRestricted('MY_LifeBar')
 end)
 local function fxTarget(r, g, b, a) return 255 - (255 - r) * 0.3, 255 - (255 - g) * 0.3, 255 - (255 - b) * 0.3, a end
 local function fxDeath(r, g, b, a) return ceil(r * 0.4), ceil(g * 0.4), ceil(b * 0.4), a end
@@ -461,10 +464,10 @@ local bSpecialNpcVisible
 local function IsSpecialNpcVisible(dwID, me, object)
 	if not IsBoolean(bSpecialNpcVisible) then
 		bSpecialNpcVisible = false
-		if object.dwTemplateID == CHANGGE_REAL_SHADOW_TPLID and (not bShieldedVersion or not IsEnemy(me.dwID, dwID)) then
+		if object.dwTemplateID == CHANGGE_REAL_SHADOW_TPLID and (not bRestrictedVersion or not IsEnemy(me.dwID, dwID)) then
 			bSpecialNpcVisible = true
-		elseif not bShieldedVersion
-		and Config.bShowSpecialNpc and (not bShieldedVersion or LIB.IsInDungeon())
+		elseif not bRestrictedVersion
+		and Config.bShowSpecialNpc and (not bRestrictedVersion or LIB.IsInDungeon())
 		and (not Config.bShowSpecialNpcOnlyEnemy or IsEnemy(me.dwID, dwID)) then
 			bSpecialNpcVisible = true
 		end
