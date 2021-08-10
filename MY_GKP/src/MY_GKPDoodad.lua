@@ -799,6 +799,9 @@ end)
 LIB.RegisterExit('MY_GKPDoodad__BC', function()
 	LIB.BreatheCall('MY_GKPDoodad', false)
 end)
+LIB.RegisterEvent('MY_RESTRICTION', function()
+	D.CheckShowName()
+end)
 LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_GKPDoodad', function()
 	for _, dwID in ipairs(D.aCraft) do
 		if dwID ~= 0 then
