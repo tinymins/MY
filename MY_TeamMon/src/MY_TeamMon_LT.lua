@@ -156,14 +156,14 @@ function D.UpdateText(txt, col)
 	D.frame:FadeIn(0)
 	D.frame:SetAlpha(255)
 	D.frame:Show()
-	O.nTime = GetTime()
+	D.nTime = GetTime()
 	LIB.BreatheCall('MY_TeamMon_LT', D.OnBreathe)
 end
 
 function D.OnBreathe()
 	local nTime = GetTime()
-	if O.nTime and (nTime - O.nTime) / 1000 > O.fPause then
-		O.nTime = nil
+	if D.nTime and (nTime - D.nTime) / 1000 > O.fPause then
+		D.nTime = nil
 		D.frame:FadeOut(O.fFadeOut * 10)
 		LIB.BreatheCall('MY_TeamMon_LT', false)
 	end
