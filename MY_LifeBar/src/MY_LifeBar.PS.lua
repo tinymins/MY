@@ -68,7 +68,7 @@ local D = {
 	UpdateShadowHandleParam = MY_LifeBar.UpdateShadowHandleParam,
 }
 
-local PS = { nPriority = 1 }
+local PS = { nPriority = 1, szRestriction = 'MY_LifeBar' }
 local function LoadUI(ui)
 	ui:Children('#WndTrackbar_GlobalUIScale'):Value(Config.fGlobalUIScale * 100 * LIB.GetUIScale())
 	ui:Children('#WndTrackbar_LifeBarWidth'):Value(Config.nLifeWidth)

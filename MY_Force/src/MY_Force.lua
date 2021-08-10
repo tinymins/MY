@@ -53,6 +53,7 @@ local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
+LIB.RegisterRestriction('MY_Force', { ['*'] = false, classic = true })
 LIB.RegisterRestriction('MY_ForceGuding', { ['*'] = true, intl = false })
 --------------------------------------------------------------------------
 
@@ -297,7 +298,7 @@ end)
 -------------------------------------
 -- …Ë÷√ΩÁ√Ê
 -------------------------------------
-local PS = {}
+local PS = { szRestriction = 'MY_Force' }
 function PS.OnPanelActive(frame)
 	local ui = UI(frame)
 	local X, Y = 25, 25

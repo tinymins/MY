@@ -53,6 +53,7 @@ local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
+LIB.RegisterRestriction('MY_LifeBar', { ['*'] = false, classic = true })
 LIB.RegisterRestriction('MY_LifeBar.MapRestriction', { ['*'] = true })
 LIB.RegisterRestriction('MY_LifeBar.SpecialNpc', { ['*'] = true, intl = false })
 --------------------------------------------------------------------------
@@ -253,8 +254,17 @@ local O = LIB.CreateUserSettingsModule('MY_LifeBar', _L['General'], {
 })
 local D = {}
 
-function D.IsShielded() return LIB.IsRestricted('MY_LifeBar.MapRestriction') and LIB.IsInShieldedMap() end
-function D.IsEnabled() return D.bReady and O.bEnabled and not D.IsShielded() end
+function D.IsShielded()
+	if LIB.IsRestricted('MY_LifeBar') then
+		return true
+	end
+	return LIB.IsRestricted('MY_LifeBar.MapRestriction') and LIB.IsInShieldedMap()
+end
+
+function D.IsEnabled()
+	return D.bReady and O.bEnabled and not D.IsShielded()
+end
+
 function D.IsMapEnabled()
 	return D.IsEnabled() and (
 		not (

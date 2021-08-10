@@ -107,7 +107,7 @@ function D.UpdateAnchor()
 end
 
 function D.CheckEnable()
-	if D.bReady and O.bEnable then
+	if D.bReady and O.bEnable and not LIB.IsRestricted('MY_Target') then
 		D.OpenPanel()
 	else
 		D.ClosePanel()
@@ -227,6 +227,12 @@ function D.OnFrameDragEnd()
 	O.tAnchor = GetFrameAnchor(this)
 end
 
+LIB.RegisterEvent('MY_RESTRICTION', 'MY_Target', function()
+	if arg0 and arg0 ~= 'MY_Target' then
+		return
+	end
+	D.CheckEnable()
+end)
 LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_TargetDirection', function()
 	D.bReady = true
 	D.CheckEnable()

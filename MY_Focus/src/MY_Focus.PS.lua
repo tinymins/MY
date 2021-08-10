@@ -55,7 +55,7 @@ if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 end
 --------------------------------------------------------------------------
 
-local PS = {}
+local PS = { szRestriction = 'MY_Focus' }
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
 	local w  = ui:Width()
