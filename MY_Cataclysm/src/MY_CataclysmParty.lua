@@ -53,6 +53,8 @@ local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
+LIB.RegisterRestriction('MY_Cataclysm.CHANGGE_SHADOW', { ['*'] = true, intl = false })
+LIB.RegisterRestriction('MY_Cataclysm.Seize', { ['*'] = true })
 --------------------------------------------------------------------------
 local D = {}
 -----------------------------------------------
@@ -95,7 +97,6 @@ local CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID
 local CHANGGE_REAL_SHADOW_TPLID = 46140 -- 清绝歌影 的主体影子
 local CHANGGE_REAL_SHADOW_CACHE = {}
 do
-LIB.RegisterRestriction('MY_Cataclysm.CHANGGE_SHADOW', { ['*'] = true, intl = false })
 local function onNpcEnterScene()
 	local me = GetClientPlayer()
 	local npc = GetNpc(arg0)
@@ -509,7 +510,6 @@ function MY_CataclysmParty_Base.OnItemMouseLeave(dst)
 end
 end
 
-LIB.RegisterRestriction('MY_Cataclysm.Seize', { ['*'] = true })
 function MY_CataclysmParty_Base.OnItemRButtonClick()
 	if not this.dwID then
 		return

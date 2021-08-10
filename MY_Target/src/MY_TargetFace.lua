@@ -54,6 +54,7 @@ local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
+LIB.RegisterRestriction('MY_TargetFace', { ['*'] = true, intl = false })
 --------------------------------------------------------------------------
 
 local O = LIB.CreateUserSettingsModule('MY_TargetFace', _L['Target'], {
@@ -209,7 +210,7 @@ local function onBreathe()
 end
 
 function D.CheckEnable()
-	if D.bReady and not LIB.IsRestricted('MY_Target.LineFace') and (O.bTargetFace or O.bTTargetFace or O.bTargetShape or O.bTTargetShape) then
+	if D.bReady and not LIB.IsRestricted('MY_TargetFace') and (O.bTargetFace or O.bTTargetFace or O.bTargetShape or O.bTTargetShape) then
 		local hShaList = UI.GetShadowHandle('MY_TargetFace')
 		for _, v in ipairs({'TargetFace', 'TargetShape', 'TTargetFace', 'TTargetShape'}) do
 			local sha = hShaList:Lookup(v)

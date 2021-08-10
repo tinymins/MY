@@ -53,6 +53,9 @@ local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
+LIB.RegisterRestriction('MY_Focus.MapRestriction', { ['*'] = true })
+LIB.RegisterRestriction('MY_Focus.SHILDED_NPC', { ['*'] = true })
+LIB.RegisterRestriction('MY_Focus.CHANGGE_SHADOW', { ['*'] = true })
 --------------------------------------------------------------------------
 
 local CHANGGE_REAL_SHADOW_TPLID = 46140 -- 清绝歌影 的主体影子
@@ -260,10 +263,6 @@ local O = LIB.CreateUserSettingsModule('MY_Focus', _L['Target'], {
 	},
 })
 local D = {}
-
-LIB.RegisterRestriction('MY_Focus.MapRestriction', { ['*'] = true })
-LIB.RegisterRestriction('MY_Focus.SHILDED_NPC', { ['*'] = true })
-LIB.RegisterRestriction('MY_Focus.CHANGGE_SHADOW', { ['*'] = true })
 
 function D.IsShielded() return LIB.IsRestricted('MY_Focus.MapRestriction') and LIB.IsInShieldedMap() end
 function D.IsEnabled() return O.bEnable and not D.IsShielded() end

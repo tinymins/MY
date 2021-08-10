@@ -53,6 +53,7 @@ local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
+LIB.RegisterRestriction('MY_TargetLine', { ['*'] = true, intl = false })
 --------------------------------------------------------------------------
 
 local INI_PATH = PACKET_INFO.ROOT .. 'MY_Target/ui/MY_TargetLine.ini'
@@ -258,7 +259,7 @@ end
 end
 
 function D.CheckEnable()
-	C.bRestricted = LIB.IsRestricted('MY_Target.LineFace')
+	C.bRestricted = LIB.IsRestricted('MY_TargetLine')
 	if D.bReady and (O.bTarget or O.bTTarget) and not C.bRestricted then
 		LIB.BreatheCall('MY_TargetLine', D.UpdateLine)
 	else

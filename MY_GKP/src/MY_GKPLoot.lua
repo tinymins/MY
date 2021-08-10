@@ -293,7 +293,7 @@ function D.UpdateShielded()
 end
 
 LIB.RegisterEvent('MY_RESTRICTION', 'MY_GKPLoot', function()
-	if arg0 and arg0 ~= 'MY_GKPLoot' then
+	if arg0 and arg0 ~= 'MY_GKPLoot.FastLoot' then
 		return
 	end
 	D.UpdateShielded()

@@ -447,13 +447,12 @@ LIB.RegisterEvent('COINSHOP_ON_CLOSE', D.AutoSwitchSysHeadTop)
 do
 local CheckInvalidRect
 do
-LIB.RegisterRestriction('MY_LifeBar', { ['*'] = true, intl = false })
-local bRestrictedVersion = LIB.IsRestricted('MY_LifeBar')
+local bRestrictedVersion = LIB.IsRestricted('MY_LifeBar.SpecialNpc')
 LIB.RegisterEvent('MY_RESTRICTION', function()
-	if arg0 and arg0 ~= 'MY_LifeBar' then
+	if arg0 and arg0 ~= 'MY_LifeBar.SpecialNpc' then
 		return
 	end
-	bRestrictedVersion = LIB.IsRestricted('MY_LifeBar')
+	bRestrictedVersion = LIB.IsRestricted('MY_LifeBar.SpecialNpc')
 end)
 local function fxTarget(r, g, b, a) return 255 - (255 - r) * 0.3, 255 - (255 - g) * 0.3, 255 - (255 - b) * 0.3, a end
 local function fxDeath(r, g, b, a) return ceil(r * 0.4), ceil(g * 0.4), ceil(b * 0.4), a end

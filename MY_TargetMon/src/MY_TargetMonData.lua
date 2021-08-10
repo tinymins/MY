@@ -190,7 +190,7 @@ local function onShieldedReset()
 	SHIELDED = nil
 end
 LIB.RegisterEvent('MY_RESTRICTION', 'MY_TargetMonData_Shield', function()
-	if arg0 and arg0 ~= 'MY_TargetMon' then
+	if arg0 and arg0 ~= 'MY_TargetMon.MapRestriction' then
 		return
 	end
 	onShieldedReset()

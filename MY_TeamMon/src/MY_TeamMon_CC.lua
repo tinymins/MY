@@ -398,7 +398,7 @@ function D.CheckEnable()
 end
 
 LIB.RegisterEvent('MY_RESTRICTION', 'MY_TeamMon_CC', function()
-	if arg0 and arg0 ~= 'MY_TargetMon' then
+	if arg0 and arg0 ~= 'MY_TeamMon_CC' then
 		return
 	end
 	D.CheckEnable()
