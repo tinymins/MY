@@ -78,6 +78,9 @@ function LIB.RegisterRestriction(szKey, tBranchRestricted)
 		end
 	end
 	if not IsBoolean(bRestricted) then
+		--[[#DEBUG BEGIN]]
+		LIB.Debug(PACKET_INFO.NAME_SPACE, 'Restriction should be a boolean value: ' .. szKey, DEBUG_LEVEL.ERROR)
+		--[[#DEBUG END]]
 		return
 	end
 	RESTRICTION[szKey] = bRestricted
