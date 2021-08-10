@@ -186,7 +186,9 @@ function LIB.NumberToSegment(n, s)
 	assert(IsNumber(s) and s > 0 and LIB.NumberBitAnd(s, s - 1) == 0, 'segment size must be a positive number and be power of 2')
 	if s == 0x20 and GlobelRecipeID2BookID then
 		local n, o = GlobelRecipeID2BookID(n)
-		return n - 1, o - 1
+		if n and o then
+			return n - 1, o - 1
+		end
 	end
 	return n / s, n % s
 end
@@ -196,7 +198,10 @@ function LIB.SegmentToNumber(n, o, s)
 	-- (!(n & (n - 1)))
 	assert(IsNumber(s) and s > 0 and LIB.NumberBitAnd(s, s - 1) == 0, 'segment size must be a positive number and be power of 2')
 	if s == 0x20 and BookID2GlobelRecipeID then
-		return BookID2GlobelRecipeID(n + 1, o + 1)
+		local n = BookID2GlobelRecipeID(n + 1, o + 1)
+		if n then
+			return n
+		end
 	end
 	return n * s + o
 end
