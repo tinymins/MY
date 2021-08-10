@@ -6,14 +6,14 @@ return {
 	-- MY_TeamMon_CA.lua --
 	['MY_TeamMon_CA'] = '中央提醒',
 	-- MY_TeamMon_CC.lua --
-	['MY_TeamMon_CC'] = '其它',
+	['MY_TeamMon_CC'] = '圈圈连线',
 	-- MY_TeamMon_BL.lua --
 	['MY_TeamMon_BL'] = '自身气劲列表',
 	-- MY_TeamMon_PBL.lua --
 	['MY_TeamMon_PBL'] = '团队重要气劲列表',
 	['Mouse enter select'] = '鼠标滑过选中目标',
 	-- MY_TeamMon_LT.lua --
-	['MY_TeamMon_LT'] = '其它',
+	['MY_TeamMon_LT'] = '特大文字',
 	['Font scale'] = '字体缩放',
 	['Pause time'] = '停留时间',
 	['FadeIn time'] = '淡入时间',
