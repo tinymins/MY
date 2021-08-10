@@ -53,8 +53,9 @@ local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
+LIB.RegisterRestriction('MY_GKPDoodad.HeadName', { ['*'] = false, classic = true })
 LIB.RegisterRestriction('MY_GKPDoodad.AutoInteract', { ['*'] = true, intl = false })
-LIB.RegisterRestriction('MY_GKPDoodad.SHIELDED_DOODAD', { ['*'] = true, intl = false })
+LIB.RegisterRestriction('MY_GKPDoodad.MapRestriction', { ['*'] = true, intl = false })
 --------------------------------------------------------------------------
 
 local O = LIB.CreateUserSettingsModule('MY_GKPDoodad', _L['General'], {
@@ -204,7 +205,13 @@ local function GetDoodadTemplateName(dwID)
 end
 
 local function IsShowNameDisabled()
-	return LIB.IsInShieldedMap() and LIB.IsRestricted('MY_GKPDoodad.SHIELDED_DOODAD')
+	if LIB.IsRestricted('MY_GKPDoodad.HeadName') then
+		return true
+	end
+	if LIB.IsInShieldedMap() and LIB.IsRestricted('MY_GKPDoodad.MapRestriction') then
+		return true
+	end
+	return false
 end
 
 local function IsAutoInteractDisabled()
@@ -831,283 +838,285 @@ function PS.OnPanelActive(frame)
 	nX, nY, nLFY = MY_GKPLoot.OnPanelActivePartial(ui, X, Y, W, H, nLineHeightM, nX, nY, nLFY)
 
 	-- doodad
-	nX, nY = X, nY + nLineHeightL
-	ui:Append('Text', { text = _L['Craft assit'], x = nX, y = nY, font = 27 })
+	if not LIB.IsRestricted('MY_GKPDoodad.HeadName') then
+		nX, nY = X, nY + nLineHeightL
+		ui:Append('Text', { text = _L['Craft assit'], x = nX, y = nY, font = 27 })
 
-	nX, nY = X + 10, nY + nLineHeightM
-	nX = ui:Append('WndCheckBox', {
-		x = nX, y = nY,
-		text = _L['Show the head name'],
-		checked = O.bShowName,
-		oncheck = function()
-			O.bShowName = not O.bShowName
-			D.CheckShowName()
-		end,
-	}):AutoWidth():Pos('BOTTOMRIGHT') + 5
-
-	nX = ui:Append('Shadow', {
-		name = 'Shadow_Color', x = nX + 2, y = nY + 4, w = 18, h = 18,
-		color = O.tNameColor,
-		onclick = function()
-			UI.OpenColorPicker(function(r, g, b)
-				ui:Fetch('Shadow_Color'):Color(r, g, b)
-				O.tNameColor = { r, g, b }
-				D.RescanNearby()
-			end)
-		end,
-		autoenable = function() return O.bShowName end,
-	}):Pos('BOTTOMRIGHT') + 5
-
-	nX = nX + ui:Append('WndButton', {
-		x = nX, y = nY, w = 65,
-		text = _L['Font'],
-		onclick = function()
-			UI.OpenFontPicker(function(nFont)
-				O.nNameFont = nFont
-				D.bUpdateLabel = true
-			end)
-		end,
-		autoenable = function() return O.bShowName end,
-	}):Width() + 5
-
-	nX = nX + ui:Append('WndTrackbar', {
-		x = nX, y = nY, w = 150,
-		textfmt = function(val) return _L('Font scale is %d%%.', val) end,
-		range = {10, 500},
-		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
-		value = O.fNameScale * 100,
-		onchange = function(val)
-			O.fNameScale = val / 100
-			D.bUpdateLabel = true
-		end,
-		autoenable = function() return O.bShowName end,
-	}):Width() + 5
-
-	nX, nY = X + 10, nY + nLineHeightM
-	nX = ui:Append('WndCheckBox', {
-		text = _L['Display minimap flag'],
-		x = nX, y = nY,
-		checked = O.bMiniFlag,
-		oncheck = function(bChecked)
-			O.bMiniFlag = bChecked
-			D.RescanNearby()
-		end,
-		autoenable = function() return O.bShowName end,
-	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
-
-	if not LIB.IsRestricted('MY_GKPDoodad.AutoInteract') then
+		nX, nY = X + 10, nY + nLineHeightM
 		nX = ui:Append('WndCheckBox', {
 			x = nX, y = nY,
-			text = _L['Auto craft'],
-			checked = O.bInteract,
-			oncheck = function(bChecked)
-				O.bInteract = bChecked
-				D.RescanNearby()
-				ui:Fetch('Check_Interact_Fight'):Enable(bChecked)
+			text = _L['Show the head name'],
+			checked = O.bShowName,
+			oncheck = function()
+				O.bShowName = not O.bShowName
+				D.CheckShowName()
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT') + 10
+		}):AutoWidth():Pos('BOTTOMRIGHT') + 5
 
-		nX = ui:Append('WndCheckBox', {
-			name = 'Check_Interact_Fight', x = nX, y = nY,
-			text = _L['Interact in fight'],
-			checked = O.bInteractEvenFight,
-			enable = O.bInteract,
-			oncheck = function(bChecked)
-				O.bInteractEvenFight = bChecked
-				D.RescanNearby()
+		nX = ui:Append('Shadow', {
+			name = 'Shadow_Color', x = nX + 2, y = nY + 4, w = 18, h = 18,
+			color = O.tNameColor,
+			onclick = function()
+				UI.OpenColorPicker(function(r, g, b)
+					ui:Fetch('Shadow_Color'):Color(r, g, b)
+					O.tNameColor = { r, g, b }
+					D.RescanNearby()
+				end)
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT') + 10
-	end
+			autoenable = function() return O.bShowName end,
+		}):Pos('BOTTOMRIGHT') + 5
 
-	--[[#DEBUG BEGIN]]
-	if LIB.IsDebugClient() then
-		nX = ui:Append('WndCheckBox', {
-			x = nX, y = nY,
-			text = _L['Debug'],
-			checked = D.bDebug,
-			oncheck = function(bChecked)
-				D.bDebug = bChecked
+		nX = nX + ui:Append('WndButton', {
+			x = nX, y = nY, w = 65,
+			text = _L['Font'],
+			onclick = function()
+				UI.OpenFontPicker(function(nFont)
+					O.nNameFont = nFont
+					D.bUpdateLabel = true
+				end)
+			end,
+			autoenable = function() return O.bShowName end,
+		}):Width() + 5
+
+		nX = nX + ui:Append('WndTrackbar', {
+			x = nX, y = nY, w = 150,
+			textfmt = function(val) return _L('Font scale is %d%%.', val) end,
+			range = {10, 500},
+			trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+			value = O.fNameScale * 100,
+			onchange = function(val)
+				O.fNameScale = val / 100
 				D.bUpdateLabel = true
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT') + 10
-	end
-	--[[#DEBUG END]]
+			autoenable = function() return O.bShowName end,
+		}):Width() + 5
 
-	-- craft
-	nX, nY = X + 10, nY + nLineHeightM
-	for _, v in ipairs(D.aCraft) do
-		if v == 0 then
-			nY = nY + 8
-			if nX ~= 10 then
-				nY = nY + nLineHeightS
-				nX = X + 10
-			end
-		else
-			local szName = GetDoodadTemplateName(v)
-			if szName then
-				if nX + 90 > W - (X + 10) then
-					nX = X + 10
+		nX, nY = X + 10, nY + nLineHeightM
+		nX = ui:Append('WndCheckBox', {
+			text = _L['Display minimap flag'],
+			x = nX, y = nY,
+			checked = O.bMiniFlag,
+			oncheck = function(bChecked)
+				O.bMiniFlag = bChecked
+				D.RescanNearby()
+			end,
+			autoenable = function() return O.bShowName end,
+		}):AutoWidth():Pos('BOTTOMRIGHT') + 10
+
+		if not LIB.IsRestricted('MY_GKPDoodad.AutoInteract') then
+			nX = ui:Append('WndCheckBox', {
+				x = nX, y = nY,
+				text = _L['Auto craft'],
+				checked = O.bInteract,
+				oncheck = function(bChecked)
+					O.bInteract = bChecked
+					D.RescanNearby()
+					ui:Fetch('Check_Interact_Fight'):Enable(bChecked)
+				end,
+			}):AutoWidth():Pos('BOTTOMRIGHT') + 10
+
+			nX = ui:Append('WndCheckBox', {
+				name = 'Check_Interact_Fight', x = nX, y = nY,
+				text = _L['Interact in fight'],
+				checked = O.bInteractEvenFight,
+				enable = O.bInteract,
+				oncheck = function(bChecked)
+					O.bInteractEvenFight = bChecked
+					D.RescanNearby()
+				end,
+			}):AutoWidth():Pos('BOTTOMRIGHT') + 10
+		end
+
+		--[[#DEBUG BEGIN]]
+		if LIB.IsDebugClient() then
+			nX = ui:Append('WndCheckBox', {
+				x = nX, y = nY,
+				text = _L['Debug'],
+				checked = D.bDebug,
+				oncheck = function(bChecked)
+					D.bDebug = bChecked
+					D.bUpdateLabel = true
+				end,
+			}):AutoWidth():Pos('BOTTOMRIGHT') + 10
+		end
+		--[[#DEBUG END]]
+
+		-- craft
+		nX, nY = X + 10, nY + nLineHeightM
+		for _, v in ipairs(D.aCraft) do
+			if v == 0 then
+				nY = nY + 8
+				if nX ~= 10 then
 					nY = nY + nLineHeightS
+					nX = X + 10
 				end
-				ui:Append('WndCheckBox', {
-					x = nX, y = nY,
-					text = szName,
-					checked = O.tCraft[v],
-					oncheck = function(bChecked)
-						if bChecked then
-							O.tCraft[v] = true
-						else
-							O.tCraft[v] = false
-						end
-						O.tCraft = O.tCraft
-						D.RescanNearby()
-					end,
-					autoenable = function() return O.bShowName or O.bInteract end,
-				})
-				nX = nX + 90
+			else
+				local szName = GetDoodadTemplateName(v)
+				if szName then
+					if nX + 90 > W - (X + 10) then
+						nX = X + 10
+						nY = nY + nLineHeightS
+					end
+					ui:Append('WndCheckBox', {
+						x = nX, y = nY,
+						text = szName,
+						checked = O.tCraft[v],
+						oncheck = function(bChecked)
+							if bChecked then
+								O.tCraft[v] = true
+							else
+								O.tCraft[v] = false
+							end
+							O.tCraft = O.tCraft
+							D.RescanNearby()
+						end,
+						autoenable = function() return O.bShowName or O.bInteract end,
+					})
+					nX = nX + 90
+				end
 			end
 		end
+		nX = X
+		nY = nY + nLineHeightM
+
+		nX = X + 10
+		nY = nY + 3
+		nX = ui:Append('WndCheckBox', {
+			x = nX, y = nY,
+			text = _L['Mining doodad'],
+			checked = O.bMiningDoodad,
+			oncheck = function(bChecked)
+				O.bMiningDoodad = bChecked
+				D.RescanNearby()
+			end,
+			autoenable = function() return O.bShowName or O.bInteract end,
+		}):AutoWidth():Pos('BOTTOMRIGHT') + 7
+
+		nX = ui:Append('WndCheckBox', {
+			x = nX, y = nY,
+			text = _L['Herbalism doodad'],
+			checked = O.bHerbalismDoodad,
+			oncheck = function(bChecked)
+				O.bHerbalismDoodad = bChecked
+				D.RescanNearby()
+			end,
+			autoenable = function() return O.bShowName or O.bInteract end,
+		}):AutoWidth():Pos('BOTTOMRIGHT') + 7
+
+		nX = ui:Append('WndCheckBox', {
+			x = nX, y = nY,
+			text = _L['Skinning doodad'],
+			checked = O.bSkinningDoodad,
+			oncheck = function(bChecked)
+				O.bSkinningDoodad = bChecked
+				D.RescanNearby()
+			end,
+			autoenable = function() return O.bShowName or O.bInteract end,
+		}):AutoWidth():Pos('BOTTOMRIGHT') + 7
+
+		nX = ui:Append('WndCheckBox', {
+			x = nX, y = nY,
+			text = _L['Quest doodad'],
+			checked = O.bQuestDoodad,
+			oncheck = function(bChecked)
+				O.bQuestDoodad = bChecked
+				D.RescanNearby()
+			end,
+			autoenable = function() return O.bShowName or O.bInteract end,
+		}):AutoWidth():Pos('BOTTOMRIGHT') + 7
+
+		nX = ui:Append('WndCheckBox', {
+			x = nX, y = nY,
+			text = _L['Read inscription doodad'],
+			checked = O.bReadInscriptionDoodad,
+			oncheck = function(bChecked)
+				O.bReadInscriptionDoodad = bChecked
+				D.RescanNearby()
+			end,
+			autoenable = function() return O.bShowName or O.bInteract end,
+		}):AutoWidth():Pos('BOTTOMRIGHT') + 7
+
+		nX = ui:Append('WndCheckBox', {
+			x = nX, y = nY,
+			text = _L['Unread inscription doodad'],
+			checked = O.bUnreadInscriptionDoodad,
+			oncheck = function(bChecked)
+				O.bUnreadInscriptionDoodad = bChecked
+				D.RescanNearby()
+			end,
+			autoenable = function() return O.bShowName or O.bInteract end,
+		}):AutoWidth():Pos('BOTTOMRIGHT') + 7
+
+		nX = ui:Append('WndCheckBox', {
+			x = nX, y = nY,
+			text = _L['Other doodad'],
+			checked = O.bOtherDoodad,
+			oncheck = function(bChecked)
+				O.bOtherDoodad = bChecked
+				D.RescanNearby()
+			end,
+			autoenable = function() return O.bShowName or O.bInteract end,
+		}):AutoWidth():Pos('BOTTOMRIGHT') + 7
+
+		-- recent / all
+		nX, nY = X + 10, nY + nLineHeightM
+		nX = ui:Append('WndCheckBox', {
+			x = nX, y = nY,
+			text = _L['Recent doodad'],
+			checked = O.bRecent,
+			oncheck = function(bChecked)
+				O.bRecent = bChecked
+				D.RescanNearby()
+			end,
+			tip = _L['Recent crafted doodads during current game'],
+			tippostype = UI.TIP_POSITION.TOP_BOTTOM,
+			autoenable = function() return O.bShowName or O.bInteract end,
+		}):AutoWidth():Pos('BOTTOMRIGHT') + 10
+
+		nX = ui:Append('WndCheckBox', {
+			x = nX, y = nY,
+			text = _L['All doodad'],
+			checked = O.bAllDoodad,
+			oncheck = function(bChecked)
+				O.bAllDoodad = bChecked
+				D.RescanNearby()
+			end,
+			autoenable = function() return O.bShowName or O.bInteract end,
+		}):AutoWidth():Pos('BOTTOMRIGHT') + 10
+
+		-- custom
+		nX, nY = X + 10, nY + nLineHeightM
+		nX = ui:Append('WndCheckBox', {
+			text = _L['Customs (split by | )'],
+			x = nX, y = nY,
+			checked = O.bCustom,
+			oncheck = function(bChecked)
+				O.bCustom = bChecked
+				D.RescanNearby()
+				ui:Fetch('Edit_Custom'):Enable(bChecked)
+			end,
+			autoenable = function() return O.bShowName or O.bInteract end,
+		}):AutoWidth():Pos('BOTTOMRIGHT') + 5
+
+		ui:Append('WndEditBox', {
+			name = 'Edit_Custom',
+			x = nX, y = nY, w = 360, h = 27,
+			limit = 1024, text = O.szCustom,
+			enable = O.bCustom,
+			onchange = function(szText)
+				O.szCustom = szText
+				D.ReloadCustom()
+			end,
+			tip = function()
+				if LIB.IsRestricted('MY_GKPDoodad.AutoInteract') then
+					return
+				end
+				return _L['Tip: Enter the name of dead animals can be automatically Paoding!']
+			end,
+			tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+			autoenable = function() return (O.bShowName or O.bInteract) and O.bCustom end,
+		})
 	end
-	nX = X
-	nY = nY + nLineHeightM
-
-	nX = X + 10
-	nY = nY + 3
-	nX = ui:Append('WndCheckBox', {
-		x = nX, y = nY,
-		text = _L['Mining doodad'],
-		checked = O.bMiningDoodad,
-		oncheck = function(bChecked)
-			O.bMiningDoodad = bChecked
-			D.RescanNearby()
-		end,
-		autoenable = function() return O.bShowName or O.bInteract end,
-	}):AutoWidth():Pos('BOTTOMRIGHT') + 7
-
-	nX = ui:Append('WndCheckBox', {
-		x = nX, y = nY,
-		text = _L['Herbalism doodad'],
-		checked = O.bHerbalismDoodad,
-		oncheck = function(bChecked)
-			O.bHerbalismDoodad = bChecked
-			D.RescanNearby()
-		end,
-		autoenable = function() return O.bShowName or O.bInteract end,
-	}):AutoWidth():Pos('BOTTOMRIGHT') + 7
-
-	nX = ui:Append('WndCheckBox', {
-		x = nX, y = nY,
-		text = _L['Skinning doodad'],
-		checked = O.bSkinningDoodad,
-		oncheck = function(bChecked)
-			O.bSkinningDoodad = bChecked
-			D.RescanNearby()
-		end,
-		autoenable = function() return O.bShowName or O.bInteract end,
-	}):AutoWidth():Pos('BOTTOMRIGHT') + 7
-
-	nX = ui:Append('WndCheckBox', {
-		x = nX, y = nY,
-		text = _L['Quest doodad'],
-		checked = O.bQuestDoodad,
-		oncheck = function(bChecked)
-			O.bQuestDoodad = bChecked
-			D.RescanNearby()
-		end,
-		autoenable = function() return O.bShowName or O.bInteract end,
-	}):AutoWidth():Pos('BOTTOMRIGHT') + 7
-
-	nX = ui:Append('WndCheckBox', {
-		x = nX, y = nY,
-		text = _L['Read inscription doodad'],
-		checked = O.bReadInscriptionDoodad,
-		oncheck = function(bChecked)
-			O.bReadInscriptionDoodad = bChecked
-			D.RescanNearby()
-		end,
-		autoenable = function() return O.bShowName or O.bInteract end,
-	}):AutoWidth():Pos('BOTTOMRIGHT') + 7
-
-	nX = ui:Append('WndCheckBox', {
-		x = nX, y = nY,
-		text = _L['Unread inscription doodad'],
-		checked = O.bUnreadInscriptionDoodad,
-		oncheck = function(bChecked)
-			O.bUnreadInscriptionDoodad = bChecked
-			D.RescanNearby()
-		end,
-		autoenable = function() return O.bShowName or O.bInteract end,
-	}):AutoWidth():Pos('BOTTOMRIGHT') + 7
-
-	nX = ui:Append('WndCheckBox', {
-		x = nX, y = nY,
-		text = _L['Other doodad'],
-		checked = O.bOtherDoodad,
-		oncheck = function(bChecked)
-			O.bOtherDoodad = bChecked
-			D.RescanNearby()
-		end,
-		autoenable = function() return O.bShowName or O.bInteract end,
-	}):AutoWidth():Pos('BOTTOMRIGHT') + 7
-
-	-- recent / all
-	nX, nY = X + 10, nY + nLineHeightM
-	nX = ui:Append('WndCheckBox', {
-		x = nX, y = nY,
-		text = _L['Recent doodad'],
-		checked = O.bRecent,
-		oncheck = function(bChecked)
-			O.bRecent = bChecked
-			D.RescanNearby()
-		end,
-		tip = _L['Recent crafted doodads during current game'],
-		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
-		autoenable = function() return O.bShowName or O.bInteract end,
-	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
-
-	nX = ui:Append('WndCheckBox', {
-		x = nX, y = nY,
-		text = _L['All doodad'],
-		checked = O.bAllDoodad,
-		oncheck = function(bChecked)
-			O.bAllDoodad = bChecked
-			D.RescanNearby()
-		end,
-		autoenable = function() return O.bShowName or O.bInteract end,
-	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
-
-	-- custom
-	nX, nY = X + 10, nY + nLineHeightM
-	nX = ui:Append('WndCheckBox', {
-		text = _L['Customs (split by | )'],
-		x = nX, y = nY,
-		checked = O.bCustom,
-		oncheck = function(bChecked)
-			O.bCustom = bChecked
-			D.RescanNearby()
-			ui:Fetch('Edit_Custom'):Enable(bChecked)
-		end,
-		autoenable = function() return O.bShowName or O.bInteract end,
-	}):AutoWidth():Pos('BOTTOMRIGHT') + 5
-
-	ui:Append('WndEditBox', {
-		name = 'Edit_Custom',
-		x = nX, y = nY, w = 360, h = 27,
-		limit = 1024, text = O.szCustom,
-		enable = O.bCustom,
-		onchange = function(szText)
-			O.szCustom = szText
-			D.ReloadCustom()
-		end,
-		tip = function()
-			if LIB.IsRestricted('MY_GKPDoodad.AutoInteract') then
-				return
-			end
-			return _L['Tip: Enter the name of dead animals can be automatically Paoding!']
-		end,
-		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
-		autoenable = function() return (O.bShowName or O.bInteract) and O.bCustom end,
-	})
 end
 LIB.RegisterPanel(_L['General'], 'MY_GKPDoodad', _L['MY_GKPLoot'], 90, PS)
 
