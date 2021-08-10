@@ -205,21 +205,12 @@ function LIB.GetPanelCategoryList()
 	return Clone(PANEL_CATEGORY_LIST)
 end
 
-local function IsShieldedTab(tTab)
-	if tTab.bShielded and LIB.IsShieldedVersion() then
+local function IsTabRestricted(tTab)
+	if tTab.szRestriction and LIB.IsRestricted(tTab.szRestriction) then
 		return true
 	end
-	if tTab.szShieldedKey then
-		if LIB.IsShieldedVersion(tTab.szShieldedKey, tTab.nShielded) then
-			return true
-		end
-	else
-		if tTab.nShielded and LIB.IsShieldedVersion(tTab.nShielded) then
-			return true
-		end
-	end
-	if tTab.IsShielded then
-		return tTab.IsShielded()
+	if tTab.IsRestricted then
+		return tTab.IsRestricted()
 	end
 	return false
 end
@@ -337,8 +328,7 @@ end
 -- szName          选项卡按钮标题
 -- szIconTex       选项卡图标文件|图标帧
 -- options         选项卡各种响应函数 {
---   options.bShielded               屏蔽的选项卡
---   options.nShielded               屏蔽等级的选项卡
+--   options.szRestriction           选项卡功能限制获取标识符
 --   options.bWelcome                欢迎页（默认页）选项卡
 --   options.OnPanelActive(wnd)      选项卡激活    wnd为当前MainPanel
 --   options.OnPanelDeactive(wnd)    选项卡取消激活
@@ -382,9 +372,8 @@ function LIB.RegisterPanel(szCategory, szKey, szName, szIconTex, options)
 			nPriority       = nPriority              ,
 			bWelcome        = options.bWelcome       ,
 			bHide           = options.bHide          ,
-			bShielded       = options.bShielded      ,
-			nShielded       = options.nShielded      ,
-			IsShielded      = options.IsShielded     ,
+			szRestriction   = options.szRestriction  ,
+			IsRestricted    = options.IsRestricted   ,
 			OnPanelActive   = options.OnPanelActive  ,
 			OnPanelScroll   = options.OnPanelScroll  ,
 			OnPanelResize   = options.OnPanelResize  ,
@@ -417,7 +406,7 @@ function D.RedrawCategory(frame, szCategory)
 	local container = frame:Lookup('Wnd_Total/WndContainer_Category')
 	container:Clear()
 	for _, tCategory in ipairs(PANEL_CATEGORY_LIST) do
-		if lodash.some(PANEL_TAB_LIST, function(tTab) return tTab.szCategory == tCategory.szName and not tTab.bHide and not IsShieldedTab(tTab) end) then
+		if lodash.some(PANEL_TAB_LIST, function(tTab) return tTab.szCategory == tCategory.szName and not tTab.bHide and not IsTabRestricted(tTab) end) then
 			local chkCategory = container:AppendContentFromIni(INI_PATH, 'CheckBox_Category')
 			if not szCategory then
 				szCategory = tCategory.szName
@@ -434,7 +423,7 @@ function D.RedrawTabs(frame, szCategory)
 	local scroll = frame:Lookup('Wnd_Total/WndScroll_Tabs', '')
 	scroll:Clear()
 	for _, tTab in ipairs(PANEL_TAB_LIST) do
-		if tTab.szCategory == szCategory and not tTab.bHide and not IsShieldedTab(tTab) then
+		if tTab.szCategory == szCategory and not tTab.bHide and not IsTabRestricted(tTab) then
 			local hTab = scroll:AppendItemFromIni(INI_PATH, 'Handle_Tab')
 			hTab.szKey = tTab.szKey
 			hTab:Lookup('Text_Tab'):SetText(tTab.szName)
@@ -451,8 +440,8 @@ function D.RedrawTabs(frame, szCategory)
 		end
 	end
 	scroll:FormatAllItemPos()
-	local tWelcomeTab = lodash.find(PANEL_TAB_LIST, function(tTab) return tTab.szCategory == szCategory and tTab.bWelcome and not IsShieldedTab(tTab) end)
-		or lodash.find(PANEL_TAB_LIST, function(tTab) return not tTab.szCategory and tTab.bWelcome and not IsShieldedTab(tTab) end)
+	local tWelcomeTab = lodash.find(PANEL_TAB_LIST, function(tTab) return tTab.szCategory == szCategory and tTab.bWelcome and not IsTabRestricted(tTab) end)
+		or lodash.find(PANEL_TAB_LIST, function(tTab) return not tTab.szCategory and tTab.bWelcome and not IsTabRestricted(tTab) end)
 	if tWelcomeTab then
 		LIB.SwitchTab(tWelcomeTab.szKey)
 	end
