@@ -452,6 +452,7 @@ function D.Reset()
 end
 LIB.RegisterEvent('MY_LIFEBAR_CONFIG_LOADED', D.Reset)
 LIB.RegisterEvent('LOADING_END', D.AutoSwitchSysHeadTop)
+LIB.RegisterEvent('MY_RESTRICTION', D.Reset)
 LIB.RegisterEvent('COINSHOP_ON_CLOSE', D.AutoSwitchSysHeadTop)
 
 do
