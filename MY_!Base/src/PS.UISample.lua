@@ -74,9 +74,11 @@ local COMPONENT_SAMPLE = {
 	-- WndWindow
 }
 
-local PS = {
-	IsShielded = function() return not LIB.IsDebugClient('Dev_UISample') end,
-}
+local PS = {}
+
+function PS.IsRestricted()
+	return not LIB.IsDebugClient('Dev_UISample')
+end
 
 -- PS.OnPanelActive(wnd)
 -- PS.OnPanelResize(wnd)

@@ -187,7 +187,7 @@ end
 ---------------------------------------------------------------------
 local PS = {}
 
-function PS.IsShielded()
+function PS.IsRestricted()
 	return not LIB.IsDebugClient('Dev_UIFindStation')
 end
 

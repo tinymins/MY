@@ -64,50 +64,62 @@ end
 -- 获取功能屏蔽等级
 do
 local DELAY_EVENT = {}
-local SHIELDED_LEVEL = { ['*'] = GLOBAL.GAME_LANG == 'zhcn' and 0 or 1 }
-function LIB.IsShieldedVersion(szKey, nLevel, bSet)
-	if not IsString(szKey) then
-		szKey, nLevel, bSet = '*', szKey, nLevel
+local RESTRICTION = {}
+
+-- 注册功能在不同分支下屏蔽状态
+-- LIB.RegisterRestriction('SomeFunc', { ['*'] = true, intl = false })
+function LIB.RegisterRestriction(szKey, tBranchRestricted)
+	local bShielded = nil
+	if IsTable(tBranchRestricted) then
+		if IsBoolean(tBranchRestricted[GLOBAL.GAME_BRANCH]) then
+			bShielded = tBranchRestricted[GLOBAL.GAME_BRANCH]
+		elseif IsBoolean(tBranchRestricted['*']) then
+			bShielded = tBranchRestricted['*']
+		end
 	end
-	if bSet then
-		-- 通用禁止设为空
-		if szKey == '*' and IsNil(nLevel) then
-			return
-		end
+	if not IsBoolean(bShielded) then
+		return
+	end
+	RESTRICTION[szKey] = bShielded
+end
+
+-- 获取功能在当前分支是否已屏蔽
+-- LIB.IsRestricted('SomeFunc')
+function LIB.IsRestricted(szKey, ...)
+	if select('#', ...) == 1 then
 		-- 设置值
-		if SHIELDED_LEVEL[szKey] == nLevel then
+		local bShielded = ...
+		if not IsNil(bShielded) then
+			bShielded = not not bShielded
+		end
+		if RESTRICTION[szKey] == bShielded then
 			return
 		end
-		SHIELDED_LEVEL[szKey] = nLevel
+		RESTRICTION[szKey] = bShielded
 		-- 发起事件通知
-		local szEvent = NSFormatString('{$NS}#SHIELDED_VERSION')
-		if szKey == '*' or szKey == '!' then
+		local szEvent = NSFormatString('{$NS}.RESTRICTION')
+		if szKey == '!' then
 			for k, _ in pairs(DELAY_EVENT) do
 				LIB.DelayCall(k, false)
 			end
+			DELAY_EVENT = {}
 			szKey = nil
 		else
-			szEvent = szEvent .. '#' .. szKey
+			szEvent = szEvent .. '.' .. szKey
 		end
 		LIB.DelayCall(szEvent, 75, function()
 			if LIB.IsPanelOpened() then
 				LIB.ReopenPanel()
 			end
 			DELAY_EVENT[szEvent] = nil
-			FireUIEvent(NSFormatString('{$NS}_SHIELDED_VERSION'), szKey)
+			FireUIEvent(NSFormatString('{$NS}_RESTRICTION'), szKey)
 		end)
 		DELAY_EVENT[szEvent] = true
 	else
-		if not IsNumber(nLevel) then
-			nLevel = 1
+		if not IsNil(RESTRICTION['!']) then
+			return RESTRICTION['!']
 		end
-		if not IsNil(SHIELDED_LEVEL['!']) then
-			return SHIELDED_LEVEL['!'] < nLevel
-		end
-		if not IsNil(SHIELDED_LEVEL[szKey]) then
-			return SHIELDED_LEVEL[szKey] < nLevel
-		end
-		return SHIELDED_LEVEL['*'] < nLevel
+		return RESTRICTION[szKey] or false
 	end
 end
 end

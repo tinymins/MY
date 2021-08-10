@@ -2308,6 +2308,8 @@ function LIB.GetTargetTarget(object)
 	return LIB.GetTarget(KTar)
 end
 
+LIB.RegisterRestriction('LIB.SET_TARGET', { ['*'] = true, intl = false })
+
 -- 根据 dwType 类型和 dwID 设置目标
 -- (void) LIB.SetTarget([number dwType, ]number dwID)
 -- (void) LIB.SetTarget([number dwType, ]string szName)
@@ -2360,15 +2362,21 @@ function LIB.SetTarget(arg0, arg1)
 		return false
 	end
 	if dwType == TARGET.NPC then
+		if LIB.IsInShieldedMap() and LIB.IsRestricted('LIB.SET_TARGET') then
+			--[[#DEBUG BEGIN]]
+			LIB.Debug('SetTarget', 'Set target to player is forbiden in current map.', DEBUG_LEVEL.WARNING)
+			--[[#DEBUG END]]
+			return false
+		end
 		local npc = GetNpc(dwID)
-		if npc and not npc.IsSelectable() and LIB.IsShieldedVersion('TARGET') then
+		if npc and not npc.IsSelectable() and LIB.IsRestricted('LIB.SET_TARGET') then
 			--[[#DEBUG BEGIN]]
 			LIB.Debug('SetTarget', 'Set target to unselectable npc.', DEBUG_LEVEL.WARNING)
 			--[[#DEBUG END]]
 			return false
 		end
 	elseif dwType == TARGET.DOODAD then
-		if LIB.IsShieldedVersion('TARGET') then
+		if LIB.IsRestricted('LIB.SET_TARGET') then
 			--[[#DEBUG BEGIN]]
 			LIB.Debug('SetTarget', 'Set target to doodad.', DEBUG_LEVEL.WARNING)
 			--[[#DEBUG END]]

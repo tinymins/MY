@@ -352,9 +352,7 @@ local ChatLinkEvents = {
 		elseif IsCtrlKeyDown() then
 			LIB.CopyChatItem(link)
 		elseif IsShiftKeyDown() then
-			if not LIB.IsInShieldedMap() or not LIB.IsShieldedVersion('TARGET') then
-				LIB.SetTarget(TARGET.PLAYER, UI(link):Text())
-			end
+			LIB.SetTarget(TARGET.PLAYER, UI(link):Text())
 		elseif IsAltKeyDown() then
 			if _G.MY_Farbnamen and _G.MY_Farbnamen.Get then
 				local info = _G.MY_Farbnamen.Get((UI(link):Text():gsub('[%[%]]', '')))
@@ -1161,6 +1159,9 @@ function StandardizeParserOptions(parsers)
 end
 end
 
+LIB.RegisterRestriction('LIB.CHAT_CRLF', { ['*'] = true })
+LIB.RegisterRestriction('LIB.CHAT_LEN', { ['*'] = true })
+
 -- 格式化聊天内容
 -- szText        -- 聊天内容，（亦可为兼容 KPlayer.Talk 的 table）
 -- parserOptions -- 解析规则，参见 @parserOptions 定义
@@ -1173,7 +1174,7 @@ local function StandardizeChatData(szText, parserOptions)
 		aSay = {{ type = 'text', text = szText }}
 	end
 	-- 过滤换行符
-	if LIB.IsShieldedVersion('TALK', 2) then
+	if LIB.IsRestricted('LIB.CHAT_CRLF') then
 		for _, v in ipairs(aSay) do
 			if v.text then
 				v.text = wgsub(v.text, '\n', ' ')
@@ -1195,7 +1196,7 @@ local function StandardizeChatData(szText, parserOptions)
 	if parserOptions.sws then
 		aSay = ParseAntiSWS(aSay)
 	end
-	if parserOptions.len and LIB.IsShieldedVersion('TALK') then
+	if parserOptions.len and LIB.IsRestricted('LIB.CHAT_LEN') then
 		local nLen = 0
 		for i, v in ipairs(aSay) do
 			if nLen <= 64 then
