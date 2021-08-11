@@ -824,9 +824,9 @@ function X.GetUserSettings(szKey, ...)
 		if not DATA_CACHE[szKey] then
 			DATA_CACHE[szKey] = {}
 		end
-		DATA_CACHE[szKey][szDataSetKey] = { DATA_CACHE_LEAF_FLAG, res, X.Clone(rec) }
+		DATA_CACHE[szKey][szDataSetKey] = { DATA_CACHE_LEAF_FLAG, res, X.Clone(res) }
 	else
-		DATA_CACHE[szKey] = { DATA_CACHE_LEAF_FLAG, res, X.Clone(rec) }
+		DATA_CACHE[szKey] = { DATA_CACHE_LEAF_FLAG, res, X.Clone(res) }
 	end
 	return res
 end
