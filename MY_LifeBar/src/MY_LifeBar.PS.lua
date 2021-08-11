@@ -524,6 +524,15 @@ function PS.OnPanelActive(wnd)
 								Config[szKey] = tRelationCfg
 							end,
 						},
+						{
+							szOption = _L['Only target'],
+							bCheck = true,
+							bChecked = cfg.Player.bOnlyTarget,
+							fnAction = function()
+								cfg.Player.bOnlyTarget = not cfg.Player.bOnlyTarget
+								Config[szKey] = tRelationCfg
+							end,
+						},
 					})
 				end
 			end
@@ -560,6 +569,15 @@ function PS.OnPanelActive(wnd)
 							bChecked = cfg.Npc.bHideInDungeon,
 							fnAction = function()
 								cfg.Npc.bHideInDungeon = not cfg.Npc.bHideInDungeon
+								Config[szKey] = tRelationCfg
+							end,
+						},
+						{
+							szOption = _L['Only target'],
+							bCheck = true,
+							bChecked = cfg.Npc.bOnlyTarget,
+							fnAction = function()
+								cfg.Npc.bOnlyTarget = not cfg.Npc.bOnlyTarget
 								Config[szKey] = tRelationCfg
 							end,
 						},

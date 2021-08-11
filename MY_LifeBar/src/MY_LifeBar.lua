@@ -51,7 +51,7 @@ function GetConfigValue(key, relation, force)
 	end
 	return value
 end
-function GetConfigComputeValue(key, relation, force, bFight, bPet)
+function GetConfigComputeValue(key, relation, force, bFight, bPet, bCurrentTarget)
 	cfg = GetConfigValue(key, relation, force)
 	if not cfg then
 		return false
@@ -66,6 +66,9 @@ function GetConfigComputeValue(key, relation, force, bFight, bPet)
 		return false
 	end
 	if cfg.bHideInDungeon and bInDungeon then
+		return false
+	end
+	if cfg.bOnlyTarget and not bCurrentTarget then
 		return false
 	end
 	return true
@@ -441,7 +444,7 @@ local function fxDeath(r, g, b, a) return math.ceil(r * 0.4), math.ceil(g * 0.4)
 local function fxDeathTarget(r, g, b, a) return math.ceil(r * 0.45), math.ceil(g * 0.45), math.ceil(b * 0.45), a end
 local lb, info, bVisible, bFight, nDisX, nDisY, nDisZ, fTextScale, dwTarType, dwTarID, relation, force, nPriority, szName, szTongName, r, g, b
 local aCountDown, szCountDown, bPet, bShowName, bShowKungfu, kunfu, bShowTong, bShowTitle, bShowLife, bShowLifePercent, tEffect, fCurrentLife, fMaxLife
-local bSpecialNpcVisible, bShowDistance
+local bSpecialNpcVisible, bShowDistance, bCurrentTarget
 local function IsSpecialNpcVisible(dwID, me, object)
 	if not X.IsBoolean(bSpecialNpcVisible) then
 		bSpecialNpcVisible = false
@@ -467,6 +470,7 @@ function CheckInvalidRect(dwType, dwID, me, object)
 	end
 	bVisible = true
 	bSpecialNpcVisible = nil
+	bCurrentTarget = dwID == dwTarID
 	-- 显示标记判断
 	if bVisible and (dwType == TARGET.NPC or dwType == TARGET.PLAYER) and X.IsIsolated(me) ~= X.IsIsolated(object) then
 		bVisible = false
@@ -504,7 +508,7 @@ function CheckInvalidRect(dwType, dwID, me, object)
 		if Config.bMineOnTop and dwType == TARGET.PLAYER and dwID == me.dwID then -- 自身永远最前
 			nPriority = nPriority + 20000
 		end
-		if Config.bTargetOnTop and dwID == dwTarID then -- 目标永远最前
+		if Config.bTargetOnTop and bCurrentTarget then -- 目标永远最前
 			nPriority = nPriority + 10000
 		end
 		szName = X.GetObjectName(object, (Config.bShowObjectID and (Config.bShowObjectIDOnlyUnnamed and 'auto' or 'always') or 'never'))
@@ -577,7 +581,7 @@ function CheckInvalidRect(dwType, dwID, me, object)
 		end
 		lb:SetCD(szCountDown)
 		-- 名字
-		bShowName = GetConfigComputeValue('ShowName', relation, force, bFight, bPet)
+		bShowName = GetConfigComputeValue('ShowName', relation, force, bFight, bPet, bCurrentTarget)
 		if bShowName and dwType == TARGET.NPC and not object.CanSeeName() then
 			bShowName = IsSpecialNpcVisible(dwID, me, object)
 		end
@@ -597,13 +601,13 @@ function CheckInvalidRect(dwType, dwID, me, object)
 		end
 		lb:SetKungfuVisible(bShowKungfu)
 		-- 距离
-		bShowDistance = Config.bShowDistance and (not Config.bShowDistanceOnlyTarget or dwID == dwTarID)
+		bShowDistance = Config.bShowDistance and (not Config.bShowDistanceOnlyTarget or bCurrentTarget)
 		if bShowDistance then
 			lb:SetDistance(X.GetDistance(object))
 		end
 		lb:SetDistanceVisible(bShowDistance)
 		-- 帮会
-		bShowTong = GetConfigComputeValue('ShowTong', relation, force, bFight, bPet)
+		bShowTong = GetConfigComputeValue('ShowTong', relation, force, bFight, bPet, bCurrentTarget)
 		if bShowTong then
 			szTongName = D.GetTongName(object.dwTongID) or ''
 			if MY_ChatMosaics and MY_ChatMosaics.MosaicsString and szTongName and (dwType == TARGET.PLAYER or bPet) then
@@ -613,7 +617,7 @@ function CheckInvalidRect(dwType, dwID, me, object)
 		end
 		lb:SetTongVisible(bShowTong)
 		-- 称号
-		bShowTitle = GetConfigComputeValue('ShowTitle', relation, force, bFight, bPet)
+		bShowTitle = GetConfigComputeValue('ShowTitle', relation, force, bFight, bPet, bCurrentTarget)
 		if bShowTitle then
 			lb:SetTitle(object.szTitle or '')
 		end
@@ -624,7 +628,7 @@ function CheckInvalidRect(dwType, dwID, me, object)
 			fCurrentLife, fMaxLife = X.GetObjectLife(object)
 		end
 		lb:SetLife(fCurrentLife, fMaxLife)
-		bShowLife = szName ~= '' and GetConfigComputeValue('ShowLife', relation, force, bFight, bPet)
+		bShowLife = szName ~= '' and GetConfigComputeValue('ShowLife', relation, force, bFight, bPet, bCurrentTarget)
 		if bShowLife and dwType == TARGET.NPC and not object.CanSeeLifeBar() then
 			bShowLife = IsSpecialNpcVisible(dwID, me, object)
 		end
@@ -634,7 +638,7 @@ function CheckInvalidRect(dwType, dwID, me, object)
 		end
 		lb:SetLifeBarVisible(bShowLife)
 		-- 血量数值部分
-		bShowLifePercent = GetConfigComputeValue('ShowLifePer', relation, force, bFight, bPet)
+		bShowLifePercent = GetConfigComputeValue('ShowLifePer', relation, force, bFight, bPet, bCurrentTarget)
 		if bShowLifePercent and dwType == TARGET.NPC and not object.CanSeeLifeBar() then
 			bShowLifePercent = IsSpecialNpcVisible(dwID, me, object)
 		end
@@ -654,8 +658,8 @@ function CheckInvalidRect(dwType, dwID, me, object)
 		lb:SetColor(r, g, b, Config.nAlpha)
 		lb:SetColorFx(
 			object.nMoveState == MOVE_STATE.ON_DEATH
-			and (dwID == dwTarID and fxDeathTarget or fxDeath)
-			or (dwID == dwTarID and fxTarget or nil)
+			and (bCurrentTarget and fxDeathTarget or fxDeath)
+			or (bCurrentTarget and fxTarget or nil)
 		)
 		lb:SetFont(Config.nFont)
 		lb:SetTextsPos(Config.nTextOffsetY, Config.nTextLineHeight)

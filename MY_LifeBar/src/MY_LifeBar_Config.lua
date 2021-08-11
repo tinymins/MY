@@ -465,6 +465,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 			bEnable = X.Schema.Boolean,
 			bOnlyFighting = X.Schema.Boolean,
 			bHideInDungeon = X.Schema.Optional(X.Schema.Boolean),
+			bOnlyTarget = X.Schema.Optional(X.Schema.Boolean),
 			bHidePets = X.Schema.Optional(X.Schema.Boolean),
 		})),
 		xDefaultValue = {
@@ -498,6 +499,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 			bEnable = X.Schema.Boolean,
 			bOnlyFighting = X.Schema.Boolean,
 			bHideInDungeon = X.Schema.Optional(X.Schema.Boolean),
+			bOnlyTarget = X.Schema.Optional(X.Schema.Boolean),
 			bHidePets = X.Schema.Optional(X.Schema.Boolean),
 		})),
 		xDefaultValue = {
@@ -519,6 +521,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 			bEnable = X.Schema.Boolean,
 			bOnlyFighting = X.Schema.Boolean,
 			bHideInDungeon = X.Schema.Optional(X.Schema.Boolean),
+			bOnlyTarget = X.Schema.Optional(X.Schema.Boolean),
 			bHidePets = X.Schema.Optional(X.Schema.Boolean),
 		})),
 		xDefaultValue = {
@@ -552,6 +555,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 			bEnable = X.Schema.Boolean,
 			bOnlyFighting = X.Schema.Boolean,
 			bHideInDungeon = X.Schema.Optional(X.Schema.Boolean),
+			bOnlyTarget = X.Schema.Optional(X.Schema.Boolean),
 			bHidePets = X.Schema.Optional(X.Schema.Boolean),
 		})),
 		xDefaultValue = {
@@ -585,6 +589,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 			bEnable = X.Schema.Boolean,
 			bOnlyFighting = X.Schema.Boolean,
 			bHideInDungeon = X.Schema.Optional(X.Schema.Boolean),
+			bOnlyTarget = X.Schema.Optional(X.Schema.Boolean),
 			bHidePets = X.Schema.Optional(X.Schema.Boolean),
 		})),
 		xDefaultValue = {

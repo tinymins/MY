@@ -94,6 +94,7 @@ return {
 
     ['Hide when unfight'] = '脫戰時隱藏',
     ['Hide in dungeon'] = '秘境中隱藏',
+    ['Only target'] = '僅當前目標',
     ['Hide pets'] = '不顯示跟寵',
     ['Hide decimal'] = '不顯示小數',
 
