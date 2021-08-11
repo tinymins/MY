@@ -83,7 +83,7 @@ function X.TrimString(szText)
 end
 
 function X.EncryptString(szText)
-	return szText:gsub('.', function (c) return format ('%02X', (string.byte(c) + 13) % 256) end):gsub(' ', '+')
+	return szText:gsub('.', function (c) return string.format('%02X', (string.byte(c) + 13) % 256) end):gsub(' ', '+')
 end
 
 function X.SimpleEncryptString(szText)
@@ -193,7 +193,7 @@ end
 X.ConvertToAnsi = ConvertToAnsi
 
 local function UrlEncodeString(szText)
-	return szText:gsub('([^0-9a-zA-Z ])', function (c) return format ('%%%02X', string.byte(c)) end):gsub(' ', '+')
+	return szText:gsub('([^0-9a-zA-Z ])', function (c) return string.format('%%%02X', string.byte(c)) end):gsub(' ', '+')
 end
 
 local function UrlDecodeString(szText)
