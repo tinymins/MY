@@ -54,7 +54,7 @@ function PS.OnPanelActive(wnd)
 		oncheck = function(bChecked)
 			if bChecked then
 				local ui = UI(this)
-				LIB.Confirm(_L['Check this will monitor system message for serendipity and share it, are you sure?'], function()
+				X.Confirm(_L['Check this will monitor system message for serendipity and share it, are you sure?'], function()
 					MY_Serendipity.bEnable = bChecked
 					ui:Check(true, WNDEVENT_FIRETYPE.PREVENT)
 				end)
@@ -97,9 +97,9 @@ function PS.OnPanelActive(wnd)
 		tip = _L['Realname, leave blank for anonymous.'],
 		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 		limit = 6,
-		text = LIB.LoadLUAData({'config/realname.jx3dat', PATH_TYPE.ROLE}) or GetClientPlayer().szName:gsub('@.-$', ''),
+		text = X.LoadLUAData({'config/realname.jx3dat', X.PATH_TYPE.ROLE}) or GetClientPlayer().szName:gsub('@.-$', ''),
 		onchange = function(szText)
-			LIB.SaveLUAData({'config/realname.jx3dat', PATH_TYPE.ROLE}, szText)
+			X.SaveLUAData({'config/realname.jx3dat', X.PATH_TYPE.ROLE}, szText)
 		end,
 		autovisible = function() return MY_Serendipity.bAutoShare end,
 		autoenable = function() return MY_Serendipity.bEnable end,
@@ -133,7 +133,7 @@ function PS.OnPanelActive(wnd)
 		name = 'WndButton_SerendipitySearch',
 		text = _L['serendipity'],
 		onclick = function()
-			LIB.OpenBrowser('https://j3cx.com/serendipity')
+			X.OpenBrowser('https://j3cx.com/serendipity')
 		end,
 	}):AutoWidth():Width() + 5
 	-- Êý¾ÝÎ»ÖÃ

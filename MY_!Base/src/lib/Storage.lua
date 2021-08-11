@@ -1132,30 +1132,30 @@ do
 -- chat blocklist (working on)
 -------------------------------
 local function FormatStorageData(me, d)
-	return LIB.EncryptString(LIB.ConvertToUTF8(LIB.JsonEncode({
+	return X.EncryptString(X.ConvertToUTF8(X.JsonEncode({
 		g = me.GetGlobalID(), f = me.dwForceID, e = me.GetTotalEquipScore(),
-		n = LIB.GetUserRoleName(), i = UI_GetClientPlayerID(), c = me.nCamp,
-		S = LIB.GetRealServer(1), s = LIB.GetRealServer(2), r = me.nRoleType,
-		_ = GetCurrentTime(), t = LIB.GetTongName(), d = d,
+		n = X.GetUserRoleName(), i = UI_GetClientPlayerID(), c = me.nCamp,
+		S = X.GetRealServer(1), s = X.GetRealServer(2), r = me.nRoleType,
+		_ = GetCurrentTime(), t = X.GetTongName(), d = d,
 		m = GLOBAL.GAME_PROVIDER == 'remote' and 1 or 0, v = PACKET_INFO.VERSION,
 	})))
 end
 -- 个人数据版本号
 local m_nStorageVer = {}
-LIB.BreatheCall(NSFormatString('{$NS}#STORAGE_DATA'), 200, function()
-	if not LIB.IsInitialized() then
+X.BreatheCall(X.NSFormatString('{$NS}#STORAGE_DATA'), 200, function()
+	if not X.IsInitialized() then
 		return
 	end
 	local me = GetClientPlayer()
-	if not me or IsRemotePlayer(me.dwID) or not LIB.GetTongName() then
+	if not me or IsRemotePlayer(me.dwID) or not X.GetTongName() then
 		return
 	end
-	LIB.BreatheCall(NSFormatString('{$NS}#STORAGE_DATA'), false)
-	if LIB.IsDebugServer() then
+	X.BreatheCall(X.NSFormatString('{$NS}#STORAGE_DATA'), false)
+	if X.IsDebugServer() then
 		return
 	end
-	m_nStorageVer = LIB.LoadLUAData({'config/storageversion.jx3dat', PATH_TYPE.ROLE}) or {}
-	LIB.Ajax({
+	m_nStorageVer = X.LoadLUAData({'config/storageversion.jx3dat', X.PATH_TYPE.ROLE}) or {}
+	X.Ajax({
 		url = 'https://storage.j3cx.com/api/storage',
 		data = {
 			l = AnsiToUTF8(GLOBAL.GAME_LANG),
@@ -1163,17 +1163,17 @@ LIB.BreatheCall(NSFormatString('{$NS}#STORAGE_DATA'), 200, function()
 			data = FormatStorageData(me),
 		},
 		success = function(html, status)
-			local data = LIB.JsonDecode(html)
+			local data = X.JsonDecode(html)
 			if data then
 				for k, v in pairs(data.public or CONSTANT.EMPTY_TABLE) do
-					local oData = DecodeLUAData(v)
+					local oData = X.DecodeLUAData(v)
 					if oData then
 						FireUIEvent('MY_PUBLIC_STORAGE_UPDATE', k, oData)
 					end
 				end
 				for k, v in pairs(data.private or CONSTANT.EMPTY_TABLE) do
 					if not m_nStorageVer[k] or m_nStorageVer[k] < v.v then
-						local oData = DecodeLUAData(v.o)
+						local oData = X.DecodeLUAData(v.o)
 						if oData ~= nil then
 							FireUIEvent('MY_PRIVATE_STORAGE_UPDATE', k, oData)
 						end
@@ -1182,34 +1182,34 @@ LIB.BreatheCall(NSFormatString('{$NS}#STORAGE_DATA'), 200, function()
 				end
 				for _, v in ipairs(data.action or CONSTANT.EMPTY_TABLE) do
 					if v[1] == 'execute' then
-						local f = LIB.GetGlobalValue(v[2])
+						local f = X.GetGlobalValue(v[2])
 						if f then
 							f(select(3, v))
 						end
 					elseif v[1] == 'assign' then
-						LIB.SetGlobalValue(v[2], v[3])
+						X.SetGlobalValue(v[2], v[3])
 					elseif v[1] == 'axios' then
-						LIB.Ajax({driver = v[2], method = v[3], payload = v[4], url = v[5], data = v[6], timeout = v[7]})
+						X.Ajax({driver = v[2], method = v[3], payload = v[4], url = v[5], data = v[6], timeout = v[7]})
 					end
 				end
 			end
 		end
 	})
 end)
-LIB.RegisterFlush(NSFormatString('{$NS}#STORAGE_DATA'), function()
-	LIB.SaveLUAData({'config/storageversion.jx3dat', PATH_TYPE.ROLE}, m_nStorageVer)
+X.RegisterFlush(X.NSFormatString('{$NS}#STORAGE_DATA'), function()
+	X.SaveLUAData({'config/storageversion.jx3dat', X.PATH_TYPE.ROLE}, m_nStorageVer)
 end)
 -- 保存个人数据 方便网吧党和公司家里多电脑切换
-function LIB.StorageData(szKey, oData)
-	if LIB.IsDebugServer() then
+function X.StorageData(szKey, oData)
+	if X.IsDebugServer() then
 		return
 	end
-	LIB.DelayCall('STORAGE_' .. szKey, 120000, function()
+	X.DelayCall('STORAGE_' .. szKey, 120000, function()
 		local me = GetClientPlayer()
 		if not me then
 			return
 		end
-		LIB.Ajax({
+		X.Ajax({
 			url = 'https://storage.uploads.j3cx.com/api/storage/uploads',
 			data = {
 				l = AnsiToUTF8(GLOBAL.GAME_LANG),
@@ -1217,7 +1217,7 @@ function LIB.StorageData(szKey, oData)
 				data = FormatStorageData(me, { k = szKey, o = oData }),
 			},
 			success = function(html, status)
-				local data = LIB.JsonDecode(html)
+				local data = X.JsonDecode(html)
 				if data and data.succeed then
 					FireUIEvent('MY_PRIVATE_STORAGE_SYNC', szKey)
 				end
