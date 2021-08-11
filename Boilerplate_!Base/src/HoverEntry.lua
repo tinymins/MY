@@ -107,11 +107,11 @@ function D.OnFrameDragEnd()
 	O.anchor = GetFrameAnchor(this)
 end
 
-function D.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
-	nX = X
+function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, nLFY)
+	nX = nPaddingX
 	nY = nLFY
 	ui:Append('Text', {
-		x = X - 10, y = nY,
+		x = nPaddingX - 10, y = nY,
 		text = _L['HoverEntry'],
 		color = { 255, 255, 0 },
 	}):AutoWidth()
@@ -147,9 +147,9 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
 		end,
 		autoenable = function() return O.bEnable end,
 	}):AutoWidth():Width() + 5
-	nX, nY = X, nY + 30
+	nX, nY = nPaddingX, nY + 30
 
-	nLFY = nY + LH
+	nLFY = nY + nLH
 	return nX, nY, nLFY
 end
 
