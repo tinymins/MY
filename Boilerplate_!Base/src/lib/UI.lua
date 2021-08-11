@@ -4530,11 +4530,11 @@ function UI.CreateFrame(szName, opt)
 			end
 			frm:Lookup('Btn_Drag').OnDragButton = function()
 				local x, y = Station.GetMessagePos()
-				local W, H = Station.GetClientSize()
-				local X, Y = frm:GetRelPos()
-				local w, h = x - X, y - Y
-				w = math.min(w, W - X) -- frame size should not larger than client size
-				h = math.min(h, H - Y)
+				local nClientW, nClientH = Station.GetClientSize()
+				local nFrameX, nFrameY = frm:GetRelPos()
+				local w, h = x - nFrameX, y - nFrameY
+				w = math.min(w, nClientW - nFrameX) -- frame size should not larger than client size
+				h = math.min(h, nClientH - nFrameY)
 				w = math.max(w, opt.minwidth) -- frame size must larger than setted min size
 				h = math.max(h, opt.minheight)
 				frm:Lookup('Btn_Drag'):SetRelPos(w - 16, h - 16)
