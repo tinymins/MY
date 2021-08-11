@@ -98,6 +98,7 @@ local function LoadUI(ui)
 	ui:Children('#WndCheckBox_ShowSpecialNpcOnlyEnemy'):Check(Config.bShowSpecialNpcOnlyEnemy)
 	ui:Children('#WndCheckBox_ShowKungfu'):Check(Config.bShowKungfu)
 	ui:Children('#WndCheckBox_ShowDistance'):Check(Config.bShowDistance)
+	ui:Children('#WndCheckBox_ShowDistanceOnlyTarget'):Check(Config.bShowDistanceOnlyTarget)
 	ui:Children('#WndCheckBox_ScreenPosSort'):Check(Config.bScreenPosSort)
 	ui:Children('#WndCheckBox_MineOnTop'):Check(Config.bMineOnTop)
 	ui:Children('#WndCheckBox_TargetOnTop'):Check(Config.bTargetOnTop)
@@ -938,7 +939,16 @@ function PS.OnPanelActive(wnd)
 					end,
 				})
 			end
-			return { m }
+			return {
+				m,
+				{
+					szOption = _L['Show distance only target'],
+					bCheck = true, bChecked = Config.bShowDistanceOnlyTarget,
+					fnAction = function()
+						Config.bShowDistanceOnlyTarget = not Config.bShowDistanceOnlyTarget
+					end,
+				},
+			}
 		end,
 		autoenable = function() return D.IsEnabled() end,
 	})

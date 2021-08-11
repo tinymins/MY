@@ -29,7 +29,7 @@ return {
 
     ['Lifebar display config'] = '血條顯示設置',
     ['Player lifebar display'] = '玩家血條顯示',
-    ['Npc lifebar display'] = 'Npc血條顯示',
+    ['Npc lifebar display'] = 'NPC血條顯示',
 
     ['Lifepercentage display config'] = '血量百分比顯示設置',
     ['Player lifepercentage display'] = '玩家百分比顯示',
@@ -83,6 +83,7 @@ return {
     ['Show kungfu'] = '顯示心法',
     ['Show distance'] = '顯示距離',
     ['Decimal number'] = '精確小數點位數',
+    ['Show distance only target'] = '僅顯示當前目標',
 
     ['Neutrality'] = '中立關係',
     ['Enemy'] = '敵對關係',

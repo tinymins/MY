@@ -20,6 +20,7 @@ local __TEMPLATE__ = {
 	bShowObjectIDOnlyUnnamed = true,
 	bShowKungfu = false,
 	bShowDistance = false,
+	bShowDistanceOnlyTarget = false,
 	nDistanceDecimal = 0,
 
 	nLifeWidth = 100,

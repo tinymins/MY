@@ -470,7 +470,7 @@ local function fxDeath(r, g, b, a) return ceil(r * 0.4), ceil(g * 0.4), ceil(b *
 local function fxDeathTarget(r, g, b, a) return ceil(r * 0.45), ceil(g * 0.45), ceil(b * 0.45), a end
 local lb, info, bVisible, bFight, nDisX, nDisY, nDisZ, fTextScale, dwTarType, dwTarID, relation, force, nPriority, szName, szTongName, r, g, b
 local aCountDown, szCountDown, bPet, bShowName, bShowKungfu, kunfu, bShowTong, bShowTitle, bShowLife, bShowLifePercent, tEffect, fCurrentLife, fMaxLife
-local bSpecialNpcVisible
+local bSpecialNpcVisible, bShowDistance
 local function IsSpecialNpcVisible(dwID, me, object)
 	if not IsBoolean(bSpecialNpcVisible) then
 		bSpecialNpcVisible = false
@@ -626,10 +626,11 @@ function CheckInvalidRect(dwType, dwID, me, object)
 		end
 		lb:SetKungfuVisible(bShowKungfu)
 		-- æ‡¿Î
-		if Config.bShowDistance then
+		bShowDistance = Config.bShowDistance and (not Config.bShowDistanceOnlyTarget or dwID == dwTarID)
+		if bShowDistance then
 			lb:SetDistance(LIB.GetDistance(object))
 		end
-		lb:SetDistanceVisible(Config.bShowDistance)
+		lb:SetDistanceVisible(bShowDistance)
 		-- ∞Ôª·
 		bShowTong = GetConfigComputeValue('ShowTong', relation, force, bFight, bPet)
 		if bShowTong then

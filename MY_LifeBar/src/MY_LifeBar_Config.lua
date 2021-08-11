@@ -186,6 +186,12 @@ local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		xSchema = Schema.Boolean,
 		xDefaultValue = false,
 	},
+	bShowDistanceOnlyTarget = {
+		ePathType = PATH_TYPE.ROLE,
+		szLabel = _L[PLUGIN_NAME],
+		xSchema = Schema.Boolean,
+		xDefaultValue = false,
+	},
 	nDistanceDecimal = {
 		ePathType = PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
